@@ -1,0 +1,223 @@
+ add empty checkbox
+ wait until checking with X, commit
+ delete on next commit only, not early
+
+ranger
+	[X] sh: .\w from .bash_alias -> append_unique to ranger/bookmarks
+	[~] Make autochoose color scheme depending on availability of 256-color term
+	[_] Add rename alias to place cursor at '.' to change only name, not extension
+	[X] A+S+Enter and rr -- different color scheme but bold.
+		: Needs bash -i (interactive) to load ranger settings
+	[X] Добавить таки сохранение папок по cd смещённых внутри сабшелла
+	[X] при выходе переход на текущую папку.
+	[_] Синхронизация истории введённых команд при закрытии сабшелла
+		 и история из того шелла из которого мы впервые открыли ранджер
+		 (тобишь добавить её в 'rr' alias)
+	[_] Сбилдить ранжер из сорцов и смержить мои текущие настройки
+		https://github.com/hut/ranger
+
+zsh
+	https://github.com/robbyrussell/oh-my-zsh/wiki/Customization
+	Здесь описано как создавать свой промпт
+		http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/
+	[_] Port cycle-second end prompt ability
+	http://dougblack.io/words/zsh-vi-mode.html
+	https://github.com/hchbaw/opp.zsh
+	http://sourceforge.net/p/zsh/code/ci/master/tree/Completion/Unix/Command/_tmux
+	[_] Find command to copy current command line in xsel for urxvt or zsh
+
+[_] See gittemplate -- что это и зачем
+[_] Make in urxvt ability to open file path in vim
+	So I will be able to open found files by {file, grep, ag} in vim
+		In same or another copy of urxvt
+[_] mpv -- create playlist to open all files in dir
+	http://xpressrazor.wordpress.com/2014/05/04/using-mpv-to-escape-start-and-end-of-videos-like-in-anime-tv-shows-etc/
+
+Deploy:
+	[X] Test on clear vbox snapshot my installation config
+	: Они требуют существенной доработки порядка подгрузки функций
+	: Ведь так получается, что у меня используются симлинки ещё до того, как
+	: они буду проброшены!!!
+	[X] all scripts -- need source funcs, or echoes error msgs, w/o installation
+	[_] Insert vim installation and update check ALSO in vim_install (one-button)
+	[_] Add check into pristine if one of packages not found
+	 then delete it from list and try install again
+	[X] make 'default' full profile, which partially applied for 'guest'
+	[X] your own profiles must distribute through private repos
+	[X] each will source 'default' and others to rewrite only necessary fields
+
+	[_] пароли для dir620 -- profile -- хотя если я всё равно буду подключаться
+		 по SSH -- то проще использовать приватные ключи.
+
+	[X] Names of autopulling repos (like erian) must also be part of profile to hide from society
+
+	[_] Dir with profiles on erian
+	 must make symlink into airy/deploy/profiles to work with it.
+	 But then we will not be able to make erian the part of profile.
+	 And it must be downloaded manually before! airy.
+
+	[X] ALT: source erian profiles
+	: Пусковой скрипт для установки должен находиться в erian: оттуда он будет
+	: клонировать репозиторий в airy, бросать в него симлинк, запускать
+	: инсталляцию системы и в конце концов выполнять функцию по установке
+	: ссылки на репу самого erian.
+	: Then: airy_profiles add to gitignore!
+
+	[_] Erian consists only from docs, profiles
+	[_] Move dev dirs erian -> devq
+
+	[_] Подписать все скрипты и файлики в строке 2
+		# MIT-License (c) 2014 amerlyq@gmail.com
+
+	pristine.sh
+		default set must be small and fast in install, true necessary
+			first launch if don't exist file this script must:
+				dowload it, next -- skip
+					but dld again when added --update or --download
+				compile it, next -- skip
+					recompile only with flag --compile [app name] (concrete or all)
+					: it's long and mustn't be in default
+		script must parse args to be able load profiles
+			insert flag system similar to build-run script
+		empty launch must update installed set of apt-gets groups
+			so you need .cfg file for this (or option with flags in bash_export)
+			wchg line PRISTINE_INSTALLED_GROUPS="${a}w"
+			Simpler: use conf file '.pristine' inside ~/pkg folder
+
+	[X] Сделать скрипт install.sh принимающим target
+	[X] <ALT> Разделить скрипт установки программ на отдельные модули
+	: -- например установка только вима или urxvt итд по target на каждый
+	:  модуль и на каждую связку интеграции (например объединение
+	:  urxvt+vim+tmux) -- это позволит пользователям ставить всё выборочно
+	:  и не обязательно на чистую систему.
+	:  Плюс локализуются изменения, симлинки и конфиги отдельно на каждый
+	:  таргет, а всё общее вынесется в функции. Будет большая модульность.
+
+Сделать отдельный скрипт по манипуляции кучей репозиториев.
+	Клонирование при отсутствии
+	Пул по всем
+		Проверка незакоммиченых изменений, огрызков в стеке,
+		неиндексированых файлов, незапушеных комитов по всем
+		Совместить скрипт с промптом для zsh -- одни и те же функции
+	Back-up:
+		Сделать скрипт, который бы подтаскивал репозитории на указанную
+		букву жёсткого диска. Тоесть по-сути использовать вышеобозначенный
+		скрипт для манипуляции кучей репозиториев. Это позволит сохранять
+		настройки и не зависеть от падающих серверов.
+
+vim
+	[_] BUG: after reloading by ':e' Airline disables, maybe smth also
+		: Bottom bar appear again after insert-mode, upper -- will never
+	Integrate this tips:
+		[_] http://vim.wikia.com/wiki/Replace_a_word_with_yanked_text
+	[X] check AirLineToggle on VBox to meashure CPU loading in the work process
+	 So, it's only a few. 'syntax on' does much more
+	[X] notate surround
+	Change colors of bkgr in ruler, which has ~,+ etc for git
+	[X] make russian autoswitch for all -- not only for latex
+		: I think better is manually choosen formats.
+		: Get the habit comment cpp in english!
+	Color !cat
+		 http://www.vim.org/scripts/script.php?script_id=4325
+	Plugins
+		 https://github.com/fholgado/minibufexpl.vim
+		 https://github.com/chrisbra/Colorizer
+		 http://www.vimpusher.com/
+		 kana/vim-textobj-user
+		 kana/vim-arpeggio
+		 https://github.com/sophacles/vim-processing
+		 https://github.com/vim-scripts/VOoM
+		 https://github.com/h1mesuke/textobj-wiw
+		 https://github.com/h1mesuke/unite-outline/wiki
+		Test and compare with vimoutliner
+		 https://github.com/vimwiki/vimwiki
+	Make-shift-auto
+		 http://www.vim.org/scripts/script.php?script_id=4278
+		 http://tuxion.com/2011/09/30/vim-makeprg.html
+	Info
+		Book about vimscript
+		 http://learnvimscriptthehardway.stevelosh.com/
+		Man (nice)
+		 http://bencrowder.net/files/vim-fu/
+		Tip & tricks, Plugins
+		 http://stevelosh.com/blog/2010/09/coming-home-to-vim/
+		Castings
+		 http://vimcasts.org/
+		 http://lococast.net/
+		 http://vimeo.com/user1690209/videos
+			Shows kun-fu with vim
+		 http://derekwyatt.org/vim/vim-tutorial-videos/
+		Man & tips (>1500)
+		 http://vim.wikia.com/wiki/Category:VimTip
+	Read
+		 http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_%28Part_2%29
+		 http://vim.wikia.com/wiki/Making_a_list_of_numbersj
+	Vim is slow!
+		: Итак, граждане, извиняйте за преувеличивание, товарищ stormblastt
+		: был прав: «скроллит скроллит» - это из-за плагина obviousmode. Он
+		: там имеет autocmd на CursorMoved, и это, конечно, создавало
+		: определенные проблемы. Завтра напишу автору, чтобы написал о лагах
+		: на страничке плагина. Ну, если не напишет, так хоть в курсе будет..
+		: А ещё говорят тормозит cursorline, если её выключить, может станет
+		: лучше.
+	How-to with desc and vimrc
+		http://konishchevdmitry.blogspot.com/2008/07/howto-vim.html
+	Integrate shell
+		http://h0rr0rr-drag0n.blogspot.com/2010/11/shell-vim.html
+	Tips
+		http://uw-freelancer.github.io/blog/vim-vdebug/
+		http://uw-freelancer.github.io/blog/insanely-faster-vim-buffer-switching/
+
+i3
+	[_] fix: make somehow do not wrap left-right containers, sticking to borders
+	 it will help to straight focus into wished window
+	[_] Make autoresizing windows (add resize command to focus)
+	 Principle: when you focus up, it's height increases by some value
+	 when focus down, it will decreses and then the height of bottom window
+	 will be increased (as gradient)
+
+	Think about workflows
+	 One of possible: open all needed windows, tag it and straight-jump.
+	Autorenaming workspaces into
+		#:name_of_focused~all_amount
+		: There are how to do subscription on events in Python
+		:	 https://github.com/ziberna/i3-py
+		: This will help to map empty wksp, chging launch regime on event:
+	Launch on empty desktop
+		Auto enter in this regime
+		Press only one key to launch
+	[_] Layouts
+	[_] Save wksp names in file
+	 (to make it consistent and able to permanent rename through sessions)
+	Fast choose of window, based on [{uio},{jkl},{m,.}] layout (numpad analogue)
+	See forum. There are many interesting things:
+		https://faq.i3wm.org/questions/scope:all/sort:activity-desc/page:2/
+	Plugins
+		https://github.com/enkore/j4-dmenu-desktop
+		https://github.com/proxypoke/quickswitch-for-i3
+	Scratchpad with tiling:
+	: В i3 можно создать воркспейс который небудет видно на панели, но можно
+	: будет перейти на него с помощью хоткея?
+	: Есть одна идея, как это сделать. Суть в том, что можно переместить
+	: воркспейс на несуществующий монитор (тогда он пропадет с панели),
+	: а по хоткею возвращать его на основной, но это немного геморно
+	: - 2 хоткея, один чтобы скрыть воркспейс, один чтобы показать.
+	: но ведь можно сделать один скрипт, который будет тогглить.
+	:
+	:>> Но желание-то ведь создать воркспейс с несколькими плавающими окнами,
+	: которые будут висеть поверх текущего воркспейса! Может, груповое
+	: перемещение на скрытый рабочий стол и обратно?
+	dunst
+		make notifications when marking windows, or see all available marks
+
+
+For my bone:
+	Other args: ${@:3}
+	Example of good git repo with multi-doxygen
+		https://github.com/ValveSoftware/steamos_mesa
+
+TODO
+	Texts dir compare on win, then convert to utf8 on unix and move into lyfa.
+
+Langs
+	https://github.com/BinRoot/Haskell-Data-Analysis-Cookbook.git

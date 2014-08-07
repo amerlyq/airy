@@ -1,0 +1,26 @@
+#!/bin/bash
+
+PREFIX_PATH="${1:-`pwd`}"
+
+C_MEM=$(tput setaf  1)
+C_LOS=$(tput setaf  9)
+C_DIR=$(tput setaf  3)
+C_LIB=$(tput setaf  2)
+# C_ADR=$(tput setaf  0)
+C_FNC=$(tput setaf  7)
+C_RET=$(tput sgr0)
+
+# SED_MEMCHECK="s@Memcheck.*\n.*\n.*\n.*\n.*\nParent PID: [0-9]\+@Memcheck@"
+SED_MEMCHECK="s@\(Memcheck\).*@\\n$C_MEM <\1> $C_RET@"
+SED_LOST="s@\(.*lost.*\)@${C_LOS}\1${C_RET}@"
+SED_ID="s@==[0-9]\+== @@"
+SED_LINE="s@[byat]\{2\} \(.*\)\(0x[0-9a-fA-F]\+:\)\(.*\)@\1${C_FNC}\3${C_RET}@" #${C_ADR}\2
+SED_DIR="s@(${PREFIX_PATH}\(.*:[0-9]\+\))@$C_DIR.\1$C_RET@"
+SED_LIB="s@(in \(/.*\))@$C_LIB\1$C_RET@"
+
+REPLACER="$SED_MEMCHECK;$SED_LOST;$SED_ID;$SED_LINE;$SED_DIR;$SED_LIB"
+
+GR_TEST=".*testing::.*)"
+
+sed -e "$REPLACER" | grep -v "$GR_TEST"
+

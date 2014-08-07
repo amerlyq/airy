@@ -1,0 +1,39 @@
+# vim: ft=sh
+
+# Ручное добавление мультимедиа клавиш -XModmap
+http://www.tux.in.ua/articles/458
+
+#You have to use xmodmap to remap the modifiers. If run without arguments it will show the current modifier mapping:
+xmodmap:  up to 4 keys per modifier, (keycodes in parentheses):
+
+shift       Shift_L (0x32),  Shift_R (0x3e)
+lock        Caps_Lock (0x42)
+control     Control_L (0x25),  Control_R (0x69)
+mod1        Alt_L (0x40),  Alt_R (0x6c),  Meta_L (0xcd)
+mod2        Num_Lock (0x4d)
+mod3
+mod4        Super_L (0x85),  Super_R (0x86),  Super_L (0xce),  Hyper_L (0xcf)
+mod5        ISO_Level3_Shift (0x5c),  Mode_switch (0xcb)
+
+#In my case you might note that mod3 is unused, and Super_R and Super_L are both assigned to mod4.
+#You can now remove the assignment of Super_R to mod4 by
+xmodmap -e 'remove Mod4 = Super_R'
+#and then redefine
+xmodmap -e 'add Mod3 = Super_R'
+
+#This will give you
+xmodmap:  up to 3 keys per modifier, (keycodes in parentheses):
+
+shift       Shift_L (0x32),  Shift_R (0x3e)
+lock        Caps_Lock (0x42)
+control     Control_L (0x25),  Control_R (0x69)
+mod1        Alt_L (0x40),  Alt_R (0x6c),  Meta_L (0xcd)
+mod2        Num_Lock (0x4d)
+mod3        Super_R (0x86)
+mod4        Super_L (0x85),  Super_L (0xce),  Hyper_L (0xcf)
+mod5        ISO_Level3_Shift (0x5c),  Mode_switch (0xcb)
+
+#Then you should be able to use set $mod mod3 in your i3 config to only mean the right super key
+#while preserving the regular function of the left super key for other applications.
+#Of course once you've got it right you might want to add those commands
+#to your ~/.xsession (or create one as outlined in the manpage of i3).

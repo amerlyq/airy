@@ -1,0 +1,17 @@
+sudo apt-get install expect libudev-dev
+
+# sudo apt-add-repository 'ppa:webupd8team/java'
+# apt-get install oracle-java7-installer
+# JAVA_HOME=/usr/lib/jvm/java-7-oracle
+#
+# Launch ./tizen-sdk-ubuntu64-v2.2.71.bin
+#   -> 'Install the new Tizen SDK version'
+#   -> 'SDK Image' {/home/amer/share/Tizen/Images/tizen-sdk-image-2.2.1-ubuntu64.zip}
+
+# sdb needs libudev.so.0
+sudo ln -sfv /lib/x86_64-linux-gnu/libudev.so.1.3.5 /lib/x86_64-linux-gnu/libudev.so.0
+
+#Gaia path dirs
+# export TRUSTZONE_SDK_DIR=/home/surc/Gaia/TZ/trustzone-tee
+# export PATH=$TRUSTZONE_SDK_DIR/toolchain/cortex-cross-tools/bin:$PATH
+# export PATH=$PATH:/home/surc/Tizen/tizen-sdk/tools

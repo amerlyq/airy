@@ -1,0 +1,209 @@
+# SEE: end of file, aliases for filetypes
+### ~/.zshrc configuration file
+## chsh -s $(which zsh)
+# Modified: 29.11.2011 - mseed : http://www.fastlinux.eu
+
+#############
+# VARIABLES #
+#############
+
+#export LANG=en_US.UTF-8
+#export LC_CTYPE=en_US.UTF-8
+#export LC_COLLATE=en_US.UTF-8
+
+export EDITOR="geany"
+export BROWSER="xxxterm"
+export PATH="${PATH}:${HOME}/bin"
+
+#################
+# SHELL OPTIONS #
+#################
+
+## type the name of a directory -> it will become the current directory
+setopt autocd
+
+## lets files beginning with a . be matched without explicitly specifying the dot
+setopt globdots
+
+## spelling correction for executed commands
+setopt correct
+
+## spelling correction for all arguments
+#setopt correctall
+
+## don't beep on errors
+setopt nobeep
+
+#################
+# SHELL HISTORY #
+#################
+
+## location of history
+HISTFILE=~/.zsh_histfile
+
+## number of lines kept in history
+HISTSIZE='40000'
+
+## number of lines saved in the history after logout
+SAVEHIST="${HISTSIZE}"
+
+## prevents the current line from being saved in the history if it is the same as the previous one
+setopt histignoredups
+
+## delete duplicates from history when adding new command
+#setopt histignorealldups
+
+## prevents the current line from being saved if it begins with a space
+setopt histignorespace
+
+## incrementally append history lines
+setopt incappendhistory
+
+##########
+# PROMPT #
+##########
+
+## substitution in the prompt (parameter and arithmetic expansion)
+setopt promptsubst
+
+## Automatic prompt configuration - Prompt Themes
+#autoload -U promptinit
+#promptinit
+#prompt walters
+
+## Manual prompt configuration (Load colors and configure prompt)
+autoload -U colors
+colors
+
+## [user@machine]%             dir[~] jobs[0]
+if [ $(whoami) = "root" ] ; then
+    PROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[red]%}%n%{$reset_color%}%{$fg_bold[white]%}@%{$reset_color%}%{$fg_bold[blue]%}%m%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%}%# "
+    RPROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[blue]%}%~%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%} %{$fg_bold[yellow]%}[%{$reset_color%}%{$fg_bold[yellow]%}%j%{$reset_color%}%{$fg_bold[yellow]%}]%{$reset_color%}"
+else
+    PROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[green]%}%n%{$reset_color%}%{$fg_bold[white]%}@%{$reset_color%}%{$fg_bold[blue]%}%m%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%}%# "
+    RPROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[blue]%}%~%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%} %{$fg_bold[yellow]%}[%{$reset_color%}%{$fg_bold[yellow]%}%j%{$reset_color%}%{$fg_bold[yellow]%}]%{$reset_color%}"
+fi
+
+##################
+# TAB COMPLETION #
+##################
+
+## Initialize completion
+autoload -U compinit
+compinit
+
+## don't cycle completions
+#setopt noautomenu
+
+## compact completion lists
+#setopt listpacked
+
+## show types in completion
+#setopt listtypes
+
+## Take the first part of the path to be exact, and to avoid partial globs.
+## (speedup)
+#zstyle ':completion:*' accept-exact '*(N)'
+
+## Cache for packages, ...
+## (speedup)
+#zstyle ':completion:*' use-cache on
+#zstyle ':completion:*' cache-path ~/.zsh/cache
+
+## all completion have menu
+zstyle ':completion:*:*:*:*:*' menu select
+
+## kill/killall tab completion
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*' force-list always
+
+## Fuzzy matching of completions for when you mistype them
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
+## cd not select parent dir
+#zstyle ':completion:*:cd:*' ignore-parents parent pwd
+
+## completion for pacman (Arch Linux)
+zstyle ':completion:*:pacman:*' force-list always
+zstyle ':completion:*:*:pacman:*' menu yes select
+
+####################
+# JOBS (PROCESSES) #
+####################
+
+## display PID on suspend
+setopt longlistjobs
+
+## alert if something failed
+setopt printexitvalue
+
+## report background processes events immediately
+setopt notify
+
+## report background processes status when closing a shell
+#setopt nocheckjobs
+
+## don't kill background processes when closing a shell
+#setopt nohup
+
+################
+# KEY BINDINGS #
+################
+
+bindkey "^[[7~" beginning-of-line                           # Home
+bindkey "^[[8~" end-of-line                                 # End
+bindkey "^[[3~" delete-char                                 # Del
+bindkey "^[[5~" history-beginning-search-backward           # PageUp
+bindkey "^[[6~" history-beginning-search-forward            # PageDown
+bindkey "^[[A" up-line-or-history                           # Up Arrow
+bindkey "^[[B" down-line-or-history                         # Down Arrow
+bindkey "^[Oc" forward-word                                 # control + right arrow
+bindkey "^[Od" backward-word                                # control + left arrow
+bindkey "^H" backward-kill-word                             # control + backspace
+bindkey "^[[3^" kill-word                                   # control + delete
+bindkey "^R" history-incremental-pattern-search-backward    # control + r
+bindkey "^S" history-incremental-pattern-search-forward     # control + s
+# completion in the middle of a line
+bindkey '^i' expand-or-complete-prefix
+
+###########
+# ALIASES #
+###########
+
+alias ..='cd ..'
+alias ls='ls --color=auto --human-readable --group-directories-first --classify'
+alias lsd='ls -ld *(-/DN)'
+alias lsa='ls -ld .*'
+alias dir='ls -1'
+alias cp='nocorrect cp -iv'     # no spelling correction
+alias mv='nocorrect mv -iv'     # no spelling correction
+alias rm='nocorrect rm -iv'     # no spelling correction
+alias mkdir='nocorrect mkdir'   # no spelling correction
+alias man='nocorrect man'       # no spelling correction
+alias chmod="chmod -c"
+alias chown="chown -c"
+alias grep='grep --colour=auto'
+alias p='ps -A f -o user,pid,priority,ni,pcpu,pmem,args'
+alias mem="free -m"
+alias f='find |grep'
+alias c="clear"
+alias hist="grep '$1' ~/.zsh_histfile"
+alias rcp='rsync -v --progress'
+alias rmv='rsync -v --progress --remove-source-files'
+alias clean='yaourt -Qdt'
+alias cleanpkg='yaourt -Scc'
+
+## Auto extension stuff
+alias -s html=$BROWSER
+alias -s php=$BROWSER
+alias -s png=feh
+alias -s jpg=feh
+alias -s gif=feh
+alias -s xls=libreoffice
+alias -s doc=libreoffice
+alias -s gz='tar -xzvf'
+alias -s bz2='tar -xjvf'
+alias -s txt=$EDITOR
+alias -s PKGBUILD=$EDITOR

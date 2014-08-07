@@ -1,0 +1,2 @@
+rem REG ADD HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v "LiberKey" /t REG_SZ /d "%CD%\LiberKey.exe"
+REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v "LiberKey" /f

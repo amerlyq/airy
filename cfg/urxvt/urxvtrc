@@ -1,0 +1,122 @@
+! vim: ft=xdefaults
+! NOTE: sudo update-alternatives --config x-terminal-emulator
+! NOTE: after changes: xrdb ~/.Xresources
+! FIX:  если будут глюки с цветами в терминале или терминальном виме по сравнению с lxterminal
+!       http://unixforum.org/index.php?showtopic=135828
+
+
+! NOTE: dump all commands with description:
+!urxvt --help 2>&1| sed -n '/:  /s/^ */! URxvt*/gp' >> ~/.urxvtrc_dump
+!TERM=dump command man -Pcat urxvt | sed -n '/depth: b/,/^BA/p'|sed '$d'|sed '/^       [a-z]/s/^ */^/g'|sed -e :a -e 'N;s/\n/@@/g;ta;P;D'|sed 's,\^\([^@]\+\)@*[\t ]*\([^\^]\+\),! \2\n! URxvt*\1\n\n,g'|sed 's,@@\(  \+\),\n\1,g'|sed 's,@*$,,g'|sed '/^[^!]/d'|tr -d "'\`" >> ~/.urxvtrc_dump
+
+
+! General
+! rxvt-256color
+URxvt*termName:         xterm-256color
+URxvt*loginShell:         true
+!URxvt*saveLines:         65535
+!URxvt*override-redirect:false
+! Turn on/off ISO 14755, *5.2 (default enabled)
+URxvt*iso14755:          false
+URxvt*iso14755_52:       false
+! Getting the meta key working normally in vim
+! The xterm equivalent of URxvt.meta8 is !(vt100.metaSendsEscape)
+!URxvt*meta8: true
+URxvt*meta8: false
+! URxvt*modifier: meta
+! Disable screen printing by overriding the default print pipe.
+URxvt*print-pipe:       "cat >/dev/null"
+
+
+
+! Font: bitmap or xft
+!URxvt*font:        -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+!URxvt*boldFont:    -xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*
+!  - use xft for drawing fonts
+! xft:monaco:bold:size=10
+!URxvt*font:       xft:Liberation Mono:size=10
+!URxvt*font:     -*-terminus-*-r-*-*-12-*-*-*-*-*-iso10646-*
+!URxvt.font: xft:Clean:size=12
+!URxvt.font: -*-clean-medium-r-*-*-12-*-*-*-*-*-*-*
+!URxvt*font:  -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+
+!, xft:PowerlineSymbols:style=Medium
+!URxvt*imFont:           xft:DejaVu Sans Mono:regular:pixelsize=14, xft:DejaVu Sans Mono for Powerline:regular:pixelsize=14
+!
+URxvt*font:             xft:PragmataPro:regular:pixelsize=15     , xft:DejaVu Sans Mono:regular:pixelsize=15     , xft:DejaVu Sans Mono for Powerline:regular:pixelsize=15
+URxvt*boldFont:         xft:PragmataPro:bold:pixelsize=15        , xft:DejaVu Sans Mono:bold:pixelsize=15        , xft:DejaVu Sans Mono for Powerline:bold:pixelsize=15
+URxvt*italicFont:       xft:PragmataPro:italic:pixelsize=15      , xft:DejaVu Sans Mono:italic:pixelsize=15      , xft:DejaVu Sans Mono for Powerline:italic:pixelsize=15
+URxvt*bolditalicFont:   xft:PragmataPro:bold:italic:pixelsize=15 , xft:DejaVu Sans Mono:bold:italic:pixelsize=15 , xft:DejaVu Sans Mono for Powerline:bold:italic:pixelsize=15
+
+! Xft (X FreeType) with Bitstream, DejaVu, Liberation, or Terminus fonts:
+!  Fedora/debian packages: libXft/libxft2
+!  An anti-aliased font setup with Xft looks fantastic; it can be a bit choppy
+!  on older systems. You can always turn off anti-aliasing (antialias=false) if
+!  your terminal is sluggish. Use only ONE of the Xft pairs below:
+!
+! Xft: Bitstream fonts
+!  Fedora/debian packages: bitstream-vera-sans-mono-fonts/ttf-bitstream-vera
+!URxvt*font: xft:Bitstream Vera Sans Mono:pixelsize=12:antialias=true:hinting=true
+!URxvt*boldFont: xft:Bitstream Vera Sans Mono:bold:pixelsize=12:antialias=true:hinting=true
+!
+! Xft: DejaVu fonts
+!  Fedora/debian packages: dejavu-sans-mono-fonts/ttf-dejavu
+!URxvt*font: xft:DejaVu Sans Mono:pixelsize=12:antialias=true:hinting=true
+!URxvt*boldFont: xft:DejaVu Sans Mono:bold:pixelsize=12:antialias=true:hinting=true
+!
+! Xft: Liberation fonts
+!  Fedora/debian packages: liberation-mono-fonts/ttf-liberation
+!URxvt*font: xft:Liberation Mono:pixelsize=13:antialias=true:hinting=true
+!URxvt*boldFont: xft:Liberation Mono:bold:pixelsize=13:antialias=true:hinting=true
+!
+! Xft: Terminus fonts
+!  Fedora/debian packages: terminus-fonts/xfonts-terminus
+!URxvt*font: xft:terminus:pixelsize=15
+!URxvt*boldFont: xft:terminus:bold:pixelsize=15
+
+! Traditional fonts - a more traditional font setup in lieu of xft
+!URxvt*font:-*-courier-medium-r-normal-*-14-*-*-*-*-*-iso8859-1
+!URxvt*boldFont:-*-courier-bold-r-normal-*-14-*-*-*-*-*-iso8859-1
+
+
+URxvt*letterSpace:      -1
+URxvt*cutchars:`"'&()URxvt*,;<=>?@[]{|}$'"`
+
+! Shading - 0 to 99 darkens, 101 to 200 lightens.
+! Dont use with tintColor; just use a darker or lighter color instead.
+URxvt*transparent:          true
+URxvt*shading:              25
+! Tint with any color; some nice listings are at:
+!  http://www.nisrv.com/drupal/?q=node/11
+!  http://www.htmlgoodies.com/tutorials/colors/article.php/3478921
+! blue, red, tomato4, olivedrab2, etc.
+! - You can't use the colors "white" or "black" as tinting colors; in terms of tinting they equal "none" and you'll
+! get no tint.
+! - Tinting with gray(s) is equivalent to shading; use the Shading option instead.
+!URxvt*tintColor: olivedrab2
+
+
+! Cursor
+URxvt*cursorColor:          #DCDCCC
+URxvt*cursorBlink:          false
+URxvt*cursorUnderline:      false
+URxvt*urgentOnBell:         true
+
+! Scrollbar: style - rxvt (default), plain, next, or xterm
+URxvt*scrollBar:            false
+URxvt*secondaryScroll:      true
+URxvt*scrollBar_right:      false
+URxvt*scrollstyle:          rxvt
+! Makes it possible, to scroll manually on output
+URxvt*scrollTtyOutput:      false
+URxvt*scrollWithBuffer:     true
+URxvt*scrollTtyKeypress:    true
+! Need false to override floating regime in i3wm
+URxvt*borderLess:           false
+URxvt*internalBorder:       0
+URxvt*externalBorder:       0
+
+! Colors
+! For match bold colors 0-7 with colors of normal font (false)
+URxvt.intensityStyles:      false
+

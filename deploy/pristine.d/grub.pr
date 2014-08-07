@@ -1,0 +1,10 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# Grub Customize
+
+ppa_add 'ppa:danielrichter2007/grub-customizer'
+# grub-customizer # To change boot order, time and boot-wallpaper
+
+apt_noprompt grub-customizer

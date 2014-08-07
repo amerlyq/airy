@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# override system-wide configuration specified by X configuration files.
+# /etc/X11/xorg.conf.d/10-keyboard.conf
+# https://wiki.archlinux.org/index.php/Keyboard_configuration_in_Xorg#Using_X_configuration_files
+
+
+# SOLUTION: bind instead of bindsym in i3conf, need generate conf by script
+
+## Script to change language
+#   L1="us"
+#   L2="ru"
+#
+#   if [ -z $1 ] ; then
+#       LG=$(setxkbmap -query | awk '/layout/{print $2}')
+#
+#       if [ $LG = $L1 ] ; then
+#           LG=$L2
+#       else
+#           LG=$L1
+#       fi
+#   else
+#       LG=$1
+#   fi
+#   setxkbmap -layout $LG
+
+# Group switcher
+#if setxkbmap -query | grep -q lang1,lang2 ; then
+#    setxkbmap -model acer_laptop -layout lang3,lang4 -variant , ;
+#else
+#    setxkbmap -model acer_laptop -layout lang1,lang2 -variant , ;
+#fi
+
+# http://madduck.net/docs/extending-xkb/
+
+# WANT: Caps->Ctrl, Alt_L->Win, Win->Alt_L, Ctrl-> ?
+
+# Full list of available _toggle_ keys for layout change
+#grep "grp:.*_toggle" /usr/share/X11/xkb/rules/base.lst
+# Remapping  list of predefined remapping options
+# /usr/share/X11/xkb/rules/evdev.lst
+#
+# altwin:swap_lalt_lwin -- for some reason don't work
+# compose:menu -- don't work in vbox 'cause of my remapping Host->Application
+# it has sense, to remap ralt->menu, cause on laptop no rwin and after alt->win there will be no raltGr
+
+setxkbmap -option "" -option "altwin:swap_alt_win, ctrl:nocaps, compose:menu"
+setxkbmap -layout "us,ru,ua" -option "grp:ctrls_toggle"
+
+[ -f ~/.Xresources ] && xrdb ~/.Xresources
+#[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults
+
+# NOTE: for vim mapping  caps:escape is less practical then mapping ctrl:nocaps,
+#       in english caps+[ works fine, but there will be problems with russian...
+#       which finely solves by mapping in russian inoremap ctrl+x <Esc>
+
+# To see current mapping:
+#$ xmodmap

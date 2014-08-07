@@ -1,0 +1,43 @@
+#!/bin/sh
+# vim: ft=sh
+# Executed by startx (run your WM from here)
+
+# if [ $(which kbdd) ]
+# then
+#     pgrep kbdd || kbdd
+# fi
+#
+# [ -f .gnupg/gpg-agent.env ] && . .gnupg/gpg-agent.env
+# GPG_AGENT=$( echo ${GPG_AGENT_INFO:-0} | cut -d: -f1 )
+#
+# if [ -e $GPG_AGENT ]
+# then
+#     export GPG_AGENT_INFO
+#     export SSH_AUTH_SOCK
+#     export SSH_AGENT_PID
+# else
+#     eval $(gpg-agent --write-env-file ${HOME}/.gnupg/gpg-agent.env --enable-ssh-support --daemon )
+# fi
+
+
+# Last command in script -- launch wm
+# Place this in .xinitrc (chmod +x) in case of direct launch in login mgr or old version of SLiM (before 1.3.6)
+# Otherwise see https://wiki.archlinux.org/index.php/SLiM
+
+# Launch daemons (all them end with &)
+# xscreensaver -no-splash &
+# xsetroot -cursor_name left_ptr &
+# sh ~/.fehbg &
+
+# DEFAULTSESSION=i3
+# case "$1" in
+#     i3) echo "Starting at $(date)" >> ~/.cache/i3.log 2>&1
+#         exec i3 -V -d all >> ~/.cache/i3.log 2>&1
+#         ;;
+#     lxde) exec lxsession ;;
+#     default) exec $DEFAULTSESSION ;;
+#     *) exec $1 ;; # unknown session name -- try run it as command
+# esac
+
+#exec lxsession
+

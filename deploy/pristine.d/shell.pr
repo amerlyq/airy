@@ -1,0 +1,13 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# Main shell apps
+
+LST="$LST mc xsel rxvt-unicode-256color tmux htop p7zip-full unrar"
+# urxvt | fast terminal, allowing vim-like tabs, show pictures in w3m browser
+# tmux  | multi-window customizable terminal with vi navigation, useful for SSH connections
+# uget  | download manager, symbiont for flashgot
+# xsel  | clipboard tool for rxvt extensions
+
+apt_noprompt $LST

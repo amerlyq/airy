@@ -1,0 +1,208 @@
+a.vim			40%
+	" Switch [c,cpp,cxx,cc] <-> [h,hpp]
+	A switches to the header file corresponding to
+	the current file being edited (or vise versa)
+	:AS splits and switches
+	::AV vertical splits and switches
+	:AT new tab and switches
+	::AN cycles through matches
+	:IH switches to file under cursor
+	::IHS splits and switches
+	:IHV vertical splits and switches
+	::IHT new tab and switches
+	:IHN cycles through matches
+	:<Leader>ih switches to file under cursor
+	:<Leader>is switches to the alternate file of file under cursor (e.g. on
+	:<foo.h> switches to foo.cpp)
+	:<Leader>ihn cycles through matches
+
+ag
+	> :Ag, :AgAdd, :LAg, and :LAgAdd
+	< :Ag [options] {pattern} [{directory}]
+	:Ag '\\\#define foo'   --- escaping of '#'
+	In the quickfix window, you can use:
+	| e  | to open file and close the quickfix window
+	| o  | to open (same as enter)
+	| go | to preview file (open but maintain focus on ag.vim results)
+	| t  | to open in new tab
+	| T  | to open in new tab silently
+	| h  | to open in horizontal split
+	| H  | to open in horizontal split silently
+	| v  | to open in vertical split
+	| gv | to open in vertical split silently
+	| q  | to close the quickfix window
+
+neobundle		100%
+:NeoBundleSource [{name}...]  |  forced source appropriate NeoBundleLazy
+:NeoBundleDisable {name}...	  | prevent loading (specify before loading bundles)
+:NeoBundleCheckUpdate
+:NeoBundleClearCache		| use after each vimrc changes and re-enter vim
+	gui|terminal : 0|1
+	 If set 1, neobundle will only load the plugin in GUI/CLI Vim.
+
+	hooks			(Dictionary)
+	 Specify hook functions or hook script path. The following
+
+
+
+
+tabular			100%
+; :Tab[ularize] /|		# alignment (smart area)	|_,_,_...|
+; :Tab /,/r0			# padding					[lrc][0-9]+
+; :Tab /,/r1c1l0		# cycling for grid			|1,2,3,1,...|
+; :Tab /:\zs			# align on first :space: after ':'
+; :Tab /^[^,]*\zs,/r0l0	# affects only first comma	|_,...|
+	: Line-begin with all non-comma chars up to the first comma,
+	: and then forgets about what it matched so far and
+	: pretends that the match starts exactly at the comma.
+
+	Auto-alignment in insert-mode for table on certain char (like '|')
+	 http://vimcasts.org/episodes/aligning-text-with-tabular-vim/
+
+	Exists: :AddTabular[Pattern,Pipeline][!]
+	: assignment, two_spaces, multiple_spaces, argument_list,
+	: split_declaration, ternary operator, cpp_io, trailing_c_comments
+	My:
+	: first_comma, asterisk, remove_lead_spaces
+
+tagbar			5%
+
+vimfiler		40%
+	Normal mode default mappings.
+	<Tab> (default)
+				switch_to_another_vimfiler
+	<Tab> (enabled "no-quit" and "split" options)
+				switch_to_other_window
+	j			loop_cursor_down
+	k			loop_cursor_up
+	gg			cursor_top
+	<C-l>		redraw_screen
+	<Space>		toggle_mark_current_line
+	<S-LM>		toggle_mark_current_line
+	<S-Space>	toggle_mark_current_line_up
+	*			toggle_mark_all_lines
+	&			mark_similar_lines
+	U			clear_mark_all_lines
+	c			copy_file
+	m			move_file
+	d			delete_file
+	Cc			clipboard_copy_file
+	Cm			clipboard_move_file
+	Cp			clipboard_paste
+	r			rename_file
+	K			make_directory
+	N			new_file
+	<Enter>		execute
+	l			smart_l
+	x			execute_system_associated
+	h			smart_h
+	L			switch_to_drive
+	~			switch_to_home_directory
+	\			switch_to_root_directory
+	&			switch_to_project_directory
+	<C-j>		switch_to_history_directory
+	<BS>		switch_to_parent_directory
+	.			toggle_visible_ignore_files
+	H			popup_shell
+	e			edit_file
+	E			split_edit_file
+	B			edit_binary_file
+	ge			execute_external_filer
+	<RM>		execute_external_filer
+	!			execute_shell_command
+	q			hide
+	Q			exit
+	-			close
+	?			help
+	v			preview_file
+	o			sync_with_current_vimfiler
+	O			open_file_in_another_vimfiler
+	<C-g>		print_filename
+	g<C-g>		toggle_maximize_window
+	yy			yank_full_path
+	M			set_current_mask
+	gr			grep
+	gf			find
+	S			select_sort_type
+	<C-v>		switch_vim_buffer_mode
+	gc			cd_vim_current_dir
+	gs			toggle_safe_mode
+	gS			toggle_simple_mode
+	a			choose_action
+	Y			pushd
+	P			popd
+	t			expand_tree
+	T			expand_tree_recursive
+	I			cd_input_directory
+	<2-LM>		double_click
+	gj			jump_last_child
+	gk			jump_first_child
+
+	<Space>		toggle_mark_selected_lines
+
+vim-indent-guides	100%
+vim-startify		100%
+
+vim-surround		100%
+< targets are similar to vim_objects
+	ds["'([{t]  | deletes differens b/w inner and a'nner obj
+	 (123+4*56)/2              ds)         123+456/2
+	cs[...wW][...)]}] | replace  surr, adding spaces if closing brack
+	 (123+4*56)/2              cs)[        [ 123+456 ]/2
+	cst<new tag>   | replace tag
+	 <div>Yo!*</div>           cst<p>      <p>Yo!</p>
+	 : You may specify attributes here and they will be stripped from the closing tag.
+	ysiw)
+	csbs | removing parentheses from a function call
+	v...S[..]  |
+	 In linewise visual mode, the surroundings are placed on separate lines
+	 and indented.  In blockwise visual mode, each line is surrounded.
+	v...gS[..]
+	 In linewise visual mode, the automatic indenting is suppressed.  In
+	 blockwise visual mode, this enables surrounding past the end of the line
+	yss
+	 Hello w*orld!         yssB            {Hello world!}
+	ySS		|  Wraps line and indent (like C++ function body)
+	<C-G>S or <C-S> | Works in insert mode
+	<C-}> (which is really <C-]>) adds braces on lines separate from the content.
+	Targets:
+		[ ([{< ] and [ )]}> ] whitespaces trimmed/not
+		[ bBra ] are aliases for [ )}]> ]
+		[ '"` ] searched only on current line
+		[ twWsp ] are [tag,word,WORD,sentence,paragraph]
+		 for 'p' newlines smtimes added/removed
+
+vimoutliner			95%
+> investigate scripts export!
+	Objects : ; | < > Space :Space,
+	Subheaders in block
+		<Head-1
+		< line1
+		< line2
+		<Head-2
+		< line1
+		< line2
+	View
+		| ,,[1..9,0] | set foldlevel=[0..9, inf]
+	Insert
+		| ,,-     | Insert dashed line
+		| ,,[tTt] | Append/prepend/insert time (HH:MM:SS)
+		| ,,[dDd] | Append/prepend/insert date (YYYY-MM-DD)
+	Checkbox
+		| ,,cb | Insert a check box on the current line/range
+		| ,,cx | Toggle check box state (percentage aware)
+		| ,,cd | Delete check boxes
+		| ,,c% | Create a check box with percentage placeholder
+		| ,,cp | Create a check box with percentage placeholder on all headings
+		| ,,cz | Compute completion for the tree below the current heading.
+	Action
+		| ,,w | Save changes and return to insert mode
+		| ,,e | Execute tag under cursor :: Some description _exe_ ls ~
+		| ,,f | Directory listing of the current directory
+		| gq  | Reformat block to width of 78
+		| ,,[sS] | Sort sub-tree under cursor [a/de]scending
+		| ,,[bB] | Make body text start with a [colon+/]space
+		| ,,[hH] | [/Manual] Hoisting
+		| >>,<<  | Demote/promote headline
+	Std
+		| z[coO] | [collapse/expand lvl 1,all] a tree

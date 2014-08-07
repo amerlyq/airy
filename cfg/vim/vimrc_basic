@@ -1,0 +1,20 @@
+set nocompatible
+set encoding=utf-8
+
+if has("unix")
+    language messages C
+else "elseif
+	language messages en_US.UTF-8 "C, en, en_US, en_US.UTF-8
+	"set langmenu=en_US.UTF-8
+	set lines=32
+	set columns=112
+endif
+
+set fileencodings=utf-8,cp1251,cp866
+" delegate configuration to files in config/
+"runtime! config/**/*.vim
+
+augroup vimrc
+  au BufReadPre * setlocal foldmethod=indent
+  au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+augroup END

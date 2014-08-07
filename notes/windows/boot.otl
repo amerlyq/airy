@@ -1,0 +1,28 @@
+Links
+	http://rufus.akeo.ie/
+Format
+	diskpart
+	list disk
+	select disk 'N'
+	list partition
+	select partition 'M'
+	> Please be careful using the select command
+	 (so you don’t select and format your hard disk instead)
+	clean
+	create partition primary
+	active
+	format fs=fat32 quick
+	assign
+	exit
+
+Create Win7 boot installer on HDD
+	Mount flashdrive to G:
+	 PowerISO, DaemonTool
+	Mount Win7.iso to F:
+		F:
+		cd boot
+		bootsect.exe /nt60 G:
+		xcopy f:\*.* g: /e /f /h
+
+“DEL” or “F2″ key when the computer power
+

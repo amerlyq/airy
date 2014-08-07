@@ -1,0 +1,15 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# Vim
+
+LST="$LST vim vim-gtk"
+LST="$LST libclang-dev exuberant-ctags python-dev silversearcher-ag"
+LST="$LST graphviz imagemagick libmagick++-dev"
+# for vimoutliner export in mindmap
+
+# libclang-dev exuberant-ctags python-dev   | for autocompleter in vim
+# silversearcher-ag                         | 'ag' instead of 'grep' inside of git project -- very best!
+
+apt_noprompt $LST

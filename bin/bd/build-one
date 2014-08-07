@@ -1,0 +1,5 @@
+#!/bin/sh
+SRC="$1"
+NM="${SRC%.*}"
+
+g++ -O -g -Wall "$SRC" -o "$NM" -lX11

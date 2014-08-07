@@ -1,0 +1,107 @@
+! NOTE, after changes: xrdb ~/.Xresources
+
+! Normal colors
+! color0    BLACK
+! color1    red
+! color2    green
+! color3    yellow
+! color4    blue (синий)
+! color5    purple (фиолетовый)
+! color6    cyan (голубой)
+! color7    white
+
+urxvt*color0:    #000000
+urxvt*color1:    #C00000
+urxvt*color2:    #00C000
+urxvt*color3:    #C0C000
+urxvt*color4:    #0C00C0
+urxvt*color5:    #AA00AA
+urxvt*color6:    #00AAAA
+urxvt*color7:    #FFFFFF
+
+! Light colors
+! color8    darkgray
+! color9    red
+! color10    green
+! color11    yellow
+! color12    blue (синий)
+! color13    purple (фиолетовый)
+! color14    cyan (голубой)
+! color15    lightgray
+
+urxvt*color8:    #212121
+urxvt*color9:    #FF8080
+urxvt*color10:    #80FF80
+urxvt*color11:    #FFFF88
+urxvt*color12:    #99CCFF
+urxvt*color13:    #B14CC2
+urxvt*color14:    #9BFFFF
+urxvt*color15:    #D0D0D0
+
+! цвет фона и текста
+URxvt*background: #101010
+URxvt*foreground: #D0D0D0
+
+URxvt*saveLines: 3000
+
+!! геометрия (позиция, размер) окна (в символах). Стандартный размер: 80x24, увеличено для использования табов
+!! URxvt.geometry: 80x40
+!! используемый шрифт
+!! URxvt.font: xft:Ubuntu-10,xft:Monospace
+!! URxvt.font: xft:Ubuntu-10
+!! URxvt*font:xft:Monospace:pixelsize=10
+!! URxvt.font: Terminus-20
+!! иконка для иксов
+!URxvt*iconFile: /usr/share/pixmaps/urxvt_32x32.xpm
+!! расстояние между строками
+!URxvt.lineSpace: 0
+!! между символами
+!URxvt.letterSpace: -1
+!! цвет фона
+!URxvt.background: #000000
+!! цвет переднего плана
+!URxvt.foreground: #f6f3e8
+!! процент "гашения" цвета текста в неактивном окне
+!URxvt.fading: 40
+!!  уменьшение (-100 .. -1) или увеличение (0 .. 100) яркости прозрачного фона
+!URxvt.shading: 100
+!! Псевдопрозрачность
+!URxvt.transparent: true
+!URxvt*shading: 30
+!! Цвет "гашения" текста
+!URxvt.fadeColor: #666666
+!! Цвет окрашивания прозрачного фона
+!!URxvt.tintColor: #354040
+!! стиль скроллбара
+!URxvt.scrollstyle: plain
+!! цвет скроллера
+!URxvt.scrollColor: #1A1A1A
+!! цвет основной части скролл-бара
+!!URxvt.troughColor: #1A1A1A
+!! скроллбар
+!URxvt.scrollBar: true
+!! прокрутка при выводе текста
+!URxvt*scrollTtyOutput: False
+!! прокрутка по нажатию клавиши
+!URxvt*scrollTtyKeypress: True
+!URxvt*scrollWithBuffer: True
+!URxvt*secondaryScroll: True
+!! расположение скроллбара
+!URxvt.scrollBar_right: false
+!URxvt.scrollBar_floating: true
+!! Мерцание курсора
+!URxvt.cursorBlink: false
+!
+!! регексп для ссылок:
+!URxvt.matcher.pattern.0:  (?:https?:\\/\\/|ftp:\\/\\/|news:\\/\\/|mailto:|file:\\/\\/|\\bwww\\.)\n\
+!                           [a-zA-Z0-9\\x{0410}-\\x{044F}\\-\\@;\\/?:&=%\\$_.+!*\\x27,~#]*\n\
+!                           (\n\
+!                             \\([a-zA-Z0-9\\x{0410}-\\x{044F}\\-\\@;\\/?:&=%\\$_.+!*\\x27,~#]*\\)| # Allow a pair of matched parentheses\n\
+!                             [a-zA-Z0-9\\x{0410}-\\x{044F}\\-\\@;\\/?:&=%\\$_+*~]  # exclude some trailing characters (heuristic)\n\
+!                           )+
+
+!! цвета табов (настройка для прозрачных терминалов)
+!! URxvt.tabbar-fg: 2
+!! URxvt.tabbar-bg: -1
+!! URxvt.tab-fg: 7
+!! URxvt.tab-bg: -1

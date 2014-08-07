@@ -1,0 +1,42 @@
+Config { lowerOnStart = True
+       , hideOnStart  = False
+       , persistent   = False
+       , font         = "xft:PragmataPro"
+       , border       = NoBorder
+       , borderColor  = "#ff0000"
+       , bgColor      = "#1b1d1e"
+       , fgColor      = "#a0a0a0"
+       , position     = Bottom
+       , commands     = [ Run Network "eth0"
+                            [ "--Low", "0"
+                            , "--High", "32"
+                            , "--normal", "#a0a0a0"
+                            , "--high"  , "#ff5995"
+                            , "--template", "<fc=#ccccc6>net:</fc> <rx>KB/<tx>KB"
+                            ]
+                            10
+                        , Run Memory
+                            [ "--Low", "10"
+                            , "--High", "66"
+                            , "--normal", "#a0a0a0"
+                            , "--high", "#ff5995"
+                            , "--template", "<fc=#ccccc6>mem:</fc> <usedratio>%"]
+                            10
+                        , Run Cpu
+                            [ "--Low", "6"
+                            , "--High", "50"
+                            , "--normal", "#b6e354"
+                            , "--high"  , "#ff5995"
+                            , "--template", "<fc=#ccccc6>cpu:</fc> <total>%"
+                            ]
+                            10
+                        , Run Date "%H:%M" "date" 10
+                        , Run Kbd []
+                        , Run StdinReader
+                        ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%StdinReader%}{%cpu% <fc=#fd971f></fc> %memory% <fc=#fd971f></fc> %eth0% <fc=#fd971f>%date% </fc><fc=#1b1d1e,#fd971f> %kbd% </fc>"
+       }
+
+-- vim: filetype=haskell

@@ -1,0 +1,10 @@
+; :vimgrep "pattern" ~/trunk/**/*.py
+; :copen 20
+
+; grep -IirlZ "pattern" .|xargs -0 vim
+	-I: ignore binary
+	-i: ignore case
+	-r: recursive
+	-l: print file name only
+	-Z: print \0 after each file name
+

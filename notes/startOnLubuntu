@@ -1,0 +1,107 @@
+exec --no-startup-id  lxsession -s Lubuntu -e LXDE
+
+Update: The above method to run i3 on Lubuntu works, but it is not the only way. This is how the process tree looks with the above method:
+
+init
+...
+  ├─lightdm
+  │   ├─Xorg -core :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+  │   │   └─{Xorg}
+  │   ├─lightdm --session-child 12 85
+  │   │   ├─i3
+...
+  │   │   └─{lightdm}
+  │   └─2*[{lightdm}]
+  ├─lxsession -s Lubuntu -e LXDE
+...
+  │   ├─lxpanel --profile Lubuntu
+  │   │   └─4*[{lxpanel}]
+...
+  │   └─3*[{lxsession}]
+...
+
+There are four different methods to run i3 in Lubuntu:
+
+    Start i3 by selecting it at login, and do not start lxsession from i3. This method works ok, but but as soon as you want to use something that relies on freedesktop features, such as polkit, they fail. Getting this configuration to work in all cases is too much evolved.
+    Same as above, but start lxsession from i3 config file. This is what I showed in the original post. I used lxsession with same session id as Lubuntu uses. This has the benefit of sharing some of configuration, but on the other hand you cannot customize the lxsession for i3 alone.
+    Same as above, start i3, and start lxsession from i3 but give to lxsession another new session id and configure it. This method I did not test, but it should work same the one above. I tested the new lxsession id with the next method.
+    Start an lxsession with a new session id, but tell lxsession to use i3 and not Openbox. This method works better in my opinion and I will explain it next.
+
+This is what process tree we will achieve for the last method:
+
+init
+  │
+...
+  ├─lightdm
+  │   ├─Xorg -core :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+  │   │   └─{Xorg}
+  │   ├─lightdm --session-child 12 79
+  │   │   ├─lxsession -s i3Lubuntu -e LXDE
+  │   │   │   ├─i3 -c /home/user/.i3/configlx
+  │   │   │   ├─pcmanfm --desktop --profile lubuntu
+  │   │   │   │   └─2*[{pcmanfm}]
+...
+  │   │   │   └─2*[{lxsession}]
+  │   │   └─{lightdm}
+  │   └─2*[{lightdm}]
+...
+
+The benefit of this approach is that we reuse lxsession as foreseen in LXDE to start the window manager (and not vice-versa). We reuse also the usual Lubuntu lxsession autostart functionality and do not need to rely on i3 exec more than it is necessary. We can also easy choose whether we want a lxpanel or not.
+
+To create a new lightdm login session configuration, I created in /usr/share/xsessions a new file called i3Lubuntu.desktop with this content:
+
+[Desktop Entry]
+Name=i3Lubuntu
+Comment=i3Lubuntu
+Exec=/usr/bin/lxsession -s i3Lubuntu -e LXDE
+Type=Application
+
+Then in /etc/xdg/lxsession I made a copy of the existing Lubuntu folder, naming it i3Lubuntu (see http://wiki.lxde.org/en/LXSession#Configuration_files).
+
+I edited first the desktop.conf in the new folder and replaced openbox with i3 and left panel command empty as I do not want to use the lxpanel.
+
+windows_manager/command=i3
+windows_manager/session=i3Lubuntu
+windows_manager/extras=
+
+panel/command=
+panel/session=
+
+After this, the new i3Lubuntu entry is available for selection at Lubuntu lighdm login screen. The lxsession fails, however, to start i3 like this for some reason, unknown to me as of now. To fix that, I added in /etc/xdg/lxsession/i3Lubuntu/autostart:
+
+@/usr/bin/i3
+
+I found out that once you login using i3Lubuntu the settings from /etc/xdg/lxsession/i3Lubuntu/ are no more used. Instead a copy of them in ~/.config/lxsession/i3Lubuntu is used. So if you want to some changes after the first login, you have to do them in ~/.config/lxsession/i3Lubuntu folder.
+
+This setup worked (I had to comment starting of lxsession in ~/.i3/config to test). That is lightdm starts lxsession, and lxsession starts i3, as part of its autostart. i3 can additionally start other stuff if needed using exec in its ~/.i3/config file.
+
+To make this finally work, some changes in ~/.i3/config shown above are needed. I made a copy of ~/.i3/config as ~/.i3/configlx and changed ~/.config/lxsession/i3Lubuntu/autostart to pass the alternative config to i3:
+
+@/usr/bin/i3 -c /home/user/.i3/configlx
+
+The first thing to configure in i3, as I already mentioned, is not to start lxsession from ~/.i3/configlx. For my first monitor i3bar I commented out #tray_output none as I want the tray icons show up there, given I am not using lxpanel in this configuration.
+
+Given i3 is started from lxsession, simply killing i3 does not exit the lxsession. This means i3-msg exit does not work in the scenario. To fix that in ~/.i3/configlx I changed:
+
+#bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'kill -15 $_LXSESSION_PID'"
+
+The i3exit bash script is also affected, so I copied it as i3exitlx and replaced there too i3-msg exit with kill -15 $_LXSESSION_PID (note if kill -15 does not work for you, use kill -9). Then I referred i3exitlx in ~/.i3/configlx.
+
+To easy handle moving of pcmanfm desktop windows I found out these i3 useful commands (I wanted to filter first by class rather by title, but then pcmanfm windows end on workspace 3):
+
+bindsym $mod+F1 [title="(?i)pcmanfm"] move workspace current
+bindsym $mod+F2 [title="(?i)pcmanfm"] move workspace 3
+for_window [title="(?i)pcmanfm"] move container to workspace 3
+workspace_auto_back_and_forth yes
+bindsym $mod+m move workspace to output right
+
+The last one is useful to move an i3 workspace from one monitor to another.
+
+Additionally, I bound the i3 of workspaces I create at startup to my monitors:
+
+workspace 1 output LVDS
+workspace 2 output HDMI-0
+workspace 3 output HDMI-0
+
+

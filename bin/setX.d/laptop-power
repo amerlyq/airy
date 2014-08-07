@@ -1,0 +1,110 @@
+#!/bin/sh
+#sudo chmod +x /etc/acpi/power.sh
+# https://wiki.archlinux.org/index.php/Power_saving
+
+# It can have reason to use some laptop-battery utils like: tlp
+# Set up it's config for eth0=no, audio=auto, etc...
+
+# Search: linux battery disable eth0
+# See: http://www.joshuagranick.com/blog/2012/04/27/increase-battery-life-in-linux
+
+# Disables Wake-On-Lan and eth0
+    # ethtool -s eth0 wol d
+    # ifconfig eth0 down
+# To enable:
+    # ethtool -s eth0 wol g
+    # ifconfig eth0 up
+
+# Also search for 'disable realtek codec', on occasional cases:
+# Mute audio to reduce power consumption!
+# This will automatically deactivate Realtek codec
+# Enable all again:
+# sudo bash
+# sudo echo 0 > /sys/module/snd_hda_intel/parameters/power_save
+# sudo echo N > /sys/module/snd_hda_intel/parameters/power_save_controller
+
+# to enable all again
+# /usr/lib/cinnamon-settings/cinnamon-settings.py sound
+
+# Need static ip for wlan. Search also.
+
+setdev() { #$1 -- value, $2 -- file_pattern
+    for fl in $2; do
+        if [ -f "$fl" ]; then
+            echo "${fl##*/}=$1"
+            echo "$1" > "$fl"
+        else
+            echo "No such file: ${fl}"
+        fi
+    done
+}
+
+#if on_ac_power; then
+if [ $(cat /proc/sys/vm/laptop_mode) = 0 ]
+then
+    echo "(Laptop: Setting Battery Mode)"
+    # <5...0>
+    setdev 5 /proc/sys/vm/laptop_mode
+
+    # Max memory to save data before writing on disk (so it would be rarely): <90 | 10>
+    setdev 90 /proc/sys/vm/dirty_ratio
+    # <1 | 5>   # min mem in % to keep data
+    setdev 1 /proc/sys/vm/dirty_background_ratio
+    # <60000 | 6000> # how often cpu seek dirty data in cantiseconds
+    setdev 60000 /proc/sys/vm/dirty_writeback_centisecs
+
+    # SATA:  <min_power | max_performance>
+    #find /sys/class/scsi_host/host*/link_power_management_policy \
+    #    -type f -exec echo min_power > '{}' \;
+    setdev 'min_power' /sys/class/scsi_host/host?/link_power_management_policy
+
+    # CPU politics: <conservative ondemand userspace powersave performance>
+    # conservative  -- slow up on load, fast down on idle
+    # ondemand      -- fast up on load, slow down on idle
+    # performance   -- unrecommended by many users
+    # Use: <powersave | ondemand>
+    setdev 'powersave' /sys/devices/system/cpu/cpu?/cpufreq/scaling_governor
+
+    ## politics for multicore processors <1 | 0>
+    # dont have on mint
+    # setdev 1 /sys/devices/system/cpu/sched_mc_power_savings
+
+    # PCI Express:  <powersave | default>
+    # needs another way to set, not only stream one word
+    #setdev 'powersave' /sys/module/pcie_aspm/parameters/policy
+
+    # Disable webcam
+    echo "webcam"
+    modprobe -r uvcvideo
+
+    # Disable audio (or only powersave regime?):  <10..0>
+    #setdev 10 /sys/module/snd_hda_intel/parameters/power_save
+    #setpci -s 00:02.0 F4.B=40
+    #hal-disable-polling --device /dev/cdrom
+
+    # Display lightness (=00..FF) # ?dont work?
+    #sudo setpci -s 00:02.0 F4.B=40
+    # Disable bluetooth
+    # in /etc/rc.local :  rfkill block bluetooth
+
+else
+    echo "(Laptop: Setting AC/Power Mode)"
+
+    setdev 0 /proc/sys/vm/laptop_mode
+    setdev 10 /proc/sys/vm/dirty_ratio
+    setdev 5 /proc/sys/vm/dirty_background_ratio
+    setdev 6000 /proc/sys/vm/dirty_writeback_centisecs
+
+    setdev 'max_performance' /sys/class/scsi_host/host?/link_power_management_policy
+    setdev 'ondemand' /sys/devices/system/cpu/cpu?/cpufreq/scaling_governor
+
+    #setdev 'default' /sys/module/pcie_aspm/parameters/policy
+    #setdev 0 /sys/devices/system/cpu/sched_mc_power_savings
+
+    echo "webcam"
+    modprobe uvcvideo
+
+    #setdev 0 /sys/module/snd_hda_intel/parameters/power_save
+    #setpci -s 00:02.0 F4.B=FF
+    #hal-disable-polling --enable-polling --device /dev/cdrom
+fi

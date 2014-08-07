@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Audio, ALSA for laptop: http://help.ubuntu.ru/wiki/alsa
+# echo "options snd-hda-intel model=auto" >> /etc/modprobe.d/alsa-base.conf
+
+#Mint:  VLC, mplayer freezes on play, Totem works fine, check mpv
+#mplayer -vo x11 -zoom Elementary.S02E01.HDTV.x264-LOL.mp4
+
+
+# Next: different dpi on computers, and if necessary -- different font size (to remove empty line under windows on
+# i3wm). May be for xrandr also need dpi:
+# +xrandr --addmode VBOX0 "1920x1080_60.00" --size 1920x1080 --dpi 82x82
+
+source ~/.bash_functions
+
+# Windows manager
+dst=~/.dmrc
+wbegin
+# Language=en_US -- breaks
+wstr "[Desktop]
+Session=i3"
+echo "W: $dst  <- i3"
+
+# Editor
+dst=~/.selected_editor
+wbegin
+wstr "SELECTED_EDITOR=\"/usr/bin/vim.gtk\""
+echo "W: $dst  <- vim"
+
+# See all groups:
+# update-alternatives --get-selections
+#
+# update-alternatives
+#     editor
+#     gnome-www-browser
+#     rview vim.gtk
+#     view vim.gtk
+#     www-browser w3m
+#     x-session-manager cinnamon-session-cinnamon
+#     x-terminal-emulator urxvt
+#     x-window-manager i3
+#     x-www-browser palemoon
+
+# bash .\w aliases -> ranger/bookmarks
+~/.config/ranger/aliases_to_bookmarks

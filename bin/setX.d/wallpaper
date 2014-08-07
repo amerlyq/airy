@@ -1,0 +1,19 @@
+#!/bin/bash
+
+source ~/.bash_functions
+if [ $? -ne 0 ]; then exit 1; fi
+
+if [ -e "$1" ]; then
+    if [ -l ~/.wallpaper ]; then rm ~/.wallpaper; fi
+    case "$1" in
+      /*) pairLink ~/.wallpaper "$1" ;;
+       *) pairLink ~/.wallpaper "$PWD/${1##*/}" ;;
+    esac
+fi
+
+if [ -f ~/.wallpaper ]; then  # symlink to one wallpaper
+    feh --bg-fill ~/.wallpaper
+elif [ -d ~/.wallpaper ]; then # random wallpaper from dir
+    feh --bg-fill "$(find ~/.wallpaper/ | shuf -n1)"
+else xsetroot -black; fi
+

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+FL=~/profile.log
+
+if ([ ! -e $FL ] && [ "${1:0:1}" != 's' ]) || [ "${1:0:1}" == 'n' ]; then
+    vim -c "profile start $FL" -c 'profile func *' -c 'profile file *' -c "echo 'Exit by :profile pause \| qall!'"
+    # At this point do slow actions
+fi
+
+if [ -e $FL ]; then
+    cat $FL \
+    | grep -C 2 "Total time" \
+    | sed -e :a -e '$!N; s/\n//; ta' -e 's/--/\n/g' \
+    | grep -v -e 'Called 1' -e 'Sourced 1' \
+    | sed -e 's/FUNCTION *\(.*()\)Called \([0-9]*\) timesTotal time: *\([0-9.]*\) *Self time: *\([0-9.]*\)/\3 \4 \2 \1/g' \
+    | sort | column -t
+
+fi
+
+
+[ "${1:0:1}" == 't' ] &&  ./$0 s | awk '{x+=$1}END{print x}'

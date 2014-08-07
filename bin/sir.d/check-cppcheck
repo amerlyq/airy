@@ -1,0 +1,42 @@
+#!/bin/bash
+
+PROJ_ROOT_DIR="${1:-`pwd`}"
+ARGS="${@:1}"
+HFL=/tmp/headers.lst
+SFL=/tmp/sources.lst
+
+# Find correct files
+find . -name '*.h' -printf '%h\n' | uniq > $HFL
+find . -name '*.c'  > $SFL  #-o -name '*.cpp'
+
+# -j4 --enable=warning,style,performance,portability
+
+# --verbose --suppress=variableScope
+cppcheck -q -f  --template=gcc --error-exitcode=2   \
+    --enable=all --inconclusive --platform=unix64   \
+    --std=c99 --std=c++03 --report-progress $ARGS   \
+    --includes-file=$HFL --file-list=$SFL           \
+    --suppress=missingIncludeSystem         \
+    -i libs/ -i build/ "$PROJ_ROOT_DIR"
+if [ $? -eq 2 ]; then exit 1; fi
+
+
+# --check-config  | To see which .h cppcheck can't find
+# --check-library
+
+# --inconclusive | For perfect program. Enables all verifyings.
+
+# Если нужно проверить код, который был написан для Win32, используя Linux, нужно обязательно указать платформу:
+# unix32, unix64 — все *nix (включая Linux)
+# win32A, win32W, win64 — Windows с кодировкой ASCII/UNICODE
+
+# Можно использовать сразу два стандарта:
+#$ cppcheck --std=c99 --std=posix ./source
+
+# posix — для ОС, совместимых со стандартом POSIX (включая Linux);
+# c89, c99, c11(default) — язык Си
+# c++03, c++11(default)  — язык Си++
+
+# Best man
+# http://habrahabr.ru/post/210256/
+# http://martin-moene.blogspot.com/2014/04/search-with-cppcheck.html

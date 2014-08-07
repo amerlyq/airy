@@ -1,0 +1,9 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# zathura
+
+apt_noprompt zathura zathura-djvu
+
+#deb_wget "http://http.us.debian.org/debian/pool/main/z/zathura/zathura_0.2.9-2_amd64.deb"

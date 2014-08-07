@@ -1,0 +1,17 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# Monitorix ## web-front-end lightweight system monitoring tool.
+
+# https://github.com/mikaku/Monitorix
+# http://apt.izzysoft.de/ubuntu/dists/generic/ # SW list, howto and troubleshooting
+if [ -z "$PKG_DIR" ]; then echo "Error: PKG_DIR not set. Skip installing."; exit 1; fi
+
+ppa_add 'deb http://apt.izzysoft.de/ubuntu generic universe'
+wget_it "http://apt.izzysoft.de/izzysoft.asc"
+sudo apt-key add "$PKG_DIR/izzysoft.asc"
+apt_noprompt monitorix
+
+# After changes in monitorix.conf: sudo service monitorix restart
+# Point your browser to http://localhost:8080/monitorix/ and enjoy!

@@ -1,0 +1,26 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+LST="$LST alsa alsa-utils alsa-tools pulseaudio ncmpcpp mpd mpc mpv"
+# pulseaudio# Need for usage pactl -- ncmpcpp and volume regulator in i3 config bindings.
+# alsa      # volume regulator
+# ncmpcpp + mdp # console music player with database
+# mpc для горячих клавиш
+
+apt_noprompt $LST
+
+# totem   | player, which not freezes in linux mint
+# vlc
+# qamixer | GUI alt for alsamixer with tray icon
+
+# stop the daemon and disable from starting on boot:
+if [ ! -e "$HOME/.mpd/pid" ]; then
+# Check if running: sudo /etc/init.d/mp status | grep -c "is running"
+    sudo service mpd stop
+    sudo update-rc.d mpd disable
+    mkdir -p "$HOME/.mpd/playlists"
+    touch $HOME/.mpd/{db,log,pid,state}
+fi
+

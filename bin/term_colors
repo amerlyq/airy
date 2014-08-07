@@ -1,0 +1,13 @@
+#!/bin/sh
+# Color maps in terminal
+
+case $1 in
+    c|column)   ~/.bin/term_colors.d/Column.sh ;;
+    d|dna)      ~/.bin/term_colors.d/Dna.sh ;;
+    g|grid)     ~/.bin/term_colors.d/Grid.sh ;;
+    r|ribbon)   ~/.bin/term_colors.d/Ribbon.sh ;;
+    i|invaders) ~/.bin/term_colors.d/SpaceInvaders.sh ;;
+    s|sparse)   ~/.bin/term_colors.d/Sparse.sh ;;
+    t|table)    ~/.bin/term_colors.d/Table.sh ;;
+*) echo "% { (c)olumn, (d)na, (g)rid, (r)ibbon, (i)nvaders, (s)parse, (t)able }"
+esac

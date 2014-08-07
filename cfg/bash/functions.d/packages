@@ -1,0 +1,70 @@
+# vim: ft=sh
+
+ppa_add() {
+    local addr="${1#ppa:}"
+    addr="${addr#*http://}"
+    addr="${addr%% *}"
+    if ! bash -c 'grep ^ /etc/apt/sources.list /etc/apt/sources.list.d/*' | grep -q "$addr" ; then
+        sudo apt-add-repository -y "$1"
+        sudo apt-get update
+    else return 1; fi
+    return 0
+}
+
+apt_noprompt(){ # $@ -- packages
+    echo -e "LST:\n\t$@\n"
+    sudo apt-get --yes install $@
+}
+
+wget_it() {
+    local NM
+    if [ -z "$CURR_DIR_PKG" ]; then echo "Error: CURR_DIR_PKG not set. Skip installing."; exit 1; fi
+    case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
+    wget -c "$1" -O "$CURR_DIR_PKG/$NM"
+}
+
+deb_wget() {
+    local NM
+    if [ -z "$CURR_DIR_PKG" ]; then echo "Error: CURR_DIR_PKG not set. Skip installing."; exit 1; fi
+    if `wget_it $*`; then
+        case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
+        sudo dpkg -i "$CURR_DIR_PKG/$NM"
+    fi
+}
+
+git_install() { # $1 - git rep, $2 - dir name
+    local PR_DIR=${1##*/} BUILD_DIR
+    if [ -z "$CURR_DIR_PKG" ]; then echo "Error: CURR_DIR_PKG not set. Skip installing."; exit 1; fi
+    PR_DIR="$CURR_DIR_PKG/${PR_DIR,,}"
+
+    if [ -d "$PR_DIR" ]; then
+        cd "$PR_DIR"
+        git pull
+    else
+        git clone --depth 1 "https://github.com/$1" "$PR_DIR"
+        cd "$PR_DIR"
+    fi
+
+    # It can be, that 'autoreconf' can replace my own vehicle.
+    if [ -f "$PR_DIR/CMakeLists.txt" ]; then
+        BUILD_DIR="$PR_DIR/build"
+        mkdir -p "$BUILD_DIR"
+        cmake -E chdir "$BUILD_DIR" cmake "$BUILD_OPTIONS" "$PR_DIR"
+        cd "$BUILD_DIR"
+        sudo make install
+    elif [ -f "$PR_DIR/setup.py" ]; then
+        sudo python setup.py install
+    elif [ -f "$PR_DIR/Makefile" ]; then
+        cd "$PR_DIR"
+        make
+        sudo make install
+    elif [ -f "$PR_DIR/configure.ac" ]; then
+        autoreconf --install
+        BUILD_DIR="$PR_DIR/build"
+        mkdir -p "$BUILD_DIR"
+        cd "$BUILD_DIR"
+        ../configure
+        make
+        sudo make install
+    fi
+}

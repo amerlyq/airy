@@ -1,0 +1,41 @@
+#!/bin/bash
+
+SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
+SCRIPT_DIR=${SCRIPT_PATH%/*}
+PR_DIR=$SCRIPT_DIR/../..
+DOCS_DIR=$PR_DIR/doxy
+DOXY_CONF=$DOCS_DIR/Doxyfile
+
+chg_line() { sed "s@\(^$1[ ]*=[ ]*\).*@\1 $2@g" -i $DOXY_CONF; }
+chg_quoted() { chg_line $1 "\"$2\""; }
+
+mkdir -p $DOCS_DIR
+rm -f $DOXY_CONF
+
+# Generate default config, [-s]-key removes comments from it
+doxygen -g $DOXY_CONF
+
+if [ -z "$1" ]; then PR_NM="EmptyName"; else PR_NM="$1"
+
+# Project sets
+chg_quoted PROJECT_NAME     "${PR_NM}"
+chg_quoted PROJECT_NUMBER   `git log --pretty=format:'%ad' --date=short -1`
+
+#chg_quoted INPUT            "inc src"
+chg_line OUTPUT_DIRECTORY   $DOCS_DIR
+chg_line TAB_SIZE           4
+
+# Additional sets
+chg_line RECURSIVE          YES
+chg_line SOURCE_BROWSER     YES
+chg_line SEARCHENGINE       NO
+chg_line GENERATE_LATEX     NO
+chg_line GENERATE_TREEVIEW        YES
+chg_line OPTIMIZE_OUTPUT_FOR_C    YES
+chg_line REFERENCED_BY_RELATION   YES
+chg_line REFERENCES_RELATION      YES
+
+cd $PR_DIR
+doxygen $DOXY_CONF
+echo "->> Docs generation is done."
+

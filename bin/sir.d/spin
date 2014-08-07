@@ -1,0 +1,13 @@
+#!/bin/sh
+#$ scp me@website.com:file somewhere 2>/dev/null &
+pid=0 # Process Id of the previous running command
+
+spin='-\|/'
+
+i=0
+while kill -0  2>/dev/null
+do
+  i=1
+  printf "\r-"
+  sleep .1
+done

@@ -1,0 +1,212 @@
+# vim: ft=sh
+# i3 config file (v4) :
+# http://i3wm.org/docs/
+# https://wiki.archlinux.org/index.php/i3
+# NOTE:
+#   Comment with '#' only full lines
+#       cause i3 appends line-comments to valid args and create mess
+#   Vars: no recursive expansion
+
+# see
+# 4.12. Automatically putting clients on specific workspaces
+# 4.16. Interprocess communication
+# 6. List of commands
+# 6.3. Manipulating layout
+# +- 6.4. Focusing/Moving containers
+# 6.16. i3bar control
+
+# not very clean what it is
+# 5.4. Bar ID
+# Commands: ipc_socket, ipc-socket
+
+# Valid: Mod1-Mod5, Shift, Control (see xmodmap(1)).
+# Mod1 (Alt) is more comfortable in use, so I remapped Alt<->Win to use Mod4 in place of Alt and keep Alt functionality.
+set $mod Mod4
+
+
+# Autofocusing on hover <yes|no>
+focus_follows_mouse no
+# popup_during_fullscreen <smart|ignore|leave_fullscreen>
+popup_during_fullscreen smart
+# display hint over 'this' time, when switching to urgent wksp
+force_display_urgency_hint 800 ms
+# When being in a tabbed or stacked container, the first container will be focused when you use focus down on the last container?�?the focus wraps. If however there is another stacked/tabbed container in that direction, focus will be set on that container. This is the default behavior so you can navigate to all your windows without having to use focus parent.
+# If you want the focus to always wrap and you are aware of using focus parent to switch to different containers, you can use the force_focus_wrapping configuration directive. After enabling it, the focus will always wrap. <yes|no>
+force_focus_wrapping no
+#  Assume you are on workspace "1: www" and switch to "2: IM" using mod+2 because somebody sent you a message. You don�t need to remember where you came from now, you can just press $mod+2 again to switch back to "1: www".
+workspace_auto_back_and_forth yes
+bindsym $mod+a workspace back_and_forth
+#bindsym $mod+Shift+a move container to workspace back_and_forth
+# Works like a charm tag system -- we can share browser in workspaces
+bindsym $mod+Control+a move container to workspace back_and_forth; workspace back_and_forth
+
+# Orientation for new workspaces <horizontal|vertical|auto>
+default_orientation auto
+# Layout for new containers <default|stacking|tabbed>
+workspace_layout default
+# hide_edge_borders (monitor frame pixel)  <none|vertical|horizontal|both>
+hide_edge_borders none
+# only 'normal' with titlebar
+# The "normal|pixel" support an optional border width in pixels:
+new_window pixel 1
+new_float pixel 1
+
+# ====================================================
+
+#bind, bindcode
+# To get appropriate key syms use '$ xev'
+# Commands can be chained by using ; (a semicolon). So, to move a window to a specific workspace and immediately switch to that workspace, you can configure the following keybinding:
+# Example:
+# bindsym $mod+x move container to workspace 3; workspace 3
+
+# ==================== Appearance ===========================
+
+# split in <horizontal,vertical> orientation
+bindsym $mod+n split vertical
+bindsym $mod+m split horizontal
+bindsym $mod+f fullscreen
+
+bindsym $mod+grave bar mode toggle
+bindsym $mod+Shift+grave bar mode dock
+bindsym $mod+Control+grave bar mode invisible
+
+#mode "Change" { #Mode to occacionaly control the appearance and behaviour
+# change container layout {stacked, tabbed, toggle split}
+bindsym $mod+period layout stacking
+bindsym $mod+comma  layout tabbed
+bindsym $mod+slash  layout toggle split
+#bindsym $mod+slash  layout toggle all
+# window border style 'border <normal|1pixel|none|pixel>'
+bindsym $mod+b border toggle
+#}
+
+# ==========================================================
+
+# kill focused window
+bindsym $mod+backslash kill
+bindsym $mod+Control+backslash focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill, workspace back_and_forth
+bindsym $mod+Shift+q kill
+
+bindsym $mod+semicolon focus child
+bindsym $mod+Shift+semicolon focus parent
+#bindsym $mod+apostrophe focus child
+
+bindsym $mod+Tab workspace next
+bindsym $mod+Shift+Tab workspace prev
+#bindsym $mod+Control+Left workspace prev
+#bindsym $mod+Control+Right workspace next
+
+#i3-msg 'rename workspace "1: www" to "10: www"'
+bindsym $mod+z exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
+
+### ==================== Workspaces ===================== ###
+
+## Assign workspaces to programs
+#assign [class="^Chromium-browser$" instance="^chromium-browser$"] → 1: web
+#assign [class="^Gvim$" instance="^gvim$"] $w10
+#assign [class="^MPlayer$" instance="^gl$"] → 6: mplayer
+#assign [class="^Firefox$" instance="^Navigator$"] → 8: firefox
+#assign [class="^Emacs$" instance="^emacs$"] → 9: emacs
+#assign [class="^libreoffice-startcenter$" instance="^VCLSalFrame.DocumentWindow$"] 10: office
+#assign [class="mpv"]  $w10
+#assign [class="Vlc"]  $w10
+
+
+# you can let i3 execute any command when it encounters a specific window. The valid criteria are the same as those for commands, see [command_criteria]
+#class #instance #window_role #id #title #urgent #con_mark #con_id
+#criteria class, instance, role, title and mark are regular expressions (PCRE).
+#       xprop | grep -i 'class'
+#       obxprop | grep WM_CLASS
+
+# # A less useful, but rather funny example:
+# # makes the window floating as soon as I change
+# # directory to ~/work
+# for_window [title="x200: ~/work"] floating enable
+# resize window (you can also use the mouse for that)
+
+
+### ======================= Scratchpad ======================= ###
+# The scratchpad container gets displayed in the centre of a window in a floating mode.
+# Exmpl: ncmpcpp, mc, bash prompt, email, REPL, alsamixer, or emacs for notes
+# Make the currently focused window a scratchpad (could contain >1 windows)
+# Toggle show/hide for the first scratchpad window (you can have >1 scratchpad container)
+bindsym $mod+i scratchpad show
+bindsym $mod+Shift+i move scratchpad
+# Toggle tiling / floating (also remove current window from scratchpad)
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+Control+space floating enable
+# Change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+#floating_minimum_size 75 x 50
+#floating_maximum_size -1 x -1
+
+# Show the sup-mail scratchpad window, if any.
+# bindsym mod4+s [title="^Sup ::"] scratchpad show
+
+### Add new mode: Insert, when I can disable Alt as mod key by Super_L, or simply insert combo with Alt into windows
+
+
+# switching to the appropriate workspace and setting focus to the windows
+# Need module such as launcher with the same names but for focusing
+# Jump exactly to the next open VIM instance
+bindsym $mod+v [class="URxvt" title="VIM"] focus
+bindsym $mod+r [class="URxvt" title="ranger"] focus
+
+### ======================= Launcher ========================= ###
+#bindsym XF86AudioMicMute exec "amixer -D pulse sset Capture toggle"
+#bindsym XF86KbdBrightnessDown exec "sudo /opt/kbdlight/bin/kbdlight -"
+#bindsym XF86KbdBrightnessUp exec "sudo /opt/kbdlight/bin/kbdlight +"
+#bindsym XF86TouchpadToggle exec "synclient TouchpadOff=$(synclient | awk '/TouchpadOff/ {print ($3+1)%2}')"
+#bindsym XF86Display exec "arandr"
+
+
+### ===================== Multi-monitors ===================== ###
+# SEE: configuring your monitors and 'xrandr' usage
+# http://i3wm.org/docs/userguide.html#multi_monitor
+# http://i3wm.org/docs/userguide.html#_giving_presentations_multi_monitor
+
+# Scratchpad, containers: move them between the screens with std move command.
+# Restrict to the current output: use workspace [next/prev]_on_output
+# move container to output <<left|right|down|up>|<output>>
+# move workspace to output <<left|right|down|up>|<output>>
+# Container: can move wdw to current workspace (makes sense only with criteria).
+
+# Move the current workspace to the next output
+# (effectively toggles when you only have two outputs)
+bindsym $mod+bracketleft  move workspace to output left
+bindsym $mod+bracketright move workspace to output right
+
+# Allows focusing through wkspaces synchronously on all outputs
+bindsym $mod+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
+bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
+## Put this window on the presentation output.
+#bindsym $mod+x move container to output VGA1
+
+## Move current floating window in certain position
+# .. move absolute position 0 0
+bindsym $mod+Insert exec --no-startup-id ~/.i3/ext/rename_as_focused
+
+# I want update i3bar when releasing Alt to fast show Lang change on Alt-Shift-9
+# And to set timing to 5-10 sec to less energy consumption
+#bindcode --release 64 bar status_command ~/.i3/i3status.sh
+
+# autostack for mpv
+#for_window [class="(?i)mpv"] focus right; split vertical; focus left, move right; layout tabbed
+
+### Scripts ###
+
+#urxvt -e sh -c "shell commands"
+# xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
+# cp /dev/null /tmp/xclipboard && xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
+
+
+#Syntax:
+#bar hidden_state hide|show|toggle [<bar_id>]
+#bar mode dock|hide|invisible|toggle [<bar_id>]
+#Examples:
+# bindsym $mod+m bar hidden_state toggle
+# bindsym $mod+n bar mode toggle
+# bindsym $mod+b bar mode hide bar-1
+# bindsym $mod+Shift+b bar mode invisible bar-1

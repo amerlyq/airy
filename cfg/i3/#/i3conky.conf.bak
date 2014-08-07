@@ -1,0 +1,8 @@
+background no
+out_to_x no
+out_to_console yes
+update_interval 1
+TEXT
+${execpi 5 ~/.i3/i3script/dropbox.py}     ${execpi 600 ~/.i3/i3script/mail.py}     ^fg(\#75dcff)Cpu $cpu% - Ram
+$memperc%^fg()     ^fg(\#87ff73)Vol ${execpi 1 amixer -c 0 sget PCM | grep -o "Left.*Playback.*" | grep -o
+"[0-9]*%"}^fg()     ^fg(\#ffa24e)${time %A %d %B %I:%M}^fg()

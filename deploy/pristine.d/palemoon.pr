@@ -1,0 +1,13 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# Palemoon: manual install by script pminstall.sh from http://pm4linux.sf.net
+
+PM_SCR="$PKG_DIR/pminstaller.tar.bz2"
+rm -f "$PM_SCR"
+wget_it "http://sourceforge.net/projects/pm4linux/files/latest/download" "$PM_SCR"
+cd "$PKG_DIR"
+tar xvfj "$PM_SCR"
+bash "${PM_SCR%.tar.*}.sh"
+

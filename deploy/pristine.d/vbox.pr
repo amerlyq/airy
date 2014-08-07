@@ -1,0 +1,9 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# VBox guest
+
+LST="$LST virtualbox-guest-additions virtualbox-guest-utils  virtualbox-guest-dkms virtualbox-guest-x11"
+
+apt_noprompt $LST

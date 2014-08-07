@@ -1,0 +1,9 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# CopyQ
+
+apt_noprompt libqt4-dev libxfixes-dev libxtst-dev libxinerama-dev libqtwebkit-dev
+# libxtst-dev (optional; auto-paste into some applications),
+git_install 'hluk/CopyQ'

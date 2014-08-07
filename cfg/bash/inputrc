@@ -1,0 +1,142 @@
+# ~/.inputrc  -- Individual readline (for bash) initialization file
+# http://linux.die.net/man/3/readline
+
+# If  ~/.inputrc doesn't work, then you need to add
+# export INPUTRC=~/.inputrc
+
+#| ~/.inputrc: used by the GNU readline library.
+#| Note that zsh doesn't use readline.
+
+# To avoid strange things with C-Arrows
+# https://bbs.archlinux.org/viewtopic.php?id=112537
+$include /etc/inputrc
+
+# See more shortcuts:
+# http://www.softpanorama.org/Scripting/Shellorama/inputrc.shtml
+# https://www.gnu.org/software/bash/manual/html_node/Readline-Init-File-Syntax.html
+# List: bind -l
+
+# Integrate:
+# https://github.com/sorin-ionescu/dotfiles/blob/master/inputrc
+#
+set editing-mode vi
+$if mode=vi
+    set keymap vi-insert
+    # these are for vi-insert mode "\C-s"
+    "\e[A": history-search-backward
+    "\e[B": history-search-forward
+    "\C-b": backward-char
+    "\C-h": backward-delete-char
+    "\eb": backward-word
+    "\ef": forward-word
+    "\C-a": beginning-of-line
+    "\C-]": character-search
+    "\e\C-]": character-search-backward
+    "\C-p": menu-complete
+    "\C-d": delete-char
+    "\C-e": end-of-line
+    "\C-f": forward-char
+    "\C-_": undo
+    set keymap vi-command
+    # these are for vi-command mode
+    "\e[A": history-search-backward
+    "\e[B": history-search-forward
+    # bind to Alt-p
+    "\ep":  yank-last-arg
+    "\C-x": re-read-init-file
+$endif
+
+"\C-j": accept-line
+
+## show insert and command mode as chars to left of prompt
+# set show-mode-in-prompt on
+
+# do not casesensitive completion
+set completion-ignore-case on
+# ask, if there more then N variants to completion
+set completion-query-items 80
+# A single <Tab> instead of double
+# set show-all-if-ambiguous on
+
+# Show extra file information when completing, like `ls -F` does
+#set visible-stats on
+
+# Be more intelligent when autocompleting by also looking at the text after
+# the cursor. For example, when the current line is "cd ~/src/mozil", and
+# the cursor is on the "z", pressing Tab will not autocomplete it to "cd
+# ~/src/mozillail", but to "cd ~/src/mozilla". (This is supported by the
+# Readline used by Bash 4.)
+set skip-completed-text on
+
+## (*** not recommend by vim bindings <M-..> ***)
+## Allow UTF-8 input and output, instead of showing stuff like $'\0123\0456'
+#set input-meta on
+#set output-meta on
+#set convert-meta off
+
+# Completed names which are symbolic links to directories have a slash appended.
+set mark-symlinked-directories on
+
+# see /usr/share/doc/bash/inputrc.arrows for other codes of arrow keys
+# allow the use of the Home/End keys
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+# those two are for rxvt
+$if term=rxvt
+    "\e[7~":beginning-of-line
+    "\e[8~":end-of-line
+$endif
+# on some xterm
+#"\e[H": beginning-of-line
+#"\e[F": end-of-line
+# on nxterms
+#"\e[\C-@": beginning-of-line
+#"\e[e": end-of-line
+
+# mappings for "page up" and "page down" to step to the beginning/end
+"\e[5~": beginning-of-history
+"\e[6~": end-of-history
+# allow the use of the Delete/Insert keys
+# # "\e[2~": quoted-insert
+# "\e[2~": yank                   # Insert
+# # "\e[3~": delete-char
+# "\e[3~":delete-char             # Suppr
+"\e[3~": delete-char
+"\e[2~": quoted-insert
+# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+"\e[5C": forward-word
+"\e[5D": backward-word
+"\e\e[C": forward-word
+"\e\e[D": backward-word
+
+#$if mode=vi
+#    set keymap vi-command
+#    "gg": beginning-of-history
+#    "G": end-of-history
+#
+#    set keymap vi-insert
+#    "\M-l": clear-screen
+#    "\C-w": backward-kill-word
+#    # auto-complete from the history
+#    "\C-p": history-search-backward
+#    "\C-n": history-search-forward
+#$endif
+#
+#$if Bash
+#$endif
+#
+#$if Python
+#$endif
+#
+## IPython needs this to appear at the bottom of the
+## file for clear-screen to work
+#set keymap vi-move
+
+##there are also vi-move
+# $if mode=vi
+#     set keymap vi-insert
+#     "ii": vi-movement-mode
+#
+#     set keymap vi-command
+#     "ii": vi-insertion-mode
+# $endif

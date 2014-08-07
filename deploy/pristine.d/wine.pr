@@ -1,0 +1,9 @@
+#!/bin/bash
+# vim: ft=sh
+# Get 159 Mb
+source ~/.bash/functions.d/packages
+if [ $? -ne 0 ]; then exit 1; fi
+
+LST="$LST wine"
+
+apt_noprompt $LST

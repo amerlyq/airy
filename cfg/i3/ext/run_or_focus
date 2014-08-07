@@ -1,0 +1,34 @@
+#!/bin/sh
+# $1 -- Pr name
+if [ `ps aux | grep -c $1` -eq 1 ]; then
+    i3-msg "exec $1"
+else
+    i3-msg "[class=(?i)$1] focus"
+fi
+
+
+# focus ()
+# {
+#     case $1 in
+#         (instance)
+#         W=$(xdotool search --classname "$2" | head -1)
+#         ;;
+#         (class)
+#         W=$(xdotool search --class "$2" | head -1)
+#         ;;
+#         (title)
+#         W=$(xdotool search --name "$2" | head -1)
+#         ;;
+#         (*)
+#         W=''
+#         ;;
+#     esac
+#     if [ -z "$W" ]; then
+#         # Launch the program.
+#         eval ${@:3} &  # bash
+#     else
+#         # Focus the window.
+#         # Used 'sed' to escape any whitepace to suit 'i3-msg'.
+#         i3-msg "[$1=$(echo $2 | sed s/\\x20/\\\\x20/g)] focus"
+#     fi
+# }

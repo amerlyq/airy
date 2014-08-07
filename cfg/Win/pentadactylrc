@@ -1,0 +1,168 @@
+"1.1
+
+loadplugins '\.(js|penta)$'
+group user
+set guioptions=bBCTrs
+
+"" {{{ Mapping
+"" scroll more
+nmap -builtin j 3j
+nmap -builtin k 3k
+
+"" swap d/D
+nmap -builtin d D
+nmap -builtin D d
+nmap -builtin gd :js config.tabbrowser.removeTab(tabs.getTab())<CR>
+
+"" swap y/Y
+"nmap -builtin y Y
+"nmap -builtin Y y
+
+"" swap p/P
+nmap -builtin p P
+nmap -builtin P p
+
+"" J/K move left/right
+"nmap -builtin J h
+"nmap -builtin K l
+
+"" w/e switch tabs
+nmap -builtin w <C-p>
+nmap -builtin e <C-n>
+
+"" back/forward
+nmap -builtin h <C-o>
+nmap -builtin l <C-i>
+
+"" left/right
+nmap -builtin <C-o> 10<Right>
+nmap -builtin <C-i> 10<Left>
+
+"" prev selected tab
+nmap -builtin x <C-^>
+
+"" <M-i> focus on input
+"nmap -builtin <M-i> gi
+
+"" U list closed tabs
+nmap -builtin U :undo<Space>
+
+"" toggle menubar
+nmap -builtin gm :set guioptions!=m<CR>
+
+"" viewsource in new tab
+nmap -builtin gf :tab viewsource<CR>
+
+" Fix the common shortcuts
+noremap <c-c> <c-v><c-c>
+inoremap <c-c> <c-v><c-c>
+inoremap <c-v> <c-v><c-v>
+inoremap <c-x> <c-v><c-x>
+" noremap <c-a> <c-v><c-a>
+" inoremap <c-a> <c-v><c-a>
+
+
+" Pattern for next/prev links
+set nextpattern=\\bnastępn,\\bdalej,\\bnext,^>$,^(>>|»)$,^(>|»),(>|»)$,\\bmore\\b
+set previouspattern=\\bpoprzedni,\\bwstecz,\\bprev|previous\\b,^<$,^(<<|«)$,^(<|«),(<|«)$
+
+
+"" {{{ Option
+"" ]]/[[ turn next/previous page
+set nextpattern&
+set nextpattern^='[下后]\s*一?\s*[页张个篇章頁]','\bolder\s*posts\b','^→$'
+set previouspattern&
+set previouspattern^='[上前]\s*一?\s*[页张个篇章頁]','\bnewer\s*posts\b','^←$'
+
+"" restore original behavior of showing hovered link
+set showstatuslinks=
+style chrome://browser/content/browser.xul statuspanel#statusbar-display { display:block; visibility: visible; overflow-x: hidden; }
+style chrome://browser/content/browser.xul statuspanel#statusbar-display[label^="Looking"], statuspanel#statusbar-display[label^="Connect"], statuspanel#statusbar-display[label^="Transfer"], statuspanel#statusbar-display[label^="Waiting"], statuspanel#statusbar-display[label^="Read"], statuspanel#statusbar-display[label^="Time"] {opacity: 0 !important; }
+
+"" highlight search
+"set hlfind
+
+"" complete search engine suguest
+set complete=location,suggestion
+
+"" allow popups popup
+"set popups=tab,resized
+
+"" home row as hintkeys
+"set hintkeys=asdfg;lkjhqwertpoiuyzxcvmnb
+set hintkeys=0123456789abcdefghijklmnopqrstuvwxyz
+"set hintkeys="4;/.123"
+
+"" only follow hints when press enter
+"set followhints=1
+
+"" show link when hover links
+"set showstatuslinks=command
+
+"" disable annoying auto focus
+set strictfocus^=tao123.com:despotic
+
+"" disable smooth scroll
+set scrollsteps=1
+set scrolltime=0
+
+set maxitems=10
+
+"" smart reader
+command smartReader -js <<EOF
+if (typeof window.__readable_by_evernote === "object") {
+    dactyl.execute("emenu Tools.Clearly");
+} else if (typeof window.FirefoxReader === "object") {
+    dactyl.execute("feedkeys <M-A-z>");
+} else if (typeof commands.get("readability") === "object") {
+    dactyl.execute("readability");
+} else {
+    dactyl.execute("bml-readability");
+}
+EOF
+nmap -builtin ,r :smartReader<CR>
+
+"" google translate
+command trans -js <<EOF
+let getParameterByName = function(url, name) {
+    let name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
+    let regexS = '[\\?&]' + name + '=([^&#]*)';
+    let regex = new RegExp(regexS);
+    let results = regex.exec(url);
+    if (results == null)
+        return '';
+    else
+        return decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+if (buffer.URL.spec.startsWith('http://translate.google.com/')) {
+    dactyl.open(getParameterByName(buffer.URL.spec, 'u'));
+} else {
+    dactyl.open('http://translate.google.com/translate?hl=en&sl=auto&tl=en&u=' + encodeURIComponent(buffer.URL.spec));
+}
+EOF
+nmap -builtin ,t :trans<CR>
+
+"" jump to a command, mapping or option source definition, from https://gist.github.com/3331062
+command jumptodef,jd -literal=1 -nargs=1 -complete help -js <<EOF
+let sourceLocation = function(str) {
+    let mapping = function(s) {
+        let [, mc, key] = /(?:(.)_)?(.*)/.exec(s);
+        return mappings.get(mc ? modes.modeChars[mc] : modes.NORMAL, key) ||
+            dactyl.echoerr("Bad bad: " + s);
+    };
+    if (isArray(str))
+        str = str[0];
+    let frame = ((str[0] === ":") ? commands.get(str.substr(1)) :
+        /'.*?'/.test(str) ? options.get(str.slice(1,-1)) :
+        mapping(str)).definedAt;
+    return { url: util.fixURI(frame.filename), line: frame.lineNumber };
+};
+//buffer.viewSource(sourceLocation(args[0]));
+let loc = sourceLocation(args[0]);
+window.openDialog("chrome://global/content/viewSource.xul",
+    "_blank", "all,dialog=no",
+    loc.url, null, null, loc.line);
+EOF
+
+
+" vim: set ft=pentadactyl fdm=marker:

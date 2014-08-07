@@ -1,0 +1,20 @@
+# It may be usefull to disable mouse pointer and/or touchpad while
+# layouting.
+#
+# Disable mouse:
+# mouseID=`xinput list | grep -Eo 'Mouse\s.*id\=[0-9]{1,2}' | grep -Eo '[0-9]{1,2}'`
+# xinput set-prop $mouseID "Device Enabled" 0
+#
+# Enable mouse:
+# xinput set-prop $mouseID "Device Enabled" 1
+#
+# Disable the touchpad:
+# touchID=`xinput list | grep -Eo 'TouchPad\s*id\=[0-9]{1,2}' | grep -Eo '[0-9]{1,2}'`
+# xinput set-prop $touchID "Device Enabled" 0
+#
+# Enable the touchpad
+# xinput set-prop $touchID "Device Enabled" 1
+#
+#
+# Another solution how to disable/enable
+# https://github.com/deterenkelt/dotfiles/blob/master/.i3/autostart.sh

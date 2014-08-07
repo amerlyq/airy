@@ -1,0 +1,135 @@
+
+
+further to my previous comment, this only appears to affect the Cinnamon desktop environment. I installed xfce4 in the same VM and this works perfectly well. After logging in to the xfce desktop, it shows Chromium as the driver in glxinfo and none of the errors are present relating to vboxvideo.
+
+Switching back to Cinnamon reverts to software rendering and errors as advised previously.
+
+Hope it helps, let me know if Xorg logs or anything else would help.
+
+
+=============
+
+You are about to add the following PPA to your system:
+ PLEASE READ: don't email me to report bugs, unless you are sure it's a packaging bug. Not only is email not a good tool for tracking bugs, it also excludes anybody else from tracking or working on the issue. Please read the section "Debugging and reporting problems" below.
+
+
+Supported Ubuntu versions:
+- 14.04 (trusty)
+- 13.10 (saucy) - will be removed on July 17, see https://lists.ubuntu.com/archives/ubuntu-announce/2014-June/000185.html
+
+For forum support see: http://goo.gl/qoUpWK
+To support this PPA with a Paypal donation: http://goo.gl/r1fBJU
+
+=== Introduction ===
+This PPA provides updated X (2D) and mesa (3D) free graphics drivers for radeon, intel and nvidia hardware. Updates packages provide:
+ * OpenGL 3.3+ support and new OpenGL extensions: http://cgit.freedesktop.org/mesa/mesa/plain/docs/GL3.txt
+ * VDPAU, OpenMAX IL Bellagio and XvMC Gallium3D accelerated video drivers (see below)
+ * OpenCL support (libopencl1-mesa package on saucy, mesa-opencl-icd package on trusty)
+ * r600 LLVM compiler, enabled with R600_DEBUG=llvm env var
+ * r600 shader backend enabled by default (mesa 10.0)
+ * radeonsi driver with 3D, 2D and Xv GLAMOR acceleration
+ * optional GLAMOR acceleration on intel and radeon (>= r300) drivers
+ * i915 gallium driver replaces by default i915 classic driver
+ * experimental intel ilo gallium driver (see below)
+
+For more details check the changelogs.
+
+=== Basic usage ===
+See "Adding this PPA to your system" later on and update your Ubuntu with the package herein.
+
+=== Using VDPAU/XvMC accelerated video ===
+Supported XvMC drivers: r600, nouveau
+Supported VDPAU drivers: r600, radeonsi, nouveau
+Supported OpenMAX IL Bellagio drivers: r600, radeonsi
+
+* First you need to install the libg3dvl-mesa (saucy) or mesa-vdpau-drivers (trusty) package:
+sudo apt-get install libg3dvl-mesa
+sudo apt-get install mesa-vdpau-drivers
+
+* Then to test the VDPAU driver with mplayer use:
+$ mplayer -vo vdpau -vc ffmpeg12vdpau yourvideofile
+
+* To test the XvMC (e.g.) r600 driver edit the file /etc/X11/XvMCConfig and insert:
+/usr/lib/dri/libXvMCr600.so
+
+and restart the X server. Then to test it with mplayer:
+mplayer -vo xvmc yourvideofile
+
+=== Using alternative drivers ===
+Example on how to run your OpenGL program (in this case glxgears -info) with non default drivers.
+
+To use experimental ilo (intel) gallium driver add this in /etc/X11/xorg.conf:
+Section "Device"
+ Identifier "Device0"
+ Driver "Intel"
+ Option "DRI" "ilo"
+EndSection
+
+To force the use of classic i915 driver:
+$ LIBGL_DRIVERS_PATH=/usr/lib/dri-alternates glxgears -info
+To force the use of gallium llvmpipe software render:
+$ LIBGL_ALWAYS_SOFTWARE=1 glxgears -info
+To force the use of old non-gallium software render:
+$ LIBGL_ALWAYS_SOFTWARE=1 LIBGL_DRIVERS_PATH=/usr/lib/dri-alternates glxgears -info
+
+=== Debugging and reporting problems ===
+If you have some problem with the drivers try running the application from the command line and see if there are graphics related warnings. Also type dmesg to see if there are other related informations here.
+
+If you get crashes install the relevant -dbg pacakges (libgl1-mesa-dri-dbg or libgl1-mesa-dri-experimental-dbg for 3D drivers and xserver-xorg-video-intel-dbg , xserver-xorg-video-nouveau-dbg or xserver-xorg-video-radeon-dbg for X drivers) and reproduce the crash with gdb. Example:
+$ gdb glxgears
+[...make your application crash and then get a backtrace with:]
+(gdb) bt
+
+If X.org crashes look at /var/log/Xorg.0.log (or /var/log/Xorg.0.log.old when a new X session is started after the crash).
+
+With the gathered informations try searching at https://bugs.freedesktop.org/query.cgi (also try with google) if someone already reported a similar bug. If not you may want to report a new bug:
+for 3D drivers bugs: https://bugs.freedesktop.org/enter_bug.cgi?product=Mesa
+for X / 2D driver bugs: https://bugs.freedesktop.org/enter_bug.cgi?product=xorg
+
+=== Revert to original drivers ===
+To revert to standard Ubuntu drivers type the following in a prompt shell:
+$ sudo apt-get install ppa-purge
+$ sudo ppa-purge ppa:oibaf/graphics-drivers
+ More info: https://launchpad.net/~oibaf/+archive/ubuntu/graphics-drivers
+Press [ENTER] to continue or ctrl-c to cancel adding it
+
+
+# ============================================================
+
+
+Note: I've added this answer at a later date, because none of the existing answers address a crucial aspects regarding ssh, and will give misleading values to those who follow the above instructions.
+
+    Use X-forwarding when ssh-ing. This is enabled with ssh -X.
+
+    Without x-forwarding:
+
+    $ ssh MYCOMP
+    $ glxinfo
+    Error: unable to open display
+
+    With x-forwarding:
+
+    $ ssh -X MYCOMP
+    $ glxinfo | grep -i opengl
+    OpenGL vendor string: NVIDIA Corporation
+    OpenGL renderer string: GeForce 8800 GT/PCIe/SSE2
+    OpenGL version string: 2.1.2 NVIDIA 310.44
+    OpenGL shading language version string: 1.20 NVIDIA via Cg compiler
+    OpenGL extensions:
+
+    I should note here that this is both the wrong graphics card, and wrong version numbers. ('Wrong' in terms of what you would expect).
+
+    Set DISPLAY variable to :0, to allow access to the graphic card's driver from the remote session.
+
+    $ ssh -X MYCOMP
+    $ DISPLAY=:0
+    $ glxinfo | grep -i opengl
+     OpenGL vendor string: NVIDIA Corporation
+     OpenGL renderer string: GeForce GTX 550 Ti/PCIe/SSE2
+     OpenGL version string: 4.3.0 NVIDIA 310.14
+     OpenGL shading language version string: 4.30 NVIDIA via Cg compiler
+     OpenGL extensions:
+
+    This lists the correct graphics card (the one on the remote computer), as well as the correct version numbers.
+
+

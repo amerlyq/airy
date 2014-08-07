@@ -1,0 +1,81 @@
+C-b send-prefix
+C-o rotate-window
+C-z suspend-client
+
+Space next-layout
+! break-pane
+" split-window
+# list-buffers
+$ command-prompt -I #S "rename-session '%%'"
+% split-window -h
+& confirm-before -p "kill-window #W? (y/n)" kill-window
+' command-prompt -p index "select-window -t ':%%'"
+( switch-client -p
+) switch-client -n
+, command-prompt -I #W "rename-window '%%'"
+- delete-buffer
+. command-prompt "move-window -t '%%'"
+
+0 select-window -t :0
+1 select-window -t :1
+2 select-window -t :2
+3 select-window -t :3
+4 select-window -t :4
+5 select-window -t :5
+6 select-window -t :6
+7 select-window -t :7
+8 select-window -t :8
+9 select-window -t :9
+
+: command-prompt
+; last-pane
+= choose-buffer
+? list-keys
+D choose-client
+L switch-client -l
+[ copy-mode
+] paste-buffer
+c new-window
+d detach-client
+f command-prompt "find-window '%%'"
+i display-message
+l last-window
+n next-window
+o select-pane -t :.+
+p previous-window
+q display-panes
+r refresh-client
+s choose-tree
+t clock-mode
+w choose-window
+x confirm-before -p "kill-pane #P? (y/n)" kill-pane
+z resize-pane -Z
+{ swap-pane -U
+} swap-pane -D
+~ show-messages
+PPage copy-mode -u
+
+Up select-pane -U
+Down select-pane -D
+Left select-pane -L
+Right select-pane -R
+
+M-1 select-layout even-horizontal
+M-2 select-layout even-vertical
+M-3 select-layout main-horizontal
+M-4 select-layout main-vertical
+M-5 select-layout tiled
+
+M-n next-window -a
+M-o rotate-window -D
+M-p previous-window -a
+
+M-Up resize-pane -U 5
+M-Down resize-pane -D 5
+M-Left resize-pane -L 5
+M-Right resize-pane -R 5
+
+C-Up resize-pane -U
+C-Down resize-pane -D
+C-Left resize-pane -L
+C-Right resize-pane -R

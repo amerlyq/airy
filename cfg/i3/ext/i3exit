@@ -1,0 +1,46 @@
+#!/bin/sh
+
+lock() {
+    local pic
+    pic=~/aura/screenlock.png
+    if [ ! -f $pic ]; then # Lock with cool bkgd:
+        pic=/tmp/screenlock.png
+        scrot $pic
+        mogrify -scale 10% -scale 1000% $pic
+    fi
+    i3lock --dpms --nofork --color 111111 --image $pic
+    ## Turn the screen off after delay, why it don't work?
+    #sleep 1; pgrep i3lock && xset dpms force off
+    # Alternative with autolock after time delay:
+    #$ xautolock -time 15 -locker '~/.local/bin/fuzzy_lock.sh'
+}
+
+case "$1" in
+    lock)
+        lock
+        ;;
+    logout)
+        i3-nagbar -t warning -m 'Logout: exit i3, end your X session, move to login screen' -b 'Yes, exit i3' 'i3-msg exit'
+        ;;
+    # TODO: Test if suspend and hibernate exists on laptop
+    suspend)
+        lock && sudo suspend
+        ;;
+    hibernate)
+        lock && sudo hibernate
+        ;;
+    reboot)
+        sudo reboot
+        #dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart
+        ;;
+    shutdown)
+        sudo poweroff
+        #systemctl poweroff
+        #dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop
+        ;;
+    *)
+        echo "Usage: $0 {lock|logout|suspend|hibernate|reboot|shutdown}"
+        exit 2
+esac
+
+exit 0

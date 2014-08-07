@@ -1,0 +1,9 @@
+#!/bin/bash
+# .\w aliases -> ranger/bookmarks
+
+cat ~/.bash_aliases | grep "alias \.\w=" |\
+    sed -e "s@alias \.\(\w\)='cd * \(.*\)'@\1:\2@" -e "s@~@/home/$CURR_USER@" \
+    | while read dir; do [ -d "${dir:2}" ] && echo $dir; done \
+    > ~/.config/ranger/bookmarks
+
+echo "W: aliases .? -> ranger/bookmarks"

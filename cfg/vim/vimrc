@@ -1,0 +1,112 @@
+" vim: ts=2 sw=2 sts=2
+" Seize
+" 100%:    https://github.com/MPogoda/dotfiles
+"  80%: https://github.com/euclio/vim-settings/blob/master/vimrc
+"
+
+if has("unix")
+    language messages C
+else "elseif
+    language messages en_US.UTF-8 "C, en, en_US, en_US.UTF-8
+    "set langmenu=en_US.UTF-8
+    " Window size
+    set lines=32
+    set columns=112
+endif
+"===============================================
+" Make $VIMHOME point to .vimrc location independent of OS
+if has('win32') || has('win64')
+  let $VIMHOME=$HOME . '/.vim'
+
+" Fix the path of vimrc and gvimrc for Windows
+  let $MYVIMRC=$VIMHOME . '/vimrc'
+  let $MYGVIMRC=$VIMHOME . '/gvimrc'
+else
+  let $VIMHOME=$HOME . '/.vim'
+endif
+
+let $VIMCACHEDIR=$HOME . '/.cache/vim'
+set backupdir=$VIMCACHEDIR,~/.tmp,/var/tmp,/tmp
+set directory=$VIMCACHEDIR,~/.tmp,/var/tmp,/tmp
+"===============================================
+" Install neobundle if it doesn't exist
+let new_neobundle_install=0
+let $NEOBUNDLE=expand('$VIMHOME/bundle/neobundle.vim')
+let neobundle_readme=expand('$NEOBUNDLE/README.md')
+if !filereadable(neobundle_readme)
+    echom 'NeoBundle not found. Installing...'
+
+    call mkdir(expand('$VIMHOME/bundle'), 'p')
+    silent exec '!git clone https://github.com/Shougo/neobundle.vim' $NEOBUNDLE
+    let new_vundle_install=1
+endif
+"===============================================
+if has ('vim_starting')
+  set nocompatible
+  set encoding=utf-8
+  " Required!
+  set runtimepath+=$NEOBUNDLE
+  set runtimepath+=$VIMHOME
+"source $VIMRUNTIME/vimrc_example.vim
+"source $VIMRUNTIME/mswin.vim
+"behave mswin
+endif
+"===============================================
+" Use only git protocol. If firewall -- set https.
+let g:neobundle#types#git#default_protocol = 'git'
+" or see neobundle-options-type__depth
+let g:neobundle#types#git#clone_depth = 1   "shallow copy
+
+"Instead all of this: call neobundle#rc(expand('~/.vim/bundle/'))
+call neobundle#begin(expand('$VIMHOME/bundle/'))
+  "Improves vim start time
+  if neobundle#has_cache()
+    NeoBundleLoadCache
+    "MUST: :NeoBundleClearCache if change .vimrc
+  else
+    NeoBundleFetch 'Shougo/neobundle.vim'
+    " Refer to |:NeoBundle-examples|.
+    source $VIMHOME/plugins.vim
+    NeoBundleSaveCache
+  endif
+call neobundle#end()
+" Required!
+filetype plugin indent on
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
+
+if !has('vim_starting')
+  " Call on_source hook when reloading .vimrc.
+  call neobundle#call_hook('on_source')
+endif
+"===============================================
+set fileformats=unix,dos,mac
+set fileencodings=utf-8,cp1251,cp866
+
+" delegate configuration to files in config/
+runtime! config/**/*.vim
+
+
+" Store undo history across sessions
+if v:version >= 703
+  let $TAGSDIR=$VIMCACHEDIR . '/easytags.d'
+  if !isdirectory($TAGSDIR)
+    call mkdir($TAGSDIR)
+  endif
+  let &undodir=$VIMCACHEDIR . '/undodir'
+  if !isdirectory(&undodir)
+    call mkdir(&undodir)
+  endif
+  set undofile
+endif
+"===============================================
+augroup vimrc
+  au BufReadPre * setlocal foldmethod=indent
+  au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+augroup END
+
+if has('win32') || has('win64')
+  cd e:\
+endif
+

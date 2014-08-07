@@ -1,0 +1,55 @@
+# Very useful and nut aliases:
+# http://brettterpstra.com//2013/03/31/a-few-more-of-my-favorite-shell-aliases/
+#
+# modified commands
+alias make="make -j6"
+alias pacman="powerpill"
+
+# new commands
+alias hist="history | grep"
+alias susp="sudo pm-suspend && xlock -mode matrix"
+alias wifi="sudo netctl-auto switch-to"
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias testnet="ping 8.8.8.8"
+
+# safety
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
+alias cls=' echo -ne "\033c"' # clear screen for real (it does not work in Terminology)
+
+# pacman
+alias pac="sudo /usr/bin/pacman -S" # default action - install one or more packages
+alias pacu="sudo /usr/bin/pacman -Syu" # '[u]pdate' - upgrade all packages to their newest version
+alias pacr="sudo /usr/bin/pacman -Rs" # '[r]emove' - uninstall one or more packages
+alias pacs="sudo /usr/bin/pacman -Ss" # '[s]earch' - search for a package using one or more keywords
+alias paci="sudo /usr/bin/pacman -Si" # '[i]nfo' - show information about a package
+alias paclo="sudo /usr/bin/pacman -Qdt" # '[l]ist [o]rphans' - list all packages which are orphaned
+alias pacc="sudo /usr/bin/pacman -Scc" # '[c]lean cache' - delete all not currently installed package files
+alias paclf="sudo /usr/bin/pacman -Ql" # '[l]ist [f]iles' - list all files installed by a given package
+alias pacexpl="/usr/bin/pacman -D --asexp" # 'mark as [expl]icit' - mark one or more packages as explicitly installed
+alias pacimpl="/usr/bin/pacman -D --asdep" # 'mark as [impl]icit' - mark one or more packages as non explicitly installed
+
+# aura
+alias aur="aura -A" # default action - install one or more packages
+alias auru="aura -Ayu" # '[u]pdate' - upgrade all packages to their newest version
+alias aurr="aura -Rs" # '[r]emove' - uninstall one or more packages
+alias aurs="aura -Ss" # '[s]earch' - search for a package using one or more keywords
+alias auri="aura -Ai" # '[i]nfo' - show information about a package
+alias aurlo="aura -Qdt" # '[l]ist [o]rphans' - list all packages which are orphaned
+alias aurc="aura -Scc" # '[c]lean cache' - delete all not currently installed package files
+alias aurlf="aura -Ql" # '[l]ist [f]iles' - list all files installed by a given package
+alias aurexpl="aura -D --asexp" # 'mark as [expl]icit' - mark one or more packages as explicitly installed
+alias aurimpl="aura -D --asdep" # 'mark as [impl]icit' - mark one or more packages as non explicitly installed
+
+# yaourt
+alias ya="/usr/bin/yaourt -S" # default action - install one or more yakages
+alias yau="/usr/bin/yaourt -Syu" # '[u]pdate' - upgrade all yakages to their newest version
+alias yar="/usr/bin/yaourt -Rs" # '[r]emove' - uninstall one or more yakages
+alias yas="/usr/bin/yaourt -Ss" # '[s]earch' - search for a yakage using one or more keywords
+alias yai="/usr/bin/yaourt -Si" # '[i]nfo' - show information about a yakage
+alias yalo="/usr/bin/yaourt -Qdt" # '[l]ist [o]rphans' - list all yakages which are orphaned
+alias yac="/usr/bin/yaourt -Scc" # '[c]lean cache' - delete all not currently installed yakage files
+alias yalf="/usr/bin/yaourt -Ql" # '[l]ist [f]iles' - list all files installed by a given yakage
+alias yaexpl="/usr/bin/yaourt -D --asexp" # 'mark as [expl]icit' - mark one or more yakages as explicitly installed
+alias yaimpl="/usr/bin/yaourt -D --asdep" # 'mark as [impl]icit' - mark one or more yakages as non explicitly installed

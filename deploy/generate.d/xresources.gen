@@ -1,0 +1,19 @@
+#!/bin/bash
+# http://linuxoid.in/%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3:Xresources
+# Color schemes with scrshots:
+# http://linsovet.org.ua/terminal-color-schemes-2
+
+source ~/.bash_export
+source ~/.bash_functions
+if [ $? -eq 1 ]; then exit 1; fi
+
+
+dst=~/.Xresources
+wbegin '!'
+warr '#include ' '".urxvt/urxvtrc" ".urxvt/urxvt_keys" ".urxvt/urxvt_ext" ".Xrc/xtheme_solarized" ".Xrc/xtermrc" ".Xrc/xfontrc"'
+wstr "
+! Too big fonts in X appears on '112' value after reboot. What to do?
+! Xft.dpi : `[ -z "$MAIN_DPI" ] && echo 96 || echo $MAIN_DPI`"
+echo "W: $dst"
+xrdb ~/.Xresources
+

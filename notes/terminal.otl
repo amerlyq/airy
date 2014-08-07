@@ -1,0 +1,45 @@
+Install *.deb
+	dpkg -i package-name-here.deb
+	dpkg --install package-name-here.deb
+	dpkg -i -R /path/to/dir/name/with/lots/of/dot-deb-files/
+	dpkg -i --recursive /path/to/dir/name/with/lots/of/dot-deb-files/
+
+if you've interrupted an apt-get operation, you can just finish it later using
+	sudo dpkg --configure -a
+
+Latex
+	with autodownload
+		texliveonfly --compiler=pdflatex <filename>.tex
+	when you need search package with appropriate file
+		apt-file -x search '/textcomp.sty$'
+
+Fonts
+	https://wiki.archlinux.org/index.php/Font_Configuration#Fontconfig_configuration
+
+Mount
+	sudo fdisk -l
+	mkdir -p ~/usb && sudo mount -t vfat /dev/sdb1 ~/usb
+	rsync -avh ~/mydir/ ~/usb/
+	sudo umount ~/usb && rmdir ~/usb
+	mkdir -p ~/usb && sudo mount -t vfat /dev/sdb1 ~/usb -o rw,flush,users,noatime,noauto,utf8,codepage=866,quiet,showexec,shortname=winnt,check=r
+
+	*.iso
+		sudo mkdir -p /mnt/hiren
+		sudo mount -t iso9660 -o loop Hiren_Boot_CD15.2ru.iso /mnt/hiren
+		$ sudo apt-get install furiusisomount
+
+Flags from nemo:
+	mkdir -p ~/usb && sudo mount -t vfat /dev/sdb1 ~/usb -o rw,nosuid,nodev,uid=1000,gid=1000,shortname=mixed,dmask=077,utf8=1,showexec,flush,uhelper=udisks2
+
+Ascii
+	$ figlet -- output text by it's big ascii version (each pixel by character)
+
+Convert all files in dir into utf8
+	find . -name '*.*' -exec iconv --verbose -f windows-1251 -t utf-8 -o {} {} \;
+
+Compare files as options
+ Simple idea to save comments: we will keep only one file in its
+ primary state, second we sort and clean. Then extract options which
+ differs, or reorder second list as first and show difference.
+	http://stackoverflow.com/questions/12869354/how-to-compare-two-text-files-for-the-same-exact-text-using-bash
+	http://mywiki.wooledge.org/BashFAQ/036

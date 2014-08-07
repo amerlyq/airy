@@ -1,0 +1,41 @@
+| % | Split a window vertically
+| " | Split the window horizontally
+| ; | Go to previous
+| x | Closing a pane
+| c | Create new window
+| w | Select window interactively
+| & | Close a window
+| z | Toggle zoom
+| d | detach window
+| , | Rename window
+| 0-9 | Switch to tmux window
+| n/p | Switch to next/prev window
+<C-o> | Rotate windows
+
+: Arrow=[Up,Down,Right,Left]
+|   Arrow   | Move between active panes
+| <C-Arrow> | Change pane sizes
+| <M-Arrow> |
+
+Copy Mode
+| [ | Scroll up the screen (use one of Up, Down, PgUp or PgDn to scroll up or down)
+| ] | In scroll mode you can copy text from history and then paste it this key. To exit insert mode press ESC
+| ? | Key bindings
+
+	tmux new -s session_name | Create a new tmux named session_name
+	tmux attach -t session_name | Attaches to an existing tmux session
+	tmux switch -t session_name | Switches to an existing session
+	tmux list-sessions | tmux ls
+
+	tmux list-keys | lists out every bound keys
+	tmux list-commands | commands and arguments
+	tmux info | lists every session, window, pane, pid
+	tmux source-file ~/.tmux.conf | Reload current configuration
+
+# set color
+#set -g status-bg black
+#set -g status-fg green
+#setw -g status-left #H:#S at #W:#T
+set -g status off
+
+

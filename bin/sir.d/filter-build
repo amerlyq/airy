@@ -1,0 +1,39 @@
+#!/bin/bash
+# Pretty build errors log
+
+PREFIX_PATH="${1:-`pwd`}"
+
+PT_ERROR="error:"
+PT_WRNNG="warning:"
+PT_UNDEF="undefined reference to"
+PT_INFNC="In function"
+
+C_DIR=$(tput setaf  3 )  #'\\033[33m'
+C_FNC=$(tput setaf 162)  #'\\033[33m'
+C_ERR=$(tput setaf  1 )  #'\\033[31m'
+C_WRN=$(tput setaf  2 )  #'\\033[31m'
+C_UDF=$(tput setaf  39)  #'\\033[31m'
+C_ARG=$(tput setaf  4 )  #'\\033[34m'
+C_SMB=$(tput setaf  4 )  #'\\033[34m'
+C_RET=$(tput sgr0)       #'\\033[0m'
+
+SED_DIR="s@${PREFIX_PATH}/\|${HOME}@\\\n${C_DIR}./@g"
+SED_FNC="s@.*${PT_INFNC}\(.*:\)@\\\n\\\n$(tput smul)${C_FNC}function:\1${C_FNC}$(tput rmul)@g"
+SED_ERR="s@${PT_ERROR}@${C_ERR}error:${C_RET}@g"
+SED_WRN="s@${PT_WRNNG}@${C_WRN}wrnng:${C_RET}@g"
+SED_UDF="s@${PT_UNDEF}@${C_UDF}undef:${C_RET}@g"
+SED_ARG="s@\(‘[^ ]*’\)@${C_ARG}\1${C_RET}@g"
+SED_SMB="s@\(\`[^ ]*\'\)@${C_SMB}\1${C_RET}@g"
+SED_LD1="s@collect[0-9]: \(.*\)@\\\n$(tput bold)\1${C_RET}@g"
+SED_MK0="s@make.*Error [0-9]@@g"                         \
+
+REPLACER="$SED_DIR;$SED_FNC;$SED_ERR;$SED_ARG;$SED_SMB;$SED_UDF;$SED_LD1;$SED_MK0"
+
+FILTER="${PT_ERROR}\|${PT_UNDEF}"
+
+if [ "${2/[w]}" != "${2}" ]; then
+    FILTER="${FILTER}\|${PT_WRNNG}"
+    REPLACER="$REPLACER;$SED_WRN"
+fi
+
+grep "$FILTER" | sed -e "$REPLACER"

@@ -1,0 +1,23 @@
+Tried following this guide.
+	http://ranger.nongnu.org/
+
+I didn't have a rc.conf file in ~/.config/ranger, so I did:
+	ranger --copy-config=all
+then I added the following to ~/.config/ranger/rc.conf
+	set preview_images true
+
+Note: previewing images in "true color" is disabled by default. To enable
+it, first make sure you have w3m installed, then check that your terminal
+supports it. It was successfully tested with urxvt and xterm, while it did
+not work with gnome-terminal and st. Currently it does not work with tmux
+but with screen. Finally, add this line to your ~/.config/ranger/rc.conf
+and restart ranger:
+	set preview_images true
+
+# Ranger: CD auto-sync when quit from ranger or its inner shell
+	Add to bashrc:
+		$RANGERCD && unset RANGERCD && rangercd
+	See
+		https://wiki.archlinux.org/index.php/ranger
+		https://github.com/hut/ranger/blob/master/doc/examples/bash_automatic_cd.sh
+

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+ROOT_DIR="`pwd`"
+DEPLOY_DIR="/var/lib/tomcat7/webapps"
+
+cd "$ROOT_DIR"
+if [ -e "$ROOT_DIR/pom.xml" ]; then
+
+    mvn clean install -Dmaven.test.skip=true
+
+    WAR_FL="`find \"$ROOT_DIR/target\" -maxdepth 1 -type f -name *.war`"
+    WAR_FL="${WAR_FL##*/}"
+    WAR_NM="${WAR_FL%.*}"
+    echo $WAR_NM
+
+    cd "$ROOT_DIR/target"
+    if [ -f "$ROOT_DIR/target/$WAR_FL" ]; then
+        sudo service tomcat7 stop
+        sudo rm -v "$DEPLOY_DIR/$WAR_FL"
+        sudo rm -Rf "$DEPLOY_DIR/$WAR_NM"
+        sudo cp -v "$ROOT_DIR/target/$WAR_FL" "$DEPLOY_DIR"
+        sudo service tomcat7 start
+        curl "http://localhost:8080/$WAR_NM/rest/csse/test"
+        echo;
+    fi
+fi

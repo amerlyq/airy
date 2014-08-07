@@ -1,0 +1,17 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# TLP -- laptop power mgmt
+# http://linrunner.de/en/tlp/docs/tlp-configuration.html
+ppa_add 'ppa:linrunner/tlp'
+# powertop # Great monitor tool to see battery consumption by processes and interfaces.
+
+apt_noprompt tlp tlp-rdw smartmontools ethtool powertop
+
+# It worth trying to see another apt-get install power...*
+# to start service
+sudo tlp start
+# to check is working properly
+#$ sudo tlp-stat
+

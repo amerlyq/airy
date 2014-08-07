@@ -1,0 +1,13 @@
+#!/bin/sh
+
+BIN_PATH="${1?'Need executable path!'}"
+BIN_DIR="${BIN_PATH%/*}"
+BIN_ARGS="${@:2}"
+FL="$BIN_DIR/prof.out"
+CLGR="${BIN_PATH}.callgrind"
+LIB_PRF="${BIN_DIR%/*}/libs/libprofiler.so"
+
+env LD_PRELOAD="$LIB_PRF" CPUPROFILE="$FL" "${BIN_PATH}"
+#./pprof --callgrind "${BIN_PATH}" "$FL" > "$CLGR"
+#kcachegrind "$CLGR" &
+./pprof --text "$BIN_PATH" "$FL"

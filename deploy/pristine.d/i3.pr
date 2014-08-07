@@ -1,0 +1,34 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# i3wm -- tiling windows mngr
+
+if ppa_add "deb http://debian.sur5r.net/i3/ $(lsb_release -c -s) universe"
+then
+    apt-get update
+    apt-get --allow-unauthenticated install sur5r-keyring
+fi
+
+
+LST="$LST conky dzen2 dunst libnotify-bin xdotool "
+LST="$LST suckless-tools feh jshon kbdd"
+# i3        # fast tiling windows manager
+# suckless-tools # dmenu by i3+D and others
+# feh       # simple image viewer and desktop wallpaper setter
+# dunst     # from j4tools for i3 -- notifier in top-right corner
+# libnotify-bin # notifier in window for long running commands (see bashrc) like $ sleep 10; alert
+# xdotool   # for correct working modes, and for ability naming worksps as focused wnds
+# jshon     # bash json parser to use in scripts with i3-msg output # http://kmkeen.com/jshon/
+# kbdd      # keep different layouts for apps
+
+# Obsolete by kbdd + dbus-send
+#    git_install 'ierton/xkb-switch'
+
+apt_noprompt $LST
+
+#git_install 'enkore/j4-dmenu-desktop'
+
+# Separate 'cause of some security checks
+LST="i3 i3lock i3status"
+apt_noprompt --force-yes $LST

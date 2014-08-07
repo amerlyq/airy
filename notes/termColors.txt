@@ -1,0 +1,115 @@
+\033[1m\033[5m\033[36m может быть заменено эквивалентной последовательностью \033[1;5;36m
+
+
+tput sgr0    Возврат цвета в "нормальное" состояние
+
+\033[0m    все атрибуты по умолчанию
+\033[1m    жирный шрифт (интенсивный цвет)
+\033[2m    полу яркий цвет (тёмно-серый, независимо от цвета)
+\033[4m    подчеркивание
+\033[5m    мигающий
+\033[7m    реверсия (знаки приобретают цвет фона, а фон -- цвет знаков)
+
+\033[22m    установить нормальную интенсивность
+\033[24m    отменить подчеркивание
+\033[25m    отменить мигание
+\033[27m    отменить реверсию
+
+\033[30    чёрный цвет знаков
+\033[31    красный цвет знаков
+\033[32    зелёный цвет знаков
+\033[33    желтый цвет знаков
+\033[34    синий цвет знаков
+\033[35    фиолетовый цвет знаков
+\033[36    цвет морской волны знаков
+\033[37    серый цвет знаков
+
+\033[40    чёрный цвет фона
+\033[41    красный цвет фона
+\033[42    зелёный цвет фона
+\033[43    желтый цвет фона
+\033[44    синий цвет фона
+\033[45    фиолетовый цвет фона
+\033[46    цвет морской волны фона
+\033[47    серый цвет фона
+
+====================================
+
+
+
+tput setab [1-7] # Set the background colour using ANSI escape
+tput setaf [1-7] # Set the foreground colour using ANSI escape
+
+Colours are as follows:
+
+Num  Colour    #define         RGB
+
+0    black     COLOR_BLACK     0,0,0
+1    red       COLOR_RED       max,0,0
+2    green     COLOR_GREEN     0,max,0
+3    yellow    COLOR_YELLOW    max,max,0
+4    blue      COLOR_BLUE      0,0,max
+5    magenta   COLOR_MAGENTA   max,0,max
+6    cyan      COLOR_CYAN      0,max,max
+7    white     COLOR_WHITE     max,max,max
+
+There are also non-ANSI versions of the colour setting functions (setb instead of setab, and setf instead of setaf) which use different numbers, not given here.
+Text mode commands
+
+tput bold    # Select bold mode
+tput dim     # Select dim (half-bright) mode
+tput smul    # Enable underline mode
+tput rmul    # Disable underline mode
+tput rev     # Turn on reverse video mode
+tput smso    # Enter standout (bold) mode
+tput rmso    # Exit standout mode
+tput sgr 0   # Reset all attributes
+
+Cursor movement commands
+
+tput cup Y X # Move cursor to screen postion X,Y (top left is 0,0)
+tput cuf N   # Move N characters forward (right)
+tput cub N   # Move N characters back (left)
+tput cuu N   # Move N lines up
+tput ll      # Move to last line, first column (if no cup)
+tput sc      # Save the cursor position
+tput rc      # Restore the cursor position
+tput lines   # Output the number of lines of the terminal
+tput cols    # Output the number of columns of the terminal
+
+Clear and insert commands
+
+tput ech N   # Erase N characters
+tput clear   # Clear screen and move the cursor to 0,0
+tput el 1    # Clear to beginning of line
+tput el      # Clear to end of line
+tput ed      # Clear to end of screen
+tput ich N   # Insert N characters (moves rest of line forward!)
+tput il N    # Insert N lines
+
+Other commands
+
+tput bel     # play a bell
+
+With compiz wobbly windows, the bel command makes the terminal wobble for a second to draw the user's attention.
+Example usage
+
+echo "$(tput setaf 1)Red text $(tput setab 7)and white background$(tput sgr 0)"
+
+Looks like this on my Ubuntu terminal:
+
+Screenshot of colour terminal text
+
+Use command sgr 0 to reset the colour at the end.
+Performing multiple operations at once
+
+tput accepts scripts containing one command per line, which are executed in order before tput exits.
+
+Avoid temporary files by echoing a multiline string and piping it:
+
+echo -e "setf 7\nsetb 1" | tput -S  # set fg white and bg red
+
+See also
+
+    See man 1 tput
+    See man 5 terminfo for the complete list of commands and more details on these options. (The corresponding tput command is listed in the Cap-name column of the huge table that starts at line 81.)

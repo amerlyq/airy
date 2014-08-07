@@ -1,0 +1,34 @@
+#!/bin/sh
+# ports for mpd player
+
+# Replace with alias for ssha!
+#{ SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
+SS=ssh
+
+
+SSH_MPD="$SS -p $SIR_PORT -fNT -L 127.0.0.1:6601:127.0.0.1:6600 -L 127.0.0.1:8001:127.0.0.1:8000 $SIR_HOST"
+STREAM="http://localhost:8001"
+FOUND=`mpc playlist -f "[%file%]" | grep -n "$STREAM"`
+
+if [ "$1" = "kill" ]; then
+    mpc stop
+    pkill -f "$SSH_MPD"
+else
+    if ! pgrep -f "$SSH_MPD" > /dev/null; then
+        $SSH_MPD
+        if [ -z "$FOUND" ]; then
+            mpc add  "$STREAM"
+            mpc play `mpc playlist | wc -l`
+        else
+            mpc play `echo $FOUND | head -1 | awk -F: '{print $1}'`
+        fi
+    fi
+    if [ "$1" != "nogui" ]; then
+        ncmpcpp -p 6601
+    fi
+fi
+
+# Check for link to music exists in ~/media/Music
+# sudo ln -svf %d/%f ~/media/Music/%f
+
+

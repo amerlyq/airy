@@ -1,0 +1,28 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+## Zsh
+# curl -L http://install.ohmyz.sh | sh
+
+apt_noprompt zsh
+
+ZSH_DIR=~/.oh-my-zsh
+if [ -d "$ZSH_DIR" ]; then
+    cd "$ZSH_DIR" && git --verbose pull
+else
+    hash git >/dev/null 2>&1 \
+    && /usr/bin/env git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR \
+    || { echo "git not installed"; exit 1; }
+fi
+
+## Copying your current PATH and adding it to the end of ~/.zshrc for
+#sed -i -e "/export PATH=/ c\\
+#export PATH=\"$PATH\"
+#" ~/.zshrc
+
+# Choose default shell
+sudo chsh -s `which zsh`
+
+#/usr/bin/env zsh
+#. ~/.zshrc

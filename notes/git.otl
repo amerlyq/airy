@@ -1,0 +1,29 @@
+Create Repository
+	mkdir meridia
+	cd meridia
+	git init
+	touch README
+	git add README
+	git commit -m 'first commit'
+	git remote add origin git@gitlab.com:freestylex/meridia.git
+	git push -u origin master
+Existing Git Repo?
+	cd existing_git_repo
+	git remote add origin git@gitlab.com:freestylex/meridia.git
+	git push -u origin master
+Submodules
+	Add
+		git submodule add http://...git ./name
+	Clone
+		git submodule init
+		git submodule update
+	Pull
+		git submodule foreach 'git checkout master && git pull origin master'
+	Push:
+		cd vendor
+		git checkout master
+		git pull origin master
+		cd ..
+		git add vendor
+		git commit -m 'Updated vendor to latest version'
+

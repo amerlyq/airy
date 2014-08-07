@@ -1,0 +1,64 @@
+#!/bin/bash
+
+FL=~/.cache/displayside
+if [ -f "$FL" ]; then SETS="$(cat $FL)"; fi
+if [ ! -z "$1" ]; then SETS="$1"; fi
+echo "$SETS" > "$FL"
+
+M_PRIMARY="--primary"
+SIDE="${SETS/[pP]}"
+if [ "$SETS" != "$SIDE" ]; then S_PRIMARY="$M_PRIMARY"; M_PRIMARY=""; fi
+
+case "$SIDE" in
+    l|L) PLACE='--left-of' ;;
+    r|R) PLACE='--right-of' ;;
+    u|U) PLACE='--above' ;;
+    d|D) PLACE='--below' ;;
+    s|S) PLACE='--same-as' ;;
+      *) PLACE='--right-of' ;;
+esac
+
+if [ -z "$MAIN_DPI" ]; then MAIN_DPI=96; fi
+
+if xrandr | grep -q 'VBOX0 connected' ; then
+    xrandr --output VBOX0 --auto --dpi $MAIN_DPI $M_PRIMARY
+    M_OUT=VBOX0
+fi
+
+if xrandr | grep -q 'VBOX1' ; then
+    if xrandr | grep -q 'VBOX1 connected' ; then
+        xrandr --output VBOX1 --auto $PLACE VBOX0 $S_PRIMARY
+        S_OUT=VBOX1
+    else
+        xrandr --output VBOX1 --off
+        S_OUT="$M_OUT"
+    fi
+fi
+
+if xrandr | grep -q 'eDP1 connected' ; then
+    xrandr --output eDP1 --auto --dpi $MAIN_DPI $M_PRIMARY
+    M_OUT=eDP1
+fi
+
+if xrandr | grep -q 'HDMI1' ; then
+    if xrandr | grep -q 'HDMI1 connected' ; then
+        xrandr --output HDMI1 --mode 1920x1080 --dpi 96 $PLACE eDP1 $S_PRIMARY #or --pos 1366x0,
+        S_OUT=HDMI1
+    else
+        xrandr --output HDMI1 --off
+        S_OUT="$M_OUT"
+    fi
+fi
+
+### =============== i3 Workspaces ================== ###
+# if [ "$CURR_HOST" == "vbox" ]
+#     then M1=VBOX0; M2=VBOX1;
+#     else M1=eDP1;  M2=HDMI1; fi
+# # MAIN_SIDE="$(cat ~/.cache/displayside)"
+# # if [ "$MAIN_SIDE" != "${MAIN_SIDE/[pP]}" ]; then MAIN_SIDE="$M1"; M1="$M2"; M2="$MAIN_SIDE"; fi
+#
+# for i in 1 2 3 4 5; do
+#     i3-msg workspace number $i output "$M_OUT"
+#     i3-msg workspace number $(($i+5)) output "$S_OUT"
+# done
+

@@ -1,0 +1,28 @@
+#!/bin/sh
+# Draws progressbar with [..%] length
+
+#TODO: Make CA to trigger state of symbol source and its color by length
+
+while read b; do echo $b |
+    grep '\[[ ]*[0-9]*\%\]' |
+    sed 's|\[\([ ]*[0-9]*\)\%\].*|\1|' |
+    awk '{ printf "\r\033[1;34;40mBUILD\033[0m[",$1 } {
+        for(i=0;i<($1/2) && (i<23);i++) printf "\033[34m=\033[0m";
+        for(;i<50 && i<23;i++) printf "\033[30m-\033[0m";
+            if(i<$1/2) printf "\033[34m%3d%%\033[0m",$1
+            else printf "\033[30m%3d%%\033[0m",$1
+        for(i+=4;i<($1/2);i++) printf "\033[34m=\033[0m";
+        for(;i<50;i++) printf "\033[30m-\033[0m";
+    } { printf "]" }'
+    # awk "{ printf "[",$1 } { s='=';
+    #     for(i=0;i<50;i++) {
+    #         if(i<$1/2 && i<23) { s
+    #             printf "\033[34m=\033[0m";
+    #             for(;i<50 && i<23) printf "\033[30m-\033[0m";
+    #         if(i<$1/2) printf "\033[34m%3d%%\033[0m",$1
+    #         else printf "\033[30m%3d%%\033[0m",$1
+    #     for(i+=4;i<($1/2);i++) printf "\033[34m=\033[0m";
+    #     for(;i<50;i++) printf "\033[30m-\033[0m";
+    #     }
+    # } { printf "]\n" }"
+done

@@ -1,0 +1,84 @@
+set vicmd=vim
+set trash
+set history=100
+set followlinks
+set fastrun
+set sortnumbers
+set undolevels=20
+set novimhelp
+
+set runexec
+
+set noiec
+
+colorscheme numix-like
+
+set fusehome=/tmp/vifm_FUSE
+set timefmt=%m/%d\ %H:%M
+set wildmenu
+
+set ignorecase
+set smartcase
+
+set hlsearch
+
+set incsearch
+
+set scrolloff=6
+
+set slowfs=curlftpfs
+
+set statusline="  %t%= %A %10u:%-7g %15s %20d  "
+
+mark b ~/bin/
+mark h ~/
+
+command df df -h %m 2> /dev/null
+command diff vim -d %f %F
+command zip zip -r %f.zip %f
+command run !! ./%f
+command make !!make
+command vgrep vim "+grep %a"
+
+filextype *.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm feh %f 
+filextype *.pdf,*.dvju evince %f 
+
+nmap gb :file &<cr>l
+
+nmap yd :!echo %d | xclip %i<cr>
+
+nmap yf :!echo %c:p | xclip %i<cr>
+
+nmap I cw<c-a>
+nmap cc cw<c-u>
+nmap A cw<c-w>
+
+nmap ,t :!xterm &<cr>
+
+nmap ,c :execute ':!vim $MYVIFMRC' | restart<cr>
+
+nmap ,w :set wrap!<cr>
+
+nmap <f3> :!less %f<cr>
+nmap <f4> :edit<cr>
+nmap <f5> :copy<cr>
+nmap <f6> :move<cr>
+nmap <f7> :mkdir<space>
+nmap <f8> :delete<cr>
+
+nmap w <up>
+nmap a <left>
+nmap s <down>
+nmap d <right>
+
+nmap q :shell
+nmap e o
+
+nmap zx u
+nmap x :delete<cr>
+nmap c yy
+nmap v p
+
+nmap f /
+
+o

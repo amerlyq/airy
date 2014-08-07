@@ -1,0 +1,15 @@
+#!/bin/sh
+# @echo on
+# REM "C:\Program Files\Apache Software Foundation\Tomcat 7.0\bin\Tomcat7.exe" stop
+# REM IF EXIST "C:\Program Files\Apache Software Foundation\Tomcat 7.0\webapps\CSSEServer\" rmdir /s /q "C:\Program Files\Apache Software Foundation\Tomcat 7.0\webapps\CSSEServer\"
+# REM IF EXIST "C:\Program Files\Apache Software Foundation\Tomcat 7.0\webapps\CSSEServer.war" del "C:\Program Files\Apache Software Foundation\Tomcat 7.0\webapps\CSSEServer.war"
+# REM "C:\Program Files\Apache Software Foundation\Tomcat 7.0\bin\Tomcat7.exe" start
+
+mysql --user=root --password=qwerty < ~/.bin/queries.sql
+
+COUCH_DB="http://localhost:5984/tf"
+
+curl -X DELETE "$COUCH_DB"
+curl -X PUT "$COUCH_DB"
+
+#REM mvn clean install -DoutputDirectory="C:\Program Files\Apache Software Foundation\Tomcat 7.0\webapps\"

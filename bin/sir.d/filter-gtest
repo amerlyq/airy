@@ -1,0 +1,10 @@
+#!/bin/sh
+
+SCRIPT_DIR="${0%/*}"
+FILTER="${SCRIPT_DIR}/filter-gtest-core"
+
+while read b; do echo $b |
+    echo `$FILTER "$@"` |
+    awk '{ if($0 != "") if($0 != ".") printf "%s\n", $0; else printf "%s", $0; }'
+done
+echo ''   # keep progressbar on screen w/o redraw

@@ -1,0 +1,47 @@
+# Also: ~/.valgrindrc, $VALGRIND_OPTS, ./.valgrindrc
+# If you wish to debug your program rather than debugging Valgrind itself, then you should use the options --vgdb=yes or --vgdb=full or --db-attach=yes. 
+--memcheck:leak-check=full
+--memcheck:show-reachable=yes
+--memcheck:track-origins=yes
+--massif:time-unit=B
+--massif:max-snapshots=128
+--massif:stacks=yes
+--massif:peak-inaccuracy=0.5
+--callgrind:dump-instr=yes
+--callgrind:compress-strings=no
+--callgrind:compress-pos=no
+--cachegrind:I1=32768,8,64
+--cachegrind:D1=32768,8,64
+--cachegrind:L2=2097152,8,64
+--cachegrind:branch-sim=yes
+
+
+# --memcheck:leak-check=full
+#
+# --track-origins=yes
+# --read-var-info=yes
+#
+# --undef-value-errors=yes
+# --db-attach=yes
+# --track-fds=yes
+# --show-reachable=yes
+# --gen-suppressions=all
+# --suppressions=tests/valgrind_vma.supp
+# --suppressions=tests/valgrind_libc.supp
+# --suppressions=tests/valgrind_sockperf.supp
+# --suppressions=tests/valgrind_rdma.supp
+#
+#
+Вот интересная статья - The Dark Side of Usability. (http://usabilitypost.com/2011/01/10/dark-side-of-usability/) Если кратко: провели ряд экспериментов, в которых двум группам людей предлагалось решить одну и ту же задачу, но с использованием дополнительных инструментов с подсказками и без них.
+В результате, время решения задачи было одинаковым, но «подопытные» без доп. инструментов делали меньше ненужных движений и больше концентрировались на стратегии решении задачи.
+
+Так ли нужно пихать в IDE или в VIM то, что уже есть в твоей операционной системе? Есть целая серия статьей: Unix as IDE (http://blog.sanctum.geek.nz/unix-as-ide-introduction/), где предлагается следующая база:
+
+File and project management — ls, find, grep/ack, bash
+Text editor and editing tools — vim, awk, sort, column
+Build tools — make
+Debugger — gdb, valgrind, ltrace, lsof, pmap
+Version control — diff, patch, svn, git
+
+
+Конечно, необязательно именно такой расклад. Я еще использую screen, fish, mercurial, tmux и всякие языкозависимые вещи, вроде maven и virtualenv.

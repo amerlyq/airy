@@ -1,0 +1,32 @@
+Usage: i3 [-c configfile] [-d all] [-a] [-v] [-V] [-C]
+
+	-a          disable autostart ('exec' lines in config)
+	-c <file>   use the provided configfile instead
+	-C          validate configuration file and exit
+	-d all      enable debug output
+	-L <file>   path to the serialized layout during restarts
+	-v          display version and exit
+	-V          enable verbose mode
+
+	--force-xinerama
+	Use Xinerama instead of RandR.
+	This option should only be used if you are stuck with the
+	old nVidia closed source driver (older than 302.17), which does
+	not support RandR.
+
+	--get-socketpath
+	Retrieve the i3 IPC socket path from X11, print it, then exit.
+
+	--shmlog-size <limit>
+	Limits the size of the i3 SHM log to <limit> bytes. Setting this
+	to 0 disables SHM logging entirely.
+	The default is 0 bytes.
+
+If you pass plain text arguments, i3 will interpret them as a command
+to send to a currently running i3 (like i3-msg). This allows you to
+use nice and logical commands, such as:
+
+	i3 border none
+	i3 floating toggle
+	i3 kill window
+

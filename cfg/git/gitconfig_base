@@ -1,0 +1,132 @@
+[user]
+    #signingkey = C8A2DA6E
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore
+    #symlinks = false
+    #autocrlf = true
+    quotepath = false #russian filenames in terminal
+                      # http://habrahabr.ru/post/74839/
+[pack]
+    threads = 0  # Cancel limit for packing threads number
+[merge]
+    tool = vimdiff
+    guitool = meld
+#[mergetool]
+#    keepBackup = false
+#    prompt = false
+[diff]
+    tool = vimdiff
+    guitool = gvimdiff
+    renamelimit = 0  # Accelerate diffs
+[difftool]
+    prompt = false
+
+#[difftool "beyondcompare"]
+#    path = /c/development/tools/beyondcompare/
+#    cmd = /c/development/tools/beyondcompare/bcomp.exe \"$LOCAL\" \"$REMOTE\" -nobackups -title1=\"Old Version\" -title2=\"New Version\"
+#    trustExitCode = false
+#[github]
+#    user = pkumar
+#    token = /* GitHub Token https://github.com/account#admin_bucket */
+#[gitflow "prefix"]
+#    feature = feature-
+#    release = release-
+#    hotfix = hotfix-
+#    support = support-
+#    versiontag = v
+
+[format]
+    pretty = oneline
+#[credential]
+#    helper = cache --timeout=3600
+[push]
+    default = simple
+[pull]
+    rebase = true
+[tig]
+    line-graphics = utf-8
+    show-date = local
+    show-id = true
+    ignore-space = all
+    commit-order = topo
+#[web]
+#    browser = firefox
+#[http]
+#    postBuffer = 52428800
+#[pack]
+#    packSizeLimit = 2g
+
+#[sendemail]
+#smtpencryption = tls
+#smtpserver = smtp.gmail.com
+#smtpuser = pavan.sss1991@gmail.com
+#smtppass = icjbejkkqtyvuach
+#smtpserverport = 587
+#[instaweb]
+#httpd = apache2 -f
+#[rerere]
+#enabled = 1
+#autoupdate = 1
+
+[color]
+    ui = true
+[color "branch"]
+    current = yellow bold
+    local = green bold
+    remote = cyan bold
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+[color "status"]
+    added = green bold
+    changed = yellow bold
+    untracked = red bold
+
+[alias]
+    # Must Have Git Aliases: Advanced Examples
+    # http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
+
+    unstage = reset HEAD
+    up = "!git remote update -p; git merge --ff-only @{u}"
+    backup = !"file=../`git describe`.tar && echo "Creating `readlink -f $file`" && tar cf $file ."
+
+    hh = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+    lg = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(bold white)— %an%C(reset)%C(bold yellow)%d%C(reset)' --abbrev-commit --date=relative
+    lg2 = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(bold white)— %an%C(reset)' --abbrev-commit
+    ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+    ld = log --pretty=format:"%C(yellow)%h\\ %C(green)%ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph
+    ls = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+    la = log --graph --date=relative --all --topo-order --pretty=format:'%C(cyan)[%an]%Creset %C(green bold)%d%Creset %C(yellow)%h%Creset : %s %C(cyan)[%ad]%Creset'
+    lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+    le = log --oneline --decorate
+#    puush = push --force
+
+#    You can see all the commits related to a file, with the diff of the changes with
+    fl = log -u # Show modified files in last commit
+    dh = diff --cached HEAD^ # Show a diff last commit
+    dh1 = diff HEAD~1
+    ds = diff --stat=160,120
+
+    st = status
+    ci = commit --verbose
+    ca = commit -a
+    cm = commit -m
+    cam = commit -am
+
+    co = checkout
+    di = diff
+    dc = diff --cached
+    amend = commit --amend
+    aa = add --all
+    ff = merge --ff-only
+    pullff = pull --ff-only
+    noff = merge --no-ff
+    fa = fetch --all
+    pom = push origin master
+    #b = branch
+
+# vim: ft=gitconfig

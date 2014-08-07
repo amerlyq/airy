@@ -1,0 +1,12 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# (17.2MB) OpenGL Graphics
+
+LST="$LST freeglut3 freeglut3-dev"
+LST="$LST glew-utils glew1.5-dev libglew-dev libglew1.5-dev libglm-dev"
+LST="$LST mesa-utils mesa-common-dev mesa-vdpau-drivers libgl1-mesa-dev libglu1-mesa-dev"
+LST="$LST libxrandr-dev x11proto-randr-dev libx11-dev libxi-dev"
+
+apt_noprompt $LST

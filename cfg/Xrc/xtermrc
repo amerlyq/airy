@@ -1,0 +1,35 @@
+! vim: ft=xdefaults
+
+! ! Disallow bold fonts mostly because XTerm fails to correctly find one ._.
+! XTerm*.allowBoldFonts : false
+! XTerm*.bellIsUrgent   : true
+! XTerm*.cutNewline     : true
+! XTerm*.faceName       : PragmataPro
+! XTerm*.faceSize       : 12
+! XTerm*.fullscreen     : never
+! XTerm*.internalBorder : 0
+! XTerm*.loginShell     : true
+! XTerm*.renderFont     : true
+! XTerm*.termName       : xterm-256color
+! XTerm*.utf8           : always
+! XTerm*.utf8Fonts      : always
+! XTerm*.visualBell     : true
+! XTerm*.visualBellLine : true
+! #include ".Xresources.theme"
+!
+! Xcursor.theme : Vanilla-DMZ
+! Xcursor.size  : 24
+
+!xterm*font: Terminus-12
+!xterm*boldFont: Terminus-12
+!xterm*loginShell: true
+xterm*vt100*geometry: 80x50
+xterm*saveLines: 2000
+! Next, I like being able to double-click to select a word. The definition of a "word" depends on the character class resource. For a complete explanation, look at the CHARACTER CLASSES section in the xterm manpage.
+xterm*charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+xterm*termName: xterm-color
+xterm*eightBitInput: false
+xterm*boldMode: false
+xterm*colorBDMode: true
+xterm*colorBD: rgb:fc/fc/fc
+

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Max seconds to wait until the process is up
+# MAXWAIT=30
+#
+# # Start the given command and wait until it's visible
+# Launch()
+# {
+#     "$@" & # Handle arguments with whitspaces
+#     mypid=$! # Pid of last background process
+#     for i in `seq $MAXWAIT` # count from 1 to MAXWAIT
+#     do
+#      if xdotool search --onlyvisible --pid $mypid; then
+#      return 0
+#      fi
+# sleep 1
+#     done
+#     # Replace on i3-notify
+#     xmessage "Error on executing: $@" &
+# }
+
+#Launch wuala
+
+i3-msg workspace number 1 &
+kbdd  &
+mpd   &
+copyq &
+wuala &
+
