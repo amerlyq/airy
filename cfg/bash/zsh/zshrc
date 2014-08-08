@@ -79,7 +79,9 @@ DEFAULT_USER="$CURR_USER"
 #   export EDITOR='mvim'
 # fi
 
+# vi-mode
 bindkey -v
+bindkey -M viins 'jj' vi-cmd-mode
 
 bindkey '^P' up-history
 bindkey '^N' down-history
@@ -87,6 +89,7 @@ bindkey '^?' backward-delete-char
 bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
+bindkey -a '^R' history-incremental-search-backward
 
 #http://unix.stackexchange.com/questions/122078/how-to-bind-a-key-sequence-to-a-widget-in-vi-cmd-mode-zsh
 #bindkey -s  'S' '^qs\n'

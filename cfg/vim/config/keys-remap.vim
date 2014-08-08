@@ -1,3 +1,8 @@
+"let mapleader=","
+"noremap \ ,
+" give it a try
+inoremap jj <ESC>
+
 " be consistent with C and D which reach the end of line
 nnoremap Y y$
 
