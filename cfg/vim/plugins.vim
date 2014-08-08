@@ -314,6 +314,8 @@ NeoBundle 'terryma/vim-multiple-cursors'
 NeoBundle 'terryma/vim-smooth-scroll'
 " Press + to expand the visual selection  and _ to shrink it.
 NeoBundle 'terryma/vim-expand-region'
+" Move text (line or vselect) in more friendly way, then :m[ove]
+NeoBundle 'matze/vim-move'
 
 " ======================================
 

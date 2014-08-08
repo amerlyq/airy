@@ -84,17 +84,18 @@ bindsym $mod+b border toggle
 
 # kill focused window
 bindsym $mod+backslash kill
+# kill all wdws on wksp
 bindsym $mod+Control+backslash focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill, workspace back_and_forth
 bindsym $mod+Shift+q kill
 
-bindsym $mod+semicolon focus child
-bindsym $mod+Shift+semicolon focus parent
+bindsym $mod+semicolon focus parent
+bindsym $mod+Shift+semicolon focus child
 #bindsym $mod+apostrophe focus child
 
 bindsym $mod+Tab workspace next
 bindsym $mod+Shift+Tab workspace prev
-#bindsym $mod+Control+Left workspace prev
-#bindsym $mod+Control+Right workspace next
+bindsym $mod+Control+Left workspace prev
+bindsym $mod+Control+Right workspace next
 
 #i3-msg 'rename workspace "1: www" to "10: www"'
 bindsym $mod+z exec i3-input -F 'rename workspace to "%s"' -P 'New name: '

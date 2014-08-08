@@ -6,6 +6,7 @@
 export ZSH=$HOME/.oh-my-zsh
 
 setopt noflowcontrol
+stty stop '' -ixoff -ixon
 # new history lines are added to the $HISTFILE incrementally (as soon as they are entered), rather than waiting until the shell exits.
 setopt INC_APPEND_HISTORY
 
