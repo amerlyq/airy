@@ -117,10 +117,11 @@ convertPics() {
 convertDjvu() {
     # Under WINE
         # --togray
-    ARGS="--dpi=300 --upsample=2 --pix-filter-level=12 --shape-filter-level=30 --threshold-level=56 --inversion-level=4 --bg-subsample=2 --quality=24 --lossless --fg-quality=1 --pages-per-dict=10 --jb2-format=color --verbose --filelist="$1" "$2""
+    local lst="$1" #"$(unix2win "$1")"
+    ARGS="--dpi=300 --upsample=2 --pix-filter-level=12 --shape-filter-level=30 --threshold-level=56 --inversion-level=4 --bg-subsample=2 --quality=24 --lossless --fg-quality=1 --pages-per-dict=10 --jb2-format=color --verbose"
     if [ "$CURR_PLTF" == "MINGW" ]
-    then "$prDjvu" $ARGS
-    else wine "$prDjvu" $ARGS ; fi
+    then "$prDjvu" $ARGS --filelist="$lst" "$2"
+    else wine "$prDjvu" $ARGS --filelist="$lst" "$2" ; fi
 }
 
 oneTask() {
@@ -139,6 +140,7 @@ oneTask() {
     convertDjvu "$DST/processed.lst" "$DST/$bnm.djvu"
 
     ## Clear temp pictures and move files
+    #TODO: add conditions to _not_ move or delete if error!
     bakDir "$DST_ORG" "$bnm"
     bakDir "$DST_PRC" "$bnm"
     bakFile "$DST/$bnm.djvu" "$DJVU/$bnm.djvu"
@@ -146,7 +148,7 @@ oneTask() {
 }
 
 mkdir -p "$LOG"
-for fnm in $SRC/*; do
+for fnm in "$SRC"/*; do
     if [ -e "$fnm" ]; then
         oneTask "$fnm" | tee "$LOG/${fnm##*/}.log"
     fi

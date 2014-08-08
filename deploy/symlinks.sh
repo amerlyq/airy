@@ -18,7 +18,7 @@ then
     lnLst ~/. "" "bash i3 urxvt Xrc"
     lnLst ~/. bash/ "inputrc profile bashrc bash_aliases bash_prompt bash_functions tmux.conf zsh/zshrc"
     lnLst ~/. "" "vim vim/vimrc vim/ycm_extra_conf.py"
-    lnLst ~/.config/ "" "ranger"
+    lnLst ~/.config/ "" "ranger mcomix"
     lnLst ~/.mpv/ mpv/ "config input.conf"
     lnLst ~/.config/copyq/ Win/ "copyq.conf"
     lnLst ~/.config/gtk-3.0/ sets/ "settings.ini"
