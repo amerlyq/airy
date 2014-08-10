@@ -4,7 +4,10 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # LaTeX
 
-LST="$LST texlive-full scalable-cyrfonts-tex"
+LST="$LST texlive texlive-latex-base texlive-latex-extra texlive-latex-recommended"
+LST="$LST texlive-latex3 latexmk texlive-lang-cyrillic texlive-science"
+LST="$LST preview-latex-style latex-beamer latex-xcolor scalable-cyrfonts-tex"
+#LST="$LST texlive-full scalable-cyrfonts-tex"
 # texlive-latex-extra texlive-science texlive-lang-cyrillic
 
 # The following packages were automatically installed and are no longer required:
@@ -25,5 +28,11 @@ LST="$LST texlive-full scalable-cyrfonts-tex"
 #   texlive-music texlive-omega texlive-pictures texlive-pictures-doc texlive-plain-extra texlive-pstricks texlive-pstricks-doc texlive-publishers
 #   texlive-publishers-doc texlive-science texlive-science-doc texlive-xetex tipa ttf-adf-accanthis ttf-adf-gillius xindy xindy-rules
 
+TD=~/pkg/ulem
+mkdir $TD
+wget http://www.ctan.org/tex-archive/macros/latex/contrib/ulem/ulem.sty -O $TD/ulem.sty
+wget http://www.ctan.org/tex-archive/macros/latex/contrib/ulem/ulem.sty -O $TD/ulem.ltx
+wget http://www.ctan.org/tex-archive/macros/latex/contrib/ulem/ulem.sty -O $TD/ulem.pdf
+sudo mv -f ~/pkg/ulem /usr/local/share/texmf/
 
 apt_noprompt $LST

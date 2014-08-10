@@ -160,13 +160,13 @@ wprf "\n### ================== Launchers =================== ###\n"
 
 pcli="r v n h"
 bcli="ranger vim ncmpcpp htop"
-pgui="g t z"
-bgui="gvim gvim.tex zathura"
-
-wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)^Float*\"] floating enable"
+pgui="g t z w"
+bgui="gvim gvim.tex zathura wuala"
 
 # How to launch in floating regime?
 # floating enable running before launching of exec, so influence on previous focused wndw
+# Simply create window with name starting with Float*
+wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)^Float*\"] floating enable"
 
 w_header "Mode: Open"
 wmode_begin 'o' "Open: $pcli, $pgui, p l a s"
@@ -177,6 +177,7 @@ wstr ''
 STD_FILEMGR="pcmanfm"
 command -v $STD_FILEMGR >/dev/null 2>&1 || STD_FILEMGR="nemo --no-desktop"
 
+#TODO: remove 's' -- <sound>.py
 wlistf "$t$bs %s $exno %s, \$mdef" "$pgui a s" $bgui "$STD_FILEMGR" "/usr/lib/cinnamon-settings/cinnamon-settings.py sound"
 wmode_end
 
@@ -209,12 +210,11 @@ wlistf "$bm+Shift+%s $exno dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/Kbd
 
 
 w_header "Autostart"
-#warr "$exno" "copyq kbdd mpd"
-#warr "$ealws" "setXdisplay setXwallpaper setXkeylayout"
 warr "$exno" "auto-once"
 warr "$ealws" "auto-always"
 
 wstr "assign [class="^Wuala$"] $ws10"
+wstr "assign [class="^Pale moon$"] $ws10"
 
 #wstr "$eurx -name htop -e htop"
 #wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)htop\"] move scratchpad"

@@ -1,0 +1,18 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# steam-related
+
+apt_noprompt steam playonlinux
+
+# For 14.04
+apt_noprompt lib32z1 lib32ncurses5 lib32bz2-1.0
+
+# For older ubuntu:
+# sudo dpkg --add-architecture i386
+# sudo apt-get update
+# Try installing it after doing that.
+# For future reference look:
+#     https://wiki.ubuntu.com/MultiarchSpec
+#     https://help.ubuntu.com/community/MultiArch

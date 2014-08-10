@@ -2,17 +2,24 @@
  wait until checking with X, commit
  delete on next commit only, not early
 
+BUGS
+	[X] не гаснущий capslock
+	[X] не загружается boot с воткнутым hdmi
+		Need disable 'Intel Rapid Start'
+	[_] steam 'OpenGL not using direct rendering'
+
 ranger
 	[X] sh: .\w from .bash_alias -> append_unique to ranger/bookmarks
 	[~] Make autochoose color scheme depending on availability of 256-color term
-	[_] Add rename alias on 'C' to place cursor at '.' to change only name, not extension
+	[X] Add rename alias on 'C' to place cursor at '.' to change only name, not extension
 	[X] A+S+Enter and rr -- different color scheme but bold.
 		: Needs bash -i (interactive) to load ranger settings
 	[X] Добавить таки сохранение папок по cd смещённых внутри сабшелла
 	[X] при выходе переход на текущую папку.
-	[_] Синхронизация истории введённых команд при закрытии сабшелла
+	[$] Синхронизация истории введённых команд при закрытии сабшелла
 		 и история из того шелла из которого мы впервые открыли ранджер
 		 (тобишь добавить её в 'rr' alias)
+		Частично реализовано через zsh -- остальное излишество
 	[_] Сбилдить ранжер из сорцов и смержить мои текущие настройки
 		https://github.com/hut/ranger
 
@@ -45,10 +52,11 @@ Deploy:
 	[X] make 'default' full profile, which partially applied for 'guest'
 	[X] your own profiles must distribute through private repos
 	[X] each will source 'default' and others to rewrite only necessary fields
+	[_] Shares -- in private profile
 
-	[_] пароли для dir620 -- profile -- хотя если я всё равно буду подключаться
-		 по SSH -- то проще использовать приватные ключи.
-
+	[$] пароли для dir620 -- profile
+		:хотя если я всё равно буду подключаться по SSH -- то проще
+		:использовать приватные ключи.
 	[X] Names of autopulling repos (like erian) must also be part of profile to hide from society
 
 	[_] Dir with profiles on erian
@@ -106,6 +114,7 @@ Deploy:
 		настройки и не зависеть от падающих серверов.
 
 vim
+	[_] BUG: vim -- C-N in plugin multi-edit
 	[_] BUG: after reloading by ':e' Airline disables, maybe smth also
 		: Bottom bar appear again after insert-mode, upper -- will never
 	Integrate this tips:
@@ -113,7 +122,7 @@ vim
 	[X] check AirLineToggle on VBox to meashure CPU loading in the work process
 	 So, it's only a few. 'syntax on' does much more
 	[X] notate surround
-	Change colors of bkgr in ruler, which has ~,+ etc for git
+	[_] Change colors of bkgr in ruler, which has ~,+ etc for git
 	[X] make russian autoswitch for all -- not only for latex
 		: I think better is manually choosen formats.
 		: Get the habit comment cpp in english!
@@ -218,7 +227,8 @@ For my bone:
 		https://github.com/ValveSoftware/steamos_mesa
 
 TODO
-	Texts dir compare on win, then convert to utf8 on unix and move into lyfa.
+	[X] Texts dir compare on win,
+	then convert to utf8 on unix and move into lyfa.
 
 Langs
 	https://github.com/BinRoot/Haskell-Data-Analysis-Cookbook.git

@@ -92,8 +92,8 @@ bindsym $mod+semicolon focus parent
 bindsym $mod+Shift+semicolon focus child
 #bindsym $mod+apostrophe focus child
 
-bindsym $mod+Tab workspace next
-bindsym $mod+Shift+Tab workspace prev
+bindsym $mod+Tab workspace next_on_output
+bindsym $mod+Shift+Tab workspace prev_on_output
 bindsym $mod+Control+Left workspace prev
 bindsym $mod+Control+Right workspace next
 
@@ -105,12 +105,7 @@ bindsym $mod+z exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
 ## Assign workspaces to programs
 #assign [class="^Chromium-browser$" instance="^chromium-browser$"] → 1: web
 #assign [class="^Gvim$" instance="^gvim$"] $w10
-#assign [class="^MPlayer$" instance="^gl$"] → 6: mplayer
-#assign [class="^Firefox$" instance="^Navigator$"] → 8: firefox
-#assign [class="^Emacs$" instance="^emacs$"] → 9: emacs
 #assign [class="^libreoffice-startcenter$" instance="^VCLSalFrame.DocumentWindow$"] 10: office
-#assign [class="mpv"]  $w10
-#assign [class="Vlc"]  $w10
 
 
 # you can let i3 execute any command when it encounters a specific window. The valid criteria are the same as those for commands, see [command_criteria]
@@ -176,12 +171,16 @@ bindsym $mod+r [class="URxvt" title="ranger"] focus
 
 # Move the current workspace to the next output
 # (effectively toggles when you only have two outputs)
-bindsym $mod+bracketleft  move workspace to output left
-bindsym $mod+bracketright move workspace to output right
+# bindsym $mod+bracketleft  move workspace to output left
+# bindsym $mod+bracketright move workspace to output right
+bindsym $mod+bracketleft  focus output left
+bindsym $mod+bracketright focus output right
+bindsym $mod+Shift+bracketleft  move workspace to output left
+bindsym $mod+Shift+bracketright move workspace to output right
 
 # Allows focusing through wkspaces synchronously on all outputs
-bindsym $mod+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
-bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
+# bindsym $mod+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
+# bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
 ## Put this window on the presentation output.
 #bindsym $mod+x move container to output VGA1
 

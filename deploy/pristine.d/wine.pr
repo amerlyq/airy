@@ -5,5 +5,13 @@ source ~/.bash/functions.d/packages
 if [ $? -ne 0 ]; then exit 1; fi
 
 LST="$LST wine"
+# playonlinux winetricks ktouch
 
 apt_noprompt $LST
+
+mkdir -p ~/".wine/drive_c/Program Files"
+mkdir -p ~/".wine/drive_c/Program Files (x86)"
+
+echo "
+    !! Place your Window's programms inside ~/.wine/drive_c/Program Files/ !!
+"
