@@ -3,7 +3,7 @@ set guioptions-=r           " disable right scrollbar
 set guioptions-=L           " disable left scrollbar
 set guioptions-=T           " disable toolbar
 set guioptions-=m           " disable menubar
-set guioptions+=c			" console-like dialogs instead of gui popup ones
+set guioptions+=c           " console-like dialogs instead of gui popup ones
 
 if has("gui_running")
   if has("gui_gtk2")

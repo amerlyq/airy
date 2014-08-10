@@ -179,6 +179,7 @@ NeoBundleLazy 'gregsexton/gitv', { 'depends' : [ 'tpope/vim-fugitive' ]
 
 " Alt: 'airblade/vim-gitgutter' "Only for git, but much faster file save
 NeoBundle 'mhinz/vim-signify'
+
 " Plugin to toggle, display and navigate marks
 " NeoBundle 'kshenoy/vim-signature'
 
@@ -307,10 +308,10 @@ NeoBundle 'henrik/vim-indexed-search'
 NeoBundle 'bronson/vim-visual-star-search'
 NeoBundle 'sudo.vim'
 " ======================================
-" Add new virtual cursor for nex occurance of word under cursor
+" Add new virtual cursor for next occurance of word under cursor
 " Or add them for each line of multiline selection
 " Ctrl-n  --> Ctrl-p, Ctrl-x, and <Esc>
-NeoBundle 'terryma/vim-multiple-cursors'
+NeoBundle 'kris89/vim-multiple-cursors'
 NeoBundle 'terryma/vim-smooth-scroll'
 " Press + to expand the visual selection  and _ to shrink it.
 NeoBundle 'terryma/vim-expand-region'
@@ -329,7 +330,8 @@ NeoBundle 'vimoutliner/vimoutliner', {
 
 " ======================================
 " Colorschemes
-"NeoBundle 'euclio/vim-nocturne'
+" 'jnurmine/Zenburn' -- dark-brown, low-contract
+"NeoBundle 'euclio/vim-nocturne',
 NeoBundle 'tomasr/molokai'
 NeoBundle 'noahfrederick/vim-hemisu'
 NeoBundle 'altercation/vim-colors-solarized'

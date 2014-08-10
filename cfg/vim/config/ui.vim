@@ -32,3 +32,12 @@ else
   endif
 endif
 
+" Restore right colors for sign column in solarized
+highlight SignColumn ctermbg=0
+
+" Fix for GitGutter
+" highlight GitGutterAdd ctermfg=green guifg=darkgreen
+" highlight GitGutterChange ctermfg=yellow guifg=darkyellow
+" highlight GitGutterDelete ctermfg=red guifg=darkred
+" highlight GitGutterChangeDelete ctermfg=yellow guifg=darkyellow
+

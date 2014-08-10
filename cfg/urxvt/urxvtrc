@@ -28,6 +28,12 @@ URxvt*meta8: false
 URxvt*print-pipe : "cat >/dev/null"
 
 
+! Using an antialiased font breaks the preview completely.
+! Having 32bit color depth enabled causes the preview to behave weirdly (jumps sometimes, being only half drawn sometimes, etc.)
+! Google: urxvt w3mimg half drawing
+URxvt*depth : 24
+
+
 
 ! Font: bitmap or xft
 !URxvt*font:        -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1

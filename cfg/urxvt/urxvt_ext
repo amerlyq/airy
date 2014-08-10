@@ -16,6 +16,10 @@
 ! URxvt*perl-lib:      .urxvt/ext
 URxvt*perl-ext-common: default,clipboard,url-select,keyboard-select,font-size
 
+! Скроллинг. "2" - количество строчек для прокрутки
+URxvt*keysym.Meta-k: command:\033]720;2\007
+URxvt*keysym.Meta-j: command:\033]721;2\007
+
 ! Только что заметил баг. Ctrl+Insert/Shift+Insert работают, но только если указатель мыши находится над окном терминала, в который нужно вставить из буфера. Тоже самое наблюдается с другими перловыми расширениями для urxvt (url-select, keyboard-select не запускаются если указатель мыши вне окна терминала). Оказывается виновато перловое расширение для табов.
 URxvt*keysym.Control-Shift-C:   perl:clipboard:copy
 URxvt*keysym.Control-Shift-V:   perl:clipboard:paste
@@ -59,21 +63,21 @@ URxvt*keysym.M-u:      perl:url-select:select_next
 URxvt*keysym.M-space: perl:keyboard-select:activate
 !!  - catch ugly URLs
 
+
 !! Disabled: tabbedex
 !! dont work keys in term when mouse not hover, even when term is active
-!
 ! Tabbedex colors
-URxvt*tabbed.new-button: no
-URxvt*tabbed.autohide: true
-URXvt*tabbed.reopen-on-close: yes
-! Note: Redefining the keys used for the user commands
+URxvt*tabbed.new-button      : no
+URxvt*tabbed.autohide        : true
+URXvt*tabbed.reopen-on-close : yes
+! Note> Redefining the keys used for the user commands
 ! will not disable the default mappings, you have to set no-tabbedex-keys for that:
 URxvt*tabbed.no-tabbedex-keys: true
 
-URxvt*tabbed.tabbar-fg: 15
-URxvt*tabbed.tabbar-bg: 8
-URxvt*tabbed.tab-fg:    8
-URxvt*tabbed.tab-bg:    14
+URxvt*tabbed.tabbar-fg : 15
+URxvt*tabbed.tabbar-bg : 8
+URxvt*tabbed.tab-fg    : 8
+URxvt*tabbed.tab-bg    : 14
 
 URxvt*keysym.Control-Shift-T:    perl:tabbedex:new_tab
 URxvt*keysym.Control-Tab:        perl:tabbedex:next_tab

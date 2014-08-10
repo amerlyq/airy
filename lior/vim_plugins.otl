@@ -140,24 +140,34 @@ vimfiler		40%
 
 	<Space>		toggle_mark_selected_lines
 
-vim-indent-guides	100%
-vim-startify		100%
+vim-indent-guides	done
+vim-signify			done
+vim-startify		done
+
+>> Possibly, I must give up on this plugin. It's slow and buggy, and rarely used
+vim-multiple-cursor 90% (bug)
+	Add new virtual cursor for next occurance of word under cursor
+	Or add them for each line of multiline selection
+; MultipleCursorsFind
+ accepts a range and a pattern - create a virtual cursor at the end of every match
+| C-N , -C-P , -C-X , <Esc> |
+
 
 vim-surround		100%
-< targets are similar to vim_objects
-	ds["'([{t]  | deletes differens b/w inner and a'nner obj
+; targets are similar to vim_objects
+	| ds["'([{t]  | deletes differens b/w inner and a'nner obj
 	 (123+4*56)/2              ds)         123+456/2
-	cs[...wW][...)]}] | replace  surr, adding spaces if closing brack
+	| cs[...wW][...)]}] | replace  surr, adding spaces if closing brack
 	 (123+4*56)/2              cs)[        [ 123+456 ]/2
-	cst<new tag>   | replace tag
+	| cst<new tag>   | replace tag
 	 <div>Yo!*</div>           cst<p>      <p>Yo!</p>
 	 : You may specify attributes here and they will be stripped from the closing tag.
 	ysiw)
-	csbs | removing parentheses from a function call
-	v...S[..]  |
+	| csbs | removing parentheses from a function call
+	| v...S[..]  |
 	 In linewise visual mode, the surroundings are placed on separate lines
 	 and indented.  In blockwise visual mode, each line is surrounded.
-	v...gS[..]
+	| v...gS[..]
 	 In linewise visual mode, the automatic indenting is suppressed.  In
 	 blockwise visual mode, this enables surrounding past the end of the line
 	yss
