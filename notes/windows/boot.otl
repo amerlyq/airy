@@ -1,5 +1,6 @@
 Links
 	http://rufus.akeo.ie/
+
 Format
 	diskpart
 	list disk
@@ -25,4 +26,34 @@ Create Win7 boot installer on HDD
 		xcopy f:\*.* g: /e /f /h
 
 “DEL” or “F2″ key when the computer power
+
+Dual-boot (linux after windows)
+	select disk 0
+	select part 1
+	shrink querymax
+	 Show maximum value of available shrink
+	shrink minimum=30000
+	 MB space, fail if less then needed,
+	: Если указано "desired=5000 minimum=2000", то предпринимается попытка
+	: сжать диск на 5 Гбайт, однако для успешного выполнения команды
+	: достаточно сжать диск на 2 Гбайт
+	list partition
+> All other steps (create partition, format -- do under linux installer!)
+
+Create Linux boot installer on USB
+	Use YUMI.exe
+	Format, install linux, boot from USB
+	Do steps untill disk selection
+		Erase disk and install
+		...
+		...
+		* I will choose what to do
+	Choose last variant (manual choice)
+	Click on free space partition by mouse R-Click
+		Shrink smaller on 4-6 GB for swap (25GB)
+			choose '/'
+		Click again on space which left
+			list partition
+	Install as always
+
 
