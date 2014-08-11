@@ -7,8 +7,8 @@ noremap <Leader>S :saveas<Space>
 " Swap registry
 noremap <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 " Remap line-up and move-up
-noremap <C-y> :let @+=@" \| echom @+<CR><CR>
-noremap <C-p> :let @"=@+ \| echom @"<CR><CR>
+noremap <C-y> :let @+=@" \| echom @+<CR>
+noremap <C-p> :let @"=@+ \| echom 'Copied:' @"<CR>
 
 " For when you forget to sudo.. Really Write the file.
 cnoremap e!! e !sudo tee %

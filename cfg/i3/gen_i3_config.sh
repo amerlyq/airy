@@ -27,7 +27,9 @@ refreshbar="&& killall -SIGUSR1 i3status"
 ealws="exec_always --no-startup-id"
 exno="exec --no-startup-id"
 eurx="$exno urxvtcd"
-ecli="$exno urxvtcd -e bash -i -c " #--hold
+eflo="$eurx -name Float"
+## Disabled: wnd name wrong setted in zsh only!
+#ecli="$exno urxvtcd -e \$SHELL -i -c " #--hold
 bs="bindsym"
 bm="$bs \$mod"
 t="    "
@@ -163,14 +165,11 @@ bcli="ranger vim ncmpcpp htop"
 pgui="g t z w"
 bgui="gvim gvim.tex zathura wuala"
 
-# How to launch in floating regime?
-# floating enable running before launching of exec, so influence on previous focused wndw
-# Simply create window with name starting with Float*
-wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)^Float*\"] floating enable"
+# xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
 
 w_header "Mode: Open"
 wmode_begin 'o' "Open: $pcli, $pgui, p l a s"
-wlistf "$t$bs %s $eurx -name Float -e %s, \$mdef" "$pcli w p l" $bcli "w3m google.com" "gksudo powertop" "gksudo tlp start"
+wlistf "$t$bs %s $eflo -e %s, \$mdef" "$pcli w p l" $bcli "w3m google.com" "gksudo powertop" "gksudo tlp start"
 wstr ''
 
 # Autochoose filemng by OS version.
@@ -193,8 +192,8 @@ wmode_end
 
 w_header "Run: Prgs" # i3-sensible-terminal, ranger
 wstr "$bm+Return $eurx"
-wstr "$bm+Control+Return $eurx -cd '$HOME/aura/sdrm'"
-wstr "$bm+Shift+Return $ecli ranger-auto" #-cd '$HOME/aura'
+wstr "$bm+Control+Return $eflo"
+wstr "$bm+Shift+Return $eflo -e ranger-auto"
 
 w_header "Run: Menus"
 wstr "$bm+d exec \"dmenu_run -p 'yes, master?' -nb '#000000' -nf '#B0E0E6' -sb '#421C84' -sf '#FFFF00'\""
@@ -210,11 +209,8 @@ wlistf "$bm+Shift+%s $exno dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/Kbd
 
 
 w_header "Autostart"
-warr "$exno" "auto-once"
-warr "$ealws" "auto-always"
-
-wstr "assign [class="^Wuala$"] $ws10"
-wstr "assign [class="^Pale moon$"] $ws10"
+wstr "$exno auto-once"
+wstr "$ealws auto-always"
 
 #wstr "$eurx -name htop -e htop"
 #wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)htop\"] move scratchpad"
@@ -228,6 +224,9 @@ wprf "\n### ================= Multimedia =================== ###\n"
 # instead of <5% | 2dB>
 # apt-get intall xbindkeys
 # https://wiki.archlinux.org/index.php/Xbindkeys_(%D0%A0%D1%83%D1%81%D1%81%D
+
+#bindsym XF86AudioMicMute exec "amixer -D pulse sset Capture toggle"
+#bindsym XF86TouchpadToggle exec "synclient TouchpadOff=$(synclient | awk '/TouchpadOff/ {print ($3+1)%2}')"
 
 # Don't forget to set primary PCH to card 0 or disable all others.
 w_header "Control: volume"
@@ -255,8 +254,15 @@ wlistf "$bm+Control+%s $exno ncmpcpp %s" \
 wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Settings"
 
+wstr "assign [class=\"^Wuala$\"] $ws10"
+wstr "assign [class=\"^Pale\ moon$\"] $ws10"
+
+# How to launch in floating regime? Simply create window with name starting with Float*.
+# floating enable running before launching of exec, so influence on previous focused wndw
+wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)^Float*\"] floating enable"
+
 wstr "for_window [window_role=\"pop-up\"] floating enable"
-wstr "for_window [class=\"(?i)urxvt\"] border 1pixel"
+#wstr "for_window [class=\"(?i)urxvt\"] border 1pixel"
 #wstr "for_window [class=\"(?i)urxvt\" title=\"(?i)vim\"] border none"
 
 # wlistf "for_window [class=\"(?i)%s\"] floating enable" \
@@ -290,6 +296,14 @@ wprf "\n### ================== Bar & Theme ================= ###\n"
     # hide - hidden and is only unhidden in case of urgency hints or by pressing the modifier key
     # show - it is drawn on top of the currently visible workspace
     #error: hidden_state        hide    # <hide|show>
+
+
+#bar hidden_state hide|show|toggle [<bar_id>]
+#bar mode dock|hide|invisible|toggle [<bar_id>]
+wstr "$bm+grave bar mode toggle"
+wstr "$bm+Shift+grave bar mode dock"
+wstr "$bm+Control+grave bar mode invisible"
+
 
 wstr "$wndtheme
 bar {
