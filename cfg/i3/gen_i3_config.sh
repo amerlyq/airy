@@ -60,8 +60,8 @@ hjkl="h j k l"
 digits="1 2 3 4 5 6 7 8 9 0"
 arrows="left down up right"
 Arrows="Left Down Up Right"
-wrksps="1:main 2:home 3:work 4:www 5 6 7 8 9 10"
-ws10="10"
+wrknum=( "1:main" "2:home" "3:work" "4:www" "5" "6" "7" "8" "9" "10" )
+wrksps="${wrknum[@]}"
 
 if [ "$CURR_HOST" == "vbox" ]
     then M1=VBOX0; M2=VBOX1;
@@ -273,8 +273,8 @@ wlistf "$bm+Control+%s $exno ncmpcpp %s" \
 wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Settings"
 
-wstr "assign [class=\"^Wuala$\"] $ws10"
-wstr "assign [class=\"^Pale\ moon$\"] $ws4"
+wstr "assign [class=\"^Wuala$\"] ${wrknum[9]}"
+wstr "assign [class=\"^Pale\ moon$\"] ${wrknum[3]}"
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
 # floating enable running before launching of exec, so influence on previous focused wndw
