@@ -274,7 +274,7 @@ wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Settings"
 
 wstr "assign [class=\"^Wuala$\"] $ws10"
-wstr "assign [class=\"^Pale\ moon$\"] $ws10"
+wstr "assign [class=\"^Pale\ moon$\"] $ws4"
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
 # floating enable running before launching of exec, so influence on previous focused wndw
