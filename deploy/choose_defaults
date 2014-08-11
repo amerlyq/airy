@@ -27,6 +27,9 @@ wbegin
 wstr "SELECTED_EDITOR=\"/usr/bin/vim.gtk\""
 echo "W: $dst  <- vim"
 
+# Set default prs
+sudo update-alternatives --set x-terminal-emulator /usr/bin/urxvt
+
 # See all groups:
 # update-alternatives --get-selections
 #

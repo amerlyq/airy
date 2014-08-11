@@ -154,7 +154,9 @@ NeoBundle 'tpope/vim-endwise'
 
 " Manage surrounding ('"<p>...) by replace cs"' or delete ds"
 NeoBundle 'tpope/vim-surround'
-NeoBundle 'kana/vim-smartinput'
+" Disabled: bug with neocomplete -- <BS> don't remove both brackets,
+" unnecessary quotes for my workflow, partially superseeded by vim-surround
+"NeoBundle 'kana/vim-smartinput'
 
 ":Make cover for long-running tasks
 NeoBundle 'tpope/vim-dispatch'

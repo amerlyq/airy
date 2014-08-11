@@ -117,21 +117,20 @@ bindsym $mod+z exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
 # Toggle show/hide for the first scratchpad window (you can have >1 scratchpad container)
 bindsym $mod+i scratchpad show
 bindsym $mod+Shift+i move scratchpad
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+# Change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
 # Toggle tiling / floating (also remove current window from scratchpad)
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+Control+space floating enable
-# Change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
-# Use Mouse+$mod to drag floating windows to their wanted position
 
 # Show the sup-mail scratchpad window, if any.
 # bindsym mod4+s [title="^Sup ::"] scratchpad show
 
 # switching to the appropriate workspace and setting focus to the windows
 # Need module such as launcher with the same names but for focusing
-# Jump exactly to the next open VIM instance
-bindsym $mod+v [class="URxvt" title="VIM"] focus
-bindsym $mod+r [class="URxvt" title="ranger"] focus
+
 
 ### ===================== Multi-monitors ===================== ###
 # SEE: configuring your monitors and 'xrandr' usage
@@ -152,16 +151,12 @@ bindsym $mod+Control+bracketleft  move container to output left
 bindsym $mod+Control+bracketright move container to output right
 bindsym $mod+Control+Shift+bracketleft  move workspace to output left
 bindsym $mod+Control+Shift+bracketright move workspace to output right
-
-# Allows focusing through wkspaces synchronously on all outputs
-# bindsym $mod+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
-# bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
+# Focusing wksps in pairs on two monitors
+bindsym $mod+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
+bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
 
 ## Put this window on the presentation output.
 #bindsym $mod+x move container to output VGA1
-
-## Move current floating window in certain position
-# .. move absolute position 0 0
 
 bindsym $mod+Insert exec --no-startup-id ~/.i3/ext/rename_as_focused
 

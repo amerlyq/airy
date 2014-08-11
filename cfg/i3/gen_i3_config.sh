@@ -26,7 +26,19 @@ wcat ~/.i3/config_base
 refreshbar="&& killall -SIGUSR1 i3status"
 ealws="exec_always --no-startup-id"
 exno="exec --no-startup-id"
-eurx="$exno urxvtcd"
+
+# Choose appropriate terminal (get current launched v-terminal)
+pid=$$
+while [ "$(echo $pid)" != 1 ]; do
+    term=`ps -h -o comm -p $pid 2>/dev/null`
+    pid=`ps -h -o ppid -p $pid 2>/dev/null`
+    echo ": $term"
+done
+if [ "$term" == "urxvtd" ]; then
+    term="urxvt"
+    eurx="$exno urxvtcd"
+else eurx="$exno $term"; fi
+
 eflo="$eurx -name Float"
 ## Disabled: wnd name wrong setted in zsh only!
 #ecli="$exno urxvtcd -e \$SHELL -i -c " #--hold
@@ -88,6 +100,8 @@ wlistf "$bm+%s focus %s" "$hjkl $Arrows" "$arrows $arrows"
 
 w_header "Navigation: Move"
 wlistf "$bm+Shift+%s move %s $smove" "$hjkl $Arrows" "$arrows $arrows"
+## Move current floating window in certain position
+# .. move absolute position 0 0
 
 
 wprf "\n### ================== Mark/Goto =================== ###\n"
@@ -111,6 +125,11 @@ wmode_end
 
 # direction = <up, down, left, right, width or height>
 # resize <grow|shrink> <direction> [<px> px [or <ppt> ppt]]
+
+# Jump exactly to the next open VIM instance
+wstr "$bm+v [class=\"(?i)$term\" title=\"(?i)vim\"] focus"
+wstr "$bm+r [class=\"(?i)$term\" title=\"(?i)ranger\"] focus"
+
 
 wprf "\n### =================== Modify ===================== ###\n"
 w_header "Containers: Modify"
@@ -182,7 +201,7 @@ wmode_end
 
 w_header "Mode: Focus"
 wmode_begin 'y' "Focus: $pcli, $pgui"
-wlistf "$t$bs %s [class=\"(?i)urxvt\" title=\"(?i)%s\"] focus, \$mdef" "$pcli" "$bcli"
+wlistf "$t$bs %s [class=\"(?i)$term\" title=\"(?i)%s\"] focus, \$mdef" "$pcli" "$bcli"
 wstr ''
 wlistf "$t$bs %s [class=\"(?i)%s\"] focus, \$mdef" "$pgui" "$bgui"
 wmode_end
@@ -213,7 +232,7 @@ wstr "$exno auto-once"
 wstr "$ealws auto-always"
 
 #wstr "$eurx -name htop -e htop"
-#wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)htop\"] move scratchpad"
+#wstr "for_window [class=\"(?i)$term\" instance=\"(?i)htop\"] move scratchpad"
 
 # Also: starter, volumeicon, weechat, xscreensaver -no-splash,
 # clipit, parcellite, dropbox, lxsession -s Lubuntu -e LXDE
@@ -259,11 +278,11 @@ wstr "assign [class=\"^Pale\ moon$\"] $ws10"
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
 # floating enable running before launching of exec, so influence on previous focused wndw
-wstr "for_window [class=\"(?i)URxvt\" instance=\"(?i)^Float*\"] floating enable"
+wstr "for_window [class=\"(?i)$term\" instance=\"(?i)^Float*\"] floating enable"
 
 wstr "for_window [window_role=\"pop-up\"] floating enable"
-#wstr "for_window [class=\"(?i)urxvt\"] border 1pixel"
-#wstr "for_window [class=\"(?i)urxvt\" title=\"(?i)vim\"] border none"
+#wstr "for_window [class=\"(?i)$term\"] border 1pixel"
+#wstr "for_window [class=\"(?i)$term\" title=\"(?i)vim\"] border none"
 
 # wlistf "for_window [class=\"(?i)%s\"] floating enable" \
 #     "lxappearance copyq"
