@@ -76,15 +76,19 @@ setprompt () {
     # Modify Git prompt
     ZSH_THEME_GIT_PROMPT_PREFIX="("
     ZSH_THEME_GIT_PROMPT_SUFFIX=")"
-    ZSH_THEME_GIT_PROMPT_DIRTY=""
+    ZSH_THEME_GIT_PROMPT_DIRTY="♭"
     ZSH_THEME_GIT_PROMPT_CLEAN=""
 
-    ZSH_THEME_GIT_PROMPT_ADDED="%{$fg[green]%}○" #✚
-    ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg[yellow]%}✹"
-    ZSH_THEME_GIT_PROMPT_DELETED="%{$fg[red]%}✖"
-    ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg[cyan]%}➜"
-    ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[magenta]%}═"
-    ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[white]%}✭"
+    ZSH_THEME_GIT_PROMPT_ADDED="%{$fg[green]%}✓" #○✚
+    ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg[yellow]%}ϟ"
+    ZSH_THEME_GIT_PROMPT_DELETED="%{$fg[red]%}✗"
+    ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg[cyan]%}➤" #➜
+    ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[magenta]%}ø"
+    ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[white]%}♯"
+    ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[white]%}✴"
+    ZSH_THEME_GIT_PROMPT_AHEAD="%{$fg[white]%}▲"
+    ZSH_THEME_GIT_PROMPT_BEHIND="%{$fg[white]%}▼"
+    ZSH_THEME_GIT_PROMPT_DIVERGED="%{$fg[white]%}☯"
 
     ###
     # See if we can use extended characters to look nicer.
