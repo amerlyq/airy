@@ -5,7 +5,10 @@ source ~/.bash/functions.d/packages
 if [ $? -ne 0 ]; then exit 1; fi
 
 LST="$LST wine"
-# playonlinux winetricks ktouch
+# playonlinux ktouch
+# winetricks | only for x86
+# mono-complete | for .NET
+# mono ./file.exe
 
 apt_noprompt $LST
 
@@ -15,3 +18,14 @@ mkdir -p ~/".wine/drive_c/Program Files (x86)"
 echo "
     !! Place your Window's programms inside ~/.wine/drive_c/Program Files/ !!
 "
+
+# you can run through wine
+# download winetricks from http://winetricks.org/winetricks by running
+# wget http://winetricks.org/winetricks
+# make it executable
+# dependency-----wine
+# run winetricks
+# it has links to microsoft .netv2, v3 ,mono and other microsoft libraries download and install mono using winetricks
+# the config files of the manga downloader has to be in home folder
+# now run
+# wine /path/to/domdomsoft.exe

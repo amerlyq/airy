@@ -28,7 +28,10 @@ wstr "SELECTED_EDITOR=\"/usr/bin/vim.gtk\""
 echo "W: $dst  <- vim"
 
 # Set default prs
+sudo update-alternatives --set x-window-manager /usr/bin/i3
 sudo update-alternatives --set x-terminal-emulator /usr/bin/urxvt
+sudo update-alternatives --set vim /usr/bin/vim.gtk
+sudo update-alternatives --set editor /usr/bin/vim.gtk
 
 # See all groups:
 # update-alternatives --get-selections
@@ -40,8 +43,6 @@ sudo update-alternatives --set x-terminal-emulator /usr/bin/urxvt
 #     view vim.gtk
 #     www-browser w3m
 #     x-session-manager cinnamon-session-cinnamon
-#     x-terminal-emulator urxvt
-#     x-window-manager i3
 #     x-www-browser palemoon
 
 # bash .\w aliases -> ranger/bookmarks

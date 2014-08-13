@@ -85,22 +85,21 @@ URxvt*bolditalicFont:   xft:PragmataPro:bold:italic:pixelsize=15 , xft:DejaVu Sa
 !URxvt*boldFont:-*-courier-bold-r-normal-*-14-*-*-*-*-*-iso8859-1
 
 
-URxvt*letterSpace:      -1
-URxvt*cutchars:`"'&()URxvt*,;<=>?@[]{|}$'"`
+URxvt*letterSpace:          -1
+URxvt*cutchars:             `"'&()URxvt*,;<=>?@[]{|}$'"`
 
-! Shading - 0 to 99 darkens, 101 to 200 lightens.
+! Tint. You can't use the colors "white" or "black" as tinting colors; in terms of tinting they equal "none" and you'll
+! get no tint. Use blue, red, tomato4, olivedrab2, etc.  http://www.htmlgoodies.com/tutorials/colors/article.php/3478921
+!URxvt*tintColor:           Red
+
+! Shading - 0 to 99 darkens, 101 to 200 lightens. Works better then tinting in gray(s).
 ! Dont use with tintColor; just use a darker or lighter color instead.
 URxvt*transparent:          true
 URxvt*shading:              25
-! Tint with any color; some nice listings are at:
-!  http://www.nisrv.com/drupal/?q=node/11
-!  http://www.htmlgoodies.com/tutorials/colors/article.php/3478921
-! blue, red, tomato4, olivedrab2, etc.
-! - You can't use the colors "white" or "black" as tinting colors; in terms of tinting they equal "none" and you'll
-! get no tint.
-! - Tinting with gray(s) is equivalent to shading; use the Shading option instead.
-!URxvt*tintColor: olivedrab2
 
+! Fade the text by the given percentage when focus is lost
+URxvt*fading:               15
+URxvt*fadeColor:            DarkBlue
 
 ! Cursor
 URxvt*cursorColor:          #DCDCCC
@@ -124,5 +123,6 @@ URxvt*externalBorder:       0
 
 ! Colors
 ! For match bold colors 0-7 with colors of normal font (false)
-URxvt.intensityStyles:      false
+URxvt*intensityStyles:      false
+
 
