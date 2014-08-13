@@ -1,0 +1,27 @@
+#!/bin/zsh
+
+source ~/.bash/zsh/zshrc
+
+gita_st() { # $1 -- rep path
+    ST="$PR_SET_CHARSET$AM_GIT`git_prompt_info`$PR_NO_COLOUR `git_prompt_status`$PR_NO_COLOUR"
+    echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
+}
+
+gita_pull() { echo "--[ $1 ]--" && git pull --rebase; }
+
+all_git() { # $1 -- git command
+    for rp in "$PWD"/*; do
+        if [ -d "$rp/.git" ]; then
+            cd "$rp"
+            #gita_pull ${rp##*/}
+            $1 ${rp##*/}
+        fi
+    done
+}
+# Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит, стэш, merge итп -- парсить и заменять на значки
+
+case "$@" in
+    l|pull) all_git "gita_pull" ;;
+    *) all_git "gita_st" | column -t ;;
+esac
+
