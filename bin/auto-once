@@ -21,8 +21,19 @@
 
 #Launch wuala
 
-kbdd  &
-mpd   &
-copyq &
+lau() {
+    local pr="$1"
+    if [ $(which $pr) ]
+    then
+        pgrep $1 > /dev/null || { $1 & }
+    fi
+}
+
+lau kbdd
+lau mpd
+lau copyq
 #i3-msg workspace number 1 &
+
+#notification
+#dunst -config ~/.i3/dunstrc &
 

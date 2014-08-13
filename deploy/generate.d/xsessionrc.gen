@@ -10,8 +10,8 @@ dst=~/.xsessionrc
 wbegin
 
 wstr "
-# This also could be sourced from i3
-#[ -f ~/.Xresources ] && xrdb ~/.Xresources
+
+xsetroot -cursor_name left_ptr
 
 xset -b &       ## Disable beeps
 xset s off &    ## Disable screensaver
@@ -30,17 +30,12 @@ fi
 
 wstr "export LIBGL_ALWAYS_SOFTWARE=1"
 
-# xsetroot -cursor_name left_ptr
-
 ## Fonts for X (terminus)
 #if [ -d /usr/share/fonts/terminus ]; then
 #    xset fp+ /usr/share/fonts/terminus &
 #elif [ -d /usr/share/fonts/local ]; then
 #    xset fp+ /usr/share/fonts/local &
 #fi
-
-#notification
-#dunst -config ~/.i3/dunstrc &
 
 chmod +x "$dst"
 

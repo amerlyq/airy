@@ -10,6 +10,11 @@ stty stop '' -ixoff -ixon
 # new history lines are added to the $HISTFILE incrementally (as soon as they are entered), rather than waiting until the shell exits.
 setopt INC_APPEND_HISTORY
 
+## don't beep on errors
+setopt nobeep
+## type the name of a directory -> it will become the current directory
+setopt autocd
+
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
@@ -33,7 +38,7 @@ ZSH_THEME="airy" #made from jonathan
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # COMPLETION_WAITING_DOTS="true"

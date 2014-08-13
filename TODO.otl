@@ -25,7 +25,7 @@ ranger
 
 zsh
 	https://github.com/robbyrussell/oh-my-zsh/wiki/Customization
-	Здесь описано как создавать свой промпт
+	[X] Здесь описано как создавать свой промпт
 		http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/
 	[_] Port cycle-second end prompt ability
 	http://dougblack.io/words/zsh-vi-mode.html
@@ -104,11 +104,11 @@ Deploy:
 	:  таргет, а всё общее вынесется в функции. Будет большая модульность.
 
 Сделать отдельный скрипт по манипуляции кучей репозиториев.
-	Клонирование при отсутствии
-	Пул по всем
-		Проверка незакоммиченых изменений, огрызков в стеке,
-		неиндексированых файлов, незапушеных комитов по всем
-		Совместить скрипт с промптом для zsh -- одни и те же функции
+	[X] Пул по всем
+		[X] Проверка незакоммиченых изменений, огрызков в стеке,
+		[X] неиндексированых файлов, незапушеных комитов по всем
+		[X] Совместить скрипт с промптом для zsh -- одни и те же функции
+		[_] ? Клонирование при отсутствии
 	Back-up:
 		Сделать скрипт, который бы подтаскивал репозитории на указанную
 		букву жёсткого диска. Тоесть по-сути использовать вышеобозначенный
@@ -117,8 +117,9 @@ Deploy:
 
 vim
 	[X] BUG: vim -- C-N in plugin multi-edit
-	[_] BUG: after reloading by ':e' Airline disables, maybe smth also
+	[X] BUG: after reloading by ':e' Airline disables, maybe smth also
 		: Bottom bar appear again after insert-mode, upper -- will never
+		: It seems problem in 'after' settings 'syntax on', which was in otl
 	Integrate this tips:
 		[_] http://vim.wikia.com/wiki/Replace_a_word_with_yanked_text
 	[X] check AirLineToggle on VBox to meashure CPU loading in the work process
