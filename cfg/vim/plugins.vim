@@ -302,6 +302,9 @@ NeoBundleLazy 'elzr/vim-json', {
 NeoBundle 'bling/vim-airline'
 
 NeoBundle 'mhinz/vim-startify'
+" When swap exists, it show process id, or you can diff swp with file on disk
+NeoBundle 'chrisbra/Recover.vim'
+
 "  toggle the plugin is <Leader>ig
 NeoBundle 'nathanaelkane/vim-indent-guides'
 

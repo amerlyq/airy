@@ -2,6 +2,7 @@
 # I need git ahead/behind markers
 # http://sebastiancelis.com/2009/11/16/zsh-prompt-git-users/
 # make different colors for 16 and 256 term
+# https://github.com/sorin-ionescu/prezto
 
 functions rbenv_prompt_info >& /dev/null || rbenv_prompt_info(){}
 
@@ -166,9 +167,13 @@ $AM_LN$PR_REND$PR_NO_COLOUR '
 
     # display exitcode on the right when >0
     return_code="%(?..%{$fg[red]%}%? ↵ %{$reset_color%})"
+    # if [ ${COLUMNS} -ge 60 ]; then
     RPROMPT='  $return_code$AM_LN$PR_HBAR\
 $PR_GREY($PR_CYAN%(!.%SROOT%s.%n)$PR_GREY@$PR_GREEN%m:%l$PR_GREY)\
-$PR_GREY($PR_YELLOW%D{%H:%M:%S}$PR_GREY)$PR_NO_COLOUR'
+$PR_GREY($PR_YELLOW%*$PR_GREY)$PR_NO_COLOUR'
+    # elif [ ${COLUMNS} -ge 40 ]; then
+    #   RPROMPT='$PR_GREY($PR_YELLOW%D{%H:%M:%S}$PR_GREY)$PR_NO_COLOUR'
+    # else RPROMPT=''; fi
 
 # history number | $PR_CYAN$PR_HBAR%!
 

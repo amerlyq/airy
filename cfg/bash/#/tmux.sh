@@ -1,6 +1,8 @@
 #!/bin/sh
 SESSION_NAME='dashboard'
 
+# urxvt -e bash -c "tmux -q has-session && exec tmux attach-session -d || exec tmux new-session -n$USER -s$USER@$HOSTNAME"
+
 tmux has-session -t $SESSION_NAME
 if [ $? -ne 0 ]
 then
