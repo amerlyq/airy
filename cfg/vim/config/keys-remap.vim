@@ -18,9 +18,9 @@ nnoremap ` '
 
 " Save keystrokes for Ex-commands
 noremap ; :
-noremap : ,
-noremap , ;
 noremap @; @:
+"noremap : ,
+noremap , ;
 
 " noremap o o<Esc><Up>
 " noremap O O<Esc><Down>
@@ -28,7 +28,8 @@ noremap @; @:
 " Use Q for formatting the current paragraph (or selection)
 " Ex-command availible by gQ
 vnoremap Q gq
-nnoremap Q gqap
+nnoremap Q Vgq
+"gqap
 
 " retain relative cursor position when paging
 nnoremap <PageUp>   <C-U>

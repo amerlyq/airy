@@ -16,22 +16,8 @@ set mouse=a
 set colorcolumn=+1 " show textwidth limit
 autocmd ColorScheme * highlight! link ColorColumn StatusLineNC
 
-if has('gui_running')
-  "colorscheme nocturne
-  colorscheme solarized
-  "set background=light
-  set background=dark
-else
-  if &t_Co >= 88
-    let g:solarized_termcolors=16
-    colorscheme solarized
-    "colorscheme molokai
-    set background=dark
-  else
-    colorscheme default
-  endif
-endif
-
+set background=dark "light
+"colorscheme nocturne "molokai
 " Restore right colors for sign column in solarized
 highlight SignColumn ctermbg=0
 

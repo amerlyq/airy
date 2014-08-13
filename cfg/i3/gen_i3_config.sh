@@ -36,7 +36,9 @@ while [ "$(echo $pid)" != 1 ]; do
 done
 if [ "$term" == "urxvtd" ]; then
     term="urxvt"
-    eurx="$exno urxvtcd"
+    # Many times inside tmux demon was hanged, so it's better use separate processes
+    #eurx="$exno urxvtcd"
+    eurx="$exno urxvt"
 else eurx="$exno $term"; fi
 
 eflo="$eurx -name Float"
