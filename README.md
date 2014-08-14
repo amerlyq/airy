@@ -3,7 +3,7 @@
 System deployment configs. All system in one click.
 Different profiles for different devices.
 Vim-consistent controls in all programms.
-Many cheetsheets.
+A lot of cheetsheets.
 
 ====
 
