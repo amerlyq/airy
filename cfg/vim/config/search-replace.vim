@@ -16,3 +16,16 @@ vnoremap <Leader>/ <C-R>
 
 " find merge conflict markers
 nnoremap <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
+
+
+
+"noremap <leader>ct <Esc>:retab<CR>, :retab!
+noremap <leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
+noremap <leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
+noremap <leader>ce :<C-U>%s:^\s*$\n::<CR>
+noremap <leader>cc :<C-U>%s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
+noremap <leader>cC :s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
+noremap <leader>cy <Esc>:%s:\<<C-R><C-W>\>:<C-R>0:g<Left><Left>
+":s;|;\\^M|;g  | split pipe on multiline
+
+

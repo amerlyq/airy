@@ -247,7 +247,7 @@ NeoBundle 'chrisbra/NrrwRgn'
 NeoBundle 'depuracao/vim-rdoc'
 
 
-NeoBundleLazy 'lyokha/vim-xkbswitch', {
+NeoBundle 'lyokha/vim-xkbswitch', {
     \ 'autoload' :
     \   { 'filetypes' : [ 'tex', 'latex', 'bib'
                       \ , 'markdown'

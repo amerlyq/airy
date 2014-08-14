@@ -3,18 +3,13 @@ set backspace=indent,eol,start
 
 nnoremap K  a<CR><Esc>l
 nnoremap gK d0o<Esc>p
+" Jump to a new line in insert mode
+inoremap <M-CR> <Esc>o
 "noremap <Leader>d "_d
 
-"noremap <leader>ct <Esc>:retab<CR>, :retab!
-noremap <leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
-noremap <leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
-noremap <leader>ce :<C-U>%s:^\s*$\n::<CR>
-noremap <leader>cc :<C-U>%s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
-noremap <leader>cC :s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
-noremap <leader>cy <Esc>:%s:\<<C-R><C-W>\>:<C-R>0:g<Left><Left>
-":s;|;\\^M|;g  | split pipe on multiline
-
-nnoremap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
+"" по звездочке не прыгать на следующее найденное, а просто подсветить
+nnoremap * *N
+vnoremap * y :execute ":let @/=@\""<CR> :execute "set hlsearch"<CR>
 
 "nmap <silent> ,s "=nr2char(getchar())<cr>P
 function! RepeatChar(char, count)
@@ -24,10 +19,6 @@ endfunction
 nnoremap <silent> <Space> :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1)<CR>
 nnoremap <silent> g<Space> :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)<CR>
 " <S-Space> work only in gvim
-
-
-"nnoremap <C-=> "+P
-"nnoremap <C-+> "+y
 
 " Ctrl-пробел для автодополнения
 inoremap <C-space> <C-x><C-o>
@@ -45,5 +36,5 @@ inoremap <C-space> <C-x><C-o>
 " Doxygen syntax highlighting
 " manually: set syn=cpp.doxygen
 " if very slow (on \c, \b ): set regexpengine=1
-let g:load_doxygen_syntax=1
+"let g:load_doxygen_syntax=1
 

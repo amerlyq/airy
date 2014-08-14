@@ -6,11 +6,6 @@ inoremap jj <ESC>
 " be consistent with C and D which reach the end of line
 nnoremap Y y$
 
-"" langs (file not found, C-9 don't work)
-" set keymap=russian-jcukenwin
-" set iminsert=0
-" noremap  <C-9> <C-^>
-" noremap! <C-9> <C-^>
 
 " Now 'a jump you to line and column, and `a only to line
 nnoremap ' `

@@ -1,5 +1,5 @@
 setlocal spell
-setlocal spelllang=uk,en,ru
+setlocal spelllang=uk,en_us,ru_yo
 setlocal iskeyword+=:
 
 " else there will be 'cant open error file'
@@ -17,4 +17,3 @@ imap <buffer> ))     \item
 "SyntasticToggleMode
 " I have disabled Syntastic by default and activate/disable error checking with the following in my .vimrc:
 let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [], 'passive_filetypes': [] }
-nnoremap <Leader>E :SyntasticCheck<CR> :SyntasticToggleMode<CR>

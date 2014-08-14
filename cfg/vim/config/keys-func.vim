@@ -1,6 +1,6 @@
 
 " As simple as Ctrl-S under Win,
-" {koi8-r, cp-1251, utf8, reg:utf-16le, :set fenc=utf8}
+" {koi8-r, imb866, cp-1251, utf8, reg:utf-16le, :set fenc=utf8}
 noremap <Leader>s :write ++enc=utf8<CR>
 noremap <Leader>S :saveas<Space>
 
@@ -17,11 +17,13 @@ cnoremap w!! w !sudo tee % >/dev/null
 " generate 'tags' file: obsolete by easytags
 nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
 " reload updated settings in running vim instance
-nnoremap <S-F1> :source $MYVIMRC<CR>
+nnoremap <M-F1> :source $MYVIMRC<CR>
 "nmap <silent> <leader>sv :so $MYVIMRC<CR>
 
 " set makeprg=ruby\ -c\ %
 noremap <silent> <F5> <Esc>:w\|make -C <C-R>=getcwd()<CR>/build \|cw<CR>
+
+nnoremap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 " repeat last character to the maximum width of current line
 nnoremap <Leader>_ :execute 's/.$/'. repeat('&', &textwidth+1) .'/'<Enter>
