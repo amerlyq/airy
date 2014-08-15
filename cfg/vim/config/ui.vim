@@ -11,8 +11,9 @@ set list            " display otherwise invisible characters
 set listchars=tab:\\_,extends:>,precedes:<,nbsp:% ",eol:¬
 set noshowmode
 set lazyredraw      " don't redraw screen while macros are executing
-set mouse=a
-set colorcolumn=+1 " show textwidth limit
+set mouse=a         " support for mouse wheel and clicks
+set colorcolumn=+1  " show textwidth limit
+set virtualedit=all " cursor can be positioned where there is no character
 
 
 autocmd ColorScheme * highlight! link ColorColumn StatusLineNC

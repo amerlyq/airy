@@ -1,5 +1,3 @@
-setlocal spell
-setlocal spelllang=uk,en_us,ru_yo
 setlocal iskeyword+=:
 
 " else there will be 'cant open error file'

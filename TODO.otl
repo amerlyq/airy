@@ -186,7 +186,8 @@ i3
 	[_] Make autoresizing windows (add resize command to focus)
 	 Principle: when you focus up, it's height increases by some value
 	 when focus down, it will decreses and then the height of bottom window
-	 will be increased (as gradient)
+	 will be increased (as gradient). May be inconvinient -- when all wds are
+	 normal sized  (2x2) -- it's undefined which are the larger (needs relative layout data).
 	[_] Make warps -- one-button switcher between two (or more) wdws
 	[_] Make one more bar (hidden), which will show some system info on appear?
 
@@ -200,7 +201,10 @@ i3
 	Launch on empty desktop
 		Auto enter in this regime
 		Press only one key to launch
-	[_] Layouts
+	[$] Layouts -- can't make to work (shell scripts with i3-msg are better)
+		i3-save-tree --workspace 2:home > ~/ss.json
+		vim ~/ss.json | uncomment lines in swallow section
+		i3-msg "workspace number 2; append_layout $HOME/ss.json"
 	[_] Save wksp names in file
 	 (to make it consistent and able to permanent rename through sessions)
 	[_] Fast choose of window, based on [{uio},{jkl},{m,.}] layout (numpad analogue)

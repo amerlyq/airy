@@ -278,7 +278,6 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {
 
 " ======================================
 "NeoBundle 'MPogoda/octave.vim--'
-"NeoBundle 'lukerandall/haskellmode-vim'
 "NeoBundleLazy 'docunext/closetag.vim', { 'autoload' : { 'filetypes' : ['html', 'xml'] }
 "                                     \ , 'name' : 'closetag'
 "                                     \ }
@@ -290,12 +289,29 @@ NeoBundle 'hsanson/vim-android'
 NeoBundle 'scrooloose/syntastic'
 "NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'
 
+" Autoformatting with one button, can use custom (like clang-styler)
+NeoBundle 'Chiel92/vim-autoformat'
+
+" Documentation online finder in one button for word under cursor
+" Keithbsmiley/investigate.vim
+" powerman/vim-plugin-viewdoc
+
 NeoBundle 'octol/vim-cpp-enhanced-highlight'
 
 " JSON Highlight and indent plugin
 NeoBundleLazy 'elzr/vim-json', {
     \ 'autoload': { 'filetypes': [ 'json' ] },
     \}
+
+"" For future of haskell
+"NeoBundle 'lukerandall/haskellmode-vim'
+" eagletmt/ghcmod-vim
+" eagletmt/neco-ghc
+" dag/vim2hs
+" Twinside/vim-haskellConceal
+"" Scala
+" derekwyatt/vim-scala
+
 
 " ======================================
 "TIME:

@@ -22,6 +22,7 @@ nnoremap <M-F1> :source $MYVIMRC<CR>
 
 " set makeprg=ruby\ -c\ %
 noremap <silent> <F5> <Esc>:w\|make -C <C-R>=getcwd()<CR>/build \|cw<CR>
+noremap <F6> :setlocal spell! spelllang=uk,en_us,ru_yo<CR>
 
 nnoremap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
