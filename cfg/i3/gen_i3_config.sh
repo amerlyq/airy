@@ -28,12 +28,18 @@ ealws="exec_always --no-startup-id"
 exno="exec --no-startup-id"
 
 # Choose appropriate terminal (get current launched v-terminal)
-pid=$$
-while [ "$(echo $pid)" != 1 ]; do
-    term=`ps -h -o comm -p $pid 2>/dev/null`
-    pid=`ps -h -o ppid -p $pid 2>/dev/null`
-    echo ": $term"
-done
+# Somehow works unstable, backing one level deeper to term=zsh instead of term=urxvt
+#   when you launch it from install.sh and not directly
+# pid=$$
+# while [ "$(echo $pid)" != 1 ]; do
+#     term=`ps -h -o comm -p $pid 2>/dev/null`
+#     pid=`ps -h -o ppid -p $pid 2>/dev/null`
+#     echo ": $term"
+# done
+
+term=`update-alternatives --get-selections | grep 'x-terminal-emulator' | awk '{ print $3 }'`
+term="${term##*/}"
+
 if [ "$term" == "urxvtd" ]; then
     term="urxvt"
     # Many times inside tmux demon was hanged, so it's better use separate processes

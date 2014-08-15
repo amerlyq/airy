@@ -1,0 +1,17 @@
+#% AutoGen by '/home/amerlyq/aura/airy/deploy/generate.d/xsessionrc.gen'. Do NOT touch! %#
+
+
+xsetroot -cursor_name left_ptr
+
+xset -b &       ## Disable beeps
+xset s off &    ## Disable screensaver
+
+
+## Set startup volume and LCD brightness
+#pactl set-sink-volume 0 '20%' &
+xbacklight -set 90 &
+
+## DPMS monitor setting (standby -> suspend -> off) (seconds)
+xset dpms 300 600 900 &
+
+export LIBGL_ALWAYS_SOFTWARE=1
