@@ -82,8 +82,10 @@ safeLinkRemove() {
     if [ -d "$1" ]; then
         if [ $CURR_PLTF == "MINGW" ]; then
             rmdir "$1"
+        elif [ -L "$1" ]; then
+            rm -f "$1"
         else
-            [ -L "$1" ] && rm -f "$1"
+            echo "This dir isn't symlink"
         fi
     else
         rm -f "$1"
@@ -95,7 +97,6 @@ makeDstBackup()
 {
     local dst="$2" dsttmp="${dst}.bak_"
     if [ -z "$1" ]; then echo "Error: empty 'remove_function"; squit; fi
-    [ ! -e "${dst%/*}" ] && mkdir -p  "${dst%/*}"
     # TODO: !!! Поломанные симлинки на винде из-под mingw НИКАК не определяются !!!
     # тоесть все имеющиеся флаги проверки на существование файла, симлинка или чего угодно тупо не работают
     # Надо всё-таки проверить всё и поробовать найти хоть что-то
@@ -133,6 +134,7 @@ pairLink()
     dst=$(win2unix "$1")
     src=$(win2unix "$2")
 
+    [ ! -e "${dst%/*}" ] && mkdir -p  "${dst%/*}"
     makeDstBackup safeLinkRemove "$dst"
 
     if [ "$CURR_PLTF" == "MINGW" ]; then
@@ -179,11 +181,16 @@ export -f sed_all_in_dir
 
 # ====================== Writing configs ======================
 #
-wbegin(){ echo "${1}#% AutoGen by '${0}'. Do NOT touch! %#" > $dst; }
+wbegin(){
+    if [ -L $dst ]; then rm $dst; fi
+    echo "${1}#% AutoGen by '${0}'. Do NOT touch! %#" > $dst
+}
 export -f wbegin
 
-wbegin_prepend(){ echo "$1" > $dst;
-    echo "#% AutoGen by '${0}'. Do NOT touch! %#" >> $dst; }
+wbegin_prepend(){
+    echo "$1" > $dst
+    wbegin
+}
 export -f wbegin_prepend
 
 wstr(){ echo "$1" >> $dst; }

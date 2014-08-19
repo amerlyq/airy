@@ -71,25 +71,28 @@ Arrows="Left Down Up Right"
 wrknum=( "1:main" "2:home" "3:work" "4:www" "5" "6" "7" "8" "9" "10" )
 wrksps="${wrknum[@]}"
 
-if [ "$CURR_HOST" == "vbox" ]
-    then M1=VBOX0; M2=VBOX1;
-    else M1=eDP1;  M2=HDMI1; fi
-MAIN_SIDE="$(cat ~/.cache/displayside)"
-if [ "$MAIN_SIDE" != "${MAIN_SIDE/[pP]}" ]; then MAIN_SIDE="$M1"; M1="$M2"; M2="$MAIN_SIDE"; fi
-monitors="$M1 $M1 $M1 $M1 $M1 $M2 $M2 $M2 $M2 $M2"
-
 # ----- Vars -----
 smove="50 px"
 
-
 wprf "\n### =========== Script-generated items ============= ###\n"
+
+w_header "Bind: Refresh on i3mod"
+i3mod=64 #LAlt
+#wstr "bindcode $i3mod $exno ${refreshbar:2}"
+wstr "bindcode --release $i3mod $exno ${refreshbar:2}"
 
 #mdf="mode \"default\"; bar mode hide; exec sleep 0.1; exec xdotool key --clearmodifiers alt"
 wstr "set \$mdef mode \"default\""
 
 wprf "\n### ================== Workspaces ================== ###\n"
-w_header "WorkSpaces: Output"
-wlistf "workspace %s output %s" "$wrksps" "$monitors"
+
+M1=( `cat ~/.cache/displayside | sed 1d` )
+if [ ! -z "$M1" ]; then
+    if [ ${#M1[@]} -le 1 ]; then M2="${M1[0]}"; else M2="${M1[1]}"; fi
+    for i in {1..5}; do monitors="$M1 $monitors $M2"; done
+    w_header "WorkSpaces: Output"
+    wlistf "workspace %s output %s" "$wrksps" "$monitors"
+fi
 
 w_header "WorkSpaces: Focus"
 wlistf "$bm+%s workspace number %s" "$digits" "$wrksps"
@@ -275,7 +278,7 @@ wlistf "$bs %s $exno ncmpcpp %s" \
     "toggle next prev stop"
 wstr ''
 wlistf "$bm+Control+%s $exno ncmpcpp %s" \
-    "Home Prior Next End" "toggle next prev stop"
+    "Home Prior Next End" "toggle prev next stop"
 
 
 wprf "\n### =================== Windows ==================== ###\n"

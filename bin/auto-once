@@ -32,7 +32,7 @@ lau() {
 lau kbdd
 lau mpd
 lau copyq
-#i3-msg workspace number 1 &
+#i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &
 
 #notification
 #dunst -config ~/.i3/dunstrc &
