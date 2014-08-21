@@ -10,136 +10,260 @@
 # Right  : RIGHT , ^[[C
 # Left   : LEFT  , ^[[D
 
-keymap  C-@ MARK           # Set/unset mark
-keymap  C-a LINE_BEGIN     # Go to the beginning of line
-keymap  C-b MOVE_LEFT      # Move cursor left (a half screen shift at the left edge)
-keymap  C-e LINE_END       # Go to the end of line
-keymap  C-f MOVE_RIGHT     # Move cursor right (a half screen shift at the right edge)
-keymap  C-g LINE_INFO      # Show current line number
-keymap  C-h HISTORY        # View history of URL
-keymap  TAB NEXT_LINK      # Move to next link
-keymap  C-j GOTO_LINK      # Go to current link
-keymap  C-k COOKIE         # View cookie list
-keymap  C-l REDRAW         # Redraw screen
-keymap  C-m GOTO_LINK      # Go to current link
-keymap  C-n MOVE_DOWN      # Move cursor down (a half screen scroll at the end of screen)
-keymap  C-p MOVE_UP        # Move cursor up (a half screen scroll at the top of screen)
-keymap  C-q CLOSE_TAB      # Close current tab
-keymap  C-r ISEARCH_BACK   # Incremental search backward
-keymap  C-s ISEARCH        # Incremental search forward
-keymap  C-t TAB_LINK       # Open current link on new tab
-keymap  C-u PREV_LINK      # Move to previous link
-keymap  C-v NEXT_PAGE      # Move to next page
-keymap  C-w WRAP_TOGGLE    # Toggle wrap search mode
-keymap  C-z SUSPEND        # Stop loading document
+# Set/unset mark
+keymap  C-@ MARK           
+# Go to the beginning of line
+keymap  C-a LINE_BEGIN     
+# Move cursor left (a half screen shift at the left edge)
+keymap  C-b MOVE_LEFT      
+# Go to the end of line
+keymap  C-e LINE_END       
+# Move cursor right (a half screen shift at the right edge)
+keymap  C-f MOVE_RIGHT     
+# Show current line number
+keymap  C-g LINE_INFO      
+# View history of URL
+keymap  C-h HISTORY        
+# Move to next link
+keymap  TAB NEXT_LINK      
+# Go to current link
+keymap  C-j GOTO_LINK      
+# View cookie list
+keymap  C-k COOKIE         
+# Redraw screen
+keymap  C-l REDRAW         
+# Go to current link
+keymap  C-m GOTO_LINK      
+# Move cursor down (a half screen scroll at the end of screen)
+keymap  C-n MOVE_DOWN      
+# Move cursor up (a half screen scroll at the top of screen)
+keymap  C-p MOVE_UP        
+# Close current tab
+keymap  C-q CLOSE_TAB      
+# Incremental search backward
+keymap  C-r ISEARCH_BACK   
+# Incremental search forward
+keymap  C-s ISEARCH        
+# Open current link on new tab
+keymap  C-t TAB_LINK       
+# Move to previous link
+keymap  C-u PREV_LINK      
+# Move to next page
+keymap  C-v NEXT_PAGE      
+# Toggle wrap search mode
+keymap  C-w WRAP_TOGGLE    
+# Stop loading document
+keymap  C-z SUSPEND        
 
-keymap  SPC NEXT_PAGE      # Move to next page
-keymap  !   SHELL          # Execute shell command
-keymap  \"  REG_MARK       # Set mark using regexp
-keymap  #   PIPE_SHELL     # Execute shell command and browse
-keymap  $   LINE_END       # Go to the end of line
-keymap  (   UNDO           # Cancel the last cursor movement
-keymap  )   REDO           # Cancel the last undo
-keymap  +   NEXT_PAGE      # Move to next page
-keymap  ,   LEFT           # Shift screen one column
-keymap  -   PREV_PAGE      # Move to previous page
-keymap  .   RIGHT          # Shift screen one column right
-keymap  /   SEARCH         # Search forward
-keymap  :   MARK_URL       # Mark URL-like strings as anchors
-keymap  ";" MARK_WORD      # Mark current word as anchor
-keymap  <   SHIFT_LEFT     # Shift screen left
-keymap  =   INFO           # View info of current document
-keymap  >   SHIFT_RIGHT    # Shift screen right
-keymap  ?   SEARCH_BACK    # Search backward
-keymap  @   READ_SHELL     # Execute shell command and load
-keymap  B   BACK           # Back to previous buffer
-keymap  D   DOWNLOAD_LIST  # Display download list panel
-keymap  E   EDIT           # Edit current document
-keymap  F   FRAME          # Render frame
-keymap  G   END            # Go to the last line
-keymap  H   HELP           # View help
-keymap  I   VIEW_IMAGE     # View image
-keymap  J   UP             # Scroll up one line
-keymap  K   DOWN           # Scroll down one line
-keymap  L   LIST           # Show all links and images
-keymap  M   EXTERN         # Execute external browser
-keymap  N   SEARCH_PREV    # Search previous regexp
-keymap  Q   EXIT           # Quit w3m without confirmation
-keymap  R   RELOAD         # Reload buffer
-keymap  S   SAVE_SCREEN    # Save rendered document to file
-keymap  T   NEW_TAB        # Open new tab
-keymap  U   GOTO           # Go to URL
-keymap  V   LOAD           # Load local file
-keymap  W   PREV_WORD      # Move to previous word
-keymap  Z   CENTER_H       # Move to the center line
-keymap  [   LINK_BEGIN     # Go to the first link
-keymap  ]   LINK_END       # Go to the last link
-keymap  \^  LINE_BEGIN     # Go to the beginning of line
-keymap  a   SAVE_LINK      # Save link to file
-keymap  b   PREV_PAGE      # Move to previous page
-keymap  c   PEEK           # Peek current URL
-keymap  g   BEGIN          # Go to the first line
-keymap  h   MOVE_LEFT      # Move cursor left (a half screen shift at the left edge)
-keymap  i   PEEK_IMG       # Peek image URL
-keymap  j   MOVE_DOWN      # Move cursor down (a half screen scroll at the end of screen)
-keymap  k   MOVE_UP        # Move cursor up (a half screen scroll at the top of screen)
-keymap  l   MOVE_RIGHT     # Move cursor right (a half screen shift at the right edge)
-keymap  m   MOUSE_TOGGLE   # Toggle activity of mouse
-keymap  n   SEARCH_NEXT    # Search next regexp
-keymap  o   OPTIONS        # Option setting panel
-keymap  q   QUIT           # Quit w3m
-keymap  r   VERSION        # Display version of w3m
-keymap  s   SELECT_MENU    # Popup buffer selection menu
-keymap  u   PEEK_LINK      # Peek link URL
-keymap  v   VIEW           # View HTML source
-keymap  w   NEXT_WORD      # Move to next word
-keymap  z   CENTER_V       # Move to the center column
-keymap  {   PREV_TAB       # Move to previous tab
-keymap  |   PIPE_BUF       # Send rendered document to pipe
-keymap  }   NEXT_TAB       # Move to next tab
+# Move to next page
+keymap  SPC NEXT_PAGE      
+# Execute shell command
+keymap  !   SHELL          
+# Set mark using regexp
+keymap  \"  REG_MARK       
+# Execute shell command and browse
+keymap  #   PIPE_SHELL     
+# Go to the end of line
+keymap  $   LINE_END       
+# Cancel the last cursor movement
+keymap  (   UNDO           
+# Cancel the last undo
+keymap  )   REDO           
+# Move to next page
+keymap  +   NEXT_PAGE      
+# Shift screen one column
+keymap  ,   LEFT           
+# Move to previous page
+keymap  -   PREV_PAGE      
+# Shift screen one column right
+keymap  .   RIGHT          
+# Search forward
+keymap  /   SEARCH         
+# Mark URL-like strings as anchors
+keymap  :   MARK_URL       
+# Mark current word as anchor
+keymap  ";" MARK_WORD      
+# Shift screen left
+keymap  <   SHIFT_LEFT     
+# View info of current document
+keymap  =   INFO           
+# Shift screen right
+keymap  >   SHIFT_RIGHT    
+# Search backward
+keymap  ?   SEARCH_BACK    
+# Execute shell command and load
+keymap  @   READ_SHELL     
+# Back to previous buffer
+keymap  B   BACK           
+# Display download list panel
+keymap  D   DOWNLOAD_LIST  
+# Edit current document
+keymap  E   EDIT           
+# Render frame
+keymap  F   FRAME          
+# Go to the last line
+keymap  G   END            
+# View help
+keymap  H   HELP           
+# View image
+keymap  I   VIEW_IMAGE     
+# Scroll up one line
+keymap  J   UP             
+# Scroll down one line
+keymap  K   DOWN           
+# Show all links and images
+keymap  L   LIST           
+# Execute external browser
+keymap  M   EXTERN         
+# Search previous regexp
+keymap  N   SEARCH_PREV    
+# Quit w3m without confirmation
+keymap  Q   EXIT           
+# Reload buffer
+keymap  R   RELOAD         
+# Save rendered document to file
+keymap  S   SAVE_SCREEN    
+# Open new tab
+keymap  T   NEW_TAB        
+# Go to URL
+keymap  U   GOTO           
+# Load local file
+keymap  V   LOAD           
+# Move to previous word
+keymap  W   PREV_WORD      
+# Move to the center line
+keymap  Z   CENTER_H       
+# Go to the first link
+keymap  [   LINK_BEGIN     
+# Go to the last link
+keymap  ]   LINK_END       
+# Go to the beginning of line
+keymap  \^  LINE_BEGIN     
+# Save link to file
+keymap  a   SAVE_LINK      
+# Move to previous page
+keymap  b   PREV_PAGE      
+# Peek current URL
+keymap  c   PEEK           
+# Go to the first line
+keymap  g   BEGIN          
+# Move cursor left (a half screen shift at the left edge)
+keymap  h   MOVE_LEFT      
+# Peek image URL
+keymap  i   PEEK_IMG       
+# Move cursor down (a half screen scroll at the end of screen)
+keymap  j   MOVE_DOWN      
+# Move cursor up (a half screen scroll at the top of screen)
+keymap  k   MOVE_UP        
+# Move cursor right (a half screen shift at the right edge)
+keymap  l   MOVE_RIGHT     
+# Toggle activity of mouse
+keymap  m   MOUSE_TOGGLE   
+# Search next regexp
+keymap  n   SEARCH_NEXT    
+# Option setting panel
+keymap  o   OPTIONS        
+# Quit w3m
+keymap  q   QUIT           
+# Display version of w3m
+keymap  r   VERSION        
+# Popup buffer selection menu
+keymap  s   SELECT_MENU    
+# Peek link URL
+keymap  u   PEEK_LINK      
+# View HTML source
+keymap  v   VIEW           
+# Move to next word
+keymap  w   NEXT_WORD      
+# Move to the center column
+keymap  z   CENTER_V       
+# Move to previous tab
+keymap  {   PREV_TAB       
+# Send rendered document to pipe
+keymap  |   PIPE_BUF       
+# Move to next tab
+keymap  }   NEXT_TAB       
 
-keymap  M-TAB   PREV_LINK  # Move to previous link
-keymap  M-C-j   SAVE_LINK  # Save link to file
-keymap  M-C-m   SAVE_LINK  # Save link to file
+# Move to previous link
+keymap  M-TAB   PREV_LINK  
+# Save link to file
+keymap  M-C-j   SAVE_LINK  
+# Save link to file
+keymap  M-C-m   SAVE_LINK  
 
-keymap  M-: MARK_MID       # Mark Message-ID-like strings as anchors
-keymap  M-< BEGIN          # Go to the first line
-keymap  M-> END            # Go to the last line
-keymap  M-I SAVE_IMAGE     # Save image to file
-keymap  M-M EXTERN_LINK    # View current link using external browser
-keymap  M-W DICT_WORD_AT   # Execute dictionary command for word at cursor
-keymap  M-a ADD_BOOKMARK   # Add current page to bookmark
-keymap  M-b BOOKMARK       # Read bookmark
-keymap  M-c COMMAND        # Execute w3m command(s)
-keymap  M-e EDIT_SCREEN    # Edit currently rendered document
-keymap  M-g GOTO_LINE      # Go to specified line
-keymap  M-k DEFINE_KEY     # Define a binding between a key stroke and a user command
-keymap  M-l LIST_MENU      # Popup link list menu and go to selected link
-keymap  M-m MOVE_LIST_MENU # Popup link list menu and move cursor to selected link
-keymap  M-n NEXT_MARK      # Move to next word
-keymap  M-o SET_OPTION     # Set option
-keymap  M-p PREV_MARK      # Move to previous mark
-keymap  M-s SAVE           # Save document source to file
-keymap  M-t TAB_MENU       # Popup tab selection menu
-keymap  M-u GOTO_RELATIVE  # Go to relative URL
-keymap  M-v PREV_PAGE      # Move to previous page
-keymap  M-w DICT_WORD      # Execute dictionary command (see README.dict)
+# Mark Message-ID-like strings as anchors
+keymap  M-: MARK_MID       
+# Go to the first line
+keymap  M-< BEGIN          
+# Go to the last line
+keymap  M-> END            
+# Save image to file
+keymap  M-I SAVE_IMAGE     
+# View current link using external browser
+keymap  M-M EXTERN_LINK    
+# Execute dictionary command for word at cursor
+keymap  M-W DICT_WORD_AT   
+# Add current page to bookmark
+keymap  M-a ADD_BOOKMARK   
+# Read bookmark
+keymap  M-b BOOKMARK       
+# Execute w3m command(s)
+keymap  M-c COMMAND        
+# Edit currently rendered document
+keymap  M-e EDIT_SCREEN    
+# Go to specified line
+keymap  M-g GOTO_LINE      
+# Define a binding between a key stroke and a user command
+keymap  M-k DEFINE_KEY     
+# Popup link list menu and go to selected link
+keymap  M-l LIST_MENU      
+# Popup link list menu and move cursor to selected link
+keymap  M-m MOVE_LIST_MENU 
+# Move to next word
+keymap  M-n NEXT_MARK      
+# Set option
+keymap  M-o SET_OPTION     
+# Move to previous mark
+keymap  M-p PREV_MARK      
+# Save document source to file
+keymap  M-s SAVE           
+# Popup tab selection menu
+keymap  M-t TAB_MENU       
+# Go to relative URL
+keymap  M-u GOTO_RELATIVE  
+# Move to previous page
+keymap  M-v PREV_PAGE      
+# Execute dictionary command (see README.dict)
+keymap  M-w DICT_WORD      
 
-keymap  UP    MOVE_UP      # Move cursor up (a half screen scroll at the top of screen)
-keymap  DOWN  MOVE_DOWN    # Move cursor down (a half screen scroll at the end of screen)
-keymap  RIGHT MOVE_RIGHT   # Move cursor right (a half screen shift at the right edge)
-keymap  LEFT  MOVE_LEFT    # Move cursor left (a half screen shift at the left edge)
+# Move cursor up (a half screen scroll at the top of screen)
+keymap  UP    MOVE_UP      
+# Move cursor down (a half screen scroll at the end of screen)
+keymap  DOWN  MOVE_DOWN    
+# Move cursor right (a half screen shift at the right edge)
+keymap  RIGHT MOVE_RIGHT   
+# Move cursor left (a half screen shift at the left edge)
+keymap  LEFT  MOVE_LEFT    
 
-keymap  M-[E    MENU       # Popup menu
-keymap  M-[L    MENU       # Popup menu
-keymap  M-[Z    PREV_LINK  # Move to previous link
+# Popup menu
+keymap  M-[E    MENU       
+# Popup menu
+keymap  M-[L    MENU       
+# Move to previous link
+keymap  M-[Z    PREV_LINK  
 
-keymap  M-[1~   BEGIN      # Go to the first line
-keymap  M-[2~   MENU       # Popup menu
-keymap  M-[4~   END        # Go to the last line
-keymap  M-[5~   PREV_PAGE  # Move to previous page
-keymap  M-[6~   NEXT_PAGE  # Move to next page
-keymap  M-[28~  MENU       # Popup menu
+# Go to the first line
+keymap  M-[1~   BEGIN      
+# Popup menu
+keymap  M-[2~   MENU       
+# Go to the last line
+keymap  M-[4~   END        
+# Move to previous page
+keymap  M-[5~   PREV_PAGE  
+# Move to next page
+keymap  M-[6~   NEXT_PAGE  
+# Popup menu
+keymap  M-[28~  MENU       
 
 
 # ABORT             # Quit w3m without confirmation

@@ -57,9 +57,10 @@ Step2 : If the sound is crapy, you MAY have to edit the alsa
 sudo update-grub
 
 # probe_mask=1
+	 # Audio, ALSA for laptop: http://help.ubuntu.ru/wiki/alsa
 	options blacklist snd_usb_audio
 	options snd-hda-intel model=auto
-
+	 # echo "options snd-hda-intel model=auto" >> /etc/modprobe.d/alsa-base.conf
 
 	/etc/modprobe.d/alsa-base.conf
 		options snd-hda-intel probe_mask=1 model=auto
