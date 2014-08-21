@@ -1,3 +1,47 @@
 ELF
 	Soft
 		http://www.gnu.org/software/binutils/
+
+See
+	http://www.linuxassembly.org/syscall.html
+
+Examples
+	std c lib
+		http://jdefr.swippet.com/2012/03/22/using-libc-with-assembly/
+	truss & strace
+		http://www.lisha.ufsc.br/teaching/os/exercise/hello.html
+	s
+		http://montcs.bloomu.edu/~bobmon/Code/Asm.and.C/Basic-asm-IO-under-Linux/
+		http://cs.lmu.edu/~ray/notes/gasexamples/
+	s
+	: I'm doing all compilation steps manually.Say first ran preprocessor (gcc
+	: -E ) then compilation (gcc -S ) and then assembler(gcc -c) and finally
+	:  reached linker
+	Marie
+		https://blogs.oracle.com/ksplice/entry/hello_from_a_libc_free
+		https://blogs.oracle.com/ksplice/entry/hello_from_a_libc_free1
+			http://habrahabr.ru/post/88101/
+	Simple
+		http://www.delorie.com/djgpp/doc/ug/asm/calling.html
+	s
+	: I just don't get what is going wrong. I have tried coff because when I
+	: objdump the 2 files they seem to be of the coff type.
+
+AT&T vs Intel
+	http://asm.sourceforge.net/articles/linasm.html
+
+
+There are at least three things that you need to do to successfully use libc with dynamic linking:
+	1. Link /usr/lib/crt1.o, which contains _start, which will be the entry point for the ELF binary;
+	2. Link /usr/lib/crti.o (before libc) and /usr/lib/crtn.o (after), which provide some initialisation and finalisation code;
+	3. Tell the linker that the binary will use the dynamic linker, /lib/ld-linux.so.
+
+	$ as -o hello.o hello.s
+	$ ld -o hello -dynamic-linker /lib/ld-linux.so.2 /usr/lib/crt1.o /usr/lib/crti.o -lc hello.o /usr/lib/crtn.o
+	$ ./hello
+
+Hack (Cool article, must read and try)
+	http://crypto.stanford.edu/~blynn/rop/
+	http://ruinedsec.wordpress.com/2013/04/04/modifying-system-calls-dispatching-linux/
+	Hook
+		http://www.ragestorm.net/blogs/?p=107

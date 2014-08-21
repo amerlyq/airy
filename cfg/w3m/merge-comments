@@ -1,0 +1,23 @@
+#!/bin/bash
+
+FLCM="./funcs"
+
+# back-up file
+FLKY0="./keymap"
+FLKY="${FLKY0}_2"
+cp -f $FLKY0 $FLKY
+echo '' >> $FLKY
+
+cat $FLCM | while read LINE; do
+    # split src to terms
+    NM=${LINE%% *}
+    CM=${LINE#* }
+    STR="$NM # $CM"
+
+    # replace with comments
+    if grep -q "\<$NM\>" $FLKY ; then
+        sed -i "/\<$NM\>/s||$STR|g" $FLKY
+    else
+        echo "# $STR" >> $FLKY
+    fi
+done
