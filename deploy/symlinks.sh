@@ -34,6 +34,8 @@ then
     pairLink ~/.dircolors "${CONF_DIR}/bash/dircolors.256dark"
     pairLink ~/.ncmpcpp/config "${CONF_DIR}/sets/ncmpcpp.conf"
     pairLink ~/.ncmpcpp/keys "${CONF_DIR}/sets/ncmpcpp.keys"
+    pairLink ~/.w3m/config "${CONF_DIR}/w3m/config"
+    pairLink ~/.w3m/keymap "${CONF_DIR}/w3m/keymap"
     pairLink ~/.wallpaper ~/aura/wallpaper.jpg
     pairLink ~/.pentadactylrc "${CONF_DIR}/Win/pentadactylrc"
 fi

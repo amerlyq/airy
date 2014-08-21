@@ -16,6 +16,8 @@ noremap ; :
 noremap @; @:
 "noremap : ,
 noremap , ;
+" remove history-window (when you mistakes)
+nnoremap q: q;
 
 " noremap o o<Esc><Up>
 " noremap O O<Esc><Down>

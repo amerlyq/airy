@@ -8,7 +8,8 @@ inoremap <M-CR> <Esc>o
 "noremap <Leader>d "_d
 
 "" по звездочке не прыгать на следующее найденное, а просто подсветить
-nnoremap * *N
+" don't works cause of plugin vim-indexed-search remapping
+"nnoremap * *N
 vnoremap * y :execute ":let @/=@\""<CR> :execute "set hlsearch"<CR>
 
 "nmap <silent> ,s "=nr2char(getchar())<cr>P

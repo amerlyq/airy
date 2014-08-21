@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Google-img
+# wget $(wget --quiet -O- -U "" \
+#  "http://images.google.com/images?imgsz=xxlarge&hl=en&q=wallpaper+HD&start=$(($RANDOM%900+100))"  \
+#  | grep -oe 'http://[^"]*\.jpg' | head -1)
+
+BASE="http://www.wallbase.cc"
+CONF="/0/213/eqeq/0x0/0/1/1/0/60/relevance/desc/wallpapers"
+SEARCH="$BASE/search"
+RANDOM="$BASE/random"
+NEWEST="$SEARCH/0/$CONF"
+SEEK="some_word"
+SEARCHED="$SEARCH/$SEEK/$CONF"
+
+random_page=$(curl -Ls "$RANDOM")
+#random_page=$(cat ~/tmp/random )
+
+rref='<a href="\(.*\)" target="_blank">'
+links=$( sed -n "/.*${rref}.*/s//\1/gp" <<< "$random_page" )
+ cnt=$( echo "$links" | sed -n '$=' )
+pick=$( echo "$links" | sed -n "$(($cnt*RANDOM/32768+1))p" )
+
+picked_page=$(curl -Ls "$pick")
+#picked_page=$(cat ~/tmp/2580213 )
+
+rimg='<img src="\(.*wallpapers.*\)" class=".*">'
+image=$( sed -n "/.*${rimg}.*/s//\1/gp" <<< "$picked_page" )
+fname=~/tmp/"${image##*/}"
+
+if [ ! -e "$fname" ]; then
+    curl "$image" -so "$fname"
+fi
+#echo "$image" "$fname"
+
+#now a duplicate check...
+# find -not -empty -type f -printf "%sn" | sort -rn | uniq -d | xargs -I{} -n1 find -type f -size {}c -print0 | xargs -0 md5sum | sort | uniq -w32 | cut -d" " -f3 | xargs -P 10 -r -n 1 rm
+
+
+## cat and split
+# OLDIFS=$IFS
+# IFS='
+# '
+# urlsa=( $( < ./wallist ) )
+# IFS=$OLDIFS
+
+
+#get the wallpaper overview page, grep the wallpaper page urls and dump them into a file for wget
+# WARGS='--referer="http://www.google.com" --user-agent="Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20120403211507 Firefox/12.0"'
+# wget -q $WARGS $GETURL -O- | egrep -o "http://[^[:space:]]*" | grep "/wallpaper/" | sed 's/"//g' > ./wallist
+
+#now loop trough the urls and wget the page, then grep the wallpaper URL, and then wget the wallpaper
+# wget -vv $WARGS $i -O- | wget -vv -nd -nc `egrep -o "http://[^[:space:]]*.jpg"`

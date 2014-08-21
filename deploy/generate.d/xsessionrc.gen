@@ -29,6 +29,8 @@ xset dpms 300 600 900 &
 fi
 
 wstr "export LIBGL_ALWAYS_SOFTWARE=1"
+# For ComposeKey to work
+wstr "export GTK_IM_MODULE=xim"
 
 ## Fonts for X (terminus)
 #if [ -d /usr/share/fonts/terminus ]; then

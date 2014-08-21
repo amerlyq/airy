@@ -168,8 +168,9 @@ $AM_LN$PR_REND$PR_NO_COLOUR '
     # display exitcode on the right when >0
     return_code="%(?..%{$fg[red]%}%? ↵ %{$reset_color%})"
     # if [ ${COLUMNS} -ge 60 ]; then
+    #:%l
     RPROMPT='  $return_code$AM_LN$PR_HBAR\
-$PR_GREY($PR_CYAN%(!.%SROOT%s.%n)$PR_GREY@$PR_GREEN%m:%l$PR_GREY)\
+$PR_GREY($PR_CYAN%(!.%SROOT%s.%n)$PR_GREY@$PR_GREEN%m$PR_GREY)\
 $PR_GREY($PR_YELLOW%*$PR_GREY)$PR_NO_COLOUR'
     # elif [ ${COLUMNS} -ge 40 ]; then
     #   RPROMPT='$PR_GREY($PR_YELLOW%D{%H:%M:%S}$PR_GREY)$PR_NO_COLOUR'
