@@ -1,0 +1,13 @@
+// vim: ft=cpp
+
+default partial xkb_compatibility "caps_lock" {
+    indicator "Caps Lock" {
+       !allowExplicit;
+       // Possible states are Base, Latched, Locked, Effective, Any or None.
+       whichModState= Locked;
+       modifiers= Shift;
+       controls=Overlay1;
+       //groups=All-group1;
+    };
+};
+

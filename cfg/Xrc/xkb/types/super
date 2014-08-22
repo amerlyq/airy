@@ -1,0 +1,27 @@
+// vim: ft=cpp
+
+default partial xkb_types "super" {
+    virtual_modifiers Super,Control;
+
+    // Super is not default modificator, so you need custom types
+
+    type "PC_SUPER_LEVEL2" {
+        modifiers = Super;
+        map[None] = Level1;
+        map[Super] = Level2;
+        level_name[Level1] = "Base";
+        level_name[Level2] = "Super";
+    };
+
+    type "PC_SUPER_CONTROL_LEVEL4" {
+        modifiers = Super+Control;
+        map[None] = Level1;
+        map[Super] = Level2;
+        map[Control] = Level3;
+        map[Super+Control] = Level3;
+        level_name[Level1] = "Base";
+        level_name[Level2] = "Super";
+        level_name[Level3] = "Control";
+        level_name[Level4] = "Super+Control";
+    };
+};

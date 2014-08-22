@@ -1,0 +1,26 @@
+// vim: ft=cpp
+
+default partial
+xkb_compatibility "langs"  {
+
+    interpret.repeat= False;
+    setMods.clearLocks= True;
+    latchMods.clearLocks= True;
+    latchMods.latchToLock= True;
+
+    interpret ISO_First_Group_Lock { action=LockGroup(group=1); };
+    interpret  ISO_Next_Group_Lock { action=LockGroup(group=2); };
+    interpret  ISO_Last_Group_Lock { action=LockGroup(group=3); };
+
+    // interpt ISO_Group_Lock { action=SetGroup(group=2); locking = True;};
+    // А описание символов (в xkb_symbols) теперь будут выглядеть как
+    // key <CAPS> { [ ISO_Next_Group_Lock ], [ ISO_First_Group_Lock ], [ ISO_Last_Group_Lock ] };
+    // key <MENU> { [ ISO_Group_Lock ] };
+
+    // Declare, because xkbcomp sometimes misses them
+    group 2 = AltGr;
+    group 3 = AltGr;
+    group 4 = AltGr;
+};
+
+

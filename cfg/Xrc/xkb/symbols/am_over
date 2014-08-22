@@ -1,0 +1,19 @@
+// vim: ft=cpp
+
+default partial xkb_symbols "base" {
+    include "am_over(hjkl)"
+};
+
+partial alphanumeric_keys
+xkb_symbols "hjkl" {
+    key <AC06> { overlay1=<LEFT> };
+    key <AC07> { overlay1=<DOWN> };
+    key <AC08> { overlay1=<UP>   };
+    key <AC09> { overlay1=<RGHT> };
+
+    key <AD10> { overlay1=<PGUP> };
+    key <AB06> { overlay1=<PGDN> };
+
+    key <AB07> { overlay1=<RTRN> };
+};
+

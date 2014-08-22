@@ -1,58 +1,37 @@
 #!/bin/sh
 
-# override system-wide configuration specified by X configuration files.
-# /etc/X11/xorg.conf.d/10-keyboard.conf
-# https://wiki.archlinux.org/index.php/Keyboard_configuration_in_Xorg#Using_X_configuration_files
-
-
 # SOLUTION: bind instead of bindsym in i3conf, need generate conf by script
 
-## Script to change language
-#   L1="us"
-#   L2="ru"
-#
-#   if [ -z $1 ] ; then
-#       LG=$(setxkbmap -query | awk '/layout/{print $2}')
-#
-#       if [ $LG = $L1 ] ; then
-#           LG=$L2
-#       else
-#           LG=$L1
-#       fi
-#   else
-#       LG=$1
-#   fi
-#   setxkbmap -layout $LG
-
-# Group switcher
+## Group switcher -- for special aims
 #if setxkbmap -query | grep -q lang1,lang2 ; then
 #    setxkbmap -model acer_laptop -layout lang3,lang4 -variant , ;
 #else
 #    setxkbmap -model acer_laptop -layout lang1,lang2 -variant , ;
 #fi
 
-# http://madduck.net/docs/extending-xkb/
-
-# WANT: Caps->Ctrl, Alt_L->Win, Win->Alt_L, Ctrl-> ?
-
 # Full list of available _toggle_ keys for layout change
-#grep "grp:.*_toggle" /usr/share/X11/xkb/rules/base.lst
+#   grep "grp:.*_toggle" /usr/share/X11/xkb/rules/base.lst
 # Remapping  list of predefined remapping options
-# /usr/share/X11/xkb/rules/evdev.lst
-#
+#   /usr/share/X11/xkb/rules/evdev.lst
+# Details: /usr/share/X11/xkb/symbols
+
+setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
+    -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \
+    -option "grp:sclk_toggle, grp:switch, misc:typo, shift:both_shiftlock"
+#shift:both_capslock_cancel" , -types "complete"
+
 # altwin:swap_lalt_lwin -- for some reason don't work
-# compose:menu -- don't work in vbox 'cause of my remapping Host->Application
-# it has sense, to remap ralt->menu, cause on laptop no rwin and after alt->win there will be no raltGr
+# menu -- don't work in vbox 'cause of my remapping Host->Application
 
-setxkbmap -option "" -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, compose:menu"
-setxkbmap -layout "us,ru,ua" -option "grp:ctrls_toggle, shift:both_capslock"
+#NOTE: for vim mapping  caps:escape is less practical then mapping ctrl:nocaps,
+#  in english caps+[ works fine, but there will be problems with russian...
+#  which finely solves by mapping in russian inoremap ctrl+x <Esc> or another variant
 
-[ -f ~/.Xresources ] && xrdb ~/.Xresources
-#[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults
+#NOTE: workman cool, but not for vim. Only for writing. But must know.
+#Or change for my likes (choose best from colemak, dvorak, workman)
+## us:workman     ## ru:typewriter        ## ua:legacy
+#                 # |+ №-/":,._?% !=;\    # '~ !"#*:,.;()_=+
+# qdrwbjfup;[]\   # йцукеншщзхъ )(        # йцукенгшщзхї ґҐ
+# ashtgyneoi'     # фывапролджэ           # фівапролджє
+# zxmcvkl,./      # ячсмитьбюё            # ячсмитьбю /?
 
-# NOTE: for vim mapping  caps:escape is less practical then mapping ctrl:nocaps,
-#       in english caps+[ works fine, but there will be problems with russian...
-#       which finely solves by mapping in russian inoremap ctrl+x <Esc>
-
-# To see current mapping:
-#$ xmodmap

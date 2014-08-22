@@ -5,7 +5,8 @@ do
     read line
     #LG=$(setxkbmap -query | awk '/layout/{print toupper($2)}')
     LG=$(xkb-switch -p | awk '{print toupper($1)}')
-    case "$LG" in
+    #LG="$LG"
+    case "${LG%(*}" in
         US) dat="#00AE00" ;;
         RU) dat="#00AEFF" ;;
         UA) dat="#FFFF00" ;;

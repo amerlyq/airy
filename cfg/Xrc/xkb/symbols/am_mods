@@ -1,0 +1,135 @@
+// vim: ft=cpp
+
+default partial xkb_symbols "amer" {
+    include "am_mods(both_shiftlock)"
+    include "am_mods(sclk_toggle)"
+    include "am_mods(alt_win_lang)"
+    include "am_mods(caps_lctl)"
+    include "am_mods(lctrl_lvl5)"
+    include "am_mods(menu_lvl3)"
+    include "am_mods(space_switch)"
+    // include "am_mods(rctrl_i3)"
+};
+
+// ==================================================================
+
+partial modifier_keys
+xkb_symbols "alt_win_lang" {
+    key <LALT> {
+        type[Group1] = "ONE_LEVEL",
+        symbols[Group1] = [ Super_L ]
+    };
+    key <LWIN> { [ Alt_L, Meta_L ] };
+
+    // WANNA: hold -- another lang, click -- en, lalt+click -- ru
+    key <RALT> { [ VoidSymbol ] };
+    replace key <RALT> {
+        type="PC_SUPER_CONTROL_LEVEL4",
+        symbols[Group1]=[ ISO_First_Group_Lock, ISO_Next_Group_Lock, ISO_Last_Group_Lock ]
+    };
+};
+
+
+// Caps -> LCtl //TODO: Check if LED_caps is disabled!!!
+partial modifier_keys
+xkb_symbols "caps_lctl" {
+    key <CAPS> { [ VoidSymbol ] };
+    replace key <CAPS> {
+        type[Group1]="ONE_LEVEL",
+        symbols[Group1] = [ Control_L ]
+    };
+    modifier_map  Control { <CAPS> };
+};
+
+
+// The Menu key (while pressed) chooses the third shift level.
+partial modifier_keys
+xkb_symbols "menu_lvl3" {
+    key <MENU> {
+        type[Group1]="ONE_LEVEL",
+        symbols[Group1] = [ ISO_Level3_Shift ]
+    };
+    replace key <LVL3> {
+        type[Group1]="ONE_LEVEL",
+        symbols[Group1] = [ ISO_Level3_Shift ]
+    };
+    modifier_map Mod5 { <LVL3> };
+};
+
+// Overlay for hjkl navigation
+partial modifier_keys
+xkb_symbols "lctrl_lvl5" {
+    replace key <LCTL> {
+        type[Group1] = "PC_SUPER_LEVEL2",
+        symbols[Group1] = [ NoSymbol, NoSymbol ],
+        actions = [
+            SetControls(ctrls=Overlay1),
+            LockControls(ctrls=Overlay1)
+        ]
+        // interpret Overlay1_Enable      { action= LockControls(ctrls=Overlay1); };
+        // interpret Overlay2_Enable      { action= LockControls(ctrls=Overlay2); };
+        // symbols[Group1] = [ ISO_Level5_Shift, ISO_Level5_Shift, ISO_Level5_Lock, ISO_Level5_Lock ]
+    };
+    // key <MDSW> { [ VoidSymbol ] };
+    // replace key <MDSW> {
+    //     type[Group1] = "ONE_LEVEL",
+    //     symbols[Group1] = [ ISO_Level5_Shift ]
+    // };
+    // modifier_map Mod3 { <MDSW> };
+};
+
+// =====================================================
+
+// ScrollLock toggles groups in cycle.
+partial modifier_keys //@@@
+xkb_symbols "sclk_toggle" {
+    virtual_modifiers AltGr;
+    key <SCLK> {
+        type[Group1]="ONE_LEVEL",
+        symbols[Group1] = [ ISO_Next_Group ],
+        virtualMods= AltGr
+    };
+};
+
+// Both shift -> ShiftLock, then either shift -> release
+partial modifier_keys //@@@
+xkb_symbols "both_shiftlock" {
+    // Change Left Shift with a sticky version (for one next symbol)
+    // key <LFSH> { [ ISO_Level2_Latch ] };
+    key <LFSH> {
+        type[Group1]="TWO_LEVEL",
+        symbols[Group1] = [ Shift_L, Shift_Lock ]
+    };
+    key <RTSH> {
+        type[Group1]="TWO_LEVEL",
+        symbols[Group1] = [ Shift_R, Shift_Lock ]
+    };
+};
+
+partial alphanumeric_keys
+xkb_symbols "space_switch" {
+    key <SPCE> {
+        type="PC_SUPER_LEVEL2", // Only 4 groups of langs
+        symbols[Group1]=[ space , Multi_key ]
+        // symbols[Group2]=[ space ],
+        // symbols[Group3]=[ space ],
+        // symbols[Group4]=[ space ],
+        // actions[Group1]=[ SetGroup(group=2) ], // en -> ru
+        // actions[Group2]=[ SetGroup(group=1) ], // ru -> en
+        // actions[Group3]=[ SetGroup(group=1) ], // ua -> en
+        // actions[Group4]=[ SetGroup(group=1) ]
+    };
+};
+
+// Menu+RCtrl -> Super_R (for i3)
+// partial modifier_keys
+// xkb_symbols "rctrl_i3" {
+//     key <RCTL> {
+//         type[Group1]="FOUR_LEVEL",
+//         symbols[Group1] = [ Control_R, Control_R, NoSymbol, NoSymbol ]
+//         , actions[Group1]= [ NoAction(), NoAction(),
+//             Redirect(key=<RWIN>, clearMods=Mod5), Redirect(key=<RWIN>, clearMods=Mod5)
+//         ]
+//     };
+// };
+
