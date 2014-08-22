@@ -14,10 +14,12 @@
 # Remapping  list of predefined remapping options
 #   /usr/share/X11/xkb/rules/evdev.lst
 # Details: /usr/share/X11/xkb/symbols
+#
+xkbcomp -I"$HOME/.Xrc/xkb" "$HOME/.Xrc/xkb/amer.xkb" "${DISPLAY%%.*}"
 
-setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
-    -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \
-    -option "grp:sclk_toggle, grp:switch, misc:typo, shift:both_shiftlock"
+# setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
+#     -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \
+#     -option "grp:sclk_toggle, grp:switch, misc:typo, shift:both_shiftlock"
 #shift:both_capslock_cancel" , -types "complete"
 
 # altwin:swap_lalt_lwin -- for some reason don't work

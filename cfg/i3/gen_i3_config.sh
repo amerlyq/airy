@@ -207,7 +207,7 @@ STD_FILEMGR="pcmanfm"
 command -v $STD_FILEMGR >/dev/null 2>&1 || STD_FILEMGR="nemo --no-desktop"
 
 #TODO: remove 's' -- <sound>.py
-wlistf "$t$bs %s $exno %s, \$mdef" "$pgui a s" $bgui "$STD_FILEMGR" "/usr/lib/cinnamon-settings/cinnamon-settings.py sound"
+wlistf "$t$bs %s $exno %s, \$mdef" "$pgui a s e" $bgui "$STD_FILEMGR" "/usr/lib/cinnamon-settings/cinnamon-settings.py sound" "elona"
 wmode_end
 
 w_header "Mode: Focus"
@@ -286,6 +286,7 @@ w_header "Windows: Settings"
 
 wstr "assign [class=\"^Wuala$\"] ${wrknum[9]}"
 wstr "assign [class=\"^Pale\ moon$\"] ${wrknum[3]}"
+wstr "assign [class=\"^elona.exe$\"] ${wrknum[8]}"
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
 # floating enable running before launching of exec, so influence on previous focused wndw
