@@ -8,7 +8,7 @@ default partial xkb_symbols "amer" {
     include "am_mods(lctrl_lvl5)"
     include "am_mods(menu_lvl3)"
     include "am_mods(space_switch)"
-    // include "am_mods(rctrl_i3)"
+    include "am_mods(rctrl_i3)"
 };
 
 // ==================================================================
@@ -57,6 +57,9 @@ xkb_symbols "menu_lvl3" {
 };
 
 // Overlay for hjkl navigation
+// WANNA: make overlay lctl->F13, where F13 = [ temporary disables overlay (as shift for Caps) ]
+// OR: as IvanPascal make ctrl as lock key, locking not LockControls but SetControls by inner mechanics
+// So original keys will be available by lctl+hjkl -> hjkl, not arrows
 partial modifier_keys
 xkb_symbols "lctrl_lvl5" {
     replace key <LCTL> {
@@ -122,14 +125,19 @@ xkb_symbols "space_switch" {
 };
 
 // Menu+RCtrl -> Super_R (for i3)
-// partial modifier_keys
-// xkb_symbols "rctrl_i3" {
-//     key <RCTL> {
-//         type[Group1]="FOUR_LEVEL",
-//         symbols[Group1] = [ Control_R, Control_R, NoSymbol, NoSymbol ]
-//         , actions[Group1]= [ NoAction(), NoAction(),
-//             Redirect(key=<RWIN>, clearMods=Mod5), Redirect(key=<RWIN>, clearMods=Mod5)
-//         ]
-//     };
-// };
+partial modifier_keys
+xkb_symbols "rctrl_i3" {
+    // key <RCTL> {
+    //     type[Group1]="FOUR_LEVEL",
+    //     symbols[Group1] = [ Control_R, Control_R, NoSymbol, NoSymbol ]
+    //     , actions[Group1]= [ NoAction(), NoAction(),
+    //         Redirect(key=<RWIN>, clearMods=Mod5), Redirect(key=<RWIN>, clearMods=Mod5)
+    //     ]
+    // };
+    replace key <RCTL> {
+        type[Group1] = "ONE_LEVEL",
+        symbols[Group1] = [ Super_R ]
+    };
+    modifier_map Mod4 { <RCTL> };
+};
 

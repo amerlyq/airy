@@ -67,7 +67,7 @@ getFileList() { #$1 - fulldirpath, $2 - fulllistname, $3 - brackets
 renameConsequential() { #$1 - dirpath (recursive),  # build mv command
     local ext="tif"
     cd "$1"
-    find . -name "*.$ext" \
+    find . -name "*.$ext" | sort \
     | awk '{ printf "mv \"%s\" \"%04d.tif\"\n", $0, NR }' | bash
 }
 

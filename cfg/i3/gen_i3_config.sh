@@ -286,7 +286,7 @@ w_header "Windows: Settings"
 
 wstr "assign [class=\"^Wuala$\"] ${wrknum[9]}"
 wstr "assign [class=\"^Pale\ moon$\"] ${wrknum[3]}"
-wstr "assign [class=\"^elona.exe$\"] ${wrknum[8]}"
+wstr "assign [class=\"^Wine$\"] ${wrknum[8]}"
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
 # floating enable running before launching of exec, so influence on previous focused wndw
