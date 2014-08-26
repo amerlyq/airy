@@ -37,6 +37,10 @@ Ascii
 Convert all files in dir into utf8
 	find . -name '*.*' -exec iconv --verbose -f windows-1251 -t utf-8 -o {} {} \;
 
+Convert binary to c-hex
+	cat hello2.o | xxd -p -c 1 | awk '{ print "0x"$1","}' | xargs
+	sed -i ':a;N;$!ba;s/\n/,/g' test.txt ## another joining instead of xargx
+
 Compare files as options
  Simple idea to save comments: we will keep only one file in its
  primary state, second we sort and clean. Then extract options which
