@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# http://www.ex.ua/filelist/$id.urls
+
+if [ "${1:7}" == "http://" ]; then
+    wget -i $1 --trust-server-names=on --restrict-file-names=nocontrol
+else
+    cat "$1" | while read line; do
+        wget -i -c --content-disposition $line
+    done
+fi
