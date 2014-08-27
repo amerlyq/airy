@@ -14,5 +14,6 @@ let g:syntastic_filetype_map = { 'latex': 'tex',
 let g:syntastic_cpp_compiler = 'clang++'
 let g:syntastic_cpp_config_file = '.clang_complete'
 
-noremap <Leader>tx <Esc>:SyntasticToggleMode<CR> \| :SyntasticCheck<CR>
+noremap <Leader>tx <Esc>:SyntasticToggleMode<CR>
+"\| :SyntasticCheck<CR>
 
