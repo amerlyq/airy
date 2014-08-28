@@ -1,0 +1,37 @@
+
+Uninstall the previously installed version of Nvidia graphics driver (if any).
+
+
+sudo apt-get purge nvidia*
+
+End the graphic session with the appropriate command from the list of commands given below:
+
+
+# For Ubuntu LightDM [DEFAULT]
+sudo service lightdm stop
+
+#For Gnome GDM
+sudo service gdm stop
+
+#For Linux Mint MDM
+sudo service mdm stop
+
+Download the appropriate driver from the source. Here are the download links:
+
+  • Nvidia 337.12 for 32 bit Linux
+  • Nvidia 337.12 for 64 bit Linux
+
+ Make the installer file executable.
+
+
+chmod 777 ~/Downloads/NVIDIA-Linux-*-337.12.run
+
+Run the executable installer file.
+    sudo sh ~/Downloads/NVIDIA-Linux-*-337.12.run
+
+This will start the installation process. Follow the on-screen instructions to complete the process.
+Note : Do not delete the installer file. It will be needed while removing/uninstalling the Nvidia 337.12 driver if it fails to work properly.
+
+To uninstall,
+    sudo sh ~/Downloads/NVIDIA-Linux-*-337.12.run --uninstall
+

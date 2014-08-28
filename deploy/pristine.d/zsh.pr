@@ -9,7 +9,7 @@ apt_noprompt zsh
 
 ZSH_DIR=~/.oh-my-zsh
 if [ -d "$ZSH_DIR" ]; then
-    cd "$ZSH_DIR" && git --verbose pull
+    cd "$ZSH_DIR" && git pull --verbose
 else
     hash git >/dev/null 2>&1 \
     && /usr/bin/env git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR \
