@@ -30,21 +30,20 @@ esac
 ## Get primary
 MON=(`xrandr | grep ' connected' | sed 's/^\([^ ]*\).*/\1/'`)
 if [ "$SETS" != "$SIDE" ] && [ ${#MON[@]} -ge 2 ]
-then if [ "$CURR_PROF" == "home" ]; then INDP=2; else INDP=1; fi
-    PRIM="${MON[$INDP]}"; unset MON[$INDP];
-else PRIM="${MON[0]}"; unset MON[0];
-fi
+then INDP=1; else INDP=0; fi
+# if [ "$CURR_PROF" == "home" ]; then INDP=2; else INDP=1; fi
+PRIM="${MON[$INDP]}"; unset MON[$INDP];
 
 ## Set primary
-if [ -z "$MAIN_DPI" ]; then MAIN_DPI=96; fi
-xrandr --output $PRIM --auto --dpi $MAIN_DPI --primary
+#if [ -z "$MAIN_DPI" ]; then MAIN_DPI=96; fi # --dpi $MAIN_DPI
+xrandr --output $PRIM --auto  --primary
 echo "$PRIM" >> $FL
 
 ## Set others
 #for m in $MON; do #or --mode 1920x1080 --dpi 96 --pos 1366x0,
 if [ ${#MON[@]} -ge 1 ]; then
     xrandr --output ${MON[0]} --auto $PLACE $PRIM
-    echo "$m" >> $FL
+    echo "${MON[0]}" >> $FL
 fi
 # done
 
