@@ -12,6 +12,7 @@ Get vtbl funcs addresses
 
 	Then see disasm of that piece
 	 ~/sdk/trustzone-tee/toolchain/cortex-cross-tools/bin
+		arm-v7a9-linux-gnueabi-objdump -b binary -m arm -D int.bin
 		arm-linux-gnueabi-objdump -b binary -m arm -D int.bin
 		: 00000000 <.data>:
 		:   0:	ef9f0000 	svc	0x009f0000

@@ -21,6 +21,7 @@ valgrind --fullpath-after=$CURRENT_DIR --log-file="${BIN_PATH}.log" \
     --tool=memcheck --leak-check=full --num-callers=12              \
     --undef-value-errors=yes --error-exitcode=1 --track-origins=yes \
     --show-reachable=yes ${ARGS} -- ${BIN_PATH} ${BIN_ARGS}
+# --vex-iropt-precise-memory-exns=yes
 
 # --error-exitcode      | instead of returning code of programm
 # --read-var-info=yes   | slow, but more precise and descriptive errors
