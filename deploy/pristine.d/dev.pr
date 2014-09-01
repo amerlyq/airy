@@ -9,7 +9,7 @@ LST="$LST git git-gui gitk tig git-core git-doc meld doxygen"
 
 # Those libs also necessary to build x32 under x64 system
 LST="$LST cmake build-essential gcc-multilib g++-multilib lib32stdc++6 openjdk-7-jdk openjdk-7-jdk:i386"
-LST="$LST make pkg-config" #binutils-gold
+LST="$LST make pkg-config autoconf automake" #binutils-gold
 # libc6-dbg:i386    # need to prevent valgrind error with strlen -> strnlen
 LST="$LST cppcheck valgrind libc6-dbg:i386 gdb"
 
