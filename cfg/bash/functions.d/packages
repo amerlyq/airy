@@ -28,7 +28,15 @@ wget_it() {
     local NM
     if [ -z "$CURR_DIR_PKG" ]; then echo "Error: CURR_DIR_PKG not set. Skip installing."; exit 1; fi
     case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
-    wget -c "$1" -O "$CURR_DIR_PKG/$NM"
+    NM="$CURR_DIR_PKG/$NM"
+    wget -c "$1" -O "$NM"
+    # if [ "$( cat $NM | head -c 9 )" == "<!doctype" ]; then
+        # echo 'yes'
+        # rref='<a href="\([^?]*\)?.* class="direct-download">'
+        # link=$( cat "$NM" | sed -n "/.*${rref}.*/{s//\1/gp;q}" )
+        # echo $link
+        # wget "$link" -O "$NM"
+    # fi
 }
 
 deb_wget() {
