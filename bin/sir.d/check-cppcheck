@@ -3,11 +3,29 @@
 PROJ_ROOT_DIR="${1:-`pwd`}"
 ARGS="${@:1}"
 HFL=/tmp/headers.lst
+HDIRS=/tmp/hd_dirs.lst
 SFL=/tmp/sources.lst
 
-# Find correct files
-find . -name '*.h' -printf '%h\n' | uniq > $HFL
-find . -name '*.c'  > $SFL  #-o -name '*.cpp'
+# Find dirs with headers
+ffarg(){ printf "\( \
+    -path './build' -prune -o -path './libs' -prune -o \
+    -path './scripts' -prune -o -path './cmake' -prune -o \
+    -iname '*.${1}' -o -iname '*.${1}pp' \)\n"; }
+
+eval "find . $(ffarg 'h') -printf '%h\n'" | sort -u | sed '1d' > "$HDIRS"
+eval "find . $(ffarg 'h') -type f" | sort -u > "$HFL"
+eval "find . $(ffarg 'c') -type f" | sort -u > "$SFL"
+
+
+# { cat "$HFL"; cat "$SFL"; } | while read line; do
+#     file -i $line
+#     CHARSET="$(file -bi "$line" | awk -F "=" '{print $2}')"
+#     if [ "$CHARSET" != utf-8 ]; then
+#         iconv -f "$CHARSET" -t utf8 "$file" -o temp
+#         cat temp > "$file"
+#     fi
+#     file -i $line
+# done
 
 # -j4 --enable=warning,style,performance,portability
 
@@ -15,9 +33,10 @@ find . -name '*.c'  > $SFL  #-o -name '*.cpp'
 cppcheck -q -f  --template=gcc --error-exitcode=2   \
     --enable=all --inconclusive --platform=unix64   \
     --std=c99 --std=c++03 --report-progress $ARGS   \
-    --includes-file=$HFL --file-list=$SFL           \
+    --includes-file="$HDIRS" --file-list="$SFL"     \
     --suppress=missingIncludeSystem         \
-    -i libs/ -i build/ "$PROJ_ROOT_DIR"
+    -i libs/ -i build/ "$PROJ_ROOT_DIR" # --xml-version=1 . 2> cppcheck_report.xml
+
 if [ $? -eq 2 ]; then exit 1; fi
 
 

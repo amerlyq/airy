@@ -36,6 +36,7 @@ BUILD_DIR="$ROOT_DIR/build"
 TARGETS_DIR="$ROOT_DIR/targets"
 [ -d "$TARGETS_DIR" ] || TARGETS_DIR="$ROOT_DIR/useflags"
 [ -d "$TARGETS_DIR" ] || TARGETS_DIR="$ROOT_DIR/scripts/useflags"
+echo "$ROOT_DIR"
 [ -d "$TARGETS_DIR" ] || { echo "No 'targets' dir in project."; exit 1; }
 BIN_DIR="$BUILD_DIR/bin"
 BIN_PR="$BIN_DIR/ut"
