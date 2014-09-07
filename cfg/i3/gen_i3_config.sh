@@ -149,6 +149,9 @@ smoveprecise="5 px"
 ssize="10 px or 2 ppt"
 
 wmode_begin "c" "Modify"
+wlistf "$t$bs %s $exno ~/.i3/ext/ratio_size %s, \$mdef" "1 2 3" \
+    "0.5" "0.667" "0.75"
+wstr ''
 wlistf "$t$bs %s resize %s $ssize" "$hjkl" \
     "shrink right" "grow down" "shrink down" "grow right"
 wstr ''

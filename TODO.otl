@@ -51,7 +51,6 @@ Deploy:
 	: они буду проброшены!!!
 	[X] all scripts -- need source funcs, or echoes error msgs, w/o installation
 	[_] Insert vim installation and update check ALSO in vim_install (one-button)
-	[_] Add check into pristine if one of packages not found
 	 then delete it from list and try install again
 	[X] make 'default' full profile, which partially applied for 'guest'
 	[X] your own profiles must distribute through private repos
@@ -94,6 +93,12 @@ Deploy:
 			so you need .cfg file for this (or option with flags in bash_export)
 			wchg line PRISTINE_INSTALLED_GROUPS="${a}w"
 			Simpler: use conf file '.pristine' inside ~/pkg folder
+		[_] Add check into pristine if one of packages not found
+		[_] Make installation with progressbar:
+			all log send into /tmp/logfile
+			filter all unnecessary info from output
+			in the end show report with success and errors
+
 
 	[X] Сделать скрипт install.sh принимающим target
 	[X] <ALT> Разделить скрипт установки программ на отдельные модули
@@ -118,6 +123,7 @@ Deploy:
 
 vim
 	[X] BUG: vim -- C-N in plugin multi-edit
+	[X] My copy-paste > get rid of "press enter problem" (cut first line only)
 	[X] BUG: after reloading by ':e' Airline disables, maybe smth also
 		: Bottom bar appear again after insert-mode, upper -- will never
 		: It seems problem in 'after' settings 'syntax on', which was in otl
@@ -237,7 +243,7 @@ tmux
 	https://github.com/zolrath/wemux
 
 keymaps
-	[_] L-Ctrl -> system-wide xmodmap vim-mode
+	[X] L-Ctrl -> system-wide xmodmap vim-mode
 	[_] R-Alt -> Lang_menu (custom layout with programmer symbols in russian)
 	[_] Try xkeymap -- so kbdd will not be closing gmail pop-up or vk focus
 	[_] In vim add custom plugin for kbdd autocmd on insert/live and operator-pending (r, R, Space)

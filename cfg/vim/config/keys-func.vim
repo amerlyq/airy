@@ -8,8 +8,10 @@ noremap <Leader>S :saveas<Space>
 " Remap line-up and move-up
 " on visual area it must copy instantly! and only in @+
 function! CountCopyLines(msg)
-    let s = split(@+, '\n\zs')
-    echo a:msg . len(s) . 'L: ' . s[0]
+    let l = split(@+, '^.\{-}\zs\n')  " -- w/o,  '\n\zs' -- with
+    let h = a:msg . len(l) . 'L> '
+    let maxlen = min([ len(l[0]), &columns - len(h) - 2 ])
+    echo h . l[0][0:maxlen]
 endfunction
 nnoremap <C-y> :let @+=@" \| :call CountCopyLines('Push:')<CR>
 cnoremap <C-y> :call setreg('+', getreg(':')) \| :call CountCopyLines('Push:')<CR><CR>

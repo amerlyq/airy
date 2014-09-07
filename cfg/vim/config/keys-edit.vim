@@ -1,8 +1,10 @@
 set backspace=indent,eol,start
 " Or i<CR><Esc> for left-split
 
-nnoremap K  a<CR><Esc>l
-nnoremap gK d0o<Esc>p
+"d0o<Esc>p
+nnoremap K  a<CR><Right><Esc>
+nnoremap gK i<CR><Right><Esc>
+
 " Jump to a new line in insert mode
 inoremap <M-CR> <Esc>o
 "noremap <Leader>d "_d

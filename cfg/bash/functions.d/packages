@@ -24,9 +24,9 @@ apt_noprompt(){ # $@ -- packages
     done
 }
 
+
 wget_it() {
     local NM
-    if [ -z "$CURR_DIR_PKG" ]; then echo "Error: CURR_DIR_PKG not set. Skip installing."; exit 1; fi
     case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
     NM="$CURR_DIR_PKG/$NM"
     wget -c "$1" -O "$NM"
@@ -39,33 +39,30 @@ wget_it() {
     # fi
 }
 
+check_pkg_dir() {
+    if [ -z "$CURR_DIR_PKG" ]; then
+        echo "Error: CURR_DIR_PKG not set. Skip installing."
+        exit 1
+    fi
+}
+
 deb_wget() {
     local NM
-    if [ -z "$CURR_DIR_PKG" ]; then echo "Error: CURR_DIR_PKG not set. Skip installing."; exit 1; fi
+    check_pkg_dir
     if `wget_it $*`; then
         case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
         sudo dpkg -i "$CURR_DIR_PKG/$NM"
     fi
 }
 
-git_install() { # $1 - git rep, $2 - dir name
-    local PR_DIR=${1##*/} BUILD_DIR
-    if [ -z "$CURR_DIR_PKG" ]; then echo "Error: CURR_DIR_PKG not set. Skip installing."; exit 1; fi
-    PR_DIR="$CURR_DIR_PKG/${PR_DIR,,}"
-
-    if [ -d "$PR_DIR" ]; then
-        cd "$PR_DIR"
-        git pull
-    else
-        git clone --depth 1 "https://github.com/$1" "$PR_DIR"
-        cd "$PR_DIR"
-    fi
-
+rep_autobuild() {
+    local PR_DIR="$1"
     # It can be, that 'autoreconf' can replace my own vehicle.
+    cd "$PR_DIR"
     if [ -f "$PR_DIR/CMakeLists.txt" ]; then
         BUILD_DIR="$PR_DIR/build"
         mkdir -p "$BUILD_DIR"
-        cmake -E chdir "$BUILD_DIR" cmake "$BUILD_OPTIONS" "$PR_DIR"
+        cmake -E chdir "$BUILD_DIR" cmake "" "$PR_DIR"
         cd "$BUILD_DIR"
         sudo make install
     elif [ -f "$PR_DIR/setup.py" ]; then
@@ -76,11 +73,45 @@ git_install() { # $1 - git rep, $2 - dir name
         sudo make install
     elif [ -f "$PR_DIR/configure.ac" ]; then
         autoreconf --install
+        # ./autogen.sh
         BUILD_DIR="$PR_DIR/build"
         mkdir -p "$BUILD_DIR"
         cd "$BUILD_DIR"
         ../configure
         make
         sudo make install
+    else
+        echo "Error: unsupported build system. Build manually."
     fi
+}
+
+git_install() { # $1 - git rep, $2 - dir name
+    local PR_DIR=${1##*/} BUILD_DIR
+    check_pkg_dir
+    PR_DIR="$CURR_DIR_PKG/${PR_DIR,,}"
+
+    if [ -d "$PR_DIR" ]; then
+        cd "$PR_DIR"
+        git pull
+    else
+        git clone --depth 1 "https://github.com/$1" "$PR_DIR"
+    fi
+
+    rep_autobuild "$PR_DIR"
+}
+
+hg_install() { # $1 - git rep, $2 - dir name
+    local PR_DIR=${1##*/} BUILD_DIR
+    check_pkg_dir
+    PR_DIR="$CURR_DIR_PKG/${PR_DIR,,}"
+
+    if [ -d "$PR_DIR" ]; then
+        cd "$PR_DIR"
+        git pull
+    else
+        hg clone "$1" "$PR_DIR"
+        cd "$PR_DIR"
+    fi
+
+    rep_autobuild "$PR_DIR"
 }

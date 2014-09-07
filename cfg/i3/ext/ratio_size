@@ -1,0 +1,17 @@
+#!/bin/zsh
+
+desire=${1:-0.5}
+
+ratio=$( i3-msg -t get_tree | jshon \
+    | sed -n -e '/\s*"percent": \([0-9\.]\+\),/{s//\1/;h}' \
+        -e '/"focused": true/{x;p}' )
+
+sz_shift=$(( ($desire - $ratio)*100 ))
+
+if (( $sz_shift < 0 )); then
+    sz_shift=$(( - $sz_shift ))
+    direct='shrink'
+else direct='grow'; fi
+
+# echo resize $direct width 0 px or $sz_shift ppt
+i3-msg -t command resize $direct width 0 px or $sz_shift ppt
