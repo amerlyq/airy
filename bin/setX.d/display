@@ -12,7 +12,7 @@ display [LRUDS][p]  |
 
 FL=~/.cache/displayside
 ## Save option
-if [  -f "$FL" ]; then SETS="$(cat $FL | sed q)"; else SETS="S"; fi
+if [  -f "$FL" ]; then SETS="$(cat "$FL" | sed q)"; else SETS="S"; fi
 if [ ! -z "$1" ]; then SETS="$1"; fi
 echo "$SETS" > "$FL"
 

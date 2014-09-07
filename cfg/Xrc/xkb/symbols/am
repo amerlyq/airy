@@ -4,6 +4,7 @@ partial alphanumeric_keys
 xkb_symbols "ru" {
     include "ru(common)"
     include "am(nums)"
+    include "am(symb_lvl3)"
     name[Group1]= "Russian (typewriter) mod_Amer";
 
     key <AD12> { [ Cyrillic_hardsign , Cyrillic_HARDSIGN ] };
@@ -14,10 +15,12 @@ partial alphanumeric_keys
 xkb_symbols "ua" {
     include "ua(legacy)"
     include "am(nums)"
+    include "am(symb_lvl3)"
     name[Group1]= "Ukrainian (typewriter) mod_Amer";
 
     // key <AD07> {[ Cyrillic_ghe, Cyrillic_GHE, Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ]};
-    key <AD12> { [ Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ] };
+    // key <AD12> { [ Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ] };
+    key <AD07> { [ NoSymbol, NoSymbol, Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ] };
     key <AC02> { [ Ukrainian_i  , Ukrainian_I  ] };
     key <AB05> { [ Cyrillic_i   , Cyrillic_I   ] };
     key <AB10> { [ Ukrainian_yi , Ukrainian_YI ] };
@@ -25,20 +28,31 @@ xkb_symbols "ua" {
 
 partial alphanumeric_keys
 xkb_symbols "nums" {
-    // backslash, bar
-    key <TLDE> { [ apostrophe , numerosign ] };
-    key <BKSL> { [ parenright,  parenleft  ] };
+    // numerosign
+    key <TLDE> { [ apostrophe , numbersign ] };
+    key <BKSL> { [ parenright , parenleft  ] };
 
-    key <AE01> { [ exclam     , 1     ] };
-    key <AE02> { [ quotedbl   , 2     ] };
-    key <AE03> { [ semicolon  , 3     ] };
-    key <AE04> { [ comma      , 4     ] };
-    key <AE05> { [ slash      , 5     ] };
-    key <AE06> { [ percent    , 6     ] };
-    key <AE07> { [ period     , 7     ] };
-    key <AE08> { [ colon      , 8     ] };
-    key <AE09> { [ question   , 9     ] };
-    key <AE10> { [ underscore , 0     ] };
-    key <AE11> { [ minus      , equal ] };
-    key <AE12> { [ semicolon  , plus  ] };
+    key <AE01> { [ exclam     , 1        ] };
+    key <AE02> { [ quotedbl   , 2        ] };
+    key <AE03> { [ period     , 3        ] };
+    key <AE04> { [ semicolon  , 4        ] };
+    key <AE05> { [ percent    , 5        ] };
+    key <AE06> { [ slash      , 6        ] };
+    key <AE07> { [ colon      , 7        ] };
+    key <AE08> { [ comma      , 8        ] };
+    key <AE09> { [ minus      , 9        ] };
+    key <AE10> { [ question   , 0        ] };
+    key <AE11> { [ underscore , asterisk ] };
+    key <AE12> { [ equal      , plus     ] };
+};
+
+partial alphanumeric_keys
+xkb_symbols "symb_lvl3" {
+    // English symbols in cyrillic
+    key <AD11> { [NoSymbol, NoSymbol, bracketleft , braceleft  ] }; // [
+    key <AD12> { [NoSymbol, NoSymbol, bracketright, braceright ] }; //   ]
+    key <AD13> { [NoSymbol, NoSymbol, backslash   , bar        ] }; // \
+
+    key <AB08> { [NoSymbol, NoSymbol, less   , less    ] }; // ", "
+    key <AB09> { [NoSymbol, NoSymbol, greater, greater ] }; // "."
 };

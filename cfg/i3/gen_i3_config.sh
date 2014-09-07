@@ -77,9 +77,10 @@ smove="50 px"
 wprf "\n### =========== Script-generated items ============= ###\n"
 
 w_header "Bind: Refresh on i3mod"
-i3mod=64 #LAlt
+# i3mod=64 #LAlt
+key_ralt=108
 #wstr "bindcode $i3mod $exno ${refreshbar:2}"
-# wstr "bindcode --release $i3mod $exno ${refreshbar:2}"
+wstr "bindcode --release $key_ralt $exno ${refreshbar:2}"
 
 #mdf="mode \"default\"; bar mode hide; exec sleep 0.1; exec xdotool key --clearmodifiers alt"
 wstr "set \$mdef mode \"default\""

@@ -1,11 +1,11 @@
 "let mapleader=","
 "noremap \ ,
+
 " give it a try
-inoremap jj <ESC>
+"inoremap jj <ESC>
 
-" be consistent with C and D which reach the end of line
+" Be consistent with C and D which reach the end of line
 nnoremap Y y$
-
 
 " Now 'a jump you to line and column, and `a only to line
 nnoremap ' `
@@ -16,12 +16,13 @@ noremap ; :
 noremap @; @:
 "noremap : ,
 noremap , ;
+
+" Insert empty line before/after
+noremap gO O <C-U><Esc>
+noremap go o <C-U><Esc>
+
 " remove history-window (when you mistakes)
 nnoremap q: q;
-
-" noremap o o<Esc><Up>
-" noremap O O<Esc><Down>
-
 " Use Q for formatting the current paragraph (or selection)
 " Ex-command availible by gQ
 vnoremap Q gq

@@ -1,8 +1,8 @@
 " Provides extra :Tabularize commands
 
 " Align on one-char
-noremap <silent> <Leader>a <Esc>:<C-U>exec ("Tabularize /" . nr2char(getchar()))<CR>
-noremap <Leader>A          <Esc>:Tabularize //l1<Left><Left><Left>
+noremap <silent> <Leader>a :<C-U>exec ('Tabularize /' . nr2char(getchar()))<CR>
+noremap          <Leader>A :Tabularize //l0r1<Left><Left><Left><Left><Left>
 
 if !exists(':AddTabularPattern')
   finish " Give up here; the Tabular plugin musn't have been loaded

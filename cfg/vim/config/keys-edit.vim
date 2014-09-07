@@ -1,5 +1,4 @@
 set backspace=indent,eol,start
-" Or i<CR><Esc> for left-split
 
 "d0o<Esc>p
 nnoremap K  a<CR><Right><Esc>
@@ -9,7 +8,7 @@ nnoremap gK i<CR><Right><Esc>
 inoremap <M-CR> <Esc>o
 "noremap <Leader>d "_d
 
-"" по звездочке не прыгать на следующее найденное, а просто подсветить
+"" РїРѕ Р·РІРµР·РґРѕС‡РєРµ РЅРµ РїСЂС‹РіР°С‚СЊ РЅР° СЃР»РµРґСѓСЋС‰РµРµ РЅР°Р№РґРµРЅРЅРѕРµ, Р° РїСЂРѕСЃС‚Рѕ РїРѕРґСЃРІРµС‚РёС‚СЊ
 " don't works cause of plugin vim-indexed-search remapping
 "nnoremap * *N
 vnoremap * y :execute ":let @/=@\""<CR> :execute "set hlsearch"<CR>
@@ -23,18 +22,18 @@ nnoremap <silent> <Space> :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v
 nnoremap <silent> g<Space> :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)<CR>
 " <S-Space> work only in gvim
 
-" Ctrl-пробел для автодополнения
+" Ctrl-РїСЂРѕР±РµР» РґР»СЏ Р°РІС‚РѕРґРѕРїРѕР»РЅРµРЅРёСЏ
 inoremap <C-space> <C-x><C-o>
 
 " set tildeop   "allow moves for register change, like  ~w -- for word
 
-" Выбор формата концов строк (dos - , unix - , mac - ) -->
+" Р’С‹Р±РѕСЂ С„РѕСЂРјР°С‚Р° РєРѕРЅС†РѕРІ СЃС‚СЂРѕРє (dos - , unix - , mac - ) -->
 "set wcm=
 "menu Encoding.FileFormat.unix :set fileformat=unix
 "menu Encoding.FileFormat.dos :set fileformat=dos
 "menu Encoding.FileFormat.mac :set fileformat=mac
 "map :emenu Encoding.FileFormat.
-" Выбор формата концов строк (dos - , unix - , mac - ) <--
+" Р’С‹Р±РѕСЂ С„РѕСЂРјР°С‚Р° РєРѕРЅС†РѕРІ СЃС‚СЂРѕРє (dos - , unix - , mac - ) <--
 
 " Doxygen syntax highlighting
 " manually: set syn=cpp.doxygen
