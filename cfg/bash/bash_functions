@@ -225,7 +225,8 @@ export -f wlistf
 # printf   "%1 text %1 text %2" for info duplication
 wlistp(){
     local i key num lst str var
-    key=( $2 ); num=${#key[*]}; lst=( $3 );
+    key=( $2 ); lst=( $3 );
+    num=$(( ${#key[*]} < ${#lst[*]} ? ${#key[*]} : ${#lst[*]} ))
     for (( i=0; i<$num; i++ )); do
         [ $# -eq 3 ] && var="${lst[i]}" || var="${*:i+3:1}"
         str=${1//"%1"/"${key[i]}"}

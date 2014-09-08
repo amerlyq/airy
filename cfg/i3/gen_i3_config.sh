@@ -54,10 +54,12 @@ bs="bindsym"
 bm="$bs \$mod"
 t="    "
 
+#For auto-hiding bar, pinned only for modes
+#wk_mode()   { wstr "$bm+$1 bar mode dock; mode \"$2\""; }
+#mdf="mode \"default\"; bar mode hide; exec sleep 0.1; exec xdotool key --clearmodifiers alt"
+
 # ---- Writers ----
 w_header(){ wprf "\n### $1 ###\n"; }
-#For hiding bar
-#wk_mode()   { wstr "$bm+$1 bar mode dock; mode \"$2\""; }
 wk_mode()   { wstr "$bm+$1 mode \"$2\""; }
 wmode_begin(){ wk_mode "$1" "$2"; wstr "mode \"$2\" {"; }
 wmode_end()  { wprf "\n$t$bs Return \$mdef \n$t$bs Escape \$mdef \n$t$bs space \$mdef \n}\n"; }
@@ -82,7 +84,6 @@ key_ralt=108
 #wstr "bindcode $i3mod $exno ${refreshbar:2}"
 wstr "bindcode --release $key_ralt $exno ${refreshbar:2}"
 
-#mdf="mode \"default\"; bar mode hide; exec sleep 0.1; exec xdotool key --clearmodifiers alt"
 wstr "set \$mdef mode \"default\""
 
 wprf "\n### ================== Workspaces ================== ###\n"
@@ -103,7 +104,7 @@ w_header "WorkSpaces: Move container"
 wlistp "$bm+Control+%1 move container to workspace number %2, workspace number %2" "$digits" "$wrksps"
 
 w_header "WorkSpaces: Move container"
-wlistp "$bm+Control+Shift+%1 move container to workspace number %2" "$digits" "$wrksps"
+wlistp "$bm+Shift+%1 move container to workspace number %2" "$digits" "${wrknum[*]:0:7}"
 #$wrksps
 
 wprf "\n### ================== Navigation ================== ###\n"
@@ -223,6 +224,8 @@ wmode_end
 
 # There also is the (new) i3-dmenu-desktop which only displays applications shipping a .desktop file. It is a wrapper around dmenu, so you need that installed.
 # bindsym $mod+Control+d exec --no-startup-id i3-dmenu-desktop
+# ALT: j4-dmenu-desktop
+# set $dmenu j4-dmenu-desktop --dmenu="dmenu -f -z -i -fn 'Droid Sans Mono-9:normal' -nb '#333333' -nf '#dedede' -sb '#d64937' -sf '#dedede'"
 
 w_header "Run: Prgs" # i3-sensible-terminal, ranger
 wstr "$bm+Return $eurx"
@@ -235,11 +238,12 @@ wstr "$bm+u exec rofi -now -font 'Sans-10' -fg '#606060' -bg '#000000' -hlfg '#f
 wstr "$bs Print exec scrot '%Y%m%d_%H%M%S_\$wx\$h.png' -e 'mv \$f ~/Downloads/'"
 # Also: lxtask
 
-# Может быть, если перенести эти мапы в ~/.xbindkeys, они перестанут сбивать фокус с полей ввода в вконтакте?
+# Those maps drop focus from input fields in browser.
+# Deprecated by xkb detailed settings.
 w_header "Languages"
 #wlistf "$bm+Shift+%s $exno xkb-switch -s %s $refreshbar" "0 9 8" "us ru ua"
 wlistf "$bm+Shift+%s $exno dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/KbddService \
-    ru.gentoo.kbdd.set_layout uint32:%s $refreshbar" "0 9 8" "0 1 2" #"us ru ua"
+     ru.gentoo.kbdd.set_layout uint32:%s $refreshbar" "0 9 8" "0 1 2" #"us ru ua"
 
 
 w_header "Autostart"
@@ -271,17 +275,18 @@ wstr ''
 wlistf "$bm+%s $exno amixer -q -D pulse set Master %s $refreshbar" \
     "Home Prior Next End" \
     '20% unmute' '2%+ unmute' '2%- unmute' 'toggle'
-#p-id pactl set-sink-volume 0 -- +10%
-#p-id pactl set-sink-volume 0 -- -10%
-#p-id pactl set-sink-mute 0 toggle
+# pactl set-sink-volume 0 -- +10%
+# pactl set-sink-volume 0 -- -10%
+# pactl set-sink-mute 0 toggle
+# mocp -r
 
 
 w_header "Control: ncmpcpp"
 wlistf "$bs %s $exno ncmpcpp %s" \
-    "XF86AudioPlay XF86AudioNext XF86AudioPrev XF86AudioStop" \
+    "XF86AudioPlay XF86AudioNext XF86AudioPrev XF86AudioStop $refreshbar" \
     "toggle next prev stop"
 wstr ''
-wlistf "$bm+Control+%s $exno ncmpcpp %s" \
+wlistf "$bm+Control+%s $exno ncmpcpp %s $refreshbar" \
     "Home Prior Next End" "toggle prev next stop"
 
 
@@ -289,6 +294,7 @@ wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Settings"
 
 wstr "assign [class=\"^Wuala$\"] ${wrknum[9]}"
+wstr "assign [class=\"^Firefox$\"] ${wrknum[3]}"
 wstr "assign [class=\"^Pale\ moon$\"] ${wrknum[3]}"
 wstr "assign [class=\"^Wine$\"] ${wrknum[8]}"
 
@@ -302,14 +308,13 @@ wstr "for_window [window_role=\"pop-up\"] floating enable"
 
 # wlistf "for_window [class=\"(?i)%s\"] floating enable" \
 #     "lxappearance copyq"
+wstr "for_window [instance=\"feh\"] fullscreen"
+wstr "for_window [class=\"^Conky\"] border none"
+wstr "for_window [instance=\"^Download\" class=\"^Firefox\"] floating enable"
 
 wprf "\n### ================== Bar & Theme ================= ###\n"
 # (dzen2, xmobar, maybe even gnome-panel?),
 # you can just remove the i3bar configuration and start your favorite bar instead.
-#
-    # Specifies the bar ID for the configured bar instance (if many). If this option is missing, the ID is set to
-    # bar-x, where x corresponds to the position of the embedding bar block in the config file (bar-0, bar-1, ...).
-    #id <bar_id>
 
     # You can restrict i3bar to one or more outputs (monitors). The default is to handle all outputs.
     # Restricting the outputs is useful for using different options for different outputs by using multiple bar blocks.
@@ -342,8 +347,9 @@ wstr "$bm+Control+grave bar mode invisible"
 
 wstr "$wndtheme
 bar {
-    mode                dock    #<dock|hide|invisible>
-    position            bottom  # <top|bottom>
+    id                  bar-main # Specifies the bar ID for the configured bar instance (if many)
+    mode                dock     # <dock|hide|invisible>
+    position            bottom   # <top|bottom>
     workspace_buttons   yes
     status_command      ~/.i3/i3status.sh
     modifier            \$mod

@@ -197,6 +197,15 @@ i3
 	 normal sized  (2x2) -- it's undefined which are the larger (needs relative layout data).
 	[_] Make warps -- one-button switcher between two (or more) wdws
 	[_] Make one more bar (hidden), which will show some system info on appear?
+	[_] Dunst/i3-notify on screenshot instead of sound (aplay -qN ~/.i3/screenshot.wav)!
+
+		https://github.com/ultrabug/py3status
+		# https://github.com/lee-/i3-bw or use bmon in a scratch terminal
+		# status_command /home/michieljoris/.i3/i3-bw 5 /sys/class/net/wlan0/statistics/rx_bytes /sys/class/net/wlan0/statistics/tx_bytes
+
+	< This will not get you auto-mount and a logout button in the bar.
+	However, the first is managed by udev/udisks(2)
+		https://wiki.archlinux.org/index.php/Udev#UDisks
 
 	Think about workflows
 	 One of possible: open all needed windows, tag it and straight-jump.

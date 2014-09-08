@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# It may be usefull to disable mouse pointer and/or touchpad while layouting.
+# Another solution how to disable/enable
+# https://github.com/deterenkelt/dotfiles/blob/master/.i3/autostart.sh
+
+isEnabled="${1-1}"
+
+getId() { sed -n "/$1/"'s/.*id=\([0-9]\+\).*/\1/p'; }
+mouse_id=$( xinput list | getId 'Mouse' )
+touch_id=$( xinput list | getId 'Touchpad' )
+
+if [ -n "$mouse_id" ]; then
+    xinput set-prop $mouse_id "Device Enabled" $isEnabled; fi
+if [ -n "$touch_id" ]; then
+    xinput set-prop $touch_id "Device Enabled" $isEnabled; fi
+
+echo "SET: mouse/touchpad = $isEnabled"
+

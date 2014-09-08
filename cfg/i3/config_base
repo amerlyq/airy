@@ -159,5 +159,14 @@ bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; foc
 ## Put this window on the presentation output.
 #bindsym $mod+x move container to output VGA1
 
+# Other miscellaneous keybindings.
+# bindsym XF86Sleep exec --no-startup-id systemctl suspend
+# bindsym Mod4+l exec --no-startup-id i3lock && xset s dpms force off
+# bindcode XF86Launch1 exec /usr/bin/pactl play-sample that_was_easy
+# bindcode 233 exec xbacklight -inc 20
+# bindcode 232 exec xbacklight -dec 20
+# bindcode 251 exec xbacklight -set 86
+
+
 bindsym $mod+Insert exec --no-startup-id ~/.i3/ext/rename_as_focused
 

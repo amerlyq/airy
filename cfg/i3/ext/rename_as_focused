@@ -5,7 +5,10 @@ getName() {
     myid=`xprop -root | awk '/_NET_ACTIVE_WINDOW\(WINDOW\)/{print $NF}'`
     myclass=`xprop -id $myid | awk '/WM_CLASS\(STRING\)/{print $NF}'`
     myname=`xprop -id $myid | awk '/WM_NAME\(STRING\)/{print $0}' | sed 's@.*"\(.*\)"@\1@'`
-    echo $myname
+    if [ ${#myname} -le 10 ]; then
+        echo "${myname:0:10}"
+    else echo "${myname:0:7}..."; fi
+
     #echo "`xdotool getwindowname $(xdotool getwindowfocus)`"
 }
 

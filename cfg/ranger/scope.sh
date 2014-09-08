@@ -76,7 +76,7 @@ case "$mimetype" in
         # to workaround conflict with Mint embedded script /usr/local/bin/highlight
         try /usr/bin/highlight --out-format=xterm256 --encoding=utf8 --failsafe \
             --line-numbers --line-number-length=3 --replace-tabs=4 --width="$width" \
-            --wrap --validate-input --style=breeze "$path" && { dump | trim; exit 5; } || exit 2;;
+            --wrap-simple --validate-input --style=breeze "$path" && { dump | trim; exit 5; } || exit 2;;
     # Ascii-previews of images:
     image/*)
         img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
