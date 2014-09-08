@@ -1,5 +1,5 @@
-#!/bin/sh
-
+#!/bin/bash
+source ~/.bash_export
 # SOLUTION: bind instead of bindsym in i3conf, need generate conf by script
 
 ## Group switcher -- for special aims
@@ -14,8 +14,14 @@
 # Remapping  list of predefined remapping options
 #   /usr/share/X11/xkb/rules/evdev.lst
 # Details: /usr/share/X11/xkb/symbols
-#
-xkbcomp -I"$HOME/.Xrc/xkb" "$HOME/.Xrc/xkb/amer.xkb" "${DISPLAY%%.*}"
+
+if [ "$CURR_HOST" == "vbox" ]; then
+    CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" | sed '/lvl5\|over/s|\(\s*\)\(.*\)|\1// \2|' )
+else CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" ); fi
+
+echo "$CONF"
+
+echo "$CONF" | xkbcomp -I"$HOME/.Xrc/xkb" - "${DISPLAY%%.*}"
 
 # setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
 #     -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \

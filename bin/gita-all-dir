@@ -7,7 +7,7 @@ gita_st() { # $1 -- rep path
     echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 
-gita_pull() { echo "--[ $1 ]--" && git pull --rebase; }
+gita_pull() { echo; echo "--[ $1 ]--" && git pull --rebase --verbose; }
 
 all_git() { # $1 -- git command
     for rp in "$PWD"/*; do

@@ -17,7 +17,11 @@ xkb_keymap {
         // You could use 'replace' in file before each key,
         // but sometimes it's simply not working.
         replace "am_mods"
+
+        // For Win+VBox, where caps mapped to ctrl, those two lines must be disabled
+        replace "am_mods(lctrl_lvl5)"
         include "am_over_elona"
+
         include "typo(base)"
         include "inet(evdev)"
     };
