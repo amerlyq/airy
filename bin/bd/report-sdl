@@ -1,0 +1,14 @@
+#!/bin/bash
+
+FL=${1}-rep.otl
+
+cat "$1" \
+| sed '/^$\|^Justification\|screenshot/d; s/\[.*\]//' \
+| sed '1s/\(.*\)/> \1/;2,9s/\(.*\)/\t\1/;10,24d' \
+| sed 's/^\([0-9]\)/\n\1/;s/^\(Interaction:\)/\n\n< \1/' \
+| sed 's/^\(Category\|Description\):\s*\(.*\)$/\t\1\n\t \2/' \
+> "$FL"
+
+vim "$FL" -E -c 'g/^/ norm VQ' -c wq
+cat "$FL"
+

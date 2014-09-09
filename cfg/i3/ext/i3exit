@@ -24,6 +24,8 @@ case "$1" in
         ;;
     # TODO: Test if suspend and hibernate exists on laptop
     suspend)
+        # I was able to solve problem by using the following commands:
+        # (sleep 0.5 && systemctl suspend) &
         lock && sudo suspend
         ;;
     hibernate)

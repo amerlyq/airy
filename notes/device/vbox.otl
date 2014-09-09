@@ -1,8 +1,8 @@
 VBox Host ( File -> Preferences )
 	General--Default machine folder: D:\VMs
-	Input--Virtual Machine--Host Key Combination: Application, then press Enter
-	OK
-	(Don't need now) remapped Alt+L in linux ~ Disable Win+L locking by reg
+	Input--Virtual Machine--Host Key Combination: Application, then press Enter OK
+	(Don't need now) remapped Alt+L in linux ~ Disable on host Win+L locking by reg
+	remap on host Caps->Ctrl by appropriate *.bat
 
 Create new guest
 	Create new guest with HDD(vdi) 20GB
@@ -16,6 +16,8 @@ Create new guest
 			--clipboard bidirectional --natpf1 "Pssh,tcp,,3822,,22"
 	Create shared folders
 		Downloads, Media, Share
+	Disable toolbar
+		GuestSets -> General -> Advanced -> Mini Toolbar (Show in fullscreen) -> uncheck
 
 First scenario after boot
 	cd ~ && rmdir *
