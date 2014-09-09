@@ -16,7 +16,7 @@ PRS_DIR="$SCRIPT_DIR/${SCRIPT_PATH##*/}.d"
 ## Parse my own set of params
 OPTS_SET=($@)
 if [ $# -eq 0 ]; then
-    OPTS_SET=( shell dev i3 ranger audio media zathura vim zsh net )
+    OPTS_SET=( shell dev i3 i3_env ranger audio media zathura vim zsh net )
     sudo apt-get update -y
     sudo apt-get upgrade -y
     sudo apt-get dist-upgrade -y #&& sudo reboot

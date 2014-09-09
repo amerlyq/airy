@@ -23,7 +23,7 @@ wcat ~/.i3/config_base
 
 # ---- Strings ----
 #For hiding bar
-refreshbar="&& killall -SIGUSR1 i3status"
+refreshbar="&& killall -SIGUSR1 i3blocks" #i3status
 ealws="exec_always --no-startup-id"
 exno="exec --no-startup-id"
 
@@ -344,14 +344,14 @@ wstr "$bm+grave bar mode toggle"
 wstr "$bm+Shift+grave bar mode dock"
 wstr "$bm+Control+grave bar mode invisible"
 
-
+#~/.i3/i3status.sh
 wstr "$wndtheme
 bar {
     id                  bar-main # Specifies the bar ID for the configured bar instance (if many)
     mode                dock     # <dock|hide|invisible>
     position            bottom   # <top|bottom>
     workspace_buttons   yes
-    status_command      ~/.i3/i3status.sh
+    status_command      i3blocks #-c ~/.i3/i3blocks.conf
     modifier            \$mod
     $bartheme}
 "
