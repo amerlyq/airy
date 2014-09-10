@@ -351,7 +351,7 @@ bar {
     mode                dock     # <dock|hide|invisible>
     position            bottom   # <top|bottom>
     workspace_buttons   yes
-    status_command      i3blocks #-c ~/.i3/i3blocks.conf
+    status_command      i3blocks -c ~/.i3/i3blocks.conf
     modifier            \$mod
     $bartheme}
 "

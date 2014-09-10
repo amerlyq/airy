@@ -1,0 +1,5 @@
+#!/bin/sh
+
+track=$( mpc status | sed -n 'N;s/^\(.*\)\n\[playing\]\s*\S*\s*\(\S*\)\s*.*/(\2) \1/p' )
+
+printf "$track\n$track\n"

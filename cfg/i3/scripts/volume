@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# CARD="${1:-0}"
+# MIXER="${2:-default}" # use pulse for pulseaudio, default is alsa
+
+amixer -M -D pulse get Master | sed -n '/.*\[\([0-9]\+%\)\].*/{s//\1/p;q}'
