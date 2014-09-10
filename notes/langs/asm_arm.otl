@@ -30,3 +30,5 @@ Get vtbl funcs addresses
 		f_addr= vtbl_start+offset
 
 
+	Cmp to binary files
+		cmp -l file1.bin file2.bin | gawk '{printf "%08X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)}'
