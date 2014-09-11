@@ -60,8 +60,15 @@ NeoBundleLazy 'Shougo/vimfiler', {
     \    'mappings' : ['<Plug>(vimfiler_'],
     \    'explorer' : 1,
     \ }}
-" Ultimate hex-editing system
-NeoBundle 'Shougo/vinarise.vim'
+
+" Ultimate hex-editing system,  depends on hexript for some optional scripts
+NeoBundle 'Shougo/vinarise.vim', {
+    \ 'depends' : 'rbtnn/hexript.vim',
+    \ 'autoload' : {
+    \    'commands' : ['Vinarise', 'VinariseDump'],
+    \    'explorer' : 1,
+    \ }}
+
 " The best testing framework for Vim script'
 "NeoBundle 'Shougo/vesting'
 
