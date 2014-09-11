@@ -22,8 +22,8 @@ wcat ~/.i3/config_base
 
 
 # ---- Strings ----
-#For hiding bar
-refreshbar="&& killall -SIGUSR1 i3blocks" #i3status
+dbar=~/.i3/scripts
+refreshbar="&& $dbar/update"
 ealws="exec_always --no-startup-id"
 exno="exec --no-startup-id"
 
@@ -79,10 +79,13 @@ smove="50 px"
 wprf "\n### =========== Script-generated items ============= ###\n"
 
 w_header "Bind: Refresh on i3mod"
+# wstr "set \$refbar bash -c 'kill -s SIGRTMIN+1 \$(pidof i3blocks)'"
 # i3mod=64 #LAlt
-key_ralt=108
 #wstr "bindcode $i3mod $exno ${refreshbar:2}"
-wstr "bindcode --release $key_ralt $exno ${refreshbar:2}"
+key_ralt=108
+wstr "bindcode --release $key_ralt $exno ${refreshbar:2} 2"
+wstr "bindcode --release \$mod+$key_ralt $exno ${refreshbar:2} 2"
+wstr "bindcode --release Control+$key_ralt $exno ${refreshbar:2} 2"
 
 wstr "set \$mdef mode \"default\""
 
@@ -243,7 +246,7 @@ wstr "$bs Print exec scrot '%Y%m%d_%H%M%S_\$wx\$h.png' -e 'mv \$f ~/Downloads/'"
 w_header "Languages"
 #wlistf "$bm+Shift+%s $exno xkb-switch -s %s $refreshbar" "0 9 8" "us ru ua"
 wlistf "$bm+Shift+%s $exno dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/KbddService \
-     ru.gentoo.kbdd.set_layout uint32:%s $refreshbar" "0 9 8" "0 1 2" #"us ru ua"
+     ru.gentoo.kbdd.set_layout uint32:%s $refreshbar 2" "0 9 8" "0 1 2" #"us ru ua"
 
 
 w_header "Autostart"

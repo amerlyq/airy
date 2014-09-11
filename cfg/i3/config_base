@@ -118,6 +118,12 @@ bindsym $mod+z exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
 bindsym $mod+i scratchpad show
 bindsym $mod+Shift+i move scratchpad
 
+# By default, scratchpads only contain a single window. However, containers can also be made a scratchpad.
+# Create a new container (for example, Mod+Enter), split it (Mod+v) and create another container. Focus the parent (Mod+a), split in the opposite direction (Mod+h), and create again.
+# Focus the first container (with focus parent as needed), make the window floating (Mod+Shift+Space), and move it to the scratchpad (Mod+Shift+-). You can now split containers to preference.
+# Note: Containers cannot be resized individually in floating windows. Resize the containers before making windows floating.
+# Tip: When only using terminal applications, consider a multiplexer such as tmux instead.
+
 # Use Mouse+$mod to drag floating windows to their wanted position
 # Change focus between tiling / floating windows
 # bindsym $mod+space focus mode_toggle
@@ -167,6 +173,6 @@ bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; foc
 # bindcode 232 exec xbacklight -dec 20
 # bindcode 251 exec xbacklight -set 86
 
-
+bindsym $mod+x [urgent=latest] focus
 bindsym $mod+Insert exec --no-startup-id ~/.i3/ext/rename_as_focused
 
