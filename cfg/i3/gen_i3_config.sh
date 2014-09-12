@@ -209,6 +209,8 @@ w_header "Mode: Open"
 wmode_begin 'o' "Open: $pcli, $pgui, p l a s"
 wlistf "$t$bs %s $eflo -e %s, \$mdef" "$pcli w p l" $bcli "w3m google.com" "gksudo powertop" "gksudo tlp start"
 wstr ''
+wstr "$t$bs m $exno ~/.i3/ext/dmenu_mpd_fmove, \$mdef"
+wstr ''
 
 # Autochoose filemng by OS version.
 STD_FILEMGR="pcmanfm"

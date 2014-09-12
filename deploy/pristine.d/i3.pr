@@ -21,10 +21,10 @@ git_install 'alols/xcape'
 #git_install 'enkore/j4-dmenu-desktop'
 
 # Separate 'cause of some security checks
-LST="i3 i3lock i3status ruby-ronn acpi"
+LST="i3 i3lock i3status ruby-ronn"
 # i3            # fast tiling windows manager
 # ruby-ronn     # for i3blocks: compiling
-# sysstat       # for i3blocks: has 'mpstat' for cpu loading
+# acpi, sysstat # for i3blocks: has 'mpstat' for cpu loading, 'acpi' for battery stat
 
 apt_noprompt --force-yes $LST
 

@@ -1,61 +1,39 @@
-#!/usr/bin/perl
+#!/bin/bash
 
-use strict;
-use warnings;
-use utf8;
+DIR=/sys/class/power_supply/BAT0
+if [ ! -d "$DIR" ]; then exit 33; fi
 
-my $acpi;
-my $status;
-my $percent;
-my $full_text;
-my $short_text;
+if [ $( cat "$DIR/present" ) -eq 1 ]; then
+    buf=$( awk "BEGIN {
+        curr=$(cat $DIR/current_now)/1000000
+        volt=$(cat $DIR/voltage_now)/1000000
+        full=$(cat $DIR/charge_full_design)/1000000
+        chrg=$(cat $DIR/charge_now)/1000000
+        watt=(curr * volt )
+        hours=int(chrg / curr)
+        minut=int(60 * (chrg / curr - hours))
+        "'
+        printf "watt=%.2f\n", watt
+        printf "time=%d:%02d\n", hours, minut
+    }' ); eval $buf
 
-# read the first line of the "acpi" command output
-open (ACPI, 'acpi -b |') or die "Can't exec acpi: $!\n";
-$acpi = <ACPI>;
-close(ACPI);
+    # time=$( awk 'BEGIN { printf("%dh", ('"${watt}"'))}' )
+    percent=$( cat $DIR/capacity )
+    stat=$( cat $DIR/status )
 
-# fail on unexpected output
-if ($acpi !~ /: (\w+), (\d+)%/) {
-	die "$acpi\n";
-}
+    if [ "$stat" == "Charging" ]
+    then stat='ϟ'; arr='▲'; #⚡
+    else stat='☯'; arr='▼'; fi
 
-$status = $1;
-$percent = $2;
-$full_text = "$percent%";
+      if [ $percent -ge 80 ]; then color="#FFF6AA";
+    elif [ $percent -ge 60 ]; then color="#FFAE00";
+    elif [ $percent -ge 40 ]; then color="#A8FF00";
+    elif [ $percent -ge 20 ]; then color="#FF0000";
+    elif [ $percent -ge 6  ]; then color="#FF00AA"; fi
 
-if ($status eq 'Discharging') {
-	$full_text .= ' DIS';
-} elsif ($status eq 'Charging') {
-	$full_text .= ' CHR';
-}
+    bat="$stat $percent%% ${time} $arr ${watt}W"
 
-$short_text = $full_text;
+else bat="☯"; color="#FF00AA"; fi
 
-if ($acpi =~ /(\d\d:\d\d):/) {
-	$full_text .= " ($1)";
-}
+printf "$bat\n$bat\n$color\n"
 
-# print text
-print "$full_text\n";
-print "$short_text\n";
-
-# consider color and urgent flag only on discharge
-if ($status eq 'Discharging') {
-
-	if ($percent < 20) {
-		print "#FF0000\n";
-	} elsif ($percent < 40) {
-		print "#FFAE00\n";
-	} elsif ($percent < 60) {
-		print "#FFF600\n";
-	} elsif ($percent < 85) {
-		print "#A8FF00\n";
-	}
-
-	if ($percent < 5) {
-		exit(33);
-	}
-}
-
-exit(0);

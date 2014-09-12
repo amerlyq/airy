@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# 1..5..inf stars as quality,
+# or name for dir for grouping
+choice=${1}
+
+dir=~/media/Music
+pd="$dir/++"
+
+fl="$dir/`mpc -f '%file%' | sed '1q'`"
+
+DMENU='dmenu -i -b -nb #000000 -nf #999999 -sb #000000 -sf #31658C -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+
+if [ -z "$choice" ]; then
+    cd "$pd"
+    choice=$( find . -maxdepth 1 -type d -exec basename {} \; | $DMENU)
+fi
+
+dst="$pd/$choice"
+mkdir -p "$dst"
+mv -i -v -b "$fl" --target-directory="$dst/"
+mpc del 0
