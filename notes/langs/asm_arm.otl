@@ -32,3 +32,10 @@ Get vtbl funcs addresses
 
 	Cmp to binary files
 		cmp -l file1.bin file2.bin | gawk '{printf "%08X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)}'
+
+	ALT: xxd
+		$ cat hdump
+		41 42 43 44
+		45 46 47 48
+
+		echo 'ibase=16' | cat - hdump | tr ' ' \; | bc | awk '{printf("%c",$0)}'

@@ -4,6 +4,7 @@
 CURR_PROF="default"
 LANG=en_US.UTF-8
 LANGUAGE=en_US
+LC_NUMERIC=en_US.UTF-8
 EDITOR=vim
 VISUAL=vim
 

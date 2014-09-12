@@ -179,7 +179,7 @@ wstr "$bm+Shift+x $exno ~/.i3/ext/i3exit lock"
 w_header "Mode: System"
 wstr "set \$system_mode i3: re(c)onf, re(n)ew, (e)xit || System: (l)ock, log(o)ut, (s)uspend, (h)ibernate, (r)eboot, shu(t)down"
 
-wk_mode 'Escape' "\$system_mode"
+wk_mode 'Control+Escape' "\$system_mode"
 wmode_begin 'Delete' "\$system_mode"
 wlistf "$t$bs %s $exno ~/.i3/ext/i3exit %s, \$mdef" "l o s h r t" \
     "lock logout suspend hibernate reboot shutdown"
@@ -285,8 +285,8 @@ wlistf "$bm+%s $exno amixer -q -D pulse set Master %s $refreshbar" \
 
 
 w_header "Control: ncmpcpp"
-wlistf "$bs %s $exno ncmpcpp %s" \
-    "XF86AudioPlay XF86AudioNext XF86AudioPrev XF86AudioStop $refreshbar" \
+wlistf "$bs %s $exno ncmpcpp %s $refreshbar" \
+    "XF86AudioPlay XF86AudioNext XF86AudioPrev XF86AudioStop" \
     "toggle next prev stop"
 wstr ''
 wlistf "$bm+Control+%s $exno ncmpcpp %s $refreshbar" \

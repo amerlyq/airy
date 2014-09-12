@@ -1,0 +1,74 @@
+#!/bin/bash
+# Based on /proc/timer_list only
+#   http://stackoverflow.com/questions/5014823/how-to-profile-a-bash-shell-script
+# Usage:
+#   source elap.bash [init|trap|trap2]
+# Bunch of functions without test for ensuring minimum time consumption
+
+# TEST="$1"
+ARG="trap2"
+
+# Useable functions
+elap()          { elapGetNow;elapCalc;elapShow "$@";elapCnt;}
+elapTotal()     { elapGetNow;elapCalc2;elapShowTotal "$@";}
+elapBoth()      { elapGetNow;elapCalc;elapCalc2;elapShowBoth "$@";elapCnt;}
+elapReset()     { elapGetNow;elapCnt;}
+elapResetTotal(){ elapGetNow;elapCntTotal;}
+elapResetBoth() { elapGetNow;elapCntBoth;}
+
+# Semi internal functions
+elapShow()      { echo -e "$_elap $@";}
+elapShowTotal() { echo -e "$_elap2 $@";}
+elapShowBoth()  { echo -e "$_elap2 $_elap $@";}
+
+# Internal functions
+elapCnt()       { _eLast=$_eNow ;}
+elapCntTotal()  { _eLast2=$_eNow;}
+elapCntBoth()   { _eLast=$_eNow ; _eLast2=$_eNow;}
+elapGetNow()    {
+    read -dk -a_eNow </proc/timer_list;
+    _eNow=${_eNow[8]}
+}
+elapCalc() {
+    _elap=000000000$((_eNow - _eLast))
+    printf -v _elap "%16.9f" \
+    "${_elap:0:${#_elap}-9}.${_elap:${#_elap}-9}"
+}
+elapCalc2() {
+    _elap2=000000000$((_eNow - _eLast2))
+    printf -v _elap2 "%16.9f" \
+    "${_elap2:0:${#_elap2}-9}.${_elap2:${#_elap2}-9}"
+}
+
+export _eNow _eLast _eLast2 _elap _elap2
+
+[ "$ARG" == "trap2" ] || [ "$1" == "trap" ] || [ "$1" == "init" ] && elapResetBoth
+if [ "$ARG" == "trap" ] ;then
+    if [ "${-/*i*/1}" == "1" ] ;then
+    trap '[ "${BASH_COMMAND%elap*}" == "$BASH_COMMAND" ] && {
+         elapReset;BASH_LAST=$BASH_COMMAND; }' debug
+    PROMPT_COMMAND='elap $BASH_LAST'
+    else
+    export BASH_LAST=Starting
+    trap 'trap -- debug;elapTotal EXIT;exit 0' 0
+    trap 'elap $BASH_LAST;BASH_LAST=$BASH_COMMAND' debug
+    fi
+else
+    if [ "$ARG" == "trap2" ] ;then
+    if [ "${-/*i*/1}" == "1" ] ;then
+        trap '[ "${BASH_COMMAND%elap*}" == "$BASH_COMMAND" ] && {
+         elapReset;BASH_LAST=$BASH_COMMAND; }' debug
+        PROMPT_COMMAND='elapBoth $BASH_LAST'
+    else
+        export BASH_LAST=Starting
+        trap 'trap -- debug;elapBoth EXIT;exit 0' 0
+        trap 'elapBoth $BASH_LAST;BASH_LAST=$BASH_COMMAND' debug
+    fi
+    fi
+fi
+
+
+# source "$TEST"
+#
+# trap -- debug
+# elapTotal \\e[1mtotal time\\e[0m

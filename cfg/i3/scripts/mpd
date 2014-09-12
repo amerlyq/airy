@@ -1,5 +1,38 @@
 #!/bin/sh
 
-track=$( mpc status | sed -n 'N;s/^\(.*\)\n\[playing\]\s*\S*\s*\(\S*\)\s*.*/(\2) \1/p' )
+track=$( mpc status | sed -n 'N;s/^\(.*\)\n\[.*\]\s*\S*\s*\(\S*\)\s*.*/(\2) \1/p' )
+mode=$( mpc status | sed -n '2s/^\[\(.*\)\].*/\1/p' )
 
-printf "$track\n$track\n"
+toggle() {
+    if [ "$mode" != "paused" ]; then
+        mode="paused"
+        mpc pause >/dev/null
+    else
+        mode="playing"
+        mpc play >/dev/null
+    fi
+    if [ -z "$track" ]; then track="stopped"; fi
+}
+
+launch() {
+    if pidof ncmpcpp >/dev/null
+    then { kill -s TERM $(pidof -c ncmpcpp) & }
+    else { 2>/dev/null 1>/dev/null i3-msg 'exec --no-startup-id urxvt -name Float -e ncmpcpp' & }; fi
+}
+
+case $BLOCK_BUTTON in
+    1) toggle ;;
+    3) launch ;;
+    *) ;;
+esac #x=$BLOCK_X y=$BLOCK_Y
+
+color='#FF4400'
+case "$mode" in
+    playing) prefix='▶'; color='#FF44FF' ;;
+    paused)  prefix='∥'; color='#4444FF' ;;
+    *) ;;
+esac
+
+printf "$track $prefix\n$track\n$color\n"
+
+

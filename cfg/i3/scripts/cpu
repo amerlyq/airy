@@ -1,0 +1,24 @@
+#!/bin/bash
+
+FL=/tmp/i3blocks_cpu
+
+p=( `cat "$FL"` )
+if [ -z "$p" ]; then p=( 0 0 ); fi
+
+#ALT: top -bn 2 -d 0.01 | grep '^%Cpu' | tail -n 1 | gawk '{print $2+$4+$6}'
+# open (MPSTAT, 'mpstat 1 1 |') or die "Can't exec mpstat: $!"; #apt-get install sysstat
+
+c=( `awk 'NR==1 {t=0; for (i=2;i<2+3;i++) {t+=$i};
+    w=t; for (;i<=NF;i++) {t+=$i} }
+    END { printf "%d %d",'"w,t }" /proc/stat` )
+printf '%s\n' "${c[*]}" > "$FL"
+
+usage=$( awk 'BEGIN { printf("%.2f\n", '"100*(${c[0]} - ${p[0]})/(${c[1]} - ${p[1]}))"' }' )
+form="${usage}%"
+
+usage="${usage%.*}"
+if [ $usage -ge 25 ]; then color="#FFFC00";
+elif [ $usage -ge 75 ]; then color="#FF0000"; fi
+
+# if >= t_crit : exit 33;
+printf "%s\n%s\n%s\n" "$form" "$form" "$color"

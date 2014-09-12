@@ -1,0 +1,6 @@
+#!/bin/sh
+
+load="`awk '{print $1}' /proc/loadavg`"
+if [ $(awk 'BEGIN{ print "'$(nproc)'"<="'$load'" }') -eq 1 ]; then color="#FF00FF"; fi
+
+printf "$load\n$load\n$color\n"
