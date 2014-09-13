@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# listen for DBus events,
+#   http://blog.fpmurphy.com/2009/02/dbus-monitor.html
+
+ifc="ru.gentoo.kbdd"
+mmb="layoutChanged"
+dbus-monitor --profile "interface='$ifc',member='$mmb'" |
+while read line; do
+    #echo $line | grep ActiveChanged && your_script_goes_here
+    printf "$line\n"
+    ~/.i3/blocks/update 2
+done

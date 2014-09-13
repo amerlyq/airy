@@ -15,21 +15,24 @@ if [ $( cat "$DIR/present" ) -eq 1 ]; then
         "'
         printf "watt=%.2f\n", watt
         printf "time=%d:%02d\n", hours, minut
-    }' ); eval $buf
+    }' );
+    eval $buf
 
     # time=$( awk 'BEGIN { printf("%dh", ('"${watt}"'))}' )
     percent=$( cat $DIR/capacity )
     stat=$( cat $DIR/status )
 
-    if [ "$stat" == "Charging" ]
-    then stat='ϟ'; arr='▲'; #⚡
-    else stat='☯'; arr='▼'; fi
+      if [ $percent -ge 80 ]; then color="#FFF6AA"
+    elif [ $percent -ge 60 ]; then color="#FFFF40"
+    elif [ $percent -ge 40 ]; then color="#FFEE20"
+    elif [ $percent -ge 20 ]; then color="#FF8800"
+    elif [ $percent -ge 6  ]; then color="#FF0000"
+    else color="#AA00AA"; fi
 
-      if [ $percent -ge 80 ]; then color="#FFF6AA";
-    elif [ $percent -ge 60 ]; then color="#FFAE00";
-    elif [ $percent -ge 40 ]; then color="#A8FF00";
-    elif [ $percent -ge 20 ]; then color="#FF0000";
-    elif [ $percent -ge 6  ]; then color="#FF00AA"; fi
+    if [ "$stat" == "Charging" ]; then
+        stat='ϟ'; arr='▲'; #⚡
+        color="#${color:5:2}${color:3:2}${color:1:2}"
+    else stat='☯'; arr='▼'; fi
 
     bat="$stat $percent%% ${time} $arr ${watt}W"
 

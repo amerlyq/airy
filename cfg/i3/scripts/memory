@@ -1,5 +1,0 @@
-#!/bin/sh
-
-mem=$( free -m | awk '$1 == "Mem:" { t=$2/100; rc=int($3/t+1) }; $1 == "-/+" { printf "%d/%d%%\n",int($3/t+1),rc }' )
-echo "$mem"
-# another source : /proc/meminfo

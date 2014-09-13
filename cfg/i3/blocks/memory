@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# another source : /proc/meminfo
+mem=$( free -m | awk '
+        $1 == "Mem:"  { total=$2/100; cache=int($3/total+1) }
+        $1 == "-/+"   { used=int($3/total+1) }
+        $1 == "Swap:" { swap="/"int(100*$3/$2+1); if($3==0) swap="" }
+        END { printf("%d/%d%s%%\n",used,cache,swap) }
+    ' )
+
+echo "$mem"

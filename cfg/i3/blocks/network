@@ -1,0 +1,74 @@
+#!/bin/bash
+
+PL=/tmp/net-speed-bytes
+DIR=/sys/class/net
+if [ ! -d "$DIR/wlan0" ]; then exit 33; fi
+
+# CHECK STATUS
+if [ "$(cat $DIR/eth0/operstate )" == "up" ]; then state="E$state"; fi
+if [ "$(cat $DIR/wlan0/operstate)" == "up" ]; then state="W$state"; fi
+if [ -z "$state" ]; then printf "E/W\nE/W\n#FF0000"; exit 0; fi
+
+# CACHE RESULTS
+prev=( $(cat "$PL") )
+curr=( $(date +%s.%0N) $(cat /proc/net/dev |
+    awk '$1=="eth0:" || $1=="wlan0:" { printf $2" "$10" " }' ))
+printf "${curr[*]}" > "$PL"
+
+for i in ${!curr[*]}; do
+    delta[$i]=$( awk 'BEGIN { printf "%s",('"${curr[$i]} - ${prev[$i]}"')}' )
+done
+
+# CALCULATE RATE
+for i in 0 1; do
+    dd="${delta[$(($i+1))]} + ${delta[$(($i+3))]}"
+    rate=$( awk 'BEGIN{ printf "%.2f",('"$dd/(1024*${delta[0]})"')}' )
+    if [ ${rate%.*} -gt 1024 ]; then
+        rate=$( awk 'BEGIN{ printf "%.2fM",('"$rate/1024"')}' )
+    else rate="${rate}K"; fi
+    bx[$i]=$rate
+done
+
+
+
+# EVENTS
+# TODO: show eth0 ip also
+case "$BLOCK_BUTTON" in
+    1) ipaddr=$(ip addr show wlan0 | sed -n 's|\s*inet \([0-9\.]*\)/.*|\1|p')
+        # WLAN DETAILS
+        # apt-get install wavemon | wlan0 ncurses monitor
+        buf=$( iwconfig 2>&1| sed -n "
+            s/.* ESSID:\"\(.*\)\".*/ssid=\1;/p;
+            s/\s*Bit Rate=\([0-9]*\).*/mbs=\1;/p;
+            s/\s*Link Quality=\(\S*\) .*/qual=\1;/p" )
+        eval "$buf"
+        text="$state (${ssid} ${mbs}Mb/s) $ipaddr"; color='#FFFF00' ;;
+    3) text=$( awk 'BEGIN { printf "↓%sK;↑%sK",'"
+        int((${curr[1]}+${curr[3]})/1024/1024),int((${curr[2]}+${curr[4]})/1024/1024)
+        "'}' ); text="$state $text"; color='#FFAA00' ;;
+    *) text="$state ↓${bx[0]} ↑${bx[1]}"; color='#00FF00' ;;
+esac
+# total=(bx0+bx1) #↕
+
+printf "$text\n$text\n$color"
+
+
+# watch -n 1 cat /proc/net/wireless | periodically calling
+
+#"/dev/shm/measure-net-speed"   # temporary (running) filesystem
+
+# IF NO SUCH PATH: /proc/net/dev
+#  eth0=$DIR/eth0/statistics
+# wlan0=$DIR/wlan0/statistics
+# read eth0_rx < "${eth0}/rx_bytes"
+# rx/tx -- incoming/outgoing
+# $(cat "${eth0}/rx_bytes") $(cat "${eth0}/tx_bytes")
+# $(cat "${wlan0}/rx_bytes") $(cat "${wlan0}/tx_bytes")
+
+# IF NO SUCH PATH: /sys/class/net/eth0/statistics
+# FL=/tmp/net-speed-devs
+# if [ ! -f "$FL" ]; then # Does once after boot, then uses cached.
+#     find "/sys/devices/pci0000:00/" -name "statistics" > "$FL"
+# fi
+#  eth0=$( sed -n '/eth0/{p;q}'  "$FL" )
+# wlan0=$( sed -n '/wlan0/{p;q}' "$FL" )

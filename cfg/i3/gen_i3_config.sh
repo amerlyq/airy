@@ -22,7 +22,7 @@ wcat ~/.i3/config_base
 
 
 # ---- Strings ----
-dbar=~/.i3/scripts
+dbar=~/.i3/blocks
 refreshbar="&& $dbar/update"
 ealws="exec_always --no-startup-id"
 exno="exec --no-startup-id"
@@ -82,10 +82,10 @@ w_header "Bind: Refresh on i3mod"
 # wstr "set \$refbar bash -c 'kill -s SIGRTMIN+1 \$(pidof i3blocks)'"
 # i3mod=64 #LAlt
 #wstr "bindcode $i3mod $exno ${refreshbar:2}"
-key_ralt=108
-wstr "bindcode --release $key_ralt $exno ${refreshbar:2} 2"
-wstr "bindcode --release \$mod+$key_ralt $exno ${refreshbar:2} 2"
-wstr "bindcode --release Control+$key_ralt $exno ${refreshbar:2} 2"
+# key_ralt=108
+# wstr "bindcode --release $key_ralt $exno ${refreshbar:2} 2"
+# wstr "bindcode --release \$mod+$key_ralt $exno ${refreshbar:2} 2"
+# wstr "bindcode --release Control+$key_ralt $exno ${refreshbar:2} 2"
 
 wstr "set \$mdef mode \"default\""
 
@@ -179,7 +179,7 @@ wstr "$bm+Shift+x $exno ~/.i3/ext/i3exit lock"
 w_header "Mode: System"
 wstr "set \$system_mode i3: re(c)onf, re(n)ew, (e)xit || System: (l)ock, log(o)ut, (s)uspend, (h)ibernate, (r)eboot, shu(t)down"
 
-wk_mode 'Control+Escape' "\$system_mode"
+wk_mode 'Shift+Escape' "\$system_mode"
 wmode_begin 'Delete' "\$system_mode"
 wlistf "$t$bs %s $exno ~/.i3/ext/i3exit %s, \$mdef" "l o s h r t" \
     "lock logout suspend hibernate reboot shutdown"

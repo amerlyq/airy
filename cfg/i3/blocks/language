@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# LG=$(setxkbmap -query | awk '/layout/{print toupper($2)}')
+# LG=$(xkb-switch -p | sed 's/am(\(.*\))\|\(\w\+\)/\U\1\2/')
+
+INDEX=$( qdbus ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.getCurrentLayout )
+
+change() { #nex_layout, prev_layout
+    dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.set_layout uint32:$1
+    INDEX=$1
+}
+
+case $BLOCK_BUTTON in
+    1) change $(( $INDEX < 2 ? $INDEX + 1 : 0 )) ;;
+    3) change 0 ;;
+    *) ;;
+esac
+
+case "${INDEX}" in
+    0) LG=US; color="#00AE00" ;;
+    1) LG=RU; color="#00AEFF" ;;
+    2) LG=UA; color="#FFFF00" ;;
+    *) color="#C60101" ;;
+esac
+
+printf "%s\n%s\n%s\n" "$LG" "$LG" "$color"

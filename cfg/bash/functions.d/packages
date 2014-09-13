@@ -86,7 +86,7 @@ rep_autobuild() {
 }
 
 git_install() { # $1 - git rep, $2 - dir name
-    local PR_DIR=${1##*/} BUILD_DIR
+    local PR_DIR=${1##*/} BUILD_DIR LINK="$1"
     check_pkg_dir
     PR_DIR="$CURR_DIR_PKG/${PR_DIR,,}"
 
@@ -94,7 +94,10 @@ git_install() { # $1 - git rep, $2 - dir name
         cd "$PR_DIR"
         git pull
     else
-        git clone --depth 1 "https://github.com/$1" "$PR_DIR"
+        if [ "${LINK//'://'}" == "$LINK" ]; then
+            LINK="https://github.com/$LINK"
+        fi
+        git clone --depth 1 "$LINK" "$PR_DIR"
     fi
 
     rep_autobuild "$PR_DIR"

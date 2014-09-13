@@ -1,0 +1,14 @@
+#!/bin/bash
+
+HASH=$(echo $(pwd)/$1|md5sum|cut -d' ' -f1)
+mkdir -p /tmp/.cache
+CACHE="/tmp/.cache/PDF-${HASH}.html"
+if [ ! -f $CACHE ]; then
+    pdftohtml -i -noframes -enc UTF-8 "$1" $CACHE
+fi
+
+if [ -f $CACHE ]; then
+    elinks $CACHE
+fi
+
+#zcat book.fb2.zip|xsltproc FB2_2_txt.xsl -|less -s
