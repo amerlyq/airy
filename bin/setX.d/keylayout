@@ -23,6 +23,8 @@ echo "$CONF"
 
 echo "$CONF" | xkbcomp -I"$HOME/.Xrc/xkb" - "${DISPLAY%%.*}"
 
+pgrep xcape > /dev/null || { xcape -t 250 -e "Control_L=Escape" & }
+
 # setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
 #     -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \
 #     -option "grp:sclk_toggle, grp:switch, misc:typo, shift:both_shiftlock"
@@ -43,3 +45,5 @@ echo "$CONF" | xkbcomp -I"$HOME/.Xrc/xkb" - "${DISPLAY%%.*}"
 # ashtgyneoi'     # фывапролджэ           # фівапролджє
 # zxmcvkl,./      # ячсмитьбюё            # ячсмитьбю /?
 
+# Remap kbd with udev rules on kernel level
+# http://git.adirat.com/carpalx-keyboard/src

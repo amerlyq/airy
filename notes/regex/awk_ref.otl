@@ -7,3 +7,42 @@ Delete 3rd column
 	sed -i -r 's/(\s+)?\S+//3' file
 	awk 'pattern{print substr($0, index($0, $3))}'
 
+Join lines
+	awk '{ print $0; }' RS='\n' ORS=' :: ' < random_data.txt
+
+Now we remove duplicate values in the 3rd column based on pairing 1st and 2nd column as key :
+	awk ‘!x[$1,$2]++’ FS=”,” data.txt
+
+Delete column
+	awk -F'|' '{
+		for(n=1; n<=NF; n++){
+		if(n!=NF)fmt="%s|"; else fmt="%s\n"
+		if(n!=4)printf(fmt,$n)
+		}
+		}' UrFile
+	ALT:
+		awk '{$3=""; print}' infile
+		 MRT_DM MR_DI_AD  JUN_SAL
+	Substituting the given string with nothing:
+		awk '{sub(/ST_DJ /,""); print}' infile
+	Conditions in awk control the execution of actions and actions are executed when the condition is true.
+
+	If the condition is true (1 is true) and there are no actions between
+	braces, awk prints the current record by default.
+		awk '{$3="";sub("  "," ")}1'
+	is similar to:
+		awk '{$3="";sub("  "," ")}{print}'
+
+Shell variables
+	Use awk's ~ operator, and you don't need to provide a literal regex on the right-hand side:
+		function _process () {
+		   awk -v l="$line" -v pattern="$1" '
+			   $0 ~ pattern {p=1}
+			   END {if(p) print l >> "outfile.txt"}
+		   '
+		}
+	Although this would be more efficient (don't have to read the whole file)
+		function _process () {
+			grep -q "$1" && echo "$line"
+		}
+	Depending on the pattern, may want grep -Eq "$1"

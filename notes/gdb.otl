@@ -1,2 +1,194 @@
-[...make your application crash and then get a backtrace with:]
-(gdb) bt
+Cool man
+	http://rus-linux.net/nlib.php?name=/MyLDP/algol/gdb/otladka-s-gdb.html
+	http://www.delorie.com/gnu/docs/gdb/gdb_toc.html
+	http://xakep.ru/articles/22176/
+	*http://beej.us/guide/bggdb/
+
+	Very cool, very many. Read them all!
+	* http://beej.us/guide/
+Ref
+	https://sourceware.org/gdb/current/onlinedocs/gdb/
+	http://www.gnu.org/software/gdb/documentation/
+
+| <CR>          | Repeat previous
+| r             | run
+| kill			| to safely recompile src and 'run' again, w/o exiting gdb and savig breakpoints where them are
+| bt			| make your application crash and then get a backtrace with
+| q	            | quit, yes
+
+| b  func       | breakpoint func
+| b  file.c :39 | breakpoint file.c :39
+| break *adress | Остановить перед выполнением инструкции по адресу.
+| tb            | temporary breakpoint  - stop once on, then removed.
+| c             | continue until next breakpoint or end of programm
+
+| n <count>     | next 1 - exec next line of code completely
+| u				| until - continue to the end of current cycle(for,while,etc)
+| s             | step
+| fin | finish  | natural continue to end of frame (return from step inside)
+| ret <val>		| emergetncy instant return from step inside
+
+| p v.sz        | print v.sz
+| printf "%08X\n", i
+| l				| list 10 lines around current
+
+| bt                           | обратная трассировка (в случае аварийного завершения программы)
+| info registers               | показать все регистры
+| disas				    	   | disassemble
+| disass $pc-32, $pc+32        | дизассемблировать код
+| disassemble main             | дизассемблировать функцию main
+| set disassembly-flavor intel | отображать команды ассемблера в синтаксисе intel
+
+| si, ni	| next in machine instructions, use 'display/i $pc' before to see asm codes
+
+| i reg | info registers
+
+
+Breakpoints
+	info breakpoints				   | list of all
+	b | break TestClass::testFunc(int) |
+	disable 2 -- disable 2nd breakpoint from list
+	ignore 2 5 -- skip 2nd breakpoint 5 times
+	save breakpoint /tmp/bps
+
+Advance -- continue to this temporary breakpoint
+	advance <location as for breakpoint>
+ To continue to a specific location, use the advance command, specifying a
+ location like those shown in the "Breakpoints" section, above. Here's an
+ example which advances from the current location until the function
+ subsubfunction() is called:
+
+Print array/memory area
+	: int *array = (int *) malloc (len * sizeof (int));
+	p *array@len
+
+Display
+	display [аргумент]  | на каждый останов/шаг принтить переменную/выражение
+	display				| list all autoprinting vars
+	info display
+	disable display <#number>
+	enable display <#number>
+	delete display <#number>
+	 Опять-таки, если не указать номер переменной, то очистится весь список
+	 отображаемых переменных.
+
+
+Изменение значения переменной
+	set <оператор присваивания>
+	print <оператор присваивания>
+	> This, along with the 'jump' command, can help you repeat sections of
+	> code without restarting the program.
+
+	whatis x
+	 TYPE = WORD
+	p x
+	 $1 = 1
+	set x=2
+	p x=x-2
+	 $3 = 0
+
+Watchpoints
+	wa | watch <переменная>
+	rw | rwatch
+	aw | awatch
+		Выполнение программы приостанавливается всякий раз, когда значение
+		указанной переменной изменяется/считывается/то либо другое.
+
+ Так как yes выводит бесконечное число символов, то лучше бы их нам не видеть
+ в отладчике, а вывод программы можно направить на другую консоль. Откройте
+ новый терминал, наберите команду и вы получите имя консоли. Должно вылезти
+ что-то вроде этого:
+	$ who is i
+	 localhost.localdomain!root pts/3 Apr 26 13:24
+ Вот теперь просто привязываем к ней.
+	(gdb) tty /dev/pts/3
+
+Замена в памяти переменных на стёке, переданных в функцию
+	 Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
+	 x/i $eip 0x4006d585 <_IO_puts+21>: mov 0x8(%ebp),%esi
+	(gdb) set {char}0x8048e59='X'
+	(gdb) set {char}0x8048e5a='A'
+	(gdb) set {char}0x8048e5b='K'
+	(gdb) set {char}0x8048e5c='E'
+	(gdb) set {char}0x8048e5d='P'
+	x/3sw 0x8048e59
+	 0x8048e59 <_IO_stdin_used+437>: "XAKEP\004\b"
+
+(gdb) attach 'pid'
+(gdb) attach 1127 // example
+Поиск в памяти:
+(gdb) x/d or x 'address' show decimal
+(gdb) x/100s 'address' show next 100 decimals
+(gdb) x 0x0804846c show decimal at 0x0804846c
+(gdb) x/s 'address' show strings at address
+(gdb) x/105 0x0804846c show 105 strings at 0x0804846c
+(gdb) x/x 'address' show hexadecimal address
+(gdb) x/10x 0x0804846c show 10 addresses at 0x0804846c
+(gdb) x/b 0x0804846c show byte at 0x0804846c
+(gdb) x/10b 0x0804846c-10 show byte at 0x0804846c-10
+(gdb) x/10b 0x0804846c+20 show byte at 0x0804846c+20
+(gdb) x/20i 0x0804846c show 20 assembler instructions at address
+Список всех секций в исполняемом файле:
+(gdb) maintenance info sections // or
+(gdb) mai i s
+Executable file:
+    `/home/hack/homepage/challenge/buf/basic', file type
+elf32-i386.
+    0x080480f4->0x08048107 at 0x000000f4: .interp ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x08048108->0x08048128 at 0x00000108: .note.ABI-tag
+ALLOC LOAD READONLY DATA HAS_CONTENTS
+    0x08048128->0x08048158 at 0x00000128: .hash ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x08048158->0x080481c8 at 0x00000158: .dynsym ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x080481c8->0x08048242 at 0x000001c8: .dynstr ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x08048242->0x08048250 at 0x00000242: .gnu.version
+ALLOC LOAD READONLY DATA
+HAS_CONTENTS
+...
+Бряк на адрес:
+(gdb) disassemble main
+Dump of assembler code for function main:
+0x8048400 <main>: push %ebp
+0x8048401 <main+1>: mov %esp,%ebp
+0x8048403 <main+3>: sub $0x408,%esp
+0x8048409 <main+9>: add $0xfffffff8,%esp
+0x804840c <main+12>: mov 0xc(%ebp),%eax
+0x804840f <main+15>: add $0x4,%eax
+0x8048412 <main+18>: mov (%eax),%edx
+0x8048414 <main+20>: push %edx
+0x8048415 <main+21>: lea 0xfffffc00(%ebp),%eax
+...
+(gdb) break *0x8048414 // example
+Breakpoint 1 at 0x8048414
+(gdb) break main // example
+Breakpoint 2 at 0x8048409
+(gdb)
+И так далее :)
+
+
+.....................................
+
+Examining stack frames
+
+If you're stopped at a breakpoint or at an error, you may also want to examine
+the state of stack frames further back in the calling sequence. You can use
+the up and down commands for this.
+
+"up" moves you up one stack frame (e.g. from a function to its caller)
+
+(gdb) up
+#1  0x08048441 in main (argc=2, argv=0xffd9add4) at reassemble.c:28
+28        buggy_function ();
+
+"down" moves you down one stack frame (e.g. from the function to its callee)
+
+(gdb) down
+#0  0x080483f1 in buggy_function () at reassemble.c:20
+20        int len = strlen (s);
+
+The commands above are really helpful if you're stuck at a segfault and want
+to know the arguments and local vars of the faulting function's caller (or
+that function's caller, etc.)
