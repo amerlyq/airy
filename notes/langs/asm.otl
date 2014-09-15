@@ -27,6 +27,10 @@ Examples
 	: I just don't get what is going wrong. I have tried coff because when I
 	: objdump the 2 files they seem to be of the coff type.
 
+	hexdump -e '1/1 "%02X"' -n 1520 -s 77892 $VMLINUX_PATH
+	vmlinux_bin() { dd if="$VMLINUX_PATH" bs=1 skip=$(( $1 )) count=$(( $2 )); }
+	vmlinux_hex() { xxd -p -c 4 -s "$(( $1 ))" -l "$(( $2 ))" $VMLINUX_PATH; }
+
 AT&T vs Intel
 	http://asm.sourceforge.net/articles/linasm.html
 

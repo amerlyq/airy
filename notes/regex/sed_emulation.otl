@@ -30,3 +30,6 @@ using SED. Please, if know about others, contribute!
 | grep -n      |  sed -n '/patt/{=;p;}' | sed '$!N;s/\n/:/'
 | cp orig new  |  sed 'w new' orig
 | hostname -s  |  hostname | sed 's/\..*//'
+
+Remove sections from file
+:Silent cat sim.otl | sed "/Category/,/Description/d" | sed -n "/NOT/,/^$/p" > ./tmp.otl
