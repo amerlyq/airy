@@ -99,10 +99,12 @@ bindkey -s -M vicmd 's' '0d$is\np'
 #     zle reset-prompt
 # }
 
-function zle-line-init {
-    vi-cmd-mode
-}
-zle -N zle-line-init
-# zle -N zle-keymap-select
+## Prompt always in command-mode
+# function zle-line-init {
+#     vi-cmd-mode
+# }
+# zle -N zle-line-init
+
+## zle -N zle-keymap-select
 
 export KEYTIMEOUT=1
