@@ -9,7 +9,7 @@ pd="$dir/++"
 
 fl="$dir/`mpc -f '%file%' | sed '1q'`"
 
-DMENU='dmenu -i -b -nb #000000 -nf #999999 -sb #000000 -sf #31658C -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+DMENU='dmenu -i -p MPD: -b -nb #000000 -nf #999999 -sb #000000 -sf #31658C -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
 
 if [ -z "$choice" ]; then
     cd "$pd"

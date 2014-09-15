@@ -1,0 +1,18 @@
+#!/bin/bash
+
+NAME="$1"
+
+WKSP=$( i3-msg -t get_workspaces |
+        sed 's/.*"name":"\([^,]*\)"[^}]*"focused":true.*/\1/g' )
+NUM=${WKSP%:*}
+NEW="${NUM}${NAME:+:$NAME}"
+
+echo $NEW
+
+# Replace name on screen and in config
+if [ "$WKSP" != "$NEW" ]; then
+    i3-msg rename workspace "$WKSP" to "$NEW" >/dev/null
+    sed -i "/^\(set \$w$NUM \).*$/ s//\1$NEW/" ~/.i3/config
+    i3-msg reload >/dev/null
+fi
+sed -i "/^${NUM}[^0-9]\?.*$/ s//$NEW/" ~/.i3/names

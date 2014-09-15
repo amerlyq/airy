@@ -2,8 +2,16 @@
 
 pr_bar="i3blocks"
 
+case "${1}" in
+      lang) NUM=2    ;;
+       mpd) NUM=1    ;;
+    volume) NUM=1    ;;
+     [0-9]) NUM="$1" ;;
+         *) NUM=1    ;;
+esac
+
 # double for some strange reasonse
-kill -s SIGRTMIN+${1-1} $(pidof $pr_bar)
+kill -s SIGRTMIN+${NUM-1} $(pidof $pr_bar)
 # kill -s SIGRTMIN+${1-1} $(pidof $pr_bar)
 
 #killall -SIGUSR1 i3status

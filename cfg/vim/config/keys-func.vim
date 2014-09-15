@@ -13,6 +13,7 @@ function! CountCopyLines(msg)
     let maxlen = min([ len(l[0]), &columns - len(h) - 2 ])
     echo h . substitute(l[0][0:maxlen], "\t", " ", 'g')
 endfunction
+
 nnoremap <C-y> :let @+=@" \| :call CountCopyLines('Push:')<CR>
 cnoremap <C-y> :call setreg('+', getreg(':')) \| :call CountCopyLines('Push:')<CR><CR>
 vnoremap <C-y> "+y \| :call CountCopyLines('Push:')<CR>
@@ -20,7 +21,9 @@ noremap  <C-p> :let @"=@+ \| :call CountCopyLines('Pull:') <CR>
 " Swap registry
 noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 
-"
+noremap  zp "0p
+noremap  zP "0P
+
 " For when you forget to sudo.. Really Write the file.
 cnoremap e!! e !sudo tee %
 cnoremap w!! w !sudo tee % >/dev/null

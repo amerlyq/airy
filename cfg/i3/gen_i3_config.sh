@@ -22,10 +22,6 @@ wcat ~/.i3/config_base
 
 
 # ---- Strings ----
-dbar=~/.i3/blocks
-refreshbar="&& $dbar/update"
-ealws="exec_always --no-startup-id"
-exno="exec --no-startup-id"
 
 # Choose appropriate terminal (get current launched v-terminal)
 # Somehow works unstable, backing one level deeper to term=zsh instead of term=urxvt
@@ -36,6 +32,12 @@ exno="exec --no-startup-id"
 #     pid=`ps -h -o ppid -p $pid 2>/dev/null`
 #     echo ": $term"
 # done
+
+bs="bindsym"
+bm="$bs \$mod"
+t="    "
+ealws="exec_always --no-startup-id"
+exno="exec --no-startup-id"
 
 term=`update-alternatives --get-selections | grep 'x-terminal-emulator' | awk '{ print $3 }'`
 term="${term##*/}"
@@ -50,9 +52,6 @@ else eurx="$exno $term"; fi
 eflo="$eurx -name Float"
 ## Disabled: wnd name wrong setted in zsh only!
 #ecli="$exno urxvtcd -e \$SHELL -i -c " #--hold
-bs="bindsym"
-bm="$bs \$mod"
-t="    "
 
 #For auto-hiding bar, pinned only for modes
 #wk_mode()   { wstr "$bm+$1 bar mode dock; mode \"$2\""; }
@@ -70,7 +69,9 @@ hjkl="h j k l"
 digits="1 2 3 4 5 6 7 8 9 0"
 arrows="left down up right"
 Arrows="Left Down Up Right"
-wrknum=( "1:main" "2:home" "3:work" "4:www" "5" "6" "7" "8" "9" "10" )
+# wnames=( "1:main" "2:home" "3:work" "4:www" "5" "6" "7" "8" "9" "10" )
+wnames=( `cat names | sed '/^[0-9]\+/!d' | awk '{ print $0 }' RS='\n' ORS=' '` )
+wrknum=( \$w1 \$w2 \$w3 \$w4 \$w5 \$w6 \$w7 \$w8 \$w9 \$w10 )
 wrksps="${wrknum[@]}"
 
 # ----- Vars -----
@@ -79,15 +80,18 @@ smove="50 px"
 wprf "\n### =========== Script-generated items ============= ###\n"
 
 w_header "Bind: Refresh on i3mod"
-# wstr "set \$refbar bash -c 'kill -s SIGRTMIN+1 \$(pidof i3blocks)'"
-# i3mod=64 #LAlt
-#wstr "bindcode $i3mod $exno ${refreshbar:2}"
-# key_ralt=108
-# wstr "bindcode --release $key_ralt $exno ${refreshbar:2} 2"
-# wstr "bindcode --release \$mod+$key_ralt $exno ${refreshbar:2} 2"
-# wstr "bindcode --release Control+$key_ralt $exno ${refreshbar:2} 2"
 
 wstr "set \$mdef mode \"default\""
+wstr "set \$upd ~/.i3/blocks/update"
+
+wstr ''
+wlistf "set %s %s" "$wrksps" "${wnames[@]}"
+
+# wstr "set \$refbar bash -c 'kill -s SIGRTMIN+1 \$(pidof i3blocks)'"
+# i3mod=64 #LAlt
+#wstr "bindcode $i3mod $exno \$upd lang"
+# key_ralt=108
+# wstr "bindcode --release $key_ralt $exno \$upd lang"
 
 wprf "\n### ================== Workspaces ================== ###\n"
 
@@ -101,14 +105,12 @@ fi
 
 w_header "WorkSpaces: Focus"
 wlistf "$bm+%s workspace number %s" "$digits" "$wrksps"
-#bindsym $mod+4 workspace $w4; layout tabbed
 
 w_header "WorkSpaces: Move container"
 wlistp "$bm+Control+%1 move container to workspace number %2, workspace number %2" "$digits" "$wrksps"
 
 w_header "WorkSpaces: Move container"
 wlistp "$bm+Shift+%1 move container to workspace number %2" "$digits" "${wrknum[*]:0:7}"
-#$wrksps
 
 wprf "\n### ================== Navigation ================== ###\n"
 w_header "Navigation: Focus"
@@ -246,9 +248,9 @@ wstr "$bs Print exec scrot '%Y%m%d_%H%M%S_\$wx\$h.png' -e 'mv \$f ~/Downloads/'"
 # Those maps drop focus from input fields in browser.
 # Deprecated by xkb detailed settings.
 w_header "Languages"
-#wlistf "$bm+Shift+%s $exno xkb-switch -s %s $refreshbar" "0 9 8" "us ru ua"
+#wlistf "$bm+Shift+%s $exno xkb-switch -s %s && \$upd lang" "0 9 8" "us ru ua"
 wlistf "$bm+Shift+%s $exno dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/KbddService \
-     ru.gentoo.kbdd.set_layout uint32:%s $refreshbar 2" "0 9 8" "0 1 2" #"us ru ua"
+     ru.gentoo.kbdd.set_layout uint32:%s && \$upd lang" "0 9 8" "0 1 2" #"us ru ua"
 
 
 w_header "Autostart"
@@ -273,11 +275,11 @@ wprf "\n### ================= Multimedia =================== ###\n"
 
 # Don't forget to set primary PCH to card 0 or disable all others.
 w_header "Control: volume"
-wlistf "$bs %s $exno amixer -q -D pulse set Master %s $refreshbar" \
+wlistf "$bs %s $exno amixer -q -D pulse set Master %s && \$upd volume" \
     "XF86AudioRaiseVolume XF86AudioLowerVolume XF86AudioMute" \
     '2%+ unmute' '2%- unmute' 'toggle'
 wstr ''
-wlistf "$bm+%s $exno amixer -q -D pulse set Master %s $refreshbar" \
+wlistf "$bm+%s $exno amixer -q -D pulse set Master %s && \$upd volume" \
     "Home Prior Next End" \
     '20% unmute' '2%+ unmute' '2%- unmute' 'toggle'
 # pactl set-sink-volume 0 -- +10%
@@ -287,21 +289,22 @@ wlistf "$bm+%s $exno amixer -q -D pulse set Master %s $refreshbar" \
 
 
 w_header "Control: ncmpcpp"
-wlistf "$bs %s $exno ncmpcpp %s $refreshbar" \
+wlistf "$bs %s $exno ncmpcpp %s && \$upd mpd" \
     "XF86AudioPlay XF86AudioNext XF86AudioPrev XF86AudioStop" \
     "toggle next prev stop"
 wstr ''
-wlistf "$bm+Control+%s $exno ncmpcpp %s $refreshbar" \
+wlistf "$bm+Control+%s $exno ncmpcpp %s && \$upd mpd" \
     "Home Prior Next End" "toggle prev next stop"
 
 
 wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Settings"
 
-wstr "assign [class=\"^Wuala$\"] ${wrknum[9]}"
-wstr "assign [class=\"^Firefox$\"] ${wrknum[3]}"
-wstr "assign [class=\"^Pale\ moon$\"] ${wrknum[3]}"
-wstr "assign [class=\"^Wine$\"] ${wrknum[8]}"
+wstr "assign [class=\"^Firefox$\"] \$4"
+wstr "assign [class=\"^Pale\ moon$\"] \$w4"
+wstr "assign [class=\"^Wine$\"] \$w9"
+wstr "assign [class=\"^Wuala$\"] \$10"
+wstr ''
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
 # floating enable running before launching of exec, so influence on previous focused wndw

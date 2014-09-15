@@ -70,18 +70,15 @@ ZSH_CUSTOM=$HOME/.bash/zsh
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(completion git grep history-substring-search vim-interaction)
+plugins=(completion git grep history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-#if [ -f ~/.bash_prompt  ]; then . ~/.bash_prompt  ; fi
 if [ -f ~/.bash_export  ]; then source ~/.bash_export  ; fi
-#if [ -f ~/.bash_functions ]; then source ~/.bash_functions  ; fi
 DEFAULT_USER="$CURR_USER"
 
-#export PATH="/home/amerlyq/.bin:/home/amerlyq/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/jvm/java-7-openjdk-amd64/include:/usr/lib/jvm/java-7-openjdk-amd64/include"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -94,37 +91,7 @@ DEFAULT_USER="$CURR_USER"
 #   export EDITOR='mvim'
 # fi
 
-# vi-mode
-bindkey -v
-bindkey -M viins 'jj' vi-cmd-mode
-
-bindkey '^P' up-history
-bindkey '^N' down-history
-bindkey '^?' backward-delete-char
-bindkey '^H' backward-delete-char
-bindkey '^W' backward-kill-word
-bindkey '^K' kill-line
-bindkey '^r' history-incremental-search-backward
-bindkey -a '^R' history-incremental-search-backward
-
-# Prev command from history, depending on text till cursor #'\e[A','\e[B'
-bindkey '^P' history-beginning-search-backward
-bindkey '^N' history-beginning-search-forward
-
-#http://unix.stackexchange.com/questions/122078/how-to-bind-a-key-sequence-to-a-widget-in-vi-cmd-mode-zsh
-#bindkey -s  'S' '^qs\n'
-#bindkey -as 's' 'i^qs\n'
-# But this somehow splints output too (((
-
-# function zle-line-init zle-keymap-select {
-#     VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]%  %{$reset_color%}"
-#     RPS1="${${KEYMAP/vicmd/$VIM_PROMPT}/(main|viins)/}$(git_custom_status) $EPS1"
-#     zle reset-prompt
-# }
-#
-# zle -N zle-line-init
-# zle -N zle-keymap-select
-export KEYTIMEOUT=1
+source "$ZSH_CUSTOM/lib/amer-key-mix.zsh"
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -140,5 +107,9 @@ export KEYTIMEOUT=1
 if [ -f ~/.bash_aliases ]; then source ~/.bash_aliases ; fi
 
 
-function finish { tempfile='/tmp/ranger_shelldir'; echo "$PWD" > "$tempfile"; }
+# For ranger auto_changedir
+function finish {
+    tempfile='/tmp/ranger_shelldir'
+    echo "$PWD" > "$tempfile"
+}
 trap finish EXIT

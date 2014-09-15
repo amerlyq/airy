@@ -93,7 +93,7 @@ bindsym $mod+Control+a move container to workspace back_and_forth; workspace bac
 bindsym $mod+Control+Shift+a move container to workspace back_and_forth
 
 #i3-msg 'rename workspace "1: www" to "10: www"'
-bindsym $mod+z exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
+bindsym $mod+z exec i3-input -P 'WS Name: ' -F 'exec --no-startup-id ~/.i3/ext/rename_current_workspace "%s"'
 
 ### ==================== Workspaces ===================== ###
 
@@ -126,11 +126,10 @@ bindsym $mod+Shift+i move scratchpad
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 # Change focus between tiling / floating windows
-# bindsym $mod+space focus mode_toggle
-bindsym $mod+Shift+space focus mode_toggle
 # Toggle tiling / floating (also remove current window from scratchpad)
-bindsym $mod+Control+space floating toggle
-# bindsym $mod+Control+space floating enable
+# mod+Control+space don't work with my xkb (no keycode!), use space for some more useful
+bindsym $mod+Shift+f focus mode_toggle
+bindsym $mod+Control+f floating toggle #enable
 
 # Show the sup-mail scratchpad window, if any.
 # bindsym mod4+s [title="^Sup ::"] scratchpad show

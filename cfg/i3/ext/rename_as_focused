@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# So, it has not much sense -- I have not so huge window set
+# and it will not help in that case anywhere.
+# Replace this idea by showing name in i3blocks
+
 getName() {
     local myid myclass myname
     myid=`xprop -root | awk '/_NET_ACTIVE_WINDOW\(WINDOW\)/{print $NF}'`
