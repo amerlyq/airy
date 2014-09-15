@@ -300,7 +300,7 @@ wlistf "$bm+Control+%s $exno ncmpcpp %s && \$upd mpd" \
 wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Settings"
 
-wstr "assign [class=\"^Firefox$\"] \$4"
+wstr "assign [class=\"^Firefox$\"] \$w4"
 wstr "assign [class=\"^Pale\ moon$\"] \$w4"
 wstr "assign [class=\"^Wine$\"] \$w9"
 wstr "assign [class=\"^Wuala$\"] \$10"
