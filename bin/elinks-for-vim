@@ -1,0 +1,4 @@
+#!/bin/sh
+tempfile=`echo $* | awk '{print $1}'`
+url=`echo $* | awk '{print $2}'`
+elinks -dump $url > $tempfile

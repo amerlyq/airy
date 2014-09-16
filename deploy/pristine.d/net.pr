@@ -4,8 +4,9 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # Net-tech untils
 
-LST="$LST openssh-server openssh-client autossh rtorrent"
+LST="$LST openssh-server openssh-client autossh rtorrent nmap"
 # openssh | server for ssh connections (Win: freesshd)
 # autossh | autoconnecting client for permanent tunnels
+# nmap    | Network exploration tool and security / port scanner
 
 apt_noprompt $LST

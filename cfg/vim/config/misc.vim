@@ -11,3 +11,9 @@ autocmd BufRead,BufNewFile {Gemfile,Rakefile,Vagrantfile,Thorfile,config.ru} set
 
 " make Python follow PEP8 ( http://www.python.org/dev/peps/pep-0008/ )
 autocmd FileType python set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
+
+
+" The Vim Netrw plugin allows one to view the contents of an http hyperlink via CTRL-W_CTRL-F
+" launch as $ agent tempfile url
+let g:netrw_http_cmd = "elinks-for-vim"
+" See: https://github.com/danchoi/elinks.vim

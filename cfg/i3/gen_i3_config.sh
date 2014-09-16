@@ -240,7 +240,7 @@ wstr "$bm+Control+Return $eflo"
 wstr "$bm+Shift+Return $eflo -e ranger-auto"
 
 w_header "Run: Menus"
-wstr "$bm+d exec \"dmenu_run -p 'yes, master?' -nb '#000000' -nf '#B0E0E6' -sb '#421C84' -sf '#FFFF00'\""
+wstr "$bm+d exec \"dmenu_run -p 'yes, master?' -nb '#000000' -nf '#B0E0E6' -sb '#421C84' -sf '#FFFF00' -fn -misc-fixed-medium-r-normal-*-*-130-75-75-*-*-iso8859-2\""
 wstr "$bm+u exec rofi -now -font 'Sans-10' -fg '#606060' -bg '#000000' -hlfg '#ffc964' -hlbg '#0C0C00' -o 85"
 wstr "$bs Print exec scrot '%Y%m%d_%H%M%S_\$wx\$h.png' -e 'mv \$f ~/Downloads/'"
 # Also: lxtask
@@ -303,7 +303,7 @@ w_header "Windows: Settings"
 wstr "assign [class=\"^Firefox$\"] \$w4"
 wstr "assign [class=\"^Pale\ moon$\"] \$w4"
 wstr "assign [class=\"^Wine$\"] \$w9"
-wstr "assign [class=\"^Wuala$\"] \$10"
+wstr "assign [class=\"^Wuala$\"] \$w10"
 wstr ''
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
