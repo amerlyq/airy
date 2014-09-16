@@ -1,11 +1,11 @@
-alias -s {avi,mpeg,mpg,mov,mkv}=mplayer2
+alias -s {avi,mpeg,mpg,mov,mkv}=mpv
 
-alias esync='sudo layman -S; sudo eix-sync'
+alias esync='sudo eix-sync'
 alias fetch='sudo emerge --update --deep --newuse --fetchonly @world'
 alias update='sudo emerge --update --deep --newuse @world'
 alias emerge='sudo emerge'
-alias vimu='vim sudo:/etc/portage/package.use'
-alias gvimu='gvim sudo:/etc/portage/package.use'
+alias vimu='sudo vim /etc/portage/package.use'
+alias gvimu='sudo gvim /etc/portage/package.use'
 alias s2disk='sudo hibernate'
 alias s2ram='sudo hibernate-ram'
 alias halt='sudo shutdown -h now'
