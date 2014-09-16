@@ -35,8 +35,7 @@ inoremap <C-space> <C-x><C-o>
 "map :emenu Encoding.FileFormat.
 " Выбор формата концов строк (dos - , unix - , mac - ) <--
 
-" Doxygen syntax highlighting
+" Doxygen syntax highlighting. Very slow on \c, \b. So set those:
+set regexpengine=1          " Do not use NFA because doxygen style will be slow
+let g:load_doxygen_syntax=1 " Load doxygen syntax by default
 " manually: set syn=cpp.doxygen
-" if very slow (on \c, \b ): set regexpengine=1
-"let g:load_doxygen_syntax=1
-

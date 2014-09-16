@@ -1,4 +1,5 @@
-nnoremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<cr>
+"GoToDefinitionElseDeclaration
+nnoremap <leader>jd :YcmCompleter GoTo<CR>
 
 " YCM won't load on startup
 " Now it is loaded as starting argument to vim inside of alias
@@ -21,7 +22,9 @@ let g:ycm_autoclose_preview_window_after_completion = 1
 
 " YCM
 "   let g:ycm_extra_conf_globlist = ['~/.vim/bundle/YouCompleteMe/cpp/ycm/*','!~/*']
-    let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
+
+    let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_fallback.conf'
+    " let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 
 " Syntastic
 "    let g:syntastic_c_checkers=['make']

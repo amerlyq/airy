@@ -1,0 +1,210 @@
+Here are some notes I prepared in C++ while preparing for the C++ interviews. Hope you find them helpful
+1. There are 5 implicit methods defined for a class by the compiler:
+	Default copy constructor
+	Default constructor
+	Assignment Operator
+	Default destructor
+	Address Operator
+2. A constructor that takes just 1 argument is called CONVERSION constructor.
+3. New and Delete call constructor and destructor respectively besides
+	allocation and deallocating the memory for the object. However, malloc and
+	free just deal with memory allocation and deallocation respectively. New
+	and Delete can be overloaded whereas malloc and free can’t.
+4. “operator new” works just like malloc, which is different from “new”.
+5. There are 4 storage classes in C++ (auto, register, extern and static).
+6. There are 3 storage qualifiers in C++ (const, volatile and mutable).
+7. If a variable/object (structure or a class) is initialized with const
+	keyword, the compiler does not allow changes to values of member variables
+	of that variable/object anytime later in the program other than during
+	initialization. However, those member variables of the object/variable can
+	be modified if they are declared as MUTABLE. Moreover, as a rule, member
+	functions that are declared as “const”, may not change value of ANY of the
+	member variables. However, it can change the value of those members that
+	are declared as “mutable”. Note that these member variables may NOT be
+	declared as consts. Declaring them as mutable just allows the const member
+	functions to be able to modify these variables. Another thing to remember
+	is – Const versions of the functions are called for objects that are
+	declared as const. Meaning, if there are two objects of the same type, one
+	const and the other one not, we’d need two functions for the same operation
+	(whatever that may be), one with const declaration and other one without.
+8. With the help of “using <namespace>” declarator, it is possible to access
+	members of the namespace without using the scope resolution operator.
+9. An iterator class helps in traversing through objects in a container. There
+	are 5 categories of iterators: { input, output, forward, bidirectional,
+	random, access }
+10. Following operators cannot be overloaded: {sizeof, ., , *, ::, ?:}
+11. Virtual functions are implemented using a table of function pointers
+	called vtable. Each virtual function in a class has an entry in the table.
+	The constructor of the class creates/generates this table. Never call a
+	virtual function from a class constructor.
+12. A reference must always refer to an object and therefoer must always be
+	initialized, whereas pointers do not have any such restriction. A pointer
+	can be reassigned to point to different objects, whereas a reference
+	always points to the object with which it was initialized.
+13. To handle a constructor that fails, use exceptions.
+14. C++ rule is that you must never throw an exception from a destructor that
+	is being called during stack unwinding process of another exception.
+	Instead write a message to a log file to handle a destructor that fails.
+15. Virtual Destructors – using these you can destroy objects without knowing
+	their type – the correct destructor for the object is called using virtual
+	functions. Destructors can also be declared as pure virtual functions for
+	abstract class.
+16. We must use Initialization List instead of assignment operator in
+	constructors while initializing non-static const members and reference
+	data members. Copy constructors can be made private.
+17. Functions cannot be overloaded on the basis of whether the parameter is a
+	value or a reference. The caller does not know the difference.
+18. Access privileges in C++ are public, protected and private.
+19. A class defined inside a function body is called Local Class.
+20. A copy constructor always accepts only the reference of the object of the
+	same and not the object itself.
+21. In the include directive, we do NOT use .h. It is just the name of the
+	identifier <iostream>, <vector>, <fstream> etc. No .h.
+22. Default return type of a function is not int. Specify explicitly.
+23. By default all the items/members inside a class are private.
+24. A non-static member of a class can NOT have an initializer.
+25. No member can be declared as auto, extern or register.
+26. Union cannot inherit neither can it be inherited.
+27. No static member can be a member variable. A union cannot have any member
+	object that overloads = operator or has an explicit constructor or
+	destructor defined.
+28. Static member function does not have a “this” pointer; it cannot be
+	virtual, they cannot be declared const or volatile. Cannot have static and
+	non-static versions of the same function.
+29. When passing objects by value, their copies are made. However, object’s
+	constructors are not called when these temporary objects are made, but
+	their destructors are indeed called when they are destroyed.
+30. new() throws bad_alloc exception when it fails (insufficient memory in
+	heap).
+31. When operators are overloaded, the object that implements the operator
+	overloading function appears on the LHS of the operator. obj1 + obj2 – in
+	this case the class that obj1 belongs to has to overload the + operator
+	and not class to which obj2 belongs to. In this case only obj2 is passed
+	to the operator function because obj1 is available by default as this.
+	Therefore in such cases whereas obj1+ 10 could be valid, 10+obj1 could be
+	invalid, because int class (to which 10 belongs) does not overload +
+	operator to take second parameter as obj. To overcome such problem,
+	implement operator overloading through friend functions. Friend functions
+	in this case need to be overloaded twice taking both int,obj as parameter
+	and other one taking obj,int as parameters.
+32. Can a constructor be virtual? When would we make a constructor as virtual?
+33. Why should the base class destructor be always virtual? Because when we
+	“delete” an object with baseclass pointer the destructor of derived class
+	will NOT be called if baseclass destructor is NOT virtual and you WANT
+	your derived class destructor to be called. However, it is a bad idea to
+	declare the destructor of a class that WILL NOT be derived (no virtual
+	functions) as virtual.
+34. What can go wrong if we throw an exception from within a destructor?
+	During stack unwinding, all the local objects in all those stack frames
+	are destructed. If one of those destructors throws an exception (say it
+	throws a Bar object), the C++ runtime system is in a no-win situation:
+	should it ignore the Bar and end up in the } catch (Foo e) { where it was
+	originally headed? Should it ignore the Foo and look for a } catch (Bar e)
+	{ handler? There is no good answer — either choice loses information.  So
+	the C++ language guarantees that it will call terminate() at this point,
+	and terminate() kills the process.
+35. Signature of pre-increment and post-increment operator overloading
+	functions. Pre increment operator takes void as parameter, increments the
+	variables inside and returns *this (return by reference). Whereas
+	post-increment takes int as parameter: note that you DO NOT mention any
+	variable name in the function signature, just say int. Store *this in a
+	temp variable, increment the values and return *this. But the return from
+	post-increment operator function is NOT by reference.
+36. What are initialization lists and where are they used? For initializing
+	const member functions, references that are declared inside the class,
+	embedded objects. Also for sub-objects (embedded objects and base
+	classes). For example of you declare a list/vector inside a class.
+37. How is the diamond problem (multiple inheritance) resolved in C++? –
+	Derive the first level classes from the base class virtually…. Class
+	DerivedClass: Virtual Public BaseClass
+38. Check template class and template function syntax.
+39. Aggregation, Association and Composition and their representations.
+40. How is a Tree different from a Graph.
+41. Virtual functions cannot be inline-d. This is because virtual functions
+	provide run-time binding, whereas inline functions are expanded at
+	compile-time. How would the compiler know which implementation of the
+	virtual function to inline at a given place in the code?
+42. Both constructor and destructor can be made private. Usually constructors
+	are made private to avoid unauthorized access, meaning, no one will be
+	able to do a “new” of the object. Instead, we can provide a static
+	function that returns an instance of the object (does a new itself and
+	returns pointer).
+43. We use dynamic_cast to downcast an object to its derived class in the
+	hierarchy. For example, we used dynamic_cast in SHMGPS Receiver to cast a
+	paratemer of type Message to its specific (derived) type –
+	GPSNotificationMessage. The function took a generic parameter of type
+	Message. Once received, we type casted it to specific message using
+	dynamic_cast. We use reinterpret_cast to do low level casts that result in
+	unportable code.
+44. static_cast <const &obj> obj – casts obj to “const obj” type.
+45. The best way to initialize the member variables in a constructor is by
+	using initialization list regardless of whether we are initializing const,
+	reference or just regular variables (though it is required that
+	initialization list be used for the former two). This is because with our
+	general/regular implementation, our constructor calls the default
+	constructor, which assigns default values to the member variables and then
+	our assignment operator overwrites those values with the ones that we
+	specify in our constructor. Using an initialization list however, passes
+	the required values to the default constructor and we do not need any
+	statement at all in our constructor. This improves the performance. For
+	initializing members of built-in types, there may be no overhead using
+	assignment, but for others we can definitely improve efficiency and
+	performance. This approach is recommended even when we do not want to
+	initialize any value on our own. Just use initialization list and it will
+	help.
+46. Default destructors are NOT virtual. Only if the base class destructor is
+	virtual, the derived class’ default destructor will become virtual.
+47. For classes that have references or const members, we have to provide our
+	own implementation of assignment operator. This is because compiler cannot
+	copy/assign references or constants. Default assignment operation will try
+	to assign the reference and constant to new values, which is not
+	permissible. Therefore we must provide an implementation.
+48. Verify on Internet – we may NOT provide implementations of functions that
+	are never called. Just declare these functions as private and don’t call
+	them. For instance declare, copy constructor and assignment operator =
+	overloading as private to avoid anyone using them. We need not provide any
+	implementation for these functions.
+49: Polymorphic base classes are those where we use the base class pointer to
+	access the derived class(es). If a base class pointer may not be used to
+	access derived class objects, it won’t be called as polymorphic base
+	class.
+50. auto_ptr and shared_ptr are RAII (Resource Acquisition is Initialization)
+	objects. shared_ptr uses RCSP (Resource Counting Smart Pointer) concept.
+	Resources are acquired during construction and released during
+	destruction. Usage: tr1::shared_ptr<Mutex>, tr1::auto_ptr<Mutex>, where
+	Mutex type is the object-resource we’d like to manage.
+51. “explicit” keyword disallows implicit type-conversions during calls to
+	copy constructor. Use “explicit” keyword before the constructor name.
+52. We can provide implicit type conversion for converting objects of our
+	class to raw resource it contains by overloading pointer dereferencing
+	operators (* and ->). tr1::auto_ptr and tr1::shared_ptr provide a get()
+	function that provides explicit type conversion to raw type. Meaning, to
+	provide implicit converion from our class to the resource it manages, we
+	overload * and ->. To provide explicit conversion, we use the get()
+	function. It may be noted that the resource object that our class manages
+	be of type tr1::shared_ptr <TYPE>. We manage the resource using smart
+	pointers and therefore we use std::auto_ptr or tr1::shared_ptr smart
+	pointers to define the resource object inside our class that manages this
+	resource.
+53: When a derived class object is passed by value to a function accepting
+	base class object, the specialized features of the derived class object
+	features will be sliced. This is because passing by value will create an
+	object (since it is pass by value) of base class type using base class
+	constructor. It is therefore advisable to have the function take const
+	reference to the base class object. In this case, no copy will be made and
+	the derived class object will be passed as is with reference and nothing
+	will get sliced off. Exceptions are built-in types (int, char etc.) and
+	STL iterator and function types.
+54. If you need type conversion on all parameters to a function the function
+	should be a non-member. In other words if there is a function operating on
+	objects of a class and if we need all the parameters (objects) to this
+	function to be type convertible, then we must make this a non-member
+	function.
+55. It is not required to have the definitions of object-types while declaring
+	pointers to those types. For instance “Date d1″ does not require Date
+	class to be defined. It just needs to be declared (forward). Similarly
+	while defining references we don’t need definitions of objects these
+	references point to. Moreover, class definitions are not required even for
+	function declarations that use these objects. Just a declaration suffices.
+	Only when the function call is made, we need the definition of classes for
+	objects passed in that function.

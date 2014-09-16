@@ -1,0 +1,43 @@
+When I switch back from Java to C++, I like to review items from C++ Coding
+Standards by Herb Sutter and Andrei Alexandrescu.
+Scott Meyers' Effective C++ series are great for this too.
+Here are quick basic stuffs that work for me:
+	Use std::swap()
+	"When in doubt, do as the ints do." (Scott Meyers)
+	> const * means constant data, * const means constant pointer (read the decl. backwards!).
+	Declare an assignment operator and a copy constructor in classes with dynamically assigned data.
+	C++ will write an assignment operator & copy constructor for you if you don't declare one yourself. Except if you declare them (private, most likely) and omit to define them.
+	Have operator=() return a reference to *this
+	Call Base(rhs) in Derived's copy constructor's init list.
+	Call Base::operator=(rhs); in Derived's operator=()
+	Check for assignment to self in operator=()
+	Don't implement operator=() by calling the copy constructor (Herb Sutter, Write what you Know, and Know what you Write)
+	Remember RAII
+	catch exceptions by reference
+
+Reference
+	http://en.cppreference.com/w/cpp
+Rules of coding
+	http://www.gotw.ca/publications/c++cs.htm
+
+http://www.sgi.com/tech/stl/
+The Function Pointer Tutorials
+	http://www.newty.de/fpt/index.html
+
+http://www.cheat-sheets.org/#CPP
+
+
+
+
+C/C++ Ternary Operator Precedence and Associativity
+Although many sources incorrectly place the ternary- and assignment operators on two seperate levels, they in fact share the same precedence level. Note, however, the right-to-left associativity of both, which allows an unparenthesized ternary operation to be assigned to a variable.
+If you would like to verify this yourself, take a look at the C++ standard. Alternatively run the following in a compiler of your choice:
+	int x=0,y=0;
+	true?x:y=5;
+You will find that, after running the above, both x and y are zero, which is consistent with
+	int x=0,y=0;
+	true?x:(y=5);
+and not with
+	int x=0,y=0;
+	(true?x:y)=5;
+in which case x=5.

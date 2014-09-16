@@ -1,8 +1,14 @@
 " Open unite buffer in Insert Mode immediately.
-let g:unite_enable_start_insert = 1
-
+call unite#custom#profile('default', 'context', {
+                        \ 'start_insert' : 1
+                        \ })
 " Directory to store unite configurations.
 let g:unite_data_directory = $VIMCACHEDIR . '/unite'
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+let g:unite_source_rec_max_cache_files = 0
+call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
+
+"MPogoda thinks it's better change <Leader> to '-'
 
 " Replaces fuzzyfinder
 nnoremap <leader>o :<C-u>Unite -buffer-name=files file_rec/async:!<cr>
@@ -24,7 +30,7 @@ nnoremap <leader>m :<C-u>Unite -buffer-name=mrus file_mru<cr>
 let g:unite_source_history_yank_enable = 1
 nnoremap <leader>y :<C-u>Unite -buffer-name=yanks history/yank<cr>
 
-nnoremap <leader>h :<C-u>Unite -buffer-name=help help<cr>
+nnoremap <leader>u :<C-u>Unite -buffer-name=Outline outline<cr>
 
 autocmd FileType unite call s:unite_my_settings()
 function! s:unite_my_settings()
@@ -45,10 +51,11 @@ if executable('ag')
   \ '--line-numbers --nocolor --nogroup --hidden --ignore ' .
   \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
   let g:unite_source_grep_recursive_opt = ''
+  let g:unite_source_rec_async_command = 'ag --follow --nocolor --nogroup -g ""'
 elseif executable('ack-grep')
   " Use ack in unite grep source.
   let g:unite_source_grep_command = 'ack-grep'
-  let g:unite_source_grep_default_opts =
-  \ '--no-heading --no-color -a -H'
+  let g:unite_source_grep_default_opts = '--no-heading --no-color -a -H'
   let g:unite_source_grep_recursive_opt = ''
+  let g:unite_source_rec_async_command = 'ack -f --nofilter'
 endif

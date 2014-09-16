@@ -1,1 +1,1 @@
-nnoremap <Leader>u :UndotreeToggle<cr>
+nnoremap <silent> <Leader>u :<C-U>UndotreeToggle<cr>

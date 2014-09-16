@@ -70,7 +70,7 @@ digits="1 2 3 4 5 6 7 8 9 0"
 arrows="left down up right"
 Arrows="Left Down Up Right"
 # wnames=( "1:main" "2:home" "3:work" "4:www" "5" "6" "7" "8" "9" "10" )
-wnames=( `cat names | sed '/^[0-9]\+/!d' | awk '{ print $0 }' RS='\n' ORS=' '` )
+wnames=( `cat ~/.i3/names | sed '/^[0-9]\+/!d' | awk '{ print $0 }' RS='\n' ORS=' '` )
 wrknum=( \$w1 \$w2 \$w3 \$w4 \$w5 \$w6 \$w7 \$w8 \$w9 \$w10 )
 wrksps="${wrknum[@]}"
 

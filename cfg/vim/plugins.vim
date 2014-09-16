@@ -83,10 +83,25 @@ NeoBundle 'Shougo/vinarise.vim', {
 NeoBundle 'Shougo/unite.vim', { 'name' : 'unite.vim'
                             \ , 'depends' : 'vimproc'
                             \ }
+" {{{ Unite hotkeys
+" <leader>o recursive files
+" <leader>f files
+" <leader>b buffers
+" <leader>/ grep
+" <leader>l lines
+" <leader>; command
+" <leader>: history/command
+" <leader>m MRU files
+" <leader>y history/yank
+" <leader>h help
+" -u outline
+" -n file/new
+" }}}
 
-NeoBundleLazy 'Shougo/unite-help', { 'depends' : 'unite.vim'
-                                 \ , 'autoload' : { 'unite_sources' : 'help' }
-                                 \ }
+NeoBundleLazy 'Shougo/unite-outline', {
+    \ 'depends' : 'unite.vim'
+    \ , 'autoload' : { 'unite_sources' : 'outline' }
+    \ }
 
 " NeoBundleLazy 'thinca/vim-unite-history', { 'depends' : 'unite.vim'
 "                                         \ , 'autoload' : { 'unite_sources' : 'history/command' }
@@ -113,6 +128,7 @@ NeoBundleLazy 'Shougo/neocomplete', {
     \ 'autoload': {
     \   'insert': 1,
     \ }}
+" SirVer/ultisnips
 NeoBundle 'Shougo/neosnippet.vim', {
     \ 'vim_version': '7.3.885',
     \ 'depends' :
@@ -149,7 +165,15 @@ if has('unix')
     " [ ! -e './third_party/ycmd/ycm_core.so' ]
     " It could be necessary to exac inside of bundle/YouCompleteMe
     " git submodule update --init --recursive
-    " To build this one: you should run './install.sh --clang-completer --system-libclang'
+" {{{Build instruction for YCM
+"   1. git submodule update --init --recursive
+"   2. cd third_party/ycmd
+"   3. mkdir -p build
+"   4. cd build
+"   5. cmake .. ../cpp
+"   5a. (optional) ccmake . # configure
+"   6. make
+" }}}
     " For win: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
 
 endif
@@ -171,6 +195,15 @@ NeoBundleLazy 'tpope/vim-markdown', { 'autoload' : { 'filetypes' : [ 'markdown' 
 
 " VCS Integration
 NeoBundle 'tpope/vim-fugitive', { 'augroup' : 'fugitive'}
+" {{{ Fugitive hotkeys
+" <leader>gs   Gstatus
+"               D for diff
+"               r for reload
+" <leader>gl   Glog
+" <leader>gd   Gdiff
+" <leader>gw   Gwrite
+" <leader>gb   Gblame
+" }}} Fugitive hotkeys
 NeoBundle 'tpope/vim-git'
 NeoBundleLazy 'gregsexton/gitv', { 'depends' : [ 'tpope/vim-fugitive' ]
                                \ , 'autoload' : { 'commands' : 'Gitv' }
@@ -220,6 +253,7 @@ NeoBundle 'tomtom/tcomment_vim'
 
 "{{{ Motions ============================
 NeoBundle 'Lokaltog/vim-easymotion'
+" Start with ,.
 
 " Switch [c,cpp,cxx,cc] <-> [h,hpp]
 NeoBundle 'vim-scripts/a.vim'
@@ -311,7 +345,7 @@ NeoBundleLazy 'elzr/vim-json', {
     \}
 
 "" For future of haskell
-"NeoBundle 'lukerandall/haskellmode-vim'
+"NeoBundle 'lukerandall/haskellmode-vim' { 'autoload' : { 'filetypes' : ['haskell', 'hs'] }  }
 " eagletmt/ghcmod-vim
 " eagletmt/neco-ghc
 " dag/vim2hs
@@ -334,7 +368,6 @@ NeoBundle 'nathanaelkane/vim-indent-guides'
 " ALT: osyo-manga/vim-anzu
 NeoBundle 'henrik/vim-indexed-search'
 NeoBundle 'bronson/vim-visual-star-search'
-NeoBundle 'sudo.vim'
 " ======================================
 " Add new virtual cursor for next occurance of word under cursor
 " Or add them for each line of multiline selection

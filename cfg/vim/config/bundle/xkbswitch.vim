@@ -1,3 +1,4 @@
+" You can Fix issue with xkbswitch by removing all its settings.
 let g:XkbSwitchEnabled = 1
 
 if has('win32') || has('win64')
