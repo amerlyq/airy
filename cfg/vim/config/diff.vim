@@ -25,4 +25,15 @@ if &diff
   " both changes
   vnoremap p :diffput <bar> diffupdate<enter>
   vnoremap o :diffget <bar> diffupdate<enter>
+else
+  " setup for non-diff mode
 endif
+
+" Use :DiffOrig to see the differences between the current buffer and the
+" file it was loaded from. Use :diffupdate then
+command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_
+    \ | diffthis | wincmd p | diffthis
+
+
+" [c  Jump backwards to the previous start of a change.
+" ]c  Jump forwards to the next start of a change.
