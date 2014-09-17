@@ -6,7 +6,6 @@ let g:solarized_termcolors=16
 " Stich with normal! Them was wisely choosen.
 " let g:solarized_contrast="high"    "default value is normal
 " let g:solarized_visibility="high"    "default value is normal
-" let g:solarized_termtrans=1         " use term transparent color for bg
 
 let g:solarized_bold=1
 let g:solarized_underline=1

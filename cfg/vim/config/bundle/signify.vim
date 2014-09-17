@@ -20,3 +20,4 @@ let g:signify_mapping_toggle_highlight = '<leader>gh'
 " highlight SignifySignAdd    cterm=bold ctermbg=237  ctermfg=119
 " highlight SignifySignDelete cterm=bold ctermbg=237  ctermfg=167
 " highlight SignifySignChange cterm=bold ctermbg=237  ctermfg=227
+
