@@ -40,8 +40,8 @@ mkdir -p "$DST_PRC"
 
 
 
-# сделать проверку по типам: если в сорцах обнаружен пдф или джвю -- то извлечь из него картинки,
-# архивы -- извлечь, если сразу найдены картинки -- то просто скопировать их.
+# СЃРґРµР»Р°С‚СЊ РїСЂРѕРІРµСЂРєСѓ РїРѕ С‚РёРїР°Рј: РµСЃР»Рё РІ СЃРѕСЂС†Р°С… РѕР±РЅР°СЂСѓР¶РµРЅ РїРґС„ РёР»Рё РґР¶РІСЋ -- С‚Рѕ РёР·РІР»РµС‡СЊ РёР· РЅРµРіРѕ РєР°СЂС‚РёРЅРєРё,
+# Р°СЂС…РёРІС‹ -- РёР·РІР»РµС‡СЊ, РµСЃР»Рё СЃСЂР°Р·Сѓ РЅР°Р№РґРµРЅС‹ РєР°СЂС‚РёРЅРєРё -- С‚Рѕ РїСЂРѕСЃС‚Рѕ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ РёС….
 
 
 
@@ -107,7 +107,7 @@ convertPics() {
         to="$2"
         lst="$1"
     fi
-    # 150x150 - чтобы при upsample=2 внутренний dpi\[Rule]300, а не 600,
+    # 150x150 - С‡С‚РѕР±С‹ РїСЂРё upsample=2 РІРЅСѓС‚СЂРµРЅРЅРёР№ dpi\[Rule]300, Р° РЅРµ 600,
     # before posterize: -colorspace Gray
     # ALT: vips | http://www.vips.ecs.soton.ac.uk/index.php?title=Stable
     mogrify -verbose -colorspace sRGB -despeckle -filter Lanczos -interpolate filter -resize 2400x1600 -level 5%,95% -auto-gamma -posterize 32 -format tif -compress lzw -density 150x150 -type Palette -path "$to" @"$lst"

@@ -1,19 +1,22 @@
-nnoremap <Leader>th :setlocal hlsearch!<cr>
-nnoremap <Leader>tl :setlocal list!<cr>
-nnoremap <Leader>tn :setlocal number!<cr>
-nnoremap <Leader>tN :setlocal relativenumber!<cr>
-nnoremap <Leader>tp :setlocal spell!<cr>
-nnoremap <Leader>tz :setlocal foldenable!<cr>
-nnoremap <Leader>tc :setlocal cursorcolumn!<cr>
-nnoremap <Leader>tC :setlocal cursorline!<cr>
+nnoremap <Leader>th :setlocal hlsearch!<CR>
+nnoremap <Leader>tl :setlocal list!<CR>
+nnoremap <Leader>tn :setlocal number!<CR>
+nnoremap <Leader>tN :setlocal relativenumber!<CR>
+nnoremap <Leader>tp :setlocal spell!<CR>
+nnoremap <Leader>tz :setlocal foldenable!<CR>
+nnoremap <Leader>tc :setlocal cursorcolumn!<CR>
+nnoremap <Leader>tC :setlocal cursorline!<CR>
 
-nnoremap <Leader>ts :call ToggleSyntax()<cr>
+nnoremap <Leader>ts :call ToggleSyntax()<CR>
 function! ToggleSyntax()
-if g:syntaxon == 1
+if g:syntax_on == 1
   syntax off
-  let g:syntaxon = 0
+  let g:syntax_on = 0
 else
   syntax on
-  let g:syntaxon = 1
+  let g:syntax_on = 1
 endif
 endfunction
+
+noremap <Leader>tx <Esc>:SyntasticToggleMode<CR>
+"\| :SyntasticCheck<CR>

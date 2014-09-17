@@ -1,4 +1,4 @@
-"Auto paste-toggle w/o F2, instead of :set pastetoggle=<F2>
+"Auto paste-toggle w/o <F2>
 " http://www.linux.org.ru/forum/desktop/9146271
 "Extended tmux-version
 
@@ -23,3 +23,7 @@ function! XTermPasteBegin()
 endfunction
 
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
+
+" For cases when not in tmux
+set pastetoggle=<F2>
+

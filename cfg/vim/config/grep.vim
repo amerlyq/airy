@@ -8,6 +8,10 @@ if executable('ag')
     set grepformat=%f:%l:%c:%m
 endif
 
+" Doxygen syntax highlighting. Very slow on \c, \b. So set those:
+set regexpengine=1          " Do not use NFA because doxygen style will be slow
+let g:load_doxygen_syntax=1 " Load doxygen syntax by default
+" manually: set syn=cpp.doxygen
 
 " Ctags {
 " set tags=./tags;/,~/.vimtags

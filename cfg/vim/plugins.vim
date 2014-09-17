@@ -255,6 +255,9 @@ NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'Lokaltog/vim-easymotion'
 " Start with ,.
 
+" New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
+NeoBundle 'bkad/CamelCaseMotion'
+
 " Switch [c,cpp,cxx,cc] <-> [h,hpp]
 NeoBundle 'vim-scripts/a.vim'
 
@@ -326,6 +329,9 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {
 " NeoBundle 'vim-scripts/DoxygenToolkit.vim'
 NeoBundle 'hsanson/vim-android'
 
+" Has syntastic integration, allow building CMake from vim.
+" TODO: temporarily disabled as I can't understand how to integrate with syntastic
+" NeoBundle 'jalcine/cmake.vim'
 
 NeoBundle 'scrooloose/syntastic'
 "NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'

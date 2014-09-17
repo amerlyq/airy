@@ -17,3 +17,4 @@ set shiftwidth=4     " indentation amount for < and > commands
 set scrolloff=3   " context lines around cursor not hiding when scroll
 set scrolljump=5  " minimum number of lines to scroll
 
+set backspace=indent,eol,start
