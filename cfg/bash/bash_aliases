@@ -149,8 +149,9 @@ alias chgrp='chgrp --preserve-root'
 
 # --- Net ---
 
-alias ping='ping -c 5'
-alias fastping='ping -c 100 -s.2'
+alias ping='\ping -c 5'
+alias pingfast='\ping -c 100 -s.2'
+alias scanip='nmap -sn 192.168.0.0/24'
 
 alias ports='netstat -tulanp'
 alias openports='netstat --all --numeric --programs --inet'

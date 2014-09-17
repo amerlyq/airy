@@ -28,3 +28,8 @@ let g:syntastic_c_include_dirs = [ 'inc', 'include', '../inc', '../include',
 " let g:syntastic_c_compiler_options = '-std=c89 -Wall -Wdeclaration-after-statement -Werror -Wno-unused-variable -Wno-unused-but-set-variable'
 " '-ansi -DMACRO_NAME'
 
+" Syntastic uses the location list (a window-local variant of the quickfix
+" list), so a :lclose will close it, but keep the other buffers.
+
+" the initial height can be configured:
+let g:syntastic_loc_list_height=5

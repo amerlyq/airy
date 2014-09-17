@@ -21,17 +21,15 @@ autocmd ColorScheme * highlight! link ColorColumn StatusLineNC
 "let g:airline_theme='serene'
 "colorscheme nocturne "molokai
 " Restore right colors for sign column in solarized
-highlight SignColumn ctermbg=0
-
-"autocmd ColorScheme * highlight DiffAdd ctermbg=None
-"autocmd ColorScheme * highlight DiffChange ctermbg=None
-"autocmd ColorScheme * highlight DiffDelete ctermbg=None
-"autocmd ColorScheme * highlight DiffText ctermbg=None
+autocmd ColorScheme * highlight DiffAdd    ctermbg=None
+autocmd ColorScheme * highlight DiffChange ctermbg=None
+autocmd ColorScheme * highlight DiffDelete ctermbg=None
+autocmd ColorScheme * highlight DiffText   ctermbg=None
 
 autocmd ColorScheme * highlight SignColumn ctermbg=None
-autocmd ColorScheme * highlight LineNr     ctermbg=None
+" autocmd ColorScheme * highlight LineNr     ctermbg=None
 autocmd ColorScheme * highlight FoldColumn ctermbg=None
-autocmd ColorScheme * highlight SpecialKey ctermbg=None
+" autocmd ColorScheme * highlight SpecialKey ctermbg=None
 
 set background=dark "light
 

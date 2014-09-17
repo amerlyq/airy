@@ -5,9 +5,11 @@ function! CompileInDir()
   let name=fnamemodify(l:dir, ":t") . '.bin'
   let bdir=l:dir . '/build'
   call mkdir(l:dir, 'p')
-  if filereadable(l:dir.'Makefile')
-    exec 'make -C'.l:bdir
+  if filereadable(l:dir . 'Makefile')
+    exec 'make -C' . l:bdir
   " set makeprg=ruby\ -c\ %
+  " elseif filereadable(l:dir . 'compile')
+  "   exec '!./compile'
   else
     let lst=substitute(glob(dir.'/**/*.c'), '\n', ' ', 'g')
     exec '!cd ' . l:bdir . '&& gcc -O0 -g -o ' . l:name .
