@@ -12,6 +12,7 @@ esac
 
 # double for some strange reasonse
 kill -s SIGRTMIN+${NUM-1} $(pidof $pr_bar)
+# kill -9 $(ps opid= -C sdb)
 # kill -s SIGRTMIN+${1-1} $(pidof $pr_bar)
 
 #killall -SIGUSR1 i3status

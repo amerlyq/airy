@@ -88,4 +88,7 @@ case "$mimetype" in
         try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
 esac
 
+# Display general information for other files:
+file -Lb "$path" | sed 's/,\s*/\n/g' && exit 5
+
 exit 1
