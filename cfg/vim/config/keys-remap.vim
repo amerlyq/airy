@@ -59,9 +59,21 @@ noremap gk k
 " Unused
 " map - $
 " map # %
-"
-" imap <C-j> <Down>
-" imap <C-k> <Up>
-" imap <C-h> <Left>
-" imap <C-l> <Right>
 
+" BUFFERS
+noremap  zJ  zj
+noremap  zK  zk
+noremap  zj  <C-W>W
+noremap  zk  <C-W>w
+" switch to adjacent buffer in current window
+noremap  gh  :<C-U>bprev<CR>
+noremap  gl  :<C-U>bnext<CR>
+noremap  gH  :<C-U>bfirst<CR>
+noremap  gL  :<C-U>blast<CR>
+" works cool only with xkb map of arrows to C-hjkl
+nnoremap <C-PageUp>    <Esc>:tabprev<CR>
+nnoremap <C-PageDown>  <Esc>:tabnext<CR>
+nnoremap <Left>        <Esc>:bprev<CR>
+nnoremap <Right>       <Esc>:bnext<CR>
+nnoremap <Up>          <C-W>W
+nnoremap <Down>        <C-W>w

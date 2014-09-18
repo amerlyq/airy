@@ -5,8 +5,8 @@ if !has('gui_running')
     let c = nr2char(i) " echom i c
     exec "set <M-".c.">=\e".c
     " Shadowed 'cause of some wierd behaviour as 'No such mapping'
-    " exec "noremap  \e".c." <M-".c.">"
-    " exec "noremap! \e".c." <M-".c.">"
+    exec "map  \e".c." <M-".c.">"
+    exec "map! \e".c." <M-".c.">"
   endfor
 endif
 

@@ -15,9 +15,12 @@ source ~/.bash_export
 #   /usr/share/X11/xkb/rules/evdev.lst
 # Details: /usr/share/X11/xkb/symbols
 
+CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" )
 if [ "$CURR_HOST" == "vbox" ]; then
-    CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" | sed '/lvl5\|over/s|\(\s*\)\(.*\)|\1// \2|' )
-else CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" ); fi
+    CONF=$( sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|' <<< "$CONF" )
+elif [ "$1" == "elona" ]; then
+    CONF=$( sed '/am_over/ s|\(\s*include "\)\(.*\)"|\1\2_'"$1"'"|' <<< "$CONF" )
+fi
 
 echo "$CONF"
 
