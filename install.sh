@@ -14,20 +14,19 @@ if [ $? -eq 1 ]; then
     fi
 fi
 
+# Create link for other child scripts to work
+if [ ! -f ~/.bash_functions ]; then
+    pairLink ~/.bash_functions "$SCRIPT_DIR/cfg/bash/bash_functions"
+fi
+
+# ====================== Install type ===========================
+
 # Zero-point (path to this script)
 amScriptDir
 if [ -z "${SCRIPT_DIR}" ]; then
     echo "Error: no SCRIPT_DIR, 'cause amScriptDir invalid"; [[$PS1]]&&return||exit; fi
 if [ "${SCRIPT_DIR}" == "/" ]; then
-    echo "Warning: launch by 'exec ./install_auto'. Attention: it will close your terminal."; squit 1; fi
-
-# Choose dir for first or next launches
-PROFILES_DIR="$HOME/.config/airy_profiles"
-if [ ! -d "$PROFILES_DIR" ]; then
-    PROFILES_DIR="${SCRIPT_DIR%/*}/erian/airy_profiles"
-    if [ ! -d "$PROFILES_DIR" ]
-    then PROFILES_DIR="$SCRIPT_DIR"; fi
-fi
+    echo "Warning: launch by 'exec ./install.sh'. Attention: it will close your terminal."; squit 1; fi
 
 DEPLOY_DIR="$SCRIPT_DIR/deploy"
 
@@ -43,9 +42,13 @@ fi
 
 # ====================== Credentials ============================
 
-# Create link for other child scripts to work
-if [ ! -f ~/.bash_functions ]; then
-    pairLink ~/.bash_functions "$SCRIPT_DIR/cfg/bash/bash_functions"
+
+# Choose dir for first or next launches
+PROFILES_DIR="$HOME/.config/airy_profiles"
+if [ ! -d "$PROFILES_DIR" ]; then
+    PROFILES_DIR="${SCRIPT_DIR%/*}/erian/airy_profiles"
+    if [ ! -d "$PROFILES_DIR" ]
+    then PROFILES_DIR="$SCRIPT_DIR"; fi
 fi
 
 # Make here path to home-symlink to erian's profile dir
@@ -88,18 +91,16 @@ fi
 source ~/.bash_export
 echo "$CURR_PROF :={ $CURR_PLTF, $CURR_HOST, $CURR_USER }"
 
+
 # ====================== General ================================
 echo 'Launching scripts...'
 
-if [ "${CURR_PLTF}" == "MINGW" ]; then
-    "$DEPLOY_DIR/symlinks.sh"
-fi
-
-if [ "${CURR_PLTF}" == "Linux" ]; then
-    $DEPLOY_DIR/symlinks.sh | sed -e "s@/home/$CURR_USER/@@g" | column -t
-    [ ! $BASIC_INSTALL -eq 1 ] && [ $CLEAN_INSTALL -eq 1 ] && "$DEPLOY_DIR/nosudo_reboot"
-    [ ! $BASIC_INSTALL -eq 1 ] && $HOME/.i3/gen_i3_config.sh grass
-fi
+case "${CURR_PLTF}" in
+    MINGW) "$DEPLOY_DIR/symlinks.sh" ;;
+    Linux) $DEPLOY_DIR/symlinks.sh | sed -e "s@/home/$CURR_USER/@@g" | column -t
+        [ ! $BASIC_INSTALL -eq 1 ] && $HOME/.i3/gen_i3_config.sh grass
+        ;;
+esac
 
 #TODO: Move this into pristine.d/vim.pr
 if [ ! -d "$HOME/.vim/res/powerline-fonts" ] || [ $CLEAN_INSTALL -eq 1 ]; then
@@ -120,6 +121,7 @@ if [ ! "${CURR_PROF}" == "guest" ]; then
     if [ "${CURR_PLTF}" == "Linux" ] && [ ! $BASIC_INSTALL -eq 1 ]; then
         "$DEPLOY_DIR/choose_defaults"
         "$DEPLOY_DIR/shares.sh"
+        [ $CLEAN_INSTALL -eq 1 ] && "$DEPLOY_DIR/nosudo_reboot"
     fi
 fi
 
@@ -130,8 +132,10 @@ if [ $FULL_INSTALL -eq 1 ] && [ ! $BASIC_INSTALL -eq 1 ] && [ "${CURR_PLTF}" == 
     if [ $CLEAN_INSTALL -eq 1 ] ; then
         if [ "${CURR_HOST}" == "vbox" ]; then
             CURR_APP_GROUPS="vbox rofi copyq"
+        elif [ "${CURR_PROF}" == "guest" ]; then
+            CURR_APP_GROUPS="dev net ranger shell vim zsh"
         else
-            CURR_APP_GROUPS="opengl rofi copyq grub tlp wuala evernote palemoon"
+            CURR_APP_GROUPS="dev_opengl rofi copyq grub tlp wuala evernote palemoon"
         fi
         $DEPLOY_DIR/pristine $CURR_APP_GROUPS
     fi
