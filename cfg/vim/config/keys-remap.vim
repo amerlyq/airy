@@ -65,8 +65,10 @@ noremap gk k
 " BUFFERS
 noremap  zJ  zj
 noremap  zK  zk
-noremap  zj  <C-W>W
-noremap  zk  <C-W>w
+noremap  zh  <C-W>h
+noremap  zj  <C-W>j
+noremap  zk  <C-W>k
+noremap  zl  <C-W>l
 " switch to adjacent buffer in current window
 noremap  gh  :<C-U>bprev<CR>
 noremap  gl  :<C-U>bnext<CR>
