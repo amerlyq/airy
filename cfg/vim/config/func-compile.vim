@@ -4,16 +4,23 @@ function! CompileInDir()
   let dir=substitute(getcwd(), '/\(src\|inc\)$', '', '')
   let name=fnamemodify(l:dir, ":t") . '.bin'
   let bdir=l:dir . '/build'
-  call mkdir(l:dir, 'p')
-  if filereadable(l:dir . 'Makefile')
+  if filereadable(l:dir . '/CMakeLists.txt')
+    exec '!sir bR'
+  elseif filereadable(l:dir . '/Makefile')
     exec 'make -C' . l:bdir
-  " set makeprg=ruby\ -c\ %
-  elseif filereadable(l:dir . 'compile')
-    exec '!cd ' . l:dir . ' && ./compile && cd ' . l:bdir . ' && ./' . l:name
+    " set makeprg=ruby\ -c\ %
+  elseif filereadable(l:dir . '/compile')
+    exec 'Silent cd ' . l:dir . ' && ./compile'
   else
     let lst=substitute(glob(dir.'/**/*.c'), '\n', ' ', 'g')
-    exec '!cd ' . l:bdir . '&& gcc -O0 -g -o ' . l:name .
-          \ ' -I ' . l:dir . ' ' . l:lst '&& ./' . l:name
+    if len(l:lst) > 0
+      call mkdir(l:bdir, 'p')
+      exec '!cd ' . l:bdir . ' && gcc -O0 -g -o ' . l:name .
+          \ ' -I ' . l:dir . ' ' . l:lst ' && ./' . l:name
+    endif
+  endif
+  if filereadable(l:dir . '/run')
+    exec 'Silent cd ' . l:dir . ' && ./run'
   endif
 endfunction
 

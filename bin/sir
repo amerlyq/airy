@@ -36,14 +36,28 @@ BUILD_DIR="$ROOT_DIR/build"
 TARGETS_DIR="$ROOT_DIR/targets"
 [ -d "$TARGETS_DIR" ] || TARGETS_DIR="$ROOT_DIR/useflags"
 [ -d "$TARGETS_DIR" ] || TARGETS_DIR="$ROOT_DIR/scripts/useflags"
-echo "$ROOT_DIR"
-[ -d "$TARGETS_DIR" ] || { echo "No 'targets' dir in project."; exit 1; }
-BIN_DIR="$BUILD_DIR/bin"
-BIN_PR="$BIN_DIR/ut"
+# echo "$ROOT_DIR"
 
-FLAGS="${1:-all64}"
- OPTS="${2:-br}"
-[ -f "$TARGETS_DIR/$FLAGS" ] || { echo "No 'flag' in target dir for project."; exit 1; }
+
+
+# TODO:
+# This msg MUST NOT appear if project has no options by design
+# I must be able to compile any CMake project, not only mine
+# So this big make system must separate on several modules
+# CMake mine, CMake others with mine configs (dirs or file), ./compile, etc
+# [ -d "$TARGETS_DIR" ] || { echo "No 'targets' dir in project."; } #exit 1;
+
+# BIN_DIR="$BUILD_DIR/bin"
+# BIN_PR="$BIN_DIR/ut"
+BIN_DIR="$BUILD_DIR"
+BIN_PR="$BIN_DIR/${ROOT_DIR##*/}.bin"
+
+if [ -d "$TARGETS_DIR" ]; then
+    FLAGS="${1:-all64}"
+    OPTS="${2:-br}"
+else OPTS="${1:-br}"; fi
+
+# [ -f "$TARGETS_DIR/$FLAGS" ] || { echo "No 'flag' in target dir for project.";  } #exit 1;
 GARGS="${3:+"--gtest_filter=$3* ${@:4} --gtest_repeat=1"}"
 # --gtest_repeat=1000 --gtest_break_on_failure --gtest_output=«xml:out.xml» --gtest_shuffle
 
@@ -78,12 +92,12 @@ if has_opti b ; then
     [ "$PREFIX_DIR" != "$ROOT_DIR" ] && echo -en "\033[1;33;40m DIR \033[0m $ROOT_DIR\n"
     mkdir -p $BUILD_DIR
 
-    BUILD_OPTIONS=$(cat "$TARGETS_DIR/$FLAGS" | "$SIR/decorate-options" )
-
-    if [ -z "$BUILD_OPTIONS" ]; then
-        echo "ERROR: empty build options. Continue with defaults."
+    if [ -f "$TARGETS_DIR/$FLAGS" ]; then
+        BUILD_OPTIONS=$(cat "$TARGETS_DIR/$FLAGS" | "$SIR/decorate-options" )
+        if [ -z "$BUILD_OPTIONS" ]; then
+            echo "ERROR: empty build options. Continue with defaults."
+        fi
     fi
-
 
     [ -f "$BIN_PR" ] && mv -f "${BIN_PR}" "${BIN_PR}.old"
     if has_opt B; then # Building with logs
@@ -170,6 +184,11 @@ if has_opti r; then
         exit 1
     fi
     if has_opti g && has_opti v; then vgdb -c v.kill; fi
+fi
+
+if has_opti p ; then
+    echo -en "\033[1;30;43m PROFILER \033[0m\n"
+    "$SIR/check-gperftools" "$PREFIX_DIR"
 fi
 
 # Valgrind-Log

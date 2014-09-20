@@ -12,7 +12,9 @@ LST="$LST cmake build-essential gcc-multilib g++-multilib lib32stdc++6 openjdk-7
 LST="$LST make pkg-config autoconf automake" #binutils-gold
 # libc6-dbg:i386    # need to prevent valgrind error with strlen -> strnlen
 LST="$LST cppcheck valgrind libc6-dbg:i386 gdb"
-
 #LST="$LST rabbit valkyrie"  #GUI#
+
+LST="$LST google-perftools libgoogle-perftools-dev libgoogle-glog-dev google-mock"
+# Not to dld, but use already! Dld manually if there is new version or absent.
 
 apt_noprompt $LST

@@ -29,6 +29,8 @@ noremap <silent> g* *N:<C-U>set hlsearch<CR>
 nnoremap K  a<CR><Right><Esc>
 nnoremap gK i<CR><Right><Esc>
 
+nnoremap gX a<Del><Esc>
+
 " Insert empty line before/after
 noremap gO O <C-U><Esc>
 noremap go o <C-U><Esc>
