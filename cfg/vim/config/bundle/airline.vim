@@ -10,6 +10,22 @@
 
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#bufferline#enabled = 1
+
+" let g:airline#extensions#branch#enabled = 1
+" let g:airline#extensions#syntastic#enabled = 1
+" let g:airline#extensions#tagbar#enabled = 1
+" let g:airline#extensions#hunks#enabled = 1
+"
+" let g:airline#extensions#tabline#show_buffers = 0
+" let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+"
+" let g:airline#extensions#tmuxline#enabled = 1
+
+
+
+
+
 
 ""Maybe it will reduce CPU load, not showing which lines are chaged
 "(gitgutter, signify, etc)

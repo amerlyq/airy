@@ -1,0 +1,43 @@
+
+ 21 down vote accepted
+
+
+sdcv is the console version of Stardict.
+
+1. Install the dictionary
+
+Run the following command in the terminal:
+
+sudo apt-get install sdcv
+
+2. Download dictionary files
+
+Download the dictionary files according to your requirements from the following sources.
+
+    http://abloz.com/huzheng/stardict-dic/dict.org/
+    http://abloz.com/huzheng/stardict-dic/misc/
+    Free On-Line Dictionary of Computing
+    Jargon File - A comprehensive compendium of hacker slang illuminating many aspects of hackish tradition, folklore, and humor
+    GNU Linux English-English Dictionary
+
+3. Install downloaded dictionaries
+
+Make the directory where sdcv looks for the dictionary:
+
+sudo mkdir -p /usr/share/stardict/dic/
+
+The next command depends on whether the downloaded file is a .gz file or a .bz2 file.
+
+If it is a .bz2 file:
+
+sudo tar -xvjf downloaded.tar.bz2 -C /usr/share/stardict/dic
+
+If it is a .gz file:
+
+sudo tar -xvzf downlaoded.tar.gz -C /usr/share/stardict/dic
+
+4. Done!
+
+To search for a word use:
+
+sdcv word

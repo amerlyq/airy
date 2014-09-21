@@ -345,6 +345,9 @@ NeoBundle 'Chiel92/vim-autoformat'
 
 NeoBundle 'octol/vim-cpp-enhanced-highlight'
 
+" Colorize html-codes
+" NeoBundleLazy 'lilydjwg/colorizer'
+
 " JSON Highlight and indent plugin
 NeoBundleLazy 'elzr/vim-json', {
     \ 'autoload': { 'filetypes': [ 'json' ] },

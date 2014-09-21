@@ -31,7 +31,7 @@ endif
 
 " Use :DiffOrig to see the differences between the current buffer and the
 " file it was loaded from. Use :diffupdate then
-command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_
+command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_
     \ | diffthis | wincmd p | diffthis
 
 

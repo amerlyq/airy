@@ -11,7 +11,8 @@ cnoremap w!! w !sudo tee % >/dev/null
 " generate 'tags' file: obsolete by easytags
 nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
 " reload updated settings in running vim instance
-nnoremap <S-F1> :source $MYVIMRC<CR>
+"
+nnoremap <S-F1> :source $MYVIMRC \| AirlineRefresh<CR>
 "nmap <silent> <leader>sv :so $MYVIMRC<CR>
 
 "http://en.cppreference.com/mwiki/index.php?title=Special%3ASearch&search=memcpy
