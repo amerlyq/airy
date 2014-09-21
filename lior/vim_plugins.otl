@@ -20,6 +20,7 @@ ag
 	> :Ag, :AgAdd, :LAg, and :LAgAdd
 	< :Ag [options] {pattern} [{directory}]
 	:Ag '\\\#define foo'   --- escaping of '#'
+	> :Ag!  | Don't open the first matched file into current buffer.
 	In the quickfix window, you can use:
 	| e  | to open file and close the quickfix window
 	| o  | to open (same as enter)
@@ -31,6 +32,24 @@ ag
 	| v  | to open in vertical split
 	| gv | to open in vertical split silently
 	| q  | to close the quickfix window
+
+vim-autoformat	100%
+	| F3 | do autoformat
+
+vim-editqf		100%
+	> :make, :grep, :Ag, <leader>n, :cw, :e loc:list
+	In the quickfix/location window:
+	| i,a,c...  any key changing text or switching mode |
+	: Automatically a new window will be opened containing all entries of the
+	: quickfix window.  You can use the regular editing commands for editing
+	: the entries. Once you're done, just save the buffer and leave or close
+	: the window.
+	For changing the type of a quickfix entry from within the quickfix window five
+	convenience shortcuts are provided:
+	| I | info
+	| W | warning
+	| E | error
+	| << and >> | cycle through the different types
 
 
 neobundle		100%

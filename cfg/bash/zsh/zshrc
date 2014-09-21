@@ -93,6 +93,10 @@ DEFAULT_USER="$CURR_USER"
 
 source "$ZSH_CUSTOM/lib/amer-key-mix.zsh"
 
+
+note() { echo "{ notify-send --urgency normal --expire-time=10000 -i typing-monitor -h int:x:500 -h int:y:500 'Alarm' 'GO and DO this'; beep }" | at now + $1 minutes; }
+# at 18:30
+
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 

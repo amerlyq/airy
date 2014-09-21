@@ -336,6 +336,9 @@ NeoBundle 'hsanson/vim-android'
 NeoBundle 'scrooloose/syntastic'
 "NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'
 
+""" Ability to edit entries from qf or lc windows in new buffer
+NeoBundle 'jceb/vim-editqf'
+
 " Autoformatting with one button, can use custom (like clang-styler)
 NeoBundle 'Chiel92/vim-autoformat'
 
