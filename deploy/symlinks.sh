@@ -37,6 +37,8 @@ then
     pairLink ~/.w3m/config "${CONF_DIR}/w3m/config"
     pairLink ~/.w3m/keymap "${CONF_DIR}/w3m/keymap"
     pairLink ~/.pentadactylrc "${CONF_DIR}/Win/pentadactylrc"
+
+    pairLink ~/.config/dunst/dunstrc "${CONF_DIR}/Xrc/dunstrc"
 fi
 
 if [ "$CURR_PLTF" == "MINGW" ]

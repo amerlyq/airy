@@ -8,7 +8,11 @@ lock() {
         scrot $pic
         mogrify -scale 10% -scale 1000% $pic
     fi
+    notify-send "DUNST_COMMAND_PAUSE" # pause notifications
     i3lock --dpms --nofork --color 111111 --image $pic
+    # or xscreensaver-command -lock
+    notify-send "DUNST_COMMAND_RESUME" # resume notifications
+
     ## Turn the screen off after delay, why it don't work?
     #sleep 1; pgrep i3lock && xset dpms force off
     # Alternative with autolock after time delay:

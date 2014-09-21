@@ -1,5 +1,5 @@
 [global]
-    font = Monospace 8
+    font = Cousine 10
 
     # allow a small subset of html markup:
     # <b>bold</b>
@@ -86,7 +86,7 @@
     #
     # If this option is set to mouse or keyboard, the monitor option will be
     # ignored.
-    follow = mouse
+    follow = keyboard
 
     # should a notification popped up from history be sticky or
     # timeout as if it would normally do.
@@ -124,10 +124,11 @@
     startup_notification = false
 
     # dmenu path
+    # dmenu = "/usr/bin/dmenu -p dunst: -nb #FFFFFF -nf #000000 -sb #94DBFF -sf #000000"
     dmenu = /usr/bin/dmenu -p dunst:
 
     # browser for opening urls in context menu
-    browser = iceweasel -new-tab
+    browser = /usr/bin/firefox -new-tab
 
 [frame]
     width = 3
@@ -144,6 +145,7 @@
 
     # close all notifications
     close_all = ctrl+shift+space
+    #close_all = mod4+ctrl+x
 
     # redisplay last message(s)
     # On the US keyboard layout 'grave' is normally above TAB and left of '1'.
@@ -220,7 +222,15 @@
 # appname = Pidgin
 # summary = *twitter.com*
 # urgency = normal
+
+[twitter]
+    appname = Pidgin
+    summary = *twitter.com*
+    urgency = low
+
 [urxvt]
-summary = *Beep*
-urgency = low
-timeout = 4
+    summary = *Beep*
+    urgency = low
+    timeout = 4
+
+# vim:ft=sh

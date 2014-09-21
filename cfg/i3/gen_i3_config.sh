@@ -270,6 +270,10 @@ wprf "\n### ================= Multimedia =================== ###\n"
 # apt-get intall xbindkeys
 # https://wiki.archlinux.org/index.php/Xbindkeys_(%D0%A0%D1%83%D1%81%D1%81%D
 
+w_header "Control: touchpad on/off"
+wlistf "$bm+%s $exno synclient TouchpadOff=%s" "p Shift+p" 0 1
+wstr ''
+
 #bindsym XF86AudioMicMute exec "amixer -D pulse sset Capture toggle"
 #bindsym XF86TouchpadToggle exec "synclient TouchpadOff=$(synclient | awk '/TouchpadOff/ {print ($3+1)%2}')"
 

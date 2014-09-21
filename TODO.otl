@@ -10,6 +10,7 @@ BUGS
 	[X] VBox & CapsLock toggle
 		Solution: remap Caps to Ctrl on Windows
 	[_] i3blocks after boot loads not always
+	[_] i3locks error and crash after hiding bar
 
 ranger
 	[_] fix 's' exit with tmux inside ranger shell -- what to do?
@@ -135,9 +136,13 @@ vim
 	[X] BUG: after reloading by ':e' Airline disables, maybe smth also
 		: Bottom bar appear again after insert-mode, upper -- will never
 		: It seems problem in 'after' settings 'syntax on', which was in otl
+	[X] BUG: Airline disables after ':so $MYVIMRC'.
+		: Use ':AirlineRefresh'
 	Integrate this tips:
 		[_] https://github.com/benmills/vimux
 		[_] http://vim.wikia.com/wiki/Replace_a_word_with_yanked_text
+		[_] http://vimhelp.appspot.com/vim_faq.txt.html#faq-20.4
+			: Very big good faq!
 	[X] check AirLineToggle on VBox to meashure CPU loading in the work process
 	 So, it's only a few. 'syntax on' does much more
 	[X] notate surround
