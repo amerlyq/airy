@@ -271,7 +271,7 @@ wprf "\n### ================= Multimedia =================== ###\n"
 # https://wiki.archlinux.org/index.php/Xbindkeys_(%D0%A0%D1%83%D1%81%D1%81%D
 
 w_header "Control: touchpad on/off"
-wlistf "$bm+%s $exno synclient TouchpadOff=%s" "p Shift+p" 0 1
+wlistf "$bm+%s $exno synclient TouchpadOff=%s" "p Shift+p" 1 0
 wstr ''
 
 #bindsym XF86AudioMicMute exec "amixer -D pulse sset Capture toggle"

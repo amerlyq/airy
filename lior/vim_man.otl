@@ -28,6 +28,12 @@ Diff
 	See cast on fugitive with vimdiff
 		http://vimcasts.org/episodes/fugitive-vim-working-with-the-git-index/
 
+
+Say we're in insert mode and we want to paste yanked text without leaving the
+insert mode. We can do that with  <C-r>0. If yanked text contains new line
+characters, <C-r><C-p>0 will take care of fixing indentation issues.
+
+
 Folding
 VIM может сворачивать текстовые блоки по следующим правилам:
 	ручное сворачивание по метке (описано в :help fold-manual)

@@ -21,8 +21,12 @@ function! CompileInDir(...)
           \ ' -I ' . l:dir . ' ' . l:lst ' && ./' . l:name
     endif
   endif
+  let bin=l:bdir . '/' . expand("%:t:r") . '.bin'
+  echo l:bin
   if filereadable(l:dir . '/run')
     exec l:run . 'cd ' . l:dir . ' && ./run'
+  elseif filereadable(l:bin)
+    exec l:run . l:bin
   endif
 endfunction
 

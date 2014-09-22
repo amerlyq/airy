@@ -70,19 +70,20 @@ fi
 if [ "$CURR_PLTF" == "MINGW" ]; then
     # http://www.marksimonson.com/fonts/view/anonymous-pro
     winFontInstall "$FONT_DIR/$FONT_USE"
-	
-	PATH="/c/Program Files (x86)/GnuWin32/bin:$PATH"
-	if wget --version &> /dev/null; then
-		# http://lua-users.org/wiki/LuaBinaries
-		LUA_DLL="$HOME/.vim/lua52.dll"
-		rm -f "$LUA_DLL"
-		wget -c "http://sourceforge.net/projects/luabinaries/files/latest/download" -O "$LUA_DLL"
-		echo "Lua dll installed"
-	else
-		echo "You must install 'wget for windows' so neocomplete can work in vim" 
-	fi
-    
+
+    PATH="/c/Program Files (x86)/GnuWin32/bin:$PATH"
+    if wget --version &> /dev/null; then
+        # http://lua-users.org/wiki/LuaBinaries
+        LUA_DLL="$HOME/.vim/lua52.dll"
+        rm -f "$LUA_DLL"
+        wget -c "http://sourceforge.net/projects/luabinaries/files/latest/download" -O "$LUA_DLL"
+        echo "Lua dll installed"
+    else
+        echo "You must install 'wget for windows' so neocomplete can work in vim"
+    fi
+
 fi
 echo "Vim font '$FONT_USE' installed"
 
+vim +NeoBundleClearCache +NeoBundleCheckUpdate #+qall
 

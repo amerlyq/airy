@@ -62,6 +62,17 @@ noremap gk k
 " map - $
 " map # %
 
+"" VISUAL
+" visually select the text that was last edited or pasted
+nnoremap gv `[v`]
+"" select last paste in visual mode
+nnoremap <expr> gb '`[' . strpart(getregtype(), 0, 1) . '`]'
+" visually select a search result
+nnoremap g/ //e<cr>v??<cr>
+" reselect visual block after indent
+vnoremap < <gv
+vnoremap > >gv
+
 " BUFFERS
 noremap  zJ  zj
 noremap  zK  zk
@@ -77,7 +88,3 @@ noremap  gL  :<C-U>blast<CR>
 " works cool only with xkb map of arrows to C-hjkl
 nnoremap <C-PageUp>    <Esc>:tabprev<CR>
 nnoremap <C-PageDown>  <Esc>:tabnext<CR>
-nnoremap <Left>        <Esc>:bprev<CR>
-nnoremap <Right>       <Esc>:bnext<CR>
-nnoremap <Up>          <C-W>W
-nnoremap <Down>        <C-W>w

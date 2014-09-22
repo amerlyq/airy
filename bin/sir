@@ -36,7 +36,8 @@ BUILD_DIR="$ROOT_DIR/build"
 TARGETS_DIR="$ROOT_DIR/targets"
 [ -d "$TARGETS_DIR" ] || TARGETS_DIR="$ROOT_DIR/useflags"
 [ -d "$TARGETS_DIR" ] || TARGETS_DIR="$ROOT_DIR/scripts/useflags"
-# echo "$ROOT_DIR"
+echo "$ROOT_DIR"
+echo "$TARGETS_DIR"
 
 
 
@@ -55,6 +56,7 @@ BIN_PR="$BIN_DIR/${ROOT_DIR##*/}.bin"
 if [ -d "$TARGETS_DIR" ]; then
     FLAGS="${1:-all64}"
     OPTS="${2:-br}"
+    echo $FLAGS
 else OPTS="${1:-br}"; fi
 
 # [ -f "$TARGETS_DIR/$FLAGS" ] || { echo "No 'flag' in target dir for project.";  } #exit 1;

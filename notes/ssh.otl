@@ -1,0 +1,20 @@
+PIPEing
+	Copy file
+		Compressed
+			tar zcf - stuff | ssh user@server 'tar zxf -'
+			ssh user@server 'tar zcf - stuff' | tar zxf -
+		Leaving tarball
+			tar zcf - stuff | ssh user@server 'cat - > stuff.tar.gz'
+		Run local script remotely
+			ssh user@server 'bash -s' < script.sh
+		Play sound remotely
+			ssh user@server 'mpg321 -' < sound.mp3
+
+
+SOCKS proxy
+	On client, listen to port for socks connection
+	ssh -fND localhost:10000 icydog@desktop.icydog.net
+	: To use it, just point your SOCKS-aware application at the port you chose
+	: earlier. For example, in the Firefox connection settings, you would
+	: choose Manual proxy configuration, fill in localhost and 10000 for SOCKS
+	: Host and Port, and leave everything else blank.

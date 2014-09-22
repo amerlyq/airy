@@ -340,7 +340,11 @@ NeoBundle 'scrooloose/syntastic'
 NeoBundle 'jceb/vim-editqf'
 
 " Autoformatting with one button, can use custom (like clang-styler)
-NeoBundle 'Chiel92/vim-autoformat'
+" NeoBundle 'Chiel92/vim-autoformat'
+" Auto-formatter for c/cpp/obj-c
+NeoBundle 'rhysd/vim-clang-format'
+" DEP BY: vim-clang-format
+NeoBundle 'kana/vim-operator-user'
 
 " Documentation online finder in one button for word under cursor
 " Keithbsmiley/investigate.vim
