@@ -4,12 +4,14 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # MEDIA
 
-LST="$LST xbindkeys scrot network-manager uget curl cups-pdf lynx elinks sxiv"
+LST="$LST scrot cups-pdf sxiv fbreader"
 # xbindkeys # to XF86AriseVolumeUp and other media keys works
 # scrot     # screenshoter
 # tixati    #NOT FOUND # nice dark torrent-downloader
 # cups-pdf  # virtual pdf printer
 # sxiv      # Image-thumbnail viewer, vim-like, ALT OLD: xzgv
-LST="$LST fbreader"
+
+LST="$LST rxvt-unicode-256color"
+# urxvt | fast terminal, allowing vim-like tabs, show pictures in w3m browser
 
 apt_noprompt $LST

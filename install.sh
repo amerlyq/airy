@@ -4,7 +4,7 @@
 # On windows under Admin:   Launch Git_Bash.lnk in PrG with Admin rights,
 # cd to this script dir and launch by $ exec ./script_name
 
-# Helper to load neccessary functions
+# ============= Helper to load neccessary functions =============
 source ~/.bash_functions 2&> /dev/null
 if [ $? -eq 1 ]; then
     source ./cfg/bash/bash_functions
@@ -98,27 +98,28 @@ echo 'Launching scripts...'
 case "${CURR_PLTF}" in
     MINGW) "$DEPLOY_DIR/symlinks.sh" ;;
     Linux) $DEPLOY_DIR/symlinks.sh | sed -e "s@/home/$CURR_USER/@@g" | column -t
-        [ ! $BASIC_INSTALL -eq 1 ] && $HOME/.i3/gen_i3_config.sh grass
+        [ "${CURR_PROF}" != "ssh" ] && [ ! $BASIC_INSTALL -eq 1 ] && $HOME/.i3/gen_i3_config.sh grass
         ;;
 esac
 
 #TODO: Move this into pristine.d/vim.pr
 if [ ! -d "$HOME/.vim/res/powerline-fonts" ] || [ $CLEAN_INSTALL -eq 1 ]; then
-    [ ! $BASIC_INSTALL -eq 1 ] && "$DEPLOY_DIR/vim_setup.sh"
+    [ ! $BASIC_INSTALL -eq 1 ] && "$DEPLOY_DIR/vim-setup.sh"
 fi
 
 # ======================== Xresources ===========================
-#if [ ! $BASIC_INSTALL -eq 1 ] && [ $CLEAN_INSTALL -eq 1 ] ; then
+
+if [ "${CURR_PROF}" != "ssh" ] && [ ! $BASIC_INSTALL -eq 1 ] && [ $CLEAN_INSTALL -eq 1 ] ; then
     "$DEPLOY_DIR/generate.sh"
-#fi
+fi
 # ======================= Personal ==============================
 
-if [ ! "${CURR_PROF}" == "guest" ]; then
+if [ "${CURR_PROF}" != "guest" ] && [ "${CURR_PROF}" != "ssh" ]; then
     cd "$SCRIPT_DIR"
     [ ! $BASIC_INSTALL -eq 1 ] && git_local_credentials
     "$SCRIPT_DIR/cfg/git/gen_git_ssh_keys_configs.sh"
 
-    if [ "${CURR_PLTF}" == "Linux" ] && [ ! $BASIC_INSTALL -eq 1 ]; then
+    if [ "${CURR_PLTF}" == "Linux" ] && [ $FULL_INSTALL -eq 1 ]; then
         "$DEPLOY_DIR/choose_defaults"
         "$DEPLOY_DIR/shares.sh"
         [ $CLEAN_INSTALL -eq 1 ] && "$DEPLOY_DIR/nosudo_reboot"
@@ -128,17 +129,19 @@ fi
 # ====================== Applications ===========================
 
 if [ $FULL_INSTALL -eq 1 ] && [ ! $BASIC_INSTALL -eq 1 ] && [ "${CURR_PLTF}" == "Linux" ]; then
-    "$DEPLOY_DIR/pristine" # Default first
-    if [ $CLEAN_INSTALL -eq 1 ] ; then
-        if [ "${CURR_HOST}" == "vbox" ]; then
-            CURR_APP_GROUPS="vbox rofi copyq"
-        elif [ "${CURR_PROF}" == "guest" ]; then
-            CURR_APP_GROUPS="dev net ranger shell vim zsh"
-        else
-            CURR_APP_GROUPS="dev_opengl rofi copyq grub tlp wuala evernote palemoon"
-        fi
-        $DEPLOY_DIR/pristine $CURR_APP_GROUPS
-    fi
+    # Default first
+    "$DEPLOY_DIR/pristine"
+
+    # if [ $CLEAN_INSTALL -eq 1 ] ; then
+        # if [ "${CURR_HOST}" == "vbox" ]; then
+        #     CURR_APP_GROUPS="vbox rofi copyq"
+        # elif [ "${CURR_PROF}" == "guest" ]; then
+        #     CURR_APP_GROUPS="dev net ranger shell vim zsh"
+        # else
+        #     CURR_APP_GROUPS="dev_opengl rofi copyq grub tlp wuala evernote palemoon"
+        # fi
+        # $DEPLOY_DIR/pristine $CURR_APP_GROUPS
+    # fi
 fi
 
 # ===============================================================

@@ -7,10 +7,14 @@ if [ $? -eq 1 ]; then exit 1; fi
 # Installation man
 # http://www.linuxrussia.com/2013/04/oracle-java-7-ubuntu-1304-1204-1210.html
 
+
+apt_noprompt openjdk-7-jdk openjdk-7-jdk:i386
+
 ppa_add 'ppa:webupd8team/java'
 apt_noprompt oracle-java7-installer
 
 java -version
 javac -version
+
 
 sudo update-java-alternatives -s java-7-oracle

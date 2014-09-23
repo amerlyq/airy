@@ -16,25 +16,23 @@ PRS_DIR="$SCRIPT_DIR/${SCRIPT_PATH##*/}.d"
 ## Parse my own set of params
 OPTS_SET=($@)
 if [ $# -eq 0 ]; then
-    OPTS_SET=( shell dev i3 i3_env ranger audio media zathura vim zsh net )
+    OPTS_SET=( $CURR_PKG_LIST )
+fi
+
+if [ "$1" == "-u" ]; then
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    sudo apt-get dist-upgrade -y #&& sudo reboot
+    # sudo apt-get dist-upgrade -y #&& sudo reboot
+else
+    # Installing
+    echo "OPTS_SET: ${OPTS_SET[@]}"
+    echo "FROM: ${PRS_DIR}"
+    exit
+    for pr in "${OPTS_SET[@]}"; do
+        echo "--- INSTALL: ${pr}.pr"
+        "$PRS_DIR/${pr}.pr"
+    done
 fi
-
-# My evergreen working set
-if [ $# -eq 1 ] && [ "$0" == "laptop" ]; then
-    OPTS_SET="-adiorsvbcxzegp"
-fi
-
-
-# Installing
-echo "OPTS_SET: ${OPTS_SET[@]}"
-echo "FROM: ${PRS_DIR}"
-for pr in "${OPTS_SET[@]}"; do
-    echo "--- INSTALL: ${pr}.pr"
-    "$PRS_DIR/${pr}.pr"
-done
 
 
 # MAN

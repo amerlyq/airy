@@ -1,0 +1,7 @@
+#!/bin/sh
+
+tmp=/tmp/lib32
+cp *.a *.so -t $tmp
+cd $tmp
+chmod 644 *.a *.so
+cp *.a *.so -t /usr/lib32

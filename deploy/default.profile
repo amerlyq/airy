@@ -23,6 +23,7 @@ WORK_MAIL=$MAIN_MAIL
 MAIN_DPI=96
 CURR_DIR_PKG=~/pkg
 CURR_DIR_SYNC=~/synchro
+CURR_PKG_LIST=""
 
 ### SDK ###
 JAVA32_HOME=/usr/lib/jvm/java-7-openjdk-i386
