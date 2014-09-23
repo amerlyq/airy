@@ -34,6 +34,7 @@ then INDP=1; else INDP=0; fi
 # if [ "$CURR_PROF" == "home" ]; then INDP=2; else INDP=1; fi
 PRIM="${MON[$INDP]}"; unset MON[$INDP];
 
+
 if [ "$PRIM" == "VBOX0" ]; then
     xrandr --newmode "1920x1080_60.00"  173.00  1920 2048 2248 2576  1080 1083 1088 1120 -hsync +vsync
     xrandr --addmode VBOX0 "1920x1080_60.00"
@@ -45,14 +46,12 @@ xrandr --output $PRIM --auto  --primary
 echo "$PRIM" >> $FL
 
 ## Set others
-#for m in $MON; do #or --mode 1920x1080 --dpi 96 --pos 1366x0,
-if [ ${#MON[@]} -ge 1 ]; then
-    xrandr --output ${MON[0]} --auto $PLACE $PRIM
-    echo "${MON[0]}" >> $FL
-fi
-# done
+for m in "${MON[@]}"; do #or --mode 1920x1080 --dpi 96 --pos 1366x0,
+    xrandr --output "$m" --auto $PLACE $PRIM
+    echo "$m" >> $FL
+done
 
 ## Disable disconnected
 MON=(`xrandr | grep ' disconnected' | sed 's/^\([^ ]*\).*/\1/'`)
-for m in ${MON[@]}; do xrandr --output $m --off; done
+for m in "${MON[@]}"; do xrandr --output $m --off; done
 
