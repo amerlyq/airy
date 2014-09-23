@@ -85,5 +85,7 @@ if [ "$CURR_PLTF" == "MINGW" ]; then
 fi
 echo "Vim font '$FONT_USE' installed"
 
-vim +NeoBundleClearCache +NeoBundleCheckUpdate #+qall
+if [ "$1" == "-u" ]; then
+    vim +NeoBundleClearCache +NeoBundleCheckUpdate #+qall
+fi
 
