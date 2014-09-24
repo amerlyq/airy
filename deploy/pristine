@@ -27,11 +27,10 @@ else
     # Installing
     echo "OPTS_SET: ${OPTS_SET[@]}"
     echo "FROM: ${PRS_DIR}"
-    exit
     for pr in "${OPTS_SET[@]}"; do
-        echo "--- INSTALL: ${pr}.pr"
+        printf "\e1;32m--- INSTALL: ${pr}.pr\n\e0m"
         "$PRS_DIR/${pr}.pr"
-    done
+    done | tee /tmp/pristine.log
 fi
 
 

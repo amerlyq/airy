@@ -109,7 +109,7 @@ fi
 
 # ======================== Xresources ===========================
 
-if [ "${CURR_PROF}" != "ssh" ] && [ ! $BASIC_INSTALL -eq 1 ] && [ $CLEAN_INSTALL -eq 1 ] ; then
+if [ "${CURR_PROF}" != "guest" ] && [ "${CURR_PROF}" != "ssh" ] && [ ! $BASIC_INSTALL -eq 1 ] && [ $CLEAN_INSTALL -eq 1 ] ; then
     "$DEPLOY_DIR/generate.sh"
 fi
 # ======================= Personal ==============================
