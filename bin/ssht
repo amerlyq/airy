@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source ~/.bash_export
-if [ $? -eq 1 ]; then exit 1; fi
+if [ $? -ne 0 ]; then exit 1; fi
 
 if [ -z "$SIR_PORT" ] || [ -z "$SIR_HOST" ]; then
     echo You need \$SIR_PORT and \$SIR_HOST setted in your profile.
@@ -16,5 +16,7 @@ case "$PRG" in
         { SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
         $SS -X -p $SIR_PORT "$SIR_HOST" $@ ;;
     mpd) ~/.bin/ssht.d/sir-mpd $@ ;;
+    srk) LC_ALL=en_US.UTF-8 ssh -X srkb $@ ;;
+    amazon) LC_ALL=en_US.UTF-8 ssh amazon $@ ;;
     *) ;;
 esac

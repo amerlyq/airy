@@ -15,9 +15,11 @@ genssh(){ # $1 -- @mail, $2 -- path/to/key
 }
 stdkey="$HOME/.ssh/id_rsa"
 gitkey="$HOME/.ssh/git_rsa"
+srkkey="$HOME/.ssh/srk_rsa"
 
 genssh "$WORK_MAIL" "$stdkey"
 genssh "$MAIN_MAIL" "$gitkey"
+genssh "$WORK_MAIL" "$srkkey"
 
 # ==================== ~/.gitconfig =========================
 
@@ -47,6 +49,9 @@ wstr "### Multi--SSH config ###
 wstr "# Accounts"
 wacc ghub github.com git "$gitkey"
 wacc glab gitlab.com git "$gitkey"
+wacc srkb $SRK_SERVER "${WORK_MAIL%@*}" "$srkkey"
+wacc amazon $AMAZON_SERVER ubuntu "$HOME/.ssh/seclab-cloud.pem"
+
 echo "W: ~/.ssh/config"
 
 pairLink ~/.gitignore "$SCRIPT_DIR/gitignore"
