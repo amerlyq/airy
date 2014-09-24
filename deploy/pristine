@@ -28,9 +28,16 @@ else
     echo "OPTS_SET: ${OPTS_SET[@]}"
     echo "FROM: ${PRS_DIR}"
     for pr in "${OPTS_SET[@]}"; do
-        printf "\e1;32m--- INSTALL: ${pr}.pr\n\e0m"
+        printf "$(tput setaf 2)--- INSTALL: ${pr}.pr\n$(tput sgr0)"
         "$PRS_DIR/${pr}.pr"
-    done | tee /tmp/pristine.log
+    done 2>&1 | tee /tmp/pristine.log | sed -n -e "
+        /^E:.*/ s//\t$(tput setaf 1)\0$(tput sgr0)/p
+        /^\(.*\) is already the newest version\./ s//\t$(tput setaf 3)\1\*$(tput sgr0)/p
+        /^The following extra packages/,/^After this operation/p
+        /.*/ s//\./p
+        " -e '/^\./N'
+        # " |  awk '{ s=$0; if(s==".") { printf $s } else { printf "\n"$s } }'
+        #
 fi
 
 

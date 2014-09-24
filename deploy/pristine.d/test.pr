@@ -1,0 +1,9 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+# Test
+
+LST="$LST mc mmmx vifm"
+
+apt_noprompt $LST
