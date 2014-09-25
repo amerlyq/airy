@@ -11,6 +11,9 @@ fi
 PRG="$1"
 shift
 
+# To launch shell in certain directory
+# ssh -t example.com "cd /foo/bar; exec \$SHELL -l"
+
 case "$PRG" in
     sir)
         { SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
