@@ -2,6 +2,7 @@
 # Gen: ssh-keys, .ssh/config, .gitconfig
 # Arg: all-new -- for re-generating rsa-pairs
 
+source ~/.bash_functions
 amScriptDir -s
 if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
 
@@ -15,11 +16,16 @@ genssh(){ # $1 -- @mail, $2 -- path/to/key
 }
 stdkey="$HOME/.ssh/id_rsa"
 gitkey="$HOME/.ssh/git_rsa"
-srkkey="$HOME/.ssh/srk_rsa"
+lokkey="$HOME/.ssh/lok_rsa"
 
 genssh "$WORK_MAIL" "$stdkey"
 genssh "$MAIN_MAIL" "$gitkey"
-genssh "$WORK_MAIL" "$srkkey"
+genssh "$MAIN_MAIL" "$lokkey"
+
+if [ "$CURR_PROF" == "work" ]; then
+    srkkey="$HOME/.ssh/srk_rsa"
+    genssh "$WORK_MAIL" "$srkkey"
+fi
 
 # ==================== ~/.gitconfig =========================
 
@@ -44,13 +50,16 @@ wacc() {
 #$ git ... -key ~/.ssh/git_rsa (or only for remote add?)
 dst="$HOME/.ssh/config"
 wbegin
-wstr "### Multi--SSH config ###
-"
+wprf "### Multi--SSH config ###\n\n"
 wstr "# Accounts"
 wacc ghub github.com git "$gitkey"
 wacc glab gitlab.com git "$gitkey"
-wacc srkb $SRK_SERVER "${WORK_MAIL%@*}" "$srkkey"
-wacc amazon $AMAZON_SERVER ubuntu "$HOME/.ssh/seclab-cloud.pem"
+wacc lok "$LOCAL_KIP" "$LOCAL_KNM" "$lokkey"
+
+if [ "$CURR_PROF" == "work" ]; then
+    wacc srkb $SRK_SERVER "${WORK_MAIL%@*}" "$srkkey"
+    wacc amazon $AMAZON_SERVER ubuntu "$HOME/.ssh/seclab-cloud.pem"
+fi
 
 echo "W: ~/.ssh/config"
 
