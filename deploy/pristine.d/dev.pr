@@ -4,7 +4,9 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # DEVELOPMENT
 
-LST="$LST git git-gui gitk tig git-core git-doc meld doxygen"
+LST="$LST git tig git-core git-doc meld doxygen"
+LST="$LST git-gui gitk" # GUI: extract them only for work
+
 # tig # git cli interactive (instead of gitk) http://jonas.nitro.dk/tig/manual.html
 
 # Those libs also necessary to build x32 under x64 system

@@ -27,3 +27,4 @@ let g:XkbSwitchIMappingsTr = {
 let g:XkbSwitchNLayout = 'us'
 ""let g:XkbSwitchILayout = 'us'
 
+let g:XkbSwitchSkipGhKeys = ['gh', 'gH', 'g']
