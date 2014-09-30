@@ -36,3 +36,11 @@ sudo update-alternatives --set editor /usr/bin/vim.gtk
 ### Scripts ###
 # bash .\w aliases -> ranger/bookmarks
 ~/.config/ranger/aliases_to_bookmarks
+
+### Shell ###
+# Choose default shell
+ZSH=$(which zsh)
+ZSH=${ZSH:-/bin/bash}
+#sudo chsh -s `which zsh`
+sudo usermod -s $ZSH "$CURR_USER"
+

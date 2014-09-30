@@ -49,6 +49,7 @@ echo "$PRIM" >> $FL
 for m in "${MON[@]}"; do #or --mode 1920x1080 --dpi 96 --pos 1366x0,
     xrandr --output "$m" --auto $PLACE $PRIM
     echo "$m" >> $FL
+    break
 done
 
 ## Disable disconnected

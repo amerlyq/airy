@@ -21,12 +21,17 @@ if [ "$CURR_HOST" != "vbox" ]; then
 wstr "
 ## Set startup volume and LCD brightness
 #pactl set-sink-volume 0 '20%' &
-xbacklight -set 90 &
+xbacklight -set 30 &
 
 ## DPMS monitor setting (standby -> suspend -> off) (seconds)
-xset dpms 300 600 900 &
 "
+    if [ "$CURR_PROF" == "laptop" ]; then
+        wprf "xset dpms 300 600 900 &\n"
+    elif [ "$CURR_PROF" == "home" ]; then
+        wprf "xset dpms 600 0 0 &\n"
+    fi
 fi
+
 
 wstr "export LIBGL_ALWAYS_SOFTWARE=1"
 # For ComposeKey to work

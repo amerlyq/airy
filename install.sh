@@ -30,9 +30,10 @@ if [ "${SCRIPT_DIR}" == "/" ]; then
 
 DEPLOY_DIR="$SCRIPT_DIR/deploy"
 
-if [ ! -e "$HOME/.bash_export" ] || [ "$1" == "--reinstall" ]
+if [ ! -e "$HOME/.bash_export" ] || [ "$1" == "--clean" ]
 then CLEAN_INSTALL=1; shift; else CLEAN_INSTALL=0; fi
-if [ $CLEAN_INSTALL -eq 1 ] || [ "$1" == "--full" ]
+# if [ $CLEAN_INSTALL -eq 1 ]
+if [ "$1" == "--full" ]
 then  FULL_INSTALL=1; shift; else  FULL_INSTALL=0; fi
 
 if  [ "$1" == "--basic" ]
@@ -66,7 +67,7 @@ fi
 # Intention Validation
 echo -n "Proceed \
 $([ $BASIC_INSTALL -eq 1 ] && echo 'BASIC ')\
-$([ $CLEAN_INSTALL -eq 1 ] && echo 'CLEAR ')\
+$([ $CLEAN_INSTALL -eq 1 ] && echo 'CLEAN ')\
 $([ $FULL_INSTALL -eq 1 ] && echo 'FULL ')\
 installation of '${CURR_PROF}' profile? (y/n): "
 
@@ -119,7 +120,7 @@ if [ "${CURR_PROF}" != "guest" ] && [ "${CURR_PROF}" != "ssh" ]; then
     [ ! $BASIC_INSTALL -eq 1 ] && git_local_credentials
     "$SCRIPT_DIR/cfg/git/gen_git_ssh_keys_configs.sh"
 
-    if [ "${CURR_PLTF}" == "Linux" ] && [ $FULL_INSTALL -eq 1 ]; then
+    if [ "${CURR_PLTF}" == "Linux" ] && [ $CLEAN_INSTALL -eq 1 ]; then
         "$DEPLOY_DIR/choose_defaults"
         "$DEPLOY_DIR/shares.sh"
         [ $CLEAN_INSTALL -eq 1 ] && "$DEPLOY_DIR/nosudo_reboot"
