@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Disk mounting util
+if [ ${#1} -eq 1 ]; then ACTION=${1}; else ACTION=m; fi
+LABELS="$@"
+
+if [ "$1" == 'l' ]; then
+    ls --color=auto /media/$CURR_USER; exit
+fi
+
+for lbl in $LABELS; do
+    if [ -L "/dev/disk/by-label/$lbl" ]; then
+        if [[ "$ACTION" == "u" ]] && [ -d "/media/$CURR_USER/$lbl" ]; then
+            echo "/media/$CURR_USER/$lbl"
+            sudo umount "/media/$CURR_USER/$lbl" && \
+            sudo rmdir "/media/$CURR_USER/$lbl"
+        fi
+        if [[ "$ACTION" == "m" ]] && [ ! -d "/media/$CURR_USER/$lbl" ]; then
+            sudo mkdir -p "/media/$CURR_USER/$lbl" && \
+            sudo mount "/dev/disk/by-label/$lbl" "/media/$CURR_USER/$lbl"
+            echo "/media/$CURR_USER/$lbl"
+        fi
+    else err=1; fi
+done
+
+if [ -z "$LABELS" ] || [ -n "$err" ]; then
+    printf "Choose from:\n"
+    ls --color=auto /dev/disk/by-label
+fi
+
