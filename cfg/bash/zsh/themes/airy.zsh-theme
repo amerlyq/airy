@@ -7,6 +7,9 @@
 functions rbenv_prompt_info >& /dev/null || rbenv_prompt_info(){}
 
 function theme_precmd {
+    # To suppress 'precmd:print: write error: interrupt'
+    [[ -t 0 && -w 0 ]] || return;
+
     local TERMWIDTH
     (( TERMWIDTH = ${COLUMNS} - 1 ))
 
