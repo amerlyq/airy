@@ -140,7 +140,9 @@ alias pkill='sudo pkill '
 #alias update='yum update'
 #alias updatey='yum -y update'
 
-alias off='xset dpms force off'
+# ALT: sudo vbetool dpms [on/off]
+alias off='xset -d :0 dpms force off'
+
 
 # --- Insurance ---
 alias mv='mv -i'
