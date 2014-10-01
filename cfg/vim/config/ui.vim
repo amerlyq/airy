@@ -36,13 +36,17 @@ else
   autocmd ColorScheme * highlight SignColumn ctermbg=0
 endif
 
-" colorscheme molokai "nocturne
+
 set background=dark
 " set background=light
 
+if exists('$TMUX')
+  colorscheme molokai "nocturne
+endif
+
 " Fix for GitGutter
-" highlight GitGutterAdd ctermfg=green guifg=darkgreen
 " highlight GitGutterChange ctermfg=yellow guifg=darkyellow
+" highlight GitGutterAdd ctermfg=green guifg=darkgreen
 " highlight GitGutterDelete ctermfg=red guifg=darkred
 " highlight GitGutterChangeDelete ctermfg=yellow guifg=darkyellow
 
