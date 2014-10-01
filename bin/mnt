@@ -13,11 +13,14 @@ for lbl in $LABELS; do
         if [[ "$ACTION" == "u" ]] && [ -d "/media/$CURR_USER/$lbl" ]; then
             echo "/media/$CURR_USER/$lbl"
             sudo umount "/media/$CURR_USER/$lbl" && \
-            sudo rmdir "/media/$CURR_USER/$lbl"
+                sudo rmdir -v "/media/$CURR_USER/$lbl"
         fi
-        if [[ "$ACTION" == "m" ]] && [ ! -d "/media/$CURR_USER/$lbl" ]; then
+        if [[ "$ACTION" == "m" ]]; then
+            if [ -d "/media/$CURR_USER/$lbl" ]; then
+                sudo rmdir -v "/media/$CURR_USER/$lbl"
+            fi
             sudo mkdir -p "/media/$CURR_USER/$lbl" && \
-            sudo mount "/dev/disk/by-label/$lbl" "/media/$CURR_USER/$lbl"
+                sudo mount "/dev/disk/by-label/$lbl" "/media/$CURR_USER/$lbl"
             echo "/media/$CURR_USER/$lbl"
         fi
     else err=1; fi
