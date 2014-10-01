@@ -130,6 +130,7 @@ alias psg='ps aux | grep '
 alias topstat='dstat -cdnpmgs --top-bio --top-cpu'
 alias mount='mount |column -t'
 alias mountl='sudo fdisk -l'
+alias mntshare="sudo mount -t cifs -o user=${WORK_MAIL%@*} //seclab.surc.kiev.ua/Exchange ~/seclab"
 
 alias apt-get='sudo apt-get'
 alias dpkg='sudo dpkg'

@@ -19,7 +19,7 @@ case "$PRG" in
         { SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
         $SS -X -p $SIR_PORT "$SIR_HOST" $@ ;;
     mpd) ~/.bin/ssht.d/sir-mpd $@ ;;
-    srk) LC_ALL=en_US.UTF-8 ssh -X srkb $@ ;;
+    srk) LC_ALL=en_US.UTF-8 ssh -X srkb -t zsh $@ ;;
     amazon) LC_ALL=en_US.UTF-8 ssh amazon $@ ;;
     kedi) ssh -X lok $@ ;;
     *) ;;
