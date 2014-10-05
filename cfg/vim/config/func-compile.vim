@@ -13,6 +13,8 @@ function! CompileInDir(...)
     " set makeprg=ruby\ -c\ %
   elseif filereadable(l:dir . '/compile')
     exec l:run . 'cd ' . l:dir . ' && ./compile'
+  elseif &filetype =~ 'sh'
+    exec l:run . './% && read tmp'
   else
     let lst=substitute(glob(dir.'/**/*.c'), '\n', ' ', 'g')
     if len(l:lst) > 0

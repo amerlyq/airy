@@ -11,7 +11,7 @@ Join lines
 	awk '{ print $0; }' RS='\n' ORS=' :: ' < random_data.txt
 
 Now we remove duplicate values in the 3rd column based on pairing 1st and 2nd column as key :
-	awk ‘!x[$1,$2]++’ FS=”,” data.txt
+	awk '!x[$1,$2]++' FS=”,” data.txt
 
 Delete column
 	awk -F'|' '{

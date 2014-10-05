@@ -1,0 +1,66 @@
+## Device names and ID numbers from 'xinput list' entered in a terminal.
+#
+## In the example "Device name" not ID # is used.  Note if you use the
+## xorg.conf the "Device names" will be stylus, eraser, touch, and pad.
+#
+## If you are hot plugging use "Device name" as ID # can change.
+#
+## ClickForce changes name to Threshold with xf86-input-wacom 0.10.9 (11-19-10)
+#
+## Warning:  Changing Mode to either Absolute or Relative in stylus/eraser stops
+## the mouse from being able to pull guidelines out of the ruler in Gimp.
+
+#Calculate devices name
+DEVICE_STYLUS=`xsetwacom list dev | grep -E -o ".*stylus"`
+DEVICE_ERASER=`xsetwacom list dev | grep -E -o ".*eraser"`
+DEVICE_CURSOR=`xsetwacom list dev | grep -E -o ".*cursor"`
+DEVICE_PAD=`xsetwacom list dev | grep -E -o ".*pad"`
+DEVICE_TOUCH=`xsetwacom list dev | grep -E -o ".*touch"` 
+
+
+#notify user about used profile
+notify-send "Using Firefox profile"
+
+#screen region where Stylus will work
+#for 1 screens: MapToOutput 1920x1080+0+0
+xsetwacom set "$DEVICE_STYLUS" MapToOutput 3286x1080+0+0
+
+## stylus = ID 12 = "Wacom Intuos4 6x9 stylus"
+xsetwacom set "$DEVICE_STYLUS" Suppress "4"  # data pt.s trimmed, default is 4, 0-20
+xsetwacom set "$DEVICE_STYLUS" RawSample "2"  # data pt.s filtered, default is 2, 0-100
+#xsetwacom set "$DEVICE_STYLUS" ClickForce "27"  # pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_STYLUS" Threshold "27"  # pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_STYLUS" PressureCurve "5 10 90 95"  # Bezier curve, default is 0,0,100,100
+xsetwacom set "$DEVICE_STYLUS" TabletPCButton "off"  # stylus tip + button, or "off" for hover mode
+xsetwacom set "$DEVICE_STYLUS" Mode "Absolute"  # or Relative cursor movement
+xsetwacom set "$DEVICE_STYLUS" Button 1 "1"  # left mouse click
+xsetwacom set "$DEVICE_STYLUS" Button 2 "3"  # right mouse click
+xsetwacom set "$DEVICE_STYLUS" Button 3 "2"  # middle mouse click
+
+## eraser = ID 9 = "$DEVICE_ERASER "
+xsetwacom set "$DEVICE_ERASER" Suppress "4"  # data pt.s trimmed, default is 4, 0-20
+xsetwacom set "$DEVICE_ERASER" RawSample "2"  # data pt.s filtered, default is 2, 0-100
+#xsetwacom set "$DEVICE_ERASER " ClickForce "27"  # pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_ERASER" Threshold "27"  # pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_ERASER" PressureCurve "0 10 90 100"  # Bezier curve, default is 0,0,100,100
+xsetwacom set "$DEVICE_ERASER" Mode "Absolute"  # or Relative cursor movement
+xsetwacom set "$DEVICE_ERASER" Button 1 "1"
+
+## pad = ID 11 = "$DEVICE_PAD"
+xsetwacom set "$DEVICE_PAD" Button 2 "key shift"
+xsetwacom set "$DEVICE_PAD" Button 3 "key ctrl shift P"
+xsetwacom set "$DEVICE_PAD" Button 8 "key ctrl D"
+xsetwacom set "$DEVICE_PAD" Button 9 "key ctrl shift T"
+
+xsetwacom set "$DEVICE_PAD" AbsWheelDown "key alt right"
+xsetwacom set "$DEVICE_PAD" Button 1 "key ctrl Z"  # button inside touchring
+xsetwacom set "$DEVICE_PAD" AbsWheelUp "key alt left"
+
+xsetwacom set "$DEVICE_PAD" Button 10 "key ctrl T"
+xsetwacom set "$DEVICE_PAD" Button 11 "key ctrl W"
+xsetwacom set "$DEVICE_PAD" Button 12 "key ctrl tab"
+xsetwacom set "$DEVICE_PAD" Button 13 "key ctrl shift tab"
+
+xsetwacom set "$DEVICE_PAD" ScrollDistance "10"
+xsetwacom set "$DEVICE_PAD" TapTime "50"
+

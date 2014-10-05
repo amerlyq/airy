@@ -1,0 +1,16 @@
+#!/bin/sh
+
+case "$1" in
+"C-d")
+        # mv "$2" ~/.trash
+        ;;
+"C-r")
+        # convert -rotate 90 "$2" "$2"
+        ;;
+"C-c")
+        echo -n "$2" | xclip -selection clipboard
+        ;;
+"C-w")
+        # nitrogen --save --set-zoom-fill "$2"
+        ;;
+esac
