@@ -9,6 +9,24 @@ PIPEing
 			ssh user@server 'bash -s' < script.sh
 		Play sound remotely
 			ssh user@server 'mpg321 -' < sound.mp3
+Audio
+	sox Klaxon.mp3 -t wav - |ssh thelab@company.com paplay
+	ssh lok 'dd bs=1k if=/dev/audio' > /dev/audio
+	 But there are no /dev/audio!
+		If your computer uses PulseAudio (Ubuntu does), run the program via
+		padsp: padsp yourprogram It will intercept attempts to open
+		/dev/audio, /dev/dsp, and other related devices (using a LD_PRELOAD
+		shared library) and send the sound directly to PulseAudio.  For
+		systems that use plain ALSA, the equivalent is aoss from the
+		"alsa-oss" package.  aoss yourprogram aoss should work on Ubuntu too,
+		since by default ALSA itself is rerouted through PulseAudio, but
+		better use padsp in that case.  Most kernels also have the snd-pcm-oss
+		module, which provides real /dev/dsp and /dev/audio devices using
+		ALSA: sudo modprobe snd-pcm-oss yourprogram I've heard it doesn't work
+		as good as aoss, though, and I'm not sure whether it works at all when
+		PulseAudio is running.
+	Send to someone or listen their output:
+		arecord -c 1 -r 32000 | ssh <user>@<server> 'mplayer -demuxer rawaudio -rawaudio channels=1:rate=32000:samplesize=1 -nocache -'
 
 
 SOCKS proxy
