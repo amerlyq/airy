@@ -7,7 +7,13 @@ Stream:
 		DISPLAY=:0 cvlc screen:// :screen-fps=15.000000 :live-caching=300 :sout="#transcode{vcodec=h264,vb=800,scale=1,acodec=mpga,ab=128, channels=2,samplerate=44100}:duplicate{dst=std{access=http,mux=ts,dst=localhost:9091/stream.mp4}}"
 	Show
 		ssh -L 9091:localhost:9091 lok
-		vlc http://localhost:8080/stream.mp4
+		vlc http://localhost:9091/stream.mp4
+
+	Show text on the host
+		 Idea: use DISPLAY=:0 before commands like gvim "text"
+	Show your's X apps, launched from specified terminal onto host workstation
+		http://superuser.com/questions/340304/ssh-launch-gui-programs-on-remote-screen-not-x-display
+		 Idea: use DISPLAY=<workstation-ip>:0
 
 	Full-setup
 	 http://xmodulo.com/live-stream-video-webcam-linux.html

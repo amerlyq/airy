@@ -39,3 +39,10 @@ Get vtbl funcs addresses
 		45 46 47 48
 
 		echo 'ibase=16' | cat - hdump | tr ' ' \; | bc | awk '{printf("%c",$0)}'
+
+	Disassembly one function
+		arm-v7a9-linux-gnueabi-objdump -d --start-address=0x00108798 ./ut
+		arm-v7a9-linux-gnueabi-objdump -d ./ut | sed '/^[0-9a-f]\+ <uselesSleep.*>:$/,$!d; /^\s*$/q'
+
+Reference
+	http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.kui0100a/armasm_cihgjhed.htm
