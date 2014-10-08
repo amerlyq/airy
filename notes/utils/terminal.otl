@@ -21,6 +21,12 @@ Diff
 
 Fonts
 	https://wiki.archlinux.org/index.php/Font_Configuration#Fontconfig_configuration
+Timerout
+	timeout 5 /path/to/slow/command with options
+	$COMMAND 2>&1 >/dev/null & WPID=$!; sleep $TIMEOUT && kill $! & KPID=$!; wait $WPID
+	Press <Enter, ~, .> one after the other to disconnect from a frozen session.
+	( cmdpid=$BASHPID; (sleep 10; kill $cmdpid) & exec ping www.goooooogle.com )
+
 
 Recover deleted files
 	http://www.opennet.ru/base/sys/recover_file10.txt.html

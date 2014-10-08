@@ -4,7 +4,8 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # Ranger
 
-LST="$LST ranger fbi caca-utils highlight atool w3m w3m-img poppler-utils mediainfo colordiff dwb"
+# ranger
+LST="$LST fbi caca-utils highlight atool w3m w3m-img poppler-utils mediainfo colordiff dwb"
 # caca-utils # (img2txt) Colour AsCii Art library. cacaview - image viewer for the terminal. The user can zoom and scroll the image, set the dithering method or enable anti-aliasing. cacaball is a tiny graphic program that renders animated ASCII metaballs on the screen, cacafire is a port of AALib's aafire and displays burning ASCII art flames, and cacademo is a simple application that shows the libcaca rendering features such as line and ellipses drawing, triangle filling and sprite blitting.
 # fbi        # framebuffer image viewer for terminal
 # atool     # previews of archives
@@ -15,3 +16,6 @@ LST="$LST ranger fbi caca-utils highlight atool w3m w3m-img poppler-utils mediai
 # dwb       # Browser webkit vi-like # http://portix.bitbucket.org/dwb/
 
 apt_noprompt $LST
+
+# Temporary solution, until 14.04 out
+git_install 'hut/ranger'

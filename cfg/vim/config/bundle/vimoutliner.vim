@@ -4,6 +4,7 @@ let g:vo_modules_load = "checkbox:tags:smart_paste:format:clock"
 ":math:newhoist" (extracting tree in ./ folder in temp file)
 "Uncomment and set to 1 to debug hoisting
 "let g:hoistParanoia=0
+let g:use_space_colon = 0
 
 "User Preferences ***************************************************
 let maplocalleader = ",,"   " this is prepended to VO key mappings
@@ -21,4 +22,3 @@ let maplocalleader = ",,"   " this is prepended to VO key mappings
 "This mapping is fold-level and fold-state dependent
 "map <S-Down> dd p
 "map <S-Up> dd <up>P
-

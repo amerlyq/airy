@@ -42,6 +42,8 @@ set background=dark
 
 if exists('$TMUX')
   colorscheme molokai "nocturne
+else
+  colorscheme solarized
 endif
 
 " Fix for GitGutter

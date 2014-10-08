@@ -1,0 +1,40 @@
+#!/bin/bash
+# One way is to run the program in a subshell, and communicate with the
+# subshell through a named pipe with the read command. This way you can check
+# the exit status of the process being run and communicate this back through
+# the pipe.  Here's an example of timing out the yes command after 3 seconds.
+# It gets the PID of the process using pgrep (possibly only works on Linux).
+# There is also some problem with using a pipe in that a process opening a pipe
+# for read will hang until it is also opened for write, and vice versa. So to
+# prevent the read command hanging, I've "wedged" open the pipe for read with a
+# background subshell. (Another way to prevent a freeze to open the pipe
+# read-write, i.e. read -t 5 <>finished.pipe - however, that also may not work
+# except with Linux.)
+
+rm -f finished.pipe
+mkfifo finished.pipe
+
+{ yes >/dev/null; echo finished >finished.pipe ; } &
+SUBSHELL=$!
+
+# Get command PID
+while : ; do
+    PID=$( pgrep -P $SUBSHELL yes )
+    test "$PID" = "" || break
+    sleep 1
+done
+
+# Open pipe for writing
+{ exec 4>finished.pipe ; while : ; do sleep 1000; done } &
+
+read -t 3 FINISHED <finished.pipe
+
+if [ "$FINISHED" = finished ] ; then
+  echo 'Subprocess finished'
+else
+  echo 'Subprocess timed out'
+  kill $PID
+fi
+
+rm finished.pipe
+
