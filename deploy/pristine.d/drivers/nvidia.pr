@@ -1,0 +1,8 @@
+#!/bin/bash
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+LST="$LST nvidia-prime nvidia-331-updates nvidia-settings"
+
+apt_noprompt $LST
+
