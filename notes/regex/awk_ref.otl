@@ -1,4 +1,9 @@
 Vars
+	Export
+		1 | declare $( awk 'BEGIN{print "var=17"}' )
+		2 | z=`awk '{if($1=="Solaris")print "x="$2;if($1=="Linux")print "y="$2}' file`
+			eval $z
+
 	http://www.theunixschool.com/2011/09/awk-passing-arguments-or-shell.html
 	http://www.theunixschool.com/2012/08/awk-passing-awk-variables-to-shell.html
 
