@@ -4,9 +4,9 @@ source ~/.bash_export
 if [ $? -ne 0 ]; then exit 1; fi
 
 if [ "$1" == "s" ]; then
-    synergys -f
+    synergys -f -c ~/.config/.synergy.conf
 fi
 
 if [ "$1" == "c" ]; then
-    synergyc -f $LOCAL_SIP
+    synergyc -f -c ~/.config/.synergy.conf $LOCAL_SIP
 fi
