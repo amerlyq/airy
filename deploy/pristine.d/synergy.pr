@@ -1,8 +1,11 @@
-#!/bin/sh
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
 
 # ALT:
 #   http://raspberrypi.stackexchange.com/questions/4253/forward-mouse-and-keyboard-input-to-x-session
 # Configure:
 #   http://synergy2.sourceforge.net/configuration.html
 
-apt-get install synergy quicksynergy
+apt_noprompt install synergy #quicksynergy

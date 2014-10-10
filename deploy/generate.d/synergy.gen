@@ -1,0 +1,54 @@
+#!/bin/bash
+#   https://wiki.archlinux.org/index.php/synergy
+#   https://help.ubuntu.com/community/SynergyHowto
+
+source ~/.bash_export
+source ~/.bash_functions
+if [ $? -eq 1 ]; then exit 1; fi
+
+dst=~/.synergy.conf
+wbegin
+
+wstr "
+section: screens
+    $LOCAL_SNM:
+        halfDuplexCapsLock = false
+        halfDuplexNumLock = false
+        halfDuplexScrollLock = false
+        xtestIsXineramaUnaware = false
+        switchCorners = none +top-left +top-right +bottom-left +bottom-right
+        switchCornerSize = 0
+    $LOCAL_HNM:
+        halfDuplexCapsLock = false
+        halfDuplexNumLock = false
+        halfDuplexScrollLock = false
+        xtestIsXineramaUnaware = false
+        switchCorners = none +top-left +top-right +bottom-left +bottom-right
+        switchCornerSize = 0
+end
+
+section: aliases
+    $LOCAL_SNM:
+        $LOCAL_SIP
+    $LOCAL_HNM:
+        $LOCAL_HIP
+end
+
+section: links
+    $LOCAL_SNM:
+        up = $LOCAL_HNM
+    $LOCAL_HNM:
+        down = $LOCAL_SNM
+end
+
+section: options
+    heartbeat = 1000
+    relativeMouseMoves = false
+    screenSaverSync = false
+    win32KeepForeground = false
+    switchCorners = none +top-left +top-right +bottom-left +bottom-right
+    switchCornerSize = 4
+end
+"
+
+echo "W: $dst"
