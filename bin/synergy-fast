@@ -13,12 +13,18 @@
 source ~/.bash_export
 if [ $? -ne 0 ]; then exit 1; fi
 
+
 CONF=~/.config/.synergy.conf
 
 # if [ "$1" == "s" ]
 if [ "$CURR_PROF" == "laptop" ]; then CLI=0; else CLI=1; fi
 
 if [ "$1" == "d" ]; then MODE='-f'; else MODE='--daemon'; fi
-if $CLI; then PR=synergyc; IP=$LOCAL_SIP; else PR=synergys; IP=''; fi
+if [ $CLI -eq 1 ]; then PR=synergyc; IP=$LOCAL_SIP; else PR=synergys; IP=''; fi
+
+LST=$(pgrep $PR)
+if [ -n "$LST" ]; then kill -s SIGTERM $LST; fi
+if [ "$1" == "k" ]; then exit; fi # kill only
+
 $PR --restart $MODE -c $CONF $IP
 
