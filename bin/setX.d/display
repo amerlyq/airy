@@ -32,6 +32,7 @@ MON=(`xrandr | grep ' connected' | sed 's/^\([^ ]*\).*/\1/'`)
 if [ "$SETS" != "$SIDE" ] && [ ${#MON[@]} -ge 2 ]
 then INDP=1; else INDP=0; fi
 # if [ "$CURR_PROF" == "home" ]; then INDP=2; else INDP=1; fi
+
 PRIM="${MON[$INDP]}"; unset MON[$INDP];
 
 
@@ -56,3 +57,6 @@ done
 MON=(`xrandr | grep ' disconnected' | sed 's/^\([^ ]*\).*/\1/'`)
 for m in "${MON[@]}"; do xrandr --output $m --off; done
 
+## Backlight brightness
+# echo 5 | sudo tee /sys/class/backlight/acpi_video0/brightness
+# ALT: xrandr --output LVDS1 --brightness 0.8

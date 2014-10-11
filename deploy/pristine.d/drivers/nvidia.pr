@@ -1,17 +1,32 @@
 #!/bin/bash
+# vim: ft=sh
 source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 
-echo 'You need fix xbacklight by editing: /etc/X11/xorg.conf
-    (If there no such file, create by ''sudo nvidia-xconfig'')
-    Section "Device"
-        Identifier     "Device0"
-        Driver         "nvidia"
-        VendorName     "NVIDIA Corporation"
-        BoardName      "GeForce 210"
-        Option "RegistryDwords" "EnableBrightnessControl=1"
-    EndSection
-'
+# sudo nvidia-xconfig   | if no such file as /etc/X11/xorg.conf
+# sudo nvidia-settings
+
+# vim /etc/default/grub
+#   GRUB_CMDLINE_LINUX="quiet splash acpi_osi=Linux acpi_backlight=vendor"
+#   sudo update-grub
+
+# /etc/X11/xorg.conf
+# Section "Device"
+#     Identifier "nvidia"
+#     Driver "nvidia"
+#     BusID "PCI:1@0:0:0"
+#     Option "ConstrainCursor" "off"
+#     Option "RegistryDwords" "EnableBrightnessControl=1"
+# EndSection
+
+# OR  /usr/share/X11/xorg.conf.d/20-nvidia.conf
+#   Section "Device"
+#       Identifier     "Device0"
+#       Driver         "nvidia"
+#       VendorName     "NVIDIA Corporation"
+#       BoardName      "GeForce 210"
+#       Option "RegistryDwords" "EnableBrightnessControl=1"
+#   EndSection
 
 LST="$LST nvidia-prime nvidia-331-updates nvidia-settings"
 
