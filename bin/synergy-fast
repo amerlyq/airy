@@ -1,12 +1,24 @@
 #!/bin/bash
+#   https://wiki.archlinux.org/index.php/synergy
+# ALT: x2x, xrdp
+#   http://raspberrypi.stackexchange.com/questions/4253/forward-mouse-and-keyboard-input-to-x-session
+
+# SSH:
+#   synergys -a localhost:24800
+#   ssh -f -N -L 24800:server-hostname:24800
+
+# --name screen-name | This option lets the client use a name
+#                    | other  than  its  hostname for its screen.
 
 source ~/.bash_export
 if [ $? -ne 0 ]; then exit 1; fi
 
-if [ "$1" == "s" ]; then
-    synergys -f -c ~/.config/.synergy.conf
-fi
+CONF=~/.config/.synergy.conf
 
-if [ "$1" == "c" ]; then
-    synergyc -f -c ~/.config/.synergy.conf $LOCAL_SIP
-fi
+# if [ "$1" == "s" ]
+if [ "$CURR_PROF" == "laptop" ]; then CLI=0; else CLI=1; fi
+
+if [ "$1" == "d" ]; then MODE='-f'; else MODE='--daemon'; fi
+if $CLI; then PR=synergyc; IP=$LOCAL_SIP; else PR=synergys; IP=''; fi
+$PR --restart $MODE -c $CONF $IP
+

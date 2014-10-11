@@ -4,11 +4,12 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # i3wm -- tiling windows mngr
 
-if ppa_add "deb http://debian.sur5r.net/i3/ $(lsb_release -c -s) universe"
-then
-    apt-get update
-    apt-get --allow-unauthenticated install sur5r-keyring
-fi
+# Failed to fetch. Obsolete?
+# if ppa_add "deb http://debian.sur5r.net/i3/ $(lsb_release -c -s) universe"
+# then
+#     apt-get update
+#     apt-get --allow-unauthenticated install sur5r-keyring
+# fi
 
 # Obsolete by kbdd + dbus-send (set_layout), qdbus (notification)
 # git_install 'ierton/xkb-switch'

@@ -2,6 +2,17 @@
 source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 
+echo 'You need fix xbacklight by editing: /etc/X11/xorg.conf
+    (If there no such file, create by ''sudo nvidia-xconfig'')
+    Section "Device"
+        Identifier     "Device0"
+        Driver         "nvidia"
+        VendorName     "NVIDIA Corporation"
+        BoardName      "GeForce 210"
+        Option "RegistryDwords" "EnableBrightnessControl=1"
+    EndSection
+'
+
 LST="$LST nvidia-prime nvidia-331-updates nvidia-settings"
 
 apt_noprompt $LST

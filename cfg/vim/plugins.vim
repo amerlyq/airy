@@ -182,7 +182,8 @@ endif
 " http://www.vim.org/scripts/script.php?script_id=4359
 NeoBundle 'tpope/vim-rsi'
 NeoBundle 'tpope/vim-endwise'
-
+" Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
+NeoBundle 'PeterRincker/vim-argumentative'
 " Manage surrounding ('"<p>...) by replace cs"' or delete ds"
 NeoBundle 'tpope/vim-surround'
 " Disabled: bug with neocomplete -- <BS> don't remove both brackets,
