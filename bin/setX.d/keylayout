@@ -18,8 +18,9 @@ source ~/.bash_export
 CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" )
 if [ "$CURR_HOST" == "vbox" ]; then
     CONF=$( sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|' <<< "$CONF" )
-elif [ "$1" == "elona" ]; then
-    CONF=$( sed '/am_over/ s|\(\s*include "\)\(.*\)"|\1\2_'"$1"'"|' <<< "$CONF" )
+# elif [ "$1" == "elona" ]; then
+else
+    CONF=$( sed '/am_over/ s|\(\s*include "\)\(.*\)"|\1\2_'"elona"'"|' <<< "$CONF" )
 fi
 
 echo "$CONF"
