@@ -28,6 +28,21 @@ if [ $? -eq 1 ]; then exit 1; fi
 #       Option "RegistryDwords" "EnableBrightnessControl=1"
 #   EndSection
 
+# If error for alternatives on 'sudo prime-select nvidia'
+#   sudo update-alternatives --set x86_64-linux-gnu_gl_conf /usr/lib/nvidia-331-updates-prime/ld.so.conf
+#   prime-select query  # to check  which card is current (if PC stuck with one, but used another)
+
+# MAN 2
+# http://forum.ubuntu-fr.org/viewtopic.php?pid=16696581#p16696581
+#   sudo apt-get purge nvidia*
+#   sudo apt-get autoremove
+#
+# sudo add-apt-repository ppa:xorg-edgers/ppa
+#       To revert to official: sudo ppa-purge xorg-edgers
+# sudo apt-get update
+# sudo apt-get install xserver-xorg-video-intel nvidia-331 ppa-purge
+# sudo apt-get upgrade
+
 LST="$LST nvidia-prime nvidia-331-updates nvidia-settings"
 
 apt_noprompt $LST
