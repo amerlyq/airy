@@ -308,6 +308,8 @@ wstr "assign [class=\"^Firefox$\"] \$w4"
 wstr "assign [class=\"^Pale\ moon$\"] \$w4"
 wstr "assign [class=\"^Wine$\"] \$w9"
 wstr "assign [class=\"^Wuala$\"] \$w10"
+wstr "assign [class=\"^Steam\"] \$w9"
+wstr "assign [class=\"^t-engine64\"] \$w8"
 wstr ''
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
@@ -323,6 +325,7 @@ wstr "for_window [window_role=\"pop-up\"] floating enable"
 wstr "for_window [instance=\"feh\"] fullscreen"
 wstr "for_window [class=\"^Conky\"] border none"
 wstr "for_window [instance=\"^Download\" class=\"^Firefox\"] floating enable"
+wstr "for_window [class=\"^t-engine64\"] border none"
 
 wprf "\n### ================== Bar & Theme ================= ###\n"
 # (dzen2, xmobar, maybe even gnome-panel?),
