@@ -1,0 +1,10 @@
+Get VGA card and display
+	lspci -vnn | grep VGA -A 12
+	lshw -numeric -C display
+	lspci -vnn | grep VGA -A 12
+To find your motherboard model, use dmidecode or inxi command.
+	sudo dmidecode -t baseboard | grep -i 'Product'
+	inxi -M
+Renderer
+	glxinfo | grep OpenGL
+

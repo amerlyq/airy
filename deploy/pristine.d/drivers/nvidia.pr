@@ -43,7 +43,10 @@ if [ $? -eq 1 ]; then exit 1; fi
 # sudo apt-get install xserver-xorg-video-intel nvidia-331 ppa-purge
 # sudo apt-get upgrade
 
-LST="$LST nvidia-prime nvidia-331-updates nvidia-settings"
+add-apt-repository ppa:nilarimogard/webupd8
+apt-get update
+
+LST="$LST nvidia-prime nvidia-331-updates nvidia-settings mesa-utils prime-indicator"
 
 apt_noprompt $LST
 
