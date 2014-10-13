@@ -6,13 +6,14 @@ BUGS
 	[X] не гаснущий capslock
 	[X] не загружается boot с воткнутым hdmi
 		Need disable 'Intel Rapid Start'
-	[_] steam 'OpenGL not using direct rendering'
+	[X] steam 'OpenGL not using direct rendering'
 	[X] VBox & CapsLock toggle
 		Solution: remap Caps to Ctrl on Windows
 	[_] i3blocks after boot loads not always
-	[_] i3locks error and crash after hiding bar
+	[X] i3blocks error and crash after hiding bar
 
 ranger
+	[_] Add to rifle opening *.dot by vim or by 'dot -Tx11 $1' viewer
 	[_] Add hang-out process checking to ranger scope.sh
 	[_] fix 's' exit with tmux inside ranger shell -- what to do?
 	[_] Add C-x,C-t commands to ranger for move one word forward/backward
@@ -27,7 +28,7 @@ ranger
 		 и история из того шелла из которого мы впервые открыли ранджер
 		 (тобишь добавить её в 'rr' alias)
 		Частично реализовано через zsh -- остальное излишество
-	[_] Сбилдить ранжер из сорцов и смержить мои текущие настройки
+	[X] Сбилдить ранжер из сорцов и смержить мои текущие настройки
 		https://github.com/hut/ranger
 	[_] After Ubuntu 14.10 chg ranger install from github to apt-get
 
@@ -65,6 +66,8 @@ Deploy:
 	[_] Shares -- in private profile
 	[_] Move install profile choosing (fast with apt-get only, or full with compile)
 	  to git_install script, checking for flag and skipping if there isn't one
+	[_] Проблема группирования -- по объекту (bash,vim,git) или по
+	  стратегии (cfg, deploy, notes) решается через 'ln -r' симлинки в репе
 
 	[$] пароли для dir620 -- profile
 		:хотя если я всё равно буду подключаться по SSH -- то проще
@@ -135,6 +138,7 @@ vim
 	[~] BUG: auto-paste mode on insert don't work, verify, add F2 to insert.
 	[_] BUG: alt-pressing buggy in insert mode with fast pressing
 	[_] WRONG: for \ts combo syntax on ignores my changes in highlighting in ui.vim
+	[X] Fix tcomment style for C.
 	[X] BUG: vim -- C-N in plugin multi-edit
 	[X] My copy-paste > get rid of "press enter problem" (cut first line only)
 	[X] BUG: after reloading by ':e' Airline disables, maybe smth also
@@ -303,6 +307,7 @@ TODO
 	[_] Ssh with two ip profiles -- for local net and for www.
 	[_] Split SSH on local and global parts, selected automatically
 	[_] Move mntshare from alias to script mnt
+	[_] Fix pristine dot's with awk concatenation
 
 
 Langs

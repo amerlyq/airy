@@ -87,6 +87,8 @@ alias root='sudo -i'
 alias mkdir='mkdir -pv'
 # echo "alias firefox='nohup firefox &>/dev/null'" >> /etc/commonrc
 mkdcd() { mkdir -p "$@" && cd "$_"; }
+hex() { printf "%08lx\n" $(($@)); }
+dec() { printf "%ld\n" $(($@)); }
 
 # --- Git ---
 alias gtA='gita-all-dir '

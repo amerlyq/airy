@@ -103,6 +103,8 @@
     la = log --graph --date=relative --all --topo-order --pretty=format:'%C(cyan)[%an]%Creset %C(green bold)%d%Creset %C(yellow)%h%Creset : %s %C(cyan)[%ad]%Creset'
     lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
     le = log --oneline --decorate
+
+    lfd = log --graph --all --follow --stat --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(bold white)— %an%C(reset)' --abbrev-commit  #add -p if needed
 #    puush = push --force
 
 #    You can see all the commits related to a file, with the diff of the changes with

@@ -35,3 +35,21 @@ Submodules
 		git add vendor
 		git commit -m 'Updated vendor to latest version'
 
+Log
+	lg = log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'\n--abbrev-commit --date=relative
+	git help log
+		git diff --cached  | diff with staged changes
+		git diff -U file   | give you a unified diff
+		git show HEAD      | changes inside last commit
+		git blame filename | last author for each text line
+	Follow its renames, on all branches:
+		git log --follow --all --stat -- file.c | commits, changing file
+		git log --follow --all -p file.c        | same, with diff
+		tig --follow --all -p file.c            | same, in viewer
+	 if the file named bar was once named foo, then git log -p bar (without
+	 the --follow option) will only show the file's history up to the point
+	 where it was renamed -- it won't show the file's history when it was
+	 known as foo.
+	Commits
+		git diff --name-status --oneline HEAD~10 HEAD~5
+

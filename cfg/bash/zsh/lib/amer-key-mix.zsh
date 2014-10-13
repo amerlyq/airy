@@ -25,7 +25,7 @@ bindkey '^Z' backward-kill-line
 
 bindkey '^P' up-history
 bindkey '^N' down-history
-bindkey '^R' history-incremental-search-backward
+bindkey '^R' history-incremental-pattern-search-backward #history-incremental-search-backward
 # Prev command from history, depending on text till cursor #'\e[A','\e[B'
 bindkey '^P' up-line-or-search      #history-beginning-search-backward
 bindkey '^N' down-line-or-search    #history-beginning-search-forward

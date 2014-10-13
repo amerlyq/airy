@@ -8,6 +8,12 @@ Stream:
 	Show
 		ssh -L 9091:localhost:9091 lok
 		vlc http://localhost:9091/stream.mp4
+	Audio
+		ssh <user>@<remotehost> 'arecord -f cd -t raw | oggenc - -r' | mplayer -
+		ssh <user>@<remotehost> ffmpeg -f alsa -ac 1 -i hw:3 -f ogg - | mplayer - -idle -demuxer ogg
+		dd if=/dev/dsp | ssh -c arcfour -C username@host dd of=/dev/dsp
+
+
 
 	Show text on the host
 		 Idea: use DISPLAY=:0 before commands like gvim "text"
