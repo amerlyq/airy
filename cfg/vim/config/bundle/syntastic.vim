@@ -18,10 +18,10 @@ let g:syntastic_filetype_map = { 'latex': 'tex',
 " let b:syntastic_c_cflags = '-I/usr/include/libsoup-2.4'
 
 let g:syntastic_cpp_compiler = 'g++'
-let g:syntastic_cpp_check_header = 1
+let g:syntastic_cpp_check_header = 0
 let g:syntastic_cpp_include_dirs = [ 'inc', 'include', '../inc', '../include', '../../include' ]
 let g:syntastic_c_compiler = 'gcc'
-let g:syntastic_c_check_header = 1
+let g:syntastic_c_check_header = 0
 let g:syntastic_c_include_dirs = [ 'inc', 'include', '../inc', '../include',
     \ '../../include', '../../common/inc' ]
 

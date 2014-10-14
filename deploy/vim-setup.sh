@@ -1,10 +1,17 @@
 #!/bin/bash
 # See: vimregex.com
 
-mkdir -p "$HOME/.cache/vim" # Dir for .swp and backup edited files
 source "$HOME/.bash_functions"
 FONT_DIR="$HOME/.vim/res/powerline-fonts"
 FONT_USE="DejaVuSansMono"
+
+CVIM="$HOME/.cache/vim"
+mkdir -p "$CVIM" # Dir for .swp and backup edited files
+
+case $1 in
+    dark)   printf "set background=dark\ncolorscheme solarized\n"  > "$CVIM/vim_theme" ;;
+    light)  printf "set background=light\ncolorscheme solarized\n" > "$CVIM/vim_theme" ;;
+esac
 
 # If neobundle don't run on Win
 # %HOME% = %USERPROFILE%

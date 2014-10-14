@@ -33,17 +33,20 @@ if g:theme_transparent
   autocmd ColorScheme * highlight SpecialKey ctermbg=None
 else
   set cursorline      " highlight currently focused line
-  autocmd ColorScheme * highlight SignColumn ctermbg=0
+  autocmd ColorScheme * highlight! link SignColumn LineNr
 endif
 
 
-set background=dark
-" set background=light
-
-if exists('$TMUX')
-  colorscheme molokai "nocturne
+let s:vim_theme=expand('$HOME/.cache/vim/vim_theme')
+if filereadable(s:vim_theme)
+  exec 'source ' . s:vim_theme
 else
-  colorscheme solarized
+  set background=dark "light
+  if exists('$TMUX')
+    colorscheme solarized  "molokai nocturne
+  else
+    colorscheme solarized
+  endif
 endif
 
 " Fix for GitGutter

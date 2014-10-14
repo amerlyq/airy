@@ -1,0 +1,309 @@
+
+-------------------------------------------------------------------------------
+Also see  regex.hints  for hints and tips of matching regular expressions
+And sed 1 liners
+  http://sed.sourceforge.net/sed1line.txt
+Also examples from the gnu "info sed"
+
+------------------------------------------------------------------------------
+Print specific lines
+
+print first line of file (emulates "head -1")
+  sed q
+
+print first 10 lines of file (emulates behavior of "head")
+  sed 10q
+
+
+print the last line of a file (emulates "tail -1")
+  sed '$!d'                    # method 1
+  sed -n '$p'                  # method 2
+
+print the next-to-the-last line of a file
+  sed -e '$!{h;d;}' -e x              # for 1-line files, print blank line
+  sed -e '1{$q;}' -e '$!{h;d;}' -e x  # for 1-line files, print the line
+  sed -e '1{$d;}' -e '$!{h;d;}' -e x  # for 1-line files, print nothing
+
+print the last 2 lines of a file (emulates "tail -2")
+  sed '$!N;$!D'
+
+print the last 10 lines of a file (emulates "tail")
+  sed -e :a -e '$q;N;11,$D;ba'
+
+
+------------------------------------------------------------------------------
+Delete between Markers AAAA and BBBB
+
+Inclusive delete (delete start and end)
+  sed '/AAAA/,/BBBB/d'
+
+Exclusive delete (output start and end)
+  sed '1,/AAAA/p; /BBBB/,$p; d'
+or
+  sed '/AAAA/,/BBBB/{ /AAAA/p; /BBBB/p; d }'
+
+delete end but output start
+  sed '/AAAA/p; /AAAA/,/BBBB/d'
+or
+  sed '/AAAA/,/BBBB/{ /AAAA/p; d }'
+
+delete start but output end
+  sed '/AAAA/,/BBBB/{ /BBBB/p; d }'
+or
+  sed '/BBBB/p; /AAAA/,/BBBB/d }'
+
+See next...
+
+------------------------------------------------------------------------------
+Print lines between markers AAAA to BBBB
+
+Including markers
+  sed -n '/AAAA/,$p; /BBBB/q' file
+
+Excluding the end marker
+  sed -n '/BBBB/q; /AAAA/,$p' file
+or
+  sed -n '/AAAA/,$p; /BBBB/Q' file
+
+Excluding both markers
+  sed -n '/BBBB/q; 1,/AAAA/d; p' file
+or
+  sed '1,/AAAA/d; /BBBB/Q' file
+
+-------------------------------------------------------------------------------
+Line numbers
+
+left aligned
+  sed = file | sed 'N;s/\n/\t/'
+
+right aligned
+  sed = filename | sed 'N; s/^/     /; s/ *\(.\{6,\}\)\n/\1  /'
+
+counting lines ("sed" only no "wc")
+
+  sed -n '$=' file
+
+------------------------------------------------------------------------------
+Delete ALL blank lines
+  sed '/^$/d' file
+
+Delete multiple blank lines (paragraph separators)
+  sed '/^$/{ N; /^\n$/D; }' file
+or
+  sed '/./,/^$/!d' file
+
+===============================================================================
+Programming with sed....
+
+------------------------------------------------------------------------------
+Delimiting "sed" Delimetors (also see next)
+
+Say you want to search for a path name that contains slashes `/'
+unfortunatally these are the sed regular expresion delimiters so you
+need to escape the slashes before you can search for it. This is not as
+easy as it sounds.
+
+old_path="/some/path/to/look/for"
+new_path="/some/path/to/look/for"
+
+old_path=`echo "$old_path" | sed 's/\//\\\\\//g'`
+new_path=`echo "$new_path" | sed 's/\//\\\\\//g'`
+
+sed 's'"$old_path"'/'"$new_path"'/g' $old_file > $new_file
+
+-------------------------------------------------------------------------------
+Sed with arbatitry patterns
+
+   #!/bin/sh
+   #  substitute {pattern} {replacement}
+   #
+   sed 's/'"$1"'/'"$2"'/g
+
+That's OK provided you know for certain that $1 will never contain a "/"
+or "\", and $2 will never contain a "/", "\" or "&".  If $1 and $2 are
+completely arbitrary you need to do something like:
+
+    pat=`echo "$1" | sed 's:[/\\]:\\&:g'`
+    rep=`echo "$2" | sed 's:[/\\&]:\\&:g'`
+    sed "s/$pat/$rep/g"
+
+Is there a problem with  """ or "`" in patterns?  -- seems not
+
+-------------------------------------------------------------------------------
+Sed Programming Methology Example:
+
+This sed script grabs a 'face' file (which always starts with a space or tab)
+and repositions it correctly at the end of the mail header (denoted by a
+absolutely blank line). NOTE the use of lables.
+
+  cat $FACE - $SIGNED | sed -n '
+    # first collect the new face at the start of the input
+    1 { s/^/X-Face:/; h; d; }
+      /^[ \t]/{H;d;}
+    # read the header; if X-face found just copy all
+    : head
+      /^X-Face:/ b body
+      /^$/ b face
+      p; n; b head
+    # output a face at end of header
+    :face
+      x; p; g; p; n
+    # just copy the rest of the file
+    : body
+      p; n; b body
+  ' | /lib/sendmail "$@"
+
+-------------------------------------------------------------------------------
+Adding a newline to sed (just add return -- messy)
+  bourne shells:
+       sed 's/;$/; }\
+       /' filename
+
+  Csh family:
+       sed 's/;$/; }\\
+       /' filename
+
+Of course you can always use a tr which is slower but neater
+
+      sed 's/;$/; }@/' | tr '@' '\012'
+
+GNU sed allows you to use \r  (for return)
+But uses \n on the input side.  Do not use \n on output as that is 'null'
+
+      sed 's/;$/; }\r/'
+
+In a similar way it allows the use of \t for tab.
+
+-------------------------------------------------------------------------------
+Moving a line to the start of the file
+EG
+     something1                          this
+     something2            ====>         something1
+     this                                something2
+     something3                          something3
+
+  sed -n '
+    /this/!H                      # if no match append to hold space
+    /this/{x; H; }                # found so exhange and append (prepend)
+    ${g; s/\n//; p; }' <infile    # if last line get and print hold
+OR
+  sed '1,/this/{                  # until found
+    /this/!{H; d; }               # if not it put in hold (no print)
+    G; s-\n--; }' infile          # otherwise output hold
+                                  # no match will continue print rest of file
+
+-------------------------------------------------------------------------------
+Word Division -- sed and non-sed version
+
+    Name=`echo $DISPLAY | sed 's/:.*//'`
+
+can be done faster with
+
+    oldIFS=$IFS; IFS=.; set -- $DISPLAY; IFS=$oldIFS; Name=$1;
+
+no fork, totally internal to shell
+
+------------------------------------------------------------------------------
+Increment the number given
+
+  sed -e '
+    #Add zero to start if needed
+    /^9*$/ s/^/0/
+    # separate changing/unchanged digits with an x (and hold)
+    s/.9*$/x&/
+    h
+    # increment digits
+    s/^.*x//
+    y/0123456789/1234567890/
+    # merge unchanged with changed
+    x
+    s/x.*$//
+    G
+    s/\n//
+    '
+
+Alturnative without using the hold buffer
+
+  sed -e '
+    /[^0-9]/ d
+
+    # replace all leading 9s by _ (any non-digit could be used)
+    :d
+    s/9\(_*\)$/_\1/
+    td
+
+    # incr last digit only.  The first line adds a most-significant
+    # digit of 1 if we have to add a digit.
+    #
+    # The t commands are not necessary, but make the thing faster
+
+    s/^\(_*\)$/1\1/; tn
+    s/8\(_*\)$/9\1/; tn
+    s/7\(_*\)$/8\1/; tn
+    s/6\(_*\)$/7\1/; tn
+    s/5\(_*\)$/6\1/; tn
+    s/4\(_*\)$/5\1/; tn
+    s/3\(_*\)$/4\1/; tn
+    s/2\(_*\)$/3\1/; tn
+    s/1\(_*\)$/2\1/; tn
+    s/0\(_*\)$/1\1/; tn
+
+    :n
+    y/_/0/
+    '
+
+-------------------------------------------------------------------------------
+Count 'a's on a line
+
+  sed -e '
+    # convert groups of ten to a higher order
+    # The t and b are not necessary, but is faster
+    t a
+    : a;  s/aaaaaaaaaa/b/g; t b; b done
+    : b;  s/bbbbbbbbbb/c/g; t c; b done
+    : c;  s/cccccccccc/d/g; t d; b done
+    : d;  s/dddddddddd/e/g; t e; b done
+    : e;  s/eeeeeeeeee/f/g; t f; b done
+    : f;  s/ffffffffff/g/g; t g; b done
+    : g;  s/gggggggggg/h/g; t h; b done
+    : h;  s/hhhhhhhhhh//g
+    : done
+
+    # convert back to numbers
+    : loop
+    /a/! s/[b-h]*/&0/
+    s/aaaaaaaaa/9/
+    s/aaaaaaaa/8/
+    s/aaaaaaa/7/
+    s/aaaaaa/6/
+    s/aaaaa/5/
+    s/aaaa/4/
+    s/aaa/3/
+    s/aa/2/
+    s/a/1/
+
+    # loop to do next digit
+    y/bcdefgh/abcdefg/
+    /[a-h]/ b loop
+    '
+
+------------------------------------------------------------------------------
+Reverse characters in a line
+
+  sed -e '
+     # skip lines with lest than two characters
+     /../! b
+
+     # Embed newlines at both ends
+     # then slowly meove markers toward middle
+     :x
+     s/\(\n.\)\(.*\)\(.\n\)/\3\2\1/
+     tx
+
+     # remove newline markers
+     s/\n//g
+     '
+
+-------------------------------------------------------------------------------
+
+
