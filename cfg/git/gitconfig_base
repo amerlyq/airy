@@ -105,7 +105,7 @@
     le = log --oneline --decorate
 
     lfd = log --graph --all --follow --stat --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(bold white)— %an%C(reset)' --abbrev-commit  #add -p if needed
-    lnew = git log @{1}..  #FULL: git log currentbranch@{1}..currentbranch  # show only new commits after pull
+    lnew = log @{1}..  #FULL: git log currentbranch@{1}..currentbranch  # show only new commits after pull
         # where the @{1} notation means "the commit the branch pointed to just before it last got updated".
 #    puush = push --force
 

@@ -23,8 +23,8 @@ bindkey '^O' kill-word
 bindkey '^K' kill-line
 bindkey '^Z' backward-kill-line
 
-bindkey '^P' up-history
-bindkey '^N' down-history
+bindkey '^P' history-substring-search-up    #up-history
+bindkey '^N' history-substring-search-down  #down-history
 bindkey '^R' history-incremental-pattern-search-backward #history-incremental-search-backward
 # Prev command from history, depending on text till cursor #'\e[A','\e[B'
 bindkey '^P' up-line-or-search      #history-beginning-search-backward
@@ -33,7 +33,6 @@ bindkey '^N' down-line-or-search    #history-beginning-search-forward
 bindkey '^\' character-search               # <C-4>, <C-\>
 bindkey '^]' character-search-backward      # <C-5>, <C-]>
 bindkey '^_' undo
-bindkey '^Y' yank-last-arg
 
 bindkey -a '^R' history-incremental-search-backward
 bindkey ' ' magic-space # [Space] - do history expansion
@@ -47,6 +46,61 @@ bindkey '\C-x\C-e' edit-command-line
 # RANGER - fast in/out with keeping expression
 bindkey -s -M vicmd 's' '0d$is\np'
 
+# bindkey '^Y' yank-last-arg # No such func
+zle -N yank-current yank_current
+bindkey "^Y" yank-current
+function yank_current() {
+    if ! [ "$BUFFER" ]; then
+        BUFFER="$(fc -ln -1)"
+    fi
+    printf "$BUFFER" | xsel --input --clipboard
+}
+
+zle -N prepend-sudo prepend_sudo
+bindkey "^S" prepend-sudo
+function prepend_sudo() {
+    if ! [ "$BUFFER" ]; then
+        BUFFER="$(fc -ln -1)"
+    fi
+    if [ "$BUFFER" != "${BUFFER#'sudo '}" ]; then
+        BUFFER="${BUFFER#'sudo '}"
+    else
+        BUFFER="sudo $BUFFER"
+        CURSOR=$(($CURSOR+5))
+    fi
+}
+
+### ----------- Untested
+# autoload smart-insert-last-word
+# bindkey "\e." smart-insert-last-word-wrapper
+# bindkey "\e," smart-insert-prev-word
+# zle -N smart-insert-last-word-wrapper
+# zle -N smart-insert-prev-word
+# function smart-insert-last-word-wrapper() {
+#     _altdot_reset=1
+#     smart-insert-last-word
+# }
+# function smart-insert-prev-word() {
+#     if (( _altdot_reset )); then
+#         _altdot_histno=$HISTNO
+#         (( _altdot_line=-_ilw_count ))
+#         _altdot_reset=0
+#         _altdot_word=-2
+#     elif (( _altdot_histno != HISTNO || _ilw_cursor != $CURSOR )); then
+#         _altdot_histno=$HISTNO
+#         _altdot_word=-1
+#         _altdot_line=-1
+#     else
+#         _altdot_word=$((_altdot_word-1))
+#     fi
+#         smart-insert-last-word $_altdot_line $_altdot_word 1
+#     if [[ $? -gt 0 ]]; then
+#         _altdot_word=-1
+#         _altdot_line=$((_altdot_line-1))
+#         smart-insert-last-word $_altdot_line $_altdot_word 1
+#     fi
+# }
+### -----------
 
 
 # # VI MODE KEYBINDINGS (ins mode)

@@ -10,6 +10,11 @@ if [ $? -eq 1 ]; then exit 1; fi
 
 dst=~/.Xresources
 wbegin '!'
+case $1 in
+    dark)   wstr '#define Dark' ;;
+    light)  wstr '#define Light' ;;
+esac
+
 warr '#include ' '".urxvt/urxvtrc" ".urxvt/urxvt_keys" ".urxvt/urxvt_ext" ".Xrc/xtheme_solarized" ".Xrc/xtermrc" ".Xrc/xfontrc"'
 wstr "
 ! Too big fonts in X appears on '112' value after reboot. What to do?
