@@ -5,7 +5,7 @@
 # you can type "cd -" to return to the original directory.
 ranger_cdback() {
     tempfile='/tmp/ranger_chosendir'
-    /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+    ranger --choosedir="$tempfile" "${@:-$(pwd)}"
     test -f "$tempfile" &&
     if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
         cd -- "$(cat "$tempfile")"
