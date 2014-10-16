@@ -38,6 +38,7 @@ alias untarbz2='tar xvfj'
 alias agi='ag --ignore build --ignore libs '
 alias agc='ag -G "CMakeLists.txt|.*.cmake" '
 
+
 # Pathes
 alias .a='cd ~/aura/airy'
 alias .b='cd ~/aura/airy/bin'
@@ -89,6 +90,7 @@ alias mkdir='mkdir -pv'
 mkdcd() { mkdir -p "$@" && cd "$_"; }
 hex() { printf "%08lx\n" $(($@)); }
 dec() { printf "%ld\n" $(($@)); }
+fdd(){ dd if="$1" bs=1 skip=$((${3:-0})) count=$((${2:-0})) of="${1}-"; }
 
 # --- Git ---
 alias gtA='gita-all-dir '

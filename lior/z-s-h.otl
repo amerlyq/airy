@@ -1,0 +1,28 @@
+Globbing
+ http://zsh.sourceforge.net/Doc/Release/Expansion.html
+ http://www.cs.elte.hu/zsh-manual/zsh_6.html
+	Disable
+		noglob echo 2*3 | bc
+	Insert
+	| ls dir/*<TAB>  | All list into line (like ranger's %s~)
+	| ls **/foo<TAB> | Recursive in subdirs (instead find~!)
+	| ls (#a1)foobar | Approximate matching (correct no more then 1 differing,
+					 |	 missing or transposed characters)
+	Negate
+	| ls [^ab]*
+	| ls ^foo
+	| ^(foo|bar)
+	Qualifiers
+	| ls foo/*(#q@)  | list all symbolic links inside the directory
+	 . for regular files, / for directories, @ for symbolic links, = for sockets and p for named pipes
+	 * for any executable files, r, w and x for owner readable, writable or executable files
+
+	 If the BARE_GLOB_QUAL option is set, you can use bare parentheses or
+	 otherwise use (#qfoo) where foo is the qualifier.
+
+Snippets
+	recursively match all normal files which have no uppercase characters or
+	numbers in the name, which are executable for the owner who must have the
+	UID 1002 but not for the rest of the world, have a file size above 30MB
+	and have been modified within the last month
+	; ls -l **/([^A-Z[:digit:]])##(#q.x^X^u1002Lm+30mM-1)

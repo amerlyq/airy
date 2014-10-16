@@ -212,7 +212,10 @@ class shell(Command):
         if command:
             if '%' in command:
                 command = self.fm.substitute_macros(command, escape=True)
-            self.fm.execute_command(command, flags=flags)
+
+            # Amer: fix to load aliases working from shell
+            self.fm.execute_command("bash -c 'source ~/.bash_aliases && " + command + "'", flags=flags)
+            # self.fm.execute_command(command, flags=flags)
 
     def tab(self):
         from ranger.ext.get_executables import get_executables

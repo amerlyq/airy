@@ -67,10 +67,9 @@ rep_autobuild() {
         sudo make install
     elif [ -f "$PR_DIR/setup.py" ]; then
         sudo python setup.py install
-    elif [ -f "$PR_DIR/Makefile" ]; then
+    elif [ -f "$PR_DIR/Makefile" ] || [ -f "$PR_DIR/makefile" ]; then
         cd "$PR_DIR"
-        make
-        sudo make install
+        make && sudo make install
     elif [ -f "$PR_DIR/configure.ac" ]; then
         autoreconf --install
         # ./autogen.sh
@@ -78,11 +77,21 @@ rep_autobuild() {
         mkdir -p "$BUILD_DIR"
         cd "$BUILD_DIR"
         ../configure
-        make
-        sudo make install
+        make && sudo make install
     else
         echo "Error: unsupported build system. Build manually."
     fi
+}
+
+wget_install() { # $1 - git rep, $2 - dir name
+    local PR_DIR NM=${1##*/} BUILD_DIR LINK="$1"
+    check_pkg_dir
+
+    wget_it "$LINK" "$NM"
+    cd "$CURR_DIR_PKG" && atool -x "$NM"
+
+    PR_DIR="$CURR_DIR_PKG/${NM%.tar.gz}"
+    rep_autobuild "$PR_DIR"
 }
 
 git_install() { # $1 - git rep, $2 - dir name

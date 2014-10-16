@@ -23,6 +23,9 @@ Count occurances in line
 	;s/pattern//gn
 	;!cat %| grep -c "pattern"
 
+Replace in block-wise
+	;%s/\%Vold/NEW/g
+
 Copy-paste lines by number
 	;8,15y | copy range 8-15 lines
 	;78t.  | duplicate line 78 and paste in current '.' line

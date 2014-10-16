@@ -49,6 +49,7 @@ bindkey -s -M vicmd 's' '0d$is\np'
 # bindkey '^Y' yank-last-arg # No such func
 zle -N yank-current yank_current
 bindkey "^Y" yank-current
+bindkey -a "^Y" yank-current
 function yank_current() {
     if ! [ "$BUFFER" ]; then
         BUFFER="$(fc -ln -1)"
