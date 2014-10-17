@@ -9,13 +9,14 @@ TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
 pause() { read -p "<======== Press ENTER to continue ========>" tmp; }
 
 # Executables
-if [ "$EXT" == 'sh' ] || [ "$TYPE" == 'text/x-shellscript' ]; then
-    "$PWD/$NM" && pause
+if [ "${TYPE:0:6}" == 'text/x' ]; then
+    "$PWD/$NM" && pause && exit
 fi
 
 # Processors
 case "$EXT" in
-    dot) dot -Tx11 "$NM" ;;
+    sh|py) "$PWD/$NM" && pause ;;
+      dot) dot -Tx11 "$NM"     ;;
 esac
 
 if [ $? -ne 0 ]; then pause; fi

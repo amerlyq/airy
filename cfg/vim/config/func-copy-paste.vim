@@ -9,9 +9,11 @@ function! CountCopyLines(msg)
 endfunction
 
 nnoremap <C-y> :let @+=@" \| :call CountCopyLines('Push:')<CR>
-cnoremap <C-y> :call setreg('+', getreg(':')) \| :call CountCopyLines('Push:')<CR><CR>
+cnoremap <C-y> <C-U>exec 'call setreg(''+'', getreg('':'')) \| call CountCopyLines(''Push:'')<CR>'<CR>
 vnoremap <C-y> "+y \| :call CountCopyLines('Push:')<CR>
-noremap  <C-p> :let @"=@+ \| :call CountCopyLines('Pull:') <CR>
+nnoremap <C-p> :let @"=@+ \| :call CountCopyLines('Pull:') <CR>
+cnoremap <C-p> <C-U>exec 'call setreg('':'', getreg('':'') . getreg(''+'')) \| call CountCopyLines(''Pull:'')<CR>'<CR>
+vnoremap <C-p> :call CountCopyLines('Pull:') \| "+p <CR>
 " Swap registry
 noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 

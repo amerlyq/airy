@@ -35,8 +35,6 @@ alias w3m='w3m google.com'
 alias targz='tar -cvfz' # arch.tar.gz ./
 alias untargz='tar xvfz'
 alias untarbz2='tar xvfj'
-alias agi='ag --ignore build --ignore libs '
-alias agc='ag -G "CMakeLists.txt|.*.cmake" '
 
 
 # Pathes
@@ -90,7 +88,9 @@ alias mkdir='mkdir -pv'
 mkdcd() { mkdir -p "$@" && cd "$_"; }
 hex() { printf "%08lx\n" $(($@)); }
 dec() { printf "%ld\n" $(($@)); }
-fdd(){ dd if="$1" bs=1 skip=$((${3:-0})) count=$((${2:-0})) of="${1}-"; }
+fdd() { dd if="$1" bs=1 skip=$((${3:-0})) count=$((${2:-0})) of="${1}-"; }
+agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
+agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
 
 # --- Git ---
 alias gtA='gita-all-dir '

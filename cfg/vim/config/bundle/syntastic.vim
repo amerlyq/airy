@@ -21,7 +21,7 @@ let g:syntastic_filetype_map = { 'latex': 'tex',
 " let g:syntastic_cpp_remove_include_errors = 1
 " let g:syntastic_cpp_config_file = '.clang_complete'
 
-let b:syntastic_c_cflags = '-I/usr/include/ImageMagick'
+" let b:syntastic_c_cflags = '-I/usr/include/ImageMagick'
 
 let g:syntastic_cpp_compiler = 'g++'
 let g:syntastic_cpp_check_header = 0
