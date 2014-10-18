@@ -15,7 +15,9 @@ if [ -z "$choice" ]; then
     choice=$( find . -maxdepth 1 -type d -exec basename {} \; | $DMENU)
 fi
 
-dst="$pd/$choice"
-mkdir -p "$dst"
-mv -i -v -b "$fl" --target-directory="$dst/"
-mpc del 0
+if [ -n "$choice" ]; then
+    dst="$pd/$choice"
+    mkdir -p "$dst"
+    mv -i -v -b "$fl" --target-directory="$dst/"
+    mpc del 0
+fi

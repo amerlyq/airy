@@ -1,7 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 track=$( mpc status | sed -n 'N;s/^\(.*\)\n\[.*\]\s*\S*\s*\(\S*\)\s*.*/(\2) \1/p' )
 mode=$( mpc status | sed -n '2s/^\[\(.*\)\].*/\1/p' )
+
+declare $( printf "$track" | sed 's/^(\([0-9:]*\)\/\([0-9:]*\)) .*/curr=\1 length=\2/g')
+remain=$(( `date +%s -d "0:$length"` - `date +%s -d "0:$curr"` ))
 
 toggle() {
     if [ "$mode" != "paused" ]; then
@@ -32,6 +35,10 @@ case "$mode" in
     paused)  prefix='∥'; color='#4444FF' ;;
     *) ;;
 esac
+
+if [ "$mode" == "playing" ] && [ $remain -le 20 ] && [ $remain -gt 15 ]
+then notify-send --urgency normal --expire-time=1000 -h int:x:500 -h int:y:500 '<b>Music</b> <i>category</i>' '<a href=a.html>You have 15s to choose</a>'
+fi
 
 printf "$track $prefix\n$track\n$color\n"
 

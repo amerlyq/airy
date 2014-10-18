@@ -1,0 +1,24 @@
+Check for graphviz bindings:
+	https://github.com/pygraphviz/pygraphviz
+
+Argument parsing
+	https://docs.python.org/3/library/argparse.html#module-argparse
+	https://www.udemy.com/blog/python-command-line-arguments/
+Flatten list
+	list(itertools.chain.from_iterable(lst))
+Formatting output
+	http://www.python-course.eu/python3_formatted_output.php
+
+Snippets
+	return (self.x ** 2 + self.y ** 2) ** 0.5
+	map(lambda x, y: x * (y if y is not None else 1), *sorted([a, b], key=lambda x: len(x), reverse=True))
+	; def __hash__(self):  (P.S. only integers)
+	; USE: hash(el)
+	results += 'Dir: %s\n' % os.path.join(root, name)
+
+Compiling
+ Adding to Bryan's answer, if you simply want to compile a file or a bunch of
+ files from a terminal, the py_compile module can be executed as a script in
+ the following manner:
+	python -m py_compile fileA.py fileB.py fileC.py
+
