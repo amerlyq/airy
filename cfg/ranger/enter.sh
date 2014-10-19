@@ -13,6 +13,10 @@ if [ "${TYPE:0:6}" == 'text/x' ]; then
     "$PWD/$NM" && pause && exit
 fi
 
+if [ "${TYPE:0:13}" == 'application/x' ]; then
+    "$PWD/$NM" && exit
+fi
+
 # Processors
 case "$EXT" in
     sh|py) "$PWD/$NM" && pause ;;

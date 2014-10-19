@@ -26,6 +26,13 @@ section: screens
         # xtestIsXineramaUnaware = false
         # switchCorners = none +top-left +top-right +bottom-left +bottom-right
         # switchCornerSize = 0
+    $LOCAL_KHT:
+        # halfDuplexCapsLock = false
+        # halfDuplexNumLock = false
+        # halfDuplexScrollLock = false
+        # xtestIsXineramaUnaware = false
+        # switchCorners = none +top-left +top-right +bottom-left +bottom-right
+        # switchCornerSize = 0
 end
 
 section: aliases
@@ -33,13 +40,18 @@ section: aliases
         $LOCAL_SIP
     $LOCAL_HHT:
         $LOCAL_HIP
+    $LOCAL_KHT:
+        $LOCAL_KIP
 end
 
 section: links
     $LOCAL_SHT:
         up = $LOCAL_HHT
+        right = $LOCAL_KHT
     $LOCAL_HHT:
         down = $LOCAL_SHT
+    $LOCAL_KHT:
+        left = $LOCAL_SHT
 end
 
 section: options
