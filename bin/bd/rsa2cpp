@@ -1,0 +1,37 @@
+#!/bin/bash
+
+KEY=~/.ssh/id_rsa
+
+openssl rsa -text -in "$KEY" \
+| sed '/^\(\S\+\):/s//\n\0/' \
+| sed '/^modulus:/,/BEGIN.*KEY/!d' \
+| sed -n "
+/^$/ be;
+$ be
+/^\(\S\+\):/{ s//uint8_t \1[] =/; p;n; }
+H; b
+:e
+x; i\
+{
+    s/\n\|\s//g
+    s/\([^:]\{2\}:\?\)\{1,12\}/    \0\n/g
+    s/[0-9a-f]\{2\}/0x\0/g
+    s/:/, /g
+    s/$/};\n/g
+p
+" | sed "
+    s/modulus/N/
+    s/publicExponent/E/
+    s/privateExponent/R/
+    s/prime1/P/
+    s/prime2/Q/
+    s/exponent1/PR/
+    s/exponent2/PQ/
+    s/coefficient/CE/
+" | sed "
+/^uint8_t\s\+\(\S\+\)\[\s*\].*/{ h; s//\1/; x }
+/^};/ {
+    p; x;
+    s/.*/uint32_t \0_sz = sizeof(\0);/
+}
+"
