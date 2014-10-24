@@ -8,6 +8,11 @@ if [ "$1" == 'l' ]; then
     ls --color=auto /media/$CURR_USER; exit
 fi
 
+if [ "$1" == 's' ]; then
+    mkdir -p ~/seclab
+    sudo mount -t cifs -o user=${WORK_MAIL%@*} //seclab.surc.kiev.ua/Exchange ~/seclab
+fi
+
 for lbl in $LABELS; do
     if [ -L "/dev/disk/by-label/$lbl" ]; then
         if [[ "$ACTION" == "u" ]] && [ -d "/media/$CURR_USER/$lbl" ]; then

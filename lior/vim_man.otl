@@ -10,6 +10,9 @@ Search
 	| s::\=@0:g   | Subs last by previously yanked (Map it?)
 	| <C-L>       | Clear results highlight
 	| <Leader>th  | Toggle highlighting
+	| /\v^start\_.{-1,}end$/  | search non-greedy multiline block
+	| g/\vstart\_.{-1,}end$/> | indent block's first line
+	| g/^{/.,/}/> | right indent!
 	:nnoremap <C-L> :noh<cr><C-L>
 
 Diff

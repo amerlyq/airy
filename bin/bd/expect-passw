@@ -1,0 +1,8 @@
+#!/bin/bash
+expect -c "
+spawn openssl rsa -in ./sign.key -out ./dec.key
+expect {
+    -re \"^Enter pass.*\" { send \"mypass\r\"; interact }
+}
+"
+

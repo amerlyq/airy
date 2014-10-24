@@ -39,6 +39,7 @@ Log
 	lg = log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'\n--abbrev-commit --date=relative
 	git help log
 		git diff --cached  | diff with staged changes
+		git diff --binary  | create diff with patch
 		git diff -U file   | give you a unified diff
 		git show HEAD      | changes inside last commit
 		git blame filename | last author for each text line
