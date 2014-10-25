@@ -12,7 +12,7 @@ function! CompileInDir(...)
     exec 'make -C' . l:bdir
     " set makeprg=ruby\ -c\ %
   elseif filereadable(l:dir . '/compile')
-    exec l:run . 'cd ' . l:dir . ' && ./compile'
+    exec l:run . 'cd ' . l:dir . ' && ./compile || read tmp'
   elseif &filetype =~ 'sh'
     exec l:run . './% && read tmp'
   else

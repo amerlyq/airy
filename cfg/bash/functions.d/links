@@ -1,0 +1,78 @@
+# vim: ft=sh
+
+# ====================== Backuping configs ====================
+
+safeLinkRemove() {
+    #!!! To remove a directory symlink in Win7 you should only use 'rmdir' (both in CMD and MSYS).
+    # The 'del' and 'rm -rf' command in CMD will delete all your files in the source directory!!!
+    # http://superuser.com/questions/167076/how-can-i-delete-a-symbolic-link
+    if [ -d "$1" ]; then
+        if [ $CURR_PLTF == "MINGW" ]; then
+            rmdir "$1"
+        elif [ -L "$1" ]; then
+            rm -f "$1"
+        else
+            echo "This dir isn't symlink"
+        fi
+    else
+        rm -f "$1"
+    fi
+}
+export -f safeLinkRemove
+
+makeDstBackup()
+{
+    local dst="$2" dsttmp="${dst}.bak_"
+    if [ -z "$1" ]; then echo "Error: empty 'remove_function"; squit; fi
+    # TODO: !!! Поломанные симлинки на винде из-под mingw НИКАК не определяются !!!
+    # тоесть все имеющиеся флаги проверки на существование файла, симлинка или чего угодно тупо не работают
+    # Надо всё-таки проверить всё и поробовать найти хоть что-то
+    if [ -e "${dst}" ]; then
+        [ -e "${dsttmp}" ] && $1 ${dsttmp}
+        mv -- "${dst}" "${dsttmp}"
+    fi
+}
+export -f makeDstBackup
+
+removeDstDublicate()
+{ # $1 -- rm, 'rm -Rf' or safeLinkRemove
+    local dst="$2" dstbak="$2.bak" dsttmp="$2.bak_"
+    if [ -z "$1" ]; then echo "Error: empty 'remove_function"; squit; fi
+    if [ -e "${dsttmp}" ]; then
+        # this only for unix: $(stat -c "%d.%i" -L ${dstbak}_)
+        # however, it seems don't work for dangling links (in nowere)
+        # readlink as variant:  test $(readlink -f a) = $(readlink -f b)
+        #
+        # TODO: cmp dont work with directories; need smth else...
+        # however, it seems to work on mingw under windows
+        if diff -rq "${dst}" "${dsttmp}" ; then
+            $1 "${dsttmp}"
+        else
+            $1 "${dstbak}"
+            mv -v -- "${dsttmp}" "${dstbak}"
+        fi
+    fi
+}
+export -f removeDstDublicate
+
+pairLink()
+{
+    local dst src ltp
+    dst=$(win2unix "$1")
+    src=$(win2unix "$2")
+
+    [ ! -e "${dst%/*}" ] && mkdir -p  "${dst%/*}"
+    makeDstBackup safeLinkRemove "$dst"
+
+    if [ "$CURR_PLTF" == "MINGW" ]; then
+        [ -d "${src}" ] && ltp="//D"     # /D - directory, default - file
+        # Use /c: //c -- only for 'git bash'
+        # http://stackoverflow.com/questions/21357813/weirdness-when-running-cmd-exe-c-under-git-bash
+        cmd //c mklink $ltp "$(unix2win "$1")" "$(unix2win "$2")"
+        #: mklink /D где_будет_лежать_ссылка  куда_ссылаться
+    else
+        ln -sfv "${src}" "${dst}"
+    fi
+    removeDstDublicate safeLinkRemove "$dst"
+}
+export -f pairLink

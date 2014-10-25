@@ -2,7 +2,7 @@
 
 source ~/.bash_export
 if [ $? -eq 1 ]; then exit 1; fi
-source ~/.bash_functions
+source ~/.bash/functions
 if [ $? -eq 1 ]; then exit 1; fi
 
 
@@ -21,7 +21,7 @@ if [ "$CURR_HOST" != "vbox" ]; then
 wstr "
 ## Set startup volume and LCD brightness
 #pactl set-sink-volume 0 '20%' &
-xbacklight -set 30 &
+xbacklight -set 50 &
 
 ## DPMS monitor setting (standby -> suspend -> off) (seconds)
 "

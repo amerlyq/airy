@@ -96,9 +96,6 @@ DEFAULT_USER="$CURR_USER"
 source "$ZSH_CUSTOM/lib/amer-key-mix.zsh"
 
 
-note() { echo "{ notify-send --urgency normal --expire-time=10000 -i typing-monitor -h int:x:500 -h int:y:500 'Alarm' 'GO and DO this'; beep }" | at now + $1 minutes; }
-# at 18:30
-
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
@@ -110,7 +107,7 @@ note() { echo "{ notify-send --urgency normal --expire-time=10000 -i typing-moni
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 # if it will print out, you can do 1&> /dev/null
-if [ -f ~/.bash_aliases ]; then source ~/.bash_aliases ; fi
+if [ -f ~/.bash/aliases ]; then source ~/.bash/aliases ; fi
 
 # MPogoda's
 alias -s {avi,mpeg,mpg,mov,mkv}=mpv

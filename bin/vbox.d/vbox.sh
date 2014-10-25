@@ -1,5 +1,5 @@
 source ~/.bash_export
-source ~/.bash_functions
+source ~/.bash/functions
 amScriptDir
 # sudo apt-get install openssh-server
 PATH="/c/Program Files/Oracle/VirtualBox:$PATH"

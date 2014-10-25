@@ -1,0 +1,34 @@
+#!/bin/bash
+
+alias su='sudo -i'
+alias root='sudo -i'
+
+# ALT: sudo vbetool dpms [on/off]
+alias off='xset -d :0 dpms force off'
+alias reswap='sudo swapoff -a && sudo swapon -a'
+alias powertop='sudo powertop' # --calibrate
+alias reboot='sudo /sbin/reboot'
+alias poweroff='sudo /sbin/poweroff'
+alias halt='sudo /sbin/halt'
+alias shutdown='sudo /sbin/shutdown'
+
+
+# --- Shorts ---
+alias apt-get='sudo apt-get'
+alias dpkg='sudo dpkg'
+alias updatey='sudo apt-get --yes'
+alias update='sudo apt-get update && sudo apt-get upgrade'
+alias pkill='sudo pkill '
+#alias update='yum update'
+#alias updatey='yum -y update'
+
+
+# --- Insurance ---
+alias mv='mv -i'
+alias cp='cp -iv'
+alias ln='ln -i'
+alias rm='rm -Iv --preserve-root'
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
+

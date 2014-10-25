@@ -1,5 +1,5 @@
 #!/bin/bash
-source ~/.bash_functions
+source ~/.bash/functions
 amScriptDir -s
 if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
 
@@ -16,7 +16,7 @@ lnLst()
 if [ "$CURR_PLTF" == "Linux" ]
 then
     lnLst ~/. "" "bash i3 urxvt Xrc"
-    lnLst ~/. bash/ "inputrc profile bashrc bash_aliases bash_prompt bash_functions tmux.conf zsh/zshrc"
+    lnLst ~/. bash/ "inputrc profile bashrc bash_prompt tmux.conf zsh/zshrc"
     lnLst ~/. "" "vim vim/vimrc vim/ycm_extra_conf.py"
     lnLst ~/.config/ "" "ranger mcomix sxiv"
     lnLst ~/.mpv/ mpv/ "config input.conf"

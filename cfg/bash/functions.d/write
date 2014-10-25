@@ -1,0 +1,58 @@
+# vim: ft=sh
+
+# ====================== Writing configs ======================
+
+wbegin(){
+    if [ -L $dst ]; then rm $dst; fi
+    echo "${1}#% AutoGen by '${0}'. Do NOT touch! %#" > $dst
+}
+export -f wbegin
+
+wbegin_prepend(){
+    echo "$1" > $dst
+    wbegin
+}
+export -f wbegin_prepend
+
+wstr(){ echo "$1" >> $dst; }
+export -f wstr
+
+wprf(){ printf "$*" >> $dst; }
+export -f wprf
+
+wcat(){ cat "$1" >> $dst; }
+export -f wcat
+
+wgroup(){ if ! [ `cat $dst | grep -c "$1"` ]; then
+    wstr "$1"; wstr "$2"; fi }
+export -f wgroup
+
+warr(){ for line in $2; do wstr "$1 $line"; done; wstr ""; }
+export -f warr
+
+#if [  -z "$3" ]; then num=${#key[*]}; else
+#num=$((${#key[*]} < ${#lst[*]} ? ${#key[*]} : ${#lst[*]}));fi
+wlistf(){
+    local i key num lst
+    key=( $2 ); num=${#key[*]}; lst=( $3 );
+    for (( i=0; i<$num; i++ )); do
+        printf "$1\n" "${key[i]}" \
+        "$([ $# -eq 3 ] && echo ${lst[i]} || echo ${*:i+3:1})" \
+        >> $dst
+    done
+}
+export -f wlistf
+
+# printf   "%1 text %1 text %2" for info duplication
+wlistp(){
+    local i key num lst str var
+    key=( $2 ); lst=( $3 );
+    num=$(( ${#key[*]} < ${#lst[*]} ? ${#key[*]} : ${#lst[*]} ))
+    for (( i=0; i<$num; i++ )); do
+        [ $# -eq 3 ] && var="${lst[i]}" || var="${*:i+3:1}"
+        str=${1//"%1"/"${key[i]}"}
+        str=${str//"%2"/"$var"}
+        printf "${str}\n" >> $dst
+    done
+}
+export -f wlistp

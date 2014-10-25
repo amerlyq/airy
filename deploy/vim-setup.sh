@@ -1,7 +1,7 @@
 #!/bin/bash
 # See: vimregex.com
 
-source "$HOME/.bash_functions"
+source "$HOME/.bash/functions"
 FONT_DIR="$HOME/.vim/res/powerline-fonts"
 FONT_USE="DejaVuSansMono"
 

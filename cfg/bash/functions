@@ -1,0 +1,11 @@
+# vim: ft=sh
+source ~/.bash_export
+
+DIR=~/.bash/functions.d
+FLES=(system links git write)
+
+if [ -d "$DIR" ]; then
+    for fl in ${FLES[@]}; do
+        source "$DIR/$fl"
+    done
+fi

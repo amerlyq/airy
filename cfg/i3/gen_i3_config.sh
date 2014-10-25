@@ -4,7 +4,7 @@
 # In generator -- bind colors to $vars, so you can change color themes consistently
 # In generation process by specifying one var you could change themes between light and dark
 
-source ~/.bash_functions
+source ~/.bash/functions
 if [ -z "$1" ]; then
     thm_nm=grass
 elif [ "$1" == "-l" ]; then

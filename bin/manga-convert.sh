@@ -5,7 +5,7 @@
 
 source ~/.bash_export
 [ $? -ne 0 ] && exit
-source ~/.bash_functions
+source ~/.bash/functions
 [ $? -ne 0 ] && exit
 
 if [ "$CURR_PLTF" == "MINGW" ]; then

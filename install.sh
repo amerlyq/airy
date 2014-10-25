@@ -5,9 +5,9 @@
 # cd to this script dir and launch by $ exec ./script_name
 
 # ============= Helper to load neccessary functions =============
-source ~/.bash_functions 2&> /dev/null
+source ~/.bash/functions 2&> /dev/null
 if [ $? -eq 1 ]; then
-    source ./cfg/bash/bash_functions
+    source ./cfg/bash/bash/functions
     if [ $? -eq 1 ]; then
         echo "First launch you must do from this script's directory ONLY!"
         [[$PS1]]&&return||exit 1;
@@ -15,8 +15,8 @@ if [ $? -eq 1 ]; then
 fi
 
 # Create link for other child scripts to work
-if [ ! -f ~/.bash_functions ]; then
-    pairLink ~/.bash_functions "$SCRIPT_DIR/cfg/bash/bash_functions"
+if [ ! -f ~/.bash/functions ]; then
+    pairLink ~/.bash/functions "$SCRIPT_DIR/cfg/bash/bash/functions"
 fi
 
 # ====================== Install type ===========================

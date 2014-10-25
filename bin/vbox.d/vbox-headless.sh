@@ -1,4 +1,4 @@
-source ~/.bash_functions
+source ~/.bash/functions
 
 PATH="/c/Program Files/Oracle/VirtualBox:$PATH"
 

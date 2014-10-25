@@ -1,0 +1,16 @@
+#!/bin/bash
+
+alias wakeupnas01='/usr/bin/wakeonlan 00:11:32:11:15:FC'
+alias wakeupnas02='/usr/bin/wakeonlan 00:11:32:11:15:FD'
+alias wakeupnas03='/usr/bin/wakeonlan 00:11:32:11:15:FE'
+
+alias ipt='sudo /sbin/iptables'
+alias iptlist='sudo /sbin/iptables -L -n -v --line-numbers'
+alias iptlistin='sudo /sbin/iptables -L INPUT -n -v --line-numbers'
+alias iptlistout='sudo /sbin/iptables -L OUTPUT -n -v --line-numbers'
+alias iptlistfw='sudo /sbin/iptables -L FORWORD -n -v --line-numbers'
+
+alias firewall=iptlist
+alias header='curl -I'
+alias headerc='curl -I --compress'
+

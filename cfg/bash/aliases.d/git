@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# --- Git ---
+alias gtA='gita-all-dir '
+alias gtP='gita-all-dir pull'
+
+alias gt='git status && git stash list | cat'
+alias gl='git pull --verbose'
+alias glu='git stash && git pull --verbose && git stash pop'
+alias glg='git lg2'
+alias gsh='git push'
+#alias ga='git add '
+alias gaa='git add --all '
+alias gcm='git commit -m '
+alias gca='git commit -am '
+alias gmm='git commit --amend '
+alias gco='git checkout '
+#alias gb='git branch '
+alias gdf='git diff'
+alias gk='gitk --all&'
+alias gmy="git ls --author=\"\$(git config user.name) \""
+alias gff='git rev-list --all | xargs git grep '
+alias gsw='git show'
+# git grep -l --all-match -e <regexp1> # To search files with line
+# git log -G Foo --since=2009.1.1 --until=2010.1.1 -- path_containing_change # To search commits changing line

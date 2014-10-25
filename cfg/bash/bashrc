@@ -36,38 +36,14 @@ stty -ixon
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
 # Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
-if [ -f ~/.bash_prompt  ]; then . ~/.bash_prompt  ; fi
-if [ -f ~/.bash_aliases ]; then . ~/.bash_aliases ; fi
-if [ -f ~/.bash_export  ]; then . ~/.bash_export  ; fi
-if [ -f ~/.bash_functions ]; then . ~/.bash_functions  ; fi
-
-# See: https://wiki.archlinux.org/index.php/Man#Colored_man_pages
-#if [ -f ~/.vim/bundle/vimpager/vimpager ]; then
-#    export PAGER=~/.vim/bundle/vimpager/vimpager
-#    alias less=$PAGER
-#    alias zless=$PAGER
-#else
-    export PAGER=less
-    man() {
-        env LESS_TERMCAP_mb=$'\E[01;31m' \
-        LESS_TERMCAP_md=$'\E[01;38;5;74m' \
-        LESS_TERMCAP_me=$'\E[0m' \
-        LESS_TERMCAP_se=$'\E[0m' \
-        LESS_TERMCAP_so=$'\E[38;5;246m' \
-        LESS_TERMCAP_ue=$'\E[0m' \
-        LESS_TERMCAP_us=$'\E[04;38;5;146m' \
-        man "$@"
-    }
-#fi
+include() { if [ -f "$1" ]; then source "$1"; fi; }
+include ~/.bash_prompt
+include ~/.bash_export
+include ~/.bash/aliases
+include ~/.bash/functions
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile

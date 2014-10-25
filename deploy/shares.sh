@@ -2,7 +2,7 @@
 # Gen: /etc/rc.local
 # vim: sw=2
 
-source ~/.bash_functions
+source ~/.bash/functions
 
 # Add option to pre-create folders as normal user
 #   (so you can create your own folders and files inside them)

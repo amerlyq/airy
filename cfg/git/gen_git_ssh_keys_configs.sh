@@ -2,7 +2,7 @@
 # Gen: ssh-keys, .ssh/config, .gitconfig
 # Arg: all-new -- for re-generating rsa-pairs
 
-source ~/.bash_functions
+source ~/.bash/functions
 amScriptDir -s
 if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
 

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# --- Modify ---
+# YCM won't load on startup
+# DONT WORK. WHY?
+# It can be simpler to do restarting of vim from inside by combo leader-F12
+# let g:...
+# source $MYVIMRC
+alias vi='\vim -u ~/.vim/vimrc_basic'
+#alias vim='\vim --cmd "let g:loaded_youcompleteme = 1"'
+#alias ycm='\vim --cmd "let g:loaded_youcompleteme = 0"'
+alias vimsyn='vim --servername synctex'
+alias s='source ranger-auto; if [ $? -eq 2 ]; then exit; fi'
+alias w3m='w3m google.com'
+alias targz='tar -cvfz' # arch.tar.gz ./
+alias untargz='tar xvfz'
+alias untarbz2='tar xvfj'
+
+alias mount='mount |column -t'
+alias mountl='sudo fdisk -l'
+# echo "alias firefox='nohup firefox &>/dev/null'" >> /etc/commonrc
+
+
+# --- Search ---
+# grep -Ri 'name' . # find in all files
+alias f="find ./ | grep -i"
+alias ff='find ./ -type f -name'
+agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
+agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
+
+# old=$1, new=$2 -r | recursively  # -l | print filenames
+sed_dir() { grep -rl "$1" ./* | xargs sed -i "s@$1@$2@g"; }

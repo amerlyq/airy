@@ -1,0 +1,22 @@
+# vim: ft=sh
+
+# After this script you must specify 'ghub' entry in ~/.ssh/config
+# In other case you will not be able to pull this repo
+# git remote show origin | grep "Push *URL" | sed "s@.*:.*:\(.*\$\)@\1@"
+git_local_credentials() {
+    REP_PATH=`git config --get remote.origin.url | sed '{s@.*git\(.*\)\.com/@g\1:@}'`
+
+    if [ -z "$REP_PATH" ]; then
+        echo "Error: not a git directory or etc '`pwd`'"
+    else
+        git remote set-url origin "$REP_PATH"
+        echo "C: git remote url -> $REP_PATH"
+    fi
+
+    if [ "$CURR_PROF" == "work" ]; then
+        git config --local user.name "$MAIN_NAME"
+        git config --local user.email "$MAIN_MAIL"
+        echo "C: git local {name, email} : {$MAIN_NAME, $MAIN_MAIL}"
+    fi
+}
+export -f git_local_credentials

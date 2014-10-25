@@ -1,0 +1,19 @@
+#!/bin/bash
+# Don't launch, source only!
+
+DIR=~/.bash/aliases.d
+FLES=(colored special pathes git std funcs system info others)
+
+if [ -d "$DIR" ]; then
+    for fl in ${FLES[@]}; do
+        source "$DIR/$fl"
+    done
+fi
+
+
+## Inspired by Vivek Gite <vivek@nixcraft.com>
+## http://www.cyberciti.biz/tips/linux-unix-osx-bash-shell-aliases.html
+
+# See also one-liners for system commands usage:
+# http://ubuntism.ru/terminal-commands-for-linux/
+
