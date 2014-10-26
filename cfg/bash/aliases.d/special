@@ -22,9 +22,9 @@ alias mountl='sudo fdisk -l'
 
 
 # --- Search ---
+alias f='find ./ -type f -name '
 # grep -Ri 'name' . # find in all files
-alias f="find ./ | grep -i"
-alias ff='find ./ -type f -name'
+alias ff='find ./ | grep -i '
 agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
 agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
 

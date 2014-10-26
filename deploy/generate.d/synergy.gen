@@ -50,8 +50,10 @@ section: links
         right = $LOCAL_KHT
     $LOCAL_HHT:
         down = $LOCAL_SHT
+        up = $LOCAL_SHT
     $LOCAL_KHT:
         left = $LOCAL_SHT
+        up = $LOCAL_SHT
 end
 
 section: options
@@ -67,6 +69,7 @@ section: options
     # My KVM uses Scroll Lock to switch screens, so set the
     # hotkey to lock the cursor to the screen to something else
     # keystroke(f12) = lockCursorToScreen(toggle)
+    keystroke(Super+minus) = switchInDirection(up)
 end
 "
 
