@@ -103,6 +103,21 @@ Watchpoints
  Вот теперь просто привязываем к ней.
 	(gdb) tty /dev/pts/3
 
+RE
+	Dump in Intel format
+	; set disassembly-flavor intel
+	; disas
+	Show
+	| x/10w           | Stack -- 10 elems of 4 bytes with addresses
+	| x/10g $rsp	  | Stack -- 8 bytes words (giantic)
+	| x/5i 0x0804844a | Disasm memory of stack by address
+	| x/s  0x080484f0 | String by address
+	| x/s  $rdi		  | dump string by address from register
+	| info registers  |
+	| disas 0x0000000000400576 |
+	| ni |
+	| info float
+
 Замена в памяти переменных на стёке, переданных в функцию
 	 Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
 	 x/i $eip 0x4006d585 <_IO_puts+21>: mov 0x8(%ebp),%esi
