@@ -1,10 +1,16 @@
 #!/bin/bash
 
-# 1..5..inf stars as quality, or name for dir for grouping, or dir/subdir tag
-choice=${1}
-
 dir=~/media/Music
 pd="$dir/++"
+
+if [ "$1" == "-l" ]; then
+    ls "$pd"
+    shift
+    exit
+fi
+
+# 1..5..inf stars as quality, or name for dir for grouping, or dir/subdir tag
+choice=${1}
 
 fl="$dir/`mpc -f '%file%' | sed '1q'`"
 

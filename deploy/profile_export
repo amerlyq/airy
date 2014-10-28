@@ -3,7 +3,7 @@
 source ~/.bash/functions
 amScriptDir -s
 # Search for profile in $1/ dir or in $1/../ dir
-PROFILES_DIR=$([ -z "$1" ] && echo "$SCRIPT_DIR" || echo "$1")
+PROFILES_DIR=${1:-$SCRIPT_DIR}
 ROOT_PROF=$PROFILES_DIR/$([ -z "$2" ] && echo "guest" || echo "$2").profile
 [ ! -f "$ROOT_PROF" ] && ROOT_PROF="${PROFILES_DIR%/*}/${ROOT_PROF##*/}"
 [ ! -f "$ROOT_PROF" ] && ROOT_PROF="${SCRIPT_DIR}/${ROOT_PROF##*/}"
@@ -17,9 +17,9 @@ wxopt() {
     KEY="export ${1?'No var name!'}"
     VAL="${2?'No var value!'}"
 
-    if [ "$4" == "APPEND" ];
-    then SED_EXP="s|\($KEY=.*\)|\1:$VAL|g" # Append value by :
-    else SED_EXP="s|\($KEY=\).*|\1$VAL|g"  # Replace value
+    if [ -n "$4" ];
+    then SED_EXP="s|\($KEY=.*\)|\1${4}${VAL}|g" # Append value by $4 sep
+    else SED_EXP="s|\($KEY=\).*|\1${VAL}|g"  # Replace value
     fi
 
     case `cat $dst | grep -c "$KEY="` in
@@ -41,7 +41,7 @@ export_profile(){
 }
 
 integrate_profile() {
-    local EXP_GROUP PARENT_PROF="$1"
+    local EXP_GROUP PARENT_PROF="$1" nm val
     while read line; do
         # Read group name, grep -qc
         if echo $line | grep -q "^ *\#\#\#\ .*\ \#\#\#"
@@ -54,12 +54,17 @@ integrate_profile() {
                 export_profile "$IM_PROF"
             fi
         # Work with separate options
-        elif echo $line | grep -q "^ *\w*=.*"
+        elif echo $line | grep -q "^ *\w*+\?=.*"
         then # Replace existing option or add new
             #echo \'${line%=*}\' "->" \'${line##*=}\'
-            if [ "${line%=*}" == "PATH" ]
-            then wxopt "${line%=*}" "${line##*=}" "$EXP_GROUP" 'APPEND'
-            else wxopt "${line%=*}" "${line##*=}" "$EXP_GROUP"
+            nm="$(echo ${line} | sed 's/\(\s*\w\+\)+\?=.*/\1/')"
+            val="$(echo ${line} | sed 's/.*+\?=\(.*\)/\1/')"
+
+            if [ "$nm" == "PATH" ]
+            then wxopt "$nm" "$val" "$EXP_GROUP" ':'
+            elif [ "${line/+=}" != "${line}" ]
+            then wxopt "$nm" "$val" "$EXP_GROUP" '" "'
+            else wxopt "$nm" "$val" "$EXP_GROUP"
             fi
             if [ $? -eq 2 ]; then EXP_GROUP=""; fi
         fi
