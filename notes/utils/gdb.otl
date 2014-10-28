@@ -6,9 +6,27 @@ Cool man
 
 	Very cool, very many. Read them all!
 	* http://beej.us/guide/
+Book & Man
+	http://www.cs.rit.edu/~csci243/resources/gdb.pdf
+
 Ref
 	https://sourceware.org/gdb/current/onlinedocs/gdb/
 	http://www.gnu.org/software/gdb/documentation/
+
+Extending
+	Composition, Python, Aliases
+	 http://www.univ-orleans.fr/sciences/info/ressources/webada/doc/gnat/gdb_24.html
+
+<incomplete type>
+	Run it in gdb and try to 'print *str' and you'll get an 'incomplete type'
+	 response. However, try 'disassemble get_string' and then 'print *str' and
+	 it'll display the struct and values properly. I have no idea why this
+	 works, but it does.
+	However, works only for pointers; not for stringstreams.
+	 For them you need libstdc++6.4.8-dbg
+	Or to use the libstdc++ debug mode, compile your application with the
+	compiler flag -D_GLIBCXX_DEBUG as all other libs you need.
+	 https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html#debug_mode.using.mode
 
 GUI
 	gdb -tui ./pr
@@ -130,6 +148,10 @@ RE
 	| disas 0x0000000000400576 |
 	| ni |
 	| info float
+
+STL debug of stringstreams, etc
+	I got what I needed by recompiling everything (not just one or two
+	translation units) with -D_GLIBCXX_DEBUG. Then I can just do p istm.tellg()
 
 Замена в памяти переменных на стёке, переданных в функцию
 	 Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
