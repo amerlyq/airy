@@ -1,6 +1,12 @@
 #!/bin/bash
 
-dir=~/media/Music
+source ~/.bash_export
+
+case "$CURR_PROF" in
+    home) dir=/media/$CURR_USER/Umi/Music ;;
+       *) dir=~/media/Music ;;
+esac
+
 pd="$dir/++"
 
 if [ "$1" == "-l" ]; then
@@ -23,7 +29,8 @@ fi
 
 if [ -n "$choice" ]; then
     dst="$pd/$choice"
-    mkdir -p "$dst"
-    mv -i -v -b "$fl" --target-directory="$dst/"
-    mpc del 0
+    curr="$(mpc -f '[%position%]' | sed '1q')"
+    mkdir -p "$dst" \
+    && mv -i -v -b "$fl" --target-directory="$dst/" \
+    && mpc next >/dev/null && mpc del $curr #Del current, interrupts cast by ssh: mpc del 0
 fi
