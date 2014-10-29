@@ -1,0 +1,9 @@
+Set:
+ http://www.catonmat.net/blog/set-operations-in-unix-shell/
+	unique in bigger N not appearing in list M
+	;comm -23 <(command_which_generate_N|sort) <(command_which_generate_M|sort)
+	 comm without option display 3 columns of output: 1: only in first file,
+	 2: only in second file, 3: in both files. -23 removes the second and
+	 third columns.
+	; awk 'FNR==NR{ array[$0];next} { if ( $1 in array ) next; print $1}' "M" "N"
+	 But this form badly works with spaces. Why?
