@@ -20,5 +20,6 @@ noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 
 noremap  zp "0p
 noremap  zP "0P
+vnoremap P  "_dP
 
 

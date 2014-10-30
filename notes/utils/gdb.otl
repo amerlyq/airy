@@ -4,10 +4,12 @@ Cool man
 	http://xakep.ru/articles/22176/
 	*http://beej.us/guide/bggdb/
 
+
 	Very cool, very many. Read them all!
 	* http://beej.us/guide/
 Book & Man
 	http://www.cs.rit.edu/~csci243/resources/gdb.pdf
+	Man: info gdb
 
 Ref
 	https://sourceware.org/gdb/current/onlinedocs/gdb/
@@ -32,6 +34,9 @@ GUI
 	gdb -tui ./pr
 	Еще его можно запустить командой layout c, layout asm
 	Или комбинацией клавиш Ctrl-X a
+		NOTE: the registers with white/gray background show that a value has
+		changed. Not too meaningful when we just started the program, but
+		mighty useful when stepping through code later on.
 	ALT: cgdb,
 	А я ddd люблю.
 		http://www.gnu.org/software/ddd/
@@ -49,7 +54,8 @@ GUI
 
 | b  func       | breakpoint func
 | b  file.c :39 | breakpoint file.c :39
-| break *adress | Остановить перед выполнением инструкции по адресу.
+| break *addrss | Остановить перед выполнением инструкции по адресу like 0x0004008882.
+| b *_start+5   | ... на адресе символа плюс смещение (полезно когда нет сорцов)
 | tb            | temporary breakpoint  - stop once on, then removed.
 | c             | continue until next breakpoint or end of programm
 
@@ -71,6 +77,7 @@ GUI
 | set disassembly-flavor intel | отображать команды ассемблера в синтаксисе intel
 
 | si, ni	| next in machine instructions, use 'display/i $pc' before to see asm codes
+| where	    | show where execution halted
 
 | i reg | info registers
 
@@ -102,6 +109,9 @@ Display
 	delete display <#number>
 	 Опять-таки, если не указать номер переменной, то очистится весь список
 	 отображаемых переменных.
+
+	info file
+	 To see sections of file where you can set breakpoints
 
 
 Изменение значения переменной
@@ -138,7 +148,11 @@ RE
 	Dump in Intel format
 	; set disassembly-flavor intel
 	; disas
-	Show
+	Examine memory content
+	| x/NFU [addr]	  | x/12xw &msg Examine contents of memory in given format
+	| x/5i $pc		  | Process counter -- disas 5 current instructions
+	| disas/r	      | Show instructions in raw
+	| x/10b $pc		  | Inspect instruction bytes
 	| x/10w           | Stack -- 10 elems of 4 bytes with addresses
 	| x/10g $rsp	  | Stack -- 8 bytes words (giantic)
 	| x/5i 0x0804844a | Disasm memory of stack by address
@@ -148,6 +162,65 @@ RE
 	| disas 0x0000000000400576 |
 	| ni |
 	| info float
+	Show registers
+		info registers
+		 prints out the contents of every register, including all the segment
+		 registers. This is often too much information. The "print" command is much
+		 more useful.
+		print/d $ecx
+		print/x $ecx
+		print/t $ecx
+		 print out the ECX register in decimal, hexadecimal, and binary
+
+ Memory contents can be examined using the "x" command. The "x" command is
+ optionally followed by a "/", a count field, a format field, a size field and
+ finally a memory address. The count field is a number in decimal. The format
+ field is a single letter with 'd' for decimal, 'x' for hexadecimal, 't' for
+ binary and 'c' for ASCII. The size field is also a single letter with 'b' for
+ byte, 'h' for 16-bit word (half word) and 'w' for a 32-bit word. For example,
+ if your program has a label "msg", the following commands:
+	x/12cb &msg x/12db &msg x/12xh &msg x/12xw &msg
+ will print out respectively the contents of memory starting at msg in the
+ following manner: the next 12 bytes as ASCII characters, the next 12 bytes as
+ decimal numbers, the next 12 16-bit words in hex, and the next 12 32-bit words
+ in hex.
+
+Sometimes, as you are tracing your program, you are really interested in the contents of a specific register. If you issue the command:
+	Display
+	| info display | will list all the active displays.
+	| undisplay	   | to remove an item on this list
+	| set disassemble-next-line on  |
+		or for older then gdb 7.0 use
+	| disp/i $pc
+		: where /i is the format, you can remember it best by thinking
+		: "instruction" and $pc being the instruction pointer, also known as
+		: program counter
+	| display $eax
+	| display/i $eip
+	 A very good use of the display command is to have the next instruction of
+	 the program printed whenever the program is halted.
+
+Also good to know
+ Sometimes when stepping through assembly the regs and asm views will get
+ borked. Simply execute the respective layout commands again to restore them
+ to their old glory:
+	(gdb) layout asm
+	(gdb) layout regs
+
+Detect tracing in Linux and how to struggle
+	http://reverseengineering.stackexchange.com/questions/1930/detecting-tracing-in-linux
+	Struggle:
+	clear call to ptrace with NOP
+		(gdb) set write
+		(gdb) set {unsigned int}$pc = 0x90909090
+		(gdb) set {unsigned char}($pc+4) = 0x90
+		(gdb) set write off
+		x/10i $pc
+	Alternative:
+		Manipulate the program counter (instruction pointer) instead:
+			set $pc+=5 or the more explicit set $pc=$pc+5
+			jump *$pc+5
+
 
 STL debug of stringstreams, etc
 	I got what I needed by recompiling everything (not just one or two
@@ -163,6 +236,11 @@ STL debug of stringstreams, etc
 	(gdb) set {char}0x8048e5d='P'
 	x/3sw 0x8048e59
 	 0x8048e59 <_IO_stdin_used+437>: "XAKEP\004\b"
+
+TIPS
+	For experiments on patching you need simple programm which will be executed
+	  over and over again -- so move all your code in cycle.
+
 
 (gdb) attach 'pid'
 (gdb) attach 1127 // example
@@ -285,3 +363,5 @@ reverse-finish
 	function returns, reverse-finish takes you to the point where it was
 	called. Instead of ending up at the end of the current function
 	invocation, you end up at the beginning.
+
+
