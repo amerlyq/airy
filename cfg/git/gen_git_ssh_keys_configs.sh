@@ -54,7 +54,9 @@ wprf "### Multi--SSH config ###\n\n"
 wstr "# Accounts"
 wacc ghub github.com git "$gitkey"
 wacc glab gitlab.com git "$gitkey"
-wacc lok "$LOCAL_KIP" "$LOCAL_KNM" "$lokkey"
+wacc lok  "$LOCAL_KIP" "$LOCAL_KNM" "$lokkey"
+wacc lsir "$LOCAL_HIP" "$LOCAL_HNM" "$stdkey"
+wacc lap  "$LOCAL_SIP" "$LOCAL_SNM" "$stdkey"
 
 if [ "$CURR_PROF" == "work" ]; then
     wacc srkb $SRK_SERVER "${WORK_MAIL%@*}" "$srkkey"
