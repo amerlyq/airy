@@ -51,6 +51,16 @@ Recover deleted files
 Get the chmod numerical value for a file
 	stat --format '%a' <file>
 
+Shared folder for users
+	http://www.cyberciti.biz/tips/understanding-linux-unix-umask-value-usage.html
+
+	ACL: set default right on all new created files
+		sudo setfacl -d -m group:domain_users:rwx ./shared
+		sudo setfacl -m group:domain_users:rwx ./shared
+	http://www.udel.edu/it/help/unix/groupsharing.html
+		setfacl -m d:u::rwx,d:g::rwx,d:m:rwx,d:o:r-x groupshare
+	 will set the default:user, default:group, default:mask, and default:other.
+
 Mount
 	sudo fdisk -l
 	mkdir -p ~/usb && sudo mount -t vfat /dev/sdb1 ~/usb
