@@ -1,0 +1,92 @@
+## Man: to get magic lines: 'xbindkeys -k' and press keys combo
+# vim: ft=sh
+
+
+## Controls for 'The Legend of Grimrock II'
+
+# Mouse usage of hands:
+# xdotool mousemove 200 200 click 1
+
+# Disable it
+"kill $(pgrep xbindkeys)"
+    m:0x40 + c:24
+    Mod4 + q
+
+# --sync  --delay 120  --name 'Legend of Grimrock 2' mousemove restore
+# "xdotool mousemove 1535 796 click --delay 800 3"
+# m:0x0 + c:16
+# 7
+
+
+# All melee on 'jkl;' row
+
+#1 Fighter
+"xdotool mousemove 1535 796 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:44
+    j
+"xdotool mousemove 1640 796 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:56
+    b
+
+
+#2 Battle Mage
+"xdotool mousemove 1716 756 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:45
+    k
+"xdotool mousemove 1845 745 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:31
+    i
+# Don't need: we have 'i' to toggle 'on/off' casting and fast-cast keys
+# "xdotool mousemove 1845 796 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+#     m:0x0 + c:30
+#     u
+
+# =============================================
+
+#> fire 1
+# "xdotool mousemove 1716 756 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3 mousemove 1845 796 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+#     m:0x0 + c:30
+#     u
+
+#> poison cloud: 7
+"xdotool mousemove 1716 835 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3 mousemove 1845 796 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:43
+    h
+#> ice shards: 789
+"xdotool mousemove 1716 835 sleep 0.2 mousedown 3 sleep 0.2 mousemove 1760 835 sleep 0.2 mousemove 1800 835 sleep 0.2 mouseup 3 sleep 0.2 mousemove 1845 796 sleep 0.2 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:30
+    u
+#> shield: 456
+"xdotool mousemove 1716 795 sleep 0.2 mousedown 3 sleep 0.2 mousemove 1760 795 sleep 0.2 mousemove 1800 795 sleep 0.2 mouseup 3 sleep 0.2 mousemove 1845 796 sleep 0.2 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:29
+    y
+
+# =============================================
+
+
+#4 Farmer
+"xdotool mousemove 1745 996 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:46
+    l
+"xdotool mousemove 1845 945 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:32
+    o
+"xdotool mousemove 1845 996 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:58
+    m
+
+
+#3 Gunfire
+"xdotool mousemove 1535 996 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:47
+    semicolon
+# m:0x0 + c:43
+# h
+"xdotool mousemove 1640 945 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:33
+    p
+"xdotool mousemove 1640 996 sleep 0.12 mousedown 3 sleep 0.12 mouseup 3"
+    m:0x0 + c:57
+    n
+
+

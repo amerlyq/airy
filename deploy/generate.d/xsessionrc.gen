@@ -37,6 +37,9 @@ fi
 # For ComposeKey to work
 wstr "export GTK_IM_MODULE=xim"
 
+# For bug suppression
+wstr "eval \$(dbus-launch --sh-syntax)"
+
 ## Fonts for X (terminus)
 #if [ -d /usr/share/fonts/terminus ]; then
 #    xset fp+ /usr/share/fonts/terminus &

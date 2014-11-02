@@ -1,0 +1,37 @@
+#!/bin/bash
+# vim: ft=sh
+
+source ~/.bash_export
+source ~/.bash/functions
+if [ $? -eq 1 ]; then exit 1; fi
+
+dst=~/.xbindkeysrc
+wbegin
+
+
+#> Magic
+#   1 2 3   # 756
+#   4 5 6   # 795
+#   7 8 9   # 835
+#1716:60:1800
+
+dt_before=0.12
+dt_press=0.12
+dt_hold=1.0
+
+m_press(){ local M=${3:-3}; printf "mousedown $M sleep ${dt_press?dt} mouseup $M"; }
+m_move(){ printf "mousemove ${1?err_x} ${2?err_y} sleep ${dt_before?err_dt}"; }
+
+press() {
+    local key=$1 x=$2 y=$3
+    # m:0x0 + c:44, etc
+    printf "xdotool $(m_move $x $y) $(m_press 3)\n    $key"
+}
+
+
+o1x=; o1y=; o2x=; o2y=;
+o3x=; o3y=; o4x=; o4y=;
+
+hlx=; hly=; hrx=; hry=;
+
+wstr "$(press u)"
