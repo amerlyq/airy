@@ -61,7 +61,7 @@ xdot(){ local key="$1" cmds="$2"; printf "\"xdotool $cmds\"\n    $key\n"; }
 
 dt_after=0.18
 dt_press=0.12
-dt_move=0.15
+dt_move=0.17
 dt_hold=1.0
 
 m_push(){    local M=${1:-3}; printf "mousedown $M sleep ${dt_after?dt}"; }
@@ -92,9 +92,9 @@ act_use(){
     case "$hand" in
         *1) hx=$set1x; hy=$set1y ;;
         *2) hx=$set2x; hy=$set2y ;;
-        *)  hx=simple;
+        *)  hx=noprefix;
     esac
-    if [ "$hx" != "simple" ]; then
+    if [ "$hx" != "noprefix" ]; then
         x=$(( vbase_x + ${ocx[$card]} + hx))
         y=$(( vbase_y + ${ocy[$card]} + hy))
         str="$(m_move $x $y) $(m_press 1)"
@@ -104,10 +104,13 @@ act_use(){
         L*) hx=$hlx; hy=$hly ;;
         R*) hx=$hrx; hy=$hry ;;
         U|u) hx=$muse_x; hy=$muse_y ;;
+        *) hx=noact;
     esac
-    x=$(( vbase_x + ${ocx[$card]} + hx))
-    y=$(( vbase_y + ${ocy[$card]} + hy))
-    str="$str $(m_move $x $y) $(m_press 3)"
+    if [ "$hx" != "noact" ]; then
+        x=$(( vbase_x + ${ocx[$card]} + hx))
+        y=$(( vbase_y + ${ocy[$card]} + hy))
+        str="$str $(m_move $x $y) $(m_press 3)"
+    fi
 
     xdot "$key" "$str"
 }
@@ -145,15 +148,16 @@ wprf "$(
     act_use 1 L j
     act_use 2 R k
     act_use 3 L2 semicolon
-    act_use 4 L l
+    act_use 4 R l
+    act_use 4 1 p
 
     act_use 1 R n
     act_use 2 L i
     act_use 3 L1 m
-    act_use 4 R o
+    act_use 4 L o
 
-    act_use 2 U comma
-    act_use 4 U period
+    act_use 2 U t
+    act_use 4 U g
 )\n"
 
 
@@ -165,5 +169,16 @@ wprf "$(
     act_magic $posmag 7   y  Poison
     act_magic $posmag 456 u  Shield
 
-    act_spell $posmag 789 b  IceShards
+    act_spell $posmag 789       b  IceShards
+    act_spell $posmag 123654789 7  Dispel
+    act_spell $posmag 25        8  Light
+    act_spell $posmag 85        9  Dark
+    act_spell $posmag 12369874  0  ForceField
+)\n"
+
+posmag=4
+wprf "$(
+    act_magic $posmag 1   comma   Fireburst
+    act_magic $posmag 3   period  Shock
+    act_magic $posmag 456 slash   Shield
 )\n"
