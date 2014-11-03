@@ -1,37 +1,169 @@
 #!/bin/bash
 # vim: ft=sh
 
-source ~/.bash_export
-source ~/.bash/functions
+source ~/.bash/functions.d/write
 if [ $? -eq 1 ]; then exit 1; fi
 
-dst=~/.xbindkeysrc
-wbegin
+# ==========================================================
+# I played the VERY GOOD Etrian Odysseys games on Nintendo DS (If you dont know these games, love LOG, and have a DS / 3DS : go get it !)
+# The farmer class does exist in these games and is a very good "strange tools" class. You can see their role here : http://etrian.wikia.com/wiki/Farmer
 
+
+# Hazard Barbarian | Acc, Heav, Armor(2)             | 23,11,14,7  | Martial, Muscular
+# Gardo BattleMage | Air(1), Conc(1), Earth(1), Water(3+) | 15,8,10,17 | Or 11 8 14 17 | Protect, Quick
+#       > Air(1), Earth(3), Water(3), Conc(3), ???Evasion?
+# Fierel Rogue  | Dodge(1), Acc(2), Miss, Dodge(2),   | 6,19,15,10  | Mutat, Agile
+# S'ana  Farmer | Acc, Acc, Conc, Fire, Air       | 10 10 15 15 | FastLea, StrongMind
+
+# food
+# fungal-boss ground
+# dig ditches for irrigation
+# grow pitplants
+# rivers to catch fish
+# respawn of turtles in level 1
+# Necklace w/o food consuption for others
+# Necklace with +%25hp for fermer only when eating
+
+#> Cards
+# 1 2
+# 3 4
+
+vbase_x=1460; vbase_y=660;
+card_w=206;   card_h=200;
+ocx[1]=0      ; ocy[1]=0      ;
+ocx[2]=$card_w; ocy[2]=0      ;
+ocx[3]=0      ; ocy[3]=$card_h;
+ocx[4]=$card_w; ocy[4]=$card_h;
 
 #> Magic
 #   1 2 3   # 756
 #   4 5 6   # 795
 #   7 8 9   # 835
-#1716:60:1800
+#1716:1760:1800
 
-dt_before=0.12
+mgx[1]=50; mgy[1]=95;    mgx[2]=95; mgy[2]=95;    mgx[3]=135; mgy[3]=95;
+mgx[4]=50; mgy[4]=135;   mgx[5]=95; mgy[5]=135;   mgx[6]=135; mgy[6]=135;
+mgx[7]=50; mgy[7]=170;   mgx[8]=95; mgy[8]=170;   mgx[9]=135; mgy[9]=170;
+mclr_x=170; mclr_y=90;
+muse_x=170; muse_y=135;
+
+#> Hands
+# L: Fire or fast-cast
+# R: Ignore or use
+hlx=${mgx[1]}; hly=${mgy[1]};
+hrx=$mclr_x; hry=$mclr_y;
+set1x=15; set1y=105;
+set2x=15; set2y=160;
+
+# ==========================================================
+
+xdot(){ local key="$1" cmds="$2"; printf "\"xdotool $cmds\"\n    $key\n"; }
+
+dt_after=0.18
 dt_press=0.12
+dt_move=0.15
 dt_hold=1.0
 
-m_press(){ local M=${3:-3}; printf "mousedown $M sleep ${dt_press?dt} mouseup $M"; }
-m_move(){ printf "mousemove ${1?err_x} ${2?err_y} sleep ${dt_before?err_dt}"; }
+m_push(){    local M=${1:-3}; printf "mousedown $M sleep ${dt_after?dt}"; }
+m_release(){ local M=${1:-3}; printf "mouseup $M sleep ${dt_after?dt}"; }
+m_press(){   local M=${1:-3}; printf "mousedown $M sleep ${dt_press?dt} mouseup $M"; }
+m_hold(){    local M=${1:-3}; printf "mousedown $M sleep ${dt_hold?dt} mouseup $M"; }
+m_move(){    printf "mousemove ${1?err_x} ${2?err_y} sleep ${dt_move?err_dt}"; }
 
-press() {
-    local key=$1 x=$2 y=$3
-    # m:0x0 + c:44, etc
-    printf "xdotool $(m_move $x $y) $(m_press 3)\n    $key"
+
+magic(){
+    local cx=$1 cy=$2 s="$3" x y ind str=""
+
+    for (( i=0; i<${#s}; i++ )); do
+        ind="${s:$i:1}"
+        x=$(( cx + ${mgx[$ind]} ))
+        y=$(( cy + ${mgy[$ind]} ))
+        str="$str $(m_move $x $y)"
+        if [[ i -eq 0 ]]; then str="$str $(m_push 3)"; fi
+    done
+    str="$str $(m_release 3)"
+    printf "$str"
 }
 
+act_use(){
+    local card=$1 hand=$2 key="$3" hx hy x y str=""
 
-o1x=; o1y=; o2x=; o2y=;
-o3x=; o3y=; o4x=; o4y=;
+    #set
+    case "$hand" in
+        *1) hx=$set1x; hy=$set1y ;;
+        *2) hx=$set2x; hy=$set2y ;;
+        *)  hx=simple;
+    esac
+    if [ "$hx" != "simple" ]; then
+        x=$(( vbase_x + ${ocx[$card]} + hx))
+        y=$(( vbase_y + ${ocy[$card]} + hy))
+        str="$(m_move $x $y) $(m_press 1)"
+    fi
 
-hlx=; hly=; hrx=; hry=;
+    case "$hand" in
+        L*) hx=$hlx; hy=$hly ;;
+        R*) hx=$hrx; hy=$hry ;;
+        U|u) hx=$muse_x; hy=$muse_y ;;
+    esac
+    x=$(( vbase_x + ${ocx[$card]} + hx))
+    y=$(( vbase_y + ${ocy[$card]} + hy))
+    str="$str $(m_move $x $y) $(m_press 3)"
 
-wstr "$(press u)"
+    xdot "$key" "$str"
+}
+
+act_spell(){
+    local key="$3" card=$1 spell="$2" x y
+    x=$(( vbase_x + ${ocx[$card]}))
+    y=$(( vbase_y + ${ocy[$card]}))
+    xdot "$key" "$(magic $x $y $spell)"
+}
+
+act_magic(){
+    local key="$3" card=$1 spell="$2" x y str
+    x=$(( vbase_x + ${ocx[$card]}))
+    y=$(( vbase_y + ${ocy[$card]}))
+    str="$(magic $x $y $spell)"
+    str="$str $(m_move $((x+muse_x)) $((y+muse_y))) $(m_press 3)"
+    xdot "$key" "$str"
+}
+
+# ==========================================================
+
+dst=~/.xbindkeysrc
+wbegin
+wstr "## Controls for 'The Legend of Grimrock II'"
+
+wprf '
+# Disable it
+"kill $(pgrep xbindkeys)"
+    Mod4 + q
+'
+
+wprf "\n\n### Hands\n"
+wprf "$(
+    act_use 1 L j
+    act_use 2 R k
+    act_use 3 L2 semicolon
+    act_use 4 L l
+
+    act_use 1 R n
+    act_use 2 L i
+    act_use 3 L1 m
+    act_use 4 R o
+
+    act_use 2 U comma
+    act_use 4 U period
+)\n"
+
+
+wprf "\n\n### Magic #2\n"
+
+posmag=2
+wprf "$(
+    act_magic $posmag 3   h  Shock
+    act_magic $posmag 7   y  Poison
+    act_magic $posmag 456 u  Shield
+
+    act_spell $posmag 789 b  IceShards
+)\n"
