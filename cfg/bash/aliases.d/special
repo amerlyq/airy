@@ -17,6 +17,11 @@ alias targz='tar -cvfz' # arch.tar.gz ./
 alias untargz='tar xvfz'
 alias untarbz2='tar xvfj'
 
+
+# dir with many small files sending
+scpto() { tar zcf - "${1?Need dir}" | ssh ${2?Need server} 'tar zxf -'; }
+scpfr() { ssh ${2?Need server} "tar zcf - '${1?Need dir}'" | tar zxf -; }
+
 alias mount='mount |column -t'
 alias mountl='sudo fdisk -l'
 # echo "alias firefox='nohup firefox &>/dev/null'" >> /etc/commonrc
@@ -26,7 +31,9 @@ alias mountl='sudo fdisk -l'
 alias f='find ./ -type f -name '
 # grep -Ri 'name' . # find in all files
 alias ff='find ./ | grep -i '
-agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
+
+# agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
+agi() { ag --pager less -G '^(?:(?!build|libs|tags).)*$' $@; }
 agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
 
 # old=$1, new=$2 -r | recursively  # -l | print filenames

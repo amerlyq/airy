@@ -364,4 +364,54 @@ reverse-finish
 	called. Instead of ending up at the end of the current function
 	invocation, you end up at the beginning.
 
+Basically you can query the registers by prepending a dollar sign, e.g.
+	print $ecx
+or use them in expressions:
+	print $esi + $ebx + 4
+You can dereference the memory using the * operator (like in C):
+	print *$ecx
+will print the contents of the memory location pointed to by ecx.
+While you can't directly type in assembly code, you can translate the expression into something more high-level, like this:
+	print $eax - ($esi * $ebx)
+Also, you can convert to various types using casts to C data-types, e.g.
+	print (char)$ecx
+would print the contents of ecx as a character.
+	print *(char**)$ecx
+which would interpret ecx as a pointer to char*, which you then dereference. So you'd see the contents of the string at the address contained in ecx.
+This is just the tip of the iceberg though. gdb is very powerful tool. You might also find the display command useful. It's basically the same as print, except it will repeat the print command whenever the code is stopped (useful with breakpoints). You can examine most registers using info registers, or info all-registers if you're masochistic.
+You can also change the contents of registers, using set:
+	set $eax = 20
 
+
+# ===============================
+
+Breakpoints from sourcecode:
+It's a one-line in any Unix
+try:
+Code:
+
+#include <signal.h>
+
+#define BREAK_HERE raise(SIGINT)
+
+int main(int argc, char *argv[]){
+	  int i,j;
+	  for(j=0,i=0;i<20;i++)
+	  {
+		j+=i;
+		if(j>20)
+			 BREAK_HERE;
+	  }
+	  return 0;
+}
+
+at the command line:
+Code:
+
+gdb mycode
+gdb> run
+Program received signal SIGINT, Interrupt.
+0x705b28a0 in kill () from /usr/lib/libc.2
+... you are now in the debugger right after the BREAK_HERE statement
+
+You will have to step twice to come back out of the raise() call into your code.
