@@ -1,28 +1,16 @@
 #!/bin/bash
 
-source ~/.bash_export
-if [ $? -ne 0 ]; then exit 1; fi
-
-if [ -z "$SIR_PORT" ] || [ -z "$SIR_HOST" ]; then
-    echo You need \$SIR_PORT and \$SIR_HOST setted in your profile.
-    exit 1
-fi
-
-PRG="$1"
-shift
+# source ~/.bash_export
+# if [ $? -ne 0 ]; then exit 1; fi
 
 # To launch shell in certain directory
 # ssh -t example.com "cd /foo/bar; exec \$SHELL -l"
+# { SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
 
+PRG="$1"
+shift
 case "$PRG" in
-    sir)
-        { SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
-        $SS -X -p $SIR_PORT "$SIR_HOST" $@ ;;
-    send) tar cvf - -T $@ | ssh "$LOCAL_HNM@$LOCAL_HIP" tar xf - ;;
-    #  scp file1 file2 ... fileN user@host:~/Downloads/
     mpd) ~/.bin/ssht.d/sir-mpd $@ ;;
-    srk) LC_ALL=en_US.UTF-8 ssh -X srkb -t zsh $@ ;;
-    amazon) LC_ALL=en_US.UTF-8 ssh amazon $@ ;;
-    kedi) ssh -X lok $@ ;;
-    *) ;;
+    srk) ssh srk -t zsh $@ ;;
+    *)   ssh $PRG $@ ;;
 esac

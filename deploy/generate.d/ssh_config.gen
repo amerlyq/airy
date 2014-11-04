@@ -1,0 +1,70 @@
+#!/bin/bash
+
+source ~/.bash/functions.d/write
+if [ $? -ne 0 ]; then exit 1; fi
+
+# ==================== ~/.ssh/config ========================
+
+
+wacc() {
+    local name=$1 host=$2 user=$3
+    local idn="$4" x11=$5 port=$6 str
+
+    str="Host $name
+    HostName $host
+    User $user\
+    ${port:+\n    Port $port}\
+    ${idn:+\n    IdentityFile ~/.ssh/$idn}\
+    ${x11:+\n    ForwardX11 yes}
+\n"; wprf "$str"
+}
+
+# Instead of this config, you can add param for each 'git push'
+#$ git ... -key ~/.ssh/git_rsa (or only for remote add?)
+dst=~/".ssh/config"
+wbegin
+wprf "\nHost *\n    SendEnv !LANG !LC_*\n\n"
+wstr "# Accounts"
+
+wacc ghub  'github.com' git         git_rsa
+wacc glab  'gitlab.com' git         git_rsa
+wacc sir   $HOME_SRV    $HOME_USER  '' '' $HOME_PORT
+wacc ked   $KEDI_SRV    $KEDI_USER  '' '' $KEDI_PORT
+
+case "$CURR_PROF" in home|laptop)
+    wacc lked   $KEDI_IPL   $KEDI_USER   lok_rsa x11
+    wacc lsir   $HOME_IPL   $HOME_USER   ''      x11
+    wacc llap   $LAPT_IPL   $LAPT_USER   ''      x11
+;; esac
+
+case "$CURR_PROF" in work)
+    wacc srk    $SRK_IPL    $SRK_USER    srk_rsa x11 ''
+    wacc amazon $AMAZON_SRV $AMAZON_USER seclab-cloud.pem
+;; esac
+
+echo "W: $dst"
+
+
+echo "
+!   You will need to replace your name and email in each your own   !
+!   local git repository, to elude overlapping with work activity   !
+    ##To make use of this, change 'remote url' of git repository
+    #$ git remote add origin git@github.com:user/repo.git   # Initial
+    #$ git remote set-url origin ghub:user/repo.git         # Existing
+"
+
+# ==================== Troubleshooting ========================
+#
+# When ssh, you can see msg: LC_ALL not setted, etc, locale problems
+#   On host:  1. sudo locale-gen uk_UA.UTF-8 (and all other missing in `locale -a`)
+#                   OR: sudo dpkg-reconfigure locales
+#                   OR: sudo apt-get --reinstall install language-pack-de
+#                   OR: sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+#             2. sed 's/^.*AcceptEnv*$/#\0' /etc/ssh/ssh_config
+#             3. echo "LC_ALL=en_US.UTF-8" >> ~/.bashrc
+#   On local: 4. sed 's/^.*SendEnv.*$/#\0' /etc/ssh/ssh_config
+#             5. LC_ALL=en_US.UTF-8 ssh...
+#             6. Use only english locales on local machine
+#             7. Insert in ~/.ssh/config
+#                   Host *\n    SendEnv !LANG !LC_*
+

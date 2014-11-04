@@ -7,6 +7,7 @@ LANG=en_US.UTF-8
 LC_NUMERIC=en_US.UTF-8
 EDITOR=vim
 VISUAL=vim
+TERMCMD=urxvt
 
 ### Profile Mgmt ###
 CURR_PLTF=$(expr substr $(uname -s) 1 5)

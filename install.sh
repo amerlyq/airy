@@ -30,7 +30,7 @@ if [ "${SCRIPT_DIR}" == "/" ]; then
 
 DEPLOY_DIR="$SCRIPT_DIR/deploy"
 
-if [ ! -e "$HOME/.bash_export" ] || [ "$1" == "--clean" ]
+if [ ! -e "$HOME/.bash_export" ] || [ "$1" == "--clean" ] || [ "$1" == "-c" ]
 then CLEAN_INSTALL=1; shift; else CLEAN_INSTALL=0; fi
 # if [ $CLEAN_INSTALL -eq 1 ]
 if [ "$1" == "--full" ]

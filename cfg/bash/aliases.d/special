@@ -6,10 +6,13 @@
 # It can be simpler to do restarting of vim from inside by combo leader-F12
 # let g:...
 # source $MYVIMRC
+
 alias vi='\vim -u ~/.vim/vimrc_basic'
+vimscp(){ vim scp://${2:-srk}/"${1:-$(xsel -o)}"; }
+alias vimsyn='vim --servername synctex'
 #alias vim='\vim --cmd "let g:loaded_youcompleteme = 1"'
 #alias ycm='\vim --cmd "let g:loaded_youcompleteme = 0"'
-alias vimsyn='vim --servername synctex'
+
 alias s='source ranger-auto; if [ $? -eq 2 ]; then exit; fi'
 alias w3m='\w3m google.com'
 alias w3mh='\w3m -T "text/html"'
@@ -18,9 +21,9 @@ alias untargz='tar xvfz'
 alias untarbz2='tar xvfj'
 
 
-# dir with many small files sending
-scpto() { tar zcf - "${1?Need dir}" | ssh ${2?Need server} 'tar zxf -'; }
-scpfr() { ssh ${2?Need server} "tar zcf - '${1?Need dir}'" | tar zxf -; }
+# dir with many small files sending   #ALT: scp file1 file2 ... fileN user@host:~/Downloads/
+scpto() { tar czvf - "${1?Need dir}" | ssh ${2?Need server} "'tar xzvf - ${3+-C "$3"}'"; }
+scpfr() { ssh ${2?Need server} "tar czvf - '${1?Need dir}'" | tar xzvf - ${3+-C "$3"}; }
 
 alias mount='mount |column -t'
 alias mountl='sudo fdisk -l'

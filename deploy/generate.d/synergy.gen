@@ -12,21 +12,21 @@ wbegin
 
 wstr "
 section: screens
-    $LOCAL_SHT:
+    $LAPT_HOST:
         # halfDuplexCapsLock = false
         # halfDuplexNumLock = false
         # halfDuplexScrollLock = false
         # xtestIsXineramaUnaware = false
         # switchCorners = none +top-left +top-right +bottom-left +bottom-right
         # switchCornerSize = 0
-    $LOCAL_HHT:
+    $HOME_HOST:
         # halfDuplexCapsLock = false
         # halfDuplexNumLock = false
         # halfDuplexScrollLock = false
         # xtestIsXineramaUnaware = false
         # switchCorners = none +top-left +top-right +bottom-left +bottom-right
         # switchCornerSize = 0
-    $LOCAL_KHT:
+    $KEDI_HOST:
         # halfDuplexCapsLock = false
         # halfDuplexNumLock = false
         # halfDuplexScrollLock = false
@@ -36,24 +36,24 @@ section: screens
 end
 
 section: aliases
-    $LOCAL_SHT:
-        $LOCAL_SIP
-    $LOCAL_HHT:
-        $LOCAL_HIP
-    $LOCAL_KHT:
-        $LOCAL_KIP
+    $LAPT_HOST:
+        $LAPT_IPL
+    $HOME_HOST:
+        $HOME_IPL
+    $KEDI_HOST:
+        $KEDI_IPL
 end
 
 section: links
-    $LOCAL_SHT:
-        up = $LOCAL_HHT
-        right = $LOCAL_KHT
-    $LOCAL_HHT:
-        down = $LOCAL_SHT
-        up = $LOCAL_SHT
-    $LOCAL_KHT:
-        left = $LOCAL_SHT
-        up = $LOCAL_SHT
+    $LAPT_HOST:
+         up = $HOME_HOST
+      right = $KEDI_HOST
+    $HOME_HOST:
+       down = $LAPT_HOST
+         up = $LAPT_HOST
+    $KEDI_HOST:
+       left = $LAPT_HOST
+         up = $LAPT_HOST
 end
 
 section: options

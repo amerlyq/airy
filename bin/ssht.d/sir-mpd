@@ -1,12 +1,7 @@
 #!/bin/sh
 # ports for mpd player
 
-# Replace with alias for ssha!
-#{ SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
-SS=ssh
-
-
-SSH_MPD="$SS -p $SIR_PORT -fNT -L 127.0.0.1:6601:127.0.0.1:6600 -L 127.0.0.1:8001:127.0.0.1:8000 $SIR_HOST"
+SSH_MPD="ssh sir -fNT -L 127.0.0.1:6601:127.0.0.1:6600 -L 127.0.0.1:8001:127.0.0.1:8000"
 STREAM="http://localhost:8001"
 FOUND=`mpc playlist -f "[%file%]" | grep -n "$STREAM"`
 

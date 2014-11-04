@@ -1,0 +1,81 @@
+### STL Containers, Boost, templates, etc ###
+<incomplete type>
+	Run it in gdb and try to 'print *str' and you'll get an 'incomplete type'
+	 response. However, try 'disassemble get_string' and then 'print *str' and
+	 it'll display the struct and values properly. I have no idea why this
+	 works, but it does.
+	However, works only for pointers; not for stringstreams.
+	 For them you need libstdc++6.4.8-dbg
+	Or to use the libstdc++ debug mode, compile your application with the
+	compiler flag -D_GLIBCXX_DEBUG as all other libs you need.
+	 https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html#debug_mode.using.mode
+	ALT: Commands file, ex. .gdbinit: pretty printing
+	STL debug of stringstreams, etc
+		I got what I needed by recompiling everything (not just one or two
+		translation units) with -D_GLIBCXX_DEBUG. Then I can just do p istm.tellg()
+
+### Breakpoints from sourcecode ###
+	<It's a one-line in any Unix, try:
+	: #include <signal.h>
+	: #define BREAK_HERE raise(SIGINT)
+	: int main(int argc, char *argv[]){
+	:	int i,j;
+	: 	for(j=0,i=0;i<20;i++) {
+	: 		j+=i;
+	: 		if(j>20) BREAK_HERE;
+	: 	}
+	: return 0;
+	: }
+	> (gdb) run
+	 Program received signal SIGINT, Interrupt.
+	 0x705b28a0 in kill () from /usr/lib/libc.2
+	...you are now in the debugger right after the BREAK_HERE statement
+	You will have to step twice to come back out of the raise() call into your code.
+
+### Signals ###
+	Print a table of all the signals and how gdb handle each one.
+		i handle
+		i signals
+	Change it by keywords: nostop|stop, print|noprint and pass|nopass
+	handle signal [keywords...]
+
+### Multi-threads ###
+: Use case: debugging specific thread, while controlling behavior of others.
+	facilities for debugging multi-thread programs:
+		- automatic notification of new threads
+		- ‘thread threadno’, to switch among threads
+		- ‘info threads’, to inquire about existing threads
+		- thread-specific breakpoints
+		- set mode for locking scheduler during execution
+			(gdb) set scheduler-locking step/on/off
+		others: Interrupted System Calls
+	(gdb) i threads
+	(gbd) b foo.cpp:13 thread 28 if x > li
+
+### Core Dump ###
+: When coredump, pr shows '~$ Segmentation fault (core dumped)'
+	Find coredump file for executable
+	| # file core.1234 | # gdb core.1234 |
+	;OR: # echo "core_%e.%p" > /proc/sys/kernel/core_pattern
+	: if the program foo dumps its core, the core_foo.1234 will be created.
+	Launch: $ gdb myprogram
+		(gdb) core core
+
+
+### Remote debugging ###
+: - GDB runs on one machine (host) and the program being debugged
+:		(exe.verXYZ.stripped ) runs on another (target).
+: - GDB communicates via Serial or TCP/IP.
+: - Host and target: exactly match between the executables and libraries,
+:		with one exception: stripped on the target.
+	Connect gdb to code in different place
+		(gdb) set substitute-path /usr/src/mnt/cross
+		(gdb) dir /your/path/verXYZ
+	Remote (10.10.0.225)
+		; gdbserver :9999 program_stripped
+		; ./gdbserver :9999 –attach <pid>
+	Host
+		; gdb program
+		(gdb) handle SIGTRAP nostop noprint pass
+		 to avoid pausing when launching the threads
+		(gdb) target remote 10.10.0.225:9999

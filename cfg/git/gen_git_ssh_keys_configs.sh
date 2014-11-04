@@ -1,5 +1,5 @@
 #!/bin/bash
-# Gen: ssh-keys, .ssh/config, .gitconfig
+# Gen: ssh-keys, .gitconfig
 # Arg: all-new -- for re-generating rsa-pairs
 
 source ~/.bash/functions
@@ -9,22 +9,19 @@ if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
 # =================== Multi--SSH ============================
 ARGS="$1"
 genssh(){ # $1 -- @mail, $2 -- path/to/key
-    if [ ! -f "$2" ] || [ "$ARGS" == "--reinstall" ]; then
-        ssh-keygen -t rsa -C "$1" -N "" -f "$2"
+    local mail="$1" idn="$HOME/.ssh/$2"
+    if [ ! -f "$idn" ] || [ "$ARGS" == "--reinstall" ]; then
+        ssh-keygen -t rsa -C "$mail" -N "" -f "$idn"
         echo "!!! Copy generated *.pub key to your servers"
     fi
 }
-stdkey="$HOME/.ssh/id_rsa"
-gitkey="$HOME/.ssh/git_rsa"
-lokkey="$HOME/.ssh/lok_rsa"
 
-genssh "$WORK_MAIL" "$stdkey"
-genssh "$MAIN_MAIL" "$gitkey"
-genssh "$MAIN_MAIL" "$lokkey"
+genssh "$WORK_MAIL" id_rsa
+genssh "$MAIN_MAIL" git_rsa
+genssh "$MAIN_MAIL" lok_rsa
 
 if [ "$CURR_PROF" == "work" ]; then
-    srkkey="$HOME/.ssh/srk_rsa"
-    genssh "$WORK_MAIL" "$srkkey"
+    genssh "$WORK_MAIL" srk_rsa
 fi
 
 # ==================== ~/.gitconfig =========================
@@ -36,45 +33,7 @@ wbegin
 wcat "$SCRIPT_DIR/gitconfig_base"
 echo "W: ~/.gitconfig"
 
-# ==================== ~/.ssh/config ========================
-
-wacc() {
-    wstr "Host $1
-    HostName $2
-    User $3
-    IdentityFile $4
-"
-}
-
-# Instead of this config, you can add param for each 'git push'
-#$ git ... -key ~/.ssh/git_rsa (or only for remote add?)
-dst="$HOME/.ssh/config"
-wbegin
-wprf "### Multi--SSH config ###\n\n"
-wstr "# Accounts"
-wacc ghub github.com git "$gitkey"
-wacc glab gitlab.com git "$gitkey"
-wacc lok  "$LOCAL_KIP" "$LOCAL_KNM" "$lokkey"
-wacc lsir "$LOCAL_HIP" "$LOCAL_HNM" "$stdkey"
-wacc lap  "$LOCAL_SIP" "$LOCAL_SNM" "$stdkey"
-
-if [ "$CURR_PROF" == "work" ]; then
-    wacc srkb $SRK_SERVER "${WORK_MAIL%@*}" "$srkkey"
-    wacc amazon $AMAZON_SERVER ubuntu "$HOME/.ssh/seclab-cloud.pem"
-fi
-
-echo "W: ~/.ssh/config"
-
 pairLink ~/.gitignore "$SCRIPT_DIR/gitignore"
-
-echo "
-!   You will need to replace your name and email in each your own   !
-!   local git repository, to elude overlapping with work activity   !
-"
-
-# To make use of this, change 'remote url' of git repository
-#$ git remote add origin git@github.com:user/repo.git   # Initial
-#$ git remote set-url origin ghub:user/repo.git         # Existing
 
 # ===========================================================
 

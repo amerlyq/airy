@@ -7,6 +7,7 @@ Cool man
 
 	Very cool, very many. Read them all!
 	* http://beej.us/guide/
+
 Book & Man
 	http://www.cs.rit.edu/~csci243/resources/gdb.pdf
 	Man: info gdb
@@ -15,20 +16,44 @@ Ref
 	https://sourceware.org/gdb/current/onlinedocs/gdb/
 	http://www.gnu.org/software/gdb/documentation/
 
+
 Extending
 	Composition, Python, Aliases
 	 http://www.univ-orleans.fr/sciences/info/ressources/webada/doc/gnat/gdb_24.html
+	What GDB Does During Startup
+		1. Executes all commands from system init file
+		2. Executes all the commands from ~/.gdbinit
+		3. Process command line options and operands
+		4. Executes all the commands from ./.
+		gdbinit
+		4. Executes all the commands from ./.
+		gdbinit
+		5. reads command files specified by the `-x' option
+	6. Reads the command history recorded in the history file
+		• (gdb) set history filename fname
+		  (gdb) set history save on/off
+		• (gdb) show history
+		• (gdb) show history
+		• (gdb) show commands
 
-<incomplete type>
-	Run it in gdb and try to 'print *str' and you'll get an 'incomplete type'
-	 response. However, try 'disassemble get_string' and then 'print *str' and
-	 it'll display the struct and values properly. I have no idea why this
-	 works, but it does.
-	However, works only for pointers; not for stringstreams.
-	 For them you need libstdc++6.4.8-dbg
-	Or to use the libstdc++ debug mode, compile your application with the
-	compiler flag -D_GLIBCXX_DEBUG as all other libs you need.
-	 https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html#debug_mode.using.mode
+FAQ
+	On x64, install another x32 gdb
+		$ ls -l `which gdb32`
+		/usr/bin/gdb32 -> ‘/your/install/path
+
+Tricks
+	Convenience vars for your own purposes
+		set $table = *table_ptr
+		show conv
+	Checkpoint -- a snapshot of a program’s state
+		(gdb) checkpoint
+		(gdb) i checkpoint
+		(gdb) restart checkpoint-id
+	Value history - values printed by the print command.
+	How to know where you are (file, next execution line)?
+		(gdb) f
+	How to find out why your program stopped?
+		(gdb) i prog
 
 GUI
 	gdb -tui ./pr
@@ -46,6 +71,14 @@ GUI
 		 pydb. Interactive graphical data display, where data structures are
 		 displayed as graphs
 
+Show data
+| info  | showing things about the program being debugged
+| show  | showing things about the debugger
+| print | print value of expression
+| x		| examines memory at specified address
+
+
+Controls
 | <CR>          | Repeat previous
 | r             | run
 | kill			| to safely recompile src and 'run' again, w/o exiting gdb and savig breakpoints where them are
@@ -60,7 +93,7 @@ GUI
 | c             | continue until next breakpoint or end of programm
 
 | n <count>     | next 1 - exec next line of code completely
-| u				| until - continue to the end of current cycle(for,while,etc)
+| u	[<lineNo>]  | until - continue to the end of current cycle(for,while,etc)
 | s             | step
 | fin | finish  | natural continue to end of frame (return from step inside)
 | ret <val>		| emergetncy instant return from step inside
@@ -222,10 +255,6 @@ Detect tracing in Linux and how to struggle
 			jump *$pc+5
 
 
-STL debug of stringstreams, etc
-	I got what I needed by recompiling everything (not just one or two
-	translation units) with -D_GLIBCXX_DEBUG. Then I can just do p istm.tellg()
-
 Замена в памяти переменных на стёке, переданных в функцию
 	 Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
 	 x/i $eip 0x4006d585 <_IO_puts+21>: mov 0x8(%ebp),%esi
@@ -383,35 +412,12 @@ You can also change the contents of registers, using set:
 	set $eax = 20
 
 
-# ===============================
-
-Breakpoints from sourcecode:
-It's a one-line in any Unix
-try:
-Code:
-
-#include <signal.h>
-
-#define BREAK_HERE raise(SIGINT)
-
-int main(int argc, char *argv[]){
-	  int i,j;
-	  for(j=0,i=0;i<20;i++)
-	  {
-		j+=i;
-		if(j>20)
-			 BREAK_HERE;
-	  }
-	  return 0;
-}
-
-at the command line:
-Code:
-
-gdb mycode
-gdb> run
-Program received signal SIGINT, Interrupt.
-0x705b28a0 in kill () from /usr/lib/libc.2
-... you are now in the debugger right after the BREAK_HERE statement
-
-You will have to step twice to come back out of the raise() call into your code.
+Problem Determination Tools for Linux
+	• -Wall
+	• Code review
+	• Program’s traces, syslog, profilers
+	• Static Source Code Analysis:
+	– scan.coverity.com – free for FOSS
+	– Flexelint
+	• Dynamic analysis: Valgrind,
+	• strace, /proc filesystem, lsof, ldd, nm, objdump, wireshark
