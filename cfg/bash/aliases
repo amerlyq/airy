@@ -8,6 +8,10 @@ if [ -d "$DIR" ]; then
     for fl in ${FLES[@]}; do
         source "$DIR/$fl"
     done
+
+    case "${SHELL##*/}" in
+        zsh) source "$DIR/zsh" ;;
+    esac
 fi
 
 

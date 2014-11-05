@@ -6,7 +6,7 @@ alias now='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 
 # --- Process ---
-# alias psg='ps aux | grep '
+# alias psg='ps aux | grep ' # Rewritten by zsh
 psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
 alias topstat='dstat -cdnpmgs --top-bio --top-cpu'
 
@@ -14,6 +14,9 @@ alias topstat='dstat -cdnpmgs --top-bio --top-cpu'
 # --- Net ---
 alias ping='\ping -c 5'
 alias pingfast='\ping -c 100 -s.2'
+alias pingg='pingfast 8.8.8.8'
+
+# {ifconfig eth0; ifconfig wlan0}  | awk '/inet addr/{print substr($2,6)}'
 alias scanip='nmap -sn 192.168.0.0/24'
 alias ports='netstat -tulanp'
 alias openports='netstat --all --numeric --programs --inet'

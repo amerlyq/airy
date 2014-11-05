@@ -14,6 +14,7 @@
 		I got what I needed by recompiling everything (not just one or two
 		translation units) with -D_GLIBCXX_DEBUG. Then I can just do p istm.tellg()
 
+
 ### Breakpoints from sourcecode ###
 	<It's a one-line in any Unix, try:
 	: #include <signal.h>
@@ -32,12 +33,14 @@
 	...you are now in the debugger right after the BREAK_HERE statement
 	You will have to step twice to come back out of the raise() call into your code.
 
+
 ### Signals ###
 	Print a table of all the signals and how gdb handle each one.
 		i handle
 		i signals
 	Change it by keywords: nostop|stop, print|noprint and pass|nopass
 	handle signal [keywords...]
+
 
 ### Multi-threads ###
 : Use case: debugging specific thread, while controlling behavior of others.
@@ -51,6 +54,7 @@
 		others: Interrupted System Calls
 	(gdb) i threads
 	(gbd) b foo.cpp:13 thread 28 if x > li
+
 
 ### Core Dump ###
 : When coredump, pr shows '~$ Segmentation fault (core dumped)'
@@ -79,3 +83,4 @@
 		(gdb) handle SIGTRAP nostop noprint pass
 		 to avoid pausing when launching the threads
 		(gdb) target remote 10.10.0.225:9999
+

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+DIR=~/hub
+mkdir -p $DIR
+
+git_get() {
+    local PR_DIR=${1##*/} BUILD_DIR LINK="$1"
+    check_pkg_dir
+    PR_DIR="$DIR/${PR_DIR,,}"
+
+    if [ -d "$PR_DIR" ]; then
+        cd "$PR_DIR"
+        git pull
+    else
+        if [ "${LINK//'://'}" == "$LINK" ]; then
+            LINK="https://github.com/$LINK"
+        fi
+        git clone --depth 1 "$LINK" "$PR_DIR"
+    fi
+}
+
+git_get 'shadowbq/Cheat-Sheets'
