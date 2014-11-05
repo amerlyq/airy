@@ -236,6 +236,7 @@ wmode_end
 
 w_header "Run: Prgs" # i3-sensible-terminal, ranger
 wstr "$bm+Return $eurx"
+wstr "$bm+Control+j $eurx"
 wstr "$bm+Control+Return $eflo"
 wstr "$bm+Shift+Return $eflo -e ranger-auto"
 

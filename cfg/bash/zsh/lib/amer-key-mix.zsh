@@ -12,16 +12,16 @@ bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 bindkey '^B' backward-char
 bindkey '^F' forward-char
-bindkey '^X' backward-word
-bindkey '^T' forward-word
+bindkey '^Z' backward-word
+bindkey '^X' forward-word
 
 bindkey '^D' delete-char
 bindkey '^H' backward-delete-char
 bindkey '^?' backward-delete-char
 bindkey '^W' backward-kill-word
-bindkey '^O' kill-word
+bindkey '^T' kill-word
 bindkey '^K' kill-line
-bindkey '^Z' backward-kill-line
+bindkey '^U' backward-kill-line
 
 bindkey '^P' history-substring-search-up    #up-history
 bindkey '^N' history-substring-search-down  #down-history
@@ -30,13 +30,16 @@ bindkey '^R' history-incremental-pattern-search-backward #history-incremental-se
 bindkey '^P' up-line-or-search      #history-beginning-search-backward
 bindkey '^N' down-line-or-search    #history-beginning-search-forward
 
+# bindkey '^O' ...
 bindkey '^\' character-search               # <C-4>, <C-\>
 bindkey '^]' character-search-backward      # <C-5>, <C-]>
 bindkey '^_' undo
 
-bindkey -a '^R' history-incremental-search-backward
 bindkey ' ' magic-space # [Space] - do history expansion
 bindkey '\C-x\C-e' edit-command-line
+
+bindkey -a '^R' history-incremental-search-backward
+bindkey -a '^S' history-incremental-search-forward
 
 #bindkey '^[e' expand-cmd-path
 # "\C-p": menu-complete
@@ -70,6 +73,29 @@ function prepend_sudo() {
         CURSOR=$(($CURSOR+5))
     fi
 }
+
+zle -N synchro-dir-push synchro_dir_push
+function synchro_dir_push {
+    curr="$(pwd)"
+    if [ "$curr" != ~ ]; then
+        printf "$curr\n" > /tmp/zsh_chosedir
+    fi
+}
+zle -N synchro-dir-pop synchro_dir_pop
+function synchro_dir_pop {
+if [ -f /tmp/zsh_chosedir ]; then
+    curr="$(cat /tmp/zsh_chosedir)"
+    if [ "$(pwd)" != "$curr" ]; then
+        # Change directories and redisplay the prompt
+        # (Still don't fully understand this magic combination of commands)
+        # [[ -o zle ]] && zle -R && cd "$(cat ~/.pwd)" && precmd && zle reset-prompt 2>/dev/null
+        cd "$curr" && zle reset-prompt
+    fi
+fi
+}
+
+bindkey -a "^O" synchro-dir-pop
+bindkey "^O" synchro-dir-push
 
 ### ----------- Untested
 # autoload smart-insert-last-word

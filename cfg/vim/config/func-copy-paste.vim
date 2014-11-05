@@ -9,17 +9,18 @@ function! CountCopyLines(msg)
 endfunction
 
 nnoremap <C-y> :let @+=@" \| :call CountCopyLines('Push:')<CR>
-cnoremap <C-y> <C-U>exec 'call setreg(''+'', getreg('':'')) \| call CountCopyLines(''Push:'')<CR>'<CR>
+cnoremap <C-y> :<C-U>call setreg(''+'', getreg('':'')) \| call CountCopyLines(''Push:'')<CR><CR>
 vnoremap <C-y> "+y \| :call CountCopyLines('Push:')<CR>
 nnoremap <C-p> :let @"=@+ \| :call CountCopyLines('Pull:') <CR>
 "" Don't use as I use C-n C-p for navigation in command line
 " cnoremap <C-p> <C-U>exec 'call setreg('':'', getreg('':'') . getreg(''+'')) \| call CountCopyLines(''Pull:'')<CR>'<CR>
-vnoremap <C-p> :call CountCopyLines('Pull:') \| "+p <CR>
+vnoremap <C-p> :call CountCopyLines('Pull:') \| normal "_d"+P <CR>
 " Swap registry
 noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 
 noremap  zp "0p
 noremap  zP "0P
 vnoremap P  "_dP
+vnoremap p  "_dP
 
 
