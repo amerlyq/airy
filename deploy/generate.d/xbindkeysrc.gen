@@ -170,15 +170,17 @@ wprf "$(
     act_magic $posmag 456 u  Shield
 
     act_spell $posmag 789       b  IceShards
-    act_spell $posmag 123654789 7  Dispel
-    act_spell $posmag 25        8  Light
-    act_spell $posmag 85        9  Dark
-    act_spell $posmag 12369874  0  ForceField
+    act_spell $posmag 123654789 8  Dispel
 )\n"
 
 posmag=4
 wprf "$(
     act_magic $posmag 1   comma   Fireburst
     act_magic $posmag 3   period  Shock
+    act_magic $posmag 1236 f      Fireball
     act_magic $posmag 456 slash   Shield
+
+    act_spell $posmag 25        7  Light
+    act_spell $posmag 12369874  9  ForceField
+    act_spell $posmag 85        0  Dark
 )\n"
