@@ -352,6 +352,13 @@ NeoBundle 'kana/vim-operator-user'
 " powerman/vim-plugin-viewdoc
 
 NeoBundle 'octol/vim-cpp-enhanced-highlight'
+" Syntax highlight
+" https://github.com/Shirk/vim-gas
+" https://github.com/beyondmarc/opengl.vim
+
+" Highlight choosen
+NeoBundle 't9md/vim-quickhl'
+
 
 " Colorize html-codes
 " NeoBundleLazy 'lilydjwg/colorizer'
