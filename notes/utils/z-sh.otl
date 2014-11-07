@@ -1,0 +1,25 @@
+Kill suggests processes to kill
+	kill chr‹tab›↓↓
+Remote scp suggestions
+ It will only work if you’ve password-less access to the remote, i.e. when
+ you’ve pre-shared rsa/dsa keys.
+	scp root@192.168.2.20:‹tab›‹tab›↓→
+Known SSH hosts
+ Zsh will suggest usernames & hosts based on where you’ve previously sshed to.
+	ssh ro‹tab›10‹tab›‹tab›‹tab›↓→
+Filesystem navigation
+	/‹tab›‹tab›↓→
+Arguments/switches completion
+	nmap -‹tab›‹tab›↓
+		More completion
+		 https://github.com/zsh-users/zsh-completions/tree/master/src
+autojump or fasd
+	https://github.com/clvv/fasd
+
+zsh-syntax-highlighting on command line
+	cd ~/.oh-my-zsh/custom/plugins
+	git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
+	# define where custom plugins live:
+	ZSH_CUSTOM=~/.oh-my-zsh/custom/
+	# Make sure plugins section contains zsh-syntax-highlighting:
+	plugins=(history-substring-search zsh-syntax-highlighting)

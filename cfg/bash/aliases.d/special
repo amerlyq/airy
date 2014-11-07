@@ -22,8 +22,14 @@ alias untarbz2='tar xvfj'
 
 
 # dir with many small files sending   #ALT: scp file1 file2 ... fileN user@host:~/Downloads/
-scpto() { tar czvf - "${2?Need dir}" | ssh ${1?Need server} "tar -xzvf - ${3+-C "$3"}"; }
-scpfr() { ssh ${1?Need server} "tar -czvf - '${2?Need dir}'" | tar -xzvf - ${3+-C "$3"}; }
+scpto() {
+    src="${2?Need dir}"
+    cd "${src%/*}" && tar czvf - "${src##*/}" | ssh ${1?Need server} "tar -xzvf - ${3+-C "$3"}";
+}
+scpfr() {
+    src="${2?Need dir}"
+    ssh ${1?Need server} "cd '${src%/*}' && tar -czvf - '${src##*/}'" | tar -xzvf - ${3+-C "$3"};
+}
 
 alias mount='mount |column -t'
 alias mountl='sudo fdisk -l'
