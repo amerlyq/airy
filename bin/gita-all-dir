@@ -7,7 +7,12 @@ gita_st() { # $1 -- rep path
     echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 
-gita_pull() { echo; echo "--[ $1 ]--" && git pull --rebase --verbose; }
+gita_pull() {
+    printf "\n\n$(tput setaf 3)--[ $1 ]--$(tput sgr0)\n";
+    if ! git pull --rebase --verbose; then
+        git stash && git pull --rebase --verbose && git stash pop
+    fi
+}
 
 all_git() { # $1 -- git command
     for rp in "$PWD"/*; do

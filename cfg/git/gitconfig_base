@@ -17,9 +17,11 @@
 #    prompt = false
 [diff]
     tool = vimdiff
-    guitool = gvimdiff
+    guitool = meld
     renamelimit = 0  # Accelerate diffs
 [difftool]
+    # http://jeetworks.org/setting-up-git-to-use-your-diff-viewer-or-editor-of-choice/
+    cmd = meld $LOCAL $REMOTE
     prompt = false
 
 #[difftool "beyondcompare"]
@@ -134,5 +136,9 @@
     fa = fetch --all
     pom = push origin master
     #b = branch
+    #
+    url = config --get remote.origin.url
+    meld = difftool -g
+    dmeld = difftool -g -d
 
 # vim: ft=gitconfig
