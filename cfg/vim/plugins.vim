@@ -408,6 +408,8 @@ NeoBundle 'matze/vim-move'
 " Viewing man in vim: good, but no colors in git lg1, need to investigate
 " NeoBundleLazy 'rkitover/vimpager'
 
+" Ascii graph drawing in vim
+NeoBundle 'vim-scripts/DrawIt'
 " ALT: http://tiddlywiki.com  -- one-page wiki
 NeoBundle 'vimoutliner/vimoutliner', {
     \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], },
