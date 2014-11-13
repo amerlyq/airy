@@ -1,11 +1,13 @@
 set number "relativenumber  " show line numbers relative to cursor
 set novisualbell    " don't flash the screen
 set laststatus=2    " always show status line
+set ruler
+set showcmd
 set wildignore+=*.o,*.obj,.git,*.rbc,*.class,.svn,vendor/gems/*
 set wildmenu        " tab-completion variants menu in command mode
 set wildmode=list:longest,full          "instead of first-choosing
 
-" Make tab char visible
+" Make tab char visible ">\\
 exec "set listchars=tab:\\\\_,extends:>,precedes:<,trail:\uB7,nbsp:~"
 set list            " display otherwise invisible characters
 " tab:\uBB\uBB,nbsp:%,eol:¬

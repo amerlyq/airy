@@ -24,6 +24,7 @@ endif
 set formatoptions+=l " don't auto-wrap line if it was longer before insert
 "set textwidth=118    " hard-wrap long lines as you type them
 set tabstop=4        " render TABs using this many spaces
-set expandtab        " insert spaces when TAB is pressed
 set softtabstop=4    " ... this many spaces
 set shiftwidth=4     " indentation amount for < and > commands
+set expandtab        " insert spaces when TAB is pressed
+set smarttab

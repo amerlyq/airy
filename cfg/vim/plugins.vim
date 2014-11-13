@@ -392,6 +392,8 @@ NeoBundle 'nathanaelkane/vim-indent-guides'
 " ALT: osyo-manga/vim-anzu
 NeoBundle 'henrik/vim-indexed-search'
 NeoBundle 'bronson/vim-visual-star-search'
+" Multiple hl for searching by / ? or g/
+NeoBundle 'haya14busa/incsearch.vim'
 " ======================================
 " Add new virtual cursor for next occurance of word under cursor
 " Or add them for each line of multiline selection
@@ -410,6 +412,8 @@ NeoBundle 'matze/vim-move'
 
 " Ascii graph drawing in vim
 NeoBundle 'vim-scripts/DrawIt'
+" Fast table creation and modification
+NeoBundle 'dhruvasagar/vim-table-mode'
 " ALT: http://tiddlywiki.com  -- one-page wiki
 NeoBundle 'vimoutliner/vimoutliner', {
     \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], },

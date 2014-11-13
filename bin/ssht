@@ -11,11 +11,13 @@ PRG="$1"
 shift
 ARGS="${@}"
 
-
 # pane_name()  { tmux send-keys "printf '\\033]2;%s\\033\\\\' '$1'" 'C-m'; }
 # $(pane_name p1)
 SESSION='main'
-sstmux="if ! tmux has-session -t $SESSION ; then
+sstmux="
+which zsh >/dev/null && export SHELL=\$(which zsh)
+which tmux >/dev/null && if ! tmux has-session -t $SESSION
+then
     tmux new-session -d -s $SESSION -n '$PRG'
     tmux rename-window -t $SESSION:1 'work'
 fi
