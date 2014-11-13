@@ -9,8 +9,22 @@
 
 PRG="$1"
 shift
+ARGS="${@}"
+
+
+# pane_name()  { tmux send-keys "printf '\\033]2;%s\\033\\\\' '$1'" 'C-m'; }
+# $(pane_name p1)
+SESSION='main'
+sstmux="if ! tmux has-session -t $SESSION ; then
+    tmux new-session -d -s $SESSION -n '$PRG'
+    tmux rename-window -t $SESSION:1 'work'
+fi
+tmux attach -t $SESSION
+"
+
 case "$PRG" in
-    mpd) ~/.bin/ssht.d/sir-mpd $@ ;;
-    srk) ssh srk -t zsh $@ ;;
-    *)   ssh $PRG $@ ;;
+    mpd)  ~/.bin/ssht.d/sir-mpd $ARGS ;;
+    srk)  ssh srk -t "$sstmux" ;;
+    srkz) ssh srk -t zsh $ARGS ;;
+    *)    ssh $PRG $ARGS ;;
 esac

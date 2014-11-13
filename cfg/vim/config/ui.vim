@@ -4,10 +4,17 @@ set laststatus=2    " always show status line
 set wildignore+=*.o,*.obj,.git,*.rbc,*.class,.svn,vendor/gems/*
 set wildmenu        " tab-completion variants menu in command mode
 set wildmode=list:longest,full          "instead of first-choosing
-set list            " display otherwise invisible characters
 
 " Make tab char visible
-set listchars=tab:\\_,extends:>,precedes:<,nbsp:% ",eol:¬
+exec "set listchars=tab:\\\\_,extends:>,precedes:<,trail:\uB7,nbsp:~"
+set list            " display otherwise invisible characters
+" tab:\uBB\uBB,nbsp:%,eol:¬
+" The "NonText" highlighting will be used for "eol", "extends" and
+"  "precedes".  "SpecialKey" for "nbsp", "tab" and "trail".
+autocmd ColorScheme * highlight! SpecialKey  ctermbg=None cterm=None
+autocmd ColorScheme * highlight! NonText  ctermbg=None
+
+
 set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
 set mouse=a           " support for mouse wheel and clicks

@@ -58,6 +58,12 @@ noremap k gk
 noremap gj j
 noremap gk k
 
+" swap v and CTRL-V because Block mode is more useful that Visual mode
+nnoremap    v   <C-V>
+nnoremap <C-V>     v
+vnoremap    v   <C-V>
+vnoremap <C-V>     v
+
 " Unused
 " map - $
 " map # %
