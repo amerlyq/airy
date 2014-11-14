@@ -26,7 +26,6 @@ tmux attach -t $SESSION
 
 case "$PRG" in
     mpd)  ~/.bin/ssht.d/sir-mpd $ARGS ;;
-    srk)  ssh srk -t "$sstmux" ;;
     srkz) ssh srk -t zsh $ARGS ;;
-    *)    ssh $PRG $ARGS ;;
+    *)    ssh $PRG ${ARGS:--t "$sstmux"} ;;
 esac

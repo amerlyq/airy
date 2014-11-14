@@ -24,20 +24,31 @@ if [ "$1" == "-u" ]; then
     sudo apt-get upgrade -y
     # sudo apt-get dist-upgrade -y #&& sudo reboot
 else
+
+    cRed=$(tput setaf 1)
+    cGrn=$(tput setaf 2)
+    cYlw=$(tput setaf 3)
+    cPrl=$(tput setaf 5)
+    cStd=$(tput sgr0)
+
     # Installing
-    echo "OPTS_SET: ${OPTS_SET[@]}"
-    echo "FROM: ${PRS_DIR}"
+printf "
+| OPTS_SET: ${OPTS_SET[@]}
+| FROM: ${PRS_DIR}
+\n"
     for pr in "${OPTS_SET[@]}"; do
-        printf "$(tput setaf 2)--- INSTALL: ${pr}.pr\n$(tput sgr0)"
-        "$PRS_DIR/${pr}.pr"
-    done 2>&1 | tee /tmp/pristine.log | sed -n -e "
-        /^E:.*/ s//\t$(tput setaf 1)\0$(tput sgr0)/p
-        /^\(.*\) is already the newest version\./ s//\t$(tput setaf 3)\1\*$(tput sgr0)/p
-        /^The following extra packages/,/^After this operation/p
-        /.*/ s//\./p
-        " -e '/^\./N'
-        # " |  awk '{ s=$0; if(s==".") { printf $s } else { printf "\n"$s } }'
-        #
+        printf "\n${Prl}INSTALL: ${pr}.pr$cStd\n"
+        "$PRS_DIR/${pr}.pr" 2>&1 \
+        | tee /tmp/pristine.log | awk '{pf=0}
+            /^E:.*/ {pf=1; printf "'"$cRed%s*$cStd"'",$0}
+            /^The following/ { printf "\n" }
+            /^The following packages will be upgraded/ {pf=1; next; printf "'"$cYlw%s*$cStd"'",$0}
+            /^The following extra packages/,/^After this operation/ {pf=1; printf "\n%s",$0}
+            /is already the newest version/ {pf=1; printf "'"$cGrn%s*$cStd"'",$1}
+            { if(pf==0) {printf "."} }
+        '
+        printf "\n"
+    done
 fi
 
 
