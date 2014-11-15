@@ -28,6 +28,7 @@ else
     cRed=$(tput setaf 1)
     cGrn=$(tput setaf 2)
     cYlw=$(tput setaf 3)
+    cBlu=$(tput setaf 4)
     cPrl=$(tput setaf 5)
     cStd=$(tput sgr0)
 
@@ -45,6 +46,7 @@ printf "
             /^The following packages will be upgraded/ {pf=1; next; printf "'"$cYlw%s*$cStd"'",$0}
             /^The following extra packages/,/^After this operation/ {pf=1; printf "\n%s",$0}
             /is already the newest version/ {pf=1; printf "'"$cGrn%s*$cStd"'",$1}
+            /^Get:/ { printf "'"${cBlu}.$cStd"'" }
             { if(pf==0) {printf "."} }
         '
         printf "\n"

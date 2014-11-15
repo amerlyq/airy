@@ -7,11 +7,25 @@ Remote
 Edit
 	ci" | Change all inside "..."
 
+Execute
+	| :.!zsh     | Replace current line with bash command to it's output
+	| :r!grep    | Append output of filter
+	| :redir[!] @+  | Redirect last in copy buffer (Else:  @A,  >> out.txt)
+	| set nomore | To suppress '--more--' prompt
+	| :history	 |
+	| :g/fred/   |
+	|   " any other commands
+	| :redir END |
+	| !}sort          " sort from cursor to end of paragraph
+	| 3!}sort         " same, 3 paragraphs
+	| 3!!sort         " sort 3 lines
+
 Search
 	| /[...]      |
 	| /<C-R><C-W> | Search word, cursor hovering (..<C-A> for space-delimited)
 	| * or #	  | Fast, as above
 	| //          | Search last
+	| g/ | g/patt | List of results for last searched pattern
 	| s::[...]:g  | Subs last
 	| s::\=@0:g   | Subs last by previously yanked (Map it?)
 	| <C-L>       | Clear results highlight

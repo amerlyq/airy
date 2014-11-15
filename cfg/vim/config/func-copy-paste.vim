@@ -23,4 +23,14 @@ noremap  zP "0P
 vnoremap P  "_dP
 vnoremap p  "_dP
 
-
+" See: http://vim.wikia.com/wiki/Copy_search_matches
+function! CopyMatches(reg)
+  let hits = []
+  %s//\=len(add(hits, submatch(0))) ? submatch(0) : ''/ge
+  let reg = empty(a:reg) ? '+' : a:reg
+  execute 'let @'.reg.' = join(hits, "\n") . "\n"'
+endfunction
+command! -register CopyMatches call CopyMatches(<q-reg>)
+" Usage:
+" :let @a = ''
+" :bufdo CopyMatches A

@@ -127,3 +127,20 @@ hg_install() { # $1 - git rep, $2 - dir name
 
     rep_autobuild "$PR_DIR"
 }
+
+
+git_get() {
+    local PR_DIR=${1##*/} BUILD_DIR LINK="$1"
+    mkdir -p "$CURR_DIR_HUB"
+    PR_DIR="$CURR_DIR_HUB/${PR_DIR,,}"
+
+    if [ -d "$PR_DIR" ]; then
+        cd "$PR_DIR"
+        git pull
+    else
+        if [ "${LINK//'://'}" == "$LINK" ]; then
+            LINK="https://github.com/$LINK"
+        fi
+        git clone --depth 1 "$LINK" "$PR_DIR"
+    fi
+}
