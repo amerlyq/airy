@@ -182,16 +182,19 @@ endif
 " http://www.vim.org/scripts/script.php?script_id=4359
 NeoBundle 'tpope/vim-rsi'
 NeoBundle 'tpope/vim-endwise'
-" Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
-NeoBundle 'PeterRincker/vim-argumentative'
-" Insert mode auto-completion for quotes, parens, brackets, etc
-NeoBundle 'Raimondi/delimitMate'
-
+NeoBundle 'tpope/vim-repeat'
 " Manage surrounding ('"<p>...) by replace cs"' or delete ds"
 NeoBundle 'tpope/vim-surround'
-" Disabled: bug with neocomplete -- <BS> don't remove both brackets,
+" Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
+NeoBundle 'PeterRincker/vim-argumentative'
+
+" DISABLED: has problems with russian text
+" Insert mode auto-completion for quotes, parens, brackets, etc
+"NeoBundle 'Raimondi/delimitMate'
+" DISABLED: bug with neocomplete -- <BS> don't remove both brackets,
 " unnecessary quotes for my workflow, partially superseeded by vim-surround
 "NeoBundle 'kana/vim-smartinput'
+
 
 ":Make cover for long-running tasks
 NeoBundle 'tpope/vim-dispatch'
@@ -222,12 +225,6 @@ NeoBundleLazy 'gregsexton/gitv', { 'depends' : [ 'tpope/vim-fugitive' ]
 " x/X -> next/previous branching point
 " Folds are enabled
 " }}}
-
-" Alt: 'airblade/vim-gitgutter' "Only for git, but much faster file save
-NeoBundle 'mhinz/vim-signify'
-
-" Plugin to toggle, display and navigate marks
-" NeoBundle 'kshenoy/vim-signature'
 
 " ======================================
 
@@ -389,6 +386,10 @@ NeoBundleLazy 'elzr/vim-json', {
 " ======================================
 "TIME:
 NeoBundle 'bling/vim-airline'
+" Alt: 'airblade/vim-gitgutter' "Only for git, but much faster file save
+NeoBundle 'mhinz/vim-signify'
+" Plugin to toggle, display and navigate marks
+" NeoBundle 'kshenoy/vim-signature'
 
 NeoBundle 'mhinz/vim-startify'
 " When swap exists, it show process id, or you can diff swp with file on disk

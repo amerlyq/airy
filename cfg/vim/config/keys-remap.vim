@@ -94,8 +94,8 @@ noremap  gL  :<C-U>blast<CR>
 " works cool only with xkb map of arrows to C-hjkl
 " nnoremap <C-PageUp>    <Esc>:tabprev<CR>
 " nnoremap <C-PageDown>  <Esc>:tabnext<CR>
-nnoremap [t <Esc>:tabprev<CR>
-nnoremap ]t <Esc>:tabnext<CR>
+" nnoremap [t <Esc>:tabprev<CR>
+" nnoremap ]t <Esc>:tabnext<CR>
 
 " use Alt-Left and Alt-Right to move current tab to left or right
 " nnoremap <silent> <A-Left> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>

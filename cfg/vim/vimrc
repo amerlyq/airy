@@ -15,7 +15,7 @@ else "elseif
 endif
 
 " All commands below will use this leader, commands above -- will use '\'
-" let mapleader=","
+let mapleader=","
 "noremap \ ,
 
 "===============================================
@@ -62,18 +62,17 @@ let g:neobundle#types#git#default_protocol = 'git'
 " or see neobundle-options-type__depth
 let g:neobundle#types#git#clone_depth = 1   "shallow copy
 
-"Instead all of this: call neobundle#rc(expand('~/.vim/bundle/'))
 call neobundle#begin(expand('$VIMHOME/bundle/'))
   "Improves vim start time
-  if neobundle#has_cache()
-    NeoBundleLoadCache
-    "MUST: :NeoBundleClearCache if change .vimrc
-  else
+  " if neobundle#has_cache()
+  "   NeoBundleLoadCache
+  "   "MUST: :NeoBundleClearCache if change .vimrc
+  " else
     NeoBundleFetch 'Shougo/neobundle.vim'
     " Refer to |:NeoBundle-examples|.
     source $VIMHOME/plugins.vim
-    NeoBundleSaveCache
-  endif
+  "   NeoBundleSaveCache
+  " endif
 call neobundle#end()
 " Required!
 filetype plugin indent on

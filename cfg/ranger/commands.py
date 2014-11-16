@@ -213,8 +213,9 @@ class shell(Command):
             if '%' in command:
                 command = self.fm.substitute_macros(command, escape=True)
 
-            # Amer: fix to load aliases working from shell
-            self.fm.execute_command("$SHELL -c 'source ~/.bash/aliases; " + command + "'", flags=flags)
+            # Amer: fix to load aliases working from shell, setopt aliases;
+            # self.fm.execute_command("$SHELL -c 'source ~/.bash/aliases; " + command + "'", flags=flags)
+            self.fm.execute_command("$SHELL -ic '" + command + "'", flags=flags)
             # self.fm.execute_command(command, flags=flags)
 
     def tab(self):

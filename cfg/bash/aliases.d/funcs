@@ -19,3 +19,17 @@ note() { echo "{ notify-send --urgency normal --expire-time=10000 -i typing-moni
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # alias notes='date +"%Y-%m-%d, %T" >> ./notes.otl && vim ./notes.otl'
+
+term-tree() {
+     leaf=$$
+     ps -eo pid,ppid,command | awk -v leaf="$leaf" \
+        '{parent[$1]=$2;command[$1]=$3;}
+     function print_ancestry(pid)
+     {
+         printf("%s|%05s\n",command[pid],pid); // parent[pid];
+         if(pid!=1) print_ancestry(parent[pid])
+     };
+     END{\
+         print_ancestry(leaf)
+     }' | column -t -s '|'
+}

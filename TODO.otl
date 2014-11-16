@@ -1,7 +1,3 @@
- add empty checkbox
- wait until checking with X, commit
- delete on next commit only, not early
-
 BUGS
 	[X] не гаснущий capslock
 	[X] не загружается boot с воткнутым hdmi
@@ -42,6 +38,10 @@ ranger
 		 http://unix.stackexchange.com/questions/82632/tmux-ranger-integration-opening-text-files-in-new-panes
 
 zsh
+	[_] Do more robust in vim
+		$r!ag ./%
+	Investigate creation of autocompletion
+		http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System-Configuration
 	https://github.com/robbyrussell/oh-my-zsh/wiki/Customization
 	[X] Здесь описано как создавать свой промпт
 		http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/
@@ -284,18 +284,12 @@ i3
 	Plugins
 		https://github.com/enkore/j4-dmenu-desktop
 		https://github.com/proxypoke/quickswitch-for-i3
-	Scratchpad with tiling:
-	: В i3 можно создать воркспейс который небудет видно на панели, но можно
-	: будет перейти на него с помощью хоткея?
-	: Есть одна идея, как это сделать. Суть в том, что можно переместить
-	: воркспейс на несуществующий монитор (тогда он пропадет с панели),
-	: а по хоткею возвращать его на основной, но это немного геморно
-	: - 2 хоткея, один чтобы скрыть воркспейс, один чтобы показать.
-	: но ведь можно сделать один скрипт, который будет тогглить.
-	:
-	:>> Но желание-то ведь создать воркспейс с несколькими плавающими окнами,
-	: которые будут висеть поверх текущего воркспейса! Может, груповое
-	: перемещение на скрытый рабочий стол и обратно?
+	[X] Scratchpad with tiling:
+		Mark parent container ('), detach to float, move in scratchpad
+		: ALT: wksp on unexisting monitor, move windows from--to by script
+		:>> Но желание-то создать воркспейс с несколькими плавающими окнами,
+		: которые будут висеть поверх текущего воркспейса! Может, груповое
+		: перемещение на скрытый рабочий стол и обратно?
 	dunst
 		make notifications when marking windows, or see all available marks
 
@@ -339,6 +333,12 @@ TODO
 >	[_] Wuala -- move files.
 >			Find another file-saving.
 >			Use copy.com? Torrent-sync? rsync?
+	[_] Rerun test every time as files in dir changes. Is it useful?
+		https://github.com/tartley/rerun
+	[_] Integrate script command for terminal 'script -afeq /tmp/log11'
+	 Be aware: vim or ncurses is not logged appropriately! How to exclude?
+		See powerfull alternative: ah [ https://github.com/9seconds/ah ]
+			http://habrahabr.ru/post/242207/
 
 Find & read
 	[_] Book: Production Volume Rendering: Design and Implementation

@@ -1,4 +1,5 @@
 
+## Global aliases
 # Write L after a command to page through the output.
 alias -g L="| less"
 alias -g TL='| tail -20'
@@ -22,4 +23,26 @@ else
     alias history='fc -l 1'
 fi
 
+## Expandable aliases
+typeset -a ealiases
+ealiases=()
 
+ealias() {
+    alias $1
+    ealiases+=(${1%%\=*})
+}
+
+function expand-ealias() {
+    if [[ $LBUFFER =~ "(^|[;|&])\s*(${(j:|:)ealiases})\$" ]]; then
+        zle _expand_alias
+        zle expand-word
+    fi
+    zle magic-space
+}
+zle -N expand-ealias
+
+bindkey -M viins ' '    expand-ealias
+bindkey -M viins '^ '   magic-space     # control-space to bypass completion
+bindkey -M isearch " "  magic-space     # normal space during searches
+
+ealias fff='find . -iname'

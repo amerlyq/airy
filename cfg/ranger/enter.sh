@@ -21,8 +21,9 @@ fi
 
 # Processors
 case "$EXT" in
-    sh|py) "$PWD/$NM" && pause ;;
-      dot) dot -Tx11 "$NM"     ;;
+    sh) "$PWD/$NM" && pause ;;
+    py) python "$PWD/$NM" && pause ;;
+    dot) dot -Tx11 "$NM"     ;;
 esac
 
 if [ $? -ne 0 ]; then pause; fi
