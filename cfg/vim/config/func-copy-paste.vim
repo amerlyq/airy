@@ -1,3 +1,5 @@
+" normal p is ':pu'
+
 " show the command history (q:)
 " Remap line-up and move-up
 " on visual area it must copy instantly! and only in @+
@@ -17,6 +19,16 @@ nnoremap <C-p> :let @"=@+ \| :call CountCopyLines('Pull:') <CR>
 vnoremap <C-p> :call CountCopyLines('Pull:') \| normal "_d"+P <CR>
 " Swap registry
 noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
+
+" Try it {{{
+" nnoremap p "+p
+" map <Leader>p :set paste<CR>o<esc>"*]p:set nopaste<cr>
+" Prevent Paste loosing the register source:
+" http://stackoverflow.com/a/7797434/1147859
+xnoremap p pgvy
+" Send shizzle to the black hole
+vnoremap <Leader>d "_d
+" }}}
 
 noremap  zp "0p
 noremap  zP "0P

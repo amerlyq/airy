@@ -1,6 +1,3 @@
-"let mapleader=","
-"noremap \ ,
-"noremap <Leader>d "_d
 " give it a try
 "inoremap jj <ESC>
 
@@ -15,7 +12,10 @@ nnoremap ` '
 noremap ; :
 noremap @; @:
 "noremap : ,
-noremap , ;
+" noremap , ;
+noremap [f ;
+noremap ]f ,
+
 
 " Highlight only. Don't jump.
 noremap z# g#
@@ -69,7 +69,7 @@ vnoremap <C-V>     v
 " map # %
 
 "" VISUAL
-" visually select the text that was last edited or pasted
+" select the last edited or pasted text, added last time you were in INSERT
 nnoremap gv `[v`]
 "" select last paste in visual mode
 nnoremap <expr> gb '`[' . strpart(getregtype(), 0, 1) . '`]'
@@ -92,8 +92,11 @@ noremap  gl  :<C-U>bnext<CR>
 noremap  gH  :<C-U>bfirst<CR>
 noremap  gL  :<C-U>blast<CR>
 " works cool only with xkb map of arrows to C-hjkl
-nnoremap <C-PageUp>    <Esc>:tabprev<CR>
-nnoremap <C-PageDown>  <Esc>:tabnext<CR>
+" nnoremap <C-PageUp>    <Esc>:tabprev<CR>
+" nnoremap <C-PageDown>  <Esc>:tabnext<CR>
+nnoremap [t <Esc>:tabprev<CR>
+nnoremap ]t <Esc>:tabnext<CR>
+
 " use Alt-Left and Alt-Right to move current tab to left or right
 " nnoremap <silent> <A-Left> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
 " nnoremap <silent> <A-Right> :execute 'silent! tabmove ' . tabpagenr()<CR>

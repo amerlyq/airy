@@ -8,6 +8,8 @@
 " leave insert mode quickly
 " if ! has('gui_running')
 " set ttimeoutlen=10
+
+set noesckeys " (Hopefully) removes the delay when hitting esc in insert mode
 augroup FastEscape
   autocmd!
   au InsertEnter * set timeoutlen=0

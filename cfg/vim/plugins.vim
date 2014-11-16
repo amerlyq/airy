@@ -184,6 +184,9 @@ NeoBundle 'tpope/vim-rsi'
 NeoBundle 'tpope/vim-endwise'
 " Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
 NeoBundle 'PeterRincker/vim-argumentative'
+" Insert mode auto-completion for quotes, parens, brackets, etc
+NeoBundle 'Raimondi/delimitMate'
+
 " Manage surrounding ('"<p>...) by replace cs"' or delete ds"
 NeoBundle 'tpope/vim-surround'
 " Disabled: bug with neocomplete -- <BS> don't remove both brackets,
@@ -329,6 +332,11 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {
 
 " NeoBundle 'vim-scripts/DoxygenToolkit.vim'
 NeoBundle 'hsanson/vim-android'
+" Web
+" NeoBundle 'mattn/emmet-vim'
+" NeoBundle 'cakebaker/scss-syntax.vim'
+" NeoBundle 'gorodinskiy/vim-coloresque'
+" NeoBundle 'tpope/tpope/vim-unimpaired'
 
 " Has syntastic integration, allow building CMake from vim.
 " TODO: temporarily disabled as I can't understand how to integrate with syntastic

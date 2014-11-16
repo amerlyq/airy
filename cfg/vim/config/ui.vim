@@ -1,10 +1,9 @@
-set number "relativenumber  " show line numbers relative to cursor
 set novisualbell    " don't flash the screen
 set laststatus=2    " always show status line
 set ruler
-set showcmd
+set showcmd "shows the last command entered in the very bottom right (not in powerline)
 set wildignore+=*.o,*.obj,.git,*.rbc,*.class,.svn,vendor/gems/*
-set wildmenu        " tab-completion variants menu in command mode
+set wildmenu        " visual tab-completion variants menu in command mode
 set wildmode=list:longest,full          "instead of first-choosing
 
 " Make tab char visible ">\\
@@ -20,6 +19,7 @@ autocmd ColorScheme * highlight! NonText  ctermbg=None
 set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
 set mouse=a           " support for mouse wheel and clicks
+set ttyfast " sends more characters to the screen for fast terminal connections
 set colorcolumn=+1    " show textwidth limit
 set virtualedit=block " cursor can be positioned where there is no character
 

@@ -15,10 +15,16 @@ if [ "$1" == 'l' ]; then
     ls --color=auto /media/$CURR_USER; exit
 fi
 
-if [ "$1" == 's' ]; then
-    mkdir -p ~/seclab
-    sudo mount -t cifs -o user=${WORK_MAIL%@*} //seclab.surc.kiev.ua/Exchange ~/seclab
-fi
+dosamba() {
+    local dir="$1" usr="$2" shr="$3"
+    mkdir -p "$dir" || sudo mkdir -p "$dir"
+    sudo mount -t cifs -o user="$usr" //$shr/ "$dir"
+}
+
+case "$1" in
+    s)  dosamba /media/seclab  ${WORK_MAIL%@*} $SURC_SRV/Exchange ;;
+    sa) dosamba /media/android $ADR_USER $ADR_IPL ;;
+esac
 
 domnt() {
     local lbl="$1" path="$2"
