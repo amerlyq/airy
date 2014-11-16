@@ -335,10 +335,16 @@ TODO
 >			Use copy.com? Torrent-sync? rsync?
 	[_] Rerun test every time as files in dir changes. Is it useful?
 		https://github.com/tartley/rerun
-	[_] Integrate script command for terminal 'script -afeq /tmp/log11'
+	[_] Integrate script command for terminal
+		| 'script -afeq /tmp/log11'
 	 Be aware: vim or ncurses is not logged appropriately! How to exclude?
 		See powerfull alternative: ah [ https://github.com/9seconds/ah ]
 			http://habrahabr.ru/post/242207/
+	[_] Rsync to ranger
+		| rsync -azP -nv --delete d1/ d2
+		: --exclude=pattern_to_exclude --include=pattern_to_include
+	[_] All uniques (remove all repeating)
+		| grep -Fvx -f umi media
 
 Find & read
 	[_] Book: Production Volume Rendering: Design and Implementation

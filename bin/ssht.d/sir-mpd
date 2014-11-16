@@ -1,7 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 # ports for mpd player
 
-SSH_MPD="ssh sir -fNT -L 127.0.0.1:6601:127.0.0.1:6600 -L 127.0.0.1:8001:127.0.0.1:8000"
+if [ "$CURR_PROF" == laptop ]; then
+    srv=lsir
+else
+    srv=sir
+fi
+
+SSH_MPD="ssh $srv -fNT -L 127.0.0.1:6601:127.0.0.1:6600 -L 127.0.0.1:8001:127.0.0.1:8000"
 STREAM="http://localhost:8001"
 FOUND=`mpc playlist -f "[%file%]" | grep -n "$STREAM"`
 

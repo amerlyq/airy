@@ -6,7 +6,7 @@ set ignorecase  " make searching case insensitive
 set smartcase   " ... unless the query has capital letters
 
 " Amazing custom search command. Thansk to Ingo: http://stackoverflow.com/a/24818933/1147859
-command -nargs=+ Se execute 'vimgrep /' . [<f-args>][0] . '/ **/*.' . [<f-args>][1]
+command! -nargs=+ Se execute 'vimgrep /' . [<f-args>][0] . '/ **/*.' . [<f-args>][1]
 set gdefault " assume the /g flag on :s substitutions to replace all matches in a line
 " set autoread " Make Vim automatically open changed files (e.g. changed after a Git commit)
 
