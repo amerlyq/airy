@@ -2,7 +2,7 @@
 inoremap <C-space> <C-x><C-o>
 
 " Change Working Directory to that of the current file
-cmap <Leader>cwd lcd %:p:h
+nnoremap <Leader>cwd :lcd %:p:h
 
 " set tildeop   "allow moves for register change, like  ~w -- for word
 

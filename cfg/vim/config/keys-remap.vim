@@ -42,10 +42,11 @@ noremap R gR
 
 " remove history-window (when you mistakes)
 nnoremap q: q;
-" Use Q for formatting the current paragraph (or selection)
+" Use q for formatting the current paragraph (or selection)
 " Ex-command availible by gQ
-vnoremap Q gq
-nnoremap Q Vgq
+noremap Q q
+vnoremap q gq
+nnoremap q Vgq
 "gqap
 
 " retain relative cursor position when paging

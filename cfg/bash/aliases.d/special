@@ -52,9 +52,12 @@ alias f='find ./ -type f -name '
 alias ff='find ./ | grep -i '
 
 # agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
-agi() { ag --pager less -G '^(?:(?!build|libs|tags).)*$' $@; }
+agi() { ag -G '^(?:(?!build|libs|tags).)*$' $@; }
+agp() { agi --pager less $@; }
 agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
-alias hi="history | agi "
+hi() { if [ -z "$@" ]; then history | tail -20; else
+    history | sed 's/^\s*\(\d\+\)\s*\(.*\)$/\2 #\1' | sort -u | agi $@;
+fi; }
 
 # old=$1, new=$2 -r | recursively  # -l | print filenames
 sed_dir() { grep -rl "$1" ./* | xargs sed -i "s@$1@$2@g"; }
