@@ -6,10 +6,8 @@ else
     set shell=/bin/sh "bash
 endif
 
-set history=9999  " remember last commands & searche patts
 set confirm       " ask user before aborting an action
-
-set nobackup writebackup " backup current file, deleted afterwards
+set history=9999  " remember last commands & searche patts
 
 command! -nargs=1 Silent
 \ | execute ':silent !'.<q-args>

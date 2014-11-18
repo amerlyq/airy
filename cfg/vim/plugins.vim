@@ -1,6 +1,21 @@
 " vim: foldmethod=marker
 " :NeoBundleClearCache if change .vimrc
 
+let mapleader="\\"
+
+
+NeoBundle 'Valloric/ListToggle'
+" <leader>q -> quickfix list
+" <leader>w -> location list
+
+"==========================================
+" All commands below will use this leader, commands above -- will use '\'
+"==========================================
+
+let mapleader=","
+"noremap \ ,
+
+
 " Let NeoBundle manage NeoBundle
 NeoBundleFetch 'Shougo/neobundle.vim'
 " git clone --depth 1 https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
@@ -111,9 +126,6 @@ NeoBundleLazy 'Shougo/unite-outline', {
 NeoBundle 'osyo-manga/vim-over'
 
 " ======================================
-NeoBundle 'Valloric/ListToggle'
-" <leader>q -> quickfix list
-" <leader>w -> location list
 
 " Integration with neocomplete: for stdlib++, boost, etc (works on Windows)
 " http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/

@@ -14,10 +14,15 @@ call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
 nnoremap <leader>o :<C-u>Unite -buffer-name=files file_rec/async:!<cr>
 " Replaces NERDTree
 nnoremap <leader>f :<C-u>Unite -buffer-name=files file<cr>
-nnoremap <leader>F :<C-u>VimFiler<cr>
 
+
+let s:leader = g:mapleader
+let mapleader = "\\"
+nnoremap <leader>f :<C-u>VimFiler<cr>
 " Quickly find a buffer
 nnoremap <leader>b :<C-u>Unite -quick-match -buffer-name=buffers buffer<cr>
+let mapleader = s:leader
+
 
 nnoremap <leader>/ :<C-u>Unite -buffer-name=grep grep:.<cr>
 

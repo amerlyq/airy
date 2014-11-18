@@ -16,6 +16,8 @@ noremap @; @:
 noremap [f ;
 noremap ]f ,
 
+" No jump when joining
+" nnoremap J mzJ`z
 
 " Highlight only. Don't jump.
 noremap z# g#
@@ -38,16 +40,14 @@ inoremap <M-CR> <Esc>o
 
 " Adequate replace tabs by parts, not entirely
 noremap R gR
-" TODO: map gR to 3gR -> replace 3 chars and return, instead of 3-times repeat
 
-" remove history-window (when you mistakes)
-nnoremap q: q;
+" history-window (when you mistakes) now on 'gq:'
 " Use q for formatting the current paragraph (or selection)
 " Ex-command availible by gQ
-noremap Q q
+noremap gq q
 vnoremap q gq
-nnoremap q Vgq
-"gqap
+nnoremap q gq$
+nnoremap Q gqap
 
 " retain relative cursor position when paging
 nnoremap <PageUp>   <C-U>
@@ -58,6 +58,9 @@ noremap j gj
 noremap k gk
 noremap gj j
 noremap gk k
+
+" more stretching comfort
+noremap g0 ^
 
 " swap v and CTRL-V because Block mode is more useful that Visual mode
 nnoremap    v   <C-V>
@@ -83,10 +86,14 @@ vnoremap > >gv
 " BUFFERS
 noremap  zJ  zj
 noremap  zK  zk
-noremap  zh  <C-W>h
-noremap  zj  <C-W>j
-noremap  zk  <C-W>k
-noremap  zl  <C-W>l
+" TRY:" Set minimum window size to 79x5
+" set winwidth=79
+set winheight=5
+set winminheight=5
+noremap  zh  <C-W>h<C-W>_
+noremap  zj  <C-W>j<C-W>_
+noremap  zk  <C-W>k<C-W>_
+noremap  zl  <C-W>l<C-W>_
 " switch to adjacent buffer in current window
 noremap  gh  :<C-U>bprev<CR>
 noremap  gl  :<C-U>bnext<CR>

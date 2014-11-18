@@ -48,6 +48,7 @@ bindkey -a '^S' history-incremental-search-forward
 
 # RANGER - fast in/out with keeping expression
 bindkey -s -M vicmd 's' '0d$is\np'
+bindkey -s -M vicmd 'q' '0d$iq\n'
 
 # bindkey '^Y' yank-last-arg # No such func
 zle -N yank-current yank_current

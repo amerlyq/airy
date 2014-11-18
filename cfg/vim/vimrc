@@ -14,10 +14,6 @@ else "elseif
     set columns=112
 endif
 
-" All commands below will use this leader, commands above -- will use '\'
-let mapleader=","
-"noremap \ ,
-
 "===============================================
 " Make $VIMHOME point to .vimrc location independent of OS
 if has('win32') || has('win64')
@@ -30,9 +26,34 @@ else
   let $VIMHOME=$HOME . '/.vim'
 endif
 
+"===============================================
+" Backup, undo, swap, etc
 let $VIMCACHEDIR=$HOME . '/.cache/vim'
-set backupdir=$VIMCACHEDIR,~/.tmp,/var/tmp,/tmp
-set directory=$VIMCACHEDIR,~/.tmp,/var/tmp,/tmp
+set backupdir=$VIMCACHEDIR/bckpdir,~/.tmp,/var/tmp,/tmp
+set directory=$VIMCACHEDIR/swapdir,~/.tmp,/var/tmp,/tmp
+if !isdirectory(expand('$VIMCACHEDIR/bckpdir'))
+  call mkdir(expand('$VIMCACHEDIR/bckpdir'), 'p')
+endif
+if !isdirectory(expand('$VIMCACHEDIR/swapdir'))
+  call mkdir(expand('$VIMCACHEDIR/swapdir'), 'p')
+endif
+
+" backup current file, not deleted afterwards: you need free space!
+set backup writebackup backupcopy=auto swapfile
+
+" Store undo history across sessions
+if v:version >= 703
+  let $TAGSDIR=$VIMCACHEDIR . '/easytags.d'
+  if !isdirectory($TAGSDIR)
+    call mkdir($TAGSDIR)
+  endif
+  let &undodir=$VIMCACHEDIR . '/undodir'
+  if !isdirectory(&undodir)
+    call mkdir(&undodir)
+  endif
+  set undofile
+endif
+
 "===============================================
 " Install neobundle if it doesn't exist
 let new_neobundle_install=0
@@ -85,25 +106,13 @@ if !has('vim_starting')
   call neobundle#call_hook('on_source')
 endif
 "===============================================
+
 set fileformats=unix,dos,mac
 set fileencodings=utf-8,cp1251,cp866
 
 " delegate configuration to files in config/
 runtime! config/**/*.vim
 
-
-" Store undo history across sessions
-if v:version >= 703
-  let $TAGSDIR=$VIMCACHEDIR . '/easytags.d'
-  if !isdirectory($TAGSDIR)
-    call mkdir($TAGSDIR)
-  endif
-  let &undodir=$VIMCACHEDIR . '/undodir'
-  if !isdirectory(&undodir)
-    call mkdir(&undodir)
-  endif
-  set undofile
-endif
 "===============================================
 augroup vimrc
   au BufReadPre * setlocal foldmethod=indent

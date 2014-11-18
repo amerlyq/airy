@@ -28,3 +28,6 @@ set softtabstop=4    " ... this many spaces
 set shiftwidth=4     " indentation amount for < and > commands
 set expandtab        " insert spaces when TAB is pressed
 set smarttab
+
+" TRY: wrap only on \s chars
+set linebreak

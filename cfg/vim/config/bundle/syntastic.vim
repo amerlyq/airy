@@ -7,9 +7,15 @@ let g:syntastic_warning_symbol='⚠'
 " the error window will be automatically closed when no errors are detected,
 " but not opened automatically.
 let g:syntastic_auto_loc_list=1
+
 " files that syntastic should neither check, nor include in error lists.
-let g:syntastic_ignore_files=['\m^/usr/include/', '\m\c\*\.h$']
+" let g:syntastic_ignore_files=['\m^/usr/include/', '\m\c\*\.h$']
 " let g:syntastic_quiet_messages = { "file":  ['\m^/usr/include/', '\m\c\.h$'] }
+
+" NOTE: Extracted from source. Hope this will suppress irritating 'not found'
+let g:syntastic_c_remove_include_errors = 1
+let g:syntastic_c_no_include_search = 1
+
 " map non-standard filetypes to standard ones.
 let g:syntastic_filetype_map = { 'latex': 'tex',
                                \ 'gentoo-metadata': 'xml' }

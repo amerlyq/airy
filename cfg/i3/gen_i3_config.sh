@@ -208,8 +208,8 @@ bgui="gvim gvim.tex zathura wuala"
 # xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
 
 w_header "Mode: Open"
-wmode_begin 'o' "Open: $pcli, $pgui, p l a s"
-wlistf "$t$bs %s $eflo -e %s, \$mdef" "$pcli w p l" $bcli "w3m google.com" "gksudo powertop" "gksudo tlp start"
+wmode_begin 'o' "Open: $pcli, $pgui, p l a s, o(urxvt)"
+wlistf "$t$bs %s $eflo -e %s, \$mdef" "$pcli w p l o" $bcli "w3m google.com" "gksudo powertop" "gksudo tlp start" "$eurx"
 wstr ''
 wstr "$t$bs m $exno ~/.i3/ext/dmenu_mpd_fmove, \$mdef"
 wstr ''
