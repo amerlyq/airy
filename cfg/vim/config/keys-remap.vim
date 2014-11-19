@@ -7,9 +7,13 @@ nnoremap Y y$
 nnoremap ' `
 nnoremap ` '
 
+" Pinky stratching
+noremap ,k :<C-U>!!<CR>
+noremap ,. :
+cnoremap <C-o> <C-p>
+
 " Save keystrokes for Ex-commands
-noremap ; :
-noremap @; @:
+noremap ;  :
 "noremap : ,
 " noremap , ;
 noremap [f ;
@@ -40,7 +44,7 @@ noremap R gR
 noremap ,q q
 vnoremap q gq
 nnoremap q gq$
-nnoremap Q gqap
+nnoremap Q gqip
 
 " retain relative cursor position when paging
 nnoremap <PageUp>   <C-U>

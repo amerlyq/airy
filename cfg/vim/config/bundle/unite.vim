@@ -7,6 +7,7 @@ let g:unite_data_directory = $VIMCACHEDIR . '/unite'
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 let g:unite_source_rec_max_cache_files = 0
 call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
+let g:unite_source_history_yank_enable = 1
 
 "MPogoda thinks it's better change <Leader> to '-'
 
@@ -17,19 +18,15 @@ nnoremap <leader>o :<C-u>Unite -buffer-name=files file_rec/async:!<cr>
 let s:leader = g:mapleader
 let mapleader = "\\"
 
-" Replaces NERDTree
-nnoremap <leader>f :<C-u>Unite -buffer-name=files file<cr>
 " nnoremap <leader>f :<C-u>VimFiler<cr>
-
-" Quickly find a buffer
-nnoremap <leader>b :<C-u>Unite -quick-match -buffer-name=buffers buffer<cr>
+nnoremap <leader>f :<C-u>Unite -buffer-name=files file<cr>
+nnoremap <leader>b :<C-u>Unite -quick-match -buffer-name=buffers buffer bookmark<cr>
 nnoremap <leader>/ :<C-u>Unite -buffer-name=grep grep:.<cr>
 nnoremap <leader>l :<C-u>Unite -buffer-name=lines line<cr>
 nnoremap <leader>; :<C-u>Unite -buffer-name=commands command<cr>
 nnoremap <leader>: :<C-u>Unite -buffer-name=commands history/command<cr>
 
 nnoremap <leader>m :<C-u>Unite -buffer-name=mrus file_mru<cr>
-let g:unite_source_history_yank_enable = 1
 nnoremap <leader>y :<C-u>Unite -buffer-name=yanks history/yank<cr>
 nnoremap <leader>u :<C-u>Unite -buffer-name=Outline outline<cr>
 
