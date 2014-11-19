@@ -27,6 +27,9 @@ autocmd ColorScheme * highlight! SpecialKey  ctermbg=None cterm=None
 autocmd ColorScheme * highlight! NonText  ctermbg=None
 
 
+" for molokai
+let g:rehash256 = 1
+
 
 let s:vim_theme=expand('$HOME/.cache/vim/vim_theme')
 if filereadable(s:vim_theme)

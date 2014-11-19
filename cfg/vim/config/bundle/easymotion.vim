@@ -1,1 +1,2 @@
-map <silent> ,. <Plug>(easymotion-prefix)
+" Easymotion-search (before: ,.)
+map <silent> s <Plug>(easymotion-prefix)

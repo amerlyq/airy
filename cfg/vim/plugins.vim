@@ -65,16 +65,17 @@ NeoBundleLazy 'Shougo/vimshell.vim', {
     \   'mappings' : ['<Plug>(vimshell_'],
     \ }}
 
-NeoBundleLazy 'Shougo/vimfiler', {
-    \ 'depends' : 'Shougo/unite.vim',
-    \ 'autoload' : {
-    \    'commands' : [{ 'name' : 'VimFiler',
-    \                    'complete' : 'customlist,vimfiler#complete' },
-    \                  'VimFilerExplorer',
-    \                  'Edit', 'Read', 'Source', 'Write'],
-    \    'mappings' : ['<Plug>(vimfiler_'],
-    \    'explorer' : 1,
-    \ }}
+" DEPRECATED: use snip-ranger-filechooser.vim
+" NeoBundleLazy 'Shougo/vimfiler', {
+"     \ 'depends' : 'Shougo/unite.vim',
+"     \ 'autoload' : {
+"     \    'commands' : [{ 'name' : 'VimFiler',
+"     \                    'complete' : 'customlist,vimfiler#complete' },
+"     \                  'VimFilerExplorer',
+"     \                  'Edit', 'Read', 'Source', 'Write'],
+"     \    'mappings' : ['<Plug>(vimfiler_'],
+"     \    'explorer' : 1,
+"     \ }}
 
 " Ultimate hex-editing system,  depends on hexript for some optional scripts
 NeoBundle 'Shougo/vinarise.vim', {
@@ -403,18 +404,26 @@ NeoBundle 'mhinz/vim-signify'
 " Plugin to toggle, display and navigate marks
 " NeoBundle 'kshenoy/vim-signature'
 
-NeoBundle 'mhinz/vim-startify'
+" DEPRECATED: use Unite MRU
+" NeoBundle 'mhinz/vim-startify'
+
 " When swap exists, it show process id, or you can diff swp with file on disk
 NeoBundle 'chrisbra/Recover.vim'
 
 "  toggle the plugin is <Leader>ig
 NeoBundle 'nathanaelkane/vim-indent-guides'
 
+" Substitution: {{{
 " ALT: osyo-manga/vim-anzu
 NeoBundle 'henrik/vim-indexed-search'
 NeoBundle 'bronson/vim-visual-star-search'
 " Multiple hl for searching by / ? or g/
 NeoBundle 'haya14busa/incsearch.vim'
+" :substitute preview
+NeoBundle 'osyo-manga/vim-over'
+" }}} ======================================
+
+
 " ======================================
 " Add new virtual cursor for next occurance of word under cursor
 " Or add them for each line of multiline selection

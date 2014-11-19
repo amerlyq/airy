@@ -11,6 +11,9 @@ exec "set listchars=tab:\\\\_,extends:>,precedes:<,trail:\uB7,nbsp:~"
 set list            " display otherwise invisible characters
 " tab:\uBB\uBB,nbsp:%,eol:¬
 
+" No intro msg
+set shortmess+=I
+
 set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
 set mouse=a           " support for mouse wheel and clicks

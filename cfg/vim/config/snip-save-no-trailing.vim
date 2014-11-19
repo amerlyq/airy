@@ -2,7 +2,7 @@
 " http://vim.wikia.com/wiki/Remove_trailing_spaces
 autocmd BufWritePre * :call StripTrailingWhitespace()
 function! StripTrailingWhitespace()
-  if !&binary && &filetype != 'diff' && &filetype != 'conf'
+  if !&binary && &filetype != 'diff' "&& &filetype != 'conf'
     normal mz
     normal Hmy
     if &filetype == 'mail'

@@ -12,30 +12,29 @@ call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
 
 " Replaces fuzzyfinder
 nnoremap <leader>o :<C-u>Unite -buffer-name=files file_rec/async:!<cr>
-" Replaces NERDTree
-nnoremap <leader>f :<C-u>Unite -buffer-name=files file<cr>
 
-
+" Leader '\' {{{
 let s:leader = g:mapleader
 let mapleader = "\\"
-nnoremap <leader>f :<C-u>VimFiler<cr>
+
+" Replaces NERDTree
+nnoremap <leader>f :<C-u>Unite -buffer-name=files file<cr>
+" nnoremap <leader>f :<C-u>VimFiler<cr>
+
 " Quickly find a buffer
 nnoremap <leader>b :<C-u>Unite -quick-match -buffer-name=buffers buffer<cr>
-let mapleader = s:leader
-
-
 nnoremap <leader>/ :<C-u>Unite -buffer-name=grep grep:.<cr>
-
 nnoremap <leader>l :<C-u>Unite -buffer-name=lines line<cr>
 nnoremap <leader>; :<C-u>Unite -buffer-name=commands command<cr>
 nnoremap <leader>: :<C-u>Unite -buffer-name=commands history/command<cr>
 
 nnoremap <leader>m :<C-u>Unite -buffer-name=mrus file_mru<cr>
-
 let g:unite_source_history_yank_enable = 1
 nnoremap <leader>y :<C-u>Unite -buffer-name=yanks history/yank<cr>
-
 nnoremap <leader>u :<C-u>Unite -buffer-name=Outline outline<cr>
+
+let mapleader = s:leader
+" }}}
 
 autocmd FileType unite call s:unite_my_settings()
 function! s:unite_my_settings()
@@ -48,6 +47,7 @@ function! s:unite_my_settings()
   " Quit from insert mode
   imap <silent><buffer> <C-q> <Plug>(unite_exit)
 endfunction
+
 
 if executable('ag')
   " Use ag in unite grep source.

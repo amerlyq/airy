@@ -11,12 +11,21 @@ function! CountCopyLines(msg)
 endfunction
 
 nnoremap <C-y> :let @+=@" \| :call CountCopyLines('Push:')<CR>
-cnoremap <C-y> :<C-U>call setreg(''+'', getreg('':'')) \| call CountCopyLines(''Push:'')<CR><CR>
 vnoremap <C-y> "+y \| :call CountCopyLines('Push:')<CR>
 nnoremap <C-p> :let @"=@+ \| :call CountCopyLines('Pull:') <CR>
+vnoremap <C-p> :call CountCopyLines('Pull:') \| normal "_d"+P <CR>
+
+nnoremap ,y :let @+=@" \| :call CountCopyLines('Push:')<CR>
+vnoremap ,y "+y \| :call CountCopyLines('Push:')<CR>
+map ,p :let @"=@+ \| :call CountCopyLines('Pull:') \| normal p<CR>
+map ,P :let @"=@+ \| :call CountCopyLines('Pull:') \| normal P<CR>
+" vnoremap ,p :call CountCopyLines('Pull:') \| normal "_d"+P <CR>
+
+" cnoremap <C-y> :<C-U>call setreg(''+'', getreg('':'')) \| call CountCopyLines(''Push:'')<CR><CR>
 "" Don't use as I use C-n C-p for navigation in command line
 " cnoremap <C-p> <C-U>exec 'call setreg('':'', getreg('':'') . getreg(''+'')) \| call CountCopyLines(''Pull:'')<CR>'<CR>
-vnoremap <C-p> :call CountCopyLines('Pull:') \| normal "_d"+P <CR>
+
+
 " Swap registry
 noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 
@@ -26,8 +35,7 @@ noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 " Prevent Paste loosing the register source:
 " http://stackoverflow.com/a/7797434/1147859
 xnoremap p pgvy
-" Send shizzle to the black hole
-vnoremap <Leader>x "_d
+xnoremap P Pgvy
 " }}}
 
 noremap  zp "0p

@@ -1,5 +1,4 @@
-" TRY:
-inoremap jk <ESC>
+" TRY: inoremap jk <ESC>
 
 " Be consistent with C and D which reach the end of line
 nnoremap Y y$
@@ -10,7 +9,6 @@ nnoremap ` '
 
 " Save keystrokes for Ex-commands
 noremap ; :
-noremap <leader>a :
 noremap @; @:
 "noremap : ,
 " noremap , ;
@@ -28,12 +26,6 @@ noremap <silent> g* *N:<C-U>set hlsearch<CR>
 " Remap for '*' and '#' don't work cause of plugin vim-indexed-search remapping
 " vnoremap * y :execute ":let @/=@\""<CR> :execute "set hlsearch"<CR>
 
-" Line split
-nnoremap K  a<CR><Right><Esc>
-nnoremap gK i<CR><Right><Esc>
-
-nnoremap gX a<Del><Esc>
-
 " Insert empty line before/after
 noremap gO O <C-U><Esc>
 noremap go o <C-U><Esc>
@@ -45,7 +37,7 @@ noremap R gR
 " history-window (when you mistakes) now on 'gq:'
 " Use q for formatting the current paragraph (or selection)
 " Ex-command availible by gQ
-noremap gq q
+noremap ,q q
 vnoremap q gq
 nnoremap q gq$
 nnoremap Q gqap
@@ -62,6 +54,7 @@ noremap gk k
 
 " more stretching comfort
 noremap g0 ^
+noremap ,4 A<Space><Esc>
 
 " swap v and CTRL-V because Block mode is more useful that Visual mode
 nnoremap    v   <C-V>

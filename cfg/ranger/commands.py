@@ -200,6 +200,8 @@ class shell(Command):
     escape_macros_for_shell = True
 
     def execute(self):
+        from ranger.ext.shell_escape import shell_escape as esc
+
         if self.arg(1) and self.arg(1)[0] == '-':
             flags = self.arg(1)[1:]
             command = self.rest(2)
@@ -214,7 +216,10 @@ class shell(Command):
                 command = self.fm.substitute_macros(command, escape=True)
 
             # Amer: fix to load aliases working from shell, setopt aliases;
-            self.fm.execute_command("$SHELL -c 'source ~/.bash/aliases; eval ''" + command + "'''", flags=flags)
+            self.fm.execute_command("$SHELL -c 'source ~/.bash/aliases; eval '"
+                    + esc(esc(command)) + "''", flags=flags)
+            # self.fm.execute_command("printf 'source ~/.bash/aliases; "
+            #         + esc(command) + "' | $SHELL", flags=flags)
             # self.fm.execute_command(command, flags=flags)
 
     def tab(self):

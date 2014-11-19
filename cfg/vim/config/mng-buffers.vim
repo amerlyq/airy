@@ -24,6 +24,7 @@ noremap  gl  :<C-U>bnext<CR>
 noremap  gH  :<C-U>bfirst<CR>
 noremap  gL  :<C-U>blast<CR>
 
+
 " focus adjacent window
 " nnoremap <A-PageUp> <C-W>W
 " nnoremap <A-PageDown> <C-W>w
@@ -39,5 +40,5 @@ nnoremap <Leader>9 <C-W>=
 " close other windows
 nnoremap <Leader>1 <C-W>o
 " close current window
-nnoremap <Leader>4 <C-W>c
+" nnoremap <Leader>4 <C-W>c
 
