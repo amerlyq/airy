@@ -5,19 +5,14 @@
 NM="$1"
 EXT="${NM##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
-
-pause() { read -p "<======== Press ENTER to continue ========>" tmp; }
+pause() { read -p "<======== Press ENTER to continue \
+    ========> ($(date +"%T"))" tmp; }
 
 # Executables
-if [ "${TYPE:0:6}" == 'text/x' ]; then
-    "$PWD/$NM" && pause
-    exit
-fi
-
-if [ "${TYPE:0:13}" == 'application/x' ]; then
-    "$PWD/$NM" || pause
-    exit
-fi
+case "$TYPE" in
+           text/x*) "$PWD/$NM" && pause ;;
+    application/x*) "$PWD/$NM" || pause ;;
+esac
 
 # Processors
 case "$EXT" in

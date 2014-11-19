@@ -7,7 +7,6 @@ alias nowdate='date +"%d-%m-%Y"'
 
 # --- Process ---
 # alias psg='ps aux | grep ' # Rewritten by zsh
-psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
 alias topstat='dstat -cdnpmgs --top-bio --top-cpu'
 
 

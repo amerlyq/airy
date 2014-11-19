@@ -8,6 +8,9 @@ alias -g NUL="> /dev/null 2>&1" # You get the idea.
 alias -g @="$(xsel -o)"
 
 
+## Std-like
+psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
+
 
 # Show history
 if [ "$HIST_STAMPS" = "mm/dd/yyyy" ]

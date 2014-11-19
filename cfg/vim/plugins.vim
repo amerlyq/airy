@@ -5,8 +5,8 @@ let mapleader="\\"
 
 
 NeoBundle 'Valloric/ListToggle'
-" <leader>q -> quickfix list
-" <leader>w -> location list
+" Ascii graph drawing in vim
+NeoBundleLazy 'vim-scripts/DrawIt'
 
 "==========================================
 " All commands below will use this leader, commands above -- will use '\'
@@ -431,8 +431,6 @@ NeoBundle 'matze/vim-move'
 " Viewing man in vim: good, but no colors in git lg1, need to investigate
 " NeoBundleLazy 'rkitover/vimpager'
 
-" Ascii graph drawing in vim
-NeoBundle 'vim-scripts/DrawIt'
 " Fast table creation and modification
 NeoBundle 'dhruvasagar/vim-table-mode'
 " ALT: http://tiddlywiki.com  -- one-page wiki

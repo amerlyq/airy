@@ -1,10 +1,15 @@
-
+" Workflow manipulation {{{
 " As simple as Ctrl-S under Win,
 " {koi8-r, imb866, cp-1251, utf8, reg:utf-16le, :set fenc=utf8}
 noremap <Leader>q :q<CR>
 noremap <Leader>s :w<CR>
 noremap <Leader>S :write ++enc=utf8<CR>
 noremap <Leader><C-S> :saveas<Space>
+" close current buffer while retaining window
+nnoremap <Leader>d :execute 'bnext<Bar>bdelete' bufnr('%')<CR>
+" reload current buffer while discarding changes
+"nnoremap <Leader>e :edit!<cr>
+" }}}
 
 " For when you forget to sudo.. Really Write the file.
 cnoremap e!! e !sudo tee %

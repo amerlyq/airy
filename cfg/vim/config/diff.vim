@@ -1,7 +1,7 @@
-nnoremap <Leader>dD :diffoff<Enter>
-nnoremap <Leader>dd :diffupdate<Enter>
-nnoremap <Leader>dt :diffthis<Enter>
-nnoremap <Leader>dT :DiffOrig<Enter>
+nnoremap \dD :diffoff<Enter>
+nnoremap \dd :diffupdate<Enter>
+nnoremap \dt :diffthis<Enter>
+nnoremap \dT :DiffOrig<Enter>
 
 if &diff
   "---------------------------------------------------------------------------

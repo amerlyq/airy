@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd ./config
+echo ----
+find . -type f -print | xargs sed -n '/^\s*.\?\(nore\)\?map/p' | sed -n '/Leader.s/p'

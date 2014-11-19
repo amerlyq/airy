@@ -1,5 +1,5 @@
-" give it a try
-"inoremap jj <ESC>
+" TRY:
+inoremap jk <ESC>
 
 " Be consistent with C and D which reach the end of line
 nnoremap Y y$
@@ -10,6 +10,7 @@ nnoremap ` '
 
 " Save keystrokes for Ex-commands
 noremap ; :
+noremap <leader>a :
 noremap @; @:
 "noremap : ,
 " noremap , ;
@@ -83,22 +84,6 @@ nnoremap g/ //e<cr>v??<cr>
 vnoremap < <gv
 vnoremap > >gv
 
-" BUFFERS
-noremap  zJ  zj
-noremap  zK  zk
-" TRY:" Set minimum window size to 79x5
-" set winwidth=79
-set winheight=5
-set winminheight=5
-noremap  zh  <C-W>h<C-W>_
-noremap  zj  <C-W>j<C-W>_
-noremap  zk  <C-W>k<C-W>_
-noremap  zl  <C-W>l<C-W>_
-" switch to adjacent buffer in current window
-noremap  gh  :<C-U>bprev<CR>
-noremap  gl  :<C-U>bnext<CR>
-noremap  gH  :<C-U>bfirst<CR>
-noremap  gL  :<C-U>blast<CR>
 " works cool only with xkb map of arrows to C-hjkl
 " nnoremap <C-PageUp>    <Esc>:tabprev<CR>
 " nnoremap <C-PageDown>  <Esc>:tabnext<CR>

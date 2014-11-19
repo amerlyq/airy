@@ -27,7 +27,7 @@ noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 " http://stackoverflow.com/a/7797434/1147859
 xnoremap p pgvy
 " Send shizzle to the black hole
-vnoremap <Leader>d "_d
+vnoremap <Leader>x "_d
 " }}}
 
 noremap  zp "0p
