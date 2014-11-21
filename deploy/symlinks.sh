@@ -15,7 +15,7 @@ lnLst()
 
 if [ "$CURR_PLTF" == "Linux" ]
 then
-    lnLst ~/. "" "bash i3 urxvt Xrc"
+    lnLst ~/. "" "bash i3 urxvt Xrc mutt"
     lnLst ~/. bash/ "inputrc profile bashrc bash_prompt tmux.conf zsh/zshrc"
     lnLst ~/. "" "vim vim/vimrc vim/ycm_extra_conf.py"
     lnLst ~/.config/ "" "ranger mcomix sxiv"

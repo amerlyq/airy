@@ -1,0 +1,63 @@
+# GENERAL
+
+# Greate by generator
+# set realname = "Name Surname"
+
+set use_from = yes
+set editor='vim -c "set spell spelllang=ru_yo,en_us,uk"'
+# set edit_headers # see the headers when editing
+set sort = reverse-threads # sort by newest conversation first
+set sort_aux = last-date-received
+set signature = ~/.mutt/signature
+
+# confirmation skipping
+# set fast_reply=yes        # when replying, don't prompt for address
+# set include=yes           # include original text on reply?
+# set forward_quote=yes     # include original text on forward?
+# set delete=yes            # don't ask for delete confirmation
+
+# IMAP | enough only set local dirs
+# set from = `echo $MAIN_MAIL`
+# set imap_user = `echo $MAIN_MAIL`
+# set imap_pass = pass
+# set smtp_url = smtp://user@smtp.gmail.com:587/
+# set smtp_pass = pass
+
+set imap_keepalive = 900
+set copy = no
+set move = no
+
+set folder = imaps://imap.gmail.com:993
+set spoolfile = +INBOX #or +[Gmail]/Important
+set postponed = +[Gmail]/Drafts
+set header_cache = ~/.cache/mutt/headers
+set message_cachedir = ~/.cache/mutt/bodies
+set certificate_file = ~/.cache/mutt/certificates
+
+
+# POP3 | need to create local dirs manually
+#set from = user@server.com
+#set mbox_type=Maildir
+#set folder=$HOME/.mail
+#set spoolfile=+/
+#set header_cache=~/.mutt/cache
+
+# SMTP
+#set my_pass='pass'
+#set my_user=user@server.com
+#set smtp_url=smtp://$my_user:$my_pass@mail.serve.com
+#set record="+sent" # where to store sent messages
+#set postponed="+postponed" # where to store draft messages
+
+# BINDING
+# fetch mail by I
+#macro index,pager I "!getmail"
+
+# ALIASES
+#set alias_file = "~/.mutt/aliases"
+#set sort_alias = alias
+#set reverse_alias = yes
+#source $alias_file
+
+# THEME
+source ~/pkg/mutt-colors-solarized/mutt-colors-solarized-dark-16.muttrc

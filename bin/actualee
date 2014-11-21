@@ -22,8 +22,9 @@ case "$EXT" in
     dot) dot -Tx11 "$NM"     ;;
     *) # Types
     case "$TYPE" in
+         text/x-python) "$PWD/$NM" ;;
+        application/x*) "$PWD/$NM" ;;
                text/x*) "$PWD/$NM" && pause ;;
-        application/x*) "$PWD/$NM" || pause ;;
     esac
     ;;
 esac

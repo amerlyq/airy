@@ -47,9 +47,10 @@ alias mountl='sudo fdisk -l'
 
 
 # --- Search ---
-alias f='find ./ -type f -name '
+f()  { find . -type f -iname "*$@*"; }
+ff() { find . -type f -iname $@; }
 # grep -Ri 'name' . # find in all files
-alias ff='find ./ | grep -i '
+# alias ff='find ./ | grep -i '
 
 # agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
 agi() { ag -G '^(?:(?!build|libs|tags).)*$' $@; }
