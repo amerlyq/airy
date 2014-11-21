@@ -6,10 +6,9 @@ NM="$1"
 NAME="${NM%/*}"
 EXT="${NAME##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
-pause() { read -n 1 -p "<======== Press any key to continue \
-($(date +"%T")) ========> " tmp; }
 
-echo $NAME
+pause() { read -n 1 -sp "<======== Press any key to continue \
+($(date +"%T")) ========> " tmp; printf "$NAME\n"; }
 
 # Names
 case "$NAME" in

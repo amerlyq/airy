@@ -13,14 +13,18 @@ BUGS
 	[_] Replace name and email in devq work
 	[_] ZSH title:print:7: write error: interrupt
 		fixed in 5.0.4, need update
+	[_] Broken gtk theme
 
 ranger
+ NOTE: 1? 2? -- help for commands
 	[X] Add to rifle opening *.dot by vim or by 'dot -Tx11 $1' viewer
 	[X] Execute prev ex command --> changed to snap on <C-s>, execute on <C-k>
 	[_] Add hang-out process checking to ranger scope.sh
 	[_] Integrate vim with ranger by repo or tmux or --syntex server like in latex
 		https://github.com/mikezackles/vranger
 	[_] fix 's' exit with tmux inside ranger shell -- what to do?
+	>[_] Change shell to zsh stabily
+	>[_] Bookmarks with two-letters
 	[_] Add C-x,C-t commands to ranger for move one word forward/backward
 	[X] sh: .\w from .bash_alias -> append_unique to ranger/bookmarks
 	[~] Make autochoose color scheme depending on availability of 256-color term
@@ -38,7 +42,7 @@ ranger
 	[_] After Ubuntu 14.10 chg ranger install from github to apt-get
 	[_] Integrate with tmux and vim
 		 http://unix.stackexchange.com/questions/82632/tmux-ranger-integration-opening-text-files-in-new-panes
-	NOTE: 1? 2? -- help for commands
+	[_] Toggle EDITOR between vim and view when investigating other sources
 
 zsh
 	[_] Do more robust in vim
@@ -286,6 +290,7 @@ i3
 		i3-msg "workspace number 2; append_layout $HOME/ss.json"
 	[X] Save wksp names in file
 	 (to make it consistent and able to permanent rename through sessions)
+	[_] Make default wksp names file, to reset names when needed
 	[_] Fast choose of window, based on [{uio},{jkl},{m,.}] layout (numpad analogue)
 	See forum. There are many interesting things:
 		https://faq.i3wm.org/questions/scope:all/sort:activity-desc/page:2/
@@ -364,6 +369,14 @@ TODO
 		: --exclude=pattern_to_exclude --include=pattern_to_include
 	[_] All uniques (remove all repeating)
 		| grep -Fvx -f umi media
+	Info with vim bindings
+		info info Advanced | vim -R -
+		info --vi-keys | but the supposed "vi" key bindings are really weird.
+		customise keybindings using the infokey tool (see Customizing Key Bindings and Variables).
+		A sample vi .infokey source file is already provided (see infokey source format).
+		It's worth learning GNU Info (info info-stnd) because it's the proper tool for viewing info files.
+		But the real way to read info files is with Emacs' Info mode (type C-h i).
+			Is it has sense to try mastering Emacs?
 
 	[_] view instead of vim in ranger by default
 		shortcuts to fast toggle vim readonly

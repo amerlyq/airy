@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+sudo stty -F /dev/ttyUSB0 115200 cs8 -cstopb -parenb -icanon min 1 time 1
+
+DIR=/tmp
+FA=usb-all.log
+FF=usb-filter.log
+RMDIR=/home/shared
+
+# sed "w /tmp/usb-all.log" | sed "$FILTER; w /tmp/usb-filter.log"
+BODY='{ pf=0; print $0 > fa }
+
+    /^E\/|\[TUNER\]|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|^Thrift|\[SNAP\]/ {
+        pf=1; printf "."
+    }
+
+    { if(pf==0) {
+        print $0 > ff;
+        fflush(fa); fflush(ff);
+        printf "\n%s\n",$0
+    } } '
+
+
+# Script to fast show-log
+ssh srk 'LOGDUMP="'$RMDIR/show-log'"
+    printf "#!/bin/bash\ntailf usb-filter.log\n" > "$LOGDUMP"
+    chmod 777 "$LOGDUMP"
+    rm "'$RMDIR/$FA'"
+'
+
+# Send log by ssh
+>"$DIR/$FA"
+{ tailf "$DIR/$FA" | ssh srk "cat > \"$RMDIR/$FA\""; } &
+
+# Ping board to prevent sleep
+# PING=~/work/sip/scripts/arm-connect.sh
+# { while $PING; do sleep 30; done; printf "\n"; } &
+
+# Filtering Serial output
+sudo cat /dev/ttyUSB0 | ansifilter |
+    awk -v fa="$DIR/$FA" -v ff="$DIR/$FF" "$BODY"
+
+
+# Create socket
+#   http://www.lainoox.com/bash-socket-programming/

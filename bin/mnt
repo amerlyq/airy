@@ -17,7 +17,7 @@ fi
 
 dosamba() {
     local dir="$1" usr="$2" shr="$3"
-    mkdir -p "$dir" || sudo mkdir -p "$dir"
+    sudo mkdir -p "$dir" || sudo mkdir -p "$dir"
     sudo mount -t cifs -o user="$usr" //$shr/ "$dir"
 }
 

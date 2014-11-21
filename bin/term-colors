@@ -4,12 +4,11 @@
 cd ~/.bin/term-colors.d
 
 case $1 in
-    c|column)   ./Column.sh ;;
-    d|dna)      ./Dna.sh ;;
-    g|grid)     ./Grid.sh ;;
-    r|ribbon)   ./Ribbon.sh ;;
-    i|invaders) ./SpaceInvaders.sh ;;
-    s|sparse)   ./Sparse.sh ;;
-    t|table)    ./Table.sh ;;
-*) echo "% { (c)olumn, (d)na, (g)rid, (r)ibbon, (i)nvaders, (s)parse, (t)able }"
+    g|grid)     ./grid256.sh        ;;
+    t|text)     ./textbg16.sh       ;;
+    l|line)     ./line256.sh        ;;
+    d|dna)      ./dna16.sh          ;;
+    r|ribbon)   ./ribbon16.sh       ;;
+    i|invaders) ./SpaceInvaders8.sh ;;
+*) echo "% { (g)rid, (t)ext, (l)line, (d)na, (r)ibbon, (i)nvaders }"
 esac

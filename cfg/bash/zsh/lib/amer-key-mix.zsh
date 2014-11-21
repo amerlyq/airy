@@ -50,9 +50,11 @@ bindkey -a '^S' history-incremental-search-forward
 bindkey -s -M vicmd 's' '0d$is\np'
 bindkey -s -M vicmd 'q' '0d$iq\n'
 
-# NOTE: setting KEYTIMEOUT seems to break the key-binding
-bindkey jj vi-cmd-mode
-bindkey -s ',d' delete-char
+# NOTE: setting KEYTIMEOUT seems to break the key-binding #bindkey jj
+bindkey -s ',d' 'q\n'
+bindkey -s ',s' 's\n'
+bindkey -s 'lf' ''
+bindkey -s 'kd' ''
 
 # bindkey '^Y' yank-last-arg # No such func
 zle -N yank-current yank_current
