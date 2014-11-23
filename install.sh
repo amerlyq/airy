@@ -117,8 +117,11 @@ fi
 
 if [ "${CURR_PROF}" != "guest" ] && [ "${CURR_PROF}" != "ssh" ]; then
     cd "$SCRIPT_DIR"
+
     [ ! $BASIC_INSTALL -eq 1 ] && git_local_credentials
-    "$SCRIPT_DIR/cfg/git/gen_git_ssh_keys_configs.sh"
+
+    "$SCRIPT_DIR/cfg/git/ssh_keys.gen"
+    "$SCRIPT_DIR/cfg/git/gitconfig.gen"
 
     if [ "${CURR_PLTF}" == "Linux" ] && [ $CLEAN_INSTALL -eq 1 ]; then
         "$DEPLOY_DIR/choose_defaults"

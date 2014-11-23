@@ -1,0 +1,55 @@
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore
+    #symlinks = false
+    #autocrlf = true
+    quotepath = false #russian filenames in terminal
+                      # http://habrahabr.ru/post/74839/
+    whitespaces = trailing-space,tab-in-indent,space-before-tab
+[pack]
+    threads = 0  # Cancel limit for packing threads number
+#    packSizeLimit = 2g
+[pull]
+    rebase = true
+[push]
+    default = simple
+
+[format]
+    pretty = oneline
+#[credential]
+#    helper = cache --timeout=3600
+
+#[github]
+#    user = pkumar
+#    token = /* GitHub Token https://github.com/account#admin_bucket */
+#[gitflow "prefix"]
+#    feature = feature-
+#    release = release-
+#    hotfix = hotfix-
+#    support = support-
+#    versiontag = v
+
+[tig]
+    line-graphics = utf-8
+    show-date = local
+    show-id = true
+    ignore-space = all
+    commit-order = topo
+#[web]
+#    browser = firefox
+#[http]
+#    postBuffer = 52428800
+
+#[sendemail]
+#smtpencryption = tls
+#smtpserver = smtp.gmail.com
+#smtpuser = pavan.sss1991@gmail.com
+#smtppass = icjbejkkqtyvuach
+#smtpserverport = 587
+#[instaweb]
+#httpd = apache2 -f
+#[rerere]
+#enabled = 1
+#autoupdate = 1
+
+# vim: ft=gitconfig

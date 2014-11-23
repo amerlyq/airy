@@ -1,0 +1,21 @@
+# vim: ft=gitconfig
+
+[merge]
+    tool = vimdiff
+    guitool = meld
+#[mergetool]
+#    keepBackup = false
+#    prompt = false
+[diff]
+    tool = vimdiff
+    guitool = meld
+    renamelimit = 0  # Accelerate diffs
+[difftool]
+    # http://jeetworks.org/setting-up-git-to-use-your-diff-viewer-or-editor-of-choice/
+    cmd = meld $LOCAL $REMOTE
+    prompt = false
+
+#[difftool "beyondcompare"]
+#    path = /c/development/tools/beyondcompare/
+#    cmd = /c/development/tools/beyondcompare/bcomp.exe \"$LOCAL\" \"$REMOTE\" -nobackups -title1=\"Old Version\" -title2=\"New Version\"
+#    trustExitCode = false

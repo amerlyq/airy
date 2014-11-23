@@ -1,0 +1,23 @@
+#!/bin/bash
+
+source ~/.bash/functions
+amScriptDir -s
+if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
+
+# ==================== ~/.gitconfig =========================
+# Customization
+# http://git-scm.com/docs/git-config
+
+dst="$HOME/.gitconfig"
+wbegin
+
+git config --global user.name  "$WORK_NAME"
+git config --global user.email "$WORK_MAIL"
+# git config --global user.signingkey = C8A2DA6E
+
+for fl in "$SCRIPT_DIR/cfg_"* ; do wcat "$fl"; done
+
+echo "W: ~/.gitconfig"
+
+pairLink ~/.gitignore "$SCRIPT_DIR/gitignore"
+

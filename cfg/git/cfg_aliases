@@ -1,0 +1,65 @@
+# vim: ft=gitconfig
+
+# overview to checkout
+# point dates
+# diff for changes in commits
+# lnew
+
+
+[alias]
+    # Must Have Git Aliases: Advanced Examples
+    # http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
+
+
+    lmsg     = log --oneline --decorate
+    lname    = log --date=short --pretty=format:'%h | %ad | %><(18)%an | %d%<(50,trunc)%s'
+    ldate    = log --pretty=format:'%C(yellow)%h%C(reset) | %C(white)%>(32,trunc)%aD%C(reset) | %C(bold green)%>(12,trunc)%ar%C(reset) | %s%C(bold red)%d%C(reset)'
+    lstd     = log --abbrev-commit --date=short --all --format=format:'%C(bold green)%ad%C(reset) %C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset) :%C(yellow)%h%C(reset)'
+    linverse = log --abbrev-commit --date=short --all --format=format:'%C(bold reverse green)%ad%C(reset)%C(reverse white) %s %C(reset)%C(bold reverse red)%d%C(reset)%C(bold reverse blue) [%aN]%C(reset):%C(reverse yellow)%h%C(reset)'
+
+    lgraph  = !git lstd --graph
+    lfiles  = !git lstd --decorate --numstat
+    lcommit = !git linverse -u # Show modified files in last commit
+
+# --topo-order
+# file difference #add -p if needed
+
+    # For one file through all commits
+    # You can see all the commits related to a file, with the diff of the changes with
+    lhistory = log --graph --all --follow --stat -p --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(bold white)— %an%C(reset)' --abbrev-commit
+
+    # show only new commits after pull
+    lnew = log @{1}..  #FULL: git log currentbranch@{1}..currentbranch
+        # where the @{1} notation means "the commit the branch pointed to just before it last got updated".
+
+    dh = diff --cached HEAD^ # Show a diff last commit
+    dh1 = diff HEAD~1
+    ds = diff --stat=160,120
+
+#    puush = push --force
+    st = status
+    ci = commit --verbose
+    ca = commit -a
+    cm = commit -m
+    cam = commit -am
+
+    co = checkout
+    di = diff
+    dc = diff --cached
+    amend = commit --amend
+    aa = add --all
+    ff = merge --ff-only
+    pullff = pull --ff-only
+    noff = merge --no-ff
+    fa = fetch --all
+    pom = push origin master
+    #b = branch
+
+    url = config --get remote.origin.url
+    meld = difftool -g
+    dmeld = difftool -g -d
+
+    unstage = reset HEAD --
+    up = "!git remote update -p; git merge --ff-only @{u}"
+    backup = !"file=../`git describe`.tar && echo "Creating `readlink -f $file`" && tar cf $file ."
+

@@ -1,5 +1,4 @@
 #!/bin/bash
-# Gen: ssh-keys, .gitconfig
 # Arg: all-new -- for re-generating rsa-pairs
 
 source ~/.bash/functions
@@ -24,17 +23,6 @@ if [ "$CURR_PROF" == "work" ]; then
     genssh "$WORK_MAIL" srk_rsa
 fi
 
-# ==================== ~/.gitconfig =========================
-
-dst="$HOME/.gitconfig"
-wbegin
-    git config --global user.name  "$WORK_NAME"
-    git config --global user.email "$WORK_MAIL"
-wcat "$SCRIPT_DIR/gitconfig_base"
-echo "W: ~/.gitconfig"
-
-pairLink ~/.gitignore "$SCRIPT_DIR/gitignore"
-
 # ===========================================================
 
 # ssh-add "$stdkey"
@@ -45,5 +33,3 @@ pairLink ~/.gitignore "$SCRIPT_DIR/gitignore"
 ## Copy .pub keys to site
 # cat "$stdkey.pub"
 # clip < "$stdkey.pub"
-
-amPause

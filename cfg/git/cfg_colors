@@ -1,0 +1,31 @@
+# vim: ft=gitconfig
+#
+# normal, black, red, green, yellow, blue, magenta, cyan, white
+# bold, dim, ul, blink and reverse
+
+[color]
+    ui = true
+    branch = auto
+    pager = true
+    status = auto
+[color "branch"]
+    current = yellow bold
+    local = green bold
+    remote = cyan bold
+    upstream = magenta bold
+[color "diff"]
+    plain = normal
+    meta = yellow bold
+    frag = magenta bold # hunk header
+    commit = blue bold  # commit header
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+[color "status"]
+    header    = normal      # the header text of the status message
+    added     = green bold  # added but not committed
+    changed   = yellow bold # changed but not added in the index
+    untracked = red bold    # files which are not tracked by git
+    branch    = magenta     # the current branch
+    nobranch  = blue        # no branch warning is shown in (def: red)
+

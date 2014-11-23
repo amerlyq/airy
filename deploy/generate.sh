@@ -11,4 +11,8 @@ if [ "${CURR_PLTF}" == "Linux" ]; then
     "$GENS/xsessionrc.gen"
     "$GENS/xresources.gen"
     "$GENS/synergy.gen"
+
+
+    # bash .\w aliases -> ranger/bookmarks
+    ~/.config/ranger/aliases_to_bookmarks
 fi
