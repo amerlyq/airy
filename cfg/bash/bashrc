@@ -3,10 +3,7 @@
 # for examples
 
 # If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
+case $- in *i*) ;; *) return ;; esac
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -41,12 +38,10 @@ stty -ixon
 
 # Alias definitions.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-include() { if [ -f "$1" ]; then source "$1"; fi; }
-include ~/.bash_prompt
-include ~/.bash_export
-include ~/.bash/aliases
-include ~/.bash/functions
+if [ -f ~/".bash/bash_prompt" ]; then source ~/".bash/bash_prompt"; fi
+if [ -f ~/".bash_export" ]; then source ~/".bash_export"; fi
+if [ -f ~/".bash/aliases" ]; then source ~/".bash/aliases"; fi
+if [ -f ~/".bash/functions" ]; then source ~/".bash/functions"; fi
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
