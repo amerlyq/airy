@@ -182,8 +182,8 @@ class cd_shelldir(Command):
         except:
             return self.fm.notify(shelldir, bad=True)
 # Need this in the end of ~/.bashrc or ~/.zshrc
-# 	function finish { tempfile='/tmp/ranger_shelldir'; echo "$PWD" > "$tempfile"; }
-# 	trap finish EXIT
+#   function finish { tempfile='/tmp/ranger_shelldir'; echo "$PWD" > "$tempfile"; }
+# `trap finish EXIT
 # }}} Amer
 
 class chain(Command):
@@ -214,6 +214,8 @@ class shell(Command):
                 command = self.fm.substitute_macros(command, escape=True)
 
             # Amer: fix to load aliases working from shell, setopt aliases;
+            # Using ~/.zshenv will crash git commands
+            # ERROR: will not work with sudo (shell -r)!
             from ranger.ext.shell_escape import shell_quote as quo
             self.fm.execute_command("source ~/.bash/aliases; eval "
                     + quo(command), flags=flags)
