@@ -4,8 +4,8 @@
 nnoremap Y y$
 
 " Now 'a jump you to line and column, and `a only to line
-nnoremap ' `
-nnoremap ` '
+noremap ' `
+noremap ` '
 
 " Pinky stratching
 noremap ,k :<C-U>!!<CR>
@@ -15,7 +15,7 @@ cnoremap <C-o> <C-p>
 " Save keystrokes for Ex-commands
 noremap ;  :
 "noremap : ,
-" noremap , ;
+noremap , <Nop>
 noremap [f ;
 noremap ]f ,
 
@@ -58,13 +58,14 @@ noremap gk k
 
 " more stretching comfort
 noremap g0 ^
-noremap ,4 A<Space><Esc>
+noremap ,4 $
+noremap g4 A<Space><Esc>
 
 " swap v and CTRL-V because Block mode is more useful that Visual mode
-nnoremap    v   <C-V>
-nnoremap <C-V>     v
-vnoremap    v   <C-V>
-vnoremap <C-V>     v
+noremap    v   <C-V>
+noremap <C-V>     v
+noremap   ,v      v
+
 
 " Unused
 " map - $

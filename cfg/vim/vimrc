@@ -2,10 +2,11 @@
 " Seize
 " 100%:    https://github.com/MPogoda/dotfiles
 "  80%: https://github.com/euclio/vim-settings/blob/master/vimrc
-"
+
 
 if has("unix")
     language messages C
+
 else "elseif
     language messages en_US.UTF-8 "C, en, en_US, en_US.UTF-8
     "set langmenu=en_US.UTF-8
@@ -29,8 +30,11 @@ endif
 "===============================================
 " Backup, undo, swap, etc
 let $VIMCACHEDIR=$HOME . '/.cache/vim'
-set backupdir=$VIMCACHEDIR/bckpdir,~/.tmp,/var/tmp,/tmp
-set directory=$VIMCACHEDIR/swapdir,~/.tmp,/var/tmp,/tmp
+set backupdir=$VIMCACHEDIR/bckpdir//,~/.tmp,/var/tmp,/tmp
+set directory=$VIMCACHEDIR/swapdir//,~/.tmp,/var/tmp,/tmp
+" The '//' at the end of each directory means that file names will be built
+" from the complete path to the file with all path separators substituted to
+" percent "%" sign
 if !isdirectory(expand('$VIMCACHEDIR/bckpdir'))
   call mkdir(expand('$VIMCACHEDIR/bckpdir'), 'p')
 endif
@@ -38,8 +42,6 @@ if !isdirectory(expand('$VIMCACHEDIR/swapdir'))
   call mkdir(expand('$VIMCACHEDIR/swapdir'), 'p')
 endif
 
-" backup current file, not deleted afterwards: you need free space!
-set backup writebackup backupcopy=auto swapfile
 
 " Store undo history across sessions
 if v:version >= 703
@@ -47,7 +49,7 @@ if v:version >= 703
   if !isdirectory($TAGSDIR)
     call mkdir($TAGSDIR)
   endif
-  let &undodir=$VIMCACHEDIR . '/undodir'
+  set undodir=$VIMCACHEDIR/undodir//
   if !isdirectory(&undodir)
     call mkdir(&undodir)
   endif
@@ -123,3 +125,6 @@ if has('win32') || has('win64')
   cd e:\
 endif
 
+" backup current file, not deleted afterwards: you need free space!
+set backup writebackup backupcopy=auto swapfile
+set viminfo+=n$VIMCACHEDIR/.viminfo

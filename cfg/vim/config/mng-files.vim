@@ -1,4 +1,4 @@
-" Workflow manipulation {{{
+" Workflow manipulation
 " http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_%28Part_3%29
 
 " SAVE: {koi8-r, imb866, cp-1251, utf8, reg:utf-16le, :set fenc=utf8}
@@ -18,15 +18,13 @@ noremap <Leader>D :<C-U>qa<CR>
 " Close current buffer while retaining window
 function! s:BufDelSafe()
   if bufnr('%') == bufnr('$')
-    exec 'bprev<Bar>bdelete ' . bufnr('%')
+    exec 'bprev|bdelete ' . bufnr('%')
   else
-    exec 'bnext<Bar>bdelete ' . bufnr('%')
+    exec 'bnext|bdelete ' . bufnr('%')
   endif
 endfunction
 command! -bar Safebd call <SID>BufDelSafe()
 nnoremap <Leader>x :<C-U>Safebd<CR>
-" noremap <Leader>x :<C-U>exec 'bnext<Bar>bdelete' bufnr('%')<CR>
 
 " reload current buffer while discarding changes
 "nnoremap <Leader>e :edit!<cr>
-" }}}

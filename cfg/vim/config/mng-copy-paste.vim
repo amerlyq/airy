@@ -6,8 +6,8 @@
 function! CountCopyLines(msg)
     let l = split(@+, '^.\{-}\zs\n')  " -- w/o,  '\n\zs' -- with
     let h = a:msg . len(l) . 'L> '
-    let maxlen = min([ len(l[0]), &columns - len(h) - 2 ])
-    echo h . substitute(l[0][0:maxlen], "\t", " ", 'g')
+    let maxlen = min([ len(l[0]), &columns - len(h) - 13 ])
+    echo h . substitute(l[0][0:l:maxlen], "\t", " ", 'g')
 endfunction
 
 nnoremap <C-y> :let @+=@" \| :call CountCopyLines('Push:')<CR>

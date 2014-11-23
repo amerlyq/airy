@@ -12,7 +12,7 @@ set list            " display otherwise invisible characters
 " tab:\uBB\uBB,nbsp:%,eol:¬
 
 " No intro msg
-set shortmess+=I
+set shortmess+=Iat
 
 set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
