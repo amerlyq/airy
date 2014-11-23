@@ -47,14 +47,15 @@ bindkey -a '^S' history-incremental-search-forward
 #bindkey '^X^N' accept-and-infer-next-history
 
 # RANGER - fast in/out with keeping expression
-bindkey -s -M vicmd 's' '0d$is\np'
+bindkey -s -M vicmd 's' '0d$is\n\ep'
 bindkey -s -M vicmd 'q' '0d$iq\n'
+bindkey -s -M vicmd '^[[24~' '0d$isource ~/.zshrc\n\ep'
 
 # NOTE: setting KEYTIMEOUT seems to break the key-binding #bindkey jj
-bindkey -s ',d' 'q\n'
-bindkey -s ',s' 's\n'
-bindkey -s 'lf' ''
-bindkey -s 'kd' ''
+bindkey -s ',d' '^Uq\n'
+bindkey -s ',s' '^Us\n'
+bindkey -s 'lf' '^['
+bindkey -s 'kd' '^M'
 
 # bindkey '^Y' yank-last-arg # No such func
 zle -N yank-current yank_current

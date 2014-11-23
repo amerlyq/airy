@@ -9,7 +9,17 @@
 
 alias vi='\vim -u ~/.vim/vimrc_basic'
 vimscp(){ vim scp://${2:-srk}/"${1:-$(xsel -o)}"; }
-alias vimsyn='vim --servername synctex'
+v() {
+    local _V fl=~/.cache/vim/servername
+    if [ -f "$fl" ]; then
+        _V=$(cat "$fl")
+        vim --servername $_V --remote-silent $@
+        vim --servername $_V --remote-send ':redraw<CR>'
+    else
+        vim $@
+    fi
+}
+
 vish(){
     local NM="${1:-`tempfile`}" shl='bash'
     if [ ! -e "$NM" ]; then

@@ -8,6 +8,8 @@ LC_NUMERIC=en_US.UTF-8
 EDITOR=vim
 VISUAL=vim
 TERMCMD=urxvt
+# speed up ranger start time
+RANGER_LOAD_DEFAULT_RC=FALSE
 
 ### Profile Mgmt ###
 CURR_PLTF=$(expr substr $(uname -s) 1 5)

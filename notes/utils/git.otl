@@ -21,6 +21,101 @@ Existing Git Repo?
 	git push -u origin master
 Workflow
 	git reset --hard ORIG_HEAD | hg update --clean (or 'hg up -C' for short)
+
+Fork and Pull request
+ http://wiki.apache.org/couchdb/ContributorWorkflow
+< See how to do this with 'hub' utility
+ : http://www.element84.com/github-pull-requests-made-easy.html
+	Fork on GitHub with 'hub'
+		hub clone hut/ranger
+		hub fork
+	Or add origin repo for upstream
+		git remote add --track master upstream https://github.com/hut/ranger.git
+	Show attached repositories
+		git remote -v
+		 origin	https://github.com/amerlyq/ranger (fetch)
+		 upstream	https://github.com/hut/ranger.git (fetch)
+	Merge with upstream
+		git fetch upstream
+		git checkout master
+		git merge upstream/master
+		<OR: git pull https://github.com/REP_OWNER/MAIN_REP.git BRANCH_NAME
+	Topic branch <jira-ticket>-[fix|feature]-<short-description>
+	: Isolated and branched off the history of your master branch, which
+	: also matches the current master branch in ASF
+		git checkout master
+		 # make a new branch that is up to date with the ASF repo master branch.
+		git checkout -b 123-fix-ini-file
+		: OR: Create a local branch that tracks the remote branch you’re
+		: interested in: $ git checkout -b PRJ-1234 origin/PRJ-1234
+		git branch
+		 * 123-fix-ini-file
+		 master
+		<<< make changes
+	Prepare to push, update repo with your own
+	> Also merge with upstream as described upper
+		git checkout master
+		git pull origin master
+		git checkout 123-fix-ini-file
+		git rebase master
+	Push to your fork and Send Pull Request
+	 'git request-pull' [-p] <start> <url> [<end>]
+		git checkout 123-fix-ini-file
+		git push -u origin 123-fix-ini-file
+		? git request-pull -p master upstream 123-fix-ini-file
+		? git request-pull refs/remotes/upstream/master $(git config --get remote.origin.url) HEAD
+	< You can have different names for local and remote branch
+		git push https://git.ko.xz/project master:for-linus
+		? git request-pull v1.0 https://git.ko.xz/project master:for-linus
+
+# Also, read: http://blogs.atlassian.com/2014/08/how-to-fetch-pull-requests/
+	http://git-scm.com/book/en/v2/Git-Internals-The-Refspec
+	About git request-pull
+		http://vmiklos.hu/blog/using-git-request-pull.html
+		git request-pull master^^^^^ $(git config remote.origin.url)
+		git request-pull origin/master origin HEAD
+		git request-pull origin/master origin ukl/for-mainline
+		git request-pull origin/master origin HEAD:ukl/for-mainline
+
+After Pull request
+	 Since you worked on the topic branch instead of the master branch, you can
+	 continue working while waiting for the pull request to go through.
+	Be sure to create the topic branch from master.
+		git checkout master
+		git pull origin master
+		git checkout -b document_blahfasel_setting
+		git branch -a
+		document_blahfasel_setting
+		master
+		123-fix-ini-file
+	When Your Pull Request is Accepted
+		git checkout master
+		git pull origin master
+		git log
+		 ( hey there's me! ya! )
+	 You can now delete your topic branch, because it is now merged into the
+	 main repository and in the master branch.
+		git branch -d 123-fix-ini-file
+		git push origin :123-fix-ini-file
+	 I know, deleting a remote topic branch is ugly
+		 (git push origin :123-fix-ini-file).
+	If Your Pull Request is Rejected
+	 In this case, you just need to update your branch from the main
+	 repository and then address the rejection reason.
+		git checkout master
+		git pull origin master
+		git checkout 123-fix-ini-file
+		git rebase master
+		 ( edit / commit / edit / commit)
+		git push origin 123-fix-ini-file
+Receive pull request
+	git checkout master
+	git remote add contributor git://github.com/contributor/project
+	git fetch contributor
+	git merge contributor/newfeature
+	git push origin master
+
+
 Submodules
 	Add
 		git submodule add http://...git ./name
@@ -55,4 +150,23 @@ Log
 	 known as foo.
 	Commits
 		git diff --name-status --oneline HEAD~10 HEAD~5
+
+Regrouping commits
+	Squash several into one
+		git rebase -i HEAD~3
+		 This will bring you into your editor with some text that will look
+		 something like this:
+		 : pick df94881 Allow install to SD
+		 : pick a7323e5 README Junkyism
+		 : pick 3ead26f rm classpath from git
+		To squash those commits into one, change to something like this:
+		 : pick df94881 Allow install to SD
+		 : squash a7323e5 README Junkyism
+		 : squash 3ead26f rm classpath from git
+		Also, you can rearrange them before it and squash 1st and 3rd
+		: pick df94881 Allow install to SD
+		: squash 3ead26f rm classpath from git
+		: pick a7323e5 README Junkyism
+	Then change it's commit message in editor
+
 

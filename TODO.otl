@@ -163,12 +163,15 @@ vim
 	[X] WRONG: for \ts combo syntax on ignores my changes in highlighting in ui.vim
 	[_] Integrate them: vim-indexed-search, incsearch, no-move, *
 	[_] Map next/prev buf, etc on [a [b, ]a ]b
+	[_] Delete all tabs besides indent. (retab! then script to retab all besides?)
 	[_] Integrate: http://learnvimscriptthehardway.stevelosh.com/
 	[X] MUST: http://dougblack.io/words/a-good-vimrc.html
 	[_] Suppress syntastic headers error
 		https://github.com/scrooloose/syntastic/issues/676
 	[_] Add <unique> attr to my shortcuts
 	[_] Create toggle for multi-windows with fixed or autoresize
+	[_] !MUST!: https://github.com/svermeulen/vim-easyclip
+		 Possible, it's that plugin which can insert full-line delete on same line
 
 	Find plugin which deletes/insertes lines without newline
 	[X] Fix tcomment style for C.
@@ -242,6 +245,7 @@ vim
 		: на страничке плагина. Ну, если не напишет, так хоть в курсе будет..
 		: А ещё говорят тормозит cursorline, если её выключить, может станет
 		: лучше.
+		:	--startuptime | Use to get statistics on long load
 	How-to with desc and vimrc
 		http://konishchevdmitry.blogspot.com/2008/07/howto-vim.html
 	Integrate shell
@@ -379,8 +383,17 @@ TODO
 			Is it has sense to try mastering Emacs?
 
 	[_] view instead of vim in ranger by default
-		shortcuts to fast toggle vim readonly
-		disable listchars, folds, syntastic on open
+		[_] shortcuts to fast toggle vim readonly
+		[_] disable listchars, folds, syntastic on open
+		[_] toggle between vim and view in ranger!
+	[_] Vimserver standalone
+		[_] Toggle vim instances as current main server <S-F2>
+		 See if it possible: ex command, with vim restart, or no way
+			[X] Dump pid in var _V will not work, but you can use file
+		[_] Open files from ranger 'ge'/'L'/F2 or another vim by <leader><F2>
+		[_] Make it possible to press key in vim/ranger over ssh, and open it
+		  in local vimserver by scp://
+		[_] Integrate suspend/resume vim functionality in this server script
 
 Find & read
 	[_] Book: Production Volume Rendering: Design and Implementation

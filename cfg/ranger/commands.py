@@ -200,8 +200,6 @@ class shell(Command):
     escape_macros_for_shell = True
 
     def execute(self):
-        from ranger.ext.shell_escape import shell_escape as esc
-
         if self.arg(1) and self.arg(1)[0] == '-':
             flags = self.arg(1)[1:]
             command = self.rest(2)
@@ -216,10 +214,9 @@ class shell(Command):
                 command = self.fm.substitute_macros(command, escape=True)
 
             # Amer: fix to load aliases working from shell, setopt aliases;
-            self.fm.execute_command("$SHELL -c 'source ~/.bash/aliases; eval '"
-                    + esc(esc(command)) + "''", flags=flags)
-            # self.fm.execute_command("printf 'source ~/.bash/aliases; "
-            #         + esc(command) + "' | $SHELL", flags=flags)
+            from ranger.ext.shell_escape import shell_quote as quo
+            self.fm.execute_command("source ~/.bash/aliases; eval "
+                    + quo(command), flags=flags)
             # self.fm.execute_command(command, flags=flags)
 
     def tab(self):
@@ -962,6 +959,9 @@ class map_(Command):
     resolve_macros = False
 
     def execute(self):
+        if not self.arg(1) or not self.arg(2):
+            return self.fm.notify("Not enough arguments", bad=True)
+
         self.fm.ui.keymaps.bind(self.context, self.arg(1), self.rest(2))
 
 
@@ -1072,7 +1072,10 @@ class scout(Command):
 
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
-            self.fm.open_console(self.line[0:-len(pattern)])
+            if not pattern:
+                self.fm.open_console(self.line)
+            else:
+                self.fm.open_console(self.line[0:-len(pattern)])
 
         if thisdir != self.fm.thisdir and pattern != "..":
             self.fm.block_input(0.5)
@@ -1282,3 +1285,23 @@ class log(Command):
 
         pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
         self.fm.run([pager, tmp.name])
+
+class flat(Command):
+    """
+    :flat <level>
+
+    Flattens the directory view up to level specified.
+        -1 fully flattened
+        0  remove flattened view
+    """
+
+    def execute(self):
+        try:
+            level = self.rest(1)
+            level = int(level)
+        except ValueError:
+            level = self.quantifier
+        self.fm.thisdir.unload()
+        self.fm.thisdir.flat = level
+        self.fm.thisdir.load_content()
+

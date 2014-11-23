@@ -65,11 +65,11 @@ rep_autobuild() {
         cmake -E chdir "$BUILD_DIR" cmake "" "$PR_DIR"
         cd "$BUILD_DIR"
         sudo make install
-    elif [ -f "$PR_DIR/setup.py" ]; then
-        sudo python setup.py install
     elif [ -f "$PR_DIR/Makefile" ] || [ -f "$PR_DIR/makefile" ]; then
         cd "$PR_DIR"
         make && sudo make install
+    elif [ -f "$PR_DIR/setup.py" ]; then
+        sudo python setup.py install
     elif [ -f "$PR_DIR/configure.ac" ]; then
         autoreconf --install
         # ./autogen.sh
