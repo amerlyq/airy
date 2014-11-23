@@ -26,5 +26,6 @@ LST=$(pgrep $PR)
 if [ -n "$LST" ]; then kill -s SIGTERM $LST; fi
 if [ "$1" == "k" ]; then exit; fi # kill only
 
-$PR --restart $MODE $LARGS
+# Set display to be able launch this by SSH
+DISPLAY=:0.0 $PR --restart $MODE $LARGS
 

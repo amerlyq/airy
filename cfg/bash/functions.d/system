@@ -40,7 +40,7 @@ amScriptDir() {
         SCRIPT_PATH="$(win2unix ${0})"
     else
         if [ "$CURR_PLTF" == "Linux" ]; then
-            type readlink && SCRIPT_PATH="$(readlink -m ${0})";
+            type readlink >/dev/null && SCRIPT_PATH="$(readlink -m ${0})";
             #else READLINK=greadlink; fi
         elif [ "$CURR_PLTF" == "MINGW" ]; then
             SCRIPT_PATH="$(pwd)/${0##*/}";

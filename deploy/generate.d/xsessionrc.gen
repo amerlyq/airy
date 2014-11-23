@@ -34,8 +34,13 @@ fi
 
 
 #wstr "export LIBGL_ALWAYS_SOFTWARE=1"
+
+wstr "
 # For ComposeKey to work
-wstr "export GTK_IM_MODULE=xim"
+export GTK_IM_MODULE=xim
+# To contact urxvtc and urxvtd when launched. Not urxvt.
+export RXVT_SOCKET=/tmp/urxvt-socket
+"
 
 # For bug suppression
 wstr "eval \$(dbus-launch --sh-syntax)"

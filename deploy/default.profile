@@ -2,9 +2,11 @@
 
 ### General ###
 CURR_PROF="default"
+# Set your language environment
 LANG=en_US.UTF-8
-# LANGUAGE=en_US
 LC_NUMERIC=en_US.UTF-8
+# LANGUAGE=en_US
+
 EDITOR=vim
 VISUAL=vim
 TERMCMD=urxvt
