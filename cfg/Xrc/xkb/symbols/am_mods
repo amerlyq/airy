@@ -98,6 +98,16 @@ partial modifier_keys //@@@
 xkb_symbols "both_shiftlock" {
     // Change Left Shift with a sticky version (for one next symbol)
     // key <LFSH> { [ ISO_Level2_Latch ] };
+    // replace key <LFSH> {
+    //     type[Group1]="ONE_LEVEL",
+    //     symbols[Group1] = [ ISO_Level2_Latch ]
+    // };
+    // replace key <RTSH> {
+    //     type[Group1]="ONE_LEVEL",
+    //     symbols[Group1] = [ ISO_Level2_Latch ]
+    // };
+    // modifier_map Shift { <LFSH>, <RTSH> }
+
     key <LFSH> {
         type[Group1]="TWO_LEVEL",
         symbols[Group1] = [ Shift_L, Shift_Lock ]

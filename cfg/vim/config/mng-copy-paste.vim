@@ -17,8 +17,8 @@ vnoremap <C-p> :call CountCopyLines('Pull:') \| normal "_d"+P <CR>
 
 nnoremap ,y :let @+=@" \| :call CountCopyLines('Push:')<CR>
 vnoremap ,y "+y \| :call CountCopyLines('Push:')<CR>
-map ,p :let @"=@+ \| :call CountCopyLines('Pull:') \| normal p<CR>
-map ,P :let @"=@+ \| :call CountCopyLines('Pull:') \| normal P<CR>
+map ,p :<C-u>call CountCopyLines('Pull:') \| normal "+p<CR>
+map ,P :<C-u>call CountCopyLines('Pull:') \| normal "+P<CR>
 " vnoremap ,p :call CountCopyLines('Pull:') \| normal "_d"+P <CR>
 
 " cnoremap <C-y> :<C-U>call setreg(''+'', getreg('':'')) \| call CountCopyLines(''Push:'')<CR><CR>

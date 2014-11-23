@@ -3,7 +3,6 @@
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_exclude_filetypes = ['votl']
 let g:indent_guides_default_mapping = 0
-nnoremap <silent> <Leader>tg <Plug>IndentGuidesToggle
 
 " Make 1-wide guide, don't works on Hard-Tabs
 let g:indent_guides_guide_size = 1

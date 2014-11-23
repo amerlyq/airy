@@ -1,6 +1,9 @@
 " Disable AutoComplPop.
 "let g:acp_enableAtStartup = 0
-"
+
+" In python this scratch window made me angry
+set completeopt-=preview
+
 " Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
 " Use smartcase.
@@ -79,6 +82,8 @@ endif
 "let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 "let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
 "let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+
+let g:neocomplete#enable_auto_close_preview = 0
 
 " For perlomni.vim setting.
 " https://github.com/c9s/perlomni.vim

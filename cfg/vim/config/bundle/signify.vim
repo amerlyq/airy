@@ -3,10 +3,14 @@ let g:signify_vcs_list = [ 'git' ]
 let g:signify_sign_change = '~'
 let g:signify_sign_delete = '-'
 
+nmap <leader>tg <plug>(signify-toggle)
+nmap <leader>tG <plug>(signify-toggle-highlight)
 
-let g:signify_mapping_next_hunk = '<leader>gj'
-let g:signify_mapping_prev_hunk = '<leader>gk'
-let g:signify_mapping_toggle_highlight = '<leader>gh'
+nmap ]c <plug>(signify-next-hunk)
+nmap [c <plug>(signify-prev-hunk)
+" If those ]c will be busy, then signify automaps:
+" nmap <leader>gj <plug>(signify-next-hunk)
+" nmap <leader>gk <plug>(signify-prev-hunk)
 
 
 " " highlight lines in Sy and vimdiff etc.)

@@ -19,15 +19,17 @@ CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" )
 if [ "$CURR_HOST" == "vbox" ]; then
     CONF=$( sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|' <<< "$CONF" )
 # elif [ "$1" == "elona" ]; then
-else
-    CONF=$( sed '/am_over/ s|\(\s*include "\)\(.*\)"|\1\2_'"elona"'"|' <<< "$CONF" )
+# else
+#     CONF=$( sed '/am_over/ s|\(\s*include "\)\(.*\)"|\1\2_'"elona"'"|' <<< "$CONF" )
 fi
 
 echo "$CONF"
 
 echo "$CONF" | xkbcomp -I"$HOME/.Xrc/xkb" - "${DISPLAY%%.*}"
 
-pgrep xcape > /dev/null || { xcape -t 250 -e "Control_L=Escape" & }
+pgrep xcape > /dev/null || {
+    xcape -t 250 -e "Control_L=Escape" &
+}
 
 # setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
 #     -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \

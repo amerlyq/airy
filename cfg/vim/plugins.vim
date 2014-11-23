@@ -89,7 +89,6 @@ NeoBundle 'Shougo/vinarise.vim', {
 "NeoBundle 'Shougo/vesting'
 
 
-
 " Always have a nice view for vim split windows
 " http://zhaocai.github.io/GoldenView.Vim/
 "NeoBundle 'zhaocai/GoldenView.Vim'
@@ -97,34 +96,17 @@ NeoBundle 'Shougo/vinarise.vim', {
 " Super-mega-replace for bunch of plugins
 " See: http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
 NeoBundle 'Shougo/unite.vim', { 'name' : 'unite.vim'
-                            \ , 'depends' : 'vimproc'
+                            \ , 'depends' : 'Shougo/vimproc'
                             \ }
-" {{{ Unite hotkeys
-" <leader>o recursive files
-" <leader>f files
-" <leader>b buffers
-" <leader>/ grep
-" <leader>l lines
-" <leader>; command
-" <leader>: history/command
-" <leader>m MRU files
-" <leader>y history/yank
-" <leader>h help
-" -u outline
-" -n file/new
-" }}}
-
 NeoBundleLazy 'Shougo/unite-outline', {
     \ 'depends' : 'unite.vim'
     \ , 'autoload' : { 'unite_sources' : 'outline' }
     \ }
+NeoBundle 'Shougo/neomru.vim', { 'depends' : 'unite.vim' }
 
 " NeoBundleLazy 'thinca/vim-unite-history', { 'depends' : 'unite.vim'
 "                                         \ , 'autoload' : { 'unite_sources' : 'history/command' }
 "                                         \ }
-
-" :substitute preview
-NeoBundle 'osyo-manga/vim-over'
 
 " ======================================
 

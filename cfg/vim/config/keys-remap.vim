@@ -60,6 +60,7 @@ noremap gk k
 noremap g0 ^
 noremap ,4 $
 noremap g4 A<Space><Esc>
+noremap ,g %
 
 " swap v and CTRL-V because Block mode is more useful that Visual mode
 noremap    v   <C-V>
