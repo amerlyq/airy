@@ -31,3 +31,6 @@ nmap <Leader>- A-<Esc><Leader>_
 nmap <Leader>= mzyypVr=:.+1g/^=\+/d<Enter>`z
 " format current line as a second-level heading in markdown (uses `z marker)
 nmap <Leader>+ mzyypVr-:.+1g/^-\+/d<Enter>`z
+
+
+command! -bar -nargs=? MapDump redir > ~/vim_map_dump | map <args> | redir END

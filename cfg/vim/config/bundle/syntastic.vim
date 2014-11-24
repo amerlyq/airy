@@ -1,4 +1,6 @@
-let g:syntastic_check_on_open=1
+" suppress 'no such file' error when browsing
+let g:syntastic_check_on_open=0
+
 " use the :sign interface to mark syntax errors.
 let g:syntastic_enable_signs=1
 " what the syntastic |:sign| text contains.

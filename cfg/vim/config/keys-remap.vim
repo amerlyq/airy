@@ -62,10 +62,8 @@ noremap ,4 $
 noremap g4 A<Space><Esc>
 noremap ,g %
 
-" swap v and CTRL-V because Block mode is more useful that Visual mode
-noremap    v   <C-V>
-noremap <C-V>     v
-noremap   ,v      v
+" Swap v and CTRL-V was pitiful idea
+noremap   ,v  <C-V>
 
 
 " Unused

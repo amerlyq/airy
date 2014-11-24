@@ -30,6 +30,6 @@ let g:clang_format#style_options = {
 "" map to <Leader>cf in C++ code
 "" Format all
 " autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
-autocmd FileType c,cpp,objc vnoremap <buffer>gy :ClangFormat<CR>
+" autocmd FileType c,cpp,objc vnoremap <buffer>gf :ClangFormat<CR>
 " Only if you install 'vim-operator-user'
-autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
+autocmd FileType c,cpp,objc map <buffer>\x <Plug>(operator-clang-format)

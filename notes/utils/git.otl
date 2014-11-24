@@ -22,6 +22,12 @@ Existing Git Repo?
 Workflow
 	git reset --hard ORIG_HEAD | hg update --clean (or 'hg up -C' for short)
 
+Add remote branch
+	git ls-remote --heads origin
+	git fetch $(git config --get remote.origin.url) fix-popen-shell:fix-popen-shell
+	git remote show origin
+	gco fix-popen-shell
+
 Fork and Pull request
  http://wiki.apache.org/couchdb/ContributorWorkflow
 < See how to do this with 'hub' utility

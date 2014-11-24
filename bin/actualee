@@ -6,9 +6,11 @@ NM="$1"
 NAME="${NM%/*}"
 EXT="${NAME##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
+FL="$PWD/$NM"
 
 pause() { read -n 1 -sp "<======== Press any key to continue \
 ($(date +"%T")) ========> " tmp; printf "$NAME\n"; }
+
 
 # Names
 case "$NAME" in
@@ -16,14 +18,15 @@ case "$NAME" in
     CMakeLists\.txt) sir       ;;
 *) # Extensions
 case "$EXT" in
-    sh) "$PWD/$NM" && pause ;;
-    py) python "$PWD/$NM" && pause ;;
+    sh) "$FL" && pause ;;
+    py) python "$FL" && pause ;;
     dot) dot -Tx11 "$NM"     ;;
     *) # Types
     case "$TYPE" in
-         text/x-python) "$PWD/$NM" ;;
-        application/x*) "$PWD/$NM" ;;
-               text/x*) "$PWD/$NM" && pause ;;
+         text/x-python) "$FL" ;;
+        application/x*) "$FL" ;;
+               text/x*) "$FL" && pause ;;
+        *) { stat -c '%A' "$FL" | grep -q x; } && "$FL" ;;
     esac
     ;;
 esac
