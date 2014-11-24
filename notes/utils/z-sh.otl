@@ -1,20 +1,43 @@
-Kill suggests processes to kill
-	kill chr‹tab›↓↓
+> Very Cool Man
+	http://www.rayninfo.co.uk/tips/zshtips.html
+Banks
+	https://github.com/sorin-ionescu/prezto
+
+Tips
+	Structural organizing and aliases
+		https://justin.abrah.ms/dotfiles/zsh.html
+
+Auto-suggests processes to kill or options
+	kill <tab> || kill chr‹tab›↓↓
+	git <tab>
 Remote scp suggestions
  It will only work if you’ve password-less access to the remote, i.e. when
  you’ve pre-shared rsa/dsa keys.
 	scp root@192.168.2.20:‹tab›‹tab›↓→
+	scp sir:~/<tab>
 Known SSH hosts
  Zsh will suggest usernames & hosts based on where you’ve previously sshed to.
 	ssh ro‹tab›10‹tab›‹tab›‹tab›↓→
 Filesystem navigation
 	/‹tab›‹tab›↓→
+	Expansion
+		cd /u/lo/b <tab>
+	Replacing in last cd
+		cd bin share
+	Batch renaming
+		zmv '(*).txt' 'tmp_$1.html'
+	$PATH <tab>
+	Alt-/ to move through argument history
 Arguments/switches completion
 	nmap -‹tab›‹tab›↓
 		More completion
 		 https://github.com/zsh-users/zsh-completions/tree/master/src
 autojump or fasd
 	https://github.com/clvv/fasd
+
+Globbing
+	Open anywhere in hierarchy
+		cat **/*.css | grep '#rule'
 
 zsh-syntax-highlighting on command line
 	cd ~/.oh-my-zsh/custom/plugins
@@ -23,3 +46,9 @@ zsh-syntax-highlighting on command line
 	ZSH_CUSTOM=~/.oh-my-zsh/custom/
 	# Make sure plugins section contains zsh-syntax-highlighting:
 	plugins=(history-substring-search zsh-syntax-highlighting)
+
+ls -l *(.L-50)    # list file size less than 50 bytes (the . ignores directories)
+ls -l *(Lm+50)  # list file size larger/greater than 50 mb
+ls -l *(m1)       # list files modified exactly 1 day ago
+ls -l *(.m4)      # as above but ignoring the directory.
+ls -lt  **/*.py(.om[1,20]) # list 20 newest python (.py) files anywhere in directory hierarchy

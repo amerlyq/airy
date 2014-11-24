@@ -8,8 +8,13 @@ EXT="${NAME##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
 FL="$PWD/$NM"
 
-pause() { read -n 1 -sp "<======== Press any key to continue \
-($(date +"%T")) ========> " tmp; printf "$NAME\n"; }
+pause() {
+    local ERR=$?
+    read -n 1 -sp "<======== Press any key to continue \
+($(date +"%T")) ========> " tmp
+    printf "$NAME\n"
+    return $ERR
+}
 
 
 # Names
@@ -33,4 +38,4 @@ esac
 ;;
 esac
 
-if [ $? -ne 0 ]; then pause; fi
+if [ $? -ne 0 ]; then pause; return $?; fi
