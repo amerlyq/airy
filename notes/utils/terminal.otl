@@ -104,3 +104,12 @@ Compare files as options
 
 Extract
 	ffmpeg -i VIDEOFILE -acodec libmp3lame -metadata TITLE="Name of Song" OUTPUTFILE.mp3
+
+Reverse lines
+	:g/^/m0		| in vim
+	tac
+	tail -r
+	sed '1!G;h;$!d'               # method 1
+	sed -n '1!G;h;$p'             # method 2
+	perl -e 'print reverse <>'
+

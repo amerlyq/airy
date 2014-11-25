@@ -17,19 +17,16 @@ let g:syntastic_auto_loc_list=1
 " NOTE: Extracted from source. Hope this will suppress irritating 'not found'
 let g:syntastic_c_remove_include_errors = 1
 let g:syntastic_c_no_include_search = 1
+let g:syntastic_cpp_config_file = '.syntastic'
 
 " map non-standard filetypes to standard ones.
 let g:syntastic_filetype_map = { 'latex': 'tex',
                                \ 'gentoo-metadata': 'xml' }
 
-" let g:syntastic_c_no_include_search = 1
-" let g:syntastic_c_remove_include_errors = 1
-
-" let g:syntastic_c_remove_include_errors = 1
 " let g:syntastic_cpp_remove_include_errors = 1
 " let g:syntastic_cpp_config_file = '.clang_complete'
 
-" let b:syntastic_c_cflags = '-I/usr/include/ImageMagick'
+let g:syntastic_c_cflags = '-I/usr/src/linux-headers-$(uname -r)/include'
 
 let g:syntastic_cpp_compiler = 'g++'
 let g:syntastic_cpp_check_header = 0
@@ -37,6 +34,7 @@ let g:syntastic_cpp_include_dirs = [ 'inc', 'include', '../inc', '../include', '
 let g:syntastic_c_compiler = 'gcc'
 let g:syntastic_c_check_header = 0
 let g:syntastic_c_include_dirs = [ 'inc', 'include', '../inc', '../include',  '../../include', '../../common/inc' ]
+" let g:syntastic_c_compiler_options = '-Wall '
 
 " let g:syntastic_c_compiler_options = '-std=c89 -Wall -Wdeclaration-after-statement -Werror -Wno-unused-variable -Wno-unused-but-set-variable'
 " '-ansi -DMACRO_NAME'

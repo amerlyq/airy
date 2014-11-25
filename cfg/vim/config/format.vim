@@ -31,6 +31,10 @@ set smarttab
 
 " TRY: wrap only on \s chars
 set linebreak
+" No more esc-insert mess when unindented typing wierd characters
+set nodigraph
+" Move by arrow keys on previous/next line around ends of line in command mode
+set whichwrap=<,>
 
 
 " set tildeop   "allow moves for register change, like  ~w -- for word
