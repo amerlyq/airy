@@ -5,6 +5,9 @@ alias path='echo -e ${PATH//:/\\n}'
 alias now='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 
+# most often used commands
+alias top20='print -l $$${(o)history%% *} | uniq -c | sort -nr | head -n 20'
+
 # --- Process ---
 # alias psg='ps aux | grep ' # Rewritten by zsh
 alias topstat='dstat -cdnpmgs --top-bio --top-cpu'

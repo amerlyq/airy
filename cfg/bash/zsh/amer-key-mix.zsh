@@ -7,6 +7,10 @@
 # vi-mode
 bindkey -v
 
+# History completion on pgup and pgdown
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end  history-search-end
+
 bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 bindkey '^B' backward-char

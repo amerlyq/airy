@@ -4,6 +4,9 @@
 alias -g L="| less"
 alias -g TL='| tail -20'
 alias -g NUL="> /dev/null 2>&1" # You get the idea.
+# alias -g NE='2>|/dev/null'
+# alias -g NO='&>|/dev/null'
+# alias -g PG='|$PAGER'
 
 alias -g @="$(xsel -o)"
 
@@ -11,6 +14,12 @@ alias -g @="$(xsel -o)"
 ## Std-like
 psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
 
+  if (( $+commands[links2] )) ; then export LINKS_BROWSER="links2"
+elif (( $+commands[links] )) ; then export LINKS_BROWSER="links"
+elif (( $+commands[lynx] )) ; then export LINKS_BROWSER="lynx"
+fi
+
+alias myip=$LINKS_BROWSER' -dump http://www.myip.ch/ | grep -o "[[:digit:]].*[[:digit:]]"'
 
 # Colored less in pipe
 # http://www.greenwoodsoftware.com/less/faq.html

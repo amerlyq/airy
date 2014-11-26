@@ -17,13 +17,18 @@ alias shutdown='sudo /sbin/shutdown'
 
 
 # --- Shorts ---
-alias apt-get='sudo apt-get'
-alias dpkg='sudo dpkg'
-alias updatey='sudo apt-get --yes'
+if (( EUID != 0 )); then
+    alias apt-get='sudo apt-get'
+    alias dpkg='sudo dpkg'
+    alias dpkg-reconfigure='sudo dpkg-reconfigure'
+    alias pkill='sudo pkill '
+    # alias debup='aptitude update && aptitude safe-upgrade'
+    # alias debup_old='aptitude update && aptitude upgrade'
+fi
+
+alias apti='apt-get'
+alias apt-search='apt-cache search'
 alias update='sudo apt-get update && sudo apt-get upgrade'
-alias pkill='sudo pkill '
-#alias update='yum update'
-#alias updatey='yum -y update'
 
 
 # --- Insurance ---
