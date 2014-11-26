@@ -1,7 +1,15 @@
 #!/bin/bash
 
-ARM_PREFIX=armv7l-tizen-linux-gnueabi-
-alias ren='${ARM_PREFIX}nm -n '
-alias res='${ARM_PREFIX}readelf -S '
-alias reo='${ARM_PREFIX}objdump -m arm -D '
-alias reb='${ARM_PREFIX}objdump -m arm -b binary -D '
+RE_PREFIX=armv7l-tizen-linux-gnueabi-
+alias ren='${RE_PREFIX}nm -n '
+alias res='${RE_PREFIX}readelf -S '
+alias reo='${RE_PREFIX}objdump -m arm -D '
+alias reb='${RE_PREFIX}objdump -m arm -b binary -D '
+
+# To use with /dev/test mem dumping on devices
+#   sdb shell "cat /dev/test" | rex L
+rex() {
+    local fl=`tempfile`
+    tee "$fl" | xxd
+    ${RE_PREFIX}objdump -m arm -b binary -D "$fl"
+}

@@ -113,3 +113,7 @@ Reverse lines
 	sed -n '1!G;h;$p'             # method 2
 	perl -e 'print reverse <>'
 
+Remove last lines
+	tac file.txt | sed "1,$n{d}" | tac > newfile
+	head -n -2 myfile.txt > newfile
+
