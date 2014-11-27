@@ -15,8 +15,8 @@ pstop() { read -n 1 -sp "$PROMPT " tmp && printf "$@\n"; }
 
 case "$1" in
     -p) shift; printf "$PROMPT $@\n" ;;
-    -e) shift; pstop $@ ;;
-*) if [ "$ERR" != "0" ]; then pstop $@; fi ;;
+    -e) shift; if [ "$ERR" != "0" ]; then pstop $@; fi ;;
+     *) pstop $@ ;;
 esac
 
 exit $ERR

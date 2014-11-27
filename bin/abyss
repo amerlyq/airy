@@ -45,6 +45,11 @@ run_build() {
     wpause
 }
 
+# Priority for files:
+#   #1 modeline in file
+#   compile
+#   Makefile
+#   CMakeLists.txt
 
 # Build each
 if [ -z "$ARGS" ]; then

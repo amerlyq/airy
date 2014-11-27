@@ -10,3 +10,27 @@ Debug makefile
 
 POSIX
 	http://pubs.opengroup.org/onlinepubs/009695399/utilities/make.html
+
+Cool tricks
+	http://locklessinc.com/articles/makefile_tricks/
+	http://mad-scientist.net/make/multi-arch.html
+
+Autodependency using Tromey's way
+	http://make.paulandlesley.org/autodep.html
+
+Integrate
+	http://stackoverflow.com/questions/231229/how-to-generate-a-makefile-with-source-in-sub-directories-using-just-one-makefil
+
+Linking
+	http://docencia.ac.upc.edu/FIB/USO/Bibliografia/unix-c-libraries.html
+
+	> ar rvs $(BIN) -o $@ $^ $(LINK_FLAGS)
+	: you can check if the system locates the library properly for a given
+	: program linked with this library: ldd prog
+
+	: The 'c' flag tells ar to create the library if it doesn't already exist.
+	: The 'r' flag tells it to replace older object files in the library, with
+	: the new object files.
+	: LD      := ar rcs
+	: ranlib libutil.a # To update symb-index inside *.a
+	: -Wl,static   # To prefer static-linking

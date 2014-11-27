@@ -218,7 +218,7 @@ class shell(Command):
             # ERROR: will not work with sudo (shell -r)!
             from ranger.ext.shell_escape import shell_quote as quo
             self.fm.execute_command("\
-                    source ~/.bash/aliases && pause $? -p; \
+                    source ~/.bash/aliases; \
                     eval " + quo(command), flags=flags)
             # self.fm.execute_command(command, flags=flags)
 
