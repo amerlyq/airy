@@ -217,8 +217,9 @@ class shell(Command):
             # Using ~/.zshenv will crash git commands
             # ERROR: will not work with sudo (shell -r)!
             from ranger.ext.shell_escape import shell_quote as quo
-            self.fm.execute_command("source ~/.bash/aliases; eval "
-                    + quo(command), flags=flags)
+            self.fm.execute_command("\
+                    source ~/.bash/aliases && pause $? -p; \
+                    eval " + quo(command), flags=flags)
             # self.fm.execute_command(command, flags=flags)
 
     def tab(self):

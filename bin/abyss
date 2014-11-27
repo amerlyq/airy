@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# TODO: Make on basis of this file the generator of simple scripts like
+#   'compile && run' to specified project
+
+ARGS="$@"
+DIR=$(pwd)
+BDR="$DIR/build"
+BIN=""
+cd "$DIR"
+
+wpause() { pause $? -e "$NAME" || exit $?; }
+
+dir_build() {
+    if [ -f "./CMakeLists.txt" ]; then
+        !sir bR
+    elif [ -f "./Makefile" ]; then
+        make # make -C "$BDR"
+        # set makeprg=ruby\ -c\ %
+    elif [ -f "./compile" ]; then
+        ./compile
+    fi
+    wpause
+}
+
+file_build() {
+#else if &filetype =~ 'sh'
+#    exec l:run . './% && read tmp'
+    # let lst=substitute(glob(dir.'/**/*.c'), '\n', ' ', 'g')
+
+    # if len(l:lst) > 0
+    #   call mkdir(l:bdir, 'p')
+    cd "$BDR" && gcc -O0 -g -o "$BIN" -I "$DIR" *.c
+    wpause
+}
+
+run_build() {
+    if [ -f "./run" ]; then
+        ./run
+    elif [ -f "$BIN" ]; then
+        "$BIN"
+    elif [ -f "./Makefile" ] && grep -q '^run:' ./Makefile; then
+        make run
+        echo yes
+    fi
+    wpause
+}
+
+
+# Build each
+if [ -z "$ARGS" ]; then
+
+    BIN="$DIR/${DIR##*/}.bin"
+    dir_build
+
+else for entry in "${ARGS[@]}"; do
+
+    BIN="$DIR/${entry##*.}.bin"
+    if [ -d "$entry" ]
+    then dir_build
+    else file_build; fi
+
+done; fi
+
+
+# Run
+if [ $# -le 1 ]; then
+    run_build;
+fi
+

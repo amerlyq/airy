@@ -8,29 +8,20 @@ EXT="${NAME##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
 FL="$PWD/$NM"
 
-pause() {
-    local ERR=$?
-    read -n 1 -sp "<======== Press any key to continue \
-($(date +"%T")) ========> " tmp
-    printf "$NAME\n"
-    return $ERR
-}
-
+wpause() { pause $? "$NAME" || exit $?; }
 
 # Names
 case "$NAME" in
     Makefile*) make -f "$NAME" ;;
     CMakeLists\.txt) sir       ;;
-*) # Extensions
-case "$EXT" in
-    sh) "$FL" && pause ;;
-    py) python "$FL" && pause ;;
-    dot) dot -Tx11 "$NM"     ;;
-    *) # Types
-    case "$TYPE" in
+*) case "$EXT" in # Extensions
+    sh) "$FL" && wpause        ;;
+    py) python "$FL" && wpause ;;
+    dot) dot -Tx11 "$NM"      ;;
+    *) case "$TYPE" in # Types
          text/x-python) "$FL" ;;
         application/x*) "$FL" ;;
-               text/x*) "$FL" && pause ;;
+               text/x*) "$FL" && wpause ;;
         *) { stat -c '%A' "$FL" | grep -q x; } && "$FL" ;;
     esac
     ;;
@@ -38,4 +29,4 @@ esac
 ;;
 esac
 
-if [ $? -ne 0 ]; then pause; exit $?; fi
+if [ $? -ne 0 ]; then wpause; fi

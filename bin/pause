@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# if [ $? -ne 0 ]; then pause; exit $?; fi
+
+if [ $# -lt 1 ]; then printf "You need \$? as first argument\n"; fi
+ERR=$1
+shift
+
+MSG="Press any key to continue"
+SP="========"
+
+PROMPT="<$SP $MSG ($(date +"%T")) $SP>"
+
+pstop() { read -n 1 -sp "$PROMPT " tmp && printf "$@\n"; }
+
+case "$1" in
+    -p) shift; printf "$PROMPT $@\n" ;;
+    -e) shift; pstop $@ ;;
+*) if [ "$ERR" != "0" ]; then pstop $@; fi ;;
+esac
+
+exit $ERR
