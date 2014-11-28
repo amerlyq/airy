@@ -25,12 +25,14 @@ BODY='{ pf=0; print $0 > fa }
 ssh srk 'LOGDUMP="'$RMDIR/show-log'"
     printf "#!/bin/bash\ntailf usb-filter.log\n" > "$LOGDUMP"
     chmod 777 "$LOGDUMP"
-    rm "'$RMDIR/$FA'"
-'
+    >'$RMDIR/$FA'
+    >'$RMDIR/$FF'
+    " '
 
 # Send log by ssh
 >"$DIR/$FA"
-{ tailf "$DIR/$FA" | ssh srk "cat > \"$RMDIR/$FA\""; } &
+# { tailf "$DIR/$FA" | ssh srk "cat > \"$RMDIR/$FA\""; } &
+{ tailf "$DIR/$FA" | ssh srk "awk -v fa=\"$RMDIR/$FA\" -v ff=\"$RMDIR/$FF\" '$BODY'"; } &
 
 # Ping board to prevent sleep
 # PING=~/work/sip/scripts/arm-connect.sh

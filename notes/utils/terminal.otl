@@ -117,3 +117,47 @@ Remove last lines
 	tac file.txt | sed "1,$n{d}" | tac > newfile
 	head -n -2 myfile.txt > newfile
 
+Buffering stdio FIX
+	stdbuf
+	: stdbuf is part of GNU coreutils, and is essentially an LD_PRELOAD hack
+	: which calls setvbuf() for an application. Thus it is a generic solution
+	: to the problem and can be used to fix most applications. Usage looks
+	: like this:
+		tail -f /var/log/foo | stdbuf -o0 app ...
+		: which will disable output buffering for app, assuming it does not do
+		: something itself to reverse the setvbuf() call. An example of a
+		: misbehaving application is mawk, below.
+	 Another way to skin this cat is to use the stdbuf program, which is part
+	 of the GNU Coreutils.
+		stdbuf -i0 -o0 -e0 command
+	 This turns off buffering completely for input, output and error. For some
+	 applications, line buffering may be more suitable for performance reasons:
+		stdbuf -oL -eL command
+	GNU awk needs no modifications, that is it does not buffer when there is
+	: no controlling tty.  mawk however (the default awk in Debian/Ubuntu and
+	: possibly others) buffers output, and also does not seem to work with
+	: stdbuf. It does however provide a -Winteractive option which will turn
+	: off buffering.
+		tail -f /var/log/foo | gawk
+		tail -f /var/log/foo | mawk -Winteractive
+	GNU sed provides the -u option which calls fflush(), thereby providing
+	: unbuffered output. You can also use stdbuf as above.
+		tail -f /var/log/foo | sed -u
+		tail -f /var/log/foo | stdbuf -o0 sed
+		: Force output to be line buffered.  By default, output is line
+		: buffered when standard output is a terminal and block buffered
+		: other-wise.
+		sed -u
+	GNU grep provides a specific option, --line-buffered, (Similar to sed) to
+	: disable buffering, or again you can use stdbuf.
+		tail -f /var/log/foo | grep --line-buffered
+		tail -f /var/log/foo | stdbuf -o0 grep
+	You can use the 'expect' command 'unbuffer', e.g.
+		unbuffer long_running_command | print_progress
+	 unbuffer connects to long_running_command via a pseudoterminal (pty),
+	 which makes the system treat it as an interactive process, therefore not
+	 using the 4-kiB buffering in the pipeline that is the likely cause of the
+	 delay.  For longer pipelines, you may have to unbuffer each command
+	 (except the final one), e.g.
+		unbuffer x | unbuffer -p y | z
+
