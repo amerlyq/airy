@@ -49,4 +49,9 @@ let g:Powerline_symbols = 'fancy'
 "- custom command line
 set stl=%f\ %m\ %r\ line:%l/%L(%p%%)\ col:%c\ buf:%n\ (%b)(0x%B)
 
+" Auto-show on launch
+" autocmd vimenter * TagbarToggle
+" autocmd vimenter * NERDTree
+" autocmd vimenter * if !argc() | NERDTree | endif
+
 " vim:ts=2:sw=2:sts=2

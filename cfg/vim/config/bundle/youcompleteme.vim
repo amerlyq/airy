@@ -1,5 +1,5 @@
 "GoToDefinitionElseDeclaration
-nnoremap <leader>jd :YcmCompleter GoTo<CR>
+" nnoremap <leader>jd :YcmCompleter GoTo<CR>
 
 " YCM won't load on startup
 " Now it is loaded as starting argument to vim inside of alias

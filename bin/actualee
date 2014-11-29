@@ -16,7 +16,7 @@ case "$NAME" in
     CMakeLists\.txt) sir       ;;
 *) case "$EXT" in # Extensions
     sh) "$FL" && wpause        ;;
-    py) python "$FL" && wpause ;;
+    py) python "$FL"          ;;
     dot) dot -Tx11 "$NM"      ;;
     *) case "$TYPE" in # Types
          text/x-python) "$FL" ;;

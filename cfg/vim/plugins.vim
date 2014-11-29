@@ -172,6 +172,19 @@ if has('unix')
     " For win: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
 
 endif
+
+
+
+"" Python =======================
+
+" Temporary disabled. Reported it has perfomance troubles with Jedi.
+" NeoBundle 'klen/python-mode', {
+"   \ 'autoload' : { 'filetypes' : [ 'python' ] } }
+NeoBundle 'davidhalter/jedi-vim', {
+    \ 'autoload' : { 'filetypes' : [ 'python' ] } }
+
+
+
 " ======================================
 " Readline style insertion
 " http://www.vim.org/scripts/script.php?script_id=4359
@@ -423,17 +436,21 @@ NeoBundle 'matze/vim-move'
 " NeoBundleLazy 'rkitover/vimpager'
 
 " Fast table creation and modification
-NeoBundle 'dhruvasagar/vim-table-mode'
+NeoBundleLazy 'dhruvasagar/vim-table-mode', {
+    \ 'autoload': { 'commands' : ['TableModeEnable'], },
+    \ }
+
 " ALT: http://tiddlywiki.com  -- one-page wiki
-NeoBundle 'vimoutliner/vimoutliner', {
+NeoBundleLazy 'vimoutliner/vimoutliner', {
     \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], },
+    \ }
+
+NeoBundleLazy 'neilagabriel/vim-geeknote', {
+    \ 'vim_version': '7.4.364',
+    \ 'autoload': { 'commands' : ['Geeknote'], },
     \ }
 
 " ======================================
 " Colorschemes
-" 'jnurmine/Zenburn' -- dark-brown, low-contract
-"NeoBundle 'euclio/vim-nocturne',
-NeoBundle 'tomasr/molokai'
-NeoBundle 'noahfrederick/vim-hemisu'
+" NeoBundle 'tomasr/molokai'
 NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'chriskempson/vim-tomorrow-theme'

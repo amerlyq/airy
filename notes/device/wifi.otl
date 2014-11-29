@@ -1,0 +1,14 @@
+>nmcli examples
+ https://wiki.archlinux.org/index.php/NetworkManager
+wifi network
+	nmcli dev wifi connect <name> password <password>
+wifi on the wlan1 wifi interface:
+	nmcli dev wifi connect <name> password <password> iface wlan1 [profile name]
+disconnect an interface:
+	nmcli dev disconnect iface eth0
+reconnect an interface marked as disconnected
+	nmcli con up uuid <uuid>
+get a list of UUIDs
+	nmcli con list
+list of network devices and their state
+	nmcli dev
