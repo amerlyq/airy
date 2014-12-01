@@ -88,6 +88,11 @@ if [ "${CURR_PLTF}" != "MINGW" ] || [ $CLEAN_INSTALL -eq 1 ] ; then
     dst=~/.bash_export
     wbegin
     "$DEPLOY_DIR/profile_export" "$PROFILES_DIR" "$CURR_PROF"
+    case "$1" in light|dark|transparent|opaque)
+        sed -i "/^export CURR_PROF/a \
+export CURR_THEME=$1" "$dst"
+        echo ">>>>>>>>>>> Used '$1' theme for all apps"
+    ;; esac
 fi
 source ~/.bash_export
 echo "$CURR_PROF :={ $CURR_PLTF, $CURR_HOST, $CURR_USER }"

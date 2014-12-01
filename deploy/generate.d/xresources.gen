@@ -10,9 +10,12 @@ if [ $? -eq 1 ]; then exit 1; fi
 
 dst=~/.Xresources
 wbegin '!'
-case $1 in
-    dark)   wstr '#define Dark' ;;
-    light)  wstr '#define Light' ;;
+case ${1:-$CURR_THEME} in
+        dark) wstr '#define Dark'   ;;
+       light) wstr '#define Light'  ;;
+ transparent) wstr '#define Transp' ;;
+      opaque) wstr '#define Opaque' ;;
+           *) wstr '#define Dark'   ;;
 esac
 
 warr '#include ' '".urxvt/urxvtrc" ".urxvt/urxvt_keys" ".urxvt/urxvt_ext" ".Xrc/xtheme_solarized" ".Xrc/xtermrc" ".Xrc/xfontrc"'
