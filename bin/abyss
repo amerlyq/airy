@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # TODO: Make on basis of this file the generator of simple scripts like
-#   'compile && run' to specified project
+#   'compile && run' for specified project
 
 ARGS="$@"
 DIR=$(pwd)
@@ -18,6 +18,8 @@ dir_build() {
         # set makeprg=ruby\ -c\ %
     elif [ -f "./compile" ]; then
         ./compile
+    else # then cd ..
+        return -1;
     fi
     wpause
 }
@@ -40,7 +42,6 @@ run_build() {
         "$BIN"
     elif [ -f "./Makefile" ] && grep -q '^run:' ./Makefile; then
         make run
-        echo yes
     fi
     wpause
 }
@@ -53,9 +54,13 @@ run_build() {
 
 # Build each
 if [ -z "$ARGS" ]; then
-
+    # Recursive search for project root dir
+    while [ "$DIR" != "$HOME" ] && [ ! -d "$PREV/.git" ]
+    do
+        dir_build && break
+        cd .. && PREV="$DIR" && DIR=$(pwd)
+    done
     BIN="$DIR/${DIR##*/}.bin"
-    dir_build
 
 else for entry in "${ARGS[@]}"; do
 

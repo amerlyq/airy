@@ -16,9 +16,9 @@ set backspace=indent,eol,start
 if has("autocmd")
     " make Python follow PEP8 ( http://www.python.org/dev/peps/pep-0008/ )
     autocmd FileType python
-        \ set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
+        \ setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
     autocmd FileType make
-        \ set tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
+        \ setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
 endif
 
 set formatoptions+=l " don't auto-wrap line if it was longer before insert

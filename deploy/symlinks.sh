@@ -23,7 +23,6 @@ then
     lnLst ~/.config/copyq/ Win/ "copyq.conf"
     lnLst ~/.config/gtk-3.0/ sets/ "settings.ini"
     lnLst ~/. sets/ "gtkrc-2.0 wgetrc dhexrc" #valgrindrc
-    lnLst ~/. Xrc/ "xbindkeysrc"
 
     if [ "$CURR_PROF" == "home" ]; then
         pairLink ~/.mpd/mpd.conf "${CONF_DIR}/sets/mpd-sir.conf"

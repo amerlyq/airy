@@ -3,3 +3,9 @@ Markdown
 		Links
 		| \[\_[^\[\]]\{-}\](\(\_[^()]\{-\}\)) | :%s;;    \1;gc |
 
+Votl
+	Move checked TODO's in Changelog
+		/\[X\] \_.\{-\}\ze\n\s*\[
+		:CopyMatches -
+		/\[X\] \_.\{-\}\n\s*\ze\[
+		:%s;;;

@@ -1,0 +1,91 @@
+CHANGELOG
+===============================================================
+
+2014-11-30 | не гаснущий capslock
+2014-11-30 | не загружается boot с воткнутым hdmi:> Need disable 'Intel Rapid Start'
+2014-11-30 | steam 'OpenGL not using direct rendering' :> install drivers
+2014-11-30 | VBox & CapsLock toggle:> Solution: remap Caps to Ctrl on Windows
+2014-11-30 | i3blocks error and crash after hiding bar :> done bug report
+2014-11-30 | Add to ranger rifle opening *.dot by vim or by 'dot -Tx11 $1' viewer:> bash-actualee
+2014-11-30 | Execute prev ex command in ranger --> changed to snap on <C-s>, execute on <C-k>
+2014-11-30 | Ranger bookmarks with two-letters:> usage as keymaps in rc.local
+2014-11-30 | sh: .\w from .bash_alias -> append_unique to ranger/bookmarks
+2014-11-30 | Add rename alias on 'C' to place cursor at '.' to change only name, not extension
+2014-11-30 | A+S+Enter and ranger by alias -- different color scheme but bold.
+	: Needs bash -i (interactive) to load ranger settings
+2014-11-30 | Ranger: Добавить таки сохранение папок по cd смещённых внутри сабшелла
+	при выходе переход на текущую папку.
+2014-11-30 | Синхронизация истории введённых команд при закрытии сабшелла
+		и история из того шелла из которого мы впервые открыли ранджер
+		(тобишь добавить её в 'rr' alias)
+	Частично реализовано через zsh -- остальное излишество
+2014-11-30 | Сбилдить ранжер из сорцов и смержить мои текущие настройки
+	https://github.com/hut/ranger
+2014-11-30 | ZSH: Здесь описано как создавать свой промпт
+	http://stevelosh.com/blog/2010/02/my-extravagant-zsh-prompt/
+2014-11-30 | Find command to copy current command line in xsel for urxvt or zsh 2014-10-15
+2014-11-30 | Test deploy on clear vbox snapshot my installation config
+: Они требуют существенной доработки порядка подгрузки функций
+: Ведь так получается, что у меня используются симлинки ещё до того, как
+: они буду проброшены!!!
+2014-11-30 | all scripts -- need source funcs, or echoes error msgs, w/o installation
+2014-11-30 | make deploy 'default' full profile, which partially applied for 'guest'
+2014-11-30 | in deploy your own profiles must distribute through private repos
+2014-11-30 | each will source 'default' and others to rewrite only necessary fields
+2014-11-30 | Names of autopulling repos (like erian) must also be part of profile to hide from society
+2014-11-30 | Dir with profiles on erian
+	must make symlink into airy/deploy/profiles to work with it.
+	But then we will not be able to make erian the part of profile.
+	And it must be downloaded manually before! airy.
+2014-11-30 | ALT: source erian profiles
+: Пусковой скрипт для установки должен находиться в erian: оттуда он будет
+: клонировать репозиторий в airy, бросать в него симлинк, запускать
+: инсталляцию системы и в конце концов выполнять функцию по установке
+: ссылки на репу самого erian.
+: Then: airy_profiles add to gitignore!
+2014-11-30 | Erian consists only from docs, profiles
+2014-11-30 | Сделать скрипт install.sh принимающим target
+2014-11-30 | <ALT> Разделить скрипт установки программ на отдельные модули
+: -- например установка только вима или urxvt итд по target на каждый
+:  модуль и на каждую связку интеграции (например объединение
+:  urxvt+vim+tmux) -- это позволит пользователям ставить всё выборочно
+:  и не обязательно на чистую систему.
+:  Плюс локализуются изменения, симлинки и конфиги отдельно на каждый
+:  таргет, а всё общее вынесется в функции. Будет большая модульность.
+2014-11-30 | Сделать отдельный скрипт по манипуляции кучей репозиториев.
+	| Пул по всем
+	| Проверка незакоммиченых изменений, огрызков в стеке,
+	| неиндексированых файлов, незапушеных комитов по всем
+	| Совместить скрипт с промптом для zsh -- одни и те же функции
+	| Клонирование при отсутствии
+2014-11-30 | Vim Change 'Space' to insert several characters if press count before it
+2014-11-30 | WRONG: for \ts combo syntax on ignores my changes in highlighting in ui.vim
+2014-11-30 | vim MUST: http://dougblack.io/words/a-good-vimrc.html
+2014-11-30 | Fix vim tcomment style for C.
+2014-11-30 | BUG: vim -- C-N in plugin multi-edit
+2014-11-30 | My vim copy-paste > get rid of "press enter problem" (cut first line only)
+2014-11-30 | BUG: after reloading vim by ':e' Airline disables, maybe smth also
+	: Bottom bar appear again after insert-mode, upper -- will never
+	: It seems problem in 'after' settings 'syntax on', which was in otl
+2014-11-30 | BUG: Airline disables after ':so $MYVIMRC' :>  Use ':AirlineRefresh'
+2014-11-30 | check AirLineToggle on VBox to meashure CPU loading in the work process
+	:> So, it's only a few. 'syntax on' does much more
+2014-11-30 | notate vim surround
+2014-11-30 | Change vim colors of bkgr in ruler, which has ~,+ etc for git
+2014-11-30 | make vim russian autoswitch for all -- not only for latex
+	: I think better is manually choosen formats.
+	: Get the habit comment cpp in english!
+2014-11-30 | BUG: i3 Xcape to work with remapped keyboard needs to press once real Control before Caps
+2014-11-30 | Save i3 wksp names in file
+	(to make it consistent and able to permanent rename through sessions)
+2014-11-30 | i3 scratchpad with tiling:
+	Mark parent container ('), detach to float, move in scratchpad
+	: ALT: wksp on unexisting monitor, move windows from--to by script
+	:>> Но желание-то создать воркспейс с несколькими плавающими окнами,
+	: которые будут висеть поверх текущего воркспейса! Может, груповое
+	: перемещение на скрытый рабочий стол и обратно?
+2014-11-30 | xkb L-Ctrl -> system-wide xmodmap vim-mode
+2014-11-30 | Texts dir compare on win,
+2014-11-30 | Move mntshare from alias to script mnt
+2014-11-30 | Fix pristine dot's with awk concatenation
+

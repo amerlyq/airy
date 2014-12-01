@@ -24,3 +24,10 @@ LST="$LST xserver-xorg-video-intel mesa-utils"
 
 apt_noprompt $LST
 
+
+# Worarounds::
+
+#:: Mesa warning: couldn't open libtxc_dxtn.so, software DXTn compression /
+#   decompression unavailable
+#> This may be needed to run games using textures in the S3TC format.
+apt_noprompt libtxc-dxtn-s2tc0 libtxc-dxtn-s2tc0:i386

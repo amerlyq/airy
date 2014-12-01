@@ -1,4 +1,4 @@
-" Jedi {{{
+" Jedi {{{1
 " If you need completion on Tab:
 " USE: https://github.com/ervandew/supertab
 
@@ -24,10 +24,8 @@ let g:jedi#show_call_signatures = "1"
 
 " jedi.preload_module('os', 'sys', 'math', 'whatever_module_you_want')
 
-" }}} Jedi
-
-
-" Python-mode {{{
+if 0
+" Python-mode {{{1
 
 " Keys:
 " K             Show python docs
@@ -76,6 +74,4 @@ let g:pymode_syntax_space_errors = g:pymode_syntax_all
 let g:pymode_folding = 0
 let g:pymode_run = 0
 
-" }}} Rope
-
-
+endif
