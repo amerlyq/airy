@@ -189,10 +189,14 @@ NeoBundle 'davidhalter/jedi-vim', {
 " Readline style insertion
 " http://www.vim.org/scripts/script.php?script_id=4359
 NeoBundle 'tpope/vim-rsi'
+" Automatic not-persistent closing statements
 NeoBundle 'tpope/vim-endwise'
+" Extend support for '.' command
 NeoBundle 'tpope/vim-repeat'
 " Manage surrounding ('"<p>...) by replace cs"' or delete ds"
 NeoBundle 'tpope/vim-surround'
+" Use CTRL-A/X to increment dates, times, and more
+NeoBundle 'tpope/vim-speeddating'
 " Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
 NeoBundle 'PeterRincker/vim-argumentative'
 
@@ -204,7 +208,7 @@ NeoBundle 'PeterRincker/vim-argumentative'
 "NeoBundle 'kana/vim-smartinput'
 
 
-":Make cover for long-running tasks
+":Make cover for long-running tasks asynchronous (as like by ssh)
 NeoBundle 'tpope/vim-dispatch'
 NeoBundleLazy 'tpope/vim-markdown', { 'autoload' : { 'filetypes' : [ 'markdown' ] } }
 
@@ -427,8 +431,9 @@ NeoBundle 'kris89/vim-multiple-cursors'
 NeoBundle 'terryma/vim-smooth-scroll'
 " Press + to expand the visual selection  and _ to shrink it.
 NeoBundle 'terryma/vim-expand-region'
+
 " Move text (line or vselect) in more friendly way, then :m[ove]
-NeoBundle 'matze/vim-move'
+NeoBundleLazy 'matze/vim-move', { 'gui' : 1, }
 
 " ======================================
 

@@ -15,9 +15,9 @@ alias gdw='git diff --no-ext-diff --word-diff'
 alias gdv='git diff'
 
 # Log
-alias glg='git lg2'
-alias gll='git log --oneline --decorate'
-alias gmy="git ls --author=\"\$(git config user.name) \""
+alias glg='git lgraph'
+alias gll='git lmsg'
+gln(){ git ldump -n ${1:-10}; } #or -1 for inf
 alias gff='git rev-list --all | xargs git grep '
 alias gsw='git show'
 # git grep -l --all-match -e <regexp1> # To search files with line

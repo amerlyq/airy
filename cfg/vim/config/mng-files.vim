@@ -12,6 +12,9 @@ noremap <Leader>s :<C-U>w<CR>
 " noremap <Leader>S :<C-U>wa<CR>
 noremap <Leader>d :<C-U>q<CR>
 noremap <Leader>D :<C-U>qa<CR>
+" Go inside shell to see output of commands like ':! ..'. Return on <C-d>
+noremap <silent> <Leader>z :<C-U>sh<CR>
+noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
 
 "-----
 

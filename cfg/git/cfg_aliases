@@ -18,7 +18,9 @@
     linverse = log --abbrev-commit --date=short --all --format=format:'%C(bold reverse green)%ad%C(reset)%C(reverse white) %s %C(reset)%C(bold reverse red)%d%C(reset)%C(bold reverse blue) [%aN]%C(reset):%C(reverse yellow)%h%C(reset)'
 
     lgraph  = !git lstd --graph
+    ldump   = !git --no-pager lgraph
     lfiles  = !git lstd --decorate --numstat
+    lmine   = !git lstd --author=\"$(git config user.name) \"
     lcommit = !git linverse -u # Show modified files in last commit
 
 # --topo-order
@@ -26,7 +28,9 @@
 
     # For one file through all commits
     # You can see all the commits related to a file, with the diff of the changes with
-    lhistory = log --graph --all --follow --stat -p --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(bold white)— %an%C(reset)' --abbrev-commit
+    fcommits = log --graph --all --follow --stat -p --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(bold white)— %an%C(reset)' --abbrev-commit
+    # ALT: annotate
+    flines = blame --stat --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n          %C(white)%s%C(reset) %C(bold white)— %an%C(reset)'
 
     # show only new commits after pull
     lnew = log @{1}..  #FULL: git log currentbranch@{1}..currentbranch
