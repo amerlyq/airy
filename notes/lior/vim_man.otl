@@ -1,13 +1,10 @@
-Remote
+Remote edit
 	vim scp://root@example.com/~/sdk/file
 	vim scp://root@example.com/~user/sdk/file
 	vim scp://root@example.com//home/user/sdk/file
 
 Web Debugger (Client-server)
 	https://github.com/Kozea/wdb
-
-Edit
-	ci" | Change all inside "..."
 
 Execute
 	| :.!zsh     | Replace current line with bash command to it's output
@@ -18,9 +15,9 @@ Execute
 	| :g/fred/   |
 	|   " any other commands
 	| :redir END |
-	| !}sort          " sort from cursor to end of paragraph
-	| 3!}sort         " same, 3 paragraphs
-	| 3!!sort         " sort 3 lines
+	| !}sort     | sort from cursor to end of paragraph
+	| 3!}sort    | same, 3 paragraphs
+	| 3!!sort    | sort 3 lines
 
 Search
 	| /[...]      |
@@ -58,42 +55,9 @@ Say we're in insert mode and we want to paste yanked text without leaving the
 insert mode. We can do that with  <C-r>0. If yanked text contains new line
 characters, <C-r><C-p>0 will take care of fixing indentation issues.
 
+To find last mapping of keys
+	:verbose nmap <C-[>
+Vim character info code
+	ga
 
-Folding
-VIM может сворачивать текстовые блоки по следующим правилам:
-	ручное сворачивание по метке (описано в :help fold-manual)
-	сворачивание на основании отступов в начале строк (описано в :help fold-indent)
-	использование выражений для сворачивания (описано в :help fold-expr)
-	сворачивание на основании синтаксиса (описано в :help fold-syntax)
-	использование разницы – сворачивание не изменившегося текста (описано в :help fold-diff)
-	вставка в тексте маркеров для обозначения точки сворачивания (описано в :help fold-marker)
 
-Для начала использования необходимо активировать возможность сворачивания
-	;set foldenable
-Затем задать правило для сворачивания, например, :set foldmethod=indent
-(сворачивание на основании отступов в начале строк)
-
-Команды для создания свертки блоков
-
-zf#j - создает свертку от текущей позиции до # строк вниз
-
-zf/подстрока - создает свертку от текущей позиции и до первой найденной подстроки
-
-v/V и zf - выделение блока и создание свертки
-
-Команды для управления
-	zc – свернуть блок
-	zo – развернуть блок
-	zM – закрыть все блоки
-	zR – открыть все блоки
-	za – инвертирование (если открыто – закрыть, если закрыто – открыть)
-	zj - переход к следующей свертке
-	zk - переход к предыдущей свертке
-	zd - удалить свертку под курсором
-	zD - удалить все свертки
-	[z - перейти к началу текущей свертки
-	]z - перейти к концу текущей свертки
-
-После закрытия vim все свертки забываться, для сохранения сверток в открытом файле используется команда :mkview, для загрузки - loadview.
-
-Дополнительное чтиво Vim documentation: fold

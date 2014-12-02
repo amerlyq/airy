@@ -1,6 +1,7 @@
 " vim: fdm=marker
 " COPY {{{1
 " Plugin to copy matches (search hits which may be multiline).
+"   http://vim.wikia.com/wiki/Copy_search_matches
 " Version 2012-05-03 from http://vim.wikia.com/wiki/VimTip478
 "
 " :CopyMatches      copy matches to clipboard (each match has newline added)

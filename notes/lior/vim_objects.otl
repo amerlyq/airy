@@ -84,25 +84,28 @@
 	Ctrl - right click
 	g - right mouse button
 
-# Folding
-	zf{motion} or {Visual}zf: Operator to create a fold
-	zf'a: fold to a mark
-	zF: create a fold for N lines
-	zd : Delete one fold at the cursor
-	zD: Delete folds recursively at the cursor
-	zE: Eliminate all folds in the window
-	zo: Open one fold
-	z): Open all folds recursively
-	zc: Close one fold
-	zC: Close all folds recursively
-	za: When on a closed fold: open it and viceversa
-	sA: When on a close fold: Open it recursively and vice versa
-	zR: Open all folds
-	zM: Close all folds
-	zn: Fold none: reset foldenable. All folds will be open
-	zN: Fold normal: set 'foldenable'. All folds will be as they were before
-	zi: Invert 'foldenable'
-	[z: Move to the start of the current open fold
-	]z: Move to the end of the current open fold
-	zj: Move downwards to the start of the next fold
-	zk: Move upwards to the end of the previous fold
+Folding
+ После закрытия vim все свертки забываться, для сохранения сверток в открытом
+ файле используется команда :mkview, для загрузки - loadview.
+	| zf{motion} or {Visual}zf | Operator to create a fold (zf5j, zf/some)
+	| zf'a | fold to a mark
+	| zF | create a fold for N lines
+	| zd | Delete one fold at the cursor
+	| zD | Delete folds recursively at the cursor
+	| zE | Eliminate all folds in the window
+	| zo | Open one fold
+	| z) | Open all folds recursively
+	| zc | Close one fold
+	| zC | Close all folds recursively
+	| za | When on a closed fold: open it and viceversa
+	| sA | When on a close fold: Open it recursively and vice versa
+	| zR | Open all folds
+	| zM | Close all folds
+	| zn | Fold none: reset foldenable. All folds will be open
+	| zN | Fold normal: set 'foldenable'. All folds will be as they were before
+	| zi | Invert 'foldenable'
+	| [z | Move to the start of the current open fold
+	| ]z | Move to the end of the current open fold
+	| zj | Move downwards to the start of the next fold
+	| zk | Move upwards to the end of the previous fold
+
