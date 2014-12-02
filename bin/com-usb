@@ -10,7 +10,7 @@ RMDIR=/home/shared
 # sed "w /tmp/usb-all.log" | sed "$FILTER; w /tmp/usb-filter.log"
 BODY='{ pf=0; print $0 > fa }
 
-    /^E\/|\[TUNER\]|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|^Thrift|\[SNAP\]/ {
+    /\sE\/|sd_notify|\[TUNER\]|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|^Thrift|\[SNAP\]/ {
         pf=1; printf "."
     }
 
@@ -26,15 +26,13 @@ ssh srk 'LOGDUMP="'$RMDIR/show-log'"
     printf "#!/bin/bash\ntailf usb-filter.log\n" > "$LOGDUMP"
     chmod 777 "$LOGDUMP"
     >'$RMDIR/$FA'
-    >'$RMDIR/$FF'
-    " '
+    >'$RMDIR/$FF' '
 
 # Send log by ssh
 >"$DIR/$FA"
-# { tailf "$DIR/$FA" | ssh srk "cat > \"$RMDIR/$FA\""; } &
 { tailf "$DIR/$FA" | ssh srk "awk -v fa=\"$RMDIR/$FA\" -v ff=\"$RMDIR/$FF\" '$BODY'"; } &
 
-# Ping board to prevent sleep
+# Ping board to prevent sleep? Don't work.
 # PING=~/work/sip/scripts/arm-connect.sh
 # { while $PING; do sleep 30; done; printf "\n"; } &
 

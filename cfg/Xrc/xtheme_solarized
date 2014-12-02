@@ -49,6 +49,19 @@
 #  define  S_base3   #002b36
     URxvt*shading:    180
     URxvt*fadeColor:  White
+    URxvt*fading:     25
+# elif defined(Transparent)
+#  define  S_base03  #fdf6e3
+#  define  S_base02  #eee8d5
+#  define  S_base01  #93a1a1
+#  define  S_base00  #839496
+#  define  S_base0   #657b83
+#  define  S_base1   #586e75
+#  define  S_base2   #073642
+#  define  S_base3   #002b36
+    URxvt*shading:    100
+    URxvt*fadeColor:  White
+    URxvt*fading:     25
 # else
 #  define  S_base03  #002b36
 #  define  S_base02  #073642
@@ -60,6 +73,7 @@
 #  define  S_base3   #fdf6e3
     URxvt*shading:    25
     URxvt*fadeColor:  Black
+    URxvt*fading:     15
 # endif
 #endif
 
@@ -71,7 +85,7 @@
 *background: S_base03
 *foreground: S_base0
 
-*fading: 40
+! *fading: 40
 *fadeColor: S_base03
 *cursorColor: S_base2
 *cursorTextColor: S_base02

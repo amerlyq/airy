@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+SETS=
+case ${1:-$CURR_THEME} in
+ transparent) SETS="-sh 100 -fadecolor White -fade 25" ;;
+      opaque) SETS="-sh   0 -fadecolor Black -fade 15" ;;
+       light) SETS="-sh 170 -fadecolor White -fade 25" ;;
+        dark) SETS="-sh  25 -fadecolor Black -fade 15" ;;
+           *) SETS="-sh  25 -fadecolor Black -fade 15" ;;
+esac
+
+urxvt $SETS

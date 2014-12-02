@@ -19,8 +19,8 @@ cnoremap <C-y> <C-R>=setreg('+', getcmdline())<CR><C-H>
 map ,y "+y
 map ,p "+p
 map ,P "+P
-" Yank full line w/o newline
-nnoremap ,Y mz0"+y$`z
+" Yank full line w/o newline and surrounded spaces
+nnoremap ,Y mz^"+yg_`z
 
 " Prevent Paste loosing the register source. Deleted available by "- reg
 " http://stackoverflow.com/a/7797434/1147859
