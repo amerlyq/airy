@@ -1,0 +1,18 @@
+C
+	Function
+		^\w\+\_[^(){};]\{-\}\s*\w\+(\_[^;]\{-\})\_\s\{-\}{
+		^\w\+\_[^(){};]\{-\}\s*\w\+\ze(\_[^;]\{-\})\_\s\{-\}{
+		; Multiline function header
+
+Markdown
+	Choose
+		Links
+			\[\_[^\[\]]\{-}\](\(\_[^()]\{-\}\))
+			:%s;;    \1;gc
+
+Votl
+	Move checked TODO's in Changelog
+		\[X\] \_.\{-\}\ze\n\s*\[
+		:CopyMatches -
+		\[X\] \_.\{-\}\n\s*\ze\[
+		:%s;;;

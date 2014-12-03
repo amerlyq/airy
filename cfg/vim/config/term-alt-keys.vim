@@ -48,21 +48,18 @@ let s:keys += map(range(48, 57), "nr2char(v:val)")  " 0-9
 
 " Try to get the best dead keycodes per terminal type
 if &term == 'xterm'
-    " 58 keycodes
-    " xterm sends shift-fkeys for shift-fkeys
+    " 58 keycodes, xterm sends shift-fkeys for shift-fkeys
     let s:key_codes = map(range(13,37), '"<S-F".v:val.">"')
-                \+ map(range(13,37), '"<F".v:val.">"')
-" uncomment if you need more
-"                \+ map(range(1,4), '"<xF".v:val.">"')
-"                \+ map(range(1,4), '"<S-xF".v:val.">"')
+            \+ map(range(13,37), '"<F".v:val.">"')
+"           \+ map(range(1,4), '"<xF".v:val.">"')
+"           \+ map(range(1,4), '"<S-xF".v:val.">"')
 else
-    " 62 keycodes
-    " rxvtish terms send f11-20 for shift-fkeys
-    let s:key_codes = map(range(1,37), '"<S-F".v:val.">"')
-" uncomment if you need more
-"                \+ map(range(21,37), '"<F".v:val.">"')
-"                \+ map(range(1,4), '"<xF".v:val.">"')
-"                \+ map(range(1,4), '"<S-xF".v:val.">"')
+    " 62 keycodes, rxvtish terms send f11-20 for shift-fkeys
+    " (Origin was: 1..37, 21..37 -- But my urxvt is customized)
+    let s:key_codes = map(range(13,37), '"<S-F".v:val.">"')
+            \+ map(range(13,37), '"<F".v:val.">"')
+"           \+ map(range(1,4), '"<xF".v:val.">"')
+"           \+ map(range(1,4), '"<S-xF".v:val.">"')
 endif
 
 "" Additional possible vim keycodes to use {{{1

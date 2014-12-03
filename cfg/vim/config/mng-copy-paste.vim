@@ -14,6 +14,8 @@ noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 "" Don't use paste in cmap as I use C-n C-p for navigation in command line
 "cmap <F7> <C-\>eescape(getcmdline(), ' \')<CR> "setreg(''+'', getreg('':''))
 cnoremap <C-y> <C-R>=setreg('+', getcmdline())<CR><C-H>
+" To be able copy/paste regex snippets into vim/snippets/vim_regex.otl
+nnoremap <C-/> :let @/=@+<CR>
 
 
 map ,y "+y

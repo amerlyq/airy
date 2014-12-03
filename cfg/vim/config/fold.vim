@@ -14,7 +14,7 @@ autocmd ColorScheme * highlight Folded ctermfg=yellow ctermbg=NonE
 function! RefinedFoldText()
     let line = getline(v:foldstart)
     let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
-    return v:folddashes . v:foldlevel . sub
+    return '' . v:foldlevel . ' >' . v:folddashes . sub
 endfunction
 set foldtext=RefinedFoldText()
 

@@ -1,5 +1,4 @@
 set novisualbell    " don't flash the screen
-set laststatus=2    " always show status line
 set ruler
 set showcmd "shows the last command entered in the very bottom right (not in powerline)
 set wildignore+=*.o,*.obj,.git,*.rbc,*.class,.svn,vendor/gems/*
@@ -45,7 +44,9 @@ let g:Powerline_symbols = 'fancy'
 "set guiheadroom=0
 
 " Custom command line when no airline or for it's bckgr splits
-set stl=%f\ %m\ %r\ line:%l/%L(%p%%)\ col:%c\ buf:%n\ (%b)(0x%B)
+set statusline=%f\ %m\ %r\ line:%l/%L(%p%%)\ col:%c\ buf:%n\ (%b)(0x%B)
+set laststatus=2    " always show status line
+" set statusline=%02n:%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
 
 " Auto-show on launch
 " autocmd vimenter * TagbarToggle

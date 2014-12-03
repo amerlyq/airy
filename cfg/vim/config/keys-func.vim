@@ -13,6 +13,7 @@ nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
 nnoremap <S-F1> :source $MYVIMRC \| AirlineRefresh<CR>
 " make current vim as the main server
 nnoremap <S-F2> :call writefile([v:servername], expand("~/.cache/vim/servername"), "b") \| echo "ServerName: " . v:servername<CR>
+nnoremap <S-F3> :e $VIMHOME/snippets/vim_regex.otl<CR>
 
 "http://en.cppreference.com/mwiki/index.php?title=Special%3ASearch&search=memcpy
 

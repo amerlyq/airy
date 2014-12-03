@@ -34,11 +34,31 @@ noremap  gL  :<C-U>blast<CR>
 " nnoremap <Leader>3 <C-W>v
 
 " collapse other windows
-nnoremap <Leader>0 <C-W><Bar><C-W>_
+" nnoremap <Leader>0 <C-W><Bar><C-W>_
 " all windows equal size
-nnoremap <Leader>9 <C-W>=
+" nnoremap <Leader>9 <C-W>=
 " close other windows
-nnoremap <Leader>1 <C-W>o
+" nnoremap <Leader>1 <C-W>o
 " close current window
 " nnoremap <Leader>4 <C-W>c
 
+" Leader '\' {{{
+let s:leader = g:mapleader
+let mapleader = "\\"
+
+" Toggle to last edited buffer/file
+nnoremap <Leader>` :b#<CR>
+
+nnoremap <Leader>1 :1b<CR>
+nnoremap <Leader>2 :2b<CR>
+nnoremap <Leader>3 :3b<CR>
+nnoremap <Leader>4 :4b<CR>
+nnoremap <Leader>5 :5b<CR>
+nnoremap <Leader>6 :6b<CR>
+nnoremap <Leader>7 :7b<CR>
+nnoremap <Leader>8 :8b<CR>
+nnoremap <Leader>9 :9b<CR>
+nnoremap <Leader>0 :10b<CR>
+
+let mapleader = s:leader
+" }}}

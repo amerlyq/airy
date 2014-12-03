@@ -6,7 +6,10 @@ let mapleader="\\"
 
 NeoBundle 'Valloric/ListToggle'
 " Ascii graph drawing in vim
-NeoBundleLazy 'vim-scripts/DrawIt'
+
+NeoBundle 'vim-scripts/DrawIt', {
+    \ 'autoload' : { 'commands' : 'DrawItStart' },
+    \ }
 
 "==========================================
 " All commands below will use this leader, commands above -- will use '\'
@@ -355,6 +358,7 @@ NeoBundle 'scrooloose/syntastic'
 "NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'
 
 """ Ability to edit entries from qf or lc windows in new buffer
+" TRY ALT: quickfix-reflector.vim (http://www.vim.org/scripts/script.php?script_id=4890)
 NeoBundle 'jceb/vim-editqf'
 
 " Autoformatting with one button, can use custom (like clang-styler)
