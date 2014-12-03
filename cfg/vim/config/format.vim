@@ -1,4 +1,5 @@
 set autoindent       " automatically indent new lines
+set smartindent
 set formatoptions+=o " continue comment marker in new lines
 set formatoptions+=n " recognize numbered lists
 
