@@ -54,16 +54,58 @@
 		others: Interrupted System Calls
 	(gdb) i threads
 	(gbd) b foo.cpp:13 thread 28 if x > li
+	Forking -- choose which to lead
+		set follow-fork-mode ask || parent/child
+	In addition, catchpoints come in handy:
+		catch exec
+	 Catchpoint works as a breakpoint. Every time a call to exec() syscall is
+	 detected, GDB stops. This allows you to set any breakpoint (i.e. break
+	 main) in the newly loaded executable before continuing. Another
+	 catchpoint catch fork works similarly for fork() syscall detection.
+	It is especially convenient:
+		when both parent and child has to be followed (set detach-on-fork off);
+		when parent processes forks often loading various executables.
+
+
 
 
 ### Core Dump ###
 : When coredump, pr shows '~$ Segmentation fault (core dumped)'
+	Enable creation of coredump (some system disabled by default)
+		ulimit -c unlimited
 	Find coredump file for executable
 	| # file core.1234 | # gdb core.1234 |
 	;OR: # echo "core_%e.%p" > /proc/sys/kernel/core_pattern
 	: if the program foo dumps its core, the core_foo.1234 will be created.
 	Launch: $ gdb myprogram
-		(gdb) core core
+		(gdb) core ./core
+		(gdb) frame 2
+		(gdb) info locals || bt || backtrace full || info stack
+	 From there on (bt full -- investigate stack local vars), it was easy to
+	 spot a char[] buffer at the lowermost valid stack level that was being
+	 updated by functions higher up in the stack.  If that buffer had
+	 overflowed, it would certainly make everything from there on in the stack
+	 invalid.
+
+	 There were other pointers in that stack level right after the suspicious
+	 buffer. Using the up command, I went up, up, up until I reached that
+	 stack level, and then I could check the pointers using the print command.
+	 Indeed, gdb replied “cannot reach memory address” for their values — the
+	 pointers were invalid.  With the down command I went down the stack,
+	 right to the function that was manipulating that buffer. A quick look at
+	 the code, combined with checking the values of local variables with print
+	 confirmed my suspicions. An off-by-one error made my loop go beyond the
+	 end of the buffer, corrupting the stack and causing the crash.
+	If stack smashed, no src, release version, and all debug smbs are stripped:
+	: Like: #0  0xc0199470 in ?? () inside libstdc.so
+		You can obtain addresses of lines in 'bt'
+		And find that addressed in asm code:
+			objdump -D ./prg | less  #
+	 A stack corruption can only mean one thing: someone wrote something over
+	 the stack and filled the stack pointer address with garbage instead.
+	You can save current debug point of any program in gdb to coredump file:
+		(gdb) generate-core-file
+	 When a program dies with SIGSEGV, it normally dumps core on Unix.
 
 
 ### Remote debugging ###
@@ -72,7 +114,7 @@
 : - GDB communicates via Serial or TCP/IP.
 : - Host and target: exactly match between the executables and libraries,
 :		with one exception: stripped on the target.
-	Connect gdb to code in different place
+	Connect gdb to code sources in different place
 		(gdb) set substitute-path /usr/src/mnt/cross
 		(gdb) dir /your/path/verXYZ
 	Remote (10.10.0.225)

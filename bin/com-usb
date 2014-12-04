@@ -10,7 +10,7 @@ RMDIR=/home/shared
 # sed "w /tmp/usb-all.log" | sed "$FILTER; w /tmp/usb-filter.log"
 BODY='{ pf=0; print $0 > fa }
 
-    /\sE\/|sd_notify|\[TUNER\]|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|^Thrift|\[SNAP\]/ {
+    /\s*E\/|sd_notify|\[TUNER\]|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|^Thrift|\[SNAP\]/ {
         pf=1; printf "."
     }
 
