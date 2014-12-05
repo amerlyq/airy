@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# sudo stty -a -F /dev/ttyUSB0 # Show params
 sudo stty -F /dev/ttyUSB0 115200 cs8 -cstopb -parenb -icanon min 1 time 1
 
 DIR=/tmp

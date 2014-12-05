@@ -19,4 +19,7 @@ LST="$LST cppcheck valgrind libc6-dbg:i386 gdb"
 LST="$LST google-perftools libgoogle-perftools-dev libgoogle-glog-dev google-mock"
 # Not to dld, but use already! Dld manually if there is new version or absent.
 
+# Cross-compilers
+# LST="$LST gcc-arm-linux-gnueabi" #Or ...-androideabi
+
 apt_noprompt $LST

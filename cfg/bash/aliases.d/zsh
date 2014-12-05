@@ -2,13 +2,15 @@
 ## Global aliases
 # Write L after a command to page through the output.
 alias -g L="| less"
+alias -g G="| grep -i "
 alias -g TL='| tail -20'
 alias -g NUL="> /dev/null 2>&1" # You get the idea.
 # alias -g NE='2>|/dev/null'
 # alias -g NO='&>|/dev/null'
 # alias -g PG='|$PAGER'
 
-alias -g @="$(xsel -o)"
+# alias -r @="printf \"$(xsel -ob)\n\""
+alias -g @="\"$(xsel -ob)\""
 
 
 ## Std-like
