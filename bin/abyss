@@ -69,7 +69,7 @@ if [ -z "$ARGS" ]; then
 
 else for entry in "${ARGS[@]}"; do
 
-    BIN="$DIR/${entry##*.}.bin"
+    BIN="$DIR/${entry%.*}.bin"
     if [ -d "$entry" ]
     then cd "$entry" && dir_build
     else file_build "$entry"; fi
