@@ -136,3 +136,5 @@ Remove last lines
 	tac file.txt | sed "1,$n{d}" | tac > newfile
 	head -n -2 myfile.txt > newfile
 
+Copy several last entries
+	copyq read {0..2}

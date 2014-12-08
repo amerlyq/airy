@@ -11,6 +11,9 @@ Format
 	 (so you don’t select and format your hard disk instead)
 	clean
 	create partition primary
+	: For correct aligning on 4kb boundary
+	: -> create partition primary align=64
+	:		or 32 if such is specified by disk vendor
 	active
 	format fs=fat32 quick
 	assign
