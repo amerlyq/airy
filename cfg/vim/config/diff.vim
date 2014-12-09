@@ -9,6 +9,7 @@ if &diff
   " http://www.reddit.com/r/vim/comments/kz84u#c2oiq1a
   "---------------------------------------------------------------------------
   set wrap
+  set nocursorline      " to not color overlap with highlighted diff regions
 
   " allows you to 'do undo', or in other words 'undo a change in the opposite
   " window'
@@ -29,6 +30,7 @@ if &diff
 
 else
   " setup for non-diff mode
+  set cursorline      " highlight currently focused line
 endif
 
 " Use :DiffOrig to see the differences between the current buffer and the

@@ -2,8 +2,8 @@
 
 SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
 SCRIPT_DIR=${SCRIPT_PATH%/*}
-PR_DIR=$SCRIPT_DIR/../..
-DOCS_DIR=$PR_DIR/doxy
+PJ_DIR=$SCRIPT_DIR/../..
+DOCS_DIR=$PJ_DIR/doxy
 DOXY_CONF=$DOCS_DIR/Doxyfile
 
 chg_line() { sed "s@\(^$1[ ]*=[ ]*\).*@\1 $2@g" -i $DOXY_CONF; }
@@ -15,7 +15,7 @@ rm -f $DOXY_CONF
 # Generate default config, [-s]-key removes comments from it
 doxygen -g $DOXY_CONF
 
-if [ -z "$1" ]; then PR_NM="EmptyName"; else PR_NM="$1"
+if [ -z "$1" ]; then PR_NM="EmptyName"; else PR_NM="$1"; fi
 
 # Project sets
 chg_quoted PROJECT_NAME     "${PR_NM}"
@@ -35,7 +35,9 @@ chg_line OPTIMIZE_OUTPUT_FOR_C    YES
 chg_line REFERENCED_BY_RELATION   YES
 chg_line REFERENCES_RELATION      YES
 
-cd $PR_DIR
+chg_line EXCLUDE_PATTERNS   "$PJ_DIR/build/* $PJ_DIR/libs/*"
+
+cd $PJ_DIR
 doxygen $DOXY_CONF
 echo "->> Docs generation is done."
 

@@ -13,7 +13,6 @@ if g:theme_transparent
   autocmd ColorScheme * highlight FoldColumn ctermbg=None
   autocmd ColorScheme * highlight SpecialKey ctermbg=None
 else
-  set cursorline      " highlight currently focused line
   autocmd ColorScheme * highlight! link SignColumn LineNr
 endif
 

@@ -10,7 +10,10 @@ alias -g NUL="> /dev/null 2>&1" # You get the idea.
 # alias -g PG='|$PAGER'
 
 # alias -r @="printf \"$(xsel -ob)\n\""
-alias -g @="\"$(xsel -ob)\""
+
+#   { xsel: Can't open display: (null)
+#   { : Inappropriate ioctl for device
+# alias -g @="\"\$(xsel -ob)\""
 
 
 ## Std-like

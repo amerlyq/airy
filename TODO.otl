@@ -9,6 +9,7 @@ BUGS
 	[_] Broken gtk theme
 	[_] ZSH source in terminal on <F12>, then $ gaa<tab><tab> will cause
 		 Vim output ... as was when I used zshenv
+	[_] xsel don't work by ssh and on my machine after ssh? (ioctl...)
 
 ranger
  NOTE: 1? 2? -- help for commands
@@ -65,6 +66,14 @@ Deploy:
 	  to git_install script, checking for flag and skipping if there isn't one
 	[_] Проблема группирования -- по объекту (bash,vim,git) или по
 	  стратегии (cfg, deploy, notes) решается через 'ln -r' симлинки в репе
+	[_] Зависание установки geeknote из-за необходимости вводить пароль и логин
+		Сделать его устанавливаемым только вручную!
+	[_] Некоторые конфиги имеет смысл запускать только после установки программ!
+		choose_default -- после всех соотвествующих дефолтов (zsh, etc.)
+		vim -- после установки vim'а...
+		erian/install.sh -- which will install repos -- after all configs
+	[_] Сделать автоматическое изменение локальных кредентиалов пользователя в репах
+
 
 	[$] пароли для dir620 -- profile
 		:хотя если я всё равно буду подключаться по SSH -- то проще
@@ -120,6 +129,7 @@ vim
 		http://valloric.github.io/YouCompleteMe/
 	[_] Setup Geeknote -- install newer vim? Connect to unstable?
 	[_] Folding: check by 'au' if file contents {{{\d\{0,2\}, then set foldmethod=marker, setlocal foldmethod=manual
+	[_] Try full virtual editing -- case: o<Esc>a  -- must delete line but stay indented
 
 	[_] Integrate this tips:
 		[_] https://github.com/benmills/vimux
@@ -366,6 +376,10 @@ TODO
 	[_] Choose one of variants: global color swap inside urxvt, or swap individually
 	[_] Add wrapper to urxvt to be able launch from i3 one ligth/dark/transp instance
 		It will be differ from default installed by theme
+
+~/.i3/ext/dmenu_mpd_fmove
+	[_] 'undo for moving' -- move back and add to playlist
+	[_] 'move to another' -- move last moved file in another dir
 
 TASKS
 	Kbuild> Read from :831

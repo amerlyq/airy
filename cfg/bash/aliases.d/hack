@@ -3,7 +3,7 @@
 RE_PREFIX=armv7l-tizen-linux-gnueabi-
 alias ren='${RE_PREFIX}nm -n '
 alias res='${RE_PREFIX}readelf -S '
-alias reo='${RE_PREFIX}objdump -m arm -D '
+alias reo='${RE_PREFIX}objdump -m arm -C -D '           # disass with demangle
 alias reb='${RE_PREFIX}objdump -m arm -b binary -D '
 
 # To use with /dev/test mem dumping on devices
