@@ -80,9 +80,10 @@ NeoBundleLazy 'Shougo/vimshell.vim', {
 "     \    'explorer' : 1,
 "     \ }}
 
-" Ultimate hex-editing system,  depends on hexript for some optional scripts
+" Ultimate hex-editing system
+" depends on hexript for some optional scripts
+"   (now that repo 'rbtnn/hexript.vim' don't exists)
 NeoBundle 'Shougo/vinarise.vim', {
-    \ 'depends' : 'rbtnn/hexript.vim',
     \ 'autoload' : {
     \    'commands' : ['Vinarise', 'VinariseDump'],
     \    'explorer' : 1,

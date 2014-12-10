@@ -7,10 +7,10 @@
 # ============= Helper to load neccessary functions =============
 source ~/.bash/functions 2&> /dev/null
 if [ $? -eq 1 ]; then
-    source ./cfg/bash/bash/functions
+    source ./cfg/bash/functions
     if [ $? -eq 1 ]; then
         echo "First launch you must do from this script's directory ONLY!"
-        [[$PS1]]&&return||exit 1;
+        [[$-=~i]]&&return||exit 1;
     fi
 fi
 
@@ -24,7 +24,7 @@ fi
 # Zero-point (path to this script)
 amScriptDir
 if [ -z "${SCRIPT_DIR}" ]; then
-    echo "Error: no SCRIPT_DIR, 'cause amScriptDir invalid"; [[$PS1]]&&return||exit; fi
+    echo "Error: no SCRIPT_DIR, 'cause amScriptDir invalid"; [[$-=~i]]&&return||exit; fi
 if [ "${SCRIPT_DIR}" == "/" ]; then
     echo "Warning: launch by 'exec ./install.sh'. Attention: it will close your terminal."; squit 1; fi
 
