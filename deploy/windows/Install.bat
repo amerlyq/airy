@@ -25,3 +25,5 @@ REG ADD "%MACHINEPOLICY%\System" /V PromptOnSecureDesktop/T REG_DWORD /D 0x0 /F
 ::REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /V HiberbootEnabled /T REG_dWORD /D 0x1 /F
 ::REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /V HiberbootEnabled /T REG_DWORD /D 0x0 /F
 
+:: Tweaks
+:: http://windows7themes.net/en-us/disable-disk-defragmentation-windows-7-ssd/

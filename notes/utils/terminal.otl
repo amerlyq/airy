@@ -85,6 +85,10 @@ Mount
 		sudo mount -t iso9660 -o loop Hiren_Boot_CD15.2ru.iso /mnt/hiren
 		$ sudo apt-get install furiusisomount
 
+	Format USB flash
+		sudo umount /dev/sdb1
+		sudo mkfs.vfat /dev/sdb1
+
 Scan local network for ip's
 	nmap -sn 192.168.0.0/24
 
