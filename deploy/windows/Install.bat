@@ -11,9 +11,9 @@ REG ADD "%USERPOLICY%\Explorer" /V NoDriveTypeAutorun /T REG_DWORD /D 0xFF /F
 ::REG DELETE "%USERPOLICY%\System" /V DisableLockWorkstation /F
 
 :: Disable/enable Blackaning only, UAC
-REG ADD "%MACHINEPOLICY%\System" /V PromptOnSecureDesktop/T REG_DWORD /D 0x0 /F
+REG ADD "%MACHINEPOLICY%\System" /V PromptOnSecureDesktop /T REG_DWORD /D 0x0 /F
 :: However temporary complete disabling while installing bunch on software (after OS reinstall) has sense too.
-::REG ADD "%MACHINEPOLICY%\System" /V EnableLUA /T REG_DWORD /D 0x0 /F
+REG ADD "%MACHINEPOLICY%\System" /V EnableLUA /T REG_DWORD /D 0x0 /F
 ::REG ADD "%MACHINEPOLICY%\System" /V EnableLUA /T REG_DWORD /D 0x1 /F
 
 
