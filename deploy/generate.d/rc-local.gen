@@ -11,7 +11,7 @@ source ~/.bash/functions
 
 if [ "$CURR_HOST" = "vbox" ]
 then type="vboxsf "
-else type="ntfs-3g /dev/"; fi
+else type="ntfs-3g /dev/disk/by-label/"; fi
 
 mount_dir() {
     local dir=/media/$CURR_USER/$1

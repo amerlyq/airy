@@ -4,12 +4,18 @@ SESSION='sir-mpd'
 pane_name()  { tmux send-keys "printf '\\033]2;%s\\033\\\\' '$1'" 'C-m'; }
 [ "$1" == '-k' ] && tmux kill-session -t $SESSION
 
+if [ "$CURR_PROF" == laptop ]; then
+    srv=lsir
+else
+    srv=sir
+fi
+
 if ! tmux has-session -t $SESSION; then
     tmux new-session -d -s $SESSION -n mpd
     tmux rename-window -t $SESSION:1 'mpd'
 
     pane_name move
-    tmux send-keys "cls && ssh -t sir 'cd ~/.i3/ext; exec \$SHELL -l'" 'C-m'
+    tmux send-keys "cls && ssh -t $srv 'cd ~/.i3/ext; exec \$SHELL -l'" 'C-m'
 
     tmux split-window -v
     tmux resize-pane  -U 20
