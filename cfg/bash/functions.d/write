@@ -4,15 +4,9 @@
 
 wbegin(){
     if [ -L $dst ]; then rm $dst; fi
-    echo "${1}#% AutoGen by '${0}'. Do NOT touch! %#" > $dst
+    printf "${1}#%% AutoGen by '${0}'. Do NOT touch! %#\n" > $dst
 }
 export -f wbegin
-
-wbegin_prepend(){
-    echo "$1" > $dst
-    wbegin
-}
-export -f wbegin_prepend
 
 wstr(){ echo "$1" >> $dst; }
 export -f wstr

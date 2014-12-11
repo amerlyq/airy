@@ -130,7 +130,7 @@ if [ "${CURR_PROF}" != "guest" ] && [ "${CURR_PROF}" != "ssh" ]; then
 
     if [ "${CURR_PLTF}" == "Linux" ] && [ $CLEAN_INSTALL -eq 1 ]; then
         "$DEPLOY_DIR/choose_defaults"
-        "$DEPLOY_DIR/shares.sh"
+        # "$DEPLOY_DIR/shares.sh"
         [ $CLEAN_INSTALL -eq 1 ] && "$DEPLOY_DIR/nosudo_reboot"
     fi
 fi
