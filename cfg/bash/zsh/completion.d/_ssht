@@ -1,0 +1,12 @@
+#compdef ssht
+# https://askql.wordpress.com/2011/01/11/zsh-writing-own-completion/
+# http://www.linux-mag.com/id/1106/
+# man zshcompsys
+
+# https://github.com/zsh-users/zsh-completions/tree/master/src
+
+#TODO: grep for ~/.ssh/config for names of servers (and history file?)
+
+_arguments "1: :(World)"\
+    "2:Countries:(France Germany Italy)"\
+    "*:Cities:((Paris\:France Berlin:\Germany Rome:\Italy))"
