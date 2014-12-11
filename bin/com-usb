@@ -19,16 +19,18 @@ FF=usb-filter.log
 RMDIR=/home/shared
 
 # sed "w /tmp/usb-all.log" | sed "$FILTER; w /tmp/usb-filter.log"
-BODY='{ pf=0; print $0 > fa }
+BODY='{ pn=pf; pf=0; print $0 > fa }
 
-    /\s*E\/|sd_notify|\[TUNER\]|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|^Thrift|\[SNAP\]/ {
+    /\s*E\/|sd_notify|\[TUNER\]|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|\[SNAP\]\
+|^Thrift|^Starting|^Started/ {
         pf=1; printf "."
     }
 
+    { if(pn!=0 && pn!=pf) { printf "\n" } }
     { if(pf==0) {
         print $0 > ff;
         fflush(fa); fflush(ff);
-        printf "\n%s\n",$0
+        printf "%s\n",$0
     } } '
 
 

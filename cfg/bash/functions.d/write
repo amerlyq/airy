@@ -4,7 +4,7 @@
 
 wbegin(){
     if [ -L $dst ]; then rm $dst; fi
-    printf "${1}#%% AutoGen by '${0}'. Do NOT touch! %#\n" > $dst
+    printf "${1}#%% AutoGen by '${0}'. Do NOT touch! %%#\n" > $dst
 }
 export -f wbegin
 

@@ -8,11 +8,11 @@ set winminheight=8
 set winwidth=79
 set winminwidth=15
 
-" switch with magnifying
-noremap  zh  <C-W>h<C-W>_
-noremap  zj  <C-W>j<C-W>_
-noremap  zk  <C-W>k<C-W>_
-noremap  zl  <C-W>l<C-W>_
+" switching
+noremap  zh  <C-W>h
+noremap  zj  <C-W>j
+noremap  zk  <C-W>k
+noremap  zl  <C-W>l
 
 " Move between folds
 noremap  zJ  zj

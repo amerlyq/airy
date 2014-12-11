@@ -10,7 +10,7 @@ noremap \cwd :lcd %:p:h
 nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
 
 " reload updated settings in running vim instance
-nnoremap <S-F1> :source $MYVIMRC \| AirlineRefresh<CR>
+nnoremap <S-F1> :autocmd! * \| source $MYVIMRC \| AirlineRefresh<CR>
 " make current vim as the main server
 nnoremap <S-F2> :call writefile([v:servername], expand("~/.cache/vim/servername"), "b") \| echo "ServerName: " . v:servername<CR>
 nnoremap <S-F3> :e $VIMHOME/snippets/vim_regex.otl<CR>
@@ -18,6 +18,7 @@ nnoremap <S-F3> :e $VIMHOME/snippets/vim_regex.otl<CR>
 "http://en.cppreference.com/mwiki/index.php?title=Special%3ASearch&search=memcpy
 
 noremap <F6> :setlocal spell! spelllang=uk,en_us,ru_yo<CR>
+imap <F6> <C-O><F6>
 
 nnoremap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
