@@ -7,7 +7,6 @@ noremap <Leader><C-S> :saveas<Space>
 
 " Ag, Save, Drop, File,
 noremap <Leader>a :<C-U>Ag<CR>
-noremap <Leader>f :<C-U>RangerChooser<CR>
 noremap <Leader>s :<C-U>w<CR>
 " noremap <Leader>S :<C-U>wa<CR>
 noremap <Leader>d :<C-U>q<CR>
@@ -16,6 +15,12 @@ noremap <Leader>D :<C-U>qa<CR>
 " Go inside shell to see output of commands like ':! ..'. Return on <C-d>
 noremap <silent> <Leader>z :<C-U>sh<CR>
 noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
+
+if has('unix')
+  noremap <Leader>f :<C-U>RangerChooser<CR>
+else
+  noremap <Leader>f :<C-U>VimFiler<CR>
+endif
 
 "-----
 

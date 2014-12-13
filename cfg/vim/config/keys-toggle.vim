@@ -42,6 +42,7 @@ function! ToggleNumber()
 endfunc
 
 " Syntax highlighting
+syntax on
 nnoremap <Leader>ts :call ToggleSyntax()<CR>
 function! ToggleSyntax()
 if g:syntax_on == 1

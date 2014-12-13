@@ -32,9 +32,9 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 "\ 'mappings' : ['<Plug>(pluign_mapping)']
 "\ }
 "\}
+
+" TODO: there must be checking on mingw! Too many plugins depends on vimproc.
 " MSG: build : { 'windows' : 'echo "Sorry, cannot update vimproc binary file in Windows."' }
-
-
 " Asynchronous execution plugin for Vim
 "   let vimproc_updcmd = has('win64') ?
 "     \ 'tools\\update-dll-mingw 64' : 'tools\\update-dll-mingw 32'
@@ -68,18 +68,6 @@ NeoBundleLazy 'Shougo/vimshell.vim', {
     \   'mappings' : ['<Plug>(vimshell_'],
     \ }}
 
-" DEPRECATED: use snip-ranger-filechooser.vim
-" NeoBundleLazy 'Shougo/vimfiler', {
-"     \ 'depends' : 'Shougo/unite.vim',
-"     \ 'autoload' : {
-"     \    'commands' : [{ 'name' : 'VimFiler',
-"     \                    'complete' : 'customlist,vimfiler#complete' },
-"     \                  'VimFilerExplorer',
-"     \                  'Edit', 'Read', 'Source', 'Write'],
-"     \    'mappings' : ['<Plug>(vimfiler_'],
-"     \    'explorer' : 1,
-"     \ }}
-
 " Ultimate hex-editing system
 " depends on hexript for some optional scripts
 "   (now that repo 'rbtnn/hexript.vim' don't exists)
@@ -99,9 +87,10 @@ NeoBundle 'Shougo/vinarise.vim', {
 
 " Super-mega-replace for bunch of plugins
 " See: http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
-NeoBundle 'Shougo/unite.vim', { 'name' : 'unite.vim'
-                            \ , 'depends' : 'Shougo/vimproc'
-                            \ }
+NeoBundle 'Shougo/unite.vim', {
+    \ 'name' : 'unite.vim'
+    \ , 'depends' : 'Shougo/vimproc'
+    \ }
 NeoBundleLazy 'Shougo/unite-outline', {
     \ 'depends' : 'unite.vim'
     \ , 'autoload' : { 'unite_sources' : 'outline' }
@@ -121,12 +110,16 @@ NeoBundle 'osyo-manga/vim-marching', {
     \ }
 
 NeoBundleLazy 'Shougo/neocomplete', {
-    \ 'vim_version' : '7.3.885',
-    \ 'depends' : 'Shougo/context_filetype.vim',
     \ 'disabled' : !has('lua'),
+    \ 'vim_version' : '7.3.885',
+    \ 'depends' :
+    \   [ 'Shougo/context_filetype.vim'
+    \   , 'Shougo/vimproc.vim'
+    \   ],
     \ 'autoload': {
     \   'insert': 1,
     \ }}
+
 " SirVer/ultisnips
 NeoBundle 'Shougo/neosnippet.vim', {
     \ 'vim_version': '7.3.885',
@@ -174,6 +167,19 @@ if has('unix')
 "   6. make
 " }}}
     " For win: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
+else
+
+"ONLY FOR WIN: on unix use snip-ranger-filechooser.vim
+NeoBundleLazy 'Shougo/vimfiler', {
+    \ 'depends' : 'Shougo/unite.vim',
+    \ 'autoload' : {
+    \    'commands' : [{ 'name' : 'VimFiler',
+    \                    'complete' : 'customlist,vimfiler#complete' },
+    \                  'VimFilerExplorer',
+    \                  'Edit', 'Read', 'Source', 'Write'],
+    \    'mappings' : ['<Plug>(vimfiler_'],
+    \    'explorer' : 1,
+    \ }}
 
 endif
 

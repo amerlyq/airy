@@ -4,7 +4,6 @@
 
 if exists("did_meta_escape") | finish | endif
 let did_meta_escape = 1
-if has("gui_running") | finish | endif
 
 " for i in range(35,61) + range(65,90) + range(97,122)
 "   let c = nr2char(i) " echom i c
@@ -27,6 +26,8 @@ augroup END
 
 " DISABLED: arrows and other escaped keys will be breaked in insert mode
 " set noesckeys " (Hopefully) removes the delay when hitting esc in insert mode
+
+if has("gui_running") | finish | endif
 
 " Keycodes {{{1
 
