@@ -18,6 +18,7 @@ alias -g NUL="> /dev/null 2>&1" # You get the idea.
 
 ## Std-like
 psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
+alias agi='noglob agi'
 
   if (( $+commands[links2] )) ; then export LINKS_BROWSER="links2"
 elif (( $+commands[links] )) ; then export LINKS_BROWSER="links"

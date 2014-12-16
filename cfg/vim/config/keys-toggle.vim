@@ -1,5 +1,7 @@
+" Often I need to disable it completely when investigating other's sources
+nnoremap <Leader>tl :set list! list?<CR>
+
 nnoremap <Leader>th :setlocal hlsearch! hlsearch?<CR>
-nnoremap <Leader>tl :setlocal list! list?<CR>
 nnoremap <Leader>tp :setlocal spell! spell?<CR>
 nnoremap <Leader>tc :setlocal cursorcolumn! cursorcolumn?<CR>
 nnoremap <Leader>tC :setlocal cursorline! cursorline?<CR>
@@ -17,7 +19,18 @@ endfunc
 " Слева появится колонка шириной в 3 символа, обозначающая где какие фолдинги
 " и какого уровня.  По ней можно будет кликать для сворачивания-разворачивания.
 set foldenable foldcolumn=2
-nnoremap <Leader>tz :call ToggleFolding()<CR>
+nnoremap <Leader>tz :call ToggleFoldingMethod()<CR>
+nnoremap <Leader>tZ :call ToggleFolding()<CR>
+
+function! ToggleFoldingMethod()
+    if(&foldmethod == manual)
+        set foldmethod=syntax
+    elseif(&foldmethod == syntax)
+        set foldmethod=marker
+    else
+        set foldmethod=manual
+    endif
+endfunc
 function! ToggleFolding()
     if(&foldenable == 1)
         set nofoldenable
