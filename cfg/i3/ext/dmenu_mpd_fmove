@@ -14,7 +14,7 @@ if [ "$1" == "-l" ]; then
     exit
 fi
 
-# 1..5..inf stars as quality, or name for dir for grouping, or dir/subdir tag
+# 1..9..inf stars as quality, or name for dir for grouping, or dir/subdir tag
 choice=${1}
 
 fl="$dir/`mpc -f '%file%' | sed '1q'`"
@@ -33,3 +33,14 @@ if [ -n "$choice" ]; then
     && mv -i -v -b "$fl" --target-directory="$dst/" \
     && mpc next >/dev/null && mpc del $curr #Del current, interrupts cast by ssh: mpc del 0
 fi
+
+# To be able send many request w/o retype password to SSH
+# You can do this cleanly with an ssh 'control socket'. To talk to an
+# already-running SSH process and get it's pid, kill it etc. Use the 'control
+# socket' (-M for master and -S for socket) as follows:
+#   $ ssh -M -S my-ctrl-socket -fnNT -L 50000:localhost:3306 jm@sampledomain.com
+#   $ ssh -S my-ctrl-socket -O check jm@sampledomain.com
+# Master running (pid=3517)
+#   $ ssh -S my-ctrl-socket -O exit jm@sampledomain.com
+# Exit request sent.
+# Note that my-ctrl-socket will be an actual file that is created.

@@ -209,6 +209,8 @@ NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-speeddating'
 " Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
 NeoBundle 'PeterRincker/vim-argumentative'
+" Function object (af, if -- code inside, aF -- all with spaces, iF )
+NeoBundle 'kana/vim-textobj-function', { 'depends' : 'kana/vim-textobj-user' }
 
 " DISABLED: has problems with russian text
 " Insert mode auto-completion for quotes, parens, brackets, etc
@@ -372,7 +374,7 @@ NeoBundle 'jceb/vim-editqf'
 NeoBundle 'Chiel92/vim-autoformat'
 " Auto-formatter for c/cpp/obj-c
 NeoBundle 'rhysd/vim-clang-format'
-" DEP BY: vim-clang-format
+" DEPEND BY: vim-clang-format
 NeoBundle 'kana/vim-operator-user'
 
 " Documentation online finder in one button for word under cursor

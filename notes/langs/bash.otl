@@ -11,6 +11,10 @@ Tracing bash substitution on/off
 	set -x
 	set +x
 
+Connect to socket
+ http://hacktux.com/bash/socket
+	exec 3<>/dev/tcp/localhost/22
+
 for
 	for OUTPUT in $(Linux-Or-Unix-Command-Here); do
 	for i in 1 2 3 4 5; do
