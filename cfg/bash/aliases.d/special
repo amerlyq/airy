@@ -9,7 +9,7 @@
 
 alias vi='\vim -u ~/.vim/vimrc_basic'
 vimscp(){ vim scp://${2:-srk}/"${1:-$(xsel -o)}"; }
-v() {
+v() { #servername == syntex (must be for LaTeX)
     local _V fl=~/.cache/vim/servername
     if [ -f "$fl" ]; then
         _V=$(cat "$fl")
@@ -73,7 +73,7 @@ hi() { if [ -z "$@" ]; then history | tail -20; else
 fi; }
 
 # old=$1, new=$2 -r | recursively  # -l | print filenames
-sed_dir() { grep -rl "$1" ./* | xargs sed -i "s@$1@$2@g"; }
+sed_dir() { grep -rl "\<${1?Need word}\>" ./* | xargs sed -i "s@\<$1\>@$2@g"; }
 
 
 # Very useful and nut aliases:

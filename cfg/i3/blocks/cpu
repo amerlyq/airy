@@ -17,7 +17,7 @@ usage=$( awk 'BEGIN { printf("%5.2f\n", '"100*(${c[0]} - ${p[0]})/(${c[1]} - ${p
 form="${usage}%"
 
 usage="${usage%.*}"
-if [ $usage -ge 25 ]; then color="#FFFC00";
+if [ $usage -ge 25 ]; then color="#FFAC00";
 elif [ $usage -ge 75 ]; then color="#FF0000"; fi
 
 # if >= t_crit : exit 33;

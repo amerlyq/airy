@@ -1,10 +1,12 @@
 #!/bin/bash
 
 track=$( mpc status | sed -n 'N;s/^\(.*\)\n\[.*\]\s\+#\(\S\+\)\s\+\(\S\+\)\s*.*/(\3) \1 < \2/p' )
-mode=$( mpc status | sed -n '2s/^\[\(.*\)\].*/\1/p' )
+ mode=$( mpc status | sed -n '2s/^\[\(.*\)\].*/\1/p' )
 
-declare $( printf "$track" | sed 's/^(\([0-9:]*\)\/\([0-9:]*\)) .*/curr=\1 length=\2/g')
-remain=$(( `date +%s -d "0:$length"` - `date +%s -d "0:$curr"` ))
+[ -n "$track" ] && declare $( printf "$track" |
+    sed 's/^(\([0-9:]*\)\/\([0-9:]*\)) .*/curr=\1 length=\2/g' )
+
+remain=$(( `date +%s -d "0:${length:-0}"` - `date +%s -d "0:${curr:-0}"` ))
 
 toggle() {
     if [ "$mode" != "paused" ]; then
@@ -29,11 +31,10 @@ case $BLOCK_BUTTON in
     *) ;;
 esac #x=$BLOCK_X y=$BLOCK_Y
 
-color='#FF4400'
 case "$mode" in
     playing) prefix='▶'; color='#FF44FF' ;;
-    paused)  prefix='∥'; color='#4444FF' ;;
-    *) ;;
+     paused) prefix='∥'; color='#4444FF' ;;
+          *) prefix='' ; color='#FF4400' ;;
 esac
 
 if [ "$mode" == "playing" ] && [ $remain -le 20 ] && [ $remain -gt 15 ]

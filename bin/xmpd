@@ -17,9 +17,14 @@ if ! tmux has-session -t $SESSION; then
     pane_name move
     tmux send-keys "cls && ssh -t $srv 'cd ~/.i3/ext; exec \$SHELL -l'" 'C-m'
 
-    tmux split-window -v
-    tmux resize-pane  -U 20
+    tmux split-window -v -p 85
+
     pane_name ncmpcpp
     tmux send-keys "cls && ssht mpd" 'C-m'
+
+    tmux select-pane -U
+
+    # tmux main-pane-height 8
+    # tmux select-layout main-horizontal
 fi
 tmux attach -t $SESSION

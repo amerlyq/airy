@@ -103,9 +103,7 @@ echo 'Launching scripts...'
 
 case "${CURR_PLTF}" in
     MINGW) "$DEPLOY_DIR/symlinks.sh" ;;
-    Linux) $DEPLOY_DIR/symlinks.sh | sed -e "s@/home/$CURR_USER/@@g" | column -t
-        [ "${CURR_PROF}" != "ssh" ] && [ ! $BASIC_INSTALL -eq 1 ] && $HOME/.i3/gen_i3_config.sh grass
-        ;;
+    Linux) $DEPLOY_DIR/symlinks.sh | sed -e "s@/home/$CURR_USER/@@g" | column -t ;;
 esac
 
 #TODO: Move this into pristine.d/vim.pr

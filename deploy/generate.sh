@@ -13,6 +13,7 @@ if [ "${CURR_PLTF}" == "Linux" ]; then
     "$GENS/xresources.gen"
     "$GENS/synergy.gen"
 
+    "$HOME/.i3/i3-config.gen"
 
     # bash .\w aliases -> ranger/bookmarks
     ~/.config/ranger/aliases_to_bookmarks

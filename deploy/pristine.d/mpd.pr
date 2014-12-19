@@ -4,9 +4,9 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # MPD + MPV
 
-LST="$LST ncmpcpp mpd mpc mpv"
-# ncmpcpp + mdp # console music player with database
-# mpc для горячих клавиш
+LST="$LST mpd mpc mpv"
+# mdp -- console music player with database
+# mpc -- for hotkeys
 
 apt_noprompt $LST
 

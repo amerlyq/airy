@@ -57,6 +57,7 @@ deb_wget() {
 
 rep_autobuild() {
     local PR_DIR="$1"
+    shift
     # It can be, that 'autoreconf' can replace my own vehicle.
     cd "$PR_DIR"
     if [ -f "$PR_DIR/CMakeLists.txt" ]; then
@@ -76,7 +77,7 @@ rep_autobuild() {
         BUILD_DIR="$PR_DIR/build"
         mkdir -p "$BUILD_DIR"
         cd "$BUILD_DIR"
-        ../configure
+        ../configure $@
         make && sudo make install
     else
         echo "Error: unsupported build system. Build manually."
@@ -109,7 +110,9 @@ git_install() { # $1 - git rep, $2 - dir name
         git clone --depth 1 "$LINK" "$PR_DIR"
     fi
 
-    rep_autobuild "$PR_DIR"
+    if [ "$2" != "-d" ]; then
+        rep_autobuild "$PR_DIR"
+    fi
 }
 
 hg_install() { # $1 - git rep, $2 - dir name

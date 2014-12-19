@@ -22,6 +22,10 @@ sudo update-alternatives --set x-terminal-emulator /usr/bin/urxvt
 sudo update-alternatives --set vim /usr/bin/vim.gtk
 sudo update-alternatives --set editor /usr/bin/vim.gtk
 
+# To disable default notification daemon on Lubuntu
+XFCE=/usr/share/dbus-1/services/org.xfce.xfce4-notifyd.Notifications.service
+[ -f "$XFCE" ] && sudo mv -n $XFCE{,.disabled}
+
 # See all groups:
 # update-alternatives --get-selections
 

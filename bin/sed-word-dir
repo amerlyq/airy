@@ -1,6 +1,0 @@
-#!/bin/bash
-
-WORD={1?'Need word to replace!'}
-NEW={2?'Need replacing word!'}
-
-grep -rl "\<$WORD\>" ./ | xargs sed -i "s/\<$WORD\>/$NEW/g"

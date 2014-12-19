@@ -5,15 +5,20 @@
 # In generation process by specifying one var you could change themes between light and dark
 
 source ~/.bash/functions
-if [ -z "$1" ]; then
-    thm_nm=grass
+source ~/.bash_export
+
+  if [ "$1" == "-t" ]; then thm_nm="$1"
 elif [ "$1" == "-l" ]; then
-    for file in ~/.i3/themes/*.i3; do
-        echo ${file##*/}
-    done
-    exit
-else thm_nm="$1"; fi
+    for file in ~/.i3/themes/*.i3; do echo ${file##*/}; done; exit
+else case ${1:-$CURR_THEME} in
+#  transparent) wstr '#define Transparent' ;;
+#       opaque) wstr '#define Opaque' ;;
+       light) thm_nm="snow"  ;;
+        dark) thm_nm="grass" ;;
+           *) thm_nm="grass" ;;
+esac; fi
 source ~/.i3/themes/"${thm_nm}.i3"
+
 
 # ----- Paths -----
 dst=~/.i3/config
@@ -255,8 +260,8 @@ wlistf "$bm+Shift+%s $exno dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/Kbd
 
 
 w_header "Autostart"
-wstr "$exno auto-once"
-wstr "$ealws auto-always"
+# wstr "$exno auto-once"
+wstr "$ealws auto-start"
 
 #wstr "$eurx -name htop -e htop"
 #wstr "for_window [class=\"(?i)$term\" instance=\"(?i)htop\"] move scratchpad"
