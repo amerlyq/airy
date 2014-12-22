@@ -4,10 +4,11 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # Newest version compilation (it has working lyrics, etc)
 #   http://crunchbang.org/forums/viewtopic.php?id=37882
+# WARNING: for older version then 0.7? use November's configs
 
 LST="$LST libboost-all-dev libmpdclient-dev libncurses5-dev libncursesw5-dev"
 # OTH: libreadline-dev libreadline-gplv2-dev libfftw3-dev libcurl4-gnutls-dev libtag1-dev automake
-apt_noprompt $LST
+# apt_noprompt $LST
 
 git_install "arybczak/ncmpcpp" -d
 

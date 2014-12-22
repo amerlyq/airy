@@ -8,6 +8,8 @@ Cool man
 	Very cool, very many. Read them all!
 	* http://beej.us/guide/
 
+	http://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques
+
 Book & Man
 	http://www.cs.rit.edu/~csci243/resources/gdb.pdf
 	Man: info gdb
@@ -32,6 +34,14 @@ Extending
 			(gdb) show history
 			(gdb) show commands
 
+Miscellaneous
+	(gdb) define command ... end        define user command
+	*(gdb) RETURN        		repeat last command
+	*(gdb) shell command args       execute shell command
+	*(gdb) source file        	load gdb commands from file
+	*(gdb) quit        		quit gdb
+	(gdb) ESC-CTRL-J			switch to vi edit mode from emacs edit mode
+
 FAQ
 	On x64, install another x32 gdb
 		$ ls -l `which gdb32`
@@ -46,6 +56,7 @@ Tricks
 		(gdb) i checkpoint
 		(gdb) restart checkpoint-id
 	Value history - values printed by the print command.
+		show values
 	How to know where you are (file, next execution line)?
 		(gdb) f
 	How to find out why your program stopped?
@@ -73,52 +84,76 @@ Show data
 | print | print value of expression
 | x		| examines memory at specified address
 
+Code sources
+	Simple
+	| l | list  | list next 10 lines
+	| list -    | list previous 10 lines
+	| list 101  | list 10 lines around line 101
+	| list 1,10 | list lines 1 to 10
+	| list main | list lines around function
+	Complex
+	| info line 22      | print addresses for object code for line 22
+	| info line *0x2c4e | print line number of object code at address
+	| list *0x22e4      | list source at address
+	| list basic.c:main | list from another file basic.c
+	Directory
+	| cd dir        	| change current directory to \fIdir\fR
+	| pwd				| print working directory
+	| dir dirname       | add directory to source path
+	| dir				| reset source path to nothing
+	| show directories  | show source path
+	| search regexpr    | forward current for regular expression
+	| reverse-search regexpr | backward search for regular expression
 
 Controls
 | <CR>          | Repeat previous
-| r             | run
+| r      | run  | run
 | kill			| to safely recompile src and 'run' again, w/o exiting gdb and savig breakpoints where them are
-| bt			| make your application crash and then get a backtrace with
-| q	            | quit, yes
+	: See http://www.chemie.fu-berlin.de/chemnet/use/info/gdb/gdb_8.html
+| q	     | quit |
+| where	 | show where execution halted
+| bt			| show backtrace for when application crashed
+
+Moving
+| n <count>     | next 1 - exec next line of code completely
+| u	[<lineNo>]  | until - continue to the end of current cycle(for,while,etc)
+| c [<ign_cnt>] | continue | until next breakpoint (ignoring count) or exit
+| s   | step    |
+| fin | finish  | natural continue to end of frame (return from step inside)
+| ret <val>		| emergetncy instant return from step inside
+
+Print
+| p v.sz        | print v.sz
+| p/x expr      | print in hex
+| p $        	| print last value
+| p *$->next    | print thru list
+| p $1        	| print value 1 from value history
+| p ::gx        | force scope to be global
+| p 'basic.c'::gx  | global scope in named file (>=4.6)
+| p array[i]@count | artificial array - print array range
+| p/x &main     print address of function
+
+| printf "%08X\n", i
 
 Breakpoints
 | b  func       | Function
 | b  file.c:39  | file:line
 | break *addrss | before executing instruction at address (like 0x400882)
 | b *_start+5   | ... на адресе символа плюс смещение (полезно когда нет сорцов)
-| tb            | temporary breakpoint -- stop once on, then auto removed
-
-| n <count>     | next 1 - exec next line of code completely
-| u	[<lineNo>]  | until - continue to the end of current cycle(for,while,etc)
-| c [<ign_cnt>] | continue until next breakpoint (ignoring count) or exit
-| s             | step
-| fin | finish  | natural continue to end of frame (return from step inside)
-| ret <val>		| emergetncy instant return from step inside
-
-| p v.sz        | print v.sz
-| printf "%08X\n", i
-| l				| list 10 lines around current
-
-| bt                           | обратная трассировка (в случае аварийного завершения программы)
-| info registers               | показать все регистры
-| disas				    	   | disassemble
-| disass $pc-32, $pc+32        | дизассемблировать код
-	: See http://www.chemie.fu-berlin.de/chemnet/use/info/gdb/gdb_8.html
-| disassemble main             | дизассемблировать функцию main
-| set disassembly-flavor intel | отображать команды ассемблера в синтаксисе intel
-
-| si, ni	| next in machine instructions, use 'display/i $pc' before to see asm codes
-| where	    | show where execution halted
-
-| i reg | info registers
-
-
-Breakpoints
-	info breakpoints				   | list of all
-	b | break TestClass::testFunc(int) |
-	disable 2 -- disable 2nd breakpoint from list
+| tb  | tbreak  | temporary breakpoint -- stop once on, then auto removed
+	info breakpoints		   | list of all
+	disable 2 -- disable 2nd breakpoint from list (or enable 2)
 	ignore 2 5 -- skip 2nd breakpoint 5 times
 	save breakpoint /tmp/bps
+commands <breakNo> ... end   set gdb commands with breakpoint
+ignore <breakNo> count       ignore bpt N-1 times before activation
+condition <breakNo> expression         break only if condition is true
+ condition 2 i == 20         example: break on breakpoint 2 if i equals 20
+	| delete 1       | delete a breakpoint by number
+	| delete         | delete all breakpoints (prompted)
+	| clear          | delete breakpoints at current line
+	| clear function | delete breakpoints at function
+	| clear line     | delete breakpoints at line
 
 Advance -- continue to this temporary breakpoint
 	advance <location as for breakpoint>
@@ -151,6 +186,11 @@ Display
 	> This, along with the 'jump' command, can help you repeat sections of
 	> code without restarting the program.
 
+(gdb) info locals      print local automatics only
+(gdb) info functions regexp         print function names
+(gdb) info variables  regexp        print global variable names
+	ptype name			| print type definition
+	whatis expression   | print type of expression
 	whatis x
 	 TYPE = WORD
 	p x
@@ -160,7 +200,8 @@ Display
 	 $3 = 0
 
 Watchpoints
-	wa | watch <переменная>
+	info watchpoints			show current watchpoints
+	wa | watch <expression>
 	rw | rwatch
 	aw | awatch
 		Выполнение программы приостанавливается всякий раз, когда значение
@@ -177,22 +218,26 @@ Watchpoints
 
 RE
 	Dump in Intel format
-	; set disassembly-flavor intel
-	; disas
+	; set disassembly-flavor intel		| отображать ассемблер в синтаксисе intel
 	Examine memory content
+	 help x | show formats for x
 	| x/NFU [addr]	  | x/12xw &msg Examine contents of memory in given format
 	| x/5i $pc		  | Process counter -- disas 5 current instructions
-	| disas/r	      | Show instructions in raw
-	| x/10b $pc		  | Inspect instruction bytes
+	| x/10xb main	  | Inspect instruction bytes of main function in hex
 	| x/10w           | Stack -- 10 elems of 4 bytes with addresses
 	| x/10g $rsp	  | Stack -- 8 bytes words (giantic)
+	| x/gf  &gd1      | print double on address
 	| x/5i 0x0804844a | Disasm memory of stack by address
 	| x/s  0x080484f0 | String by address
 	| x/s  $rdi		  | dump string by address from register
-	| info registers  |
-	| disas 0x0000000000400576 |
-	| ni |
+
 	| info float
+	| disas 0x00400576		| disassemble
+	| disas main			| function
+	| disas/r				| Show instructions in raw
+	| disass $pc-32, $pc+32 | scope of current executed code
+	| si, ni | stepi, nexti | move in machine instructions
+	| i reg  | info [all-]registers |
 	Show registers
 		info registers
 		 prints out the contents of every register, including all the segment
@@ -202,6 +247,8 @@ RE
 		print/x $ecx
 		print/t $ecx
 		 print out the ECX register in decimal, hexadecimal, and binary
+
+
 
  Memory contents can be examined using the "x" command. The "x" command is
  optionally followed by a "/", a count field, a format field, a size field and
@@ -222,7 +269,7 @@ Sometimes, as you are tracing your program, you are really interested in the con
 	| undisplay	   | to remove an item on this list
 	| set disassemble-next-line on  |
 		or for older then gdb 7.0 use
-	| disp/i $pc
+	| disp/i $pc   | use to see the asm codes on each '<CR>' command
 		: where /i is the format, you can remember it best by thinking
 		: "instruction" and $pc being the instruction pointer, also known as
 		: program counter
@@ -268,9 +315,6 @@ TIPS
 	For experiments on patching you need simple programm which will be executed
 	  over and over again -- so move all your code in cycle.
 
-
-(gdb) attach 'pid'
-(gdb) attach 1127 // example
 Поиск в памяти:
 (gdb) x/d or x 'address' show decimal
 (gdb) x/100s 'address' show next 100 decimals
@@ -332,22 +376,27 @@ If you're stopped at a breakpoint or at an error, you may also want to examine
 the state of stack frames further back in the calling sequence. You can use
 the up and down commands for this.
 
-"up" moves you up one stack frame (e.g. from a function to its caller)
-
-(gdb) up
-#1  0x08048441 in main (argc=2, argv=0xffd9add4) at reassemble.c:28
-28        buggy_function ();
-
-"down" moves you down one stack frame (e.g. from the function to its callee)
-
-(gdb) down
-#0  0x080483f1 in buggy_function () at reassemble.c:20
-20        int len = strlen (s);
+### Stack ###
+	info locals      print automatic variables in frame
+	info args         print function parameters
+| bt    | stack backtrace
+| frame | show current execution position
+| up    | move up stack trace (from func to its caller -- till main)
+ (gdb) up
+ #1  0x08048441 in main (argc=2, argv=0xffd9add4) at reassemble.c:28
+ 28        buggy_function ();
+| down  | move down stack trace (from func to its callee -- away from main)
+ (gdb) down
+ #0  0x080483f1 in buggy_function () at reassemble.c:20
+ 20        int len = strlen (s);
 
 The commands above are really helpful if you're stuck at a segfault and want
 to know the arguments and local vars of the faulting function's caller (or
 that function's caller, etc.)
 
+
+Reverse execution (often not available)
+TODO: find where available
 
 reverse-continue [ignore-count]
 rc [ignore-count]

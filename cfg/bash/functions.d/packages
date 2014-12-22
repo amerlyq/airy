@@ -72,13 +72,16 @@ rep_autobuild() {
     elif [ -f "$PR_DIR/setup.py" ]; then
         sudo python setup.py install
     elif [ -f "$PR_DIR/configure.ac" ]; then
-        autoreconf --install
-        # ./autogen.sh
         BUILD_DIR="$PR_DIR/build"
         mkdir -p "$BUILD_DIR"
         cd "$BUILD_DIR"
-        ../configure $@
-        make && sudo make install
+        if [ -f "$PR_DIR/autogen.sh" ]; then
+            ../autogen.sh
+        else
+            autoreconf --install
+        fi
+        [ $? -eq 0 ] && ../configure $@
+        [ $? -eq 0 ] && make && sudo make install
     else
         echo "Error: unsupported build system. Build manually."
     fi

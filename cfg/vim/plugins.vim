@@ -7,7 +7,7 @@ let mapleader="\\"
 NeoBundle 'Valloric/ListToggle'
 " Ascii graph drawing in vim
 
-NeoBundle 'vim-scripts/DrawIt', {
+NeoBundleLazy 'vim-scripts/DrawIt', {
     \ 'autoload' : { 'commands' : 'DrawItStart' },
     \ }
 

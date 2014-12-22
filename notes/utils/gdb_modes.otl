@@ -1,3 +1,10 @@
+### C++ classes, etc ###
+| list class::member		 | list member in class
+| b TestClass::testFunc(int) | 'class::member' -- w/o body, may get menu
+	ptype class         print class members
+	print *this        	print contents of this pointer
+	rbreak regexpr     	useful for breakpoint on overloaded member name
+
 ### STL Containers, Boost, templates, etc ###
 <incomplete type>
 	Run it in gdb and try to 'print *str' and you'll get an 'incomplete type'
@@ -37,9 +44,12 @@
 ### Signals ###
 	Print a table of all the signals and how gdb handle each one.
 		i handle
-		i signals
-	Change it by keywords: nostop|stop, print|noprint and pass|nopass
-	handle signal [keywords...]
+		info signals				print signal setup
+		handle {signo} {actions}    set debugger actions for signal
+		 handle INT [no]print       [don't] print message when signal occurs
+		 handle INT [no]stop        [don't] stop program when signal occurs
+		 handle INT [no]pass		pass signal to program [only to debugger]
+		signal <signo|0>        continue and send [no] signal to program
 
 
 ### Multi-threads ###
@@ -69,7 +79,7 @@
 
 
 
-### Core Dump ###
+### Core Dump / Segfault ###
 <working memory of a computer program at a specific time, generally when the
  program has terminated abnormally (crashed).[2] In practice, other key pieces
  of program state are usually dumped at the same time, including the processor
@@ -125,7 +135,7 @@
 		(gdb) dir /your/path/verXYZ
 	Remote (10.10.0.225)
 		; gdbserver :9999 program_stripped
-		; ./gdbserver :9999 –attach <pid>
+		; ./gdbserver :9999 -attach <pid>
 	Host
 		; gdb program
 		(gdb) handle SIGTRAP nostop noprint pass
