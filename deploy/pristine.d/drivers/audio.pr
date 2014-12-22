@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+if ! grep -q snd-hda-intel /etc/modprobe.d/alsa-base.conf; then
+    echo 'options snd-hda-intel model=asus' | sudo tee -a /etc/modprobe.d/alsa-base.conf
+fi

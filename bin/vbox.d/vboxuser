@@ -1,0 +1,40 @@
+It is a BAD BAD idea to add yourself to group disk.  Many bad things can happen and it would be a great vector for viruses.  Create a new user, add them to the group disk and then run the vm as that user.  Here is my script (based on another found on virtualbox) that automates this.  Just create the user virtualbox and use this script.
+
+#! /bin/bash
+# Windows 7 VM boot script for VirtualBox 4.x– you’ll have to always use it instead of running VirtualBox
+VBUSER=virtualbox          # name of custom account created (which is a member of disk group)
+VM_NAME=Win7           # name of virtual machine
+
+wait_for_closing_machines() {
+RUNNING_MACHINES=`sudo -u $VBUSER VBoxManage list runningvms | wc -l`
+if [ $RUNNING_MACHINES != 0 ]; then
+sleep 5
+wait_for_closing_machines
+fi
+}
+
+sudo chown -R $USER:users /home/$USER/.VirtualBox    # make sure $VBUSER will be able to access VirtualBox settings etc.
+                                                     # we use sudo because $VBUSER creates files with its ownership on previous runs
+sudo chmod -R g=u /home/$USER/.VirtualBox                 # $VBOXUSER permissions should be the same as ours
+sudo chown -R $USER:users /home/$USER/VirtualBox VMs/$VM_NAME    # ditto for VirtualBox VMs directory.
+sudo chmod -R g=u /home/$USER/VirtualBox VMs/$VM_NAME
+
+xauth extract /home/$USER/cookieTmp $DISPLAY
+
+chmod g+r /home/$USER/cookieTmp
+sudo chmod g+x /home/$USER/
+
+sudo -u $VBUSER XAUTHORITY=/tmp/.Xauthority_$VBUSER xauth merge /home/$USER/cookieTmp
+rm /home/$USER/cookieTmp
+
+sudo -u $VBUSER DISPLAY=:0 XAUTHORITY=/tmp/.Xauthority_$VBUSER VBOX_USER_HOME=/home/$USER/.VirtualBox VBoxManage startvm $VM_NAME
+#sudo -u $VBUSER DISPLAY=:0 XAUTHORITY=/tmp/.Xauthority_$VBUSER VBOX_USER_HOME=/home/$USER/.VirtualBox virtualbox
+
+echo “Waiting for shutdown of $VM_NAME”
+wait_for_closing_machines
+echo “$VM_NAME shutdown. Resetting permissions.”
+sudo chown -R $USER:users /home/$USER/.VirtualBox    # make sure $VBUSER will be able to access VirtualBox settings etc.
+                                                     # we use sudo because $VBUSER creates files with its ownership on previous runs
+sudo chmod -R g-rw /home/$USER/.VirtualBox/*                 # $VBOXUSER permissions should be the same as ours
+sudo chown -R $USER:users /home/$USER/VirtualBox VMs/$VM_NAME    # ditto for VirtualBox VMs directory.
+sudo chmod -R g-rw /home/$USER/VirtualBox VMs/$VM_NAME

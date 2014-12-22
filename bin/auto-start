@@ -14,16 +14,20 @@ lau() {
             "$pr $args" & # Handle arguments with whitspaces
 
             # Start the given command and wait until it's visible
-            mypid=$! # Pid of last background process
-            for i in `seq $MAXWAIT`; do
-                if xdotool search --onlyvisible --pid $mypid; then
-                    break
-                fi
-                sleep 1
-            done
-
-            printf "Error on executing: $pr $args\n"
-            notify "Error on executing: $pr $args" &
+            # ERROR: this block is infinite for ~/.i3/blocks/kbdd-i3blocks
+            #
+            # mypid=$! # Pid of last background process
+            # for i in `seq $MAXWAIT`; do
+            #     echo "Wait: $i"
+            #     if xdotool search --onlyvisible --pid $mypid; then
+            #         return 0;
+            #     fi
+            #     sleep 1
+            # done
+            #
+            # printf "Error on executing: $pr $args\n"
+            # # notify "Error on executing: $pr $args" &
+            # return 1;
         fi
     fi
 }
@@ -48,6 +52,7 @@ lau copyq
 ### ALWAYS ### --------------------------------------
 
 setX ktdaw &
+
 [ -f ~/.Xresources ] && xrdb ~/.Xresources &
 #[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults &
 

@@ -107,4 +107,7 @@ echo "W: vbox '${VNM}' settings"
 # Keeping the NAT adapter and adding a second host-only adapter works amazing
 # Also, I just added additional adapter and it worked, didn't need to edit the /etc/network/interfaces
 
+# See options:
+# VBoxManage modifyvm --help  2>&1 | grep 3d
+
 amPause
