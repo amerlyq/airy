@@ -14,11 +14,6 @@ if [ $? -eq 1 ]; then
     fi
 fi
 
-# Create link for other child scripts to work
-if [ ! -f ~/.bash/functions ]; then
-    pairLink ~/.bash/functions "$SCRIPT_DIR/cfg/bash/bash/functions"
-fi
-
 # ====================== Install type ===========================
 
 # Zero-point (path to this script)
@@ -39,6 +34,12 @@ then  FULL_INSTALL=1; shift; else  FULL_INSTALL=0; fi
 if  [ "$1" == "--basic" ]
 then BASIC_INSTALL=1; CLEAN_INSTALL=0; FULL_INSTALL=0; shift; echo "BASIC"
 else BASIC_INSTALL=0;
+fi
+
+
+# Create link for other child scripts to work
+if [ ! -f ~/.bash/functions ]; then
+    pairLink ~/.bash "$SCRIPT_DIR/cfg/bash"
 fi
 
 # ====================== Credentials ============================
