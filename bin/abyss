@@ -17,7 +17,7 @@ dir_build() {
         make # make -C "$BDR"
         # set makeprg=ruby\ -c\ %
     elif [ -f "./CMakeLists.txt" ]; then
-        !sir bR
+        sir bR
     else # then cd ..
         return -1;
     fi

@@ -23,9 +23,15 @@ if [ "$CURR_HOST" == "vbox" ]; then
 #     CONF=$( sed '/am_over/ s|\(\s*include "\)\(.*\)"|\1\2_'"elona"'"|' <<< "$CONF" )
 fi
 
-echo "$CONF"
+if [ "$1" == "-l" ]; then
+    printf "$CONF\n"
+fi
 
-echo "$CONF" | xkbcomp -I"$HOME/.Xrc/xkb" - "${DISPLAY%%.*}"
+# Setup
+printf "$CONF" |
+    xkbcomp -I"$HOME/.Xrc/xkb" - "${DISPLAY%%.*}" 2>&1 |
+    sed '/No symbols defined\|Symbols ignored\|not found in evdev/d'
+
 
 pgrep xcape > /dev/null || {
     xcape -t 250 -e "Control_L=Escape" &

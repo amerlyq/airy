@@ -41,3 +41,12 @@ and not with
 	int x=0,y=0;
 	(true?x:y)=5;
 in which case x=5.
+
+Optimizing IO
+	http://habrahabr.ru/post/246257/?
+		scanf  1.41 c
+		/ std::ios::sync_with_stdio(false);
+		\ std::cin 1.33 c
+		Хотим ещё быстрее! (getchar/getchar_unlocked) 0.82 / 0.28 с!
+		C++11: std::stoi 1.04 c
+		Boost::Spirit::Qi 0.18 c

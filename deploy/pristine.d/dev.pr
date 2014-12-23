@@ -11,7 +11,7 @@ LST="$LST git-gui gitk" # GUI: extract them only for work
 
 # Those libs also necessary to build x32 under x64 system
 LST="$LST cmake build-essential gcc-multilib g++-multilib lib32stdc++6 "
-LST="$LST make pkg-config autoconf automake" #binutils-gold
+LST="$LST make checkinstall pkg-config autoconf automake" #binutils-gold
 # libc6-dbg:i386    # need to prevent valgrind error with strlen -> strnlen
 LST="$LST cppcheck valgrind libc6-dbg:i386 gdb"
 #LST="$LST rabbit valkyrie"  #GUI#

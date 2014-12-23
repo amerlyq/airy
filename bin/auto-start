@@ -9,24 +9,24 @@ MAXWAIT=30
 
 lau() {
     local pr="$1" args="${@:2}"
-    if which "$pr" 2>&1 /dev/null || [ -f "$pr" ]; then
+    if which "$pr" > /dev/null || [ -f "$pr" ]; then
         if ! pgrep "$pr" > /dev/null; then
-            "$pr $args" & # Handle arguments with whitspaces
+            $pr $args &
 
             # Start the given command and wait until it's visible
-            # ERROR: this block is infinite for ~/.i3/blocks/kbdd-i3blocks
-            #
+            # ERROR: this block is infinite for ~/.i3/blocks/kbdd-i3blocks or dunst.
+
             # mypid=$! # Pid of last background process
             # for i in `seq $MAXWAIT`; do
-            #     echo "Wait: $i"
-            #     if xdotool search --onlyvisible --pid $mypid; then
+            #     echo "Wait $pr $mypid: $i"
+            #     if xdotool search --onlyvisible --pid $mypid --name "$pr"; then
             #         return 0;
             #     fi
             #     sleep 1
             # done
             #
             # printf "Error on executing: $pr $args\n"
-            # # notify "Error on executing: $pr $args" &
+            # notify "Error on executing: $pr $args" &
             # return 1;
         fi
     fi
@@ -34,9 +34,20 @@ lau() {
 
 # To be able to restart programms / reload configs for those which already launched!
 rcf() {
-    kill $(ps opid= -C $1)
+    local pid=$(ps opid= -C ${1##*/})
+    [ -n "$pid" ] && kill $pid
     lau $@
 }
+
+
+### ALWAYS ### --------------------------------------
+
+setX ktdaw
+[ -f ~/.Xresources ] && xrdb ~/.Xresources
+
+#[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults &
+# Focus certain wksp
+#i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &
 
 
 ### ONCE ### ----------------------------------------
@@ -44,17 +55,8 @@ rcf() {
 lau kbdd
 lau ~/.i3/blocks/kbdd-i3blocks
 rcf dunst
-lau compton
 lau mpd
+lau comptonaaa
 lau copyq
 
 
-### ALWAYS ### --------------------------------------
-
-setX ktdaw &
-
-[ -f ~/.Xresources ] && xrdb ~/.Xresources &
-#[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults &
-
-# Focus certain wksp
-#i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &

@@ -4,6 +4,8 @@
 # locate *synaptics.conf
 
 TPAD_NM=`xinput -list | grep Touchpad | sed "s@\W*\(\w*.*Touchpad\).*@\1@"`
+if [ -z "$TPAD_NM" ]; then exit; fi
+
 echo $TPAD_NM
 echo O: [{left, middle, right}, {two-fing, three-fing}, {conf-vert-resolution, ..-horiz-...}]
 
