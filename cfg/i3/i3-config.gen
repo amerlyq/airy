@@ -239,17 +239,19 @@ wmode_end
 # ALT: j4-dmenu-desktop
 # set $dmenu j4-dmenu-desktop --dmenu="dmenu -f -z -i -fn 'Droid Sans Mono-9:normal' -nb '#333333' -nf '#dedede' -sb '#d64937' -sf '#dedede'"
 
-w_header "Run: Prgs" # i3-sensible-terminal, ranger
+w_header "Run: Prgs"    # i3-sensible-terminal, ranger
 wstr "$bm+Return $eurx"
-wstr "$bm+Control+j $eurx"
+wstr "$bm+u $eurx"      # Because it's urxvt!
 wstr "$bm+Control+Return $eflo"
 wstr "$bm+Shift+Return $eflo -e ranger-auto"
 
 w_header "Run: Menus"
 wstr "$bm+d exec \"dmenu_run -p 'yes, master?' -nb '#000000' -nf '#B0E0E6' -sb '#421C84' -sf '#FFFF00' -fn -misc-fixed-medium-r-normal-*-*-130-75-75-*-*-iso8859-2\""
-wstr "$bm+u exec rofi -now -font 'Sans-10' -fg '#606060' -bg '#000000' -hlfg '#ffc964' -hlbg '#0C0C00' -o 85"
 wstr "$bs Print exec scrot '%Y%m%d_%H%M%S_\$wx\$h.png' -e 'mv \$f ~/Downloads/'"
-# Also: lxtask
+# UNNECESSARY:
+# wstr "$bm+u exec rofi -now -font 'Sans-10' -fg '#606060' -bg '#000000' -hlfg '#ffc964' -hlbg '#0C0C00' -o 85"
+
+# Also: lxtask ?
 
 # Those maps drop focus from input fields in browser.
 # Deprecated by xkb detailed settings.

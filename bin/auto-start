@@ -11,6 +11,7 @@ lau() {
     local pr="$1" args="${@:2}"
     if which "$pr" > /dev/null || [ -f "$pr" ]; then
         if ! pgrep "$pr" > /dev/null; then
+            printf "exec:    $pr $args \n"
             $pr $args &
 
             # Start the given command and wait until it's visible
@@ -28,7 +29,9 @@ lau() {
             # printf "Error on executing: $pr $args\n"
             # notify "Error on executing: $pr $args" &
             # return 1;
+        else printf "running: $pr $args \n"
         fi
+    else printf "No such: $pr $args \n"
     fi
 }
 
@@ -56,7 +59,7 @@ lau kbdd
 lau ~/.i3/blocks/kbdd-i3blocks
 rcf dunst
 lau mpd
-lau comptonaaa
+lau compton
 lau copyq
 
 
