@@ -77,8 +77,11 @@ if [ ! -f "$mbr" ]; then
     fi
     printf "\n!!! Installing MBR. Be carefull! Don't modify disk settings !!!\n\n"
 
+    # -d 0x80 -- boot a first drive (starting from 128), not first disk
     # -e12 -- try to boot from partitions 1,2 (enable them)
-    install-mbr --verbose -e12 --force "$mbr"
+    install-mbr --verbose --drive 0x80 -e12 --force "$mbr"
+    # dd if=/dev/sda bs=512 count=1 of="$mbr"
+
     ls -l "$mbr"
     # -rw-r--r-- 1 user user 512 2011-04-29 11:29 Win7.mbr
 fi
