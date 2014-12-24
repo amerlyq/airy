@@ -12,5 +12,6 @@ command! -bar -nargs=? CompilerInDir call CompileInDir(<args>)
 " \| cw
 noremap <silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
 noremap <silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
+noremap <silent> <Leader>j <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
 
 " vim:ts=2:sw=2:sts=2

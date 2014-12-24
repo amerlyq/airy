@@ -10,6 +10,11 @@
     tool = vimdiff
     guitool = meld
     renamelimit = 0  # Accelerate diffs
+    wordRegex = [[:alnum:]_]+|[^[:alnum:]_ ]+  # For 'gdw'
+    # This regex treats these as "words":
+    #     consecutive strings of alphanumerics and underscores
+    #     consecutive strings of non-alphanumerics, non-underscores, and
+    #       non-spaces (good for detecting operators)
 [difftool]
     # http://jeetworks.org/setting-up-git-to-use-your-diff-viewer-or-editor-of-choice/
     cmd = meld $LOCAL $REMOTE

@@ -20,7 +20,7 @@ nnoremap <S-F3> :e $VIMHOME/snippets/vim_regex.otl<CR>
 noremap <F6> :setlocal spell! spelllang=uk,en_us,ru_yo<CR>
 imap <F6> <C-O><F6>
 
-nnoremap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
+" nnoremap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
 
 " repeat last character to the maximum width of current line
 nnoremap <Leader>_ :execute 's/.$/'. repeat('&', &textwidth+1) .'/'<Enter>
