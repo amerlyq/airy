@@ -8,10 +8,10 @@
 # https://ru.wikipedia.org/wiki/Mount
 
 # Disk mounting util
-if [ ${#1} -eq 1 ]; then ACTION=${1}; else ACTION=m; fi
+if [ ${#1} -eq 1 ]; then ACTION=${1}; shift; else ACTION=m; fi
 LABELS="$@"
 
-if [ "$1" == 'l' ]; then
+if [[ "$ACTION" == 'l' ]]; then
     ls --color=auto /media/$CURR_USER; exit
 fi
 
@@ -39,6 +39,16 @@ domnt() {
         fi
         sudo mkdir -p "/media/$CURR_USER/$lbl" && \
             sudo mount "$path" "/media/$CURR_USER/$lbl"
+        echo "/media/$CURR_USER/$lbl"
+    fi
+    # Flash drive
+    if [[ "$ACTION" == "f" ]]; then
+        if [ -d "/media/$CURR_USER/$lbl" ]; then
+            sudo rmdir -v "/media/$CURR_USER/$lbl"
+        fi
+        sudo mkdir -p "/media/$CURR_USER/$lbl" && \
+            sudo mount vfat "$path" "/media/$CURR_USER/$lbl" -o codepage=866,iocharset=utf8
+            # mount -t vfat /dev/sdb1 /media/tmp -o codepage=866,utf8
         echo "/media/$CURR_USER/$lbl"
     fi
 }
