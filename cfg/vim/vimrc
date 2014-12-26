@@ -64,7 +64,7 @@ if !filereadable(neobundle_readme)
     echom 'NeoBundle not found. Installing...'
 
     call mkdir(expand('$VIMHOME/bundle'), 'p')
-    silent exec '!git clone https://github.com/Shougo/neobundle.vim' $NEOBUNDLE
+    silent exec '!git clone --depth=1 https://github.com/Shougo/neobundle.vim' $NEOBUNDLE
     let new_vundle_install=1
 endif
 "===============================================
