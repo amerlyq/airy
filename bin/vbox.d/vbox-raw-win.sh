@@ -6,6 +6,15 @@
 # http://www.virtualbox.org/manual/ch09.html
 # http://scarygliders.net/2011/10/28/virtualbox-on-windows-7-host-with-raw-disk-access-solution-to-randomly-changing-disc-assignment-numbers/
 
+# Need to add installing proprietary VBox by adding ppa.
+# http://blog.amhill.net/2010/01/27/linux-ftw-using-virtualbox-with-an-existing-windows-partition/comment-page-1/
+
+# Repair -- some options
+# 1. Rarely load into raw windows -- repair once, and each time when needed
+# 2. Fix generated mbr by hex: http://en.wikipedia.org/wiki/Master_boot_record
+#   Problem -- broken rules for mbr: http://gparted.org/h2-fix-msdos-pt.php
+# 3. Use full disk, but mbr with only one entry to windows. Not secure.
+
 source ~/.bash_export
 if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
 
@@ -75,11 +84,11 @@ if [ ! -f "$mbr" ]; then
     if ! which install-mbr >/dev/null; then
         sudo apt-get install -y mbr
     fi
-    printf "\n!!! Installing MBR. Be carefull! Don't modify disk settings !!!\n\n"
+    printf "\n!!! Installing MBR for ${prts//,/}. Be carefull! Don't modify disk settings !!!\n\n"
 
     # -d 0x80 -- boot a first drive (starting from 128), not first disk
     # -e12 -- try to boot from partitions 1,2 (enable them)
-    install-mbr --verbose --drive 0x80 -e12 --force "$mbr"
+    install-mbr --verbose --drive 0x80 -e${prts//,/} --force "$mbr"
     # dd if=/dev/sda bs=512 count=1 of="$mbr"
 
     ls -l "$mbr"
@@ -120,19 +129,41 @@ if [ ! -f "$grub" ]; then
         sudo apt-get install -y xorriso
     fi
 
-    exclude="{10_linux_proxy,33_memtest86+,34_linux_proxy}"
-    eval "sudo chmod -x /etc/grub.d/$exclude"
     mkdir -p /tmp/iso/boot/grub
     cd /tmp/iso/boot/grub
-    sudo grub-mkconfig > grub.cfg
-    eval "sudo chmod +x /etc/grub.d/$exclude"
+#     exclude="{05_debian_theme,10_linux_proxy,30_os-prober_proxy,31_lupin,32_linux_xen,\
+# 33_memtest86+,34_linux_proxy,35_os-prober_proxy,36_uefi-firmware,41_custom}"
+#     eval "sudo chmod -x /etc/grub.d/$exclude"
+#     sudo grub-mkconfig > grub.cfg
+#     eval "sudo chmod +x /etc/grub.d/$exclude"
+#     sed -i '/^### END \/etc\/grub.d\/40_custom ###$/i\
+# set timeout_style=menu\
+# if [ "${timeout}" = 0 ]; then\
+#     set timeout=7\
+# fi\
+# menuentry "Windows7" --class windows {\
+#     #30_os-prober_proxy\
+#     insmod part_msdos\
+#     insmod ntfs\
+#     set root=(hd0,msdos1)\
+#     chainloader +1\
+# }' ./grub.cfg
+printf 'set timeout=0
+menuentry "Windows7" --class windows {
+    #30_os-prober_proxy
+    insmod part_msdos
+    insmod ntfs
+    set root=(hd0,msdos1)
+    chainloader +1
+}' > ./grub.cfg
 
-    grub-mkrescue --modules="linux ext2 fat fshelp ls boot ntfs" --output="$grub" /tmp/iso #pc
+    # --modules="loadenv fshelp ls boot ntfs parttool chain search terminal"
+    grub-mkrescue  --output="$grub" /tmp/iso #pc
 fi
 
 
 if [ ! -f "$vimg" ]; then
-    printf "\n!!! If not SSD: remove --nonrotational option !!!\n\n"
+    printf "\n!!! IF NOT SSD: remove --nonrotational option !!!\n\n"
 
     VBoxManage internalcommands createrawvmdk -filename "$vimg" \
         -rawdisk "$disk" -partitions $prts -mbr "$mbr" -relative
