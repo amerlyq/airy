@@ -1,5 +1,10 @@
-Firefox: AuthProxy.plugin
-ssh -D <port>  SOCK5
+< There are two mistakes one can make along the road to truth...not going all the way, and not starting.
+<	 --Prince Gautama Siddharta
+
+Firefox:
+	AuthProxy.plugin
+	ssh -D <port>  SOCK5
+
 Steganography (info hiding)
  Google: стеганография ssh
 : Pack ssh tunnel inside common http traffic on :80 port with valid web headers
@@ -14,3 +19,44 @@ Anonimizing net
 Crypt your keys, use CA to auth your server
 	https://www.digitalocean.com/community/tutorials/how-to-create-an-ssh-ca-to-validate-hosts-and-clients-with-ubuntu
 	 Gpg, see MPogoda/dotfiles/blob/master/xinitrc
+
+Delete Cookies/Passwords/Forms in browsers -- IE, Firefox
+	FF -> Options -> Privacy -> History: Firefox will: "Use custom settings"
+	-> Show Cookies -> Remove All Cookies
+
+< http://superuser.com/questions/62303/how-can-i-tunnel-all-of-my-network-traffic-through-ssh
+Tunnel all traffic
+ https://github.com/apenwarr/sshuttle.
+	./sshuttle -r username@sshserver 0.0.0.0/0 -vv --dns
+	 It will tunnel all your TCP traffic and DNS requests automatically for you.
+
+Tunnel specific programs
+ http://proxychains.sourceforge.net/.
+	ssh -fND 127.0.0.1:<local port> username@sshserver
+ This will start a "SOCKS" proxy listening on <port>.
+	Then edit /etc/proxychains.conf to point to the same port as <port>.
+ Finally start your program that you want proxy-ed like so:
+	proxychains <program name>
+
+ It should just work. However, a few programs will have trouble working with
+ Proxy Chains. Also keep in mind, that with Firefox, you have to change
+ additional items under about:config to force it to do DNS lookups through the
+ proxy instead of bypassing it.
+
+ As an additional note, on web browsers. If they support socks proxies, you
+ don't need to do anything additional to get them to use the above mentioned,
+ ssh tunnel, just enter 127.0.0.1 for the SOCKS proxy server and the <local
+ port> for the proxy port.
+
+Ubuntu security
+	http://ubuntuforums.org/showthread.php?t=510812
+
+Keylogger
+	http://theinvisiblethings.blogspot.com/2011/04/linux-security-circus-on-gui-isolation.html
+	https://www.nsa.gov/research/_files/selinux/papers/x11/t1.shtml
+
+SSL keys, etc
+	http://kjur.github.com/jsrsasign
+	https://github.com/aldebaran/connman
+
+

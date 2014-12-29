@@ -2,7 +2,7 @@ BUGS
 	[_] Trouble: can't use overlay xkb mapping on LAlt-LCtrl
 		Cause vbox after windows treats LCtrl and Caps as same keycode
 
-	[_] i3blocks after boot loads not always
+	[X] i3blocks after boot loads not always
 	[_] Replace name and email in devq work
 	[_] ZSH title:print:7: write error: interrupt
 		fixed in 5.0.4, need update
@@ -10,6 +10,7 @@ BUGS
 	[_] ZSH source in terminal on <F12>, then $ gaa<tab><tab> will cause
 		 Vim output ... as was when I used zshenv
 	[_] xsel don't work by ssh and on my machine after ssh? (ioctl...)
+	 Maybe because I changed connect to default instead of -X
 
 ranger
  NOTE: 1? 2? -- help for commands
@@ -296,6 +297,7 @@ Xkbmap
 
 TODO
 	[_] Alias to goldendict
+>	[_] Update i3-block pr and modules
 	[_] Clang own style of formatting
 	[_] Fix synergy errors in debug mode with 'not found display'
 			Simply launch it
@@ -365,6 +367,7 @@ TODO
 
 [_] 40% Light white theme with inverted solarized in bash, vim, i3, ranger and else
 	[_] i3
+	[_] palette for i3blocks plugins
 	[X] urxvt
 	[X] vim
 	[_] ranger
@@ -381,6 +384,8 @@ TODO
 ~/.i3/ext/dmenu_mpd_fmove
 	[_] 'undo for moving' -- move back and add to playlist
 	[_] 'move to another' -- move last moved file in another dir
+	[_] if exist tty -- on launch with $#=0 show list of items
+	[_] -l with dir name -- show content list
 
 TASKS
 	Kbuild> Read from :831

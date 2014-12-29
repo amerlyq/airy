@@ -22,11 +22,11 @@ if [ $( cat "$DIR/present" ) -eq 1 ]; then
     percent=$( cat $DIR/capacity )
     stat=$( cat $DIR/status )
 
-      if [ $percent -ge 80 ]; then color="#FFF6AA"
-    elif [ $percent -ge 60 ]; then color="#FFFF40"
-    elif [ $percent -ge 40 ]; then color="#FFEE20"
-    elif [ $percent -ge 20 ]; then color="#FF8800"
-    elif [ $percent -ge 6  ]; then color="#FF0000"
+      if [ $percent -ge 80 ]; then color="#AAF6AA"
+    elif [ $percent -ge 60 ]; then color="#AAFF40"
+    elif [ $percent -ge 40 ]; then color="#AAEE20"
+    elif [ $percent -ge 20 ]; then color="#AA8800"
+    elif [ $percent -ge 6  ]; then color="#AA0000"
     else color="#AA00AA"; fi
 
     if [ "$stat" == "Charging" ]; then
