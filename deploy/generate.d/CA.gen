@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# CA -- certificate authority
+# TODO:
+#   Don't forget to disable your passwd connection. Strengen my passwd on CA. Protection from DDOS & brutforce.
+#   Reinstall new firmware with only very necessary progs. Is it has OpenCA? I smth such remember...
+
+#Check fingerprint
+#   find /etc/ssh/ -name "*_key.pub" -exec ssh-keygen -lf {} \;
+# Find appropriate line in known_hosts and it's fingerprint
+#   ssh-keygen -H -F hostname
+#   ssh-keygen -l -f ~/.ssh/known_hosts -F hostname
+
+dir=/tmp/ca
+mkdir -p "$dir"
+cd "$dir"
+
+
+# Gen CA key -- use root rights!
+ca_sign=./ca_sign
+[ -f "$ca_sign" ] || ssh-keygen -t rsa -C "mail" -N "" -f "$ca_sign"
+
+
+# Signing the CA server's host key itself
+ca_idn=./ca_rsa   # /etc/ssh/ssh_host_rsa_key.pub
+[ -f "$ca_idn" ] || ssh-keygen -t rsa -C "ca-server" -N "" -f "$ca_idn"
+ssh-keygen -s "$ca_sign" -I "CA_auth_server" -V +52w1d -n "ca.server.com" -h "$ca_idn"
+# -s | sign with key
+# -I | log that info (identity) when connect
+# -V | validity -- expriration date 20160101
+# -n | limit validity to principal names
+# -h | host cert -- user cert w/o -h
+# >>>> Signed host key ./ca_rsa-cert.pub: id "CA_auth_server" serial 0 for ca.server.com valid from 2014-12-30T14:05:00 to 2015-12-30T14:06:06
+
+
+# Sign custom server
+# scp root@sshserver.example.com:/etc/ssh/ssh_host_rsa_key.pub
+sir_idn=./srk_rsa.pub
+cp ~/.ssh/$sir_idn "$sir_idn"
+ssh-keygen -s "$ca_sign" -I "HostSrv_Sir" -h -n "sir.com" -V +52w1d "$sir_idn"
+# scp ssh_host_rsa_key-cert.pub root@sshserver.example.com:/etc/ssh/
+# cp "${sir_idn%.pub}-cert.pub" ~/.ssh/
+rm "$sir_idn" "${sir_idn%.pub}-cert.pub"
+

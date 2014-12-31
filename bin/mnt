@@ -42,6 +42,7 @@ domnt() {
         echo "/media/$CURR_USER/$lbl"
     fi
     # Flash drive
+    # http://linuxsam.livejournal.com/18176.html
     if [[ "$ACTION" == "f" ]]; then
         if [ -d "/media/$CURR_USER/$lbl" ]; then
             sudo rmdir -v "/media/$CURR_USER/$lbl"
