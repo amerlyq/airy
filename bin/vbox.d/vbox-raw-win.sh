@@ -28,7 +28,7 @@ if WIN; then exit; fi
 VMs="$HOME/VMs"
 
 # Home Profile
-if [ "$CURR_PROF" != "home" ]; then echo "Error -- only home!"; exit 1; fi
+if [ "$CURR_PROF" != "home" -a "$CURR_PROF" != "work" ]; then echo "Error -- not setted!"; exit 1; fi
 
 
 if ! WIN; then
@@ -36,7 +36,10 @@ if ! WIN; then
     ost=Windows7_64
     # Home
     disk=/dev/sda
-    prts="1,2,3"    # 100MB recovery, Win7, Data
+    case "$CURR_PROF" in # 100MB recovery, Win7, Data
+        "home") prts="1,2,3" ;;
+        "work") prts="1,2,8" ;;
+    esac
 else
     VNM=Mint17hdd
     ost=Ubuntu_64
@@ -70,7 +73,7 @@ printf "\n!!! Check if you are in 'disk' group\n"
 if ! id | grep '(disk)'; then
     # Look at current disk rights 'root group'
     group=$(ls -g "$disk" | awk '{print $3}')
-    printf "Add user '${CURR_USER?Need CURR_USER}' to disk (or appropriate)
+    printf "Adding user '${CURR_USER?Need CURR_USER}' to disk (or appropriate)
         group '${group?Need group}' (to be able to use key '-relative')\n"
     sudo usermod -a -G "$group" "$CURR_USER"
 
@@ -84,12 +87,15 @@ if [ ! -f "$mbr" ]; then
     if ! which install-mbr >/dev/null; then
         sudo apt-get install -y mbr
     fi
-    printf "\n!!! Installing MBR for ${prts//,/}. Be carefull! Don't modify disk settings !!!\n\n"
+    printf "\n!!! Installing MBR for ${prts}. Be carefull! Don't modify disk settings !!!\n\n"
+    # Choose only from main 1-4 partitions, used in boot for neccessary OS
+    bprts=${prts//,/}; bprts=${bprts:0:2}
 
     # -d 0x80 -- boot a first drive (starting from 128), not first disk
     # -e12 -- try to boot from partitions 1,2 (enable them)
-    install-mbr --verbose --drive 0x80 -e${prts//,/} --force "$mbr"
+    install-mbr --verbose --drive 0x80 -e${bprts} --force "$mbr"
     # dd if=/dev/sda bs=512 count=1 of="$mbr"
+    # cp ~/tmp/win7mbr512x1 "$mbr"
 
     ls -l "$mbr"
     # -rw-r--r-- 1 user user 512 2011-04-29 11:29 Win7.mbr
@@ -131,31 +137,25 @@ if [ ! -f "$grub" ]; then
 
     mkdir -p /tmp/iso/boot/grub
     cd /tmp/iso/boot/grub
-#     exclude="{05_debian_theme,10_linux_proxy,30_os-prober_proxy,31_lupin,32_linux_xen,\
-# 33_memtest86+,34_linux_proxy,35_os-prober_proxy,36_uefi-firmware,41_custom}"
-#     eval "sudo chmod -x /etc/grub.d/$exclude"
-#     sudo grub-mkconfig > grub.cfg
-#     eval "sudo chmod +x /etc/grub.d/$exclude"
-#     sed -i '/^### END \/etc\/grub.d\/40_custom ###$/i\
+
+    exclude=$(ls /etc/grub.d | sed '/^[0-9]\{2\}_/!d; /header\|os-prober$/d' | xargs)
+    eval "sudo chmod -x /etc/grub.d/{${exclude// /,}}"
+    sudo grub-mkconfig > grub.cfg
+    eval "sudo chmod +x /etc/grub.d/{${exclude// /,}}"
+
+# sed -i '/^### END \/etc\/grub.d\/40_custom ###$/i\
 # set timeout_style=menu\
 # if [ "${timeout}" = 0 ]; then\
 #     set timeout=7\
 # fi\
-# menuentry "Windows7" --class windows {\
-#     #30_os-prober_proxy\
-#     insmod part_msdos\
-#     insmod ntfs\
-#     set root=(hd0,msdos1)\
-#     chainloader +1\
-# }' ./grub.cfg
-printf 'set timeout=0
-menuentry "Windows7" --class windows {
-    #30_os-prober_proxy
-    insmod part_msdos
-    insmod ntfs
-    set root=(hd0,msdos1)
-    chainloader +1
-}' > ./grub.cfg
+# printf 'set timeout=0
+# menuentry "Windows7" --class windows {
+#     #30_os-prober_proxy
+#     insmod part_msdos
+#     insmod ntfs
+#     set root=(hd0,msdos1)
+#     chainloader +1
+# }' > ./grub.cfg
 
     # --modules="loadenv fshelp ls boot ntfs parttool chain search terminal"
     grub-mkrescue  --output="$grub" /tmp/iso #pc
@@ -164,6 +164,11 @@ fi
 
 if [ ! -f "$vimg" ]; then
     printf "\n!!! IF NOT SSD: remove --nonrotational option !!!\n\n"
+
+    case "$CURR_PROF" in # 100MB recovery, Win7, Data
+        "home") HDDOPTS="--nonrotational on" ;;
+        "work") HDDOPTS="" ;;
+    esac
 
     VBoxManage internalcommands createrawvmdk -filename "$vimg" \
         -rawdisk "$disk" -partitions $prts -mbr "$mbr" -relative
@@ -177,7 +182,7 @@ if [ ! -f "$vimg" ]; then
     VBoxManage storagectl "${VNM}" --name "SATA" --add sata \
         --controller IntelAHCI --hostiocache on --portcount 1
     VBoxManage storageattach "${VNM}" --storagectl "SATA" \
-        --port 0 --device 0 --type hdd --nonrotational on --medium "$vimg"
+        --port 0 --device 0 --type hdd $HDDOPTS --medium "$vimg"
 fi
 
 

@@ -38,17 +38,20 @@ printf "
 | FROM: ${PRS_DIR}
 \n"
     for pr in "${OPTS_SET[@]}"; do
-        printf "\n${Prl}INSTALL: ${pr}.pr$cStd\n"
-        "$PRS_DIR/${pr}.pr" 2>&1 \
-        | tee /tmp/pristine.log | awk '{pf=0}
+        prgb="$PRS_DIR/${pr}.pr"
+        printf "\n${cPrl}INSTALL: ${prgb##*/}$cStd\n"
+        if ! [ -f "$prgb" ]; then
+            echo "${cRed}Error! Don't exist $prgb${cStd}"
+            continue
+        fi
+        $prgb 2>&1 | tee /tmp/pristine.log | awk '{pf=0}
             /^E:.*/ {pf=1; printf "'"$cRed%s*$cStd"'",$0}
             /^The following/ { printf "\n" }
             /^The following packages will be upgraded/ {pf=1; next; printf "'"$cYlw%s*$cStd"'",$0}
             /^The following extra packages/,/^After this operation/ {pf=1; printf "\n%s",$0}
             /is already the newest version/ {pf=1; printf "'"$cGrn%s*$cStd"'",$1}
             /^Get:/ { printf "'"${cBlu}.$cStd"'" }
-            { if(pf==0) {printf "."} }
-        '
+            { if(pf==0) {printf "."} } '
         printf "\n"
     done
 fi

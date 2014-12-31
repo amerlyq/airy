@@ -1,5 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
 
-if ! grep -q snd-hda-intel /etc/modprobe.d/alsa-base.conf; then
-    echo 'options snd-hda-intel model=asus' | sudo tee -a /etc/modprobe.d/alsa-base.conf
-fi
+LST="$LST alsa alsa-utils alsa-tools pulseaudio"
+# pulseaudio# Need for usage pactl -- ncmpcpp and volume regulator in i3 config bindings.
+# alsa      # volume regulator
+apt_noprompt $LST
+

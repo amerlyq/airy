@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+if [ "$1" == "-d" ]
+then CLR=1; shift; fi
+
+if [ "$1" == "-c" ]
+then DIR="/usr/local/share/ca-certificates"
+else DIR="${1:-~/work/cfg/cert}"; [ -d "$DIR" ] || DIR="."; fi
+
+echo "GUI: $ sudo dpkg-reconfigure ca-certificates"
+echo "CLI: Now changing /etc/ssl/certs/"
+
+
+find "${DIR}" -type f -regex ".*\.cer\|.*\.crt" | while read cer; do
+    nm="${cer##*/}"
+    dst="/usr/local/share/ca-certificates/${nm%.*}.crt"
+
+    echo "$dst"
+
+    if [ -n "$CLR" ]
+    then sudo rm "$dst"
+    else sudo cp "$cer" "$dst"
+    fi
+done
+
+sudo update-ca-certificates ${CLR+-f}
+
+echo "Restart your browser now!"
