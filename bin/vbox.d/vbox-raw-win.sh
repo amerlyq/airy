@@ -19,14 +19,15 @@
 source ~/.bash_export
 if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
 
-
-# Home Profile
+# Available Profiles
 if [ "$CURR_PROF" != "home" -a "$CURR_PROF" != "work" ]; then
-    echo "Error -- settings only for 'home' and 'work'!"; exit 1
+    echo "Error -- settings only for 'home' and 'work'!"
+    exit 1
 fi
 
 
-if ! [ "$CURR_PLTF" == "MINGW" ]
+
+if [ ! "$1" == "-w" ] && [ "$CURR_PLTF" == "Linux" ]
 then
     VMs="$HOME/VMs"
     VNM=Win7hdd
@@ -37,6 +38,19 @@ then
         "home") prts="1,2,3" ;;   # Recovery, Win7, Data
         "work") prts="1,2,8" ;;
     esac
+
+    printf "\n!!! Check if you are in 'disk' group\n"
+    if ! id | grep '(disk)'; then
+        # Look at current disk rights 'root group'
+        group=$(ls -g "$disk" | awk '{print $3}')
+        printf "Adding user '${CURR_USER?Need CURR_USER}' to disk (or appropriate)
+            group '${group?Need group}' (to be able to use key '-relative')\n"
+        sudo usermod -a -G "$group" "$CURR_USER"
+
+        printf "\n!!! Re-login in this shell/session or reboot to update changes in Groups\n"
+        exit 0
+    fi
+
 else
     VMs="/e/VMs"
     VNM=Mint17hdd
@@ -44,15 +58,14 @@ else
     disk='\\\\.\\GLOBALROOT\\ArcName\\multi(0)disk(0)rdisk(0)' #\\.\PhysicalDrive0
     boot_ent="linux"
     case "$CURR_PROF" in
-        "home") prts="4,5" ;;
+        "home") prts="6,5" ;;
         "work") prts="3,5,6,7" ;; # boot,swap,root,home
     esac
     PATH="$PATH:/c/Program Files/Oracle/VirtualBox"
-    printf "You need to run this script as Administrator!"
+    printf "\nYou need to run this script as Administrator!\n"
 fi
 
 
-printf "\n>>> ${VNM} guest image <<<\n"
 
 vimg="$VMs/${VNM}/${VNM}.vmdk"
 vbox="${vimg%.*}.vbox"
@@ -61,30 +74,38 @@ grub="${vimg%/*}/grub2.iso"
 tmp_iso=/tmp/iso/boot/grub
 
 
-if [ "$1" == "-r" ]; then rm -rf "${vimg%/*}"; fi
-mkdir -p "${vimg%/*}"
-
-
-if [ -z "$prts" ]; then
 # Find appropriate disk
 #   L: sudo fdisk -l $disk
 #   W: diskpart; list disk; select disk 0; list partition
+if [ "$1" == "-l" ]; then
     sudo VBoxManage internalcommands listpartitions -rawdisk "$disk"
-    read -p "Enter wished partitions numbers (like <4,5>):" prts
+    exit 0
+fi
+
+
+if [ "$1" == "-w" ]; then
+    mbr="${2:-/tmp}/${VNM}.mbr"
+    printf "\nCreating MBR for ${prts}:\n"
+    bprts=${prts:0:1}
+    install-mbr --verbose --drive 0x80 -e${bprts} --force "$mbr"
+    ls -l "$mbr"
+    printf "\nMBR generated successfully\n"
+    exit 0  # --------------------
+fi
+
+# =======================================================================
+
+printf "\n>>> ${VNM} guest image <<<\n"
+
+if [ -z "$prts" ]; then
+    sudo VBoxManage internalcommands listpartitions -rawdisk "$disk"
+    read -p "Enter wished partitions numbers (like <6,5>):" prts
     ${prts?Error, not entered partitions}
 fi
 
-printf "\n!!! Check if you are in 'disk' group\n"
-if ! id | grep '(disk)'; then
-    # Look at current disk rights 'root group'
-    group=$(ls -g "$disk" | awk '{print $3}')
-    printf "Adding user '${CURR_USER?Need CURR_USER}' to disk (or appropriate)
-        group '${group?Need group}' (to be able to use key '-relative')\n"
-    sudo usermod -a -G "$group" "$CURR_USER"
 
-    printf "\n!!! Re-login in this shell/session or reboot to update changes in Groups\n"
-    exit
-fi
+if [ "$1" == "-r" ]; then rm -rf "${vimg%/*}"; fi
+mkdir -p "${vimg%/*}"
 
 
 # Create MBR to use with Win guest. Otherwise you get "grub> Unknown format"
@@ -92,7 +113,7 @@ if [ ! -f "$mbr" ]; then
     if ! which install-mbr >/dev/null; then
         sudo apt-get install -y mbr
     fi
-    printf "\n!!! Installing MBR for ${prts}. Be carefull! Don't modify disk settings !!!\n\n"
+    printf "\n!!! Installing MBR for ${prts}. Be carefull! Don't modify disk own settings !!!\n\n"
     # Choose only from main 1-4 partitions, used in boot for neccessary OS
     # bprts=${prts//,/}; bprts=${bprts:0:2}
     bprts=${prts:0:1}
@@ -105,6 +126,7 @@ if [ ! -f "$mbr" ]; then
 
     ls -l "$mbr"
     # -rw-r--r-- 1 user user 512 2011-04-29 11:29 Win7.mbr
+
 fi
 
 
@@ -143,6 +165,7 @@ if [ ! -f "$vbox" ]; then
 fi
 
 
+# This iso could be unneccessary if mbr contains only one entry to boot...
 if [ ! -f "$grub" ]; then
     if ! which xorriso  >/dev/null; then
         sudo apt-get install -y xorriso
