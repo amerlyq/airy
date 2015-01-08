@@ -19,29 +19,36 @@
 source ~/.bash_export
 if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
 
-VMs="$HOME/VMs"
 
 # Home Profile
 if [ "$CURR_PROF" != "home" -a "$CURR_PROF" != "work" ]; then
-    echo "Error -- not setted beside 'home' and 'work'!"; exit 1
+    echo "Error -- settings only for 'home' and 'work'!"; exit 1
 fi
 
 
-if ! [ "$CURR_PLTF" == "MINGW" ]; then
+if ! [ "$CURR_PLTF" == "MINGW" ]
+then
+    VMs="$HOME/VMs"
     VNM=Win7hdd
     ost=Windows7_64
-    # Home
     disk=/dev/sda
-    case "$CURR_PROF" in # 100MB recovery, Win7, Data
-        "home") prts="1,2,3" ;;
+    boot_ent="os-prober"
+    case "$CURR_PROF" in
+        "home") prts="1,2,3" ;;   # Recovery, Win7, Data
         "work") prts="1,2,8" ;;
     esac
 else
+    VMs="/e/VMs"
     VNM=Mint17hdd
     ost=Ubuntu_64
-    cd 'c:\Program Files\Oracle\VirtualBox\'
-    disk='\\.\PhysicalDrive0'
-    prts="4,5"
+    disk='\\\\.\\GLOBALROOT\\ArcName\\multi(0)disk(0)rdisk(0)' #\\.\PhysicalDrive0
+    boot_ent="linux"
+    case "$CURR_PROF" in
+        "home") prts="4,5" ;;
+        "work") prts="3,5,6,7" ;; # boot,swap,root,home
+    esac
+    PATH="$PATH:/c/Program Files/Oracle/VirtualBox"
+    printf "You need to run this script as Administrator!"
 fi
 
 
@@ -51,6 +58,7 @@ vimg="$VMs/${VNM}/${VNM}.vmdk"
 vbox="${vimg%.*}.vbox"
  mbr="${vimg%.*}.mbr"
 grub="${vimg%/*}/grub2.iso"
+tmp_iso=/tmp/iso/boot/grub
 
 
 if [ "$1" == "-r" ]; then rm -rf "${vimg%/*}"; fi
@@ -140,12 +148,11 @@ if [ ! -f "$grub" ]; then
         sudo apt-get install -y xorriso
     fi
 
-    mkdir -p /tmp/iso/boot/grub
-    cd /tmp/iso/boot/grub
+    mkdir -p "$tmp_iso"
 
-    exclude=$(ls /etc/grub.d | sed '/^[0-9]\{2\}_/!d; /header\|os-prober$/d' | xargs)
+    exclude=$(ls /etc/grub.d | sed '/^[0-9]\{2\}_/!d; /header\|'"$boot_ent"'$/d' | xargs)
     eval "sudo chmod -x /etc/grub.d/{${exclude// /,}}"
-    sudo grub-mkconfig > grub.cfg
+    sudo grub-mkconfig > "$tmp_iso/grub.cfg"
     eval "sudo chmod +x /etc/grub.d/{${exclude// /,}}"
 
 # sed -i '/^### END \/etc\/grub.d\/40_custom ###$/i\
