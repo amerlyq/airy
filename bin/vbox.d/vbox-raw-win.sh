@@ -14,24 +14,20 @@
 # 2. Fix generated mbr by hex: http://en.wikipedia.org/wiki/Master_boot_record
 #   Problem -- broken rules for mbr: http://gparted.org/h2-fix-msdos-pt.php
 # 3. Use full disk, but mbr with only one entry to windows. Not secure.
+# 4. Two bcdedit options -- original and repaired for vbox.
 
 source ~/.bash_export
 if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
 
-
-if [ "$CURR_PLTF" == "MINGW" ]
-then WIN(){ return 0; } # true
-else WIN(){ return 1; } # false
-fi
-
-if WIN; then exit; fi
 VMs="$HOME/VMs"
 
 # Home Profile
-if [ "$CURR_PROF" != "home" -a "$CURR_PROF" != "work" ]; then echo "Error -- not setted!"; exit 1; fi
+if [ "$CURR_PROF" != "home" -a "$CURR_PROF" != "work" ]; then
+    echo "Error -- not setted beside 'home' and 'work'!"; exit 1
+fi
 
 
-if ! WIN; then
+if ! [ "$CURR_PLTF" == "MINGW" ]; then
     VNM=Win7hdd
     ost=Windows7_64
     # Home
@@ -52,7 +48,8 @@ fi
 printf "\n>>> ${VNM} guest image <<<\n"
 
 vimg="$VMs/${VNM}/${VNM}.vmdk"
-mbr="${vimg%.*}.mbr"
+vbox="${vimg%.*}.vbox"
+ mbr="${vimg%.*}.mbr"
 grub="${vimg%/*}/grub2.iso"
 
 
@@ -89,7 +86,8 @@ if [ ! -f "$mbr" ]; then
     fi
     printf "\n!!! Installing MBR for ${prts}. Be carefull! Don't modify disk settings !!!\n\n"
     # Choose only from main 1-4 partitions, used in boot for neccessary OS
-    bprts=${prts//,/}; bprts=${bprts:0:2}
+    # bprts=${prts//,/}; bprts=${bprts:0:2}
+    bprts=${prts:0:1}
 
     # -d 0x80 -- boot a first drive (starting from 128), not first disk
     # -e12 -- try to boot from partitions 1,2 (enable them)
@@ -114,19 +112,26 @@ if VBoxManage list vms | grep -q "\<${VNM}\>"; then
 fi
 
 
-if [ ! -f "${vimg%.*}.vbox" ]; then
+if [ ! -f "$vbox" ]; then
     VBoxManage createvm --name "${VNM}" --ostype "$ost" --basefolder "$VMs" --register
 
+    case "$CURR_PROF" in # 100MB recovery, Win7, Data
+        "home") VMOPTS="--memory 3072" ;;
+        "work") VMOPTS="--memory 2560 --macaddress1 ${WORK_MAC?Need_WORK_MAC}" ;;
+    esac
     # Сеть придётся основательно подрихтовать, так чтобы наружу торчал
     # правильный айпишник и мак из-под нутри виртуалки.
-    VBoxManage modifyvm "${VNM}" --memory 3072 --vram 256 --pae on     \
+    VBoxManage modifyvm "${VNM}" ${VMOPTS} --vram 128 --pae on         \
         --accelerate3d on --accelerate2dvideo on                       \
         --ioapic on --cpus 2 --rtcuseutc on --cpuexecutioncap 100      \
         --hwvirtex on --nestedpaging on  --largepages on  --vtxvpid on \
         --boot1 dvd --boot2 disk --firmware bios                       \
         --clipboard bidirectional --monitorcount 1 --vrde off          \
-        --audio pulse --audiocontroller hda --usb on --usbehci off    \
-        --nic1 nat --nic2 intnet  --intnet2 "InnerVMs" --nic3 none --nic4 none
+        --audio pulse --audiocontroller hda --usb on --usbehci off     \
+        --nic1 nat --nic2 none --nic3 none --nic4 none
+    # Intranet: --nic2 intnet  --intnet2 "InnerVMs"
+
+    sed -i '/ShowMiniToolBar/ s/\(value="\)\w\+"/\1no"/' "$vbox"
 fi
 
 
@@ -187,11 +192,7 @@ fi
 
 
 # TODO: if I can't to make grub2 or bcdedit loader
-# Set the VM to mount the DVD drive and put in your Vista DVD. Start the VM.
-# Press F12 and select the DVD drive to start (c). Let Win7 setup start, pick a
-# language, and then click the ‘Repair installation’ option. Go through
-# automatic repair, and then let the VM restart. This time it should go into
-# Win7 running off the raw disk.
+# Use automatic 'Repair installation' Win7_DVD option.
 
 # In my case this was caused by wrong bios SATA mode setting. I installed
 # windows 7 with bios SATA mode set to RAID so windows installed only RAID
@@ -204,17 +205,11 @@ fi
 
 # Note: For me the SATA emulation for the RAW disk (under VirtualBox) did not
 # work. I had to use the IDE emulation for the real SATA disk to get this
-# working. There is some patch available to break windows binding to a given
-# SATA driver and go more generic, but I did not try that yet.
+# working.
 
-# I tried to virtualize my old physical Windows XP hard disk partition and when
-# booting nothing happened after starting mode menu choice. No error, but no
-# Windows too :) (even 'safe mode' do not work)
-# I found the solution from:
+
+# Author advises that IO APIC must be activated from VM settings.
 # http://doc.ubuntu-fr.org/utilisateurs/brazz/virtualbox#utilisation_d_un_disque_dur_physique_dans_virtual_box
-# So, author advises that IO APIC must be activated from VM settings but I do
-# not understand the exact role of this feature.
-
 
 # --discard on option (after --nonrotational on) specifies that vdi image will be
 # shrunk in response to trim command from guest OS. Following requirements must
@@ -222,7 +217,7 @@ fi
 #     disk format must be VDI
 #     cleared area must be at least 1MB (size)
 #     [probably] cleared area must be cover one or more 1MB blocks (alignment)
-#
+
 # Obviously guest OS must be configured to issue trim command, typically that
 # means guest OS is made to think the disk is an SSD. Ext4 supports -o discard
 # mount flag; OSX probably requires additional settings as by default only
@@ -232,6 +227,6 @@ fi
 # Samsung) supports discard command. It is not clear if Microsoft
 # implementation of exFAT supports same, even though the file system was
 # designed for flash to begin with.
-#
+
 # Alternatively there are ad hoc methods to issue trim, e.g. Linux fstrim
 # command, part of util-linux package.

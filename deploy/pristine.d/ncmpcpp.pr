@@ -6,9 +6,9 @@ if [ $? -eq 1 ]; then exit 1; fi
 #   http://crunchbang.org/forums/viewtopic.php?id=37882
 # WARNING: for older version then 0.7? use November's configs
 
-LST="$LST libboost-all-dev libmpdclient-dev libncurses5-dev libncursesw5-dev"
-# OTH: libreadline-dev libreadline-gplv2-dev libfftw3-dev libcurl4-gnutls-dev libtag1-dev automake
-# apt_noprompt $LST
+LST="$LST libtool libboost-all-dev libmpdclient-dev libncurses5-dev libncursesw5-dev libfftw3-dev libreadline-dev libreadline-gplv2-dev"
+# OTH: libcurl4-gnutls-dev libtag1-dev automake
+apt_noprompt $LST
 
 git_install "arybczak/ncmpcpp" -d
 
@@ -19,4 +19,5 @@ dir="$CURR_DIR_PKG/ncmpcpp/"
 # -mt suffix for boost libraries
 sed -i "s/^\(AS_IF\|AC_ARG_VAR\)(/# \1(/" "$dir/configure.ac"
 
+# ABSENT: tag editor, tiny tag editor, artist info
 rep_autobuild "$dir" --enable-outputs --enable-visualizer --enable-clock --with-fftw
