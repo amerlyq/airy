@@ -29,6 +29,7 @@ fi
 
 if [ ! "$1" == "-w" ] && [ "$CURR_PLTF" == "Linux" ]
 then
+	sudo="sudo"
     VMs="$HOME/VMs"
     VNM=Win7hdd
     ost=Windows7_64
@@ -52,10 +53,11 @@ then
     fi
 
 else
+	sudo=""
     VMs="${2:-/e/VMs}"
     VNM=Mint17hdd
     ost=Ubuntu_64
-    disk='\\\\.\\GLOBALROOT\\ArcName\\multi(0)disk(0)rdisk(0)' #\\.\PhysicalDrive0
+    disk="\\\\.\\GLOBALROOT\\ArcName\\multi(0)disk(0)rdisk(0)" #\\.\PhysicalDrive0
     boot_ent="linux"
     case "$CURR_PROF" in
         "home") prts="6,5" ;;
@@ -78,7 +80,7 @@ tmp_iso=/tmp/iso/boot/grub
 #   L: sudo fdisk -l $disk
 #   W: diskpart; list disk; select disk 0; list partition
 if [ "$1" == "-l" ]; then
-    sudo VBoxManage internalcommands listpartitions -rawdisk "$disk"
+    $sudo VBoxManage internalcommands listpartitions -rawdisk "$disk"
     exit 0
 fi
 
@@ -99,7 +101,7 @@ mkdir -p "${vimg%/*}"
 
 
 # Create MBR to use with Win guest. Otherwise you get "grub> Unknown format"
-if [ ! -f "$mbr" ]; then
+if [ ! -f "$mbr" ] && [ "$CURR_PLTF" == "Linux" ]; then
     if ! which install-mbr >/dev/null; then
         sudo apt-get install -y mbr
     fi
@@ -121,7 +123,7 @@ if [ ! -f "$mbr" ]; then
 fi
 
 # This iso could be unneccessary if mbr contains only one entry to boot...
-if [ ! -f "$grub" ]; then
+if [ ! -f "$grub" ] && [ "$CURR_PLTF" == "Linux" ]; then
     if ! which xorriso  >/dev/null; then
         sudo apt-get install -y xorriso
     fi
@@ -172,20 +174,22 @@ fi
 if [ ! -f "$vbox" ]; then
     VBoxManage createvm --name "${VNM}" --ostype "$ost" --basefolder "$VMs" --register
 
-    case "$CURR_PROF" in # 100MB recovery, Win7, Data
+    case "$CURR_PROF" in  # 100MB recovery, Win7, Data
         "home") VMOPTS="--memory 3072" ;;
         "work") VMOPTS="--memory 2560 --macaddress1 ${WORK_MAC?Need_WORK_MAC}" ;;
+    esac
+	case "$CURR_PLTF" in 
+        "Linux") VMOPTS="$VMOPTS --audio pulse  --audiocontroller hda  --accelerate2dvideo on"  ;;
+        "MINGW") VMOPTS="$VMOPTS --audio dsound --audiocontroller ac97 --accelerate2dvideo off" ;;
     esac
     # Сеть придётся основательно подрихтовать, так чтобы наружу торчал
     # правильный айпишник и мак из-под нутри виртуалки.
     VBoxManage modifyvm "${VNM}" ${VMOPTS} --vram 128 --pae on         \
-        --accelerate3d on --accelerate2dvideo on                       \
         --ioapic on --cpus 2 --rtcuseutc on --cpuexecutioncap 100      \
         --hwvirtex on --nestedpaging on  --largepages on  --vtxvpid on \
-        --boot1 dvd --boot2 disk --firmware bios                       \
+        --boot1 dvd --boot2 disk --firmware bios  --accelerate3d on    \
         --clipboard bidirectional --monitorcount 1 --vrde off          \
-        --audio pulse --audiocontroller hda --usb on --usbehci off     \
-        --nic1 nat --nic2 none --nic3 none --nic4 none
+        --usb on --usbehci off --nic1 nat --nic2 none --nic3 none --nic4 none
     # Intranet: --nic2 intnet  --intnet2 "InnerVMs"
 
     sed -i '/ShowMiniToolBar/ s/\(value="\)\w\+"/\1no"/' "$vbox"
@@ -200,9 +204,11 @@ if [ ! -f "$vimg" ]; then
         "home") HDDOPTS="--nonrotational on" ;;
         "work") HDDOPTS="" ;;
     esac
+	
+	if [ "$CURR_PLTF" == "Linux" ]; then IMGOPTS='-relative'; fi
 
     VBoxManage internalcommands createrawvmdk -filename "$vimg" \
-        -rawdisk "$disk" -partitions $prts -mbr "$mbr" -relative
+        -rawdisk "$disk" -partitions $prts -mbr "$mbr" $IMGOPTS
     #>> RAW host disk access VMDK file /home/vishalj/.VirtualBox/WinXP.vmdk created successfully.
 
     VBoxManage storagectl "${VNM}" --name "IDE"  --add ide \
