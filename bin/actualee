@@ -11,18 +11,26 @@ FL="$PWD/$NM"
 wpause() { pause $? "$NAME" || exit $?; }
 
 # Names
-case "$NAME" in
+case "$NAME" in  # Names
+
     Makefile*) make -f "$NAME" ;;
     CMakeLists\.txt) sir       ;;
-*) case "$EXT" in # Extensions
+
+*) case "$EXT" in  # Extensions
+
     sh) "$FL" && wpause        ;;
     py) python "$FL"          ;;
     dot) dot -Tx11 "$NM"      ;;
-    *) case "$TYPE" in # Types
+
+    *) case "$TYPE" in  # Types
+
          text/x-python) "$FL" ;;
         application/x*) "$FL" ;;
                text/x*) "$FL" && wpause ;;
+               video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
+
         *) { stat -c '%A' "$FL" | grep -q x; } && "$FL" ;;
+
     esac
     ;;
 esac

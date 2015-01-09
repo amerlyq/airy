@@ -52,7 +52,7 @@ then
     fi
 
 else
-    VMs="/e/VMs"
+    VMs="${2:-/e/VMs}"
     VNM=Mint17hdd
     ost=Ubuntu_64
     disk='\\\\.\\GLOBALROOT\\ArcName\\multi(0)disk(0)rdisk(0)' #\\.\PhysicalDrive0
@@ -83,16 +83,6 @@ if [ "$1" == "-l" ]; then
 fi
 
 
-if [ "$1" == "-w" ]; then
-    mbr="${2:-/tmp}/${VNM}.mbr"
-    printf "\nCreating MBR for ${prts}:\n"
-    bprts=${prts:0:1}
-    install-mbr --verbose --drive 0x80 -e${bprts} --force "$mbr"
-    ls -l "$mbr"
-    printf "\nMBR generated successfully\n"
-    exit 0  # --------------------
-fi
-
 # =======================================================================
 
 printf "\n>>> ${VNM} guest image <<<\n"
@@ -113,7 +103,7 @@ if [ ! -f "$mbr" ]; then
     if ! which install-mbr >/dev/null; then
         sudo apt-get install -y mbr
     fi
-    printf "\n!!! Installing MBR for ${prts}. Be carefull! Don't modify disk own settings !!!\n\n"
+    printf "\n!!! Creating MBR for ${prts}. Be carefull! Don't modify disk own settings !!!\n\n"
     # Choose only from main 1-4 partitions, used in boot for neccessary OS
     # bprts=${prts//,/}; bprts=${bprts:0:2}
     bprts=${prts:0:1}
@@ -126,44 +116,9 @@ if [ ! -f "$mbr" ]; then
 
     ls -l "$mbr"
     # -rw-r--r-- 1 user user 512 2011-04-29 11:29 Win7.mbr
+    printf "\nMBR generated successfully\n"
 
 fi
-
-
-# Create virtual proxy to raw disk 'sda' partition '1',
-#   with specified mbr. Key '-relative' only for linux -- to put full access only on that partitions.
-if VBoxManage list vms | grep -q "\<${VNM}\>"; then
-    if [ "$1" == "-d" ] || [ "$1" == "-r" ]; then
-        VBoxManage unregistervm "${VNM}" #--delete
-    else
-        printf "\n!!! ERR: There are already such VM: ${VNM} !!!\n\n"
-        exit
-    fi
-fi
-
-
-if [ ! -f "$vbox" ]; then
-    VBoxManage createvm --name "${VNM}" --ostype "$ost" --basefolder "$VMs" --register
-
-    case "$CURR_PROF" in # 100MB recovery, Win7, Data
-        "home") VMOPTS="--memory 3072" ;;
-        "work") VMOPTS="--memory 2560 --macaddress1 ${WORK_MAC?Need_WORK_MAC}" ;;
-    esac
-    # Сеть придётся основательно подрихтовать, так чтобы наружу торчал
-    # правильный айпишник и мак из-под нутри виртуалки.
-    VBoxManage modifyvm "${VNM}" ${VMOPTS} --vram 128 --pae on         \
-        --accelerate3d on --accelerate2dvideo on                       \
-        --ioapic on --cpus 2 --rtcuseutc on --cpuexecutioncap 100      \
-        --hwvirtex on --nestedpaging on  --largepages on  --vtxvpid on \
-        --boot1 dvd --boot2 disk --firmware bios                       \
-        --clipboard bidirectional --monitorcount 1 --vrde off          \
-        --audio pulse --audiocontroller hda --usb on --usbehci off     \
-        --nic1 nat --nic2 none --nic3 none --nic4 none
-    # Intranet: --nic2 intnet  --intnet2 "InnerVMs"
-
-    sed -i '/ShowMiniToolBar/ s/\(value="\)\w\+"/\1no"/' "$vbox"
-fi
-
 
 # This iso could be unneccessary if mbr contains only one entry to boot...
 if [ ! -f "$grub" ]; then
@@ -195,6 +150,47 @@ if [ ! -f "$grub" ]; then
     # --modules="loadenv fshelp ls boot ntfs parttool chain search terminal"
     grub-mkrescue  --output="$grub" /tmp/iso #pc
 fi
+
+if [ "$1" == "-w" ]; then
+    printf "\n Prerequisit files for raw linux guest was generated.\n"
+    exit
+fi
+
+# =======================================================================
+
+# Create virtual proxy to raw disk 'sda' partition '1',
+#   with specified mbr. Key '-relative' only for linux -- to put full access only on that partitions.
+if VBoxManage list vms | grep -q "\<${VNM}\>"; then
+    if [ "$1" == "-d" ] || [ "$1" == "-r" ]; then
+        VBoxManage unregistervm "${VNM}" #--delete
+    else
+        printf "\n!!! ERR: There are already such VM: ${VNM} !!!\n\n"
+        exit 1
+    fi
+fi
+
+if [ ! -f "$vbox" ]; then
+    VBoxManage createvm --name "${VNM}" --ostype "$ost" --basefolder "$VMs" --register
+
+    case "$CURR_PROF" in # 100MB recovery, Win7, Data
+        "home") VMOPTS="--memory 3072" ;;
+        "work") VMOPTS="--memory 2560 --macaddress1 ${WORK_MAC?Need_WORK_MAC}" ;;
+    esac
+    # Сеть придётся основательно подрихтовать, так чтобы наружу торчал
+    # правильный айпишник и мак из-под нутри виртуалки.
+    VBoxManage modifyvm "${VNM}" ${VMOPTS} --vram 128 --pae on         \
+        --accelerate3d on --accelerate2dvideo on                       \
+        --ioapic on --cpus 2 --rtcuseutc on --cpuexecutioncap 100      \
+        --hwvirtex on --nestedpaging on  --largepages on  --vtxvpid on \
+        --boot1 dvd --boot2 disk --firmware bios                       \
+        --clipboard bidirectional --monitorcount 1 --vrde off          \
+        --audio pulse --audiocontroller hda --usb on --usbehci off     \
+        --nic1 nat --nic2 none --nic3 none --nic4 none
+    # Intranet: --nic2 intnet  --intnet2 "InnerVMs"
+
+    sed -i '/ShowMiniToolBar/ s/\(value="\)\w\+"/\1no"/' "$vbox"
+fi
+
 
 
 if [ ! -f "$vimg" ]; then
