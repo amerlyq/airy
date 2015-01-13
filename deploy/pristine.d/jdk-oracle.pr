@@ -8,7 +8,7 @@ if [ $? -eq 1 ]; then exit 1; fi
 # http://www.linuxrussia.com/2013/04/oracle-java-7-ubuntu-1304-1204-1210.html
 
 
-apt_noprompt openjdk-7-jdk openjdk-7-jdk:i386
+#apt_noprompt openjdk-7-jdk #openjdk-7-jdk:i386 == broken
 
 ppa_add 'ppa:webupd8team/java'
 apt_noprompt oracle-java7-installer
