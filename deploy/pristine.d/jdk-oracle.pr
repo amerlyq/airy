@@ -10,11 +10,30 @@ if [ $? -eq 1 ]; then exit 1; fi
 
 #apt_noprompt openjdk-7-jdk #openjdk-7-jdk:i386 == broken
 
+#ppa:eugenesan/java
 ppa_add 'ppa:webupd8team/java'
-apt_noprompt oracle-java7-installer
+apt_noprompt oracle-java8-installer
 
 java -version
 javac -version
 
 
-sudo update-java-alternatives -s java-7-oracle
+sudo update-java-alternatives -s java-8-oracle
+
+
+
+# IF ppa CAN'T DOWNLOAD java (ex: oracle changed cookies)
+# manually dld from offsite
+#   http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+#   sudo cp -t /var/cache/oracle-jdk8-installer ./jdk-8u25-linux-x64.tar.gz
+# comment lines in file /var/lib/dpkg/info/oracle-java7-installer.postinst
+#       echo "Downloading..."
+#       #rm -f $FILENAME
+#       #WGETRC=wgetrc wget $PARTNER_URL
+#       #    || fp_exit_with_error "download failed"
+#       #rm -f wgetrc
+#       echo "Download done."
+# do again
+#   sudo apt-get install oracle-java8-installer
+### FROM: http://rootzwiki.com/topic/23008-howto-install-java-7-on-ubuntu-1204/
+

@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# dvolbar - OSD Volume utility
+# thanks to http://bbs.archlinux.org/viewtopic.php?id=46608
+
+#Customize this stuff
+IFC=Master
+PIPE=/tmp/dvolpipe
+
+WND_BG="#43464f" # window
+WND_FG="#9ab8c2" # text/icon
+BAR_BG="#33363f"
+BAR_FG="#9ab8c2"
+
+WIDTH=250
+BAR_W=$(($WIDTH - 150))
+# HEIGHT=30
+FONT="-*-dina-medium-r-*-*-13-*-*-*-*-*-*-*"
+
+DESK_W=$(xdpyinfo | awk '$1 ~ /dimensions/ {split($2,arr,"x"); print int(arr[1])}')
+DESK_H=$(xdpyinfo | awk '$1 ~ /dimensions/ {split($2,arr,"x"); print int(arr[2])}')
+XPOS=$((($DESK_W / 2) - ($WIDTH / 2)))
+YPOS=$(($DESK_H / 2))
+
+
+ICON_VOL=~/.dzen2/thayer/vol-hi.xbm
+ICON_MUTE=~/.dzen2/thayer/vol-mute.xbm
+ICON=$ICON_VOL
+
+
+usage() { printf "
+usage: dvol [option] [argument] [interface]
+
+Options:
+     -i, --increase - increase volume by 'argument'
+     -d, --decrease - decrease volume by 'argument'
+     -t, --toggle   - toggle mute on and off
+     -g, --get      - show the current volume
+     -h, --help     - display this
+"; exit; }
+
+checkarg() {
+    [ -z "$1" ] && printf "No argument specified for increase.\n"  && exit 1
+    [ -n "${1//[0-9]/}" ] && printf "The argument needs to be an integer.\n" && exit 1
+}
+
+#Argument Parsing
+PROP=set
+case "${1}" in
+  -g|--get) PROP='get' ;;
+  -t|--toggle) AMIXARG="toggle"; ;;
+  -i|--increase) checkarg ${2}; AMIXARG="${2}%+"; shift ;;
+  -d|--decrease) checkarg ${2}; AMIXARG="${2}%-"; shift ;;
+  -h|--help|'') usage ;;
+   *) printf "Unrecognized option '$1'\n"; usage ;;
+esac
+
+
+#Actual volume changing
+VARS=$(amixer -M -D pulse $PROP "${2:-$IFC}" "$AMIXARG" |
+    sed -n '$s/.*\[\([0-9]\+\)%\].*\[\([onf]\{2,3\}\)\].*/VOL=\1;MUTE=\2/p')
+eval $VARS
+
+if [ "$MUTE"=="off" -o "$VOL"=="0" ]; then ICON=$ICON_MUTE; else ICON=$ICON_VOL; fi
+
+
+#Using named pipe to determine whether previous call still exists
+#Also prevents multiple volume bar instances
+if [ ! -e "$PIPE" ]; then
+    mkfifo "$PIPE"
+    #-h "$HEIGHT" -fn "$FONT"
+    (dzen2 -tw $WIDTH -x "$XPOS" -y "$YPOS" -w "$WIDTH" -bg "$WND_BG" -fg "$WND_FG" -fn "$FONT" < "$PIPE"
+        rm -f "$PIPE") &
+fi
+
+
+#Feed the pipe!
+(printf "$VOL" | dzen2-gdbar -l "$IFC ^i(${ICON}) " -fg "$BAR_FG" -bg "$BAR_BG" -w "$BAR_W"
+    sleep 0.7) > "$PIPE" &
+

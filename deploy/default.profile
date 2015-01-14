@@ -34,7 +34,7 @@ CURR_PKG_LIST=""
 ### SDK ###
 JAVA32_HOME=/usr/lib/jvm/java-7-openjdk-i386
 JAVA64_HOME=/usr/lib/jvm/java-7-openjdk-amd64
-JAVA64_ORACLE_HOME=/usr/lib/jvm/java-7-oracle
+JAVA64_ORACLE_HOME=/usr/lib/jvm/java-8-oracle
 JAVA_HOME=$JAVA64_ORACLE_HOME
 #SDL2=$CURR_DIR_PKG/SDL
 

@@ -1,6 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 # CARD="${1:-0}"
 # MIXER="${2:-default}" # use pulse for pulseaudio, default is alsa
 
-amixer -M -D pulse get Master | sed -n '/.*\[\([0-9]\+%\)\].*/{s//\1/p;q}'
+case $BLOCK_BUTTON in
+    1) ARG='-d 5' ;;
+    2) ARG='-t'   ;;
+    3) ARG='-i 5' ;;
+    *)  ;;
+esac
+${ARG+~/.i3/ext/dvolbar $ARG}
+
+VARS=$(amixer -M -D pulse get Master |
+    sed -n '$s/.*\[\([0-9]\+\)%\].*\[\([onf]\{2,3\}\)\].*/VOL=\1;MUTE=\2/p')
+eval $VARS
+
+if [ "$MUTE" == "off" ]; then color="#EE0000"; fi
+printf "%s\n%s\n%s" "$VOL%" "$VOL%" "${color:+$color\n}"

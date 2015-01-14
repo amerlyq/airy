@@ -187,7 +187,7 @@ w_header "Mode: System"
 wstr "set \$system_mode i3: re(c)onf, re(n)ew, (e)xit || System: (l)ock, log(o)ut, (s)uspend, (h)ibernate, (r)eboot, shu(t)down"
 
 wk_mode 'Shift+Escape' "\$system_mode"
-wmode_begin 'Delete' "\$system_mode"
+wmode_begin 'Control+Delete' "\$system_mode"
 wlistf "$t$bs %s $exno ~/.i3/ext/i3exit %s, \$mdef" "l o s h r t" \
     "lock logout suspend hibernate reboot shutdown"
 
@@ -291,7 +291,7 @@ wlistf "$bs %s $exno amixer -q -D pulse set Master %s && \$upd volume" \
     "XF86AudioRaiseVolume XF86AudioLowerVolume XF86AudioMute" \
     '2%+ unmute' '2%- unmute' 'toggle'
 wstr ''
-wlistf "$bm+%s $exno amixer -q -D pulse set Master %s && \$upd volume" \
+wlistf "$bm+%s $exno amixer -q -D pulse set Master %s && \$upd volume && ~/.i3/ext/dvolbar -g" \
     "Home Prior Next End" \
     '20% unmute' '2%+ unmute' '2%- unmute' 'toggle'
 # pactl set-sink-volume 0 -- +10%

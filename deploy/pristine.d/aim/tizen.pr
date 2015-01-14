@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Necessary packets for tizen-sdk
+sudo apt-get install expect libudev-dev
+
+# sdb needs libudev.so.0
+sudo ln -sfv libudev.so.1 /lib/x86_64-linux-gnu/libudev.so.0
+
+# Install Oracle Java (OpenJDK isn't compatible)
+sudo apt-add-repository 'ppa:webupd8team/java' && sudo apt-get update
+sudo apt-get install oracle-java8-installer
+
+
+printf "
+>>> In Launched ./tizen-sdk-ubuntu64-v2.2.71.bin
+  -> 'Install the new Tizen SDK version'
+  -> 'SDK Image' {~/share/Tizen/Images/tizen-sdk-image-2.2.1-ubuntu64.zip}
+"
+
+printf '
+!!! Add those vars to yours .bashrc ::
+    export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+    export TRUSTZONE_SDK_DIR=~/Gaia/TZ/trustzone-tee
+    export PATH=$TRUSTZONE_SDK_DIR/toolchain/cortex-cross-tools/bin:$PATH
+    export PATH=$PATH:/home/surc/Tizen/tizen-sdk/tools
+'
