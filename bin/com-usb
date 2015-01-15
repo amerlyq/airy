@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# To use minicom in interactive regime, disable HW flow control, as our COM
+# doesn't have neccessary wires and never receives "OK to send" signal.
 
 # Dump params, -g -- print bit-str
 #   sudo stty -a -F /dev/ttyUSB0
