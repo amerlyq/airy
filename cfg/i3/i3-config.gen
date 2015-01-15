@@ -14,8 +14,7 @@ else case ${1:-$CURR_THEME} in
 #  transparent) wstr '#define Transparent' ;;
 #       opaque) wstr '#define Opaque' ;;
        light) thm_nm="snow"  ;;
-        dark) thm_nm="grass" ;;
-           *) thm_nm="grass" ;;
+      dark|*) thm_nm="grass" ;;
 esac; fi
 source ~/.i3/themes/"${thm_nm}.i3"
 
@@ -64,9 +63,12 @@ eflo="$eurx -name Float"
 
 # ---- Writers ----
 w_header(){ wprf "\n### $1 ###\n"; }
-wk_mode()   { wstr "$bm+$1 mode \"$2\""; }
+wk_mode(){ wstr "$bm+$1 mode \"$2\""; }
 wmode_begin(){ wk_mode "$1" "$2"; wstr "mode \"$2\" {"; }
-wmode_end()  { wprf "\n$t$bs Return \$mdef \n$t$bs Escape \$mdef \n$t$bs space \$mdef \n}\n"; }
+wmode_end(){ wprf "
+    $bs Return \$mdef \n$t$bs Escape \$mdef
+    $bs space \$mdef \n$t$bs q \$mdef
+}\n"; }
 
 
 # ----- Lists -----
@@ -130,12 +132,12 @@ wlistf "$bm+Shift+%s move %s $smove" "$hjkl $Arrows" "$arrows $arrows"
 wprf "\n### ================== Mark/Goto =================== ###\n"
 # keybindings for marking and jumping to clients
 
-#bindsym $mod+Shift+F1 mark F1
-#bindsym $mod+F1 [con_mark="F1"] focus
-#bindsym $mod+Control+F1 unmark F1
+# Jump exactly to the next open VIM instance
+wstr "$bm+v [class=\"(?i)$term\" title=\"(?i)vim\"] focus"
+wstr "$bm+r [class=\"(?i)$term\" title=\"(?i)ranger\"] focus"
 
 w_header "Navigation: Mark"
-wmode_begin 't' "Mark this: 0..9, Mod+T"
+wmode_begin 't' "Mark this: 0..9, <mod+T>"
 wprf "$t$bm+t $exno i3-input -F 'mark %%s' -P 'Mark name: ', \$mdef\n\n"
 wlistf "$t$bs %s mark mrk%s, \$mdef" "$digits" "$digits"
 wmode_end
@@ -146,16 +148,18 @@ wprf "$t$bm+g $exno i3-input -F '[con_mark=%%s] focus' -P 'Go to mark: ', \$mdef
 wlistf "$t$bs %s [con_mark=\"mrk%s\"] focus, \$mdef" "$digits" "$digits"
 wmode_end
 
-# direction = <up, down, left, right, width or height>
-# resize <grow|shrink> <direction> [<px> px [or <ppt> ppt]]
-
-# Jump exactly to the next open VIM instance
-wstr "$bm+v [class=\"(?i)$term\" title=\"(?i)vim\"] focus"
-wstr "$bm+r [class=\"(?i)$term\" title=\"(?i)ranger\"] focus"
+w_header "Navigation: <F1..12>"
+for i in {1..12}; do wprf "
+$bm+F$i [con_mark=\"mrkF$i\"] focus
+$bm+Shift+F$i mark mrkF$i
+$bm+Shift+Control+F$i unmark mrkF$i
+"; done
 
 
 wprf "\n### =================== Modify ===================== ###\n"
 w_header "Containers: Modify"
+# direction = <up, down, left, right, width or height>
+# resize <grow|shrink> <direction> [<px> px [or <ppt> ppt]]
 
 smoveprecise="5 px"
 ssize="10 px or 2 ppt"
@@ -184,54 +188,43 @@ wstr "$bm+Shift+r restart"
 wstr "$bm+Shift+x $exno ~/.i3/ext/i3exit lock"
 
 w_header "Mode: System"
-wstr "set \$system_mode i3: re(c)onf, re(n)ew, (e)xit || System: (l)ock, log(o)ut, (s)uspend, (h)ibernate, (r)eboot, shu(t)down"
+wstr "set \$system_mode <i3> : \
+(r)eboot, shu(t)down, (l)ock, log(o)ut, (s)uspend, (h)ibernate | re(c)onf, re(n)ew, (e)xit"
 
 wk_mode 'Shift+Escape' "\$system_mode"
 wmode_begin 'Control+Delete' "\$system_mode"
 wlistf "$t$bs %s $exno ~/.i3/ext/i3exit %s, \$mdef" "l o s h r t" \
     "lock logout suspend hibernate reboot shutdown"
-
 # c - reload the configuration file
 # n - restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 # e - logs you out of your X session
-#, mode \"default\"\"
 wlistf "$t$bs %s %s" "c n" "reload restart"
-wstr ''
 wstr "$t$bs e $exno ~/.i3/ext/i3exit logout"
 wmode_end
 
-# lock screen and suspend
-#bindsym $mod+Control+s exec i3lock && dbus-send --system --print-reply --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.Suspend
 
 wprf "\n### ================== Launchers =================== ###\n"
-
-pcli="r v n h"
-bcli="ranger vim ncmpcpp htop"
-pgui="g t z w"
-bgui="gvim gvim.tex zathura wuala"
-
 # xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
-
-w_header "Mode: Open"
-wmode_begin 'o' "Open: $pcli, $pgui, p l a s, o(urxvt)"
-wlistf "$t$bs %s $eflo -e %s, \$mdef" "$pcli w p l o" $bcli "w3m google.com" "gksudo powertop" "gksudo tlp start" "$eurx"
-wstr ''
-wstr "$t$bs m $exno ~/.i3/ext/dmenu_mpd_fmove, \$mdef"
-wstr ''
 
 # Autochoose filemng by OS version.
 STD_FILEMGR="pcmanfm"
 command -v $STD_FILEMGR >/dev/null 2>&1 || STD_FILEMGR="nemo --no-desktop"
 
-#TODO: remove 's' -- <sound>.py
-wlistf "$t$bs %s $exno %s, \$mdef" "$pgui a s e" $bgui "$STD_FILEMGR" "/usr/lib/cinnamon-settings/cinnamon-settings.py sound" "elona"
+w_header "Mode: Open"
+wmode_begin 'o' "<Open> : [n]cmpcpp, [h]top | [p]owertop, [t]lp | [g]vim, [f]m, [s]ets | [m]usic"
+wlistf "$t$bs %s $eflo -e %s, \$mdef" "n h p t" \
+    ncmpcpp htop "gksudo powertop" "gksudo tlp start"
+wlistf "$t$bs %s $exno %s, \$mdef" "g f m Shift+s"  \
+    gvim "$STD_FILEMGR" "~/.i3/ext/dmenu_mpd_fmove" \
+    "/usr/lib/cinnamon-settings/cinnamon-settings.py sound"
 wmode_end
 
+
 w_header "Mode: Focus"
-wmode_begin 'y' "Focus: $pcli, $pgui"
-wlistf "$t$bs %s [class=\"(?i)$term\" title=\"(?i)%s\"] focus, \$mdef" "$pcli" "$bcli"
+wmode_begin 'y' "<Focus> : [v]im, [r]anger, [n]cmpcpp, [h]top | [g]vim"
+wlistf "$t$bs %s [class=\"(?i)$term\" title=\"(?i)%s\"] focus, \$mdef" "v r n h" "vim ranger ncmpcpp htop"
 wstr ''
-wlistf "$t$bs %s [class=\"(?i)%s\"] focus, \$mdef" "$pgui" "$bgui"
+wlistf "$t$bs %s [class=\"(?i)%s\"] focus, \$mdef" "g" "gvim"
 wmode_end
 
 # There also is the (new) i3-dmenu-desktop which only displays applications shipping a .desktop file. It is a wrapper around dmenu, so you need that installed.
@@ -316,7 +309,6 @@ wstr "assign [class=\"^Firefox$\"]    \$w4"
 wstr "assign [class=\"^Pale\ moon$\"] \$w4"
 # wstr "assign [title=\"^Win7hdd\"]     \$w7"
 wstr "assign [class=\"^Wine$\"]       \$w9"
-wstr "assign [class=\"^Wuala$\"]      \$w10"
 wstr "assign [class=\"^Steam\"]       \$w9"
 wstr "assign [class=\"^t-engine64\"]  \$w8"
 wstr ''

@@ -19,15 +19,9 @@ toggle() {
     if [ -z "$track" ]; then track="stopped"; fi
 }
 
-launch() {
-    if pidof ncmpcpp >/dev/null
-    then { kill -s TERM $(pidof -c ncmpcpp) & }
-    else { 2>/dev/null 1>/dev/null i3-msg 'exec --no-startup-id urxvt -name Float -e ncmpcpp' & }; fi
-}
-
 case $BLOCK_BUTTON in
     1) toggle ;;
-    3) launch ;;
+    3) ~/.i3/ext/floaty ncmpcpp ;;
     *) ;;
 esac #x=$BLOCK_X y=$BLOCK_Y
 

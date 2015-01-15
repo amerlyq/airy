@@ -40,7 +40,7 @@ force_focus_wrapping no
 #  Assume you are on workspace "1: www" and switch to "2: IM" using mod+2 because somebody sent you a message. You don’t need to remember where you came from now, you can just press $mod+2 again to switch back to "1: www".
 workspace_auto_back_and_forth yes
 
-#floating_minimum_size 75 x 50
+floating_minimum_size 100 x 80
 #floating_maximum_size -1 x -1
 
 ### New wksp ###
@@ -50,6 +50,7 @@ hide_edge_borders none # <none|vertical|horizontal|both>
 # border <normal|pixel> [0-9], only 'normal' with titlebar
 new_window pixel 1
 new_float pixel 1
+
 
 # ==================== Appearance ===========================
 
@@ -72,7 +73,6 @@ bindsym $mod+b border toggle
 # ==========================================================
 
 # kill focused window
-
 bindsym $mod+backslash kill
 # kill all wdws on wksp
 bindsym $mod+Control+backslash focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill, workspace back_and_forth
@@ -81,6 +81,7 @@ bindsym $mod+Shift+q kill
 bindsym $mod+semicolon focus parent
 bindsym $mod+Shift+semicolon focus child
 #bindsym $mod+apostrophe focus child
+bindsym $mod+x [urgent=latest] focus
 
 bindsym $mod+Tab workspace next_on_output
 bindsym $mod+Shift+Tab workspace prev_on_output
@@ -92,9 +93,6 @@ bindsym $mod+Control+Right workspace next
 bindsym $mod+a workspace back_and_forth
 bindsym $mod+Control+a move container to workspace back_and_forth; workspace back_and_forth
 bindsym $mod+Control+Shift+a move container to workspace back_and_forth
-
-#i3-msg 'rename workspace "1: www" to "10: www"'
-bindsym $mod+z exec i3-input -P 'WS Name: ' -F 'exec --no-startup-id ~/.i3/ext/rename_current_workspace "%s"'
 
 ### ==================== Workspaces ===================== ###
 
@@ -118,6 +116,7 @@ bindsym $mod+z exec i3-input -P 'WS Name: ' -F 'exec --no-startup-id ~/.i3/ext/r
 # Toggle show/hide for the first scratchpad window (you can have >1 scratchpad container)
 bindsym $mod+i scratchpad show
 bindsym $mod+Shift+i move scratchpad
+bindsym $mod+Control+i floating toggle
 
 # By default, scratchpads only contain a single window. However, containers can also be made a scratchpad.
 # Create a new container (for example, Mod+Enter), split it (Mod+v) and create another container. Focus the parent (Mod+a), split in the opposite direction (Mod+h), and create again.
@@ -129,15 +128,13 @@ bindsym $mod+Shift+i move scratchpad
 # Change focus between tiling / floating windows #toggle/enable
 # Toggle tiling / floating (also remove current window from scratchpad)
 # mod+Control+space don't work with my xkb (no keycode!), use space for some more useful
-bindsym $mod+Shift+f focus mode_toggle
-bindsym $mod+Control+f floating toggle
+bindsym $mod+w focus mode_toggle
+bindsym $mod+Shift+w floating toggle
 
 # Show the sup-mail scratchpad window, if any.
 # bindsym mod4+s [title="^Sup ::"] scratchpad show
 
-# switching to the appropriate workspace and setting focus to the windows
-# Need module such as launcher with the same names but for focusing
-
+# Need module such as launcher with the same names but for focusing. Use dmenu?
 
 ### ===================== Multi-monitors ===================== ###
 # SEE: configuring your monitors and 'xrandr' usage
@@ -152,15 +149,16 @@ bindsym $mod+Control+f floating toggle
 
 # Move the current workspace to the next output
 # (effectively toggles when you only have two outputs)
-bindsym $mod+bracketleft  focus output left
-bindsym $mod+bracketright focus output right
+bindsym $mod+bracketleft          focus output left
+bindsym $mod+bracketright         focus output right
 bindsym $mod+Control+bracketleft  move workspace to output left
 bindsym $mod+Control+bracketright move workspace to output right
-bindsym $mod+Control+Shift+bracketright move container to output right
-bindsym $mod+Control+Shift+bracketleft  move container to output left
+bindsym $mod+Shift+bracketright   move container to output right; focus output right
+bindsym $mod+Shift+bracketleft    move container to output left;  focus output left
+
 # Focusing wksps in pairs on two monitors
-bindsym $mod+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
-bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
+bindsym $mod+Control+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
+bindsym $mod+Control+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
 
 ## Put this window on the presentation output.
 #bindsym $mod+x move container to output VGA1
@@ -173,6 +171,8 @@ bindsym $mod+Shift+bracketright focus output left; workspace next_on_output; foc
 # bindcode 232 exec xbacklight -dec 20
 # bindcode 251 exec xbacklight -set 86
 
-bindsym $mod+x [urgent=latest] focus
+## Renaming
+#i3-msg 'rename workspace "1: www" to "10: www"'
+bindsym $mod+z exec i3-input -P 'WS Name: ' -F 'exec --no-startup-id ~/.i3/ext/rename_current_workspace "%s"'
 bindsym $mod+Insert exec --no-startup-id ~/.i3/ext/rename_as_focused
 

@@ -59,8 +59,8 @@ bindkey -s -M vicmd ',d' '0d$iq\n'
 export KEYTIMEOUT=20
 bindkey -s ',d' '^Uq\n'
 bindkey -s ',s' '^Us\n'
-bindkey -s 'lf' '^['
-bindkey -s 'kd' '^M'
+# bindkey -s 'lf' '^['
+# bindkey -s 'kd' '^M'
 
 alias sh-rc-reload="source ~/.zshrc && echo 'ZSH config reloaded'"
 bindkey -s -M vicmd '^[[24~' '0d$ish-rc-reload\n\e'

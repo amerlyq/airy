@@ -1,0 +1,11 @@
+#!/bin/bash
+
+## Launch term app in float window
+# TODO: autodetect term app or gui and launch appropriately
+
+APP="$1"
+
+PID=$(pidof -c $APP)
+if [ -n "$PID" ]; then kill -s TERM $PID & exit; fi
+
+i3-msg "exec --no-startup-id urxvt -name Float -e \"$APP\"; sleep 1" >/dev/null 2>&1 &

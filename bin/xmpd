@@ -1,14 +1,25 @@
 #!/usr/bin/env bash
+source ~/.bash_export
+
+loopback() {
+    local cfg=~/".bash/../sets/mpd-own.conf"
+    if ! pgrep -f "mpd \S+\.${cfg##*.}"; then
+        if pgrep mpd >/dev/null; then mpd --kill; fi
+        mpd "$cfg"
+    fi
+    ncmpcpp
+}
+
+case "$CURR_PROF" in
+  home) loopback; exit ;;
+laptop) srv=lsir ;;
+     *) srv=sir  ;;
+esac
 
 SESSION='sir-mpd'
 pane_name()  { tmux send-keys "printf '\\033]2;%s\\033\\\\' '$1'" 'C-m'; }
 [ "$1" == '-k' ] && tmux kill-session -t $SESSION
 
-if [ "$CURR_PROF" == laptop ]; then
-    srv=lsir
-else
-    srv=sir
-fi
 
 if ! tmux has-session -t $SESSION; then
     tmux new-session -d -s $SESSION -n mpd

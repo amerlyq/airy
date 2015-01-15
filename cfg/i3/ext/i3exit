@@ -31,6 +31,10 @@ case "$1" in
         # I was able to solve problem by using the following commands:
         # (sleep 0.5 && systemctl suspend) &
         lock && sudo suspend
+
+        # lock screen and suspend
+        #bindsym $mod+Control+s exec i3lock && dbus-send --system --print-reply --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.Suspend
+
         ;;
     hibernate)
         lock && sudo hibernate

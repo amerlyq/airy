@@ -8,7 +8,6 @@ noremap ' `
 noremap ` '
 
 " Pinky stratching
-noremap ,k :<C-U>!!<CR>
 noremap ,. :
 cnoremap <C-o> <C-p>
 
