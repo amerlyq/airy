@@ -34,6 +34,7 @@ let g:syntastic_filetype_map = { 'latex': 'tex',
 " let g:syntastic_c_cflags = '-I/usr/src/linux-headers-$(uname -r)/include'
 
 let g:syntastic_cpp_compiler = 'g++'
+let g:syntastic_cpp_compiler_options = '-std=c++11 '
 let g:syntastic_cpp_check_header = 0
 let g:syntastic_cpp_include_dirs = [ 'inc', 'include', '../inc', '../include', '../../include' ]
 let g:syntastic_cpp_remove_include_errors = 1

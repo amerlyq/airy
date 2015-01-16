@@ -29,7 +29,7 @@ fi
 
 if [ ! "$1" == "-w" ] && [ "$CURR_PLTF" == "Linux" ]
 then
-	sudo="sudo"
+    sudo="sudo"
     VMs="$HOME/VMs"
     VNM=Win7hdd
     ost=Windows7_64
@@ -53,7 +53,7 @@ then
     fi
 
 else
-	sudo=""
+    sudo=""
     VMs="${2:-/e/VMs}"
     VNM=Mint17hdd
     ost=Ubuntu_64
@@ -178,7 +178,7 @@ if [ ! -f "$vbox" ]; then
         "home") VMOPTS="--memory 3072" ;;
         "work") VMOPTS="--memory 2560 --macaddress1 ${WORK_MAC?Need_WORK_MAC}" ;;
     esac
-	case "$CURR_PLTF" in 
+    case "$CURR_PLTF" in
         "Linux") VMOPTS="$VMOPTS --audio pulse  --audiocontroller hda  --accelerate2dvideo on"  ;;
         "MINGW") VMOPTS="$VMOPTS --audio dsound --audiocontroller ac97 --accelerate2dvideo off" ;;
     esac
@@ -204,8 +204,8 @@ if [ ! -f "$vimg" ]; then
         "home") HDDOPTS="--nonrotational on" ;;
         "work") HDDOPTS="" ;;
     esac
-	
-	if [ "$CURR_PLTF" == "Linux" ]; then IMGOPTS='-relative'; fi
+
+    if [ "$CURR_PLTF" == "Linux" ]; then IMGOPTS='-relative'; fi
 
     VBoxManage internalcommands createrawvmdk -filename "$vimg" \
         -rawdisk "$disk" -partitions $prts -mbr "$mbr" $IMGOPTS
