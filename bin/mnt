@@ -46,8 +46,8 @@ domnt() {
         if [ -d "$MNT/$lbl" ]; then
             sudo rmdir -v "$MNT/$lbl"
         fi
-        sudo mkdir -p "$MNT/$lbl" && \
-            sudo mount vfat "$path" "$MNT/$lbl" -o codepage=866,iocharset=utf8
+        sudo mkdir -p "/media/$CURR_USER/$lbl" && \
+            sudo mount -t vfat "$path" "/media/$CURR_USER/$lbl" -o rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro
             # mount -t vfat /dev/sdb1 /media/tmp -o codepage=866,utf8
         echo "$MNT/$lbl"
     fi
