@@ -56,7 +56,7 @@ case "$BLOCK_BUTTON" in
         *) ifc=eth0 ;; esac
 
         ipaddr=$(ip addr show ${ifc} | sed -n 's|.*\s*inet \([0-9\.]*\)/.*|\1|p')
-        text="$state (${ssid} ${mbs}Mb/s) $ipaddr"; color='#BBBB88'
+        text="$state (${ssid} ${mbs}Mb/s) $ipaddr"; color=''
         ;;
 
     3) text=$( awk 'BEGIN { printf "↓%sM ↑%sM",'"
@@ -64,11 +64,11 @@ case "$BLOCK_BUTTON" in
         "'}' ); text="$state $text"; color='#DD9900'
         ;;
 
-    *) text="$state ↓${bx[0]} ↑${bx[1]}"; color='#00DD00' ;;
+    *) text="$state ↓${bx[0]} ↑${bx[1]}"; color='#00AA00' ;;
 esac
 # total=(bx0+bx1) #↕
 
-printf "$text\n$text\n$color"
+printf "$text\n$text\n${color:+$color\n}"
 
 
 # watch -n 1 cat /proc/net/wireless | periodically calling

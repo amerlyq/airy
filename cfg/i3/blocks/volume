@@ -4,9 +4,9 @@
 # MIXER="${2:-default}" # use pulse for pulseaudio, default is alsa
 
 case $BLOCK_BUTTON in
-    1) ARG='-d 5' ;;
-    2) ARG='-t'   ;;
-    3) ARG='-i 5' ;;
+    1) ARG='-t' ;;
+    # 2) ARG='-i 5'   ;;
+    3) ARG='-g' ;;
     *)  ;;
 esac
 ${ARG+~/.i3/ext/dvolbar $ARG}
@@ -16,4 +16,5 @@ VARS=$(amixer -M -D pulse get Master |
 eval $VARS
 
 if [ "$MUTE" == "off" ]; then color="#EE0000"; fi
-printf "%s\n%s\n%s" "$VOL%" "$VOL%" "${color:+$color\n}"
+
+printf "$VOL%%\n$VOL%%\n${color:+$color\n}"

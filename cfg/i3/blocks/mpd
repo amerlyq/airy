@@ -26,9 +26,9 @@ case $BLOCK_BUTTON in
 esac #x=$BLOCK_X y=$BLOCK_Y
 
 case "$mode" in
-    playing) prefix='▶'; color='#FF44FF' ;;
+    playing) prefix='▶'; color='#CC44AA' ;;
      paused) prefix='∥'; color='#4444FF' ;;
-          *) prefix='' ; color='#FF4400' ;;
+          *) prefix='' ; color='#CC4400' ;;
 esac
 
 if [ "$mode" == "playing" ] && [ $remain -le 20 ] && [ $remain -gt 15 ]

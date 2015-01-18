@@ -22,8 +22,9 @@ usage=$( awk 'BEGIN { printf("%5.2f\n", '"100*(${c[0]} - ${p[0]})/(${c[1]} - ${p
 form="${usage}%"
 
 usage="${usage%.*}"
-if [ $usage -ge 25 ]; then color="#FFAC00";
-elif [ $usage -ge 75 ]; then color="#FF0000"; fi
+  if [ $usage -ge 25 ]; then color="#008888";
+elif [ $usage -ge 50 ]; then color="#EE8800";
+elif [ $usage -ge 75 ]; then color="#CC0000"; fi
 
 # if >= t_crit : exit 33;
 printf "%s\n%s\n%s\n" "$form" "$form" "$color"
