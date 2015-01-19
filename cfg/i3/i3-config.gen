@@ -283,8 +283,8 @@ w_header "Control: volume"
 wlistf "$bs %s $exno amixer -q -D pulse set Master %s && \$upd volume" \
     "XF86AudioRaiseVolume XF86AudioLowerVolume XF86AudioMute" \
     '2%+ unmute' '2%- unmute' 'toggle'
-wstr ''
-wlistf "$bm+%s $exno amixer -q -D pulse set Master %s && \$upd volume && ~/.i3/ext/dvolbar -g" \
+wstr '' # && ~/.i3/ext/dvolbar -g
+wlistf "$bm+%s $exno amixer -q -D pulse set Master %s && \$upd volume" \
     "Home Prior Next End" \
     '20% unmute' '2%+ unmute' '2%- unmute' 'toggle'
 # pactl set-sink-volume 0 -- +10%
