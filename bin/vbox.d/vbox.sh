@@ -9,19 +9,6 @@ PATH="/c/Program Files/Oracle/VirtualBox:$PATH"
 #VBoxManage setextradata x "VBoxInternal/Devices/pcnet/0/LUN#0/Config/ssh/GuestPort" 22
 #VBoxManage setextradata x "VBoxInternal/Devices/pcnet/0/LUN#0/Config/ssh/HostPort"  2222
 
-# Creating new vm 7.1.3 Step by step:
-# VBoxManage list ostypes
-# VBoxManage createvm --name "Windows XP" --ostype WindowsXP --register
-# VBoxManage modifyvm "${VNM}" ...
-# VBoxManage createhd --filename "WinXP.vdi" --size 10000
-# VBoxManage storagectl "Windows XP" --name "IDE Controller" --add ide --controller PIIX4
-# VBoxManage storageattach "Windows XP" --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium "WinXP.vdi"
-# VBoxManage storageattach "Windows XP" --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium /full/path/to/iso.iso
-# VBoxHeadless --startvm "Windows XP"
-
-# 7.1.4 Remote USB
-# Insert Flash-drive on one copm, use it on another!
-
 add_port_forward() {
     if [ $# -eq 3 ]; then
         echo "Add $1 port forwarding rule '$2,$3'"
@@ -80,16 +67,17 @@ fi
 add_port_forward "${VNM}" "Port_ssh" "tcp,,$SIR_PORT,,22"
 
 echo "W: vbox '${VNM}' settings"
+
 # Only if Extensions installed
 # --usbehci on
-# Wrong???
-#--audio oss
-#  used when starting this VM; see chapter 8.12, VBoxManage startvm,
-#--defaultfrontend default|<name>
+# --defaultfrontend default|<name>
 # VBoxManage startvm "VM name" --type headless
 # Alt: but make background yourself!
 # VBoxHeadless --startvm <uuid|name>  --vrde off
 
+
+# 7.1.4 Remote USB
+# Insert Flash-drive on one copm, use it on another!
 
 ## 8.8.2 Networking settings :
 # My build server model:

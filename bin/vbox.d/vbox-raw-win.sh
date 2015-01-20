@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+### MBR unnecessary if use whole disk, but you need grub. And vice versa.
+### But for partitioned disk Windows and Office will lost activations.
+
+
 # GUI: $ VirtualBox
 
 # Man
@@ -100,27 +104,26 @@ if [ "$1" == "-r" ]; then rm -rf "${vimg%/*}"; fi
 mkdir -p "${vimg%/*}"
 
 
-# Create MBR to use with Win guest. Otherwise you get "grub> Unknown format"
-if [ ! -f "$mbr" ] && [ "$CURR_PLTF" == "Linux" ]; then
-    if ! which install-mbr >/dev/null; then
-        sudo apt-get install -y mbr
-    fi
-    printf "\n!!! Creating MBR for ${prts}. Be carefull! Don't modify disk own settings !!!\n\n"
-    # Choose only from main 1-4 partitions, used in boot for neccessary OS
-    # bprts=${prts//,/}; bprts=${bprts:0:2}
-    bprts=${prts:0:1}
-
-    # -d 0x80 -- boot a first drive (starting from 128), not first disk
-    # -e12 -- try to boot from partitions 1,2 (enable them)
-    install-mbr --verbose --drive 0x80 -e${bprts} --force "$mbr"
-    # dd if=/dev/sda bs=512 count=1 of="$mbr"
-    # cp ~/tmp/win7mbr512x1 "$mbr"
-
-    ls -l "$mbr"
-    # -rw-r--r-- 1 user user 512 2011-04-29 11:29 Win7.mbr
-    printf "\nMBR generated successfully\n"
-
-fi
+# # Create MBR to use with Win guest. Otherwise you get "grub> Unknown format"
+# if [ ! -f "$mbr" ] && [ "$CURR_PLTF" == "Linux" ]; then
+#     if ! which install-mbr >/dev/null; then
+#         sudo apt-get install -y mbr
+#     fi
+#     printf "\n!!! Creating MBR for ${prts}. Be carefull! Don't modify disk own settings !!!\n\n"
+#     # Choose only from main 1-4 partitions, used in boot for neccessary OS
+#     # bprts=${prts//,/}; bprts=${bprts:0:2}
+#     bprts=${prts:0:1}
+#
+#     # -d 0x80 -- boot a first drive (starting from 128), not first disk
+#     # -e12 -- try to boot from partitions 1,2 (enable them)
+#     install-mbr --verbose --drive 0x80 -e${bprts} --force "$mbr"
+#     # dd if=/dev/sda bs=512 count=1 of="$mbr"
+#     # cp ~/tmp/win7mbr512x1 "$mbr"
+#
+#     ls -l "$mbr"
+#     # -rw-r--r-- 1 user user 512 2011-04-29 11:29 Win7.mbr
+#     printf "\nMBR generated successfully\n"
+# fi
 
 # This iso could be unneccessary if mbr contains only one entry to boot...
 if [ ! -f "$grub" ] && [ "$CURR_PLTF" == "Linux" ]; then
@@ -205,10 +208,11 @@ if [ ! -f "$vimg" ]; then
         "work") HDDOPTS="" ;;
     esac
 
-    if [ "$CURR_PLTF" == "Linux" ]; then IMGOPTS='-relative'; fi
+    # if [ "$CURR_PLTF" == "Linux" ]; then IMGOPTS='-relative'; fi
 
-    VBoxManage internalcommands createrawvmdk -filename "$vimg" \
-        -rawdisk "$disk" -partitions $prts -mbr "$mbr" $IMGOPTS
+    VBoxManage internalcommands createrawvmdk -filename "$vimg" -rawdisk "$disk"
+    # VBoxManage internalcommands createrawvmdk -filename "$vimg" \
+    #     -rawdisk "$disk" -partitions $prts -mbr "$mbr" $IMGOPTS
     #>> RAW host disk access VMDK file /home/vishalj/.VirtualBox/WinXP.vmdk created successfully.
 
     VBoxManage storagectl "${VNM}" --name "IDE"  --add ide \
