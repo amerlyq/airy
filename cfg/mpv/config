@@ -84,16 +84,19 @@ volume=100
 # cache settings
 
 # Use 8MB input cache by default. The cache is enabled for network streams only.
-#cache-default=8192
+cache-default=8192
 
-# Use 8MB input cache for everything, even local files.
-cache=8192
+# Use 8MB input cache for everything, even local files. Else use from cache-default
+# cache=8192
+cache=auto
 
 # Prefill 20% of the cache before starting playback.
 #cache-min=20.0
 #
 # Prefill 50% of the cache before restarting playback after the cache emptied.
 #cache-seek-min=50
+
+hr-seek=yes
 
 # Languages
 slang=ru,rus,en,eng,jp

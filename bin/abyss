@@ -33,8 +33,9 @@ file_build() {
     #   call mkdir(l:bdir, 'p')
     # cd "$BDR" &&
     case "$1" in
-    *.c|*.cpp|"") gcc -O1 -g3 -o "$BIN" -I "$DIR" ${1:-*.c} ;;
-               *) actualee "$1" ;;
+    *.c|"") gcc -O1 -g3 -o "$BIN" -I "$DIR" ${1:-*.c} ;;
+     *.cpp) g++ -O1 -g3 -std=c++11 -o "$BIN" -I "$DIR" ${1:-*.cpp} ;;
+         *) actualee "$1" ;;
     esac
     wpause
 }

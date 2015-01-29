@@ -233,7 +233,7 @@ wmode_end
 # set $dmenu j4-dmenu-desktop --dmenu="dmenu -f -z -i -fn 'Droid Sans Mono-9:normal' -nb '#333333' -nf '#dedede' -sb '#d64937' -sf '#dedede'"
 
 w_header "Run: Prgs"    # i3-sensible-terminal, ranger
-wstr "$bm+Return $eurx"
+wstr "$bm+Return $eurx -e zsh -c ranger-auto"
 wstr "$bm+u $eurx"      # Because it's urxvt!
 wstr "$bm+Control+Return $eflo"
 wstr "$bm+Shift+Return $eflo -e ranger-auto"
@@ -298,8 +298,8 @@ wlistf "$bs %s $exno ncmpcpp %s && \$upd mpd" \
     "XF86AudioPlay XF86AudioNext XF86AudioPrev XF86AudioStop" \
     "toggle next prev stop"
 wstr ''
-wlistf "$bm+Control+%s $exno ncmpcpp %s && \$upd mpd" \
-    "Home Prior Next End" "toggle prev next stop"
+wlistf "$bm+Control+%s $exno mpc %s && \$upd mpd" \
+    "Home Prior Next End" toggle prev next "seek +5 >/dev/null"
 
 
 wprf "\n### =================== Windows ==================== ###\n"
