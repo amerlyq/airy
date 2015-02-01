@@ -25,13 +25,6 @@ dir_build() {
 }
 
 file_build() {
-#else if &filetype =~ 'sh'
-#    exec l:run . './% && read tmp'
-    # let lst=substitute(glob(dir.'/**/*.c'), '\n', ' ', 'g')
-
-    # if len(l:lst) > 0
-    #   call mkdir(l:bdir, 'p')
-    # cd "$BDR" &&
     case "$1" in
     *.c|"") gcc -O1 -g3 -o "$BIN" -I "$DIR" ${1:-*.c} ;;
      *.cpp) g++ -O1 -g3 -std=c++11 -o "$BIN" -I "$DIR" ${1:-*.cpp} ;;
@@ -67,15 +60,16 @@ if [ -z "$ARGS" ]; then
         cd .. && PREV="$DIR" && DIR=$(pwd)
     done
     BIN="$DIR/${DIR##*/}.bin"
-
-else for entry in "${ARGS[@]}"; do
-
-    BIN="$DIR/${entry%.*}.bin"
-    if [ -d "$entry" ]
-    then cd "$entry" && dir_build
-    else file_build "$entry"; fi
-
-done; fi
+else
+    for entry in "${ARGS[@]}"
+    do
+        BIN="$DIR/${entry%.*}.bin"
+        if [ -d "$entry" ]
+        then cd "$entry" && dir_build
+        else file_build "$entry" || { ret=$?; }
+        fi
+    done
+fi
 
 
 # Run

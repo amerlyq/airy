@@ -3,17 +3,17 @@
 
 function! CompileInDir(...)
   let run = a:0 >= 1  ?  a:1 . ' '  :  '!'
-
-  exec l:run . 'abyss || abyss ' . @%
+  " 'actualee ' . @% . ' || ' .
+  exec l:run . 'abyss || { [ $? -eq 255 ] && abyss ' . @% . '}'
   " set makeprg=ruby\ -c\ %
-  "   let lst=substitute(glob(dir.'/**/*.c'), '\n', ' ', 'g')
 endfunction
 
 command! -bar -nargs=? CompilerInDir call CompileInDir(<args>)
 " \| cw
 noremap <silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
 noremap <silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
-noremap <silent> <Leader>j <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
+noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
+noremap <silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
 
 " Launch executable scripts
 noremap <Leader>K :<C-U>!./%<CR>

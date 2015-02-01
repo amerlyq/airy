@@ -23,7 +23,10 @@ v() { #servername == syntex (must be for LaTeX)
 vish(){
     local NM="${1:-`tempfile`}" shl='bash'
     if [ ! -e "$NM" ]; then
-        if [[ 'py' == ${NM##*\.} ]]; then shl='python'; fi
+        if [[ 'py' == ${NM##*\.} ]]; then
+            shl='python\n# vim: fileencoding=utf-8'
+        fi
+        # Python recognizes encoding: "coding[:=]\s*([-\w.]+)"
         printf "#!/usr/bin/env $shl\n\n\n" > "$NM"
         chmod 764 "$NM"
     fi

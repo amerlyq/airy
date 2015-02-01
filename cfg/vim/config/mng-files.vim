@@ -14,7 +14,6 @@ noremap <Leader>D :<C-U>qa<CR>
 " cnoremap <Leader>d <C-E><C-U>q<CR>
 " Go inside shell to see output of commands like ':! ..'. Return on <C-d>
 noremap <silent> <Leader>z :<C-U>sh<CR>
-noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
 
 if has('unix')
   noremap <Leader>f :<C-U>RangerChooser<CR>
