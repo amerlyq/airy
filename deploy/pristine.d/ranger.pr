@@ -5,7 +5,7 @@ if [ $? -eq 1 ]; then exit 1; fi
 # Ranger
 
 # ranger
-LST="$LST fbi caca-utils highlight atool w3m w3m-img poppler-utils mediainfo colordiff dwb"
+LST="$LST fbi caca-utils highlight atool w3m w3m-img poppler-utils mediainfo colordiff"
 # caca-utils # (img2txt) Colour AsCii Art library. cacaview - image viewer for the terminal. The user can zoom and scroll the image, set the dithering method or enable anti-aliasing. cacaball is a tiny graphic program that renders animated ASCII metaballs on the screen, cacafire is a port of AALib's aafire and displays burning ASCII art flames, and cacademo is a simple application that shows the libcaca rendering features such as line and ellipses drawing, triangle filling and sprite blitting.
 # fbi        # framebuffer image viewer for terminal
 # atool     # previews of archives
@@ -13,7 +13,6 @@ LST="$LST fbi caca-utils highlight atool w3m w3m-img poppler-utils mediainfo col
 # w3m         # W3M supports images, so where are they? Well, terminals like GNOME Terminal and KDE’s Konsole can’t display W3M’s images. Other terminals, such as Xterm, can. W3M will also display images if you’re running it in a framebuffer console, so you don’t need an X server running to take advantage of this feature. W3M still doesn’t compare with desktop browsers — notably, it doesn’t support JavaScript. There’s an experimental w3m-js extension you can compile and install yourself, but I wouldn’t rely too much on that. Then again, do you really want JavaScript in a terminal browser?
 # poppler   # (pdftotext) for pdf previews
 # mediainfo or perl-image-exiftool # viewing information about media files
-# dwb       # Browser webkit vi-like # http://portix.bitbucket.org/dwb/
 
 apt_noprompt $LST
 
