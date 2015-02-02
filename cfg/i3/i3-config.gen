@@ -211,7 +211,7 @@ STD_FILEMGR="pcmanfm"
 command -v $STD_FILEMGR >/dev/null 2>&1 || STD_FILEMGR="nemo --no-desktop"
 
 w_header "Mode: Open"
-wmode_begin 'o' "<Open> : [n]cmpcpp, [h]top | [p]owertop, [t]lp | [g]vim, [f]m, [s]ets | [m]usic"
+wmode_begin 'o' "<Open> : [n]cmpcpp, [h]top | [p]owertop, [t]lp | [g]vim, [f]m, [S]ets | [m]usic"
 wlistf "$t$bs %s $eflo -e %s, \$mdef" "n h p t" \
     ncmpcpp htop "gksudo powertop" "gksudo tlp start"
 wlistf "$t$bs %s $exno %s, \$mdef" "g f m Shift+s"  \

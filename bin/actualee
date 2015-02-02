@@ -21,6 +21,7 @@ case "$NAME" in  # Names
     sh) "$FL" && wpause   ;;
     py) python "$FL"      ;;
     dot) dot -Tx11 "$NM"  ;;
+    xmind) XMind -noSplash -- "$@" ;;
 
     *) case "$TYPE" in  # Types
 

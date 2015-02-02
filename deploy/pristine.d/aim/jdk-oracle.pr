@@ -11,14 +11,18 @@ if [ $? -eq 1 ]; then exit 1; fi
 #apt_noprompt openjdk-7-jdk #openjdk-7-jdk:i386 == broken
 
 #ppa:eugenesan/java
-ppa_add 'ppa:webupd8team/java'
-apt_noprompt oracle-java8-installer
+
+# Can't dld. Use offsite, dld .rpm package, then
+#   sudo apt-get install alien && sudo alien *.rpm && dpkg -i *.deb
+
+# ppa_add 'ppa:webupd8team/java'
+# apt_noprompt oracle-java8-installer
 
 java -version
 javac -version
 
 
-sudo update-java-alternatives -s java-8-oracle
+# sudo update-java-alternatives -s java-8-oracle
 
 
 
