@@ -4,7 +4,10 @@ source ~/.bash/zsh/zshrc
 
 gita_st() { # $1 -- rep path
     ST="$PR_SET_CHARSET$AM_GIT`git_prompt_info`$PR_NO_COLOUR `git_prompt_status`$PR_NO_COLOUR"
-    echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
+    st=$(echo "$ST" | sed 's/[%{}]//g')
+    dt=$(git log -1 --pretty=format:'%ci' | awk '{ print $2,$1 }')
+    printf "$dt | $1 $st\n"
+    # echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 
 gita_pull() {
