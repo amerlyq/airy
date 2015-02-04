@@ -24,6 +24,28 @@ map ,P "+P
 " Yank full line w/o newline and surrounded spaces
 nnoremap ,Y mz^"+yg_`z
 
+" Get text to current
+" TODO: Add ability to copy visual selection
+function! LNf(...)
+    let len =  a:0 >= 1 ? a:1 : " "
+    let href=@% . ":" . line(".") . len
+    exec 'let @+="' . href . '"'
+    echo "REF: " . href
+endfunction
+command! -bar LN call LNf()
+command! -bar LL call LNf("\n\t" . getline(".")) "split(getline('.'))
+nnoremap \Y :<C-U>LN<CR>
+nnoremap \t :<C-U>LL<CR>
+
+function! CompileInDir(...)
+  let run = a:0 >= 1  ?  a:1 . ' '  :  '!'
+  " 'actualee ' . @% . ' || ' .
+  exec l:run . 'abyss || { [ $? -eq 255 ] && abyss ' . @% . '}'
+  " set makeprg=ruby\ -c\ %
+endfunction
+
+command! -bar -nargs=? CompilerInDir call CompileInDir(<args>)
+
 " Prevent Paste loosing the register source. Deleted available by "- reg
 " http://stackoverflow.com/a/7797434/1147859
 vnoremap p pgvy
