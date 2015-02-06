@@ -1,11 +1,18 @@
 #!/bin/sh
+# Chain: javaSRV -> maven -> tomcat7
 
 ROOT_DIR="`pwd`"
 DEPLOY_DIR="/var/lib/tomcat7/webapps"
 
+# Java build system:
+if ! which mvn >/dev/null; then
+    sudo apt-get install -y maven
+fi
+
 cd "$ROOT_DIR"
 if [ -e "$ROOT_DIR/pom.xml" ]; then
 
+    # Maven: compile java -> .war
     mvn clean install -Dmaven.test.skip=true
 
     WAR_FL="`find \"$ROOT_DIR/target\" -maxdepth 1 -type f -name *.war`"

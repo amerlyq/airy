@@ -1,0 +1,28 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+apt_noprompt tomcat7 tomcat7-admin tomcat7-user
+
+
+## Manually:
+# deb_wget "http://apache.cp.if.ua/tomcat/tomcat-8/v8.0.18/bin/apache-tomcat-8.0.18.tar.gz"
+# export CATALINA_HOME=~/aura/airy/pkg/tomcat8
+# =sudo $CATALINA_HOME/bin/startup.sh
+
+## Insert to: /etc/tomcat7/tomcat-users.xml (created after sudo service tomcat7 start)
+## (OR: c:\Program Files (x86)\Apache Software Foundation\Tomcat 7.0\conf\tomcat-users)
+## Inside group: <tomcat-users>
+#    <role rolename="admin-gui"/>
+#    <role rolename="manager-gui"/>
+#    <user username="admin" password="..." roles="admin-gui,manager-gui"/>
+
+## Default port
+# <Service name="Catalina">
+#     ...
+#     <Connector port="1248" protocol="HTTP/1.1" ...
+
+## Several/multiple ports (each applet) for one tomcat7 instance
+#   http://stackoverflow.com/questions/8823290/how-to-run-different-apps-on-single-tomcat-instance-behind-different-ports
+#   http://www.coderanch.com/t/84172/Tomcat/listen-multiple-ports
