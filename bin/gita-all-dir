@@ -6,7 +6,7 @@ gita_st() { # $1 -- rep path
     ST="$PR_SET_CHARSET$AM_GIT`git_prompt_info`$PR_NO_COLOUR `git_prompt_status`$PR_NO_COLOUR"
     st=$(echo "$ST" | sed 's/[%{}]//g')
     dt=$(git log -1 --pretty=format:'%ci' | awk '{ print $2,$1 }')
-    printf "$dt | $1 $st\n"
+    printf "%-20s\t %-16s %-18s\n" "$st" "$1" "$dt"
     # echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 
@@ -30,6 +30,6 @@ all_git() { # $1 -- git command
 
 case "$@" in
     l|pull) all_git "gita_pull" ;;
-    *) all_git "gita_st" | column -t ;;
+    *) all_git "gita_st" ;;
 esac
 

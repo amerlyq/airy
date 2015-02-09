@@ -1,0 +1,53 @@
+#!/bin/bash
+# Man
+#   https://github.com/OpenGrok/OpenGrok/wiki/How-to-install-OpenGrok
+#   https://github.com/OpenGrok/OpenGrok
+
+ARGS="${@:--d}"
+
+PR=/var/opengrok
+export OPENGROK_VERBOSE=true
+export OPENGROK_INSTANCE_BASE=$PR
+export JAVA_HOME=/usr/lib/jvm/java-7-oracle
+export SRC_ROOT=$PR/src
+export DATA_ROOT=$PR/data
+
+# CFG=/var/opengrok/etc/configuration.xml
+# if [ ! -f "$CFG" ]; then
+#     sudo mkdir -p ${CFG%/*}
+#     sudo ln -svf $PR/etc/configuration.xml $CFG
+# fi
+
+cd $PR/bin
+
+  if [ "$ARGS" == "-u" ]; then
+    ./OpenGrok index #$SRC_ROOT
+elif [ "$ARGS" == "-d" ]; then
+    sudo service tomcat7 stop
+    sudo ./OpenGrok deploy
+    sudo service tomcat7 start
+elif [ "${ARGS%% *}" == "-a" ] && [ -d "${ARGS#* }" ]; then
+    sudo cp -vit "$SRC_ROOT" "${ARGS#* }"
+    ./OpenGrok index
+fi
+
+
+## GRANT SECURITY ACCESS
+# /etc/tomcat7/policy.d/03catalina.policy
+# grant codeBase "file:${catalina.home}/webapps/source/-" {
+#         permission java.security.AllPermission;
+# };
+# grant codeBase "file:${catalina.home}/webapps/source/WEB-INF/lib/-" {
+#         permission java.security.AllPermission;
+# };
+
+# OR: Disable security checking
+# /etc/default/tomcat7
+#   TOMCAT7_SECURITY=no
+
+## IP WHITE LIST
+# /etc/tomcat7/server.xml
+# ...<Engine name="Catalina" defaultHost="localhost">
+#   ...<Host name="localhost"  appBase="webapps" unpackWARs="true" autoDeploy="true">
+#       <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+#            allow="10\.132\.77\.55|10\.132\.76\.120|10\.132\.77\.47"/>
