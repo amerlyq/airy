@@ -276,3 +276,16 @@ Whitelisting a directory (note: needs the rest of the path):
 Resources
 	Create a orphan branch (no history) for storing documentation or resources:
 		git checkout --orphan
+
+Create local git server
+	On Server
+		mkdir -p /var/rep/project.git
+		cd /var/rep
+		chown user:group ./project.git
+		cd project.git
+		git init --bare --shared=group
+	On Client (first)
+		git clone ssh://yourserver.com/var/rep/project.git
+		cd project && touch README && git add README
+		git commit -m "Initial import"
+		git push origin master
