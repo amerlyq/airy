@@ -1,0 +1,35 @@
+#!/bin/bash
+
+declare cmd fl arch pref
+
+cmd="${1?ELF aliases. Specify [nsob] as first arg}"
+
+if [ -t 0 ]; then  # input from terminal
+    fl="${2?Need elf or binary dump file name}"
+    [ -f "$fl" ] || { echo "No such file '$fl'" && exit 1; }
+#[ ! -t 0 ] && [ -p /dev/stdin ] -- from pipe only, not from redirected file
+else  # redirected input from file '<' or pipe '|'
+    fl=`tempfile`
+    cat > "$fl"
+    trap "rm -rf $fl" EXIT
+fi
+
+if file -b "$fl" | grep -q '^[^,]*, ARM,'; then
+        arch=arm; pref="armv7l-tizen-linux-gnueabi-"
+else arch=i386; fi
+
+case "$cmd" in
+    n) cmd="nm -n" ;;
+    s) cmd="readelf -S" ;;
+    o) cmd="objdump -m $arch -C -D" ;;  # disass with demangle
+    b) cmd="objdump -m $arch -b binary -D" ;;
+    x) cmd="xxd " ;;
+    l) cmd="less " ;;
+    *) echo "No such '$cmd' processor" && exit 1 ;;
+esac
+
+# For not piped output
+[ -t 1 ] && printf "=> ${pref}${cmd%% *} ${cmd#* } ${fl}\n"
+
+${pref}${cmd%% *} ${cmd#* } ${fl}
+
