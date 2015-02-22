@@ -5,6 +5,8 @@ Stream:
 	From screen
 		vlc screen://
 		DISPLAY=:0 cvlc screen:// :screen-fps=15.000000 :live-caching=300 :sout="#transcode{vcodec=h264,vb=800,scale=1,acodec=mpga,ab=128, channels=2,samplerate=44100}:duplicate{dst=std{access=http,mux=ts,dst=localhost:9091/stream.mp4}}"
+		ffmpeg
+			Gets direct access to camera on Linux and Windows
 	Show
 		ssh -L 9091:localhost:9091 lok
 		vlc http://localhost:9091/stream.mp4

@@ -62,6 +62,7 @@ alias mountl='sudo fdisk -l'
 # --- Search ---
 f()  { find . -type f -iname "*$@*"; }
 ff() { find . -type f -iname $@; }
+fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
 # grep -Ri 'name' . # find in all files
 # alias ff='find ./ | grep -i '
 
