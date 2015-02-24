@@ -29,7 +29,7 @@ set guioptions+=c           " console-like dialogs instead of gui popup ones
 
 if has("gui_running")
   if has("gui_gtk2")
-    set guifont=PragmataPro\ 12,DejaVu\ Sans\ Mono\ 11,Courier\ New\ 11
+    set guifont=PragmataPro\ 12,DejaVu\ Sans\ Mono\ for\ Powerline\ 11,DejaVu\ Sans\ Mono\ 11
   elseif has("x11")
     set guifont=-*-courier-medium-r-normal-*-*-180-*-*-m-*-*
   elseif has("win32") || has("win64")

@@ -53,6 +53,8 @@ ssh srk 'LOGDUMP="'$RMDIR/show-log'"
 # { while $PING; do sleep 30; done; printf "\n"; } &
 
 # Filtering Serial output
+#ALT (ansifilter): stdbuf -oL -eL tr -cd "[:print:]\033\n"
+#OR (to disable buffering completely): stdbuf -i0 -o0 -e0 command
 sudo cat /dev/ttyUSB0 | ansifilter |
     awk -v fa="$DIR/$FA" -v ff="$DIR/$FF" "$BODY"
 

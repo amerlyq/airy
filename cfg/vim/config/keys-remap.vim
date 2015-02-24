@@ -1,8 +1,5 @@
 " TRY: inoremap jk <ESC>
 
-" Be consistent with C and D which reach the end of line
-nnoremap Y y$
-
 " Now 'a jump you to line and column, and `a only to line
 noremap ' `
 noremap ` '
@@ -13,8 +10,7 @@ cnoremap <C-o> <C-p>
 
 " Save keystrokes for Ex-commands
 noremap ;  :
-"noremap : ,
-noremap , <Nop>
+" noremap , <Nop>
 noremap [f ;
 noremap ]f ,
 
