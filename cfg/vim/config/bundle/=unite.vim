@@ -1,7 +1,7 @@
 " Mappings
 
 " Toggle {{{
-nnoremap <Leader>ti :IndentGuidesToggle<CR>
+nnoremap <Leader>tI :IndentGuidesToggle<CR>
 nnoremap <Leader>tb :TagbarToggle<CR>
 let g:lt_location_list_toggle_map = '\l'
 let g:lt_quickfix_list_toggle_map = '\q'

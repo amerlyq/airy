@@ -1,7 +1,6 @@
-
 " For when you forget to sudo.. Really Write the file.
-cnoremap e!! e !sudo tee %
-cnoremap w!! w !sudo tee % >/dev/null
+cnoremap E e !sudo tee %
+cnoremap W w !sudo tee % >/dev/null
 
 " Change Working Directory to that of the current file
 noremap \cwd :lcd %:p:h
