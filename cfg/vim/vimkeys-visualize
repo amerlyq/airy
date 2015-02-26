@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim:ts=2:sw=2:sts=2
 
 # cd ./config
 # echo ----
@@ -8,19 +9,74 @@
 # TODO: include default :h index to /tmp/vim_keys
 
 FL=/tmp/vim_keys
+GR=/tmp/vim_graph.dot
 
 #verbose
 vim -c ":redir! > $FL | silent map | redir END" -c "q"
 sed -i '/^...<Plug>/d' $FL  #; /^\s\+<\S\+>\s\+\S$/d
 
 # TODO: dot graph for vim
+
+>$GR
+cat << EOT >> $GR
+digraph G {
+  graph [
+    fontsize=40
+    labelloc="t"
+    label=""
+    splines=true
+    overlap=true
+    rankdir="LR"
+    nodesep=.05;
+    // size ="4,4";
+  ];
+  edge [
+    penwidth = 1
+    fontsize = 20
+    fontcolor = "black"
+    // label = "*"
+    dir="forward"
+    // arrowhead="diamond"
+    arrowtail="normal"
+  ];
+  node [shape=Mrecord];
+  VIM -> { " ", n, v, o, x }
+EOT
+
+
 # http://www.markhneedham.com/blog/2013/06/26/unixawk-extracting-substring-using-a-regular-expression-with-capture-groups/
-cat $FL | gawk -f <(
-cat - <<-'EOD'
-    BEGIN{ print "test" } {
-        # match($0, /#([0-9]+)/, arr)
-        printf("%s -> %s\n", substr($0,0,3), substr($0,4))
+# '-' -- last EOT can be indented with hardtabs
+# first 'EOT' in single quotes -- then bash don't expands vars inside heredoc
+cat $FL | gawk -f <(cat - <<-'EOT'
+  # BEGIN{ }
+  {
+    match(substr($0,4), /,\w+/, arr)
+    kmap = substr($0,0,1)arr[0]
+    curl = substr(kmap,0,1)
+    if (arr[0] != "") {
+      for (i=1; i<length(kmap); ++i) {
+        nxtl = substr(kmap, 0, i+1)
+        printf("  \"%s\" [ label=\"%s\" ];\n", nxtl, substr(kmap,i+1,i+1))
+        printf("  \"%s\" -> \"%s\";\n", curl, nxtl)
+        curl = nxtl
+      }
+      # printf "%s\n",kmap
+      # printf "\n"
     }
-EOD
-)
+  }
+EOT
+) | sort -u >> $GR
+
+
+cat << EOT >> $GR
+  label="VIM mappings";
+  labelloc=top;
+  labeljust=left;
+}
+EOT
+
+dot -Tpng "$GR" > /tmp/output.png || exit 1
+# neato -Tpng "$FGR" > /tmp/output.png || exit 1
+# neato -Ln100 mymap.gv -Tpng
+sxiv  /tmp/output.png
 
