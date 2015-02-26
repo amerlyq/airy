@@ -1,4 +1,3 @@
-
 ## Global aliases
 # Write L after a command to page through the output.
 alias -g L="| less"
@@ -15,10 +14,9 @@ alias -g NUL="> /dev/null 2>&1" # You get the idea.
 #   { : Inappropriate ioctl for device
 # alias -g @="\"\$(xsel -ob)\""
 
-
 ## Std-like
+# alias agi='noglob agi'
 psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
-alias agi='noglob agi'
 
   if (( $+commands[links2] )) ; then export LINKS_BROWSER="links2"
 elif (( $+commands[links] )) ; then export LINKS_BROWSER="links"
@@ -56,26 +54,3 @@ case "$HIST_STAMPS" in
                *) alias history='fc -l 1'  ;;
 esac
 
-## Expandable aliases
-typeset -a ealiases
-ealiases=()
-
-ealias() {
-    alias $1
-    ealiases+=(${1%%\=*})
-}
-
-function expand-ealias() {
-    if [[ $LBUFFER =~ "(^|[;|&])\s*(${(j:|:)ealiases})\$" ]]; then
-        zle _expand_alias
-        zle expand-word
-    fi
-    zle magic-space
-}
-zle -N expand-ealias
-
-bindkey -M viins ' '    expand-ealias
-bindkey -M viins '^ '   magic-space     # control-space to bypass completion
-bindkey -M isearch " "  magic-space     # normal space during searches
-
-ealias fff='find . -iname'

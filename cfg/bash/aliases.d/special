@@ -59,19 +59,6 @@ alias mountl='sudo fdisk -l'
 # echo "alias firefox='nohup firefox &>/dev/null'" >> /etc/commonrc
 
 
-# --- Search ---
-f()  { find . -type f -iname "*$@*"; }
-ff() { find . -type f -iname $@; }
-fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
-# grep -Ri 'name' . # find in all files
-# alias ff='find ./ | grep -i '
-
-# agi() { printf "Ag: {{{\n"; ag --ignore build --ignore libs $@; printf "}}}-Ag.\n"; }
-agi() { ag -i -G '^(?:(?!build|libs|tags).)*$' $@; }
-agf() { ag -i -g $@; }
-agp() { agi --pager less $@; }
-agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
-
 hi() { if [ -z "$@" ]; then history | tail -20; else
     history | sed 's/^\s*\(\d\+\)\s*\(.*\)$/\2 #\1' | sort -u | agi $@;
 fi; }

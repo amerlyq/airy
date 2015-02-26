@@ -2,16 +2,13 @@
 # Don't launch, source only!
 
 DIR=~/.bash/aliases.d
-FLES=(colored special pathes git std funcs system info others less-termcap)
 
 if [ -d "$DIR" ]; then
-    for fl in ${FLES[@]}; do
-        source "$DIR/$fl"
+    for fl in "$DIR"/*; do if [[ \
+        "${SHELL##*/}" == zsh || \
+        "${fl##*/}" != zsh*      \
+        ]]; then source "$fl"; fi
     done
-
-    case "${SHELL##*/}" in
-        zsh) source "$DIR/zsh" ;;
-    esac
 fi
 
 

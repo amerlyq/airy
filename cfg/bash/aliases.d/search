@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# --- Search ---
+f()  { find . -type f -iname "*$@*"; }
+ff() { find . -type f -regex $@; }
+# fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
+# grep -Ri 'name' . # find in all files
+# alias ff='find ./ | grep -i '
+
+agi() { ag -i -G '^(?:(?!build|libs|tags).)*$' $@; }
+agf() { ag -i -g $@; }
+agp() { agi --pager less $@; }
+agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
+
+vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
+    local als="$1" args std add cmd
+    shift;
+    std=$(which "$als" | sed '/\<ag\>/!d; s/^.*\<ag\>\(.*\)\s*$/\1/; s/\$@//g')
+    add=$(for k in "${@}"; do [[ "${k:0:1}" == - ]] && printf "$k " || printf "\"$k\" "; done)
+    cmd=":Ag!$std$add"
+    printf "$cmd\n" | vim -R -c "set nolist | let g:magnify_on=0 | copen 30 " \
+        -c "$cmd" - # | let g:ag_qhandler='botleft lopen 7'
+}
+

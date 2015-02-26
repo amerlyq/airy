@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 
-cd ./config
-echo ----
-find . -type f -print | xargs sed -n '/^\s*.\?\(nore\)\?map/p' | sed -n '/Leader.s/p'
+# cd ./config
+# echo ----
+# find . -type f -print | xargs sed -n '/^\s*.\?\(nore\)\?map/p' | sed -n '/Leader.s/p'
+
+# :h index | see default keybindings
+# TODO: include default :h index to /tmp/vim_keys
+
+FL=/tmp/vim_keys
+
+#verbose
+vim -c ":redir! > $FL | silent map | redir END" -c "q"
+sed -i '/^...<Plug>/d' $FL  #; /^\s\+<\S\+>\s\+\S$/d
+
+# TODO: dot graph for vim
+# http://www.markhneedham.com/blog/2013/06/26/unixawk-extracting-substring-using-a-regular-expression-with-capture-groups/
+cat $FL | gawk -f <(
+cat - <<-'EOD'
+    BEGIN{ print "test" } {
+        # match($0, /#([0-9]+)/, arr)
+        printf("%s -> %s\n", substr($0,0,3), substr($0,4))
+    }
+EOD
+)
+

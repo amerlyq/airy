@@ -71,13 +71,17 @@ nnoremap <leader>Y mz^vg_:<C-U>call CopyStringInReg('+', GetVisualSelection("\n"
 cnoremap <C-y> <C-R>=CopyStringInReg('+', getcmdline())<CR><C-H>
 " To be able copy/paste regex snippets into vim/snippets/vim_regex.otl
 nnoremap <leader>/ :<C-U>call CopyStringInReg('/', @+)<CR>
+vnoremap <leader>/ :<C-U><C-R>=TrimLines(GetVisualSelection('\n')))<CR>
+" Open commandline with copied text
+nnoremap <leader>; :<C-R>"
+vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
 
 
 let s:leader = g:mapleader
 let mapleader = "\\"
   nnoremap <leader>Y :<C-U>call GetLineBookmark('')<CR>
-  nnoremap <leader>t :<C-U>call GetLineBookmark('\n\t'.getline('.'))<CR>
-  vnoremap <leader>t :<C-U>call GetLineBookmark('\n\t'.GetVisualSelection('\n\t'))<CR>
+  nnoremap <leader>t :<C-U>call GetLineBookmark("\n\t".getline('.'))<CR>
+  vnoremap <leader>t :<C-U>call GetLineBookmark("\n\t".GetVisualSelection("\n\t"))<CR>
 let mapleader = s:leader
 
 
