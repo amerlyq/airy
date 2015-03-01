@@ -87,6 +87,8 @@ Shared folder for users
 
 Mount
 	sudo fdisk -l
+	Print filesystems as tree
+		findmnt
 	mkdir -p ~/usb && sudo mount -t vfat /dev/sdb1 ~/usb
 	rsync -avh ~/mydir/ ~/usb/
 	sudo umount ~/usb && rmdir ~/usb
