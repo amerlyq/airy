@@ -54,6 +54,10 @@ map <leader>y "+y
 map <leader>p "+p
 map <leader>P "+P
 
+" Append to copy buffer
+" nnoremap <leader><leader>y :<C-U>call CopyStringInReg('+', @+ . @")<CR>
+vnoremap <leader><leader>y :<C-U>call CopyStringInReg('"', @" . GetVisualSelection("\n"))<CR>
+
 " Duplicate unnamed and copy registers
 nnoremap <C-y> :<C-U>call CopyStringInReg('+', @")<CR>
 vnoremap <C-y> :<C-U>call CopyStringInReg('+', GetVisualSelection("\n"))<CR>
