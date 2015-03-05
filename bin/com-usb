@@ -25,7 +25,7 @@ BODY='{ pn=pf; pf=0; print $0 > fa }
 
     /\s*E\/|\[TUNER\]|\[DWS-FRAMEWORK\]|\[SNAP\]\
 |tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|sd_notify\
-|^Thrift|^Starting|^Started/ {
+|^Thrift|^Starting|^Started|^\[DLOG\]/ {
         pf=1; printf "."
     }
 

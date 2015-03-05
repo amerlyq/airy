@@ -20,3 +20,17 @@ others
 interactively edit
 	nmcli con edit
 		:> help, describe team.config
+
+Set MAC address
+	/etc/init.d/networking stop
+	ifconfig eth0 hw ether 02:01:02:03:04:08
+	/etc/init.d/networking start
+	 Execute "ifconfig eth0" to confirm.
+ The above should work on Debian, Ubuntu, and similar distributions.
+ Alternatively, under RHEL/Fedora and possibly other GNU/Linux distributions
+ (incl. CentOS and Scientific Linux), to disable and restart networking, one
+ must stop and start /etc/init.d/network, instead of /etc/init.d/networking.
+If you have iproute2 utilities installed, you may prefer to use the "ip" command, as follows:
+	/etc/init.d/network stop
+	ip link set eth0 address 02:01:02:03:04:08
+	/etc/init.d/network start
