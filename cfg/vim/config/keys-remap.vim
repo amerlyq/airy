@@ -14,6 +14,11 @@ noremap ;  :
 noremap [f ;
 noremap ]f ,
 
+" Show list of tags when there more then one entry:
+noremap <C-]> g<C-]>
+noremap g] <C-]>
+noremap g<C-]> g]
+
 " No jump when joining
 " nnoremap J mzJ`z
 

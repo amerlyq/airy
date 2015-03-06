@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# vim:ts=2:sw=2:sts=2
+
+awk 'BEGIN{ mm=0 }
+  /<[/][^>]+>/ {
+    mm-=1
+    print "\n"
+  }
+  {
+    for(i=0;i<mm;++i){printf " "};
+    print $0
+  }
+  /<[^/?][^>]+[^/]>/ {
+    mm+=1
+    print "\n"
+  }
+'
