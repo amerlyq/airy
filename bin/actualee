@@ -21,7 +21,10 @@ case "$NAME" in  # Names
     sh) "$FL" && wpause   ;;
     py) python "$FL"      ;;
     dot) dot -Tx11 "$NM"  ;;
-    xmind) XMind -noSplash -- "$@" ;;
+
+    # Launched w/o fork, because of poor cmd support: it opens new instance of
+    # XMind instead of adding file to opened
+    xmind) XMind -noSplash -- "$1" ;;
 
     *) case "$TYPE" in  # Types
 

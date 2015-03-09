@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+cat lst.html \
+    | sed '/^var myPlayList = /!d; s/{name/\n&/g' \
+    | sed -n '/.*mp3:\("[^}]*"\)}.*/s//\1/gp' \
+    | xargs wget -c

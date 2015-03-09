@@ -1,3 +1,5 @@
+" vim:ts=2:sw=2:sts=2
+
 " Often I need to disable it completely when investigating other's sources
 nnoremap <Leader>tl :set list! list?<CR>
 
@@ -8,24 +10,26 @@ nnoremap <Leader>tC :setlocal cursorline! cursorline?<CR>
 
 " magnifying when switching (more stable then 'hjkl<C-W>_' )
 let g:magnify_on = 1
-noremap <Leader>tw :<C-U>let g:magnify_on = g:magnify_on ? 0 : 1<CR>
+noremap <Leader>tw :<C-U>let g:magnify_on = g:magnify_on ? 0 : 1 \|
+      \ echo('  wmagnify = ' . (g:magnify_on ? 'on' : 'off'))<CR>
 autocmd WinEnter * call AutoMagnifying()
 function! AutoMagnifying()
   if g:magnify_on
     resize 100    "or another big number
   endif
+
 endfunc
 
 " Слева появится колонка шириной в 3 символа, обозначающая где какие фолдинги
 " и какого уровня.  По ней можно будет кликать для сворачивания-разворачивания.
 set foldenable foldcolumn=2
-nnoremap <Leader>tz :call ToggleFoldingMethod()<CR>
-nnoremap <Leader>tZ :call ToggleFolding()<CR>
+nnoremap <Leader>tz :call ToggleFoldingMethod() \| set fdm?<CR>
+nnoremap <Leader>tZ :call ToggleFolding() \| set fen?<CR>
 
 function! ToggleFoldingMethod()
-    if(&foldmethod == manual)
+    if(&foldmethod == "manual")
         set foldmethod=syntax
-    elseif(&foldmethod == syntax)
+    elseif(&foldmethod == "syntax")
         set foldmethod=marker
     else
         set foldmethod=manual
@@ -44,7 +48,7 @@ endfunc
 " toggle between number and relativenumber
 set number
 nnoremap <Leader>tN :setlocal number! number?<CR>
-nnoremap <Leader>tn :call ToggleNumber()<CR>
+nnoremap <Leader>tn :call ToggleNumber() \| set rnu?<CR>
 function! ToggleNumber()
     if(&relativenumber == 1)
         set norelativenumber
@@ -70,4 +74,3 @@ endfunction
 noremap <Leader>tx <Esc>:SyntasticToggleMode<CR>
 "\| :SyntasticCheck<CR>
 
-" vim:ts=2:sw=2:sts=2

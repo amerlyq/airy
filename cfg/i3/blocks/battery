@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR=/sys/class/power_supply/BAT0
+DIR=$(echo /sys/class/power_supply/BAT* | awk '{print $1}')
 if [ ! -d "$DIR" ]; then exit 33; fi
 
 if [ $( cat "$DIR/present" ) -eq 1 ]; then
