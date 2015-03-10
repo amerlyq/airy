@@ -40,12 +40,20 @@ noremap  gL  :<C-U>blast<CR>
 " close current window
 " nnoremap <Leader>4 <C-W>c
 
+
+" Direct pick tab
+for idx in range(1,10)
+    exec "noremap <unique> <Leader>". string(idx % 10) ." ". idx ."gt"
+endfor
+
+
 " Leader '\' {{{
 let s:leader = g:mapleader
 let mapleader = "\\"
 
 " Toggle to last edited buffer/file
 nnoremap <unique> <Leader>` :b#<CR>
+" Direct pick buffer
 for idx in range(1,20)
     let key = (idx<=10 ? "" : "<Leader>") . string(idx % 10)
     exec "nnoremap <unique> <Leader>". key ." :". idx ."b<CR>"
@@ -53,3 +61,4 @@ endfor
 
 let mapleader = s:leader
 " }}}
+

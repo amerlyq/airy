@@ -58,7 +58,7 @@ noremap gk k
 
 " more stretching comfort
 noremap g0 ^
-noremap ,4 $
+" noremap ,4 $
 noremap g4 A<Space><Esc>
 noremap ,g %
 

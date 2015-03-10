@@ -26,7 +26,9 @@ endfunction
 function! TrimLines(str)
   return substitute(a:str, '^[\n\s]\+\(.*\)[\n\s]\+$', '\1', 'g')
 endfunction
+
 function! CopyStringInReg(r1, str)
+  call setreg('9',  a:r1,  'c') " Preserve previous buffer
   call setreg(a:r1, a:str, 'c')
   call CountLinesInRegister(a:r1, '@'.a:r1.':')
 endfunction

@@ -9,7 +9,10 @@ bits() {
     printf "%d%s", (and($1,i) > 0), ++c%4==0?c%16==0?"   ":" ":"";
     printf"\n"; }'
 }
-fdd() { dd if="$1" bs=1 skip=$((${3:-0})) count=$((${2:-0})) of="${1}-"; }
+ddb() { dd if="$1" bs=1 count=$((${2:-0})) skip=$((${3:-0})); }  #of="${1}.part"
+cmpb() { cmp -l $@ |
+    gawk '{printf "%04X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)}'
+}
 
 timer() { echo "{ notify-send --urgency normal --expire-time=10000 -i typing-monitor -h int:x:500 -h int:y:500 'Alarm' 'GO and DO this'; beep }" | at now + ${1:-1} minutes; }
 # at 18:30

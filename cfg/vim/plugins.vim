@@ -368,7 +368,11 @@ NeoBundle 'scrooloose/syntastic'
 
 """ Ability to edit entries from qf or lc windows in new buffer
 " TRY ALT: quickfix-reflector.vim (http://www.vim.org/scripts/script.php?script_id=4890)
-NeoBundle 'jceb/vim-editqf'
+" ALT: https://github.com/thinca/vim-qfreplace
+NeoBundleLazy 'jceb/vim-editqf', { 'autoload' : { 'commands' :
+            \ ['QFEdit', 'QFAddNote', 'QFAddPatternNote'] } }
+
+
 
 " Autoformatting with one button, can use custom (like clang-styler)
 NeoBundle 'Chiel92/vim-autoformat'

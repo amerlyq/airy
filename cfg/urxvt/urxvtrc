@@ -102,7 +102,7 @@ URxvt*transparent:          true
 ! Fade the text by the given percentage when focus is lost !DarkBlue
 ! URxvt*fading:               15
 
-! Cursor
+!!! Cursor -------------------------------------------
 ! URxvt*cursorColor:          #DCDCCC
 ! URxvt*cursorColor:          #FFFFFF
 ! URxvt*cursorTextColor:      #ff0000
@@ -114,22 +114,41 @@ URxvt*cursorUnderline:      false
 URxvt*pointerBlank:         false
 URxvt*urgentOnBell:         true
 
+
+
+!!! View ---------------------------------------------
 ! Scrollbar: style - rxvt (default), plain, next, or xterm
 URxvt*scrollBar:            false
-URxvt*secondaryScroll:      true
 URxvt*scrollBar_right:      false
 URxvt*scrollstyle:          rxvt
-! Makes it possible, to scroll manually on output
-URxvt*scrollTtyOutput:      false
-URxvt*scrollWithBuffer:     true
-URxvt*scrollTtyKeypress:    true
 ! Need false to override floating regime in i3wm
 URxvt*borderLess:           false
 URxvt*internalBorder:       0
 URxvt*externalBorder:       0
-
 ! Colors
 ! For match bold colors 0-7 with colors of normal font (false)
 URxvt*intensityStyles:      false
+
+
+!!! Scrolling ----------------------------------------
+! Turn on/off secondary screen (default enabled)
+URxvt*secondaryScreen:      true
+! (default enabled). If this option is enabled, scrolls on the secondary screen
+! will change the scrollback buffer and, when secondaryScreen is off, switching
+! to/from the secondary screen will instead scroll the screen up.
+URxvt*secondaryScroll:      false
+! Makes it possible, to scroll manually on output
+! True: scroll to bottom when tty receives output
+URxvt*scrollTtyOutput:      false
+! True: scroll with scrollback buffer when tty recieves new lines (and scrollTtyOutput is False)
+URxvt*scrollWithBuffer:     true
+! True: scroll to bottom when a non-special key pressed.  Special keys are those which are intercepted by rxvt for special handling andnt passed onto the shell; False: dont scroll to bottom
+URxvt*scrollTtyKeypress:    true
+! When receiving lots of lines, urxvt will only scroll once a whole screen height of lines has been read, resulting in fewer updates while still displaying every received line
+! False: specify that smooth scrolling should be used. urxvt will force a screen refresh on each new line it received
+! URxvt*jumpScroll:                     false
+! (true) When receiving lots of lines, urxvt will only scroll once in a while (around 60x/sec), resulting in fewer updates. This can result in urxvt not ever displaying some of the lines it receives
+URxvt*skipScroll:           false
+
 
 

@@ -3,6 +3,10 @@
 # Source
 #   http://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables
 
+# Keeps last viewed page in terminal after exiting less
+# NOTE: disabled as support for coloring output has broke
+# export LESS='-FiX' #see $ man less, /export LESS/
+
 if [ -x /usr/bin/dircolors ]; then
 
 export LESS_TERMCAP_mb=$(tput bold; tput setaf 2) # green

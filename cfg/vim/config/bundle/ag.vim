@@ -1,7 +1,10 @@
 let g:agprg="ag --column --smart-case --ignore tags"
 " let g:aghighlight=1
-let g:ag_apply_lmappings=1
-let g:ag_apply_qmappings=1
+
+" Disable default map.
+" All real mappings included into 'after/ftplugin/qf.vim'
+let g:ag_apply_lmappings=0
+let g:ag_apply_qmappings=0
 
 
 " let g:ag_lhandler="botright lopen 7"

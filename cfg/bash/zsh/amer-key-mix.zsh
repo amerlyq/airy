@@ -63,7 +63,7 @@ bindkey -s ',s' '^Us\n'
 # bindkey -s 'kd' '^M'
 
 alias sh-rc-reload="source ~/.zshrc && echo 'ZSH config reloaded'"
-bindkey -s -M vicmd '^[[24~' '0d$ish-rc-reload\n\e'
+bindkey -s -M vicmd '^[[24~' '0d$ish-rc-reload\n\e'  # On <F12> in vim mode
 
 
 # ELSE

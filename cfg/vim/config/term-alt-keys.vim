@@ -1,6 +1,7 @@
 " vim: fdm=marker
 " Based on vim tip 1272 [http://vim.wikia.com/wiki/VimTip1272]
 " See: http://vim.wikia.com/wiki/Mapping_fast_keycodes_in_terminal_Vim
+" See: :h <Char> -- how to use direct code mapping for multibyte: <S-Char-114>
 
 if exists("did_meta_escape") | finish | endif
 let did_meta_escape = 1
