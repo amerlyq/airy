@@ -12,6 +12,7 @@ let b:wPref = b:isLoc ? 'l' : 'c'
 " force the qf wnd to be opened at the bottom and take the full width
 wincmd J
 
+"" Rule of Thumb: reuse editing mappings, and don't touch navigation
 " q/<Space> - close / jump,
 " o/O - preview/jump of and stay,        I - jump into and close,
 " x/X - exchange to tab foregr/backgr,   S/H - split vert/horz,

@@ -1,0 +1,31 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+
+LST="$LST build-essential autoconf libtool"
+LST="$LST libX11-dev libxi-dev x11proto-input-dev xserver-xorg-dev libxrandr-dev libncurses5-dev"
+LST="$LST linux-headers-generic xutils-dev"
+apt_noprompt $LST
+
+# NOTE:
+#   http://linuxwacom.sourceforge.net/wiki/index.php/Main_Page
+#   http://sourceforge.net/projects/linuxwacom/files/latest/download
+
+git_install "git://git.code.sf.net/p/linuxwacom/xf86-input-wacom" -d
+dir="$CURR_DIR_PKG/xf86-input-wacom/"
+rep_autobuild "$dir" --prefix=/usr --libdir=/usr/lib64    # on 64 bit install
+
+
+# Media/control support
+LST="$LST gnome-control-center krita"
+apt_noprompt $LST
+
+# Хорошие сеты кистей
+#     https://krita.org/learn/resources/
+
+# В gnome 3.10 конфигуратор wacom просто шикарный! У меня wacom intuos 4 и «из коробки» работают даже led экранчики на планшете.
+#     Да, четверка почти везде сейчас из «коробки». Проблема с пятым поколением. Хотя, понятное дело, это временно.
+#     И спасибо за наводку на конфигуратор, а то led мертвым грузом сейчас на планшете.
+
