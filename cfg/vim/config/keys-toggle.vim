@@ -1,5 +1,8 @@
 " vim:ts=2:sw=2:sts=2
 
+" Toggle status line
+nnoremap <Leader>ta :set laststatus=<C-R>=&laststatus?0 :2<CR> \| :AirlineToggle<CR>
+
 " Often I need to disable it completely when investigating other's sources
 nnoremap <Leader>tl :set list! list?<CR>
 

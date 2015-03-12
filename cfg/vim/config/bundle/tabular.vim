@@ -4,12 +4,20 @@
 let s:leader = g:mapleader
 let mapleader = "\\"
 
-" Align on one-char
-noremap <silent> <Leader>aa :<C-U>exec ('Tabularize /[' .nr2char(getchar()). ']/l0r0')<CR>
-noremap <silent> <Leader>Aa :<C-U>exec ('Tabularize /[' .nr2char(getchar()). ']/l1r0')<CR>
-noremap <silent> <Leader>aA :<C-U>exec ('Tabularize /[' .nr2char(getchar()). ']/l0r1')<CR>
-noremap          <Leader>AA :Tabularize //l1r1<Left><Left><Left><Left><Left>
-noremap          <Leader>AF :Tabularize /^[^,]*\zs,/l1r0
+
+function! s:Tabi(bang, ...)
+    " Align on one-char, next word after one-char, or whole pattern
+    let patt = (a:0 > 0) ? a:1 :
+                \ ((a:bang?'': '[') .nr2char(getchar()). (a:bang?'\s*\zs': ''))
+    let aln = '/l'. v:count/10 .'r'. v:count%10
+    exec 'Tabularize /' . patt . aln
+endfunction
+command! -bang -nargs=? -range=% Tabi call s:Tabi(<bang>0, <q-args>)
+
+noremap <silent><unique> <Leader>a  :Tabi<CR>
+noremap <silent><unique> <Leader>ga :Tabi!<CR>
+noremap <silent><unique> <Leader>A  :Tabularize /<C-R>//l1r1
+noremap <silent><unique> <Leader>gA :Tabularize /^[^,]*\zs,/l1r1 ,
 
 let mapleader = s:leader
 " }}}

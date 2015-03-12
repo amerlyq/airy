@@ -4,10 +4,7 @@ bindkey "^Y" yank-current
 bindkey -a "^Y" yank-current
 function yank_current() {
     # If empty cmd line, copy last line from history
-    if ! [ "$BUFFER" ]; then
-        BUFFER="$(fc -ln -1)"
-    fi
-    printf "'$BUFFER'" | xsel --input --clipboard
+    xsel --input --clipboard <<< "${BUFFER:-$(fc -ln -1)}"
 }
 
 zle -N prepend-sudo prepend_sudo

@@ -41,24 +41,13 @@ noremap  gL  :<C-U>blast<CR>
 " nnoremap <Leader>4 <C-W>c
 
 
-" Direct pick tab
-for idx in range(1,10)
-    exec "noremap <unique> <Leader>". string(idx % 10) ." ". idx ."gt"
-endfor
-
-
-" Leader '\' {{{
-let s:leader = g:mapleader
-let mapleader = "\\"
-
+" Symmetrical binding to 'gt' for buffers  (12gb -- open buffer 12)
+nnoremap <unique> gb :<C-U><C-R>=v:count1<CR>b<CR>
 " Toggle to last edited buffer/file
-nnoremap <unique> <Leader>` :b#<CR>
-" Direct pick buffer
-for idx in range(1,20)
-    let key = (idx<=10 ? "" : "<Leader>") . string(idx % 10)
-    exec "nnoremap <unique> <Leader>". key ." :". idx ."b<CR>"
+nnoremap <unique> \` :b#<CR>
+
+" Direct pick tab on <M-\d> or buffer on <leader>\d
+for idx in range(1,10)
+    exec "map <unique> <M-". string(idx % 10) ."> ". idx ."gt"
+    exec "map <unique>  \\". string(idx % 10) ."  ". idx ."gb"
 endfor
-
-let mapleader = s:leader
-" }}}
-

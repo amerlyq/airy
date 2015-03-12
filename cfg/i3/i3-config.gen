@@ -322,7 +322,10 @@ wstr "for_window [window_role=\"pop-up\"] floating enable"
 #wstr "for_window [class=\"(?i)$term\" title=\"(?i)vim\"] border none"
 
 # wlistf "for_window [class=\"(?i)%s\"] floating enable" \
-#     "lxappearance copyq"
+#     "lxappearance Copyq Pidgin"
+
+wstr "for_window [class=\"^Pidgin\"] floating enable"
+
 wstr "for_window [instance=\"feh\"] fullscreen"
 wstr "for_window [class=\"^Conky\"] border none"
 wstr "for_window [instance=\"^Download\" class=\"^Firefox\"] floating enable"
