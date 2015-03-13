@@ -1,3 +1,15 @@
+### Output Pipe Redirection ###
+	 Like backtrace from coredump
+	printf "set logging on gdb.log\nbt 10\nq\n" > cmd_gdb && \
+	  gdb -x cmd_gdb -e /tmp/MrsAgent -c /tmp/Coredump 2>/dev/null
+
+	| show logging | Show the current values of the logging settings.
+	| set logging [on|off]    | Enable/Disable at all
+	| set logging file <file> | Name of the current logfile (default: gdb.txt)
+	| set logging overwrite [on|off] | To overwrite logfile each time (default: append)
+	| set logging redirect [on|off]  | Log only to logfile (default: both terminal and logfile)
+
+
 ### C++ classes, etc ###
 | list class::member		 | list member in class
 | b TestClass::testFunc(int) | 'class::member' -- w/o body, may get menu

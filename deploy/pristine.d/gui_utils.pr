@@ -6,6 +6,22 @@ if [ $? -eq 1 ]; then exit 1; fi
 
 LST="$LST wxhexeditor"
 # wxHexEditor | gui hex edit / compare tool, can mark selection with tags
+#   * You can work with delete/insert bytes to file, more than once, without creating temp file!
+#   * Could open your devices on Linux, Windows or MacOSX.
+#   * Allows Linux Process Memory Editing operations
+#   * Has x86 disassembly support
+#   * Comparison of binary files (scroll two views at once), allows merge of near results.
+#   * Added Sorted Tag Saving / Loading
+#   * Save selection as a dump file feature for make life easier.
+
+
+# PM="wxHexEditor.tar.bz2"
+# PM_SCR="$CURR_DIR_PKG/$PM"
+# wget_it "http://sourceforge.net/projects/wxhexeditor/files/latest/download?source=files" "$PM"
+# rm -f "$PM_SCR"
+# cd "$CURR_DIR_PKG"
+# tar xvfj "$PM_SCR"
+# # bash "${PM_SCR%.tar.*}.sh"
 
 apt_noprompt $LST
 

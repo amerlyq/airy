@@ -1,15 +1,22 @@
 # GENERAL
 # http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
+# (+++) https://wiki.archlinux.org/index.php/mutt
+
+# MULTI_ACC: In the most simple solution, just 'c'hange folders to the IMAP server:
+# https://www.df7cb.de/blog/2010/Using_multiple_IMAP_accounts_with_Mutt.html
+#   macro index <f2> '<change-folder>imaps://imap.example.com<enter>'
+#   macro index <f3> '<change-folder>imaps://imap.otherdomain.tld<enter>'
+
 
 # Greate by generator
 # set realname = "Name Surname"
 
-set use_from = yes
+# set use_from = yes
 set editor='vim -c "set spell spelllang=ru_yo,en_us,uk"'
-# set edit_headers # see the headers when editing
-set sort = reverse-threads # sort by newest conversation first
-set sort_aux = last-date-received
-set signature = ~/.mutt/signature
+# # set edit_headers # see the headers when editing
+# set sort = reverse-threads # sort by newest conversation first
+# set sort_aux = last-date-received
+# set signature = ~/.mutt/signature
 
 # confirmation skipping
 # set fast_reply=yes        # when replying, don't prompt for address
@@ -17,37 +24,49 @@ set signature = ~/.mutt/signature
 # set forward_quote=yes     # include original text on forward?
 # set delete=yes            # don't ask for delete confirmation
 
-# IMAP | enough only set local dirs
-# set from = `echo $MAIN_MAIL`
-# set imap_user = `echo $MAIN_MAIL`
-# set imap_pass = pass
 # set smtp_url = smtp://user@smtp.gmail.com:587/
 # set smtp_pass = pass
 
-set imap_keepalive = 900
-set copy = no
-set move = no
+# set imap_keepalive = 900
+# set copy = no
+# set move = no
 
-set folder = imaps://imap.gmail.com:993
-set spoolfile = +INBOX #or +[Gmail]/Important
-set postponed = +[Gmail]/Drafts
-set header_cache = ~/.cache/mutt/headers
-set message_cachedir = ~/.cache/mutt/bodies
-set certificate_file = ~/.cache/mutt/certificates
+# IMAP | enough only set local dirs
+# set from = `echo $MAIN_MAIL`
+set my_user = `echo ${MAIN_MAIL%%@*}`
+set imap_user = `echo $MAIN_MAIL`
+unset imap_pass   # set imap_pass = pass
+# [$my_user@] -- prefixed only to have different folders for each account
+set folder = imaps://$my_user@imap.gmail.com:993  # /[folder/]
+
+## Check incoming
+set spoolfile = +INBOX      #or +[Gmail]/Important
+mailboxes =INBOX
+mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.gmail.com/family
+#>  config includes a macro bound to the 'y' key which will allow you to change
+#>  to any of the folders listed under mailboxes
+# ALT: set imap_check_subscribed
+
+# set postponed = +[Gmail]/Drafts
+# set header_cache = ~/.cache/mutt/headers
+# set message_cachedir = ~/.cache/mutt/bodies
+# set certificate_file = ~/.cache/mutt/certificates
 
 
 # POP3 | need to create local dirs manually
 #set from = user@server.com
 #set mbox_type=Maildir
-#set folder=$HOME/.mail
-#set spoolfile=+/
-#set header_cache=~/.mutt/cache
+#set folder=$HOME/work/mail
+#set spoolfile=+/           # local directories to poll for new Mail. Can be more then one
+                            # (e.g. the Directories of Mailing-Lists)
+#set header_cache=~/.cache/mutt
 
 # SMTP
 #set my_pass='pass'
 #set my_user=user@server.com
-#set smtp_url=smtp://$my_user:$my_pass@mail.serve.com
+#set smtp_url=smtps://$my_user:$my_pass@mail.serve.com
 #set record="+sent" # where to store sent messages
+#set ssl_force_tls = yes
 #set postponed="+postponed" # where to store draft messages
 
 # BINDING

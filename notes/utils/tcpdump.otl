@@ -1,0 +1,141 @@
+// Мониторинг HTTP, how-to, necessary apps:
+	http://www.wireshark.org/docs/wsug_html_chunked/AppTools.html
+
+> apt-get install tcpdump tshark wireshark
+| rawcap (win), tcpdump (unix) | можно перехватывать пакеты из сетевых
+|		    | соединений или лупбэка и сливать их в дамп файл
+| wireshark | позволяет просматривать и фильтровать эти дамп файлы
+| strings   | отображает все текстовые строки, игнорируя бинарные данные -- для быстрого анализа разных ответов сети
+| ss		| another util to investigate sockets
+
+
+Snippet
+	ip addr show dev eth0
+	sudo tcpdump -v -i lo port 8080
+	sudo tcpdump -vvv -i lo port 8080 -l -s0 -w /tmp/http.log | strings
+	wireshark /tmp/http.log
+	tshark -r /tmp/http.log -O http
+
+	Wireshark -> Start (eth0)
+	Filter: http contains <site_nm>.net
+	Wireshark -> Follow TCP Stream -> Find 'USERID'
+		If not found -> Filter Out This Stream (to remove tcp-entries w/o 'USERID')
+
+
+
+TUT
+	(+++) https://danielmiessler.com/study/
+	http://www.securitywizardry.com/
+	https://danielmiessler.com/study/tcpdump/
+
+	from old-db
+		http://www.k-max.name/linux/tcpdump-v-primerax/
+		http://www.lexpr.ru/tcpdump
+
+FLAGS
+| -i any | Listen on all interfaces just to see if you’re seeing any traffic.
+| -v[vv] | Increase the amount of packet information you get back.
+|  -n[n] | Don’t resolve hostnames [and port names], so IPs themselves always being displayed.
+|  -X[X] | Show the packet’s contents in both hex and ASCII, [also ethernet header]
+|     -S | Print absolute sequence numbers instead of relative
+|        | The idea there is that you can’t see weirdness in the sequence
+|        | numbers if they’re being hidden from you.
+|     -c | Only get x number of packets and then stop.
+|     -s | Define the snaplength (size) of the capture in bytes. (default 96)
+|        | Use -s0 to get everything (recommended), unless you are intentionally capturing less.
+|        | Use -s 1514 to get full coverage
+|     -e | Get the ethernet header as well.
+|     -q | Show less protocol information.
+|     -E | Decrypt IPSEC traffic by providing an encryption key.
+
+USAGE
+	Basic communication // see the basics without many options
+		tcpdump -nS
+	Basic communication (very verbose) // see a good amount of traffic, with verbosity and no name help
+		tcpdump -nnvvS
+	A deeper look at the traffic // adds -X for payload but doesn’t grab any more of the packet
+		tcpdump -nnvvXS
+	Heavy packet viewing // the final “s” increases the snaplength, grabbing the whole packet
+		tcpdump -nnvvXSs 1514
+	Here’s a capture of exactly two (-c2) ICMP packets (a ping and pong)
+		tcpdump -nnvXSs 0 -c2 icmp
+
+FILTERING EXPRESSIONS
+	type=[host,net,port]
+	dir=[src and/or dst]
+	MIX: and / &&,  or / ||,  not / !
+	Parenthesis
+		tcpdump src 10.0.2.4 and \(dst port 3389 or 22\)
+		tcpdump 'src 10.0.2.4 and (dst port 3389 or 22)'
+	Write in file and read back. Dump format -- can be read by Wireshark, Snort, etc.
+		tcpdump -s 1514 port 80 -w capture_file
+		tcpdump -r capture_file
+
+PRIMER
+	look for traffic based on IP address (also works with hostname if you’re not using -n)
+		tcpdump host 1.2.3.4
+	find traffic from only a source or destination (eliminates one side of a host conversation)
+		tcpdump src 2.3.4.5
+		tcpdump dst 3.4.5.6
+	capture an entire network using CIDR notation
+		tcpdump net 1.2.3.0/24
+	works for tcp, udp, and icmp. Note that you don’t have to type proto
+		tcpdump icmp
+	see only traffic to or from a certain port
+		tcpdump port 3389
+	filter based on the source or destination port
+		tcpdump src port 1025
+		tcpdump dst port 389
+	combine all three
+		tcpdump src port 1025 and tcp
+		tcpdump udp and src port 53
+	Port Ranges
+		tcpdump portrange 21-23
+	Packet Size Filter (in bytes)
+		tcpdump less 32		| tcpdump > 32
+		tcpdump greater 128 | tcpdump <= 128
+
+
+[UAPRSF] TCP flags: Unskilled Attackers Pester Real Security Folk
+	tcp[13] looks at offset 13 in the TCP header, number represents bit within the byte
+	Show me all URGENT (URG) packets…
+		tcpdump ‘tcp[13] & 32!=0‘
+	Show me all ACKNOWLEDGE (ACK) packets…
+		tcpdump ‘tcp[13] & 16!=0‘
+	Show me all PUSH (PSH) packets…
+		tcpdump ‘tcp[13] & 8!=0‘
+	Show me all RESET (RST) packets…
+		tcpdump ‘tcp[13] & 4!=0‘
+	Show me all SYNCHRONIZE (SYN) packets…
+		tcpdump ‘tcp[13] & 2!=0‘
+	Show me all FINISH (FIN) packets…
+		tcpdump ‘tcp[13] & 1!=0‘
+	Show me all SYNCHRONIZE/ACKNOWLEDGE (SYNACK) packets…
+		tcpdump ‘tcp[13]=18‘
+	ALT: Capture TCP Flags Using the tcpflags Option…
+		tcpdump ‘tcp[tcpflags] & & tcp-syn != 0‘
+ [ Note: Only the PSH, RST, SYN, and FIN flags are displayed in tcpdump‘s
+ flag field output. URGs and ACKs are displayed, but they are shown
+ elsewhere in the output rather than in the flags field ]
+
+
+ISOLATION SPECIFIC TYPE OF TRAFFIC
+	Primer
+		tcpdump -nnvvS src 10.5.2.3 and dst port 3389
+	Traffic originating from the 192.168 network headed for the 10 or 172.16 networks
+		tcpdump -nvX src net 192.168.0.0/16 and dst net 10.0.0.0/8 or 172.16.0.0/16
+	Non-ICMP traffic destined for 192.168.0.2 from the 172.16 network
+		tcpdump -nvvXSs 1514 dst 192.168.0.2 and src net and not icmp
+	Traffic originating from Mars or Pluto that isn’t to the SSH port
+		tcpdump -vv src mars and not dst port 22
+	IPv6 traffic
+		tcpdump ip6
+	Malformed/likely-malicious packets
+		Packets with both the RST and SYN flags set (why?)
+			tcpdump ‘tcp[13] = 6′
+		Traffic with the ‘Evil Bit’ Set
+			tcpdump ‘ip[6] & 128 != 0‘
+
+A workaround to filter by content: If you add -s0 -A -w - (show entire packets, ASCII, write to
+standard output) to your tcpdump params, you can then use grep with some
+context to show only the packets that show where X-Cache: HIT.

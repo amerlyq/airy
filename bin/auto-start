@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ~/.bash_export
+
 MAXWAIT=30
 
 # Kill all childs
@@ -61,5 +63,6 @@ rcf dunst
 lau mpd
 lau compton
 lau copyq
+[[ "$CURR_PROF" == "work" ]] && lau pidgin
 
 
