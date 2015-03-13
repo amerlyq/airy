@@ -1,7 +1,8 @@
 "Common Plugins ***************************************************
 " This setting loads the checkboxes, tags and smart_paste plugins as default.
-let g:vo_modules_load = "checkbox:tags:smart_paste:format:clock"
+let g:vo_modules_load = "checkbox:tags:format:clock"
 ":math:newhoist" (extracting tree in ./ folder in temp file)
+":smart_paste (cut/put branches to the end)
 "Uncomment and set to 1 to debug hoisting
 "let g:hoistParanoia=0
 let g:use_space_colon = 0
