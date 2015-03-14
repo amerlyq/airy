@@ -1,0 +1,52 @@
+MAN
+ http://i3wm.org/docs/
+ https://wiki.archlinux.org/index.php/i3
+
+
+WARNING
+	Comment with '#' only full lines
+	 cause i3 appends line-comments to valid args and create mess
+	Vars: no recursive expansion!
+	Keys:
+
+
+SEE
+ 4.16. Interprocess communication
+ 6. List of commands
+ 6.3. Manipulating layout
+ +- 6.4. Focusing/Moving containers
+ 6.16. i3bar control
+
+ not very clean what it is
+ 5.4. Bar ID
+ Commands: ipc_socket, ipc-socket
+
+
+KEYS
+	bind \mod\w, bindcode [--release] [0-9]\+
+	 Valid: Mod1-Mod5, Shift, Control
+	 Mod1 (Alt) is more comfortable in use, so I remapped Alt<->Win
+	 to use Mod4 in place of Alt and keep Alt functionality.
+	To get appropriate key syms press all keys and see file:
+		xev | sed -ne '/keysym/!d; s/.*([^,]\+, \(\S\+\)).*/\1/gp; w /tmp/kbs'
+	Unavailable
+		mod+space -- used as Compose key
+		mod+ISO_First_Group_Lock -- used for ru lang
+		NoSymbol (Ctrl_L) -- treated as Overlay key
+		UNUSED?: ISO_Level3_Shift   Multi_key
+
+AUTOCMD
+	i3 execute any command when it encounters a specific window
+	criteria (all beside ids are regex PCRE):
+		class instance window_role id title urgent con_mark con_id
+	> xprop | grep 'WM_CLASS(STRING)' == "#instance, #class"
+	> obxprop | grep WM_CLASS
+	E.G. make window floating as it change directory to ~/work
+		for_window [title="x200: ~/work"] floating enable
+
+MULTI MONITOR
+	SEE: configuring your monitors and 'xrandr' usage
+		http://i3wm.org/docs/userguide.html#multi_monitor
+		http://i3wm.org/docs/userguide.html#_giving_presentations_multi_monitor
+
+

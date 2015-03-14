@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+ARGS=${1:--e}
+
+# But how about ALT modifator? Mod1-Mod5, Shift, Control
+KBD_ALL=$(sed 's/\s\+/\n/g' <<EOT | sed 's/.*/$mod+&\n$mSd+&\n$mCd+&\n$mCS+&/'
+$(echo {{0..9},{a..z},F{1..12}})
+Left Down Up Right           Home Next Prior End
+Tab Return Escape            BackSpace Insert Delete Pause
+comma period semicolon       slash backslash grave
+bracketleft bracketright     apostrophe equal minus
+EOT
+)
+
+I3_GMAP=$(cat ~/.i3/config | sed -rn '/^bindsym\s+(\S+)\s+(.*)/s//\1 \2/p')
+
+rm_tag_pair() { gawk '
+    /=$/{ if($1!=prev){print $1} }; !/=$/{prev=$1}
+';}
+
+list_to_table(){ gawk '
+    { k=substr($0,6); $0=substr($0,3,2)}
+    /od/{a[k]+=1} /Sd/{a[k]+=2} /Cd/{a[k]+=4} /CS/{a[k]+=8}
+    function r(v){return " "(and(a[k],v)?"x":"-")}
+    function cmp_key(i1,v1,i2,v2){return xor(length(i1)==1,length(i2)==1)\
+        ? ((length(i2)==1)?-1: 1) : ((i1<i2) ? -1 : (i1!=i2)) }
+    END{ print "<---key---> . S C CS"
+        PROCINFO["sorted_in"]="cmp_key"
+        for(k in a){printf("%10s %s\n",k,r(1)r(2)r(4)r(8))}
+}';}
+
+
+if [ "$ARGS" == "-e" ]; then { # empty only
+    echo "$KBD_ALL" | sed 's/^.*/& =/'
+    echo "$I3_GMAP" | awk '{print $1}'
+} | LC_ALL=C sort | rm_tag_pair | list_to_table
+fi
+
+if [ "$ARGS" == "-a" ]; then  # all used
+    echo "$I3_GMAP" | sed 's/ /|/1' | column -ts'|'
+fi
+
+if [ "$ARGS" == "-x" ]; then  # xkb map
+    cat /usr/share/X11/xkb/symbols/{pc,us} | sed '/^default/,/^};$/!d' \
+        | sed -n '/^.*\[\s*\(.\+\)\s*\].*$/s//\1/p' | sed 's/\s*,\s*/\n/g' \
+        | LC_ALL=C sort -u #| sed 's/^\s*\(\S\+\)\s*$/$mod+\1 ===/'
+fi

@@ -29,6 +29,8 @@ noremap <leader>cE :<C-U>%s:^\s*$\n::<CR>
 noremap <leader>cc :<C-U>%s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
 noremap <leader>cC :s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
 noremap <leader>cy <Esc>:%s:\<<C-R><C-W>\>:<C-R>0:g<Left><Left>
+": Emulate 'tr' command -> vectored replacing of symbols
+noremap <leader>cR :s/.*/\=tr(submatch(0), '()', '[]')
 
 ": Delete highlighted match
 nnoremap <leader>cx :%s;;;g<CR>

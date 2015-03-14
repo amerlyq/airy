@@ -19,20 +19,11 @@ export PATH="${PATH}:${HOME}/bin"
 # SHELL OPTIONS #
 #################
 
-## type the name of a directory -> it will become the current directory
-setopt autocd
-
-## lets files beginning with a . be matched without explicitly specifying the dot
-setopt globdots
-
 ## spelling correction for executed commands
 setopt correct
 
 ## spelling correction for all arguments
 #setopt correctall
-
-## don't beep on errors
-setopt nobeep
 
 #################
 # SHELL HISTORY #
@@ -167,43 +158,3 @@ bindkey "^R" history-incremental-pattern-search-backward    # control + r
 bindkey "^S" history-incremental-pattern-search-forward     # control + s
 # completion in the middle of a line
 bindkey '^i' expand-or-complete-prefix
-
-###########
-# ALIASES #
-###########
-
-alias ..='cd ..'
-alias ls='ls --color=auto --human-readable --group-directories-first --classify'
-alias lsd='ls -ld *(-/DN)'
-alias lsa='ls -ld .*'
-alias dir='ls -1'
-alias cp='nocorrect cp -iv'     # no spelling correction
-alias mv='nocorrect mv -iv'     # no spelling correction
-alias rm='nocorrect rm -iv'     # no spelling correction
-alias mkdir='nocorrect mkdir'   # no spelling correction
-alias man='nocorrect man'       # no spelling correction
-alias chmod="chmod -c"
-alias chown="chown -c"
-alias grep='grep --colour=auto'
-alias p='ps -A f -o user,pid,priority,ni,pcpu,pmem,args'
-alias mem="free -m"
-alias f='find |grep'
-alias c="clear"
-alias hist="grep '$1' ~/.zsh_histfile"
-alias rcp='rsync -v --progress'
-alias rmv='rsync -v --progress --remove-source-files'
-alias clean='yaourt -Qdt'
-alias cleanpkg='yaourt -Scc'
-
-## Auto extension stuff
-alias -s html=$BROWSER
-alias -s php=$BROWSER
-alias -s png=feh
-alias -s jpg=feh
-alias -s gif=feh
-alias -s xls=libreoffice
-alias -s doc=libreoffice
-alias -s gz='tar -xzvf'
-alias -s bz2='tar -xjvf'
-alias -s txt=$EDITOR
-alias -s PKGBUILD=$EDITOR

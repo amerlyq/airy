@@ -46,3 +46,10 @@ tmux-display-fix() {
         tmux setenv -g -t $name DISPLAY $DISPLAY
     done
 }
+
+copyq-edit() {
+    local fl=`tempfile`
+    copyq clipboard > $fl
+    vim $fl && cat $fl | copyq copy -
+    rm -f $fl
+}

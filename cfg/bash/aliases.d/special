@@ -39,9 +39,11 @@ vish(){
 alias s='source ranger-auto; if [ $? -eq 2 ]; then exit; fi'
 alias w3m='\w3m google.com'
 alias w3mh='\w3m -T "text/html"'
-alias targz='tar -cvfz' # arch.tar.gz ./
-alias untargz='tar xvfz'
-alias untarbz2='tar xvfj'
+alias tgz='tar -cvfz' # arch.tar.gz ./
+alias utgz='tar xvfz'
+alias utbz2='tar xvfj'
+
+alias p='ps -A f -o user,pid,priority,ni,pcpu,pmem,args'
 
 
 # dir with many small files sending   #ALT: scp file1 file2 ... fileN user@host:~/Downloads/

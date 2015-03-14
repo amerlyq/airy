@@ -10,6 +10,8 @@ setopt INC_APPEND_HISTORY
 setopt nobeep
 ## type the name of a directory -> it will become the current directory
 setopt autocd
+## lets files beginning with a . be matched without explicitly specifying the dot
+setopt globdots
 ## glob's expanding magic
 setopt extended_glob
 ## make aliases available in scripts

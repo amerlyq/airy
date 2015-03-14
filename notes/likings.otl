@@ -12,6 +12,9 @@ zathura
 		evince
 		wwwoffle
 
+CHECK
+	xosview, irssi, gajim
+
 OpenGrok
 	Утилита индексирующая базы сорцов -- с навигацией локально внутри браузера
 
@@ -67,3 +70,16 @@ pdfpc
 
 vifm
 	Можно ползать внутри архивов! Ставить ассоциации файлов итп
+
+ftools
+	https://github.com/xiaozhiwen/linux-ftools
+	 These are tools designed for working with modern linux system calls
+	 including, mincore, fallocate, fadvise, etc.
+	 We designed these primarily to work in high performance environments to
+	 determine information about the running kernel, improve system
+	 performance, and debug performance problems.
+		Take a look at linux-ftools if you'd like to analyze the contents of the
+		buffers & cache. Specifically if you'd like to see what files are
+		currently being cached.
+	cd ~ && fincore --pages=false --summarize --only-cached *
+	 With this tool you can see what files are being cached within a give directory.

@@ -2,11 +2,11 @@
 
 SETS=
 case ${1:-$CURR_THEME} in
- transparent|-t) SETS="-sh 100 -fadecolor White -fade 25" ;;
-      opaque|-o) SETS="-sh   0 -fadecolor Black -fade 15" ;;
-       light|-l) SETS="-sh 170 -fadecolor White -fade 25" ;;
-        dark|-d) SETS="-sh  25 -fadecolor Black -fade 15" ;;
-             *) SETS="-sh 100 -fadecolor White -fade 25" ;;
+ transparent|-t) SETS="-sh 100 -fadecolor White -fade 25"; shift ;;
+      opaque|-o) SETS="-sh   0 -fadecolor Black -fade 15"; shift ;;
+       light|-l) SETS="-sh 170 -fadecolor White -fade 25"; shift ;;
+        dark|-d) SETS="-sh  25 -fadecolor Black -fade 15"; shift ;;
+              *) SETS="-sh 100 -fadecolor White -fade 25" ;;
 esac
 
-urxvt $SETS
+urxvt $SETS ${@:+-e "$@"}

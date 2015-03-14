@@ -1,37 +1,19 @@
-# vim: ft=sh
 # i3 config file (v4) :
-# http://i3wm.org/docs/
-# https://wiki.archlinux.org/index.php/i3
-# NOTE:
-#   Comment with '#' only full lines
-#       cause i3 appends line-comments to valid args and create mess
-#   Vars: no recursive expansion
+# vim: ft=sh
 
-# see
-# 4.12. Automatically putting clients on specific workspaces
-# 4.16. Interprocess communication
-# 6. List of commands
-# 6.3. Manipulating layout
-# +- 6.4. Focusing/Moving containers
-# 6.16. i3bar control
-
-# not very clean what it is
-# 5.4. Bar ID
-# Commands: ipc_socket, ipc-socket
-
-# To get appropriate key syms use '$ xev'
-#bind \mod\w, bindcode [--release] [0-9]\+
-
-# Valid: Mod1-Mod5, Shift, Control (see xmodmap(1)).
-# Mod1 (Alt) is more comfortable in use, so I remapped Alt<->Win
-# to use Mod4 in place of Alt and keep Alt functionality.
 set $mod Mod4
+set $mSd Mod4+Shift
+set $mCd Mod4+Control
+set $mCS Mod4+Control+Shift
+
+set $exno exec --no-startup-id
+set $move_ctw move container to workspace
+
+
 floating_modifier $mod
-focus_follows_mouse no  # auto on hover <yes|no>
-
-
-popup_during_fullscreen smart # <smart|ignore|leave_fullscreen>
-# display hint over 'this' time, when switching to urgent wksp
+focus_follows_mouse no          # auto on hover <yes|no>
+popup_during_fullscreen smart   # <smart|ignore|leave_fullscreen>
+# Display hint over 'this' time, when switching to urgent wksp
 force_display_urgency_hint 800 ms
 
 # When being in a tabbed or stacked container, the first container will be focused when you use focus down on the last container?—?the focus wraps. If however there is another stacked/tabbed container in that direction, focus will be set on that container. This is the default behavior so you can navigate to all your windows without having to use focus parent.
@@ -44,12 +26,12 @@ floating_minimum_size 100 x 80
 #floating_maximum_size -1 x -1
 
 ### New wksp ###
-default_orientation auto # <horizontal|vertical|auto>
-workspace_layout default # <default|stacking|tabbed>
-hide_edge_borders none # <none|vertical|horizontal|both>
-# border <normal|pixel> [0-9], only 'normal' with titlebar
-new_window pixel 1
-new_float pixel 1
+default_orientation auto    # <horizontal|vertical|auto>
+workspace_layout default    # <default|stacking|tabbed>
+hide_edge_borders none      # <none|vertical|horizontal|both>
+# border <normal|pixel> [0-9] px, only 'normal' with titlebar
+new_window pixel 1 px
+new_float pixel 1 px
 
 
 # ==================== Appearance ===========================
@@ -75,39 +57,26 @@ bindsym $mod+b border toggle
 # kill focused window
 bindsym $mod+backslash kill
 # kill all wdws on wksp
-bindsym $mod+Control+backslash focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill, workspace back_and_forth
-bindsym $mod+Shift+q kill
+bindsym $mCd+backslash focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill, workspace back_and_forth
+bindsym $mSd+q kill
 
 bindsym $mod+semicolon focus parent
-bindsym $mod+Shift+semicolon focus child
+bindsym $mSd+semicolon focus child
 #bindsym $mod+apostrophe focus child
 bindsym $mod+x [urgent=latest] focus
 
-bindsym $mod+Tab workspace next_on_output
-bindsym $mod+Shift+Tab workspace prev_on_output
-bindsym $mod+Control+Left workspace prev
-bindsym $mod+Control+Right workspace next
+bindsym $mod+Tab   workspace next_on_output
+bindsym $mSd+Tab   workspace prev_on_output
+bindsym $mCd+Tab   $move_ctw next_on_output, workspace next_on_output
+bindsym $mCS+Tab   $move_ctw prev_on_output, workspace prev_on_output
+bindsym $mCd+Left  workspace prev
+bindsym $mCd+Right workspace next
 
 ### Current and previous ###
 # Works like a charm tag system -- we can share browser, moving it throughout all wksps
 bindsym $mod+a workspace back_and_forth
-bindsym $mod+Control+a move container to workspace back_and_forth; workspace back_and_forth
-bindsym $mod+Control+Shift+a move container to workspace back_and_forth
-
-### ==================== Workspaces ===================== ###
-
-# you can let i3 execute any command when it encounters a specific window.
-# The valid criteria are the same as those for commands, see [command_criteria]
-# #class #instance #window_role #id #title #urgent #con_mark #con_id (all beside ids are regex (PCRE))
-#       xprop | grep -i 'class'
-#       obxprop | grep WM_CLASS
-
-# # A less useful, but rather funny example:
-# # makes the window floating as soon as I change
-# # directory to ~/work
-# for_window [title="x200: ~/work"] floating enable
-# resize window (you can also use the mouse for that)
-
+bindsym $mCd+a $move_ctw back_and_forth; workspace back_and_forth
+bindsym $mCS+a $move_ctw back_and_forth
 
 ### ======================= Scratchpad ======================= ###
 # The scratchpad container gets displayed in the centre of a window in a floating mode.
@@ -115,8 +84,8 @@ bindsym $mod+Control+Shift+a move container to workspace back_and_forth
 # Make the currently focused window a scratchpad (could contain >1 windows)
 # Toggle show/hide for the first scratchpad window (you can have >1 scratchpad container)
 bindsym $mod+i scratchpad show
-bindsym $mod+Shift+i move scratchpad
-bindsym $mod+Control+i floating toggle
+bindsym $mSd+i move scratchpad
+bindsym $mCd+i floating toggle
 
 # By default, scratchpads only contain a single window. However, containers can also be made a scratchpad.
 # Create a new container (for example, Mod+Enter), split it (Mod+v) and create another container. Focus the parent (Mod+a), split in the opposite direction (Mod+h), and create again.
@@ -127,9 +96,10 @@ bindsym $mod+Control+i floating toggle
 # Use Mouse+$mod to drag floating windows to their wanted position
 # Change focus between tiling / floating windows #toggle/enable
 # Toggle tiling / floating (also remove current window from scratchpad)
-# mod+Control+space don't work with my xkb (no keycode!), use space for some more useful
+# mCd+space don't work with my xkb (no keycode!), use space for some more useful
 bindsym $mod+w focus mode_toggle
-bindsym $mod+Control+w floating toggle
+bindsym $mSd+w floating enable
+bindsym $mCd+w floating toggle
 
 # Show the sup-mail scratchpad window, if any.
 # bindsym mod4+s [title="^Sup ::"] scratchpad show
@@ -137,10 +107,6 @@ bindsym $mod+Control+w floating toggle
 # Need module such as launcher with the same names but for focusing. Use dmenu?
 
 ### ===================== Multi-monitors ===================== ###
-# SEE: configuring your monitors and 'xrandr' usage
-# http://i3wm.org/docs/userguide.html#multi_monitor
-# http://i3wm.org/docs/userguide.html#_giving_presentations_multi_monitor
-
 # Scratchpad, containers: move them between the screens with std move command.
 # Restrict to the current output: use workspace [next/prev]_on_output
 # move container to output <<left|right|down|up>|<output>>
@@ -149,16 +115,16 @@ bindsym $mod+Control+w floating toggle
 
 # Move the current workspace to the next output
 # (effectively toggles when you only have two outputs)
-bindsym $mod+bracketleft          focus output left
-bindsym $mod+bracketright         focus output right
-bindsym $mod+Control+bracketleft  move workspace to output left
-bindsym $mod+Control+bracketright move workspace to output right
-bindsym $mod+Shift+bracketright   move container to output right; focus output right
-bindsym $mod+Shift+bracketleft    move container to output left;  focus output left
+bindsym $mod+bracketleft  focus output left
+bindsym $mod+bracketright focus output right
+bindsym $mCd+bracketleft  move workspace to output left
+bindsym $mCd+bracketright move workspace to output right
+bindsym $mSd+bracketright move container to output right; focus output right
+bindsym $mSd+bracketleft  move container to output left;  focus output left
 
 # Focusing wksps in pairs on two monitors
-bindsym $mod+Control+Shift+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
-bindsym $mod+Control+Shift+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
+bindsym $mCS+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
+bindsym $mCS+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
 
 ## Put this window on the presentation output.
 #bindsym $mod+x move container to output VGA1

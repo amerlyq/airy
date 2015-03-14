@@ -1,0 +1,94 @@
+Search for device name
+	xinput list
+	tail -f /var/log/Xorg.0.log  (and plug usb of your tablet)
+		Wacom Intuos Pro S Pen pad: Wacom USB Intuos Pro tablet maxX=31496
+		maxY=19685 maxZ=2047 resX=200000 resY=200000  tilt=enabled
+ So, WACOM_NM="Wacom Intuos Pro S Pen pad"
+
+Show abilities
+	xinput list-props $WACOM_NM
+
+Get events for calibration
+ Using the -proximity switch will tell you when you've gone beyond the tablets edge
+	xinput test -proximity $WACOM_NM
+ Then get minimum and maximum X and Y from list
+	xsetwacom set $WACOM_NM Area -20 12 87064 65691
+ NOTE: eraser, cursor, stylus coordinates are the same for xsetwacom, and
+ different when setting through /usr/share/X11/xorg.conf.d/50-wacom.conf
+
+REF
+	Get tablet abilities
+		man wacom
+		man xsetwacom
+		xsetwacom list			   | modes
+		xsetwacom list parameters  | options
+		xsetwacom list modifiers   | keyboard
+
+	Get available keys for your keyboard
+		man dumpkeys
+		sudo dumpkeys --long-info
+		sudo dumpkeys --funcs-only
+
+SETS
+
+WACOM_NM="Wacom Intuos Pro S Pen pad"
+cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
+
+	Button 1 "key p"      # Paintbrush
+	Button 2 "key ctrl z" # Undo
+	Button 3 "key KP_Next"
+	Button 4 "key KP_Prior"
+	Button 5 "key shift control left"  # prev/next brush (must be mapped in GIMP; disables float)
+	Button 6 "key shift control right"
+	Button 7 "key tab" # toggle docks
+	Button 8 "key F11" # fullscreen
+
+	Button 1 "key ctrl t"    # key combination for toggle touch script
+	Button 2 "key backspace" #
+	Button 3 3               # right mouse click
+	Button 4 1               # left mouse click
+
+	RelWheelDown   "key minus"		# Zoom out
+	RelWheelUp     "key plus"		# Zoom in
+	AbsWheelDown   "key ctrl shift s"
+	AbsWheelUp     "key ctrl shift s"
+	StripLeftDown  "key minus"      # zoom out
+	StripLeftUp    "key shift plus" # zoom in
+	StripRightDown "key alt down"   # brush radius (must be mapped in GIMP)
+	StripRightUp   "key alt up"
+EOT
+
+WACOM_NM="Wacom Intuos Pro S Pen stylus"
+cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
+	RawSample 8  # made up to decrease the lag between where the stylus tip is and when the line is drawn in Gimp
+	PressureCurve 0 10 90 100   # Softer
+	Area -10 -20 14720 9200     # Calibration results
+EOT
+
+WACOM_NM="Wacom Intuos Pro S Pen eraser"
+cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
+	RawSample 8
+	PressureCurve 5 0 100 95    # Firmer
+	Area -10 -20 14720 9200     # Calibration results
+EOT
+
+WACOM_NM="Wacom Intuos Pro S Finger touch"
+cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
+	ScrollDistance 18  # a little more sensitive
+	TapTime 220
+EOT
+
+notify-send -t 1500 "Gimp Profile Ran"
+
+Also need profile with default settings
+
+Portret regime for tablet -- read and create appropriate matrix to map only _part_ of monitor
+ http://linuxwacom.sourceforge.net/wiki/index.php/Dual_and_Multi-Monitor_Set_Up#MapToOutput
+	xsetwacom set "Wacom Intuos4 6x9 stylus" MapToOutput VGA1
+	xsetwacom set "device name" Rotate half #none, half, cw, ccw
+	OR
+	xinput set-prop "Serial Wacom Tablet stylus" --type=float "Coordinate Transformation Matrix" 0 0.333333 0.666666 -1 0 1 0 0 1
+
+xsetwacom set "device name" PressureCurve 0 0 100 100
+xsetwacom set "device name" Mode "Absolute"
+xsetwacom set "device name" TabletPCButton "off"

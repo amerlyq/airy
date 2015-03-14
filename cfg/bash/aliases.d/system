@@ -8,12 +8,16 @@ alias root='sudo -i'
 
 # ALT: sudo vbetool dpms [on/off]
 alias off='xset -d :0 dpms force off'
-alias reswap='sudo swapoff -a && sudo swapon -a'
 alias powertop='sudo powertop' # --calibrate
+
 alias reboot='sudo /sbin/reboot'
 alias poweroff='sudo /sbin/poweroff'
 alias halt='sudo /sbin/halt'
 alias shutdown='sudo /sbin/shutdown'
+
+alias free='free -h'
+alias reswap='sudo swapoff -a && sudo swapon -a && free'
+alias recache='free && sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free'
 
 
 # --- Shorts ---
@@ -26,12 +30,13 @@ if (( EUID != 0 )); then
     # alias debup_old='aptitude update && aptitude upgrade'
 fi
 
-alias apti='apt-get'
-alias apt-search='apt-cache search'
+alias apti='apt-get install'
+alias apts='apt-cache search'
 alias update='sudo apt-get update && sudo apt-get upgrade'
 
 
 # --- Insurance ---
+alias sort='LC_ALL=C sort'
 alias mv='mv -i'
 alias cp='cp -iv'
 alias ln='ln -i'
