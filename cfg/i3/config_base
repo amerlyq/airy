@@ -1,6 +1,8 @@
 # i3 config file (v4) :
 # vim: ft=sh
 
+### ================== Variables =================== ###
+
 set $mod Mod4
 set $mSd Mod4+Shift
 set $mCd Mod4+Control
@@ -9,6 +11,11 @@ set $mCS Mod4+Control+Shift
 set $exno exec --no-startup-id
 set $move_ctw move container to workspace
 
+set $def mode "default"
+set $upd ~/.i3/blocks/update
+
+
+### =================== Options ==================== ###
 
 floating_modifier $mod
 focus_follows_mouse no          # auto on hover <yes|no>
@@ -34,7 +41,7 @@ new_window pixel 1 px
 new_float pixel 1 px
 
 
-# ==================== Appearance ===========================
+### ================== Appearance ================== ###
 
 # split in <horizontal,vertical> orientation
 bindsym $mod+n split vertical
@@ -52,7 +59,8 @@ bindsym $mod+slash  layout toggle split
 bindsym $mod+b border toggle
 #}
 
-# ==========================================================
+
+### ================== Operations ================== ###
 
 # kill focused window
 bindsym $mod+backslash kill
@@ -75,10 +83,11 @@ bindsym $mCd+Right workspace next
 ### Current and previous ###
 # Works like a charm tag system -- we can share browser, moving it throughout all wksps
 bindsym $mod+a workspace back_and_forth
+bindsym $mSd+a $move_ctw back_and_forth
 bindsym $mCd+a $move_ctw back_and_forth; workspace back_and_forth
-bindsym $mCS+a $move_ctw back_and_forth
 
-### ======================= Scratchpad ======================= ###
+
+### ================== Scratchpad ================== ###
 # The scratchpad container gets displayed in the centre of a window in a floating mode.
 # Exmpl: ncmpcpp, mc, bash prompt, email, REPL, alsamixer, or emacs for notes
 # Make the currently focused window a scratchpad (could contain >1 windows)
@@ -106,7 +115,7 @@ bindsym $mCd+w floating toggle
 
 # Need module such as launcher with the same names but for focusing. Use dmenu?
 
-### ===================== Multi-monitors ===================== ###
+### ================ Multi-monitors ================ ###
 # Scratchpad, containers: move them between the screens with std move command.
 # Restrict to the current output: use workspace [next/prev]_on_output
 # move container to output <<left|right|down|up>|<output>>
@@ -136,9 +145,4 @@ bindsym $mCS+bracketright focus output left; workspace next_on_output; focus out
 # bindcode 233 exec xbacklight -inc 20
 # bindcode 232 exec xbacklight -dec 20
 # bindcode 251 exec xbacklight -set 86
-
-## Renaming
-#i3-msg 'rename workspace "1: www" to "10: www"'
-bindsym $mod+z exec i3-input -P 'WS Name: ' -F 'exec --no-startup-id ~/.i3/ext/rename_current_workspace "%s"'
-bindsym $mod+Insert exec --no-startup-id ~/.i3/ext/rename_as_focused
 

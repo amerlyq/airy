@@ -49,4 +49,9 @@ MULTI MONITOR
 		http://i3wm.org/docs/userguide.html#multi_monitor
 		http://i3wm.org/docs/userguide.html#_giving_presentations_multi_monitor
 
+SNIPPETS
+	For auto-hiding bar, pinned only for modes
+		wk_mode()   { wstr "$mod+$1 bar mode dock; mode \"$2\""; }
+		mdf="mode \"default\"; bar mode hide; exec sleep 0.1; exec xdotool key --clearmodifiers alt"
+
 

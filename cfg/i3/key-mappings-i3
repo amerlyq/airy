@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ARGS=${1:--e}
+ARGS=${1:--a}
 
 # But how about ALT modifator? Mod1-Mod5, Shift, Control
 KBD_ALL=$(sed 's/\s\+/\n/g' <<EOT | sed 's/.*/$mod+&\n$mSd+&\n$mCd+&\n$mCS+&/'
@@ -11,11 +11,17 @@ comma period semicolon       slash backslash grave
 bracketleft bracketright     apostrophe equal minus
 EOT
 )
-
+# +grtvyz
 I3_GMAP=$(cat ~/.i3/config | sed -rn '/^bindsym\s+(\S+)\s+(.*)/s//\1 \2/p')
 
 rm_tag_pair() { gawk '
     /=$/{ if($1!=prev){print $1} }; !/=$/{prev=$1}
+';}
+
+sort_keys(){ gawk '
+    function cmp_key(i1,v1,i2,v2){return xor(length(i1)==6,length(i2)==6)\
+        ? ((length(i2)==6)?-1: 1) : ((i1<i2) ? -1 : (i1!=i2)) }
+    { a[$1]=$0 } END{ PROCINFO["sorted_in"]="cmp_key"; for(k in a){print a[k]} }
 ';}
 
 list_to_table(){ gawk '
@@ -33,11 +39,11 @@ list_to_table(){ gawk '
 if [ "$ARGS" == "-e" ]; then { # empty only
     echo "$KBD_ALL" | sed 's/^.*/& =/'
     echo "$I3_GMAP" | awk '{print $1}'
-} | LC_ALL=C sort | rm_tag_pair | list_to_table
+} | LC_ALL=C sort | rm_tag_pair | list_to_table | cat -b
 fi
 
 if [ "$ARGS" == "-a" ]; then  # all used
-    echo "$I3_GMAP" | sed 's/ /|/1' | column -ts'|'
+    echo "$I3_GMAP" | sort_keys | sed 's/ /|/1' | column -ts'|'
 fi
 
 if [ "$ARGS" == "-x" ]; then  # xkb map
