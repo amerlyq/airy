@@ -18,12 +18,6 @@ rm_tag_pair() { gawk '
     /=$/{ if($1!=prev){print $1} }; !/=$/{prev=$1}
 ';}
 
-sort_keys(){ gawk '
-    function cmp_key(i1,v1,i2,v2){return xor(length(i1)==6,length(i2)==6)\
-        ? ((length(i2)==6)?-1: 1) : ((i1<i2) ? -1 : (i1!=i2)) }
-    { a[$1]=$0 } END{ PROCINFO["sorted_in"]="cmp_key"; for(k in a){print a[k]} }
-';}
-
 list_to_table(){ gawk '
     { k=substr($0,6); $0=substr($0,3,2)}
     /od/{a[k]+=1} /Sd/{a[k]+=2} /Cd/{a[k]+=4} /CS/{a[k]+=8}
@@ -35,6 +29,26 @@ list_to_table(){ gawk '
         for(k in a){printf("%10s %s\n",k,r(1)r(2)r(4)r(8))}
 }';}
 
+sort_keys_list(){ gawk '
+    function cmp_key(i1,v1,i2,v2) { return   \
+        (substr(i1,1,5) == substr(i2,1,5))   \
+        ? xor(length(i1)==6, length(i2)==6)  \
+            ? ((length(i2)==6) ? -1 : 1)     \
+            : ((i1<i2) ? -1 : (i1!=i2))      \
+        : (substr(i1,1,5) < substr(i2,1,5))
+    } { a[$1]=$0 } END{ PROCINFO["sorted_in"]="cmp_key"; for(k in a){print a[k]} }
+';}
+
+sort_keys_group(){ gawk '
+    function cmp_key(i,v1,j,v2,    p,q) {
+    split(i,p,/+/); split(j,q,/+/);
+    return xor(length(p[2])==1, length(q[2])==1)\
+    ? ((length(q[2])==1) ? -1 : 1) : (          \
+        (p[2]!=q[2]) ? ((p[2]<q[2]) ? -1 : 1)   \
+        : (p[1]>q[1] ? -1 : (p[1]!=q[1])))
+    } { a[$1]=$0 } END{ PROCINFO["sorted_in"]="cmp_key"; for(k in a){print a[k]} }
+';}
+
 
 if [ "$ARGS" == "-e" ]; then { # empty only
     echo "$KBD_ALL" | sed 's/^.*/& =/'
@@ -43,7 +57,7 @@ if [ "$ARGS" == "-e" ]; then { # empty only
 fi
 
 if [ "$ARGS" == "-a" ]; then  # all used
-    echo "$I3_GMAP" | sort_keys | sed 's/ /|/1' | column -ts'|'
+    echo "$I3_GMAP" | sort_keys_group | sed 's/ /|/1' | column -ts'|'
 fi
 
 if [ "$ARGS" == "-x" ]; then  # xkb map

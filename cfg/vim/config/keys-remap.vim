@@ -71,10 +71,10 @@ noremap   ,v  <C-V>
 " map # %
 
 "" VISUAL
-" selects the last text edited/pasted in INSERT, and reselect of last VISUAL
-noremap gv `[v`]
 "" select last paste in visual mode
-noremap <expr> gV '`[' . strpart(getregtype(), 0, 1) . '`]'
+noremap <expr> gv '`[' . strpart(getregtype(), 0, 1) . '`]'
+" selects the last text edited/pasted in INSERT, and reselect of last VISUAL
+noremap gV `[v`]
 " visually select a search result
 nnoremap g/ //e<cr>v??<cr>
 " reselect visual block after indent

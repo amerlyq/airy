@@ -29,7 +29,8 @@ wget_it() {
     local NM
     case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
     NM="$CURR_DIR_PKG/$NM"
-    wget -c "$1" -O "$NM"
+    # http://unix.stackexchange.com/questions/45959/wget-is-returning-an-html-page-instead-of-original-file
+    wget -c "$1" -O "$NM" --trust-server-names --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0" #--max-redirect=2
     # if [ "$( cat $NM | head -c 9 )" == "<!doctype" ]; then
         # echo 'yes'
         # rref='<a href="\([^?]*\)?.* class="direct-download">'
