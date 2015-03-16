@@ -42,9 +42,9 @@ noremap R gR
 " Use q for formatting the current paragraph (or selection)
 " Ex-command availible by gQ
 noremap ,q q
-vnoremap q gq
-nnoremap q gq$
-nnoremap Q gqip
+" vnoremap q gq
+" " nnoremap q gq$
+" nnoremap Q gqip
 
 " retain relative cursor position when paging
 nnoremap <PageUp>   <C-U>

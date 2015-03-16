@@ -10,7 +10,7 @@ i3
 	[_] i3 copyq shortcuts, and remove copyq own shortcuts
 		[_] debug copyq-edit()
 		[_] copyq default floating
-		 xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
+		: xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
 	[_] i3 separate ./dmenu directory
 		[_] move launching dmenu from i3 to script in that dir
 		[_] same do for dbus lang changing
@@ -18,6 +18,8 @@ i3
 		[_] use 'grave' as 0 workspace for scratch monitoring
 		[_] use 'minus, equal' monitors as 11,12
 		[_] temporarily don't skip mCS+[789] for lang chg, but create possibility
+	[_] container settings
+		fast 1,2,3 sizes for window
 	[_] wrksp settings
 		[_] toggle bar
 		[_] change layout on predefined (current -- left half, others -- right column, etc)
@@ -30,32 +32,57 @@ i3
 	[_] Disallow using mSd+[hjkl] for floating detached desktops from several windows
 		-> better case would be moving them inside floating window only, without re-attaching to tiled
 	[_] Launching prs from empty screen -- use i3-ipc?
-		 need event of choosing dsktp -- and sending mod+o to it if empty)
+		: need event of choosing dsktp -- and sending mod+o to it if empty)
 	[_] Split on mSd+[nm] must create it, move to right/below? window and move it
 	[_] mSd+[,./] must make such layout for all windows on workspace
 	[_] mCd+f -- must focus to fullscreen window
 	[_] mCS+[0-9] must move all windows from specified desktop to current
-	[_] mCd+semicolon must focus deepest child, mCS -- all of parents
+	[_] mCd+semicolon must focus deepest child, mCS -- all of parents chain only?
 	[_] mCd,mCS +[hjkl] -- choose from two possible cases
 		[_] move window to another output
 		[_] detach/attach (float) window from tiled and move to screen corner
 	[_] Make several setter scripts (xev, xprop) launching from i3 shortcuts dev menu
 	[_] Cut too long song names when showed on i3bar -- otherwise there are artefacts
+	[_] Consolidate: $mod open or focus to app if already opened, or open copy if $mSd
+		Consider: ncmpcpp, firefox, pidgin("Buddy list"), gvim
+		[_] key to hide in scratchpad (hide only, not toggle)
+		[_] loop through unmarked windows in scratchpad
+		[_] overlay to show which window has which mark
+		: maybe key press must ressurect notify with mark
+		: or mark always showed on bar as two letter/number
+		: I can use separate top bar for debug information like in Unity:
+		: window header, scratch headers, their marks, etc
 
 vim:
 	[_] comment each mapping with regex to extract placeholders from binding
 		[_] for continuous group of maps use that regex for each
 	[_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
-		 to generate vimrc for others or for me on other computers (buildserver)
+		: to generate vimrc for others or for me on other computers (buildserver)
 	[_] regions of file highlighting
 		http://vim.wikia.com/wiki/Different_syntax_highlighting_within_regions_of_a_file
 		http://vim.wikia.com/wiki/Creating_your_own_syntax_files
 		https://robots.thoughtbot.com/writing-vim-syntax-plugins
-
+	[_] load spellchecking in vim_install
+		[_] install -u must run vim_install in update regime
+	Navigation
+		[_] mappings to move between loci of entries of qf/loc list
+		[_] move to next/prev change in :Git marks
+		[_] move to next/prev spellchecking error
 	[_] Autocopying on focus lost/gain
-	 http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
+	: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
 		au FocusLost   * silent! call CopyStringInReg('"', @+)
 		au FocusGained * silent! call CopyStringInReg('+', @")
+	[_] easymotion
+		[_] maybe, move to 'q' key? Or combining with surround will work smoothly?
+		[_] ALT: https://github.com/justinmk/vim-sneak
+	[_] Seize
+		http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
+	[_] BUG: C-F, C-D on the end of content of ':' or '/' opens menu, needs to disable it
+	[_] Vimoutliner
+		[_] Change mapping to more easy pressed
+		[_] Disable autoformating on pasting
+	[_] Autoreplacing: choose delimiter from [:|/;@] on ,cc ,cy depending on expression
+		 Or escape delimiter symbols in expression
 
 
 
@@ -82,7 +109,7 @@ zsh
 		http://www.zsh.org/mla/users/2005/msg00599.html
 
 [_] wget with redirection, cookies and user-agent
-	:TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"
+	TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"
 	http://stackoverflow.com/questions/1324421/how-to-get-past-the-login-page-with-wget
 	http://unix.stackexchange.com/questions/45959/wget-is-returning-an-html-page-instead-of-original-file
 
@@ -100,8 +127,42 @@ zsh
 [_] cut command
 	http://how-to.linuxcareer.com/learning-linux-commands-cut
 
-2015-03-15 [X] notify -- default is white body, green border
+dunst
+	2015-03-15 [X] notify -- default is white body, green border
+	[_] choose on which screen to appear (main, second, current, etc)
+		: to fixate music 15s left msg on second screen
+	[_] fix geometry to be more agile -- to content messages from chat
 
-[_] geeknote open concrete files
-[_] wacom
+
 [_] mutt
+	[_] pop3+smtp one-account
+	[_] multi-account
+	[_] gpg keyring
+	[_] passwordless login (smth like private keys?)
+	[_] keyring for ssh keys
+
+
+SECURITY
+	[_] read about vpn and setup <-> it
+	[_] Split home dir to sdk (big, many files) and home (projects, cfgs)
+		[_] Encrypted volume for home directory
+			[_] Read about encrypted filesystems
+		[_] Fast filesystem for /var (?) volume for linux sources
+			[_] Read about filesystems [производительность]
+			[_] Read how in arch to split disk from terminal and mount all your partitions
+
+ADMIN
+	[_] encrypted git repo -- to store working notes on gitlab instead of evernote
+		[_] http://git-annex.branchable.com/tips/fully_encrypted_git_repositories_with_gcrypt/
+		[_] search about evernote client for linux, which I had mail of
+		[_] geeknote open concrete files
+	[_] myspot -- use curl + Google browser identity + cookies + authorithation to get to http://myspot
+	[_] read about samba and rights for domain users
+		http://www.tldp.org/HOWTO/SMB-HOWTO-8.html
+	[_] setup pidgin
+		[_] extract configs from ~/.purple to <airy>
+		2015-03-13 [X] make note about communicator! using tcpdump + regex
+		2015-03-13 [X] disable online/offline notifications
+		2015-03-15 [X] autolaunching in generated work i3 autostart (or use that on each system?)
+
+[_] wacom

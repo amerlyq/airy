@@ -132,11 +132,11 @@ w_header "Navigation: GoTo"
     wmode_end
 
 w_header "Navigation: Direct Go"
-    m_dir="> [v]im, [r]anger, [n]cmpcpp, [h]top | [u]rxvt, [g]vim"
+    m_dir="-> [v]im, [r]anger, [n]cmpcpp, [h]top | [u]rxvt, [g]vim, [f]irefox, [p]idgin"
     wmode_begin "$mod+s" 'godir' "$m_dir"
         # Temporary solution: Jump exactly to the next open instance
         wlistf "$ts %s [class=\"(?i)$term\" title=\"(?i)%s\"] focus ,$def" "v r n h" "vim ranger ncmpcpp htop"
-        wlistf "$ts %s [class=\"(?i)%s\"] focus ,$def" "u g" "urxvt gvim"
+        wlistf "$ts %s [class=\"(?i)%s\"] focus ,$def" "u g f p" "urxvt gvim Firefox Pidgin"
     wmode_end
 
 w_header "Navigation: <F1..12>"
@@ -183,15 +183,15 @@ wstr "$mSd+x $exno ~/.i3/ext/i3exit lock"
 w_header "Mode: System"
 msg_sys='<i3> : shu[t]down, [r]eboot, [l]ock | log[o]ut, [s]uspend, [h]ibernate | re[c]onf, re[n]ew, [e]xit'
     wmode_begin "$mCd+Delete" 'system' "$msg_sys"
-    wlistf "$ts %s $exno ~/.i3/ext/i3exit %-9s ,$def" "l o s h r t" \
-        "lock logout suspend hibernate reboot shutdown"
-    # c - reload the configuration file
-    # n - restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-    # e - logs you out of your X session
-    wlistf "$ts %s %s" "c n" "reload restart"
-    wstr "$ts e $exno ~/.i3/ext/i3exit logout"
-wmode_end
-wmode_kmap "$mSd+Escape" 'system'
+        wlistf "$ts %s $exno ~/.i3/ext/i3exit %-9s ,$def" "l o s h r t" \
+            "lock logout suspend hibernate reboot shutdown"
+        # c - reload the configuration file
+        # n - restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+        # e - logs you out of your X session
+        wlistf "$ts %s %s" "c n" "reload restart"
+        wstr "$ts e $exno ~/.i3/ext/i3exit logout"
+    wmode_end
+    wmode_kmap "$mSd+Escape" 'system'
 
 
 wprf "\n### ================== Launchers =================== ###\n"
@@ -200,14 +200,14 @@ STD_FMG="pcmanfm"
 command -v $STD_FMG >/dev/null 2>&1 || STD_FMG="nemo --no-desktop"
 
 w_header "Mode: Open"
-    m_open="<Open> : [n]cmpcpp, [h]top, [c]opyq | [p]owertop, [t]lp | [g]vim, [f]m, [S]ets | [m]usic"
+m_open="<Open> : [n]cmpcpp, [h]top | [P]owertop, [t]lp | [g]vim, [c]opyq, [p]idgin, [f]irefox, [F]m, [S]ets | [m]usic (s)ound"
     wmode_begin "$mod+o" 'open' "$m_open"
-    wlistf "$ts %s $eflo -e %s ,$def" "n h c p t" \
-        ncmpcpp htop "copyq toggle" "gksudo powertop" "gksudo tlp start"
-    wlistf "$ts %s $exno %s ,$def" "g f m Shift+s"  \
-        gvim "$STD_FMG" "~/.i3/ext/dmenu_mpd_fmove" \
-        "/usr/lib/cinnamon-settings/cinnamon-settings.py sound"
-wmode_end
+        wlistf "$ts %s $eflo -e %s ,$def" "n h Shift+p t" \
+            "ncmpcpp" "htop" "gksudo powertop" "gksudo tlp start"
+        wlistf "$ts %s $exno %s ,$def" "g c p Shift+f m Shift+s"  \
+            "gvim" "copyq toggle" "pidgin" "$STD_FMG" "~/.i3/ext/dmenu_mpd_fmove" \
+            "/usr/lib/cinnamon-settings/cinnamon-settings.py sound"
+    wmode_end
 
 
 w_header "Run: Prgs"
