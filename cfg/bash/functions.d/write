@@ -33,7 +33,7 @@ wlistf(){
         printf "$1\n" "${key[i]}" \
         "$([ $# -eq 3 ] && echo ${lst[i]} || echo ${*:i+3:1})" \
         >> $dst
-    done
+    done; wstr ''
 }
 export -f wlistf
 
@@ -47,6 +47,6 @@ wlistp(){
         str=${1//"%1"/"${key[i]}"}
         str=${str//"%2"/"$var"}
         printf "${str}\n" >> $dst
-    done
+    done; wstr ''
 }
 export -f wlistp

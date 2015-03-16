@@ -1,6 +1,11 @@
-lsusb
-ls /dev/sd??
-ls /dev/disk/by-label
+Devices
+	lsusb
+	ls /dev/sd??
+	ls /dev/disk/by-label/
 
-mkdir -p /media/Aria
-jsudo mount /dev/disk/by-label/Aria /media/Aria
+Mount
+	mkdir -p /media/Aria
+	sudo mount /dev/disk/by-label/Aria /media/Aria
+
+Format flash drive
+	sudo mkfs.vfat -n 'Label' /dev/sdb1

@@ -32,11 +32,12 @@ DISABLE_AUTO_TITLE="true"
 # Uncomment the following line to display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
-if [[ -z ${MY_SHELL_LEVEL} ]]; then
-    export MY_SHELL_LEVEL=0
-else
-    export MY_SHELL_LEVEL=$(($MY_SHELL_LEVEL+1))
-fi
+## There is $SHLVL instead of this
+# if [[ -z ${MY_SHELL_LEVEL} ]]; then
+#     export MY_SHELL_LEVEL=0
+# else
+#     export MY_SHELL_LEVEL=$(($MY_SHELL_LEVEL+1))
+# fi
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large
@@ -47,6 +48,8 @@ fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
+
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # Would you like to use another custom folder than $ZSH/custom?
 ZSH_CUSTOM=$HOME/.bash/zsh
@@ -63,8 +66,8 @@ source "$ZSH/oh-my-zsh.sh"
 
 # User configuration
 if [ -f ~/.bash_export  ]; then source ~/.bash_export  ; fi
-source "$ZSH_CUSTOM/amer-key-mix.zsh"
 source "$ZSH_CUSTOM/amer-widgets.zsh"
+source "$ZSH_CUSTOM/amer-key-mix.zsh"
 source "$ZSH_CUSTOM/filetypes.zsh"
 DEFAULT_USER="$CURR_USER"
 

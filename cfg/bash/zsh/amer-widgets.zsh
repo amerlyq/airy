@@ -1,15 +1,40 @@
-# bindkey '^Y' yank-last-arg # No such func
-zle -N yank-current yank_current
-bindkey "^Y" yank-current
-bindkey -a "^Y" yank-current
-function yank_current() {
+# SEE
+#   print -s : http://linux.die.net/man/1/zshbuiltins
+
+zle -N amer-yank-current _yank_current
+function _yank_current() {
     # If empty cmd line, copy last line from history
     xsel --input --clipboard <<< "${BUFFER:-$(fc -ln -1)}"
 }
 
-zle -N prepend-sudo prepend_sudo
-bindkey "^S" prepend-sudo
-function prepend_sudo() {
+# Send current buffer to history and replace it from '+' register
+zle -N amer-past-current _past_current
+function _past_current() {
+    if [ -n "$BUFFER" ]; then print -s "$BUFFER"; fi
+    BUFFER="$(xsel --output --clipboard)"
+}
+
+## Re-run and add lines from output to completion menu
+# We can't simply '|tee' output of each command, as we has 'vim' and 'less'
+# NOTE: Now, while editing cmdline, ^O will copy output of previous command,
+#   which you can paste in cmdline. Or you can check if buffer empty and on
+#   nonempty buffer execute current command and copy its output.
+zle -N amer-yank-output _yank_output
+function _yank_output() {
+    eval $(fc -l -n -1) | xsel --input --clipboard
+}
+
+## Re-run and add lines from output to completion menu
+zle -C jh-prev-comp menu-complete _jh-prev-result
+function _jh-prev-result() {
+    cmd_output_buf=$(eval `fc -l -n -1`)
+    set -A hlist ${(@s/
+/)cmd_output_buf}
+    compadd - ${hlist}
+}
+
+zle -N amer-prepend-sudo _prepend_sudo
+function _prepend_sudo() {
     if ! [ "$BUFFER" ]; then
         BUFFER="$(fc -ln -1)"
     fi
@@ -21,17 +46,20 @@ function prepend_sudo() {
     fi
 }
 
+
+# bindkey -a "^O" synchro-dir-pop
+# bindkey "^O" synchro-dir-push
 zle -N synchro-dir-push synchro_dir_push
+zle -N synchro-dir-pop synchro_dir_pop
 function synchro_dir_push {
     curr="$(pwd)"
     if [ "$curr" != ~ ]; then
-        printf "$curr\n" > /tmp/zsh_chosedir
+        printf "$curr\n" > /tmp/aura/zsh_chosedir
     fi
 }
-zle -N synchro-dir-pop synchro_dir_pop
 function synchro_dir_pop {
-if [ -f /tmp/zsh_chosedir ]; then
-    curr="$(cat /tmp/zsh_chosedir)"
+if [ -f /tmp/aura/zsh_chosedir ]; then
+    curr="$(cat /tmp/aura/zsh_chosedir)"
     if [ "$(pwd)" != "$curr" ]; then
         # Change directories and redisplay the prompt
         # (Still don't fully understand this magic combination of commands)
@@ -41,8 +69,6 @@ if [ -f /tmp/zsh_chosedir ]; then
 fi
 }
 
-bindkey -a "^O" synchro-dir-pop
-bindkey "^O" synchro-dir-push
 
 ### ----------- Untested
 # autoload smart-insert-last-word
@@ -75,4 +101,18 @@ bindkey "^O" synchro-dir-push
 #     fi
 # }
 ### -----------
+
+## Autocmd
+# ELSE
+# function zle-line-init zle-keymap-select {
+#     VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]%  %{$reset_color%}"
+#     RPS1="${${KEYMAP/vicmd/$VIM_PROMPT}/(main|viins)/}$(git_custom_status) $EPS1"
+#     zle reset-prompt
+# }
+## Prompt always in command-mode
+# function zle-line-init {
+#     vi-cmd-mode
+# }
+# zle -N zle-line-init
+## zle -N zle-keymap-select
 

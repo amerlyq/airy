@@ -1,0 +1,8 @@
+# vim: ft=sh
+## <F12> Source on demand when enhancing configs:  source ~/.bash/debug
+printf "
+    ~=> rc-reload-*  actualizes last config version
+"
+
+alias rc-reload-zsh='source ~/.zshrc && echo "ZSH config reloaded"'
+alias rc-reload-dunst='killall dunst; for i in low normal critical; do notify-send --urgency=$i $i; done'
