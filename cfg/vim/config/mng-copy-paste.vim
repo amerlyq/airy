@@ -55,10 +55,15 @@ noremap  zP "0P
 map <leader>y "+y
 map <leader>p "+p
 map <leader>P "+P
+map <leader>l "+d
+map <leader>L "+D
+" Send shizzle to the black hole (Remove)
+map <leader>r "_d
+map <leader>R "_D
 
 " Append to copy buffer
 " nnoremap <leader><leader>y :<C-U>call CopyStringInReg('+', @+ . @")<CR>
-vnoremap <leader><leader>y :<C-U>call CopyStringInReg('"', @" . GetVisualSelection("\n"))<CR>
+vnoremap gy :<C-U>call CopyStringInReg('"', @" . GetVisualSelection("\n"))<CR>
 
 " Duplicate unnamed and copy registers
 nnoremap <C-y> :<C-U>call CopyStringInReg('+', @")<CR>

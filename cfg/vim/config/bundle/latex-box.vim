@@ -29,7 +29,7 @@ let g:LatexBox_viewer = 'zathura -s -x "vim --servername synctex --remote-silent
 
 " expand("%:p:h")
 " Navigate in pdf to current vim position
-noremap <silent> <Leader>ls :silent
+noremap <silent> \s :silent
     \ ! zathura --synctex-forward
     \ "<C-R>=line(".")<CR>:1:%:p"
     \ "<C-R>=LatexBox_GetOutputFile()<CR>"

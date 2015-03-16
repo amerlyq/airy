@@ -17,12 +17,12 @@ if [ "$CURR_PLTF" == "Linux" ]
 then
     lnLst ~/. "" "bash i3 urxvt Xrc mutt"
     lnLst ~/. bash/ "inputrc profile bashrc bash_prompt tmux.conf zsh/zshrc"
-    lnLst ~/. "" "vim vim/vimrc vim/ycm_extra_conf.py"
+    lnLst ~/. "" "vim vim/vimrc" #vim/ycm_extra_conf.py
     lnLst ~/.config/ "" "ranger mcomix sxiv Xrc/compton.conf"
     lnLst ~/.mpv/ mpv/ "config input.conf"
     lnLst ~/.config/copyq/ Win/ "copyq.conf"
     lnLst ~/.config/gtk-3.0/ sets/ "settings.ini"
-    lnLst ~/. sets/ "gtkrc-2.0 wgetrc dhexrc" #valgrindrc
+    lnLst ~/. sets/ "gtkrc-2.0 dhexrc" #valgrindrc wgetrc
 
     if [ "$CURR_PROF" == "home" ]; then
         pairLink ~/.mpd/mpd.conf "${CONF_DIR}/sets/mpd-sir.conf"

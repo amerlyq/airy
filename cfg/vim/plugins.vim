@@ -4,9 +4,12 @@
 let mapleader="\\"
 
 
-NeoBundle 'Valloric/ListToggle'
-" Ascii graph drawing in vim
+" Switch [c,cpp,cxx,cc] <-> [h,hpp]
+NeoBundle 'vim-scripts/a.vim'
 
+NeoBundle 'Valloric/ListToggle'
+
+" Ascii graph drawing in vim
 NeoBundleLazy 'vim-scripts/DrawIt', {
     \ 'autoload' : { 'commands' : 'DrawItStart' },
     \ }
@@ -282,9 +285,6 @@ NeoBundle 'Lokaltog/vim-easymotion'
 
 " New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
 NeoBundle 'bkad/CamelCaseMotion'
-
-" Switch [c,cpp,cxx,cc] <-> [h,hpp]
-NeoBundle 'vim-scripts/a.vim'
 
 "{{{ Std vim/macros/ =====================
 " Bring back opened window instead of dull msg about swapfile

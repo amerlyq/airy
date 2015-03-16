@@ -58,13 +58,11 @@ noremap gk k
 
 " more stretching comfort
 noremap g0 ^
-" noremap ,4 $
+noremap ,4 $
 noremap g4 A<Space><Esc>
 noremap ,g %
-
 " Swap v and CTRL-V was pitiful idea
-noremap   ,v  <C-V>
-
+noremap ,v  <C-V>
 
 " Unused
 " map - $

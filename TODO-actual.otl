@@ -1,0 +1,107 @@
+i3
+> All abilities are primarily in submenus -- and only often used are duplicated to simple shortcuts
+	[_] list keysym mappings for i3
+		[X] list global used
+		[X] list unused
+		[_] list tree for all modes
+	[_] i3 save markers between sessions -- fast mappings on shortcuts
+		[_] use mod+s for fixed named markers (vim, ranger, firefox, etc)
+		[_] mSd+s must understand which type of window it's on, and change appropriate shortcut to this window
+	[_] i3 copyq shortcuts, and remove copyq own shortcuts
+		[_] debug copyq-edit()
+		[_] copyq default floating
+		 xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
+	[_] i3 separate ./dmenu directory
+		[_] move launching dmenu from i3 to script in that dir
+		[_] same do for dbus lang changing
+	[_] additional desktops
+		[_] use 'grave' as 0 workspace for scratch monitoring
+		[_] use 'minus, equal' monitors as 11,12
+		[_] temporarily don't skip mCS+[789] for lang chg, but create possibility
+	[_] wrksp settings
+		[_] toggle bar
+		[_] change layout on predefined (current -- left half, others -- right column, etc)
+		[_] focus one of unnumbered (named) workspaces
+		[X] rename wrksp
+		[_] choose/highlight all windows
+		[_] detach all as floating desktop
+		[_] save/load layout
+		[_] kill all windows
+	[_] Disallow using mSd+[hjkl] for floating detached desktops from several windows
+		-> better case would be moving them inside floating window only, without re-attaching to tiled
+	[_] Launching prs from empty screen -- use i3-ipc?
+		 need event of choosing dsktp -- and sending mod+o to it if empty)
+	[_] Split on mSd+[nm] must create it, move to right/below? window and move it
+	[_] mSd+[,./] must make such layout for all windows on workspace
+	[_] mCd+f -- must focus to fullscreen window
+	[_] mCS+[0-9] must move all windows from specified desktop to current
+	[_] mCd+semicolon must focus deepest child, mCS -- all of parents
+	[_] mCd,mCS +[hjkl] -- choose from two possible cases
+		[_] move window to another output
+		[_] detach/attach (float) window from tiled and move to screen corner
+	[_] Make several setter scripts (xev, xprop) launching from i3 shortcuts dev menu
+	[_] Cut too long song names when showed on i3bar -- otherwise there are artefacts
+
+vim:
+	[_] comment each mapping with regex to extract placeholders from binding
+		[_] for continuous group of maps use that regex for each
+	[_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
+		 to generate vimrc for others or for me on other computers (buildserver)
+	[_] regions of file highlighting
+		http://vim.wikia.com/wiki/Different_syntax_highlighting_within_regions_of_a_file
+		http://vim.wikia.com/wiki/Creating_your_own_syntax_files
+		https://robots.thoughtbot.com/writing-vim-syntax-plugins
+
+	[_] Autocopying on focus lost/gain
+	 http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
+		au FocusLost   * silent! call CopyStringInReg('"', @+)
+		au FocusGained * silent! call CopyStringInReg('+', @")
+
+
+
+
+ranger
+	[_] shortcut to show file size in bytes (search in sources?)
+	[_] FIX shell -r cp ./%f /var // sudo: source: command not found
+	[_] fix scpto/from
+		[_] Create its inner handful support inside ranger
+	[_] on ',s' do [print -s "$BUFFER" to history] instead of copying in reg
+
+zsh
+	[_] fasd for zsh
+		https://github.com/horosgrisa/fasd
+		~/.oh-my-zsh/plugins/fasd/fasd.plugin.zsh
+	2015-03-15 [X] save last command output on <C-o>
+	Seize
+		http://reasoniamhere.com/2014/01/11/outrageously-useful-tips-to-master-your-z-shell/
+		http://chneukirchen.org/blog/archive/2008/02/10-zsh-tricks-you-may-not-know.html
+		http://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
+	[_] Check zsh profiling (debug starting and accept-line timing)
+	[_] append sudo and execute command instead of simply appending it
+	[_] pre-execute command before starting interactive shell
+		http://www.zsh.org/mla/users/2005/msg00599.html
+
+[_] wget with redirection, cookies and user-agent
+	:TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"
+	http://stackoverflow.com/questions/1324421/how-to-get-past-the-login-page-with-wget
+	http://unix.stackexchange.com/questions/45959/wget-is-returning-an-html-page-instead-of-original-file
+
+[_] fuzzy file finder
+	https://github.com/junegunn/fzf
+	http://webglimpse.net/
+	https://github.com/opentraveldata/geobases/wiki/Using-GeoBase-as-a-grep-on-steroids
+
+[_] audio notes to text script
+	http://wiki.openmoko.org/wiki/Google_Voice_Recognition
+	http://www.apparelyzed.com/forums/topic/27228-open-source-gnulinux-speech-recognition-program-that-uses-googles-voice-apis-now-called-palaver-g-community-install-video-github-links-inside/
+	http://www.youtube.com/watch?v=NpjMlVPvfT8
+	http://linux.about.com/od/soft/fl/The-State-Of-Linux-Voice-Recognition.htm
+
+[_] cut command
+	http://how-to.linuxcareer.com/learning-linux-commands-cut
+
+2015-03-15 [X] notify -- default is white body, green border
+
+[_] geeknote open concrete files
+[_] wacom
+[_] mutt
