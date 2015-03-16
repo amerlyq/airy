@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Don't forget to set primary PCH to card 0 or disable all others.
+# instead of <5% | 2dB>
+# apt-get intall xbindkeys
+# https://wiki.archlinux.org/index.php/Xbindkeys_(%D0%A0%D1%83%D1%81%D1%81%D
+
+case "$1" in [0-9]*) CMD="$1 unmute" ;; esac
+amixer -q -D pulse set Master ${CMD:-toggle}
+
+# pactl set-sink-volume 0 -- +10%
+# pactl set-sink-volume 0 -- -10%
+# pactl set-sink-mute 0 toggle
+# mocp -r
+
+# ~/.i3/ext/dvolbar -g
+~/.i3/blocks/update volume

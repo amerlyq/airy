@@ -39,7 +39,7 @@ wcat ~/.i3/config_base
 
 bs="bindsym"   ;  t="    "       ;  def='$def'     ;  exno="\$exno"
 mod="$bs \$mod";  mSd="$bs \$mSd";  mCd="$bs \$mCd";  mCS="$bs \$mCS"
-ts="$t$bs"     ;  tmd="$t$mod"   ;  tSd="$t$mSd"   ;  tCd="$t$mCd"   ;  tCS="$t$mCS"
+ts="$t$bs"     ;  tod="$t$mod"   ;  tSd="$t$mSd"   ;  tCd="$t$mCd"   ;  tCS="$t$mCS"
 
 ealws="exec_always --no-startup-id"
 exi3="$exno i3-input -F "
@@ -48,7 +48,7 @@ term=`update-alternatives --get-selections | grep 'x-terminal-emulator' | awk '{
 term="${term##*/}"
 
 if [ "$term" == "urxvtd" ]; then
-  term="urxvt"
+  term="urxvt"        # i3-sensible-terminal
   eurx="$exno urxvt"  # Many times inside tmux demon was hanged, so it's better use separate processes
 else eurx="$exno $term"; fi
 
@@ -57,13 +57,14 @@ eflo="$eurx -name Float"
 #ecli="$exno urxvtcd -e \$SHELL -i -c " #--hold
 
 # ---- Writers ----
-w_header(){ wprf "\n### $1 ###\n"; }
-wk_mode(){ wstr "$1 mode \"$2\""; }
-wmode_begin(){ wk_mode "$1" "$2"; wstr "mode \"$2\" {"; }
-wmode_end(){ wprf "
+w_header(){ wprf "### $1 ###\n"; }
+wmode_kmap(){ wstr "$1 mode \"\$mode_$2\""; }
+wmode_begin(){ local m="\$mode_$2"
+    wstr "set $m $3"; wmode_kmap "$1" "$2"; wstr "mode \"$m\" {"; }
+wmode_end(){ wprf "\
 $ts Return $def\n$ts Escape $def
 $ts space  $def\n$ts q      $def
-}\n"; }
+}\n\n"; }
 
 
 # ----- Lists -----
@@ -78,7 +79,6 @@ wrkkey="1 2 3 4 5 6 7 8 9 0" # minus equal
 wrksps="${wrknum[@]}"
 
 # ----- Vars -----
-smove="50 px"
 
 wprf "\n### =========== Script-generated items ============= ###\n"
 w_header "Bind: Refresh on i3mod"
@@ -107,95 +107,82 @@ w_header "WorkSpaces: Focus"
 w_header "WorkSpaces: Move container"
     wlistp "$mSd+%1 \$move_ctw number %2" "$wrkkey" "${wrknum[*]:0:7}"
 
-w_header "WorkSpaces: Move container"
+w_header "WorkSpaces: Move and move container"
     wlistp "$mCd+%1 \$move_ctw number %2, workspace number %2" "$wrkkey" "$wrksps"
 
 wprf "\n### ================== Navigation ================== ###\n"
 w_header "Navigation: Focus"
     wlistf "$mod+%-5s focus %s" "$hjkl $Arrows" "$arrows $arrows"
 
+smove="50 px"
 w_header "Navigation: Move"
     wlistf "$mSd+%-5s move %s $smove" "$hjkl $Arrows" "$arrows $arrows"
 
-## Move current floating window in certain position
-# .. move absolute position 0 0
-
 wprf "\n### ================== Mark & Go =================== ###\n"
-# keybindings for marking and jumping to clients
-
 w_header "Navigation: Mark"
-    wmode_begin "$mod+t" "Mark this: 0..9, <mod+T>"
-    wprf "$tmd+t $exi3 'mark %%s' -P 'Mark name: ' ,$def\n\n"
-    wlistf "$ts %s mark mrk%s ,$def" "$digits" "$digits"
-wmode_end
+    wmode_begin "$mod+t" 'mark' "Mark this: 0..9, <mod+T>"
+        wprf "$tod+t $exi3 'mark %%s' -P 'Mark name: ' ,$def\n\n"
+        wlistf "$ts %s mark mrk%s ,$def" "$digits" "$digits"
+    wmode_end
 
 w_header "Navigation: GoTo"
-    wmode_begin "$mod+g" "GoTo mark: 0..9, Mod+G"
-    wprf "$tmd+g $exi3 '[con_mark=%%s] focus' -P 'Go to mark: ' ,$def\n\n"
-    wlistf "$ts %s [con_mark=\"mrk%s\"] focus ,$def" "$digits" "$digits"
-wmode_end
+    wmode_begin "$mod+g" 'goto' "GoTo mark: 0..9, Mod+G"
+        wprf "$tod+g $exi3 '[con_mark=%%s] focus' -P 'Go to mark: ' ,$def\n\n"
+        wlistf "$ts %s [con_mark=\"mrk%s\"] focus ,$def" "$digits" "$digits"
+    wmode_end
 
 w_header "Navigation: Direct Go"
-    wmode_begin "$mod+s" "> [v]im, [r]anger, [n]cmpcpp, [h]top | [u]rxvt, [g]vim"
-    # Temporary solution: Jump exactly to the next open instance
-    wlistf "$ts %s [class=\"(?i)$term\" title=\"(?i)%s\"] focus ,$def" "v r n h" "vim ranger ncmpcpp htop"
-    wstr ''
-    wlistf "$ts %s [class=\"(?i)%s\"] focus ,$def" "u g" "urxvt gvim"
-wmode_end
+    m_dir="> [v]im, [r]anger, [n]cmpcpp, [h]top | [u]rxvt, [g]vim"
+    wmode_begin "$mod+s" 'godir' "$m_dir"
+        # Temporary solution: Jump exactly to the next open instance
+        wlistf "$ts %s [class=\"(?i)$term\" title=\"(?i)%s\"] focus ,$def" "v r n h" "vim ranger ncmpcpp htop"
+        wlistf "$ts %s [class=\"(?i)%s\"] focus ,$def" "u g" "urxvt gvim"
+    wmode_end
 
 w_header "Navigation: <F1..12>"
-    for i in {1..12}; do wprf "
-    $mSd+F$i mark mrkF$i
-    $mCS+F$i unmark mrkF$i
-    $mod+F$i [con_mark=\"mrkF$i\"] focus
-    $mCd+F$i [con_mark=\"mrkF$i\"] \$move_ctw current
-    "; done
+for i in {1..12}; do wprf "
+$mSd+F$i mark mrkF$i
+$mCS+F$i unmark mrkF$i
+$mod+F$i [con_mark=\"mrkF$i\"] focus
+$mCd+F$i [con_mark=\"mrkF$i\"] \$move_ctw current
+"; done
 
 
 wprf "\n### ==================== Edit ====================== ###\n"
 w_header "Containers: Edit"
-# direction = <up, down, left, right, width or height>
-# resize <grow|shrink> <direction> [<px> px [or <ppt> ppt]]
+    smoveprecise="5 px"
+    ssize="10 px or 2 ppt"
+    wmode_begin "$mod+e" 'container' "Edit"
+        wstr "$ts f floating toggle"
+        wlistf "$ts %s $exno ~/.i3/ext/ratio_size %-5s ,$def" "1 2 3" \
+            "0.5" "0.667" "0.75"
+        # direction = <up, down, left, right, width or height>
+        # resize <grow|shrink> <direction> [<px> px [or <ppt> ppt]]
+        wlistf "$ts %s resize %-12s $ssize" "$hjkl" \
+            "shrink right" "grow down" "shrink down" "grow right"
+        wlistf "$ts Shift+%s resize %-11s $ssize" "$hjkl" \
+            "grow left" "shrink up" "grow up" "shrink left"
+        wlistf "$ts %-5s resize %-13s $ssize" "$Arrows" \
+            "shrink width" "grow height" "shrink height" "grow width"
+        wlistf "$tod+%s move %-5s $smoveprecise" "$hjkl" "$arrows"
+        wlistf "$ts Shift+%-5s move %-5s $smoveprecise" "$Arrows" "$arrows"
+    wmode_end
 
-smoveprecise="5 px"
-ssize="10 px or 2 ppt"
-
-wmode_begin "$mod+e" "Edit"
-    wlistf "$ts %s $exno ~/.i3/ext/ratio_size %-5s ,$def" "1 2 3" \
-        "0.5" "0.667" "0.75"
-    wstr "$ts f floating toggle"
-    wstr ''
-    wlistf "$ts %s resize %-12s $ssize" "$hjkl" \
-        "shrink right" "grow down" "shrink down" "grow right"
-    wstr ''
-    wlistf "$ts Shift+%s resize %-11s $ssize" "$hjkl" \
-        "grow left" "shrink up" "grow up" "shrink left"
-    wstr ''
-    wlistf "$ts %-5s resize %-13s $ssize" "$Arrows" \
-        "shrink width" "grow height" "shrink height" "grow width"
-    wstr ''
-    wlistf "$tmd+%s move %-5s $smoveprecise" "$hjkl" "$arrows"
-    wstr ''
-    wlistf "$ts Shift+%-5s move %-5s $smoveprecise" "$Arrows" "$arrows"
-wmode_end
-wstr ''
-wmode_begin "$mCd+e" "Workspace/Tune-up"
-    wstr "$ts r $exi3 '$exno ~/.i3/ext/rename_current_workspace \"%%s\"' -P 'WS Name: ' ,$def"
-    wprf "$tSd+r $exno ~/.i3/ext/rename_as_focused ,$def\n\n"
-    #bar hidden_state hide|show|toggle [<bar_id>]
-    #bar mode dock|hide|invisible|toggle [<bar_id>]
-    wlistf "$t$bs \$m%sd+grave bar mode %-9s ,$def" "o S C" "toggle dock invisible"
-wmode_end
+    wmode_begin "$mCd+e" 'workspace' "Workspace/Tune-up"
+        wstr "$ts r $exi3 '$exno ~/.i3/ext/rename_current_workspace \"%%s\"' -P 'WS Name: ' ,$def"
+        wprf "$tSd+r $exno ~/.i3/ext/rename_as_focused ,$def\n\n"
+        #bar hidden_state hide|show|toggle [<bar_id>]
+        #bar mode dock|hide|invisible|toggle [<bar_id>]
+        wlistf "$t$bs \$m%sd+grave bar mode %-9s ,$def" "o S C" "toggle dock invisible"
+    wmode_end
 
 wprf "\n### =================== System ===================== ###\n"
 wstr "$mSd+r restart"
 wstr "$mSd+x $exno ~/.i3/ext/i3exit lock"
 
 w_header "Mode: System"
-    wstr 'set $system_mode <i3> : shu[t]down, [r]eboot, [l]ock | log[o]ut, [s]uspend, [h]ibernate | re[c]onf, re[n]ew, [e]xit'
-
-wk_mode "$mSd+Escape" '$system_mode'
-    wmode_begin "$mCd+Delete" '$system_mode'
+msg_sys='<i3> : shu[t]down, [r]eboot, [l]ock | log[o]ut, [s]uspend, [h]ibernate | re[c]onf, re[n]ew, [e]xit'
+    wmode_begin "$mCd+Delete" 'system' "$msg_sys"
     wlistf "$ts %s $exno ~/.i3/ext/i3exit %-9s ,$def" "l o s h r t" \
         "lock logout suspend hibernate reboot shutdown"
     # c - reload the configuration file
@@ -204,106 +191,65 @@ wk_mode "$mSd+Escape" '$system_mode'
     wlistf "$ts %s %s" "c n" "reload restart"
     wstr "$ts e $exno ~/.i3/ext/i3exit logout"
 wmode_end
+wmode_kmap "$mSd+Escape" 'system'
 
 
 wprf "\n### ================== Launchers =================== ###\n"
-# xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
-
 # Autochoose filemng by OS version.
-STD_FILEMGR="pcmanfm"
-command -v $STD_FILEMGR >/dev/null 2>&1 || STD_FILEMGR="nemo --no-desktop"
+STD_FMG="pcmanfm"
+command -v $STD_FMG >/dev/null 2>&1 || STD_FMG="nemo --no-desktop"
 
 w_header "Mode: Open"
-    wmode_begin "$mod+o" "<Open> : [n]cmpcpp, [h]top, [c]opyq | [p]owertop, [t]lp | [g]vim, [f]m, [S]ets | [m]usic"
+    m_open="<Open> : [n]cmpcpp, [h]top, [c]opyq | [p]owertop, [t]lp | [g]vim, [f]m, [S]ets | [m]usic"
+    wmode_begin "$mod+o" 'open' "$m_open"
     wlistf "$ts %s $eflo -e %s ,$def" "n h c p t" \
         ncmpcpp htop "copyq toggle" "gksudo powertop" "gksudo tlp start"
     wlistf "$ts %s $exno %s ,$def" "g f m Shift+s"  \
-        gvim "$STD_FILEMGR" "~/.i3/ext/dmenu_mpd_fmove" \
+        gvim "$STD_FMG" "~/.i3/ext/dmenu_mpd_fmove" \
         "/usr/lib/cinnamon-settings/cinnamon-settings.py sound"
 wmode_end
 
 
-# There also is the (new) i3-dmenu-desktop which only displays applications shipping a .desktop file. It is a wrapper around dmenu, so you need that installed.
-# bindsym $mCd+d exec --no-startup-id i3-dmenu-desktop
-# ALT: j4-dmenu-desktop
-# set $dmenu j4-dmenu-desktop --dmenu="dmenu -f -z -i -fn 'Droid Sans Mono-9:normal' -nb '#333333' -nf '#dedede' -sb '#d64937' -sf '#dedede'"
-
-w_header "Run: Prgs"    # i3-sensible-terminal, ranger
-    wstr "$mod+Return $eurx -e zsh -ic ranger-auto"
+w_header "Run: Prgs"
     wstr "$mod+u $eurx"      # Because it's urxvt!
-    wstr "$mCd+Return $eflo"
+    wstr "$mod+Return $eurx -e zsh -ic ranger-auto"
     wstr "$mSd+Return $eflo -e ranger-auto"
+    wstr "$mCd+Return $eflo"
 
 w_header "Run: Menus"
-    wstr "$mod+d exec \"dmenu_run -p 'yes, master?' -nb '#000000' -nf '#B0E0E6' -sb '#421C84' -sf '#FFFF00' -fn -misc-fixed-medium-r-normal-*-*-130-75-75-*-*-iso8859-2\""
-    wstr "$bs Print exec scrot '%Y%m%d_%H%M%S_\$wx\$h.png' -e 'mv \$f ~/Downloads/'"
-# UNNECESSARY:
-# wstr "$mod+u exec rofi -now -font 'Sans-10' -fg '#606060' -bg '#000000' -hlfg '#ffc964' -hlbg '#0C0C00' -o 85"
-
-# Also: lxtask ?
-
-# Those maps drop focus from input fields in browser.
-# Deprecated by xkb detailed settings.
-w_header "Languages"
-#wlistf "$mSd+%s $exno xkb-switch -s %s && \$upd lang" "0 9 8" "us ru ua"
-wlistf "$mSd+%s $exno dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/KbddService \
-     ru.gentoo.kbdd.set_layout uint32:%s && \$upd lang" "0 9 8" "0 1 2" #"us ru ua"
-
+    wstr "$mCd+d $exno j4-dmenu-desktop"   #ALT (slow): i3-dmenu-desktop
+    wstr "$mod+d $exno ~/.i3/dmenu/lsbin"  #ALT (firm): dmenu_run
+    wstr "$bs Print $exno ~/.i3/ext/screenshot"
 
 w_header "Autostart"
-# wstr "$exno auto-once"
-wstr "$ealws auto-start"
-
-#wstr "$eurx -name htop -e htop"
-#wstr "for_window [class=\"(?i)$term\" instance=\"(?i)htop\"] move scratchpad"
-
-# Also: starter, volumeicon, weechat, xscreensaver -no-splash,
-# clipit, parcellite, dropbox, lxsession -s Lubuntu -e LXDE
-
-
+    wstr "$ealws auto-start"
 
 wprf "\n### ================= Multimedia =================== ###\n"
-# instead of <5% | 2dB>
-# apt-get intall xbindkeys
-# https://wiki.archlinux.org/index.php/Xbindkeys_(%D0%A0%D1%83%D1%81%D1%81%D
 
-# w_header "Control: touchpad on/off"
-# wlistf "$mod+%s $exno synclient TouchpadOff=%s" "p Shift+p" 1 0
-# wstr ''
-
-#bindsym XF86AudioMicMute exec "amixer -D pulse sset Capture toggle"
-#bindsym XF86TouchpadToggle exec "synclient TouchpadOff=$(synclient | awk '/TouchpadOff/ {print ($3+1)%2}')"
-
-# Don't forget to set primary PCH to card 0 or disable all others.
 w_header "Control: volume"
-    wlistf "$bs %-20s $exno amixer -q -D pulse set Master %-10s && \$upd volume" \
+    wlistf "$bs %-20s $exno ~/.i3/ext/volume %-3s" \
         "XF86AudioRaiseVolume XF86AudioLowerVolume XF86AudioMute" \
-        '2%+ unmute' '2%- unmute' 'toggle'
-    wstr '' # && ~/.i3/ext/dvolbar -g
-    wlistf "$mod+%-5s $exno amixer -q -D pulse set Master %-10s && \$upd volume" \
-        "Home Prior Next End" \
-        '20% unmute' '2%+ unmute' '2%- unmute' 'toggle'
-# pactl set-sink-volume 0 -- +10%
-# pactl set-sink-volume 0 -- -10%
-# pactl set-sink-mute 0 toggle
-# mocp -r
-
+        '20%' '2%+' '2%-' ' '
+    wlistf "$mod+%-5s $exno ~/.i3/ext/volume %-3s" \
+        "Home Prior Next End" '20%' '2%+' '2%-' ' '
 
 w_header "Control: ncmpcpp"
     wlistf "$bs %s $exno ncmpcpp %-6s && \$upd mpd" \
         "XF86AudioPlay XF86AudioNext XF86AudioPrev XF86AudioStop" \
         "toggle next prev stop"
-    wstr ''
     wlistf "$mCd+%-5s $exno mpc %-6s && \$upd mpd" \
         "Home Prior Next End" toggle prev next "seek +5 >/dev/null"
 
+w_header "Control: lang"
+    wlistf "$mSd+%s $exno ~/.i3/ext/lang %s" "0 9 8" "us ru ua"
+
+# w_header "Control: touchpad on/off"
+#   wlistf "$mod+%s $exno synclient TouchpadOff=%s" "p Shift+p" 1 0
+#   bindsym XF86TouchpadToggle exec "synclient TouchpadOff=$(synclient | awk '/TouchpadOff/ {print ($3+1)%2}')"
+#   bindsym XF86AudioMicMute exec "amixer -D pulse sset Capture toggle"
 
 wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Settings"
-
-## Launch on certain workspace once, instead assign
-# $exno i3-msg 'workspace 3; exec iceweasel; workspace 1'
-
 # wlistf "assign [class=\"^%1\$s\"] %2\$s" "\$w4 \$w4 \$w9 \$w9 \$w8" \
     # Firefox Pale_moon Wine Steam t-engine64
 
@@ -313,7 +259,6 @@ wstr "assign [class=\"^Wine$\"]       \$w09"
 wstr "assign [class=\"^Steam\"]       \$w09"
 wstr "assign [class=\"^t-engine64\"]  \$w08"
 wstr "assign [title=\"^Win7hdd\"]     \$w07"
-wstr ''
 
 # How to launch in floating regime? Simply create window with name starting with Float*.
 # floating enable running before launching of exec, so influence on previous focused wndw
@@ -325,6 +270,7 @@ wstr "for_window [window_role=\"pop-up\"] floating enable"
 
 # wlistf "for_window [class=\"(?i)%s\"] floating enable" \
 #     "lxappearance Copyq Pidgin"
+#wstr "for_window [class=\"(?i)$term\" instance=\"(?i)htop\"] move scratchpad"
 
 wstr "for_window [class=\"^Pidgin\"] floating enable"
 wstr "for_window [instance=\"feh\"] fullscreen"

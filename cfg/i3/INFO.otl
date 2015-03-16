@@ -53,5 +53,14 @@ SNIPPETS
 	For auto-hiding bar, pinned only for modes
 		wk_mode()   { wstr "$mod+$1 bar mode dock; mode \"$2\""; }
 		mdf="mode \"default\"; bar mode hide; exec sleep 0.1; exec xdotool key --clearmodifiers alt"
+	Move current floating window in certain position
+		.. move absolute position 0 0
+	Launch on certain workspace once, instead assign
+		$exno i3-msg 'workspace 3; exec iceweasel; workspace 1'
+	j4 settings
+		j4-dmenu-desktop --dmenu="dmenu -f -z -i -fn 'Droid Sans Mono-9:normal' -nb '#333333' -nf '#dedede' -sb '#d64937' -sf '#dedede'"
 
 
+# Also: lxtask ?
+# Also: starter, volumeicon, weechat, xscreensaver -no-splash,
+# clipit, parcellite, dropbox, lxsession -s Lubuntu -e LXDE

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# USAGE: ./% -[gltemx] <|N>,  where N -- number returned by -m
 
-ARGS=${1:--a}
+ARGS=${1:--m}
+MODE=${2}
 
 # But how about ALT modifator? Mod1-Mod5, Shift, Control
 KBD_ALL=$(sed 's/\s\+/\n/g' <<EOT | sed 's/.*/$mod+&\n$mSd+&\n$mCd+&\n$mCS+&/'
@@ -11,57 +13,75 @@ comma period semicolon       slash backslash grave
 bracketleft bracketright     apostrophe equal minus
 EOT
 )
-# +grtvyz
-I3_GMAP=$(cat ~/.i3/config | sed -rn '/^bindsym\s+(\S+)\s+(.*)/s//\1 \2/p')
 
 rm_tag_pair() { gawk '
     /=$/{ if($1!=prev){print $1} }; !/=$/{prev=$1}
 ';}
 
 list_to_table(){ gawk '
-    { k=substr($0,6); $0=substr($0,3,2)}
+    { k=substr($1,6); $0=substr($1,3,2)}
     /od/{a[k]+=1} /Sd/{a[k]+=2} /Cd/{a[k]+=4} /CS/{a[k]+=8}
     function r(v){return " "(and(a[k],v)?"x":"-")}
-    function cmp_key(i1,v1,i2,v2){return xor(length(i1)==1,length(i2)==1)\
-        ? ((length(i2)==1)?-1: 1) : ((i1<i2) ? -1 : (i1!=i2)) }
-    END{ print "<---key---> . S C CS"
+    function cmp_key(i,v,j,w){return xor(length(i)==1,length(j)==1)\
+        ? ((length(j)==1)?-1: 1) : ((i<j) ? -1 : (i!=j)) }
+    END{ print "<----key----> . S C CS"
         PROCINFO["sorted_in"]="cmp_key"
-        for(k in a){printf("%10s %s\n",k,r(1)r(2)r(4)r(8))}
+        for(k in a){printf("%12s %s\n",k,r(1)r(2)r(4)r(8))}
 }';}
 
 sort_keys_list(){ gawk '
-    function cmp_key(i1,v1,i2,v2) { return   \
-        (substr(i1,1,5) == substr(i2,1,5))   \
-        ? xor(length(i1)==6, length(i2)==6)  \
-            ? ((length(i2)==6) ? -1 : 1)     \
-            : ((i1<i2) ? -1 : (i1!=i2))      \
-        : (substr(i1,1,5) < substr(i2,1,5))
+    function cmp_key(i,m,j,n) {
+    split(i,p,/+/); split(j,q,/+/); m=p[1];n=q[1];i=p[2];j=q[2]
+    return (m!=n) ? ((m>n) ? -1 : 1)     \
+        : xor(length(i)==1, length(j)==1)\
+            ? ((length(j)==1) ? -1 : 1)  \
+            : ((i<j) ? -1 : (i!=j))
     } { a[$1]=$0 } END{ PROCINFO["sorted_in"]="cmp_key"; for(k in a){print a[k]} }
 ';}
 
 sort_keys_group(){ gawk '
-    function cmp_key(i,v1,j,v2,    p,q) {
-    split(i,p,/+/); split(j,q,/+/);
-    return xor(length(p[2])==1, length(q[2])==1)\
-    ? ((length(q[2])==1) ? -1 : 1) : (          \
-        (p[2]!=q[2]) ? ((p[2]<q[2]) ? -1 : 1)   \
-        : (p[1]>q[1] ? -1 : (p[1]!=q[1])))
+    function cmp_key(i,m,j,n,    p,q) {
+    split(i,p,/+/); split(j,q,/+/); m=p[1];n=q[1];i=p[2];j=q[2]
+    return xor(length(i)==1, length(j)==1)    \
+        ? ((length(j)==1) ? -1 : 1) : ((i!=j) \
+            ? ((i<j) ? -1 : 1) : (m>n ? -1 : (m!=n)))
     } { a[$1]=$0 } END{ PROCINFO["sorted_in"]="cmp_key"; for(k in a){print a[k]} }
 ';}
 
+get_map(){ sed -rn '/^'"$1"'bindsym\s+(\S+)\s+(.*)/s//\1 \2/p'; }
 
-if [ "$ARGS" == "-e" ]; then { # empty only
-    echo "$KBD_ALL" | sed 's/^.*/& =/'
-    echo "$I3_GMAP" | awk '{print $1}'
-} | LC_ALL=C sort | rm_tag_pair | list_to_table | cat -b
+extract_mode(){ gawk ' #-v c="${1:-0}"
+    /^bindsym\s.*\smode\s/ { n=index($0,"\"")+1;
+        nm=substr($0,n,length($0)-n); a[nm]=a[nm]" "$2 }
+    /^mode\s/ { ism=NR;
+        nm=substr($0,7,length($0)-9); }
+    /^}$/ { if(ism){a[nm]=ism","NR" "a[nm]; ism=0} }
+    END{ n=0; for (k in a){n++; print n" "k" "a[k]}}
+';}
+
+get_mloc(){ cat ~/.i3/config | extract_mode | awk "$1==NR {print \$3}"; }
+
+if [ -z "$MODE" ]; then
+    I3_GMAP=$(cat ~/.i3/config | get_map)
+else
+    I3_GMAP=$(cat ~/.i3/config | sed "$(get_mloc $MODE)!d" | get_map '\s+')
 fi
 
-if [ "$ARGS" == "-a" ]; then  # all used
-    echo "$I3_GMAP" | sort_keys_group | sed 's/ /|/1' | column -ts'|'
-fi
+case "$ARGS" in
+-g) echo "$I3_GMAP" | sort_keys_group | sed 's/ / | /1'
+    ;; # from i3: used (group by key)
+-l) echo "$I3_GMAP" | sort_keys_list | sed 's/ / | /1' #| column -ts'|'
+    ;; # from i3: used (group by modifiers)
+-t) echo "$I3_GMAP" | list_to_table #| cat -b
+    ;; # from i3: used (group as table)
+-e) { echo "$KBD_ALL"|sed 's/^.*/& =/'; echo "$I3_GMAP"|awk '{print $1}'; } \
+    | LC_ALL=C sort | rm_tag_pair | list_to_table | cat -b
+    ;; # from i3: empty
+-m) cat config | extract_mode | column -t
+    ;; # from i3: modes
+-x) cat /usr/share/X11/xkb/symbols/{pc,us} | sed '/^default/,/^};$/!d' \
+    | sed -n '/^.*\[\s*\(.\+\)\s*\].*$/s//\1/p' | sed 's/\s*,\s*/\n/g' \
+    | LC_ALL=C sort -u #| sed 's/^\s*\(\S\+\)\s*$/$mod+\1 ===/'
+    ;; # from xkb
+esac
 
-if [ "$ARGS" == "-x" ]; then  # xkb map
-    cat /usr/share/X11/xkb/symbols/{pc,us} | sed '/^default/,/^};$/!d' \
-        | sed -n '/^.*\[\s*\(.\+\)\s*\].*$/s//\1/p' | sed 's/\s*,\s*/\n/g' \
-        | LC_ALL=C sort -u #| sed 's/^\s*\(\S\+\)\s*$/$mod+\1 ===/'
-fi
