@@ -24,7 +24,7 @@ width="$2"   # Width of the preview pane (number of fitting characters)
 height="$3"  # Height of the preview pane (number of fitting characters)
 cached="$4"  # Path that should be used to cache image previews
 
-maxln=200    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
+maxln=128    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
 
 # Find out something about the file:
 mimetype=$(file --mime-type -Lb "$path")
@@ -108,7 +108,11 @@ case "$mimetype" in
         try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
 esac
 
-# Display general information for other files:
-file -Lb "$path" | sed 's/,\s*/\n/g' && exit 5
+{ # Display general information for other files:
+    file -Lb "$path" | sed 's/,\s*/\n/g'
+    if [ "$(ls -l "$path" | awk '{print $5}')" != "0" ]; then
+    echo "<================================================================>"
+    xxd "$path" | sed "${maxln}q"; fi
+} && exit 5
 
 exit 1

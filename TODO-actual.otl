@@ -92,9 +92,10 @@ ranger
 	[_] FIX shell -r cp ./%f /var // sudo: source: command not found
 	[_] fix scpto/from
 		[_] Create its inner handful support inside ranger
-	[_] on ',s' do [print -s "$BUFFER" to history] instead of copying in reg
 
 zsh
+	[_] on ',s' do [print -s "$BUFFER" to history] instead of copying in reg
+		BUG: inserts widget's name, but don't executes it.
 	[_] fasd for zsh
 		https://github.com/horosgrisa/fasd
 		~/.oh-my-zsh/plugins/fasd/fasd.plugin.zsh
@@ -105,6 +106,7 @@ zsh
 		http://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
 	[_] Check zsh profiling (debug starting and accept-line timing)
 	[_] append sudo and execute command instead of simply appending it
+	[$] BUG: xsel -ob don't work in widget --> update to ArchLinux
 	[_] pre-execute command before starting interactive shell
 		http://www.zsh.org/mla/users/2005/msg00599.html
 
@@ -144,6 +146,7 @@ dunst
 
 SECURITY
 	[_] read about vpn and setup <-> it
+	[_] check server certificate from terminal
 	[_] Split home dir to sdk (big, many files) and home (projects, cfgs)
 		[_] Encrypted volume for home directory
 			[_] Read about encrypted filesystems
@@ -161,6 +164,10 @@ ADMIN
 		http://www.tldp.org/HOWTO/SMB-HOWTO-8.html
 	[_] setup pidgin
 		[_] extract configs from ~/.purple to <airy>
+		[_] attach google talks
+			https://support.google.com/a/answer/49147?hl=ru
+		[_] security
+			https://www.google.com.ua/search?q=pidgin+google+chat&gws_rd=cr,ssl&ei=yzEHVZbxF4SuU5iPhHA#q=pidgin+security
 		2015-03-13 [X] make note about communicator! using tcpdump + regex
 		2015-03-13 [X] disable online/offline notifications
 		2015-03-15 [X] autolaunching in generated work i3 autostart (or use that on each system?)

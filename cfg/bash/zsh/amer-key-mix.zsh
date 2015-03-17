@@ -71,6 +71,10 @@ bindkey -a  '\C-e' edit-command-line
 
 ## Integration
 # ranger -- fast in/out with keeping expression  #bindkey -s -M vicmd
+# bindkey    ',s' amer-toggle-ranger
+# bindkey -s ',s' amer-toggle-ranger
+# bindkey -s  's' amer-toggle-ranger
+
 bindkey  -s ',s' '^Us\n'
 bindkey -as  's' 'Ss\n'
 # quit
