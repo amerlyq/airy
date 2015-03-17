@@ -1,3 +1,4 @@
+# vim: ft=sh
 -------------------------------------------------------------------------
 USEFUL ONE-LINE SCRIPTS FOR SED (Unix stream editor)        Dec. 29, 2005
 Compiled by Eric Pement - pemente[at]northpark[dot]edu        version 5.5
@@ -6,18 +7,8 @@ Latest version of this file (in English) is usually at:
    http://sed.sourceforge.net/sed1line.txt
    http://www.pement.org/sed/sed1line.txt
 
-This file will also available in other languages:
-  Chinese     - http://sed.sourceforge.net/sed1line_zh-CN.html
-  Czech       - http://sed.sourceforge.net/sed1line_cz.html
-  Dutch       - http://sed.sourceforge.net/sed1line_nl.html
-  French      - http://sed.sourceforge.net/sed1line_fr.html
-  German      - http://sed.sourceforge.net/sed1line_de.html
-  Italian     - (pending)
-  Portuguese  - http://sed.sourceforge.net/sed1line_pt-BR.html
-  Spanish     - (pending)
 
-
-FILE SPACING:
+# >> FILE SPACING:
 
  # double space a file
  sed G
@@ -41,7 +32,7 @@ FILE SPACING:
  # insert a blank line above and below every line which matches "regex"
  sed '/regex/{x;p;x;G;}'
 
-NUMBERING:
+# >> NUMBERING:
 
  # number each line of a file (simple left alignment). Using a tab (see
  # note on '\t' at end of file) instead of space will preserve margins.
@@ -56,7 +47,7 @@ NUMBERING:
  # count lines (emulates "wc -l")
  sed -n '$='
 
-TEXT CONVERSION AND SUBSTITUTION:
+# >> TEXT CONVERSION AND SUBSTITUTION:
 
  # IN UNIX ENVIRONMENT: convert DOS newlines (CR/LF) to Unix format.
  sed 's/.$//'               # assumes that all lines end with CR/LF
@@ -152,7 +143,7 @@ TEXT CONVERSION AND SUBSTITUTION:
  gsed '0~5G'                  # GNU sed only
  sed 'n;n;n;n;G;'             # other seds
 
-SELECTIVE PRINTING OF CERTAIN LINES:
+# >> SELECTIVE PRINTING OF CERTAIN LINES:
 
  # print first 10 lines of file (emulates behavior of "head")
  sed 10q
@@ -242,7 +233,7 @@ SELECTIVE PRINTING OF CERTAIN LINES:
  # print section of file between two regular expressions (inclusive)
  sed -n '/Iowa/,/Montana/p'             # case sensitive
 
-SELECTIVE DELETION OF CERTAIN LINES:
+# >> SELECTIVE DELETION OF CERTAIN LINES:
 
  # print all of file EXCEPT section between 2 regular expressions
  sed '/Iowa/,/Montana/d'
@@ -300,7 +291,7 @@ SELECTIVE DELETION OF CERTAIN LINES:
  # delete the last line of each paragraph
  sed -n '/^$/{p;h;};/./{x;/./p;}'
 
-SPECIAL APPLICATIONS:
+# >> SPECIAL APPLICATIONS:
 
  # remove nroff overstrikes (char, backspace) from man pages. The 'echo'
  # command may need an -e switch if you use Unix System V or bash shell.
@@ -352,7 +343,7 @@ SPECIAL APPLICATIONS:
  echo @echo off >zipup.bat
  dir /b *.txt | sed "s/^\(.*\)\.TXT/pkzip -mo \1 \1.TXT/" >>zipup.bat
 
-TYPICAL USE: Sed takes one or more editing commands and applies all of
+# >> TYPICAL USE: Sed takes one or more editing commands and applies all of
 them, in sequence, to each line of input. After all the commands have
 been applied to the first input line, that line is output and a second
 input line is taken for processing, and the cycle repeats. The
@@ -365,39 +356,7 @@ not come from stdin. Output is sent to stdout (the screen). Thus:
  sed '10q' filename              # same effect, avoids a useless "cat"
  sed '10q' filename > newfile    # redirects output to disk
 
-For additional syntax instructions, including the way to apply editing
-commands from a disk file instead of the command line, consult "sed &
-awk, 2nd Edition," by Dale Dougherty and Arnold Robbins (O'Reilly,
-1997; http://www.ora.com), "UNIX Text Processing," by Dale Dougherty
-and Tim O'Reilly (Hayden Books, 1987) or the tutorials by Mike Arst
-distributed in U-SEDIT2.ZIP (many sites). To fully exploit the power
-of sed, one must understand "regular expressions." For this, see
-"Mastering Regular Expressions" by Jeffrey Friedl (O'Reilly, 1997).
-The manual ("man") pages on Unix systems may be helpful (try "man
-sed", "man regexp", or the subsection on regular expressions in "man
-ed"), but man pages are notoriously difficult. They are not written to
-teach sed use or regexps to first-time users, but as a reference text
-for those already acquainted with these tools.
-
-QUOTING SYNTAX: The preceding examples use single quotes ('...')
-instead of double quotes ("...") to enclose editing commands, since
-sed is typically used on a Unix platform. Single quotes prevent the
-Unix shell from intrepreting the dollar sign ($) and backquotes
-(`...`), which are expanded by the shell if they are enclosed in
-double quotes. Users of the "csh" shell and derivatives will also need
-to quote the exclamation mark (!) with the backslash (i.e., \!) to
-properly run the examples listed above, even within single quotes.
-Versions of sed written for DOS invariably require double quotes
-("...") instead of single quotes to enclose editing commands.
-
-USE OF '\t' IN SED SCRIPTS: For clarity in documentation, we have used
-the expression '\t' to indicate a tab character (0x09) in the scripts.
-However, most versions of sed do not recognize the '\t' abbreviation,
-so when typing these scripts from the command line, you should press
-the TAB key instead. '\t' is supported as a regular expression
-metacharacter in awk, perl, and HHsed, sedmod, and GNU sed v3.02.80.
-
-VERSIONS OF SED: Versions of sed do differ, and some slight syntax
+# >> VERSIONS OF SED: Versions of sed do differ, and some slight syntax
 variation is to be expected. In particular, most do not support the
 use of labels (:name) or branch instructions (b,t) within editing
 commands, except at the end of those commands. We have used the syntax
@@ -431,21 +390,3 @@ will drastically reduce processing time for large files. Thus:
 
    sed -n '45,50p' filename           # print line nos. 45-50 of a file
    sed -n '51q;45,50p' filename       # same, but executes much faster
-
-If you have any additional scripts to contribute or if you find errors
-in this document, please send e-mail to the compiler. Indicate the
-version of sed you used, the operating system it was compiled for, and
-the nature of the problem. To qualify as a one-liner, the command line
-must be 65 characters or less. Various scripts in this file have been
-written or contributed by:
-
- Al Aab                   # founder of "seders" list
- Edgar Allen              # various
- Yiorgos Adamopoulos      # various
- Dale Dougherty           # author of "sed & awk"
- Carlos Duarte            # author of "do it with sed"
- Eric Pement              # author of this document
- Ken Pizzini              # author of GNU sed v3.02
- S.G. Ravenhall           # great de-html script
- Greg Ubben               # many contributions & much help
--------------------------------------------------------------------------

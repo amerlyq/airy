@@ -5,8 +5,7 @@
 wbegin(){
     if [ -L $dst ]; then rm $dst; fi
     printf "${1}#%% AutoGen by '${0}'. Do NOT touch! %%#\n" > $dst
-}
-export -f wbegin
+}; export -f wbegin
 
 wstr(){ echo "$1" >> $dst; }
 export -f wstr
@@ -17,36 +16,19 @@ export -f wprf
 wcat(){ cat "$1" >> $dst; }
 export -f wcat
 
-wgroup(){ if ! [ `cat $dst | grep -c "$1"` ]; then
-    wstr "$1"; wstr "$2"; fi }
-export -f wgroup
+wgroup(){ if ! [ $(cat $dst | grep -c "$1") ]; then
+    wstr "$1"; wstr "$2"; fi
+}; export -f wgroup
 
-warr(){ for line in $2; do wstr "$1 $line"; done; wstr ""; }
-export -f warr
-
-#if [  -z "$3" ]; then num=${#key[*]}; else
-#num=$((${#key[*]} < ${#lst[*]} ? ${#key[*]} : ${#lst[*]}));fi
-wlistf(){
-    local i key num lst
-    key=( $2 ); num=${#key[*]}; lst=( $3 );
-    for (( i=0; i<$num; i++ )); do
-        printf "$1\n" "${key[i]}" \
-        "$([ $# -eq 3 ] && echo ${lst[i]} || echo ${*:i+3:1})" \
-        >> $dst
+wmapf(){ for key in "${@:2}"; do
+        printf "$1\n" "$key" >> $dst
     done; wstr ''
-}
-export -f wlistf
+}; export -f wmapf
 
-# printf   "%1 text %1 text %2" for info duplication
-wlistp(){
-    local i key num lst str var
-    key=( $2 ); lst=( $3 );
-    num=$(( ${#key[*]} < ${#lst[*]} ? ${#key[*]} : ${#lst[*]} ))
-    for (( i=0; i<$num; i++ )); do
-        [ $# -eq 3 ] && var="${lst[i]}" || var="${*:i+3:1}"
-        str=${1//"%1"/"${key[i]}"}
-        str=${str//"%2"/"$var"}
-        printf "${str}\n" >> $dst
+wlistf(){ local i str key
+    str="$1"; key=( $2 ); shift 2;
+    for (( i=1; (i<=${#key[@]} && i<=$#); i++ )); do
+        printf "$str\n" "${key[i-1]}" "${!i}" |
+            sed "s|%1|${key[i-1]}|g; s|%2|${!i}|g" >> $dst
     done; wstr ''
-}
-export -f wlistp
+}; export -f wlistf

@@ -20,7 +20,7 @@ esac
 
 if [ -n "$2" ]; then wstr "#define UShading $2"; fi
 
-warr '#include ' '".urxvt/urxvtrc" ".urxvt/urxvt_keys" ".urxvt/urxvt_ext" ".Xrc/xtheme_solarized" ".Xrc/xtermrc" ".Xrc/xfontrc"'
+wmapf '#include %s' '".urxvt/urxvtrc" ".urxvt/urxvt_keys" ".urxvt/urxvt_ext" ".Xrc/xtheme_solarized" ".Xrc/xtermrc" ".Xrc/xfontrc"'
 wstr "
 ! Too big fonts in X appears on '112' value after reboot. What to do?
 ! Xft.dpi : `[ -z "$MAIN_DPI" ] && echo 96 || echo $MAIN_DPI`"

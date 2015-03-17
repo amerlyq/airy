@@ -9,6 +9,10 @@ WARNING
 	Vars: no recursive expansion!
 	Keys:
 
+# You can run script from xsessionrc before each start of i3.
+# In generator -- bind colors to $vars, so you can change color themes consistently
+# In generation process by specifying one var you could change themes between light and dark
+
 
 SEE
  4.16. Interprocess communication
@@ -39,8 +43,7 @@ AUTOCMD
 	i3 execute any command when it encounters a specific window
 	criteria (all beside ids are regex PCRE):
 		class instance window_role id title urgent con_mark con_id
-	> xprop | grep 'WM_CLASS(STRING)' == "#instance, #class"
-	> obxprop | grep WM_CLASS
+	> [ob]xprop | grep 'WM_CLASS(STRING)' == "#instance, #class"
 	E.G. make window floating as it change directory to ~/work
 		for_window [title="x200: ~/work"] floating enable
 

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+cat ~/.i3/names | sed '/^[0-9]\+/!d' | awk '
+BEGIN{ for(i=0;i<=12;++i) a[i]="" }
+$2!=""{a[$1]=":"$2}
+END{ PROCINFO["sorted_in"]="@ind_num_asc"
+    for(n in a) print n""a[n]
+}' FS=':' RS='\n' ORS=' '
+

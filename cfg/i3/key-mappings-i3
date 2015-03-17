@@ -79,9 +79,12 @@ case "$ARGS" in
     ;; # from i3: empty
 -m) cat config | extract_mode | column -t
     ;; # from i3: modes
--x) cat /usr/share/X11/xkb/symbols/{pc,us} | sed '/^default/,/^};$/!d' \
+-k) cat /usr/share/X11/xkb/symbols/{pc,us} | sed '/^default/,/^};$/!d' \
     | sed -n '/^.*\[\s*\(.\+\)\s*\].*$/s//\1/p' | sed 's/\s*,\s*/\n/g' \
     | LC_ALL=C sort -u #| sed 's/^\s*\(\S\+\)\s*$/$mod+\1 ===/'
     ;; # from xkb
+-x) xprop | sed -r '/=\s+Icon \(/,/^\S/d; s/^WM_CLASS.*/& (#instance, #class)/' \
+    | grep --color -E '(^|WM_CLASS|^WM_NAME)'
+    ;;
 esac
 

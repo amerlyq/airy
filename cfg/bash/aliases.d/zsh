@@ -12,7 +12,7 @@ alias -g  V='|& vim - '
 
 ## Utils
 alias -g C='| wc -l '
-alias -g G='| noglob grep -i '
+alias -g G="| noglob grep $AUTOCOLORS -i "
 alias -g S='| noglob sed -rn '
 alias -g W="| while read line; do "
 
@@ -21,7 +21,7 @@ alias -g A='| tee -a /tmp/aura/zsh-last-output '
 alias -g T='| tee /tmp/aura/zsh-last-output '
 alias -g O='  cat /tmp/aura/zsh-last-output '
 alias -g X='  xsel -ob '
-alias -g Y='| xsel -iob '
+alias -g Y='| xsel -ib && xsel -ob '
 
 # alias -r @="printf \"$(xsel -ob)\n\""
 #   { xsel: Can't open display: (null)
