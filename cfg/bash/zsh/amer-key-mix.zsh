@@ -68,6 +68,11 @@ bindkey -a  '\C-u' jh-prev-comp       # Run with last output autocomplete
 bindkey '\C-x\C-e' edit-command-line
 bindkey -a  '\C-e' edit-command-line
 
+bindkey '\C-x\C-s' synchro-dir-push
+bindkey '\C-x\C-l' synchro-dir-pop
+
+
+
 
 ## Integration
 # ranger -- fast in/out with keeping expression  #bindkey -s -M vicmd

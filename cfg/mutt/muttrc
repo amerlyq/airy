@@ -1,22 +1,33 @@
-# GENERAL
+# GENERAL: man muttrc
 # http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
-# (+++) https://wiki.archlinux.org/index.php/mutt
+# (+) https://wiki.archlinux.org/index.php/mutt
+# (++) http://www.mutt.org/doc/manual/manual-4.html
+# http://www.elho.net/mutt/maildir/
+# VIM+gpg:
+#   http://blog.developwithpassion.com/2013/05/02/getting-up-and-running-with-a-sane-mutt-setup/
+# Offline sending and reading, see about 'alternates':
+#   https://technosorcery.net/blog/2010/11/21/offline-email-with-gmail-mutt-postfix-and-offlineimap/
+# http://dev.mutt.org/trac/wiki/MailConcept
+# http://mutt.blackfish.org.uk/storage/
 
 # MULTI_ACC: In the most simple solution, just 'c'hange folders to the IMAP server:
 # https://www.df7cb.de/blog/2010/Using_multiple_IMAP_accounts_with_Mutt.html
-#   macro index <f2> '<change-folder>imaps://imap.example.com<enter>'
-#   macro index <f3> '<change-folder>imaps://imap.otherdomain.tld<enter>'
 
 
-# Greate by generator
-# set realname = "Name Surname"
+set imap_user = "`echo $MAIN_MAIL`"
+set pop_user = "`echo ${WORK_MAIL%%@*}`"
+unset imap_pass   # set imap_pass = pass
+unset pop_pass
+unset smtp_pass
 
-# set use_from = yes
-set editor='vim -c "set spell spelllang=ru_yo,en_us,uk"'
-# # set edit_headers # see the headers when editing
-# set sort = reverse-threads # sort by newest conversation first
-# set sort_aux = last-date-received
-# set signature = ~/.mutt/signature
+set from = "`echo ${WORK_MAIL}`"
+set realname = "`echo ${WORK_NAME}`"
+set use_from = yes
+
+set editor = '`echo \$EDITOR` -c "set spell spelllang=ru_yo,en_us,uk"'
+set edit_headers # see the headers when editing
+set sort = reverse-threads # sort by newest conversation first
+set sort_aux = last-date-received
 
 # confirmation skipping
 # set fast_reply=yes        # when replying, don't prompt for address
@@ -24,62 +35,78 @@ set editor='vim -c "set spell spelllang=ru_yo,en_us,uk"'
 # set forward_quote=yes     # include original text on forward?
 # set delete=yes            # don't ask for delete confirmation
 
-# set smtp_url = smtp://user@smtp.gmail.com:587/
-# set smtp_pass = pass
-
+set abort_nosubject=yes
 # set copy = no
 set move = no
 set imap_keepalive = 900
+set ssl_force_tls = yes
+
+# Automatically include message when replying
+set include=ask-yes
+# Ask before printing
+set print=ask-yes
 
 # IMAP | enough only set local dirs
-# set from = `echo $MAIN_MAIL`
-set my_user = `echo ${MAIN_MAIL%%@*}`
-set imap_user = `echo $MAIN_MAIL`
-unset imap_pass   # set imap_pass = pass
-# [$my_user@] -- prefixed only to have different folders for each account
-set folder = imaps://$my_user@imap.gmail.com:993  # /[folder/]
-
 ## Check incoming
-set spoolfile = +INBOX      #or +[Gmail]/Important
-set postponed = +[Gmail]/Drafts
-mailboxes =INBOX
-mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.gmail.com/family
-#>  config includes a macro bound to the 'y' key which will allow you to change
-#>  to any of the folders listed under mailboxes
-# ALT: set imap_check_subscribed
+set mail_check=15
+set timeout=30
+# DESC: [$my_user@] -- prefixed only to have different folders for each account
+# set folder = imaps://$my_user@imap.gmail.com:993  # /[folder/]
+# set spoolfile = +INBOX      #or +[Gmail]/Important
+# set postponed = +[Gmail]/Drafts
 
-set header_cache = ~/.cache/mutt/headers
-set message_cachedir = ~/.cache/mutt/bodies
-set certificate_file = ~/.cache/mutt/certificates
+set folder = ~/work/mail
 
 
 # POP3 | need to create local dirs manually
-#set from = user@server.com
-#set mbox_type=Maildir
-#set folder=$HOME/work/mail
-#set spoolfile=+/           # local directories to poll for new Mail. Can be more then one
-                            # (e.g. the Directories of Mailing-Lists)
-#set header_cache=~/.cache/mutt
+# touch ~/work/mail/inbox
+### If I will use getmail
+set mbox_type=Maildir
+
+# spoolfile is only necessary if $MAIL is not correct
+set spoolfile = "+inbox"         # local directories to poll for new Mail. Can be more then one
+                           # (e.g. the Directories of Mailing-Lists)
+set postponed = "+postponed"      # where to store draft messages
+set record = "+sent"              # where to store sent messages
+
+set pop_host = pops://$pop_user@`echo ${WORK_SRV_POP3}`
+set pop_reconnect = yes
+set pop_checkinterval = 60
+unset pop_delete
+# Similar to IMAP, a pop_authenticators option also exists
+
+# set folder = $pop_host
 
 # SMTP
-#set my_pass='pass'
-#set my_user=user@server.com
-#set smtp_url=smtps://$my_user:$my_pass@mail.serve.com
-#set ssl_force_tls = yes
-set smtp_url=smtp://`echo ${MAIN_MAIL%%@*}`@smtp.gmail.com:587
-# set smtp_pass=pass
-set record="+sent"              # where to store sent messages
-set postponed="+postponed"      # where to store draft messages
+# set smtp_url = smtps://$imap_user@smtp.gmail.com:587
+set smtp_url = smtps://$pop_user@`echo ${WORK_SRV_SMTP}`
 
-# BINDING
+
+## DIRS
+set header_cache = ~/.cache/mutt/headers
+set message_cachedir = ~/.cache/mutt/bodies
+set certificate_file = ~/.cache/mutt/certificates
+# set signature = ~/.mutt/signature
+
+
+## BINDING
 # fetch mail by I
 #macro index,pager I "!getmail"
+macro index <f2> "<change-folder>imaps://$imap_user@imap.gmail.com:993<enter>"
+macro index <f3> "<change-folder>$pop_host<enter>"
 
-# ALIASES
+## ALIASES
 #set alias_file = "~/.mutt/aliases"
 #set sort_alias = alias
 #set reverse_alias = yes
 #source $alias_file
 
-# THEME
+## THEME
 source ~/pkg/mutt-colors-solarized/mutt-colors-solarized-dark-16.muttrc
+
+## COMMANDS
+mailboxes +inbox
+# mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.gmail.com/family
+#>  config includes a macro bound to the 'y' key which will allow you to change
+#>  to any of the folders listed under mailboxes
+# ALT: set imap_check_subscribed

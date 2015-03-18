@@ -7,8 +7,8 @@ ff() { find . -type f -regex $@; }
 # grep -Ri 'name' . # find in all files
 # alias ff='find ./ | grep -i '
 
-agi() { ag -i -G '^(?:(?!build|libs|tags).)*$' $@; }
-agf() { ag -i -g $@; }
+agi() { ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' $@; }
+agf() { ag -S -g $@; }
 agp() { agi --pager less $@; }
 agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
 

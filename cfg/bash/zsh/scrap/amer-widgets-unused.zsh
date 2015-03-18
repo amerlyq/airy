@@ -12,29 +12,6 @@ function _prepend_sudo() {
 }
 
 
-# bindkey -a "^O" synchro-dir-pop
-# bindkey "^O" synchro-dir-push
-zle -N synchro-dir-push synchro_dir_push
-zle -N synchro-dir-pop synchro_dir_pop
-function synchro_dir_push {
-    curr="$(pwd)"
-    if [ "$curr" != ~ ]; then
-        printf "$curr\n" > /tmp/aura/zsh_chosedir
-    fi
-}
-function synchro_dir_pop {
-if [ -f /tmp/aura/zsh_chosedir ]; then
-    curr="$(cat /tmp/aura/zsh_chosedir)"
-    if [ "$(pwd)" != "$curr" ]; then
-        # Change directories and redisplay the prompt
-        # (Still don't fully understand this magic combination of commands)
-        # [[ -o zle ]] && zle -R && cd "$(cat ~/.pwd)" && precmd && zle reset-prompt 2>/dev/null
-        cd "$curr" && zle reset-prompt
-    fi
-fi
-}
-
-
 ### ----------- Untested
 # autoload smart-insert-last-word
 # bindkey "\e." smart-insert-last-word-wrapper
