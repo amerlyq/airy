@@ -1,4 +1,5 @@
 " vim:ts=2:sw=2:sts=2
+" NOTE: more prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
 
 " Toggle status line
 nnoremap <Leader>ta :set laststatus=<C-R>=&laststatus?0 :2<CR> \| :AirlineToggle<CR>

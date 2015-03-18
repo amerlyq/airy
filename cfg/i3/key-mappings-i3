@@ -8,7 +8,7 @@ MODE=${2}
 KBD_ALL=$(sed 's/\s\+/\n/g' <<EOT | sed 's/.*/$mod+&\n$mSd+&\n$mCd+&\n$mCS+&/'
 $(echo {{0..9},{a..z},F{1..12}})
 Left Down Up Right           Home Next Prior End
-Tab Return Escape            BackSpace Insert Delete Pause
+Tab Return Escape Space      BackSpace Insert Delete Pause
 comma period semicolon       slash backslash grave
 bracketleft bracketright     apostrophe equal minus
 EOT

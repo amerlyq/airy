@@ -21,7 +21,7 @@ i3
 	[_] container settings
 		fast 1,2,3 sizes for window
 	[_] wrksp settings
-		[_] toggle bar
+		[X] toggle bar
 		[_] change layout on predefined (current -- left half, others -- right column, etc)
 		[_] focus one of unnumbered (named) workspaces
 		[X] rename wrksp
@@ -40,7 +40,9 @@ i3
 	[_] mCd+semicolon must focus deepest child, mCS -- all of parents chain only?
 	[_] mCd,mCS +[hjkl] -- choose from two possible cases
 		[_] move window to another output
+		: (+) comfortable, (-) not consistent with ]/[, not too frequent ops
 		[_] detach/attach (float) window from tiled and move to screen corner
+		: more logical, but need absolute positioning for floats
 	[_] Make several setter scripts (xev, xprop) launching from i3 shortcuts dev menu
 	[_] Cut too long song names when showed on i3bar -- otherwise there are artefacts
 	[_] Consolidate: $mod open or focus to app if already opened, or open copy if $mSd
@@ -52,11 +54,17 @@ i3
 		: or mark always showed on bar as two letter/number
 		: I can use separate top bar for debug information like in Unity:
 		: window header, scratch headers, their marks, etc
-	Maybe, it has sense do mCd+[hjkl] move container to output right
+	[_] try menu inside menu (use for Open)
 
 vim:
 	[_] comment each mapping with regex to extract placeholders from binding
 		[_] for continuous group of maps use that regex for each
+		[~] develop format
+		[_] mark several files
+		[_] create parser
+	[_] fix ,k ,K behaviour
+		,k by default must always run :./% -- to speed up work on open
+		,K must replace current default run cmd with last from ':'
 	[_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
 		: to generate vimrc for others or for me on other computers (buildserver)
 	[_] regions of file highlighting
@@ -66,19 +74,21 @@ vim:
 	[_] load spellchecking in vim_install
 		[_] install -u must run vim_install in update regime
 	Navigation
-		[_] mappings to move between loci of entries of qf/loc list
-		[_] move to next/prev change in :Git marks
-		[_] move to next/prev spellchecking error
+		2015-03-18 [X] mappings to move between loci of entries of qf/loc list
+		2015-03-17 [X] move to next/prev change in git signify (Use: ]c [c)
+		2015-03-17 [X] move to next/prev spellchecking error (Use: ]s [s z=)
 	[_] Autocopying on focus lost/gain
 	: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
 		au FocusLost   * silent! call CopyStringInReg('"', @+)
 		au FocusGained * silent! call CopyStringInReg('+', @")
 	[_] easymotion
-		[_] maybe, move to 'q' key? Or combining with surround will work smoothly?
+		2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
+			No combining -- overlapping x-mappings aren't possible
 		[_] ALT: https://github.com/justinmk/vim-sneak
 	[_] Seize
 		http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
-	[_] BUG: C-F, C-D on the end of content of ':' or '/' opens menu, needs to disable it
+		http://www.vim.org/scripts/script.php?script_id=4449
+	[_] BUG: C-F on end of '/', C-D on emtpy ':' -- both opens menu, needs to disable it
 	[_] Vimoutliner
 		[_] Change mapping to more easy pressed
 		[_] Disable autoformating on pasting
@@ -112,6 +122,7 @@ zsh
 	[$] BUG: xsel -ob don't work in widget --> update to ArchLinux
 	[_] pre-execute command before starting interactive shell
 		http://www.zsh.org/mla/users/2005/msg00599.html
+	[_] BUG: fix agi to search case insensitive text
 
 [_] wget with redirection, cookies and user-agent
 	TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"
@@ -138,6 +149,9 @@ dunst
 		: to fixate music 15s left msg on second screen
 	[_] fix geometry to be more agile -- to content messages from chat
 
+urxvt
+	move (scroll) up to beginning of last launched command (perl?)
+	: useful for long outputs, alignes prompt atop as after <C-l>
 
 [_] mutt
 	[_] pop3+smtp one-account

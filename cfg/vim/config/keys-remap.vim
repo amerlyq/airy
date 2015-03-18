@@ -4,15 +4,22 @@
 noremap ' `
 noremap ` '
 
-" Pinky stratching
+" noremap , <Nop>
+
+" Pinky stretching soothing
 noremap ,. :
 cnoremap <C-o> <C-p>
 
-" Save keystrokes for Ex-commands
+" Faster $3 ex-cmds
 noremap ;  :
-" noremap , <Nop>
-noremap [f ;
-noremap ]f ,
+" Repeat find $3 <next|prev>
+noremap ]f ;
+noremap [f ,
+" Move to <next|prev> [qf|loc] entry
+noremap <unique> ]q :<C-U><C-R>=v:count1<CR>cnext!<CR>
+noremap <unique> [q :<C-U><C-R>=v:count1<CR>cprevious!<CR>
+noremap <unique> ]l :<C-U><C-R>=v:count1<CR>lnext!<CR>
+noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 
 " Show list of tags when there more then one entry:
 noremap <C-]> g<C-]>

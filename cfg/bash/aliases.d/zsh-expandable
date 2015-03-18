@@ -22,6 +22,6 @@ bindkey -M isearch " "  magic-space     # normal space during searches
 
 
 ## Expandable
-ealias fff='find . -iname'
+# ealias fff='find . -iname'
 ealias agl="ag -i -G '^(?:((?!tags|drivers|arch)|arch/arm/).)*$' "
-
+ealias ascii='for i in {32..126}; do printf "\x$(printf "%x" $i)\n"; done'

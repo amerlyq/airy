@@ -21,7 +21,7 @@ wgroup(){ if ! [ $(cat $dst | grep -c "$1") ]; then
 }; export -f wgroup
 
 wmapf(){ for key in "${@:2}"; do
-        printf "$1\n" "$key" >> $dst
+        printf "$1\n" "$key" | sed "s|%1|$key|g" >> $dst
     done; wstr ''
 }; export -f wmapf
 
