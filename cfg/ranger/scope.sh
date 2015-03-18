@@ -106,13 +106,19 @@ case "$mimetype" in
         exiftool "$path" && exit 5
         # Use sed to remove spaces so the output fits into the narrow window
         try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
+
+    # application/x-executable)
+    #     { ~/.bin/reb "$path" || exit 1; } | sed "${maxln}q" && exit 5
+    #     ;;
 esac
 
 { # Display general information for other files:
     file -Lb "$path" | sed 's/,\s*/\n/g'
     if [ "$(ls -l "$path" | awk '{print $5}')" != "0" ]; then
-    echo "<================================================================>"
-    xxd "$path" | sed "${maxln}q"; fi
+        maxcol=$(((width-6)/7*2)); actualwidth=$((maxcol/2*7+6))
+        printf "<$(printf "=%.0s" {1..62})>\n"
+        xxd -c $maxcol -l $((maxcol*maxln)) "$path" | sed "s/^.\{4\}//; ${maxln}q"
+    fi
 } && exit 5
 
 exit 1

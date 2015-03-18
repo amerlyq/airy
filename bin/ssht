@@ -25,7 +25,7 @@ tmux attach -t $SESSION
 "
 
 case "$PRG" in
-    mpd)  ~/.bin/ssht.d/sir-mpd $ARGS ;;
+    mpd)  ~/.bin/net.d/sir-mpd $ARGS ;;
     srkz) ssh srk -t zsh $ARGS ;;
     sirx) ssh sir -X ${ARGS:--t "$sstmux"} ;;
     *)    ssh $PRG ${ARGS:--t "$sstmux"} ;;

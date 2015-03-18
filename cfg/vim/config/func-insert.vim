@@ -36,7 +36,8 @@ inoremap <C-space> <C-x><C-o>
 " inoremap <C-space> <C-x><C-l>
 
 " Line split
-nnoremap K  a<CR><Right><Esc>
-nnoremap gK i<CR><Right><Esc>
+nnoremap K   a<CR><Right><Esc>
+nnoremap gK  i<CR><Right><Esc>
+nnoremap g,k i<CR><Right><Esc>:m .-2<CR>
 nnoremap gX a<Del><Esc>
 

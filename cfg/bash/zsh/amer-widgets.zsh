@@ -26,3 +26,11 @@ function _jh-prev-result() {
     compadd - ${hlist}
 }
 
+zle -C amer-coplete-bin menu-complete _amer-coplete-bin
+function _amer-coplete-bin() {
+    cmd_output_buf=$(cd ~/.bin && ls **/*(.x))
+    set -A hlist ${(@s/
+/)cmd_output_buf}
+    compadd - ${hlist}
+}
+

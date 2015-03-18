@@ -19,9 +19,10 @@ alias -g W="| while read line; do "
 ## Buffers
 alias -g A='| tee -a /tmp/aura/zsh-last-output '
 alias -g T='| tee /tmp/aura/zsh-last-output '
-alias -g O='  cat /tmp/aura/zsh-last-output '
-alias -g X='  xsel -ob '
+alias -g O='cat /tmp/aura/zsh-last-output '
+alias -g X='xsel -ob '
 alias -g Y='| xsel -ib && xsel -ob '
+alias -g YA='| xsel -ib && xsel -ob '
 
 # alias -r @="printf \"$(xsel -ob)\n\""
 #   { xsel: Can't open display: (null)

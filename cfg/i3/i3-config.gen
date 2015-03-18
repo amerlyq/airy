@@ -17,7 +17,7 @@ esac; fi
 source ~/.i3/themes/"${thm_nm}.i3"
 
 ### Declare it only if you want change lang on Mod+Shift+890
-# USE_LANG="8 9"
+USE_LANG="8 9 0"
 
 # ----- Paths -----
 wbegin
@@ -93,12 +93,11 @@ w_header "Autostart"
 # wstr "bindcode --release $key_ralt $exno \$upd lang"
 
 wprf "\n### ================== Workspaces ================== ###\n"
-M1=( $(cat ~/.cache/displayside | sed 1d) )
-if [ ! -z "$M1" ]; then
-    if [ ${#M1[@]} -le 1 ]; then M2="${M1[0]}"; else M2="${M1[1]}"; fi
-    for i in {1..5}; do monitors="$M1 $monitors $M2"; done
+declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;N;s/\n//p')
+if [ -n "$M1$M2" ]; then
+    monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"
     w_header "WorkSpaces: Output"
-    wlistf "workspace %s output %s" "$wrksps" $monitors
+        wlistf "workspace %s output %s" "$wrksps" $monitors
 fi
 
 w_header "WorkSpaces: Focus"
@@ -108,8 +107,16 @@ w_header "WorkSpaces: Move container"
 if [ -n "$USE_LANG" ]; then
     tmp_wrkkey=( "$wrkkey" ); #for i in $USE_LANG; do tmp_wrkkey=("${tmp_wrkkey[@]:1}"); done
     tmp_wrksps=( "$wrksps" ); #for i in $USE_LANG; do tmp_wrksps[$i]=""; done
-    # echo "$tmp_wrkkey"
-    # echo "$tmp_wrksps"
+    echo "b $tmp_wrkkey"
+    echo "b $tmp_wrksps"
+    for i in $USE_LANG; do for ((k=1; k<=${#tmp_wrkkey}; ++k)); do
+        # if [ "$i" == "${tmp_wrkkey[k]}" ]; then
+        echo $k
+        if [ "$k" == 4 ]; then
+            tmp_wrkkey[k]=""; tmp_wrksps[k]=""; fi; done; done
+
+    echo "n $tmp_wrkkey"
+    echo "n $tmp_wrksps"
     wlistf "$mSd+%-5s \$move_ctw number %s" "$tmp_wrkkey" $tmp_wrksps
 else wlistf "$mSd+%-5s \$move_ctw number %s" "$wrkkey" $wrksps; fi
 
@@ -216,7 +223,9 @@ m_open="<Open> : [n]cmpcpp, [h]top | [P]owertop, [t]lp | [g]vim, [p]idgin, [f]ir
     wmode_end "$mod+o"
 
 w_header "Run: Prgs"
-    wstr "$mod+u $eurx"      # Because it's urxvt!
+    wstr "$mod+u $eurx"  # Because it's urxvt!
+    wstr "$mSd+u split vertical  , $eurx"
+    wstr "$mCd+u split horizontal, $eurx"
     wstr "$mod+Return $eurx -e zsh -ic ranger-auto"
     wstr "$mSd+Return $eflo -e ranger-auto"
     wstr "$mCd+Return $eflo"

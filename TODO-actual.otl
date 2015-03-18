@@ -11,12 +11,13 @@ i3
 		[_] debug copyq-edit()
 		[_] copyq default floating
 		: xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
+			[_] BUG: moving by one pixel each time i'm opening it
 	[_] i3 separate ./dmenu directory
 		[_] move launching dmenu from i3 to script in that dir
 		[_] same do for dbus lang changing
 	[_] additional desktops
-		[_] use 'grave' as 0 workspace for scratch monitoring
-		[_] use 'minus, equal' monitors as 11,12
+		[X] use 'grave' as 0 workspace for scratch monitoring
+		[X] use 'minus, equal' monitors as 11,12
 		[_] temporarily don't skip mCS+[789] for lang chg, but create possibility
 	[_] container settings
 		fast 1,2,3 sizes for window
@@ -33,9 +34,10 @@ i3
 		-> better case would be moving them inside floating window only, without re-attaching to tiled
 	[_] Launching prs from empty screen -- use i3-ipc?
 		: need event of choosing dsktp -- and sending mod+o to it if empty)
-	[_] Split on mSd+[nm] must create it, move to right/below? window and move it
+	[_] Split on mSd+[nm] must move to right/below? window and merge them
+	2015-03-18 [X] m..+U must point split and then create window
 	[_] mSd+[,./] must make such layout for all windows on workspace
-	[_] mCd+f -- must focus to fullscreen window
+	[_] mCd+f -- must focus to fullscreen window -- but which if many?
 	[_] mCS+[0-9] must move all windows from specified desktop to current
 	[_] mCd+semicolon must focus deepest child, mCS -- all of parents chain only?
 	[_] mCd,mCS +[hjkl] -- choose from two possible cases
@@ -117,6 +119,7 @@ zsh
 		http://reasoniamhere.com/2014/01/11/outrageously-useful-tips-to-master-your-z-shell/
 		http://chneukirchen.org/blog/archive/2008/02/10-zsh-tricks-you-may-not-know.html
 		http://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
+		http://linuxaria.com/howto/globbing-con-zsh
 	[_] Check zsh profiling (debug starting and accept-line timing)
 	[_] append sudo and execute command instead of simply appending it
 	[$] BUG: xsel -ob don't work in widget --> update to ArchLinux

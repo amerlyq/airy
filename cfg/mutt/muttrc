@@ -27,9 +27,9 @@ set editor='vim -c "set spell spelllang=ru_yo,en_us,uk"'
 # set smtp_url = smtp://user@smtp.gmail.com:587/
 # set smtp_pass = pass
 
-# set imap_keepalive = 900
 # set copy = no
-# set move = no
+set move = no
+set imap_keepalive = 900
 
 # IMAP | enough only set local dirs
 # set from = `echo $MAIN_MAIL`
@@ -41,16 +41,16 @@ set folder = imaps://$my_user@imap.gmail.com:993  # /[folder/]
 
 ## Check incoming
 set spoolfile = +INBOX      #or +[Gmail]/Important
+set postponed = +[Gmail]/Drafts
 mailboxes =INBOX
 mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.gmail.com/family
 #>  config includes a macro bound to the 'y' key which will allow you to change
 #>  to any of the folders listed under mailboxes
 # ALT: set imap_check_subscribed
 
-# set postponed = +[Gmail]/Drafts
-# set header_cache = ~/.cache/mutt/headers
-# set message_cachedir = ~/.cache/mutt/bodies
-# set certificate_file = ~/.cache/mutt/certificates
+set header_cache = ~/.cache/mutt/headers
+set message_cachedir = ~/.cache/mutt/bodies
+set certificate_file = ~/.cache/mutt/certificates
 
 
 # POP3 | need to create local dirs manually
@@ -65,9 +65,11 @@ mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.g
 #set my_pass='pass'
 #set my_user=user@server.com
 #set smtp_url=smtps://$my_user:$my_pass@mail.serve.com
-#set record="+sent" # where to store sent messages
 #set ssl_force_tls = yes
-#set postponed="+postponed" # where to store draft messages
+set smtp_url=smtp://`echo ${MAIN_MAIL%%@*}`@smtp.gmail.com:587
+# set smtp_pass=pass
+set record="+sent"              # where to store sent messages
+set postponed="+postponed"      # where to store draft messages
 
 # BINDING
 # fetch mail by I
