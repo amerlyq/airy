@@ -16,6 +16,6 @@ noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
 noremap <silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
 
 " Launch executable scripts
-noremap <Leader>K :<C-U>!./%<CR>
-noremap <Leader>k :<C-U>!!<CR>
+noremap <Leader>k :<C-U>!./%<CR>
+noremap <Leader>K :<C-U>!!<CR>
 

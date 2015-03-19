@@ -1,9 +1,9 @@
-#!/bin/sh
-# $1 -- Pr name
-if [ `ps aux | grep -c $1` -eq 1 ]; then
-    i3-msg "exec $1"
-else
-    i3-msg "[class=(?i)$1] focus"
+#!/usr/bin/env bash
+PR="$1"
+
+if ! pgrep "$PR" >/dev/null
+then i3-msg "exec $1"
+else i3-msg "[class=(?i)$1] focus"
 fi
 
 

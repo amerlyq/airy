@@ -17,7 +17,7 @@ esac; fi
 source ~/.i3/themes/"${thm_nm}.i3"
 
 ### Declare it only if you want change lang on Mod+Shift+890
-USE_LANG="8 9 0"
+# USE_LANG="8 9 0"
 
 # ----- Paths -----
 wbegin
@@ -93,8 +93,8 @@ w_header "Autostart"
 # wstr "bindcode --release $key_ralt $exno \$upd lang"
 
 wprf "\n### ================== Workspaces ================== ###\n"
-declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;N;s/\n//p')
-if [ -n "$M1$M2" ]; then
+declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;p;N;s/\n//p')
+if [[ "$M1" && "$M2" ]]; then
     monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"
     w_header "WorkSpaces: Output"
         wlistf "workspace %s output %s" "$wrksps" $monitors
@@ -105,19 +105,11 @@ w_header "WorkSpaces: Focus"
 
 w_header "WorkSpaces: Move container"
 if [ -n "$USE_LANG" ]; then
-    tmp_wrkkey=( "$wrkkey" ); #for i in $USE_LANG; do tmp_wrkkey=("${tmp_wrkkey[@]:1}"); done
-    tmp_wrksps=( "$wrksps" ); #for i in $USE_LANG; do tmp_wrksps[$i]=""; done
-    echo "b $tmp_wrkkey"
-    echo "b $tmp_wrksps"
-    for i in $USE_LANG; do for ((k=1; k<=${#tmp_wrkkey}; ++k)); do
-        # if [ "$i" == "${tmp_wrkkey[k]}" ]; then
-        echo $k
-        if [ "$k" == 4 ]; then
-            tmp_wrkkey[k]=""; tmp_wrksps[k]=""; fi; done; done
-
-    echo "n $tmp_wrkkey"
-    echo "n $tmp_wrksps"
-    wlistf "$mSd+%-5s \$move_ctw number %s" "$tmp_wrkkey" $tmp_wrksps
+    tmp_wrkkey=( $wrkkey ); tmp_wrksps=( $wrksps )
+    for i in $USE_LANG; do for ((k=1; k<=${#tmp_wrkkey[@]}; ++k))
+    do if [ "$i" == "${tmp_wrkkey[$k]}" ]; then
+        tmp_wrkkey[$k]=""; tmp_wrksps[$k]=""; fi; done; done
+    wlistf "$mSd+%-5s \$move_ctw number %s" "${tmp_wrkkey[*]}" ${tmp_wrksps[*]}
 else wlistf "$mSd+%-5s \$move_ctw number %s" "$wrkkey" $wrksps; fi
 
 w_header "WorkSpaces: Move and move container"
@@ -128,7 +120,7 @@ w_header "Navigation: Focus"
     wlistf "$mod+%-5s focus %s" "$hjkl $Arrows" $arrows $arrows
 
 w_header "Navigation: Move"
-    wlistf "$mSd+%-5s move %s \$s_grid" "$hjkl $Arrows" $arrows $arrows
+    wlistf "$mSd+%-5s move %-5s \$s_grid" "$hjkl $Arrows" $arrows $arrows
 
 
 wprf "\n### ================== Mark & Go =================== ###\n"
@@ -136,12 +128,10 @@ w_header "Navigation: Mark"
     wmode_begin "$mod+t" 'mark' "Mark this: 0..9, <mod+T>"
         wprf "$tod+t $exi3 'mark %%s' -P 'Mark name: ' ,$def\n\n"
         wlistf "$ts %-5s mark mrkM%s ,$def" "$wrkkey" $wrkkey
-        wstr "$mod+BackSpace nop"
-        wstr "$mod+Space rename current"
     wmode_end "$mod+t"
 
 w_header "Navigation: GoTo"
-    wmode_begin "$mod+g" 'goto' "GoTo mark: 0..9, Mod+G"
+    wmode_begin "$mod+g" 'goto' "GoTo mark: [0..9-=], Mod+G"
         wprf "$tod+g $exi3 '[con_mark=%%s] focus' -P 'Go to mark: ' ,$def\n\n"
         wlistf "$ts %-5s [con_mark=\"mrkM%s\"] focus ,$def" "$wrkkey" $wrkkey
     wmode_end "$mod+g"
@@ -213,12 +203,21 @@ STD_FMG="pcmanfm"
 command -v $STD_FMG >/dev/null 2>&1 || STD_FMG="nemo --no-desktop"
 
 w_header "Mode: Open"
-m_open="<Open> : [n]cmpcpp, [h]top | [P]owertop, [t]lp | [g]vim, [p]idgin, [f]irefox, [F]m, [S]ets | [m]usic (s)ound"
+m_open="<O>pen : [n]cmpcpp, [h]top | [p]idgin, [f]irefox | [m]usic"
     wmode_begin "$mod+o" 'open' "$m_open"
-        wlistf "$ts %s $eflo -e %s ,$def" "n h Shift+p t" \
-            "ncmpcpp" "htop" "gksudo powertop" "gksudo tlp start"
-        wlistf "$ts %s $exno %s ,$def" "g p Shift+f m Shift+s"  \
-            "gvim" "pidgin" "$STD_FMG" "~/.i3/ext/dmenu_mpd_fmove" \
+        wlistf "$ts %s $eflo -e %s ,$def" "n h" \
+            "ncmpcpp" "htop"
+        wlistf "$ts %s $exno %s ,$def" "p f m"  \
+            "pidgin" "firefox" "~/.i3/ext/dmenu/mpd_fmove" \
+        wstr "$tod+o mode \"\$mode_open_rare\""
+    wmode_end
+
+m_open="<Open> : [P]owertop, [t]lp | [g]vim, [F]m | (s)ound"
+    wmode_begin 'open_rare' "$m_open"
+        wlistf "$ts %s $eflo -e %s ,$def" "Shift+p t" \
+            "gksudo powertop" "gksudo tlp start"
+        wlistf "$ts %s $exno %s ,$def" "g Shift+f Control+s"  \
+            "gvim" "$STD_FMG" \
             "/usr/lib/cinnamon-settings/cinnamon-settings.py sound"
     wmode_end "$mod+o"
 
