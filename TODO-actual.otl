@@ -41,10 +41,15 @@ i3
 	[_] mCS+[0-9] must move all windows from specified desktop to current
 	[_] mCd+semicolon must focus deepest child, mCS -- all of parents chain only?
 	[_] mCd,mCS +[hjkl] -- choose from two possible cases
-		[_] move window to another output
+		[$] move window to another output
 		: (+) comfortable, (-) not consistent with ]/[, not too frequent ops
-		[_] detach/attach (float) window from tiled and move to screen corner
+		[X] detach/attach (float) window from tiled and move to screen corner
 		: more logical, but need absolute positioning for floats
+			[_] optionally change size of window to predefined size ((1/4 - 2/25)*screen)
+			: by another 'Edit' shortcut or automatically when moving
+		[_] advanced float tiling: use '~/.i3/ext/move_by_grid 3:22' or 2:11
+		: precaching results from xrandr in /tmp
+		: detecting current output
 	[_] Make several setter scripts (xev, xprop) launching from i3 shortcuts dev menu
 	[_] Cut too long song names when showed on i3bar -- otherwise there are artefacts
 	[_] Consolidate: $mod open or focus to app if already opened, or open copy if $mSd
@@ -57,7 +62,11 @@ i3
 		: or mark always showed on bar as two letter/number
 		: I can use separate top bar for debug information like in Unity:
 		: window header, scratch headers, their marks, etc
-	[_] try menu inside menu (use for Open)
+	2015-03-18 [X] try menu inside menu (use for Open)
+	[_] run/autostart on specified workspace and start on 1
+	[_] border -- instead '1pixel' do 'pixel $s_border'
+	[_] organize scripts as bash filter functions which use same output of
+		i3-msg -t get_tree | jshon | tee >(pbcopy) >(do_stuff) >(do_more_stuff) | grep errors
 
 vim:
 	[_] comment each mapping with regex to extract placeholders from binding
@@ -128,6 +137,7 @@ zsh
 		http://www.zsh.org/mla/users/2005/msg00599.html
 	[_] BUG: fix agi to search case insensitive text
 		: flags -S -i have no effect on it
+	[_] Ag search only files in current directory
 
 [_] wget with redirection, cookies and user-agent
 	TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"

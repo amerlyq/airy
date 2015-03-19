@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Pre-caching of slow xrandr results.
+# Works only once after system startup.
+
+FL=/tmp/aura/outputs
+if [ ! -f "$FL" ]; then
+    xrandr | sed -n '/\sconnected\s/{{
+        s/connected\|x\|+\|(.*$/ /g
+        s/\(.*\) primary \(.*\)/\1 \2 */
+    };p}' > "$FL"
+fi
+
+cat "$FL"
+

@@ -16,6 +16,14 @@ else case ${1:-$CURR_THEME} in
 esac; fi
 source ~/.i3/themes/"${thm_nm}.i3"
 
+# ----- Monitors -----
+declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;p;N;s/\n//p')
+if [[ "$M1" && "$M2" ]]; then
+    monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"
+fi
+# Set snap_gr array in values of lines from snap script
+IFS=$'\n' read -d '' -r -a snap_gr <<< "$(~/.i3/ext/get_snap_grid)"
+
 ### Declare it only if you want change lang on Mod+Shift+890
 # USE_LANG="8 9 0"
 
@@ -81,7 +89,7 @@ w_header "Vars"
     wstr 'set $s_size 10 px or 2 ppt'
 
 w_header "\n" "Bind: Refresh on i3mod"
-wlistf "set %s %s" "$wrksps" $(~/.i3/ext/get_names)
+wlistf "set %s %s" "$wrksps" $(~/.i3/ext/load_names)
 
 w_header "Autostart"
     wstr "exec_always --no-startup-id auto-start"
@@ -93,9 +101,7 @@ w_header "Autostart"
 # wstr "bindcode --release $key_ralt $exno \$upd lang"
 
 wprf "\n### ================== Workspaces ================== ###\n"
-declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;p;N;s/\n//p')
-if [[ "$M1" && "$M2" ]]; then
-    monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"
+if [[ "$monitors" ]]; then
     w_header "WorkSpaces: Output"
         wlistf "workspace %s output %s" "$wrksps" $monitors
 fi
@@ -121,6 +127,10 @@ w_header "Navigation: Focus"
 
 w_header "Navigation: Move"
     wlistf "$mSd+%-5s move %-5s \$s_grid" "$hjkl $Arrows" $arrows $arrows
+
+w_header "Navigation: Move Float"
+    wlistf "$mCd+%s  floating enable, $exno ~/.i3/ext/move_by_grid %s" \
+        "$hjkl" 2:11 2:12 2:21 2:22
 
 
 wprf "\n### ================== Mark & Go =================== ###\n"
@@ -280,15 +290,16 @@ w_header "Windows: Assigning"
 w_header "Windows: Settings"
     # How to launch in floating regime? Simply create window with name starting with Float*.
     # floating enable running before launching of exec, so influence on previous focused wndw
-    wmapf 'for_window [%s] floating enable' 'window_role="pop-up"'\
-        'class="(?i)'"$term"'" instance="(?i)^Float*"'            \
-        'class="^Firefox" instance="^Download"' 'class="^Pidgin"' \
-        'class="^Copyq" instance="^copyq"'
-
+    wstr 'for_window [class="^Copyq" instance="^copyq"] border none'
     wstr 'for_window [class="^Pidgin" title="Buddy List"] move scratchpad'
     wstr 'for_window [class="^Conky"] border none'
     wstr 'for_window [class="^t-engine64"] border none'
     wstr 'for_window [instance="feh"] fullscreen'
+    wstr ''
+    wmapf 'for_window [%s] floating enable' 'window_role="pop-up"'\
+        'class="(?i)'"$term"'" instance="(?i)^Float*"'            \
+        'class="^Firefox" instance="^Download"' 'class="^Pidgin"' \
+        'class="^Copyq" instance="^copyq"'
 
 
 wprf "\n### ================== Bar & Theme ================= ###\n"

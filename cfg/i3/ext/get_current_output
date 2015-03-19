@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+i3-msg -t get_tree | jshon | awk '
+    /^\s\s\s"name"/ { match($0,/"(\w+)",/,a) }
+    /"focused": true/ { print a[1]; exit }
+'
+

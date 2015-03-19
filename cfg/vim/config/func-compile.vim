@@ -15,7 +15,20 @@ noremap <silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
 noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
 noremap <silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
 
-" Launch executable scripts
-noremap <Leader>k :<C-U>!./%<CR>
-noremap <Leader>K :<C-U>!!<CR>
+
+" Launch command line fast (preliminary executable scripts)
+let g:run_cmdline = ""
+function! s:RunCmdLine(bChange)
+  if empty(g:run_cmdline)
+    let g:run_cmdline = "!./" . getreg('%')
+  endif
+  if a:bChange
+    let g:run_cmdline = getreg(':')
+  endif
+  exec g:run_cmdline
+endfunction
+
+" Shortcuts to <launch setted|change by ':'> command
+noremap <silent> <unique> <Leader>k :<C-U>call <SID>RunCmdLine(0)<CR>
+noremap <silent> <unique> <Leader>K :<C-U>call <SID>RunCmdLine(1)<CR>
 

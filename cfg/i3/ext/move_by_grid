@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+## Layouts:
+# 11 21    # 11 21 31
+# 12 22    # 12 22 32
+#          # 13 23 33
+
+ARG=${1:-'2:22'}
+
+~/.i3/ext/get_outputs_resolution \
+| sed "/^$(~/.i3/ext/get_current_output)/!d" \
+| awk -v n=${ARG%%:*} -v ji=${ARG##*:} -v s=25 '{
+    px=$4; py=$5; sx=int($2/s); sy=int($3/s)
+    gx=int(ji/10-1)*int($2/n);
+    gy=int(ji%10-1)*int($3/n)
+    x=px+sx+gx; y=py+sy+gy
+    print x" "y
+}'
+

@@ -17,8 +17,10 @@
 #set $white  #ACFFF9
 #set $dark   #212121
 
-#You can also specify the color to be used to paint the background of the client windows. This color will be used to paint the window on top of which the client will be rendered.
-# client.background color
+# client.background color -- used to paint the window on top of which the client will be rendered.
+# background -- also used for borders
+# border -- only the two thin lines at the top/bottom of the window header.
+# indicator -- used for indicating where a new window will be opened on <left|bottom>
 
 wndtheme="
 font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1

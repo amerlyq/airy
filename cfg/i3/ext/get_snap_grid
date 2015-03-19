@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+xrandr | sed -n '/\sconnected\s/s/x\|+\| primary / /gp' | awk '
+function cmp_key(i,x1,j,y1,    a,b) { split(x1,a); split(y1,b);
+    return (a[1]!=b[1]) ? ((a[1]<b[1]) ? -1 : 1) : ((a[2]<=b[2]) ? -1 : 1)
+}
+BEGIN{ j=0; s=25 }
+{ for(i=0;i<4;++i) {
+    a[++j]=($5 + int($3/s) + (i%2)*($3/2))" "($6 + int($4/s) + int(i/2)*($4/2))
+} }
+END{ PROCINFO["sorted_in"]="cmp_key"; for(k in a){print a[k]} }
+'

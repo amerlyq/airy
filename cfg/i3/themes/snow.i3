@@ -10,15 +10,16 @@ bright='#a0a0a0'
 white='#ffffff'
  dark='#212121'
  gray='#aaaaaa'
+green='#60ff60'
 
 wndtheme="
 font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 font pango:Ubuntu 9
-# class                 border  backgr. text    indicator
-client.focused          #3cb371 #008080 #ffffff #ff4500
-client.focused_inactive #333333 #5f676a #ffffff #292d2e
-client.unfocused        #333333 #222222 #888888 #d2691e
-client.urgent           #2f343a #900000 #ffffff #900000
+# class                 border  bkgrnd. text    indicator
+client.focused          #88ff88 #40dd40 $dark   #ff4500
+client.focused_inactive #ffff44 #ffffbb $dark   #ff4500
+client.unfocused        $gray   $white  $gray   #ff4500
+client.urgent           #ffff88 #dd4040 $white  #ff4500
 "
 
 bartheme="
@@ -30,7 +31,7 @@ bartheme="
         separator           $gray
 
         # colorclass      <border> <bkgrnd> <text>
-        focused_workspace  #005533 #60ff60 $dark
+        focused_workspace  #005533 $green  $dark
         active_workspace   #333333 #5f676a $dark
         inactive_workspace #777777 #dddddd $dark
         urgent_workspace   #900000 #FFD700 $dark
