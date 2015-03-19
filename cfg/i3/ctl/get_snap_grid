@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Set snap_gr array in values of lines from snap script
+# IFS=$'\n' read -d '' -r -a snap_gr <<< "$(~/.i3/ext/get_snap_grid)"
+
 xrandr | sed -n '/\sconnected\s/s/x\|+\| primary / /gp' | awk '
 function cmp_key(i,x1,j,y1,    a,b) { split(x1,a); split(y1,b);
     return (a[1]!=b[1]) ? ((a[1]<b[1]) ? -1 : 1) : ((a[2]<=b[2]) ? -1 : 1)

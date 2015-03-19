@@ -21,8 +21,6 @@ declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;p;N;s/\n//p')
 if [[ "$M1" && "$M2" ]]; then
     monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"
 fi
-# Set snap_gr array in values of lines from snap script
-IFS=$'\n' read -d '' -r -a snap_gr <<< "$(~/.i3/ext/get_snap_grid)"
 
 ### Declare it only if you want change lang on Mod+Shift+890
 # USE_LANG="8 9 0"
@@ -40,10 +38,9 @@ wrkkey="grave $digits minus equal"
 wrksps="$(echo \$w{00..12})"
 
 # ---- Strings ----
-bs="bindsym"   ; t="    "       ; def='$def'     ; exno="\$exno"
+bs="bindsym"   ; t="    "       ; def='$def'     ; exno='$exno'
 mod="$bs \$mod"; mSd="$bs \$mSd"; mCd="$bs \$mCd"; mCS="$bs \$mCS"
 ts="$t$bs"     ; tod="$t$mod"   ; tSd="$t$mSd"   ; tCd="$t$mCd"   ; tCS="$t$mCS"
-
 exi3="$exno i3-input -F "
 
 # ----- Terminal -----
@@ -75,10 +72,14 @@ wmode_begin(){ local m="\$mode_${@:${#}-1:1}"
     for key in "${@:1:${#}-2}"; do wstr "$key mode \"$m\""; done
     wstr "mode \"$m\" {"
 }
+wmode_ignore(){ for key in "$@"; do
+    wstr "$t$key $exno i3-input -l 1 P 'Key isn''t mapped'"
+done; }
 wmode_end(){
     for key in "$@"; do wstr "$t$key $def"; done
     wprf "$ts Return $def\n$ts Escape $def\n"
-    wprf "$ts space  $def\n$ts q      $def\n}\n\n"
+    wprf "$ts space  $def\n$ts q      $def\n"
+    wprf "}\n\n"
 }
 
 
@@ -89,7 +90,7 @@ w_header "Vars"
     wstr 'set $s_size 10 px or 2 ppt'
 
 w_header "\n" "Bind: Refresh on i3mod"
-wlistf "set %s %s" "$wrksps" $(~/.i3/ext/load_names)
+wlistf "set %s %s" "$wrksps" $(~/.i3/ctl/load_names)
 
 w_header "Autostart"
     wstr "exec_always --no-startup-id auto-start"
@@ -129,7 +130,7 @@ w_header "Navigation: Move"
     wlistf "$mSd+%-5s move %-5s \$s_grid" "$hjkl $Arrows" $arrows $arrows
 
 w_header "Navigation: Move Float"
-    wlistf "$mCd+%s  floating enable, $exno ~/.i3/ext/move_by_grid %s" \
+    wlistf "$mCd+%s  floating enable, $exno ~/.i3/ctl/move_by_grid %s" \
         "$hjkl" 2:11 2:12 2:21 2:22
 
 
@@ -169,7 +170,7 @@ wprf "\n### ==================== Edit ====================== ###\n"
 w_header "Containers: Edit"
     wmode_begin "$mod+e" 'container' "Edit"
         wstr "$ts f floating toggle"
-        wlistf "$ts %s $exno ~/.i3/ext/ratio_size %-5s ,$def" \
+        wlistf "$ts %s $exno ~/.i3/ctl/ratio_size %-5s ,$def" \
             "1 2 3" 0.5 0.667 0.75
         # direction = <up, down, left, right, width or height>
         # resize <grow|shrink> <direction> [<px> px [or <ppt> ppt]]
@@ -184,8 +185,8 @@ w_header "Containers: Edit"
     wmode_end "$mod+e"
 
     wmode_begin "$mCd+e" 'workspace' "Workspace/Tune-up"
-        wstr "$ts r $exi3 '$exno ~/.i3/ext/rename_current_workspace \"%%s\"' -P 'WS Name: ' ,$def"
-        wprf "$tSd+r $exno ~/.i3/ext/rename_as_focused ,$def\n\n"
+        wstr "$ts r $exi3 '$exno ~/.i3/ctl/rename_current_workspace \"%%s\"' -P 'WS Name: ' ,$def"
+        wprf "$tSd+r $exno ~/.i3/ctl/rename_as_focused ,$def\n\n"
         #bar hidden_state hide|show|toggle [<bar_id>]
         #bar mode dock|hide|invisible|toggle [<bar_id>]
         wlistf "$t$bs \$m%sd+grave bar mode %-9s ,$def" "o S C" toggle dock invisible
@@ -215,6 +216,7 @@ command -v $STD_FMG >/dev/null 2>&1 || STD_FMG="nemo --no-desktop"
 w_header "Mode: Open"
 m_open="<O>pen : [n]cmpcpp, [h]top | [p]idgin, [f]irefox | [m]usic"
     wmode_begin "$mod+o" 'open' "$m_open"
+        wlistf "$mod+%-5s $def, workspace number %s" "$wrkkey" $wrksps
         wlistf "$ts %s $eflo -e %s ,$def" "n h" \
             "ncmpcpp" "htop"
         wlistf "$ts %s $exno %s ,$def" "p f m"  \
@@ -296,10 +298,11 @@ w_header "Windows: Settings"
     wstr 'for_window [class="^t-engine64"] border none'
     wstr 'for_window [instance="feh"] fullscreen'
     wstr ''
-    wmapf 'for_window [%s] floating enable' 'window_role="pop-up"'\
-        'class="(?i)'"$term"'" instance="(?i)^Float*"'            \
+    wmapf 'for_window [%s] floating enable, border pixel 3' \
+        'window_role="pop-up"' 'class="^Copyq" instance="^copyq"' \
         'class="^Firefox" instance="^Download"' 'class="^Pidgin"' \
-        'class="^Copyq" instance="^copyq"'
+        'class="(?i)'"$term"'" instance="(?i)^Float*"'
+
 
 
 wprf "\n### ================== Bar & Theme ================= ###\n"

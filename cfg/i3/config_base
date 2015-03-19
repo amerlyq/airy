@@ -17,10 +17,11 @@ set $upd ~/.i3/blocks/update
 
 ### =================== Options ==================== ###
 
+# Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
-focus_follows_mouse no          # auto on hover <yes|no>
-popup_during_fullscreen smart   # <smart|ignore|leave_fullscreen>
-# Display hint over 'this' time, when switching to urgent wksp
+focus_follows_mouse no                     # auto on hover <yes|no>
+popup_during_fullscreen leave_fullscreen   # <smart|ignore|leave_fullscreen>
+# Display hint 'this' more time on switch to urgent wrksp
 force_display_urgency_hint 800 ms
 
 # When being in a tabbed or stacked container, the first container will be focused when you use focus down on the last container?—?the focus wraps. If however there is another stacked/tabbed container in that direction, focus will be set on that container. This is the default behavior so you can navigate to all your windows without having to use focus parent.
@@ -93,8 +94,9 @@ bindsym $mCd+a $move_ctw back_and_forth; workspace back_and_forth
 # Make the currently focused window a scratchpad (could contain >1 windows)
 # Toggle show/hide for the first scratchpad window (you can have >1 scratchpad container)
 bindsym $mod+i scratchpad show
-bindsym $mSd+i move scratchpad
-bindsym $mCd+i floating toggle
+bindsym $mSd+i floating enable
+bindsym $mCd+i floating disable
+bindsym $mCS+i move scratchpad
 
 # By default, scratchpads only contain a single window. However, containers can also be made a scratchpad.
 # Create a new container (for example, Mod+Enter), split it (Mod+v) and create another container. Focus the parent (Mod+a), split in the opposite direction (Mod+h), and create again.
@@ -102,10 +104,8 @@ bindsym $mCd+i floating toggle
 # Note: Containers cannot be resized individually in floating windows. Resize the containers before making windows floating.
 # Tip: When only using terminal applications, consider a multiplexer such as tmux instead.
 
-# Use Mouse+$mod to drag floating windows to their wanted position
 # Change focus between tiling / floating windows #toggle/enable
 # Toggle tiling / floating (also remove current window from scratchpad)
-# mCd+space don't work with my xkb (no keycode!), use space for some more useful
 bindsym $mod+w focus mode_toggle
 bindsym $mSd+w floating enable
 bindsym $mCd+w floating toggle

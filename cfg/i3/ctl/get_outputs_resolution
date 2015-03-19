@@ -13,3 +13,6 @@ fi
 
 cat "$FL"
 
+# Or native method without pre-caching:
+# i3-msg -t get_outputs | sed -rn 's/.*\{"name":"([^"]+)","active":true,"primary":(\w+),"rect":\{"x":([0-9]+),"y":([0-9]+),"width":([0-9]+),"height":([0-9]+)\}.*/\1 \5 \6 \3 \4 \2/gp' | sed 's/true/*/g'
+

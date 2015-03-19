@@ -7,25 +7,26 @@ i3
 	[_] i3 save markers between sessions -- fast mappings on shortcuts
 		[_] use mod+s for fixed named markers (vim, ranger, firefox, etc)
 		[_] mSd+s must understand which type of window it's on, and change appropriate shortcut to this window
+		[_] mCd+s will launch app even if there is one exist
 	[_] i3 copyq shortcuts, and remove copyq own shortcuts
 		[_] debug copyq-edit()
-		[_] copyq default floating
+		[X] copyq default floating
 		: xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
 			[_] BUG: moving by one pixel each time i'm opening it
-	[_] i3 separate ./dmenu directory
-		[_] move launching dmenu from i3 to script in that dir
-		[_] same do for dbus lang changing
-	[_] additional desktops
-		[X] use 'grave' as 0 workspace for scratch monitoring
-		[X] use 'minus, equal' monitors as 11,12
-		[_] temporarily don't skip mCS+[789] for lang chg, but create possibility
+	2015-03-19 [X] i3 separate ./dmenu directory
+		2015-03-19 [X] move launching dmenu from i3 to script in that dir
+		2015-03-19 [X] same do for dbus lang changing
+	2015-03-19 [X] additional desktops
+		2015-03-18 [X] use 'grave' as 0 workspace for scratch monitoring
+		2015-03-18 [X] use 'minus, equal' monitors as 11,12
+		2015-03-19 [X] temporarily don't skip mCS+[789] for lang chg, but create possibility
 	[_] container settings
 		fast 1,2,3 sizes for window
 	[_] wrksp settings
-		[X] toggle bar
+		2015-03-17 [X] toggle bar
 		[_] change layout on predefined (current -- left half, others -- right column, etc)
 		[_] focus one of unnumbered (named) workspaces
-		[X] rename wrksp
+		2015-03-18 [X] rename wrksp
 		[_] choose/highlight all windows
 		[_] detach all as floating desktop
 		[_] save/load layout
@@ -34,6 +35,7 @@ i3
 		-> better case would be moving them inside floating window only, without re-attaching to tiled
 	[_] Launching prs from empty screen -- use i3-ipc?
 		: need event of choosing dsktp -- and sending mod+o to it if empty)
+		: many of other shortcuts must do 'mode default' before execution
 	[_] Split on mSd+[nm] must move to right/below? window and merge them
 	2015-03-18 [X] m..+U must point split and then create window
 	[_] mSd+[,./] must make such layout for all windows on workspace
@@ -64,9 +66,14 @@ i3
 		: window header, scratch headers, their marks, etc
 	2015-03-18 [X] try menu inside menu (use for Open)
 	[_] run/autostart on specified workspace and start on 1
-	[_] border -- instead '1pixel' do 'pixel $s_border'
+	[~] border -- instead '1pixel' do 'border pixel $s_border'
+		can't set for 'border toggle' -- only direct mappings
 	[_] organize scripts as bash filter functions which use same output of
 		i3-msg -t get_tree | jshon | tee >(pbcopy) >(do_stuff) >(do_more_stuff) | grep errors
+	[_] use 0 wrksp as own scratch desktop -- moving wnds back and forth
+	[_] generate 'ignore' complementary keys on wmode_end
+		parse end of written dst file, create complementary list to received
+		from get_available_keys, identical shortcuts to message 'not implemented'
 
 vim:
 	[_] comment each mapping with regex to extract placeholders from binding
@@ -204,6 +211,10 @@ ADMIN
 		2015-03-13 [X] make note about communicator! using tcpdump + regex
 		2015-03-13 [X] disable online/offline notifications
 		2015-03-15 [X] autolaunching in generated work i3 autostart (or use that on each system?)
+
+ncmpcpp
+	can't resize window
+	to update list needs restart
 
 deploy
 	one list install to accelerate process (simply check status of apt-get =100)

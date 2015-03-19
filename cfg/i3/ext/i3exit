@@ -1,57 +1,57 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-lock() {
-    local pic
-    pic=~/aura/screenlock.png
-    if [ ! -f $pic ]; then # Lock with cool bkgd:
+ARG="$1"
+
+sys_lock() {
+    local pic=~/aura/screenlock.png
+    if [ ! -f $pic ]; then
         pic=/tmp/screenlock.png
-        scrot $pic
+        scrot $pic  # Lock with cool bkgd
         mogrify -scale 10% -scale 1000% $pic
     fi
-    notify-send "DUNST_COMMAND_PAUSE" # pause notifications
-    i3lock --dpms --nofork --color 111111 --image $pic
-    # or xscreensaver-command -lock
-    notify-send "DUNST_COMMAND_RESUME" # resume notifications
-
-    ## Turn the screen off after delay, why it don't work?
-    #sleep 1; pgrep i3lock && xset dpms force off
-    # Alternative with autolock after time delay:
-    #$ xautolock -time 15 -locker '~/.local/bin/fuzzy_lock.sh'
+    { notify-send "DUNST_COMMAND_PAUSE";   # pause notifications
+      i3lock --dpms --nofork --color 111111 --image $pic;
+      notify-send "DUNST_COMMAND_RESUME";  # resume notifications
+    } &
+    ## With this you can hold backlight 3 sec longer
+    ## But then it will not off after wrong passwords!
+    # xset dpms force on && sleep 3;
+    # pgrep i3lock >/dev/null && xset dpms force off;
+    # ALT:
+    # xscreensaver-command -lock
+    # xautolock -time 15 -locker '~/.local/bin/fuzzy_lock.sh'
 }
 
-case "$1" in
-    lock)
-        lock
-        ;;
-    logout)
-        i3-nagbar -t warning -m 'Logout: exit i3, end your X session, move to login screen' -b 'Yes, exit i3' 'i3-msg exit'
-        ;;
-    # TODO: Test if suspend and hibernate exists on laptop
-    suspend)
-        # I was able to solve problem by using the following commands:
-        # (sleep 0.5 && systemctl suspend) &
-        lock && sudo suspend
+scratchpad_is_empty(){
+    if ! i3-msg -t get_tree | jshon | awk '/scratchpad_state/{a[$2]=0}
+        END{exit (length(a)>1)}'; then
+    i3-input -l 1 -P "Your scratchpad isn't empty" -F "scratchpad show"
+    return 1; fi
+}
 
-        # lock screen and suspend
-        #bindsym $mod+Control+s exec i3lock && dbus-send --system --print-reply --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.Suspend
+sys_logout(){ i3-nagbar -t warning \
+    -m 'Logout: exit i3, end your X session, move to login screen' \
+    -b 'Yes, exit i3' 'i3-msg exit'
+}
 
-        ;;
-    hibernate)
-        lock && sudo hibernate
-        ;;
-    reboot)
-        sudo reboot
-        #Newest: lock && dbus-send --system --print-reply --dest="org.freedesktop.UPower" /org/freedesktop/UPower org.freedesktop.UPower.Suspend #Hibernate
-        #dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart
-        ;;
-    shutdown)
-        sudo poweroff
-        #systemctl poweroff
-        #dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop
-        ;;
-    *)
-        echo "Usage: $0 {lock|logout|suspend|hibernate|reboot|shutdown}"
-        exit 2
+sys_power(){ #Suspend #Hibernate
+    # PORTABLE: http://askubuntu.com/questions/1792/how-can-i-suspend-hibernate-from-command-line/131022#131022
+    dbus-send --system --print-reply --dest="org.freedesktop.UPower" \
+        /org/freedesktop/UPower org.freedesktop.UPower.$1
+    # sudo pm-suspend -- from pm-utils for Debian-based distros.
+    # ALT: (sleep 0.5 && systemctl suspend) & #systemctl poweroff
+    # dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" \
+    #    /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart #Stop
+}
+
+case "$ARG" in
+       lock|-l) sys_lock            ;;
+    suspend|-s) sys_power Suspend   ;;
+  hibernate|-h) sys_power Hibernate ;;
+     logout|-o) scratchpad_is_empty && sys_logout    ;;
+     reboot|-r) scratchpad_is_empty && sudo reboot   ;;
+   shutdown|-t) scratchpad_is_empty && sudo poweroff ;;
+             *) echo "Usage: $0
+    <[l]ock|log[o]ut|[s]uspend|[h]ibernate|[r]eboot|shu[t]down>"; exit 2
 esac
 
-exit 0
