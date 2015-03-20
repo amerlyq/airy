@@ -42,6 +42,7 @@ i3
 	[_] mCd+f -- must focus to fullscreen window -- but which if many?
 	[_] mCS+[0-9] must move all windows from specified desktop to current
 	[_] mCd+semicolon must focus deepest child, mCS -- all of parents chain only?
+	[_] mCS+backslash -- as kill -SIGKILL $pr
 	[_] mCd,mCS +[hjkl] -- choose from two possible cases
 		[$] move window to another output
 		: (+) comfortable, (-) not consistent with ]/[, not too frequent ops
@@ -74,6 +75,7 @@ i3
 	[_] generate 'ignore' complementary keys on wmode_end
 		parse end of written dst file, create complementary list to received
 		from get_available_keys, identical shortcuts to message 'not implemented'
+	[_] disable border if window is only one?
 
 vim:
 	[_] comment each mapping with regex to extract placeholders from binding

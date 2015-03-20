@@ -2,6 +2,10 @@
 
 hex() { printf "%08lx\n" $(($@)); }
 dec() { printf "%ld\n" $(($@)); }
+# perl -e "print unpack('s',pack 's', hex('ffaa'))"
+d2hex() { { [ -t 0 ] && echo "$1" || cat; } | perl -ne 'printf("%x\n", int($_))'; }
+h2dec() { { [ -t 0 ] && echo "$1" || cat; } | perl -ne 'printf("%u\n", hex($_))'; }
+# printf '%x\n' "$((2#101010101))"
 bits() {
     printf "%08lx:  " $(($@));
     dec "$@" | gawk '{
@@ -15,7 +19,10 @@ for i in hex dec bits; do
     alias $i='noglob '"$i"' '
 done
 
+# Works with long hex only
+ddh() { sudo dd if="$1" bs=1 count=$(h2dec ${2:-0}) skip=$(h2dec ${3:-0}); }
 ddb() { dd if="$1" bs=1 count=$((${2:-0})) skip=$((${3:-0})); }  #of="${1}.part"
+
 cmpb() { cmp -l $@ |
     gawk '{printf "%04X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)}'
 }

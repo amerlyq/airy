@@ -15,6 +15,7 @@ noremap <silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
 noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
 noremap <silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
 
+" map <F9> :!gcc -o %< % <enter><CR><C-w>
 
 " Launch command line fast (preliminary executable scripts)
 let g:run_cmdline = ""

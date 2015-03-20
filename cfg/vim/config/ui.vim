@@ -12,6 +12,14 @@ set list            " display otherwise invisible characters
 
 " No intro msg
 set shortmess+=Iat
+set cmdheight=2   " Reduce hit Enter twice after :make
+" If you accidentally hit or and you want to see the displayed text then use
+" |g<|. This only works when 'more' is set.
+"   To reduce the number of hit-enter prompts:
+"       Set 'cmdheight' to 2 or higher.
+"       Add flags to 'shortmess'.
+"       Reset 'showcmd' and/or 'ruler'.
+" If set nomore -> the prompts will be no more
 
 set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
