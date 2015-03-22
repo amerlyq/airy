@@ -14,6 +14,7 @@ noremap <silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
 noremap <silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
 noremap <silent> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
 noremap <silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
+noremap <silent> <Leader>M <Esc>:<C-U>w \| Make<CR>
 
 " map <F9> :!gcc -o %< % <enter><CR><C-w>
 

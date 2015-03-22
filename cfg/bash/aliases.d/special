@@ -71,7 +71,7 @@ sed_dir() { grep -rl "\<${1?Need word}\>" ./* | xargs sed -i "s@\<$1\>@$2@g"; }
 
 # For 'reu' investigation tool in ~/.bin
 for i in n s o b x l; do
-    alias re$i='reu '"$i"' '
+    alias re$i='~/.bin/prg.d/reu '"$i"' '
 done
 
 

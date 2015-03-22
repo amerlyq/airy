@@ -20,6 +20,8 @@ source ~/.i3/themes/"${thm_nm}.i3"
 declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;p;N;s/\n//p')
 if [[ "$M1" && "$M2" ]]; then
     monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"
+elif [[ "$M1" ]]; then
+    monitors="$(printf "$M1 %.0s" {0..12})"
 fi
 
 ### Declare it only if you want change lang on Mod+Shift+890
@@ -92,6 +94,11 @@ w_header "Vars"
 w_header "\n" "Bind: Refresh on i3mod"
 wlistf "set %s %s" "$wrksps" $(~/.i3/ctl/load_names)
 
+if [[ "$monitors" ]]; then
+    w_header "WorkSpaces: Output"
+        wlistf "workspace %s output %s" "$wrksps" $monitors
+fi
+
 w_header "Autostart"
     wstr "exec_always --no-startup-id auto-start"
 
@@ -102,11 +109,6 @@ w_header "Autostart"
 # wstr "bindcode --release $key_ralt $exno \$upd lang"
 
 wprf "\n### ================== Workspaces ================== ###\n"
-if [[ "$monitors" ]]; then
-    w_header "WorkSpaces: Output"
-        wlistf "workspace %s output %s" "$wrksps" $monitors
-fi
-
 w_header "WorkSpaces: Focus"
     wlistf "$mod+%-5s workspace number %s" "$wrkkey" $wrksps
 
@@ -192,6 +194,14 @@ w_header "Containers: Edit"
         wlistf "$t$bs \$m%sd+grave bar mode %-9s ,$def" "o S C" toggle dock invisible
     wmode_end "$mCd+e"
 
+w_header "Containers: Border Style"
+    # window border style 'border <normal|1pixel|none|pixel>'
+    wmode_begin "$mod+b" 'border' "Border : <1-9> [n]ormal [p]ixel [h]idden"
+        wmapf "$ts %%1 border pixel %%1 ,$def" $digits
+        wlistf "$ts %s border %s, $def" "\$mod+b n p h" \
+            toggle normal 1pixel none
+        wptf "$ts %%1 border pixel %%1 ,$def\n"
+    wmode_end
 
 wprf "\n### =================== System ===================== ###\n"
 w_header "Mode: System"
@@ -301,7 +311,8 @@ w_header "Windows: Settings"
     wmapf 'for_window [%s] floating enable, border pixel 3' \
         'window_role="pop-up"' 'class="^Copyq" instance="^copyq"' \
         'class="^Firefox" instance="^Download"' 'class="^Pidgin"' \
-        'class="(?i)'"$term"'" instance="(?i)^Float*"'
+        'class="(?i)'"$term"'" instance="(?i)^Float*"' \
+        'class="^transmission-gtk"'
 
 
 

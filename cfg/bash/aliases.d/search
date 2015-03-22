@@ -7,18 +7,27 @@ ff() { find . -type f -regex $@; }
 # grep -Ri 'name' . # find in all files
 # alias ff='find ./ | grep -i '
 
-agi() { ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' $@; }
-agf() { ag -S -g $@; }
+agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S $@; }
+agd() { find . -maxdepth 1 -type f | xargs agi $@; }    # in curr dir only
+agw() { agi -w $@; }
 agp() { agi --pager less $@; }
-agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
+# agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
 
 vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
-    local als="$1" args std add cmd
-    shift;
-    std=$(which "$als" | sed '/\<ag\>/!d; s/^.*\<ag\>\(.*\)\s*$/\1/; s/\$@//g')
-    add=$(for k in "${@}"; do [[ "${k:0:1}" == - ]] && printf "$k " || printf "\"$k\" "; done)
-    cmd=":Ag!$std$add"
-    printf "$cmd\n" | vim -R -c "set nolist | let g:magnify_on=0 | copen 30 " \
-        -c "$cmd" - # | let g:ag_qhandler='botleft lopen 7'
+    local cnt=30 als='ag' args std add cmd
+
+    if [[ $1 =~ ^[0-9]+$ ]]; then cnt=$1; shift; fi
+    if [[ $1 =~ ^ag ]]; then als="$1"; shift; fi
+    std=$(which "$als" | sed '
+        /\<ag\>/!d; s/^.*\<ag\>\(.*\)\s*$/\1/; s/\$@//g')
+    cmd=":Ag!${std:- }$add"
+    for k in "${@//\\/\\\\}"; do
+        [[ "${k:0:1}" != - ]] && k="\"${k}\""
+        cmd="$cmd$k "
+    done
+
+    printf "$cmd\n" | vim -R -c \
+        "set nolist | let g:magnify_on=0 | copen $cnt " -c "$cmd" -
+    # | let g:ag_qhandler='botleft lopen 7'
 }
 

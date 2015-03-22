@@ -67,8 +67,9 @@ i3
 		: window header, scratch headers, their marks, etc
 	2015-03-18 [X] try menu inside menu (use for Open)
 	[_] run/autostart on specified workspace and start on 1
-	[~] border -- instead '1pixel' do 'border pixel $s_border'
-		can't set for 'border toggle' -- only direct mappings
+	[X] border -- instead '1pixel' do 'border pixel $s_border'
+		: can't set for 'border toggle' -- only direct mappings
+		[X] Create submenu for borders
 	[_] organize scripts as bash filter functions which use same output of
 		i3-msg -t get_tree | jshon | tee >(pbcopy) >(do_stuff) >(do_more_stuff) | grep errors
 	[_] use 0 wrksp as own scratch desktop -- moving wnds back and forth
@@ -86,6 +87,9 @@ vim:
 	[_] fix ,k ,K behaviour
 		,k by default must always run :./% -- to speed up work on open
 		,K must replace current default run cmd with last from ':'
+	[_] Try all plugins for textobj:
+		https://github.com/kana/vim-textobj-user/wiki
+		https://github.com/tommcdo
 	[_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
 		: to generate vimrc for others or for me on other computers (buildserver)
 	[_] regions of file highlighting
@@ -109,6 +113,7 @@ vim:
 	[_] Seize
 		http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
 		http://www.vim.org/scripts/script.php?script_id=4449
+		https://github.com/jackfranklin/dotfiles
 	[_] BUG: C-F on end of '/', C-D on emtpy ':' -- both opens menu, needs to disable it
 	[_] Vimoutliner
 		[_] Change mapping to more easy pressed
@@ -124,6 +129,10 @@ ranger
 	[_] FIX shell -r cp ./%f /var // sudo: source: command not found
 	[_] russian -- half of text width in lister
 		https://bbs.archlinux.org/viewtopic.php?pid=998125
+		: Same problem with git --verbose when it shows changes for files with
+		: russian names -- then length of such names threated as doubled.
+	[_] optimize navi speed/fps in dir for very large lists (preferably got on 'b')
+	[_] re-read output from scope.sh for lister on shortcut inside lister
 	[_] fix scpto/from
 		[_] Create its inner handful support inside ranger
 
@@ -144,9 +153,9 @@ zsh
 	[$] BUG: xsel -ob don't work in widget --> update to ArchLinux
 	[_] pre-execute command before starting interactive shell
 		http://www.zsh.org/mla/users/2005/msg00599.html
-	[_] BUG: fix agi to search case insensitive text
-		: flags -S -i have no effect on it
-	[_] Ag search only files in current directory
+	[X] BUG: fix agi to search case insensitive text
+		: flags -S -i have no effect on it -> must be last of arguments!
+	[X] Ag search only files in current directory: agd (uses find)
 
 [_] wget with redirection, cookies and user-agent
 	TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"
@@ -187,13 +196,21 @@ urxvt
 
 SECURITY
 	[_] read about vpn and setup <-> it
+		https://openvpn.net/index.php/open-source/documentation/howto.html
 	[_] check server certificate from terminal
 	[_] Split home dir to sdk (big, many files) and home (projects, cfgs)
 		[_] Encrypted volume for home directory
 			[_] Read about encrypted filesystems
 		[_] Fast filesystem for /var (?) volume for linux sources
 			[_] Read about filesystems [производительность]
+			<Check: hfs, hfs+, hfsx reiserfs ufs btrfs
+				https://btrfs.wiki.kernel.org/index.php/Getting_started
+				https://btrfs.wiki.kernel.org/index.php/SysadminGuide
+				http://marc.merlins.org/perso/btrfs/post_2014-05-21_My-Btrfs-Talk-at-Linuxcon-JP-2014.html
 			[_] Read how in arch to split disk from terminal and mount all your partitions
+				https://wiki.archlinux.org/index.php/Beginners%27_guide_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29
+	Анонимизация всего траффика через VPN + TOR/I2P. Собираем миддлбокс с нуля
+		http://habrahabr.ru/post/245435/
 
 ADMIN
 	[_] encrypted git repo -- to store working notes on gitlab instead of evernote
@@ -213,13 +230,46 @@ ADMIN
 		2015-03-13 [X] make note about communicator! using tcpdump + regex
 		2015-03-13 [X] disable online/offline notifications
 		2015-03-15 [X] autolaunching in generated work i3 autostart (or use that on each system?)
+	[_] syncthink vs rsync vs btsync
+
 
 ncmpcpp
 	can't resize window
 	to update list needs restart
+
+surf
+:> http://www.ragingpenguin.com/2012/07/7-surf-a-simple-browser/index.html
+	[_] setup
+		http://surf.suckless.org/files/easier_key
+		https://wiki.archlinux.org/index.php/Surf
+	[_] setup elink too
+	[_] split script.js in several files
+		http://stackoverflow.com/questions/950087/include-a-javascript-file-in-another-javascript-file
+
+Vim-all-environment
+	https://bbs.archlinux.org/viewtopic.php?id=89567#3
 
 deploy
 	one list install to accelerate process (simply check status of apt-get =100)
 
 
 [_] wacom
+
+READ (blogs -- downloaded)
+	http://duartes.org/gustavo/blog/archives/
+
+
+FORK
+	sync my fork for kedi
+		https://help.github.com/articles/syncing-a-fork/
+
+
+NOTE
+	pandoc -- convert between markups
+	 $ pandoc -o result.md ./%f
+		http://johnmacfarlane.net/pandoc/
+		See vim-pandoc
+		https://github.com/jgm/pandoc/wiki/Pandoc-Extras
+		Decide: maybe integrate converting mindmaps into pandoc instead of developing own tool?
+			(+) community, spreading, learn Haskell
+			(-) not every mardown could be described as MM

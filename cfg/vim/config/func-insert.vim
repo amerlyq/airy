@@ -23,10 +23,10 @@ command! -bar -nargs=1 Limio call LimitedInput(<q-args>)
 
 nnoremap <silent>  <Space>  :Limio i<CR>
 vnoremap <silent>  <Space>  :<C-U>Limio I<CR>
-nnoremap <silent> ,<Space>  :Limio a<CR>
-vnoremap <silent> ,<Space>  :<C-U>Limio A<CR>
-nnoremap <silent> g<Space>  :Limio s<CR>
-vnoremap <silent> g<Space>  :<C-U>Limio S<CR>
+nnoremap <silent> g<Space>  :Limio a<CR>
+vnoremap <silent> g<Space>  :<C-U>Limio A<CR>
+nnoremap <silent> ,<Space>  :Limio s<CR>
+vnoremap <silent> ,<Space>  :<C-U>Limio S<CR>
 
 " <S-Space> work only in gvim
 

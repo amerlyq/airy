@@ -1,0 +1,29 @@
+Actually, I like to view it like this:
+
+	d{j/k} deletes linewise to the destination of your motion
+
+	dd is kind of an exception to the rule, to delete one line, since dj or dk
+	can't do that
+
+	using d{count}d is a bad practice for me
+
+	That said, there IS _ that is basically a text object and stands for line.
+	dd and the likes are just abbrevations of this, so _ is pretty useless in
+	practice AFAICT
+
+It's not an exception. It's a consistent part of the grammar. I think of it
+like slang. Normal mode commands often expect a motion or text object as their
+predicate/direct object. Doubling the command is almost an enhanced imperative
+meaning "right here where I am. You can think of it as meaning "to nowhere, so
+just do your thing," which defaults to where you are.
+
+I think of it like a lieutenant saying "March!" and the private saying "to
+where?" and the lieutenant yelling "MAAARCH!" so the private just starts
+marching, without direction (which defaults typically to the whole line you're
+currently on, which I think of as a nod to the line-editors of Vim's ancestry,
+where everything was always a whole-line operation).
+
+For example, >> is 'indent this line'. gUgU is 'go uppercase this line.' cc is
+'correct this line.g~g~is 'invert the case of this line'. The list goes on.
+The two-character 'g' commands can have their second 'g' left out, which is
+like evolved, even-lazier slang, e.g.gUUandg~~`.

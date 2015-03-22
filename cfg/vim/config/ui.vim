@@ -12,7 +12,7 @@ set list            " display otherwise invisible characters
 
 " No intro msg
 set shortmess+=Iat
-set cmdheight=2   " Reduce hit Enter twice after :make
+" set cmdheight=2   " No hit <CR> twice after :make (but lose one view line)
 " If you accidentally hit or and you want to see the displayed text then use
 " |g<|. This only works when 'more' is set.
 "   To reduce the number of hit-enter prompts:

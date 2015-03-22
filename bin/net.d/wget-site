@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+LINK="${1?Need link}"
+DOM="${LINK#*//}"
+DOM="${DOM%%/*}" #Comma-separated list
+
+wget --recursive --no-parent --no-clobber \
+    --user-agent Mozilla -e robots=off \
+    --page-requisites --adjust-extension --convert-links \
+    --restrict-file-names=windows \
+    --wait=8 --random-wait --limit-rate=100K \
+    --domains "$DOM" "$LINK"
+
+# Disable domains if needed (or add more domains)
+# Use --level=<depth> to limit recursion
+
+# OR: (view logs: tail -f nohup.out)
+#   nohup wget ... &
+# ALT: https://www.httrack.com/

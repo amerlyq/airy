@@ -5,7 +5,7 @@
 # Status
 alias gt='git status -sb && (git stash list | cat)'
 alias gtb='git branch -a '
-alias gtt='git tag'
+# alias gtt='git tag'
 
 # Diff
 alias gdf='git diff'
@@ -49,8 +49,9 @@ alias gsh='git push'
 
 
 # Many repos
-alias gta='gita-all-dir '
-alias gla='gita-all-dir pull'
+alias gta='~/.bin/prg.d/git-for-each st'
+alias gtt='~/.bin/prg.d/git-for-each st status -su'
+alias gla='~/.bin/prg.d/git-for-each pl'
 
 
 alias gk='gitk --all&'

@@ -1,0 +1,35 @@
+Dell E7440, same problem on 14.04: very quick to change brightness using
+intel_backlight command, but hardward keys (Fn-Up/Down) pause the computer
+briefly.
+	sudo intel_backlight
+	sudo intel_backlight 40
+
+Thanks to instruction from user Toz
+ (http://ubuntuforums.org/showthread.php?t=2208278),
+	Current kernel boot line:
+		cat /proc/cmdline
+	Video card(s):
+		lspci -k | grep -iA2 VGA
+	Known backlight interfaces:
+		for interface in /sys/class/backlight/*; do echo -e "\n $interface"; cat $interface/{brightness,max_brightness,actual_brightness}; done
+	A listing of your loaded kernel modules:
+		lsmod
+	Your /var/log/Xorg.0.log file:
+		pastebinit /var/log/Xorg.0.log
+
+the fix requires both
+	kernel param "acpi_backlight=vendor"
+	 My Dell Latitude E5430 only needed the kernel param adding to work correctly.
+	and creating the /usr/share/X11/xorg.conf.d/20-intel.conf file:
+	 Adding the xorg.conf file as well may just caused it to oscillate rapidly +/-
+	 10% with a permanent on screen KDE brightness bar.
+		Section "Device"
+				Identifier "card0"
+				Driver "intel"
+				Option "Backlight" "intel_backlight"
+				BusID "PCI:0:2:0"
+		EndSection
+
+
+
+

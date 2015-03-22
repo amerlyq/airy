@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+ARG="$1"; shift
+CMD="$@"
+
 source ~/.bash/zsh/zshrc
 
 gita_st() { # $1 -- rep path
@@ -10,26 +13,18 @@ gita_st() { # $1 -- rep path
     # echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 
-gita_pull() {
+gita_pl() {
     printf "\n\n$(tput setaf 3)--[ $1 ]--$(tput sgr0)\n";
     if ! git pull --rebase --verbose; then
         git stash && git pull --rebase --verbose && git stash pop
     fi
 }
 
-all_git() { # $1 -- git command
-    for rp in "$PWD"/*; do
-        if [ -d "$rp/.git" ]; then
-            cd "$rp"
-            #gita_pull ${rp##*/}
-            $1 ${rp##*/}
-        fi
-    done
-}
 # Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит, стэш, merge итп -- парсить и заменять на значки
 
-case "$@" in
-    l|pull) all_git "gita_pull" ;;
-    *) all_git "gita_st" ;;
-esac
-
+for rp in "$PWD"/*; do
+    if [ -d "$rp/.git" ]; then
+        cd "$rp" && gita_$ARG ${rp##*/}
+        eval ${CMD:+git $CMD}
+    fi
+done

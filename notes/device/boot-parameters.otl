@@ -1,0 +1,35 @@
+> Temporarily Add a Kernel Boot Parameter for Testing
+
+Restart your system, or shut it down and then power it on again.
+	Press and hold down the SHIFT key immediately and keep it held down while the
+	system starts to boot, in order to force the "GNU GRUB" menu to appear. The
+	"GNU GRUB" menu will look something like this:
+
+	: If the system hangs at the initial vendor logo screen when you hold down
+	: SHIFT, just release the SHIFT key briefly then hold it down again until
+	: the "GNU GRUB" menu appears.
+	: If the system boots up to the Ubuntu login screen without displaying the
+	: "GNU GRUB" menu, reboot again and try pressing the ESC key instead of
+	: holding down SHIFT... If the ESC key makes the "GNU GRUB" menu appear,
+	: then the system is using the older GRUB (not GRUB 2), so use the
+	: instructions for changing boot parameters in GRUB for earlier releases.
+
+Once the "GNU GRUB" menu appears, release SHIFT and enter edit mode by 'e'.
+	Use the down arrow key to move the cursor to the line beginning with the
+	word "linux", then press the END key to move the cursor to the end of that
+	line.  Normally this will be just after the words "quiet splash".
+
+	After "...splash" add space and exactly parameters
+		(no space around '=' or punctuation)
+
+Press Ctrl+X to boot the system using the parameters you've added.
+	This will affect only this one boot session
+
+
+> Permanently Add a Kernel Boot Parameter
+	Open sudo vim /etc/default/grub
+	Move to line "GRUB_CMDLINE_LINUX_DEFAULT..."
+	Add parameter(s) to the text inside the double-quotes after the words
+	"quiet splash"
+		sudo update-grub
+		sudo restart

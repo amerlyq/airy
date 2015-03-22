@@ -8,6 +8,7 @@ if [ -z "$CURR_USER" ]; then [[$PS1]]&&return||exit; fi
 dst=/etc/sudoers
 SYS_ENTRY="$CURR_USER ALL=(ALL) NOPASSWD:/usr/sbin/pm-hibernate,/usr/sbin/pm-suspend,\
 /sbin/reboot,/sbin/halt,/sbin/shutdown,/sbin/poweroff"
+# ,/usr/bin/intel_backlight
 
 sudo sed -i "/^$CURR_USER ALL=(ALL) NOPASSWD/d" $dst
 echo "$SYS_ENTRY" | sudo tee --append $dst  #> /dev/null # to deprecate printing
