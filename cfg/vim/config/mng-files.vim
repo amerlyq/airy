@@ -6,7 +6,6 @@ noremap <Leader>S :<C-U>write ++enc=utf8<CR>
 noremap <Leader><C-S> :saveas<Space>
 
 " Ag, Save, Drop, File,
-noremap <Leader>a :<C-U>Ag<CR>
 noremap <Leader>s :<C-U>w<CR>
 " noremap <Leader>S :<C-U>wa<CR>
 noremap <Leader>d :<C-U>q<CR>

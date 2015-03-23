@@ -35,7 +35,7 @@ endfunction
 
 function! GetLineBookmark(text, ...)
   let path= a:0>=1 ? expand('%:p') : @%
-  let str=path . ":" . line(".") . a:text
+  let str="\t" . path . ":" . line(".") . a:text
   call CopyStringInReg('+', str)
   " TODO: Add re-indenting of several lines (like 'for' or 'function' part)
   " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
@@ -95,6 +95,10 @@ let mapleader = "\\"
   vnoremap <leader>t :<C-U>call GetLineBookmark("\n\t".GetVisualSelection("\n\t"))<CR>
 let mapleader = s:leader
 
+nnoremap <leader>a :<C-U>Ag -w '<C-R><C-W>'<CR>
+vnoremap <leader>a :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
+" vnoremap <leader>A :<C-U>Ag -w -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
+" vnoremap <leader>a :<C-U>Ag! '<C-R>=substitute(GetVisualSelection(" "),"\([\\\]\[]\)","\\\1","g")<CR>'<CR>
 
 " UNUSED:
 " Swap registry
