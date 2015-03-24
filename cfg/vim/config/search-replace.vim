@@ -25,7 +25,9 @@ nnoremap <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
 noremap <leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
 noremap <leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
 ": Remove empty lines
-noremap <leader>cE :<C-U>%s:^\s*$\n::<CR>
+command -bar -range=% RemoveEmptyLines %s:.\n\zs\s*\n\ze.\|^\s*\n\s*\_$::
+noremap <leader>cE :<C-U>RemoveEmptyLines<CR>`>
+
 noremap <leader>cc :<C-U>%s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
 noremap <leader>cC :s:\<<C-R><C-W>\>:<C-R><C-W>:g<Left><Left>
 noremap <leader>cy <Esc>:%s:\<<C-R><C-W>\>:<C-R>0:g<Left><Left>
