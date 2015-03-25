@@ -1,5 +1,3 @@
-" TRY: inoremap jk <ESC>
-
 " Now 'a jump you to line and column, and `a only to line
 noremap ' `
 noremap ` '
@@ -7,11 +5,11 @@ noremap ` '
 " noremap , <Nop>
 
 " Pinky stretching soothing
-noremap ,. :
 cnoremap <C-o> <C-p>
 
 " Faster $3 ex-cmds
 noremap ;  :
+noremap ,. :
 " Repeat find $3 <next|prev>
 noremap ]f ;
 noremap [f ,
@@ -40,7 +38,6 @@ noremap <silent> g* *N:<C-U>set hlsearch<CR>
 " Insert empty line before/after
 noremap gO O <C-U><Esc>
 noremap go o <C-U><Esc>
-inoremap <M-CR> <Esc>o
 
 " Adequate replace tabs by parts, not entirely
 noremap R gR

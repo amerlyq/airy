@@ -5,7 +5,8 @@ ARG="$1"
 sys_lock() {
     local pic=~/aura/screenlock.png
     if [ ! -f $pic ]; then
-        pic=/tmp/screenlock.png
+        pic=/tmp/aura/screenlock.png
+        mkdir -p "${pic%/*}"
         scrot $pic  # Lock with cool bkgd
         mogrify -scale 10% -scale 1000% $pic
     fi

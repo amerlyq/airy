@@ -40,6 +40,7 @@ then
 
     pairLink ~/.config/dunst/dunstrc "${CONF_DIR}/Xrc/dunstrc"
     pairLink ~/.config/vimb/config "${CONF_DIR}/sets/vimb.conf"
+    pairLink ~/.config/vimb/style.css "${CONF_DIR}/sets/vimb-style.css"
 fi
 
 if [ "$CURR_PLTF" == "MINGW" ]

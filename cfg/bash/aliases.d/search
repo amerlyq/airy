@@ -25,9 +25,10 @@ vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
         [[ "${k:0:1}" != - ]] && k="\"${k}\""
         cmd="$cmd$k "
     done
-
-    printf "$cmd\n" | vim -R -c \
-        "set nolist | let g:magnify_on=0 | copen $cnt " -c "$cmd" -
+    # printf "$cmd\n" |
+    vim -R \
+        -c "set nolist | let g:magnify_on=0 | copen $cnt " \
+        -c "call histadd(':','$cmd')" -c "$cmd" #-
     # | let g:ag_qhandler='botleft lopen 7'
 }
 

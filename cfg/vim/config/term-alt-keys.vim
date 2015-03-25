@@ -11,7 +11,6 @@ let did_meta_escape = 1
 "   exec "set <M-".c.">=\e".c
 "   " Shadowed 'cause of some wierd behaviour as 'No such mapping'
 "   " exec "map  \e".c." <M-".c.">"
-"   " exec "map! \e".c." <M-".c.">"
 " endfor
 
 " Timeout {{{1
@@ -102,7 +101,9 @@ for idx in range(len(s:keys))
     let kc  = s:key_codes[idx]
     exec "set ".kc."=\e".pc
     exec "map ".kc." <M-".pc.">"
-    exec "map! ".kc." <M-".pc.">"
+    "" DISABLED: due to interpreting <Esc>j etc as unicode when returning
+    ""           too fast from insert mode. Same always present on macro exec.
+    " exec "map! ".kc." <M-".pc.">"
 endfor
 
 " NOTE: {{{1
