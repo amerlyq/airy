@@ -39,6 +39,7 @@ then
     pairLink ~/.pentadactylrc "${CONF_DIR}/Win/pentadactylrc"
 
     pairLink ~/.config/dunst/dunstrc "${CONF_DIR}/Xrc/dunstrc"
+    pairLink ~/.config/vimb/config "${CONF_DIR}/sets/vimb.conf"
 fi
 
 if [ "$CURR_PLTF" == "MINGW" ]

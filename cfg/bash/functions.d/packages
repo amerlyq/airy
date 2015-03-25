@@ -13,15 +13,15 @@ ppa_add() {
 
 apt_noprompt(){ # $@ -- packages
     echo -e "LST:\n\t$@\n"
-    # Need filter for output!
-    for pr in $@; do
-        sudo apt-get --yes install $pr
+    # Need filter for output! -- inserted in -/deploy/pristine
+    # for pr in $@; do
+        sudo apt-get --yes install $@
         #  # | sed -n '/^Need to get/p'
         # if ([ -z "$ZSH" ] && [ "${PIPESTATUS[0]}" != "0" ]) \
         #     || ([ ! -z "$ZSH" ] && [ "${pipestatus[0]}" != "0" ]); then
         #     echo "something is wrong..."
         # fi
-    done
+    # done
 }
 
 

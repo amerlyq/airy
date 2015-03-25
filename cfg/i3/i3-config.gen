@@ -224,13 +224,13 @@ STD_FMG="pcmanfm"
 command -v $STD_FMG >/dev/null 2>&1 || STD_FMG="nemo --no-desktop"
 
 w_header "Mode: Open"
-m_open="<O>pen : [n]cmpcpp, [h]top | [p]idgin, [f]irefox | [m]usic"
+m_open="<O>pen : [n]cmpcpp, [h]top | vim[b], [p]idgin, [f]irefox | [m]usic"
     wmode_begin "$mod+o" 'open' "$m_open"
         wlistf "$mod+%-5s $def, workspace number %s" "$wrkkey" $wrksps
         wlistf "$ts %s $eflo -e %s ,$def" "n h" \
             "ncmpcpp" "htop"
-        wlistf "$ts %s $exno %s ,$def" "p f m"  \
-            "pidgin" "firefox" "~/.i3/ext/dmenu/mpd_fmove" \
+        wlistf "$ts %s $exno %s ,$def" "b p f m"  \
+            "vimb" "pidgin" "firefox" "~/.i3/ext/dmenu/mpd_fmove" \
         wstr "$tod+o mode \"\$mode_open_rare\""
     wmode_end
 
