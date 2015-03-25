@@ -20,15 +20,14 @@ vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
     if [[ $1 =~ ^ag ]]; then als="$1"; shift; fi
     std=$(which "$als" | sed '
         /\<ag\>/!d; s/^.*\<ag\>\(.*\)\s*$/\1/; s/\$@//g')
-    cmd=":Ag!${std:- }$add"
+    cmd="Ag!${std:- }$add"
     for k in "${@//\\/\\\\}"; do
         [[ "${k:0:1}" != - ]] && k="\"${k}\""
         cmd="$cmd$k "
     done
-    # printf "$cmd\n" |
-    vim -R \
+    printf "$cmd\n" | vim -R \
         -c "set nolist | let g:magnify_on=0 | copen $cnt " \
-        -c "call histadd(':','$cmd')" -c "$cmd" #-
+        -c "call histadd(':','$cmd')" -c ":$cmd" -
     # | let g:ag_qhandler='botleft lopen 7'
 }
 

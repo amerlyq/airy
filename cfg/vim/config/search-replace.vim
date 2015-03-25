@@ -20,6 +20,14 @@ command! -nargs=+ Se execute 'vimgrep /' . [<f-args>][0] . '/ **/*.' . [<f-args>
 " find merge conflict markers
 nnoremap <unique> <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
 
+": Ag working dir  searching
+nnoremap <leader>a :<C-U>Ag -w '<C-R><C-W>'<CR>
+vnoremap <leader>a :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
+": Ag current file searching (currently no jumping -- need Ag >= 0.25 with --vimgrep)
+nnoremap <leader>A :<C-U>Ag -w '<C-R><C-W>' %:p<CR>
+vnoremap <leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<CR>
+
+
 
 ": Substitute current match
 " nnoremap <leader>cw :%s:\<<C-R><C-w>\>:<C-R><C-w>:g<Left><Left>

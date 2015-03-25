@@ -95,11 +95,6 @@ let mapleader = "\\"
   vnoremap <leader>t :<C-U>call GetLineBookmark("\n\t".GetVisualSelection("\n\t"))<CR>
 let mapleader = s:leader
 
-nnoremap <leader>a :<C-U>Ag -w '<C-R><C-W>'<CR>
-vnoremap <leader>a :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
-" vnoremap <leader>A :<C-U>Ag -w -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
-" vnoremap <leader>a :<C-U>Ag! '<C-R>=substitute(GetVisualSelection(" "),"\([\\\]\[]\)","\\\1","g")<CR>'<CR>
-
 " UNUSED:
 " Swap registry
 " noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
