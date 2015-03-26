@@ -1,3 +1,4 @@
+#!/bin/bash
 ## Device names and ID numbers from 'xinput list' entered in a terminal.
 #
 ## In the example "Device name" not ID # is used.  Note if you use the
@@ -15,7 +16,7 @@ DEVICE_STYLUS=`xsetwacom list dev | grep -E -o ".*stylus"`
 DEVICE_ERASER=`xsetwacom list dev | grep -E -o ".*eraser"`
 DEVICE_CURSOR=`xsetwacom list dev | grep -E -o ".*cursor"`
 DEVICE_PAD=`xsetwacom list dev | grep -E -o ".*pad"`
-DEVICE_TOUCH=`xsetwacom list dev | grep -E -o ".*touch"` 
+DEVICE_TOUCH=`xsetwacom list dev | grep -E -o ".*touch"`
 
 
 #notify user about used profile
@@ -25,25 +26,25 @@ notify-send "Using Krita profile"
 #for 2 screens: MapToOutput 3286x1080+0+0
 xsetwacom set "$DEVICE_STYLUS" MapToOutput 1920x1080+0+0
 
-## stylus = ID 12 = "Wacom Intuos4 6x9 stylus"
-xsetwacom set "$DEVICE_STYLUS" Suppress "4"  # data pt.s trimmed, default is 4, 0-20
-xsetwacom set "$DEVICE_STYLUS" RawSample "2"  # data pt.s filtered, default is 2, 0-100
-#xsetwacom set "$DEVICE_STYLUS" ClickForce "27"  # pressure, default is 27, range is 0-2047
-xsetwacom set "$DEVICE_STYLUS" Threshold "27"  # pressure, default is 27, range is 0-2047
-xsetwacom set "$DEVICE_STYLUS" PressureCurve "5 10 90 95"  # Bezier curve, default is 0,0,100,100
-xsetwacom set "$DEVICE_STYLUS" TabletPCButton "off"  # stylus tip + button, or "off" for hover mode
-xsetwacom set "$DEVICE_STYLUS" Mode "Absolute"  # or Relative cursor movement
-xsetwacom set "$DEVICE_STYLUS" Button 1 "1"  # left mouse click
-xsetwacom set "$DEVICE_STYLUS" Button 2 "3"  # right mouse click
-xsetwacom set "$DEVICE_STYLUS" Button 3 "2"  # middle mouse click
+                                                          #stylus = ID 12 = "Wacom Intuos4 6x9 stylus"
+xsetwacom set "$DEVICE_STYLUS" Suppress "4"               #data pt.s trimmed, default is 4, 0-20
+xsetwacom set "$DEVICE_STYLUS" RawSample "2"              #data pt.s filtered, default is 2, 0-100
+                                                          #xsetwacom set "$DEVICE_STYLUS" ClickForce "27" #pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_STYLUS" Threshold "27"             #pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_STYLUS" PressureCurve "5 10 90 95" #Bezier curve, default is 0,0,100,100
+xsetwacom set "$DEVICE_STYLUS" TabletPCButton "off"       #stylus tip + button, or "off" for hover mode
+xsetwacom set "$DEVICE_STYLUS" Mode "Absolute"            #or Relative cursor movement
+xsetwacom set "$DEVICE_STYLUS" Button 1 "1"               #left mouse click
+xsetwacom set "$DEVICE_STYLUS" Button 2 "3"               #right mouse click
+xsetwacom set "$DEVICE_STYLUS" Button 3 "2"               #middle mouse click
 
-## eraser = ID 9 = "$DEVICE_ERASER "
-xsetwacom set "$DEVICE_ERASER" Suppress "4"  # data pt.s trimmed, default is 4, 0-20
-xsetwacom set "$DEVICE_ERASER" RawSample "2"  # data pt.s filtered, default is 2, 0-100
-#xsetwacom set "$DEVICE_ERASER " ClickForce "27"  # pressure, default is 27, range is 0-2047
-xsetwacom set "$DEVICE_ERASER" Threshold "27"  # pressure, default is 27, range is 0-2047
-xsetwacom set "$DEVICE_ERASER" PressureCurve "0 10 90 100"  # Bezier curve, default is 0,0,100,100
-xsetwacom set "$DEVICE_ERASER" Mode "Absolute"  # or Relative cursor movement
+                                                            #eraser = ID 9 = "$DEVICE_ERASER "
+xsetwacom set "$DEVICE_ERASER" Suppress "4"                 #data pt.s trimmed, default is 4, 0-20
+xsetwacom set "$DEVICE_ERASER" RawSample "2"                #data pt.s filtered, default is 2, 0-100
+                                                            #xsetwacom set "$DEVICE_ERASER " ClickForce "27" #pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_ERASER" Threshold "27"               #pressure, default is 27, range is 0-2047
+xsetwacom set "$DEVICE_ERASER" PressureCurve "0 10 90 100"  #Bezier curve, default is 0,0,100,100
+xsetwacom set "$DEVICE_ERASER" Mode "Absolute"              #or Relative cursor movement
 xsetwacom set "$DEVICE_ERASER" Button 1 "1"
 
 ## pad = ID 11 = "$DEVICE_PAD"
@@ -57,7 +58,7 @@ xsetwacom set "$DEVICE_PAD" Button 9 "key ctrl shift A"
 #xsetwacom set "$DEVICE_PAD" Button 5  "key E"
 
 xsetwacom set "$DEVICE_PAD" AbsWheelDown "5"
-xsetwacom set "$DEVICE_PAD" Button 1 "key E"  # button inside touchring
+xsetwacom set "$DEVICE_PAD" Button 1 "key E"                # button inside touchring
 xsetwacom set "$DEVICE_PAD" AbsWheelUp "4"
 
 xsetwacom set "$DEVICE_PAD" Button 10 "key ctrl K"

@@ -33,7 +33,6 @@ SETS
 
 WACOM_NM="Wacom Intuos Pro S Pen pad"
 cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
-
 	Button 1 "key p"      # Paintbrush
 	Button 2 "key ctrl z" # Undo
 	Button 3 "key KP_Next"
@@ -58,29 +57,6 @@ cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
 	StripRightUp   "key alt up"
 EOT
 
-WACOM_NM="Wacom Intuos Pro S Pen stylus"
-cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
-	RawSample 8  # made up to decrease the lag between where the stylus tip is and when the line is drawn in Gimp
-	PressureCurve 0 10 90 100   # Softer
-	Area -10 -20 14720 9200     # Calibration results
-EOT
-
-WACOM_NM="Wacom Intuos Pro S Pen eraser"
-cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
-	RawSample 8
-	PressureCurve 5 0 100 95    # Firmer
-	Area -10 -20 14720 9200     # Calibration results
-EOT
-
-WACOM_NM="Wacom Intuos Pro S Finger touch"
-cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
-	ScrollDistance 18  # a little more sensitive
-	TapTime 220
-EOT
-
-notify-send -t 1500 "Gimp Profile Ran"
-
-Also need profile with default settings
 
 Portret regime for tablet -- read and create appropriate matrix to map only _part_ of monitor
  http://linuxwacom.sourceforge.net/wiki/index.php/Dual_and_Multi-Monitor_Set_Up#MapToOutput
@@ -89,6 +65,12 @@ Portret regime for tablet -- read and create appropriate matrix to map only _par
 	OR
 	xinput set-prop "Serial Wacom Tablet stylus" --type=float "Coordinate Transformation Matrix" 0 0.333333 0.666666 -1 0 1 0 0 1
 
-xsetwacom set "device name" PressureCurve 0 0 100 100
-xsetwacom set "device name" Mode "Absolute"
-xsetwacom set "device name" TabletPCButton "off"
+
+Also need profile with default settings
+	xsetwacom -s get "Wacom Intuos Pro S Pen pad" all
+
+
+BUGS
+	Shaking
+		This is a common problem with dual CRT's, took me years to find the solution!
+		In your Wacom control panel go to the "tablet mode" tab and try each of the different settings (Standard, Recognition and Single Mode). For me setting it to recognition stopped the jitters.
