@@ -1,4 +1,9 @@
-let g:agprg="ag --column --smart-case --nogroup --ignore tags"
+if split(system("ag --version"), "[ \n\r\t]")[2] > '0.25.0'
+  let g:ag_prg="ag --vimgrep --smart-case"
+else
+  let g:ag_prg="ag --column --nogroup --noheading --ignore tags --smart-case"
+endif
+
 " let g:aghighlight=1
 
 " Disable default map: all real mappings included into 'after/ftplugin/qf.vim'

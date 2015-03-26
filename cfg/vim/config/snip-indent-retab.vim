@@ -71,14 +71,19 @@ function! ApplyTabIndent(ntabs)
   " retab
 endfunc
 
+
 call SetTabIndent(g:default_indent)
-noremap <Leader>ti :<C-U>call ApplyTabIndent(v:count)<CR>
+noremap <unique> <Leader>ti :<C-U>call ApplyTabIndent(v:count)<CR>
+"noremap <leader>ct <Esc>:retab<CR>, :retab!
+noremap <unique> <leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
+noremap <unique> <leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
+
 
 " Indenting
 if has("autocmd")
   " make Python follow PEP8 ( http://www.python.org/dev/peps/pep-0008/ )
   autocmd FileType python
-    \ setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
+    \ setlocal tabstop=4 shiftwidth=4 softtabstop=4 textwidth=79
   autocmd FileType make
     \ setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
 endif

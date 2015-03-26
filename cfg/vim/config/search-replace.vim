@@ -20,13 +20,17 @@ command! -nargs=+ Se execute 'vimgrep /' . [<f-args>][0] . '/ **/*.' . [<f-args>
 " find merge conflict markers
 nnoremap <unique> <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
 
-": Ag working dir  searching
-nnoremap <leader>a :<C-U>Ag -w '<C-R><C-W>'<CR>
-vnoremap <leader>a :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
-": Ag current file searching (currently no jumping -- need Ag >= 0.25 with --vimgrep)
-nnoremap <leader>A :<C-U>Ag -w '<C-R><C-W>' %:p<CR>
-vnoremap <leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<CR>
 
+": Ag working dir  searching
+" nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
+nnoremap <unique> <Leader>a :<C-U>Ag -w '<C-R><C-W>'<CR>
+vnoremap <unique> <Leader>a :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
+": Ag buffer search
+nnoremap <unique> g<Leader>a :<C-U>AgBuffer -w '<C-R><C-W>'<CR>
+vnoremap <unique> g<Leader>a :<C-U>AgBuffer -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
+": Ag current file searching (currently no jumping -- need Ag >= 0.25 with --vimgrep)
+nnoremap <unique> <Leader>A :<C-U>Ag -w '<C-R><C-W>' %:p<CR>
+vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<CR>
 
 
 ": Substitute current match
@@ -51,7 +55,4 @@ command -bar -range=% RemoveEmptyLines <line1>,<line2>s:.\n\zs\s*\n\ze.\|^\s*\n\
 noremap <unique> <leader>cE :<C-U>RemoveEmptyLines<CR>`>
 ": Emulate 'tr' command -> vectored replacing of symbols
 noremap <unique> <leader>cR :s/.*/\=tr(submatch(0), '()', '[]')
-"noremap <leader>ct <Esc>:retab<CR>, :retab!
-noremap <unique> <leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
-noremap <unique> <leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
 

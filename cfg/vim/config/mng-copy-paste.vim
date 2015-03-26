@@ -23,9 +23,29 @@ function! GetVisualSelection(...)
   return a:0 >= 1 ? join(lines, a:1) : lines
 endfunction
 
+""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! ShortestIndent(s1, s2)
+  let m=strlen(a:s1) | let n=strlen(a:s2)
+  return m == n ? 0 : m > n ? 1 : -1
+endfunc
+
 function! TrimLines(str)
-  return substitute(a:str, '^[\n\s]\+\(.*\)[\n\s]\+$', '\1', 'g')
+  return substitute(a:str, '\v^\s*\_[ \t]\n?(.{-})\_[ \t\n]*$', '\1', 'g')
 endfunction
+
+function! TrimIndents(str,...)
+  let tlst=map(split(a:str, '\n'), 'matchstr(v:val, "^\\s*")')
+  " BUG: when lines are mixed tabs with spaces
+  let tir=sort(l:tlst, "ShortestIndent")[0]
+  let rgx='\v\_^' . l:tir . '(.{-})\s*\_$'
+  let feach='substitute(v:val,"^'.l:tir.'","","")'
+  return join(map(split(a:str, '\n'),l:feach), (a:0>0?a:1 :'')."\n")
+  " return substitute(a:str, l:rgx, (a:0>0?a:1:'').'\1', 'g')
+  " return l:tir
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! CopyStringInReg(r1, str)
   call setreg('9',  a:r1,  'c') " Preserve previous buffer
@@ -33,10 +53,15 @@ function! CopyStringInReg(r1, str)
   call CountLinesInRegister(a:r1, '@'.a:r1.':')
 endfunction
 
-function! GetLineBookmark(text, ...)
+function! GetLineBookmark(tid, text, ...)
   let path= a:0>=1 ? expand('%:p') : @%
-  let str="\t" . path . ":" . line(".") . a:text
-  call CopyStringInReg('+', str)
+  let tab="\t"
+  "" Can't use, as values must be extracted from dst, not from src
+  "repeat(&et ? repeat(" ", &ts) : "\t", a:tid)
+  let prf= repeat(l:tab, a:tid)
+  let str=l:prf . path . ":" . line(".")
+  let str=l:str . (empty(a:text) ? "" : "\n" . l:prf . l:tab . a:text)
+  call CopyStringInReg('+', l:str)
   " TODO: Add re-indenting of several lines (like 'for' or 'function' part)
   " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
 endfunction
@@ -90,9 +115,9 @@ vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
 
 let s:leader = g:mapleader
 let mapleader = "\\"
-  nnoremap <leader>Y :<C-U>call GetLineBookmark('')<CR>
-  nnoremap <leader>t :<C-U>call GetLineBookmark("\n\t".getline('.'))<CR>
-  vnoremap <leader>t :<C-U>call GetLineBookmark("\n\t".GetVisualSelection("\n\t"))<CR>
+  nnoremap <leader>Y :<C-U>call GetLineBookmark(v:count,'')<CR>
+  nnoremap <leader>t :<C-U>call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
+  vnoremap <leader>t :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
 let mapleader = s:leader
 
 " UNUSED:
