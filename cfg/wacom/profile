@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+cd "${BASH_SOURCE[0]%/*}" || exit 1
+
+# Need cache old window
+
+get_active_wnd() {
+    local wid=$(xprop -root | awk '/^_NET_ACTIVE_WINDOW/{print $NF}')
+    xprop -id $wid | awk '
+        /^WM_CLASS/{c=$NF} /^WM_NAME/{n=$NF} END{print c,n}
+    ' | cat
+}
+
+WND_ACTIVE="$(get_active_wnd)"
+
+for pf in ./profile.d/*; do
+    if grep -q "$(sed -n '/^#:\(.*\)$/{p;q}' "$pf")" <<< "$WND_ACTIVE"; then
+        WCURR_PROF="${pf##*/}"
+    fi
+done
+
+./profile.d/default
+${WCURR_PROF:+./profile.d/$WCURR_PROF}

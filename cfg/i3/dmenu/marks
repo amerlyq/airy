@@ -1,0 +1,12 @@
+#!/bin/bash
+
+DMENU='dmenu -i -b -nb #000000 -nf #999999 -sb #000000 -sf #31f58C -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+
+if [ "$1" == "-s" ]
+then
+    CMD=$($DMENU -p "MARK:" <<< "$name")
+    i3-msg mark "$CMD"
+else
+    MARKS=$(i3-msg -t get_marks | sed 's/,/\n/g; s/"//g; s/\[//g; s/\]//g' | $DMENU -p "GOTO:")
+    [ -n "$MARKS" ] && i3-msg [con_mark=\"$MARKS\"] focus
+fi

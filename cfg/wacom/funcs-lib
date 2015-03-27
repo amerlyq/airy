@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# --- 2  -- Layout --+
+# === 3              #
+# --- 8              #
+# (O) 4:1:5          #
+# --- 9              #
+# === 10             #
+# --- 11 ------------+
+
+eval $(xsetwacom list devices \
+    | awk '{tp=$10; sub(/\s+id:.*/,""); printf "W%s=\"%s\" ",tp,$0}')
+
+wacom() { sed -r 's/#.*$//; /^\s*$/d;
+    s/\s*(.*)/xsetwacom set "'"$1"'" \1/'; } # | bash
+
+wnotify() { notify-send --expire-time=500 -h \
+    int:x:500 -h int:y:500 '<b>Wacom:</b> <i>profile</i>' "$1"; }
+
+
+wnotify "${BASH_SOURCE[1]##*/}"
+

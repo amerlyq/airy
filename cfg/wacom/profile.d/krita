@@ -1,22 +1,5 @@
 #!/usr/bin/env bash
-
-SCRIPT_DIR=$(cd ${BASH_SOURCE[0]%/*} && pwd)
-
-eval $(xsetwacom list devices \
-    | awk '{tp=$10; sub(/\s+id:.*/,""); printf "W%s=\"%s\" ",tp,$0}')
-
-# $SCRIPT_DIR/notify-wacom "Krita"
-
-wacom() { sed -r '/^\s*$/d; s/#.*$//;
-    s/\s*(.*)/xsetwacom set "'"$1"'" \1/'; }
-
-# --- 2  -- Layout --+
-# === 3              #
-# --- 8              #
-# (O) 4:1:5          #
-# --- 9              #
-# === 10             #
-# --- 11 ------------+
+source "${BASH_SOURCE[0]%/*/*}/funcs-lib" || exit 1
 
 wacom "$WPAD" << EOT
     Button  1  "key E"                # button inside touchring
@@ -38,21 +21,21 @@ EOT
 wacom "$WSTYLUS" << EOT
     RawSample 8     # made up to decrease the lag between where
                     # the stylus tip is and when the line is drawn in Gimp
-	PressureCurve 0 10 90 100   # Softer
+    PressureCurve 0 10 90 100   # Softer
     TabletPCButton off
     Mode Absolute
-	# Area -10 -20 14720 9200     # Calibration results
+    # Area -10 -20 14720 9200     # Calibration results
 EOT
 
 wacom "$WERASER" << EOT
-	RawSample 8
-	PressureCurve 5 0 100 95    # Firmer
-	# Area -10 -20 14720 9200     # Calibration results
+    RawSample 8
+    PressureCurve 5 0 100 95    # Firmer
+    # Area -10 -20 14720 9200     # Calibration results
 EOT
 
 wacom "$WTOUCH" << EOT
-	ScrollDistance 18       # a little more sensitive
-	TapTime 220
+    ScrollDistance 18       # a little more sensitive
+    TapTime 220
 EOT
 
 wacom "$WCURSOR" << EOT

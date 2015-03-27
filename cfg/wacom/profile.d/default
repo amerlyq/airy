@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+source "${BASH_SOURCE[0]%/*/*}/funcs-lib" || exit 1
+
+wacom "$WPAD" << EOT
+    Button  1       "button +1 "
+    Button  2       "+2 "
+    Button  3       "+3 "
+    Button  8       "+8 "
+    Button  9       "+9 "
+    Button 10       "+10 "
+    Button 11       "+11 "
+
+    Suppress        2
+    RawSample       4
+    Mode            Absolute
+    Touch           off
+    Gesture         off
+    ZoomDistance    0
+    ScrollDistance  0
+    TapTime         250
+
+    RelWheelUp      1 "+5 "
+    RelWheelDown    2 "+4 "
+    AbsWheelUp      3 "+4 "
+    AbsWheelDown    4 "+5 "
+    AbsWheel2Up     5 "+4 "
+    AbsWheel2Down   6 "+5 "
+    StripLeftUp     1 "+4 "
+    StripLeftDown   2 "+5 "
+    StripRightUp    3 "+4 "
+    StripRightDown  4 "+5 "
+
+    Threshold        27
+    ToolDebugLevel   0
+    TabletDebugLevel 0
+    BindToSerial     0
+EOT
+
+### -------------------------------------------------------------
+
+wacom "$WSTYLUS" << EOT
+    Button 1 "button +1 "
+    Button 2 "+2 "
+    Button 3 "+3 "
+    Button 8 "+8 "
+    Button 9 "+9 "
+    Area          "0 0 31496 19685"
+    PressureCurve "0 0 100 100"
+    Suppress       2
+    RawSample      4
+    Mode           Absolute
+    TabletPCButton off
+    Touch          off
+    Gesture        off
+    ZoomDistance   0
+    ScrollDistance 0
+    TapTime        250
+    Rotate         none
+    Threshold      27
+    ToolDebugLevel   0
+    TabletDebugLevel 0
+    BindToSerial     0
+EOT
+
+### -------------------------------------------------------------
+
+wacom "$WERASER" << EOT
+    Button 1 "button +1 "
+    Button 2 "+2 "
+    Button 3 "+3 "
+    Button 8 "+8 "
+    Button 9 "+9 "
+    Area          "0 0 31496 19685"
+    PressureCurve "0 0 100 100"
+    Suppress       2
+    RawSample      4
+    Mode           Absolute
+    Touch          off
+    Gesture        off
+    ZoomDistance   0
+    ScrollDistance 0
+    TapTime        250
+    Rotate         none
+    Threshold      27
+    ToolDebugLevel   0
+    TabletDebugLevel 0
+    BindToSerial     0
+EOT
+
+### -------------------------------------------------------------
+
+wacom "$WTOUCH" << EOT
+    Button 1 "button +1 "
+    Button 2 "+2 "
+    Button 3 "+3 "
+    Button 8 "+8 "
+    Button 9 "+9 "
+    Area "0 0 31496 19685"
+    Threshold       27
+    Suppress        2
+    RawSample       4
+    Mode            Absolute
+    Touch           off
+    Gesture         off
+    ZoomDistance    0
+    ScrollDistance  0
+    TapTime         250
+    CursorProximity 10
+    Rotate          none
+    RelWheelUp      1 "+5 "
+    RelWheelDown    2 "+4 "
+    AbsWheelUp      3 "+0 "
+    AbsWheelDown    4 "+0 "
+    AbsWheel2Up     5 "+0 "
+    AbsWheel2Down   6 "+0 "
+    ToolDebugLevel   0
+    TabletDebugLevel 0
+    BindToSerial     0
+EOT
+
+### -------------------------------------------------------------
+
+wacom "$WTOUCH" << EOT
+    Button           1 "button +1 "
+    Button           2 "+2 "
+    Button           3 "+3 "
+    ToolDebugLevel   0
+    TabletDebugLevel 0
+    Suppress         2
+    RawSample        4
+    Area             "0 0 4096 4096"
+    PressureCurve    "0 0 100 100"
+    Mode             Absolute
+    Touch            on
+    Gesture          on
+    ZoomDistance     180
+    ScrollDistance   80
+    TapTime          250
+    Rotate           none
+    Threshold        0
+    BindToSerial     0
+EOT
