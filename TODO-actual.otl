@@ -81,12 +81,14 @@ i3
 vim:
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
 		: problem is in mappings of <M-..> at term-alt-keys.vim. Temporarily disabled.
+	[_] Change Bookmarking 2\t --> to trigger let g:tin=v:count instead of one-time setting?
+		or simply use \T or g\t for permanent setting and \t for one-time
 	[_] comment each mapping with regex to extract placeholders from binding
 		[_] for continuous group of maps use that regex for each
 		[~] develop format
 		[_] mark several files
 		[_] create parser
-	[_] fix ,k ,K behaviour
+	2015-03-27 [X] fix ,k ,K behaviour
 		,k by default must always run :./% -- to speed up work on open
 		,K must replace current default run cmd with last from ':'
 	[_] Try all plugins for textobj:
@@ -155,6 +157,7 @@ zsh
 	[_] Check zsh profiling (debug starting and accept-line timing)
 	[_] append sudo and execute command instead of simply appending it
 	[$] BUG: xsel -ob don't work in widget --> update to ArchLinux
+	[_] BUG: <C-y> by ssh: xsel: Can't open display: (null) Inappropriate ioctl for device
 	[_] pre-execute command before starting interactive shell
 		http://www.zsh.org/mla/users/2005/msg00599.html
 	[X] BUG: fix agi to search case insensitive text

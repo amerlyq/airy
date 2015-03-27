@@ -46,15 +46,21 @@ alias utbz2='tar xvfj'
 alias p='ps -A f -o user,pid,priority,ni,pcpu,pmem,args'
 
 
-# dir with many small files sending   #ALT: scp file1 file2 ... fileN user@host:~/Downloads/
-scpto() {
-    src="${2?Need dir}"
-    cd "${src%/*}" && tar czvf - "${src##*/}" | ssh ${1?Need server} "tar -xzvf - ${3+-C "$3"}";
+#ALT: scp file1 file2 ... fileN user@host:~/Downloads/
+scptar() {
+    local srv src z TP
+    if [ "$1" != -u ]; then z="z"; else shift; fi  # uncompressed
+    if [ "$1" == -s ]; then TP="$1"; shift; fi     # send
+    srv="${1?Need server}"; src="${2?Need dir path}"
+    pack="cd '${src%/*}' && tar cvf$c - '${src##*/}'"
+    unpack="tar xvf$c - ${3+-C "$3"}"
+    case "$TP" in
+        -s)  bash -c "$pack" | ssh "$srv" "$unpack" ;;
+         *)  ssh "$srv" "$pack" | bash -c "$unpack" ;;
+    esac
 }
-scpfr() {
-    src="${2?Need dir}"
-    ssh ${1?Need server} "cd '${src%/*}' && tar -czvf - '${src##*/}'" | tar -xzvf - ${3+-C "$3"};
-}
+alias scpto='scptar -s '
+alias scpfr='scptar '
 
 alias mount='mount |column -t'
 alias mountl='sudo fdisk -l'
