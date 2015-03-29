@@ -1,22 +1,19 @@
 #!/usr/bin/env bash
+# source ~/.bash/functions.d/bash-profiler
 cd "${BASH_SOURCE[0]%/*}" || exit 1
 
-# Need cache old window
-
-get_active_wnd() {
-    local wid=$(xprop -root | awk '/^_NET_ACTIVE_WINDOW/{print $NF}')
-    xprop -id $wid | awk '
-        /^WM_CLASS/{c=$NF} /^WM_NAME/{n=$NF} END{print c,n}
-    ' | cat
-}
-
-WND_ACTIVE="$(get_active_wnd)"
+WND_ACTIVE="$(~/.i3/ctl/get_active_wnd)"
 
 for pf in ./profile.d/*; do
-    if grep -q "$(sed -n '/^#:\(.*\)$/{p;q}' "$pf")" <<< "$WND_ACTIVE"; then
+    line="$(sed -n '/^#:\s*\(.*\)$/{s//\1/p;q}' "$pf")"
+    if [[ "$WND_ACTIVE" != "${WND_ACTIVE//$line}" ]]; then
         WCURR_PROF="${pf##*/}"
     fi
 done
 
-./profile.d/default
-${WCURR_PROF:+./profile.d/$WCURR_PROF}
+echo "$WCURR_PROF"
+[[ $WCURR_PROF == $(cat /tmp/aura/wacom_prof) ]] && exit
+echo "$WCURR_PROF" > /tmp/aura/wacom_prof
+
+./profile.d/default >/dev/null
+${WCURR_PROF:+./profile.d/$WCURR_PROF >/dev/null}

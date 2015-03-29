@@ -8,8 +8,8 @@ wget --recursive --no-parent --no-clobber \
     --user-agent Mozilla -e robots=off \
     --page-requisites --adjust-extension --convert-links \
     --restrict-file-names=windows \
-    --wait=8 --random-wait --limit-rate=100K \
-    --domains "$DOM" "$LINK"
+    --wait=8 --random-wait \
+    --domains "$DOM" "$LINK" #--limit-rate=100K
 
 # Disable domains if needed (or add more domains)
 # Use --level=<depth> to limit recursion

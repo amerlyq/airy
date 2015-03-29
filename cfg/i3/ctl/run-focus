@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+ARG="$1"
+if [[ -z "$ARG" ]]; then
+    echo "USAGE: $0 [<letter>]"; exit 1
+fi
+
+pr_lst=$(sed '/#/d' <<-'EOT'
+    [f]irefox      class="^Firefox$"  instance="^Navigator$"
+    [k]rita        class="^Krita$"    instance="^krita$"
+    [p]idgin       class="^Pidgin$"   title="^Buddy List$"
+    [n]cmpcpp      class="^(?i)urxvt" title="ncmpcpp"
+
+    [g]vim         class="^Gvim$"     instance="^gvim$"
+    [t]ransmission class="^Transmission-gtk" title="^Transmission"
+    # vim[b]
+EOT
+)
+
+# WARNING: shortcuts with Shift like (t) not fully supported yet!!!
+case "$ARG" in
+-m) awk '{s=s""$1""(length($1) ? " " : "| ")}
+    END{print s} ' <<< "$pr_lst" ;;
+-k) awk 'match($1,/\[\w\]/) {k=k" "substr($1,RSTART+1,1)}
+         match($1,/\(\w\)/) {k=k" Shift+"substr($1,RSTART+1,1)}
+    END{print k} ' <<< "$pr_lst" ;;
+ *) awk '$1 ~ /\['"$ARG"'\]/ {
+        pr=$1; gsub(/[\[\]()]/, "", pr);
+        $1=""; sub(FS,""); foc=$0; exit
+    } END { if(pr=="") { print "no such letter <'"$ARG"'>"; exit }
+        if(system("pgrep " pr " >/dev/null")) {
+            system("i3-msg \"exec " pr "\" >/dev/null")
+        } else { system("i3-msg \"[" foc "] focus\" >/dev/null")
+    }} ' <<< "$pr_lst" ;;
+esac
+
+# i3-msg "[$1=$(echo $2 | sed s/\\x20/\\\\x20/g)] focus"
+# W=$(xdotool search --classname "$2" | head -1)
+# list_of_running_prog=`wmctrl -l | awk "${awk_string_result}"`

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Online-demo: http://linuxwacom.sourceforge.net/misc/bezier.html
+#   http://www.imagemagick.org/Usage/draw/
+
+# My Windows original curve
+# PressureCurveControlPoint: 40 0 239 23 1407 2047
+
+FL=/tmp/wacom_curve.gif
+control="${1:-80,0}   ${2:-80,100}"
+points="0,0 $control 100,100"
+clines=$(echo "$points" | sed 's/   /\n/g' | sed 's/.*/line &/')
+locus="l -2,-2 +4,+4 -2,-2   l -2,+2 +4,-4 -2,+2"
+symbols=$(echo path "'"; for pt in $points; do echo "M $pt $locus"; done;  echo "'")
+
+convert -size 100x100 xc:skyblue -fill none \
+        -draw "stroke red  bezier $points " \
+        -draw "stroke gray $clines stroke blue $symbols " \
+        -flip -scale 300% $FL \
+    && sxiv $FL
+
+

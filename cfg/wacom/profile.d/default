@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-source "${BASH_SOURCE[0]%/*/*}/funcs-lib" || exit 1
+#:
+SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
+source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
 wacom "$WPAD" << EOT
-    Button  1       "button +1 "
     Button  2       "+2 "
     Button  3       "+3 "
     Button  8       "+8 "
+    Button  1       "button +1 "        # button inside touchring
     Button  9       "+9 "
     Button 10       "+10 "
-    Button 11       "+11 "
+    Button 11       "key +Super_L o k -Super_L"  #Def: "+11 "
 
     Suppress        2
     RawSample       4
@@ -19,16 +21,16 @@ wacom "$WPAD" << EOT
     ScrollDistance  0
     TapTime         250
 
-    RelWheelUp      1 "+5 "
-    RelWheelDown    2 "+4 "
-    AbsWheelUp      3 "+4 "
-    AbsWheelDown    4 "+5 "
-    AbsWheel2Up     5 "+4 "
-    AbsWheel2Down   6 "+5 "
-    StripLeftUp     1 "+4 "
-    StripLeftDown   2 "+5 "
-    StripRightUp    3 "+4 "
-    StripRightDown  4 "+5 "
+    # RelWheelUp      1 "+5 "
+    # RelWheelDown    2 "+4 "
+    # AbsWheelUp      3 "+4 "
+    # AbsWheelDown    4 "+5 "
+    # AbsWheel2Up     5 "+4 "
+    # AbsWheel2Down   6 "+5 "
+    # StripLeftUp     1 "+4 "
+    # StripLeftDown   2 "+5 "
+    # StripRightUp    3 "+4 "
+    # StripRightDown  4 "+5 "
 
     Threshold        27
     ToolDebugLevel   0
@@ -44,10 +46,10 @@ wacom "$WSTYLUS" << EOT
     Button 3 "+3 "
     Button 8 "+8 "
     Button 9 "+9 "
-    Area          "0 0 31496 19685"
-    PressureCurve "0 0 100 100"
+    Area          "0 0 31496 19685"     #Calibration results  : Area -10 -20 14720 9200
+    PressureCurve "0 0 100 100"         #Bezier curve, default is 0,0,100,100
     Suppress       2
-    RawSample      4
+    RawSample      4                    #Raw input averaging number of point stamps
     Mode           Absolute
     TabletPCButton off
     Touch          off
@@ -89,7 +91,7 @@ EOT
 
 ### -------------------------------------------------------------
 
-wacom "$WTOUCH" << EOT
+wacom "$WCURSOR" << EOT
     Button 1 "button +1 "
     Button 2 "+2 "
     Button 3 "+3 "
@@ -107,12 +109,12 @@ wacom "$WTOUCH" << EOT
     TapTime         250
     CursorProximity 10
     Rotate          none
-    RelWheelUp      1 "+5 "
-    RelWheelDown    2 "+4 "
-    AbsWheelUp      3 "+0 "
-    AbsWheelDown    4 "+0 "
-    AbsWheel2Up     5 "+0 "
-    AbsWheel2Down   6 "+0 "
+    # RelWheelUp      1 "+5 "
+    # RelWheelDown    2 "+4 "
+    # AbsWheelUp      3 "+0 "
+    # AbsWheelDown    4 "+0 "
+    # AbsWheel2Up     5 "+0 "
+    # AbsWheel2Down   6 "+0 "
     ToolDebugLevel   0
     TabletDebugLevel 0
     BindToSerial     0
@@ -130,13 +132,14 @@ wacom "$WTOUCH" << EOT
     RawSample        4
     Area             "0 0 4096 4096"
     PressureCurve    "0 0 100 100"
-    Mode             Absolute
+    Mode             Relative           #Def: Absolute
     Touch            on
     Gesture          on
     ZoomDistance     180
     ScrollDistance   80
     TapTime          250
     Rotate           none
-    Threshold        0
+    Threshold        27
     BindToSerial     0
 EOT
+

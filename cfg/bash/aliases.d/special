@@ -20,8 +20,8 @@ v() { #servername == syntex (must be for LaTeX)
     fi
 }
 
-vish(){
-    local NM="${1:-`tempfile`}" shl='bash'
+vienv(){
+    local shl="$1" NM="${2:-`tempfile`}"
     if [ ! -e "$NM" ]; then
         if [[ 'py' == ${NM##*\.} ]]; then
             shl='python\n# vim: fileencoding=utf-8'
@@ -33,6 +33,8 @@ vish(){
     vim "$NM"
     # vim "$NM" -c "normal i#!/usr/bin/env $shl<CR>"
 }
+alias vish='vienv bash '
+alias vipl='vienv perl '
 #alias vim='\vim --cmd "let g:loaded_youcompleteme = 1"'
 #alias ycm='\vim --cmd "let g:loaded_youcompleteme = 0"'
 

@@ -13,7 +13,8 @@ white='#ffffff'
 green='#60ff60'
 
 wndtheme="
-font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# font pango:PragmataPro 8
 font pango:Ubuntu 9
 # class                 border  bkgrnd. text    indicator
 client.focused          #88ff88 #40dd40 $dark   #ff4500
@@ -24,7 +25,8 @@ client.urgent           #ffff88 #dd4040 $white  #ff4500
 
 bartheme="
     font -misc-fixed-medium-r-normal--12-120-75-75-C-70-iso10646-1
-    #font pango:DejaVu Sans Mono 10
+    # font pango:PragmataPro 10
+    # font pango:Ubuntu 9
     colors {
         background          $white
         statusline          $dark

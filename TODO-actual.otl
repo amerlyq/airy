@@ -67,16 +67,17 @@ i3
 		: window header, scratch headers, their marks, etc
 	2015-03-18 [X] try menu inside menu (use for Open)
 	[_] run/autostart on specified workspace and start on 1
-	[X] border -- instead '1pixel' do 'border pixel $s_border'
+	2015-03-24 [X] border -- instead '1pixel' do 'border pixel $s_border'
 		: can't set for 'border toggle' -- only direct mappings
-		[X] Create submenu for borders
+		2015-03-24 [X] Create submenu for borders
 	[_] organize scripts as bash filter functions which use same output of
 		i3-msg -t get_tree | jshon | tee >(pbcopy) >(do_stuff) >(do_more_stuff) | grep errors
 	[_] use 0 wrksp as own scratch desktop -- moving wnds back and forth
 	[_] generate 'ignore' complementary keys on wmode_end
 		parse end of written dst file, create complementary list to received
 		from get_available_keys, identical shortcuts to message 'not implemented'
-	[_] disable border if window is only one?
+	[$] auto disable border if window is only one?
+		: there is fullscreen for this
 
 vim:
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
@@ -119,7 +120,7 @@ vim:
 		http://www.vim.org/scripts/script.php?script_id=4449
 		https://github.com/jackfranklin/dotfiles
 	[_] BUG: C-F on end of '/', C-D on emtpy ':' -- both opens menu, needs to disable it
-	[X] BUG: 'gcc' comments are old-style again
+	2015-03-26 [X] BUG: 'gcc' comments are old-style again
 	[_] Vimoutliner
 		[_] Change mapping to more easily pressed
 		[X] Disable autoformating on pasting
@@ -160,12 +161,13 @@ zsh
 	[_] BUG: <C-y> by ssh: xsel: Can't open display: (null) Inappropriate ioctl for device
 	[_] pre-execute command before starting interactive shell
 		http://www.zsh.org/mla/users/2005/msg00599.html
-	[X] BUG: fix agi to search case insensitive text
+	2015-03-25 [X] BUG: fix agi to search case insensitive text
 		: flags -S -i have no effect on it -> must be last of arguments!
-	[X] Ag search only files in current directory: agd (uses find)
+	2015-03-25 [X] Ag search only files in current directory: agd (uses find)
 	[_] ag in Sack
 		https://github.com/sampson-chen/sack
-	[_] vim: ag search inside file -- check if it will work with --vimgrep on Ag from src
+	2015-03-27 [X] vim: ag search inside file -- check if it will work with --vimgrep on Ag from src
+		: need newest version of ag, for --vimgrep to work (and you could search inside file)
 
 [_] wget with redirection, cookies and user-agent
 	TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"
@@ -276,7 +278,17 @@ gdb
 	[_] python support
 
 
-[_] wacom
+wacom
+	[X] profile auto switching
+	[_] focus event instead of timer
+	[_] circlet-modes
+		[_] <C-z> <C-r> on 4 5
+	[_] setup krita
+		[_] key-mappings
+		[_] brushes
+		[_] sync profile
+
+
 
 READ (blogs -- downloaded)
 	http://duartes.org/gustavo/blog/archives/

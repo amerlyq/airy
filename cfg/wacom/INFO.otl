@@ -30,6 +30,8 @@ REF
 		sudo dumpkeys --funcs-only
 
 SETS
+	http://www.tldp.org/HOWTO/pdf/Wacom-Tablet-HOWTO.pdf
+	https://wiki.archlinux.org/index.php/Wacom_Tablet#Pressure_curves
 
 WACOM_NM="Wacom Intuos Pro S Pen pad"
 cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
@@ -74,3 +76,7 @@ BUGS
 	Shaking
 		This is a common problem with dual CRT's, took me years to find the solution!
 		In your Wacom control panel go to the "tablet mode" tab and try each of the different settings (Standard, Recognition and Single Mode). For me setting it to recognition stopped the jitters.
+	Warning:
+		Changing Mode to either Absolute or Relative in stylus/eraser stops
+		the mouse from being able to pull guidelines out of the ruler in Gimp.
+

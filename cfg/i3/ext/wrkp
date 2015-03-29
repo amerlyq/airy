@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+# ALT: https://github.com/acrisci/i3ipc-python
+
+use feature qw(say);
+# use AnyEvent::I3 qw(:all);
+#
+# my $i3 = i3();
+#
+# $i3->connect->recv or die "Error connecting";
+# say "Connected to i3";
+#
+# my $workspaces = $i3->message(TYPE_GET_WORKSPACES)->recv;
+# say "Currently, you use " . @{$workspaces} . " workspaces";
+
+use Data::Dumper;
+use AnyEvent;
+use AnyEvent::I3;
+
+my $i3 = i3();
+
+$i3->connect->recv or die "Error connecting to i3";
+
+my %callbacks = (
+    # workspace => sub {
+    #     $i3->get_tree->cb(sub {
+    #         my ($tree) = @_;
+    #         say "tree: " . Dumper($tree);
+    #     });
+    # }
+    workspace => sub {
+        say "Workspaces changed";
+    } ,
+    output => sub {
+        say "output";
+    } ,
+    mode => sub {
+        say "mode";
+    } ,
+    window => sub {
+        # my ($wnd) = @_;
+        # say Dumper($wnd)
+        say "wnd";
+    }
+    # ,
+    # _error => sub {
+    #     my ($msg) = @_;
+    #     say "Need to reconnect: $msg";
+    #     exit 1;
+    # }
+);
+
+$i3->subscribe(\%callbacks)->recv->{success}
+    or die "Error subscribing to events";
+
+# my $reply = $i3->message(TYPE_COMMAND, "float enable")->recv;
+# if ($reply->{success}) {
+#     say "Configuration successfully reloaded";
+# }
+
+AE::cv->recv

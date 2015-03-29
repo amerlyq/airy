@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
+source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
+
+state=$(xsetwacom get "$WTOUCH" "Touch" \
+    | awk '/on/{print "OFF"} /off/{print "ON"}')
+xsetwacom set "$WTOUCH" Touch $state && wnotify "Touch is $state"
+

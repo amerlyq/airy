@@ -42,6 +42,7 @@ fi
 Batch and encoding (charset) of files
 	All in subdirs
 		ls **/*(.c)
+		iconv -f CP1251 -t UTF-8 *.srt
 	Count files with each encoding
 		find . -type f -exec file -i {} \; | sed '/.*charset=\(\S\+\)$/s//\1/' | sort | uniq -c
 	Batch convert by vim

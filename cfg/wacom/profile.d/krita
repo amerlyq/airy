@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-source "${BASH_SOURCE[0]%/*/*}/funcs-lib" || exit 1
+#: class="Krita"
+SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
+source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
 wacom "$WPAD" << EOT
-    Button  1  "key E"                # button inside touchring
     Button  2  "key shift"
     Button  3  "key ctrl"
-    Button  4  "key D"
-    Button  5  "key E"
-    Button  8  "key ctrl Z"
+    Button  8  "key +Control_L z -Control_L"
+    Button  1  "key E"
     Button  9  "key ctrl shift A"
     Button 10  "key ctrl K"
-    Button 11  "key ctrl M"
+    Button 11  "key +Super_L a -Super_L"  #Def: "key ctrl M"
 
     # AbsWheelDown    5
     # AbsWheelUp      4
@@ -19,26 +19,24 @@ wacom "$WPAD" << EOT
 EOT
 
 wacom "$WSTYLUS" << EOT
-    RawSample 8     # made up to decrease the lag between where
-                    # the stylus tip is and when the line is drawn in Gimp
-    PressureCurve 0 10 90 100   # Softer
-    TabletPCButton off
+    RawSample       8               # Decrease the lag between the stylus tip is and the line drawn
+    PressureCurve   20 0 10 100     # Firmer: 80 0 80 100
+    TabletPCButton  off             # Buttons works even on the air
+    Threshold       10
     Mode Absolute
-    # Area -10 -20 14720 9200     # Calibration results
 EOT
 
 wacom "$WERASER" << EOT
-    RawSample 8
-    PressureCurve 5 0 100 95    # Firmer
-    # Area -10 -20 14720 9200     # Calibration results
+    RawSample       8               # Smoother
+    PressureCurve   10 0 50 100
 EOT
 
 wacom "$WTOUCH" << EOT
-    ScrollDistance 18       # a little more sensitive
-    TapTime 220
+    #ScrollDistance  18             # a little more sensitive
+    #TapTime         220
 EOT
 
 wacom "$WCURSOR" << EOT
-    Threshold 27
+    #Threshold       27
 EOT
 

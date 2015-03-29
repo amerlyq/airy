@@ -1,27 +1,4 @@
 #!/bin/bash
-## Device names and ID numbers from 'xinput list' entered in a terminal.
-#
-## In the example "Device name" not ID # is used.  Note if you use the
-## xorg.conf the "Device names" will be stylus, eraser, touch, and pad.
-#
-## If you are hot plugging use "Device name" as ID # can change.
-#
-## ClickForce changes name to Threshold with xf86-input-wacom 0.10.9 (11-19-10)
-#
-## Warning:  Changing Mode to either Absolute or Relative in stylus/eraser stops
-## the mouse from being able to pull guidelines out of the ruler in Gimp.
-
-#Calculate devices names
-DEVICE_STYLUS=`xsetwacom list dev | grep -E -o ".*stylus"`
-DEVICE_ERASER=`xsetwacom list dev | grep -E -o ".*eraser"`
-DEVICE_CURSOR=`xsetwacom list dev | grep -E -o ".*cursor"`
-DEVICE_PAD=`xsetwacom list dev | grep -E -o ".*pad"`
-DEVICE_TOUCH=`xsetwacom list dev | grep -E -o ".*touch"`
-
-
-#notify user about used profile
-notify-send "Using Krita profile"
-
 #screen region where Stylus will work
 #for 2 screens: MapToOutput 3286x1080+0+0
 xsetwacom set "$DEVICE_STYLUS" MapToOutput 1920x1080+0+0
@@ -47,18 +24,14 @@ xsetwacom set "$DEVICE_ERASER" PressureCurve "0 10 90 100"  #Bezier curve, defau
 xsetwacom set "$DEVICE_ERASER" Mode "Absolute"              #or Relative cursor movement
 xsetwacom set "$DEVICE_ERASER" Button 1 "1"
 
-## pad = ID 11 = "$DEVICE_PAD"
+
 xsetwacom set "$DEVICE_PAD" Button 2 "key shift"
 xsetwacom set "$DEVICE_PAD" Button 3 "key ctrl"
 xsetwacom set "$DEVICE_PAD" Button 8 "key ctrl Z"
 xsetwacom set "$DEVICE_PAD" Button 9 "key ctrl shift A"
 
-#THESE BUTTONS DO NOT WORK FOR ME
-#xsetwacom set "$DEVICE_PAD" Button 4 "key D"
-#xsetwacom set "$DEVICE_PAD" Button 5  "key E"
-
 xsetwacom set "$DEVICE_PAD" AbsWheelDown "5"
-xsetwacom set "$DEVICE_PAD" Button 1 "key E"                # button inside touchring
+xsetwacom set "$DEVICE_PAD" Button 1 "key E"
 xsetwacom set "$DEVICE_PAD" AbsWheelUp "4"
 
 xsetwacom set "$DEVICE_PAD" Button 10 "key ctrl K"
