@@ -1,2 +1,10 @@
 Choose digit column
 	perl -ne '/Node\[(\d+)/ && print $1."\n"'
+
+Match all whole words w/o prefix
+	ag '^(?!\s*/?\*\s+).*(?:\bmem_map\b)'
+
+Sources
+	ag -G '^(?:((?!tags|drivers|arch|\.map)|arch/arm/).)*$' -s '^(?!\s*/?\*\s+).*\K(?:\bmem_map\b)'
+
+

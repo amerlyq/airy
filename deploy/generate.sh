@@ -20,4 +20,5 @@ if [ "${CURR_PLTF}" == "Linux" ]; then
 
     # Need sudo:
     "$GENS/rc-local.gen"
+    "$GENS/hosts.gen"
 fi

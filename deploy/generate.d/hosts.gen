@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+source ~/.bash_export
+
+FL=/etc/hosts
+
+# NOTE: if I want multiple names for same IP -- change it.
+# But then each host renaming will not clean old names!
+if grep -q "^$SRK_IPL" $FL; then
+    sudo sed -i "/^\($SRK_IPL\).*/s//\1\tsrk/" $FL
+else
+    echo "${SRK_IPL}\tsrk" | sudo tee -a $FL
+fi

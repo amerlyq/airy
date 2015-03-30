@@ -20,9 +20,11 @@ noremap <unique> ]l :<C-U><C-R>=v:count1<CR>lnext!<CR>
 noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 
 " Show list of tags when there more then one entry:
-noremap <C-]> g<C-]>
-noremap g] <C-]>
+" ALSO:
+noremap g] g<C-]>
 noremap g<C-]> g]
+noremap g[ :<C-U><C-R>=v:count1<CR>tnext<CR>
+" noremap <C-]> g<C-]>
 
 " No jump when joining
 " nnoremap J mzJ`z
