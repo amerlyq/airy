@@ -1,56 +1,53 @@
 #!/usr/bin/env bash
-# From within Arch VBox:
-#   scp user@local.ip:~/aura/airy/arch-install .
+# On Host linux
+#   ssh-keygen -N "" -f ~/.ssh/arch
+#   cat ~/.ssh/arch.pub >> ~/.ssh/authorized_keys
+# From within Arch vbox:
+#   scp user@local.ip:~/.ssh/arch  ~/.ssh/arch
+#   scp -i ~/.ssh/arch user@local.ip:~/aura/airy/arch-install .
 
-# if [ "$(uname -n)" != "archiso" ]; then
-#     echo "Use this script only under archiso image!"
-#     exit 1
-# fi
+if [ "$(uname -n)" != "archiso" ]; then
+    echo "Use this script only under archiso image!"
+    exit 1
+fi
 
 
 sd=/dev/sda
 nd=(boot root swap home)
 for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
 
+layout="
+    /boot ext4       100MB
+    /     ext4       8GB
+    *     linux-swap 10GB
+    /home ext4       100%
+"
+
 if [ "$1" == --force ]; then
-    swapoff $s_swap
-    umount -f /mnt
+    swapoff -a
+    umount -fR /mnt
 
     ## Partitioning
-    parted -s -a opt $sd mklabel msdos
-    lsblk $sd && echo
-    parted -s -a opt $sd  \
-        mkpart primary ext4 1MB 100MB      \
-        mkpart primary ext4 100MB 8GB      \
-        mkpart primary linux-swap 8GB 10GB \
-        mkpart primary ext4 10GB 100%
-
-    parted -s -a opt $sd set $n_boot boot on
-fi
-
-if [ "$1" == --force ]; then
-    ## Format
-    mkswap $s_swap
-    mkfs.ext4 $s_boot
-    mkfs.ext4 $s_root
-    mkfs.ext4 $s_home
+    gawk -v sd="$sd" '
+    BEGIN { pp="parted -s -a opt "sd; ps="1MB"; N=0
+        print pp,"mklabel msdos && lsblk",sd,"&& echo"
+    } /\S/ {
+        a[$1]=sd""(++N); t[$1]=$2
+        print pp,"mkpart primary",$2,ps,$3
+        ps=$3
+    } END {
+        print pp,"set 1 boot on"
+        PROCINFO["sorted_in"]="@ind_str_asc"
+        for(m in a) {
+            if(m == "*") { print "mkswap",a[m],"&& swapon",a[m] }
+            else { print "mkfs."t[m],a[m],"&& mkdir -p /mnt"m,"&& mount",a[m],"/mnt"m }
+        }
+    }' <<< "$layout" | bash
 fi
 
 ## Layout
-parted -l
-# lsblk $sd
-
-exit
-
-if [ "$1" == --force ]; then
-    # Mount
-    swapon $s_swap
-    mnt() { mkdir -p /mnt$2 && mount $1 /mnt$2; }
-    mnt $s_root /
-    mnt $s_boot /boot
-    mnt $s_home /home
-fi
-
+# parted -l
+lsblk $sd
 
 ## Select a mirror
 pm=/etc/pacman.d/mirrorlist
@@ -67,12 +64,13 @@ sed '/#%BEGIN/,/#%END/d' $pm >> $pmt
 mv -vf $pmt $pm
 
 
-## Install the base system
-# pacstrap -i /mnt base base-devel
+if [ "$1" == --force ]; then
+    ## Install the base system  # -i -- interactive
+    pacstrap /mnt base base-devel
+fi
 
-## Need more then one-go method
-# genfstab -U -p /mnt >> /mnt/etc/fstab
-# vim /mnt/etc/fstab
+fs=/mnt/etc/fstab
+sed -i '4q' $fs && genfstab -U -p /mnt >> $fs && less $fs
 
 # Chroot
-# arch-chroot /mnt /bin/bash
+arch-chroot /mnt /bin/bash
