@@ -16,8 +16,9 @@ else
 fi
 VNM=Arch64
 ost=ArchLinux_64
-vimg="$VMs/${VNM}/${VNM}.vmdk"
+vimg="$VMs/${VNM}/${VNM}.vdi"
 vbox="${vimg%.*}.vbox"
+install_iso="$VMs/img/archlinux-2015.03.01-dual.iso"
 
 # =======================================================================
 
@@ -69,61 +70,16 @@ if [ ! -f "$vimg" ]; then
         "work") HDDOPTS="" ;;
     esac
 
-    # if [ "$CURR_PLTF" == "Linux" ]; then IMGOPTS='-relative'; fi
-
-    VBoxManage internalcommands createrawvmdk -filename "$vimg" -rawdisk "$disk"
-    # VBoxManage internalcommands createrawvmdk -filename "$vimg" \
-    #     -rawdisk "$disk" -partitions $prts -mbr "$mbr" $IMGOPTS
-    #>> RAW host disk access VMDK file /home/vishalj/.VirtualBox/WinXP.vmdk created successfully.
-
     VBoxManage storagectl "${VNM}" --name "IDE"  --add ide \
         --controller PIIX4 --hostiocache on --bootable on
     VBoxManage storageattach "${VNM}" --storagectl "IDE" \
-        --port 0 --device 0 --type dvddrive --medium "$grub"
+        --port 0 --device 0 --type dvddrive --medium "$install_iso"
 
+    VBoxManage createhd --filename "$vimg" \
+        --size 20480 --format VDI --variant Standard
     VBoxManage storagectl "${VNM}" --name "SATA" --add sata \
         --controller IntelAHCI --hostiocache on --portcount 1
     VBoxManage storageattach "${VNM}" --storagectl "SATA" \
         --port 0 --device 0 --type hdd $HDDOPTS --medium "$vimg"
 fi
 
-
-# TODO: if I can't to make grub2 or bcdedit loader
-# Use automatic 'Repair installation' Win7_DVD option.
-
-# In my case this was caused by wrong bios SATA mode setting. I installed
-# windows 7 with bios SATA mode set to RAID so windows installed only RAID
-# drivers. Since VM is using AHCI mode to access harddisks, windows doesn’t
-# have proper driver installed for it. Microsoft has made a fix for this
-# http://support.microsoft.com/kb/922976, you must run this fix before changing
-# SATA mode to AHCI or running VM in AHCI. Still I recommend changing the bios
-# setting to AHCÍ before even installing windows.
-
-
-# Note: For me the SATA emulation for the RAW disk (under VirtualBox) did not
-# work. I had to use the IDE emulation for the real SATA disk to get this
-# working.
-
-
-# Author advises that IO APIC must be activated from VM settings.
-# http://doc.ubuntu-fr.org/utilisateurs/brazz/virtualbox#utilisation_d_un_disque_dur_physique_dans_virtual_box
-
-# --discard on option (after --nonrotational on) specifies that vdi image will be
-# shrunk in response to trim command from guest OS. Following requirements must
-# be met:
-#     disk format must be VDI
-#     cleared area must be at least 1MB (size)
-#     [probably] cleared area must be cover one or more 1MB blocks (alignment)
-
-# Obviously guest OS must be configured to issue trim command, typically that
-# means guest OS is made to think the disk is an SSD. Ext4 supports -o discard
-# mount flag; OSX probably requires additional settings as by default only
-# Apple-supplied SSD's are issued this command. Windows ought to automatically
-# detect and support SSD's at least in versions 7 and 8, I am not clear if
-# detection happens at install or run time. Linux exFAT driver (courtesy of
-# Samsung) supports discard command. It is not clear if Microsoft
-# implementation of exFAT supports same, even though the file system was
-# designed for flash to begin with.
-
-# Alternatively there are ad hoc methods to issue trim, e.g. Linux fstrim
-# command, part of util-linux package.

@@ -2,32 +2,53 @@
 # From within Arch VBox:
 #   scp user@local.ip:~/aura/airy/arch-install .
 
+# if [ "$(uname -n)" != "archiso" ]; then
+#     echo "Use this script only under archiso image!"
+#     exit 1
+# fi
+
+
 sd=/dev/sda
+nd=(boot root swap home)
+for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
 
 if [ "$1" == --force ]; then
-    parted -s -a opt $sd mklabel msdos   \
+    swapoff $s_swap
+    umount -f /mnt
+
+    ## Partitioning
+    parted -s -a opt $sd mklabel msdos
+    lsblk $sd && echo
+    parted -s -a opt $sd  \
         mkpart primary ext4 1MB 100MB      \
         mkpart primary ext4 100MB 8GB      \
         mkpart primary linux-swap 8GB 10GB \
-        mkpart primary ext4 10GB 100%      \
-        set 1 boot on
+        mkpart primary ext4 10GB 100%
+
+    parted -s -a opt $sd set $n_boot boot on
 fi
 
-## MORE:
-# parted -l
-lsblk $sd
+if [ "$1" == --force ]; then
+    ## Format
+    mkswap $s_swap
+    mkfs.ext4 $s_boot
+    mkfs.ext4 $s_root
+    mkfs.ext4 $s_home
+fi
 
+## Layout
+parted -l
+# lsblk $sd
+
+exit
 
 if [ "$1" == --force ]; then
-    # Enable swap
-    mkswap ${sd}1
-    swapon ${sd}1
-
     # Mount
-    mnt() { mkdir -p /mnt/$2 && mount ${sd}$1 /mnt/$2; }
-    mnt 2 /
-    mnt 1 /boot
-    mnt 4 /home
+    swapon $s_swap
+    mnt() { mkdir -p /mnt$2 && mount $1 /mnt$2; }
+    mnt $s_root /
+    mnt $s_boot /boot
+    mnt $s_home /home
 fi
 
 
@@ -47,11 +68,11 @@ mv -vf $pmt $pm
 
 
 ## Install the base system
-pacstrap -i /mnt base base-devel
+# pacstrap -i /mnt base base-devel
 
 ## Need more then one-go method
 # genfstab -U -p /mnt >> /mnt/etc/fstab
 # vim /mnt/etc/fstab
 
 # Chroot
-arch-chroot /mnt /bin/bash
+# arch-chroot /mnt /bin/bash
