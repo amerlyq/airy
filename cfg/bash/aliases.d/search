@@ -14,7 +14,7 @@ agp() { agi --pager less $@; }
 # agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
 
 vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
-    local cnt=30 als='ag' args std add cmd
+    local cnt=24 als='ag' args std add cmd
 
     if [[ $1 =~ ^[0-9]+$ ]]; then cnt=$1; shift; fi
     if [[ $1 =~ ^ag ]]; then als="$1"; shift; fi

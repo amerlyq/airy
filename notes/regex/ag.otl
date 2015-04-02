@@ -1,0 +1,11 @@
+Kernel
+	agl = ag -G '^(?:((?!tags|drivers|sound|arch|\.map)|arch/arm/).)*$' -s
+
+Static pointer declaration/definition
+	agl '^[ \t]*static[^()\n]*?\*[^()\n]*?[=;]'
+
+Keywords (w/o comment prefix '*')
+	agl '^(?!\s*/?\*\s+).*\K(?:\bmem_map\b)'
+
+
+

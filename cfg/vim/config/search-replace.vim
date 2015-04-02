@@ -35,8 +35,8 @@ vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<
 
 ": Substitute current match
 " nnoremap <leader>cw :%s:\<<C-R><C-w>\>:<C-R><C-w>:g<Left><Left>
-nnoremap <unique> <Leader>cm :%s::<C-R>/:g<Left><Left>
-vnoremap <unique> <Leader>cm  :s::<C-R>/:g<Left><Left>
+nnoremap <unique> <Leader>c/ :%s::<C-R>/:g<Left><Left>
+vnoremap <unique> <Leader>c/  :s::<C-R>/:g<Left><Left>
 ": Replace by yanked/deleted text
 nnoremap <unique> <Leader>cy :%s::<C-R>":g<Left><Left>
 vnoremap <unique> <Leader>cy  :s::<C-R>":g<Left><Left>
