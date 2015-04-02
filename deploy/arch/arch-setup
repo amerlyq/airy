@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# On Host linux
+#   ssh-keygen -N "" -f ~/.ssh/arch
+#   cat ~/.ssh/arch.pub >> ~/.ssh/authorized_keys
+# From within Arch vbox:
+#   scp user@local.ip:~/.ssh/arch  ~/.ssh/id_rsa
+#   scp user@local.ip:~/aura/airy/arch-install .
+
+### Seized ###
+# https://wiki.archlinux.org/index.php/Beginners%27_guide
+
+if [ "$(uname -n)" != "archiso" ]; then
+    echo "Use this script only under archiso image!"
+    exit 1
+fi
+
+case "$1" in
+--new) bNew=1 ;;
+--mnt) bNew=0 ;;
+    *) bNew=  ;;
+esac
+
+sd=/dev/sda
+nd=(boot root swap home)
+for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
+
+layout="
+    /boot ext4       100MB
+    /     ext4       8GB
+    *     linux-swap 10GB
+    /home ext4       100%
+"
+
+## Partitioning
+if [ -n "$bNew" ]; then
+    umount -fR /mnt
+    gawk -v new="$bNew" -v sd="$sd" '
+    BEGIN { pp="parted -s -a opt "sd; ps="1MB"; N=0
+        if(new) {
+            print "swapoff -a"
+            print pp,"mklabel msdos"
+            print "lsblk",sd,"&& echo"
+        }}
+    /\S/ {
+        a[$1]=sd""(++N); t[$1]=$2
+        if(new) { print pp,"mkpart primary",$2,ps,$3 }
+        ps=$3
+    } END {
+        if(new) { print pp,"set 1 boot on" }
+        PROCINFO["sorted_in"]="@ind_str_asc"
+        for(m in a) {
+            if(m == "*") { if(new) print "mkswap",a[m],"&& swapon",a[m] }
+            else { if(new) { print "mkfs."t[m],a[m] }
+                print "mkdir -p /mnt"m
+                print "mount",a[m],"/mnt"m
+            }
+        }
+    }' <<< "$layout" | bash
+fi
+
+## Layout
+# parted -l
+lsblk $sd
+
+## Select a mirror
+pm=/etc/pacman.d/mirrorlist
+pmt=/tmp/mrlst
+cat - <<-'EOT' > $pmt
+#%BEGIN Prepended during install
+## Score: 0.7, Ukraine
+Server = http://archlinux.bln-ua.net/$repo/os/$arch
+## Score: 25.8, Ukraine
+Server = http://mirrors.nix.org.ua/linux/archlinux/$repo/os/$arch
+#%END
+EOT
+sed '/#%BEGIN/,/#%END/d' $pm >> $pmt
+mv -vf $pmt $pm
+echo ":: mirror selected"
+
+
+if [ ! -d "/mnt/usr/bin" ]; then
+    ## Install the base system  # -i -- interactive
+    pacstrap /mnt base #base-devel
+    echo ":: packstrap installed"
+fi
+
+fs=/mnt/etc/fstab
+sed -i '4q' $fs && genfstab -U -p /mnt >> $fs #&& less $fs
+echo ":: fstab generated"
+
+# Chroot
+loc="en_US.UTF-8"
+zon=/usr/share/zoneinfo/Europe/Kiev
+arch-chroot /mnt /bin/bash -c "
+    sed -ri 's/^#(${loc}.*)$/\1/' /etc/locale.gen
+    locale-gen
+    echo LANG=${loc} > /etc/locale.conf
+    export LANG=${loc}
+    echo ':: locale generated'
+
+    rm -vf /etc/localtime
+    ln -sv $zon /etc/localtime
+    # WARNING: dual boot with Windows: https://wiki.archlinux.org/index.php/Time#UTC_in_Windows
+    hwclock --systohc --utc
+    echo ':: time setted up'
+
+    ## Host
+    CURR_PLTF=myhost
+    echo ':: writing host'
+    echo \$CURR_PLTF | tee /etc/hostname
+    sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '\$CURR_PLTF'/' /etc/hosts
+
+    ## Network
+    ifcnm=\$(ip link | sed -rn '/^.*:\s+(e\w+):.*$/{s//\1/p;q}')
+    systemctl enable dhcpcd@\$ifcnm.service
+    echo ':: eth dhcp active'
+
+    # For grained set-up
+    # Set correct hooks (lvm,usb...) in /etc/mkinitcpio.conf
+    # mkinitcpio -p linux
+
+    echo ':: set root password'
+    passwd
+
+    pacman -S --noconfirm grub os-prober
+    grub-install --target=i386-pc --recheck $sd
+    rm -vf /boot/grub/grub.cfg
+    grub-mkconfig -o /boot/grub/grub.cfg
+    echo ':: grub installed'
+"
+echo ':: chroot ended'
+
+# umount -R /mnt && reboot   # Or use 'fuser' to find by what it is busy

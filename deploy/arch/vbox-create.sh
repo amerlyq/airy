@@ -2,9 +2,9 @@
 
 source ~/.bash_export
 if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
+ARGS="$@"
 
-
-if [ ! "$1" == "-w" ] && [ "$CURR_PLTF" == "Linux" ]
+if [ ! "$ARGS" == "-w" ] && [ "$CURR_PLTF" == "Linux" ]
 then
     sudo="sudo"
     VMs="$HOME/VMs"
@@ -18,18 +18,18 @@ VNM=Arch64
 ost=ArchLinux_64
 vimg="$VMs/${VNM}/${VNM}.vdi"
 vbox="${vimg%.*}.vbox"
-install_iso="$VMs/img/archlinux-2015.03.01-dual.iso"
+install_iso="$(find "$VMs" -type f -name "archlinux*iso")"
 
 # =======================================================================
 
 printf "\n>>> ${VNM} guest image <<<\n"
 
-if [ "$1" == "-r" ]; then rm -rf "${vimg%/*}"; fi
+if [ "$ARGS" == "-r" ]; then rm -rf "${vimg%/*}"; fi
 mkdir -p "${vimg%/*}"
 
 
 if VBoxManage list vms | grep -q "\<${VNM}\>"; then
-    if [ "$1" == "-d" ] || [ "$1" == "-r" ]; then
+    if [ "$ARGS" == "-d" ] || [ "$ARGS" == "-r" ]; then
         VBoxManage unregistervm "${VNM}" #--delete
     else
         printf "\n!!! ERR: There are already such VM: ${VNM} !!!\n\n"
