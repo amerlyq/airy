@@ -4,12 +4,6 @@
 #   Don't forget to disable your passwd connection. Strengen my passwd on CA. Protection from DDOS & brutforce.
 #   Reinstall new firmware with only very necessary progs. Is it has OpenCA? I smth such remember...
 
-#Check fingerprint
-#   find /etc/ssh/ -name "*_key.pub" -exec ssh-keygen -lf {} \;
-# Find appropriate line in known_hosts and it's fingerprint
-#   ssh-keygen -H -F hostname
-#   ssh-keygen -l -f ~/.ssh/known_hosts -F hostname
-
 dir=/tmp/ca
 mkdir -p "$dir"
 cd "$dir"

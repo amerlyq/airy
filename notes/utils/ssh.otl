@@ -51,6 +51,13 @@ X over SSH
 SSH over UDP
 	https://mosh.mit.edu/
 
+Check fingerprint (/tmp/local/etc/dropbear)
+	find . -name "*_key.pub" -exec ssh-keygen -lf {} \;
+Find appropriate line in known_hosts and it's fingerprint
+	ssh-keygen -H -F hostname
+	ssh-keygen -lf ~/.ssh/known_hosts -F hostname
+
+
 Supported escape sequences: ~?
 	> Exit frozen ssh session: press <CR>~.
  (Note that escapes are only recognized immediately after newline.)
