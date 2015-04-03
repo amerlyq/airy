@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-
-source ~/.bash_export
-if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
+source ~/.bash_export || exit $?
+source ~/.bash/functions.d/vbox || exit $?
 ARGS="$@"
 
 if [ ! "$ARGS" == "-w" ] && [ "$CURR_PLTF" == "Linux" ]
@@ -19,6 +18,7 @@ ost=ArchLinux_64
 vimg="$VMs/${VNM}/${VNM}.vdi"
 vbox="${vimg%.*}.vbox"
 install_iso="$(find "$VMs" -type f -name "archlinux*iso")"
+VBOX_PORT=2822
 
 # =======================================================================
 
@@ -28,13 +28,18 @@ if [ "$ARGS" == "-r" ]; then rm -rf "${vimg%/*}"; fi
 mkdir -p "${vimg%/*}"
 
 
-if VBoxManage list vms | grep -q "\<${VNM}\>"; then
-    if [ "$ARGS" == "-d" ] || [ "$ARGS" == "-r" ]; then
-        VBoxManage unregistervm "${VNM}" #--delete
-    else
-        printf "\n!!! ERR: There are already such VM: ${VNM} !!!\n\n"
-        exit 1
-    fi
+if is_vm_exist "$VNM"; then case "$ARGS" in
+-d|-r) VBoxManage unregistervm "${VNM}" ;; #--delete
+-m) printf "VM exist, updating settings!\n" ;;
+ *) squit "\n!!! ERR: There are already such VM: ${VNM} !!!\n";
+esac; else case "$ARGS" in
+-m) squit "There no such VM as '${VNM}'"
+esac; fi
+
+if is_vm_run "$VNM"; then
+    if ask_confirm "Shutdown to modify?"
+    then VBoxManage controlvm "${VNM}" poweroff
+    else squit; fi
 fi
 
 if [ ! -f "$vbox" ]; then
@@ -49,13 +54,30 @@ if [ ! -f "$vbox" ]; then
         "MINGW") VMOPTS="$VMOPTS --audio dsound --audiocontroller ac97 --accelerate2dvideo off" ;;
     esac
 
+
+    # (virtualization options Only for Intel Host)
+    # Intranet: --nic2 intnet  --intnet2 "InnerVMs"
+    #--nic3 none --nic4 none
     VBoxManage modifyvm "${VNM}" ${VMOPTS} --vram 128 --pae on         \
         --ioapic on --cpus 2 --rtcuseutc on --cpuexecutioncap 100      \
         --hwvirtex on --nestedpaging on  --largepages on  --vtxvpid on \
         --boot1 dvd --boot2 disk --firmware bios  --accelerate3d on    \
         --clipboard bidirectional --monitorcount 1 --vrde off          \
-        --usb on --usbehci off --nic1 nat --nic2 none --nic3 none --nic4 none
-    # Intranet: --nic2 intnet  --intnet2 "InnerVMs"
+        --usb on --usbehci off --nic1 nat --nic2 none
+
+    add_port_forward "${VNM}" "${VNM}_ssh" "tcp,,$VBOX_PORT,,22"
+
+    # Only if Extensions installed
+    # --usbehci on
+    # --defaultfrontend default|<name>
+
+    ## Headless
+    # VBoxManage modifyvm "${VNM}" --memory 1024 --vram 16 --pae on      \
+    #     --ioapic on --cpus 2 --rtcuseutc on --cpuexecutioncap 100      \
+    #     --hwvirtex on --nestedpaging on  --largepages on  --vtxvpid on \
+    #     --boot1 dvd --boot2 disk --firmware bios  --accelerate3d off   \
+    #     --clipboard disabled --monitorcount 1 --vrde off --audio none  \
+    #     --usb off --usbehci off --nic1 nat --nic2 hostonly
 
     sed -i '/ShowMiniToolBar/ s/\(value="\)\w\+"/\1no"/' "$vbox"
 fi
@@ -83,3 +105,4 @@ if [ ! -f "$vimg" ]; then
         --port 0 --device 0 --type hdd $HDDOPTS --medium "$vimg"
 fi
 
+echo "W: vbox '${VNM}' vm"

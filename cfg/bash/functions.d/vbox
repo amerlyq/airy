@@ -1,0 +1,47 @@
+# vim: ft=sh
+source ~/.bash/functions.d/system || exit $?
+
+ask_confirm() {
+    printf "$1\n"
+    read answer
+    case $answer in
+        [yY] | [yY][Ee][Ss] ) return 0 ;;
+        [nN] | [n|N][O|o] ) squit "Rejected" ;;
+        *) squit "Invalid input" ;;
+    esac
+}
+
+is_vm_exist() { VBoxManage list vms        | grep -q "\<$1\>"      ; return $?; }
+is_vm_run()   { VBoxManage list runningvms | grep -q "\<$1\>"      ; return $?; }
+has_vm_rule() { VBoxManage showvminfo "$1" | grep -q "Rule.*\<$2\>"; return $?; }
+show_vm_rule(){ VBoxManage showvminfo "$1" | grep "Rule.*\<${2}\>" ; return $?; }
+
+add_port_forward() {
+    if [ $# -ne 3 ]; then echo "Number of $# args isn't enough"; exit 1; fi
+    # Delete if exist
+    if has_vm_rule "$1" "$2"; then
+        VBoxManage modifyvm "$1" --natpf1 delete "$2"
+        show_vm_rule "$1" "$2"
+    fi
+    # Create if don't exist
+    if ! has_vm_rule "$1" "$2"; then
+        VBoxManage modifyvm "$1" --natpf1 "$2,$3"
+        show_vm_rule "$1" "$2"
+    fi
+    echo "Add $1 port forwarding rule '$2,$3'"
+}
+
+do_vm_run() { local opt vm
+    if [ -z "$2" ]; then vm="$1"; else vm="$2"; opt="$1"; fi
+    if ! is_vm_exist "$vm"; then squit "There no such VM as '$vm'"; fi
+    if is_vm_run "$vm"; then
+        if ask_confirm "Do you want shutdown VM='$vm'? (y/n)"
+        then VBoxManage controlvm "$vm" poweroff; fi
+    else
+        if ask_confirm "Launch VM='$vm' is your wish? (y/n)"
+        then VBoxManage startvm "$vm"; fi  #--type headless # --vrde off
+        # Alt: but make background yourself!
+        # VBoxHeadless --startvm <uuid|name>  --vrde off
+    fi
+}
+

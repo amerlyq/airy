@@ -18,7 +18,7 @@ win2unix() { # -> /g/#
 }
 export -f win2unix
 
-squit() { if ! [ -z "$PS1" ]; then return $1; else exit $1; fi; }
+squit() { printf "${1+$1\n}"; if [ -n "$PS1" ]; then return ${1+1}; else exit ${1+1}; fi; }
 export -f squit
 
 amPause() {
