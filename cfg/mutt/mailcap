@@ -1,0 +1,7 @@
+# The first entry tests that X is running, and if it is, it hands the file to
+# vimprobable. The default, however, is determined by the copiousoutput tag.
+# So, in mutt it is just a matter of hitting v to view the attached HTML and
+# then m to send it to mailcap. For convenience, I bind Enter to that function in muttrc.
+#text/html; vimprobtab.sh %s &; test=test -n "$DISPLAY"; needsterminal;
+text/html; vimb %s; test=test -n "$DISPLAY";
+text/html; w3m -I %{charset} -T text/html; copiousoutput;

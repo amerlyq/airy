@@ -110,3 +110,8 @@ mailboxes +inbox
 #>  config includes a macro bound to the 'y' key which will allow you to change
 #>  to any of the folders listed under mailboxes
 # ALT: set imap_check_subscribed
+
+## HTML enriched mails
+auto_view text/html                                      # view html automatically
+alternative_order text/plain text/enriched text/html     # save html for last
+bind attach <return>    view-mailcap
