@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
+source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
+
+mod="$1"
+if [ -z "$mod" ]; then
+    ## Choose next
+    mod=$(cat /tmp/aura/wacom_mod)
+    case "$mod" in brush) mod=scale ;; scale|*) mod=brush ;; esac
+fi
+echo "$mod" > /tmp/aura/wacom_mod
+
+case "$mod" in
+scale|*) wacom "$WPAD" <<< '
+    AbsWheelDown 5
+    AbsWheelUp 4
+' ;;
+  brush) wacom "$WPAD" <<< '
+    AbsWheelDown "key ["
+    AbsWheelUp "key ]"
+' ;;
+esac
+
+wnotify "Mode <b>$mod</b>"
+

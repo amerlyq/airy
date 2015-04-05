@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#: class="(Firefox|Vimb)"
+SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
+source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
+
+wacom "$WPAD" << EOT
+    Button  2  "key shift"
+    Button  3  "key ctrl shift P"
+    Button  8  "key shift L"
+    Button  1  "key shift H"
+    Button  9  "key ctrl shift T"
+    Button 10  "key ctrl T"         # "key ctrl tab"
+    Button 11  "key +Super_L o k -Super_L"      # "key ctrl shift tab" # ctrl W
+
+    AbsWheelDown    4               # "key alt right"
+    AbsWheelUp      5               # "key alt left"
+    ScrollDistance  30
+    TapTime         50
+EOT
+
+wacom "$WSTYLUS" << EOT
+    RawSample       2
+    PressureCurve   5 10 90 95
+    TabletPCButton  off
+    Threshold       27
+    Mode            Absolute
+
+    Button  1       1               # left   mouse click
+    Button  2       3               # right  mouse click
+    Button  3       2               # middle mouse click
+EOT
+
+wacom "$WERASER" << EOT
+    RawSample       2
+    PressureCurve   0 10 90 100
+    Mode            Absolute
+    Button  1       2               # middle mouse click
+EOT
+
+wacom "$WTOUCH" << EOT
+    #ScrollDistance  18             # a little more sensitive
+    #TapTime         220
+    Mode            Relative
+EOT
+
+wacom "$WCURSOR" << EOT
+    #Threshold       27
+EOT
+

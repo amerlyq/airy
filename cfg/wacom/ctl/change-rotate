@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
+source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
+
+# Rotate: none,cw,ccw and half
+# cw, ccw -- only have sense in pair with MapToOutput
+rot=$(cat /tmp/aura/wacom_rot)
+case "$rot" in half) rot=none ;; none|*) rot=half ;; esac
+echo "$rot" > /tmp/aura/wacom_rot
+
+for w in "$WPAD" "$WSTYLUS" "$WERASER" "$WTOUCH" "$WCURSOR"; do
+    xsetwacom set "$w" Rotate "$rot"
+done
+
+wnotify "Rotate is <b>$rot</b>"
+

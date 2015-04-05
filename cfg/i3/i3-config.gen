@@ -203,6 +203,15 @@ w_header "Containers: Border Style"
         # wprf "$ts %%1 border pixel %%1 ,$def\n"
     wmode_end
 
+w_header "Wacom: Submenu"
+    # window border style 'border <normal|1pixel|none|pixel>'
+    wmode_begin "$mod+Insert" 'wacom' "Wacom : <1-4> [n]ext "
+        # wmapf "$ts %%1 border pixel %%1 ,$def" 1 2 3 4
+        # wlistf "$ts %s border %s, $def" "\$mod+b n p h" \
+        #     toggle normal 1pixel none
+        wstr "$ts m $exno ~/aura/airy/cfg/wacom/ctl/change-mode ,$def"
+    wmode_end
+
 wprf "\n### =================== System ===================== ###\n"
 w_header "Mode: System"
 msg_sys='<i3> : shu[t]down, [r]eboot, [l]ock | log[o]ut, [s]uspend, [h]ibernate | re[c]onf, re[n]ew, [e]xit'
@@ -230,7 +239,7 @@ m_open="<O>pen : [n]cmpcpp, [h]top | vim[b], [p]idgin, [f]irefox, <k>rita | [m]u
         wlistf "$ts %s $eflo -e %s ,$def" "n h" \
             "ncmpcpp" "htop"
         wlistf "$ts %s $exno %s ,$def" "b p f m"  \
-            "vimb" "pidgin" "firefox" "~/.i3/ext/dmenu/mpd_fmove"
+            "vimb" "pidgin" "firefox" "~/.i3/dmenu/mpd_fmove"
         wstr "$tod+k $exno ~/.i3/ctl/run-focus k ,$def"
         wstr "$tod+o mode \"\$mode_open_rare\""
     wmode_end

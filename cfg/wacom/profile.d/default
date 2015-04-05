@@ -46,19 +46,19 @@ wacom "$WSTYLUS" << EOT
     Button 3 "+3 "
     Button 8 "+8 "
     Button 9 "+9 "
-    Area          "0 0 31496 19685"     #Calibration results  : Area -10 -20 14720 9200
-    PressureCurve "0 0 100 100"         #Bezier curve, default is 0,0,100,100
-    Suppress       2
-    RawSample      4                    #Raw input averaging number of point stamps
+    Area          "0 0 31496 19685"     # Calibration results  : Area -10 -20 14720 9200
+    PressureCurve "0 0 100 100"         # Bezier curve, default is 0,0,100,100
+    Suppress       2                    # Trimming: [0-20], def=4
+    RawSample      4                    # Filter: [0-100], def=2. Raw input averaging number of point stamps
     Mode           Absolute
-    TabletPCButton off
+    TabletPCButton off                  # Buttons works even on hover (if 'on' -- tip only)
     Touch          off
     Gesture        off
     ZoomDistance   0
     ScrollDistance 0
     TapTime        250
     Rotate         none
-    Threshold      27
+    Threshold      27                   # Pressure drop [0-2047]
     ToolDebugLevel   0
     TabletDebugLevel 0
     BindToSerial     0

@@ -35,10 +35,10 @@ do_vm_run() { local opt vm
     if [ -z "$2" ]; then vm="$1"; else vm="$2"; opt="$1"; fi
     if ! is_vm_exist "$vm"; then squit "There no such VM as '$vm'"; fi
     if is_vm_run "$vm"; then
-        if ask_confirm "Do you want shutdown VM='$vm'? (y/n)"
+        if [ "$opt" == "-y" ] || ask_confirm "Do you want shutdown VM='$vm'? (y/n)"
         then VBoxManage controlvm "$vm" poweroff; fi
     else
-        if ask_confirm "Launch VM='$vm' is your wish? (y/n)"
+        if [ "$opt" == "-y" ] || ask_confirm "Launch VM='$vm' is your wish? (y/n)"
         then VBoxManage startvm "$vm"; fi  #--type headless # --vrde off
         # Alt: but make background yourself!
         # VBoxHeadless --startvm <uuid|name>  --vrde off

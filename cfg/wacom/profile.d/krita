@@ -1,39 +1,48 @@
 #!/usr/bin/env bash
 #: class="Krita"
+# source ~/.bash/functions.d/bash-profiler
+
 SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
 source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
 wacom "$WPAD" << EOT
     Button  2  "key shift"
     Button  3  "key ctrl"
-    Button  8  "key +Control_L z -Control_L"
-    Button  1  "key E"
+    Button  8  "key +Control_L Z -Control_L"        # Redo without pick-up
+    Button  1  "key E"                              # Toggle brush/erase
     Button  9  "key ctrl shift A"
-    Button 10  "key ctrl K"
-    Button 11  "key +Super_L a -Super_L"  #Def: "key ctrl M"
+    Button 10  "key +Super_L insert -Super_L M"     # Change mode
+    Button 11  "key +Super_L a -Super_L"            # Back to previous workspace
 
-    # AbsWheelDown    5
-    # AbsWheelUp      4
-    # ScrollDistance  10
-    # TapTime         50
+    AbsWheelDown    5               # Zoom in
+    AbsWheelUp      4               # Zoom out
+
+    ScrollDistance  10
+    TapTime         50
 EOT
 
 wacom "$WSTYLUS" << EOT
     RawSample       8               # Decrease the lag between the stylus tip is and the line drawn
-    PressureCurve   20 0 10 100     # Firmer: 80 0 80 100
-    TabletPCButton  off             # Buttons works even on the air
+    PressureCurve   5 10 90 95      # Firmer: 80 0 80 100  # Softer: 20 0 10 100
+    TabletPCButton  off
     Threshold       10
-    Mode Absolute
+    Mode            Absolute
+
+    Button  1       1               # draw  M_left
+    Button  2       2               # drag  M_middle
+    Button  3       3               # menu  M_right
 EOT
 
 wacom "$WERASER" << EOT
     RawSample       8               # Smoother
-    PressureCurve   10 0 50 100
+    PressureCurve   20 0 10 100     # 10 0 50 100
 EOT
 
 wacom "$WTOUCH" << EOT
-    #ScrollDistance  18             # a little more sensitive
-    #TapTime         220
+    ScrollDistance  18             # a little more sensitive
+    TapTime         220
+    Mode            Relative
+    Threshold       40
 EOT
 
 wacom "$WCURSOR" << EOT

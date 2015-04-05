@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Online-demo: http://linuxwacom.sourceforge.net/misc/bezier.html
+#   http://www.imagemagick.org/Usage/draw/
+
+# My Windows original curve
+# PressureCurveControlPoint: 40 0 239 23 1407 2047
+
+DIR=$(readlink -m "$0")
+cd ${DIR%/*/*}/profile.d
+
+for pf in *; do
+    cat "$pf" | "${DIR%/*}/pressure-extract" "$pf" | bash
+done
+[ $? -eq 0 ] && sxiv /tmp/wacom_*.gif
+

@@ -16,6 +16,13 @@ Get events for calibration
  NOTE: eraser, cursor, stylus coordinates are the same for xsetwacom, and
  different when setting through /usr/share/X11/xorg.conf.d/50-wacom.conf
 
+LED
+	 #/etc/rc.local
+	 #/bin/chmod 666 /sys/bus/usb/devices/*/wacom_led/status_led0_select
+	echo 0..3 > /sys/bus/usb/devices/*/wacom_led/status_led0_select
+	echo 1..127 > /sys/bus/usb/devices/*/wacom_led/status0_luminance
+		https://github.com/PrzemoF/i4oled
+
 REF
 	Get tablet abilities
 		man wacom
@@ -28,6 +35,27 @@ REF
 		man dumpkeys
 		sudo dumpkeys --long-info
 		sudo dumpkeys --funcs-only
+
+	Keys
+		xev
+		xbindkeys -mk
+
+| KEYWORD [ARGS...] [KEYWORD [ARGS...] ...]
+| KEYWORD + ARGS:
+|   key [+,-]KEY [[+,-]KEY ...]  | where +:key down, -:key up, no prefix:down and up
+|   button BUTTON [BUTTON ...]   | (1=left,2=middle,3=right mouse button, 4/5 scroll mouse wheel)
+|   modetoggle                   | toggle absolute/relative tablet mode
+|   displaytoggle                | toggle cursor movement among all displays which include individual screens
+|                                | plus the whole desktop for the selected tool if it is not a pad.
+|                                | When the tool is a pad, the function applies to all tools that are asssociated
+|                                | with the tablet
+|
+| BUTTON: button ID as integer number
+| KEY: MODIFIER, SPECIALKEY or ASCIIKEY
+| MODIFIER: (each can be prefix with an l or an r for the left/right modifier (no prefix = left)
+|    ctrl=ctl=control, meta, alt, shift, super, hyper
+| SPECIALKEY: f1-f35, esc=Esc, up,down,left,right, backspace=Backspace, tab, PgUp,PgDn
+| ASCIIKEY: (usual characters the key produces, e.g. a,b,c,1,2,3 etc.)
 
 SETS
 	http://www.tldp.org/HOWTO/pdf/Wacom-Tablet-HOWTO.pdf
@@ -66,6 +94,9 @@ Portret regime for tablet -- read and create appropriate matrix to map only _par
 	xsetwacom set "device name" Rotate half #none, half, cw, ccw
 	OR
 	xinput set-prop "Serial Wacom Tablet stylus" --type=float "Coordinate Transformation Matrix" 0 0.333333 0.666666 -1 0 1 0 0 1
+	TwinView
+	 http://linuxwacom.sourceforge.net/index_old.php/howto/multimonitor
+		https://bbs.archlinux.org/viewtopic.php?pid=797617
 
 
 Also need profile with default settings

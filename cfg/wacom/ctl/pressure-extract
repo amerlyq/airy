@@ -1,0 +1,37 @@
+#!/usr/bin/gawk -f
+# convert -list font, # -font Ubuntu
+BEGIN {
+    fl = ARGC<2 ? "default" : ""ARGV[1]
+    PROCINFO["sorted_in"]="@ind_num_asc"
+    n=0; m=0; w=400; dw=w/20
+    printf "convert -size "2*(w+2*dw)"x"30+(w+2*dw)" xc:skyblue \
+    -fill none -strokewidth 3 -pointsize 40 \
+    -draw \"stroke none fill green text "dw",35 '"fl"'\" \
+    -pointsize 30 "
+}
+function scale(p,q) {
+    x=n*(w+2*dw)+dw; y=m*(w+2*dw)+dw
+    return sprintf("%d,%d", w*p/100+x, w*q/100+y)
+}
+function immg(nm, p) {
+    printf "-flip -draw \"stroke none fill white rectangle "p[1]" "p[4]"\n"
+    printf "stroke red bezier "; for (i in p) printf p[i]" "
+    printf "stroke gray "; for (i=0;i<2;++i) printf "line %s,%s ",p[2*i+1],p[2*i+2]
+    printf "stroke blue path \x27"; for (i in p) {
+        printf "\nM "p[i]" l -2,-2 +4,+4 -2,-2   l -2,+2 +4,-4 -2,+2" }
+    printf "\x27\" -flip -draw \""
+    printf "stroke none fill black text "(2*w/5+x)","y+15" '"nm"'\" "
+}
+/^\s*wacom / {
+    match($0, /"\$W(\w+)"/, tmp)
+    nm=tolower(tmp[1])
+    p[1]=scale(0,0); p[4]=scale(100,100)
+}
+/^\s*PressureCurve/ {
+    p[2]=scale($2,$3); p[3]=scale($4,$5)
+    immg(nm, p)
+    n++
+}
+END {
+    print " /tmp/wacom_"fl".gif" #-scale 300% -flip
+}

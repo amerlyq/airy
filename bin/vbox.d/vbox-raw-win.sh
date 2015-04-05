@@ -2,6 +2,10 @@
 
 ### MBR unnecessary if use whole disk, but you need grub. And vice versa.
 ### But for partitioned disk Windows and Office will lost activations.
+# SEE:
+#   http://gparted.org/h2-fix-msdos-pt.php
+# Migration from RAW
+#   http://superuser.com/questions/237782/virtualbox-booting-cloned-disk/253417#253417
 
 
 # GUI: $ VirtualBox

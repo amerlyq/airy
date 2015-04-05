@@ -6,7 +6,8 @@ WND_ACTIVE="$(~/.i3/ctl/get_active_wnd)"
 
 for pf in ./profile.d/*; do
     line="$(sed -n '/^#:\s*\(.*\)$/{s//\1/p;q}' "$pf")"
-    if [[ "$WND_ACTIVE" != "${WND_ACTIVE//$line}" ]]; then
+    if [ -z "$line" ]; then continue; fi
+    if ! awk "/${line}/ {exit 1}" <<< "$WND_ACTIVE"; then
         WCURR_PROF="${pf##*/}"
     fi
 done

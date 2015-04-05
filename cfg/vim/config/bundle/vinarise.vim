@@ -1,5 +1,5 @@
 " detects binary file or large file automatically.
-let g:vinarise_enable_auto_detect=1
+let g:vinarise_enable_auto_detect=0
 
 let g:vinarise_detect_large_file_size=0
 

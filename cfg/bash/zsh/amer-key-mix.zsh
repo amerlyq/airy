@@ -66,7 +66,7 @@ bindkey -a '\C-o' amer-yank-output
 bindkey '\C-x\C-j' jh-prev-comp       # Run with last output autocomplete
 bindkey -a  '\C-u' jh-prev-comp       # Run with last output autocomplete
 bindkey '\C-x\C-e' edit-command-line
-bindkey -a  '\C-e' edit-command-line
+bindkey -a  '\C-t' edit-command-line
 
 bindkey '\C-x\C-s' synchro-dir-push
 bindkey '\C-x\C-l' synchro-dir-pop

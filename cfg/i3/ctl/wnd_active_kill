@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+wid=$(xprop -root | awk '/^_NET_ACTIVE_WINDOW/{print $NF}')
+pid=$(xprop -id $wid | awk '/^_NET_WM_PID/{print $NF}')
+kill -SIGKILL $pid

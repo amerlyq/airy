@@ -1,0 +1,35 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+# Main Blog: how to build and setup krita
+#   http://www.davidrevoy.com/article218/guide-my-hardware-and-software-for-digital-painting
+#   http://www.ramonmiranda.com/2012/09/new-set-for-krita-software-45-or-later.html
+
+mkdir -p ~/.kde4/env
+printf "export KDEDIRS=\$HOME/kde4/inst:\$KDEDIRS
+export PATH=\$HOME/kde4/inst/bin:\$PATH
+"  > ~/.kde4/env/env.sh
+apt_noprompt krita kdelibs-bin kdelibs5-data kdelibs5-plugins oxygen-icon-theme
+
+# Хорошие сеты кистей
+#   https://krita.org/learn/resources/
+#   https://krita.org/learn/tutorials/
+
+## Brushsets
+
+# Windows: c:\Users\USERNAME\AppData\Roaming\krita\share\apps\krita
+dst=~/.kde/share/apps/krita
+
+nm="deevad-krita-brushpresets"
+git_install "Deevad/$nm" -d
+rsync -abvu "$CURR_DIR_PKG/$nm/" "$dst/" # -izP
+# http://meemodraws.deviantart.com/art/Krita-Brush-Pack-311306611
+
+nm="krita-modular-brushset-v3"
+cd "$CURR_DIR_PKG"
+rm -rf ./"${nm}"
+wget -c "https://dl.dropboxusercontent.com/u/82709100/Brushsets/Krita/${nm}.zip" -O ./"${nm}.zip"
+unzip ${nm}.zip
+rsync -abvu "$CURR_DIR_PKG/$nm/" "$dst/" # -izP
