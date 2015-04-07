@@ -10,8 +10,8 @@ NeoBundle 'vim-scripts/a.vim'
 NeoBundle 'Valloric/ListToggle'
 
 " Ascii graph drawing in vim
-NeoBundleLazy 'vim-scripts/DrawIt', {
-    \ 'autoload' : { 'commands' : 'DrawItStart' },
+NeoBundleLazy 'vim-scripts/DrawIt' , {
+    \ 'autoload' : { 'commands' : 'DrawIt' },
     \ }
 
 "==========================================

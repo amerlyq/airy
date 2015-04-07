@@ -51,6 +51,7 @@ noremap ,q q
 " vnoremap q gq
 " " nnoremap q gq$
 nnoremap Q gqip
+vnoremap Q gq
 
 " retain relative cursor position when paging
 nnoremap <PageUp>   <C-U>
