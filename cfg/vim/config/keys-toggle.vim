@@ -8,7 +8,7 @@ nnoremap <Leader>ta :set laststatus=<C-R>=&laststatus?0 :2<CR> \| :AirlineToggle
 nnoremap <Leader>tl :set list! list?<CR>
 
 nnoremap <Leader>th :setlocal hlsearch! hlsearch?<CR>
-nnoremap <Leader>tp :setlocal spell! spell?<CR>
+nnoremap <Leader>ts :setlocal spell! spell?<CR>
 nnoremap <Leader>tc :setlocal cursorcolumn! cursorcolumn?<CR>
 nnoremap <Leader>tC :setlocal cursorline! cursorline?<CR>
 
@@ -49,6 +49,7 @@ function! ToggleFolding()
     endif
 endfunc
 
+
 " toggle between number and relativenumber
 set number
 nnoremap <Leader>tN :setlocal number! number?<CR>
@@ -62,9 +63,12 @@ function! ToggleNumber()
     endif
 endfunc
 
+
+noremap <Leader>tx <Esc>:SyntasticToggleMode<CR>
+"\| :SyntasticCheck<CR>
 " Syntax highlighting
 syntax on
-nnoremap <Leader>ts :call ToggleSyntax()<CR>
+nnoremap <Leader>tX :call ToggleSyntax()<CR>
 function! ToggleSyntax()
 if g:syntax_on == 1
   syntax off
@@ -75,6 +79,4 @@ else
 endif
 endfunction
 
-noremap <Leader>tx <Esc>:SyntasticToggleMode<CR>
-"\| :SyntasticCheck<CR>
 

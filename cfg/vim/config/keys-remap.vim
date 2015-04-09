@@ -2,7 +2,7 @@
 noremap ' `
 noremap ` '
 
-" noremap , <Nop>
+noremap , <Nop>
 
 " Pinky stretching soothing
 cnoremap <C-o> <C-p>

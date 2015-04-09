@@ -2,9 +2,10 @@
 SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
 source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
-# ONE: 1920x1080+0+0, TWO: 3286x1080+0+0
 map=$(~/.i3/ctl/get_current_output)
 
+# ROTATION: table must be rotated before!
+# ONE: 1920x1080+0+0, TWO: 3286x1080+0+0, NAME: <name>, WHOLE: 'desktop'
 for w in "$WPAD" "$WSTYLUS" "$WERASER" "$WTOUCH" "$WCURSOR"; do
     xsetwacom set "$w" MapToOutput "$map"
 done
