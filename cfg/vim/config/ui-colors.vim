@@ -48,3 +48,12 @@ endif
 " highlight GitGutterDelete ctermfg=red guifg=darkred
 " highlight GitGutterChangeDelete ctermfg=yellow guifg=darkyellow
 
+"" Highlight pidgin logs:
+function! PidginHL()
+  syntax match pidginMe '^([^)]\+) me:'
+  syntax match pidginOther '\v^\([^)]+\)( me)@!.*:'
+
+  highlight link pidginMe Type
+  highlight link pidginOther Identifier
+endfunction
+command! -bar -nargs=0 PidginHL call PidginHL()

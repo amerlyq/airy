@@ -21,6 +21,9 @@ sudo update-alternatives --set x-window-manager /usr/bin/i3
 sudo update-alternatives --set x-terminal-emulator /usr/bin/urxvt
 sudo update-alternatives --set vim /usr/bin/vim.gtk
 sudo update-alternatives --set editor /usr/bin/vim.gtk
+sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/local/bin/vimb 200
+sudo update-alternatives --set x-www-browser /usr/local/bin/vimb
+# sudo update-alternatives --config gnome-www-browser
 
 # To disable default notification daemon on Lubuntu
 XFCE=/usr/share/dbus-1/services/org.xfce.xfce4-notifyd.Notifications.service

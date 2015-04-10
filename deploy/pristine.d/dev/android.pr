@@ -1,0 +1,22 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+apt_noprompt "p7zip-full"
+
+# INSTALL:
+#   http://developer.android.com/tools/sdk/ndk/index.html
+#   http://www.learn2crack.com/2013/07/learn-to-use-android-ndk-linux.html
+#   http://www.kandroid.org/ndk/docs/STANDALONE-TOOLCHAIN.html
+#
+#   https://wiki.archlinux.org/index.php/Android
+#   https://wiki.archlinux.org/index.php/Android_(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9)jk
+
+# MAN:
+#   http://habrahabr.ru/post/203014/
+
+cd ~/sdk
+nm="android-ndk-r10d-linux-x86_64.bin"
+wget -c "http://dl.google.com/android/ndk/$nm" -O "$nm"
+7za x -o$HOME/sdk/android/ndk "$nm"
