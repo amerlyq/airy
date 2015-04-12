@@ -2,24 +2,91 @@
 SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
 source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
-mod="$1"
-if [ -z "$mod" ]; then
-    ## Choose next
-    mod=$(cat /tmp/aura/wacom_mod)
-    case "$mod" in brush) mod=scale ;; scale|*) mod=brush ;; esac
+# IDEA:
+#   switch modes on wheel when holding button 1
+#   : similar to my trackball capturing mouse wheel or alt-back
+#   show in i3bar also "profile : mode" instead of notify
+
+curr() { cat /tmp/aura/wacom_mod
+    # | awk '$1 == '"$(cat /tmp/aura/wacom_prof)"' {print $2}'
+}
+
+next() { ## Choose next
+    case "$1" in
+    brush)   mod=rotate  ;;
+    rotate)  mod=undo    ;;
+    undo)    mod=layer   ;;
+    layer)   mod=color   ;;
+    color)   mod=opacity ;;
+    opacity) mod=zoom    ;;
+    zoom)    mod=brush   ;;
+    *) mod=zoom ;; esac
+}
+
+
+## Indicator
+wledf=$(ls /sys/bus/usb/devices/*/wacom_led/status_led0_select)
+if [ -f "$wledf" ]; then
+    ledmsg="Change wacom led file permission to indicate current mode"
+    [ -w "$wledf" ] || gksudo -m "$ledmsg" chmod 666 "$wledf"
+    bLed=1
 fi
+fled() { [ -n "$bLed" -a -n "$1" ] && echo "$1" > "$wledf"; }
+
+
+## Next
+mod="$1"
+case "$mod" in -?) arg="$mod"; shift; mod="$1" ;; esac
+
+if [ -z "$mod" ]; then
+    next $(curr)
+else case "$mod" in
+    --next) next $(curr) ;;
+ --refresh) mod=$(curr) ;;
+   --reset) next ;;
+         *) next $mod ;; esac
+fi
+# awk '$1 == '"$(cat /tmp/aura/wacom_prof)"' {print $1,$2,$3; next} ' /tmp/aura/wacom_mod
 echo "$mod" > /tmp/aura/wacom_mod
 
+## Orienting on inner half-circle due to hands position
 case "$mod" in
-scale|*) wacom "$WPAD" <<< '
+rotate) fled 1; wacom "$WPAD" <<< '
+    Button  1    "key 5"  # reset
+    AbsWheelDown "key 6"  # right
+    AbsWheelUp   "key 4"  # left
+';;
+undo) fled 3; wacom "$WPAD" <<< '
+    Button  1    "key E"  # brush/erase
+    AbsWheelDown "key +Control_L Z -Control_L"        # prev
+    AbsWheelUp   "key +Control_L shift Z -Control_L"  # next
+' ;;
+brush) fled 0; wacom "$WPAD" <<< '
+    Button  1    "key E"  # brush/erase
+    AbsWheelDown "key ["  # small
+    AbsWheelUp   "key ]"  # big
+' ;;
+layer) fled 2; wacom "$WPAD" <<< '
+    Button  1    "key E"  # brush/erase
+    AbsWheelDown "key PgDn"
+    AbsWheelUp   "key PgUp"
+' ;;
+color) wacom "$WPAD" <<< '
+    Button  1    "key X"  # swap b/f
+    AbsWheelDown "key K"  # dark
+    AbsWheelUp   "key L"  # light
+' ;;
+opacity) wacom "$WPAD" <<< '
+    Button  1    "key E"  # brush/erase
+    AbsWheelDown "key I"  # opaque
+    AbsWheelUp   "key O"  # transparent
+' ;;
+zoom) wacom "$WPAD" <<< '
+    Button  1    "key E"  # brush/erase
     AbsWheelDown 5
-    AbsWheelUp 4
+    AbsWheelUp   4
 ' ;;
-  brush) wacom "$WPAD" <<< '
-    AbsWheelDown "key ["
-    AbsWheelUp "key ]"
-' ;;
-esac
+*) esac
 
-wnotify "Mode <b>$mod</b>"
+case "$arg" in -s) echo "$mod" ;; -q) ;; *) wnotify "Mode <b>$mod</b>" ;; esac
 

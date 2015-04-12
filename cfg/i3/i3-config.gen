@@ -205,12 +205,14 @@ w_header "Containers: Border Style"
 
 w_header "Wacom: Submenu"
     # window border style 'border <normal|1pixel|none|pixel>'
-    wmode_begin "$mod+Insert" 'wacom' "Wacom : <1-4> [n]ext "
+    wmode_begin "$mod+Insert" 'wacom' "Wacom : <1-4> [n]ext, [m]ode, [c]urve, [o]utput"
         # wmapf "$ts %%1 border pixel %%1 ,$def" 1 2 3 4
         # wlistf "$ts %s border %s, $def" "\$mod+b n p h" \
         #     toggle normal 1pixel none
-        wstr "$ts m $exno ~/aura/airy/cfg/wacom/ctl/change-mode ,$def"
-    wmode_end
+        wstr "$ts o $exno ~/aura/airy/cfg/wacom/ctl/change-output ,$def"
+        wstr "$tod+m $exno ~/aura/airy/cfg/wacom/ctl/change-mode -q && \$upd wnd ,$def"
+        wstr "$tod+s $exno ~/aura/airy/cfg/wacom/ctl/change-curve  ,$def"
+    wmode_end "$mod+Insert"
 
 wprf "\n### =================== System ===================== ###\n"
 w_header "Mode: System"
@@ -324,6 +326,7 @@ w_header "Windows: Settings"
         'class="(?i)'"$term"'" instance="(?i)^Float*"' \
         'class="^Transmission-gtk"'
     wstr 'for_window [title="^Transmission" class="^Transmission-gtk" instance="^transmission-gtk"] move scratchpad'
+    wstr 'for_window [class="^Overly.py"] floating enable, border pixel 1'
 
 
 

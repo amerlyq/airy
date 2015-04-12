@@ -1,0 +1,40 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+# Uzbl: http://www.uzbl.org
+# surf: http://surf.suckless.org
+# jumanji: https://pwmt.org/projects/jumanji
+# luakit: https://mason-larobina.github.io/luakit
+# vimium: http://vimium.github.io
+# cVim (active): https://github.com/1995eaton/chromium-vim
+# pentadactyl (vimperator fork): http://5digits.org/pentadactyl
+
+apt_noprompt "libsoup2.4-dev libwebkit-dev libgtk-3-dev libwebkitgtk-3.0-dev"
+git_install 'fanglingsu/vimb'
+
+# privoxy
+#   http://www.privoxy.org/user-manual/quickstart.html
+#   https://projects.zubr.me/wiki/adblock2privoxy
+sudo groupadd -g 206 privoxy
+sudo useradd -u 206 -g 206 -c "Web Proxy" -d /dev/null -s /bin/false privoxy
+apt_noprompt 'privoxy'
+
+# /etc/privoxy/config as its main configuration file.
+# /etc/init.d/privoxy start
+# sudo service privoxy start
+# MORE
+#   https://easylist.adblockplus.org/en/
+#   https://adblockplus.org/ru/subscriptions
+#   https://code.google.com/p/ruadlist/wiki/adblock_plus_installation
+# SEE  https://adblockplus.org/forum/viewtopic.php?f=2&t=3486
+git_install 'Andrwe/privoxy-blocklist' -d
+cd "$CURR_PKG_DIR"
+# ./privoxy-blocklist.sh
+# 2) edit /etc/conf.d/privoxy-blacklist, and uncomment the line that says "PRIVOXY_USER=" and the two lines below it.
+# 3) Run the script again to download and install the blocklists.
+# 4) restart privoxy.
+# https://clodaroundtheglobe.wordpress.com/2012/07/06/configure-tor-for-bash-on-debian-linux-distor/
+
+# Cosider using preload and polipo together with privoxy

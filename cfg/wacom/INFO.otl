@@ -61,31 +61,12 @@ SETS
 	http://www.tldp.org/HOWTO/pdf/Wacom-Tablet-HOWTO.pdf
 	https://wiki.archlinux.org/index.php/Wacom_Tablet#Pressure_curves
 
-WACOM_NM="Wacom Intuos Pro S Pen pad"
-cat - << EOT | while read line; do echo "$WACOM_NM" $line; done
-	Button 1 "key p"      # Paintbrush
-	Button 2 "key ctrl z" # Undo
-	Button 3 "key KP_Next"
-	Button 4 "key KP_Prior"
-	Button 5 "key shift control left"  # prev/next brush (must be mapped in GIMP; disables float)
-	Button 6 "key shift control right"
-	Button 7 "key tab" # toggle docks
-	Button 8 "key F11" # fullscreen
-
-	Button 1 "key ctrl t"    # key combination for toggle touch script
-	Button 2 "key backspace" #
-	Button 3 3               # right mouse click
-	Button 4 1               # left mouse click
-
 	RelWheelDown   "key minus"		# Zoom out
 	RelWheelUp     "key plus"		# Zoom in
-	AbsWheelDown   "key ctrl shift s"
-	AbsWheelUp     "key ctrl shift s"
 	StripLeftDown  "key minus"      # zoom out
 	StripLeftUp    "key shift plus" # zoom in
 	StripRightDown "key alt down"   # brush radius (must be mapped in GIMP)
 	StripRightUp   "key alt up"
-EOT
 
 
 Portret regime for tablet -- read and create appropriate matrix to map only _part_ of monitor
@@ -97,6 +78,16 @@ Portret regime for tablet -- read and create appropriate matrix to map only _par
 	TwinView
 	 http://linuxwacom.sourceforge.net/index_old.php/howto/multimonitor
 		https://bbs.archlinux.org/viewtopic.php?pid=797617
+
+Area shrink (to keep aspect ration)
+: xsetwacom --set "Your device name here" ResetArea
+: xsetwacom --get "Your device name here" Area
+	AREAX=16704
+	AREAY=12064
+: New values respecint aspect ratio:
+	RATIOAREAY=$(( AREAX * HEIGHT / WIDTH ))
+	RATIOAREAX=$(( AREAY * WIDTH / HEIGHT ))
+	xsetwacom --set "$DEVICE" Area 0 0 "$NEWAREAX" "$NEWAREAY"
 
 
 Also need profile with default settings

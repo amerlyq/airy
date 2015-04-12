@@ -11,14 +11,12 @@ LST="$LST scrot cups-pdf sxiv fbreader xbacklight"
 # cups-pdf  # virtual pdf printer
 # sxiv      # Image-thumbnail viewer, vim-like, ALT OLD: xzgv
 
-LST="$LST rxvt-unicode-256color mpv suckless-tools surf"
+LST="$LST rxvt-unicode-256color mpv suckless-tools "
 # urxvt | fast terminal, allowing vim-like tabs, show pictures in w3m browser
 # tabbed | (from suckless-tools) generic tabbed fronted for surf, st, uzbl, urxvt and xterm
-# surf | one-go www browser
 
 apt_noprompt $LST
 
 git_install 'matimatik/fbless'
 
-apt_noprompt "libsoup2.4-dev libwebkit-dev libgtk-3-dev libwebkitgtk-3.0-dev"
-git_install 'fanglingsu/vimb'
+
