@@ -40,7 +40,16 @@ then
 
     pairLink ~/.config/dunst/dunstrc "${CONF_DIR}/Xrc/dunstrc"
     pairLink ~/.config/vimb/config "${CONF_DIR}/sets/vimb.conf"
-    pairLink ~/.config/vimb/style.css "${CONF_DIR}/sets/vimb-style.css"
+
+
+    case ${1:-$CURR_THEME} in
+    light)
+        pairLink ~/.config/vimb/style.css "${CONF_DIR}/sets/vimb-theme-light.css"
+    ;;
+    dark|*)
+        pairLink ~/.config/vimb/style.css "${CONF_DIR}/sets/vimb-theme-dark.css"
+    ;;
+    esac
 fi
 
 if [ "$CURR_PLTF" == "MINGW" ]

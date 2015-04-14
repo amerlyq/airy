@@ -89,10 +89,11 @@ if [ "${CURR_PLTF}" != "MINGW" ] || [ $CLEAN_INSTALL -eq 1 ] ; then
     dst=~/.bash_export
     wbegin
     "$DEPLOY_DIR/profile_export" "$PROFILES_DIR" "$CURR_PROF"
-    case "$1" in light|dark|transparent|opaque)
+    CURR_THEME="$1"
+    case "$CURR_THEME" in light|dark|transparent|opaque)
         sed -i "/^export CURR_PROF/a \
-export CURR_THEME=$1" "$dst"
-        echo ">>>>>>>>>>> Used '$1' theme for all apps"
+export CURR_THEME=$CURR_THEME" "$dst"
+        echo ">>>>>>>>>>> Used '$CURR_THEME' theme for all apps"
     ;; esac
 fi
 source ~/.bash_export
@@ -104,7 +105,7 @@ echo 'Launching scripts...'
 
 case "${CURR_PLTF}" in
     MINGW) "$DEPLOY_DIR/symlinks.sh" ;;
-    Linux) $DEPLOY_DIR/symlinks.sh | sed -e "s@/home/$CURR_USER/@@g" | column -t ;;
+    Linux) $DEPLOY_DIR/symlinks.sh "$CURR_THEME" | sed -e "s@/home/$CURR_USER/@@g" | column -t ;;
 esac
 
 #TODO: Move this into pristine.d/vim.pr

@@ -20,7 +20,7 @@ CONF=~/.config/.synergy.conf
 if [ "$CURR_PROF" == "laptop" ]; then CLI=0; else CLI=1; fi
 
 if [ "$1" == "d" ]; then MODE='-f'; else MODE='--daemon'; fi
-if [ $CLI -eq 1 ]; then PR=synergyc; LARGS=$LOCAL_SIP; else PR=synergys; LARGS="-c $CONF"; fi
+if [ $CLI -eq 1 ]; then PR=synergyc; LARGS=$LAPT_IPL; else PR=synergys; LARGS="-c $CONF"; fi
 
 LST=$(pgrep $PR)
 if [ -n "$LST" ]; then kill -s SIGTERM $LST; fi

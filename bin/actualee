@@ -21,6 +21,7 @@ case "$NAME" in  # Names
     sh) "$FL" && wpause   ;;
     py) python "$FL"      ;;
     dot) dot -Tx11 "$NM"  ;;
+    md) pandoc -o /tmp/pandoc.html "$FL" && x-www-browser /tmp/pandoc.html ;;
 
     # Launched w/o fork, because of poor cmd support: it opens new instance of
     # XMind instead of adding file to opened

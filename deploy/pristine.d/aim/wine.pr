@@ -4,6 +4,9 @@
 source ~/.bash/functions.d/packages
 if [ $? -ne 0 ]; then exit 1; fi
 
+# MAN:
+#     http://mintgeek.ru/2011/06/12/kak-ustanovit-witcher-2-v-linux-mint/
+
 LST="$LST wine winetricks playonlinux"
 # playonlinux ktouch
 # winetricks | only for x86
@@ -36,6 +39,9 @@ echo "
 # now run
 # wine /path/to/domdomsoft.exe
 
+# Install vcrun2010:
+#   you need configure 'winecfg' to Window7, and in libraries choose 'builtin then native'
+#   then you will be able to install vcrun2010 through 'winetricks'
 
 
 
