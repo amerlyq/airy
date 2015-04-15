@@ -23,9 +23,9 @@ RMDIR=/home/shared
 # sed "w /tmp/usb-all.log" | sed "$FILTER; w /tmp/usb-filter.log"
 BODY='{ pn=pf; pf=0; print $0 > fa }
 
-    /\s*E\/|\[TUNER\]|\[DWS-FRAMEWORK\]|\[SNAP\]\
-|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|sd_notify\
-|^Thrift|^Starting|^Started|^\[DLOG\]/ {
+    /\s*E\/|\[TUNER[^\[\]]*\]|\[DWS-FRAMEWORK\]|\[SNAP\]\
+|tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|sd_notify|launch-helper\
+|^Thrift|^Starting|^Started|\[DLOG\]|tvtuner|TD_SOUND/ {
         pf=1; printf "."
     }
 

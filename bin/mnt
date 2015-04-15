@@ -7,21 +7,30 @@
 # https://ru.wikipedia.org/wiki/Mount
 
 # Disk mounting util
-if [ ${#1} -eq 1 ]; then ACTION=${1}; shift; else ACTION=m; fi
+if [ ${#1} -le 2 ]; then ACTION=${1}; shift; else ACTION=m; fi
 LABELS="$@"
 MNT="/media/$CURR_USER"
 
 dosamba() {
     local dir="$1" usr="$2" shr="$3"
-    sudo mkdir -p "$dir" || sudo mkdir -p "$dir"
+    mkdir -p "$dir" || sudo mkdir -p "$dir"
     sudo mount -t cifs -o user="$usr" //$shr/ "$dir"
+}
+
+doloop() {
+    local iso="${1?Need iso name}" dir
+    dir="$MNT/${iso##*/}"; dir="${dir%.*}"
+    mkdir -p "$dir" || sudo mkdir -p "$dir"
+    echo "$dir"
+    sudo mount -o loop "$iso" "$dir"
 }
 
 case "$ACTION" in
     l)  ls --color=auto "$MNT"; exit ;;
-    # s-file.surc.kiev.ua/{exchange,projects,install}
-    s)  dosamba "$MNT/seclab"  ${WORK_MAIL%@*} $SURC_SRV/Exchange ;; #Books, ${WORK_MAIL%@*}
+    o)  doloop "$LABELS" ;;
+    s)  dosamba "$MNT/seclab"  ${WORK_MAIL%@*} $SURC_SRV/Exchange ;; #{Books,${WORK_MAIL%@*}}
     sa) dosamba /media/android $ADR_USER $ADR_IPL ;;
+    si) dosamba "$MNT/install" ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;; #{exchange,projects,install}
     *) printf "Choose from:\n" && cd /dev && ls --color=auto /dev/disk/by-label && ls --color=auto sd?[0-9] ;;
 esac
 
