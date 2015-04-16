@@ -1,0 +1,5 @@
+
+# /etc/udev/rules.d/20-FTDI-serial.rules
+
+
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="0403", SYMLINK+="serial/tv-board", MODE:="0666"

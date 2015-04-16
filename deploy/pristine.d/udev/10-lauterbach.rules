@@ -1,0 +1,4 @@
+
+# /etc/udev/rules.d/10-lauterbach.rules
+
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="0897", SYMLINK+="lauterbach/trace32/%k", MODE:="0666"

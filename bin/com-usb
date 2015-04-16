@@ -2,9 +2,12 @@
 # To use minicom in interactive regime, disable HW flow control, as our COM
 # doesn't have neccessary wires and never receives "OK to send" signal.
 
+# PORT=/dev/ttyUSB0
+PORT=/dev/serial/tv-board   # Set-up by udev rule
+
 # Dump params, -g -- print bit-str
 #   sudo stty -a -F /dev/ttyUSB0
-sudo stty -F /dev/ttyUSB0 115200 rows 0 columns 0 line 0 min 1 time 5 \
+sudo stty -F "$PORT" 115200 rows 0 columns 0 line 0 min 1 time 5 \
     -parenb -parodd cs8 -hupcl -cstopb cread clocal crtscts \
     ignbrk -brkint -ignpar -parmrk -inpck -istrip \
     -inlcr -igncr -icrnl -ixon -ixoff -iuclc -ixany -imaxbel -iutf8 \
@@ -55,7 +58,7 @@ ssh srk 'LOGDUMP="'$RMDIR/show-log'"
 # Filtering Serial output
 #ALT (ansifilter): stdbuf -oL -eL tr -cd "[:print:]\033\n"
 #OR (to disable buffering completely): stdbuf -i0 -o0 -e0 command
-sudo cat /dev/ttyUSB0 | ansifilter |
+sudo cat "$PORT" | ansifilter |
     awk -v fa="$DIR/$FA" -v ff="$DIR/$FF" "$BODY"
 
 
