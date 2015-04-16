@@ -6,10 +6,6 @@ nnoremap <Leader>tb :TagbarToggle<CR>
 let g:lt_location_list_toggle_map = '\l'
 let g:lt_quickfix_list_toggle_map = '\q'
 
-"To stop vim-rooter changing directory automatically
-let g:rooter_manual_only = 1
-nmap <silent> <Leader>cd <Plug>RooterChangeToRootDirectory
-
 " }}}
 
 

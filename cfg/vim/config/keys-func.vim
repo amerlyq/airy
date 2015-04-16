@@ -2,9 +2,6 @@
 cnoremap E!! e !sudo tee %
 cnoremap W!! w !sudo tee % >/dev/null
 
-" Change Working Directory to that of the current file
-noremap \cwd :lcd %:p:h
-
 " generate 'tags' file: obsolete by easytags
 nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
 
