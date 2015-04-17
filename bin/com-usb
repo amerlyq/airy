@@ -2,8 +2,8 @@
 # To use minicom in interactive regime, disable HW flow control, as our COM
 # doesn't have neccessary wires and never receives "OK to send" signal.
 
-# PORT=/dev/ttyUSB0
-PORT=/dev/serial/tv-board   # Set-up by udev rule
+PORT=/dev/ttyUSB0
+# PORT=/dev/serial/tv-board   # Set-up by udev rule
 
 # Dump params, -g -- print bit-str
 #   sudo stty -a -F /dev/ttyUSB0
@@ -24,7 +24,10 @@ FF=usb-filter.log
 RMDIR=/home/shared
 
 # sed "w /tmp/usb-all.log" | sed "$FILTER; w /tmp/usb-filter.log"
-BODY='{ pn=pf; pf=0; print $0 > fa }
+BODY='
+# BEGIN { t32wait = 1 }
+# { if(t32wait) { system("~/aura/devq/kernel/helpers/t32/t32stop"); t32wait=0 } }
+{ pn=pf; pf=0; print $0 > fa }
 
     /\s*E\/|\[TUNER[^\[\]]*\]|\[DWS-FRAMEWORK\]|\[SNAP\]\
 |tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|sd_notify|launch-helper\
@@ -48,8 +51,8 @@ ssh srk 'LOGDUMP="'$RMDIR/show-log'"
     >'$RMDIR/$FF' '
 
 # Send log by ssh
->"$DIR/$FA"
-{ tailf "$DIR/$FA" | ssh srk "awk -v fa=\"$RMDIR/$FA\" -v ff=\"$RMDIR/$FF\" '$BODY'"; } &
+# >"$DIR/$FA"
+# { tailf "$DIR/$FA" | ssh srk "awk -v fa=\"$RMDIR/$FA\" -v ff=\"$RMDIR/$FF\" '$BODY'"; } &
 
 # Ping board to prevent sleep? Don't work.
 # PING=~/work/sip/scripts/arm-connect.sh
