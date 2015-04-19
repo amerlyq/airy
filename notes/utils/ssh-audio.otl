@@ -15,6 +15,9 @@ Stream:
 		ssh <user>@<remotehost> ffmpeg -f alsa -ac 1 -i hw:3 -f ogg - | mplayer - -idle -demuxer ogg
 		dd if=/dev/dsp | ssh -c arcfour -C username@host dd of=/dev/dsp
 
+		OR
+			arecord -c 1 -r 32000 | ssh <user>@<server> 'mplayer -demuxer rawaudio -rawaudio channels=1:rate=32000:samplesize=1 -nocache -'
+
 
 
 	Show text on the host

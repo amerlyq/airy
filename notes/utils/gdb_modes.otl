@@ -9,6 +9,9 @@
 	| set logging overwrite [on|off] | To overwrite logfile each time (default: append)
 	| set logging redirect [on|off]  | Log only to logfile (default: both terminal and logfile)
 
+	Process output redirection
+		http://stackoverflow.com/questions/593724/redirect-stderr-stdout-of-a-process-after-its-been-started-using-command-lin/593764#593764
+		https://blogs.oracle.com/ahl/entry/inside_nohup_p
 
 ### C++ classes, etc ###
 | list class::member		 | list member in class
@@ -137,6 +140,7 @@
 
 
 ### Remote debugging ###
+: https://sourceware.org/gdb/onlinedocs/gdb/Server.html
 : - GDB runs on one machine (host) and the program being debugged
 :		(exe.verXYZ.stripped ) runs on another (target).
 : - GDB communicates via Serial or TCP/IP.

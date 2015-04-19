@@ -49,6 +49,9 @@ vnoremap <unique> <Leader>cx  :s;;;g<CR>
 
 vnoremap <unique> <Leader>cv :<C-U>%s;;<C-R>=GetVisualSelection("")<CR>;g<CR>
 
+" Search opened buffers
+" http://vim.wikia.com/wiki/Search_using_quickfix_to_list_occurrences
+" :bufdo vimgrepadd threading % | copen
 
 ": Remove empty lines
 command -bar -range=% RemoveEmptyLines <line1>,<line2>s:.\n\zs\s*\n\ze.\|^\s*\n\s*\_$::

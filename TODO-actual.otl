@@ -108,10 +108,11 @@ vim:
 		2015-03-18 [X] mappings to move between loci of entries of qf/loc list
 		2015-03-17 [X] move to next/prev change in git signify (Use: ]c [c)
 		2015-03-17 [X] move to next/prev spellchecking error (Use: ]s [s z=)
-	[_] Autocopying on focus lost/gain
+	> [_] Autocopying on focus lost/gain
 	: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
 		au FocusLost   * silent! call CopyStringInReg('"', @+)
 		au FocusGained * silent! call CopyStringInReg('+', @")
+		: and autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
 	[_] easymotion
 		2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
 			No combining -- overlapping x-mappings aren't possible
@@ -131,6 +132,8 @@ vim:
 	[_] Autoreplacing: choose delimiter from [:|/;@] on ,cc ,cy depending on expression
 		 Or escape delimiter symbols in expression
 	[_] Delay on saving -- by means of syntastic -- move it in asynchronous mode
+	[_] Copy-Paste w/o newline
+		http://www.vim.org/scripts/script.php?script_id=3355
 
 
 
@@ -308,8 +311,11 @@ gdb
 
 wacom
 	[X] profile auto switching
-	[$] focus event instead of timer
-		setup arch beforehand to upgrade i3, if not use xmonad?
+	[~] focus event instead of timer
+		: setup arch beforehand to upgrade i3, if not use xmonad?
+		https://metacpan.org/pod/AnyEvent::I3
+		https://i3wm.org/docs/ipc.html#_window_event
+
 	[_] circlet-modes
 		[_] <C-z> <C-r> on 4 5
 	[_] setup krita
@@ -330,6 +336,8 @@ Arch bang
 		http://joaquinlp.me/blog/your-guide-to-a-damn-light-arch-linux-with-i3-and-text-apps/
 	Read
 		https://wiki.archlinux.org/index.php/pacman
+	Colemak?
+		http://forum.colemak.com/viewtopic.php?id=1808
 
 READ (blogs -- downloaded)
 	http://duartes.org/gustavo/blog/archives/
