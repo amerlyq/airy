@@ -6,8 +6,10 @@ let g:signify_sign_delete = '-'
 noremap <unique> <leader>tg :<C-u>SignifyToggle \| redraw!<CR>
 noremap <unique> <leader>tG :<C-u>SignifyToggleHighlight \| redraw!<CR>
 
-nmap <unique> ]c <Plug>(signify-next-hunk)
-nmap <unique> [c <Plug>(signify-prev-hunk)
+"" Already mapped
+" nmap <unique> ]c <Plug>(signify-next-hunk)
+" nmap <unique> [c <Plug>(signify-prev-hunk)
+
 " If those ]c will be busy, then signify automaps:
 " nmap <leader>gj <plug>(signify-next-hunk)
 " nmap <leader>gk <plug>(signify-prev-hunk)

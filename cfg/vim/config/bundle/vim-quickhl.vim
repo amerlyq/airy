@@ -13,8 +13,8 @@ xmap <Leader><C-l> <Plug>(quickhl-manual-reset)
 
 "" Disabled: unusable on big tag base (like kernels)
 " nmap g<Leader>] <Plug>(quickhl-tag-toggle)
-
-map gs <Plug>(operator-quickhl-manual-this-motion)
+"" Disabled: Collide with sideways.vim
+" map gs <Plug>(operator-quickhl-manual-this-motion)
 
 
 " let g:quickhl_manual_colors = [

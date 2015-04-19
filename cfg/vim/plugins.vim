@@ -211,7 +211,12 @@ NeoBundle 'tpope/vim-surround'
 " Use CTRL-A/X to increment dates, times, and more
 NeoBundle 'tpope/vim-speeddating'
 " Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
-NeoBundle 'PeterRincker/vim-argumentative'
+" NeoBundle 'PeterRincker/vim-argumentative'
+" Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
+NeoBundle 'AndrewRadev/sideways.vim'
+" Exchange text: cx{motion} on first, then cx{motion} on other.
+"   cxx -- current line, X -- Visual mode,  cxc -- clear pending exchange.
+NeoBundle 'tommcdo/vim-exchange'
 
 " DEPEND BY: vim-clang-format
 NeoBundle 'kana/vim-operator-user'
