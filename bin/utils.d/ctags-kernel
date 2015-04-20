@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+EFL=.ctags_exclude
+> "$EFL"
+printf "drivers/*\nsound/*\ntags\n" >> "$EFL"
+find arch -mindepth 1 -maxdepth 1 -type d ! -name arm -printf "%p/*\n" >> "$EFL"
+
+ctags-exuberant --verbose --recurse --excmd=number --sort=foldcase --tag-relative --fields=+nS --exclude=@"$EFL"
