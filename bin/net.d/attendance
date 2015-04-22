@@ -7,9 +7,12 @@ parse(){ sed -r ' /(([0-9]{2}:?){3})/s//\n\1 \n/g' | sed -rn '
 }
 
 # IE: -A "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko"
-curl -q --ntlm --user "${WORK_MAIL%%@*}" "${WORK_SRV_ATTEND}" |
-    sed -r '/^<div id="masterViewContent">/,/^<\/div>/!d' | w3m -T text/html | cat
-
+if [ "$1" == -v ]; then
+    curl -q --ntlm --user "${WORK_MAIL%%@*}" "${WORK_SRV_ATTEND}" | vimb -
+else
+    curl -q --ntlm --user "${WORK_MAIL%%@*}" "${WORK_SRV_ATTEND}" |
+        sed -r '/^<div id="masterViewContent">/,/^<\/div>/!d' | w3m -T text/html | cat
+fi
 
 # Basic    # -b "$cook" --cookie "$cook"
 #   curl -q --ntlm --user "${WORK_MAIL%%@*}" "${WORK_SRV_ATTEND}" 2>/dev/null | sed -r '/^<div id="masterViewContent">/,/^<\/div>/!d' | \w3m -T text/html | cat
