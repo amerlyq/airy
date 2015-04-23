@@ -41,3 +41,6 @@ javac -version
 #   sudo apt-get install oracle-java8-installer
 ### FROM: http://rootzwiki.com/topic/23008-howto-install-java-7-on-ubuntu-1204/
 
+## for java8 -- dld from site. If VM can't start -- you must unpack it's files.
+# find . -type f -name '*.pack' | while read fl; do sudo ./bin/unpack200 $fl ${fl%.*}.jar; done
+
