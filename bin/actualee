@@ -19,7 +19,6 @@ case "$NAME" in  # Names
 *) case "$EXT" in  # Extensions
 
     sh) "$FL" && wpause   ;;
-    py) python "$FL"      ;;
     dot) dot -Tx11 "$NM"  ;;
     md) pandoc -o /tmp/pandoc.html "$FL" && x-www-browser /tmp/pandoc.html ;;
 
@@ -33,9 +32,13 @@ case "$NAME" in  # Names
         application/x*) "$FL"  ;;
                text/x*) "$FL" && wpause  ;;
                video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
+        *) case "$EXT" in  # Extensions
 
-        *) { stat -c '%A' "$FL" | grep -q x; } && "$FL" ;;
+            py) python "$FL"      ;;
 
+        *) { stat -c '%A' "$FL" | grep -q x; } && "$FL"
+        esac
+        ;;
     esac
     ;;
 esac
