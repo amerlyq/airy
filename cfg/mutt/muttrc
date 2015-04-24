@@ -39,6 +39,7 @@ set abort_nosubject=yes
 # set copy = no
 set move = no
 set imap_keepalive = 900
+set ssl_starttls = yes
 set ssl_force_tls = yes
 
 # Automatically include message when replying
@@ -79,7 +80,7 @@ unset pop_delete
 
 # SMTP
 # set smtp_url = smtps://$imap_user@smtp.gmail.com:587
-set smtp_url = smtps://$pop_user@`echo ${WORK_SRV_SMTP}`
+set smtp_url = smtp://$pop_user@`echo ${WORK_SRV_SMTP}`
 
 
 ## DIRS
@@ -102,7 +103,8 @@ macro index <f3> "<change-folder>$pop_host<enter>"
 #source $alias_file
 
 ## THEME
-source ~/pkg/mutt-colors-solarized/mutt-colors-solarized-light-16.muttrc
+# source ~/pkg/mutt-colors-solarized/mutt-colors-solarized-light-16.muttrc
+source ~/pkg/mutt-colors-solarized/mutt-colors-solarized-dark-16.muttrc
 
 ## COMMANDS
 mailboxes +inbox
