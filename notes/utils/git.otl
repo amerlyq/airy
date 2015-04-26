@@ -3,6 +3,7 @@ Cool manual
 	vizualization: gource
 	gource --seconds-per-day 1 1920x1080 --auto-skip-seconds 1 --multi-sampling --stop-at-end --highlight-users --hide mouse,progress --file-idle-time 13 --max-files 0 --background-colour 000000 --font-size 20 --output-ppm-stream output.ppm --output-framerate 30 --hide-filenames ~/PathToGIT/.git/
 	ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i output.ppm  -vcodec libx264 -preset ultrafast -pix_fmt yuv420p -threads 3 -bf 0 gource.avi
+	>>> BEST: https://github.com/tiimgreen/github-cheat-sheet
 
 git difftool -t meld <commit> <commit> [<path_to_file_to_compare>]
 
@@ -39,7 +40,15 @@ Delete
 	Delete a remote branch, e.g. in Github:
 		git push origin :some_branch_name
 
-git reflog ?
+dig through all the commits, even ones that were no longer part of the log
+because of an accidental overwriting during interactive rebasing
+	git reflog
+lists you all the blobs associated with the repo path
+	git rev-list --all --objects -- path/to/file.txt
+To get a specific version of a file
+	git cat-file -p commitid:path/to/file.txt
+< See composition of those methods inside 'piony/scripts/show-changelog'
+
 
 Fork and Pull request
  http://wiki.apache.org/couchdb/ContributorWorkflow

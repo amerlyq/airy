@@ -20,11 +20,12 @@ let g:jedi#documentation_command = "<Leader>jr"
 let g:jedi#usages_command = "<Leader>ju"
 let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<Leader>jr"
-let g:jedi#show_call_signatures = "1"
+let g:jedi#show_call_signatures = "0"
 
 " jedi.preload_module('os', 'sys', 'math', 'whatever_module_you_want')
 
-if 0
+
+
 " Python-mode {{{1
 
 " Keys:
@@ -47,14 +48,22 @@ let g:pymode_rope_complete_on_dot = 0
 
 " Documentation
 let g:pymode_doc = 0
-let g:pymode_doc_key = 'K'
+" let g:pymode_doc_key = 'K'
 
 " Linting (code checking)
 let g:pymode_lint = 1
-let g:pymode_lint_checker = "pyflakes,pep8"
-" let g:pymode_lint_ignore="E501,W601,C0110"
+let g:pymode_lint_checker = "pylint,pep8"
+let g:pymode_lint_ignore="E266,E501"
+"E266,E501 -- multiple '#' in comments and line width > 80
+"W391 -- empty line at EOF, better keep it enabled for fluent git auto-merge
+"W601,C0110
+
+let g:pymode_lint_cwindow = 1
+let g:pymode_lint_signs = 1
+
+
 " Auto check on save
-let g:pymode_lint_write = 1
+let g:pymode_lint_write = 0
 
 " Support virtualenv
 let g:pymode_virtualenv = 1
@@ -62,7 +71,7 @@ let g:pymode_virtualenv = 1
 " Enable breakpoints plugin
 let g:pymode_breakpoint = 1
 " inserts import pdb; pdb.set_trace() ### XXX BREAKPOINT into your code
-let g:pymode_breakpoint_key = '<leader>b'
+" let g:pymode_breakpoint_key = '<leader>b'
 
 " syntax highlighting
 let g:pymode_syntax = 1
@@ -74,4 +83,7 @@ let g:pymode_syntax_space_errors = g:pymode_syntax_all
 let g:pymode_folding = 0
 let g:pymode_run = 0
 
-endif
+" let g:pymode_lint_options_pep8 =
+"     \ {'max_line_length': g:pymode_options_max_line_length})
+" let g:pymode_lint_options_pylint =
+"     \ {'max-line-length': g:pymode_options_max_line_length})

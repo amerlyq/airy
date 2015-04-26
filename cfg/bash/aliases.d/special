@@ -68,14 +68,9 @@ alias mount='mount |column -t'
 alias mountl='sudo fdisk -l'
 # echo "alias firefox='nohup firefox &>/dev/null'" >> /etc/commonrc
 
-
 hi() { if [ -z "$@" ]; then history | tail -20; else
     history | sed 's/^\s*\(\d\+\)\s*\(.*\)$/\2 #\1' | sort -u | agi $@;
 fi; }
-
-# old=$1, new=$2 -r | recursively  # -l | print filenames
-sed_dir() { grep -rl "\<${1?Need word}\>" ./* | xargs sed -i "s@\<$1\>@$2@g"; }
-
 
 # For 'reu' investigation tool in ~/.bin
 for i in n s o b x l; do
@@ -83,8 +78,3 @@ for i in n s o b x l; do
 done
 
 
-# Very useful and nut aliases:
-# http://brettterpstra.com//2013/03/31/a-few-more-of-my-favorite-shell-aliases/
-# new commands
-# alias susp="sudo pm-suspend && xlock -mode matrix"
-# alias wifi="sudo netctl-auto switch-to"

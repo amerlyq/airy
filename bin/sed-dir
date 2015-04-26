@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+case "$1" in -*) KEY="$1"; shift ;; esac
+
+OLD="${1?Need old regex}"
+NEW="$2"
+HL="$OLD"
+
+case "$KEY" in
+-r) ag -l "$OLD" | xargs sed -i "/$OLD/s//$NEW/g" ;;
+-s) # If NEW=="" then returns empty list: as all OLD was deleted!
+    if [[ -n "$NEW" ]]; then HL="$OLD|$NEW"; fi
+    ag -l "$OLD" | xargs sed -n "/$OLD/s//$NEW/gp" | ag "$HL"
+    ;;
+-f) ag -l "$OLD" ;;
+ *) ag "$HL" ;;
+esac
+

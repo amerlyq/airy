@@ -46,6 +46,12 @@ Latex
 	when you need search package with appropriate file
 		apt-file -x search '/textcomp.sty$'
 
+Total file size
+	estimate
+		find . -type f -name "*.py" -exec du -shc {} + | sed '$!d'
+	exact
+		find . -type f -name "*.otl" -exec ls -l {} + | awk '{sz+=$5}END{print sz}'
+
 Image
 	Get image information
 	; identify -verbose picture.jpg

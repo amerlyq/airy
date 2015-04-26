@@ -49,3 +49,6 @@ let g:syntastic_cpp_config_file = '.sirrc' "'.clang_complete'
 
 " the initial height can be configured:
 let g:syntastic_loc_list_height=5
+
+""" Python """
+let g:syntastic_python_checkers = []

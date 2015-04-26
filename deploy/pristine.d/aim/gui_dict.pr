@@ -4,8 +4,15 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 
 
-apt_noprompt dict dictd dict-moby-thesaurus dict-gcide dict-stardic dict-freedict-eng-rus
+apt_noprompt dict dictd #dict-moby-thesaurus dict-gcide dict-stardic dict-freedict-eng-rus dict-wn dict-devil
+# View list of databases:
+# dict -D
+# Use a particular database eg. for English to Spanish translation:
+# dict -d fd-eng-spa "how are you?"
 
+## CLI online google translation
+# echo "what are you doing" | translate-bin -s google -f en -t ru
+apt_noprompt libtranslate-bin
 
 # apt_noprompt goldendict
 

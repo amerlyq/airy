@@ -1,3 +1,10 @@
 Choose digit column
 	perl -ne '/Node\[(\d+)/ && print $1."\n"'
 
+Sort words in one line
+	perl -ne '$,=" ";print sort split /\s+/'
+
+Join all lines
+	perl -pe'chomp, s/$/,/ unless eof'
+	perl '-peeof||s|$/$|,|'
+	perl -l54 -pe 'eof and $\=""'

@@ -191,8 +191,8 @@ endif
 "" Python =======================
 
 " Temporary disabled. Reported it has perfomance troubles with Jedi.
-" NeoBundle 'klen/python-mode', {
-"   \ 'autoload' : { 'filetypes' : [ 'python' ] } }
+NeoBundle 'klen/python-mode', {
+    \ 'autoload' : { 'filetypes' : [ 'python' ] } }
 NeoBundle 'davidhalter/jedi-vim', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] } }
 
