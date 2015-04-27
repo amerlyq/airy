@@ -80,6 +80,8 @@ i3
 		: there is fullscreen for this
 	[_] Toggle container horizontal autoexpanding (like Mod4+e+[1-4]) when focus
 		: depends on focus events from ipc
+	[_] BUG: when disable/enable HDMI monitor and updated xrandr, i3wm output
+		rect (i3-msg -t get_outputs) shows smaller resolution than actual display
 
 vim:
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
@@ -223,8 +225,10 @@ mutt
 		> https://wiki.archlinux.org/index.php/Mutt
 	2015-04-24 [X] pop3+smtp one-account
 	[_] multi-account
+		http://vsido.org/index.php?topic=618.0
 	[_] passwordless login (smth like private keys?)
 		[_] gpg keyring
+			http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
 		[_] keyring for ssh keys
 	[_] separate mail fetcher
 	[_] separate mail sorter
@@ -388,6 +392,8 @@ TODO
 	git
 		Faster checking if there are new commints in upstream before pull
 			git rev-list HEAD@{upstream}..HEAD
+	Disable boot/login on VGA
+		http://superuser.com/questions/626482/permanently-disable-second-screen
 
 
 DICT : in terminal

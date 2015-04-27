@@ -18,6 +18,8 @@ source ~/.i3/themes/"${thm_nm}.i3"
 
 # ----- Monitors -----
 declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;p;N;s/\n//p')
+if [ "$1" == "-1" ]; then M1="$M2"; fi
+
 if [[ "$M1" && "$M2" ]]; then
     monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"
 elif [[ "$M1" ]]; then
