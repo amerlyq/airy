@@ -83,7 +83,9 @@ i3
 	[_] BUG: when disable/enable HDMI monitor and updated xrandr, i3wm output
 		rect (i3-msg -t get_outputs) shows smaller resolution than actual display
 	2015-03-11 [X] Dont poweroff i3wm if scratchpad isn't empty
-		[_] Allow
+		[_] Allow force closing in i3-input
+	[_] Additional informational bar on the top
+		[_] hidden by default, but when opened, ncmpcpp must migrate onto it
 
 vim:
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
@@ -266,14 +268,16 @@ SECURITY
 ADMIN
 	[_] encrypted git repo -- to store working notes on gitlab instead of evernote
 		[_] http://git-annex.branchable.com/tips/fully_encrypted_git_repositories_with_gcrypt/
-		[_] search about evernote client for linux, which I had mail of
-		[_] geeknote open concrete files
-	[_] myspot -- use curl + Google browser identity + cookies + authorithation to get to http://myspot
+		2015-04-29 [$] search about evernote client for linux, which I had mail of
+		2015-04-29 [$] geeknote open concrete files
+	2015-04-09 [X] myspot -- use curl + Google browser identity + cookies + authorithation to get to http://myspot
 	[_] read about samba and rights for domain users
 		http://www.tldp.org/HOWTO/SMB-HOWTO-8.html
 	[_] setup pidgin
 		<SEE:ALL> https://developer.pidgin.im/wiki/ThirdPartyPlugins
-		[_] extract configs from ~/.purple to <airy>
+		2015-04-29 [X] extract configs from ~/.purple to <airy>
+		[_] attach GnuPG-keyring (but found only pidgin-gnome-keyring)
+			https://github.com/segler-alex/Pidgin-GPG/
 		[_] attach google talks
 			https://support.google.com/a/answer/49147?hl=ru
 		[_] security
@@ -319,6 +323,8 @@ vimb
 		https://wiki.archlinux.org/index.php/Privoxy
 	[_] customized light vim for editing url etc
 		https://github.com/boychi/vimb
+	BUGS:
+		[_] not in every input box works 'C-e' to edit in vim
  you can totally filter HTTPS with a proxy, especially with a local one.
  Either use the option to activate the dump of you keys on disk (a one-liner
  on every browser) and point the proxy to that file, or just break the SSL in

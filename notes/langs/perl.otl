@@ -23,6 +23,55 @@ Good hacks
 
 Man
 	http://www.tutorialspoint.com/perl/perl_regular_expression.htm
+	> http://perldoc.perl.org/perlrequick.html
 
 Tutorials
 	http://www.arl.wustl.edu/projects/fpx/references/perl/cookbook/ch07_08.htm
+
+Using Perl like awk and sed
+	Flags
+		-e is used to specify the expression to evaluate.
+		-n wraps the expression inside a while loop that places each input
+				line into $_ and evaluate the expression.
+		-p wraps the expression inside a while loop, placing each input line
+				into $_, evaluate the expression which manipulates $_, and
+				prints $_, the result.
+		-l makes each print statement output a record separator that is the same as
+				input record separator (newline by default).
+		-Fpattern is used to specify input field separator, much like awk's -F option.
+		-a turns on the autosplit mode, so input fields are placed into @F array.
+
+	Filter
+		cat | egrep 'pattern'
+		cat | awk '/pattern/ { print }'
+		cat | sed -n '/pattern/ p'
+		cat | perl -ne '/pattern/ and print'
+		cat | perl -ne 'print if /pattern/'
+		cat | perl -ne 'if ($_ =~ /pattern/) {print $_}'  # or 'm{pattern}'
+
+	Substitute
+		cat | sed 's/pattern/replacement/flags'
+		cat | perl -pe 's/pattern/replacement/flags'
+		: '$value =~ s/pattern/replacement/flags'
+		: '$value =~ s{pattern}{replacement}flags'
+
+	Columns
+		echo foo bar baz | perl -lane '/foo/ and do { print $F[2]; }'
+		cat /etc/passwd | awk -F: '{ print $1 }'
+		cat /etc/passwd | perl -F: -lane 'print @F[0]'
+		: Note that Perl fields are @F[0], @F[1], ...; awk fields are $1, $2, ... instead.
+		: However, awk $0 (the whole input line) corresponds to $_ in Perl.
+
+	Combine
+		find . | awk -F/ '/hw[0-9]+/ { print $1 }'
+		find . | perl -F/ -lane 'print @F[0] if /hw[0-9]+/'
+
+	Many awk variables have their Perl equivalents as well. However, in order to
+	use them, the -MEnglish flag must be passed to Perl like this:
+		cat | awk '{ print NR, $0 }'
+		cat | perl -MEnglish -ne 'print $NR, " ", $_'
+	Most notably, the commas in the Perl print statement does not normally
+	print out an output field separator. To get a behavior more like awk, do
+	this:
+		cat | awk 'BEGIN { OFS = ": " } { print NR, $0 }'
+		cat | perl -MEnglish -ne 'BEGIN { $OFS = ": " } print $NR, $_'

@@ -1,0 +1,13 @@
+Get your own password
+	; printf "\n>>> Open IExplorer -> and search for someone's profile\n\n"
+	:> Used base64 to encode previous copied value two times, correct value must end by ==
+	; pswd=$(sudo tcpdump -lvvvASs 0 -i eth0 tcp port http | sed -n
+	;    '/.*"USERID":"\(\w\+\)".*/{s//\1/p;q}' | { printf $(base64); } | base64 )
+
+CLI interface
+	определенную реакцию компьютера на какое то событие
+	посылать сообщения по расписанию с использованием cron
+	Например изменить статус и послать сообщение:
+		purple-remote "setstatus?status=available&message=$TEXT"
+	Более сложный вариант со случайной цитатой(найдено на просторах сети):
+		purple-remote "setstatus?status=available&message=$(wget -qO - http://greatwords.ru/random | sed -ne '/quote-p\|info-p/!b;s/<[^>]*>//g;s/ / /g;s/sclear();//;p' | fold -sw 160)
