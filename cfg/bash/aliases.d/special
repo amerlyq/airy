@@ -67,6 +67,9 @@ scptar() {
 alias scpto='scptar -s '
 alias scpfr='scptar '
 
+# Deploy instant server for exposing files in current directory to LAN
+alias http-server='/usr/bin/env python2 -m SimpleHTTPServer 8000'
+
 alias mount='mount |column -t'
 alias mountl='sudo fdisk -l'
 # echo "alias firefox='nohup firefox &>/dev/null'" >> /etc/commonrc
