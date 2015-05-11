@@ -1,10 +1,23 @@
-*,div,pre,textarea,body,input,td,tr,p {
+/* http://www-archive.mozilla.org/unix/customizing.html */
+*:not(img) {
+    font-size: 1.04em;
     background-color: #101010 !important;
-    background-image: none !important;
-    color: #bbbbbb !important;
 }
-h1,h2,h3,h4 {
-    background-color: #101010 !important;
+code,code>* {
+    /* white-space: pre; */
+    /* margin-top: -1.00em; */
+    /* display: block; */
+    font-size: 1.04em !important;
+    font-family: bold !important;
+    color: #ffffff !important;
+}
+div,pre,textarea,body,input,td,tr,p,strong {
+    background-image: none !important;
+    color: #bbccbb !important;
+
+    font-family: PragmataPro !important;
+}
+h1,h2,h3,h4,button {
     color: #b8ddea !important;
 }
 a {
@@ -22,6 +35,7 @@ img {
 img:hover {
     opacity: 1;
 }
+
 ._hintLabel {
     -webkit-transform:translate(-4px,-4px);
     position: absolute;

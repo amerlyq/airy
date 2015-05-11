@@ -1,0 +1,15 @@
+#!/bin/bash
+source ~/.bash/functions
+amScriptDir -s
+if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
+
+case "$1" in
+d|dark) THEME=dark ;;
+l|light) THEME=light ;;
+*) THEME="${CURR_THEME:-dark}"
+esac
+BROWSERS="${PWD%/*}"
+
+pairLink ~/.config/vimb/config    "${BROWSERS}/vimb/config"
+pairLink ~/.config/vimb/dld-start "${BROWSERS}/vimb/dld-start"
+pairLink ~/.config/vimb/style.css "${BROWSERS}/vimb/theme/${THEME}.css"

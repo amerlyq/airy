@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# $VIMB_URI $VIMB_FILE
+
+DIR=~/Downloads/vimb
+# -m -- monitor contiguously
+FL=$(inotifywait -r -t 300 -e close_write "$DIR" 2>/dev/null | sed 's/\sCLOSE_WRITE,CLOSE\s//')
+# [[ $? -eq 0 ]] || exit
+# FL=$(-e open | sed 's/\sOPEN\s//' <<< "$FL")
+
+# inotifywait -t 300 -e attrib "$FL"
+# xdg-open
+[[ $? -eq 0 ]] && zathura "$FL" >/dev/null 2>&1

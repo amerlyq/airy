@@ -4,6 +4,7 @@ amScriptDir -s
 if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
 
 CONF_DIR="${SCRIPT_DIR%/*}/cfg"
+THEME="${1:-${CURR_THEME:-dark}}"
 
 lnLst()
 {   # 1 - dstdir, 2 - srcdir, 3 - fls list
@@ -22,7 +23,7 @@ then
     lnLst ~/.mpv/ mpv/ "config input.conf"
     lnLst ~/.config/copyq/ Win/ "copyq.conf"
     lnLst ~/.config/gtk-3.0/ sets/ "settings.ini"
-    lnLst ~/. sets/ "gtkrc-2.0 dhexrc" #valgrindrc wgetrc
+    lnLst ~/. sets/ "gtkrc-2.0 dhexrc pdbrc" #valgrindrc wgetrc
 
     if [ "$CURR_PROF" == "home" ]; then
         pairLink ~/.mpd/mpd.conf "${CONF_DIR}/sets/mpd-sir.conf"
@@ -31,25 +32,21 @@ then
     fi
 
     pairLink ~/.bin "${CONF_DIR}/../bin"
-    pairLink ~/.dircolors "${CONF_DIR}/bash/dircolors.256dark"
+    pairLink ~/.dircolors "${CONF_DIR}/Xrc/sol/dircolors.ansi-${THEME}"
     pairLink ~/.ncmpcpp/config   "${CONF_DIR}/sets/ncmpcpp.conf"
     pairLink ~/.ncmpcpp/bindings "${CONF_DIR}/sets/ncmpcpp.keys"
-    pairLink ~/.w3m/config "${CONF_DIR}/w3m/config"
-    pairLink ~/.w3m/keymap "${CONF_DIR}/w3m/keymap"
-    pairLink ~/.pentadactylrc "${CONF_DIR}/Win/pentadactylrc"
-
     pairLink ~/.config/dunst/dunstrc "${CONF_DIR}/Xrc/dunstrc"
-    pairLink ~/.config/vimb/config "${CONF_DIR}/sets/vimb.conf"
 
+    BROWSERS="${CONF_DIR}/browser"
+    pairLink ~/.elinks/elinks.conf "${BROWSERS}/elinks/elinks.conf"
+    pairLink ~/.pentadactylrc "${BROWSERS}/firefox/pentadactylrc"
+    pairLink ~/.surf/script.js "${BROWSERS}/surf/script.js"
+    pairLink ~/.surf/style.css "${BROWSERS}/vimb/theme/${THEME}.css"
+    pairLink ~/.w3m/config "${BROWSERS}/w3m/config"
+    pairLink ~/.w3m/keymap "${BROWSERS}/w3m/keymap"
+    pairLink ~/.config/vimb/config "${BROWSERS}/vimb/config"
+    pairLink ~/.config/vimb/style.css "${BROWSERS}/vimb/theme/${THEME}.css"
 
-    case ${1:-$CURR_THEME} in
-    light)
-        pairLink ~/.config/vimb/style.css "${CONF_DIR}/sets/vimb-theme-light.css"
-    ;;
-    dark|*)
-        pairLink ~/.config/vimb/style.css "${CONF_DIR}/sets/vimb-theme-dark.css"
-    ;;
-    esac
 fi
 
 if [ "$CURR_PLTF" == "MINGW" ]
@@ -61,7 +58,7 @@ then
         pairLink "${prtb}\Demons\CopyQ\config\copyq\copyq.conf" "${CONF_DIR}\Win\copyq.conf"
     fi
 
-    pairLink "${HOME}\_pentadactylrc" "${CONF_DIR}\Win\pentadactylrc"
+    pairLink "${HOME}\_pentadactylrc" "${CONF_DIR}\browser\firefox\pentadactylrc"
     pairLink "${HOME}\.vim" "${CONF_DIR}\vim"
     pairLink "${HOME}\.vimrc" "${CONF_DIR}\vim\vimrc"
 

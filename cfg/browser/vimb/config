@@ -1,4 +1,3 @@
-# vim: ft=vim
 #SEE
 # http://thedarnedestthing.com/vimb
 
@@ -14,6 +13,7 @@ nnoremap <C-c> Y
 #nnoremap y Y
 #nnoremap Y y
 
+nnoremap e ;e
 nnoremap ,d :quit<CR>
 nnoremap H <C-o>
 nnoremap L <C-i>
@@ -40,7 +40,7 @@ nnoremap ,ts :set strict-ssl!<CR>
 
 ### Toggle defaults ###
 set statusbar=true
-set strict-focus=true
+set strict-focus=false
 set proxy=false
 set strict-ssl=true
 
@@ -49,9 +49,10 @@ set strict-ssl=true
 set scrollstep=120
 set fontsize=12px
 set home-page=https://google.com/
-set download-path=~/Downloads/vimb
 # set editor-command=gvim -f %s
-set editor-command=x-terminal-emulator -name Float -e vim %s
+# At specified position: -g 78x8+50+20
+set editor-command=x-terminal-emulator -g 78x5 -name Float -e vim +'norm G$' -u ~/.vim/vimrc_basic %s
+set x-hint-command=:sh! curl -e <C-R>% <C-R>;
 set webinspector=true
 
 set smooth-scrolling=true
@@ -67,18 +68,23 @@ set history-max-items=99999
 
 
 ### Hooks ###
-# au DownloadFinished *.pdf shellcmd! open-download.sh
+set download-path=~/Downloads/vimb
+au DownloadStart *.pdf shellcmd! ~/.config/vimb/dld-start
 
 ### Bookmarks ###
 nmap <F2> :open http://www.ex.ua/ru/video/anime<CR>
 
 ### Shortcuts  :open <sc> <string> ###
-shortcut-default du
+shortcut-default gg
 
-shortcut-add gi=https://github.com/search?q=$0
-shortcut-add go=https://encrypted.google.com/search?q=$0
+# --- Everyday ---
+shortcut-add gg=https://encrypted.google.com/search?q=$0
+shortcut-add gh=https://github.com/search?q=$0
 shortcut-add gr=http://srk:1248/source/search?q=&defs=$0&refs=&path=&hist=&type=&project=linux-3.10.28
+shortcut-add wi=http://en.wikipedia.org/w/index.php?title=Special:Search&search=$0
+shortcut-add wa=http://www.wolframalpha.com/input/?i=$0
 
+# --- Others ---
 shortcut-add ab=https://bbs.archlinux.org/search.php?action=search&author=&forums=&search_in=0&sort_by=0&sort_dir=DESC&show_as=topics&keywords=$0
 shortcut-add al=http://www.allmusic.com/search/all/$0
 shortcut-add ar=https://duckduckgo.com/?q=arch%20linux%20$0
@@ -92,8 +98,6 @@ shortcut-add ja=http://www.jango.com/music/$0
 shortcut-add mr=http://www.mrqe.com/search?q=$0
 shortcut-add re=https://duckduckgo.com/?q=review%20$0
 shortcut-add ro=http://www.rottentomatoes.com/search/?search=$0
-shortcut-add wi=http://en.wikipedia.org/w/index.php?title=Special:Search&search=$0
-shortcut-add wo=http://www.wolframalpha.com/input/?i=$0
 shortcut-add yo=http://www.youtube.com/results?search_query=$0
 shortcut-add za=http://songza.com/search/?q=$0
 

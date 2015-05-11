@@ -3,17 +3,6 @@
 source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 
-# Uzbl: http://www.uzbl.org
-# surf: http://surf.suckless.org
-# jumanji: https://pwmt.org/projects/jumanji
-# luakit: https://mason-larobina.github.io/luakit
-# vimium: http://vimium.github.io
-# cVim (active): https://github.com/1995eaton/chromium-vim
-# pentadactyl (vimperator fork): http://5digits.org/pentadactyl
-
-apt_noprompt "libsoup2.4-dev libwebkit-dev libgtk-3-dev libwebkitgtk-3.0-dev"
-git_install 'fanglingsu/vimb'
-
 # privoxy
 #   http://www.privoxy.org/user-manual/quickstart.html
 #   https://projects.zubr.me/wiki/adblock2privoxy

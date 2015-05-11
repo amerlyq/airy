@@ -1,0 +1,11 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages
+if [ $? -eq 1 ]; then exit 1; fi
+
+apt_noprompt "libsoup2.4-dev libwebkit-dev libgtk-3-dev libwebkitgtk-3.0-dev"
+# all of them -- to build vimb
+git_install 'fanglingsu/vimb'
+
+apt_noprompt "inotify-tools"
+# inotify-tools | watch on downloaded files in dir and auto-open them
