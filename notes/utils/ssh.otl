@@ -60,6 +60,40 @@ Find appropriate line in known_hosts and it's fingerprint
 	ssh-keygen -H -F hostname
 	ssh-keygen -lf ~/.ssh/known_hosts -F hostname
 
+VNC over SSH
+	VNC over SSH is slightly faster than X11 over SSH. In this case, Xvfb is
+	often combined with a lightweight window manager such as Fluxbox.
+		export DISPLAY=:1
+		Xvfb :1 -screen 0 1024x768x16 &
+		fluxbox &
+		x11vnc -display :1 -bg -nopw -listen localhost -xkb
+	The next step is to fire up a SSH client such as PuTTY with tunneling to
+	localhost port 5900 enabled. A vncviewer can then connect to localhost to
+	get remote control over the server.
+		ssh -N -T -L 5900:localhost:5900 user@remotehost &
+		vncviewer -encodings 'copyrect tight zrle hextile' localhost:5900
+
+Xvfb over SSH
+	Server
+		Xvfb :99 -screen 0 640x480x24 -fbdir /var/tmp
+	Client
+		DISPLAY=:99 xwud -in /var/tmp/Xvfb_screen0
+	Xwd
+		scrot -z "$DIR/size-${sz}.png"
+		> Using any of this you will not receive Qt window transparency!
+		import -window $wid "$DIR/size-${sz}.png"
+		import -crop 100x100+4+86 -window root "$DIR/size-${sz}.png"
+		xwd -root -out /tmp/image.xwd
+		convert /tmp/image.xwd "$DIR/size-${sz}.png"
+		xwd -nobdrs -icmap -screen -root | convert xwd:- "$DIR/size-${sz}.png"
+		xwd -root | xwdtopnm | pnmtopng > "$DIR/size-${sz}.png"
+		xwd -icmap -frame -id $wid -out /tmp/image.xwd
+	Xprop
+		: May be useful to manually set properties. However was not too helpful.
+		xprop -id $wid -f _NET_WM_WINDOW_OPACITY 32c -set _NET_WM_WINDOW_OPACITY 0x7fffffff
+
+
+
 
 Supported escape sequences: ~?
 	> Exit frozen ssh session: press <CR>~.

@@ -1,0 +1,37 @@
+>> Intel and AT&T Syntax <<
+
+: In Intel syntax there are no register prefixes or immed prefixes. In AT&T
+: however registers are prefixed with a '%' and immed's are prefixed with a
+: '$'.  Intel syntax hexadecimal or binary immed data are suffixed with 'h'
+: and 'b' respectively. Also if the first hexadecimal digit is a letter then
+: the value is prefixed by a '0'.
+
+> -------------- Prefixes
+| mov     eax,1       | movl    $1,%eax
+| mov     ebx,0ffh    | movl    $0xff,%ebx
+| int     80h         | int     $0x80
+> ---------- Direction of Operands
+| instr   dest,source | instr   source,dest
+| mov     eax,[ecx]   | movl    (%ecx),%eax
+> --------------------- Memory Operands
+<INTL>  instr   foo,segreg:[base+index*scale+disp]
+<AT&T>  instr   %segreg:disp(base,index,scale),foo
+| mov     eax,[ebx]            | movl    (%ebx),%eax
+| mov     eax,[ebx+3]          | movl    3(%ebx),%eax
+| mov     eax,[ebx+20h]        | movl    0x20(%ebx),%eax
+| add     eax,[ebx+ecx*2h      | addl    (%ebx,%ecx,0x2),%eax
+| lea     eax,[ebx+ecx]        | leal    (%ebx,%ecx),%eax
+| sub     eax,[ebx+ecx*4h-20h] | subl    -0x20(%ebx,%ecx,0x4),%eax
+> ------------------------ Suffixes
+| mov     al,bl                | movb    %bl,%al
+| mov     ax,bx                | movw    %bx,%ax
+| mov     eax,ebx              | movl    %ebx,%eax
+| mov     eax, dword ptr [ebx] | movl    (%ebx),%eax
+
+
+: Index/scale/disp/segreg are all optional and can simply be left out. Scale,
+: if not specified and index is specified, defaults to 1. Segreg depends on
+: the instruction and whether the app is being run in real mode or pmode. In
+: real mode it depends on the instruction whereas in pmode its unnecessary.
+: Immediate data used should not '$' prefixed in AT&T when used for
+: scale/disp.
