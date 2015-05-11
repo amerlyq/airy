@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+if ($#ARGV < 1) {
+    print "\nUsage: filter-list <src> <list> | column -s\| -t\n";
+    exit;
+}
+
+my $keySrc;
+my $fsrc=$ARGV[0];
+my $flst=$ARGV[1];
+
+if ($fsrc eq "-") { my $FILE1 = 'STDIN'; }
+else { open FILE1, "<", $fsrc or die "could not open src file\n"; }
+while (<FILE1>) {
+    chomp;
+    my ($first, $second, $rest) = split(/\s+/, $_, 3);
+    $keySrc->{$first} = "$second | $rest";
+}
+close FILE1;
+
+if ($flst eq "-") { my $FILE2 = 'STDIN'; }
+else { open FILE2, "<", $flst or die "could not open file with list\n"; }
+while (<FILE2>) {
+    chomp;
+    my ($first, $second, $rest) = split(/\s+/, $_, 3);
+    if (defined $keySrc->{$first}) {
+        # from src in list order
+        print STDOUT "$first | $keySrc->{$first}\n";
+        # print STDOUT "$_\n"; # show entries from list
+    }
+}
+close FILE2;
+

@@ -2,11 +2,16 @@
 
 source ~/.bash_export
 dst=~/.purple/accounts.xml
+> $dst
 
-cat - << EOT > $dst
+cat - << EOT >> $dst
 <?xml version='1.0' encoding='UTF-8' ?>
 
 <account version='1.0'>
+EOT
+
+if [ "$CURR_PROF" == "work" ]; then
+    cat - << EOT >> $dst
 	<account>
 		<protocol>prpl-sipe</protocol>
 		<name>${WORK_MAIL?Need account for MSCommunicator},</name>
@@ -55,6 +60,10 @@ cat - << EOT > $dst
 		</settings>
 		<current_error/>
 	</account>
+EOT
+fi
+
+cat - << EOT >> $dst
 	<account>
 		<protocol>prpl-jabber</protocol>
 		<name>${MAIN_MAIL?Need account for GoogleTalk}/</name>

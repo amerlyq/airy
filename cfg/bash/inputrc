@@ -21,29 +21,47 @@ $include /etc/inputrc
 #
 set editing-mode vi
 $if mode=vi
+
     set keymap vi-insert
-    # these are for vi-insert mode "\C-s"
-    "\e[A": history-search-backward
-    "\e[B": history-search-forward
-    "\C-b": backward-char
-    "\C-h": backward-delete-char
-    "\eb": backward-word
-    "\ef": forward-word
+
     "\C-a": beginning-of-line
-    "\C-]": character-search
-    "\e\C-]": character-search-backward
-    "\C-p": menu-complete
-    "\C-d": delete-char
     "\C-e": end-of-line
     "\C-f": forward-char
+    "\C-b": backward-char
+    "\C-t": forward-word
+    "\C-q": backward-word
+
     "\C-_": undo
+    "\C-z": undo
+    "\C-d": delete-char
+    "\C-h": backward-delete-char
+    "\C-?": backward-delete-char
+    "\C-g": kill-word
+    "\C-w": backward-kill-word
+    "\C-k": kill-line
+    "\C-u": backward-kill-line
+
+    "\C-p": previous-history
+    "\C-n": next-history
+    "\C-r": reverse-search-history
+    "\C-s": forward-search-history
+    "\M-f": transpose-chars
+    "\M-t": transpose-words
+    "\C-]": character-search
+    "\e\C-]": character-search-backward
+    # "\C-p": menu-complete
+
     set keymap vi-command
-    # these are for vi-command mode
-    "\e[A": history-search-backward
-    "\e[B": history-search-forward
+
+    "\C-p": history-search-backward
+    "\C-n": history-search-forward
+    "\C-r": non-incremental-reverse-search-history
+    "\C-s": non-incremental-forward-search-history
+
     # bind to Alt-p
-    "\ep":  yank-last-arg
-    "\C-x": re-read-init-file
+    # "\ep":  yank-last-arg
+    # "\C-x": re-read-init-file
+
 $endif
 
 "\C-j": accept-line
@@ -77,8 +95,11 @@ set skip-completed-text on
 # Completed names which are symbolic links to directories have a slash appended.
 set mark-symlinked-directories on
 
+
 # see /usr/share/doc/bash/inputrc.arrows for other codes of arrow keys
 # allow the use of the Home/End keys
+"\e[A": history-search-backward
+"\e[B": history-search-forward
 "\e[1~": beginning-of-line
 "\e[4~": end-of-line
 # those two are for rxvt
@@ -116,7 +137,6 @@ $endif
 #
 #    set keymap vi-insert
 #    "\M-l": clear-screen
-#    "\C-w": backward-kill-word
 #    # auto-complete from the history
 #    "\C-p": history-search-backward
 #    "\C-n": history-search-forward
@@ -127,7 +147,7 @@ $endif
 #
 #$if Python
 #$endif
-#
+
 ## IPython needs this to appear at the bottom of the
 ## file for clear-screen to work
 #set keymap vi-move

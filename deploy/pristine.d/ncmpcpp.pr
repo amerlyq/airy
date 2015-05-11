@@ -17,7 +17,7 @@ dir="$CURR_DIR_PKG/ncmpcpp/"
 
 # Reason for the above is that debian / ubuntu based distros no longer have the
 # -mt suffix for boost libraries
-sed -i "s/^\(AS_IF\|AC_ARG_VAR\)(/# \1(/" "$dir/configure.ac"
+# sed -i "s/^\(AS_IF\|AC_ARG_VAR\)(/# \1(/" "$dir/configure.ac"
 
 # ABSENT: tag editor, tiny tag editor, artist info
 rep_autobuild "$dir" --enable-outputs --enable-visualizer --enable-clock --enable-unicode --with-fftw --with-curl --with-taglib

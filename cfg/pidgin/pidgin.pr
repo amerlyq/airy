@@ -4,8 +4,10 @@ source ~/.bash/functions.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # Pidgin
 
-apt_noprompt pidgin pidgin-sipe pidgin-plugin-pack finch myspell-ru tcpdump
+apt_noprompt pidgin pidgin-sipe pidgin-plugin-pack myspell-ru
 # pidgin-sipe        | Office Communicator plugin
 # pidgin-plugin-pack | Primarily for convenient history plugin
-# finch              | TUI interface to pidgin
 
+### ON DEMAND ###
+# finch              | TUI interface to pidgin
+# tcpdump | if necessary

@@ -34,7 +34,7 @@ stty -ixon
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
+export SHELL=$(which bash)
 
 # Alias definitions.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.

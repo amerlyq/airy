@@ -195,7 +195,8 @@ NeoBundle 'klen/python-mode', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] } }
 NeoBundle 'davidhalter/jedi-vim', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] } }
-
+NeoBundle 'joonty/vdebug', {
+    \ 'autoload' : { 'filetypes' : [ 'python' ] } }
 
 
 " ======================================

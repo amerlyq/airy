@@ -1,0 +1,6 @@
+#!/bin/bash
+source ~/.bash/functions
+amScriptDir -s
+if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
+
+pairLink ~/.purple/prefs.xml "${SCRIPT_DIR}/prefs.xml"

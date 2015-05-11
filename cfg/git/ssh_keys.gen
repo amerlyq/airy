@@ -17,11 +17,15 @@ genssh(){ # $1 -- @mail, $2 -- path/to/key
 
 genssh "$WORK_MAIL" id_rsa
 genssh "$MAIN_MAIL" git_rsa
-genssh "$MAIN_MAIL" lok_rsa
 
-if [ "$CURR_PROF" == "work" ]; then
-    genssh "$WORK_MAIL" srk_rsa
-fi
+case "$CURR_PROF" in
+work) genssh "$WORK_MAIL" srk_rsa ;;
+laptop)
+    genssh "$MAIN_MAIL" lsir_rsa
+    genssh "$MAIN_MAIL" lked_rsa
+;;
+home) genssh "$MAIN_MAIL" lked_rsa ;;
+esac
 
 # ===========================================================
 

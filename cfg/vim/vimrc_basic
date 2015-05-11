@@ -1,20 +1,66 @@
+" vim: ts=2 sw=2 sts=2
+
+""" General """
 set nocompatible
 set encoding=utf-8
+set fileencodings=utf-8
+set fileformats=unix
+language messages en_US.UTF-8
 
-if has("unix")
-    language messages C
-else "elseif
-	language messages en_US.UTF-8 "C, en, en_US, en_US.UTF-8
-	"set langmenu=en_US.UTF-8
-	set lines=32
-	set columns=112
+
+""" Configs """
+let mapleader=","
+runtime! config/func-insert.vim
+runtime! config/keys-remap.vim
+runtime! config/mng-copy-paste.vim
+
+
+""" Settings """
+set number
+set autoindent
+set smartindent
+set backspace=indent,eol,start
+set whichwrap=<,>
+set shortmess+=Iat
+
+
+""" Terminal """
+set timeout
+if &term =~ "^xterm\\|rxvt"
+  let &t_EI .= "\<Esc>[2 q"
+  let &t_SI .= "\<Esc>[4 q"
+
+  augroup FastEscape
+    autocmd!
+    let CursorColumnI = 0 "the cursor column position in INSERT
+    au InsertEnter * set timeoutlen=0 ttimeoutlen=0
+          \| let CursorColumnI = col('.')
+    au InsertLeave * set timeoutlen=1000 ttimeoutlen=32
+          \| if col('.') != CursorColumnI | call cursor(0, col('.')+1)
+          \| endif
+    au CursorMovedI * let CursorColumnI = col('.')
+  augroup END
 endif
+set ttimeout
+if &ttimeoutlen == -1
+  set ttimeoutlen=50
+endif
+" au BufRead,BufNewFile * start  " start in insert mode. OR: $ vim +star
 
-set fileencodings=utf-8,cp1251,cp866
-" delegate configuration to files in config/
-"runtime! config/**/*.vim
 
-augroup vimrc
-  au BufReadPre * setlocal foldmethod=indent
-  au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
-augroup END
+""" Readline """
+inoremap <C-j> <C-o>:wq<CR>
+inoremap        <C-A> <C-O>^
+inoremap <expr> <C-E> col('.')>strlen(getline('.'))<bar><bar>pumvisible()?"\<Lt>C-E>":"\<Lt>End>"
+inoremap <expr> <C-B> getline('.')=~'^\s*$'&&col('.')>strlen(getline('.'))?"0\<Lt>C-D>\<Lt>Esc>kJs":"\<Lt>Left>"
+inoremap <expr> <C-F> col('.')>strlen(getline('.'))?"\<Lt>C-F>":"\<Lt>Right>"
+inoremap <expr> <C-D> col('.')>strlen(getline('.'))?"\<Lt>C-D>":"\<Lt>Del>"
+
+
+""" Keymaps """
+noremap <Leader>ts :setlocal spell! spell?<CR>
+noremap <Leader>S :<C-U>w<CR>
+noremap <Leader>x :<C-U>q!<CR>
+noremap <Leader>s :<C-U>wq<CR>
+noremap <Leader>d :<C-U>wq<CR>
+

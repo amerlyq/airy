@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# https://wiki.archlinux.org/index.php/CUE_Splitting
+
+for nm in cuetools shntool flac vorbis-tools; do
+    if command -v foo >/dev/null 2>&1; then
+        printf ">>> No '$nm' package. Installing...\n"
+        sudo apt-get install "$nm"
+    fi
+done
+
+# shnsplit -f *.cue -t %n-%t -o flac *.flac
+
+# cuebreakpoints *.cue | shnsplit -o flac *.flac
+# cuetag *.cue split-*.flac
+
+fcue=$(find . -name "*.cue" | head)
+shnsplit -f "$fcue" -t "%n %t" \
+    -o "flac ext=ogg oggenc -b 256 -o %f -" "${fcue%.*}.flac"
+
+OLDIFS="$IFS"
+IFS=$'\n'
+songs=($(find . -name "*.ogg" | sort))
+IFS="$OLDIFS"
+
+cuetag "$fcue" "${songs[@]}"
