@@ -44,9 +44,8 @@ then
     pairLink ~/.surf/style.css "${BROWSERS}/vimb/theme/${THEME}.css"
     pairLink ~/.w3m/config "${BROWSERS}/w3m/config"
     pairLink ~/.w3m/keymap "${BROWSERS}/w3m/keymap"
-    pairLink ~/.config/vimb/config "${BROWSERS}/vimb/config"
-    pairLink ~/.config/vimb/style.css "${BROWSERS}/vimb/theme/${THEME}.css"
 
+    "${BROWSERS}/vimb/symlinks" ${THEME}
 fi
 
 if [ "$CURR_PLTF" == "MINGW" ]

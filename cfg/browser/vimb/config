@@ -37,6 +37,9 @@ nnoremap ,tb :set statusbar!<CR>
 nnoremap ,tf :set strict-focus!<CR>
 nnoremap ,tp :set proxy!<CR>
 nnoremap ,ts :set strict-ssl!<CR>
+# Theme dark/light toggle
+nnoremap ,tT :set stylesheet!<CR>
+nnoremap ,tt :shellcmd ~/.config/vimb/symlinks -t <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
 
 ### Toggle defaults ###
 set statusbar=true
@@ -68,6 +71,9 @@ set history-max-items=99999
 
 
 ### Hooks ###
+handler-add torrent=transmission-gtk %s
+handler-add magnet=transmission-gtk %s
+
 set download-path=~/Downloads/vimb
 au DownloadStart *.pdf shellcmd! ~/.config/vimb/dld-start
 

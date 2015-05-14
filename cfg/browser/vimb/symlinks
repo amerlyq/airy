@@ -3,13 +3,22 @@ source ~/.bash/functions
 amScriptDir -s
 if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
 
+DST=~/.config/vimb
 case "$1" in
-d|dark) THEME=dark ;;
-l|light) THEME=light ;;
+-d|dark) THEME=dark ;;
+-l|light) THEME=light ;;
+-t|toggle) THEME=$(readlink "${DST}/style.css")
+    case ${THEME##*/} in
+        dark*) THEME=light ;;
+        light*) THEME=dark ;;
+    esac ;;
 *) THEME="${CURR_THEME:-dark}"
 esac
-BROWSERS="${PWD%/*}"
+pairLink "${DST}/style.css" "${DST}/theme/${THEME}.css"
 
-pairLink ~/.config/vimb/config    "${BROWSERS}/vimb/config"
-pairLink ~/.config/vimb/dld-start "${BROWSERS}/vimb/dld-start"
-pairLink ~/.config/vimb/style.css "${BROWSERS}/vimb/theme/${THEME}.css"
+# Set other symlinks only if used full keys. Short color keys only toggle.
+if [ "${1:0:1}" != - ]; then
+    for nm in config dld-start symlinks theme; do
+        pairLink "${DST}/$nm" "${SCRIPT_DIR}/$nm"
+    done
+fi
