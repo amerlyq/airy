@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Check 'wlan0' and 'ieee...' from iwconfig
+
+# With internet
+# create_ap -m nat -w WPA2 --hidden --ieee80211n wlan0 ap_test terrified
+
+sudo create_ap --hidden --ieee80211n -c 5 -n wlan0 ap_test terrified
