@@ -1,3 +1,4 @@
+# vim: ft=sh
 EXPLAINED: http://www.catonmat.net/blog/perl-one-liners-explained-part-two/
 
 Useful One-Line Scripts for Perl                    Dec 03 2013 | version 1.10
@@ -24,8 +25,8 @@ Perl One-Liners on Github:
     You can send me pull requests over GitHub! I accept bug fixes,
     new one-liners, translations and everything else related.
 
-I have also written "Perl One-Liners Explained" ebook that's based on
-this file. It explains all the one-liners here. Get it at:
+# I have also written "Perl One-Liners Explained" ebook that's based on
+# this file. It explains all the one-liners here. Get it at:
 
     http://www.catonmat.net/blog/perl-book/
 
@@ -369,7 +370,7 @@ perl -ple 'y/A-Za-z/a-zA-Z/'
 
 # Camel case each line
 perl -ple 's/(\w+)/\u$1/g'
-perl -ple 's/(?<!['])(\w+)/\u\1/g'
+perl -ple "s/(?<!['])(\w+)/\u\1/g"
 
 # Strip leading whitespace (spaces, tabs) from the beginning of each line
 perl -ple 's/^[ \t]+//'
@@ -480,7 +481,7 @@ perl -ne 'print if /\d/'
 perl -ne 'print if /^\d+$/'
 
 # Print all lines that contain only characters
-perl -ne 'print if /^[[:alpha:]]+$/
+perl -ne 'print if /^[[:alpha:]]+$/'
 
 # Print every second line
 perl -ne 'print if $. % 2'

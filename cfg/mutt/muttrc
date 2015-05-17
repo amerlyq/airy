@@ -59,7 +59,7 @@ set timeout=30
 set folder = ~/work/mail
 
 # show mail list before it's content
-set pager_index_lines=10
+set pager_index_lines=5
 
 # POP3 | need to create local dirs manually
 # touch ~/work/mail/inbox
@@ -81,8 +81,8 @@ unset pop_delete
 # set folder = $pop_host
 
 # SMTP
-# set smtp_url = smtps://$imap_user@smtp.gmail.com:587
-set smtp_url = smtp://$pop_user@`echo ${WORK_SRV_SMTP}`
+set smtp_url = smtps://$imap_user@smtp.gmail.com:587
+# set smtp_url = smtp://$pop_user@`echo ${WORK_SRV_SMTP}`
 
 
 ## DIRS
@@ -95,8 +95,11 @@ set certificate_file = ~/.cache/mutt/certificates
 ## BINDING
 # fetch mail by I
 #macro index,pager I "!getmail"
-macro index <f2> "<change-folder>imaps://$imap_user@imap.gmail.com:993<enter>"
-macro index <f3> "<change-folder>$pop_host<enter>"
+macro index <f2> ":set smtp_url = smtps://$imap_user@smtp.gmail.com:587\n\
+<change-folder>imaps://$imap_user@imap.gmail.com:993<enter>"
+
+macro index <f3> ":set smtp_url = smtp://$pop_user@`echo ${WORK_SRV_SMTP}`\n\
+<change-folder>$pop_host<enter>"
 
 ## ALIASES
 #set alias_file = "~/.mutt/aliases"
