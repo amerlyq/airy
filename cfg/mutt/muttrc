@@ -14,14 +14,14 @@
 # https://www.df7cb.de/blog/2010/Using_multiple_IMAP_accounts_with_Mutt.html
 
 
-set imap_user = "`echo $MAIN_MAIL`"
+set imap_user = "`echo ${MAIN_MAIL}`"
 set pop_user = "`echo ${WORK_MAIL%%@*}`"
 unset imap_pass   # set imap_pass = pass
 unset pop_pass
 unset smtp_pass
 
-set from = "`echo ${WORK_MAIL}`"
-set realname = "`echo ${WORK_NAME}`"
+set from = "`echo ${MAIN_MAIL}`"
+set realname = "`echo ${MAIN_NAME}`"
 set use_from = yes
 
 set editor = '`echo \$EDITOR` -c "set spell spelllang=ru_yo,en_us,uk"'
@@ -39,7 +39,6 @@ set abort_nosubject=yes
 # set copy = no
 set move = no
 set imap_keepalive = 900
-set ssl_starttls = yes
 set ssl_force_tls = yes
 
 # Automatically include message when replying
@@ -96,9 +95,15 @@ set certificate_file = ~/.cache/mutt/certificates
 # fetch mail by I
 #macro index,pager I "!getmail"
 macro index <f2> ":set smtp_url = smtps://$imap_user@smtp.gmail.com:587\n\
+:set from = "`echo ${MAIN_MAIL}`"\n\
+:set realname = "`echo ${MAIN_NAME}`"\n\
+:set ssl_starttls = no\n\
 <change-folder>imaps://$imap_user@imap.gmail.com:993<enter>"
 
 macro index <f3> ":set smtp_url = smtp://$pop_user@`echo ${WORK_SRV_SMTP}`\n\
+:set from = "`echo ${WORK_MAIL}`"\n\
+:set realname = "`echo ${WORK_NAME}`"\n\
+:set ssl_starttls = yes\n\
 <change-folder>$pop_host<enter>"
 
 ## ALIASES
