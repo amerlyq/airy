@@ -3,22 +3,25 @@ source ~/.bash_export || exit $?
 source ~/.bash/functions.d/vbox || exit $?
 ARGS="$@"
 
+VNM=Arch64
+ost=ArchLinux_64
 if [ ! "$ARGS" == "-w" ] && [ "$CURR_PLTF" == "Linux" ]
 then
     sudo="sudo"
     VMs="$HOME/VMs"
+    SERIAL="/tmp/vbox-${VNM}S0"
 else
     sudo=""
     VMs="${2:-/e/VMs}"
     PATH="$PATH:/c/Program Files/Oracle/VirtualBox"
     printf "\nYou need to run this script as Administrator!\n"
+    SERIAL='\\.\pipe\'"vbox-${VNM}S0"
 fi
-VNM=Arch64
-ost=ArchLinux_64
 vimg="$VMs/${VNM}/${VNM}.vdi"
 vbox="${vimg%.*}.vbox"
 install_iso="$(find "$VMs" -type f -name "archlinux*iso")"
 VBOX_PORT=2822
+GUEST_NET=vboxnet0
 
 # =======================================================================
 
@@ -49,23 +52,33 @@ if [ ! -f "$vbox" ]; then
         "home") VMOPTS="--memory 1024" ;;
         "work") VMOPTS="--memory 1024" ;;  # "--macaddress1 ${WORK_MAC?Need_WORK_MAC}" ;;
     esac
+    # For Windows Guests only:  --accelerate2dvideo on
     case "$CURR_PLTF" in
-        "Linux") VMOPTS="$VMOPTS --audio pulse  --audiocontroller hda  --accelerate2dvideo on"  ;;
+        "Linux") VMOPTS="$VMOPTS --audio pulse  --audiocontroller hda  --accelerate2dvideo off"  ;;
         "MINGW") VMOPTS="$VMOPTS --audio dsound --audiocontroller ac97 --accelerate2dvideo off" ;;
     esac
 
+    # Add host-only network in Host vbox and check it:
+    if ! VBoxManage list -l hostonlyifs | grep -q "$GUEST_NET"; then
+        VBoxManage hostonlyif create
+        VBoxManage dhcpserver add --ifname "$GUEST_NET" --enable
+        ifconfig "$GUEST_NET"
+    fi
 
     # (virtualization options Only for Intel Host)
-    # Intranet: --nic2 intnet  --intnet2 "InnerVMs"
-    #--nic3 none --nic4 none
     VBoxManage modifyvm "${VNM}" ${VMOPTS} --vram 128 --pae on         \
         --ioapic on --cpus 2 --rtcuseutc on --cpuexecutioncap 100      \
         --hwvirtex on --nestedpaging on  --largepages on  --vtxvpid on \
         --boot1 dvd --boot2 disk --firmware bios  --accelerate3d on    \
         --clipboard bidirectional --monitorcount 1 --vrde off          \
-        --usb on --usbehci off --nic1 nat --nic2 none
-
+        --usb on --usbehci off --nic1 nat --nic2 hostonly --hostonlyadapter2 "${GUEST_NET}"
+    # Host-only: https://forums.virtualbox.org/viewtopic.php?f=8&t=34396
+    # Intranet: --nic3 intnet  --intnet3 "InnerVMs"
     add_port_forward "${VNM}" "${VNM}_ssh" "tcp,,$VBOX_PORT,,22"
+
+    # Provide virtual serial port to debug guest kernel
+    #   Install Arch from serial port:  https://wiki.archlinux.org/index.php/Working_with_the_serial_console
+    VBoxManage modifyvm "${VNM}" --uart1 0x3F8 4 --uartmode1 server "$SERIAL"
 
     # Only if Extensions installed
     # --usbehci on
@@ -85,11 +98,11 @@ fi
 
 
 if [ ! -f "$vimg" ]; then
-    printf "\n!!! IF NOT SSD: remove --nonrotational option !!!\n\n"
-
     case "$CURR_PROF" in
-        "home") HDDOPTS="--nonrotational on" ;;
-        "work") HDDOPTS="" ;;
+        "home") HDDOPTS="--nonrotational on"
+            printf "\n!!! IF NOT SSD: remove --nonrotational option !!!\n\n"
+            ;;
+        "work"|*) HDDOPTS="" ;;
     esac
 
     VBoxManage storagectl "${VNM}" --name "IDE"  --add ide \

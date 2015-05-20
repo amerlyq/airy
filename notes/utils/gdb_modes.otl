@@ -139,6 +139,19 @@
 	 When a program dies with SIGSEGV, it normally dumps core on Unix.
 
 
+### Short-living programs ###
+	Main remote term
+		./prg -a & kill -STOP $! && echo $! > /tmp/dbgpid
+	Host
+		gdb -q -x /tmp/gdbrc ./prg -p $(cat /tmp/dbgpid)
+		(gdb) ...
+		(gdb) detach
+	New remote term
+		strace -p $(cat /tmp/dbgpid)
+	Main remote term
+		kill -CONT $(cat /tmp/dbgpid)
+
+
 ### Remote debugging ###
 : https://sourceware.org/gdb/onlinedocs/gdb/Server.html
 : - GDB runs on one machine (host) and the program being debugged

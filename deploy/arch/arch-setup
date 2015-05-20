@@ -73,6 +73,7 @@ Server = http://archlinux.bln-ua.net/$repo/os/$arch
 Server = http://mirrors.nix.org.ua/linux/archlinux/$repo/os/$arch
 #%END
 EOT
+
 sed '/#%BEGIN/,/#%END/d' $pm >> $pmt
 mv -vf $pmt $pm
 echo ":: mirror selected"
