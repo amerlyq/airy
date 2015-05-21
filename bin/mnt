@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # ???? instead of file name
 # sudo LC_ALL="ru_RU.UTF-8" ranger (don't work but helps)
@@ -7,67 +7,61 @@
 # https://ru.wikipedia.org/wiki/Mount
 
 # Disk mounting util
-if [ ${#1} -le 2 ]; then ACTION=${1}; shift; else ACTION=m; fi
-LABELS="$@"
+if [[ -n "$1" && ${#1} -le 2 ]]; then ACTION=${1}; shift; else ACTION=m; fi
+
+LBL="$1"
 MNT="/media/$CURR_USER"
+DIR="$MNT/$LBL"
 
-dosamba() {
-    local dir="$1" usr="$2" shr="$3"
-    mkdir -p "$dir" || sudo mkdir -p "$dir"
-    sudo mount -t cifs -o user="$usr" //$shr/ "$dir"
+if [[ -z "$LBL" ]]; then
+    printf "LABELS: " && cd /dev && ls --color=auto disk/by-label
+    printf "DISKS: " cd /dev && ls --color=auto sd?[0-9]
+    printf "SAMBA: android seclab install\n"
+    printf "ACTIVE: " && ls --color=auto "$MNT"
+    exit
+fi
+
+
+dosamba() { sudo mount -t cifs -o user="${2?Need user}" //${3?Need share}/ "$DIR"; }
+doloop() {  # You must launch it from iso's directory!
+    DEVPATH="$PWD/$LBL"
+    if ! [ -e "$DEVPATH" ]; then echo "Error: no such file '$DEVPATH'"; exit 1; fi
+    sudo mount -o loop "$DEVPATH" "${DIR%.*}"
+}
+domnt() {
+    local DEVPATH TYPE
+    DEVPATH="/dev/disk/by-label/$LBL"
+    if ! [ -L "$DEVPATH" ]; then DEVPATH="/dev/$LBL"; fi
+    if ! [ -e "$DEVPATH" ]; then echo "No device at path"; exit 1; fi
+
+    # Flash drive:  http://linuxsam.livejournal.com/18176.html
+    declare $(blkid "$DEVPATH" | awk '{print $NF}')  # TYPE=...
+    if [ "$TYPE" == "vfat" ]; then
+        MOPTS="rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,\
+codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
+    fi
+    # -t "$TYPE"
+    if dirmk; then sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} && echo "$DIR"; fi
 }
 
-doloop() {
-    local iso="${1?Need iso name}" dir
-    dir="$MNT/${iso##*/}"; dir="${dir%.*}"
-    mkdir -p "$dir" || sudo mkdir -p "$dir"
-    echo "$dir"
-    sudo mount -o loop "$iso" "$dir"
-}
+check() { if grep -qsw "$DIR" /proc/mounts; then echo "Already mounted at '$DIR'!"; exit; fi; }
+clean() { check; if [ -d "$DIR" ]; then rmdir -v "$DIR" || sudo rmdir -v "$DIR" || exit 1; fi; }
+dirmk() { clean; mkdir -p "$DIR" || sudo mkdir -p "$DIR"; }
+if ! dirmk; then echo "Error: Can't create directory for mount!"; exit 1; fi
+
 
 case "$ACTION" in
-    l)  ls --color=auto "$MNT"; exit ;;
-    o)  doloop "$LABELS" ;;
-    s)  dosamba "$MNT/seclab"  ${WORK_MAIL%@*} $SURC_SRV/Exchange ;; #{Books,${WORK_MAIL%@*}}
-    sa) dosamba /media/android $ADR_USER $ADR_IPL ;;
-    si) dosamba "$MNT/install" ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;; #{exchange,projects,install}
-    *) printf "Choose from:\n" && cd /dev && ls --color=auto /dev/disk/by-label && ls --color=auto sd?[0-9] ;;
+ m) domnt ;;
+ o) doloop "$LBL" ;;
+ s) case "$LBL" in
+    android) dosamba $ADR_USER $ADR_IPL ;;
+#{Books,${WORK_MAIL%@*}}
+     seclab) dosamba ${WORK_MAIL%@*} $SURC_SRV/Exchange ;;
+#{exchange,projects,install}
+    install) dosamba ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;;
+    esac ;;
+ u) sudo umount -v "$DIR" && clean ;;
+#U) sudo umount -v -R "$MNT"/* && sudo rmdir -v "$MNT"/* ;;  # ERROR: No -R key
+ *) echo "Error: '$ACTION'" ;;
 esac
 
-domnt() {
-    local lbl="$1" path="$2"
-    if [[ "$ACTION" == "u" ]] && [ -d "$MNT/$lbl" ]; then
-        echo "$MNT/$lbl"
-        sudo umount "$MNT/$lbl" && \
-            sudo rmdir -v "$MNT/$lbl"
-    fi
-    if [[ "$ACTION" == "m" ]]; then
-        if [ -d "$MNT/$lbl" ]; then
-            sudo rmdir -v "$MNT/$lbl"
-        fi
-        sudo mkdir -p "$MNT/$lbl" && \
-            sudo mount "$path" "$MNT/$lbl"
-        echo "$MNT/$lbl"
-    fi
-    # Flash drive
-    # http://linuxsam.livejournal.com/18176.html
-    if [[ "$ACTION" == "f" ]]; then
-        if [ -d "$MNT/$lbl" ]; then
-            sudo rmdir -v "$MNT/$lbl"
-        fi
-        sudo mkdir -p "/media/$CURR_USER/$lbl" && \
-            sudo mount -t vfat "$path" "/media/$CURR_USER/$lbl" -o rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro
-            # mount -t vfat /dev/sdb1 /media/tmp -o codepage=866,utf8
-        echo "$MNT/$lbl"
-    fi
-}
-
-for lbl in $LABELS; do
-    if [ -L "/dev/disk/by-label/$lbl" ]; then
-        domnt "$lbl" "/dev/disk/by-label/$lbl"
-    elif [ -e "/dev/$lbl" ]; then
-        domnt "$lbl" "/dev/$lbl"
-    else err=1; fi
-done
-
-if [ "$err" != "0" ]; then exit $err; fi

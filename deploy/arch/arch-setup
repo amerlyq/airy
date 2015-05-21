@@ -20,6 +20,10 @@ case "$1" in
     *) bNew=  ;;
 esac
 
+CURR_PLTF=myhost
+CURR_USER=root
+
+
 sd=/dev/sda
 nd=(boot root swap home)
 for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
@@ -81,7 +85,7 @@ echo ":: mirror selected"
 
 if [ ! -d "/mnt/usr/bin" ]; then
     ## Install the base system  # -i -- interactive
-    pacstrap /mnt base #base-devel
+    pacstrap /mnt base || exit $?  #base-devel
     echo ":: packstrap installed"
 fi
 
@@ -106,10 +110,9 @@ arch-chroot /mnt /bin/bash -c "
     echo ':: time setted up'
 
     ## Host
-    CURR_PLTF=myhost
     echo ':: writing host'
-    echo \$CURR_PLTF | tee /etc/hostname
-    sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '\$CURR_PLTF'/' /etc/hosts
+    echo $CURR_PLTF | tee /etc/hostname
+    sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '$CURR_PLTF'/' /etc/hosts
 
     ## Network
     ifcnm=\$(ip link | sed -rn '/^.*:\s+(e\w+):.*$/{s//\1/p;q}')
@@ -120,9 +123,6 @@ arch-chroot /mnt /bin/bash -c "
     # Set correct hooks (lvm,usb...) in /etc/mkinitcpio.conf
     # mkinitcpio -p linux
 
-    echo ':: set root password'
-    passwd
-
     pacman -S --noconfirm grub os-prober
     grub-install --target=i386-pc --recheck $sd
     rm -vf /boot/grub/grub.cfg
@@ -130,5 +130,9 @@ arch-chroot /mnt /bin/bash -c "
     echo ':: grub installed'
 "
 echo ':: chroot ended'
+
+echo ":: set $CURR_USER password"
+printf "$CURR_USER" | passwd --stdin "$CURR_USER"
+
 
 # umount -R /mnt && reboot   # Or use 'fuser' to find by what it is busy
