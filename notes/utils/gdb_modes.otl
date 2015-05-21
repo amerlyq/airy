@@ -141,7 +141,7 @@
 
 ### Short-living programs ###
 	Main remote term
-		./prg -a & kill -STOP $! && echo $! > /tmp/dbgpid
+		./prg -a -b & kill -STOP $! && echo $! > /tmp/dbgpid
 	Host
 		gdb -q -x /tmp/gdbrc ./prg -p $(cat /tmp/dbgpid)
 		(gdb) ...
@@ -150,6 +150,14 @@
 		strace -p $(cat /tmp/dbgpid)
 	Main remote term
 		kill -CONT $(cat /tmp/dbgpid)
+
+	Attach w/o influence on environment:
+	:NOTE: You don't need 'set follow-fork-mode child'
+	:WARNING: Don't use 'gdb -q -ex 'source /usr/local/peda/peda.py'
+	: -- (or breakpoints will not work)
+		./prg -a -b & kill -STOP $! && gdb -q ./prg -p $!
+		(gdb) b *main
+		< then twice continue to skip SIGSTOP and once more to jump to main()
 
 
 ### Remote debugging ###

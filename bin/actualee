@@ -20,6 +20,7 @@ case "$NAME" in  # Names
 
     sh) "$FL" && wpause   ;;
     dot) dot -Tx11 "$NM"  ;;
+    tpp) tpp "$NM"        ;;
     md) pandoc -o /tmp/pandoc.html "$FL" && x-www-browser /tmp/pandoc.html ;;
     jar) java -jar "$NM" ;;
 
