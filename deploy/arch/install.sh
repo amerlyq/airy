@@ -44,11 +44,20 @@ nc -d -U "$SERIAL"  # Non-interactive monitoring of installation (safe Ctrl-C to
 # ERROR: you must enter root password! How? Extract it from script and lauch interactive separately?
 # TODO: reboot after all
 
+# Netcat
+#   http://www.debian-administration.org/article/58/Netcat_The_TCP/IP_Swiss_army_knife
+#   http://www.debian-administration.org/article/145/use_and_abuse_of_pipes_with_audio_data
 # Possible manual commands from separate terminal:
 #   echo ls | nc -q 1 -U $SERIAL -P root -
 #   { printf "ls\n"; sleep 0.2; } | nc -q 0 -U /tmp/vbox-"$VNM"S0 -P root -
 #   cat <file> | nc -q 1 -U /tmp/vbox-"$VNM"S0 -P root -
 
+# Fixed IP
+#   http://coding4streetcred.com/blog/post/VirtualBox-Configuring-Static-IPs-for-VMs
+#   http://coding4streetcred.com/blog/post/VirtualBox-Getting-Around-an-Absence-of-Domain
+# ALT: use 'arp' to get MACs from vbox dhcp server, then identify IP of each guest by it's MAC
+# ALT: get host names? How? How synergy does it?
+# Crossplatform  ==  Linux + Windows + Geanymotion (Android)
 
 ## First state after boot
 # VBoxManage controlvm <vm> savestate
