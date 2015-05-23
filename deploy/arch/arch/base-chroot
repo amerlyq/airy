@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+if [ "$(uname -n)" != "archiso" ]; then
+    echo "Use this script only under archiso image!"
+    exit 1
+fi
+sd="${1?No sd disk specified for grub}"
+
+CURR_HOST=myhost
+CURR_USER=root
+loc="en_US.UTF-8"
+zone=/usr/share/zoneinfo/Europe/Kiev
+
+
+## Locale
+sed -ri "s/^#(${loc}.*)\$/\1/" /etc/locale.gen
+locale-gen
+echo LANG=${loc} > /etc/locale.conf
+export LANG=${loc}
+echo ':: locale generated'
+
+## Time
+rm -vf /etc/localtime
+ln -sv $zone /etc/localtime
+# WARNING: dual boot with Windows: https://wiki.archlinux.org/index.php/Time#UTC_in_Windows
+hwclock --systohc --utc
+echo ':: time setted up'
+
+## Host
+echo ':: writing host'
+echo $CURR_HOST | tee /etc/hostname
+sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"$CURR_HOST"'/' /etc/hosts
+
+## Network
+ifcnm=$(ip link | sed -rn '/^.*:\s+(e\w+):.*$/{s//\1/p;q}')
+systemctl enable dhcpcd@${ifcnm}.service
+echo ':: eth dhcp active'
+
+# For grained set-up
+# Set correct hooks (lvm,usb...) in /etc/mkinitcpio.conf
+# mkinitcpio -p linux
+
+## Bootloader
+pacman -S --noconfirm grub os-prober
+grub-install --target=i386-pc --recheck $sd
+rm -vf /boot/grub/grub.cfg
+grub-mkconfig -o /boot/grub/grub.cfg
+echo ':: grub installed'
+
+## Password
+echo ":: set $CURR_USER password"
+printf "$CURR_USER:$CURR_USER" | chpasswd
+

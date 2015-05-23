@@ -18,6 +18,9 @@ win2unix() { # -> /g/#
 }
 export -f win2unix
 
+do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1; do printf "."; sleep 0.5; done; echo; }; }
+export -f do_sleep
+
 squit() { printf "${1+$1\n}"; if [ -n "$PS1" ]; then return ${1+1}; else exit ${1+1}; fi; }
 export -f squit
 

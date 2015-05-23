@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+if [ "$(uname -n)" != "archiso" ]; then
+    echo "Use this script only under archiso image!"
+    exit 1
+fi
+
+## Create initial database running as root
+/usr/bin/mandb --quiet
+
+CURR_USER=user
+
+useradd -m -g users -G wheel,storage,power -s /bin/bash "$CURR_USER"
+passwd "$CURR_USER"
+
+pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm
+pacman -S xf86-video-vesa  # Or X will not start!
+pacman -S mesa
+pacman -S nvidia lib32-nvidia-utils
+pacman -S xf86-input-synaptics
+pacman -Sy
+pacman -S yaourt
+
+# ADD sudo powers)
+# pacman -S sudo bash-completion
+# visudo
+# %wheel ALL=(ALL) ALL

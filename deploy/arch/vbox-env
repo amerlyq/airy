@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+source ~/.bash_export || exit $?
+
+VNM=Arch64
+VBOX_PORT=2822
+VBOX_NET=vboxnet0
+
+# Use option '-w' on Linux to build for Windows: [[ "${ARGS/-w}" == ${ARGS} ]]
+if [ "$CURR_PLTF" == "Linux" ]
+then
+    sudo="sudo"
+    VMs="$HOME/VMs"
+    SERIAL="/tmp/vbox-${VNM}S0"
+else
+    sudo=""
+    VMs="${2:-/e/VMs}"
+    PATH="$PATH:/c/Program Files/Oracle/VirtualBox"
+    printf "\nYou need to run this script as Administrator!\n"
+    SERIAL='\\.\pipe\'"vbox-${VNM}S0"
+fi
+
+vimg="$VMs/${VNM}/${VNM}.vdi"
+vbox="${vimg%.*}.vbox"
+
+install_iso="$(find "$VMs" -type f -name "archlinux*iso")"
+ost="$(VBoxManage list ostypes | awk '/^ID:.*Arch.*64/{print $NF}')"

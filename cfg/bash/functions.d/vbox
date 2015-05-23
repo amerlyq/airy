@@ -17,31 +17,48 @@ has_vm_rule() { VBoxManage showvminfo "$1" | grep -q "Rule.*\<$2\>"; return $?; 
 show_vm_rule(){ VBoxManage showvminfo "$1" | grep "Rule.*\<${2}\>" ; return $?; }
 
 add_port_forward() {
-    if [ $# -ne 3 ]; then echo "Number of $# args isn't enough"; exit 1; fi
-    # Delete if exist
-    if has_vm_rule "$1" "$2"; then
+    if [ $# -ne 3 ]; then echo "Number of args '$#' != 3"; exit 1; fi
+    if has_vm_rule "$1" "$2"; then  # Firstly, delete if exist
         VBoxManage modifyvm "$1" --natpf1 delete "$2"
         show_vm_rule "$1" "$2"
     fi
-    # Create if don't exist
-    if ! has_vm_rule "$1" "$2"; then
+    if ! has_vm_rule "$1" "$2"; then  # Create if don't exist
         VBoxManage modifyvm "$1" --natpf1 "$2,$3"
         show_vm_rule "$1" "$2"
     fi
     echo "Add $1 port forwarding rule '$2,$3'"
 }
 
-do_vm_run() { local opt vm
-    if [ -z "$2" ]; then vm="$1"; else vm="$2"; opt="$1"; fi
-    if ! is_vm_exist "$vm"; then squit "There no such VM as '$vm'"; fi
-    if is_vm_run "$vm"; then
-        if [ "$opt" == "-y" ] || ask_confirm "Do you want shutdown VM='$vm'? (y/n)"
-        then VBoxManage controlvm "$vm" poweroff; fi
-    else
-        if [ "$opt" == "-y" ] || ask_confirm "Launch VM='$vm' is your wish? (y/n)"
-        then VBoxManage startvm "$vm"; fi  #--type headless # --vrde off
-        # Alt: but make background yourself!
-        # VBoxHeadless --startvm <uuid|name>  --vrde off
-    fi
+
+do_vm_off() {
+if is_vm_exist "${1?No vbox name}" && is_vm_run "$1"; then
+    if [ "$2" == "-y" ] || ask_confirm "Do you want shutdown VM='$1'? (y/n)"
+    then VBoxManage controlvm "$1" poweroff; else return 1; fi
+fi; }
+
+do_vm_run() { is_vm_exist "${1?No vbox name}" || squit "There no such VM as '$1'"
+    do_vm_off "$1" "$2" || squit "Rejected '$1' shutdown"
+    if [ "$2" == "-y" ] || ask_confirm "Launch VM='$1' is your wish? (y/n)"
+    then case "$3" in  # ALT:
+        -h) VBoxHeadless --startvm "$1" --vrde off & ;;
+         *) VBoxManage startvm "$1" ;;
+    esac; fi
+    VBOX_PID=$!
 }
 
+
+do_vm_keys() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
+    VBoxManage controlvm "${1?No vbox name}" keyboardputscancode ${line?No input}
+done; }
+
+do_vm_socket() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
+    echo "${line?No input}" | nc -U "${1?No vbox serial}"
+done; }
+
+do_vm_socket_file() {
+    local serial="${1?No vbox serial}" file="${2?No file path}"
+    if [ ! -f "$file" ]; then squit "File doesn't exist!"; fi
+    echo "cat - <<-'EOFSERIALFILE' > ${3:-~}/${file##*/}" | nc -U "$serial"
+    cat "$file" | nc -U "$serial"           # Send content
+    echo "EOFSERIALFILE" | nc -U "$serial"  # End of heredoc file
+}

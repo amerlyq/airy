@@ -1,0 +1,93 @@
+TODO
+	> http://www.linuxveda.com/2015/04/20/arch-linux-tutorial-manual/
+	> http://www.linuxveda.com/2015/03/27/how-to-install-arch-linux-server-tutorial/
+
+	> https://wiki.archlinux.org/index.php/General_recommendations
+	https://wiki.archlinux.org/index.php/Maximizing_performance
+	https://wiki.archlinux.org/index.php/Security
+	https://wiki.archlinux.org/index.php/System_maintenance
+	https://wiki.archlinux.org/index.php/Systemd#Basic_systemctl_usage
+
+[_] Give my complete auto installation to Igor to test)
+
+
+Optimize boot time (both kernel and bootloader)
+: http://events.linuxfoundation.org/sites/events/files/slides/12%20Lessons%20Learnt%20in%20Boot%20Time%20Reduction.pdf
+	measure data read (See at 7th column):
+		cat /proc/diskstats
+	Use compression?
+	Maybe XFS would be best as for init+mount+r/w time?
+	Utilize 100% I/O and CPU on boot
+	Focus on delays -- enable logs and watch
+	'quiet' to disable printing
+	$ perf, oprofile, strace, bootchart
+
+
+Games on
+	http://wikiwiki.jp/elonaplus/?FrontPage#q11e8183
+	http://te4.org/download
+
+Xorg
+	https://wiki.archlinux.org/index.php/Xorg
+	| https://wiki.archlinux.org/index.php/Systemd/User#Xorg_as_a_systemd_user_service
+
+: Maybe, move from sh -> dash?
+	https://wiki.archlinux.org/index.php/Dash
+: Maybe preinstall configured system onto removable?
+	https://wiki.archlinux.org/index.php/Archiso
+
+RSS
+	https://www.archlinux.org/feeds/news/
+
+Display managers
+	https://wiki.archlinux.org/index.php/Display_manager
+	https://wiki.archlinux.org/index.php/Qingy
+
+Window managers -- switcher for multiprofiling work/media
+	Use Qingy + i3 + Enligtment
+		https://wiki.archlinux.org/index.php/Enlightenment
+
+Terminal emulators -- switcher for local/remote/no-X work
+	https://wiki.archlinux.org/index.php/KMSCON
+	https://wiki.archlinux.org/index.php/Fbterm
+	https://github.com/uobikiemukot/yaft
+	https://wiki.archlinux.org/index.php/St
+	TRY:
+		http://finalterm.org/
+		http://liftoffsoftware.com/Products/GateOne
+
+Composition
+	http://projects.mini-dweeb.org/projects/unagi
+	https://wiki.archlinux.org/index.php/Compton
+
+Laptop
+	https://wiki.archlinux.org/index.php/Power_management#Power_management_with_systemd
+	https://wiki.archlinux.org/index.php/CPU_frequency_scaling
+	https://wiki.archlinux.org/index.php/Category:Laptops
+
+KMS
+	https://wiki.archlinux.org/index.php/Kernel_mode_setting
+
+Apps
+	https://wiki.archlinux.org/index.php/List_of_applications
+
+Pacman tips
+	https://wiki.archlinux.org/index.php/Pacman_tips
+
+Mirrors
+	https://wiki.archlinux.org/index.php/Mirrors
+	https://www.archlinux.org/mirrorlist/
+	https://wiki.archlinux.org/index.php/Reflector
+
+Multilib
+	https://wiki.archlinux.org/index.php/Multilib
+	https://wiki.archlinux.org/index.php/Install_bundled_32-bit_system_in_64-bit_system
+
+LVM
+	http://blog.ataboydesign.com/2012/08/29/installing-arch-linux-on-lvm/
+
+UEFI
+	http://www.tomshardware.co.uk/faq/id-1860905/install-arch-linux-uefi.html
+	https://bbs.archlinux.org/viewtopic.php?id=169025
+	https://wiki.archlinux.org/index.php/Unified_Extensible_Firmware_Interface#EFI_System_Partition
+	https://wiki.archlinux.org/index.php/GRUB_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29

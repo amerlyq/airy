@@ -88,7 +88,8 @@ i3
 		[_] hidden by default, but when opened, ncmpcpp must migrate onto it
 
 vim:
-	[_] BUG: in insert for fast presses: <S-F12>, etc
+	[_] Check neovim
+	[_] BUG: in insert for fast presses: <S-F12>, etc. Check with macro.
 	[_] BUG: mouse highlight don't work
 	[_] BUG: mix of incsearch, others! Find higlighting-as-you-type in '/' or ':s;..;' !
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
@@ -159,6 +160,8 @@ vim:
 
 
 ranger
+	[_] BUG: when fork new shell 'S' from current, it will get env var
+		'RANGER_LEVEL' so I can't launch ranger in it. Maybe spawn with clear env?
 	[_] shortcut to show file size in bytes (search in sources?)
 	[_] FIX shell -r cp ./%f /var // sudo: source: command not found
 	[_] russian -- half of text width in lister
@@ -172,6 +175,16 @@ ranger
 		[_] Create its inner handful support inside ranger
 
 zsh
+	[_] ADD: feature to launch zsh in different plugins configurations:
+		+adb support, +etc, ...
+	[_] Move to Prezto
+		http://jeromedalbert.com/migrate-from-oh-my-zsh-to-prezto/
+		http://linhmtran168.github.io/blog/2013/12/15/ditching-oh-my-zsh-for-prezto/
+		http://jr0cket.co.uk/2013/09/hey-prezto-zsh-for-command-line-heaven.html
+		http://joshsymonds.com/blog/2014/06/12/shell-awesomeness-with-prezto/
+		https://github.com/unixorn/awesome-zsh-plugins
+	[_] Completion paths only widget on different key
+		http://unix.stackexchange.com/questions/85836/zsh-expand-or-complete-for-all-files-regardless-of-command-context
 	[_] Setup emacs navigation in both configs directly to remember keys with alt (duplicate)
 		[_] All free alt-keys use for urxvt navigation
 	[_] on ',s' do [print -s "$BUFFER" to history] instead of copying in reg
@@ -422,6 +435,8 @@ TODO
 		To be able work from alien computers
 		Maybe simplified color schemes?
 		:= Detect in vim, etc ENV[..] corresponding to tmux and ssh
+	[_] Use Dockers instead of VirtualBoxes to deploy server system?
+	[_] See on Xen
 
 
 DICT : in terminal
@@ -471,3 +486,5 @@ ANDROID
 		https://ifttt.com/
 	2015-05-20 [X] Remount fs from 'adb shell'
 		mount -o rw,remount /dev/block/mtdblock<..> /system
+	[_] Launch arm code directly in linux by qemu. See about KVM -- QEMU w/ VT/SVM
+		http://ubuntuforums.org/showthread.php?t=2010979
