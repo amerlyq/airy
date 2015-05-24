@@ -52,13 +52,13 @@ do_vm_keys() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
 done; }
 
 do_vm_socket() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
-    echo "${line?No input}" | nc -U "${1?No vbox serial}"
+    printf "\n%s\n" "${line?No input}" | nc -U "${1?No vbox serial}"
 done; }
 
 do_vm_socket_file() {
     local serial="${1?No vbox serial}" file="${2?No file path}"
     if [ ! -f "$file" ]; then squit "File doesn't exist!"; fi
-    echo "cat - <<-'EOFSERIALFILE' > ${3:-~}/${file##*/}" | nc -U "$serial"
-    cat "$file" | nc -U "$serial"           # Send content
-    echo "EOFSERIALFILE" | nc -U "$serial"  # End of heredoc file
+    printf "\n%s\n" "cat - <<-'EOFSERIALFILE' > ${3:-~}/${file##*/}" | nc -U "$serial"
+    cat "$file" | nc -U "$serial"                       # Send content
+    printf "\n%s\n"  "EOFSERIALFILE" | nc -U "$serial"  # End of heredoc file
 }

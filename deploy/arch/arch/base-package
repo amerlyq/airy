@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+if ! [[ "$(uname -n)" =~ archiso ]]; then
+    echo "Use this script only under archiso image!"
+    exit 1
+fi
+
+## Select a mirror
+pm=/etc/pacman.d/mirrorlist
+pmt=/tmp/mrlst
+cat - <<-'EOT' > $pmt
+#%BEGIN Prepended during install
+
+## Score: 0.7, Ukraine -- 6MiB/s, stable
+Server = http://archlinux.bln-ua.net/$repo/os/$arch
+
+## Score: 25.8, Ukraine -- 11MiB/s, but some packages are <1MiB/s
+Server = http://mirrors.nix.org.ua/linux/archlinux/$repo/os/$arch
+
+#%END
+EOT
+
+sed '/#%BEGIN/,/#%END/d' $pm >> $pmt
+mv -vf $pmt $pm
+echo ":: mirror selected"
+
+
+### BASE SOFT
+soft=base  #base-devel
+
+if [ ! -d "/mnt/usr/bin" ]; then
+    ## Install the base system  # -i -- interactive
+    pacstrap /mnt $soft || exit $?
+    echo ":: packstrap installed"
+fi

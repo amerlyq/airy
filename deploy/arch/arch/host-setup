@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then
+    echo "Use this script only under 'vbox...' hosts!"
+    exit 1
+fi
+
+CURR_USER="${1?No current user}"
+
+## Password
+echo ":: set root password"
+printf "root:root" | chpasswd
+
+
+### ADD users
+useradd -m -g users -G wheel,storage,power -s /bin/bash "$CURR_USER"
+echo ":: set $CURR_USER password"
+printf "$CURR_USER:$CURR_USER" | chpasswd
+### ADD sudo powers)
+# pacman -S sudo bash-completion
+# visudo
+# %wheel ALL=(ALL) ALL
+
+
+### Autostart X
+ddst="/home/$CURR_USER/aura"
+mkdir -p "$ddst" && cp -vft "$ddst" ~/user-*
+chown "$CURR_USER:$CURR_USER" ~/user-*
+su "$CURR_USER" ~/aura/user-su
+
+systemctl enable xdm.service

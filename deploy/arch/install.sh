@@ -44,9 +44,8 @@ for fl in "$SCRIPT_DIR"/arch/*; do do_vm_socket_file "$SERIAL" "$fl"; done
 
 # Start installation
 do_vm_socket "$SERIAL" << EOT
-cd ~
-chmod u+x ./install
-./install ${oNew+--new}
+chmod u+x ~/base-install
+~/base-install ${oNew+--new}
 poweroff
 EOT
 
