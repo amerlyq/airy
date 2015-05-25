@@ -1,3 +1,10 @@
+MAN
+	All flags
+		$ perldoc perlrun
+	: if you use B::Deparse, you can see what it means (for most things)
+		$ perl -MO=Deparse   -p  -e 1
+	: http://perldoc.perl.org/functions/pack.html
+
 Choose digit column
 	perl -ne '/Node\[(\d+)/ && print $1."\n"'
 
@@ -8,3 +15,11 @@ Join all lines
 	perl -pe'chomp, s/$/,/ unless eof'
 	perl '-peeof||s|$/$|,|'
 	perl -l54 -pe 'eof and $\=""'
+
+Split by 4 little bytes
+> read FH, $temp, 12;
+> ($a,$b)=unpack("N2", substr($temp,0,8));
+	perl -lne 'binmode(STDIN) printf "0x%lx\n",unpack("N", $_)' ./pgtdump
+
+	perl -We 'while($nb=read(STDIN,$buf,4)){printf "0x%lx\n",unpack("N", $buf)}' ./pgtdump
+

@@ -3,6 +3,7 @@
 declare cmd fl arch pref
 
 cmd="${1?ELF aliases. Specify [nsob] as first arg}"
+opts="${3}"
 
 if [ -t 0 ]; then  # input from terminal
     fl="${2?Need elf or binary dump file name}"
@@ -13,23 +14,49 @@ else  # redirected input from file '<' or pipe '|'
     cat > "$fl"
     trap "rm -rf $fl" EXIT
 fi
+[ -t 1 ] && bOutPipe=true
 
 if file -b "$fl" | grep -q '^[^,]*, ARM,'; then
         arch=arm; pref="armv7l-tizen-linux-gnueabi-"
 else arch=i386; fi
 
+funcOnly() { ${pref}nm -nS ${2?Need file name} |
+perl -lane '/'"${1?Need symbol name}"'/ and do {
+    $s=hex(@F[0]); $e=$s+hex(@F[1]);
+    $str="'"$pref"'objdump -C -D -j.text --start-address=0x%x --stop-address=0x%x '"${2}"' | sed 1,5d";
+    $cmd=sprintf($str, $s,$e);
+    system($cmd)
+}'; }
+
+# SEE: http://www.m0rd0r.eu/little-endian-to-big-endian-in-perl/
+## NOTE: for simple string reverse there is 'rev' util. But I need byte-wise.
+big2lit_pipe() { perl -We 'my $n=4; if ($#ARGV >= 0)
+    { open($in, "<", $ARGV[0]); } else { $in = *STDIN; }
+    while(read($in, $buf, $n)){
+        printf "%08lx\n", unpack("'${2:-N}'", $buf) if length($buf) == $n;
+}' "$1"; }
+big2lit() { [[ -t 0 ]] || { big2lit_pipe "$1" "$2"; exit $?; }
+perl -We 'my $i=0; my $n=4;
+if ($#ARGV >= 0) { open($in, "<", $ARGV[0]); } else { $in = *STDIN; }
+while(read($in, $buf, $n)){
+    ($i % (16*$n)) or printf "%s=%03x=\n"," "x(4*(2*$n+1)-2),$i;
+    $i++; printf "%08lx ",unpack("'${2:-N}'", $buf) if length($buf) == $n;
+    if ($i % (2*$n)) { ($i % $n) or printf "  "; } else { printf "\n"; }
+}' "$1"; }
+
+# Use prefix 'rx' instead of 're' for hex input:
+# echo "aabbccdd 11223344" | rxxb  == ... | xxd -p -r | rexb
+# Also use suffix 'b/x' to switch between 'binary' and 'hex' output formats
 case "$cmd" in
     n) cmd="nm -n" ;;
     s) cmd="readelf -S" ;;
     o) cmd="objdump -m $arch -C -D" ;;  # disass with demangle
-    of) ${pref}nm -nS ${fl} | perl -lane '/'"${3?Need symbol name}"'/ and do {
-            $s=hex(@F[0]); $e=$s+hex(@F[1]);
-            $str="'"$pref"'objdump -C -D -j.text --start-address=0x%x --stop-address=0x%x '"$fl"' | sed 1,5d";
-            $cmd=sprintf($str, $s,$e);
-            system($cmd)
-        }'; exit ;;
+    of) funcOnly "$fl" "$symb"; exit ;;
     b) cmd="objdump -m $arch -b binary -D" ;;
+    B) cmd="armv7l-tizen-linux-gnueabi-objdump -m arm -b binary -D" ;;
     x) cmd="xxd " ;;
+    xb) big2lit "$fl" N; exit ;;
+    xl) big2lit "$fl" L; exit ;;
     l) cmd="less " ;;
     *) echo "No such '$cmd' processor" && exit 1 ;;
 esac

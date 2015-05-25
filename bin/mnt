@@ -16,13 +16,13 @@ DIR="$MNT/$LBL"
 if [[ -z "$LBL" ]]; then
     printf "LABELS: " && cd /dev && ls --color=auto disk/by-label
     printf "DISKS: " cd /dev && ls --color=auto sd?[0-9]
-    printf "SAMBA: android seclab install\n"
+    printf "SAMBA: android seclab install ${WORK_MAIL%@*}\n"
     printf "ACTIVE: " && ls --color=auto "$MNT"
     exit
 fi
 
 
-dosamba() { sudo mount -t cifs -o user="${2?Need user}" //${3?Need share}/ "$DIR"; }
+dosamba() { sudo mount -t cifs -o user="${1?Need user}" //${2?Need share}/ "$DIR"; }
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
     if ! [ -e "$DEVPATH" ]; then echo "Error: no such file '$DEVPATH'"; exit 1; fi
@@ -45,7 +45,7 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
 }
 
 check() { if grep -qsw "$DIR" /proc/mounts; then echo "Already mounted at '$DIR'!"; exit; fi; }
-clean() { check; if [ -d "$DIR" ]; then rmdir -v "$DIR" || sudo rmdir -v "$DIR" || exit 1; fi; }
+clean() { check; if [ -d "$DIR" ]; then rmdir "$DIR" || sudo rmdir -v "$DIR" || exit 1; fi; }
 dirmk() { clean; mkdir -p "$DIR" || sudo mkdir -p "$DIR"; }
 if ! dirmk; then echo "Error: Can't create directory for mount!"; exit 1; fi
 
@@ -57,6 +57,7 @@ case "$ACTION" in
     android) dosamba $ADR_USER $ADR_IPL ;;
 #{Books,${WORK_MAIL%@*}}
      seclab) dosamba ${WORK_MAIL%@*} $SURC_SRV/Exchange ;;
+${WORK_MAIL%@*}) dosamba ${WORK_MAIL%@*} $SURC_SRV/${WORK_MAIL%@*} ;;
 #{exchange,projects,install}
     install) dosamba ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;;
     esac ;;
