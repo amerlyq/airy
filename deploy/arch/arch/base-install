@@ -1,32 +1,16 @@
 #!/usr/bin/env bash
-# On Host linux
-#   ssh-keygen -N "" -f ~/.ssh/arch
-#   cat ~/.ssh/arch.pub >> ~/.ssh/authorized_keys
-# From within Arch vbox:
-#   scp user@local.ip:~/.ssh/arch  ~/.ssh/id_rsa
-#   scp user@local.ip:~/aura/airy/arch-install .
-
-# SEE:
-#   http://initrd.org/wiki/Arch_Installation_Script
-
-### Seized ###
-# https://wiki.archlinux.org/index.php/Beginners%27_guide
-
-if ! [[ "$(uname -n)" =~ archiso ]]; then
-    echo "Use this script only under archiso image!"
-    exit 1
-fi
+if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
 
 opts="$1"
 user="user"
 sd=/dev/sda
 
+
+### BASE
 chmod 755 ~/*
 ~/base-disk "$sd" "$opts" || exit $?
 ~/base-package || exit $?
-
-
-## Mounts
+## Mounts of fstap (generate after pacstrap)
 fst=/mnt/etc/fstab
 sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
 echo ":: fstab generated"
@@ -39,6 +23,11 @@ arch-chroot /mnt ~/host-package
 arch-chroot /mnt ~/host-setup $user
 echo ':: host chroot ended'
 
+
+### SSH access: add host public key to vbox guest
+dst="/mnt/home/$user/.ssh/authorized_keys"
+mkdir -p "${dst%/*}" && cp -vf ~/id_rsa.pub "$dst"
+chown "$user:$user" "$dst" && chmod 600 "$dst"
 
 
 # NOTE: use 'fuser' to find by what it is busy

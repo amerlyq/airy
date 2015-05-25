@@ -1,0 +1,24 @@
+REGRESSION TESTS
+	[_] Disk
+	: see output of 'lsblk $sd'
+		[_] Partitions
+		[_] Filesystems
+		> Encryption & LVM
+		[_] Mounting
+		[_] fstab
+	[_] Packages
+		[_] Mirrors
+		> Local cache
+			| mirrorlist    :: from Host-server w/o access
+			| pacman.conf   :: from USB/ISO
+			| sshfs->/var/cache/pacman/pkg  :: for several Arch on shared LAN
+		[_] base, openssh
+		[_] pacstrap
+	> AUR
+	[_] X
+	[_] User
+	[_] SSH access
+	[_] aura configs
+
+	>> Don't forget to change your root and user passwords <<
+

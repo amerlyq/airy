@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
-
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then
-    echo "Use this script only under 'vbox...' hosts!"
-    exit 1
-fi
-
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
 
 dst=~/.xinitrc
-chmod u+x "$dst"
+touch "$dst" && chmod u+x "$dst"
 cat - << EOT > "$dst"
 #!/bin/sh
-
+xrandr --size 1 &
 exec i3
 EOT
 
-mkdir -p ~/aura
-git clone https://github.com/amerlyq/airy.gin ~/aura/airy
+
+dst=~/.ssh/authorized_keys
+
+# mkdir -p ~/aura
+# git clone https://github.com/amerlyq/airy.git ~/aura/airy

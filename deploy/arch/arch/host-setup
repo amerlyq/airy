@@ -1,31 +1,37 @@
 #!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
 
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then
-    echo "Use this script only under 'vbox...' hosts!"
-    exit 1
-fi
+user="${1?No current user}"
 
-CURR_USER="${1?No current user}"
-
-## Password
+## ROOT setup
 echo ":: set root password"
 printf "root:root" | chpasswd
 
 
 ### ADD users
-useradd -m -g users -G wheel,storage,power -s /bin/bash "$CURR_USER"
-echo ":: set $CURR_USER password"
-printf "$CURR_USER:$CURR_USER" | chpasswd
+# https://wiki.archlinux.org/index.php/Users_and_groups#User_groups
+# adbusers, mpd, vboxsf, vboxusers, wireshark
+groupadd "$user"
+useradd -m -g "$user" -G users,wheel,uucp -s /bin/bash "$user"
+echo ":: set $user password"
+printf "$user:$user" | chpasswd
 ### ADD sudo powers)
 # pacman -S sudo bash-completion
 # visudo
 # %wheel ALL=(ALL) ALL
 
 
-### Autostart X
-ddst="/home/$CURR_USER/aura"
-mkdir -p "$ddst" && cp -vft "$ddst" ~/user-*
-chown "$CURR_USER:$CURR_USER" ~/user-*
-su "$CURR_USER" ~/aura/user-su
+### USER setup
+dir="/home/$user/aura"
+chown "$user:$user" ~/user-*
+mkdir -p "$dir" && cp -vft "$dir" ~/user-*
+su "$user" "$dir/user-su"
 
-systemctl enable xdm.service
+
+### ENABLE Services
+systemctl enable sshd.service
+systemctl enable xdm.service   # Autostart X
+
+
+## Create initial database running as root
+# /usr/bin/mandb --quiet

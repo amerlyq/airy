@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
 
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then
-    echo "Use this script only under archiso image!"
-    exit 1
-fi
 sd="${1?No sd disk specified for grub}"
 
-CURR_HOST=vboxarch
+CURR_HOST=archvbox
 CURR_USER=root
 loc="en_US.UTF-8"
 zone=/usr/share/zoneinfo/Europe/Kiev
@@ -28,21 +25,72 @@ echo ':: time setted up'
 
 ## Host
 echo ':: writing host'
-echo $CURR_HOST | tee /etc/hostname
-sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"$CURR_HOST"'/' /etc/hosts
+# echo $CURR_HOST | tee /etc/hostname
+# sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"$CURR_HOST"'/' /etc/hosts
+hostnamectl set-hostname "$CURR_HOST"
 
-## Network
-ifcnm=$(ip link | sed -rn '/^.*:\s+(e\w+):.*$/{s//\1/p;q}')
-systemctl enable dhcpcd@${ifcnm}.service
-echo ':: eth dhcp active'
+
+### Network
+ifcnm=$(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p;q}')
+# systemctl enable dhcpcd@${ifcnm}.service  # Disable if use netctl
+
+cat - << EOT > /etc/netctl/vbox-nat
+Description='VBox NAT main connection'
+Interface=enp0s3
+Connection=ethernet
+IP=dhcp
+EOT
+netctl enable vbox-nat
+
+cat - << EOT > /etc/netctl/vbox-hostonly
+Description='VBox host-only connection'
+Interface=enp0s8
+Connection=ethernet
+IP=static
+Address=('192.168.56.11/24')
+# Routes=('192.168.56.0/24 via 192.168.56.1')
+## Don't uncomment, or 'ip route' will be wrong and w/o inet
+# Gateway='192.168.56.1'
+# DNS=('192.168.56.1')
+EOT
+netctl enable vbox-hostonly
+
+echo ':: eth dhcp and vbox static are active'
+
 
 # For grained set-up
 # Set correct hooks (lvm,usb...) in /etc/mkinitcpio.conf
 # mkinitcpio -p linux
 
-## Bootloader
+
+### Bootloader
 pacman -S --noconfirm grub os-prober
-grub-install --target=i386-pc --recheck $sd
+grub-install --core-compress=auto --target=i386-pc --recheck $sd
 rm -vf /boot/grub/grub.cfg
+
+## Change default grub:
+# info -f grub -n 'Simple configuration'
+# Press <Esc> to show menu.  Holding down the "SHIFT" key will not display the
+# menu if "GRUB_TIMEOUT=" is set to "0"
+# In future use 'sudo update-grub' after changes.
+mv -vf /etc/default/grub{,.bkp}
+cat - <<-'EOT' > /etc/default/grub
+GRUB_DEFAULT=saved
+GRUB_SAVEDEFAULT=true
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden  # conuntdown / menu
+
+GRUB_DISTRIBUTOR="Arch"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX=""
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial"
+
+GRUB_GFXPAYLOAD_LINUX=text  # keep
+GRUB_DISABLE_RECOVERY=true
+# GRUB_ENABLE_CRYPTODISK=true
+GRUB_PRELOAD_MODULES="part_msdos"  # parg_gpt
+EOT
+
 grub-mkconfig -o /boot/grub/grub.cfg
 echo ':: grub installed'

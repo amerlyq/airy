@@ -1,6 +1,9 @@
 TODO
+	>>> [_] https://wiki.archlinux.org/index.php/SSH_keys
+
 	> http://www.linuxveda.com/2015/04/20/arch-linux-tutorial-manual/
 	> http://www.linuxveda.com/2015/03/27/how-to-install-arch-linux-server-tutorial/
+	> http://initrd.org/wiki/Arch_Installation_Script
 
 	> https://wiki.archlinux.org/index.php/General_recommendations
 	https://wiki.archlinux.org/index.php/Maximizing_performance
@@ -8,7 +11,127 @@ TODO
 	https://wiki.archlinux.org/index.php/System_maintenance
 	https://wiki.archlinux.org/index.php/Systemd#Basic_systemctl_usage
 
+	[_] Exclude root from display managers -- always load in console w/o X
+
+### Seized ###
+	https://wiki.archlinux.org/index.php/Beginners%27_guide
+
+
+VBOX
+	https://wiki.archlinux.org/index.php/VirtualBox#Failed_to_create_the_host-only_network_interface
+
+	On Host linux
+		ssh-keygen -N "" -f ~/.ssh/arch
+		cat ~/.ssh/arch.pub >> ~/.ssh/authorized_keys
+	From within Arch vbox:
+		scp user@local.ip:~/.ssh/arch  ~/.ssh/id_rsa
+		scp user@local.ip:~/aura/airy/arch-install .
+
+
 [_] Give my complete auto installation to Igor to test)
+	Window managers -- switcher for multiprofiling work/media
+		Use Qingy + i3 + Enligtment
+			https://wiki.archlinux.org/index.php/Enlightenment
+		Use Enligtment + dvtm -- analogue to dwm but for terminals only (like tmux?)
+			http://www.brain-dump.org/projects/dvtm/
+		| + some drop-down terminal?
+			https://wiki.archlinux.org/index.php/Terminal_as_a_Transparent_Wallpaper
+
+	Terminal emulators -- switcher for local/remote/no-X work
+		https://wiki.archlinux.org/index.php/KMSCON
+		https://wiki.archlinux.org/index.php/Fbterm
+		https://github.com/uobikiemukot/yaft
+		https://wiki.archlinux.org/index.php/St
+		TRY:
+			http://finalterm.org/
+			http://liftoffsoftware.com/Products/GateOne
+
+
+Local repository caching on router's ftp
+	https://wiki.archlinux.org/index.php/Pacman_tips#Custom_local_repository
+	https://wiki.archlinux.org/index.php/Local_repository
+	https://wiki.archlinux.org/index.php/Local_Mirror
+	https://wiki.archlinux.org/index.php/Pacman_tips#Network_shared_pacman_cache
+
+	Run a standalone webserver which other computers can use as a first mirror:
+	: https://www.unix4lyfe.org/darkhttpd/
+		repo-add /var/cache/pacman/pkg/custom.db.tar.gz /var/cache/pacman/pkg/*.pkg.tar.xz
+		scp -r /var/cache/pacman/pkg $VBOX_SSH:"$VMs"
+		darkhttpd /var/cache/pacman/pkg
+		: - you must update it manually
+	Use sshfs to share /var/cache/pacman/pkg
+	: https://wiki.archlinux.org/index.php/Sshfs
+		mount /var/cache/pacman/pkg from the server to /var/cache/pacman/pkg on every client machine
+		; sshfs sessy@mycomputer:/foo/bar /mnt/bar -p 9876
+		; fusermount -u /mnt/sessy
+
+		: + autoupdating
+	ALT to sshfs
+	: https://wiki.archlinux.org/index.php/Pacserve
+		: + simplicity
+	vsftp or sftp?
+		https://wiki.archlinux.org/index.php/Very_Secure_FTP_Daemon
+		https://wiki.archlinux.org/index.php/SFTP
+
+
+Troubleshooting
+	Network
+	: https://wiki.archlinux.org/index.php/Netctl
+		ip link set enp0s8 up  # vboxnet0
+		systemctl --type=service
+		ip route  # Check what happens to route table
+	Get known to host ip-mac pairs
+		arp -a
+	Get guest IP:
+		Install VBoxAdditions
+		VBoxManage guestproperty enumerate Arch64
+		VBoxManage guestproperty get Arch64 "/VirtualBox/GuestInfo/Net/2/V4/IP"
+
+
+	https://wiki.archlinux.org/index.php/General_troubleshooting#Session_permissions
+	; who  # check all logged in
+	; loginctl show-session $XDG_SESSION_ID
+	: If you cannot boot due to errors caused by a daemon, faulty fstab,
+	: display manager or Xorg, you may be able use the single user runlevel to
+	: fix your problem. Single user mode drops you into a root shell after
+	: booting minimally. Since Arch uses systemd, you do this by appending
+	: systemd.unit=rescue.target to the kernel parameters. If that does not
+	: work for whatever reason (e.g. the rescue target depends on a target
+	: that fails), you can instantly drop to a root shell by adding
+	: init=/bin/sh to the kernel parameters.
+
+
+NOTE
+	ALT: Vagrant
+		https://lwn.net/Articles/486319/
+	Send binary as text over serial port to bare linux embedded device
+		http://www.devttys0.com/2011/05/serial-file-uploads-with-serio/
+	BADLY e.g: https://github.com/wopfel/archlinux-setup-vb
+
+	Netcat
+		http://www.debian-administration.org/article/58/Netcat_The_TCP/IP_Swiss_army_knife
+		http://www.debian-administration.org/article/145/use_and_abuse_of_pipes_with_audio_data
+	Possible manual commands from separate terminal:
+		echo ls | nc -q 1 -U $SERIAL -P root -
+		{ printf "ls\n"; sleep 0.2; } | nc -q 0 -U /tmp/vbox-"$VNM"S0 -P root -
+		cat <file> | nc -q 1 -U /tmp/vbox-"$VNM"S0 -P root -
+	Netcat
+		http://www.debian-administration.org/article/58/Netcat_The_TCP/IP_Swiss_army_knife
+		http://www.debian-administration.org/article/145/use_and_abuse_of_pipes_with_audio_data
+	Possible manual commands from separate terminal:
+		echo ls | nc -q 1 -U $SERIAL -P root -
+		{ printf "ls\n"; sleep 0.2; } | nc -q 0 -U /tmp/vbox-"$VNM"S0 -P root -
+		cat <file> | nc -q 1 -U /tmp/vbox-"$VNM"S0 -P root -
+	NOTE: Get scancodes interactively: sudo showkey -s
+		http://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html
+	<TODO> Think how to duplicate input/output from ttyS0 and tty0 showed on monitor.
+		>>> It simply don't work!  (moreover, tty0 don't work and tty1 used for autologin)
+		: 0f 8f 39 b9  # <Tab><Space>
+		: 2e ae 18 98 31 b1 1f 9f 18 98 26 a6 12 92  # 'console'
+		: 0d 8d 14 94 14 94 15 95 03 83              # '=tty2'
+
+
+
 
 
 Optimize boot time (both kernel and bootloader)
@@ -42,19 +165,6 @@ RSS
 Display managers
 	https://wiki.archlinux.org/index.php/Display_manager
 	https://wiki.archlinux.org/index.php/Qingy
-
-Window managers -- switcher for multiprofiling work/media
-	Use Qingy + i3 + Enligtment
-		https://wiki.archlinux.org/index.php/Enlightenment
-
-Terminal emulators -- switcher for local/remote/no-X work
-	https://wiki.archlinux.org/index.php/KMSCON
-	https://wiki.archlinux.org/index.php/Fbterm
-	https://github.com/uobikiemukot/yaft
-	https://wiki.archlinux.org/index.php/St
-	TRY:
-		http://finalterm.org/
-		http://liftoffsoftware.com/Products/GateOne
 
 Composition
 	http://projects.mini-dweeb.org/projects/unagi

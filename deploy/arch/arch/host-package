@@ -1,23 +1,17 @@
 #!/usr/bin/env bash
-
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then
-    echo "Use this script only under 'vbox...' hosts!"
-    exit 1
-fi
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
 
 
 ### Install X, etc
 # pacman -Sy
-LST="xorg-server xorg-server-utils xorg-xinit xorg-xdm"
-LST="$LST xf86-video-vesa mesa-libgl" # VBOX only: or X will not start!
+LST="xorg-server xorg-server-utils xorg-xinit"
+# VBox needs at least vesa GPU driver: or X will not start!
+LST="$LST xorg-xdm xf86-video-vesa mesa-libgl"
 # 1) mesa-libgl  2) nvidia-304xx-libgl  3) nvidia-340xx-libgl  4) nvidia-libgl
+# pacman -S xorg-twm xterm xf86-input-synaptics mesa nvidia lib32-nvidia-utils
 
-# pacman -S xorg-twm xterm
-# pacman -S mesa
-# pacman -S nvidia lib32-nvidia-utils
-# pacman -S xf86-input-synaptics
 LST="$LST git i3-wm dmenu"
-pacman -S $LST
+pacman -S --noconfirm $LST
 
 
 ### AUR: https://archlinux.fr/yaourt-en
@@ -27,10 +21,5 @@ pacman -S $LST
 # SigLevel = Never
 # Server = http://repo.archlinux.fr/$arch
 # ' >> /etc/pacman.conf; fi
-# pacman -Sy base-devel yaourt
-
-
-
-## Create initial database running as root
-# /usr/bin/mandb --quiet
+# pacman -Sy --noconfirm base-devel yaourt
 

@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-
-if ! [[ "$(uname -n)" =~ archiso ]]; then
-    echo "Use this script only under archiso image!"
-    exit 1
-fi
+if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
 
 sd="${1?No disk device}"
 
