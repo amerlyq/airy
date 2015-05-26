@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+
+opts="$1"
+user="user"
+sd=/dev/sda
+CURR_HOST="archvbox"
+VBOX_IP="192.168.56.1"
+
+
+
+user_own() { chown -R "$1:$1" "$2" && chmod -R ${3:-700} "$3"; }
+usercopy() {
+    local nm="$1" dr="$2" src="$3" dst="$2/${3%/*}"
+    if ! [[ -d "$dr" ]]; then mkdir -p "$dr" && user_own "$dr"; fi
+    cp -vrft "$dr" "$src"
+    user_own "$nm" "$dst" ${4}
+}
+die() { exit $?; }
+run_in_chroot() { xargs -I@ arch-chroot /mnt "$1/@" || exit $?; }
+run_in_chr_su() { xargs -I@ arch-chroot /mnt su "$1" "$2/@" || exit $?; }
+
+
+
+### BASE
+user_own "root" ~/base
+~/base/00-disk "$sd" "$opts" || die
+~/base/40-package || die
+
+## Automounts in fstab (generate after pacstrap)
+fst=/mnt/etc/fstab
+sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
+echo ":: fstab generated"
+
+
+### CHROOT
+usercopy "root" "/mnt/root" ~/host
+cat - << EOT | run_in_chroot ~/host
+00-setup
+10-network "$CURR_HOST" "$VBOX_IP"
+20-boot "$sd"
+40-package "http://${VBOX_IP}:23208"
+60-services
+EOT
+echo ':: host chroot ended'
+
+
+### ADD users:  https://wiki.archlinux.org/index.php/Users_and_groups#User_groups
+# adbusers, mpd, vboxsf, vboxusers, wireshark
+groupadd "$user"
+useradd -m -g "$user" -G users,wheel,uucp -s /bin/bash "$user"
+echo ":: set $user password"
+printf "$user:$user" | chpasswd
+
+
+## SSH access: add host public key to vbox guest
+home="/mnt/home/$user"
+usercopy "$user" "$home" ~/id_rsa.pub 600
+mkdir -p "$home/.ssh" && mv -v "$home/id_rsa.pub" "$home/.ssh/authorized_keys"
+
+
+### SU user
+usercopy "$user" "$home" ~/user
+cat - << EOT | run_in_chr_su "$user" ~/user
+30-configs
+EOT
+echo ":: $user su in chroot ended"
+
+
+# NOTE: use 'fuser' to find by what it is busy
+umount -R /mnt
+
+echo '::: install complete :::'
+# Reboot now! Other scripts only after that? Or before?

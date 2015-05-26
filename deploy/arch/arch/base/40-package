@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+
+srv="${1?No local pacman server}"
+
+pmt=/tmp/pacman.tmp
+prepend_to() { cat > $pmt; sed '/#%BEGIN/,/#%END/d' "$1" >> $pmt; mv -vf $pmt "$1"; }
+
+
+### Select a mirror.
+# TODO: Add fetching and sorting for mirror list?
+# TODO: Replace Local IP to 'vboxhost'
+cat - <<EOT | prepend_to /etc/pacman.d/mirrorlist
+#%BEGIN Prepended during install
+
+## Local: pacman mirror on host server.
+## Must contain official databases (base, core, ...)!
+# Server = $srv
+
+## Score: 0.7, Ukraine -- 6MiB/s, stable
+Server = http://archlinux.bln-ua.net/\$repo/os/\$arch
+
+## Score: 25.8, Ukraine -- 11MiB/s, but some packages are <1MiB/s
+Server = http://mirrors.nix.org.ua/linux/archlinux/\$repo/os/\$arch
+
+#%END
+EOT
+
+
+### Add local cache repository
+# Don't forget to do:
+#   repo-add /var/cache/pacman/pkg/custom.db.tar.gz /var/cache/pacman/pkg/*.pkg.tar.xz
+#   scp -r /var/cache/pacman/pkg $VBOX_SSH:"$VMs"
+cat - <<EOT | prepend_to /etc/pacman.conf
+## Local: pacman mirror on host server
+#%BEGIN Prepended during install
+[custom]
+SigLevel = Optional TrustAll
+Server = $srv
+#%END
+EOT
+
+echo ":: mirrors selected"
+
+
+### BASE SOFT
+soft="base openssh"  #base-devel  sshfs
+
+if [ ! -d "/mnt/usr/bin" ]; then
+    ## Install the base system  # -i -- interactive
+    pacstrap /mnt $soft || exit $?
+    echo ":: packstrap installed"
+fi

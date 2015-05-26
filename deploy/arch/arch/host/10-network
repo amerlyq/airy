@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+CURR_HOST="${1?No current host name}"
+VBOX_IP="${2?No vbox host-only ip}"
+
+
+## Host
+echo ':: writing host'
+# echo $CURR_HOST | tee /etc/hostname
+# sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"$CURR_HOST"'/' /etc/hosts
+hostnamectl set-hostname "$CURR_HOST"
+
+
+### Network
+ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
+# systemctl enable dhcpcd@${ifcs[0]}.service  # Disable if use netctl
+vnet="${VBOX_IP##*.}"
+
+
+cat - << EOT > /etc/netctl/vbox-nat
+Description='VBox NAT main connection'
+Interface=${ifcs[0]}
+Connection=ethernet
+IP=dhcp
+EOT
+netctl enable vbox-nat
+
+
+cat - << EOT > /etc/netctl/vbox-hostonly
+Description='VBox host-only connection'
+Interface=${ifcs[1]}
+Connection=ethernet
+IP=static
+Address=('${vnet}.11/24')
+# Routes=('${vnet}.0/24 via $VBOX_IP')
+## Don't uncomment, or 'ip route' will be wrong and w/o inet
+# Gateway='$VBOX_IP'
+# DNS=('$VBOX_IP')
+EOT
+netctl enable vbox-hostonly
+
+
+echo ':: eth dhcp and vbox static are active'

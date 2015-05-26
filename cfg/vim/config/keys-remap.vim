@@ -80,7 +80,7 @@ noremap ,v  <C-V>
 noremap <expr> gv '`[' . strpart(getregtype(), 0, 1) . '`]'
 " selects the last text edited/pasted in INSERT, and reselect of last VISUAL
 noremap gV `[v`]
-" visually select a search result
+" visually select a search result (default: 'gn, gN' -- much better!)
 nnoremap g/ //e<cr>v??<cr>
 " reselect visual block after indent
 vnoremap < <gv

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+sdX="${1?No sdX disk specified for grub}"
+
+# For grained set-up
+# Set correct hooks (lvm,usb...) in /etc/mkinitcpio.conf
+# mkinitcpio -p linux
+
+
+### Bootloader
+pacman -S --noconfirm grub os-prober
+grub-install --core-compress=auto --target=i386-pc --recheck ${sdX}
+rm -vf /boot/grub/grub.cfg
+
+## Change default grub:
+# info -f grub -n 'Simple configuration'
+# Press <Esc> to show menu.  Holding down the "SHIFT" key will not display the
+# menu if "GRUB_TIMEOUT=" is set to "0"
+# In future use 'sudo update-grub' after changes.
+mv -vf /etc/default/grub{,.bkp}
+cat - <<-'EOT' > /etc/default/grub
+GRUB_DEFAULT=saved
+GRUB_SAVEDEFAULT=true
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden  # conuntdown / menu
+
+GRUB_DISTRIBUTOR="Arch"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX=""
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial"
+
+GRUB_GFXPAYLOAD_LINUX=text  # keep
+GRUB_DISABLE_RECOVERY=true
+# GRUB_ENABLE_CRYPTODISK=true
+GRUB_PRELOAD_MODULES="part_msdos"  # parg_gpt
+EOT
+
+grub-mkconfig -o /boot/grub/grub.cfg
+echo ':: grub installed'

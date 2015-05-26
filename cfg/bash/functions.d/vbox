@@ -62,3 +62,13 @@ do_vm_socket_file() {
     cat "$file" | nc -U "$serial"                       # Send content
     printf "\n%s\n"  "EOFSERIALFILE" | nc -U "$serial"  # End of heredoc file
 }
+
+do_vm_socket_dir() {
+    local serial="${1?No vbox serial}" dir="${2?No dir path}" ddst=${3:-~}/"${2##*/}"
+    if [ ! -d "$dir" ]; then squit "Dir doesn't exist!"; fi
+    echo "mkdir -p '$ddst'" | nc -U "$serial"
+
+    for fl in "$dir"/*; do if [ -f "$fl" ]
+    then do_vm_socket_file "$serial" "$fl" "$ddst"
+    else do_vm_socket_dir "$serial" "$fl" "$ddst"; fi; done
+}
