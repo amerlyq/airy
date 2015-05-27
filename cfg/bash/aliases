@@ -1,10 +1,8 @@
 #!/bin/bash
 # Don't launch, source only!
 
-DIR=~/.bash/aliases.d
-
-if [ -d "$DIR" ]; then
-    for fl in "$DIR"/*; do if [[ \
+if [ -d ~/.bash/aliases.d ]; then
+    for fl in ~/.bash/aliases.d/*; do if [[ \
         "${SHELL##*/}" == zsh || \
         "${fl##*/}" != zsh*      \
         ]]; then source "$fl"; fi

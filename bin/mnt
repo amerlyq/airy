@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 # ???? instead of file name
 # sudo LC_ALL="ru_RU.UTF-8" ranger (don't work but helps)
@@ -7,7 +7,7 @@
 # https://ru.wikipedia.org/wiki/Mount
 
 # Disk mounting util
-if [[ -n "$1" && ${#1} -le 2 ]]; then ACTION=${1}; shift; else ACTION=m; fi
+if [[ -n "$1" && ${#1} -le 2 ]]; then ACTION="${1}"; shift; else ACTION=m; fi
 
 LBL="$1"
 MNT="/media/$CURR_USER"
@@ -22,11 +22,11 @@ if [[ -z "$LBL" ]]; then
 fi
 
 
-dosamba() { sudo mount -t cifs -o user="${1?Need user}" //${2?Need share}/ "$DIR"; }
+dosamba() { dirmk && sudo mount -t cifs -o user="${1?Need user}" //${2?Need share}/ "$DIR"; }
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
     if ! [ -e "$DEVPATH" ]; then echo "Error: no such file '$DEVPATH'"; exit 1; fi
-    sudo mount -o loop "$DEVPATH" "${DIR%.*}"
+    dirmk && sudo mount -o loop "$DEVPATH" "${DIR%.*}" || exit $?
 }
 domnt() {
     local DEVPATH TYPE
@@ -41,13 +41,22 @@ domnt() {
 codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
     fi
     # -t "$TYPE"
-    if dirmk; then sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} && echo "$DIR"; fi
+    dirmk && sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} && echo "$DIR" || exit $?
 }
 
-check() { if grep -qsw "$DIR" /proc/mounts; then echo "Already mounted at '$DIR'!"; exit; fi; }
-clean() { check; if [ -d "$DIR" ]; then rmdir "$DIR" || sudo rmdir -v "$DIR" || exit 1; fi; }
-dirmk() { clean; mkdir -p "$DIR" || sudo mkdir -p "$DIR"; }
-if ! dirmk; then echo "Error: Can't create directory for mount!"; exit 1; fi
+
+check() { if grep -qsw "$DIR" /proc/mounts
+then echo "Already mounted at '$DIR'!"; exit 1
+fi; }
+clean() { check || exit $?
+if [ -d "$DIR" ]; then
+    rmdir "$DIR" 2>/dev/null || sudo rmdir -v "$DIR" || {
+        echo "Can't remove directry '$DIR'!"; exit 1
+}; fi; }
+dirmk() { clean || exit $?
+    mkdir -p "$DIR" 2>/dev/null || sudo mkdir -p "$DIR"
+    [[ $? -ne 0 ]] && echo "Error: Can't create directory for mount!" && exit 1
+}
 
 
 case "$ACTION" in
@@ -61,7 +70,7 @@ ${WORK_MAIL%@*}) dosamba ${WORK_MAIL%@*} $SURC_SRV/${WORK_MAIL%@*} ;;
 #{exchange,projects,install}
     install) dosamba ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;;
     esac ;;
- u) sudo umount -v "$DIR" && clean ;;
+ u) sudo umount -v "$DIR"; clean || exit $? ;;
 #U) sudo umount -v -R "$MNT"/* && sudo rmdir -v "$MNT"/* ;;  # ERROR: No -R key
  *) echo "Error: '$ACTION'" ;;
 esac

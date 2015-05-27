@@ -26,6 +26,7 @@ let s:qf_mappings = {
       \ 'x' : '<C-w><CR><C-w>T',
       \ 'X' : '<C-w><CR><C-w>TgT<C-W><C-W>',
       \ '<Space>' : '<CR>',
+      \ '<CR>' : '<CR>',
 \ }
 
 " SNIP: \ 'o' : '<CR>:#open<CR>',

@@ -1,4 +1,4 @@
-" vim: foldmethod=marker
+" vim:fdm=marker:fdl=1
 " :NeoBundleClearCache if change .vimrc
 
 let mapleader="\\"
@@ -275,8 +275,6 @@ NeoBundleLazy 'gregsexton/gitv', { 'depends' : [ 'tpope/vim-fugitive' ]
 
 " Change your root working dir to nearest .git on file_open or <Leader>cd
 NeoBundle 'airblade/vim-rooter'
-" The Silver searcher
-NeoBundle 'rking/ag.vim', { 'external_commands' : 'ag' }
 " ======================================
 
 " Undo tree
@@ -292,9 +290,7 @@ NeoBundle 'tomtom/tcomment_vim'
 " NeoBundle
 
 "{{{ Motions ============================
-NeoBundle 'Lokaltog/vim-easymotion'
-" Start with ,.
-
+NeoBundle 'justinmk/vim-sneak'
 " New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
 NeoBundle 'bkad/CamelCaseMotion'
 
@@ -358,7 +354,7 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {
 
 
 " ======================================
-"NeoBundle 'MPogoda/octave.vim--'
+
 "NeoBundleLazy 'docunext/closetag.vim', { 'autoload' : { 'filetypes' : ['html', 'xml'] }
 "                                     \ , 'name' : 'closetag'
 "                                     \ }
@@ -370,10 +366,6 @@ NeoBundle 'hsanson/vim-android'
 " NeoBundle 'cakebaker/scss-syntax.vim'
 " NeoBundle 'gorodinskiy/vim-coloresque'
 " NeoBundle 'tpope/tpope/vim-unimpaired'
-
-" Has syntastic integration, allow building CMake from vim.
-" TODO: temporarily disabled as I can't understand how to integrate with syntastic
-" NeoBundle 'jalcine/cmake.vim'
 
 NeoBundle 'scrooloose/syntastic'
 "NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'
@@ -412,15 +404,6 @@ NeoBundleLazy 'elzr/vim-json', {
     \ 'autoload': { 'filetypes': [ 'json' ] },
     \}
 
-"" For future of haskell
-"NeoBundle 'lukerandall/haskellmode-vim' { 'autoload' : { 'filetypes' : ['haskell', 'hs'] }  }
-" eagletmt/ghcmod-vim
-" eagletmt/neco-ghc
-" dag/vim2hs
-" Twinside/vim-haskellConceal
-"" Scala
-" derekwyatt/vim-scala
-
 
 " ======================================
 "TIME:
@@ -430,9 +413,6 @@ NeoBundle 'mhinz/vim-signify'
 " Plugin to toggle, display and navigate marks
 " NeoBundle 'kshenoy/vim-signature'
 
-" DEPRECATED: use Unite MRU
-" NeoBundle 'mhinz/vim-startify'
-
 " When swap exists, it show process id, or you can diff swp with file on disk
 NeoBundle 'chrisbra/Recover.vim'
 
@@ -440,13 +420,28 @@ NeoBundle 'chrisbra/Recover.vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 
 " Substitution: {{{
-" ALT: osyo-manga/vim-anzu
-NeoBundle 'henrik/vim-indexed-search'
-NeoBundle 'bronson/vim-visual-star-search'
+" The Silver searcher
+NeoBundle 'rking/ag.vim', {
+    \ 'external_commands' : 'ag',
+    \ 'autoload': { 'commands' : [
+    \   'Ag', 'AgAdd', 'AgBuffer', 'AgFile', 'AgFromSearch',
+    \   'AgHelp', 'LAg', 'LAgAdd', 'LAgBuffer', 'LAgHelp'
+    \ ], }, }
 " Multiple hl for searching by / ? or g/
 NeoBundle 'haya14busa/incsearch.vim'
-" :substitute preview
-NeoBundle 'osyo-manga/vim-over'
+" Smart highlight
+NeoBundleLazy 'haya14busa/vim-asterisk', {
+    \   'autoload' : {
+    \     'mappings' : ['<Plug>(asterisk-']
+    \   }
+    \ }
+" Index for search results
+NeoBundle 'osyo-manga/vim-anzu'
+" Preview :substitute patterns
+NeoBundle 'osyo-manga/vim-over', {
+    \ 'autoload': { 'commands' : ['OverCommandLine'], },
+    \ }
+
 " }}} ======================================
 
 

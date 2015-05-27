@@ -91,7 +91,7 @@ vim:
 	[_] Check neovim
 	[_] BUG: in insert for fast presses: <S-F12>, etc. Check with macro.
 	[_] BUG: mouse highlight don't work
-	[_] BUG: mix of incsearch, others! Find higlighting-as-you-type in '/' or ':s;..;' !
+	2015-05-26 [X] BUG: mix of incsearch, others! Find higlighting-as-you-type in '/' or ':s;..;' !
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
 	[_] BUG: ttimeoutlen or similar -- after some editing, two-key combo timing is too fast
 		: problem is in mappings of <M-..> at term-alt-keys.vim. Temporarily disabled.
@@ -125,10 +125,15 @@ vim:
 		au FocusLost   * silent! call CopyStringInReg('"', @+)
 		au FocusGained * silent! call CopyStringInReg('+', @")
 		: and autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
-	[_] easymotion
+	2015-05-26 [X] easymotion
 		2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
 			No combining -- overlapping x-mappings aren't possible
-		[_] ALT: https://github.com/justinmk/vim-sneak
+		[X] ALT: https://github.com/justinmk/vim-sneak
+	Substitute keeps case
+		keepcase.vim
+			http://www.vim.org/scripts/script.php?script%5Fid=6
+		SmartCase
+			http://www.vim.org/scripts/script.php?script_id=1359
 	[_] own syntax highlighting
 		http://learnvimscriptthehardway.stevelosh.com/chapters/46.html
 		http://vim.wikia.com/wiki/Search_for_lines_not_containing_pattern_and_other_helpful_searches

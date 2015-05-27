@@ -1,3 +1,4 @@
+" vim:fdm=marker:fdl=1
 " Jedi {{{1
 " If you need completion on Tab:
 " USE: https://github.com/ervandew/supertab
