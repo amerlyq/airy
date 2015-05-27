@@ -39,7 +39,7 @@ big2lit() { [[ -t 0 ]] || { big2lit_pipe "$1" "$2"; exit $?; }
 perl -We 'my $i=0; my $n=4;
 if ($#ARGV >= 0) { open($in, "<", $ARGV[0]); } else { $in = *STDIN; }
 while(read($in, $buf, $n)){
-    ($i % (16*$n)) or printf "%s=%03x=\n"," "x(4*(2*$n+1)-2),$i;
+    ($i % (16*$n)) or printf "%s=%03x=\n"," "x(4*(2*$n+1)-2), 4*$i;
     $i++; printf "%08lx ",unpack("'${2:-N}'", $buf) if length($buf) == $n;
     if ($i % (2*$n)) { ($i % $n) or printf "  "; } else { printf "\n"; }
 }' "$1"; }
@@ -54,9 +54,9 @@ case "$cmd" in
     of) funcOnly "$fl" "$symb"; exit ;;
     b) cmd="objdump -m $arch -b binary -D" ;;
     B) cmd="armv7l-tizen-linux-gnueabi-objdump -m arm -b binary -D" ;;
-    x) cmd="xxd " ;;
-    xb) big2lit "$fl" N; exit ;;
+    xn) big2lit "$fl" N; exit ;;
     xl) big2lit "$fl" L; exit ;;
+    x) cmd="xxd " ;;
     l) cmd="less " ;;
     *) echo "No such '$cmd' processor" && exit 1 ;;
 esac

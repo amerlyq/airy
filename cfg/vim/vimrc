@@ -2,11 +2,17 @@
 " Seize
 " 100%:    https://github.com/MPogoda/dotfiles
 "  80%: https://github.com/euclio/vim-settings/blob/master/vimrc
+set nocompatible
+set fileformats=unix,dos,mac
 
-if has("unix")
-    language messages C
+if has("multi_byte")
+  if &termencoding == "" | let &termencoding = &encoding | endif
+  set encoding=utf-8
+  setglobal fileencoding=utf-8
+  set fileencodings=utf-8,cp1251,cp866
+endif
 
-else "elseif
+if has("unix") | language messages C | else "elseif
     language messages en_US.UTF-8 "C, en, en_US, en_US.UTF-8
     "set langmenu=en_US.UTF-8
     " Window size
@@ -109,8 +115,6 @@ if !has('vim_starting')
 endif
 "===============================================
 
-set fileformats=unix,dos,mac
-set fileencodings=utf-8,cp1251,cp866
 
 " delegate configuration to files in config/
 runtime! config/**/*.vim

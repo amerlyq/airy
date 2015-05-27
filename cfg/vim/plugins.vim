@@ -189,8 +189,6 @@ endif
 
 
 "" Python =======================
-
-" Temporary disabled. Reported it has perfomance troubles with Jedi.
 NeoBundle 'klen/python-mode', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] } }
 NeoBundle 'davidhalter/jedi-vim', {
@@ -235,6 +233,7 @@ NeoBundle 'coderifous/textobj-word-column.vim'
 "NeoBundle 'kana/vim-smartinput'
 
 
+" ======================================
 ":Make cover for long-running tasks asynchronous (as like by ssh)
 NeoBundle 'tpope/vim-dispatch'
 NeoBundleLazy 'tpope/vim-markdown', { 'autoload' : { 'filetypes' : [ 'markdown' ] } }
@@ -278,16 +277,16 @@ NeoBundle 'airblade/vim-rooter'
 " ======================================
 
 " Undo tree
-NeoBundleLazy 'mbbill/undotree', { 'autoload' : { 'commands' : 'UndotreeToggle' } }
-
-NeoBundleLazy 'godlygeek/tabular', { 'autoload' : { 'commands' : [ 'Tab', 'Tabularize' ] } }
-
-NeoBundleLazy 'majutsushi/tagbar', { 'autoload' : { 'commands' : 'TagbarToggle' } }
+NeoBundleLazy 'mbbill/undotree', {
+    \ 'autoload' : { 'commands' : 'UndotreeToggle' } }
+NeoBundleLazy 'godlygeek/tabular', {
+    \ 'autoload' : { 'commands' : [ 'Tab', 'Tabularize' ] } }
+NeoBundleLazy 'majutsushi/tagbar', {
+    \ 'autoload' : { 'commands' : 'TagbarToggle' } }
 
 NeoBundle 'tomtom/tcomment_vim'
 " Alt: tpope/commentary
 
-" NeoBundle
 
 "{{{ Motions ============================
 NeoBundle 'justinmk/vim-sneak'
@@ -314,26 +313,23 @@ NeoBundle 'matchit.zip'
 " Alt: 'bb:abudden/taghighlight' "(small and fast) from bitbucket
 "NeoBundle 'xolox/vim-easytags', { 'depends' : [ 'xolox/vim-misc' ] }
 "NeoBundle 'xolox/vim-misc'
+
+
+" Focus on line/selection/window in new buffer. ALT to LineDiff?
+NeoBundle 'chrisbra/NrrwRgn'
+" No Lazy, or disable support for nrrwrgn in airline!
+" , { 'autoload' : {
+"     \ 'commands' : ['NR', 'NW', 'NRV', 'NUD', 'NRP', 'NRM', 'NRL'],
+"     \ 'mappings' : ['<Plug>(NrrwrgnDo)', '<Plug>(NrrwrgnBangDo)'],
+"     \ } }
+
 NeoBundle 'AndrewRadev/linediff.vim'
 
-
-
-NeoBundle 'chrisbra/NrrwRgn'
-" <leader>nr -> narrow region
-
-NeoBundle 'depuracao/vim-rdoc'
-
-
-NeoBundle 'lyokha/vim-xkbswitch', {
-    \ 'autoload' :
-    \   { 'filetypes' : [ 'tex', 'latex', 'bib'
-                      \ , 'markdown'
-                      \ , 'votl', 'txt'
-                      \ ],
+" No Lazy -- vim will pause 'ENTER' on file open
+NeoBundle 'lyokha/vim-xkbswitch', { 'autoload' : {
+    \ 'filetypes' : [ 'tex', 'latex', 'bib', 'markdown', 'votl', 'txt' ],
     \ 'commands' : 'EnableXkbSwitch'
-    \   }
-    \ , 'name' : 'vim-xkbswitch'
-    \ }
+    \ }, 'name' : 'vim-xkbswitch' }
 
 
 " ======================================
@@ -360,7 +356,7 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {
 "                                     \ }
 
 " NeoBundle 'vim-scripts/DoxygenToolkit.vim'
-NeoBundle 'hsanson/vim-android'
+" NeoBundle 'hsanson/vim-android'
 " Web
 " NeoBundle 'mattn/emmet-vim'
 " NeoBundle 'cakebaker/scss-syntax.vim'

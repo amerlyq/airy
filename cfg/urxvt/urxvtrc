@@ -16,7 +16,7 @@ URxvt*loginShell         : true
 URxvt*saveLines          : 10000
 !URxvt*override-redirect : false
 
-! Turn on/off ISO 14755, *5.2 (default enabled)
+! Turn on/off ISO 14755, *5.2 for keymaps to work (default enabled)
 URxvt*iso14755    : false
 URxvt*iso14755_52 : false
 ! Getting the meta key working normally in vim
@@ -24,8 +24,6 @@ URxvt*iso14755_52 : false
 !URxvt*meta8: true
 URxvt*meta8: false
 ! URxvt*modifier: meta
-! Disable screen printing by overriding the default print pipe.
-URxvt*print-pipe : "cat >/dev/null"
 
 
 ! Using an antialiased font breaks the preview completely.
@@ -34,25 +32,22 @@ URxvt*print-pipe : "cat >/dev/null"
 URxvt*depth : 24
 
 
-
-! Font: bitmap or xft
+! Font: bitmap or xft :antialias=true:hinting=true
 !URxvt*font:        -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 !URxvt*boldFont:    -xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*
-!  - use xft for drawing fonts
 ! xft:monaco:bold:size=10
-!URxvt*font:       xft:Liberation Mono:size=10
+! xft:Clean:size=12
 !URxvt*font:     -*-terminus-*-r-*-*-12-*-*-*-*-*-iso10646-*
-!URxvt.font: xft:Clean:size=12
-!URxvt.font: -*-clean-medium-r-*-*-12-*-*-*-*-*-*-*
-!URxvt*font:  -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+!URxvt.font:     -*-clean-medium-r-*-*-12-*-*-*-*-*-*-*
 
+!
 !, xft:PowerlineSymbols:style=Medium
 !URxvt*imFont:           xft:DejaVu Sans Mono:regular:pixelsize=14, xft:DejaVu Sans Mono for Powerline:regular:pixelsize=14
-!
-URxvt*font:             xft:PragmataPro:regular:pixelsize=15     , xft:DejaVu Sans Mono:regular:pixelsize=15     , xft:DejaVu Sans Mono for Powerline:regular:pixelsize=15
-URxvt*boldFont:         xft:PragmataPro:bold:pixelsize=15        , xft:DejaVu Sans Mono:bold:pixelsize=15        , xft:DejaVu Sans Mono for Powerline:bold:pixelsize=15
-URxvt*italicFont:       xft:PragmataPro:italic:pixelsize=15      , xft:DejaVu Sans Mono:italic:pixelsize=15      , xft:DejaVu Sans Mono for Powerline:italic:pixelsize=15
-URxvt*bolditalicFont:   xft:PragmataPro:bold:italic:pixelsize=15 , xft:DejaVu Sans Mono:bold:italic:pixelsize=15 , xft:DejaVu Sans Mono for Powerline:bold:italic:pixelsize=15
+!! WARNING: Dont use spaces before "," if you want the working "font-size".
+URxvt*font           : xft:PragmataPro:regular:pixelsize=15,     xft:DejaVu Sans Mono:regular:pixelsize=15,     xft:DejaVu Sans Mono for Powerline:regular:pixelsize=15
+URxvt*boldFont       : xft:PragmataPro:bold:pixelsize=15,        xft:DejaVu Sans Mono:bold:pixelsize=15,        xft:DejaVu Sans Mono for Powerline:bold:pixelsize=15
+URxvt*italicFont     : xft:PragmataPro:italic:pixelsize=15,      xft:DejaVu Sans Mono:italic:pixelsize=15,      xft:DejaVu Sans Mono for Powerline:italic:pixelsize=15
+URxvt*bolditalicFont : xft:PragmataPro:bold:italic:pixelsize=15, xft:DejaVu Sans Mono:bold:italic:pixelsize=15, xft:DejaVu Sans Mono for Powerline:bold:italic:pixelsize=15
 
 ! Xft (X FreeType) with Bitstream, DejaVu, Liberation, or Terminus fonts:
 !  Fedora/debian packages: libXft/libxft2
@@ -61,29 +56,11 @@ URxvt*bolditalicFont:   xft:PragmataPro:bold:italic:pixelsize=15 , xft:DejaVu Sa
 !  your terminal is sluggish. Use only ONE of the Xft pairs below:
 !
 ! Xft: Bitstream fonts
-!  Fedora/debian packages: bitstream-vera-sans-mono-fonts/ttf-bitstream-vera
-!URxvt*font: xft:Bitstream Vera Sans Mono:pixelsize=12:antialias=true:hinting=true
-!URxvt*boldFont: xft:Bitstream Vera Sans Mono:bold:pixelsize=12:antialias=true:hinting=true
-!
-! Xft: DejaVu fonts
-!  Fedora/debian packages: dejavu-sans-mono-fonts/ttf-dejavu
-!URxvt*font: xft:DejaVu Sans Mono:pixelsize=12:antialias=true:hinting=true
-!URxvt*boldFont: xft:DejaVu Sans Mono:bold:pixelsize=12:antialias=true:hinting=true
-!
-! Xft: Liberation fonts
-!  Fedora/debian packages: liberation-mono-fonts/ttf-liberation
-!URxvt*font: xft:Liberation Mono:pixelsize=13:antialias=true:hinting=true
-!URxvt*boldFont: xft:Liberation Mono:bold:pixelsize=13:antialias=true:hinting=true
-!
-! Xft: Terminus fonts
-!  Fedora/debian packages: terminus-fonts/xfonts-terminus
-!URxvt*font: xft:terminus:pixelsize=15
-!URxvt*boldFont: xft:terminus:bold:pixelsize=15
-
-! Traditional fonts - a more traditional font setup in lieu of xft
-!URxvt*font:-*-courier-medium-r-normal-*-14-*-*-*-*-*-iso8859-1
-!URxvt*boldFont:-*-courier-bold-r-normal-*-14-*-*-*-*-*-iso8859-1
-
+!  Fedora/debian packages:
+!  bitstream-vera-sans-mono-fonts/ttf-bitstream-vera (Bitstream Vera Sans Mono)
+!  liberation-mono-fonts/ttf-liberation (Liberation Mono)
+!  terminus-fonts/xfonts-terminus (terminus)
+! Traditional fonts - in lieu of xft (-*-courier-medium-r-normal-*-14-*-*-*-*-*-iso8859-1)
 
 URxvt*letterSpace:          -1
 URxvt*cutchars:             `"'&()URxvt*,;<=>?@[]{|}$'"`

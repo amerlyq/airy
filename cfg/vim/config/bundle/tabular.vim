@@ -15,8 +15,8 @@ function! s:Tabi(bang, ...)
 endfunction
 command! -bang -nargs=? Tabi call s:Tabi(<bang>0, <q-args>)
 
-noremap <silent><unique> <Leader>a  :<C-U>Tabi<CR>
-noremap <silent><unique> <Leader>ga :<C-U>Tabi!<CR>
+noremap <unique> <silent> <Leader>a  :<C-U>Tabi<CR>
+noremap <unique> <silent> <Leader>ga :<C-U>Tabi!<CR>
 noremap <unique> <Leader>A  :Tabularize /<C-R>//l1r1
 noremap <unique> <Leader>gA :Tabularize /^[^:]*\zs:/l0c1r0
 

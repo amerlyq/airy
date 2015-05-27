@@ -10,6 +10,10 @@
 "" Scala
 " derekwyatt/vim-scala
 
+"" Ruby
+" NeoBundle 'depuracao/vim-rdoc'
+
+
 "NeoBundle 'MPogoda/octave.vim--'
 
 " Has syntastic integration, allow building CMake from vim.

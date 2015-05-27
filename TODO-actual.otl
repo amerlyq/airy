@@ -89,10 +89,21 @@ i3
 
 vim:
 	[_] Check neovim
+	[_] ALT to vim-surround -- use on 'q' as operator
+		https://github.com/rhysd/vim-operator-surround
+	[_] Enhance config/bundle/tabular
+		[_] use v:count to align on N'th entry
+		[_] different shortcuts for spaces: 00, 01, 11
+		[_] visual selection or current character as delimiter
 	[_] BUG: in insert for fast presses: <S-F12>, etc. Check with macro.
 	[_] BUG: mouse highlight don't work
 	2015-05-26 [X] BUG: mix of incsearch, others! Find higlighting-as-you-type in '/' or ':s;..;' !
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
+		May be something with urxvt, check in gvim
+			http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
+		Yes, it is -- read 'cryptic characters'
+			http://vim.wikia.com/wiki/Get_Alt_key_to_work_in_terminal?useskin=monobook
+		Seems one only way -- use Xresources to remap all. Or don't use mappings.
 	[_] BUG: ttimeoutlen or similar -- after some editing, two-key combo timing is too fast
 		: problem is in mappings of <M-..> at term-alt-keys.vim. Temporarily disabled.
 	[_] Change Bookmarking 2\t --> to trigger let g:tin=v:count instead of one-time setting?
@@ -245,8 +256,14 @@ dunst
 	[_] fix geometry to be more agile -- to content messages from chat
 
 urxvt
-	move (scroll) up to beginning of last launched command (perl?)
+: http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
+: NOTE: $ listres -- to show all active resources (loaded by xrdb ~/.Xresources, etc)
+	[_] Customize
+		http://www.askapache.com/linux/rxvt-xresources.html
+	[_] move (scroll) up to beginning of last launched command (perl?)
 	: useful for long outputs, alignes prompt atop as after <C-l>
+	:= maybe save position when pressed <CR>, <C-j>, <C-m> ?
+	[_] see man 7 urxvt -- for additional control commands (like font-size)
 
 mutt
 	Seize
@@ -411,6 +428,12 @@ Arch bang
 		https://wiki.archlinux.org/index.php/pacman
 	Colemak?
 		http://forum.colemak.com/viewtopic.php?id=1808
+	Urxvt
+		Install all my plugins from AUR instead of own copy at repo?
+		: scrollback with vim navigation and simple past into commandline
+		See: https://github.com/ervandew/urxvt-vim-scrollback
+		Also: search on github for urxvt -- you find many plugins
+
 
 READ (blogs -- downloaded)
 	http://duartes.org/gustavo/blog/archives/

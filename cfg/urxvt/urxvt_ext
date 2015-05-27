@@ -1,89 +1,86 @@
 ! vim: ft=xdefaults
 !
-! See: https://github.com/ervandew/urxvt-vim-scrollback
-! : scrollback with vim navigation and simple past into commandline
-! Also: search on github for urxvt -- you find many plugins
-!
-! Extensions: search in this dir, then in /usr/lib/urxvt/perl/
-! matcher - regex parser
-! https://github.com/muennich/urxvt-perls
-! http://github.com/stepb/urxvt-tabbedex
-! https://github.com/majutsushi/urxvt-font-size
 ! searchable-scrollback<hotkey> - incremental scrollback search (enabled by default)
-! Adds regex search functionality to the scrollback buffer, triggeredby a hotkey (default: "M-s"). While in search
-! mode, normal terminalinput/output is suspended and a regex is displayed at the bottom of thescreen.
-! DISABLED: tabbedex,
-! URxvt*perl-lib:      .urxvt/ext
-URxvt*perl-ext-common: default,clipboard,url-select,keyboard-select,font-size
-
-! Скроллинг. "2" - количество строчек для прокрутки
-URxvt*keysym.Meta-k: command:\033]720;2\007
-URxvt*keysym.Meta-j: command:\033]721;2\007
-
-! Только что заметил баг. Ctrl+Insert/Shift+Insert работают, но только если указатель мыши находится над окном терминала, в который нужно вставить из буфера. Тоже самое наблюдается с другими перловыми расширениями для urxvt (url-select, keyboard-select не запускаются если указатель мыши вне окна терминала). Оказывается виновато перловое расширение для табов.
-URxvt*keysym.Control-Shift-C:   perl:clipboard:copy
-URxvt*keysym.Control-Shift-V:   perl:clipboard:paste
-!URxvt*keysym.Meta-Control-Shift-v: perl:clipboard:paste_escaped
-
-!! Change font size on Control-Plus/Minus
-URxvt.keysym.Control-0xffab: perl:font-size:increase
-URxvt.keysym.Control-0xffad: perl:font-size:decrease
-!URxvt.keysym.Control-0x2b: perl:font-size:increase
-!URxvt.keysym.Control-0x2d: perl:font-size:decrease
-
-!URxvt.keysym.C-S-Up:   perl:font-size:incglobal
-!URxvt.keysym.C-S-Down: perl:font-size:decglobal
-! If you prefer xclip, then put these lines in your .Xdefaults/.Xresources:
-!URxvt*clipboard.copycmd:  xclip -i -selection clipboard
-!URxvt*clipboard.pastecmd: xclip -o -selection clipboard
-!! Else
-URxvt.clipboard.copycmd:  xsel --input --clipboard
-URxvt.clipboard.pastecmd: xsel --output --clipboard
-URxvt.clipboard.autocopy: true
-URxvt.selection.pattern-0: ([[:word:]]+)
-
-!matcher,
-!URxvt*matcher.button:  1
-! Since rxvt-unicode 9.14, its also possible to use matcher
-! to open and list recent (currently limited to 10) URLs via keyboard:
-!URxvt.keysym.C-Delete: perl:matcher:last
-!URxvt.keysym.M-Delete: perl:matcher:list
-
-!url-select without mouse !firefox
-!URxvt*urlLauncher:     x-www-browser
-!URxvt*underlineURLs:   true
-!URxvt*colorUL:         #4682B4
-URxvt*url-select.autocopy:  false
-URxvt*url-select.button:    C-1
-! x-www-browser
-! URxvt*url-select.launcher:      urxvt -e w3m
-URxvt*url-select.launcher:      vimb
-URxvt*url-select.underline:     true
-URxvt*keysym.M-u:      perl:url-select:select_next
-
-URxvt*keysym.M-space: perl:keyboard-select:activate
-!!  - catch ugly URLs
+! Adds regex search functionality to the scrollback buffer, triggeredby a hotkey (default: "M-s").
+! DISABLED: tabbedex, matcher
+! URxvt*perl-lib:      ~/.urxvt/ext
+URxvt*perl-ext-common: default,clipboard,keyboard-select,url-select,vtwheel,font-size
 
 
-!! Disabled: tabbedex
-!! dont work keys in term when mouse not hover, even when term is active
+!! === Standart =========================
+! NOTE: PrtSc is binded by wm, so only C/S-PrtSc works (scrollback + screen)
+! URxvt*print-pipe : cat > /tmp/urxvt.dump; urxvt -e vim /tmp/urxvt.dump &
+URxvt*print-pipe : urxvt -e vim - &
+! URxvt*print-pipe : cat > /tmp/urxvt.dump; urxvt -e "cat /tmp/urxvt.dump \| vim -" &
+
+
+!! === Scrolling =========================
+!! "2" -- count of scroll lines
+URxvt*keysym.M-k   : command:\033]720;2\007
+URxvt*keysym.M-j   : command:\033]721;2\007
+URxvt*keysym.M-S-K : command:\033]720;40\007
+URxvt*keysym.M-S-J : command:\033]721;40\007
+
+
+!! === Selection =========================
+URxvt*selection.pattern-0 : ([[:word:]]+)
+URxvt*keysym.M-space      : perl:keyboard-select:activate
+URxvt*keysym.M-s          : perl:keyboard-select:search
+
+
+!! === Clipboard =========================
+URxvt*clipboard.copycmd   : xsel --input --clipboard
+URxvt*clipboard.pastecmd  : xsel --output --clipboard
+! updated whenever the PRIMARY selection changes
+URxvt*clipboard.autocopy  : true
+
+URxvt*keysym.C-S-C : perl:clipboard:copy
+URxvt*keysym.C-S-V : perl:clipboard:paste
+URxvt*keysym.M-c   : perl:clipboard:copy
+URxvt*keysym.M-v   : perl:clipboard:paste
+URxvt*keysym.M-C-v : perl:clipboard:paste_escaped
+
+
+!! === Browser =========================
+!OR: x-www-browser, urxvt -e w3m
+URxvt*url-select.launcher  : vimb
+URxvt*url-select.autocopy  : false
+URxvt*url-select.button    : C-1
+URxvt*url-select.underline : true
+URxvt*keysym.M-u           : perl:url-select:select_next
+
+
+!! === Font-size =========================
+!! Change font size on +/- (OR Num +/- with 0xffab, 0xffad)
+URxvt*font-size.step   : 0.5
+URxvt*keysym.M-equal   : perl:font-size:increase
+URxvt*keysym.M-minus   : perl:font-size:decrease
+URxvt*keysym.M-0       : perl:font-size:reset
+! DISABLED: :reset dont work for new windows, only for current
+!           for global reset use "xrdb ~/.Xresources"
+! URxvt*keysym.M-C-equal : perl:font-size:incglobal
+! URxvt*keysym.M-C-minus : perl:font-size:decglobal
+
+
+!! === Tabbedex =========================
+!! BUG: when tabbedex enabled, all keymaps for perl extensions dont work,
+!!    if mouse not hover urxvt, even when its active. Same for C/S+Insert.
 ! Tabbedex colors
-URxvt*tabbed.new-button      : no
-URxvt*tabbed.autohide        : true
-URXvt*tabbed.reopen-on-close : yes
-! Note> Redefining the keys used for the user commands
-! will not disable the default mappings, you have to set no-tabbedex-keys for that:
-URxvt*tabbed.no-tabbedex-keys: true
-
-URxvt*tabbed.tabbar-fg : 15
-URxvt*tabbed.tabbar-bg : 8
-URxvt*tabbed.tab-fg    : 8
-URxvt*tabbed.tab-bg    : 14
-
-URxvt*keysym.Control-Shift-T:    perl:tabbedex:new_tab
-URxvt*keysym.Control-Tab:        perl:tabbedex:next_tab
-URxvt*keysym.Control-Shift-Tab:  perl:tabbedex:prev_tab
-!URxvt*keysym.Control-Shift-Left: perl:tabbedex:move_tab_left
-!URxvt*keysym.Control-Shift-Right: perl:tabbedex:move_tab_right
-!URxvt*keysym.Control-Shift-R: perl:tabbedex:rename_tab
-
+! URxvt*tabbed.new-button      : no
+! URxvt*tabbed.autohide        : true
+! URXvt*tabbed.reopen-on-close : yes
+! ! Note> Redefining the keys used for the user commands
+! ! will not disable the default mappings, you have to set no-tabbedex-keys for that:
+! URxvt*tabbed.no-tabbedex-keys: true
+!
+! URxvt*tabbed.tabbar-fg : 15
+! URxvt*tabbed.tabbar-bg : 8
+! URxvt*tabbed.tab-fg    : 8
+! URxvt*tabbed.tab-bg    : 14
+!
+! URxvt*keysym.C-S-T      : perl:tabbedex:new_tab
+! URxvt*keysym.C-Tab      : perl:tabbedex:next_tab
+! URxvt*keysym.C-S-Tab    : perl:tabbedex:prev_tab
+! !URxvt*keysym.C-S-Left  : perl:tabbedex:move_tab_left
+! !URxvt*keysym.C-S-Right : perl:tabbedex:move_tab_right
+! !URxvt*keysym.C-S-R     : perl:tabbedex:rename_tab
