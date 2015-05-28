@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 ARGS="$@"
-source ~/.bash/functions.d/vbox && amScriptDir || exit $?
+source ~/.bash/functions.d/system && amScriptDir || exit $?
+source "$SCRIPT_DIR/vbox-funcs" || exit $?
 source "$SCRIPT_DIR/vbox-env" || exit $?
 printf "\n>>> ${VNM?No VM name} guest image <<<\n"
 
 # =======================================================================
 
-if [ "$ARGS" == "-r" ]; then rm -rf "${vimg%/*}"; fi
+if [ "$ARGS" == "-c" ]; then rm -rf "${vimg%/*}"; fi
 mkdir -p "${vimg%/*}"
 
 
 if is_vm_exist "$VNM"; then
     do_vm_off "$VNM" || squit "Rejected VM shutdown"
     case "$ARGS" in
--d|-r) VBoxManage unregistervm "${VNM}" ;; #--delete
+-d|-c) VBoxManage unregistervm "${VNM}" ;; #--delete
    -m) printf "VM exist, updating settings!\n" ;;
     *) squit "\n!!! ERR: There are already such VM: ${VNM} !!!\n";
 esac; else case "$ARGS" in

@@ -2,44 +2,53 @@
 if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
 
 opts="$1"
-user="user"
+user="tester"
 sd=/dev/sda
 CURR_HOST="archvbox"
 VBOX_IP="192.168.56.1"
 
 
 
-user_own() { chown -R "$1:$1" "$2" && chmod -R ${3:-700} "$3"; }
+user_own() { chown -R "$1:$1" "$2" && chmod -R ${3:-700} "$2"; }
 usercopy() {
     local nm="$1" dr="$2" src="$3" dst="$2/${3%/*}"
-    if ! [[ -d "$dr" ]]; then mkdir -p "$dr" && user_own "$dr"; fi
+    if ! [[ -d "$dr" ]]; then mkdir -p "$dr" && user_own "$nm" "$dr"; fi
     cp -vrft "$dr" "$src"
-    user_own "$nm" "$dst" ${4}
+    user_own "$nm" "$dr" ${4}
 }
 die() { exit $?; }
-run_in_chroot() { xargs -I@ arch-chroot /mnt "$1/@" || exit $?; }
+run_in_chroot() { xargs -I@ arch-chroot /mnt "$1"/@ || exit $?; }
 run_in_chr_su() { xargs -I@ arch-chroot /mnt su "$1" "$2/@" || exit $?; }
 
 
 
 ### BASE
-user_own "root" ~/base
-~/base/00-disk "$sd" "$opts" || die
-~/base/40-package || die
+user_own "root" ~/arch/base
+~/arch/base/00-disk "$sd" "$opts" || die
+~/arch/base/40-package "http://${VBOX_IP}:23208" || die
 
 ## Automounts in fstab (generate after pacstrap)
 fst=/mnt/etc/fstab
 sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
 echo ":: fstab generated"
 
+# chroot: failed to run command ‘/root/host/10-network archvbox 192.168.56.1’: No such file or directory
+# :: host chroot ended
+# :: set user password
+# chown: invalid user: ‘/mnt/home/user:/mnt/home/user’
+# ‘/root/id_rsa.pub’ -> ‘/mnt/home/user/id_rsa.pub’
+# ‘/mnt/home/user/id_rsa.pub’ -> ‘/mnt/home/user/.ssh/authorized_keys’
+# ‘/root/arch/user’ -> ‘/mnt/home/user/user’
+# ‘/root/arch/user/30-configs’ -> ‘/mnt/home/user/user/30-configs’
+# su: user user does not exist
 
 ### CHROOT
-usercopy "root" "/mnt/root" ~/host
+usercopy "root" "/mnt/root" ~/arch/host
 cat - << EOT | run_in_chroot ~/host
 00-setup
 10-network "$CURR_HOST" "$VBOX_IP"
 20-boot "$sd"
-40-package "http://${VBOX_IP}:23208"
+40-package
 60-services
 EOT
 echo ':: host chroot ended'
@@ -60,7 +69,7 @@ mkdir -p "$home/.ssh" && mv -v "$home/id_rsa.pub" "$home/.ssh/authorized_keys"
 
 
 ### SU user
-usercopy "$user" "$home" ~/user
+usercopy "$user" "$home" ~/arch/user
 cat - << EOT | run_in_chr_su "$user" ~/user
 30-configs
 EOT

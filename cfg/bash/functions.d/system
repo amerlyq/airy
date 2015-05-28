@@ -73,3 +73,15 @@ amScriptDir() {
 }
 export -f amScriptDir
 
+
+amAskConfirm() {
+    printf "$1\n"
+    read answer
+    case $answer in
+        [yY] | [yY][Ee][Ss] ) return 0 ;;
+        [nN] | [n|N][O|o] ) squit "Rejected" ;;
+        *) squit "Invalid input" ;;
+    esac
+}
+export -f amAskConfirm
+

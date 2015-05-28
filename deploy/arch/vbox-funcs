@@ -1,16 +1,6 @@
 # vim: ft=sh
 source ~/.bash/functions.d/system || exit $?
 
-ask_confirm() {
-    printf "$1\n"
-    read answer
-    case $answer in
-        [yY] | [yY][Ee][Ss] ) return 0 ;;
-        [nN] | [n|N][O|o] ) squit "Rejected" ;;
-        *) squit "Invalid input" ;;
-    esac
-}
-
 is_vm_exist() { VBoxManage list vms        | grep -q "\<$1\>"      ; return $?; }
 is_vm_run()   { VBoxManage list runningvms | grep -q "\<$1\>"      ; return $?; }
 has_vm_rule() { VBoxManage showvminfo "$1" | grep -q "Rule.*\<$2\>"; return $?; }
@@ -32,13 +22,13 @@ add_port_forward() {
 
 do_vm_off() {
 if is_vm_exist "${1?No vbox name}" && is_vm_run "$1"; then
-    if [ "$2" == "-y" ] || ask_confirm "Do you want shutdown VM='$1'? (y/n)"
+    if [ "$2" == "-y" ] || amAskConfirm "Do you want shutdown VM='$1'? (y/n)"
     then VBoxManage controlvm "$1" poweroff; else return 1; fi
 fi; }
 
 do_vm_run() { is_vm_exist "${1?No vbox name}" || squit "There no such VM as '$1'"
     do_vm_off "$1" "$2" || squit "Rejected '$1' shutdown"
-    if [ "$2" == "-y" ] || ask_confirm "Launch VM='$1' is your wish? (y/n)"
+    if [ "$2" == "-y" ] || amAskConfirm "Launch VM='$1' is your wish? (y/n)"
     then case "$3" in  # ALT:
         -h) VBoxHeadless --startvm "$1" --vrde off & ;;
          *) VBoxManage startvm "$1" ;;
@@ -64,7 +54,7 @@ do_vm_socket_file() {
 }
 
 do_vm_socket_dir() {
-    local serial="${1?No vbox serial}" dir="${2?No dir path}" ddst=${3:-~}/"${2##*/}"
+    local serial="${1?No vbox serial}" dir="${2?No dir path}" ddst="${3+$3/}${2##*/}"
     if [ ! -d "$dir" ]; then squit "Dir doesn't exist!"; fi
     echo "mkdir -p '$ddst'" | nc -U "$serial"
 

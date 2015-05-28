@@ -34,11 +34,12 @@ EOT
 cat - <<EOT | prepend_to /etc/pacman.conf
 ## Local: pacman mirror on host server
 #%BEGIN Prepended during install
-[custom]
-SigLevel = Optional TrustAll
-Server = $srv
+# [custom]
+# SigLevel = Never  # Optional TrustAll
+# Server = $srv
 #%END
 EOT
+# pacman -Sy
 
 echo ":: mirrors selected"
 
@@ -48,6 +49,7 @@ soft="base openssh"  #base-devel  sshfs
 
 if [ ! -d "/mnt/usr/bin" ]; then
     ## Install the base system  # -i -- interactive
+    # timedatectl set-timezone "Europe/Kiev"
     pacstrap /mnt $soft || exit $?
     echo ":: packstrap installed"
 fi

@@ -1,4 +1,5 @@
 # Man
+#   http://zsh.sourceforge.net/Guide/zshguide04.html
 #   http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Zle-Builtins
 # Available widgets as cheetsheet
 #   http://www.bash2zsh.com/zsh_refcard/refcard.pdf
@@ -35,6 +36,15 @@ bindkey '^G' kill-word
 bindkey '^W' backward-kill-word
 bindkey '^K' kill-line
 bindkey '^U' backward-kill-line
+
+
+## Emacs duplicates
+bindkey '\eOH'  beginning-of-line # Home
+bindkey '\eOF'  end-of-line       # End
+bindkey '\e[2~' overwrite-mode    # Insert
+bindkey '\ef'   forward-word      # Alt-f
+bindkey '\eb'   backward-word     # Alt-b
+bindkey '\ed'   kill-word         # Alt-d
 
 
 # History completion on pgup and pgdown
@@ -92,6 +102,10 @@ bindkey -as ',d' 'Sq\n'
 bindkey ' ' magic-space  # [Space] - do history expansion
 # On <F12> in vim mode loads config debug aliases
 bindkey -as '^[[24~' '0d$isource ~/.bash/debug\n\e'
+# Handle SIGINT when completing
+# bindkey '^I' interruptible-expand-or-complete
+# Autocomplete paths only on <S-Tab> (SEE: amer-widgets)
+bindkey '\e[Z' complete  # SEE ALT inside widgets.
 
 
 ## Menu completion

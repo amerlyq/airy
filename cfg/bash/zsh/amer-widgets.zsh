@@ -55,4 +55,25 @@ if [ -f /tmp/aura/zsh_chosedir ]; then
 fi
 }
 
+# Autocomplete paths only, ignore possible options
+zle -C complete complete-word complete-files
+function complete-files() { compadd - $PREFIX*; }
 
+# New-style -- loaded by 'compinit'
+# _complete_files () {
+#   eval "$_comp_setup"
+#   _main_complete _files
+# }
+# compdef -k _complete_files complete-word '^X/'
+
+
+### TRAPS ###
+
+# Save to history on <C-c> alongside interrupt
+function TRAPINT() {
+    if [[ -n "$BUFFER" ]]; then
+        zle && print -s -r -- $BUFFER && return $1  # Default
+    else
+        return 1
+    fi
+}
