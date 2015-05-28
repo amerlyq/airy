@@ -32,7 +32,7 @@ case "$NAME" in  # Names
 
          text/x-python) "$FL"  ;;
         application/x*) "$FL"  ;;
-               text/x*) "$FL" && wpause  ;;
+               text/x*) if [[ -x "$FL" ]]; then "$FL" && wpause; else echo "Non-executable '$FL'"; fi ;;
                video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
         *) case "$EXT" in  # Extensions
 

@@ -6,10 +6,8 @@ noremap <unique> ` '
 " Pinky stretching soothing
 cnoremap <unique> <C-o> <C-p>
 
-
 " Faster $3 ex-cmds
 noremap <unique> ;  :
-noremap <unique> ,. :
 
 " Move to <next|prev> [qf|loc] entry
 noremap <unique> ]q :<C-U><C-R>=v:count1<CR>cnext!<CR>
@@ -38,12 +36,6 @@ noremap <unique> R gR
 " Use q for formatting the current paragraph (or selection)
 " Ex-command availible by gQ
 noremap <unique> ,q q
-
-" DEPRECATED:
-" vnoremap q gq
-" " nnoremap q gq$
-" nnoremap <unique> Q gqip
-" vnoremap <unique> Q gq
 
 " retain relative cursor position when paging
 nnoremap <unique> <PageUp>   <C-U>

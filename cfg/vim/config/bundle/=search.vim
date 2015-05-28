@@ -11,7 +11,8 @@ let g:incsearch#separate_highlight = 0
 let g:incsearch#consistent_n_direction = 0
 " See: :messages -- for history
 let g:incsearch#do_not_save_error_message_history = 1
-let g:incsearch#magic = '\v'
+" Prefer literal search. Use most magic \v directly when using regexes.
+let g:incsearch#magic = '\V'
 " Highlight auto-disable when moving
 let g:incsearch#auto_nohlsearch = 1
 

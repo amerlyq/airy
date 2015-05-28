@@ -3,7 +3,7 @@
 " If you need completion on Tab:
 " USE: https://github.com/ervandew/supertab
 
-" let g:jedi#auto_initialization = 0
+let g:jedi#auto_initialization = 1
 " Because of neocomplete:
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
@@ -15,12 +15,13 @@ let g:jedi#use_tabs_not_buffers = 0
 " let g:jedi#popup_on_dot = 0
 
 " TRY: map ,j<*>
-let g:jedi#goto_assignments_command = "<Leader>ja"
-let g:jedi#goto_definitions_command = "<Leader>jd"
-let g:jedi#documentation_command = "<Leader>jK"
-let g:jedi#usages_command = "<Leader>ju"
+let g:jedi#goto_command = "<LocalLeader>d"
+let g:jedi#goto_assignments_command = "<LocalLeader>g"
+" let g:jedi#rename_command = "<LocalLeader>r"
+let g:jedi#rename_command = "<localleader>r"
+let g:jedi#documentation_command = "<LocalLeader>k"
+let g:jedi#usages_command = "<LocalLeader>u"
 let g:jedi#completions_command = "<C-Space>"
-let g:jedi#rename_command = "<Leader>jr"
 let g:jedi#show_call_signatures = "0"
 
 " jedi.preload_module('os', 'sys', 'math', 'whatever_module_you_want')
@@ -70,7 +71,7 @@ let g:pymode_virtualenv = 1
 let g:pymode_breakpoint = 1
 "" XXX BREAKPOINT into your code
 " At begin, insert (pdb, ipdb, pudb): import pdb; pdb.set_trace()
-let g:pymode_breakpoint_bind = '<leader>jb'
+let g:pymode_breakpoint_bind = '<LocalLeader>b'
 " Manually set breakpoint command (leave empty for automatic detection)
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace()'
 

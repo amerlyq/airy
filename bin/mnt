@@ -21,18 +21,28 @@ if [[ -z "$LBL" ]]; then
     exit
 fi
 
+die() { printf "%s\n" "$@"; exit 1; }
+check() { grep -qsw "$DIR" /proc/mounts && die "Already mounted at '$DIR'!"; }
+clean() { check; if [ -d "$DIR" ]; then
+rmdir "$DIR" 2>/dev/null ||
+    sudo rmdir -v "$DIR" || die "Can't remove directry '$DIR'!"
+fi; }
+dirmk() { clean; mkdir -p "$DIR" 2>/dev/null ||
+    sudo mkdir -p "$DIR" || die "Error: Can't create directory for mount!"
+}
+
 
 dosamba() { dirmk && sudo mount -t cifs -o user="${1?Need user}" //${2?Need share}/ "$DIR"; }
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
-    if ! [ -e "$DEVPATH" ]; then echo "Error: no such file '$DEVPATH'"; exit 1; fi
+    if ! [ -e "$DEVPATH" ]; then die "Error: no such file '$DEVPATH'"; fi
     dirmk && sudo mount -o loop "$DEVPATH" "${DIR%.*}" || exit $?
 }
 domnt() {
     local DEVPATH TYPE
     DEVPATH="/dev/disk/by-label/$LBL"
     if ! [ -L "$DEVPATH" ]; then DEVPATH="/dev/$LBL"; fi
-    if ! [ -e "$DEVPATH" ]; then echo "No device at path"; exit 1; fi
+    if ! [ -e "$DEVPATH" ]; then die "No device at path"; fi
 
     # Flash drive:  http://linuxsam.livejournal.com/18176.html
     declare $(blkid "$DEVPATH" | awk '{print $NF}')  # TYPE=...
@@ -42,20 +52,6 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
     fi
     # -t "$TYPE"
     dirmk && sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} && echo "$DIR" || exit $?
-}
-
-
-check() { if grep -qsw "$DIR" /proc/mounts
-then echo "Already mounted at '$DIR'!"; exit 1
-fi; }
-clean() { check || exit $?
-if [ -d "$DIR" ]; then
-    rmdir "$DIR" 2>/dev/null || sudo rmdir -v "$DIR" || {
-        echo "Can't remove directry '$DIR'!"; exit 1
-}; fi; }
-dirmk() { clean || exit $?
-    mkdir -p "$DIR" 2>/dev/null || sudo mkdir -p "$DIR"
-    [[ $? -ne 0 ]] && echo "Error: Can't create directory for mount!" && exit 1
 }
 
 

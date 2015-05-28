@@ -179,6 +179,10 @@ vim:
 ranger
 	[_] BUG: when fork new shell 'S' from current, it will get env var
 		'RANGER_LEVEL' so I can't launch ranger in it. Maybe spawn with clear env?
+	[_] Run new urxvt in current dir, with clean 'RANGER_LEVEL' variable
+		(setsid emacs &)  -- double fork
+		: This uses ( &) to fork to background, and setsid to detach from the controlling tty.
+		emacs & disown -- built-in
 	[_] shortcut to show file size in bytes (search in sources?)
 	[_] FIX shell -r cp ./%f /var // sudo: source: command not found
 	[_] russian -- half of text width in lister
@@ -268,6 +272,11 @@ urxvt
 	: useful for long outputs, alignes prompt atop as after <C-l>
 	:= maybe save position when pressed <CR>, <C-j>, <C-m> ?
 	[_] see man 7 urxvt -- for additional control commands (like font-size)
+	[_] always show cursor in keyboard-selection
+		Hide cursor
+			echo -ne "\033[?25l"
+		Show cursor
+			echo -ne "\033[?25h
 
 mutt
 	Seize

@@ -46,6 +46,7 @@ sub on_user_command {
 	if (not $self->{active}) {
 		if ($cmd eq 'keyboard-select:activate') {
 			activate($self);
+            printf "%s","\033[?25h";
 		} elsif ($cmd eq 'keyboard-select:search') {
 			activate($self, 1);
 		}
@@ -227,7 +228,7 @@ sub move_cursor {
 
 	status_area($self);
 	$self->want_refresh();
-	
+
 	()
 }
 
@@ -495,7 +496,7 @@ sub status_area {
 			$stat .= sprintf("%2d%%",
 					($self->top_row - $self->view_start) * 100 / $self->top_row);
 		}
-		
+
 		$stat = "$extra $stat" if $extra;
 		$stat_len = length($stat);
 	}
@@ -537,7 +538,7 @@ sub calc_span {
 	my ($self) = @_;
 	my ($cr, $cc) = $self->screen_cur();
 	my ($br, $bc, $er, $ec);
-	
+
 	if ($self->{select} eq 'b') {
 		$br = $self->line($cr)->beg;
 		$bc = $self->line($cr)->offset_of($cr, $cc);

@@ -275,11 +275,11 @@ w_header "Run: Menus"
 wprf "\n### ================= Multimedia =================== ###\n"
 w_header "Control: copyq"
 msg_copyq="Copyq: [e]dit, [o]pen, [m]enu | [a]ctive, [p]assive"
-    wmode_begin "$mod+x" 'copyq' "$msg_copyq"
+    wmode_begin "$mCd+x" 'copyq' "$msg_copyq"
         wlistf "$ts %s $exno copyq %s ,$def" "e o m a p" \
             edit toggle menu enable disable
         wmapf "$ts %%1 $exno copyq select %%1 ,$def" $digits
-    wmode_end "$mod+x"
+    wmode_end "$mCd+x"
 
 w_header "Control: volume"
     wlistf "$mod+%-5s $exno ~/.i3/ext/volume %-3s" \

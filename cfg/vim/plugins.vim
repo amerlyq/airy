@@ -1,6 +1,7 @@
 " vim:fdm=marker:fdl=1
 " :NeoBundleClearCache if change .vimrc
 
+let maplocalleader=",."
 let mapleader="\\"
 
 
