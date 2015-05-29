@@ -12,7 +12,7 @@ let g:incsearch#consistent_n_direction = 0
 " See: :messages -- for history
 let g:incsearch#do_not_save_error_message_history = 1
 " Prefer literal search. Use most magic \v directly when using regexes.
-let g:incsearch#magic = '\V'
+let g:incsearch#magic = '\M'
 " Highlight auto-disable when moving
 let g:incsearch#auto_nohlsearch = 1
 

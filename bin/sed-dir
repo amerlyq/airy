@@ -7,10 +7,10 @@ NEW="$2"
 HL="$OLD"
 
 case "$KEY" in
--r) ag -l "$OLD" | xargs sed -i "/$OLD/s//$NEW/g" ;;
+-r) ag -l "$OLD" | xargs sed -ri -e '/'"$OLD"'/s||'"$NEW"'|g' ;;
 -s) # If NEW=="" then returns empty list: as all OLD was deleted!
     if [[ -n "$NEW" ]]; then HL="$OLD|$NEW"; fi
-    ag -l "$OLD" | xargs sed -n "/$OLD/s//$NEW/gp" | ag "$HL"
+    ag -l "$OLD" | xargs sed -rn -e '/'"$OLD"'/s||'"$NEW"'|gp'  | ag "$HL"
     ;;
 -f) ag -l "$OLD" ;;
  *) ag "$HL" ;;

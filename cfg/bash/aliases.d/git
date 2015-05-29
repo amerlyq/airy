@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # --- Git ---
+# git clean -f
+alias gremu='git clean -f --dry-run && echo "dry-run only; directly use git clean -f"'
 
 # Status
 alias gt='git status -sb && (git stash list | cat)'

@@ -426,12 +426,8 @@ NeoBundle 'rking/ag.vim', {
     \ ], }, }
 " Multiple hl for searching by / ? or g/
 NeoBundle 'haya14busa/incsearch.vim'
-" Smart highlight
-NeoBundleLazy 'haya14busa/vim-asterisk', {
-    \   'autoload' : {
-    \     'mappings' : ['<Plug>(asterisk-']
-    \   }
-    \ }
+" Smart highlight (don't do lazy -- I use it almost always)
+NeoBundle 'haya14busa/vim-asterisk'
 " Index for search results
 NeoBundle 'osyo-manga/vim-anzu'
 " Preview :substitute patterns

@@ -17,6 +17,11 @@ Cool tricks
 	http://locklessinc.com/articles/makefile_tricks/
 	http://mad-scientist.net/make/multi-arch.html
 
+	Combining several instructions:
+		all: ; $(info $$var is [${var}])echo Hello world
+	Print vars
+		http://stackoverflow.com/questions/16467718/how-to-print-out-a-variable-in-makefile
+
 Dependency
 	Autodependency using Tromey's way
 		http://make.paulandlesley.org/autodep.html
