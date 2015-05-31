@@ -7,18 +7,17 @@ VBOX_IP="${2?No vbox host-only ip}"
 
 ## Host
 echo ':: writing host'
-# echo $CURR_HOST | tee /etc/hostname
-# sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"$CURR_HOST"'/' /etc/hosts
-hostnamectl set-hostname "$CURR_HOST"
+echo "$CURR_HOST" | tee /etc/hostname
+sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"$CURR_HOST"'/' /etc/hosts
+# NOTE: Need active dbus -- impossible at setup time
+# hostnamectl set-hostname "$CURR_HOST"
 
 
 ### Network
 ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
 # systemctl enable dhcpcd@${ifcs[0]}.service  # Disable if use netctl
-vnet="${VBOX_IP##*.}"
 
-
-cat - << EOT > /etc/netctl/vbox-nat
+cat >/etc/netctl/vbox-nat <<EOT
 Description='VBox NAT main connection'
 Interface=${ifcs[0]}
 Connection=ethernet
@@ -27,7 +26,8 @@ EOT
 netctl enable vbox-nat
 
 
-cat - << EOT > /etc/netctl/vbox-hostonly
+vnet="${VBOX_IP%.*}"
+cat >/etc/netctl/vbox-hostonly <<EOT
 Description='VBox host-only connection'
 Interface=${ifcs[1]}
 Connection=ethernet

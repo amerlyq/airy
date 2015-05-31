@@ -89,7 +89,31 @@ i3
 
 vim:
 	[_] Check neovim
+	[_] READ vim vs PyCharm3 in Idea
+		http://andrewbrookins.com/tech/one-year-later-an-epic-review-of-pycharm-2-7-from-a-vim-users-perspective/
+	[_] Check
+		https://github.com/szw/vim-ctrlspace
+		quickfixsigns <https://github.com/tomtom/quickfixsigns_vim>
+	[_] ADD ranger as NERDTree -- try using NERDTree before it.
+		: open by shortcut ',F' -- fork in another window
+		: setup vimserver and client, and 'ranger server and client'
+		: all opened in ranger files go to vimserver
+		: changing buffers in vim -- moves cursor in ranger (ranger-server)
+		: creating tabs in vim creates them in ranger
+		:	(or one tab for each buffer unique dir?)
+	[_] Seize http://vimawesome.com/
+	[_] ALT to tcomment -- if it's too cumbersome (shortcuts are laggy)
+		: Check tcomment additional features and is really i need them
+		: Also supports repeat.vim
+		https://github.com/tpope/vim-commentary
+	[_] ALT to tabular -- I can't set comfortable shortcus
+		: Check for operators and all possible dilimiters, regex (C-x)
+		https://github.com/junegunn/vim-easy-align
+		https://github.com/tommcdo/vim-lion
+	[_] Add v:count to <Space> operator -- amount of chars before exit.
 	[_] ALT to vim-surround -- use on 'q' as operator
+		: It can replace my ,<Space> shortcut for surrounding by spaces
+		: Possibly it can surround visual blocks?
 		https://github.com/rhysd/vim-operator-surround
 	[_] Remap 'ge' with motion 'prev-to-last' letter? (See: CamelMotion plugin)
 	[_] Enhance config/bundle/tabular
@@ -97,6 +121,8 @@ vim:
 		[_] different shortcuts for spaces: 00, 01, 11
 		[_] visual selection or current character as delimiter
 	[_] BUG: in insert for fast presses: <S-F12>, etc. Check with macro.
+		:= Result of <Esc> + any key (notimeout + ttimeout + ttimeoutlen)
+		:  + mappings in term-alt-keys
 	[_] BUG: mouse highlight don't work
 	2015-05-26 [X] BUG: mix of incsearch, others! Find higlighting-as-you-type in '/' or ':s;..;' !
 	[_] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
@@ -197,6 +223,7 @@ ranger
 		[_] Create its inner handful support inside ranger
 
 zsh
+	[_] Get configs for zsh from arch live-cd
 	[_] ADD: feature to launch zsh in different plugins configurations:
 		+adb support, +etc, ...
 	2015-05-28 [X] Add to history on <C-c>

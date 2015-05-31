@@ -1,12 +1,21 @@
 " vim:fdm=marker:fdl=1
 " :NeoBundleClearCache if change .vimrc
 
+"==========================================
+" Use ',.' as preferable localleader
+"==========================================
 let maplocalleader=",."
+noremap <unique> <LocalLeader> <Nop>
+
+"==========================================
+" Use '\' as leader for all plugins below
+"==========================================
 let mapleader="\\"
+noremap <unique> <Leader> <Nop>
 
 
 " Switch [c,cpp,cxx,cc] <-> [h,hpp]
-NeoBundle 'vim-scripts/a.vim'
+NeoBundle 'kana/vim-altr'
 
 NeoBundle 'Valloric/ListToggle'
 
@@ -16,26 +25,16 @@ NeoBundleLazy 'vim-scripts/DrawIt' , {
     \ }
 
 "==========================================
-" All commands below will use this leader, commands above -- will use '\'
+" Use ',' as leader for all plugins below
 "==========================================
-
 let mapleader=","
-"noremap \ ,
+noremap <unique> <Leader> <Nop>
 
 
 " Let NeoBundle manage NeoBundle
 NeoBundleFetch 'Shougo/neobundle.vim'
 " git clone --depth 1 https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
-" vim +NeoBundleInstall +qall
 
-"NeoBundle 'user/repo', {
-"\ 'lazy' : 1,
-"\ 'autoload' : {
-"\ 'filetypes' : ['vim', 'elisp']
-"\ 'commands' : ['Command']
-"\ 'mappings' : ['<Plug>(pluign_mapping)']
-"\ }
-"\}
 
 " TODO: there must be checking on mingw! Too many plugins depends on vimproc.
 " MSG: build : { 'windows' : 'echo "Sorry, cannot update vimproc binary file in Windows."' }
@@ -43,7 +42,7 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 "   let vimproc_updcmd = has('win64') ?
 "     \ 'tools\\update-dll-mingw 64' : 'tools\\update-dll-mingw 32'
 " 'windows' : vimproc_updcmd,
-NeoBundle 'Shougo/vimproc',{
+NeoBundle 'Shougo/vimproc.vim',{
     \ 'external_commands' : 'make',
     \ 'build' : {
     \   'windows' : 'make -f make_mingw32.mak',
@@ -52,13 +51,6 @@ NeoBundle 'Shougo/vimproc',{
     \   'unix' : 'make -f make_unix.mak',
     \ }}
 
-"" Commented out section
-    " \ 'build' : {
-    " \   'windows' : 'make -f make_mingw32.mak',
-    " \   'cygwin' : 'make -f make_cygwin.mak',
-    " \   'mac' : 'make -f make_mac.mak',
-    " \   'unix' : 'make -f make_unix.mak',
-    " \   },
 " Powerful shell implemented by Vim script
 NeoBundleLazy 'Shougo/vimshell.vim', {
     \ 'depends' : 'Shougo/vimproc.vim',
@@ -83,7 +75,6 @@ NeoBundle 'Shougo/vinarise.vim', {
 
 " The best testing framework for Vim script'
 "NeoBundle 'Shougo/vesting'
-
 
 " Always have a nice view for vim split windows
 " http://zhaocai.github.io/GoldenView.Vim/
@@ -285,8 +276,9 @@ NeoBundleLazy 'godlygeek/tabular', {
 NeoBundleLazy 'majutsushi/tagbar', {
     \ 'autoload' : { 'commands' : 'TagbarToggle' } }
 
-NeoBundle 'tomtom/tcomment_vim'
-" Alt: tpope/commentary
+" NeoBundle 'tomtom/tcomment_vim'
+" ALT:
+NeoBundle 'tpope/vim-commentary'
 
 
 "{{{ Motions ============================

@@ -17,7 +17,6 @@ let g:jedi#use_tabs_not_buffers = 0
 " TRY: map ,j<*>
 let g:jedi#goto_command = "<LocalLeader>d"
 let g:jedi#goto_assignments_command = "<LocalLeader>g"
-" let g:jedi#rename_command = "<LocalLeader>r"
 let g:jedi#rename_command = "<localleader>r"
 let g:jedi#documentation_command = "<LocalLeader>k"
 let g:jedi#usages_command = "<LocalLeader>u"

@@ -94,5 +94,6 @@ echo "Vim font '$FONT_USE' installed"
 
 if [ "$1" == "-u" ]; then
     vim +NeoBundleClearCache +NeoBundleCheckUpdate #+qall
+    # vim +NeoBundleInstall +qall
 fi
 

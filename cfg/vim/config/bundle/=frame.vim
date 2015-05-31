@@ -17,7 +17,8 @@ let mapleader = s:leader
 " }}}
 
 
-"" Focus on content -- 'chrisbra/NrrwRgn'
+" ============== NrrwRgn ============== {{{1
+":: Focus on content in split window
 " Create two region buffers and use :diffthis --> instead of LineDiff
 " Multiselection in new buffer! :v/^#/NRP | NRM
 " Tip -- completely delete blocks you don't want to change.
@@ -32,4 +33,11 @@ omap <unique> <Leader>n <Plug>NrrwrgnDo
 nmap <unique> <Leader>N <Plug>NrrwrgnBangDo
 xmap <unique> <Leader>N <Plug>NrrwrgnBangDo
 omap <unique> <Leader>N <Plug>NrrwrgnBangDo
-" CMD:
+
+
+" ============== vim-altr ============== {{{1
+":: Toggle between alternative files (.h, .cpp, ...)
+nmap <unique> ]f  <Plug>(altr-forward)
+nmap <unique> [f  <Plug>(altr-back)
+command! A  call altr#forward()
+" ALT: map <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>

@@ -70,6 +70,9 @@ nnoremap <unique> z/ //e<CR>v??<CR>
 vnoremap <unique> < <gv
 vnoremap <unique> > >gv
 
+" Visual block sorting. Restore text _outside_ block:  gvyugvp
+command! -range VBSort <line1>,<line2>sort i /\ze\%V/
+
 " works cool only with xkb map of arrows to C-hjkl
 " nnoremap <C-PageUp>    <Esc>:tabprev<CR>
 " nnoremap <C-PageDown>  <Esc>:tabnext<CR>

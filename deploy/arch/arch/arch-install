@@ -1,83 +1,96 @@
 #!/usr/bin/env bash
 if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
 
-opts="$1"
+OPTS="$1"
 user="tester"
+zone="Europe/Kiev"
 sd=/dev/sda
 CURR_HOST="archvbox"
 VBOX_IP="192.168.56.1"
+LOCAL_SRV="http://${VBOX_IP}:23208"
 
 
-
-user_own() { chown -R "$1:$1" "$2" && chmod -R ${3:-700} "$2"; }
-usercopy() {
-    local nm="$1" dr="$2" src="$3" dst="$2/${3%/*}"
-    if ! [[ -d "$dr" ]]; then mkdir -p "$dr" && user_own "$nm" "$dr"; fi
-    cp -vrft "$dr" "$src"
-    user_own "$nm" "$dr" ${4}
+hopt() { [ "${OPTS/[$1]}" != "$OPTS" ]; }
+oadd() { OPTS="${OPTS}${1}"; }
+die() { local ret=$?
+    case "$1" in [0-9]) ret=$1; shift ;; esac
+    printf "%s${1+\n}" "$1"; exit $ret
 }
-die() { exit $?; }
-run_in_chroot() { xargs -I@ arch-chroot /mnt "$1"/@ || exit $?; }
-run_in_chr_su() { xargs -I@ arch-chroot /mnt su "$1" "$2/@" || exit $?; }
+do_each() {  # Split args on 'most' and 'last'
+sed '/#.*$/s///; /^\s*$/d' | while read L
+    do ${@:1:${#@}-1} "${@:${#@}}${L}" || die
+done; }
 
 
+### Options chooser ###
+hlst=cdpmMhsur
+case "$1" in
+    -[$hlst]) OPTS="-${1##*-}" ;;
+    +[$hlst]*) echo "::: no chain -- choosen options only :::"
+        OPTS="${1##*+}" ;;
+    *) die 1 "Need option -/+'$hlst'" ;; esac
+if hopt -; then
+    hopt c && oadd dM  # create -> disks, unmount
+    hopt d && oadd pm  # disk -> mount, packstrap
+    hopt p && oadd f   # pacstrap -> fstab, repo/cache (r)
+    hopt m && oadd h   # mount -> host/scripts
+    hopt h && oadd s   # host -> system
+    hopt s && oadd u   # system -> user
+fi
 
-### BASE
-user_own "root" ~/arch/base
-~/arch/base/00-disk "$sd" "$opts" || die
-~/arch/base/40-package "http://${VBOX_IP}:23208" || die
+timedatectl set-timezone "$zone"
 
-## Automounts in fstab (generate after pacstrap)
-fst=/mnt/etc/fstab
-sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
-echo ":: fstab generated"
+### BASE step (1/3)
+hopt cdpm && { chmod -R 700 ~/arch/base || die; }
+hopt m && { ~/arch/base/00-disk "$sd" $(hopt d && echo "--new") || die; }
 
-# chroot: failed to run command ‘/root/host/10-network archvbox 192.168.56.1’: No such file or directory
-# :: host chroot ended
-# :: set user password
-# chown: invalid user: ‘/mnt/home/user:/mnt/home/user’
-# ‘/root/id_rsa.pub’ -> ‘/mnt/home/user/id_rsa.pub’
-# ‘/mnt/home/user/id_rsa.pub’ -> ‘/mnt/home/user/.ssh/authorized_keys’
-# ‘/root/arch/user’ -> ‘/mnt/home/user/user’
-# ‘/root/arch/user/30-configs’ -> ‘/mnt/home/user/user/30-configs’
-# su: user user does not exist
+if hopt p; then
+do_each /bin/bash -c ~/arch/base/ <<EOTBASE
+30-pacman-conf "$LOCAL_SRV" /etc/pacman.conf
+40-pacstrap "$LOCAL_SRV"
+30-pacman-conf "$LOCAL_SRV" /mnt/etc/pacman.conf
+EOTBASE
+fi && echo ":: base disk and pacstrap ended"
 
-### CHROOT
-usercopy "root" "/mnt/root" ~/arch/host
-cat - << EOT | run_in_chroot ~/host
-00-setup
-10-network "$CURR_HOST" "$VBOX_IP"
-20-boot "$sd"
-40-package
+if hopt f; then
+    ## Automounts in fstab (generate after pacstrap)
+    fst=/mnt/etc/fstab
+    sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
+fi && echo ":: fstab generated"
+
+
+### HOST CHROOT step (2/3)
+if hopt h; then
+    cp -vrft /mnt/root/ ~/arch/{host,user} ~/id_rsa.pub || die
+    chmod -R 700 /mnt/root/host || die
+# ALT: systemd-nspawn
+do_each arch-chroot /mnt /bin/bash -c ~/host/ <<EOTHOST
+00-setup $zone
+10-network $CURR_HOST $VBOX_IP
+20-boot $sd
+40-X
+42-AUR
 60-services
-EOT
-echo ':: host chroot ended'
+90-add-user $user
+EOTHOST
+fi && echo ':: host chroot ended'
 
 
-### ADD users:  https://wiki.archlinux.org/index.php/Users_and_groups#User_groups
-# adbusers, mpd, vboxsf, vboxusers, wireshark
-groupadd "$user"
-useradd -m -g "$user" -G users,wheel,uucp -s /bin/bash "$user"
-echo ":: set $user password"
-printf "$user:$user" | chpasswd
+### USER SU step (3/3)
+if hopt u; then
+do_each arch-chroot /mnt /usr/bin/su $user -c "" <<EOTUSER
+chown -R $user:$user ~/user && chmod -R 700 ~/user
+~/user/30-configs
+EOTUSER
+fi && echo ":: '$user' <su in chroot> ended"
 
-
-## SSH access: add host public key to vbox guest
-home="/mnt/home/$user"
-usercopy "$user" "$home" ~/id_rsa.pub 600
-mkdir -p "$home/.ssh" && mv -v "$home/id_rsa.pub" "$home/.ssh/authorized_keys"
-
-
-### SU user
-usercopy "$user" "$home" ~/arch/user
-cat - << EOT | run_in_chr_su "$user" ~/user
-30-configs
-EOT
-echo ":: $user su in chroot ended"
-
+if hopt r; then
+    rep=/var/cache/pacman/pkg
+    arch-chroot /mnt /bin/bash -c "repo-add $rep/custom.db.tar.gz $rep/*.pkg.tar.xz"
+    scp -r /mnt/$rep frees@${VBOX_IP}:\~/home/VMs
+fi
 
 # NOTE: use 'fuser' to find by what it is busy
-umount -R /mnt
+hopt M && umount -R /mnt
 
-echo '::: install complete :::'
-# Reboot now! Other scripts only after that? Or before?
+echo '::: install complete, reboot now :::'

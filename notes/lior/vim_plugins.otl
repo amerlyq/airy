@@ -1,21 +1,3 @@
-a.vim			40%
-	" Switch [c,cpp,cxx,cc] <-> [h,hpp]
-	A switches to the header file corresponding to
-	the current file being edited (or vise versa)
-	:AS splits and switches
-	::AV vertical splits and switches
-	:AT new tab and switches
-	::AN cycles through matches
-	:IH switches to file under cursor
-	::IHS splits and switches
-	:IHV vertical splits and switches
-	::IHT new tab and switches
-	:IHN cycles through matches
-	<Leader>ih  | switches to file under cursor
-	<Leader>is  | switches to the alternate file of file under cursor (e.g. on <foo.h> switches to foo.cpp)
-	<Leader>ihn | cycles through matches
-
-
 ag
 	> :Ag, :AgAdd, :LAg, and :LAgAdd
 	< :Ag [options] {pattern} [{directory}]
@@ -32,9 +14,6 @@ ag
 	| v  | to open in vertical split
 	| gv | to open in vertical split silently
 	| q  | to close the quickfix window
-
-NrrwRgn 10%
-	| ,nr | focus on selected text / motion by opening it in a new split window
 
 vim-argumentative  100%
 	[,			go to [count] previous argument boundary
@@ -70,7 +49,6 @@ neobundle		100%
 :NeoBundleClearCache		| use after each vimrc changes and re-enter vim
 	gui|terminal : 0|1
 	 If set 1, neobundle will only load the plugin in GUI/CLI Vim.
-
 	hooks			(Dictionary)
 	 Specify hook functions or hook script path. The following
 
@@ -96,16 +74,9 @@ tabular			100%
 	My:
 	: first_comma, asterisk, remove_lead_spaces
 
-tagbar			5%
-
 vim-dispatch
 	Asynchronously runs:
 		;Make or :Dispatch <cmd>
-vim-indent-guides	done
-vim-signify			done
-vim-smartinput		done
- \It's conflicting with neocomplete (<BS>), so brackets not removed properly
-vim-startify		done
 
 vim-multiple-cursor done (bug)
  \Possibly, I must give up on this plugin. It's slow and buggy, and rarely used

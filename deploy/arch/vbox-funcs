@@ -45,20 +45,10 @@ do_vm_socket() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
     printf "\n%s\n" "${line?No input}" | nc -U "${1?No vbox serial}"
 done; }
 
-do_vm_socket_file() {
-    local serial="${1?No vbox serial}" file="${2?No file path}"
-    if [ ! -f "$file" ]; then squit "File doesn't exist!"; fi
-    printf "\n%s\n" "cat - <<-'EOFSERIALFILE' > ${3:-~}/${file##*/}" | nc -U "$serial"
-    cat "$file" | nc -U "$serial"                       # Send content
-    printf "\n%s\n"  "EOFSERIALFILE" | nc -U "$serial"  # End of heredoc file
-}
-
-do_vm_socket_dir() {
-    local serial="${1?No vbox serial}" dir="${2?No dir path}" ddst="${3+$3/}${2##*/}"
-    if [ ! -d "$dir" ]; then squit "Dir doesn't exist!"; fi
-    echo "mkdir -p '$ddst'" | nc -U "$serial"
-
-    for fl in "$dir"/*; do if [ -f "$fl" ]
-    then do_vm_socket_file "$serial" "$fl" "$ddst"
-    else do_vm_socket_dir "$serial" "$fl" "$ddst"; fi; done
+do_vm_socket_copy() {
+    local serial="${1?No vbox serial}" src="${2?No src path}"
+    if [ ! -e "$src" ]; then squit "Error: '$src' doesn't exist!"; fi
+    printf "\nbase64 -d <<-'EOFSERIALFILE' | tar xvfz -\n" | nc -U "$serial"
+    { cd "${src%/*}" && tar cfz - "${src##*/}" | base64;
+        printf "%s\n"  "EOFSERIALFILE"; } | nc -U "$serial"
 }

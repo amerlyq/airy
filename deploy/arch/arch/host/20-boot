@@ -10,7 +10,8 @@ sdX="${1?No sdX disk specified for grub}"
 
 ### Bootloader
 pacman -S --noconfirm grub os-prober
-grub-install --core-compress=auto --target=i386-pc --recheck ${sdX}
+# ERROR: --core-compress=auto  -- Not recognized?
+grub-install --target=i386-pc --recheck ${sdX}
 rm -vf /boot/grub/grub.cfg
 
 ## Change default grub:
@@ -19,7 +20,7 @@ rm -vf /boot/grub/grub.cfg
 # menu if "GRUB_TIMEOUT=" is set to "0"
 # In future use 'sudo update-grub' after changes.
 mv -vf /etc/default/grub{,.bkp}
-cat - <<-'EOT' > /etc/default/grub
+cat >/etc/default/grub <<-'EOT'
 GRUB_DEFAULT=saved
 GRUB_SAVEDEFAULT=true
 GRUB_TIMEOUT=0

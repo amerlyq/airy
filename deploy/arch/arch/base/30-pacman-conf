@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+
+srv="${1?No local pacman server}"
+cfg="${2?No cfg: pacman.conf path}"
+tmp=/tmp/pacman.tmp
+>$tmp
+
+
+### Add local cache repository
+# Cut first part of file
+sed -r '/#%BEGIN/,/#%END/d; /^\[core\]/,$d' $cfg >> $tmp
+
+# Add custom repository
+cat >> $tmp <<EOT
+#%BEGIN Prepended during install
+## Local: pacman mirror on host server
+[custom]
+SigLevel = Never  # Optional TrustAll
+Server = $srv
+
+## AUR: https://archlinux.fr/yaourt-en
+[archlinuxfr]
+SigLevel = Never
+Server = http://repo.archlinux.fr/\$arch
+#%END
+EOT
+
+# Add last part of file
+sed -r '/^\[core\]/,$!d' $cfg >> $tmp
+
+# Comment out official repo
+# sed -ri '/^\[(core|extra|community)\]|^Include/s//#&/' $tmp
+
+# Apply changes
+mv -vfb $tmp $cfg
+
+# pacman -Sy -- will be automatically called by pacstrap
+
+# WARNING: when pacstrap, resulting /mnt/etc/pacman.conf may be different!
+echo ":: pacman set up complete"

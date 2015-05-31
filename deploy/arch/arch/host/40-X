@@ -12,13 +12,4 @@ LST="$LST xorg-xdm xf86-video-vesa mesa-libgl"
 
 LST="$LST git i3-wm dmenu"
 pacman -S --noconfirm $LST
-
-
-### AUR: https://archlinux.fr/yaourt-en
-# if ! grep -q '^\[archlinuxfr\]$' /etc/pacman.conf
-# then echo '
-# [archlinuxfr]
-# SigLevel = Never
-# Server = http://repo.archlinux.fr/$arch
-# ' >> /etc/pacman.conf; fi
-# pacman -Sy --noconfirm base-devel yaourt
+# pacman -S --needed $LST

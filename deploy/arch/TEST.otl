@@ -1,4 +1,5 @@
 REGRESSION TESTS
+: see log /tmp/vbox-Arch64S0.log
 	[_] Disk
 	: see output of 'lsblk $sd'
 		[_] Partitions
@@ -8,7 +9,8 @@ REGRESSION TESTS
 		[_] fstab
 	[_] Packages
 		[_] Mirrors
-		> Local cache
+		[_] Local cache
+		: see log /tmp/vbox-PackageServer.log
 			| mirrorlist    :: from Host-server w/o access
 			| pacman.conf   :: from USB/ISO
 			| sshfs->/var/cache/pacman/pkg  :: for several Arch on shared LAN

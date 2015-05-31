@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+
+# But you have to install package-query first for yaourt
+# curl -O https://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz
+# tar zxvf package-query.tar.gz
+# cd package-query
+# makepkg -si
+
+if grep -q '^\[archlinuxfr\]' /etc/pacman.conf; then
+    LST="$LST package-query yaourt"
+fi
+
+pacman -S --noconfirm $LST
+
+
+# AUR="$AUR qingy"
+# yaourt -S $AUR

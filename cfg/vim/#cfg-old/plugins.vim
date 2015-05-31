@@ -25,4 +25,6 @@
 " NeoBundle 'Lokaltog/vim-easymotion'
 " DEPRECATED: use Unite MRU
 " NeoBundle 'mhinz/vim-startify'
+" DEPRECATED: use 'kana/vim-altr'
+" NeoBundle 'vim-scripts/a.vim'
 

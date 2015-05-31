@@ -1,42 +1,21 @@
+" DEPRECATED:
+" - Too much bugs in caused by every seen implementation
+" - Clushes with terminal escape codes, insert mode, etc
+" - Use <Alt/Meta> for urxvt/tmux only, not necessary in vim
+" - For gvim use <Alt> only for gui-specific mappings
+
+
 " vim: fdm=marker
 " Based on vim tip 1272 [http://vim.wikia.com/wiki/VimTip1272]
 " See: http://vim.wikia.com/wiki/Mapping_fast_keycodes_in_terminal_Vim
 " See: :h <Char> -- how to use direct code mapping for multibyte: <S-Char-114>
 
-if exists("did_meta_escape") | finish | endif
+" NOTE: Alt-c and Alt-C -- different
+"" fix meta-keys which generate <Esc>[0-9A-Za-z]
+
+
+if has("gui_running") || exists("did_meta_escape") | finish | endif
 let did_meta_escape = 1
-
-" for i in range(35,61) + range(65,90) + range(97,122)
-"   let c = nr2char(i) " echom i c
-"   exec "set <M-".c.">=\e".c
-"   " Shadowed 'cause of some wierd behaviour as 'No such mapping'
-"   " exec "map  \e".c." <M-".c.">"
-" endfor
-
-" Timeout {{{1
-" leave insert mode quickly
-" if ! has("gui_running") | set ttimeoutlen=32 | endif
-
-set timeout
-augroup FastEscape
-  autocmd!
-  au InsertEnter * set timeoutlen=0 ttimeoutlen=0
-  au InsertLeave * set timeoutlen=1000 ttimeoutlen=32
-augroup END
-
-
-" Suppress move-left of cursor when leaving insert mode
-"   http://vim.wikia.com/wiki/Prevent_escape_from_moving_the_cursor_one_character_to_the_left
-let CursorColumnI = 0 "the cursor column position in INSERT
-au InsertEnter * let CursorColumnI = col('.')
-au CursorMovedI * let CursorColumnI = col('.')
-au InsertLeave * if col('.') != CursorColumnI | call cursor(0, col('.')+1) | endif
-
-
-" DISABLED: arrows and other escaped keys will be breaked in insert mode
-" set noesckeys " (Hopefully) removes the delay when hitting esc in insert mode
-
-if has("gui_running") | finish | endif
 
 " Keycodes {{{1
 
@@ -111,7 +90,6 @@ endfor
 " 1. Map <ESC> to \033\015 or \033\007 in .Xresources, then add in ranger some
 "       copy?map <ESC> ... <C-g>
 " 2. Use snip-insert-autoleave@FastEscape
-"
 " When it will not work again, see ':h term'
 
 " As alternative for Alt, there are plugin, doing somewhat more, then I do.
@@ -122,5 +100,3 @@ endfor
 " for i in range(32,126) | $put =nr2char(i) | endfor
 "  http://vim.wikia.com/wiki/Making_a_list_of_numbers
 
-" NOTE: Alt-c and Alt-C -- different
-"" fix meta-keys which generate <Esc>[0-9A-Za-z]

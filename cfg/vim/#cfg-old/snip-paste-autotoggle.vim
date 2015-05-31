@@ -1,7 +1,12 @@
+" DEPRECATED:
+"   I have no use of it, having own '+' mappings and urxvt shortcuts
+"   Also, keymap clashes with <Esc> presses in INSERT when 'notimeout' set
+"   Don't use 'au InsertEnter * set paste' as <CR> will never indent!
+
 "Auto paste-toggle w/o <F2>
 " http://www.linux.org.ru/forum/desktop/9146271
-"Extended tmux-version
 
+"Extended tmux-version
 function! WrapForTmux(s)
   if !exists('$TMUX')
     return a:s
@@ -23,7 +28,3 @@ function! XTermPasteBegin()
 endfunction
 
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
-
-" For cases when not in tmux
-set pastetoggle=<F2>
-

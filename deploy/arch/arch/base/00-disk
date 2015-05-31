@@ -5,12 +5,11 @@ sd="${1?No disk device}"
 
 case "$2" in
 --new) bNew=1 ;;
---mnt) bNew=0 ;;
-    *) bNew=  ;;
+    *) bNew=0 ;;
 esac
 
-nd=(boot root swap home)
-for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
+# nd=(boot root swap home)
+# for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
 
 layout="
     /boot ext4       100MB
@@ -22,7 +21,7 @@ layout="
 ## Partitioning
 if [ -n "$bNew" ]; then
     umount -fR /mnt
-    gawk -v new="$bNew" -v sd="$sd" '
+    gawk -v new="${bNew?No bNew derived value}" -v sd="$sd" '
     BEGIN { pp="parted -s -a opt "sd; ps="1MB"; N=0
         if(new) {
             print "swapoff -a"
