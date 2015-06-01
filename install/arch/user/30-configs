@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+wfile() { printf "%s" "${2?No text}" > "${1?No file name}"; }
+wscript() { wfile "$1" "$2" && chmod u+x "$1"; }
+
+# Those scripts must provide only basic strokes to load X.
+# They will be completely replaced by user setup from git.
+wscript ~/.profile "\
+#!/bin/sh
+[[ -f ~/.bashrc ]] && source ~/.bashrc
+[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && exec startx
+# OR: ... && exec xinit -- :0 -nolisten tcp vt\$XDG_VTNR
+"
+
+wscript ~/.xinitrc "\
+#!/bin/sh
+xrandr --size 1 &
+xsetroot -gray &
+exec i3
+"

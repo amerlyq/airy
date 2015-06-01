@@ -70,7 +70,7 @@ do_each arch-chroot /mnt /bin/bash -c ~/host/ <<EOTHOST
 20-boot $sd
 40-X
 42-AUR
-60-services
+60-services $user
 90-add-user $user
 EOTHOST
 fi && echo ':: host chroot ended'

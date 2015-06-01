@@ -48,6 +48,9 @@ done; }
 do_vm_socket_copy() {
     local serial="${1?No vbox serial}" src="${2?No src path}"
     if [ ! -e "$src" ]; then squit "Error: '$src' doesn't exist!"; fi
+    # WARNING: when using netcat to transmit texts directly, don't use '&' on
+    # the line ends, as it will consume all next linebreaks and merge text with
+    # heredoc marker.
     printf "\nbase64 -d <<-'EOFSERIALFILE' | tar xvfz -\n" | nc -U "$serial"
     { cd "${src%/*}" && tar cfz - "${src##*/}" | base64;
         printf "%s\n"  "EOFSERIALFILE"; } | nc -U "$serial"

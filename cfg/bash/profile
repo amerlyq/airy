@@ -24,3 +24,7 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
+## Export variable for systemd/user units
+# systemctl --user import-environment PATH
+# xargs systemctl --user set-environment < /path/to/file.conf
+# drop-in config file in /etc/systemd/system/user@.service.d/

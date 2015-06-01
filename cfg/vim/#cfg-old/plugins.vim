@@ -28,3 +28,13 @@
 " DEPRECATED: use 'kana/vim-altr'
 " NeoBundle 'vim-scripts/a.vim'
 
+" ======================================
+" DISABLED: has problems with russian text
+" Insert mode auto-completion for quotes, parens, brackets, etc
+"NeoBundle 'Raimondi/delimitMate'
+" DISABLED: bug with neocomplete -- <BS> don't remove both brackets,
+" unnecessary quotes for my workflow, partially superseeded by vim-surround
+"NeoBundle 'kana/vim-smartinput'
+" DISABLED: completely destroys mouse selection. Has not much usecases.
+"NeoBundle 'joonty/vdebug', {
+"            \ 'autoload' : { 'filetypes' : [ 'python' ] } }

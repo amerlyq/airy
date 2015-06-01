@@ -1,0 +1,34 @@
+# vim: ft=sh
+
+# X settings
+xrandr --size 1 &
+
+# xscreensaver -no-splash &
+xsetroot -cursor_name left_ptr &
+xsetroot -solid "#333333"
+
+
+# http://fluxbox.sourceforge.net/docbook/en/html/app-setup.html
+# Disable DPMS turning off the screen
+xset -dpms
+xset s off
+# Disable bell
+xset -b
+
+# Coredumps
+# ulimit -c unlimited
+
+
+## Maybe better launch by systemd?
+#::  https://wiki.archlinux.org/index.php/GnuPG
+### GPG
+# [ -f .gnupg/gpg-agent.env ] && . .gnupg/gpg-agent.env
+# GPG_AGENT=$( echo ${GPG_AGENT_INFO:-0} | cut -d: -f1 )
+#
+# if [ -e $GPG_AGENT ]; then
+#     export GPG_AGENT_INFO
+#     export SSH_AUTH_SOCK
+#     export SSH_AGENT_PID
+# else
+#     eval $(gpg-agent --write-env-file ${HOME}/.gnupg/gpg-agent.env --enable-ssh-support --daemon )
+# fi

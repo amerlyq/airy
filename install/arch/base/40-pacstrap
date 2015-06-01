@@ -30,7 +30,7 @@ echo ":: mirrors selected"
 
 
 ### BASE SOFT
-soft="base base-devel openssh"  #  sshfs
+soft="base base-devel openssh gnupg pinentry"  #  sshfs
 if [ ! -d "/mnt/usr/bin" ]; then
     ## Install the base system  # -i -- interactive
     pacstrap /mnt $soft || exit $?

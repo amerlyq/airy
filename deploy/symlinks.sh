@@ -21,7 +21,7 @@ then
     lnLst ~/. "" "vim vim/vimrc" #vim/ycm_extra_conf.py
     lnLst ~/.config/ "" "ranger mcomix sxiv Xrc/compton.conf"
     lnLst ~/.mpv/ mpv/ "config input.conf"
-    lnLst ~/.config/copyq/ Win/ "copyq.conf"
+    lnLst ~/.config/copyq/ sets/ "copyq.conf"
     lnLst ~/.config/gtk-3.0/ sets/ "settings.ini"
     lnLst ~/. sets/ "gtkrc-2.0 dhexrc pdbrc" #valgrindrc wgetrc
 

@@ -1,0 +1,214 @@
+vim:
+	[_] Check neovim
+	[_] READ vim vs PyCharm3 in Idea
+		http://andrewbrookins.com/tech/one-year-later-an-epic-review-of-pycharm-2-7-from-a-vim-users-perspective/
+	[_] Check
+		https://github.com/szw/vim-ctrlspace
+		quickfixsigns <https://github.com/tomtom/quickfixsigns_vim>
+	[_] ADD ranger as NERDTree -- try using NERDTree before it.
+		: open by shortcut ',F' -- fork in another window
+		: setup vimserver and client, and 'ranger server and client'
+		: all opened in ranger files go to vimserver
+		: changing buffers in vim -- moves cursor in ranger (ranger-server)
+		: creating tabs in vim creates them in ranger
+		:	(or one tab for each buffer unique dir?)
+	[_] Seize http://vimawesome.com/
+	[_] ALT to tcomment -- if it's too cumbersome (shortcuts are laggy)
+		: Check tcomment additional features and is really i need them
+		: Also supports repeat.vim
+		https://github.com/tpope/vim-commentary
+	[_] ALT to tabular -- I can't set comfortable shortcus
+		: Check for operators and all possible dilimiters, regex (C-x)
+		https://github.com/junegunn/vim-easy-align
+		https://github.com/tommcdo/vim-lion
+	[_] Add v:count to <Space> operator -- amount of chars before exit.
+	[_] ALT to vim-surround -- use on 'q' as operator
+		: It can replace my ,<Space> shortcut for surrounding by spaces
+		: Possibly it can surround visual blocks?
+		https://github.com/rhysd/vim-operator-surround
+	[_] Remap 'ge' with motion 'prev-to-last' letter? (See: CamelMotion plugin)
+	[_] Enhance config/bundle/tabular
+		[_] use v:count to align on N'th entry
+		[_] different shortcuts for spaces: 00, 01, 11
+		[_] visual selection or current character as delimiter
+	2015-06-01 [X] BUG: in insert for fast presses: <S-F12>, etc. :> Alt-keys removed.
+		:> Result of <Esc> + any key (+notimeout) + mappings in term-alt-keys.
+	2015-06-01 [X] BUG: mouse highlight don't work  :> Culprit is 'vdebug'. Removed.
+	2015-05-26 [X] BUG: mix of incsearch, others! Find higlighting-as-you-type in '/' or ':s;..;' !
+	2015-06-01 [X] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
+		:> Seems one only way -- use Xresources to remap all. Or don't use mappings.
+		May be something with urxvt, check in gvim
+			http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
+		Yes, it is -- read 'cryptic characters'
+			http://vim.wikia.com/wiki/Get_Alt_key_to_work_in_terminal?useskin=monobook
+	2015-06-01 [X] BUG: ttimeoutlen or similar -- after some editing, two-key combo timing is too fast
+		: problem is in mappings of <M-..> at term-alt-keys.vim. :> Disabled maps and timeout.
+	[_] Change Bookmarking 2\t --> to trigger let g:tin=v:count instead of one-time setting?
+		or simply use \T or g\t for permanent setting and \t for one-time
+	[_] comment each mapping with regex to extract placeholders from binding
+		[_] for continuous group of maps use that regex for each
+		[~] develop format
+		[_] mark several files
+		[_] create parser
+	2015-03-27 [X] fix ,k ,K behaviour
+		,k by default must always run :./% -- to speed up work on open
+		,K must replace current default run cmd with last from ':'
+		[_] Use v:counter -- to setup several different scripts
+	[_] Try all plugins for textobj:
+		https://github.com/kana/vim-textobj-user/wiki
+		https://github.com/tommcdo
+	[_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
+		: to generate vimrc for others or for me on other computers (buildserver)
+	[_] regions of file highlighting
+		http://vim.wikia.com/wiki/Different_syntax_highlighting_within_regions_of_a_file
+		http://vim.wikia.com/wiki/Creating_your_own_syntax_files
+		https://robots.thoughtbot.com/writing-vim-syntax-plugins
+	[_] load spellchecking in vim_install
+		[_] install -u must run vim_install in update regime
+	Navigation
+		2015-03-18 [X] mappings to move between loci of entries of qf/loc list
+		2015-03-17 [X] move to next/prev change in git signify (Use: ]c [c)
+		2015-03-17 [X] move to next/prev spellchecking error (Use: ]s [s z=)
+	> [_] Autocopying on focus lost/gain
+	: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
+		au FocusLost   * silent! call CopyStringInReg('"', @+)
+		au FocusGained * silent! call CopyStringInReg('+', @")
+		: and autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
+	2015-05-26 [X] easymotion  :> Replaced by vim-sneak
+		2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
+			No combining -- overlapping x-mappings aren't possible
+		[X] ALT: https://github.com/justinmk/vim-sneak
+	Substitute keeps case
+		keepcase.vim
+			http://www.vim.org/scripts/script.php?script%5Fid=6
+		SmartCase
+			http://www.vim.org/scripts/script.php?script_id=1359
+	[_] own syntax highlighting
+		http://learnvimscriptthehardway.stevelosh.com/chapters/46.html
+		http://vim.wikia.com/wiki/Search_for_lines_not_containing_pattern_and_other_helpful_searches
+	[_] Seize
+		http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
+		http://www.vim.org/scripts/script.php?script_id=4449
+		https://github.com/jackfranklin/dotfiles
+	[_] BUG: C-F on end of '/', C-D on emtpy ':' -- both opens menu, needs to disable it
+	2015-03-26 [X] BUG: 'gcc' comments are old-style again
+	[o] Vimoutliner
+		[_] Remove insert mappings
+		2015-06-01 [X] Change mapping to more easily pressed :> use everywhere ',.'
+		[X] Disable autoformating on pasting
+	[_] Autoreplacing: choose delimiter from [:|/;@] on ,cc ,cy depending on expression
+		 Or escape delimiter symbols in expression
+	[_] Delay on saving -- by means of syntastic -- move it in asynchronous mode
+	[_] Copy-Paste w/o newline
+		http://www.vim.org/scripts/script.php?script_id=3355
+	[_] Swap args in func
+		http://blog.kamil.dworakowski.name/2007/09/swap-parameters-script-for-vim.html
+		http://www.vim.org/scripts/script.php?script_id=2032
+	[_] setup python-jedi
+		http://habrahabr.ru/post/224979/
+		http://redkrieg.com/2012/12/11/writing-python-like-a-jedi/
+		http://vimawesome.com/plugin/jedi-vim
+		http://michiganlabs.com/vim-python-ide/
+		http://thibaut.horel.org/blog/using-vim-as-a-python-ide.html
+
+vim
+	2015-06-01 [X] BUG: auto-paste mode on insert don't work, verify, add F2 to insert. :> Disabled.
+	[_] Map next/prev buf, etc on [a [b, ]a ]b
+	[_] Delete all tabs besides indent. (retab! then script to retab all besides?)
+	[_] Integrate: http://learnvimscriptthehardway.stevelosh.com/
+	[_] Suppress syntastic headers error
+		https://github.com/scrooloose/syntastic/issues/676
+	2015-06-01 [X] Add <unique> attr to my shortcuts
+	[_] Create toggle for multi-windows with fixed or autoresize
+	[_] !MUST!: https://github.com/svermeulen/vim-easyclip
+		 Possible, it's that plugin which can insert full-line delete on same line
+		 Find plugin which deletes/insertes lines without newline
+	[_] Install Ycm back
+		http://www.alexeyshmalko.com/2014/youcompleteme-ultimate-autocomplete-plugin-for-vim/
+		http://valloric.github.io/YouCompleteMe/
+	[_] Setup Geeknote -- install newer vim? Connect to unstable?
+	[_] Folding: check by 'au' if file contents {{{\d\{0,2\}, then set foldmethod=marker, setlocal foldmethod=manual
+	[_] Try full virtual editing -- case: o<Esc>a  -- must delete line but stay indented
+
+	>[_] Search inside useful hacks and tips
+		https://github.com/romainl/dotvim
+	[_] Integrate this tips:
+		[_] https://github.com/benmills/vimux
+		[_] http://vim.wikia.com/wiki/Replace_a_word_with_yanked_text
+		[_] http://vimhelp.appspot.com/vim_faq.txt.html#faq-20.4
+		[_] !! http://dalibornasevic.com/posts/43-12-vim-tips
+			: Very big good faq!
+		[_] http://amix.dk/vim/vimrc.html
+	[_] Color !cat
+		 http://www.vim.org/scripts/script.php?script_id=4325
+	[_] Plugins
+		 https://github.com/fholgado/minibufexpl.vim
+		 https://github.com/chrisbra/Colorizer
+		 http://www.vimpusher.com/
+		 kana/vim-textobj-user
+		 kana/vim-arpeggio
+		 https://github.com/sophacles/vim-processing
+		 https://github.com/vim-scripts/VOoM
+		 https://github.com/h1mesuke/textobj-wiw
+		 https://github.com/h1mesuke/unite-outline/wiki
+		 http://try.nodebb.com/plugin/unimpaired-vim
+		Test and compare with vimoutliner
+		 https://github.com/vimwiki/vimwiki
+	[_] Make-shift-auto
+		 http://www.vim.org/scripts/script.php?script_id=4278
+		 http://tuxion.com/2011/09/30/vim-makeprg.html
+	[_] Read
+		http://www.integralist.co.uk/posts/a-guide-to-getting-started-with-vim/
+		http://www.integralist.co.uk/posts/vim-workflow/
+		http://www.integralist.co.uk/posts/vim-workflow-part-deux/
+	[_] Info
+		Book about vimscript
+		 http://learnvimscriptthehardway.stevelosh.com/
+		Man (nice)
+		 http://bencrowder.net/files/vim-fu/
+		Tip & tricks, Plugins
+		 http://stevelosh.com/blog/2010/09/coming-home-to-vim/
+		Castings
+		 http://vimcasts.org/
+		 http://lococast.net/
+		 http://vimeo.com/user1690209/videos
+			Shows kun-fu with vim
+		 http://derekwyatt.org/vim/vim-tutorial-videos/
+		Man & tips (>1500)
+		 http://vim.wikia.com/wiki/Category:VimTip
+		 http://vimawesome.com/
+	Read
+		 http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_%28Part_2%29
+		 http://vim.wikia.com/wiki/Making_a_list_of_numbersj
+	Vim is slow!
+		: Итак, граждане, извиняйте за преувеличивание, товарищ stormblastt
+		: был прав: «скроллит скроллит» - это из-за плагина obviousmode. Он
+		: там имеет autocmd на CursorMoved, и это, конечно, создавало
+		: определенные проблемы. Завтра напишу автору, чтобы написал о лагах
+		: на страничке плагина. Ну, если не напишет, так хоть в курсе будет..
+		: А ещё говорят тормозит cursorline, если её выключить, может станет
+		: лучше.
+		:	--startuptime | Use to get statistics on long load
+	How-to with desc and vimrc
+		http://konishchevdmitry.blogspot.com/2008/07/howto-vim.html
+	Integrate shell
+		http://h0rr0rr-drag0n.blogspot.com/2010/11/shell-vim.html
+	Tips
+		http://uw-freelancer.github.io/blog/vim-vdebug/
+		http://uw-freelancer.github.io/blog/insanely-faster-vim-buffer-switching/
+		https://netguru.co/blog/win-vim-hacks
+	[_] % Text-objs
+		http://vim.wikia.com/wiki/Category%3aC%2B%2B
+		https://github.com/kana/vim-textobj-user
+		https://github.com/kana/vim-textobj-function
+		https://github.com/bps/vim-textobj-python
+	Plugs
+		For coersion (case convert)
+			https://github.com/tpope/vim-abolish
+		text place exchange operator
+			https://github.com/tommcdo/vim-exchange
+	[_] Run in term without '!'
+		See 'system()' and 'show output in split'
+			http://learnvimscriptthehardway.stevelosh.com/chapters/52.html
+		For asynch run, search plugins already installed!
+

@@ -161,9 +161,9 @@ Xorg
 	https://wiki.archlinux.org/index.php/Xorg
 	| https://wiki.archlinux.org/index.php/Systemd/User#Xorg_as_a_systemd_user_service
 
-: Maybe, move from sh -> dash?
+< Maybe, move from sh -> dash?
 	https://wiki.archlinux.org/index.php/Dash
-: Maybe preinstall configured system onto removable?
+< Maybe preinstall configured system onto removable?
 	https://wiki.archlinux.org/index.php/Archiso
 
 RSS
@@ -172,7 +172,15 @@ RSS
 Autologin
 	https://wiki.archlinux.org/index.php/Automatic_login_to_virtual_console
 	https://wiki.archlinux.org/index.php/Start_X_at_login
+	: using xinit w/o xauth may fail ssh X11 (also, use -Y flag -- trusted X11)
 	https://wiki.archlinux.org/index.php/Xinitrc
+		Use direct start w/o using .xinitrc (if you broke it)
+			xinit /usr/X11R6/bin/xterm
+			xinit `which xterm`
+		Use ~/.xinitrc and pass 'i3' as argument to script
+			xinit i3
+	https://wiki.archlinux.org/index.php/Systemd/User#Xorg_and_systemd
+
 
 2015-05-30 [$] Display managers :> not needed
 	https://wiki.archlinux.org/index.php/Display_manager  :> lightdm if needed

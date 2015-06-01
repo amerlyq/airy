@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source ~/.bash/functions.d/system && amScriptDir || exit $?
-source "$SCRIPT_DIR/vbox-funcs" || exit $?
-source "$SCRIPT_DIR/vbox-env" || exit $?  # Import some variables
+source "$SCRIPT_DIR/vbox/funcs" || exit $?
+source "$SCRIPT_DIR/vbox/env" || exit $?  # Import some variables
 
 
 hopt() { [ "${OPTS/[$1]}" != "$OPTS" ]; }
@@ -28,7 +28,7 @@ fi
 ### Create vbox and setup local repository server ###
 #####################################################
 hopt r && do_vm_off "$VNM" -y
-hopt c && "$SCRIPT_DIR/vbox-create.sh" -c
+hopt c && "$SCRIPT_DIR/vbox/create.sh" -c
 hopt r && do_vm_run "$VNM" -y $(hopt h && echo '-h')
 
 hopt e && [ -d "$VMs/pkg" ] && { ( cd "$VMs/pkg" &&

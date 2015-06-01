@@ -93,7 +93,7 @@ NeoBundleLazy 'Shougo/unite-outline', {
 NeoBundle 'Shougo/neomru.vim', { 'depends' : 'unite.vim' }
 
 " NeoBundleLazy 'thinca/vim-unite-history', { 'depends' : 'unite.vim'
-"                                         \ , 'autoload' : { 'unite_sources' : 'history/command' }
+"                                         \ , 'autoload' : { 'unite_sources' : 'history/command' 4}
 "                                         \ }
 
 " ======================================
@@ -185,8 +185,6 @@ NeoBundle 'klen/python-mode', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] } }
 NeoBundle 'davidhalter/jedi-vim', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] } }
-NeoBundle 'joonty/vdebug', {
-    \ 'autoload' : { 'filetypes' : [ 'python' ] } }
 
 
 " ======================================
@@ -216,13 +214,6 @@ NeoBundle 'kana/vim-textobj-function', { 'depends' : 'kana/vim-textobj-user' }
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-entire'
 NeoBundle 'coderifous/textobj-word-column.vim'
-
-" DISABLED: has problems with russian text
-" Insert mode auto-completion for quotes, parens, brackets, etc
-"NeoBundle 'Raimondi/delimitMate'
-" DISABLED: bug with neocomplete -- <BS> don't remove both brackets,
-" unnecessary quotes for my workflow, partially superseeded by vim-surround
-"NeoBundle 'kana/vim-smartinput'
 
 
 " ======================================

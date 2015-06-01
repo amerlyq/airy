@@ -5,10 +5,11 @@ if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exi
 ### Install X, etc
 # pacman -Sy
 LST="xorg-server xorg-server-utils xorg-xinit"
+
 # VBox needs at least vesa GPU driver: or X will not start!
-LST="$LST xorg-xdm xf86-video-vesa mesa-libgl"
+LST="$LST xf86-video-vesa mesa-libgl"  # xorg-xdm
 # 1) mesa-libgl  2) nvidia-304xx-libgl  3) nvidia-340xx-libgl  4) nvidia-libgl
-# pacman -S xorg-twm xterm xf86-input-synaptics mesa nvidia lib32-nvidia-utils
+# pacman -S xf86-input-synaptics mesa nvidia lib32-nvidia-utils
 
 LST="$LST git i3-wm dmenu"
 pacman -S --noconfirm $LST

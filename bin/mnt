@@ -47,7 +47,7 @@ domnt() {
     # Flash drive:  http://linuxsam.livejournal.com/18176.html
     declare $(blkid "$DEVPATH" | awk '{print $NF}')  # TYPE=...
     if [ "$TYPE" == "vfat" ]; then
-        MOPTS="rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,\
+        MOPTS="rw,nosuid,nodev,noexec,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,\
 codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
     fi
     # -t "$TYPE"
