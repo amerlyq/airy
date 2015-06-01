@@ -1,9 +1,11 @@
+if !exists('unite#custom#profile') | finish | endif
+
 " Open unite buffer in Insert Mode immediately.
 call unite#custom#profile('default', 'context', {
                         \ 'start_insert' : 1
                         \ })
 " Directory to store unite configurations.
-let g:unite_data_directory = $VIMCACHEDIR . '/unite'
+let g:unite_data_directory = $CACHE . '/unite'
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 let g:unite_source_rec_max_cache_files = 0
 call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)

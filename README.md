@@ -1,9 +1,7 @@
-# airy #
+airy
+=====
 
-System deployment configs. All system in one click.
-Different profiles for different devices.
-Vim-consistent controls in all programms.
-A lot of cheetsheets.
+Vim-like developer's workstation. Automatic setup on clean system.
 
 ====
 
@@ -15,6 +13,7 @@ Development-based configuration.
 Utils
   * [exuberant-ctags](http://ctags.sourceforge.net). Used by vim/tagbar
   * [ag](https://github.com/ggreer/the_silver_searcher). Used by vim/unite and vim/ag.
+
 
 ## Install ##
 
@@ -30,8 +29,3 @@ Go make some tea.
 
 Need more?
 Make your own profile and re-launch.
-
-## Seized ##
-
-  [MPogoda](https://github.com/MPogoda/dotfiles)
-  Many, many others... thu name is legion.

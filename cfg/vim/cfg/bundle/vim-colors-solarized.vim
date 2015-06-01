@@ -1,3 +1,5 @@
+if !exists('solaraized') | finish | endif
+
 " if &t_Co >= 88
 "If 256 -- will choose from existing palette similar colors:
 "   makes brown bg and bold font...

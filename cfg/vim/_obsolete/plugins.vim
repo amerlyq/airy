@@ -20,6 +20,15 @@
 " TODO: temporarily disabled as I can't understand how to integrate with syntastic
 " NeoBundle 'jalcine/cmake.vim'
 
+
+" The best testing framework for Vim script'
+"NeoBundle 'Shougo/vesting'
+
+" Always have a nice view for vim split windows
+" http://zhaocai.github.io/GoldenView.Vim/
+"NeoBundle 'zhaocai/GoldenView.Vim'
+
+
 " ======================================
 " DEPRECATED: use vim-sneak
 " NeoBundle 'Lokaltog/vim-easymotion'

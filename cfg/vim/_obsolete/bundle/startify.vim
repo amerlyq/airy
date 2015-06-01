@@ -32,7 +32,7 @@ let g:startify_custom_footer = ['',
 
 let g:startify_enable_special = 0
 
-let g:startify_session_dir = '~/.vim/session'
+let g:startify_session_dir = '$CACHE/sessions'
 let g:startify_bookmarks = [ '~/.vimrc' ]
 let g:startify_files_number = 8
 

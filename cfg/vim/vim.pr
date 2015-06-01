@@ -1,0 +1,18 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.bash/functions.d/packages || exit $?
+
+# for vimoutliner export in mindmap
+LST="$LST vim vim-gtk python-dev"
+LST="$LST libclang-dev clang-format-3.5 exuberant-ctags"
+# libclang-dev exuberant-ctags python-dev   | for autocompleter in vim
+# clang-format-3.5          | for auto-formatting c/cpp code
+
+apt_noprompt $LST
+
+## TODO: Change to neovim
+# yaourt -S neovim-git
+## Principle: Download all pkg with '-w', then once do interactive install.
+# pacman -S gvim / gvim-python3
+# yaourt -S silver-searcher-git
+# http://kissmyarch.blogspot.com/2012/05/two-simple-yaourt-tips.html

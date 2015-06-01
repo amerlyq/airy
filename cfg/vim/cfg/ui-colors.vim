@@ -30,7 +30,7 @@ autocmd ColorScheme * highlight! NonText  ctermbg=None
 let g:rehash256 = 1
 
 
-let s:vim_theme=expand('$HOME/.cache/vim/vim_theme')
+let s:vim_theme=expand('$CACHE/vim_theme')
 if filereadable(s:vim_theme)
   exec 'source ' . s:vim_theme
 else

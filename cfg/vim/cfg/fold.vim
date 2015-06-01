@@ -21,3 +21,8 @@ set foldtext=RefinedFoldText()
 " Тут есть как сделать мануальный и автоматический фолдинг одновременно
 "  http://vim.wikia.com/wiki/Folding
 
+augroup MixedFolding
+    autocmd!
+    au BufReadPre * setlocal foldmethod=indent
+    au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+augroup END

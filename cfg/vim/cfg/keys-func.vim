@@ -1,6 +1,7 @@
 " For when you forget to sudo.. Really Write the file.
-cnoremap E!! e !sudo tee %
-cnoremap W!! w !sudo tee % >/dev/null
+command! -bar -bang -nargs=0 Sw write !sudo tee % >/dev/null
+" Execute command and place output in new buffer. (:new, :vnew, :tabnew)
+command! -bar -nargs=+ E new | r ! <args>
 
 " generate 'tags' file: obsolete by easytags
 nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
@@ -30,5 +31,5 @@ nmap <Leader>= mzyypVr=:.+1g/^=\+/d<Enter>`z
 " format current line as a second-level heading in markdown (uses `z marker)
 nmap <Leader>+ mzyypVr-:.+1g/^-\+/d<Enter>`z
 
-
+" Dump all keymaps
 command! -bar -nargs=? MapDump redir > ~/vim_map_dump | map <args> | redir END

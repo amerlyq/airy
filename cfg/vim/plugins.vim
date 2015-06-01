@@ -1,5 +1,4 @@
 " vim:fdm=marker:fdl=1
-" :NeoBundleClearCache if change .vimrc
 
 "==========================================
 " Use ',.' as preferable localleader
@@ -31,24 +30,15 @@ let mapleader=","
 noremap <unique> <Leader> <Nop>
 
 
-" Let NeoBundle manage NeoBundle
-NeoBundleFetch 'Shougo/neobundle.vim'
-" git clone --depth 1 https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
-
-
-" TODO: there must be checking on mingw! Too many plugins depends on vimproc.
-" MSG: build : { 'windows' : 'echo "Sorry, cannot update vimproc binary file in Windows."' }
 " Asynchronous execution plugin for Vim
-"   let vimproc_updcmd = has('win64') ?
-"     \ 'tools\\update-dll-mingw 64' : 'tools\\update-dll-mingw 32'
-" 'windows' : vimproc_updcmd,
-NeoBundle 'Shougo/vimproc.vim',{
+NeoBundle 'Shougo/vimproc.vim', {
     \ 'external_commands' : 'make',
     \ 'build' : {
-    \   'windows' : 'make -f make_mingw32.mak',
-    \   'cygwin' : 'make -f make_cygwin.mak',
-    \   'mac' : 'make -f make_mac.mak',
-    \   'unix' : 'make -f make_unix.mak',
+    \     'windows' : 'tools\\update-dll-mingw',
+    \     'cygwin' : 'make -f make_cygwin.mak',
+    \     'mac' : 'make -f make_mac.mak',
+    \     'linux' : 'make',
+    \     'unix' : 'gmake',
     \ }}
 
 " Powerful shell implemented by Vim script
@@ -73,60 +63,41 @@ NeoBundle 'Shougo/vinarise.vim', {
     \    'explorer' : 1,
     \ }}
 
-" The best testing framework for Vim script'
-"NeoBundle 'Shougo/vesting'
-
-" Always have a nice view for vim split windows
-" http://zhaocai.github.io/GoldenView.Vim/
-"NeoBundle 'zhaocai/GoldenView.Vim'
 
 " Super-mega-replace for bunch of plugins
 " See: http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
-NeoBundle 'Shougo/unite.vim', {
-    \ 'name' : 'unite.vim'
-    \ , 'depends' : 'Shougo/vimproc'
-    \ }
-NeoBundleLazy 'Shougo/unite-outline', {
-    \ 'depends' : 'unite.vim'
-    \ , 'autoload' : { 'unite_sources' : 'outline' }
-    \ }
-NeoBundle 'Shougo/neomru.vim', { 'depends' : 'unite.vim' }
-
+NeoBundle 'Shougo/unite.vim', { 'depends' : 'Shougo/vimproc.vim' }
+NeoBundleLazy 'Shougo/unite-outline', { 'depends' : 'Shougo/unite.vim'
+    \ , 'autoload' : { 'unite_sources' : 'outline' }}
+NeoBundle 'Shougo/neomru.vim', { 'depends' : 'Shougo/unite.vim' }
 " NeoBundleLazy 'thinca/vim-unite-history', { 'depends' : 'unite.vim'
-"                                         \ , 'autoload' : { 'unite_sources' : 'history/command' 4}
-"                                         \ }
+"    \ , 'autoload' : { 'unite_sources' : 'history/command' 4}}
+
 
 " ======================================
-
 " Integration with neocomplete: for stdlib++, boost, etc (works on Windows)
 " http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
-NeoBundle 'osyo-manga/vim-marching', {
-    \ 'depends' : 'Shougo/vimproc'
-    \ }
+NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
 
-NeoBundleLazy 'Shougo/neocomplete', {
+NeoBundleLazy 'Shougo/neocomplete.vim', {
     \ 'disabled' : !has('lua'),
     \ 'vim_version' : '7.3.885',
-    \ 'depends' :
-    \   [ 'Shougo/context_filetype.vim'
-    \   , 'Shougo/vimproc.vim'
+    \ 'depends' : [
+    \     'Shougo/context_filetype.vim',
+    \     'Shougo/vimproc.vim'
     \   ],
-    \ 'autoload': {
-    \   'insert': 1,
-    \ }}
+    \ 'autoload': { 'insert': 1, }}
 
 " SirVer/ultisnips
 NeoBundle 'Shougo/neosnippet.vim', {
     \ 'vim_version': '7.3.885',
-    \ 'depends' :
-    \   [ 'Shougo/neocomplete.vim'
-    \   , 'Shougo/neosnippet-snippets'
-    \   , 'honza/vim-snippets'
-    \   ],
-    \ }
+    \ 'depends' : [
+    \   'Shougo/neocomplete.vim',
+    \   'Shougo/neosnippet-snippets',
+    \   'honza/vim-snippets' ]}
+
 
 if has('unix')
-
     " W3m from vim
     "NeoBundle 'yuratomo/w3m.vim'
 
@@ -165,7 +136,7 @@ if has('unix')
 else
 
 "ONLY FOR WIN: on unix use snip-ranger-filechooser.vim
-NeoBundleLazy 'Shougo/vimfiler', {
+NeoBundleLazy 'Shougo/vimfiler.vim', {
     \ 'depends' : 'Shougo/unite.vim',
     \ 'autoload' : {
     \    'commands' : [{ 'name' : 'VimFiler',
@@ -182,9 +153,9 @@ endif
 
 "" Python =======================
 NeoBundle 'klen/python-mode', {
-    \ 'autoload' : { 'filetypes' : [ 'python' ] } }
+    \ 'autoload' : { 'filetypes' : [ 'python' ] }}
 NeoBundle 'davidhalter/jedi-vim', {
-    \ 'autoload' : { 'filetypes' : [ 'python' ] } }
+    \ 'autoload' : { 'filetypes' : [ 'python' ] }}
 
 
 " ======================================
@@ -210,7 +181,8 @@ NeoBundle 'tommcdo/vim-exchange'
 " DEPEND BY: vim-clang-format
 NeoBundle 'kana/vim-operator-user'
 " Function object (af, if -- code inside, aF -- all with spaces, iF )
-NeoBundle 'kana/vim-textobj-function', { 'depends' : 'kana/vim-textobj-user' }
+NeoBundle 'kana/vim-textobj-function', {
+    \ 'depends' : 'kana/vim-textobj-user' }
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-entire'
 NeoBundle 'coderifous/textobj-word-column.vim'
@@ -219,7 +191,8 @@ NeoBundle 'coderifous/textobj-word-column.vim'
 " ======================================
 ":Make cover for long-running tasks asynchronous (as like by ssh)
 NeoBundle 'tpope/vim-dispatch'
-NeoBundleLazy 'tpope/vim-markdown', { 'autoload' : { 'filetypes' : [ 'markdown' ] } }
+NeoBundleLazy 'tpope/vim-markdown', {
+    \ 'autoload' : { 'filetypes' : [ 'markdown' ] } }
 
 " VCS Integration
 NeoBundle 'tpope/vim-fugitive', { 'augroup' : 'fugitive'}
@@ -233,9 +206,8 @@ NeoBundle 'tpope/vim-fugitive', { 'augroup' : 'fugitive'}
 " <leader>gb   Gblame
 " }}} Fugitive hotkeys
 NeoBundle 'tpope/vim-git'
-NeoBundleLazy 'gregsexton/gitv', { 'depends' : [ 'tpope/vim-fugitive' ]
-                               \ , 'autoload' : { 'commands' : 'Gitv' }
-                               \ }
+NeoBundleLazy 'gregsexton/gitv', { 'depends' : 'tpope/vim-fugitive',
+    \ 'autoload' : { 'commands' : 'Gitv' } }
 " {{{ GitV hotkeys
 " \gv -> full repo view, \gV -> file view
 " <cr> -> view commit, <C-n>/<C-p> jump to next/previous commit and <cr>.
@@ -272,32 +244,21 @@ NeoBundleLazy 'majutsushi/tagbar', {
 NeoBundle 'tpope/vim-commentary'
 
 
-"{{{ Motions ============================
+"{{{1 Motions ============================
+" Two-letters find on whole screen scope
 NeoBundle 'justinmk/vim-sneak'
 " New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
 NeoBundle 'bkad/CamelCaseMotion'
 
-"{{{ Std vim/macros/ =====================
+"{{{1 Std vim/macros/ =====================
 " Bring back opened window instead of dull msg about swapfile
 "NeoBundle 'svintus/vim-editexisting'
 "ERROR: conflicting
-
 NeoBundle 'matchit.zip'
-" NeoBundleLazy 'matchit.zip', { 'autoload' : {
-"       \ 'mappings' : ['%', 'g%']
-"       \ }}
-" let bundle = neobundle#get('matchit.zip')
-" function! bundle.hooks.on_post_source(bundle)
-"   silent! execute 'doautocmd Filetype' &filetype
-" endfunction
-" }}} Std
-"
-" }}} Motions
 
 " Alt: 'bb:abudden/taghighlight' "(small and fast) from bitbucket
 "NeoBundle 'xolox/vim-easytags', { 'depends' : [ 'xolox/vim-misc' ] }
 "NeoBundle 'xolox/vim-misc'
-
 
 " Focus on line/selection/window in new buffer. ALT to LineDiff?
 NeoBundle 'chrisbra/NrrwRgn'
@@ -335,10 +296,8 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {
 
 " ======================================
 
-"NeoBundleLazy 'docunext/closetag.vim', { 'autoload' : { 'filetypes' : ['html', 'xml'] }
-"                                     \ , 'name' : 'closetag'
-"                                     \ }
-
+"NeoBundleLazy 'docunext/closetag.vim', {
+"   \ 'autoload' : { 'filetypes' : ['html', 'xml'] } }
 " NeoBundle 'vim-scripts/DoxygenToolkit.vim'
 " NeoBundle 'hsanson/vim-android'
 " Web
@@ -355,7 +314,6 @@ NeoBundle 'scrooloose/syntastic'
 " ALT: https://github.com/thinca/vim-qfreplace
 NeoBundleLazy 'jceb/vim-editqf', { 'autoload' : { 'commands' :
             \ ['QFEdit', 'QFAddNote', 'QFAddPatternNote'] } }
-
 
 
 " Autoformatting with one button, can use custom (like clang-styler)
@@ -386,7 +344,6 @@ NeoBundleLazy 'elzr/vim-json', {
 
 
 " ======================================
-"TIME:
 NeoBundle 'bling/vim-airline'
 " Alt: 'airblade/vim-gitgutter' "Only for git, but much faster file save
 NeoBundle 'mhinz/vim-signify'
@@ -415,8 +372,7 @@ NeoBundle 'haya14busa/vim-asterisk'
 NeoBundle 'osyo-manga/vim-anzu'
 " Preview :substitute patterns
 NeoBundle 'osyo-manga/vim-over', {
-    \ 'autoload': { 'commands' : ['OverCommandLine'], },
-    \ }
+    \ 'autoload': { 'commands' : ['OverCommandLine'], }}
 
 " }}} ======================================
 
@@ -431,7 +387,7 @@ NeoBundle 'terryma/vim-smooth-scroll'
 NeoBundle 'terryma/vim-expand-region'
 
 " Move text (line or vselect) in more friendly way, then :m[ove]
-NeoBundleLazy 'matze/vim-move', { 'gui' : 1, }
+NeoBundleLazy 'matze/vim-move', { 'gui' : 1 }
 
 " ======================================
 
@@ -440,18 +396,14 @@ NeoBundleLazy 'matze/vim-move', { 'gui' : 1, }
 
 " Fast table creation and modification
 NeoBundleLazy 'dhruvasagar/vim-table-mode', {
-    \ 'autoload': { 'commands' : ['TableModeEnable'], },
-    \ }
+    \ 'autoload': { 'commands' : ['TableModeEnable'], }}
 
 " ALT: http://tiddlywiki.com  -- one-page wiki
 NeoBundleLazy 'vimoutliner/vimoutliner', {
-    \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], },
-    \ }
+    \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], }}
 
-NeoBundleLazy 'neilagabriel/vim-geeknote', {
-    \ 'vim_version': '7.4.364',
-    \ 'autoload': { 'commands' : ['Geeknote'], },
-    \ }
+NeoBundleLazy 'neilagabriel/vim-geeknote', { 'vim_version': '7.4.364',
+    \ 'autoload': { 'commands' : ['Geeknote'], }}
 
 " ======================================
 " Colorschemes
