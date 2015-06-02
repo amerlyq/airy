@@ -86,4 +86,7 @@ class console(Command):
             except:
                 pass
 
-        self.fm.open_console(self.rest(1) + " " if position != 0 else "", position=position)
+        command = self.rest(1) + " " if position != 0 else ""
+        self.fm.open_console(command, position=position)
+        if not command:
+            self.fm.ui.console.history_move(-self.quantifier)

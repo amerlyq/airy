@@ -151,11 +151,10 @@ setprompt () {
 
 
     ###
-    # Finally, the prompt.
-    if [ -n "$SSH_CLIENT" ]; then
-      AM_LN=$PR_GREEN
-    else
-      AM_LN=$PR_RED #"%{$(tput setaf 124)%}"
+    # Finally, the prompt.  #"%{$(tput setaf 124)%}"
+    if [[ -n "$SSH_CLIENT" ]]
+    then [[ -z "$RANGER_LEVEL" ]] && AM_LN=$PR_YELLOW || AM_LN=$PR_BLUE
+    else [[ -z "$RANGER_LEVEL" ]] && AM_LN=$PR_RED || AM_LN=$PR_GREEN
     fi
 
     AM_PWD="%{$(tput setaf 220)%}" #$PR_YELLOW

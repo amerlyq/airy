@@ -1,13 +1,13 @@
 ranger
-	[_] ADD: <counter> for ':' command -- opens N up commands from history (default - 0)
-	[_] BUG: when fork new shell 'S' from current, it will get env var
-		'RANGER_LEVEL' so I can't launch ranger in it. Maybe spawn with clear env?
-	[_] Run new urxvt in current dir, with clean 'RANGER_LEVEL' variable
-		(setsid emacs &)  -- double fork
+	[_] make use of local settings for choosen directories
+		:setlocal path=<python string> <option name>=<python expression>
+	2015-06-02 [X] ADD: <counter> for ':' command -- opens N up commands from history (default - 0)
+	2015-06-02 [X] Run '<C-n>' to launch ranger in new window with current working directory
+	2015-06-02 [X] Run new urxvt in current dir, with clean 'RANGER_LEVEL' variable
 		: This uses ( &) to fork to background, and setsid to detach from the controlling tty.
-		emacs & disown -- built-in
-	[_] shortcut to show file size in bytes (search in sources?)
-	[_] FIX shell -r cp ./%f /var // sudo: source: command not found
+		(setsid emacs &)  -- double fork  OR: emacs & disown -- built-in
+	2015-06-02 [X] shortcut to show file size in bytes  :> 'Mb' -> :linemode bytesize
+	2015-06-02 [X] FIX shell -r cp ./%f /var // sudo: source: command not found  :> disable aliases for sudo
 	[_] russian -- half of text width in lister
 		https://bbs.archlinux.org/viewtopic.php?pid=998125
 		: Same problem with git --verbose when it shows changes for files with
@@ -23,14 +23,13 @@ ranger
 	[_] Add hang-out process checking to ranger scope.sh
 	[_] Integrate vim with ranger by repo or tmux or --syntex server like in latex
 		https://github.com/mikezackles/vranger
+		 http://unix.stackexchange.com/questions/82632/tmux-ranger-integration-opening-text-files-in-new-panes
 	[_] fix 's' exit with tmux inside ranger shell -- what to do?
-	>[_] Change shell to zsh stabily
+	2015-06-02 [X] Change shell to zsh stabily  :> already patched github
 	[_] Add C-x,C-t commands to ranger for move one word forward/backward
 	[~] Make autochoose color scheme depending on availability of 256-color term
-	[_] After Ubuntu 14.10 chg ranger install from github to apt-get
-	[_] Integrate with tmux and vim
-		 http://unix.stackexchange.com/questions/82632/tmux-ranger-integration-opening-text-files-in-new-panes
+	2015-06-02 [$] After Ubuntu 14.10 chg ranger install from github to apt-get
 	[_] Toggle EDITOR between vim and view when investigating other sources
-	[_] vim-ranger -- execute from script, not by ! to not override last command
+	>[_] vim-ranger -- execute from script, not by ! to not override last command
 	[_] open_with must use zsh to execute as in console
 
