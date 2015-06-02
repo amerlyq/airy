@@ -7,19 +7,19 @@ DST=~/.${PWD##*/} && [[ ! -e $DST || -L $DST ]] && ln -sfvT "$PWD" $DST
 
 VIMC="$HOME/.cache/vim"  # Dir for .swp, backup, ... files
 FONT="$VIMC/powerline-fonts/DejaVuSansMono"
-
+mkdir -p "$VIMC"
 
 ### THEMES ###
 case "$1" in
-dark|light) printf "\
-set background=$1
-colorscheme solarized
-" > "$VIMC/vim_theme"
-;; esac
+ dark|light) printf "set background=$1
+colorscheme solarized" > "$VIMC/vim_theme" ;;
+    --clean) rm -rf "$VIMC" ;;
+-u|--update) update="$1" ;;
+esac
 
 
 ### SPELL ###
-if [ ! -d "$VIMC/spell" ]; then
+if [[ ! -d "$VIMC/spell" ]]; then
     mkdir -p "$VIMC/spell"
     src='http://ftp.vim.org/pub/vim/runtime/spell'
     for nm in ru en uk; do ( cd "$VIMC/spell"
@@ -32,7 +32,7 @@ fi
 
 ### FONTS ###
 # https://powerline.readthedocs.org/en/latest/installation/linux.html
-if [ ! -f ~/.fonts/PowerlineSymbols.otf ]; then
+if [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
     mkdir -p ~/.fonts/
     # See: https://wiki.archlinux.org/index.php/Font_Configuration
     cp ~/.vim/res/PowerlineSymbols.otf ~/.fonts/
@@ -42,7 +42,7 @@ if [ ! -f ~/.fonts/PowerlineSymbols.otf ]; then
     echo "Powerline symbols configured"
 fi
 
-if [ ! -d ~/.fonts/"${FONT##*/}" ]; then
+if [[ ! -d ~/.fonts/"${FONT##*/}" ]]; then
     # Patched fonts for windows usage:
     src='https://github.com/Lokaltog/powerline-fonts'
     [ ! -d "${FONT%/*}" ] && git clone --depth=1 "$src" "${FONT%/*}"
@@ -53,5 +53,6 @@ fi
 
 
 ### PLUGINS ###
-vim -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall
-
+if [[ ! -d "$VIMC/bundle" || -n "$update" ]]; then
+    vim -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall
+fi

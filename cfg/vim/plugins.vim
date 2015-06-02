@@ -14,14 +14,14 @@ noremap <unique> <Leader> <Nop>
 
 
 " Switch [c,cpp,cxx,cc] <-> [h,hpp]
-NeoBundle 'kana/vim-altr'
+NeoBundleLazy 'kana/vim-altr', { 'autoload': {
+    \ 'commands' : 'A', 'mappings': '<Plug>(altr-' }}
 
 NeoBundle 'Valloric/ListToggle'
 
 " Ascii graph drawing in vim
-NeoBundleLazy 'vim-scripts/DrawIt' , {
-    \ 'autoload' : { 'commands' : 'DrawIt' },
-    \ }
+NeoBundleLazy 'vim-scripts/DrawIt' , { 'autoload' : {
+    \ 'commands' : 'DrawIt', 'mappings' : '<Plug>DrawItStart' }}
 
 "==========================================
 " Use ',' as leader for all plugins below
@@ -57,11 +57,9 @@ NeoBundleLazy 'Shougo/vimshell.vim', {
 " Ultimate hex-editing system
 " depends on hexript for some optional scripts
 "   (now that repo 'rbtnn/hexript.vim' don't exists)
-NeoBundle 'Shougo/vinarise.vim', {
-    \ 'autoload' : {
-    \    'commands' : ['Vinarise', 'VinariseDump'],
-    \    'explorer' : 1,
-    \ }}
+NeoBundle 'Shougo/vinarise.vim', { 'autoload': {
+    \ 'commands' : ['Vinarise', 'VinariseDump'],
+    \ 'explorer' : 1 }}
 
 
 " Super-mega-replace for bunch of plugins
@@ -192,22 +190,15 @@ NeoBundle 'coderifous/textobj-word-column.vim'
 ":Make cover for long-running tasks asynchronous (as like by ssh)
 NeoBundle 'tpope/vim-dispatch'
 NeoBundleLazy 'tpope/vim-markdown', {
-    \ 'autoload' : { 'filetypes' : [ 'markdown' ] } }
+    \ 'autoload' : { 'filetypes' : [ 'markdown' ] }}
 
 " VCS Integration
-NeoBundle 'tpope/vim-fugitive', { 'augroup' : 'fugitive'}
-" {{{ Fugitive hotkeys
-" <leader>gs   Gstatus
-"               D for diff
-"               r for reload
-" <leader>gl   Glog
-" <leader>gd   Gdiff
-" <leader>gw   Gwrite
-" <leader>gb   Gblame
-" }}} Fugitive hotkeys
 NeoBundle 'tpope/vim-git'
+NeoBundleLazy 'tpope/vim-fugitive', {'autoload': {
+    \ 'augroup' : 'fugitive',
+    \ 'commands' : [ 'Git', 'Gstatus', 'Gdiff', 'Glog', 'Gbrowse' ] }}
 NeoBundleLazy 'gregsexton/gitv', { 'depends' : 'tpope/vim-fugitive',
-    \ 'autoload' : { 'commands' : 'Gitv' } }
+    \ 'autoload' : { 'commands' : 'Gitv' }}
 " {{{ GitV hotkeys
 " \gv -> full repo view, \gV -> file view
 " <cr> -> view commit, <C-n>/<C-p> jump to next/previous commit and <cr>.
@@ -228,7 +219,7 @@ NeoBundleLazy 'gregsexton/gitv', { 'depends' : 'tpope/vim-fugitive',
 "NeoBundle 'vim-scripts/RelOps'
 
 " Change your root working dir to nearest .git on file_open or <Leader>cd
-NeoBundle 'airblade/vim-rooter'
+NeoBundleLazy 'airblade/vim-rooter', {'autoload': {'commands': 'Rooter'}}
 " ======================================
 
 " Undo tree
@@ -261,12 +252,10 @@ NeoBundle 'matchit.zip'
 "NeoBundle 'xolox/vim-misc'
 
 " Focus on line/selection/window in new buffer. ALT to LineDiff?
-NeoBundle 'chrisbra/NrrwRgn'
-" No Lazy, or disable support for nrrwrgn in airline!
-" , { 'autoload' : {
-"     \ 'commands' : ['NR', 'NW', 'NRV', 'NUD', 'NRP', 'NRM', 'NRL'],
-"     \ 'mappings' : ['<Plug>(NrrwrgnDo)', '<Plug>(NrrwrgnBangDo)'],
-"     \ } }
+NeoBundleLazy 'chrisbra/NrrwRgn' , { 'autoload' : {
+    \ 'commands' : ['NR', 'NW', 'NRV', 'NUD', 'NRP', 'NRM', 'NRL'],
+    \ 'mappings' : ['<Plug>NrrwrgnDo', '<Plug>NrrwrgnBangDo'],
+    \ }}
 
 NeoBundle 'AndrewRadev/linediff.vim'
 
@@ -278,10 +267,9 @@ NeoBundle 'lyokha/vim-xkbswitch', { 'autoload' : {
 
 
 " ======================================
-NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {
-\ 'autoload' : { 'filetypes' : [ 'tex', 'bib', 'latex' ] },
-\ 'external_commands': [ 'latexmk' ],
-\ }
+NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
+    \ 'filetypes' : [ 'tex', 'bib', 'latex' ]
+    \ }, 'external_commands': [ 'latexmk' ] }
 " {{{ LaTeX-Box
 " C-xC-o completion
 " [[ -> \begin

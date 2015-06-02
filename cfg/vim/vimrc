@@ -30,6 +30,7 @@ endif
 "============= Vim dirs structure ============== {{{1
 " Backup, undo, swap, etc
 " The '//' at directory end: use full path for filename with '%' separators
+" let $CACHE=$XDG_CACHE_HOME . '/vim'
 let $CACHE=$HOME . '/.cache/vim'
 set backupdir=$CACHE/bckpdir//,~/.tmp,/var/tmp,/tmp
 set directory=$CACHE/swapdir//,~/.tmp,/var/tmp,/tmp
@@ -39,6 +40,8 @@ set viminfo+=n$CACHE/.viminfo
 " for v:version >= 703
 set undodir=$CACHE/undodir//
 set undofile
+let g:netrw_home=$CACHE
+" let g:netrw_dirhistmax = 0
 
 let $BUNDLES=expand('$CACHE/bundle/')
 let cdirs = ['bundle', 'bckpdir', 'swapdir', 'undodir', 'easytags.d']

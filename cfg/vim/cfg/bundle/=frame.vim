@@ -2,28 +2,29 @@
 let s:leader = g:mapleader
 let mapleader = "\\"
 
-if exists(':DrawIt')
-  nnoremap <unique> <Leader>di DrawIt!
-  " map <unique> <Leader>swp <Plug>SaveWinPosn
-  " map <unique> <Leader>rwp <Plug>RestoreWinPosn
+if neobundle#tap('DrawIt')
+  map <unique> <Leader>DI <Plug>DrawItStart
+  map <unique> <Leader>DS <Plug>DrawItStop
+  map <unique> <Leader>Dsw <Plug>SaveWinPosn
+  map <unique> <Leader>Drw <Plug>RestoreWinPosn
 endif
 
+" Change working directory to that of the current file
+noremap <unique> <silent> <Leader>cw :lcd %:p:h \| pwd<CR>
 
-if exists(':RooterChangeToRootDirectory')
-  "To stop vim-rooter changing directory automatically
+if neobundle#tap('vim-rooter')
   let g:rooter_manual_only = 1
-  nmap <unique> <silent> <Leader>cd <Plug>RooterChangeToRootDirectory
-  " Change Working Directory to that of the current file
+  let g:rooter_disable_map = 1
+  nnoremap <unique> <silent> <Leader>cd :Rooter<CR>
 endif
-noremap <unique> <silent> <Leader>cw :lcd %:p:h<CR>
+
 
 let mapleader = s:leader
 " }}}
 
 
-" ============== NrrwRgn ============== {{{1
-if exists('<Plug>NrrwrgnDo')
-  ":: Focus on content in split window
+if neobundle#tap('NrrwRgn')  " NrrwRgn: {{{1
+":: Focus on content in split window
   " Create two region buffers and use :diffthis --> instead of LineDiff
   " Multiselection in new buffer! :v/^#/NRP | NRM
   " Tip -- completely delete blocks you don't want to change.
@@ -40,9 +41,9 @@ if exists('<Plug>NrrwrgnDo')
   omap <unique> <Leader>N <Plug>NrrwrgnBangDo
 endif
 
-" ============== vim-altr ============== {{{1
-if exists('<Plug>(altr-forward)')
-  ":: Toggle between alternative files (.h, .cpp, ...)
+
+if neobundle#tap('vim-altr')  " vim-altr: {{{1
+":: Toggle between alternative files (.h, .cpp, ...)
   nmap <unique> ]f  <Plug>(altr-forward)
   nmap <unique> [f  <Plug>(altr-back)
   command! A  call altr#forward()

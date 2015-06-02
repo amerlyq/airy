@@ -8,9 +8,9 @@ endif
 " Use only necessary plugins
 let g:airline#extensions#disable_rtp_load = 1
 let g:airline#extensions#whitespace#enabled = 0
-"'branch', 'tmuxline', 'windowswap', 'virtualenv'
-let g:airline_extensions = [ 'tabline', 'hunks',
-    \ 'nrrwrgn', 'tagbar', 'syntastic' ]
+" POSSIBLE: 'branch', 'tmuxline', 'windowswap', 'virtualenv',
+" DISABLED: 'nrrwrgn'
+let g:airline_extensions = [ 'tabline', 'hunks', 'tagbar', 'syntastic' ]
 
 
 "" TABS and BUFFERS

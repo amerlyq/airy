@@ -1,3 +1,4 @@
+" vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 let g:theme_transparent = 0
 
 if g:theme_transparent
@@ -35,11 +36,11 @@ if filereadable(s:vim_theme)
   exec 'source ' . s:vim_theme
 else
   set background=dark "light
-  if exists('$TMUX')
-    colorscheme solarized  "molokai nocturne
-  else
-    colorscheme solarized
-  endif
+  try  "molokai nocturne
+    if exists('$TMUX') | color slate | else | color solarized | endif
+  catch /^Vim\%((\a\+)\)\=:E185/
+    color slate
+  endtry
 endif
 
 " Fix for GitGutter
