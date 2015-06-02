@@ -106,7 +106,7 @@ git_install() { # $1 - git rep, $2 - dir name
 
     if [ -d "$PR_DIR" ]; then
         cd "$PR_DIR"
-        git pull
+        git pull --depth 1
     else
         if [ "${LINK//'://'}" == "$LINK" ]; then
             LINK="https://github.com/$LINK"
@@ -126,7 +126,7 @@ hg_install() { # $1 - git rep, $2 - dir name
 
     if [ -d "$PR_DIR" ]; then
         cd "$PR_DIR"
-        git pull
+        hg pull
     else
         hg clone "$1" "$PR_DIR"
         cd "$PR_DIR"

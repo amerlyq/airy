@@ -75,41 +75,34 @@ case "$extension" in
         ;; # fall back to highlight/cat if the text browsers fail
 esac
 
+case "$CURR_THEME" in
+light) STYLE=solarized-light ;;
+transparent) STYLE=bright ;;
+dark|*)  STYLE=freya ;; #breeze/freya/clarity
+esac
+
 case "$mimetype" in
     # Syntax highlight for text files:
     text/* | */xml)
-        # NOTE: Chg highlight -> /usr/bin/highlight
-        # to workaround conflict with Mint embedded script /usr/local/bin/highlight
-        # --wrap-simple --width="$width"
-
-        case "$CURR_THEME" in
-            dark)  STYLE=freya ;; #breeze/freya/clarity
-            light) STYLE=solarized-light ;;
-            transparent) STYLE=bright ;;
-            *) STYLE=freya ;;
-        esac
+		# --wrap-simple --width="$width"
         try /usr/bin/highlight --out-format=xterm256 --encoding=utf8 --failsafe \
             --line-numbers --line-number-length=3 --replace-tabs=4 --no-trailing-nl \
             --validate-input --style=$STYLE \
-            "$path" && { dump | trim; exit 5; } || exit 2
-        unset STYLE
-        ;;
+            "$path" && { dump | trim; exit 5; } || exit 2;;
 
     # Ascii-previews of images:
     image/*)
         img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
+
     # Image preview for videos, disabled by default:
     video/*)
         ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1;;
+
     # Display information about media files:
     video/* | audio/*)
         exiftool "$path" && exit 5
         # Use sed to remove spaces so the output fits into the narrow window
         try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
-
-    # application/x-executable)
-    #     { ~/.bin/reb "$path" || exit 1; } | sed "${maxln}q" && exit 5
-    #     ;;
 esac
 
 { # Display general information for other files:

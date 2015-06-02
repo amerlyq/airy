@@ -1,8 +1,8 @@
 #!/bin/bash
 cd $(dirname $(readlink -m ${0})) || exit $?
 ### LINKS ###
-DST=~/.${PWD##*/} && [[ ! -e $DST || -L $DST ]] && ln -sfvT "$PWD" $DST
-#vim/vimrc vim/ycm_extra_conf.py
+link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+link "$PWD" ~/.vim  #vim/vimrc vim/ycm_extra_conf.py
 
 
 VIMC="$HOME/.cache/vim"  # Dir for .swp, backup, ... files
@@ -55,4 +55,5 @@ fi
 ### PLUGINS ###
 if [[ ! -d "$VIMC/bundle" || -n "$update" ]]; then
     vim -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall
+    sudo pip install --upgrade pip -U jedi
 fi
