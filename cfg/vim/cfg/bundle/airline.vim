@@ -9,9 +9,8 @@ endif
 let g:airline#extensions#disable_rtp_load = 1
 let g:airline#extensions#whitespace#enabled = 0
 " POSSIBLE: 'branch', 'tmuxline', 'windowswap', 'virtualenv',
-" DISABLED: 'nrrwrgn'
-let g:airline_extensions = [ 'tabline', 'hunks', 'tagbar', 'syntastic' ]
-
+" DISABLED: 'nrrwrgn' (conflict with lazy-loading), 'tagbar' (slow)
+let g:airline_extensions = [ 'tabline', 'hunks', 'syntastic' ]
 
 "" TABS and BUFFERS
 let g:airline#extensions#tabline#show_tabs = 0

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl -w
+# MIT: (c) amerlyq, 2015
+# @brief: Extracts first valid cwd from child pids tree, owned by this urxvt.
+
+my $name = 'fork-cwd';
+
+sub on_start {
+    my ($self) = @_;
+
+    # read resource settings
+    if ($self->x_resource($name.'.command')) {
+        @{$self->{fork_command}} = split /\s+/, $self->x_resource($name.'.command');
+    }
+    ()
+}
+
+
+sub get_cwd {
+    my ($pwd, $pr);
+    foreach (reverse( qx(pstree -p $$) =~ m/\((\d+)\)/g )) {
+        $pr = $_;
+        $pwd = readlink("/proc/$pr/cwd");
+        last if ($pwd =~ /^\S+$/);
+    }
+    return $pwd
+}
+
+sub on_user_command {
+    my ($self, $cmd) = @_;
+    if ($cmd eq $name.':shell') {
+        $self->exec_async("x-terminal-emulator", "-cd", get_cwd());
+        # ALT: exec("urxvt", "-cd", "$dir") unless fork;
+    } elsif ($cmd eq $name.':command') {
+        $self->exec_async("x-terminal-emulator", "-cd", get_cwd(), "-e", @{$self->{fork_command}});
+        # $self->exec_async("urxvt", "-cd", get_cwd(), "-e", "bash", "-c", "printf '$$\n$pr\n$pwd\n' | vim -");
+    }
+    ()
+}

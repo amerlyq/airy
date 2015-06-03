@@ -2,10 +2,12 @@
 
 FL=~/profile.log
 
-if ([ ! -e $FL ] && [ "${1:0:1}" != 's' ]) || [ "${1:0:1}" == 'n' ]; then
-    vim -c "profile start $FL" -c 'profile func *' -c 'profile file *' -c "echo 'Exit by :profile pause \| qall!'"
+# if ([ ! -e $FL ] && [ "${1:0:1}" != 's' ]) || [ "${1:0:1}" == 'n' ]; then
+    vim --cmd "profile start $FL" --cmd 'profile func *' --cmd 'profile file *' \
+        -c "echo 'Exit by :profile pause \| qall!'" $@
+        # -c "profile pause" -c "qall!" $@
     # At this point do slow actions
-fi
+# fi
 
 if [ -e $FL ]; then
     cat $FL \

@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+# http://karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
+# ENABLE:  echo -ne "\033]777;focus;on\007"
+# DISABLE: echo -ne "\033]777;focus;off\007"
+# VIM: -- add appropriate snippet with checking only to urxvt!
+
+# Hook invoqué au démarrage d'urxvt
+sub on_start {
+    my($term) = @_;
+    # le mode "focus" est désactivé par défaut
+    $term->{focus_activated} = 0;
+}
+
+# Interception des séquences "OSC 777 xxx BEL"
+sub on_osc_seq_perl {
+    my ($term, $osc, $resp) = @_;
+    return unless $osc =~ s/^focus;//;
+    $term->{focus_activated} = $osc eq 'on'?1:0;
+}
+
+# Hook invoqué au gain de focus
+sub on_focus_in {
+    my($term) = @_;
+
+    # Si le mode focus est activé, on envoie la notification
+    if ($term->{focus_activated}) {
+        $term->tt_write("\033[UlFocusIn");
+    }
+}
+
+# Hook invoqué à la perte de focus
+sub on_focus_out {
+    my($term) = @_;
+
+    # Si le mode focus est activé, on envoie la notification
+    if ($term->{focus_activated}) {
+        $term->tt_write("\033[UlFocusOut");
+    }
+}

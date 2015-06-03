@@ -1,22 +1,139 @@
+SEE
+	man urxvtperl
+	man 7 urxvt -- for additional control commands (like font-size)
+	Terminal codes: Control Sequence Introducer,  Operating System Control, ...
+	REF:  -- all control sequences
+		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+
 urxvt
 : http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
 : NOTE: $ listres -- to show all active resources (loaded by xrdb ~/.Xresources, etc)
+>	[_] vim	auto ":set paste"
+		https://github.com/seletskiy/urxvt-vim-insert
+	[_] CHG url-select to start not from bottom, but from current cursor
+			position (useful in vim notes)
+	[_] SEE default extensions at /usr/lib/urxvt/perl
+	[_] SEE big list at https://github.com/rad-/perl
+	2015-06-03 [X] FIX autocomplete
+	2015-06-03 [X] FIX pipe scrollback to vim
+	[_] Maybe, always launch new tmux inside urxvt?
+		it has chance to not corrupt scrollback
 	[_] Customize
 		http://www.askapache.com/linux/rxvt-xresources.html
 	[_] move (scroll) up to beginning of last launched command (perl?)
 	: useful for long outputs, alignes prompt atop as after <C-l>
 	:= maybe save position when pressed <CR>, <C-j>, <C-m> ?
-	[_] see man 7 urxvt -- for additional control commands (like font-size)
+	:= or simply parse scrollback and search my PS1 markers!
 	[_] always show cursor in keyboard-selection
-		Hide cursor
-			echo -ne "\033[?25l"
-		Show cursor
-			echo -ne "\033[?25h
-
+		| echo -en "\033]39;$color\007" | bg
+		| echo -en "\033]49;$color\007" | fg
+		| echo -en "\033]50;$font\007"  | font
+		| echo -ne "\033[?25l"          | Hide cursor
+		| echo -ne "\033[?25h"          | Show cursor
+	[_] Per-ssh-host color
+		colors=( 222222 111111 333333 444444 111111 333333)
+		printf "\e]49;#$resultingcolor\a"
 	[_] Make in urxvt ability to open file path in vim
 		So I will be able to open found files by {file, grep, ag} in vim
 			In same or another copy of urxvt
-	[_] urxvt config seize
-		https://github.com/majutsushi/etc/blob/master/xorg/Xresources
-		http://wiki.archbang.org/index.php?title=Rxvt-Unicode_Terminal
+	[_] Create own color-themes to switch
+		[_] dark/light/transparent
+		[_] based on ssh
+	[_] Right-click menu with context-aware entries (cat, wget, netcat, copy, send...)
+		:? Maybe, it's most simple to try /fish/ already?
+		https://github.com/grugq/urxvt-ctx
+	[ ] fork-cwd
+		2015-06-03 [X] https://github.com/myeisha/urxvt-fork-here
+		[_] https://github.com/atweiden/urxvt-cwd-spawn
+			:= Idea: copy and spawn ssh session
+		> [_] https://github.com/schischi-a/xcwd
+			:= Idea: get cwd of any foreground process and integrate in i3
+			:> My fork-cwd extension may be replaced by universal script in i3 directory!
+			: Mapping -> $mod+Shift+U
+	[_] notify when task is done -- useful if build kernel/gbs. And forget do it through zsh.
+		https://github.com/P-Seebauer/urxvt-extensions/blob/master/notify.pl
+		<Special osc in-urxvt
+		https://github.com/Waldteufel/osc_notify
+	[_] fifo ipc + vim integration
+		https://github.com/kovetskiy/urxvt-fifo
+		https://github.com/kovetskiy/urxvt.vim
+		:= Idea: launch from vim/(even any X pr!) urxvt and control it through fifo
+	[_] modeline (status string like in vim?)
+		https://github.com/ryuslash/urxvt-modeline
+	[_] more color schemes
+		https://github.com/randalltuxarc/URxvt-colorscheme
+		https://github.com/AntSunrise/URxvt-themes
+	[_] scrolling and clearing on scroll
+		https://github.com/Maelan/urxvt-plugins
+		https://github.com/verrens/urxvt-pcon
+	[_] font autoresize for small windows
+		:= This will allow me use bigger font in main window
+		https://github.com/zestrada/urxvt-fixed-cols
 
+
+FOCUS -- EVENTS
+	For example a common problem when we're working in the console is to copy text
+	on a remote console (ssh vim) and edit the content locally. By this approach
+	is feasible by defining a sequence OSC "clipboard" qu'URxvt recover to
+	transfer the contents into the CLIPBOARD selection of the local X11 server.
+	Something like:
+		echo -en "\033]777;CLIPBOARD;ON\077Ceci est mon texte à copier\033]777;CLIPBOARD;OFF\077"
+	Besides, the idea is already a little set up in a little-known plugin urxvt, clipboard-osc.
+
+	> http://karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
+	: <Change sources to implement>: VIM launch will enable notification of mouse
+	: events to the terminal (set mouse = ...). When it will stop, it will
+	: turn off this notification
+
+	> But how to do it less harmful?
+	: So even bash will not show those sequences and interpret them instead?
+	: Maybe, zsh has built-in ability for focus lost? And I will no need to use urxvt?
+
+	> Xterm special codes:
+		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Mouse-Tracking
+		: Ps = 1 0 0 1  -> Use Hilite Mouse Tracking.
+		: Ps = 1 0 0 2  -> Use Cell Motion Mouse Tracking.
+		: Ps = 1 0 0 3  -> Use All Motion Mouse Tracking.
+		: Ps = 1 0 0 4  -> Send FocusIn/FocusOut events.
+		: Ps = 1 0 0 5  -> Enable UTF-8 Mouse Mode.
+		: Ps = 1 0 0 6  -> Enable SGR Mouse Mode.
+		: Ps = 1 0 0 7  -> Enable Alternate Scroll Mode.
+		: Ps = 1 0 1 0  -> Scroll to bottom on tty output (rxvt).
+		: Ps = 1 0 1 1  -> Scroll to bottom on key press (rxvt).
+		> Ps = 1 0 1 5  -> Enable urxvt Mouse Mode.  -- What is it? Where?
+
+	Tmux
+		Must additionally send it's own events when moving through windows/pans.
+
+	Vitality  <F24>/<F25>
+		https://github.com/sjl/vitality.vim/blob/master/plugin/vitality.vim
+	iTerm  [O[I
+	: FocusIn/FocusOut control sequences, which uses CSI O and CSI I
+		https://github.com/fish-shell/fish-shell/issues/1917
+
+	| Maybe, create new button in my xkbmap and use it somehow with escape sequences?
+
+
+SEIZE
+	https://github.com/majutsushi/etc/blob/master/xorg/Xresources
+	http://wiki.archbang.org/index.php?title=Rxvt-Unicode_Terminal
+
+TODO
+	[_] Numbering all scrollback and copy line
+		: 16:47 < maxauthor> bartman: I just thought about a useful feature,
+		:    Alt-K would select lines one upwards, which can then be pasted to
+		:    the current bash-command with enter, let me explain...
+		: 16:47 < maxauthor> $ locate test.conf ->
+		: 16:47 < maxauthor> 1
+		: 16:47 < maxauthor> 2
+		: 16:47 < maxauthor> 3
+		: 16:47 < maxauthor> 4
+		: 16:47 < maxauthor> $ vim <Alt-k><alt-k><enter> ->
+		: 16:47 < maxauthor> $ vim 3
+	[_] Path-selection for files after ag/find
+		<REF>
+			https://github.com/ervandew/urxvt-vim-scrollback
+			https://github.com/Vifon/autocomplete-ALL-the-things/blob/master/autocomplete-ALL-the-things
+			https://github.com/bartman/urxvt-scripts/blob/master/mark-yank-urls
+		[_] copy in buffer
+		[_] open in new instance

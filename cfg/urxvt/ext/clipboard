@@ -1,4 +1,4 @@
-#! perl -w
+#!/usr/bin/env perl -w
 # Author:   Bert Muennich
 # Website:  http://www.github.com/muennich/urxvt-perls
 # License:  GPLv2
@@ -84,6 +84,12 @@ sub paste_escaped {
 	}
 
 	()
+}
+
+sub on_action {
+    my ($self, $action) = @_;
+
+    on_user_command($self, "clipboard:" . $action);
 }
 
 sub on_user_command {

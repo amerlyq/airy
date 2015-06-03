@@ -4,7 +4,6 @@
 "   <C-l>         start buffer text completion
 "   <Right>, <Left> select candidate while completion
 
-
 " Options
 let g:incsearch#smart_backward_word=1
 let g:incsearch#separate_highlight = 0

@@ -204,9 +204,6 @@ URxvt*internalBorder:
 ! The string to send when the delete key (not the keypad delete key) is pressed. If unset it will send the sequence traditionally associated with the Execute key.
 ! URxvt*deletekey:                      string
 
-! Specify a command pipe for vt100 printer [default lpr(1)].  Use Print to initiate a screen dump to the printer and Ctrl-Print or Shift-Print to include the scrollback
-URxvt*print-pipe:                       cat > $HOME/$(echo urxvt.dump.$(date +'%Y%M%d%H%m%S'))
-
 ! Set the key to be interpreted as the Meta key to: alt, meta, hyper, super, mod1, mod2, mod3, mod4, mod5
 ! URxvt*modifier:                       modifier
 
@@ -221,10 +218,6 @@ URxvt*print-pipe:                       cat > $HOME/$(echo urxvt.dump.$(date +'%
 
 ! Perl code to be evaluated when all extensions have been registered
 ! URxvt*perl-eval:                      perl-eval
-
-! Comma-separated list(s) of perl extension scripts (default: "default") to use in this terminal instance, blank disables
-URxvt*perl-ext-common:
-URxvt*perl-ext:
 
 ! Specifies the program to be started with a URL argument. Used by the "selection-popup" and "matcher" perl extensions
 ! URxvt*url-launcher:                   string

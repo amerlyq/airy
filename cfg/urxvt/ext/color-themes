@@ -1,0 +1,189 @@
+#!/usr/bin/env perl -w
+#
+# Change color theme.
+#
+# Based on John Tyree's rotate-colors
+#
+# License: CCBYNC
+# Homepage: https://github.com/felixr/urxvt-theme-switch
+#
+# Settings:
+#
+#  URxvt.perl-ext-common: color-themes
+#  URxvt.color-themes.themedir:  ~/.themes/urxvt
+#  URxvt.color-themes.preprocessor: /usr/bin/cpp
+#  URxvt.keysym.M-C-n:  perl:color-themes:next
+#  URxvt.keysym.M-C-p:  perl:color-themes:prev
+#
+#  URxvt.color-themes.state-file: ~/.urxvt-theme
+#  URxvt.color-themes.autosave: 1
+#  URxvt.keysym.M-C-l:  perl:color-themes:load-state
+#  URxvt.keysym.M-C-s:  perl:color-themes:save-state
+#
+use strict;
+
+sub on_start {
+    my ($self) = @_;
+    $self->{current_index} = 0;
+    my $path =
+      glob( $self->x_resource('color-themes.themedir') || "~/.themes/urxvt" );
+
+    my @arr = ();
+    if ( opendir( DIR, $path ) ) {
+        @arr = grep { -f "$path/$_" } readdir(DIR);
+        @arr = sort @arr;
+        @arr = map  { "$path/$_"; } @arr;
+    }
+    $self->{theme_files}     = \@arr;
+    $self->{theme_dir}       = $path;
+    $self->{auto_save_state} = $self->x_resource('color-themes.autosave') || 0;
+    $self->{settingsfile} =
+      glob( $self->x_resource('color-themes.state-file') || "~/.urxvt-theme" );
+    $self->{preprocessor} =
+      glob( $self->x_resource('color-themes.preprocessor') || "" );
+
+    load_state($self);
+
+    ();
+}
+
+sub load_state {
+    my $self = shift;
+    my $fn   = $self->{settingsfile};
+    open my $fin, $fn
+      or print STDERR "Unable to open $fn for reading" && return;
+    $self->cmd_parse(<$fin>);
+    close($fin);
+}
+
+sub save_state {
+    my $self = shift;
+    my $esc  = shift;
+    my $fno  = $self->{settingsfile};
+    open( OUT, ">$fno" ) or print STDERR "Unable to open $fno for writing";
+    print OUT $esc;
+    close(OUT);
+}
+
+sub read_commands {
+    my $fn = shift;
+    my $preproc = shift;
+    my $fin;
+    if ($preproc eq '') {
+	open($fin, $fn) or print STDERR "Unable to open $fn for reading\n";
+    } else {
+	open($fin, "$preproc \"$fn\" |")
+	    or print STDERR "Unable to open $fn using '$preproc' \n";
+    }
+    my %commands;
+
+    while ( my $line = <$fin> ) {
+        if ( $line =~ /(\w+)\s*:\s*([^!]+)\s*\n/ ) {
+            $commands{$1} = $2;
+        }
+    }
+    close($fin);
+
+    return %commands;
+}
+
+sub escape_seq {
+
+    # XTerm Operating System Commands
+    my %commands = (
+        'colorBD'          => '5;0',
+        'colorUL'          => '5;1',
+        'colorBL'          => '5;2',
+        'colorRV'          => '5;3',
+        'foreground'       => '10',
+        'background'       => '11',
+        'cursorColor'      => '12',
+        'pointerColor'     => '13',
+        'highlightColor'   => '17',
+        'backgroundPixmap' => '20',
+        'italicColor'      => '704',
+        'tintColor'        => '705',
+        'boldColor'        => '706',
+        'underlinedColor'  => '707',
+        'borderColor'      => '708',
+        'font'             => '710',
+        'boldFont'         => '711',
+        'italicFont'       => '712',
+        'boldItalicFont'   => '713'
+    );
+
+    my ( $k, $v ) = @_;
+    my $cmd = "";
+
+    if ( $k =~ /^color(\d+)$/ ) {
+        $cmd = "4;$1;$v";
+    }
+    else {
+        if ( not exists( $commands{$k} ) ) {
+            return "";
+        }
+        $cmd = "$commands{$k};$v";
+    }
+
+    return "\033]" . $cmd . "\007";
+}
+
+sub build_cmd {
+    my $fn       = shift;
+    my $preproc  = shift;
+    my %commands = read_commands($fn, $preproc);
+    my $s = join( "", map { escape_seq( $_, $commands{$_} ) } keys %commands );
+
+    return $s;
+}
+
+sub key_press {
+    my ( $self, $event, $keysym, $string ) = @_;
+
+    delete $self->{overlay};
+    $self->disable("key_press");
+
+    return 1;
+}
+
+sub on_user_command {
+    my ( $self, $cmd ) = @_;
+    my @fs  = @{ $self->{theme_files} };
+    my $len = @fs;
+    my $msg = "";
+    my @parts = split(/:/, $cmd);
+    if (not $parts[0] eq "color-themes") {
+        return;
+    }
+    my $subcmd = $parts[1];
+    if ( $subcmd eq "load-state" ) {
+        load_state($self);
+        return ();
+    }
+    if ( $len > 0 ) {
+        my $idx = $self->{current_index};
+        if ( $subcmd eq "next" ) {
+            $idx = ++$self->{current_index};
+        }
+        elsif ( $subcmd eq "prev" ) {
+            $idx = --$self->{current_index};
+        }
+        my $fn  = $fs[ $idx % $len ];
+        my $esc = build_cmd($fn, $self->{preprocessor});
+        if ( $self->{auto_save_state} or $subcmd eq "save-state" ) {
+            save_state( $self, $esc );
+        }
+        $self->cmd_parse($esc);
+        $fn =~ s{.*/}{};
+        $msg = " Theme: " . $fn;
+    }
+    else {
+        $msg = " No themes found in " . $self->{theme_dir};
+    }
+
+    $self->{overlay} = $self->overlay( 0, -1, $self->strwidth($msg) + 1,
+        1, urxvt::OVERLAY_RSTYLE, 0 );
+    $self->{overlay}->set( 0, 0, $msg );
+    $self->enable( key_press => \&key_press );
+    ();
+}

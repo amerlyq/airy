@@ -354,6 +354,8 @@ NeoBundle 'rking/ag.vim', {
     \ ], }, }
 " Multiple hl for searching by / ? or g/
 NeoBundle 'haya14busa/incsearch.vim'
+" NeoBundle 'haya14busa/incsearch.vim', 'incsearch-preload'
+
 " Smart highlight (don't do lazy -- I use it almost always)
 NeoBundle 'haya14busa/vim-asterisk'
 " Index for search results
