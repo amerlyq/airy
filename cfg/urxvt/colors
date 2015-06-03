@@ -16,6 +16,7 @@
 
 #ifdef Solarized
 # ifdef Light
+
 #  define  S_base03  #fdf6e3
 #  define  S_base02  #eee8d5
 #  define  S_base01  #93a1a1
@@ -24,7 +25,9 @@
 #  define  S_base1   #586e75
 #  define  S_base2   #073642
 #  define  S_base3   #002b36
+
 # elif defined(Transparent)
+
 #  define  S_base03  #fdf6e3
 #  define  S_base02  #eee8d5
 #  define  S_base01  #93a1a1
@@ -33,7 +36,9 @@
 #  define  S_base1   #586e75
 #  define  S_base2   #073642
 #  define  S_base3   #002b36
+
 # else
+
 #  define  S_base03  #002b36
 #  define  S_base02  #073642
 #  define  S_base01  #586e75
@@ -42,6 +47,7 @@
 #  define  S_base1   #93a1a1
 #  define  S_base2   #eee8d5
 #  define  S_base3   #fdf6e3
+
 # endif
 #endif
 
@@ -55,25 +61,24 @@
 # endif
 #endif
 
-! 15 black, 25 white
-URxvt*shading:    UShading
-URxvt*fading:     20
-URxvt*fadeColor:  S_base03
 
-! To only apply colors to your terminal, for example, prefix
-! the color assignment statement with its name. Example:
-!URxvt*background: S_base03
 
 ! In vim you will receive opaque background. Change if you dont wanna
-*background: S_base03
-*foreground: S_base0
+URxvt*background: S_base03
+URxvt*foreground: S_base0
+! Fade the text by the given percentage when focus is lost !DarkBlue
+URxvt*fading:     20          ! 15 black, 25 white
+URxvt*fadeColor:  S_base03
+URxvt*shading:    UShading
 
-! *fading: 40
-*fadeColor: S_base03
-*cursorColor: S_base2
-*cursorTextColor: S_base02
-*pointerColorBackground: S_base01
-*pointerColorForeground: S_base1
+
+!!! Cursor -------------------------------------------
+URxvt*cursorColor:            S_base2
+URxvt*cursorTextColor:        S_base02
+URxvt*pointerColorBackground: S_base01
+URxvt*pointerColorForeground: S_base1
+! reverve bf and fg colors
+! *reverseVideo:         true
 
 
 ! Dark/light palette
@@ -86,16 +91,16 @@ URxvt*fadeColor:  S_base03
 ! cyan      6,14
 ! white     7,15
 
-URxvt*color0: S_base02
-URxvt*color1: S_red
-URxvt*color2: S_green
-URxvt*color3: S_yellow
-URxvt*color4: S_blue
-URxvt*color5: S_magenta
-URxvt*color6: S_cyan
-URxvt*color7: S_base2
-URxvt*color8: S_base03
-URxvt*color9: S_orange
+URxvt*color0:  S_base02
+URxvt*color1:  S_red
+URxvt*color2:  S_green
+URxvt*color3:  S_yellow
+URxvt*color4:  S_blue
+URxvt*color5:  S_magenta
+URxvt*color6:  S_cyan
+URxvt*color7:  S_base2
+URxvt*color8:  S_base03
+URxvt*color9:  S_orange
 URxvt*color10: S_base01
 URxvt*color11: S_base00
 URxvt*color12: S_base0

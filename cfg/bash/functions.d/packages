@@ -106,7 +106,7 @@ git_install() { # $1 - git rep, $2 - dir name
 
     if [ -d "$PR_DIR" ]; then
         cd "$PR_DIR"
-        git pull --depth 1
+        git pull   #--depth 1 -- disabled by cause of automerges
     else
         if [ "${LINK//'://'}" == "$LINK" ]; then
             LINK="https://github.com/$LINK"

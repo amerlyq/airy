@@ -1,0 +1,57 @@
+! vim: ft=xdefaults
+
+
+! Tint. You can't use the colors "white" or "black" as tinting colors; in terms of tinting they equal "none" and you'll
+! get no tint. Use blue, red, tomato4, olivedrab2, etc.  http://www.htmlgoodies.com/tutorials/colors/article.php/3478921
+!URxvt*tintColor:           Red
+
+! Using an antialiased font breaks the preview completely. Having 32bit color
+! depth enabled causes the preview to behave weirdly (jumps sometimes, being
+! only half drawn sometimes, etc.) Google: urxvt w3mimg half drawing
+URxvt*depth:                24
+! Shading - 0 to 99 darkens, 101 to 200 lightens. Works better then tinting in gray(s).
+! Dont use with tintColor; just use a darker or lighter color instead.
+URxvt*transparent:          true
+
+
+!!! Cursor -------------------------------------------
+! blank the pointer on keypress or timeout
+URxvt*pointerBlank:         false
+URxvt*urgentOnBell:         true
+URxvt*cursorBlink:          false
+URxvt*cursorUnderline:      false
+
+
+!!! View ---------------------------------------------
+! Scrollbar: style - rxvt (default), plain, next, or xterm
+URxvt*scrollBar:            false
+URxvt*scrollBar_right:      false
+URxvt*scrollstyle:          rxvt
+! Need false to override floating regime in i3wm
+URxvt*borderLess:           false
+URxvt*internalBorder:       0
+URxvt*externalBorder:       0
+! Colors
+! For match bold colors 0-7 with colors of normal font (false)
+URxvt*intensityStyles:      false
+
+
+!!! Scrolling ----------------------------------------
+! Turn on/off secondary screen (default enabled)
+URxvt*secondaryScreen:      true
+! (default enabled). If this option is enabled, scrolls on the secondary screen
+! will change the scrollback buffer and, when secondaryScreen is off, switching
+! to/from the secondary screen will instead scroll the screen up.
+URxvt*secondaryScroll:      false
+! Makes it possible, to scroll manually on output
+! True: scroll to bottom when tty receives output
+URxvt*scrollTtyOutput:      false
+! True: scroll with scrollback buffer when tty recieves new lines (and scrollTtyOutput is False)
+URxvt*scrollWithBuffer:     true
+! True: scroll to bottom when a non-special key pressed.  Special keys are those which are intercepted by rxvt for special handling and nt passed onto the shell; False: dont scroll to bottom
+URxvt*scrollTtyKeypress:    true
+! When receiving lots of lines, urxvt will only scroll once a whole screen height of lines has been read, resulting in fewer updates while still displaying every received line
+! False: specify that smooth scrolling should be used. urxvt will force a screen refresh on each new line it received
+! URxvt*jumpScroll:                     false
+! (true) When receiving lots of lines, urxvt will only scroll once in a while (around 60x/sec), resulting in fewer updates. This can result in urxvt not ever displaying some of the lines it receives
+URxvt*skipScroll:           false

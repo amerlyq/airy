@@ -3,15 +3,15 @@ from ranger.ext.shell_escape import shell_quote
 
 
 # Need this in the end of ~/.bashrc or ~/.zshrc
-#   function finish { tempfile='/tmp/ranger_shelldir'; echo "$PWD" > "$tempfile"; }
+#   function finish { tempfile='/tmp/aura/ranger_cwdir'; echo "$PWD" > "$tempfile"; }
 # `trap finish EXIT
 class cd_shelldir(Command):
     """:cd_shelldir
-    Goes to path from /tmp/ranger_shelldir
+    Goes to path from /tmp/aura/ranger_cwdir
     """
     def execute(self):
         try:
-            shelldir = '/tmp/ranger_shelldir'
+            shelldir = '/tmp/aura/ranger_cwdir'
             fname = self.fm.confpath(shelldir)
             with open(fname, 'r') as f:
                 self.fm.cd(f.readline().rstrip())
@@ -20,6 +20,29 @@ class cd_shelldir(Command):
 
     def tab(self):
         return self._tab_directory_content()  # Generic function
+
+
+class actualee(Command):
+    FL = '/tmp/aura/ranger_list'
+    """:actualee
+    Use '~/.bin/actually' to apply secondary action to file/list
+    """
+    def execute(self):
+        s = [f.path for f in self.fm.thisdir.files]
+        index = s.index(self.fm.thisfile.path)
+        with open(actualee.FL, 'wb') as f:
+            f.write("\n".join(s[index:] + s[:index]))
+
+        if self.fm.thisfile.is_file:
+            # if 'x' in file.get_permission_string():
+            command = 'cd %d && actualee %f -l ' + actualee.FL
+            command = self.fm.substitute_macros(command, escape=True)
+            self.fm.execute_command(command)
+        else:
+            self.fm.move(right=1)
+
+    def tab(self):
+        return self._tab_directory_content()
 
 
 # Load aliases to shell (setopt aliases?). Using ~/.zshenv will crash git commands

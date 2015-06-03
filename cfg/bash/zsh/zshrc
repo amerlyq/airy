@@ -86,9 +86,6 @@ export SHELL=$(which zsh)
 # if [[ -n $SSH_CONNECTION ]]; then export EDITOR='vim'; fi
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
 
-# For ranger auto_changedir
-function finish {
-    tempfile='/tmp/ranger_shelldir'
-    echo "$PWD" > "$tempfile"
-}
+# To sync zsh and ranger working directories
+function finish { echo "$PWD" > '/tmp/aura/ranger_cwdir'; }
 trap finish EXIT
