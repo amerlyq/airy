@@ -5,12 +5,25 @@ SEE
 	REF:  -- all control sequences
 		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 		http://en.wikipedia.org/wiki/ANSI_escape_code#CSI_codes
+	Xterm special codes:
+		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Mouse-Tracking
+	Vim codes
+		http://vimdoc.sourceforge.net/htmldoc/term.html#t_RV
 
 urxvt
 : http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
 : NOTE: $ listres -- to show all active resources (loaded by xrdb ~/.Xresources, etc)
 >	[_] vim	auto ":set paste"
 		https://github.com/seletskiy/urxvt-vim-insert
+	[_] Highlighting
+		[_] '>>> ...' and ':: ...' -- as I use it for start/end of scripts
+		[_] 'Press ENTER ... ' -- considering ranger until I replace its API
+	[_] Scrollback
+		[_] Copy Last command output -- between prompts?
+		[_] Move (scroll) up to beginning of last launched command (perl?)
+		: useful for long outputs, alignes prompt atop as after <C-l>
+		:= maybe save position when pressed <CR>, <C-j>, <C-m> ?
+		:= or simply parse scrollback and search my PS1 markers!
 	[_] keyboard-select -- add sending t_ve/t_vi keycodes to be able select text in ranger
 	[_] CHG url-select to start not from bottom, but from current cursor
 			position (useful in vim notes)
@@ -22,10 +35,6 @@ urxvt
 		it has chance to not corrupt scrollback
 	[_] Customize
 		http://www.askapache.com/linux/rxvt-xresources.html
-	[_] move (scroll) up to beginning of last launched command (perl?)
-	: useful for long outputs, alignes prompt atop as after <C-l>
-	:= maybe save position when pressed <CR>, <C-j>, <C-m> ?
-	:= or simply parse scrollback and search my PS1 markers!
 	[_] always show cursor in keyboard-selection
 		| echo -en "\033]39;$color\007" | bg
 		| echo -en "\033]49;$color\007" | fg
@@ -74,6 +83,9 @@ urxvt
 
 
 FOCUS -- EVENTS
+	[_] BUG: when opening new urxvt ($mod+u) i3 will not send focus_out event to urxvt?
+	[_] Check :wa! with dirty new buffer in vim w/o file to save
+
 	For example a common problem when we're working in the console is to copy text
 	on a remote console (ssh vim) and edit the content locally. By this approach
 	is feasible by defining a sequence OSC "clipboard" qu'URxvt recover to
@@ -86,34 +98,21 @@ FOCUS -- EVENTS
 	: <Change sources to implement>: VIM launch will enable notification of mouse
 	: events to the terminal (set mouse = ...). When it will stop, it will
 	: turn off this notification
-
 	> But how to do it less harmful?
 	: So even bash will not show those sequences and interpret them instead?
 	: Maybe, zsh has built-in ability for focus lost? And I will no need to use urxvt?
+	: Think about how to disable those commands (or make them not harmful) if plugin is absent
 
-	> Xterm special codes:
-		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Mouse-Tracking
-		: Ps = 1 0 0 1  -> Use Hilite Mouse Tracking.
-		: Ps = 1 0 0 2  -> Use Cell Motion Mouse Tracking.
-		: Ps = 1 0 0 3  -> Use All Motion Mouse Tracking.
-		: Ps = 1 0 0 4  -> Send FocusIn/FocusOut events.
-		: Ps = 1 0 0 5  -> Enable UTF-8 Mouse Mode.
-		: Ps = 1 0 0 6  -> Enable SGR Mouse Mode.
-		: Ps = 1 0 0 7  -> Enable Alternate Scroll Mode.
-		: Ps = 1 0 1 0  -> Scroll to bottom on tty output (rxvt).
-		: Ps = 1 0 1 1  -> Scroll to bottom on key press (rxvt).
-		> Ps = 1 0 1 5  -> Enable urxvt Mouse Mode.  -- What is it? Where?
 
 	Tmux
 		Must additionally send it's own events when moving through windows/pans.
 
 	Vitality  <F24>/<F25>
 		https://github.com/sjl/vitality.vim/blob/master/plugin/vitality.vim
-	iTerm  [O[I
+		> find why mapping in cnoremap such a pain
+	2015-06-04 [X] Check if that codes are in spec now  :> Yes (xterm, iTerm2)
 	: FocusIn/FocusOut control sequences, which uses CSI O and CSI I
-	:	http://en.wikipedia.org/wiki/ANSI_escape_code#CSI_codes
 		https://github.com/fish-shell/fish-shell/issues/1917
-
 	| Maybe, create new button in my xkbmap and use it somehow with escape sequences?
 
 
