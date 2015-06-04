@@ -33,8 +33,8 @@ let s:patterns = {
 
 
 function! s:everywhere_define(cols)
-  for [k,v] in items(a:cols)  "guifg=#E01B1B
-    exec 'hi! Note'. k .' term=bold,underline cterm=bold,underline ctermbg=None guibg=None ctermfg='. v
+  for [k,v] in items(a:cols)  "term=bold,underline guifg=#E01B1B
+    exec 'hi! Note'. k .' term=bold cterm=bold ctermbg=None guibg=None ctermfg='. v
   endfor
 endfunction
 

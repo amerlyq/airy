@@ -17,14 +17,17 @@ esac
 "$PWD"/aliases_to_bookmarks
 
 
-echo "===========================
->>> Place in your shell's config (~/.bashrc or ~/.zshrc):
-# To sync zsh and ranger working directories:"
-case "$SHELL" in *bash) echo '
-finish() { echo "$PWD" > '/tmp/aura/ranger_cwdir'; }
-trap finish EXIT
-' ;; *zsh) echo '
-function finish { echo "$PWD" > '/tmp/aura/ranger_cwdir'; }
-trap finish EXIT
-' ;; esac
-echo "-----------------"
+case "$SHELL" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
+if ! grep -q '/tmp/aura/ranger_cwdir' $RC; then
+    echo "===========================
+    >>> Place in your shell's config ($RC):
+    # To sync zsh and ranger working directories:"
+    case "$SHELL" in *bash) echo '
+    finish() { echo "$PWD" > '/tmp/aura/ranger_cwdir'; }
+    trap finish EXIT
+    ' ;; *zsh) echo '
+    function finish { echo "$PWD" > '/tmp/aura/ranger_cwdir'; }
+    trap finish EXIT
+    ' ;; esac
+    echo "-----------------"
+fi

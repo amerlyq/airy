@@ -12,9 +12,10 @@ mkdir -p "$VIMC"
 
 ### THEMES ###
 case "$1" in
- dark|light) printf "set background=$1
-colorscheme solarized" > "$VIMC/vim_theme" ;;
-    --clean) rm -rf "$VIMC" ;;
+dark|light|transparent)
+    if [[ ! -e "$VIMC/vim_theme" || "$1" != "$(cat "$VIMC/vim_theme")" ]]
+    then echo "$1" > "$VIMC/vim_theme"; fi ;;
+--clean) rm -rf "$VIMC" ;;
 -u|--update) update="$1" ;;
 esac
 
