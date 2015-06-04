@@ -51,7 +51,7 @@ endif
 " highlight GitGutterAdd ctermfg=green guifg=darkgreen
 " highlight GitGutterDelete ctermfg=red guifg=darkred
 " highlight GitGutterChangeDelete ctermfg=yellow guifg=darkyellow
-
+" TODO?
 "" Highlight pidgin logs:
 function! PidginHL()
   syntax match pidginMe '^([^)]\+) me:'

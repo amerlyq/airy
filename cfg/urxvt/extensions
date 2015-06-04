@@ -22,11 +22,15 @@ URxvt*keysym.M-S-Return:    perl:fork-cwd:command
 
 
 !! === Scrolling =========================
-!! "2" -- count of scroll lines
-URxvt*keysym.M-o:    command:\033]720;10\007
-URxvt*keysym.M-n:    command:\033]721;10\007
-URxvt*keysym.M-S-O:  command:\033]720;40\007
-URxvt*keysym.M-S-N:  command:\033]721;40\007
+!! "40" -- count of scroll lines
+URxvt*keysym.M-k:    command:\033]720;10\007
+URxvt*keysym.M-j:    command:\033]721;10\007
+URxvt*keysym.M-S-K:  command:\033]720;40\007
+URxvt*keysym.M-S-J:  command:\033]721;40\007
+
+! TODO: use for prev/next 'path' found in scrollback
+URxvt*keysym.M-o:
+URxvt*keysym.M-n:
 
 
 !! === Selection =========================
