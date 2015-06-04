@@ -4,12 +4,14 @@ SEE
 	Terminal codes: Control Sequence Introducer,  Operating System Control, ...
 	REF:  -- all control sequences
 		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+		http://en.wikipedia.org/wiki/ANSI_escape_code#CSI_codes
 
 urxvt
 : http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
 : NOTE: $ listres -- to show all active resources (loaded by xrdb ~/.Xresources, etc)
 >	[_] vim	auto ":set paste"
 		https://github.com/seletskiy/urxvt-vim-insert
+	[_] keyboard-select -- add sending t_ve/t_vi keycodes to be able select text in ranger
 	[_] CHG url-select to start not from bottom, but from current cursor
 			position (useful in vim notes)
 	[_] SEE default extensions at /usr/lib/urxvt/perl
@@ -109,6 +111,7 @@ FOCUS -- EVENTS
 		https://github.com/sjl/vitality.vim/blob/master/plugin/vitality.vim
 	iTerm  [O[I
 	: FocusIn/FocusOut control sequences, which uses CSI O and CSI I
+	:	http://en.wikipedia.org/wiki/ANSI_escape_code#CSI_codes
 		https://github.com/fish-shell/fish-shell/issues/1917
 
 	| Maybe, create new button in my xkbmap and use it somehow with escape sequences?

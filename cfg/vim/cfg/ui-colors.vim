@@ -5,16 +5,19 @@ if g:theme_transparent
   let g:solarized_termtrans=1         " use term transparent color for bg
   let g:airline_theme='serene'
   " Restore right colors for sign column in solarized
-  autocmd ColorScheme * highlight DiffAdd    ctermbg=None
-  autocmd ColorScheme * highlight DiffChange ctermbg=None
-  autocmd ColorScheme * highlight DiffDelete ctermbg=None
-  autocmd ColorScheme * highlight DiffText   ctermbg=None
-  autocmd ColorScheme * highlight SignColumn ctermbg=None
-  autocmd ColorScheme * highlight LineNr     ctermbg=None
-  autocmd ColorScheme * highlight FoldColumn ctermbg=None
-  autocmd ColorScheme * highlight SpecialKey ctermbg=None
+  augroup PatchSolarized "{{{2
+    autocmd!
+    au ColorScheme * hi DiffAdd    ctermbg=None
+    au ColorScheme * hi DiffChange ctermbg=None
+    au ColorScheme * hi DiffDelete ctermbg=None
+    au ColorScheme * hi DiffText   ctermbg=None
+    au ColorScheme * hi SignColumn ctermbg=None
+    au ColorScheme * hi LineNr     ctermbg=None
+    au ColorScheme * hi FoldColumn ctermbg=None
+    au ColorScheme * hi SpecialKey ctermbg=None
+  augroup END "}}}2
 else
-  autocmd ColorScheme * highlight! link SignColumn LineNr
+  au ColorScheme * highlight! link SignColumn LineNr
 endif
 
 autocmd ColorScheme * highlight! link ColorColumn StatusLineNC

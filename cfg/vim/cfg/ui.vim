@@ -1,4 +1,7 @@
-set novisualbell    " don't flash the screen
+set confirm       " ask user before aborting an action
+set history=9999  " remember last commands & searche patts
+
+set novisualbell  " don't flash the screen
 set ruler
 set showcmd "shows the last command entered in the very bottom right (not in powerline)
 set wildignore+=*.o,*.obj,.git,*.rbc,*.class,.svn,vendor/gems/*
@@ -20,6 +23,10 @@ set shortmess+=Iat
 "       Add flags to 'shortmess'.
 "       Reset 'showcmd' and/or 'ruler'.
 " If set nomore -> the prompts will be no more
+
+" To be able safely save sessions and change settings between them
+set sessionoptions-=options
+
 
 set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
@@ -48,9 +55,7 @@ if has("gui_running")
   endif
 endif
 
-let g:Powerline_symbols = 'fancy'
 "set guiheadroom=0
-
 " Custom command line when no airline or for it's bckgr splits
 set statusline=%f\ %m\ %r\ line:%l/%L(%p%%)\ col:%c\ buf:%n\ (%b)(0x%B)
 set laststatus=2    " always show status line

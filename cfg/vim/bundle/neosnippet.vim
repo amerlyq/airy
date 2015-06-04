@@ -23,10 +23,10 @@ endif
 "let g:neosnippet#enable_snipmate_compatibility = 1
 
 " Tell Neosnippet about the other snippets, like Honza's
-let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets,~/.vim/snippets'
+let g:neosnippet#snippets_directory='$BUNDLES/vim-snippets/snippets,$VIMHOME/snippets'
 
 " enable the preview window feature in neocomplcache/neocomplete sources
 "let g:neosnippet#enable_preview=1
 
 " directory for neosnippet cache
-let g:neosnippet#data_directory=expand("~/.cache/vim/neosnippet")
+let g:neosnippet#data_directory=expand("$CACHE/neosnippet")

@@ -4,36 +4,33 @@
 # DISABLE: echo -ne "\033]777;focus;off\007"
 # VIM: -- add appropriate snippet with checking only to urxvt!
 
-# Hook invoqué au démarrage d'urxvt
+# my $csi_in = "\033[UlFocusIn";
+# my $csi_out = "\033[UlFocusOut";
+my $csi_in = "\033[I";
+my $csi_out = "\033[O";
+
 sub on_start {
-    my($term) = @_;
-    # le mode "focus" est désactivé par défaut
-    $term->{focus_activated} = 0;
+    my($self) = @_;
+    $self->{focus_activated} = 0;
 }
 
-# Interception des séquences "OSC 777 xxx BEL"
 sub on_osc_seq_perl {
-    my ($term, $osc, $resp) = @_;
+    my ($self, $osc, $resp) = @_;
+    # Catching urxvt control group "OSC 777 xxx BEL"
     return unless $osc =~ s/^focus;//;
-    $term->{focus_activated} = $osc eq 'on'?1:0;
+    $self->{focus_activated} = $osc eq 'on' ? 1 : 0;
 }
 
-# Hook invoqué au gain de focus
 sub on_focus_in {
-    my($term) = @_;
-
-    # Si le mode focus est activé, on envoie la notification
-    if ($term->{focus_activated}) {
-        $term->tt_write("\033[UlFocusIn");
+    my($self) = @_;
+    if ($self->{focus_activated}) {
+        $self->tt_write($csi_in);
     }
 }
 
-# Hook invoqué à la perte de focus
 sub on_focus_out {
-    my($term) = @_;
-
-    # Si le mode focus est activé, on envoie la notification
-    if ($term->{focus_activated}) {
-        $term->tt_write("\033[UlFocusOut");
+    my($self) = @_;
+    if ($self->{focus_activated}) {
+        $self->tt_write($csi_out);
     }
 }

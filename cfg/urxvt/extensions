@@ -13,18 +13,20 @@ autocomplete,focus-event,fork-cwd,vtwheel,color-themes,font-size
 URxvt*print-pipe:  bash -c "x-terminal-emulator -e editor -c 'norm G$' <(cat -)"
 ! cat > $HOME/$(echo urxvt.dump.$(date +'%Y%M%d%H%m%S'))
 
-URxvt*fork-cwd.command: zsh -ic ranger-auto
-! URxvt*fork-cwd.command: vim
-URxvt*keysym.M-o:       perl:fork-cwd:shell
-URxvt*keysym.M-S-O:     perl:fork-cwd:command
+
+!! === Fork-cwd =========================
+! URxvt*fork-cwd.command:   vim
+URxvt*fork-cwd.command:     zsh -ic ranger-auto
+URxvt*keysym.M-Return:      perl:fork-cwd:shell
+URxvt*keysym.M-S-Return:    perl:fork-cwd:command
 
 
 !! === Scrolling =========================
 !! "2" -- count of scroll lines
-URxvt*keysym.M-k:    command:\033]720;2\007
-URxvt*keysym.M-j:    command:\033]721;2\007
-URxvt*keysym.M-S-K:  command:\033]720;40\007
-URxvt*keysym.M-S-J:  command:\033]721;40\007
+URxvt*keysym.M-o:    command:\033]720;10\007
+URxvt*keysym.M-n:    command:\033]721;10\007
+URxvt*keysym.M-S-O:  command:\033]720;40\007
+URxvt*keysym.M-S-N:  command:\033]721;40\007
 
 
 !! === Selection =========================

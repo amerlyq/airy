@@ -1,6 +1,28 @@
 SMALL
 	[_] for commenter -- add prefix: '!' in Xresources and ':' in votl
 
+INTEGRATION
+	vim + tmux + ssh + {different terminals}
+		install several different terminals -- with 16 and 256 colors
+			gnome, mint, st, putty, xterm
+		ssh to localhost
+		open same tmux in several terminals
+	Check
+		colors -- autochoose appropriate color schemes by availability and colors
+		escape codes -- terminal must not produce something it's not understanding
+		fonts -- see on powerline problems, detect and replace symbols if not available
+
+	Events
+		Vim
+		:h autocmd-events
+			in/out :sh command on ,z
+				:Try hook -- ShellCmdPost -- but it also work on :make and :grep
+			in/out :Ranger on ,f
+			suspend/restore
+		Tmux
+			focusing pane
+			focusing window
+
 vim:
 	[_] Check neovim
 	[_] move cfb/bundle -> plugins, cfg/snip-* -> ext, plugins.vim -> neobundle.vim
@@ -11,6 +33,8 @@ vim:
 	[_] Check
 		https://github.com/szw/vim-ctrlspace
 		quickfixsigns <https://github.com/tomtom/quickfixsigns_vim>
+	[_] ADD vim-hooks -- custom scripts on save and other events in vim
+		https://github.com/ahw/vim-hooks
 	[_] ADD ranger as NERDTree -- try using NERDTree before it.
 		: open by shortcut ',F' -- fork in another window
 		: setup vimserver and client, and 'ranger server and client'

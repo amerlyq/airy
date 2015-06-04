@@ -11,16 +11,18 @@ noremap <Leader>s :<C-U>w<CR>
 noremap <Leader>d :<C-U>q<CR>
 noremap <Leader>D :<C-U>qa<CR>
 " cnoremap <Leader>d <C-E><C-U>q<CR>
-" Go inside shell to see output of commands like ':! ..'. Return on <C-d>
-noremap <silent> <Leader>z :<C-U>sh<CR>
 
 if has('unix')
   noremap <Leader>f :<C-U>RangerChooser<CR>
-else
+elseif has('win32') || has('win64')
   noremap <Leader>f :<C-U>VimFiler<CR>
+  let $SHELL='cmd.exe'  " Is any sense using git-msys under git instead?
 endif
 
-"-----
+" Go inside shell to see output of commands like ':! ..'. Return on <C-d>
+set shell=$SHELL  "go to by ':sh' or mapping ',z'.  Def: /bin/sh
+noremap <silent> <Leader>z :<C-U>sh<CR>
+
 
 " Close current buffer while retaining window
 function! s:BufDelSafe()

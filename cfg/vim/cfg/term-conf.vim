@@ -2,10 +2,11 @@
 set pastetoggle=<F2>
 
 
+" DISABLED: necessary only for bare urxvt w/o remappings in resources
 " masquerade rxvt as xterm so that arrow keys work correctly in insert mode
-if &term =~ 'rxvt'
-  execute 'set term=' . substitute(&term, '\vrxvt(-unicode)?', 'xterm', '')
-endif
+" if &term =~ 'rxvt'
+"   execute 'set term=' . substitute(&term, '\vrxvt(-unicode)?', 'xterm', '')
+" endif
 
 
 " Infinite wait on mappings, but timeout on keycodes (like <\e..>)
