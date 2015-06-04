@@ -101,7 +101,7 @@ bindkey -as ',d' 'Sq\n'
 ## Miscellaneous
 bindkey ' ' magic-space  # [Space] - do history expansion
 # On <F12> in vim mode loads config debug aliases
-bindkey -as '^[[24~' '0d$isource ~/.bash/debug\n\e'
+bindkey -as '^[[24~' '0d$isource ~/.shell/func.d/debug\n\e'
 # Handle SIGINT when completing
 # bindkey '^I' interruptible-expand-or-complete
 # Autocomplete paths only on <S-Tab> (SEE: amer-widgets)

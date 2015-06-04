@@ -6,8 +6,13 @@ OLD="${1?Need old regex}"
 NEW="$2"
 HL="$OLD"
 
+[[ -z "$KEY" && -n "$NEW" ]] && KEY='-s'
+[[ "$KEY" == '-s' && "$3" == '--r' ]] && KEY='-r'
+
 case "$KEY" in
--r) ag -l "$OLD" | xargs sed -ri -e '/'"$OLD"'/s||'"$NEW"'|g' ;;
+-r) ag -l "$OLD" | xargs sed -ri -e '/'"$OLD"'/s||'"$NEW"'|g'
+    if [[ -n "$NEW" ]]; then HL="$NEW"; ag -l "$HL"; fi
+    ;;
 -s) # If NEW=="" then returns empty list: as all OLD was deleted!
     if [[ -n "$NEW" ]]; then HL="$OLD|$NEW"; fi
     ag -l "$OLD" | xargs sed -rn -e '/'"$OLD"'/s||'"$NEW"'|gp'  | ag "$HL"

@@ -1,6 +1,6 @@
 # COMPLETION SETTINGS
 # add custom completion scripts
-fpath=(~/.bash/zsh/completion.d $fpath)
+fpath=(~/.shell/zsh/completion.d $fpath)
 
 # compsys initialization
 # autoload -U compinit

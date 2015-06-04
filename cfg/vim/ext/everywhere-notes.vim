@@ -41,7 +41,7 @@ endfunction
 
 function! s:everywhere_matches(patts)
   for [k,v] in items(a:patts)
-    call matchadd('Note'. k, '\v('. v .'):=', 0)
+    call matchadd('Note'. k, '\v<('. v .')>:=', 0)
   endfor
 endfunction
 

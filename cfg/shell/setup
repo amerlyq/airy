@@ -1,0 +1,21 @@
+#!/bin/bash
+cd $(dirname $(readlink -m ${0})) || exit $?
+THEME=${CURR_THEME:-dark}
+
+case "$1" in
+ dark|light) THEME="$1" ;;
+--clean) echo "nothing" ;;
+-u|--update) update="$1" ;;
+esac
+
+case "$SHELL" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
+
+### LINKS ###
+link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+
+link "$PWD" ~/.shell
+link "$PWD/input/dircolors.ansi-${THEME}" ~/.dircolors
+# TODO: link tmux/theme-${THEME}.conf ~/.tmux-color.conf
+
+for nm in bash/bashrc zsh/zshrc tmux/tmux.conf input/inputrc
+do link "$PWD/$nm" ~/.${nm##*/}; done

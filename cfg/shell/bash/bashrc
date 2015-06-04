@@ -38,10 +38,10 @@ export SHELL=$(which bash)
 
 # Alias definitions.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-if [ -f ~/".bash/bash_prompt" ]; then source ~/".bash/bash_prompt"; fi
-if [ -f ~/".bash_export" ]; then source ~/".bash_export"; fi
-if [ -f ~/".bash/aliases" ]; then source ~/".bash/aliases"; fi
-if [ -f ~/".bash/functions" ]; then source ~/".bash/functions"; fi
+if [ -f ~/.shell/bash/prompt ]; then source ~/.shell/bash/prompt; fi
+if [ -f ~/.shenv ]; then source ~/.shenv; fi
+if [ -f ~/.shell/aliases ]; then source ~/.shell/aliases; fi
+if [ -f ~/.shell/funcs ]; then source ~/.shell/funcs; fi
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile

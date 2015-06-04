@@ -1,5 +1,5 @@
 #!/bin/bash
-source ~/.bash/functions
+source ~/.shell/funcs
 amScriptDir -s
 if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
 
@@ -16,9 +16,8 @@ lnLst()
 
 if [ "$CURR_PLTF" == "Linux" ]
 then
-    lnLst ~/. "" "bash i3 urxvt Xrc mutt"
-    lnLst ~/. bash/ "inputrc profile bashrc bash_prompt tmux.conf zsh/zshrc"
-    lnLst ~/.config/ "" "ranger mcomix sxiv Xrc/compton.conf"
+    lnLst ~/. "" "i3 Xrc mutt"
+    lnLst ~/.config/ "" "mcomix sxiv Xrc/compton.conf"
     lnLst ~/.mpv/ mpv/ "config input.conf"
     lnLst ~/.config/copyq/ sets/ "copyq.conf"
     lnLst ~/.config/gtk-3.0/ sets/ "settings.ini"
@@ -31,7 +30,6 @@ then
     fi
 
     pairLink ~/.bin "${CONF_DIR}/../bin"
-    pairLink ~/.dircolors "${CONF_DIR}/Xrc/sol/dircolors.ansi-${THEME}"
     pairLink ~/.ncmpcpp/config   "${CONF_DIR}/sets/ncmpcpp.conf"
     pairLink ~/.ncmpcpp/bindings "${CONF_DIR}/sets/ncmpcpp.keys"
     pairLink ~/.config/dunst/dunstrc "${CONF_DIR}/Xrc/dunstrc"

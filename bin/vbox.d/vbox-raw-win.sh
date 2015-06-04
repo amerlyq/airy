@@ -24,7 +24,7 @@
 # 3. Use full disk, but mbr with only one entry to windows. Not secure.
 # 4. Two bcdedit options -- original and repaired for vbox.
 
-source ~/.bash_export
+source ~/.shenv
 if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
 
 # Available Profiles

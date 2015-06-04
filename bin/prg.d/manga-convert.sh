@@ -3,9 +3,9 @@
 # http://commons.wikimedia.org/wiki/Help:Creating_a_DjVu_file
 # http://debiania.blogspot.com/2010/06/djvu-linux.html
 
-source ~/.bash_export
+source ~/.shenv
 [ $? -ne 0 ] && exit
-source ~/.bash/functions
+source ~/.shell/funcs
 [ $? -ne 0 ] && exit
 
 if [ "$CURR_PLTF" == "MINGW" ]; then

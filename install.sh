@@ -5,7 +5,7 @@
 # cd to this script dir and launch by $ exec ./script_name
 
 # ============= Helper to load neccessary functions =============
-source ~/.bash/functions 2&> /dev/null
+source ~/.shell/funcs 2&> /dev/null
 if [ $? -eq 1 ]; then
     source ./cfg/bash/functions
     if [ $? -eq 1 ]; then
@@ -25,7 +25,7 @@ if [ "${SCRIPT_DIR}" == "/" ]; then
 
 DEPLOY_DIR="$SCRIPT_DIR/deploy"
 
-if [ ! -e "$HOME/.bash_export" ] || [ "$1" == "--clean" ] || [ "$1" == "-c" ]
+if [ ! -e "$HOME/.shenv" ] || [ "$1" == "--clean" ] || [ "$1" == "-c" ]
 then CLEAN_INSTALL=1; shift; else CLEAN_INSTALL=0; fi
 # if [ $CLEAN_INSTALL -eq 1 ]
 if [ "$1" == "--full" ]
@@ -38,7 +38,7 @@ fi
 
 
 # Create link for other child scripts to work
-if [ ! -f ~/.bash/functions ]; then
+if [ ! -f ~/.shell/funcs ]; then
     pairLink ~/.bash "$SCRIPT_DIR/cfg/bash"
 fi
 
@@ -86,7 +86,7 @@ esac
 
 # Launch installation
 if [ "${CURR_PLTF}" != "MINGW" ] || [ $CLEAN_INSTALL -eq 1 ] ; then
-    dst=~/.bash_export
+    dst=~/.shenv
     wbegin
     "$DEPLOY_DIR/profile_export" "$PROFILES_DIR" "$CURR_PROF"
     CURR_THEME="$1"
@@ -96,7 +96,7 @@ export CURR_THEME=$CURR_THEME" "$dst"
         echo ">>>>>>>>>>> Used '$CURR_THEME' theme for all apps"
     ;; esac
 fi
-source ~/.bash_export
+source ~/.shenv
 echo "$CURR_PROF :={ $CURR_PLTF, $CURR_HOST, $CURR_USER }"
 
 
@@ -108,10 +108,7 @@ case "${CURR_PLTF}" in
     Linux) $DEPLOY_DIR/symlinks.sh "$CURR_THEME" | sed -e "s@/home/$CURR_USER/@@g" | column -t ;;
 esac
 
-#TODO: Move this into pristine.d/vim.pr
-if [ ! -d "$HOME/.vim/res/powerline-fonts" ] || [ $CLEAN_INSTALL -eq 1 ]; then
-    [ ! $BASIC_INSTALL -eq 1 ] && "$DEPLOY_DIR/vim-setup.sh"
-fi
+if [ $CLEAN_INSTALL -eq 1 ]; then "$SCRIPT_DIR/cfg/vim/setup"; fi
 
 # ======================== Xresources ===========================
 

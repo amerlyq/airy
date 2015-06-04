@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ~/.bash/functions.d/system && amScriptDir || exit $?
+source ~/.shell/func.d/system && amScriptDir || exit $?
 source "$SCRIPT_DIR/vbox/funcs" || exit $?
 source "$SCRIPT_DIR/vbox/env" || exit $?  # Import some variables
 

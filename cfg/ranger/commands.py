@@ -65,7 +65,7 @@ class shell(Command):
                 command = self.fm.substitute_macros(command, escape=True)
 
             if 'r' not in flags:
-                command = "source ~/.bash/aliases && eval " + shell_quote(command)
+                command = "source ~/.shell/aliases && eval " + shell_quote(command)
 
             self.fm.execute_command(command, flags=flags)
 

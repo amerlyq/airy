@@ -1,20 +1,20 @@
 #!/bin/bash
 
-source ~/.bash/functions
+source ~/.shell/funcs
 
 # Windows manager
-dst=~/.dmrc
-wbegin
-# Language=en_US -- breaks
-wstr "[Desktop]
-Session=i3"
-echo "W: $dst  <- i3"
+# dst=~/.dmrc
+# wbegin
+# # Language=en_US -- breaks
+# wstr "[Desktop]
+# Session=i3"
+# echo "W: $dst  <- i3"
 
 # Editor
-dst=~/.selected_editor
-wbegin
-wstr "SELECTED_EDITOR=\"/usr/bin/vim.gtk\""
-echo "W: $dst  <- vim"
+# dst=~/.selected_editor
+# wbegin
+# wstr "SELECTED_EDITOR=\"/usr/bin/vim.gtk\""
+# echo "W: $dst  <- vim"
 
 # Set default prs
 sudo update-alternatives --set x-window-manager /usr/bin/i3

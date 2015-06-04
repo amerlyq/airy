@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-source ~/.bash_export
+source ~/.shenv
 
 loopback() {
-    local cfg=~/".bash/../sets/mpd-own.conf"
+    local cfg=~/".shell/../sets/mpd-own.conf"
     if ! pgrep -f "mpd \S+\.${cfg##*.}"; then
         if pgrep mpd >/dev/null; then mpd --kill; fi
         mpd "$cfg"

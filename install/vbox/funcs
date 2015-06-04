@@ -1,5 +1,5 @@
 # vim: ft=sh
-source ~/.bash/functions.d/system || exit $?
+source ~/.shell/func.d/system || exit $?
 
 is_vm_exist() { VBoxManage list vms        | grep -q "\<$1\>"      ; return $?; }
 is_vm_run()   { VBoxManage list runningvms | grep -q "\<$1\>"      ; return $?; }
