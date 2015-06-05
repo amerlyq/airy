@@ -1,6 +1,10 @@
 zsh
 	[_] ENH: Text insertion w/o triggering ',d' or ',s'
 		See plugin for urxvt/vim-insert -- with autotoggle 'set paste'?
+	[_] ENH: in ~/.shenv reduce zsh startup time by pre-processing file
+		[_] remove all 'export' where them are not needed
+		[_] pre-evaluate all $(...) and insert values in appropriate places
+		: But how? Use somehow heredoc? sed -i?
 	[_] Get configs for zsh from arch live-cd. Or use github grml:
 		https://grml.org/zsh/
 		https://www.archlinux.de/?page=PackageDetails;repo=extra;arch=i686;pkgname=grml-zsh-config

@@ -1,23 +1,25 @@
-#!/bin/sh
+#!/bin/bash
+
+# Don't allow to launch chain of rangers inside shells of other rangers
+[[ -z "$RANGER_LEVEL" ]] || exit 2  # You must interpret this error
+
+
+tempfile='/tmp/aura/ranger_cwdir'
+trap "rm -f -- '$tempfile' > /dev/null" EXIT
+
+# export TERM=xterm-256color #launch even inside terms w/o color support
+
+# for rifle when open_with -t'
+export TERMCMD=x-terminal-emulator
+# speed up ranger start time
+export RANGER_LOAD_DEFAULT_RC=FALSE
+
+ranger --choosedir="$tempfile" "${@:-$PWD}"
+
+[[ -f "$tempfile" ]] && dir="$(cat -- "$tempfile")"
+
 
 # Automatically change the directory in bash to the last visited one
 # after ranger quits. To undo the effect of this function,
 # you can type "cd -" to return to the original directory.
-ranger_cdback() {
-    tempfile='/tmp/ranger_chosendir'
-    ranger --choosedir="$tempfile" "${@:-$(pwd)}"
-    test -f "$tempfile" &&
-    if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
-        cd -- "$(cat "$tempfile")"
-    fi
-    rm -f -- "$tempfile" > /dev/null
-}
-
-
-# Don't allow to launch chain of rangers
-# inside shells of other rangers
-if [ -z "$RANGER_LEVEL" ]; then
-    TERM=xterm-256color #launch even inside terms w/o color support
-    ranger_cdback
-else exit 2 # You must interpret this error
-fi
+[[ "$dir" != "$PWD" && -d "$dir" ]] && cd -- "$dir"

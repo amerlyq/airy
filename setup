@@ -1,0 +1,18 @@
+#!/bin/bash
+cd $(dirname $(readlink -m ${0})) || exit
+
+case "$1" in
+-u|--update) ARGS="$1" ;;
+--clean) ARGS="$1" ;;
+*) ARGS="" ;;
+esac
+
+
+echo ">>> Airy public <<<"
+./cfg/setup "$ARGS"
+
+
+if [[ -f ../erian/setup ]]; then
+    echo ">>> Erian private <<<"
+    ../erian/setup "$ARGS"
+fi

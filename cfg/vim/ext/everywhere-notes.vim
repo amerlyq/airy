@@ -1,6 +1,7 @@
 " vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 " Fast highlighting: match Error /ENOMEM/
 " CHECK: http://andrewradev.com/2011/08/06/making-vim-pretty-with-custom-colors/
+" FIXME: background for labels don't match, when cursor is on same line
 
 if !has("autocmd") || v:version <= 701 | finish | endif
 

@@ -1,0 +1,26 @@
+# vim: ft=sh
+
+### HW ###
+export MAIN_DPI=96
+
+### DIRS ###
+export CURR_DIR_PKG=~/pkg
+export CURR_DIR_HUB=~/hub
+export CURR_DIR_SYNC=~/synchro
+
+### LIST ###
+export CURR_PKG_LIST=""
+
+### Profile Mgmt ###
+export CURR_PLTF=$(expr substr $(uname -s) 1 5)
+export CURR_USER=${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}
+export CURR_HOST=${HOSTNAME:-$(uname -n)}
+
+### Git ###
+export MAIN_NAME=""
+export MAIN_MAIL=""
+export WORK_NAME=$MAIN_NAME
+export WORK_MAIL=$MAIN_MAIL
+
+### END ###
+export PATH="$PATH:$HOME/.bin"

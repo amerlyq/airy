@@ -25,6 +25,17 @@ dunst
 		: to fixate music 15s left msg on second screen
 	[_] fix geometry to be more agile -- to content messages from chat
 
+GIT
+	Check if pull needed
+		[[ $(git rev-parse HEAD) == $(git ls-remote $(git rev-parse --abbrev-ref @{u})) ]]
+		git rev-list HEAD...origin/master --count
+		[ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]
+	Unstaged changes
+		if ! git diff-files --quiet --ignore-submodules --; then
+			git diff-files --name-status -r --ignore-submodules -- >&2
+	Uncommited changes
+		if ! git diff-index --cached --quiet HEAD --ignore-submodules --; then
+			git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2
 
 > [_] Add blog directly to ./airy
 	[_] http://octopress.org/docs/
@@ -32,8 +43,14 @@ dunst
 		https://www.heroku.com/
 		http://www.dreamhost.com/
 
+	http://technicalpickles.com/posts/using-markdown-in-vim/
+
 	http://www.smashingmagazine.com/2014/08/01/build-blog-jekyll-github-pages/
 	https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/
+
+[_] scpto/fr
+	[_] Move to separate script -- less loading time for aliases
+	[_] FIXME: duplicating filename when sending files
 
 
 SECURITY

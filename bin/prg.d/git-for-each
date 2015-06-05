@@ -15,9 +15,14 @@ gita_st() { # $1 -- rep path
 
 gita_pl() {
     printf "\n\n$(tput setaf 3)--[ $1 ]--$(tput sgr0)\n";
-    if ! git pull --rebase --verbose; then
-        git stash && git pull --rebase --verbose && git stash pop
-    fi
+    # FIXME: Check if has remote updates
+    # if [[ $(git rev-parse HEAD) == $(git ls-remote $(git rev-parse --abbrev-ref @{u})) ]]; then
+        # Check if clean directory
+        if git diff-files --quiet --ignore-submodules --
+        then git pull --rebase --verbose
+        else git stash && git pull --rebase --verbose && git stash pop
+        fi
+    # fi
 }
 
 # Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит, стэш, merge итп -- парсить и заменять на значки
