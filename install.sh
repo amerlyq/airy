@@ -137,17 +137,6 @@ fi
 if [ $FULL_INSTALL -eq 1 ] && [ ! $BASIC_INSTALL -eq 1 ] && [ "${CURR_PLTF}" == "Linux" ]; then
     # Default first
     "$DEPLOY_DIR/pristine"
-
-    # if [ $CLEAN_INSTALL -eq 1 ] ; then
-        # if [ "${CURR_HOST}" == "vbox" ]; then
-        #     CURR_APP_GROUPS="vbox rofi copyq"
-        # elif [ "${CURR_PROF}" == "guest" ]; then
-        #     CURR_APP_GROUPS="dev net ranger shell vim zsh"
-        # else
-        #     CURR_APP_GROUPS="dev_opengl rofi copyq grub tlp wuala evernote palemoon"
-        # fi
-        # $DEPLOY_DIR/pristine $CURR_APP_GROUPS
-    # fi
 fi
 
 # ===============================================================

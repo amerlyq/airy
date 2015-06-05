@@ -1,0 +1,18 @@
+#!/bin/bash
+cd $(dirname $(readlink -m ${0})) || exit
+THEME=${CURR_THEME:-dark}
+
+case "$1" in
+ dark|light) THEME="$1" ;;
+--clean) echo "nothing" ;;
+-u|--update) update="$1" ;;
+esac
+
+link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
+
+### LINKS ###
+link "$PWD" ~/.Xrc
+link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
+link "$PWD/compton.conf" ~/.config/compton.conf
+link "$PWD/settings.ini" ~/.config/gtk-3.0/settings.ini
+link "$PWD/dunstrc" ~/.config/dunst/dunstrc

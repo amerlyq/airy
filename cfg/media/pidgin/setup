@@ -1,0 +1,9 @@
+#!/bin/bash
+cd $(dirname $(readlink -m ${0})) || exit
+
+### LINKS ###
+link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+
+link "$PWD/prefs.xml" ~/.purple/prefs.xml
+
+./accounts.gen

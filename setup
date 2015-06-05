@@ -1,18 +1,29 @@
 #!/bin/bash
 cd $(dirname $(readlink -m ${0})) || exit
 
+# WARNING:
+#   Now if file exsist, 'setup' simply exits and you will not know that
+#   NEED: message on error -- if exist. Maybe some flags for 'ln' be enough?
+
 case "$1" in
 -u|--update) ARGS="$1" ;;
 --clean) ARGS="$1" ;;
 *) ARGS="" ;;
 esac
 
+link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+pretty() { sed "
+    s|/home/$(whoami)|\~|g
+    s|\~/\S\+/cfg/||g
+    />>>/!s|^|  |g
+    />>> /s|^|\[|g; / <<</s|$|\]|g
+"; }
 
 echo ">>> Airy public <<<"
-./cfg/setup "$ARGS"
-
+link "$PWD/bin" ~/.bin
+./cfg/setup "$ARGS" | pretty
 
 if [[ -f ../erian/setup ]]; then
     echo ">>> Erian private <<<"
-    ../erian/setup "$ARGS"
+    ../erian/setup "$ARGS" | pretty
 fi
