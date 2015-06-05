@@ -1,10 +1,10 @@
 # vim: ft=sh
-source ~/.shell/func.d/system || exit $?
+source ~/.shell/func.d/system || exit
 
-is_vm_exist() { VBoxManage list vms        | grep -q "\<$1\>"      ; return $?; }
-is_vm_run()   { VBoxManage list runningvms | grep -q "\<$1\>"      ; return $?; }
-has_vm_rule() { VBoxManage showvminfo "$1" | grep -q "Rule.*\<$2\>"; return $?; }
-show_vm_rule(){ VBoxManage showvminfo "$1" | grep "Rule.*\<${2}\>" ; return $?; }
+is_vm_exist() { VBoxManage list vms        | grep -q "\<$1\>"      ; return; }
+is_vm_run()   { VBoxManage list runningvms | grep -q "\<$1\>"      ; return; }
+has_vm_rule() { VBoxManage showvminfo "$1" | grep -q "Rule.*\<$2\>"; return; }
+show_vm_rule(){ VBoxManage showvminfo "$1" | grep "Rule.*\<${2}\>" ; return; }
 
 add_port_forward() {
     if [ $# -ne 3 ]; then echo "Number of args '$#' != 3"; exit 1; fi

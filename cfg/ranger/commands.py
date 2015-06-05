@@ -10,12 +10,12 @@ class cd_shelldir(Command):
     Goes to path from /tmp/aura/ranger_cwdir
     """
     def execute(self):
+        shelldir = '/tmp/aura/ranger_cwdir'
         try:
-            shelldir = '/tmp/aura/ranger_cwdir'
             fname = self.fm.confpath(shelldir)
             with open(fname, 'r') as f:
                 self.fm.cd(f.readline().rstrip())
-        except:
+        except IOError:
             return self.fm.notify(shelldir, bad=True)
 
     def tab(self):

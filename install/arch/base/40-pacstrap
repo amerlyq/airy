@@ -33,6 +33,6 @@ echo ":: mirrors selected"
 soft="base base-devel openssh wget"  #  sshfs gnupg pinentry
 if [ ! -d "/mnt/usr/bin" ]; then
     ## Install the base system  # -i -- interactive
-    pacstrap /mnt $soft || exit $?
+    pacstrap /mnt $soft || exit
     echo ":: packstrap installed"
 fi

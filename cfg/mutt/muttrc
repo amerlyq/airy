@@ -24,7 +24,7 @@ set from = "`echo ${MAIN_MAIL}`"
 set realname = "`echo ${MAIN_NAME}`"
 set use_from = yes
 
-set editor = '`echo \$EDITOR` -c "set spell spelllang=ru_yo,en_us,uk"'
+set editor = 'edit -c "set spell spelllang=ru_yo,en_us,uk"'
 # set edit_headers # see the headers when editing
 set sort = reverse-threads # sort by newest conversation first
 set sort_aux = last-date-received
@@ -81,8 +81,8 @@ unset pop_delete
 # set folder = $pop_host
 
 # SMTP
-set smtp_url = smtps://$imap_user@smtp.gmail.com:587
-# set smtp_url = smtp://$pop_user@`echo ${WORK_SRV_SMTP}`
+# set smtp_url = smtps://$imap_user@smtp.gmail.com:587
+set smtp_url = smtp://$pop_user@`echo ${WORK_SRV_SMTP}`
 
 
 ## DIRS

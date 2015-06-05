@@ -1,5 +1,5 @@
 #!/bin/bash
-cd $(dirname $(readlink -m ${0})) || exit $?
+cd $(dirname $(readlink -m ${0})) || exit
 
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
@@ -11,10 +11,6 @@ case "$1" in
 --clean) while read line; do rm -vf "${PWD}${line}"; done < "$PWD/.gitignore" ;;
 -u|--update) update="$1"; echo "USE: ranger --copy-config=all (Be Careful!), and see diff" ;;
 esac
-
-
-# bash .\w aliases -> ranger/bookmarks
-"$PWD"/aliases_to_bookmarks
 
 
 case "$SHELL" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac

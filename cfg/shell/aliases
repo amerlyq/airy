@@ -1,4 +1,4 @@
-#!/bin/bash
+# vim: ft=sh
 # Don't launch, source only!
 
 if [ -d ~/.shell/alias.d ]; then
@@ -16,3 +16,12 @@ fi
 # See also one-liners for system commands usage:
 # http://ubuntism.ru/terminal-commands-for-linux/
 
+
+# Source all pathes shortcuts
+sed 's/\s*#.*$//; /^\s*$/d' ~/.shell/pathes \
+    | while read k p; do alias $k='cd '"$p"; done
+
+
+# For 'reu' binary investigation tool
+sed -rn '/case/,/esac/{/\s*(\w+)\)\s.*/s//\1/p}' ~/.bin/prg.d/reu \
+    | while read i; do alias re$i='~/.bin/prg.d/reu '"$i"' '; done

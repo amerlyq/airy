@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-source ~/.shell/func.d/system && amScriptDir || exit $?
-source "$SCRIPT_DIR/vbox/funcs" || exit $?
-source "$SCRIPT_DIR/vbox/env" || exit $?  # Import some variables
+source ~/.shell/func.d/system && amScriptDir || exit
+source "$SCRIPT_DIR/vbox/funcs" || exit
+source "$SCRIPT_DIR/vbox/env" || exit  # Import some variables
 
 
 hopt() { [ "${OPTS/[$1]}" != "$OPTS" ]; }

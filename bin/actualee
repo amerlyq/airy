@@ -8,7 +8,7 @@ EXT="${NAME##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
 FL="$PWD/$NM"
 
-wpause() { pause $? "$NAME" || exit $?; }
+wpause() { pause $? "$NAME" || exit; }
 
 # Names
 case "$NAME" in  # Names

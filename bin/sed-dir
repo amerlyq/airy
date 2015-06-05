@@ -11,7 +11,8 @@ HL="$OLD"
 
 case "$KEY" in
 -r) ag -l "$OLD" | xargs sed -ri -e '/'"$OLD"'/s||'"$NEW"'|g'
-    if [[ -n "$NEW" ]]; then HL="$NEW"; ag -l "$HL"; fi
+    # TODO: save 'ag -l' output filenames to var/file, then use 'ag... $HL' on that list
+    # if [[ -n "$NEW" ]]; then HL="$NEW"; ag -l "$HL"; fi
     ;;
 -s) # If NEW=="" then returns empty list: as all OLD was deleted!
     if [[ -n "$NEW" ]]; then HL="$OLD|$NEW"; fi

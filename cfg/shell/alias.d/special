@@ -80,8 +80,3 @@ alias mountl='sudo fdisk -l'
 hi() { if [ -z "$@" ]; then history | tail -20; else
     history | sed 's/^\s*\(\d\+\)\s*\(.*\)$/\2 #\1' | sort -u | agi $@;
 fi; }
-
-# For 'reu' binary investigation tool
-sed -rn '/case/,/esac/{/\s*(\w+)\)\s.*/s//\1/p}' ~/.bin/prg.d/reu \
-    | while read i; do alias re$i='~/.bin/prg.d/reu '"$i"' '; done
-

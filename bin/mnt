@@ -36,7 +36,7 @@ dosamba() { dirmk && sudo mount -t cifs -o user="${1?Need user}" //${2?Need shar
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
     if ! [ -e "$DEVPATH" ]; then die "Error: no such file '$DEVPATH'"; fi
-    dirmk && sudo mount -o loop "$DEVPATH" "${DIR%.*}" || exit $?
+    dirmk && sudo mount -o loop "$DEVPATH" "${DIR%.*}" || exit
 }
 domnt() {
     local DEVPATH TYPE
@@ -51,7 +51,7 @@ domnt() {
 codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
     fi
     # -t "$TYPE"
-    dirmk && sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} && echo "$DIR" || exit $?
+    dirmk && sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} && echo "$DIR" || exit
 }
 
 
@@ -66,7 +66,7 @@ ${WORK_MAIL%@*}) dosamba ${WORK_MAIL%@*} $SURC_SRV/${WORK_MAIL%@*} ;;
 #{exchange,projects,install}
     install) dosamba ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;;
     esac ;;
- u) sudo umount -v "$DIR"; clean || exit $? ;;
+ u) sudo umount -v "$DIR"; clean || exit ;;
 #U) sudo umount -v -R "$MNT"/* && sudo rmdir -v "$MNT"/* ;;  # ERROR: No -R key
  *) echo "Error: '$ACTION'" ;;
 esac

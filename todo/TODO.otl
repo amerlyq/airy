@@ -1,16 +1,8 @@
 BUGS
 	[_] Trouble: can't use overlay xkb mapping on LAlt-LCtrl
 		Cause vbox after windows treats LCtrl and Caps as same keycode
-	[X] i3blocks after boot loads not always
+	2014-12-05 [X] i3blocks after boot loads not always
 	[_] Replace name and email in devq work
-	[_] ZSH title:print:7: write error: interrupt
-		fixed in 5.0.4, need update
-	>[_] Broken gtk theme
-		http://awesome.naquadah.org/wiki/Customizing_GTK_Apps/ru
-		http://davidjb.com/blog/2012/10/configuring-gtkgnome-toolbar-icon-sizes-and-labels-ubuntu-12-10-and-more/
-		:= it may be caused by 'xrdb ~/.Xresources' which replaces resources instead of '-merge'
-	[_] ZSH source in terminal on <F12>, then $ gaa<tab><tab> will cause
-		 Vim output ... as was when I used zshenv
 	[_] xsel don't work by ssh and on my machine after ssh? (ioctl...)
 	 Maybe because I changed connect to default instead of -X
 
@@ -22,8 +14,8 @@ BUGS
 		https://github.com/mpv-player/mpv/blob/master/DOCS/man/osc.rst
 
 Deploy:
-	[_] Insert vim installation and update check ALSO in vim_install (one-button)
-	 then delete it from list and try install again
+	2015-06-05 [X] Insert vim installation and update check ALSO in vim_install (one-button)
+		: then delete it from list and try install again
 	[_] Shares -- in private profile
 	[_] Move install profile choosing (fast with apt-get only, or full with compile)
 	  to git_install script, checking for flag and skipping if there isn't one
@@ -31,21 +23,24 @@ Deploy:
 	  стратегии (cfg, deploy, notes) решается через 'ln -r' симлинки в репе
 	[_] Зависание установки geeknote из-за необходимости вводить пароль и логин
 		Сделать его устанавливаемым только вручную!
-	[_] Некоторые конфиги имеет смысл запускать только после установки программ!
+	2015-06-05 [X] Некоторые конфиги имеет смысл запускать только после установки программ!
 		choose_default -- после всех соотвествующих дефолтов (zsh, etc.)
 		vim -- после установки vim'а...
 		erian/install.sh -- which will install repos -- after all configs
 	[_] Сделать автоматическое изменение локальных кредентиалов пользователя в репах
+		: individually for airy and devq
 	[_] add to installation script setting passwd for root and samba
 
 
 	[$] пароли для dir620 -- profile
 		:хотя если я всё равно буду подключаться по SSH -- то проще
 		:использовать приватные ключи.
-	[_] Move dev dirs erian -> devq
 
+RFC for REPO
+	[_] Move dev dirs erian_old -> devq
 	[_] Подписать все скрипты и файлики в строке 2
 		# MIT-License (c) 2014 amerlyq@gmail.com
+
 
 	pristine.sh
 		default set must be small and fast in install, true necessary
@@ -73,13 +68,6 @@ Deploy:
 		букву жёсткого диска. Тоесть по-сути использовать вышеобозначенный
 		скрипт для манипуляции кучей репозиториев. Это позволит сохранять
 		настройки и не зависеть от падающих серверов.
-
-tmux
-	https://github.com/benmills/vimux
-	https://www.braintreepayments.com/braintrust/vimux-simple-vim-and-tmux-integration
-	http://robots.thoughtbot.com/seamlessly-navigate-vim-and-tmux-splits
-	https://github.com/tmuxinator/tmuxinator
-	https://github.com/zolrath/wemux
 
 keymaps
 	[_] R-Alt -> Lang_menu (custom layout with programmer symbols in russian)
@@ -119,9 +107,9 @@ TODO
 	[_] Ssh with two ip profiles -- for local net and for www.
 	[_] Split SSH on local and global parts, selected automatically
 	[_] Find vim python completer and debugger
->	[_] Wuala -- move files.
->			Find another file-saving.
->			Use copy.com? Torrent-sync? rsync?
+	[_] Wuala
+		[X] move files.
+		[_] Find another file-saving.  Use copy.com? Torrent-sync? rsync?
 	[_] Rerun test every time as files in dir changes. Is it useful?
 		https://github.com/tartley/rerun
 	[_] Integrate script command for terminal
@@ -237,5 +225,7 @@ Buy
 	Keyboard
 	 (brown or clear switches -- find curves of pressing)
 		https://wasdkeyboards.com
+	Trackball -- again Marble? -- and setup it under Linux/Windows
+		https://wiki.archlinux.org/index.php/Logitech_Marble_Mouse
 
 

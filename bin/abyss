@@ -8,7 +8,7 @@ BDR="$DIR/build"
 BIN=""
 cd "$DIR"
 
-wpause() { pause $? -e "$NAME" || { [ $? -ne -7 ] && exit $? || exit; }; }
+wpause() { pause $? -e "$NAME" || { [ $? -ne -7 ] && exit || exit; }; }
 
 dir_build() {
     if [ -f "./compile" ]; then

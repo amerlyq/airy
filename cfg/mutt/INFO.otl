@@ -1,3 +1,14 @@
+SEND
+	Message from file / shell output
+		cat ./message.txt | mutt -s "Subject" user@gmail.com
+	With attachment
+		... -a /tmp/file.jpg
+	Diff profile
+		cat ./message.txt | mutt -s "Subject" -e "source ~/.mutt/acc/work" -e "set smtp_pass=$(read -s p && echo $p)" user@gmail.com
+
+	print all variables
+		mutt -D
+
 For thunderbird
 : sudo apt-get install thunderbird
 	Server Type: POP3

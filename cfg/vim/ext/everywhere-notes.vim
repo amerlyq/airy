@@ -1,5 +1,6 @@
 " vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 " Fast highlighting: match Error /ENOMEM/
+" CHECK: http://andrewradev.com/2011/08/06/making-vim-pretty-with-custom-colors/
 
 if !has("autocmd") || v:version <= 701 | finish | endif
 
@@ -25,9 +26,9 @@ let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Msg': 7, 'Tbd': 5, 'Alt': 3 }
 let s:patterns = {
       \ 'Err': 'ERR(OR)=|BUG',
       \ 'Fix': 'FIX(ME)=|WARNING',
-      \ 'Add': 'ADD',
+      \ 'Add': 'ADD|SEE',
       \ 'Msg': 'NOTE',
-      \ 'Tbd': 'TODO',
+      \ 'Tbd': 'TODO|CHECK',
       \ 'Alt': 'ALT|OR',
       \ }
 
@@ -41,7 +42,7 @@ endfunction
 
 function! s:everywhere_matches(patts)
   for [k,v] in items(a:patts)
-    call matchadd('Note'. k, '\v<('. v .')>:=', 0)
+    call matchadd('Note'. k, '\v<('. v .')>:=', -1)
   endfor
 endfunction
 

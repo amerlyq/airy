@@ -35,7 +35,7 @@ big2lit_pipe() { perl -We 'my $n=4; if ($#ARGV >= 0)
     while(read($in, $buf, $n)){
         printf "%08lx\n", unpack("'${2:-N}'", $buf) if length($buf) == $n;
 }' "$1"; }
-big2lit() { [[ -t 0 ]] || { big2lit_pipe "$1" "$2"; exit $?; }
+big2lit() { [[ -t 0 ]] || { big2lit_pipe "$1" "$2"; exit; }
 perl -We 'my $i=0; my $n=4;
 if ($#ARGV >= 0) { open($in, "<", $ARGV[0]); } else { $in = *STDIN; }
 while(read($in, $buf, $n)){

@@ -8,7 +8,7 @@ if [ $? -eq 1 ]; then exit 1; fi
 
 LST="$LST automake libtool libboost-all-dev libmpdclient-dev libncurses5-dev libncursesw5-dev libfftw3-dev libreadline-gplv2-dev libcurl4-gnutls-dev libtag1-dev"  #libreadline-dev
 apt_noprompt $LST
-[ $? -eq 0 ] || exit $?
+[ $? -eq 0 ] || exit
 
 git_install "arybczak/ncmpcpp" -d
 
