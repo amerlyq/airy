@@ -11,6 +11,9 @@ agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S $@; }
 agd() { find . -maxdepth 1 -type f | xargs agi $@; }    # in curr dir only
 agw() { agi -w $@; }
 agp() { agi --pager less $@; }
+agpdf() {
+    find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep --with-filename --label="{}" --color "your pattern"' \;
+}
 # agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
 
 vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim

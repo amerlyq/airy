@@ -22,7 +22,7 @@ link "$dir/theme/${THEME}.css" "$dir/style.css"
 
 # Set other symlinks only if used full keys. Short color keys only toggle.
 if [ "${1:0:1}" != '-' ]; then
-    for nm in config 'dld-start' theme; do
+    for nm in config 'dld-start' theme setup; do
         link "$PWD/$nm" "$dir/$nm"
     done
 fi

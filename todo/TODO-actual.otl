@@ -25,6 +25,8 @@ dunst
 		: to fixate music 15s left msg on second screen
 	[_] fix geometry to be more agile -- to content messages from chat
 
+Use Mathematica at mCS+Return as default computation notebook
+
 GIT
 	Check if pull needed
 		[[ $(git rev-parse HEAD) == $(git ls-remote $(git rev-parse --abbrev-ref @{u})) ]]
@@ -211,7 +213,17 @@ TODO
 
 
 DICT : in terminal
-	> http://en.wikipedia.org/wiki/DICT
+	[_] Add goldendict downloaded dicts to terminal server
+	ALT dico
+		http://www.gnu.org.ua/software/dico/dico.html
+		| apt-get install dico dicod dicoweb dico-doc dico-module-mediawiki dico-module-python dico-module-wordnet
+	ALT sdcv
+		http://sdcv.sourceforge.net/
+
+	Sources
+		:SEE: list of dicts http://en.wikipedia.org/wiki/DICT
+		http://en.wikipedia.org/wiki/WordNet
+
 	http://askubuntu.com/questions/191125/is-there-an-offline-command-line-dictionary
 	http://www.unixmen.com/look-dictionary-definitions-via-terminal/
 	https://linuxtidbits.wordpress.com/2008/01/30/command-line-dictionary/
@@ -220,6 +232,18 @@ DICT : in terminal
 	https://bayxao.wordpress.com/2007/03/24/convert-lingvo-dict-to-stardict-dict-format/
 	https://engraver.wordpress.com/2009/07/07/lingvo_dict_convertation_for_stardict/
 	https://www.google.com.ua/?gfe_rd=cr&ei=H8UuVfyQA4Ou8wfK_oCIBQ#q=linux+convert+lingvo+to+stardict
+
+	Usage
+		Create
+			dictfmt—utf8—allchars -s "My Dictionary" -j mydict < mydict.txt
+			: will compile a Unicode-compatible DICT file called mydict, with
+			: heading My Dictionary, from mydict.txt which is in Jargon File format i.e.:
+			| :word1:definition 1
+			| :word2:definition 2
+		Install
+			mv mydict.dict mydict.index /usr/share/dictd/
+			/usr/sbin/dictdconfig -—write
+			/etc/init.d/dictd restart
 
 REP
 	Git extensions to provide high-level repository operations for Vincent Driessen's branching model.

@@ -42,8 +42,12 @@ INTEGRATION
 vim:
 	[_] Check neovim
 	[_] move cfb/bundle -> plugins, cfg/snip-* -> ext, plugins.vim -> neobundle.vim
-	[_] FIX russian xkb plugin -- my own mappings simply don't work (like ,s or ,d)
+	[_] FIX russian xkb plugin
+		: Maybe, some of mapping map not as keysym but by keycodes?
+		[_] my own mappings simply don't work (like ,s or ,d)
+		[_] mappings on digits are wrong, as I replaced them.
 	[_] FIX ,K to check if current file executable, and if not -- using last command in ':'
+	[_] TODO remove insert mappings from votl
 	[_] BUG: visual-block +Y yanks only column, but must be as +D, which deletes until end.
 	[_] BUG: broken swap diff
 	[_] BUG: broken Lazy for fugitive

@@ -43,3 +43,27 @@ ranger
 	>[_] vim-ranger -- execute from script, not by ! to not override last command
 	[_] open_with must use zsh to execute as in console
 
+
+[X] Separate riffle system
+	[X] ranger: own rifle system + launcher
+	[X] vim:
+		comm: separate .c
+			inline string in comment
+			std build by gcc/g++ in /tmp/dir
+		./ :  separate script
+		make: Makefile
+		sir:  CMakeFiles.txt
+		dot:  dot
+	[X] both:
+		> So, I need to move this script into .bin -- make global dispatcher
+		Makefile -- launch build
+		Use interpreter for filetype
+	[X] Script launch--pause
+		shell:  no pause
+			check by PS1 non interactive
+		lister: pauses itself -- no pause
+
+		command: no pause     | only on error
+		script: pause to show | and on error
+		gui: no pause         | only on error
+

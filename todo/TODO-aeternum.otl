@@ -22,25 +22,6 @@ Build:
 	Sir должен уметь генерировать простые скрипты из своего тела для "чужих" проектов
 
 Thoughts
-	Некоторые отвлечённые мысли после чтения "Программист-прагматик"
-		Любая билд система -- собственно не только билд система
-		Она может настраивать среду, деплоить, билдить, проганять тесты и
-		  метрики, создавать отчёты, паковать пакеты и поставлять.
-		Но и это ещё не всё. В ней может вестить картотека багов, из которой
-		  скриптами формируются отчёты, проводиться анализ кода и архитектуры,
-		  параллельная визуализация по ходу работы над проектом...
-		Однако это не предел -- куда нас может завести DRY? Проект, в котором
-		  часть кода создаётся прямо на ходу -- там где мы выходим за пределы
-		  языка и вынуждены генерировать его из текстовых процессоров.
-		Симулякр. И всё это в рамках единого билд-процесса.
-		Краеугольные камни данного подхода -- поддержка, гибкость и устаревание.
-		  С развитием проекта ему будет требоваться разные наборы и каркасы
-		  из инструментов. Вначале лишние инструменты будут только переутяжелять
-		  прототипы, замедляя создание. Значит, надо изучать процесс изменений
-		  среды поддержки параллельно развитию проекта.
-		Единственный вариант -- множество независимых кирпичиков, библиотека
-		  подобная oh-my-zsh. Из которых можно собрать требуемую конфигурацию
-		  и быстро перестроить её в иную.
 
 Git
 	Сделать скрипт, с помощью которого происходит коммит
@@ -132,33 +113,3 @@ Libs in one place
 		Folder with wrapped modules, each module in it's own wrapper dir
 		This dir contains dirs of module, CMake snippet to include and some
 		gtest files with simple snips how-to use module.
-
-Script launch--pause
-	shell:  no pause
-		check by PS1 non interactive
-	lister: pauses itself -- no pause
-
-	command: no pause     | only on error
-	script: pause to show | and on error
-	gui: no pause         | only on error
-
-	ranger:
-		own rifle system
-		+ launcher
-	vim:
-		comm: separate .c
-			inline string in comment
-			std build by gcc/g++ in /tmp/dir
-		./ :  separate script
-		make: Makefile
-		sir:  CMakeFiles.txt
-		dot:  dot
-	both:
-		> So, I need to move this script into .bin -- make global dispatcher
-		pause on error
-		Makefile -- launch build
-		Use interpreter for filetype
-	<Priorities
-		sh: compile, run
-		Makefile
-		CMakeFile

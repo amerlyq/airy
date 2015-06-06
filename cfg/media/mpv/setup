@@ -6,4 +6,4 @@ link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 
 dir=~/.mpv && mkdir -p $dir
 link "$PWD/config" "$dir/config"
-link "$PWD/input.conf" "$dir/inpupt.conf"
+link "$PWD/input.conf" "$dir/input.conf"
