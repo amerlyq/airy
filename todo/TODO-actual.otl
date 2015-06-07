@@ -25,34 +25,40 @@ dunst
 		: to fixate music 15s left msg on second screen
 	[_] fix geometry to be more agile -- to content messages from chat
 
-Use Mathematica at mCS+Return as default computation notebook
 
 GIT
 	Check if pull needed
 		[[ $(git rev-parse HEAD) == $(git ls-remote $(git rev-parse --abbrev-ref @{u})) ]]
 		git rev-list HEAD...origin/master --count
 		[ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]
+	Faster checking if there are new commints in upstream before pull
+		: but works only if 'git fetch' before?
+		git rev-list HEAD@{upstream}..HEAD
 	Unstaged changes
 		if ! git diff-files --quiet --ignore-submodules --; then
 			git diff-files --name-status -r --ignore-submodules -- >&2
 	Uncommited changes
 		if ! git diff-index --cached --quiet HEAD --ignore-submodules --; then
 			git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2
+	Git extensions to provide high-level repository operations for Vincent Driessen's branching model.
+		https://github.com/nvie/gitflow
+	[_] TODO sync my fork for kedi
+		https://help.github.com/articles/syncing-a-fork/
+	[_] See gittemplate -- что это и зачем
 
-> [_] Add blog directly to ./airy
-	[_] http://octopress.org/docs/
-		http://jekyllbootstrap.com/
-		https://www.heroku.com/
-		http://www.dreamhost.com/
+
+BLOG
+	[_] Add blog directly to ./airy
+	Platforms
+		[_] http://octopress.org/docs/
+			: http://jekyllbootstrap.com/
+			: https://www.heroku.com/
+			: http://www.dreamhost.com/
 
 	http://technicalpickles.com/posts/using-markdown-in-vim/
 
 	http://www.smashingmagazine.com/2014/08/01/build-blog-jekyll-github-pages/
 	https://help.github.com/articles/setting-up-a-custom-domain-with-github-pages/
-
-[_] scpto/fr
-	[_] Move to separate script -- less loading time for aliases
-	[_] FIXME: duplicating filename when sending files
 
 
 SECURITY
@@ -83,38 +89,25 @@ ADMIN
 	2015-04-09 [X] myspot -- use curl + Google browser identity + cookies + authorithation to get to http://myspot
 	[_] read about samba and rights for domain users
 		http://www.tldp.org/HOWTO/SMB-HOWTO-8.html
-	[_] setup pidgin
-		<SEE:ALL> https://developer.pidgin.im/wiki/ThirdPartyPlugins
-		2015-04-29 [X] extract configs from ~/.purple to <airy>
-		[_] attach GnuPG-keyring (but found only pidgin-gnome-keyring)
-			https://github.com/segler-alex/Pidgin-GPG/
-		[_] attach google talks
-			https://support.google.com/a/answer/49147?hl=ru
-		[_] security
-			https://www.google.com.ua/search?q=pidgin+google+chat&gws_rd=cr,ssl&ei=yzEHVZbxF4SuU5iPhHA#q=pidgin+security
-		2015-03-13 [X] make note about communicator! using tcpdump + regex
-		2015-03-13 [X] disable online/offline notifications
-		2015-03-15 [X] autolaunching in generated work i3 autostart (or use that on each system?)
-		plugins
-			[_] http://www.howtogeek.com/102919/5-tips-and-tricks-for-pidgin-users/
-			2015-04-22 [X] default spellchecking: choose it for each contact separately
-			2015-04-24 [$] skype :> only alongside with running skype. Forget about it
-			2015-04-24 [X] google-talk
-	[_] syncthink vs rsync vs btsync
-	[_] Arch liveroot : install completely in RAM and keep unchanged
-		https://bbs.archlinux.org/viewtopic.php?id=193461
 
 
 ncmpcpp
-	[_] can't resize window
+	[_] BUG can't resize window
 		: Search similar option for urxvt:
 		:	XTerm*allowWindowOps: 		true
 		:	http://vimdoc.sourceforge.net/htmldoc/term.html#t_RV
-	to update list needs restart
+	[_] BUG to update list needs restart
+	[_] TODO ncmpcpp must resieve info for pop-up dbus notifications through ssh
 	[_] dynamic urxvt background from ncmpcpp song
 		http://vlevit.org/ru/blog/tech/mnuc
 	[_] flac -> ogg convert
 		http://vlevit.org/ru/blog/tech/flacconvert
+
+	[_] mpv -- create playlist to open all files in dir
+		http://xpressrazor.wordpress.com/2014/05/04/using-mpv-to-escape-start-and-end-of-videos-like-in-anime-tv-shows-etc/
+	[_] mpv osc (Fixed in mpv 0.3.10-dmo3)
+		https://github.com/mpv-player/mpv/blob/master/DOCS/man/osc.rst
+
 
 surf
 :> http://www.ragingpenguin.com/2012/07/7-surf-a-simple-browser/index.html
@@ -126,35 +119,15 @@ surf
 		http://stackoverflow.com/questions/950087/include-a-javascript-file-in-another-javascript-file
 
 
-Vim-all-environment
-	https://bbs.archlinux.org/viewtopic.php?id=89567#3
-
 deploy
-	one list install to accelerate process (simply check status of apt-get =100)
+	one list install to accelerate process
+		simply check status of apt-get =100
 
 gdb
 	[_] contols setup (like zsh)
 	[_] color printing
 	[_] pretty printing seize
 	[_] python support
-
-
-wacom
-	[X] profile auto switching
-	[~] focus event instead of timer
-		: setup arch beforehand to upgrade i3, if not use xmonad?
-		https://metacpan.org/pod/AnyEvent::I3
-		https://i3wm.org/docs/ipc.html#_window_event
-
-	[_] circlet-modes
-		[_] <C-z> <C-r> on 4 5
-	[_] setup krita
-		[_] key-mappings
-		[_] brushes
-		[_] sync profile
-	[_] udev rule
-		[_] default config
-		[_] move gksudo chmod 666 for led into udev rule
 
 
 Arch bang
@@ -164,8 +137,6 @@ Arch bang
 		https://wiki.archlinux.org/index.php/Window_manager#Tiling_window_managers
 	i3+ guide -- see gtk and playerctl
 		http://joaquinlp.me/blog/your-guide-to-a-damn-light-arch-linux-with-i3-and-text-apps/
-	Read
-		https://wiki.archlinux.org/index.php/pacman
 	Colemak?
 		http://forum.colemak.com/viewtopic.php?id=1808
 	Urxvt
@@ -183,9 +154,6 @@ READ (blogs -- downloaded)
 Makefile target-variable : when many
 	http://stackoverflow.com/questions/1909188/define-make-variable-at-rule-execution-time
 
-FORK
-	sync my fork for kedi
-		https://help.github.com/articles/syncing-a-fork/
 
 TODO
 	[_] BUG with gtk colors. Again. Broken gtk theme?
@@ -195,59 +163,11 @@ TODO
 	MUD
 		http://archive09.linux.com/feature/119631
 		http://forums.mudlet.org/viewtopic.php?f=9&t=4028
-	git
-		Faster checking if there are new commints in upstream before pull
-			git rev-list HEAD@{upstream}..HEAD
 	Disable boot/login on VGA
 		http://superuser.com/questions/626482/permanently-disable-second-screen
-	System deploying
-		https://github.com/ansible/ansible
-	[_] Fix tmux + vim + ssh + NON-urxvt
-		To be able work from alien computers
-		Maybe simplified color schemes?
-		:= Detect in vim, etc ENV[..] corresponding to tmux and ssh
-	[_] Use Dockers instead of VirtualBoxes to deploy server system?
-	[_] See on Xen
 	[_] Customize 'info' (vim keys, etc)
 		http://www.gnu.org/software/texinfo/manual/info-stnd/html_node/Custom-Key-Bindings.html
 
-
-DICT : in terminal
-	[_] Add goldendict downloaded dicts to terminal server
-	ALT dico
-		http://www.gnu.org.ua/software/dico/dico.html
-		| apt-get install dico dicod dicoweb dico-doc dico-module-mediawiki dico-module-python dico-module-wordnet
-	ALT sdcv
-		http://sdcv.sourceforge.net/
-
-	Sources
-		:SEE: list of dicts http://en.wikipedia.org/wiki/DICT
-		http://en.wikipedia.org/wiki/WordNet
-
-	http://askubuntu.com/questions/191125/is-there-an-offline-command-line-dictionary
-	http://www.unixmen.com/look-dictionary-definitions-via-terminal/
-	https://linuxtidbits.wordpress.com/2008/01/30/command-line-dictionary/
-	http://linuxcommando.blogspot.com/2007/10/dictionary-lookup-via-command-line.html
-	http://anl4u.com/blog/artha-offline-dictionary-for-linux/
-	https://bayxao.wordpress.com/2007/03/24/convert-lingvo-dict-to-stardict-dict-format/
-	https://engraver.wordpress.com/2009/07/07/lingvo_dict_convertation_for_stardict/
-	https://www.google.com.ua/?gfe_rd=cr&ei=H8UuVfyQA4Ou8wfK_oCIBQ#q=linux+convert+lingvo+to+stardict
-
-	Usage
-		Create
-			dictfmt—utf8—allchars -s "My Dictionary" -j mydict < mydict.txt
-			: will compile a Unicode-compatible DICT file called mydict, with
-			: heading My Dictionary, from mydict.txt which is in Jargon File format i.e.:
-			| :word1:definition 1
-			| :word2:definition 2
-		Install
-			mv mydict.dict mydict.index /usr/share/dictd/
-			/usr/sbin/dictdconfig -—write
-			/etc/init.d/dictd restart
-
-REP
-	Git extensions to provide high-level repository operations for Vincent Driessen's branching model.
-		https://github.com/nvie/gitflow
 
 NOTE
 	pandoc -- convert between markups
@@ -260,7 +180,11 @@ NOTE
 			(-) not every mardown could be described as MM
 
 DEPLOYING
-	Dockers
+	[_] Dockers
+		[_] Use Dockers instead of VirtualBoxes to deploy server system?
 		http://nathanleclaire.com/blog/2014/07/12/10-docker-tips-and-tricks-that-will-make-you-sing-a-whale-song-of-joy/
-	Ansible
+	[_] Ansible
 		http://docs.ansible.com/
+		https://github.com/ansible/ansible
+	[_] Xen
+	[_] syncthink vs rsync vs btsync

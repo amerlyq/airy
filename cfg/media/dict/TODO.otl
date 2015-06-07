@@ -1,0 +1,100 @@
+> DICT : in terminal
+
+TODO
+	[_] Add goldendict downloaded dicts to terminal server
+	[_] CFG /usr/share/doc/dictd/examples
+	> http://www.linuxfortranslators.org/dicts.html
+	[_] TRY using inetd to startup 'dictd' service only on purpose (to save resources)
+		http://www.freebsd.org/cgi/man.cgi?inetd(8)
+	[_] Consider using dict_lookup for X selections on i3wm shortcut
+	[_] use dictdconfig to configure?
+	[_] CFG Links to files in /etc/dictd
+
+
+SEE
+	http://askubuntu.com/questions/191125/is-there-an-offline-command-line-dictionary
+	http://www.unixmen.com/look-dictionary-definitions-via-terminal/
+	https://linuxtidbits.wordpress.com/2008/01/30/command-line-dictionary/
+	http://linuxcommando.blogspot.com/2007/10/dictionary-lookup-via-command-line.html
+	http://anl4u.com/blog/artha-offline-dictionary-for-linux/
+	https://bayxao.wordpress.com/2007/03/24/convert-lingvo-dict-to-stardict-dict-format/
+	https://engraver.wordpress.com/2009/07/07/lingvo_dict_convertation_for_stardict/
+	https://www.google.com.ua/?gfe_rd=cr&ei=H8UuVfyQA4Ou8wfK_oCIBQ#q=linux+convert+lingvo+to+stardict
+
+
+USAGE
+	Create dic
+		dictfmt—utf8—allchars -s "My Dictionary" -j mydict < mydict.txt
+		: will compile a Unicode-compatible DICT file called mydict, with
+		: heading My Dictionary, from mydict.txt which is in Jargon File format i.e.:
+		| :word1:definition 1
+		| :word2:definition 2
+	Convert dic
+		http://www.math.tamu.edu/~comech/tools/dict-mueller.html
+	Install dic
+		mv mydict.dict mydict.index /usr/share/dictd/
+		/usr/sbin/dictdconfig -—write
+		/etc/init.d/dictd restart
+	If eats up too much memory
+		/sbin/service dictd stop
+
+	See what it's doing, format output for parsing, list dictionaries/databases
+		dict -vr -f -I/D
+		dict -v myword
+	Use a particular database eg. for English to Spanish translation:
+		dict -d fd-eng-spa "how are you?"
+		dict -d moby-thesaurus
+
+Clients
+	http://www.dict.org/w/servers/start
+	http://www.dict.org/w/software/software
+
+
+SRC
+	list of dicts
+		2015-06-07 [X] https://servers.freedict.org/index.php
+		> http://www.dict.org/w/databases/start
+		http://en.wikipedia.org/wiki/DICT
+		http://en.wikipedia.org/wiki/WordNet
+
+	NOTE for goldendict (from lingvo):
+		http://rutracker.org/forum/viewtopic.php?t=3477949
+		http://rutracker.org/forum/viewtopic.php?t=3369767
+		http://www.linux23.com/torrent/lingvo-x3-stardict:0d65e1274acb329ef1cd19716ab514f6fd6820ef
+
+
+INSTALL
+	dict
+	: apt_noprompt dict dictd #dict-moby-thesaurus dict-gcide dict-stardic dict-freedict-eng-rus dict-wn dict-devil
+
+	TODO? try gnu dico someday on Arch to see difference
+	2015-06-07 [$] ALT dico (marked as old on AUR)
+		http://www.gnu.org.ua/software/dico/dico.html
+		| apt-get install dico dicod dicoweb dico-doc dico-module-mediawiki dico-module-python dico-module-wordnet
+
+	ALT sdcv
+		: https://www.archlinux.org/packages/?name=sdcv
+		http://sdcv.sourceforge.net/
+		: sdcv with rlwrap is great. Install rlwrap and put this in ~/.bashrc. Then you get history with the up and down arrows:
+			alias sdcv='rlwrap sdcv'
+		https://linuxtidbits.wordpress.com/2008/01/30/command-line-dictionary/
+
+	ALT online CLI google translation
+	: apt_noprompt libtranslate-bin
+	echo "what are you doing" | translate-bin -s google -f en -t ru
+
+	ALT goldendict
+	Вытяжки из статьи по использованию
+	: http://gimrock.blogspot.com/2012/03/lingvo-ubuntu.html
+
+	: В GoldenDict выбираем «Правка» → «Словари». В открывшимся окне открываем
+	: вкладки: «Источники» → «Файлы», жмём кнопку «Добавить» → указываем путь
+	: к папке со словарями, которую вы скачали с торрента → отмечаем поле
+	: «Рекурсивно» → жмём «Пересканировать» и ждём завершения сканирования.
+
+	: Снова выбираем «Правка» → «Словари». В открывшимся окне открываем
+	: вкладку «Группы», добавляем новые группы и переносим туда
+	: соответствующие словари.  Можно также воспользоваться кнопкой «Авто
+	: группы» и программа сама создаст группы и рассортирует по ним словари.
+	: В этом же окне можно распределить словари в том порядке, в котором они
+	: будут расположены при переводе слова.

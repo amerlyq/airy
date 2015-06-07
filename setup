@@ -4,6 +4,8 @@ cd $(dirname $(readlink -m ${0})) || exit
 # WARNING:
 #   Now if file exsist, 'setup' simply exits and you will not know that
 #   NEED: message on error -- if exist. Maybe some flags for 'ln' be enough?
+#   SEE maybe aliases also can be placed/extracted in their own directories?
+#        Then merged in one file?
 
 case "$1" in
 -u|--update) ARGS="$1" ;;

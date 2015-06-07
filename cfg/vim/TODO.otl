@@ -1,18 +1,46 @@
 SMALL
 	[_] for commenter -- add prefix: '!' in Xresources and ':' in votl
 
-INTEGRATION
-	vim + tmux + ssh + {different terminals}
+
+> TERM-FOCUS
++Urxvt
+	2015-06-04 [X] Autocopying on focus lost/gain
+		: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
+	[_] Autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
+
+BUG:
+	[_] Focus not triggered -- FocusIn works not always?
+		[_] two vims on split screen -- copying works only in one direction
+		[_] two vims on different workspaces -- works FocusOut->+, but not FoucIn for another
+		[_] when opening new urxvt ($mod+u) i3 will not send focus_out event to urxvt?
+
+Features
+	[_] BUG: returning into vim drops visual selection -- so 'gv' after vnoremap is not enough?
+	[_] Check :wa! with dirty new buffer in vim w/o file to save
+		: to implement autosaving on FocusOut
+	[_] FIXME: erasing changes scenario
+		copied in clipboard, pressed $mSd+X, clipboard edited, change focus from vim
+			as result my edits will be replaced with current @" content
+
+
+> INTEGRATION
+: To be able work from alien computers
+	Vim-all-environment
+		https://bbs.archlinux.org/viewtopic.php?id=89567#3
+
+	FIX vim + tmux + ssh + {different terminals (not-urxvt)}
 		install several different terminals -- with 16 and 256 colors
 			gnome, mint, st, putty, xterm
 		ssh to localhost
 		open same tmux in several terminals
 	Check
 		colors -- autochoose appropriate color schemes by availability and colors
+		: Maybe simplified color schemes?
 		escape codes -- terminal must not produce something it's not understanding
 		fonts -- see on powerline problems, detect and replace symbols if not available
 
 	Events
+	:= Detect in vim, etc ENV[..] corresponding to tmux and ssh
 		Vim
 		:h autocmd-events
 			in/out :sh command on ,z
@@ -38,6 +66,7 @@ INTEGRATION
 		http://robots.thoughtbot.com/seamlessly-navigate-vim-and-tmux-splits
 		https://github.com/tmuxinator/tmuxinator
 		https://github.com/zolrath/wemux
+
 
 vim:
 	[_] Check neovim
@@ -106,7 +135,7 @@ vim:
 		,k by default must always run :./% -- to speed up work on open
 		,K must replace current default run cmd with last from ':'
 		[_] Use v:counter -- to setup several different scripts
-	[_] Try all plugins for textobj:
+	[_] ALT Try all plugins for textobj:
 		https://github.com/kana/vim-textobj-user/wiki
 		https://github.com/tommcdo
 	[_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
@@ -121,11 +150,6 @@ vim:
 		2015-03-18 [X] mappings to move between loci of entries of qf/loc list
 		2015-03-17 [X] move to next/prev change in git signify (Use: ]c [c)
 		2015-03-17 [X] move to next/prev spellchecking error (Use: ]s [s z=)
-	> [_] Autocopying on focus lost/gain
-	: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
-		au FocusLost   * silent! call CopyStringInReg('"', @+)
-		au FocusGained * silent! call CopyStringInReg('+', @")
-		: and autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
 	2015-05-26 [X] easymotion  :> Replaced by vim-sneak
 		2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
 			No combining -- overlapping x-mappings aren't possible
@@ -245,10 +269,6 @@ vim
 		http://konishchevdmitry.blogspot.com/2008/07/howto-vim.html
 	Integrate shell
 		http://h0rr0rr-drag0n.blogspot.com/2010/11/shell-vim.html
-	Tips
-		http://uw-freelancer.github.io/blog/vim-vdebug/
-		http://uw-freelancer.github.io/blog/insanely-faster-vim-buffer-switching/
-		https://netguru.co/blog/win-vim-hacks
 	[_] % Text-objs
 		http://vim.wikia.com/wiki/Category%3aC%2B%2B
 		https://github.com/kana/vim-textobj-user
@@ -270,3 +290,8 @@ SEIZE
 	: https://github.com/rafi/vim-config/blob/master/config/neobundle.vim
 	http://vimawesome.com/
 	https://wiki.archlinux.org/index.php/Vim
+
+	Tips
+		http://uw-freelancer.github.io/blog/vim-vdebug/
+		http://uw-freelancer.github.io/blog/insanely-faster-vim-buffer-switching/
+		https://netguru.co/blog/win-vim-hacks
