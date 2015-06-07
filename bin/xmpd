@@ -2,7 +2,7 @@
 source ~/.shenv
 
 loopback() {
-    local cfg=~/".shell/../sets/mpd-own.conf"
+    local cfg=~/".shell/../media/mpd/mpd-own.conf"
     if ! pgrep -f "mpd \S+\.${cfg##*.}"; then
         if pgrep mpd >/dev/null; then mpd --kill; fi
         mpd "$cfg"

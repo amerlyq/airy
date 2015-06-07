@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+exit  # Guard from unintentional launch
+
+## From stardict (very slow)
+# DICS=$(patsubst %.ifo,%.index,$(shell find $(shell pwd) -name '*.ifo'))
+# dictconv -o $@ $<
+
+src=~/dicts/GoldenDict_Dicts
+dst=~/dicts/dicts
+cd "$src"
+
+## From dsl (much faster)
+find . -name '*.dsl.dz' -exec dictzip -d {} \;
+
+find . -name '*.dsl' | while read fl; do
+    sdir="${fl#*/}"
+    sdir="${sdir%%/*}"
+    mkdir -vp "$dst/$sdir"
+    makedict -i dsl -o dictd --work-dir "$dst/$sdir" "$fl"
+done
+
+cd "$dst"
+find . -name '*.dict' -exec dictzip {} \;

@@ -7,7 +7,7 @@
 
 """ Helpers
 function! CountLinesInRegister(reg, msg)
-  let l = split(getreg(a:reg), '^.\{-}\zs\n')  " -- w/o,  '\n\zs' -- with
+  let l = split(getreg(a:reg), '^.\{-}\zs\n', 1)  " -- w/o,  '\n\zs' -- with
   let h = a:msg . len(l) . 'L> '
   let maxlen = min([ len(l[0]), &columns - len(h) - 13 ])
   echo h . substitute(l[0][0:l:maxlen], "\t", " ", 'g')
@@ -49,8 +49,8 @@ endfunction
 
 function! CopyStringInReg(r, str)
  " Preserve previous buffer in register. Breaks next 'setreg'.
-  " call setreg('8', getreg(a:r, 1),  getregtype(a:r))
-  call setreg(a:r, a:str, 'c')
+  call setreg('p', getreg(a:r, 1),  getregtype(a:r))
+  call setreg(a:r, a:str, getregtype(a:r))
   call CountLinesInRegister(a:r, '@'. a:r .':')
 endfunction
 

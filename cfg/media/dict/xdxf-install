@@ -1,0 +1,16 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.shell/func.d/packages || exit
+# Converting Lingvo .dsl to .dict for dictd
+
+git_install 'soshial/xdxf_makedict' -d
+dir="$CURR_DIR_PKG/xdxf_makedict"
+
+sed -i '/g_info/s|^[^/].*|// &|' "$dir/src/log.hpp"
+sed -i '/g_info/,/^}/s|^[^/].*|// &|' "$dir/src/log.cpp"
+
+rep_autobuild "$dir"
+
+# https://brutalblog.wordpress.com/2007/12/20/1/
+## Sadly, but seems it will not work on .dsl.dz, you need
+# makedict -i dsl -o dictd dir/*.dsl
