@@ -209,10 +209,21 @@ augroup TermFocusEvent
   " au FocusLost   * set nonumber
 
   "" INTEGRATION: mng-copy
-  au FocusGained * let @"=@+
-  au FocusLost   * let @+=@"
-  " au! FocusGained * call CopyStringInReg('"', @+)
-  " au! FocusLost   * call CopyStringInReg('+', @")
+  " au FocusGained * sleep 10 m | call setreg('"', @+, 'c')
+  " au FocusLost   * call setreg('+', @", 'c')
+
+  "" Need sleep: prev vim FocusGained triggered BEFORE next vim FocusLost
+  au FocusGained * call CopyStringInReg('"', @+)
+  au FocusLost   * call CopyStringInReg('+', @")
+
+  "" ALT: If vim compiled w/o clipboard or launched by ssh:
+  " command -range Cz silent <line1>,<line2>write !xsel -ib
+  " cabbrev cv Cv  " To be able do simple ':cv' to copy text
+  " write !xsel -ib
+  " read !xsel -ob
+
+  "" ALT: Autosync regs @" and @+
+  " set clipboard^=unnamedplus
 
   "" Reload all changed, save all unchanged
   " au! FocusGained * bufdo checktime<CR>

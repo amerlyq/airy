@@ -47,10 +47,11 @@ endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
 
-function! CopyStringInReg(r1, str)
-  call setreg('9',  a:r1,  'c') " Preserve previous buffer
-  call setreg(a:r1, a:str, 'c')
-  call CountLinesInRegister(a:r1, '@'.a:r1.':')
+function! CopyStringInReg(r, str)
+ " Preserve previous buffer in register. Breaks next 'setreg'.
+  " call setreg('8', getreg(a:r, 1),  getregtype(a:r))
+  call setreg(a:r, a:str, 'c')
+  call CountLinesInRegister(a:r, '@'. a:r .':')
 endfunction
 
 function! GetLineBookmark(tid, text, ...)
@@ -69,6 +70,7 @@ endfunction
 
 " Be consistent with C and D which reach the end of line
 nnoremap Y y$
+vnoremap Y $y
 " Prevent Paste loosing the register source. Deleted available by "- reg.
 "   http://stackoverflow.com/a/7797434/1147859
 vnoremap p pgvy
@@ -115,8 +117,7 @@ nnoremap <leader>; :<C-R>"
 vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
 
 
-let s:leader = g:mapleader
-let mapleader = "\\"
+let s:leader = g:mapleader | let mapleader = "\\"
   nnoremap <leader>Y :<C-U>call GetLineBookmark(v:count,'')<CR>
   nnoremap <leader>t :<C-U>call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
   vnoremap <leader>t :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>

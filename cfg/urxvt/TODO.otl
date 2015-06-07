@@ -85,6 +85,13 @@ urxvt
 
 
 FOCUS -- EVENTS
+	2015-06-07 [X] Focus not triggered -- FocusIn works not always?
+	:= Seems like FocusIn for next vim triggered before FocusOut for previous.
+	:  So next vim always copies previous content of "+ register, instead of new.
+	:> Resolved, adding delay to 'urxvt/ext/focus-term'
+		2015-06-07 [X] two vims on split screen -- copying works only in one direction
+		2015-06-07 [X] two vims on different workspaces -- works FocusOut->+, but not FoucIn for another
+
 	For example a common problem when we're working in the console is to copy text
 	on a remote console (ssh vim) and edit the content locally. By this approach
 	is feasible by defining a sequence OSC "clipboard" qu'URxvt recover to

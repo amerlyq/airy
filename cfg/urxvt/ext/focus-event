@@ -2,6 +2,10 @@
 # @ref: MIT, (c) amerlyq, 2015
 # Inspired by: http://karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
 
+use strict;
+use warnings;
+use Time::HiRes qw(usleep);
+
 # Escape sequences cab be custom, like:
 # ENABLE:  echo -ne "\033]777;focus;on\007"
 # DISABLE: echo -ne "\033]777;focus;off\007"
@@ -31,6 +35,10 @@ sub on_osc_seq_perl {
 sub on_focus_in {
     my($self) = @_;
     if ($self->{focus_activated}) {
+        # WARNING postpone this event on 16 mS, because focus_in in next
+        # terminal will forestall focus_out from previous, and will process
+        # under old system state, primary to state changed by focus_out.
+        usleep(16000);
         $self->tt_write($csi_in);
     }
 }

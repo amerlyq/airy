@@ -6,15 +6,13 @@ SMALL
 +Urxvt
 	2015-06-04 [X] Autocopying on focus lost/gain
 		: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
+		WARNING when opening new urxvt ($mod+u) vim is not opened yet, so buffer
+				will not be copied in @"! You must keep yank shortcuts for such cases.
 	[_] Autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
 
-BUG:
-	[_] Focus not triggered -- FocusIn works not always?
-		[_] two vims on split screen -- copying works only in one direction
-		[_] two vims on different workspaces -- works FocusOut->+, but not FoucIn for another
-		[_] when opening new urxvt ($mod+u) i3 will not send focus_out event to urxvt?
 
 Features
+	[_] BUG: cursor don't change form in insert. Maybe regression after usleep in urxvt/focus-term?
 	[_] BUG: returning into vim drops visual selection -- so 'gv' after vnoremap is not enough?
 	[_] Check :wa! with dirty new buffer in vim w/o file to save
 		: to implement autosaving on FocusOut
@@ -256,15 +254,6 @@ vim
 	Read
 		 http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_%28Part_2%29
 		 http://vim.wikia.com/wiki/Making_a_list_of_numbersj
-	Vim is slow!
-		: Итак, граждане, извиняйте за преувеличивание, товарищ stormblastt
-		: был прав: «скроллит скроллит» - это из-за плагина obviousmode. Он
-		: там имеет autocmd на CursorMoved, и это, конечно, создавало
-		: определенные проблемы. Завтра напишу автору, чтобы написал о лагах
-		: на страничке плагина. Ну, если не напишет, так хоть в курсе будет..
-		: А ещё говорят тормозит cursorline, если её выключить, может станет
-		: лучше.
-		:	--startuptime | Use to get statistics on long load
 	How-to with desc and vimrc
 		http://konishchevdmitry.blogspot.com/2008/07/howto-vim.html
 	Integrate shell
@@ -295,3 +284,13 @@ SEIZE
 		http://uw-freelancer.github.io/blog/vim-vdebug/
 		http://uw-freelancer.github.io/blog/insanely-faster-vim-buffer-switching/
 		https://netguru.co/blog/win-vim-hacks
+
+PROFILING
+	Slow
+		autocmd на CursorMoved
+		: А ещё говорят тормозит cursorline...
+	Check
+		Use to get statistics on long load
+			vim --startuptime profile.log
+		Very verbose with timings
+			vim -V12

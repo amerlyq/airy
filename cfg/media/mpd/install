@@ -1,0 +1,14 @@
+#!/bin/bash
+source ~/.shell/func.d/packages || exit
+# MPD + MPV
+
+LST="$LST mpd mpc"
+# mdp -- console music player with database
+# mpc -- for hotkeys
+
+apt_noprompt $LST
+
+# ALT:
+# totem   | player, which not freezes in linux mint
+# vlc
+# qamixer | GUI alt for alsamixer with tray icon

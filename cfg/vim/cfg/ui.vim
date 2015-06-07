@@ -13,6 +13,10 @@ exec "set listchars=tab:\\\\_,extends:>,precedes:<,trail:\uB7,nbsp:~"
 set list            " display otherwise invisible characters
 " tab:\uBB\uBB,nbsp:%,eol:¬
 
+" Never use select(replace) mode by mouse/keyboard. Always use visual.
+set selectmode=
+set keymodel=
+
 " No intro msg
 set shortmess+=Iat
 " set cmdheight=2   " No hit <CR> twice after :make (but lose one view line)
