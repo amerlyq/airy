@@ -1,0 +1,11 @@
+#!/bin/bash
+# vim: ft=sh
+source ~/.shell/func.d/packages || exit
+# http://ffmpeg.org/download.html#build-linux
+
+ppa_add 'ppa:mc3man/trusty-media'
+
+apt_noprompt ffmpeg
+
+# ffmpeg -i video.avi extracted_audio.mp3
+# mplayer -dumpaudio video.avi -dumpfile extracted_audio.mp3

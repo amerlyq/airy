@@ -1,0 +1,16 @@
+#!/usr/bin/perl -lp
+
+# By default, dictdconfig uses the basename of the file in
+# /usr/share/dictd as the name of the database.  This file is an
+# executable filter that substitutes a preferred name for a dictionary
+# in /var/lib/dictd/db.list.  This name is displayed by the dict -D
+# command and is used with the -d option of dict to request
+# definitions from a specific dictionary instead of the default of all
+# installed dictionaries.
+
+# The format of each line is:
+#          s/^<basename-of dictionary-file>/<preferred nickname>/;
+# Lines preceded by a hash character (#) are ignored.
+ 
+s/^freedict/fd/;
+s/^gazetteer/gaz/;

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+dblst=/var/lib/dictd/custom.list
+
+if [[ -f "$dblst" ]]
+then dir="$(dirname $(readlink -m "$dblst"))"
+else dir="${1?No dir with *.dict.dz specified}"
+fi
+
+dst="$dir/custom.list"
+> "$dst"
+
+## Generate database of all dictionaries in 'dir'
+find "$dir" -regex '.*\.dict\(\.dz\)?' | while read fl; do
+    nm="${fl%.dz}"; nm="${nm%.dict}";
+    if [[ -e "${nm}.index" ]]; then
+        echo "database \"${nm##*/}\" {
+  data  \"$fl\"
+  index \"${nm}.index\"
+}" >> "$dst"
+fi; done
+
+
+## Link database to configs
+link(){ [[ -e "$1" && (! -e $2 || -L $2) ]] && sudo ln -sfvT "$1" $2; }
+link "$dst" $dblst

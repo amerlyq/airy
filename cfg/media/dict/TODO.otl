@@ -1,14 +1,19 @@
 > DICT : in terminal
 
 TODO
-	[_] Add goldendict downloaded dicts to terminal server
+	2015-06-07 [X] Add goldendict downloaded dicts to terminal server
+	[_] Find colorized html viewer for dict ouput
+		:? what that file used for -- /etc/dictd/colorit.conf
+	[_] SEE relative packages
+		apt-cache showpkg dictd
 	[_] CFG /usr/share/doc/dictd/examples
 	> http://www.linuxfortranslators.org/dicts.html
 	[_] TRY using inetd to startup 'dictd' service only on purpose (to save resources)
 		http://www.freebsd.org/cgi/man.cgi?inetd(8)
 	[_] Consider using dict_lookup for X selections on i3wm shortcut
-	[_] use dictdconfig to configure?
-	[_] CFG Links to files in /etc/dictd
+	2015-06-07 [$] use dictdconfig to configure?  :> use own script
+	2015-06-07 [X] CFG Links to files in /etc/dictd
+
 
 
 SEE
@@ -24,19 +29,17 @@ SEE
 
 USAGE
 	Create dic
-		dictfmt—utf8—allchars -s "My Dictionary" -j mydict < mydict.txt
+		: http://www.math.tamu.edu/~comech/tools/dict-mueller.html
+		dictfmt-utf8-allchars -s "My Dictionary" -j mydict < mydict.txt
 		: will compile a Unicode-compatible DICT file called mydict, with
 		: heading My Dictionary, from mydict.txt which is in Jargon File format i.e.:
 		| :word1:definition 1
 		| :word2:definition 2
 	Convert dic
-		http://www.math.tamu.edu/~comech/tools/dict-mueller.html
-	Install dic
-		mv mydict.dict mydict.index /usr/share/dictd/
-		/usr/sbin/dictdconfig -—write
-		/etc/init.d/dictd restart
+		find . -name '*.ifo' | while read nm; do dictconv -o "${nm%.*}.index" "$nm"; done
+		find . -name '*.dict' -exec dictzip -v {} \;
 	If eats up too much memory
-		/sbin/service dictd stop
+		sudo service dictd stop
 
 	See what it's doing, format output for parsing, list dictionaries/databases
 		dict -vr -f -I/D
@@ -44,6 +47,9 @@ USAGE
 	Use a particular database eg. for English to Spanish translation:
 		dict -d fd-eng-spa "how are you?"
 		dict -d moby-thesaurus
+	View
+		dict -v никогда | elinks -default-mime-type text/html
+
 
 Clients
 	http://www.dict.org/w/servers/start
@@ -51,6 +57,8 @@ Clients
 
 
 SRC
+	xdxf list of dicts
+		http://dicto.org.ru/xdxf.html
 	list of dicts
 		2015-06-07 [X] https://servers.freedict.org/index.php
 		> http://www.dict.org/w/databases/start
