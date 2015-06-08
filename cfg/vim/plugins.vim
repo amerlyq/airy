@@ -353,8 +353,7 @@ NeoBundle 'rking/ag.vim', {
     \   'AgHelp', 'LAg', 'LAgAdd', 'LAgBuffer', 'LAgHelp'
     \ ], }, }
 " Multiple hl for searching by / ? or g/
-NeoBundle 'haya14busa/incsearch.vim'
-" NeoBundle 'haya14busa/incsearch.vim', 'incsearch-preload'
+NeoBundle 'haya14busa/incsearch.vim'  ", 'incsearch-preload'
 
 " Smart highlight (don't do lazy -- I use it almost always)
 NeoBundle 'haya14busa/vim-asterisk'
@@ -366,6 +365,7 @@ NeoBundle 'osyo-manga/vim-over', {
 
 " }}} ======================================
 
+NeoBundle 'amerlyq/vim-focus-autocmd'
 
 " ======================================
 " Add new virtual cursor for next occurance of word under cursor

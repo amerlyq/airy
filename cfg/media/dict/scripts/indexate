@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-
+# BUG: creates empty custom.list in ../ when empty args, but need to exit.
 dblst=/var/lib/dictd/custom.list
 
 if [[ -f "$dblst" ]]
 then dir="$(dirname $(readlink -m "$dblst"))"
-else dir="${1?No dir with *.dict.dz specified}"
+else dir="${1?}"
 fi
+[[ -z "$dir" ]] && { echo "No dir with *.dict.dz specified"; exit 1; }
 
 dst="$dir/custom.list"
 > "$dst"

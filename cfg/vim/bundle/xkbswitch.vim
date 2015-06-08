@@ -2,7 +2,7 @@
 let g:XkbSwitchEnabled = 1
 
 if has('win32') || has('win64')
-    let g:XkbSwitchLib = $VIMHOME . '/bundle/xkb-switch/libxkbswitch.dll'
+    let g:XkbSwitchLib = $CACHE . '/bundle/xkb-switch/libxkbswitch.dll'
 endif
 
 "" all commented to solve MPogoda's issues
@@ -10,11 +10,14 @@ endif
 let g:XkbSwitchIMappings = ['ru', 'ua']
 "let g:XkbSwitchIMappingsSkipFt = ['tex']
 
+"" TODO: disable if no custom layout detected
+let g:XkbCustom = ['1234567890-=!@#$%^&*()_+', '!".;%/:,-?_=1234567890_+']
+
 let g:XkbSwitchIMappingsTr = {
     \ 'ru':
-    \ {'<': 'qwertyuiop[]asdfghjkl;''zxcvbnm,.`/'.
+    \ {'<': 'qwertyuiop[]asdfghjkl;''zxcvbnm,.`/' . g:XkbCustom[0] .
     \       'QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?~@#$^&|',
-    \  '>': 'йцукенгшщзхъфывапролджэячсмитьбюё.'.
+    \  '>': 'йцукенгшщзхъфывапролджэячсмитьбюё.' . g:XkbCustom[1] .
     \       'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,Ё"№;:?/'},
     \ 'ua':
     \ {'<': 'qwertyuiop[]asdfghjkl;''zxcvbnm,.`/'.
@@ -22,7 +25,6 @@ let g:XkbSwitchIMappingsTr = {
     \  '>': 'йцукенгшщзхїфівапролджєячсмитьбю’.'.
     \       'ЙЦУКЕНГШЩЗХЇФІВАПРОЛДЖЄЯЧСМИТЬБЮ,''"№;:?/'},
     \ }
-
 
 let g:XkbSwitchNLayout = 'us'
 ""let g:XkbSwitchILayout = 'us'
