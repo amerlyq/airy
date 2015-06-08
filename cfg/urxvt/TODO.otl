@@ -2,13 +2,6 @@ SEE
 	man urxvtperl
 	man 7 urxvt -- for additional control commands (like font-size)
 	Terminal codes: Control Sequence Introducer,  Operating System Control, ...
-	REF:  -- all control sequences
-		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-		http://en.wikipedia.org/wiki/ANSI_escape_code#CSI_codes
-	Xterm special codes:
-		http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Mouse-Tracking
-	Vim codes
-		http://vimdoc.sourceforge.net/htmldoc/term.html#t_RV
 
 urxvt
 : http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
@@ -43,7 +36,7 @@ urxvt
 		| echo -en "\033]50;$font\007"  | font
 		| echo -ne "\033[?25l"          | Hide cursor
 		| echo -ne "\033[?25h"          | Show cursor
-	[_] Per-ssh-host color
+	[_] Per-ssh-host bkgr/theme color
 		colors=( 222222 111111 333333 444444 111111 333333)
 		printf "\e]49;#$resultingcolor\a"
 	[_] Make in urxvt ability to open file path in vim
@@ -82,44 +75,6 @@ urxvt
 	[_] font autoresize for small windows
 		:= This will allow me use bigger font in main window
 		https://github.com/zestrada/urxvt-fixed-cols
-
-
-FOCUS -- EVENTS
-	2015-06-07 [X] Focus not triggered -- FocusIn works not always?
-	:= Seems like FocusIn for next vim triggered before FocusOut for previous.
-	:  So next vim always copies previous content of "+ register, instead of new.
-	:> Resolved, adding delay to 'urxvt/ext/focus-term'
-		2015-06-07 [X] two vims on split screen -- copying works only in one direction
-		2015-06-07 [X] two vims on different workspaces -- works FocusOut->+, but not FoucIn for another
-
-	For example a common problem when we're working in the console is to copy text
-	on a remote console (ssh vim) and edit the content locally. By this approach
-	is feasible by defining a sequence OSC "clipboard" qu'URxvt recover to
-	transfer the contents into the CLIPBOARD selection of the local X11 server.
-	Something like:
-		echo -en "\033]777;CLIPBOARD;ON\077Ceci est mon texte à copier\033]777;CLIPBOARD;OFF\077"
-	Besides, the idea is already a little set up in a little-known plugin urxvt, clipboard-osc.
-
-	> http://karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
-	: <Change sources to implement>: VIM launch will enable notification of mouse
-	: events to the terminal (set mouse = ...). When it will stop, it will
-	: turn off this notification
-	> But how to do it less harmful?
-	: So even bash will not show those sequences and interpret them instead?
-	: Maybe, zsh has built-in ability for focus lost? And I will no need to use urxvt?
-	: Think about how to disable those commands (or make them not harmful) if plugin is absent
-
-
-	Tmux
-		Must additionally send it's own events when moving through windows/pans.
-
-	Vitality  <F24>/<F25>
-		https://github.com/sjl/vitality.vim/blob/master/plugin/vitality.vim
-		> find why mapping in cnoremap such a pain
-	2015-06-04 [X] Check if that codes are in spec now  :> Yes (xterm, iTerm2)
-	: FocusIn/FocusOut control sequences, which uses CSI O and CSI I
-		https://github.com/fish-shell/fish-shell/issues/1917
-	| Maybe, create new button in my xkbmap and use it somehow with escape sequences?
 
 
 SEIZE

@@ -1,26 +1,16 @@
 SMALL
-	[_] for commenter -- add prefix: '!' in Xresources and ':' in votl
+	2015-06-08 [X] for commenter -- add prefix: '!' in Xresources and ':' in votl
+	:CHECK: how to do this for tcomment
+	[_] Integrate xiki
+		http://xiki.org/
+		http://stackoverflow.com/questions/24465655/configure-vim-to-use-xiki
 
 
 > TERM-FOCUS
-+Urxvt
-	2015-06-04 [X] Autocopying on focus lost/gain
-		: http://artisan.karma-lab.net/creer-plugin-urxvt-sauvegarder-vim-automatiquement
-		WARNING when opening new urxvt ($mod+u) vim is not opened yet, so buffer
-				will not be copied in @"! You must keep yank shortcuts for such cases.
-	[_] Autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
+	2015-06-08 [X] Autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
 
-
-Features
 	[_] BUG: on <C-y> with specific reg content, may be error msgs produced.
 		: So, for FocusOut/In use function version w/o printing
-	[_] BUG: cursor don't change form in insert. Maybe regression after usleep in urxvt/focus-term?
-	[_] BUG: returning into vim drops visual selection -- so 'gv' after vnoremap is not enough?
-	[_] Check :wa! with dirty new buffer in vim w/o file to save
-		: to implement autosaving on FocusOut
-	[_] FIXME: erasing changes scenario
-		copied in clipboard, pressed $mSd+X, clipboard edited, change focus from vim
-			as result my edits will be replaced with current @" content
 
 
 > INTEGRATION

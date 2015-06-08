@@ -365,7 +365,10 @@ NeoBundle 'osyo-manga/vim-over', {
 
 " }}} ======================================
 
-NeoBundle 'amerlyq/vim-focus-autocmd'
+NeoBundle 'amerlyq/vim-focus-autocmd', {
+    \ 'disabled' : !has('unix'),
+    \ 'build': { 'linux': 'bash ./res/setup' }
+    \ }
 
 " ======================================
 " Add new virtual cursor for next occurance of word under cursor
