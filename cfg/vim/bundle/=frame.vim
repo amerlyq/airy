@@ -48,6 +48,6 @@ if neobundle#tap('vim-altr')  " vim-altr: {{{1
   nmap <unique> [f  <Plug>(altr-back)
   command! A  call altr#forward()
   " Additional rules
-  call altr#define('src/%.c', 'inc/%.h')
+  call altr#define('%/src/%.c', '%/inc/%.h')
   " ALT: map <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 endif
