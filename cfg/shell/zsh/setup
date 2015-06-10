@@ -10,15 +10,20 @@ esac
 
 PREZTO="${ZDOTDIR:-$HOME}/.zprezto"
 
-git clone --recursive https://github.com/sorin-ionescu/prezto.git "$PREZTO"
+if [[ ! -d "$PREZTO" ]]; then
+    git clone --recursive https://github.com/sorin-ionescu/prezto.git "$PREZTO"
+fi
 
 # Exec in /usr/bin/zsh only!
 # setopt EXTENDED_GLOB
 # for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do
 #   ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
 # done
+link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+for nm in zlogin zprofile zshenv zshrc zpreztorc
+do link "$PWD/$nm" ~/.${nm##*/}; done
 
-chsh -s /bin/zsh
+# chsh -s /bin/zsh
 
 if [[ "$update" -eq 1 ]]; then
     (cd "$PREZTO" && git pull && git submodule update --init --recursive)
