@@ -194,7 +194,7 @@ NeoBundleLazy 'tpope/vim-markdown', {
 
 " VCS Integration
 NeoBundle 'tpope/vim-git'
-NeoBundleLazy 'tpope/vim-fugitive', {'autoload': {
+NeoBundle 'tpope/vim-fugitive', {'autoload': {
     \ 'augroup' : 'fugitive',
     \ 'commands' : [ 'Git', 'Gstatus', 'Gdiff', 'Glog', 'Gbrowse' ] }}
 NeoBundleLazy 'gregsexton/gitv', { 'depends' : 'tpope/vim-fugitive',

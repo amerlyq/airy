@@ -21,7 +21,13 @@ let g:airline#extensions#tabline#tab_nr_type = 2
 " let g:airline#extensions#tabline#show_tab_type = 1
 " let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline#extensions#tabline#buffer_idx_mode = 1
-" nmap <leader>1 <Plug>AirlineSelectTab1
+
+
+" Direct pick buffer on <leader>\d
+for idx in range(1,9)
+    exec "nmap <unique> \\". idx  ." <Plug>AirlineSelectTab". idx
+endfor
+
 
 "" GIT signify + fugitive
 ""Maybe it will reduce CPU load, not showing which lines are chaged

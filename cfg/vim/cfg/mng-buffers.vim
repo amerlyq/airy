@@ -41,13 +41,20 @@ noremap  gL  :<C-U>blast<CR>
 " nnoremap <Leader>4 <C-W>c
 
 
+let s:leader = g:mapleader | let mapleader = "\\"  "{{{
+
 " Symmetrical binding to 'gt' for buffers  (12gb -- open buffer 12)
 nnoremap <unique> gb :<C-U><C-R>=v:count1<CR>b<CR>
-" Toggle to last edited buffer/file
-nnoremap <unique> \` :b#<CR>
 
-" Direct pick tab on <M-\d> or buffer on <leader>\d
-for idx in range(1,10)
-    exec "map <unique> <M-". string(idx % 10) ."> ". idx ."gt"
-    exec "map <unique>  \\". string(idx % 10) ."  ". idx ."gb"
-endfor
+" Toggle to last edited buffer/file
+nnoremap <unique> <leader>` :b#<CR>
+
+" if ! neobundle#tap('vim-airline')
+"   for idx in range(1,10)
+"     " Direct pick tab on <M-\d> or buffer on <leader>\d
+"     " REMOVED: exec "nnoremap <unique> <M-". string(idx % 10) ."> ". idx ."gt"
+"     exec "nmap <unique> <leader>". string(idx % 10) ."  ". idx ."gb"
+"   endfor
+" endif
+
+let mapleader = s:leader  " }}}

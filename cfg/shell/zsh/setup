@@ -1,0 +1,25 @@
+#!/bin/bash
+cd $(dirname $(readlink -m ${0})) || exit
+THEME=${CURR_THEME:-dark}
+
+case "$1" in
+ dark|light) THEME="$1" ;;
+--clean) echo "nothing" ;;
+-u|--update) update="$1" ;;
+esac
+
+PREZTO="${ZDOTDIR:-$HOME}/.zprezto"
+
+git clone --recursive https://github.com/sorin-ionescu/prezto.git "$PREZTO"
+
+# Exec in /usr/bin/zsh only!
+# setopt EXTENDED_GLOB
+# for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do
+#   ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
+# done
+
+chsh -s /bin/zsh
+
+if [[ "$update" -eq 1 ]]; then
+    (cd "$PREZTO" && git pull && git submodule update --init --recursive)
+fi

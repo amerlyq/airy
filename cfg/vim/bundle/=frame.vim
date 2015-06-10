@@ -1,6 +1,4 @@
-" Leader '\' {{{
-let s:leader = g:mapleader
-let mapleader = "\\"
+let s:leader = g:mapleader | let mapleader = "\\"  "{{{
 
 if neobundle#tap('DrawIt')
   map <unique> <Leader>DI <Plug>DrawItStart
@@ -19,8 +17,7 @@ if neobundle#tap('vim-rooter')
 endif
 
 
-let mapleader = s:leader
-" }}}
+let mapleader = s:leader  " }}}
 
 
 if neobundle#tap('NrrwRgn')  " NrrwRgn: {{{1

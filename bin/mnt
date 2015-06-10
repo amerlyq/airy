@@ -9,7 +9,7 @@
 # Disk mounting util
 if [[ -n "$1" && ${#1} -le 2 ]]; then ACTION="${1}"; shift; else ACTION=m; fi
 
-LBL="$1"
+LBL="${1}"
 MNT="/media/$CURR_USER"
 DIR="$MNT/$LBL"
 
@@ -28,10 +28,12 @@ rmdir "$DIR" 2>/dev/null ||
     sudo rmdir -v "$DIR" || die "Can't remove directry '$DIR'!"
 fi; }
 dirmk() { clean; mkdir -p "$DIR" 2>/dev/null ||
-    sudo mkdir -p "$DIR" || die "Error: Can't create directory for mount!"
+    sudo mkdir -p "$DIR" && sudo chown $CURR_USER:$CURR_USER "$DIR" || die "Error: Can't create directory for mount!"
 }
 
 
+# Need package 'jmtpfs', unmount by fusermount -u "$DIR"
+domtp() { dirmk && jmtpfs "$DIR"; }
 dosamba() { dirmk && sudo mount -t cifs -o user="${1?Need user}" //${2?Need share}/ "$DIR"; }
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
@@ -45,7 +47,7 @@ domnt() {
     if ! [ -e "$DEVPATH" ]; then die "No device at path"; fi
 
     # Flash drive:  http://linuxsam.livejournal.com/18176.html
-    declare $(blkid "$DEVPATH" | awk '{print $NF}')  # TYPE=...
+    declare $(sudo blkid "$DEVPATH" | awk '{print $NF}')  # TYPE=...
     if [ "$TYPE" == "vfat" ]; then
         MOPTS="rw,nosuid,nodev,noexec,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,\
 codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
@@ -57,6 +59,7 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
 
 case "$ACTION" in
  m) domnt ;;
+ p) domtp "phone" ;;
  o) doloop "$LBL" ;;
  s) case "$LBL" in
     android) dosamba $ADR_USER $ADR_IPL ;;
