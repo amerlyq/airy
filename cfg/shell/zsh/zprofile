@@ -1,12 +1,11 @@
 # vim: ft=zsh
 # Executes commands at login pre-zshrc.
 
-export EDITOR='nano'
-export VISUAL='nano'
+export EDITOR='vim'
+export VISUAL="$EDITOR"
 export PAGER='less'
-if [[ -z "$LANG" ]]; then
-  export LANG='en_US.UTF-8'
-fi
+[[ -z "$LANG" ]] && export LANG='en_US.UTF-8'
+[[ -z "$LC_NUMERIC" ]] && export LC_NUMERIC="$LANG"
 
 
 ### Paths ###

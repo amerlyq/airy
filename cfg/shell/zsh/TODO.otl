@@ -1,10 +1,33 @@
-zsh
-	[_] ENH: Text insertion w/o triggering ',d' or ',s'
-		See plugin for urxvt/vim-insert -- with autotoggle 'set paste'?
-	[_] ENH: in ~/.shenv reduce zsh startup time by pre-processing file
-		[_] remove all 'export' where them are not needed
-		[_] pre-evaluate all $(...) and insert values in appropriate places
-		: But how? Use somehow heredoc? sed -i?
+Profiling
+	SEE
+		http://stackoverflow.com/questions/4351244/can-i-profile-my-zshrc-zshenv
+		https://kev.inburke.com/kevin/profiling-zsh-startup-time/
+		http://stackoverflow.com/questions/8899890/zsh-script-and-prompt-profiling
+
+
+Prezto
+	SEE
+		http://jeromedalbert.com/migrate-from-oh-my-zsh-to-prezto/
+		2015-06-11 [X] http://linhmtran168.github.io/blog/2013/12/15/ditching-oh-my-zsh-for-prezto/
+		http://jr0cket.co.uk/2013/09/hey-prezto-zsh-for-command-line-heaven.html
+		http://joshsymonds.com/blog/2014/06/12/shell-awesomeness-with-prezto/
+		https://github.com/unixorn/awesome-zsh-plugins
+	TODO
+		2015-06-11 [X] Deploy Prezto into ~/.cache/zsh/, move history and cache files
+			:> Set ZDOTDIR=~/.cache/zsh as first line in ~/.zshrc
+		[_] merge my git aliases with prezto 'git' and general aliases with 'utility'
+		2015-06-11 [X] Check all prezto modules and choose needed
+		[_] Port my prompt theme and enhance it from 'sorin' theme and other.
+		[_] I need git ahead/behind markers
+			http://sebastiancelis.com/2009/11/16/zsh-prompt-git-users/
+		[_] make different prompt colors for 16 and 256 term
+
+Mods
+	TRY
+		https://github.com/tarruda/zsh-autosuggestions
+
+
+Configs
 	[_] Get configs for zsh from arch live-cd. Or use github grml:
 		https://grml.org/zsh/
 		https://www.archlinux.de/?page=PackageDetails;repo=extra;arch=i686;pkgname=grml-zsh-config
@@ -13,18 +36,19 @@ zsh
 		https://github.com/grml/grml-etc-core
 		http://www.bash2zsh.com/zsh_refcard/refcard.pdf
 
-	[_] ADD: feature to launch zsh in different plugins configurations:
+
+zsh
+	[_] ENH: Text insertion w/o triggering ',d' or ',s'
+		See plugin for urxvt/vim-insert -- with autotoggle 'set paste'?
+		:= Use mapping to use wrapper for replace/insert in cmdline:
+		:	> BUFFER="${BUFFER:0:POS}$(xsel -ob)${BUFFER:POS}"
+		:	like my _past_current widget! Also remap C-S-v in zsh?
+	[_] ENH: in ~/.shenv reduce zsh startup time by pre-processing file
+		[_] remove all 'export' where them are not needed
+		[_] pre-evaluate all $(...) and insert values in appropriate places
+		: But how? Use somehow heredoc? sed -i?
+	[_] ADD: feature to launch zsh in different optional plugins configurations:
 		+adb support, +etc, ...
-	2015-05-28 [X] Add to history on <C-c>
-		http://superuser.com/questions/561725/put-a-command-in-history-without-executing-it
-	[_] Move to Prezto
-		http://jeromedalbert.com/migrate-from-oh-my-zsh-to-prezto/
-		http://linhmtran168.github.io/blog/2013/12/15/ditching-oh-my-zsh-for-prezto/
-		http://jr0cket.co.uk/2013/09/hey-prezto-zsh-for-command-line-heaven.html
-		http://joshsymonds.com/blog/2014/06/12/shell-awesomeness-with-prezto/
-		https://github.com/unixorn/awesome-zsh-plugins
-	2015-05-28 [X] Completion paths only widget on different key like <S-Tab>
-		http://unix.stackexchange.com/questions/85836/zsh-expand-or-complete-for-all-files-regardless-of-command-context
 	[_] Setup emacs navigation in both configs directly to remember keys with alt (duplicate)
 		[_] All free alt-keys use for urxvt navigation
 	[_] on ',s' do [print -s "$BUFFER" to history] instead of copying in reg
@@ -32,45 +56,57 @@ zsh
 	[_] fasd for zsh
 		https://github.com/horosgrisa/fasd
 		~/.oh-my-zsh/plugins/fasd/fasd.plugin.zsh
-	2015-03-15 [X] save last command output on <C-o>
-	Seize
-		http://reasoniamhere.com/2014/01/11/outrageously-useful-tips-to-master-your-z-shell/
-		http://chneukirchen.org/blog/archive/2008/02/10-zsh-tricks-you-may-not-know.html
-		http://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
-		http://linuxaria.com/howto/globbing-con-zsh
-		http://dustri.org/b/my-zsh-configuration.html
 	[_] Check zsh profiling (debug starting and accept-line timing)
 	[_] append sudo and execute command instead of simply appending it
-	[$] BUG: xsel -ob don't work in widget --> update to ArchLinux
 	[_] BUG: <C-y> by ssh: xsel: Can't open display: (null) Inappropriate ioctl for device
 	[_] pre-execute command before starting interactive shell
 		http://www.zsh.org/mla/users/2005/msg00599.html
-	2015-03-25 [X] BUG: fix agi to search case insensitive text
-		: flags -S -i have no effect on it -> must be last of arguments!
-	2015-03-25 [X] Ag search only files in current directory: agd (uses find)
 	[_] ag in Sack
 		https://github.com/sampson-chen/sack
-	2015-03-27 [X] vim: ag search inside file -- check if it will work with --vimgrep on Ag from src
-		: need newest version of ag, for --vimgrep to work (and you could search inside file)
-
-
-zsh
+	[_] FIX scp/adb expanding of '*' for files
+		http://stackoverflow.com/questions/4763885/how-to-use-wildcards-to-auto-complete-on-remote-server-in-zsh
 	[_] Do more robust in vim
 		$r!ag ./%
 	Investigate creation of autocompletion
 		http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System-Configuration
-	https://github.com/robbyrussell/oh-my-zsh/wiki/Customization
 	[_] Port cycle-second end prompt ability
 	http://dougblack.io/words/zsh-vi-mode.html
 	https://github.com/hchbaw/opp.zsh
-	http://sourceforge.net/p/zsh/code/ci/master/tree/Completion/Unix/Command/_tmux
-	[_] 0% Intergrate
-		[_] http://chneukirchen.org/blog/archive/2013/03/10-fresh-zsh-tricks-you-may-not-know.html
-		[_] https://github.com/zsh-users/zsh-syntax-highlighting
 	[_] Добавить красную точку в верхней части промпта в случае если мы находимся
 	    в той же директории, что и сохранённая в /tmp/zsh_chosedir
-	[_] Aim: add quotes to nearest word by shortcut. (vim: by ", emc: by C-@)
+	[_] Aim: add quotes to nearest word by shortcut. (vim : by ", emc: by C-@)
 		Read zsh scripts in seize, find 'quote' realization
+	REF
+		http://zsh.sourceforge.net/Doc/Release/Zsh-Modules.html#The-zsh_002fzutil-Module
+		Commands to bind
+			http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Standard-Widgets
+		http://sourceforge.net/p/zsh/code/ci/master/tree/Completion/Unix/Command/_tmux
+		https://github.com/robbyrussell/oh-my-zsh/wiki/Customization
+		http://www.fastlinux.eu/about/
+
+SEIZE
+	> https://wiki.archlinux.org/index.php/Zsh
+	[_] http://chneukirchen.org/blog/archive/2013/03/10-fresh-zsh-tricks-you-may-not-know.html
+	[_] http://chneukirchen.org/blog/archive/2008/02/10-zsh-tricks-you-may-not-know.html
+	2015-06-11 [X] https://github.com/zsh-users/zsh-syntax-highlighting  :> use Prezto
+	[_] http://reasoniamhere.com/2014/01/11/outrageously-useful-tips-to-master-your-z-shell/
+	[_] http://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
+	[_] http://linuxaria.com/howto/globbing-con-zsh
+	[_] http://dustri.org/b/my-zsh-configuration.html
+
+
+DONE
+	2015-06-11 [$] BUG: xsel -ob don't work in widget --> update to ArchLinux
 	2015-06-05 [X] ZSH title:print:7: write error: interrupt :> fixed in 5.0.4, need update
 	2015-06-05 [X] ZSH source in terminal on <F12>, then $ gaa<tab><tab> will cause
 		 Vim output ... as was when I used zshenv
+	2015-05-28 [X] Add to history on <C-c>
+		http://superuser.com/questions/561725/put-a-command-in-history-without-executing-it
+	2015-05-28 [X] Completion paths only widget on different key like <S-Tab>
+		http://unix.stackexchange.com/questions/85836/zsh-expand-or-complete-for-all-files-regardless-of-command-context
+	2015-03-15 [X] save last command output on <C-o>
+	2015-03-25 [X] BUG: fix agi to search case insensitive text
+		: flags -S -i have no effect on it -> must be last of arguments!
+	2015-03-25 [X] Ag search only files in current directory: agd (uses find)
+	2015-03-27 [X] vim : ag search inside file -- check if it will work with --vimgrep on Ag from src
+		: need newest version of ag, for --vimgrep to work (and you could search inside file)

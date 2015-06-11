@@ -1,8 +1,4 @@
 # vim:ft=zsh ts=2 sw=2 sts=2
-# I need git ahead/behind markers
-# http://sebastiancelis.com/2009/11/16/zsh-prompt-git-users/
-# make different colors for 16 and 256 term
-# https://github.com/sorin-ionescu/prezto
 
 functions rbenv_prompt_info >& /dev/null || rbenv_prompt_info(){}
 
@@ -108,8 +104,8 @@ setprompt () {
         PR_REND="╼"
         PR_ULCORNER="┌"
         PR_LLCORNER="└"
-        PR_LRCORNER="┘"
         PR_URCORNER="┐"
+        PR_LRCORNER="┘"
     else
         typeset -A altchar
         set -A altchar ${(s..)terminfo[acsc]}

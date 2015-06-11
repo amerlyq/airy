@@ -98,6 +98,13 @@ vim:
 		https://github.com/junegunn/vim-easy-align
 		https://github.com/tommcdo/vim-lion
 	[_] Add v:count to <Space> operator -- amount of chars before exit.
+	[_] CHG <Space> to operator mode:
+		' A' -- inserts space at line end, then goes to insert regime
+		' r' -- inserts space, then replace
+		'  ' -- put space
+		: v:count treated as amount of spaces inserted
+		:= But then I will need some other operator for single-char inserts --
+		: to work with other characters beside spaces.
 	[_] ALT to vim-surround -- use on 'q' as operator
 		: It can replace my ,<Space> shortcut for surrounding by spaces
 		: Possibly it can surround visual blocks?

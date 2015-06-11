@@ -1,40 +1,28 @@
 # vim: ft=zsh
 
-# See
-# Commands to bind
-# http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Standard-Widgets
-
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-##### Vars #####
-
-# export GPG_TTY=$(tty)
-
-ZSH_THEME="airy"
+### Vars ###
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
-WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+### Opts ###
+## Disable suspending on <C-s>, <C-q>
+setopt noflowcontrol && stty stop '' -ixoff -ixon
+## Lets files beginning with a . be matched without explicitly specifying the dot
+setopt globdots
 
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Add wisely, as too many plugins slow down shell startup.
-# plugins=(adb autojump completion git grep history-substring-search)
 
-# Main configuration
-# source ~/.shell/zsh/options.zsh
-# source ~/.shell/zsh/completion.zsh
-# source "$ZSH/oh-my-zsh.sh"
-
-# User configuration
+### User Cfg ###
 if [[ -f ~/.shenv ]]; then source ~/.shenv; fi
 source ~/.shell/zsh/amer-widgets.zsh
 source ~/.shell/zsh/amer-key-mix.zsh
 source ~/.shell/zsh/filetypes.zsh
-DEFAULT_USER="$CURR_USER"
+# source ~/.shell/zsh/completion.zsh  # UNUSED
+
 
 # ~/.zshenv -- always sourced by zsh (before ~/.zshrc).
 # WARNING: Available even in scripts! With #!/zsh
@@ -44,8 +32,9 @@ DEFAULT_USER="$CURR_USER"
 # So it can't be used to source aliases to be available in ranger.
 # For bash use analogue BASH_ENV=$HOME/.zshenv before launching
 if [[ -f ~/.shell/aliases ]]; then source ~/.shell/aliases ; fi
-# export SHELL=$(which zsh)
 
-# To sync zsh and ranger working directories
-function finish { echo "$PWD" > '/tmp/aura/ranger_cwdir'; }
+
+## Trap to sync zsh and ranger working directories.
+# NOTE: '>!' is because of 'unsetopt CLOBBER' by 'prezto:directory'
+function finish { printf "%s" "$PWD" >! '/tmp/aura/ranger_cwdir'; }
 trap finish EXIT

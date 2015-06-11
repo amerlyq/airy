@@ -22,9 +22,9 @@ if neobundle#tap('vim-sneak')  "{{{1
 "   is invoked and streak-mode will _not_ be invoked.
 
 " Options: {{{2
-  let g:sneak#streak = 1
-  let g:sneak#use_ic_scs = 0
-  let g:sneak#textobject_z = 0
+  let g:sneak#streak = 1        " With multiple suggestions use labels to jump
+  let g:sneak#use_ic_scs = 1    " Respect 'ignorecase' and 'smartcase'
+  let g:sneak#textobject_z = 0  " No default z-operator (I use q-operator)
 
   " nmap <unique> <Space> <Plug>(SneakStreak)
 
