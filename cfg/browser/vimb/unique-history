@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+cat ~/.config/vimb/history | grep 'github\.com' | awk '{
+    match($1, /^https?:\/\/[^\/]+\/([^\/]+\/[^\/]+).*/, v)
+    a[v[1]]=$1
+} END {
+    for (i in a) { print a[i] }
+}'
+
