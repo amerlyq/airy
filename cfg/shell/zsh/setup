@@ -11,7 +11,7 @@ esac
 
 # Main destination for Zsh
 ZDOTDIR=~/.cache/zsh
-mkdir -p "$ZDOTDIR"
+mkdir -vp "$ZDOTDIR"
 
 if [[ ! -d "$ZDOTDIR/.zprezto/" ]]; then
     git clone --recursive https://github.com/sorin-ionescu/prezto.git "$ZDOTDIR/.zprezto/"
