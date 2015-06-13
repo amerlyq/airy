@@ -5,7 +5,7 @@ let g:rainbow_active = 1
 
 let g:rainbow_conf = {
   \ 'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
-  \ 'ctermfgs': ['gray', 'lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+  \ 'ctermfgs': ['gray', 'lightcyan', 'lightyellow', 'lightblue', 'lightmagenta'],
   \ 'operators': '_,_',
   \ 'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
   \ 'separately': {
@@ -20,7 +20,7 @@ let g:rainbow_conf = {
   \   'lisp': { 'guifgs': [
   \     'royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'
   \   ] },
-  \   'sh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] },
+  \    'sh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] },
   \   'tex': { 'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'] },
   \   'vim': { 'parentheses': [
   \     'start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold',
@@ -29,5 +29,6 @@ let g:rainbow_conf = {
   \     'start=/{/ end=/}/ fold containedin=vimFuncBody'
   \   ] },
   \   'votl': 0,
+  \   'zsh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] },
   \ }
   \}

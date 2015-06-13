@@ -23,6 +23,33 @@ Prezto
 		[_] make different prompt colors for 16 and 256 term
 		[_] FIX inside ranger 'less' arguments or find workaround
 			:= as it prints content instead viewing, being launched from ranger
+		[_] FIX reduce startup time -- it's too much for zsh+ranger
+			:= do all preparations async like for git?
+			:/ or make async ipc from ranger to zsh -- which is even better
+
+Prompt
+	2015-06-13 [X] Shortening path depending on terminal width
+	2015-06-13 [X] branch name must be also included in width when shortening path
+		:NO-FIX: on first launch branch lenght is not included, as git_info
+		:empty and not completed async procesing yet.
+	2015-06-14 [X] BUG: undefined identificator with 1/4 screen width term
+
+	Markers
+		Root user
+	Env variables -- ssh, vim, ranger
+		: vim/ranger -- are not so important, so markers at right enough
+	Git status -- icons, branch
+		icons below on left
+		: always on eyes
+		above after path and branch name
+		: prompt has same width
+		SEE usage icons in left prompt instead right may be slower and not async?
+	Key mode -- vim/emacs
+		above on left before path -- small 'v' for vim mode instead '-'
+		different color for corners
+		same place as 'Replace' symbol
+
+
 Mods
 	TRY
 		https://github.com/tarruda/zsh-autosuggestions

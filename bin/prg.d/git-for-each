@@ -5,11 +5,30 @@ CMD="$@"
 
 source ~/.shell/zsh/zshrc
 
-gita_st() { # $1 -- rep path
+gita_omz() {
+    ## For Oh-My-Zsh
     ST="$PR_SET_CHARSET$AM_GIT`git_prompt_info`$PR_NO_COLOUR `git_prompt_status`$PR_NO_COLOUR"
-    st=$(echo "$ST" | sed 's/[%{}]//g')
+    echo $(echo "$ST" | sed 's/[%{}]//g')
+}
+
+gita_prezto() {
+    _prompt_amer_precmd_async_data="${TMPPREFIX}-prompt_amer_data"
+    if (( $+functions[git-info] )); then
+        git-info
+        typeset -p git_info >! "$_prompt_amer_precmd_async_data"
+    fi
+    if [[ -s "$_prompt_amer_precmd_async_data" ]]; then
+        alias typeset='typeset -g'
+        source "$_prompt_amer_precmd_async_data"
+        unalias typeset
+    fi
+    echo "${(%e)git_info[details]} ${(%e)git_info[icons]}"
+}
+
+gita_st() { # $1 -- rep path
+    st="$(gita_prezto)"
     dt=$(git log -1 --pretty=format:'%ci' | awk '{ print $2,$1 }')
-    printf "%-20s\t %-16s %-18s\n" "$st" "$1" "$dt"
+    printf "%-20s\t %-17s %-18s\n" "$st" "$1" "$dt"
     # echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 

@@ -47,8 +47,10 @@ alias utbz2='tar xvfj'
 
 alias p='ps -A f -o user,pid,pgrp,priority,ni,pcpu,pmem,args'
 
-en2ru() { echo "$@" | translate-bin -s google -f en -t ru; }
-ru2en() { echo "$@" | translate-bin -s google -f ru -t en; }
+uni_dict(){ dict $@ | less; }
+alias _='uni_dict '
+# en2ru() { echo "$@" | translate-bin -s google -f en -t ru; }
+# ru2en() { echo "$@" | translate-bin -s google -f ru -t en; }
 
 
 #ALT: scp file1 file2 ... fileN user@host:~/Downloads/
