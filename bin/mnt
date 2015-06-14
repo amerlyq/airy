@@ -10,7 +10,7 @@
 if [[ -n "$1" && ${#1} -le 2 ]]; then ACTION="${1}"; shift; else ACTION="m"; fi
 
 LBL="${1}"
-MNT="/media/$CURR_USER"
+MNT="/media/${CURR_USER:-`whoami`}"
 DIR="$MNT/$LBL"
 
 if [[ -z "$LBL" ]]; then
@@ -34,7 +34,10 @@ dirmk() { clean; mkdir -p "$DIR" 2>/dev/null ||
 
 # Need package 'jmtpfs', unmount by fusermount -u "$DIR"
 domtp() { dirmk && jmtpfs "$DIR"; }
-dosamba() { dirmk && sudo mount -t cifs -o user="${1?Need user}" "//${2?Need share}/" "$DIR"; }
+dosamba() {
+    dirmk && sudo mount -t cifs -o user="${1?Need user}" "//${2?Need share}/" "$DIR" \
+        && sudo chmod "$CURR_USER:$CURR_USER" "$DIR" && echo "$DIR" || exit
+}
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
     if ! [ -e "$DEVPATH" ]; then die "Error: no such file '$DEVPATH'"; fi
@@ -55,7 +58,8 @@ domnt() {
 codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
     fi
     # -t "$TYPE"
-    dirmk && sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} && echo "$DIR" || exit
+    dirmk && sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} \
+        && sudo chmod "$CURR_USER:$CURR_USER" "$DIR" && echo "$DIR" || exit
 }
 
 
@@ -73,6 +77,7 @@ ${WORK_MAIL%@*}) dosamba ${WORK_MAIL%@*} $SURC_SRV/${WORK_MAIL%@*} ;;
     esac ;;
  u) sudo umount -v "$DIR"; clean || exit ;;
 #U) sudo umount -v -R "$MNT"/* && sudo rmdir -v "$MNT"/* ;;  # ERROR: No -R key
+ i) sudo blkid ;;  # Get table disk/label/filesystems
  *) echo "Error: '$ACTION'" ;;
 esac
 

@@ -11,7 +11,6 @@ Prezto
 		2015-06-11 [X] http://linhmtran168.github.io/blog/2013/12/15/ditching-oh-my-zsh-for-prezto/
 		http://jr0cket.co.uk/2013/09/hey-prezto-zsh-for-command-line-heaven.html
 		http://joshsymonds.com/blog/2014/06/12/shell-awesomeness-with-prezto/
-		https://github.com/unixorn/awesome-zsh-plugins
 	TODO
 		2015-06-11 [X] Deploy Prezto into ~/.cache/zsh/, move history and cache files
 			:> Set ZDOTDIR=~/.cache/zsh as first line in ~/.zshrc
@@ -33,7 +32,11 @@ Prompt
 		:NO-FIX: on first launch branch lenght is not included, as git_info
 		:empty and not completed async procesing yet.
 	2015-06-14 [X] BUG: undefined identificator with 1/4 screen width term
-	[_] ADD: dynamic main color for prompt
+	2015-06-14 [X] ADD: dynamic main color for prompt
+	[_] BUG: can't use variables as <editor:info:keymap:primary> for dynamic shape
+		: this can be resolved by setting that option explicitly for root!
+	[_] BUG: preview don't work (prompt -p -- can't list my theme)
+	[_] TODO: option to enable VCS for other systems: bzr, hg, svn (vcs_info)
 
 	Markers
 		[_] Root user
@@ -41,11 +44,21 @@ Prompt
 			: vim/ranger -- are not so important, so markers at right enough
 			order of combination vim-ranger -- derive from env vars
 	Git status -- icons, branch
-		icons below on left
-		: always on eyes
-		above after path and branch name
-		: prompt has same width
-		SEE usage icons in left prompt instead right may be slower and not async?
+		2015-06-13 [X] icons below on left :> always on eyes
+		2015-06-13 [$] above after path and branch name :> too far
+		2015-06-15 [X] SEE usage icons in left prompt instead right may be slower and not async?
+			:> All work async untill `trap + &!` is last section of function.
+
+		INFO
+		: # check if there is an upstream configured for this branch
+		: command git rev-parse --abbrev-ref @'{u}' &>/dev/null || return
+		: (( $(command git rev-list --right-only --count HEAD...@'{u}' 2>/dev/null) > 0 )) && arrows='⇣'
+		: (( $(command git rev-list --left-only --count HEAD...@'{u}' 2>/dev/null) > 0 )) && arrows+='⇡'
+		: # get the current git working tree, empty if not inside a git directory
+		: local working_tree="$(command git rev-parse --show-toplevel 2>/dev/null)"
+		: # set GIT_TERMINAL_PROMPT=0 to disable auth prompting for git fetch (git 2.3+)
+		: GIT_TERMINAL_PROMPT=0 command git -c gc.auto=0 fetch
+
 	Key mode -- vim/emacs
 		above on left before path -- small 'v' for vim mode instead '-'
 		different color for corners
@@ -116,7 +129,8 @@ zsh
 		http://www.fastlinux.eu/about/
 
 SEIZE
-	> https://wiki.archlinux.org/index.php/Zsh
+>>>	[_] https://github.com/unixorn/awesome-zsh-plugins
+>	[_] https://wiki.archlinux.org/index.php/Zsh
 	[_] http://chneukirchen.org/blog/archive/2013/03/10-fresh-zsh-tricks-you-may-not-know.html
 	[_] http://chneukirchen.org/blog/archive/2008/02/10-zsh-tricks-you-may-not-know.html
 	2015-06-11 [X] https://github.com/zsh-users/zsh-syntax-highlighting  :> use Prezto

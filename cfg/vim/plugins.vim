@@ -248,6 +248,8 @@ NeoBundle 'bkad/CamelCaseMotion'
 NeoBundle 'matchit.zip'
 
 " Alt: 'bb:abudden/taghighlight' "(small and fast) from bitbucket
+" NOTE: easytags can make CursorMove very slow
+"   https://github.com/xolox/vim-easytags/issues/68#issuecomment-28480981
 "NeoBundle 'xolox/vim-easytags', { 'depends' : [ 'xolox/vim-misc' ] }
 "NeoBundle 'xolox/vim-misc'
 

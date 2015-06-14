@@ -1,10 +1,32 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
-# Two-line theme for easy separating commands output
-# Seized: agnoster, cloud, damoekri, giddie, minimal, nicoulaj,
+
+# Features:
+#   - two-line theme to separate cmds output easily
+#   - pwd full/shrank/name-only depending on term width
+#     (I like to see full pathes, having many similarly named directories)
+#   - git icons placed close to input for
+#       (clean state is needless -- you will see branch/hash)
+#   - line color as environment indicator
+#   - line shape as root indicator
+#   - indicators for vim/emacs editing mods
+#   - non-intrusive time stamp for logging cmd execution
+#   - non-intrusive ssh user@host
+#   - indicators for launching from vim/ranger
+#   - last code exit code
+# Integrated:
+#   - async preparing of git_info by sorin
+#       (fast prompt displaying in git projects, even on cold systems)
+#   - msg "elapsed time" for long running cmds by paradox
+#       (consumes very little resources, useful for building projects, or statistics for interactive programs)
+# Seized: agnoster, cloud, damoekri, giddie, minimal, nicoulaj, paradox,
+#   peepcode, powerline (moved into script), pure, skwp, smiley, steeef
+# Screenshot:
+#   TODO: http://i.imgur.com/
 
 # Load dependencies.
 pmodload 'helper'
+
 
 function prompt_amer_pwd {
   local ppwd="${PWD/#$HOME/~}"
@@ -12,7 +34,7 @@ function prompt_amer_pwd {
   local wth=$(($COLUMNS - 6))
   [[ -n "$branch" ]] && (( wth -= ${#branch} + 2 ))
 
-  if [[ "$ppwd" == (#m)[/~] ]]; then
+  if [[ "$ppwd" == (#m)[/~] ]]; then  ## Keep first char '/' or '~' in path
     _prompt_amer_pwd="$MATCH"
     unset MATCH
   else
@@ -39,12 +61,40 @@ function prompt_amer_git_info {
   zle && zle reset-prompt
 }
 
+function prompt_amer_format_time {
+  local dt=$1 total="" color=3
+  local seconds=$(( dt % 60 ))
+  local minutes=$(( (dt /= 60) % 60 ))
+  local hours=$(( (dt /= 60) % 24 ))
+  local days=$(( dt / 24 ))
+  (( $days > 0 )) && total+="${days}d" && color=9
+  (( $hours > 0 )) && total+="${hours}h" && color=13
+  (( $minutes > 0 )) && total+="${minutes}m" && color=1
+  print -P "%F{$color}${total}${seconds}s"
+}
+
+# ============================================ #
+
+function prompt_amer_preexec {
+  _prompt_amer_start_time="$SECONDS"
+}
+
 function prompt_amer_precmd_async {
   # Get Git repository information.
   if (( $+functions[git-info] )); then
     git-info
     typeset -p git_info >! "$_prompt_amer_precmd_async_data"
   fi
+
+  # # Get Python environment information.
+  # if (( $+functions[python-info] )); then
+  #   python-info
+  # fi
+
+  # # Get Ruby version information.
+  # if (( $+functions[ruby-info] )); then
+  #   ruby-info
+  # fi
 
   # Signal completion to parent process.
   kill -USR1 $$
@@ -60,62 +110,31 @@ function prompt_amer_precmd {
   # Define prompts. Actual for git? Why it was here and not in _setup?
   # RPROMPT[1,0]='${editor_info[overwrite]} %(?:: %F{1}%?↵ %f)'  # Prepend
 
+  # Calculate and print the elapsed time.
+  local dt=$(( SECONDS - _prompt_amer_start_time ))
+  if (( dt > 10 )); then
+    local hdt="$(prompt_amer_format_time ${dt})"
+    print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
+  fi
+
   # Kill the old process of slow commands if it is still running.
   if (( _prompt_amer_precmd_async_pid > 0 )); then
     kill -TERM "$_prompt_amer_precmd_async_pid" &>/dev/null
   fi
 
   # Compute slow commands in the background.
+  # NOTE: Must be the last commands of function for prompt refresh to work.
   trap prompt_amer_git_info USR1
   prompt_amer_precmd_async &!
   _prompt_amer_precmd_async_pid=$!
 }
 
-function prompt_amer_help {
-  cat <<EOT
-This prompt's main color is customizable:
+# ============================================ #
 
-  prompt amer [<colorN>]  # N=[0..255], def: 1
-EOT
-}
-
-function prompt_amer_preview {
-  if (( $# > 0 ))
-  then prompt_preview_theme 'amer' "$@"
-  else #for i in 1 2 4; do prompt_preview_theme 'amer' $i; print; done
-    prompt_preview_theme 'amer'
-    print
-    prompt_preview_theme 'amer' 2
-  fi
-}
-
-function prompt_amer_setup {
-  setopt LOCAL_OPTIONS
-  unsetopt XTRACE KSH_ARRAYS
-  prompt_opts=(cr percent subst)
-  _prompt_amer_precmd_async_pid=0
-  _prompt_amer_precmd_async_data="${TMPPREFIX}-prompt_amer_data"
-
-  ## Change main color according to environment variables
-  prompt_color="${1:-1}"
-
-
-  # Load required functions.
-  autoload -Uz add-zsh-hook
-
-  # Add hook for calling git-info before each command.
-  add-zsh-hook precmd prompt_amer_precmd
-
-  # Set editor-info parameters.
-  zstyle ':prezto:module:editor:info:completing' format '%B%F{1}…%f%b'
-  zstyle ':prezto:module:editor:info:keymap:primary' format '╼'
-  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{3}♺%f'
-  zstyle ':prezto:module:editor:info:keymap:alternate' format '╢'
-
+function prompt_amer_setup_git {
   # http://www.fileformat.info/info/unicode/category/So/list.htm
-  # : ✚ ⬆ ⬇ ✖ ✱ ➜ ✭ ═ ◼ ❮ ❯ ⏎ ♺ »
-  # ✔ ✓ ○ ◯ ϟ ✗ ➤ ø ♯ ✴ ▲ ▼ ↵ ☯ ↻
-  # ╔═╚╼ ┌─┘└╼╾┐   ╣╢┾
+  # : ✚ ⬆ ⬇ ✖ ✱ ➜ ✭ ═ ◼ ❮ ❯ ⏎ ♺ » ⁝  ➙ ± ✯
+  # ✔ ✓ ○ ◯ ϟ ✗ ➤ ø ♯ ✴ ▲ ▼ ↵ ☯ ↻ ✘ ⚡ ⚙ ⇣ ⇡
 
   ## Set git-info parameters.
   zstyle ':prezto:module:git:info' verbose 'yes'
@@ -136,19 +155,23 @@ function prompt_amer_setup {
   # Coalesce: -- find first non-empty value
   zstyle ':prezto:module:git:info:keys' format \
     'details' '$(coalesce "%b" "%p" "%c")' 'icons' '%s%A%B%S%a%d%m%r%U%u'
+}
 
-
+function prompt_amer_setup_prompts {
   # First line:
-  PROMPT='%F{$prompt_color}┌──%B%F{8}[%F{220}${_prompt_amer_pwd}%F{8}]%b'
+  PROMPT='%F{$prompt_color}'"${prompt_parts[1,2]}${prompt_parts[2]}"
+  PROMPT+='%B%F{8}[%F{220}${_prompt_amer_pwd}%F{8}]%b'
   PROMPT+='${git_info:+${(e)git_info[details]}}${prompt_newline}'
   # Next line:
-  PROMPT+='%F{$prompt_color}└${git_info:+${(e)git_info[icons]}}'
+  PROMPT+='%F{$prompt_color}'"${prompt_parts[3]}"
+  PROMPT+='${git_info:+${(e)git_info[icons]}}'
   PROMPT+='%(!. %B%F{1}#%f%b.)%F{$prompt_color}${editor_info[keymap]}%f '
 
   # Right prompt
   RPROMPT='${editor_info[overwrite]} %(?::%F{1}%?↵ %f)'
   RPROMPT+='${RANGER_LEVEL:+"%B%F{10}R%f%b"}'
-  RPROMPT+='${VIM:+"%B%F{10}V%f%b"}%F{1}─%f'
+  RPROMPT+='${VIM:+"%B%F{10}V%f%b"}'
+  RPROMPT+='%F{$prompt_color}'"${prompt_parts[2]}"'%f'
   RPROMPT+='${SSH_TTY:+"%B%F{8}(%F{6}%n%f%F{8}@%f%F{2}%m%F{8})%f%b"}'
   RPROMPT+='%B%F{8}(%F{3}%*%F{8})%f%b'
 
@@ -157,6 +180,65 @@ function prompt_amer_setup {
 
   # Suggestion prompt
   SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
+}
+
+function prompt_amer_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+  _prompt_amer_precmd_async_pid=0
+  _prompt_amer_precmd_async_data="${TMPPREFIX}-prompt_amer_data"
+  _prompt_amer_start_time=$SECONDS
+
+  ## Change main color according to environment variables
+  prompt_color="${1:-1}"
+  [[ $UID -eq 0 ]] && prompt_parts="╔═╚╣╼" || prompt_parts="┌─└╢╼"
+  # if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then ... else ... fi
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook preexec prompt_amer_preexec
+  add-zsh-hook precmd prompt_amer_precmd
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{1}…%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format "${prompt_parts[5]}"
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{3}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format "${prompt_parts[4]}"
+
+  # # Set python-info parameters.
+  # zstyle ':prezto:module:python:info:virtualenv' format '%F{yellow}[%v]%f '
+  # # Set ruby-info parameters.
+  # zstyle ':prezto:module:ruby:info:version' format '%F{yellow}[%v]%f '
+
+  prompt_amer_setup_git
+  prompt_amer_setup_prompts
+}
+
+# ============================================ #
+
+function prompt_amer_help {
+  cat <<EOT
+This prompt's main color is customizable:
+
+  prompt amer [<colorN>]  # N=[0..255], def: 1
+EOT
+}
+
+function prompt_amer_preview {
+  # local +h PROMPT='%# '
+  # local +h RPROMPT=''
+  # local +h SPROMPT=''
+
+  if (( $# > 0 )); then
+    prompt_preview_theme 'amer' "$@"
+  else #for i in 1 2 4; do prompt_preview_theme 'amer' $i; print; done
+    prompt_preview_theme 'amer'
+    print
+    prompt_preview_theme 'amer' 2
+  fi
 }
 
 prompt_amer_setup "$@"

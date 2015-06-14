@@ -84,6 +84,7 @@ chown -R $user:$user ~/user && chmod -R 700 ~/user
 EOTUSER
 fi && echo ":: '$user' <su in chroot> ended"
 
+# Unused?
 if hopt r; then
     rep=/var/cache/pacman/pkg
     arch-chroot /mnt /bin/bash -c "repo-add $rep/custom.db.tar.gz $rep/*.pkg.tar.xz"

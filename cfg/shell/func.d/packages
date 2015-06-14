@@ -66,10 +66,10 @@ rep_autobuild() {
         mkdir -p "$BUILD_DIR"
         cmake -E chdir "$BUILD_DIR" cmake "" "$PR_DIR"
         cd "$BUILD_DIR"
-        sudo checkinstall
+        sudo checkinstall --default
     elif [ -f "$PR_DIR/Makefile" ] || [ -f "$PR_DIR/makefile" ]; then
         cd "$PR_DIR"
-        make && sudo checkinstall
+        make && sudo checkinstall --default
     elif [ -f "$PR_DIR/setup.py" ]; then
         sudo python setup.py install
     elif [ -f "$PR_DIR/configure.ac" ]; then
@@ -82,7 +82,7 @@ rep_autobuild() {
             autoreconf --install
         fi
         [ $? -eq 0 ] && ../configure $@
-        [ $? -eq 0 ] && make && sudo checkinstall
+        [ $? -eq 0 ] && make && sudo checkinstall --default
     else
         echo "Error: unsupported build system. Build manually."
     fi

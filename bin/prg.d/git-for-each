@@ -2,16 +2,17 @@
 
 ARG="$1"; shift
 CMD="$@"
+DIR="$PWD"
 
 source ~/.shell/zsh/zshrc
 
-gita_omz() {
+function gita_omz {
     ## For Oh-My-Zsh
     ST="$PR_SET_CHARSET$AM_GIT`git_prompt_info`$PR_NO_COLOUR `git_prompt_status`$PR_NO_COLOUR"
     echo $(echo "$ST" | sed 's/[%{}]//g')
 }
 
-gita_prezto() {
+function gita_prezto {
     _prompt_amer_precmd_async_data="${TMPPREFIX}-prompt_amer_data"
     if (( $+functions[git-info] )); then
         git-info
@@ -25,14 +26,27 @@ gita_prezto() {
     echo "${(%e)git_info[details]} ${(%e)git_info[icons]}"
 }
 
-gita_st() { # $1 -- rep path
+function time_dt {
+    local dt=$((`date +%s`-`git log --pretty=format:'%at' -1 2>/dev/null`))
+    local seconds=$(( dt % 60 ))
+    local minutes=$(( (dt /= 60) % 60 ))
+    local hours=$(( (dt /= 60) % 24 ))
+    local days=$(( dt / 24 ))
+    if (( $days > 0 )); then print -P "${days}d+"
+    elif (( $days > 0 )); then print -P "${days}d ${hours}h"
+    elif (( $hours > 0 )); then print -P "${hours}:${minutes}:"
+    elif (( $minutes > 0 )); then print -P ":${minutes}:${seconds}"
+    else print -P "-${seconds}s"; fi
+}
+
+function gita_st { # $1 -- rep path
     st="$(gita_prezto)"
     dt=$(git log -1 --pretty=format:'%ci' | awk '{ print $2,$1 }')
-    printf "%-20s\t %-17s %-18s\n" "$st" "$1" "$dt"
+    printf "%-20s\t %-17s %-18s - %6s\n" "$st" "$1" "$dt" "$(time_dt)"
     # echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 
-gita_pl() {
+function gita_pl {
     printf "\n\n$(tput setaf 3)--[ $1 ]--$(tput sgr0)\n";
     # FIXME: Check if has remote updates
     # if [[ $(git rev-parse HEAD) == $(git ls-remote $(git rev-parse --abbrev-ref @{u})) ]]; then
@@ -44,14 +58,22 @@ gita_pl() {
     # fi
 }
 
-# Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит, стэш, merge итп -- парсить и заменять на значки
-
-for rp in "$PWD"/*; do
-    if [ -d "$rp/.git" ]; then
-        cd "$rp" && gita_$ARG ${rp##*/}
+function git_for_each {
+    if [[ -d "$1/.git" ]]; then cd "$1"
+        ## Additional verification of git repo existance
+        git rev-parse --git-dir > /dev/null 2>&1 && bFound=1 || continue
+        ## Print git info from zsh-specific prompt
+        case "$ARG" in pl|st) gita_$ARG ${1##*/} ;; esac
+        ## Also, exec any commands after "gta/gla/gtt ..."
         eval ${CMD:+git $CMD}
     fi
-done
+}
+
+# Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит, стэш, merge итп -- парсить и заменять на значки
+
+for rp in "$DIR"/*; do git_for_each "$rp"; done
+## If there are no repo/submodules, print status for current dir
+if [[ -z "$bFound" ]]; then git_for_each "$DIR"; fi
 
 
 # for nm in *; do (cd $nm && pwd && gt && echo); done
