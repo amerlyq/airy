@@ -1,5 +1,5 @@
-#!/bin/bash
-cd $(dirname $(readlink -m ${0})) || exit
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
 
 case "$1" in
 -u|--update) update=1 ;;
@@ -9,9 +9,9 @@ case "$1" in
 esac
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
 
-dir=~/.mpd && mkdir -p $dir
+dir=~/.mpd
 case "$CURR_PROF" in
 home) link "$PWD/mpd-sir.conf" "$dir/mpd.conf" ;;
    *) link "$PWD/mpd-own.conf" "$dir/mpd.conf" ;;

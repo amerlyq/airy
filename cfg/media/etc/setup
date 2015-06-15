@@ -1,5 +1,5 @@
-#!/bin/bash
-cd $(dirname $(readlink -m ${0})) || exit
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
 
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }

@@ -2,14 +2,12 @@
 
 # if [ $? -ne 0 ]; then pause; exit; fi
 
-if [ $# -lt 1 ]; then printf "You need \$? as first argument\n"; fi
-ERR=$1
+ERR="${1?'You need $? as first argument'}"
 shift
 
 MSG="Press any key to continue"
-SP="========"
 
-PROMPT="<$SP $MSG ($(date +"%T")) $SP>"
+PROMPT="<======== $MSG ($(date +"%T")) ====($ERR)==>"
 
 pstop() { read -n 1 -sp "$PROMPT " tmp && printf "$@\n"; }
 

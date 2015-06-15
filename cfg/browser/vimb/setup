@@ -1,5 +1,5 @@
-#!/bin/bash
-cd $(dirname $(readlink -m ${0})) || exit
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
 
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
@@ -8,8 +8,7 @@ dir=~/.config/vimb
 mkdir -p $dir
 
 case "$1" in
--d|dark) THEME=dark ;;
--l|light) THEME=light ;;
+dark|light) THEME="$1" ;;
 -t|toggle) THEME=$(readlink "$dir/style.css")
     case ${THEME##*/} in
         dark*) THEME=light ;;
@@ -21,7 +20,7 @@ esac
 link "$dir/theme/${THEME}.css" "$dir/style.css"
 
 # Set other symlinks only if used full keys. Short color keys only toggle.
-if [ "${1:0:1}" != '-' ]; then
+if [[ "${1:0:1}" != '-' ]]; then
     for nm in config 'dld-start' theme setup; do
         link "$PWD/$nm" "$dir/$nm"
     done

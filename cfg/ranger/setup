@@ -1,5 +1,5 @@
-#!/bin/bash
-cd $(dirname $(readlink -m ${0})) || exit
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
 
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
@@ -14,7 +14,8 @@ esac
 
 
 case "$SHELL" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
-if ! grep -q '/tmp/aura/ranger_cwdir' $RC; then
+RC="$RC $HOME/.cache/zsh/.zshrc"
+if ! grep -q '/tmp/aura/ranger_cwdir' $RC 2>/dev/null; then
     echo "===========================
     >>> Place in your shell's config ($RC):
     # To sync zsh and ranger working directories:"

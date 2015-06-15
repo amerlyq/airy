@@ -1,0 +1,20 @@
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
+
+### LINKS ###
+link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+link "$PWD/gitignore" ~/.gitignore
+
+# Customization
+# http://git-scm.com/docs/git-config
+
+### GENS ###
+dst=~/.gitconfig
+> $dst
+git config --global user.name  "$WORK_NAME"
+git config --global user.email "$WORK_MAIL"
+# git config --global user.signingkey = C8A2DA6E
+
+for fl in "$PWD/cfg_"* ; do cat "$fl" >> $dst; done
+
+echo "W: ~/.gitconfig"

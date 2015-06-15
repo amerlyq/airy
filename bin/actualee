@@ -8,43 +8,38 @@ EXT="${NAME##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
 FL="$PWD/$NM"
 
-wpause() { pause $? "$NAME" || exit; }
 
 # Names
 case "$NAME" in  # Names
+      Makefile*) make -f "$NAME" ;;
+CMakeLists\.txt) sir ;;
+*) v1=false ;; esac
 
-    Makefile*) make -f "$NAME"  ;;
-    CMakeLists\.txt) sir        ;;
 
-*) case "$EXT" in  # Extensions
+[[ -n "$v1" ]] && case "$EXT" in  # Extensions
+dot) dot -Tx11 "$NM"  ;;
+tpp) tpp "$NM"        ;;
+ md) pandoc -o /tmp/pandoc.html "$FL" && x-www-browser /tmp/pandoc.html ;;
+jar) java -jar "$NM" ;;
+# Launched w/o fork, because of poor cmd support: it opens new instance of
+# XMind instead of adding file to opened
+xmind) XMind -noSplash -- "$1" ;;
+*) v2=false ;; esac
 
-    sh) "$FL" && wpause   ;;
-    dot) dot -Tx11 "$NM"  ;;
-    tpp) tpp "$NM"        ;;
-    md) pandoc -o /tmp/pandoc.html "$FL" && x-www-browser /tmp/pandoc.html ;;
-    jar) java -jar "$NM" ;;
 
-    # Launched w/o fork, because of poor cmd support: it opens new instance of
-    # XMind instead of adding file to opened
-    xmind) XMind -noSplash -- "$1" ;;
+[[ -n "$v2" ]] && case "$TYPE" in  # Types
+ text/x-python) "$FL"  ;;
+application/x*) "$FL"  ;;
+       text/x*) if [[ -x "$FL" ]]; then "$FL"
+                else echo "Non-executable '$FL'"; fi ;;
+       video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
+*) v3=false ;; esac
 
-    *) case "$TYPE" in  # Types
 
-         text/x-python) "$FL"  ;;
-        application/x*) "$FL"  ;;
-               text/x*) if [[ -x "$FL" ]]; then "$FL" && wpause; else echo "Non-executable '$FL'"; fi ;;
-               video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
-        *) case "$EXT" in  # Extensions
+[[ -n "$v3" ]] && case "$EXT" in
+py) python "$FL" ;;
+ *) { stat -c '%A' "$FL" | grep -q x; } && "$FL"
+;; esac
 
-            py) python "$FL"      ;;
-
-        *) { stat -c '%A' "$FL" | grep -q x; } && "$FL"
-        esac
-        ;;
-    esac
-    ;;
-esac
-;;
-esac
-
-if [ $? -ne 0 ]; then wpause; fi
+ERR=$?
+if [[ "$ERR" != 0 ]]; then pause $ERR "$NAME" || exit $ERR;  fi

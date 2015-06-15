@@ -1,10 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
 source ~/.shenv
 dst=~/.purple/accounts.xml
 > $dst
 
-cat - << EOT >> $dst
+cat >> $dst << EOT
 <?xml version='1.0' encoding='UTF-8' ?>
 
 <account version='1.0'>
@@ -63,7 +63,7 @@ if [ "$CURR_PROF" == "work" ]; then
 EOT
 fi
 
-cat - << EOT >> $dst
+cat >> $dst << EOT
 	<account>
 		<protocol>prpl-jabber</protocol>
 		<name>${MAIN_MAIL?Need account for GoogleTalk}/</name>
@@ -109,6 +109,8 @@ cat - << EOT >> $dst
 	</account>
 </account>
 EOT
+
+echo "W: ~/.purple/accounts.xml"
 
 ### Manual profiles setup
 ## MS Office Communicator
