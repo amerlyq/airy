@@ -1,16 +1,18 @@
 ! vim: ft=xdefaults
 
-! Generated depending on curr_profile
-!Xft.dpi       : 82.0
+#ifndef MAIN_DPI
+# define MAIN_DPI 96
+#endif
+! Too big fonts in X appears on '112' value and too small for '82' after reboot. What to do?
+Xft*dpi : MAIN_DPI
 
 ! Fonts for Cairo and libXft
-Xft.antialias : true
+Xft*antialias : true
 ! Стиль автохинтинга - hintnone *hintslight hintmedium hintfull
-Xft.hintstyle : hintslight
-Xft.hinting   : true
-Xft.autohint  : false
+Xft*hintstyle : hintfull
+Xft*hinting   : true
+Xft*autohint  : true
 ! unknown, rgb, bgr, vrgb, vbgr, none - геометрия для субпиксельного сглаживания
-Xft.rgba      : rgb
+Xft*rgba      : rgb
 ! тип фильтра для lcd мониторов - lcdnone lcddefault lcdlight lcdlegacy
-Xft.lcdfilter : lcddefault
-
+Xft*lcdfilter : lcddefault

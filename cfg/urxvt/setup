@@ -1,35 +1,35 @@
 #!/bin/bash
 cd $(dirname $(readlink -m ${0})) || exit
+THEME=${CURR_THEME:-dark}
 
 # https://wiki.archlinux.org/index.php/Rxvt-unicode
 
-### LINKS ###
-# link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-# link "$PWD" ~/.config/ranger
-
 case "$1" in
-dark|light) echo "colorscheme $1" ;;
+ dark|light|transparent|opaque) THEME="${1}" ;;
 -u|--update) ARGS="$1" ;;
    --clean) ARGS="$1" ;;
 -l|--list) xrdb -query -all ;;  # To see the current loaded resources:
  *) ARGS="" ;;
 esac
 
-# xrdb -I$HOME ~/.Xresources
-# /usr/share/icons
-# Xcursor.theme: Vanilla-DMZ-AA
-# Xcursor.size:  22
-# https://wiki.archlinux.org/index.php/XScreenSaver
+
+### LINKS ###
+link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
+
+link "$PWD/themes/amer-sol.${THEME}" ~/.cache/airy/theme-urxvt
 
 
-# ! NOTE: sudo update-alternatives --config x-terminal-emulator
-# ! NOTE: after changes: xrdb ~/.Xresources
 # ! FIX:  если будут глюки с цветами в терминале или терминальном виме по сравнению с lxterminal
 # !       http://unixforum.org/index.php?showtopic=135828
-
 # ! NOTE: dump all commands with description:
 # !urxvt --help 2>&1| sed -n '/:  /s/^ */! URxvt*/gp' >> ~/.urxvtrc_dump
 # !TERM=dump command man -Pcat urxvt | sed -n '/depth: b/,/^BA/p'|sed '$d'|sed '/^       [a-z]/s/^ */^/g'|sed -e :a -e 'N;s/\n/@@/g;ta;P;D'|sed 's,\^\([^@]\+\)@*[\t ]*\([^\^]\+\),! \2\n! URxvt*\1\n\n,g'|sed 's,@@\(  \+\),\n\1,g'|sed 's,@*$,,g'|sed '/^[^!]/d'|tr -d "'\`" >> ~/.urxvtrc_dump
 
+# xrdb -I$HOME ~/.Xresources
 # xrdb -load "$PWD/urxvtrc"
 xrdb "$PWD/urxvtrc"
+
+# /usr/share/icons
+# Xcursor.theme: Vanilla-DMZ-AA
+# Xcursor.size:  22
+# https://wiki.archlinux.org/index.php/XScreenSaver

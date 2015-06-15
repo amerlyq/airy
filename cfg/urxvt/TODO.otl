@@ -3,13 +3,12 @@ SEE
 	man 7 urxvt -- for additional control commands (like font-size)
 	Terminal codes: Control Sequence Introducer,  Operating System Control, ...
 
+
 urxvt
 : http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
 : NOTE: $ listres -- to show all active resources (loaded by xrdb ~/.Xresources, etc)
 >	[_] vim	auto ":set paste"
 		https://github.com/seletskiy/urxvt-vim-insert
-	[_] TODO: now I can switch colorthemes on the fly, and don't need directive '#define Dark'
-		So I can keep permanent Xresources instead of generating it each time
 	[_] Highlighting (colorize output)
 		[_] '>>> ...' and ':: ...' -- as I use it for start/end of scripts
 		[_] 'Press ENTER ... ' -- considering ranger until I replace its API
@@ -36,19 +35,13 @@ urxvt
 		| echo -en "\033]50;$font\007"  | font
 		| echo -ne "\033[?25l"          | Hide cursor
 		| echo -ne "\033[?25h"          | Show cursor
-	[_] Per-ssh-host bkgr/theme color
-		colors=( 222222 111111 333333 444444 111111 333333)
-		printf "\e]49;#$resultingcolor\a"
 	[_] Make in urxvt ability to open file path in vim
 		So I will be able to open found files by {file, grep, ag} in vim
 			In same or another copy of urxvt
-	[_] Create own color-themes to switch
-		[_] dark/light/transparent
-		[_] based on ssh
 	[_] Right-click menu with context-aware entries (cat, wget, netcat, copy, send...)
 		:? Maybe, it's most simple to try /fish/ already?
 		https://github.com/grugq/urxvt-ctx
-	[ ] fork-cwd
+	[_] fork-cwd
 		2015-06-03 [X] https://github.com/myeisha/urxvt-fork-here
 		[_] https://github.com/atweiden/urxvt-cwd-spawn
 			:= Idea: copy and spawn ssh session
@@ -66,9 +59,6 @@ urxvt
 		:= Idea: launch from vim/(even any X pr!) urxvt and control it through fifo
 	[_] modeline (status string like in vim?)
 		https://github.com/ryuslash/urxvt-modeline
-	[_] more color schemes
-		https://github.com/randalltuxarc/URxvt-colorscheme
-		https://github.com/AntSunrise/URxvt-themes
 	[_] scrolling and clearing on scroll
 		https://github.com/Maelan/urxvt-plugins
 		https://github.com/verrens/urxvt-pcon
@@ -77,9 +67,32 @@ urxvt
 		https://github.com/zestrada/urxvt-fixed-cols
 
 
+Themes
+	[_] TODO: switch colorthemes on the fly,
+		2015-06-15 [X] don't need directive '#define Dark'
+		[_] So I can keep permanent Xresources instead of generating it each time
+			:> But how about dpi?
+	[_] Per-ssh-host bkgr/theme color
+		colors=( 222222 111111 333333 444444 111111 333333)
+		printf "\e]49;#$resultingcolor\a"
+	[_] Create own color-themes to switch
+		2015-06-15 [X] dark/light/transparent
+		[_] based on ssh
+	[_] more color schemes
+		https://github.com/randalltuxarc/URxvt-colorscheme
+		https://github.com/AntSunrise/URxvt-themes
+	[_] SEE try using reptyr -- to spawn new terminal with choosen color
+			scheme and move all apps to it from old terminal
+		https://github.com/nelhage/reptyr
+		: also -- attaching daemon processes to terminals
+
+
+
+
 SEIZE
 	https://github.com/majutsushi/etc/blob/master/xorg/Xresources
 	http://wiki.archbang.org/index.php?title=Rxvt-Unicode_Terminal
+
 
 TODO
 	[_] Numbering all url-select lines to fast access link (NOT letter-based)

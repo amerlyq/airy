@@ -5,3 +5,6 @@ cd $(dirname $(readlink -m ${0})) || exit
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 
 link "$PWD" ~/.i3
+
+### GENS ###
+./i3-config.gen

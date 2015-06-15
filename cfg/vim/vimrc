@@ -19,7 +19,14 @@ endif
 
 "================ Windows ====================== {{{1
 " Make $VIMHOME point to .vimrc location independent of OS
-let $VIMHOME=$HOME . '/.vim'
+if isdirectory($XDG_CONFIG_HOME.'/vim')
+  let $VIMHOME=expand('$XDG_CONFIG_HOME/vim')
+  let $CACHE=expand('$XDG_CACHE_HOME/vim')
+else
+  let $VIMHOME=expand('~/.vim')
+  let $CACHE=expand('~/.cache/vim')
+endif
+
 if has('win32') || has('win64')
 " Fix the path of vimrc and gvimrc for Windows
   let $MYVIMRC=$VIMHOME . '/vimrc'
@@ -30,8 +37,6 @@ endif
 "============= Vim dirs structure ============== {{{1
 " Backup, undo, swap, etc
 " The '//' at directory end: use full path for filename with '%' separators
-" let $CACHE=$XDG_CACHE_HOME . '/vim'
-let $CACHE=$HOME . '/.cache/vim'
 set backupdir=$CACHE/bckpdir//,~/.tmp,/var/tmp,/tmp
 set directory=$CACHE/swapdir//,~/.tmp,/var/tmp,/tmp
 " backup current file, not deleted afterwards: you need free space!
@@ -50,7 +55,7 @@ let g:netrw_http_cmd = "elinks-for-vim"
 
 
 let $BUNDLES=expand('$CACHE/bundle/')
-let cdirs = ['bundle', 'bckpdir', 'swapdir', 'undodir', 'easytags.d']
+let cdirs = ['bundle', 'bckpdir', 'swapdir', 'undodir']  " 'easytags.d'
 for nm in cdirs
   if !isdirectory(expand('$CACHE/' . nm))
     call mkdir(expand('$CACHE/' . nm), 'p')
@@ -69,6 +74,7 @@ endif
 if has ('vim_starting')
   set runtimepath+=$NEOBUNDLE
   set runtimepath+=$VIMHOME
+  set runtimepath+=$CACHE  " For ./spell
 endif
 
 let g:neobundle#types#git#default_protocol = 'git'  " OR: https, ssh
@@ -76,9 +82,12 @@ let g:neobundle#types#git#clone_depth = 1   "shallow copy
 let g:neobundle#types#git#enable_submodule = 1
 
 call neobundle#begin(expand('$BUNDLES/'))
+  " if neobundle#load_cache()
   " Let NeoBundle manage NeoBundle
     NeoBundleFetch 'Shougo/neobundle.vim'
-    source $VIMHOME/plugins.vim
+    source $VIMHOME/plugins.vim  " fnameescape(
+    " NeoBundleSaveCache
+  " endif
 call neobundle#end()
 
 filetype plugin indent on  " Required!
@@ -91,3 +100,7 @@ endif
 
 "================ Configuration ================ {{{1
 runtime! bundle/*.vim cfg/*.vim ext/*.vim
+
+" Search rc in current dirs, but don't execute :autocmd, shell and write commands
+set exrc
+set secure

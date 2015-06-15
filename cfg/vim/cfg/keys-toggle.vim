@@ -9,7 +9,7 @@ nnoremap <unique> <Leader>tl :set list! list?<CR>
 nnoremap <unique> <Leader>tL :NeoCompleteToggle<CR>
 
 nnoremap <unique> <Leader>th :setlocal hlsearch! hlsearch?<CR>
-nnoremap <unique> <Leader>ts :setlocal spell! spell?<CR>
+nnoremap <unique> <Leader>ts :setlocal spell! spelllang=en_us,ru_yo,uk spell?<CR>
 nnoremap <unique> <Leader>tc :setlocal cursorcolumn! cursorcolumn?<CR>
 nnoremap <unique> <Leader>tC :setlocal cursorline! cursorline?<CR>
 

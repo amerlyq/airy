@@ -149,9 +149,9 @@ function prompt_amer_setup_git {
   zstyle ':prezto:module:git:info:modified' format '%F{220}◯%f'
   zstyle ':prezto:module:git:info:position' format '%%B%F{13}%p%f%%b'
   zstyle ':prezto:module:git:info:renamed' format '%%B%F{6}➤%f%%b'
-  zstyle ':prezto:module:git:info:stashed' format '%%B%F{9}✭%f%%b'
-  zstyle ':prezto:module:git:info:unmerged' format '%%B%F{5}ø%f%%b'
-  zstyle ':prezto:module:git:info:untracked' format '%%B%F{7}♯%f%%b'
+  zstyle ':prezto:module:git:info:stashed' format '%%B%F{220}✭%f%%b'
+  zstyle ':prezto:module:git:info:unmerged' format '%F{5}⚡%f'
+  zstyle ':prezto:module:git:info:untracked' format '%F{7}♯%f'
   # Coalesce: -- find first non-empty value
   zstyle ':prezto:module:git:info:keys' format \
     'details' '$(coalesce "%b" "%p" "%c")' 'icons' '%s%A%B%S%a%d%m%r%U%u'

@@ -3,7 +3,7 @@ cd $(dirname $(readlink -m ${0})) || exit
 
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-link "$PWD" ~/.vim  #vim/vimrc vim/ycm_extra_conf.py
+link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
 
 
 VIMC="$HOME/.cache/vim"  # Dir for .swp, backup, ... files

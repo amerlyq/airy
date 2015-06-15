@@ -3,7 +3,7 @@ cd $(dirname $(readlink -m ${0})) || exit
 THEME=${CURR_THEME:-dark}
 
 case "$1" in
- dark|light) THEME="$1" ;;
+ dark|light|transparent|opaque) THEME="${1}" ;;
 --clean) echo "nothing" ;;
 -u|--update) update="$1" ;;
 esac
@@ -16,3 +16,23 @@ link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
 link "$PWD/compton.conf" ~/.config/compton.conf
 link "$PWD/settings.ini" ~/.config/gtk-3.0/settings.ini
 link "$PWD/dunstrc" ~/.config/dunst/dunstrc
+
+
+### GENS ###
+# http://linuxoid.in/%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3:Xresources
+# Color schemes with scrshots:
+# http://linsovet.org.ua/terminal-color-schemes-2
+
+if [[ -f ~/.cache/airy/theme-urxvt ]]
+then theme_file=".cache/airy/theme-urxvt"
+else theme_file=".urxvt/themes/amer-sol.dark"; fi
+
+cat > ~/.Xresources << EOT
+#define MAIN_DPI ${MAIN_DPI:-96}
+#include ".urxvt/urxvtrc"
+#include ".Xrc/xtermrc"
+#include ".Xrc/xfontrc"
+#include "${theme_file}"
+EOT
+
+xrdb ~/.Xresources

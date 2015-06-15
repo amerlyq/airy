@@ -38,7 +38,6 @@ source ~/.shell/zsh/filetypes.zsh
 # For bash use analogue BASH_ENV=$HOME/.zshenv before launching
 if [[ -f ~/.shell/aliases ]]; then source ~/.shell/aliases ; fi
 
-
 ## Trap to sync zsh and ranger working directories.
 # NOTE: '>!' is because of 'unsetopt CLOBBER' by 'prezto:directory'
 function finish { printf "%s" "$PWD" >! '/tmp/aura/ranger_cwdir'; }

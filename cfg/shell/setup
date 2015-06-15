@@ -13,10 +13,14 @@ link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 ldir(){ rm -rf $2 && mkdir -p $2 && lndir "$1" $2; }
 
 ### LINKS ###
-ldir "$PWD/profile.d" ~/.config/airy/
 link "$PWD" ~/.shell
+ldir "$PWD/profile.d" ~/.config/airy/
 link "$PWD/input/dircolors.ansi-${THEME}" ~/.dircolors
 # TODO: link tmux/theme-${THEME}.conf ~/.tmux-color.conf
 
-for nm in bash/bashrc zsh/zshrc tmux/tmux.conf input/inputrc
+for nm in bash/bashrc tmux/tmux.conf input/inputrc
 do link "$PWD/$nm" ~/.${nm##*/}; done
+
+## Subdirectories:
+for dir in "$PWD"/*; do if [[ -d "$dir" && -f "$dir/setup" ]]
+then echo ">>> Cfg: $dir <<<"; "$dir/setup" "$ARGS"; fi; done

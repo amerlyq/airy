@@ -23,3 +23,9 @@ For thunderbird
 	Security: SSL/TLS
 	Authentication: Normal Password
 
+RC
+	Multiline macro
+	: macro index <f2> ":set smtp_url = smtps://$imap_user@smtp.gmail.com:587\n\
+	: :set from = \"`echo ${MAIN_MAIL}`\"\n\
+	: :set realname = \"`echo ${MAIN_NAME}`\"\n\
+	: <change-folder>imaps://$imap_user@imap.gmail.com:993<enter>"
