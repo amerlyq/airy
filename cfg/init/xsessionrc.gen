@@ -1,37 +1,38 @@
-#!/bin/bash
-
+#!/bin/bash -e
 source ~/.shenv
-if [ $? -eq 1 ]; then exit 1; fi
-source ~/.shell/funcs
-if [ $? -eq 1 ]; then exit 1; fi
 
 
 dst=~/.xsessionrc
-wbegin
+> $dst && chmod +x $dst
 
-wstr "
-
+cat >> $dst << EOT
 xsetroot -cursor_name left_ptr
-
 xset -b &       ## Disable beeps
 xset s off &    ## Disable screensaver
-"
 
-if [ "$CURR_HOST" != "vbox" ]; then
-wstr "
+## For ComposeKey to work
+export GTK_IM_MODULE=xim
+
+## For bug suppression
+wstr "eval \$(dbus-launch --sh-syntax)"
+EOT
+
+
+case "$CURR_PROF" in
+laptop) dpms="300 600 900" ;;
+home) dpms="600 0 0" ;;
+esac
+
+[[ "$CURR_HOST" != vbox ]] && cat >> $dst << EOT
 ## Set startup volume and LCD brightness
 #pactl set-sink-volume 0 '20%' &
 xbacklight -set 50 &
 
 ## DPMS monitor setting (standby -> suspend -> off) (seconds)
-"
-    if [ "$CURR_PROF" == "laptop" ]; then
-        wprf "xset dpms 300 600 900 &\n"
-    elif [ "$CURR_PROF" == "home" ]; then
-        wprf "xset dpms 600 0 0 &\n"
-    fi
-fi
+${dpms+xset dpms $dpms}
+EOT
 
+echo "W: $dst"
 
 ## Force intel driver
 #export LIBGL_ALWAYS_SOFTWARE=1
@@ -41,22 +42,9 @@ fi
 # export http_proxy=\"http://127.0.0.1:8118\"
 # export https_proxy=\"http://127.0.0.1:8118\"
 
-wstr "
-## For ComposeKey to work
-export GTK_IM_MODULE=xim
-"
-
-
-## For bug suppression
-wstr "eval \$(dbus-launch --sh-syntax)"
-
 ## Fonts for X (terminus)
 #if [ -d /usr/share/fonts/terminus ]; then
 #    xset fp+ /usr/share/fonts/terminus &
 #elif [ -d /usr/share/fonts/local ]; then
 #    xset fp+ /usr/share/fonts/local &
 #fi
-
-chmod +x "$dst"
-
-echo "W: $dst"

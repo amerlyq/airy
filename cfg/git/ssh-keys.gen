@@ -1,32 +1,27 @@
-#!/bin/bash
-# Arg: all-new -- for re-generating rsa-pairs
-
-source ~/.shell/funcs
-amScriptDir -s
-if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi
-
-# =================== Multi--SSH ============================
+#!/bin/bash -e
+source ~/.shenv
 ARGS="$1"
+
 genssh(){ # $1 -- @mail, $2 -- path/to/key
     local mail="$1" idn="$HOME/.ssh/$2"
-    if [ ! -f "$idn" ] || [ "$ARGS" == "--reinstall" ]; then
+    if [[ ! -f "$idn" || "$ARGS" == --update ]]; then
         ssh-keygen -t rsa -C "$mail" -N "" -f "$idn"
         echo "!!! Copy generated *.pub key to your servers"
     fi
 }
+# =================== Multi--SSH ============================
 
 genssh "$WORK_MAIL" id_rsa
 genssh "$MAIN_MAIL" git_rsa
 
 case "$CURR_PROF" in
-work) genssh "$WORK_MAIL" srk_rsa ;;
-laptop)
-    genssh "$MAIN_MAIL" lsir_rsa
-    genssh "$MAIN_MAIL" lked_rsa
-;;
-home) genssh "$MAIN_MAIL" lked_rsa ;;
+  work) genssh "$WORK_MAIL" srk_rsa ;;
+laptop) genssh "$MAIN_MAIL" lsir_rsa
+        genssh "$MAIN_MAIL" lked_rsa ;;
+  home) genssh "$MAIN_MAIL" lked_rsa ;;
 esac
 
+echo "W: ~/.ssh/*_rsa"
 # ===========================================================
 
 # ssh-add "$stdkey"

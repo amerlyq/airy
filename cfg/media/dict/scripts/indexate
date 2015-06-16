@@ -25,3 +25,5 @@ fi; done
 ## Link database to configs
 link(){ [[ -e "$1" && (! -e $2 || -L $2) ]] && sudo ln -sfvT "$1" $2; }
 link "$dst" $dblst
+
+echo "W: $dblst"

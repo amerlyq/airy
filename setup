@@ -1,5 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash
 cd $(dirname $(readlink -m ${0})) || exit
+set -o errexit
+set -o pipefail
 
 # WARNING:
 #   Now if file exsist, 'setup' simply exits and you will not know that
@@ -21,17 +23,28 @@ pretty() { sed "
     />>>/!s|^|  |g
     /^>>> \.\//s||\n$(tput setaf 2)\[|g; / <<<$/s||\]$(tput sgr0)|g
 "; }
+header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
 
 
-echo "$(tput setaf 1)>>> Airy public <<<$(tput sgr0)"
+header "Airy public"
 link "$PWD/bin" ~/.bin
 
 
+## Populate sensible configs
+if [[ -f ../erian/setup ]]; then
+    header "Erian private data"
+    ../erian/setup "$ARGS" | pretty
+fi
+
+## Setup all configs (private data must be initialized already)
+header "Airy cfgs"
 cfgs=(shell/* browser/* media/* git init i3 mutt ranger sets urxvt vim Xrc)
+
 for nm in "${cfgs[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl
-    do echo ">>> $fl <<<"; $fl $ARGS || exit; done
+    do echo ">>> $fl <<<"; $fl $ARGS; done
 done | pretty
+
 ## Subdirectories:
 # for dir in "$PWD"/*; do if [[ -d "$dir" && -f "$dir/setup" ]]
 # then echo ">>> Cfg: $dir <<<"; "$dir/setup" "$ARGS"; fi; done
@@ -41,8 +54,4 @@ done | pretty
 # find . -mindepth 2 -type f -wholename "*/setup" -not -exec \
 #     bash -c "echo '>>> {} <<<' && '{}' $ARGS || exit" \; -quit
 
-
-if [[ -f ../erian/setup ]]; then echo
-    echo "$(tput setaf 1)>>> Erian private  <<<$(tput sgr0)"
-    ../erian/setup "$ARGS" | pretty
-fi
+header "DONE"

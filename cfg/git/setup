@@ -15,6 +15,8 @@ git config --global user.name  "$WORK_NAME"
 git config --global user.email "$WORK_MAIL"
 # git config --global user.signingkey = C8A2DA6E
 
-for fl in "$PWD/cfg_"* ; do cat "$fl" >> $dst; done
+for fl in "$PWD"/cfg_* ; do cat "$fl" >> $dst; done
 
 echo "W: ~/.gitconfig"
+
+for pr in "$PWD"/ssh-* ; do $pr; done

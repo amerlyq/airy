@@ -23,11 +23,13 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 " White
 
 let g:everywhere_activated = 1
-let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Msg': 7, 'Tbd': 5, 'Alt': 3 }
+let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2,
+      \ 'Dev': 4, 'Msg': 7, 'Tbd': 5, 'Alt': 3 }
 let s:patterns = {
       \ 'Err': 'ERR(OR)=|BUG',
       \ 'Fix': 'FIX(ME)=|WARNING',
       \ 'Add': 'ADD|SEE|NEED',
+      \ 'Dev': 'DEV',
       \ 'Msg': 'NOTE',
       \ 'Tbd': 'TODO|CHECK',
       \ 'Alt': 'ALT|OR',

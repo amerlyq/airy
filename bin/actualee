@@ -9,6 +9,12 @@ TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
 FL="$PWD/$NM"
 
 
+finish() {
+  local ERR=$?;  if [[ "$ERR" != 0 ]]
+  then pause $ERR "$NAME" || exit $ERR; fi
+} && trap finish EXIT
+
+
 # Names
 case "$NAME" in  # Names
       Makefile*) make -f "$NAME" ;;
@@ -30,7 +36,7 @@ xmind) XMind -noSplash -- "$1" ;;
 [[ -n "$v2" ]] && case "$TYPE" in  # Types
  text/x-python) "$FL"  ;;
 application/x*) "$FL"  ;;
-       text/x*) if [[ -x "$FL" ]]; then "$FL"
+       text/x*) if [[ -x "$FL" ]]; then "$FL" || exit
                 else echo "Non-executable '$FL'"; fi ;;
        video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
 *) v3=false ;; esac
@@ -40,6 +46,3 @@ application/x*) "$FL"  ;;
 py) python "$FL" ;;
  *) { stat -c '%A' "$FL" | grep -q x; } && "$FL"
 ;; esac
-
-ERR=$?
-if [[ "$ERR" != 0 ]]; then pause $ERR "$NAME" || exit $ERR;  fi
