@@ -85,12 +85,7 @@ call neobundle#begin(expand('$BUNDLES'))
   " if neobundle#load_cache()
   " Let NeoBundle manage NeoBundle
     NeoBundleFetch 'Shougo/neobundle.vim'
-
-  if !exists('g:forced_theme')
     source $VIMHOME/plugins.vim  " fnameescape(
-  else
-    source $VIMHOME/plugins-cat.vim
-  endif
     " NeoBundleSaveCache
   " endif
 call neobundle#end()
@@ -107,5 +102,4 @@ endif
 runtime! bundle/*.vim cfg/*.vim ext/*.vim
 
 " Search rc in current dirs, but don't execute :autocmd, shell and write commands
-set exrc
-set secure
+set exrc secure

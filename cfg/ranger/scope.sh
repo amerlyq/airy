@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-EXTDIR="${0%/*}/ext"
-source ~/.shell/profile || exit
-
-# ranger supports enhanced previews.  If the option "use_preview_script"
-# is set to True and this file exists, this script will be called and its
-# output is displayed in ranger.  ANSI color codes are supported.
-
-# NOTES: This script is considered a configuration file.  If you upgrade
-# ranger, it will be left untouched. (You must update it yourself.)
-# Also, ranger disables STDIN here, so interactive scripts won't work properly
 
 # Meanings of exit codes:
 # code | meaning    | action of ranger
@@ -21,30 +11,49 @@ source ~/.shell/profile || exit
 # 5    | fix both   | success. Don't ever reload
 # 6    | image      | success. display the image $cached points to as an image preview
 
-# Meaningful aliases for arguments:
+set -o pipefail
+
 path="$1"    # Full path of the selected file
 width="$2"   # Width of the preview pane (number of fitting characters)
 height="$3"  # Height of the preview pane (number of fitting characters)
 cached="$4"  # Path that should be used to cache image previews
+EXTDIR="${0%/*}/ext"
 
-maxln=128    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
+
+# source ~/.shell/profile || exit
+# case "$CURR_THEME" in
+# light) STYLE=solarized-light ;;
+# transparent) STYLE=bright ;;
+# dark|*)  STYLE=freya ;; #breeze/freya/clarity
+# esac
+STYLE=freya
+
 
 # Find out something about the file:
 mimetype=$(file --mime-type -Lb "$path")
-extension=$(/bin/echo -E "${path##*.}" | tr "[:upper:]" "[:lower:]")
+extension="${path##*.}"
+extension="${extension,,}"
 
 # Functions:
 # runs a command and saves its output into $output.  Useful if you need
 # the return value AND want to use the output in a pipe
 # http://stackoverflow.com/questions/687948/timeout-a-command-in-bash-without-unnecessary-delay
-timed(){(
-    eval "$@" & child=$!
-    trap -- "" SIGTERM
-    (sleep 3 && kill $child 2> /dev/null) &
-    wait $child
-);}
+# timed(){(
+#     eval "$@" & child=$!
+#     trap -- "" SIGTERM
+#     (sleep 3 && kill $child 2> /dev/null) &
+#     wait $child
+# );}
+
+# writes the output of the previously used "try" command
+maxln=128
+# dump() { /bin/echo -E "$output" | head -n "$maxln"; }
 try() {
-    output=$(eval '"$@"');
+    # (sleep 3 && echo hi && kill $$ >/dev/null 2>&1) & disown
+    timeout --kill-after 5 --foreground 3 $@ | head -n "$maxln"
+    # kill $! >/dev/null 2>&1
+
+    # output=$(eval '"$@"');
     # output=$(timed "$@");
     # output=$(eval '"$@" & SPID=$!
     #         (sleep 1 && kill "$SPID" >/dev/null) & KPID=$!
@@ -55,87 +64,67 @@ try() {
     # output=$( bash -c '{sleep 5 && kill $$ >/dev/null; }& eval "$@"' )
     # output=$(eval '{sleep 5 && kill $$ >/dev/null; } & "$@"')
     # output=$(timeout --foreground 5 eval '"$@"')
-    # output=$(timeout --foreground 5 "$@")
     # output=$(eval 'timeout -k 5 --foreground 3 "$@"')
     # output=$( ( set +b; sleep 3 & "$@" & wait -n; kill -9 $(jobs -p); ) )
 }
 
-# writes the output of the previously used "try" command
-dump() { /bin/echo -E "$output"; }
-
-# a common post-processing function used after most commands
-trim() { head -n "$maxln"; }
-
-# wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
-# NOTE: Chg highlight -> /usr/bin/highlight
-# to workaround conflict with Mint embedded script /usr/local/bin/highlight
-highlight() { command /usr/bin/highlight "$@"; test $? = 0 -o $? = 141; }
 
 case "$extension" in
-    # Archive extensions:
     7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
     rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
-        try als "$path" && { dump | trim; exit 0; }
-        try acat "$path" && { dump | trim; exit 3; }
-        try bsdtar -lf "$path" && { dump | trim; exit 0; }
-        exit 1;;
-    rar)
-        try unrar -p- lt "$path" && { dump | trim; exit 0; } || exit 1;;
-    # PDF documents:
-    pdf)
-        try pdftotext -l 10 -nopgbrk -q "$path" - && \
-            { dump | trim | fmt -s -w $width; exit 0; } || exit 1;;
-    # BitTorrent Files
-    torrent)
-        try transmission-show "$path" && { dump | trim; exit 5; } || exit 1;;
-    # HTML Pages:
+        try als "$path" && exit 0
+        try acat "$path" && exit 3
+        try bsdtar -lf "$path" && exit 0
+        exit 1 ;;
+    rar) try unrar -p- lt "$path" && exit 0 || exit 1 ;;
+
+    pdf) try pdftotext -l 10 -nopgbrk -q "$path" - \
+            | fmt -s -w $width && exit 0 || exit 1 ;;
+
+    torrent) try transmission-show "$path" && exit 5 || exit 1 ;;
+
     htm|html|xhtml)
-        try w3m    -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
-        try lynx   -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
-        try elinks -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
+        # try lynx   -dump "$path" && { dump | fmt -s -w $width; exit 4; }
+        try elinks -dump "$path" | fmt -s -w $width && exit 4
+        try w3m    -dump "$path" | fmt -s -w $width && exit 4
         ;; # fall back to highlight/cat if the text browsers fail
 esac
 
-case "$CURR_THEME" in
-light) STYLE=solarized-light ;;
-transparent) STYLE=bright ;;
-dark|*)  STYLE=freya ;; #breeze/freya/clarity
-esac
 
 case "$mimetype" in
-    # Syntax highlight for text files:
-    text/* | */xml)
-        # --wrap-simple --width="$width"
-        try /usr/bin/highlight --out-format=xterm256 --encoding=utf8 --failsafe \
-            --line-numbers --line-number-length=3 --replace-tabs=4 --no-trailing-nl \
-            --validate-input --style=$STYLE \
-          "$path" && { dump | trim; exit 5; } || exit 2;;
 
-        # try pygmentize "$path" && { dump | trim; exit 5; } || exit 2;;
-        # try "$EXTDIR/pygmentation.py" \
-        #     "$path" && { dump | trim; exit 5; } || exit 2;;
+    text/* | */xml) # Syntax highlight for text files:
+        if command -v pygmentize >/dev/null; then
+            # try pygmentize "$path" && exit 5 || exit 2
+            try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
+            ## Also highly loads CPU
+            # try "$EXTDIR/color-preview" pygmentize "$path" && exit 5 || exit 2
 
-        # try "$EXTDIR/vimcatwrapper" "$path" && { dump | trim; exit 5; } || exit 2 ;;
-        # "$EXTDIR/color-preview" "$path" && exit 5 || exit 2 ;;
+        elif command -v highlight >/dev/null; then
+            # wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
+            # NOTE: Chg highlight -> /usr/bin/highlight
+            # to workaround conflict with Mint embedded script /usr/local/bin/highlight
+            highlight() { command /usr/bin/highlight "$@"; test $? = 0 -o $? = 141; }
+            # --wrap-simple --width="$width"
+            try highlight --out-format=xterm256 --encoding=utf8 --failsafe \
+                --line-numbers --line-number-length=3 --replace-tabs=4 --no-trailing-nl \
+                --validate-input --style=$STYLE \
+                "$path" && exit 5 || exit 2
+        else
+            ## Really cool, but slow :(
+            try "$EXTDIR/color-preview" "$path" && exit 5 || exit 2
+        fi ;;
 
-        # NOTE:
-        #   http://stackoverflow.com/questions/14690010/bash-trick-program-into-thinking-stdout-is-an-interactive-terminal
-        # try script -qc "vimcat -u ~/.vim/vimcatrc \"$path\"" /tmp/aura/ranger_typescript &&
-        #       { dump | trim; exit 5; } || exit 2 ;;
+    image/*) # Ascii-previews of images:
+        img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1 ;;
 
-    # Ascii-previews of images:
-    image/*)
-        img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
+    video/*)  # Image preview for videos, disabled by default:
+        ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1 ;;
 
-    # Image preview for videos, disabled by default:
-    video/*)
-        ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1;;
-
-    # Display information about media files:
-    video/* | audio/*)
+    video/* | audio/*) # Display information about media files:
         exiftool "$path" && exit 5
         # Use sed to remove spaces so the output fits into the narrow window
-        try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
+        try mediainfo "$path" | sed 's/  \+:/: /;' && exit 5 || exit 1 ;;
 esac
 
 { # Display general information for other files:
@@ -143,8 +132,8 @@ esac
     if [ "$(ls -l "$path" | awk '{print $5}')" != "0" ]; then
         maxcol=$(((width-6)/7*2)); actualwidth=$((maxcol/2*7+6))
         printf "<$(printf "=%.0s" {1..62})>\n"
-        xxd -c $maxcol -l $((maxcol*maxln)) "$path" | sed "s/^.\{4\}//; ${maxln}q"
+        try xxd -c $maxcol -l $((maxcol*maxln)) "$path" | sed "s/^.\{4\}//; ${maxln}q"
     fi
-} && exit 5
+} && exit 4
 
 exit 1

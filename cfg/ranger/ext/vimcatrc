@@ -1,0 +1,30 @@
+" vim: ft=vim:ts=2:sw=2:sts=2
+set nocompatible
+set fileformats=unix,dos,mac
+if has("multi_byte")
+  if &termencoding == "" | let &termencoding = &encoding | endif
+  set encoding=utf-8
+  setglobal fileencoding=utf-8
+  set fileencodings=utf-8,cp1251,cp866
+endif
+set nobackup noundofile noswapfile
+set nowrap ttyfast
+
+let $BUNDLES=expand('~/.cache/vim/bundle')
+set runtimepath+=$BUNDLES/neobundle.vim
+
+call neobundle#begin(expand('$BUNDLES'))
+  NeoBundleLazy 'octol/vim-cpp-enhanced-highlight'
+      \ 'autoload' : { 'filetypes' : [ 'c', 'cpp' ] }}
+  NeoBundleLazy 'vimoutliner/vimoutliner', {
+      \ 'autoload' : { 'filetypes' : [ 'votl'] }}
+  NeoBundle 'altercation/vim-colors-solarized'
+call neobundle#end()
+
+filetype plugin indent on
+syntax on
+
+let g:forced_theme='transparent'
+runtime! ext/everywhere-notes.vim cfg/ui-colors.vim
+
+set exrc secure
