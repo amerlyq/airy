@@ -54,7 +54,7 @@ let g:netrw_home=$CACHE
 let g:netrw_http_cmd = "elinks-for-vim"
 
 
-let $BUNDLES=expand('$CACHE/bundle/')
+let $BUNDLES=expand('$CACHE/bundle')
 let cdirs = ['bundle', 'bckpdir', 'swapdir', 'undodir']  " 'easytags.d'
 for nm in cdirs
   if !isdirectory(expand('$CACHE/' . nm))
@@ -81,11 +81,16 @@ let g:neobundle#types#git#default_protocol = 'git'  " OR: https, ssh
 let g:neobundle#types#git#clone_depth = 1   "shallow copy
 let g:neobundle#types#git#enable_submodule = 1
 
-call neobundle#begin(expand('$BUNDLES/'))
+call neobundle#begin(expand('$BUNDLES'))
   " if neobundle#load_cache()
   " Let NeoBundle manage NeoBundle
     NeoBundleFetch 'Shougo/neobundle.vim'
+
+  if !exists('g:forced_theme')
     source $VIMHOME/plugins.vim  " fnameescape(
+  else
+    source $VIMHOME/plugins-cat.vim
+  endif
     " NeoBundleSaveCache
   " endif
 call neobundle#end()

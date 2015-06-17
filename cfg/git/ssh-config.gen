@@ -10,12 +10,12 @@ wacc() {
     local name=$1 host=$2 user=$3
     local idn="$4" x11=$5 port=$6 str
 
-    echo -ne "Host $name
+echo -ne "Host $name
     HostName $host
     User $user\
-    ${port:+\n    Port $port}\
-    ${idn:+\n    IdentityFile ~/.ssh/$idn}\
-    ${x11:+\n    ForwardX11 yes}
+${port:+\n    Port $port}\
+${idn:+\n    IdentityFile ~/.ssh/$idn}\
+${x11:+\n    ForwardX11 yes}
 \n" >> $dst;
 }
 

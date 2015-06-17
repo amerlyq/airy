@@ -3,12 +3,15 @@
 " WARNING: will not work nicely with light themes, as cursor will remain white
 "   I must use t_SI, t_EI here to setup colors? And integrate it with vim-term-focus...
 "   OR: simply toggle whole urxvt theme instead.
-
-try  " Load theme name
-  let s:theme = readfile(expand('$CACHE/vim_theme'))[0]
-catch /^Vim\%((\a\+)\)\=:E484/
-  let s:theme = 'dark'
-endtry
+if !exists('g:forced_theme')
+  try  " Load theme name
+    let s:theme = readfile(expand('$CACHE/vim_theme'))[0]
+  catch /^Vim\%((\a\+)\)\=:E484/
+    let s:theme = 'dark'
+  endtry
+else
+  let s:theme = g:forced_theme
+endif
 
 if s:theme ==# 'transparent'
   let s:theme_bkgr = 'dark'

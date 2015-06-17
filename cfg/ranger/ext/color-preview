@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# set +o bgnice
+# https://www.dartmouth.edu/~rc/classes/ksh/run-with-timeout.html
+mkdir -p /tmp/preview
+
+fpath="${@: -1}"
+
+# ftmp="$(tempfile -s ".${fpath##*.}")"
+# ext="${fpath/${fpath%.*}}"
+
+ftmp="/tmp/preview/${fpath##*/}"
+trap "sleep 1 && rm -rf $ftmp" EXIT
+# rm -rf /tmp/ranger_preview*
+
+head -10 "$fpath" > "$ftmp"
+
+# parent=$$
+# ( sleep 1 && kill -s TERM "$parent" >/dev/null 2>&1 ) & alarm=$!
+# disown $alarm
+
+# eval '${@:1:($#-1)} "$ftmp"'
+# pygmentize "$ftmp"
+
+# cat "$ftmp"
+# Vimfiler
+script -qc "vimcat -u ~/.vim/vimcatrc '$ftmp'" /tmp/aura/ranger_typescript
+# vimcat -u ~/.vim/vimcatrc "$ftmp" /tmp/aura/ranger_typescript
+# pgrep "$watcher" >/dev/null &&
+# kill -0 "$watcher" &&
+# kill -s TERM "$alarm" >/dev/null

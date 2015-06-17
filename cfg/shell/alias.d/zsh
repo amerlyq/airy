@@ -25,8 +25,9 @@ alias -g A='| tee -a /tmp/aura/zsh-last-output '
 alias -g T='| tee /tmp/aura/zsh-last-output '
 alias -g O='cat /tmp/aura/zsh-last-output '
 alias -g X='xsel -ob '
-alias -g Y='| xsel -ib && xsel -ob '
-alias -g YA='| xsel -ab && xsel -ob '
+alias -g XN='| xsel -ib '
+alias -g XC='| xsel -ib && xsel -ob '
+alias -g XA='| xsel -ab && xsel -ob '
 
 # alias -r @="printf \"$(xsel -ob)\n\""
 #   { xsel: Can't open display: (null)

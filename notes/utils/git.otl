@@ -148,6 +148,13 @@ Receive pull request
 	git merge contributor/newfeature
 	git push origin master
 
+Feature branch
+	http://arjanvandergaag.nl/blog/clarify-git-history-with-merge-commits.html
+	SEE: http://ginsys.eu/git-and-github-keeping-a-feature-branch-updated-with-upstream/
+	SEE: http://railsware.com/blog/2014/08/11/git-housekeeping-tutorial-clean-up-outdated-branches-in-local-and-remote-repositories/
+	Local:
+		https://techbase.kde.org/Development/Git/Feature_Branch_Workflow
+		https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
 
 Submodules
 	Add
@@ -213,6 +220,7 @@ Log
 		git diff --name-status --oneline HEAD~10 HEAD~5
 
 Regrouping commits
+: http://arjanvandergaag.nl/blog/clarify-git-history-with-merge-commits.html
 	Squash several into one
 		git rebase -i HEAD~3
 		 This will bring you into your editor with some text that will look
@@ -222,7 +230,7 @@ Regrouping commits
 		 : pick 3ead26f rm classpath from git
 		To squash those commits into one, change to something like this:
 		 : pick df94881 Allow install to SD
-		 : squash a7323e5 README Junkyism
+		 : squash a7323e5 README Junkyism  (ALT:  s a7323e5 README...)
 		 : squash 3ead26f rm classpath from git
 		Also, you can rearrange them before it and squash 1st and 3rd
 		: pick df94881 Allow install to SD

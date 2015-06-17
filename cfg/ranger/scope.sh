@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+EXTDIR="${0%/*}/ext"
 source ~/.shell/profile || exit
 
 # ranger supports enhanced previews.  If the option "use_preview_script"
@@ -35,10 +36,28 @@ extension=$(/bin/echo -E "${path##*.}" | tr "[:upper:]" "[:lower:]")
 # Functions:
 # runs a command and saves its output into $output.  Useful if you need
 # the return value AND want to use the output in a pipe
+# http://stackoverflow.com/questions/687948/timeout-a-command-in-bash-without-unnecessary-delay
+timed(){(
+    eval "$@" & child=$!
+    trap -- "" SIGTERM
+    (sleep 3 && kill $child 2> /dev/null) &
+    wait $child
+);}
 try() {
     output=$(eval '"$@"');
-    # (output=$(eval '"$@"'))& && SPID=$!;
-    # (sleep 5; kill "$SPID" >/dev/null; )& && wait "$SPID";
+    # output=$(timed "$@");
+    # output=$(eval '"$@" & SPID=$!
+    #         (sleep 1 && kill "$SPID" >/dev/null) & KPID=$!
+    #          wait "$SPID" && kill "$KPID" >/dev/null')
+    # output=$(eval '"$@" & SPID=$!
+    # ( sleep 5 && kill "$SPID" >/dev/null) &
+    # wait "$SPID"')
+    # output=$( bash -c '{sleep 5 && kill $$ >/dev/null; }& eval "$@"' )
+    # output=$(eval '{sleep 5 && kill $$ >/dev/null; } & "$@"')
+    # output=$(timeout --foreground 5 eval '"$@"')
+    # output=$(timeout --foreground 5 "$@")
+    # output=$(eval 'timeout -k 5 --foreground 3 "$@"')
+    # output=$( ( set +b; sleep 3 & "$@" & wait -n; kill -9 $(jobs -p); ) )
 }
 
 # writes the output of the previously used "try" command
@@ -86,11 +105,23 @@ esac
 case "$mimetype" in
     # Syntax highlight for text files:
     text/* | */xml)
-		# --wrap-simple --width="$width"
+        # --wrap-simple --width="$width"
         try /usr/bin/highlight --out-format=xterm256 --encoding=utf8 --failsafe \
             --line-numbers --line-number-length=3 --replace-tabs=4 --no-trailing-nl \
             --validate-input --style=$STYLE \
-            "$path" && { dump | trim; exit 5; } || exit 2;;
+          "$path" && { dump | trim; exit 5; } || exit 2;;
+
+        # try pygmentize "$path" && { dump | trim; exit 5; } || exit 2;;
+        # try "$EXTDIR/pygmentation.py" \
+        #     "$path" && { dump | trim; exit 5; } || exit 2;;
+
+        # try "$EXTDIR/vimcatwrapper" "$path" && { dump | trim; exit 5; } || exit 2 ;;
+        # "$EXTDIR/color-preview" "$path" && exit 5 || exit 2 ;;
+
+        # NOTE:
+        #   http://stackoverflow.com/questions/14690010/bash-trick-program-into-thinking-stdout-is-an-interactive-terminal
+        # try script -qc "vimcat -u ~/.vim/vimcatrc \"$path\"" /tmp/aura/ranger_typescript &&
+        #       { dump | trim; exit 5; } || exit 2 ;;
 
     # Ascii-previews of images:
     image/*)
