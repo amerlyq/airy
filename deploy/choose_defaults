@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/bin/bash -e
 source ~/.shell/funcs
 
 # Windows manager
@@ -52,4 +51,3 @@ ZSH=$(which zsh)
 ZSH=${ZSH:-$(which bash)}
 #sudo chsh -s `which zsh`
 sudo usermod -s $ZSH "$CURR_USER"
-

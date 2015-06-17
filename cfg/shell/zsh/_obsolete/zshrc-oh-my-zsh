@@ -70,7 +70,7 @@ source ~/.shell/env
 source "$ZSH_CUSTOM/amer-widgets.zsh"
 source "$ZSH_CUSTOM/amer-key-mix.zsh"
 source "$ZSH_CUSTOM/filetypes.zsh"
-DEFAULT_USER="$CURR_USER"
+DEFAULT_USER=$(whoami)
 source ~/.shell/aliases
 
 export SHELL=$(which zsh)

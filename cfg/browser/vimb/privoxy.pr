@@ -18,7 +18,8 @@ apt_noprompt 'privoxy'
 #   https://code.google.com/p/ruadlist/wiki/adblock_plus_installation
 # SEE  https://adblockplus.org/forum/viewtopic.php?f=2&t=3486
 git_install 'Andrwe/privoxy-blocklist' -d
-cd "$CURR_PKG_DIR"
+
+# cd "$CURR_PKG_DIR"
 # ./privoxy-blocklist.sh
 # 2) edit /etc/conf.d/privoxy-blacklist, and uncomment the line that says "PRIVOXY_USER=" and the two lines below it.
 # 3) Run the script again to download and install the blocklists.

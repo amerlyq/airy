@@ -1,4 +1,5 @@
 #!/bin/bash
+source ~/.shell/profile
 source ~/.shell/funcs
 amScriptDir -s
 if [ -z "$SCRIPT_DIR" ]; then echo "Error: SCRIPT_DIR"; exit 1; fi

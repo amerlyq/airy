@@ -1,5 +1,6 @@
-#!/bin/bash
-if [ -z "$CURR_USER" ]; then [[$PS1]]&&return||exit; fi
+#!/bin/bash -e
+source ~/.shell/profile
+if [[ -z "$CURR_USER" ]]; then [[$PS1]]&&return||exit; fi
 
 # Reboot w/o sudo: remove all previous entries for user and append to end
 # Or manually setting: launch editor of access file with errs checking '$ sudo visudo', and append your's user

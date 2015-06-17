@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+source ~/.shell/profile
+cd $(dirname $(readlink -m ${0}))
 ARGS="$@"
+
 source ~/.shell/func.d/system && amScriptDir || exit
 source "$SCRIPT_DIR/vbox-funcs" || exit
 source "$SCRIPT_DIR/vbox-env" || exit
