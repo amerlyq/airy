@@ -1,12 +1,8 @@
 # vim: ft=zsh
 # Executes commands at login pre-zshrc.
 
-export EDITOR='vim'
-export VISUAL="$EDITOR"
-export PAGER='less'
-[[ -z "$LANG" ]] && export LANG='en_US.UTF-8'
-[[ -z "$LC_NUMERIC" ]] && export LC_NUMERIC="$LANG"
-
+## Load std environment (EDITOR, LANG, etc)
+[[ -d ~/.shell/env ]] && source ~/.shell/env
 
 ### Paths ###
 # Ensure path arrays do not contain duplicates.

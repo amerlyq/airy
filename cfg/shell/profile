@@ -1,0 +1,23 @@
+# vim: ft=sh
+
+### Profile Mgmt ###
+CURR_PROF="default"
+CURR_PLTF=$(expr substr $(uname -s) 1 5)
+CURR_USER=${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}
+CURR_HOST=${HOSTNAME:-$(uname -n)}
+
+
+### Dirs ###
+CURR_DIR_PKG=~/pkg
+CURR_DIR_HUB=~/hub
+CURR_DIR_SYNC=~/synchro
+CURR_DIR_VARS=~/.cache/airy/vars
+
+
+### Load ###
+PKG_LIST=(shell/* dev net cli_utils ranger vim)
+if [[ -f ~/.cache/airy/profile ]]; then
+    source ~/.cache/airy/profile || return
+fi
+WORK_NAME="${WORK_NAME:-${MAIN_NAME?No MAIN_NAME}}"
+WORK_MAIL="${WORK_MAIL:-${MAIN_MAIL?No MAIN_MAIL}}"

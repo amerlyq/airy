@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+source ~/.shell/profile || exit
 
 ### MBR unnecessary if use whole disk, but you need grub. And vice versa.
 ### But for partitioned disk Windows and Office will lost activations.
@@ -24,8 +25,6 @@
 # 3. Use full disk, but mbr with only one entry to windows. Not secure.
 # 4. Two bcdedit options -- original and repaired for vbox.
 
-source ~/.shenv
-if [ $? -ne 0 ]; then echo "nnoo!"; exit; fi
 
 # Available Profiles
 if [ "$CURR_PROF" != "home" -a "$CURR_PROF" != "work" ]; then

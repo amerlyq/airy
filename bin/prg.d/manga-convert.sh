@@ -1,12 +1,11 @@
 #!/bin/bash
+source ~/.shell/profile || exit
+source ~/.shell/funcs || exit
 
-# http://commons.wikimedia.org/wiki/Help:Creating_a_DjVu_file
-# http://debiania.blogspot.com/2010/06/djvu-linux.html
+# SEE
+#   http://commons.wikimedia.org/wiki/Help:Creating_a_DjVu_file
+#   http://debiania.blogspot.com/2010/06/djvu-linux.html
 
-source ~/.shenv
-[ $? -ne 0 ] && exit
-source ~/.shell/funcs
-[ $? -ne 0 ] && exit
 
 if [ "$CURR_PLTF" == "MINGW" ]; then
     pr7zip="/c/Program Files/7-Zip"

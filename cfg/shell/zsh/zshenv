@@ -1,9 +1,14 @@
 # vim: ft=zsh
-# Defines environment variables.
+# ~/.zshenv -- always sourced by zsh (before ~/.zshrc).
 
-ZDOTDIR=~/.cache/zsh
-
+[[ -d ~/.cache/zsh ]] && ZDOTDIR=~/.cache/zsh
 # Ensure that a non-login, non-interactive shell has a defined environment.
-if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
-    source "${ZDOTDIR:-$HOME}/.zprofile"
-fi
+if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]
+then source "${ZDOTDIR:-$HOME}/.zprofile"; fi
+
+# WARNING: Available even in Zsh scripts!
+# :> But as I mostly writing portable scripts in bash, it's not a problem.
+# WARNING: It should not contain commands that produce output or assume the
+# shell is attached to a tty.
+# So it can't be used to source aliases to be available in ranger.
+# For bash use analogue BASH_ENV=$HOME/.zshenv before launching

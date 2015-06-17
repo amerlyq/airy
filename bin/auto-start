@@ -1,6 +1,5 @@
 #!/bin/bash
-
-source ~/.shenv
+source ~/.shell/profile
 
 MAXWAIT=30
 
@@ -11,8 +10,8 @@ MAXWAIT=30
 
 lau() {
     local pr="$1" args="${@:2}"
-    if which "$pr" > /dev/null || [ -f "$pr" ]; then
-        if ! pgrep "$pr" > /dev/null; then
+    if which "$pr" > /dev/null || [ -f "$pr" ]
+    then if ! pgrep "$pr" > /dev/null; then
             printf "exec:    $pr $args \n"
             $pr $args &
 
@@ -48,7 +47,7 @@ rcf() {
 ### ALWAYS ### --------------------------------------
 
 setX ktdaw
-[ -f ~/.Xresources ] && xrdb ~/.Xresources
+[[ -f ~/.Xresources ]] && xrdb ~/.Xresources
 
 #[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults &
 # Focus certain wksp
@@ -68,4 +67,3 @@ lau syncthing > /tmp/syncthing.log 2>&1
 # i3-msg 'workspace number 11'
 [[ "$CURR_PROF" == "work" ]] && lau pidgin
 # i3-msg 'workspace number 1'
-

@@ -1,4 +1,7 @@
 #!/bin/bash
+source ~/.shell/profile || exit
+
+# SEE
 #   https://wiki.archlinux.org/index.php/synergy
 # ALT: x2x, xrdp
 #   http://raspberrypi.stackexchange.com/questions/4253/forward-mouse-and-keyboard-input-to-x-session
@@ -9,10 +12,6 @@
 
 # --name screen-name | This option lets the client use a name
 #                    | other  than  its  hostname for its screen.
-
-source ~/.shenv
-if [ $? -ne 0 ]; then exit 1; fi
-
 
 CONF=~/.config/.synergy.conf
 
@@ -28,4 +27,3 @@ if [ "$1" == "k" ]; then exit; fi # kill only
 
 # Set display to be able launch this by SSH
 DISPLAY=:0.0 $PR --restart $MODE $LARGS
-

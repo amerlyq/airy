@@ -1,0 +1,44 @@
+# vim: ft=sh
+
+export EDITOR='vim'
+export VISUAL="$EDITOR"
+export PAGER='less'
+if [[ -z "$LANG" ]]; then export LANG='en_US.UTF-8'; fi
+if [[ -z "$LC_NUMERIC" ]]; then export LC_NUMERIC="$LANG"; fi
+export PATH="$PATH:$HOME/.bin"
+# export MANPATH="/usr/local/man:$MANPATH"
+
+
+#SDL2=$CURR_DIR_PKG/SDL
+
+### Java SDK ###
+if [[ -d /usr/java/jdk1.8.0_31 ]]; then
+    # export JAVA32_HOME=/usr/lib/jvm/java-7-openjdk-i386
+    # export JAVA64_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+
+    #/usr/lib/jvm/java-8-oracle
+    export JAVA64_ORACLE_HOME=/usr/java/jdk1.8.0_31
+    export JAVA_HOME="$JAVA64_ORACLE_HOME"
+    export PATH="$PATH:$JAVA_HOME/bin:$JAVA_HOME/include"
+fi
+
+### Android ###
+if [[ -d ~/sdk/android-sdk-linux ]]; then
+    export ANDROID_SDK=~/sdk/android-sdk-linux
+    # export ANDROID_BIN=$ANDROID_SDK/tools/android
+    export ANDROID_GENYMOTION=~/sdk/android-genymotion
+    export PATH="$PATH:$ANDROID_SDK/tools:$ANDROID_SDK/platform-tools\
+        :$ANDROID_SDK/build-tools/19.1.0:$ANDROID_GENYMOTION"
+
+    export ANDROID_NDK=~/sdk/android-ndk-linux
+    #export ANDROID_SRC=\$ANDROID_DIR/android_sources
+    #export ANDROID_BIN=\$ANDROID_DIR/android_binaries
+    #export ANDROID_NDK_TOOLCHAIN_ROOT=\$ANDROID_DIR/android-toolchain
+    # export PATH="$PATH:$ANDROID_NDK_TOOLCHAIN_ROOT/bin"
+fi
+
+
+### Custom ###
+if [[ -d ~/.cache/airy/env ]]; then
+    source ~/.cache/airy/env
+fi

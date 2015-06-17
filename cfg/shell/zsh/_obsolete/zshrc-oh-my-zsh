@@ -66,20 +66,13 @@ source "$ZSH_CUSTOM/completion.zsh"
 source "$ZSH/oh-my-zsh.sh"
 
 # User configuration
-if [ -f ~/.shenv  ]; then source ~/.shenv; fi
+source ~/.shell/env
 source "$ZSH_CUSTOM/amer-widgets.zsh"
 source "$ZSH_CUSTOM/amer-key-mix.zsh"
 source "$ZSH_CUSTOM/filetypes.zsh"
 DEFAULT_USER="$CURR_USER"
+source ~/.shell/aliases
 
-# ~/.zshenv -- always sourced by zsh (before ~/.zshrc).
-# WARNING: Available even in scripts! With #!/zsh
-# But as I mostly writing portable scripts in bash, it's not a problem.
-# WARNING: It should not contain commands that produce output or assume the
-# shell is attached to a tty.
-# So it can't be used to source aliases to be available in ranger.
-# For bash use analogue BASH_ENV=$HOME/.zshenv before launching
-if [ -f ~/.shell/aliases ]; then source ~/.shell/aliases ; fi
 export SHELL=$(which zsh)
 
 # Preferred editor for local and remote sessions

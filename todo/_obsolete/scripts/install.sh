@@ -96,7 +96,7 @@ export CURR_THEME=$CURR_THEME" "$dst"
         echo ">>>>>>>>>>> Used '$CURR_THEME' theme for all apps"
     ;; esac
 fi
-source ~/.shenv
+source ~/.shell/profile
 echo "$CURR_PROF :={ $CURR_PLTF, $CURR_HOST, $CURR_USER }"
 
 

@@ -33,24 +33,24 @@ shopt -s expand_aliases
 stty -ixon
 
 # make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+[[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
 export SHELL=$(which bash)
 
 # Alias definitions.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-if [ -f ~/.shell/bash/prompt ]; then source ~/.shell/bash/prompt; fi
-if [ -f ~/.shenv ]; then source ~/.shenv; fi
-if [ -f ~/.shell/aliases ]; then source ~/.shell/aliases; fi
-if [ -f ~/.shell/funcs ]; then source ~/.shell/funcs; fi
+source ~/.shell/env
+source ~/.shell/bash/prompt
+source ~/.shell/funcs
+source ~/.shell/aliases
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
+  if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+    source /usr/share/bash-completion/bash_completion
+  elif [[ -f /etc/bash_completion ]]; then
+    source /etc/bash_completion
   fi
 fi
 

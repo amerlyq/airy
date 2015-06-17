@@ -1,8 +1,5 @@
-#!/bin/bash
-# Gen: /etc/rc.local
-# vim: sw=2
-
-source ~/.shenv
+#!/bin/bash -e
+source ~/.shell/profile
 source ~/.shell/funcs
 
 # To process errors with share folder name don't exists
@@ -55,4 +52,3 @@ fi
 #     ethtool -s eth0 wol d
 #     ifconfig eth0 down"
 # fi
-

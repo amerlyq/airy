@@ -1,4 +1,5 @@
 #!/bin/bash
+# [[ $- =~ i ]] && return || exit
 cd $(dirname $(readlink -m ${0})) || exit
 set -o errexit
 set -o pipefail
@@ -17,6 +18,7 @@ esac
 
 
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+# ldir(){ mkdir -p $2 && lndir "$1" $2; }
 pretty() { sed "
     s|/home/$(whoami)|\~|g
     s|\~/\S\+/cfg/||g
@@ -36,11 +38,12 @@ if [[ -f ../erian/setup ]]; then
     ../erian/setup "$ARGS" | pretty
 fi
 
+
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
-cfgs=(shell/* browser/* media/* git init i3 mutt ranger sets urxvt vim Xrc)
-
-for nm in "${cfgs[@]}"; do
+# WARNING: what to do if not exists?
+source ~/.shell/profile || PKG_LIST=(shell/*)
+for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl
     do echo ">>> $fl <<<"; $fl $ARGS; done
 done | pretty

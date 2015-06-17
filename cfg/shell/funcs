@@ -1,16 +1,14 @@
 # vim: ft=sh
-#source ~/.shenv
 
 DIR=~/.shell/func.d
-if [ ! -e "$DIR" ]; then
+FLES=(system links git write)
+
+if [[ ! -e "$DIR" ]]; then
     DIR=./cfg/bash/functions.d
 fi
 
-FLES=(system links git write)
-
-if [ -d "$DIR" ]; then
+if [[ -d "$DIR" ]]; then
     for fl in ${FLES[@]}; do
         source "$DIR/$fl"
     done
-else printf "Not exist $DIR"
-fi
+else printf "Not exist '$DIR'"; fi

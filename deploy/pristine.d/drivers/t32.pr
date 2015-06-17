@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 # vim: ft=sh
-source ~/.shenv
-source ~/.shell/func.d/packages
-if [ $? -eq 1 ]; then exit 1; fi
+source ~/.shell/profile
 
 ISO="${1?Need iso name}"
 DIR="/opt/t32"
@@ -44,4 +42,3 @@ sudo service udev reload
 # export T32SYS=/opt/t32mini
 # export T32TMP=/tmp
 # export T32ID=T32
-

@@ -10,11 +10,9 @@ esac
 
 case "$SHELL" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-ldir(){ rm -rf $2 && mkdir -p $2 && lndir "$1" $2; }
 
 ### LINKS ###
 link "$PWD" ~/.shell
-ldir "$PWD/profile.d" ~/.config/airy/
 link "$PWD/input/dircolors.ansi-${THEME}" ~/.dircolors
 # TODO: link tmux/theme-${THEME}.conf ~/.tmux-color.conf
 

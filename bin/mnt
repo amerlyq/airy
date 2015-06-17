@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -e
+source ~/.shell/profile
 
 # ???? instead of file name
 # sudo LC_ALL="ru_RU.UTF-8" ranger (don't work but helps)
@@ -68,9 +69,9 @@ case "$ACTION" in
  p) domtp "phone" ;;
  o) doloop "$LBL" ;;
  s) case "$LBL" in
-    android) dosamba $ADR_USER $ADR_IPL ;;
+    android) dosamba ${ADR_USER?No var} $ADR_IPL ;;
 #{Books,${WORK_MAIL%@*}}
-     seclab) dosamba ${WORK_MAIL%@*} $SURC_SRV/Exchange ;;
+     seclab) dosamba ${WORK_MAIL%@*} ${SURC_SRV?No var}/Exchange ;;
 ${WORK_MAIL%@*}) dosamba ${WORK_MAIL%@*} $SURC_SRV/${WORK_MAIL%@*} ;;
 #{exchange,projects,install}
     install) dosamba ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;;
@@ -80,4 +81,3 @@ ${WORK_MAIL%@*}) dosamba ${WORK_MAIL%@*} $SURC_SRV/${WORK_MAIL%@*} ;;
  i) sudo blkid ;;  # Get table disk/label/filesystems
  *) echo "Error: '$ACTION'" ;;
 esac
-

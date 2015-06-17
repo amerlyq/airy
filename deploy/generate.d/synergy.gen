@@ -1,16 +1,12 @@
-#!/bin/bash
-# vim: ft=sh
+#!/bin/bash -e
+source ~/.shell/profile
+
+# SEE
 #   https://wiki.archlinux.org/index.php/synergy
 #   https://help.ubuntu.com/community/SynergyHowto
 
-source ~/.shenv
-source ~/.shell/funcs
-if [ $? -eq 1 ]; then exit 1; fi
-
 dst=~/.config/.synergy.conf
-wbegin
-
-wstr "
+cat > $dst << EOT
 section: screens
     $LAPT_HOST:
         # halfDuplexCapsLock = false
@@ -71,6 +67,6 @@ section: options
     # keystroke(f12) = lockCursorToScreen(toggle)
     keystroke(Super+minus) = switchInDirection(up)
 end
-"
+EOT
 
 echo "W: $dst"

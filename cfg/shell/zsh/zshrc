@@ -3,16 +3,11 @@
 ## Add completions and themes from custom place
 # fpath=(~/.shell/zsh/completion.d $fpath ~/.shell/zsh/theme.d)
 
-prompt_parts="┌─└╢╼"
-
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-### Vars ###
-
-# export MANPATH="/usr/local/man:$MANPATH"
 
 ### Opts ###
 ## Disable suspending on <C-s>, <C-q>
@@ -22,21 +17,14 @@ setopt globdots
 
 
 ### User Cfg ###
-if [[ -f ~/.shenv ]]; then source ~/.shenv; fi
+# You will see errors in tty if one of them is not found:
+# source ~/.shell/env -- must be already sourced through .zprofile
 source ~/.shell/zsh/amer-widgets.zsh
 source ~/.shell/zsh/amer-key-mix.zsh
 source ~/.shell/zsh/filetypes.zsh
 # source ~/.shell/zsh/completion.zsh  # UNUSED
+source ~/.shell/aliases
 
-
-# ~/.zshenv -- always sourced by zsh (before ~/.zshrc).
-# WARNING: Available even in scripts! With #!/zsh
-# But as I mostly writing portable scripts in bash, it's not a problem.
-# WARNING: It should not contain commands that produce output or assume the
-# shell is attached to a tty.
-# So it can't be used to source aliases to be available in ranger.
-# For bash use analogue BASH_ENV=$HOME/.zshenv before launching
-if [[ -f ~/.shell/aliases ]]; then source ~/.shell/aliases ; fi
 
 ## Trap to sync zsh and ranger working directories.
 # NOTE: '>!' is because of 'unsetopt CLOBBER' by 'prezto:directory'
