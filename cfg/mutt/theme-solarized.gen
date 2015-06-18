@@ -1,0 +1,33 @@
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
+
+SRC="$PWD/theme-solarized.muttrc"
+dst=~/.cache/mutt/theme && mkdir -p "${dst%/*}"
+column="$(( 2 + (COLORS!=256) + 2*(THEME==light) ))"
+
+awk 'NR==FNR {a[$1]=$'"$column"';next} {
+   for (i in a) {gsub(i"(\\s+|$)",sprintf("%-16s",a[i]))}
+}1' - "$SRC" > "${dst}" <<SETPALETTEDARK
+J_base03    color234  brightblack    color233  brightblack
+J_base02    color235  black          color234  black
+J_base01    color240  brightgreen    color239  brightgreen
+J_base00    color241  brightyellow   color240  brightyellow
+J_base0     color244  brightblue     color244  brightblue
+J_base1     color245  brightcyan     color245  brightcyan
+J_base2     color254  white          color254  white
+J_base3     color230  brightwhite    color230  brightwhite
+J_yellow    color136  yellow         color136  yellow
+J_orange    color166  brightred      color166  brightred
+J_red       color160  red            color160  red
+J_magenta   color125  magenta        color125  magenta
+J_violet    color61   brightmagenta  color61   brightmagenta
+J_blue      color33   blue           color33   blue
+J_cyan      color37   cyan           color37   cyan
+J_green     color64   green          color64   green
+J_bg        color234  default        color233  default
+J_fg        color244  default        color240  default
+J_statusfg  color241  brightyellow   color244  brightblue
+J_statusbg  color235  black          color254  white
+SETPALETTEDARK
+
+echo "W: ~/.cache/mutt/theme (${THEME:-dark})"
