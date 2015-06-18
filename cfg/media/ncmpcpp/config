@@ -208,8 +208,13 @@ song_list_format = {$4 %f$9}$R{$8▕ %l $9}
 #
 #
 #alternative_header_first_line_format = $b$1$aqqu$/a$9 {%t}|{%f} $1$atqq$/a$9$/b
-#
 #alternative_header_second_line_format = {{$4$b%a$/b$9}{ - $7%b$9}{ ($4%y$9)}}|{%D}
+### For streaming, show radiostation title
+#: so by defining an OR condition for a tag that is most probably not being
+#: filled by the radio station (i chose artist %a), i get a sane layout whether
+#: i play radio or some songs from my database.
+#alternative_header_first_line_format ="$b$5«« {%a}|{%t} »»$9$/b"
+#alternative_header_second_line_format ="$b$5 {%b}|{%f} {%b} ({%y})$9$/b"
 #
 now_playing_prefix = $b$u
 #
@@ -277,8 +282,7 @@ selected_item_suffix = $/b$9
 ##
 #
 # song_columns_list_format = (20)[]{a} (6f)[green]{NE} (50)[white]{t|f:Title} (20)[cyan]{b} (7f)[magenta]{l}
-song_columns_list_format = (3f)[red]{nrE:Tr} (8f)[blue]{lr} (45)[yellow]{t|f} (1f)[green]{} (20)[green]{a|c|p:Artist} (20)[cyan]{b|D:Album/Dir}
-#
+song_columns_list_format = (3f)[red]{nrE:Tr} (8f)[blue]{lr} (45)[yellow]{t|f} (1f)[green]{} (20)[green]{a|A|c|p|C:Artist} (20)[cyan]{b|D|d|f:Album/Dir}
 ##### various settings #####
 #
 ##

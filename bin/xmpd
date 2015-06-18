@@ -1,6 +1,27 @@
 #!/usr/bin/env bash
 source ~/.shell/profile || exit
 
+loadsongs() { sed 's/\s*#.*$//; /^\s*$/d' | while read song; do
+    { mpc playlist -f "[%file%]" | grep -q "$song"; } || mpc load "$song"
+done; }
+
+case "$1" in
+anime) loadsongs <<EOT
+http://animeradio.su/playlists/gar.pls
+http://animeradio.ru/play.m3u
+http://listen.radionomy.com/radio-anime.m3u   # Banned at work
+http://158.69.9.92:443/listen.pls
+http://apple.neostreams.info:10007/listen.pls
+EOT
+# MOOD:  http://8tracks.com/explore/anime
+exit ;;
+oldie) loadsongs <<EOT
+http://cent4.serverhostingcenter.com/tunein.php/ksbepaeb/playlist.pls
+http://somafm.com/bootliquor.pls
+EOT
+exit ;;
+esac
+
 loopback() {
     local cfg=~/".shell/../media/mpd/mpd-own.conf"
     if ! pgrep -f "mpd \S+\.${cfg##*.}"; then
