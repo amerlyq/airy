@@ -34,8 +34,8 @@ fi
 
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
-# WARNING: what to do if not exists?
-source ~/.shell/profile || PKG_LIST=(shell/*)
+# WARNING: what to do if not exists -- like on pure system setup?
+source ~/.shell/profile || PKG_LIST=(shell 'shell/*')
 for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl
     do echo ">>> $fl <<<"; $fl $ARGS; done
@@ -52,4 +52,4 @@ done | pretty
 
 header "DONE"
 
-# i3-msg restart
+bash -ic "i3-msg restart && sleep 1"

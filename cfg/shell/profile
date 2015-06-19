@@ -15,7 +15,8 @@ CURR_DIR_VARS=~/.cache/airy/vars
 
 
 ### Load ###
-PKG_LIST=('shell/*' dev net cli_utils ranger vim)
+# Def: prs for headless ssh, cli/tui only
+PKG_LIST=(shell 'shell/*' ranger vim)  #dev net cli_utils
 if [[ -f ~/.cache/airy/profile ]]; then
     source ~/.cache/airy/profile || return
 fi

@@ -3,11 +3,12 @@ cd $(dirname $(readlink -m ${0}))
 
 SRC="$PWD/theme-solarized.muttrc"
 dst=~/.cache/mutt/theme && mkdir -p "${dst%/*}"
-column="$(( 2 + (COLORS!=256) + 2*(THEME==light) ))"
+column="$(( 2 + (${COLORS:=16}!=256) + 2*(${THEME:=dark}==light) ))"
+echo "# $THEME/$COLORS" > "${dst}"
 
 awk 'NR==FNR {a[$1]=$'"$column"';next} {
    for (i in a) {gsub(i"(\\s+|$)",sprintf("%-16s",a[i]))}
-}1' - "$SRC" > "${dst}" <<SETPALETTEDARK
+}1' - "$SRC" >> "${dst}" <<SETPALETTEDARK
 J_base03    color234  brightblack    color233  brightblack
 J_base02    color235  black          color234  black
 J_base01    color240  brightgreen    color239  brightgreen
@@ -30,4 +31,4 @@ J_statusfg  color241  brightyellow   color244  brightblue
 J_statusbg  color235  black          color254  white
 SETPALETTEDARK
 
-echo "W: ~/.cache/mutt/theme (${THEME:-dark})"
+echo "W: ~/.cache/mutt/theme ($THEME)"
