@@ -9,8 +9,8 @@
 #        shift:both_shiftlock, lv3:menu_switch, misc:typo, keypad:pointerkeys" \
 #     -print > ./amer.xkb
 
-# cat "$HOME/.Xrc/xkb/amer.xkb" \ | xkbcomp -I"$HOME/.config/xkb" - "${DISPLAY%%.*}"
-xkbcomp -I"$HOME/.Xrc/xkb" "$HOME/.Xrc/xkb/amer.xkb" "${DISPLAY%%.*}"
+# cat "$PWD/amer.xkb" \ | xkbcomp -I"$HOME/.config/xkb" - "${DISPLAY%%.*}"
+xkbcomp -I"$PWD" "$PWD/amer.xkb" "${DISPLAY%%.*}"
 
 
 # cd /usr/share/X11/xkb/keymap

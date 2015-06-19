@@ -1,38 +1,13 @@
 #!/bin/bash -e
 cd $(dirname $(readlink -m ${0}))
 
-case "$1" in
--l|--list) # To see the current loaded resources
-    xrdb -query -all; exit ;;
-esac
-
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
-link "$PWD" ~/.Xrc
 link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
 link "$PWD/compton.conf" ~/.config/compton.conf
 link "$PWD/settings.ini" ~/.config/gtk-3.0/settings.ini
 
-link "$PWD/dunstrc" ~/.config/dunst/dunstrc
 ## To disable default notification daemon on Lubuntu
 # XFCE=/usr/share/dbus-1/services/org.xfce.xfce4-notifyd.Notifications.service
 # [[ -f "$XFCE" ]] && sudo mv -n $XFCE{,.disabled}
-
-### GENS ###
-# http://linuxoid.in/%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3:Xresources
-# Color schemes with scrshots:
-# http://linsovet.org.ua/terminal-color-schemes-2
-
-dst=~/.Xresources
-cat > $dst << EOT
-#define MAIN_DPI ${MAIN_DPI:-96}
-#include ".Xrc/xtermrc"
-#include ".Xrc/xfontrc"
-#include ".urxvt/urxvtrc"
-#include "$(if [[ -f ~/.cache/airy/theme-urxvt ]]
-then printf ".cache/airy/theme-urxvt"
-else printf ".urxvt/themes/amer-dark"
-fi)"
-EOT
-
-xrdb -load ~/.Xresources
+link "$PWD/dunstrc" ~/.config/dunst/dunstrc

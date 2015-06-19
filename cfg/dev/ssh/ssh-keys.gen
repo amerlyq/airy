@@ -1,18 +1,22 @@
 #!/bin/bash -e
 source ~/.shell/profile
-ARGS="$1"
+cd $(dirname $(readlink -m ${0}))
+
+case "$1" in
+-u|--update) update="$1" ;;
+esac
 
 genssh(){ # $1 -- @mail, $2 -- path/to/key
     local mail="$1" idn="$HOME/.ssh/$2"
-    if [[ ! -f "$idn" || "$ARGS" == --update ]]; then
+    if [[ ! -f "$idn" || "$update" -eq 1 ]]; then
         ssh-keygen -t rsa -C "$mail" -N "" -f "$idn"
         echo "!!! Copy generated *.pub key to your servers"
     fi
 }
 # =================== Multi--SSH ============================
 
-genssh "$WORK_MAIL" id_rsa
-genssh "$MAIN_MAIL" git_rsa
+genssh "${WORK_MAIL?No work}" id_rsa
+genssh "${MAIN_MAIL?No main}" git_rsa
 
 case "$CURR_PROF" in
   work) genssh "$WORK_MAIL" srk_rsa ;;

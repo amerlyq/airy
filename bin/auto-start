@@ -46,7 +46,7 @@ rcf() {
 
 ### ALWAYS ### --------------------------------------
 
-setX ktdaw
+setX tdaw
 [[ -f ~/.Xresources ]] && xrdb ~/.Xresources
 
 #[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults &
@@ -56,7 +56,11 @@ setX ktdaw
 
 ### ONCE ### ----------------------------------------
 
+## Keylayout
+lau xkbcomp ~/.cache/airy/keylayout.xkm
+lau xcape -t 250 -e "Control_L=Escape"
 lau kbdd
+
 lau ~/.i3/blocks/kbdd-i3blocks
 rcf dunst
 lau mpd

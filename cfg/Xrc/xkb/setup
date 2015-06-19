@@ -1,0 +1,19 @@
+#!/bin/bash -e
+source ~/.shell/profile
+cd $(dirname $(readlink -m ${0}))
+
+### GENS ###
+kmap() { xkbcomp -I"$HOME/.Xrc/xkb" ${1:--} ${2} 2>&1 |
+    sed '/No symbols defined\|Symbols ignored\|not found in evdev/d'; }
+
+dst=~/.cache/airy/keylayout.xkm
+
+case "$CURR_HOST" in
+vbox) sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|
+          ' ./amer.xkb | kmap - "-xkm $dst" ;;
+*) kmap ./amer.xkb "-xkm $dst"
+esac
+echo "W: $dst"
+
+## Update
+kmap "$dst" ${DISPLAY%%.*}

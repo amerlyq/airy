@@ -1,5 +1,5 @@
-#!/bin/bash
-source ~/.shell/profile || exit
+#!/bin/bash -e
+source ~/.shell/profile
 
 # SOLUTION: bind instead of bindsym in i3conf, need generate conf by script
 
@@ -16,7 +16,10 @@ source ~/.shell/profile || exit
 #   /usr/share/X11/xkb/rules/evdev.lst
 # Details: /usr/share/X11/xkb/symbols
 
-CONF=$( cat "$HOME/.Xrc/xkb/amer.xkb" )
+DIR=~/.cache/airy/xkb
+[[ -d "$DIR" ]] || exit
+
+CONF=$(cat "$DIR/amer.xkb")
 if [ "$CURR_HOST" == "vbox" ]; then
     CONF=$( sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|' <<< "$CONF" )
 # elif [ "$1" == "elona" ]; then
@@ -34,9 +37,9 @@ printf "$CONF" |
     sed '/No symbols defined\|Symbols ignored\|not found in evdev/d'
 
 
-pgrep xcape > /dev/null || {
-    xcape -t 250 -e "Control_L=Escape" &
-}
+# pgrep xcape > /dev/null || {
+#     xcape -t 250 -e "Control_L=Escape" &
+# }
 
 # setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
 #     -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \

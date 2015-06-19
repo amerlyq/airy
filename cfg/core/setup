@@ -15,7 +15,7 @@ for nm in profile; do link "$PWD/$nm" ~/.${nm##*/}; done
 if grep -q Ubuntu /proc/version; then (cd ./ubuntu
     ./xsessionrc.gen
     ./hosts.gen
-    if [[ -n "$update" ]]; then
+    if [[ "$update" -eq 1 ]]; then
         ./rc-local.gen
         ./nosudo_reboot
     fi

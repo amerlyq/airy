@@ -5,8 +5,5 @@ cd $(dirname $(readlink -m ${0}))
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 
-link "$PWD" ~/.shell
-link "$PWD/input/dircolors-${THEME}.ansi" ~/.dircolors
-
-for nm in bash/bashrc input/inputrc
-do link "$PWD/$nm" ~/.${nm##*/}; done
+link "$PWD/tmux.conf" ~/.tmux.conf
+link "$PWD/theme-${THEME}.conf" ~/.cache/airy/theme-tmux.conf

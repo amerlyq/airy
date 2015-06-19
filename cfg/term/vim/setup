@@ -57,7 +57,7 @@ fi
 
 
 ### PLUGINS ###
-if [[ ! -d "$VCACHE/bundle" || -n "$update" ]]; then
+if [[ ! -d "$VCACHE/bundle" || "$update" -eq 1 ]]; then
     vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall
     sudo pip install --upgrade pip -U jedi
 fi

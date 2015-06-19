@@ -6,7 +6,7 @@ cd $(dirname $(readlink -m ${0})) || exit
 
 case "$1" in
 dark|light|lucid|opaque) THEME="${1}" ;;
--u|--update) ARGS="$1" ;;
+-u|--update) ARGS="$1"; update=1 ;;
 --clean) ARGS="$1" ;;
 ?*) echo "Error: no such option '$1'"; exit 1 ;;
 esac
@@ -14,6 +14,7 @@ esac
 [[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
 echo "$THEME" > ~/.cache/airy/theme
 
+# ======================================================================
 
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 # ldir(){ mkdir -p $2 && lndir "$1" $2; }
@@ -25,17 +26,25 @@ header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
 header "Airy public"
 link "$PWD/bin" ~/.bin
 
+# ======================================================================
+
 ## Populate sensible configs
 if [[ -f ../erian/setup ]]; then
     header "Erian private data"
     ../erian/setup "$ARGS" | pretty
 fi
 
+# ======================================================================
 
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
 # WARNING: what to do if not exists -- like on pure system setup?
 source ~/.shell/profile || PKG_LIST=(shell 'shell/*')
+
+case "$CURR_PROF" in laptop|home|work)
+PKG_LIST=(shell 'shell/*' core 'dev/*' i3 'term/*' Xrc 'Xrc/*' 'browser/*' 'media/*')
+;; esac
+
 for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl
     do echo ">>> $fl <<<"; $fl $ARGS; done
@@ -50,10 +59,11 @@ done | pretty
 # find . -mindepth 2 -type f -wholename "*/setup" -not -exec \
 #     bash -c "echo '>>> {} <<<' && '{}' $ARGS || exit" \; -quit
 
+# ======================================================================
+
 header "DONE"
+[[ "$update" -eq 1 ]] && i3-msg restart </dev/tty >/dev/null 2>&1
 
-i3-msg restart </dev/tty >/dev/null 2>&1
-
-# Interactive choose
+# Interactive choose defaults
 #   sudo update-alternatives --config gnome-www-browser
 #   update-alternatives --display x-session-manager

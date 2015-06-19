@@ -2,12 +2,18 @@
 cd $(dirname $(readlink -m ${0}))
 [[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
 
+case "$1" in
+-l|--list) # To see the current loaded resources
+    xrdb -query -all; exit ;;
+esac
+
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
+
 dst=~/.cache/airy/theme-urxvt
+link "$PWD" ~/.urxvt
 link "$PWD/themes/amer-${THEME}" "$dst"
 
-xrdb -merge -I"$PWD" urxvtrc "$dst"
 
 mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
     sudo update-alternatives --set $1 "$2"; }
@@ -24,3 +30,25 @@ mkdef x-terminal-emulator $(which urxvt)
 # Xcursor.theme: Vanilla-DMZ-AA
 # Xcursor.size:  22
 # https://wiki.archlinux.org/index.php/XScreenSaver
+
+
+### GENS ###
+# http://linuxoid.in/%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3:Xresources
+# Color schemes with scrshots:
+# http://linsovet.org.ua/terminal-color-schemes-2
+
+dst=~/.Xresources
+cat > $dst << EOT
+#define MAIN_DPI ${MAIN_DPI:-96}
+#include ".urxvt/etc/xtermrc"
+#include ".urxvt/etc/xfontrc"
+#include ".urxvt/urxvtrc"
+#include "$(if [[ -f ~/.cache/airy/theme-urxvt ]]
+then printf ".cache/airy/theme-urxvt"
+else printf ".urxvt/themes/amer-dark"
+fi)"
+EOT
+echo "W: ~/.Xresources"
+
+# xrdb -merge -I"$PWD" urxvtrc "$dst"
+xrdb -load ~/.Xresources
