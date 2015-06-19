@@ -28,7 +28,7 @@ case "$SIDE" in
 esac
 
 ## Get primary
-MON=(`xrandr | grep ' connected' | sed 's/^\([^ ]*\).*/\1/'`)
+MON=( $(xrandr --query | grep ' connected' | sed 's/^\([^ ]*\).*/\1/') )
 if [ "$SETS" != "$SIDE" ] && [ ${#MON[@]} -ge 2 ]
 then INDP=1; else INDP=0; fi
 # if [ "$CURR_PROF" == "home" ]; then INDP=2; else INDP=1; fi
@@ -45,7 +45,7 @@ PRIM="${MON[$INDP]}"; unset MON[$INDP];
 
 ## Set primary
 #if [ -z "$MAIN_DPI" ]; then MAIN_DPI=96; fi # --dpi $MAIN_DPI
-xrandr --output $PRIM --auto  --primary
+xrandr --output $PRIM --auto --primary
 echo "$PRIM" >> $FL
 
 if [ "$1" == 1 ]; then exit; fi
@@ -58,7 +58,7 @@ for m in "${MON[@]}"; do #or --mode 1920x1080 --dpi 96 --pos 1366x0,
 done
 
 ## Disable disconnected
-MON=(`xrandr | grep ' disconnected' | sed 's/^\([^ ]*\).*/\1/'`)
+MON=( $(xrandr --query | grep ' disconnected' | sed 's/^\([^ ]*\).*/\1/') )
 for m in "${MON[@]}"; do xrandr --output $m --off; done
 
 ## Backlight brightness

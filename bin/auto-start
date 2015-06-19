@@ -47,20 +47,20 @@ rcf() {
 ### ALWAYS ### --------------------------------------
 
 setX tdaw
-[[ -f ~/.Xresources ]] && xrdb ~/.Xresources
+[[ -f ~/.Xresources ]] && xrdb -load ~/.Xresources
 
-#[ -f ~/.Xdefaults ] && xrdb -merge ~/.Xdefaults &
+## Keylayout
+xkbcomp ~/.cache/airy/keylayout.xkm ${DISPLAY%%.*}
+lst=$(pgrep xcape) && kill -TERM $lst
+xcape -t 250 -e "Control_L=Escape"
+
 # Focus certain wksp
 #i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &
 
 
 ### ONCE ### ----------------------------------------
 
-## Keylayout
-lau xkbcomp ~/.cache/airy/keylayout.xkm
-lau xcape -t 250 -e "Control_L=Escape"
 lau kbdd
-
 lau ~/.i3/blocks/kbdd-i3blocks
 rcf dunst
 lau mpd

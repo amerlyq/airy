@@ -11,9 +11,6 @@ dark|light|lucid|opaque) THEME="${1}" ;;
 ?*) echo "Error: no such option '$1'"; exit 1 ;;
 esac
 
-[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
-echo "$THEME" > ~/.cache/airy/theme
-
 # ======================================================================
 
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
@@ -24,7 +21,13 @@ header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
 
 
 header "Airy public"
+
+cache=~/.cache/airy
+mkdir -p $cache/bin
 link "$PWD/bin" ~/.bin
+
+[[ "${THEME:=$(< $cache/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
+echo "$THEME" > $cache/theme
 
 # ======================================================================
 
@@ -42,7 +45,7 @@ header "Airy cfgs"
 source ~/.shell/profile || PKG_LIST=(shell 'shell/*')
 
 case "$CURR_PROF" in laptop|home|work)
-PKG_LIST=(shell 'shell/*' core 'dev/*' i3 'term/*' Xrc 'Xrc/*' 'browser/*' 'media/*')
+PKG_LIST=(shell 'shell/*' core 'dev/*' i3 'term/*' Xrc 'Xrc/*' 'net/*' 'browser/*' 'media/*')
 ;; esac
 
 for nm in "${PKG_LIST[@]}"; do

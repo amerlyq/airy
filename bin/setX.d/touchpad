@@ -1,17 +1,17 @@
-#!/bin/sh
+#!/bin/bash -e
 # http://www.x.org/archive/X11R7.5/doc/man/man4/synaptics.4.html
 
 # locate *synaptics.conf
 
-TPAD_NM=`xinput -list | grep Touchpad | sed "s@\W*\(\w*.*Touchpad\).*@\1@"`
-if [ -z "$TPAD_NM" ]; then exit; fi
+TPAD_NM=$(xinput -list | grep Touchpad | sed "s@\W*\(\w*.*Touchpad\).*@\1@")
 
-echo $TPAD_NM
-echo O: [{left, middle, right}, {two-fing, three-fing}, {conf-vert-resolution, ..-horiz-...}]
-
-# See w/o grep -- there plenty of properties
-xinput list-props "$TPAD_NM"
-#xinput list-props "$TPAD_NM" | grep Capabilities
+case "$1" in
+-l|--list) echo $TPAD_NM
+    echo O: [{left, middle, right}, {two-fing, three-fing}, {conf-vert-resolution, ..-horiz-...}]
+    # See w/o grep -- there plenty of properties
+    xinput list-props "${TPAD_NM?No touchpad}"
+    #xinput list-props "$TPAD_NM" | grep Capabilities
+;; esac
 
 #synclient -l | sort
 

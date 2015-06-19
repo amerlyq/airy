@@ -51,4 +51,4 @@ EOT
 echo "W: ~/.Xresources"
 
 # xrdb -merge -I"$PWD" urxvtrc "$dst"
-xrdb -load ~/.Xresources
+! xrdb -load ~/.Xresources 2>&1 | grep 'error'

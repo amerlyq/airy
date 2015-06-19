@@ -13,9 +13,8 @@
 #umask 022
 
 # set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.bin" ]; then
-    PATH="$HOME/.bin:$PATH"
-fi
+if [ -d ~/.cache/airy/bin ]; then PATH="$HOME/.cache/airy/bin:$PATH"; fi
+if [ -d ~/.bin ]; then PATH="$HOME/.bin:$PATH"; fi
 
 # For all my system-wide global files
 mkdir -p /tmp/aura

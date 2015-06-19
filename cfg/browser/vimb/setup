@@ -2,19 +2,18 @@
 cd $(dirname $(readlink -m ${0}))
 [[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^(dark|light)$ ]] || THEME=dark
 
-dir=~/.config/vimb
-mkdir -p $dir
-
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
+
+dir=~/.config/vimb
+if [[ "$1" != '-t' ]]; then  # Skip if you only toggle them
+    for nm in config 'dld-start' theme setup
+    do link "$PWD/$nm" "$dir/$nm"; done
+
+    mkdef() { if ! update-alternatives --get-selections | grep -q "^$1.*$2\$"
+    then sudo update-alternatives --install /usr/bin/$1 $1 "$2" 200
+         sudo update-alternatives --set $1 "$2"; fi; }
+    mkdef x-www-browser $(which vimb)
+fi
 
 link "$dir/theme/${THEME}.css" "$dir/style.css"
-[[ "$1" == '-t' ]] && exit
-
-for nm in config 'dld-start' theme setup
-do link "$PWD/$nm" "$dir/$nm"; done
-
-mkdef() { if ! update-alternatives --get-selections | grep -q "^$1.*$2\$"
-then sudo update-alternatives --install /usr/bin/$1 $1 "$2" 200
-     sudo update-alternatives --set $1 "$2"; fi; }
-mkdef x-www-browser $(which vimb)
