@@ -5,24 +5,25 @@ source ~/.shell/profile
 #   https://wiki.archlinux.org/index.php/synergy
 #   https://help.ubuntu.com/community/SynergyHowto
 
-dst=~/.config/.synergy.conf
+dst=~/.cache/airy/synergy.conf
+
 cat > $dst << EOT
 section: screens
-    $LAPT_HOST:
+    ${LAPT_HOST?No lapt}:
         # halfDuplexCapsLock = false
         # halfDuplexNumLock = false
         # halfDuplexScrollLock = false
         # xtestIsXineramaUnaware = false
         # switchCorners = none +top-left +top-right +bottom-left +bottom-right
         # switchCornerSize = 0
-    $HOME_HOST:
+    ${HOME_HOST?No home}:
         # halfDuplexCapsLock = false
         # halfDuplexNumLock = false
         # halfDuplexScrollLock = false
         # xtestIsXineramaUnaware = false
         # switchCorners = none +top-left +top-right +bottom-left +bottom-right
         # switchCornerSize = 0
-    $KEDI_HOST:
+    ${KEDI_HOST?No kedi}:
         # halfDuplexCapsLock = false
         # halfDuplexNumLock = false
         # halfDuplexScrollLock = false

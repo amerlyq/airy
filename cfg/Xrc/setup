@@ -12,8 +12,11 @@ link "$PWD" ~/.Xrc
 link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
 link "$PWD/compton.conf" ~/.config/compton.conf
 link "$PWD/settings.ini" ~/.config/gtk-3.0/settings.ini
-link "$PWD/dunstrc" ~/.config/dunst/dunstrc
 
+link "$PWD/dunstrc" ~/.config/dunst/dunstrc
+## To disable default notification daemon on Lubuntu
+# XFCE=/usr/share/dbus-1/services/org.xfce.xfce4-notifyd.Notifications.service
+# [[ -f "$XFCE" ]] && sudo mv -n $XFCE{,.disabled}
 
 ### GENS ###
 # http://linuxoid.in/%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3:Xresources

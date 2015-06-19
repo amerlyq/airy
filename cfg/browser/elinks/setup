@@ -6,3 +6,7 @@ link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 
 dir=~/.elinks && mkdir -p $dir
 link "$PWD/elinks.conf" "$dir/elinks.conf"
+
+mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+    sudo update-alternatives --set $1 "$2"; }
+mkdef www-browser $(which elinks)

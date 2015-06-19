@@ -1,25 +1,25 @@
 #!/bin/bash -e
 source ~/.shell/profile
-source ~/.shell/funcs
 
 # To process errors with share folder name don't exists
 # You can perform mount and catch error code.
 # But it's not possible for '#!/bin/sh -e' due to instant catch.
 
-if [ "$CURR_HOST" = "vbox" ]
-then type="vboxsf "
-else type="ntfs-3g /dev/disk/by-label/"; fi
+case "$CURR_HOST" in
+vbox) TYPE="vboxsf " ;;
+   *) TYPE="ntfs-3g /dev/disk/by-label/" ;;
+esac
 
 mount_dir() {
     local dir=/media/$CURR_USER/$1
-    wstr "
+    echo "
     mkdir -p \"$dir\"
-    mount -t ${type}$1 \"$dir\""
+    mount -t ${TYPE}$1 \"$dir\""
 }
 
-dst=`tempfile`
-wbegin "#!/bin/sh\n"
-wstr "
+dst=$(tempfile)
+cat > $dst << EOT
+#!/bin/sh
 # rc.local
 #
 # This script is executed at the end of each multiuser runlevel.
@@ -29,17 +29,15 @@ wstr "
 # In order to enable or disable this script just change the execution
 # bits.
 #
-# By default this script does nothing."
+# By default this script does nothing.
 
-for dir in $CURR_MOUNTS; do
-  mount_dir $dir
-done
+$(for dir in $CURR_MOUNTS; do mount_dir $dir; done)
 
-wprf '\nexit 0\n'
-
-chmod +x $dst
+exit 0
+EOT
 
 if ! diff -rq $dst "/etc/rc.local" ; then
+    chmod +x $dst
     sudo mv $dst /etc/rc.local
     echo "W: ${0} - mount"
 fi

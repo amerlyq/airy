@@ -22,6 +22,13 @@ for nm in zlogin zprofile zshrc zpreztorc
 do link "$PWD/$nm" "$ZDOTDIR/.${nm##*/}"; done
 
 
+# Choose default shell
+if [[ "$(which zsh)" != $SHELL ]]; then
+    sudo chsh -s $(which zsh)
+    sudo usermod -s $(which zsh) "$(whoami)"
+fi
+
+
 if [[ "$update" -eq 1 ]]; then
     # chsh -s /bin/zsh
     (cd "$PREZTO" && git pull && git submodule update --init --recursive)

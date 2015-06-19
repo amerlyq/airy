@@ -13,3 +13,8 @@ link "$dir/theme/${THEME}.css" "$dir/style.css"
 
 for nm in config 'dld-start' theme setup
 do link "$PWD/$nm" "$dir/$nm"; done
+
+mkdef() { if ! update-alternatives --get-selections | grep -q "^$1.*$2\$"
+then sudo update-alternatives --install /usr/bin/$1 $1 "$2" 200
+     sudo update-alternatives --set $1 "$2"; fi; }
+mkdef x-www-browser $(which vimb)

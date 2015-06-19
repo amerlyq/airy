@@ -1,6 +1,22 @@
 #!/bin/bash -e
 cd $(dirname $(readlink -m ${0}))
 
+case "$1" in
+-u|--update) update="$1" ;;
+esac
+
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 for nm in profile; do link "$PWD/$nm" ~/.${nm##*/}; done
+
+# update-alternatives
+#     x-session-manager cinnamon-session-cinnamon
+
+if grep -q Ubuntu /proc/version; then (cd ./ubuntu
+    ./xsessionrc.gen
+    ./hosts.gen
+    if [[ -n "$update" ]]; then
+        ./rc-local.gen
+        ./nosudo_reboot
+    fi
+); fi

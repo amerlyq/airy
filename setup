@@ -52,4 +52,8 @@ done | pretty
 
 header "DONE"
 
-bash -ic "i3-msg restart && sleep 1"
+i3-msg restart </dev/tty >/dev/null 2>&1
+
+# Interactive choose
+#   sudo update-alternatives --config gnome-www-browser
+#   update-alternatives --display x-session-manager

@@ -1,17 +1,22 @@
 #!/bin/bash -e
 source ~/.shell/profile
-if [[ -z "$CURR_USER" ]]; then [[$PS1]]&&return||exit; fi
 
 # Reboot w/o sudo: remove all previous entries for user and append to end
 # Or manually setting: launch editor of access file with errs checking '$ sudo visudo', and append your's user
 # If all that will break sudo command: '$ pkexec bash', and then change file manually
 
-dst=/etc/sudoers
-SYS_ENTRY="$CURR_USER ALL=(ALL) NOPASSWD:/usr/sbin/pm-hibernate,/usr/sbin/pm-suspend,\
+CURR_USER=${CURR_USER:-${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}}
+
+SYS_ENTRY="$CURR_USER ALL=(ALL) \
+NOPASSWD:/usr/sbin/pm-hibernate,/usr/sbin/pm-suspend,\
 /sbin/reboot,/sbin/halt,/sbin/shutdown,/sbin/poweroff"
-# ,/usr/bin/intel_backlight
 
+case "$CURR_PROF" in
+laptop) SYS_ENTRY="$SYS_ENTRY,/usr/bin/intel_backlight" ;;
+esac
+
+dst=/etc/sudoers
 sudo sed -i "/^$CURR_USER ALL=(ALL) NOPASSWD/d" $dst
-echo "$SYS_ENTRY" | sudo tee --append $dst  #> /dev/null # to deprecate printing
-echo "W: $dst <- reboot w/o sudo"
+echo "$SYS_ENTRY" | sudo tee --append $dst
 
+echo "W: $dst <- reboot w/o sudo"

@@ -6,6 +6,11 @@ link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
 
 
+mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+    sudo update-alternatives --set $1 "$2"; }
+for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
+
+
 VCACHE="$HOME/.cache/vim"  # Dir for .swp, backup, ... files
 FONT="$VCACHE/powerline-fonts/DejaVuSansMono"
 mkdir -p "$VCACHE"
@@ -56,3 +61,9 @@ if [[ ! -d "$VCACHE/bundle" || -n "$update" ]]; then
     vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall
     sudo pip install --upgrade pip -U jedi
 fi
+
+# Editor
+# dst=~/.selected_editor
+# wbegin
+# wstr "SELECTED_EDITOR=\"$(which vim.gtk)\""
+# echo "W: $dst  <- vim"
