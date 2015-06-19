@@ -1,33 +1,20 @@
 #!/bin/bash -e
 cd $(dirname $(readlink -m ${0}))
-THEME=${CURR_THEME:-dark}
-
-# https://wiki.archlinux.org/index.php/Rxvt-unicode
-
-case "$1" in
- dark|light|transparent|opaque) THEME="${1}" ;;
--u|--update) ARGS="$1" ;;
-   --clean) ARGS="$1" ;;
--l|--list) xrdb -query -all ;;  # To see the current loaded resources:
- *) ARGS="" ;;
-esac
-
+[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
 
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
+dst=~/.cache/airy/theme-urxvt
+link "$PWD/themes/amer-${THEME}" "$dst"
 
-link "$PWD/themes/amer-sol.${THEME}" ~/.cache/airy/theme-urxvt
+xrdb -merge -I"$PWD" urxvtrc "$dst"
 
-
+# https://wiki.archlinux.org/index.php/Rxvt-unicode
 # ! FIX:  если будут глюки с цветами в терминале или терминальном виме по сравнению с lxterminal
 # !       http://unixforum.org/index.php?showtopic=135828
 # ! NOTE: dump all commands with description:
 # !urxvt --help 2>&1| sed -n '/:  /s/^ */! URxvt*/gp' >> ~/.urxvtrc_dump
 # !TERM=dump command man -Pcat urxvt | sed -n '/depth: b/,/^BA/p'|sed '$d'|sed '/^       [a-z]/s/^ */^/g'|sed -e :a -e 'N;s/\n/@@/g;ta;P;D'|sed 's,\^\([^@]\+\)@*[\t ]*\([^\^]\+\),! \2\n! URxvt*\1\n\n,g'|sed 's,@@\(  \+\),\n\1,g'|sed 's,@*$,,g'|sed '/^[^!]/d'|tr -d "'\`" >> ~/.urxvtrc_dump
-
-# xrdb -I$HOME ~/.Xresources
-# xrdb -load "$PWD/urxvtrc"
-xrdb "$PWD/urxvtrc"
 
 # /usr/share/icons
 # Xcursor.theme: Vanilla-DMZ-AA

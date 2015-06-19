@@ -333,6 +333,9 @@ NeoBundleLazy 'elzr/vim-json', {
     \ 'autoload': { 'filetypes': [ 'json' ] },
     \}
 
+NeoBundleLazy 'zaiste/tmux.vim', {
+    \ 'autoload': { 'filename_patterns': [ 'tmux.*conf' ] },
+    \}
 
 " ======================================
 NeoBundle 'bling/vim-airline'

@@ -6,25 +6,22 @@ link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
 
 
-VIMC="$HOME/.cache/vim"  # Dir for .swp, backup, ... files
-FONT="$VIMC/powerline-fonts/DejaVuSansMono"
-mkdir -p "$VIMC"
+VCACHE="$HOME/.cache/vim"  # Dir for .swp, backup, ... files
+FONT="$VCACHE/powerline-fonts/DejaVuSansMono"
+mkdir -p "$VCACHE"
 
 ### THEMES ###
 case "$1" in
-dark|light|transparent)
-    if [[ ! -e "$VIMC/vim_theme" || "$1" != "$(cat "$VIMC/vim_theme")" ]]
-    then echo "$1" > "$VIMC/vim_theme"; fi ;;
---clean) rm -rf "$VIMC" ;;
+--clean) rm -rf "$VCACHE" ;;
 -u|--update) update="$1" ;;
 esac
 
 
 ### SPELL ###
-if [[ ! -d "$VIMC/spell" ]]; then
-    mkdir -p "$VIMC/spell"
+if [[ ! -d "$VCACHE/spell" ]]; then
+    mkdir -p "$VCACHE/spell"
     src='http://ftp.vim.org/pub/vim/runtime/spell'
-    for nm in ru en uk; do ( cd "$VIMC/spell"
+    for nm in ru en uk; do ( cd "$VCACHE/spell"
         wget "$src/${nm}.utf-8.spl" && wget "$src/${nm}.utf-8.sug"
     ) done
 fi
@@ -55,7 +52,7 @@ fi
 
 
 ### PLUGINS ###
-if [[ ! -d "$VIMC/bundle" || -n "$update" ]]; then
+if [[ ! -d "$VCACHE/bundle" || -n "$update" ]]; then
     vim -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall
     sudo pip install --upgrade pip -U jedi
 fi

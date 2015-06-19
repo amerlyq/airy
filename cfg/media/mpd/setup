@@ -5,8 +5,7 @@ cd $(dirname $(readlink -m ${0}))
 case "$1" in
 -u|--update) update=1 ;;
 --clean) clean=1 ;;
---debug) debug=1 ;;
-*) ARGS="" ;;
+--debug) update=1; debug=1 ;;
 esac
 
 ### LINKS ###

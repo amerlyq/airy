@@ -1,5 +1,6 @@
 #!/bin/bash -e
 cd $(dirname $(readlink -m ${0}))
+[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
@@ -7,4 +8,4 @@ link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 link "$PWD" ~/.i3
 
 ### GENS ###
-./i3-config.gen
+THEME=$THEME ./i3-config.gen

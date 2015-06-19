@@ -1,16 +1,13 @@
 #!/bin/bash -e
 cd $(dirname $(readlink -m ${0}))
-THEME=${CURR_THEME:-dark}
 
 case "$1" in
- dark|light|transparent|opaque) THEME="${1}" ;;
---clean) echo "nothing" ;;
--u|--update) update="$1" ;;
+-l|--list) # To see the current loaded resources
+    xrdb -query -all; exit ;;
 esac
 
-link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
-
 ### LINKS ###
+link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
 link "$PWD" ~/.Xrc
 link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
 link "$PWD/compton.conf" ~/.config/compton.conf
@@ -23,16 +20,16 @@ link "$PWD/dunstrc" ~/.config/dunst/dunstrc
 # Color schemes with scrshots:
 # http://linsovet.org.ua/terminal-color-schemes-2
 
-if [[ -f ~/.cache/airy/theme-urxvt ]]
-then theme_file=".cache/airy/theme-urxvt"
-else theme_file=".urxvt/themes/amer-sol.dark"; fi
-
-cat > ~/.Xresources << EOT
+dst=~/.Xresources
+cat > $dst << EOT
 #define MAIN_DPI ${MAIN_DPI:-96}
-#include ".urxvt/urxvtrc"
 #include ".Xrc/xtermrc"
 #include ".Xrc/xfontrc"
-#include "${theme_file}"
+#include ".urxvt/urxvtrc"
+#include "$(if [[ -f ~/.cache/airy/theme-urxvt ]]
+then printf ".cache/airy/theme-urxvt"
+else printf ".urxvt/themes/amer-dark"
+fi)"
 EOT
 
-xrdb ~/.Xresources
+xrdb -load ~/.Xresources

@@ -5,20 +5,14 @@ source ~/.shell/func.d/write
 dst=~/.i3/config
 
 # ---- Choose Theme ----
-  if [ "$1" == "-t" ]; then thm_nm="$1"
-elif [ "$1" == "-l" ]; then
-    for file in ~/.i3/themes/*.i3; do echo ${file##*/}; done; exit
-else case ${1:-$CURR_THEME} in
-#  transparent) wstr '#define Transparent' ;;
-#       opaque) wstr '#define Opaque' ;;
-       light) thm_nm="snow"  ;;
-      dark|*) thm_nm="grass" ;;
-esac; fi
-source ~/.i3/themes/"${thm_nm}.i3"
+[[ "$1" == "-t" ]] && thm_nm="$2" && shift
+
+[[ "${THEME}" == light ]] && thm_nm="snow" || thm_nm="grass"
+source ~/.i3/themes/${thm_nm}.i3 || exit
 
 # ----- Monitors -----
 declare $(cat ~/.cache/displayside | sed -n '1d;s/.*/M1=& M2=/;p;N;s/\n//p')
-if [ "$1" == "-1" ]; then M1="$M2"; fi
+[[ "$1" == "-1" ]] && M1="$M2" && shift
 
 if [[ "$M1" && "$M2" ]]; then
     monitors="$(printf "$M1 %.0s" {0..5}; printf "$M2 %.0s" {6..10}) $M1 $M1"

@@ -1,36 +1,29 @@
 #!/bin/bash
-# [[ $- =~ i ]] && return || exit
-cd $(dirname $(readlink -m ${0})) || exit
 set -o errexit
 set -o pipefail
-
-# WARNING:
-#   Now if file exsist, 'setup' simply exits and you will not know that
-#   NEED: message on error -- if exist. Maybe some flags for 'ln' be enough?
-#   SEE maybe aliases also can be placed/extracted in their own directories?
-#        Then merged in one file?
+# [[ $- =~ i ]] && return || exit
+cd $(dirname $(readlink -m ${0})) || exit
 
 case "$1" in
+dark|light|lucid|opaque) THEME="${1}" ;;
 -u|--update) ARGS="$1" ;;
 --clean) ARGS="$1" ;;
-*) ARGS="" ;;
+?*) echo "Error: no such option '$1'"; exit 1 ;;
 esac
+
+[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
+echo "$THEME" > ~/.cache/airy/theme
 
 
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 # ldir(){ mkdir -p $2 && lndir "$1" $2; }
-pretty() { sed "
-    s|/home/$(whoami)|\~|g
-    s|\~/\S\+/cfg/||g
-    />>>/!s|^|  |g
-    /^>>> \.\//s||\n$(tput setaf 2)\[|g; / <<<$/s||\]$(tput sgr0)|g
-"; }
+pretty() { sed "s|/home/$(whoami)|\~|g;  s|\~/\S\+/cfg/||g;  />>>/!s|^|  |g
+    /^>>> \.\//s||\n$(tput setaf 2)\[|g;  / <<<$/s||\]$(tput sgr0)|g"; }
 header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
 
 
 header "Airy public"
 link "$PWD/bin" ~/.bin
-
 
 ## Populate sensible configs
 if [[ -f ../erian/setup ]]; then
@@ -58,3 +51,5 @@ done | pretty
 #     bash -c "echo '>>> {} <<<' && '{}' $ARGS || exit" \; -quit
 
 header "DONE"
+
+# i3-msg restart

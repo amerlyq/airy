@@ -1,13 +1,9 @@
 #!/bin/bash -e
 cd $(dirname $(readlink -m ${0}))
-THEME=${CURR_THEME:-dark}
 
 case "$1" in
- dark|light) THEME="$1" ;;
---clean) echo "nothing" ;;
 -u|--update) update="$1" ;;
 esac
-
 
 # Main destination for Zsh
 ZDOTDIR=~/.cache/zsh
@@ -15,16 +11,10 @@ PREZTO="$ZDOTDIR/.zprezto"
 mkdir -vp "$ZDOTDIR"
 
 if [[ ! -d "$PREZTO" ]]; then
-    git clone --recursive https://github.com/sorin-ionescu/prezto.git "$PREZTO"
+    git clone --recursive 'https://github.com/sorin-ionescu/prezto.git' "$PREZTO"
 fi
 
-# Exec in /usr/bin/zsh only!
-# setopt EXTENDED_GLOB
-# for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^README.md(.N); do
-#   ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
-# done
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-
 link "$PWD/zshenv" ~/.zshenv
 link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
 
@@ -32,8 +22,7 @@ for nm in zlogin zprofile zshrc zpreztorc
 do link "$PWD/$nm" "$ZDOTDIR/.${nm##*/}"; done
 
 
-# chsh -s /bin/zsh
-
 if [[ "$update" -eq 1 ]]; then
+    # chsh -s /bin/zsh
     (cd "$PREZTO" && git pull && git submodule update --init --recursive)
 fi

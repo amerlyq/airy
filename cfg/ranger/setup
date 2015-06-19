@@ -1,16 +1,14 @@
 #!/bin/bash -e
 cd $(dirname $(readlink -m ${0}))
 
-### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-link "$PWD" ~/.config/ranger
-
-
 case "$1" in
- dark|light) echo "colorscheme $1" ;;
 --clean) while read line; do rm -vf "${PWD}${line}"; done < "$PWD/.gitignore" ;;
 -u|--update) update="$1"; echo "USE: ranger --copy-config=all (Be Careful!), and see diff" ;;
 esac
+
+### LINKS ###
+link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
+link "$PWD" ~/.config/ranger
 
 
 case "$SHELL" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac

@@ -38,8 +38,9 @@ nnoremap ,tf :set strict-focus!<CR>
 nnoremap ,tp :set proxy!<CR>
 nnoremap ,ts :set strict-ssl!<CR>
 # Theme dark/light toggle
-nnoremap ,tT :set stylesheet!<CR>
-nnoremap ,tt :shellcmd ~/.config/vimb/setup -t <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
+nnoremap ,tt :set stylesheet!<CR>
+nnoremap  \l :shellcmd sh -c "THEME=light ~/.config/vimb/setup -t" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
+nnoremap  \d :shellcmd sh -c "THEME=dark ~/.config/vimb/setup -t" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
 
 ### Toggle defaults ###
 set statusbar=true

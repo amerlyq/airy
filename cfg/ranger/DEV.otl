@@ -1,0 +1,81 @@
+[X] press_enter(),
+	Change std ranger msg core/runner.py:39 to some terminal variable
+	It's to distinguish several outputs easily
+[X] Context
+	Popen, popen_kws, action
+		< Need use 'executable' arg
+			https://docs.python.org/2/library/subprocess.html#subprocess.Popen
+
+[_] Autocompletion on <Tab> in ':' line
+	: Ability was added in plugin functional
+	: but how to add zsh completion there?
+
+[X] # 1
+	I use zsh with extended globbing, etc, and miss it in ranger.
+	Spawning subshell for one command a time is too slow, comparing to ':'.
+
+[X] # 1.5
+	I missed the legion of aliases, spawned in zsh.
+
+[_] # 2
+	%%s with "..."  around each file. When escaping isn't enough.
+	fix '%d/%f' problem with '' and spaces in name
+
+[X] # 3
+	I never liked the idea of trailing whitespaces in config file.
+	My plugin to vim always discards them on saving.
+	Additional ' ' after command will not make any harm, even if that command don't need it.
+	But you could suppress it by -p0 flag when really-really need such behaviour.
+	So I changed default behaviour to this in sake of consistency with other conf files.
+
+[$] # 3.5
+	Preview of terminal under ranger toggle by one key
+		mapped to ,z
+	But are you need to keep ability scrolling, etc in this preview?
+		Scroll by urxvt embedded instruments
+	Of course yes! How it's done in ranger now?
+
+[_] # 4
+	Multiwindow support. To be able split ranger on two window and make diffs easily
+		ALT (or in addition): shared copy/cut buffers between picked ranger
+		sessions -- to open several rangers and cross-moving files in them
+
+[_] # 5
+	Reset tab number to 1, when there only one tab last.
+	Or shift every tabs numbers to fill gap in sequence.
+	= Impossible -- cause you must be able to undo tab closing!
+
+[$] # 6
+	find on 'f' -- be able to stick to only dir or only files names
+		Simply combine 'filter_inode' and 'find'
+
+[_] # 7 Prompt --
+	For long output (like agi) prompt is more suitable in bottom place.
+	\\=== Press ENTER to continue === (13:53:41) === agi 'some\(' ===>>
+	Last part of this prompt could be written as in actualee script
+	[_] Customizable with embedded macro -- great in conjunction with creating
+			custom macro like date, time, etc
+	Make hooks pre- and post- command execution. Link post- with default prompt.
+	[_] Must output error code of last command
+
+[X] # 8
+	Distinguish action "right" as Editor, and 'L', 'C-j', <CR> as viewers
+	But!!! Complete some end-product before!
+
+[$] # 9
+	For new feature on 'b' -- and ticket for ':filter' -- when hiding dirs
+	and enables 'b' -- there must be only dirs shown! Now it will show nothing.
+		Already done -- all works
+
+[_] Show all found files inside browser
+	[_] add function to show find results
+		: Ranger already can show all files under dir on 'b'
+	[_] Show any other results -- like from 'ag' -- list of entries
+		Each entry can be opened like any other file, but at specified line/column!
+
+[_] actualee
+	[X] empty -- dump all, sorted by current first, then others
+	[_] don't execute if has no 'x' in permissions
+	[_] selection -- dump to list all selected files
+	[_] argument -- treat as regex. Filename will match themselves.
+
