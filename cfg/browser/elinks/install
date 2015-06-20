@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# | elinks | console browser with js
+pkg_inst 'elinks'
+
+if distro ubuntu; then
+    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+        sudo update-alternatives --set $1 "$2"; }
+    mkdef www-browser $(which elinks)
+fi

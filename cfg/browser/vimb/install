@@ -10,4 +10,9 @@ if distro arch; then
 elif distro ubuntu; then
     pkg_inst 'libsoup2.4-dev libwebkit-dev libgtk-3-dev libwebkitgtk-3.0-dev'
     git_inst 'fanglingsu/vimb'
+
+    mkdef() { if ! update-alternatives --get-selections | grep -q "^$1.*$2\$"
+    then sudo update-alternatives --install /usr/bin/$1 $1 "$2" 200
+         sudo update-alternatives --set $1 "$2"; fi; }
+    mkdef x-www-browser $(which vimb)
 fi

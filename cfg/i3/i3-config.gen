@@ -51,13 +51,18 @@ exi3="$exno i3-input -F "
 #     pid=`ps -h -o ppid -p $pid 2>/dev/null`
 #     echo ": $term"
 # done
-term=$(update-alternatives --get-selections | grep 'x-terminal-emulator' | awk '{print $3}')
-term="${term##*/}"
 
-if [ "$term" == "urxvtd" ]; then
-  term="urxvt"        # i3-sensible-terminal
-  eurx="$exno urxvt"  # Many times inside tmux demon was hanged, so it's better use separate processes
-else eurx="$exno $term"; fi
+## Arch has no update-alternatives
+# term=$(update-alternatives --get-selections |
+#     grep 'x-terminal-emulator' | awk '{print $3}')
+# term="${term##*/}"
+
+# if [ "$term" == "urxvtd" ]; then
+#   term="urxvt"        # i3-sensible-terminal
+#   eurx="$exno urxvt"  # Many times inside tmux demon was hanged, so it's better use separate processes
+# fi
+term=urxvt
+eurx="$exno $term"
 eflo="$eurx -name Float"
 ## Disabled: wnd name wrong setted in zsh only!
 #ecli="$exno urxvtcd -e \$SHELL -i -c " #--hold

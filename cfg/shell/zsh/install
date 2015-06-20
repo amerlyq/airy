@@ -3,9 +3,5 @@ source ~/.shell/func.d/packages
 
 pkg_inst zsh
 
-if distro arch; then
-    aur_inst fasd
-
-elif distro ubuntu; then
-    git_inst 'clvv/fasd'
-fi
+# AUR has deprecated package since 2012, therefore git:
+git_inst 'clvv/fasd'

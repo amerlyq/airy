@@ -15,10 +15,6 @@ link "$PWD" ~/.urxvt
 link "$PWD/themes/amer-${THEME}" "$dst"
 
 
-mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
-    sudo update-alternatives --set $1 "$2"; }
-mkdef x-terminal-emulator $(which urxvt)
-
 # https://wiki.archlinux.org/index.php/Rxvt-unicode
 # ! FIX:  если будут глюки с цветами в терминале или терминальном виме по сравнению с lxterminal
 # !       http://unixforum.org/index.php?showtopic=135828

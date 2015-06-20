@@ -2,14 +2,16 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst 'ranger'
+    pkg_inst 'ranger fbida libcaca poppler'
 
 else
     # git_inst 'amerlyq/ranger'
     git_inst 'hut/ranger'
+    pkg_inst 'fbi caca-utils poppler-utils w3m-img'
 fi
 
-pkg_inst 'fbi caca-utils atool poppler-utils mediainfo colordiff'
+#| fbi        | framebuffer image viewer for terminal
+#| poppler    | (pdftotext) for pdf previews
 #| caca-utils | (img2txt) Colour AsCii Art library.
 #|   cacaview | image viewer for the terminal. The user can zoom and scroll
 #|            | the image, set the dithering method or enable anti-aliasing.
@@ -19,16 +21,13 @@ pkg_inst 'fbi caca-utils atool poppler-utils mediainfo colordiff'
 #|   cacademo | simple application that shows the libcaca rendering features
 #|            | such as line and ellipses drawing, triangle filling and
 #|            | sprite blitting.
-#| fbi        | framebuffer image viewer for terminal
+
+pkg_inst 'w3m atool p7zip zip mediainfo colordiff highlight'
+#| w3m | supports images (xterm, framebuffer console), but it doesn’t support JavaScript.
 #| atool      | previews of archives
 #| highlight  | syntax highlighting of code
-
-pkg_inst 'w3m w3m-img'
-#| w3m | supports images (xterm, framebuffer console), but it doesn’t support JavaScript.
-#| poppler   # (pdftotext) for pdf previews
 #| mediainfo or perl-image-exiftool # viewing information about media files
 
-pkg_inst highlight
-# pkg_inst python-pygments
-# pkg_inst pandoc sharutils # or some uuencode
-# git_inst 'rkitover/vimpager'
+ # pkg_inst python-pygments
+ # pkg_inst pandoc sharutils # or some uuencode
+ # git_inst 'rkitover/vimpager'

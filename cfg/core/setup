@@ -9,8 +9,8 @@ esac
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 for nm in profile; do link "$PWD/$nm" ~/.${nm##*/}; done
 
-# update-alternatives
-#     x-session-manager cinnamon-session-cinnamon
+# if distro ubuntu; then:
+# update-alternatives : x-session-manager cinnamon-session-cinnamon
 
 distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
 if distro ubuntu; then (cd ./ubuntu

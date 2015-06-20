@@ -7,11 +7,6 @@ link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 
 link "$PWD" ~/.i3
 
-mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
-    sudo update-alternatives --set $1 "$2"; }
-mkdef x-window-manager $(which i3)
-
-
 ### GENS ###
 THEME=$THEME ./i3-config.gen
 
@@ -21,4 +16,8 @@ if distro ubuntu; then
     echo "[Desktop]
     Session=i3" > ~/.dmrc
     echo "W: ~/.dmrc  <- i3"
+
+    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+        sudo update-alternatives --set $1 "$2"; }
+    mkdef x-window-manager $(which i3)
 fi

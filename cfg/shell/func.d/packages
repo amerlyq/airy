@@ -2,7 +2,7 @@
 source ~/.shell/profile
 
 mkdir -p "${CURR_DIR_PKG:=~/pkg}"
-distro(){ uname -rv | grep -iq "$1"; }
+distro(){ cat /etc/os-release | grep -iq "$1"; }
 
 
 if distro ubuntu; then
@@ -20,6 +20,7 @@ if distro ubuntu; then
 
 elif distro arch; then
   pkg_inst(){ sudo pacman -S --noconfirm $@; }
+  pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
   if hash yaourt >/dev/null 2>&1
   then aur_inst(){ sudo yaourt -S --noconfirm $@; }
   else aur_inst(){ return 1; }

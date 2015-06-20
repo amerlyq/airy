@@ -8,4 +8,8 @@ if distro arch; then
 
 elif distro ubuntu; then
     pkg_inst 'rxvt-unicode-256color'
+
+    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+        sudo update-alternatives --set $1 "$2"; }
+    mkdef x-terminal-emulator $(which urxvt)
 fi
