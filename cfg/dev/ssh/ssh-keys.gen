@@ -15,8 +15,8 @@ genssh(){ # $1 -- @mail, $2 -- path/to/key
 }
 # =================== Multi--SSH ============================
 
-genssh "${WORK_MAIL?No work}" id_rsa
-genssh "${MAIN_MAIL?No main}" git_rsa
+genssh "${WORK_NAME:=${MAIN_NAME?No}}" id_rsa
+genssh "${WORK_MAIL:=${MAIN_MAIL?No}}" git_rsa
 
 case "$CURR_PROF" in
   work) genssh "$WORK_MAIL" srk_rsa ;;

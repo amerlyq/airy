@@ -68,13 +68,12 @@ case "$ACTION" in
  m) domnt ;;
  p) domtp "phone" ;;
  o) doloop "$LBL" ;;
- s) case "$LBL" in
+ s) wuser="${WORK_MAIL?No work mail}"; wuser="${wuser%@*}"
+    case "$LBL" in
     android) dosamba ${ADR_USER?No var} $ADR_IPL ;;
-#{Books,${WORK_MAIL%@*}}
-     seclab) dosamba ${WORK_MAIL%@*} ${SURC_SRV?No var}/Exchange ;;
-${WORK_MAIL%@*}) dosamba ${WORK_MAIL%@*} $SURC_SRV/${WORK_MAIL%@*} ;;
-#{exchange,projects,install}
-    install) dosamba ${WORK_MAIL%@*} s-file.${SURC_SRV#*.}/install ;;
+     seclab) dosamba $wuser ${SURC_SRV?No wsrv}/Exchange ;; #{Books}
+     $wuser) dosamba $wuser $SURC_SRV/$wuser ;;  #/{OR /exchange,/projects}
+    install) dosamba $wuser s-file.${SURC_SRV#*.}/install ;;
     esac ;;
  u) sudo umount -v "$DIR"; clean || exit ;;
 #U) sudo umount -v -R "$MNT"/* && sudo rmdir -v "$MNT"/* ;;  # ERROR: No -R key

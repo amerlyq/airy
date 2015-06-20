@@ -37,14 +37,9 @@ pkg_build() {
         cmake -E chdir ./build cmake "" "$prdir" || return
         cd ./build && pkg_make
 
-    elif [[ -f ./Makefile ]]; then
-        make && pkg_make
-
-    elif [[ -f ./setup.py ]]; then
-        sudo python setup.py install
-
-    elif [[ -f ./build.sh ]]; then
-        ./build.sh && pkg_make
+    elif [[ -f ./Makefile ]]; then make && pkg_make
+    elif [[ -f ./setup.py ]]; then sudo python setup.py install
+    elif [[ -f ./build.sh ]]; then ./build.sh && pkg_make
 
     elif [[ -f ./configure.ac ]]; then
         mkdir -p ./build && cd ./build

@@ -48,7 +48,7 @@ fi
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
 # WARNING: what to do if not exists -- like on pure system setup?
-source ~/.shell/profile || PKG_LIST=(shell 'shell/*')
+source ~/.shell/profile || PKG_LIST=(shell zsh git ranger tmux vim elinks)
 
 case "$CURR_PROF" in laptop|home|work)
 PKG_LIST=(shell 'shell/*' core 'dev/*' i3 'term/*' Xrc 'Xrc/*' 'net/*' 'browser/*' 'media/*')
