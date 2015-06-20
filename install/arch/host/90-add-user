@@ -11,6 +11,15 @@ useradd -m -g $user -G users,wheel,uucp -s /bin/bash $user
 printf $user:$user | chpasswd
 echo ":: created '$user' password"
 
+## sudo for user
+entry="$user ALL=(ALL) \
+NOPASSWD:/sbin/reboot,/sbin/halt,/sbin/shutdown,/sbin/poweroff"
+dst=/etc/sudoers
+sed -i '/.*\(%wheel ALL=(ALL) ALL\)/s/\1/' $dst  # Uncomment group 'wheel'
+sed -i "/^$user ALL=(ALL) NOPASSWD/d" $dst       # Add specific rights
+echo "$entry" | tee --append $dst
+echo ":: sudo '$user' enabled"
+
 
 ## SSH access: add host public key to vbox guest
 home="/home/$user"

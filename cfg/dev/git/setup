@@ -11,9 +11,12 @@ link "$PWD/gitignore" ~/.gitignore
 ### GENS ###
 dst=~/.gitconfig
 > $dst
-git config --global user.name  "${WORK_NAME:=${MAIN_NAME?No}}"
-git config --global user.email "${WORK_MAIL:=${MAIN_MAIL?No}}"
-# git config --global user.signingkey = C8A2DA6E
+if [[ -n "${WORK_NAME:=$MAIN_NAME}" &&
+      -n "${WORK_MAIL:=$MAIN_MAIL}" ]]; then
+    git config --global user.name  "$WORK_NAME"
+    git config --global user.email "$WORK_MAIL"
+    # git config --global user.signingkey = C8A2DA6E
+fi
 
 for fl in "$PWD"/cfg_* ; do cat "$fl" >> $dst; done
 
