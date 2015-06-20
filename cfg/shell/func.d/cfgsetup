@@ -5,17 +5,19 @@ set -o errexit
 set -o pipefail
 # [[ $- =~ i ]] && return || exit
 
+cfgOpt(){ [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
+cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 
 case "$1" in
 dark|light|lucid|opaque) THEME="${1}" ;;
   # Install all packages, linked to 'setup'
-  -i|--install) install=1 ;;
+ -i|--install) cfgOptAdd i ;;
   # Repeat all ops, which locked by files
-  -u|--update) ARGS="$1"; update=1 ;;
+  -u|--update) cfgOptAdd u; ARGS="$1" ;;
   # Clean all created files/directories -- to repeat as clean
-      --clean) ARGS="$1" ;;
-      --reset) reset=1; update=1 ;;
-      --debug) update=1; debug=1 ;;
+      --clean) cfgOptAdd c; ARGS="$1" ;;
+      --reset) cfgOptAdd ru ;;
+      --debug) cfgOptAdd ud ;;
 ?*) echo "Error: no such option '$1'"; exit 1 ;;
 esac
 
@@ -34,11 +36,12 @@ done;}
 
 
 ### Choose theme
-CURR_CACHE=~/.cache/airy
-mkdir -p "$CURR_CACHE"
+CURR_CACHE=~/.cache/airy && mkdir -vp "$CURR_CACHE"
 if [[ ! "${THEME:=$(< $CURR_CACHE/theme)}" =~ ^[a-z]+$ ]]
 then THEME=dark; fi
 
+### Go to current script's directory
+cd $(dirname $(readlink -m ${0}))
 
 # =============================== ALT ==================================
 

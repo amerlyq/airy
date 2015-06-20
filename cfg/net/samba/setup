@@ -1,16 +1,16 @@
 #!/bin/bash -e
 source ~/.shell/profile
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 ## Don't share samba in work network, only at home
 case "$CURR_PROF" in
 laptop|home)
-  if [[ "$reset" -eq 1 ]]; then
+  if cfgOpt r; then
     echo "! ATTENTION!!! Generate password for samba user !"
     sudo smbpasswd -a $(whoami)
   fi
 
-  if [[ "$update" -eq 1 ]]; then
+  if cfgOpt u; then
     ### GENS ###
     ./samba.gen
     sudo service smbd restart

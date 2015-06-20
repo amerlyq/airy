@@ -5,7 +5,7 @@ source "$SCRIPT_DIR/vbox/env" || exit  # Import some variables
 
 
 hopt() { [ "${OPTS/[$1]}" != "$OPTS" ]; }
-oadd() { OPTS="${OPTS}${1}"; }
+oadd() { OPTS="${OPTS/[$1]}${1}"; }
 
 
 ### Options chooser ###

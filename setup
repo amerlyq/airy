@@ -9,12 +9,14 @@ pretty() { sed "
         /^>>> \.\//s//\n$(tput setaf 2)\[/g
             / <<<$/s//\]$(tput sgr0)/g
     /\(C\|W\):\s.*/s//$(tput setaf 13)&$(tput sgr0)/
+       /\(N\):\s.*/s//$(tput setaf 6)&$(tput sgr0)/
        /.*\s->\s.*/s//$(tput setaf 4)&$(tput sgr0)/
 ";}
 
-header "Airy public"
-link "$PWD/bin" ~/.bin
-link "$PWD/cfg/shell" ~/.shell
+header "Airy public" && {
+    link "$PWD/bin" ~/.bin
+    link "$PWD/cfg/shell" ~/.shell
+} | pretty
 
 # ======================================================================
 ## Populate sensible configs
@@ -47,4 +49,4 @@ done | pretty
 # ======================================================================
 
 header "DONE"
-[[ "$update" -eq 1 ]] && i3-msg restart </dev/tty >/dev/null 2>&1
+cfgOpt u && i3-msg restart </dev/tty >/dev/null 2>&1

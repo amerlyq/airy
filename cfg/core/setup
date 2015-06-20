@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD/profile" ~/.profile
@@ -11,7 +11,8 @@ distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
 if distro ubuntu; then (cd ./ubuntu
     ./xsessionrc.gen
     ./hosts.gen
-    if [[ "$update" -eq 1 ]]; then
+    if cfgOpt u; then
+        echo "N: rc-local, nosudo_reboot"
         ./rc-local.gen
         ./nosudo_reboot
     fi

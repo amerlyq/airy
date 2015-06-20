@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 # WARNING: symlink is not enough, it will be replaced when you launch
@@ -8,7 +8,7 @@ cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 dst=~/.purple/prefs.xml
 diff -rq "$PWD/prefs.xml" $dst || cp -vf "$PWD/prefs.xml" $dst
 
-if [[ "$update" -eq 1 ]]; then
+if cfgOpt u; then
     ./accounts.gen
 fi
 

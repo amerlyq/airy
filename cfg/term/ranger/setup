@@ -1,14 +1,14 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD" ~/.config/ranger
 
 
-if [[ "$clean" -eq 1 ]]; then while read line
+if cfgOpt c; then while read line
 do rm -vf "${PWD}${line}"; done < "$PWD/.gitignore"; fi
 
-if [[ "$update" -eq 1 ]]; then
+if cfgOpt u; then
 echo "USE: ranger --copy-config=all (Be Careful!), and see diff"; exit; fi
 
 

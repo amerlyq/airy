@@ -1,18 +1,15 @@
 #!/bin/bash -e
 source ~/.shell/profile
-cd $(dirname $(readlink -m ${0}))
-
-case "$1" in
--u|--update) update="$1" ;;
-esac
+source ~/.shell/func.d/cfgsetup
 
 genssh(){ # $1 -- @mail, $2 -- path/to/key
     local mail="$1" idn="$HOME/.ssh/$2"
-    if [[ ! -f "$idn" || "$update" -eq 1 ]]; then
+    if cfgOpt u || [[ ! -f "$idn" ]]; then
         ssh-keygen -t rsa -C "$mail" -N "" -f "$idn"
         echo "!!! Copy generated *.pub key to your servers"
     fi
 }
+
 # =================== Multi--SSH ============================
 
 genssh "${WORK_NAME:=${MAIN_NAME?No}}" id_rsa

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/profile
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 dir=~/.mpd
@@ -9,7 +9,7 @@ home) link "$PWD/mpd-sir.conf" "$dir/mpd.conf" ;;
    *) link "$PWD/mpd-own.conf" "$dir/mpd.conf" ;;
 esac
 
-if [[ "$clean" -eq 1 || ! -e "$dir/pid" ]]; then
+if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
     # Stop the daemon and disable from starting on boot:
     # Because being launched by init.d it has no access to ~/.ncmpcpp
     # TODO: Maybe with systemd all will be ok?
@@ -20,9 +20,9 @@ if [[ "$clean" -eq 1 || ! -e "$dir/pid" ]]; then
     # Check if running: sudo /etc/init.d/mp status | grep -c "is running"
 fi
 
-if [[ "$update" -eq 1 ]]; then
+if cfgOpt u; then
     mpd --kill
-    if [[ -n "$debug" ]]
+    if cfgOpt d
     then mpd --verbose --no-daemon --stdout > /tmp/mpd-verbose.log
     else mpd; fi
 

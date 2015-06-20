@@ -1,15 +1,14 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
 
 # Dir for .swp, backup, ... files
-VCACHE=~/.cache/vim
-mkdir -vp "$VCACHE"
+VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"
 FONT="$VCACHE/powerline-fonts/DejaVuSansMono"
 
-if [[ "$clean" -eq 1 ]]; then rm -rf "$VCACHE"; fi
+if cfgOpt c; then rm -rf "$VCACHE"; fi
 
 
 ### SPELL ###
@@ -49,9 +48,9 @@ fi
 
 
 ### PLUGINS ###
-if [[ ! -d "$VCACHE/bundle" || "$update" -eq 1 ]]; then
+if cfgOpt u || [[ ! -d "$VCACHE/bundle" ]]; then
     # FIXME: error on clean system, when NeoBundle is not installed yet
-    vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty
+    vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty && echo
 fi
 
 # Editor

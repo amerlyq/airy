@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 dir=/etc/dictd
 # Backup older dir (hovewer, it seems always the same)
@@ -8,7 +8,7 @@ dir=/etc/dictd
 [[ "$PWD" -ef $dir ]] || sudo ln -sfvT "$PWD" $dir
 
 
-if [[ "$update" -eq 1 ]]; then
+if cfgOpt u; then
     ## Add dictionaries to dictd
     "$PWD/scripts/indexate" "$dir"
     # mv mydict.dict mydict.index /usr/share/dictd/

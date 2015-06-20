@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+source ~/.shell/func.d/cfgsetup
 
 # Main destination for Zsh
 ZDOTDIR=~/.cache/zsh
@@ -22,7 +22,7 @@ if [[ "$(which zsh)" != ${SHELL?No} ]]; then
 fi
 
 
-if [[ "$update" -eq 1 ]]; then
+if cfgOpt u; then
     # chsh -s /bin/zsh
     (cd "$PREZTO" && git pull && git submodule update --init --recursive)
 fi
