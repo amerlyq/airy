@@ -1,8 +1,7 @@
 #!/bin/bash
 source ~/.shell/func.d/write || exit
 
-# ATTENTION!!! Generate password for samba user
-#sudo smbpasswd -a "$CURR_USER"
+CURR_USER="${CURR_USER:-$(whoami)}"
 
 #=========================== INFO ==============================
 
@@ -290,8 +289,3 @@ wopt "
 #========================== Applying ============================
 
 sudo mv -fv $dst /etc/samba/smb.conf
-
-sudo restart smbd
-
-# Once Samba has restarted, use this command to check your smb.conf for any syntax errors
-testparm

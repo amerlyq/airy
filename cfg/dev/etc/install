@@ -1,0 +1,16 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if grep -q Arch /proc/version; then
+    yaourt -S silver-searcher-git
+
+elif grep -q Ubuntu /proc/version; then
+    ### Ag ### : The silver searcher
+    # apt_noprompt silversearcher-ag
+    # :: 'ag' instead of 'grep' inside of git project -- very best!
+    apt_noprompt "automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev"
+    CURR_DIR_HUB="$CURR_DIR_PKG"
+    git_get "ggreer/the_silver_searcher"
+    cd "$CURR_DIR_PKG/the_silver_searcher" && ./build.sh && sudo make install
+
+fi

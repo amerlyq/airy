@@ -10,8 +10,10 @@ ZDOTDIR=~/.cache/zsh
 PREZTO="$ZDOTDIR/.zprezto"
 mkdir -vp "$ZDOTDIR"
 
+run() { hash $1 >/dev/null 2>&1 && /usr/bin/env $@; }
 if [[ ! -d "$PREZTO" ]]; then
-    git clone --recursive 'https://github.com/sorin-ionescu/prezto.git' "$PREZTO"
+    run git clone --recursive 'https://github.com/sorin-ionescu/prezto.git' "$PREZTO"
+    # run git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
 fi
 
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }

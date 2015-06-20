@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 # vim: ft=sh
-source ~/.shell/func.d/packages || exit
+source ~/.shell/func.d/packages
 
 # for vimoutliner export in mindmap
 LST="$LST vim vim-gtk python-dev"
@@ -14,5 +14,4 @@ apt_noprompt $LST
 # yaourt -S neovim-git
 ## Principle: Download all pkg with '-w', then once do interactive install.
 # pacman -S gvim / gvim-python3
-# yaourt -S silver-searcher-git
 # http://kissmyarch.blogspot.com/2012/05/two-simple-yaourt-tips.html
