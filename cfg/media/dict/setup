@@ -1,11 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-
-case "$1" in
--u|--update) update=1; shift ;;
-*) dir="$1" ;;
-esac
-
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
 dir=/etc/dictd
 # Backup older dir (hovewer, it seems always the same)

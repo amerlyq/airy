@@ -1,0 +1,18 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+
+if distro arch; then
+    pkg_inst i3
+
+elif distro ubuntu; then
+    pkg_inst i3
+
+    # Language=en_US -- breaks
+    printf "[Desktop]\nSession=i3\n" > ~/.dmrc
+    echo "W: ~/.dmrc  <- i3"
+
+    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+        sudo update-alternatives --set $1 "$2"; }
+    mkdef x-window-manager $(which i3)
+fi

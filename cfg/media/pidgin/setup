@@ -1,19 +1,15 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-
-case "$1" in
--u|--update) update=1 ;;
-esac
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-# link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-# link "$PWD/prefs.xml" ~/.purple/prefs.xml
-
 # WARNING: symlink is not enough, it will be replaced when you launch
 # pidgin! But maybe, even file will be overwritten...
+# link "$PWD/prefs.xml" ~/.purple/prefs.xml
 dst=~/.purple/prefs.xml
 diff -rq "$PWD/prefs.xml" $dst || cp -vf "$PWD/prefs.xml" $dst
 
 if [[ "$update" -eq 1 ]]; then
     ./accounts.gen
 fi
+
+echo "C: pidgin"

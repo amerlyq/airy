@@ -6,15 +6,18 @@ source ~/.shell/func.d/packages
 # clang-format-3.5          | for auto-formatting c/cpp code
 
 if distro arch; then
+    # SEE gtags (GNU Global) -- instead of ctags?
     # aur_inst neovim-git
-    pkg_inst gvim-python3
+    pkg_inst 'python-pip' 'gvim-python3'
 
 elif distro ubuntu; then
     # for vimoutliner export in mindmap
-    pkg_inst vim-gtk exuberant-ctags python-dev
+    pkg_inst vim-gtk exuberant-ctags 'python-pip' python-dev
     pkg_inst libclang-dev clang-format-3.5
 
     mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
         sudo update-alternatives --set $1 "$2"; }
     for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
 fi
+
+sudo pip install --upgrade pip -U jedi

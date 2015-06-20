@@ -1,9 +1,7 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^(dark|light)$ ]] || THEME=dark
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-
 link "$PWD/tmux.conf" ~/.tmux.conf
 link "$PWD/theme-${THEME}.conf" ~/.cache/airy/theme-tmux.conf

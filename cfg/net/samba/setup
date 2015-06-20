@@ -1,27 +1,23 @@
 #!/bin/bash -e
 source ~/.shell/profile
-cd $(dirname $(readlink -m ${0}))
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
-case "$1" in
--u|--update) update=1 ;;
---reset) reset=1; update=1 ;;
-esac
-
-## Don't share samba in work network
+## Don't share samba in work network, only at home
 case "$CURR_PROF" in
-work) sudo service smbd stop; exit ;;
-esac
-
-if [[ "$reset" -eq 1 ]]; then
+laptop|home)
+  if [[ "$reset" -eq 1 ]]; then
     echo "! ATTENTION!!! Generate password for samba user !"
     sudo smbpasswd -a $(whoami)
-fi
+  fi
 
-if [[ "$update" -eq 1 ]]; then
+  if [[ "$update" -eq 1 ]]; then
     ### GENS ###
     ./samba.gen
     sudo service smbd restart
     # Once Samba has restarted, use this command
     # to check your smb.conf for any syntax errors
     testparm
-fi
+  fi
+
+;; *) hash samba >/dev/null 2>&1 && sudo service smbd stop; exit ;; esac
+

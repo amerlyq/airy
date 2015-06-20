@@ -1,31 +1,22 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-
-case "$1" in
--u|--update) update="$1" ;;
-esac
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
 # Main destination for Zsh
 ZDOTDIR=~/.cache/zsh
-PREZTO="$ZDOTDIR/.zprezto"
 mkdir -vp "$ZDOTDIR"
+PREZTO="$ZDOTDIR/.zprezto"
 
-run() { hash $1 >/dev/null 2>&1 && /usr/bin/env $@; }
 if [[ ! -d "$PREZTO" ]]; then
     run git clone --recursive 'https://github.com/sorin-ionescu/prezto.git' "$PREZTO"
     # run git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
 fi
 
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 link "$PWD/zshenv" ~/.zshenv
 link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
-
-for nm in zlogin zprofile zshrc zpreztorc
-do link "$PWD/$nm" "$ZDOTDIR/.${nm##*/}"; done
-
+linkdir "$ZDOTDIR/." zlogin zprofile zshrc zpreztorc
 
 # Choose default shell
-if [[ "$(which zsh)" != $SHELL ]]; then
+if [[ "$(which zsh)" != ${SHELL?No} ]]; then
     sudo chsh -s $(which zsh)
     sudo usermod -s $(which zsh) "$(whoami)"
 fi

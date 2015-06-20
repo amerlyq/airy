@@ -1,0 +1,69 @@
+# vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
+
+# FIXME: even with those options, pkgbuild errors are not catched
+set -o errexit
+set -o pipefail
+# [[ $- =~ i ]] && return || exit
+
+
+case "$1" in
+dark|light|lucid|opaque) THEME="${1}" ;;
+  # Install all packages, linked to 'setup'
+  -i|--install) install=1 ;;
+  # Repeat all ops, which locked by files
+  -u|--update) ARGS="$1"; update=1 ;;
+  # Clean all created files/directories -- to repeat as clean
+      --clean) ARGS="$1" ;;
+      --reset) reset=1; update=1 ;;
+      --debug) update=1; debug=1 ;;
+?*) echo "Error: no such option '$1'"; exit 1 ;;
+esac
+
+
+### LINKS ###
+run() { hash $1 >/dev/null 2>&1 && /usr/bin/env $@; }
+# FIXME: this must be moved into func.d/cfgsetup -- to catch errors smoothly
+link(){ if [[ ! -e "$2" || -L "$2" ]]
+then mkdir -p "${2%/*}" && ln -sfvT "$1" "$2"
+else echo "Err: symlink to $2"; exit 1
+fi;}
+# ldir(){ mkdir -p $2 && lndir "$1" $2; }
+linkdir(){ for nm in ${@:2}
+do link "$PWD/$nm" "${1?No pref}$nm"
+done;}
+
+
+### Choose theme
+CURR_CACHE=~/.cache/airy
+mkdir -p "$CURR_CACHE"
+if [[ ! "${THEME:=$(< $CURR_CACHE/theme)}" =~ ^[a-z]+$ ]]
+then THEME=dark; fi
+
+
+# =============================== ALT ==================================
+
+## Subdirectories:
+# for dir in "$PWD"/*; do if [[ -d "$dir" && -f "$dir/setup" ]]
+# then echo ">>> Cfg: $dir <<<"; "$dir/setup" "$ARGS"; fi; done
+## Packages
+# [[ "${PKG_LIST[@]} " =~ "${PWD##*/} " ]] || exit
+## Robust find with exec
+# find . -mindepth 2 -type f -wholename "*/setup" -not -exec \
+#     bash -c "echo '>>> {} <<<' && '{}' $ARGS || exit" \; -quit
+
+# ALT: Interactive choose defaults
+#   sudo update-alternatives --config gnome-www-browser
+#   update-alternatives --display x-session-manager
+
+# ALT: Check distro name and version: lsb_release -si
+# lsb_release -ds 2>/dev/null || cat /etc/*release 2>/dev/null | head -n1 || uname -om
+
+## ALT: Instead of my "$CURR_PLTF"
+# case "$OSTYPE" in
+#   cygwin|msys) echo "Windows"
+#   solaris*) echo "SOLARIS" ;;
+#   darwin*)  echo "OSX" ;;
+#   linux*)   echo "LINUX" ;;
+#   bsd*)     echo "BSD" ;;
+#   *)        echo "unknown: $OSTYPE" ;;
+# esac

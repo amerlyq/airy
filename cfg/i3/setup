@@ -1,23 +1,9 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^(dark|light)$ ]] || THEME=dark
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-
 link "$PWD" ~/.i3
 
 ### GENS ###
 THEME=$THEME ./i3-config.gen
-
-distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
-if distro ubuntu; then
-    # Language=en_US -- breaks
-    echo "[Desktop]
-    Session=i3" > ~/.dmrc
-    echo "W: ~/.dmrc  <- i3"
-
-    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
-        sudo update-alternatives --set $1 "$2"; }
-    mkdef x-window-manager $(which i3)
-fi

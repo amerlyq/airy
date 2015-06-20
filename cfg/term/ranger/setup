@@ -1,17 +1,18 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-
-case "$1" in
---clean) while read line; do rm -vf "${PWD}${line}"; done < "$PWD/.gitignore" ;;
--u|--update) update="$1"; echo "USE: ranger --copy-config=all (Be Careful!), and see diff" ;;
-esac
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 link "$PWD" ~/.config/ranger
 
 
-case "$SHELL" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
+if [[ "$clean" -eq 1 ]]; then while read line
+do rm -vf "${PWD}${line}"; done < "$PWD/.gitignore"; fi
+
+if [[ "$update" -eq 1 ]]; then
+echo "USE: ranger --copy-config=all (Be Careful!), and see diff"; exit; fi
+
+
+case "${SHELL?No}" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
 RC="$RC $HOME/.cache/zsh/.zshrc"
 if ! grep -q '/tmp/aura/ranger_cwdir' $RC 2>/dev/null; then
     echo "===========================

@@ -1,21 +1,8 @@
-#!/bin/bash
-set -o errexit
-set -o pipefail
-# [[ $- =~ i ]] && return || exit
-cd $(dirname $(readlink -m ${0})) || exit
-
-case "$1" in
-dark|light|lucid|opaque) THEME="${1}" ;;
--u|--update) ARGS="$1"; update=1 ;;
---clean) ARGS="$1" ;;
--i|--install) install=1 ;;
-?*) echo "Error: no such option '$1'"; exit 1 ;;
-esac
-
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0})) && source ./cfg/shell/func.d/cfgsetup
 # ======================================================================
+echo "$THEME" > "${CURR_CACHE?No}/theme"
 
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-# ldir(){ mkdir -p $2 && lndir "$1" $2; }
 header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
 pretty() { sed "
     s|/home/$(whoami)|\~|g;  s|\~/\S\+/cfg/||g;  />>>/!s|^|  |g
@@ -25,18 +12,11 @@ pretty() { sed "
        /.*\s->\s.*/s//$(tput setaf 4)&$(tput sgr0)/
 ";}
 
-
 header "Airy public"
-
-cache=~/.cache/airy
-mkdir -p $cache/bin
 link "$PWD/bin" ~/.bin
-
-[[ "${THEME:=$(< $cache/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
-echo "$THEME" > $cache/theme
+link "$PWD/cfg/shell" ~/.shell
 
 # ======================================================================
-
 ## Populate sensible configs
 if [[ -f ../erian/setup ]]; then
     header "Erian private data"
@@ -44,14 +24,15 @@ if [[ -f ../erian/setup ]]; then
 fi
 
 # ======================================================================
-
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
-# WARNING: what to do if not exists -- like on pure system setup?
-source ~/.shell/profile || PKG_LIST=(shell zsh git ranger tmux vim elinks)
+source ~/.shell/profile
 
-case "$CURR_PROF" in laptop|home|work)
-PKG_LIST=(shell 'shell/*' core 'dev/*' i3 'term/*' Xrc 'Xrc/*' 'net/*' 'browser/*' 'media/*')
+case "${CURR_PROF:=headless}" in
+laptop|home|work) PKG_LIST=(
+    shell 'shell/*' core 'dev/*' 'term/*'
+    i3 Xrc 'Xrc/*' 'net/*' 'browser/*' 'media/*'
+) ;; *) PKG_LIST=(shell zsh git ranger tmux vim elinks)
 ;; esac
 
 for nm in "${PKG_LIST[@]}"; do
@@ -63,33 +44,7 @@ for nm in "${PKG_LIST[@]}"; do
     done
 done | pretty
 
-## Subdirectories:
-# for dir in "$PWD"/*; do if [[ -d "$dir" && -f "$dir/setup" ]]
-# then echo ">>> Cfg: $dir <<<"; "$dir/setup" "$ARGS"; fi; done
-## Packages
-# [[ "${PKG_LIST[@]} " =~ "${PWD##*/} " ]] || exit
-## Robust find with exec
-# find . -mindepth 2 -type f -wholename "*/setup" -not -exec \
-#     bash -c "echo '>>> {} <<<' && '{}' $ARGS || exit" \; -quit
-
 # ======================================================================
 
 header "DONE"
 [[ "$update" -eq 1 ]] && i3-msg restart </dev/tty >/dev/null 2>&1
-
-# ALT: Interactive choose defaults
-#   sudo update-alternatives --config gnome-www-browser
-#   update-alternatives --display x-session-manager
-
-# ALT: Check distro name and version: lsb_release -si
-# lsb_release -ds 2>/dev/null || cat /etc/*release 2>/dev/null | head -n1 || uname -om
-
-## ALT: Instead of my "$CURR_PLTF"
-# case "$OSTYPE" in
-#   cygwin|msys) echo "Windows"
-#   solaris*) echo "SOLARIS" ;;
-#   darwin*)  echo "OSX" ;;
-#   linux*)   echo "LINUX" ;;
-#   bsd*)     echo "BSD" ;;
-#   *)        echo "unknown: $OSTYPE" ;;
-# esac

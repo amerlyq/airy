@@ -1,23 +1,19 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
 
-
-VCACHE="$HOME/.cache/vim"  # Dir for .swp, backup, ... files
+# Dir for .swp, backup, ... files
+VCACHE=~/.cache/vim
+mkdir -vp "$VCACHE"
 FONT="$VCACHE/powerline-fonts/DejaVuSansMono"
-mkdir -p "$VCACHE"
 
-### THEMES ###
-case "$1" in
---clean) rm -rf "$VCACHE" ;;
--u|--update) update="$1" ;;
-esac
+if [[ "$clean" -eq 1 ]]; then rm -rf "$VCACHE"; fi
 
 
 ### SPELL ###
+# WARNING: first clean install will always fail as uk*.sug file is absent!
 if [[ ! -d "$VCACHE/spell" ]]; then
     mkdir -p "$VCACHE/spell"
     src='http://ftp.vim.org/pub/vim/runtime/spell'
@@ -30,6 +26,7 @@ fi
 
 
 ### FONTS ###
+# FIXME: fonts are needless on headless system! Check what???
 # https://powerline.readthedocs.org/en/latest/installation/linux.html
 if [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
     mkdir -p ~/.fonts/
@@ -53,8 +50,8 @@ fi
 
 ### PLUGINS ###
 if [[ ! -d "$VCACHE/bundle" || "$update" -eq 1 ]]; then
-    vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall
-    sudo pip install --upgrade pip -U jedi
+    # FIXME: error on clean system, when NeoBundle is not installed yet
+    vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty
 fi
 
 # Editor

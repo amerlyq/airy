@@ -1,14 +1,12 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^(dark|light)$ ]] || THEME=dark
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
-
 dir=~/.config/vimb
-if [[ "$1" != '-t' ]]; then  # Skip if you only toggle them
-    for nm in config 'dld-start' theme setup
-    do link "$PWD/$nm" "$dir/$nm"; done
+# Skip if you only toggle them
+if [[ "$1" != '-t' ]]; then
+    linkdir "$dir/" config 'dld-start' theme setup
 fi
 
 link "$dir/theme/${THEME}.css" "$dir/style.css"

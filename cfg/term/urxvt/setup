@@ -1,18 +1,13 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^[a-z]+$ ]] || THEME=dark
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
-case "$1" in
--l|--list) # To see the current loaded resources
-    xrdb -query -all; exit ;;
-esac
+# To see the current loaded resources
+#   xrdb -query -all
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
-
-dst=~/.cache/airy/theme-urxvt
 link "$PWD" ~/.urxvt
-link "$PWD/themes/amer-${THEME}" "$dst"
+link "$PWD/themes/amer-${THEME}" ~/.cache/airy/theme-urxvt
 
 
 # https://wiki.archlinux.org/index.php/Rxvt-unicode

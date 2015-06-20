@@ -1,11 +1,8 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-[[ "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^(dark|light)$ ]] || THEME=dark
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
+[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && mkdir -p ${2%/*} && ln -sfvT "$1" $2; }
-
-
 link "$PWD/copyq.conf" ~/.config/copyq/copyq.conf
 link "$PWD/rtorrent.rc" ~/.rtorrent.rc
 link "$PWD/zathurarc-${THEME}"  ~/.config/zathura/zathurarc

@@ -1,17 +1,12 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-
-case "$1" in
--u|--update) update="$1" ;;
-esac
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-for nm in profile; do link "$PWD/$nm" ~/.${nm##*/}; done
+link "$PWD/profile" ~/.profile
+
 
 # if distro ubuntu; then:
 # update-alternatives : x-session-manager cinnamon-session-cinnamon
-
 distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
 if distro ubuntu; then (cd ./ubuntu
     ./xsessionrc.gen

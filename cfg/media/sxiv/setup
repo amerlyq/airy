@@ -1,7 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
+cd $(dirname $(readlink -m ${0})) && source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
-
 link "$PWD" ~/.config/sxiv
