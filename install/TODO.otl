@@ -13,16 +13,28 @@ TODO
 
 	[_] Exclude root from display managers -- always load in console w/o X
 
+	SEE packer instead of yaourt
+		http://ubuntuforums.org/showthread.php?t=1389872
 
 	### ADD sudo powers)
 	# pacman -S sudo bash-completion
 	# visudo
 	# %wheel ALL=(ALL) ALL
 
+Delaying kernel upgrades
+	http://unix.stackexchange.com/questions/164465/delaying-kernel-upgrades-on-arch-linux
+	Backup old kernels
+		http://unix.stackexchange.com/questions/50579/automatically-include-n-latest-kernel-versions-in-grub-grub2-menu-on-kernel-up
+
+Snapshots -- ARM and LVM
+	https://wiki.archlinux.org/index.php/Downgrading_packages
 
 ### Seized ###
 	https://wiki.archlinux.org/index.php/Beginners%27_guide
 
+Packman
+	> Principle: Download all pkg with '-w', then once do interactive install.
+		http://kissmyarch.blogspot.com/2012/05/two-simple-yaourt-tips.html
 
 VBOX
 	https://wiki.archlinux.org/index.php/VirtualBox#Failed_to_create_the_host-only_network_interface
@@ -34,6 +46,15 @@ VBOX
 		scp user@local.ip:~/.ssh/arch  ~/.ssh/id_rsa
 		scp user@local.ip:~/aura/airy/arch-install .
 
+Installing lts kernel (for fallback on broken system)
+: http://wiki.archbang.org/index.php?title=Installing_the_Long_Term_Support_Kernel
+: https://wiki.archlinux.org/index.php/Arch_Build_System
+: https://wiki.archlinux.org/index.php/Kernels/Compilation/Arch_Build_System
+: https://wiki.archlinux.org/index.php/Kernels/Compilation/Traditional
+	packman -S linux-lts linux-headers-lts
+	vi /etc/default/grub
+	: GRUB_DEFAULT=0	# Count lts entry order in /boot/grub/grub.cfg
+	grub-mkconfig -o /boot/grub/grub.cfg
 
 [_] Give my complete auto installation to Igor to test)
 	Window managers -- switcher for multiprofiling work/media
@@ -143,6 +164,8 @@ NOTE
 
 Optimize boot time (both kernel and bootloader)
 : http://events.linuxfoundation.org/sites/events/files/slides/12%20Lessons%20Learnt%20in%20Boot%20Time%20Reduction.pdf
+	check time
+		systemd-analyze
 	measure data read (See at 7th column):
 		cat /proc/diskstats
 	Use compression?

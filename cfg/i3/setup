@@ -15,7 +15,8 @@ mkdef x-window-manager $(which i3)
 ### GENS ###
 THEME=$THEME ./i3-config.gen
 
-if grep -q Ubuntu /proc/version; then
+distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
+if distro ubuntu; then
     # Language=en_US -- breaks
     echo "[Desktop]
     Session=i3" > ~/.dmrc

@@ -12,7 +12,8 @@ for nm in profile; do link "$PWD/$nm" ~/.${nm##*/}; done
 # update-alternatives
 #     x-session-manager cinnamon-session-cinnamon
 
-if grep -q Ubuntu /proc/version; then (cd ./ubuntu
+distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
+if distro ubuntu; then (cd ./ubuntu
     ./xsessionrc.gen
     ./hosts.gen
     if [[ "$update" -eq 1 ]]; then

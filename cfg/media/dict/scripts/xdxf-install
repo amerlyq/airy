@@ -2,13 +2,15 @@
 source ~/.shell/func.d/packages
 # Converting Lingvo .dsl to .dict for dictd
 
-git_install 'soshial/xdxf_makedict' -d
-dir="$CURR_DIR_PKG/xdxf_makedict"
+if distro ubuntu; then
+    git_inst -d 'soshial/xdxf_makedict'
+    dir="$CURR_DIR_PKG/xdxf_makedict"
 
-sed -i '/g_info/s|^[^/].*|// &|' "$dir/src/log.hpp"
-sed -i '/g_info/,/^}/s|^[^/].*|// &|' "$dir/src/log.cpp"
+    sed -i '/g_info/s|^[^/].*|// &|' "$dir/src/log.hpp"
+    sed -i '/g_info/,/^}/s|^[^/].*|// &|' "$dir/src/log.cpp"
 
-rep_autobuild "$dir"
+    pkg_build "$dir"
+fi
 
 # https://brutalblog.wordpress.com/2007/12/20/1/
 ## Sadly, but seems it will not work on .dsl.dz, you need

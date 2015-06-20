@@ -1,154 +1,95 @@
-# vim: ft=sh
+# vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 source ~/.shell/profile
 
-ppa_add() {
+mkdir -p "${CURR_DIR_PKG:=~/pkg}"
+distro(){ uname -rv | grep -iq "$1"; }
+
+
+if distro ubuntu; then
+  pkg_inst(){ sudo apt-get --yes install $@ || exit; }
+  pkg_make(){ sudo checkinstall --default $@ || exit; }
+  deb_wget(){ wget_it $* && sudo dpkg -i "$CURR_DIR_PKG/${2:-${1##*/}}"; }
+  ppa_add(){
     local addr="${1#ppa:}"
     addr="${addr#*http://}"
     addr="${addr%% *}"
-    if ! bash -c 'grep ^ /etc/apt/sources.list /etc/apt/sources.list.d/*' | grep -q "$addr" ; then
-        sudo apt-add-repository -y "$1"
-        sudo apt-get update
-    else return 1; fi
-    return 0
-}
+    grep -q "^$addr" /etc/apt/sources.list /etc/apt/sources.list.d/* || return
+    sudo apt-add-repository --yes "$1"
+    sudo apt-get update
+  }
 
-apt_noprompt(){ # $@ -- packages
-    echo -e "LST:\n\t$@\n"
-    # Need filter for output! -- inserted in -/deploy/pristine
-    # for pr in $@; do
-        sudo apt-get --yes install $@
-        #  # | sed -n '/^Need to get/p'
-        # if ([ -z "$ZSH" ] && [ "${PIPESTATUS[0]}" != "0" ]) \
-        #     || ([ ! -z "$ZSH" ] && [ "${pipestatus[0]}" != "0" ]); then
-        #     echo "something is wrong..."
-        # fi
-    # done
-}
+elif distro arch; then
+  pkg_inst(){ sudo pacman -S --noconfirm $@; }
+  if hash yaourt >/dev/null 2>&1
+  then aur_inst(){ sudo yaourt -S --noconfirm $@; }
+  else aur_inst(){ return 1; }
+  fi
+
+fi
 
 
-wget_it() {
-    local NM
-    case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
-    NM="$CURR_DIR_PKG/$NM"
-    # http://unix.stackexchange.com/questions/45959/wget-is-returning-an-html-page-instead-of-original-file
-    wget -c "$1" -O "$NM" --trust-server-names --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0" #--max-redirect=2
-    # if [ "$( cat $NM | head -c 9 )" == "<!doctype" ]; then
-        # echo 'yes'
-        # rref='<a href="\([^?]*\)?.* class="direct-download">'
-        # link=$( cat "$NM" | sed -n "/.*${rref}.*/{s//\1/gp;q}" )
-        # echo $link
-        # wget "$link" -O "$NM"
-    # fi
-}
-
-check_pkg_dir() {
-    if [ -z "$CURR_DIR_PKG" ]; then
-        echo "Error: CURR_DIR_PKG not set. Skip installing."
-        exit 1
-    fi
-}
-
-deb_wget() {
-    local NM
-    check_pkg_dir
-    if `wget_it $*`; then
-        case $# in 1) NM="${1##*/}";; 2) NM="${2}";; *) echo "Error: invalid args. Skip installing"; exit 1; ;; esac
-        sudo dpkg -i "$CURR_DIR_PKG/$NM"
-    fi
-}
-
-rep_autobuild() {
-    local PR_DIR="$1"
-    shift
+pkg_build() {
     # It can be, that 'autoreconf' can replace my own vehicle.
-    cd "$PR_DIR"
-    if [ -f "$PR_DIR/CMakeLists.txt" ]; then
-        BUILD_DIR="$PR_DIR/build"
-        mkdir -p "$BUILD_DIR"
-        cmake -E chdir "$BUILD_DIR" cmake "" "$PR_DIR"
-        cd "$BUILD_DIR"
-        sudo checkinstall --default
-    elif [ -f "$PR_DIR/Makefile" ] || [ -f "$PR_DIR/makefile" ]; then
-        cd "$PR_DIR"
-        make && sudo checkinstall --default
-    elif [ -f "$PR_DIR/setup.py" ]; then
+    local prdir="$1"; shift; cd "$prdir"
+
+    if [[ -f ./CMakeLists.txt ]]; then
+        mkdir -p ./build && bdir="$_"
+        cmake -E chdir ./build cmake "" "$prdir" || return
+        cd ./build && pkg_make
+
+    elif [[ -f ./Makefile ]]; then
+        make && pkg_make
+
+    elif [[ -f ./setup.py ]]; then
         sudo python setup.py install
-    elif [ -f "$PR_DIR/configure.ac" ]; then
-        BUILD_DIR="$PR_DIR/build"
-        mkdir -p "$BUILD_DIR"
-        cd "$BUILD_DIR"
-        if [ -f "$PR_DIR/autogen.sh" ]; then
-            ../autogen.sh
-        else
-            autoreconf --install
-        fi
-        [ $? -eq 0 ] && ../configure $@
-        [ $? -eq 0 ] && make && sudo checkinstall --default
-    else
-        echo "Error: unsupported build system. Build manually."
-    fi
-}
 
-wget_install() { # $1 - git rep, $2 - dir name
-    local PR_DIR NM=${1##*/} BUILD_DIR LINK="$1"
-    check_pkg_dir
+    elif [[ -f ./build.sh ]]; then
+        ./build.sh && pkg_make
 
-    wget_it "$LINK" "$NM"
-    cd "$CURR_DIR_PKG" && atool -x "$NM"
+    elif [[ -f ./configure.ac ]]; then
+        mkdir -p ./build && cd ./build
+        [[ -f ../autogen.sh ]] && ../autogen.sh || autoreconf --install || return
+        ../configure $@ && make && pkg_make
 
-    PR_DIR="$CURR_DIR_PKG/${NM%.tar.gz}"
-    rep_autobuild "$PR_DIR"
-}
-
-git_install() { # $1 - git rep, $2 - dir name
-    local PR_DIR=${1##*/} BUILD_DIR LINK="$1"
-    check_pkg_dir
-    PR_DIR="$CURR_DIR_PKG/${PR_DIR,,}"
-
-    if [ -d "$PR_DIR" ]; then
-        cd "$PR_DIR"
-        git pull   #--depth 1 -- disabled by cause of automerges
-    else
-        if [ "${LINK//'://'}" == "$LINK" ]; then
-            LINK="https://github.com/$LINK"
-        fi
-        git clone --depth 1 "$LINK" "$PR_DIR"
-    fi
-
-    if [ "$2" != "-d" ]; then
-        rep_autobuild "$PR_DIR"
-    fi
-}
-
-hg_install() { # $1 - git rep, $2 - dir name
-    local PR_DIR=${1##*/} BUILD_DIR
-    check_pkg_dir
-    PR_DIR="$CURR_DIR_PKG/${PR_DIR,,}"
-
-    if [ -d "$PR_DIR" ]; then
-        cd "$PR_DIR"
-        hg pull
-    else
-        hg clone "$1" "$PR_DIR"
-        cd "$PR_DIR"
-    fi
-
-    rep_autobuild "$PR_DIR"
+    else echo "Error: unsupported build system. Build manually."; fi
 }
 
 
-git_get() {
-    local PR_DIR=${1##*/} BUILD_DIR LINK="$1"
-    mkdir -p "$CURR_DIR_HUB"
-    PR_DIR="$CURR_DIR_HUB/${PR_DIR,,}"
+wget_inst() {
+  local nobuild link fl prdir; case "$1" in -d) nobuild=1; shift ;; esac
+  fl="$CURR_DIR_PKG/${1##*/}" && prdir="${fl%.tar.gz}"
+  [[ "${1//'://'}" == $1 ]] && link="https://sf.com/$1" || link="$1"
 
-    if [ -d "$PR_DIR" ]; then
-        cd "$PR_DIR"
-        git pull
-    else
-        if [ "${LINK//'://'}" == "$LINK" ]; then
-            LINK="https://github.com/$LINK"
-        fi
-        git clone --depth 1 "$LINK" "$PR_DIR"
-    fi
+  if [[ -d "$prdir" ]]; then rm -rf "$prdir"; fi
+  wget -c "$link" -O "$fl" --trust-server-names \
+    --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) \
+Gecko/20100101 Firefox/12.0" #--max-redirect=2
+  wget_it "$link" "$fl" && atool -X "$prdir" "$fl"
+
+  if [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
+}
+
+
+git_inst() { # $0 -d pr_name
+  local nobuild link prdir; case "$1" in -d) nobuild=1; shift ;; esac
+  prdir=${1##*/} && prdir="$CURR_DIR_PKG/${prdir,,}"
+  [[ "${1//'://'}" == $1 ]] && link="https://github.com/$1" || link="$1"
+
+  #--depth 1 -- disabled by cause of automerges
+  if [[ -d "$prdir" ]]; then cd "$prdir" && git pull --rebase --verbose
+  else git clone --depth 1 "$link" "$prdir" && cd "$prdir"; fi
+
+  if [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
+}
+
+
+hg_inst() {
+  local nobuild link prdir; case "$1" in -d) nobuild=1; shift ;; esac
+  prdir=${1##*/} && prdir="$CURR_DIR_PKG/${prdir,,}"
+  [[ "${1//'://'}" == $1 ]] && link="https://bitbucket.com/$1" || link="$1"
+
+  if [[ -d "$prdir" ]]; then cd "$prdir" && hg pull
+  else hg clone "$link" "$prdir" && cd "$prdir"; fi
+
+  if [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
 }

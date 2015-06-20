@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# | urxvt | fast terminal, image support, perl extensions
+
+if distro arch; then
+    pkg_inst 'rxvt-unicode-256color'
+
+elif distro ubuntu; then
+    aur_inst 'rxvt-unicode-patched' || pkg_inst 'rxvt-unicode'
+fi

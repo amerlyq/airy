@@ -41,4 +41,9 @@ def hook_init(fm):
     aura_options(fm)
     aura_pathes(fm)
 
+    for fmt in ("\{0}", "<a-{0}>"):
+        for i in range(9):
+            fm.execute_console(("map " + fmt + " tab_open {0}").format(i+1))
+
+
 ranger.api.hook_init = hook_init

@@ -2,16 +2,16 @@
 # vim: ft=sh
 source ~/.shell/func.d/packages
 
-# for vimoutliner export in mindmap
-LST="$LST vim vim-gtk python-dev"
-LST="$LST libclang-dev clang-format-3.5 exuberant-ctags"
 # libclang-dev exuberant-ctags python-dev   | for autocompleter in vim
 # clang-format-3.5          | for auto-formatting c/cpp code
 
-apt_noprompt $LST
+if distro arch; then
+    # aur_inst neovim-git
+    pkg_inst gvim-python3
 
-## TODO: Change to neovim
-# yaourt -S neovim-git
-## Principle: Download all pkg with '-w', then once do interactive install.
-# pacman -S gvim / gvim-python3
-# http://kissmyarch.blogspot.com/2012/05/two-simple-yaourt-tips.html
+elif distro ubuntu; then
+    # for vimoutliner export in mindmap
+    pkg_inst vim-gtk exuberant-ctags python-dev
+    pkg_inst libclang-dev clang-format-3.5
+
+fi

@@ -8,6 +8,7 @@ case "$1" in
 dark|light|lucid|opaque) THEME="${1}" ;;
 -u|--update) ARGS="$1"; update=1 ;;
 --clean) ARGS="$1" ;;
+-i|--install) install=1 ;;
 ?*) echo "Error: no such option '$1'"; exit 1 ;;
 esac
 
@@ -15,9 +16,14 @@ esac
 
 link(){ [[ ! -e $2 || -L $2 ]] && ln -sfvT "$1" $2; }
 # ldir(){ mkdir -p $2 && lndir "$1" $2; }
-pretty() { sed "s|/home/$(whoami)|\~|g;  s|\~/\S\+/cfg/||g;  />>>/!s|^|  |g
-    /^>>> \.\//s||\n$(tput setaf 2)\[|g;  / <<<$/s||\]$(tput sgr0)|g"; }
 header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
+pretty() { sed "
+    s|/home/$(whoami)|\~|g;  s|\~/\S\+/cfg/||g;  />>>/!s|^|  |g
+        /^>>> \.\//s//\n$(tput setaf 2)\[/g
+            / <<<$/s//\]$(tput sgr0)/g
+    /\(C\|W\):\s.*/s//$(tput setaf 13)&$(tput sgr0)/
+       /.*\s->\s.*/s//$(tput setaf 4)&$(tput sgr0)/
+";}
 
 
 header "Airy public"
@@ -50,7 +56,11 @@ PKG_LIST=(shell 'shell/*' core 'dev/*' i3 'term/*' Xrc 'Xrc/*' 'net/*' 'browser/
 
 for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl
-    do echo ">>> $fl <<<"; $fl $ARGS; done
+    do echo ">>> $fl <<<"
+        if [[ "$install" -eq 1 && -f "${fl%/*}/install" ]]
+        then "${fl%/*}/install"; echo; fi
+        $fl $ARGS
+    done
 done | pretty
 
 ## Subdirectories:
@@ -67,6 +77,19 @@ done | pretty
 header "DONE"
 [[ "$update" -eq 1 ]] && i3-msg restart </dev/tty >/dev/null 2>&1
 
-# Interactive choose defaults
+# ALT: Interactive choose defaults
 #   sudo update-alternatives --config gnome-www-browser
 #   update-alternatives --display x-session-manager
+
+# ALT: Check distro name and version: lsb_release -si
+# lsb_release -ds 2>/dev/null || cat /etc/*release 2>/dev/null | head -n1 || uname -om
+
+## ALT: Instead of my "$CURR_PLTF"
+# case "$OSTYPE" in
+#   cygwin|msys) echo "Windows"
+#   solaris*) echo "SOLARIS" ;;
+#   darwin*)  echo "OSX" ;;
+#   linux*)   echo "LINUX" ;;
+#   bsd*)     echo "BSD" ;;
+#   *)        echo "unknown: $OSTYPE" ;;
+# esac

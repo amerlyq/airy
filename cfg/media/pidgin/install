@@ -1,12 +1,11 @@
-#!/bin/bash
-# vim: ft=sh
-source ~/.shell/func.d/packages || exit
-# Pidgin
+#!/bin/bash -e
+source ~/.shell/func.d/packages
 
-apt_noprompt pidgin pidgin-sipe pidgin-plugin-pack myspell-ru
-# pidgin-sipe        | Office Communicator plugin
-# pidgin-plugin-pack | Primarily for convenient history plugin
+# | pidgin-sipe        | Office Communicator plugin
+# | pidgin-plugin-pack | Primarily for convenient history plugin
+
+pkg_inst 'pidgin pidgin-sipe pidgin-plugin-pack myspell-ru'
 
 ### ON DEMAND ###
-# finch              | TUI interface to pidgin
-# tcpdump | if necessary
+# finch   | TUI interface to pidgin
+# tcpdump | if necessary to extract paswd

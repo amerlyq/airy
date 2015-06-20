@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# | mcomix | fork of comix, one of several apps in linux instead of mmce
+
+if distro arch; then
+    pkg_inst mcomix
+
+elif distro ubuntu; then
+    git_inst 'benoit-pierre/mcomix'
+fi

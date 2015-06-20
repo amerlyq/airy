@@ -18,7 +18,7 @@ then
     tmux new-session -d -s $SESSION -n '$PRG'
     tmux rename-window -t $SESSION:1 'work'
 fi
-tmux attach -t $SESSION
+tmux -2 attach -t $SESSION
 "
 
 case "$PRG" in

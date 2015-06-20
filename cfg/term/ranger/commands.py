@@ -47,6 +47,7 @@ class actualee(Command):
 
 # Load aliases to shell (setopt aliases?). Using ~/.zshenv will crash git commands
 # NOTE: shell -r ... works w/o sourcing, as there are no 'sudo source'
+#   FIXME: http://askubuntu.com/questions/20953/sudo-source-command-not-found
 class shell(Command):
     escape_macros_for_shell = True
 

@@ -1,23 +1,34 @@
-#!/bin/bash
-source ~/.shell/func.d/packages || exit
+#!/bin/bash -e
+source ~/.shell/func.d/packages
 
-LST="$LST ranger"
-LST="$LST fbi caca-utils highlight atool w3m w3m-img poppler-utils mediainfo colordiff"
-# caca-utils # (img2txt) Colour AsCii Art library. cacaview - image viewer for the terminal. The user can zoom and scroll the image, set the dithering method or enable anti-aliasing. cacaball is a tiny graphic program that renders animated ASCII metaballs on the screen, cacafire is a port of AALib's aafire and displays burning ASCII art flames, and cacademo is a simple application that shows the libcaca rendering features such as line and ellipses drawing, triangle filling and sprite blitting.
-# fbi        # framebuffer image viewer for terminal
-# atool     # previews of archives
-# highlight # syntax highlighting of code
-# w3m         # W3M supports images, so where are they? Well, terminals like GNOME Terminal and KDE’s Konsole can’t display W3M’s images. Other terminals, such as Xterm, can. W3M will also display images if you’re running it in a framebuffer console, so you don’t need an X server running to take advantage of this feature. W3M still doesn’t compare with desktop browsers — notably, it doesn’t support JavaScript. There’s an experimental w3m-js extension you can compile and install yourself, but I wouldn’t rely too much on that. Then again, do you really want JavaScript in a terminal browser?
-# poppler   # (pdftotext) for pdf previews
-# mediainfo or perl-image-exiftool # viewing information about media files
+if distro arch; then
+    pkg_inst 'ranger'
 
-apt_noprompt $LST
+else
+    # git_inst 'amerlyq/ranger'
+    git_inst 'hut/ranger'
+fi
 
-# Temporary solution, until fork merged?
-# git_install 'amerlyq/ranger'
-# git_install 'hut/ranger'
+pkg_inst 'fbi caca-utils atool poppler-utils mediainfo colordiff'
+#| caca-utils | (img2txt) Colour AsCii Art library.
+#|   cacaview | image viewer for the terminal. The user can zoom and scroll
+#|            | the image, set the dithering method or enable anti-aliasing.
+#|   cacaball | tiny graphic program that renders animated ASCII metaballs
+#|            | on the screen
+#|   cacafire | port of AALib's aafire and displays burning ASCII art flames
+#|   cacademo | simple application that shows the libcaca rendering features
+#|            | such as line and ellipses drawing, triangle filling and
+#|            | sprite blitting.
+#| fbi        | framebuffer image viewer for terminal
+#| atool      | previews of archives
+#| highlight  | syntax highlighting of code
 
-# Highlighting
-# apt_noprompt python-pygments
-apt_noprompt pandoc sharutils # or some uuencode
-git_install 'rkitover/vimpager'
+pkg_inst 'w3m w3m-img'
+#| w3m | supports images (xterm, framebuffer console), but it doesn’t support JavaScript.
+#| poppler   # (pdftotext) for pdf previews
+#| mediainfo or perl-image-exiftool # viewing information about media files
+
+pkg_inst highlight
+# pkg_inst python-pygments
+# pkg_inst pandoc sharutils # or some uuencode
+# git_inst 'rkitover/vimpager'

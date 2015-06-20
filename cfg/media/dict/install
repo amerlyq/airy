@@ -1,9 +1,11 @@
-#!/bin/bash
-source ~/.shell/func.d/packages || exit
+#!/bin/bash -e
+source ~/.shell/func.d/packages
 
-apt_noprompt dict dictd #dict-moby-thesaurus dict-gcide dict-freedict-eng-rus dict-wn dict-devil
+pkg_inst dict dictd
+
+# dict-moby-thesaurus dict-gcide dict-freedict-eng-rus dict-wn dict-devil
 # dictconv dictfmt dictzip
 # mueller7-dict
 
-# apt_noprompt libtranslate-bin
-# apt_noprompt goldendict
+# libtranslate-bin
+# goldendict

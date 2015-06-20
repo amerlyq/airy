@@ -1,6 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-apt_noprompt zsh
+pkg_inst zsh
 
-git_install "clvv/fasd"
+if distro arch; then
+    aur_inst fasd
+
+elif distro ubuntu; then
+    git_inst 'clvv/fasd'
+fi
