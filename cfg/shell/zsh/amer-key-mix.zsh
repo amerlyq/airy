@@ -5,7 +5,6 @@
 #   http://www.bash2zsh.com/zsh_refcard/refcard.pdf
 
 # List of widgets and structure of commands
-#   http://www.math.technion.ac.il/Site/computing/docs/zsh/zsh_17.html
 #   http://unix.stackexchange.com/questions/122078/how-to-bind-a-key-sequence-to-a-widget-in-vi-cmd-mode-zsh
 
 # Vim text-objects, tex-between
@@ -97,16 +96,24 @@ bindkey  -s ',d' '^Uq\n'
 bindkey -as  'q' 'Sq\n'
 bindkey -as ',d' 'Sq\n'
 
+# TODO: bindkey -s '<keystroke>' '^qfoo\n'
+#   where ^q is bound to 'push-line'.
+# It saves current cmdline, and restores it back after running foo
 
-## Miscellaneous
+
+### Miscellaneous
 bindkey ' ' magic-space  # [Space] - do history expansion
-# On <F12> in vim mode loads config debug aliases
+## On <F12> in vim mode loads config debug aliases
 bindkey -as '^[[24~' '0d$isource ~/.shell/func.d/debug\n\e'
-# Handle SIGINT when completing
+## Handle SIGINT when completing
 # bindkey '^I' interruptible-expand-or-complete
-# Autocomplete paths only on <S-Tab> (SEE: amer-widgets)
+## Autocomplete paths only on <S-Tab> (SEE: amer-widgets)
 bindkey '\e[Z' complete  # SEE ALT inside widgets.
 
+## Ignore focus events ::: https://github.com/amerlyq/vim-focus-events
+#FIXME: -- I don't know how to make it working in zsh, as in inputrc
+# bindkey '\e[O' ''
+# bindkey '\e[I' ''
 
 ## Menu completion
 # For '-M menuselect' (http://www.zsh.org/mla/users/2009/msg01018.html

@@ -11,14 +11,11 @@ TODO
 	https://wiki.archlinux.org/index.php/System_maintenance
 	https://wiki.archlinux.org/index.php/Systemd#Basic_systemctl_usage
 
-	[_] Exclude root from display managers -- always load in console w/o X
-
-	[_] Test vim + tmux + ssh in vbox -- to be able present it to kedi
-	[_] BUG: ranger doesn't show hidden files
-	[_] TODO: change prompt color when vbox+ssh -- to easier distinguishing
-	[_] Font italic -- by default arch has it for LESS -- (END), restore it!
-	2015-06-21 [X] zsh cmdline has italic font for cli :> it's only for root!
-	2015-06-21 [X] ADD sudo powers)  :> # visudo # %wheel ALL=(ALL) ALL
+	2015-06-21 [X] Exclude root from display managers -- always load in console w/o X
+		Simply don't use X in xinitrc for it!
+		: In GRUB you can add 3 at the end of entry, to boot w/o X in console:
+		:	(grub) kernel /boot/vmlinuz-linux root=/dev/disk/by-uuid/..ro 3
+	2015-06-21 [X] ADD sudo powers)  :> # visudo # 100%wheel ALL=(ALL) ALL
 
 	[_] SEE packer instead of yaourt
 		http://ubuntuforums.org/showthread.php?t=1389872
@@ -56,7 +53,7 @@ Installing lts kernel (for fallback on broken system)
 : https://wiki.archlinux.org/index.php/Kernels/Compilation/Traditional
 	packman -S linux-lts linux-headers-lts
 	vi /etc/default/grub
-	: GRUB_DEFAULT=0	# Count lts entry order in /boot/grub/grub.cfg
+	: GRUB_DEFAULT="1>2"  # Count lts entry (menu>submenu) order in /boot/grub/grub.cfg
 	grub-mkconfig -o /boot/grub/grub.cfg
 
 [_] Give my complete auto installation to Igor to test)
@@ -70,7 +67,8 @@ Installing lts kernel (for fallback on broken system)
 
 	Terminal emulators -- switcher for local/remote/no-X work
 		https://wiki.archlinux.org/index.php/KMSCON
-		https://wiki.archlinux.org/index.php/Fbterm
+		> https://wiki.archlinux.org/index.php/Fbterm
+		: Use it as default to be able to work with ranger/images in console
 		https://github.com/uobikiemukot/yaft
 		https://wiki.archlinux.org/index.php/St
 		TRY:
@@ -161,6 +159,11 @@ NOTE
 		: 2e ae 18 98 31 b1 1f 9f 18 98 26 a6 12 92  # 'console'
 		: 0d 8d 14 94 14 94 15 95 03 83              # '=tty2'
 
+
+SETUP
+	Boot debugging
+	: NEED script to set-up necessary case for current box (through serial/ssh)
+		https://wiki.archlinux.org/index.php/Boot_debugging
 
 
 

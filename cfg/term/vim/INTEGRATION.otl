@@ -1,0 +1,71 @@
+> INTEGRATION
+: To be able work from alien computers
+	NOTE
+		Check vim table of colors
+		> http://www.robmeerman.co.uk/unix/256colours
+			vim "+runtime syntax/colortest.vim"
+
+	[_] CHECK vim + tmux + ssh in vbox -- to be able present it to kedi
+		[_] BUG: ranger doesn't show hidden files on the end box
+		| urxvt -- tmux -- vim                   #
+		| urxvt -- tmux -- ssh | vim             # Will vim will have $TMUX?
+		| urxvt	        -- ssh | tmux -- vim     #
+		| urxvt -- tmux -- ssh | tmux -- vim     # Which term will be set?
+		:SEE maybe ranger also will influence somehow on that?
+
+	Vim-all-environment
+		https://bbs.archlinux.org/viewtopic.php?id=89567#3
+
+	FIX vim + tmux + ssh + {different terminals (not-urxvt)}
+		install several different terminals -- with 16 and 256 colors
+			gnome, mint, st, putty, xterm
+		ssh to localhost
+		open same tmux in several terminals
+	Check
+		colors -- autochoose appropriate color schemes by availability and colors
+		: Maybe simplified color schemes?
+			http://askubuntu.com/questions/125526/vim-in-tmux-display-wrong-colors
+		escape codes -- terminal must not produce something it's not understanding
+		fonts -- see on powerline problems, detect and replace symbols if not available
+
+	2015-06-08 [X] Autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
+	[_] BUG: <C-y> in zsh by ssh: xsel: Can't open display: (null) Inappropriate ioctl for device
+		: xsel don't work by ssh and on my machine after ssh? (ioctl...)
+		:	 Maybe because I changed connect to default instead of -X
+		:= may use OSC 52:  http://sunaku.github.io/tmux-yank-osc52.html
+		Also SEE fix ::: cfg/shell/alias.d/funcs:53 // tmux-display-fix()
+	[_] BUG: italic/highlighted is swapped when searching in vim inside tmux
+		:=SEE: Fix reverse-video/italic mode in urxvt
+		:	https://wiki.archlinux.org/index.php/Tmux#Correct_the_TERM_variable_according_to_terminal_type
+
+	Events
+	:= Detect in vim, etc ENV[..] corresponding to tmux and ssh
+		Vim
+		:h autocmd-events
+			in/out :sh command on ,z
+				:Try hook -- ShellCmdPost -- but it also work on :make and :grep
+			in/out :Ranger on ,f
+			suspend/restore
+		Tmux
+			focusing pane
+			focusing window
+	Run commands -- send to new tmux pane or urxvt fork
+	Tmux seamless navigation (integrate one function in my code)
+		https://github.com/christoomey/vim-tmux-navigator/blob/master/plugin/tmux_navigator.vim
+		https://github.com/mhinz/vim-tmuxify
+		: https://github.com/ThomasAdam/tmux
+	Plugins for tmux
+		https://github.com/tmux-plugins
+		https://github.com/tmux-plugins/tmux-resurrect
+	Run commands in tmux
+		> https://github.com/benmills/vimux
+		https://github.com/zepto/unite-tmux
+		https://github.com/tpope/vim-tbone
+	[_] Many configs (vim+tmux+...)
+		https://github.com/thoughtbot/dotfiles
+		https://github.com/square/maximum-awesome
+	Others
+		https://www.braintreepayments.com/braintrust/vimux-simple-vim-and-tmux-integration
+		http://robots.thoughtbot.com/seamlessly-navigate-vim-and-tmux-splits
+		https://github.com/tmuxinator/tmuxinator
+		https://github.com/zolrath/wemux

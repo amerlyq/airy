@@ -36,6 +36,7 @@ urxvt
 		| echo -ne "\033[?25l"          | Hide cursor
 		| echo -ne "\033[?25h"          | Show cursor
 	[_] Make in urxvt ability to open file path in vim
+	: http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/src/urxvt.pm
 		So I will be able to open found files by {file, grep, ag} in vim
 			In same or another copy of urxvt
 	[_] Right-click menu with context-aware entries (cat, wget, netcat, copy, send...)
@@ -72,6 +73,11 @@ Themes
 		2015-06-15 [X] don't need directive '#define Dark'
 		[_] So I can keep permanent Xresources instead of generating it each time
 			:> But how about dpi?
+		>[_] Use native perl api for this
+			http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/src/urxvt.pm
+			: $isset = $term->option ($optval[, $set])
+			: $value = $term->resource ($name[, $newval])
+			: $value = $term->x_resource ($pattern)
 	[_] Per-ssh-host bkgr/theme color
 		colors=( 222222 111111 333333 444444 111111 333333)
 		printf "\e]49;#$resultingcolor\a"

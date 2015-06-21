@@ -1,12 +1,13 @@
 #!/bin/bash -e
+echo "0: $THEME" > ~/vlog
 source ~/.shell/func.d/cfgsetup
+echo "A: $THEME" >> ~/vlog
 [[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
+echo "B: $THEME" >> ~/vlog
 
 ### LINKS ###
 dir=~/.config/vimb
 # Skip if you only toggle them
-if [[ "$1" != '-t' ]]; then
-    linkdir "$dir/" config 'dld-start' theme setup
-fi
+cfgOpt s || linkdir "$dir/" config 'dld-start' theme setup
 
 link "$dir/theme/${THEME}.css" "$dir/style.css"

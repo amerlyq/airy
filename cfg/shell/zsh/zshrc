@@ -8,6 +8,16 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
+## workaround for handling TERM variable in multiple tmux sessions
+# https://wiki.archlinux.org/index.php/Tmux#Correct_the_TERM_variable_according_to_terminal_type
+#  properly by Nicholas Marriott
+# if [[ -n ${TMUX} && -n ${commands[tmux]} ]]
+# then case $(tmux showenv TERM 2>/dev/null) in
+#     *256color) ;&
+#     TERM=fbterm) TERM=screen-256color ;;
+#     *) TERM=screen
+# ;; esac; fi
+
 
 ### Opts ###
 ## Disable suspending on <C-s>, <C-q>

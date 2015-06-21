@@ -61,7 +61,9 @@ autocmd ColorScheme * highlight! NonText  ctermbg=None
 " nocturne
 exec 'set background='. s:theme_bkgr
 try
-  if exists('$TMUX') | color slate | else | color solarized | endif
+  if exists('$TMUX') && &t_Co <= 16
+    color slate | else | color solarized
+  endif
 catch /^Vim\%((\a\+)\)\=:E185/
   color slate
 endtry

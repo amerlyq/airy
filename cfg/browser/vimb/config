@@ -1,3 +1,4 @@
+# vim: ft=vim
 #SEE
 # http://thedarnedestthing.com/vimb
 
@@ -39,14 +40,17 @@ nnoremap ,tp :set proxy!<CR>
 nnoremap ,ts :set strict-ssl!<CR>
 # Theme dark/light toggle
 nnoremap ,tt :set stylesheet!<CR>
-nnoremap  \l :shellcmd sh -c "THEME=light ~/.config/vimb/setup -t" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
-nnoremap  \d :shellcmd sh -c "THEME=dark ~/.config/vimb/setup -t" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
+nnoremap  \s :set scripts!<CR>
+nnoremap  \l :shellcmd sh -c "THEME=light ~/.config/vimb/setup -s" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
+nnoremap  \d :shellcmd sh -c "THEME=dark ~/.config/vimb/setup -s" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
 
 ### Toggle defaults ###
 set statusbar=true
 set strict-focus=false
 set proxy=false
 set strict-ssl=true
+set stylesheet=true
+set scripts=false
 
 
 ### Setttings ###

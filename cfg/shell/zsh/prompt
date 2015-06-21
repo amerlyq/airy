@@ -191,7 +191,10 @@ function prompt_amer_setup {
   _prompt_amer_start_time=$SECONDS
 
   ## Change main color according to environment variables
-  prompt_color="${1:-1}"
+  if [[ -n "$SSH_TTY" && "$HOST" =~ vbox ]]
+  then prompt_color=${1:-4}
+  else prompt_color=${1:-1}
+  fi
   [[ $UID -eq 0 ]] && prompt_parts="╔═╚╣╼" || prompt_parts="┌─└╢╼"
   # if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then ... else ... fi
 

@@ -17,7 +17,6 @@ if [[ -n "${WORK_NAME:=$MAIN_NAME}" &&
     git config --global user.email "$WORK_MAIL"
     # git config --global user.signingkey = C8A2DA6E
 fi
-
-for fl in "$PWD"/cfg_* ; do cat "$fl" >> $dst; done
+cat "$PWD/cfg"/* >> $dst
 
 echo "W: ~/.gitconfig"

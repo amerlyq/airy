@@ -8,7 +8,7 @@ set -o pipefail
 cfgOpt(){ [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
 cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 
-case "$1" in
+for arg in "${@}"; do case "$1" in
 dark|light|lucid|opaque) THEME="${1}" ;;
   # Install all packages, linked to 'setup'
  -i|--install) cfgOptAdd i ;;
@@ -18,15 +18,19 @@ dark|light|lucid|opaque) THEME="${1}" ;;
       --clean) cfgOptAdd c; ARGS="$1" ;;
       --reset) cfgOptAdd ru ;;
       --debug) cfgOptAdd ud ;;
+     -s|--set) cfgOptAdd s; ARGS="$2" ;;
 ?*) echo "Error: no such option '$1'"; exit 1 ;;
-esac
+esac; done
 
 
 ### LINKS ###
 run() { hash $1 >/dev/null 2>&1 && /usr/bin/env $@; }
 # FIXME: this must be moved into func.d/cfgsetup -- to catch errors smoothly
-link(){ if [[ ! -e "$2" || -L "$2" ]]
-then mkdir -p "${2%/*}" && ln -sfvT "$1" "$2"
+link(){ if [[ ! -e "$2" || -L "$2" ]]; then
+  if [[ ! "$1" -ef "$2" ]]; then
+    mkdir -p "${2%/*}"
+    ln -sfvT "$1" "$2"
+  fi
 else echo "Err: symlink to $2"; exit 1
 fi;}
 # ldir(){ mkdir -p $2 && lndir "$1" $2; }
