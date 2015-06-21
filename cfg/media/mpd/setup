@@ -21,10 +21,9 @@ if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
 fi
 
 if cfgOpt u; then
-    mpd --kill
-    if cfgOpt d
-    then mpd --verbose --no-daemon --stdout > /tmp/mpd-verbose.log
-    else mpd; fi
+    pgrep mpd && mpd --kill
+    pgrep mpd || if ! cfgOpt d; then mpd
+    else mpd --verbose --no-daemon --stdout > /tmp/mpd-verbose.log; fi
 
     ## Re-scan music folder
     # mpc update --wait

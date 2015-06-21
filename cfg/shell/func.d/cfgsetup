@@ -8,7 +8,7 @@ set -o pipefail
 cfgOpt(){ [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
 cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 
-for arg in "$@"; do echo hi; case "$arg" in
+for arg in "$@"; do case "$arg" in
 dark|light|lucid|opaque) THEME="${1}" ;;
   # Install all packages, linked to 'setup'
  -i|--install) cfgOptAdd i ;;
