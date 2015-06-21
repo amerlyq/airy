@@ -40,7 +40,7 @@ laptop|home|work) PKG_LIST=(
 for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl
     do echo ">>> $fl <<<"
-        if [[ "$install" -eq 1 && -f "${fl%/*}/install" ]]
+        if cfgOpt i && [[ -f "${fl%/*}/install" ]]
         then "${fl%/*}/install"; echo; fi
         $fl $ARGS
     done
