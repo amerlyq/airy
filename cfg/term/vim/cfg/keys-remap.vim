@@ -42,10 +42,10 @@ nnoremap <unique> <PageUp>   <C-U>
 nnoremap <unique> <PageDown> <C-D>
 
 " improve scroll
-noremap <unique><expr> <C-f> max([winheight(0) - 2, 1]) . "\<C-d>" . (line("w$") >= line('$') ? "L" : "H")
-noremap <unique><expr> <C-b> max([winheight(0) - 2, 1]) . "\<C-u>" . (line("w0") <= 1         ? "H" : "L")
-noremap <unique><expr> <C-e> (line("w$") >= line('$') ? "j" : "3\<C-e>")
-noremap <unique><expr> <C-y> (line("w0") <= 1         ? "k" : "3\<C-y>")
+" noremap <unique><expr> <C-f> max([winheight(0) - 2, 1]) . "\<C-d>" . (line("w$") >= line('$') ? "L" : "H")
+" noremap <unique><expr> <C-b> max([winheight(0) - 2, 1]) . "\<C-u>" . (line("w0") <= 1         ? "H" : "L")
+" noremap <unique><expr> <C-e> (line("w$") >= line('$') ? "j" : "3\<C-e>")
+" noremap <unique><expr> <C-y> (line("w0") <= 1         ? "k" : "3\<C-y>")
 
 " swap vertical line motions with wrapped text
 " noremap <unique><expr> j v:count ? 'j' : 'gj'
@@ -91,10 +91,10 @@ vnoremap <unique> < <gv
 " nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 
 " Drag current line/s vertically and auto-indent. (Use Overlay+hjkl)
-nnoremap <unique> <S-Down> :m-2<CR>==
-nnoremap <unique> <S-Up>   :m+<CR>==
-vnoremap <unique> <S-Down> :m-2<CR>gv=gv
-vnoremap <unique> <S-Up>   :m'>+<CR>gv=gv
+nnoremap <unique> <S-Up>    :m-2<CR>==
+nnoremap <unique> <S-Down>  :m+<CR>==
+vnoremap <unique> <S-Up>    :m-2<CR>gv=gv
+vnoremap <unique> <S-Down>  :m'>+<CR>gv=gv
 
 " Visual block sorting. Restore text _outside_ block:  gvyugvp
 command! -range VBSort <line1>,<line2>sort i /\ze\%V/

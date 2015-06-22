@@ -3,8 +3,8 @@ set splitright " focus new window after vertical splitting
 set splitbelow " focus new window after horizontal splitting
 
 " Set minimum window size to 79x8
-set winheight=6
-set winminheight=6
+set winheight=10
+set winminheight=10
 set winwidth=72
 set winminwidth=15
 
@@ -25,10 +25,13 @@ noremap  gH  :<C-U>bfirst<CR>
 noremap  gL  :<C-U>blast<CR>
 
 " if winnr() > 1
-nnoremap <unique> <Up>    :resize +4<CR>
-nnoremap <unique> <Down>  :resize -4<CR>
-nnoremap <unique> <Left>  :vertical resize +4<CR>
-nnoremap <unique> <Right> :vertical resize -4<CR>
+" DISABLED: bugs
+"   -- when winnr==1 resizes 'ex' line from 1 to bigger when up/down
+"   -- on winnr==2 resizes windows by mouse instead of scrolling inside
+" nnoremap <unique> <Up>    :resize +4<CR>
+" nnoremap <unique> <Down>  :resize -4<CR>
+" nnoremap <unique> <Left>  :vertical resize +4<CR>
+" nnoremap <unique> <Right> :vertical resize -4<CR>
 " endif
 
 " Increment and decrement
