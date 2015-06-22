@@ -21,6 +21,9 @@ nnoremap <silent> <Leader>u :<C-U>UndotreeToggle<CR>
 " Replaces fuzzyfinder, recursive
 nnoremap <leader>o :<C-u>Unite -buffer-name=files file_rec/async:!<cr>
 
+" Focus the current fold by closing all others
+" nnoremap [unite]z mzzM`zzv
+
 " Leader '\' {{{
 let s:leader = g:mapleader
 let mapleader = "\\"
@@ -43,6 +46,3 @@ nnoremap <leader>u :<C-u>Unite -buffer-name=Outline outline<cr>
 
 let mapleader = s:leader
 " }}}
-
-
-

@@ -17,7 +17,8 @@ if [[ ! -d "$VCACHE/spell" ]]; then
     mkdir -p "$VCACHE/spell"
     src='http://ftp.vim.org/pub/vim/runtime/spell'
     for nm in ru en uk; do ( cd "$VCACHE/spell"
-        wget "$src/${nm}.utf-8.spl" && wget "$src/${nm}.utf-8.sug"
+        wget "$src/${nm}.utf-8.spl" || echo "No spl: $nm"
+        wget "$src/${nm}.utf-8.sug" || echo "No sug: $nm"
     ) done
 fi
 # For vim-easytags

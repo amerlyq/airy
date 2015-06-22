@@ -133,9 +133,10 @@ if has('unix')
     " For win: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
 else
 
-"ONLY FOR WIN: on unix use snip-ranger-filechooser.vim
+" In unix terminal use snip-ranger-filechooser.vim
 NeoBundleLazy 'Shougo/vimfiler.vim', {
     \ 'depends' : 'Shougo/unite.vim',
+    \ 'disabled' : has('unix') && !has('gui_running'),
     \ 'autoload' : {
     \    'commands' : [{ 'name' : 'VimFiler',
     \                    'complete' : 'customlist,vimfiler#complete' },

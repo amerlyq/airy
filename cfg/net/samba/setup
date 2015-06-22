@@ -3,10 +3,10 @@ source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
 ## Don't share samba in work network, only at home
-case "$CURR_PROF" in
+case "${CURR_PROF?No}" in
 laptop|home)
   if cfgOpt r; then
-    echo "! ATTENTION!!! Generate password for samba user !"
+    echo "N: ATTENTION ! Generate password for samba user !"
     sudo smbpasswd -a $(whoami)
   fi
 
@@ -19,5 +19,6 @@ laptop|home)
     testparm
   fi
 
-;; *) hash samba >/dev/null 2>&1 && sudo service smbd stop; exit ;; esac
-
+;; *) ## FIXME: not working as supposed:
+#if cfgOpt u && has_pr samba; then sudo service smbd stop
+exit ;; esac

@@ -241,6 +241,7 @@ vim
 
 SEIZE
 >>> [_] https://github.com/rafi/vim-config
+>	https://github.com/Shougo/shougo-s-github
 	[_] copy and refine whole 'ftplugin' dir
 	[_] see some secure plugins from 'plugin', 'autoload/unite/sources'
 >	https://github.com/tpope/tpope/blob/c0af0f5ecb6f26d98e668bf1a81617e918952274/.vimrc#L482
@@ -269,3 +270,9 @@ PROFILING
 			vim --startuptime profile.log
 		Very verbose with timings
 			vim -V12
+
+DEBUG
+
+	" Source line and selection in vim
+	: vnoremap <Leader>S y:execute @@<CR>:echo 'Sourced selection.'<CR>
+	: nnoremap <Leader>S ^vg_y:execute @@<CR>:echo 'Sourced line.'<CR>

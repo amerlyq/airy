@@ -23,7 +23,8 @@ dark|light|lucid|opaque) THEME="${1}" ;;
 esac; done
 
 ### LINKS ###
-run() { hash $1 >/dev/null 2>&1 && /usr/bin/env $@; }
+has_pr(){ hash $1 >/dev/null 2>&1; }
+run() { has_pr && /usr/bin/env $@; }
 # FIXME: this must be moved into func.d/cfgsetup -- to catch errors smoothly
 link(){ if [[ ! -e "$2" || -L "$2" ]]; then
   if [[ ! "$1" -ef "$2" ]]; then

@@ -3,9 +3,9 @@ set splitright " focus new window after vertical splitting
 set splitbelow " focus new window after horizontal splitting
 
 " Set minimum window size to 79x8
-set winheight=8
-set winminheight=8
-set winwidth=79
+set winheight=6
+set winminheight=6
+set winwidth=72
 set winminwidth=15
 
 " switching
@@ -23,6 +23,20 @@ noremap  gh  :<C-U>bprev<CR>
 noremap  gl  :<C-U>bnext<CR>
 noremap  gH  :<C-U>bfirst<CR>
 noremap  gL  :<C-U>blast<CR>
+
+" if winnr() > 1
+nnoremap <unique> <Up>    :resize +4<CR>
+nnoremap <unique> <Down>  :resize -4<CR>
+nnoremap <unique> <Left>  :vertical resize +4<CR>
+nnoremap <unique> <Right> :vertical resize -4<CR>
+" endif
+
+" Increment and decrement
+nnoremap + <C-a>
+nnoremap - <C-x>
+" Navigate window
+nnoremap <C-x> <C-w>x
+" nnoremap <expr><C-m> (bufname('%') ==# '[Command Line]' <bar><bar> &l:buftype ==# 'quickfix') ? "<CR>" : "<C-w>j"
 
 
 " focus adjacent window

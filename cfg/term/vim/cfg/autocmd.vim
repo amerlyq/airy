@@ -29,6 +29,12 @@ augroup CommentOptions "{{{2
     au FileType c,cpp,cs,java          setlocal commentstring=//\ %s
     au FileType xdefaults              setlocal commentstring=!\ %s
     au FileType votl                   setlocal commentstring=:\ %s
+
+    " Use Zeal on Linux for context help
+    " au FileType {ansible,go,python,php,css,less,html,markdown}
+    "     \ nnoremap <silent><buffer> K :!zeal --query "<C-R>=&ft<CR>:<cword>"&<CR><CR>
+    " au FileType {javascript,sql,ruby,conf,sh}
+    "     \ nnoremap <silent><buffer> K :!zeal --query "<cword>"&<CR><CR>
 augroup END "}}}2
 
 

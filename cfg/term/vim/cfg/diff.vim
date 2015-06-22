@@ -2,6 +2,7 @@ nnoremap \dD :diffoff<Enter>
 nnoremap \dd :diffupdate<Enter>
 nnoremap \dt :diffthis<Enter>
 nnoremap \dT :DiffOrig<Enter>
+" nnoremap <silent> <expr> ,d ":\<C-u>".(&diff?"diffoff":"diffthis")."\<CR>"
 
 if &diff
   "---------------------------------------------------------------------------

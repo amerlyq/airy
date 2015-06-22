@@ -6,6 +6,11 @@ command! -bar -nargs=+ E new | r ! <args>
 " generate 'tags' file: obsolete by easytags
 nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
 
+" Show highlight names under cursor
+map <F3> :echo 'hi<'.synIDattr(synID(line('.'), col('.'), 1), 'name')
+    \.'> trans<'.synIDattr(synID(line('.'), col('.'), 0), 'name').'> lo<'
+    \.synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>'<CR>
+
 " reload updated settings in running vim instance
 nnoremap <S-F1> :autocmd! * \| source $MYVIMRC \| AirlineRefresh<CR>
 " make current vim as the main server
@@ -30,3 +35,6 @@ nmap <Leader>+ mzyypVr-:.+1g/^-\+/d<Enter>`z
 
 " Dump all keymaps
 command! -bar -nargs=? MapDump redir > ~/vim_map_dump | map <args> | redir END
+
+"" Append modeline to EOF
+" nnoremap <silent> <Leader>ml :call AppendModeline()<CR>

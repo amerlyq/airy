@@ -87,6 +87,8 @@ map <leader>L "+D
 " Send shizzle to the black hole (Remove)
 map <leader>r "_d
 map <leader>R "_D
+" " Yank buffer's absolute path to X11 clipboard
+" nnoremap [unite]y :let @+=expand("%:p")<CR>:echo 'Copied to clipboard.'<CR>
 
 " Append to copy buffer
 " nnoremap <leader><leader>y :<C-U>call CopyStringInReg('+', @+ . @")<CR>
