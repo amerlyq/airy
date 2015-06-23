@@ -1,7 +1,7 @@
 # vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 source ~/.shell/profile
 
-CURR_DIR_PKG=~/pkg
+CURR_DIR_PKG="${CURR_DIR_PKG:-~/pkg}"
 mkdir -vp "$CURR_DIR_PKG"
 distro(){ cat /etc/os-release | grep -iq "$1"; }
 

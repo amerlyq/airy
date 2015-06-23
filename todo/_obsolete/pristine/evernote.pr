@@ -9,7 +9,7 @@ if [ $? -eq 1 ]; then exit 1; fi
 
 apt_noprompt python-setuptools
 git_install 'VitaliyRodnenko/geeknote'
-chmod u+rw,g-wx,o-rwx "$HOME/.python-eggs"
+chmod 640 "$HOME/.python-eggs"
 geeknote settings --editor vim
 geeknote login
 

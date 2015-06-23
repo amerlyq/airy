@@ -1,6 +1,6 @@
 #!/bin/bash
 source ~/.shell/profile || exit
-source ~/.shell/funcs || exit
+source ~/.shell/func.d/system || exit
 
 # SEE
 #   http://commons.wikimedia.org/wiki/Help:Creating_a_DjVu_file
@@ -20,10 +20,6 @@ else
     prDjvu="$HOME/.wine/drive_c/Program Files (x86)/DjVu Small v0.4.4/bin/documenttodjvum.exe"
 fi
 
-mkdir -p "$WORK_DIR"
-cd "$WORK_DIR"
-
-
 SRC=$WORK_DIR/src
 DST=$WORK_DIR/tmp
 LOG=$DST/log
@@ -31,11 +27,8 @@ DJVU=$WORK_DIR/djvu
 READY=$WORK_DIR/ready
 DST_ORG=$DST/origin
 DST_PRC=$DST/processed
-
-mkdir -p "$SRC"
-mkdir -p "$DST"
-mkdir -p "$DST_ORG"
-mkdir -p "$DST_PRC"
+mkdir -p "$WORK_DIR" && cd "$WORK_DIR"
+mkdir -p "$SRC" "$DST" "$DST_ORG" "$DST_PRC"
 
 
 

@@ -10,9 +10,10 @@ link "$PWD/profile" ~/.profile
 distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
 if distro ubuntu; then (cd ./ubuntu
     ./xsessionrc.gen
-    ./hosts.gen
+
     if cfgOpt u; then
-        echo "N: rc-local, nosudo_reboot"
+        echo "N: hosts, rc-local, nosudo_reboot"
+        ./hosts.gen
         ./rc-local.gen
         ./nosudo_reboot
     fi
