@@ -38,6 +38,9 @@
 " NeoBundle 'vim-scripts/a.vim'
 
 " ======================================
+" DISABLED: breaks syntax colors in too many formats (zsh, cmake, etc...)
+" Also is culprit for memory/autocmd leaks
+" NeoBundle 'luochen1990/rainbow'
 " DISABLED: has problems with russian text
 " Insert mode auto-completion for quotes, parens, brackets, etc
 "NeoBundle 'Raimondi/delimitMate'

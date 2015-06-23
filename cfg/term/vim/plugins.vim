@@ -324,8 +324,6 @@ NeoBundle 'octol/vim-cpp-enhanced-highlight'
 " Highlight choosen
 NeoBundle 't9md/vim-quickhl'
 
-NeoBundle 'luochen1990/rainbow'
-
 " Colorize html-codes
 " NeoBundleLazy 'lilydjwg/colorizer'
 

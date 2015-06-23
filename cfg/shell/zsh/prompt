@@ -165,7 +165,7 @@ function prompt_amer_setup_prompts {
   # Next line:
   PROMPT+='%F{$prompt_color}'"${prompt_parts[3]}"
   PROMPT+='${git_info:+${(e)git_info[icons]}}'
-  PROMPT+='%F{$prompt_color}${editor_info[keymap]}%(!. %B%F{196}#%f%b.)%f '
+  PROMPT+='%F{$prompt_color}${editor_info[keymap]}%f%(!. %B%F{196}#%f%b.) '
 
   # Right prompt
   RPROMPT='${editor_info[overwrite]} %(?::%F{1}%?↵ %f)'
