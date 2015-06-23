@@ -36,11 +36,14 @@ Prompt
 	[_] BUG: can't use variables as <editor:info:keymap:primary> for dynamic shape
 		: this can be resolved by setting that option explicitly for root!
 	[_] BUG: preview don't work (prompt -p -- can't list my theme)
-	[_] BUG: highlighted prompt for root user! (Use italic if possible! Check in tmux!)
+	2015-06-24 [X] BUG: highlighted prompt for root user! ::> disabled
+		(Use italic if possible! Check in tmux!)
 	[_] TODO: option to enable VCS for other systems: bzr, hg, svn (vcs_info)
 	[_] TODO: Change '+' icon to something more visible
 	2015-06-21 [X] TODO: change prompt color when vbox+ssh -- to easier distinguishing
 		: NOTE: use 'env' to see vars you can use
+	[_] FIXME: SSH_TTY is empty after 'su' as it will not inherit environment
+		so color is red, not blue. Search 'export SSH_TTY for su by default'
 
 	Markers
 		[_] Root user
