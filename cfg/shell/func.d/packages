@@ -1,6 +1,14 @@
 # vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 source ~/.shell/profile
 
+cfgOpt(){ [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
+cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
+
+for arg in "$@"; do case "$arg" in
+  # Re-install even if git pull is up-to-date (for broken builds)
+  -u|--update) cfgOptAdd u ;;
+esac; done
+
 CURR_DIR_PKG="${CURR_DIR_PKG:-~/pkg}"
 mkdir -vp "$CURR_DIR_PKG"
 distro(){ cat /etc/os-release | grep -iq "$1"; }
@@ -85,7 +93,7 @@ git_inst() { # $0 -d pr_name
   #--depth 1 -- disabled by cause of automerges
   if [[ -d "$prdir" ]]; then git_pull "$prdir"
   else git clone --depth 1 "$link" "$prdir" && cd "$prdir"; fi
-  if [[ "$GIT_IS_THE_SAME" -eq 1 ]]; then
+  if ! cfgOpt u && [[ "$GIT_IS_THE_SAME" -eq 1 ]]; then
       echo "C: Up to date, no re-build"
   elif [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
 }

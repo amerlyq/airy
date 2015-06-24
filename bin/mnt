@@ -37,7 +37,7 @@ dirmk() { clean; mkdir -p "$DIR" 2>/dev/null ||
 domtp() { dirmk && jmtpfs "$DIR"; }
 dosamba() {
     dirmk && sudo mount -t cifs -o user="${1?Need user}" "//${2?Need share}/" "$DIR" \
-        && sudo chmod "$CURR_USER:$CURR_USER" "$DIR" && echo "$DIR" || exit
+        && sudo chown "$CURR_USER:$CURR_USER" "$DIR" && echo "$DIR" || exit
 }
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
@@ -60,7 +60,7 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
     fi
     # -t "$TYPE"
     dirmk && sudo mount "$DEVPATH" "$DIR" ${MOPTS+-o $MOPTS} \
-        && sudo chmod "$CURR_USER:$CURR_USER" "$DIR" && echo "$DIR" || exit
+        && sudo chown "$CURR_USER:$CURR_USER" "$DIR" && echo "$DIR" || exit
 }
 
 
