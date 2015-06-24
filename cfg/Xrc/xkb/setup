@@ -2,11 +2,14 @@
 source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
+### LINKS ###
+link "$PWD/run" "$CURR_CACHE/bin/lau-${PWD##*/}"
+
 ### GENS ###
 kmap() { xkbcomp -I"$HOME/.Xrc/xkb" ${1:--} ${2} 2>&1 |
     sed '/No symbols defined\|Symbols ignored\|not found in evdev/d'; }
 
-dst=~/.cache/airy/keylayout.xkm
+dst=$CURR_CACHE/keylayout.xkm
 
 case "${CURR_HOST?No}" in
 vbox) sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|

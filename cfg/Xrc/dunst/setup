@@ -1,12 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-### LINKS ###
-link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
-link "$PWD/compton.conf" ~/.config/compton.conf
-link "$PWD/settings.ini" ~/.config/gtk-3.0/settings.ini
-
 ## To disable default notification daemon on Lubuntu
 # XFCE=/usr/share/dbus-1/services/org.xfce.xfce4-notifyd.Notifications.service
 # [[ -f "$XFCE" ]] && sudo mv -n $XFCE{,.disabled}
+
+### LINKS ###
 link "$PWD/dunstrc" ~/.config/dunst/dunstrc

@@ -1,0 +1,12 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| openssh | server for ssh connections (Win: freesshd)
+#| autossh | autoconnecting client for permanent tunnels
+
+if distro arch; then
+    pkg_inst openssl openssh
+
+elif distro ubuntu; then
+    pkg_inst openssl openssh-server openssh-client autossh
+fi

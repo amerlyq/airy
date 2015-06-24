@@ -3,5 +3,12 @@ snippet pr
     # vim: ft=sh
     if source ~/.shell/func.d/packages ; then exit 1; fi
 
+snippet ifdis
+    if distro arch; then
+        pkg_inst ""
+    elif distro ubuntu; then
+        pkg_inst ""
+    fi
+
 snippet tab2
     # vim:ts=2:sw=2:sts=2

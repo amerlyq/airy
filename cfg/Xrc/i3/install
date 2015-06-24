@@ -1,0 +1,31 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| i3        | fast tiling windows manager
+#| ruby-ronn | for i3blocks: compiling
+#| i3blocks  | special status bar, allowing clicks and else
+#| libanyevent-i3-perl | i3-ipc wrapper for perl scripts -- https://metacpan.org/pod/AnyEvent::I3
+
+#git_inst 'enkore/j4-dmenu-desktop'
+# OBSOLETE:
+# i3status      #
+# acpi, sysstat # for i3blocks: has 'mpstat' for cpu loading, 'acpi' for battery stat
+
+if distro arch; then
+    pkg_inst i3 i3lock
+    echo "Err: port ruby-ronn and i3blocks"
+
+elif distro ubuntu; then
+    pkg_inst i3 i3lock #dzen2 libanyevent-i3-perl
+
+    pkg_inst 'ruby-ronn'
+    git_inst 'vivien/i3blocks'
+
+    # Language=en_US -- breaks
+    printf "[Desktop]\nSession=i3\n" > ~/.dmrc
+    echo "W: ~/.dmrc  <- i3"
+
+    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+        sudo update-alternatives --set $1 "$2"; }
+    mkdef x-window-manager $(which i3)
+fi

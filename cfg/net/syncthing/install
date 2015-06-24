@@ -1,12 +1,14 @@
-#!/bin/bash
-# vim: ft=sh
+#!/bin/bash -e
 source ~/.shell/func.d/packages
-if [ $? -eq 1 ]; then exit 1; fi
 
 # https://syncthing.net/
 # https://github.com/syncthing/syncthing
 # https://github.com/syncthing/syncthing/releases/download/v0.11.3/syncthing-linux-amd64-v0.11.3.tar.gz
 
-ppa_add 'ppa:ytvwld/syncthing'
+if distro arch; then
+    aur_inst 'syncthing'
 
-apt_noprompt syncthing
+elif distro ubuntu; then
+    ppa_add 'ppa:ytvwld/syncthing'
+    pkg_inst 'syncthing'
+fi

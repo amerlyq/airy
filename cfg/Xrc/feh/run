@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Set new wallpaper
+[[ -n "$1" ]] && link "$(readlink -m "$1")" ~/.wallpaper
+
+if [[ -f ~/.wallpaper ]]; then  # symlink to one wallpaper
+    feh --bg-fill ~/.wallpaper
+elif [[ -d ~/.wallpaper ]]; then  # random wallpaper from dir
+    feh --bg-fill "$(find ~/.wallpaper/ | shuf -n1)"
+else xsetroot -black; fi

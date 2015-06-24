@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| tmux | multi-window customizable terminal with vi navigation, useful for SSH connections
+
+if distro arch; then
+    pkg_inst 'tmux'
+
+elif distro ubuntu; then
+    pkg_inst 'tmux'
+fi

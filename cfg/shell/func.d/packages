@@ -66,6 +66,16 @@ Gecko/20100101 Firefox/12.0" #--max-redirect=2
   if [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
 }
 
+git_pull() { [[ -d "$1" ]] && cd "$1" || return
+  git fetch origin master && if [[ $(
+    git rev-list HEAD...origin/master --count
+  ) == 0 ]]; then GIT_IS_THE_SAME=1; fi
+
+  if git diff-files --quiet --ignore-submodules --
+  then git pull --rebase --verbose
+  else git stash && git pull --rebase --verbose && git stash pop
+  fi
+}
 
 git_inst() { # $0 -d pr_name
   local nobuild link prdir; case "$1" in -d) nobuild=1; shift ;; esac
@@ -73,10 +83,11 @@ git_inst() { # $0 -d pr_name
   [[ "${1//'://'}" == $1 ]] && link="https://github.com/$1" || link="$1"
 
   #--depth 1 -- disabled by cause of automerges
-  if [[ -d "$prdir" ]]; then cd "$prdir" && git pull --rebase --verbose
+  if [[ -d "$prdir" ]]; then git_pull "$prdir"
   else git clone --depth 1 "$link" "$prdir" && cd "$prdir"; fi
-
-  if [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
+  if [[ "$GIT_IS_THE_SAME" -eq 1 ]]; then
+      echo "C: Up to date, no re-build"
+  elif [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
 }
 
 

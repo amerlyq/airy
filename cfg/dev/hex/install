@@ -1,7 +1,10 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-# wxHexEditor | gui hex edit / compare tool, can mark selection with tags
+#| meld | cool text/directory comparator
+#| dhex | small ncurses binary diff programm with configurable controls
+
+#| wxHexEditor | gui hex edit / compare tool, can mark selection with tags
 #   * You can work with delete/insert bytes to file, more than once, without creating temp file!
 #   * Could open your devices on Linux, Windows or MacOSX.
 #   * Allows Linux Process Memory Editing operations
@@ -10,13 +13,14 @@ source ~/.shell/func.d/packages
 #   * Added Sorted Tag Saving / Loading
 #   * Save selection as a dump file feature for make life easier.
 
-if distro arch; then
-    echo "Error: not adapted"
-    if has_pr X; then pkg_inst wxhexeditor; fi
-
-elif distro ubuntu; then
-    if has_pr X; then pkg_inst wxhexeditor; fi
+pkg_inst dhex
+if has_pr X; then
+    pkg_inst "meld wxhexeditor"
 fi
+
+# if distro arch; then
+# elif distro ubuntu; then
+# fi
 
 # PM="wxHexEditor.tar.bz2"
 # PM_SCR="$CURR_DIR_PKG/$PM"

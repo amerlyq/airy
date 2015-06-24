@@ -1,0 +1,23 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| cups-pdf  | virtual pdf printer
+#| ffmpeg    | http://ffmpeg.org/download.html#build-linux
+#|           | ffmpeg -i video.avi extracted_audio.mp3
+#|___________| mplayer -dumpaudio video.avi -dumpfile extracted_audio.mp3
+
+# fbreader
+pkg_inst "graphviz imagemagick libmagick++-dev pandoc cups-pdf"
+git_inst 'matimatik/fbless'
+
+if distro arch; then
+    pkg_inst ffmpeg
+elif distro ubuntu; then
+    ppa_add 'ppa:mc3man/trusty-media'
+    pkg_inst ffmpeg
+fi
+
+## DEPRECATED: by 'tr ...'
+# wget_inst 'http://www.andre-simon.de/zip/ansifilter-1.10.tar.gz'
+## DISABLED: Can't compile by the reason of <lua.hpp> is inside its own directory...
+# wget_install 'http://www.andre-simon.de/zip/highlight-3.19.tar.gz'

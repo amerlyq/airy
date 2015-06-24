@@ -1,111 +1,13 @@
 # vim:ts=2:sw=2:sts=2
-##########################################################
-## Key map for ncmpcpp tui to mpd. Copy to ~/.ncmpcpp/bindings
-
-##### General rules #####
-##  Each action has runtime checks whether it's OK to run it.
-##  NOTE: * Function def_key accepts non-ascii characters.
-##        * The following actions are not bound to any key/command:
-##           - set_volume
-##
-##    Sequence = consecutively run until one of them gets fully executed.
-##    : runs first of them which succeeds, then others ignored
-##         def_key "key"
-##           action1
-##         def_key "key"
-##           action2
-##    Chain = runs all
-##    : runs each of them until succeeds, on fail -- others ignored
-##         def_key "key"
-##           action1
-##           action2
-##    Disable default action
-##    : example -- for ability to crop playlists
-##         def_key "C"
-##         dummy
-##    Bind to command (action 'execute_command', key ':')
-##    : [deferred] -- wait <CR> press; or [immediate] -- moment you typed
-##         def_command "quit" [deferred]
-##           stop
-##           quit
-
-##  MACRO with actions:
-##
-##    - push_character "character" - pushes given special
-##      character into input queue, so it will be immediately
-##      picked by ncmpcpp upon next call to readKey function.
-##      Accepted values: mouse, up, down, page_up, page_down,
-##      home, end, space, enter, insert, delete, left, right,
-##      tab, shift_tab, ctrl_a, ctrl_b, ..., ctrl_z, f1, f2,
-##      ..., f12, backspace, backspace_2.
-##
-##    - push_characters "string" - pushes given string into input queue.
-##
-##    - require_runnable "action" - checks whether given action
-##      is runnable and fails if it isn't. This is especially
-##      useful when mixed with previous two functions. Consider
-##      the following macro definition:
-##
-##      def_key "key"
-##        push_characters "custom_filter"
-##        apply_filter
-##
-##      If apply_filter can't be currently run, we end up with
-##      sequence of characters in input queue which will be
-##      treated just as we typed them. This may lead to unexpected
-##      results (in this case 'c' will most likely clear current
-##      playlist, 'u' will trigger database update, 's' will stop
-##      playback etc.). To prevent such thing from happening, we
-##      need to change above definition to this one:
-##
-##      def_key "key"
-##        require_runnable "apply_filter"
-##        push_characters "custom_filter"
-##        apply_filter
-##
-##      Here, first we test whether apply_filter can be actually run
-##      before we stuff characters into input queue, so if condition
-##      is not met, whole chain is aborted and we're fine.
-##
-##    - require_screen "screen" - checks whether given screen is
-##      currently active. accepted values: browser, clock, help,
-##      media_library, outputs, playlist, playlist_editor,
-##      search_engine, tag_editor, visualizer, last_fm, lyrics,
-##      selected_items_adder, server_info, song_info,
-##      sort_playlist_dialog, tiny_tag_editor.
-##
-##    - run_external_command "command" - runs cmd using system() function.
-
-
-
 ####### General #######
-
-def_key "f1"
-  show_help
-def_key "q"
-  quit
-def_key "u"
-  update_database
 
 def_key "mouse"
   mouse_event
-def_key ":"
-  execute_command
 
-def_key "space"
-  press_space
-def_key "enter"
-  press_enter
-def_key "m"
-  press_enter
-
-def_key "tab"
-  next_screen
-def_key "shift_tab"
-  previous_screen
-
-
-####### Navigation #######
+def_key "up"
+  scroll_up
+def_key "down"
+  scroll_down
 
 def_key "["
   scroll_up_album
@@ -118,10 +20,6 @@ def_key "}"
 
 
 # Std --------------------
-def_key "up"
-  scroll_up
-def_key "down"
-  scroll_down
 
 def_key "page_up"
   page_up
@@ -133,6 +31,13 @@ def_key "home"
 def_key "end"
   move_end
 
+def_key "insert"
+  select_item
+
+def_key "enter"
+  press_enter
+def_key "m"
+  press_enter
 
 # Vim --------------------
 
@@ -141,16 +46,30 @@ def_key "k"
 def_key "j"
   scroll_down
 
-
-def_key "ctrl_b"
+def_key "ctrl-b"
   page_up
-def_key "ctrl_f"
+def_key "ctrl-f"
   page_down
 
 def_key "g"
   move_home
 def_key "G"
   move_end
+
+
+def_key "space"
+  add_item_to_playlist
+def_key "space"
+  toggle_lyrics_update_on_song_change
+def_key "space"
+  toggle_visualization_type
+
+def_key "delete"
+  delete_playlist_items
+def_key "delete"
+  delete_browser_items
+def_key "delete"
+  delete_stored_playlist
 
 
 ####### Control #######
@@ -179,13 +98,6 @@ def_key "d"
 
 # Std --------------------
 
-def_key "left"
-  previous_column
-def_key "left"
-  master_screen
-def_key "left"
-  volume_down
-
 def_key "right"
   next_column
 def_key "right"
@@ -193,24 +105,31 @@ def_key "right"
 def_key "right"
   volume_up
 
+def_key "left"
+  previous_column
+def_key "left"
+  master_screen
+def_key "left"
+  volume_down
 
-def_key "+"
-  volume_up
 def_key "="
+  volume_up
+def_key "+"
   volume_up
 def_key "-"
   volume_down
 
+def_key ":"
+  execute_command
 
-def_key "delete"
-  delete_playlist_items
-def_key "delete"
-  delete_browser_items
-def_key "delete"
-  delete_stored_playlist
-
+def_key "tab"
+  next_screen
+def_key "shift-tab"
+  previous_screen
 
 ####### Menus #######
+def_key "f1"
+  show_help
 
 def_key "1"
   show_playlist
@@ -250,16 +169,6 @@ def_key "@"
 
 ####### Play #######
 
-def_key "o"
-  show_playlist
-def_key "o"
-  jump_to_playing_song
-
-def_key "c"
-  show_playlist
-def_key "c"
-  jump_to_playing_song
-
 def_key "s"
   stop
 def_key "p"
@@ -270,6 +179,15 @@ def_key ">"
 def_key "<"
   previous
 
+def_key "ctrl-h"
+  jump_to_parent_directory
+def_key "ctrl-h"
+  replay_song
+
+def_key "backspace"
+  jump_to_parent_directory
+def_key "backspace"
+  replay_song
 def_key "f"
   seek_forward
 def_key "b"
@@ -285,73 +203,58 @@ def_key ","
 def_key "."
   seek_forward
 
-def_key "t"
-  jump_to_position_in_song
+def_key "r"
+  toggle_repeat
+def_key "z"
+  toggle_random
 
+def_key "y"
+  save_tag_changes
+def_key "y"
+  start_searching
+def_key "y"
+  toggle_single
 
+def_key "R"
+  toggle_consume
 
-#def_key "ctrl_h"
-#  jump_to_parent_directory
-#def_key "ctrl_h"
-#  replay_song
-#
-#def_key "backspace"
-#  jump_to_parent_directory
-#def_key "backspace"
-#  replay_song
-#
-#def_key "backspace_2"
-#  jump_to_parent_directory
-#def_key "backspace_2"
-#  replay_song
-
-
-#def_key "r"
-#  toggle_repeat
-#def_key "z"
-#  toggle_random
-#def_key "y"
-#  toggle_single
-#
-#
-#def_key "y"
-#  save_tag_changes
-#
-#def_key "y"
-#  start_searching
-#
-#def_key "R"
-#  toggle_consume
-#
-#def_key "Y"
-#  toggle_replay_gain_mode
+def_key "Y"
+  toggle_replay_gain_mode
 
 # Add instantly or select only
 def_key "T"
-  toggle_space_mode
-# Only add or add/remove
-def_key "ctrl_t"
   toggle_add_mode
 
-#def_key "|"
-#  toggle_mouse
-#def_key "#"
-#  toggle_bitrate_visibility
-#
-#def_key "x"
-#  toggle_crossfade
-#def_key "X"
-#  set_crossfade
+def_key "|"
+  toggle_mouse
+def_key "#"
+  toggle_bitrate_visibility
 
-#def_key "Z"
-#  shuffle
-#def_key "ctrl_v"
-#  sort_playlist
-#def_key "ctrl_r"
-#  reverse_playlist
+def_key "Z"
+  shuffle
 
+def_key "x"
+  toggle_crossfade
+def_key "X"
+  set_crossfade
+
+def_key "u"
+  update_database
+
+def_key "ctrl-s"
+  sort_playlist
+def_key "ctrl-s"
+  toggle_browser_sort_mode
+def_key "ctrl-s"
+  toggle_media_library_sort_mode
 
 ####### Searching #######
+
+def_key "ctrl-r"
+  reverse_playlist
+
+def_key "ctrl-_"
+  select_found_items
 
 def_key "/"
   find
@@ -368,16 +271,14 @@ def_key "n"
 def_key "N"
   previous_found_item
 
-#def_key "w"
-#  toggle_find_mode
+def_key "w"
+  toggle_find_mode
 
 
 ####### Edit #######
 
 def_key "e"
   edit_song
-def_key "e"
-  edit_lyrics
 def_key "e"
   edit_library_tag
 def_key "e"
@@ -386,38 +287,43 @@ def_key "e"
   edit_directory_name
 def_key "e"
   edit_playlist_name
-
-def_key "'"
-  show_lyrics
-def_key "\""
-  toggle_lyrics_fetcher
-
+def_key "e"
+  edit_lyrics
 
 def_key "i"
   show_song_info
 def_key "I"
   show_artist_info
 
+def_key "t"
+  jump_to_position_in_song
+
+def_key "'"
+  show_lyrics
+
+def_key "ctrl-v"
+  select_range
+
 def_key "v"
   reverse_selection
 def_key "V"
   remove_selection
 
-#def_key "B"
-#  select_album
-#
-#def_key "a"
-#  add_selected_items
+def_key "B"
+  select_album
+
+def_key "a"
+  add_selected_items
 
 def_key "D"
   clear_playlist
 def_key "D"
   clear_main_playlist
 
-#def_key "C"
-#  crop_playlist
-#def_key "C"
-#  crop_main_playlist
+def_key "C"
+  crop_playlist
+def_key "C"
+  crop_main_playlist
 
 def_key "K"
   move_sort_order_up
@@ -436,60 +342,68 @@ def_key "J"
 def_key "M"
   move_selected_items_to
 
+def_key "A"
+  add
 
-#def_key "A"
-#  add
-
-def_key "ctrl_s"
+def_key "ctrl-t"
   save_playlist
+
+def_key "o"
+  show_playlist
+def_key "o"
+  jump_to_playing_song
+
+def_key "c"
+  show_playlist
+def_key "c"
+  jump_to_playing_song
 
 def_key "S"
   jump_to_browser
 def_key "S"
   jump_to_playlist_editor
 
-#def_key "~"
-#  jump_to_media_library
-#
-#def_key "E"
-#  jump_to_tag_editor
-#
-#def_key "U"
-#  toggle_playing_song_centering
+def_key "~"
+  jump_to_media_library
+
+def_key "E"
+  jump_to_tag_editor
+
+def_key "U"
+  toggle_playing_song_centering
 
 def_key "P"
- toggle_display_mode
+  toggle_display_mode
 
-#def_key "\\"
-#  toggle_interface
-#
-#def_key "!"
-#  toggle_separators_between_albums
+def_key "\\"
+  toggle_interface
 
-#def_key "L"
-#  toggle_lyrics_fetcher
+def_key "!"
+  toggle_separators_between_albums
+
+def_key "L"
+  toggle_lyrics_fetcher
+def_key "\""
+  toggle_lyrics_fetcher
 
 def_key "F"
   toggle_fetching_lyrics_in_background
 
-def_key "."
-  toggle_screen_lock
-
-def_key "ctrl_l"
+# toggle_screen_lock
+def_key "ctrl-l"
   dummy
 
-#def_key "`"
-#  toggle_browser_sort_mode
-#
-#def_key "`"
-#  toggle_library_tag_type
+def_key "`"
+  toggle_library_tag_type
 
-#def_key "`"
-#  add_random_items
-# def_key "`"
-#   refetch_lyrics
-#
-#def_key "ctrl_p"
-#  set_selected_items_priority
+def_key "`"
+  refetch_lyrics
 
+def_key "`"
+  add_random_items
 
+def_key "ctrl-p"
+  set_selected_items_priority
+
+def_key "q"
+  quit

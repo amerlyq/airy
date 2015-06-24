@@ -1,0 +1,13 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| kbdd      | keep different layouts for apps
+#| xsel      | clipboard tool for rxvt extensions
+#| xbindkeys | to XF86AriseVolumeUp and other media keys works
+#| xdotool   | for correct working modes, and for ability naming worksps as focused wnds
+
+pkg_inst "kbdd xsel xbindkeys xdotool xbacklight"
+
+# Obsolete by kbdd + dbus-send (set_layout), qdbus (notification)
+# git_install 'ierton/xkb-switch'
+

@@ -1,9 +1,8 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD/synergy-fast" ~/.cache/airy/bin/synergy-fast
+link "$PWD/synergy-fast" $CURR_CACHE/bin/synergy-fast
 
 ### GENS ###
 ./synergy.gen

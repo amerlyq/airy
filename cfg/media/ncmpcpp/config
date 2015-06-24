@@ -65,7 +65,7 @@ visualizer_fifo_path = /tmp/mpd.fifo
 ## are some problems with it.
 ##
 #
-visualizer_output_name = "Visualizer feed"
+visualizer_output_name = Visualizer feed
 #
 ##
 ## If you set format to 44100:16:2, make it 'yes'.
@@ -136,7 +136,7 @@ message_delay_time = 4
 #
 ##### song format #####
 ##
-## for song format you can use:
+## For a song format you can use:
 ##
 ## %l - length
 ## %f - filename
@@ -156,10 +156,14 @@ message_delay_time = 4
 ## %P - priority
 ## $R - begin right alignment
 ##
-## You can also put them in { } and then it will be displayed
-## only if all requested values are available and/or define alternate
-## value with { }|{ } eg. {%a - %t}|{%f}. It is worth noting that
-## a single bracket {..} is equivalent to the alternative {..}|{}.
+## If you want to make sure that a part of the format is displayed
+## only when certain tags are present, you can archieve it by
+## grouping them with brackets, e.g. '{%a - %t}' will be evaluated
+## to 'ARTIST - TITLE' if both tags are present or '' otherwise.
+## It is also possible to define a list of alternatives by providing
+## several groups and separating them with '|', e.g. '{%t}|{%f}'
+## will be evaluated to 'TITLE' or 'FILENAME' if the former is not
+## present.
 ##
 ## Note: If you want to set limit on maximal length of a tag, just
 ## put the appropriate number between % and character that defines
@@ -198,7 +202,6 @@ message_delay_time = 4
 ##
 ## Note: colors can be nested.
 ##
-## In classic mode
 # song_list_format = {%a - }{%t}|{$8%f$9}$R{$3(%l)$9}
 song_list_format = {$4 %f$9}$R{$8▕ %l $9}
 #
@@ -291,6 +294,8 @@ song_columns_list_format = (3f)[red]{nrE:Tr} (8f)[blue]{lr} (45)[yellow]{t|f} (1
 ##
 #execute_on_song_change = ""
 #
+playlist_show_mpd_host = yes
+#
 #playlist_show_remaining_time = no
 #
 #playlist_shorten_total_times = no
@@ -346,10 +351,6 @@ autocenter_mode = no
 ##
 default_find_mode = wrapped
 #
-## Available values: add, select.
-##
-default_space_mode = add
-#
 #default_tag_editor_pattern = %n - %t
 #
 header_visibility = yes
@@ -384,10 +385,6 @@ allow_for_physical_item_deletion = no
 ##
 lastfm_preferred_language = en
 #
-## Available values: add_remove, always_add.
-##
-#space_add_mode = always_add
-#
 #show_hidden_files_in_local_browser = no
 #
 ##
@@ -414,6 +411,8 @@ lastfm_preferred_language = en
 ##
 #startup_slave_screen = ""
 #
+#startup_slave_screen_focus = no
+#
 ##
 ## Default width of locked screen (in %).
 ## Acceptable values are from 20 to 80.
@@ -435,9 +434,9 @@ lastfm_preferred_language = en
 #
 #display_remaining_time = no
 #
-## Available values: none, basic, extended.
+## Available values: none, basic, extended, perl.
 ##
-#regular_expressions = none
+#regular_expressions = basic
 #
 ##
 ## Note: If below is enabled, ncmpcpp will ignore leading

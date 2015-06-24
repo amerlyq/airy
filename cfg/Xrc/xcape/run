@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+lst=$(pgrep xcape) && kill -TERM $lst
+xcape -t 250 -e "Control_L=Escape"

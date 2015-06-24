@@ -1,0 +1,13 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| xcape     | to configure modifier keys to act as other keys when pressed and
+#|___________|  released on their own
+
+if distro arch; then
+    aur_inst 'xcape'
+
+elif distro ubuntu; then
+    # FIXED???, works after reboot only after you once press REAL Control_L
+    git_inst 'alols/xcape'
+fi

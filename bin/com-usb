@@ -2,12 +2,26 @@
 # To use minicom in interactive regime, disable HW flow control, as our COM
 # doesn't have neccessary wires and never receives "OK to send" signal.
 
+# Create socket
+#   http://www.lainoox.com/bash-socket-programming/
+
+hopt() { [ "${OPTS/[$1]}" != "$OPTS" ]; }
+oadd() { OPTS="${OPTS}${1}"; }
+
+
+# PORT=/dev/serial/tv-board   # Set-up by udev rule, how about two serials?
 PORT=/dev/ttyUSB0
-# PORT=/dev/serial/tv-board   # Set-up by udev rule
+DIR=/tmp
+FA=usb-all.log
+FF=usb-filter.log
+RMDIR=/home/shared
+BODY=""
+
+[[ -w $PORT ]] || sudo chmod 666 $PORT
 
 # Dump params, -g -- print bit-str
 #   sudo stty -a -F /dev/ttyUSB0
-sudo stty -F "$PORT" 115200 rows 0 columns 0 line 0 min 1 time 5 \
+stty -F "$PORT" 115200 rows 0 columns 0 line 0 min 1 time 5 \
     -parenb -parodd cs8 -hupcl -cstopb cread clocal crtscts \
     ignbrk -brkint -ignpar -parmrk -inpck -istrip \
     -inlcr -igncr -icrnl -ixon -ixoff -iuclc -ixany -imaxbel -iutf8 \
@@ -18,16 +32,14 @@ sudo stty -F "$PORT" 115200 rows 0 columns 0 line 0 min 1 time 5 \
     start ^Q stop ^S susp ^Z rprnt ^R werase ^W lnext ^V flush ^O \
     # eol <undef> eol2 <undef> swtch <undef>
 
-DIR=/tmp
-FA=usb-all.log
-FF=usb-filter.log
-RMDIR=/home/shared
+hopt t && BODY="$BODY"'
+BEGIN { t32wait = 1 } { if(t32wait) {
+    system("~/aura/devq/kernel/helpers/t32/t32stop"); t32wait=0 }
+}'
+
 
 # sed "w /tmp/usb-all.log" | sed "$FILTER; w /tmp/usb-filter.log"
-BODY='
-# BEGIN { t32wait = 1 }
-# { if(t32wait) { system("~/aura/devq/kernel/helpers/t32/t32stop"); t32wait=0 } }
-{ pn=pf; pf=0; print $0 > fa }
+BODY='{ pn=pf; pf=0; print $0 > fa }
 
     /\s*E\/|\[TUNER[^\[\]]*\]|\[DWS-FRAMEWORK\]|\[SNAP\]\
 |tztv_tuner_set_mft|mmcblk0|SfRulesUpdater|sd_notify|launch-helper\
@@ -40,30 +52,26 @@ BODY='
         print $0 > ff;
         fflush(fa); fflush(ff);
         printf "%s\n",$0
-    } } '
+    } }
+'
+
+hopt p && BODY="$BODY"'/please attach T32/ { system("notify-send \
+    --urgency=critical --expire-time=0 \"TV needs restart!\"")
+}'
 
 
 # Script to fast show-log
-ssh srk 'LOGDUMP="'$RMDIR/show-log'"
+hopt s && ssh srk 'LOGDUMP="'$RMDIR/show-log'"
     printf "#!/bin/bash\ntailf usb-filter.log\n" > "$LOGDUMP"
     chmod 777 "$LOGDUMP"
     >'$RMDIR/$FA'
     >'$RMDIR/$FF' '
-
 # Send log by ssh
 # >"$DIR/$FA"
 # { tailf "$DIR/$FA" | ssh srk "awk -v fa=\"$RMDIR/$FA\" -v ff=\"$RMDIR/$FF\" '$BODY'"; } &
 
-# Ping board to prevent sleep? Don't work.
-# PING=~/work/sip/scripts/arm-connect.sh
-# { while $PING; do sleep 30; done; printf "\n"; } &
 
 # Filtering Serial output
-#ALT (ansifilter): stdbuf -oL -eL tr -cd "[:print:]\033\n"
-#OR (to disable buffering completely): stdbuf -i0 -o0 -e0 command
-sudo cat "$PORT" | ansifilter |
+#ALT: ansifilter OR (to disable buffering completely): stdbuf -i0 -o0 -e0 command
+cat "$PORT" | stdbuf -oL -eL tr -cd "[:print:]\033\n" |
     awk -v fa="$DIR/$FA" -v ff="$DIR/$FF" "$BODY"
-
-
-# Create socket
-#   http://www.lainoox.com/bash-socket-programming/

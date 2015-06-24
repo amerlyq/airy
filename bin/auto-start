@@ -46,13 +46,14 @@ rcf() {
 
 ### ALWAYS ### --------------------------------------
 
-setX tdaw
+setX tda
 [[ -f ~/.Xresources ]] && xrdb -load ~/.Xresources
 
+
+lau-feh
 ## Keylayout
-xkbcomp ~/.cache/airy/keylayout.xkm ${DISPLAY%%.*}
-lst=$(pgrep xcape) && kill -TERM $lst
-xcape -t 250 -e "Control_L=Escape"
+lau-xkb
+lau-xcape
 
 # Focus certain wksp
 #i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &

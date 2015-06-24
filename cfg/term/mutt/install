@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| mutt | console mail client
+
+if distro arch; then
+    pkg_inst 'mutt'
+
+elif distro ubuntu; then
+    pkg_inst 'mutt'
+fi

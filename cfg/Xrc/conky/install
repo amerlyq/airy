@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| conky | show system info on screen overlay
+
+pkg_inst "conky lm-sensors"
+
+echo "Configure cpu and etc sensors. Reply 'yes' on all questions"
+sudo sensors-detect
+# Display all found sensors
+sensors

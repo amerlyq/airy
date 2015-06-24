@@ -1,0 +1,19 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    pkg_inst "base-devel"
+    echo "Err: Not enough packages"
+
+elif distro ubuntu; then
+    # Those libs also necessary to build x32 under x64 system
+    LST="$LST build-essential gcc-multilib g++-multilib lib32stdc++6 "
+    LST="$LST make checkinstall pkg-config autoconf automake cmake" #binutils-gold
+    #| libc6-dbg:i386 | need to prevent valgrind error with strlen -> strnlen
+    LST="$LST valgrind libc6-dbg:i386 gdb doxygen cppcheck"  #rabbit valkyrie  <GUI>
+    # LST="$LST google-perftools libgoogle-perftools-dev libgoogle-glog-dev google-mock"
+    # Cross-compilers
+    # LST="$LST gcc-arm-linux-gnueabi" #Or ...-androideabi
+
+    pkg_inst $LST
+fi

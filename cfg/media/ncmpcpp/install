@@ -12,12 +12,16 @@ elif distro ubuntu; then
                 libcurl4-gnutls-dev libtag1-dev"  #libreadline-dev
 
     git_inst -d "arybczak/ncmpcpp"
+    if [[ "$GIT_IS_THE_SAME" -eq 1 ]]; then exit 0; fi
 
     dir="${CURR_DIR_PKG?No}/ncmpcpp/"
 
-    # Reason for the above is that debian / ubuntu based distros no longer have the
-    # -mt suffix for boost libraries
+    # FIXED: Reason for this replace is that debian / ubuntu based distros no
+    # longer have the '-mt' suffix for boost libraries
     # sed -i "s/^\(AS_IF\|AC_ARG_VAR\)(/# \1(/" "$dir/configure.ac"
+
+    # FIXED: checkinstall has troubles with version format '0.7_pre'
+    pkg_make(){ sudo make install $@ || exit; }
 
     # ABSENT: tag editor, tiny tag editor, artist info
     pkg_build "$dir" --enable-outputs --enable-visualizer --enable-clock \
