@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+
+## Change default grub:
+mv -vf /etc/default/grub{,.bkp}
+cat >/etc/default/grub <<-'EOT'
+GRUB_DEFAULT=saved
+GRUB_SAVEDEFAULT=true
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden  # countdown / menu
+
+GRUB_DISTRIBUTOR="Arch"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX=""
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial"
+
+GRUB_GFXPAYLOAD_LINUX=text
+GRUB_DISABLE_RECOVERY=true
+# GRUB_ENABLE_CRYPTODISK=true
+GRUB_PRELOAD_MODULES="part_msdos"
+EOT
+
+grub-mkconfig -o /boot/grub/grub.cfg
+echo ':: vbox grub installed'

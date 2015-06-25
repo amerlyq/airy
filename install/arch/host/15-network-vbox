@@ -1,0 +1,28 @@
+#!/bin/bash -e
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+vboxip="${1?No vbox host-only ip}"
+vbhost=main
+
+if ! grep -q "$vbhost" /etc/hosts; then echo "$vboxip $vbhost" >> /etc/hosts
+else sed -i "s/\s$vbhost$/$vboxip $vbhost"; fi
+echo ':: writing host ended'
+
+ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
+
+vnet="${vboxip%.*}"
+cat >/etc/netctl/vbox_hostonly <<EOT
+Description='VBox host-only connection'
+Interface=${ifcs[1]}
+Connection=ethernet
+IP=static
+Address=('${vnet}.11/24')
+# Routes=('${vnet}.0/24 via $vboxip')
+## Don't uncomment, or 'ip route' will be wrong and w/o inet
+# Gateway='$vboxip'
+# DNS=('$vboxip')
+EOT
+netctl enable vbox_hostonly
+
+echo ':: vbox_hostonly (static) is active'
+

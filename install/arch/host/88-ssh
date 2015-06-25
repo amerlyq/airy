@@ -1,0 +1,18 @@
+#!/bin/bash -e
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+user="${1?No user}"
+
+
+## SSH access: add host public key to vbox guest authorized_keys
+if [[ -f ~/id_rsa.pub ]]; then
+    home="/home/$user"
+    key="$home/.ssh/authorized_keys"
+    mkdir -p ${key%/*} && cp -vfT ~/id_rsa.pub $key
+    chown -R $user:$user ${key%/*} && chmod 600 ${key}
+
+    cp -vrft $home ~/user
+    chown -R $user:$user $home/user && chmod -R 700 $home/user
+fi
+
+echo ":: add authorized_keys for '$user' "

@@ -1,0 +1,708 @@
+#% AutoGen by './i3-config.gen'. Do NOT touch! %#
+# i3 config file (v4) :
+# vim: ft=sh
+
+### ================== Variables =================== ###
+
+set $mod Mod4
+set $mSd Mod4+Shift
+set $mCd Mod4+Control
+set $mCS Mod4+Control+Shift
+
+set $exno exec --no-startup-id
+set $move_ctw move container to workspace
+
+set $def mode "default"
+set $upd ~/.i3/blocks/update
+
+
+### =================== Options ==================== ###
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+focus_follows_mouse no                     # auto on hover <yes|no>
+popup_during_fullscreen leave_fullscreen   # <smart|ignore|leave_fullscreen>
+# Display hint 'this' more time on switch to urgent wrksp
+force_display_urgency_hint 800 ms
+
+# When being in a tabbed or stacked container, the first container will be focused when you use focus down on the last container?—?the focus wraps. If however there is another stacked/tabbed container in that direction, focus will be set on that container. This is the default behavior so you can navigate to all your windows without having to use focus parent.
+# If you want the focus to always wrap and you are aware of using focus parent to switch to different containers, you can use the force_focus_wrapping configuration directive. After enabling it, the focus will always wrap. <yes|no>
+force_focus_wrapping no
+#  Assume you are on workspace "1: www" and switch to "2: IM" using mod+2 because somebody sent you a message. You don’t need to remember where you came from now, you can just press $mod+2 again to switch back to "1: www".
+workspace_auto_back_and_forth yes
+
+floating_minimum_size 100 x 80
+#floating_maximum_size -1 x -1
+
+### New wksp ###
+default_orientation auto    # <horizontal|vertical|auto>
+workspace_layout default    # <default|stacking|tabbed>
+hide_edge_borders none      # <none|vertical|horizontal|both>
+# border <normal|pixel> [0-9] px, only 'normal' with titlebar
+new_float pixel 2 px
+new_window pixel 2 px
+
+
+### ================== Appearance ================== ###
+
+# split in <horizontal,vertical> orientation
+bindsym $mod+n split vertical
+bindsym $mod+m split horizontal
+bindsym $mod+f fullscreen
+
+
+#mode "Change" { #Mode to occacionaly control the appearance and behaviour
+# change middle container layout {stacked, tabbed, toggle split}
+bindsym $mod+period layout stacking
+bindsym $mod+comma  layout tabbed
+bindsym $mod+slash  layout toggle split
+# change inner container layout
+bindsym $mSd+period split vertical, layout stacking
+bindsym $mSd+comma  split vertical, layout tabbed
+bindsym $mSd+slash  split vertical, layout toggle split
+# change outer container layout
+bindsym $mCd+period focus parent, layout stacking
+bindsym $mCd+comma  focus parent, layout tabbed
+bindsym $mCd+slash  focus parent, layout toggle split
+#bindsym $mod+slash  layout toggle all
+#}
+
+
+### ================== Operations ================== ###
+
+# kill focused window
+bindsym $mod+backslash kill
+bindsym $mCS+backslash $exno ~/.i3/ctl/wnd_active_kill
+# kill all wdws on wksp
+# bindsym $mSd+backslash focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, focus parent, kill, workspace back_and_forth
+bindsym $mSd+q kill
+
+bindsym $mod+semicolon focus parent
+bindsym $mSd+semicolon focus child
+#bindsym $mod+apostrophe focus child
+bindsym $mod+z [urgent=latest] focus
+
+bindsym $mod+Tab   workspace next_on_output
+bindsym $mSd+Tab   workspace prev_on_output
+bindsym $mCd+Tab   $move_ctw next_on_output, workspace next_on_output
+bindsym $mCS+Tab   $move_ctw prev_on_output, workspace prev_on_output
+bindsym $mCd+Left  workspace prev
+bindsym $mCd+Right workspace next
+
+### Current and previous ###
+# Works like a charm tag system -- we can share browser, moving it throughout all wksps
+bindsym $mod+a workspace back_and_forth
+bindsym $mSd+a $move_ctw back_and_forth
+bindsym $mCd+a $move_ctw back_and_forth; workspace back_and_forth
+
+
+### ================== Scratchpad ================== ###
+# The scratchpad container gets displayed in the centre of a window in a floating mode.
+# Exmpl: ncmpcpp, mc, bash prompt, email, REPL, alsamixer, or emacs for notes
+# Make the currently focused window a scratchpad (could contain >1 windows)
+# Toggle show/hide for the first scratchpad window (you can have >1 scratchpad container)
+bindsym $mod+i scratchpad show
+bindsym $mSd+i floating enable
+bindsym $mCd+i floating disable
+bindsym $mCS+i move scratchpad
+
+# By default, scratchpads only contain a single window. However, containers can also be made a scratchpad.
+# Create a new container (for example, Mod+Enter), split it (Mod+v) and create another container. Focus the parent (Mod+a), split in the opposite direction (Mod+h), and create again.
+# Focus the first container (with focus parent as needed), make the window floating (Mod+Shift+Space), and move it to the scratchpad (Mod+Shift+-). You can now split containers to preference.
+# Note: Containers cannot be resized individually in floating windows. Resize the containers before making windows floating.
+# Tip: When only using terminal applications, consider a multiplexer such as tmux instead.
+
+# Change focus between tiling / floating windows #toggle/enable
+# Toggle tiling / floating (also remove current window from scratchpad)
+bindsym $mod+w focus mode_toggle
+bindsym $mSd+w floating enable
+bindsym $mCd+w floating toggle
+
+# Show the sup-mail scratchpad window, if any.
+# bindsym mod4+s [title="^Sup ::"] scratchpad show
+
+# Need module such as launcher with the same names but for focusing. Use dmenu?
+
+### ================ Multi-monitors ================ ###
+# Scratchpad, containers: move them between the screens with std move command.
+# Restrict to the current output: use workspace [next/prev]_on_output
+# move container to output <<left|right|down|up>|<output>>
+# move workspace to output <<left|right|down|up>|<output>>
+# Container: can move wdw to current workspace (makes sense only with criteria).
+
+# Move the current workspace to the next output
+# (effectively toggles when you only have two outputs)
+bindsym $mod+bracketleft  focus output left
+bindsym $mod+bracketright focus output right
+bindsym $mCd+bracketleft  move workspace to output left
+bindsym $mCd+bracketright move workspace to output right
+bindsym $mSd+bracketleft  move container to output left;  focus output left
+bindsym $mSd+bracketright move container to output right; focus output right
+# Focusing wksps in pairs on two monitors
+bindsym $mCS+bracketleft  focus output left; workspace prev_on_output; focus output right; workspace prev_on_output
+bindsym $mCS+bracketright focus output left; workspace next_on_output; focus output right; workspace next_on_output
+
+## Put this window on the presentation output.
+#bindsym $mod+x move container to output VGA1
+
+# Other miscellaneous keybindings.
+# bindsym XF86Sleep exec --no-startup-id systemctl suspend
+# bindsym Mod4+l exec --no-startup-id i3lock && xset s dpms force off
+# bindcode XF86Launch1 exec /usr/bin/pactl play-sample that_was_easy
+# bindcode 233 exec xbacklight -inc 20
+# bindcode 232 exec xbacklight -dec 20
+# bindcode 251 exec xbacklight -set 86
+
+### =========== Script-generated items ============= ###
+### Vars ###
+set $s_grid 50 px
+set $s_step  5 px
+set $s_size 10 px or 2 ppt
+
+### Bind: Refresh on i3mod ###
+set $w00 0
+set $w01 1:main
+set $w02 2:home
+set $w03 3:work
+set $w04 4:www
+set $w05 5:media
+set $w06 6
+set $w07 7
+set $w08 8
+set $w09 9
+set $w10 10:VM
+set $w11 11
+set $w12 12
+
+### WorkSpaces: Output ###
+workspace $w00 output VGA1
+workspace $w01 output VGA1
+workspace $w02 output VGA1
+workspace $w03 output VGA1
+workspace $w04 output VGA1
+workspace $w05 output VGA1
+workspace $w06 output LVDS1
+workspace $w07 output LVDS1
+workspace $w08 output LVDS1
+workspace $w09 output LVDS1
+workspace $w10 output LVDS1
+workspace $w11 output VGA1
+workspace $w12 output VGA1
+
+### Autostart ###
+exec_always --no-startup-id auto-start
+
+### ================== Workspaces ================== ###
+### WorkSpaces: Focus ###
+bindsym $mod+grave workspace number $w00
+bindsym $mod+1     workspace number $w01
+bindsym $mod+2     workspace number $w02
+bindsym $mod+3     workspace number $w03
+bindsym $mod+4     workspace number $w04
+bindsym $mod+5     workspace number $w05
+bindsym $mod+6     workspace number $w06
+bindsym $mod+7     workspace number $w07
+bindsym $mod+8     workspace number $w08
+bindsym $mod+9     workspace number $w09
+bindsym $mod+0     workspace number $w10
+bindsym $mod+minus workspace number $w11
+bindsym $mod+equal workspace number $w12
+
+### WorkSpaces: Move container ###
+bindsym $mSd+grave $move_ctw number $w00
+bindsym $mSd+1     $move_ctw number $w01
+bindsym $mSd+2     $move_ctw number $w02
+bindsym $mSd+3     $move_ctw number $w03
+bindsym $mSd+4     $move_ctw number $w04
+bindsym $mSd+5     $move_ctw number $w05
+bindsym $mSd+6     $move_ctw number $w06
+bindsym $mSd+7     $move_ctw number $w07
+bindsym $mSd+8     $move_ctw number $w08
+bindsym $mSd+9     $move_ctw number $w09
+bindsym $mSd+0     $move_ctw number $w10
+bindsym $mSd+minus $move_ctw number $w11
+bindsym $mSd+equal $move_ctw number $w12
+
+### WorkSpaces: Move and move container ###
+bindsym $mCd+grave $move_ctw number $w00, workspace number $w00
+bindsym $mCd+1     $move_ctw number $w01, workspace number $w01
+bindsym $mCd+2     $move_ctw number $w02, workspace number $w02
+bindsym $mCd+3     $move_ctw number $w03, workspace number $w03
+bindsym $mCd+4     $move_ctw number $w04, workspace number $w04
+bindsym $mCd+5     $move_ctw number $w05, workspace number $w05
+bindsym $mCd+6     $move_ctw number $w06, workspace number $w06
+bindsym $mCd+7     $move_ctw number $w07, workspace number $w07
+bindsym $mCd+8     $move_ctw number $w08, workspace number $w08
+bindsym $mCd+9     $move_ctw number $w09, workspace number $w09
+bindsym $mCd+0     $move_ctw number $w10, workspace number $w10
+bindsym $mCd+minus $move_ctw number $w11, workspace number $w11
+bindsym $mCd+equal $move_ctw number $w12, workspace number $w12
+
+
+### ================== Navigation ================== ###
+### Navigation: Focus ###
+bindsym $mod+h     focus left
+bindsym $mod+j     focus down
+bindsym $mod+k     focus up
+bindsym $mod+l     focus right
+bindsym $mod+Left  focus left
+bindsym $mod+Down  focus down
+bindsym $mod+Up    focus up
+bindsym $mod+Right focus right
+
+### Navigation: Move ###
+bindsym $mSd+h     move left  $s_grid
+bindsym $mSd+j     move down  $s_grid
+bindsym $mSd+k     move up    $s_grid
+bindsym $mSd+l     move right $s_grid
+bindsym $mSd+Left  move left  $s_grid
+bindsym $mSd+Down  move down  $s_grid
+bindsym $mSd+Up    move up    $s_grid
+bindsym $mSd+Right move right $s_grid
+
+### Navigation: Move Float ###
+bindsym $mCd+h  floating enable, $exno ~/.i3/ctl/move_by_grid 2:11
+bindsym $mCd+j  floating enable, $exno ~/.i3/ctl/move_by_grid 2:12
+bindsym $mCd+k  floating enable, $exno ~/.i3/ctl/move_by_grid 2:21
+bindsym $mCd+l  floating enable, $exno ~/.i3/ctl/move_by_grid 2:22
+
+
+### ================== Mark & Go =================== ###
+### Navigation: Mark ###
+set $mode_mark Mark this: 0..9, <mod+T>
+bindsym $mod+t mode "$mode_mark"
+mode "$mode_mark" {
+    bindsym $mod+t $exno i3-input -F  'mark %s' -P 'Mark name: ' ,$def
+
+    bindsym grave mark mrkMgrave ,$def
+    bindsym 1     mark mrkM1 ,$def
+    bindsym 2     mark mrkM2 ,$def
+    bindsym 3     mark mrkM3 ,$def
+    bindsym 4     mark mrkM4 ,$def
+    bindsym 5     mark mrkM5 ,$def
+    bindsym 6     mark mrkM6 ,$def
+    bindsym 7     mark mrkM7 ,$def
+    bindsym 8     mark mrkM8 ,$def
+    bindsym 9     mark mrkM9 ,$def
+    bindsym 0     mark mrkM0 ,$def
+    bindsym minus mark mrkMminus ,$def
+    bindsym equal mark mrkMequal ,$def
+
+    bindsym $mod+t $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+### Navigation: GoTo ###
+set $mode_goto GoTo mark: [0..9-=], Mod+G
+bindsym $mod+g mode "$mode_goto"
+mode "$mode_goto" {
+    bindsym $mod+g $exno i3-input -F  '[con_mark=%s] focus' -P 'Go to mark: ' ,$def
+
+    bindsym grave [con_mark="mrkMgrave"] focus ,$def
+    bindsym 1     [con_mark="mrkM1"] focus ,$def
+    bindsym 2     [con_mark="mrkM2"] focus ,$def
+    bindsym 3     [con_mark="mrkM3"] focus ,$def
+    bindsym 4     [con_mark="mrkM4"] focus ,$def
+    bindsym 5     [con_mark="mrkM5"] focus ,$def
+    bindsym 6     [con_mark="mrkM6"] focus ,$def
+    bindsym 7     [con_mark="mrkM7"] focus ,$def
+    bindsym 8     [con_mark="mrkM8"] focus ,$def
+    bindsym 9     [con_mark="mrkM9"] focus ,$def
+    bindsym 0     [con_mark="mrkM0"] focus ,$def
+    bindsym minus [con_mark="mrkMminus"] focus ,$def
+    bindsym equal [con_mark="mrkMequal"] focus ,$def
+
+    bindsym $mod+g $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+### Navigation: Direct Go ###
+set $mode_godir -> [v]im, [r]anger, [n]cmpcpp, [h]top | [u]rxvt, [g]vim, [f]irefox, [p]idgin
+bindsym $mod+s mode "$mode_godir"
+mode "$mode_godir" {
+    bindsym v [class="(?i)urxvt" title="(?i)vim"] focus ,$def
+    bindsym r [class="(?i)urxvt" title="(?i)ranger"] focus ,$def
+    bindsym n [class="(?i)urxvt" title="(?i)ncmpcpp"] focus ,$def
+    bindsym h [class="(?i)urxvt" title="(?i)htop"] focus ,$def
+
+    bindsym u [class="(?i)urxvt"] focus ,$def
+    bindsym g [class="(?i)gvim"] focus ,$def
+    bindsym f [class="(?i)Firefox"] focus ,$def
+    bindsym p [class="(?i)Pidgin"] focus ,$def
+
+    bindsym $mod+s $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+### Navigation: Key <F1..12> ###
+bindsym $mSd+F1 mark mrkF1
+bindsym $mCS+F1 unmark mrkF1
+bindsym $mod+F1 [con_mark="mrkF1"] focus
+bindsym $mCd+F1 [con_mark="mrkF1"] $move_ctw current
+
+bindsym $mSd+F2 mark mrkF2
+bindsym $mCS+F2 unmark mrkF2
+bindsym $mod+F2 [con_mark="mrkF2"] focus
+bindsym $mCd+F2 [con_mark="mrkF2"] $move_ctw current
+
+bindsym $mSd+F3 mark mrkF3
+bindsym $mCS+F3 unmark mrkF3
+bindsym $mod+F3 [con_mark="mrkF3"] focus
+bindsym $mCd+F3 [con_mark="mrkF3"] $move_ctw current
+
+bindsym $mSd+F4 mark mrkF4
+bindsym $mCS+F4 unmark mrkF4
+bindsym $mod+F4 [con_mark="mrkF4"] focus
+bindsym $mCd+F4 [con_mark="mrkF4"] $move_ctw current
+
+bindsym $mSd+F5 mark mrkF5
+bindsym $mCS+F5 unmark mrkF5
+bindsym $mod+F5 [con_mark="mrkF5"] focus
+bindsym $mCd+F5 [con_mark="mrkF5"] $move_ctw current
+
+bindsym $mSd+F6 mark mrkF6
+bindsym $mCS+F6 unmark mrkF6
+bindsym $mod+F6 [con_mark="mrkF6"] focus
+bindsym $mCd+F6 [con_mark="mrkF6"] $move_ctw current
+
+bindsym $mSd+F7 mark mrkF7
+bindsym $mCS+F7 unmark mrkF7
+bindsym $mod+F7 [con_mark="mrkF7"] focus
+bindsym $mCd+F7 [con_mark="mrkF7"] $move_ctw current
+
+bindsym $mSd+F8 mark mrkF8
+bindsym $mCS+F8 unmark mrkF8
+bindsym $mod+F8 [con_mark="mrkF8"] focus
+bindsym $mCd+F8 [con_mark="mrkF8"] $move_ctw current
+
+bindsym $mSd+F9 mark mrkF9
+bindsym $mCS+F9 unmark mrkF9
+bindsym $mod+F9 [con_mark="mrkF9"] focus
+bindsym $mCd+F9 [con_mark="mrkF9"] $move_ctw current
+
+bindsym $mSd+F10 mark mrkF10
+bindsym $mCS+F10 unmark mrkF10
+bindsym $mod+F10 [con_mark="mrkF10"] focus
+bindsym $mCd+F10 [con_mark="mrkF10"] $move_ctw current
+
+bindsym $mSd+F11 mark mrkF11
+bindsym $mCS+F11 unmark mrkF11
+bindsym $mod+F11 [con_mark="mrkF11"] focus
+bindsym $mCd+F11 [con_mark="mrkF11"] $move_ctw current
+
+bindsym $mSd+F12 mark mrkF12
+bindsym $mCS+F12 unmark mrkF12
+bindsym $mod+F12 [con_mark="mrkF12"] focus
+bindsym $mCd+F12 [con_mark="mrkF12"] $move_ctw current
+
+
+### ==================== Edit ====================== ###
+### Containers: Edit ###
+set $mode_container Edit
+bindsym $mod+e mode "$mode_container"
+mode "$mode_container" {
+    bindsym f floating toggle
+    bindsym 1 $exno ~/.i3/ctl/ratio_size 0.5   ,$def
+    bindsym 2 $exno ~/.i3/ctl/ratio_size 0.667 ,$def
+    bindsym 3 $exno ~/.i3/ctl/ratio_size 0.75  ,$def
+
+    bindsym h resize shrink right $s_size
+    bindsym j resize grow down    $s_size
+    bindsym k resize shrink down  $s_size
+    bindsym l resize grow right   $s_size
+
+    bindsym Shift+h resize grow left   $s_size
+    bindsym Shift+j resize shrink up   $s_size
+    bindsym Shift+k resize grow up     $s_size
+    bindsym Shift+l resize shrink left $s_size
+
+    bindsym Left  resize shrink width  $s_size
+    bindsym Down  resize grow height   $s_size
+    bindsym Up    resize shrink height $s_size
+    bindsym Right resize grow width    $s_size
+
+    bindsym $mod+h move left  $s_step
+    bindsym $mod+j move down  $s_step
+    bindsym $mod+k move up    $s_step
+    bindsym $mod+l move right $s_step
+
+    bindsym Shift+Left  move left  $s_step
+    bindsym Shift+Down  move down  $s_step
+    bindsym Shift+Up    move up    $s_step
+    bindsym Shift+Right move right $s_step
+
+    bindsym $mod+e $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+set $mode_workspace Workspace/Tune-up
+bindsym $mCd+e mode "$mode_workspace"
+mode "$mode_workspace" {
+    bindsym r $exno i3-input -F  '$exno ~/.i3/ctl/rename_current_workspace "%%s"' -P 'WS Name: ' ,$def
+    bindsym $mSd+r $exno ~/.i3/ctl/rename_as_focused ,$def
+
+    bindsym $mod+grave bar mode toggle    ,$def
+    bindsym $mSd+grave bar mode dock      ,$def
+    bindsym $mCd+grave bar mode invisible ,$def
+
+    bindsym $mCd+e $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+### Containers: Border Style ###
+set $mode_border Border : <1-9> [n]ormal [p]ixel [h]idden
+bindsym $mod+b mode "$mode_border"
+mode "$mode_border" {
+    bindsym 1 border pixel 1 ,$def
+    bindsym 2 border pixel 2 ,$def
+    bindsym 3 border pixel 3 ,$def
+    bindsym 4 border pixel 4 ,$def
+    bindsym 5 border pixel 5 ,$def
+    bindsym 6 border pixel 6 ,$def
+    bindsym 7 border pixel 7 ,$def
+    bindsym 8 border pixel 8 ,$def
+    bindsym 9 border pixel 9 ,$def
+    bindsym 0 border pixel 0 ,$def
+
+    bindsym $mod+b border toggle, $def
+    bindsym n border normal, $def
+    bindsym p border 1pixel, $def
+    bindsym h border none, $def
+
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+### Wacom: Submenu ###
+set $mode_wacom Wacom : <1-4> [n]ext, [m]ode, [c]urve, [o]utput
+bindsym $mod+Insert mode "$mode_wacom"
+mode "$mode_wacom" {
+    bindsym o $exno ~/aura/airy/cfg/wacom/ctl/change-output ,$def
+    bindsym $mod+m $exno ~/aura/airy/cfg/wacom/ctl/change-mode -q && $upd wnd ,$def
+    bindsym $mod+s $exno ~/aura/airy/cfg/wacom/ctl/change-curve  ,$def
+    bindsym $mod+Insert $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+
+### =================== System ===================== ###
+### Mode: System ###
+set $mode_system <i3> : shu[t]down, [r]eboot, [l]ock | log[o]ut, [s]uspend, [h]ibernate | re[c]onf, re[n]ew, [e]xit
+bindsym $mCd+Delete mode "$mode_system"
+bindsym $mSd+Escape mode "$mode_system"
+mode "$mode_system" {
+    bindsym l $exno ~/.i3/ext/i3exit lock      ,$def
+    bindsym o $exno ~/.i3/ext/i3exit logout    ,$def
+    bindsym s $exno ~/.i3/ext/i3exit suspend   ,$def
+    bindsym h $exno ~/.i3/ext/i3exit hibernate ,$def
+    bindsym r $exno ~/.i3/ext/i3exit reboot    ,$def
+    bindsym t $exno ~/.i3/ext/i3exit shutdown  ,$def
+
+    bindsym c reload
+    bindsym n restart
+
+    bindsym $mCd+Delete $def
+    bindsym $mSd+Escape $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+bindsym $mSd+BackSpace restart
+bindsym $mSd+z $exno ~/.i3/ext/i3exit lock
+
+### ================== Launchers =================== ###
+### Mode: Open ###
+set $mode_open <O>pen : [n]cmpcpp, [h]top | vim[b], [p]idgin, [f]irefox, <k>rita | [m]usic
+bindsym $mod+o mode "$mode_open"
+mode "$mode_open" {
+    bindsym $mod+grave $def, workspace number $w00
+    bindsym $mod+1     $def, workspace number $w01
+    bindsym $mod+2     $def, workspace number $w02
+    bindsym $mod+3     $def, workspace number $w03
+    bindsym $mod+4     $def, workspace number $w04
+    bindsym $mod+5     $def, workspace number $w05
+    bindsym $mod+6     $def, workspace number $w06
+    bindsym $mod+7     $def, workspace number $w07
+    bindsym $mod+8     $def, workspace number $w08
+    bindsym $mod+9     $def, workspace number $w09
+    bindsym $mod+0     $def, workspace number $w10
+    bindsym $mod+minus $def, workspace number $w11
+    bindsym $mod+equal $def, workspace number $w12
+
+    bindsym n $exno urxvt -name Float -e ncmpcpp ,$def
+    bindsym h $exno urxvt -name Float -e htop ,$def
+
+    bindsym b $exno vimb ,$def
+    bindsym p $exno pidgin ,$def
+    bindsym f $exno firefox ,$def
+    bindsym m $exno ~/.i3/dmenu/mpd_fmove ,$def
+
+    bindsym $mod+k $exno ~/.i3/ctl/run-focus k ,$def
+    bindsym $mod+o mode "$mode_open_rare"
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+set $mode_open_rare <Open> : [P]owertop, [t]lp | [g]vim, [F]m | (s)ound
+mode "$mode_open_rare" {
+    bindsym Shift+p $exno urxvt -name Float -e gksudo powertop ,$def
+    bindsym t $exno urxvt -name Float -e gksudo tlp start ,$def
+
+    bindsym g $exno gvim ,$def
+    bindsym Shift+f $exno nemo --no-desktop ,$def
+    bindsym Control+s $exno /usr/lib/cinnamon-settings/cinnamon-settings.py sound ,$def
+
+    bindsym $mod+o $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+### Run: Prgs ###
+bindsym $mod+u $exno urxvt
+bindsym $mSd+u split vertical  , $exno urxvt
+bindsym $mCd+u split horizontal, $exno urxvt
+bindsym $mod+Return $exno urxvt -e zsh -ic ranger-auto
+bindsym $mSd+Return $exno urxvt -name Float -e ranger-auto
+bindsym $mCd+Return $exno urxvt -name Float
+bindsym $mCS+Return $exno urxvt -name Float -e ipython -ic 'from pwn import *'
+### Run: Menus ###
+bindsym $mCd+d $exno j4-dmenu-desktop
+bindsym $mod+d $exno ~/.i3/dmenu/lsbin
+bindsym $mod+Print $exno ~/.i3/ext/screenshot
+
+### ================= Multimedia =================== ###
+### Control: copyq ###
+set $mode_copyq Copyq: [e]dit, [o]pen, [m]enu | [a]ctive, [p]assive
+bindsym $mCd+x mode "$mode_copyq"
+mode "$mode_copyq" {
+    bindsym e $exno copyq edit ,$def
+    bindsym o $exno copyq toggle ,$def
+    bindsym m $exno copyq menu ,$def
+    bindsym a $exno copyq enable ,$def
+    bindsym p $exno copyq disable ,$def
+
+    bindsym 1 $exno copyq select 1 ,$def
+    bindsym 2 $exno copyq select 2 ,$def
+    bindsym 3 $exno copyq select 3 ,$def
+    bindsym 4 $exno copyq select 4 ,$def
+    bindsym 5 $exno copyq select 5 ,$def
+    bindsym 6 $exno copyq select 6 ,$def
+    bindsym 7 $exno copyq select 7 ,$def
+    bindsym 8 $exno copyq select 8 ,$def
+    bindsym 9 $exno copyq select 9 ,$def
+    bindsym 0 $exno copyq select 0 ,$def
+
+    bindsym $mCd+x $def
+    bindsym Return $def
+    bindsym Escape $def
+    bindsym space  $def
+    bindsym q      $def
+}
+
+### Control: volume ###
+bindsym $mod+Home  $exno ~/.i3/ext/volume 20%
+bindsym $mod+Prior $exno ~/.i3/ext/volume 2%+
+bindsym $mod+Next  $exno ~/.i3/ext/volume 2%-
+bindsym $mod+End   $exno ~/.i3/ext/volume    
+
+bindsym XF86AudioRaiseVolume $exno ~/.i3/ext/volume 2%+
+bindsym XF86AudioLowerVolume $exno ~/.i3/ext/volume 2%-
+bindsym XF86AudioMute        $exno ~/.i3/ext/volume    
+
+### Control: ncmpcpp ###
+bindsym XF86AudioPlay $exno ncmpcpp toggle && $upd mpd
+bindsym XF86AudioNext $exno ncmpcpp next   && $upd mpd
+bindsym XF86AudioPrev $exno ncmpcpp prev   && $upd mpd
+bindsym XF86AudioStop $exno ncmpcpp stop   && $upd mpd
+
+bindsym $mCd+Home  $exno mpc toggle && $upd mpd
+bindsym $mCd+Prior $exno mpc prev   && $upd mpd
+bindsym $mCd+Next  $exno mpc next   && $upd mpd
+bindsym $mCd+End   $exno mpc seek +5 >/dev/null && $upd mpd
+
+
+### =================== Windows ==================== ###
+### Windows: Assigning ###
+assign [title="^Win7hdd"] $w10
+assign [class="^Firefox"] $w04
+assign [class="^Pale moon"] $w04
+assign [class="^Krita"] $w05
+assign [class="^Wine"] $w09
+assign [class="^Steam"] $w09
+assign [class="^t-engine64"] $w08
+
+### Windows: Settings ###
+for_window [class="^Copyq" instance="^copyq"] border none
+for_window [class="^Conky"] border none
+for_window [class="^t-engine64"] border none
+for_window [instance="feh"] fullscreen
+
+for_window [window_role="pop-up"] floating enable, border pixel 3
+for_window [class="^Copyq" instance="^copyq"] floating enable, border pixel 3
+for_window [class="^Firefox" instance="^Download"] floating enable, border pixel 3
+for_window [class="^Pidgin"] floating enable, border pixel 3
+for_window [class="(?i)urxvt" instance="(?i)^Float*"] floating enable, border pixel 3
+for_window [class="^Transmission-gtk"] floating enable, border pixel 3
+
+for_window [title="^Transmission" class="^Transmission-gtk" instance="^transmission-gtk"] move scratchpad
+for_window [class="^piony.py"] floating enable, border pixel 3
+
+### ================== Bar & Theme ================= ###
+
+font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+font pango:Ubuntu 9
+# class                 border  backgr. text    indicator
+client.focused          #3cb371 #008080 #ffffff #ff4500
+client.focused_inactive #333333 #5f676a #ffffff #292d2e
+client.unfocused        #333333 #222222 #888888 #d2691e
+client.urgent           #2f343a #900000 #ffffff #900000
+
+bar {
+    id                  bar-main # Specifies the bar ID for the configured bar instance (if many)
+    mode                dock     # <dock|hide|invisible>
+    position            bottom   # <top|bottom>
+    workspace_buttons   yes
+    status_command      i3blocks -c ~/.i3/i3blocks.conf
+    modifier            $mod
+
+    font -misc-fixed-medium-r-normal--12-120-75-75-C-70-iso10646-1
+    #font pango:DejaVu Sans Mono 10
+    colors {
+        background          #000000
+        statusline          #ffffff
+        separator           #555555
+
+        # colorclass <border> <background> <text>
+        focused_workspace  #00ff00 #005533 #ffffff
+        active_workspace   #333333 #5f676a #ffffff
+        inactive_workspace #333333 #222222 #888888
+        urgent_workspace   #900000 #FFD700 #000000
+    }
+}
+

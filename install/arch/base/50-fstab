@@ -1,0 +1,8 @@
+#!/bin/bash -e
+if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+
+## Automounts in fstab (generate after pacstrap)
+fst=/mnt/etc/fstab
+sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
+
+echo ":: fstab generated"

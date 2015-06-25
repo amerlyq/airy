@@ -11,6 +11,7 @@ useradd -m -g $user -G users,wheel,uucp -s /bin/bash $user
 printf "%s" $user:$user | chpasswd
 echo ":: created '$user' password"
 
+
 ## sudo for user
 entry="$user ALL=(ALL) \
 NOPASSWD:/sbin/reboot,/sbin/halt,/sbin/shutdown,/sbin/poweroff"
@@ -19,18 +20,3 @@ sed -i '/.*\(%wheel ALL=(ALL) ALL\)/s/\1/' $dst  # Uncomment group 'wheel'
 sed -i "/^$user ALL=(ALL) NOPASSWD/d" $dst       # Add specific rights
 echo "$entry" | tee --append $dst
 echo ":: sudo '$user' enabled"
-
-
-## SSH access: add host public key to vbox guest authorized_keys
-if [[ -f ~/id_rsa.pub ]]; then
-    home="/home/$user"
-    key="$home/.ssh/authorized_keys"
-    mkdir -p ${key%/*} && cp -vfT ~/id_rsa.pub $key
-    chown -R $user:$user ${key%/*} && chmod 600 ${key}
-
-    cp -vrft $home ~/user
-    chown -R $user:$user $home/user && chmod -R 700 $home/user
-fi
-
-### ENABLE Services
-systemctl enable sshd.service

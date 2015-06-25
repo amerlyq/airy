@@ -48,17 +48,12 @@ timedatectl set-timezone "$zone"
 hopt cdpm && { chmod -R 700 ~/arch/base || die; }
 
 do_each /bin/bash -c ~/arch/base/ <<EOTBASE
-$(hopt m && echo "00-disk $(hopt d && echo '--new') $sd" || die)
-$(hopt v && echo "35-custom-pacman $LOCAL_SRV /etc/pacman.conf" || die)
-$(hopt p && echo "40-pacstrap" || die)
+$(hopt m && echo "00-disk $(hopt d && echo '--new') $sd")
+$(hopt v && echo "35-custom-pacman $LOCAL_SRV /etc/pacman.conf")
+$(hopt p && echo "40-pacstrap")
+$(hopt f && echo "50-fstab")
 EOTBASE
-echo ":: base disk and pacstrap ended"
-
-if hopt f; then
-    ## Automounts in fstab (generate after pacstrap)
-    fst=/mnt/etc/fstab
-    sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
-fi && echo ":: fstab generated"
+echo ":: {disk, pacstrap, fstab} ended"
 
 # ========================================================================
 
@@ -66,15 +61,19 @@ fi && echo ":: fstab generated"
 if hopt h; then
     cp -vrft /mnt/root/ ~/arch/{host,user} ~/id_rsa.pub || die
     chmod -R 700 /mnt/root/host || die
+
 # ALT: systemd-nspawn
 do_each arch-chroot /mnt /bin/bash -c ~/host/ <<EOTHOST
 00-setup $zone
-10-network $CURR_HOST $VBOX_HOST_IP
+10-network $CURR_HOST
+$(hopt v && echo "15-network-vbox $VBOX_HOST_IP")
 20-boot $sd
+$(hopt v && echo "22-boot-vbox $sd")
 40-AUR
 50-X
-90-add-user $user
-92-autologin -c $user
+80-add-user $user
+$(hopt v && echo "88-ssh-nopswd $user")
+$(hopt v && echo "92-autologin -c $user")
 EOTHOST
 fi && echo ':: host chroot ended'
 
