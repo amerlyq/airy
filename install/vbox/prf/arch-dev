@@ -1,0 +1,8 @@
+# vim: ft=sh
+
+VNM='Arch64'
+VBOX_HDD=20480
+
+is_assoc VMOPTS || exit
+VMOPTS+=( [memory]=2048 [vram]=128  [accelerate3d]=on  [usb]=on
+          [clipboard]=bidirectional )

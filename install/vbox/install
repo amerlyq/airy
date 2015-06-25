@@ -2,7 +2,5 @@
 source ~/.shell/func.d/packages
 # VBox guest
 
-LST="virtualbox-guest-additions virtualbox-guest-utils \
-virtualbox-guest-dkms virtualbox-guest-x11"
-
-apt_noprompt $LST
+pkg_inst "virtualbox-guest-additions virtualbox-guest-utils \
+          virtualbox-guest-dkms virtualbox-guest-x11"

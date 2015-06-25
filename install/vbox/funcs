@@ -1,13 +1,23 @@
 # vim: ft=sh
 source ~/.shell/func.d/system || exit
 
+### General ###
+is_assoc() { [[ "$(declare -p $1)" =~ "declare -A" ]]; }
+exit_s() { printf "${1+$1\n}"; exit ${?:-1}; }
+hopt() { [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
+oadd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
+
+
+### Conditions ###
 is_vm_exist() { VBoxManage list vms        | grep -q "\<$1\>"      ; return; }
 is_vm_run()   { VBoxManage list runningvms | grep -q "\<$1\>"      ; return; }
 has_vm_rule() { VBoxManage showvminfo "$1" | grep -q "Rule.*\<$2\>"; return; }
 show_vm_rule(){ VBoxManage showvminfo "$1" | grep "Rule.*\<${2}\>" ; return; }
 
+
+### Functions ###
 add_port_forward() {
-    if [ $# -ne 3 ]; then echo "Number of args '$#' != 3"; exit 1; fi
+    if [[ $# -ne 3 ]]; then echo "Number of args '$#' != 3"; return 1; fi
     if has_vm_rule "$1" "$2"; then  # Firstly, delete if exist
         VBoxManage modifyvm "$1" --natpf1 delete "$2"
         show_vm_rule "$1" "$2"
@@ -20,15 +30,16 @@ add_port_forward() {
 }
 
 
+### Actions ###
 do_vm_off() {
 if is_vm_exist "${1?No vbox name}" && is_vm_run "$1"; then
-    if [ "$2" == "-y" ] || amAskConfirm "Do you want shutdown VM='$1'? (y/n)"
+    if [[ "$2" == "-y" ]] || amAskConfirm "Do you want shutdown VM='$1'? (y/n)"
     then VBoxManage controlvm "$1" poweroff; else return 1; fi
 fi; }
 
-do_vm_run() { is_vm_exist "${1?No vbox name}" || squit "There no such VM as '$1'"
-    do_vm_off "$1" "$2" || squit "Rejected '$1' shutdown"
-    if [ "$2" == "-y" ] || amAskConfirm "Launch VM='$1' is your wish? (y/n)"
+do_vm_run() { is_vm_exist "${1?No vbox name}" || exit_s "There no such VM as '$1'"
+    do_vm_off "$1" "$2" || exit_s "Rejected '$1' shutdown"
+    if [[ "$2" == "-y" ]] || amAskConfirm "Launch VM='$1' is your wish? (y/n)"
     then case "$3" in  # ALT:
         -h) VBoxHeadless --startvm "$1" --vrde off & ;;
          *) VBoxManage startvm "$1" ;;
@@ -37,6 +48,7 @@ do_vm_run() { is_vm_exist "${1?No vbox name}" || squit "There no such VM as '$1'
 }
 
 
+### Serial ###
 do_vm_keys() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
     VBoxManage controlvm "${1?No vbox name}" keyboardputscancode ${line?No input}
 done; }
@@ -47,7 +59,7 @@ done; }
 
 do_vm_socket_copy() {
     local serial="${1?No vbox serial}" src="${2?No src path}"
-    if [ ! -e "$src" ]; then squit "Error: '$src' doesn't exist!"; fi
+    if [ ! -e "$src" ]; then exit_s "Error: '$src' doesn't exist!"; fi
     # WARNING: when using netcat to transmit texts directly, don't use '&' on
     # the line ends, as it will consume all next linebreaks and merge text with
     # heredoc marker.

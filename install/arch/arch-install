@@ -6,8 +6,8 @@ user="tester"
 zone="Europe/Kiev"
 sd=/dev/sda
 CURR_HOST="archvbox"
-VBOX_IP="192.168.56.1"
-LOCAL_SRV="http://${VBOX_IP}:23208"
+VBOX_HOST_IP="192.168.56.1"
+LOCAL_SRV="http://${VBOX_HOST_IP}:23208"
 
 
 hopt() { [ "${OPTS/[$1]}" != "$OPTS" ]; }
@@ -66,7 +66,7 @@ if hopt h; then
 # ALT: systemd-nspawn
 do_each arch-chroot /mnt /bin/bash -c ~/host/ <<EOTHOST
 00-setup $zone
-10-network $CURR_HOST $VBOX_IP
+10-network $CURR_HOST $VBOX_HOST_IP
 20-boot $sd
 40-X
 42-AUR
@@ -88,7 +88,7 @@ fi && echo ":: '$user' <su in chroot> ended"
 if hopt r; then
     rep=/var/cache/pacman/pkg
     arch-chroot /mnt /bin/bash -c "repo-add $rep/custom.db.tar.gz $rep/*.pkg.tar.xz"
-    scp -r /mnt/$rep frees@${VBOX_IP}:\~/home/VMs
+    scp -r /mnt/$rep frees@${VBOX_HOST_IP}:\~/home/VMs
 fi
 
 # NOTE: use 'fuser' to find by what it is busy

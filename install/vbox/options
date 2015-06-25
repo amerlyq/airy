@@ -1,0 +1,11 @@
+# vim: ft=sh
+
+VBOX_PORT=2822
+VBOX_NET=vboxnet0
+
+VBOX_USER="$(whoami)"
+VBOX_HOST_IP="$(ifconfig $VBOX_NET | awk '/inet addr/{print substr($2,6)}')"
+VBOX_HOST="$(uname -n)"
+DHCPIP_INN="$(VBoxManage list dhcpservers | awk '/^IP:/{print $NF}')"
+
+VBOX_SSH="${VBOX_USER}@${VBOX_HOST_IP}"

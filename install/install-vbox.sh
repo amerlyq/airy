@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 source ~/.shell/func.d/system && amScriptDir || exit
-source "$SCRIPT_DIR/vbox/funcs" || exit
-source "$SCRIPT_DIR/vbox/env" || exit  # Import some variables
-
-
-hopt() { [ "${OPTS/[$1]}" != "$OPTS" ]; }
-oadd() { OPTS="${OPTS/[$1]}${1}"; }
-
+source ./vbox/funcs || exit
+source ./vbox/options || exit
+source ./vbox/hosts || exit  # Import some variables
+cd $(dirname $(readlink -m ${0}))
 
 ### Options chooser ###
 hlst=rhcispetl
@@ -14,8 +11,8 @@ case "$1" in
     -[$hlst]) OPTS="-${1##*-}" ;;
     +[$hlst]*) echo "::: no chain -- choosen options only :::"
         OPTS="${1##*+}" ;;
-    *) squit "Need option -/+'$hlist'" ;; esac
-hopt r && { do_vm_run "$VNM" -y; squit; }
+    *) exit_s "Need option -/+'$hlist'" ;; esac
+hopt r && { do_vm_run "$VNM" -y; exit_s; }
 if hopt -; then
     hopt h && oadd ctx # hidden -> create, shutdown, detach/snapshot
     hopt c && oadd s   # create -> serial, login
@@ -36,14 +33,6 @@ hopt e && [ -d "$VMs/pkg" ] && { ( cd "$VMs/pkg" &&
 ) & trap "kill -15 $!; exit 1" EXIT SIGINT SIGTERM; }
 
 hopt r && do_sleep 8  # WARNING: May be facing problems with timing!
-
-VBOX_USER="$(whoami)"
-VBOX_IP="$(ifconfig $VBOX_NET | awk '/inet addr/{print substr($2,6)}')"
-VBOX_HOST="$(uname -n)"
-DHCPIP_INN="$(VBoxManage list dhcpservers | awk '/^IP:/{print $NF}')"
-
-VBOX_SSH="${VBOX_USER}@${VBOX_IP}"
-GUEST_IP="${VBOX_IP##*.}.11"
 
 
 #####################################################

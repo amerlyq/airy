@@ -1,0 +1,10 @@
+# vim: ft=sh
+
+VNM='arch-kernel-64'
+VBOX_HDD=20480
+GUEST_IP=11  # Last value after dot
+
+is_assoc VMOPTS || exit
+VMOPTS+=( [memory]=1024  [vram]=16  [accelerate3d]=off  [usb]=off
+          [clipboard]=disabled  [audio]=none  [firmware]=bios )
+
