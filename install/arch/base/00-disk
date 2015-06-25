@@ -1,48 +1,43 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
 
+case "$1" in --new) bNew=1; shift ;; esac
 sd="${1?No disk device}"
 
-case "$2" in
---new) bNew=1 ;;
-    *) bNew=0 ;;
-esac
+declare -A pts=( [boot]=${sd}1 [root]=${sd}2
+                 [swap]=${sd}3 [home]=${sd}4 )
 
-# nd=(boot root swap home)
-# for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
+## Detach all previous
+umount -fR /mnt
 
-layout="
-    /boot ext4       100MB
-    /     ext4       8GB
-    *     linux-swap 10GB
-    /home ext4       100%
-"
+if [[ "$bNew" -eq 1 ]]; then
+    ## Set MBR / GPT
+    swapoff -a
+    parted -s -a opt $sd mklabel msdos
+    lsblk $sd && echo
 
-## Partitioning
-if [ -n "$bNew" ]; then
-    umount -fR /mnt
-    gawk -v new="${bNew?No bNew derived value}" -v sd="$sd" '
-    BEGIN { pp="parted -s -a opt "sd; ps="1MB"; N=0
-        if(new) {
-            print "swapoff -a"
-            print pp,"mklabel msdos"
-            print "lsblk",sd,"&& echo"
-        }}
-    /\S/ {
-        a[$1]=sd""(++N); t[$1]=$2
-        if(new) { print pp,"mkpart primary",$2,ps,$3 }
-        ps=$3
-    } END {
-        if(new) { print pp,"set 1 boot on" }
-        PROCINFO["sorted_in"]="@ind_str_asc"
-        for(m in a) {
-            if(m == "*") { if(new) print "mkswap",a[m],"&& swapon",a[m] }
-            else { if(new) { print "mkfs."t[m],a[m] }
-                print "mkdir -p /mnt"m
-                print "mount",a[m],"/mnt"m
-            }
-        }
-    }' <<< "$layout" | bash
+    ## LVM partitions
+    # ...
+
+    ## Profile for current disk
+    parted -s -a opt $sd mkpart primary ext4        1MB     100MB
+    parted -s -a opt $sd mkpart primary ext4        100MB   8GB
+    parted -s -a opt $sd mkpart primary linux-swap  8GB     10GB
+    parted -s -a opt $sd mkpart primary ext4        10GB    100%
+
+    parted -s -a opt $sd set ${pts[boot]} boot on
+    mkswap ${pts[swap]} && swapon ${pts[swap]}
+
+    mkfs.ext4 ${pts[root]}
+    mkfs.ext4 ${pts[boot]}
+    mkfs.ext4 ${pts[home]}
+fi
+
+## Mounting
+if ! grep -qsw /mnt /proc/mounts; then
+    mkdir -p /mnt      && mount ${pts[root]} /mnt
+    mkdir -p /mnt/boot && mount ${pts[boot]} /mnt/boot
+    mkdir -p /mnt/home && mount ${pts[home]} /mnt/home
 fi
 
 ## Layout

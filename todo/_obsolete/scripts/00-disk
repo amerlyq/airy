@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+
+sd="${1?No disk device}"
+
+case "$2" in
+--new) bNew=1 ;;
+    *) bNew=0 ;;
+esac
+
+# nd=(boot root swap home)
+# for nm in "${nd[@]}"; do ((++i)); declare n_${nm}=$i s_${nm}=$sd$i; done
+
+layout="
+    /boot ext4       100MB
+    /     ext4       8GB
+    *     linux-swap 10GB
+    /home ext4       100%
+"
+
+## Partitioning
+if [ -n "$bNew" ]; then
+    # umount -fR /mnt
+    gawk -v new="${bNew?No bNew derived value}" -v sd="$sd" '
+    BEGIN { pp="parted -s -a opt "sd; ps="1MB"; N=0
+        if(new) {
+            print "swapoff -a"
+            print pp,"mklabel msdos"
+            print "lsblk",sd,"&& echo"
+        }}
+    /\S/ {
+        a[$1]=sd""(++N); t[$1]=$2
+        if(new) { print pp,"mkpart primary",$2,ps,$3 }
+        ps=$3
+    } END {
+        if(new) { print pp,"set 1 boot on" }
+        PROCINFO["sorted_in"]="@ind_str_asc"
+        for(m in a) {
+            if(m == "*") { if(new) print "mkswap",a[m],"&& swapon",a[m] }
+            else { if(new) { print "mkfs."t[m],a[m] }
+                print "mkdir -p /mnt"m
+                print "mount",a[m],"/mnt"m
+            }
+        }
+    }' <<< "$layout" #| bash
+fi
+
+## Layout
+# parted -l
+# lsblk $sd

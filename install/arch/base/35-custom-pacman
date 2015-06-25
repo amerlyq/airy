@@ -2,14 +2,12 @@
 if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
 
 srv="${1?No local pacman server}"
-cfg="${2?No cfg: pacman.conf path}"
+
+### Add local cache repository before [core]
+cfg=/etc/pacman.conf
 tmp=/tmp/pacman.tmp
->$tmp
-
-
-### Add local cache repository
 # Cut first part of file
-sed -r '/#%BEGIN_CUSTOM/,/#%END_CUSTOM/d; /^\[core\]/,$d' $cfg >> $tmp
+sed -r '/#%BEGIN_CUSTOM/,/#%END_CUSTOM/d; /^\[core\]/,$d' $cfg > $tmp
 # Add custom repository
 cat >> $tmp <<EOT
 #%BEGIN_CUSTOM Prepended during install
@@ -18,17 +16,6 @@ cat >> $tmp <<EOT
 SigLevel = Never  # Optional TrustAll
 Server = $srv
 #%END_CUSTOM
-EOT
-
-sed -r '/#%BEGIN_AUR/,/#%END_AUR/d; /^\[core\]/,$d' $cfg >> $tmp
-# Add AUR
-cat >> $tmp <<EOT
-#%BEGIN_AUR
-## AUR: https://archlinux.fr/yaourt-en
-[archlinuxfr]
-SigLevel = Never
-Server = http://repo.archlinux.fr/\$arch
-#%END_AUR
 EOT
 
 # Add last part of file
@@ -40,7 +27,17 @@ sed -r '/^\[core\]/,$!d' $cfg >> $tmp
 # Apply changes
 mv -vfb $tmp $cfg
 
-# pacman -Sy -- will be automatically called by pacstrap
+# NOTE:
+#   pacman -Sy -- will be automatically called by pacstrap
 
 # WARNING: when pacstrap, resulting /mnt/etc/pacman.conf may be different!
-echo ":: pacman set up complete"
+echo ":: [custom] set up complete"
+
+
+# NOTE: Also you may use complete mirror for [core,...,community]:
+# prepend >! /etc/pacman.d/mirrorlist <<EOT
+## Local: pacman mirror on host server.
+## Must contain official databases (base, core, ...)!
+# Server = $srv
+# EOT
+# TODO: Replace Local IP to 'vboxhost'

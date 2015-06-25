@@ -2,6 +2,22 @@
 if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
 
 
+### Add AUR repository to the end
+cfg=/etc/pacman.conf
+sed -ri '/#%BEGIN_AUR/,/#%END_AUR/d; /^\[core\]/,$d' $cfg
+cat >> $cfg <<EOT
+#%BEGIN_AUR
+## AUR: https://archlinux.fr/yaourt-en
+[archlinuxfr]
+SigLevel = Never
+Server = http://repo.archlinux.fr/\$arch
+#%END_AUR
+EOT
+
+pacman -Sy
+echo ":: [archlinuxfr] set up complete"
+
+
 # But you have to install package-query first for yaourt
 # curl -O https://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz
 # tar zxvf package-query.tar.gz

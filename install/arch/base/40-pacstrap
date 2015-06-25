@@ -1,19 +1,13 @@
 #!/usr/bin/env bash
 if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
 
-srv="${1?No local pacman server}"
-tmp=/tmp/mirror.tmp
->$tmp
 
 ### Select a mirror.
+fl=/etc/pacman.d/mirrorlist
+tmp=/tmp/mirror.tmp
 # TODO: Add fetching and sorting for mirror list?
-# TODO: Replace Local IP to 'vboxhost'
-cat >> $tmp <<EOT
+cat > $tmp <<EOT
 #%BEGIN Prepended during install
-
-## Local: pacman mirror on host server.
-## Must contain official databases (base, core, ...)!
-# Server = $srv
 
 ## Score: 0.7, Ukraine -- 6MiB/s, stable
 Server = http://archlinux.bln-ua.net/\$repo/os/\$arch
@@ -23,7 +17,6 @@ Server = http://mirrors.nix.org.ua/linux/archlinux/\$repo/os/\$arch
 
 #%END
 EOT
-fl=/etc/pacman.d/mirrorlist
 sed '/#%BEGIN/,/#%END/d' $fl >> $tmp
 mv -vfb $tmp $fl
 echo ":: mirrors selected"
@@ -32,7 +25,7 @@ echo ":: mirrors selected"
 ### BASE SOFT
 # NOTE: need 'sudo' for 'airy/cfg/shell/func.d/packages'
 soft="base base-devel openssh wget sudo"  #  sshfs gnupg pinentry
-if [ ! -d "/mnt/usr/bin" ]; then
+if [[ ! -d "/mnt/usr/bin" ]]; then
     ## Install the base system  # -i -- interactive
     pacstrap /mnt $soft || exit
     echo ":: packstrap installed"
