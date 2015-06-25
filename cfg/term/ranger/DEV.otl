@@ -84,6 +84,17 @@ Completely detach ranger interface from filemanager
 	[_] argument -- treat as regex. Filename will match themselves.
 
 DEV
-Being at '/', left panel is empty -- but you can use it for network/bookmarks!
-	Also, using that panel -- you must not do it central, simply move focus and control to left
-	Such behaviour may be possible for any path! Being anywhere open list on left and choose!
+	[_] Ipc with interactive zsh instance in separate thread.
+		:= Seems like it will need headless terminal emulator written in python?
+		:= Sockets are better: http://www.theochem.uni-duisburg.de/cgi-bin/info2www?(zsh)The+zsh/net/socket+Module
+		:http://www.zsh.org/mla/users/2007/msg00785.html
+		:SEE: tmux-vim async integration -- how vim launches commands inside separate panel
+		Faster -- as it loads once and always works
+		Relaunching when it crashes
+		All aliases and abilities can be available from ranger's ':'
+		SEE maybe you even be able to create terminal and attach that
+			background zsh to it? However, scrollback will not be restored?
+
+	[_] Being at '/', left panel is empty -- but you can use it for network/bookmarks!
+		Also, using that panel -- you must not do it central, simply move focus and control to left
+		Such behaviour may be possible for any path! Being anywhere open list on left and choose!

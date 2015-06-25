@@ -3,3 +3,10 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 linkdir ~/.ncmpcpp/ config bindings
+cd ./radio && linkdir ~/.mpd/playlists/ *
+
+
+# MOOD:  http://8tracks.com/explore/anime
+# loadsongs() { sed 's/\s*#.*$//; /^\s*$/d' | while read song; do
+#     { mpc playlist -f "[%file%]" | grep -q "$song"; } || mpc load "$song"
+# done; }

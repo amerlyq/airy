@@ -17,7 +17,13 @@ if neobundle#tap('vim-rooter')
 endif
 
 
+if neobundle#tap('linediff.vim')
+  nnoremap <unique> <Leader>L  :LinediffReset<CR>
+  vnoremap <unique> <Leader>L  :Linediff<CR>
+endif
+
 let mapleader = s:leader  " }}}
+
 
 
 if neobundle#tap('NrrwRgn')  " NrrwRgn: {{{1
