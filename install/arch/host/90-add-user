@@ -1,14 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
 
-user="${1?No user specified}"
+user="${1?No user}"
 
 
 ### ADD users:  https://wiki.archlinux.org/index.php/Users_and_groups#User_groups
 # adbusers, mpd, vboxsf, vboxusers, wireshark
 groupadd $user
 useradd -m -g $user -G users,wheel,uucp -s /bin/bash $user
-printf $user:$user | chpasswd
+printf "%s" $user:$user | chpasswd
 echo ":: created '$user' password"
 
 ## sudo for user
@@ -21,11 +21,16 @@ echo "$entry" | tee --append $dst
 echo ":: sudo '$user' enabled"
 
 
-## SSH access: add host public key to vbox guest
-home="/home/$user"
-key="$home/.ssh/authorized_keys"
-mkdir -p ${key%/*} && cp -vf ~/id_rsa.pub $key
-chown -R $user:$user ${key%/*} && chmod 600 ${key}
+## SSH access: add host public key to vbox guest authorized_keys
+if [[ -f ~/id_rsa.pub ]]; then
+    home="/home/$user"
+    key="$home/.ssh/authorized_keys"
+    mkdir -p ${key%/*} && cp -vfT ~/id_rsa.pub $key
+    chown -R $user:$user ${key%/*} && chmod 600 ${key}
 
-cp -vrft $home ~/user
-chown -R $user:$user $home/user && chmod -R 700 $home/user
+    cp -vrft $home ~/user
+    chown -R $user:$user $home/user && chmod -R 700 $home/user
+fi
+
+### ENABLE Services
+systemctl enable sshd.service

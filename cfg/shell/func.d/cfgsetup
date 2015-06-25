@@ -11,7 +11,7 @@ cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 for arg in "$@"; do case "$arg" in
 dark|light|lucid|opaque) THEME="${1}" ;;
   # Install all packages, linked to 'setup'
- -i|--install) cfgOptAdd i ;;
+ -i|--install) cfgOptAdd i; shift ;;
   # Repeat all ops, which locked by files
   -u|--update) cfgOptAdd u; ARGS="$1" ;;
   # Clean all created files/directories -- to repeat as clean

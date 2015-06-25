@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+cd $(dirname $(readlink -m ${0}))
 
-OPTS="$1"
 user="tester"
 zone="Europe/Kiev"
 sd=/dev/sda
@@ -24,11 +24,11 @@ done; }
 
 ### Options chooser ###
 hlst=cdpmMhsur
-case "$1" in
-    -[$hlst]) OPTS="-${1##*-}" ;;
-    +[$hlst]*) echo "::: no chain -- choosen options only :::"
-        OPTS="${1##*+}" ;;
-    *) die 1 "Need option -/+'$hlst'" ;; esac
+case "$1"
+in -[$hlst])  oadd "-${1##*-}"
+;; +[$hlst]*) oadd "${1##*+}"
+    echo "::: no chain -- choosen options only :::"
+;; *) die 1 "Need option -/+'$hlst'" ;; esac
 if hopt -; then
     hopt c && oadd dM  # create -> disks, unmount
     hopt d && oadd pm  # disk -> mount, packstrap
@@ -70,8 +70,8 @@ do_each arch-chroot /mnt /bin/bash -c ~/host/ <<EOTHOST
 20-boot $sd
 40-X
 42-AUR
-60-services $user
 90-add-user $user
+92-autologin -c $user
 EOTHOST
 fi && echo ':: host chroot ended'
 

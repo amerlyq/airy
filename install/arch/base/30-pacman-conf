@@ -9,21 +9,26 @@ tmp=/tmp/pacman.tmp
 
 ### Add local cache repository
 # Cut first part of file
-sed -r '/#%BEGIN/,/#%END/d; /^\[core\]/,$d' $cfg >> $tmp
-
+sed -r '/#%BEGIN_CUSTOM/,/#%END_CUSTOM/d; /^\[core\]/,$d' $cfg >> $tmp
 # Add custom repository
 cat >> $tmp <<EOT
-#%BEGIN Prepended during install
-## Local: pacman mirror on host server
+#%BEGIN_CUSTOM Prepended during install
+## Custom: local pacman mirror on host server
 [custom]
 SigLevel = Never  # Optional TrustAll
 Server = $srv
+#%END_CUSTOM
+EOT
 
+sed -r '/#%BEGIN_AUR/,/#%END_AUR/d; /^\[core\]/,$d' $cfg >> $tmp
+# Add AUR
+cat >> $tmp <<EOT
+#%BEGIN_AUR
 ## AUR: https://archlinux.fr/yaourt-en
 [archlinuxfr]
 SigLevel = Never
 Server = http://repo.archlinux.fr/\$arch
-#%END
+#%END_AUR
 EOT
 
 # Add last part of file

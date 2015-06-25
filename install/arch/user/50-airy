@@ -1,0 +1,10 @@
+#!/bin/bash -e
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+## Clone my dotfiles
+dir=~/aura/airy && mkdir -p "$dir"
+if [[ -d "$dir" ]]; then ( cd "$dir" && git pull --verbose )
+else git clone 'https://github.com/amerlyq/airy' "$dir"; fi
+
+cd "$dir"
+./setup -i -u
