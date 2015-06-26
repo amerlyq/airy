@@ -31,12 +31,16 @@ fi
 header "Airy cfgs"
 source ~/.shell/profile
 
-case "${CURR_PROF:=headless}" in
-laptop|home|work) PKG_LIST=(
-    shell 'shell/*' core 'dev/*' 'term/*'
-    Xrc 'Xrc/*' 'net/*' 'browser/*' media 'media/*'
-) ;; *) PKG_LIST=(shell zsh git ranger tmux vim elinks)
-;; esac
+
+## NOTE: installs folder of configs, instead whole or individual
+if cfgOpt s; then PKG_LIST="$ARGS"
+else case "${CURR_PROF:=headless}" in
+laptop|home|work) PKG_LIST=(shell 'shell/*' core 'dev/*' 'term/*'
+        Xrc 'Xrc/*' 'net/*' 'browser/*' media 'media/*') ;;
+headless) PKG_LIST=(shell zsh git ranger tmux vim elinks)
+        if has_pr X; then PKG_LIST+=(urxvt); fi ;;
+*) die "No such profile" ;; esac; fi
+
 
 for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl

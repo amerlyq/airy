@@ -4,7 +4,7 @@ source ~/.shell/func.d/packages
 [[ "${CURR_PROF?No}" == work ]] || exit 0
 
 if distro arch; then
-    aur_inst gbs
+    aur_inst python-docutils gbs
 
     # Separately build deltarpm (fix PKGBUILD in AUR)
     #   https://gitlab.com/necrose99/deltarpm

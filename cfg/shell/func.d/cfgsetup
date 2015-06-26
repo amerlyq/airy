@@ -17,7 +17,7 @@ dark|light|lucid|opaque) THEME="${1}" ;;
       --reset) cfgOptAdd ru ;;
       --debug) cfgOptAdd ud ;;
      -s|--set) cfgOptAdd s; ARGS="$2" ;;
-?*) echo "Error: no such option '$1'"; exit 1 ;;
+?*) echo "Error: unsupported argument '$1'"; exit 1 ;;
 esac; done
 
 ### LINKS ###

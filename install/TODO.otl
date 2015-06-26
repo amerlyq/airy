@@ -183,6 +183,13 @@ Optimize boot time (both kernel and bootloader)
 	Focus on delays -- enable logs and watch
 	'quiet' to disable printing
 	$ perf, oprofile, strace, bootchart
+	E4rat
+		https://wiki.archlinux.org/index.php/Ext4#Tips_and_tricks
+		: E4rat is a preload application designed for the ext4 filesystem. It
+		: monitors files opened during boot, optimizes their placement on the
+		: partition to improve access time, and preloads them at the very
+		: beginning of the boot process. E4rat does not offer improvements
+		: with SSDs, whose access time is negligible compared to hard disks.
 
 
 Games on

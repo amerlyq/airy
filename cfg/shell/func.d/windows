@@ -39,8 +39,7 @@ amScriptDir() {
     fi
     [ "$1" != "-s" ] && echo "> ARG0=${SCRIPT_PATH}"
     if [ "${SCRIPT_PATH:0:1}" != '/' ]; then
-        echo "Error: \${SCRIPT_PATH}=${SCRIPT_PATH} is not full path to script"
-        squit
+        die "Error: \${SCRIPT_PATH}=${SCRIPT_PATH} is not full path to script"
     fi
 
     SCRIPT_DIR=$(win2unix "${SCRIPT_PATH}")
@@ -83,7 +82,7 @@ export -f safeLinkRemove
 makeDstBackup()
 {
     local dst="$2" dsttmp="${dst}.bak_"
-    if [ -z "$1" ]; then echo "Error: empty 'remove_function"; squit; fi
+    if [ -z "$1" ]; then die "Error: empty 'remove_function"; fi
     # TODO: !!! Поломанные симлинки на винде из-под mingw НИКАК не определяются !!!
     # тоесть все имеющиеся флаги проверки на существование файла, симлинка или чего угодно тупо не работают
     # Надо всё-таки проверить всё и поробовать найти хоть что-то
@@ -97,7 +96,7 @@ export -f makeDstBackup
 removeDstDublicate()
 { # $1 -- rm, 'rm -Rf' or safeLinkRemove
     local dst="$2" dstbak="$2.bak" dsttmp="$2.bak_"
-    if [ -z "$1" ]; then echo "Error: empty 'remove_function"; squit; fi
+    if [ -z "$1" ]; then die "Error: empty 'remove_function"; fi
     if [ -e "${dsttmp}" ]; then
         # this only for unix: $(stat -c "%d.%i" -L ${dstbak}_)
         # however, it seems don't work for dangling links (in nowere)

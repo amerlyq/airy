@@ -1,0 +1,37 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# https://wiki.archlinux.org/index.php/Kernels/Compilation/Arch_Build_System
+
+if distro arch; then
+    pkg_inst abs
+
+    dir=~/sdk/kernel
+    mkdir -p $dir && cd $dir
+    ABSROOT=. abs core/linux  #-t
+    cd ./core/linux
+
+    sed -ri '/^(pkgbase=).*/s//\1linux-custom/' PKGBUILD
+
+    ## Setup options (or cli/gui tools inside PKGBUILD to edit)
+    sed -ri '/.*(CONFIG_KGDB).*/s//\1\=y/' config.x86_64
+
+    ## Fetch kernel sources
+    updpkgsums
+
+    ## Build and dld dependencies (10m~1h)
+    # FIXME: don't skip, use gnupg for sig checking:
+    #  https://wiki.archlinux.org/index.php/Makepkg#Signature_checking
+    makepkg --skippgpcheck -s
+    #: You can use multithreading: edit /etc/makepkg.conf
+    #:: MAKEFLAGS="-j4"
+
+    # Look at linux.install -- some vars will be changed
+    ## Install
+    # pacman -U linux-headers-custom  # Must be first -- as used for LKM build hooks
+    # pacman -U linux-custom
+    # grub-mkconfig -- add default/fallback kernel entries to grub
+
+elif distro ubuntu; then
+    echo "Err: no"
+fi
