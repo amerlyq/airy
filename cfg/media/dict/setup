@@ -7,6 +7,8 @@ dir=/etc/dictd
 # Create symlink, if it doesn't exist or points to another place
 [[ "$PWD" -ef $dir ]] || sudo ln -sfvT "$PWD" $dir
 
+echo "Err: dict"
+exit
 
 if cfgOpt u; then
     ## Add dictionaries to dictd

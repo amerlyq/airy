@@ -1,0 +1,44 @@
+From grub2 loop iso
+	menuentry "ArchLinux ISO" {
+		loopback loop (hd0,3)/iso/arch.iso
+		linux    (loop)/boot/vmlinuz26 findiso=/iso/arch.iso lang=en locale=en_US.UTF-8 archisolabel=ARCHISO_KE1AECIE ramdisk_size=75%
+		initrd   (loop)/boot/archiso_pata.img
+		boot
+	}
+	menuentry "Arch Net Install Try" {
+		set isofile="/archlinux-2011.08.19-netinstall-i686.iso"
+		loopback loop (hd0,3)$isofile
+		linux (loop)/arch/boot/i686/vmlinuz archisolabel=ARCH_201108 img_dev=/dev/sdb3 img_loop=$isofile earlymodules=loop
+		initrd (loop)/arch/boot/i686/archiso.img
+	}
+
+SEE: docs with possible entries to boot archiso
+	https://github.com/djgera/archiso/tree/master/docs
+	https://patchwork.archlinux.org/patch/573/
+
+-menuentry "Arch Linux (x86_64)" {
+-    set isofile="/<TARGET-PATH>/archlinux-<YYYY>.<MM>.<DD>-<ARCH>.iso"
+-    loopback loop (hd<D>,<P>)$isofile
+-    linux (loop)/arch/boot/x86_64/vmlinuz archisolabel=<FS-LABEL> img_label=<TARGET-FS-LABEL> img_loop=$isofile
+-    initrd (loop)/arch/boot/x86_64/archiso.img
+-}
+	menuentry "Arch64iso" --class iso {
+		set isofile="/amer/VMs/_res/archlinux-2015.06.01-dual.iso"
+		loopback loop (hd0,msdos7)$isofile
+		linux (loop)/arch/boot/x86_64/vmlinuz archisolabel=ARCH_201506 img_dev=/dev/sda7 img_loop=$isofile
+		initrd (loop)/arch/boot/x86_64/archiso.img
+	}
+
+Display partitions known to GRUB.
+	ls
+Display the contents of the / folder on /dev/sdXY
+	ls (hdX,Y)/<Tab>
+To mount an ISO via the GRUB terminal, determine the location/path of the ISO file, then:
+	loopback loop (hdX,Y)/<path>/<filename.iso>
+	: loopback loop (hd0,5)/my_isos/ubuntu-12.04-desktop-amd64.iso
+Once mounted via the above command, the ISO can be inspected using the ls
+command. The ISO will be mounted on "(loop)".
+	ls (loop)/
+	ls (loop)/casper
+On an Ubuntu ISO, this should display vmlinuz and initrd.img, among other files.
+

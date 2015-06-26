@@ -13,8 +13,14 @@ if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
     # Stop the daemon and disable from starting on boot:
     # Because being launched by init.d it has no access to ~/.ncmpcpp
     # TODO: Maybe with systemd all will be ok?
-    sudo service mpd stop
-    sudo update-rc.d mpd disable
+    if distro arch; then
+        sudo systemctl stop mpd
+
+    elif distro ubuntu; then
+        sudo service mpd stop
+        sudo update-rc.d mpd disable
+    fi
+
     mkdir -p "$dir/playlists"
     touch $dir/{db,log,pid,state}
     # Check if running: sudo /etc/init.d/mp status | grep -c "is running"

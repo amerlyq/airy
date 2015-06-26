@@ -4,7 +4,7 @@ if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exi
 
 ### Add AUR repository to the end
 cfg=/etc/pacman.conf
-sed -ri '/#%BEGIN_AUR/,/#%END_AUR/d; /^\[core\]/,$d' $cfg
+sed -ri '/#%BEGIN_AUR/,/#%END_AUR/d' $cfg
 cat >> $cfg <<EOT
 #%BEGIN_AUR
 ## AUR: https://archlinux.fr/yaourt-en

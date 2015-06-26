@@ -1,12 +1,10 @@
 # vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
+source ~/.shell/func.d/system
 
 # FIXME: even with those options, pkgbuild errors are not catched
 set -o errexit
 set -o pipefail
 # [[ $- =~ i ]] && return || exit
-
-cfgOpt(){ [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
-cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 
 for arg in "$@"; do case "$arg" in
 dark|light|lucid|opaque) THEME="${1}" ;;
@@ -23,7 +21,6 @@ dark|light|lucid|opaque) THEME="${1}" ;;
 esac; done
 
 ### LINKS ###
-has_pr(){ hash $1 >/dev/null 2>&1; }
 run() { has_pr && /usr/bin/env $@; }
 # FIXME: this must be moved into func.d/cfgsetup -- to catch errors smoothly
 link(){ if [[ ! -e "$2" || -L "$2" ]]; then

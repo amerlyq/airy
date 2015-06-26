@@ -30,7 +30,7 @@ class actualee(Command):
     def execute(self):
         s = [f.path for f in self.fm.thisdir.files]
         index = s.index(self.fm.thisfile.path)
-        with open(actualee.FL, 'wb') as f:
+        with open(actualee.FL, 'w') as f:
             f.write("\n".join(s[index:] + s[:index]))
 
         if self.fm.thisfile.is_file:

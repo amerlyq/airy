@@ -67,8 +67,8 @@ do_each arch-chroot /mnt /bin/bash -c ~/host/ <<EOTHOST
 00-setup $zone
 10-network $CURR_HOST
 $(hopt v && echo "15-network-vbox $VBOX_HOST_IP")
-20-boot $sd
-$(hopt v && echo "22-boot-vbox $sd")
+20-grub $sd
+$(hopt v && echo "22-grub-vbox $sd")
 40-AUR
 50-X
 80-add-user $user

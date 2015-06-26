@@ -17,4 +17,9 @@ case "$1" in
      *) pstop $@ ;;
 esac
 
+# if [ "$CURR_PLTF" == "MINGW" ]; then
+#     # -s = silent, -n1 = only one symbol needed to continue after the insert
+#     read -sn1 -p "Paused: press any key to continue..."
+# fi
+
 exit $ERR

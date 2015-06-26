@@ -2,12 +2,11 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD/profile" ~/.profile
-
+#link "$PWD/profile" ~/.profile
+echo "Err: FIXME"
 
 # if distro ubuntu; then:
 # update-alternatives : x-session-manager cinnamon-session-cinnamon
-distro(){ grep -iq "$1" <<<"${DISTRO:=$(uname -rv)}"; }
 if distro ubuntu; then (cd ./ubuntu
     ./xsessionrc.gen
 

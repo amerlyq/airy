@@ -4,7 +4,9 @@ source ~/.shell/func.d/packages
 # | urxvt | fast terminal, image support, perl extensions
 
 if distro arch; then
-    aur_inst 'rxvt-unicode-patched' || pkg_inst 'rxvt-unicode'
+    if cfgOpt u || ! has_pr urxvt; then
+        aur_inst 'rxvt-unicode-patched' || pkg_inst 'rxvt-unicode'
+    fi
 
 elif distro ubuntu; then
     pkg_inst 'rxvt-unicode-256color'

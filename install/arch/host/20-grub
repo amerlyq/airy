@@ -7,6 +7,18 @@ sdX="${1?No sdX disk specified for grub}"
 # Set correct hooks (lvm,usb...) in /etc/mkinitcpio.conf
 # mkinitcpio -p linux
 
+# My USB legacy support was set to 'Auto'. I remember switching it to 'Enabled'
+# previously. Somehow it was switched back to Auto. So I changed it to Enabled
+# and everything went running smoothly. I can now enter bios settings and also
+# choose OS from the Grub OS list
+
+# However the bios setting for "Fast Boot" had additional setting for usb
+# support, which was disabled (implying usb will only become available after os
+# loads). Changing it to Partial (usb with keyboard and mouse available) or
+# Full Initialization (Full Support of all usb devices at any time) solved the
+# problem.
+
+It has been currently set to Partial Initialization to get some balance between boot speed and minimal support needed.
 
 ### Bootloader
 pacman -S --noconfirm grub os-prober
@@ -23,8 +35,8 @@ mv -vf /etc/default/grub{,.bkp}
 cat >/etc/default/grub <<-'EOT'
 GRUB_DEFAULT=0
 GRUB_SAVEDEFAULT=true
-GRUB_TIMEOUT=15
-GRUB_TIMEOUT_STYLE=countdown  # hidden / countdown / menu
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden  # hidden / countdown / menu
 
 GRUB_DISTRIBUTOR="Arch"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash"

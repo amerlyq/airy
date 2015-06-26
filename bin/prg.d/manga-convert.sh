@@ -145,5 +145,3 @@ for fnm in "$SRC"/*; do
         oneTask "$fnm" | tee "$LOG/${fnm##*/}.log"
     fi
 done
-
-amPause

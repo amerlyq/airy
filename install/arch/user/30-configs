@@ -1,5 +1,4 @@
 #!/bin/bash -e
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
 
 wfile() { printf "%s" "${2?No text}" > "${1?No file name}"; }
 wscript() { wfile "$1" "$2" && chmod u+x "$1"; }

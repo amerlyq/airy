@@ -9,12 +9,13 @@ source ~/.shell/func.d/packages
 #| urlview | Extracting URLs from text files and displaying a menu from which
 #|_________|    you may launch a command to view a specific item
 
-pkg_inst "at htop dstat urlview jshon"
+pkg_inst "at htop dstat jshon"
 
 if distro arch; then
-    aur_inst silver-searcher-git
+    pkg_inst the_silver_searcher
 
 elif distro ubuntu; then
+    pkg_inst urlview  # No for arch?
     # pkg_inst silversearcher-ag
     pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
     git_inst "ggreer/the_silver_searcher"

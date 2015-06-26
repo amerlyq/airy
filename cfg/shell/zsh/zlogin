@@ -22,3 +22,5 @@
 #  (force adding a line of scrollback after the initial window opening)
 # WARNING: don't place at ~/.zshrc, as it will erase scrollback on 's' in ranger
 printf '\e[99999;H\n\e[H'
+
+[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx

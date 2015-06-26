@@ -1,7 +1,10 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst dict dictd
+pkg_inst dictd
+if distro ubuntu; then
+    pkg_inst dict 
+fi
 
 # dict-moby-thesaurus dict-gcide dict-freedict-eng-rus dict-wn dict-devil
 # dictconv dictfmt dictzip

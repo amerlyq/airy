@@ -2,12 +2,12 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst 'ranger fbida libcaca poppler'
+    pkg_inst 'ranger fbida libcaca poppler p7zip'
 
 else
     # git_inst 'amerlyq/ranger'
     git_inst 'hut/ranger'
-    pkg_inst 'fbi caca-utils poppler-utils w3m-img'
+    pkg_inst 'fbi caca-utils poppler-utils w3m-img p7zip-full'
 fi
 
 #| fbi        | framebuffer image viewer for terminal
@@ -22,7 +22,7 @@ fi
 #|            | such as line and ellipses drawing, triangle filling and
 #|            | sprite blitting.
 
-pkg_inst 'w3m atool p7zip-full unrar zip mediainfo colordiff highlight'
+pkg_inst 'w3m atool unrar zip mediainfo colordiff highlight'
 #| w3m | supports images (xterm, framebuffer console), but it doesn’t support JavaScript.
 #| atool      | previews of archives
 #| highlight  | syntax highlighting of code

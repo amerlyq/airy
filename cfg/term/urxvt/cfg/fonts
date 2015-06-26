@@ -11,13 +11,16 @@ URxvt*letterSpace:    -1
 ! xft:Clean:size=12
 ! xft:PowerlineSymbols:style=Medium
 
+#define FONT1 xft:PragmataPro:pixelsize=15
+#define FONT2 xft:DejaVu Sans Mono:pixelsize=15
+#define FONT3 xft:DejaVu Sans Mono for Powerline:pixelsize=15
 
-!URxvt*imFont:           xft:DejaVu Sans Mono:regular:pixelsize=14, xft:DejaVu Sans Mono for Powerline:regular:pixelsize=14
+!URxvt*imFont:         FONT1:regular,     FONT2:regular,     FONT3:regular
 !! WARNING: Dont use spaces before "," if you want the working "font-size".
-URxvt*font:            xft:PragmataPro:regular:pixelsize=15,     xft:DejaVu Sans Mono:regular:pixelsize=15,     xft:DejaVu Sans Mono for Powerline:regular:pixelsize=15
-URxvt*boldFont:        xft:PragmataPro:bold:pixelsize=15,        xft:DejaVu Sans Mono:bold:pixelsize=15,        xft:DejaVu Sans Mono for Powerline:bold:pixelsize=15
-URxvt*italicFont:      xft:PragmataPro:italic:pixelsize=15,      xft:DejaVu Sans Mono:italic:pixelsize=15,      xft:DejaVu Sans Mono for Powerline:italic:pixelsize=15
-URxvt*bolditalicFont:  xft:PragmataPro:bold:italic:pixelsize=15, xft:DejaVu Sans Mono:bold:italic:pixelsize=15, xft:DejaVu Sans Mono for Powerline:bold:italic:pixelsize=15
+URxvt*font:            FONT1:regular,     FONT2:regular,     FONT3:regular
+URxvt*boldFont:        FONT1:bold,        FONT2:bold,        FONT3:bold
+URxvt*italicFont:      FONT1:italic,      FONT2:italic,      FONT3:italic
+URxvt*bolditalicFont:  FONT1:bold:italic, FONT2:bold:italic, FONT3:bold:italic
 
 ! Xft (X FreeType) with Bitstream, DejaVu, Liberation, or Terminus fonts:
 !  Fedora/debian packages: libXft/libxft2

@@ -28,5 +28,3 @@ add_port_forward "${VNM}" "Port_ssh" "tcp,,$SIR_PORT,,22"
 
 # See options:
 # VBoxManage modifyvm --help  2>&1 | grep 3d
-
-amPause

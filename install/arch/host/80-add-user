@@ -6,8 +6,8 @@ user="${1?No user}"
 
 ### ADD users:  https://wiki.archlinux.org/index.php/Users_and_groups#User_groups
 # adbusers, mpd, vboxsf, vboxusers, wireshark
-groupadd $user
-useradd -m -g $user -G users,wheel,uucp -s /bin/bash $user
+id -g $user || groupadd $user
+id -u $user || useradd -m -g $user -G users,wheel,uucp -s /bin/bash $user
 printf "%s" $user:$user | chpasswd
 echo ":: created '$user' password"
 
@@ -16,7 +16,7 @@ echo ":: created '$user' password"
 entry="$user ALL=(ALL) \
 NOPASSWD:/sbin/reboot,/sbin/halt,/sbin/shutdown,/sbin/poweroff"
 dst=/etc/sudoers
-sed -i '/.*\(%wheel ALL=(ALL) ALL\)/s/\1/' $dst  # Uncomment group 'wheel'
+sed -i '/.*\(%wheel ALL=(ALL) ALL\)/s//\1/' $dst  # Uncomment group 'wheel'
 sed -i "/^$user ALL=(ALL) NOPASSWD/d" $dst       # Add specific rights
 echo "$entry" | tee --append $dst
 echo ":: sudo '$user' enabled"

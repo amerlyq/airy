@@ -1,5 +1,64 @@
 # vim: ft=sh
 source ~/.shell/profile
+# ======================== System =============================
+
+unix2win() { # -> g:\#
+    local t="$*"
+    [ "${t:0:1}" == '/' ] && t="${t:1}"
+    [ "${t:1:1}" != ':' ] && t="${t:0:1}:${t:1}"
+    echo "${t//\//\\}"
+}
+export -f unix2win
+
+win2unix() { # -> /g/#
+    local t="$*"
+    [ "${t:0:1}" == '"' ] && t="${t//\"/}"
+    [ "${t:0:1}" != '/' ] && t="/${t}"
+    [ "${t:2:1}" == ':' ] && t="${t:0:2}${t:3}"
+    echo "${t//\\//}"
+}
+export -f win2unix
+
+# MacOS: Darwi[n], Linux, Win: MINGW[32_NT_6_1], Cygwin: CYGWIN
+# SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]}) #/${0##*/}
+# SCRIPT_DIR=$(cd ${0%\\*} && pwd) # win: %\\*, unix: %/*
+
+amScriptDir() {
+    echo ''
+    CURR_PLTF 2&> /dev/null || CURR_PLTF=$(expr substr $(uname -s) 1 5)
+    if [ "${0:0:2}" != "./" ]; then
+        SCRIPT_PATH="$(win2unix ${0})"
+    else
+        if [ "$CURR_PLTF" == "Linux" ]; then
+            type readlink >/dev/null && SCRIPT_PATH="$(readlink -m ${0})";
+            #else READLINK=greadlink; fi
+        elif [ "$CURR_PLTF" == "MINGW" ]; then
+            SCRIPT_PATH="$(pwd)/${0##*/}";
+            echo $SCRIPT_PATH
+        fi
+    fi
+    [ "$1" != "-s" ] && echo "> ARG0=${SCRIPT_PATH}"
+    if [ "${SCRIPT_PATH:0:1}" != '/' ]; then
+        echo "Error: \${SCRIPT_PATH}=${SCRIPT_PATH} is not full path to script"
+        squit
+    fi
+
+    SCRIPT_DIR=$(win2unix "${SCRIPT_PATH}")
+    SCRIPT_DIR="${SCRIPT_DIR%/*}"
+
+    #if [ "${SCRIPT_PATH:1:1}" == ":" ]; then
+    #    SCRIPT_DIR="${SCRIPT_DIR%\\*}"
+    #else
+    #    SCRIPT_DIR="${SCRIPT_DIR%/*}"
+    #fi
+
+    RELATIVE_DIR="$(pwd)"
+    SCRIPT_DIR=$(cd "$SCRIPT_DIR" && pwd)
+
+    [ "$1" != "-s" ] && echo "> RELATIVE_DIR=$RELATIVE_DIR"
+    [ "$1" != "-s" ] && echo "> SCRIPT_DIR=$SCRIPT_DIR"
+}
+export -f amScriptDir
 
 # ====================== Backuping configs ====================
 

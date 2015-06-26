@@ -2,7 +2,9 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    aur_inst copyq
+    if cfgOpt u || ! has_pr copyq; then
+        aur_inst copyq
+    fi
 
 elif distro ubuntu; then
     # libxtst-dev (optional; auto-paste into some applications),

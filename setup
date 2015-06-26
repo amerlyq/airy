@@ -10,6 +10,7 @@ pretty() { sed "
             / <<<$/s//\]$(tput sgr0)/g
     /\(C\|W\):\s.*/s//$(tput setaf 13)&$(tput sgr0)/
        /\(N\):\s.*/s//$(tput setaf 6)&$(tput sgr0)/
+   /\(E|Err\):\s.*/s//$(tput setaf 1)&$(tput sgr0)/
        /.*\s->\s.*/s//$(tput setaf 4)&$(tput sgr0)/
 ";}
 
@@ -41,7 +42,7 @@ for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl
     do echo ">>> $fl <<<"
         if cfgOpt i && [[ -f "${fl%/*}/install" ]]
-        then "${fl%/*}/install"; echo; fi
+        then "${fl%/*}/install" $ARGS; echo; fi
         $fl $ARGS
     done
 done | pretty

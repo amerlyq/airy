@@ -4,7 +4,14 @@ source ~/.shell/func.d/packages
 # | pidgin-sipe        | Office Communicator plugin
 # | pidgin-plugin-pack | Primarily for convenient history plugin
 
-pkg_inst 'pidgin pidgin-sipe pidgin-plugin-pack myspell-ru'
+pkg_inst 'pidgin pidgin-sipe'
+
+if distro arch; then
+    pkg_inst 'pidgin-encryption'
+elif distro ubuntu; then
+    pkg_inst 'pidgin-plugin-pack myspell-ru'
+fi
+
 
 ### ON DEMAND ###
 # finch   | TUI interface to pidgin

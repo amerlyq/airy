@@ -1,0 +1,39 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+[[ "${CURR_PROF?No}" == work ]] || exit 0
+
+if distro arch; then
+    aur_inst gbs
+
+    # Separately build deltarpm (fix PKGBUILD in AUR)
+    #   https://gitlab.com/necrose99/deltarpm
+    # source=("https://gitlab.com/necrose99/deltarpm/repository/archive.tar.bz2")
+    # md5sum("...")  # count by yourself
+    # cd "deltarpm.git"
+
+elif distro ubuntu; then
+    # Necessary packets for tizen-sdk
+    pkg_inst expect libudev-dev
+
+    # sdb needs libudev.so.0
+    sudo ln -sfv libudev.so.1 /lib/x86_64-linux-gnu/libudev.so.0
+
+    # Install Oracle Java (OpenJDK isn't compatible)
+    # ppa_add 'ppa:webupd8team/java'
+    # pkg_inst oracle-java8-installer
+
+
+    printf "
+    >>> In Launched ./tizen-sdk-ubuntu64-v2.2.71.bin
+    -> 'Install the new Tizen SDK version'
+    -> 'SDK Image' {~/share/Tizen/Images/tizen-sdk-image-2.2.1-ubuntu64.zip}
+    "
+    printf '
+    !!! Add those vars to yours .bashrc ::
+        export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+        export TRUSTZONE_SDK_DIR=~/Gaia/TZ/trustzone-tee
+        export PATH=$TRUSTZONE_SDK_DIR/toolchain/cortex-cross-tools/bin:$PATH
+        export PATH=$PATH:/home/surc/Tizen/tizen-sdk/tools
+    '
+fi

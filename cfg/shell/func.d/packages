@@ -1,8 +1,6 @@
 # vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 source ~/.shell/profile
-
-cfgOpt(){ [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
-cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
+source ~/.shell/func.d/system
 
 for arg in "$@"; do case "$arg" in
   # Re-install even if git pull is up-to-date (for broken builds)
@@ -11,7 +9,6 @@ esac; done
 
 CURR_DIR_PKG="${CURR_DIR_PKG:-~/pkg}"
 mkdir -vp "$CURR_DIR_PKG"
-distro(){ cat /etc/os-release | grep -iq "$1"; }
 
 
 if distro ubuntu; then
@@ -31,7 +28,7 @@ elif distro arch; then
   pkg_inst(){ sudo pacman -S --noconfirm $@; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
   if hash yaourt >/dev/null 2>&1
-  then aur_inst(){ sudo yaourt -S --noconfirm $@; }
+  then aur_inst(){ yaourt -S --noconfirm $@; }
   else aur_inst(){ return 1; }
   fi
 
