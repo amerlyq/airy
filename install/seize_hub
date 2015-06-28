@@ -1,32 +1,44 @@
 #!/bin/bash -e
+CURR_DIR_PKG=~/hub  # Change dst dir
 source ~/.shell/func.d/packages
 
 ### Learning ###
-git_get 'shadowbq/Cheat-Sheets'
-git_get 'BinRoot/Haskell-Data-Analysis-Cookbook'
-git_get 'sjl/learnvimscriptthehardway'
+git_inst -d 'shadowbq/Cheat-Sheets'
+git_inst -d 'BinRoot/Haskell-Data-Analysis-Cookbook'
+git_inst -d 'sjl/learnvimscriptthehardway'
+## Modeling With Data
+# http://modelingwithdata.org/about_the_book.html
 
 ### Integrate ###
-git_get 'robbyrussell/oh-my-zsh.git'
-#git_get vispy #for python primes
+git_inst -d 'robbyrussell/oh-my-zsh.git'
+#git_inst -d vispy #for python primes interactive scientific visualization
 
 # SEE for dependencies: http://www.graphviz.org/Download_source.php
-git_get 'ellson/graphviz'
+git_inst -d 'ellson/graphviz'
 
 
 ### System & Kernel ###
 # System Programming:  lessons and examples -- smashing stack, etc
 # https://github.com/angrave/SystemProgramming/wiki
+## Boot: modern MBR, etc
+# git_inst -d 'http://review.coreboot.org/p/coreboot.git'
 
 
 ### Frameworks ###
 
 # SDL2.0
 # hg clone http://hg.libsdl.org/SDL
+# git_inst -d 'libRocket/libRocket'
+# hg_inst -d 'gabomdq/ignifuga'
 
 # Code with examples for Qt
-# git_get 'git://code.qt.io/qt/qt.git'
-# git_get 'Werkov/PyQt4'
-git_get 'baoboa/pyqt5'
+# git_inst -d 'git://code.qt.io/qt/qt.git'
+# git_inst -d 'Werkov/PyQt4'
+git_inst -d 'baoboa/pyqt5'
+
+
+
+### Opengl ###
+hg_inst -d 'https://code.google.com/p/flyinghigh-opengl-from-python/'
 
 echo "DONE"
