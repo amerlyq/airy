@@ -1,0 +1,34 @@
+# vim: ft=sh
+SYS_PRF='kernel'
+
+# ============= Host ===================================================
+
+VM_NAME='arch-kernel64'
+VM_HDD=10240  # MB
+
+declare -A VM_OVER
+VM_OVER+=( [memory]=1024  [vram]=16  [accelerate3d]=off  [usb]=off
+           [clipboard]=disabled  [audio]=none  [firmware]=bios )
+
+# Custom local pkg server
+VM_MIRROR="http://192.168.56.1:23208"
+
+# ============ System ==================================================
+
+SYS_IP='192.168.56.11'
+SYS_USER=root
+SYS_HOST=kernelvbox
+
+# MBR/GPT
+SYS_DISK="/dev/sda"
+SYS_PREF="$SYS_DISK"
+
+## Order determines disk layout
+SYS_PART=(   1     2 )
+SYS_SIZE=(  1G '100%')
+SYS_MNT=(    % /home )
+SYS_FS=(  swap btrfs )
+
+
+SYS_SOFT="base openssh"
+SYS_ENABLED=( mbr lan vbox console serial )

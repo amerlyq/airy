@@ -1,7 +1,6 @@
 #!/bin/bash -e
-
-wfile() { printf "%s" "${2?No text}" > "${1?No file name}"; }
-wscript() { wfile "$1" "$2" && chmod u+x "$1"; }
+source ~/sys_funcs
+is_enabled 'X' || exit 0
 
 # Those scripts must provide only basic strokes to load X.
 # They will be completely replaced by user setup from git.

@@ -1,19 +1,19 @@
-#!/usr/bin/env bash
-if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+#!/bin/bash -e
+source ~/sys_funcs
 
 
 ### Select a mirror.
 fl=/etc/pacman.d/mirrorlist
 tmp=/tmp/mirror.tmp
 # TODO: Add fetching and sorting for mirror list?
-cat > $tmp <<EOT
+cat > $tmp <<-'EOT'
 #%BEGIN Prepended during install
 
 ## Score: 0.7, Ukraine -- 6MiB/s, stable
-Server = http://archlinux.bln-ua.net/\$repo/os/\$arch
+Server = http://archlinux.bln-ua.net/$repo/os/$arch
 
 ## Score: 25.8, Ukraine -- 11MiB/s, but some packages are <1MiB/s
-Server = http://mirrors.nix.org.ua/linux/archlinux/\$repo/os/\$arch
+Server = http://mirrors.nix.org.ua/linux/archlinux/$repo/os/$arch
 
 #%END
 EOT
@@ -23,10 +23,8 @@ echo ":: mirrors selected"
 
 
 ### BASE SOFT
-# NOTE: need 'sudo' for 'airy/cfg/shell/func.d/packages'
-soft="base base-devel openssh wget sudo btrfs-progs"  #  sshfs gnupg pinentry
 if [[ ! -d "/mnt/usr/bin" ]]; then
     ## Install the base system  # -i -- interactive
-    pacstrap /mnt $soft || exit
+    pacstrap /mnt ${SYS_SOFT:?No} || exit
     echo ":: packstrap installed"
 fi

@@ -1,6 +1,7 @@
-#!/usr/bin/env bash
-if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
-cd $(dirname $(readlink -m ${0}))
+#!/bin/bash -e
+source ~/sys_funcs
+echo "Err: broken, fix for current snippets"
+exit 1
 
 user="tester"
 zone="Europe/Kiev"
@@ -40,8 +41,6 @@ if hopt -; then
 fi
 
 # ========================================================================
-
-timedatectl set-timezone "$zone"
 
 
 ### BASE step (1/3)

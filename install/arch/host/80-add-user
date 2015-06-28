@@ -1,7 +1,8 @@
 #!/bin/bash -e
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+source ~/sys_funcs
+is_enabled 'user' || exit 0
 
-user="${1?No user}"
+user="${SYS_USER:?No}"
 
 
 ### ADD users:  https://wiki.archlinux.org/index.php/Users_and_groups#User_groups
@@ -12,10 +13,13 @@ printf "%s" $user:$user | chpasswd
 echo ":: created '$user' password"
 
 
-## sudo for user
+### sudo for user
+pacman -S --noconfirm sudo
+
 entry="$user ALL=(ALL) \
 NOPASSWD:/sbin/reboot,/sbin/halt,/sbin/shutdown,/sbin/poweroff"
 dst=/etc/sudoers
+
 sed -i '/.*\(%wheel ALL=(ALL) ALL\)/s//\1/' $dst  # Uncomment group 'wheel'
 sed -i "/^$user ALL=(ALL) NOPASSWD/d" $dst       # Add specific rights
 echo "$entry" | tee --append $dst

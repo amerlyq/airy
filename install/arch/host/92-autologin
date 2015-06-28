@@ -1,31 +1,29 @@
 #!/bin/bash -e
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
-
-opts=${1?No opts}
-user=${2?No user}
+source ~/sys_funcs
+is_enabled 'vbox' || exit 0
 
 
 ### Autologin in virtual console
-case "$opts" in -a|-c)
+if is_enabled 'console'; then
 fl=/etc/systemd/system/getty@tty1.service.d/override.conf
 mkdir -p ${fl%/*}
 cat > $fl <<EOT
 [Service]
 Type=idle
 ExecStart=
-ExecStart=-/sbin/agetty --autologin $user --noclear %I 115200 linux
+ExecStart=-/sbin/agetty --autologin ${SYS_USER:?No} --noclear %I 115200 linux
 EOT
-;; esac
+fi
 
 
 ### Autologin in serial
-case "$opts" in -a|-s)
+if is_enabled 'serial'; then
 fl=/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf
 mkdir -p ${fl%/*}
 cat > $fl <<EOT
 [Service]
 Type=simple
 ExecStart=
-ExecStart=-/usr/bin/agetty --autologin $user -s %I 115200,38400,9600 vt102
+ExecStart=-/usr/bin/agetty --autologin ${SYS_USER:?No} -s %I 115200,38400,9600 vt102
 EOT
-;; esac
+fi

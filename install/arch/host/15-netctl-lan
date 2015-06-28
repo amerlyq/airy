@@ -1,0 +1,22 @@
+#!/bin/bash -e
+source ~/sys_funcs
+is_enabled 'lan' || exit 0
+
+nm=eth_dhcp
+
+### Network
+ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
+ifc=${ifcs[0]:?No}
+
+cat > /etc/netctl/${nm?No} <<EOT
+Description='General LAN dhcp connection'
+Interface=$ifc
+Connection=ethernet
+IP=dhcp
+EOT
+
+netctl enable $nm
+
+echo ":: $nm is active"
+
+# systemctl enable dhcpcd@${ifcs[0]}.service  # Disable if use netctl

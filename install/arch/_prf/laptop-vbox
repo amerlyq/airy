@@ -1,0 +1,39 @@
+# vim: ft=sh
+SYS_PRF='laptop-vbox'
+
+# ============= Host ===================================================
+
+VM_NAME='arch-laptop'
+VM_HDD=20480  # MB
+
+declare -A VM_OVER
+VM_OVER+=( [memory]=2048  [vram]=128  [accelerate3d]=on  [usb]=on
+           [clipboard]=bidirectional  [audio]=none  [firmware]=bios )
+
+# ============ System ==================================================
+
+SYS_USER=tester
+SYS_HOST=laptopvbox
+
+# LVM
+SYS_DISK="/dev/sda"
+SYS_PREF="/dev/mapper/lvm-"      # OR: pr="/dev/$gr/"
+
+#| boot  | Separate for kernels
+#| swap  | Need > 2/5 of RAM memory for suspend-to-disk
+#| root  | Main
+#| home  | Dev: cfgs, git, sdk...
+#| media | Large binary files
+
+## Order determines disk layout
+SYS_PART=( boot swap  root   home   media )
+SYS_SIZE=( 200M   1G    8G     4G  '+100%FREE' )
+SYS_MNT=( /boot    %     /  /home  /home/media)
+SYS_FS=(   ext4 swap btrfs  btrfs  ext4 )
+
+# Separate partition in lvm for source files -- ReiserFS
+#   Keep it of similar to overall size of sources to reduce fragmentation
+
+# NOTE: need 'sudo' for 'airy/cfg/shell/func.d/packages'
+SYS_SOFT="base base-devel btrfs-progs wget"  #  sshfs gnupg pinentry
+SYS_ENABLED=( lvm lan aur X user )

@@ -1,17 +1,16 @@
-#!/usr/bin/env bash
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
-
-loc="en_US.UTF-8"
-zone=/usr/share/zoneinfo/${1?No zone localtime}
+#!/bin/bash -e
+source ~/sys_funcs
 
 ## Console font
-cat > /etc/vconsole.conf <<EOT
-KEYMAP=us
-FONT=
-FONT_MAP=
-EOT
+# cat > /etc/vconsole.conf <<EOT
+# KEYMAP=us
+# FONT=
+# FONT_MAP=
+# EOT
 
-## Locale
+
+### Locale
+loc="en_US.UTF-8"
 sed -ri "s/^#(${loc}.*)\$/\1/" /etc/locale.gen
 locale-gen
 echo LANG=${loc} > /etc/locale.conf
@@ -20,6 +19,7 @@ echo ':: locale generated'
 
 
 ## Time
+zone="/usr/share/zoneinfo/Europe/Kiev"
 rm -vf /etc/localtime
 ln -sv $zone /etc/localtime
 # WARNING: dual boot with Windows: https://wiki.archlinux.org/index.php/Time#UTC_in_Windows

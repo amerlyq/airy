@@ -1,27 +1,32 @@
 #!/bin/bash -e
-if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+source ~/sys_funcs
 
-## Automounts in fstab (generate after pacstrap)
-fst=/mnt/etc/fstab
-sed -i '4q' $fst && genfstab -U -p /mnt >> $fst #&& less $fs
+
+### Automounts in fstab (generate after pacstrap)
+cfg=/mnt/etc/fstab
+mv -vf --backup=t ${cfg}{,}
+genfstab -U -p /mnt > $cfg
+# less $cfg  # WARNING: Check it!
+
+# TODO: (on media) sudo chown -R myname:myname /media/data/
+
+# Mount on-demand (0.15s for btrfs):  noauto,x-systemd.automount
 
 ## When editing fstab manually, get UUID of disks:
 #   lsblk -f
 #   lsblk -no UUID /dev/sda1
 
-# После создания fstab отредактируем его, убрав из опций монтирования файловых
-# систем rw,relatime,space_cache - они идут по умолчанию и в конфиге
-# дублировать их незачем. Пример fstab:
-# # /dev/sda
+
+## Btrfs instead of MBR/GPT
 # UUID=56edc366-a153-4eee-b2a6-471b7066b93d /     btrfs compress=lzo,autodefrag             0 0
 # # Как оказалось, параметр subvol=root можно не указывать, здесь он всё равно игнорируется, передаётся опцией rootflags=subvol=root к ядру.
 
-# # /dev/sda
-# UUID=56edc366-a153-4eee-b2a6-471b7066b93d /home btrfs compress=lzo,autodefrag,subvol=home 0 0
-
-# Хитрые опции noauto,x-systemd.automount позволяют смонтировать каталог в тот
-# момент, как только он потребуется, то есть не при загрузке, т.к. при старте
-# системы он не особо нужен (а выигрыш в целых 0.15 секунды!).
-# UUID=56edc366-a153-4eee-b2a6-471b7066b93d /var/cache/pacman/pkg btrfs noauto,x-systemd.automount,noatime,compress=lzo,autodefrag,subvol=pkg 0 0
 
 echo ":: fstab generated"
+
+## Bind the mounted filesystem with permissions for the current user (or any other user/group):
+# sudo mount -o user /dev/sdXN /media/disk
+# sudo bindfs -u $(id -u) -g $(id -g) /media/disk /home/user/new_disk
+
+# NTFS partitions -- user permissions, masks
+# UUID=12102C02102CEB81 /mnt/dataXYZ ntfs-3g auto,users,uid=1000,gid=100,dmask=027,fmask=137,ut f8 0 0

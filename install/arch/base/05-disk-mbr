@@ -1,0 +1,36 @@
+#!/bin/bash -e
+source ~/sys_funcs
+is_enabled 'mbr' || exit 0
+
+## Set MBR / GPT
+sd="${SYS_DISK:?No}"
+parted -s -a opt $sd mklabel msdos
+lsblk $sd
+
+
+## Profile for current disk
+prev_zs='1MB'
+for i in "${!SYS_PART[@]:?No}"
+do
+    num="${SYS_PART[$i]:?No}"
+    sz="${SYS_SIZE[$i]:?No}"
+    fs="${SYS_FS[$i]:?No}"
+    dev="${SYS_PREF?No}${num}"
+    opts="-s -a opt $sd mkpart primary"
+
+    if [[ "${SYS_MNT[$i]:?No}" =~ boot$ ]]; then
+        parted -s -a opt $sd set $num boot on
+    fi
+
+    case "$fs"
+    in  swap) parted $opts linux-swap $prev_sz $sz && mkswap $dev
+    ;;     *) parted $opts        $fs $prev_sz $sz && mkfs.${fs} $dev  # -L Media
+    ;; esac
+    prev_sz="$sz"
+done
+
+
+## Layout
+# parted -l
+lsblk $sd
+echo ":: disk mbr"

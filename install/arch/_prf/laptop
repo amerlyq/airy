@@ -1,0 +1,32 @@
+# vim: ft=sh
+SYS_PRF='laptop'
+
+# ============ System ==================================================
+
+SYS_ESSID='Amerlyq'
+SYS_IP='192.168.0.2'
+SYS_USER=user
+SYS_HOST=laptop
+
+# LVM
+SYS_DISK="/dev/sda"
+SYS_PREF="/dev/mapper/lvm-"      # OR: pr="/dev/$gr/"
+
+#| boot  | Separate for kernels
+#| swap  | Need > 2/5 of RAM memory for suspend-to-disk
+#| root  | Main
+#| home  | Dev: cfgs, git, sdk...
+#| media | Large binary files
+
+## Order determines disk layout (500GB)
+SYS_PART=( boot swap  root   home   media )
+SYS_SIZE=( 200M   2G   40G    40G  '+100%FREE' )
+SYS_MNT=( /boot    %     /  /home  /home/media)
+SYS_FS=(   ext4 swap btrfs  btrfs  ext4 )
+
+# Separate partition in lvm for source files -- ReiserFS
+#   Keep it of similar to overall size of sources to reduce fragmentation
+
+# NOTE: need 'sudo' for 'airy/cfg/shell/func.d/packages'
+SYS_SOFT="base base-devel btrfs-progs wget"  #  sshfs gnupg pinentry
+SYS_ENABLED=( lvm wifi aur X user )

@@ -1,0 +1,29 @@
+#!/bin/bash -e
+source ~/sys_funcs
+is_enabled 'vbox' || exit 0
+
+nm=vbox_static
+gate="${SYS_IP%.*}.1"
+vbhost=main
+
+if ! grep -q "$vbhost" /etc/hosts; then echo "${gate:?No} $vbhost" >> /etc/hosts
+else sed -i "s/\s$vbhost$/$gate $vbhost"; fi
+echo ':: writing host ended'
+
+ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
+
+cat > /etc/netctl/${nm:?No} <<EOT
+Description='VBox host-only connection'
+Interface=${ifcs[1]}
+Connection=ethernet
+IP=static
+Address=('${SYS_IP:?No}/24')
+# Routes=('${SYS_IP%.*}.0/24 via $gate')
+## Don't uncomment, or 'ip route' will be wrong and w/o inet
+# Gateway='${gate:?No}'
+# DNS=('$gate')
+EOT
+
+netctl enable $nm
+
+echo ":: $nm is active"

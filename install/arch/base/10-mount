@@ -1,0 +1,29 @@
+#!/bin/bash -e
+source ~/sys_funcs
+
+## Mounting
+if grep -qsw /mnt /proc/mounts; then die "Already mounted"; fi
+
+
+## Sort mount points alphabetically!
+order=( $(echo "${SYS_MNT[@]:?No}" | awk 'BEGIN{RS=" "} {a[$1]=i++} END{
+        PROCINFO["sorted_in"]="@ind_str_asc"; for(i in a)print a[i]}') )
+
+
+for i in "${order[@]:?No}"
+do
+    dev="${SYS_PREF?No}${SYS_PART[$i]:?No}"
+    dir="/mnt/${SYS_MNT[$i]:?No}"
+    fs="${SYS_FS[$i]:?No}"
+    # fs="$(blkid $dev | sed -r 's/.*TYPE="(\w+)".*/\1/')"
+
+    case "$fs"
+    in  swap) swapon $dev
+    ;;  ext?) mkdir -p $dir && mount $dev $dir
+    ;; btrfs) mkdir -p $dir && mount -o compress=lzo,autodefrag $dev $dir  #subvol=root,
+    ;;     *) die "Unknown FS" ;; esac
+done
+
+## Layout
+lsblk ${SYS_DISK:?No}
+echo ":: disk mounted"

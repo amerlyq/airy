@@ -1,11 +1,10 @@
-#!/usr/bin/env bash
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+#!/bin/bash -e
+source ~/sys_funcs
+is_enabled 'lvm' || exit 0
 
-
-## ?UNNECESSARY? vi /etc/rc.conf
+## CHECK: unnecessary? vi /etc/rc.conf
 #: USELVM="yes"
 
-### LVM ###
 
 ## Add lvm2 hook
 mv -vf --backup=t /etc/mkinitcpio.conf{,}
@@ -17,9 +16,11 @@ HOOKS="base udev autodetect modconf block lvm2 filesystems keyboard fsck"
 #COMPRESSION="gzip"
 #COMPRESSION_OPTIONS=""
 EOT
-## Show available hooks and help for them
-# mkinitcpio -L
-# mkinitcpio -H udev
 
 ## Re-create /boot/initrd.img-...
 mkinitcpio -p linux
+
+
+## Show available hooks and help for them
+# mkinitcpio -L
+# mkinitcpio -H udev

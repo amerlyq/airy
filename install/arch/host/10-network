@@ -1,47 +1,10 @@
 #!/bin/bash -e
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+source ~/sys_funcs
 
-myhost="${1?No current host name}"
+### Host
+echo "${SYS_HOST:?No}" > /etc/hostname
 
-## Host
-echo "$myhost" | tee /etc/hostname
-sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"$myhost"'/' /etc/hosts
-
+sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 '"${SYS_HOST:?No}"'/' /etc/hosts
 # NOTE: Need active dbus -- impossible at setup time
 # hostnamectl set-hostname "$myhost"
 echo ':: writing host ended'
-
-
-### Network
-ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
-# systemctl enable dhcpcd@${ifcs[0]}.service  # Disable if use netctl
-
-cat >/etc/netctl/eth_dhcp <<EOT
-Description='General network connection'
-Interface=${ifcs[0]}
-Connection=ethernet
-IP=dhcp
-EOT
-netctl enable eth_dhcp
-
-echo ':: eth_dhcp is active'
-
-## Wifi
-wfc=wlan0
-iwconfig
-ip link set $wfc up
-iwlist $wfc scan | less
-# OR: iw dev $wfc scan  ## For new netlink interface
-# vi /etc/wpa_supplicant.conf
-# ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
-# eapol_version=1
-# ap_scan=1
-# fast_reauth=1
-# wpa_passphrase SSID_NAME "PASSPHRASE" >> /etc/wpa_supplicant.conf
-# wpa_supplicant -B -Dwext -i $wfc -c /etc/wpa_supplicant.conf
-# dhcpcd $wfc
-# ip addr show $wfc
-
-
-### ENABLE Services
-systemctl enable sshd.service

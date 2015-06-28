@@ -1,0 +1,56 @@
+#!/bin/bash -e
+source ~/sys_funcs
+is_enabled 'wifi' || exit 0
+
+nm=wlan_static
+gate="${SYS_IP%.*}.1"
+
+## Wifi
+wfcs=($(ip link | sed -rn '/^[0-9]+:\s+(w\w+):.*$/{s//\1/p}'))
+wfc=${wfcs[0]:?No}
+
+
+cat > /etc/netctl/${nm?No} <<EOT
+Description='General Wi-Fi static connection'
+Interface=$wfc
+Connection=wireless
+Security=wpa
+ESSID='${SYS_ESSID:?No}'
+# Key='WirelessKey'
+IP=static
+Address='${SYS_IP:?No}/24'
+Gateway='$gate'
+DNS=('$gate')
+Hidden=yes
+EOT
+
+netctl enable $nm
+
+echo ":: $nm is active"
+
+
+## DHCP
+# Description='General Wi-Fi dhcp connection'
+# Interface=$wfc
+# Connection=wireless
+# Security=wpa
+# ESSID="${SYS_ESSID:?No}"
+# # Key='WirelessKey'
+# IP=static
+# # Priority=10
+
+
+# iwconfig
+# ip link set $wfc up
+# iwlist ${wfcs[0]} scan | less
+
+# OR: iw dev $wfc scan  ## For new netlink interface
+# vi /etc/wpa_supplicant.conf
+# ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
+# eapol_version=1
+# ap_scan=1
+# fast_reauth=1
+# wpa_passphrase SSID_NAME "PASSPHRASE" >> /etc/wpa_supplicant.conf
+# wpa_supplicant -B -Dwext -i $wfc -c /etc/wpa_supplicant.conf
+# dhcpcd $wfc
+# ip addr show $wfc

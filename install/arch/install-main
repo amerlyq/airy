@@ -1,0 +1,51 @@
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
+
+prf=laptop-vbox
+
+setup() {
+    loc src="$1" dst="$2"
+    [[ -d $dst/arch ]] || cp -vrT "$src/arch" $dst/arch
+    ln -svT $dst/arch/_prf/funcs     $dst/sys_funcs
+    ln -svT $dst/arch/_prf/${prf:?No}  $dst/sys_prf
+}
+
+# ========================================================================
+setup "$PWD" /root
+source ~/sys_funcs
+
+do_each /bin/bash -c ~/arch/base/ <<EOTBASE
+00-reset
+05-disk-lvm
+05-disk-mbr
+10-mount
+40-pacstrap
+50-fstab
+EOTBASE
+
+
+setup /root /mnt/root
+do_each arch-chroot /mnt /bin/bash -c ~/arch/host/ <<EOTHOST
+00-setup
+10-network
+15-netctl-lan
+15-netctl-wifi
+19-mkinitcpio
+20-grub
+40-AUR
+50-X
+80-add-user
+EOTHOST
+echo ':: <chroot> ended'
+
+
+if is_enabled user; then user="${SYS_USER:?No}"
+do_each arch-chroot /mnt /usr/bin/su $user -c "" <<EOTUSER
+chown -R $user:$user ~/arch && chmod -R 700 ~/arch
+~/arch/user/30-configs
+EOTUSER
+fi && echo ":: <su in chroot> ended"
+
+# umount -R /mnt
+
+echo '::: install complete, reboot now :::'

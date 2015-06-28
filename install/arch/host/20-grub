@@ -1,37 +1,49 @@
-#!/usr/bin/env bash
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+#!/bin/bash -e
+source ~/sys_funcs
 
-sdX="${1?No sdX disk specified for grub}"
 
+### Switcher
+  if is_enabled mbr; then mods='part_msdos'
+elif is_enabled gpt; then mods='part_gpt'
+elif is_enabled lvm; then mods='lvm'; fi
+
+if is_enabled serial; then args="console=ttyS0,115200n8"; terms="serial"; fi
+
+
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash "
+GRUB_CMDLINE_LINUX=""
+GRUB_TERMINAL="console serial"
 
 ### Bootloader
 pacman -S --noconfirm grub os-prober
 # ERROR: --core-compress=auto  -- Not recognized?
-grub-install --target=i386-pc --recheck ${sdX}
-rm -vf /boot/grub/grub.cfg
+grub-install --target=i386-pc --recheck ${SYS_DISK:?No}
 
 ## Change default grub:
 # info -f grub -n 'Simple configuration'
 # Press <Esc> to show menu.  Holding down the "SHIFT" key will not display the
 # menu if "GRUB_TIMEOUT=" is set to "0"
 # In future use 'sudo update-grub' after changes.
-mv -vf --backup=t /etc/default/grub{,}
-cat >/etc/default/grub <<-'EOT'
+cfg=/etc/default/grub
+mv -vf --backup=t ${cfg}{,}
+cat > $cfg <<-EOT
 GRUB_DEFAULT=0
 GRUB_SAVEDEFAULT=true
 GRUB_TIMEOUT=0
 GRUB_TIMEOUT_STYLE=hidden  # hidden / countdown / menu
 
 GRUB_DISTRIBUTOR="Arch"
-GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash ${args}"
 GRUB_CMDLINE_LINUX=""
-GRUB_TERMINAL="console"
+GRUB_TERMINAL="console $terms"
+$(is_enabled serial && echo 'GRUB_SERIAL_COMMAND="serial"' || echo)
 
 GRUB_GFXPAYLOAD_LINUX=text  # text / keep
 GRUB_DISABLE_RECOVERY=true
 # GRUB_ENABLE_CRYPTODISK=true
-GRUB_PRELOAD_MODULES="lvm"  # part_msdos, parg_gpt
+GRUB_PRELOAD_MODULES="${mods:?No}"
 EOT
 
 grub-mkconfig -o /boot/grub/grub.cfg
+
 echo ':: grub installed'

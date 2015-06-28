@@ -1,0 +1,37 @@
+# vim: ft=sh
+SYS_PRF='simple'
+
+# ============= Host ===================================================
+
+VM_NAME='arch-simple'
+VM_HDD=20480  # MB
+
+declare -A VM_OVER
+VM_OVER+=( [memory]=2048  [vram]=128  [accelerate3d]=off  [usb]=off
+           [clipboard]=disabled  [audio]=none  [firmware]=bios )
+
+# ============ System ==================================================
+
+SYS_IP='192.168.56.3'
+SYS_USER=user
+SYS_HOST=simplevbox
+
+# MBR/GPT
+SYS_DISK="/dev/sda"
+SYS_PREF="$SYS_DISK"
+
+#| boot  | Separate for kernels
+#| swap  | Need > 2/5 of RAM memory for suspend-to-disk
+#| root  | Main
+#| home  | Dev: cfgs, git, sdk...
+#| media | Large binary files
+
+## Order determines disk layout
+SYS_PART=(    1    2     3      4)
+SYS_SIZE=( 200M   2G   40G  '100%')
+SYS_MNT=( /boot    %     /  /home)
+SYS_FS=(   ext4 swap btrfs  btrfs)
+
+
+SYS_SOFT="base openssh"
+SYS_ENABLED=( mbr lan vbox )

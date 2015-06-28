@@ -1,0 +1,12 @@
+#!/bin/bash -e
+source ~/sys_funcs
+
+timedatectl set-timezone "Europe/Kiev"
+
+## Disable swap disks
+swapoff -a
+
+## Detach all previous mounts
+umount -fR /mnt || echo "Ready using /mnt "
+
+echo ":: reset done"

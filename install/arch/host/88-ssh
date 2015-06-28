@@ -1,18 +1,23 @@
 #!/bin/bash -e
-if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+source ~/sys_funcs
+is_enabled 'vbox' || exit 0
 
-user="${1?No user}"
+user="${SYS_USER:?No}"
 
-
-## SSH access: add host public key to vbox guest authorized_keys
+## Authorize SSH access to guest from host
 if [[ -f ~/id_rsa.pub ]]; then
     home="/home/$user"
-    key="$home/.ssh/authorized_keys"
-    mkdir -p ${key%/*} && cp -vfT ~/id_rsa.pub $key
-    chown -R $user:$user ${key%/*} && chmod 600 ${key}
+    auth="$home/.ssh/authorized_keys"
+    mkdir -p ${auth%/*} && cp -vfT ~/id_rsa.pub $auth
+    chown -R $user:$user ${auth%/*} && chmod 600 ${auth}
 
     cp -vrft $home ~/user
     chown -R $user:$user $home/user && chmod -R 700 $home/user
 fi
 
-echo ":: add authorized_keys for '$user' "
+echo ":: add VBOX to authorized_keys of '$user' "
+
+
+### ENABLE Services
+pacman -S --noconfirm openssh
+systemctl enable sshd.service

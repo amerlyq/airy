@@ -1,0 +1,23 @@
+# vim: ft=sh
+set -o errexit
+set -o pipefail
+
+## General
+is_assoc(){ [[ "$(declare -p $1)" =~ "declare -A" ]]; }  # && "${#SYS_SZ[@]}" == 5
+ has_pr() { hash $1 >/dev/null 2>&1; }
+    die() { local ret=$?; printf "%s${1+\n}" "$1"; exit $ret; }
+  wfile() { printf "%s" "${2?No text}" > "${1?No file name}"; }
+wscript() { wfile "$1" "$2" && chmod u+x "$1"; }
+do_each() {  # Split args on 'most' and 'last'
+sed '/#.*$/s///; /^\s*$/d' | while read L
+    do ${@:1:${#@}-1} "${@:${#@}}${L}" || die
+done; }
+
+
+## Individual
+[[ "$(uname -n)" =~ archiso ]] || die "Use under archiso live-cd!"
+
+is_enabled() { [[ "${SYS_ENABLED[@]:?No} " =~ "${1} " ]]; }
+
+source ~/sys_prf  # Load choosen prf through symlink
+cd $(dirname $(readlink -m ${0}))
