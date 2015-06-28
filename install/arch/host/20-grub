@@ -3,22 +3,6 @@ if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exi
 
 sdX="${1?No sdX disk specified for grub}"
 
-# For grained set-up
-# Set correct hooks (lvm,usb...) in /etc/mkinitcpio.conf
-# mkinitcpio -p linux
-
-# My USB legacy support was set to 'Auto'. I remember switching it to 'Enabled'
-# previously. Somehow it was switched back to Auto. So I changed it to Enabled
-# and everything went running smoothly. I can now enter bios settings and also
-# choose OS from the Grub OS list
-
-# However the bios setting for "Fast Boot" had additional setting for usb
-# support, which was disabled (implying usb will only become available after os
-# loads). Changing it to Partial (usb with keyboard and mouse available) or
-# Full Initialization (Full Support of all usb devices at any time) solved the
-# problem.
-
-It has been currently set to Partial Initialization to get some balance between boot speed and minimal support needed.
 
 ### Bootloader
 pacman -S --noconfirm grub os-prober
@@ -31,7 +15,7 @@ rm -vf /boot/grub/grub.cfg
 # Press <Esc> to show menu.  Holding down the "SHIFT" key will not display the
 # menu if "GRUB_TIMEOUT=" is set to "0"
 # In future use 'sudo update-grub' after changes.
-mv -vf /etc/default/grub{,.bkp}
+mv -vf --backup=t /etc/default/grub{,}
 cat >/etc/default/grub <<-'EOT'
 GRUB_DEFAULT=0
 GRUB_SAVEDEFAULT=true
@@ -46,7 +30,7 @@ GRUB_TERMINAL="console"
 GRUB_GFXPAYLOAD_LINUX=text  # text / keep
 GRUB_DISABLE_RECOVERY=true
 # GRUB_ENABLE_CRYPTODISK=true
-GRUB_PRELOAD_MODULES="part_msdos"  # parg_gpt
+GRUB_PRELOAD_MODULES="lvm"  # part_msdos, parg_gpt
 EOT
 
 grub-mkconfig -o /boot/grub/grub.cfg

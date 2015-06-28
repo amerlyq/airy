@@ -4,6 +4,12 @@ if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exi
 loc="en_US.UTF-8"
 zone=/usr/share/zoneinfo/${1?No zone localtime}
 
+## Console font
+cat > /etc/vconsole.conf <<EOT
+KEYMAP=us
+FONT=
+FONT_MAP=
+EOT
 
 ## Locale
 sed -ri "s/^#(${loc}.*)\$/\1/" /etc/locale.gen

@@ -24,7 +24,7 @@ echo ":: mirrors selected"
 
 ### BASE SOFT
 # NOTE: need 'sudo' for 'airy/cfg/shell/func.d/packages'
-soft="base base-devel openssh wget sudo"  #  sshfs gnupg pinentry
+soft="base base-devel openssh wget sudo btrfs-progs"  #  sshfs gnupg pinentry
 if [[ ! -d "/mnt/usr/bin" ]]; then
     ## Install the base system  # -i -- interactive
     pacstrap /mnt $soft || exit

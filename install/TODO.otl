@@ -11,6 +11,7 @@ TODO
 	https://wiki.archlinux.org/index.php/System_maintenance
 	https://wiki.archlinux.org/index.php/Systemd#Basic_systemctl_usage
 
+	2015-06-10 [X] https://wiki.archlinux.org/index.php/Beginners%27_guide
 	2015-06-21 [X] Exclude root from display managers -- always load in console w/o X
 		Simply don't use X in xinitrc for it!
 		: In GRUB you can add 3 at the end of entry, to boot w/o X in console:
@@ -20,20 +21,42 @@ TODO
 	[_] SEE packer instead of yaourt
 		http://ubuntuforums.org/showthread.php?t=1389872
 
->	[_] SEE script for DigitalOcean which installs Arch with GPT
-	: https://github.com/gh2o/digitalocean-debian-to-arch/blob/debian8/install.sh
+
+GPT + LVM
+: https://wiki.archlinux.org/index.php/Mkinitcpio#Image_creation_and_activation
+	LVM
+		2015-06-27 [X] http://blog.ataboydesign.com/2012/08/29/installing-arch-linux-on-lvm/
+		[_] SEE script for DigitalOcean which installs Arch with GPT
+		: https://github.com/gh2o/digitalocean-debian-to-arch/blob/debian8/install.sh
+		https://wiki.archlinux.org/index.php/Create_root_filesystem_snapshots_with_LVM
+	Btrfs
+		2015-06-28 [X] http://blog.fabio.mancinelli.me/data/arch_linux_on_btrfs_installation.txt
+		http://wongdev.com/blog/pure-btrfs-installation/
+		?[_] Install on whole disk w/o partition table
+			2015-06-28 [X] http://linuxhub.ru/viewtopic.php?t=1309
+	Suspend-to-disk
+		https://wiki.archlinux.org/index.php/Power_management/Suspend_and_hibernate
+	UEFI
+		http://www.tomshardware.co.uk/faq/id-1860905/install-arch-linux-uefi.html
+		https://bbs.archlinux.org/viewtopic.php?id=169025
+		https://wiki.archlinux.org/index.php/Unified_Extensible_Firmware_Interface#EFI_System_Partition
+		https://wiki.archlinux.org/index.php/GRUB_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29
+	Grub
+		https://wiki.archlinux.org/index.php/GRUB2#GPT_specific_instructions
+		https://github.com/voidlinux/documentation/wiki/Install-LVM-LUKS-on-UEFI-GPT
+	Encryption
+		http://www.brunoparmentier.be/blog/how-to-install-arch-linux-on-an-encrypted-btrfs-partition.html
+		https://wiki.archlinux.org/index.php/Dm-crypt
+		https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system
+	XEN HVM
 
 
 Delaying kernel upgrades
 	http://unix.stackexchange.com/questions/164465/delaying-kernel-upgrades-on-arch-linux
 	Backup old kernels
 		http://unix.stackexchange.com/questions/50579/automatically-include-n-latest-kernel-versions-in-grub-grub2-menu-on-kernel-up
-
-Snapshots -- ARM and LVM
-	https://wiki.archlinux.org/index.php/Downgrading_packages
-
-### Seized ###
-	https://wiki.archlinux.org/index.php/Beginners%27_guide
+	Arch Rollback Machine
+		https://wiki.archlinux.org/index.php/Downgrading_packages
 
 Packman
 	> Principle: Download all pkg with '-w', then once do interactive install.
@@ -49,7 +72,8 @@ VBOX
 		scp user@local.ip:~/.ssh/arch  ~/.ssh/id_rsa
 		scp user@local.ip:~/aura/airy/arch-install .
 
-Installing lts kernel (for fallback on broken system)
+
+Installing another kernel (for fallback on broken system)
 : http://wiki.archbang.org/index.php?title=Installing_the_Long_Term_Support_Kernel
 : https://wiki.archlinux.org/index.php/Arch_Build_System
 : https://wiki.archlinux.org/index.php/Kernels/Compilation/Arch_Build_System
@@ -58,6 +82,7 @@ Installing lts kernel (for fallback on broken system)
 	vi /etc/default/grub
 	: GRUB_DEFAULT="1>2"  # Count lts entry (menu>submenu) order in /boot/grub/grub.cfg
 	grub-mkconfig -o /boot/grub/grub.cfg
+
 
 [_] Give my complete auto installation to Igor to test)
 	Window managers -- switcher for multiprofiling work/media
@@ -171,25 +196,27 @@ SETUP
 
 
 
-Optimize boot time (both kernel and bootloader)
-: http://events.linuxfoundation.org/sites/events/files/slides/12%20Lessons%20Learnt%20in%20Boot%20Time%20Reduction.pdf
-	check time
-		systemd-analyze
-	measure data read (See at 7th column):
-		cat /proc/diskstats
-	Use compression?
-	Maybe XFS would be best as for init+mount+r/w time?
-	Utilize 100% I/O and CPU on boot
-	Focus on delays -- enable logs and watch
-	'quiet' to disable printing
-	$ perf, oprofile, strace, bootchart
-	E4rat
-		https://wiki.archlinux.org/index.php/Ext4#Tips_and_tricks
-		: E4rat is a preload application designed for the ext4 filesystem. It
-		: monitors files opened during boot, optimizes their placement on the
-		: partition to improve access time, and preloads them at the very
-		: beginning of the boot process. E4rat does not offer improvements
-		: with SSDs, whose access time is negligible compared to hard disks.
+OPTIMIZE
+	[_] Boot time (both kernel and bootloader)
+	: http://events.linuxfoundation.org/sites/events/files/slides/12%20Lessons%20Learnt%20in%20Boot%20Time%20Reduction.pdf
+	: https://wiki.archlinux.org/index.php/Improve_boot_performance
+		check time
+		: systemd-analyze
+		measure data read (See at 7th column):
+		: cat /proc/diskstats
+		Use compression?
+		Maybe XFS would be best as for init+mount+r/w time?
+		Utilize 100% I/O and CPU on boot
+		Focus on delays -- enable logs and watch
+		'quiet' to disable printing
+		: perf, oprofile, strace, bootchart
+		E4rat
+			https://wiki.archlinux.org/index.php/Ext4#Tips_and_tricks
+			: E4rat is a preload application designed for the ext4 filesystem. It
+			: monitors files opened during boot, optimizes their placement on the
+			: partition to improve access time, and preloads them at the very
+			: beginning of the boot process. E4rat does not offer improvements
+			: with SSDs, whose access time is negligible compared to hard disks.
 
 
 Games on
@@ -202,8 +229,6 @@ Xorg
 
 < Maybe, move from sh -> dash?
 	https://wiki.archlinux.org/index.php/Dash
-< Maybe preinstall configured system onto removable?
-	https://wiki.archlinux.org/index.php/Archiso
 
 RSS
 	https://www.archlinux.org/feeds/news/
@@ -253,16 +278,10 @@ Multilib
 	https://wiki.archlinux.org/index.php/Multilib
 	https://wiki.archlinux.org/index.php/Install_bundled_32-bit_system_in_64-bit_system
 
-LVM
-	http://blog.ataboydesign.com/2012/08/29/installing-arch-linux-on-lvm/
-
-UEFI
-	http://www.tomshardware.co.uk/faq/id-1860905/install-arch-linux-uefi.html
-	https://bbs.archlinux.org/viewtopic.php?id=169025
-	https://wiki.archlinux.org/index.php/Unified_Extensible_Firmware_Interface#EFI_System_Partition
-	https://wiki.archlinux.org/index.php/GRUB_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29
 
 Live-CD -- create your own customized from current system
 	https://blog.chendry.org/automating-arch-linux-installation/
+< Maybe preinstall configured system onto removable?
+	https://wiki.archlinux.org/index.php/Archiso
 [_] Arch liveroot : install completely in RAM and keep unchanged
 	https://bbs.archlinux.org/viewtopic.php?id=193461

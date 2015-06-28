@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+SNAPS_DIR="/mnt/snapshots/pacsnap";
+SNAP_NAME=$(date "+%Y%m%d%H%M");
+CURR_TIME=$(date "+%b %d %H:%M:%S");
+LOG="/var/log/snapshot_pacsnap.log";
+SAVE_SNAPS=15;
+USER="alex";
+
+if [[ ! -e $SNAPS_DIR ]]
+then
+    echo ":: Oops!";
+    exit 1;
+fi
+
+echo -n ":: Creating new snapshot... ";
+echo -n "$CURR_TIME " >> $LOG;
+btrfs subvolume snapshot -r / $SNAPS_DIR/$SNAP_NAME &>> $LOG;
+echo "Done!";
+
+NUM_SNAPS=$(ls -1 $SNAPS_DIR | wc -l);
+if [[ $NUM_SNAPS -gt $SAVE_SNAPS ]]
+then
+    let OVER_SNAPS=$NUM_SNAPS-$SAVE_SNAPS;
+    ls -1 $SNAPS_DIR | head -n $OVER_SNAPS | while read DEL_SNAP;
+    do
+        echo -n ":: Deleting old snapshot... ";
+        echo -n "$CURR_TIME " >> $LOG;
+        btrfs subvolume delete $SNAPS_DIR/$DEL_SNAP &>> $LOG;
+        echo "Done!";
+    done
+fi
+
+echo "";
+
+sudo -u $USER yaourt -Syu;
+
+echo "";
+
+pkgfile -u;
+
+exit 0;

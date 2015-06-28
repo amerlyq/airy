@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if ! [[ "$(uname -n)" =~ archiso|vbox ]]; then echo "Use under vbox guest!"; exit 1; fi
+
+chmod 700 /boot /etc/{iptables,arptables}
+
+echo "Do it manually!"
+exit 1
+
+nano /etc/securetty
+ * Comment tty1
+
+nano /etc/iptables/iptables.rules
+ *filter
+ :INPUT DROP [0:0]
+ :FORWARD DROP [0:0]
+ :OUTPUT ACCEPT [0:0]
+ -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+ -A INPUT -i lo -j ACCEPT
+ -A INPUT -p udp --sport 53 -j ACCEPT
+ -A INPUT -p icmp -j REJECT
+ -A INPUT -p tcp -j REJECT --reject-with tcp-reset
+ -A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable
+ -A INPUT -j REJECT --reject-with icmp-proto-unreachable
+ COMMIT
+systemctl enable iptables.service
+
+nano /etc/sysctl.conf
+ * net.ipv4.conf.all.log_martians = 1
+ * net.ipv4.conf.all.rp_filter = 1
+ * net.ipv4.icmp_echo_ignore_broadcasts = 1
+ * net.ipv4.icmp_ignore_bogus_error_responses = 1

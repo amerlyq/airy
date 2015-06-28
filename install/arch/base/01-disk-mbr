@@ -19,32 +19,6 @@ if [[ "$bNew" -eq 1 ]]; then
     parted -s -a opt $sd mklabel msdos
     lsblk $sd && echo
 
-    ## LVM partitions
-    # ...
-    # lvcreate -C y -L 10G VolGroup -n swap  # -C: contiguous space
-    # To create a swap partition in your lvm
-    #     lvcreate vgroup000 -n lv_swap -L 4GB
-    #     mkswap /dev/vgroup000/lv_swap
-    # To mount it on every boot append the following line to /etc/fstab:
-    #     /dev/vgroup000/lv_swap    swap    swap    defaults    0    0
-    # To mount it instantly:
-    #     swapon -a
-
-    # Separate partition in lvm for source files -- ReiserFS
-    #   Keep it of similar to overall size of sources to reduce fragmentation
-
-    ## Init
-    # lvmdiskscan
-    # pvcreate /dev/sda
-    # pvdisplay
-    ### For SSD
-    ## pvcreate --dataalignment 1m /dev/sda
-    ## Create
-    #: You can create more than one volume group if you need to, but then you
-    #: will not have all your storage presented as one disk.
-    # vgcreate VolGroup00 /dev/sda
-    # vgdisplay
-
     ## Profile for current disk
     parted -s -a opt $sd mkpart primary ext4        1MB     100MB
     parted -s -a opt $sd mkpart primary ext4        100MB   8GB

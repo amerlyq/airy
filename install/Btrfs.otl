@@ -1,0 +1,71 @@
+>>> Btrfs
+
+Free space (df -h /)
+	btrfs filesystem df /
+
+Snapshots
+	Снимки. Монтируем корень ФС и создаём снимок корня системы:
+		mount /dev/sda /mnt
+		btrfs subvolume snapshot /mnt/root /mnt/backup
+	Откат: грузимся с live CD, монтируем корень ФС и переименовываем подтома
+	(так же подтома можно переименовать прямо в рабочей системе, если загрузка
+	удачна, но не в данном случае, конечно):
+		mount /dev/sda /mnt
+		mv /mnt/root /mnt/root_bad
+		mv /mnt/backup /mnt/root
+	Либо грузимся как обычно, а в меню grub'а указываем подтом с бэкапом
+	: (rootflags=subvol=backup).
+
+	<SEIZE> ### Btrfs snapshots ###
+		echo `date "+%Y%m%d-%H%M%S"` > /run/btrfs-root/__current/ROOT/SNAPSHOT
+		echo "Fresh install" >> /run/btrfs-root/__current/ROOT/SNAPSHOT
+		btrfs subvolume snapshot -r /run/btrfs-root/__current/ROOT /run/btrfs-root/__snapshot/ROOT@`head -n 1 /run/btrfs-root/__current/ROOT/SNAPSHOT`
+		cd /run/btrfs-root/__snapshot/
+		ln -s ROOT@`cat /run/btrfs-root/__current/ROOT/SNAPSHOT` fresh-install
+		rm /run/btrfs-root/__current/ROOT/SNAPSHOT
+
+
+CoW daily
+	Копирование при записи (CoW). Если использовать команду cp с ключом
+	--reflink=auto, то копия файла не будет занимать место на диске. И
+	впоследствии, допустим, при изменении скопированного файла, записываться
+	на диск будут только изменённые блоки.
+
+Commit interval settings
+> It is recommended to disable CoW for big binary files with random writes,
+> like database files and virtual machine images.
+	SEE: https://wiki.archlinux.org/index.php/Btrfs
+	: The resolution at which data are written to the filesystem is dictated
+	: by Btrfs itself and by system-wide settings. Btrfs defaults to a 30
+	: seconds checkpoint interval in which new data are committed to the
+	: filesystem.  This is tuneable using mount options (see below)
+	: System-wide settings also affect commit intervals. They include the
+	: files under /proc/sys/vm/* and are out-of-scope of this wiki article.
+	: The kernel documentation for them resides in
+	: Documentation/sysctl/vm.txt.
+
+Checking
+	"Онлайн"-проверка ФС. При которой осуществляется чтение всех данных/метаданных
+	с перепроверкой контрольных сумм, при наличии ошибок обнаружение их и
+	исправление по возможности.
+		btrfs scrub start -B /
+		: Если опустить ключ -B, процесс уйдёт в фон, и о ходе выполнения
+		: можно будет узнать командой:
+		btrfs scrub status /
+		: scrub status for 56edc366-a153-4eee-b2a6-471b7066b93d
+		:  scrub started at Sat Dec 14 06:37:19 2013 and finished after 3242 seconds
+		:  total bytes scrubbed: 222.45GB with 0 errors
+		Рекомендуется проводить проверку регулярно (~еженедельно).
+		:=> Автоматизировал это дело, задействовав малююсенький скрипт в cron.weekly:
+		: #!/usr/bin/env bash
+		: LOG="/var/log/scrub.log";
+		: btrfs scrub start -B / &>> $LOG;
+		: echo "" >> $LOG;
+		: exit 0;
+
+	"Оффлайн"-проверка ФС (на отмонтированном разделе).
+		btrfs check /dev/sda
+		:=> При отсутствии ошибок утилита возвратит 0:
+		: ...
+		: found 88435663767 bytes used err is 0
+		: ...

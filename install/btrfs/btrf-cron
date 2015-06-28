@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+SNAPS_DIR="/mnt/snapshots/daily";
+SNAP_NAME=$(date "+%Y%m%d%H%M");
+CURR_TIME=$(date "+%b %d %H:%M:%S");
+LOG="/var/log/snapshot_daily.log";
+SAVE_SNAPS=15;
+
+if [[ ! -e $SNAPS_DIR ]]
+then
+    echo "$CURR_TIME Oops!" >> $LOG;
+    exit 1;
+fi
+
+echo -n "$CURR_TIME " >> $LOG;
+btrfs subvolume snapshot -r / $SNAPS_DIR/$SNAP_NAME &>> $LOG;
+
+NUM_SNAPS=$(ls -1 $SNAPS_DIR | wc -l);
+if [[ $NUM_SNAPS -gt $SAVE_SNAPS ]]
+then
+    let OVER_SNAPS=$NUM_SNAPS-$SAVE_SNAPS;
+    ls -1 $SNAPS_DIR | head -n $OVER_SNAPS | while read DEL_SNAP;
+    do
+        echo -n "$CURR_TIME " >> $LOG;
+        btrfs subvolume delete $SNAPS_DIR/$DEL_SNAP &>> $LOG;
+    done
+fi
+
+exit 0;
+
+# На выходе получим такой беспорядок:
+# КОД: ВЫДЕЛИТЬ ВСЁ
+# # btrfs subvolume list -at /
+# ID   gen   top level   path
+# --   ---   ---------   ----
+# 257   4161   5      <FS_TREE>/root
+# 258   4160   5      <FS_TREE>/home
+# 259   4158   5      <FS_TREE>/pkg
+# 260   4148   5      <FS_TREE>/snapshots
+# 323   137    5      <FS_TREE>/snapshots/daily/201404040508
+# 465   439    5      <FS_TREE>/snapshots/pacsnap/201404042007
+# 466   836    5      <FS_TREE>/snapshots/daily/201404050319
+# 467   1547   5      <FS_TREE>/snapshots/daily/201404060318
+# 468   2472   5      <FS_TREE>/snapshots/daily/201404070315
+# 469   2496   5      <FS_TREE>/snapshots/pacsnap/201404070335
+# 472   2933   5      <FS_TREE>/snapshots/daily/201404080435
+# 473   3635   5      <FS_TREE>/snapshots/pacsnap/201404082319
+# 474   3740   5      <FS_TREE>/snapshots/daily/201404091627
+# 476   4058   5      <FS_TREE>/snapshots/pacsnap/201404100106

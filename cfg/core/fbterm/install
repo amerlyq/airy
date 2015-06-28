@@ -1,0 +1,13 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    pkg_inst 'fbterm cantarell-fonts'
+    ## Also, you need frame buffer driver:
+    # https://wiki.archlinux.org/index.php/Uvesafb
+    aur_inst 'v86d'
+    # https://wiki.archlinux.org/index.php/Fbterm
+fi
+# elif distro ubuntu; then
+    # http://blog.samat.org/2010/11/09/High-resolution-text-console-with-uvesafb-and-Debian/
+# fi

@@ -48,7 +48,8 @@ timedatectl set-timezone "$zone"
 hopt cdpm && { chmod -R 700 ~/arch/base || die; }
 
 do_each /bin/bash -c ~/arch/base/ <<EOTBASE
-$(hopt m && echo "00-disk $(hopt d && echo '--new') $sd")
+$(hopt m && hopt v && echo "01-disk-vbox $(hopt d && echo '--new') $sd")
+$(hopt m && false  && echo "02-disk-lvm  $(hopt d && echo '--new') $sd")
 $(hopt v && echo "35-custom-pacman $LOCAL_SRV /etc/pacman.conf")
 $(hopt p && echo "40-pacstrap")
 $(hopt f && echo "50-fstab")

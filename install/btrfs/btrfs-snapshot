@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+# UUID диска/раздела.
+FS_UUID="56edc366-a153-4eee-b2a6-471b7066b93d";
+
+# Каталог, куда будет монтироваться корень ФС.
+FS_DIR="/mnt/filesystem";
+
+# Подтом с корнем.
+ROOT_SUB="$FS_DIR/root";
+
+# Каталог со снимками.
+SNAPS_DIR="$FS_DIR/snapshots";
+
+# Имя снимка.
+SNAP_NAME=$(date "+%Y%m%d%H%M");
+
+# Текущее время для лога.
+CURR_TIME=$(date "+%b %d %H:%M:%S");
+
+# Место сохранения лога.
+LOG_FILE="/var/log/pacsnap.log";
+
+# Количество сохраняемых снимков.
+SAVE_SNAPS=15;
+
+# Имя пользователя, от которого запускается yaourt.
+# Если для обновления используется pacman, строчку можно безболезненно убрать.
+USER="alex";
+
+
+ALREADY_MOUNTED=1;
+grep -qs $FS_DIR /etc/mtab;
+if [[ $? != 0 ]]
+then
+    echo -n ":: Mounting FS... ";
+    mount -U $FS_UUID $FS_DIR;
+    echo "Done!";
+    ALREADY_MOUNTED=0;
+else
+    echo ":: FS already mounted!";
+fi
+
+if [[ ! -e $ROOT_SUB || ! -e $SNAPS_DIR ]]
+then
+    echo ":: Oops!";
+    exit 1;
+fi
+
+echo -n ":: Creating snapshot... ";
+echo -n "$CURR_TIME " >> $LOG_FILE;
+btrfs subvolume snapshot $ROOT_SUB $SNAPS_DIR/$SNAP_NAME &>> $LOG_FILE;
+echo "Done!";
+
+NUM_SNAPS=$(ls -1 $SNAPS_DIR | wc -l);
+if [[ $NUM_SNAPS -gt $SAVE_SNAPS ]]
+then
+    let OVER_SNAPS=$NUM_SNAPS-$SAVE_SNAPS;
+    ls -1 $SNAPS_DIR | head -n $OVER_SNAPS | while read DEL_SNAPS;
+    do
+        echo -n ":: Deleting old snapshot... ";
+        echo -n "$CURR_TIME " >> $LOG_FILE;
+        btrfs subvolume delete $SNAPS_DIR/$DEL_SNAPS &>> $LOG_FILE;
+        echo "Done!";
+    done
+fi
+
+if [[ $ALREADY_MOUNTED == 0 ]]
+then
+    echo -n ":: Unmounting FS... ";
+    umount $FS_DIR;
+    echo "Done!";
+fi
+
+# Собственно команда полного обновления системы.
+# При желании заменить на свою любимую, например:
+# sudo -u $USER yaourt -Syua --devel;
+# Ещё пример:
+# pacman -Syu;
+sudo -u $USER yaourt -Syu;
+
+# И до кучи обновление базы данных pkgfile.
+# Если не пользуемся - стираем.
+pkgfile -u;
+
+exit 0;

@@ -28,7 +28,7 @@ fi
 ### FONTS ###
 # FIXME: fonts are needless on headless system! Check what???
 # https://powerline.readthedocs.org/en/latest/installation/linux.html
-if [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
+if has_pr X && [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
     mkdir -p ~/.fonts/
     # See: https://wiki.archlinux.org/index.php/Font_Configuration
     cp ~/.vim/res/PowerlineSymbols.otf ~/.fonts/
@@ -38,7 +38,7 @@ if [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
     echo "Powerline symbols configured"
 fi
 
-if [[ ! -d ~/.fonts/"${FONT##*/}" ]]; then
+if has_pr X && [[ ! -d ~/.fonts/"${FONT##*/}" ]]; then
     # Patched fonts for windows usage:
     src='https://github.com/Lokaltog/powerline-fonts'
     [ ! -d "${FONT%/*}" ] && git clone --depth=1 "$src" "${FONT%/*}"

@@ -1,0 +1,72 @@
+#!/bin/bash -e
+if ! [[ "$(uname -n)" =~ archiso ]]; then echo "Use under archiso live-cd!"; exit 1; fi
+
+case "$1" in --new) bNew=1; shift ;; esac
+## sd may contain list of disk or partitions!
+sd="${1?No disk device}"
+## Volume group name
+gr=lvm
+
+## Detach all previous
+umount -fR /mnt || echo "Ready using /mnt "
+
+if [[ "$bNew" -eq 1 ]]; then
+
+    ## Set MBR / GPT
+    # ...
+
+    swapoff -a
+    parted -s -a opt $sd mklabel msdos
+
+    ## Init disks/partitions
+    lvmdiskscan
+    ## For SSD:  pvcreate --dataalignment 1m $sd
+    pvcreate --zero y -f $sd
+    pvdisplay
+
+    ## Create group
+    # You can create more than one volume group if you need to, but then you
+    # will not have all your storage presented as one disk.
+    vgcreate $gr $sd
+    vgdisplay
+
+    ## LVM Partitions (500GB HDD)
+    lvcreate $gr -L 200M      -n boot   # Separate for kernels
+    lvcreate $gr -L 2G   -C y -n swap   # Need > 2/5 of RAM memory for suspend-to-disk
+    lvcreate $gr -L 40G       -n root   # Main
+    lvcreate $gr -l 40G       -n home   # Dev: cfgs, git, sdk...
+    lvcreate $gr -l +100%FREE -n media  # Large binary files
+    lvs
+
+    # Separate partition in lvm for source files -- ReiserFS
+    #   Keep it of similar to overall size of sources to reduce fragmentation
+
+    pf=/dev/$gr/      # OR: pr="/dev/mapper/${gr}-"
+    ## If there are no logical volumes under /dev/mapper, run next commands to
+    ## bring up the modules and to make volume group available:
+    # modprobe dm-mod   # dm-mod needs to be loaded before doing anything with LVM
+    # vgscan            # Scans all disks for volume groups and re-builds caches
+    # vgchange -ay      # Makes the logical volumes known to the kernel
+
+    mkswap ${pf}swap && swapon ${pf}swap
+    # To mount it on every boot append the following line to /etc/fstab:
+    #     /dev/lvm/swap    swap    swap    defaults    0    0
+
+    mkfs.btrfs ${pf}root
+    mkfs.ext4 ${pf}boot
+    mkfs.btrfs ${pf}home
+    mkfs.ext4 ${pf}media  # -L Media
+fi
+
+## Mounting
+if ! grep -qsw /mnt /proc/mounts; then
+    # mount -o subvol=root,compress=lzo,autodefrag ${pf}root /mnt
+    mkdir -p /mnt && mount ${pf}root /mnt
+    mkdir -p /mnt/boot && mount ${pf}boot /mnt/boot
+    mkdir -p /mnt/home && mount ${pf}home /mnt/home
+    mkdir -p /mnt/home/media && mount ${pf}home /mnt/home/media
+fi
+
+## Layout
+# parted -l
+lsblk $sd

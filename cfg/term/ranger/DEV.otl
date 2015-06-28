@@ -84,6 +84,7 @@ Completely detach ranger interface from filemanager
 	[_] argument -- treat as regex. Filename will match themselves.
 
 [_] Show copying speed around percents on Task view
+[_] Show position/number (like 6/44) in right bottom even when you marking files
 
 DEV
 	[_] Ipc with interactive zsh instance in separate thread.
@@ -100,3 +101,20 @@ DEV
 	[_] Being at '/', left panel is empty -- but you can use it for network/bookmarks!
 		Also, using that panel -- you must not do it central, simply move focus and control to left
 		Such behaviour may be possible for any path! Being anywhere open list on left and choose!
+
+	[_] DEV: on press 'f' of '/' highlight or underline 'minimal unique letters' in file list
+		: so you will instantly see shortest keystroke to jump.
+		[_] Highlight on all three columns -- use previous and next folder also?
+		: You can create highlight, but before actual jump you will need
+		: automatically move in prev/next folder
+		[_] Highlight pressed keystrokes on all files in dir
+		[_] Highlighting numbers of preview lines (3rd column) -- to open in vim exactly at that line
+		SEE: two possible cases (add switcher) -- one-time and interactive
+		: Cases can be linked with :findfy regimes -- filtering / searching
+			[_] Create global unique codes for whole directory once on 'f' press
+			[_] On each letter press, when dir is filtered, rebuild unique codes for remained files
+			: Of course, only remaining part of word (after last letter
+			:	in :findfy) must be taken into account
+		[_] More simple variant -- set marks as in browser -- linear
+				alphabetical, not dependent on name, only on position
+			: on HD it will be 40-80 marks depending on font size

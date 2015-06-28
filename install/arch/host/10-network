@@ -26,6 +26,22 @@ netctl enable eth_dhcp
 
 echo ':: eth_dhcp is active'
 
+## Wifi
+wfc=wlan0
+iwconfig
+ip link set $wfc up
+iwlist $wfc scan | less
+# OR: iw dev $wfc scan  ## For new netlink interface
+# vi /etc/wpa_supplicant.conf
+# ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
+# eapol_version=1
+# ap_scan=1
+# fast_reauth=1
+# wpa_passphrase SSID_NAME "PASSPHRASE" >> /etc/wpa_supplicant.conf
+# wpa_supplicant -B -Dwext -i $wfc -c /etc/wpa_supplicant.conf
+# dhcpcd $wfc
+# ip addr show $wfc
+
 
 ### ENABLE Services
 systemctl enable sshd.service
