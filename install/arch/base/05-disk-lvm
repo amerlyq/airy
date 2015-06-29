@@ -4,14 +4,19 @@ is_enabled 'lvm' || exit 0
 
 ## Physical disk and LVM volume group name
 sd="${SYS_DISK:?No}"
-gr=lvm
+
+parted -s -a opt $sd mklabel msdos
+parted -s -a opt $sd mkpart primary ext2 1MB '+100%'
+parted -s -a opt $sd set 1 lvm on
+parted -s -a opt $sd set 1 boot on
 
 
 ## Init disks/partitions
+gr=lvm
+lsd=${sd}1
 lvmdiskscan
-## For SSD:  pvcreate --dataalignment 1m $sd
-parted -s -a opt $sd mklabel msdos
-pvcreate --zero y -f $sd   # May use list of disks/partitions
+## For SSD:  pvcreate --dataalignment 1m $lsd
+pvcreate --zero y -f $lsd   # May use list of disks/partitions
 pvdisplay
 pvs
 
@@ -19,7 +24,7 @@ pvs
 ## Create group
 # You can create more than one volume group if you need to, but then you
 # will not have all your storage presented as one disk.
-vgcreate $gr $sd
+vgcreate $gr $lsd
 vgdisplay
 vgs
 
