@@ -4,7 +4,7 @@ source ~/sys_funcs
 
 ### Automounts in fstab (generate after pacstrap)
 cfg=/mnt/etc/fstab
-mv -vf --backup=t ${cfg}{,}
+cp -vf --backup=t ${cfg}{,}
 genfstab -U -p /mnt > $cfg
 # less $cfg  # WARNING: Check it!
 

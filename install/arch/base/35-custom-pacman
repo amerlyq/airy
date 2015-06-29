@@ -7,7 +7,7 @@ cfg=/etc/pacman.conf
 tmp=/tmp/pacman.tmp
 
 # Cut first part of file
-mv -vf --backup=t ${cfg}{,}
+cp -vf --backup=t ${cfg}{,}
 sed -r '/#%BEGIN_CUSTOM/,/#%END_CUSTOM/d; /^\[core\]/,$d' $cfg > $tmp
 # Add custom repository
 cat >> $tmp <<EOT

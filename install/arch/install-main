@@ -4,16 +4,22 @@ cd $(dirname $(readlink -m ${0}))
 prf=laptop-vbox
 
 setup() {
-    loc src="$1" dst="$2"
-    [[ -d $dst/arch ]] || cp -vrT "$src/arch" $dst/arch
-    ln -svT $dst/arch/_prf/funcs     $dst/sys_funcs
-    ln -svT $dst/arch/_prf/${prf:?No}  $dst/sys_prf
+    local src="$1" dst="$2"
+    cp -vfrT "$src/arch" $dst/arch
+    ln -svfT ./arch/_prf/funcs      $dst/sys_funcs
+    ln -svfT ./arch/_prf/${prf:?No} $dst/sys_prf
 }
 
+## Copying all output to log, as console has no scrollback
+# WARNING: disables progressbar of pacman!
+exec > >(tee /root/${prf}.log)
+exec 2>&1
+
 # ========================================================================
-setup "$PWD" /root
+setup "${PWD%/*}" /root
 source ~/sys_funcs
 
+if [[ ! -d /mnt/bin ]]; then
 do_each /bin/bash -c ~/arch/base/ <<EOTBASE
 00-reset
 05-disk-lvm
@@ -22,6 +28,7 @@ do_each /bin/bash -c ~/arch/base/ <<EOTBASE
 40-pacstrap
 50-fstab
 EOTBASE
+fi && echo ':: <archiso> ended'
 
 
 setup /root /mnt/root

@@ -13,6 +13,7 @@ lvmdiskscan
 parted -s -a opt $sd mklabel msdos
 pvcreate --zero y -f $sd   # May use list of disks/partitions
 pvdisplay
+pvs
 
 
 ## Create group
@@ -20,6 +21,7 @@ pvdisplay
 # will not have all your storage presented as one disk.
 vgcreate $gr $sd
 vgdisplay
+vgs
 
 
 ## If there are no logical volumes under /dev/mapper, run next commands to
@@ -28,7 +30,7 @@ vgdisplay
 # vgscan            # Scans all disks for volume groups and re-builds caches
 # vgchange -ay      # Makes the logical volumes known to the kernel
 
-for i in "${!SYS_PART[@]:?No}"
+for i in ${!SYS_PART[@]:?No}
 do
     nm="${SYS_PART[$i]:?No}"
     sz="${SYS_SIZE[$i]:?No}"
@@ -41,9 +43,9 @@ do
               lvcreate $gr $lopt   $sz -n $nm && mkfs.${fs} $dev  # -L Media
     ;; esac
 done
+lvs
 
 
 ## Layout
-lvs
 lsblk $sd
 echo ":: disk lvm"

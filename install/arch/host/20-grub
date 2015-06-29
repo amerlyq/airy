@@ -5,14 +5,18 @@ source ~/sys_funcs
 ### Switcher
   if is_enabled mbr; then mods='part_msdos'
 elif is_enabled gpt; then mods='part_gpt'
-elif is_enabled lvm; then mods='lvm'; fi
-
+elif is_enabled lvm; then
+    mods='lvm'
+    args='root=lvm/lvm-boot'
+    # systemctl enable lvm.service
+fi
 if is_enabled serial; then args="console=ttyS0,115200n8"; terms="serial"; fi
 
+## Warnings 'lvmetad.socket: connect failded' -- possible solution
+## vi /etc/lvm/lvm.conf
+#: use_lvmetad = 0
 
-GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash "
-GRUB_CMDLINE_LINUX=""
-GRUB_TERMINAL="console serial"
+
 
 ### Bootloader
 pacman -S --noconfirm grub os-prober
@@ -25,8 +29,8 @@ grub-install --target=i386-pc --recheck ${SYS_DISK:?No}
 # menu if "GRUB_TIMEOUT=" is set to "0"
 # In future use 'sudo update-grub' after changes.
 cfg=/etc/default/grub
-mv -vf --backup=t ${cfg}{,}
-cat > $cfg <<-EOT
+cp -vf --backup=t ${cfg}{,}
+cat > $cfg <<EOT
 GRUB_DEFAULT=0
 GRUB_SAVEDEFAULT=true
 GRUB_TIMEOUT=0
@@ -40,8 +44,10 @@ $(is_enabled serial && echo 'GRUB_SERIAL_COMMAND="serial"' || echo)
 
 GRUB_GFXPAYLOAD_LINUX=text  # text / keep
 GRUB_DISABLE_RECOVERY=true
-# GRUB_ENABLE_CRYPTODISK=true
+$(is_enabled encrypt && echo 'GRUB_ENABLE_CRYPTODISK=true' || echo)
 GRUB_PRELOAD_MODULES="${mods:?No}"
+## Fix broken 'lvmetad.socket: connect failed'; WARNING: not working?
+# GRUB_DISABLE_SUBMENU=true
 EOT
 
 grub-mkconfig -o /boot/grub/grub.cfg

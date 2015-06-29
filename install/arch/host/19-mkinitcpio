@@ -2,13 +2,10 @@
 source ~/sys_funcs
 is_enabled 'lvm' || exit 0
 
-## CHECK: unnecessary? vi /etc/rc.conf
-#: USELVM="yes"
-
-
 ## Add lvm2 hook
-mv -vf --backup=t /etc/mkinitcpio.conf{,}
-cat > /etc/mkinitcpio.conf <<-'EOT'
+cfg=/etc/mkinitcpio.conf
+cp -vf --backup=t ${cfg}{,}
+cat > $cfg <<-'EOT'
 MODULES=""
 BINARIES=""
 FILES=""
