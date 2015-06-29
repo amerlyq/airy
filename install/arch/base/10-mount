@@ -2,7 +2,7 @@
 source ~/sys_funcs
 
 ## Mounting
-if grep -qsw /mnt /proc/mounts; then die "Already mounted"; fi
+! grep -qsw '\s/mnt\s' /proc/mounts &&:|| die "Already mounted"
 
 
 ## Sort mount points alphabetically!

@@ -22,7 +22,7 @@ case "$1" in -[u]) oadd "-${1##*-}" ;; esac
 
 
 if hopt u || [[ ! -d /mnt/bin ]]; then
-do_each /bin/bash -c ~/arch/base/ <<EOTBASE
+do_each ~/arch/base/ <<EOTBASE
 00-reset
 05-disk-mbr
 05-disk-lvm
@@ -40,13 +40,11 @@ fi && echo ':: <archiso> ended' || die
 
 if hopt u || true; then
     if is_enabled lvm; then
-        mkdir /mnt/hostrun && mount --bind /run /mnt/hostrun
+        mkdir -vp /mnt/hostrun && mount --bind /run /mnt/hostrun
+        trap "umount /mnt/hostrun && rmdir -v /mnt/hostrun" INT QUIT KILL TERM EXIT
     fi
     setup /root /mnt/root
-fi
-
-if hopt u || true; then
-do_each arch-chroot /mnt /bin/bash -c ~/arch/host/ <<EOTHOST
+    do_each arch-chroot /mnt /bin/bash -c ~/arch/host/ <<EOTHOST
 00-setup
 10-network
 15-netctl-lan
@@ -67,10 +65,7 @@ if is_enabled user; then
     setup /mnt/root /mnt${dir}
     arch-chroot /mnt chown -R $user:$user $dir/arch
     arch-chroot /mnt chmod -R 700 $dir/arch
-fi
-
-if is_enabled user; then
-do_each arch-chroot /mnt /usr/bin/su $user -c '~/arch/user/' <<EOTUSER
+    do_each arch-chroot /mnt /usr/bin/su $user -c '~/arch/user/' <<EOTUSER
 30-configs
 EOTUSER
 fi && echo ":: <su in chroot> ended" || die

@@ -8,10 +8,10 @@ is_assoc(){ [[ "$(declare -p $1)" =~ "declare -A" ]]; }  # && "${#SYS_SZ[@]}" ==
     die() { local ret=$?; printf "%s${1+\n}" "$1"; exit $ret; }
   wfile() { printf "%s" "${2?No text}" > "${1?No file name}"; }
 wscript() { wfile "$1" "$2" && chmod u+x "$1"; }
-do_each() {  # Split args on 'most' and 'last'
-sed '/#.*$/s///; /^\s*$/d' | while read L
-    do ${@:1:${#@}-1} "${@:${#@}}${L}" || die
-done; }
+## Split args on 'most' and 'last'
+# ${@:1:${#@}-1} "${@:${#@}}${L}"
+do_each() { sed '/#.*$/s///; /^\s*$/d' | while read L
+    do echo "N: $L"; ${@}${L} || die "Err: $L"; done; }
 hopt() { [ "${ARCH_OPTS/[$1]}" != "$ARCH_OPTS" ]; }
 oadd() { ARCH_OPTS="${ARCH_OPTS}${1}"; }
 
