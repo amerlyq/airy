@@ -25,10 +25,13 @@ pacman -S --noconfirm grub os-prober
 cfg=/etc/default/grub
 cp -vf --backup=t ${cfg}{,}
 cat > $cfg <<EOT
-GRUB_DEFAULT=0
-GRUB_SAVEDEFAULT=true
+GRUB_DEFAULT=$(is_enabled lvm && echo 0 || echo saved)
+GRUB_SAVEDEFAULT=$(is_enabled lvm && echo true || echo false)
 GRUB_TIMEOUT=0
 GRUB_TIMEOUT_STYLE=hidden  # hidden / countdown / menu
+GRUB_DISABLE_RECOVERY=true
+GRUB_DISABLE_OS_PROBER=$(is_enabled dual && echo false || echo true)
+GRUB_DISABLE_SUBMENU=true
 
 GRUB_DISTRIBUTOR="Arch"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash ${args}"
@@ -37,7 +40,6 @@ GRUB_TERMINAL="console $terms"
 $(is_enabled serial && echo 'GRUB_SERIAL_COMMAND="serial"' || echo)
 
 GRUB_GFXPAYLOAD_LINUX=text  # text / keep
-GRUB_DISABLE_RECOVERY=true
 $(is_enabled encrypt && echo 'GRUB_ENABLE_CRYPTODISK=true' || echo)
 GRUB_PRELOAD_MODULES="${mods:?No}"
 ## Fix broken 'lvmetad.socket: connect failed'; WARNING: not working?
