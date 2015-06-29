@@ -5,7 +5,7 @@ prf=laptop-vbox
 
 setup() {
     local src="$1" dst="$2"
-    cp -vfrT "$src/arch" $dst/arch
+    [[ "$src/arch" -ef $dst/arch ]] || cp -vfrT "$src/arch" $dst/arch
     ln -svfT ./arch/_prf/funcs      $dst/sys_funcs
     ln -svfT ./arch/_prf/${prf:?No} $dst/sys_prf
 }
@@ -18,20 +18,34 @@ exec 2>&1
 # ========================================================================
 setup "${PWD%/*}" /root
 source ~/sys_funcs
+case "$1" in -[u]) oadd "-${1##*-}" ;; esac
 
-if [[ ! -d /mnt/bin ]]; then
+
+if hopt u || [[ ! -d /mnt/bin ]]; then
 do_each /bin/bash -c ~/arch/base/ <<EOTBASE
 00-reset
-05-disk-lvm
 05-disk-mbr
+05-disk-lvm
 10-mount
 40-pacstrap
 50-fstab
 EOTBASE
-fi && echo ':: <archiso> ended'
+fi && echo ':: <archiso> ended' || die
 
 
-setup /root /mnt/root
+# ========================================================================
+
+# THINK: if installation was interrupted, how to use only part of this setup
+# directly at chroot or under su?
+
+if hopt u || true; then
+    if is_enabled lvm; then
+        mkdir /mnt/hostrun && mount --bind /run /mnt/hostrun
+    fi
+    setup /root /mnt/root
+fi
+
+if hopt u || true; then
 do_each arch-chroot /mnt /bin/bash -c ~/arch/host/ <<EOTHOST
 00-setup
 10-network
@@ -43,15 +57,23 @@ do_each arch-chroot /mnt /bin/bash -c ~/arch/host/ <<EOTHOST
 50-X
 80-add-user
 EOTHOST
-echo ':: <chroot> ended'
+fi && echo ':: <chroot> ended' || die
 
 
-if is_enabled user; then user="${SYS_USER:?No}"
-do_each arch-chroot /mnt /usr/bin/su $user -c "" <<EOTUSER
-chown -R $user:$user ~/arch && chmod -R 700 ~/arch
-~/arch/user/30-configs
+# ========================================================================
+
+if is_enabled user; then
+    user="${SYS_USER:?No}" dir=/home/$user
+    setup /mnt/root /mnt${dir}
+    arch-chroot /mnt chown -R $user:$user $dir/arch
+    arch-chroot /mnt chmod -R 700 $dir/arch
+fi
+
+if is_enabled user; then
+do_each arch-chroot /mnt /usr/bin/su $user -c '~/arch/user/' <<EOTUSER
+30-configs
 EOTUSER
-fi && echo ":: <su in chroot> ended"
+fi && echo ":: <su in chroot> ended" || die
 
 # umount -R /mnt
 

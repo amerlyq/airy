@@ -5,17 +5,25 @@ is_enabled 'lvm' || exit 0
 ## Physical disk and LVM volume group name
 sd="${SYS_DISK:?No}"
 
+## Create one partition spanning whole disk
+# (you must do it to have space fro grub embedding)
 parted -s -a opt $sd mklabel msdos
-parted -s -a opt $sd mkpart primary ext2 1MB '+100%'
+parted -s -a opt $sd mkpart primary ext2 1MB 100%
 parted -s -a opt $sd set 1 lvm on
 parted -s -a opt $sd set 1 boot on
 
+## If disk had lvm previously created, remove devices from memory
+#:> FIXED: pvcreate cant open exclusively mounted filesystem
+# dmsetup ls
+# dmsetup remove lvm-...
 
 ## Init disks/partitions
 gr=lvm
 lsd=${sd}1
 lvmdiskscan
 ## For SSD:  pvcreate --dataalignment 1m $lsd
+## Verbose: pvcreate -vvvvv ...
+if vgs $gr >/dev/null 2>&1; then vgremove -f $gr; fi
 pvcreate --zero y -f $lsd   # May use list of disks/partitions
 pvdisplay
 pvs
@@ -35,7 +43,8 @@ vgs
 # vgscan            # Scans all disks for volume groups and re-builds caches
 # vgchange -ay      # Makes the logical volumes known to the kernel
 
-for i in ${!SYS_PART[@]:?No}
+order="${!SYS_PART[@]}"
+for i in ${order:?No}
 do
     nm="${SYS_PART[$i]:?No}"
     sz="${SYS_SIZE[$i]:?No}"

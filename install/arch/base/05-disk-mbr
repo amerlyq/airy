@@ -10,7 +10,8 @@ lsblk $sd
 
 ## Profile for current disk
 prev_zs='1MB'
-for i in "${!SYS_PART[@]:?No}"
+order="${!SYS_PART[@]}"
+for i in ${order:?No}
 do
     num="${SYS_PART[$i]:?No}"
     sz="${SYS_SIZE[$i]:?No}"

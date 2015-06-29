@@ -12,16 +12,9 @@ elif is_enabled lvm; then
 fi
 if is_enabled serial; then args="console=ttyS0,115200n8"; terms="serial"; fi
 
-## Warnings 'lvmetad.socket: connect failded' -- possible solution
-## vi /etc/lvm/lvm.conf
-#: use_lvmetad = 0
-
-
 
 ### Bootloader
 pacman -S --noconfirm grub os-prober
-# ERROR: --core-compress=auto  -- Not recognized?
-grub-install --target=i386-pc --recheck ${SYS_DISK:?No}
 
 ## Change default grub:
 # info -f grub -n 'Simple configuration'
@@ -50,6 +43,14 @@ GRUB_PRELOAD_MODULES="${mods:?No}"
 # GRUB_DISABLE_SUBMENU=true
 EOT
 
+
+if is_enabled lvm; then
+    ## Bind host /run to mitigate warnings 'lvmetad.socket: connect failded'
+    mkdir -vp /run/lvm && mount --bind /hostrun/lvm /run/lvm
+fi
+# ERROR: --core-compress=auto  -- Not recognized?
+grub-install --target=i386-pc --recheck ${SYS_DISK:?No}
 grub-mkconfig -o /boot/grub/grub.cfg
 
+if is_enabled lvm; then umount /run/lvm && rmdir -v /run/lvm; fi
 echo ':: grub installed'

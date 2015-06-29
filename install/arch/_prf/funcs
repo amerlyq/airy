@@ -12,6 +12,8 @@ do_each() {  # Split args on 'most' and 'last'
 sed '/#.*$/s///; /^\s*$/d' | while read L
     do ${@:1:${#@}-1} "${@:${#@}}${L}" || die
 done; }
+hopt() { [ "${ARCH_OPTS/[$1]}" != "$ARCH_OPTS" ]; }
+oadd() { ARCH_OPTS="${ARCH_OPTS}${1}"; }
 
 
 ## Individual
