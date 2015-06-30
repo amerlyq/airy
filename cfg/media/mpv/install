@@ -2,4 +2,6 @@
 source ~/.shell/func.d/packages
 
 # | mpv | X video player with minimal gui
-pkg_inst mpv
+if distro ubuntu; then
+    pkg_inst mpv
+fi

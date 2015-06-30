@@ -3,7 +3,9 @@ source ~/.shell/func.d/packages
 
 # | mdp | console music player with database
 # | mpc | for control from cli / hotkeys in WM
-pkg_inst mpd mpc
+if distro ubuntu; then
+  pkg_inst mpd mpc
+fi
 
 # ALT:
 # totem   | player, which not freezes in linux mint

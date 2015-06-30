@@ -10,7 +10,7 @@ pretty() { sed "
             / <<<$/s//\]$(tput sgr0)/g
     /\(C\|W\):\s.*/s//$(tput setaf 13)&$(tput sgr0)/
        /\(N\):\s.*/s//$(tput setaf 6)&$(tput sgr0)/
-   /\(E|Err\):\s.*/s//$(tput setaf 1)&$(tput sgr0)/
+   /\(E\|Err\):\s.*/s//$(tput setaf 1)&$(tput sgr0)/
        /.*\s->\s.*/s//$(tput setaf 4)&$(tput sgr0)/
 ";}
 
@@ -19,6 +19,7 @@ header "Airy public" && {
     link "$PWD/cfg/shell" ~/.shell
 } | pretty
 
+[[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell 
 # ======================================================================
 ## Populate sensible configs
 if [[ -f ../erian/setup ]]; then

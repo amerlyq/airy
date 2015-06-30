@@ -14,7 +14,8 @@ if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
     # Because being launched by init.d it has no access to ~/.ncmpcpp
     # TODO: Maybe with systemd all will be ok?
     if distro arch; then
-        sudo systemctl stop mpd
+	echo "Err: FIXME"
+        # sudo systemctl stop mpd
 
     elif distro ubuntu; then
         sudo service mpd stop

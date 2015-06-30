@@ -4,7 +4,8 @@ xkb_keymap {
     xkb_keycodes  { include "evdev+aliases(qwerty)" };
     xkb_types     {
         include "complete"
-        include "super"
+        // include "super"  // Ubuntu
+        include "pc"     // Arch: instead of 'super'
     };
     xkb_compat    {
         include "complete"

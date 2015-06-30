@@ -4,11 +4,13 @@ source ~/.shell/func.d/packages
 # | pidgin-sipe        | Office Communicator plugin
 # | pidgin-plugin-pack | Primarily for convenient history plugin
 
-pkg_inst 'pidgin pidgin-sipe'
 
 if distro arch; then
-    pkg_inst 'pidgin-encryption'
+    echo "Err: broken"
+    # pkg_inst 'pidgin-encryption'
+
 elif distro ubuntu; then
+    pkg_inst 'pidgin pidgin-sipe'
     pkg_inst 'pidgin-plugin-pack myspell-ru'
 fi
 
