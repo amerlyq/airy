@@ -2,8 +2,9 @@
 source ~/.shell/func.d/packages
 
 
-# if distro arch; then
-#     echo "N: none"
+if distro arch; then
+    pkg_inst 'ntfs-3g'
+fi
 # elif distro ubuntu; then
     #| grub-customizer | To change boot order, time and boot-wallpaper
     # ppa_add 'ppa:danielrichter2007/grub-customizer'

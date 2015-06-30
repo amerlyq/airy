@@ -4,15 +4,23 @@
 # define MAIN_DPI 96
 #endif
 ! Too big fonts in X appears on '112' value and too small for '82' after reboot. What to do?
-Xft*dpi : MAIN_DPI
+! Xft*dpi : MAIN_DPI
 
-! Fonts for Cairo and libXft
-Xft*antialias : true
-! Стиль автохинтинга - hintnone *hintslight hintmedium hintfull
-Xft*hintstyle : hintfull
-Xft*hinting   : true
-Xft*autohint  : true
-! unknown, rgb, bgr, vrgb, vbgr, none - геометрия для субпиксельного сглаживания
-Xft*rgba      : rgb
-! тип фильтра для lcd мониторов - lcdnone lcddefault lcdlight lcdlegacy
+! ! Fonts for Cairo and libXft
+! Xft*antialias : true
+! ! Стиль автохинтинга - hintnone *hintslight hintmedium hintfull
+! Xft*hintstyle : hintfull
+! Xft*hinting   : true
+! Xft*autohint  : true
+! ! unknown, rgb, bgr, vrgb, vbgr, none - геометрия для субпиксельного сглаживания
+! Xft*rgba      : rgb
+! ! тип фильтра для lcd мониторов - lcdnone lcddefault lcdlight lcdlegacy
+! Xft*lcdfilter : lcddefault
+
+
+Xft*antialias : 1
+Xft*autohint  : 0
+Xft*hinting   : 1
+Xft*hintstyle : hintslight
 Xft*lcdfilter : lcddefault
+Xft*rgba      : rgb

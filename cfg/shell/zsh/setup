@@ -16,10 +16,8 @@ link "$PWD/zlogin" ~/.zlogin
 link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
 linkdir "$ZDOTDIR/." zlogin zprofile zshrc zpreztorc
 
-echo 2
-
 # Choose default shell
-if [[ "$(which zsh)" != ${SHELL?No} ]]; then
+if [[ -z "$SSH_TTY" && "$(which zsh)" != ${SHELL?No} ]]; then
     sudo chsh -s /bin/bash  # Root login shell
     sudo usermod -s $(which zsh) "$(whoami)"  # User shell
 fi

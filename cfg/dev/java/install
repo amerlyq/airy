@@ -1,28 +1,26 @@
 #!/bin/bash
-# vim: ft=sh
 source ~/.shell/func.d/packages
-if [ $? -eq 1 ]; then exit 1; fi
-# JDK
 
 # Installation man
 # http://www.linuxrussia.com/2013/04/oracle-java-7-ubuntu-1304-1204-1210.html
-
-
 #apt_noprompt openjdk-7-jdk #openjdk-7-jdk:i386 == broken
 
 #ppa:eugenesan/java
-
 # Can't dld. Use offsite, dld .rpm package, then
 #   sudo apt-get install alien && sudo alien *.rpm && dpkg -i *.deb
 
-# ppa_add 'ppa:webupd8team/java'
-# apt_noprompt oracle-java8-installer
+
+if distro arch; then
+    aur_inst jdk
+
+elif distro ubuntu; then
+    ppa_add 'ppa:webupd8team/java'
+    pkg_inst 'oracle-java8-installer'
+    # sudo update-java-alternatives -s java-8-oracle
+fi
 
 java -version
 javac -version
-
-
-# sudo update-java-alternatives -s java-8-oracle
 
 
 
@@ -43,4 +41,3 @@ javac -version
 
 ## for java8 -- dld from site. If VM can't start -- you must unpack it's files.
 # find . -type f -name '*.pack' | while read fl; do sudo ./bin/unpack200 $fl ${fl%.*}.jar; done
-

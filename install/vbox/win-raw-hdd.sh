@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 source ~/.shell/profile || exit
 
 ### MBR unnecessary if use whole disk, but you need grub. And vice versa.
