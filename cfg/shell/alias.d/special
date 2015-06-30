@@ -33,7 +33,7 @@ vienv(){
         printf "%s\n\n\n" "$sb" > "$NM"
         chmod 764 "$NM"
     fi
-    vim "$NM"
+    vim +'norm G' "$NM"
     # vim "$NM" -c "normal i#!/usr/bin/env $shl<CR>"
 }
 alias vish='vienv bash '

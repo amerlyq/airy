@@ -4,8 +4,7 @@
 [[ -z "$RANGER_LEVEL" ]] || exit 2  # You must interpret this error
 
 
-mkdir -p /tmp/aura
-tempfile='/tmp/aura/ranger_cwdir'
+tempfile="${TMPDIR:-/tmp}/ranger_cwdir"
 trap "rm -f -- '$tempfile' > /dev/null" EXIT
 
 # export TERM=xterm-256color #launch even inside terms w/o color support

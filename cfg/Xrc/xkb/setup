@@ -3,17 +3,17 @@ source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD/run" "$CURR_CACHE/bin/lau-${PWD##*/}"
+link "$PWD/run" "${CURR_CACHE:?No}/bin/lau-${PWD##*/}"
 
 ### GENS ###
-kmap() { xkbcomp -I"$HOME/.Xrc/xkb" ${1:--} ${2} 2>&1 |
+kmap() { xkbcomp -I"$PWD" ${1:--} ${2} 2>&1 |
     sed '/No symbols defined\|Symbols ignored\|not found in evdev/d'; }
 
-dst=$CURR_CACHE/keylayout.xkm
+dst="$CURR_CACHE/keylayout.xkm"
 
 case "${CURR_HOST?No}" in
-vbox) sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|
-          ' ./amer.xkb | kmap - "-xkm $dst" ;;
+vbox) sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|' \
+            ./amer.xkb | kmap - "-xkm $dst" ;;
 *) kmap ./amer.xkb "-xkm $dst"
 esac
 echo "W: $dst"

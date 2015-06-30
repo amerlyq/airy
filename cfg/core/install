@@ -3,7 +3,15 @@ source ~/.shell/func.d/packages
 
 
 if distro arch; then
+    # device drivers
+    pkg_inst 'xf86-input-synaptics'
+    # system drivers
     pkg_inst 'ntfs-3g'
+    # fonts
+    pkg_inst 'ttf-freefont ttf-dejavu'
+    # sudo fc-cache && sudo mkfontscale && sudo mkfontdir
+
+# http://askubuntu.com/questions/468466/why-this-occurs-error-diskfilter-writes-are-not-supported
 fi
 # elif distro ubuntu; then
     #| grub-customizer | To change boot order, time and boot-wallpaper

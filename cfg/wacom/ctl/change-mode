@@ -7,8 +7,8 @@ source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 #   : similar to my trackball capturing mouse wheel or alt-back
 #   show in i3bar also "profile : mode" instead of notify
 
-curr() { cat /tmp/aura/wacom_mod
-    # | awk '$1 == '"$(cat /tmp/aura/wacom_prof)"' {print $2}'
+curr() { cat ${TMPDIR:-/tmp}/wacom_mod
+    # | awk '$1 == '"$(cat ${TMPDIR:-/tmp}/wacom_prof)"' {print $2}'
 }
 
 next() { ## Choose next
@@ -47,7 +47,7 @@ else case "$mod" in
          *) next $mod ;; esac
 fi
 # awk '$1 == '"$(cat /tmp/aura/wacom_prof)"' {print $1,$2,$3; next} ' /tmp/aura/wacom_mod
-echo "$mod" > /tmp/aura/wacom_mod
+echo "$mod" > ${TMPDIR:-/tmp}/wacom_mod
 
 ## Orienting on inner half-circle due to hands position
 case "$mod" in

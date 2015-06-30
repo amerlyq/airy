@@ -2,6 +2,9 @@
 # About 'file' command
 #   https://www.ibm.com/developerworks/community/blogs/58e72888-6340-46ac-b488-d31aa4058e9c/entry/get_over_extensions_use_file_command_to_determine_file_types_in_linux?lang=en
 
+## Prompt: always/newer/on_error
+case "$1" in -[aen]) ARGS="$1"; shift ;; *) ARGS='-e' ;; esac
+
 NM="$1"
 NAME="${NM%/*}"
 EXT="${NAME##*.}"
@@ -9,10 +12,10 @@ TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
 FL="$PWD/$NM"
 
 
-finish() {
-  local ERR=$?;  if [[ "$ERR" != 0 ]]
-  then pause $ERR "$NAME" || exit $ERR; fi
-} && trap finish EXIT
+finish() { local ERR=$?; if [[
+    "$ARGS" == '-a' || ("$ARGS" != '-n' && "$ERR" != 0)
+]]; then pause $ERR "$NAME" || exit $ERR; fi
+} && trap finish INT TERM EXIT
 
 
 # Names
@@ -36,7 +39,7 @@ xmind) XMind -noSplash -- "$1" ;;
 [[ -n "$v2" ]] && case "$TYPE" in  # Types
  text/x-python) "$FL"  ;;
 application/x*) "$FL"  ;;
-       text/x*) if [[ -x "$FL" ]]; then "$FL" || exit
+       text/x*) if [[ -x "$FL" ]]; then "$FL"; exit
                 else echo "Non-executable '$FL'"; fi ;;
        video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
 *) v3=false ;; esac

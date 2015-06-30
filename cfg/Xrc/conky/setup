@@ -2,4 +2,7 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-# link "$PWD/conkyrc" ~/.config/conkyrc
+link "$PWD/conky.conf" ~/.config/conky/conky.conf
+
+## Reload cfg
+lst=$(pgrep conky) && kill -USR1 $lst ||:

@@ -8,15 +8,15 @@ source ~/.shell/func.d/packages
 
 #git_inst 'enkore/j4-dmenu-desktop'
 # OBSOLETE:
-# i3status      #
+# dzen2, i3status
 # acpi, sysstat # for i3blocks: has 'mpstat' for cpu loading, 'acpi' for battery stat
 
 if distro arch; then
     pkg_inst i3 i3lock
-    echo "Err: port ruby-ronn and i3blocks"
+    aur_inst i3blocks
 
 elif distro ubuntu; then
-    pkg_inst i3 i3lock #dzen2 libanyevent-i3-perl
+    pkg_inst i3 i3lock
 
     pkg_inst 'ruby-ronn'
     git_inst 'vivien/i3blocks'

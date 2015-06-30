@@ -2,12 +2,12 @@
 SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
 source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
-curve=$(cat /tmp/aura/wacom_curve)
+curve=$(cat ${TMPDIR:-/tmp}/wacom_curve)
 case "$curve" in
     soft) curve=firm; bezier="50 0 20 75" ;;
 firm|norm|*) curve=soft; bezier="20 0 10 100" ;;
 esac
-echo "$curve" > /tmp/aura/wacom_curve
+echo "$curve" > ${TMPDIR:-/tmp}/wacom_curve
 
 for w in "$WSTYLUS" ; do #"$WERASER"
     xsetwacom set "$w" PressureCurve "$bezier"

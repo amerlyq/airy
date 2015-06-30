@@ -1,41 +1,48 @@
 from ranger.api.commands import Command
 from ranger.ext.shell_escape import shell_quote
 
+import os
+
 
 # Need this in the end of ~/.bashrc or ~/.zshrc
 #   function finish { tempfile='/tmp/aura/ranger_cwdir'; echo "$PWD" > "$tempfile"; }
 # `trap finish EXIT
 class cd_shelldir(Command):
+    LAST = os.path.join('/tmp', os.getenv('USER'), 'ranger_cwdir')
     """:cd_shelldir
-    Goes to path from /tmp/aura/ranger_cwdir
+    Goes to path from /tmp/<username>/ranger_cwdir
     """
     def execute(self):
-        shelldir = '/tmp/aura/ranger_cwdir'
         try:
-            fname = self.fm.confpath(shelldir)
+            fname = self.fm.confpath(cd_shelldir.LAST)
             with open(fname, 'r') as f:
                 self.fm.cd(f.readline().rstrip())
         except IOError:
-            return self.fm.notify(shelldir, bad=True)
+            return self.fm.notify(cd_shelldir.LAST, bad=True)
 
     def tab(self):
         return self._tab_directory_content()  # Generic function
 
 
 class actualee(Command):
-    FL = '/tmp/aura/ranger_list'
+    FLS = os.path.join('/tmp', os.getenv('USER'), 'ranger_list')
     """:actualee
     Use '~/.bin/actually' to apply secondary action to file/list
     """
     def execute(self):
+        if self.arg(1) and self.arg(1)[0] == '-':
+            flags = self.arg(1)
+        else:
+            flags = '-e'
+
         s = [f.path for f in self.fm.thisdir.files]
         index = s.index(self.fm.thisfile.path)
-        with open(actualee.FL, 'w') as f:
+        with open(actualee.FLS, 'w') as f:
             f.write("\n".join(s[index:] + s[:index]))
 
         if self.fm.thisfile.is_file:
             # if 'x' in file.get_permission_string():
-            command = 'cd %d && actualee %f -l ' + actualee.FL
+            command = 'cd %d && actualee ' + flags + ' %f -l ' + actualee.FLS
             command = self.fm.substitute_macros(command, escape=True)
             self.fm.execute_command(command)
         else:

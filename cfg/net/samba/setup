@@ -2,6 +2,8 @@
 source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
+distro ubuntu || exit 0
+
 ## Don't share samba in work network, only at home
 case "${CURR_PROF?No}" in
 laptop|home)

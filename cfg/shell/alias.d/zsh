@@ -21,9 +21,9 @@ alias -g S='| noglob sed -rn '
 alias -g W="| while read line; do "
 
 ## Buffers
-alias -g A='| tee -a /tmp/aura/zsh-last-output '
-alias -g T='| tee /tmp/aura/zsh-last-output '
-alias -g O='cat /tmp/aura/zsh-last-output '
+alias -g A='| tee -a $TMPDIR/zsh-last-output '
+alias -g T='| tee $TMPDIR/zsh-last-output '
+alias -g O='cat $TMPDIR/zsh-last-output '
 alias -g X='xsel -ob '
 alias -g XN='| xsel -ib '
 alias -g XC='| xsel -ib && xsel -ob '

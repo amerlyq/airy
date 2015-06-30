@@ -9,13 +9,13 @@ for pf in ./profile.d/*; do
     if [ -z "$line" ]; then continue; fi
     if ! awk "/${line}/ {exit 1}" <<< "$WND_ACTIVE"; then
         WCURR_PROF="${pf##*/}"
-        WCURR_MODE=" : $(cat /tmp/aura/wacom_mod)"
+        WCURR_MODE=" : $(cat ${TMPDIR:-/tmp}/wacom_mod)"
     fi
 done
 
 echo "${WCURR_PROF}${WCURR_MODE}"
-[[ $WCURR_PROF == $(cat /tmp/aura/wacom_prof) ]] && exit
-echo "$WCURR_PROF" > /tmp/aura/wacom_prof
+[[ $WCURR_PROF == $(cat ${TMPDIR:-/tmp}/wacom_prof) ]] && exit
+echo "$WCURR_PROF" > ${TMPDIR:-/tmp}/wacom_prof
 
 ./profile.d/default >/dev/null
 ${WCURR_PROF:+./profile.d/$WCURR_PROF >/dev/null}

@@ -3,7 +3,7 @@
 # Pre-caching of slow xrandr results.
 # Works only once after system startup.
 
-FL=/tmp/aura/outputs
+FL=${TMPDIR:-/tmp}/outputs
 if [ ! -f "$FL" ]; then
     xrandr | sed -n '/\sconnected\s/{{
         s/connected\|x\|+\|(.*$/ /g
