@@ -22,12 +22,15 @@ v() { #servername == syntex (must be for LaTeX)
 
 vienv(){
     local shl="$1" NM="${2:-`tempfile`}"
-    if [ ! -e "$NM" ]; then
-        if [[ 'py' == ${NM##*\.} ]]; then
-            shl='python\n# vim: fileencoding=utf-8'
-        fi
+    if [[ ! -e "$NM" ]]; then
+        case "$shl"
         # Python recognizes encoding: "coding[:=]\s*([-\w.]+)"
-        printf "#!/usr/bin/env $shl\n\n\n" > "$NM"
+        in  python2) sb="#!/usr/bin/env $shl\n# vim: fileencoding=utf-8"
+        ;;  python3) sb="#!/usr/bin/env $shl"
+        ;; bash|zsh) sb="#!/bin/$shl -e"
+        esac
+
+        printf "%s\n\n\n" "$sb" > "$NM"
         chmod 764 "$NM"
     fi
     vim "$NM"

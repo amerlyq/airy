@@ -19,7 +19,7 @@ header "Airy public" && {
     link "$PWD/cfg/shell" ~/.shell
 } | pretty
 
-[[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell 
+[[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell
 # ======================================================================
 ## Populate sensible configs
 if [[ -f ../erian/setup ]]; then
@@ -38,7 +38,7 @@ if cfgOpt s; then PKG_LIST="$ARGS"
 else case "${CURR_PROF:=headless}" in
 laptop|home|work) PKG_LIST=(shell 'shell/*' core 'dev/*' 'term/*'
         Xrc 'Xrc/*' 'net/*' 'browser/*' media 'media/*') ;;
-headless) PKG_LIST=(shell zsh git ranger tmux vim elinks)
+ssh|headless) PKG_LIST=(shell zsh git ranger tmux vim elinks)
         if has_pr X; then PKG_LIST+=(urxvt); fi ;;
 *) die "No such profile" ;; esac; fi
 

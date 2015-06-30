@@ -42,7 +42,7 @@ function time_dt {
 function gita_st { # $1 -- rep path
     st="$(gita_prezto)"
     dt=$(git log -1 --pretty=format:'%ci' | awk '{ print $2,$1 }')
-    printf "%-20s\t %-17s %-18s - %6s\n" "$st" "$1" "$dt" "$(time_dt)"
+    printf "%-20s\t %+17s %-18s - %6s\n" "$st" "$1" "$dt" "$(time_dt)"
     # echo -en " $1 `echo $ST | sed 's/[%{}]//g'`\n"
 }
 
