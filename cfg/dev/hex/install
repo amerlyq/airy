@@ -16,14 +16,14 @@ source ~/.shell/func.d/packages
 pkg_inst dhex
 
 if has_pr X; then
-  pkg_inst "meld"
-if distro arch; then
-if cfgOpt u || has_pr wxhexeditor; then
-  aur_inst "wxhexeditor"
-fi
-elif distro ubuntu; then
-  pkg_inst "wxhexeditor"
-fi
+    pkg_inst "meld"
+
+    if distro arch; then
+       aur_inst -p 'wxHexEditor' wxhexeditor-git
+
+    elif distro ubuntu; then
+        pkg_inst "wxhexeditor"
+    fi
 fi
 
 # PM="wxHexEditor.tar.bz2"

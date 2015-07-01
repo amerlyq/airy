@@ -5,9 +5,7 @@ source ~/.shell/func.d/packages
 pkg_inst 'inotify-tools'
 
 if distro arch; then
-    if cfgOpt u || ! has_pr vimb; then
-        aur_inst 'vimb'
-    fi
+    aur_inst -p 'vimb' 'vimb'
 
 elif distro ubuntu; then
     pkg_inst 'libsoup2.4-dev libwebkit-dev libgtk-3-dev libwebkitgtk-3.0-dev'
@@ -15,6 +13,6 @@ elif distro ubuntu; then
 
     mkdef() { if ! update-alternatives --get-selections | grep -q "^$1.*$2\$"
     then sudo update-alternatives --install /usr/bin/$1 $1 "$2" 200
-         sudo update-alternatives --set $1 "$2"; fi; }
+            sudo update-alternatives --set $1 "$2"; fi; }
     mkdef x-www-browser $(which vimb)
 fi

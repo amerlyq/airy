@@ -1,22 +1,25 @@
-#!/bin/bash
-# vim: ft=sh
+#!/bin/bash -e
 source ~/.shell/func.d/packages
-if [ $? -eq 1 ]; then exit 1; fi
 
 
-LST="$LST build-essential autoconf libtool"
-LST="$LST libX11-dev libxi-dev x11proto-input-dev xserver-xorg-dev libxrandr-dev libncurses5-dev"
-LST="$LST linux-headers-generic xutils-dev"
-apt_noprompt $LST
+if distro arch; then
+    pkg_inst "xf86-input-wacom"
+
+elif distro ubuntu; then
+    LST="$LST build-essential autoconf libtool"
+    LST="$LST libX11-dev libxi-dev x11proto-input-dev xserver-xorg-dev libxrandr-dev libncurses5-dev"
+    LST="$LST linux-headers-generic xutils-dev"
+    pkg_inst $LST
+
+    git_inst -d "git://git.code.sf.net/p/linuxwacom/xf86-input-wacom"
+    dir="$CURR_DIR_PKG/xf86-input-wacom/"
+    pkg_build "$dir" --prefix=/usr --libdir=/usr/lib64    # on 64 bit install
+fi
+
 
 # NOTE:
 #   http://linuxwacom.sourceforge.net/wiki/index.php/Main_Page
 #   http://sourceforge.net/projects/linuxwacom/files/latest/download
-
-git_install "git://git.code.sf.net/p/linuxwacom/xf86-input-wacom" -d
-dir="$CURR_DIR_PKG/xf86-input-wacom/"
-rep_autobuild "$dir" --prefix=/usr --libdir=/usr/lib64    # on 64 bit install
-
 
 # Media/control support
 # apt_noprompt gnome-control-center

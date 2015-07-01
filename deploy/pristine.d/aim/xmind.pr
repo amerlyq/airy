@@ -1,9 +1,0 @@
-#!/bin/bash
-# vim: ft=sh
-source ~/.shell/func.d/packages
-if [ $? -eq 1 ]; then exit 1; fi
-
-apt_noprompt lame
-
-url=$(curl -s 'http://www.xmind.net/download/linux/' | sed -n '/.*href="\(http:.*xmind.*amd64\.deb\)".*/s//\1/p')
-deb_wget "$url"

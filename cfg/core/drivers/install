@@ -1,0 +1,19 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# pulseaudio# Need for usage pactl -- ncmpcpp and volume regulator in i3 config bindings.
+# alsa      # volume regulator
+
+if distro arch; then
+    # device drivers
+    pkg_inst 'xf86-input-synaptics'
+    # sound
+    pkg_inst 'alsa-firmware alsa-plugins alsa-utils alsa-tools pulseaudio pulseaudio-alsa'
+
+elif distro ubuntu; then
+    ## For Mint
+    # if ! grep -q snd-hda-intel /etc/modprobe.d/alsa-base.conf; then
+    #     echo 'options snd-hda-intel model=asus' | sudo tee -a /etc/modprobe.d/alsa-base.conf
+    # fi
+    echo "Err: "
+fi

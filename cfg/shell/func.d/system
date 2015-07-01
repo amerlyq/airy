@@ -1,12 +1,15 @@
 # vim: ft=sh
 # ======================== System =============================
 
-cfgOpt(){ [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
+cfgOpt(){ [[ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]]; }
 cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 
 distro(){ cat /etc/os-release | grep -iq "$1"; }
 has_pr(){ hash $1 >/dev/null 2>&1; }
-do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1; do printf "."; sleep 0.5; done; echo; }; }
+do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
+    do printf "."; sleep 0.5; done; echo; }; }
+# $(ps opid= -C ${1##*/})
+kill_prs(){ pids=$(pgrep "${1##*/}(\s|\$)") && kill -TERM $pids || true; }
 
 die() { local ret=$?
     if [[ "$1" =~ [0-9]+ ]]; then ret=$1; shift; fi
@@ -24,3 +27,22 @@ amAskConfirm() {
         *) die "Invalid input" ;;
     esac
 }
+
+run_single() { local pids
+    # To be able to restart programms / reload configs for those which already launched!
+    case "$1" in -r) shift; kill_prs "$1" ;; esac
+    has_pr "$1" || [[ -f "$1" ]] || return
+    if ! pgrep "${1##*/}(\s|\$)" > /dev/null; then $@ & fi
+}
+
+# Start the given command and wait until it's visible
+# ERROR: this block is infinite for ~/.i3/blocks/kbdd-i3blocks or dunst.
+# mypid=$! # Pid of last background process
+# for i in `seq $MAXWAIT`; do
+#     echo "Wait $pr $mypid: $i"
+#     if xdotool search --onlyvisible --pid $mypid --name "$pr"; then
+#         return 0;
+#     fi
+#     sleep 1
+# done
+# notify "Error on executing: $pr $args" &

@@ -3,14 +3,11 @@ source ~/.shell/func.d/packages
 
 #| conky | show system info on screen overlay
 
-if distro arch; then
-    pkg_inst "conky lm_sensors"
+pkg_inst -p 'conky' conky lm-sensors
 
-elif distro ubuntu; then
-    pkg_inst "conky lm-sensors"
-fi
-
-echo "Configure cpu and etc sensors. Reply 'yes' on all questions"
-sudo sensors-detect
-# Display all found sensors
-sensors
+if cfgOpt u; do
+    echo "Configure cpu and etc sensors. Reply 'yes' on all questions"
+    sudo sensors-detect
+    # Display all found sensors
+    sensors
+done

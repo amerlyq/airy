@@ -40,4 +40,16 @@ function! s:SetArgs(args, jump_to_first)
   endif
 endf
 
+" ALT:
+"   https://github.com/Peeja/vim-cdo
+"   https://github.com/sk1418/QFGrep
+"   https://github.com/stefandtw/quickfix-reflector.vim
+"   https://github.com/jceb/vim-editqf
+
+function! s:FilterQuickfixList(bang, pattern)
+  let cmp = a:bang ? '!~#' : '=~#'
+  call setqflist(filter(getqflist(), "bufname(v:val['bufnr']) " . cmp . " a:pattern"))
+endfunction
+command! -bang -nargs=1 -complete=file QFilter call s:FilterQuickfixList(<bang>0, <q-args>)
+
 " vim:et:sw=2:ts=4:tw=78

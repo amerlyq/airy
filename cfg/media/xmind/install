@@ -1,0 +1,13 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+
+if distro arch; then
+    pkg_inst "xmind"
+
+elif distro ubuntu; then
+    pkg_inst lame
+    site='http://www.xmind.net/download/linux/#'
+    mask='http:.*xmind.*amd64\.deb'
+    deb_wget "$(curl -s "$site" | sed -n '/.*href="\('"$mask"'\)".*/s//\1/p')"
+fi

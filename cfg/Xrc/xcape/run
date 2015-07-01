@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
+source ~/.shell/func.d/system
 
-lst=$(pgrep xcape) && kill -TERM $lst
-xcape -t 250 -e "Control_L=Escape"
+run_single kbdd
+run_single xcape -t 250 -e "Control_L=Escape"

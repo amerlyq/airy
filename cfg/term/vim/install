@@ -15,8 +15,6 @@ elif distro ubuntu; then
     pkg_inst vim-gtk exuberant-ctags 'python-pip' python-dev
     pkg_inst libclang-dev clang-format-3.5
 
-    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
-        sudo update-alternatives --set $1 "$2"; }
     for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
 fi
 

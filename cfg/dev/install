@@ -3,6 +3,9 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     pkg_inst "base-devel"
+    pkg_inst "gcc-multilib lib32-gcc-libs"
+    pkg_inst "valgrind-multilib"
+
     echo "Err: Not enough packages"
 
 elif distro ubuntu; then

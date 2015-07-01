@@ -8,10 +8,16 @@ cfg=/etc/pacman.conf
 sed -ri '/#%BEGIN_AUR/,/#%END_AUR/d' $cfg
 cat >> $cfg <<EOT
 #%BEGIN_AUR
+
+## Build and run 32-bit apps
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+
 ## AUR: https://archlinux.fr/yaourt-en
 [archlinuxfr]
 SigLevel = Never
 Server = http://repo.archlinux.fr/\$arch
+
 #%END_AUR
 EOT
 

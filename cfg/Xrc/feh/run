@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 # Set new wallpaper
-[[ -n "$1" ]] && link "$(readlink -m "$1")" ~/.wallpaper
+[[ -n "$1" ]] &&
+    source ~/.shell/func.d/cfgsetup &&
+    link "$(readlink -m "$1")" ~/.wallpaper
 
 if [[ -f ~/.wallpaper ]]; then  # symlink to one wallpaper
     feh --bg-fill ~/.wallpaper

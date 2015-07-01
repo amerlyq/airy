@@ -13,7 +13,7 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     pkg_inst i3 i3lock
-    aur_inst i3blocks
+    aur_inst -p 'i3blocks' i3blocks
 
 elif distro ubuntu; then
     pkg_inst i3 i3lock
@@ -25,7 +25,5 @@ elif distro ubuntu; then
     printf "[Desktop]\nSession=i3\n" > ~/.dmrc
     echo "W: ~/.dmrc  <- i3"
 
-    mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
-        sudo update-alternatives --set $1 "$2"; }
     mkdef x-window-manager $(which i3)
 fi

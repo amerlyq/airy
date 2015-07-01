@@ -10,10 +10,21 @@ esac; done
 CURR_DIR_PKG="${CURR_DIR_PKG:-~/pkg}"
 mkdir -vp "$CURR_DIR_PKG"
 
+do_if() {  local cmd pkgs exists
+  while (($# > 0)); do case "$1"
+  in -c) cmd="$2"; shift 2
+  ;; -d|-f) if eval "[[ $1 '${2:?No dir path}' ]]"; then exists=1; fi; shift 2
+  ;; -p) if has_pr "${2:?No pr name}"; then exists=1; fi; shift 2
+  ;; *) pkgs="$pkgs $1"; shift ;; esac; done
+
+  if cfgOpt u || [[ "$exists" -ne 1 ]]; then
+    ${cmd:?No cmd} ${pkgs:?No packages} || exit
+  fi
+}
 
 if distro ubuntu; then
-  pkg_inst(){ sudo apt-get --yes install $@ || exit; }
-  pkg_make(){ sudo checkinstall --default $@ || exit; }
+  pkg_inst(){ do_if -c 'sudo apt-get --yes install' $@; }
+  pkg_make(){ sudo checkinstall --default $@; }
   deb_wget(){ wget_it $* && sudo dpkg -i "$CURR_DIR_PKG/${2:-${1##*/}}"; }
   ppa_add(){
     local addr="${1#ppa:}"
@@ -23,12 +34,14 @@ if distro ubuntu; then
     sudo apt-add-repository --yes "$1"
     sudo apt-get update
   }
+  mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+      sudo update-alternatives --set $1 "$2"; }
 
 elif distro arch; then
-  pkg_inst(){ sudo pacman -S --noconfirm $@; }
+  pkg_inst(){ do_if -c 'sudo pacman -S --noconfirm' $@; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
   if hash yaourt >/dev/null 2>&1
-  then aur_inst(){ yaourt -S --noconfirm $@; }
+  then aur_inst(){ do_if -c 'yaourt -S --noconfirm' $@; }
   else aur_inst(){ return 1; }
   fi
 

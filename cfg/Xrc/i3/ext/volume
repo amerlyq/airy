@@ -7,9 +7,7 @@
 
 case "$1" in [0-9]*) CMD="$1 unmute" ;; esac
 amixer -q -D pulse set Master ${CMD:-toggle}
-
-# pactl set-sink-volume 0 -- +10%
-# pactl set-sink-volume 0 -- -10%
+# pactl set-sink-volume 0 -- 20%  # +10%
 # pactl set-sink-mute 0 toggle
 # mocp -r
 

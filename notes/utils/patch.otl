@@ -1,0 +1,44 @@
+> Applying patches with patch
+
+A single file
+	cd <dir_of_file>
+	patch < foo.patch
+	: These instructions assume the patch is distributed in unified format,
+	: which identifies the file the patch should be applied to. If not, you can
+	: specify the file on the command line:
+	patch foo.txt < bar.patch
+
+Applying patches to entire directories (perhaps the more common case) is
+similar, but you have to be careful about setting a "p level". What this means
+is that, within patch files, the files to be patched are identified by path
+names which may be different now that the files are located on your computer
+rather than on the computer where the patch was created. The p level instructs
+patch to ignore parts of the path name so that it can identify the files
+correctly. Most often a p level of one will work, so you use:
+	patch -p1 < baz.patch
+
+You should change to the top level source directory before running this
+command. If a patch level of one does not correctly identify any files to
+patch, inspect the patch file for file names. If you see a name like
+	/users/stephen/package/src/net/http.c
+and you are working in a directory that contains net/http.c, use
+	patch -p5 < baz.patch
+In general, count up one for each path separator (slash character) that you
+remove from the beginning of the path, until what's left is a path that exists
+in your working directory. The count you reach is the p level.
+
+
+To remove a patch, use the -R flag, ie
+	patch -p5 -R < baz.patch
+
+> Creating patches with diff
+
+Using diff is simple whether you are working with single files or entire
+source directories. To create a patch for a single file, use the form:
+	diff -u original.c new.c > original.patch
+
+To create a patch for an entire source tree, make a copy of the tree:
+	cp -R original new
+	: Make any changes required in the directory new/. Then create a patch
+	: with the following command:
+	diff -rupN original/ new/ > original.patch
