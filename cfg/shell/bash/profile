@@ -16,8 +16,10 @@
 if [ -d ~/.cache/airy/bin ]; then PATH="$HOME/.cache/airy/bin:$PATH"; fi
 if [ -d ~/.bin ]; then PATH="$HOME/.bin:$PATH"; fi
 
-# For all my system-wide global files
-mkdir -p /tmp/aura
+if [ ! -d "$TMPDIR" ]; then
+  export TMPDIR="/tmp/$LOGNAME"
+  mkdir -p -m 700 "$TMPDIR"
+fi
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then

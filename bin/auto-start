@@ -54,6 +54,7 @@ lau-feh
 ## Keylayout
 lau-xkb
 lau-xcape
+lau-dunst
 
 # Focus certain wksp
 #i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &
@@ -61,14 +62,12 @@ lau-xcape
 
 ### ONCE ### ----------------------------------------
 
-lau kbdd
 lau ~/.i3/blocks/kbdd-i3blocks
-rcf dunst
 lau mpd
 # Must be launched before installing wallpaper!
 lau compton
 lau copyq
-lau syncthing > /tmp/syncthing.log 2>&1
+lau syncthing >/tmp/syncthing.log 2>&1
 # i3-msg 'workspace number 11'
 [[ "$CURR_PROF" == "work" ]] && lau pidgin
 # i3-msg 'workspace number 1'

@@ -56,3 +56,5 @@ fi
 # turn on directory spelling typos automagic
 shopt -s cdspell
 
+finish() { printf "%s" "$PWD" >! "${TMPDIR:-/tmp}/ranger_cwdir"; }
+trap finish EXIT

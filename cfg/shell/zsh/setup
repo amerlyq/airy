@@ -7,8 +7,8 @@ mkdir -vp "$ZDOTDIR"
 PREZTO="$ZDOTDIR/.zprezto"
 
 if [[ ! -d "$PREZTO" ]]; then
-    run git clone --recursive 'https://github.com/sorin-ionescu/prezto.git' "$PREZTO"
-    # run git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
+    git clone --recursive 'https://github.com/sorin-ionescu/prezto.git' "$PREZTO"
+    # git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
 fi
 
 link "$PWD/zshenv" ~/.zshenv

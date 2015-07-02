@@ -1,0 +1,7 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+### LINKS ###
+if cfgOpt u || [[ ! -L /etc/minirc.dfl ]]; then
+    sudo ln -svf "$PWD/usb0" /etc/minirc.dfl
+fi

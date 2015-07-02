@@ -85,6 +85,8 @@ mailboxes +inbox
 # ALT: set imap_check_subscribed
 
 ## HTML enriched mails
-auto_view text/html                                      # view html automatically
+set mailcap_path=~/.mutt/mailcap
 alternative_order text/plain text/enriched text/html     # save html for last
+set implicit_autoview=yes  # Load in pager if setting in .mailcap says 'copiousoutput'
 bind attach <return>    view-mailcap
+auto_view text/html                                      # view html automatically

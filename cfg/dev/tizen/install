@@ -19,6 +19,10 @@ if distro arch; then
     # md5sum("...")  # count by yourself
     # cd "deltarpm.git"
 
+    # Perforce visual client
+    aur_inst -p 'p4v' p4v
+
+
 elif distro ubuntu; then
     # Necessary packets for tizen-sdk
     pkg_inst expect libudev-dev
@@ -28,6 +32,12 @@ elif distro ubuntu; then
     # Install Oracle Java (OpenJDK isn't compatible)
     # ppa_add 'ppa:webupd8team/java'
     # pkg_inst oracle-java8-installer
+
+    # Download p4v.tgz
+    # tar xvfz p4v.tgz
+    # cd p4v-*
+    # sudo cp -vt /usr/local/bin/ bin/*
+    # sudo cp -vrt /usr/local/lib/ lib/*
 
     printf "
     >>> In Launched ./tizen-sdk-ubuntu64-v2.2.71.bin

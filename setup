@@ -35,12 +35,12 @@ source ~/.shell/profile
 
 ## NOTE: installs folder of configs, instead whole or individual
 if cfgOpt s; then PKG_LIST="$ARGS"
-else case "${CURR_PROF:=headless}" in
+else case "${CURR_PROF:=default}" in
 laptop|home|work) PKG_LIST=(shell 'shell/*' core 'dev/*' 'term/*'
         Xrc 'Xrc/*' 'net/*' 'browser/*' media 'media/*') ;;
-ssh|headless) PKG_LIST=(shell zsh git ranger tmux vim elinks)
+default|ssh) PKG_LIST=(shell 'shell/*' git ranger tmux vim elinks)
         if has_pr X; then PKG_LIST+=(urxvt); fi ;;
-*) die "No such profile" ;; esac; fi
+*) die "No such profile '$CURR_PROF'" ;; esac; fi
 
 
 for nm in "${PKG_LIST[@]}"; do

@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+case "$1" in
+ lucid) OPTS="-sh 100 -fadecolor White -fade 25"; shift ;;
+opaque) OPTS="-sh   0 -fadecolor Black -fade 15"; shift ;;
+ light) OPTS="-sh 170 -fadecolor White -fade 25"; shift ;;
+  dark) OPTS="-sh  25 -fadecolor Black -fade 15"; shift ;;
+*) if [[ ! "${THEME:=$(< ~/.cache/airy/theme)}" =~ ^[a-z]+$ ]]
+then THEME=dark; fi ;; esac
+
+
+urxvt $OPTS $@

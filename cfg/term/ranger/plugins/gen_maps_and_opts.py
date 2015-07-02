@@ -15,6 +15,9 @@ def aura_options(fm):
         theme = "dark"
     theme = {"dark": "solarized", "light": "solarized"
              }.get(theme, "solarized")
+
+    if not "256color" in os.getenv('TERM'):
+        theme = "default"
     fm.execute_console("set colorscheme {}".format(theme))
 
 

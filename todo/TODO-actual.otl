@@ -2,6 +2,14 @@
 	https://github.com/holman/dotfiles
 	https://dotfiles.github.io/
 
+Deploy/setup
+	[_] do_if -> system
+	[_] do_if must accept commands from stdin
+		:= Aim -- in all ./setup files to simplify upgrade sections
+	[_] No duplicates: simple '-p' argument (pkg_inst -p name) duplicates package name
+		:= if name -- list, repeat this check of name for each package
+		:= Add '-P' key for explicit consideration of package
+
 [_] Colorizing programs output
 : LIKE: grc ps aux
 	https://github.com/garabik/grc
@@ -116,6 +124,7 @@ ncmpcpp
 	[_] SEE: http://mpd.wikia.com/wiki/Hacks
 	[_] Playlists for radio
 		http://www.tristancollins.me/computing/bbc-streaming-radio-script-for-mpd/
+	[_] Edit tags for streams to be able fetch lyrics by splitting artist tag
 	[_] BUG can't resize window
 		: Search similar option for urxvt:
 		:	XTerm*allowWindowOps: 		true
