@@ -3,7 +3,8 @@ source ~/.shell/func.d/packages
 
 #| conky | show system info on screen overlay
 
-pkg_inst -p 'conky' conky lm-sensors
+pkg_inst conky
+pkg_inst -p 'sensors' lm-sensors
 
 if cfgOpt u; do
     echo "Configure cpu and etc sensors. Reply 'yes' on all questions"

@@ -5,7 +5,7 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     pkg_inst python-docutils
-    aur_inst -p 'gbs' 'gbs'
+    aur_inst 'gbs'
     # sdb: pkg_inst expect
     sudo ln -sfv /lib64/libudev.so.{1,0}
 
@@ -20,7 +20,7 @@ if distro arch; then
     # cd "deltarpm.git"
 
     # Perforce visual client
-    aur_inst -p 'p4v' p4v
+    aur_inst p4v
 
 
 elif distro ubuntu; then

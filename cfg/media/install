@@ -7,14 +7,18 @@ source ~/.shell/func.d/packages
 #|___________| mplayer -dumpaudio video.avi -dumpfile extracted_audio.mp3
 
 # fbreader
-pkg_inst "graphviz imagemagick libmagick++-dev pandoc cups-pdf"
-git_inst 'matimatik/fbless'
+pkg_inst "graphviz imagemagick cups-pdf"
+# libmagick++-dev
 
 if distro arch; then
     pkg_inst ffmpeg
+    aur_inst 'fbless'
+    aur_inst pandoc-bin
+
 elif distro ubuntu; then
     ppa_add 'ppa:mc3man/trusty-media'
-    pkg_inst ffmpeg
+    pkg_inst ffmpeg pandoc
+    git_inst 'matimatik/fbless'
 fi
 
 ## DEPRECATED: by 'tr ...'

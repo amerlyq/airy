@@ -1,0 +1,21 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| netctl         | Profile based systemd network management
+#| wpa_supplicant | Cli-tool to establish secure wifi connection
+#| wpa_actiond    | Auto switching profiles for different wifi networks
+#|________________|     =USE: netctl-auto
+#| dialog         | For wifi-menu. A tool to display dialog boxes from shell scripts
+
+pkg_inst netctl wpa_supplicant dialog
+pkg_inst wpa_actiond
+
+
+# FAQ:
+#   wpa_cli
+# Enable
+#   ip link set wlan0 down
+#   netctl start wlan_static
+# If error on connection -- see reasons:
+#   journalctl -xn
+#   netctl status wlan_static

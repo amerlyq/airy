@@ -10,15 +10,16 @@ esac; done
 CURR_DIR_PKG="${CURR_DIR_PKG:-~/pkg}"
 mkdir -vp "$CURR_DIR_PKG"
 
-do_if() {  local cmd pkgs exists
+do_exist() { $@ && echo 1 || echo 0; }
+do_if() {  local cmd pkgs exists=1
   while (($# > 0)); do case "$1"
-  in -c) cmd="$2"; shift 2
-  ;; -d|-f) if eval "[[ $1 '${2:?No dir path}' ]]"; then exists=1; fi; shift 2
-  ;; -p) if has_pr "${2:?No pr name}"; then exists=1; fi; shift 2
-  ;; *) pkgs="$pkgs $1"; shift ;; esac; done
-
+  in -c) cmd="${2}"; shift 2
+  ;; -d|-f) (( exists *= $(do_exist "[[ $1 '${2:?No dir path}' ]]") )); shift 2
+  ;;    -p) (( exists *= $(do_exist "has_pr '${2:?No pr name}'") )); shift 2
+  ;;     *) if ! has_pr "$1"; then pkgs+=" $1"; exists=0; fi; shift
+  ;; esac; done
   if cfgOpt u || [[ "$exists" -ne 1 ]]; then
-    ${cmd:?No cmd} ${pkgs:?No packages} || exit
+    [[ -n "$pkgs" ]] && ${cmd:?No cmd} ${pkgs:?No packages}
   fi
 }
 
@@ -38,10 +39,10 @@ if distro ubuntu; then
       sudo update-alternatives --set $1 "$2"; }
 
 elif distro arch; then
-  pkg_inst(){ do_if -c 'sudo pacman -S --noconfirm' $@; }
+  pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' $@; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
   if hash yaourt >/dev/null 2>&1
-  then aur_inst(){ do_if -c 'yaourt -S --noconfirm' $@; }
+  then aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' $@; }
   else aur_inst(){ return 1; }
   fi
 

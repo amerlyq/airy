@@ -1,23 +1,26 @@
 #!/bin/bash
 
-PL=/tmp/net-eth0
+PL=/tmp/${LOGNAME}/i3blocks-net
 DIR=/sys/class/net
-IFCS="eth0 wlan0"
 # if [ ! -d "$DIR/$ifc" ]; then exit 33; fi
 
 # CHECK STATUS
-for ifc in $IFCS; do
-    if [ "$(cat $DIR/$ifc/operstate )" == "up" ]; then
-        state="${ifc:0:1}$state"; state="${state^^}"
+for ifc in $DIR/*; do
+    ifc="${ifc##*/}"
+    if [[ "$ifc" =~ ^(w|e) ]]; then
+        IFCS+="$ifc "
+        if [[ "$(cat $DIR/$ifc/operstate )" == "up" ]]; then
+            state="${ifc:0:1}$state"; state="${state^^}"
+        fi
     fi
 done
-if [ -z "$state" ]; then printf "E/W\nE/W\n#DD0000"; exit 0; fi
+if [[ -z "$state" ]]; then printf "E/W\nE/W\n#DD0000"; exit 0; fi
 
 
 # CACHE RESULTS -- list of time and IFCS data
 prev=( $(cat "$PL") )
 curr=( $(date +%s.%0N) $(cat /proc/net/dev | awk '
-    $1=="eth0:" || $1=="wlan0:" { printf $2" "$10" " }' ))
+    $1 ~ "^(e|w).*:" { printf $2" "$10" " }' ))
 printf "${curr[*]}" > "$PL"
 
 # TOTAL:
@@ -45,7 +48,7 @@ done
 
 # EVENTS
 case "$BLOCK_BUTTON" in
-    1)  case $state in *W*) ifc=wlan0
+    1)  case $state in *W*) ifc=$(sed -r 's/.*(w\w+).*/\1/' <<<"$aaa")
             # WLAN DETAILS
             # apt-get install wavemon | wlan0 ncurses monitor
             buf=$( iwconfig $ifc 2>&1| sed -n "
@@ -53,7 +56,7 @@ case "$BLOCK_BUTTON" in
                 s/\s*Bit Rate=\([0-9]*\).*/mbs=\1;/p;
                 s/\s*Link Quality=\(\S*\) .*/qual=\1;/p" )
             eval "$buf" ;;
-        *) ifc=eth0 ;; esac
+        *) ifc=$(sed -r 's/.*(e\w+).*/\1/' <<<"$aaa") ;; esac
 
         ipaddr=$(ip addr show ${ifc} | sed -n 's|.*\s*inet \([0-9\.]*\)/.*|\1|p')
         text="$state (${ssid} ${mbs}Mb/s) $ipaddr"; color=''

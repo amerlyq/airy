@@ -12,7 +12,7 @@ source ~/.shell/func.d/packages
 pkg_inst "at htop dstat jshon"
 
 if distro arch; then
-    pkg_inst the_silver_searcher
+    pkg_inst -p ag the_silver_searcher
 
 elif distro ubuntu; then
     pkg_inst urlview  # No for arch?

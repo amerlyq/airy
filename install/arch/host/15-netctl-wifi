@@ -11,12 +11,13 @@ wfc=${wfcs[0]:?No}
 
 
 cat > /etc/netctl/${nm?No} <<EOT
-Description='General Wi-Fi static connection'
+Description='Home Wi-Fi static'
 Interface=$wfc
 Connection=wireless
 Security=wpa
 ESSID='${SYS_ESSID:?No}'
-# Key='WirelessKey'
+Key='$(wpa_passphrase $SYS_ESSID ${SYS_WPASS:?No} |
+    sed -rn '/.*psk=([0-9a-f]+).*/s//\1/p')'
 IP=static
 Address='${SYS_IP:?No}/24'
 Gateway='$gate'

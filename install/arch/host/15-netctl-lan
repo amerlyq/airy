@@ -20,3 +20,7 @@ netctl enable $nm
 echo ":: $nm is active"
 
 # systemctl enable dhcpcd@${ifcs[0]}.service  # Disable if use netctl
+
+# Вы можете запускать профиль Ethetnet со статическим IP независимо от того,
+# подключен кабель или нет. Для этого добавьте SkipNoCarrier=yes в файл
+# конфигурации профиля.
