@@ -2,7 +2,7 @@
 source ~/.shell/func.d/packages
 
 # | inotify-tools | watch on downloaded files in dir and auto-open them
-pkg_inst 'inotify-tools'
+pkg_inst -p inotifywait 'inotify-tools'
 
 if distro arch; then
     aur_inst 'vimb'

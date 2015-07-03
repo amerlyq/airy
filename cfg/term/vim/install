@@ -8,7 +8,10 @@ source ~/.shell/func.d/packages
 if distro arch; then
     # SEE gtags (GNU Global) -- instead of ctags?
     # aur_inst neovim-git
-    pkg_inst 'python-pip gvim-python3 ctags'
+    pkg_inst -p 'pip' python-pip
+    pkg_inst -p 'vim' gvim-python3
+    pkg_inst ctags
+    echo "Err: not all"
 
 elif distro ubuntu; then
     # for vimoutliner export in mindmap

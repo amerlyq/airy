@@ -7,8 +7,9 @@ source ~/.shell/func.d/packages
 pkg_inst "dunst"
 
 if distro arch; then
-    pkg_inst "libnotify"
-
+    LST="libnotify"
 elif distro ubuntu; then
-    pkg_inst "libnotify-bin"
+    LST="libnotify-bin"
 fi
+
+pkg_inst -p 'notify-send' $LST

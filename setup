@@ -42,7 +42,7 @@ default|ssh) PKG_LIST=(shell 'shell/*' git ranger tmux vim elinks)
         if has_pr X; then PKG_LIST+=(urxvt); fi ;;
 *) die "No such profile '$CURR_PROF'" ;; esac; fi
 
-cfgOpt u && pacman -Sy
+cfgOpt i && cfgOpt u && sudo pacman -Syu
 
 for nm in "${PKG_LIST[@]}"; do
     find ./cfg -type f -wholename "*/$nm/setup" | while read fl

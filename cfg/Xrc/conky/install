@@ -6,9 +6,9 @@ source ~/.shell/func.d/packages
 pkg_inst conky
 pkg_inst -p 'sensors' lm-sensors
 
-if cfgOpt u; do
+if cfgOpt u; then
     echo "Configure cpu and etc sensors. Reply 'yes' on all questions"
     sudo sensors-detect
     # Display all found sensors
     sensors
-done
+fi

@@ -10,16 +10,21 @@ esac; done
 CURR_DIR_PKG="${CURR_DIR_PKG:-~/pkg}"
 mkdir -vp "$CURR_DIR_PKG"
 
-do_exist() { $@ && echo 1 || echo 0; }
-do_if() {  local cmd pkgs exists=1
-  while (($# > 0)); do case "$1"
-  in -c) cmd="${2}"; shift 2
-  ;; -d|-f) (( exists *= $(do_exist "[[ $1 '${2:?No dir path}' ]]") )); shift 2
-  ;;    -p) (( exists *= $(do_exist "has_pr '${2:?No pr name}'") )); shift 2
-  ;;     *) if ! has_pr "$1"; then pkgs+=" $1"; exists=0; fi; shift
-  ;; esac; done
-  if cfgOpt u || [[ "$exists" -ne 1 ]]; then
-    [[ -n "$pkgs" ]] && ${cmd:?No cmd} ${pkgs:?No packages}
+do_if() { local cmd pkgs bHas=1 bChk=1 OPTIND=1
+  while getopts "ac:d:p:f:" opt; do case $opt
+  in d|f) eval "[[ -$opt $OPTARG ]]" || bHas=0
+  ;; a) bChk=0  # Always re-install the whole list w/o checking
+  ;; c) cmd="$OPTARG"
+  ;; p) bChk=0; has_pr "$OPTARG" || bHas=0  # Need this pr
+  ;; :|"?") echo "Need value for '-${opt}'" >&2; die 1
+  ;; esac; done && shift $((OPTIND-1))
+
+  if (($bChk)); then while (($#>0)); do
+    has_pr "$1" || { bHas=0; pkgs+=" $1"; }; shift
+  done; fi
+
+  if cfgOpt u || [[ "$bHas" -ne 1 ]]; then
+    ${cmd:?No cmd} ${pkgs:?No pkgs}
   fi
 }
 

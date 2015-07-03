@@ -9,6 +9,7 @@ user="${SYS_USER:?No}"
 # adbusers, mpd, vboxsf, vboxusers, wireshark
 id -g $user || groupadd $user
 id -u $user || useradd -m -g $user -G users,wheel,uucp -s /bin/bash $user
+gpasswd -a $user uucp  # FIND: useradd is not enough to add to group?
 printf "%s" $user:$user | chpasswd
 echo ":: created '$user' password"
 

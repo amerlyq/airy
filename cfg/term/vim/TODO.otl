@@ -262,9 +262,13 @@ SEIZE
 		http://www.vim.org/scripts/script.php?script_id=4433
 
 PROFILING
-	Slow
+	[_] Slow
 		autocmd на CursorMoved
-		: А ещё говорят тормозит cursorline...
+		:= strace -o /tmp/sprof -f vim ./cfgsetup
+		: 17303 read(0, "j", 4096)                = 1
+		: 17303 recvmsg(4, 0x7ffdc2d32400, 0)     = -1 EAGAIN (Resource temporarily unavailable)
+		: (repeat ~ 400 lines)
+		А ещё говорят тормозит cursorline...
 	Check
 		Use to get statistics on long load
 			vim --startuptime profile.log
