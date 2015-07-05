@@ -1,25 +1,21 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0})) && source ./cfg/shell/func.d/cfgsetup
-# ======================================================================
+cd $(dirname $(readlink -m ${0}))
+[[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell
+source ~/.shell/func.d/cfgsetup
 echo "$THEME" > "${CURR_CACHE?No}/theme"
 
+cfgOpt i && cfgOpt u && sudo pacman -Syu
+# ======================================================================
+
+for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
 header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
-pretty() { sed "
-    s|/home/$(whoami)|\~|g;  s|\~/\S\+/cfg/||g;  />>>/!s|^|  |g
-        /^>>> \.\//s//\n$(tput setaf 2)\[/g
-            / <<<$/s//\]$(tput sgr0)/g
-    /\(C\|W\):\s.*/s//$(tput setaf 13)&$(tput sgr0)/
-       /\(N\):\s.*/s//$(tput setaf 6)&$(tput sgr0)/
-   /\<\(E\|Err\):\s.*/s//$(tput setaf 1)&$(tput sgr0)/
-       /.*\s->\s.*/s//$(tput setaf 4)&$(tput sgr0)/
+pretty() { sed "s|/home/$(whoami)|\~|g
+              s|\~/\S\+/cfg/||g;  />>>/!s|^|  |g
+        /^>>> \.\//s//\n$C2\[/g; / <<<$/s//\]$CR/g
+    /\(C\|W\):\s.*/s//$C13&$CR/; /\(N\):\s.*/s//$C6&$CR/
+ /\<\(E\|Err\):\s.*/s//$C1&$CR/; /.*\s->\s.*/s//$C4&$CR/
 ";}
 
-header "Airy public" && {
-    link "$PWD/bin" ~/.bin
-    link "$PWD/cfg/shell" ~/.shell
-} | pretty
-
-[[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell
 # ======================================================================
 ## Populate sensible configs
 if [[ -f ../erian/setup ]]; then
@@ -31,29 +27,38 @@ fi
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
 source ~/.shell/profile
+link "$PWD/bin" ~/.bin
+cfgOpt u && opts='-u' ||:
 
 
 ## NOTE: installs folder of configs, instead whole or individual
-if cfgOpt s; then PKG_LIST="$ARGS"
-else case "${CURR_PROF:=default}" in
-laptop|home|work) PKG_LIST=(shell 'shell/*' core 'dev/*' 'term/*'
-        Xrc 'Xrc/*' 'net/*' 'browser/*' media 'media/*') ;;
-default|ssh) PKG_LIST=(shell 'shell/*' git ranger tmux vim elinks)
-        if has_pr X; then PKG_LIST+=(urxvt); fi ;;
-*) die "No such profile '$CURR_PROF'" ;; esac; fi
+if cfgOpt s; then PKG_LIST=( ${ARGS[@]} )
+else case "${CURR_PROF:=default}"
+in laptop|home|work) PKG_LIST=(shell core dev term Xrc net browser media)
+;; default|ssh) PKG_LIST=(shell git ranger tmux vim elinks)
+      if has_pr X; then PKG_LIST+=(urxvt); fi
+;; *) die "No such profile '$CURR_PROF'" ;; esac; fi
 
-cfgOpt i && cfgOpt u && sudo pacman -Syu
+PKG_SKIP=()
 
-for nm in "${PKG_LIST[@]}"; do
-    find ./cfg -type f -wholename "*/$nm/setup" | while read fl
-    do echo ">>> $fl <<<"
-        if cfgOpt i && [[ -f "${fl%/*}/install" ]]
-        then "${fl%/*}/install" $ARGS; echo; fi
-        $fl $ARGS
-    done
-done | pretty
+filter_find() { local y n
+    y="$(sed 's/ /|/g' <<< "${PKG_LIST[@]}")"
+    n="$(sed 's/ /|/g' <<< "${PKG_SKIP[@]}")"
+    if [[ -n "$y" ]]; then y='$0  ~ "\\y('"$y"')\\y"'; fi
+    if [[ -n "$n" ]]; then n='$0 !~ "\\y('"$n"')\\y"'; fi
+    if [[ -n "$y" && -n "$n" ]]; then n=" && $n"; fi
+    find "$1" -type f -name "$2" | awk "$y $n { print \$0 }" | sort -df
+}
+
+if cfgOpt i; then
+    filter_find ./cfg install | while read fl; do
+        echo ">>> $fl <<<"; $fl $opts; done | pretty
+fi
+
+filter_find ./cfg setup | while read fl; do
+    echo ">>> $fl <<<"; $fl $opts; done | pretty
 
 # ======================================================================
 
 header "DONE"
-cfgOpt u && i3-msg restart </dev/tty >/dev/null 2>&1
+if cfgOpt u; then i3-msg restart </dev/tty >/dev/null 2>&1; fi

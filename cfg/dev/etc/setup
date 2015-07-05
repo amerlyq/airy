@@ -2,6 +2,9 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD/dhexrc" ~/.dhexrc
 link "$PWD/pdbrc" ~/.pdbrc
 # valgrindrc pudb.cfg
+
+if cfgOpt u; then
+    sudo updatedb  # For locate
+fi

@@ -3,6 +3,8 @@ source ~/.shell/func.d/packages
 
 # https://wiki.archlinux.org/index.php/Kernels/Compilation/Arch_Build_System
 
+cfgOpt s || die 0 "N: Use only on purpose"
+
 if distro arch; then
     pkg_inst abs
 

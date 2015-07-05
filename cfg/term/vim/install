@@ -21,4 +21,4 @@ elif distro ubuntu; then
     for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
 fi
 
-sudo pip install --upgrade pip -U jedi
+do_if -c 'sudo pip install --upgrade' pip jedi

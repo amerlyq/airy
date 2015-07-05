@@ -8,13 +8,19 @@ source ~/.shell/func.d/packages
 #| jshon   | Bash json parser to use in scripts with i3-msg output # http://kmkeen.com/jshon/
 #| urlview | Extracting URLs from text files and displaying a menu from which
 #|_________|    you may launch a command to view a specific item
+#| mlocate | Searching indexed (daily or by 'sudo updatedb') files on arch
+
+# Desktop search: (USE 'whereis' along with which)
+#   https://wiki.archlinux.org/index.php/File_system_search
 
 pkg_inst "at htop dstat jshon"
 
 if distro arch; then
-    pkg_inst -p ag the_silver_searcher
+    pkg_inst -p 'locate' mlocate
+    pkg_inst -p 'ag' the_silver_searcher
 
 elif distro ubuntu; then
+    pkg_inst locate
     pkg_inst urlview  # No for arch?
     # pkg_inst silversearcher-ag
     pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev

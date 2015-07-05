@@ -1,0 +1,14 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+pkg_inst 'gdb'
+
+if distro arch; then
+    aur_inst -f '/usr/share/peda/peda.py' peda-git
+
+elif distro ubuntu; then
+    git_inst ""
+fi
+
+# Enable peda:
+# echo 'source /usr/share/peda/peda.py' >> .gdbinit

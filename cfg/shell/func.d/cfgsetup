@@ -1,24 +1,32 @@
 # vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 source ~/.shell/func.d/system
 
-# FIXME: even with those options, pkgbuild errors are not catched
+
+### Err handling ###
+# FIXME: even with those options, pkgbuild errors are not catched?
+# [[ $- =~ i ]] && return || exit
 set -o errexit
 set -o pipefail
-# [[ $- =~ i ]] && return || exit
+error() { echo "Err: ${PWD/$HOME/\~}/${0##*/}:L${1}: (${3:-1}) ${2}"; exit "${3:-1}"; }
+trap 'error ${LINENO}' ERR
+# SEE: http://mywiki.wooledge.org/BashFAQ/105
 
-for arg in "$@"; do case "$arg" in
-dark|light|lucid|opaque) THEME="${1}" ;;
-  # Install all packages, linked to 'setup'
- -i|--install) cfgOptAdd i; shift ;;
-  # Repeat all ops, which locked by files
-  -u|--update) cfgOptAdd u; ARGS="$1" ;;
-  # Clean all created files/directories -- to repeat as clean
-      --clean) cfgOptAdd c; ARGS="$1" ;;
-      --reset) cfgOptAdd ru ;;
-      --debug) cfgOptAdd ud ;;
-     -s|--set) cfgOptAdd s; ARGS="$2" ;;
-?*) echo "Error: unsupported argument '$1'"; exit 1 ;;
-esac; done
+
+### Argparse ###
+while getopts "cdirs:t:u" opt; do case $opt
+in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="${1}" ;; esac
+;; [iuc]) cfgOptAdd "$opt"  # Install/update/clean all configs/packages
+;; [rd]) cfgOptAdd "u$opt"  # Reset/debug
+;; s) cfgOptAdd s; ARGS+=("$OPTARG")
+;; :|"?") die 1 "Err: need value for '-$opt'"
+;; esac; done
+
+
+### Choose theme
+CURR_CACHE=~/.cache/airy && mkdir -vp "$CURR_CACHE"
+if [[ ! "${THEME:=$(< $CURR_CACHE/theme)}" =~ ^[a-z]+$ ]]
+then THEME=dark; fi
+
 
 ### LINKS ###
 # FIXME: this must be moved into func.d/cfgsetup -- to catch errors smoothly
@@ -29,16 +37,12 @@ link(){ if [[ ! -e "$2" || -L "$2" ]]; then
   else echo "->   $2"; fi
 else echo "Err: symlink to $2"; exit 1
 fi;}
+
 # ldir(){ mkdir -p $2 && lndir "$1" $2; }
 linkdir(){ for nm in ${@:2}
 do link "$PWD/$nm" "${1?No pref}$nm"
 done;}
 
-
-### Choose theme
-CURR_CACHE=~/.cache/airy && mkdir -vp "$CURR_CACHE"
-if [[ ! "${THEME:=$(< $CURR_CACHE/theme)}" =~ ^[a-z]+$ ]]
-then THEME=dark; fi
 
 ### Go to current script's directory
 cd $(dirname $(readlink -m ${0}))

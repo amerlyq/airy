@@ -4,7 +4,15 @@ source ~/.shell/func.d/packages
 #| conky | show system info on screen overlay
 
 pkg_inst conky
-pkg_inst -p 'sensors' lm-sensors
+
+
+if distro arch; then
+    LST='i2c-tools'
+elif distro ubuntu; then
+    LST='lm-sensors'
+fi
+pkg_inst -p 'sensors' $LST
+
 
 if cfgOpt u; then
     echo "Configure cpu and etc sensors. Reply 'yes' on all questions"

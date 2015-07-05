@@ -5,7 +5,7 @@ source ~/.shell/func.d/packages
 #| autossh | autoconnecting client for permanent tunnels
 
 if distro arch; then
-    pkg_inst openssl openssh
+    pkg_inst -p sshd openssh
 
 elif distro ubuntu; then
     pkg_inst openssl openssh-server openssh-client autossh

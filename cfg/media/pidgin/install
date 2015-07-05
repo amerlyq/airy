@@ -1,16 +1,20 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
-
+has_pr X || die
 # | pidgin-sipe        | Office Communicator plugin
 # | pidgin-plugin-pack | Primarily for convenient history plugin
 
+pkg_inst pidgin
+
+case "$CURR_PROF" in work)
+    pkg_inst -a 'pidgin-sipe'
+esac
 
 if distro arch; then
     echo "Err: broken"
     # pkg_inst 'pidgin-encryption'
 
 elif distro ubuntu; then
-    pkg_inst 'pidgin pidgin-sipe'
     pkg_inst 'pidgin-plugin-pack myspell-ru'
 fi
 
