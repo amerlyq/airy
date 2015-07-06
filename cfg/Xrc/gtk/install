@@ -1,0 +1,8 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+has_pr X || die
+
+pkg_inst -a "gtk2 gtk3"
+
+# mate-themes numix-themes
+aur_inst -a "vertex-themes zukitwo-themes ceti-2-themes"

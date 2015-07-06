@@ -16,7 +16,7 @@ do_if() {
 
   while getopts "ac:d:p:f:" opt; do case $opt
   in d|f) eval "[[ -$opt $OPTARG ]]" || bSkip=0
-  ;; a) bAll=1  # Always re-install the whole list w/o checking
+  ;; a) bAll=1; bSkip=0  # Always re-install the whole list w/o checking
   ;; c) cmd="$OPTARG"
   ;; p) bAll=1; has_pr "$OPTARG" || bSkip=0  # Need this pr
   ;; :|"?") die 1 "Need value for '-${opt}'" >&2

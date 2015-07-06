@@ -14,12 +14,12 @@ trap 'error ${LINENO}' ERR
 
 ### Argparse ###
 while getopts "cdirs:t:u" opt; do case $opt
-in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="${1}" ;; esac
-;; [iuc]) cfgOptAdd "$opt"  # Install/update/clean all configs/packages
-;; [rd]) cfgOptAdd "u$opt"  # Reset/debug
-;; s) cfgOptAdd s; ARGS+=("$OPTARG")
+in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="$OPTARG" ;; esac
+;; [iuc]) : # Install/update/clean all configs/packages
+;; [rd]) cfgOptAdd 'u'  # Reset/debug
+;; s) ARGS+=("$OPTARG")
 ;; :|"?") die 1 "Err: need value for '-$opt'"
-;; esac; done
+;; esac; cfgOptAdd "$opt"; done
 
 
 ### Choose theme

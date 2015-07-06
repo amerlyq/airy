@@ -15,15 +15,16 @@ source ~/.shell/func.d/packages
 
 pkg_inst dhex
 
-if has_pr X; then
-    pkg_inst "meld"
+# ==== X only ====
+has_pr X || die
 
-    if distro arch; then
-        aur_inst -p 'wxHexEditor' wxhexeditor-git
+pkg_inst "meld"
 
-    elif distro ubuntu; then
-        pkg_inst -p 'wxHexEditor' "wxhexeditor"
-    fi
+if distro arch; then
+    aur_inst -p 'wxHexEditor' wxhexeditor-git
+
+elif distro ubuntu; then
+    pkg_inst -p 'wxHexEditor' "wxhexeditor"
 fi
 
 # PM="wxHexEditor.tar.bz2"

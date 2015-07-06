@@ -1,0 +1,33 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+[[ "$CURR_PROF" == "laptop" ]] || die
+# See
+#   https://01.org/linuxgraphics/downloads
+
+if distro arch; then
+    pkg_inst "xf86-video-intel libva libva-intel-driver"
+    pkg_inst "mesa mesa-libgl lib32-mesa-libgl"
+
+elif distro ubuntu; then
+    echo "Do instructions from 'https://01.org/linuxgraphics/downloads'
+    You must install 'intel-linux-graphics-installer'
+    On mint 17 you also must change vendor in file '/etc/lsb-release'
+    So intel could update
+        DISTRIB_ID=Ubuntu
+        DISTRIB_RELEASE=14.04
+        DISTRIB_CODENAME=trusty
+        DISTRIB_DESCRIPTION="Ubuntu 14.04 LTS"
+    Then 'sudo intel-linux-graphics-installer'
+    "
+    echo "After update, 'glxinfo| grep -i opengl'
+    MUST NOT have llvmpipe -- it's software renderer
+    "
+
+    # Workarounds::
+    #:: Mesa warning: couldn't open libtxc_dxtn.so, software DXTn compression /
+    #   decompression unavailable
+    #> This may be needed to run games using textures in the S3TC format.
+    pkg_inst "libtxc-dxtn-s2tc0 libtxc-dxtn-s2tc0:i386"
+    pkg_inst "xserver-xorg-video-intel mesa-utils"
+fi
+

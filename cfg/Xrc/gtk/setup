@@ -4,3 +4,17 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
 link "$PWD/settings.ini" ~/.config/gtk-3.0/settings.ini
+
+link "$PWD/fonts.conf" ~/.config/fontconfig/fonts.conf
+
+if cfgOpt u; then
+    fc-cache -vf ~/.fonts
+fi
+
+## Fonts
+# To achieve system-wide effect, place the xml config inside
+# /etc/fonts/conf.avail/29-prettify.conf and enable loading by symlinking it:
+# ln -s /etc/fonts/conf.avail/29-prettify.conf /etc/fonts/conf.d/29-prettify.conf
+
+# To disable scaling of bitmap fonts (which often makes them blurry), remove
+#   /etc/fonts/conf.d/10-scale-bitmap-fonts.conf

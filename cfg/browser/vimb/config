@@ -41,8 +41,8 @@ nnoremap ,ts :set strict-ssl!<CR>
 # Theme dark/light toggle
 nnoremap ,tt :set stylesheet!<CR>
 nnoremap  \s :set scripts!<CR>
-nnoremap  \l :shellcmd sh -c "THEME=light ~/.config/vimb/setup -s" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
-nnoremap  \d :shellcmd sh -c "THEME=dark ~/.config/vimb/setup -s" <CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
+nnoremap  \l :shellcmd ~/.config/vimb/setup -t light<CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
+nnoremap  \d :shellcmd ~/.config/vimb/setup -t  dark<CR>:set stylesheet=false <CR>:set stylesheet=true<CR>
 
 ### Toggle defaults ###
 set statusbar=true
