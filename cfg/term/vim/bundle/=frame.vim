@@ -54,3 +54,10 @@ if neobundle#tap('vim-altr')  " vim-altr: {{{1
   call altr#define('%/src/%.c', '%/inc/%.h')
   " ALT: map <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 endif
+
+if neobundle#tap('vim-smooth-scroll')  " {{{1
+  noremap <silent> <unique> <C-u> :<C-u>call smooth_scroll#up(&scroll, 0, 2)<CR>
+  noremap <silent> <unique> <C-d> :<C-u>call smooth_scroll#down(&scroll, 0, 2)<CR>
+  noremap <silent> <unique> <C-b> :<C-u>call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+  noremap <silent> <unique> <C-f> :<C-u>call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+endif

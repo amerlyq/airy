@@ -40,12 +40,6 @@ function! s:SetArgs(args, jump_to_first)
   endif
 endf
 
-" ALT:
-"   https://github.com/Peeja/vim-cdo
-"   https://github.com/sk1418/QFGrep
-"   https://github.com/stefandtw/quickfix-reflector.vim
-"   https://github.com/jceb/vim-editqf
-
 function! s:FilterQuickfixList(bang, pattern)
   let cmp = a:bang ? '!~#' : '=~#'
   call setqflist(filter(getqflist(), "bufname(v:val['bufnr']) " . cmp . " a:pattern"))

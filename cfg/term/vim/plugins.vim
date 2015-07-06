@@ -19,9 +19,9 @@ NeoBundleLazy 'kana/vim-altr', { 'autoload': {
 
 NeoBundle 'Valloric/ListToggle'
 
-" Ascii graph drawing in vim
-NeoBundleLazy 'vim-scripts/DrawIt' , { 'autoload' : {
-    \ 'commands' : 'DrawIt', 'mappings' : '<Plug>DrawItStart' }}
+"OFF: " Ascii graph drawing in vim
+" NeoBundleLazy 'vim-scripts/DrawIt' , { 'autoload' : {
+"     \ 'commands' : 'DrawIt', 'mappings' : '<Plug>DrawItStart' }}
 
 "==========================================
 " Use ',' as leader for all plugins below
@@ -155,37 +155,47 @@ NeoBundle 'klen/python-mode', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] }}
 NeoBundle 'davidhalter/jedi-vim', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] }}
+" USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
+" https://github.com/bps/vim-textobj-python
 
 
-" ======================================
+"{{{1 Motions ============================
+" Two-letters find on whole screen scope
+NeoBundle 'justinmk/vim-sneak'
+" New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
+NeoBundle 'bkad/CamelCaseMotion'
 " Readline style insertion
 " http://www.vim.org/scripts/script.php?script_id=4359
 NeoBundle 'tpope/vim-rsi'
+
+"{{{1 Actions ============================
 " Automatic not-persistent closing statements
 NeoBundle 'tpope/vim-endwise'
 " Extend support for '.' command
 NeoBundle 'tpope/vim-repeat'
-" Manage surrounding ('"<p>...) by replace cs"' or delete ds"
-NeoBundle 'tpope/vim-surround'
 " Use CTRL-A/X to increment dates, times, and more
 NeoBundle 'tpope/vim-speeddating'
-" Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
-" NeoBundle 'PeterRincker/vim-argumentative'
-" Manage function arguments with textobj 'a,' 'i,', shifting with '<,' '>,'
-NeoBundle 'AndrewRadev/sideways.vim'
 " Exchange text: cx{motion} on first, then cx{motion} on other.
-"   cxx -- current line, X -- Visual mode,  cxc -- clear pending exchange.
+"   cxx -- current line, X -- in Visual mode,  cxc -- clear pending exchange.
 NeoBundle 'tommcdo/vim-exchange'
 
-" DEPEND BY: vim-clang-format
-NeoBundle 'kana/vim-operator-user'
-" Function object (af, if -- code inside, aF -- all with spaces, iF )
-NeoBundle 'kana/vim-textobj-function', {
-    \ 'depends' : 'kana/vim-textobj-user' }
-NeoBundle 'kana/vim-textobj-indent'
-NeoBundle 'kana/vim-textobj-entire'
-NeoBundle 'coderifous/textobj-word-column.vim'
-
+"{{{1 Textobj ============================
+NeoBundle 'kana/vim-operator-user'              " = Dependency: vim-clang-format
+NeoBundle 'kana/vim-textobj-user'               " = Dependency: vim-textobj-*
+NeoBundle 'kana/vim-textobj-entire'             " ..[ai]e -- instead ggVG
+NeoBundle 'kana/vim-textobj-fold'               " ..[ai]z
+NeoBundle 'kana/vim-textobj-function'           " ..[ai][fF] (C/Java/Vimscript)
+NeoBundle 'kana/vim-textobj-indent'             " ..[ai][iI]
+NeoBundle 'kana/vim-textobj-line'               " ..[ai]l
+NeoBundle 'vimtaku/vim-textobj-sigil'           " ..[ai]G
+NeoBundle 'kana/vim-textobj-syntax'             " ..[ai]y
+NeoBundle 'coderifous/textobj-word-column.vim'  " ..[ai][cC]<[IA]>
+NeoBundle 'rhysd/vim-operator-surround'         "q..[ai]..
+NeoBundle 'beloglazov/vim-textobj-quotes'       " ..[ai]q -- any nearest quotes
+" TODO ADD: inner are most used: xmap q iq, omap q iq
+NeoBundle 'saihoooooooo/vim-textobj-space'      " ..[ai]Q -- space between words, etc
+" ALT: 'sgur/vim-textobj-parameter', 'PeterRincker/vim-argumentative'
+NeoBundle 'AndrewRadev/sideways.vim'            " ..[ai], and [<>], -- shift
 
 " ======================================
 ":Make cover for long-running tasks asynchronous (as like by ssh)
@@ -236,12 +246,6 @@ NeoBundleLazy 'majutsushi/tagbar', {
 NeoBundle 'tpope/vim-commentary'
 
 
-"{{{1 Motions ============================
-" Two-letters find on whole screen scope
-NeoBundle 'justinmk/vim-sneak'
-" New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
-NeoBundle 'bkad/CamelCaseMotion'
-
 "{{{1 Std vim/macros/ =====================
 " Bring back opened window instead of dull msg about swapfile
 "NeoBundle 'svintus/vim-editexisting'
@@ -284,7 +288,6 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
 " )) -- \item
 " }}} LaTeX-Box
 
-
 " ======================================
 
 "NeoBundleLazy 'docunext/closetag.vim', {
@@ -295,17 +298,8 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
 " NeoBundle 'mattn/emmet-vim'
 " NeoBundle 'cakebaker/scss-syntax.vim'
 " NeoBundle 'gorodinskiy/vim-coloresque'
-" NeoBundle 'tpope/tpope/vim-unimpaired'
 
 NeoBundle 'scrooloose/syntastic'
-"NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'
-
-""" Ability to edit entries from qf or lc windows in new buffer
-" TRY ALT: quickfix-reflector.vim (http://www.vim.org/scripts/script.php?script_id=4890)
-" ALT: https://github.com/thinca/vim-qfreplace
-NeoBundleLazy 'jceb/vim-editqf', { 'autoload' : { 'commands' :
-            \ ['QFEdit', 'QFAddNote', 'QFAddPatternNote'] } }
-
 
 " Autoformatting with one button, can use custom (like clang-styler)
 NeoBundle 'Chiel92/vim-autoformat'
@@ -321,11 +315,8 @@ NeoBundle 'octol/vim-cpp-enhanced-highlight'
 " https://github.com/Shirk/vim-gas
 " https://github.com/beyondmarc/opengl.vim
 
-" Highlight choosen
+" DESIDE: Highlight choosen
 NeoBundle 't9md/vim-quickhl'
-
-" Colorize html-codes
-" NeoBundleLazy 'lilydjwg/colorizer'
 
 " JSON Highlight and indent plugin
 NeoBundleLazy 'elzr/vim-json', {
@@ -340,13 +331,13 @@ NeoBundleLazy 'zaiste/tmux.vim', {
 NeoBundle 'bling/vim-airline'
 " Alt: 'airblade/vim-gitgutter' "Only for git, but much faster file save
 NeoBundle 'mhinz/vim-signify'
-" Plugin to toggle, display and navigate marks
-" NeoBundle 'kshenoy/vim-signature'
+" TEST: Plugin to toggle, display and navigate marks
+NeoBundle 'kshenoy/vim-signature'
 
 " When swap exists, it show process id, or you can diff swp with file on disk
 NeoBundle 'chrisbra/Recover.vim'
 
-"  toggle the plugin is <Leader>ig
+" Highlight first space of tab columns
 NeoBundle 'nathanaelkane/vim-indent-guides'
 
 " Substitution: {{{
@@ -368,6 +359,10 @@ NeoBundle 'osyo-manga/vim-anzu'
 NeoBundle 'osyo-manga/vim-over', {
     \ 'autoload': { 'commands' : ['OverCommandLine'], }}
 
+" Delete entries from qf/loc wdws (or edit them as text) and save to apply
+" Useful for interactive replacing in many files found by :Ag, skiping needless.
+NeoBundle 'stefandtw/quickfix-reflector.vim'
+
 " }}} ======================================
 
 NeoBundle 'amerlyq/vim-focus-autocmd', {
@@ -375,33 +370,12 @@ NeoBundle 'amerlyq/vim-focus-autocmd', {
     \ 'build': { 'linux': 'bash ./res/setup' }
     \ }
 
-" ======================================
-" Add new virtual cursor for next occurance of word under cursor
-" Or add them for each line of multiline selection
-" Ctrl-n  --> Ctrl-p, Ctrl-x, and <Esc>
-NeoBundle 'kris89/vim-multiple-cursors'
-NeoBundle 'terryma/vim-smooth-scroll'
-" Press + to expand the visual selection  and _ to shrink it.
-NeoBundle 'terryma/vim-expand-region'
-
-" Move text (line or vselect) in more friendly way, then :m[ove]
-NeoBundleLazy 'matze/vim-move', { 'gui' : 1 }
-
-" ======================================
-
 " Viewing man in vim: good, but no colors in git lg1, need to investigate
 " NeoBundleLazy 'rkitover/vimpager'
-
-" Fast table creation and modification
-NeoBundleLazy 'dhruvasagar/vim-table-mode', {
-    \ 'autoload': { 'commands' : ['TableModeEnable'], }}
 
 " ALT: http://tiddlywiki.com  -- one-page wiki
 NeoBundleLazy 'vimoutliner/vimoutliner', {
     \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], }}
-
-NeoBundleLazy 'neilagabriel/vim-geeknote', { 'vim_version': '7.4.364',
-    \ 'autoload': { 'commands' : ['Geeknote'], }}
 
 " ======================================
 " Colorschemes

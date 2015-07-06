@@ -61,4 +61,4 @@ filter_find ./cfg setup | while read fl; do
 # ======================================================================
 
 header "DONE"
-if cfgOpt u; then i3-msg restart </dev/tty >/dev/null 2>&1; fi
+if cfgOpt u; then i3-msg restart </dev/tty >/dev/null 2>&1 ||: ; fi

@@ -26,13 +26,16 @@ function! s:RunCmdLine(bChange)
     echo g:run_cmdline
   endif
   if a:bChange
-    let g:run_cmdline = getreg(':')
-    echo g:run_cmdline | return
+    let g:run_cmdline = getcmdline()  " getreg(':')
+    echo g:run_cmdline | return g:run_cmdline
   endif
+  " let pos = getcmdpos()
   exec g:run_cmdline
+  " call setcmdpos(pos)
+  " return g:run_cmdline
 endfunction
 
 " Shortcuts to <launch setted|change by ':'> command
 noremap <unique> <Leader>k :<C-U>call <SID>RunCmdLine(0)<CR>
 noremap <unique> <Leader>K :<C-U>call <SID>RunCmdLine(1)<CR>
-
+cnoremap <unique>    <C-s>  <C-\>e<SID>RunCmdLine(1)<CR>

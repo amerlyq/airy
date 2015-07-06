@@ -4,7 +4,7 @@ source ~/.shell/func.d/packages
 #   http://crunchbang.org/forums/viewtopic.php?id=37882
 
 if distro arch; then
-    aur_inst ncmpcpp
+    aur_inst -p 'ncmppcpp' ncmpcpp-git
 
 elif distro ubuntu; then
     pkg_inst "automake libtool libboost-all-dev libmpdclient-dev libncurses5-dev

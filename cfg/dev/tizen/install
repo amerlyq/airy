@@ -11,7 +11,7 @@ if distro arch; then
 
     # To build arm kernel by 32-bit gcc
     aur_inst -f /usr/lib32/libmpc.so.2 'lib32-libmpc lib32-zlib'
-    sudo ln -sv /usr/lib32/libmpc.so.{3,2}
+    sudo ln -sfv /usr/lib32/libmpc.so.{3,2}
 
     # Separately build deltarpm (fix PKGBUILD in AUR)
     #   https://gitlab.com/necrose99/deltarpm

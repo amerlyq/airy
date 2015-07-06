@@ -73,26 +73,20 @@ if neobundle#tap('vim-sneak')  "{{{1
 endif
 
 
-if neobundle#tap('vim-surround')  "{{{1
-  let g:surround_no_mappings=1
+if neobundle#tap('vim-operator-surround')  "{{{1
+  map <silent><unique> qa <Plug>(operator-surround-append)
+  map <silent><unique> qd <Plug>(operator-surround-delete)
+  map <silent><unique> qr <Plug>(operator-surround-replace)
+endif
 
-  " Existing: operator-pending analogue (HACK)
-  nmap <unique> dq <Plug>Dsurround
-  nmap <unique> cq <Plug>Csurround
-  " New: add on same line
-  nmap <unique> yq <Plug>Ysurround
-  xmap <unique>  q <Plug>VSurround
-  " New: surround on new lines
-  nmap <unique> yQ <Plug>YSurround
-  xmap <unique>  Q <Plug>VgSurround
-  " New: use whole line
-  nmap <unique>  Q <Plug>Yssurround
-  nmap <unique> gQ <Plug>YSsurround
+if neobundle#tap('vim-textobj-space')  "{{{1
+  let g:textobj_space_no_default_key_mappings = 1
+  map <silent><unique> aQ <Plug>(textobj-space-a)
+  map <silent><unique> iQ <Plug>(textobj-space-i)
+endif
 
-  " gs, <C-G>s, <C-G>S -- I can use for my aims!!
-  " <Plug>Isurround -- unused
-
-  if !hasmapto("<Plug>Isurround","i") && "" == mapcheck("<C-S>","i")
-    imap <C-S> <Plug>Isurround
-  endif
+if neobundle#tap('vim-textobj-space')  "{{{1
+  let g:textobj_sigil_no_default_key_mappings = 1
+  map <silent><unique> aG <Plug>(textobj-sigil-a)
+  map <silent><unique> iG <Plug>(textobj-sigil-i)
 endif

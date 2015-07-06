@@ -13,6 +13,9 @@
 "" Ruby
 " NeoBundle 'depuracao/vim-rdoc'
 
+" Colorize html-codes
+" NeoBundleLazy 'lilydjwg/colorizer'
+
 
 "NeoBundle 'MPogoda/octave.vim--'
 
@@ -28,6 +31,21 @@
 " http://zhaocai.github.io/GoldenView.Vim/
 "NeoBundle 'zhaocai/GoldenView.Vim'
 
+"NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'
+
+" ======================================
+
+" Move text (line or vselect) in more friendly way, then :m[ove]
+NeoBundleLazy 'matze/vim-move', { 'gui' : 1 }
+
+NeoBundleLazy 'neilagabriel/vim-geeknote', { 'vim_version': '7.4.364',
+    \ 'autoload': { 'commands' : ['Geeknote'], }}
+
+" Fast table creation and modification
+NeoBundleLazy 'dhruvasagar/vim-table-mode', {
+    \ 'autoload': { 'commands' : ['TableModeEnable'], }}
+
+"OFF: NeoBundle 'terryma/vim-smooth-scroll'
 
 " ======================================
 " DEPRECATED: use vim-sneak
@@ -36,6 +54,17 @@
 " NeoBundle 'mhinz/vim-startify'
 " DEPRECATED: use 'kana/vim-altr'
 " NeoBundle 'vim-scripts/a.vim'
+" DEPRECATED: use 'coderifous/textobj-word-column.vim'
+" Add new virtual cursor for next occurance of word under cursor
+" Or add them for each line of multiline selection
+" Ctrl-n  --> Ctrl-p, Ctrl-x, and <Esc>
+" NeoBundle 'kris89/vim-multiple-cursors'
+" DEPRECATED: use 'rhysd/vim-operator-surround'
+" Manage surrounding ('"<p>...) by replace cs"' or delete ds"
+" NeoBundle 'tpope/vim-surround'
+" DEPRECATED: use 'stefandtw/quickfix-reflector.vim'
+" NeoBundleLazy 'jceb/vim-editqf', { 'autoload' : { 'commands' :
+"             \ ['QFEdit', 'QFAddNote', 'QFAddPatternNote'] } }
 
 " ======================================
 " DISABLED: breaks syntax colors in too many formats (zsh, cmake, etc...)
@@ -50,3 +79,6 @@
 " DISABLED: completely destroys mouse selection. Has not much usecases.
 "NeoBundle 'joonty/vdebug', {
 "            \ 'autoload' : { 'filetypes' : [ 'python' ] } }
+" DISABLED: not so useful -- I more often use direct selection
+" Press + to expand the visual selection  and _ to shrink it.
+" NeoBundle 'terryma/vim-expand-region'
