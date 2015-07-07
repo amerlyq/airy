@@ -1,14 +1,16 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-dir=/etc/dictd
+if distro arch; then
+    dir=/etc/dict
+elif distro ubuntu; then
+    dir=/etc/dictd
+fi
 # Backup older dir (hovewer, it seems always the same)
 [[ -e $dir && ! -L $dir ]] && sudo mv -vf -- $dir ${dir}_
 # Create symlink, if it doesn't exist or points to another place
-[[ "$PWD" -ef $dir ]] || sudo ln -sfvT "$PWD" $dir
+[[ "$PWD/cfg" -ef $dir ]] || sudo ln -sfvT "$PWD/cfg" $dir
 
-echo "Err: dict"
-exit
 
 if cfgOpt u; then
     ## Add dictionaries to dictd
@@ -19,7 +21,12 @@ if cfgOpt u; then
     ## Re-read configuration file
     # /etc/init.d/dictd restart
     # pid=$(pgrep dictd) && sudo kill -SIGHUP $pid
-    sudo service dictd restart
+
+    if distro arch; then
+        sudo systemctl restart dictd
+    elif distro ubuntu; then
+        sudo service dictd restart
+    fi
 fi
 
 echo "C: 'dict' done"

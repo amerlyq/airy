@@ -3,27 +3,26 @@ source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
 ## Don't share samba in work network, only at home
-case "${CURR_PROF?No}" in
-laptop|home)
-  if cfgOpt r; then
-    echo "N: ATTENTION ! Generate password for samba user !"
-    sudo smbpasswd -a $(whoami)
+cfgOpt f || [[ "${CURR_PROF?No}" =~ laptop|home ]] || die
+
+if cfgOpt r; then
+  echo "N: ATTENTION ! Generate password for samba user !"
+  sudo smbpasswd -a $(whoami)
+fi
+
+if cfgOpt u; then
+  ### GENS ###
+  ./samba.gen
+  if distro arch; then
+      sudo systemctl restart smbd
+
+  elif distro ubuntu; then
+      sudo service smbd restart
   fi
+  # Once Samba has restarted, use this command
+  # to check your smb.conf for any syntax errors
+  testparm
+fi
 
-  if cfgOpt u; then
-    ### GENS ###
-    ./samba.gen
-    if distro arch; then
-        sudo systemctl restart smbd
-
-    elif distro ubuntu; then
-        sudo service smbd restart
-    fi
-    # Once Samba has restarted, use this command
-    # to check your smb.conf for any syntax errors
-    testparm
-  fi
-
-;; *) ## FIXME: not working as supposed:
+## FIXME: not working as supposed:
 #if cfgOpt u && has_pr samba; then sudo service smbd stop
-exit ;; esac

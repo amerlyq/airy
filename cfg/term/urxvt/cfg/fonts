@@ -2,10 +2,13 @@
 
 URxvt*letterSpace:    -1
 
+! Font: bitmap or xft:...:pixelsize=15:antialias=true:hinting=true
+! ... = monaco, Clean, PowerlineSymbols, Bitstream Vera Sans Mono,
+!   Liberation Mono, or terminus
 #define FONT1 PragmataPro
 #define FONT2 DejaVu Sans Mono
 #define FONT3 DejaVu Sans Mono for Powerline
-#define FONT(i, opts) xft:FONT##i:pixelsize=15:opts,
+#define FONT(i, opts) xft:FONT##i:size=11:opts,
 #define FONTS(opts) FONT(1,opts) FONT(2,opts) FONT(3,opts)
 
 !URxvt*imFont:         FONTS(regular)
@@ -14,24 +17,8 @@ URxvt*boldFont:        FONTS(bold)
 URxvt*italicFont:      FONTS(italic)
 URxvt*bolditalicFont:  FONTS(bold:italic)
 
-! Font: bitmap or xft :antialias=true:hinting=true
 !URxvt*font:        -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 !URxvt*boldFont:    -xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*
 !URxvt*font:        -*-terminus-*-r-*-*-12-*-*-*-*-*-iso10646-*
 !URxvt.font:        -*-clean-medium-r-*-*-12-*-*-*-*-*-*-*
-! xft:monaco:bold:size=10
-! xft:Clean:size=12
-! xft:PowerlineSymbols:style=Medium
-
-! Xft (X FreeType) with Bitstream, DejaVu, Liberation, or Terminus fonts:
-!  Fedora/debian packages: libXft/libxft2
-!  An anti-aliased font setup with Xft looks fantastic; it can be a bit choppy
-!  on older systems. You can always turn off anti-aliasing (antialias=false) if
-!  your terminal is sluggish. Use only ONE of the Xft pairs below:
-
-! Xft: Bitstream fonts
-!  Fedora/debian packages:
-!  bitstream-vera-sans-mono-fonts/ttf-bitstream-vera (Bitstream Vera Sans Mono)
-!  liberation-mono-fonts/ttf-liberation (Liberation Mono)
-!  terminus-fonts/xfonts-terminus (terminus)
 ! Traditional fonts - in lieu of xft (-*-courier-medium-r-normal-*-14-*-*-*-*-*-iso8859-1)

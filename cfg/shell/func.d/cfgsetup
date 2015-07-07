@@ -15,7 +15,7 @@ trap 'error ${LINENO}' ERR
 ### Argparse ###
 while getopts "cdirs:t:u" opt; do case $opt
 in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="$OPTARG" ;; esac
-;; [iuc]) : # Install/update/clean all configs/packages
+;; [iucf]) : # Install/update/clean/force all configs/packages
 ;; [rd]) cfgOptAdd 'u'  # Reset/debug
 ;; s) ARGS+=("$OPTARG")
 ;; :|"?") die 1 "Err: need value for '-$opt'"

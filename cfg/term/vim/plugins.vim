@@ -187,13 +187,12 @@ NeoBundle 'kana/vim-textobj-fold'               " ..[ai]z
 NeoBundle 'kana/vim-textobj-function'           " ..[ai][fF] (C/Java/Vimscript)
 NeoBundle 'kana/vim-textobj-indent'             " ..[ai][iI]
 NeoBundle 'kana/vim-textobj-line'               " ..[ai]l
-NeoBundle 'vimtaku/vim-textobj-sigil'           " ..[ai]G
 NeoBundle 'kana/vim-textobj-syntax'             " ..[ai]y
 NeoBundle 'coderifous/textobj-word-column.vim'  " ..[ai][cC]<[IA]>
 NeoBundle 'rhysd/vim-operator-surround'         "q..[ai]..
-NeoBundle 'beloglazov/vim-textobj-quotes'       " ..[ai]q -- any nearest quotes
-" TODO ADD: inner are most used: xmap q iq, omap q iq
+NeoBundle 'beloglazov/vim-textobj-quotes'       " ..[ai]q -- any nearest quotes (OR: ..q)
 NeoBundle 'saihoooooooo/vim-textobj-space'      " ..[ai]Q -- space between words, etc
+NeoBundle 'vimtaku/vim-textobj-sigil'           " ..[ai]G
 " ALT: 'sgur/vim-textobj-parameter', 'PeterRincker/vim-argumentative'
 NeoBundle 'AndrewRadev/sideways.vim'            " ..[ai], and [<>], -- shift
 

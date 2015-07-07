@@ -79,14 +79,26 @@ if neobundle#tap('vim-operator-surround')  "{{{1
   map <silent><unique> qr <Plug>(operator-surround-replace)
 endif
 
-if neobundle#tap('vim-textobj-space')  "{{{1
-  let g:textobj_space_no_default_key_mappings = 1
-  map <silent><unique> aQ <Plug>(textobj-space-a)
-  map <silent><unique> iQ <Plug>(textobj-space-i)
+if neobundle#tap('vim-operator-quotes')  "{{{1
+  " Inner quotes are used the most:
+  xmap <silent><unique> q iq
+  omap <silent><unique> q iq
 endif
 
 if neobundle#tap('vim-textobj-space')  "{{{1
+  let g:textobj_space_no_default_key_mappings = 1
+  xmap <silent><unique> aQ <Plug>(textobj-space-a)
+  omap <silent><unique> aQ <Plug>(textobj-space-a)
+
+  xmap <silent><unique> iQ <Plug>(textobj-space-i)
+  omap <silent><unique> iQ <Plug>(textobj-space-i)
+endif
+
+if neobundle#tap('vim-textobj-sigil')  "{{{1
   let g:textobj_sigil_no_default_key_mappings = 1
-  map <silent><unique> aG <Plug>(textobj-sigil-a)
-  map <silent><unique> iG <Plug>(textobj-sigil-i)
+  xmap <silent><unique> aG <Plug>(textobj-sigil-a)
+  omap <silent><unique> aG <Plug>(textobj-sigil-a)
+
+  xmap <silent><unique> iG <Plug>(textobj-sigil-i)
+  omap <silent><unique> iG <Plug>(textobj-sigil-i)
 endif
