@@ -74,17 +74,25 @@ endif
 
 
 if neobundle#tap('vim-operator-surround')  "{{{1
-  map <silent><unique> qa <Plug>(operator-surround-append)
-  map <silent><unique> qd <Plug>(operator-surround-delete)
-  map <silent><unique> qr <Plug>(operator-surround-replace)
+  nmap <silent><unique> qa <Plug>(operator-surround-append)
+  xmap <silent><unique> qa <Plug>(operator-surround-append)
+
+  nmap <silent><unique> qd <Plug>(operator-surround-delete)
+  xmap <silent><unique> qd <Plug>(operator-surround-delete)
+
+  nmap <silent><unique> qr <Plug>(operator-surround-replace)
+  xmap <silent><unique> qr <Plug>(operator-surround-replace)
+"" Chaining of operator+textobj
+"   nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
 endif
 
-if neobundle#tap('vim-operator-quotes')  "{{{1
+if neobundle#tap('vim-textobj-quotes')  "{{{1
   " Inner quotes are used the most:
-  xmap <silent><unique> q iq
+  " xmap <silent><unique> q iq
   omap <silent><unique> q iq
 endif
 
+" TODO: maybe space/sigil change mappings to reverse -- G/Q?
 if neobundle#tap('vim-textobj-space')  "{{{1
   let g:textobj_space_no_default_key_mappings = 1
   xmap <silent><unique> aQ <Plug>(textobj-space-a)
