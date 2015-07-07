@@ -2,8 +2,6 @@
 source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
-distro ubuntu || exit 0
-
 ## Don't share samba in work network, only at home
 case "${CURR_PROF?No}" in
 laptop|home)
@@ -15,7 +13,12 @@ laptop|home)
   if cfgOpt u; then
     ### GENS ###
     ./samba.gen
-    sudo service smbd restart
+    if distro arch; then
+        sudo systemctl restart smbd
+
+    elif distro ubuntu; then
+        sudo service smbd restart
+    fi
     # Once Samba has restarted, use this command
     # to check your smb.conf for any syntax errors
     testparm
