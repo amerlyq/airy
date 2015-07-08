@@ -67,7 +67,8 @@ xkb_symbols "lctrl_lvl5" {
         symbols[Group1] = [ NoSymbol, NoSymbol ],
         actions = [
             SetControls(ctrls=Overlay1),
-            LockControls(ctrls=Overlay1)
+            SetControls(ctrls=Overlay1)
+            // LockControls(ctrls=Overlay1)
         ]
         // interpret Overlay1_Enable      { action= LockControls(ctrls=Overlay1); };
         // interpret Overlay2_Enable      { action= LockControls(ctrls=Overlay2); };
@@ -79,6 +80,14 @@ xkb_symbols "lctrl_lvl5" {
     //     symbols[Group1] = [ ISO_Level5_Shift ]
     // };
     // modifier_map Mod3 { <MDSW> };
+    replace key <RWIN> {
+        type[Group1] = "PC_SUPER_LEVEL2",
+        symbols[Group1] = [ NoSymbol, NoSymbol ],
+        actions = [
+            SetControls(ctrls=Overlay1),
+            SetControls(ctrls=Overlay1)
+        ]
+    };
 };
 
 partial modifier_keys

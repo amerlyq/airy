@@ -2,5 +2,7 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-dst=/home/amerlyq/.config/syncthing/config.xml
-sed -i -r '/(<startBrowser>)true/s//\1false/' $dst
+dst=~/.config/syncthing/config.xml
+if [[ -f "$dst" ]]; then
+    sed -i -r '/(<startBrowser>)true/s//\1false/' "$dst"
+fi
