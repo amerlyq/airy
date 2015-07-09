@@ -15,6 +15,7 @@
 
 " Colorize html-codes
 " NeoBundleLazy 'lilydjwg/colorizer'
+" https://github.com/ap/vim-css-color
 
 
 "NeoBundle 'MPogoda/octave.vim--'

@@ -59,6 +59,8 @@ psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
 # ptyless() {
 #     pty $@ | less
 # }
+## Open less on first word
+#  ... | less +/pattern
 
 # Show history
 # Uncomment the following line if you want to change the command execution

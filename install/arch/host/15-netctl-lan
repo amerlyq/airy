@@ -15,6 +15,11 @@ Connection=ethernet
 IP=dhcp
 EOT
 
+## For dhcp to transmit MAC instead DUID, so server could attach ip:
+# vi /etc/dhcpcd.conf
+# clientid  # Uncomment
+# # duid   # Comment o
+
 netctl enable $nm
 
 echo ":: $nm is active"

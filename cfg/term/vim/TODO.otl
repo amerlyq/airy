@@ -14,6 +14,8 @@ SMALL
 	[_] DEV mapping to move in column like '{/}' -- on gG, g{, g}
 		: for more simple C-v block selecting
 		: I can make regex which sticks to \< \> and move until this condition works
+	[_] Definition lookup: ag+ctags
+		https://github.com/gorkunov/smartgf.vim
 
 BUG:
 	[_] BUG: vim not only slow, but also SEGFAULT -- enable coredumps and see
@@ -116,6 +118,8 @@ vim:
 			NeoBundleLazy 'rbonvall/vim-textobj-latex'
 		[_] Half-textobj motions
 			https://github.com/tommcdo/vim-ninja-feet/
+		[_] Selection of pairs
+			https://github.com/gorkunov/smartpairs.vim
 		2015-05-26 [X] easymotion  :> Replaced by vim-sneak
 			2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
 			:> No combining -- overlapping x-mappings aren't possible
@@ -162,6 +166,7 @@ vim:
 	[_] own syntax highlighting
 		http://learnvimscriptthehardway.stevelosh.com/chapters/46.html
 		http://vim.wikia.com/wiki/Search_for_lines_not_containing_pattern_and_other_helpful_searches
+		https://robots.thoughtbot.com/writing-vim-syntax-plugins
 	[_] Seize
 		http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
 		http://www.vim.org/scripts/script.php?script_id=4449
@@ -275,6 +280,12 @@ SEIZE
 	http://www.alexeyshmalko.com/2014/youcompleteme-ultimate-autocomplete-plugin-for-vim/
 	http://vimcasts.org/episodes/fugitive-vim---a-complement-to-command-line-git/
 
+	http://www.sontek.net/blog/2011/05/07/turning_vim_into_a_modern_python_ide.html
+	http://nvie.com/posts/how-i-boosted-my-vim/
+	http://statico.github.io/vim.html
+
+>>> http://usevim.com/
+
 	>[_] Search inside useful hacks and tips
 		https://github.com/romainl/dotvim
 	[_] Integrate this tips:
@@ -306,6 +317,7 @@ PROFILING
 			vim --startuptime profile.log
 		Very verbose with timings
 			vim -V12
+			vim -V20/tmp/vimlog
 
 DEBUG
 

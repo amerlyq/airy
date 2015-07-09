@@ -13,6 +13,8 @@ Books
 
 Combine (mix) two list pairing line by line
 	paste -d '\n' file1 file2
+Combine each two lines in one
+	paste -d " "  - - < filename
 
 Uniq from search lists
 	find DIR1 DIR2 -type f -exec sha1sum '{}' \+ | sort | \
