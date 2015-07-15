@@ -61,3 +61,9 @@ if neobundle#tap('vim-smooth-scroll')  " {{{1
   noremap <silent> <unique> <C-b> :<C-u>call smooth_scroll#up(&scroll*2, 0, 4)<CR>
   noremap <silent> <unique> <C-f> :<C-u>call smooth_scroll#down(&scroll*2, 0, 4)<CR>
 endif
+
+if neobundle#tap('vim-signature')  " {{{1
+  let g:SignatureIncludeMarkers = '!@#$%^&*()[]".'
+  let g:SignaturePurgeConfirmation = 1
+  let g:SignaturePrioritizeMarks = 0
+endif

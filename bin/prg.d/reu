@@ -20,13 +20,13 @@ if file -b "$fl" | grep -q '^[^,]*, ARM,'; then
         arch=arm; pref="armv7l-tizen-linux-gnueabi-"
 else arch=i386; fi
 
-funcOnly() { ${pref}nm -nS ${2?Need file name} |
-perl -lane '/'"${1?Need symbol name}"'/ and do {
+funcOnly() { ${pref}nm -nS ${1?Need file name} |
+perl -lane '/'"${2?Need symbol name}"'/ and do {
     $s=hex(@F[0]); $e=$s+hex(@F[1]);
-    $str="'"$pref"'objdump -C -D -j.text --start-address=0x%x --stop-address=0x%x '"${2}"' | sed 1,5d";
+    $str="'"$pref"'objdump -C -D --start-address=0x%x --stop-address=0x%x '"${1}"' | sed 1,5d";
     $cmd=sprintf($str, $s,$e);
     system($cmd)
-}'; }
+}'; }  # -j.text
 
 # SEE: http://www.m0rd0r.eu/little-endian-to-big-endian-in-perl/
 ## NOTE: for simple string reverse there is 'rev' util. But I need byte-wise.
@@ -51,7 +51,7 @@ case "$cmd" in
     n) cmd="nm -n" ;;
     s) cmd="readelf -S" ;;
     o) cmd="objdump -m $arch -C -D" ;;  # disass with demangle
-    of) funcOnly "$fl" "$symb"; exit ;;
+    of) funcOnly "$fl" "$opts"; exit ;;
     b) cmd="objdump -m $arch -b binary -D" ;;
     B) cmd="armv7l-tizen-linux-gnueabi-objdump -m arm -b binary -D" ;;
     xn) big2lit "$fl" N; exit ;;
