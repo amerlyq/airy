@@ -27,6 +27,10 @@ Existing Git Repo?
 Workflow
 	git reset --hard ORIG_HEAD | hg update --clean (or 'hg up -C' for short)
 
+Ignore after commit
+	git rm --cached
+	git update-index --assume-unchanged [path]
+
 Add remote branch
 	git ls-remote --heads origin
 	git fetch $(git config --get remote.origin.url) fix-popen-shell:fix-popen-shell

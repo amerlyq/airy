@@ -1,8 +1,12 @@
 #!/bin/bash
 # vim: ft=sh
-# Get 159 Mb
 source ~/.shell/func.d/packages
-if [ $? -ne 0 ]; then exit 1; fi
+
+if distro arch; then
+    pkg_inst "wine wine-mono wine_gecko winetricks"
+    pkg_inst "lib32-alsa-lib lib32-alsa-plugins lib32-ncurses lib32-mpg123"
+
+elif distro ubuntu; then
 
 # MAN:
 #     http://mintgeek.ru/2011/06/12/kak-ustanovit-witcher-2-v-linux-mint/
@@ -23,6 +27,8 @@ winetricks xna31 xna40 vcrun2010 vcrun2008 steam
 
 mkdir -p ~/".wine/drive_c/Program Files"
 mkdir -p ~/".wine/drive_c/Program Files (x86)"
+
+fi
 
 echo "
     !! Place your Window's programms inside ~/.wine/drive_c/Program Files/ !!

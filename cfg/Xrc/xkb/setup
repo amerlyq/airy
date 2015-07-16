@@ -11,11 +11,13 @@ kmap() { xkbcomp -I"$PWD" ${1:--} ${2} 2>&1 |
 
 dst="$CURR_CACHE/keylayout.xkm"
 
-case "${CURR_HOST?No}" in
-vbox) sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|' \
-            ./amer.xkb | kmap - "-xkm $dst" ;;
-*) kmap ./amer.xkb "-xkm $dst"
-esac
+if cfgOpt s; then layout="$ARGS"; echo "Layout: $layout"; fi
+
+cat ./amer.xkb | case "$layout"
+in elona) sed '/am_over/s//&_elona/'
+;;     *) cat
+;; esac | kmap "" "-xkm $dst"
+
 echo "W: $dst"
 
 ## Update
