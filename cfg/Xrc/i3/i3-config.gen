@@ -325,9 +325,10 @@ w_header "Windows: Settings"
     wstr ''
     wmapf 'for_window [%s] floating enable, border pixel 3' \
         'window_role="pop-up"' 'class="^Copyq" instance="^copyq"' \
-        'class="^Firefox" instance="^Download"' 'class="^Pidgin"' \
-        'class="(?i)'"$term"'" instance="(?i)^Float*"' \
-        'class="^Transmission-gtk"'
+        'class="^Firefox" instance="^Download"' 'class="^Transmission-gtk"' \
+        'class="^Pidgin"' 'class="^Skype"' \
+        'class="(?i)'"$term"'" instance="(?i)^Float*"'
+
     wstr 'for_window [title="^Transmission" class="^Transmission-gtk" instance="^transmission-gtk"] move scratchpad'
     wstr 'for_window [class="^piony.py"] floating enable, border pixel 3'
 

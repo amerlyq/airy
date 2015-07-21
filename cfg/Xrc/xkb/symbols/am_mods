@@ -63,12 +63,11 @@ xkb_symbols "menu_lvl3" {
 partial modifier_keys
 xkb_symbols "lctrl_lvl5" {
     replace key <LCTL> {
-        type[Group1] = "PC_SUPER_LEVEL2",
-        symbols[Group1] = [ NoSymbol, NoSymbol ],
+        type[Group1] = "ONE_LEVEL",
+        symbols[Group1] = [ NoSymbol ],
         actions = [
             SetControls(ctrls=Overlay1),
-            // SetControls(ctrls=Overlay1)
-            LockControls(ctrls=Overlay1)
+            // LockControls(ctrls=Overlay1)
         ]
         // interpret Overlay1_Enable      { action= LockControls(ctrls=Overlay1); };
         // interpret Overlay2_Enable      { action= LockControls(ctrls=Overlay2); };
