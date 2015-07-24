@@ -1,0 +1,31 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+if cfgOpt c; then
+    sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+    sudo mysql_secure_installation
+fi
+
+if cfgOpt u; then
+    # cfg=/etc/mysql/my.cnf
+    cfg=~/my.cnf
+
+    # sudo mysql_upgrade -u root -p
+    # Disable logging, replication and data recovery
+    # Use only for development/testing machine, NOT production server!
+    sudo sed -ri '/^(log-bin|binlog_format)/s//#&/' $cfg
+    # Enable client completion features
+    sudo sed -ri '/^no-(auto-rehash)/s//\1/' $cfg
+
+    if ! grep -q 'character_set_client' $cfg; then
+        sudo sed -i '/\[mysqld\]/a \
+init_connect         = '"'SET collation_connection = utf8_general_ci,NAMES utf8'"'\
+collation_server     = utf8_general_ci\
+character_set_client = utf8\
+character_set_server = utf8' $cfg
+    fi
+fi
+
+if cfgOpt s; then
+    sudo systemctl start mysqld
+fi
