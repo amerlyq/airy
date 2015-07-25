@@ -1,12 +1,10 @@
 #!/bin/bash -e
-# BUG: creates empty custom.list in ../ when empty args, but need to exit.
+source ~/.shell/func.d/cfgsetup
+
+dir="${1:-$HOME/res/dicts}"
 dblst=/var/lib/dictd/custom.list
 
-if [[ -f "$dblst" ]]
-then dir="$(dirname $(readlink -m "$dblst"))"
-else dir="${1?}"
-fi
-[[ -z "$dir" ]] && { echo "No dir with *.dict.dz specified"; exit 1; }
+[[ -n "$dir" && -d "$dir" ]] || die "No dir with *.dict.dz specified"
 
 dst="$dir/custom.list"
 > "$dst"
@@ -23,7 +21,8 @@ fi; done
 
 
 ## Link database to configs
-link(){ [[ -e "$1" && (! -e $2 || -L $2) ]] && sudo ln -sfvT "$1" $2; }
+link(){ [[ -e "$1" && (! -e $2 || -L $2) ]] &&
+    sudo mkdir -p "${2%/*}" && sudo ln -sfvT "$1" $2; }
 link "$dst" $dblst
 
 echo "W: $dblst"

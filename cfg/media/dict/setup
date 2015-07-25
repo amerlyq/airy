@@ -6,25 +6,29 @@ if distro arch; then
 elif distro ubuntu; then
     dir=/etc/dictd
 fi
+
 # Backup older dir (hovewer, it seems always the same)
-[[ -e $dir && ! -L $dir ]] && sudo mv -vf -- $dir ${dir}_
+if [[ -e $dir && ! -L $dir ]]; then sudo mv -vf -- $dir ${dir}_; fi
 # Create symlink, if it doesn't exist or points to another place
 [[ "$PWD/cfg" -ef $dir ]] || sudo ln -sfvT "$PWD/cfg" $dir
 
+link "$PWD/run" "$CURR_CACHE/bin/lau-${PWD##*/}"
 
 if cfgOpt u; then
     ## Add dictionaries to dictd
-    "$PWD/scripts/indexate" "$dir"
+    "$PWD/scripts/indexate"
     # mv mydict.dict mydict.index /usr/share/dictd/
     # echo "~/installer/Dics" >> /etc/dictd/dictd.order
-    sudo dictdconfig --write
-    ## Re-read configuration file
-    # /etc/init.d/dictd restart
-    # pid=$(pgrep dictd) && sudo kill -SIGHUP $pid
 
     if distro arch; then
+        sudo touch /var/lib/dictd/db.list
         sudo systemctl restart dictd
+
     elif distro ubuntu; then
+        sudo dictdconfig --write
+        ## Re-read configuration file
+        # /etc/init.d/dictd restart
+        # pid=$(pgrep dictd) && sudo kill -SIGHUP $pid
         sudo service dictd restart
     fi
 fi

@@ -3,8 +3,8 @@ set splitright " focus new window after vertical splitting
 set splitbelow " focus new window after horizontal splitting
 
 " Set minimum window size to 79x8
-set winheight=10
-set winminheight=10
+set winheight=8
+set winminheight=8
 set winwidth=72
 set winminwidth=15
 
