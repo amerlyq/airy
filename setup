@@ -39,7 +39,7 @@ in laptop|home|work) PKG_LIST=(shell core dev term Xrc net browser media)
       if has_pr X; then PKG_LIST+=(urxvt); fi
 ;; *) die "No such profile '$CURR_PROF'" ;; esac; fi
 
-PKG_SKIP=(sql)
+PKG_SKIP=(sql latex)
 
 filter_find() { local y n
     y="$(sed 's/ /|/g' <<< "${PKG_LIST[@]}")"

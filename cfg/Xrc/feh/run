@@ -1,12 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
 # Set new wallpaper
-[[ -n "$1" ]] &&
-    source ~/.shell/func.d/cfgsetup &&
-    link "$(readlink -m "$1")" ~/.wallpaper
+if [[ -n "$1" ]]; then
+    ln -svf "$(readlink -m "$1")" ~/.wallpaper
+fi
 
 if [[ -f ~/.wallpaper ]]; then  # symlink to one wallpaper
     feh --bg-fill ~/.wallpaper
 elif [[ -d ~/.wallpaper ]]; then  # random wallpaper from dir
     feh --bg-fill "$(find ~/.wallpaper/ | shuf -n1)"
-else xsetroot -black; fi
+else xsetroot -gray; fi

@@ -309,8 +309,8 @@ fi
 wprf "\n### =================== Windows ==================== ###\n"
 w_header "Windows: Assigning"
     wstr 'assign [title="^Win7hdd"] $w10'
-    wlistf 'assign [class="^%%2"] %%1' '$w04 $w04 $w05 $w09 $w09 $w08' \
-        Firefox Pale\ moon Krita Wine Steam t-engine64
+    wlistf 'assign [class="^%%2"] %%1' '$w04 $w04 $w05 $w09 $w08' \
+        Firefox Pale\ moon Krita Steam t-engine64
 
 ## WARNING: There is no reason to use wlistf as options are too different.
 w_header "Windows: Settings"
@@ -321,7 +321,7 @@ w_header "Windows: Settings"
     wstr 'for_window [class="^Conky"] border none'
     wstr 'for_window [class="^t-engine64"] border none'
     wstr 'for_window [instance="feh"] fullscreen'
-    wstr 'for_window [instance="elona.exe"] fullscreen'
+    wstr 'for_window [title="^ElonaPlus"] fullscreen'
     wstr ''
     wmapf 'for_window [%s] floating enable, border pixel 3' \
         'window_role="pop-up"' 'class="^Copyq" instance="^copyq"' \

@@ -1,3 +1,6 @@
 #!/bin/bash -e
 
+if systemctl status mysqld >/dev/null; then
+    sudo systemctl start mysqld
+fi
 mysql -u root -p

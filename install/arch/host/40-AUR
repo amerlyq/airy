@@ -18,8 +18,14 @@ Include = /etc/pacman.d/mirrorlist
 SigLevel = Never
 Server = http://repo.archlinux.fr/\$arch
 
+[infinality-bundle]
+SigLevel = Never
+Server = http://bohoomil.com/repo/\$arch
+
 #%END_AUR
 EOT
+
+echo "TODO: insert gpg keyring to check signature of infinality"
 
 pacman -Sy
 echo ":: [archlinuxfr] set up complete"

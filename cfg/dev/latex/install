@@ -1,0 +1,21 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    pkg_inst texlive-most texlive-langcyrillic
+
+elif distro ubuntu; then
+
+    LST="$LST texlive texlive-latex-base texlive-latex-extra texlive-latex-recommended"
+    LST="$LST texlive-latex3 latexmk texlive-lang-cyrillic texlive-science"
+    LST="$LST preview-latex-style latex-beamer latex-xcolor scalable-cyrfonts-tex"
+    #LST="$LST texlive-full scalable-cyrfonts-tex"
+    # texlive-latex-extra texlive-science texlive-lang-cyrillic
+    pkg_inst $LST
+
+    DIR=~/pkg/ulem
+    mkdir -p $DIR
+    src=http://www.ctan.org/tex-archive/macros/latex/contrib/ulem/
+    for ext in sty ltx pdf; do wget  $src/ulem.$ext -O $DIR/ulem.$ext; done
+    sudo mv -f ~/pkg/ulem /usr/local/share/texmf/
+fi

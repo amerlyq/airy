@@ -1,19 +1,23 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
+# SEE:
+# http://www.techrapid.co.uk/linux/arch-linux/improve-font-rendering-on-arch-linux/
+
 ### LINKS ###
 link "$PWD/gtkrc-2.0" ~/.gtkrc-2.0
 link "$PWD/settings.ini" ~/.config/gtk-3.0/settings.ini
 
 
-link "$PWD/fonts.conf" ~/.config/fontconfig/fonts.conf
+# Disabled -- use infinality-bundle instead
+# link "$PWD/fonts.conf" ~/.config/fontconfig/fonts.conf
 
 ## Use gtk themes for Qt4
 cfg=~/.config/Trolltech.conf
 if [[ -f "$cfg" ]]; then
     if grep -q 'style=' "$cfg"
-    then sed -i -r '/^(style=).*/s//\1GTK+/' "$cfg"
-    else sed -i- r '/\[Qt\]/s//\0\nstyle=GTK+/' "$cfg"; fi
+    then sed -ri '/^(style=).*/s//\1GTK+/' "$cfg"
+    else sed -ri '/\[Qt\]/s//\0\nstyle=GTK+/' "$cfg"; fi
     echo "W: $cfg"
     # gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme Vertex-Dark
     # Maybe install libgnomeui -- people says then theme will work?
@@ -21,11 +25,17 @@ fi
 
 
 if cfgOpt u; then
-    fc-cache -vf ~/.fonts
+    # cfg=/etc/fonts/conf.d/10-scale-bitmap-fonts.conf
+    # if [[ -L $cfg ]]; then rm $cfg; fi
+    sudo ln -svf /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d/70-no-bitmaps.conf
+    mkfontscale ~/.fonts/*
+    mkfontdir ~/.fonts/*
+    sudo fc-cache -vf ~/.fonts  # fc-cache -fs >/dev/null
 fi
 
 ## Setup
 # https://wiki.archlinux.org/index.php/Font_configuration
+# http://vincent.jousse.org/tech/archlinux-retina-hidpi-macbookpro-xmonad/
 
 ## Fonts
 # To achieve system-wide effect, place the xml config inside

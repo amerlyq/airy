@@ -9,7 +9,7 @@ lsblk $sd
 
 
 ## Profile for current disk
-prev_zs='1MB'
+prev_sz='1MB'
 order="${!SYS_PART[@]}"
 for i in ${order:?No}
 do
@@ -19,14 +19,22 @@ do
     dev="${SYS_PREF?No}${num}"
     opts="-s -a opt $sd mkpart primary"
 
+    # TODO: primary only for boot, then create extended, all others -- logical
+    #       If boot and root are merged, then primary goes to root
+
+    case "$fs" in swap) fs=linux-swap ;; esac
+    parted $opts $fs $prev_sz $sz
+
+    case "$fs"
+    in *swap) mkswap -f $dev
+    ;;  ext?) mkfs.${fs} $dev  # -L Media
+    ;; btrfs) mkfs.${fs} -f $dev
+    ;;     *) die "Unknown FS" ;; esac
+
     if [[ "${SYS_MNT[$i]:?No}" =~ boot$ ]]; then
         parted -s -a opt $sd set $num boot on
     fi
 
-    case "$fs"
-    in  swap) parted $opts linux-swap $prev_sz $sz && mkswap $dev
-    ;;     *) parted $opts        $fs $prev_sz $sz && mkfs.${fs} $dev  # -L Media
-    ;; esac
     prev_sz="$sz"
 done
 

@@ -164,6 +164,17 @@ Feature branch
 		https://techbase.kde.org/Development/Git/Feature_Branch_Workflow
 		https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
 
+Replace master by detached commit
+	Localize detached commit to tmpbr
+		git branch tmpbr
+	Replace master by tmpbr (with strategy 'ours')
+		git checkout tmpbr
+		git merge -s ours master
+		git checkout master
+		git merge tmpbr
+	Clean
+		git branch -d tmpbr
+
 Submodules
 	Add
 		git submodule add http://...git ./name
