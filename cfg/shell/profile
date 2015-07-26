@@ -18,7 +18,6 @@ CURR_DIR_VARS=~/.cache/airy/vars
 ## NOTE: installs folder of configs, instead whole or individual
 # Def: prs for headless ssh, cli/tui only
 PKG_LIST=(shell git ranger tmux vim elinks)
-if has_pr X; then PKG_LIST+=(urxvt); fi
 PKG_SKIP=(sql latex wacom)
 
 if [[ -f ~/.cache/airy/profile ]]
