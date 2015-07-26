@@ -1,3 +1,4 @@
 #!/bin/bash -e
 
+DISPLAY=${DISPLAY:-:0}
 xkbcomp ~/.cache/airy/keylayout.xkm ${DISPLAY%%.*}
