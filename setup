@@ -28,18 +28,8 @@ fi
 header "Airy cfgs"
 source ~/.shell/profile
 link "$PWD/bin" ~/.bin
-cfgOpt u && opts='-u' ||:
-
-
-## NOTE: installs folder of configs, instead whole or individual
-if cfgOpt s; then PKG_LIST=( ${ARGS[@]} )
-else case "${CURR_PROF:=default}"
-in laptop|home|work) PKG_LIST=(shell core dev term Xrc net browser media)
-;; default|ssh) PKG_LIST=(shell git ranger tmux vim elinks)
-      if has_pr X; then PKG_LIST+=(urxvt); fi
-;; *) die "No such profile '$CURR_PROF'" ;; esac; fi
-
-PKG_SKIP=(sql latex)
+if cfgOpt u; then opts='-u'; fi
+if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
 
 filter_find() { local y n
     y="$(sed 's/ /|/g' <<< "${PKG_LIST[@]}")"

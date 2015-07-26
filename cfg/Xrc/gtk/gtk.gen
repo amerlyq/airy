@@ -1,0 +1,57 @@
+#!/bin/bash -e
+source ~/.shell/profile
+source ~/.shell/func.d/cfgsetup
+
+g2=~/.gtkrc-2.0
+g3=~/.config/gtk-3.0/settings.ini
+mkdir -p "${g3%/*}"
+echo '# include "/etc/gtk-2.0/gtkrc"' > $g2
+echo '[Settings]' > $g3
+
+# GUI (use lxappearance): Adwaita, Hope-DT, FlatStudioGray, Mint-X, Ambiance
+if cfgOpt t || [[ -z "$GTK_THEME" ]]
+then case "${THEME}" in
+  lucid) GTK_THEME="Vertex-Light" ;;
+ opaque) GTK_THEME="Vertex-Dark"  ;;
+  light) GTK_THEME="Vertex-Light" ;;
+ dark|*) GTK_THEME="Vertex-Dark"  ;;
+esac; fi
+
+tee -a $g2 $g3 >/dev/null <<EOT
+gtk-theme-name = "$GTK_THEME"
+# gtk-application-prefer-dark-theme = true
+gtk-font-name = "Sans 9"
+
+## Icons
+## Name is defined in the theme's index file, it's NOT the name of its directory.
+# gtk-icon-theme-name = Tango
+# gtk-fallback-icon-theme = gnome
+
+# gtk-icon-sizes = "panel-menu-bar=24,24"
+# gtk-icon-sizes = 18,18
+
+# gtk-cursor-theme-name=Vanilla-DMZ
+# gtk-cursor-theme-size=0
+
+## Toolbar
+# gtk-toolbar-style=GTK_TOOLBAR_ICONS  # GTK_TOOLBAR_BOTH
+gtk-toolbar-icon-size = GTK_ICON_SIZE_SMALL_TOOLBAR
+# gtk-button-images=1
+# gtk-menu-images=1
+
+# gtk-sound-theme-name = ubuntu
+# gtk-enable-event-sounds=1
+# gtk-enable-input-feedback-sounds=1
+
+## Fonts
+# gtk-xft-antialias=1
+# gtk-xft-hinting=1
+# gtk-xft-hintstyle=hintslight
+# gtk-xft-rgba=rgb
+
+#include "/home/do/.gtkrc-2.0.mine"
+EOT
+echo "W: {$g2, $g3}"
+
+# INFO:
+# gtk-color-scheme=theme_text_dark_color:#363636\ntooltip_fg_color:#ffffff\nlink_color:#4a90f9\nbase_color:#FDFDFD\ntext_color:#363636\ntheme_bg_dark_color:#D0D0D0\nselected_fg_color:#FAFAFA\nbg_color:#EBEBEB\ntooltip_bg_color:#161616\ntheme_fg_dark_color:#424242\nselected_bg_color:#6d8cc7\nfg_color:#484848\n

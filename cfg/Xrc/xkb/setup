@@ -1,24 +1,14 @@
 #!/bin/bash -e
-source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD/run" "${CURR_CACHE:?No}/bin/lau-${PWD##*/}"
 
 ### GENS ###
-kmap() { xkbcomp -I"$PWD" ${1:--} ${2} 2>&1 |
-    sed '/No symbols defined\|Symbols ignored\|not found in evdev/d'; }
+if cfgOpt s; then
+    case "$ARGS" in elona) over="am_over_elona" ;; esac
+    echo "Layout: $ARGS"
+fi
 
-dst="$CURR_CACHE/keylayout.xkm"
-
-if cfgOpt s; then layout="$ARGS"; echo "Layout: $layout"; fi
-
-cat ./amer.xkb | case "$layout"
-in elona) sed '/am_over/s//&_elona/'
-;;     *) cat
-;; esac | kmap "" "-xkm $dst"
-
-echo "W: $dst"
-
-## Update
-kmap "$dst" ${DISPLAY%%.*}
+"$PWD/xkbm.gen" $over
+"$PWD/run"

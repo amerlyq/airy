@@ -4,6 +4,7 @@ source ~/.shell/func.d/packages
 pkg_inst 'gdb'
 
 if distro arch; then
+    pkg_inst 'python2-six'
     aur_inst -f '/usr/share/peda/peda.py' peda-git
 
 elif distro ubuntu; then

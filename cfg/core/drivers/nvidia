@@ -1,0 +1,10 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    # Kedi (need remove mesa)
+    pkg_inst "nvidia-340xx nvidia-340xx-libgl lib32-nvidia-340xx-libgl"
+
+elif distro ubuntu; then
+    pkg_inst ""
+fi

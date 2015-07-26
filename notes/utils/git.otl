@@ -11,6 +11,12 @@ git difftool -t meld <commit> <commit> [<path_to_file_to_compare>]
 Git Trick: Preview before pull
 	http://entrenchant.blogspot.com/2013/06/git-trick-preview-before-pull.html
 
+	Diff remote and origin before merge:
+		git fetch
+		git log HEAD..origin  # show the log entries between commit/origin
+		git log -p HEAD..origin  # show each patch
+		git diff HEAD...origin  # show a single diff
+
 Create Repository
 	mkdir meridia
 	cd meridia

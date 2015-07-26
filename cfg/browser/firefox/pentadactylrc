@@ -1,168 +1,120 @@
-"1.1
+"1.2pre, vim: set ft=vim:
+" Reload: source ~/.pentadactylrc
 
 loadplugins '\.(js|penta)$'
 group user
-set guioptions=bBCTrs
+command! -nargs=1 jumptodef -javascript let sourceLocation = function(str) {
+       \    let mapping = function(s) {
+       \        let [, mc, key] = /(?:(.)_)?(.*)/.exec(s);
+       \        return mappings.get(mc ? modes.modeChars[mc] : modes.NORMAL, key) ||
+       \            dactyl.echoerr("Bad bad: " + s);
+       \    };
+       \    if (isArray(str))
+       \        str = str[0];
+       \    let frame = ((str[0] === ":") ? commands.get(str.substr(1)) :
+       \        /'.*?'/.test(str) ? options.get(str.slice(1,-1)) :
+       \        mapping(str)).definedAt;
+       \    return { url: util.fixURI(frame.filename), line: frame.lineNumber };
+       \};
+       \//buffer.viewSource(sourceLocation(args[0]));
+       \let loc = sourceLocation(args[0]);
+       \window.openDialog("chrome://global/content/viewSource.xul",
+       \    "_blank", "all,dialog=no",
+       \    loc.url, null, null, loc.line);
 
-"" {{{ Mapping
+command! smartReader -javascript if (typeof window.__readable_by_evernote === "object") {
+       \    dactyl.execute("emenu Tools.Clearly");
+       \} else if (typeof window.FirefoxReader === "object") {
+       \    dactyl.execute("feedkeys <M-A-z>");
+       \} else if (typeof commands.get("readability") === "object") {
+       \    dactyl.execute("readability");
+       \} else {
+       \    dactyl.execute("bml-readability");
+       \}
+
+
 "" scroll more
-nmap -builtin j 3j
-nmap -builtin k 3k
+map -count -modes=n j -builtin <count>3j
+map -count -modes=n k -builtin <count>3k
 
 "" swap d/D
-nmap -builtin d D
-nmap -builtin D d
-nmap -builtin gd :js config.tabbrowser.removeTab(tabs.getTab())<CR>
-
-"" swap y/Y
-"nmap -builtin y Y
-"nmap -builtin Y y
+map -count -modes=n d -builtin <count>D
+map -count -modes=n D -builtin <count>d
+map -count -modes=n gd -builtin <count>:js<Space>config.tabbrowser.removeTab(tabs.getTab())<Return>
 
 "" swap p/P
-nmap -builtin p P
-nmap -builtin P p
-
-"" J/K move left/right
-"nmap -builtin J h
-"nmap -builtin K l
+map -count -modes=n p -builtin <count>P
+map -count -modes=n P -builtin <count>p
 
 "" w/e switch tabs
-nmap -builtin w <C-p>
-nmap -builtin e <C-n>
+map -count -modes=n w -builtin <count><C-p>
+map -count -modes=n e -builtin <count><C-n>
 
 "" back/forward
-nmap -builtin h <C-o>
-nmap -builtin l <C-i>
+map -count -modes=n h -builtin <count><C-o>
+map -count -modes=n l -builtin <count><C-i>
 
 "" left/right
-nmap -builtin <C-o> 10<Right>
-nmap -builtin <C-i> 10<Left>
+map -count -modes=n <C-o> -builtin <count>10<Right>
+map -count -modes=n <C-i> -builtin <count>10<Left>
 
 "" prev selected tab
-nmap -builtin x <C-^>
-
-"" <M-i> focus on input
-"nmap -builtin <M-i> gi
+map -count -modes=n x -builtin <count><C-^>
 
 "" U list closed tabs
-nmap -builtin U :undo<Space>
+map -count -modes=n U -builtin <count>:undo<Space>
 
 "" toggle menubar
-nmap -builtin gm :set guioptions!=m<CR>
-
+map -count -modes=n gm -builtin <count>:set<Space>guioptions!=m<Return>
 "" viewsource in new tab
-nmap -builtin gf :tab viewsource<CR>
+map -count -modes=n gf -builtin <count>:tab<Space>viewsource<Return>
+
+map -count -modes=n,v <C-c> -builtin <count><C-v><C-c>
+map -count -modes=n ,r -builtin <count>:smartReader<Return>
+map -count -modes=n ,t -builtin <count>:trans<Return>
 
 " Fix the common shortcuts
-noremap <c-c> <c-v><c-c>
-inoremap <c-c> <c-v><c-c>
-inoremap <c-v> <c-v><c-v>
-inoremap <c-x> <c-v><c-x>
-" noremap <c-a> <c-v><c-a>
-" inoremap <c-a> <c-v><c-a>
+map -count -modes=i <C-c> -builtin <C-v><C-c>
+map -count -modes=i <C-v> -builtin <C-v><C-v>
+map -count -modes=i <C-x> -builtin <C-v><C-x>
 
-
-" Pattern for next/prev links
-set nextpattern=\\bnastępn,\\bdalej,\\bnext,^>$,^(>>|»)$,^(>|»),(>|»)$,\\bmore\\b
-set previouspattern=\\bpoprzedni,\\bwstecz,\\bprev|previous\\b,^<$,^(<<|«)$,^(<|«),(<|«)$
-
-
-"" {{{ Option
-"" ]]/[[ turn next/previous page
-set nextpattern&
-set nextpattern^='[下后]\s*一?\s*[页张个篇章頁]','\bolder\s*posts\b','^→$'
-set previouspattern&
-set previouspattern^='[上前]\s*一?\s*[页张个篇章頁]','\bnewer\s*posts\b','^←$'
-
-"" restore original behavior of showing hovered link
-set showstatuslinks=
-style chrome://browser/content/browser.xul statuspanel#statusbar-display { display:block; visibility: visible; overflow-x: hidden; }
-style chrome://browser/content/browser.xul statuspanel#statusbar-display[label^="Looking"], statuspanel#statusbar-display[label^="Connect"], statuspanel#statusbar-display[label^="Transfer"], statuspanel#statusbar-display[label^="Waiting"], statuspanel#statusbar-display[label^="Read"], statuspanel#statusbar-display[label^="Time"] {opacity: 0 !important; }
-
-"" highlight search
-"set hlfind
-
+set cdpath=''
 "" complete search engine suguest
 set complete=location,suggestion
+" for bookmark panel: B
+set guioptions=bCTrs
+set hintkeys=0123456789abcdefghijklmnopqrstuvwxyz
+set maxitems=10
 
 "" allow popups popup
 "set popups=tab,resized
 
-"" home row as hintkeys
-"set hintkeys=asdfg;lkjhqwertpoiuyzxcvmnb
-set hintkeys=0123456789abcdefghijklmnopqrstuvwxyz
-"set hintkeys="4;/.123"
-
 "" only follow hints when press enter
 "set followhints=1
 
-"" show link when hover links
-"set showstatuslinks=command
 
-"" disable annoying auto focus
-set strictfocus^=tao123.com:despotic
+" Pattern for next/prev links
+"" ]]/[[ turn next/previous page
+set nextpattern='[下后]\s*一?\s*[页张个篇章頁]','\bolder\s*posts\b',^→$,'^\s*Next Page\s*$','^\s*Next [>»]','\bnext\b',^>$,'^(>>|»)$','^(>|»)','(>|»)$','\bmore\b'
+set previouspattern='[上前]\s*一?\s*[页张个篇章頁]','\bnewer\s*posts\b',^←$,'^\s*Prev(ious)? Page\s*$','[<«] Prev\s*$','\bprev(ious)?\b',^<$,'^(<<|«)$','^(<|«)','(<|«)$'
 
 "" disable smooth scroll
 set scrollsteps=1
 set scrolltime=0
 
-set maxitems=10
+"" show link when hover links
+set showstatuslinks=command
+"" restore original behavior of showing hovered link
+" set showstatuslinks=''
 
-"" smart reader
-command smartReader -js <<EOF
-if (typeof window.__readable_by_evernote === "object") {
-    dactyl.execute("emenu Tools.Clearly");
-} else if (typeof window.FirefoxReader === "object") {
-    dactyl.execute("feedkeys <M-A-z>");
-} else if (typeof commands.get("readability") === "object") {
-    dactyl.execute("readability");
-} else {
-    dactyl.execute("bml-readability");
-}
-EOF
-nmap -builtin ,r :smartReader<CR>
+"" disable annoying auto focus
+set strictfocus=tao123.com:despotic,'chrome:*':laissez-faire,*:moderate
 
-"" google translate
-command trans -js <<EOF
-let getParameterByName = function(url, name) {
-    let name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
-    let regexS = '[\\?&]' + name + '=([^&#]*)';
-    let regex = new RegExp(regexS);
-    let results = regex.exec(url);
-    if (results == null)
-        return '';
-    else
-        return decodeURIComponent(results[1].replace(/\+/g, ' '));
-};
-if (buffer.URL.spec.startsWith('http://translate.google.com/')) {
-    dactyl.open(getParameterByName(buffer.URL.spec, 'u'));
-} else {
-    dactyl.open('http://translate.google.com/translate?hl=en&sl=auto&tl=en&u=' + encodeURIComponent(buffer.URL.spec));
-}
-EOF
-nmap -builtin ,t :trans<CR>
+style chrome://browser/content/browser.xul statuspanel#statusbar-display { display:block; visibility: visible; overflow-x: hidden; }
+style chrome://browser/content/browser.xul statuspanel#statusbar-display[label^="Looking"], statuspanel#statusbar-display[label^="Connect"], statuspanel#statusbar-display[label^="Transfer"], statuspanel#statusbar-display[label^="Waiting"], statuspanel#statusbar-display[label^="Read"], statuspanel#statusbar-display[label^="Time"] {opacity: 0 !important; }
 
-"" jump to a command, mapping or option source definition, from https://gist.github.com/3331062
-command jumptodef,jd -literal=1 -nargs=1 -complete help -js <<EOF
-let sourceLocation = function(str) {
-    let mapping = function(s) {
-        let [, mc, key] = /(?:(.)_)?(.*)/.exec(s);
-        return mappings.get(mc ? modes.modeChars[mc] : modes.NORMAL, key) ||
-            dactyl.echoerr("Bad bad: " + s);
-    };
-    if (isArray(str))
-        str = str[0];
-    let frame = ((str[0] === ":") ? commands.get(str.substr(1)) :
-        /'.*?'/.test(str) ? options.get(str.slice(1,-1)) :
-        mapping(str)).definedAt;
-    return { url: util.fixURI(frame.filename), line: frame.lineNumber };
-};
-//buffer.viewSource(sourceLocation(args[0]));
-let loc = sourceLocation(args[0]);
-window.openDialog("chrome://global/content/viewSource.xul",
-    "_blank", "all,dialog=no",
-    loc.url, null, null, loc.line);
-EOF
+"" Styles
+hi Hint font-size: 12px; font-weight: bold; color: black; background-color: white; border-color: ButtonShadow; border-width: 1px; border-style: solid; padding: 0px 1px 0px 1px;
 
-
-" vim: set ft=pentadactyl fdm=marker:
+"" highlight search
+"set hlfind

@@ -1,0 +1,40 @@
+#!/bin/bash -e
+source ~/.shell/profile
+source ~/.shell/func.d/cfgsetup
+
+# pc+us:1+ru(typewriter):2+ua(legacy):3
+lang="${CURR_XKB_LANG:-us:1+am(ru):2+am(ua):3}"
+over="${1:-${CURR_XKB_OVER:-am_over}}"
+
+dst="$CURR_CACHE/keylayout.xkb"
+cat > "$dst" <<EOT
+xkb_keymap {
+    xkb_keycodes  { include "evdev+aliases(qwerty)" };
+    xkb_types     {
+        include "complete"
+        include "super"
+    };
+    xkb_compat    {
+        include "complete"
+        replace "iso_langs"
+        include "leds"
+    };
+    xkb_symbols   {
+        include "pc+$lang"
+        replace "am_mods"
+        replace "am_mods(lctrl_lvl5)"
+        include "$over"
+
+        include "typo(base)"
+        include "inet(evdev)"
+    };
+    xkb_geometry  { include "pc(pc86)" };
+};
+EOT
+# You could use 'replace' in file before each key,
+# but sometimes it's simply not working.
+
+xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 |
+    sed -r '/No symbols defined|Symbols ignored|not found in evdev/d'
+
+echo "W: $dst"

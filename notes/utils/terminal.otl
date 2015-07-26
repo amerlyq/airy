@@ -118,8 +118,10 @@ Mount
 		sudo umount /dev/sdb1
 		sudo mkfs.vfat /dev/sdb1
 
-Scan local network for ip's
-	nmap -sn 192.168.0.0/24
+HACK
+	Scan local network for ip's
+		nmap -sn 192.168.0.0/24
+		nmap -sP 192.168.1.0/24
 
 Flags from nemo:
 	mkdir -p ~/usb && sudo mount -t vfat /dev/sdb1 ~/usb -o rw,nosuid,nodev,uid=1000,gid=1000,shortname=mixed,dmask=077,utf8=1,showexec,flush,uhelper=udisks2

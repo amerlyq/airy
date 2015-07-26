@@ -14,9 +14,9 @@ fi
 pkg_inst -p 'sensors' $LST
 
 
-if cfgOpt u; then
-    echo "Configure cpu and etc sensors. Reply 'yes' on all questions"
-    sudo sensors-detect
+if cfgOpt c; then
+    echo ">>> Configure cpu and etc sensors. Reply 'yes' on all questions"
+    sudo sensors-detect --auto
     # Display all found sensors
     sensors
 fi

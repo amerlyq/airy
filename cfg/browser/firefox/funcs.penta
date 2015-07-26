@@ -1,0 +1,46 @@
+"1.1
+
+"" google translate
+command trans -js <<EOF
+let getParameterByName = function(url, name) {
+    let name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
+    let regexS = '[\\?&]' + name + '=([^&#]*)';
+    let regex = new RegExp(regexS);
+    let results = regex.exec(url);
+    if (results == null)
+        return '';
+    else
+        return decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+if (buffer.URL.spec.startsWith('http://translate.google.com/')) {
+    dactyl.open(getParameterByName(buffer.URL.spec, 'u'));
+} else {
+    dactyl.open('http://translate.google.com/translate?hl=en&sl=auto&tl=en&u=' + encodeURIComponent(buffer.URL.spec));
+}
+EOF
+nmap -builtin ,t :trans<CR>
+
+"" jump to a command, mapping or option source definition, from https://gist.github.com/3331062
+command jumptodef,jd -literal=1 -nargs=1 -complete help -js <<EOF
+let sourceLocation = function(str) {
+    let mapping = function(s) {
+        let [, mc, key] = /(?:(.)_)?(.*)/.exec(s);
+        return mappings.get(mc ? modes.modeChars[mc] : modes.NORMAL, key) ||
+            dactyl.echoerr("Bad bad: " + s);
+    };
+    if (isArray(str))
+        str = str[0];
+    let frame = ((str[0] === ":") ? commands.get(str.substr(1)) :
+        /'.*?'/.test(str) ? options.get(str.slice(1,-1)) :
+        mapping(str)).definedAt;
+    return { url: util.fixURI(frame.filename), line: frame.lineNumber };
+};
+//buffer.viewSource(sourceLocation(args[0]));
+let loc = sourceLocation(args[0]);
+window.openDialog("chrome://global/content/viewSource.xul",
+    "_blank", "all,dialog=no",
+    loc.url, null, null, loc.line);
+EOF
+
+
+" vim: set ft=vim fdm=marker:
