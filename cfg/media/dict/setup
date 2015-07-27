@@ -22,6 +22,9 @@ if cfgOpt u; then
 
     if distro arch; then
         sudo touch /var/lib/dictd/db.list
+        if ! systemctl is-enabled dictd; then
+            sudo systemctl enable dictd
+        fi
         sudo systemctl restart dictd
 
     elif distro ubuntu; then

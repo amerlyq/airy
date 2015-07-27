@@ -11,6 +11,7 @@ alias gtb='git branch -a '
 
 # Diff
 alias gdf='git diff'
+alias glF='git diff HEAD...origin'  # with fetched
 alias gdw='gdf --no-ext-diff --word-diff'
 alias gdc='gdf --cached -w'
 alias gdcw='gdf --no-ext-diff --word-diff --cached -w'
@@ -25,6 +26,7 @@ alias gdv='gdfv'
 
 # Log
 alias glg='git lgraph'
+alias glF='git log -p HEAD..origin'  # with fetched
 alias gll='git lmsg'
 gln(){ git ldump -n ${1:-10}; } #or -1 for inf
 alias gff='git rev-list --all | xargs git grep '

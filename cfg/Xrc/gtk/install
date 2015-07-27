@@ -7,8 +7,8 @@ pkg_inst -a "gtk2 gtk3"
 # mate-themes numix-themes
 aur_inst -a "vertex-themes zukitwo-themes ceti-2-themes"
 
-# fonts
 if grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
+    # infinality supports only 96dpi
     pkg_inst -a infinality-bundle
 fi
 pkg_inst 'ttf-freefont ttf-droid ttf-dejavu otf-ipafont'

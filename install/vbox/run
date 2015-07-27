@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+if ! lsmod | grep -q '^vboxdrv\>'; then
+    sudo modprobe vboxdrv
+fi
+
+if ! pgrep VirtualBox >/dev/null; then
+    VirtualBox &
+fi

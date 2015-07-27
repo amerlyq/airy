@@ -3,5 +3,5 @@
 ## Server: no demon
 # dictd -d nofork -d init
 
-dict $@ | less
+dict $@ | w3m -T "text/html" | less +/Universal
 
