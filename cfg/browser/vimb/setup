@@ -5,6 +5,7 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 dir=~/.config/vimb
 link "$dir/theme/${THEME}.css" "$dir/style.css"
+link "$PWD/run" "$CURR_CACHE/bin/lau-${PWD##*/}"
 
 # Skip if you only toggle them
 cfgOpt t || linkdir "$dir/" config 'dld-start' theme setup
