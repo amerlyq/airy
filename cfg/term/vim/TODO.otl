@@ -19,9 +19,13 @@ SMALL
 
 BUG:
 	[_] BUG: vim not only slow, but also SEGFAULT -- enable coredumps and see
-		what is the reason
-	[_] FIX gj/gk and j/k for wrapping text
-	[_] ?FIX? maybe bug from 'not back-moving cursor'
+		:= Reason in garbage collector + lua. See coredumps:
+		coredumpctl list; coredumctl info 1832; coredumpctl gdb 1832; bt
+		SEE:
+		: https://github.com/Shougo/neocomplete.vim/issues/351
+		: https://groups.google.com/forum/#!msg/vim_dev/PbLFBAD5Xu8/bH_kew8vmJAJ
+	2015-07-28 [X] FIX gj/gk and j/k for wrapping text
+	[_] FIX? maybe bug from 'not back-moving cursor'
 		: -- V till end of line deletes also \n -- DECIDE: change behaviour?
 	[_] FIX russian xkb plugin
 		: Maybe, some of mapping map not as keysym but by keycodes?
