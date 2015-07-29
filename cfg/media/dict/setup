@@ -15,11 +15,10 @@ if [[ -e $dir && ! -L $dir ]]; then sudo mv -vf -- $dir ${dir}_; fi
 if cfgOpt u; then
     ## Add dictionaries to dictd
     "$PWD/scripts/indexate"
-    # mv mydict.dict mydict.index /usr/share/dictd/
     # echo "~/installer/Dics" >> /etc/dictd/dictd.order
 
     if distro arch; then
-        sudo touch /var/lib/dictd/db.list
+        # sudo touch /var/lib/dictd/db.list
         if ! systemctl is-enabled dictd; then
             sudo systemctl enable dictd
         fi

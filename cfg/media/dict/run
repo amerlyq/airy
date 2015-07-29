@@ -3,5 +3,8 @@
 ## Server: no demon
 # dictd -d nofork -d init
 
-dict "$@" | w3m -T "text/html" | less +/Universal
-
+if dict -h localhost -H >/dev/null; then
+    dict "$@" | w3m -T "text/html" | less +/Universal
+else
+    dict "$@" | less "+/$@"
+fi

@@ -1,28 +1,26 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-dir="${1:-$HOME/res/dicts}"
-dblst=/var/lib/dictd/custom.list
+src="${1:-$HOME/res/dicts}"
+[[ -d "$src" ]] || die "No dir with *.dict.dz specified"
 
-[[ -n "$dir" && -d "$dir" ]] || die "No dir with *.dict.dz specified"
+## Link directory to access it by 'nobody'
+dst=/usr/share/dictd
+[[ ! -e $dst || -L $dst ]] || sudo mv -vf -- $dst ${dst}_
+[[ "$src" -ef $dst ]] || sudo ln -sfvT "$src" $dst
 
-dst="$dir/custom.list"
-> "$dst"
 
 ## Generate database of all dictionaries in 'dir'
-find "$dir" -regex '.*\.dict\(\.dz\)?' | while read fl; do
+dblst="$src/custom.list"  # /var/lib/dictd/custom.list
+> "$dblst"
+
+find "$dst/" -regex '.*\.dict\(\.dz\)?' | while read fl; do
     nm="${fl%.dz}"; nm="${nm%.dict}";
     if [[ -e "${nm}.index" ]]; then
         echo "database \"${nm##*/}\" {
   data  \"$fl\"
   index \"${nm}.index\"
-}" >> "$dst"
+}" >> "$dblst"
 fi; done
-
-
-## Link database to configs
-link(){ [[ -e "$1" && (! -e $2 || -L $2) ]] &&
-    sudo mkdir -p "${2%/*}" && sudo ln -sfvT "$1" $2; }
-link "$dst" $dblst
 
 echo "W: $dblst"
