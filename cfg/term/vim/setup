@@ -3,6 +3,11 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
+if distro arch; then
+    mkdef editor $(which vim)
+elif distro ubuntu; then
+    for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
+fi
 
 # Dir for .swp, backup, ... files
 VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"

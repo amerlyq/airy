@@ -17,8 +17,6 @@ elif distro ubuntu; then
     # for vimoutliner export in mindmap
     pkg_inst vim-gtk exuberant-ctags 'python-pip' python-dev
     pkg_inst libclang-dev clang-format-3.5
-
-    for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
 fi
 
 do_if -c 'sudo pip install --upgrade' pip jedi

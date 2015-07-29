@@ -1,9 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-### LINKS ###
-link "$PWD/run" "${CURR_CACHE:?No}/bin/lau-${PWD##*/}"
-
 ### GENS ###
 if cfgOpt s; then
     case "$ARGS" in elona) over="am_over_elona" ;; esac

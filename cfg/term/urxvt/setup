@@ -9,9 +9,7 @@ source ~/.shell/profile
 ### LINKS ###
 link "$PWD" ~/.urxvt
 link "$PWD/themes/amer-${THEME}" ~/.cache/airy/theme-urxvt
-
-link "$PWD/run" "$CURR_CACHE/bin/lau-term"
-link "$(which urxvt)" "$CURR_CACHE/bin/def-term"
+mkdef x-terminal-emulator $(which urxvt)
 
 
 # https://wiki.archlinux.org/index.php/Rxvt-unicode

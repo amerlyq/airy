@@ -8,6 +8,4 @@ if distro arch; then
 
 elif distro ubuntu; then
     pkg_inst -p urxvt 'rxvt-unicode-256color'
-
-    mkdef x-terminal-emulator $(which urxvt)
 fi

@@ -42,8 +42,6 @@ if distro ubuntu; then
     sudo apt-add-repository --yes "$1"
     sudo apt-get update
   }
-  mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
-      sudo update-alternatives --set $1 "$2"; }
 
 elif distro arch; then
   pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' $@; }

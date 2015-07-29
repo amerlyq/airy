@@ -44,9 +44,17 @@ do link "$PWD/$nm" "${1?No pref}$nm"
 done;}
 
 
+if distro arch; then
+  mkdef() { link "${2?No bin}" "$CURR_CACHE/bin/${1?No name}"; }
+
+elif distro ubuntu; then
+  mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
+      sudo update-alternatives --set $1 "$2"; }
+fi
+
 ### Go to current script's directory
 cd $(dirname $(readlink -m ${0}))
-
+[[ ! -f "$PWD/run" ]] || link "$PWD/run" "$CURR_CACHE/bin/lau-${PWD##*/}"
 # =============================== ALT ==================================
 
 ## Subdirectories:

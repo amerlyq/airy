@@ -12,8 +12,6 @@ if [[ -e $dir && ! -L $dir ]]; then sudo mv -vf -- $dir ${dir}_; fi
 # Create symlink, if it doesn't exist or points to another place
 [[ "$PWD/cfg" -ef $dir ]] || sudo ln -sfvT "$PWD/cfg" $dir
 
-link "$PWD/run" "$CURR_CACHE/bin/lau-${PWD##*/}"
-
 if cfgOpt u; then
     ## Add dictionaries to dictd
     "$PWD/scripts/indexate"
