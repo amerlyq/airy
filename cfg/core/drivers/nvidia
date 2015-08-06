@@ -2,8 +2,10 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    # Kedi (need remove mesa)
-    pkg_inst "nvidia-340xx nvidia-340xx-libgl lib32-nvidia-340xx-libgl"
+    if [[ "$CURR_PROF" == kedi ]]  # Kedi (need remove mesa)
+    then pkg_inst --asdeps "nvidia-340xx nvidia-340xx-libgl lib32-nvidia-340xx-libgl"
+    else pkg_inst --asdeps "nvidia nvidia-libgl nvidia-utils lib32-nvidia-libgl"
+    fi
 
 elif distro ubuntu; then
     pkg_inst ""
