@@ -14,8 +14,8 @@ let g:tex_conceal = ""
 
 let g:LatexBox_latexmk_options ="-pdflatex='pdflatex -synctex=1 \\%O \\%S'"  " -file-line-error
 
-" see $ syntex edit help, -n ?
-let g:LatexBox_viewer = 'zathura -s -x "vim --servername synctex --remote-silent +\\%{line} \\%{input}  > /dev/null 2>&1"'
+" see $ synctex edit help, -n ?
+let g:LatexBox_viewer = 'zathura -x "vim --servername synctex --remote-silent +\\%{line} \\%{input} >/dev/null 2>&1"'
 
 " https://bbs.archlinux.org/viewtopic.php?pid=800460
 " http://stackoverflow.com/questions/14466395/making-vim-mappings-quiet

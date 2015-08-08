@@ -372,6 +372,8 @@ NeoBundle 'amerlyq/vim-focus-autocmd', {
 " Viewing man in vim: good, but no colors in git lg1, need to investigate
 " NeoBundleLazy 'rkitover/vimpager'
 
+NeoBundle 'szw/vim-dict'
+
 " ALT: http://tiddlywiki.com  -- one-page wiki
 NeoBundleLazy 'vimoutliner/vimoutliner', {
     \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], }}
