@@ -77,23 +77,26 @@ NeoBundle 'Shougo/neomru.vim', { 'depends' : 'Shougo/unite.vim' }
 " http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
 NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
 
-NeoBundleLazy 'Shougo/neocomplete.vim', {
-    \ 'disabled' : !has('lua'),
-    \ 'vim_version' : '7.3.885',
+" echo neobundle#tap('YouCompleteMe')
+
+NeoBundle 'Shougo/neocomplete.vim', {
     \ 'depends' : [
-    \     'Shougo/context_filetype.vim',
-    \     'Shougo/vimproc.vim'
-    \   ],
-    \ 'autoload': { 'insert': 1, }}
+    \   'Shougo/context_filetype.vim',
+    \   'Shougo/vimproc.vim' ],
+    \ 'disabled' : !has('lua'),
+    \ 'vim_version' : '7.3.885'}
 
 " SirVer/ultisnips
 NeoBundle 'Shougo/neosnippet.vim', {
-    \ 'vim_version': '7.3.885',
     \ 'depends' : [
     \   'Shougo/neocomplete.vim',
     \   'Shougo/neosnippet-snippets',
-    \   'honza/vim-snippets' ]}
+    \   'honza/vim-snippets' ],
+    \ 'disabled' : !has('lua'),
+    \ 'vim_version': '7.3.885'}
 
+
+" ======================================
 
 if has('unix')
     " W3m from vim
@@ -103,34 +106,33 @@ if has('unix')
     "NeoBundleLazy 'Rip-Rip/clang_complete'
     "autocmd FileType c,cpp NeoBundleSource clang_complete
 
-    "" Autocompletion for Python and C-like languages
-    " NeoBundle 'Valloric/YouCompleteMe', {
-    "         \ 'lazy': 1,
-    "         \ 'augroup': 'youcompletemeStart',
-    "         \ 'autoload': {
-    "         \   'insert': 1,
-    "         \   'commands' : ['Ycm'],
-    "         \ },
-    "         \ 'build': {
-    "         \   'unix': './install.sh --clang-completer --system-libclang',
-    "         \ },
-    "         \ 'disabled': !has('python'),
-    "         \ 'vim_version': '7.3.584',
-    "         \}
+    "" Autocompletion for Python and C-like languages. Need Python2 exclusively
+    NeoBundleLazy 'Valloric/YouCompleteMe', {
+        \ 'augroup': 'youcompletemeStart',
+        \ 'autoload': {
+        \   'commands' : ['YcmDebugInfo'],
+        \   'filetypes' : [ 'c', 'cpp' ],
+        \ },
+        \ 'build': {
+        \   'linux': './install.sh --clang-completer',
+        \ },
+        \ 'disabled': !has('python'),
+        \ 'vim_version': '7.3.584',
+        \ }
+        " \   'unix': './install.sh --clang-completer --system-libclang'
 
-    " [ ! -e './third_party/ycmd/ycm_core.so' ]
-    " It could be necessary to exac inside of bundle/YouCompleteMe
-    " git submodule update --init --recursive
-" {{{Build instruction for YCM
+    " TODO FIX: resolve completion conflicts -- seems like isn't disabled?
+    " autocmd FileType c,cpp if exists(':YcmCompleter') | NeoCompleteDisable | endif
+    " neocomplete: 'autoload': { 'filetypes' : [ 'vim', 'sh', 'shell', 'votl' ], },
+
+" {{{Build instruction for YCM : if [ ! -e './third_party/ycmd/ycm_core.so' ]
 "   1. git submodule update --init --recursive
-"   2. cd third_party/ycmd
-"   3. mkdir -p build
-"   4. cd build
-"   5. cmake .. ../cpp
+"   2. cd third_party/ycmd && mkdir -p build && cd build && cmake .. ../cpp
 "   5a. (optional) ccmake . # configure
 "   6. make
+" For win: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
 " }}}
-    " For win: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
+
 else
 
 " In unix terminal use snip-ranger-filechooser.vim
@@ -151,9 +153,9 @@ endif
 
 
 "" Python =======================
-NeoBundle 'klen/python-mode', {
+NeoBundleLazy 'klen/python-mode', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] }}
-NeoBundle 'davidhalter/jedi-vim', {
+NeoBundleLazy 'davidhalter/jedi-vim', {
     \ 'autoload' : { 'filetypes' : [ 'python' ] }}
 " USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
 " https://github.com/bps/vim-textobj-python

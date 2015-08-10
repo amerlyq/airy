@@ -1,21 +1,4 @@
-# default:
-# ~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py
-
-#flags = [
-#'-Wall',
-#'-Wextra',
-#'-Werror',
-#'-Wno-long-long',
-#'-Wno-variadic-macros',
-#'-fexceptions',
-#'-I/usr/include/',
-#'-std=c++11',
-#'-x',
-#'c++',
-#]
-#
-#def FlagsForFile(filename, **kwargs):
-#    return {'flags': flags, 'do_cache': True}
+# SEE: CACHE/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py
 
 import os
 import ycm_core
@@ -24,13 +7,8 @@ import ycm_core
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
 flags = [
-'-Wall',
-'-Wextra',
-'-Werror',
-'-Wc++98-compat',
-'-Wno-long-long',
-'-Wno-variadic-macros',
-'-fexceptions',
+'-Wall', '-Wextra', '-Werror', '-Wc++98-compat',
+'-Wno-long-long', '-Wno-variadic-macros', '-fexceptions',
 '-DNDEBUG',
 # You 100% do NOT need -DUSE_CLANG_COMPLETER in your flags; only the YCM
 # source code needs it.
@@ -46,38 +24,22 @@ flags = [
 # language that the files to be compiled are written in. This is mostly
 # relevant for c++ headers.
 # For a C project, you would set this to 'c' instead of 'c++'.
-'-x',
-'c++',
-'-isystem',
-'../BoostParts',
-'-isystem',
-# This path will only work on OS X, but extra paths that don't exist are not
-# harmful
-'/System/Library/Frameworks/Python.framework/Headers',
-'-isystem',
-'../llvm/include',
-'-isystem',
-'../llvm/tools/clang/include',
-'-I',
-'.',
-'-I',
-'./ClangCompleter',
-'-isystem',
-'./tests/gmock/gtest',
-'-isystem',
-'./tests/gmock/gtest/include',
-'-isystem',
-'./tests/gmock',
-'-isystem',
-'./tests/gmock/include',
-'-isystem',
-'/usr/include',
-'-isystem',
-'/usr/local/include',
-'-isystem',
-'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1',
-'-isystem',
-'/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include',
+'-x', 'c++',
+'-isystem', '../BoostParts',
+# This path will only work on OS X, but extra paths that don't exist are not harmful
+'-isystem', '/System/Library/Frameworks/Python.framework/Headers',
+'-isystem', '../llvm/include',
+'-isystem', '../llvm/tools/clang/include',
+'-I', '.',
+'-I', './ClangCompleter',
+'-isystem', './tests/gmock/gtest',
+'-isystem', './tests/gmock/gtest/include',
+'-isystem', './tests/gmock',
+'-isystem', './tests/gmock/include',
+'-isystem', '/usr/include',
+'-isystem', '/usr/local/include',
+'-isystem', '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1',
+'-isystem', '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include',
 ]
 
 
@@ -175,7 +137,4 @@ def FlagsForFile( filename, **kwargs ):
     relative_to = DirectoryOfThisScript()
     final_flags = MakeRelativePathsInFlagsAbsolute( flags, relative_to )
 
-  return {
-    'flags': final_flags,
-    'do_cache': True
-  }
+  return { 'flags': final_flags, 'do_cache': True }

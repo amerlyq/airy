@@ -1,7 +1,8 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-[[ "${CURR_PROF?No}" == work ]] || exit 0
+# [[ "${CURR_PROF?No}" == work ]] || exit 0
+exit 0
 
 if distro arch; then
     pkg_inst python-docutils

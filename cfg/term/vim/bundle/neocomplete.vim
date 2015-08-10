@@ -1,3 +1,5 @@
+if !neobundle#tap('neocomplete.vim') | finish | endif
+
 " Disable AutoComplPop.
 "let g:acp_enableAtStartup = 0
 
