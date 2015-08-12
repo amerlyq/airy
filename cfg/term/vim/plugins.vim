@@ -106,20 +106,20 @@ if has('unix')
     "NeoBundleLazy 'Rip-Rip/clang_complete'
     "autocmd FileType c,cpp NeoBundleSource clang_complete
 
-    "" Autocompletion for Python and C-like languages. Need Python2 exclusively
-    NeoBundleLazy 'Valloric/YouCompleteMe', {
-        \ 'augroup': 'youcompletemeStart',
-        \ 'autoload': {
-        \   'commands' : ['YcmDebugInfo'],
-        \   'filetypes' : [ 'c', 'cpp' ],
-        \ },
-        \ 'build': {
-        \   'linux': './install.sh --clang-completer',
-        \ },
-        \ 'disabled': !has('python'),
-        \ 'vim_version': '7.3.584',
-        \ }
-        " \   'unix': './install.sh --clang-completer --system-libclang'
+    " "" Autocompletion for Python and C-like languages. Need Python2 exclusively
+    " NeoBundleLazy 'Valloric/YouCompleteMe', {
+    "     \ 'augroup': 'youcompletemeStart',
+    "     \ 'autoload': {
+    "     \   'commands' : ['YcmDebugInfo'],
+    "     \   'filetypes' : [ 'c', 'cpp' ],
+    "     \ },
+    "     \ 'build': {
+    "     \   'linux': './install.sh --clang-completer',
+    "     \ },
+    "     \ 'disabled': !has('python'),
+    "     \ 'vim_version': '7.3.584',
+    "     \ }
+    "     " \   'unix': './install.sh --clang-completer --system-libclang'
 
     " TODO FIX: resolve completion conflicts -- seems like isn't disabled?
     " autocmd FileType c,cpp if exists(':YcmCompleter') | NeoCompleteDisable | endif

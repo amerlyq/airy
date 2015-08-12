@@ -18,6 +18,8 @@ SMALL
 		https://github.com/gorkunov/smartgf.vim
 
 BUG:
+	[_] FIX youcompleteme <BS> -- deletes all letters beside first, instead of one letter only
+		: maybe it's result of simultaneous working neocomplete -- try to disable it
 	[_] BUG: vim not only slow, but also SEGFAULT -- enable coredumps and see
 		:= Reason in garbage collector + lua. See coredumps:
 		coredumpctl list; coredumctl info 1832; coredumpctl gdb 1832; bt
@@ -39,7 +41,8 @@ BUG:
 	[_] BUG: visual-block +Y yanks only column, but must be as +D, which deletes until end.
 	[_] BUG: broken swap diff :> Opened issue
 	[_] BUG: broken Lazy for fugitive
-	[_] BUG: vim-altr -- [f ]f don't work for rule 'src/%.c' -> 'inc/%.h'
+	2015-08-12 [X] BUG: vim-altr -- [f ]f don't work for rule 'src/%.c' -> 'inc/%.h'
+		:> Need specific pattern description -- author was helpful
 	[_] BUG: C-F on end of '/', C-D on emtpy ':' -- both opens menu, needs to disable it
 	2015-03-26 [X] BUG: 'gcc' comments are old-style again
 	2015-06-01 [X] BUG: auto-paste mode on insert don't work, verify, add F2 to insert. :> Disabled.

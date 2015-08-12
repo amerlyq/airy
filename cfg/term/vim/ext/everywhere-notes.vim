@@ -27,7 +27,7 @@ let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Did': 10,
       \ 'Dev': 4, 'Msg': 7, 'Tbd': 5, 'Alt': 3 }
 let s:patterns = {
       \ 'Err': 'ERR(OR)=|BUG',
-      \ 'Fix': 'FIX(ME)=|WARNING',
+      \ 'Fix': 'FIX(ME)=|WARNING|ATTENTION',
       \ 'Add': 'ADD|SEE|NEED|FIND',
       \ 'Did': 'DONE|FIXED',
       \ 'Dev': 'DEV|HACK',
