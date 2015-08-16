@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+convert "$1" -background Khaki -pointsize 10 \
+    -font DejaVu-Sans-Condensed label:"$2" \
+    -gravity Center -append "$1"_anno.jpg
+
+# List fonts
+#   convert -list font
