@@ -1,0 +1,28 @@
+Open the repository source list for editing:
+	sudo vi /etc/apt/sources.list
+Append the list file with the URL of the Tizen GBS tool based on your system version.
+	: Linux Mint 17.10
+	deb http://download.tizen.org/tools/latest-release/Ubuntu_14.04/ /
+	: where 14.10 = lsb_release -a
+Update the repository list:
+	sudo apt-get update
+Install GBS:
+	sudo apt-get install libcrypt-ssleay-perl build depanneur gbs
+	# sudo apt-get install gbs mic
+
+To update the build package based on your Linux distribution:
+	sudo dpkg -r --force-depends build
+	sudo apt-get update
+	sudo apt-get install build
+
+
+gbs build	Builds an RPM package from the Git repository on the local host
+gbs changelog	Generates a changelog file consisting of Git commit messages.
+This sub-command is currently not supported.
+
+gbs chroot	Enables you to migrate from the chroot directory to the buildroot directory (created using the gbs build sub-command)
+gbs export	Exports the Git tree as a tarball
+gbs import	Imports an RPM package or spec file to the Git repository
+gbs remotebuild	Builds an RPM package from the Git repository on the remote OBS
+gbs submit	Prepares a changelog or tag file for submission and other operations, such as a sanity check.
+This sub-command is currently not supported.
