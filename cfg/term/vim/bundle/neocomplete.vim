@@ -88,11 +88,12 @@ endif
 
 " For Jedi
 " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType python setlocal omnifunc=jedi#completions
 if !exists('g:neocomplete#force_omni_input_patterns')
     let g:neocomplete#force_omni_input_patterns = {}
 endif
-let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+  let g:neocomplete#force_omni_input_patterns.python =
+  \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+  " alternative pattern: '\h\w*\|[^. \t]\.\w*'
 let g:neocomplete#enable_auto_close_preview = 0
 
 " For perlomni.vim setting.

@@ -7,8 +7,7 @@ for arg in "$@"; do case "$arg" in
   -u|--update) cfgOptAdd u ;;
 esac; done
 
-CURR_DIR_PKG="${CURR_DIR_PKG:-~/pkg}"
-mkdir -vp "$CURR_DIR_PKG"
+mkdir -vp "${CURR_DIR_PKG:?No in profile}"
 
 do_if() {
   local cmd pkgs bSkip=1 bAll=0 OPTIND=1

@@ -2,7 +2,7 @@
 
 case "$1" in
 "C-d")
-        # mv "$2" ~/.trash
+        mkdir -p /tmp/trash && mv "$2" /tmp/trash
         ;;
 "C-r")
         # convert -rotate 90 "$2" "$2"

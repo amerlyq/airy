@@ -14,8 +14,9 @@ noremap <unique> <Leader> <Nop>
 
 
 " Switch [c,cpp,cxx,cc] <-> [h,hpp]
-NeoBundleLazy 'kana/vim-altr', { 'autoload': {
-    \ 'commands' : 'A', 'mappings': '<Plug>(altr-' }}
+NeoBundle 'kana/vim-altr'
+" , { 'autoload': {
+"     \ 'commands' : 'A', 'mappings': '<Plug>(altr-' }}
 
 NeoBundle 'Valloric/ListToggle'
 
@@ -153,10 +154,13 @@ endif
 
 
 "" Python =======================
-NeoBundleLazy 'klen/python-mode', {
-    \ 'autoload' : { 'filetypes' : [ 'python' ] }}
-NeoBundleLazy 'davidhalter/jedi-vim', {
-    \ 'autoload' : { 'filetypes' : [ 'python' ] }}
+" WARNING: can't do them Lazy, as them will load on every
+"         new *.py fileopen (,f) and reset my autocmd for jedi autocomplete
+NeoBundle 'davidhalter/jedi-vim'
+    " \, { 'autoload' : { 'filetypes' : [ 'python' ] }}
+NeoBundle 'klen/python-mode'
+    " \, { 'autoload' : { 'filetypes' : [ 'python' ] }}
+" autocmd FileType python NeoBundleSource 'python-mode', 'jedi-vim',
 " USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
 " https://github.com/bps/vim-textobj-python
 

@@ -3,11 +3,13 @@
 " If you need completion on Tab:
 " USE: https://github.com/ervandew/supertab
 
+let g:jedi#force_py_version = 3
 let g:jedi#auto_initialization = 1
 " Because of neocomplete:
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
+autocmd FileType python setlocal omnifunc=jedi#completions
 
 " If you are a person who likes to use VIM-buffers not tabs
 let g:jedi#use_tabs_not_buffers = 0
