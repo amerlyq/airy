@@ -86,6 +86,21 @@ if neobundle#tap('vim-operator-surround')  "{{{1
 "   nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
 endif
 
+if neobundle#tap('sideways.vim')  "{{{1
+  xmap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
+  omap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
+
+  xmap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
+  omap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
+
+  noremap <silent><unique> [a :<C-u>SidewaysJumpLeft<CR>
+  noremap <silent><unique> ]a :<C-u>SidewaysJumpRight<CR>
+
+  " NOTE: overrides 'ga -- print ascii for letter', do 'unmap ga' on demand
+  nnoremap <silent><unique> ga :SidewaysLeft<CR>
+  nnoremap <silent><unique> gA :SidewaysRight<CR>
+endif
+
 if neobundle#tap('vim-textobj-quotes')  "{{{1
   " Inner quotes are used the most:
   " xmap <silent><unique> q iq

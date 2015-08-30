@@ -9,7 +9,7 @@ let g:jedi#auto_initialization = 1
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
-autocmd FileType python setlocal omnifunc=jedi#completions
+" ALT 'after': autocmd FileType python setlocal omnifunc=jedi#completions
 
 " If you are a person who likes to use VIM-buffers not tabs
 let g:jedi#use_tabs_not_buffers = 0
