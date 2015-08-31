@@ -20,6 +20,7 @@ if distro arch; then
     pkg_inst -p 'ag' the_silver_searcher
 
 elif distro ubuntu; then
+    pkg_inst -p 'checkinstall' checkinstall
     pkg_inst locate
     pkg_inst urlview  # No for arch?
     # pkg_inst silversearcher-ag

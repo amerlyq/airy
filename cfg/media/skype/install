@@ -1,0 +1,23 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+has_pr X || die
+
+if distro arch; then
+    # Currently not fully works
+    # https://github.com/EionRobb/skype4pidgin/blob/master/skypeweb/README.md
+    # aur_inst -a 'purple-skypeweb-git'
+    pkg_inst 'skype'  # multilib only
+
+elif distro ubuntu; then
+    # Чтобы не возникало проблем с установкой, нужно установить некоторые 32-битные библиотеки:
+    pkg_inst 'sni-qt:i386 libdbusmenu-qt2:i386 libqt4-dbus:i386 libxss1:i386'
+    # Чтобы не было проблем с темами оформления Skype, нужно обязательно доставить
+    # следующие 32 - битные пакеты и тогда Skype будет выглядеть нормально:
+    pkg_inst 'libgtk2.0-0:i386 gtk2-engines:i386 libgconf-2-4:i386'
+    pkg_inst 'pidgin-skype'
+    if ! has_pr skype || cfgOpt u; then
+        sudo add-apt-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
+        sudo apt-get update
+        sudo apt-get install skype
+    fi
+fi

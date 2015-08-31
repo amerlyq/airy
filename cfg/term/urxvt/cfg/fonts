@@ -1,6 +1,6 @@
 ! vim: ft=xdefaults
 
-#if MAIN_DPI <= 96
+#if MAIN_DPI <= 102
 URxvt*letterSpace: -1
 #endif
 
@@ -10,7 +10,7 @@ URxvt*letterSpace: -1
 #define FONT1 PragmataPro
 #define FONT2 DejaVu Sans Mono
 #define FONT3 Droid Sans Mono
-#define FONT(i, opts) xft:FONT##i:size=11:opts,
+#define FONT(i, opts) xft:FONT##i:FONT_SIZE:opts,
 #define FONTS(opts) FONT(1,opts) FONT(2,opts) FONT(3,opts)
 
 !URxvt*imFont:         FONTS(regular)

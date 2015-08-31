@@ -4,7 +4,14 @@ cd $(dirname $(readlink -m ${0}))
 source ~/.shell/func.d/cfgsetup
 echo "$THEME" > "${CURR_CACHE?No}/theme"
 
-cfgOpt i && cfgOpt u && sudo pacman -Syu
+if cfgOpt i && cfgOpt u; then
+    if distro arch; then
+        sudo pacman -Syu
+    elif distro ubuntu; then
+	sudo apt-get install gawk
+	echo "sudo apt-get update && sudo apt-get upgrade"
+    fi
+fi
 # ======================================================================
 
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
@@ -30,6 +37,8 @@ source ~/.shell/profile
 link "$PWD/bin" ~/.bin
 if cfgOpt u; then opts='-u'; fi
 if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
+echo "LIST: ${PKG_LIST[@]}"
+echo "SKIP: ${PKG_SKIP[@]}"
 
 filter_find() { local y n
     y="$(sed 's/ /|/g' <<< "${PKG_LIST[@]}")"
@@ -41,11 +50,11 @@ filter_find() { local y n
 }
 
 if cfgOpt i; then
-    filter_find ./cfg install | while read fl; do
+    filter_find cfg install | while read fl; do
         echo ">>> $fl <<<"; $fl $opts; done | pretty
 fi
 
-filter_find ./cfg setup | while read fl; do
+filter_find cfg setup | while read fl; do
     echo ">>> $fl <<<"; $fl $opts; done | pretty
 
 # ======================================================================

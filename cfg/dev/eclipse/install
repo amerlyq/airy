@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+cfgOpt s || die 0 "N: Use only on purpose"
+
+if distro arch; then
+    echo "Err: no"
+
+elif distro ubuntu; then
+    pkg_inst eclipse eclipse-cdt
+fi

@@ -10,7 +10,7 @@ cat >> $dst << EOT
 <account version='1.0'>
 EOT
 
-if [ "$CURR_PROF" == "work" ]; then
+if [ "$CURR_PROF" == "work_samsung" ]; then
     cat - << EOT >> $dst
 	<account>
 		<protocol>prpl-sipe</protocol>
@@ -54,6 +54,55 @@ if [ "$CURR_PROF" == "work" ]; then
 			<setting name='silence-suppression' type='bool'>0</setting>
 			<setting name='server' type='string'>${WORK_SRV_MSCMM?No var WORK_SRV_MSCMM}</setting>
 			<setting name='dont-publish' type='bool'>0</setting>
+		</settings>
+		<settings ui='gtk-gaim'>
+			<setting name='auto-login' type='bool'>1</setting>
+		</settings>
+		<current_error/>
+	</account>
+EOT
+fi
+
+if [ "$CURR_PROF" == "work" ]; then
+    cat - << EOT >> $dst
+	<account>
+		<protocol>prpl-bigbrownchunx-skype</protocol>
+		<name>${MAIN_SKYPE?Need account for skype}</name>
+		<alias>me</alias>
+		<statuses>
+			<status type='ONLINE' name='Online' active='true'>
+				<attributes/>
+			</status>
+			<status type='SKYPEME' name='SkypeMe' active='false'>
+				<attributes/>
+			</status>
+			<status type='AWAY' name='Away' active='false'>
+				<attributes/>
+			</status>
+			<status type='NA' name='Not Available' active='false'>
+				<attributes/>
+			</status>
+			<status type='DND' name='Do Not Disturb' active='false'>
+				<attributes/>
+			</status>
+			<status type='INVISIBLE' name='Invisible' active='false'>
+				<attributes/>
+			</status>
+			<status type='OFFLINE' name='Offline' active='false'>
+				<attributes/>
+			</status>
+		</statuses>
+		<settings>
+			<setting name='skype_autostart' type='bool'>1</setting>
+			<setting name='buddy_icon_timestamp' type='int'>0</setting>
+			<setting name='silence-suppression' type='bool'>0</setting>
+			<setting name='skype_sync' type='bool'>1</setting>
+			<setting name='voicevideoemblems' type='bool'>1</setting>
+			<setting name='skypeout_online' type='bool'>1</setting>
+			<setting name='buddy_icon'/>
+			<setting name='skype_path' type='string'></setting>
+			<setting name='use-global-buddyicon' type='bool'>1</setting>
+			<setting name='reject_all_auths' type='bool'>0</setting>
 		</settings>
 		<settings ui='gtk-gaim'>
 			<setting name='auto-login' type='bool'>1</setting>

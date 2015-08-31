@@ -2,16 +2,25 @@
 source ~/.shell/func.d/packages
 has_pr X || die
 
-pkg_inst -a "gtk2 gtk3"
+if distro arch; then
+    pkg_inst -a "gtk2 gtk3"
 
-# mate-themes numix-themes
-aur_inst -a "vertex-themes zukitwo-themes ceti-2-themes"
+    # mate-themes numix-themes
+    aur_inst -a "vertex-themes zukitwo-themes ceti-2-themes"
 
-if grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
-    # infinality supports only 96dpi
-    pkg_inst -a infinality-bundle
+    if grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
+        # infinality supports only 96dpi
+        pkg_inst -a infinality-bundle
+    fi
+    pkg_inst 'ttf-freefont ttf-droid ttf-dejavu otf-ipafont'
+
+    # Install manually:
+    # aur_inst -a 'freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu'
+elif distro ubuntu; then
+    echo "ERR: install manually"
+    if [[ ! -d /usr/share/themes/Vertex-Dark ]]; then
+        sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_14.04/ /' > /etc/apt/sources.list.d/vertex-theme.list"
+        sudo apt-get update
+        sudo apt-get install vertex-theme
+    fi
 fi
-pkg_inst 'ttf-freefont ttf-droid ttf-dejavu otf-ipafont'
-
-# Install manually:
-# aur_inst -a 'freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu'

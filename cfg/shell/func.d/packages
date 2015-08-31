@@ -5,6 +5,7 @@ source ~/.shell/func.d/system
 for arg in "$@"; do case "$arg" in
   # Re-install even if git pull is up-to-date (for broken builds)
   -u|--update) cfgOptAdd u ;;
+  -s) cfgOptAdd s ;;
 esac; done
 
 mkdir -vp "${CURR_DIR_PKG:?No in profile}"
@@ -32,12 +33,13 @@ do_if() {
 if distro ubuntu; then
   pkg_inst(){ do_if -c 'sudo apt-get --yes install' $@; }
   pkg_make(){ sudo checkinstall --default $@; }
-  deb_wget(){ wget_it $* && sudo dpkg -i "$CURR_DIR_PKG/${2:-${1##*/}}"; }
+  deb_wget(){ wget_inst -d "$1" && echo "$CURR_DIR_PKG/${2:-${1##*/}}"; }
+  deb_inst(){ do_if -c 'deb_wget' $@; }
   ppa_add(){
     local addr="${1#ppa:}"
     addr="${addr#*http://}"
     addr="${addr%% *}"
-    grep -q "^$addr" /etc/apt/sources.list /etc/apt/sources.list.d/* || return
+    grep -Rq "^$addr" /etc/apt/sources.list /etc/apt/sources.list.d/ && return
     sudo apt-add-repository --yes "$1"
     sudo apt-get update
   }
@@ -84,9 +86,11 @@ wget_inst() {
   wget -c "$link" -O "$fl" --trust-server-names \
     --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) \
 Gecko/20100101 Firefox/12.0" #--max-redirect=2
-  wget_it "$link" "$fl" && atool -X "$prdir" "$fl"
 
-  if [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
+  if [[ -z "$nobuild" ]]; then
+    atool -X "$prdir" "$fl"
+    pkg_build "$prdir";
+  fi
 }
 
 git_pull() { [[ -d "$1" ]] && cd "$1" || return

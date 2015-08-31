@@ -33,6 +33,7 @@ mkdef x-terminal-emulator $(which urxvt)
 dst=~/.Xresources
 cat > $dst << EOT
 #define MAIN_DPI ${MAIN_DPI:-96}
+#define FONT_SIZE ${FONT_SIZE:-size=11}
 #include ".urxvt/etc/xtermrc"
 #include ".urxvt/etc/xfontrc"
 #include ".urxvt/urxvtrc"

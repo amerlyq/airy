@@ -3,4 +3,9 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD/bashrc" ~/.bashrc
-link "$PWD/profile" ~/.bash_profile
+
+if distro arch; then
+    link "$PWD/profile" ~/.bash_profile
+elif distro ubuntu; then
+    link "$PWD/profile" ~/.profile
+fi

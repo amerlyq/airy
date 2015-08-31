@@ -2,5 +2,11 @@
 source ~/.shell/func.d/packages
 has_pr X || die
 
-aur_inst -p 'firefox' pentadactyl-git
-pkg_inst -p 'firefox' firefox flashplugin
+pkg_inst -p 'firefox' firefox
+
+if distro arch; then
+    aur_inst -p 'firefox' pentadactyl-git
+    pkg_inst -p 'firefox' flashplugin
+elif distro ubuntu; then
+    echo "ERR: install manually pentadactyl and flashplugin"
+fi

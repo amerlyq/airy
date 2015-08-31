@@ -9,5 +9,5 @@ elif distro ubuntu; then
     pkg_inst lame
     site='http://www.xmind.net/download/linux/#'
     mask='http:.*xmind.*amd64\.deb'
-    deb_wget "$(curl -s "$site" | sed -n '/.*href="\('"$mask"'\)".*/s//\1/p')"
+    deb_inst "$(curl -s "$site" | sed -n '/.*href="\('"$mask"'\)".*/s//\1/p')"
 fi

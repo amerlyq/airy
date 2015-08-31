@@ -15,7 +15,8 @@ if distro arch; then
 
 elif distro ubuntu; then
     ppa_add 'ppa:webupd8team/java'
-    pkg_inst 'oracle-java8-installer'
+    # WARNING: you need accept agreement, so you can't autoinstall!
+    sudo apt-get install 'oracle-java8-installer'
     # sudo update-java-alternatives -s java-8-oracle
 fi
 
