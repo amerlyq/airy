@@ -70,3 +70,24 @@ lvs
 ## Layout
 lsblk $sd
 echo ":: disk lvm"
+
+### Encrypted volume
+# cryptsetup -y -v luksFormat /dev/sdaX
+# cryptsetup open /dev/sdaX cryptroot
+# mkfs -t ext4 /dev/mapper/cryptroot
+# mount -t ext4 /dev/mapper/cryptroot /cryptfs
+### Convert fs
+# umount /dev/mapper/cryptfs
+# sudo fsck.ext4 -f /dev/mapper/cryptfs
+# sudo btrfs-convert /dev/mapper/cryptfs
+### Check the mapping works as intended:
+# cryptsetup close cryptroot
+# cryptsetup open /dev/sdaX cryptroot
+# mount -t ext4 /dev/mapper/cryptroot /mnt
+### Force compression on existing files after fs conversion
+# sudo btrfs fi defragment -r -v /cryptfs
+# sudo btrfs balance start /cryptfs
+# auto,noatime,nodiratime
+# /dev/mapper/cryptfs /cryptfs        btrfs    compress=lzo,autodefrag        0       0
+### Reload new entries in fstab:
+# mount -a
