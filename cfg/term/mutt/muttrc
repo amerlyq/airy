@@ -3,33 +3,49 @@ set my_cache=~/.cache/mutt
 set pager_index_lines=5
 
 set editor = "vim -c 'set spell spelllang=ru_yo,en_us,uk'"
-# set edit_headers # see the headers when editing
-set sort = reverse-threads # sort by newest conversation first
+# set edit_headers          # see the headers when editing
+set sort = reverse-threads  # reverse-threads -- sort by newest conversation first
 set sort_aux = last-date-received
+
+## Show only important fields in the header
+# ignore *
+# unignore from resent-from reply-to x-mailer user-agent date to cc subject
+## Order for display of the header fields
+# hdr_order From: Resent-From: Reply-To: X-Mailer: User-Agent: Date: To: Cc: Subject:
+set indent_str="> "         # Set quotemark to 1 byte
+# Collapse old messages
+set collapse_unread=no
+folder-hook . 'push <collapse-all>'
 
 # confirmation skipping
 # set fast_reply=yes        # when replying, don't prompt for address
-# set include=yes           # include original text on reply?
+set include=ask-yes         # include original text on reply?
 # set forward_quote=yes     # include original text on forward?
 # set delete=yes            # don't ask for delete confirmation
+set print=ask-yes           # Ask before printing
 
-set use_from = yes
-set abort_nosubject=yes
-# set copy = no
+set use_from = yes          # to ensure mutt doesn't put user@localhost.localhost
+set abort_nosubject=yes     # Cancel a message when subject is blank
+set copy = yes              # keep copies of outgoing mail.
 set move = no
-set ssl_force_tls = yes
-set ssl_starttls = yes
 
-# Automatically include message when replying
-set include=ask-yes
-# Ask before printing
-set print=ask-yes
+# activate TLS if available on the server
+set ssl_starttls = yes
+# always use SSL when connecting to a server
+set ssl_force_tls=yes
+# Display download progress every 5K
+set net_inc=5
 
 # IMAP | enough only set local dirs
-## Check incoming
-set mail_check=20
-set timeout=120
+# Don't wait to enter mailbox manually
+unset imap_passive
+## Check incoming: Reduce polling frequency to a sane level
+set mail_check=60
+# And poll the current mailbox more often (not needed with IDLE in post 1.5.11)
+set timeout=20
 set imap_keepalive = 900
+# Automatically poll subscribed mailboxes for new mail (new in 1.5.11)
+set imap_check_subscribed
 
 
 # POP3 | needs to create local dirs manually
@@ -56,7 +72,8 @@ source $my_cache/acc/default    # Default account
 source $my_cache/theme          # Theme
 
 ## DIRS
-set folder = ~/work/mail
+# set folder = ~/work/mail
+# keep a cache of headers for faster loading (1.5.9+?)
 set header_cache = $my_cache/headers
 set message_cachedir = $my_cache/bodies
 set certificate_file = $my_cache/certificates
@@ -78,11 +95,10 @@ macro index <f3> "<sync-mailbox><enter-command>\n\
 
 
 ## COMMANDS
-mailboxes +inbox
+mailboxes +Inbox
 # mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.gmail.com/family
 #>  config includes a macro bound to the 'y' key which will allow you to change
 #>  to any of the folders listed under mailboxes
-# ALT: set imap_check_subscribed
 
 ## HTML enriched mails
 set mailcap_path=~/.mutt/mailcap

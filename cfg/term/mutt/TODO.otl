@@ -3,6 +3,14 @@ mutt
 		> http://www.mutt.org/doc/devel/manual.html#functions
 		> https://wiki.archlinux.org/index.php/Mutt
 		https://github.com/andrewgaul/dotfiles/blob/master/muttrc
+		http://dev.mutt.org/trac/wiki/MuttGuide/UseIMAP
+		[_] Address book and thorough setup
+			>! https://wiki.debian.org/Mutt
+
+	Useful additional additions
+		http://cedricduval.free.fr/mutt/patches/#trash
+	Smtp
+		https://nixtricks.wordpress.com/2010/05/05/mutt-configure-mutt-to-receive-email-via-imap-and-send-via-smtp/
 
 	2015-04-24 [X] pop3+smtp one-account
 	[_] multi-account
@@ -23,6 +31,8 @@ mutt
 	> [_] vim-like
 		http://wcm1.web.rice.edu/mutt-tips.html
 		http://www.noah.org/wiki/Mutt
+	[_] pgp encrypting mails on sent/receive
+		http://habrahabr.ru/post/135800/
 
 	2015-06-15 [X] https://www.df7cb.de/blog/2010/Using_multiple_IMAP_accounts_with_Mutt.html
 		Good way to setup multiple accs!
@@ -33,6 +43,15 @@ GENERAL: man muttrc
 	(+) https://wiki.archlinux.org/index.php/mutt
 	(++) http://www.mutt.org/doc/manual/manual-4.html
 	2015-07-02 [X] http://www.elho.net/mutt/maildir/
+
+	Integrate
+	: # Gmail-style keyboard shortcuts
+	: macro index,pager y "<enter-command>unset trash\n <delete-message>" "Gmail archive message"
+	: macro index,pager d "<enter-command>set trash=\"imaps://imap.googlemail.com/[GMail]/Bin\"\n <delete-message>" "Gmail delete message"
+	: macro index,pager gi "<change-folder>=INBOX<enter>" "Go to inbox"
+	: macro index,pager ga "<change-folder>=[Gmail]/All Mail<enter>" "Go to all mail"
+	: macro index,pager gs "<change-folder>=[Gmail]/Starred<enter>" "Go to starred messages"
+	: macro index,pager gd "<change-folder> =[Gmail]/Drafts<enter>" "Go to drafts"
 
 VIM+gpg:
 	http://blog.developwithpassion.com/2013/05/02/getting-up-and-running-with-a-sane-mutt-setup/
@@ -47,3 +66,4 @@ Offline sending and reading, see about 'alternates':
 gpg
 	https://wiki.archlinux.org/index.php/GnuPG#gpg-agent
 	https://wiki.archlinux.org/index.php/SSH_keys_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29
+

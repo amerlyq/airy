@@ -29,7 +29,7 @@ let s:patterns = {
       \ 'Err': 'ERR(OR)=|BUG',
       \ 'Fix': 'FIX(ME)=|WARNING|ATTENTION',
       \ 'Add': 'ADD|SEE|NEED|FIND',
-      \ 'Did': 'DONE|FIXED',
+      \ 'Did': 'DONE|FIXED|EXPL',
       \ 'Dev': 'DEV|HACK',
       \ 'Msg': 'NOTE',
       \ 'Tbd': 'TODO|CHECK|TRY',

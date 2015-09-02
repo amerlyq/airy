@@ -8,7 +8,9 @@ import os
 #   function finish { tempfile='/tmp/aura/ranger_cwdir'; echo "$PWD" > "$tempfile"; }
 # `trap finish EXIT
 class cd_shelldir(Command):
-    LAST = os.path.join('/tmp', os.getenv('USER'), 'ranger_cwdir')
+    LAST = os.getenv('TMPDIR')
+    if not LAST:
+        LAST = os.path.join('/tmp', 'ranger_cwdir')
     """:cd_shelldir
     Goes to path from /tmp/<username>/ranger_cwdir
     """

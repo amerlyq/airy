@@ -16,9 +16,9 @@ def aura_options(fm):
     theme = {"dark": "solarized", "light": "solarized"
              }.get(theme, "solarized")
 
-    if not "256color" in os.getenv('TERM'):
+    if "256color" not in os.getenv('TERM'):
         theme = "default"
-    fm.execute_console("set colorscheme {}".format(theme))
+    fm.execute_console("set colorscheme " + str(theme))
 
 
 def aura_pathes(fm):
@@ -36,7 +36,7 @@ def aura_pathes(fm):
     lst = filter(lambda e: len(e) > 1, lst)
     # ERR: ranger sorts by 2nd column by default... Qs: How to alterate?
     for e in sorted(lst, key=lambda l: l[0]):  # reverse=True
-        fm.execute_console("map {} cd {}".format(*e))
+        fm.execute_console("map " + str(e[0]) + " cd " + str(e[1]))
 
 
 def hook_init(fm):

@@ -3,11 +3,14 @@ source ~/.shell/profile
 
 FL=/etc/hosts
 
-case "$CURR_PROF" in work)
+case "$CURR_PROF" in work_samsung)
 # NOTE: if I want multiple names for same IP -- change it.
 # But then each host renaming will not clean old names!
-if grep -q "^$SRK_IPL" $FL; then
+if grep -q "^${SRK_IPL:?No}" $FL; then
     sudo sed -i "/^\($SRK_IPL\).*/s//\1\tsrk/" $FL
 else
     echo "${SRK_IPL}\tsrk" | sudo tee -a $FL
 fi ;; esac
+
+# Minimal /etc/hosts: -- NEED if DNS isn't working
+# 127.0.0.1 localhost $(hostname)

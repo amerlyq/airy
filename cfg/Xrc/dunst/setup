@@ -1,9 +1,10 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-## To disable default notification daemon on Lubuntu
-# XFCE=/usr/share/dbus-1/services/org.xfce.xfce4-notifyd.Notifications.service
-# [[ -f "$XFCE" ]] && sudo mv -n $XFCE{,.disabled}
+## To disable default notification daemon
+# on Lubuntu: org.xfce.xfce4-notifyd.Notifications.service
+DFL=/usr/share/dbus-1/services/org.freedesktop.Notifications.service  # Ubuntu
+[[ -f "$DFL" ]] && sudo mv -n $DFL{,.disabled}
 
 ### LINKS ###
 link "$PWD/dunstrc" ~/.config/dunst/dunstrc
