@@ -59,18 +59,6 @@ unset pop_delete
 # Similar to IMAP, a pop_authenticators option also exists
 
 
-## BINDING
-## fetch mail by I
-# macro index,pager I "!getmail"
-## Fetch mail shortcut
-# bind index G imap-fetch-mail
-
-# Folder hooks
-folder-hook 'acc.amerlyq' 'source $my_cache/acc/amerlyq'
-folder-hook 'acc.work'    'source $my_cache/acc/work'
-source $my_cache/acc/default    # Default account
-source $my_cache/theme          # Theme
-
 ## DIRS
 # set folder = ~/work/mail
 # keep a cache of headers for faster loading (1.5.9+?)
@@ -80,18 +68,31 @@ set certificate_file = $my_cache/certificates
 # set signature = ~/.mutt/signature
 
 
+## ALIASES (fast access to contacts)
+set alias_file = $my_cache/aliases
+set sort_alias = alias
+set reverse_alias = yes
+source $alias_file
+
+
+## BINDING
+## fetch mail by I
+# macro index,pager I "!getmail"
+## Fetch mail shortcut
+# bind index G imap-fetch-mail
+
+# Folder hooks
+folder-hook 'acc.amerlyq' 'source $my_cache/acc/amerlyq'
+folder-hook 'acc.work'    'source $my_cache/acc/work'
+# source $my_cache/gpgrc          # Keyring
+source $my_cache/acc/default    # Default account
+source $my_cache/theme          # Theme
+
 # Macros for switching accounts
 macro index <f2> "<sync-mailbox><enter-command>\n\
 :source $my_cache/acc/amerlyq<enter><change-folder>!<enter>"
 macro index <f3> "<sync-mailbox><enter-command>\n\
 :source $my_cache/acc/work<enter><change-folder>!<enter>"
-
-
-## ALIASES
-#set alias_file = "~/.mutt/aliases"
-#set sort_alias = alias
-#set reverse_alias = yes
-#source $alias_file
 
 
 ## COMMANDS

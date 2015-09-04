@@ -3,4 +3,8 @@
 # SEE:
 #   http://stackoverflow.com/questions/17360580/copy-text-in-minicom-doesnt-get-copied-completely
 # minicom -w  # -c -o
-screen /dev/ttyUSB0 115200
+# screen /dev/ttyUSB0 115200
+
+# Exit: C-a,C-x,  --escape x
+# Resize (shell inside com): stty rows lines cols columns
+picocom --baud 115200 --flow n --databits 8 --parity n ${1:-/dev/ttyUSB0}

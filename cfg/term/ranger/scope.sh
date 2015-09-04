@@ -79,7 +79,7 @@ case "$extension" in
     rar) try unrar -p- lt "$path" && exit 0 || exit 1 ;;
 
     pdf) try pdftotext -l 10 -nopgbrk -q "$path" - \
-            | fmt -s -w $width && exit 0 || exit 1 ;;
+            | fmt -s ${width:+-w $width} && exit 0 || exit 1 ;;
 
     torrent) try transmission-show "$path" && exit 5 || exit 1 ;;
 

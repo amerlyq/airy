@@ -4,8 +4,25 @@ mutt
 		> https://wiki.archlinux.org/index.php/Mutt
 		https://github.com/andrewgaul/dotfiles/blob/master/muttrc
 		http://dev.mutt.org/trac/wiki/MuttGuide/UseIMAP
+		2015-09-04 [X] http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
 		[_] Address book and thorough setup
 			>! https://wiki.debian.org/Mutt
+
+	Read:
+		http://home.roadrunner.com/~computertaijutsu/mutt.html
+		http://stevelosh.com/blog/2012/10/the-homely-mutt/
+		http://port-denis.ucoz.ru/Xakep/krilataypochta.htm
+
+	>How-To
+		https://hynek.me/articles/my-mutt-gmail-setup/
+		http://stevelosh.com/blog/2012/10/the-homely-mutt/
+		https://hynek.me/articles/fleeing-from-gmail/
+		https://blog.bartbania.com/raspberry_pi/consolify-your-gmail-with-mutt/
+
+	Security
+		http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
+		http://codesorcery.net/old/mutt/mutt-gnupg-howto
+		http://jasonwryan.com/blog/2013/07/20/gnupg/
 
 	Useful additional additions
 		http://cedricduval.free.fr/mutt/patches/#trash
@@ -18,7 +35,17 @@ mutt
 		https://pbrisbin.com/posts/two_accounts_in_mutt/
 	[_] passwordless login (smth like private keys?)
 		[_] gpg keyring
-			http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
+			For example, if you use gpg-agent to store your passphrase, then you
+			can encrypt each password as its own file:
+				echo password | gpg --encrypt -o ~/.acct1_pass
+				echo password2 | gpg --encrypt -o ~/.acct2_pass
+			Then put this into your muttrc:
+				set my_acct1_pass=`gpg --decrypt ~/.acct1_pass`
+				set my_acct2_pass=`gpg --decrypt ~/.acct2_pass`
+				account-hook account2 'set imap_pass=$my_acct2_pass'
+			set imap_pass = `gpg -d ~/.mutt/.pass.gpg | awk '/GMail:/ {print $2}'`
+				: The key to making that convenient, though, is using gpg-agent to store
+				: your passphrase (so you don't have to enter it multiple times).
 		[_] keyring for ssh keys
 	[_] separate mail fetcher
 		https://wiki.archlinux.org/index.php/Getmail
@@ -33,6 +60,7 @@ mutt
 		http://www.noah.org/wiki/Mutt
 	[_] pgp encrypting mails on sent/receive
 		http://habrahabr.ru/post/135800/
+		http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
 
 	2015-06-15 [X] https://www.df7cb.de/blog/2010/Using_multiple_IMAP_accounts_with_Mutt.html
 		Good way to setup multiple accs!
@@ -70,4 +98,3 @@ Offline sending and reading, see about 'alternates':
 gpg
 	https://wiki.archlinux.org/index.php/GnuPG#gpg-agent
 	https://wiki.archlinux.org/index.php/SSH_keys_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29
-

@@ -1,0 +1,55 @@
+export GPG_TTY=$(tty)
+: Need for mutt if you don't use gpg-agent
+export GPG_AGENT_INFO=""
+: Don't use it for >v2.1, instead socket ~/.gnupg/S.gpg-agent
+: Also you don't need to launch agent, as it will be used on demand from socket
+
+: Keychain: ssh-agent autostart
+eval $(keychain --eval -Q --quiet id_dsa id_rsa)
+: SSH_AUTH_SOCK=$(gpg-connect-agent 'getinfo ssh_socket_name' /bye | grep '^D' | cut -d' ' -f2)
+: [ -S "$SSH_AUTH_SOCK" ] && export SSH_AUTH_SOCK
+
+SEE:
+	http://www.spywarewarrior.com/uiuc/gpg/gpg-com-4.htm
+	Hardening
+		http://www.incenp.org/notes/2015/using-an-offline-gnupg-master-key.html
+
+Setup
+	Interactively generate 2048b key for 1 year (you can extend it later)
+	: so, if you lost it, then expire and users will know it
+		gpg --gen-key
+		: For >v2.1:  gpg --full-gen-key
+		< Extend/edit later: gpg --edit-key <..> (SEE: arch-wiki)
+	Encrypt data
+		echo "GMail: mySecretPassowrd" > ~/.mutt/.pass
+
+		gpg --recipient <id(part)> --encrypt file
+		echo "password" | gpg --encrypt -o ~/.acc_pass.gpg
+
+		< For read-only fs (for rw -- only if keyring is not going to change)
+		read -s -p "Passwd: " pp && echo "$pp" | gpg \
+		  --keyserver-options no-use-temp-files --lock-never --no-verbose
+		  -e -a -r martin@example.com
+	External config
+		set imap_pass = `gpg -d ~/.mutt/.pass.gpg | awk '/^GMail:/ {print $2}'`
+
+Config
+	Reload
+		echo RELOADAGENT | gpg-connect-agent
+		:OR: systemctl --user reload gpg-agent
+
+Test
+	pgrep gpg-agent
+	gpg-connect-agent  #> bye/quit
+
+	Systemd:
+		link '..' ~/.config/systemd/user/gpg-agent.service
+		systemctl --user daemon-reload
+		systemctl --user enable gpg-agent
+		systemctl --user start gpg-agent
+
+: To cache your passphrase for the whole session, please run the following command:
+: $ /usr/lib/gnupg/gpg-preset-passphrase --preset XXXXXX
+: where XXXX is the keygrip. You can get its value when running gpg
+: --with-keygrip -K. Passphrase will be stored until gpg-agent is restarted. If
+: you set up default-cache-ttl value, it will take precedence.

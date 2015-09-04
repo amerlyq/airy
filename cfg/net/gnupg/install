@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    echo # pkg_inst ""
+
+elif distro ubuntu; then
+    pkg_inst "gnupg gnupg-agent keychain pineentry"
+fi

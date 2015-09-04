@@ -5,7 +5,9 @@ export VISUAL="$EDITOR"
 export PAGER='less'
 export TERMCMD='urxvt'
 # FIXED: for working in schroot into old ubuntu
-# export LANG="${LANG:-en_US.UTF-8}"
+if [[ -z "$LANG" ]]; then
+    export LANG='en_US.UTF-8'
+fi
 export LC_NUMERIC="${LC_NUMERIC:-$LANG}"
 if [[ -d "$HOME/.cache/airy/bin" ]]; then export PATH="$HOME/.cache/airy/bin:$PATH"; fi
 if [[ -d "$HOME/.bin" ]]; then export PATH="$HOME/.bin:$PATH"; fi

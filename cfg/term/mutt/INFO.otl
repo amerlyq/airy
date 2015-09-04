@@ -1,11 +1,15 @@
 READ
 	Use [Google Mail] instead of [GMail].
 	In mutt press c followed by ? to bring up a list of available folders.
-	Sent and Bin are under GMail but other folders are under GoogleMail. At
-	least in my case
+		Sent and Bin are under GMail but other folders are under GoogleMail.
+		At least in my case
+
+	Для просмотра почтового ящика некоего юзера достаточно запустить
+		mutt -f /path/to/mail/john (например на сервере).
 
 SEND
 	Message from file / shell output
+		mutt -s "subject" recipient@server.com < ~/message.txt
 		cat ./message.txt | mutt -s "Subject" user@gmail.com
 	With attachment
 		... -a /tmp/file.jpg
@@ -35,3 +39,8 @@ RC
 	: :set from = \"`echo ${MAIN_MAIL}`\"\n\
 	: :set realname = \"`echo ${MAIN_NAME}`\"\n\
 	: <change-folder>imaps://$imap_user@imap.gmail.com:993<enter>"
+
+
+Добавить POP3 getmail в cron для проверки раз 10 минут
+	# crontab -e
+	*/10 * * * * /usr/bin/getmail
