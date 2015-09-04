@@ -1,3 +1,4 @@
+# vim: ft=sh
 # WARNING: seems like ZSH on Mint not sources this file!
 #          but it's still necessary on ubuntu to export PATH to i3wm
 #   Read more: http://unix.stackexchange.com/questions/88201/whats-the-best-distro-shell-agnostic-way-to-set-environment-variables
@@ -13,20 +14,22 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-# set PATH so it includes user's private bin if it exists
-if [ -d ~/.cache/airy/bin ]; then PATH="$HOME/.cache/airy/bin:$PATH"; fi
-if [ -d ~/.bin ]; then PATH="$HOME/.bin:$PATH"; fi
-
-if [ ! -d "$TMPDIR" ]; then
-  export TMPDIR="/tmp/$LOGNAME"
-  mkdir -p -m 700 "$TMPDIR"
-fi
-
-# if running bash
+# Only if running bash
 if [ -n "$BASH_VERSION" ]; then
+    # set PATH so it includes user's private bin if it exists
+    for path in ~/.cache/airy/bin ~/.bin
+    do if [[ -d "$path" ]]; then
+        grep -q "$path" <<< "$PATH" || PATH="$path:$PATH"
+    fi; done
+
+    if [[ ! -d "$TMPDIR" ]]; then
+        export TMPDIR="/tmp/$LOGNAME"
+        mkdir -p -m 700 "$TMPDIR"
+    fi
+
     # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-    . "$HOME/.bashrc"
+    if [[ -f "$HOME/.bashrc" ]]; then
+        source "$HOME/.bashrc"
     fi
 fi
 
