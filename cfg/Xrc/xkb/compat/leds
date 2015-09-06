@@ -1,13 +1,61 @@
 // vim: ft=cpp
 
-default partial xkb_compatibility "caps_lock" {
+default partial
+xkb_compatibility "all"
+{
+    // Possible states are Base, Latched, Locked, Effective, Any or None.
+    // NOTE: only 8 indicators -- to use 1-character Braile unicode symbols
+
+    // 1 -> 1
     indicator "Caps Lock" {
        !allowExplicit;
-       // Possible states are Base, Latched, Locked, Effective, Any or None.
        whichModState= Locked;
-       modifiers= Shift;
+       modifiers= Lock;
+    };
+    // 11-> 2
+    indicator "Shift Lock" {
+        !allowExplicit;
+        whichModState= Effective;
+        modifiers= Shift;
+    };
+
+
+    // 2 -> 3
+    indicator "Num Lock" {
+        !allowExplicit;
+        whichModState= Locked;
+        modifiers= NumLock;
+    };
+    // 3 -> 4
+    indicator "Scroll Lock" {
+        allowExplicit;
+        whichModState= Effective;
+        modifiers= Control;
+    };
+
+
+    // 4 -> 5
+    indicator "Kana" {
+       !allowExplicit;
+       whichModState= Effective;
+       modifiers= Mod1;
+    };
+    // 9 -> 6
+    indicator "Misc" {
+       !allowExplicit;
+       whichModState= Effective;
        controls=Overlay1;
-       //groups=All-group1;
+    };
+
+
+    // 12 -> 7
+    indicator "Group 2" {
+        !allowExplicit;
+        groups= All-Group1;
+    };
+    // 13 -> 8
+    indicator "Mouse Keys" {
+        indicatorDrivesKeyboard;
+        controls= MouseKeys;
     };
 };
-

@@ -1,0 +1,77 @@
+// vim: ft=cpp
+
+default partial xkb_symbols "mods" {
+    include "mods(keys)"
+    include "mods(switches)"
+    include "mods(shift_lock)"
+};
+
+// ==================================================================
+
+partial alphanumeric_keys
+xkb_symbols "keys"
+{
+    key <ESC>  { [ Escape ] };
+    key <TAB>  { type="TWO_LEVEL", [ Tab, ISO_Left_Tab ] };
+    key <SPCE> { type="L2:SUPER", [ space , Multi_key ] };
+    // The extra key on many European keyboards:
+    key <LSGT> { [ less, greater, bar, brokenbar ] };
+
+    key <BKSL> { [ backslash, bar ] };
+    key <RTRN> { [ Return ] };
+    key <BKSP> { [ BackSpace, BackSpace ] };
+
+    key <PRSC> { type= "PC_ALT_LEVEL2", [ Print, Sys_Req ] };
+    key <PAUS> { type= "PC_CONTROL_LEVEL2", [ Pause, Break ] };
+};
+
+
+partial modifier_keys
+xkb_symbols "switches" {
+
+    key.type = "ONE_LEVEL";
+
+    key <CAPS> { [ Control_L ] };
+    modifier_map  Control { <CAPS> };
+    modifier_map  Lock { Caps_Lock };
+
+    key <LWIN> { type="TWO_LEVEL", [ Alt_L, Meta_L ] };
+    modifier_map  Mod1 { <LWIN> };
+
+    key <LALT> { [ Super_L ] };
+    key <RCTL> { [ Super_R ] };
+    modifier_map  Mod4 { <LALT>, <RCTL> };
+
+    key <MENU> { [ ISO_Level3_Shift ] };
+    modifier_map  Mod5 { <MENU> };
+
+    key <LCTL> { [ Overlay1_Enable ], actions= [ SetControls(ctrls=Overlay1) ] };
+    // key <RWIN> { [ Overlay1_Enable ], actions = [ SetControls(ctrls=Overlay1) ] };
+    // ALT: (lock) Overlay1_Enable --> SEE: compat/accessx
+    // key <SCLK> { [ Overlay1_Enable ] };
+    key <SCLK> { [ StickyKeys_Enable ], actions= [ LockControls(ctrls=StickyKeys) ] };
+
+
+    key <NMLK> { type="TWO_LEVEL", [ Num_Lock, Pointer_Accelerate ] };  // Pointer_EnableKeys
+    modifier_map  Mod2 { Num_Lock };
+};
+
+// =====================================================
+
+partial modifier_keys
+xkb_symbols "shift_lock" {
+    // Both shift -> ShiftLock, then either shift -> release
+    key.type = "TWO_LEVEL";
+    key <LFSH> { [ Shift_L, Shift_Lock ] };
+    key <RTSH> { [ Shift_R, Shift_Lock ] };
+    modifier_map Shift { <LFSH>, <RTSH> };
+};
+
+partial modifier_keys
+xkb_symbols "shift_latch" {
+    // Change Shift with a sticky version (for one next symbol)
+    key.type = "ONE_LEVEL";
+    key <LFSH> { [ ISO_Level2_Latch ] };
+    key <RTSH> { [ ISO_Level2_Latch ] };
+    modifier_map Shift { <LFSH>, <RTSH> };
+};

@@ -1,12 +1,11 @@
 // vim: ft=cpp
 
 default partial
-xkb_compatibility "langs"  {
+xkb_compatibility "lock"  {
 
     interpret.repeat= False;
     setMods.clearLocks= True;
     latchMods.clearLocks= True;
-    latchMods.latchToLock= True;
 
     interpret ISO_First_Group_Lock { action=LockGroup(group=1); };
     interpret  ISO_Next_Group_Lock { action=LockGroup(group=2); };
@@ -22,5 +21,3 @@ xkb_compatibility "langs"  {
     group 3 = AltGr;
     group 4 = AltGr;
 };
-
-

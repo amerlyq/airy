@@ -6,7 +6,7 @@ default partial xkb_types "super" {
 
     // Super is not default modificator, so you need custom types
 
-    type "PC_SUPER_LEVEL2" {
+    type "L2:SUPER" {
         modifiers = Super;
         map[None] = Level1;
         map[Super] = Level2;
@@ -14,7 +14,7 @@ default partial xkb_types "super" {
         level_name[Level2] = "Super";
     };
 
-    type "PC_SUPER_CONTROL_LEVEL4" {
+    type "L4:SUPER+CONTROL" {
         modifiers = Super+Control;
         map[None] = Level1;
         map[Super] = Level2;

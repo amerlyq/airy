@@ -1,0 +1,42 @@
+// vim: ft=cpp
+
+default partial
+xkb_compatibility "latch"  {
+
+    virtual_modifiers  Alt,Meta,Super,ScrollLock;
+
+    interpret.repeat= False;
+    // setMods.clearLocks= True;
+    latchMods.clearLocks= True;
+    latchMods.latchToLock= False;
+
+    interpret Alt_L+Any {
+        //useModMapMods= level1;
+        virtualModifier= Alt;
+        action = LatchMods(modifiers=modMapMods);
+    };
+
+    interpret Alt_L {
+        action = LatchMods(modifiers=Alt);
+    };
+
+    interpret Meta_L+Any {
+        //useModMapMods= level1;
+        virtualModifier= Meta;
+        action = LatchMods(modifiers=modMapMods);
+    };
+
+    interpret Meta_L {
+        action = LatchMods(modifiers=Meta);
+    };
+
+    interpret Super_L+Any {
+        //useModMapMods= level1;
+        virtualModifier= Super;
+        action = LatchMods(modifiers=modMapMods);
+    };
+
+    interpret Super_L {
+        action = LatchMods(modifiers=Super);
+    };
+};

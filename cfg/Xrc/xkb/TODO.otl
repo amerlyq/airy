@@ -1,4 +1,5 @@
 Xkbmap
+	>[_] NEED: Tray indicators for latching ModN
 	[_] FIXME: can't use overlay xkb mapping on LAlt-LCtrl
 		Cause vbox after windows treats LCtrl and Caps as same keycode
 	[_] R-Alt -> Lang_menu (custom layout with programmer symbols in russian)
@@ -14,9 +15,93 @@ Xkbmap
 		Search for key-fixator key (to hold modifiers like shift or control)
 	[_] Key Layout for entering [,] in russian with mod3 or Alt<space>
 
-	R-Alt -- same way as Caps -- remap to Alt on combo, or Lang on press
+	[_] R-Alt -- same way as Caps -- remap to Alt on combo, or Lang on press
+		WANNA: hold -- another lang, click -- en, lalt+click -- ru
 
 	[_] Make second overlay/types group for right Win/Menu/Ctrl button
 		[_] Vbox button will be the composition of them instead of single button
 		[_] Simulate level5
 		[_] I need alt,ctrl,win modifiers on right in any case
+
+	>[_] Make latching modifiers (for i3 also), -> ctrl aside as it is double-key
+	[_] Show led indicators for regimes in i3bar (xset -q)
+		: https://www.google.com.ua/search?hl=uk&source=hp&biw=&bih=&q=linux+get+capslock+status&btnG=%D0%9F%D0%BE%D1%88%D1%83%D0%BA+Google&gbv=1
+		ALT: xset -q
+		: sudo pip install evdev
+		: from evdev import InputDevice, ecodes
+		: dev = InputDevice('/dev/input/eventX') # your keyboard device
+		: dev.leds()  # (verbose=True)
+	[_] When latching is done, xcape must be inversed for alt,shift,win
+	: modifier on short, key on long?
+	[_] Use my second '\' as Latch/Lock for level3/5
+	[_] ??: Ctrl_L (short) -> ISO_Lock, Ctrl_L+Space -> Lock lvl3/5?
+	[_] Latching of langs -> for diff lang input
+		: To use effectively set/latch you need bind ISO_Lock
+	[_] TODO: Check if LED_caps is disabled!!!
+	[_] Menu+RCtrl -> Super_R (for i3)
+	[_] TRY: accessx instead of my modifiers latching
+		http://www.x.org/releases/X11R7.7/doc/libX11/XKB/xkblib.html#Controls_for_Better_Keyboard_Access_by_Physically_ImpairedPersons
+
+	[_] Mouse on hjkl
+		http://superuser.com/questions/695315/make-scroll-lock-toggle-mouse-keys-on-home-row
+
+
+	Overlay for hjkl navigation
+		WANNA: make overlay lctl->F13, where F13 = [ temporary disables overlay (as shift for Caps) ]
+		OR: as IvanPascal make ctrl as lock key, locking not LockControls but SetControls by inner mechanics
+		So original keys will be available by lctl+hjkl -> hjkl, not arrows
+
+Setup
+	I use .xsession to set up my keyboard:
+	: xsetroot -solid black
+	: xset -b
+	: xset s off
+	: xset -dpms
+	: xset r rate 250 30
+	: setxkbmap -keycodes evdev -types default -compat 'basic+misc+iso9995+ledcaps(group_lock)' -symbols 'pc+us+kh:2+level3(ralt_switch)+ctrl(nocaps)' -geometry 'thinkpad(us)'
+	: xkbset -bell -feedback sticky -twokey latchlock
+	: xkbset exp '=sticky'
+	: kinput2 -xim &
+	: export XMODIFIERS="@im=kinput2"
+	: export LC_CTYPE=ja_JP.UTF-8
+	: exec ratpoison
+
+REF
+	[_] CHECK WARNING: keys Pause/Break may be useful for serial devices
+	Holding down Alt and SysRq (if combined with Print Screen key) while slowly
+	typing REISUB will get you safely restarted.
+		http://kember.net/articles/reisub-the-gentle-linux-restart/
+	Holding down Alt and SysRq (which is the Print Screen key) and typing K
+	will log you out and restart the X server. This replaces
+	<CTRL><ALT><Backspace> which is no longer supported in Ubuntu
+	Ctrl-Break is used with programmes like putty that can operate a serial
+	console connection to a Cisco router. Ctrl-Break interrupts the normal
+	boot process to get into the Cisco rommon
+
+Snippets
+	Words
+		replace, override, augment  // hidden
+	Placeholders
+		key <RALT> { [ VoidSymbol ] };
+		key <CAPS> { [ VoidSymbol ] };
+		actions[Group1]= [ Redirect(key=<RWIN>, clearMods=Mod5) ]
+		ISO_Level5_Shift, ISO_Level5_Lock
+	Latch
+	: virtual_modifiers Super;
+	: key <LALT> {
+	:     type = "ONE_LEVEL",
+	:     virtualMods= Super,
+	:     symbols = [ Super_L ],
+	:     actions = [ LatchMods(modifiers=Super) ]
+	: };
+
+	key <LWIN> {
+		symbols[Group1] = [ Mode_switch, Multi_key ],
+		virtualMods= AltGr
+	};
+
+	pc: Pure blocks w/o nested includes
+	: include "srvr_ctrl(fkey2vt)"
+	: include "pc(editing)"
+	: include "keypad(operators)"
+	: include "keypad(x11)"

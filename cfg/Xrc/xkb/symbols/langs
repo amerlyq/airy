@@ -1,0 +1,18 @@
+// vim: ft=cpp
+
+default partial modifier_keys
+xkb_symbols "direct" {
+    key.type="L4:SUPER+CONTROL";
+    key <RALT> { [ ISO_First_Group_Lock, ISO_Next_Group_Lock, ISO_Last_Group_Lock ] };
+};
+
+
+partial modifier_keys
+xkb_symbols "switch" {
+    key <RALT> {
+        type = "L2:SUPER",
+        [  ISO_Next_Group_Lock, ISO_Last_Group_Lock ],  // en->ru,ua
+        [ ISO_First_Group_Lock, ISO_Last_Group_Lock ],  // ru->en,ua
+        [ ISO_First_Group_Lock, ISO_Next_Group_Lock ]   // ua->en,ru
+    };
+};

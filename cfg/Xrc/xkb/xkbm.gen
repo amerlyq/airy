@@ -4,37 +4,47 @@ source ~/.shell/func.d/cfgsetup
 
 # pc+us:1+ru(typewriter):2+ua(legacy):3
 lang="${CURR_XKB_LANG:-us:1+am(ru):2+am(ua):3}"
-over="${1:-${CURR_XKB_OVER:-am_over}}"
+over="${1:-${CURR_XKB_OVER:-vim}}"
 
 dst="$CURR_CACHE/keylayout.xkb"
 cat > "$dst" <<EOT
 xkb_keymap {
     xkb_keycodes  { include "evdev+aliases(qwerty)" };
-    xkb_types     {
-        include "complete"
-        include "super"
-    };
+    xkb_types     { include "complete+super" };
     xkb_compat    {
-        include "complete"
-        replace "iso_langs"
-        include "leds"
+        include "basic"
+        augment "iso9995"
+        augment "mousekeys"
+        // DONE: augment "accessx(full)"
+        augment "misc"
+        // augment "xfree86"
+        augment "level5"
+        // DONE: augment "caps(caps_lock)"
+
+        // CHECK: replace "mods(latch)"
+        replace "langs(lock)"
+        replace "leds"
     };
     xkb_symbols   {
-        include "pc+$lang"
-        replace "am_mods"
-        replace "am_mods(lctrl_lvl5)"
-        include "$over"
+        // ALT: include "pc"
+        include "srvr_ctrl(fkey2vt)"
+        include "pc(editing)"
+        include "keypad(x11)"
+        include "$lang"
 
-        include "typo(base)"
-        include "inet(evdev)"
+        include "typo(base)"   // lvl3 symbols on rows [1-4]
+        // ALT: include "inet(evdev)+inet(logitech_base)"
+
+        include "media"
+        replace "mods"
+        replace "langs(direct)"
+        include "overlay($over)"
     };
     xkb_geometry  { include "pc(pc86)" };
 };
 EOT
-# You could use 'replace' in file before each key,
-# but sometimes it's simply not working.
 
-xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 |
-    sed -r '/No symbols defined|Symbols ignored|not found in evdev/d'
+xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 #|
+    # sed -r '/No symbols defined/d'
 
 echo "W: $dst"
