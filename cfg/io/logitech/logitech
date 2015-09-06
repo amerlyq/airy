@@ -1,0 +1,10 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    aur_inst 'solaar'
+
+elif distro ubuntu; then
+    ppa_add 'ppa:daniel.pavel/solaar'
+    pkg_inst 'solaar'
+fi
