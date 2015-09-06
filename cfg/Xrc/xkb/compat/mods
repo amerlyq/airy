@@ -3,12 +3,28 @@
 default partial
 xkb_compatibility "latch"  {
 
-    virtual_modifiers  Alt,Meta,Super,ScrollLock;
+    virtual_modifiers  Alt,Meta,Super,Hyper;
 
     interpret.repeat= False;
-    // setMods.clearLocks= True;
+    setMods.clearLocks= True;
     latchMods.clearLocks= True;
-    latchMods.latchToLock= False;
+
+    // BUG: not working at all
+    // interpret ISO_Lock+Any {
+    //     //useModMapMods= level1;
+    //     action = LockMods(modifiers=modMapMods);
+    // };
+
+    // ----------------------------------------------
+    latchMods.latchToLock= True;
+
+    interpret Shift_L {
+        action= LatchMods(modifiers=Shift);
+    };
+
+    interpret Shift_R {
+        action= LatchMods(modifiers=Shift);
+    };
 
     interpret Alt_L+Any {
         //useModMapMods= level1;
@@ -20,6 +36,7 @@ xkb_compatibility "latch"  {
         action = LatchMods(modifiers=Alt);
     };
 
+
     interpret Meta_L+Any {
         //useModMapMods= level1;
         virtualModifier= Meta;
@@ -30,13 +47,28 @@ xkb_compatibility "latch"  {
         action = LatchMods(modifiers=Meta);
     };
 
+    // ----------------------------------------------
+    latchMods.latchToLock= False;
+
     interpret Super_L+Any {
         //useModMapMods= level1;
         virtualModifier= Super;
-        action = LatchMods(modifiers=modMapMods);
+        action = LatchMods(clearLocks,modifiers=modMapMods);
     };
 
     interpret Super_L {
         action = LatchMods(modifiers=Super);
+    };
+
+
+    interpret Hyper_L+Any {
+        //useModMapMods= level1;
+        virtualModifier= Hyper;
+        action = SetMods(modifiers=modMapMods);
+    };
+
+    // Clear any locked modifiers when the key is released.
+    interpret Hyper_L {
+        action = SetMods(modifiers=Hyper); // ,clearLocks
     };
 };

@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    pkg_inst 'radare2'
+
+elif distro ubuntu; then
+    git_inst ""
+fi

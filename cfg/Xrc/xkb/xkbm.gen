@@ -21,7 +21,8 @@ xkb_keymap {
         augment "level5"
         // DONE: augment "caps(caps_lock)"
 
-        // CHECK: replace "mods(latch)"
+        // CHECK:
+        replace "mods"
         replace "langs(lock)"
         replace "leds"
     };
@@ -44,7 +45,8 @@ xkb_keymap {
 };
 EOT
 
-xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 #|
-    # sed -r '/No symbols defined/d'
+setxkbmap -option ""  # Reset keyboard layout
+xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 |
+    sed -r '/No symbols defined/d'
 
 echo "W: $dst"

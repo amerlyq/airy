@@ -1,6 +1,3 @@
-#!/bin/bash -e
-source ~/.shell/profile
-
 # SOLUTION: bind instead of bindsym in i3conf, need generate conf by script
 
 ## Group switcher -- for special aims
@@ -15,31 +12,6 @@ source ~/.shell/profile
 # Remapping  list of predefined remapping options
 #   /usr/share/X11/xkb/rules/evdev.lst
 # Details: /usr/share/X11/xkb/symbols
-
-DIR=~/.cache/airy/xkb
-[[ -d "$DIR" ]] || exit
-
-CONF=$(cat "$DIR/amer.xkb")
-if [ "$CURR_HOST" == "vbox" ]; then
-    CONF=$( sed '/lvl5\|over/ s|\(\s*\)\(.*\)|\1// \2|' <<< "$CONF" )
-# elif [ "$1" == "elona" ]; then
-# else
-#     CONF=$( sed '/am_over/ s|\(\s*include "\)\(.*\)"|\1\2_'"elona"'"|' <<< "$CONF" )
-fi
-
-if [ "$1" == "-l" ]; then
-    printf "$CONF\n"
-fi
-
-# Setup
-printf "$CONF" |
-    xkbcomp -I"$HOME/.Xrc/xkb" - "${DISPLAY%%.*}" 2>&1 |
-    sed '/No symbols defined\|Symbols ignored\|not found in evdev/d'
-
-
-# pgrep xcape > /dev/null || {
-#     xcape -t 250 -e "Control_L=Escape" &
-# }
 
 # setxkbmap -v 10 -option -layout "us,ru,ua" -variant "altgr-intl,typewriter,legacy" \
 #     -option "altwin:swap_alt_win, caps:none, ctrl:nocaps, lv3:menu_switch, keypad:pointerkeys"  \

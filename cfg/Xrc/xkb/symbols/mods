@@ -3,7 +3,7 @@
 default partial xkb_symbols "mods" {
     include "mods(keys)"
     include "mods(switches)"
-    include "mods(shift_lock)"
+    include "mods(shift_latch)"
 };
 
 // ==================================================================
@@ -14,8 +14,6 @@ xkb_symbols "keys"
     key <ESC>  { [ Escape ] };
     key <TAB>  { type="TWO_LEVEL", [ Tab, ISO_Left_Tab ] };
     key <SPCE> { type="L2:SUPER", [ space , Multi_key ] };
-    // The extra key on many European keyboards:
-    key <LSGT> { [ less, greater, bar, brokenbar ] };
 
     key <BKSL> { [ backslash, bar ] };
     key <RTRN> { [ Return ] };
@@ -27,32 +25,51 @@ xkb_symbols "keys"
 
 
 partial modifier_keys
-xkb_symbols "switches" {
+xkb_symbols "switches"
+{
+    // modifier_map Shift  { Shift_L, Shift_R };
+    // modifier_map Lock   { Caps_Lock };
+    // modifier_map Control{ Control_L, Control_R };
+    // modifier_map Mod1   { Alt_L, Alt_R, Meta_L, Meta_R };
+    // modifier_map Mod2   { Num_Lock };
+    // modifier_map Mod3   { Hyper_L, Hyper_R };
+    // modifier_map Mod4   { Super_L, Super_R };
+    // modifier_map Mod5   { ISO_Level3_Shift };
 
     key.type = "ONE_LEVEL";
 
     key <CAPS> { [ Control_L ] };
     modifier_map  Control { <CAPS> };
-    modifier_map  Lock { Caps_Lock };
+    // modifier_map  Lock { Caps_Lock };
 
     key <LWIN> { type="TWO_LEVEL", [ Alt_L, Meta_L ] };
     modifier_map  Mod1 { <LWIN> };
 
     key <LALT> { [ Super_L ] };
-    key <RCTL> { [ Super_R ] };
-    modifier_map  Mod4 { <LALT>, <RCTL> };
+    // key <RCTL> { [ Super_R ] };
+    // key <LALT> { [ Super_L ], actions= [ LatchMods(modifiers=Mod4) ] };
+    modifier_map  Mod4 { <LALT> }; //, <RCTL> };
 
-    key <MENU> { [ ISO_Level3_Shift ] };
-    modifier_map  Mod5 { <MENU> };
+    key <MENU> { [ VoidSymbol ] };  // For VirtualBox
+    key <RCTL> { type="TWO_LEVEL", [ ISO_Level3_Shift, ISO_Level5_Shift ] };
+    modifier_map  Mod5 { <RCTL> };
+
+    // Obtain one more modifier by swaping Hyper
+    // key <HYPR> { [ space ] };
+    // The extra key on many European keyboards.
+    // key <LSGT> { [ less, greater, bar, brokenbar ] };
+    // key <LSGT> { [ Hyper_L ] };
+    // modifier_map  Mod3 { <LSGT> };
 
     key <LCTL> { [ Overlay1_Enable ], actions= [ SetControls(ctrls=Overlay1) ] };
     // key <RWIN> { [ Overlay1_Enable ], actions = [ SetControls(ctrls=Overlay1) ] };
+
     // ALT: (lock) Overlay1_Enable --> SEE: compat/accessx
-    // key <SCLK> { [ Overlay1_Enable ] };
-    key <SCLK> { [ StickyKeys_Enable ], actions= [ LockControls(ctrls=StickyKeys) ] };
+    key <SCLK> { [ Overlay1_Enable ] };
+    // BUG: key <SCLK> { [ ISO_Lock ] };
+    // ALT: key <SCLK> { [ StickyKeys_Enable ], actions= [ LockControls(ctrls=StickyKeys) ] };
 
-
-    key <NMLK> { type="TWO_LEVEL", [ Num_Lock, Pointer_Accelerate ] };  // Pointer_EnableKeys
+    key <NMLK> { type="TWO_LEVEL", [ Num_Lock, Pointer_EnableKeys ] };  // Pointer_Accelerate
     modifier_map  Mod2 { Num_Lock };
 };
 
@@ -70,8 +87,8 @@ xkb_symbols "shift_lock" {
 partial modifier_keys
 xkb_symbols "shift_latch" {
     // Change Shift with a sticky version (for one next symbol)
-    key.type = "ONE_LEVEL";
-    key <LFSH> { [ ISO_Level2_Latch ] };
-    key <RTSH> { [ ISO_Level2_Latch ] };
+    key.type = "TWO_LEVEL";
+    key <LFSH> { [ Shift_L, ISO_Level3_Latch ] };
+    key <RTSH> { [ Shift_R, Multi_key ] };  // ISO_Level2_Latch
     modifier_map Shift { <LFSH>, <RTSH> };
 };
