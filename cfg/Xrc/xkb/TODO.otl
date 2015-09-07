@@ -1,7 +1,7 @@
 Xkbmap
+	[_] BUG: xcape is randomly crashed -- maybe too much combo?
 	[_] FIXME: can't use overlay xkb mapping on LAlt-LCtrl
 		Cause vbox after windows treats LCtrl and Caps as same keycode
-	[_] R-Alt -> Lang_menu (custom layout with programmer symbols in russian)
 	2015-09-06 [X] Try xkeymap -- so kbdd will not be closing gmail pop-up or vk focus
 	[_] In vim add custom plugin for kbdd autocmd on insert/live and operator-pending (r, R, Space)
 		save state of last used lang in insert regime and return it back again
@@ -12,48 +12,58 @@ Xkbmap
 		: Search for key-fixator key (to hold modifiers like shift or control)
 	[_] Key Layout for entering [,] in russian with mod3 or Alt<space>
 
-	[_] R-Alt -- same way as Caps -- remap to Alt on combo, or Lang on press
-		WANNA: hold -- another lang, click -- en, lalt+click -- ru
-
 	[_] Make second overlay/types group for right Win/Menu/Ctrl button
 		[_] Vbox button will be the composition of them instead of single button
 		[_] Simulate level5
 		[_] I need alt,ctrl,win modifiers on right in any case
 
-	2015-09-06 [X] NEED: Tray indicators for latching ModN
-	>[_] Make latching modifiers (for i3 also), -> ctrl aside as it is double-key
-		Toggle this behaviour with num lock or scroll lock or whatsoever
-	[_] Show led indicators for regimes in i3bar (xset -q)
-		: https://www.google.com.ua/search?hl=uk&source=hp&biw=&bih=&q=linux+get+capslock+status&btnG=%D0%9F%D0%BE%D1%88%D1%83%D0%BA+Google&gbv=1
-		ALT: xset -q
-		: sudo pip install evdev
-		: from evdev import InputDevice, ecodes
-		: dev = InputDevice('/dev/input/eventX') # your keyboard device
-		: dev.leds()  # (verbose=True)
-	[_] When latching is done, xcape must be inversed for alt,shift,win
-	: modifier on short, key on long?
-	[_] Use my second '\' as Latch/Lock for level3/5
-	[_] ??: Ctrl_L (short) -> ISO_Lock, Ctrl_L+Space -> Lock lvl3/5?
-	[_] Latching of langs -> for diff lang input
-		: To use effectively set/latch you need bind ISO_Lock
-	[_] TODO: Check if LED_caps is disabled!!!
-	[_] Menu+RCtrl -> Super_R (for i3)
-	[_] TRY: accessx instead of my modifiers latching
-		http://www.x.org/releases/X11R7.7/doc/libX11/XKB/xkblib.html#Controls_for_Better_Keyboard_Access_by_Physically_ImpairedPersons
-		https://wiki.archlinux.org/index.php/Accessibility
+	Lang
+		[_] R-Alt -> Lang_menu (custom layout with programmer symbols in russian)
+		[_] R-Alt -- same way as Caps -- remap to Alt on combo, or Lang on press
+			WANNA: hold -- another lang, click -- en, lalt+click -- ru
 
-	[_] Mouse on hjkl
-		http://superuser.com/questions/695315/make-scroll-lock-toggle-mouse-keys-on-home-row
+	Latching
+		2015-09-06 [X] NEED: Tray indicators for latching ModN
+		>[_] Make latching modifiers (for i3 also), -> ctrl aside as it is double-key
+			: Toggle this behaviour with num lock or scroll lock or whatsoever
+		[_] Toggle overlay locking/unlocking on double-press of Control_L
+		[_] When latching is done, xcape must be inversed for alt,shift,win
+			: modifier on short, key on long?
+		[_] Use my second '\' as Latch/Lock for level3/5
+		[_] Latching of langs -> for diff lang input
+			: To use effectively set/latch you need bind ISO_Lock
+		[_] TRY: accessx instead of my modifiers latching
+			: http://www.x.org/releases/X11R7.7/doc/libX11/XKB/xkblib.html#Controls_for_Better_Keyboard_Access_by_Physically_ImpairedPersons
+			: https://wiki.archlinux.org/index.php/Accessibility
+
+	LED
+		[_] Show led indicators for regimes in i3bar (xset -q)
+		: https://www.google.com.ua/search?hl=uk&source=hp&biw=&bih=&q=linux+get+capslock+status&btnG=%D0%9F%D0%BE%D1%88%D1%83%D0%BA+Google&gbv=1
+			ALT: xset -q
+			: sudo pip install evdev
+			: from evdev import InputDevice, ecodes
+			: dev = InputDevice('/dev/input/eventX') # your keyboard device
+			: dev.leds()  # (verbose=True)
+		[_] TODO: Check if LED_caps is disabled!!!
+
+	Composite modifiers
+		[_] ??: Ctrl_L (short) -> ISO_Lock, Ctrl_L+Space -> Lock lvl3/5?
+		[_] Menu+RCtrl -> Super_R (for i3)
 
 	[_] Use Space as Hyper_L -> modify layout for ctrl/alt/super when pressed first
 		And if first pressed ctrl/alt/super -> change Hyper_L to simple Space, keeping modifiers (disable cleaning)
 
 	[_] Make F1-12 be accessible by mod+F1-12, and reuse them as-is for i3
+		: Shift must be kept as level for S-F1x -> F2x
+		:= Search useful but unused symbols to reuse as commands
 
 	Overlay for hjkl navigation
 		WANNA: make overlay lctl->F13, where F13 = [ temporary disables overlay (as shift for Caps) ]
 		OR: as IvanPascal make ctrl as lock key, locking not LockControls but SetControls by inner mechanics
 		So original keys will be available by lctl+hjkl -> hjkl, not arrows
+		[_] Mouse on hjkl
+			: http://superuser.com/questions/695315/make-scroll-lock-toggle-mouse-keys-on-home-row
+
 
 SEIZE:
 	http://forum.colemak.com/viewtopic.php?id=1438

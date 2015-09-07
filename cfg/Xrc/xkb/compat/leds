@@ -5,57 +5,48 @@ xkb_compatibility "all"
 {
     // Possible states are Base, Latched, Locked, Effective, Any or None.
     // NOTE: only 8 indicators -- to use 1-character Braile unicode symbols
+    indicator.allowExplicit = False;
+    // whichModState= Locked;
 
-    // 1 -> 1
-    indicator "Caps Lock" {
-       !allowExplicit;
-       whichModState= Locked;
-       modifiers= Lock;
+    // 2 -- Overlay
+    indicator "Scroll Lock" {
+       controls= Overlay1;  // Lock
     };
-    // 11-> 2
+    // 11 -- ShiftLock
     indicator "Shift Lock" {
-        !allowExplicit;
-        whichModState= Effective;
         modifiers= Shift;
     };
 
 
-    // 2 -> 3
-    indicator "Num Lock" {
-        !allowExplicit;
-        whichModState= Locked;
-        modifiers= NumLock;
-    };
-    // 3 -> 4
-    indicator "Scroll Lock" {
-        allowExplicit;
-        whichModState= Effective;
+    // 0 -- Control
+    indicator "Caps Lock" {
         modifiers= Control;
     };
-
-
-    // 4 -> 5
+    // 4 -- Alt
     indicator "Kana" {
-       !allowExplicit;
-       whichModState= Effective;
        modifiers= Mod1;
     };
-    // 9 -> 6
-    indicator "Misc" {
-       !allowExplicit;
-       whichModState= Effective;
-       controls=Overlay1;
+
+
+    // 1 -- NumLock
+    indicator "Num Lock" {
+        modifiers= NumLock;
+    };
+    // 3 -- Super
+    indicator "Compose" {
+       modifiers= Mod4;
     };
 
 
-    // 12 -> 7
+    // 12 -- group!=1
     indicator "Group 2" {
-        !allowExplicit;
         groups= All-Group1;
     };
-    // 13 -> 8
+    // 13 -- MouseKeys
     indicator "Mouse Keys" {
-        indicatorDrivesKeyboard;
-        controls= MouseKeys;
+        // allowExplicit;
+        // indicatorDrivesKeyboard;
+        // whichModState= Locked;
+        controls= MouseKeys;  // Pointer_Accelerate
     };
 };

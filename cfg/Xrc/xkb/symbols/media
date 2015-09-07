@@ -2,6 +2,7 @@
 
 default partial xkb_symbols "base"
 {
+    // Logitech
     key <I180> { [ XF86HomePage ] };
     key <I163> { [ XF86Mail ] };
     key <I225> { [ XF86Search ] };
@@ -16,6 +17,17 @@ default partial xkb_symbols "base"
     key <VOL-> { [ XF86AudioLowerVolume ] };
     key <VOL+> { [ XF86AudioRaiseVolume ] };
     key <I150> { [ XF86Sleep ] };
-
     // key <I248> // Light level
+
+
+    // Impresion (+)
+    // NOTE: hardware buttons
+    // key <FK21>   {      [ XF86TouchpadToggle    ]       };
+    // { type="TWO_LEVELS", [ XF86TouchpadOn, XF86TouchpadOff ] };
+    // FnF3 -> 134 (<RWIN>) -- switch output
+    // FnF9 -> disable screen
+    // Fn10 -> Eject?
+    // Fn11 -> Bluetooth?
+    key <I232>   {      [ XF86MonBrightnessDown ]       };
+    key <I233>   {      [ XF86MonBrightnessUp   ]       };
 };

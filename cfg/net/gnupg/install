@@ -1,11 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst "gnupg gnupg-agent"
+pkg_inst "gnupg keychain"
 
 if distro arch; then
-    echo pkg_inst "keychain pineentry"
+    pkg_inst "pinentry"
 
 elif distro ubuntu; then
-    pkg_inst "keychain pinentry-curses  pinentry-gtk2"
+    pkg_inst "gnupg-agent pinentry-curses  pinentry-gtk2"
 fi

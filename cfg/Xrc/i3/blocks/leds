@@ -3,6 +3,25 @@
 from subprocess import check_output, CalledProcessError
 import re
 
+''' Braile bits:
+ 1 4  | cyan  yellow |
+ 2 5  | blue  orange |
+ 3 6  | green red    |
+ 7 8  | gray  white  |
+'''
+indicators = {"Caps Lock": 0, "Num Lock": 1, "Scroll Lock": 2, "Compose": 3,
+              "Kana": 4, "Sleep": 5, "Suspend": 6, "Mute": 7,
+              "Misc": 8, "Mail": 9, "Charging": 10, "Shift Lock": 11,
+              "Group 2": 12, "Mouse Keys": 13}
+
+colors = ((0, 1, 1), (0, 0, 1), (0, 1, 0),
+          (1, 1, 0), (1, 0.5, 0), (1, 0, 0),
+          (0.2, 0.2, 0.2), (1, 1, 0))
+
+choosen = ("Scroll Lock", "Caps Lock", "Num Lock",
+           "Shift Lock", "Kana", "Compose",
+           "Group 2", "Mouse Keys")
+
 try:
     out = check_output(['xset', '-q'])
 except CalledProcessError:
@@ -13,10 +32,7 @@ else:
 m = re.search('LED mask:\s*(\w+)', out)
 leds = int(m.group(1), 16) if m else 0
 
-indicators = (1, 11, 2, 3, 4, 9, 12, 13)
-colors = ((1, 1, 0), (1, 1, 0), (0, 1, 0), (0, 0, 1),
-          (1, 0, 1), (0, 1, 1), (0.2, 0.2, 0.2), (1, 0, 0))
-state = [bool(leds & (1 << (n - 1))) for n in indicators]
+state = [bool(leds & (1 << indicators[nm])) for nm in choosen]
 
 code = 0x2800 + sum([(1 << i) for i, b in enumerate(state) if b])
 tr = list(map(list, zip(*[colors[i] for i, b in enumerate(state) if b])))
