@@ -9,10 +9,23 @@ eval $(keychain --eval -Q --quiet id_dsa id_rsa)
 : SSH_AUTH_SOCK=$(gpg-connect-agent 'getinfo ssh_socket_name' /bye | grep '^D' | cut -d' ' -f2)
 : [ -S "$SSH_AUTH_SOCK" ] && export SSH_AUTH_SOCK
 
+Create and mount RAM disk
+	mkdir mytmpdir
+	mount -t ramfs -o size=1m ramfs mytmpdir
+	...
+	umount mytmpdir
+	rmdir mytmpdir
+
 SEE:
 	http://www.spywarewarrior.com/uiuc/gpg/gpg-com-4.htm
 	Hardening
 		http://www.incenp.org/notes/2015/using-an-offline-gnupg-master-key.html
+	> Mutt
+		> https://gist.github.com/bnagy/8914f712f689cc01c267
+		: https://gist.github.com/grugq/03167bed45e774551155
+		: http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
+	See how spoolfile located on imap:
+		https://wiki.xmission.com/Hosted_Email:Mutt
 
 Setup
 	Interactively generate 2048b key for 1 year (you can extend it later)
@@ -32,6 +45,11 @@ Setup
 		  -e -a -r martin@example.com
 	External config
 		set imap_pass = `gpg -d ~/.mutt/.pass.gpg | awk '/^GMail:/ {print $2}'`
+		OR: source "gpg -d ~/.mutt/passwords.gpg |"
+
+	ALT:
+		echo '$PASSWORD' | gpg --use-agent -e > ~/.passwd/$ACCOUNT.gpg
+		set imap_pass = "`gpg --use-agent --quiet --batch -d ~/.passwd/$ACCOUNT.gpg`"
 
 Config
 	Reload
@@ -39,8 +57,11 @@ Config
 		:OR: systemctl --user reload gpg-agent
 
 Test
-	pgrep gpg-agent
-	gpg-connect-agent  #> bye/quit
+	Check if working
+		pgrep gpg-agent
+		gpg-connect-agent  #> bye/quit
+	Try decrypt
+		gpg -dq ./password.gpg
 
 	Systemd:
 		link '..' ~/.config/systemd/user/gpg-agent.service

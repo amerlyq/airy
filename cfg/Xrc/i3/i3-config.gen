@@ -295,9 +295,9 @@ w_header "\n" "Control: volume"
         "XF86AudioRaiseVolume XF86AudioLowerVolume XF86AudioMute" \
         2%+ 2%- " "
 
-w_header "Control: ncmpcpp"
+w_header "Control: mpc / ncmpcpp"
     wstr "$bs XF86Tools ~/.i3/ext/floaty ncmpcpp"
-    wlistf "$bs %s $exno ncmpcpp %-6s && \$upd mpd" \
+    wlistf "$bs %s $exno mpc %-6s && \$upd mpd" \
         "XF86AudioPlay XF86AudioPause XF86AudioNext XF86AudioPrev XF86AudioStop" \
         toggle pause next prev stop
     wlistf "$mSd+%-5s $exno mpc %-6s && \$upd mpd" \
