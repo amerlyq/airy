@@ -9,7 +9,7 @@
 
 # Those maps drop focus from input fields in browser.
 #   Better use own layout switcher in ~/.Xrc/xkb
-get_current() { qdbus-qt4 ru.gentoo.KbddService \
+get_current() { qdbus ru.gentoo.KbddService \
     /ru/gentoo/KbddService ru.gentoo.kbdd.getCurrentLayout; }
 
 change() { dbus-send --dest=ru.gentoo.KbddService \

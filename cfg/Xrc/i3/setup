@@ -5,6 +5,8 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 link "$PWD" ~/.i3
 mkdef x-window-manager $(which i3)
+# Link qdbus-qt4 on Arch
+(cd /usr/bin && [[ ! -f qdbus && -f qdbus-qt4 ]] && sudo ln -svfT qdbus-qt4 qdbus)
 
 ### GENS ###
 THEME=$THEME ./i3-config.gen

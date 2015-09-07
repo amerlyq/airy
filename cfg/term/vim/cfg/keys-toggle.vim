@@ -21,6 +21,9 @@ noremap <unique> <Leader>tw :<C-U>let g:magnify_on = g:magnify_on ? 0 : 1 \|
 autocmd WinEnter * call AutoMagnifying()
 function! AutoMagnifying()
   if g:magnify_on
+    " BUG: bad when split screen -- need min(8, &lines-othersH)
+    let &winminheight=min([&lines, 8])
+    let &winminwidth=min([&columns, 15])
     resize 100    "or another big number
   endif
 endfunc

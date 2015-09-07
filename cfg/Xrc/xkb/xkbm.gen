@@ -1,12 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/profile
-source ~/.shell/func.d/cfgsetup
 
 # pc+us:1+ru(typewriter):2+ua(legacy):3
 lang="${CURR_XKB_LANG:-us:1+am(ru):2+am(ua):3}"
 over="${1:-${CURR_XKB_OVER:-vim}}"
 
-dst="$CURR_CACHE/keylayout.xkb"
+dst="${CURR_CACHE?No}/keylayout.xkb"
 cat > "$dst" <<EOT
 xkb_keymap {
     xkb_keycodes  { include "evdev+aliases(qwerty)" };
@@ -15,7 +14,8 @@ xkb_keymap {
         include "basic"
         augment "iso9995"
         augment "mousekeys"
-        // DONE: augment "accessx(full)"
+        // DISABLED: don't know how to disable overall timeout
+        // augment "accessx(full)"
         augment "misc"
         // augment "xfree86"
         augment "level5"
@@ -38,7 +38,7 @@ xkb_keymap {
 
         include "media"
         replace "mods"
-        replace "langs(direct)"
+        replace "langs(direct)"  // OR: switch
         include "overlay($over)"
     };
     xkb_geometry  { include "pc(pc86)" };

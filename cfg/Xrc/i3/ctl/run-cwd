@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+# TODO: use -e only if $cmd not empty
+
+# Get both cwd and opened files (to sent in ranger):
+#   lsof -p 10006  # need filter out libraries
+
+my @cmd = ('unset RANGER_LEVEL && ranger-auto');
+# --selectfile=<current_working_file>
+
+# For current file: $pid=$$
+sub active_pid {
+    my $wid = `xprop -root -notype _NET_ACTIVE_WINDOW` =~ /(\S+)$/;
+    my $pid = `xprop -id $1 -notype _NET_WM_PID` =~ /(\S+)$/;
+    return $1;
+}
+
+sub get_cwd {
+    my ($pid, $pwd) = @_;
+    foreach (reverse( qx(pstree -p $pid) =~ m/\((\d+)\)/g )) {
+        $pwd = readlink("/proc/$_/cwd");
+        last if $pwd and ($pwd =~ /^\S+$/);
+    }
+    return $pwd;
+}
+
+my @args = ("x-terminal-emulator", "-cd", get_cwd(active_pid()), "-e", "zsh", "-ic");
+exec(@args, @cmd);  # unless fork;
+# DEBUG: "bash", "-c", "printf '$$\n$pr\n$pwd\n' | vim -"

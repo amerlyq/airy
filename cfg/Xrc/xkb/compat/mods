@@ -26,6 +26,10 @@ xkb_compatibility "latch"  {
         action= LatchMods(modifiers=Shift);
     };
 
+    interpret Control_R {
+        action= LatchMods(modifiers=Control);
+    };
+
     interpret Alt_L+Any {
         //useModMapMods= level1;
         virtualModifier= Alt;
@@ -60,6 +64,20 @@ xkb_compatibility "latch"  {
         action = LatchMods(modifiers=Super);
     };
 
+    interpret Super_R+Any {
+        //useModMapMods= level1;
+        virtualModifier= Super;
+        action = LatchMods(clearLocks,modifiers=modMapMods);
+    };
+
+    interpret Super_R {
+        action = LatchMods(modifiers=Super);
+    };
+
+    // ----------------------------------------------
+    interpret Control_L {
+        action= SetMods(modifiers=Control);
+    };
 
     interpret Hyper_L+Any {
         //useModMapMods= level1;

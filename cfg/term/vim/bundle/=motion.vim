@@ -102,9 +102,9 @@ if neobundle#tap('sideways.vim')  "{{{1
 endif
 
 if neobundle#tap('vim-textobj-quotes')  "{{{1
-  " Inner quotes are used the most:
+  " Outer quoted is the most useful:
   " xmap <silent><unique> q iq
-  omap <silent><unique> q iq
+  omap <silent><unique> q aq
 endif
 
 " TODO: maybe space/sigil change mappings to reverse -- G/Q?

@@ -1,4 +1,5 @@
 " vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
+" Name: Notches
 " Fast highlighting: match Error /ENOMEM/
 " CHECK: http://andrewradev.com/2011/08/06/making-vim-pretty-with-custom-colors/
 " FIXME: background for labels don't match, when cursor is on same line
@@ -37,6 +38,13 @@ let s:patterns = {
       \ }
 
 
+function! s:everywhere_print(patts)
+  for [k,v] in items(a:patts)
+    echo k .': '. v
+  endfor
+endfunction
+
+
 function! s:everywhere_define(cols)
   for [k,v] in items(a:cols)  "term=bold,underline guifg=#E01B1B
     exec 'hi! Note'. k .' term=bold cterm=bold ctermbg=None guibg=None ctermfg='. v
@@ -73,8 +81,12 @@ call s:everywhere_define(s:colors)
 call s:everywhere_enable(1)
 " autocmd WinEnter,VimEnter * call s:everywhere_enable(1)
 
-command! -bar -bang -nargs=0 EverywhereNotesToggle
+command! -bar -bang -nargs=0 EverywhereNotchesToggle
       \ call s:everywhere_enable(!g:everywhere_activated)
       \ | syntax off | syntax on
 
-nnoremap <unique> <Leader>tT :EverywhereNotesToggle<CR>
+command! -bar -bang -nargs=0 EverywhereNotchesList
+      \ call s:everywhere_print(s:patterns)
+      \ | syntax off | syntax on
+
+nnoremap <unique> <Leader>tT :EverywhereNotchesToggle<CR>

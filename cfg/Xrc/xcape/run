@@ -4,6 +4,8 @@ source ~/.shell/func.d/system
 run_single kbdd
 
 # SEE: /usr/include/X11/keysymdef.h
-run_single xcape -t 250 -e "Control_L=Escape"
-#;Overlay1_Enable=space;Hyper_L=space"
-# clearMods: ISO_Level3_Shift=Hyper_L
+run_single -r xcape -t 250 -e "\
+Control_L=Escape;\
+ISO_Level3_Shift=Super_R;\
+Overlay1_Enable=Control_R"
+# clearMods:  ;Hyper_L=space

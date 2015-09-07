@@ -3,7 +3,7 @@
 default partial xkb_symbols "mods" {
     include "mods(keys)"
     include "mods(switches)"
-    include "mods(shift_latch)"
+    include "mods(shift_lock)"
 };
 
 // ==================================================================
@@ -15,7 +15,6 @@ xkb_symbols "keys"
     key <TAB>  { type="TWO_LEVEL", [ Tab, ISO_Left_Tab ] };
     key <SPCE> { type="L2:SUPER", [ space , Multi_key ] };
 
-    key <BKSL> { [ backslash, bar ] };
     key <RTRN> { [ Return ] };
     key <BKSP> { [ BackSpace, BackSpace ] };
 
@@ -39,33 +38,38 @@ xkb_symbols "switches"
     key.type = "ONE_LEVEL";
 
     key <CAPS> { [ Control_L ] };
-    modifier_map  Control { <CAPS> };
+    key <RWIN> { [ Control_R ] };
+    modifier_map  Control { <CAPS>, <RWIN> };
     // modifier_map  Lock { Caps_Lock };
 
     key <LWIN> { type="TWO_LEVEL", [ Alt_L, Meta_L ] };
     modifier_map  Mod1 { <LWIN> };
 
     key <LALT> { [ Super_L ] };
-    // key <RCTL> { [ Super_R ] };
-    // key <LALT> { [ Super_L ], actions= [ LatchMods(modifiers=Mod4) ] };
-    modifier_map  Mod4 { <LALT> }; //, <RCTL> };
+    key <SUPR> { [ Super_R ] };
+    modifier_map  Mod4 { <LALT>, <SUPR> };
 
-    key <MENU> { [ VoidSymbol ] };  // For VirtualBox
-    key <RCTL> { type="TWO_LEVEL", [ ISO_Level3_Shift, ISO_Level5_Shift ] };
+    // EXPL: xcape: -> Super_R, so dbl click-hold will cause lvl5
+    key <RCTL> { type="L2:SUPER", [ ISO_Level3_Shift, ISO_Level5_Shift ] };
     modifier_map  Mod5 { <RCTL> };
+    key <MENU> { [ VoidSymbol ] };  // For VirtualBox
 
     // Obtain one more modifier by swaping Hyper
-    // key <HYPR> { [ space ] };
     // The extra key on many European keyboards.
-    // key <LSGT> { [ less, greater, bar, brokenbar ] };
-    // key <LSGT> { [ Hyper_L ] };
-    // modifier_map  Mod3 { <LSGT> };
+    key <LSGT> { [ Hyper_L ] };  // { [ less, greater, bar, brokenbar ] };
+    modifier_map  Mod3 { <LSGT> };
+    // key <HYPR> { [ space ] };
 
-    key <LCTL> { [ Overlay1_Enable ], actions= [ SetControls(ctrls=Overlay1) ] };
-    // key <RWIN> { [ Overlay1_Enable ], actions = [ SetControls(ctrls=Overlay1) ] };
+    // NOTE: can be used as clearMods!
+    key <LCTL> {
+        type="PC_CONTROL_LEVEL2",
+        [ Overlay1_Enable, Overlay1_Enable ],
+        actions= [ SetControls(ctrls=Overlay1), LockControls(ctrls=Overlay1) ]
+    };
 
     // ALT: (lock) Overlay1_Enable --> SEE: compat/accessx
-    key <SCLK> { [ Overlay1_Enable ] };
+    // ATTENTION: removed symbol to not interfere with latching xcape Control_L -> Control_R
+    key <SCLK> { [ VoidSymbol ], actions= [ LockControls(ctrls=Overlay1) ] };
     // BUG: key <SCLK> { [ ISO_Lock ] };
     // ALT: key <SCLK> { [ StickyKeys_Enable ], actions= [ LockControls(ctrls=StickyKeys) ] };
 

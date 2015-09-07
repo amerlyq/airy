@@ -258,8 +258,9 @@ m_open="<Open> : [P]owertop, [t]lp | [g]vim, [F]m | (s)ound"
 
 w_header "Run: Prgs"
     wstr "$mod+u $eurx"  # Because it's urxvt!
+    wstr "$mCd+u $exno ~/.i3/ctl/run-cwd"  # Run with cwd of current active window
     wstr "$mSd+u split vertical  , $eurx"
-    wstr "$mCd+u split horizontal, $eurx"
+    wstr "$mCS+u split horizontal, $eurx"
     wstr "$mod+Return $eurx -e zsh -ic ranger-auto"
     wstr "$mSd+Return $eflo -e ranger-auto"
     wstr "$mCd+Return $eflo"
