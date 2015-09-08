@@ -8,19 +8,18 @@ import os
 #   function finish { tempfile='/tmp/aura/ranger_cwdir'; echo "$PWD" > "$tempfile"; }
 # `trap finish EXIT
 class cd_shelldir(Command):
-    LAST = os.getenv('TMPDIR')
-    if not LAST:
-        LAST = os.path.join('/tmp', 'ranger_cwdir')
+    lastdir = os.path.join(os.getenv('TMPDIR') or '/tmp', 'ranger_cwdir')
+    print(lastdir)
     """:cd_shelldir
     Goes to path from /tmp/<username>/ranger_cwdir
     """
     def execute(self):
         try:
-            fname = self.fm.confpath(cd_shelldir.LAST)
+            fname = self.fm.confpath(cd_shelldir.lastdir)
             with open(fname, 'r') as f:
                 self.fm.cd(f.readline().rstrip())
         except IOError:
-            return self.fm.notify(cd_shelldir.LAST, bad=True)
+            return self.fm.notify(cd_shelldir.lastdir, bad=True)
 
     def tab(self):
         return self._tab_directory_content()  # Generic function
