@@ -20,25 +20,6 @@ v() { #servername == syntex (must be for LaTeX)
     fi
 }
 
-vienv(){
-    local shl="$1" NM="${2:-`tempfile`}"
-    if [[ ! -e "$NM" ]]; then
-        case "$shl"
-        # Python recognizes encoding: "coding[:=]\s*([-\w.]+)"
-        in  python2) sb="#!/usr/bin/env $shl\n# vim: fileencoding=utf-8"
-        ;;  python3) sb="#!/usr/bin/env $shl"
-        ;; bash|zsh) sb="#!/bin/$shl -e"
-        esac
-
-        printf "%s\n\n\n" "$sb" > "$NM"
-        chmod 764 "$NM"
-    fi
-    vim +'norm G' "$NM"
-    # vim "$NM" -c "normal i#!/usr/bin/env $shl<CR>"
-}
-alias vish='vienv bash '
-alias vipl='vienv perl '
-alias vipy='vienv python3 '
 #alias vim='\vim --cmd "let g:loaded_youcompleteme = 1"'
 #alias ycm='\vim --cmd "let g:loaded_youcompleteme = 0"'
 

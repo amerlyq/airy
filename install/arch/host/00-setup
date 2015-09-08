@@ -17,6 +17,13 @@ echo LANG=${loc} > /etc/locale.conf
 export LANG=${loc}
 echo ':: locale generated'
 
+## On Ubuntu 12, fix:
+# sudo locale-gen en_US.UTF-8
+# sudo dpkg-reconfigure locales
+# sudo sh -c 'echo LANG=en_US.UTF-8 > /etc/default/locale'
+## People with a similar problem have had good luck with:
+# sudo sh -c 'echo LANG=en_US.UTF-8 >> /etc/environment'
+
 
 ## Time
 zone="/usr/share/zoneinfo/Europe/Kiev"

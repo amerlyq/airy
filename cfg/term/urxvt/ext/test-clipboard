@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+# SEE
+#   http://jbl.web.cern.ch/jbl/doc/urxvt/
+#   http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/src/urxvt.pm#Hooks
+
+use strict;
+use warnings;
+
+# DEV: if xsel don't exist, or there are no forwarding X or inside tmux
+#   :: Try xsel, then termcode for buffer, then pipe through tmp-file (like ssh?)
+
+# Better to do it here -- to be independent from used shell.
+#   * insert in start/middle/end -- use 'paste', then 'Enter'
+#   * execute: <C-c> to save current (bad when empty)
+#              <C-u><C-k> to clear (lost prev command)
+#              Copy current line (interact with zsh) then execute and past that line back
+my %processors = (
+    default => sub { return "d:@_"; },
+    escaped => sub { $_[0] =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/g; return $_[0]; },
+    # escaped => sub { return "e:new"; },
+    execute => \&exe
+    # DEV remove all spaces from beginning/end and before/after each line break
+    # Eliminate multiple line breaks, last character must always be line break
+    # Clear current
+);
+
+sub exe {
+    print "@_";
+}
+
+sub paste {
+    my ($self, $cmd) = @_;
+    my $str = "   so#me \n  string";
+    # my $str = `$self->{paste_cmd}`;
+
+    if ($? == 0) {
+        print "%s\n", $processors{$cmd}->($str);
+        # $self->tt_paste($str);
+    } else {
+        print STDERR "error running '$self->{paste_cmd}': $!\n";
+    }
+}
+
+sub on_user_command {
+    my ($self, $cmd) = @_;
+    $_ = $cmd;
+    if (/:paste:/) {
+        $cmd =~ /:(\w+)$/;
+        if ($processors{$1}) {
+            &paste($self, $1);
+        } else {
+            print STDERR "Error: unknown action '$cmd'\n";
+        }
+    }
+    ()  # return false : else <consume event>
+}
+
+on_user_command(0, 'clipboard:paste:default');
+on_user_command(0, 'clipboard:paste:escaped');
+# Call function pointer
+# &{\&{$action}}();

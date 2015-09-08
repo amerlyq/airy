@@ -1,4 +1,8 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
 # Author:   Bert Muennich
 # Website:  http://www.github.com/muennich/urxvt-perls
 # License:  GPLv2
@@ -27,63 +31,60 @@
 #   URxvt.clipboard.copycmd:  pbcopy
 #   URxvt.clipboard.pastecmd: pbpaste
 
-# The use of the functions should be self-explanatory!
-
-use strict;
 
 sub on_start {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	$self->{copy_cmd} = $self->x_resource('clipboard.copycmd') || 'xsel -ib';
-	$self->{paste_cmd} = $self->x_resource('clipboard.pastecmd') || 'xsel -ob';
+    $self->{copy_cmd} = $self->x_resource('clipboard.copycmd') || 'xsel -ib';
+    $self->{paste_cmd} = $self->x_resource('clipboard.pastecmd') || 'xsel -ob';
 
-	if ($self->x_resource('clipboard.autocopy') eq 'true') {
-		$self->enable(sel_grab => \&sel_grab);
-	}
+    if ($self->x_resource('clipboard.autocopy') eq 'true') {
+        $self->enable(sel_grab => \&sel_grab);
+    }
 
-	()
+    ()
 }
 
 sub copy {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	if (open(CLIPBOARD, "| $self->{copy_cmd}")) {
-		my $sel = $self->selection();
-		utf8::encode($sel);
-		print CLIPBOARD $sel;
-		close(CLIPBOARD);
-	} else {
-		print STDERR "error running '$self->{copy_cmd}': $!\n";
-	}
+    if (open(CLIPBOARD, "| $self->{copy_cmd}")) {
+        my $sel = $self->selection();
+        utf8::encode($sel);
+        print CLIPBOARD $sel;
+        close(CLIPBOARD);
+    } else {
+        print STDERR "error running '$self->{copy_cmd}': $!\n";
+    }
 
-	()
+    ()
 }
 
 sub paste {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	my $str = `$self->{paste_cmd}`;
-	if ($? == 0) {
-		$self->tt_paste($str);
-	} else {
-		print STDERR "error running '$self->{paste_cmd}': $!\n";
-	}
+    my $str = `$self->{paste_cmd}`;
+    if ($? == 0) {
+        $self->tt_paste($str);
+    } else {
+        print STDERR "error running '$self->{paste_cmd}': $!\n";
+    }
 
-	()
+    ()
 }
 
 sub paste_escaped {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	my $str = `$self->{paste_cmd}`;
-	if ($? == 0) {
-		$str =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\\1/g;
-		$self->tt_paste($str);
-	} else {
-		print STDERR "error running '$self->{paste_cmd}': $!\n";
-	}
+    my $str = `$self->{paste_cmd}`;
+    if ($? == 0) {
+        $str =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/g;
+        $self->tt_paste($str);
+    } else {
+        print STDERR "error running '$self->{paste_cmd}': $!\n";
+    }
 
-	()
+    ()
 }
 
 sub on_action {
@@ -93,23 +94,23 @@ sub on_action {
 }
 
 sub on_user_command {
-	my ($self, $cmd) = @_;
+    my ($self, $cmd) = @_;
 
-	if ($cmd eq "clipboard:copy") {
-	   $self->copy;
-	} elsif ($cmd eq "clipboard:paste") {
-	   $self->paste;
-	} elsif ($cmd eq "clipboard:paste_escaped") {
-	   $self->paste_escaped;
-	}
+    if ($cmd eq "clipboard:copy") {
+        $self->copy;
+    } elsif ($cmd eq "clipboard:paste") {
+        $self->paste;
+    } elsif ($cmd eq "clipboard:paste_escaped") {
+        $self->paste_escaped;
+    }
 
-	()
+    ()
 }
 
 sub sel_grab {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	$self->copy;
+    $self->copy;
 
-	()
+    ()
 }

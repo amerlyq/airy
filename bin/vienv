@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+shl="$1"
+NM="${2:-`tempfile`}"
+env='#!/usr/bin/env'
+
+if [[ ! -f "$NM" ]]; then
+    # Python recognizes encoding: "coding[:=]\s*([-\w.]+)"
+    case "$shl"
+    in  pl) sb="$env perl\n\nuse strict;\nuse warnings;"
+    ;; py2) sb="$env python2\n# vim: fileencoding=utf-8"
+    ;; py3) sb="$env python3"
+    ;;  sh) sb="#!/bin/bash -e"
+    ;;  zh) sb="#!/usr/bin/zsh -e"
+    ;;   *) sb="$env $shl"
+    esac
+    printf "%b\n\n\n" "$sb" > "$NM"  # Compatible with 'echo -e'
+    chmod 764 "$NM"
+fi
+
+vim +'norm G' "$NM"
+# OR: vim "$NM" -c "normal i$env $shl<CR>"

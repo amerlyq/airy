@@ -21,6 +21,10 @@ fi
 sed 's/\s*#.*$//; /^\s*$/d' ~/.shell/pathes \
     | while read k p; do alias $k='cd '"$p"; done
 
+# For 'vienv' fast shebang template
+sed -rn '/case/,/esac/{/\s*(in|;;)\s+(\w+)\).*/s//\2/p}' ~/.bin/vienv \
+    | while read sfx; do alias vi$sfx='vienv '"$sfx"; done
+
 
 # For 'reu' binary investigation tool
 sed -rn '/case/,/esac/{/\s*(\w+)\)\s.*/s//\1/p}' ~/.bin/prg.d/reu \
