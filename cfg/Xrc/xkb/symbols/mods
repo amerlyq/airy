@@ -80,6 +80,15 @@ xkb_symbols "switches"
 // =====================================================
 
 partial modifier_keys
+xkb_symbols "shift_simple" {
+    // Both shift -> ShiftLock, then either shift -> release
+    key.type = "ONE_LEVEL";
+    key <LFSH> { [ Shift_L ] };
+    key <RTSH> { [ Shift_R ] };
+    modifier_map Shift { <LFSH>, <RTSH> };
+};
+
+partial modifier_keys
 xkb_symbols "shift_lock" {
     // Both shift -> ShiftLock, then either shift -> release
     key.type = "TWO_LEVEL";

@@ -1,116 +1,118 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
-
-# Author:   Bert Muennich
-# Website:  http://www.github.com/muennich/urxvt-perls
-# License:  GPLv2
-
-# Use keyboard shortcuts to copy the selection to the clipboard and to paste
-# the clipboard contents (optionally escaping all special characters).
-# Requires xsel to be installed!
-
-# Usage: put the following lines in your .Xdefaults/.Xresources:
+# Use clipboard by keyboard directly in terminal. Config in '.Xresources':
 #   URxvt.perl-ext-common: ...,clipboard
 #   URxvt.keysym.M-c:   perl:clipboard:copy
 #   URxvt.keysym.M-v:   perl:clipboard:paste
 #   URxvt.keysym.M-C-v: perl:clipboard:paste_escaped
-
-# Options:
 #   URxvt.clipboard.autocopy: If true, PRIMARY overwrites clipboard
+# | xsel -ib | xclip -i -selection clipboard | pbcopy
+# | xsel -ob | xclip -o -selection clipboard | pbpaste
 
-# You can also overwrite the system commands to use for copying/pasting.
-# The default ones are:
-#   URxvt.clipboard.copycmd:  xsel -ib
-#   URxvt.clipboard.pastecmd: xsel -ob
-# If you prefer xclip, then put these lines in your .Xdefaults/.Xresources:
-#   URxvt.clipboard.copycmd:  xclip -i -selection clipboard
-#   URxvt.clipboard.pastecmd: xclip -o -selection clipboard
-# On Mac OS X, put these lines in your .Xdefaults/.Xresources:
-#   URxvt.clipboard.copycmd:  pbcopy
-#   URxvt.clipboard.pastecmd: pbpaste
+use warnings;
+use strict;
+use Encode qw(encode decode);
+# package utf8;
+# package urxvt;
+no strict 'subs';  # Use when 'urxvt::*' unimported
 
 
-sub on_start {
-    my ($self) = @_;
-
-    $self->{copy_cmd} = $self->x_resource('clipboard.copycmd') || 'xsel -ib';
-    $self->{paste_cmd} = $self->x_resource('clipboard.pastecmd') || 'xsel -ob';
-
-    if ($self->x_resource('clipboard.autocopy') eq 'true') {
-        $self->enable(sel_grab => \&sel_grab);
+my %modes = (
+    default => sub { return $_[0] =~ s/.*/$0/r; },
+    escaped => sub {  # Escape each character, specific for shell.
+        return $_[0] =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/gr;
+    },
+    execute => sub {  # Trim spaces and compress line breaks, append <CR>.
+        return ($_[0] =~ s/^\s*|\s*$//gr) =~ s/\s*\n+\s*/\n/gr . "\n";
     }
+);
 
-    ()
-}
+sub a_err { print STDERR "Error: unknown action '$_[0]'\n"; }
+sub r_err { print STDERR "Error running: '$_[0]': $!\n"; }
+sub gxres { return $_[0]->x_resource("clipboard.$_[1]"); }
+
 
 sub copy {
     my ($self) = @_;
-
     if (open(CLIPBOARD, "| $self->{copy_cmd}")) {
-        my $sel = $self->selection();
-        utf8::encode($sel);
-        print CLIPBOARD $sel;
+        # utf8::encode($msel);  # Uninicialized subroutine?
+        my $msel = $self->selection();
+        print CLIPBOARD encode('utf8', $msel) if $msel;
         close(CLIPBOARD);
-    } else {
-        print STDERR "error running '$self->{copy_cmd}': $!\n";
-    }
+    } else { r_err $self->{copy_cmd}; }
 
     ()
 }
 
+# THINK could filter from text shortcuts for ZSH like ',s' and ',d'
 sub paste {
-    my ($self) = @_;
-
-    my $str = `$self->{paste_cmd}`;
-    if ($? == 0) {
-        $self->tt_paste($str);
-    } else {
-        print STDERR "error running '$self->{paste_cmd}': $!\n";
-    }
-
-    ()
+    my ($self, $nm) = @_;
+    my $cmd = $self->{paste_cmd};
+    my $str = `$cmd`;
+    # my $str = " \t\t  ls   \n\n   \n  echo   \n\n\n  ls /mnt   \n";
+    # WARNING don't check this code if xsel called inside!
+    if ($? == 0) { $self->tt_paste($modes{$nm}->($str)); }
+    else { r_err $cmd; }
+    { printf("%s -> %s\n", $str, $modes{$nm}->($str)); }
 }
 
-sub paste_escaped {
-    my ($self) = @_;
 
-    my $str = `$self->{paste_cmd}`;
-    if ($? == 0) {
-        $str =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/g;
-        $self->tt_paste($str);
-    } else {
-        print STDERR "error running '$self->{paste_cmd}': $!\n";
-    }
+sub on_action { $_[0]->on_user_command("clipboard:" . $_[1]); () }
 
-    ()
-}
-
-sub on_action {
-    my ($self, $action) = @_;
-
-    on_user_command($self, "clipboard:" . $action);
+sub dbg_osd {
+    my ($self, $dbg) = @_;
+    $self->{overlay}->set(0,0, $self->special_encode($dbg));
+    $self->{overlay}->show();
 }
 
 sub on_user_command {
     my ($self, $cmd) = @_;
+    $_ = $cmd;
 
-    if ($cmd eq "clipboard:copy") {
+    if (/:copy$/) {
         $self->copy;
-    } elsif ($cmd eq "clipboard:paste") {
-        $self->paste;
-    } elsif ($cmd eq "clipboard:paste_escaped") {
-        $self->paste_escaped;
+        $self->dbg_osd("copy");
+
+    } elsif (/:paste:/) {
+        /:(\w+)$/;
+        if ($modes{$1}) {
+            $self->paste($1);
+            $self->dbg_osd("paste");
+        }
+        else { a_err $_; }
     }
 
-    ()
+    ()  # return false : else <consume event>
 }
 
-sub sel_grab {
+sub on_start {
     my ($self) = @_;
-
-    $self->copy;
-
+    $self->{copy_cmd}  = $self->gxres('copycmd')  || 'xsel -ib';
+    $self->{paste_cmd} = $self->gxres('pastecmd') || 'xsel -ob';
+    if ($self->gxres('autocopy') eq 'true') {
+        $self->enable(sel_grab => sub { $self->copy; ()});
+    }
+    if(not $self->{overlay}) {
+        delete $self->{overlay} if $self->{overlay};
+        $self->{overlay} = $self->overlay(-1,-1, 40, 1, 1, 0);
+    }
+    $self->{timer} = urxvt::timer ->new ->interval (1) ->cb (
+        sub { $self->{overlay}->set (0, 0,
+            sprintf "%2d:%02d:%02d", (localtime urxvt::NOW)[2,1,0]);
+        });
     ()
 }
+
+# SEE
+#   http://jbl.web.cern.ch/jbl/doc/urxvt/
+#   http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/src/urxvt.pm#Hooks
+
+# DEV: if xsel don't exist, or there are no forwarding X or inside tmux
+#   :: Try xsel, then termcode for buffer, then pipe through tmp-file (like ssh?)
+# Call function pointer: &{\&{$action}}();
+
+# Better to do it here -- to be independent from used shell.
+#   * insert in start/middle/end -- use 'paste', then 'Enter'
+#   * execute: <C-c> to save current (bad when empty)
+#              <C-u><C-k> to clear (lost prev command)
+#              Copy current line (interact with zsh) then execute and past that line back
