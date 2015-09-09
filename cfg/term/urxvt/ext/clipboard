@@ -130,33 +130,32 @@ sub on_destroy
 # ==================== Confirm multiline past =================
 
 sub leave {
-   my ($self) = @_;
-   $self->{pastestr} = undef;
-   $self->{overlay}->hide();
-   $self->disable("key_press");
+    my ($self) = @_;
+    $self->{pastestr} = undef;
+    $self->{overlay}->hide();
+    $self->disable("key_press");
 }
 
 sub key_press {
-   my ($self, $event, $keysym, $string) =  @_;
+    my ($self, $event, $keysym, $string) =  @_;
+    if ($keysym == 121) { # y
+        $self->tt_paste(${$self->{pastestr}});
+        $self->leave();
+    } elsif ($keysym == 110) { # n
+        $self->leave();
+    }
 
-   if ($keysym == 121) { # y
-      $self->tt_paste(${$self->{pastestr}});
-      $self->leave();
-   } elsif ($keysym == 110) { # n
-      $self->leave();
-   }
-
-   1  # EXPL intercept all keys until confirm choice
+    1  # EXPL intercept all keys until confirm choice
 }
 
 sub on_tt_paste {
-   my ($self, $str) = @_;
-   return unless ($str =~ tr/\012\015//);
+    my ($self, $str) = @_;
+    return unless ($str =~ tr/\012\015//);
 
-   $self->{pastestr} = \$str;
-   # BUG timer must be disabled until leave event
-   $self->status_osd("sure? (y/n)", $str);
-   $self->enable (key_press => \&key_press);
+    $self->{pastestr} = \$str;
+    # BUG timer must be disabled until leave event
+    $self->status_osd("sure? (y/n)", $str);
+    $self->enable (key_press => \&key_press);
 
-   1  # EXPL interrupt paste process
+    1  # EXPL interrupt paste process
 }

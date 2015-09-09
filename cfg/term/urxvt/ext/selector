@@ -4,6 +4,11 @@ use strict;
 use warnings;
 no strict 'subs';  # Use because 'urxvt::*' unimported
 
+our %keymap = (
+    'y' => sub { $_[0]->status_osd("yes"); $_[0]->deactivate(); },
+    'n' => sub { $_[0]->status_osd("no");  $_[0]->deactivate(); },
+);
+
 
 sub status_osd
 {
@@ -12,27 +17,48 @@ sub status_osd
     $status .= $str if $str;
 
     $self->{overlay}->set(0,0, $self->special_encode($status));
-    $self->{overlay}->show();
 }
 
-sub leave {
-   my ($self) = @_;
-   $self->{overlay}->hide();
-   $self->disable("key_press");
+# SEE
+#   http://perldesignpatterns.com/?DispatchTable
+#   http://perldoc.perl.org/perlop.html#Regexp-Quote-Like-Operators
+#   http://perl101.org/arrays.html
+sub fmt_key
+{
+    my ($self, $event, $keysym) =  @_;
+    my $key = '';
+    $key .= 'A-' if ($event->{state} & $self->ModLevel3Mask);
+    $key .= 'M-' if ($event->{state} & $self->ModMetaMask);
+    $key .= 'C-' if ($event->{state} & urxvt::ControlMask);
+    $key .= 'S-' if ($event->{state} & urxvt::ShiftMask);
+    $key .= lc chr($keysym);
+    return $key;
 }
 
 sub key_press {
-   my ($self, $event, $keysym, $string) =  @_;
+    my ($self, $event, $keysym, $string) =  @_;
+    # Check on white list: $action =~ m/[0-9][a-z]/i
+    # my $key = fmt_key(@_);
+    # ($keymap{$key} || sub {})->(@_);
+    # $self->status_osd($key);
 
-   if ($keysym == 121) { # y
-      $self->status_osd("yes");
-      $self->leave();
-   } elsif ($keysym == 110) { # n
-      $self->status_osd("no");
-      $self->leave();
-   }
+    1  # EXPL intercept all keys until confirm choice
+}
 
-   1  # EXPL intercept all keys until confirm choice
+
+sub activate {
+    my ($self) = @_;
+    $self->{overlay}->show();
+    $self->enable (
+        key_press => \&key_press,
+        tt_write  => sub { 1 }
+    );
+}
+
+sub deactivate {
+    my ($self) = @_;
+    $self->{overlay}->hide();
+    $self->disable('key_press', 'tt_write');
 }
 
 
@@ -44,13 +70,9 @@ sub on_user_command
     return () unless s/^selector://;
 
     if (/^run$/) {
-        $self->status_osd("Run? (y/n)");
-        $self->enable (
-            key_press => \&key_press,
-            # tt_write  => sub { 1 }
-        );
-    }
-    else { cmd_err($_); }
+        $self->activate("Run? (y/n)");
+
+    } else { cmd_err($_); }
 
     ()
 }
@@ -67,5 +89,6 @@ sub on_start
 sub on_destroy
 {
     my ($self) = @_;
+    $self->deactivate();
     delete $self->{overlay} if $self->{overlay};
 }
