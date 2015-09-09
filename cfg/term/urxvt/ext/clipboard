@@ -1,118 +1,119 @@
 #!/usr/bin/env perl
-
-# Use clipboard by keyboard directly in terminal. Config in '.Xresources':
+# @ref: MIT, (c) amerlyq, 2015
+# @brief Shell independent copy-paste extension for clipboard by keyboard.
+# @config .Xresources
 #   URxvt.perl-ext-common: ...,clipboard
-#   URxvt.keysym.M-c:   perl:clipboard:copy
-#   URxvt.keysym.M-v:   perl:clipboard:paste
-#   URxvt.keysym.M-C-v: perl:clipboard:paste_escaped
-#   URxvt.clipboard.autocopy: If true, PRIMARY overwrites clipboard
-# | xsel -ib | xclip -i -selection clipboard | pbcopy
-# | xsel -ob | xclip -o -selection clipboard | pbpaste
+#   URxvt*clipboard.copycmd:  xsel -ib  # xclip -i -selection clipboard | pbcopy
+#   URxvt*clipboard.pastecmd: xsel -ob  # xclip -o -selection clipboard | pbpaste
+#   ! updated whenever the PRIMARY selection changes
+#   URxvt*clipboard.autocopy: true
+#   URxvt*keysym.C-S-C:  perl:clipboard:copy
+#   URxvt*keysym.C-S-V:  perl:clipboard:paste:default
+#   URxvt*keysym.M-c:    perl:clipboard:copy
+#   URxvt*keysym.M-v:    perl:clipboard:paste:default
+#   URxvt*keysym.M-C-v:  perl:clipboard:paste:escaped
+#   URxvt*keysym.M-m:    perl:clipboard:paste:execute
+# Inspired by: http://www.github.com/muennich/urxvt-perls
+
 
 use warnings;
 use strict;
 use Encode qw(encode decode);
-# package utf8;
-# package urxvt;
-no strict 'subs';  # Use when 'urxvt::*' unimported
+no strict 'subs';  # Use because 'urxvt::*' unimported
 
+
+## DEV Execute:
+#  * <C-c> to save current (bad when empty)
+#  * <C-u><C-k> to clear (lost prev command)
+#  * Copy current line (interact with zsh) then execute and past that line back
 
 my %modes = (
-    default => sub { return $_[0] =~ s/.*/$0/r; },
-    escaped => sub {  # Escape each character, specific for shell.
-        return $_[0] =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/gr;
-    },
-    execute => sub {  # Trim spaces and compress line breaks, append <CR>.
-        return ($_[0] =~ s/^\s*|\s*$//gr) =~ s/\s*\n+\s*/\n/gr . "\n";
-    }
+    default => sub { return $_[0]; },
+    # Escape each character, specific for shell.
+    escaped => sub { return $_[0] =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/gr; },
+    # Trim spaces and compress line breaks, append <CR>.
+    execute => sub { return ($_[0] =~ s/^\s*|\s*$//gr) =~ s/\s*\n+\s*/\n/gr . "\n"; }
 );
 
-sub a_err { print STDERR "Error: unknown action '$_[0]'\n"; }
-sub r_err { print STDERR "Error running: '$_[0]': $!\n"; }
-sub gxres { return $_[0]->x_resource("clipboard.$_[1]"); }
+sub line_count { return scalar(split('\n', $_[0])); }
+sub text_metrics { return sprintf("%dL> %-d", line_count(@_), length($_[0])); }
+sub status_osd {
+    my ($self, $pref, $msel) = @_;
+    my $status = $pref .': '. ($msel ? text_metrics($msel): "(none)");
+    $self->{overlay}->set(0,0, $self->special_encode($status));
+    $self->{overlay}->show();
+    $self->{timer}->after(1);  # CHECK Can't call method "set" on an undefined value
+}
 
-
+sub run_err { warn "Error running: '$_[0]': $!\n"; () }
 sub copy {
     my ($self) = @_;
-    if (open(CLIPBOARD, "| $self->{copy_cmd}")) {
-        # utf8::encode($msel);  # Uninicialized subroutine?
-        my $msel = $self->selection();
-        print CLIPBOARD encode('utf8', $msel) if $msel;
-        close(CLIPBOARD);
-    } else { r_err $self->{copy_cmd}; }
-
-    ()
+    my $cmd = $self->{copy_cmd};
+    return run_err($cmd) unless (open(CLIPBOARD, "| $cmd"));
+    my $msel = $self->selection();
+    print CLIPBOARD encode('utf8', $msel) if $msel;
+    close(CLIPBOARD);
+    # NOTE  8s -- adjust number by osd width
+    $self->status_osd("copied", $msel);
+    # print encode('utf8', $msel) if $msel;  # REMOVE
 }
 
 # THINK could filter from text shortcuts for ZSH like ',s' and ',d'
 sub paste {
     my ($self, $nm) = @_;
-    my $cmd = $self->{paste_cmd};
-    my $str = `$cmd`;
-    # my $str = " \t\t  ls   \n\n   \n  echo   \n\n\n  ls /mnt   \n";
-    # WARNING don't check this code if xsel called inside!
-    if ($? == 0) { $self->tt_paste($modes{$nm}->($str)); }
-    else { r_err $cmd; }
-    { printf("%s -> %s\n", $str, $modes{$nm}->($str)); }
+    # EXPL need local value to refer it inside subroutines
+    my $str = `$self->{paste_cmd}`;
+    return run_err($self->{paste_cmd}) if $?;
+    $self->tt_paste($modes{$nm}->($str));
+    # printf("%s -> %s\n", $str, $modes{$nm}->($str));  # REMOVE
+    $self->status_osd($nm, $str);
 }
 
 
-sub on_action { $_[0]->on_user_command("clipboard:" . $_[1]); () }
+# WARNING for >v.9.19 (Ubuntu 14.04) used instead of on_user_command
+sub on_action { $_[0]->on_user_command($_[1]); () }
 
-sub dbg_osd {
-    my ($self, $dbg) = @_;
-    $self->{overlay}->set(0,0, $self->special_encode($dbg));
-    $self->{overlay}->show();
-}
-
+sub cmd_err { warn "Error: unknown command '$_[0]'\n"; () }
 sub on_user_command {
     my ($self, $cmd) = @_;
-    $_ = $cmd;
+    $_ = $cmd =~ s/^clipboard://r;
 
-    if (/:copy$/) {
-        $self->copy;
-        $self->dbg_osd("copy");
+    if (/^copy$/) {
+        $self->copy();
 
-    } elsif (/:paste:/) {
+    } elsif (/^paste:/) {
         /:(\w+)$/;
-        if ($modes{$1}) {
-            $self->paste($1);
-            $self->dbg_osd("paste");
-        }
-        else { a_err $_; }
-    }
+        return cmd_err($_) unless $modes{$1};
+        $self->paste($1);
+    } else { cmd_err($_); }
 
     ()  # return false : else <consume event>
 }
 
+
+# DEV (desktop X, headless server, ssh w/o X, tmux/screen)
+#   no X -> termcode copybuffer if <96k else tmp file or in-mem pipe
+#   else -> try consequently xsel, xclip, pbcopy -> treat with no X methods.
+
+sub gxres { return $_[0]->x_resource("clipboard.$_[1]"); }
 sub on_start {
     my ($self) = @_;
     $self->{copy_cmd}  = $self->gxres('copycmd')  || 'xsel -ib';
     $self->{paste_cmd} = $self->gxres('pastecmd') || 'xsel -ob';
     if ($self->gxres('autocopy') eq 'true') {
-        $self->enable(sel_grab => sub { $self->copy; ()});
+        $self->enable(sel_grab => sub { $_[0]->copy; ()});
     }
-    if(not $self->{overlay}) {
-        delete $self->{overlay} if $self->{overlay};
-        $self->{overlay} = $self->overlay(-1,-1, 40, 1, 1, 0);
-    }
-    $self->{timer} = urxvt::timer ->new ->interval (1) ->cb (
-        sub { $self->{overlay}->set (0, 0,
-            sprintf "%2d:%02d:%02d", (localtime urxvt::NOW)[2,1,0]);
-        });
+    my $osdw = 18;
+    $self->{overlay} = $self->overlay(-1,-1, $osdw,1, urxvt::OVERLAY_RSTYLE, 0);
+    $self->{timer} = urxvt::timer ->new ->cb ( sub {
+            $self->{overlay}->hide();
+            $self->{overlay}->set(0, 0, " " x $osdw);  # Clear overlay.
+        } );
     ()
 }
 
-# SEE
-#   http://jbl.web.cern.ch/jbl/doc/urxvt/
-#   http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/src/urxvt.pm#Hooks
-
-# DEV: if xsel don't exist, or there are no forwarding X or inside tmux
-#   :: Try xsel, then termcode for buffer, then pipe through tmp-file (like ssh?)
-# Call function pointer: &{\&{$action}}();
-
-# Better to do it here -- to be independent from used shell.
-#   * insert in start/middle/end -- use 'paste', then 'Enter'
-#   * execute: <C-c> to save current (bad when empty)
-#              <C-u><C-k> to clear (lost prev command)
-#              Copy current line (interact with zsh) then execute and past that line back
+sub on_destroy {
+    my ($self) = @_;
+    delete $self->{overlay} if $self->{overlay};
+    delete $self->{timer} if $self->{timer};
+}

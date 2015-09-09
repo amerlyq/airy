@@ -9,7 +9,6 @@ import os
 # `trap finish EXIT
 class cd_shelldir(Command):
     lastdir = os.path.join(os.getenv('TMPDIR') or '/tmp', 'ranger_cwdir')
-    print(lastdir)
     """:cd_shelldir
     Goes to path from /tmp/<username>/ranger_cwdir
     """
