@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+
+sub on_user_command {
+    my ($term, $cmd) = @_;
+
+    $_ = $cmd;
+    if (/:mon/) {
+        if ($term->{overlay}) {
+            if ($term->{showing}) {
+                $term->disable("add_lines");
+                $term->{overlay}->hide;
+                $term->{showing} = 0;
+            } else {
+                $term->enable(add_lines => \&add_lines);
+                $term->{overlay}->show;
+                $term->{showing} = 1;
+            }
+        } else {
+            $term->enable(add_lines => \&add_lines);
+            $term->{overlay} = $term->overlay_simple(-1, 0, "monitored");
+            $term->{showing} = 1;
+        }
+    } elsif (/:vim/) {
+        my $tempdir = "$ENV{'HOME'}/.urxvt/tmp";
+
+        # Clean up tempfiles
+        opendir DIR, $tempdir;
+        my $latest = 0;
+        while (my $filename = readdir(DIR)) {
+            my $mtime = (stat("$tempdir/$filename"))[9];
+            $latest = $mtime > $latest ? $mtime : $latest;
+        }
+        closedir DIR;
+        opendir DIR, $tempdir;
+        while (my $filename = readdir(DIR)) {
+            my $mtime = (stat("$tempdir/$filename"))[9];
+            if ($mtime && $mtime < $latest - 60 * 60 * 24 * 7) {
+                unlink "$tempdir/$filename";
+            }
+        }
+        closedir DIR;
+
+        # Write scrollback to file
+        use File::Temp qw/ tempfile /;
+        my ($fh, $filename) = tempfile(DIR => $tempdir, SUFFIX => '-urxvt');
+        my $empties = 0;
+        my $previous;
+        for (my $i = $term->top_row; $i < $term->nrow; $i++) {
+            unless (defined $previous && $term->line($i)->beg == $previous) {
+                my $line = $term->line($i)->t;
+                my $cleanline;
+                for (my $j = 0; $j < length($line); $j++) {
+                    my $c = substr($line, $j, 1);
+                    unless (ord($c) == 65535) {
+                        $cleanline .= $c;
+                    }
+                }
+                print $fh $cleanline . "\n";
+                $previous = $term->line($i)->beg
+            }
+
+            # Keep track of trailing empty lines
+            $empties = $term->line($i)->t eq "" ? $empties + 1 : 0;
+        }
+        close $fh;
+
+        # Any need to move the cursor up at all?
+        my $up = $empties ? "${empties}k" : '';
+
+        # Open file in Vim
+        my $vimcmds = "+setl so=0 ts=8 clipboard=unnamed | normal G$up";
+        system("urxvt", "-e", "vim", $vimcmds, $filename);
+    } elsif (/:resetfont/) {
+        $term->cmd_parse("\e]710;" . $term->x_resource("font") . "\007");
+        $term->{fontsize} = 12;
+    } elsif (/:smallerfont/) {
+        if ($term->{fontsize}) {
+            $term->{fontsize} -= 2;
+        } else {
+            $term->{fontsize} = 12;
+        }
+
+        my $font = "xft:DejaVu Sans Mono:pixelsize=" . $term->{fontsize};
+
+        $term->cmd_parse("\e]710;" . $font . "\007");
+    } elsif (/:largerfont/) {
+        if ($term->{fontsize}) {
+            $term->{fontsize} += 2;
+        } else {
+            $term->{fontsize} = 12;
+        }
+
+        my $font = "xft:DejaVu Sans Mono:pixelsize=" . $term->{fontsize};
+
+        $term->cmd_parse("\e]710;" . $font . "\007");
+    }
+    ()
+}
+
+sub add_lines { shift->scr_bell; () }

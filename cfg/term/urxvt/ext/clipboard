@@ -21,6 +21,9 @@ use strict;
 use Encode qw(encode decode);
 no strict 'subs';  # Use because 'urxvt::*' unimported
 
+## DEV Command output:
+#  Copy all text in-between two dividers (currently between prompts)
+#  Move between such zones with j/k -- show overlay as square border around it
 
 ## DEV Execute:
 #  * <C-c> to save current (bad when empty)
@@ -28,15 +31,15 @@ no strict 'subs';  # Use because 'urxvt::*' unimported
 #  * Copy current line (interact with zsh) then execute and past that line back
 
 my %modes = (
-    default => sub { return $_[0]; },
+    default => sub { $_[0]; },
     # Escape each character, specific for shell.
-    escaped => sub { return $_[0] =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/gr; },
+    escaped => sub { $_[0] =~ s/([!#\$%&\*\(\) ='"\\\|\[\]`~,<>\?])/\\$1/gr; },
     # Trim spaces and compress line breaks, append <CR>.
-    execute => sub { return ($_[0] =~ s/^\s*|\s*$//gr) =~ s/\s*\n+\s*/\n/gr . "\n"; }
+    execute => sub { ($_[0] =~ s/^\s*|\s*$//gr) =~ s/\s*\n+\s*/\n/gr . "\n"; }
 );
 
-sub line_count { return scalar(split('\n', $_[0])); }
-sub text_metrics { return sprintf("%dL> %-d", line_count(@_), length($_[0])); }
+sub line_count { scalar(split('\n', $_[0])); }
+sub text_metrics { sprintf("%dL> %-d", line_count(@_), length($_[0])); }
 sub status_osd
 {
     my ($self, $pref, $msel) = @_;
@@ -46,7 +49,7 @@ sub status_osd
     $self->{timer}->after(1);  # CHECK Can't call method "set" on an undefined value
 }
 
-sub run_err { warn "Error running: '$_[0]': $!\n"; () }
+sub run_err { warn "clipboard: error running: '$_[0]': $!\n"; () }
 sub copy
 {
     my ($self) = @_;
@@ -73,14 +76,14 @@ sub paste
 }
 
 
-# WARNING for >v.9.19 (Ubuntu 14.04) used instead of on_user_command
-sub on_action { $_[0]->on_user_command($_[1]); () }
+# EXPL for >v.9.19 (Ubuntu 14.04) used instead of on_user_command
+sub on_action { $_[0]->on_user_command("clipboard:" . $_[1]); () }
 
-sub cmd_err { warn "Error: unknown command '$_[0]'\n"; () }
+sub cmd_err { warn "clipboard: unknown command '$_[0]'\n"; () }
 sub on_user_command
 {
-    my ($self, $cmd) = @_;
-    $_ = $cmd =~ s/^clipboard://r;
+    my ($self, $cmd) = @_; $_ = $cmd;
+    return () unless s/^clipboard://;
 
     if (/^copy$/) {
         $self->copy();
@@ -119,6 +122,41 @@ sub on_start
 sub on_destroy
 {
     my ($self) = @_;
-    delete $self->{overlay} if $self->{overlay};
     delete $self->{timer} if $self->{timer};
+    delete $self->{overlay} if $self->{overlay};
+}
+
+
+# ==================== Confirm multiline past =================
+
+sub leave {
+   my ($self) = @_;
+   $self->{pastestr} = undef;
+   $self->{overlay}->hide();
+   $self->disable("key_press");
+}
+
+sub key_press {
+   my ($self, $event, $keysym, $string) =  @_;
+
+   if ($keysym == 121) { # y
+      $self->tt_paste(${$self->{pastestr}});
+      $self->leave();
+   } elsif ($keysym == 110) { # n
+      $self->leave();
+   }
+
+   1  # EXPL intercept all keys until confirm choice
+}
+
+sub on_tt_paste {
+   my ($self, $str) = @_;
+   return unless ($str =~ tr/\012\015//);
+
+   $self->{pastestr} = \$str;
+   # BUG timer must be disabled until leave event
+   $self->status_osd("sure? (y/n)", $str);
+   $self->enable (key_press => \&key_press);
+
+   1  # EXPL interrupt paste process
 }

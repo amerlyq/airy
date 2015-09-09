@@ -5,8 +5,11 @@
 ! DISABLED: tabbedex, matcher
 ! URxvt*perl-lib:      ~/.urxvt/ext
 URxvt*perl-ext-common: default,clipboard,keyboard-select,url-select,\
-autocomplete,focus-events,fork-cwd,vtwheel,color-themes,font-size
+autocomplete,focus-events,fork-cwd,vtwheel,color-themes,font-size,selector
 
+
+! REMOVE
+URxvt*keysym.M-e:    perl:selector:run
 
 !! === Standart =========================
 ! NOTE: PrtSc is binded by wm, so only C/S-PrtSc works (scrollback + screen)

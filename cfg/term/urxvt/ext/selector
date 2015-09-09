@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+no strict 'subs';  # Use because 'urxvt::*' unimported
+
+
+sub status_osd
+{
+    my ($self, $pref, $str) = @_;
+    my $status = $pref .': ';
+    $status .= $str if $str;
+
+    $self->{overlay}->set(0,0, $self->special_encode($status));
+    $self->{overlay}->show();
+}
+
+sub leave {
+   my ($self) = @_;
+   $self->{overlay}->hide();
+   $self->disable("key_press");
+}
+
+sub key_press {
+   my ($self, $event, $keysym, $string) =  @_;
+
+   if ($keysym == 121) { # y
+      $self->status_osd("yes");
+      $self->leave();
+   } elsif ($keysym == 110) { # n
+      $self->status_osd("no");
+      $self->leave();
+   }
+
+   1  # EXPL intercept all keys until confirm choice
+}
+
+
+sub on_action { $_[0]->on_user_command($_[1]); () }
+sub cmd_err { warn "selector: unknown command '$_[0]'\n"; () }
+sub on_user_command
+{
+    my ($self, $cmd) = @_; $_ = $cmd;
+    return () unless s/^selector://;
+
+    if (/^run$/) {
+        $self->status_osd("Run? (y/n)");
+        $self->enable (
+            key_press => \&key_press,
+            # tt_write  => sub { 1 }
+        );
+    }
+    else { cmd_err($_); }
+
+    ()
+}
+
+sub on_start
+{
+    my ($self) = @_;
+    $self->{overlay} = $self->overlay(0,-1, $self->ncol,1, urxvt::OVERLAY_RSTYLE, 0);
+    $self->{overlay}->hide();
+
+    ()
+}
+
+sub on_destroy
+{
+    my ($self) = @_;
+    delete $self->{overlay} if $self->{overlay};
+}
