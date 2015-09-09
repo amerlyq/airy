@@ -37,7 +37,8 @@ my %modes = (
 
 sub line_count { return scalar(split('\n', $_[0])); }
 sub text_metrics { return sprintf("%dL> %-d", line_count(@_), length($_[0])); }
-sub status_osd {
+sub status_osd
+{
     my ($self, $pref, $msel) = @_;
     my $status = $pref .': '. ($msel ? text_metrics($msel): "(none)");
     $self->{overlay}->set(0,0, $self->special_encode($status));
@@ -46,7 +47,8 @@ sub status_osd {
 }
 
 sub run_err { warn "Error running: '$_[0]': $!\n"; () }
-sub copy {
+sub copy
+{
     my ($self) = @_;
     my $cmd = $self->{copy_cmd};
     return run_err($cmd) unless (open(CLIPBOARD, "| $cmd"));
@@ -59,7 +61,8 @@ sub copy {
 }
 
 # THINK could filter from text shortcuts for ZSH like ',s' and ',d'
-sub paste {
+sub paste
+{
     my ($self, $nm) = @_;
     # EXPL need local value to refer it inside subroutines
     my $str = `$self->{paste_cmd}`;
@@ -74,7 +77,8 @@ sub paste {
 sub on_action { $_[0]->on_user_command($_[1]); () }
 
 sub cmd_err { warn "Error: unknown command '$_[0]'\n"; () }
-sub on_user_command {
+sub on_user_command
+{
     my ($self, $cmd) = @_;
     $_ = $cmd =~ s/^clipboard://r;
 
@@ -95,12 +99,12 @@ sub on_user_command {
 #   no X -> termcode copybuffer if <96k else tmp file or in-mem pipe
 #   else -> try consequently xsel, xclip, pbcopy -> treat with no X methods.
 
-sub gxres { return $_[0]->x_resource("clipboard.$_[1]"); }
-sub on_start {
+sub on_start
+{
     my ($self) = @_;
-    $self->{copy_cmd}  = $self->gxres('copycmd')  || 'xsel -ib';
-    $self->{paste_cmd} = $self->gxres('pastecmd') || 'xsel -ob';
-    if ($self->gxres('autocopy') eq 'true') {
+    $self->{copy_cmd}  = $self->x_resource('%.copycmd')  || 'xsel -ib';
+    $self->{paste_cmd} = $self->x_resource('%.pastecmd') || 'xsel -ob';
+    if ($self->x_resource_boolean('%.autocopy')) {
         $self->enable(sel_grab => sub { $_[0]->copy; ()});
     }
     my $osdw = 18;
@@ -112,7 +116,8 @@ sub on_start {
     ()
 }
 
-sub on_destroy {
+sub on_destroy
+{
     my ($self) = @_;
     delete $self->{overlay} if $self->{overlay};
     delete $self->{timer} if $self->{timer};
