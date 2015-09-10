@@ -14,7 +14,7 @@ package urxcommon;
 # =================== Package ========================
 
 use warnings;
-use strict;  # "vars"
+use strict "vars";
 # no strict 'subs';  # because 'urxvt::*' unimported
 use Exporter;
 use lib '/usr/lib/urxvt';
@@ -42,21 +42,29 @@ sub text_metrics { sprintf("%dL> %-d", line_count($_[0]), length($_[0])); }
 
 # =================== Convertors ========================
 # Input events
+sub std_mod {
+    my ($term, $event) = @_;
+    my $mod = '';
+    $mod .= 'A-' if ($event->{state} & $term->ModLevel3Mask);
+    $mod .= 'M-' if ($event->{state} & $term->ModMetaMask);
+    $mod .= 'C-' if ($event->{state} & urxvt::ControlMask);
+    $mod .= 'S-' if ($event->{state} & urxvt::ShiftMask);
+    return $mod;
+}
+sub std_key {
+    my ($term, $keysym) = @_;
+    my $key = $term->XKeysymToString($keysym);
+    return (1 == length($key) ? lc $key : $key);
+}
 sub fmt_key
 {
     my ($term, $event, $keysym) = @_;
-    my $key = '';
-    if (0x20 <= $keysym && $keysym < 0x80) {
-        $key .= 'A-' if ($event->{state} & $term->ModLevel3Mask);
-        $key .= 'M-' if ($event->{state} & $term->ModMetaMask);
-        $key .= 'C-' if ($event->{state} & urxvt::ControlMask);
-        $key .= 'S-' if ($event->{state} & urxvt::ShiftMask);
-        $key .= lc chr($keysym);
-    }
-    return $key;
+    # if (0x20 <= $keysym && $keysym < 0x80) {
+    return std_mod($term, $event) . std_key($term, $keysym);
 }
 
 # =================== Common urxvt api impl ========================
 
 # EXPL for >v.9.19 (Ubuntu 14.04) used instead of on_user_command
+# BUG need prepend extension name!
 sub on_action { $_[0]->on_user_command($_[1]); () }

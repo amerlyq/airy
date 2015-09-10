@@ -5,13 +5,37 @@ use strict;
 use lib "$ENV{HOME}/.urxvt/ext";
 use urxcommon qw(:API);
 
-my %keymap = (
-    'y' => sub { $_[0]->status_osd("yes"); $_[0]->deactivate(); },
-    'n' => sub { $_[0]->status_osd("no");  $_[0]->deactivate(); },
+
+my %actions = (
+    close => sub { $_[0]->status_osd("no");  $_[0]->deactivate(); },
+    openx => sub { print 'x-www',"\n"; },
+    # openx => sub { $_[0]->exec_async(@{$_[0]->{browser}}, ${$self->{found}[$self->{n}]}[4]); }
+    yank  => sub { $_[0]->status_osd("yes"); print 'yank',"\n"; },
 );
+
+# Wrapper: curry (args bind) impl by closure
+sub staying { my $fnm = shift; $actions{$fnm} }
+sub closing { my $f = $actions{(shift)}; sub { $f->(@_); deactivate(@_); } }
+
+my %keymap = (
+    q => staying('close'), Escape => staying('close'), 'C-c' => staying('close'),
+    o => staying('openx'), Return => closing('openx'),
+    y => staying('yank'),   'S-y' => closing('yank'),
+);
+
 
 # DEV for hints use vertical overlay over whole screen on left side
 #   (two char width)
+# DEV bind to current visible text (plus some lines around which contain
+# visible parts of links/pathes)
+# DEV open file path in vim/ranger/xsel current/nested/fork/float
+# THINK toggle on_line_update by shortcut or osc code from lau-serial?
+#       man says it could spend alot of time on filtering and redrawing...
+#       possibly dropping some of output
+# NEED keep selected cursor position and highlight when re-activate
+# FIX long multiline url -- concatenate and refine before launching in browser
+# BUG press Return -- when in active mode -- first time has no effect.
+
 
 sub status_osd
 {
@@ -27,7 +51,7 @@ sub key_press
     my ($self, $event, $keysym, $string) =  @_;
     my $key = fmt_key($self, $event, $keysym);
     # Check on white list: $action =~ m/[0-9][a-z]/i
-    ($keymap{$key} || sub {})->($self);
+    ($keymap{$key} || sub {})->($self, $key);
     $self->status_osd($key);
 
     1  # EXPL intercept all keys until confirm choice

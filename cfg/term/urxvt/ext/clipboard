@@ -101,6 +101,7 @@ sub on_start
     $self->{copy_cmd}  = $self->x_resource('%.copycmd')  || 'xsel -ib';
     $self->{paste_cmd} = $self->x_resource('%.pastecmd') || 'xsel -ob';
     if ($self->x_resource_boolean('%.autocopy')) {
+        # Returning a true value aborts selection grabbing. It will still be highlighted.
         $self->enable(sel_grab => sub { $_[0]->copy; ()});
     }
     my $osdw = 18;
@@ -142,12 +143,12 @@ sub key_press {
 }
 
 sub on_tt_paste {
-    my ($self, $str) = @_;
-    return unless ($str =~ tr/\012\015//);
+    my ($self, $octets) = @_;
+    return unless ($octets =~ tr/\012\015//);
 
-    $self->{pastestr} = \$str;
+    $self->{pastestr} = \$octets;
     # BUG timer must be disabled until leave event
-    $self->status_osd("sure? (y/n)", $str);
+    $self->status_osd("sure? (y/n)", $self->locale_decode($octets));
     $self->enable (key_press => \&key_press);
 
     1  # EXPL interrupt paste process
