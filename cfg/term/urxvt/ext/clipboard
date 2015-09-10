@@ -15,11 +15,13 @@
 #   URxvt*keysym.M-m:    perl:clipboard:paste:execute
 # Inspired by: http://www.github.com/muennich/urxvt-perls
 
-
 use warnings;
 use strict;
-use Encode qw(encode decode);
-no strict 'subs';  # Use because 'urxvt::*' unimported
+use lib "$ENV{HOME}/.urxvt/ext";
+use urxcommon qw(&cmd_err &run_err &text_metrics);
+
+## BUG -- open window, do M-c -- copy (none), then M-m paste
+#       -> first empty (wrong), then pastes some values from "+ (right).
 
 ## DEV Command output:
 #  Copy all text in-between two dividers (currently between prompts)
@@ -38,8 +40,6 @@ my %modes = (
     execute => sub { ($_[0] =~ s/^\s*|\s*$//gr) =~ s/\s*\n+\s*/\n/gr . "\n"; }
 );
 
-sub line_count { scalar(split('\n', $_[0])); }
-sub text_metrics { sprintf("%dL> %-d", line_count(@_), length($_[0])); }
 sub status_osd
 {
     my ($self, $pref, $msel) = @_;
@@ -49,18 +49,15 @@ sub status_osd
     $self->{timer}->after(1);  # CHECK Can't call method "set" on an undefined value
 }
 
-sub run_err { warn "clipboard: error running: '$_[0]': $!\n"; () }
 sub copy
 {
     my ($self) = @_;
     my $cmd = $self->{copy_cmd};
     return run_err($cmd) unless (open(CLIPBOARD, "| $cmd"));
     my $msel = $self->selection();
-    print CLIPBOARD encode('utf8', $msel) if $msel;
+    if ($msel) { utf8::encode $msel; print CLIPBOARD $msel; }
     close(CLIPBOARD);
-    # NOTE  8s -- adjust number by osd width
     $self->status_osd("copied", $msel);
-    # print encode('utf8', $msel) if $msel;  # REMOVE
 }
 
 # THINK could filter from text shortcuts for ZSH like ',s' and ',d'
@@ -76,10 +73,6 @@ sub paste
 }
 
 
-# EXPL for >v.9.19 (Ubuntu 14.04) used instead of on_user_command
-sub on_action { $_[0]->on_user_command("clipboard:" . $_[1]); () }
-
-sub cmd_err { warn "clipboard: unknown command '$_[0]'\n"; () }
 sub on_user_command
 {
     my ($self, $cmd) = @_; $_ = $cmd;

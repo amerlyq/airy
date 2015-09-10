@@ -22,7 +22,7 @@ alias shutdown='sudo /sbin/shutdown'
 alias free='free -h'
 # в /proc/sys/vm/ есть файл swappiness - понизь его на десяток-другой. 60 - оптимальное значение.
 alias reswap='sudo swapoff -a && sudo swapon -a && free'
-alias recache='free && sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free'
+alias recache='free && sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && reswap'
 
 
 # --- Shorts ---

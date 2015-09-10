@@ -1,14 +1,17 @@
 #!/usr/bin/env perl
 
-use strict;
 use warnings;
-no strict 'subs';  # Use because 'urxvt::*' unimported
+use strict;
+use lib "$ENV{HOME}/.urxvt/ext";
+use urxcommon qw(:API);
 
-our %keymap = (
+my %keymap = (
     'y' => sub { $_[0]->status_osd("yes"); $_[0]->deactivate(); },
     'n' => sub { $_[0]->status_osd("no");  $_[0]->deactivate(); },
 );
 
+# DEV for hints use vertical overlay over whole screen on left side
+#   (two char width)
 
 sub status_osd
 {
@@ -19,28 +22,13 @@ sub status_osd
     $self->{overlay}->set(0,0, $self->special_encode($status));
 }
 
-# SEE
-#   http://perldesignpatterns.com/?DispatchTable
-#   http://perldoc.perl.org/perlop.html#Regexp-Quote-Like-Operators
-#   http://perl101.org/arrays.html
-sub fmt_key
+sub key_press
 {
-    my ($self, $event, $keysym) =  @_;
-    my $key = '';
-    $key .= 'A-' if ($event->{state} & $self->ModLevel3Mask);
-    $key .= 'M-' if ($event->{state} & $self->ModMetaMask);
-    $key .= 'C-' if ($event->{state} & urxvt::ControlMask);
-    $key .= 'S-' if ($event->{state} & urxvt::ShiftMask);
-    $key .= lc chr($keysym);
-    return $key;
-}
-
-sub key_press {
     my ($self, $event, $keysym, $string) =  @_;
+    my $key = fmt_key($self, $event, $keysym);
     # Check on white list: $action =~ m/[0-9][a-z]/i
-    # my $key = fmt_key(@_);
-    # ($keymap{$key} || sub {})->(@_);
-    # $self->status_osd($key);
+    ($keymap{$key} || sub {})->($self);
+    $self->status_osd($key);
 
     1  # EXPL intercept all keys until confirm choice
 }
@@ -62,15 +50,15 @@ sub deactivate {
 }
 
 
-sub on_action { $_[0]->on_user_command($_[1]); () }
-sub cmd_err { warn "selector: unknown command '$_[0]'\n"; () }
 sub on_user_command
 {
     my ($self, $cmd) = @_; $_ = $cmd;
     return () unless s/^selector://;
 
     if (/^run$/) {
-        $self->activate("Run? (y/n)");
+        # print "S:", @INC, "\n";
+        $self->status_osd("Run? (y/n)");
+        $self->activate();
 
     } else { cmd_err($_); }
 

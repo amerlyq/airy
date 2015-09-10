@@ -19,14 +19,6 @@ xkb_compatibility "latch"  {
     // ----------------------------------------------
     latchMods.latchToLock= True;
 
-    interpret Shift_L {
-        action= LatchMods(modifiers=Shift);
-    };
-
-    interpret Shift_R {
-        action= LatchMods(modifiers=Shift);
-    };
-
     interpret Control_R {
         action= LatchMods(modifiers=Control);
     };
@@ -54,6 +46,14 @@ xkb_compatibility "latch"  {
 
     // ----------------------------------------------
     latchMods.latchToLock= False;
+
+    interpret Shift_L {
+        action= LatchMods(modifiers=Shift);
+    };
+
+    interpret Shift_R {
+        action= LatchMods(modifiers=Shift);
+    };
 
     interpret Super_L+Any {
         //useModMapMods= level1;

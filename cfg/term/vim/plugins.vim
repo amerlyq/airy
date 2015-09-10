@@ -304,6 +304,7 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
 " NeoBundle 'cakebaker/scss-syntax.vim'
 " NeoBundle 'gorodinskiy/vim-coloresque'
 
+NeoBundle 'vim-perl/vim-perl'
 NeoBundle 'scrooloose/syntastic'
 
 " Autoformatting with one button, can use custom (like clang-styler)

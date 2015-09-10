@@ -52,3 +52,4 @@ let g:syntastic_loc_list_height=5
 
 """ Python """
 let g:syntastic_python_checkers = []
+let g:syntastic_enable_perl_checker = 1
