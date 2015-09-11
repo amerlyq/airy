@@ -1,57 +1,53 @@
 #!/bin/bash
 
-alias info='info --vi-keys'
-
-# build
-alias make="make -j4"
-
-# Allow using sudo with aliases
-alias sudo='sudo '
-# alias su='sudo -i'
-# alias root='sudo -i'
-
+alias info='info --vi-keys'  # Vim navigation inside 'info' as in 'man'
+alias make="make -j4"       # multithread build
+alias sort='LC_ALL=C sort'  # fix sorting order
 # ALT: sudo vbetool dpms [on/off]
 alias off='xset -d :0 dpms force off'
-alias powertop='sudo powertop' # --calibrate
 
-alias reboot='sudo /sbin/reboot'
-alias poweroff='sudo /sbin/poweroff'
-alias halt='sudo /sbin/halt'
-alias shutdown='sudo /sbin/shutdown'
-
+# --- State ---
 alias free='free -h'
 # в /proc/sys/vm/ есть файл swappiness - понизь его на десяток-другой. 60 - оптимальное значение.
 alias reswap='sudo swapoff -a && sudo swapon -a && free'
 alias recache='free && sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && reswap'
 
-
-# --- Shorts ---
-if (( EUID != 0 )); then
-    alias apt-get='sudo apt-get'
-    alias dpkg='sudo dpkg'
-    alias dpkg-reconfigure='sudo dpkg-reconfigure'
-    alias pkill='sudo pkill '
-    # alias debup='aptitude update && aptitude safe-upgrade'
-    # alias debup_old='aptitude update && aptitude upgrade'
-fi
-
+# --- Packages ---
 alias apti='apt-get install'
 alias apts='apt-cache search'
-alias update='sudo apt-get update && sudo apt-get upgrade'
+alias update='apt-get update && apt-get upgrade'
+# alias debup='aptitude update && aptitude safe-upgrade'
+# alias debup_old='aptitude update && aptitude upgrade'
 
 
-# --- Insurance ---
-alias sort='LC_ALL=C sort'
-alias mv='mv -i'
+# --- Insurance and rights ---
+alias mv='mv -iv'
 alias cp='cp -iv'
-alias ln='ln -i'
+alias ln='ln -iv'
 alias rm='rm -Iv --preserve-root'
 alias chown='chown --preserve-root'
+alias chownm='chown $CURR_USER:$CURR_USER'
+alias chownr='chown $CURR_USER:$CURR_USER'
 alias chmod='chmod --preserve-root'
 alias chgrp='chgrp --preserve-root'
+
 
 # Very useful and nut aliases:
 # http://brettterpstra.com//2013/03/31/a-few-more-of-my-favorite-shell-aliases/
 # new commands
-# alias susp="sudo pm-suspend && xlock -mode matrix"
-# alias wifi="sudo netctl-auto switch-to"
+# alias susp="pm-suspend && xlock -mode matrix"
+# alias wifi="netctl-auto switch-to"
+
+
+# --- Shorts for non-root ---
+if (( EUID != 0 )); then
+    SUDOLST=(chown chmod pkill powertop)   # --calibrate
+    SUDOLST+=(apt-get dpkg dpkg-reconfigure)
+    SUDOLST+=(reboot poweroff halt shutdown)
+    for nm in "${SUDOLST[@]}"; do
+        alias $nm='sudo '"$nm"' '
+    done
+    unset SUDOLST
+fi
+alias sudo='sudo '  # Allow using sudo with aliases
+# alias su='sudo -i'

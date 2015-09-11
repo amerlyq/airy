@@ -3,8 +3,12 @@ source ~/.shell/func.d/packages
 
 pkg_inst dictd
 
-if distro ubuntu; then
+if distro arch; then
+    echo "Err: no yarxi"
+
+elif distro ubuntu; then
     pkg_inst dict
+    deb_inst 'http://www.susi.ru/yarxi/yarxi_1.10-1_amd64.deb'
 fi
 
 # dict-moby-thesaurus dict-gcide dict-freedict-eng-rus dict-wn dict-devil

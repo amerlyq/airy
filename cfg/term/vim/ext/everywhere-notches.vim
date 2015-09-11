@@ -24,15 +24,16 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 " White
 
 let g:everywhere_activated = 1
+" UNUSED: 6 - light blue, 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Did': 10,
-      \ 'Dev': 4, 'Msg': 7, 'Tbd': 5, 'Alt': 3 }
+      \ 'Dev': 4, 'Msg': 13, 'Tbd': 5, 'Alt': 3 }
 let s:patterns = {
-      \ 'Err': 'ERR(OR)=|BUG',
-      \ 'Fix': 'FIX(ME)=|WARNING|ATTENTION|REMOVE',
+      \ 'Err': 'ERR%(OR)=|BUG',
+      \ 'Fix': 'FIX%(ME)=|WARNING|ATTENTION|REMOVE',
       \ 'Add': 'ADD|SEE|NEED|FIND',
       \ 'Did': 'DONE|FIXED|EXPL',
       \ 'Dev': 'DEV|HACK',
-      \ 'Msg': 'NOTE',
+      \ 'Msg': 'NOTE|OPT%(ION)=%(S)=',
       \ 'Tbd': 'TODO|CHECK|TRY',
       \ 'Alt': 'ALT|OR|THINK|CHG',
       \ }

@@ -7,22 +7,28 @@ use urxcommon qw(:API);
 
 
 my %actions = (
-    close => sub { $_[0]->status_osd("no");  $_[0]->deactivate(); },
+    close => sub { $_[0]->deactivate(); },
     openx => sub { print 'x-www',"\n"; },
     # openx => sub { $_[0]->exec_async(@{$_[0]->{browser}}, ${$self->{found}[$self->{n}]}[4]); }
     yank  => sub { $_[0]->status_osd("yes"); print 'yank',"\n"; },
+    next => sub { print 'next',"\n"; },
+    prev => sub { print 'prev',"\n"; },
+    frst => sub { print 'frst',"\n"; },
+    last => sub { print 'last',"\n"; },
 );
 
-# Wrapper: curry (args bind) impl by closure
-sub staying { my $fnm = shift; $actions{$fnm} }
-sub closing { my $f = $actions{(shift)}; sub { $f->(@_); deactivate(@_); } }
+sub staying { makecurry(\%actions, @_) }
+sub closing { staying(@_, 'close') }
 
 my %keymap = (
-    q => staying('close'), Escape => staying('close'), 'C-c' => staying('close'),
-    o => staying('openx'), Return => closing('openx'),
-    y => staying('yank'),   'S-y' => closing('yank'),
+    o => staying('openx'),
+    y => staying('yank'),
+    pairto(qw(j Down Right) => staying('next')),
+    pairto(qw(k   Up  Left) => staying('prev')),
+    pairto(qw(O S-o Return) => closing('openx')),
+    pairto(qw(Y S-y)        => closing('yank')),
+    pairto(qw(q Escape C-c) => closing()),
 );
-
 
 # DEV for hints use vertical overlay over whole screen on left side
 #   (two char width)

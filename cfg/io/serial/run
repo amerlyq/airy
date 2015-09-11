@@ -7,4 +7,8 @@
 
 # Exit: C-a,C-x,  --escape x
 # Resize (shell inside com): stty rows lines cols columns
-picocom --baud 115200 --flow n --databits 8 --parity n ${1:-/dev/ttyUSB0}
+case "$1"
+in [0-9]|"") dev=/dev/ttyUSB${1:-0}
+;; *) dev="$1" ;; esac
+
+picocom --baud 115200 --flow n --databits 8 --parity n ${dev?No}

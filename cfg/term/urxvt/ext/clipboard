@@ -26,7 +26,8 @@ use urxcommon qw(&cmd_err &run_err &text_metrics);
 ## DEV Command output:
 #  Copy all text in-between two dividers (currently between prompts)
 #  Move between such zones with j/k -- show overlay as square border around it
-
+## DEV M-C-y -- copy whole line where cursor is.
+#  by regex (to remove PS1 and PS2) -- when have no zsh.
 ## DEV Execute:
 #  * <C-c> to save current (bad when empty)
 #  * <C-u><C-k> to clear (lost prev command)
@@ -121,7 +122,7 @@ sub on_destroy
 }
 
 
-# ==================== Confirm multiline past =================
+# ==================== Confirm multiline insert =================
 
 sub leave {
     my ($self) = @_;

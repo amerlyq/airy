@@ -24,8 +24,10 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION     = 1.00;
 @ISA         = qw(Exporter);
 @EXPORT      = qw(on_action);  # Always
-@EXPORT_OK   = qw(cmd_err run_err line_count text_metrics fmt_key);  # On demand
-%EXPORT_TAGS = (API => [qw(&cmd_err &run_err &line_count &text_metrics &fmt_key)]);
+@EXPORT_OK   = qw(cmd_err run_err line_count text_metrics
+                  pairto makecurry fmt_key);  # On demand
+%EXPORT_TAGS = (API => [qw(&cmd_err &run_err &line_count &text_metrics
+                        &pairto &makecurry &fmt_key)]);
 
 
 # =================== Embed ========================
@@ -41,7 +43,17 @@ sub line_count { scalar(split('\n', $_[0])); }
 sub text_metrics { sprintf("%dL> %-d", line_count($_[0]), length($_[0])); }
 
 # =================== Convertors ========================
-# Input events
+
+# Wrapper for action tuples: curry (args bind) impl by closure
+sub pairto { my $val = pop @_; map { $_=> $val } @_ }
+sub makecurry {
+    my ($hmap, @nms) = @_;
+    my @funs = map { $hmap->{$_} if $_ } @nms;
+    return sub { $_->(@_) foreach @funs; }
+    # ALT return eval "sub {". map { "$_" . '->(@_);' } @funs ."}"; }
+}
+
+# ALT always use 'Y' instead 'S-y' -- then no need to augment XKeysymToString
 sub std_mod {
     my ($term, $event) = @_;
     my $mod = '';
@@ -56,6 +68,8 @@ sub std_key {
     my $key = $term->XKeysymToString($keysym);
     return (1 == length($key) ? lc $key : $key);
 }
+
+# Input events
 sub fmt_key
 {
     my ($term, $event, $keysym) = @_;

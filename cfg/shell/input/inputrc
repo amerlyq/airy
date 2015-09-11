@@ -1,5 +1,6 @@
 # ~/.inputrc  -- Individual readline (for bash) initialization file
 # http://linux.die.net/man/3/readline
+# >>> TODO http://man7.org/linux/man-pages/man3/readline.3.html
 
 # If  ~/.inputrc doesn't work, then you need to add
 # export INPUTRC=~/.inputrc
@@ -31,6 +32,7 @@ $if mode=vi
     "\C-t": forward-word
     "\C-q": backward-word
 
+    "\C-^": self-insert
     "\C-_": undo
     "\C-z": undo
     "\C-d": delete-char
@@ -51,6 +53,10 @@ $if mode=vi
     "\e\C-]": character-search-backward
     # "\C-p": menu-complete
 
+    # ZSH shortcuts -- keeps last line in past buffer
+    ",s": "\C-e\C-us\n"
+    ",d": "\C-e\C-uq\n"
+
     set keymap vi-command
 
     "\C-p": history-search-backward
@@ -62,12 +68,20 @@ $if mode=vi
     # "\ep":  yank-last-arg
     # "\C-x": re-read-init-file
 
+    # ZSH shortcuts
+     "s": "ccs\n"
+     "q": "ccq\n"
+    ",d": "ccq\n
+
 $endif
 
 "\C-j": accept-line
 
-## show insert and command mode as chars to left of prompt
+## Show insert and command mode as chars to left of prompt
 # set show-mode-in-prompt on
+
+# Timeout for ambiguous bindings like <Esc> and ',s'
+set keyseq-timeout 200
 
 # do not casesensitive completion
 set completion-ignore-case on
@@ -94,7 +108,6 @@ set skip-completed-text on
 
 # Completed names which are symbolic links to directories have a slash appended.
 set mark-symlinked-directories on
-
 
 # see /usr/share/doc/bash/inputrc.arrows for other codes of arrow keys
 # allow the use of the Home/End keys

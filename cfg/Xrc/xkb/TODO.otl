@@ -1,5 +1,7 @@
 Xkbmap
 	[_] BUG: xcape is randomly crashed -- maybe too much combo?
+	[_] BUG: when pressing both Alt+Shift -- they aren't latched
+		:= maybe it's consequence of *.clearMods = true inside ./compat/
 	[_] FIXME: can't use overlay xkb mapping on LAlt-LCtrl
 		Cause vbox after windows treats LCtrl and Caps as same keycode
 	2015-09-06 [X] Try xkeymap -- so kbdd will not be closing gmail pop-up or vk focus
