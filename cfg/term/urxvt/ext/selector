@@ -1,20 +1,23 @@
-#!/usr/bin/env perl
-
-use warnings;
-use strict;
+# vim: ft=perl
+# LOADED: package $pkg; use strict 'vars'; use utf8; no warnings 'utf8';
 use lib "$ENV{HOME}/.urxvt/ext";
 use urxcommon qw(:API);
 
+# =================== CONFIG ========================
 
 my %actions = (
-    close => sub { $_[0]->deactivate(); },
-    openx => sub { print 'x-www',"\n"; },
-    # openx => sub { $_[0]->exec_async(@{$_[0]->{browser}}, ${$self->{found}[$self->{n}]}[4]); }
-    yank  => sub { $_[0]->status_osd("yes"); print 'yank',"\n"; },
-    next => sub { print 'next',"\n"; },
-    prev => sub { print 'prev',"\n"; },
-    frst => sub { print 'frst',"\n"; },
-    last => sub { print 'last',"\n"; },
+    start => sub { print "\nstart\n"; $_[0]->activate(); },
+    close => sub { print "close\n\n"; $_[0]->deactivate(); },
+    openx => sub { print "x-www\n";
+        print @{$_[0]->{browser}}; print $_[0]->{current}->{link}; },
+    yank => sub { print "yank\n";
+        $_[0]->select_pattern(@_); $_[0]->status_osd("yes"); },
+    next => sub { print "next\n";
+        $_[0]->{posi}[0] = $_[0]->{posi}[2] += 1; },
+    prev => sub { print "prev\n";
+        $_[0]->{posi}[0] = $_[0]->{posi}[2] -= 1; },
+    home => sub { print "frst\n"; },
+    end  => sub { print "last\n"; },
 );
 
 sub staying { makecurry(\%actions, @_) }
@@ -23,25 +26,46 @@ sub closing { staying(@_, 'close') }
 my %keymap = (
     o => staying('openx'),
     y => staying('yank'),
-    pairto(qw(j Down Right) => staying('next')),
-    pairto(qw(k   Up  Left) => staying('prev')),
-    pairto(qw(O S-o Return) => closing('openx')),
-    pairto(qw(Y S-y)        => closing('yank')),
-    pairto(qw(q Escape C-c) => closing()),
+
+    paired(qw( O S-o Return ) => closing('openx')),
+    paired(qw( Y S-y C-y )    => closing('yank')),
+    paired(qw( q C-c Escape ) => closing()),
+
+    paired(qw( g Home ) => staying('home')),
+    paired(qw( G End  ) => staying('end')),
+    paired(qw( j Down Right ) => staying('next')),
+    paired(qw( k Up   Left  ) => staying('prev')),
+    paired(qw( C-p Prior  Page_Up ) => staying('pgup')),
+    paired(qw( C-n Next Page_Down ) => staying('pgdn')),
 );
 
-# DEV for hints use vertical overlay over whole screen on left side
-#   (two char width)
-# DEV bind to current visible text (plus some lines around which contain
-# visible parts of links/pathes)
-# DEV open file path in vim/ranger/xsel current/nested/fork/float
-# THINK toggle on_line_update by shortcut or osc code from lau-serial?
-#       man says it could spend alot of time on filtering and redrawing...
-#       possibly dropping some of output
-# NEED keep selected cursor position and highlight when re-activate
-# FIX long multiline url -- concatenate and refine before launching in browser
-# BUG press Return -- when in active mode -- first time has no effect.
+# =================== IMPL ========================
 
+sub search_next
+{
+    my ($self) = @_;
+    # $self->{posi}[0] += 1;
+
+    $self->want_refresh();
+}
+
+sub select_pattern
+{
+    my ($self, $event) = @_;
+    # return unless $self->{autocopy};
+    # return unless $self->{found};
+
+    my @pos = @{$self->{posi}};
+    print "s:",@pos,"\n";
+
+    # NOTE used only for copying to PRIMARY
+    # $self->selection_beg($pos[0], $pos[1]);
+    # $self->selection_end($pos[2], $pos[3]);
+    # $self->selection_make($event->{time});
+    # EXPL used to clear selection after copying
+    # $self->selection_beg(1, 0);
+    # $self->selection_end(1, 0);
+}
 
 sub status_osd
 {
@@ -52,45 +76,54 @@ sub status_osd
     $self->{overlay}->set(0,0, $self->special_encode($status));
 }
 
-sub key_press
+sub paint {
+    my ($self) = @_;
+    $self->scr_xor_span(@{$self->{posi}}, urxvt::RS_RVid);
+    ()
+}
+
+sub dispatcher
 {
     my ($self, $event, $keysym, $string) =  @_;
     my $key = fmt_key($self, $event, $keysym);
     # Check on white list: $action =~ m/[0-9][a-z]/i
     ($keymap{$key} || sub {})->($self, $key);
     $self->status_osd($key);
-
-    1  # EXPL intercept all keys until confirm choice
 }
 
+# =================== HOOKS ========================
+
+my %hooks = (
+    refresh_begin => sub { paint(@_); () },
+    refresh_end   => sub { paint(@_); () },
+    key_press => sub { dispatcher(@_); 1 },  # EXPL intercept all keys
+    tt_write  => sub { 1 },
+);
 
 sub activate {
     my ($self) = @_;
     $self->{overlay}->show();
-    $self->enable (
-        key_press => \&key_press,
-        tt_write  => sub { 1 }
-    );
+    $self->enable(%hooks);
 }
 
 sub deactivate {
     my ($self) = @_;
     $self->{overlay}->hide();
-    $self->disable('key_press', 'tt_write');
+    $self->disable(keys %hooks);
+
+    $self->want_refresh();
 }
 
+# =================== EVENTS ========================
 
-sub on_user_command
+sub on_user_command { $_[1] =~ s/^selector:// and on_action(@_); }
+sub on_action
 {
     my ($self, $cmd) = @_; $_ = $cmd;
-    return () unless s/^selector://;
-
     if (/^run$/) {
-        # print "S:", @INC, "\n";
         $self->status_osd("Run? (y/n)");
-        $self->activate();
-
-    } else { cmd_err($_); }
+        staying('start','next')->(@_);  # unless $self->{active};
+    } else { cmd_err($cmd); }
 
     ()
 }
@@ -98,6 +131,10 @@ sub on_user_command
 sub on_start
 {
     my ($self) = @_;
+    $self->{posi} = [2,2, 2,5];
+    @{$self->{browser}} = ('x-www-browser');
+    $self->{current} = { link => "ref+def", beg => [2,2], end => [2,5] };
+
     $self->{overlay} = $self->overlay(0,-1, $self->ncol,1, urxvt::OVERLAY_RSTYLE, 0);
     $self->{overlay}->hide();
 

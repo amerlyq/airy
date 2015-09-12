@@ -1,41 +1,25 @@
 # Common: don't run as standalone!
 package urxcommon;
 
-# SEE
-#   http://perldesignpatterns.com/?DispatchTable
-#   http://perldoc.perl.org/perlop.html#Regexp-Quote-Like-Operators
-#   http://perl101.org/arrays.html
-
-## USAGE
-# use urxcommon qw(&cmd_err &run_err);
-# use urxcommon qw(:API);
-# OR: urxcommon::fmt_key(@_)
-
 # =================== Package ========================
-
 use warnings;
-use strict "vars";
-# no strict 'subs';  # because 'urxvt::*' unimported
+use strict;
+no strict 'subs';  # because 'urxvt::*' can't be imported
 use Exporter;
-use lib '/usr/lib/urxvt';
-use urxvt;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 $VERSION     = 1.00;
 @ISA         = qw(Exporter);
-@EXPORT      = qw(on_action);  # Always
+@EXPORT      = ();  # Always export
 @EXPORT_OK   = qw(cmd_err run_err line_count text_metrics
-                  pairto makecurry fmt_key);  # On demand
+                  paired makecurry fmt_key);  # On demand
 %EXPORT_TAGS = (API => [qw(&cmd_err &run_err &line_count &text_metrics
-                        &pairto &makecurry &fmt_key)]);
+                        &paired &makecurry &fmt_key)]);
 
 
 # =================== Embed ========================
 sub cmd_err { warn "unknown command '$_[0]'\n"; () }
 sub run_err { warn "error running: '$_[0]': $!\n"; () }
-# sub dbg_hash { my %all = @_;
-#     foreach (sort keys %all) { print "$_ : $all{$_}\n"; } }
-#     print "$_ : $all{$_}\n" for sort keys %all; }
 
 # =================== Shorts ========================
 
@@ -45,7 +29,7 @@ sub text_metrics { sprintf("%dL> %-d", line_count($_[0]), length($_[0])); }
 # =================== Convertors ========================
 
 # Wrapper for action tuples: curry (args bind) impl by closure
-sub pairto { my $val = pop @_; map { $_=> $val } @_ }
+sub paired { my $val = pop @_; map { $_=> $val } @_ }
 sub makecurry {
     my ($hmap, @nms) = @_;
     my @funs = map { $hmap->{$_} if $_ } @nms;
@@ -53,7 +37,6 @@ sub makecurry {
     # ALT return eval "sub {". map { "$_" . '->(@_);' } @funs ."}"; }
 }
 
-# ALT always use 'Y' instead 'S-y' -- then no need to augment XKeysymToString
 sub std_mod {
     my ($term, $event) = @_;
     my $mod = '';
@@ -76,9 +59,3 @@ sub fmt_key
     # if (0x20 <= $keysym && $keysym < 0x80) {
     return std_mod($term, $event) . std_key($term, $keysym);
 }
-
-# =================== Common urxvt api impl ========================
-
-# EXPL for >v.9.19 (Ubuntu 14.04) used instead of on_user_command
-# BUG need prepend extension name!
-sub on_action { $_[0]->on_user_command($_[1]); () }

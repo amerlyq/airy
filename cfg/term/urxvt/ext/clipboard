@@ -1,7 +1,12 @@
-#!/usr/bin/env perl
-# @ref: MIT, (c) amerlyq, 2015
-# @brief Shell independent copy-paste extension for clipboard by keyboard.
-# @config .Xresources
+# vim: ft=perl
+# LOADED: package $pkg; use strict 'vars'; use utf8; no warnings 'utf8';
+use lib "$ENV{HOME}/.urxvt/ext";
+use urxcommon qw(&cmd_err &run_err &text_metrics);
+
+# @ref: GPLv3, (c) amerlyq, 2015
+# @brief: Shell independent copy-paste extension for clipboard by keyboard.
+# @credits: http://www.github.com/muennich/urxvt-perls
+# @config: .Xresources
 #   URxvt.perl-ext-common: ...,clipboard
 #   URxvt*clipboard.copycmd:  xsel -ib  # xclip -i -selection clipboard | pbcopy
 #   URxvt*clipboard.pastecmd: xsel -ob  # xclip -o -selection clipboard | pbpaste
@@ -13,25 +18,9 @@
 #   URxvt*keysym.M-v:    perl:clipboard:paste:default
 #   URxvt*keysym.M-C-v:  perl:clipboard:paste:escaped
 #   URxvt*keysym.M-m:    perl:clipboard:paste:execute
-# Inspired by: http://www.github.com/muennich/urxvt-perls
 
-use warnings;
-use strict;
-use lib "$ENV{HOME}/.urxvt/ext";
-use urxcommon qw(&cmd_err &run_err &text_metrics);
 
-## BUG -- open window, do M-c -- copy (none), then M-m paste
-#       -> first empty (wrong), then pastes some values from "+ (right).
-
-## DEV Command output:
-#  Copy all text in-between two dividers (currently between prompts)
-#  Move between such zones with j/k -- show overlay as square border around it
-## DEV M-C-y -- copy whole line where cursor is.
-#  by regex (to remove PS1 and PS2) -- when have no zsh.
-## DEV Execute:
-#  * <C-c> to save current (bad when empty)
-#  * <C-u><C-k> to clear (lost prev command)
-#  * Copy current line (interact with zsh) then execute and past that line back
+# =================== CONFIG ========================
 
 my %modes = (
     default => sub { $_[0]; },
@@ -40,6 +29,8 @@ my %modes = (
     # Trim spaces and compress line breaks, append <CR>.
     execute => sub { ($_[0] =~ s/^\s*|\s*$//gr) =~ s/\s*\n+\s*/\n/gr . "\n"; }
 );
+
+# =================== IMPL ========================
 
 sub status_osd
 {
@@ -53,11 +44,14 @@ sub status_osd
 sub copy
 {
     my ($self) = @_;
-    my $cmd = $self->{copy_cmd};
-    return run_err($cmd) unless (open(CLIPBOARD, "| $cmd"));
     my $msel = $self->selection();
-    if ($msel) { utf8::encode $msel; print CLIPBOARD $msel; }
-    close(CLIPBOARD);
+    if ($msel) {
+        my $cmd = $self->{copy_cmd};
+        return run_err($cmd) unless (open(CLIPBOARD, "| $cmd"));
+        utf8::encode $msel;
+        print CLIPBOARD $msel;
+        close(CLIPBOARD);
+    }
     $self->status_osd("copied", $msel);
 }
 
@@ -73,16 +67,15 @@ sub paste
     $self->status_osd($nm, $str);
 }
 
-
-sub on_user_command
+# =================== EVENTS ========================
+sub on_user_command { $_[1] =~ s/^clipboard:// and on_action(@_); }
+sub on_action
 {
     my ($self, $cmd) = @_; $_ = $cmd;
-    return () unless s/^clipboard://;
-
     if (/^copy$/) {
         $self->copy();
 
-    } elsif (/^paste:/) {
+    } elsif (/^paste:\w+/) {
         /:(\w+)$/;
         return cmd_err($_) unless $modes{$1};
         $self->paste($1);
@@ -90,11 +83,6 @@ sub on_user_command
 
     ()  # return false : else <consume event>
 }
-
-
-# DEV (desktop X, headless server, ssh w/o X, tmux/screen)
-#   no X -> termcode copybuffer if <96k else tmp file or in-mem pipe
-#   else -> try consequently xsel, xclip, pbcopy -> treat with no X methods.
 
 sub on_start
 {
@@ -122,7 +110,7 @@ sub on_destroy
 }
 
 
-# ==================== Confirm multiline insert =================
+# ==================== MERGE =================
 
 sub leave {
     my ($self) = @_;

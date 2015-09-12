@@ -1,0 +1,50 @@
+| urxvt-ext-evolved
+
+<ALL>
+	[_] THINK always use 'Y' instead 'S-y' -- then no need to augment XKeysymToString
+	[_] Use on_action as main mechanics (setup cfg for new and note in README for old urxvt)
+	[_] Move copy/paste xsel block to common -- as it will be used for more than one?
+
+
+> Clipboard
+BUG
+	2015-09-11 [X] Open window, do M-c -- copy (none), then M-m paste
+		: -> first empty (wrong), then pastes some values from "+ (right).
+
+DEV
+	[_] TRY to replace xsel with api group $self->selection*(..., true)
+		: OR use it only if no tool specified for copying
+	[_] Menu on M-y and M-p -- with status 'y: current, c: command, ...'
+		:= useful when there are too many variants for copy-paste.
+	[_] Command output:
+		: Copy all text in-between two dividers (currently between prompts)
+		: Move between such zones with j/k -- show overlay as square border around it
+	[_] M-C-y -- copy whole line where cursor is.
+		: by regex (to remove PS1 and PS2) -- when have no zsh.
+	[_] M-S-v Insert from "* instead of "+
+		: OR copy clipboard "* -> "+ to minimally duplicate shortcuts
+	[_] Execute:
+		<C-c> to save current (bad when empty)
+		<C-u><C-k> to clear (lost prev command)
+		Copy current line (interact with zsh) then execute and past that line back
+	[_] DEV (desktop X, headless server, ssh w/o X, tmux/screen)
+		: no X -> termcode copybuffer if <96k else tmp file or in-mem pipe
+		: else -> try consequently xsel, xclip, pbcopy -> treat with no X methods.
+
+
+
+> Selector
+DEV
+	[_] For hints use vertical overlay over whole screen on left side (two char width)
+	[_] Bind to current visible text (plus some lines around which contain visible parts of links/pathes)
+	[_] Open file path in vim/ranger/xsel current/nested/fork/float
+	[_] When matching -- gray out whole screen and highlight only urls and paths
+		:= use different colors for file/dir/url
+
+THINK
+	[_] Toggle on_line_update by shortcut or osc code from lau-serial?
+		man says it could spend alot of time on filtering and redrawing...
+		possibly dropping some of output
+	[_] NEED keep selected cursor position and highlight when re-activate
+	[_] FIX long multiline url -- concatenate and refine before launching in browser
+	[_] BUG press Return -- when in active mode -- first time has no effect.
