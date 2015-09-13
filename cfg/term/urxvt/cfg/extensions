@@ -1,16 +1,13 @@
 ! vim: ft=xdefaults
-!
 ! searchable-scrollback<hotkey> - incremental scrollback search (enabled by default)
 ! Adds regex search functionality to the scrollback buffer, triggeredby a hotkey (default: "M-s").
+
+#include "../ext/config"
 ! DISABLED: tabbedex, matcher
-! URxvt*perl-lib:      ~/.urxvt/ext
-URxvt*perl-ext-common: default,clipboard,keyboard-select,url-select,\
-autocomplete,focus-events,fork-cwd,vtwheel,color-themes,font-size,selector
+URxvt*perl-ext-common: default,keyboard-select,url-select,\
+autocomplete,focus-events,fork-cwd,vtwheel,color-themes,font-size,\
+copypastor,selector
 
-
-! REMOVE
-! URxvt*keysym.M-e:    perl:selector:run
-URxvt*keysym.M-e:    selector:run
 
 !! === Standart =========================
 ! NOTE: PrtSc is binded by wm, so only C/S-PrtSc works (scrollback + screen)
@@ -41,20 +38,6 @@ URxvt*keysym.M-n:
 URxvt*selection.pattern-0:  ([[:word:]]+)
 URxvt*keysym.M-space:       perl:keyboard-select:activate
 URxvt*keysym.M-s:           perl:keyboard-select:search
-
-
-!! === Clipboard =========================
-URxvt*clipboard.copycmd:    xsel --input --clipboard
-URxvt*clipboard.pastecmd:   xsel --output --clipboard
-! updated whenever the PRIMARY selection changes
-URxvt*clipboard.autocopy:   true
-
-URxvt*keysym.C-S-C:  perl:clipboard:copy
-URxvt*keysym.C-S-V:  perl:clipboard:paste:default
-URxvt*keysym.M-c:    perl:clipboard:copy
-URxvt*keysym.M-v:    perl:clipboard:paste:default
-URxvt*keysym.M-C-v:  perl:clipboard:paste:escaped
-URxvt*keysym.M-m:    perl:clipboard:paste:execute
 
 
 !! === Browser =========================
