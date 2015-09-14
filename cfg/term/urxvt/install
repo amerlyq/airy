@@ -1,4 +1,5 @@
 #!/bin/bash -e
+CURR_DIR_PKG=~/aura  # Change dst dir
 source ~/.shell/func.d/packages
 
 # | urxvt | fast terminal, image support, perl extensions
@@ -9,3 +10,7 @@ if distro arch; then
 elif distro ubuntu; then
     pkg_inst -p urxvt 'rxvt-unicode-256color'
 fi
+
+git_inst -d 'amerlyq/urxvt-ext-evolved'
+dir="${CURR_DIR_PKG?No}/urxvt-ext-evolved/"
+(cd "$dir" && ./setup)
