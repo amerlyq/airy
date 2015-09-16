@@ -7,6 +7,12 @@
 # let g:...
 # source $MYVIMRC
 
+# ALT: use dir from last history -- cd !$:h
+# OR:  physical pwd for symlinks -- cd $(pwd -P) -- ALT: cd -P ~/ch
+cdauto() { local p="${@: -1}"
+    [[ -z "$p" || -d "$p" ]] && \cd $@ || \cd ${@:1:-1} "${p%/*}"; }
+alias cd='cdauto'
+
 alias vi='\vim -u ~/.vim/vimrc_basic'
 vimscp(){ vim scp://${2:-srk}/"${1:-$(xsel -o)}"; }
 v() { #servername == syntex (must be for LaTeX)
