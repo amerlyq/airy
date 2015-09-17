@@ -115,8 +115,9 @@ case "$mimetype" in
             try "$EXTDIR/color-preview" "$path" && exit 5 || exit 2
         fi ;;
 
-    image/*) # Ascii-previews of images:
-        img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1 ;;
+    image/*) { # Ascii-previews of images:
+            img2txt --gamma=0.6 --width="$width" "$path"; identify "$path";
+        } && exit 4 || exit 1 ;;
 
     video/*)  # Image preview for videos, disabled by default:
         ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1 ;;

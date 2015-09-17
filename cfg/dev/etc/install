@@ -4,6 +4,7 @@ source ~/.shell/func.d/packages
 #| ag      | The silver searcher -- 'ag' instead of 'grep' inside of git project -- very best!
 #| at      | Read commands from standard input or a specified file which are to
 #|_________|    be executed at a later time, using /bin/sh.
+#| iotop   | Show disk r/w statistics for processes like htop (press 'a')
 #| dstat   | Versatile tool for generating system resource statistics
 #| jshon   | Bash json parser to use in scripts with i3-msg output # http://kmkeen.com/jshon/
 #| urlview | Extracting URLs from text files and displaying a menu from which
@@ -13,7 +14,7 @@ source ~/.shell/func.d/packages
 # Desktop search: (USE 'whereis' along with which)
 #   https://wiki.archlinux.org/index.php/File_system_search
 
-pkg_inst "at htop dstat jshon"
+pkg_inst "at htop iotop dstat jshon"
 
 if distro arch; then
     pkg_inst -p 'locate' mlocate
