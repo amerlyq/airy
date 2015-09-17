@@ -1,0 +1,26 @@
+> cvs
+> http://www.cs.umb.edu/~srevilak/cvs.html
+: http://pfspd.sourceforge.net/cvs.html
+: https://www-e815.fnal.gov/webspace/cvs/commands.html
+	status
+		cvs -q -n update
+		cvs status -qq
+		cvs -q status "$@" | grep '^[?F]' | grep -v 'Up-to-date'
+		cvst (:my alias:)
+
+http://wiki.audacityteam.org/wiki/CVS_Tips_and_Tricks
+
+> https://git.wiki.kernel.org/index.php/GitSvnCrashCourse
+	git clone == cvs/svn checkout
+	git pull == cvs/svn update
+	git commit + git push == cvs/svn commit
+		: When you commit in CVS or SVN, it instantly sends it back to the server
+		: your code came from. With Git, you commit changes to your local
+		: repository. Those changes will not be sent anywhere until you call git
+		: push.
+	git add !== svn/cvs add
+		: With Git, when making a commit of changes, you must git add FILENAME and
+		: then git commit. This helps make sure only the files you want get
+		: committed. You may also call git commit -am 'Commit Message.' to
+		: automatically add all changed files. git add is also used for new files,
+		: just like CVS/SVN.

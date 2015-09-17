@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+RC='. ~/.bashrc; . /cryptfs/env; . /cryptfs/bash_extension.sh'
+dir="${PWD#/cryptfs/chroots/lucid_i386}"
+[[ "$dir" != $PWD ]] || dir=/cryptfs/workspace
+schroot -c lucid_i386 -d "$dir" -- bash --rcfile <(echo "$RC")

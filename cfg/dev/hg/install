@@ -1,0 +1,13 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# Mercurial
+#   hg hgv
+#   : https://bitbucket.org/lc2817/hgv
+
+if distro arch; then
+    pkg_inst "hg hgv"
+
+elif distro ubuntu; then
+    pkg_inst "hg"
+fi

@@ -37,6 +37,21 @@ Xkbmap
 		[_] TRY: accessx instead of my modifiers latching
 			: http://www.x.org/releases/X11R7.7/doc/libX11/XKB/xkblib.html#Controls_for_Better_Keyboard_Access_by_Physically_ImpairedPersons
 			: https://wiki.archlinux.org/index.php/Accessibility
+		There is a utility called xbkeys for setting accessibiltiy options for xorg.
+			From xbkey manual:
+			: To switch sticky keys on or off, and optionally set or reset:
+			: () two keys pressed at the same time stops sticky keys;
+			: () a modifier pressed twice will be locked:
+			:     [-]{sticky|st} [[-]twokey|[-]latchlock]...
+			I ran this:
+				xkbset sticky -twokey -latchlock
+			That command can go in .xinitrc
+				: turn on stickykeys. don't let two keys pressed at the same time
+				: disable it.  don't turn on "latch lock", ie pressing a modifier
+				: key twice "locks" it on.
+				xkbset accessx sticky -twokey -latchlock
+				: don't expire these settings. (run xkbset q exp for details.)
+				xkbset exp 1 =accessx =sticky =twokey =latchlock
 
 	LED
 		[_] Show led indicators for regimes in i3bar (xset -q)

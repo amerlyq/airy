@@ -1,0 +1,152 @@
+> hg
+: https://mercurial.selenic.com/wiki/GitConcepts
+	Objects
+		changeset, revision, nodeid, heads
+	hg status
+	hg branches
+	Remove untracked
+		hg purge --all
+		: hg --config "extensions.purge=" purge --all
+	Revert changes
+		hg up -C
+	Graph
+		hg glog
+			: hg --config "extensions.graphlog=" glog > ../hmc.log
+		hg view
+		hg serve
+			: navigate in local browser
+
+	See types of files in repo
+		hg manifest S 's/.*\.(\w+)$/\1/p' | sort | uniq -c | sort -n
+
+> Command equivalence table
+
+| Git command                   |  Hg command              |  Notes             |
+|-------------------------------|--------------------------|--------------------|
+                                                            The fetch command is
+                                 hg fetch                   more similar but
+git pull                         hg pull -u                 requires the
+                                                            FetchExtension to be
+                                                            enabled.
+git fetch                        hg pull
+                                                            By default, git only
+git push                         hg push -r .               pushes the current
+                                                            branch.
+                                                            git checks and
+git checkout <commit>            hg update -c <cset>        reloads
+                                                            (accidentally)
+                                                            removed files
+git checkout [<rev>] -- <file    hg revert [-r <rev>] <file
+(s)>                             (s)>
+git reset --hard                 hg revert -a --no-backup
+git reset --hard HEAD~1          hg strip -r .
+git revert <commit>              hg backout <cset>
+                                                            Only equivalent when
+git add <new_file>               hg add <new_file>          <new_file> is not
+                                                            tracked.
+                                                            Not necessary in
+git add <file>                                              Mercurial (see
+git reset HEAD <file>            —                          shelve below for
+                                                            partial commit
+                                                            support).
+                                                            Requires the
+                                                            RecordExtension to
+git add -i                       hg record                  be enabled.
+                                 hg commit -i               Interactive mode has
+                                                            been added to commit
+                                                            in 3.4.
+git commit --amend               hg commit --amend
+                                                            Requires the
+git rebase --interactive         hg histedit <base cset>    HisteditExtension.
+                                                            In core since
+                                                            version 2.3
+                                                            Requires the
+git stash                        hg shelve                  ShelveExtension or
+                                                            the AtticExtension.
+                                                            git merge is capable
+                                                            of octopus merges,
+git merge                        hg merge                   while mercurial
+                                                            merge prefers
+                                                            multiple merges
+                                                            Transplant requires
+                                 hg transplant <cset>       the
+git cherry-pick <commit>         hg graft <csets>           TransplantExtension.
+                                                            Graft is available
+                                                            in 2.0 and higher.
+git rebase <upstream>            hg rebase -d <cset>        Requires the
+                                                            RebaseExtension.
+git format-patch <commits> and   hg email -r <csets>        Requires the
+git send-mail                                               PatchbombExtension.
+                                                            Requires the
+                                                            MboxExtension and
+git am <mbox>                    hg mimport -m <mbox>       the MqExtension.
+                                                            Imports patches to
+                                                            mq.
+                                 hg log -r . --template '
+git describe                     {latesttag}-
+                                 {latesttagdistance}-{node|
+                                 short}\n'
+                                 hg log -r rev --template '
+git describe rev                 {latesttag}-
+                                 {latesttagdistance}-{node|
+                                 short}\n'
+git log origin..HEAD             hg outgoing
+git log origin/foobranch..HEAD
+                                                            git fetch keeps the
+                                                            changesets while
+                                                            hg incoming (without
+                                                            --bundle foo)
+git fetch &&                     hg incoming                discards them. Use
+ git log HEAD..origin                                       git pull (will fetch
+                                                            further changes) or
+                                                            git merge origin to
+                                                            update the working
+                                                            directory
+git show rev                     hg export rev
+                                 hg log -pvr rev
+git rev-parse HEAD               hg identify
+git ls-remote <url> HEAD         hg identify <url>
+git show hash:file               hg cat -r rev file
+git ls-files                     hg manifest
+git log                          hg log
+git log -n                       hg log --limit n
+                                                            Requires the
+                                                            GraphlogExtension.
+git log --graph                  hg glog                    log supports --graph
+                                 hg log --graph             without the
+                                                            extension since
+                                                            version 2.3
+git ??                           hg summary
+git status                       hg outgoing
+                                 hg status
+                                                            Edit .hg/hgrc and
+                                                            add the line
+                                                            'remotename = url'
+git remote add -f remotename url —                          under section '
+                                                            [paths]'; see below
+                                                            for getting
+                                                            changesets
+                                                            When remotename is
+                                                            omitted in Git, all
+git remote update remotename     hg pull remotename         remotes are updated.
+                                                            In Mercurial, the
+                                                            default remote is
+                                                            refreshed.
+git branch -a                    hg branches
+
+|                                                           Edit ~/.hgrc section
+| git config --global user.(name|email) ...                 "[ui]", key
+|															"username", value
+|                                                             "First Last <
+|                                                             mail@example.org >"
+
+                                                            purge requires the
+                                                            PurgeExtension
+                                                            In Windows you might
+git clean or                                                need to add sed 's:\
+git status --porcelain|          hg purge or                \:/:g' before piping
+sed -r 's:\?\?\s(.*):\1:g'|      hg status -un|xargs rm     xargs rm, otherwise
+xargs rm                                                    the inverted slash
+                                                            in Windows paths
+                                                            will be interpreted
+                                                            as an escape

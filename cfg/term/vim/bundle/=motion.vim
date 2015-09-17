@@ -122,9 +122,28 @@ endif
 
 if neobundle#tap('vim-textobj-sigil')  "{{{1
   let g:textobj_sigil_no_default_key_mappings = 1
-  xmap <silent><unique> aG <Plug>(textobj-sigil-a)
-  omap <silent><unique> aG <Plug>(textobj-sigil-a)
+  xmap <silent><unique> ag <Plug>(textobj-sigil-a)
+  omap <silent><unique> ag <Plug>(textobj-sigil-a)
 
-  xmap <silent><unique> iG <Plug>(textobj-sigil-i)
-  omap <silent><unique> iG <Plug>(textobj-sigil-i)
+  xmap <silent><unique> ig <Plug>(textobj-sigil-i)
+  omap <silent><unique> ig <Plug>(textobj-sigil-i)
+endif
+
+
+if neobundle#tap('signify')  "{{{1
+  let g:signify_vcs_list = [ 'git' ]
+  let g:signify_sign_change = '~'
+  let g:signify_sign_delete = '-'
+
+  noremap <unique> <leader>tg :<C-u>SignifyToggle \| redraw!<CR>
+  noremap <unique> <leader>tG :<C-u>SignifyToggleHighlight \| redraw!<CR>
+  "" Already mapped -- if busy: automaps <leader>gj and <leader>gk
+  " nmap <unique> ]c <Plug>(signify-next-hunk)
+  " nmap <unique> [c <Plug>(signify-prev-hunk)
+
+  omap <silent><unique> iG <Plug>(signify-motion-inner-pending)
+  xmap <silent><unique> iG <Plug>(signify-motion-inner-visual)
+
+  omap <silent><unique> aG <Plug>(signify-motion-outer-pending)
+  xmap <silent><unique> aG <Plug>(signify-motion-outer-visual)
 endif
