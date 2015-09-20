@@ -42,7 +42,7 @@ dosamba() {
 doloop() {  # You must launch it from iso's directory!
     DEVPATH="$PWD/$LBL"
     if ! [ -e "$DEVPATH" ]; then die "Error: no such file '$DEVPATH'"; fi
-    dirmk && sudo mount -o loop "$DEVPATH" "${DIR%.*}" || exit
+    dirmk && sudo mount -o loop "$DEVPATH" "$DIR" || exit
 }
 domnt() {
     local DEVPATH TYPE
