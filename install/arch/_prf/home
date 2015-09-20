@@ -1,0 +1,30 @@
+# vim: ft=sh
+SYS_PRF='home'
+
+# ============ System ==================================================
+
+SYS_ESSID='Amerlyq'
+SYS_WPASS='<passwd>'
+SYS_IP='192.168.0.3'
+SYS_USER=user
+SYS_HOST=home
+
+# ATTENTION be careful and don't split disk automatically!
+# Do all work from mbr file by yourself!
+
+# MBR/GPT + Windows 7
+SYS_DISK="/dev/sda"
+SYS_PREF="$SYS_DISK"
+
+#| swap  | Need > 2/5 of RAM memory for suspend-to-disk
+#| root  | Main
+
+## Order determines disk layout (last 100GB of 500GB SSD)
+SYS_PART=(    5     6 )
+SYS_SIZE=(   4G '+100%FREE' )
+SYS_MNT=(     %     / )
+SYS_FS=(   swap btrfs )
+
+# NOTE: need 'sudo' for 'airy/cfg/shell/func.d/packages'
+SYS_SOFT="base base-devel lvm2 btrfs-progs wget wpa_supplicant"  #  sshfs gnupg pinentry
+SYS_ENABLED=( lan wifi aur X user )
