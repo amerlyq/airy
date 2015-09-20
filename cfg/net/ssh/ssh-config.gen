@@ -29,8 +29,11 @@ EOT
 
 wacc ghub  'github.com' git         git_rsa
 wacc glab  'gitlab.com' git         git_rsa
-wacc sir   $HOME_SRV    $HOME_USER  '' '' $HOME_PORT
-wacc ked   $KEDI_SRV    $KEDI_USER  '' '' $KEDI_PORT
+
+if [[ -n "$HOME_SRV" ]]; then
+    wacc sir   $HOME_SRV    $HOME_USER  '' '' $HOME_PORT
+    wacc ked   $KEDI_SRV    $KEDI_USER  '' '' $KEDI_PORT
+fi
 
 case "$CURR_PROF" in home|laptop)
     wacc lked   $KEDI_IPL   $KEDI_USER   lked_rsa #x11
