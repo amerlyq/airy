@@ -1,4 +1,5 @@
 Languages Tree
+>>> https://en.wikipedia.org/wiki/Generational_list_of_programming_languages
 	http://www.metodolog.ru/node/1600
 	https://upload.wikimedia.org/wikipedia/commons/2/25/Genealogical_tree_of_programming_languages.svg
 	> https://webhome.csc.uvic.ca/~mcheng/330/spring.2016/index.html
@@ -8,29 +9,43 @@ Languages Tree
 	https://en.wikipedia.org/wiki/Timeline_of_programming_languages
 	https://en.wikipedia.org/wiki/Category:Data-structured_programming_languages
 
-Cool list of tools for different langs!
-	https://github.com/bayandin/awesome-awesomeness
+ Experienced programmers carry quite a number of patterns around in their
+ heads. They may have learned these patterns from books or by hard won
+ experience. The patterns enable a fluid style of programming where attention
+ can be maintained on the unknown parts of the task at hand and work feels
+ productive. Programmers tend to like programming languages that have good
+ support for the patterns they use. Programmers don't like languages that
+ disallow or inconvenience the patterns they use. They are also rarely
+ impressed by language features that support patterns they don't know or use.
 
-Пейсателям языков программирования посвящается
-	http://habrahabr.ru/post/130362/
-	Arthur Samuel (1959). Machine Learning: Field of study that gives
-	computers the ability to learn without being explicitly programmed.
+ALL
+	All langs -- cookbook
+		http://pleac.github.io/pleac/
+		http://webcache.googleusercontent.com/search?q=cache:dwoOulab3_wJ:http://www.ariel.com.au/jokes/The_Evolution_of_a_Programmer.html%2BThe_Evolution_of_a_Programmer&hl=en&&ct=clnk
+		http://www.lysator.liu.se/c/bwk-on-pascal.html
+		https://github.com/pleac/pleac
 
-Online compilers
-	http://ideone.com/  | more then 60 langs
+	Cool list of tools for different langs!
+		https://github.com/bayandin/awesome-awesomeness
+
+	Online compilers
+		http://ideone.com/  | more then 60 langs
+
+	Lex & yacc
+		http://www.ibm.com/developerworks/aix/tutorials/au-lexyacc/
+
 
 Haskell
 	Over 130 Practical Recipes For Data Analysis and Machine Learning
 		http://haskelldata.com/
 
-Lex & yacc
-	http://www.ibm.com/developerworks/aix/tutorials/au-lexyacc/
 
 Io -- ALT to lua
 < with event-driven all operations
 	http://www.iolanguage.com/
 	 the more I work in OO the more I am drawn to prototype-based OO; and all
 	 the Io code samples I’ve seen are beautiful.
+	-- homoiconic!
 
 Smalltalk -- ALT to Lisp
 < with event-driven methods call (embedded concurrency)
@@ -44,10 +59,12 @@ Scala
 	 learning Haskell left behind a lingering itch to play with powerful type
 	 systems that help rather than hinder, and Scala seems like a pragmatic
 	 environment in which to do so.
-Clojure
+
+Clojure -- ALT to Lisp on JVM
 	http://clojure.org/
 	 the early buzz is growing on this one. Good documentation for a young
 	 language, and I like a lot of the design decisions.
+
 PROLOG
 	http://en.wikipedia.org/wiki/Prolog
 	 the only language in this list which would actually expose me to a
@@ -69,17 +86,14 @@ J
 		http://habrahabr.ru/post/198228/
 		http://habrahabr.ru/post/198230/
 
-Формализация создания языка -- вывод типов
-	http://habrahabr.ru/post/185362/
-
-K
-	https://github.com/kevinlawler/kona
-
 Lisp
 	http://www.lisperati.com/
 	http://lisper.ru/wiki/lisp-source-code
 	http://habrahabr.ru/post/265589/
 	http://rus-linux.net/MyLDP/algol/LISP/lisp01.html
+	Multithreading
+		http://stackoverflow.com/questions/9400410/common-lisp-parallel-programming
+	 Maybe think about Arc as Lisp with syntax sugar, short keywords, small rules
 
 Forth
 	http://habrahabr.ru/post/29967/
@@ -111,6 +125,10 @@ Fort
 	разобраться с синтаксисом (одна обратная бесскобочная запись выражений
 	чего стоит)Фортом.
 
+Nim ? -- imperative, elegant, parallel, compiles in C
+	http://nim-lang.org/
+
+
 GNU R
 	Front-end for bash and pipe-capabilities
 	: http://stackoverflow.com/questions/3205302/difference-between-rscript-and-littler
@@ -118,8 +136,32 @@ GNU R
 	Using for analysis as Wolfram
 		http://tuxette.nathalievilla.org/?cat=78
 
-All langs -- cookbook
-	http://pleac.github.io/pleac/
-	http://webcache.googleusercontent.com/search?q=cache:dwoOulab3_wJ:http://www.ariel.com.au/jokes/The_Evolution_of_a_Programmer.html%2BThe_Evolution_of_a_Programmer&hl=en&&ct=clnk
-	http://www.lysator.liu.se/c/bwk-on-pascal.html
-	https://github.com/pleac/pleac
+
+> FUTURE <
+
+Scheme
+	: As Lisp alternative?
+	-- Harold Abelson and Gerald Jay Sussman with Julie Sussman
+		[disk] Structure and Interpretation of Computer Programs
+	 - Most implementations have only hygienic macro, which can't define new macro
+	 - Need to re-implement many of standartized libs and funcs
+		 (its only 50pgs vs 1300pgs in CL)
+
+	>> Has sense to return to it after CL, concentrating on Guile and Racket
+
+	Guile (embedded scheme) -- for linux scripting?
+
+	Racket
+	: The language acts like an operating system for loading and managing other programs
+	: Racket's contract system is inspired by the Design by Contract work for Eiffel
+		https://en.wikipedia.org/wiki/Racket_(programming_language)
+		http://realmofracket.com/
+
+
+> NO <
+	Nemerle
+		based on .NET, can use matching and code generation, some concepts
+		from lisp -- but is too much overloaded.
+	K
+		no community and docs, trading oriented, proprietary
+		: https://github.com/kevinlawler/kona
