@@ -21,8 +21,12 @@ if cfgOpt u; then
   fi
   # Once Samba has restarted, use this command
   # to check your smb.conf for any syntax errors
-  testparm
+  testparm -s
 fi
 
 ## FIXME: not working as supposed:
 #if cfgOpt u && has_pr samba; then sudo service smbd stop
+
+# EXPL to see errors on start
+# sudo smbd -i
+# ATTENTION sudo chmod 0755 /var/cache/samba/msg

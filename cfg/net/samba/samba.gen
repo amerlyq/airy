@@ -37,9 +37,13 @@ wopt 'server string = %h server (Samba, Linux)'
 # This will prevent nmbd to search for NetBIOS names through DNS.
 wopt 'dns proxy = no'
 
+wopt 'hosts allow = 192.168.0. 127.'
+wopt 'printing = bsd'
+wopt 'printcap name = /dev/null'
+
 # Windows Internet Name Serving Support Section:
 # WINS Support - Tells the NMBD component of Samba to enable its WINS Server
-#   wins support = no
+wopt 'wins support = no'
 
 # WINS Server - Tells the NMBD components of Samba to be a WINS Client
 # Note: Samba can be either a WINS Server, or a WINS Client, but NOT both
@@ -67,7 +71,7 @@ wopt 'dns proxy = no'
 
 # This tells Samba to use a separate log file for each machine
 # that connects
-wopt 'log file = /var/log/samba/log.%m'
+wopt 'log file = /var/log/samba/%m.log'
 
 # Cap the size of the individual log files (in KiB).
 wopt 'max log size = 1000'
@@ -75,6 +79,10 @@ wopt 'max log size = 1000'
 # If you want Samba to only log through syslog then set the following
 # parameter to 'yes'.
 #   syslog only = no
+
+# Security mode. Most people will want user level security. See
+# security_level.txt for details.
+wopt 'security = user'
 
 # We want Samba to log a minimum amount of information to syslog. Everything
 # should go to /var/log/samba/log.{smbd,nmbd} instead. If you want to log
