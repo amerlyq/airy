@@ -5,8 +5,10 @@ if distro arch; then
     pkg_inst 'ranger fbida libcaca poppler p7zip unzip'
 
 else
-    git_inst 'hut/ranger'  # 'amerlyq/ranger'
     pkg_inst 'fbi caca-utils poppler-utils w3m-img p7zip-full zip'
+
+    pkg_build() { sudo python3 setup.py install; }
+    git_inst 'hut/ranger'  # 'amerlyq/ranger'
 fi
 
 #| fbi        | framebuffer image viewer for terminal

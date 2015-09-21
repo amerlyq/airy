@@ -14,7 +14,7 @@ export TERMCMD=x-terminal-emulator
 # speed up ranger start time
 export RANGER_LOAD_DEFAULT_RC=FALSE
 
-ranger --choosedir="$tempfile" "${@:-$PWD}"
+python3 $(which ranger) --choosedir="$tempfile" "${@:-$PWD}"
 
 [[ -f "$tempfile" ]] && dir="$(cat -- "$tempfile")"
 

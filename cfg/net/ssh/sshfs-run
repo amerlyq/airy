@@ -16,7 +16,7 @@ trap "fusermount -u $dst && rmdir $dst" INT TERM EXIT
 
 mkdir -p $dst && sshfs -o $opts $src $dst -C
 
-ranger-auto $dst
+lau-ranger $dst
 
 ## SEE: reverse sshfs!
 # http://blog.dhampir.no/content/reverse-sshfs-mounts-fs-push

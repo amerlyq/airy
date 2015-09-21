@@ -1,4 +1,6 @@
 :: Bind CapsLock to Control (as in Linux)
+:: SEE http://johnhaller.com/useful-stuff/disable-caps-lock
+
 set "KBD_LAYOUT=HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout"
 REG ADD "%KBD_LAYOUT%" /V "Scancode Map" /T REG_BINARY /D "0000000000000000020000001d003a0000000000" /F
 
