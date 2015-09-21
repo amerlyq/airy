@@ -3,8 +3,8 @@
 alias info='info --vi-keys'  # Vim navigation inside 'info' as in 'man'
 alias make="make -j4"       # multithread build
 alias sort='LC_ALL=C sort'  # fix sorting order
-# ALT: sudo vbetool dpms [on/off]
-alias off='xset -d :0 dpms force off'
+# ALT: sudo vbetool dpms [on/off]      # Permanent (ignores mouse and kbd)
+alias off='xset -d :0 dpms force off'  # Until mouse moves
 
 # --- State ---
 alias free='free -h'
@@ -40,10 +40,9 @@ alias chgrp='chgrp --preserve-root'
 
 
 # --- Shorts for non-root ---
-if (( EUID != 0 )); then
-    SUDOLST=(chown chmod pkill powertop)   # --calibrate
-    SUDOLST+=(apt-get dpkg dpkg-reconfigure)
-    SUDOLST+=(reboot poweroff halt shutdown)
+if (( EUID != 0 )); then  # --calibrate
+    SUDOLST=(chown chmod pkill powertop apt-get dpkg dpkg-reconfigure
+             reboot poweroff halt shutdown)
     for nm in "${SUDOLST[@]}"; do
         alias $nm='sudo '"$nm"' '
     done

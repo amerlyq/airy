@@ -21,3 +21,15 @@ pkg_inst wpa_actiond
 # If error on connection -- see reasons:
 #   journalctl -xn
 #   netctl status wlan_static
+
+# General
+# LST="$LST util-linux procps hostapd iproute2 iw haveged"
+# (or procps-ng)
+# haveged (optional) -- entropy for randomness
+# iwconfig (you only need this if 'iw' can not recognize your adapter)
+
+# For 'NATed' or 'None' Internet sharing method
+# LST="$LST dnsmasq iptables"
+
+# apt_noprompt $LST
+# git_install 'oblique/create_ap'

@@ -8,26 +8,25 @@ if distro arch; then
 
 elif distro ubuntu; then
 
-# MAN:
-#     http://mintgeek.ru/2011/06/12/kak-ustanovit-witcher-2-v-linux-mint/
+    # MAN:
+    #     http://mintgeek.ru/2011/06/12/kak-ustanovit-witcher-2-v-linux-mint/
 
-LST="$LST wine winetricks playonlinux"
-# playonlinux ktouch
-# winetricks | only for x86
-# mono-complete | for .NET
-apt-get install mono-complete winbind
-# mono ./file.exe
+    LST="$LST wine winetricks playonlinux"
+    # playonlinux ktouch
+    # winetricks | only for x86
+    # mono-complete | for .NET
+    apt-get install mono-complete winbind
+    # mono ./file.exe
 
-apt_noprompt $LST
+    apt_noprompt $LST
 
-# Show available components winetricks --help
-winetricks dinput directx9 d3dx9_36 d3dx9_43 d3dx10 d3dx11_43 xact_jun2010 d3dcompiler_43 #3dmark06
-# winetricks dotnet20 dotnet35 dotnet40 dotnet45 dotnet_verifier
-winetricks xna31 xna40 vcrun2010 vcrun2008 steam
+    # Show available components winetricks --help
+    winetricks dinput directx9 d3dx9_36 d3dx9_43 d3dx10 d3dx11_43 xact_jun2010 d3dcompiler_43 #3dmark06
+    # winetricks dotnet20 dotnet35 dotnet40 dotnet45 dotnet_verifier
+    winetricks xna31 xna40 vcrun2010 vcrun2008 steam
 
-mkdir -p ~/".wine/drive_c/Program Files"
-mkdir -p ~/".wine/drive_c/Program Files (x86)"
-
+    mkdir -p ~/".wine/drive_c/Program Files"
+    mkdir -p ~/".wine/drive_c/Program Files (x86)"
 fi
 
 echo "
