@@ -34,7 +34,7 @@ if [[ ! -e "$2" || -L "$2" ]]; then
   if [[ ! "$1" -ef "$2" ]]; then
     $sudo mkdir -p "${2%/*}"
     $sudo ln -sfvT "$1" "$2"
-  else echo "->   $2"; fi
+  else echo "L->   $2"; fi
 else echo "Err: symlink to $2"; exit 1
 fi;}
 

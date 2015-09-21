@@ -1,6 +1,15 @@
 #!/bin/bash -e
 source ~/.shell/profile || exit
 
+# NOTE Manually:
+# Create raw disk
+#   cd ~/VMs/arch64/
+#   VBoxManage internalcommands createrawvmdk -filename arch64.vmdk -rawdisk /dev/mapper/vg0-arch
+#   OR VBoxManage internalcommands createrawvmdk -filename arch64.vmdk -rawdisk /dev/sda
+# Then -- create new machine and use existing disk
+#   ATTENTION Disable swap under ubuntu to reuse it for arch, create partial profile
+
+
 ### MBR unnecessary if use whole disk, but you need grub. And vice versa.
 ### But for partitioned disk Windows and Office will lost activations.
 # SEE:
@@ -27,7 +36,7 @@ source ~/.shell/profile || exit
 
 
 # Available Profiles
-if [ "$CURR_PROF" != "home" -a "$CURR_PROF" != "work" ]; then
+if [[ "$CURR_PROF" != "home" && "$CURR_PROF" != "work" ]]; then
     echo "Error -- settings only for 'home' and 'work'!"
     exit 1
 fi

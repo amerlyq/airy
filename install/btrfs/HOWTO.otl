@@ -3,6 +3,37 @@
 Free space (df -h /)
 	btrfs filesystem df /
 
+Resize
+	https://www.libcrack.so/2012/05/15/reduce-btrfs-on-lvm-quick-recipe/
+	Unmount the filesystem and check its' LV
+		umount /mnt/foo
+		e2fsck -f /dev/mapper/vg0-foo
+
+	Shrink ext4 and then the LV to the desired size
+		resize2fs -p /dev/mapper/vg0-foo 40G
+		: OR btrfsctl -r 500g /MaquinasVirtuales/
+		lvreduce -L 40G /dev/mapper/vg0-foo
+
+	Before continuing, run e2fsck.
+	: If it bails because the partition is too small, don't panic! The LV can
+	: still be extended with lvextend until e2fsck succeeds, e.g.:
+	: lvextend -L +1G /dev/mapper/vg0-foo
+		e2fsck -f /dev/mapper/vg0-foo
+
+	Resize the filesystem to match the LVs size, check and mount it
+		resize2fs -p /dev/mapper/vg0-foo
+		e2fsck -f /dev/mapper/vg0-foo
+		mount /mnt/foo
+
+	Transfer free space to another volume
+		umount /mnt/bar
+		lvextend -l +100%FREE /dev/mapper/vg0-bar
+		e2fsck -f /dev/mapper/vg0-bar
+		resize2fs -p /dev/mapper/vg0-bar
+		: OR btrfsctl -r max /MaquinasVirtuales/
+		e2fsck -f /dev/mapper/vg0-bar
+		mount /mnt/bar
+
 Snapshots
 	Снимки. Монтируем корень ФС и создаём снимок корня системы:
 		mount /dev/sda /mnt

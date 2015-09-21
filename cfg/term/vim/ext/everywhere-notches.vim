@@ -33,11 +33,11 @@ let s:patterns = {
       \ 'Add': 'ADD|SEE|NEED|FIND',
       \ 'Did': 'DONE|FIXED|EXPL',
       \ 'Dev': 'DEV|HACK',
-      \ 'Msg': 'NOTE|OPT%(ION)=%(S)=',
+      \ 'Msg': 'NOTE',
       \ 'Tbd': 'TODO|CHECK|TRY',
       \ 'Alt': 'ALT|OR|THINK|CHG',
       \ }
-
+"|OPT%(ION)=%(S)=',
 
 function! s:everywhere_print(patts)
   for [k,v] in items(a:patts)

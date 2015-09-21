@@ -12,7 +12,7 @@ wscript() { wfile "$1" "$2" && chmod u+x "$1"; }
 # ${@:1:${#@}-1} "${@:${#@}}${L}"
 do_each() { sed '/#.*$/s///; /^\s*$/d' | while read L
     do echo "N: $L"; ${@}${L} || die "Err: $L"; done; }
-hopt() { [ "${ARCH_OPTS/[$1]}" != "$ARCH_OPTS" ]; }
+hopt() { [[ "${ARCH_OPTS/[$1]}" != "$ARCH_OPTS" ]]; }
 oadd() { ARCH_OPTS="${ARCH_OPTS}${1}"; }
 
 

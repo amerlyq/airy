@@ -1,6 +1,10 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+# CHECK GPU vendor
+# lshw -numeric -C display
+# sudo lshw -numeric -C display
+
 if distro arch; then
     if [[ "$CURR_PROF" == kedi ]]  # Kedi (need remove mesa)
     then pkg_inst --asdeps "nvidia-340xx nvidia-340xx-libgl lib32-nvidia-340xx-libgl"
