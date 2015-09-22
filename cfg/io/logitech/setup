@@ -1,11 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-if distro arch; then
-    echo "Err: see how to"
-
-elif distro ubuntu; then
-    dst=/usr/share/X11/xorg.conf.d
-    link -s "$PWD/50-vmmouse.conf" "$dst/50-vmmouse.conf"
-    echo "NEED relogin/restart Xorg"
-fi
+dst=/usr/share/X11/xorg.conf.d
+link -s "$PWD/50-vmmouse.conf" "$dst/50-vmmouse.conf"
+echo "NEED relogin/restart Xorg"

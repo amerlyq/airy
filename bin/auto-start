@@ -70,5 +70,6 @@ lau compton
 lau copyq
 # lau syncthing >/tmp/syncthing.log 2>&1
 # i3-msg 'workspace number 11'
-[[ "$CURR_PROF" =~ "^(home|laptop)" ]] || lau pidgin
+echo "PRF: $CURR_PROF"
+[[ "$CURR_PROF" =~ ^(home|laptop) ]] || lau pidgin
 # i3-msg 'workspace number 1'

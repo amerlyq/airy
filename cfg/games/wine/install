@@ -1,24 +1,17 @@
-#!/bin/bash
-# vim: ft=sh
+#!/bin/bash -e
 source ~/.shell/func.d/packages
+
+# winetricks | only for x86
+# mono-complete | for .NET   ::  mono ./file.exe
 
 if distro arch; then
     pkg_inst "wine wine-mono wine_gecko winetricks"
     pkg_inst "lib32-alsa-lib lib32-alsa-plugins lib32-ncurses lib32-mpg123"
 
 elif distro ubuntu; then
-
     # MAN:
     #     http://mintgeek.ru/2011/06/12/kak-ustanovit-witcher-2-v-linux-mint/
-
-    LST="$LST wine winetricks playonlinux"
-    # playonlinux ktouch
-    # winetricks | only for x86
-    # mono-complete | for .NET
-    apt-get install mono-complete winbind
-    # mono ./file.exe
-
-    apt_noprompt $LST
+    pkg_inst 'wine' 'winetricks' 'playonlinux' 'mono-complete' 'winbind'  # ktouch
 
     # Show available components winetricks --help
     winetricks dinput directx9 d3dx9_36 d3dx9_43 d3dx10 d3dx11_43 xact_jun2010 d3dcompiler_43 #3dmark06
@@ -32,35 +25,3 @@ fi
 echo "
     !! Place your Window's programms inside ~/.wine/drive_c/Program Files/ !!
 "
-
-# you can run through wine
-# download winetricks from http://winetricks.org/winetricks by running
-# wget http://winetricks.org/winetricks
-# make it executable
-# dependency-----wine
-# run winetricks
-# it has links to microsoft .netv2, v3 ,mono and other microsoft libraries download and install mono using winetricks
-# the config files of the manga downloader has to be in home folder
-# now run
-# wine /path/to/domdomsoft.exe
-
-# Install vcrun2010:
-#   you need configure 'winecfg' to Window7, and in libraries choose 'builtin then native'
-#   then you will be able to install vcrun2010 through 'winetricks'
-
-
-
-# There are a lot of us that use linux. We love terraria but without linux
-# support, it becomes irritating. However, I have managed to get Terraria working
-# in Linux under wine!
-# All you need is:
-#     Wine 1.7.X
-#     Microsoft .Net package 3.5 and 4
-#     The Microsoft XNA package.
-# Make sure you have downloaded the complete wine from either Ubuntu Software Center or other alternatives.
-# * Download wine, install it before hand. Then go and download the WINDOWS
-#   version of steam (Has a extension ".exe" or .msi) From there, log in verify
-#   all the things you need to and start downloading terraria.
-# * While thats downloading you want to go to your "Configure Wine" and should come up with a XP or 98 looking window.
-#   Click on graphics. Then check the first box (Automatically capture the mouse in full-screen windows.
-# * Once Terraria has finished, Install .NET and XNA setups you have just downloaded. Terraria relies on these!
