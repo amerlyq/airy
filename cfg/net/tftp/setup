@@ -1,0 +1,25 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+# http://linux.die.net/man/8/tftpd
+dir=/cryptfs/tftpboot
+
+if cfgOpt u; then
+    # System user 'tftp' without shell access and without a home directory
+    id tftp >/dev/null 2>&1 || sudo useradd -r -U -s /usr/bin/nologin tftp
+
+    mkdir -p "$dir"
+    if [[ "$(stat -c '%u %g' "$dir")" != "$(id -u tftp) $(id -g tftp)" ]]
+    then sudo chown -R tftp:tftp "$dir"; fi
+
+    if distro arch; then
+        sudo cp -vufT "$PWD/config" /etc/conf.d/tftpd
+        svc_enable  tftpd
+        svc_restart tftpd
+
+    elif distro ubuntu; then
+        sudo cp -vufT "$PWD/config" /etc/default/tftpd-hpa
+        svc_enable  tftpd-hpa
+        svc_restart tftpd-hpa
+    fi
+fi

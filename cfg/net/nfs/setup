@@ -1,0 +1,15 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+if cfgOpt u; then
+    if distro arch; then
+        svc_enable rpcbind
+        svc_enable nfs-server
+        svc_restart rpcbind
+        svc_restart nfs-server
+
+    elif distro ubuntu; then
+        svc_enable  nfs-kernel-server
+        svc_restart nfs-kernel-server
+    fi
+fi

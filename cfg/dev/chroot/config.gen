@@ -1,0 +1,22 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+dst=/etc/schroot/schroot.conf
+nm=lucid_i386
+
+sudo tee "$dst" <<EOT
+[$nm]
+description=Build environment $nm
+personality=linux32
+root-users=$USER
+users=$USER
+type=directory
+directory=/cryptfs/chroots/$nm
+EOT
+
+
+# Exists on Ubuntu, create manually on Arch
+sudo tee /etc/networks <<EOT
+# symbolic names for networks, see networks(5) for more information
+link-local 169.254.0.0
+EOT

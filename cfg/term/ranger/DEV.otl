@@ -102,6 +102,17 @@ Completely detach ranger interface from filemanager
 [_] Viewer on 'I' -- select text by mouse, cursor enable for kbd select
 [_] Viewer/lister -- search/highlight/copy text in 'I' regime (maybe urxvt is enough?)
 
+	[_] 'cp' -- cd on path in buffer, if file -- select it
+		2015-09-23 [X] cd in dir of file
+		[_] select each file from clipboard
+		[_] THINK use regex to extract all pathes from any text, or only exact pathes?
+		[_] THINK Check validity with my urxvt path regex?
+
+	DEV Send:
+	: from subprocess import Popen, PIPE
+	: p = Popen(['xsel','-ob'], stdin=PIPE)
+	: p.communicate(input='Hello, World')
+
 DEV
 	[_] Ipc with interactive zsh instance in separate thread.
 		:= Seems like it will need headless terminal emulator written in python?

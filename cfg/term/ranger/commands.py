@@ -24,6 +24,29 @@ class cd_shelldir(Command):
         return self._tab_directory_content()  # Generic function
 
 
+class cd_clipboard(Command):
+    from subprocess import check_output
+    def execute(self):
+        path = cd_clipboard.check_output(['xsel','-ob']).decode('utf-8').rstrip()
+        if path[0:1] == '~':
+            path = os.path.expanduser(path)
+        if not os.path.exists(path):
+            return self.fm.notify("No such: " + path, bad=True)
+
+        # actions.py:393
+        #     self.open_console('open_with ')
+        # cwd = self.thisdir
+        if os.path.isdir(path):
+            self.fm.cd(path)
+        elif os.path.isfile(path):
+            self.fm.thistab.enter_dir(os.path.dirname(path))
+            # if cwd and cwd.accessible and cwd.content_loaded:
+            # TODO replace with comparing in .thisdir and moving cursor
+            self.fm.search_file(os.path.basename(path), regexp=False)
+            # if len(..) > 1:
+            #     self.fm.select_file(destination)
+
+
 class actualee(Command):
     FLS = os.path.join('/tmp', os.getenv('USER'), 'ranger_list')
     """:actualee

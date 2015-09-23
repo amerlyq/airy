@@ -46,10 +46,14 @@ done;}
 
 if distro arch; then
   mkdef() { link "${2?No bin}" "$CURR_CACHE/bin/${1?No name}"; }
+  svc_enable() { systemctl is-enabled "$1" > /dev/null || sudo systemctl enable "$1"; }
+  svc_restart() { sudo systemctl restart "$1"; }
 
 elif distro ubuntu; then
   mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
       sudo update-alternatives --set $1 "$2"; }
+  svc_enable() { sudo update-rc.d "$1" defaults; }
+  svc_restart() { sudo service "$1" restart; }
 fi
 
 ### Go to current script's directory

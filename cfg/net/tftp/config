@@ -1,0 +1,10 @@
+# For Ubuntu -- separate options
+# /etc/default/tftpd-hpa
+TFTP_USERNAME="tftp"
+TFTP_DIRECTORY="/cryptfs/tftpboot"
+TFTP_ADDRESS="[::]:69"
+TFTP_OPTIONS="--secure"
+
+# For Arch -- cmdline for systemd
+# /etc/conf.d/tftpd
+TFTPD_ARGS="--user tftp --address [::]:69 --secure /cryptfs/tftpboot"

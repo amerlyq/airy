@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# Purpose -- watch video on android through wifi, instead of samba
+
+if distro arch; then
+    pkg_inst "nfs-utils"
+
+elif distro ubuntu; then
+    pkg_inst "nfs-common nfs-kernel-server"
+fi

@@ -167,6 +167,26 @@ Ubuntu gnome terminal, disable cursor blinking
 Outlook
 	http://www.tech-recipes.com/rx/43875/outlook-2013-paste-as-plain-text-without-style-formatting/
 
+User/groups
+	Change UID/GUID
+		Identical ids are necessary for shared home between distro
+		Login as root, kill all user daemons, assume user=amer, id=1001
+			usermod -u 1000 amer
+			groupmod -g 1000 amer
+			chown --changes --silent --no-dereference --recursive --from=1001 1000 /
+			OR ... --from=1001:1001 1000:1000 /
+				: ATTENTION this will skip or files with not matching user/group!
+		WARNING: After group changes all SUID will be dropped
+			find / -group 1001 ! -type l -exec chgrp -h 1000 {} \;
+		OR:
+		: find / -user 1001 ! -type l -exec chown -h 1000 {} \;
+		: chgrp --changes --silent --no-dereference --recursive --from=1001 1000 /
+		usermod -g 1000 amer
+
+	Swap users --> use temp ids (need to be free):
+	:NOTE: Different tmp ids for case of partial operation.
+		1001->1012, 1002->1011, 1012->1002, 1011->1001
+
 Package mgrs
 	apt-get
 	| if add-apt-repository not found:  | sudo apt-get python-software-properties

@@ -25,12 +25,13 @@ alias mv='mv -iv'
 alias cp='cp -iv'
 alias ln='ln -iv'
 alias rm='rm -Iv --preserve-root'
-alias chown='chown --preserve-root'
-alias chownm='chown $CURR_USER:$CURR_USER'
-alias chownr='chown $CURR_USER:$CURR_USER'
+alias chown='chown --preserve-root '
+alias chownm='chown $USER:$USER'  # USE this exclusively
+alias chownr='chown root:root'
 alias chmod='chmod --preserve-root'
 alias chgrp='chgrp --preserve-root'
-
+alias mountl='\mount | column -t'
+alias mountf='sudo fdisk -l'
 
 # Very useful and nut aliases:
 # http://brettterpstra.com//2013/03/31/a-few-more-of-my-favorite-shell-aliases/
@@ -41,8 +42,8 @@ alias chgrp='chgrp --preserve-root'
 
 # --- Shorts for non-root ---
 if (( EUID != 0 )); then  # --calibrate
-    SUDOLST=(chown chmod pkill powertop apt-get dpkg dpkg-reconfigure
-             reboot poweroff halt shutdown)
+    SUDOLST=(chown chmod mount umount pkill powertop apt-get dpkg
+             dpkg-reconfigure reboot poweroff halt shutdown)
     for nm in "${SUDOLST[@]}"; do
         alias $nm='sudo '"$nm"' '
     done
