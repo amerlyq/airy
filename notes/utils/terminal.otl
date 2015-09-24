@@ -188,7 +188,7 @@ User/groups
 		1001->1012, 1002->1011, 1012->1002, 1011->1001
 
 Package mgrs
-	apt-get
+	apt-get  -->  /var/cache/apt/archives/*.deb
 	| if add-apt-repository not found:  | sudo apt-get python-software-properties
 	| to remove unavailable ppa:        | sudo apt-get install ppa-purge, sudo ppa-purge [the ppa you want to remove]
 	|									|	ALT: Manually edit 'sudo vim /etc/apt/sources.list.d/*'
@@ -208,5 +208,7 @@ Package mgrs
 		dpkg --install package-name-here.deb
 		dpkg -i -R /path/to/dir/name/with/lots/of/dot-deb-files/
 		dpkg -i --recursive /path/to/dir/name/with/lots/of/dot-deb-files/
+	Extract
+		ar xv *.deb
 		<Смотреть установленные либы gcc
 			dpkg -l | grep gcc

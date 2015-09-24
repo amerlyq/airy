@@ -31,6 +31,8 @@ xbacklight -set 50 &
 ## DPMS monitor setting (standby -> suspend -> off) (seconds)
 ${dpms+xset dpms $dpms}
 EOT
+# NOTE use 'xset q' to show current values for dmps
+# xset -dpms
 
 echo "W: $dst"
 

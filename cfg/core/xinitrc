@@ -3,6 +3,11 @@
 session=${1:-i3}
 xin=/etc/X11/xinit
 
+xrandr --auto
+# Disable PC speaker in X:
+xset b off
+# xsetroot -gray &
+
 # Merge in defaults and resources
 if [ -f "$xin/.Xresources" ]; then xrdb -merge "$xin/.Xresources"; fi
 if [ -f "$HOME/.Xresources" ]; then xrdb -merge "$HOME/.Xresources"; fi
@@ -19,7 +24,7 @@ fi
 
 # Launch session
 case $session in
-i3|i3wm) exec i3 ;;  # i3 -V -d all >> ~/.cache/i3.log 2>&1
+i3|i3wm) exec i3 > /var/log/i3.log 2>&1 ;;  # i3 -V -d all >> ~/.cache/i3.log 2>&1
  xmonad) exec xmonad ;;
   xterm) exec xterm -geometry 80x66+0+0 -name login ;;
 esac

@@ -29,14 +29,17 @@ then THEME=dark; fi
 
 
 ### LINKS ###
-link(){ local sudo=""; case "$1" in -s) sudo=sudo; shift ;; esac
-if [[ ! -e "$2" || -L "$2" ]]; then
-  if [[ ! "$1" -ef "$2" ]]; then
-    $sudo mkdir -p "${2%/*}"
-    $sudo ln -sfvT "$1" "$2"
-  else echo "L->   $2"; fi
-else echo "Err: symlink to $2"; exit 1
-fi;}
+link(){
+  local sudo=""; case "$1" in -s) sudo=sudo; shift ;; esac
+  local src="$1" dst="${2/%%/${1##*/}}"  # Replaces path/% -> path/<src_file>
+  [[ ! "$dst" =~ %$ ]] || die 1 "Err: guards '$dst' expansion"
+  if [[ ! -e "$dst" || -L "$dst" ]]; then
+    if [[ ! "$src" -ef "$dst" ]]; then
+      $sudo mkdir -p "${dst%/*}"
+      $sudo ln -sfvT "$src" "$dst"
+    else echo "-> L  $dst"; fi
+  else die 1 "Err: can't symlink to $dst"; fi
+}
 
 # ldir(){ mkdir -p $2 && lndir "$1" $2; }
 linkdir(){ for nm in ${@:2}

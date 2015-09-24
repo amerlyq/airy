@@ -1,4 +1,5 @@
 # vim: ft=sh
+[[ -x /usr/bin/dircolors ]] || return
 
 # Source
 #   http://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables
@@ -7,7 +8,6 @@
 # NOTE: disabled as support for coloring output has broke
 # export LESS='-FiX' #see $ man less, /export LESS/
 
-if [ -x /usr/bin/dircolors ]; then
 
 export LESS_TERMCAP_mb=$(tput bold; tput setaf 2) # green
 export LESS_TERMCAP_md=$(tput bold; tput setaf 6) # cyan
@@ -34,25 +34,24 @@ export LESS_TERMCAP_ZO=$(tput ssupm)
 export LESS_TERMCAP_ZW=$(tput rsupm)
 
 
+# export PAGER=less
+# man() {
+#     env LESS_TERMCAP_mb=$'\E[01;31m' \
+#     LESS_TERMCAP_md=$'\E[01;38;5;74m' \
+#     LESS_TERMCAP_me=$'\E[0m' \
+#     LESS_TERMCAP_se=$'\E[0m' \
+#     LESS_TERMCAP_so=$'\E[38;5;246m' \
+#     LESS_TERMCAP_ue=$'\E[0m' \
+#     LESS_TERMCAP_us=$'\E[04;38;5;146m' \
+#     man "$@"
+# }
+# export LESS="--RAW-CONTROL-CHARS"
+
+
+# DISABLED: no colors in git diff, etc -- google 'vimpager colors'
 # See: https://wiki.archlinux.org/index.php/Man#Colored_man_pages
-#if [ -f ~/.vim/bundle/vimpager/vimpager ]; then
-#    export PAGER=~/.vim/bundle/vimpager/vimpager
-#    alias less=$PAGER
-#    alias zless=$PAGER
-#else
-    # export PAGER=less
-    # man() {
-    #     env LESS_TERMCAP_mb=$'\E[01;31m' \
-    #     LESS_TERMCAP_md=$'\E[01;38;5;74m' \
-    #     LESS_TERMCAP_me=$'\E[0m' \
-    #     LESS_TERMCAP_se=$'\E[0m' \
-    #     LESS_TERMCAP_so=$'\E[38;5;246m' \
-    #     LESS_TERMCAP_ue=$'\E[0m' \
-    #     LESS_TERMCAP_us=$'\E[04;38;5;146m' \
-    #     man "$@"
-    # }
-#fi
-
-    # export LESS="--RAW-CONTROL-CHARS"
-fi
-
+# if [[ "${SHELL##*/}" == zsh ]] && (( $+commands[vimpager] )); then
+#     export PAGER=vimpager
+#     alias less=$PAGER
+#     alias zless=$PAGER
+# fi

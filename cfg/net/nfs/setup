@@ -3,12 +3,15 @@ source ~/.shell/func.d/cfgsetup
 
 if cfgOpt u; then
     if distro arch; then
+        sudo cp -vufT "$PWD/nfs-server.conf" /etc/conf.d/nfs-server.conf
         svc_enable rpcbind
         svc_enable nfs-server
         svc_restart rpcbind
+        svc_restart nfs-mountd
         svc_restart nfs-server
 
     elif distro ubuntu; then
+        echo "Err: No NFS config conversion. Works by default?"
         svc_enable  nfs-kernel-server
         svc_restart nfs-kernel-server
     fi
