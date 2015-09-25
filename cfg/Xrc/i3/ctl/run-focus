@@ -4,15 +4,19 @@ if [[ -z "$ARG" ]]; then
     echo "USAGE: $0 [<letter>]"; exit 1
 fi
 
-pr_lst=$(sed '/#/d' <<-'EOT'
-    [f]irefox      class="^Firefox$"  instance="^Navigator$"
-    [k]rita        class="^Krita$"    instance="^krita$"
-    [p]idgin       class="^Pidgin$"   title="^Buddy List$"
-    [n]cmpcpp      class="^(?i)urxvt" title="ncmpcpp"
+pr_lst=$(sed '/#.*$/s///; /^\s*$/d' <<-'EOT'
+[f]irefox       class="^Firefox$"   instance="^Navigator$"
+vim[b]          class="^Vimb$"      instance="^vimb$"
+[k]rita         class="^Krita$"     instance="^krita$"
+[p]idgin        class="^Pidgin$"    title="\"^Buddy List$\""
+[g]vim          class="^Gvim$"      instance="^gvim$"
+# [t]ransmission  class="^Transmission-gtk" title="^Transmission"
 
-    [g]vim         class="^Gvim$"     instance="^gvim$"
-    [t]ransmission class="^Transmission-gtk" title="^Transmission"
-    # vim[b]
+[u]rxvt         class="^(?i)urxvt"  title="^urxvt"
+[v]im           class="^(?i)urxvt"  title="^vim"
+[r]anger        class="^(?i)urxvt"  title="^ranger"
+[n]cmpcpp       class="^(?i)urxvt"  title="^ncmpcpp"
+[h]htop         class="^(?i)urxvt"  title="^htop"
 EOT
 )
 
@@ -27,10 +31,10 @@ case "$ARG" in
         pr=$1; gsub(/[\[\]()]/, "", pr);
         $1=""; sub(FS,""); foc=$0; exit
     } END { if(pr=="") { print "no such letter <'"$ARG"'>"; exit }
-        if(system("pgrep " pr " >/dev/null")) {
-            system("i3-msg \"exec " pr "\" >/dev/null")
-        } else { system("i3-msg \"[" foc "] focus\" >/dev/null")
-    }} ' <<< "$pr_lst" ;;
+        if(0 == system("pgrep " pr " >/dev/null")) {
+            system("i3-msg \"[" foc "] focus\" >/dev/null")
+        } else { system("i3-msg \"exec " pr "\" >/dev/null") }
+    } ' <<< "$pr_lst" ;;
 esac
 
 # i3-msg "[$1=$(echo $2 | sed s/\\x20/\\\\x20/g)] focus"

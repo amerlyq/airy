@@ -5,7 +5,7 @@
 
 FL=${TMPDIR:-/tmp}/outputs
 if [ ! -f "$FL" ]; then
-    xrandr | sed -n '/\sconnected\s/{{
+    xrandr -q | sed -n '/\sconnected\s/{{
         s/connected\|x\|+\|(.*$/ /g
         s/\(.*\) primary \(.*\)/\1 \2 */
     };p}' > "$FL"

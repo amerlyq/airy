@@ -39,7 +39,7 @@ lau() {
 # To be able to restart programms / reload configs for those which already launched!
 rcf() {
     local pid=$(ps opid= -C ${1##*/})
-    [ -n "$pid" ] && kill $pid
+    [[ -n "$pid" ]] && kill $pid
     lau $@
 }
 
@@ -50,12 +50,12 @@ setX da
 [[ -f ~/.Xresources ]] && xrdb -load ~/.Xresources
 
 ## Keylayout
-lau-xkb
-lau-xcape
-lau-touchpad
+lau r.xkb
+lau r.xcape
+lau r.touchpad
 
-lau-feh
-lau-dunst
+lau r.feh
+lau r.dunst
 
 # Focus certain wksp
 #i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &

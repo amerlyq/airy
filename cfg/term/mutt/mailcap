@@ -6,5 +6,5 @@
 text/html; vimb %s; test=test -n "$DISPLAY"; nametemplate=%s.html
 text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
 # text/html; elinks -dump %s ; copiousoutput
-application/zip; ~/.config/ranger/scope.sh %s; copiousoutput; nametemplate=%s
-application/pdf; ~/.config/ranger/scope.sh %s; copiousoutput; nametemplate=%s
+application/*; ~/.config/ranger/scope.sh %s; copiousoutput
+image/*; sxiv %s; test=test -n "$DISPLAY"

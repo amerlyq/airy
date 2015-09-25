@@ -1,12 +1,6 @@
 #!/bin/bash
 
 # --- Modify ---
-# YCM won't load on startup
-# DONT WORK. WHY?
-# It can be simpler to do restarting of vim from inside by combo leader-F12
-# let g:...
-# source $MYVIMRC
-
 # ALT: use dir from last history -- cd !$:h
 # OR:  physical pwd for symlinks -- cd $(pwd -P) -- ALT: cd -P ~/ch
 cdauto() { local p="${@: -1}"
@@ -30,7 +24,7 @@ v() { #servername == syntex (must be for LaTeX)
 #alias vim='\vim --cmd "let g:loaded_youcompleteme = 1"'
 #alias ycm='\vim --cmd "let g:loaded_youcompleteme = 0"'
 
-alias s='source lau-ranger; if [ $? -eq 2 ]; then exit; fi'
+alias s='r.ranger || (($?==2)) && exit'
 alias w3m='\w3m google.com'
 alias w3mh='\w3m -T "text/html"'
 alias tgz='tar -cvfz' # arch.tar.gz ./
@@ -44,8 +38,8 @@ alias wgetf='wget -i -c --content-disposition '
 alias p='ps -A f -o user,pid,pgrp,priority,ni,pcpu,pmem,args'
 
 # because _=/usr/bin/env
-alias ,.='lau-dict '
-alias .,='lau-dict '
+alias ,.='r.dict '
+alias .,='r.dict '
 # en2ru() { echo "$@" | translate-bin -s google -f en -t ru; }
 # ru2en() { echo "$@" | translate-bin -s google -f ru -t en; }
 

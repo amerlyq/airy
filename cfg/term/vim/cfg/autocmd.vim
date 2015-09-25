@@ -15,12 +15,14 @@ augroup AdditionalFiletypes "{{{2
     autocmd!
     au BufRead,BufNewFile {PKGBUILD,.AURINFO} setfiletype PKGBUILD
     au BufRead,BufNewFile
-        \ {Gemfile,Rakefile,Thorfile,Vagrantfile} set ft=ruby
+        \ {*.log*,log-*} setfiletype messages
     au BufRead,BufNewFile
-        \ {*tmux.conf*,Tmuxfile,*tmux/config} set ft=tmux
+        \ {Gemfile,Rakefile,Thorfile,Vagrantfile} setfiletype ruby
+    au BufRead,BufNewFile
+        \ {*tmux.conf*,Tmuxfile,*tmux/config} setfiletype tmux
     au BufRead,BufNewFile
         \ {*.automount,*.mount,*.path,*.service,*.socket,*.swap,*.target,*.timer}
-        \ set ft=systemd
+        \ setfiletype systemd
 augroup END
 
 

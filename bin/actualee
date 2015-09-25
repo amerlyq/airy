@@ -9,7 +9,7 @@ NM="$1"
 NAME="${NM%/*}"
 EXT="${NAME##*.}"
 TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
-FL="$PWD/$NM"
+FL="$(readlink -m "$NM")"
 
 
 finish() { local ERR=$?; if [[

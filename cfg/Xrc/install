@@ -7,6 +7,13 @@ source ~/.shell/func.d/packages
 
 pkg_inst "xsel xbindkeys xdotool"
 
+if distro arch; then
+    pkg_inst "xorg-xprop"
+
+elif distro ubuntu; then
+    echo "Err: No xprop"
+fi
+
 # xbacklight
 # Obsolete by kbdd + dbus-send (set_layout), qdbus (notification)
 # git_install 'ierton/xkb-switch'

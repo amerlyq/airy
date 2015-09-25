@@ -151,13 +151,10 @@ w_header "Navigation: GoTo"
     wmode_end "$mod+g"
 
 w_header "Navigation: Direct Go"
-    m_dir="-> [v]im, [r]anger, [n]cmpcpp, [h]top | [u]rxvt, [g]vim, [f]irefox, [p]idgin"
-    wmode_begin "$mod+s" 'godir' "$m_dir"
-        # Temporary solution: Jump exactly to the next open instance
-        wlistf "$ts %s [class=\"(?i)$term\" title=\"(?i)%s\"] focus ,$def"\
-            "v r n h" vim ranger ncmpcpp htop
-        wlistf "$ts %s [class=\"(?i)%s\"] focus ,$def"\
-            "u g f p" urxvt gvim Firefox Pidgin
+    # Temporary solution: Jump exactly to the next open instance
+    wmode_begin "$mod+s" 'godir' "-> $(~/.i3/ctl/run-focus -m)"
+        wmapf "$ts %%1 $exno ~/.i3/ctl/run-focus %%1 ,$def" \
+            $(~/.i3/ctl/run-focus -k)
     wmode_end "$mod+s"
 
 w_header "Navigation: Key <F1..12>"
@@ -261,14 +258,14 @@ w_header "Run: Prgs"
     wstr "$mCd+u $exno ~/.i3/ctl/run-cwd"  # Run with cwd of current active window
     wstr "$mSd+u split vertical  , $eurx"
     wstr "$mCS+u split horizontal, $eurx"
-    wstr "$mod+Return $eurx -e zsh -ic lau-ranger"
-    wstr "$mSd+Return $eflo -e lau-ranger"
+    wstr "$mod+Return $eurx -e zsh -ic r.ranger"
+    wstr "$mSd+Return $eflo -e r.ranger"
     wstr "$mCd+Return $eflo"
     wstr "$mCS+Return $eflo -e ipython -ic 'from pwn import *'"
 
 w_header "Run: Menus"
     wstr "$mCd+d $exno j4-dmenu-desktop"    #ALT (slow): i3-dmenu-desktop
-    wstr "$mod+d $exno lau-dmenu"           #ALT (firm): dmenu_run
+    wstr "$mod+d $exno r.dmenu"           #ALT (firm): dmenu_run
     wstr "$mod+Print $exno ~/.i3/ext/screenshot"
 
 
@@ -284,7 +281,7 @@ msg_copyq="Copyq: [e]dit, [o]pen, [m]enu | [a]ctive, [p]assive"
 w_header "Control: media-keys"
     # wstr "$bs XF86HomePage $exno xmind"
     wstr "$bs XF86Mail $eflo -e mutt"
-    wstr "$bs XF86Search $exno lau-vimb -p"
+    wstr "$bs XF86Search $exno r.vimb -p"
     wstr "$bs XF86Calculator $eflo -e ipython"  # '-ic from pwn import *'
     wstr "$bs XF86Sleep $exno xset -d :0 dpms force off"
 
