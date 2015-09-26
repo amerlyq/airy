@@ -1,0 +1,48 @@
+Get VGA card and display GPU vendor
+	lspci -vnn | grep VGA -A 12
+	lshw -numeric -C display
+	sudo lshw -numeric -C display
+To find your motherboard model, use dmidecode or inxi command.
+	sudo dmidecode -t baseboard | grep -i 'Product'
+	inxi -M
+Renderer
+	glxinfo | grep OpenGL
+
+Monitors EDID
+	paci read-edid
+	sudo get-edid | parse-edid
+
+Dual screen
+	: https://www.reddit.com/r/archlinux/comments/2kkrsr/dual_monitor_intelnvidia/
+	: http://us.download.nvidia.com/XFree86/Linux-x86/304.125/README/configtwinview.html
+	: http://us.download.nvidia.com/XFree86/Linux-x86/304.125/README/configmultxscreens.html
+	: http://us.download.nvidia.com/XFree86/Linux-x86/304.125/README/xconfigoptions.html
+	xrandr --listproviders
+	> https://github.com/Bumblebee-Project/Bumblebee/issues/21
+	nvidia-xconfig --query-gpu-info
+
+After logging in, you can also check that both drivers are running with the following commands:
+	lsmod | egrep "i915|nvidia"
+
+	glxinfo| grep "OpenGL version string"
+	: OpenGL version string: 4.4.0 NVIDIA 337.19
+	vdpauinfo | grep -i string
+	: Information string: NVIDIA VDPAU Driver Shared Library  337.19  Tue Apr 29 19:51:41 PDT 2014
+
+
+REF
+	http://archlinux.org.ru/forum/topic/12113/?page=1
+	https://wiki.archlinux.org/index.php/Xorg#Multiple_monitors
+	https://wiki.ubuntu.com/X/Config/Multihead
+	http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/
+	https://forums.opensuse.org/showthread.php/506693-Nvidia-settings-How-to-disable-panning
+
+
+	nvidia-settings --assign CurrentMetaMode="DFP-0: 1920x1200 { ViewPortIn=800x600, ViewPortOut=1600x1200+160+0 }"
+
+	nv-control-dpy --print-metamodes
+	nv-control-dpy --print-current-metamode
+	nv-control-dpy --add-metamode "DFP-0: 1280x1024 @1280x1024 +1280+0, DFP-1: nvidia-auto-select @1280x1024 +0+103"
+
+	nvidia-xconfig -o test
+	nvidia-xconfig -c /dev/null -o test

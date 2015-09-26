@@ -1,6 +1,7 @@
 #!/bin/bash -e
 source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
+exit 0
 
 
 cpf(){ [[ "$1" -ef "$2" ]] || sudo cp -vfT "$1" "$2"; }
@@ -9,15 +10,16 @@ case "$CURR_PROF"
 in home)
     video=1
     # cpf "$PWD/xorg.conf" /etc/X11/xorg.conf
-    cpf "$PWD/20-nvidia.conf" /etc/X11/xorg.conf.d/20-nvidia.conf
+    # cpf "$PWD/20-nvidia.conf" /etc/X11/xorg.conf.d/20-nvidia.conf
 ;; esac
 
 dst=~/.xinitrc
 cat > "$dst" <<EOT
 #!/bin/sh
-${video:+xrandr --setprovideroutputsource modesetting NVIDIA-0}
-# OR: --size 1 &
-xrandr --auto
+## NEED only for manual nvidia configuration.  For Optimus use bumblebee!
+# Because you will not be able to configure multihead manually for Optimus.
+# ${video:+xrandr --setprovideroutputsource modesetting NVIDIA-0}
+# xrandr --auto  # OR: --size 1 &
 
 # xsetroot -gray &
 exec i3

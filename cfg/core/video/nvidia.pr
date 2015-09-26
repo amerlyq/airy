@@ -51,14 +51,3 @@ apt-get update
 LST="$LST nvidia-prime nvidia-331-updates nvidia-settings mesa-utils prime-indicator"
 
 apt_noprompt $LST
-
-
-# Performance:
-#
-# For me I get a 50% increase in FPS in all games / openGL apps in Ubuntu with Nvidia by doing the following:-
-# 1. Enable the binary Nvidia driver
-# 2. enable 'unredirect fullscreen windows' in CCSM
-# -  Navigate to ccsm -> Composite - Enable unredirect fullscreen windows
-# - If using KDE (far far far better desktop) then the option is it desktop effects -> advanced -> disable desktop effects on fullscreen apps.
-# 3.  disable 'sync to vblank' (openGL settings) with nvidia-settings
-# (this is really important or all games appear laggy)

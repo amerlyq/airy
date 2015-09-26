@@ -1,0 +1,19 @@
+#!/bin/bash -e
+source ~/.shell/profile
+source ~/.shell/func.d/cfgsetup
+
+if distro arch; then
+  case "${CURR_PROF?:No}"
+  in home)
+    if ! id | grep -q bumblebee; then
+      sudo gpasswd -a $(whoami) bumblebee
+      die "!!! Re-login X session or reboot to update changes in Groups"
+    fi
+    svc_enable  bumblebeed
+  ;; esac
+
+elif distro ubuntu; then
+  echo "Err: no nvidia"
+fi
+
+# vim: ts=2:sw=2:sts=2

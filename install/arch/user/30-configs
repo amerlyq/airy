@@ -7,13 +7,21 @@ is_enabled 'X' || exit 0
 wscript ~/.profile "\
 #!/bin/sh
 [[ -f ~/.bashrc ]] && source ~/.bashrc
-[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && exec startx
+[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && exec startx  # -- -logverbose 5
 # OR: ... && exec xinit -- :0 -nolisten tcp vt\$XDG_VTNR
 "
 
 wscript ~/.xinitrc "\
 #!/bin/sh
+## VBox
 xrandr --size 1 &
+
+## Home
+# xrandr --query > /tmp/xlog
+# xrandr --setprovideroutputsource modesetting NVIDIA-0 # drivers order
+# xrandr --query >> /tmp/xlog
+# xrandr --output HDMI-0 --mode 1920x1080 --pos 0x0 --primary --panning 0x0+0+0 --output LVDS-1-0 --mode 1366x768 --pos 1920x312 --panning 0x0+0+0
+
 xsetroot -gray &
-exec i3
+exec i3 > /tmp/\$USER/i3.log 2>&1
 "
