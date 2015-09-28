@@ -8,22 +8,24 @@ nm=eth_dhcp
 ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
 ifc=${ifcs[0]:?No}
 
-cat > /etc/netctl/${nm?No} <<EOT
+cat > /etc/netctl/${nm?:No} <<EOT
 Description='General LAN dhcp connection'
-Interface=$ifc
+Interface=${ifc?:No}
 Connection=ethernet
 IP=dhcp
 EOT
 
-cat > /etc/netctl/eth_static <<EOT
+nm=eth_static
+gate="${SYS_IP%.*}.1"
+cat > /etc/netctl/${nm?:No} <<EOT
 Description='Static LAN connection behind NAT'
-Interface=$ifc
+Interface=${ifc?:No}
 Connection=ethernet
 IP=static
-Address=('192.168.1.2/24')
+Address=('${SYS_IP:?No}/24')
 #Routes=('192.168.0.0/24 via 192.168.1.2')
-Gateway='192.168.1.1'
-DNS=('192.168.1.1')
+Gateway='$gate'
+DNS=('$gate')
 EOT
 
 ## For dhcp to transmit MAC instead DUID, so server could attach ip:

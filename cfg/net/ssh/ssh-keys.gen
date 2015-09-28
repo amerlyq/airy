@@ -3,7 +3,7 @@ source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
 genssh(){ # $1 -- @mail, $2 -- path/to/key
-    local mail="$1" idn="$HOME/.ssh/$2"
+    local mail="$1" idn=~/.ssh/"$2"
     if cfgOpt u || [[ ! -f "$idn" ]]; then
         ssh-keygen -t rsa -C "$mail" -N "" -f "$idn"
         echo "!!! Copy generated *.pub key to your servers"
@@ -11,9 +11,9 @@ genssh(){ # $1 -- @mail, $2 -- path/to/key
 }
 
 # =================== Multi--SSH ============================
-
 genssh "${WORK_NAME:=${MAIN_NAME?No}}" id_rsa
 genssh "${WORK_MAIL:=${MAIN_MAIL?No}}" git_rsa
+genssh "${WORK_MAIL:=${MAIN_MAIL?No}}" rt_rsa
 
 case "$CURR_PROF" in
   work) genssh "$WORK_MAIL" srk_rsa ;;
