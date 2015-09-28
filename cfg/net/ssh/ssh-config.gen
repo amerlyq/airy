@@ -8,14 +8,15 @@ source ~/.shell/profile
 
 wacc() {
     local name=$1 host=$2 user=$3
-    local idn="$4" x11=$5 port=$6 str
+    local idn="$4" x11=$5 port=$6 dh=$7 str
 
 echo -ne "Host $name
     HostName $host
     User $user\
 ${port:+\n    Port $port}\
 ${idn:+\n    IdentityFile ~/.ssh/$idn}\
-${x11:+\n    ForwardX11 yes}
+${x11:+\n    ForwardX11 yes}\
+${dh:+\n    KexAlgorithms +diffie-hellman-group1-sha1}
 \n" >> $dst;
 }
 
@@ -33,12 +34,14 @@ wacc glab  'gitlab.com' git         git_rsa
 if [[ -n "$HOME_SRV" ]]; then
     wacc sir   $HOME_SRV    $HOME_USER  '' '' $HOME_PORT
     wacc ked   $KEDI_SRV    $KEDI_USER  '' '' $KEDI_PORT
+    wacc rou   $ROUT_SRV    $ROUT_USER  rt_rsa '' $ROUT_PORT dh
 fi
 
-case "$CURR_PROF" in home|laptop)
+case "$CURR_PROF" in home|laptop|gnote4)
     wacc lked   $KEDI_IPL   $KEDI_USER   lked_rsa #x11
     wacc lsir   $HOME_IPL   $HOME_USER   lsir_rsa x11
     wacc llap   $LAPT_IPL   $LAPT_USER   ''      x11
+    wacc lrou   $ROUT_IPL   $ROUT_USER   rt_rsa '' $ROUT_PORT dh
 ;; esac
 
 case "$CURR_PROF" in work_samsung)

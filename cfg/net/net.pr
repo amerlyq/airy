@@ -4,11 +4,12 @@ source ~/.shell/func.d/packages
 if [ $? -eq 1 ]; then exit 1; fi
 # Net-tech untils
 
-LST="$LST nmap"
 # nmap    | Network exploration tool and security / port scanner
-LST="$LST network-manager uget"
 # uget  | download manager, symbiont for flashgot
-LST="$LST youtube-dl"
 # youtube-dl | downloader for youtube video from page
+pkg_inst iw nmap network-manager uget youtube-dl
 
-apt_noprompt $LST
+# iw phy
+# sudo iw dev wlp3s0 scan
+# sudo iwlist wlp3s0 scan | sed -n '/(Channel/p'
+# iwlist wlp3s0 freq
