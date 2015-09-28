@@ -1,0 +1,197 @@
+#!/bin/bash -e
+# vim: ft=sh
+# ALT: xmacroplay (instead of xdotool)
+
+source ~/.shell/func.d/write
+
+#> Cards
+# 1 2
+# 3 4
+vbase_x=975; vbase_y=440;
+card_w=135;   card_h=130;
+ocx[0]=$((1280/2-vbase_x));   ocy[0]=$((720/2-vbase_y));
+ocx[1]=0      ; ocy[1]=0      ;
+ocx[2]=$card_w; ocy[2]=0      ;
+ocx[3]=0      ; ocy[3]=$card_h;
+ocx[4]=$card_w; ocy[4]=$card_h;
+
+#> Magic
+#   1 2 3   # 756
+#   4 5 6   # 795
+#   7 8 9   # 835
+#1716:1760:1800
+
+mgx[1]=33; mgy[1]=63;    mgx[2]=62; mgy[2]=63;    mgx[3]=90; mgy[3]=63;
+mgx[4]=33; mgy[4]=90;    mgx[5]=62; mgy[5]=90;    mgx[6]=90; mgy[6]=90;
+mgx[7]=33; mgy[7]=114;   mgx[8]=62; mgy[8]=114;   mgx[9]=90; mgy[9]=114;
+mclr_x=117; mclr_y=58;
+muse_x=117; muse_y=90;
+
+#> Hands
+# L: Fire or fast-cast
+# R: Ignore or use
+hlx=${mgx[1]}; hly=${mgy[1]};
+hrx=$mclr_x; hry=$mclr_y;
+set1x=10; set1y=70;
+set2x=10; set2y=105;
+
+# ==========================================================
+
+xdot(){ local key="$1" cmds="$2"; printf "\"xdotool $cmds\"\n    $key\n"; }
+
+dt_after=0.18
+dt_press=0.12
+dt_move=0.17
+dt_hold=1.0
+
+m_push(){    local M=${1:-3}; printf "mousedown $M sleep ${3:-${dt_after?dt}}"; }
+m_release(){ local M=${1:-3}; printf "mouseup $M sleep ${3:-${dt_after?dt}}"; }
+m_press(){   local M=${1:-3}; printf "mousedown $M sleep ${3:-${dt_press?dt}} mouseup $M"; }
+m_hold(){    local M=${1:-3}; printf "mousedown $M sleep ${3:-${dt_hold?dt}} mouseup $M"; }
+m_move(){    printf "mousemove --sync ${1?err_x} ${2?err_y} sleep ${3:-${dt_move?dt}}"; }
+
+
+magic(){
+    local cx=$1 cy=$2 s="$3" x y ind str=""
+
+    for (( i=0; i<${#s}; i++ )); do
+        ind="${s:$i:1}"
+        x=$(( cx + ${mgx[$ind]} ))
+        y=$(( cy + ${mgy[$ind]} ))
+        str="$str $(m_move $x $y)"
+        if [[ i -eq 0 ]]; then str="$str $(m_push 3)"; fi
+    done
+    str="$str $(m_release 3)"
+    printf "$str"
+}
+
+act_use(){
+    local card=$1 hand=$2 key="$3" hx hy x y str=""
+
+    #set
+    case "$hand" in
+        *1) hx=$set1x; hy=$set1y ;;
+        *2) hx=$set2x; hy=$set2y ;;
+        S*) hx=0; hy=-80 ;; #Screen
+        *)  hx=noprefix;
+    esac
+    if [ "$hx" != "noprefix" ]; then
+        x=$(( vbase_x + ${ocx[$card]} + hx))
+        y=$(( vbase_y + ${ocy[$card]} + hy))
+        str="$(m_move $x $y) $(m_press 1)"
+    fi
+
+    case "$hand" in
+        L*|B*) hx=$hlx; hy=$hly ;;
+        R*) hx=$hrx; hy=$hry ;;
+        U*) hx=$muse_x; hy=$muse_y ;; #Use magic
+        X*) hx=$hx; hy=$hy ;; #Switch
+        *)  hx=noact;
+    esac
+    if [ "$hx" != "noact" ]; then
+        x=$(( vbase_x + ${ocx[$card]} + hx))
+        y=$(( vbase_y + ${ocy[$card]} + hy))
+        str="$str $(m_move $x $y) $(m_press 3)"
+
+        case "$hand" in B*)
+            x=$(( vbase_x + ${ocx[$card]} + hrx))
+            y=$(( vbase_y + ${ocy[$card]} + hry))
+            str="$str sleep ${dt_press?dt} $(m_move $x $y) $(m_press 3)"
+            ;; esac
+    fi
+
+    xdot "$key" "$str"
+}
+
+act_spell(){
+    local key="$3" card=$1 spell="$2" x y
+    x=$(( vbase_x + ${ocx[$card]}))
+    y=$(( vbase_y + ${ocy[$card]}))
+    xdot "$key" "$(magic $x $y $spell)"
+}
+
+act_magic(){
+    local key="$3" card=$1 spell="$2" x y str
+    x=$(( vbase_x + ${ocx[$card]}))
+    y=$(( vbase_y + ${ocy[$card]}))
+    str="$(magic $x $y $spell)"
+    str="$str $(m_move $((x+muse_x)) $((y+muse_y))) $(m_press 3)"
+    xdot "$key" "$str"
+}
+
+# ==========================================================
+
+dst=~/.xbindkeysrc
+wbegin
+wstr "## Controls for 'The Legend of Grimrock II'"
+
+wprf '
+# Disable it
+"kill $(pgrep xbindkeys)"
+    Mod4 + q
+'
+
+wprf "\n\n### Hands\n"
+wprf "$(
+    act_use 0 S z
+
+    act_use 1 L j
+    act_use 1 R u
+    act_use 1 1 Control+u
+    act_use 1 2 Control+j
+
+    act_use 2 U k
+    act_use 2 R i
+    act_use 2 L 8
+    act_use 2 1 Control+i
+    act_use 2 2 Control+k
+
+    act_use 3 L l
+    act_use 3 B o
+    act_use 3 1 Control+o
+    act_use 3 2 Control+l
+
+    act_use 4 U semicolon
+    act_use 4 R p
+    act_use 4 L 9
+    act_use 4 1 Control+p
+    act_use 4 2 Control+semicolon
+)\n"
+
+
+wprf "\n\n### Magic #2\n"
+
+posmag=2
+wprf "$(
+    act_spell $posmag 78963     t           PoisonBolt
+    act_spell $posmag 7         y           Poison
+
+    act_spell $posmag 3         g           Shock
+    act_spell $posmag 789       h           IceShards
+
+    act_spell $posmag 123654789 b           Dispel
+    act_spell $posmag 369       n           FrostBolt
+
+    act_magic $posmag 456       m           Shield
+    act_spell $posmag 96589     Control+m   FrostShield
+    act_spell $posmag 123698741 5           ForceField_C2
+)\n"
+
+posmag=4
+wprf "$(
+    act_spell $posmag 1     comma           Fireburst25
+    act_spell $posmag 1236  f               Fireball43
+    act_spell $posmag 14563 Control+comma   MeteorStorm80
+    act_spell $posmag 3     period          Shock25
+    act_spell $posmag 3254  Control+period  LightningBolt50
+
+    act_magic $posmag 456     slash   Shield
+    act_spell $posmag 12541   Control+slash   FireShield
+    act_spell $posmag 52365   Shift+slash     ShockShield
+
+    act_magic $posmag 85        6  Dark_C1
+    act_magic $posmag 25        7  Light_C1
+    act_spell $posmag 123698741 c  ForceField35_C2
+    act_spell $posmag 458       x  DarkBolt_C3
+    act_spell $posmag 3658      v  Invisibility45_A3C2
+)\n"

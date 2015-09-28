@@ -4,9 +4,12 @@ source ~/.shell/func.d/packages
 # winetricks | only for x86
 # mono-complete | for .NET   ::  mono ./file.exe
 
+# lib32-openal | necessary for XAudio2.7
+
 if distro arch; then
-    pkg_inst "wine wine-mono wine_gecko winetricks"
-    pkg_inst "lib32-alsa-lib lib32-alsa-plugins lib32-ncurses lib32-mpg123"
+    pkg_inst "wine wine-mono wine_gecko winetricks playonlinux"
+    pkg_inst "lib32-alsa-lib lib32-alsa-plugins lib32-openal"
+    pkg_inst "lib32-ncurses lib32-mpg123"
 
 elif distro ubuntu; then
     # MAN:

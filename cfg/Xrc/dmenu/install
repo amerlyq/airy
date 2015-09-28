@@ -5,7 +5,9 @@ source ~/.shell/func.d/packages
 #|                | 'tabbed' -- generic tabbed fronted for surf, st, uzbl, urxvt and xterm
 
 if distro arch; then
+    # aur_inst dmenu-frecency-git ||
     pkg_inst dmenu
+
 elif distro ubuntu; then
     pkg_inst suckless-tools
 fi

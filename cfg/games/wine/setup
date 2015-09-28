@@ -1,0 +1,6 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+if [[ ! -d ~/.wine32 ]]; then
+    WINEPREFIX=$HOME/.wine32 WINEARCH='win32' wine 'wineboot'
+fi

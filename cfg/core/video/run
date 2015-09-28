@@ -3,9 +3,11 @@ source ~/.shell/profile
 [[ "$CURR_PROF" =~ ^(home) ]] || exit
 
 setm() { local sz=${1:-1920x1080}; shift
-    # xrandr --addmode VGA1 1280x720
+    if ! xrandr -q | sed '/^VGA1/,/^\S/!d' | grep -q "$sz"; then
+        xrandr --addmode VGA1 "$sz"
+    fi
     xrandr --output VGA1 --mode $sz --primary \
-            --output LVDS1 ${@:---off};
+           --output LVDS1 ${@:---off};
 }
 
 case "${1#-}"
