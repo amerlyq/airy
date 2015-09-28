@@ -50,7 +50,8 @@ xkb_symbols "switches"
     modifier_map  Mod4 { <LALT>, <SUPR> };
 
     // EXPL: xcape: -> Super_R, so dbl click-hold will cause lvl5
-    key <RCTL> { type="L2:SUPER", [ ISO_Level3_Shift, ISO_Level5_Shift ] };
+    // BUT: I temporarily don't use ISO_Level5_Shift
+    key <RCTL> { type="L2:SUPER", [ ISO_Level3_Shift, Control_R ] };
     modifier_map  Mod5 { <RCTL> };
     key <MENU> { [ VoidSymbol ] };  // For VirtualBox
 

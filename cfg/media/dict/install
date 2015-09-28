@@ -4,12 +4,15 @@ source ~/.shell/func.d/packages
 pkg_inst dictd
 
 if distro arch; then
-    echo "Err: no yarxi"
+    echo "Err: need create PKGBUILD for yarxi"
+    # Dependencies: libc6, libqt4-core (>= 4.6), libqt4-gui (>= 4.6),
+    #               libqt4-network (>= 4.6), ttf-sazanami-mincho
+    # SEE https://code.google.com/p/yarxi-pl/downloads/list
 
 elif distro ubuntu; then
     pkg_inst dict
     echo "Err: no yarxi for old mint!"
-    # deb_inst 'http://www.susi.ru/yarxi/yarxi_1.10-1_amd64.deb'
+    deb_inst 'http://www.susi.ru/yarxi/yarxi_1.10-1_amd64.deb'
 fi
 
 # dict-moby-thesaurus dict-gcide dict-freedict-eng-rus dict-wn dict-devil
