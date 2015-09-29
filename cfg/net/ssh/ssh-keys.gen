@@ -16,7 +16,7 @@ genssh "${WORK_MAIL:=${MAIN_MAIL?No}}" git_rsa
 genssh "${WORK_MAIL:=${MAIN_MAIL?No}}" rt_rsa
 
 case "$CURR_PROF" in
-  work) genssh "$WORK_MAIL" srk_rsa ;;
+  # work) genssh "$WORK_MAIL" srk_rsa ;;
 laptop) genssh "$MAIN_MAIL" lsir_rsa
         genssh "$MAIN_MAIL" lked_rsa ;;
   home) genssh "$MAIN_MAIL" lked_rsa ;;

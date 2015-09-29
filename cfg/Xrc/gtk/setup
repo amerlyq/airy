@@ -27,8 +27,8 @@ if cfgOpt u; then
     # cfg=/etc/fonts/conf.d/10-scale-bitmap-fonts.conf
     # if [[ -L $cfg ]]; then rm $cfg; fi
     sudo ln -svf /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d/70-no-bitmaps.conf
-    mkfontscale ~/.fonts/*
-    mkfontdir ~/.fonts/*
+    mkfontscale ~/.fonts
+    mkfontdir ~/.fonts
     sudo fc-cache -vf ~/.fonts  # fc-cache -fs >/dev/null
 fi
 

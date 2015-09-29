@@ -1,6 +1,6 @@
 Keys
 	Для смены/создания пароля закрытого ключа RSA выполните следующую команду:
-		ssh-keygen -f ~/.ssh/id_rsa -p
+		ssh-keygen -o -a 32 -p -f ~/.ssh/id_rsa
 	Send key to remote-server
 		ssh-copy-id -i ~/.ssh/id_ecdsa.pub -p 221 user@remote-server.org
 	man ssh_config 5

@@ -18,7 +18,7 @@ for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
 header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
 pretty() { sed -r "s|/home/$(whoami)|\~|g
               s|\~/\S+/cfg/||g;  />>>/!s|^|  |g
-        /^>>> \.\//s//\n$C2\[/g; / <<<$/s//\]$CR/g
+        /^>>> /s//\n$C2\[/g; / <<<$/s//\]$CR/g
     /(C|W):\s.*/s//$C13&$CR/; /(N):\s.*/s//$C6&$CR/
  /\<(E|Err|ERR):\s.*/s//$C1&$CR/; /.*\s->\s.*/s//$C4&$CR/
 ";}

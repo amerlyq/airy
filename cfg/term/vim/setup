@@ -56,7 +56,7 @@ fi
 ### PLUGINS ###
 if cfgOpt u || [[ ! -d "$VCACHE/bundle" ]]; then
     # FIXME: error on clean system, when NeoBundle is not installed yet
-    vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty && echo
+    vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty ||:
 fi
 
 # Editor
