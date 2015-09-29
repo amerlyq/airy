@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+mutt -e "source ~/.cache/mutt/acc/default" \
+     -e "set smtp_pass=$(read -p "Mutt pass:" -s p && echo $p)" \
+     $@

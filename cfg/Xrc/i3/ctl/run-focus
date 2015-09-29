@@ -12,12 +12,12 @@ vim[b]          class="^Vimb$"      instance="^vimb$"
 [g]vim          class="^Gvim$"      instance="^gvim$"
 # [t]ransmission  class="^Transmission-gtk" title="^Transmission"
 
-[u]rxvt         class="^(?i)urxvt"  title="^urxvt"
-[v]im           class="^(?i)urxvt"  title="^vim"
-[r]anger        class="^(?i)urxvt"  title="^ranger"
-[m]anger        class="^(?i)urxvt"  title="^mutt"
-[n]cmpcpp       class="^(?i)urxvt"  title="^ncmpcpp"
-[h]htop         class="^(?i)urxvt"  title="^htop"
+[u]rxvt         class="^(?i)urxvt"  instance="^urxvt"
+[v]im           class="^(?i)urxvt"  instance="^vim"
+[r]anger        class="^(?i)urxvt"  instance="^ranger"
+[m]anger        class="^(?i)urxvt"  instance="^mutt"
+[n]cmpcpp       class="^(?i)urxvt"  instance="^ncmpcpp"
+[h]htop         class="^(?i)urxvt"  instance="^htop"
 EOT
 )
 
@@ -28,15 +28,20 @@ case "$ARG" in
 -k) awk 'match($1,/\[\w\]/) {k=k" "substr($1,RSTART+1,1)}
          match($1,/\(\w\)/) {k=k" Shift+"substr($1,RSTART+1,1)}
     END{print k} ' <<< "$pr_lst" ;;
- *) awk '$1 ~ /\['"$ARG"'\]/ {
+ *) awk <<< "$pr_lst" -v arg="$ARG" '
+    BEGIN { patt="\\["arg"\\]" }
+    $1 ~ patt {
         pr=$1; gsub(/[\[\]()]/, "", pr);
         $1=""; sub(FS,""); foc=$0; exit
-    } END { if(pr=="") { print "no such letter <'"$ARG"'>"; exit }
+    } END { if(pr=="") { print "no such letter <"arg">"; exit }
         if(0 == system("pgrep " pr " >/dev/null")) {
-            system("i3-msg \"[" foc "] focus\" >/dev/null")
+            system("i3-msg '"'"'["foc"]'"'"' focus >/dev/null")
         } else { system("i3-msg \"exec " pr "\" >/dev/null") }
-    } ' <<< "$pr_lst" ;;
+    }' ;;
 esac
+# DEV get list of all apps, matching class/instance pattern,
+#   and choose next from list relative to current window.
+#   So we will have tab-rings for each application.
 
 # i3-msg "[$1=$(echo $2 | sed s/\\x20/\\\\x20/g)] focus"
 # W=$(xdotool search --classname "$2" | head -1)

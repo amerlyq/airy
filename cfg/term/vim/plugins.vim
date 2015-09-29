@@ -304,6 +304,8 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
 " NeoBundle 'cakebaker/scss-syntax.vim'
 " NeoBundle 'gorodinskiy/vim-coloresque'
 
+NeoBundle 'Matt-Deacalion/vim-systemd-syntax'
+
 NeoBundle 'vim-perl/vim-perl'
 NeoBundle 'scrooloose/syntastic'
 
