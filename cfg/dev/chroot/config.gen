@@ -1,17 +1,21 @@
 #!/bin/bash -e
 source ~/.shell/profile
 
-dst=/etc/schroot/schroot.conf
-nm=lucid_i386
+# File must exist to start schroot
+sudo touch /etc/schroot/schroot.conf
 
-sudo tee "$dst" <<EOT
+
+nm=lucid_i386
+sudo tee "/etc/schroot/chroot.d/${nm}.conf" <<EOT
 [$nm]
-description=Build environment $nm
+description=Build environment for $nm
 personality=linux32
 root-users=$USER
 users=$USER
+profile=default
 type=directory
 directory=/cryptfs/chroots/$nm
+shell=/bin/bash
 EOT
 
 

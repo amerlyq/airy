@@ -29,28 +29,22 @@ then THEME=dark; fi
 
 
 ### LINKS ###
-link(){
-  local sudo=""; case "$1" in -s) sudo=sudo; shift ;; esac
-  local src="$1" dst="${2/%%/${1##*/}}"  # Replaces path/% -> path/<src_file>
-  [[ ! "$dst" =~ %$ ]] || die 1 "Err: guards '$dst' expansion"
-  if [[ ! -e "$dst" || -L "$dst" ]]; then
-    if [[ ! "$src" -ef "$dst" ]]; then
-      $sudo mkdir -p "${dst%/*}"
-      $sudo ln -sfvT "$src" "$dst"
-    else echo "-> L  $dst"; fi
-  else die 1 "Err: can't symlink to $dst"; fi
-}
-
-# ldir(){ mkdir -p $2 && lndir "$1" $2; }
+link(){ ~/.bin/prg.d/linkcp $@; }
 linkdir(){ for nm in ${@:2}
 do link "$PWD/$nm" "${1?No pref}$nm"
 done;}
+# ALT linkdir(){ mkdir -p $2 && lndir "$1" $2; }
 
 
 if distro arch; then
   mkdef() { link "${2?No bin}" "$CURR_CACHE/bin/${1?No name}"; }
   svc_enable() { systemctl is-enabled "$1" > /dev/null || sudo systemctl enable "$1"; }
   svc_restart() { sudo systemctl restart "$1"; }
+  usvc_activate() { systemctl --user daemon-reload &&  # Refresh configurations
+      systemctl --user enable "$1" && systemctl --user start "$1"; }
+  # System user for demons without shell access and without a home directory
+  add_sysuser() { id "${1:?No}" >/dev/null 2>&1 ||
+      sudo useradd -r -U -d /dev/null -s /usr/bin/nologin "$1"; }
 
 elif distro ubuntu; then
   mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||

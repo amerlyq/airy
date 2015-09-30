@@ -2,6 +2,9 @@
 source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
+# TODO
+#   https://wiki.archlinux.org/index.php/Samba/Tips_and_tricks
+
 ## Don't share samba in work network, only at home
 cfgOpt f || [[ "${CURR_PROF?No}" =~ laptop|home ]] || die 0 "<Skip>"
 

@@ -21,7 +21,7 @@ HISTFILESIZE=2000
 shopt -s checkwinsize
 
 # Expand aliases to be available in scripts
-shopt -s expand_aliases
+# shopt -s expand_aliases
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
@@ -31,6 +31,8 @@ shopt -s expand_aliases
 # http://unix.stackexchange.com/questions/12107/how-to-unfreeze-after-accidentally-pressing-ctrl-s-in-a-terminal/12108#12108
 # to enable: stty ixany
 stty -ixon
+# Don't insert ^C in commandline
+stty -echoctl
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -58,3 +60,6 @@ shopt -s cdspell
 
 finish() { printf "%s" "$PWD" > "${TMPDIR:-/tmp}/ranger_cwdir"; }
 trap finish EXIT
+
+# Execute exported commands for chroot and ssh
+[[ -z "$BASHRC_EVAL" ]] || eval "$BASHRC_EVAL"

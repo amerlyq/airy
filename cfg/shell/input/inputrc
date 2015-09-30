@@ -83,12 +83,18 @@ $endif
 # Timeout for ambiguous bindings like <Esc> and ',s'
 set keyseq-timeout 200
 
+# Keep original entry in history after command modifying
+set revert-all-at-newline on
 # do not casesensitive completion
 set completion-ignore-case on
 # ask, if there more then N variants to completion
 set completion-query-items 80
 # A single <Tab> instead of double
 # set show-all-if-ambiguous on
+
+# From LC_COLORS
+set colored-stats on
+
 
 # Show extra file information when completing, like `ls -F` does
 #set visible-stats on

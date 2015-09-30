@@ -5,8 +5,7 @@ source ~/.shell/func.d/cfgsetup
 dir=/cryptfs/tftpboot
 
 if cfgOpt u; then
-    # System user 'tftp' without shell access and without a home directory
-    id tftp >/dev/null 2>&1 || sudo useradd -r -U -s /usr/bin/nologin tftp
+    add_sysuser tftp
 
     mkdir -p "$dir"
     if [[ "$(stat -c '%u %g' "$dir")" != "$(id -u tftp) $(id -g tftp)" ]]

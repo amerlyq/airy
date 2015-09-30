@@ -1,0 +1,10 @@
+Start user instance right after boot and keep beside sessions
+: USE for mpd
+	loginctl enable-linger username
+
+Set many variables ~/.bash_profile
+	xargs systemctl --user set-environment < /path/to/file.conf
+	systemctl --user import-environment PATH
+
+SEE for autostart tmux session (to use instead of X)
+	https://wiki.archlinux.org/index.php/Systemd/User

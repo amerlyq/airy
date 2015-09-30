@@ -1,0 +1,45 @@
+#!/bin/bash -e
+# vim: ts=2:sw=2:sts=2
+pr="${0##*/}"
+die() { printf "Err: '$pr' %s${1+\n}" "$1"; exit 1; }
+# echo ">> $*"
+
+
+while getopts "cst:" opt; do case $opt
+in c) cmd='copy'
+;; s) sudo='sudo'
+;; t) dir="$OPTARG"
+;; :|"?") die "needs value for '-$opt'"
+;; *) die "invalid option '-$opt'"
+;; esac; done
+shift $((OPTIND-1))
+
+# echo "cmd=$cmd, sudo=$sudo, dir=$dir"
+
+src="$1"
+dst="$2"
+[[ -e "$src" ]] || die "no such file '$src'"
+[[ -f "$src" ]] || args='-r'
+[[ -z "$dir" ]] || dst="$dir/${1##*/}"
+# dst="${2/%%/${1##*/}}"  # Replaces path/% -> path/<src_file>
+# [[ ! "$dst" =~ %$ ]] || die "guards '$dst' expansion"
+
+
+case "$cmd"
+in copy)
+  if [[ ! -e "${dst:?No}" || ! -L "$dst" ]]; then
+    if ! diff $args -q "${src:?No}" "$dst" >/dev/null; then
+      $sudo mkdir -p "${dst%/*}"
+      $sudo cp $args -vfT "$src" "$dst"
+    else echo "-> C  $dst"; fi
+  else die "can't copy to $dst"; fi
+
+;; link|*)
+  if [[ ! -e "${dst:?No}" || -L "$dst" ]]; then
+    if [[ ! "${src:?No}" -ef "$dst" ]]; then
+      $sudo mkdir -p "${dst%/*}"
+      $sudo ln -svfT "$src" "$dst"
+    else echo "-> L  $dst"; fi
+  else die "can't symlink to $dst"; fi
+
+;; esac
