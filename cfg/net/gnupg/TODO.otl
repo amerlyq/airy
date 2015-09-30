@@ -56,6 +56,12 @@ Config
 		echo RELOADAGENT | gpg-connect-agent
 		:OR: systemctl --user reload gpg-agent
 
+	Cache for the whole session until gpg-agent is restarted.
+	: If you set up default-cache-ttl value, it will take precedence.
+		/usr/lib/gnupg/gpg-preset-passphrase --preset <keygrip>
+		: Where <keygrip> is taken from
+			gpg -with-keygrip -K
+
 Test
 	Check if working
 		pgrep gpg-agent
@@ -68,9 +74,3 @@ Test
 		systemctl --user daemon-reload
 		systemctl --user enable gpg-agent
 		systemctl --user start gpg-agent
-
-: To cache your passphrase for the whole session, please run the following command:
-: $ /usr/lib/gnupg/gpg-preset-passphrase --preset XXXXXX
-: where XXXX is the keygrip. You can get its value when running gpg
-: --with-keygrip -K. Passphrase will be stored until gpg-agent is restarted. If
-: you set up default-cache-ttl value, it will take precedence.

@@ -4,7 +4,7 @@ IgnoreOnIsolate=true
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/gpg-agent --daemon   # --homedir=%h/.gnupg
+ExecStart=/usr/bin/gpg-agent --daemon --enable-ssh-support --homedir=%h/.gnupg
 ExecReload=/usr/bin/gpg-connect-agent RELOADAGENT
 Restart=on-abort
 

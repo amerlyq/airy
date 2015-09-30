@@ -3,4 +3,9 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-link "$PWD/gpg-agent.conf" ~/.gnupg/gpg-agent.conf
+link -t  ~/.gnupg   ./gpg-agent.conf
+link -ct ~/.config/systemd/user   ./gpg-agent.service
+# NOTE: Configs for systemd can't be link, only real file.
+#       But whole dir ./systemd/ or ./user/ could.
+
+usvc_activate gpg-agent
