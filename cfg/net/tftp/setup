@@ -12,12 +12,12 @@ if cfgOpt u; then
     then sudo chown -R tftp:tftp "$dir"; fi
 
     if distro arch; then
-        sudo cp -vufT "$PWD/config" /etc/conf.d/tftpd
+        link -sc ./config /etc/conf.d/tftpd
         svc_enable  tftpd
         svc_restart tftpd
 
     elif distro ubuntu; then
-        sudo cp -vufT "$PWD/config" /etc/default/tftpd-hpa
+        link -sc ./config /etc/default/tftpd-hpa
         svc_enable  tftpd-hpa
         svc_restart tftpd-hpa
     fi

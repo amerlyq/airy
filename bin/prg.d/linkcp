@@ -28,11 +28,11 @@ dst="$2"
 case "$cmd"
 in copy)
   if [[ ! -e "${dst:?No}" || ! -L "$dst" ]]; then
-    if ! diff $args -q "${src:?No}" "$dst" >/dev/null; then
+    if ! diff $args -q "${src:?No}" "$dst" >/dev/null 2>&1; then
       $sudo mkdir -p "${dst%/*}"
-      $sudo cp $args -vfT "$src" "$dst"
+      $sudo cp $args -vufT "$src" "$dst"
     else echo "-> C  $dst"; fi
-  else die "can't copy to $dst"; fi
+  else die "refuse copy over existing link '$dst'"; fi
 
 ;; link|*)
   if [[ ! -e "${dst:?No}" || -L "$dst" ]]; then
@@ -40,6 +40,6 @@ in copy)
       $sudo mkdir -p "${dst%/*}"
       $sudo ln -svfT "$src" "$dst"
     else echo "-> L  $dst"; fi
-  else die "can't symlink to $dst"; fi
+  else die "refuse symlink over existing file/dir '$dst'"; fi
 
 ;; esac
