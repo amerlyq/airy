@@ -4,6 +4,8 @@ pr="${0##*/}"
 die() { printf "Err: '$pr' %s${1+\n}" "$1"; exit 1; }
 # echo ">> $*"
 
+unset dir sudo
+cmd=link
 
 while getopts "cst:" opt; do case $opt
 in c) cmd='copy'
@@ -16,30 +18,32 @@ shift $((OPTIND-1))
 
 # echo "cmd=$cmd, sudo=$sudo, dir=$dir"
 
-src="$1"
-dst="$2"
-[[ -e "$src" ]] || die "no such file '$src'"
-[[ -f "$src" ]] || args='-r'
-[[ -z "$dir" ]] || dst="$dir/${1##*/}"
-# dst="${2/%%/${1##*/}}"  # Replaces path/% -> path/<src_file>
-# [[ ! "$dst" =~ %$ ]] || die "guards '$dst' expansion"
-
-
-case "$cmd"
-in copy)
-  if [[ ! -e "${dst:?No}" || ! -L "$dst" ]]; then
-    if ! diff $args -q "${src:?No}" "$dst" >/dev/null 2>&1; then
+copy() { local src="$1" dst="$2"
+  if [[ ! -e "$dst" || ! -L "$dst" ]]; then
+    if ! diff $args -q "$src" "$dst" >/dev/null 2>&1; then
       $sudo mkdir -p "${dst%/*}"
-      $sudo cp $args -vufT "$src" "$dst"
+      $sudo cp $args -vfT -- "$src" "$dst"
     else echo "-> C  $dst"; fi
   else die "refuse copy over existing link '$dst'"; fi
-
-;; link|*)
-  if [[ ! -e "${dst:?No}" || -L "$dst" ]]; then
-    if [[ ! "${src:?No}" -ef "$dst" ]]; then
+}
+link() { local src="$1" dst="$2"
+  if [[ ! -e "$dst" || -L "$dst" ]]; then
+    if [[ ! "$src" -ef "$dst" ]]; then
       $sudo mkdir -p "${dst%/*}"
-      $sudo ln -svfT "$src" "$dst"
+      $sudo ln -svfT -- "$src" "$dst"
     else echo "-> L  $dst"; fi
   else die "refuse symlink over existing file/dir '$dst'"; fi
+}
+dispatch() { local src=$(readlink -e "${1:?No}") dst="${2:?No}"
+  [[ -e "$src" ]] || die "no such file '$src'"
+  [[ -f "$src" ]] || args='-r'
+  ${cmd:?No} "$src" "$dst" | sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g"
+}
 
-;; esac
+if [[ -z "$dir" ]]; then
+  dispatch "$1" "$2"
+else for src in "$@"; do
+  dispatch "$src" "$dir/${src##*/}"
+done; fi
+# dst="${2/%%/${1##*/}}"  # Replaces path/% -> path/<src_file>
+# [[ ! "$dst" =~ %$ ]] || die "guards '$dst' expansion"

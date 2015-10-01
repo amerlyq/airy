@@ -26,12 +26,25 @@ SEE:
 		: http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
 	See how spoolfile located on imap:
 		https://wiki.xmission.com/Hosted_Email:Mutt
+	Sign network of trust public keys (SEE After Party)
+		http://www.phillylinux.org/keys/terminal.html
+
+	REF
+		http://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
+		2015-10-01 [X] https://wiki.debian.org/Subkeys?action=show&redirect=subkeys
+		https://help.ubuntu.com/community/GnuPrivacyGuardHowto
+			: SEE recipes
+		> https://alexcabal.com/creating-the-perfect-gpg-keypair/
+			: article is read, but most of comments remained. Read them.
+
+	SSH similar system for CA (short)
+		>>> https://blog.habets.se/2011/07/OpenSSH-certificates
 
 Setup
 	Interactively generate 2048b key for 1 year (you can extend it later)
 	: so, if you lost it, then expire and users will know it
-		gpg --gen-key
-		: For >v2.1:  gpg --full-gen-key
+		gpg --full-gen-key
+		: OR gpg --gen-key  # for <v2.1
 		< Extend/edit later: gpg --edit-key <..> (SEE: arch-wiki)
 	Encrypt data
 		echo "GMail: mySecretPassowrd" > ~/.mutt/.pass
@@ -74,3 +87,23 @@ Test
 		systemctl --user daemon-reload
 		systemctl --user enable gpg-agent
 		systemctl --user start gpg-agent
+
+Revocation
+: One of subkeys
+	Boot LiveCD + Encrypted USB drive + master.asc OR ~/.gnupg
+		sudo mount /dev/sdb /mnt
+		gpg --import /mnt/amerlyq.gpg-public.asc /mnt/amerlyq.gpg-private.asc
+		gpg --edit-key $GPGKEY   # ALT --homedir=/mnt/.gnupg
+		USE gpg> list, key 2, revkey, save
+		: Send the updated key to the keyservers
+		gpg --send-key --keyserver <server> $GPGKEY
+
+NEED master key pair (scenarios)
+: Because all this done by adding a new self- or revocation signatures)
+	* sign someone else's key or revoke an existing signature,
+	* add a new UID or mark an existing UID as primary,
+	* create a new subkey,
+	* revoke an existing UID or subkey,
+	* change the preferences (e.g., with setpref) on a UID,
+	* change the expiration date on your master key or any of its subkey, or
+	* revoke or generate a revocation certificate for the complete key.

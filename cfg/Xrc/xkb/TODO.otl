@@ -1,6 +1,7 @@
 Xkbmap
 	[_] BUG: xcape is randomly crashed -- maybe too much combo?
 	[_] BUG: when pressing both Alt+Shift -- they aren't latched
+		:= Because of TwoKeys -- but how to reset this option?
 		:= maybe it's consequence of *.clearMods = true inside ./compat/
 	[_] FIXME: can't use overlay xkb mapping on LAlt-LCtrl
 		Cause vbox after windows treats LCtrl and Caps as same keycode
@@ -79,6 +80,8 @@ Xkbmap
 		WANNA: make overlay lctl->F13, where F13 = [ temporary disables overlay (as shift for Caps) ]
 		OR: as IvanPascal make ctrl as lock key, locking not LockControls but SetControls by inner mechanics
 		So original keys will be available by lctl+hjkl -> hjkl, not arrows
+		: On overlay 'on' remap LCtrl action from Set(overlay=true) to temporary Set(overlay=false)
+		:	therefore you will be able to access original keys when overlay locked
 		[_] Mouse on hjkl
 			: http://superuser.com/questions/695315/make-scroll-lock-toggle-mouse-keys-on-home-row
 

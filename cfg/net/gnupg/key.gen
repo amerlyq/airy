@@ -1,0 +1,58 @@
+#!/bin/bash -e
+exit
+
+# .bashrc --> for each subkey into corresponding prf
+# export GPGKEY=D8FC66D2
+
+
+## Create one root key on main secure machine
+# ATTENTION: better to use LiveCD in offline to eliminate possible threats.
+gpg --full-gen-key --expert   # ALT --gen-key for gpg < v2.1
+# USE RSA/Certify+Sign/4096/3y/Name/email/nick
+GPGKEY=amerlyq@gmail.com
+
+
+## Create separate subkeys for each machine (main included)
+# do twice for local sign/decrypt and import once created shared decrypt for mail
+gpg --edit-key $GPGKEY
+gpg --import amerlyq.gpg-mail.asc  # timeframe key, could be recreated and distributed regularly
+# USE gpg> addkey/RSA/2048/6m/save
+#   NOTE adduid -- if you want more than one name/mail address,
+#                  but then you need re-generate all subkeys to include this information
+# Can embed photo into key by: gpg> addphoto   # ~120x144px, ~4KB JPEG
+# ERROR: If you have multiple encryption subkeys, gpg is said to encrypt only for the most recent encryption subkey and not for all known and not revoked encryption subkeys.
+#   >> Therefore I can't use local encrypt key and mail-decrypt?
+
+
+## Export key with subkeys and its revocation:
+# NOTE do it after subkeys creation, so master key know about and can revoke them
+gpg --export-secret-keys --armor $GPGKEY > amerlyq.gpg-private.asc
+gpg --export --armor $GPGKEY > amerlyq.gpg-public.asc
+gpg --gen-revoke $GPGKEY --output amerlyq.gpg-revoke.asc
+# USE 0/Use only in case of master key loss, else gen new with specified reason.
+# ATTENTION: store revocation !separately! from master exactly for case of master key loss!
+#   NOTE you can even print it on paper and keep with other docs in safe.
+
+
+# Back-up to roll-back in case of unexpected troubles
+# (umask 077 && tar -cf "$HOME"/gnupg-backup.tar -C "$HOME" .gnupg)
+# OR copy ~/.gnupg to your encrypted USB drives (better multiple)
+
+
+## Remove master key and keep subkeys only, then change their passwords:
+# ATTENTION: move master key to secure place before this!
+gpg --export-secret-subkeys $GPGKEY > subkeys.asc
+gpg --delete-secret-key $GPGKEY
+gpg --import subkeys.asc
+shred --remove subkeys.asc   # WARNING: use cp + shred instead of mv
+# USE Verify that gpg -K shows a sec# instead of just sec for your private key.
+#     That means the signing subkey is not in the keypair located in keyring.
+gpg --edit-key $GPGKEY passwd
+
+
+# '<MAINID>!'
+# If necessary: move main key to another system
+# gpg -K
+# gpg --export-secret-key -a '<ID>!' > secretkey.asc  # W/o '!' exports all
+# gpg --import secretkey.asc
+# OR gpg --export-secret-key -a | ssh othermachine gpg --import -

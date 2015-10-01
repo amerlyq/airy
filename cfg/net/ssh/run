@@ -21,10 +21,11 @@ fi
 tmux -2 attach -t $SESSION
 "
 
-case "$PRG" in
-    mpd)  ~/.bin/net.d/sir-mpd $ARGS ;;
-    srkz) ssh srk -t zsh $ARGS ;;
-    sirx) ssh sir -X ${ARGS:--t "$sstmux"} ;;
-    stb)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 "root@192.168.1.$1" ;;
-    *)    ssh $PRG ${ARGS:--t "$sstmux"} ;;
+case "$PRG"
+in mpd)  ~/.bin/net.d/sir-mpd $ARGS
+;; srkz) ssh srk -t zsh $ARGS
+;; sirx) ssh sir -X ${ARGS:--t "$sstmux"}
+;; stb)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 "root@192.168.1.$1"
+;; rou)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 rou
+;; *)    ssh $PRG ${ARGS:--t "$sstmux"}
 esac

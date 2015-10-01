@@ -9,7 +9,7 @@ fi
 
 # Copy files instead of symlink, as dictd drops to 'nobody' user
 #   with no access to my config files inside home directory.
-link -sc "$PWD/cfg" "$dir"
+link -sc ./cfg "$dir"
 
 if cfgOpt u; then
     ## Add dictionaries to dictd

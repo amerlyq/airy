@@ -1,8 +1,8 @@
 #!/bin/bash
+# Do '$ . r.ranger' -- you must source it, not launch!
 
 # Don't allow to launch chain of rangers inside shells of other rangers
-[[ -z "$RANGER_LEVEL" ]] || exit 2  # You must interpret this error
-
+[[ -z "$RANGER_LEVEL" ]] || exit
 
 tempfile="${TMPDIR:-/tmp}/ranger_cwdir"
 trap "rm -f -- '$tempfile' > /dev/null" EXIT
