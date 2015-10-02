@@ -189,6 +189,7 @@ User/groups
 
 Package mgrs
 	| pacman -Qo <file>  | search which pkg contains
+	| pacman -Ql <pkg>   | list all pkg files
 	apt-get  -->  /var/cache/apt/archives/*.deb
 	| if add-apt-repository not found:  | sudo apt-get python-software-properties
 	| to remove unavailable ppa:        | sudo apt-get install ppa-purge, sudo ppa-purge [the ppa you want to remove]

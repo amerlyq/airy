@@ -151,3 +151,25 @@ xargs rm                                                    the inverted slash
                                                             in Windows paths
                                                             will be interpreted
                                                             as an escape
+
+
+Troubleshooting
+	dotencode
+		: If an older Mercurial version tries to access a repository that was
+		: created by a newer Mercurial version, an error message like
+		> abort: requirement 'dotencode' not supported!
+		: may be displayed, which means the Mercurial version used to access
+		: that repository doesn't know how to interpret it, because accessing
+		: it would require knowledge about the 'dotencode' capability.
+
+		If such an error message appears, a newer Mercurial version must be
+		used to access the repository or the repository must be converted to
+		an older format understood by that version
+			hg clone --pull
+
+		The format configuration option may be used to instruct Mercurial to
+		create older repository formats. For example, to convert a 'dotencode'
+		repository into the previous format, the command
+			hg --config format.dotencode=0 clone --pull repoA repoB
+		can be used, which of course requires a Mercurial version that
+		supports the 'dotencode' capability.

@@ -32,7 +32,7 @@ vnoremap <silent> ,<Space>  :<C-U>Limio S<CR>
 
 
 " Built-in autocompletion, word, line
-inoremap <C-space> <C-x><C-o>
+" inoremap <C-space> <C-x><C-o>
 " inoremap <C-space> <C-x><C-l>
 
 " Line split

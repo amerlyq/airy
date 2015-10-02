@@ -1,3 +1,8 @@
+Dump boot msgs
+	Screen after login
+		sudo setterm -dump 1 -file tty1.log
+	journalctl /usr/lib/systemd/systemd -b
+
 USB keyboard for boot and grub:
 	: My USB legacy support was set to 'Auto'. I remember switching it to
 	: 'Enabled' previously. Somehow it was switched back to Auto. So I changed

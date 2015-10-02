@@ -41,9 +41,9 @@ bindkey '^U' backward-kill-line
 bindkey '\eOH'  beginning-of-line # Home
 bindkey '\eOF'  end-of-line       # End
 bindkey '\e[2~' overwrite-mode    # Insert
-bindkey '\ef'   forward-word      # Alt-f
-bindkey '\eb'   backward-word     # Alt-b
-bindkey '\ed'   kill-word         # Alt-d
+bindkey '\M-f'  forward-word      # Alt-f
+bindkey '\M-b'  backward-word     # Alt-b
+bindkey '\M-d'  kill-word         # Alt-d
 
 
 # History completion on pgup and pgdown
@@ -58,10 +58,10 @@ bindkey -a '^S' history-incremental-pattern-search-forward
 # Prev-hist-cmd, depending on text from beginning till cursor #'\e[A','\e[B'
 bindkey    '^P' up-line-or-history                 #up-line-or-search
 bindkey    '^N' down-line-or-history               #down-line-or-search
-bindkey -a '^P' history-substring-search-up        #up-history
-bindkey -a '^N' history-substring-search-down      #down-history
-bindkey -a  'j' history-beginning-search-backward
-bindkey -a  'k' history-beginning-search-forward
+# bindkey -a '^P' history-substring-search-up        #up-history
+# bindkey -a '^N' history-substring-search-down      #down-history
+bindkey -a '^P' history-beginning-search-backward
+bindkey -a '^N' history-beginning-search-forward
 
 
 ## Command-line copy-paste-edit
@@ -109,6 +109,8 @@ bindkey -as '^[[24~' '0d$isource ~/.shell/func.d/debug\n\e'
 # bindkey '^I' interruptible-expand-or-complete
 ## Autocomplete paths only on <S-Tab> (SEE: amer-widgets)
 bindkey '\e[Z' complete  # SEE ALT inside widgets.
+## Insert literal \n for multiline editing in emacs-mode (for vi use o/O)
+# self-insert-unmeta
 
 ## Ignore focus events ::: https://github.com/amerlyq/vim-focus-events
 #FIXME: -- I don't know how to make it working in zsh, as in inputrc

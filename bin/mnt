@@ -35,6 +35,8 @@ dirmk() { clean; mkdir -p "$DIR" 2>/dev/null ||
 
 # Need package 'jmtpfs', unmount by fusermount -u "$DIR"
 domtp() { dirmk && jmtpfs "$DIR"; }
+doram() { dirmk && sudo mount -t ramfs -o size=100m ramfs "$DIR" &&
+        sudo chown "$CURR_USER:$CURR_USER" "$DIR"; }
 dosamba() {
     dirmk && sudo mount -t cifs -o user="${1?Need user}" "//${2?Need share}/" "$DIR" \
         && sudo chown "$CURR_USER:$CURR_USER" "$DIR" && echo "$DIR" || exit
@@ -69,8 +71,9 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
 
 case "$ACTION" in
  m) domnt ;;
- p) domtp "phone" ;;
- o) doloop "$LBL" ;;
+ a) domtp ;;
+ r) doram ;;
+ o) doloop ;;
  s) wuser="${WORK_MAIL?No work mail}"; wuser="${wuser%@*}"
     case "$LBL" in
     android) dosamba ${ADR_USER?No var} $ADR_IPL ;;

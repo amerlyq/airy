@@ -39,3 +39,7 @@ Add to bootloader:
 	: GRUB_CMDLINE_LINUX_DEFAULT="... video.use_native_backlight=1"
 	sudo grub-mkconfig -o /boot/grub/grub.cfg
 
+
+On work -- where no backlight -- disable to eliminate boot error
+	sudo systemctl disable systemd-backlight@backlight:acpi_video0.service
+	OR sudo systemctl mask systemd-backlight

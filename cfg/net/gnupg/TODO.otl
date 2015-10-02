@@ -9,12 +9,6 @@ eval $(keychain --eval -Q --quiet id_dsa id_rsa)
 : SSH_AUTH_SOCK=$(gpg-connect-agent 'getinfo ssh_socket_name' /bye | grep '^D' | cut -d' ' -f2)
 : [ -S "$SSH_AUTH_SOCK" ] && export SSH_AUTH_SOCK
 
-Create and mount RAM disk
-	mkdir mytmpdir
-	mount -t ramfs -o size=1m ramfs mytmpdir
-	...
-	umount mytmpdir
-	rmdir mytmpdir
 
 SEE:
 	http://www.spywarewarrior.com/uiuc/gpg/gpg-com-4.htm
@@ -32,48 +26,18 @@ SEE:
 	REF
 		http://spin.atomicobject.com/2013/11/24/secure-gpg-keys-guide/
 		2015-10-01 [X] https://wiki.debian.org/Subkeys?action=show&redirect=subkeys
+		2015-10-02 [X] https://alexcabal.com/creating-the-perfect-gpg-keypair/
 		https://help.ubuntu.com/community/GnuPrivacyGuardHowto
 			: SEE recipes
-		> https://alexcabal.com/creating-the-perfect-gpg-keypair/
-			: article is read, but most of comments remained. Read them.
+		https://gist.github.com/anonymous/3d928a0bcbb3ed92c454
+
+	[_] Advanced techniques
+		| http://atom.smasher.org/gpg/
+		[_] converting master key
+		[_] multiple passphrases
 
 	SSH similar system for CA (short)
 		>>> https://blog.habets.se/2011/07/OpenSSH-certificates
-
-Setup
-	Interactively generate 2048b key for 1 year (you can extend it later)
-	: so, if you lost it, then expire and users will know it
-		gpg --full-gen-key
-		: OR gpg --gen-key  # for <v2.1
-		< Extend/edit later: gpg --edit-key <..> (SEE: arch-wiki)
-	Encrypt data
-		echo "GMail: mySecretPassowrd" > ~/.mutt/.pass
-
-		gpg --recipient <id(part)> --encrypt file
-		echo "password" | gpg --encrypt -o ~/.acc_pass.gpg
-
-		< For read-only fs (for rw -- only if keyring is not going to change)
-		read -s -p "Passwd: " pp && echo "$pp" | gpg \
-		  --keyserver-options no-use-temp-files --lock-never --no-verbose
-		  -e -a -r martin@example.com
-	External config
-		set imap_pass = `gpg -d ~/.mutt/.pass.gpg | awk '/^GMail:/ {print $2}'`
-		OR: source "gpg -d ~/.mutt/passwords.gpg |"
-
-	ALT:
-		echo '$PASSWORD' | gpg --use-agent -e > ~/.passwd/$ACCOUNT.gpg
-		set imap_pass = "`gpg --use-agent --quiet --batch -d ~/.passwd/$ACCOUNT.gpg`"
-
-Config
-	Reload
-		echo RELOADAGENT | gpg-connect-agent
-		:OR: systemctl --user reload gpg-agent
-
-	Cache for the whole session until gpg-agent is restarted.
-	: If you set up default-cache-ttl value, it will take precedence.
-		/usr/lib/gnupg/gpg-preset-passphrase --preset <keygrip>
-		: Where <keygrip> is taken from
-			gpg -with-keygrip -K
 
 Test
 	Check if working
@@ -88,6 +52,96 @@ Test
 		systemctl --user enable gpg-agent
 		systemctl --user start gpg-agent
 
+
+> Initial setup
+: for multiple machines
+< export GPGKEY=amerlyq@gmail.com
+
+	Create Interactively one root key on main secured machine
+	: ATTENTION: better to use LiveCD in offline to eliminate possible threats.
+		gpg --full-gen-key --expert
+		|gpg> RSA/Certify+Sign/4096/3y/Name/email/nick
+		: ALT --gen-key for gpg < v2.1
+		: NOTE It’s easy to extend the expiration date, even after it elapsed.
+		:	But, if you lost it, then key will expire and users will know it.
+
+	Create separate subkeys for each machine (main included)
+	: do twice for local sign/decrypt and import once created shared decrypt for mail
+		gpg --edit-key $GPGKEY
+		|gpg> addkey/RSA/2048/6m/save
+		gpg --import amerlyq.gpg-mail.asc
+			: timeframe key, could be recreated and distributed regularly
+			adduid
+			: for additional name/email (for searching your key on key server)
+			: but then you need re-generate all subkeys to include this information
+			addphoto
+			: Can embed photo into key ~120x144px, ~4KB JPEG
+		WARNING first generate signing only key, then encryption!
+		: EXPL A key with a signing subkey that is newer than the encryption subkey
+		: cannot be used for encryption in PGP 8. A key where the encryption
+		: subkey is newer than the signing subkey can be used for encryption.
+
+	Export master key with subkeys and master revocation cert:
+	: do it after subkeys creation, so master key know about and can revoke them
+		gpg --export-secret-keys --armor $GPGKEY > amerlyq.gpg-private.asc
+		gpg --export --armor $GPGKEY > amerlyq.gpg-public.asc
+		gpg --gen-revoke $GPGKEY --output amerlyq.gpg-revoke.asc
+		|gpg> 0/Use only in case of master key loss, else gen new with specified reason.
+		ATTENTION:
+			Store revocation !separately! from master exactly for case of master key loss!
+			You can even print it on paper and keep with other docs in safe.
+
+	Back-up to roll-back in case of unexpected troubles
+		cp -rv ~/.gnupg to your encrypted USB drives (better multiple)
+		: OR (umask 077 && tar -cf "$HOME"/gnupg-backup.tar -C "$HOME" .gnupg)
+
+	Remove master key and keep subkeys only, then change their passwords:
+	: ATTENTION: export master key to secure place before this!
+	<You can use RAM disk for tmp operations, instead of using shred on HDD>
+		: ALT eport all: gpg --export-secret-subkeys $GPGKEY > subkeys.asc
+		gpg --list-options show-keyring -K
+		gpg --export-secret-subkeys -a '<SID>!' '<EID>!' >  <subkeys_...>.asc
+		| Repeat this for each machine -- using different files
+		gpg --delete-secret-key $GPGKEY  # public key will remain
+		gpg --import subkeys_home.asc
+		shred --remove subkeys_home.asc
+		: WARNING: use cp + shred instead of mv for key transportation
+		| Verify that gpg -K shows a sec# instead of just sec for your private key.
+			: That means the signing subkey is not in the keypair located in keyring.
+		gpg --edit-key $GPGKEY passwd
+
+
+# '<MAINID>!'
+# gpg --import secretkey.asc
+# OR gpg --export-secret-key -a | ssh othermachine gpg --import -
+	Publish keys (master pub, sign/enc subkeys pub, uid?)
+		gpg --send-keys
+		: FIND? use subkeys.pgp.net for keys with multiple subkeys?
+
+	Keyrings
+		If you really want to force it then you can export the subkeys to a
+		different keyring (call gpg with --no-default-keyring and --keyring
+		and import the key), delete all other subkeys and start the normal
+		encryption afterwards.
+		: OR Giving a subkey ID as encryption target with '!' mark
+		| ERROR | I can't use local encrypt key and mail-decrypt?
+		: If you have multiple encryption subkeys, gpg is said to encrypt
+		: only for the most recent encryption subkey and not for all known and not
+		: revoked encryption subkeys.
+		--keyring file
+			Add  file  to the current list of keyrings.
+			: Note that this adds a keyring to the current list. If the intent
+			: is to use the specified keyring alone, use --keyring along with
+			: --no-default-keyring.
+		--primary-keyring file
+			Designate file as the primary public keyring.
+			: This means that newly imported keys (via --import or keyserver
+			: --recv-from) will go to this keyring.
+		| ~/.gnupg/secring.gpg
+			: A secret keyring as used by GnuPG versions before 2.1.
+			: It is not used by GnuPG 2.1 and later.
+
+>> Other scenarios
 Revocation
 : One of subkeys
 	Boot LiveCD + Encrypted USB drive + master.asc OR ~/.gnupg
@@ -98,7 +152,48 @@ Revocation
 		: Send the updated key to the keyservers
 		gpg --send-key --keyserver <server> $GPGKEY
 
-NEED master key pair (scenarios)
+Sign others keys
+	Mounted USB drive
+		export GNUPGHOME=/mnt/keys/gnupg
+		gpg --recv-key 0x12341234
+		gpg --sign-key --ask-cert-level 0x12341234
+		gpg --edit-key 0x12341234 trust
+		gpg --send-key 0x12341234
+
+Create new subkey
+	Backup temporary (if you mess up) -- stay on USB!
+		export GNUPGHOME=/mnt/keys/gnupg
+		gpg --export				> /mnt/tmp/pub.gpg
+		gpg --export-secret-keys    > /mnt/tmp/pri.gpg
+		gpg --export-secret-subkeys > /mnt/tmp/sub.gpg
+	Create new sign/enc
+		gpg --edit-key $GPGKEY
+		|gpg> addkey, addkey
+	Revoke the old keys
+		gpg --edit-key $GPGKEY
+		: select the subkeys to revoke (watch the * in front of the subkeys)
+		key 1
+		key 2
+		revkey
+		save
+		: ATTENTION: This only revoked the keys, but does not delete them: you
+		: will need the old decryption key to decrypt old files.
+	Import new subkeys into system
+		export GNUPGHOME=/mnt/keys/gnupg
+		gpg --export				> /mnt/tmp/pub.gpg
+		gpg --export-secret-keys    > /mnt/tmp/pri.gpg
+		gpg --export-secret-subkeys > /mnt/tmp/sub.gpg
+		unset GNUPGHOME
+		gpg --import-options merge-only --import /mnt/tmp/pub.gpg /mnt/tmp/sub.gpg
+		: ALT -- if you need more then simple key addition:
+		:: EXPL delete, else gnupg don't allow import master (and !all! its
+		::	subkeys) if master already in gpg db
+		: gpg --delete-secret-key $GPGKEY
+		: gpg --import /mnt/tmp/pub.gpg /mnt/tmp/sub.gpg
+	Send keys
+		gpg --send-key $GPGKEY
+
+NEED master key pair when:
 : Because all this done by adding a new self- or revocation signatures)
 	* sign someone else's key or revoke an existing signature,
 	* add a new UID or mark an existing UID as primary,
@@ -107,3 +202,49 @@ NEED master key pair (scenarios)
 	* change the preferences (e.g., with setpref) on a UID,
 	* change the expiration date on your master key or any of its subkey, or
 	* revoke or generate a revocation certificate for the complete key.
+
+ssh
+: gpg-agent can be used in-place of ssh-agent (it has a compatibility mode).
+: So you can create the authentication subkey in a similar manner and use it
+: with ssh. gpgkey2ssh(1) tool can convert the specified GPG key to a format
+: suitable for authorized_keys.
+
+
+Encrypt data
+	echo "GMail: mySecretPassowrd" > ~/.mutt/.pass
+
+	gpg --recipient <id(part)> --encrypt file
+	echo "password" | gpg --encrypt -o ~/.acc_pass.gpg
+
+	< For read-only fs (for rw -- only if keyring is not going to change)
+	read -s -p "Passwd: " pp && echo "$pp" | gpg \
+		--keyserver-options no-use-temp-files --lock-never --no-verbose
+		-e -a -r martin@example.com
+External config
+	set imap_pass = `gpg -d ~/.mutt/.pass.gpg | awk '/^GMail:/ {print $2}'`
+	OR: source "gpg -d ~/.mutt/passwords.gpg |"
+
+	ALT:
+		echo '$PASSWORD' | gpg --use-agent -e > ~/.passwd/$ACCOUNT.gpg
+		set imap_pass = "`gpg --use-agent --quiet --batch -d ~/.passwd/$ACCOUNT.gpg`"
+
+Multi-key encryption (for several recipients)
+: SEE https://www.gnupg.org/gph/en/manual.html#AEN111
+	gpg --encrypt --recipient alice@m.com --recipient bob@m.com <file>
+	: EXPL GPG encrypts the file once with a symmetric key, then places a
+	: header identifying the target keypair and an encrypted version of the
+	: symmetric key.
+	: [...] When encrypted to multiple recipients, this header is placed
+	: multiple times providing a uniquely encrypted version of the same
+	: symmetric key for each recipient.
+
+Config
+	Reload
+		echo RELOADAGENT | gpg-connect-agent
+		:OR: systemctl --user reload gpg-agent
+
+	Cache for the whole session until gpg-agent is restarted.
+	: If you set up default-cache-ttl value, it will take precedence.
+		/usr/lib/gnupg/gpg-preset-passphrase --preset <keygrip>
+		: Where <keygrip> is taken from
+			gpg -with-keygrip -K
