@@ -37,7 +37,7 @@ wopt 'server string = %h server (Samba, Linux)'
 # This will prevent nmbd to search for NetBIOS names through DNS.
 wopt 'dns proxy = no'
 
-wopt 'hosts allow = 192.168.0. 127.'
+wopt 'hosts allow = 192.168.1. 127.'
 wopt 'printing = bsd'
 wopt 'printcap name = /dev/null'
 
@@ -279,7 +279,15 @@ wopt "
     valid users = $CURR_USER
     read only = yes
     browseable = yes
-    public = yes
+    public = no
+    writable = no
+[media]
+    path = /media/$CURR_USER
+    available = yes
+    valid users = $CURR_USER
+    read only = yes
+    browseable = yes
+    public = no
     writable = no
 "
     # guest ok = no

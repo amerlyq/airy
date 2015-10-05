@@ -6,7 +6,11 @@ if [[ -n "$1" ]]; then
 fi
 
 if [[ -f ~/.wallpaper ]]; then  # symlink to one wallpaper
-    feh --bg-fill ~/.wallpaper
+    # Use parts of one wallpaper for all monitors
+    feh --no-xinerama --bg-fill ~/.wallpaper
+    # Multimonitor
+    # feh --bg-scale 'pic1.png' --bg-scale 'pic2.png'
 elif [[ -d ~/.wallpaper ]]; then  # random wallpaper from dir
     feh --bg-fill "$(find ~/.wallpaper/ | shuf -n1)"
 else xsetroot -gray; fi
+

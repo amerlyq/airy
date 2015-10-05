@@ -7,3 +7,43 @@ For me I get a 50% increase in FPS in all games / openGL apps in Ubuntu with Nvi
 		- If using KDE (far far far better desktop) then the option is it desktop effects -> advanced -> disable desktop effects on fullscreen apps.
 	3.  disable 'sync to vblank' (openGL settings) with nvidia-settings
 	: (this is really important or all games appear laggy)
+
+Dependencies
+	ldd mb_warband_linux
+
+Wine
+	M&B Warband
+	: hunter -- a page of nobleman -- university -- wanderlust -- medicine = 44 skills
+	: BUT somehow you can do 45
+		Wine: directx, d3dcompiler_36, d3dx9_36 dlls
+		Linux: lib32-libaudio2 lib32-libpng12 lib32-sdl2 lib32-libldap
+		       lib32-krb5 lib32-libgnutls28 lib32-libcurl-gnutls
+		       lib32-libgcrypt15 lib32-glew1.10 lib32-libfmod
+			(cd /usr/lib32 && sudo ln -sv libgnutls.so.{28,26})
+		Change Module:
+			: A better way in my opinion is to change one line in the file
+			: $HOME/.mbwarband/last_module_warband Basically replace 'Native'
+			: with the name of the mod folder in your Modules directory.
+			: Like: Perisno 0.75
+		ALT for list of all libraries
+		aur/gog-mountandblade-warband 2.7.0.12-3 (1)
+			An action role playing game, GOG version
+
+	> http://rusmnb.ru/index.php?topic=7747.0
+	> http://rusmnb.ru/index.php?action=article;topic=4307.0
+	Лаги во время боя
+		rgl_config.txt
+			render_buffer_size  512
+			: half of videomemory, works only on singleplayer
+		realistic_headshots=1
+	Используемые в Warband определенных версий звуковые файлы OGG достаточно сильно нагружают систему. Если заменить звуки на иные форматы, можно добиться повышения быстродействия
+		1. Вам нужно просто переконвертировать все звуки (музыка должна оставаться в формате .ogg) в формат .wav и закинуть их в папку Sounds модуля.
+		2. В файле sounds.txt модуля необходимо авто-заменой заменить все строки ogg на wav.
+		3. В файле module.ini в строке scan_module_sounds = 0 изменяем 0 на 1.
+	Сжатие dds текстур
+	Черные текстуры
+		libtxc_dxtn
+		http://forums.taleworlds.com/index.php?topic=306927.130;wap2
+
+		mogrify -format dds -define dds:compression=none '*.dds'
+		ls | grep -n $(lsof -p 27965 | sed -rn 's|.*/([^/]+\.dds)$|\1|p')

@@ -39,6 +39,7 @@ echo ":: [archlinuxfr] set up complete"
 
 if grep -q '^\[archlinuxfr\]' /etc/pacman.conf; then
     LST="$LST package-query yaourt"
+    # ALT USE packer or pacaur
 fi
 
 pacman -S --noconfirm $LST

@@ -3,9 +3,9 @@
 # http://www.ex.ua/filelist/$id.urls
 
 if [ "${1:0:4}" == "http" ]; then
-    wget -i $1 --trust-server-names=on --restrict-file-names=nocontrol
+    wget -c -i $1 --trust-server-names=on --restrict-file-names=nocontrol
 else
     cat "$1" | while read line; do
-        wget -i -c --content-disposition $line
+        wget -c -i --content-disposition $line
     done
 fi

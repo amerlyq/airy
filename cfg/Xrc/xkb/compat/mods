@@ -20,6 +20,11 @@ xkb_compatibility "latch"  {
     latchMods.latchToLock= True;
     // latchMods.twoKeys = True;
 
+    // Long press -- latch, Short press -- Esc
+    interpret Control_L {
+        action= SetMods(modifiers=Control);
+    };
+
     interpret Control_R {
         action= LatchMods(modifiers=Control);
     };
@@ -77,10 +82,6 @@ xkb_compatibility "latch"  {
     };
 
     // ----------------------------------------------
-    interpret Control_L {
-        action= SetMods(modifiers=Control);
-    };
-
     interpret Hyper_L+Any {
         //useModMapMods= level1;
         virtualModifier= Hyper;
