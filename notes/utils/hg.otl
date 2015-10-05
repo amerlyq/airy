@@ -2,12 +2,16 @@
 : https://mercurial.selenic.com/wiki/GitConcepts
 	Objects
 		changeset, revision, nodeid, heads
-	hg status
+	Status
+		hg id
+		hg status
 	List for checkout
 		hg branches
 	Remove untracked
 		hg purge --all
 		: hg --config "extensions.purge=" purge --all
+		rm .hgignore && hg purge -a && hg rev -a
+		: clean completely
 	Revert changes
 		hg up -C
 	Graph

@@ -40,3 +40,9 @@ if [[ ! -d "$TMPDIR" ]]; then
 fi
 
 TMPPREFIX="${TMPDIR%/}/zsh"
+
+
+### SSH-agent ###
+export GPG_TTY=$(tty)
+SSH_AUTH_SOCK=$(gpg-connect-agent 'getinfo ssh_socket_name' /bye | awk '/^D/{print $2}')
+[[ -S "$SSH_AUTH_SOCK" ]] && export SSH_AUTH_SOCK

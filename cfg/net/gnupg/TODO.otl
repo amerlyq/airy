@@ -1,15 +1,3 @@
-export GPG_TTY=$(tty)
-: Need for mutt if you don't use gpg-agent
-export GPG_AGENT_INFO=""
-: Don't use it for >v2.1, instead socket ~/.gnupg/S.gpg-agent
-: Also you don't need to launch agent, as it will be used on demand from socket
-
-: Keychain: ssh-agent autostart
-eval $(keychain --eval -Q --quiet id_dsa id_rsa)
-: SSH_AUTH_SOCK=$(gpg-connect-agent 'getinfo ssh_socket_name' /bye | grep '^D' | cut -d' ' -f2)
-: [ -S "$SSH_AUTH_SOCK" ] && export SSH_AUTH_SOCK
-
-
 SEE:
 	http://www.spywarewarrior.com/uiuc/gpg/gpg-com-4.htm
 	Hardening
@@ -85,7 +73,7 @@ Test
 	: do it after subkeys creation, so master key know about and can revoke them
 		gpg --export-secret-keys --armor $GPGKEY > amerlyq.gpg-private.asc
 		gpg --export --armor $GPGKEY > amerlyq.gpg-public.asc
-		gpg --gen-revoke $GPGKEY --output amerlyq.gpg-revoke.asc
+		gpg --output amerlyq.gpg-revoke.asc --gen-revoke $GPGKEY
 		|gpg> 0/Use only in case of master key loss, else gen new with specified reason.
 		ATTENTION:
 			Store revocation !separately! from master exactly for case of master key loss!
@@ -110,10 +98,11 @@ Test
 			: That means the signing subkey is not in the keypair located in keyring.
 		gpg --edit-key $GPGKEY passwd
 
+	Deploy keys
+		gpg --import secretkey1.asc && shred --remove secretkey1.asc
+		gpg --export-secret-key -a '<ID1>!'| ssh :dst: gpg --import -
+		ssh :src: "gpg --export-secret-key -a '<ID1>!'" | gpg --import -
 
-# '<MAINID>!'
-# gpg --import secretkey.asc
-# OR gpg --export-secret-key -a | ssh othermachine gpg --import -
 	Publish keys (master pub, sign/enc subkeys pub, uid?)
 		gpg --send-keys
 		: FIND? use subkeys.pgp.net for keys with multiple subkeys?
@@ -203,13 +192,6 @@ NEED master key pair when:
 	* change the expiration date on your master key or any of its subkey, or
 	* revoke or generate a revocation certificate for the complete key.
 
-ssh
-: gpg-agent can be used in-place of ssh-agent (it has a compatibility mode).
-: So you can create the authentication subkey in a similar manner and use it
-: with ssh. gpgkey2ssh(1) tool can convert the specified GPG key to a format
-: suitable for authorized_keys.
-
-
 Encrypt data
 	echo "GMail: mySecretPassowrd" > ~/.mutt/.pass
 
@@ -248,3 +230,39 @@ Config
 		/usr/lib/gnupg/gpg-preset-passphrase --preset <keygrip>
 		: Where <keygrip> is taken from
 			gpg -with-keygrip -K
+
+SSH
+	ssh-add ~/.ssh/git_rsa
+	: Need for mutt if you don't use gpg-agent
+	export GPG_AGENT_INFO=""
+	: Don't use it for >v2.1, instead socket ~/.gnupg/S.gpg-agent
+	: Also you don't need to launch agent, as it will be used on demand from socket
+
+	: Keychain: ssh-agent autostart
+	eval $(keychain --eval -Q --quiet id_dsa id_rsa)
+
+	.zprofile / .bashrc
+	: NOTE list of approved keys is stored in the ~/.gnupg/sshcontrol
+		SSH_AUTH_SOCK=$(gpg-connect-agent 'getinfo ssh_socket_name' /bye | awk '/^D/{print $2}')
+		[[ -S "$SSH_AUTH_SOCK" ]] && export SSH_AUTH_SOCK
+		export GPG_TTY=$(tty)
+
+	ssh
+	: gpg-agent can be used in-place of ssh-agent (it has a compatibility mode).
+	: So you can create the authentication subkey in a similar manner and use it
+	: with ssh. gpgkey2ssh(1) tool can convert the specified GPG key to a format
+	: suitable for authorized_keys.
+
+	.bashrc
+	: # Start the gpg-agent if not already running
+	: if ! pgrep -x -u "${USER}" gpg-agent >/dev/null 2>&1; then
+	:	gpg-connect-agent /bye >/dev/null 2>&1
+	: fi
+	: # Set SSH to use gpg-agent
+	: unset SSH_AGENT_PID
+	: if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+	:	export SSH_AUTH_SOCK="${HOME}/.gnupg/S.gpg-agent.ssh"
+	: fi
+	: export GPG_TTY=$(tty)
+	: # Refresh gpg-agent tty in case user switches into an X session
+	: gpg-connect-agent updatestartuptty /bye >/dev/null
