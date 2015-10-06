@@ -1,45 +1,16 @@
-# vim: ft=sh
+# vim: ft=sh:ts=2:sw=2:sts=2
 
 # set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+if [[ -z "${debian_chroot:-}" ]] && [[ -r /etc/debian_chroot ]]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color) color_prompt=yes;;
-esac
-
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-    # We have color support; assume it's compliant with Ecma-48
-    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-    # a case would tend to support setf rather than setaf.)
-    color_prompt=yes
-    else
-    color_prompt=
-    fi
-fi
-
-# Prompt
-# обратите внимание на то, что управляющие последовательности заключены в скобки "\[" и "\]"
-# like '\[$(tput setaf 1)\]text\[$(tput setaf 7)\]' or '\[\033[1;30m\]text\[\033[0m\]'
-# Это сделано для того, чтобы shell не учитывал их при оценке длины строки.
-# В противном случае длинные строки будут переноситься неверно.
-#PROMPT_DIRTRIM=4   # change too deep dir names to .../airy/cfg/bash/
-
+## Git branch and status
 GIT_PS1_SHOWDIRTYSTATE=true
-
 __git_ps1() {
     ref=$(git symbolic-ref -q HEAD 2> /dev/null) || return
     printf "${1:- (%s)}" "${ref#refs/heads/}"
 }
-
 __svn_rev_ps1() {
     local DIRTY REV=$(svn info 2>/dev/null | grep Revision | sed -e 's/Revision: //')
     [ "$REV" ] || return
@@ -47,31 +18,56 @@ __svn_rev_ps1() {
     echo "(r$REV$DIRTY)"
 }
 
-# \u - username, \A,\t - time w/out :SS, \!,\# - history/command number
-if [ "$color_prompt" = yes ]; then
-# def:  PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-    # fancy prompt
-    [ -n "$SSH_CONNECTION" ] && { BOTT="─ssh─"; BERR="s"; } || { BOTT="────"; BERR=""; }
+# Assume term is compliant with Ecma-48 (ISO/IEC-6429).
+# (Lack of such support is extremely rare, and such
+# a case would tend to support setf rather than setaf.)
+if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
+# DEV test for 256 colors
+# case "$TERM" in xterm*|rxvt*)
 
-    export PS1="\[$(tput setaf 1)\]┌──╼ \[$(tput setaf 7)\][\w]\
-\[$(tput setaf 13)\]\$(__git_ps1)\[$(tput setaf 7)\]\n\
-\[$(tput setaf 1)\]\$(if [ \$? == 0 ]; then echo \"\[$(tput setaf 1)\]└$BOTT╼\";\
-else echo \"\[$(tput setaf 1)\]└$BERR╼\"; fi) \[$(tput setaf 7)\]"
+  # Characters inside brackets \[..\] will be ignored in prompt length calculation
+  # WARNING: zero-padding works only in bash>=v4.0
+  for nm in setaf\ {00..15} sgr0 bold
+  do declare F${nm##* }="\[$(tput $nm)\]"; done
 
-    # prompt for logging -- allow copying bash history as valid scripts!!!
-    #export PS1="\e[01;33m#\e[01;35m\D{%y-%m-%d} \e[01;36m\D{%H:%M:%S} \e[00;32m\u\e[01;32m@\e[00;32m\h \e[01;33m\w :\e[00m\n"
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+  #OR SSH_CONNECTION
+  prompt_suffix=${SSH_TTY:+S}${debian_chroot:+C}${RANGER_LEVEL:+R}${VIM:+V}
+  [[ ! "$HOST" =~ vbox ]] || prompt_suffix+=B
+
+  #PROMPT_DIRTRIM=4   # change too deep dir names to .../airy/cfg/bash/
+  PS1="$F04┌─${prompt_suffix}${debian_chroot:+($debian_chroot)}─"
+  PS1+="$Fbold$F00[$F03\w$F00]$Fsgr0"
+  PS1+="$F01\$([[ \$? == 0 ]] || echo \" \$?↵\")"
+  PS1+="\n$F04└$F13\$(__git_ps1)$F04╼ $Fsgr0"
+  # \u - username, \A,\t - time w/out :SS, \!,\# - history/command number
+
+  unset F{00..15} Fsgr0
+else PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+
+## Timer for commands
+__format_time() {
+  local dt=$1 total="" color=3
+  local seconds=$(( dt % 60 ))
+  local minutes=$(( (dt /= 60) % 60 ))
+  local hours=$(( (dt /= 60) % 24 ))
+  local days=$(( dt / 24 ))
+  if (( $days > 0 )); then total+="${days}d"; color=9; fi
+  if (( $hours > 0 )); then total+="${hours}h"; color=13; fi
+  if (( $minutes > 0 )); then total+="${minutes}m"; color=1; fi
+  echo "$(tput setaf $color)${total}${seconds}s"
+}
+__timer_start() { __timer_stamp=${__timer_stamp:-$SECONDS}; }
+__timer_stop() {
+    local dt=$(($SECONDS - $__timer_stamp))
+    (( dt <= 2 )) || echo "$(tput bold setaf 10)>>> elapsed time: $(__format_time $dt)"
+    unset __timer_stamp
+}
+trap '__timer_start' DEBUG
+PROMPT_COMMAND='__timer_stop'
 
 
-unset color_prompt force_color_prompt
+# ALT prompt for logging -- allow copying bash history as valid scripts!!!
+#export PS1="\e[01;33m#\e[01;35m\D{%y-%m-%d} \e[01;36m\D{%H:%M:%S} \e[00;32m\u\e[01;32m@\e[00;32m\h \e[01;33m\w :\e[00m\n"
+# def:  PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '

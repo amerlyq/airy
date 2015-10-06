@@ -22,7 +22,7 @@ noremap <silent> <unique> <Leader>M <Esc>:<C-U>w \| Make<CR>
 let g:run_cmdline = ""
 function! s:RunCmdLine(bChange)
   if empty(g:run_cmdline)
-    let g:run_cmdline = "!./" . getreg('%')
+    let g:run_cmdline = "!$PWD/" . getreg('%')
     echo g:run_cmdline
   endif
   if a:bChange
@@ -36,6 +36,7 @@ function! s:RunCmdLine(bChange)
 endfunction
 
 " Shortcuts to <launch setted|change by ':'> command
-noremap <unique> <Leader>k :<C-U>call <SID>RunCmdLine(0)<CR>
-noremap <unique> <Leader>K :<C-U>call <SID>RunCmdLine(1)<CR>
+nnoremap <unique> <Leader>k :<C-U>call <SID>RunCmdLine(0)<CR>
+nnoremap <unique> <Leader>K :<C-U>call <SID>RunCmdLine(1)<CR>
+nnoremap <unique> <Leader><C-k> :<C-U>!$PWD/%<Space>
 cnoremap <unique>    <C-s>  <C-\>e<SID>RunCmdLine(1)<CR>
