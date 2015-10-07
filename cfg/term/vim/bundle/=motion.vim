@@ -131,7 +131,7 @@ endif
 
 
 if neobundle#tap('vim-signify')  "{{{1
-  let g:signify_vcs_list = [ 'git' ]
+  let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
   let g:signify_sign_change = '~'
   let g:signify_sign_delete = '-'
 

@@ -87,10 +87,10 @@ function prompt_amer_precmd_async {
     typeset -p git_info >! "$_prompt_amer_precmd_async_data"
   fi
   # All other VCS beside git (truncated info)
-  # if (( $+functions[vcs_info] )); then
-  #   vcs_info 'prompt'
-  #   typeset -p vcs_info_msg_0_ vcs_info_msg_1_ >> "$_prompt_amer_precmd_async_data"
-  # fi
+  if (( $+functions[vcs_info] )); then
+    vcs_info 'prompt'
+    typeset -p vcs_info_msg_0_ vcs_info_msg_1_ >> "$_prompt_amer_precmd_async_data"
+  fi
 
   # # Get Python environment information.
   # if (( $+functions[python-info] )); then
@@ -148,7 +148,7 @@ function prompt_amer_setup_git {
   zstyle ':prezto:module:git:info:added' format '%%B%F{2}+%f%%b'
   zstyle ':prezto:module:git:info:ahead' format '%%B%F{13}▲%f%%b'
   zstyle ':prezto:module:git:info:behind' format '%%B%F{13}▼%f%%b'
-  zstyle ':prezto:module:git:info:branch' format '%%B%F{92}(%b)%f%%b'
+  zstyle ':prezto:module:git:info:branch' format ' %%B%F{92}(%b)%f%%b'
   #zstyle ':prezto:module:git:info:clean' format '%F{2}✔%f'
   zstyle ':prezto:module:git:info:commit' format '%%B%F{15}(%.7c)%f%%b'
   zstyle ':prezto:module:git:info:deleted' format '%%B%F{1}✗%f%%b'
@@ -163,31 +163,36 @@ function prompt_amer_setup_git {
     'details' '$(coalesce "%b" "%p" "%c")' 'icons' '%s%A%B%S%a%d%m%r%U%u'
 }
 
-# function prompt_amer_setup_vcs {
-#   # Set vcs_info parameters (from 'steef' prompt).
-#   zstyle ':vcs_info:*' enable git hg svn # bzr git cvn
-#   zstyle ':vcs_info:*:prompt:*' check-for-changes true
-#   zstyle ':vcs_info:*:prompt:*' unstagedstr '%F{220}◯%f'
-#   zstyle ':vcs_info:*:prompt:*' stagedstr '%%B%F{2}+%f%%b'
-#   zstyle ':vcs_info:*:prompt:*' actionformats "%S" "%r/%s/%b %u%c (%a%f)"
-#   zstyle ':vcs_info:*:prompt:*' formats "%S" "%r/%s/%b %f%u%c"
-#   zstyle ':vcs_info:*:prompt:*' nvcsformats   ""  # OR: nvcsformats "%~" ""
-#   # zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b|%F{cyan}%r%f'
-#   # zstyle ':vcs_info:git*+set-message:*' hooks git_status
-#   # NOTE: Prior to Zsh v4.3.12, there are no static hooks, no vcs_info_hookadd
-#   # zstyle ':vcs_info:*+start-up:*' hooks set_novcs_prompt_symbol
-#   # zstyle ':vcs_info:git*+set-message:*' hooks set_vcs_prompt_symbol git_precmd
-#   # zstyle ':vcs_info:*+set-message:*' hooks set_vcs_prompt_symbol
-# }
+function prompt_amer_setup_vcs {
+  # Set vcs_info parameters (from 'steef' prompt).
+  zstyle ':vcs_info:*' enable hg cvs # bzr git cvs svn
+  zstyle ':vcs_info:*:prompt:*' check-for-changes true  # For %c and %u
+  zstyle ':vcs_info:*:prompt:*' unstagedstr '%F{220}◯%f'
+  zstyle ':vcs_info:*:prompt:*' stagedstr '%%B%F{2}+%f%%b'
+  zstyle ':vcs_info:*:prompt:*' actionformats "%S" "%b %u%c (%a%f)"
+  zstyle ':vcs_info:*:prompt:*' formats " " "%%B%F{92}(%b)%f%%b %f%u%c"  # %r/%s/%b
+
+  # SEE http://arjanvandergaag.nl/blog/customize-zsh-prompt-with-vcs-info.html#fn:1
+  # zstyle ':vcs_info:git*' formats "%{$fg[grey]%}%s %{$reset_color%}%r/%S%{$fg[grey]%} %{$fg[blue]%}%b%{$reset_color%}%m%u%c%{$reset_color%} "
+
+  # zstyle ':vcs_info:*:prompt:*' nvcsformats   ""  # OR: nvcsformats "%~" ""
+  # zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b|%F{cyan}%r%f'
+  # zstyle ':vcs_info:*' branchformat '%b|%F{cyan}%r%f'
+  # zstyle ':vcs_info:git*+set-message:*' hooks git_status
+  # NOTE: Prior to Zsh v4.3.12, there are no static hooks, no vcs_info_hookadd
+  # zstyle ':vcs_info:*+start-up:*' hooks set_novcs_prompt_symbol
+  # zstyle ':vcs_info:git*+set-message:*' hooks set_vcs_prompt_symbol git_precmd
+  # zstyle ':vcs_info:*+set-message:*' hooks set_vcs_prompt_symbol
+}
 
 function prompt_amer_setup_prompts {
   # First line:
   PROMPT='%F{$prompt_color}'"${prompt_parts[1,2]}${prompt_parts[2]}"
   PROMPT+='%B%F{8}[%F{220}${_prompt_amer_pwd}%F{8}]%b'
+  PROMPT+='${git_info:+${(e)git_info[details]}}'
   PROMPT+='${vcs_info_msg_0_}${vcs_info_msg_1_}'
-  PROMPT+='${git_info:+${(e)git_info[details]}}${prompt_newline}'
   # Next line:
-  PROMPT+='%F{$prompt_color}'"${prompt_parts[3]}"
+  PROMPT+='${prompt_newline}%F{$prompt_color}'"${prompt_parts[3]}"
   PROMPT+='${git_info:+${(e)git_info[icons]}}'
   PROMPT+='%F{$prompt_color}${editor_info[keymap]}%f%(!. %B%F{196}#%f%b.) '
 
@@ -228,7 +233,7 @@ function prompt_amer_setup {
   # Load required functions.
   autoload -Uz add-zsh-hook
   # WARNING (time-consuming) Add hook for calling vcs_info before each command.
-  # autoload -Uz vcs_info
+  autoload -Uz vcs_info
 
   # Add hook for calling git-info before each command.
   add-zsh-hook preexec prompt_amer_preexec
@@ -246,7 +251,7 @@ function prompt_amer_setup {
   # zstyle ':prezto:module:ruby:info:version' format '%F{yellow}[%v]%f '
 
   prompt_amer_setup_git
-  # prompt_amer_setup_vcs  # NOTE vcs_info cfg
+  prompt_amer_setup_vcs  # NOTE vcs_info cfg
   prompt_amer_setup_prompts
 }
 

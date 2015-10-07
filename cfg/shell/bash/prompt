@@ -27,21 +27,29 @@ if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
 
   # Characters inside brackets \[..\] will be ignored in prompt length calculation
   # WARNING: zero-padding works only in bash>=v4.0
-  for nm in setaf\ {00..15} sgr0 bold
+  for nm in setaf\ {00..15} bold sgr0
   do declare F${nm##* }="\[$(tput $nm)\]"; done
 
   #OR SSH_CONNECTION
-  prompt_suffix=${SSH_TTY:+S}${debian_chroot:+C}${RANGER_LEVEL:+R}${VIM:+V}
+  prompt_suffix=${SSH_TTY:+s}${RANGER_LEVEL:+r}${VIM:+v}
   [[ ! "$HOST" =~ vbox ]] || prompt_suffix+=B
 
+  prompt_color="$F01"
+  [[ -z "$SSH_TTY" ]] || prompt_color="$F02"
+  [[ -z "$debian_chroot" ]] || prompt_color="$F04"
+
   #PROMPT_DIRTRIM=4   # change too deep dir names to .../airy/cfg/bash/
-  PS1="$F04┌─${prompt_suffix}${debian_chroot:+($debian_chroot)}─"
-  PS1+="$Fbold$F00[$F03\w$F00]$Fsgr0"
-  PS1+="$F01\$([[ \$? == 0 ]] || echo \" \$?↵\")"
-  PS1+="\n$F04└$F13\$(__git_ps1)$F04╼ $Fsgr0"
+  prompt_parts="╔═╚╣╼"
+  PS1="$prompt_color${prompt_parts:0:2}${prompt_suffix}${prompt_parts:1:1}$Fsgr0"
+  PS1+="$F00$Fbold[$F03\w$F00]$Fsgr0"
+  PS1+="${SSH_TTY:+ ~ $F06\u@\h$Fsgr0}"
+  PS1+="${debian_chroot:+ :: $F06$debian_chroot$Fsgr0}"
+  PS1+="\$([[ \$? == 0 ]] || echo \" $F01\$?↵$Fsgr0\")"
+  PS1+="\n$prompt_color${prompt_parts:2:1}$F13\$(__git_ps1)"
+  PS1+="$prompt_color${prompt_parts:4:1}$Fsgr0 "
   # \u - username, \A,\t - time w/out :SS, \!,\# - history/command number
 
-  unset F{00..15} Fsgr0
+  unset F{00..15} Fbold Fsgr0
 else PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 
@@ -61,7 +69,7 @@ __format_time() {
 __timer_start() { __timer_stamp=${__timer_stamp:-$SECONDS}; }
 __timer_stop() {
     local dt=$(($SECONDS - $__timer_stamp))
-    (( dt <= 2 )) || echo "$(tput bold setaf 10)>>> elapsed time: $(__format_time $dt)"
+    (( dt <= 2 )) || echo "$(tput bold setaf 10)>>> elapsed time: $(__format_time $dt)$(tput sgr0)"
     unset __timer_stamp
 }
 trap '__timer_start' DEBUG
