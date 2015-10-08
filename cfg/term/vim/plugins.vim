@@ -318,6 +318,8 @@ NeoBundle 'rhysd/vim-clang-format'
 " Keithbsmiley/investigate.vim
 " powerman/vim-plugin-viewdoc
 
+NeoBundle 'KabbAmine/zeavim.vim', { 'disabled' : !has('unix') }
+
 NeoBundle 'octol/vim-cpp-enhanced-highlight'
 " Syntax highlight
 " https://github.com/Shirk/vim-gas

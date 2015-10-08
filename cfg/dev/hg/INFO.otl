@@ -1,5 +1,77 @@
+REF
+	https://www.mercurial-scm.org/wiki/Workflows
+
+	https://mercurial.selenic.com/wiki/GitConcepts
+	https://developer.mozilla.org/en-US/docs/Mercurial/Using_Mercurial
+	> http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html
+	http://gregoryszorc.com/blog/2014/06/23/please-stop-using-mq/
+
+	vs git
+		https://docs.python.org/devguide/gitdevs.html
+		> http://gregoryszorc.com/blog/2013/05/12/thoughts-on-mercurial-%28and-git%29/
+READ
+	>>> https://sethrobertson.github.io/GitBestPractices/
+
+> TECH
+
+FeatureBranch
+	Create a new bookmark for the new feature I'm developing.
+		hg bookmark gps/my-new-feature
+		: make changes to files
+		hg commit, ..., hg commit, ..., hg commit
+	Look at DAG to choose which reorder (being on gps/my-new-features)
+		hg log --graph
+		hg histedit 5e907ed10e22
+		: this opens an editor where I can say what changes to make
+	Start a new feature.
+		hg up central
+		: (leaving bookmark gps/my-new-feature)
+		hg bookmark gps/feature2  # Now on (gps/feature2)
+		hg commit, ..., hg commit, ..., hg commit
+	I got review on my original feature. Let's push it.
+		hg up gps/my-new-feature  # (being on gps/feature2)
+		: (activating bookmark gps/marionette-restart)
+		hg pull gecko
+		hg rebase -d fx-team
+	Verify what I'm about to push
+		hg out -r . fx-team
+		hg push -r . fx-team
+	And delete the bookmark that I don't need any more.
+		hg bookmark -d gps/my-new-feature
+
+THINK
+: FIND which ALT it has? -- group changes in different commits on fly
+: FIND simultaneously adding/marking/grouping changes to different commits
+
+mq -- refine changes in different commits (single workflow I would liked?)
+: https://www.mercurial-scm.org/wiki/MqTutorial
+: ALSO see 6.3 in https://www.mercurial-scm.org/wiki/MqTutorial
+	Momentarily stop working on the original change.
+	Add any outstanding portions of that change into your current patch.
+	Create a new patch.
+	Fix the problem you discovered.
+	Add that fix into the new patch.
+	Return to your original patch.
+
 > hg
-: https://mercurial.selenic.com/wiki/GitConcepts
+	DevCycle
+		hg status
+		hg diff
+		hg commit [<filename>..]
+		: To add new files to the repository and to remove obsolete ones use
+		hg addremove
+		: Check what you're going to push
+		hg outgoing
+	Local branch
+		hg commit
+		...
+		hg strip --keep -r .  #.~2
+		: And now commit unified
+		hg commit
+	Rebase
+		: SEE https://www.mercurial-scm.org/wiki/RebaseExtension
+		hg rebase --dest .~2 --base . --collapse
+
 	Objects
 		changeset, revision, nodeid, heads
 	Status
@@ -20,9 +92,40 @@
 		hg view
 		hg serve
 			: navigate in local browser
+	Stash -- could be used as ALT to mq
+		hg shelve -n tmp-chgs
+		hg unshelve tmp-chgs
+		hg shelve -d tmp-chgs
 
 	See types of files in repo
 		hg manifest S 's/.*\.(\w+)$/\1/p' | sort | uniq -c | sort -n
+	Patch
+		with mq (SEE in .hg/patches/)
+		: after editing some source code, you can use hg qref to update your patch file.
+			hg qnew name.patch
+				: edit commit msg
+				hg qref -e
+		instead mq
+			hg commit
+			hg export . > mypatch.diff
+			: If you need to make further changes to your patch, you can back
+			: out that last commit, leaving the changes in place, using:
+			hg strip --keep -r .
+			:OR hg strip --keep -r .~2   # 3 commits
+		ALT to mq use
+
+		last changeset
+			hg export -o FILE -r REV
+		one file through multiple changesets
+			hg diff file.c -r 20:30 > new.diff
+			: As a more versatile approach, you can use -I (include file pattern) / -X (exclude).
+		apply style
+			mercurial
+				hg patch -p1
+				: p1 instead of p0 -- due to a quirk of Mercurial diff output
+			git (with renames, deletions and binary files)
+				hg import --no-commit
+
 
 > Command equivalence table
 

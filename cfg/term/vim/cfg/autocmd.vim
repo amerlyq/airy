@@ -29,8 +29,10 @@ augroup END
 augroup CommentOptions "{{{2
     autocmd!
     au FileType c,cpp,cs,java          setlocal commentstring=//\ %s
+    au FileType cmake,nginx,fstab,expect
+          \ setlocal commentstring=#\ %s
+    au FileType cfg                    setlocal commentstring=;\ %s
     au FileType xdefaults              setlocal commentstring=!\ %s
-    au FileType nginx,fstab,expect     setlocal commentstring=#\ %s
     au FileType votl                   setlocal commentstring=:\ %s
 
     " Use Zeal on Linux for context help

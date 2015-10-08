@@ -1,4 +1,72 @@
+# SEE
+#   http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html
+#   http://gregoryszorc.com/blog/2013/05/12/thoughts-on-mercurial-%28and-git%29/
+
+[defaults]
+qnew = -Ue
+
+[alias]
+# USE instead of 'hg log'
+wip = log --graph --rev=wip --template=wip
+
+[revsetalias]
+wip = (parents(not public()) or not public() or . or head()) and (not obsolete() or unstable()^) and not closed()
+
+[templates]
+wip = '{label("log.branch", ifeq(branch, "default", "", branch))} {label("changeset.{phase}", rev)} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))} {bookmarks % "{ifeq(bookmark, currentbookmark, label('log.activebookmark', bookmark), label('log.bookmark', bookmark))} "}\n{label(ifcontains(rev, revset('parents()'), 'desc.here'),desc|firstline)}'
+wbrch = '{label("log.branch", ifeq(branch, "default", "", branch))}'
+wcset = '{label("changeset.{phase}", rev)}'
+wuser = '{label("grep.user", author|user)}'
+wtags = '{label("log.tag", if(tags," {tags}"))}'
+wbook = '{bookmarks % "{ifeq(bookmark, currentbookmark,
+                             label('log.activebookmark', bookmark),
+                             label('log.bookmark', bookmark))} "}'
+wdesc = '{label(ifcontains(rev, revset('parents()'), 'desc.here'), desc|firstline)}'
+changeset = '{wbrch} {wcset} {wuser} {wtags} {wbook}\n{wdesc}'
+
 [extensions]
-purge =
-graphlog =
+## Beautifiers
+color=
+pager=
+progress=
+## History rewriting
+purge=
+histedit=
+rebase=
+shelve=
+strip=
+# mq =
+## Viewing
+graphlog=
 hgext.hgk=
+
+[color]
+mode=terminfo
+## Colours for each label
+# default
+color.orange=202
+color.lightyellow=191
+color.darkorange=220
+color.brightyellow=226
+# log
+log.branch=cyan
+log.summary=lightyellow
+log.description=lightyellow
+log.bookmark=green
+log.tag=darkorange
+log.activebookmark = green bold underline
+# changeset
+changeset.public=orange bold
+changeset.secret=blue bold
+changeset.draft=brightyellow bold
+# desc
+desc.here=bold blue_background
+
+[diff]
+git = 1
+showfunc = 1
+unified = 8
+
+[hooks]
+# To prevent accidental pushes instead of qpush in mq
+pre-push = printf 'Are you sure you want to push to remote? (y/n): '; read R; [ x"$R" == "xy" ]

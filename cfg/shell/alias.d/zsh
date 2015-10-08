@@ -37,6 +37,8 @@ alias -g XA='| xsel -ab && xsel -ob '
 # Re-run last cmd as sudo (ALT: sudo `!!`)
 alias please='sudo $(fc -ln -1)'
 
+## Shorts
+(( $+commands[jcalc] )) && alias jc='noglob jcalc'
 
 ## Std-like
 # alias agi='noglob agi'
@@ -73,4 +75,3 @@ case "$HIST_STAMPS" in
     "yyyy-mm-dd") alias history='fc -il 1' ;;
                *) alias history='fc -l 1'  ;;
 esac
-

@@ -22,6 +22,18 @@ if neobundle#tap('linediff.vim')
   vnoremap <unique> <Leader>L  :Linediff<CR>
 endif
 
+if neobundle#tap('zeavim.vim')  " {{{1
+  let g:zv_disable_mapping = 1
+  nmap <unique> <silent> <Leader>z <Plug>Zeavim
+  vmap <unique> <silent> <Leader>z <Plug>ZVVisSelection
+  nmap <unique> <silent> <Leader>Z <Plug>ZVKeyDocset
+  nmap <unique> <silent> <Leader><Leader>z <Plug>ZVKeyword
+  " let g:zv_file_types = {'python' : 'python 3'}
+  " let g:zv_docsets_dir = has('unix') ?
+  "             \ '~/Important!/docsets_Zeal/' :
+  "             \ 'Z:/myUser/Important!/docsets_Zeal/'
+endif
+
 let mapleader = s:leader  " }}}
 
 
