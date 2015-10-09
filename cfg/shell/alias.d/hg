@@ -1,0 +1,33 @@
+# vim: ft=sh
+# SEE
+#   http://hgbook.red-bean.com/read/customizing-the-output-of-mercurial.html
+# Analoguos to git, but with <h..> prefix
+
+alias hga='hg add'
+alias hgst='hg status'
+alias hgdf='hg diff'
+alias hgds='hgd --ignore-space-change'
+
+# hg log --template "{node};{date|shortdate};{branch};{author};{join(splitlines(desc), ' ')};{diffstat};files: {join(files, ', ')}\n"
+alias hglg='hg log --graph --limit 25 --template "\t{desc|strip|firstline}\n\t\t{date|shortdate} [{author|user}] :{node|short} "'
+alias hglb='hg bookmarks'
+alias hglbr='hg branches'
+alias hglh='hg heads'
+
+alias hgc='hg commit'
+alias hgcm='hg commit -m'
+alias hgb='hg branch'
+alias hgco='hg checkout'
+# alias hged='hg diffmerge'
+# pull and update
+# alias hgs='hg shelve'
+alias hgl='hg pull -u'
+# alias hglr='hg pull --rebase'
+# alias hgsh='hg push'
+alias hgi='hg incoming'
+alias hgo='hg outgoing'
+
+# this is the 'git commit --amend' equivalent
+# alias hgca='hg qimport -r tip ; hg qrefresh -e ; hg qfinish tip'
+# list unresolved files (since hg does not list unmerged files in the status command)
+# alias hgun='hg resolve --list'

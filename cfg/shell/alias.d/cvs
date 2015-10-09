@@ -1,7 +1,7 @@
 # vim: ft=sh
 
-alias cvst='cvsstatus_colored'
-cvsstatus_colored() {
+alias cvst='cvs_status_colored'
+cvs_status_colored() {
     local d=$(tput setaf 1) rt=$(tput sgr0)
     cvs -q status | sed '/^[?F]/!d; /Up-to-date/d; '"
     s/^? /$(tput setaf 9)&$rt/;       s/Needs Checkout$/$(tput setaf 1)&$rt/
@@ -9,8 +9,8 @@ cvsstatus_colored() {
     s/Locally Modified$/$(tput setaf 3)&$rt/
 "; }  # arr["Needs Merge"] = "0;31"; arr["Needs Patch"] = "1;31";
 
-alias cvsrmu='cvsremove_untracked'
-cvsremove_untracked() {
+alias cvsrmu='cvs_remove_untracked'
+cvs_remove_untracked() {
     cvs -q status | grep '^? ' | cut -c 3- |
         while IFS= read -r f; do rm -rf "$f"; done
 }

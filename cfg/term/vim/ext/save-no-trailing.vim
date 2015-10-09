@@ -18,22 +18,22 @@ autocmd BufWritePre * :call StripTrailingWhitespace()
 "   endif
 " endfunction
 
-function ShowSpaces(...)
+function! ShowSpaces(...)
   let @/='\v(\s+$)|( +\ze\t)'
   let l:old=&hlsearch
   let &hlsearch = a:0 ? a:1 : !&hlsearch
   return l:old
 endfunction
 
-function TrimSpaces() range
+function! TrimSpaces() range
   let oldhlsearch=ShowSpaces(1)
   " ///gec -- to highlight and ask if replace
   execute a:firstline.",".a:lastline."substitute ///ge"
   let &hlsearch=oldhlsearch
 endfunction
 
-command -bar -nargs=? ShowSpaces call ShowSpaces(<args>)
-command -bar -nargs=0 -range=% TrimSpaces <line1>,<line2>call TrimSpaces()
+command! -bar -nargs=? ShowSpaces call ShowSpaces(<args>)
+command! -bar -nargs=0 -range=% TrimSpaces <line1>,<line2>call TrimSpaces()
 " nnoremap <F12>     :ShowSpaces 1<CR>
 " nnoremap <S-F12>   m`:TrimSpaces<CR>``
 " vnoremap <S-F12>   :TrimSpaces<CR>

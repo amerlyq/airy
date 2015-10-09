@@ -1,6 +1,8 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
 # SEE: https://github.com/zsh-users/zsh/blob/master/Misc/vcs_info-examples
+#     http://eseth.org/2010/hg-in-zsh.html
+# DEV https://github.com/whiteinge/dotfiles/blob/master/.zsh_shouse_prompt
 
 # Features:
 #   - two-line theme to separate cmds output easily
@@ -166,10 +168,12 @@ function prompt_amer_setup_git {
 function prompt_amer_setup_vcs {
   # Set vcs_info parameters (from 'steef' prompt).
   zstyle ':vcs_info:*' enable hg cvs # bzr git cvs svn
+  zstyle ':vcs_info:hg*' get-bookmarks true
+  zstyle ':vcs_info:hg*' actionformats "(%s|%a)[%i%u %b %m]"
   zstyle ':vcs_info:*:prompt:*' check-for-changes true  # For %c and %u
   zstyle ':vcs_info:*:prompt:*' unstagedstr '%F{220}◯%f'
   zstyle ':vcs_info:*:prompt:*' stagedstr '%%B%F{2}+%f%%b'
-  zstyle ':vcs_info:*:prompt:*' actionformats "%S" "%b %u%c (%a%f)"
+  # zstyle ':vcs_info:*:prompt:*' actionformats "%S" "%b %u%c (%a%f)"
   zstyle ':vcs_info:*:prompt:*' formats " " "%%B%F{92}(%b)%f%%b %f%u%c"  # %r/%s/%b
 
   # SEE http://arjanvandergaag.nl/blog/customize-zsh-prompt-with-vcs-info.html#fn:1

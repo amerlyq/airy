@@ -7,6 +7,7 @@ if distro arch; then
     # https://github.com/EionRobb/skype4pidgin/blob/master/skypeweb/README.md
     # aur_inst -a 'purple-skypeweb-git'
     pkg_inst 'skype'  # multilib only
+    aur_inst 'skype4pidgin-git'
 
 elif distro ubuntu; then
     # Чтобы не возникало проблем с установкой, нужно установить некоторые 32-битные библиотеки:

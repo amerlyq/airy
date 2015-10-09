@@ -58,7 +58,7 @@ vnoremap <unique> <Leader>cv :<C-U>%s;;<C-R>=GetVisualSelection("")<CR>;g<CR>
 " :bufdo vimgrepadd threading % | copen
 
 ": Remove empty lines
-command -bar -range=% RemoveEmptyLines <line1>,<line2>s:.\n\zs\s*\n\ze.\|^\s*\n\s*\_$::
+command! -bar -range=% RemoveEmptyLines <line1>,<line2>s:.\n\zs\s*\n\ze.\|^\s*\n\s*\_$::
 noremap <unique> <leader>cE :<C-U>RemoveEmptyLines<CR>`>
 ": Emulate 'tr' command -> vectored replacing of symbols
 noremap <unique> <leader>cR :s/.*/\=tr(submatch(0), '()', '[]')

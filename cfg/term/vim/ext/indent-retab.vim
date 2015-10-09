@@ -75,8 +75,8 @@ endfunc
 call SetTabIndent(g:default_indent)
 noremap <unique> <Leader>ti :<C-U>call ApplyTabIndent(v:count)<CR>
 "noremap <leader>ct <Esc>:retab<CR>, :retab!
-noremap <unique> <leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
-noremap <unique> <leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
+noremap <unique> <Leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
+noremap <unique> <Leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
 
 
 " Indenting

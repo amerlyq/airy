@@ -1,9 +1,10 @@
 REF
 	https://www.mercurial-scm.org/wiki/Workflows
+	https://www.mercurial-scm.org/wiki/TipsAndTricks
 
 	https://mercurial.selenic.com/wiki/GitConcepts
 	https://developer.mozilla.org/en-US/docs/Mercurial/Using_Mercurial
-	> http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html
+	2015-10-09 [X] http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html
 	http://gregoryszorc.com/blog/2014/06/23/please-stop-using-mq/
 
 	vs git
@@ -15,6 +16,8 @@ READ
 > TECH
 
 FeatureBranch
+	REF
+		http://stevelosh.com/blog/2009/08/a-guide-to-branching-in-mercurial/#branching-with-bookmarks
 	Create a new bookmark for the new feature I'm developing.
 		hg bookmark gps/my-new-feature
 		: make changes to files
@@ -38,6 +41,49 @@ FeatureBranch
 		hg push -r . fx-team
 	And delete the bookmark that I don't need any more.
 		hg bookmark -d gps/my-new-feature
+
+FeatureBranch
+	Reference to place where we started -- we mark clean state before work
+		hg bookmark loc-main
+		hg bookmark loc-feature
+		:OR hg bookmark -r 7300 feature-fix && hg up feature-fix
+	Changes
+		hg commit -m 'some fix'
+	Merge feature
+		hg update -c loc-main
+		hg merge loc-feature
+		hg commit -m 'Merge <feature>'
+	Move any bookmark to current tip to work in main after feature merge
+		hg book -f loc-feature
+	Delete
+		hg book -d loc-feature
+	To actually delete the changeset as well requires the mq extension.
+		hg tag -r hgweb-fix hgweb-fix-tag
+		hg bookmark -d hgweb-fix
+		hg strip hgweb-fix-tag
+	Look up
+		hg log -prf loc-main:0
+		hg id -r.
+
+Bookmarks
+: Activated only with direct 'hg up <bkmk>', not by --rev (as multiple on one)
+: Each commit/strip moves active bkmk, behaving as head
+	Push your bookmark onto server (default: local only .hg/bookmarks)
+		hg push -B my-bookmark user
+		: works only with publishing repositories (check on bitbucket)
+		hg pull -B bkmk
+		: for getting relevant changesets for bkmk on hg<v2.3
+	Branch landing
+		hg up <SHA-1 or label>
+		: Before landing, we need to rebase our unlanded changesets on top of
+		: the latest changeset from an integration branch:
+		hg pull inbound
+		hg rebase -d inbound
+		: If you need to add r= reviewer attribution to the commit message, do that now:
+		hg histedit
+			: Change the action to m for all the changesets and proceed to
+			: update commit messages accordingly.
+		hg push -r . inbound
 
 THINK
 : FIND which ALT it has? -- group changes in different commits on fly
@@ -87,6 +133,7 @@ mq -- refine changes in different commits (single workflow I would liked?)
 	Revert changes
 		hg up -C
 	Graph
+		hg log -G -T '{node|short} {desc}'
 		hg glog
 			: hg --config "extensions.graphlog=" glog > ../hmc.log
 		hg view
@@ -125,6 +172,13 @@ mq -- refine changes in different commits (single workflow I would liked?)
 				: p1 instead of p0 -- due to a quirk of Mercurial diff output
 			git (with renames, deletions and binary files)
 				hg import --no-commit
+
+	Local repo ignore -- .hg/hgignore
+		Edit .hg/hgrc:
+		: [ui]
+		: ignore = /path/to/repo/.hg/hgignore
+		EXPL Full path is necessary to work from a repo subdir
+
 
 
 > Command equivalence table
