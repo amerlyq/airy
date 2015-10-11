@@ -122,7 +122,7 @@ oneTask() {
     bnm="${bnm%.*}"
     mkdir -p "$DST_PRC/$bnm"
 
-    extractPics "$fnm" "$DST_ORG/$bnm"
+    extractPics "$SRC/$fnm" "$DST_ORG/$bnm"
     #there you need test pictures if there are <16kB then output list and stop
     # or another variant -- ignore all of them but log errors for my knowing.
     getFileList "$DST_ORG/$bnm" "$DST/origin.lst" \"
@@ -135,13 +135,20 @@ oneTask() {
     #TODO: add conditions to _not_ move or delete if error!
     bakDir "$DST_ORG" "$bnm"
     bakDir "$DST_PRC" "$bnm"
-    bakFile "$DST/$bnm.djvu" "$DJVU/$bnm.djvu"
-    bakFile "$fnm" "$READY/${fnm##*/}"
+    bakFile "$DST/${bnm}.djvu" "$DJVU/${fnm%.*}.djvu"
+    bakFile "$SRC/$fnm" "$READY/$fnm"
 }
 
+
+## Processing
 mkdir -p "$LOG"
-for fnm in "$SRC"/*; do
-    if [ -e "$fnm" ]; then
-        oneTask "$fnm" | tee "$LOG/${fnm##*/}.log"
-    fi
-done
+find "$SRC" -type f -regex '.*\.\(zip\|rar\|7z\|gz|tar\)' | sort |
+    while read fnm; do
+        relp="${fnm#$SRC/}"
+        flog="$LOG/${relp%.*}.log"
+        mkdir -p "${flog%/*}"
+        oneTask "$relp" | tee "$flog"
+    done
+
+# Remove remained empty dirs
+rmdir --ignore-fail-on-non-empty "$SRC"/*

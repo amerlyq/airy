@@ -8,8 +8,8 @@ source ~/.shell/func.d/cfgsetup
 ## Don't share samba in work network, only at home
 cfgOpt f || [[ "${CURR_PROF?No}" =~ laptop|home ]] || die 0 "<Skip>"
 
+echo "N: ATTENTION ! Generate password for samba user !"
 if cfgOpt r; then
-  echo "N: ATTENTION ! Generate password for samba user !"
   sudo smbpasswd -a $(whoami)
 fi
 
