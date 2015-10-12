@@ -3,7 +3,6 @@
 #   http://hgbook.red-bean.com/read/customizing-the-output-of-mercurial.html
 # Analoguos to git, but with <h..> prefix
 
-alias hga='hg add'
 alias hgst='hg status'
 alias hgdf='hg diff'
 alias hgds='hgd --ignore-space-change'
@@ -14,8 +13,11 @@ alias hglb='hg bookmarks'
 alias hglbr='hg branches'
 alias hglh='hg heads'
 
+alias hga='hg add'
 alias hgc='hg commit'
 alias hgcm='hg commit -m'
+alias hgpop='hg strip --keep -r .'
+
 alias hgb='hg branch'
 alias hgco='hg checkout'
 # alias hged='hg diffmerge'

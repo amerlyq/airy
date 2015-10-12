@@ -24,10 +24,16 @@ class cd_shelldir(Command):
         return self._tab_directory_content()  # Generic function
 
 
-class cd_clipboard(Command):
-    from subprocess import check_output
+# Auto cd
+class cda(Command):
     def execute(self):
-        path = cd_clipboard.check_output(['xsel','-ob']).decode('utf-8').rstrip()
+        if self.arg(1) and self.arg(1)[0] == '-':
+            flags = self.arg(1)[1:]
+            path = self.rest(2)
+        else:
+            flags = ''
+            path = self.rest(1)
+
         if path[0:1] == '~':
             path = os.path.expanduser(path)
         if not os.path.exists(path):

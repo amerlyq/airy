@@ -150,7 +150,7 @@ function prompt_amer_setup_git {
   zstyle ':prezto:module:git:info:added' format '%%B%F{2}+%f%%b'
   zstyle ':prezto:module:git:info:ahead' format '%%B%F{13}▲%f%%b'
   zstyle ':prezto:module:git:info:behind' format '%%B%F{13}▼%f%%b'
-  zstyle ':prezto:module:git:info:branch' format ' %%B%F{92}(%b)%f%%b'
+  zstyle ':prezto:module:git:info:branch' format '%%B%F{92}(%b)%f%%b'
   #zstyle ':prezto:module:git:info:clean' format '%F{2}✔%f'
   zstyle ':prezto:module:git:info:commit' format '%%B%F{15}(%.7c)%f%%b'
   zstyle ':prezto:module:git:info:deleted' format '%%B%F{1}✗%f%%b'
@@ -165,23 +165,26 @@ function prompt_amer_setup_git {
     'details' '$(coalesce "%b" "%p" "%c")' 'icons' '%s%A%B%S%a%d%m%r%U%u'
 }
 
+# SEE:
+#   http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#Version-Control-Information
 function prompt_amer_setup_vcs {
   # Set vcs_info parameters (from 'steef' prompt).
   zstyle ':vcs_info:*' enable hg cvs # bzr git cvs svn
   zstyle ':vcs_info:hg*' get-bookmarks true
-  zstyle ':vcs_info:hg*' actionformats "(%s|%a)[%i%u %b %m]"
+  zstyle ':vcs_info:hg*' get-revision true
   zstyle ':vcs_info:*:prompt:*' check-for-changes true  # For %c and %u
   zstyle ':vcs_info:*:prompt:*' unstagedstr '%F{220}◯%f'
   zstyle ':vcs_info:*:prompt:*' stagedstr '%%B%F{2}+%f%%b'
-  # zstyle ':vcs_info:*:prompt:*' actionformats "%S" "%b %u%c (%a%f)"
-  zstyle ':vcs_info:*:prompt:*' formats " " "%%B%F{92}(%b)%f%%b %f%u%c"  # %r/%s/%b
+  zstyle ':vcs_info:*:prompt:*' branchformat '%%B%F{29}(%b)%f%%b'
+  zstyle ':vcs_info:hg:prompt:*' hgrevformat '%F{cyan}%r%f'  # OR %h
+  zstyle ':vcs_info:hg:prompt:*' branchformat '%%B%F{27}(%b)%f%%b %r'
+  zstyle ':vcs_info:*:prompt:*' actionformats '' '(%s|%a)[%i%u %b %m]'
+  zstyle ':vcs_info:*:prompt:*' formats '%c%u' '%b'  # %r/%s
 
   # SEE http://arjanvandergaag.nl/blog/customize-zsh-prompt-with-vcs-info.html#fn:1
   # zstyle ':vcs_info:git*' formats "%{$fg[grey]%}%s %{$reset_color%}%r/%S%{$fg[grey]%} %{$fg[blue]%}%b%{$reset_color%}%m%u%c%{$reset_color%} "
 
-  # zstyle ':vcs_info:*:prompt:*' nvcsformats   ""  # OR: nvcsformats "%~" ""
   # zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b|%F{cyan}%r%f'
-  # zstyle ':vcs_info:*' branchformat '%b|%F{cyan}%r%f'
   # zstyle ':vcs_info:git*+set-message:*' hooks git_status
   # NOTE: Prior to Zsh v4.3.12, there are no static hooks, no vcs_info_hookadd
   # zstyle ':vcs_info:*+start-up:*' hooks set_novcs_prompt_symbol
@@ -193,11 +196,10 @@ function prompt_amer_setup_prompts {
   # First line:
   PROMPT='%F{$prompt_color}'"${prompt_parts[1,2]}${prompt_parts[2]}"
   PROMPT+='%B%F{8}[%F{220}${_prompt_amer_pwd}%F{8}]%b'
-  PROMPT+='${git_info:+${(e)git_info[details]}}'
-  PROMPT+='${vcs_info_msg_0_}${vcs_info_msg_1_}'
+  PROMPT+=' ${git_info:+${(e)git_info[details]}}${vcs_info_msg_1_}'
   # Next line:
   PROMPT+='${prompt_newline}%F{$prompt_color}'"${prompt_parts[3]}"
-  PROMPT+='${git_info:+${(e)git_info[icons]}}'
+  PROMPT+='${git_info:+${(e)git_info[icons]}}${vcs_info_msg_0_}'
   PROMPT+='%F{$prompt_color}${editor_info[keymap]}%f%(!. %B%F{196}#%f%b.) '
 
   # Right prompt
