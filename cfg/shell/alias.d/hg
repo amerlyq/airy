@@ -6,6 +6,7 @@
 alias hgst='hg status'
 alias hgdf='hg diff'
 alias hgds='hg diff --ignore-space-change'
+alias hgdp='hgdf -r .~1 -r .'
 
 # hg log --template "{node};{date|shortdate};{branch};{author};{join(splitlines(desc), ' ')};{diffstat};files: {join(files, ', ')}\n"
 alias hglg='hg log --graph --limit 50 --template "\t{desc|strip|firstline}\n\t\t{date|shortdate} [{author|user}] :{node|short} "'
@@ -14,8 +15,8 @@ alias hglbr='hg branches'
 alias hglh='hg heads'
 
 alias hga='hg add'
-alias hgc='hg commit'
 alias hgcm='hg commit -m'
+alias hgca='hg commit --amend'
 
 # Edit
 alias hgpop='hg strip --keep -r .'
