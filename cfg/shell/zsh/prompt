@@ -31,11 +31,13 @@
 pmodload 'helper'
 
 
+# First time this function don't work, because right part isn't appeared yet
 function prompt_amer_pwd {
   local ppwd="${PWD/#$HOME/~}"
-  local branch=${${${git_info[details]}%%\)*}##*\(}
-  local wth=$(($COLUMNS - 6))
-  [[ -n "$branch" ]] && (( wth -= ${#branch} + 2 ))
+  local branch="$(print -P ${git_info[details]}${vcs_info_msg_1_} | sed 's/\x1b\[[0-9;]*m//g')"
+  # local branch="${branch//\x1b\[[0-9;]*m/}"
+  # echo "$#branch" | xxd
+  local wth=$(($COLUMNS - 6 - $#branch))  # Drop prompt parts before and after path
 
   if [[ "$ppwd" == (#m)[/~] ]]; then  ## Keep first char '/' or '~' in path
     _prompt_amer_pwd="$MATCH"
@@ -48,19 +50,25 @@ function prompt_amer_pwd {
   fi
 }
 
-function prompt_amer_git_info {
-  # Append Git status.
-  if [[ -s "$_prompt_amer_precmd_async_data" ]]; then
+function prompt_amer_source_data {
+  if [[ -s "$1" ]]; then
     alias typeset='typeset -g'
-    source "$_prompt_amer_precmd_async_data"
+    source "$1"
     # RPROMPT+='${git_info:+${(e)git_info[icons]}}'
     unalias typeset
   fi
+}
+
+function prompt_amer_update {
+  # Append Git status.
+  prompt_amer_source_data "${_prompt_amer_data_pref}-git"
+  prompt_amer_source_data "${_prompt_amer_data_pref}-vcs"
 
   # Reset PID.
   _prompt_amer_precmd_async_pid=0
 
   # Redisplay prompt.
+  # prompt_amer_pwd
   zle && zle reset-prompt
 }
 
@@ -82,37 +90,44 @@ function prompt_amer_preexec {
   _prompt_amer_start_time="$SECONDS"
 }
 
-function prompt_amer_precmd_async {
-  # Get Git repository information.
+function prompt_amer_async_git {
   if (( $+functions[git-info] )); then
     git-info
-    typeset -p git_info >! "$_prompt_amer_precmd_async_data"
+    typeset -p git_info >! "${_prompt_amer_data_pref}-git"
   fi
-  # All other VCS beside git (truncated info)
+  kill -USR1 $$  ## Signal completion to parent process.
+}
+
+# All other VCS beside git (truncated info)
+function prompt_amer_async_vcs {
   if (( $+functions[vcs_info] )); then
     vcs_info 'prompt'
-    typeset -p vcs_info_msg_0_ vcs_info_msg_1_ >> "$_prompt_amer_precmd_async_data"
+    typeset -p vcs_info_msg_0_ vcs_info_msg_1_ >! "${_prompt_amer_data_pref}-vcs"
   fi
-
-  # # Get Python environment information.
-  # if (( $+functions[python-info] )); then
-  #   python-info
-  # fi
-
-  # # Get Ruby version information.
-  # if (( $+functions[ruby-info] )); then
-  #   ruby-info
-  # fi
-
-  # Signal completion to parent process.
   kill -USR1 $$
 }
+
+# function prompt_amer_async_env {
+#   # Get Python environment information.
+#   if (( $+functions[python-info] )); then
+#     python-info
+#   fi
+
+#   # Get Ruby version information.
+#   if (( $+functions[ruby-info] )); then
+#     ruby-info
+#   fi
+
+#   # Signal completion to parent process.
+#   kill -USR1 $$
+# }
 
 function prompt_amer_precmd {
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
 
   # Format PWD.
+  # ERROR: two times for calling git and hg statuses
   prompt_amer_pwd
 
   # Define prompts. Actual for git? Why it was here and not in _setup?
@@ -132,9 +147,11 @@ function prompt_amer_precmd {
 
   # Compute slow commands in the background.
   # NOTE: Must be the last commands of function for prompt refresh to work.
-  trap prompt_amer_git_info USR1
-  prompt_amer_precmd_async &!
-  _prompt_amer_precmd_async_pid=$!
+  trap prompt_amer_update USR1
+  prompt_amer_async_git &!
+  # BUG need array to contain all pids
+  _prompt_amer_async_pid=$!
+  prompt_amer_async_vcs &!
 }
 
 # ============================================ #
@@ -176,15 +193,12 @@ function prompt_amer_setup_vcs {
   zstyle ':vcs_info:*:prompt:*' unstagedstr '%F{220}◯%f'
   zstyle ':vcs_info:*:prompt:*' stagedstr '%%B%F{2}+%f%%b'
   zstyle ':vcs_info:*:prompt:*' branchformat '%%B%F{29}(%b)%f%%b'
-  zstyle ':vcs_info:hg:prompt:*' hgrevformat '%F{cyan}%r%f'  # OR %h
+  zstyle ':vcs_info:(sv[nk]|hg):prompt:*' hgrevformat '%F{cyan}%r%f'  # OR %h
   zstyle ':vcs_info:hg:prompt:*' branchformat '%%B%F{27}(%b)%f%%b %r'
-  zstyle ':vcs_info:*:prompt:*' actionformats '' '(%s|%a)[%i%u %b %m]'
+  zstyle ':vcs_info:*:prompt:*' actionformats '%c%u' '%F{red}%a%f <%i> %m'
   zstyle ':vcs_info:*:prompt:*' formats '%c%u' '%b'  # %r/%s
 
   # SEE http://arjanvandergaag.nl/blog/customize-zsh-prompt-with-vcs-info.html#fn:1
-  # zstyle ':vcs_info:git*' formats "%{$fg[grey]%}%s %{$reset_color%}%r/%S%{$fg[grey]%} %{$fg[blue]%}%b%{$reset_color%}%m%u%c%{$reset_color%} "
-
-  # zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b|%F{cyan}%r%f'
   # zstyle ':vcs_info:git*+set-message:*' hooks git_status
   # NOTE: Prior to Zsh v4.3.12, there are no static hooks, no vcs_info_hookadd
   # zstyle ':vcs_info:*+start-up:*' hooks set_novcs_prompt_symbol
@@ -222,7 +236,7 @@ function prompt_amer_setup {
   unsetopt XTRACE KSH_ARRAYS
   prompt_opts=(cr percent subst)
   _prompt_amer_precmd_async_pid=0
-  _prompt_amer_precmd_async_data="${TMPPREFIX}-prompt_amer_data"
+  _prompt_amer_data_pref="${TMPDIR:-/tmp}/zsh-prompt_amer"
   _prompt_amer_start_time=$SECONDS
 
   ## Change main color according to environment variables

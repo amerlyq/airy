@@ -3,6 +3,7 @@ source ~/.shell/func.d/packages
 
 #| meld | cool text/directory comparator
 #| dhex | small ncurses binary diff programm with configurable controls
+#| bvi  | small vi-like editor with binary search on '\'
 
 #| wxHexEditor | gui hex edit / compare tool, can mark selection with tags
 #   * You can work with delete/insert bytes to file, more than once, without creating temp file!
@@ -21,6 +22,7 @@ has_pr X || die
 pkg_inst "meld bless"
 
 if distro arch; then
+    aur_inst 'bvi'
     aur_inst -p 'wxHexEditor' wxhexeditor-git
 
 elif distro ubuntu; then

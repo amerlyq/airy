@@ -31,7 +31,7 @@ if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
   do declare F${nm##* }="\[$(tput $nm)\]"; done
 
   #OR SSH_CONNECTION
-  prompt_suffix=${SSH_TTY:+s}${RANGER_LEVEL:+r}${VIM:+v}
+  prompt_suffix=${SSH_TTY:+S}${RANGER_LEVEL:+R}${VIM:+V}
   [[ ! "$HOST" =~ vbox ]] || prompt_suffix+=B
 
   prompt_color="$F01"
@@ -40,8 +40,8 @@ if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
 
   #PROMPT_DIRTRIM=4   # change too deep dir names to .../airy/cfg/bash/
   prompt_parts="╔═╚╣╼"
-  PS1="$prompt_color${prompt_parts:0:2}${prompt_suffix}${prompt_parts:1:1}$Fsgr0"
-  PS1+="$F00$Fbold[$F03\w$F00]$Fsgr0"
+  PS1="${prompt_color}${prompt_parts:0:1}${prompt_suffix:-${prompt_parts:1:1}}"
+  PS1+="${prompt_parts:1:1}$F00$Fbold[$F03\w$F00]$Fsgr0"
   PS1+="${SSH_TTY:+ ~ $F06\u@\h$Fsgr0}"
   PS1+="${debian_chroot:+ :: $F06$debian_chroot$Fsgr0}"
   PS1+="\$([[ \$? == 0 ]] || echo \" $F01\$?↵$Fsgr0\")"
