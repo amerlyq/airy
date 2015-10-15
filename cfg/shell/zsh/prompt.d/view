@@ -1,21 +1,29 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
 
-function prompt_amer_setup_prompts {
+function _prompt_amer_setup_prompts {
+  local color="$1" parts="$2"
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{1}…%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format "${parts[5]}"
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{3}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format "${parts[4]}"
+
   # First line:
-  PROMPT='%F{$prompt_color}'"${prompt_parts[1,2]}${prompt_parts[2]}"
+  PROMPT="%F{$color}${parts[1,2]}${parts[2]}%f"
   PROMPT+='%B%F{8}[%F{220}${_prompt_amer_pwd}%F{8}]%b'
   PROMPT+=' ${git_info:+${(e)git_info[details]}}${vcs_info_msg_1_}'
   # Next line:
-  PROMPT+='${prompt_newline}%F{$prompt_color}'"${prompt_parts[3]}"
+  PROMPT+="${prompt_newline}%F{$color}${parts[3]}%f"
   PROMPT+='${git_info:+${(e)git_info[icons]}}${vcs_info_msg_0_}'
-  PROMPT+='%F{$prompt_color}${editor_info[keymap]}%f%(!. %B%F{196}#%f%b.) '
+  PROMPT+="%F{$color}"'${editor_info[keymap]}%f%(!. %B%F{196}#%f%b.) '
 
   # Right prompt
   RPROMPT='${editor_info[overwrite]} %(?::%F{1}%?↵ %f)'
   RPROMPT+='${RANGER_LEVEL:+"%B%F{10}R%f%b"}'
   RPROMPT+='${VIM:+"%B%F{10}V%f%b"}'
-  RPROMPT+='%F{$prompt_color}'"${prompt_parts[2]}"'%f'
+  RPROMPT+="%F{$color}${parts[2]}%f"
   RPROMPT+='${SSH_TTY:+"%B%F{8}(%F{6}%n%f%F{8}@%f%F{2}%m%F{8})%f%b"}'
   RPROMPT+='%B%F{8}(%F{3}%*%F{8})%f%b'
 

@@ -1,7 +1,7 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
 
-function prompt_amer_format_time {
+function prompt_amer_time_format {
   local dt=$1 total="" color=3
   local seconds=$(( dt % 60 ))
   local minutes=$(( (dt /= 60) % 60 ))
@@ -16,5 +16,14 @@ function prompt_amer_format_time {
 # ============================================ #
 
 function prompt_amer_preexec {
-  _prompt_amer_start_time="$SECONDS"
+  _prompt_amer_time_start="$SECONDS"
+}
+
+function _prompt_amer_time_get {
+  # Calculate and print the elapsed time.
+  local dt=$(( SECONDS - _prompt_amer_time_start ))
+  if (( dt > 10 )); then
+    local hdt="$(prompt_amer_time_format ${dt})"
+    print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
+  fi
 }

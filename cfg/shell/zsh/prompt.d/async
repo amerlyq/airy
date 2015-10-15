@@ -11,9 +11,10 @@ function prompt_amer_source_data {
 }
 
 function prompt_amer_update {
+  local cache="$1"
   # Append Git status.
-  prompt_amer_source_data "${_prompt_amer_data_pref}-git"
-  prompt_amer_source_data "${_prompt_amer_data_pref}-vcs"
+  prompt_amer_source_data "${cache}-git"
+  prompt_amer_source_data "${cache}-vcs"
 
   # Reset PID.
   _prompt_amer_precmd_async_pid=0
@@ -21,6 +22,21 @@ function prompt_amer_update {
   # Redisplay prompt.
   # prompt_amer_pwd
   zle && zle reset-prompt
+}
+
+function _prompt_amer_async_exec {
+  # Kill the old process of slow commands if it is still running.
+  if (( _prompt_amer_async_pid > 0 )); then
+    kill -TERM "$_prompt_amer_precmd_async_pid" &>/dev/null
+  fi
+
+  # Compute slow commands in the background.
+  # NOTE: Must be the last commands of function for prompt refresh to work.
+  trap "prompt_amer_update ${_prompt_amer_data_pref}" USR1
+  prompt_amer_async_git &!
+  # BUG need array to contain all pids
+  _prompt_amer_async_pid=$!
+  prompt_amer_async_vcs &!
 }
 
 function prompt_amer_precmd {
@@ -34,23 +50,6 @@ function prompt_amer_precmd {
   # Define prompts. Actual for git? Why it was here and not in _setup?
   # RPROMPT[1,0]='${editor_info[overwrite]} %(?:: %F{1}%?↵ %f)'  # Prepend
 
-  # Calculate and print the elapsed time.
-  local dt=$(( SECONDS - _prompt_amer_start_time ))
-  if (( dt > 10 )); then
-    local hdt="$(prompt_amer_format_time ${dt})"
-    print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
-  fi
-
-  # Kill the old process of slow commands if it is still running.
-  if (( _prompt_amer_precmd_async_pid > 0 )); then
-    kill -TERM "$_prompt_amer_precmd_async_pid" &>/dev/null
-  fi
-
-  # Compute slow commands in the background.
-  # NOTE: Must be the last commands of function for prompt refresh to work.
-  trap prompt_amer_update USR1
-  prompt_amer_async_git &!
-  # BUG need array to contain all pids
-  _prompt_amer_async_pid=$!
-  prompt_amer_async_vcs &!
+  _prompt_amer_time_get
+  _prompt_amer_async_exec
 }

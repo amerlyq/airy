@@ -1,0 +1,19 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+# @ref: MIT, (c) amerlyq, 2015
+
+function _prompt_color {
+  local color="${1:-1}"
+  ## Change main color according to environment variables
+  #if (( $(echotc Co) < 256 )) ? 1,2,4 : 124,112,27; fi
+  if [[ -n "$SSH_TTY" ]]; then color=${2:-2}
+    if [[ "$HOST" =~ vbox ]]; then color=${3:-4}; fi
+  fi
+  # if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then ... else ... fi
+  # TODO: dependant on availability -- colors and symbols
+  print -rn "$color"
+}
+
+function _prompt_parts {
+  # ADD chroot form
+  [[ $UID -eq 0 ]] && printf "╔═╚╣╼" || printf "┌─└╢╼"
+}
