@@ -27,10 +27,9 @@ function _prompt_amer_setup_vcs {
 }
 
 # All other VCS beside git (truncated info)
-function prompt_amer_async_vcs {
+function _prompt_async_call_vcs {
   if (( $+functions[vcs_info] )); then
-    vcs_info 'prompt'
-    typeset -p vcs_info_msg_0_ vcs_info_msg_1_ >! "${_prompt_amer_data_pref}-vcs"
+    vcs_info 'prompt' >/dev/null 2>&1
+    typeset vcs_info_msg_0_ vcs_info_msg_1_
   fi
-  kill -USR1 $$
 }

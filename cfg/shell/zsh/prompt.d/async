@@ -1,7 +1,13 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
 
-function prompt_amer_source_data {
+function _prompt_async_thread {
+  _prompt_async_call_$1 >! "$2"
+  # unset _prompt_amer_async_git_pid  # Changing just copy
+  kill -USR1 $$  ## Signal completion to parent process.
+}
+
+function _prompt_source_data {
   if [[ -s "$1" ]]; then
     alias typeset='typeset -g'
     source "$1"
@@ -12,31 +18,32 @@ function prompt_amer_source_data {
 
 function prompt_amer_update {
   local cache="$1"
-  # Append Git status.
-  prompt_amer_source_data "${cache}-git"
-  prompt_amer_source_data "${cache}-vcs"
-
-  # Reset PID.
-  _prompt_amer_precmd_async_pid=0
-
+  for f in ${_prompt_async_calls[@]}; do
+    _prompt_source_data "${cache}-$f"
+    declare _prompt_amer_async_pid_$f=0  # Reset PID.
+  done
   # Redisplay prompt.
   # prompt_amer_pwd
   zle && zle reset-prompt
 }
 
 function _prompt_amer_async_exec {
-  # Kill the old process of slow commands if it is still running.
-  if (( _prompt_amer_async_pid > 0 )); then
-    kill -TERM "$_prompt_amer_precmd_async_pid" &>/dev/null
-  fi
-
+  local cache="${_prompt_amer_data_pref}"
   # Compute slow commands in the background.
   # NOTE: Must be the last commands of function for prompt refresh to work.
-  trap "prompt_amer_update ${_prompt_amer_data_pref}" USR1
-  prompt_amer_async_git &!
-  # BUG need array to contain all pids
-  _prompt_amer_async_pid=$!
-  prompt_amer_async_vcs &!
+  # BUG prompt will be refreshed after each async -- several times on each command
+  # DEV refresh once after all results (unset pid on kill or end, check all pids before refresh)
+  #   WARNING Will not work, because '&' launches another env, so can't sync variables
+  trap "prompt_amer_update ${cache}" USR1
+
+  for f in ${_prompt_async_calls[@]}; do
+    # Kill the old process of slow commands if it is still running.
+    if (( _prompt_amer_async_git_pid > 0 )); then
+      kill -TERM "${_prompt_amer_async_pid_${f}}" &>/dev/null
+    fi
+    _prompt_async_thread "$f" "${cache}-$f" &!
+    declare _prompt_amer_async_pid_$f=$!
+  done
 }
 
 function prompt_amer_precmd {

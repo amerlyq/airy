@@ -27,10 +27,9 @@ function _prompt_amer_setup_git {
     'details' '$(coalesce "%b" "%p" "%c")' 'icons' '%s%A%B%S%a%d%m%r%U%u'
 }
 
-function prompt_amer_async_git {
+function _prompt_async_call_git {
   if (( $+functions[git-info] )); then
-    git-info
-    typeset -p git_info >! "${_prompt_amer_data_pref}-git"
+    git-info >/dev/null 2>&1
+    typeset -p git_info
   fi
-  kill -USR1 $$  ## Signal completion to parent process.
 }
