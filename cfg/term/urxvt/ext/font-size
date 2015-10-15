@@ -276,7 +276,7 @@ sub font_change_size_xft
 {
     my ($term, $fontstring, $change, $basesize) = @_;
 
-    my @pieces   = split(/:/, $fontstring);
+    my @pieces   = split(/\s*:\s*/, $fontstring);
     my @resized  = ();
     my $size     = 0;
     my $new_size = 0;

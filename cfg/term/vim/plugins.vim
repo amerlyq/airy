@@ -80,7 +80,8 @@ NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
 
 " echo neobundle#tap('YouCompleteMe')
 
-NeoBundle 'Shougo/neocomplete.vim', {
+NeoBundleLazy 'Shougo/neocomplete.vim', {
+    \ 'autoload' : { 'insert' : 1 },
     \ 'depends' : [
     \   'Shougo/context_filetype.vim',
     \   'Shougo/vimproc.vim' ],
@@ -88,7 +89,8 @@ NeoBundle 'Shougo/neocomplete.vim', {
     \ 'vim_version' : '7.3.885'}
 
 " SirVer/ultisnips
-NeoBundle 'Shougo/neosnippet.vim', {
+NeoBundleLazy 'Shougo/neosnippet.vim', {
+    \ 'autoload' : { 'insert' : 1 },
     \ 'depends' : [
     \   'Shougo/neocomplete.vim',
     \   'Shougo/neosnippet-snippets',

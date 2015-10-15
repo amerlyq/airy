@@ -8,7 +8,9 @@ sys_lock() {
         pic="${TMPDIR:-/tmp}/screenlock.png"
         mkdir -p "${pic%/*}"
         scrot $pic  # Lock with cool bkgd
-        mogrify -scale 10% -scale 1000% $pic
+        mogrify -scale 10% -scale 1000% \
+            -pointsize 72 -font DejaVu-Sans-Condensed -fill Yellow \
+            -annotate +200+200 "$(</tmp/$USER/screentext)" $pic
     fi
     { notify-send "DUNST_COMMAND_PAUSE";   # pause notifications
       i3lock --dpms --nofork --color 111111 --image $pic;
