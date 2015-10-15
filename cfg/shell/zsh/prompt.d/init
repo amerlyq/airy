@@ -1,0 +1,46 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+# @ref: MIT, (c) amerlyq, 2015
+
+function prompt_amer_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+  _prompt_amer_precmd_async_pid=0
+  _prompt_amer_data_pref="${TMPDIR:-/tmp}/zsh-prompt_amer"
+  _prompt_amer_start_time=$SECONDS
+
+  ## Change main color according to environment variables
+  #if (( $(echotc Co) < 256 )) ? 1,2,4 : 124,112,27; fi
+  if [[ -n "$SSH_TTY" ]]; then
+    if [[ "$HOST" =~ vbox ]]
+    then prompt_color=${3:-4}
+    else prompt_color=${2:-2}; fi
+  else prompt_color=${1:-1}; fi
+  [[ $UID -eq 0 ]] && prompt_parts="╔═╚╣╼" || prompt_parts="┌─└╢╼"
+  # if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then ... else ... fi
+  # TODO: dependant on availability -- colors and symbols
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+  # WARNING (time-consuming) Add hook for calling vcs_info before each command.
+  autoload -Uz vcs_info
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook preexec prompt_amer_preexec
+  add-zsh-hook precmd prompt_amer_precmd
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{1}…%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format "${prompt_parts[5]}"
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{3}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format "${prompt_parts[4]}"
+
+  # # Set python-info parameters.
+  # zstyle ':prezto:module:python:info:virtualenv' format '%F{yellow}[%v]%f '
+  # # Set ruby-info parameters.
+  # zstyle ':prezto:module:ruby:info:version' format '%F{yellow}[%v]%f '
+
+  prompt_amer_setup_git
+  prompt_amer_setup_vcs  # NOTE vcs_info cfg
+  prompt_amer_setup_prompts
+}

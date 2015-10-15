@@ -1,0 +1,56 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+# @ref: MIT, (c) amerlyq, 2015
+
+function prompt_amer_source_data {
+  if [[ -s "$1" ]]; then
+    alias typeset='typeset -g'
+    source "$1"
+    # RPROMPT+='${git_info:+${(e)git_info[icons]}}'
+    unalias typeset
+  fi
+}
+
+function prompt_amer_update {
+  # Append Git status.
+  prompt_amer_source_data "${_prompt_amer_data_pref}-git"
+  prompt_amer_source_data "${_prompt_amer_data_pref}-vcs"
+
+  # Reset PID.
+  _prompt_amer_precmd_async_pid=0
+
+  # Redisplay prompt.
+  # prompt_amer_pwd
+  zle && zle reset-prompt
+}
+
+function prompt_amer_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Format PWD.
+  # ERROR: two times for calling git and hg statuses
+  prompt_amer_pwd
+
+  # Define prompts. Actual for git? Why it was here and not in _setup?
+  # RPROMPT[1,0]='${editor_info[overwrite]} %(?:: %F{1}%?↵ %f)'  # Prepend
+
+  # Calculate and print the elapsed time.
+  local dt=$(( SECONDS - _prompt_amer_start_time ))
+  if (( dt > 10 )); then
+    local hdt="$(prompt_amer_format_time ${dt})"
+    print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
+  fi
+
+  # Kill the old process of slow commands if it is still running.
+  if (( _prompt_amer_precmd_async_pid > 0 )); then
+    kill -TERM "$_prompt_amer_precmd_async_pid" &>/dev/null
+  fi
+
+  # Compute slow commands in the background.
+  # NOTE: Must be the last commands of function for prompt refresh to work.
+  trap prompt_amer_update USR1
+  prompt_amer_async_git &!
+  # BUG need array to contain all pids
+  _prompt_amer_async_pid=$!
+  prompt_amer_async_vcs &!
+}

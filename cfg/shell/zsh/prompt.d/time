@@ -1,0 +1,20 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+# @ref: MIT, (c) amerlyq, 2015
+
+function prompt_amer_format_time {
+  local dt=$1 total="" color=3
+  local seconds=$(( dt % 60 ))
+  local minutes=$(( (dt /= 60) % 60 ))
+  local hours=$(( (dt /= 60) % 24 ))
+  local days=$(( dt / 24 ))
+  if (( $days > 0 )); then total+="${days}d"; color=9; fi
+  if (( $hours > 0 )); then total+="${hours}h"; color=13; fi
+  if (( $minutes > 0 )); then total+="${minutes}m"; color=1; fi
+  print -P "%F{$color}${total}${seconds}s"
+}
+
+# ============================================ #
+
+function prompt_amer_preexec {
+  _prompt_amer_start_time="$SECONDS"
+}

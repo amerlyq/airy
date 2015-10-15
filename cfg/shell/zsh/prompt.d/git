@@ -1,0 +1,36 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+# @ref: MIT, (c) amerlyq, 2015
+
+# http://www.fileformat.info/info/unicode/category/So/list.htm
+# : ✚ ⬆ ⬇ ✖ ✱ ➜ ✭ ═ ◼ ❮ ❯ ⏎ ♺ » ⁝  ➙ ± ✯
+# ✔ ✓ ○ ◯ ϟ ✗ ➤ ø ♯ ✴ ▲ ▼ ↵ ☯ ↻ ✘ ⚡ ⚙ ⇣ ⇡
+
+function prompt_amer_setup_git {
+  ## Set git-info parameters.
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:action'    format '%F{7}:%f%%B%F{9}%s%f%%b'
+  zstyle ':prezto:module:git:info:added'     format '%%B%F{2}+%f%%b'
+  zstyle ':prezto:module:git:info:ahead'     format '%%B%F{13}▲%f%%b'
+  zstyle ':prezto:module:git:info:behind'    format '%%B%F{13}▼%f%%b'
+  zstyle ':prezto:module:git:info:branch'    format '%%B%F{92}(%b)%f%%b'
+  #zstyle ':prezto:module:git:info:clean'    format '%F{2}✔%f'
+  zstyle ':prezto:module:git:info:commit'    format '%%B%F{15}(%.7c)%f%%b'
+  zstyle ':prezto:module:git:info:deleted'   format '%%B%F{1}✗%f%%b'
+  zstyle ':prezto:module:git:info:modified'  format '%F{220}◯%f'
+  zstyle ':prezto:module:git:info:position'  format '%%B%F{13}%p%f%%b'
+  zstyle ':prezto:module:git:info:renamed'   format '%%B%F{6}➤%f%%b'
+  zstyle ':prezto:module:git:info:stashed'   format '%%B%F{220}✭%f%%b'
+  zstyle ':prezto:module:git:info:unmerged'  format '%F{5}⚡%f'
+  zstyle ':prezto:module:git:info:untracked' format '%F{7}♯%f'
+  # Coalesce: -- find first non-empty value
+  zstyle ':prezto:module:git:info:keys' format \
+    'details' '$(coalesce "%b" "%p" "%c")' 'icons' '%s%A%B%S%a%d%m%r%U%u'
+}
+
+function prompt_amer_async_git {
+  if (( $+functions[git-info] )); then
+    git-info
+    typeset -p git_info >! "${_prompt_amer_data_pref}-git"
+  fi
+  kill -USR1 $$  ## Signal completion to parent process.
+}

@@ -1,0 +1,36 @@
+SEE:
+	https://github.com/zsh-users/zsh/blob/master/Misc/vcs_info-examples
+	http://eseth.org/2010/hg-in-zsh.html
+DEV
+	https://github.com/whiteinge/dotfiles/blob/master/.zsh_shouse_prompt
+
+Features:
+	- two-line theme to separate cmds output easily
+	- pwd full/shrank/name-only depending on term width
+		(I like to see full pathes, having many similarly named directories)
+	- git icons placed close to input for
+		(clean state is needless -- you will see branch/hash)
+	- line color as environment indicator
+	- line shape as root indicator
+	- indicators for vim/emacs editing mods
+	- non-intrusive time stamp for logging cmd execution
+	- non-intrusive ssh user@host
+	- indicators for launching from vim/ranger
+	- last command exit code
+Integrated:
+	- async preparing of git_info by sorin
+		(fast prompt displaying in git projects, even on cold systems)
+	- msg "elapsed time" for long running cmds by paradox
+		(consumes very little resources, useful for building projects, or statistics for interactive programs)
+
+Seized:
+	agnoster, cloud, damoekri, giddie, minimal, nicoulaj, paradox,
+	peepcode, powerline (moved into script), pure, skwp, smiley, steeef
+Screenshot:
+	TODO: http://i.imgur.com/
+
+
+SNIPPETS
+	Repetition number specifier
+		zmv -n '(**/)(*)' '$1${2//-[A-Za-z0-9]##\./.}'
+		zmv -n '(**/)(*)' '$1${2//-[A-Za-z0-9](#c32)/}'

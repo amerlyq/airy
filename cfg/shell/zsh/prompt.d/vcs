@@ -1,0 +1,36 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+# @ref: MIT, (c) amerlyq, 2015
+
+# SEE:
+#   http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#Version-Control-Information
+
+function prompt_amer_setup_vcs {
+  # Set vcs_info parameters (from 'steef' prompt).
+  zstyle ':vcs_info:*' enable hg cvs # bzr git cvs svn
+  zstyle ':vcs_info:hg*' get-bookmarks true
+  zstyle ':vcs_info:hg*' get-revision true
+  zstyle ':vcs_info:*:prompt:*' check-for-changes true  # For %c and %u
+  zstyle ':vcs_info:*:prompt:*' unstagedstr '%F{220}◯%f'
+  zstyle ':vcs_info:*:prompt:*' stagedstr '%%B%F{2}+%f%%b'
+  zstyle ':vcs_info:*:prompt:*' branchformat '%%B%F{29}(%b)%f%%b'
+  zstyle ':vcs_info:(sv[nk]|hg):prompt:*' hgrevformat '%F{cyan}%r%f'  # OR %h
+  zstyle ':vcs_info:hg:prompt:*' branchformat '%%B%F{27}(%b)%f%%b %r'
+  zstyle ':vcs_info:*:prompt:*' actionformats '%c%u' '%F{red}%a%f <%i> %m'
+  zstyle ':vcs_info:*:prompt:*' formats '%c%u' '%b'  # %r/%s
+
+  # SEE http://arjanvandergaag.nl/blog/customize-zsh-prompt-with-vcs-info.html#fn:1
+  # zstyle ':vcs_info:git*+set-message:*' hooks git_status
+  # NOTE: Prior to Zsh v4.3.12, there are no static hooks, no vcs_info_hookadd
+  # zstyle ':vcs_info:*+start-up:*' hooks set_novcs_prompt_symbol
+  # zstyle ':vcs_info:git*+set-message:*' hooks set_vcs_prompt_symbol git_precmd
+  # zstyle ':vcs_info:*+set-message:*' hooks set_vcs_prompt_symbol
+}
+
+# All other VCS beside git (truncated info)
+function prompt_amer_async_vcs {
+  if (( $+functions[vcs_info] )); then
+    vcs_info 'prompt'
+    typeset -p vcs_info_msg_0_ vcs_info_msg_1_ >! "${_prompt_amer_data_pref}-vcs"
+  fi
+  kill -USR1 $$
+}

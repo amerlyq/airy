@@ -1,0 +1,23 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+# @ref: MIT, (c) amerlyq, 2015
+
+# First time this function don't work, because right part isn't appeared yet?
+function prompt_amer_pwd {
+  local ppwd="${PWD/#$HOME/~}"
+  local strip_patt="%[Bbf]|%F{[0-9a-z]##}"
+  local sfx="${git_info[details]}${vcs_info_msg_1_}"
+  sfx="${(S)sfx//${~strip_patt}}"
+  ## ALT Strip color codes
+  # sfx=$(print -P ${git_info[details]}${vcs_info_msg_1_} | sed 's/\x1b\[[0-9;]*m//g')
+  local wth=$(($COLUMNS - 6 - $#sfx))  # Drop prompt parts before and after path
+
+  if [[ "$ppwd" == (#m)[/~] ]]; then  ## Keep first char '/' or '~' in path
+    _prompt_amer_pwd="$MATCH"
+    unset MATCH
+  else
+    ppwd="${${ppwd%/}//\%/%%}"
+    [[ $#ppwd -ge $wth ]] && ppwd="${${(@j:/:M)${(@s:/:)ppwd}##.#?}:h}/${ppwd:t}"
+    [[ $#ppwd -ge $wth ]] && ppwd="%$wth>…>…/${ppwd:t}%<<"
+    _prompt_amer_pwd="$ppwd"
+  fi
+}
