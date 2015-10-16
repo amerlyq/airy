@@ -22,3 +22,10 @@ elif distro ubuntu; then
         sudo apt-get install skype
     fi
 fi
+
+# FIX silent crash with pidgin
+# SEE http://community.skype.com/t5/Linux/Skype-4-3-crash-on-ubuntu-14-04/td-p/3219892
+
+# $ sqlite3 ~/.Skype/[username]/main.db
+# > UPDATE Messages SET body_xml=substr(body_xml,instr(body_xml,'<files')) WHERE type=68 AND body_xml LIKE 'posted%';
+# > .quit

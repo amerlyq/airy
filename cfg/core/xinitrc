@@ -1,32 +1,35 @@
 #!/bin/sh
 
-session=${1:-i3}
-xin=/etc/X11/xinit
+session=$1
 
 xrandr --auto
-# Disable PC speaker in X:
-xset b off
+xset b off  # No PC speaker in X
+xset s off  # No screensaver
+xset -dmps  # No energy saving
+# USE xset -q -- to find out values
 # xsetroot -gray &
+# setterm -blank 0  # Disable blanking for virtual consoles
 
 # Merge in defaults and resources
-if [ -f "$xin/.Xresources" ]; then xrdb -merge "$xin/.Xresources"; fi
-if [ -f "$HOME/.Xresources" ]; then xrdb -merge "$HOME/.Xresources"; fi
+xin=/etc/X11/xinit
+if [[ -f  "$xin/.Xresources" ]]; then xrdb -merge  "$xin/.Xresources"; fi
+if [[ -f "$HOME/.Xresources" ]]; then xrdb -merge "$HOME/.Xresources"; fi
 
 # Start dbus, ...
 xindir=$xin/xinitrc.d
-if [ -d $xin/xinitrc.d ] ; then
-    for f in $xin/xinitrc.d/?*.sh ; do [ -x "$f" ] && source "$f" ; done
+if [[ -d $xin/xinitrc.d ]] ; then
+    for f in $xin/xinitrc.d/?*.sh ; do [[ -x "$f" ]] && source "$f" ; done
     unset f
 fi
 
 # Source X settings and programs
-[ -f $HOME/.xprofile ] && source $HOME/.xprofile
+[[ -f $HOME/.xprofile ]] && source $HOME/.xprofile
 
 # Launch session
 case $session in
-i3|i3wm) exec i3 > /var/log/i3.log 2>&1 ;;  # i3 -V -d all >> ~/.cache/i3.log 2>&1
- xmonad) exec xmonad ;;
-  xterm) exec xterm -geometry 80x66+0+0 -name login ;;
+   xmonad) exec xmonad ;;
+    xterm) exec xterm -geometry 80x66+0+0 -name login ;;
+*|i3|i3wm) exec i3 > /var/log/i3.log 2>&1 ;;  # i3 -V -d all >> ~/.cache/i3.log 2>&1
 esac
 
 # startx

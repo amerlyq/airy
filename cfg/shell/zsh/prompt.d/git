@@ -29,7 +29,7 @@ function _prompt_amer_setup_git {
 
 function _prompt_async_call_git {
   if (( $+functions[git-info] )); then
-    git-info >/dev/null 2>&1
+    git-info &>/dev/null
     typeset -p git_info
   fi
 }

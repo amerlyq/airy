@@ -1,61 +1,66 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
+# @brief Compute slow commands in the background.
+#   NOTE Must be the last commands of function for prompt refresh to work.
 
-function _prompt_async_thread {
-  _prompt_async_call_$1 >! "$2"
-  # unset _prompt_amer_async_git_pid  # Changing just copy
-  kill -USR1 $$  ## Signal completion to parent process.
-}
 
-function _prompt_source_data {
-  if [[ -s "$1" ]]; then
+function _prompt_vars_source {
+  local cached="${_prompt_amer_data_pref}-${1:?No}"
+  if [[ -s "$cached" ]]; then
     alias typeset='typeset -g'
-    source "$1"
-    # RPROMPT+='${git_info:+${(e)git_info[icons]}}'
+    source "$cached"
     unalias typeset
   fi
 }
 
 function prompt_amer_update {
-  local cache="$1"
-  for f in ${_prompt_async_calls[@]}; do
-    _prompt_source_data "${cache}-$f"
-    declare _prompt_amer_async_pid_$f=0  # Reset PID.
+  # BUG on each USR1 will source all the info instead only necessary
+  for smod in ${_prompt_async_calls[@]}; do
+    _prompt_vars_source $smod
+    typeset -g _prompt_amer_async_pid_$smod=0  # Reset PID.  OR unset ...
+    # echo ${_prompt_amer_async_pid_${smod}}
   done
+
+  # DEV (pid==0 for all pids || (time > 0.5)) --> update_now()
   # Redisplay prompt.
-  # prompt_amer_pwd
+  prompt_amer_pwd
   zle && zle reset-prompt
 }
 
-function _prompt_amer_async_exec {
-  local cache="${_prompt_amer_data_pref}"
-  # Compute slow commands in the background.
-  # NOTE: Must be the last commands of function for prompt refresh to work.
-  # BUG prompt will be refreshed after each async -- several times on each command
-  # DEV refresh once after all results (unset pid on kill or end, check all pids before refresh)
-  #   WARNING Will not work, because '&' launches another env, so can't sync variables
-  trap "prompt_amer_update ${cache}" USR1
 
-  for f in ${_prompt_async_calls[@]}; do
-    # Kill the old process of slow commands if it is still running.
-    if (( _prompt_amer_async_git_pid > 0 )); then
-      kill -TERM "${_prompt_amer_async_pid_${f}}" &>/dev/null
+function _prompt_vars_save {
+  local cached="${_prompt_amer_data_pref}-${1:?No}"
+  _prompt_async_call_$1 >! "$cached"
+}
+
+# BUG prompt will be refreshed after each async -- several times on each command
+# DEV refresh once after all results (unset pid on kill or end, check all pids before refresh)
+#   WARNING Will not work, because '&' launches another env, so can't sync variables
+function _prompt_amer_async_exec {
+  # Call submodule (git, vcs, ...) and signal completion to parent process.
+  for smod in ${_prompt_async_calls[@]}; do
+    if (( $+functions[_prompt_async_call_$smod] )); then
+
+      # Kill the old process of slow commands if it is still running.
+      if (( _prompt_amer_async_pid_${smod} > 0 )); then
+        kill -TERM "${_prompt_amer_async_pid_${smod}}" &>/dev/null
+      fi
+
+      ( _prompt_vars_save $smod && kill -USR1 $$ ) &!
+      # EXPL Make var global, so *_update would know it
+      typeset -g _prompt_amer_async_pid_$smod=$!
+
+      # print -r ${_prompt_amer_async_pid_${smod}}
     fi
-    _prompt_async_thread "$f" "${cache}-$f" &!
-    declare _prompt_amer_async_pid_$f=$!
   done
 }
 
 function prompt_amer_precmd {
-  setopt LOCAL_OPTIONS
-  unsetopt XTRACE KSH_ARRAYS
+  setopt LOCAL_OPTIONS        # On return restore all changed options
+  unsetopt XTRACE KSH_ARRAYS  # Drop env influence on prompt itself
 
-  # Format PWD.
-  # ERROR: two times for calling git and hg statuses
-  prompt_amer_pwd
-
-  # Define prompts. Actual for git? Why it was here and not in _setup?
-  # RPROMPT[1,0]='${editor_info[overwrite]} %(?:: %F{1}%?↵ %f)'  # Prepend
+  # THINK maybe better setup this in *_setup?
+  trap prompt_amer_update USR1  # Re-establish trap each time
 
   _prompt_amer_time_get
   _prompt_amer_async_exec

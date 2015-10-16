@@ -38,5 +38,4 @@ source ~/.shell/aliases
 
 ## Trap to sync zsh and ranger working directories.
 # NOTE: '>!' is because of 'unsetopt CLOBBER' by 'prezto:directory'
-function finish { printf "%s" "$PWD" >! "${TMPDIR:-/tmp}/ranger_cwdir"; }
-trap finish EXIT
+trap 'print -rnD "$PWD" >! "${TMPDIR:-/tmp}/ranger_cwdir"' EXIT

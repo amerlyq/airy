@@ -34,3 +34,25 @@ SNIPPETS
 	Repetition number specifier
 		zmv -n '(**/)(*)' '$1${2//-[A-Za-z0-9]##\./.}'
 		zmv -n '(**/)(*)' '$1${2//-[A-Za-z0-9](#c32)/}'
+
+Behaviour
+	on cmd: run_timer --> update_now()
+	always update on last pid immediately
+		pid_c=0
+		(pid==0 for all pids || (time > 0.5)) --> update_now()
+	update on each process -- after first 0.5s
+		 --> update_now()
+	update on timer of first 0.5s, if some process left
+
+
+Sockets
+: socket -- send module name through it
+	http://www.theochem.uni-duisburg.de/cgi-bin/info2www?(zsh)The+zsh/net/socket+Module
+	http://www.zsh.org/mla/users/2007/msg00785.html
+	: zmodload zsh/net/socket
+	: $ zsocket -l -d 3
+	: $ zsocket -a -d 4 3
+	: $ echo foobar >&4
+	: $ 4>&- 3>&
+	: fd=20
+	: exec {fd}>&-

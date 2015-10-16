@@ -20,6 +20,7 @@ function! LimitedInput(mode) range
 endfunction
 
 command! -bar -nargs=1 Limio call LimitedInput(<q-args>)
+" silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
 
 nnoremap <silent>  <Space>  :Limio i<CR>
 vnoremap <silent>  <Space>  :<C-U>Limio I<CR>
