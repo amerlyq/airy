@@ -16,11 +16,14 @@ wrt2() { wrt1 "    $@"; }
 
 add_folder() {
     ## EXPL I use >60s update interval, because of 'inotify' service
-    wrt1 '<folder id="android" path="'$1'" ro="false" rescanIntervalS="3600" ignorePerms="false" autoNormalize="true">' && shift
-
+    cat>> ${dst:?No} <<EOT
+    <folder id="${1##*/}" path="${1:?No}" ro="false" \
+        rescanIntervalS="3600" ignorePerms="false" autoNormalize="true">'
+EOT
+    shift
     for id in $@; do wrt2 '<device id="'$id'"></device>'; done
 
-    cat >> $dst << EOT
+    cat>> $dst <<EOT
         <minDiskFreePct>1</minDiskFreePct>
         <versioning type="simple">
             <param key="keep" val="5"></param>
@@ -44,7 +47,8 @@ EOT
 
 
 wrt '<configuration version="11">'
-add_folder ~/sync/android ${ANDR_ID:?No} ${HOME_ID:?No} ${ANDR_ID:?No}
+add_folder ~/sync/android ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
+add_folder ~/sync/fl ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
 wrt
 add_device ${ANDR_ID:?No} ${ANDR_HOST:?No}
 add_device ${HOME_ID:?No} ${HOME_HOST:?No}
