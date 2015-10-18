@@ -76,7 +76,7 @@ case "$ACTION" in
  o) doloop ;;
  s) wuser="${WORK_MAIL?No work mail}"; wuser="${wuser%@*}"
     case "$LBL" in
-    android) dosamba ${ADR_USER?No var} $ADR_IPL ;;
+    android) dosamba ${ANDR_USER?No var} $ANDR_IPL ;;
      seclab) dosamba $wuser ${SURC_SRV?No wsrv}/Exchange ;; #{Books}
      $wuser) dosamba $wuser $SURC_SRV/$wuser ;;  #/{OR /exchange,/projects}
     install) dosamba $wuser s-file.${SURC_SRV#*.}/install ;;

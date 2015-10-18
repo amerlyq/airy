@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-case "$1" in
--p) vimb open "$(xsel -ob)" ;;
- *) vimb open "$@" ;;
-esac
+case "$1"
+in -p) vimb open "$(xsel -ob)"
+;; -s) vimb -C 'set scripts=true' open "$@"
+;;  *) vimb open "$@"
+;; esac
