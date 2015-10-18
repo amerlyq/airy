@@ -17,7 +17,7 @@ DIR="$MNT/$LBL"
 if [[ -z "$LBL" ]]; then
     printf "LABELS: " && cd /dev && ls --color=auto disk/by-label
     printf "DISKS: " cd /dev && ls --color=auto sd?[0-9]
-    printf "SAMBA: android seclab install ${WORK_MAIL%@*}\n"
+    printf "SAMBA: $(sed -rn '/^\s+(\w+)\)\s+dosamba.*/s//\1/p' $0 | xargs)\n"
     printf "ACTIVE: " && ls --color=auto "$MNT"
     exit
 fi
@@ -74,15 +74,18 @@ case "$ACTION" in
  a) domtp ;;
  r) doram ;;
  o) doloop ;;
- s) wuser="${WORK_MAIL?No work mail}"; wuser="${wuser%@*}"
-    case "$LBL" in
-    android) dosamba ${ANDR_USER?No var} $ANDR_IPL ;;
-     seclab) dosamba $wuser ${SURC_SRV?No wsrv}/Exchange ;; #{Books}
-     $wuser) dosamba $wuser $SURC_SRV/$wuser ;;  #/{OR /exchange,/projects}
-    install) dosamba $wuser s-file.${SURC_SRV#*.}/install ;;
+ s) case "${LBL:?No}" in
+     android) dosamba ${ANDR_USER:?No} ${ANDR_IPL:?No} ;;
+      router) dosamba ${ROUT_USER:?No} ${ROUT_IPL:?No}/share ;;
     esac ;;
  u) sudo umount -v "$DIR"; clean || exit ;;
 #U) sudo umount -v -R "$MNT"/* && sudo rmdir -v "$MNT"/* ;;  # ERROR: No -R key
  i) sudo blkid ;;  # Get table disk/label/filesystems
  *) echo "Error: '$ACTION'" ;;
 esac
+
+## WORK samba
+# wuser="${WORK_MAIL?No work mail}"; wuser="${wuser%@*}"
+#      seclab) dosamba $wuser ${SURC_SRV?No wsrv}/Exchange ;; #{Books}
+#      $wuser) dosamba $wuser $SURC_SRV/$wuser ;;  #/{OR /exchange,/projects}
+#     install) dosamba $wuser s-file.${SURC_SRV#*.}/install ;;
