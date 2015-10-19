@@ -2,9 +2,13 @@ SEE:
 	REF
 		http://radare.org/r/
 		http://radare.org/r/pics.html
+		http://radare.today/page/3/
+		> http://radare.today/visual-mode/
 	EXPL
 		http://dukebarman.pro/na-radare-kak-na-ladoni/
 		https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
+	Cheetsheets
+		https://github.com/pwntester/cheatsheets/blob/master/radare2.md
 
 Usage
 	Info on cmd
@@ -14,3 +18,6 @@ Usage
 		bin.demangle = true
 	Disasm
 		radare2 -c 'aa;pdf@main' ./level09
+	Analyze stack
+		ad@esp
+		pxw@esp
