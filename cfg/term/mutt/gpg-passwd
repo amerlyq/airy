@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+key="${1:?No}"
+path=~/.cache/airy/gpg/mutt.gpg
+
+# source "gpg -d ~/.mutt/passwords.gpg |"
+# source `FILE=$HOME/.muttaliases; if [ ! -s "$FILE" ]; then FILE=/dev/null;fi;echo "$FILE"`
+if [[ -s "$path" ]]; then
+    gpg --use-agent --quiet --batch --decrypt "$path" |
+        awk '/'"$key"'/ {print $NF}'
+fi

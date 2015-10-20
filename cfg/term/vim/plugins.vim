@@ -153,6 +153,9 @@ NeoBundleLazy 'Shougo/vimfiler.vim', {
 
 endif
 
+" Edit and save encrypted *.gpg files 'in-place'
+" BUG: can't do it lazy?
+NeoBundle 'jamessan/vim-gnupg'
 
 
 "" Python =======================

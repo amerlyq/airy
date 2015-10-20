@@ -193,22 +193,16 @@ NEED master key pair when:
 	* revoke or generate a revocation certificate for the complete key.
 
 Encrypt data
-	echo "GMail: mySecretPassowrd" > ~/.mutt/.pass
-
 	gpg --recipient <id(part)> --encrypt file
 	echo "password" | gpg --encrypt -o ~/.acc_pass.gpg
+
+	echo '$PASSWORD' | gpg --use-agent -e > ~/.passwd/$ACCOUNT.gpg
+	set imap_pass = "`gpg --use-agent --quiet --batch -d ~/.passwd/$ACCOUNT.gpg`"
 
 	< For read-only fs (for rw -- only if keyring is not going to change)
 	read -s -p "Passwd: " pp && echo "$pp" | gpg \
 		--keyserver-options no-use-temp-files --lock-never --no-verbose
 		-e -a -r martin@example.com
-External config
-	set imap_pass = `gpg -d ~/.mutt/.pass.gpg | awk '/^GMail:/ {print $2}'`
-	OR: source "gpg -d ~/.mutt/passwords.gpg |"
-
-	ALT:
-		echo '$PASSWORD' | gpg --use-agent -e > ~/.passwd/$ACCOUNT.gpg
-		set imap_pass = "`gpg --use-agent --quiet --batch -d ~/.passwd/$ACCOUNT.gpg`"
 
 Multi-key encryption (for several recipients)
 : SEE https://www.gnupg.org/gph/en/manual.html#AEN111

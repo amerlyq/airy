@@ -22,6 +22,8 @@ alias hgca='hg commit --amend'
 alias hgpop='hg strip --keep -r .'
 alias hgrbk='hg rebase --keepbranches -d '
 alias hgrev='hg revert --no-backup'
+alias hgpatch='hgcm "ADD feature" && hg export . > feature.patch && hgpop'
+
 
 alias hgb='hg branch'
 alias hgco='hg checkout'
