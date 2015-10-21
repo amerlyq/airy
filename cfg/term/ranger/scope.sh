@@ -11,6 +11,7 @@
 # 5    | fix both   | success. Don't ever reload
 # 6    | image      | success. display the image $cached points to as an image preview
 
+# Meaningful aliases for arguments:
 set -o pipefail
 
 path="$1"    # Full path of the selected file
@@ -28,6 +29,7 @@ EXTDIR="${0%/*}/ext"
 # esac
 STYLE=freya
 
+maxln=128
 
 # Find out something about the file:
 mimetype=$(file --mime-type -Lb "$path")
@@ -46,8 +48,11 @@ extension="${extension,,}"
 # );}
 
 # writes the output of the previously used "try" command
-maxln=128
+dump() { /bin/echo "$output"; }
 # dump() { /bin/echo -E "$output" | head -n "$maxln"; }
+# a common post-processing function used after most commands
+trim() { head -n "$maxln"; }
+
 try() {
     # (sleep 3 && echo hi && kill $$ >/dev/null 2>&1) & disown
     timeout --kill-after 5 --foreground 3 $@ | head -n "$maxln"
@@ -70,21 +75,25 @@ try() {
 
 
 case "$extension" in
+    # Archive extensions:
     7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
     rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
-        try als "$path" && exit 0
-        try acat "$path" && exit 3
-        try bsdtar -lf "$path" && exit 0
+        try als "$path" && { dump | trim; exit 0; }
+        try acat "$path" && { dump | trim; exit 3; }
+        try bsdtar -lf "$path" && { dump | trim; exit 0; }
         exit 1 ;;
-    rar) try unrar -p- lt "$path" && exit 0 || exit 1 ;;
-
-    pdf) try pdftotext -l 10 -nopgbrk -q "$path" - \
-            | fmt -s ${width:+-w $width} && exit 0 || exit 1 ;;
-
-    torrent) try transmission-show "$path" && exit 5 || exit 1 ;;
-
+    rar) try unrar -p- lt "$path" && { dump | trim; exit 0; } || exit 1 ;;
+    # PDF documents:
+    pdf) try pdftotext -l 10 -nopgbrk -q "$path" - && \
+            { dump | trim | fmt -s -w $width; exit 0; } || exit 1;;
+    # pdf) try pdftotext -l 10 -nopgbrk -q "$path" - \
+    #         | fmt -s ${width:+-w $width} && exit 0 || exit 1 ;;
+    # BitTorrent Files
+    torrent)
+        try transmission-show "$path" && { dump | trim; exit 5; } || exit 1;;
+    # HTML Pages:
     htm|html|xhtml)
-        # try lynx   -dump "$path" && { dump | fmt -s -w $width; exit 4; }
+        # try lynx -dump "$path" && { dump | fmt -s -w $width; exit 4; }
         try elinks -dump "$path" | fmt -s -w $width && exit 4
         try w3m    -dump "$path" | fmt -s -w $width && exit 4
         ;; # fall back to highlight/cat if the text browsers fail
@@ -93,7 +102,7 @@ esac
 
 case "$mimetype" in
 
-    text/* | */xml) # Syntax highlight for text files:
+    text/*|*/xml) # Syntax highlight for text files:
         if command -v pygmentize >/dev/null; then
             # try pygmentize "$path" && exit 5 || exit 2
             try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
@@ -116,16 +125,21 @@ case "$mimetype" in
         fi ;;
 
     image/*) { # Ascii-previews of images:
-            img2txt --gamma=0.6 --width="$width" "$path"; identify "$path";
-        } && exit 4 || exit 1 ;;
+        img2txt --gamma=0.6 --width="$width" "$path"
+        identify "$path"
+    } && exit 4 || exit 1 ;;
 
-    video/*)  # Image preview for videos, disabled by default:
-        ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1 ;;
+    video/*) { # Image preview for videos, disabled by default:
+        # ffmpegthumbnailer -i "$path" -o "$cached" -s 0 #&& exit 6
+        exiftool "$path" && exit 5
+    } || exit 1 ;;
 
-    video/* | audio/*) # Display information about media files:
+    audio/*) { # Display information about media files:
         exiftool "$path" && exit 5
         # Use sed to remove spaces so the output fits into the narrow window
-        try mediainfo "$path" | sed 's/  \+:/: /;' && exit 5 || exit 1 ;;
+        try mediainfo "$path" | sed 's/  \+:/: /;' && exit 5
+    } || exit 1 ;;
+
 esac
 
 { # Display general information for other files:

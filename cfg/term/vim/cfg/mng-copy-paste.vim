@@ -119,10 +119,17 @@ nnoremap <leader>; :<C-R>"
 vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
 
 
+" Convert unnamed to block register for pasting
+fun! s:RegConvert(reg, tp)
+  call setreg(a:reg, getreg(a:reg, 1), a:tp)
+endfunction
+command! -bang -nargs=1 RegConvert call s:RegConvert(<bang>0? '+': '"', <q-args>)
+
 let s:leader = g:mapleader | let mapleader = "\\"
-  nnoremap <leader>Y :<C-U>call GetLineBookmark(v:count,'')<CR>
-  nnoremap <leader>t :<C-U>call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
+  nnoremap <leader>Y :call GetLineBookmark(v:count,'')<CR>
+  nnoremap <leader>t :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
   vnoremap <leader>t :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
+  nnoremap <leader>T :RegConvert b
 let mapleader = s:leader
 
 " UNUSED:
