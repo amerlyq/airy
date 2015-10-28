@@ -1,1 +1,48 @@
+# vim: ft=gdb
 # source /usr/share/peda/peda.py
+
+*.gdbinit* # origin from buildroot
+set environment LD_BIND_NOW=1
+# turn off pagination
+set height 0
+# Print C++ names in their source form rather than their mangled form
+set print asm-demangle
+# Use findsym $sp $sp+1000 to get a dump of all symbols on the stack
+define findsym
+    set $address = ($arg0)
+    set $count = ($arg1)
+    set $end = $count
+    if( $address > $end )
+        set $end = $address + ( $count * 4 )
+    end
+    while( $address < $end )
+        if( *$address != 0 )
+            printf "*0x%08X 0x%08X: ",$address,*$address
+            info symbol *$address
+        end
+        set $address = $address + 4
+    end
+end
+
+# Use findval addr count value to find symbol with a specific value
+define findval
+    set $address = ($arg0)
+    set $count = ($arg1)
+    set $value = ($arg2)
+    set $end = $count
+    if( $address > $end )
+        set $end = $address + ( $count * 4 )
+    end
+    while( $address < $end )
+        if( *$address == $value )
+            printf "*%08X %08X: ",$address,*$address
+            info symbol *$address
+        end
+    set $address = $address + 4
+    end
+end
+
+# Use bta to print backtraces for the all threads
+define bta
+    thread apply all bt
+end
