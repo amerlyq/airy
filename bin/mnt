@@ -75,6 +75,7 @@ case "$ACTION" in
  r) doram ;;
  o) doloop ;;
  s) case "${LBL:?No}" in
+    # smbclient -L 192.168.1.1
      android) dosamba ${ANDR_USER:?No} ${ANDR_IPL:?No} ;;
       router) dosamba ${ROUT_USER:?No} ${ROUT_IPL:?No}/share ;;
     esac ;;

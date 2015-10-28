@@ -5,7 +5,7 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 dir=~/.mpd
 case "$CURR_PROF" in
-home) link "$PWD/mpd-sir.conf" "$dir/mpd.conf" ;;
+# home) link "$PWD/mpd-sir.conf" "$dir/mpd.conf" ;;
    *) link "$PWD/mpd-own.conf" "$dir/mpd.conf" ;;
 esac
 
@@ -25,6 +25,9 @@ if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
     touch $dir/{db,log,pid,state}
     # Check if running: sudo /etc/init.d/mp status | grep -c "is running"
 fi
+
+### GENS ###
+./state.gen
 
 if cfgOpt u; then
     pgrep mpd && mpd --kill
