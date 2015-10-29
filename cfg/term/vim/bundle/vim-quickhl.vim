@@ -5,10 +5,10 @@ nmap <Leader>H <Plug>(quickhl-manual-toggle)
 xmap <Leader>H <Plug>(quickhl-manual-toggle)
 
 nmap g<Leader>h <Plug>(quickhl-cword-toggle)
+nmap g<Leader>H <Plug>(quickhl-manual-reset)
 
-" OR: nmap g<Leader>h <Plug>(quickhl-manual-reset)
-nmap <Leader><C-l> <Plug>(quickhl-manual-reset)
-xmap <Leader><C-l> <Plug>(quickhl-manual-reset)
+" nmap <Leader><C-l> <Plug>(quickhl-manual-reset)
+" xmap <Leader><C-l> <Plug>(quickhl-manual-reset)
 
 
 "" Disabled: unusable on big tag base (like kernels)
