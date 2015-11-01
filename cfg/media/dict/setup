@@ -26,6 +26,10 @@ if cfgOpt u; then
 
     svc_enable  dictd
     svc_restart dictd
+
+    ### GEN ###
+    echo 'cd "$HOME/.wine/drive_c/Program Files (x86)/Yarxi" && wine yarxi.exe'\
+        | vienv -r sh ~/.cache/airy/bin/r.yarxi
 fi
 
 echo "C: 'dict' done"

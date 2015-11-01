@@ -1,10 +1,11 @@
 #!/bin/bash -e
 
+case "$1" in -r) bReplace=1; shift ;; esac
 shl="$1"
 NM="${2:-`tempfile`}"
 env='#!/usr/bin/env'
 
-if [[ ! -f "$NM" ]]; then
+if [[ -n "$bReplace" || ! -f "$NM" ]]; then
     # Python recognizes encoding: "coding[:=]\s*([-\w.]+)"
     case "$shl"
     in  pl) sb="$env perl\n\nuse strict;\nuse warnings;"
@@ -18,5 +19,9 @@ if [[ ! -f "$NM" ]]; then
     chmod 764 "$NM"
 fi
 
-vim +'norm G' "$NM"
-# OR: vim "$NM" -c "normal i$env $shl<CR>"
+if [[ -t 0 ]]; then  # input from terminal
+    # OR: vim "$NM" -c "normal i$env $shl<CR>"
+    vim +'norm G' "$NM"
+else  # redirected input from file '<' or pipe '|'
+    cat >> "$NM"
+fi
