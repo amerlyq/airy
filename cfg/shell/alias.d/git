@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# --- Git ---
+## --- Git ---
 # git clean -f
 alias gremu='git clean -f --dry-run && echo "dry-run only; directly use git clean -f"'
 
-# Status
+## Status
 alias gt='git status -sb && (git stash list | cat)'
-alias gtb='git branch -a '
+alias gtb='git branch -a'
 # alias gtt='git tag'
 
-# Diff
+## Diff
 alias gdf='git diff'
 alias glF='git diff HEAD...origin'  # with fetched
 alias gdw='gdf --no-ext-diff --word-diff --unified=0'  # OR -U0
@@ -20,43 +20,45 @@ alias gdr='gdf --color-words'
 alias gdp='gdw HEAD~1 HEAD'
 alias gdl="gdw '@{1}..'"
 alias gds='gdf HEAD stash@{0}'
-alias gdfv='git difftool --tool=vimdiff '
-alias gdfm='git difftool --tool=meld '
+alias gdfv='git difftool --tool=vimdiff'
+alias gdfm='git difftool --tool=meld'
 alias gdv='gdfv'
 
-# Log
+## Log
 alias glg='git lgraph'
 alias glF='git log -p HEAD..origin'  # with fetched
 alias gll='git lmsg'
 gln(){ git ldump -n ${1:-10}; } #or -1 for inf
-alias gff='git rev-list --all | xargs git grep '
+alias gff='git rev-list --all | xargs git grep'
 alias gsw='git show'
 # git grep -l --all-match -e <regexp1> # To search files with line
 # git log -G Foo --since=2009.1.1 --until=2010.1.1 -- path_containing_change # To search commits changing line
 
-# Pull
+## Pull
 alias gl='git pull --rebase --verbose'
 alias glc='git rebase --continue'
 # alias grs='git rebase --skip'
 alias gss='git stash save'
 alias gsp='git stash pop'
 alias glu='gss && gl && gsp'
-alias gco='git checkout '
+alias gco='git checkout'
 # Use gco -b for topic branches
-#alias gb='git branch '
+#alias gb='git branch'
 # alias gf='git fetch'
 
-# Push
-alias gaa='git add --all '
+## Push
+alias gaa='git add --all'
+# Partial commit: select several hunks from files 'y' and diskard others 'd'.
+alias gap='git add --patch '  # USE: 'git add -N <file>' before if untracked
 alias gtr='git reset'
-alias gcm='git commit -m '
-alias gca='git commit -am '
-alias gcu='git commit --amend '
+alias gcm='git commit -m'
+alias gca='git commit -am'
+alias gcu='git commit --amend -v'
 # alias gcv='git commit --no-verify'
 alias gsh='git push'
 
 
-# Many repos
+## Recursive repo
 alias Gs='~/.bin/prg.d/git-for-each st'  # summary
 alias Gt='~/.bin/prg.d/git-for-each st status -su'
 alias Gd='~/.bin/prg.d/git-for-each st diff --no-ext-diff --unified=0 --exit-code --no-prefix --word-diff'
