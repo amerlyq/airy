@@ -383,7 +383,7 @@ NeoBundle 'stefandtw/quickfix-reflector.vim'
 
 NeoBundle 'amerlyq/vim-focus-autocmd'
 NeoBundleLazy 'amerlyq/vim-forestanza', {
-    \ 'autoload' : { 'filetypes' : 'fza' }}
+    \ 'autoload' : { 'filetypes' : 'forestanza' }}
 
 " Viewing man in vim: good, but no colors in git lg1, need to investigate
 " NeoBundleLazy 'rkitover/vimpager'

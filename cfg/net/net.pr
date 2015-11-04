@@ -9,6 +9,10 @@ if [ $? -eq 1 ]; then exit 1; fi
 # youtube-dl | downloader for youtube video from page
 pkg_inst iw nmap network-manager uget youtube-dl
 
+## FTP search
+# lftp user@ftp.domain.net:/> find . | grep WORD
+# OR mount the ftp folder locally using curlftpfs.
+
 # iw phy
 # sudo iw dev wlp3s0 scan
 # sudo iwlist wlp3s0 scan | sed -n '/(Channel/p'

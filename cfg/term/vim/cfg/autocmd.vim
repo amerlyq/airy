@@ -26,6 +26,7 @@ augroup AdditionalFiletypes "{{{2
 augroup END
 
 
+set commentstring=#\ %s
 augroup CommentOptions "{{{2
     autocmd!
     au FileType c,cpp,cs,java          setlocal commentstring=//\ %s
