@@ -4,19 +4,20 @@ pr="${0##*/}"
 die() { printf "Err: '$pr' %s${1+\n}" "$1"; exit 1; }
 # echo ">> $*"
 
-unset dir sudo
+unset dfr dto sudo
 cmd=link
 
-while getopts "cst:" opt; do case $opt
+while getopts "csf:t:" opt; do case $opt
 in c) cmd='copy'
 ;; s) sudo='sudo'
-;; t) dir="$OPTARG"
+;; f) dfr="$OPTARG"
+;; t) dto="$OPTARG"
 ;; :|"?") die "needs value for '-$opt'"
 ;; *) die "invalid option '-$opt'"
 ;; esac; done
 shift $((OPTIND-1))
 
-# echo "cmd=$cmd, sudo=$sudo, dir=$dir"
+# echo "cmd=$cmd, sudo=$sudo, dto=$dto"
 
 copy() { local src="$1" dst="$2"
   if [[ ! -e "$dst" || ! -L "$dst" ]]; then
@@ -40,10 +41,10 @@ dispatch() { local src=$(readlink -e "${1:?No}") dst="${2:?No}"
   ${cmd:?No} "$src" "$dst" | sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g"
 }
 
-if [[ -z "$dir" ]]; then
+if [[ -z "$dto" ]]; then
   dispatch "$1" "$2"
-else for src in "$@"; do
-  dispatch "$src" "$dir/${src##*/}"
+else for nm in "$@"; do
+  dispatch "${dfr:+$dfr/}$nm" "$dto/${nm##*/}"
 done; fi
 # dst="${2/%%/${1##*/}}"  # Replaces path/% -> path/<src_file>
 # [[ ! "$dst" =~ %$ ]] || die "guards '$dst' expansion"
