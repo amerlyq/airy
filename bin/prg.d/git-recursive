@@ -40,15 +40,15 @@ function time_dt {
 function head_name {
     local name="$1"
     regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
-    print -P "\n%B%F{3}--[%f $name %F{3}]--%f%b\n"
+    print -P "%B%F{3}--[%f $name %F{3}]--%f%b\n"
 }
 
-function gita_st { # $1 -- rep name
+function gita_st { # $1 -- rep name, $2 -- suffix
     local stm=$(git log -1 --pretty=format:'%ci' | awk '{print $2,$1}')
     local name=$(printf "%+${WCOL:-17}s" "$1")
     # ALT "$(print -P "%F{6}${rep:h}/%f${rep:t}")"
     regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
-    print -P "$(gita_prezto)\t $name  $stm - $(time_dt)"
+    print -P "$(gita_prezto)\t $name  $stm - $(time_dt)$2"
 }
 
 function gita_pl { head_name "$1"
@@ -63,7 +63,7 @@ function gita_pl { head_name "$1"
     then git pull --rebase --verbose
     else git stash && git pull --rebase --verbose && git stash pop
     fi
-    gita_st "$1" && echo
+    gita_st "$1" "\n"
 }
 
 function gita_ph { head_name "$1"
@@ -71,7 +71,7 @@ function gita_ph { head_name "$1"
     local ahead=$(git rev-list HEAD...origin/"$branch" --ignore-submodules --count)
     (( $ahead )) || return
     git push --verbose
-    gita_st "$1" && echo
+    gita_st "$1" "\n\n"
 }
 
 function git_process {

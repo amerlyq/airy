@@ -59,11 +59,12 @@ alias gsh='git push'
 
 
 ## Recursive repo
-alias Gs='~/.bin/prg.d/git-for-each st'  # summary
-alias Gt='~/.bin/prg.d/git-for-each st status -su'
-alias Gd='~/.bin/prg.d/git-for-each st diff --no-ext-diff --unified=0 --exit-code --no-prefix --word-diff'
-alias Gl='~/.bin/prg.d/git-for-each pl'
-alias Gh='~/.bin/prg.d/git-for-each ph'
+alias Gs='~/.bin/prg.d/git-recursive st'  # summary
+alias Gt='~/.bin/prg.d/git-recursive st status -su'
+alias Gd='~/.bin/prg.d/git-recursive st diff \
+    --no-ext-diff --unified=0 --exit-code --no-prefix --word-diff'
+alias Gl='~/.bin/prg.d/git-recursive pl'
+alias Gh='~/.bin/prg.d/git-recursive ph'
 
 # Faster gitk startup
 alias gk='gitk --all --max-count=200 --branches --remotes --tags &'
