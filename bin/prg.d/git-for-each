@@ -37,6 +37,12 @@ function time_dt {
     printf "%6s" "$total"
 }
 
+function head_name {
+    local name="$1"
+    regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
+    print -P "\n%B%F{3}--[%f $name %F{3}]--%f%b\n"
+}
+
 function gita_st { # $1 -- rep name
     local stm=$(git log -1 --pretty=format:'%ci' | awk '{print $2,$1}')
     local name=$(printf "%+${WCOL:-17}s" "$1")
@@ -45,26 +51,34 @@ function gita_st { # $1 -- rep name
     print -P "$(gita_prezto)\t $name  $stm - $(time_dt)"
 }
 
-function gita_pl {
-    local name="$1"
-    regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
-    print -P "\n\n%B%F{3}--[%f $name %F{3}]--%f%b\n"
+function gita_pl { head_name "$1"
+    # ATTENTION: Checking remote updates has no sense, as its time ~= pull
+    # local remote=$(git rev-parse --abbrev-ref '@{u}')
+    # remote=$(git ls-remote -h ${remote%/*} refs/heads/${remote##*/} | awk '{print $1}')
+    # [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return
 
-    # FIXME: Check if has remote updates
-    # if [[ $(git rev-parse HEAD) == $(git ls-remote $(git rev-parse --abbrev-ref @{u})) ]]; then
-        # Check if clean directory
-        if git diff-files --quiet --ignore-submodules --
-        then git pull --rebase --verbose
-        else git stash && git pull --rebase --verbose && git stash pop
-        fi
-    # fi
+    # Check if clean directory
+    # ALT: git diff-index --name-only --ignore-submodules HEAD --
+    if git diff-files --quiet --ignore-submodules --
+    then git pull --rebase --verbose
+    else git stash && git pull --rebase --verbose && git stash pop
+    fi
+    gita_st "$1" && echo
+}
+
+function gita_ph { head_name "$1"
+    local branch=$(git rev-parse --abbrev-ref HEAD)
+    local ahead=$(git rev-list HEAD...origin/"$branch" --ignore-submodules --count)
+    (( $ahead )) || return
+    git push --verbose
+    gita_st "$1" && echo
 }
 
 function git_process {
     ## Additional verification of git repo existance
     git rev-parse --git-dir > /dev/null 2>&1 && bFound=1 || continue
     ## Print git info from zsh-specific prompt
-    case "$ARG" in pl|st) gita_$ARG "$1" ;; esac
+    case "$ARG" in st|pl|ph) gita_$ARG "$1" ;; esac
     ## Also, exec any git commands after "Gs/Gt/Gl/Gd ..."
     eval ${CMD:+git $CMD}
 }
@@ -78,7 +92,7 @@ function git_process {
 # Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит,
 # стэш, merge итп -- парсить и заменять на значки
 LST=( "$DIR"/**/.git(-/^D:h) )
-LST=( ${^LST##$DIR/} )
+LST=( ${${^${^LST##$DIR}#/}:-.} )
 
 # Search min pr rep column width
 for rep in "${LST[@]}"; do
