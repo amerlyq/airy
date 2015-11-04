@@ -1,18 +1,16 @@
 #!/bin/bash
+## Moves currently playing song into $dstdir/<subdir>
 
 source ~/.shell/profile
 
-case "$CURR_PROF" in
-    home) dir=/media/$CURR_USER/Umi/Music ;;
-       *) dir=~/media/Music ;;
+case "${CURR_PROF:?No}" in
+    home) dir=/media/${CURR_USER:?No}/Umi/Music ;;
+       *) dir=/home/media/music ;;
 esac
 
-pd="$dir/++"
+dstdir="$dir/++"
 
-if [ "$1" == "-l" ]; then
-    ls "$pd/$2"
-    exit
-fi
+if [[ "$1" == "-l" ]]; then ls "$dstdir/$2"; exit; fi
 
 # 1..9..inf stars as quality, or name for dir for grouping, or dir/subdir tag
 choice=${1}
@@ -21,13 +19,13 @@ fl="$dir/`mpc -f '%file%' | sed '1q'`"
 
 DMENU='dmenu -i -p MPD: -b -nb #000000 -nf #999999 -sb #000000 -sf #31658C -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
 
-if [ -z "$choice" ]; then
-    cd "$pd"
+if [[ -z "$choice" ]]; then
+    cd "$dstdir"
     choice=$( find . -maxdepth 1 -type d -exec basename {} \; | $DMENU)
 fi
 
-if [ -n "$choice" ]; then
-    dst="$pd/$choice"
+if [[ -n "$choice" ]]; then
+    dst="$dstdir/$choice"
     curr="$(mpc -f '[%position%]' | sed '1q')"
     mkdir -p "$dst" \
     && mv -i -v -b "$fl" --target-directory="$dst/" \

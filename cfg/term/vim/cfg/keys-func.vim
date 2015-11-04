@@ -36,8 +36,9 @@ nmap <Leader>+ mzyypVr-:.+1g/^-\+/d<Enter>`z
 
 " Dump all keymaps
 command! -bar -nargs=? MapDump redir > ~/vim_map_dump | map <args> | redir END
-" command! FormatJSON %!python -m json.tool
-command! FormatJSON %!python -c 'import json, sys; print(json.dumps(json.load(sys.stdin), indent=2))'
+" ALT command! FormatJSON %!python -m json.tool
+command! FormatJSON %!python -c 'import json, sys;
+      \ print(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=False))'
 
 "" Append modeline to EOF
 " nnoremap <silent> <Leader>ml :call AppendModeline()<CR>

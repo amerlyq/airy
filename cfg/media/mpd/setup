@@ -4,7 +4,8 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 dir=~/.mpd
-case "$CURR_PROF" in
+link -t "$dir" move_current
+case "${CURR_PROF?:No}" in
 # home) link "$PWD/mpd-sir.conf" "$dir/mpd.conf" ;;
    *) link "$PWD/mpd-own.conf" "$dir/mpd.conf" ;;
 esac
