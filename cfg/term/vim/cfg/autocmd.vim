@@ -15,6 +15,8 @@ augroup AdditionalFiletypes "{{{2
     autocmd!
     au BufRead,BufNewFile {PKGBUILD,.AURINFO} setfiletype PKGBUILD
     au BufRead,BufNewFile
+        \ {*.fza} setfiletype forestanza
+    au BufRead,BufNewFile
         \ {*.log*,log-*} setfiletype messages
     au BufRead,BufNewFile
         \ {Gemfile,Rakefile,Thorfile,Vagrantfile} setfiletype ruby
