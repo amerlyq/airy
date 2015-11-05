@@ -23,7 +23,7 @@ else arch=i386; fi
 funcOnly() { ${pref}nm -nS ${1?Need file name} |
 perl -lane '/'"${2?Need symbol name}"'/ and do {
     $s=hex(@F[0]); $e=$s+hex(@F[1]);
-    $str="'"$pref"'objdump -C -D --start-address=0x%x --stop-address=0x%x '"${1}"' | sed 1,5d";
+    $str="'"$pref"'objdump -m '"$arch"' -C -D --start-address=0x%x --stop-address=0x%x '"${1}"' | sed 1,5d";
     $cmd=sprintf($str, $s,$e);
     system($cmd)
 }'; }  # -j.text
