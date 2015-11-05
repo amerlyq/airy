@@ -42,4 +42,6 @@ nnoremap gK  i<CR><Right><Esc>
 nnoremap <C-k> i<CR><Right><Esc>:m .-2<CR>
 nnoremap gX  lxh
 
-
+" DEV: use <Space> as <Leader-2>
+" space,space -- insert space
+" space,p/P -- insert space, then paste

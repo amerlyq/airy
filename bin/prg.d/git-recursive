@@ -89,8 +89,16 @@ function git_process {
 # fi; }
 # traverse_dir "$DIR"
 
+## DEV:
 # Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит,
 # стэш, merge итп -- парсить и заменять на значки
+
+## WARNING:
+# Will find even submodules as separate repo!
+# It's useful for status, but could be very bad for pull/push/<cmd>
+## DEV
+# Different color for found submodules (yellow), and show them only in status.
+# Allow to specify cmd together with status to apply for all repo, but disallow for pull/push.
 LST=( "$DIR"/**/.git(-/^D:h) )
 LST=( ${${^${^LST##$DIR}#/}:-.} )
 

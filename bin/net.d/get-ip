@@ -1,0 +1,19 @@
+#!/bin/bash -e
+
+DIR=/sys/class/net
+mask='^(w|e|p)'
+
+for ifc in $DIR/*; do
+    ifc="${ifc##*/}"
+    if [[ "$ifc" =~ $mask ]]; then
+        IFCS+="$ifc "
+        if [[ "$(cat $DIR/$ifc/operstate )" == "up" ]]; then
+            state="${ifc:0:1}$state"; state="${state^^}"
+        fi
+    fi
+done
+
+ifc=$(sed -r "s/.* (${state,,}\w+) .*/\1/" <<<" ${IFCS[*]} ")
+ipaddr=$(ip addr show ${ifc} | sed -n 's|.*\s*inet \([0-9\.]*\)/.*|\1|p')
+
+printf "%s\n" "$ipaddr"
