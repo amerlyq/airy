@@ -25,5 +25,7 @@ fi
 
 if cfgOpt u; then
     # chsh -s /bin/zsh
-    (cd "$PREZTO" && git pull && git submodule update --init --recursive)
+    # BUG: submodules aren't updated at all!
+    (cd "$PREZTO" && git pull &&
+        git submodule update --init --recursive --remote --merge)
 fi

@@ -191,6 +191,9 @@ Submodules
 		git submodule update
 	Pull
 		git submodule foreach 'git checkout master && git pull origin master'
+	Full update
+		git pull && git submodule update --init --recursive
+		git submodule update --remote --merge
 	Push:
 		cd vendor
 		git checkout master
