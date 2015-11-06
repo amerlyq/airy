@@ -11,8 +11,9 @@ copypastor,selector
 
 !! === Standart =========================
 ! NOTE: PrtSc is binded by wm, so only C/S-PrtSc works (scrollback + screen)
-URxvt*print-pipe:  bash -c "x-terminal-emulator -e editor -c 'norm G$' <(cat -)"
-! cat > $HOME/$(echo urxvt.dump.$(date +'%Y%M%d%H%m%S'))
+! ALT URxvt*print-pipe:  bash -c "x-terminal-emulator -e editor -c 'norm G$' <(cat -) &"
+! OR cat > $HOME/$(echo urxvt.dump.$(date +'%Y%M%d%H%m%S'))
+URxvt*print-pipe:  ~/.urxvt/etc/printer
 
 
 !! === Fork-cwd =========================
