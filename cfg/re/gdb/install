@@ -6,6 +6,7 @@ pkg_inst 'gdb'
 if distro arch; then
     pkg_inst 'python2-six'
     aur_inst -f '/usr/share/peda/peda.py' peda-git
+    # ALT dual compatible: https://github.com/zachriggle/peda
 
 elif distro ubuntu; then
     git_inst ""
