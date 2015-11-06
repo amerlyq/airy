@@ -6,7 +6,13 @@ def_key "mouse"
 
 def_key "up"
   scroll_up
+def_key "shift-up"
+  select_item
+  scroll_up
 def_key "down"
+  scroll_down
+def_key "shift-down"
+  select_item
   scroll_down
 
 def_key "["
@@ -35,9 +41,18 @@ def_key "insert"
   select_item
 
 def_key "enter"
-  press_enter
+  enter_directory
+def_key "enter"
+  toggle_output
+def_key "enter"
+  play_item
+def_key "enter"
+  run_action
+
 def_key "m"
-  press_enter
+  enter_directory
+def_key "m"
+  play_item
 
 # Vim --------------------
 
@@ -68,6 +83,7 @@ def_key "delete"
   delete_playlist_items
 def_key "delete"
   delete_browser_items
+
 def_key "delete"
   delete_stored_playlist
 
@@ -87,7 +103,9 @@ def_key "l"
 def_key "l"
   slave_screen
 def_key "l"
-  press_enter
+  enter_directory
+def_key "l"
+  play_item
 
 
 def_key "d"
@@ -303,13 +321,12 @@ def_key "T"
 def_key "'"
   show_lyrics
 
+def_key "ctrl-v"
+  select_range
 def_key "v"
   select_item
 def_key "V"
   reverse_selection
-def_key "ctrl-v"
-# select_range
-  remove_selection
 def_key "escape"
   remove_selection
 
