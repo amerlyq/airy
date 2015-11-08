@@ -39,6 +39,7 @@ command! -bar -nargs=? MapDump redir > ~/vim_map_dump | map <args> | redir END
 " ALT command! FormatJSON %!python -m json.tool
 command! FormatJSON %!python -c 'import json, sys;
       \ print(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=False))'
+command! -bar -nargs=? Format2 set ts=2 sw=2 sts=2 fdl=99
 
 "" Append modeline to EOF
 " nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
