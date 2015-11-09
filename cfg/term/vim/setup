@@ -8,6 +8,7 @@ mkdir -p "${XDG_DATA_HOME:=$HOME/.cache}/shada"
 
 if distro arch; then
     mkdef editor $(which vim)
+    has_pr nvim && mkdef vim $(which nvim) ||:
 elif distro ubuntu; then
     for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
 fi
@@ -57,7 +58,7 @@ fi
 ### PLUGINS ###
 if cfgOpt u || [[ ! -d "$VCACHE/bundle" ]]; then
     # FIXME: error on clean system, when NeoBundle is not installed yet
-    vim -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty ||:
+    $EDITOR -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty ||:
 fi
 
 # Editor

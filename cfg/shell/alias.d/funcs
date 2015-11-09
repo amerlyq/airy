@@ -34,7 +34,7 @@ timer() { echo "{ notify-send --urgency normal --expire-time=10000 -i typing-mon
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# alias notes='date +"%Y-%m-%d, %T" >> ./notes.otl && vim ./notes.otl'
+# alias notes='date +"%Y-%m-%d, %T" >> ./notes.otl && editor ./notes.otl'
 
 term_tree() {
      local leaf=$$
@@ -62,7 +62,6 @@ tmux_display_fix() {
 
 copyq_edit() {
     local fl=`tempfile`
-    copyq clipboard > $fl
-    vim $fl && cat $fl | copyq copy -
-    rm -f $fl
+    copyq clipboard > "$fl" && "$EDITOR" -- "$fl" && copyq copy - < "$fl"
+    trap "rm -f '$fl'" EXIT
 }

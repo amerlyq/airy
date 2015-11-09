@@ -28,10 +28,10 @@ vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
         [[ "${k:0:1}" != - ]] && k="\"${k}\""
         cmd="$cmd$k "
     done
-    printf "$cmd\n" | vim -R \
+    printf "$cmd\n" | $EDITOR -R \
         -c "set nolist | let g:magnify_on=0 | copen $cnt " \
         -c "NeoCompleteDisable" -c "call histadd(':','$cmd')" -c ":$cmd" -
     # | let g:ag_qhandler='botleft lopen 7'
 }
 
-vimf(){ ag -g $@ | vim -; }
+vimf(){ ag -g $@ | $EDITOR -; }
