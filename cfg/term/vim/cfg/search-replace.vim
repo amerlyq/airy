@@ -4,6 +4,7 @@ set incsearch   " incremental search
 set hlsearch    " highlight search results
 set ignorecase  " make searching case insensitive
 set smartcase   " ... unless the query has capital letters
+set wrapscan    " Searches wrap around the end of the file.
 " set gdefault  " assume the /g flag on :s substitutions to replace all matches in a line
 " set autoread  " Make Vim automatically open changed files (e.g. changed after a Git commit)
 

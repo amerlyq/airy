@@ -5,11 +5,6 @@
 " files, press enter (or move right) and ranger will quit again and vim will
 " open the selected files.
 
-command! -nargs=1 Silent
-\ | execute ':silent !'.<q-args>
-\ | execute ':redraw!'
-
-
 function! RangeChooser()
     let temp = tempname()
     exec 'Silent ranger --choosefiles=' . shellescape(temp)
