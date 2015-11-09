@@ -1,0 +1,31 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+source ~/.shell/profile
+
+pkg_inst bluez bluez-utils obexfs
+
+if ! id | grep -q '(lp)'; then
+    sudo usermod -aG lp "${CURR_USER:?No}"
+    printf "\n!!! Re-login in this shell/session or reboot to update changes in Groups\n"
+fi
+
+
+exit
+
+# Alg to pair by bluetoothctl
+hciconfig -a hci0
+sudo hciconfig hci0 up      # Enable usb-dongle
+sudo hciconfig hci0 piscan  # Enable PC visibility
+hciconfig
+
+sudo bluetoothctl
+    agent KeyboardOnly
+    default-agent
+    scan on
+    pair 60:AF:6D:E7:B4:1D
+    # -- scan on phone, and initiate pairing from phone ONLY
+    :pass: ...
+sudo hciconfig hci0 noscan  # Disable PC visibility
+
+obexfs -b 60:AF:6D:E7:B4:1D /mnt
+obexftp -b 60:AF:6D:E7:B4:1D -g /sdcard/Books/pdb.otl
