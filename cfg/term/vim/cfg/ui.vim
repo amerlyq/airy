@@ -35,16 +35,10 @@ set sessionoptions-=options
 set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
 set mouse=a           " support for mouse wheel and clicks
-set ttyfast " sends more characters to the screen for fast terminal connections
 set colorcolumn=+1    " show textwidth limit
 set virtualedit=block " cursor can be positioned where there is no character
 
 set guicursor+=a:blinkwait0 " disable cursor blink in gvim
-set guioptions-=r           " disable right scrollbar
-set guioptions-=L           " disable left scrollbar
-set guioptions-=T           " disable toolbar
-set guioptions-=m           " disable menubar
-set guioptions+=c           " console-like dialogs instead of gui popup ones
 
 if has("gui_running")
   if has("gui_gtk2")

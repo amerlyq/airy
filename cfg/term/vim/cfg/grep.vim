@@ -5,6 +5,10 @@ elseif executable('ack')
     set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
 endif
 
+if exists('&regexpengine')
+  " Use old regexp engine.
+  " set regexpengine=1
+endif
 " Doxygen syntax highlighting. Very slow on \c, \b. So set those:
 set regexpengine=1          " Do not use NFA because doxygen style will be slow
 let g:load_doxygen_syntax=1 " Load doxygen syntax by default

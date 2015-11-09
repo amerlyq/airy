@@ -1,5 +1,13 @@
-set nocompatible
-let $CACHE=expand('~/.cache/vim')
+" vim:ts=2:sw=2:sts=2
+" Defaults for nvim (ignored), also set always for vim
+set nocompatible ttyfast
+set fileformats=unix,dos,mac
+if has("multi_byte")
+  if &termencoding == "" | let &termencoding = &encoding | endif
+  set encoding=utf-8
+  setglobal fileencoding=utf-8
+  set fileencodings=utf-8,cp1251,cp866
+endif
 
 fun! s:cfg(path)
   execute 'source' fnameescape(expand($VIMHOME .'/cfg/'. a:path))
@@ -8,8 +16,8 @@ com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
 
 call s:cfg('detect')
-" call s:cfg('setenv')
-" call s:cfg('init')
+call s:cfg('env')
+call s:cfg('init')
 
 call s:cfg('neobundle.vim')
 
@@ -53,5 +61,16 @@ call s:cfg('ui.vim')
 
 " " Default home directory.
 " let t:cwd = getcwd()
+
+augroup MyAutoCmd
+  " Open at last position
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+        \| exe "normal g'\"" | endif
+augroup END
+
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
-set exrc secure
+set exrc secure modeline  " also parse 'vim:...' cmds from comments
+if has('cryptv')  " USE blowfish2: https://dgl.cx/2014/10/vim-blowfish
+  " set cryptmethod=blowfish2   " It seems +15ms overhead.
+endif
+" SEE loadorder of *.vim by :scriptnames

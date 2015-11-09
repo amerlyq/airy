@@ -2,7 +2,7 @@ set autoindent       " automatically indent new lines
 set cindent          " instead of 'smartindent' to not move '#' to right
 set formatoptions+=o " continue comment marker in new lines
 set formatoptions+=n " recognize numbered lists
-set backspace=indent,eol,start
+set backspace=indent,eol,start  " delete indent and newline
 set commentstring=#\ %s  " Use sh-style comments by default instead of c-style
 
 if v:version >= 704

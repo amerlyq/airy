@@ -1,4 +1,4 @@
-" vim:ts=2:sw=2:sts=2
+" vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 " NOTE: more prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
 
 " Toggle status line
