@@ -71,6 +71,14 @@ endfor
 "================ Configuration ================ {{{1
 source $VIMHOME/neobundle.vim
 runtime! bundle/*.vim cfg/*.vim ext/*.vim
+" execute 'source' fnamemodify(expand('<sfile>'), ':h').'/rc/vimrc'
+
+augroup StartupOptions
+    autocmd!
+    " Open at last position
+    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+        \| exe "normal g'\"" | endif
+augroup END
 
 " Search rc in current dirs, but don't execute :autocmd, shell and write commands
 set exrc secure

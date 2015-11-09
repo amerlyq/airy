@@ -1,3 +1,4 @@
+setlocal commentstring=:\ %s
 setlocal nowrap
 " Dont display tab and other invisible chars
 setlocal nolist
