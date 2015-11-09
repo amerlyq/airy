@@ -27,6 +27,11 @@ else
   let $CACHE=expand('~/.cache/vim')
 endif
 
+if has('vim_starting')
+  set runtimepath+=$VIMHOME
+  set runtimepath+=$CACHE  " For ./spell
+endif
+
 if has('win32') || has('win64')
 " Fix the path of vimrc and gvimrc for Windows
   let $MYVIMRC=$VIMHOME . '/vimrc'
@@ -41,7 +46,9 @@ set backupdir=$CACHE/bckpdir//,~/.tmp,/var/tmp,/tmp
 set directory=$CACHE/swapdir//,~/.tmp,/var/tmp,/tmp
 " backup current file, not deleted afterwards: you need free space!
 set backup writebackup backupcopy=auto swapfile
-set viminfo+=n$CACHE/.viminfo
+if !has("nvim")
+  set viminfo+=n$CACHE/.viminfo
+endif
 " for v:version >= 703
 set undodir=$CACHE/undodir//
 set undofile
@@ -54,7 +61,6 @@ let g:netrw_home=$CACHE
 let g:netrw_http_cmd = "elinks-for-vim"
 
 
-let $BUNDLES=expand('$CACHE/bundle')
 let cdirs = ['bundle', 'bckpdir', 'swapdir', 'undodir']  " 'easytags.d'
 for nm in cdirs
   if !isdirectory(expand('$CACHE/' . nm))
@@ -62,44 +68,11 @@ for nm in cdirs
   endif
 endfor
 
-"================ Neobundle ==================== {{{1
-" Install neobundle if it doesn't exist
-let $NEOBUNDLE=expand('$BUNDLES/neobundle.vim')
-if !filereadable(expand('$NEOBUNDLE/README.md'))
-    echom 'NeoBundle not found. Installing...'
-    let neobundle='https://github.com/Shougo/neobundle.vim'
-    silent exec '!git clone --depth=1 '.neobundle $NEOBUNDLE
-endif
-
-if has ('vim_starting')
-  set runtimepath+=$NEOBUNDLE
-  set runtimepath+=$VIMHOME
-  set runtimepath+=$CACHE  " For ./spell
-endif
-
-let g:neobundle#types#git#default_protocol = 'git'  " OR: https, ssh
-let g:neobundle#types#git#clone_depth = 1   "shallow copy
-let g:neobundle#types#git#enable_submodule = 1
-
-call neobundle#begin(expand('$BUNDLES'))
-  " if neobundle#load_cache()
-  " Let NeoBundle manage NeoBundle
-    NeoBundleFetch 'Shougo/neobundle.vim'
-    source $VIMHOME/plugins.vim  " fnameescape(
-    " NeoBundleSaveCache
-  " endif
-call neobundle#end()
-
-filetype plugin indent on  " Required!
-NeoBundleCheck  " Checks and installs all not installed bundles
-
-if !has('vim_starting')
-  " Call on_source hook when reloading .vimrc.
-  call neobundle#call_hook('on_source')
-endif
-
 "================ Configuration ================ {{{1
+source $VIMHOME/neobundle.vim
 runtime! bundle/*.vim cfg/*.vim ext/*.vim
 
 " Search rc in current dirs, but don't execute :autocmd, shell and write commands
 set exrc secure
+
+" SEE loadorder of *.vim by :scriptnames

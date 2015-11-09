@@ -8,6 +8,7 @@ source ~/.shell/func.d/packages
 if distro arch; then
     # SEE gtags (GNU Global) -- instead of ctags?
     # aur_inst neovim-git
+    pkg_inst neovim python-neovim python2-neovim
     pkg_inst -p 'pip' python-pip
     # Used 'gvim' instead of 'gvim-python3' for YouCompleteMe
     #   and for pythoncomplete#Complete
@@ -20,6 +21,8 @@ elif distro ubuntu; then
     # for vimoutliner export in mindmap
     pkg_inst vim-gtk exuberant-ctags 'python-pip' python-dev
     pkg_inst libclang-dev clang-format-3.5
+    # sudo pip  install neovim
+    # sudo pip3 install neovim
     echo "Err: not all"
 fi
 
