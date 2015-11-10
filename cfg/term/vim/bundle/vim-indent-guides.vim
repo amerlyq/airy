@@ -1,7 +1,7 @@
 " At the moment Terminal Vim only has basic support.
 " So colors won't be autocalculated from your colorscheme.
 let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_exclude_filetypes = ['votl']
+let g:indent_guides_exclude_filetypes = ['votl', 'iav_term']  " SEE RangerChooser
 let g:indent_guides_default_mapping = 0
 
 " Make 1-wide guide, don't works on Hard-Tabs
