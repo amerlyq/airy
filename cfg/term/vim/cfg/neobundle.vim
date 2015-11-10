@@ -20,7 +20,7 @@ call neobundle#begin(expand('$BUNDLES'))
   " if neobundle#load_cache()
     " Let NeoBundle manage NeoBundle
     NeoBundleFetch 'Shougo/neobundle.vim'
-    source $VIMHOME/plugins.vim  " fnameescape(
+    call SourcePlugins()
     " NeoBundleSaveCache
   " endif
 

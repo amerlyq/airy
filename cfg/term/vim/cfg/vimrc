@@ -1,6 +1,4 @@
 " vim:ts=2:sw=2:sts=2
-" Defaults for nvim (ignored), also set always for vim
-set nocompatible ttyfast
 set fileformats=unix,dos,mac
 if has("multi_byte")
   if &termencoding == "" | let &termencoding = &encoding | endif
@@ -12,13 +10,26 @@ endif
 fun! s:cfg(path)
   execute 'source' fnameescape(expand($VIMHOME .'/cfg/'. a:path))
 endf
-com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
+com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
 call s:cfg('detect')
 call s:cfg('env')
 call s:cfg('init')
 
+fun! SourcePlugins()
+  let g:mapleader="\\"
+  call s:cfg('plugins/backslash.vim')
+  " let g:mapleader=" "
+  " call s:cfg('plugins/space.vim')
+  let g:mapleader=","
+  call s:cfg('plugins/comma.vim')
+  call s:cfg('plugins/integration.vim')
+  call s:cfg('plugins/languages.vim')
+  call s:cfg('plugins/search.vim')
+  call s:cfg('plugins/operators.vim')
+  call s:cfg('plugins/decoration.vim')
+endf
 call s:cfg('neobundle.vim')
 
 " syntax enable
