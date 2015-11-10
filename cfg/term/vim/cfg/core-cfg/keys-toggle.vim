@@ -16,7 +16,7 @@ nnoremap <unique> <Leader>tW :setlocal wrap! breakindent!<CR>
 
 " magnifying when switching (more stable then 'hjkl<C-W>_' )
 let g:magnify_on = 1
-noremap <unique> <Leader>tw :<C-U>let g:magnify_on = g:magnify_on ? 0 : 1 \|
+noremap <unique> <Leader>tw :<C-U>let g:magnify_on = !g:magnify_on  \|
       \ echo('  wmagnify = ' . (g:magnify_on ? 'on' : 'off'))<CR>
 autocmd WinEnter * call AutoMagnifying()
 function! AutoMagnifying()

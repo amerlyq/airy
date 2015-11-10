@@ -1,4 +1,4 @@
-let s:leader = g:mapleader | let mapleader = "\\"  "{{{
+let s:leader = g:mapleader | let g:mapleader = "\\"  "{{{
 
 if neobundle#tap('DrawIt')
   map <unique> <Leader>DI <Plug>DrawItStart

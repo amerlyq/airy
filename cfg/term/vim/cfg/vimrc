@@ -8,14 +8,17 @@ if has("multi_byte")
 endif
 
 fun! s:cfg(path)
-  execute 'source' fnameescape(expand($VIMHOME .'/cfg/'. a:path))
+  for f in globpath(expand($VIMHOME .'/cfg/'), a:path, 0, 1)
+    exe 'source' fnameescape(f)
+  endfor
 endf
 
 com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
-call s:cfg('detect')
-call s:cfg('env')
-call s:cfg('init')
+let g:mapleader=","
+call s:cfg('core/detect')
+call s:cfg('core/env')
+call s:cfg('core/init')
 
 fun! SourcePlugins()
   let g:mapleader="\\"
@@ -30,46 +33,26 @@ fun! SourcePlugins()
   call s:cfg('plugins/search.vim')
   call s:cfg('plugins/operators.vim')
   call s:cfg('plugins/decoration.vim')
+  " runtime! $VIMHOME/cfg/plugins-cfg/*.vim
 endf
-call s:cfg('neobundle.vim')
 
+call s:cfg('neobundle.vim')
 " syntax enable
 
-let mapleader=","
-runtime! bundle/*.vim
+let g:mapleader=","
+call s:cfg('plugins-cfg/*.vim')
 
+let g:mapleader=","
+call s:cfg('core-cfg/*.vim')
 " call s:source_rc('encoding.rc.vim')
 " call s:source_rc('edit.rc.vim')
 " call s:source_rc('view.rc.vim')
 " call s:source_rc('filetype.rc.vim')
 " call s:source_rc('mappings.rc.vim')
 
-" " Display diff with the file.
-" command! -nargs=1 -complete=file Diff vertical diffsplit <args>
-" " Disable diff mode.
-" command! -nargs=0 Undiff setlocal nodiff noscrollbind wrap
-
-call s:cfg('diff.vim')
-call s:cfg('fold.vim')
-call s:cfg('format.vim')
-call s:cfg('func-compile.vim')
-call s:cfg('func-insert.vim')
-call s:cfg('grep.vim')
-call s:cfg('keys-func.vim')
-call s:cfg('keys-remap.vim')
-call s:cfg('keys-toggle.vim')
-call s:cfg('locale.vim')
-call s:cfg('mng-buffers.vim')
-call s:cfg('mng-copy-paste.vim')
-call s:cfg('mng-files.vim')
-call s:cfg('search-replace.vim')
-call s:cfg('term-conf.vim')
-call s:cfg('ui-colors.vim')
-call s:cfg('ui.vim')
-
-" call s:source_rc(IsWindows() ? 'windows.rc.vim' : 'unix.rc.vim')
-" call s:source_rc(has('gui_running') ? 'gui.rc.vim' : 'term.rc.vim')
-" call s:source_rc(has('nvim') ? 'neovim.rc.vim' : 'vim.vim')
+" call s:cfg('features/'.(IsWindows() ? 'windows' : 'unix').'.vim')
+" call s:cfg('features/'.(has('gui_running') ? 'gui' : 'term').'.vim')
+" call s:cfg('features/'.(has('nvim') ? 'neovim' : 'vim').'.vim')
 
 " " Default home directory.
 " let t:cwd = getcwd()

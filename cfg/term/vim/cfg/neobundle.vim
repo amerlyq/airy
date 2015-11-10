@@ -31,7 +31,6 @@ call neobundle#begin(expand('$BUNDLES'))
   "         \ {}, ['vim*', 'unite-*', 'neco-*', '*.vim', '*.nvim'])
   " endif
 
-  runtime! $VIMHOME/bundles/*
   " call s:source_rc('plugins.rc.vim')
 call neobundle#end()
 

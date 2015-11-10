@@ -19,9 +19,11 @@ if &diff
   " updates the highlighting and folding when undoing a change
   nnoremap u :undo <bar> diffupdate<enter>
 
-  " use space and backspace to jump forward/backward through differences
-  nnoremap <space> :normal! ]c<enter>
-  nnoremap <backspace> :normal! [c<enter>
+  " [c  Jump backwards to the previous start of a change.
+  " ]c  Jump forwards to the next start of a change.
+  " USE space and backspace to jump forward/backward through differences
+  nnoremap <space> :normal! ]c<CR>
+  nnoremap <backspace> :normal! [c<CR>
 
   " allows you to 'put' and 'obtain' changes in visual mode for the instances
   " where multiple changes are on concurrent lines and you don't want to make
@@ -34,11 +36,12 @@ else
   set cursorline      " highlight currently focused line
 endif
 
+
+" Display diff with the file.
+command! -nargs=1 -complete=file Diff vertical diffsplit <args>
+" Disable diff mode.
+command! -nargs=0 DiffEnd setlocal nodiff noscrollbind wrap
 " Use :DiffOrig to see the differences between the current buffer and the
 " file it was loaded from. Use :diffupdate then
 command! DiffOrig vert new | set bt=nofile | r ++edit # | 0d_
     \ | diffthis | wincmd p | diffthis
-
-
-" [c  Jump backwards to the previous start of a change.
-" ]c  Jump forwards to the next start of a change.

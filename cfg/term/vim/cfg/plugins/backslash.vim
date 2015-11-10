@@ -1,9 +1,5 @@
 " vim:fdm=marker:fdl=1
-" USE '\' as <Leader> for all plugins below
-
-let mapleader="\\"
-noremap <unique> <Leader> <Nop>
-
+"{{{1 Apps ============================
 
 " Switch [c,cpp,cxx,cc] <-> [h,hpp]
 NeoBundle 'kana/vim-altr'
