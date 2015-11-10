@@ -35,7 +35,7 @@ NeoBundle 'Shougo/vinarise.vim', { 'autoload': {
 
 " Super-mega-replace for bunch of plugins
 " See: http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
-NeoBundle 'Shougo/unite.vim', { 'depends' : 'Shougo/vimproc.vim' }
+NeoBundle 'Shougo/unite.vim', { 'depends' : 'Shougo/neomru.vim' }
 NeoBundleLazy 'Shougo/unite-outline', { 'depends' : 'Shougo/unite.vim'
     \ , 'autoload' : { 'unite_sources' : 'outline' }}
 NeoBundle 'Shougo/neomru.vim', { 'depends' : 'Shougo/unite.vim' }
@@ -44,70 +44,10 @@ NeoBundle 'Shougo/neomru.vim', { 'depends' : 'Shougo/unite.vim' }
 
 
 " ======================================
-" Integration with neocomplete: for stdlib++, boost, etc (works on Windows)
-" http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
-NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
+" W3m from vim
+"NeoBundle 'yuratomo/w3m.vim'
 
-" echo neobundle#tap('YouCompleteMe')
-
-NeoBundleLazy 'Shougo/neocomplete.vim', {
-    \ 'autoload' : { 'insert' : 1 },
-    \ 'depends' : [
-    \   'Shougo/context_filetype.vim',
-    \   'Shougo/vimproc.vim' ],
-    \ 'disabled' : !has('lua'),
-    \ 'vim_version' : '7.3.885'}
-
-" SirVer/ultisnips
-NeoBundleLazy 'Shougo/neosnippet.vim', {
-    \ 'autoload' : { 'insert' : 1 },
-    \ 'depends' : [
-    \   'Shougo/neocomplete.vim',
-    \   'Shougo/neosnippet-snippets',
-    \   'honza/vim-snippets' ],
-    \ 'disabled' : !has('lua'),
-    \ 'vim_version': '7.3.885'}
-
-
-" ======================================
-
-if has('unix')
-    " W3m from vim
-    "NeoBundle 'yuratomo/w3m.vim'
-
-    "Lazy loading like this
-    "NeoBundleLazy 'Rip-Rip/clang_complete'
-    "autocmd FileType c,cpp NeoBundleSource clang_complete
-
-    " "" Autocompletion for Python and C-like languages. Need Python2 exclusively
-    " NeoBundleLazy 'Valloric/YouCompleteMe', {
-    "     \ 'augroup': 'youcompletemeStart',
-    "     \ 'autoload': {
-    "     \   'commands' : ['YcmDebugInfo'],
-    "     \   'filetypes' : [ 'c', 'cpp' ],
-    "     \ },
-    "     \ 'build': {
-    "     \   'linux': './install.sh --clang-completer',
-    "     \ },
-    "     \ 'disabled': !has('python'),
-    "     \ 'vim_version': '7.3.584',
-    "     \ }
-    "     " \   'unix': './install.sh --clang-completer --system-libclang'
-
-    " TODO FIX: resolve completion conflicts -- seems like isn't disabled?
-    " autocmd FileType c,cpp if exists(':YcmCompleter') | NeoCompleteDisable | endif
-    " neocomplete: 'autoload': { 'filetypes' : [ 'vim', 'sh', 'shell', 'votl' ], },
-
-" {{{Build instruction for YCM : if [ ! -e './third_party/ycmd/ycm_core.so' ]
-"   1. git submodule update --init --recursive
-"   2. cd third_party/ycmd && mkdir -p build && cd build && cmake .. ../cpp
-"   5a. (optional) ccmake . # configure
-"   6. make
-" For win: https://github.com/Valloric/YouCompleteMe/wiki/Windows-Installation-Guide
-" }}}
-
-else
-
+if IsWindows()
 " In unix terminal use snip-ranger-filechooser.vim
 NeoBundleLazy 'Shougo/vimfiler.vim', {
     \ 'depends' : 'Shougo/unite.vim',
@@ -120,7 +60,6 @@ NeoBundleLazy 'Shougo/vimfiler.vim', {
     \    'mappings' : ['<Plug>(vimfiler_'],
     \    'explorer' : 1,
     \ }}
-
 endif
 
 " ======================================
@@ -212,13 +151,6 @@ NeoBundle 'Chiel92/vim-autoformat'
 " Auto-formatter for c/cpp/obj-c
 NeoBundle 'rhysd/vim-clang-format'
 
-
-
-" JSON Highlight and indent plugin
-NeoBundleLazy 'elzr/vim-json', {
-    \ 'autoload': { 'filetypes': [ 'json' ] },
-    \}
-
 " ======================================
 
 " When swap exists, it show process id, or you can diff swp with file on disk
@@ -229,5 +161,5 @@ NeoBundle 'chrisbra/Recover.vim'
 NeoBundle 'amerlyq/vim-focus-autocmd'
 NeoBundleLazy 'amerlyq/vim-forestanza', {
     \ 'autoload' : { 'filetypes': 'forestanza' }}
-" Viewing man in vim: good, but no colors in git lg1, need to investigate
+" Viewing man in vim -- good, but no colors in git lg1, need to investigate
 " NeoBundleLazy 'rkitover/vimpager'

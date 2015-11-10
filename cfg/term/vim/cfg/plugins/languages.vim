@@ -35,12 +35,16 @@ NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
 " }}} LaTeX-Box
 
 
-"{{{1 Syntax ============================
+"{{{1 Main ============================
 NeoBundle 'octol/vim-cpp-enhanced-highlight'
 " Syntax highlight
 " https://github.com/Shirk/vim-gas
 " https://github.com/beyondmarc/opengl.vim
 NeoBundle 'vim-perl/vim-perl'
+" JSON Highlight and indent plugin
+NeoBundleLazy 'elzr/vim-json', { 'autoload': { 'filetypes': [ 'json' ] }}
+
+"{{{1 Syntax ============================
 NeoBundle 'Matt-Deacalion/vim-systemd-syntax'
 NeoBundleLazy 'zaiste/tmux.vim', { 'autoload': {
       \ 'filename_patterns': [ 'tmux.*conf' ] }}
