@@ -138,15 +138,35 @@ class console(Command):
     Open the console with the given command.
     """
     def execute(self):
-        position = None
+        pos = None
         if self.arg(1)[0:2] == '-p':
             try:
-                position = int(self.arg(1)[2:])
+                pos = int(self.arg(1)[2:])
                 self.shift()
             except:
                 pass
 
-        command = self.rest(1) + " " if position != 0 else ""
-        self.fm.open_console(command, position=position)
+        command = self.rest(1)
+        if pos is None or int(pos) > len(command):
+            command += " "
+        self.fm.open_console(command, position=pos)
         if not command:
             self.fm.ui.console.history_move(-self.quantifier)
+
+
+class edit(Command):
+    """:edit <filename>
+
+    Opens the specified file in vim
+    """
+
+    def execute(self):
+        if not self.arg(1):
+            self.fm.edit_file(self.fm.thisfile.path)
+        elif '.' == self.rest(1):
+            self.fm.edit_file('')
+        else:
+            self.fm.edit_file(self.rest(1))
+
+    def tab(self):
+        return self._tab_directory_content()
