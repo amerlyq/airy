@@ -44,5 +44,7 @@ let g:over_command_line_key_mappings = {}
 let g:over#command_line#search#enable_move_cursor = 0
 " let g:over_enable_auto_nohlsearch = 1
 " let g:over_enable_cmd_window = 1
-map <unique> <silent> z; :<C-u>OverCommandLine<CR>
-
+" map <unique> <silent> z; :<C-u>OverCommandLine<CR>
+noremap  <unique><silent> <Leader>c; :<C-u>OverCommandLine<CR>
+nnoremap <unique><silent> <Leader>cr :OverCommandLine<CR>%s;;;g<Left><Left>
+vnoremap <unique><silent> <Leader>cr :OverCommandLine<CR>s;;;g<Left><Left>

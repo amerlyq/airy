@@ -45,9 +45,9 @@ vnoremap <unique> <Leader>c/  :s::<C-R>/:g<Left><Left>
 ": Replace by yanked/deleted text
 nnoremap <unique> <Leader>cy :%s::<C-R>":g<Left><Left>
 vnoremap <unique> <Leader>cy  :s::<C-R>":g<Left><Left>
-": Replace highlighted match
-nnoremap <unique> <Leader>cr :%s;;;g<Left><Left>
-vnoremap <unique> <Leader>cr  :s;;;g<Left><Left>
+": Replace highlighted match (REPLACED by
+" nnoremap <unique> <Leader>cr :%s;;;g<Left><Left>
+" vnoremap <unique> <Leader>cr  :s;;;g<Left><Left>
 ": Delete highlighted match
 nnoremap <unique> <Leader>cx :%s;;;g<CR>
 vnoremap <unique> <Leader>cx  :s;;;g<CR>

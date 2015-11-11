@@ -15,13 +15,6 @@ noremap <unique> [q :<C-U><C-R>=v:count1<CR>cprevious!<CR>
 noremap <unique> ]l :<C-U><C-R>=v:count1<CR>lnext!<CR>
 noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 
-" Show list of tags when there more then one entry:
-noremap <unique> g] g<C-]>
-noremap <unique> g<C-]> g]
-noremap <unique> g[ :<C-U><C-R>=v:count1<CR>tnext<CR>
-" noremap <C-]> g<C-]>
-" ALSO:  Use [I or ]I -- to show matches of current work in this file
-
 " No jump when joining
 " nnoremap J mzJ`z
 

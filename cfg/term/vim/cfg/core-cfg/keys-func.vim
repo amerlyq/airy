@@ -3,10 +3,6 @@ command! -bar -bang -nargs=0 Sw write !sudo tee % >/dev/null
 " Execute command and place output in new buffer. (:new, :vnew, :tabnew)
 command! -bar -nargs=+ E new | r ! <args>
 
-" generate 'tags' file: obsolete by easytags
-nnoremap <silent> <F1> :!ctags-exuberant --recurse<CR>
-"OR: nnoremap <silent> <F1> :!ctags --recurse<CR>
-
 " Show highlight names under cursor
 map <F3> :echo 'hi<'.synIDattr(synID(line('.'), col('.'), 1), 'name')
     \.'> trans<'.synIDattr(synID(line('.'), col('.'), 0), 'name').'> lo<'
