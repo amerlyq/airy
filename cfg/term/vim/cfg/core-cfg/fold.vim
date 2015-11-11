@@ -3,7 +3,7 @@ set foldenable
 set foldcolumn=2        " fold levels ruler on left (clickable)
 "set foldmethod=manual  " <expr|syntax|marker> -- syntax defines folds
 set foldlevelstart=99   " close folds below this depth, initially
-set foldopen=all
+set foldopen=all        " open on cursor touch
 " if exists('*RefinedFoldText')
 set foldtext=RefinedFoldText()  " ALT getline(v:foldstart)
 

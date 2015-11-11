@@ -1,5 +1,4 @@
 set confirm       " ask user before aborting an action
-set history=9999  " remember last commands & searche patts
 
 set novisualbell  " don't flash the screen
 set ruler
@@ -17,8 +16,8 @@ set list            " display otherwise invisible characters
 set selectmode=
 set keymodel=
 
-" No intro msg
-set shortmess+=Iat
+
+set shortmess=aIT   " No intro msg, etc
 " set cmdheight=2   " No hit <CR> twice after :make (but lose one view line)
 " If you accidentally hit or and you want to see the displayed text then use
 " |g<|. This only works when 'more' is set.

@@ -22,7 +22,8 @@ augroup filetypedetect
   au BufRead,BufNewFile *.hla  setl ft=hla syntax=hla
   " Configuration
   au BufRead,BufNewFile {*tmux.conf*,Tmuxfile,*tmux/config}     setf tmux
-  au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,Vagrantfile} setf ruby
+  au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,Vagrantfile}
+        \ setl ft=ruby fdm=syntax fdn=1
   " System
   au BufRead,BufNewFile {*.log*,log-*}                         setf messages
   au BufRead,BufNewFile {PKGBUILD,.AURINFO}                    setf PKGBUILD

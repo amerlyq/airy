@@ -50,8 +50,8 @@ else
 endif
 
 augroup PatchColorScheme "{{{2
-  au ColorScheme * hi! Folded ctermfg=3 ctermbg=NONE
-  " :highlight FoldColumn guibg=darkgrey guifg=white
+  " au ColorScheme * hi! Folded ctermfg=3 ctermbg=NONE
+  " au ColorScheme * hi! FoldColumn ctermfg=4 ctermbg=NONE guifg=Cyan guibg=Grey
   au ColorScheme * hi! link ColorColumn StatusLineNC
   " Suppress transparency on reverse cursor of search results highlight
   au ColorScheme * hi Search cterm=None ctermbg=3 ctermfg=0

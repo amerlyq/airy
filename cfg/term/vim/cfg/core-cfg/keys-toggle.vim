@@ -12,7 +12,6 @@ nnoremap <unique> <Leader>th :setlocal hlsearch! hlsearch?<CR>
 nnoremap <unique> <Leader>ts :setlocal spell! spelllang=en_us,ru_yo,uk spell?<CR>
 nnoremap <unique> <Leader>tc :setlocal cursorcolumn! cursorcolumn?<CR>
 nnoremap <unique> <Leader>tC :setlocal cursorline! cursorline?<CR>
-nnoremap <unique> <Leader>tW :setlocal wrap! breakindent!<CR>
 
 " magnifying when switching (more stable then 'hjkl<C-W>_' )
 let g:magnify_on = 1

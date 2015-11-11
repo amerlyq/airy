@@ -6,9 +6,10 @@
 let g:jedi#force_py_version = 3
 let g:jedi#auto_initialization = 1
 " Because of neocomplete:
-let g:jedi#popup_select_first = 0
-let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#show_call_signatures = 0
+let g:jedi#popup_select_first = 0
 " ALT 'after': autocmd FileType python setlocal omnifunc=jedi#completions
 
 " If you are a person who likes to use VIM-buffers not tabs
@@ -17,13 +18,13 @@ let g:jedi#use_tabs_not_buffers = 0
 " let g:jedi#popup_on_dot = 0
 
 " TRY: map ,j<*>
+let g:jedi#smart_auto_mappings = 0
 let g:jedi#goto_command = "<LocalLeader>d"
 let g:jedi#goto_assignments_command = "<LocalLeader>g"
 let g:jedi#rename_command = "<localleader>r"
 let g:jedi#documentation_command = "<LocalLeader>k"
 let g:jedi#usages_command = "<LocalLeader>u"
 let g:jedi#completions_command = "<C-Space>"
-let g:jedi#show_call_signatures = "0"
 
 " jedi.preload_module('os', 'sys', 'math', 'whatever_module_you_want')
 

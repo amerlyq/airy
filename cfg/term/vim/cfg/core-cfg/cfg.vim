@@ -10,12 +10,20 @@ set shiftround     " Round indent by shiftwidth.
 "{{{1 Indent/Format ============================
 set autoindent        " automatically indent new lines
 set cindent           " instead of 'smartindent' to not move '#' to right
-set linebreak         " wrap only on \s chars
-set backspace=indent,eol,start  " delete indent and newline
 set formatoptions+=l " don't auto-wrap line if it was longer before insert
-" Mitigate issue with auto-removing trainling whitespaces in wrapped file
-" set showbreak=>\ \ \
 " set formatexpr=autofmt#japanese#formatexpr()  " Use autofmt.
+
+
+"{{{1 Multiline ============================
+set linebreak         " wrap only on \s chars
+" set breakat=\ \	;:,!?
+set showbreak=\
+" Move by arrow keys on previous/next line around ends of line in command mode
+set whichwrap=<,>
+set backspace=indent,eol,start  " delete indent and newline
+
+set nowrap nobreakindent
+noremap <unique> <Leader>tW :<C-u>setl wrap! breakindent!<CR>
 
 
 "{{{1 Comment/Multiline ============================
@@ -43,11 +51,9 @@ set infercase       " ignore case on insert completion.
 " autocmd FileType python setlocal completeopt-=preview
 set completeopt-=preview
 
-" Move by arrow keys on previous/next line around ends of line in command mode
-set whichwrap=<,>
-
 
 "{{{1 Edit ============================
+set history=9999        " remember last commands & searche patts
 set virtualedit=block   " cursor can be positioned anywhere in <C-v> mode
 set nodigraph  " No more esc-insert mess when unindented typing wierd characters
 set notildeop  " Allow moves for register change, like  ~w -- for word
@@ -62,3 +68,4 @@ set scrolljump=5  " minimum number of lines to scroll
 set keywordprg=:help
 " Check timestamp more for 'autoread'.
 autocmd MyAutoCmd WinEnter * checktime
+set cursorline      " highlight currently focused line

@@ -5,15 +5,13 @@ nnoremap \dT :DiffOrig<Enter>
 " nnoremap <silent> <expr> ,d ":\<C-u>".(&diff?"diffoff":"diffthis")."\<CR>"
 
 " Disable paste.
-autocmd MyAutoCmd InsertLeave * if &l:diff | diffupdate | endif
+au MyAutoCmd InsertLeave * if &l:diff | diffupdate | endif
 
 if &diff
   "---------------------------------------------------------------------------
   " Randy Morris' convenient diff mappings
   " http://www.reddit.com/r/vim/comments/kz84u#c2oiq1a
   "---------------------------------------------------------------------------
-  set wrap
-  set nocursorline      " to not color overlap with highlighted diff regions
 
   " allows you to 'do undo', or in other words 'undo a change in the opposite
   " window'
@@ -33,10 +31,6 @@ if &diff
   " both changes
   vnoremap p :diffput <bar> diffupdate<enter>
   vnoremap o :diffget <bar> diffupdate<enter>
-
-else
-  " setup for non-diff mode
-  set cursorline      " highlight currently focused line
 endif
 
 
