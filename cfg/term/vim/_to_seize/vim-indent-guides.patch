@@ -1,0 +1,58 @@
+diff --git a/autoload/indent_guides.vim b/autoload/indent_guides.vim
+index 53d4ff9..c779eec 100644
+--- a/autoload/indent_guides.vim
++++ b/autoload/indent_guides.vim
+@@ -47,14 +47,18 @@ function! indent_guides#enable()
+   for l:level in range(s:start_level, s:indent_levels)
+     let l:group = 'IndentGuides' . ((l:level % 2 == 0) ? 'Even' : 'Odd')
+     let l:column_start = (l:level - 1) * s:indent_size + 1
+-    let l:soft_pattern = indent_guides#indent_highlight_pattern(g:indent_guides_soft_pattern, l:column_start, s:guide_size)
+-    let l:hard_pattern = indent_guides#indent_highlight_pattern('\t', l:column_start, s:indent_size)
+ 
+     " define the higlight patterns and add to matches list
+     if g:indent_guides_space_guides
++      let l:soft_pattern = indent_guides#indent_highlight_pattern(
++            \ g:indent_guides_soft_pattern, l:column_start, s:guide_size)
+       call add(w:indent_guides_matches, matchadd(l:group, l:soft_pattern))
+     end
+-    call add(w:indent_guides_matches, matchadd(l:group, l:hard_pattern))
++    if g:indent_guides_tab_guides
++      let l:hard_pattern = indent_guides#indent_highlight_pattern(
++            \ '\t', l:column_start, s:indent_size)
++      call add(w:indent_guides_matches, matchadd(l:group, l:hard_pattern))
++    end
+   endfor
+ endfunction
+ 
+diff --git a/doc/indent_guides.txt b/doc/indent_guides.txt
+index fe50cb8..b7b88df 100644
+--- a/doc/indent_guides.txt
++++ b/doc/indent_guides.txt
+@@ -143,6 +143,15 @@ Default: 1. Values: 0 or 1.
+ <
+ 
+ ------------------------------------------------------------------------------
++                                                  *'indent_guides_tab_guides'*
++Use this option to control whether the plugin considers tabs as indention.
++
++Default: 1. Values: 0 or 1.
++>
++  let g:indent_guides_tab_guides = 0
++
++
++------------------------------------------------------------------------------
+                                                   *'indent_guides_soft_pattern'*
+ Use this option to explicitly specify a pattern for soft indentation. For
+ example to match spaces only in the beginning of line use ' ' pattern.
+diff --git a/plugin/indent_guides.vim b/plugin/indent_guides.vim
+index 8a6dee3..c94079b 100644
+--- a/plugin/indent_guides.vim
++++ b/plugin/indent_guides.vim
+@@ -58,6 +58,7 @@ call s:InitVariable('g:indent_guides_start_level', 1)
+ call s:InitVariable('g:indent_guides_enable_on_vim_startup', 0)
+ call s:InitVariable('g:indent_guides_debug', 0)
+ call s:InitVariable('g:indent_guides_space_guides', 1)
++call s:InitVariable('g:indent_guides_tab_guides', 1)
+ call s:InitVariable('g:indent_guides_soft_pattern', '\s')
+ call s:InitVariable('g:indent_guides_default_mapping', 1)
+ 
