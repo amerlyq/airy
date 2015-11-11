@@ -1,12 +1,13 @@
-if !exists('solarized') | finish | endif
+"if !exists('solarized') | finish | endif
 
-"If 256 -- will choose from existing palette similar colors:
+" Use solarized only with pre-setup palette!
+if &term =~# '^rxvt'  "\|nvim
+  let g:solarized_termcolors=16
+else
+"If 256 -- choose from existing palette similar colors:
 "   makes brown bg and bold font...
-" if &t_Co >= 88
-"   let g:solarized_termcolors=256
-" else
-"   let g:solarized_termcolors=16
-" endif
+  let g:solarized_termcolors=256
+endif
 
 " Stich with normal! Them was wisely choosen.
 " let g:solarized_contrast="high"    "default value is normal
