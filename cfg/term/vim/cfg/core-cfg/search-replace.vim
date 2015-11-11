@@ -22,7 +22,7 @@ command! -nargs=0 -range SortLine <line1>,<line2>call setline('.',join(sort(spli
 " find merge conflict markers
 nnoremap <unique> <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
 
-" Find next character from under cursor
+" Find next character from under cursor (TODO replace with [% and ]%)
 noremap <unique> <Leader>F :norm <C-R>=v:count1<CR>f<C-R>=getline('.')[col('.')-1]<CR><CR>
 noremap <unique> <Leader>T :norm <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR><CR>
 
