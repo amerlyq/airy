@@ -4,6 +4,9 @@ nnoremap \dt :diffthis<Enter>
 nnoremap \dT :DiffOrig<Enter>
 " nnoremap <silent> <expr> ,d ":\<C-u>".(&diff?"diffoff":"diffthis")."\<CR>"
 
+" Disable paste.
+autocmd MyAutoCmd InsertLeave * if &l:diff | diffupdate | endif
+
 if &diff
   "---------------------------------------------------------------------------
   " Randy Morris' convenient diff mappings

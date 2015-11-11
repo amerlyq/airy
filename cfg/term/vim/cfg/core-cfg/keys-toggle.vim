@@ -28,31 +28,6 @@ function! AutoMagnifying()
   endif
 endfunc
 
-" Слева появится колонка шириной в 3 символа, обозначающая где какие фолдинги
-" и какого уровня.  По ней можно будет кликать для сворачивания-разворачивания.
-set foldenable foldcolumn=2
-nnoremap <unique> <Leader>tz :call ToggleFoldingMethod() \| set fdm?<CR>
-nnoremap <unique> <Leader>tZ :call ToggleFolding() \| set fen?<CR>
-
-function! ToggleFoldingMethod()
-    if(&foldmethod == "manual")
-        set foldmethod=syntax
-    elseif(&foldmethod == "syntax")
-        set foldmethod=marker
-    else
-        set foldmethod=manual
-    endif
-endfunc
-function! ToggleFolding()
-    if(&foldenable == 1)
-        set nofoldenable
-        set foldcolumn=0
-    else
-        set foldenable
-        set foldcolumn=2
-    endif
-endfunc
-
 
 " toggle between number and relativenumber
 set number

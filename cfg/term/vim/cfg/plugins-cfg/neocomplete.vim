@@ -3,10 +3,6 @@ if !(neobundle#tap('neocomplete.vim') && has('lua')) | finish | endif
 " Disable AutoComplPop.
 "let g:acp_enableAtStartup = 0
 
-" In python this scratch window made me angry
-" autocmd FileType python setlocal completeopt-=preview
-set completeopt-=preview
-
 " Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
 " Use smartcase.

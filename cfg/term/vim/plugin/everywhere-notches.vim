@@ -35,7 +35,7 @@ let s:patterns = {
       \ 'Dev': 'DEV|HACK',
       \ 'Msg': 'NOTE|USE',
       \ 'Tbd': 'TODO|CHECK|TRY',
-      \ 'Alt': 'ALT|OR|THINK|CHG',
+      \ 'Alt': 'ALT|OR|CASE|THINK|CHG',
       \ }
 "|OPT%(ION)=%(S)=',
 

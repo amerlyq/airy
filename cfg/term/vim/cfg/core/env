@@ -20,6 +20,7 @@ let $FALLBACK='~/.tmp,/var/tmp,/tmp'
 " Swap
 set directory=$CACHE/swapdir//,$FALLBACK
 set swapfile
+set updatetime=1000  " Save swap when inactive (ALSO interval for CursorHold)
 " Backup
 set backupdir=$CACHE/bckpdir//,$FALLBACK
 set backup writebackup backupcopy=auto

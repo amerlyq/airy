@@ -28,12 +28,14 @@ else
   let s:theme_bkgr = 'dark'
 endif
 
+augroup PatchColorScheme
+  autocmd!
+augroup END
 
 if s:theme ==# 'transparent'
   " Restore right colors for sign column in solarized
   " TODO: check -- simply use this patch always. Will it work?
-  augroup PatchSolarized "{{{2
-    autocmd!
+  augroup PatchColorScheme "{{{2
     au ColorScheme * hi DiffAdd    ctermbg=None
     au ColorScheme * hi DiffChange ctermbg=None
     au ColorScheme * hi DiffDelete ctermbg=None
@@ -44,16 +46,20 @@ if s:theme ==# 'transparent'
     au ColorScheme * hi SpecialKey ctermbg=None
   augroup END "}}}2
 else
-  au ColorScheme * highlight! link SignColumn LineNr
+  au PatchColorScheme ColorScheme * highlight! link SignColumn LineNr
 endif
 
-autocmd ColorScheme * highlight! link ColorColumn StatusLineNC
-" Suppress transparency on reverse cursor of search results highlight
-autocmd ColorScheme * highlight Search cterm=None ctermbg=3 ctermfg=0
-" The "NonText" highlighting will be used for "eol", "extends" and
-"  "precedes".  "SpecialKey" for "nbsp", "tab" and "trail".
-autocmd ColorScheme * highlight! SpecialKey  ctermbg=None cterm=None
-autocmd ColorScheme * highlight! NonText  ctermbg=None
+augroup PatchColorScheme "{{{2
+  au ColorScheme * hi! Folded ctermfg=3 ctermbg=NONE
+  " :highlight FoldColumn guibg=darkgrey guifg=white
+  au ColorScheme * hi! link ColorColumn StatusLineNC
+  " Suppress transparency on reverse cursor of search results highlight
+  au ColorScheme * hi Search cterm=None ctermbg=3 ctermfg=0
+  " The "NonText" highlighting will be used for "eol", "extends" and
+  "  "precedes".  "SpecialKey" for "nbsp", "tab" and "trail".
+  au ColorScheme * hi! SpecialKey  ctermbg=None cterm=None
+  au ColorScheme * hi! NonText  ctermbg=None
+augroup END "}}}2
 
 
 " for molokai
@@ -69,7 +75,7 @@ catch /^Vim\%((\a\+)\)\=:E185/
 endtry
 
 " Fix for GitGutter
-" highlight GitGutterChange ctermfg=yellow guifg=darkyellow
-" highlight GitGutterAdd ctermfg=green guifg=darkgreen
-" highlight GitGutterDelete ctermfg=red guifg=darkred
-" highlight GitGutterChangeDelete ctermfg=yellow guifg=darkyellow
+" hi! GitGutterChange ctermfg=yellow guifg=darkyellow
+" hi! GitGutterAdd ctermfg=green guifg=darkgreen
+" hi! GitGutterDelete ctermfg=red guifg=darkred
+" hi! GitGutterChangeDelete ctermfg=yellow guifg=darkyellow

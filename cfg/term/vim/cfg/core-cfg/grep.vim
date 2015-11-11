@@ -1,8 +1,11 @@
 set grepformat=%f:%l:%c:%m
 if executable('ag')
-    set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
 elseif executable('ack')
-    set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+  set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+else
+  set grepprg=internal  " Use vimgrep.
+  " set grepprg=grep\ -inH " Use grep.
 endif
 
 if exists('&regexpengine')

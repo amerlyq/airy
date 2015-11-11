@@ -1,6 +1,6 @@
-set hidden     " lets you switch buffers without saving
-set splitright " focus new window after vertical splitting
-set splitbelow " focus new window after horizontal splitting
+set hidden      " lets you switch buffers without saving
+set splitright  " focus new window after vertical splitting
+set splitbelow  " focus new window after horizontal splitting
 
 " Set minimum window size to 79x8
 set winheight=8
