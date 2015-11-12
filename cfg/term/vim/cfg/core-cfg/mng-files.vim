@@ -19,13 +19,24 @@ elseif has('win32') || has('win64')
   let $SHELL='cmd.exe'  " Is any sense using git-msys under git instead?
 endif
 
-" Go inside shell to see output of commands like ':! ..'. Return on <C-d>
-set shell=$SHELL  "go to by ':sh' or mapping ',z'.  Def: /bin/sh
+" BUG can't work in vim w/o redirections?
+" if executable('r.shell')
+"   set shell=r.shell
+"   set shellcmdflag=
+" elseif exists('$SHELL')
+  " WARNING Don't use '-i':  'stty: standard input: Inappropriate ioctl for device'
+  set shell=$SHELL
+" endif
+
 if has('nvim')
   noremap <silent> <Leader>z :<C-u>edit <C-r>=&errorfile<CR><CR>
 else
+  " Go to by ':sh' or mapping ',z'.  DFL: /bin/sh
+  " Go inside shell to see output of commands like ':! ..'. Return on <C-d>
   noremap <silent> <Leader>z :<C-u>shell<CR>
 endif
+command! -bar -nargs=+ Z call RedirectOutput(<q-args>)
+" set shell=$SHELL\ -c\ source\ ~/.shell/aliases\ \&\&\ eval\ "ls"
 
 
 " Close current buffer while retaining window
@@ -41,3 +52,13 @@ nnoremap <Leader>x :<C-U>Safebd<CR>
 
 " reload current buffer while discarding changes
 "nnoremap <Leader>e :edit!<cr>
+
+" DEV TRY redirect any vim command (like g] for tags) into new buffer to search
+"   ALT redirect into quickfix list
+fun! RedirectOutput(...)
+  redir @z
+  silent exe join(a:000, ' ')
+  redir END
+  new | put z
+endf
+command! -bar -nargs=+ R call RedirectOutput(<q-args>)

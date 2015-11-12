@@ -16,9 +16,10 @@ endf
 com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
 let g:mapleader=","
-call s:cfg('core/detect')
-call s:cfg('core/env')
-call s:cfg('core/init')
+call s:cfg('core/detect.vim')
+call s:cfg('core/env.vim')
+call s:cfg('core/init.vim')
+call s:cfg('core/leaders.vim')
 
 fun! SourcePlugins()
   let g:mapleader="\\"

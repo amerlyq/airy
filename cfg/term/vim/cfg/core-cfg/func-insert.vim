@@ -22,12 +22,14 @@ endfunction
 command! -bar -nargs=1 Limio call LimitedInput(<q-args>)
 " silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
 
-nnoremap <silent>  <Space>  :Limio i<CR>
-vnoremap <silent>  <Space>  :<C-U>Limio I<CR>
-nnoremap <silent> g<Space>  :Limio a<CR>
-vnoremap <silent> g<Space>  :<C-U>Limio A<CR>
-nnoremap <silent> ,<Space>  :Limio s<CR>
-vnoremap <silent> ,<Space>  :<C-U>Limio S<CR>
+" nnoremap <unique><silent> [Space]<Space>  i<Space><Esc>
+" xmap <unique><silent> [Space]<Space>  [Quote]a<Space>
+nnoremap <unique><silent> [Space]i  :<C-U>Limio i<CR>
+xnoremap <unique><silent> [Space]i  :<C-U>Limio I<CR>
+nnoremap <unique><silent> [Space]a  :Limio a<CR>
+xnoremap <unique><silent> [Space]a  :<C-U>Limio A<CR>
+nnoremap <unique><silent> [Space]s  :Limio s<CR>
+xnoremap <unique><silent> [Space]s  :<C-U>Limio S<CR>
 
 " <S-Space> work only in gvim
 
@@ -38,7 +40,7 @@ vnoremap <silent> ,<Space>  :<C-U>Limio S<CR>
 
 " Line split
 nnoremap K   a<CR><Right><Esc>
-vnoremap K   c<CR><Esc>
+xnoremap K   c<CR><Esc>
 nnoremap gK  i<CR><Right><Esc>
 nnoremap <C-k> i<CR><Right><Esc>:m .-2<CR>
 nnoremap gX  lxh

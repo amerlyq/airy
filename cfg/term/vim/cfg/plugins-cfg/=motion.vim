@@ -74,19 +74,18 @@ endif
 
 
 if neobundle#tap('vim-operator-surround')  "{{{1
-  nmap <silent><unique> qa <Plug>(operator-surround-append)
-  xmap <silent><unique> qa <Plug>(operator-surround-append)
+  nmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
+  xmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
+  " TRY Insert around one character only
+  nmap <silent><unique> [Quote]<Space> [Quote]al
 
-  nmap <silent><unique> qd <Plug>(operator-surround-delete)
-  xmap <silent><unique> qd <Plug>(operator-surround-delete)
+  nmap <silent><unique> [Quote]d <Plug>(operator-surround-delete)
+  xmap <silent><unique> [Quote]d <Plug>(operator-surround-delete)
 
-  nmap <silent><unique> qr <Plug>(operator-surround-replace)
-  xmap <silent><unique> qr <Plug>(operator-surround-replace)
+  nmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
+  xmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
 "" Chaining of operator+textobj
 "   nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
-
-  " Insert around one character only
-  nmap <silent><unique> q<Space> qal
 endif
 
 if neobundle#tap('sideways.vim')  "{{{1
