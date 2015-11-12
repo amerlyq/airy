@@ -13,7 +13,6 @@ set cindent           " instead of 'smartindent' to not move '#' to right
 set formatoptions+=l " don't auto-wrap line if it was longer before insert
 " set formatexpr=autofmt#japanese#formatexpr()  " Use autofmt.
 
-
 "{{{1 Multiline ============================
 set linebreak         " wrap only on \s chars
 " set breakat=\ \	;:,!?
@@ -22,7 +21,7 @@ set showbreak=\
 set whichwrap=<,>
 set backspace=indent,eol,start  " delete indent and newline
 
-set nowrap nobreakindent
+set wrap breakindent
 noremap <unique> <Leader>tW :<C-u>setl wrap! breakindent!<CR>
 
 

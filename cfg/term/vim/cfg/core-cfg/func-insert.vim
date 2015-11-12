@@ -38,6 +38,7 @@ vnoremap <silent> ,<Space>  :<C-U>Limio S<CR>
 
 " Line split
 nnoremap K   a<CR><Right><Esc>
+vnoremap K   c<CR><Esc>
 nnoremap gK  i<CR><Right><Esc>
 nnoremap <C-k> i<CR><Right><Esc>:m .-2<CR>
 nnoremap gX  lxh
