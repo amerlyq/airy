@@ -56,6 +56,21 @@ nnoremap <C-x> <C-w>x
 " nnoremap <Leader>4 <C-W>c
 
 
+" magnifying when switching (more stable then 'hjkl<C-W>_' )
+let g:magnify_on = 1
+noremap <unique> <Leader>tw :<C-U>let g:magnify_on = !g:magnify_on  \|
+      \ echo('  wmagnify = ' . (g:magnify_on ? 'on' : 'off'))<CR>
+autocmd WinEnter * call AutoMagnifying()
+function! AutoMagnifying()
+  if g:magnify_on
+    " BUG: bad when split screen -- need min(8, &lines-othersH)
+    let &winminheight=min([&lines, 8])
+    let &winminwidth=min([&columns, 15])
+    resize 100    "or another big number
+  endif
+endfunc
+
+
 let s:leader = g:mapleader | let mapleader = "\\"  "{{{
 
 " Symmetrical binding to 'gt' for buffers  (12gb -- open buffer 12)

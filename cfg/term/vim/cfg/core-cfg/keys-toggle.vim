@@ -1,60 +1,33 @@
 " vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 " NOTE: more prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
 
-" Toggle status line
-nnoremap <unique> <Leader>ta :set laststatus=<C-R>=&laststatus?0 :2<CR> \| :AirlineToggle<CR>
-
 " Often I need to disable it completely when investigating other's sources
+" DEV TODO ',tL' -- toggle list chars more visible -- by high-contrast solarized
 nnoremap <unique> <Leader>tl :set list! list?<CR>
-nnoremap <unique> <Leader>tL :NeoCompleteToggle<CR>
+nnoremap <unique> <Leader>tN :NeoCompleteToggle<CR>
 
-nnoremap <unique> <Leader>th :setlocal hlsearch! hlsearch?<CR>
-nnoremap <unique> <Leader>ts :setlocal spell! spelllang=en_us,ru_yo,uk spell?<CR>
-nnoremap <unique> <Leader>tc :setlocal cursorcolumn! cursorcolumn?<CR>
-nnoremap <unique> <Leader>tC :setlocal cursorline! cursorline?<CR>
+" Local buffer
+nnoremap <unique> <Leader>th :setl hlsearch! hls?<CR>
+nnoremap <unique> <Leader>ts :setl spell! spelllang=en_us,ru_yo,uk spell?<CR>
+nnoremap <unique> <Leader>tc :setl cursorcolumn! cuc?<CR>
+nnoremap <unique> <Leader>tC :setl cursorline! cul?<CR>
 
-" magnifying when switching (more stable then 'hjkl<C-W>_' )
-let g:magnify_on = 1
-noremap <unique> <Leader>tw :<C-U>let g:magnify_on = !g:magnify_on  \|
-      \ echo('  wmagnify = ' . (g:magnify_on ? 'on' : 'off'))<CR>
-autocmd WinEnter * call AutoMagnifying()
-function! AutoMagnifying()
-  if g:magnify_on
-    " BUG: bad when split screen -- need min(8, &lines-othersH)
-    let &winminheight=min([&lines, 8])
-    let &winminwidth=min([&columns, 15])
-    resize 100    "or another big number
-  endif
-endfunc
+" Toggle status line only
+nnoremap <unique> <Leader>tA :let &laststatus=(&ls?0:2) \| :AirlineToggle<CR>
+" Toggle all UI elements NEED DEV save/restore current state instead hardcode!
+""showcmd! ruler!
+nnoremap <unique> <Leader>tf :set number! showmode!
+      \\| let &foldcolumn=(&fdc?0:2) \| let &laststatus=(&ls?0:2)
+      \\| SignifyToggle \| AirlineToggle \| SignatureToggleSigns<CR><CR>
 
-
-" toggle between number and relativenumber
+" Toggle between number and relativenumber
 set number
-nnoremap <unique> <Leader>tN :setlocal number! number?<CR>
-nnoremap <unique> <Leader>tn :call ToggleNumber() \| set rnu?<CR>
-function! ToggleNumber()
-    if(&relativenumber == 1)
-        set norelativenumber
-        set number
-    else
-        set relativenumber
-    endif
-endfunc
+nnoremap <unique> <Leader>tn :set relativenumber! \| set rnu?<CR>
 
 
-noremap <unique> <Leader>tx <Esc>:SyntasticToggleMode<CR>
+noremap <unique> <Leader>tx :<C-u>SyntasticToggleMode<CR>
 "\| :SyntasticCheck<CR>
+
 " Syntax highlighting
-syntax on
-nnoremap <unique> <Leader>tX :call ToggleSyntax()<CR>
-function! ToggleSyntax()
-if g:syntax_on == 1
-  syntax off
-  let g:syntax_on = 0
-else
-  syntax on
-  let g:syntax_on = 1
-endif
-endfunction
-
-
+syntax enable
+nnoremap <unique> <Leader>tX :exe 'syn' (exists("g:syntax_on")?'off': 'enable')<CR>

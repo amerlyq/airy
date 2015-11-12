@@ -95,6 +95,9 @@ bindkey -as  's' 'Ss\n'
 bindkey  -s ',d' '^Uq\n'
 bindkey -as  'q' 'Sq\n'
 bindkey -as ',d' 'Sq\n'
+# make
+bindkey  -s ',m' '^Uabyss\n'
+bindkey -as ',m' 'Sabyss\n'
 
 # TODO: bindkey -s '<keystroke>' '^qfoo\n'
 #   where ^q is bound to 'push-line'.

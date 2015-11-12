@@ -4,16 +4,17 @@ set foldcolumn=2        " fold levels ruler on left (clickable)
 "set foldmethod=manual  " <expr|syntax|marker> -- syntax defines folds
 set foldlevelstart=99   " close folds below this depth, initially
 " set foldopen=all        " open on cursor touch, DISABLED: prevents 'za' fold
-" if exists('*RefinedFoldText')
-set foldtext=RefinedFoldText()  " ALT getline(v:foldstart)
+" if exists('*s:RefinedFoldText')
+set foldtext=s:RefinedFoldText()  " ALT getline(v:foldstart)
 
 set concealcursor=cv    " Concealing -- hide in command and visual modes.
 set conceallevel=2      " Conceal all hidden beside having custom replacement
 
 
 "{{{1 Mappings ============================
-nnoremap <unique> <Leader>tz :call ToggleFoldingMethod() \| set fdm?<CR>
-nnoremap <unique> <Leader>tZ :call ToggleFolding() \| set fen?<CR>
+nnoremap <unique> <Leader>tz :let &foldmethod=(&fdm=='manual'?'syntax':
+      \ &fdm=='syntax'?'marker': 'manual') \| set foldenable fdm?<CR>
+nnoremap <unique> <Leader>tZ :let &fdc=(&fdc?0:2) \| set foldenable! fen?<CR>
 
 
 "{{{1 Mixed/Folding ============================
@@ -26,29 +27,8 @@ augroup MixedFolding
 augroup END
 
 
-"{{{1 IMPL ============================
-fun! RefinedFoldText()
+fun! s:RefinedFoldText()
     let line = getline(v:foldstart)
     let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
     return '' . v:foldlevel . ' >' . v:folddashes . sub
-endfun
-
-fun! ToggleFoldingMethod()
-    if(&foldmethod == "manual")
-        set foldmethod=syntax
-    elseif(&foldmethod == "syntax")
-        set foldmethod=marker
-    else
-        set foldmethod=manual
-    endif
-endfun
-
-fun! ToggleFolding()
-    if(&foldenable == 1)
-        set nofoldenable
-        set foldcolumn=0
-    else
-        set foldenable
-        set foldcolumn=2
-    endif
 endfun

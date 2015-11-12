@@ -27,6 +27,10 @@ let s:qf_mappings = {
       \ 'X' : '<C-w><CR><C-w>TgT<C-W><C-W>',
       \ '<Space>' : '<CR>',
       \ '<CR>' : '<CR>',
+      \ 'gH' : ':#older<CR> 99',
+      \ 'gL' : ':#newer<CR> 99',
+      \ 'gh' : ':#older<CR>',
+      \ 'gl' : ':#newer<CR>',
 \ }
 
 " SNIP: \ 'o' : '<CR>:#open<CR>',
@@ -34,9 +38,9 @@ let s:qf_mappings = {
 " inspired by Ack.vim
 " nnoremap <buffer> s <C-w><CR>
 
-for key_map in items(s:qf_mappings)
-  exec printf("nnoremap <buffer><nowait><silent> %s %s", get(key_map, 0)
-                    \ , substitute(get(key_map, 1), '#', b:wPref, 'g'))
+let s:fmt_key = "nnoremap <buffer><nowait><silent> %s %s"
+for [k, v] in items(s:qf_mappings)
+  exe printf(s:fmt_key, k, substitute(v, '#', b:wPref, 'g'))
 endfor
 
 " FROM: https://github.com/thinca/vim-qfreplace/issues/5

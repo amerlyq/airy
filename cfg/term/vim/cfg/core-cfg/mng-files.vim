@@ -21,7 +21,11 @@ endif
 
 " Go inside shell to see output of commands like ':! ..'. Return on <C-d>
 set shell=$SHELL  "go to by ':sh' or mapping ',z'.  Def: /bin/sh
-noremap <silent> <Leader>z :<C-U>sh<CR>
+if has('nvim')
+  noremap <silent> <Leader>z :<C-u>edit <C-r>=&errorfile<CR><CR>
+else
+  noremap <silent> <Leader>z :<C-u>shell<CR>
+endif
 
 
 " Close current buffer while retaining window

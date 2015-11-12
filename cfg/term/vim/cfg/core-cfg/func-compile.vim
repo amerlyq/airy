@@ -10,11 +10,17 @@ endfunction
 
 command! -bar -nargs=? CompilerInDir call CompileInDir(<args>)
 " \| cw
-noremap <silent> <unique> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
-noremap <silent> <unique> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
-noremap <silent> <unique> <Leader>m <Esc>:<C-U>w \| Silent abyss<CR>
-noremap <silent> <unique> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
-noremap <silent> <unique> <Leader>M <Esc>:<C-U>w \| Make<CR>
+noremap <unique><silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
+noremap <unique><silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
+fun! Abyss()
+  let l:pmake = &makeprg
+  let &makeprg = 'abyss'
+  Make
+  let &makeprg = l:pmake
+endfun
+noremap <unique><silent> <Leader>m <Esc>:<C-U>w \| call Abyss()<CR>
+noremap <unique><silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
+noremap <unique><silent> <Leader>M <Esc>:<C-U>w \| Make<CR>
 
 " map <F9> :!gcc -o %< % <enter><CR><C-w>
 
