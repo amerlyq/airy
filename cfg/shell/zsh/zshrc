@@ -21,7 +21,8 @@ fi
 
 ### Opts ###
 ## Disable suspending on <C-s>, <C-q>
-setopt noflowcontrol && stty stop '' -ixoff -ixon
+setopt noflowcontrol
+[[ $- != *i* ]] || stty stop '' -ixoff -ixon
 ## Lets files beginning with a . be matched without explicitly specifying the dot
 setopt globdots
 
