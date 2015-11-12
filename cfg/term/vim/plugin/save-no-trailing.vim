@@ -1,7 +1,26 @@
-" remove trailing spaces before saving text files
-" http://vim.wikia.com/wiki/Remove_trailing_spaces
+" Remove trailing spaces before saving text files
+"   http://vim.wikia.com/wiki/Remove_trailing_spaces
 
-autocmd BufWritePre * :call StripTrailingWhitespace()
+"{{{1 CMDS ====================
+let g:trailing_space = 1
+
+command! -bar -nargs=0 TrailingSpaceOnSaveToggle
+      \ let g:trailing_space = !g:trailing_space | echo g:trailing_space
+command! -bar -nargs=? TrailingSpaceShow
+      \ call s:TrailingSpaceShow(<args>)
+command! -bar -nargs=0 -range=% TrailingSpaceStrip
+      \ <line1>,<line2>call s:TrailingSpaceStrip()
+
+" nnoremap <F12>     :ShowSpaces 1<CR>
+" nnoremap <S-F12>   m`:TrimSpaces<CR>``
+" vnoremap <S-F12>   :TrimSpaces<CR>
+
+
+"{{{1 AUTO ====================
+augroup TrailingSpace
+  au!
+  au BufWritePre * if g:trailing_space | call s:TrailingSpaceStrip() | endif
+augroup END
 
 " function! StripTrailingWhitespace()
 "   if !&binary && &filetype != 'diff' "&& &filetype != 'conf'
@@ -18,29 +37,24 @@ autocmd BufWritePre * :call StripTrailingWhitespace()
 "   endif
 " endfunction
 
-function! ShowSpaces(...)
-  let @/='\v(\s+$)|( +\ze\t)'
-  let l:old=&hlsearch
+
+"{{{1 IMPL ====================
+fun! s:TrailingSpaceShow(...)
+  let @/ = '\v(\s+$)|( +\ze\t)'
+  let l:old = &hlsearch
   let &hlsearch = a:0 ? a:1 : !&hlsearch
   return l:old
 endfunction
 
-function! TrimSpaces() range
-  let oldhlsearch=ShowSpaces(1)
+fun! s:TrailingSpaceTrim() range
+  let l:oldhlsearch=s:TrailingSpaceShow(1)
   " ///gec -- to highlight and ask if replace
   execute a:firstline.",".a:lastline."substitute ///ge"
-  let &hlsearch=oldhlsearch
+  let &hlsearch=l:oldhlsearch
 endfunction
 
-command! -bar -nargs=? ShowSpaces call ShowSpaces(<args>)
-command! -bar -nargs=0 -range=% TrimSpaces <line1>,<line2>call TrimSpaces()
-" nnoremap <F12>     :ShowSpaces 1<CR>
-" nnoremap <S-F12>   m`:TrimSpaces<CR>``
-" vnoremap <S-F12>   :TrimSpaces<CR>
-
-function! StripTrailingWhitespace()
-  let l = line(".")
-  let c = col(".")
-  TrimSpaces
+fun! s:TrailingSpaceStrip()
+  let [l,c] = [line("."), col(".")]
+  call s:TrailingSpaceTrim()
   call cursor(l, c)
-endfunction
+endf
