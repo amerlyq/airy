@@ -26,7 +26,7 @@ augroup filetypedetect
         \ setl ft=ruby fdm=syntax fdn=1
   " System
   au BufRead,BufNewFile {*.log*,log-*}                         setf messages
-  au BufRead,BufNewFile {PKGBUILD,.AURINFO}                    setf PKGBUILD
+  au BufRead,BufNewFile {PKGBUILD,.AURINFO}                    setf sh
   au BufRead,BufNewFile {*.automount,*.mount,*.path,*.service} setf systemd
   au BufRead,BufNewFile {*.socket,*.swap,*.target,*.timer}     setf systemd
 augroup END
