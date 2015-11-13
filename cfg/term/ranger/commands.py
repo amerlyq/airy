@@ -4,6 +4,26 @@ from ranger.ext.shell_escape import shell_quote
 import os
 
 
+class doc(Command):
+    lst = ['TODO', 'DEV', 'NOTE', 'INFO']
+    ext = '.otl'
+    """:doc [<name>]
+    Search and open appropriate metafile in one of choosen directories
+    """
+    def execute(self):
+        name = (self.arg(1) if self.arg(1) else doc.lst[0]) + doc.ext
+        for d in ['doc', '']:
+            path = os.path.join(self.fm.thisdir.path, d, name)
+            if os.path.isfile(path):
+                self.fm.edit_file(path)
+                return
+        # Use last path as default location for creation of new files
+        self.fm.edit_file(path)
+
+    def tab(self):
+        return ['doc ' + nm for nm in doc.lst]
+
+
 # Need this in the end of ~/.bashrc or ~/.zshrc
 #   function finish { tempfile='/tmp/aura/ranger_cwdir'; echo "$PWD" > "$tempfile"; }
 # `trap finish EXIT
