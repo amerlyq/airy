@@ -82,6 +82,8 @@ noremap  zP "0P
 map <leader>y "+y
 map <leader>p "+p
 map <leader>P "+P
+nnoremap g<leader>p  :put +<CR>
+nnoremap g<leader>P  :put!+<CR>
 map <leader>l "+d
 map <leader>L "+D
 " Send shizzle to the black hole (Remove)

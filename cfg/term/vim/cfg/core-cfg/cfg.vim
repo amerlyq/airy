@@ -45,7 +45,7 @@ set completeopt-=preview
 
 "{{{1 Edit ============================
 set history=9999        " remember last commands & searche patts
-set virtualedit=block   " cursor can be positioned anywhere in <C-v> mode
+set virtualedit=block,insert  " TRY cursor can be positioned anywhere in INSERT and V-BLOCK mode
 set nodigraph  " No more esc-insert mess when unindented typing wierd characters
 set notildeop  " Allow moves for register change, like  ~w -- for word
 

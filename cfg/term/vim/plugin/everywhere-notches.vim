@@ -63,17 +63,11 @@ endfunction
 
 function! s:everywhere_enable(mode)
   let g:everywhere_activated = a:mode
-  augroup everywhere_colors
-    autocmd!
-    if g:everywhere_activated
-      au ColorScheme * call s:everywhere_define(s:colors)
-    endif
-  augroup END
-
-  augroup everywhere_notes
+  augroup EverywhereNotches
     autocmd!
     if g:everywhere_activated
       au Syntax * call s:everywhere_matches(s:patterns)
+      au ColorScheme * call s:everywhere_define(s:colors)
     endif
   augroup END
 endfunction

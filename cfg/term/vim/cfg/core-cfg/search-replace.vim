@@ -39,6 +39,7 @@ vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<
 
 
 ": Substitute current match
+nnoremap <unique> <Leader>cc <Nop>
 " nnoremap <leader>cw :%s:\<<C-R><C-w>\>:<C-R><C-w>:g<Left><Left>
 nnoremap <unique> <Leader>c/ :%s::<C-R>/:g<Left><Left>
 vnoremap <unique> <Leader>c/  :s::<C-R>/:g<Left><Left>
@@ -48,11 +49,16 @@ vnoremap <unique> <Leader>cy  :s::<C-R>":g<Left><Left>
 ": Replace highlighted match (REPLACED by
 " nnoremap <unique> <Leader>cr :%s;;;g<Left><Left>
 " vnoremap <unique> <Leader>cr  :s;;;g<Left><Left>
+" nnoremap <unique> <Leader>ce :%s;;<C-r>/;g<Left><Left>
+" vnoremap <unique> <Leader>ce  :s;;<C-r>/;g<Left><Left>
 ": Delete highlighted match
 nnoremap <unique> <Leader>cx :%s;;;g<CR>
 vnoremap <unique> <Leader>cx  :s;;;g<CR>
 
-vnoremap <unique> <Leader>cv :<C-U>%s;;<C-R>=GetVisualSelection("")<CR>;g<CR>
+" Replace current vsel
+vnoremap <unique> <Leader>cv :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><Left><Left>
+" Replace last patt by current vsel
+" vnoremap <unique> <Leader>cv :<C-U>%s;;<C-R>=GetVisualSelection("")<CR>;g<CR>
 
 " Search opened buffers
 " http://vim.wikia.com/wiki/Search_using_quickfix_to_list_occurrences
