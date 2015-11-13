@@ -5,3 +5,11 @@ exe "fun! IsMac()    \nreturn".(!IsWindows() && !IsCygwin() && (
     \ !executable('xdg-open') && system('uname') =~? '^darwin')))."\nendf"
 exe "fun! IsSudo()   \nreturn".($SUDO_USER !=# '' && $USER !=# $SUDO_USER &&
     \ $HOME !=# expand('~'.$USER) && $HOME ==# expand('~'.$SUDO_USER))."\nendf"
+
+"{{{1 Maps helpers ==========
+fun! RetainPos(cmd)
+  " ALT line("."), col(".")
+  let l:pos = getcurpos()
+  silent! exe a:cmd
+  call setpos('.', l:pos)
+endf

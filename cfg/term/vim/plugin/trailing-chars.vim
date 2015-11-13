@@ -35,13 +35,6 @@ command! -bar -nargs=0 -range TrailingHighlight
 
 
 "{{{1 IMPL ====================
-fun! RetainPos(cmd)
-  " ATTENTION Can't save/restore preffered column! USE cursor() instead.
-  " EXPL let [l,c] = [line("."), col(".")] | ... | call cursor(l, c)
-  let pos = getpos(".")
-  silent! exe a:cmd
-  call setpos('.', pos)
-endf
 
 fun! ToggleVariable(name)
   let {a:name} = !{a:name}

@@ -1,6 +1,7 @@
 " Set cpp tags file.
 "let &l:tags='./tags,tags,'.$DOTVIM.'/tags/cpp/tags'
 
+setlocal cindent
 setlocal commentstring=//\ %s
 
 " Set path.

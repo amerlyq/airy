@@ -39,12 +39,15 @@ map <unique> z#  <Plug>(incsearch-nohl0)<Plug>(asterisk-z#)
 map <unique> gz# <Plug>(incsearch-nohl0)<Plug>(asterisk-gz#)
 
 
-" Over: use :OverCommandLine<CR> and input your expr: %s/../.../g
-let g:over_command_line_key_mappings = {}
-let g:over#command_line#search#enable_move_cursor = 0
+" Over: THINK -- can be useless w/o imap timings, etc
+" USE :<C-f> and then type in command window %s/.../.../g
+" USE :OverCommandLine<CR> and in standalone input your expr: %s/../.../g
 " let g:over_enable_auto_nohlsearch = 1
 " let g:over_enable_cmd_window = 1
+" let g:over_command_line_key_mappings = {}
+" let g:over#command_line#search#enable_incsearch = 1
+" let g:over#command_line#search#enable_move_cursor = 1
 " map <unique> <silent> z; :<C-u>OverCommandLine<CR>
 noremap  <unique><silent> <Leader>c; :<C-u>OverCommandLine<CR>
-nnoremap <unique><silent> <Leader>cr :OverCommandLine<CR>%s;;;g<Left><Left>
-vnoremap <unique><silent> <Leader>cr :OverCommandLine<CR>s;;;g<Left><Left>
+nnoremap <unique><silent> <Leader>cr :OverCommandLine %s;;;g<CR><Left><Left>
+xnoremap <unique><silent> <Leader>cr :OverCommandLine  s;;;g<CR><Left><Left>

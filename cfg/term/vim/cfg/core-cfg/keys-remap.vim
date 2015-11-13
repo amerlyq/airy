@@ -1,3 +1,9 @@
+" TODO TRY -- then I could replace ReleaseEsc on Caps by LatchCtrl
+" inoremap jj <Esc>
+inoremap jf <Esc>
+inoremap fj <Esc>
+
+
 " Now 'a jump you to line and column, and `a only to line
 noremap <unique> ' `
 noremap <unique> ` '
@@ -19,8 +25,25 @@ noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 " nnoremap J mzJ`z
 
 " Insert empty line before/after, prepend  <C-u>..
-noremap <unique> gO O <Space><BS><Esc>
-noremap <unique> go o <Space><BS><Esc>
+" THINK visual mappings could do smth useful? -- like add line, staing in place
+" TRY -- tear out current selection in up/down line for character-wise?
+" TRY -- surround by empty lines for linewise?
+" ALT http://vim.wikia.com/wiki/Quickly_adding_and_deleting_empty_lines
+nnoremap <unique> go o<Space><Esc>^"_D
+nnoremap <unique> gO O<Space><Esc>^"_D
+" nnoremap <unique> go o<Space><C-u><Esc>
+" nnoremap <unique> gO O<Space><C-u><Esc>
+" nnoremap <unique> go o<Space><BS><Esc>
+" nnoremap <unique> gO O<Space><BS><Esc>
+" nnoremap <Enter> :call append(line('.'), '')<CR>
+" nnoremap <S-Enter> :call append(line('.')-1, '')<CR>
+" nnoremap <silent> ]<Space> :<C-u>put =repeat(nr2char(10),v:count)<Bar>execute "'[-1"<CR>
+" nnoremap <silent> [<Space> :<C-u>put!=repeat(nr2char(10),v:count)<Bar>execute "']+1"<CR>
+
+" Insert commented out copy under current line, keeps cursor position
+nnoremap <unique><silent> gC :call RetainPos('.t.\|norm gcc')<CR>
+
+
 
 " Adequate replace tabs by parts, not entirely
 noremap <unique> R gR

@@ -17,12 +17,12 @@ let g:neobundle#types#git#clone_depth = 1           "shallow copy
 let g:neobundle#types#git#enable_submodule = 1
 
 call neobundle#begin(expand('$BUNDLES'))
-  " if neobundle#load_cache()
+  if neobundle#load_cache()
     " Let NeoBundle manage NeoBundle
     NeoBundleFetch 'Shougo/neobundle.vim'
     call SourcePlugins()
-    " NeoBundleSaveCache
-  " endif
+    NeoBundleSaveCache
+  endif
 
   "" Load develop version.
   " let s:vimrc_local = findfile('vimrc_local.vim', '.;')
@@ -37,7 +37,8 @@ call neobundle#end()
 filetype plugin indent on  " Required!
 
 if !has('vim_starting')
-  " Checks and installs all not installed bundles
+  " Checks and installs all not installed bundles -- only on :so $MYVIMRC
+  " WARNING :so don't work gracely with <unique> mappings...at all.
   NeoBundleCheck
   " Call on_source hook when reloading .vimrc.
   call neobundle#call_hook('on_source')

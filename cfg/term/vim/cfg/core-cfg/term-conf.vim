@@ -25,17 +25,6 @@ augroup END
 " set noesckeys " (Hopefully) removes the delay when hitting esc in insert mode
 
 
-" Suppress move-left of cursor when leaving insert mode
-"   http://vim.wikia.com/wiki/Prevent_escape_from_moving_the_cursor_one_character_to_the_left
-let CursorColumnI = 0 "the cursor column position in INSERT
-augroup StayFixed
-  autocmd!
-  au InsertEnter * let CursorColumnI = col('.')
-  au CursorMovedI * let CursorColumnI = col('.')
-  au InsertLeave * if col('.') != CursorColumnI | call cursor(0, col('.')+1) | endif
-augroup END
-
-
 "{{{1 Mouse in Term ============================
 if !has('nvim') && has('mouse')
   set mouse=a           " support for mouse wheel and clicks

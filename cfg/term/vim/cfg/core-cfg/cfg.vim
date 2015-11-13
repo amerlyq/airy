@@ -8,10 +8,11 @@ set shiftround     " Round indent by shiftwidth.
 
 
 "{{{1 Indent/Format ============================
-set autoindent        " automatically indent new lines
-set cindent           " instead of 'smartindent' to not move '#' to right
-set formatoptions+=l " don't auto-wrap line if it was longer before insert
+set autoindent               " automatically indent new lines
+set nocindent nosmartindent  " DISABLED: use them selectively for filetypes
+set commentstring=#\ %s  " Use sh-style comments by default instead of c-style
 " set formatexpr=autofmt#japanese#formatexpr()  " Use autofmt.
+
 
 "{{{1 Multiline ============================
 set linebreak         " wrap only on \s chars
@@ -23,15 +24,6 @@ set backspace=indent,eol,start  " delete indent and newline
 
 set wrap breakindent
 noremap <unique> <Leader>tW :<C-u>setl wrap! breakindent!<CR>
-
-
-"{{{1 Comment/Multiline ============================
-set commentstring=#\ %s  " Use sh-style comments by default instead of c-style
-set formatoptions+=o  " continue comment marker in new lines
-set formatoptions+=n  " recognize numbered lists
-if v:version >= 704
-    set formatoptions+=j " remove a comment leader when joining lines
-endif
 
 
 "{{{1 Clipboard ============================

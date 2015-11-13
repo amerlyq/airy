@@ -21,6 +21,9 @@ NeoBundle 'tpope/vim-speeddating'
 " Exchange text: cx{motion} on first, then cx{motion} on other.
 "   cxx -- current line, X -- in Visual mode,  cxc -- clear pending exchange.
 NeoBundle 'tommcdo/vim-exchange'
+" Mappings to add empty lines or move/exchange/duplicate/fetch lines of text
+" ALT NeoBundle 'tpope/vim-unimpaired'
+" NeoBundle 'vim-scripts/LineJuggler'
 
 "{{{1 Textobj ============================
 NeoBundle 'kana/vim-operator-user'              " = Dependency: vim-clang-format

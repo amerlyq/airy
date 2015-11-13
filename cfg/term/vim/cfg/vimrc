@@ -18,6 +18,7 @@ com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 let g:mapleader=","
 call s:cfg('core/detect.vim')
 call s:cfg('core/env.vim')
+call s:cfg('core/options.vim')
 call s:cfg('core/init.vim')
 call s:cfg('core/leaders.vim')
 
@@ -66,7 +67,4 @@ augroup END
 
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
 set exrc secure modeline  " also parse 'vim:...' cmds from comments
-if has('cryptv')  " USE blowfish2: https://dgl.cx/2014/10/vim-blowfish
-  " set cryptmethod=blowfish2   " It seems +15ms overhead.
-endif
 " SEE loadorder of *.vim by :scriptnames

@@ -7,10 +7,12 @@ link "$PWD" "${XDG_CONFIG_HOME:=$HOME/.config}/nvim"
 mkdir -p "${XDG_DATA_HOME:=$HOME/.cache}/shada"
 
 if distro arch; then
-    mkdef editor $(which vim)
-    # has_pr nvim && mkdef vim $(which nvim) ||:
+    mkdef editor $(which $EDITOR)
+    has_pr nvim && mkdef vim $(which $EDITOR) ||:
 elif distro ubuntu; then
     for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
+    # dst=~/.selected_editor
+    # wstr "SELECTED_EDITOR=\"$(which vim.gtk)\""
 fi
 
 # Dir for .swp, backup, ... files
@@ -58,11 +60,6 @@ fi
 ### PLUGINS ###
 if cfgOpt u || [[ ! -d "$VCACHE/bundle" ]]; then
     # FIXME: error on clean system, when NeoBundle is not installed yet
-    $EDITOR -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty ||:
+    $EDITOR -E -X -R -i NONE -c "set nomore" \
+        +NeoBundleClearCache +NeoBundleUpdate +qall </dev/tty ||:
 fi
-
-# Editor
-# dst=~/.selected_editor
-# wbegin
-# wstr "SELECTED_EDITOR=\"$(which vim.gtk)\""
-# echo "W: $dst  <- vim"

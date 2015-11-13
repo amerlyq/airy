@@ -1,28 +1,8 @@
 " vim: ft=vim
-let g:mapleader = ','        " ALT +,\<Space>+. Use <Leader> in global plugin.
-let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugin.
-" noremap <unique> <Leader> <Nop>
-" noremap <unique> <LocalLeader> <Nop>
-
-" " Release keymappings for plug-in.
-" nnoremap ;  <Nop>
-" xnoremap ;  <Nop>
-" nnoremap m  <Nop>
-" xnoremap m  <Nop>
-" nnoremap ,  <Nop>
-" xnoremap ,  <Nop>
-
-
 " Set augroup.
 augroup MyAutoCmd
   autocmd!
 augroup END
-
-" Disable menu.vim (must be before syntax/filetype on)
-if has('gui_running')  " TODO TRY 'eg'; 'a' -- disabled because of 'copyq'
-  set guioptions=Mc    " and use console-like dialogs instead of gui popup
-" elseif exists('$DISPLAY')
-endif
 
 "" DISABLED default plugins
 " Disable GetLatestVimPlugin.vim
