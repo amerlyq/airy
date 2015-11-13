@@ -8,8 +8,8 @@ set shiftround     " Round indent by shiftwidth.
 
 
 "{{{1 Indent/Format ============================
-set autoindent               " automatically indent new lines
-set nocindent nosmartindent  " DISABLED: use them selectively for filetypes
+set autoindent             " automatically indent new lines
+set cindent nosmartindent  " used cindent for votl topic aligning on 'cc'
 set commentstring=#\ %s  " Use sh-style comments by default instead of c-style
 " set formatexpr=autofmt#japanese#formatexpr()  " Use autofmt.
 

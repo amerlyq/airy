@@ -10,9 +10,9 @@ wacc() {
     local name=$1 host=$2 user=$3
     local idn="$4" x11=$5 port=$6 str
 
-echo -ne "Host $name
-    HostName $host
-    User $user\
+echo -ne "Host ${name:?No}
+    HostName ${host:?No}
+    User ${user:?No}\
 ${port:+\n    Port $port}\
 ${idn:+\n    IdentityFile ~/.ssh/$idn}\
 ${x11:+\n    ForwardX11 yes}
@@ -41,6 +41,7 @@ case "$CURR_PROF" in home|laptop|gnote4)
     wacc lsir   $HOME_IPL   $HOME_USER   lsir_rsa x11
     wacc llap   $LAPT_IPL   $LAPT_USER   ''      x11
     wacc lrou   $ROUT_IPL   $ROUT_USER   rt_rsa '' $ROUT_PORT
+    wacc land   $VAND_IPL   $VAND_USER
 ;; esac
 
 case "$CURR_PROF" in work_samsung)

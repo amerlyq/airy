@@ -2,12 +2,18 @@ Neovim
 	BUG neovim
 		[_] Cursor blinks once after startup
 		[_] Double cursor on search by / or ,cr
-		[_] No shell on ,z
+		[_] No shell on ,z -- need to reuse code in ranger filechooser
 		[_] No pause on error at :make by ,m
+		[_] Error from make, when launched through abyss not from root dir
 		[_] Err xsel no X launched/present?
+			:= It's result of *has('clipboard')* inside several plugins
+			: Seems like I need to try last AUR build
 	[_] Check neovim
-		https://github.com/neovim/neovim/wiki/Related-projects
+		[_] https://github.com/neovim/neovim/wiki/Related-projects
 		:> to work permanently with nvim, use another packer instead of yaourt
+		[_] Search for async term cmds launcher plugin
+			If not found -- extract from ranger filechooser common code
+
 	[_] Integrate xiki (can be deprecated by neovim :term)
 		http://xiki.org/
 		http://stackoverflow.com/questions/24465655/configure-vim-to-use-xiki
@@ -17,6 +23,8 @@ Neovim
 	[_] FIX auto-magnify -- split screen in already small window
 	[_] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves рывками
+	[_] Disable textwidth indicator column when screensize smaller then tw
+	[_] FIX [Space]-insert mode after ENH stage
 
 
 SMALL
