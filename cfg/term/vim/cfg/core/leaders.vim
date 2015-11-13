@@ -1,3 +1,5 @@
+" NOTE more prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
+"
 " For quote, etc
 nmap <silent><unique> q [Quote]
 xmap <silent><unique> q [Quote]

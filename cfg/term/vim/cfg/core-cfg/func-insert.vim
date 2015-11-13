@@ -22,14 +22,16 @@ endfunction
 command! -bar -nargs=1 Limio call LimitedInput(<q-args>)
 " silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
 
-" nnoremap <unique><silent> [Space]<Space>  i<Space><Esc>
+nnoremap <unique><silent> [Space]<Space>  i<Space><Esc>
+vnoremap <unique><silent> [Space]<Space>  c<Space><C-r>"<Space><Esc>
+" nnoremap <unique><silent> <Leader><Space> a<Space><Left><Left><Space><Esc>
 " xmap <unique><silent> [Space]<Space>  [Quote]a<Space>
-nnoremap <unique><silent> [Space]i  :<C-U>Limio i<CR>
-xnoremap <unique><silent> [Space]i  :<C-U>Limio I<CR>
+nnoremap <unique><silent> [Space]i  :<C-u>Limio i<CR>
+xnoremap <unique><silent> [Space]i  :<C-u>Limio I<CR>
 nnoremap <unique><silent> [Space]a  :Limio a<CR>
-xnoremap <unique><silent> [Space]a  :<C-U>Limio A<CR>
+xnoremap <unique><silent> [Space]a  :<C-u>Limio A<CR>
 nnoremap <unique><silent> [Space]s  :Limio s<CR>
-xnoremap <unique><silent> [Space]s  :<C-U>Limio S<CR>
+xnoremap <unique><silent> [Space]s  :<C-u>Limio S<CR>
 
 " <S-Space> work only in gvim
 

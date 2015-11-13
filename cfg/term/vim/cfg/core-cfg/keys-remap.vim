@@ -18,9 +18,9 @@ noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 " No jump when joining
 " nnoremap J mzJ`z
 
-" Insert empty line before/after
-noremap <unique> gO O <C-U><Esc>
-noremap <unique> go o <C-U><Esc>
+" Insert empty line before/after, prepend  <C-u>..
+noremap <unique> gO O <Space><BS><Esc>
+noremap <unique> go o <Space><BS><Esc>
 
 " Adequate replace tabs by parts, not entirely
 noremap <unique> R gR
