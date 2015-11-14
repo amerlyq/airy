@@ -3,6 +3,42 @@
 "   call with arg of right ts in which file looks like
 "   must be no error when file is already processed
 
+"{{{1 MAPS =================
+
+" USE :retab to revert effect
+" noremap <unique> <Leader>ti :<C-U>call s:ApplyTabIndent(v:count)<CR>
+" noremap <leader>ct <Esc>:retab<CR>, :retab!
+
+noremap <unique> <Leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
+noremap <unique> <Leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
+
+
+"{{{1 CMDS =================
+" Render TABs using this many spaces, as indentation on </>
+let g:default_indent = 4
+" Retab spaced file, but only indentation
+command! -bar RetabIndents call s:RetabIndents()
+
+
+"{{{1 IMPL =================
+function! s:ApplyTabIndent(ntabs)
+  call s:RetabIndents()
+  let nt= a:ntabs>0 ? a:ntabs : g:default_indent
+  exe printf('setl ts=%s sts=%s sw=%s', nt, nt, nt)
+  " retab
+endfunc
+
+" Retab spaced file, but only indentation
+func! s:RetabIndents()
+  let saved_view = winsaveview()
+  let patt = '^\( \{'.&ts.'}\)\+'
+  let repl = '\=repeat("\t", len(submatch(0))/'.&ts.')'
+  silent exe '%s@'.l:patt.'@'.l:repl.'@e'
+  call winrestview(saved_view)
+endfunc
+
+
+"{{{1 EXPL =================
 " to replace all leading spaces as tabs but not to affect tabs after other characters. It assumes that 'ts' is set correctly. You can go a long way to making files that are misaligned better by doing something like this:
 
 " :set ts=8     " Or whatever makes the file looks like right
@@ -14,17 +50,7 @@
 
 " You'll end up with a file where all the leading whitespace is tabs so people can look at it in whatever format they want, but where all the trailing whitespace is spaces so that all the end-of-line comments, tables etc line up properly with any tab width.
 
-
-" Retab spaced file, but only indentation
-command! -bar RetabIndents call RetabIndents()
-
-" Retab spaced file, but only indentation
-func! RetabIndents()
-  let saved_view = winsaveview()
-  execute '%s@^\( \{'.&ts.'}\)\+@\=repeat("\t", len(submatch(0))/'.&ts.')@'
-  call winrestview(saved_view)
-endfunc
-
+"{{{1 EXPL =================
 " Explanation of the 'exe' line:
 " execute '%s@^\( \{'.&ts.'}\)\+@\=repeat("\t", len(submatch(0))/'.&ts.')@'
 " Execute the result of joining a few strings together:
@@ -52,39 +78,3 @@ endfunc
 " )                " The end of the repeat() function call
 "
 " @                " End delimiter
-
-
-set shiftround       " round indent to multiple of 'shiftwidth'
-set expandtab        " insert spaces when TAB is pressed
-set smarttab
-
-let g:default_indent = 4
-function! SetTabIndent(ntabs)
-  let nt= a:ntabs>0 ? a:ntabs : g:default_indent
-  let &tabstop=nt        " render TABs using this many spaces
-  let &softtabstop=nt    " ... this many spaces
-  let &shiftwidth=nt     " indentation amount for < and > commands
-endfunc
-function! ApplyTabIndent(ntabs)
-  call RetabIndents()
-  call SetTabIndent(a:ntabs)
-  " retab
-endfunc
-
-
-call SetTabIndent(g:default_indent)
-noremap <unique> <Leader>ti :<C-U>call ApplyTabIndent(v:count)<CR>
-"noremap <leader>ct <Esc>:retab<CR>, :retab!
-noremap <unique> <Leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
-noremap <unique> <Leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
-
-
-" Indenting
-if has("autocmd")
-  " make Python follow PEP8 ( http://www.python.org/dev/peps/pep-0008/ )
-  autocmd FileType python
-    \ setlocal tabstop=4 shiftwidth=4 softtabstop=4 textwidth=79
-  autocmd FileType make
-    \ setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
-endif
-

@@ -30,33 +30,34 @@ let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Did': 10,
       \ 'Dev': 4, 'Msg': 13, 'Tbd': 5, 'Alt': 3 }
 let s:patterns = {
       \ 'Err': 'ERR%(OR)=|BUG',
-      \ 'Fix': 'FIX%(ME)=|WARNING|ATTENTION|REMOVE',
+      \ 'Fix': 'FIX%(ME)=|WARNING|ATTENTION|%(REM)OVE',
       \ 'Add': 'ADD|SEE|NEED|FIND',
       \ 'Did': 'DONE|FIXED|EXPL',
-      \ 'Dev': 'DEV|HACK',
+      \ 'Dev': 'DEV|ENH|HACK',
       \ 'Msg': 'NOTE|USE',
       \ 'Tbd': 'TODO|CHECK|TRY',
       \ 'Alt': 'ALT|OR|CASE|THINK|CHG',
       \ }
-"|OPT%(ION)=%(S)=',
 
 function! s:everywhere_print(patts)
+  tabnew
+  setl winfixwidth winfixheight buftype=nofile bufhidden=wipe nobuflisted
   for [k,v] in items(a:patts)
-    echo k .': '. v
+    call append(line('.'), k .': '. v)
   endfor
 endfunction
 
 
 function! s:everywhere_define(cols)
   for [k,v] in items(a:cols)  "term=bold,underline guifg=#E01B1B
-    exec 'hi! Note'. k .' term=bold cterm=bold ctermbg=None guibg=None ctermfg='. v
+    exec 'hi! Notch'. k .' term=bold cterm=bold ctermbg=None guibg=None ctermfg='. v
   endfor
 endfunction
 
 
 function! s:everywhere_matches(patts)
   for [k,v] in items(a:patts)
-    call matchadd('Note'. k, '\v<('. v .')>:=', -1)
+    call matchadd('Notch'. k, '\v<('. v .')>[:?*]=', -1)
   endfor
 endfunction
 
