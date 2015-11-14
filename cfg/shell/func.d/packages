@@ -47,8 +47,10 @@ if distro ubuntu; then
 elif distro arch; then
   pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' $@; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
-  if hash yaourt >/dev/null 2>&1
-  then aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' $@; }
+  if has_pr pacaur; then
+    aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' $@; }
+  elif has_pr yaourt; then
+    aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' $@; }
   else aur_inst(){ return 1; }
   fi
 

@@ -7,6 +7,9 @@ if distro arch; then
     pkg_inst 'ntfs-3g'
     # sudo fc-cache && sudo mkfontscale && sudo mkfontdir
 
+    # ALT packer (lightweight but less automatable and w/o shell completion)
+    aur_inst 'pacaur'
+
 # http://askubuntu.com/questions/468466/why-this-occurs-error-diskfilter-writes-are-not-supported
 else
     pkg_inst 'btrfs-tools'

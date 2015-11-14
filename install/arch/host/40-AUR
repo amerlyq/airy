@@ -5,6 +5,7 @@ is_enabled 'aur' || exit 0
 
 ### Add AUR repository to the end
 cfg=/etc/pacman.conf
+sed -ri '/^#(Color)$/s//\1/' $cfg
 sed -ri '/#%BEGIN_AUR/,/#%END_AUR/d' $cfg
 cat >> $cfg <<EOT
 #%BEGIN_AUR
@@ -39,13 +40,9 @@ echo ":: [archlinuxfr] set up complete"
 
 if grep -q '^\[archlinuxfr\]' /etc/pacman.conf; then
     LST="$LST package-query yaourt"
-    # ALT USE packer or pacaur
 fi
-
 pacman -S --noconfirm $LST
-
-# AUR="$AUR qingy"
-# yaourt -S $AUR
+!has_pr yaourt || yaourt -S --needed --noconfirm pacaur  # qingy
 
 # SEE manual installation for ARM
 # https://astrofloyd.wordpress.com/2015/01/17/installing-yaourt-on-arch-linux/

@@ -4,6 +4,11 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 #link "$PWD/profile" ~/.profile
 echo "Err: FIXME"
+if distro arch; then
+    cfg=/etc/pacman.conf
+    ! grep -q '^#(Color)$' $cfg || sudo sed -ri '/^#(Color)$/s//\1/' $cfg
+    link "$PWD/pacaur.conf" ~/.config/pacaur/config
+fi
 
 # if distro ubuntu; then:
 # update-alternatives : x-session-manager cinnamon-session-cinnamon

@@ -36,7 +36,7 @@ link() { local src="$1" dst="$2"
   else die "refuse symlink over existing file/dir '$dst'"; fi
 }
 dispatch() { local src=$(readlink -e "${1:?No}") dst="${2:?No}"
-  [[ -e "$src" ]] || die "no such file '$src'"
+  [[ -e "$src" ]] || die "no such file '${src:-$1}'"
   [[ -f "$src" ]] || args='-r'
   ${cmd:?No} "$src" "$dst" | sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g"
 }

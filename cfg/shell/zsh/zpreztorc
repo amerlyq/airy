@@ -61,7 +61,11 @@ zstyle ':prezto:module:editor' key-bindings 'emacs'
 
 ### Pacman ###
 ## Set the Pacman frontend.
-zstyle ':prezto:module:pacman' frontend 'yaourt'
+if (( $+commands[pacaur] )); then
+  zstyle ':prezto:module:pacman' frontend 'pacaur'
+elif (( $+commands[yaour] )); then
+  zstyle ':prezto:module:pacman' frontend 'yaourt'
+fi
 
 
 ### Prompt ###
