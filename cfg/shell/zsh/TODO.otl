@@ -33,8 +33,13 @@ Prezto
 			:/ or make async ipc from ranger to zsh -- which is even better
 
 Prompt
-	[_] BUG: double prompt / async err / empty path -- if fast <CR> after urxvt start
-		: ALSO _prompt_amer_async_exec:7: bad substitution
+	[_] BUG: -- if fast <CR> after urxvt start
+		[_] double prompt
+			:= seems like it's result of prompt update by async git/vcs cmds
+			:? make them synchronize with time intervals as I thought before?
+		2015-11-14 [X] async err _prompt_amer_async_exec:7: bad substitution
+			:> Replace ${var_${mod}} by vvar=var_$mod && ${(P)vvar}
+		2015-11-14 [X] empty path
 	2015-06-13 [X] Shortening path depending on terminal width
 	2015-06-13 [X] branch name must be also included in width when shortening path
 		:NO-FIX: on first launch branch lenght is not included, as git_info

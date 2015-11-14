@@ -39,19 +39,20 @@ function _prompt_vars_save {
 function _prompt_amer_async_exec {
   # Call submodule (git, vcs, ...) and signal completion to parent process.
   for smod in ${_prompt_async_calls[@]}; do
-    if (( $+functions[_prompt_async_call_$smod] )); then
+    (( $+functions[_prompt_async_call_$smod] )) || continue
 
-      # Kill the old process of slow commands if it is still running.
-      if (( _prompt_amer_async_pid_${smod} > 0 )); then
-        kill -TERM "${_prompt_amer_async_pid_${smod}}" &>/dev/null
-      fi
-
-      ( _prompt_vars_save $smod && kill -USR1 $$ ) &!
-      # EXPL Make var global, so *_update would know it
-      typeset -g _prompt_amer_async_pid_$smod=$!
-
-      # print -r ${_prompt_amer_async_pid_${smod}}
+    # Kill the old process of slow commands if it is still running.
+    local vpid="_prompt_amer_async_pid_${smod}"
+    # printf "%s - %s\n" "${smod}" "${(P)vpid}" >&2
+    if (( ${(P)vpid:-0} > 0 )); then
+        kill -TERM "${(P)vpid}" &>/dev/null
     fi
+
+    ( _prompt_vars_save $smod && kill -USR1 $$ ) &!
+    # EXPL Make var global, so *_update would know it
+    typeset -g ${vpid}=$!
+
+    # print -r ${_prompt_amer_async_pid_${smod}}
   done
 }
 

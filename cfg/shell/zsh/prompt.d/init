@@ -18,6 +18,9 @@ function prompt_amer_setup {
   add-zsh-hook preexec prompt_amer_preexec
   add-zsh-hook precmd  prompt_amer_precmd
 
+  # At startup dirpath must already be visible
+  prompt_amer_pwd
+
   _prompt_amer_setup_git
   _prompt_amer_setup_vcs  # NOTE vcs_info cfg
   _prompt_amer_setup_prompts "$(_prompt_color $@)" "$(_prompt_parts)"
