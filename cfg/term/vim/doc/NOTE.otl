@@ -1,0 +1,138 @@
+> PLUGINS
+
+SEE
+	For coersion (case convert)
+		https://github.com/tpope/vim-abolish
+	cscope_maps
+	AutoFenc
+	https://github.com/sheerun/vim-polyglot
+	https://github.com/morhetz/gruvbox
+		https://github.com/fholgado/minibufexpl.vim
+		https://github.com/chrisbra/Colorizer
+		http://www.vimpusher.com/
+		kana/vim-arpeggio
+		https://github.com/vim-scripts/VOoM
+	2015-07-06 [$] https://github.com/h1mesuke/textobj-wiw ::> (use CamelMotion)
+		https://github.com/h1mesuke/unite-outline/wiki
+
+MISC
+	[_] Qf buffer editing/replacing
+		[_] https://github.com/jceb/vim-editqf  ::> use quickfix-reflector.vim
+			[_] Port features like AddNote and Err/Warn/Note type change to my code
+			: Or put them into fork of quickfix-reflector!
+			[_] SEE: my ext/qf-do.vim script -- aggregate that features from/to it.
+		2015-07-06 [X] https://github.com/stefandtw/quickfix-reflector.vim
+			: Very best for now
+		2015-07-06 [$] https://github.com/thinca/vim-qfreplace ::> NO: Too frail
+		[_] https://github.com/Peeja/vim-cdo
+		[_] https://github.com/sk1418/QFGrep
+		[_] https://github.com/tomtom/quickfixsigns_vim
+	[_] ALT to tabular -- I can't set comfortable shortcus
+		: Check for operators and all possible dilimiters, regex (C-x)
+		https://github.com/junegunn/vim-easy-align
+		https://github.com/tommcdo/vim-lion
+		[_] Enhance config/bundle/tabular
+			[_] use v:count to align on N'th entry
+			[_] different shortcuts for spaces: 00, 01, 11
+			[_] visual selection or current character as delimiter
+
+CLIPBOARD
+	[_] !MUST!: https://github.com/svermeulen/vim-easyclip
+		 Possible, it's that plugin which can insert full-line delete on same line
+		 Find plugin which deletes/insertes lines without newline
+		[_] Copy-Paste w/o newline
+			http://www.vim.org/scripts/script.php?script_id=3355
+
+
+OPERATORS
+	[_] Motions & textobj
+		[_] https://github.com/jeetsukumaran/vim-indentwise
+		[_] Paired mappings on [, ] for frequent commands
+			:? Maybe change toggling ,t.. -> [t.. and ]t..
+			: https://github.com/tpope/vim-unimpaired
+		[_] Consider motions for diff mode
+			: https://github.com/kana/vim-textobj-diff
+		[_] Try motions for Latex
+			: https://github.com/rbonvall/vim-textobj-latex'
+		[_] Half-textobj motions
+			: https://github.com/tommcdo/vim-ninja-feet/
+		[_] Selection of pairs
+			: https://github.com/gorkunov/smartpairs.vim
+		[_] Swap args in func
+			: http://blog.kamil.dworakowski.name/2007/09/swap-parameters-script-for-vim.html
+			: http://www.vim.org/scripts/script.php?script_id=2032
+		2015-05-26 [X] easymotion  :> Replaced by vim-sneak
+			2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
+			:> No combining -- overlapping x-mappings aren't possible
+			[X] ALT: https://github.com/justinmk/vim-sneak
+		2015-07-06 [X] text place exchange operator
+			: https://github.com/tommcdo/vim-exchange
+		2015-07-06 [X] ALT Try all plugins for textobj:
+			: https://github.com/kana/vim-textobj-user/wiki
+			: https://github.com/tommcdo
+		2015-07-06 [X] Navigation
+			[_] mappings to move between loci of entries of qf/loc list
+			: move to next/prev change in git signify (Use: ]c [c)
+			: move to next/prev spellchecking error (Use: ]s [s z=)
+		2015-07-06 [X] ALT to vim-surround -- use on 'q' as operator
+			:: It can replace my ,<Space> shortcut for surrounding by spaces
+			:: Possibly it can surround visual blocks?
+			: https://github.com/rhysd/vim-operator-surround
+
+	[_] DEV Consider switching to relative number in operator pending mode
+		https://github.com/jeffkreeftmeijer/vim-numbertoggle
+		http://www.vim.org/scripts/script.php?script_id=4212
+		http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/
+		http://vim.1045645.n5.nabble.com/Changing-line-numbers-from-normal-to-relative-td5723150.html
+		http://www.vim.org/scripts/script.php?script_id=4461
+		https://www.reddit.com/r/vim/comments/1hocx4/better_lines_numbers_for_vim/
+	SEE
+		https://github.com/deris/vim-operator-insert
+		https://github.com/seletskiy/urxvt-vim-insert
+		https://github.com/kana/vim-smartchr
+		https://github.com/osyo-manga/vim-operator-exec_command
+		https://github.com/thinca/vim-quickrun
+		https://github.com/osyo-manga/vim-jplus
+	2015-11-15 [X] Test in conjunction with : vim-operator-surround
+		:$ https://github.com/osyo-manga/vim-textobj-multiblock
+		:+ https://github.com/thinca/vim-textobj-between
+		:+ https://github.com/rhysd/vim-textobj-anyblock
+
+EDIT
+	[_] THINK about pairs
+		https://github.com/jiangmiao/auto-pairs
+		https://github.com/Townk/vim-autoclose
+		https://github.com/Raimondi/delimitMate
+		https://github.com/seletskiy/vim-autosurround
+	Substitute keeps case
+		keepcase.vim
+			http://www.vim.org/scripts/script.php?script%5Fid=6
+		SmartCase
+			http://www.vim.org/scripts/script.php?script_id=1359
+	2015-07-06 [X] ALT to tcomment -- if it's too cumbersome (shortcuts are laggy)
+		: Check tcomment additional features and is really i need them
+		: Also supports repeat.vim
+		2015-07-06 [X] https://github.com/tpope/vim-commentary
+
+SYNTAX
+	[_] regions of file highlighting
+		: http://vim.wikia.com/wiki/Different_syntax_highlighting_within_regions_of_a_file
+		: http://vim.wikia.com/wiki/Creating_your_own_syntax_files
+		: https://robots.thoughtbot.com/writing-vim-syntax-plugins
+	[_] Python
+		: http://www.sontek.net/blog/2011/05/07/turning_vim_into_a_modern_python_ide.html
+		: http://habrahabr.ru/post/224979/
+		: http://redkrieg.com/2012/12/11/writing-python-like-a-jedi/
+		: http://vimawesome.com/plugin/jedi-vim
+		: http://michiganlabs.com/vim-python-ide/
+		: http://thibaut.horel.org/blog/using-vim-as-a-python-ide.html
+	[_] Markdown
+		better syntax in vim, github flavours
+		: https://github.com/gabrielelana/vim-markdown
+		origin
+		: https://github.com/plasticboy/vim-markdown
+		xz
+		: https://github.com/tpope/vim-markdown
+		: https://github.com/rcmdnk/vim-markdown
+		preview window in browser (like latex)
+		: https://github.com/suan/vim-instant-markdown

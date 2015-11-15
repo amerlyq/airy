@@ -5,7 +5,7 @@ import os
 
 
 class doc(Command):
-    lst = ['TODO', 'DEV', 'NOTE', 'INFO']
+    lst = ['DEV', 'EXAMPLES' 'INFO', 'LIOR', 'NOTE', 'SYNERGY', 'TODO']
     ext = '.otl'
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories

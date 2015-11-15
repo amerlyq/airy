@@ -42,42 +42,18 @@ Neovim
 		: https://github.com/syngan/vim-operator-inserttext
 		: https://github.com/aur-archive/vim-insertchar
 		: https://github.com/mwgkgk/vim-operator-insert
-	[_] THINK about pairs
-		https://github.com/jiangmiao/auto-pairs
-		https://github.com/Townk/vim-autoclose
-		https://github.com/Raimondi/delimitMate
-		https://github.com/seletskiy/vim-autosurround
-	[_] DEV Consider switching to relative number in operator pending mode
-		https://github.com/jeffkreeftmeijer/vim-numbertoggle
-		http://www.vim.org/scripts/script.php?script_id=4212
-		http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/
-		http://vim.1045645.n5.nabble.com/Changing-line-numbers-from-normal-to-relative-td5723150.html
-		http://www.vim.org/scripts/script.php?script_id=4461
-		https://www.reddit.com/r/vim/comments/1hocx4/better_lines_numbers_for_vim/
-	SEE
-		https://github.com/deris/vim-operator-insert
-		https://github.com/seletskiy/urxvt-vim-insert
-		https://github.com/kana/vim-smartchr
-		https://github.com/osyo-manga/vim-operator-exec_command
-		https://github.com/thinca/vim-quickrun
-		https://github.com/osyo-manga/vim-jplus
-	2015-11-15 [X] Test in conjunction with : vim-operator-surround
-		:$ https://github.com/osyo-manga/vim-textobj-multiblock
-		:+ https://github.com/thinca/vim-textobj-between
-		:+ https://github.com/rhysd/vim-textobj-anyblock
 
-INTEGRATE
-	http://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
-	SEE: plugins list
-		https://raw.githubusercontent.com/lambdalisue/vim-castle/7545bcea880a28f85947ee47e4b2e9cfc281f804/home/.vim/vimrc
 
 SMALL
+	[_] DEV :SortLine inside selection/motion (like inside brackets)
+		:= Search for operator-* plugins first, or make one myself
+		:= Such operator- plugin may consolidate SortBlock as linewise move
 	2015-06-08 [X] for commenter -- add prefix: '!' in Xresources and ':' in votl
 	:CHECK: how to do this for tcomment
 	2015-11-13 [X] BUG: after saving, can't use n/N -- bad regex of trailing space!
 		2015-11-13 [X] Replace TrailingSpaceShow by high-contrast airline highlight
 	[_] When opening file, which opened in another vim (pid exists), focus its window instead.
-	[_] TODO: When updating vim plugins, how to run it in non-interactive?
+	2015-11-15 [X] TODO: When updating vim plugins, how to run it in non-interactive?
 	[_] SEE Tips vim + git + fugitive
 		http://mislav.uniqpath.com/2014/02/hidden-documentation/
 	[_] Toggling background directly in vim -- use urxvt codes to change
@@ -147,70 +123,21 @@ SEE & CHECK
 		http://www.lepem.ufc.br/jaa/r-plugin.html
 	[_] Search by name and insert Unicode
 		https://github.com/chrisbra/unicode.vim
-
-DEV ranger integration
-	[_] view instead of vim in ranger by default
-		[_] shortcuts to fast toggle vim readonly
-		[_] disable listchars, folds, syntastic on open
-		[_] toggle between vim and view in ranger!
-	[_] Socket server for IPython (try to write for usage with ranger)
-	[_] Vimserver standalone (now can be replaced by neovim?)
-		[_] Toggle vim instances as current main server <S-F2>
-		 See if it possible: ex command, with vim restart, or no way
-			[$] Dump pid in var _V will not work, but you can use file
-		[_] Open files from ranger 'ge'/'L'/F2 or another vim by <leader><F2>
-		[_] Make it possible to press key in vim/ranger over ssh, and open it
-		  in local vimserver by scp://
-		[_] Integrate suspend/resume vim functionality in this server script
-	[_] ADD ranger as NERDTree -- try using NERDTree before it.
-		: open by shortcut ',F' -- fork in another window
-		: setup vimserver and client, and 'ranger server and client'
-		: all opened in ranger files go to vimserver
-		: changing buffers in vim -- moves cursor in ranger (ranger-server)
-		: creating tabs in vim creates them in ranger
-		:	(or one tab for each buffer unique dir?)
-	[_] Integrate with ranger more
-		[_] https://github.com/mikezackles/vranger
-		[_] https://github.com/koreyconway/ranger.vim
-		[_] https://github.com/vim-scripts/vim-ranger
-		[_] https://github.com/Mizuchi/vim-ranger
-		[_] https://github.com/justinmk
-			: ALSO see new vim_file_chooser plugin in /usr/share/doc/ranger
+	[_] Xz
+		https://github.com/szw/vim-ctrlspace
+	[_] CHECK MindMap integration?
+		https://processing.org/
+		https://github.com/sophacles/vim-processing
 
 
 vim:
-	[_] move cfb/bundle -> plugins, cfg/snip-* -> ext, plugins.vim -> neobundle.vim
+	2015-11-15 [$] move cfb/bundle -> plugins, cfg/snip-* -> ext, plugins.vim -> neobundle.vim
 	[_] THINK For neobundle use generating yml -> plugins.vim
 		http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
-	[_] TODO remove insert mappings from votl
 	[_] READ vim vs PyCharm3 in Idea
 		http://andrewbrookins.com/tech/one-year-later-an-epic-review-of-pycharm-2-7-from-a-vim-users-perspective/
-	[_] Check
-		https://github.com/szw/vim-ctrlspace
-		quickfixsigns <https://github.com/tomtom/quickfixsigns_vim>
 	[_] ADD vim-hooks -- custom scripts on save and other events in vim
 		https://github.com/ahw/vim-hooks
-	2015-07-06 [X] ALT to tcomment -- if it's too cumbersome (shortcuts are laggy)
-		: Check tcomment additional features and is really i need them
-		: Also supports repeat.vim
-		2015-07-06 [X] https://github.com/tpope/vim-commentary
-	[_] ALT to tabular -- I can't set comfortable shortcus
-		: Check for operators and all possible dilimiters, regex (C-x)
-		https://github.com/junegunn/vim-easy-align
-		https://github.com/tommcdo/vim-lion
-		[_] Enhance config/bundle/tabular
-			[_] use v:count to align on N'th entry
-			[_] different shortcuts for spaces: 00, 01, 11
-			[_] visual selection or current character as delimiter
-	[_] Add v:count to <Space> operator -- amount of chars before exit.
-	[_] CHG <Space> to operator mode:
-		' A' -- inserts space at line end, then goes to insert regime
-		' r' -- inserts space, then replace
-		'  ' -- put space
-		' p' -- put (yanked) text with space before it
-		: v:count treated as amount of spaces inserted
-		:= But then I will need some other operator for single-char inserts --
-		: to work with other characters beside spaces.
 	[_] Remap 'ge' with motion 'prev-to-last' letter? (See: CamelMotion plugin)
 	[_] Change Bookmarking 2\t --> to trigger let g:tin=v:count instead of one-time setting?
 		or simply use \T or g\t for permanent setting and \t for one-time
@@ -220,88 +147,14 @@ vim:
 		[_] mark several files
 		[_] create parser
 
-	[_] Motions & textobj
-		[_] https://github.com/jeetsukumaran/vim-indentwise
-		[_] Paired mappings on [, ] for frequent commands
-			:? Maybe change toggling ,t.. -> [t.. and ]t..
-			https://github.com/tpope/vim-unimpaired
-		[_] Consider motions for diff mode
-			https://github.com/kana/vim-textobj-diff
-		[_] Try motions for Latex
-			NeoBundleLazy 'rbonvall/vim-textobj-latex'
-		[_] Half-textobj motions
-			https://github.com/tommcdo/vim-ninja-feet/
-		[_] Selection of pairs
-			https://github.com/gorkunov/smartpairs.vim
-		2015-05-26 [X] easymotion  :> Replaced by vim-sneak
-			2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
-			:> No combining -- overlapping x-mappings aren't possible
-			[X] ALT: https://github.com/justinmk/vim-sneak
-		2015-07-06 [X] text place exchange operator
-			: https://github.com/tommcdo/vim-exchange
-		2015-07-06 [X] ALT Try all plugins for textobj:
-			: https://github.com/kana/vim-textobj-user/wiki
-			: https://github.com/tommcdo
-		2015-07-06 [X] Navigation
-			[_] mappings to move between loci of entries of qf/loc list
-			: move to next/prev change in git signify (Use: ]c [c)
-			: move to next/prev spellchecking error (Use: ]s [s z=)
-		2015-07-06 [X] ALT to vim-surround -- use on 'q' as operator
-			:: It can replace my ,<Space> shortcut for surrounding by spaces
-			:: Possibly it can surround visual blocks?
-			: https://github.com/rhysd/vim-operator-surround
-
-	[_] Qf buffer editing/replacing
-		[_] https://github.com/jceb/vim-editqf  ::> use quickfix-reflector.vim
-			[_] Port features like AddNote and Err/Warn/Note type change to my code
-			: Or put them into fork of quickfix-reflector!
-			[_] SEE: my ext/qf-do.vim script -- aggregate that features from/to it.
-		2015-07-06 [X] https://github.com/stefandtw/quickfix-reflector.vim
-			: Very best for now
-		2015-07-06 [$] https://github.com/thinca/vim-qfreplace ::> NO: Too frail
-		[_] https://github.com/Peeja/vim-cdo
-		[_] https://github.com/sk1418/QFGrep
-
 	[_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
 		: to generate vimrc for others or for me on other computers (buildserver)
-	[_] regions of file highlighting
-		http://vim.wikia.com/wiki/Different_syntax_highlighting_within_regions_of_a_file
-		http://vim.wikia.com/wiki/Creating_your_own_syntax_files
-		https://robots.thoughtbot.com/writing-vim-syntax-plugins
 	2015-07-06 [X] load spellchecking in vim_install
 		2015-07-06 [X] install -u must run vim_install in update regime
 
-	Substitute keeps case
-		keepcase.vim
-			http://www.vim.org/scripts/script.php?script%5Fid=6
-		SmartCase
-			http://www.vim.org/scripts/script.php?script_id=1359
-	[_] own syntax highlighting
-		http://learnvimscriptthehardway.stevelosh.com/chapters/46.html
-		http://vim.wikia.com/wiki/Search_for_lines_not_containing_pattern_and_other_helpful_searches
-		https://robots.thoughtbot.com/writing-vim-syntax-plugins
-	[_] Seize
-		http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
-		http://www.vim.org/scripts/script.php?script_id=4449
-		https://github.com/jackfranklin/dotfiles
-	[o] Vimoutliner
-		[_] Remove insert mappings
-		2015-06-01 [X] Change mapping to more easily pressed :> use everywhere ',.'
-		[X] Disable autoformating on pasting
-		[_] Test and compare with vimoutliner
-			: https://github.com/vimwiki/vimwiki
 	[_] Autoreplacing: choose delimiter from [:|/;@] on ,cc ,cy depending on expression
 		 Or escape delimiter symbols in expression
 	[_] Delay on saving -- by means of syntastic -- move it in asynchronous mode
-	[_] Swap args in func
-		http://blog.kamil.dworakowski.name/2007/09/swap-parameters-script-for-vim.html
-		http://www.vim.org/scripts/script.php?script_id=2032
-	[_] setup python-jedi
-		http://habrahabr.ru/post/224979/
-		http://redkrieg.com/2012/12/11/writing-python-like-a-jedi/
-		http://vimawesome.com/plugin/jedi-vim
-		http://michiganlabs.com/vim-python-ide/
-		http://thibaut.horel.org/blog/using-vim-as-a-python-ide.html
 
 vim
 	[_] Map next/prev buf, etc on [a [b, ]a ]b
@@ -311,11 +164,6 @@ vim
 		https://github.com/scrooloose/syntastic/issues/676
 	2015-06-01 [X] Add <unique> attr to my shortcuts
 	[_] Create toggle for multi-windows with fixed or autoresize
-	[_] !MUST!: https://github.com/svermeulen/vim-easyclip
-		 Possible, it's that plugin which can insert full-line delete on same line
-		 Find plugin which deletes/insertes lines without newline
-		[_] Copy-Paste w/o newline
-			http://www.vim.org/scripts/script.php?script_id=3355
 	[_] Install Ycm back -- but activate only for c/c++
 		http://www.alexeyshmalko.com/2014/youcompleteme-ultimate-autocomplete-plugin-for-vim/
 		http://valloric.github.io/YouCompleteMe/
@@ -326,65 +174,25 @@ vim
 
 	[_] Color !cat
 		 http://www.vim.org/scripts/script.php?script_id=4325
-	[_] Plugins
-		 https://github.com/fholgado/minibufexpl.vim
-		 https://github.com/chrisbra/Colorizer
-		 http://www.vimpusher.com/
-		 kana/vim-arpeggio
-		 https://github.com/vim-scripts/VOoM
-		2015-07-06 [$] https://github.com/h1mesuke/textobj-wiw ::> (use CamelMotion)
-		 https://github.com/h1mesuke/unite-outline/wiki
 	[_] Make-shift-auto
 		 http://www.vim.org/scripts/script.php?script_id=4278
 		 http://tuxion.com/2011/09/30/vim-makeprg.html
-	[_] Read
-		http://www.integralist.co.uk/posts/a-guide-to-getting-started-with-vim/
-		http://www.integralist.co.uk/posts/vim-workflow/
-		http://www.integralist.co.uk/posts/vim-workflow-part-deux/
 
-[_] INFO
-	Book about vimscript
-		http://learnvimscriptthehardway.stevelosh.com/
-	Man (nice)
-		http://bencrowder.net/files/vim-fu/
-	Tip & tricks, Plugins
-	> http://stevelosh.com/blog/2010/09/coming-home-to-vim/
-	Castings
-		http://vimcasts.org/
-		http://lococast.net/
-		http://vimeo.com/user1690209/videos
-		Shows kun-fu with vim
-		http://derekwyatt.org/vim/vim-tutorial-videos/
-	Man & tips (>1500)
-		https://wiki.archlinux.org/index.php/Vim
-		http://vim.wikia.com/wiki/Category:VimTip
-		http://vimawesome.com/
-	Read
-		 http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_%28Part_2%29
-		 http://vim.wikia.com/wiki/Making_a_list_of_numbersj
-
-	How-to with desc and vimrc
-		http://konishchevdmitry.blogspot.com/2008/07/howto-vim.html
 	Integrate shell
 		http://h0rr0rr-drag0n.blogspot.com/2010/11/shell-vim.html
 	[_] C++: http://vim.wikia.com/wiki/Category%3aC%2B%2B
 
-	Plugs
-		For coersion (case convert)
-			https://github.com/tpope/vim-abolish
-		cscope_maps
-		AutoFenc
-		https://github.com/sheerun/vim-polyglot
-		https://github.com/morhetz/gruvbox
 	[_] Run in term without '!'
 		See 'system()' and 'show output in split'
 			http://learnvimscriptthehardway.stevelosh.com/chapters/52.html
 		For asynch run, search plugins already installed!
 
 SEIZE
+	http://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
+	SEE: plugins list
+		https://raw.githubusercontent.com/lambdalisue/vim-castle/7545bcea880a28f85947ee47e4b2e9cfc281f804/home/.vim/vimrc
 >>>> [_] https://github.com/Shougo/shougo-s-github
 >>> [_] https://github.com/rafi/vim-config
->	https://github.com/Shougo/shougo-s-github
 	[_] copy and refine whole 'ftplugin' dir
 	[_] see some secure plugins from 'plugin', 'autoload/unite/sources'
 >	https://github.com/tpope/tpope/blob/c0af0f5ecb6f26d98e668bf1a81617e918952274/.vimrc#L482
@@ -394,11 +202,15 @@ SEIZE
 	http://www.alexeyshmalko.com/2014/youcompleteme-ultimate-autocomplete-plugin-for-vim/
 	http://vimcasts.org/episodes/fugitive-vim---a-complement-to-command-line-git/
 
-	http://www.sontek.net/blog/2011/05/07/turning_vim_into_a_modern_python_ide.html
 	http://nvie.com/posts/how-i-boosted-my-vim/
 	http://statico.github.io/vim.html
 
 >>> http://usevim.com/
+
+	[_] Seize
+		http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
+		http://www.vim.org/scripts/script.php?script_id=4449
+		https://github.com/jackfranklin/dotfiles
 
 	>[_] Search inside useful hacks and tips
 		https://github.com/romainl/dotvim
@@ -418,6 +230,7 @@ SEIZE
 	Libs for vimscript
 		http://www.vim.org/scripts/script.php?script_id=4433
 
+
 PROFILING
 	[_] Slow
 		autocmd на CursorMoved
@@ -433,13 +246,7 @@ PROFILING
 			vim -V12
 			vim -V20/tmp/vimlog
 
-DEBUG
-
-	" Source line and selection in vim
-	: vnoremap <Leader>S y:execute @@<CR>:echo 'Sourced selection.'<CR>
-	: nnoremap <Leader>S ^vg_y:execute @@<CR>:echo 'Sourced line.'<CR>
-
-SEE
-	CHECK [_] MindMap integration?
-		https://processing.org/
-		https://github.com/sophacles/vim-processing
+	Debug
+		" Source line and selection in vim
+		: vnoremap <Leader>S y:execute @@<CR>:echo 'Sourced selection.'<CR>
+		: nnoremap <Leader>S ^vg_y:execute @@<CR>:echo 'Sourced line.'<CR>

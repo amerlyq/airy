@@ -1,5 +1,36 @@
 > INTEGRATION
-: To be able work from alien computers
+
+DEV ranger integration
+	[_] view instead of vim in ranger by default
+		[_] shortcuts to fast toggle vim readonly
+		[_] disable listchars, folds, syntastic on open
+		[_] toggle between vim and view in ranger!
+	[_] Socket server for IPython (try to write for usage with ranger)
+	[_] Vimserver standalone (now can be replaced by neovim?)
+		[_] Toggle vim instances as current main server <S-F2>
+		 See if it possible: ex command, with vim restart, or no way
+			[$] Dump pid in var _V will not work, but you can use file
+		[_] Open files from ranger 'ge'/'L'/F2 or another vim by <leader><F2>
+		[_] Make it possible to press key in vim/ranger over ssh, and open it
+		  in local vimserver by scp://
+		[_] Integrate suspend/resume vim functionality in this server script
+	[_] ADD ranger as NERDTree -- try using NERDTree before it.
+		: open by shortcut ',F' -- fork in another window
+		: setup vimserver and client, and 'ranger server and client'
+		: all opened in ranger files go to vimserver
+		: changing buffers in vim -- moves cursor in ranger (ranger-server)
+		: creating tabs in vim creates them in ranger
+		:	(or one tab for each buffer unique dir?)
+	[_] Integrate with ranger more
+		[_] https://github.com/mikezackles/vranger
+		[_] https://github.com/koreyconway/ranger.vim
+		[_] https://github.com/vim-scripts/vim-ranger
+		[_] https://github.com/Mizuchi/vim-ranger
+		[_] https://github.com/justinmk
+			: ALSO see new vim_file_chooser plugin in /usr/share/doc/ranger
+
+
+DEV env: to be able work from alien computers
 	NOTE
 		Check vim table of colors
 		> http://www.robmeerman.co.uk/unix/256colours

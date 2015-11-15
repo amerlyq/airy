@@ -1,0 +1,27 @@
+Leaders
+	[_] CHG <Space> to operator mode:
+		: Add v:count to <Space> operator -- amount of chars before exit.
+		' A' -- inserts space at line end, then goes to insert regime
+		' I' -- inserts space at line beg, then goes to insert regime
+		' r' -- inserts space, then replace
+		'  ' -- put space
+		' p' -- put (yanked) text with space before it
+		: v:count treated as amount of spaces inserted
+		:= But then I will need some other operator for single-char inserts --
+		: to work with other characters beside spaces.
+
+Syntax
+	Ranger
+	SEE
+	[_] own syntax highlighting
+		http://learnvimscriptthehardway.stevelosh.com/chapters/46.html
+		http://vim.wikia.com/wiki/Search_for_lines_not_containing_pattern_and_other_helpful_searches
+		https://robots.thoughtbot.com/writing-vim-syntax-plugins
+
+Outline
+	[o] Vimoutliner
+		[_] TODO Remove insert mappings
+		2015-06-01 [X] Change mapping to more easily pressed :> use everywhere ',.'
+		[X] Disable autoformating on pasting
+		[_] Test and compare with vimoutliner
+			: https://github.com/vimwiki/vimwiki

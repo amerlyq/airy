@@ -2,6 +2,7 @@
 " http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_%28Part_3%29
 
 " Save, Drop, File
+" ATTENTION be aware, that :update will not create NEW files like touch!
 noremap <Leader>s :<C-U>update<CR>
 " noremap <Leader>S :<C-U>wa<CR>
 noremap <Leader>d :<C-U>q<CR>
