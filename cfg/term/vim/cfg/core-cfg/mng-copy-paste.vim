@@ -4,6 +4,7 @@
 "To comment (instead of C-V): select by S-V, then type : s/^/#
 " list all occurrences of word under cursor in current buffer: [I
 " SEE: http://www.ibm.com/developerworks/library/l-vim-script-2/
+" MUST SEE: https://github.com/svermeulen/vim-easyclip
 
 """ Helpers
 function! CountLinesInRegister(reg, msg)

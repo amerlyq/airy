@@ -1,5 +1,9 @@
-if &term !~# 'xterm' | finish | endif
-" DEPRECATED:
+if &term !~# 'xterm|urxvt' | finish | endif
+" THINK urxvt inserts text by this mode?
+"   SEE more at
+"       https://github.com/ConradIrwin/vim-bracketed-paste/blob/master/plugin/bracketed-paste.vim
+" WARNING need to save/restore &cpo and control its flag to allow "\<Esc>" interpretation
+" THINK DEPRECATED?
 "   I have no use of it, having own '+' mappings and urxvt shortcuts
 "   Also, keymap clashes with <Esc> presses in INSERT when 'notimeout' set
 "   WARNING Don't use 'au InsertEnter * set paste' as <CR> will never indent!

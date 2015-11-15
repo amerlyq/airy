@@ -14,7 +14,7 @@ Neovim
 	[_] Search for async term cmds launcher plugin
 		If not found -- extract from ranger filechooser common code
 
-	[_] Integrate xiki (can be deprecated by neovim :term)
+	[_] Integrate xiki (can be already deprecated by neovim :term)
 		http://xiki.org/
 		http://stackoverflow.com/questions/24465655/configure-vim-to-use-xiki
 	[_] Check my vim-focus on compatability and unnecessary
@@ -25,7 +25,51 @@ Neovim
 		:= In small window it moves рывками
 	[_] Disable textwidth indicator column when screensize smaller then tw
 	[_] FIX [Space]-insert mode after ENH stage
+	[_] Vimserver by rpc for LaTeX and FIX? ranger issue to not open vim in vim
+		https://github.com/neovim/neovim/issues/1531
+	THINK autosave on stop writing? -- can be trouble on pause in insert mode
+	[_] Put arrows to use
+		FIND How to make arrows move as virtual=all, keeping hjkl as always
+		THINK Arrows for lineshift?
+			: http://codingfearlessly.com/2012/08/21/vim-putting-arrows-to-use/
+	TODO DEV vimoutline
+		After $ -- use complete bash syntax until end of line
+		SEE multi syntax regions for this -- or include all syntax into region
+	[_] DEV insert single char instead of my Limio
+		SEE $ vimb gh vim insert (seeen until 5th page)
+		: http://vim.wikia.com/wiki/Insert_a_single_character
+		: http://www.vim.org/scripts/script.php?script_id=2810
+		: https://github.com/syngan/vim-operator-inserttext
+		: https://github.com/aur-archive/vim-insertchar
+		: https://github.com/mwgkgk/vim-operator-insert
+	[_] THINK about pairs
+		https://github.com/jiangmiao/auto-pairs
+		https://github.com/Townk/vim-autoclose
+		https://github.com/Raimondi/delimitMate
+		https://github.com/seletskiy/vim-autosurround
+	[_] DEV Consider switching to relative number in operator pending mode
+		https://github.com/jeffkreeftmeijer/vim-numbertoggle
+		http://www.vim.org/scripts/script.php?script_id=4212
+		http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/
+		http://vim.1045645.n5.nabble.com/Changing-line-numbers-from-normal-to-relative-td5723150.html
+		http://www.vim.org/scripts/script.php?script_id=4461
+		https://www.reddit.com/r/vim/comments/1hocx4/better_lines_numbers_for_vim/
+	SEE
+		https://github.com/deris/vim-operator-insert
+		https://github.com/seletskiy/urxvt-vim-insert
+		https://github.com/kana/vim-smartchr
+		https://github.com/osyo-manga/vim-operator-exec_command
+		https://github.com/thinca/vim-quickrun
+		https://github.com/osyo-manga/vim-jplus
+	2015-11-15 [X] Test in conjunction with : vim-operator-surround
+		: https://github.com/osyo-manga/vim-textobj-multiblock
+		: https://github.com/thinca/vim-textobj-between
+		: https://github.com/rhysd/vim-textobj-anyblock
 
+INTEGRATE
+	http://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
+	SEE: plugins list
+		https://raw.githubusercontent.com/lambdalisue/vim-castle/7545bcea880a28f85947ee47e4b2e9cfc281f804/home/.vim/vimrc
 
 SMALL
 	2015-06-08 [X] for commenter -- add prefix: '!' in Xresources and ':' in votl
@@ -45,13 +89,7 @@ SMALL
 	[_] Definition lookup: ag+ctags
 		https://github.com/gorkunov/smartgf.vim
 	[_] SEE http://vimcasts.org/episodes/the-file-explorer/
-	<SEIZE
-	>>[_] Test in conjunction with : vim-operator-surround
-		https://github.com/osyo-manga/vim-textobj-multiblock
-		https://github.com/thinca/vim-textobj-between
-		https://github.com/rhysd/vim-textobj-anyblock
-		> https://github.com/Mizuchi/vim-ranger
-		: ALSO see new vim_file_chooser plugin in /usr/share/doc/ranger
+
 
 BUG:
 	>[_] Can't enable perl check in syntastic
@@ -105,6 +143,10 @@ SEE & CHECK
 	[_] Check spacemacs
 		https://github.com/syl20bnr/spacemacs
 	[_] TRY: https://github.com/junegunn/fzf
+	[_] R-lang for vim
+		http://www.lepem.ufc.br/jaa/r-plugin.html
+	[_] Search by name and insert Unicode
+		https://github.com/chrisbra/unicode.vim
 
 DEV ranger integration
 	[_] view instead of vim in ranger by default
@@ -132,6 +174,8 @@ DEV ranger integration
 		[_] https://github.com/koreyconway/ranger.vim
 		[_] https://github.com/vim-scripts/vim-ranger
 		[_] https://github.com/Mizuchi/vim-ranger
+		[_] https://github.com/justinmk
+			: ALSO see new vim_file_chooser plugin in /usr/share/doc/ranger
 
 
 vim:

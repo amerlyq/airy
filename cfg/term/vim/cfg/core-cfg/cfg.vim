@@ -26,15 +26,6 @@ set wrap breakindent
 noremap <unique> <Leader>tW :<C-u>setl wrap! breakindent!<CR>
 
 
-"{{{1 Clipboard ============================
-" TRY use copy-always -- and keep yank-history by copyq
-if has('unnamedplus')
-  set clipboard& clipboard+=unnamedplus
-else
-  set clipboard& clipboard+=unnamed
-endif
-
-
 "{{{1 Completion ============================
 set matchpairs+=<:>,=:;     " Match pairs (NOTE ;/= is useful for C/Java)
 set infercase       " ignore case on insert completion.

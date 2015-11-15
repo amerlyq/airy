@@ -1,7 +1,9 @@
 "{{{1 Neo ============================
+" Async clang code completion.
 " Integration with neocomplete: for stdlib++, boost, etc (works on Windows)
 " http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
 NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
+
 NeoBundleLazy 'Shougo/neocomplete.vim', {
     \ 'autoload' : { 'insert': 1 },
     \ 'depends' : [ 'Shougo/context_filetype.vim' ],

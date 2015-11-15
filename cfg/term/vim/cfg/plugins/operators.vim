@@ -2,6 +2,7 @@
 
 "{{{1 Motions ============================
 " Two-letters find on whole screen scope
+" THINK as augment: https://github.com/rhysd/clever-f.vim
 NeoBundle 'justinmk/vim-sneak'
 " New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
 NeoBundle 'bkad/CamelCaseMotion'
@@ -24,20 +25,31 @@ NeoBundle 'tommcdo/vim-exchange'
 " Mappings to add empty lines or move/exchange/duplicate/fetch lines of text
 " ALT NeoBundle 'tpope/vim-unimpaired'
 " NeoBundle 'vim-scripts/LineJuggler'
+NeoBundle 'kana/vim-niceblock'        " I,A,gI for all VISUAL like in V-BLOCK
 
 "{{{1 Textobj ============================
-NeoBundle 'kana/vim-operator-user'              " = Dependency: vim-clang-format
-NeoBundle 'kana/vim-textobj-user'               " = Dependency: vim-textobj-*
-NeoBundle 'kana/vim-textobj-entire'             " ..[ai]e -- instead ggVG
-NeoBundle 'kana/vim-textobj-fold'               " ..[ai]z
-NeoBundle 'kana/vim-textobj-function'           " ..[ai][fF] (C/Java/Vimscript)
-NeoBundle 'kana/vim-textobj-indent'             " ..[ai][iI]
-NeoBundle 'kana/vim-textobj-line'               " ..[ai]l
-NeoBundle 'kana/vim-textobj-syntax'             " ..[ai]y
-NeoBundle 'coderifous/textobj-word-column.vim'  " ..[ai][cC]<[IA]>
-NeoBundle 'rhysd/vim-operator-surround'         "q..[ai]..
-NeoBundle 'beloglazov/vim-textobj-quotes'       " ..[ai]q -- any nearest quotes (OR: ..q)
-NeoBundle 'saihoooooooo/vim-textobj-space'      " ..[ai]Q -- space between words, etc
-NeoBundle 'vimtaku/vim-textobj-sigil'           " ..[ai]G
-" ALT: 'sgur/vim-textobj-parameter', 'PeterRincker/vim-argumentative'
-NeoBundle 'AndrewRadev/sideways.vim'            " ..[ai], and [<>], -- shift
+NeoBundle 'kana/vim-operator-user'         " = Dependency: vim-clang-format
+NeoBundle 'kana/vim-textobj-user'          " = Dependency: vim-textobj-*
+
+NeoBundle 'kana/vim-textobj-entire'        " ..[ai]G -- instead ggVG
+NeoBundle 'kana/vim-textobj-fold'          " ..[ai]z
+NeoBundle 'kana/vim-textobj-function'      " ..[ai][fF] (C/Java/Vimscript)
+NeoBundle 'kana/vim-textobj-indent'        " ..[ai][iI] -- python-like indented
+NeoBundle 'kana/vim-textobj-line'          " ..[ai]l -- line content only
+NeoBundle 'kana/vim-textobj-syntax'        " ..[ai]h -- highlighted syntax region
+NeoBundle 'coderifous/textobj-word-column.vim'  " ..[ai][cC] -- «smart» column
+
+"" NOTE pairs by priority: ({["'<`
+" ALT (more old and in jp) 'osyo-manga/vim-textobj-multiblock'
+"  Add buffer local: let b:textobj_anyblock_buffer_local_blocks = [ ':', '*' ]
+NeoBundle 'rhysd/vim-textobj-anyblock'     " ..[ai]b -- content of closest pair
+NeoBundle 'thinca/vim-textobj-between'     " ..[ai]f..- between found symbols
+NeoBundle 'rhysd/vim-operator-surround'    "q..[ai]..-- boundaries of motion
+
+NeoBundle 'beloglazov/vim-textobj-quotes'  " ..[ai]q -- any nearest quotes (OR: ..q)
+NeoBundle 'saihoooooooo/vim-textobj-space' " ..[ai]s -- space between words, etc
+NeoBundle 'vimtaku/vim-textobj-sigil'      " ..[ai]g -- for bash/perl $name{...}
+" ALT 'sgur/vim-textobj-parameter', 'PeterRincker/vim-argumentative'
+NeoBundle 'AndrewRadev/sideways.vim'       " ..[ai], and [<>], -- shift
+" ALT 'airblade/vim-gitgutter' (git only, but much faster file save)
+NeoBundle 'mhinz/vim-signify'              " ..[ai]S -- inside vcs area

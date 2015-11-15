@@ -13,7 +13,7 @@ let b:undo_ftplugin .= 'setl modeline<'
 
 " set indent.
 setlocal shiftwidth=2 tabstop=2 softtabstop=2
-setlocal fdm=marker fdl=1
+setlocal foldmethod=marker foldlevel=2
 setlocal iskeyword+=:,#
 
 " For gf.

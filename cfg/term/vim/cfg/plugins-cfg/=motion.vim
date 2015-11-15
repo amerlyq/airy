@@ -1,6 +1,6 @@
 " vim:fdm=marker:fdl=1
 
-if neobundle#tap('vim-sneak')  "{{{1
+if neobundle#tap('vim-sneak')  "{{{
 " USE: Streak-mode features:
 "  - automatically jumps to the first match
 "    - press <Space> or <Esc> to escape streak-mode
@@ -25,6 +25,7 @@ if neobundle#tap('vim-sneak')  "{{{1
   let g:sneak#streak = 1        " With multiple suggestions use labels to jump
   let g:sneak#use_ic_scs = 1    " Respect 'ignorecase' and 'smartcase'
   let g:sneak#textobject_z = 0  " No default z-operator (I use q-operator)
+  " }}}
 
   " nmap <unique> <Space> <Plug>(SneakStreak)
 
@@ -37,6 +38,7 @@ if neobundle#tap('vim-sneak')  "{{{1
   nmap <unique> S <Plug>Sneak_S
   xmap <unique> S <Plug>Sneak_S
   omap <unique> S <Plug>Sneak_S
+  " }}}
 
 
   " Moving: next/prev -- explicit repeat {{{2
@@ -49,12 +51,14 @@ if neobundle#tap('vim-sneak')  "{{{1
   xmap <unique> <BS>    <Plug>SneakPrevious
   omap <unique> <BS>    <Plug>SneakPrevious
   " OLD:  ]f -> ;  and  [f -> ,
+  " }}}
 
   " Standart: 1-character enhanced 'f/t' {{{2
   let g:sneak#f_reset = 0
   let g:sneak#t_reset = 0
 
   " normal, visual, operator-pending
+  " ALT clever-f ?
   nmap <unique> f <Plug>Sneak_f
   xmap <unique> f <Plug>Sneak_f
   omap <unique> f <Plug>Sneak_f
@@ -70,10 +74,34 @@ if neobundle#tap('vim-sneak')  "{{{1
   nmap <unique> T <Plug>Sneak_T
   xmap <unique> T <Plug>Sneak_T
   omap <unique> T <Plug>Sneak_T
-endif
+  " }}}
+
+  call neobundle#untap()
+endif "}}}
 
 
-if neobundle#tap('vim-operator-surround')  "{{{1
+if neobundle#tap('vim-textobj-entire')  "{{{
+  let g:textobj_entire_no_default_key_mappings = 1
+  xmap <silent><unique> aG <Plug>(textobj-entire-a)
+  omap <silent><unique> aG <Plug>(textobj-entire-a)
+  xmap <silent><unique> iG <Plug>(textobj-entire-i)
+  omap <silent><unique> iG <Plug>(textobj-entire-i)
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('vim-textobj-syntax')  "{{{
+  let g:textobj_syntax_no_default_key_mappings = 1
+  " ATTENTION currently textobj-syntax-a acts the same as textobj-syntax-i
+  xmap <silent><unique> ah <Plug>(textobj-syntax-a)
+  omap <silent><unique> ah <Plug>(textobj-syntax-a)
+  xmap <silent><unique> ih <Plug>(textobj-syntax-i)
+  omap <silent><unique> ih <Plug>(textobj-syntax-i)
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('vim-operator-surround')  "{{{
   nmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
   xmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
   " TRY Insert around one character only
@@ -84,11 +112,59 @@ if neobundle#tap('vim-operator-surround')  "{{{1
 
   nmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
   xmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
-"" Chaining of operator+textobj
-"   nmap <silent>srr <Plug>(operator-surround-replace)<Plug>(textobj-multiblock-a)
-endif
 
-if neobundle#tap('sideways.vim')  "{{{1
+  " Current enclosing block of ({["'<`
+  nmap <silent><unique> [Quote]b <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
+  nmap <silent><unique> [Quote]B <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
+  " Surrounding symbols for current cursor position (like 'f`')
+  nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
+  nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
+  " Explicit shortcuts
+  nmap <silent><unique> [Quote]Q <Plug>"operator-surround-delete"<Plug>(textobj-anyblock-a)"
+  " for c in [['('], ['0', '('], ['{'], ['9', '{'], ['['],
+  " \ ['q', '"'], ['"'], ["'"], ['<'], ['.', '<'], ['`']]
+  "   exe printf("nmap <silent><unique> [Quote]%s <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)%s",
+  "       \ string(c[0]), string(1<len(c)? c[1] : c))
+  " endfor
+  nmap <silent><unique> [Quote]( <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)(
+  nmap <silent><unique> [Quote]{ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a){
+  nmap <silent><unique> [Quote][ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)[
+  nmap <silent><unique> [Quote]' <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
+  nmap <silent><unique> [Quote]< <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)<
+  nmap <silent><unique> [Quote]` <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)`
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap("vim-textobj-quotes")  "{{{
+  " Outer quoted is the most useful:
+  omap <silent><unique> q aq
+  call neobundle#untap()
+endif "}}}
+
+
+" TODO: maybe space/sigil change mappings to reverse -- G/Q?
+if neobundle#tap('vim-textobj-space')  "{{{
+  let g:textobj_space_no_default_key_mappings = 1
+  xmap <silent><unique> as <Plug>(textobj-space-a)
+  omap <silent><unique> as <Plug>(textobj-space-a)
+  xmap <silent><unique> is <Plug>(textobj-space-i)
+  omap <silent><unique> is <Plug>(textobj-space-i)
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('vim-textobj-sigil')  "{{{
+  let g:textobj_sigil_no_default_key_mappings = 1
+  xmap <silent><unique> ag <Plug>(textobj-sigil-a)
+  omap <silent><unique> ag <Plug>(textobj-sigil-a)
+  xmap <silent><unique> ig <Plug>(textobj-sigil-i)
+  omap <silent><unique> ig <Plug>(textobj-sigil-i)
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('sideways.vim')  "{{{
   xmap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
   omap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
 
@@ -101,35 +177,11 @@ if neobundle#tap('sideways.vim')  "{{{1
   " NOTE: overrides 'ga -- print ascii for letter', do 'unmap ga' on demand
   nnoremap <silent><unique> ga :SidewaysLeft<CR>
   nnoremap <silent><unique> gA :SidewaysRight<CR>
-endif
-
-if neobundle#tap('vim-textobj-quotes')  "{{{1
-  " Outer quoted is the most useful:
-  " xmap <silent><unique> q iq
-  omap <silent><unique> q aq
-endif
-
-" TODO: maybe space/sigil change mappings to reverse -- G/Q?
-if neobundle#tap('vim-textobj-space')  "{{{1
-  let g:textobj_space_no_default_key_mappings = 1
-  xmap <silent><unique> aQ <Plug>(textobj-space-a)
-  omap <silent><unique> aQ <Plug>(textobj-space-a)
-
-  xmap <silent><unique> iQ <Plug>(textobj-space-i)
-  omap <silent><unique> iQ <Plug>(textobj-space-i)
-endif
-
-if neobundle#tap('vim-textobj-sigil')  "{{{1
-  let g:textobj_sigil_no_default_key_mappings = 1
-  xmap <silent><unique> ag <Plug>(textobj-sigil-a)
-  omap <silent><unique> ag <Plug>(textobj-sigil-a)
-
-  xmap <silent><unique> ig <Plug>(textobj-sigil-i)
-  omap <silent><unique> ig <Plug>(textobj-sigil-i)
-endif
+  call neobundle#untap()
+endif "}}}
 
 
-if neobundle#tap('vim-signify')  "{{{1
+if neobundle#tap('vim-signify')  "{{{
   let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
   let g:signify_sign_change = '~'
   let g:signify_sign_delete = '-'
@@ -140,9 +192,9 @@ if neobundle#tap('vim-signify')  "{{{1
   " nmap <unique> ]c <Plug>(signify-next-hunk)
   " nmap <unique> [c <Plug>(signify-prev-hunk)
 
-  omap <silent><unique> iG <Plug>(signify-motion-inner-pending)
-  xmap <silent><unique> iG <Plug>(signify-motion-inner-visual)
-
-  omap <silent><unique> aG <Plug>(signify-motion-outer-pending)
-  xmap <silent><unique> aG <Plug>(signify-motion-outer-visual)
-endif
+  xmap <silent><unique> aS <Plug>(signify-motion-outer-visual)
+  omap <silent><unique> aS <Plug>(signify-motion-outer-pending)
+  xmap <silent><unique> iS <Plug>(signify-motion-inner-visual)
+  omap <silent><unique> iS <Plug>(signify-motion-inner-pending)
+  call neobundle#untap()
+endif "}}}
