@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+# 1 - fname
+# 2 - beg  [-][<HH>:]<MM>:<SS>[.<m>...] OR [-]<S>+[.<m>...]
+# 3 - end
+
+src=$(readlink -m "$1")
+dst="${src%/*}/fl-clip"
+mkdir -p "$dst"
+
+ffmpeg -i "$1" \
+    -ss "${2:-00:00}" -to "${3:--00:00}" -c copy \
+    "$dst/${1##*/}"

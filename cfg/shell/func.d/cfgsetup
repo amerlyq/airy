@@ -55,7 +55,12 @@ fi
 
 ### Go to current script's directory
 cd $(dirname $(readlink -m ${0}))
-[[ ! -f "$PWD/run" ]] || link "$PWD/run" "$CURR_CACHE/bin/r.${PWD##*/}"
+
+### Populate all run, run.pr1 scripts into mycache/bin
+for path in "$PWD/run"*; do
+  [[ -f "$path" ]] || continue
+  link "$path" "$CURR_CACHE/bin/r.${PWD##*/}${path#$PWD/run}"
+done
 # =============================== ALT ==================================
 
 ## Subdirectories:

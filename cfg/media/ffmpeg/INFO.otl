@@ -1,0 +1,18 @@
+CLI video editor / cutting tool
+	http://mltframework.org/twiki/bin/view/MLT/MltMelt
+
+Cut flv
+: SEE http://superuser.com/questions/138331/using-ffmpeg-to-cut-up-video
+	: -ss/-to HH:MM:SS.xxx OR -t for duration OR -vframes 1800
+	ffmpeg -i video.flv -ss 00:00:00 -t 00:15:00 -vcodec copy -acodec copy video1.flv
+	ffmpeg -i video.flv -ss 00:00:00 -t 00:15:00 -c copy video1.flv
+	< Fast and accurate -- use two consequent seeks
+	ffmpeg -ss 00:08:00 -i Video.mp4 -ss 00:01:00 -t 00:01:00 -c copy VideoClip.mp4
+	: I found that -ss combined with -c copy resulted in a half-second chop at the start.
+	: Also, instead of copying video, you may need to re-encode it to fix
+	: choppy and out of sync
+
+Extract audio
+	ffmpeg -i VIDEOFILE -acodec libmp3lame -metadata TITLE="Name of Song" OUTPUTFILE.mp3
+	ffmpeg -i video.avi extracted_audio.mp3
+	mplayer -dumpaudio video.avi -dumpfile extracted_audio.mp3

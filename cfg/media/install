@@ -2,9 +2,6 @@
 source ~/.shell/func.d/packages
 
 #| cups-pdf  | virtual pdf printer
-#| ffmpeg    | http://ffmpeg.org/download.html#build-linux
-#|           | ffmpeg -i video.avi extracted_audio.mp3
-#|___________| mplayer -dumpaudio video.avi -dumpfile extracted_audio.mp3
 
 # mutagen | convert mp3 tags to utf8
 # find ./ -iname "*.mp3" -print0 | xargs -0 mid3iconv -eCP1251 --remove-v1 -d
@@ -14,13 +11,10 @@ pkg_inst "graphviz imagemagick cups-pdf"
 # libmagick++-dev
 
 if distro arch; then
-    pkg_inst ffmpeg
     aur_inst 'fbless'
     aur_inst pandoc-bin
 
 elif distro ubuntu; then
-    ppa_add 'ppa:mc3man/trusty-media'
-    pkg_inst ffmpeg pandoc
     git_inst 'matimatik/fbless'
 fi
 
