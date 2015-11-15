@@ -1,5 +1,13 @@
 " vim:fdm=marker:fdl=1
 
+if neobundle#tap('matchit.zip') "{{{
+  function! neobundle#hooks.on_post_source(bundle)
+    silent! execute 'doautocmd Filetype' &filetype
+  endfunction
+
+  call neobundle#untap()
+endif "}}}
+
 if neobundle#tap('vim-sneak')  "{{{
 " USE: Streak-mode features:
 "  - automatically jumps to the first match

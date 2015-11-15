@@ -6,12 +6,31 @@
 " eagletmt/neco-ghc
 " dag/vim2hs
 " Twinside/vim-haskellConceal
+" repository = 'itchyny/vim-haskell-indent'
+
+" Php
+" repository = 'shawncplus/phpcomplete.vim'
+
+"" Java
+" repository = 'artur-shaik/vim-javacomplete2'
+
+"" Javascript
+" repository = 'mxw/vim-jsx'
+" repository = 'marijnh/tern_for_vim', build = 'npm install'
+" repository = 'jiangmiao/simple-javascript-indenter'
+" repository = 'jelera/vim-javascript-syntax'
 
 "" Scala
 " derekwyatt/vim-scala
 
 "" Ruby
 " NeoBundle 'depuracao/vim-rdoc'
+
+"" Rust
+" repository = 'rust-lang/rust.vim'
+" repository = 'rhysd/rust-doc.vim'
+" repository = 'phildawes/racer'
+
 
 " Colorize html-codes
 " NeoBundleLazy 'lilydjwg/colorizer'

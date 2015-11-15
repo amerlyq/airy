@@ -9,3 +9,12 @@ NeoBundle 'szw/vim-dict'
 " Keithbsmiley/investigate.vim
 " powerman/vim-plugin-viewdoc
 NeoBundle 'KabbAmine/zeavim.vim', { 'disabled' : !has('unix') }
+
+" Multiwindow regime for 'git commit [--amend]'
+NeoBundleLazy 'rhysd/committia.vim', { 'autoload': {
+    \ 'explorer': 'COMMIT_EDITMSG' }}
+
+" THINK
+" 'lambdalisue/vim-gista', { 'autoload': {
+"   \ commands = 'Gista', mappings = '<Plug>', unite_sources = 'gista' }}
+" repository = 'lambdalisue/vim-gita'

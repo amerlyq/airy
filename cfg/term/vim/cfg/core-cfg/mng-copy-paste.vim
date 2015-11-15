@@ -15,6 +15,7 @@ function! CountLinesInRegister(reg, msg)
 endfunction
 
 function! GetVisualSelection(...)
+  " THINK DEV RFC add:  ():range and use a:firstline, etc -- to exec f once?
   " Why is this not a built-in Vim script function?!
   let [lnum1, col1] = getpos("'<")[1:2]
   let [lnum2, col2] = getpos("'>")[1:2]

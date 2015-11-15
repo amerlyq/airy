@@ -25,3 +25,13 @@ Outline
 		[X] Disable autoformating on pasting
 		[_] Test and compare with vimoutliner
 			: https://github.com/vimwiki/vimwiki
+
+Python
+	Module in file
+		SEE http://www.terminally-incoherent.com/blog/2013/05/06/vriting-vim-plugins-in-python/
+		: function! LoadYAML(path)
+		: " import vim
+		: " vim.command("let sInVim = %s".format(range(10)))
+		: if has('python3')| return |endif
+		: py3file markdown2html.py
+		: endfunc

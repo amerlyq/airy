@@ -1,49 +1,50 @@
-let s:leader = g:mapleader | let g:mapleader = "\\"  "{{{
+" USE let &commentstring=' "%s'
 
-if neobundle#tap('DrawIt')
-  map <unique> <Leader>DI <Plug>DrawItStart
-  map <unique> <Leader>DS <Plug>DrawItStop
-  map <unique> <Leader>Dsw <Plug>SaveWinPosn
-  map <unique> <Leader>Drw <Plug>RestoreWinPosn
-endif
+if neobundle#tap('DrawIt') "{{{
+  map <unique> [Frame]DI  <Plug>DrawItStart
+  map <unique> [Frame]DS  <Plug>DrawItStop
+  map <unique> [Frame]Dsw <Plug>SaveWinPosn
+  map <unique> [Frame]Drw <Plug>RestoreWinPosn
+  call neobundle#untap()
+endif "}}}
 
-" Change working directory to that of the current file
-noremap <unique> <silent> <Leader>cw :lcd %:p:h \| pwd<CR>
 
-if neobundle#tap('vim-rooter')
+if neobundle#tap('vim-rooter') "{{{
   let g:rooter_manual_only = 1
   let g:rooter_disable_map = 1
-  nnoremap <unique> <silent> <Leader>cd :Rooter<CR>
-endif
+  " Change working directory to that of the current file
+  nnoremap <unique><silent> [Frame]cw :lcd %:p:h \| pwd<CR>
+  nnoremap <unique><silent> [Frame]cd :Rooter<CR>
+  call neobundle#untap()
+endif "}}}
 
 
-if neobundle#tap('linediff.vim')
-  nnoremap <unique> <Leader>L  :LinediffReset<CR>
-  vnoremap <unique> <Leader>L  :Linediff<CR>
-endif
+if neobundle#tap('linediff.vim') "{{{
+  nnoremap <unique> [Frame]L  :LinediffReset<CR>
+  vnoremap <unique> [Frame]L  :Linediff<CR>
+  call neobundle#untap()
+endif "}}}
 
-if neobundle#tap('zeavim.vim')  " {{{1
+
+if neobundle#tap('zeavim.vim') "{{{
   let g:zv_disable_mapping = 1
-  nmap <unique> <silent> <Leader>z <Plug>Zeavim
-  vmap <unique> <silent> <Leader>z <Plug>ZVVisSelection
-  nmap <unique> <silent> <Leader>Z <Plug>ZVKeyDocset
-  nmap <unique> <silent> <Leader><Leader>z <Plug>ZVKeyword
+  nmap <unique> <silent> [Frame]z  <Plug>Zeavim
+  vmap <unique> <silent> [Frame]z  <Plug>ZVVisSelection
+  nmap <unique> <silent> [Frame]Zd <Plug>ZVKeyDocset
+  nmap <unique> <silent> [Frame]Zk <Plug>ZVKeyword
   " let g:zv_file_types = {'python' : 'python 3'}
   " let g:zv_docsets_dir = has('unix') ?
   "             \ '~/Important!/docsets_Zeal/' :
   "             \ 'Z:/myUser/Important!/docsets_Zeal/'
-endif
-
-let mapleader = s:leader  " }}}
-
+  call neobundle#untap()
+endif "}}}
 
 
-if neobundle#tap('NrrwRgn')  " NrrwRgn: {{{1
+if neobundle#tap('NrrwRgn') "{{{
 ":: Focus on content in split window
   " Create two region buffers and use :diffthis --> instead of LineDiff
   " Multiselection in new buffer! :v/^#/NRP | NRM
   " Tip -- completely delete blocks you don't want to change.
-
   " let g:nrrw_rgn_nohl = 1
   " split buffer in same window
   let g:nrrw_topbot_leftright = 'botright'
@@ -54,28 +55,27 @@ if neobundle#tap('NrrwRgn')  " NrrwRgn: {{{1
   nmap <unique> <Leader>N <Plug>NrrwrgnBangDo
   xmap <unique> <Leader>N <Plug>NrrwrgnBangDo
   omap <unique> <Leader>N <Plug>NrrwrgnBangDo
-endif
+  call neobundle#untap()
+endif "}}}
 
 
-if neobundle#tap('vim-altr')  " vim-altr: {{{1
+if neobundle#tap('vim-altr') "{{{
 ":: Toggle between alternative files (.h, .cpp, ...)
   nmap <unique> ]f  <Plug>(altr-forward)
   nmap <unique> [f  <Plug>(altr-back)
+  " ALT map <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
   command! A  call altr#forward()
   " Additional rules
-  call altr#define('%/src/%.c', '%/inc/%.h')
-  " ALT: map <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-endif
+  fun! neobundle#hooks.on_source(bundle)
+    call altr#define('%/src/%.c', '%/inc/%.h')
+  endf
+  call neobundle#untap()
+endif "}}}
 
-if neobundle#tap('vim-smooth-scroll')  " {{{1
-  noremap <silent> <unique> <C-u> :<C-u>call smooth_scroll#up(&scroll, 0, 2)<CR>
-  noremap <silent> <unique> <C-d> :<C-u>call smooth_scroll#down(&scroll, 0, 2)<CR>
-  noremap <silent> <unique> <C-b> :<C-u>call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-  noremap <silent> <unique> <C-f> :<C-u>call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-endif
 
-if neobundle#tap('vim-signature')  " {{{1
+if neobundle#tap('vim-signature') "{{{
   let g:SignatureIncludeMarkers = '!@#$%^&*()[]".'
   let g:SignaturePurgeConfirmation = 1
   let g:SignaturePrioritizeMarks = 0
-endif
+  call neobundle#untap()
+endif "}}}

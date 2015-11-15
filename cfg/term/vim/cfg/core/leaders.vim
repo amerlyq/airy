@@ -30,3 +30,9 @@ nmap <silent><unique> <Space> [Space]
 xmap <silent><unique> <Space> [Space]
 nnoremap <silent><unique> [Space] <Nop>
 xnoremap <silent><unique> [Space] <Nop>
+
+" For rarely used plugins/frameworks
+nmap <silent><unique> \ [Frame]
+xmap <silent><unique> \ [Frame]
+nnoremap <silent><unique> [Frame] <Nop>
+xnoremap <silent><unique> [Frame] <Nop>

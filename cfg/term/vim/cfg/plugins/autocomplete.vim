@@ -4,6 +4,11 @@
 " http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
 NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
 
+" THINK what can be useful to add
+" repository = 'Shougo/neoinclude.vim'
+" repository = 'Shougo/neco-vim'
+" repository = 'Shougo/neco-syntax'
+
 NeoBundleLazy 'Shougo/neocomplete.vim', {
     \ 'autoload' : { 'insert': 1 },
     \ 'depends' : [ 'Shougo/context_filetype.vim' ],

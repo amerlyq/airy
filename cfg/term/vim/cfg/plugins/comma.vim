@@ -97,6 +97,7 @@ NeoBundleLazy 'airblade/vim-rooter', {'autoload': {'commands': 'Rooter'}}
 " ======================================
 
 " Undo tree
+" ALT https://github.com/sjl/gundo.vim/
 NeoBundleLazy 'mbbill/undotree', {
     \ 'autoload' : { 'commands' : 'UndotreeToggle' } }
 NeoBundleLazy 'godlygeek/tabular', {
@@ -107,10 +108,6 @@ NeoBundleLazy 'majutsushi/tagbar', {
 
 
 "{{{1 Std vim/macros/ =====================
-" Bring back opened window instead of dull msg about swapfile
-"NeoBundle 'svintus/vim-editexisting'
-"ERROR: conflicting
-NeoBundle 'matchit.zip'
 
 " Alt: 'bb:abudden/taghighlight' "(small and fast) from bitbucket
 " NOTE: easytags can make CursorMove very slow

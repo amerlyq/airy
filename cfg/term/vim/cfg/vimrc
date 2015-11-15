@@ -8,11 +8,12 @@ endf
 com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
 call s:cfg('core/detect.vim')
-call s:cfg('core/encoding.vim')
+call s:cfg('core/encoding.vim')  " TODO move below plugins, must overwrite
 call s:cfg('core/env.vim')
 call s:cfg('core/options.vim')
 call s:cfg('core/init.vim')
 call s:cfg('core/leaders.vim')
+
 
 fun! SourcePlugins()
   let g:mapleader="\\"
@@ -27,18 +28,21 @@ fun! SourcePlugins()
   call s:cfg('plugins/search.vim')
   call s:cfg('plugins/operators.vim')
   call s:cfg('plugins/decoration.vim')
-  " runtime! $VIMHOME/cfg/plugins-cfg/*.vim
+  " TEMP call s:cfg('plugins/fun.vim')
+endf
+
+fun! SourcePluginsCfg()
+  let g:mapleader=","
+  call s:cfg('plugins-cfg/*.vim')
 endf
 
 call s:cfg('neobundle.vim')
+filetype plugin indent on  " Required!
 syntax enable
 
-let g:mapleader=","
-call s:cfg('plugins-cfg/*.vim')
 
 let g:mapleader=","
 call s:cfg('core-cfg/*.vim')
-" call s:source_rc('encoding.rc.vim')
 " call s:source_rc('edit.rc.vim')
 " call s:source_rc('view.rc.vim')
 " call s:source_rc('filetype.rc.vim')
@@ -60,4 +64,3 @@ augroup END
 
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
 set exrc secure modeline  " also parse 'vim:...' cmds from comments
-" SEE loadorder of *.vim by :scriptnames

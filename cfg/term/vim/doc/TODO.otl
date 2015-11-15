@@ -10,13 +10,22 @@ Neovim
 			: Seems like I need to try last AUR build, but build it on
 			:	android is troublesome...
 	2015-11-10 [X] Check neovim (for neovim-git better use pacaur instead of yaourt)
+	[_] ADD guards to each cfg file: g:did_load_<sname> = 1
+		:= this will allow s:cfg('dir/file') and then s:cfg('dir/*')
+		:	so you can change loading order for some files, but rest on regex
+		:= also will eliminate <unique> mapping problem, but not reload them
+		: Checks and installs all not installed bundles -- only on :so $MYVIMRC
+		: WARNING :so don't work gracely with <unique> mappings...at all.
+		:   Maybe, clear all mapping before reloading? But then plugins will broke
 	[_] https://github.com/neovim/neovim/wiki/Related-projects
 	[_] Search for async term cmds launcher plugin
 		If not found -- extract from ranger filechooser common code
 
-	[_] Integrate xiki (can be already deprecated by neovim :term)
-		http://xiki.org/
-		http://stackoverflow.com/questions/24465655/configure-vim-to-use-xiki
+	[_] THINK For neobundle use generating yml -> plugins.vim
+		Generate plugins.vim by python/awk inside ./setup from plugins.yml
+		:= You can use yml back-references for identical configs!
+		: http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
+
 	[_] Check my vim-focus on compatability and unnecessary
 	[_] BUG vim -- press 'v$' -- will select end of line also! (in .otl at least)
 		:= Then deleting selection will cause joining lines!
@@ -53,6 +62,8 @@ SMALL
 	2015-11-13 [X] BUG: after saving, can't use n/N -- bad regex of trailing space!
 		2015-11-13 [X] Replace TrailingSpaceShow by high-contrast airline highlight
 	[_] When opening file, which opened in another vim (pid exists), focus its window instead.
+		:SEE Bring back opened window instead of dull msg about swapfile
+		:		NeoBundle 'svintus/vim-editexisting'
 	2015-11-15 [X] TODO: When updating vim plugins, how to run it in non-interactive?
 	[_] SEE Tips vim + git + fugitive
 		http://mislav.uniqpath.com/2014/02/hidden-documentation/
@@ -116,6 +127,9 @@ BUG:
 
 
 SEE & CHECK
+	[_] Integrate xiki (can be already deprecated by neovim :term)
+		http://xiki.org/
+		http://stackoverflow.com/questions/24465655/configure-vim-to-use-xiki
 	[_] Check spacemacs
 		https://github.com/syl20bnr/spacemacs
 	[_] TRY: https://github.com/junegunn/fzf
@@ -132,8 +146,6 @@ SEE & CHECK
 
 vim:
 	2015-11-15 [$] move cfb/bundle -> plugins, cfg/snip-* -> ext, plugins.vim -> neobundle.vim
-	[_] THINK For neobundle use generating yml -> plugins.vim
-		http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
 	[_] READ vim vs PyCharm3 in Idea
 		http://andrewbrookins.com/tech/one-year-later-an-epic-review-of-pycharm-2-7-from-a-vim-users-perspective/
 	[_] ADD vim-hooks -- custom scripts on save and other events in vim
@@ -245,8 +257,9 @@ PROFILING
 		Very verbose with timings
 			vim -V12
 			vim -V20/tmp/vimlog
-
 	Debug
-		" Source line and selection in vim
+		Loadorder of *.vim by
+			:scriptnames
+		Source line and selection in vim
 		: vnoremap <Leader>S y:execute @@<CR>:echo 'Sourced selection.'<CR>
 		: nnoremap <Leader>S ^vg_y:execute @@<CR>:echo 'Sourced line.'<CR>

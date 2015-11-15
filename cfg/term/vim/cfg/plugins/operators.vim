@@ -1,11 +1,13 @@
 " vim:fdm=marker:fdl=1
 
 "{{{1 Motions ============================
+NeoBundleLazy 'matchit.zip', { 'autoload' : { 'mappings' : ['%', 'g%'] }}
 " Two-letters find on whole screen scope
 " THINK as augment: https://github.com/rhysd/clever-f.vim
 NeoBundle 'justinmk/vim-sneak'
 " New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
-NeoBundle 'bkad/CamelCaseMotion'
+NeoBundleLazy 'bkad/CamelCaseMotion', { 'autoload': {
+    \ 'mappings': '<Plug>' }}
 " Readline style insertion
 " http://www.vim.org/scripts/script.php?script_id=4359
 NeoBundle 'tpope/vim-rsi'
@@ -27,10 +29,15 @@ NeoBundle 'tommcdo/vim-exchange'
 " NeoBundle 'vim-scripts/LineJuggler'
 NeoBundle 'kana/vim-niceblock'        " I,A,gI for all VISUAL like in V-BLOCK
 
-"{{{1 Textobj ============================
+"{{{1 Operators ============================
 NeoBundle 'kana/vim-operator-user'         " = Dependency: vim-clang-format
-NeoBundle 'kana/vim-textobj-user'          " = Dependency: vim-textobj-*
+NeoBundle 'rhysd/vim-operator-surround'    "q..[ai]..-- boundaries of motion
+NeoBundleLazy 'kana/vim-operator-replace', {
+      \ 'depends': 'kana/vim-operator-user',
+      \ 'autoload': { 'mappings': [['nx', '<Plug>']] } }
 
+"{{{1 Textobj ============================
+NeoBundle 'kana/vim-textobj-user'          " = Dependency: vim-textobj-*
 NeoBundle 'kana/vim-textobj-entire'        " ..[ai]G -- instead ggVG
 NeoBundle 'kana/vim-textobj-fold'          " ..[ai]z
 NeoBundle 'kana/vim-textobj-function'      " ..[ai][fF] (C/Java/Vimscript)
@@ -44,7 +51,6 @@ NeoBundle 'coderifous/textobj-word-column.vim'  " ..[ai][cC] -- «smart» column
 "  Add buffer local: let b:textobj_anyblock_buffer_local_blocks = [ ':', '*' ]
 NeoBundle 'rhysd/vim-textobj-anyblock'     " ..[ai]b -- content of closest pair
 NeoBundle 'thinca/vim-textobj-between'     " ..[ai]f..- between found symbols
-NeoBundle 'rhysd/vim-operator-surround'    "q..[ai]..-- boundaries of motion
 
 NeoBundle 'beloglazov/vim-textobj-quotes'  " ..[ai]q -- any nearest quotes (OR: ..q)
 NeoBundle 'saihoooooooo/vim-textobj-space' " ..[ai]s -- space between words, etc
