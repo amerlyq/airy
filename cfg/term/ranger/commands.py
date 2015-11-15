@@ -5,20 +5,28 @@ import os
 
 
 class doc(Command):
-    lst = ['DEV', 'EXAMPLES' 'INFO', 'LIOR', 'NOTE', 'SYNERGY', 'TODO']
+    lst = ['DEV', 'EXAMPLES', 'INFO', 'LIOR', 'NOTE', 'SYNERGY', 'TODO']
     ext = '.otl'
+    loci = ['doc', 'docs', '']
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories
     """
+
+    def _nearest(self, validate):
+        for d in doc.loci:
+            path = os.path.join(self._dbase, d, self._dname)
+            if validate(path):
+                return path
+
     def execute(self):
-        name = (self.arg(1) if self.arg(1) else doc.lst[0]) + doc.ext
-        for d in ['doc', '']:
-            path = os.path.join(self.fm.thisdir.path, d, name)
-            if os.path.isfile(path):
-                self.fm.edit_file(path)
-                return
-        # Use last path as default location for creation of new files
-        self.fm.edit_file(path)
+        self._dname = (self.arg(1) if self.arg(1) else doc.lst[0]) + doc.ext
+        self._dbase = self.fm.thisdir.path
+        path = self._nearest(lambda x: os.path.isfile(x))
+        if not path:
+            path = self._nearest(lambda x: os.path.isdir(os.path.dirname(x)))
+        if path:
+            self.fm.select_file(path)
+            self.fm.move(right=1)
 
     def tab(self):
         return ['doc ' + nm for nm in doc.lst]
@@ -59,18 +67,10 @@ class cda(Command):
         if not os.path.exists(path):
             return self.fm.notify("No such: " + path, bad=True)
 
-        # actions.py:393
-        #     self.open_console('open_with ')
-        # cwd = self.thisdir
         if os.path.isdir(path):
             self.fm.cd(path)
         elif os.path.isfile(path):
-            self.fm.thistab.enter_dir(os.path.dirname(path))
-            # if cwd and cwd.accessible and cwd.content_loaded:
-            # TODO replace with comparing in .thisdir and moving cursor
-            self.fm.search_file(os.path.basename(path), regexp=False)
-            # if len(..) > 1:
-            #     self.fm.select_file(destination)
+            self.fm.select_file(path)
 
 
 class actualee(Command):
