@@ -4,11 +4,6 @@
 "   must be no error when file is already processed
 
 "{{{1 MAPS =================
-
-" USE :retab to revert effect
-" noremap <unique> <Leader>ti :<C-U>call s:ApplyTabIndent(v:count)<CR>
-" noremap <leader>ct <Esc>:retab<CR>, :retab!
-
 noremap <unique> <Leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
 noremap <unique> <Leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
 
@@ -16,20 +11,22 @@ noremap <unique> <Leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0
 "{{{1 CMDS =================
 " Render TABs using this many spaces, as indentation on </>
 let g:default_indent = 4
+" USE :retab to revert effect
 " Retab spaced file, but only indentation
-command! -bar RetabIndents call s:RetabIndents()
+command! -bar -nargs=0 RetabSpaces call s:RetabSpaces()
+command! -bar -nargs=? RetabIndent call s:RetabIndent(<args>)
 
 
 "{{{1 IMPL =================
-function! s:ApplyTabIndent(ntabs)
-  call s:RetabIndents()
-  let nt= a:ntabs>0 ? a:ntabs : g:default_indent
+function! s:RetabIndent(...)
+  let nt = a:0>0 ? a:1 : g:default_indent
+  call s:RetabSpaces()
   exe printf('setl ts=%s sts=%s sw=%s', nt, nt, nt)
-  " retab
+  retab
 endfunc
 
 " Retab spaced file, but only indentation
-func! s:RetabIndents()
+func! s:RetabSpaces()
   let saved_view = winsaveview()
   let patt = '^\( \{'.&ts.'}\)\+'
   let repl = '\=repeat("\t", len(submatch(0))/'.&ts.')'

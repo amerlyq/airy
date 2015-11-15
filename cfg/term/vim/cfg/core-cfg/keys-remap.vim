@@ -1,7 +1,30 @@
+"" INSERT "{{{
 " TODO TRY -- then I could replace ReleaseEsc on Caps by LatchCtrl
+" WARNING This will prevent you from writing such pairs at all (even paste)!
+" So, to paste text with them from term you need use 'set paste'
 " inoremap jj <Esc>
 inoremap jf <Esc>
 inoremap fj <Esc>
+" cnoremap <expr> j
+"       \ getcmdline()[getcmdpos()-2] ==# 'j' ? "\<BS>\<C-c>" : 'j'
+" onoremap jj           <ESC>
+" inoremap j<Space>     j
+" onoremap j<Space>     j
+
+" Instead of whole line indention
+inoremap <C-t>  <C-v><TAB>
+" inoremap <C-d>  <Del>  DONE by vim-rsi
+" Enable undo for <C-w> and <C-u>.
+inoremap <C-w>  <C-g>u<C-w>
+inoremap <C-u>  <C-g>u<C-u>
+
+if has('gui_running')
+  inoremap <ESC> <ESC>
+endif
+
+cnoremap <C-k> <C-\>e getcmdpos() == 1 ?
+      \ '' : getcmdline()[:getcmdpos()-2]<CR>
+"}}}
 
 
 " Now 'a jump you to line and column, and `a only to line
@@ -87,6 +110,8 @@ noremap <unique> ,v  <C-V>
 " map # %
 
 "" VISUAL
+" Select last paste
+" nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 "" select last paste in visual mode
 noremap <unique> <expr> gv '`[' . strpart(getregtype(), 0, 1) . '`]'
 " selects the last text edited/pasted in INSERT, and reselect of last VISUAL
@@ -95,25 +120,23 @@ noremap <unique> gV `[v`]
 nnoremap <unique> z/ //e<CR>v??<CR>
 " Go to the first non-blank character of the line after paragraph motions
 noremap } }^
+
+
+"" Indention
+nnoremap > >>_
+nnoremap < <<_
+" USE instead g< for last message -- ':mes' or ':norm! g<'
+nnoremap g> >
+nnoremap g< <
 " reselect visual block after indent
-vnoremap <unique> > >gv|
-vnoremap <unique> < <gv
-" Tab mapped in neosnippet? But why for visual mode?
-" vnoremap <unique> <Tab> >gv|
-" vnoremap <unique> <S-Tab> <gv
-" nnoremap > >>_
-" nnoremap < <<_
-" Select last paste
-" nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
+xnoremap <unique> > >gv|
+xnoremap <unique> < <gv
 
 " Drag current line/s vertically and auto-indent. (Use Overlay+hjkl)
 nnoremap <unique> <S-Up>    :m-2<CR>==
 nnoremap <unique> <S-Down>  :m+<CR>==
-vnoremap <unique> <S-Up>    :m-2<CR>gv=gv
-vnoremap <unique> <S-Down>  :m'>+<CR>gv=gv
-
-" Visual block sorting. Restore text _outside_ block:  gvyugvp
-command! -range VBSort <line1>,<line2>sort i /\ze\%V/
+xnoremap <unique> <S-Up>    :m-2<CR>gv=gv
+xnoremap <unique> <S-Down>  :m'>+<CR>gv=gv
 
 " works cool only with xkb map of arrows to C-hjkl
 " nnoremap <C-PageUp>    <Esc>:tabprev<CR>

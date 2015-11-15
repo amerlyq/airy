@@ -138,5 +138,6 @@ let mapleader = s:leader
 " UNUSED:
 " Swap registry
 " noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
+" HACK xnoremap <silent> y "*y:let [@+,@"]=[@*,@*]<CR>
 "" Don't use paste in cmap as I use C-n, C-p for navigation in command line
 "cmap <F7> <C-\>eescape(getcmdline(), ' \')<CR> "setreg(''+'', getreg('':''))

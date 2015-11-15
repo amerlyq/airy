@@ -1,9 +1,9 @@
 " NOTE more prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
-" TODO consider using <Tab> in mappings
+" TODO consider using <Tab>, <S-Tab> in mappings, think about '|'
 "     Also can be used for operator-pending, related to indent
 "     <Space> also can be used for operator pending
 "     All surround-insert by <Leader><Space>
-"
+
 let g:mapleader = ','        " ALT +,\<Space>+. Use <Leader> in global plugin.
 let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugin.
 " noremap <unique> <Leader> <Nop>

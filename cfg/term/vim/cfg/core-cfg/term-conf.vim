@@ -1,5 +1,6 @@
 " Toggle auto-indenting manually (works in INSERT too)
 set pastetoggle=<F2>
+nnoremap <unique> <Leader>tP :set paste! paste?<CR>
 " Auto-disable paste.
 au MyAutoCmd InsertLeave * if &paste | set nopaste | endif
 

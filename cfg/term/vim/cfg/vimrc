@@ -1,12 +1,4 @@
 " vim:ts=2:sw=2:sts=2
-set fileformats=unix,dos,mac  " Line endings
-if has("multi_byte")
-  if &termencoding == "" | let &termencoding = &encoding | endif
-  set encoding=utf-8
-  setglobal fileencoding=utf-8
-  set fileencodings=utf-8,cp1251,cp866
-endif
-
 fun! s:cfg(path)
   for f in globpath(expand($VIMHOME .'/cfg/'), a:path, 0, 1)
     exe 'source' fnameescape(f)
@@ -15,8 +7,8 @@ endf
 
 com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
-let g:mapleader=","
 call s:cfg('core/detect.vim')
+call s:cfg('core/encoding.vim')
 call s:cfg('core/env.vim')
 call s:cfg('core/options.vim')
 call s:cfg('core/init.vim')
