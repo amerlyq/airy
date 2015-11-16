@@ -3,7 +3,7 @@
 "{{{1 Motions ============================
 NeoBundleLazy 'matchit.zip', { 'autoload' : { 'mappings' : ['%', 'g%'] }}
 " Two-letters find on whole screen scope
-" THINK as augment: https://github.com/rhysd/clever-f.vim
+" NOT NEEDED: https://github.com/rhysd/clever-f.vim
 NeoBundle 'justinmk/vim-sneak'
 " New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
 NeoBundleLazy 'bkad/CamelCaseMotion', { 'autoload': {

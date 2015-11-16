@@ -6,7 +6,7 @@ source ~/.shell/func.d/cfgsetup
 echo "Err: FIXME"
 if distro arch; then
     cfg=/etc/pacman.conf
-    ! grep -q '^#(Color)$' $cfg || sudo sed -ri '/^#(Color)$/s//\1/' $cfg
+    ! grep -q '^#Color\s*$' $cfg || sudo sed -ri '/^#(Color)\s*$/s//\1/' $cfg
     link "$PWD/pacaur.conf" ~/.config/pacaur/config
 fi
 

@@ -14,7 +14,7 @@ let b:undo_ftplugin .= 'setl modeline<'
 " set indent.
 setlocal shiftwidth=2 tabstop=2 softtabstop=2
 setlocal foldmethod=marker foldlevel=2
-setlocal iskeyword+=:,#
+" setlocal iskeyword+=:,#
 
 " For gf.
 let &l:path = join(map(split(&runtimepath, ','), 'v:val."/autoload"'), ',')

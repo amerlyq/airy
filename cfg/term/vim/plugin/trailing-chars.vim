@@ -1,7 +1,7 @@
 " SEE Remove trailing spaces before saving text files
 "   http://vim.wikia.com/wiki/Remove_trailing_spaces
 
-"{{{1 KEYS ====================
+"{{{1 MAPS ====================
 noremap <unique> <Leader>tl :<C-u>set list! list?<CR>
 noremap <unique> <Leader>tL :<C-u>TrailingHighlight<CR>
 

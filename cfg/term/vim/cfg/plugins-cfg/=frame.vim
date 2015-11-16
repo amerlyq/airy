@@ -14,6 +14,7 @@ if neobundle#tap('vim-rooter') "{{{
   let g:rooter_disable_map = 1
   " Change working directory to that of the current file
   nnoremap <unique><silent> [Frame]cw :lcd %:p:h \| pwd<CR>
+  nnoremap <unique><silent> [Frame]cc :lcd ..    \| pwd<CR>
   nnoremap <unique><silent> [Frame]cd :Rooter<CR>
   call neobundle#untap()
 endif "}}}

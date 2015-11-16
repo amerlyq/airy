@@ -13,13 +13,6 @@ noremap <Leader>S :<C-U>write ++enc=utf8<CR>
 noremap <Leader><C-S> :saveas<Space>
 
 
-if has('unix')
-  noremap <Leader>f :<C-U>RangerChooser<CR>
-elseif has('win32') || has('win64')
-  noremap <Leader>f :<C-U>VimFiler<CR>
-  let $SHELL='cmd.exe'  " Is any sense using git-msys under git instead?
-endif
-
 " BUG can't work in vim w/o redirections?
 " if executable('r.shell')
 "   set shell=r.shell

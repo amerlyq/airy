@@ -2,7 +2,7 @@ if neobundle#tap('deoplete.nvim') && has('nvim') "{{{
   let g:deoplete#enable_at_startup = 1
 
   fun! neobundle#hooks.on_source(bundle)
-    set completeopt+=noinsert
+    " set completeopt+=noinsert
     function! s:check_back_space() "{{{
       let col = col('.') - 1
       return !col || getline('.')[col - 1]  =~ '\s'

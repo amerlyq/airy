@@ -19,6 +19,7 @@ wincmd J
 let s:qf_mappings = {
       \ 'q' : ':#close<CR>',
       \ 'o' : '<CR><C-w>p',
+      \ 'm' : '<CR><C-w>pj',
       \ 'O' : '<CR>',
       \ 'I' : '<CR><C-w><C-w>:#close<CR>',
       \ 'S' : '<C-w><CR><C-w>L<C-w>p<C-w>J<C-w>p',

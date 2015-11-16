@@ -6,6 +6,23 @@
 " open the selected files.
 
 
+"{{{1 MAPS ====================
+if IsWindows()
+  let $SHELL='cmd.exe'  " Is any sense using git-msys under git instead?
+  noremap <unique>  <Leader>f :<C-U>VimFiler<CR>
+else
+  noremap <unique>  <Leader>f :<C-U>RangerChooser<CR>
+  noremap <unique>  <Leader>F :<C-U>RangerChooser!<CR>
+  noremap <unique> g<Leader>f :<C-U>RangerChooser '<cfile>'<CR>
+endif
+
+
+"{{{1 CMDS ====================
+command! -bang -bar -nargs=? RangerChooser
+      \ call RangerChooser(<bang>1, <args>)
+
+
+"{{{1 IMPL ====================
 function! s:open_paths(lines)
   if empty(a:lines) | return | endif
   " Edit the first item.
@@ -86,9 +103,11 @@ function! s:warn(msg)
 endfunction
 
 
-function! RangeChooser()
+function! RangerChooser(select, ...)
   let temps = {'result': tempname()}
-  let cmd = 'ranger --choosefiles='.shellescape(temps.result)
+  let path = expand((a:0 > 0 ? a:1 : a:select ? '%:p' : getcwd()), 1)
+  let cmd = 'ranger --choosefiles=' . shellescape(temps.result)
+  let cmd .= (a:select ? ' --selectfile=' : ' --cmd=cd\ ').shellescape(l:path)
   if has('nvim')
     if bufexists('term://*:FZF')
       call s:warn('FZF is already running!')
@@ -101,5 +120,3 @@ function! RangeChooser()
     call s:open_paths(s:read_file(temps))
   endif
 endfun
-
-command! -bar RangerChooser call RangeChooser()

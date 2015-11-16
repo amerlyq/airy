@@ -61,9 +61,15 @@ fi
 if cfgOpt u || [[ ! -d "$VCACHE/bundle" ]]; then
     # FIXME: error on clean system, when NeoBundle is not installed yet
     $EDITOR -E -X -R -i NONE -c "set nomore" \
-        +NeoBundleClearCache +NeoBundleInstall +NeoBundleUpdate \
+        +NeoBundleClearCache +NeoBundleUpdate \
         +qall </dev/tty ||:
 
     ! has_pr nvim || nvim -E -X -R -i NONE -c "set nomore" \
         +UpdateRemotePlugins +qall </dev/tty ||:
+fi
+
+### PLUG-RC ###
+dst="$VCACHE/bundle/unicode.vim/autoload/unicode/UnicodeData.txt"
+if [[ ! -f "$dst" ]]; then
+    wget -c -O "$dst" 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt'
 fi

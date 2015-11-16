@@ -50,8 +50,8 @@ map <unique> gz# <Plug>(incsearch-nohl0)<Plug>(asterisk-gz#)
 " map <unique> <silent> z; :<C-u>OverCommandLine<CR>
 noremap  <unique><silent> <Leader>c; :<C-u>OverCommandLine<CR>
 
-nnoremap <unique><silent> <Leader>cr :OverCommandLine %s;;;g<CR><Left><Left>
-xnoremap <unique><silent> <Leader>cr :OverCommandLine  s;;;g<CR><Left><Left>
+nnoremap <unique><silent> <Leader>cc :OverCommandLine %s;;;g<CR><Left><Left>
+xnoremap <unique><silent> <Leader>cc :OverCommandLine  s;;;g<CR><Left><Left>
 
-nnoremap <unique><silent> <Leader>ce :OverCommandLine %s;;<C-r>/;g<CR><Left><Left>
-xnoremap <unique><silent> <Leader>ce :OverCommandLine  s;;<C-r>/;g<CR><Left><Left>
+nnoremap <unique><silent> <Leader>cm :OverCommandLine %s;;<C-r>/;g<CR><Left><Left>
+xnoremap <unique><silent> <Leader>cm :OverCommandLine  s;;<C-r>/;g<CR><Left><Left>

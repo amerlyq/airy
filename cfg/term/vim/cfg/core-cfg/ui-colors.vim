@@ -52,9 +52,10 @@ endif
 augroup PatchColorScheme "{{{2
   " au ColorScheme * hi! Folded ctermfg=3 ctermbg=NONE
   " au ColorScheme * hi! FoldColumn ctermfg=4 ctermbg=NONE guifg=Cyan guibg=Grey
+  au ColorScheme * hi! lCursor guifg=NONE ctermbg=4 guibg=Cyan
   au ColorScheme * hi! link ColorColumn StatusLineNC
   " Suppress transparency on reverse cursor of search results highlight
-  au ColorScheme * hi Search cterm=None ctermbg=3 ctermfg=0
+  " au ColorScheme * hi! Search cterm=None ctermbg=3 ctermfg=0
   " The "NonText" highlighting will be used for "eol", "extends" and
   "  "precedes".  "SpecialKey" for "nbsp", "tab" and "trail".
   au ColorScheme * hi! SpecialKey  ctermbg=None cterm=None

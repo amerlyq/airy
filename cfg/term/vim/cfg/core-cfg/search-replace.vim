@@ -26,8 +26,8 @@ command! -range SortBlock <line1>,<line2>sort i /\ze\%V/
 nnoremap <unique> <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
 
 " Find next character from under cursor (TODO replace with [% and ]%)
-noremap <unique> <Leader>F :norm <C-R>=v:count1<CR>f<C-R>=getline('.')[col('.')-1]<CR><CR>
-noremap <unique> <Leader>T :norm <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR><CR>
+noremap <unique> gs :norm <C-R>=v:count1<CR>f<C-R>=getline('.')[col('.')-1]<CR><CR>
+noremap <unique> gS :norm <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR><CR>
 
 ": Ag working dir  searching
 " nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
@@ -42,24 +42,32 @@ vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<
 
 
 ": Substitute current match
-nnoremap <unique> <Leader>cc <Nop>
 " nnoremap <leader>cw :%s:\<<C-R><C-w>\>:<C-R><C-w>:g<Left><Left>
 nnoremap <unique> <Leader>c/ :%s::<C-R>/:g<Left><Left>
 vnoremap <unique> <Leader>c/  :s::<C-R>/:g<Left><Left>
 ": Replace by yanked/deleted text
 nnoremap <unique> <Leader>cy :%s::<C-R>":g<Left><Left>
 vnoremap <unique> <Leader>cy  :s::<C-R>":g<Left><Left>
-": Replace highlighted match (REPLACED by
-" nnoremap <unique> <Leader>cr :%s;;;g<Left><Left>
-" vnoremap <unique> <Leader>cr  :s;;;g<Left><Left>
-" nnoremap <unique> <Leader>ce :%s;;<C-r>/;g<Left><Left>
-" vnoremap <unique> <Leader>ce  :s;;<C-r>/;g<Left><Left>
+": Replace highlighted match (REPLACED by OverCommandLine)
+if maparg('<Leader>cc') ==# ''
+  nnoremap <unique> <Leader>cc :%s;;;g<Left><Left>
+  vnoremap <unique> <Leader>cc  :s;;;g<Left><Left>
+endif
+if maparg('<Leader>cm') ==# ''
+  nnoremap <unique> <Leader>cm :%s;;<C-r>/;g<Left><Left>
+  vnoremap <unique> <Leader>cm  :s;;<C-r>/;g<Left><Left>
+endif
 ": Delete highlighted match
-nnoremap <unique> <Leader>cx :%s;;;g<CR>
-vnoremap <unique> <Leader>cx  :s;;;g<CR>
+nnoremap <unique> <Leader>cd :%s;;;g<CR>
+vnoremap <unique> <Leader>cd  :s;;;g<CR>
+
+nnoremap <unique> <Leader>cv :%v//d<CR>
+vnoremap <unique> <Leader>cv  :v//d<CR>
+nnoremap <unique> <Leader>cx :%g//d<CR>
+vnoremap <unique> <Leader>cx  :g//d<CR>
 
 " Replace current vsel
-vnoremap <unique> <Leader>cv :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><Left><Left>
+vnoremap <unique> <Leader>cs :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><Left><Left>
 " Replace last patt by current vsel
 " vnoremap <unique> <Leader>cv :<C-U>%s;;<C-R>=GetVisualSelection("")<CR>;g<CR>
 

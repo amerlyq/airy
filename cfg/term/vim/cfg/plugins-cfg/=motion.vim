@@ -9,35 +9,20 @@ if neobundle#tap('matchit.zip') "{{{
   call neobundle#untap()
 endif "}}}
 
-if neobundle#tap('vim-sneak')  "{{{
-" USE: Streak-mode features:
-"  - automatically jumps to the first match
-"    - press <Space> or <Esc> to escape streak-mode
-"    - press <Tab> to skip to the next 56 matches
-"    - press any key that is _not_ a target label to exit streak-mode and
-"      immediately perform that key's normal-mode function
-"  - works with all operators, including |surround|
-"  - streak-mode edit operations can be repeated and it works correctly
-"    regardless of the remaining on-screen matches
-"  - s<Enter> repeats the last sneak search (S<Enter> to change direction)
+if neobundle#tap('vim-sneak') "{{{
+"  - s<Enter> repeats (even off-screen), <Tab> skips to next 56 matches,
+"  - any key that is _not_ a target label, performs its normal-mode function
 "  - text in |folds| is ignored by streak-mode
-"      - you can reach folded/off-screen matches with |;| and |,|
-"
-" As always, you can:
-"     - skip to the next or previous match with |;| or |,|
-"     - return to your original location via |CTRL-O| or |``|
-"
-" Note: If `s` is prefixed with a [count] then sneak-vertical-scope
-"   is invoked and streak-mode will _not_ be invoked.
+"  - return to your original location via |CTRL-O| or |``|
+"  - if `s` is prefixed with a [count] then sneak-vertical-scope invoked
 
-" Options: {{{
-  let g:sneak#streak = 1        " With multiple suggestions use labels to jump
+  let g:sneak#streak = 1        " Use labels, Space/Esc to choose current
+  let g:sneak#s_next = 1        " Use s/S immediately after sneak to next/prev
   let g:sneak#use_ic_scs = 1    " Respect 'ignorecase' and 'smartcase'
   let g:sneak#textobject_z = 0  " No default z-operator (I use q-operator)
-  " }}}
+  if hasmapto('[Space]') | let g:sneak#streak_esc = '[Space]' | endif
 
-  " nmap <unique> <Space> <Plug>(SneakStreak)
-
+  " THINK nmap <unique> <Space> <Plug>(SneakStreak)
 
   " Sneak: 2-character (default) {{{
   nmap <unique> s <Plug>Sneak_s
