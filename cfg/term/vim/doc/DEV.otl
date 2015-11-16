@@ -1,14 +1,20 @@
 Leaders
-	[_] CHG <Space> to operator mode:
-		: Add v:count to <Space> operator -- amount of chars before exit.
+	[_] CHG <Space> to operator mode: (vim-osmos?)
+	:SEE https://github.com/spiiph/vim-space
+		: Add v:count to <Space> insert operator -- amount of chars before exit.
 		' A' -- inserts space at line end, then goes to insert regime
 		' I' -- inserts space at line beg, then goes to insert regime
 		' r' -- inserts space, then replace
 		'  ' -- put space
+		: Add v:count to <Space> paste operator -- amount of spaces before it
 		' p' -- put (yanked) text with space before it
+		: THINK choose what to insert -- space or inputted character?
+		:	= Do like surround' chains of textobjects?
+		:	=> Then <Space>p is shortcut for <Space>i<Space>p
 		: v:count treated as amount of spaces inserted
 		:= But then I will need some other operator for single-char inserts --
 		: to work with other characters beside spaces.
+		: USE CamelMotion on Space? Or smart-word for urls-like strings?
 
 Syntax
 	Ranger
@@ -17,6 +23,10 @@ Syntax
 		http://learnvimscriptthehardway.stevelosh.com/chapters/46.html
 		http://vim.wikia.com/wiki/Search_for_lines_not_containing_pattern_and_other_helpful_searches
 		https://robots.thoughtbot.com/writing-vim-syntax-plugins
+
+Notches
+	Cycle through all notches
+		https://github.com/zef/vim-cycle
 
 Outline
 	[o] Vimoutliner

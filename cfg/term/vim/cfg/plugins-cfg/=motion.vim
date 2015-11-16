@@ -149,7 +149,7 @@ endif "}}}
 
 if neobundle#tap("vim-textobj-quotes")  "{{{
   " Outer quoted is the most useful:
-  omap <silent><unique> q aq
+  omap <silent><unique> [Quote] aq
   call neobundle#untap()
 endif "}}}
 

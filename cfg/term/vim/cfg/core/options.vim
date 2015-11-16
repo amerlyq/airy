@@ -31,3 +31,5 @@ if has('gui_running')  " TODO TRY 'eg'; 'a' -- disabled because of 'copyq'
   set guioptions=Mc    " and use console-like dialogs instead of gui popup
 " elseif exists('$DISPLAY')
 endif
+
+set viewoptions=cursor,folds,slash,unix   " What to save in :mkview

@@ -1,4 +1,4 @@
-" NOTE more prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
+" NOTE more toggle prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
 " TODO consider using <Tab>, <S-Tab> in mappings, think about '|'
 "     Also can be used for operator-pending, related to indent
 "     <Space> also can be used for operator pending
@@ -17,22 +17,13 @@ let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugin.
 " nnoremap ,  <Nop>
 " xnoremap ,  <Nop>
 
+fun! s:MapLeader(fr, to)
+  for c in ['n', 'x', 'o']
+    exe c  .  'map <silent><unique> '. a:fr .' '. a:to
+    exe c.'noremap <silent><unique> '. a:to .' <Nop>'
+  endfor
+endfun
 
-" For quote, etc
-nmap <silent><unique> q [Quote]
-xmap <silent><unique> q [Quote]
-nnoremap <silent><unique> [Quote] <Nop>
-xnoremap <silent><unique> [Quote] <Nop>
-
-" For edit, inserts
-" CamelMotion
-nmap <silent><unique> <Space> [Space]
-xmap <silent><unique> <Space> [Space]
-nnoremap <silent><unique> [Space] <Nop>
-xnoremap <silent><unique> [Space] <Nop>
-
-" For rarely used plugins/frameworks
-nmap <silent><unique> \ [Frame]
-xmap <silent><unique> \ [Frame]
-nnoremap <silent><unique> [Frame] <Nop>
-xnoremap <silent><unique> [Frame] <Nop>
+call s:MapLeader('\', '[Frame]')
+call s:MapLeader('q', '[Qoute]')
+call s:MapLeader('<Space>', '[Space]')

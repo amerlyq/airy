@@ -67,6 +67,17 @@ nnoremap <unique> gO O<Space><Esc>^"_D
 nnoremap <unique><silent> gC :call RetainPos('.t.\|norm gcc')<CR>
 
 
+" Built-in autocompletion, word, line
+" inoremap <C-space> <C-x><C-o>
+" inoremap <C-space> <C-x><C-l>
+
+" Line split
+nnoremap K   a<CR><Right><Esc>
+xnoremap K   c<CR><Esc>
+nnoremap gK  i<CR><Right><Esc>
+nnoremap <C-k> i<CR><Right><Esc>:m .-2<CR>
+nnoremap gX  lxh
+
 
 " Adequate replace tabs by parts, not entirely
 noremap <unique> R gR

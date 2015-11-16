@@ -13,13 +13,13 @@ if IsWindows()
 else
   noremap <unique>  <Leader>f :<C-U>RangerChooser<CR>
   noremap <unique>  <Leader>F :<C-U>RangerChooser!<CR>
-  noremap <unique> g<Leader>f :<C-U>RangerChooser '<cfile>'<CR>
+  noremap <unique> g<Leader>f :<C-U>RangerChooser <cfile><CR>
+  noremap <unique> g<Leader>F :<C-U>RangerChooser!!<CR>
 endif
 
 
 "{{{1 CMDS ====================
-command! -bang -bar -nargs=? RangerChooser
-      \ call RangerChooser(<bang>1, <args>)
+command! -bang -bar -nargs=? RangerChooser call RangerChooser(<bang>1, <q-args>)
 
 
 "{{{1 IMPL ====================
@@ -105,7 +105,7 @@ endfunction
 
 function! RangerChooser(select, ...)
   let temps = {'result': tempname()}
-  let path = expand((a:0 > 0 ? a:1 : a:select ? '%:p' : getcwd()), 1)
+  let path = expand((a:0>0 && a:1!='' ? a:1 : (a:select ? '%:p' : getcwd())), 1)
   let cmd = 'ranger --choosefiles=' . shellescape(temps.result)
   let cmd .= (a:select ? ' --selectfile=' : ' --cmd=cd\ ').shellescape(l:path)
   if has('nvim')
