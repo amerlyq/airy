@@ -7,20 +7,20 @@ set winheight=8
 set winwidth=80
 
 " switching
-noremap  zh  <C-W>h
-noremap  zj  <C-W>j
-noremap  zk  <C-W>k
-noremap  zl  <C-W>l
+noremap <unique> zh  <C-W>h
+noremap <unique> zj  <C-W>j
+noremap <unique> zk  <C-W>k
+noremap <unique> zl  <C-W>l
 
 " Move between folds
-noremap  zJ  zj
-noremap  zK  zk
+noremap <unique> zJ  zj
+noremap <unique> zK  zk
 
 " switch to adjacent buffer in current window
-noremap  gh  :<C-U>bprev<CR>
-noremap  gl  :<C-U>bnext<CR>
-noremap  gH  :<C-U>bfirst<CR>
-noremap  gL  :<C-U>blast<CR>
+noremap <unique> gh  :<C-U>bprev<CR>
+noremap <unique> gl  :<C-U>bnext<CR>
+noremap <unique> gH  :<C-U>bfirst<CR>
+noremap <unique> gL  :<C-U>blast<CR>
 
 " if winnr() > 1
 " DISABLED: bugs
@@ -33,10 +33,10 @@ noremap  gL  :<C-U>blast<CR>
 " endif
 
 " Increment and decrement
-nnoremap + <C-a>
-nnoremap - <C-x>
+" nnoremap + <C-a>
+" nnoremap - <C-x>
 " Navigate window
-nnoremap <C-x> <C-w>x
+" nnoremap <C-x> <C-w>x
 " nnoremap <expr><C-m> (bufname('%') ==# '[Command Line]' <bar><bar> &l:buftype ==# 'quickfix') ? "<CR>" : "<C-w>j"
 
 

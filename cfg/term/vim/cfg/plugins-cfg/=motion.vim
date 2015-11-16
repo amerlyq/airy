@@ -1,5 +1,6 @@
 " vim:fdm=marker:fdl=1
 
+"{{{1 Motions ============================
 if neobundle#tap('matchit.zip') "{{{
   function! neobundle#hooks.on_post_source(bundle)
     silent! execute 'doautocmd Filetype' &filetype
@@ -29,7 +30,7 @@ if neobundle#tap('vim-sneak')  "{{{
 " Note: If `s` is prefixed with a [count] then sneak-vertical-scope
 "   is invoked and streak-mode will _not_ be invoked.
 
-" Options: {{{2
+" Options: {{{
   let g:sneak#streak = 1        " With multiple suggestions use labels to jump
   let g:sneak#use_ic_scs = 1    " Respect 'ignorecase' and 'smartcase'
   let g:sneak#textobject_z = 0  " No default z-operator (I use q-operator)
@@ -38,7 +39,7 @@ if neobundle#tap('vim-sneak')  "{{{
   " nmap <unique> <Space> <Plug>(SneakStreak)
 
 
-  " Sneak: 2-character (default) {{{2
+  " Sneak: 2-character (default) {{{
   nmap <unique> s <Plug>Sneak_s
   xmap <unique> s <Plug>Sneak_s
   omap <unique> s <Plug>Sneak_s
@@ -49,7 +50,7 @@ if neobundle#tap('vim-sneak')  "{{{
   " }}}
 
 
-  " Moving: next/prev -- explicit repeat {{{2
+  " Moving: next/prev -- explicit repeat {{{
   " (as opposed to implicit 'clever-s' repeat)
   nmap <unique> <Enter> <Plug>SneakNext
   xmap <unique> <Enter> <Plug>SneakNext
@@ -61,7 +62,7 @@ if neobundle#tap('vim-sneak')  "{{{
   " OLD:  ]f -> ;  and  [f -> ,
   " }}}
 
-  " Standart: 1-character enhanced 'f/t' {{{2
+  " Standart: 1-character enhanced 'f/t' {{{
   let g:sneak#f_reset = 0
   let g:sneak#t_reset = 0
 
@@ -88,27 +89,14 @@ if neobundle#tap('vim-sneak')  "{{{
 endif "}}}
 
 
-if neobundle#tap('vim-textobj-entire')  "{{{
-  let g:textobj_entire_no_default_key_mappings = 1
-  xmap <silent><unique> aG <Plug>(textobj-entire-a)
-  omap <silent><unique> aG <Plug>(textobj-entire-a)
-  xmap <silent><unique> iG <Plug>(textobj-entire-i)
-  omap <silent><unique> iG <Plug>(textobj-entire-i)
+if neobundle#tap('vim-expand-region') "{{{
+  xmap v <Plug>(expand_region_expand)
+  xmap <C-v> <Plug>(expand_region_shrink)
   call neobundle#untap()
 endif "}}}
 
 
-if neobundle#tap('vim-textobj-syntax')  "{{{
-  let g:textobj_syntax_no_default_key_mappings = 1
-  " ATTENTION currently textobj-syntax-a acts the same as textobj-syntax-i
-  xmap <silent><unique> ah <Plug>(textobj-syntax-a)
-  omap <silent><unique> ah <Plug>(textobj-syntax-a)
-  xmap <silent><unique> ih <Plug>(textobj-syntax-i)
-  omap <silent><unique> ih <Plug>(textobj-syntax-i)
-  call neobundle#untap()
-endif "}}}
-
-
+"{{{1 Operators ============================
 if neobundle#tap('vim-operator-surround')  "{{{
   nmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
   xmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
@@ -144,6 +132,36 @@ if neobundle#tap('vim-operator-surround')  "{{{
 endif "}}}
 
 
+if neobundle#tap('vim-operator-replace') "{{{
+  " THINK Could be used instead of my own paste-replace?
+  " xmap p <Plug>(operator-replace)
+  map - <Plug>(operator-replace)
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('vim-textobj-entire')  "{{{
+  let g:textobj_entire_no_default_key_mappings = 1
+  xmap <silent><unique> aG <Plug>(textobj-entire-a)
+  omap <silent><unique> aG <Plug>(textobj-entire-a)
+  xmap <silent><unique> iG <Plug>(textobj-entire-i)
+  omap <silent><unique> iG <Plug>(textobj-entire-i)
+  call neobundle#untap()
+endif "}}}
+
+
+"{{{1 Textobj ============================
+if neobundle#tap('vim-textobj-syntax')  "{{{
+  let g:textobj_syntax_no_default_key_mappings = 1
+  " ATTENTION currently textobj-syntax-a acts the same as textobj-syntax-i
+  xmap <silent><unique> ah <Plug>(textobj-syntax-a)
+  omap <silent><unique> ah <Plug>(textobj-syntax-a)
+  xmap <silent><unique> ih <Plug>(textobj-syntax-i)
+  omap <silent><unique> ih <Plug>(textobj-syntax-i)
+  call neobundle#untap()
+endif "}}}
+
+
 if neobundle#tap("vim-textobj-quotes")  "{{{
   " Outer quoted is the most useful:
   omap <silent><unique> q aq
@@ -172,6 +190,7 @@ if neobundle#tap('vim-textobj-sigil')  "{{{
 endif "}}}
 
 
+"{{{1 Specific ============================
 if neobundle#tap('sideways.vim')  "{{{
   xmap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
   omap <silent><unique> aa <Plug>SidewaysArgumentTextobjA

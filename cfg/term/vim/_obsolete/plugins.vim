@@ -99,6 +99,3 @@ NeoBundleLazy 'dhruvasagar/vim-table-mode', {
 " DISABLED: completely destroys mouse selection. Has not much usecases.
 "NeoBundle 'joonty/vdebug', {
 "            \ 'autoload' : { 'filetypes' : [ 'python' ] } }
-" DISABLED: not so useful -- I more often use direct selection
-" Press + to expand the visual selection  and _ to shrink it.
-" NeoBundle 'terryma/vim-expand-region'

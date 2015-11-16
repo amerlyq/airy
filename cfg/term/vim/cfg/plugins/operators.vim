@@ -24,10 +24,14 @@ NeoBundle 'tpope/vim-speeddating'
 " Exchange text: cx{motion} on first, then cx{motion} on other.
 "   cxx -- current line, X -- in Visual mode,  cxc -- clear pending exchange.
 NeoBundle 'tommcdo/vim-exchange'
+" I,A,gI for all VISUAL like in V-BLOCK
+NeoBundle 'kana/vim-niceblock', { 'autoload': {
+    \ 'mappings': '<Plug>' }}
 " Mappings to add empty lines or move/exchange/duplicate/fetch lines of text
 " ALT NeoBundle 'tpope/vim-unimpaired'
 " NeoBundle 'vim-scripts/LineJuggler'
-NeoBundle 'kana/vim-niceblock'        " I,A,gI for all VISUAL like in V-BLOCK
+
+NeoBundle 'terryma/vim-expand-region'  " v - Expand/shrink visual selection
 
 "{{{1 Operators ============================
 NeoBundle 'kana/vim-operator-user'         " = Dependency: vim-clang-format
@@ -42,9 +46,11 @@ NeoBundle 'kana/vim-textobj-entire'        " ..[ai]G -- instead ggVG
 NeoBundle 'kana/vim-textobj-fold'          " ..[ai]z
 NeoBundle 'kana/vim-textobj-function'      " ..[ai][fF] (C/Java/Vimscript)
 NeoBundle 'kana/vim-textobj-indent'        " ..[ai][iI] -- python-like indented
+NeoBundle 'kana/vim-textobj-lastpat'       " ..[ai]/ -- last searched pattern
 NeoBundle 'kana/vim-textobj-line'          " ..[ai]l -- line content only
 NeoBundle 'kana/vim-textobj-syntax'        " ..[ai]h -- highlighted syntax region
 NeoBundle 'coderifous/textobj-word-column.vim'  " ..[ai][cC] -- «smart» column
+NeoBundle 'lucapette/vim-textobj-underscore'    " ..[ai]_ -- part of _some_text_
 
 "" NOTE pairs by priority: ({["'<`
 " ALT (more old and in jp) 'osyo-manga/vim-textobj-multiblock'
@@ -55,6 +61,8 @@ NeoBundle 'thinca/vim-textobj-between'     " ..[ai]f..- between found symbols
 NeoBundle 'beloglazov/vim-textobj-quotes'  " ..[ai]q -- any nearest quotes (OR: ..q)
 NeoBundle 'saihoooooooo/vim-textobj-space' " ..[ai]s -- space between words, etc
 NeoBundle 'vimtaku/vim-textobj-sigil'      " ..[ai]g -- for bash/perl $name{...}
+
+"{{{1 Specific ============================
 " ALT 'sgur/vim-textobj-parameter', 'PeterRincker/vim-argumentative'
 NeoBundle 'AndrewRadev/sideways.vim'       " ..[ai], and [<>], -- shift
 " ALT 'airblade/vim-gitgutter' (git only, but much faster file save)
