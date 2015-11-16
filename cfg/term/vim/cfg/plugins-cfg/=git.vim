@@ -1,21 +1,17 @@
-" Leader '\' {{{
-let s:leader = g:mapleader
-let mapleader = "\\"
-
 if neobundle#tap('vim-fugitive')  " Fugitive: {{{1
   autocmd BufReadPost fugitive://* set bufhidden=delete
-  nnoremap <silent> <unique> <leader>gs :Gstatus<CR>
-  nnoremap <silent> <unique> <leader>gl :Glog<CR>
-  nnoremap <silent> <unique> <leader>gd :Gdiff<CR>
-  nnoremap <silent> <unique> <leader>gw :Gwrite<CR>
-  nnoremap <silent> <unique> <leader>gb :Gblame<CR>
+  nnoremap <silent><unique> [Frame]gs :Gstatus<CR>
+  nnoremap <silent><unique> [Frame]gl :Glog<CR>
+  nnoremap <silent><unique> [Frame]gd :Gdiff<CR>
+  nnoremap <silent><unique> [Frame]gw :Gwrite<CR>
+  nnoremap <silent><unique> [Frame]gb :Gblame<CR>
+  call neobundle#untap()
 endif
 
 
-if neobundle#tap('gitv')  " Gitv: {{{1
-  nmap <silent> <unique> <leader>gv :Gitv --all<CR>
-  nmap <silent> <unique> <leader>gV :Gitv! --all<CR>
-  vmap <silent> <unique> <leader>gV :Gitv! --all<CR>
-endif
-
-let mapleader = s:leader  " }}}
+if neobundle#tap('gitv')  "{{{1
+  nnoremap <silent><unique> [Frame]gv :Gitv  --all<CR>
+  nnoremap <silent><unique> [Frame]gV :Gitv! --all<CR>
+  xnoremap <silent><unique> [Frame]gV :Gitv! --all<CR>
+  call neobundle#untap()
+endif "}}}

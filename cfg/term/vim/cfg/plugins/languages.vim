@@ -21,6 +21,10 @@ NeoBundle 'klen/python-mode'
 
 
 "{{{1 Mark-up ============================
+" HACK jap ranobe translation/formatting
+NeoBundleLazy 'amerlyq/vim-forestanza', {
+    \ 'autoload' : { 'filetypes': 'forestanza' }}
+
 " ALT: http://tiddlywiki.com  -- one-page wiki
 NeoBundleLazy 'vimoutliner/vimoutliner', {
     \ 'autoload' : { 'filetypes' : [ 'votl', 'txt' ], }}

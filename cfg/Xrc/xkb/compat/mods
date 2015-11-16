@@ -53,6 +53,9 @@ xkb_compatibility "latch"  {
     // ----------------------------------------------
     latchMods.latchToLock= False;
 
+    // TODO:DEV:
+    //   Lock only on press simultaneously
+    //   On one after another -- use second level (multi/iso)
     interpret Shift_L {
         action= LatchMods(modifiers=Shift);
     };
@@ -60,6 +63,7 @@ xkb_compatibility "latch"  {
     interpret Shift_R {
         action= LatchMods(modifiers=Shift);
     };
+
 
     interpret Super_L+Any {
         //useModMapMods= level1;

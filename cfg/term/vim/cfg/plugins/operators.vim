@@ -13,8 +13,6 @@ NeoBundleLazy 'bkad/CamelCaseMotion', { 'autoload': {
 NeoBundle 'tpope/vim-rsi'
 
 "{{{1 Actions ============================
-" ALT: 'tomtom/tcomment_vim'
-NeoBundle 'tpope/vim-commentary'
 " Automatic not-persistent closing statements
 NeoBundle 'tpope/vim-endwise'
 " Extend support for '.' command
@@ -39,6 +37,9 @@ NeoBundle 'rhysd/vim-operator-surround'    "q..[ai]..-- boundaries of motion
 NeoBundleLazy 'kana/vim-operator-replace', {
       \ 'depends': 'kana/vim-operator-user',
       \ 'autoload': { 'mappings': [['nx', '<Plug>']] } }
+
+" ALT: (overladen) 'tomtom/tcomment_vim'
+NeoBundle 'tpope/vim-commentary'           " ..gc -- for commented area
 
 "{{{1 Textobj ============================
 NeoBundle 'kana/vim-textobj-user'          " = Dependency: vim-textobj-*

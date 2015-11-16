@@ -17,13 +17,8 @@ let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugin.
 " nnoremap ,  <Nop>
 " xnoremap ,  <Nop>
 
-fun! s:MapLeader(fr, to)
-  for c in ['n', 'x', 'o']
-    exe c  .  'map <silent><unique> '. a:fr .' '. a:to
-    exe c.'noremap <silent><unique> '. a:to .' <Nop>'
-  endfor
-endfun
-
-call s:MapLeader('\', '[Frame]')
-call s:MapLeader('q', '[Qoute]')
-call s:MapLeader('<Space>', '[Space]')
+let mods = [['\', '[Frame]'], ['q', '[Quote]'], ['<Space>', '[Space]']]
+for [fr, to] in mods
+  call Map_nxo(fr, to)
+  call Map_nxo(to, '<Nop>', 'noremap')
+endfor

@@ -1,6 +1,7 @@
 Neovim
 	BUG neovim
 		[_] Cursor blinks once after startup
+		[_] Prompt 'Enter' on each save -- excess output line? SEE ui.vim last ENH
 		[_] Double cursor on search by / or ,cr
 		[_] No shell on ,z -- need to reuse code in ranger filechooser
 		[_] No pause on error at :make by ,m
@@ -34,30 +35,13 @@ Neovim
 	[_] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves рывками
 	[_] Disable textwidth indicator column when screensize smaller then tw
-	[_] FIX [Space]-insert mode after ENH stage
 	[_] Vimserver by rpc for LaTeX and FIX? ranger issue to not open vim in vim
 		https://github.com/neovim/neovim/issues/1531
 	THINK autosave on stop writing? -- can be trouble on pause in insert mode
-	[_] Put arrows to use
-		FIND How to make arrows move as virtual=all, keeping hjkl as always
-		THINK Arrows for lineshift?
-			: http://codingfearlessly.com/2012/08/21/vim-putting-arrows-to-use/
-	TODO DEV vimoutline
-		After $ -- use complete bash syntax until end of line
-		SEE multi syntax regions for this -- or include all syntax into region
-	[_] DEV insert single char instead of my Limio
-		SEE $ vimb gh vim insert (seeen until 5th page)
-		: http://vim.wikia.com/wiki/Insert_a_single_character
-		: http://www.vim.org/scripts/script.php?script_id=2810
-		: https://github.com/syngan/vim-operator-inserttext
-		: https://github.com/aur-archive/vim-insertchar
-		: https://github.com/mwgkgk/vim-operator-insert
+		: for writing on android
 
 
 SMALL
-	[_] DEV :SortLine inside selection/motion (like inside brackets)
-		:= Search for operator-* plugins first, or make one myself
-		:= Such operator- plugin may consolidate SortBlock as linewise move
 	2015-06-08 [X] for commenter -- add prefix: '!' in Xresources and ':' in votl
 	:CHECK: how to do this for tcomment
 	2015-11-13 [X] BUG: after saving, can't use n/N -- bad regex of trailing space!
@@ -71,9 +55,6 @@ SMALL
 	[_] Toggling background directly in vim -- use urxvt codes to change
 		color of cursor for more contrast
 	[_] CHECK vim search inside syntax objects -- to search only in strings or in function names
-	[_] DEV mapping to move in column like '{/}' -- on gG, g{, g}
-		: for more simple C-v block selecting
-		: I can make regex which sticks to \< \> and move until this condition works
 	[_] Definition lookup: ag+ctags
 		https://github.com/gorkunov/smartgf.vim
 	[_] SEE http://vimcasts.org/episodes/the-file-explorer/
@@ -94,7 +75,7 @@ BUG:
 		: https://groups.google.com/forum/#!msg/vim_dev/PbLFBAD5Xu8/bH_kew8vmJAJ
 	2015-07-28 [X] FIX gj/gk and j/k for wrapping text
 	[_] FIX? maybe bug from 'not back-moving cursor'
-		: -- V till end of line deletes also \n -- DECIDE: change behaviour?
+		: -- V till end of line deletes also \n -- THINK: change behaviour?
 	[_] FIX russian xkb plugin
 		: Maybe, some of mapping map not as keysym but by keycodes?
 		[_] my own mappings simply don't work (like ,s or ,d)

@@ -1,7 +1,9 @@
-nnoremap \dD :diffoff<Enter>
-nnoremap \dd :diffupdate<Enter>
-nnoremap \dt :diffthis<Enter>
-nnoremap \dT :DiffOrig<Enter>
+" NOTE diffopt=iwhite  to find what is -common- between buffers
+
+nnoremap [Frame]dD :diffoff<CR>
+nnoremap [Frame]dd :diffupdate<CR>
+nnoremap [Frame]dt :diffthis<CR>
+nnoremap [Frame]dT :DiffOrig<CR>
 " nnoremap <silent> <expr> ,d ":\<C-u>".(&diff?"diffoff":"diffthis")."\<CR>"
 
 " Disable paste.

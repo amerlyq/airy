@@ -44,9 +44,6 @@ NeoBundle 'Shougo/neomru.vim', { 'depends' : 'Shougo/unite.vim' }
 
 
 " ======================================
-" W3m from vim
-"NeoBundle 'yuratomo/w3m.vim'
-
 if IsWindows()
 " In unix terminal use snip-ranger-filechooser.vim
 NeoBundleLazy 'Shougo/vimfiler.vim', {
@@ -156,7 +153,5 @@ NeoBundle 'chrisbra/Recover.vim'
 " }}} ======================================
 
 NeoBundle 'amerlyq/vim-focus-autocmd'
-NeoBundleLazy 'amerlyq/vim-forestanza', {
-    \ 'autoload' : { 'filetypes': 'forestanza' }}
 " Viewing man in vim -- good, but no colors in git lg1, need to investigate
 " NeoBundleLazy 'rkitover/vimpager'

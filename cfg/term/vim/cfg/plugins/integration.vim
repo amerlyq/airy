@@ -5,6 +5,9 @@ NeoBundle 'jamessan/vim-gnupg'
 " Use !dict translations from inside vim
 NeoBundle 'szw/vim-dict'
 
+" W3m from vim
+"NeoBundle 'yuratomo/w3m.vim'
+
 " Documentation online finder in one button for word under cursor
 " Keithbsmiley/investigate.vim
 " powerman/vim-plugin-viewdoc

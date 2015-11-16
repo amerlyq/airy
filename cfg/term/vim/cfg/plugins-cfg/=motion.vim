@@ -1,4 +1,4 @@
-" vim:fdm=marker:fdl=1
+" vim:fdm=marker:fdl=2
 
 "{{{1 Motions ============================
 if neobundle#tap('matchit.zip') "{{{
@@ -15,60 +15,24 @@ if neobundle#tap('vim-sneak') "{{{
 "  - text in |folds| is ignored by streak-mode
 "  - return to your original location via |CTRL-O| or |``|
 "  - if `s` is prefixed with a [count] then sneak-vertical-scope invoked
-
   let g:sneak#streak = 1        " Use labels, Space/Esc to choose current
   let g:sneak#s_next = 1        " Use s/S immediately after sneak to next/prev
+  let g:sneak#f_reset = 0
+  let g:sneak#t_reset = 0
   let g:sneak#use_ic_scs = 1    " Respect 'ignorecase' and 'smartcase'
   let g:sneak#textobject_z = 0  " No default z-operator (I use q-operator)
   if hasmapto('[Space]') | let g:sneak#streak_esc = '[Space]' | endif
 
-  " THINK nmap <unique> <Space> <Plug>(SneakStreak)
-
-  " Sneak: 2-character (default) {{{
-  nmap <unique> s <Plug>Sneak_s
-  xmap <unique> s <Plug>Sneak_s
-  omap <unique> s <Plug>Sneak_s
-
-  nmap <unique> S <Plug>Sneak_S
-  xmap <unique> S <Plug>Sneak_S
-  omap <unique> S <Plug>Sneak_S
-  " }}}
-
-
-  " Moving: next/prev -- explicit repeat {{{
-  " (as opposed to implicit 'clever-s' repeat)
-  nmap <unique> <Enter> <Plug>SneakNext
-  xmap <unique> <Enter> <Plug>SneakNext
-  omap <unique> <Enter> <Plug>SneakNext
-
-  nmap <unique> <BS>    <Plug>SneakPrevious
-  xmap <unique> <BS>    <Plug>SneakPrevious
-  omap <unique> <BS>    <Plug>SneakPrevious
-  " OLD:  ]f -> ;  and  [f -> ,
-  " }}}
-
-  " Standart: 1-character enhanced 'f/t' {{{
-  let g:sneak#f_reset = 0
-  let g:sneak#t_reset = 0
-
-  " normal, visual, operator-pending
-  " ALT clever-f ?
-  nmap <unique> f <Plug>Sneak_f
-  xmap <unique> f <Plug>Sneak_f
-  omap <unique> f <Plug>Sneak_f
-
-  nmap <unique> F <Plug>Sneak_F
-  xmap <unique> F <Plug>Sneak_F
-  omap <unique> F <Plug>Sneak_F
-
-  nmap <unique> t <Plug>Sneak_t
-  xmap <unique> t <Plug>Sneak_t
-  omap <unique> t <Plug>Sneak_t
-
-  nmap <unique> T <Plug>Sneak_T
-  xmap <unique> T <Plug>Sneak_T
-  omap <unique> T <Plug>Sneak_T
-  " }}}
+  " SEARCH sneak 's' -- 2-char (default) and clever-'f/t' -- 1-char enhanced
+  for c in split('sfFtT', '\zs')
+    call Map_nxo(c, '<Plug>Sneak_'. c)
+  endfor
+  " JUMP next/prev -- explicit repeat (as opposed to implicit 'clever-s')
+  call Map_nxo('<Enter>', '<Plug>SneakNext')
+  call Map_nxo('<BS>',    '<Plug>SneakNext')
+  " BUG JUMP by label (as in browser) -- how to configure?
+  call Map_nxo('[Frame]s', '<Plug>(SneakStreak)')
+  call Map_nxo('[Frame]S', '<Plug>(SneakStreakBackward)')
 
   call neobundle#untap()
 endif "}}}
@@ -93,27 +57,30 @@ if neobundle#tap('vim-operator-surround')  "{{{
 
   nmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
   xmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
-
-  " Current enclosing block of ({["'<`
-  nmap <silent><unique> [Quote]b <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
-  nmap <silent><unique> [Quote]B <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
-  " Surrounding symbols for current cursor position (like 'f`')
-  nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
-  nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
-  " Explicit shortcuts
-  nmap <silent><unique> [Quote]Q <Plug>"operator-surround-delete"<Plug>(textobj-anyblock-a)"
-  " for c in [['('], ['0', '('], ['{'], ['9', '{'], ['['],
-  " \ ['q', '"'], ['"'], ["'"], ['<'], ['.', '<'], ['`']]
-  "   exe printf("nmap <silent><unique> [Quote]%s <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)%s",
-  "       \ string(c[0]), string(1<len(c)? c[1] : c))
-  " endfor
-  nmap <silent><unique> [Quote]( <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)(
-  nmap <silent><unique> [Quote]{ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a){
-  nmap <silent><unique> [Quote][ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)[
-  nmap <silent><unique> [Quote]' <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
-  nmap <silent><unique> [Quote]< <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)<
-  nmap <silent><unique> [Quote]` <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)`
   call neobundle#untap()
+
+  if neobundle#tap('vim-textobj-anyblock')  "{{{
+    " Current enclosing block of ({["'<`
+    nmap <silent><unique> [Quote]b <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
+    nmap <silent><unique> [Quote]B <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
+    " Surrounding symbols for current cursor position (like 'f`')
+    nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
+    nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
+    " Explicit shortcuts
+    nmap <silent><unique> [Quote]Q <Plug>"operator-surround-delete"<Plug>(textobj-anyblock-a)"
+    " for c in [['('], ['0', '('], ['{'], ['9', '{'], ['['],
+    " \ ['q', '"'], ['"'], ["'"], ['<'], ['.', '<'], ['`']]
+    "   exe printf("nmap <silent><unique> [Quote]%s <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)%s",
+    "       \ string(c[0]), string(1<len(c)? c[1] : c))
+    " endfor
+    nmap <silent><unique> [Quote]( <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)(
+    nmap <silent><unique> [Quote]{ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a){
+    nmap <silent><unique> [Quote][ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)[
+    nmap <silent><unique> [Quote]' <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
+    nmap <silent><unique> [Quote]< <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)<
+    nmap <silent><unique> [Quote]` <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)`
+    call neobundle#untap()
+  endif "}}}
 endif "}}}
 
 
@@ -149,7 +116,7 @@ endif "}}}
 
 if neobundle#tap("vim-textobj-quotes")  "{{{
   " Outer quoted is the most useful:
-  omap <silent><unique> [Quote] aq
+  " omap <silent><unique> [Quote] aq
   call neobundle#untap()
 endif "}}}
 

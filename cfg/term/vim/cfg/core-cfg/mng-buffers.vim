@@ -22,6 +22,9 @@ noremap <unique> gl  :<C-U>bnext<CR>
 noremap <unique> gH  :<C-U>bfirst<CR>
 noremap <unique> gL  :<C-U>blast<CR>
 
+" Use on each window of split, to scroll in sync
+nnoremap <unique> <Leader>tb :setl scrollbind! scb?<CR>
+
 " if winnr() > 1
 " DISABLED: bugs
 "   -- when winnr==1 resizes 'ex' line from 1 to bigger when up/down

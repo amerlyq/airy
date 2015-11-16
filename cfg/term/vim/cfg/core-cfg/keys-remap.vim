@@ -5,6 +5,7 @@
 " inoremap jj <Esc>
 inoremap jf <Esc>
 inoremap fj <Esc>
+inoremap ,s <Esc>:update<CR>
 " cnoremap <expr> j
 "       \ getcmdline()[getcmdpos()-2] ==# 'j' ? "\<BS>\<C-c>" : 'j'
 " onoremap jj           <ESC>
@@ -52,6 +53,7 @@ noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 " TRY -- tear out current selection in up/down line for character-wise?
 " TRY -- surround by empty lines for linewise?
 " ALT http://vim.wikia.com/wiki/Quickly_adding_and_deleting_empty_lines
+" NOTE! you can use 'o<C-R>_' to keep indent and not insert any character
 nnoremap <unique> go o<Space><Esc>^"_D
 nnoremap <unique> gO O<Space><Esc>^"_D
 " nnoremap <unique> go o<Space><C-u><Esc>

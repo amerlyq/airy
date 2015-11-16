@@ -1,8 +1,8 @@
 "" VISUAL
 let g:airline_powerline_fonts = 1
 if !exists('g:airline_symbols')
-    " Also use it when font have no support for Powerline
-    let g:airline_symbols = {}
+  " Also use it when font have no support for Powerline
+  let g:airline_symbols = {}
 endif
 
 " Use only necessary plugins
@@ -24,8 +24,8 @@ let g:airline#extensions#tabline#buffer_idx_mode = 1
 
 
 " Direct pick buffer on <leader>\d
-for idx in range(1,9)
-    exec "nmap <unique> \\". idx  ." <Plug>AirlineSelectTab". idx
+for i in range(1,9)
+  call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'map', 'n')
 endfor
 
 
