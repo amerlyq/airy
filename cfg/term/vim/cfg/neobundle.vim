@@ -14,7 +14,7 @@ endif
 
 
 let g:neobundle#default_options = {}
-let g:neobundle#types#git#default_protocol = 'git'  " OR https, ssh
+let g:neobundle#types#git#default_protocol = 'https'  " OR https, ssh
 let g:neobundle#types#git#clone_depth = 1           " Shallow copy
 let g:neobundle#types#git#enable_submodule = 1
 
