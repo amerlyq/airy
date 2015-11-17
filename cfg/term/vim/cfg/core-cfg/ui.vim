@@ -9,13 +9,13 @@ set wildoptions=tagfile  " Can supplement a tag in a command-line.
 set wildignore+=*.o,*.obj,.git,*.rbc,*.class,.svn,vendor/gems/*
 
 " Never use select(replace) mode by mouse/keyboard. Always use visual.
-set selectmode=
-set keymodel=
+set selectmode= "empty
+set keymodel= "empty
 
 
-set showcmd     " Shows the last command entered in the very bottom right
-set laststatus=2    " always show status line
-set ruler
+set ruler           " Show cursor position
+set showcmd         " Shows last command entered in the very bottom right
+set laststatus=2    " Show status line always
 " Custom command line when no airline or for it's bckgr splits
 " set statusline=%f\ %m\ %r\ line:%l/%L(%p%%)\ col:%c\ buf:%n\ (%b)(0x%B)
 " set statusline=%02n:%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
@@ -29,13 +29,10 @@ let &statusline="%{winnr('$')>1?'['.winnr().'/'.winnr('$')"
 
 set confirm         " ask user before aborting an action
 set novisualbell    " don't flash the screen
-set shortmess=aIT   " No intro msg, etc
+set shortmess=atTIO " No intro msg, etc
 " set cmdheight=2   " No hit <CR> twice after :make (but lose one view line)
 " If you accidentally hit or and you want to see the displayed text then use
 " |g<|. This only works when 'more' is set.
-"   To reduce the number of hit-enter prompts:
-"       Set 'cmdheight' to 2 or higher.
-"       Add flags to 'shortmess'.
 "       Reset 'showcmd' and/or 'ruler'.
 " If set nomore -> the prompts will be no more
 

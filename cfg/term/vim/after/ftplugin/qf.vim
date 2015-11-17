@@ -44,11 +44,10 @@ for [k, v] in items(s:qf_mappings)
   exe printf(s:fmt_key, k, substitute(v, '#', b:wPref, 'g'))
 endfor
 
-" FROM: https://github.com/thinca/vim-qfreplace/issues/5
 " MAIN: https://github.com/romainl/dotvim/blob/master/bundle/qf/after/ftplugin/qf.vim
 " filter the location/quickfix list :Filter foo
 command! -buffer -nargs=* Filter call qf#FilterList(<q-args>)
-nnoremap <silent> <buffer> § :Filter <C-r><C-f><CR>
+nnoremap <silent> <buffer> <F4> :Filter <C-r><C-f><CR>
 " restore the location/quickfix list :Restore
 command! -buffer Restore call qf#RestoreList()
 nnoremap <silent> <buffer> <F5> :Restore<CR>
@@ -56,3 +55,24 @@ nnoremap <silent> <buffer> <F5> :Restore<CR>
 command! -buffer -nargs=1 Doline call qf#DoList(1, <q-args>)
 " do something on each file in the location/quickfix list :Dofile %s/^/---
 command! -buffer -nargs=1 Dofile call qf#DoList(0, <q-args>)
+
+" SEE more stable solution
+"   https://github.com/thinca/vim-qfreplace/issues/5
+" if exists('s:processing') | finish | endif
+" let s:processing = 1
+" let listbufnr = bufnr("%")
+" let numwindows = winnr('$')
+" let altwin = winnr('#')
+" let curwin = winnr()
+" copen
+" if curwin == winnr()
+"   call setbufvar(listbufnr, 'isQuickfix', '1')
+" endif
+" " close the quickfix list if it was closed when we began
+" if numwindows != winnr('$')
+"   cclose
+" endif
+" " return to quickfix/location list
+" exe altwin 'wincmd w'
+" exe curwin 'wincmd w'
+" unlet s:processing

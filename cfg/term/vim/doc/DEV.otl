@@ -55,6 +55,16 @@ Operators
 
 > Plugins
 
+Window & buffer
+	2015-11-17 [X] https://github.com/zhaocai/GoldenView.Vim
+	https://github.com/spolu/dwm.vim
+	https://github.com/vectorstorm/vim-spacelanes
+	https://github.com/moll/vim-bbye
+	https://github.com/t9md/vim-choosewin
+	https://github.com/talek/obvious-resize
+
+
+
 Syntax
 	Ranger
 	SEE
@@ -83,12 +93,19 @@ Outline
 Python
 	Module in file
 		SEE http://www.terminally-incoherent.com/blog/2013/05/06/vriting-vim-plugins-in-python/
-		: function! LoadYAML(path)
-		: " import vim
-		: " vim.command("let sInVim = %s".format(range(10)))
-		: if has('python3')| return |endif
-		: py3file markdown2html.py
+		: function! LoadFromYAML(path)
+		: if has('python3') | let pyt='python3'
+		: elseif has('python2') | let pyt='python2' | finish | endif
+		: " ALT: py3file load_yaml.py
+		: exe pyt . ' << endofpython'
+		: 	import vim, yaml;
+		: 	with open(vim.eval("a:path")) as f:
+		: 		plugins = yaml.safe_load(f)
+		: 	for src, opts in plugins.items():
+		: 		vim.command("NeoBundle '{!s:s}', {}".format(src, opts))
+		: endofpython
 		: endfunc
+
 
 Manipulations
 	[_] DEV Table mode editing -- shift columns (when editing lyrics -- you need

@@ -6,8 +6,7 @@ NeoBundleLazy 'matchit.zip', { 'autoload' : { 'mappings' : ['%', 'g%'] }}
 " NOT NEEDED: https://github.com/rhysd/clever-f.vim
 NeoBundle 'justinmk/vim-sneak'
 " New motions [count]{ ,w ,b ,e } for n/o/v modes in camel_case
-NeoBundleLazy 'bkad/CamelCaseMotion', { 'autoload': {
-    \ 'mappings': '<Plug>' }}
+NeoBundleLazy 'bkad/CamelCaseMotion', { 'autoload': { 'mappings': '<Plug>' }}
 " Readline style insertion
 " http://www.vim.org/scripts/script.php?script_id=4359
 NeoBundle 'tpope/vim-rsi'
@@ -23,8 +22,7 @@ NeoBundle 'tpope/vim-speeddating'
 "   cxx -- current line, X -- in Visual mode,  cxc -- clear pending exchange.
 NeoBundle 'tommcdo/vim-exchange'
 " I,A,gI for all VISUAL like in V-BLOCK
-NeoBundle 'kana/vim-niceblock', { 'autoload': {
-    \ 'mappings': '<Plug>' }}
+NeoBundle 'kana/vim-niceblock', { 'autoload': { 'mappings': '<Plug>' }}
 " Mappings to add empty lines or move/exchange/duplicate/fetch lines of text
 " ALT NeoBundle 'tpope/vim-unimpaired'
 " NeoBundle 'vim-scripts/LineJuggler'

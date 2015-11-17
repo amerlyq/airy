@@ -9,6 +9,32 @@ if neobundle#tap('DrawIt') "{{{
 endif "}}}
 
 
+if neobundle#tap('GoldenView.Vim') "{{{
+  let g:goldenview__enable_at_startup = 1
+  let g:goldenview__enable_default_mapping = 0
+  " ALSO :Disable*, :Enable*
+  noremap <unique>      <Leader>tm <Plug>ToggleGoldenViewAutoResize
+  " Do automatic/manual resizing of focused window, or split it
+  nmap <unique><silent> [Frame]vt  <Plug>ToggleGoldenViewAutoResize
+  nmap <unique><silent> [Frame]vr  <Plug>GoldenViewResize
+  nmap <unique><silent> [Frame]vs  <Plug>GoldenViewSplit
+  " Jump to next/prev or choosen
+  nmap <unique><silent> [Frame]vn  <Plug>GoldenViewNext
+  nmap <unique><silent> [Frame]vp  <Plug>GoldenViewPrevious
+  " Switch current window with one of others and toggle back
+  nmap <unique><silent> [Frame]vv  <Plug>GoldenViewSwitchToggle
+  nmap <unique><silent> [Frame]vM  <Plug>GoldenViewSwitchMain
+  nmap <unique><silent> [Frame]vL  <Plug>GoldenViewSwitchWithLargest
+  nmap <unique><silent> [Frame]vS  <Plug>GoldenViewSwitchWithSmallest
+  " fun! neobundle#hooks.on_source(bundle)
+  "   call GoldenView#ExtendProfile('small-height',
+  "       \ { 'other_window_winheight': 2 })
+  "   let g:goldenview__active_profile = 'small-height'
+  " endfun
+  call neobundle#untap()
+endif "}}}
+
+
 if neobundle#tap('vim-rooter') "{{{
   let g:rooter_manual_only = 1
   let g:rooter_disable_map = 1

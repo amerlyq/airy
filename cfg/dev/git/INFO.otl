@@ -202,6 +202,11 @@ Submodules
 	Full update
 		git pull && git submodule update --init --recursive
 		git submodule update --remote --merge
+		OR (truly)
+			git submodule -q foreach git pull -q origin master
+		ALT
+			git pull --recurse-submodules
+			git submodule update --recursive
 	Push:
 		cd vendor
 		git checkout master

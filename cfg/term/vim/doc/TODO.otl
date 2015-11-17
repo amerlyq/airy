@@ -1,13 +1,14 @@
 Neovim
 	BUG neovim
-		[_] Cursor blinks once after startup
+		2015-11-17 [X] Cursor blinks once after startup
+			:> Make Deoplete loading lazy
 		[_] Prompt 'Enter' on each save -- excess output line? SEE ui.vim last ENH
 		[_] Double cursor on search by / or ,cr
-            := Seems like this bug is related to t_vi/t_ve disabled in Neovim?
+			:= Seems like this bug is related to t_vi/t_ve disabled in Neovim?
 		[_] No shell on ,z -- need to reuse code in ranger filechooser
 		[_] No pause on error at :make by ,m
 		[_] Error from make, when launched through abyss not from root dir
-		[_] Automagnify -- fix height problems
+		[_] Automagnify -- fix height problems after split
 		[_] Err xsel no X launched/present?
 			:= It's result of *has('clipboard')* inside several plugins
 			: Seems like I need to try last AUR build, but build it on
@@ -32,7 +33,6 @@ Neovim
 	[_] Check my vim-focus on compatability and unnecessary
 	[_] BUG vim -- press 'v$' -- will select end of line also! (in .otl at least)
 		:= Then deleting selection will cause joining lines!
-	[_] FIX auto-magnify -- split screen in already small window
 	[_] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves рывками
 	[_] Disable textwidth indicator column when screensize smaller then tw
@@ -128,6 +128,10 @@ SEE & CHECK
 	[_] Graphviz
 		https://github.com/wannesm/wmgraphviz.vim
 		https://github.com/dahu/VimCallGraph
+
+	<Diff
+		vim llvm + plugin == на синт разбор
+		http://pig-monkey.com/2013/04/4/password-management-vim-gnupg/
 
 
 vim:
@@ -244,6 +248,8 @@ PROFILING
 			vim -V12
 			vim -V20/tmp/vimlog
 	Debug
+		Hit Enter -- find who is cause screen to scroll up (only first reason remembered)
+			:v:scrollstart
 		Loadorder of *.vim by
 			:scriptnames
 		Source line and selection in vim

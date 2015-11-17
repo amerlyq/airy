@@ -47,10 +47,6 @@
 " The best testing framework for Vim script'
 "NeoBundle 'Shougo/vesting'
 
-" Always have a nice view for vim split windows
-" http://zhaocai.github.io/GoldenView.Vim/
-"NeoBundle 'zhaocai/GoldenView.Vim'
-
 "NeoBundle 'scrooloose/nerdtree, { 'augroup' : 'NERDTreeHijackNetrw'}'
 
 " ======================================
