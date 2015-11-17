@@ -16,11 +16,10 @@ NeoBundleLazy 'Shougo/neocomplete.vim', {
     \ 'disabled' : !has('lua') }
 
 " DO: :UpdateRemotePlugins and restart. Then once execute :DeopleteEnable
-let g:deoplete#enable_at_startup = 1
-NeoBundle 'Shougo/deoplete.nvim', {
-    \ 'autoload' : { 'insert': 1 },
-    \ 'depends' : [ 'Shougo/context_filetype.vim' ],
-    \ 'disabled' : !has('nvim') }
+NeoBundleLazy 'Shougo/deoplete.nvim', {
+    \ 'autoload': { 'insert': 1 },
+    \ 'depends': [ 'Shougo/context_filetype.vim' ],
+    \ 'neovim': 1 }
 
 " ALT SirVer/ultisnips
 NeoBundleLazy 'Shougo/neosnippet.vim', {

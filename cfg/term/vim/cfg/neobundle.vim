@@ -20,10 +20,12 @@ let g:neobundle#types#git#enable_submodule = 1
 
 
 call neobundle#begin(expand('$BUNDLES'))
-  if neobundle#load_cache()
+  " if neobundle#load_cache()
     NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
     call SourcePlugins()
-    NeoBundleSaveCache
-  endif
+    " NeoBundleSaveCache
+  " endif
   call SourcePluginsCfg()
 call neobundle#end()  " Load all listed non-lazy plugins
+
+NeoBundleCheck

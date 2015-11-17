@@ -18,13 +18,13 @@ if neobundle#tap('incsearch.vim') "{{{
   map <unique> g/ <Plug>(incsearch-stay)
   call neobundle#untap() "}}}
 
-  if neobundle#tap('incsearch.vim') "{{{ 'osyo-manga/vim-anzu'
+  if neobundle#tap('vim-anzu') "{{{ 'osyo-manga/vim-anzu'
     map <unique> n <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
     map <unique> N <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
     call neobundle#untap()
   endif "}}}
 
-  if neobundle#tap('incsearch.vim') "{{{ 'haya14busa/vim-asterisk'
+  if neobundle#tap('vim-asterisk') "{{{ 'haya14busa/vim-asterisk'
     let g:asterisk#keeppos = 1
     map <unique> *   <Plug>(incsearch-nohl)<Plug>(asterisk-*)
     map <unique> g*  <Plug>(incsearch-nohl)<Plug>(asterisk-g*)

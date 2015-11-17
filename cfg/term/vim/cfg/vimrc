@@ -17,8 +17,6 @@ call s:cfg('core/leaders.vim')
 fun! SourcePlugins()
   let g:mapleader="\\"
   call s:cfg('plugins/backslash.vim')
-  " let g:mapleader=" "
-  " call s:cfg('plugins/space.vim')
   let g:mapleader=","
   call s:cfg('plugins/autocomplete.vim')
   call s:cfg('plugins/comma.vim')
@@ -54,12 +52,9 @@ call s:cfg('features/clipboard.vim')
 
 " " Default home directory.
 " let t:cwd = getcwd()
-
-augroup MyAutoCmd
   " Open at last position
-  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+au MyAutoCmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
         \| exe "normal g'\"" | endif
-augroup END
 
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
 set exrc secure modeline  " also parse 'vim:...' cmds from comments

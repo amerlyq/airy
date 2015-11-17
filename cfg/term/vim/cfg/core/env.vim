@@ -18,21 +18,21 @@ endif
 " NOTE The '//' at directory end: use full path for filename with '%' separators
 let $FALLBACK='~/.tmp,/var/tmp,/tmp'
 " Swap
-set directory=$CACHE/swapdir//,$FALLBACK
+set directory=$CACHE/swap//,$FALLBACK
 set swapfile
 set updatetime=1000  " Save swap when inactive (ALSO interval for CursorHold)
 " Backup
-set backupdir=$CACHE/bckpdir//,$FALLBACK
+set backupdir=$CACHE/backup,$FALLBACK
 set backup writebackup backupcopy=auto
 " View
-set viewdir=$CACHE/view,$FALLBACK
+set viewdir=$CACHE/view
 set viewoptions-=options viewoptions+=slash,unix
 " Spell
 " set runtimepath+=$VIMHOME
 set runtimepath^=$CACHE  " For ./spell
 
 if v:version >= 703
-  set undodir=$CACHE/undodir//,$FALLBACK
+  set undodir=$CACHE/undo//,$FALLBACK
   set undofile
 endif
 if v:version < 703 || (v:version == 7.3 && !has('patch336'))  " Vim's bug.
