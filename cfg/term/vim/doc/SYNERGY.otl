@@ -3,6 +3,8 @@
 DEV ranger integration
 	[_] If open already opened in this vim -- return
 	[_] If press E -- real edit -- send file into vim, but remain in ranger
+		: It must be possible in neovim by saving file and calling callback
+		:	but staying inside ranger w/o exit
 	[_] When invoked ':RangerChooser!!' add --choosedir= and then :cd <newcwd>
 	[_] view instead of vim in ranger by default
 		[_] shortcuts to fast toggle vim readonly
@@ -11,6 +13,10 @@ DEV ranger integration
 	[_] Socket server for IPython (try to write for usage with ranger)
 		See how created REPL
 		: https://github.com/ivanov/vim-ipython
+	[_] Jobs api on Neovim for color-syntax in ranger preview
+		:= Launch neovim once, relauch on each crash, send/receive files
+		+ Also neovim could be integrated into ranger command line editing?
+			:= Like C-V and then bulkrename directly onto filelist?
 	[_] Vimserver standalone (now can be replaced by neovim?)
 		[_] Toggle vim instances as current main server <S-F2>
 		 See if it possible: ex command, with vim restart, or no way

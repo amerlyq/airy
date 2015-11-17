@@ -53,7 +53,7 @@ elif distro arch; then
     aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' $@; }
   else aur_inst(){ return 1; }
   fi
-
+  pip_inst(){ sudo pip3 install --upgrade $@; }
 fi
 
 

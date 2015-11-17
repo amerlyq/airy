@@ -10,21 +10,34 @@ endif
 set nobackup noundofile noswapfile
 set nowrap ttyfast
 
+let $VIMHOME=fnamemodify(expand('$MYVIMRC'), ':h')
 let $BUNDLES=expand('~/.cache/vim/bundle')
 set runtimepath+=$BUNDLES/neobundle.vim
 
+
+fun! s:cfg(path)
+  for f in globpath(expand($VIMHOME .'/cfg/'), a:path, 0, 1)
+    exe 'source' fnameescape(f)
+  endfor
+endf
+
+
 call neobundle#begin(expand('$BUNDLES'))
-  NeoBundleLazy 'octol/vim-cpp-enhanced-highlight'
-      \ 'autoload' : { 'filetypes' : [ 'c', 'cpp' ] }}
+  " NeoBundleLazy 'octol/vim-cpp-enhanced-highlight'
+  "     \ 'autoload' : { 'filetypes' : [ 'c', 'cpp' ] }}
   NeoBundleLazy 'vimoutliner/vimoutliner', {
       \ 'autoload' : { 'filetypes' : [ 'votl'] }}
   NeoBundle 'altercation/vim-colors-solarized'
+
+  call s:cfg('plugin-cfg/vim-colors-solarized.vim')
 call neobundle#end()
+
 
 filetype plugin indent on
 syntax on
 
 let g:forced_theme='transparent'
-runtime! ext/everywhere-notes.vim cfg/ui-colors.vim
+
+call s:cfg('core-cfg/ui-colors.vim')
 
 set exrc secure

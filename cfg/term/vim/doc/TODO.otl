@@ -2,17 +2,21 @@ Neovim
 	BUG neovim
 		2015-11-17 [X] Cursor blinks once after startup
 			:> Make Deoplete loading lazy
-		[_] Prompt 'Enter' on each save -- excess output line? SEE ui.vim last ENH
+		2015-11-18 [X] Prompt 'Enter' on each save -- excess output line? SEE ui.vim last ENH
+			:> Seems like somehow fixed. Need more excessive testing.
 		[_] Double cursor on search by / or ,cr
 			:= Seems like this bug is related to t_vi/t_ve disabled in Neovim?
 		[_] No shell on ,z -- need to reuse code in ranger filechooser
 		[_] No pause on error at :make by ,m
 		[_] Error from make, when launched through abyss not from root dir
-		[_] Automagnify -- fix height problems after split
+		2015-11-18 [X] Automagnify -- fix height problems after split
+			:> Use plugin GoldenRatio.Vim
 		[_] Err xsel no X launched/present?
 			:= It's result of *has('clipboard')* inside several plugins
 			: Seems like I need to try last AUR build, but build it on
 			:	android is troublesome...
+			:= As a workaround -- load custom vimrc on android?
+		[_] BUG of vim-stay -- text is folded on restore
 	2015-11-10 [X] Check neovim (for neovim-git better use pacaur instead of yaourt)
 	[_] ADD guards to each cfg file: g:did_load_<sname> = 1
 		:= this will allow s:cfg('dir/file') and then s:cfg('dir/*')

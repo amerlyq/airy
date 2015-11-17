@@ -100,6 +100,9 @@ case "$extension" in
         try elinks -dump "$path" | fmt -s -w $width && exit 4
         try w3m    -dump "$path" | fmt -s -w $width && exit 4
         ;; # fall back to highlight/cat if the text browsers fail
+    otl)
+        try "$EXTDIR/color-preview" "$path" && exit 5 || exit 2
+        ;;
 esac
 
 
@@ -107,7 +110,9 @@ case "$mimetype" in
 
     text/*|*/xml) # Syntax highlight for text files:
         if command -v pygmentize >/dev/null; then
-            try pygmentize "$path" && exit 5 || exit 2
+            # WARNING: you must be sure to have 256 term and downloaded solarized
+            try pygmentize -g -f terminal256 -O style=solarizeddark \
+                "$path" && exit 5 || exit 2
             # try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
             ## Also highly loads CPU
             # try "$EXTDIR/color-preview" pygmentize "$path" && exit 5 || exit 2

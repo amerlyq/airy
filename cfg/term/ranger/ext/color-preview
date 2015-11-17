@@ -15,7 +15,7 @@ mkdir -p /tmp/preview
 fpath="${@: -1}"
 # eval '${@:1:($#-1)} "$ftmp"'
 
-EXT=~/.config/ranger/ext
+EXT="${0%/*}"
 vimrc=$EXT/vimcatrc
 script=$EXT/vimcat.vim
 ftmp="/tmp/preview/${fpath##*/}"
