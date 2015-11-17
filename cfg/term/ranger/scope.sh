@@ -107,8 +107,8 @@ case "$mimetype" in
 
     text/*|*/xml) # Syntax highlight for text files:
         if command -v pygmentize >/dev/null; then
-            # try pygmentize "$path" && exit 5 || exit 2
-            try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
+            try pygmentize "$path" && exit 5 || exit 2
+            # try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
             ## Also highly loads CPU
             # try "$EXTDIR/color-preview" pygmentize "$path" && exit 5 || exit 2
 

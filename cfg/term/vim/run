@@ -1,5 +1,16 @@
 #!/bin/bash -e
 
-export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
-# export NVIM_TUI_ENABLE_TRUE_COLOR=1
+unset NVIM_TUI_ENABLE_TRUE_COLOR
+unset NVIM_TUI_ENABLE_CURSOR_SHAPE
+
+case "$TERM"
+in xterm-*)
+    # BUG: open vim inside vim -- thinks it's xterm
+    # export NVIM_TUI_ENABLE_TRUE_COLOR=1
+    export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+;; rxvt-*)
+    export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+;; *)
+;; esac
+
 nvim $@

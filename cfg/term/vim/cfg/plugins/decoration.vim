@@ -12,4 +12,4 @@ NeoBundle 'kshenoy/vim-signature'
 
 " Colorschemes
 " NeoBundle 'tomasr/molokai'
-NeoBundle 'altercation/vim-colors-solarized'
+" NeoBundle 'altercation/vim-colors-solarized'

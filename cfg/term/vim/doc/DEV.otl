@@ -17,6 +17,7 @@ Leaders
 		: USE CamelMotion on Space? Or smart-word for urls-like strings?
 
 Operators
+	DEV '[ai]k' -- copy key until ':' -- useful for yaml
 	DEV space-insert
 		[_] FIX [Space]-insert mode after ENH stage
 		[_] DEV insert single char instead of my Limio
@@ -55,24 +56,6 @@ Operators
 
 > Plugins
 
-Window & buffer
-	2015-11-17 [X] https://github.com/zhaocai/GoldenView.Vim
-	https://github.com/spolu/dwm.vim
-	https://github.com/vectorstorm/vim-spacelanes
-	https://github.com/moll/vim-bbye
-	https://github.com/t9md/vim-choosewin
-	https://github.com/talek/obvious-resize
-
-
-
-Syntax
-	Ranger
-	SEE
-	[_] own syntax highlighting
-		http://learnvimscriptthehardway.stevelosh.com/chapters/46.html
-		http://vim.wikia.com/wiki/Search_for_lines_not_containing_pattern_and_other_helpful_searches
-		https://robots.thoughtbot.com/writing-vim-syntax-plugins
-
 Notches
 	Cycle through all notches
 		https://github.com/zef/vim-cycle
@@ -93,18 +76,7 @@ Outline
 Python
 	Module in file
 		SEE http://www.terminally-incoherent.com/blog/2013/05/06/vriting-vim-plugins-in-python/
-		: function! LoadFromYAML(path)
-		: if has('python3') | let pyt='python3'
-		: elseif has('python2') | let pyt='python2' | finish | endif
-		: " ALT: py3file load_yaml.py
-		: exe pyt . ' << endofpython'
-		: 	import vim, yaml;
-		: 	with open(vim.eval("a:path")) as f:
-		: 		plugins = yaml.safe_load(f)
-		: 	for src, opts in plugins.items():
-		: 		vim.command("NeoBundle '{!s:s}', {}".format(src, opts))
-		: endofpython
-		: endfunc
+		Universal code py2/3: https://github.com/wilywampa/vim-ipython
 
 
 Manipulations

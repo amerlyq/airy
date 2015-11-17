@@ -23,6 +23,9 @@ NeoBundleLazy 'chrisbra/unicode.vim', { 'autoload': {
     \ 'mappings': [['n', '<C-X><C-G>'], ['n', '<C-X><C-Z>'], ['n', '<F4>']] }}
 
 
+NeoBundle 'wmvanvliet/vim-ipython'
+" NeoBundle 'wilywampa/vim-ipython'
+
 " THINK
 " 'lambdalisue/vim-gista', { 'autoload': {
 "   \ commands = 'Gista', mappings = '<Plug>', unite_sources = 'gista' }}

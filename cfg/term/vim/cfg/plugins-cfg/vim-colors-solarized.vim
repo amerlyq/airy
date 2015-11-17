@@ -5,7 +5,7 @@ elseif &t_Co > 16
   "If 256 -- choose from existing palette similar colors:
   "   makes brown bg and bold font...
   let g:solarized_termcolors=&t_Co
-  let g:airline_theme = 'badwolf'  " serene
+  let g:airline_theme = 'badwolf'  " seren
 else
   echom "Too much reduced palette for solarized colorscheme"
 endif

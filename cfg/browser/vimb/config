@@ -66,7 +66,7 @@ set scrollstep=120
 set home-page=https://google.com/
 # set editor-command=gvim -f %s
 # At specified position: -g 78x8+50+20
-set editor-command=x-terminal-emulator -g 78x5 -name Float -e vim +'norm G$' -u ~/.vim/vimrc_basic %s
+set editor-command=x-terminal-emulator -g 78x5 -name Float -e vim +norm\!G\$ -u ~/.vim/vimrc_basic --noplugin %s
 set x-hint-command=:sh! curl -e <C-R>% <C-R>;
 set webinspector=true
 

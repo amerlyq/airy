@@ -7,6 +7,20 @@ exe "fun! IsSudo()   \nreturn".($SUDO_USER !=# '' && $USER !=# $SUDO_USER &&
     \ $HOME !=# expand('~'.$USER) && $HOME ==# expand('~'.$SUDO_USER))."\nendf"
 
 
+"{{{1 Cross-wrappers ==========
+if has('python3') && get(g:, 'pymode_python', '') !=# 'python'
+  command! -nargs=1 PythonI python3 <args>
+  PythonI PY3 = True
+  exe "fun! IPythonPyeval(arg)\nreturn py3eval (a:arg)\nendf"
+elseif has('python')
+  command! -nargs=1 PythonI python <args>
+  PythonI PY3 = False
+  exe "fun! IPythonPyeval(arg)\nreturn pyeval (a:arg)\nendf"
+else
+  echom "No python support. Your bads, plugins will be not loaded"
+endif
+
+
 "{{{1 Maps helpers ==========
 fun! RetainPos(cmd)
   " ALT line("."), col(".")
