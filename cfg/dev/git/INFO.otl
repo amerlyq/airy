@@ -9,6 +9,14 @@ Cool manual
 
 git difftool -t meld <commit> <commit> [<path_to_file_to_compare>]
 
+View old files
+    Current dir in older revision
+        git show 'HEAD~20:./'
+        git show 'master:HEAD~20:./'
+        git ls-tree 'HEAD~20'
+        git cat-file blob 'HEAD~20'
+
+
 Git Trick: Preview before pull
 	http://entrenchant.blogspot.com/2013/06/git-trick-preview-before-pull.html
 

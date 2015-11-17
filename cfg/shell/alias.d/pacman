@@ -1,0 +1,23 @@
+#!/bin/bash
+if hash pacaur >/dev/null 2>&1; then
+    alias pacman='pacaur'
+elif hash yaourt >/dev/null 2>&1; then
+    alias pacman='yaourt'
+else
+    alias pacman='sudo pacman'
+fi
+
+alias paci='pacman -S'     # install
+alias pacI='pacman -Su'    # install file
+alias pacu='pacman -Sy'    # refresh only
+alias pacU='pacman -Syu'   # '[u]pgrade all'
+alias pacr='\pacman -Rs'   # '[r]emove'
+alias pacR='\pacman -Rs --nosave --recursive'
+alias pacs='pacman -Ss'    # '[s]earch repos'
+alias pacS='pacman -Qs'    # '[s]earch local'
+alias pacI='pacman -Si'    # '[i]nfo'
+alias paclo='\pacman -Qdt'  # '[l]ist [o]rphans'
+# alias pacc='pacman -Scc'   # '[c]lean cache' (not currently installed)
+alias paclf='\pacman -Ql'   # '[l]ist [f]iles' (installed by a given package)
+# alias pacexpl='pacman -D --asexp'  # 'mark as [expl]icit'
+# alias pacimpl='pacman -D --asdep'  # 'mark as [impl]icit'
