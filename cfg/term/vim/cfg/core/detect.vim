@@ -1,4 +1,6 @@
 exe "fun! IsWindows()\nreturn".(has('win32') || has('win64'))."\nendf"
+exe "fun! IsAndroid()\nreturn".('android'==#$USER&&$TERM=~#'^xterm')."\nendf"
+
 exe "fun! IsCygwin() \nreturn". has('win32unix') ."\nendf"
 exe "fun! IsMac()    \nreturn".(!IsWindows() && !IsCygwin() && (
     \ has('mac') || has('macunix') || has('gui_macvim') || (
