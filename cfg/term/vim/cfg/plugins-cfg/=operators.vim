@@ -37,8 +37,8 @@ endif "}}}
 
 
 if neobundle#tap('vim-expand-region') "{{{
-  xmap v <Plug>(expand_region_expand)
-  xmap <C-v> <Plug>(expand_region_shrink)
+  xmap <silent><unique> + <Plug>(expand_region_expand)
+  xmap <silent><unique> - <Plug>(expand_region_shrink)
   call neobundle#untap()
 endif "}}}
 
@@ -65,7 +65,7 @@ if neobundle#tap('vim-operator-surround')  "{{{
     nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
     nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
     " Explicit shortcuts
-    nmap <silent><unique> [Quote]Q <Plug>"operator-surround-delete"<Plug>(textobj-anyblock-a)"
+    nmap <silent><unique> [Quote]Q <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)"
     " for c in [['('], ['0', '('], ['{'], ['9', '{'], ['['],
     " \ ['q', '"'], ['"'], ["'"], ['<'], ['.', '<'], ['`']]
     "   exe printf("nmap <silent><unique> [Quote]%s <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)%s",
@@ -85,17 +85,16 @@ endif "}}}
 if neobundle#tap('vim-operator-replace') "{{{
   " THINK Could be used instead of my own paste-replace?
   " xmap p <Plug>(operator-replace)
-  map - <Plug>(operator-replace)
+  map <silent><unique> gr <Plug>(operator-replace)
   call neobundle#untap()
 endif "}}}
 
 
-if neobundle#tap('vim-textobj-entire')  "{{{
-  let g:textobj_entire_no_default_key_mappings = 1
-  xmap <silent><unique> aG <Plug>(textobj-entire-a)
-  omap <silent><unique> aG <Plug>(textobj-entire-a)
-  xmap <silent><unique> iG <Plug>(textobj-entire-i)
-  omap <silent><unique> iG <Plug>(textobj-entire-i)
+if neobundle#tap('vim-exchange') "{{{
+  xmap <silent><unique> X   <Plug>(Exchange)
+  nmap <silent><unique> cx  <Plug>(Exchange)
+  nmap <silent><unique> cxc <Plug>(ExchangeLine)
+  nmap <silent><unique> cxx <Plug>(ExchangeClear)
   call neobundle#untap()
 endif "}}}
 
@@ -140,20 +139,28 @@ if neobundle#tap('vim-textobj-sigil')  "{{{
 endif "}}}
 
 
+if neobundle#tap('vim-textobj-entire')  "{{{
+  let g:textobj_entire_no_default_key_mappings = 1
+  xmap <silent><unique> aG <Plug>(textobj-entire-a)
+  omap <silent><unique> aG <Plug>(textobj-entire-a)
+  xmap <silent><unique> iG <Plug>(textobj-entire-i)
+  omap <silent><unique> iG <Plug>(textobj-entire-i)
+  call neobundle#untap()
+endif "}}}
+
+
 "{{{1 Specific ============================
 if neobundle#tap('sideways.vim')  "{{{
   xmap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
   omap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
-
   xmap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
   omap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
-
+  " NOTE: overrides 'ga -- print ascii for letter', do 'norm! ga' on demand
+  nmap <silent><unique> ga <Plug>SidewaysLeft
+  nmap <silent><unique> gA <Plug>SidewaysRight
+  " TODO replace with ',a' OR '<Tab>a', and move Ag to '[Frame]a]'
   noremap <silent><unique> [a :<C-u>SidewaysJumpLeft<CR>
   noremap <silent><unique> ]a :<C-u>SidewaysJumpRight<CR>
-
-  " NOTE: overrides 'ga -- print ascii for letter', do 'unmap ga' on demand
-  nnoremap <silent><unique> ga :SidewaysLeft<CR>
-  nnoremap <silent><unique> gA :SidewaysRight<CR>
   call neobundle#untap()
 endif "}}}
 
@@ -162,13 +169,13 @@ if neobundle#tap('vim-signify')  "{{{
   let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
   let g:signify_sign_change = '~'
   let g:signify_sign_delete = '-'
-
-  noremap <unique> <leader>tg :<C-u>SignifyToggle \| redraw!<CR>
-  noremap <unique> <leader>tG :<C-u>SignifyToggleHighlight \| redraw!<CR>
+  noremap <unique> [Frame]gg :<C-u>SignifyFold<CR>
+  noremap <unique> <leader>tg :<C-u>SignifyToggle \| SignifyRefresh<CR>
+  noremap <unique> <leader>tG :<C-u>SignifyToggleHighlight \| SignifyRefresh<CR>
   "" Already mapped -- if busy: automaps <leader>gj and <leader>gk
-  " nmap <unique> ]c <Plug>(signify-next-hunk)
-  " nmap <unique> [c <Plug>(signify-prev-hunk)
-
+  nmap <silent><unique> ]c <Plug>(signify-next-hunk)
+  nmap <silent><unique> [c <Plug>(signify-prev-hunk)
+  " Textobj -- changed areas
   xmap <silent><unique> aS <Plug>(signify-motion-outer-visual)
   omap <silent><unique> aS <Plug>(signify-motion-outer-pending)
   xmap <silent><unique> iS <Plug>(signify-motion-inner-visual)

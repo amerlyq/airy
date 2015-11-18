@@ -27,6 +27,8 @@ cnoremap <C-k> <C-\>e getcmdpos() == 1 ?
       \ '' : getcmdline()[:getcmdpos()-2]<CR>
 "}}}
 
+xnoremap <unique><expr> v mode()==#"\<C-v>" ? "v" : "\<C-v>"
+"I;\<Esc>" : "\<C-v>I;\<Esc>"
 
 " Now 'a jump you to line and column, and `a only to line
 noremap <unique> ' `
@@ -126,6 +128,7 @@ noremap <unique> ,v  <C-V>
 " Select last paste
 " nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 "" select last paste in visual mode
+" BUG THINK gv/gV -- has no sense / don't work in VISUAL?
 noremap <unique> <expr> gv '`[' . strpart(getregtype(), 0, 1) . '`]'
 " selects the last text edited/pasted in INSERT, and reselect of last VISUAL
 noremap <unique> gV `[v`]

@@ -44,6 +44,22 @@ Neovim
 		https://github.com/neovim/neovim/issues/1531
 	THINK autosave on stop writing? -- can be trouble on pause in insert mode
 		: for writing on android
+	[_] FIND -- qf
+		[_] add new search results to edited results (to edit them together)
+		[_] rearrange up/down entries
+		[_] insert empty strings or delimiters to organize results
+		[_] syntax highlighting on right side of results (snippets)
+
+BUG plugins
+	[_] expand-region -- different mappings in line-, char-, blockwise modes
+		:= TODO same key as mode -- expands, [g|Space][vV<C-V>] -- shrinks
+		:= I have done smth similar in keys-remap  :ALSO:SEE :h v_v
+	[_] textobj-anyblock -- deletes current character if there are no brackets!
+	[_] neobundle - patch if necessary
+		autoload/neobundle/autoload.vim:154
+			silent! execute mode.'unmap ' mapping
+	[_] ag -- FIX escaping '#' -> '\\#'
+	[_] ag -- DEV repeat last search
 
 
 SMALL
@@ -198,6 +214,10 @@ SEIZE
 	SEE: plugins list
 		https://raw.githubusercontent.com/lambdalisue/vim-castle/7545bcea880a28f85947ee47e4b2e9cfc281f804/home/.vim/vimrc
 >>>> [_] https://github.com/Shougo/shougo-s-github
+	Must-see -- kana's dotfiles (as creator textobj/operator/vimmode)
+		http://kana.github.io/config/vim/
+		https://github.com/kana/config/tree/master/vim
+
 >>> [_] https://github.com/rafi/vim-config
 	[_] copy and refine whole 'ftplugin' dir
 	[_] see some secure plugins from 'plugin', 'autoload/unite/sources'
@@ -245,7 +265,9 @@ PROFILING
 		: 17303 recvmsg(4, 0x7ffdc2d32400, 0)     = -1 EAGAIN (Resource temporarily unavailable)
 		: (repeat ~ 400 lines)
 		А ещё говорят тормозит cursorline...
-	Check
+	NOTE: If you want to know slow loading plugins, you should use
+				the external tool or |--startuptime|.
+		: https://github.com/hyiltiz/vim-plugins-profile
 		Use to get statistics on long load
 			vim --startuptime profile.log
 		Very verbose with timings

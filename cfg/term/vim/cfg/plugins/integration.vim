@@ -14,6 +14,8 @@ NeoBundle 'szw/vim-dict'
 NeoBundle 'KabbAmine/zeavim.vim', { 'disabled' : !has('unix') }
 
 " Multiwindow regime for 'git commit [--amend]'
+" NOTE seems like can't be loaded lazy?
+" TRY more precisely SEE https://github.com/Shougo/neobundle.vim/issues/434
 NeoBundleLazy 'rhysd/committia.vim', { 'autoload': {
     \ 'explorer': 'COMMIT_EDITMSG' }}
 

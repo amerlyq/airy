@@ -1,7 +1,9 @@
 " Use ',' as leader for all plugins below
 
 " Asynchronous execution plugin for Vim
+" Must not be lazy for neobundle to use it to update plugins
 NeoBundle 'Shougo/vimproc.vim', {
+  \ 'lazy': 0,
     \ 'external_commands' : 'make',
     \ 'build' : {
     \     'windows' : 'tools\\update-dll-mingw',
@@ -138,11 +140,6 @@ NeoBundle 'lyokha/vim-xkbswitch', { 'autoload' : {
 " NeoBundle 'gorodinskiy/vim-coloresque'
 
 NeoBundle 'scrooloose/syntastic'
-
-" Autoformatting with one button, can use custom (like clang-styler)
-NeoBundle 'Chiel92/vim-autoformat'
-" Auto-formatter for c/cpp/obj-c
-NeoBundle 'rhysd/vim-clang-format'
 
 " ======================================
 

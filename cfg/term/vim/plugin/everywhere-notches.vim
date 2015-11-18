@@ -30,10 +30,10 @@ let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Did': 10,
 let s:patterns = {
       \ 'Err': 'ERR%(OR)=|BUG',
       \ 'Fix': 'FIX%(ME)=|WARNING|ATTENTION|%(REM)OVE',
-      \ 'Add': 'ADD|SEE|NEED|FIND',
+      \ 'Add': 'ADD|SEE|NEED|FIND|ALSO',
       \ 'Did': 'DONE|FIXED|EXPL|TEMP',
       \ 'Dev': 'DEV|ENH|HACK|RFC',
-      \ 'Msg': 'NOTE|USE',
+      \ 'Msg': 'NOTE|USE|DFT|STD',
       \ 'Tbd': 'TODO|CHECK|TRY',
       \ 'Alt': 'ALT|OR|CASE|THINK|CHG',
       \ }
