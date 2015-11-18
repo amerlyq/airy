@@ -49,6 +49,8 @@ noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 
 " No jump when joining
 " nnoremap J mzJ`z
+" Here is an example, to replace the selected text with the output of "date":
+" :vmap _a <Esc>`>a<CR><Esc>`<i<CR><Esc>!!date<CR>kJJ
 
 " Insert empty line before/after, prepend  <C-u>..
 " THINK visual mappings could do smth useful? -- like add line, staing in place
@@ -58,6 +60,10 @@ noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 " NOTE! you can use 'o<C-R>_' to keep indent and not insert any character
 nnoremap <unique> go o<Space><Esc>^"_D
 nnoremap <unique> gO O<Space><Esc>^"_D
+" TODO:DEV: visual mappings -- NEED enter one-cmd normal (FIND:HOW)
+" xnoremap <unique> go <C-o>go
+" xnoremap <unique> gO <C-o>gO
+" ALT:
 " nnoremap <unique> go o<Space><C-u><Esc>
 " nnoremap <unique> gO O<Space><C-u><Esc>
 " nnoremap <unique> go o<Space><BS><Esc>

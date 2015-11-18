@@ -33,7 +33,7 @@ let s:patterns = {
       \ 'Add': 'ADD|SEE|NEED|FIND|ALSO',
       \ 'Did': 'DONE|FIXED|EXPL|TEMP',
       \ 'Dev': 'DEV|ENH|HACK|RFC',
-      \ 'Msg': 'NOTE|USE|DFT|STD',
+      \ 'Msg': 'NOTE|USE|DFL|STD',
       \ 'Tbd': 'TODO|CHECK|TRY',
       \ 'Alt': 'ALT|OR|CASE|THINK|CHG',
       \ }

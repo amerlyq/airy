@@ -32,6 +32,7 @@ NeoBundleLazy 'vimoutliner/vimoutliner', {
 " JSON Highlight and indent
 NeoBundleLazy 'elzr/vim-json', { 'autoload': { 'filetypes': [ 'json' ] }}
 " YAML Highlight and indent
+" SEE:THINK: https://github.com/lmeijvogel/vim-yaml-helper
 NeoBundleLazy 'mrk21/yaml-vim', { 'autoload': { 'filetypes': [ 'yaml' ] }}
 
 

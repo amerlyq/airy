@@ -32,8 +32,8 @@ fun! RetainPos(cmd)
 endf
 
 fun! Map_nxo(fr, to, ...)
-  for m in split(a:0>1 ? a:2 : 'nxo', '\zs')
+  for m in split(a:0>0 ? a:1 : 'nxo', '\zs')
     " echo m.(a:0>0 ? a:1 : 'map').' <silent><unique> '. a:fr .' '. a:to
-    exe m.(a:0>0 ? a:1 : 'map').' <silent><unique> '. a:fr .' '. a:to
+    exe m.(a:0>1 ? a:2 : 'map').' <silent><unique> '. a:fr .' '. a:to
   endfor
 endfun

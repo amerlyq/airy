@@ -27,7 +27,7 @@ if neobundle#tap('vim-airline') "{{{
 
   " Direct pick buffer on <leader>\d
   for i in range(1,9)
-    call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'map', 'n')
+    call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
   endfor
 
 

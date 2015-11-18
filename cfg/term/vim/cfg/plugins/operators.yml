@@ -4,43 +4,55 @@
 
 ---
 ## Operators
-kana/vim-operator-user: &opu
+kana/vim-operator-user:
   description: Dependency of 'vim-operator-*' and vim-clang-format
-  depends: kana/vim-operator-user
+  functions: operator#user
   mappings: [[nx, <Plug>]]
 
-rhysd/vim-operator-surround:
-  description: q[adr][ai]..-- manage block chars ({[... on boundaries of motion
-  # CHG mappings: [[nx, qa, qd, qr], [n, qb, qB, qf, qF, qQ, any of: ({["'<` ]
-  <<: *opu
 kana/vim-operator-replace:
-  depends: Replaces motion by register content
+  description: Replaces motion by register content
   # CHG mappings: [[nxo, gr]]
-  <<: *opu
+  mappings: [[nx, <Plug>]]
+  depends: kana/vim-operator-user
+
+rhysd/vim-operator-surround:
+  description: q[adr][ai]..-- manage block chars ({[... on bounds of motion
+  # CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({["'<`] ]
+  mappings: [[nx, <Plug>]]
+  depends:
+    - kana/vim-operator-user
+    ## For chain mappings (Optional)
+    - thinca/vim-textobj-between
+    - beloglazov/vim-textobj-quotes
+    - rhysd/vim-textobj-anyblock
+
 tommcdo/vim-exchange:
   description: |
     Exchange text: cx{motion} on first, then cx{motion} on other.
-    NOTE: swapped DFL keymaps for line/clear, as cxx is harder to press then cxc
-    cxc -- line, X -- selection, cxx -- clear
+    NOTE:USE: line 'cxc' and clear 'cxx', as 'cxc' is more comfortable
   # CHG mappings: [[x, X], [n, cx, cxc, cxx]]
-  <<: *opu
+  mappings: [[nx, <Plug>(Exchange]]
 
 # ALT: (overladen) 'tomtom/tcomment_vim'
 tpope/vim-commentary:
-  description: ..gc -- for commented area
-  mappings: [gc, [n, gcc, cgc, gcu]]
+  description: Toggle commentstring, ADD textobj-comment
+  mappings: [[nxo, gc], [n, gcc, cgc, gcu]]
   commands: Commentary
 
 # ALT sgur/vim-textobj-parameter, PeterRincker/vim-argumentative
 AndrewRadev/sideways.vim:
-  description: ..[ai], and [<>], -- shift
+  description: Shift/jump func-args/list-item/table-cell, ADD textobj-args
+  # CHG mappings: [[xo, aa, ia], [n, ga, gA, '[a', ']a']]
   mappings: <Plug>Sideways
   commands: [SidewaysLeft, SidewaysRight, SidewaysJumpLeft, SidewaysJumpRight]
 
-# TODO {{{
 rhysd/vim-clang-format:
   description: Auto-formatter for c/cpp/obj-c
-  <<: *opu
+  mappings: <Plug>(operator-clang-format)
+  commands: [ClangFormat, ClangFormatEchoFormattedCode]
+  depends: [vimproc, vim-operator-user, clang-format]
+  filetypes: ['c', 'cpp', 'objc']
+
 Chiel92/vim-autoformat:
   description: |
       Autoformatting with one button, can use custom (like clang-styler)
@@ -50,8 +62,10 @@ Chiel92/vim-autoformat:
 ---
 ## Textobj
 kana/vim-textobj-user: &tou
-  description: Dependency ob 'vim-textobj-*'
-  depends: kana/vim-operator-user
+  description: Dependency of 'vim-textobj-*'
+  functions: textobj#user
+  ## EXPL Loopback for following back-refs
+  depends: kana/vim-textobj-user
   mappings: [[ox, <Plug>]]
 
 kana/vim-textobj-fold:
@@ -70,7 +84,7 @@ vimtaku/vim-textobj-keyvalue:
   description: key/value with/beside quotes and space
   mappings: [[ox, ak, ik, av, iv]]
   <<: *tou
-kana/vim-textobj-lastpat:  # OR:STD:NOTE: '..[ai]gn'
+kana/vim-textobj-lastpat:  # OR:STD:NOTE: '..[ai]g[nN]'
   description: last searched pattern
   mappings: [[ox, a/, i/]]
   <<: *tou
@@ -87,26 +101,27 @@ kana/vim-textobj-syntax:
   # CHG mappings: [[ox, ah, ih]]
   <<: *tou
 coderifous/textobj-word-column.vim:
-  description: ..[ai][cC] -- «smart» column
+  description: «smart» words column
   mappings: [[ox, ac, ic, aC, iC]]
   <<: *tou
 lucapette/vim-textobj-underscore:
-  description: ..[ai]_ -- part of _some_text_
+  description: part of camel _some_text_
   mappings: [[ox, a_, i_]]
   <<: *tou
 ## NOTE pairs by priority: ({["'<`
 # ALT (more old and in jp) 'osyo-manga/vim-textobj-multiblock'
 # CFG for buffer locally: let b:textobj_anyblock_buffer_local_blocks = [ ':', '*' ]
 rhysd/vim-textobj-anyblock:
-  description: ..[ai]b -- content of closest pair
+  description: content of closest block pair
   mappings: [[ox, ab, ib]]
   <<: *tou
 thinca/vim-textobj-between:
-  description: ..[ai]f..- between found symbols
+  description: between same found symbols
   mappings: [[ox, af, if]]
   <<: *tou
 beloglazov/vim-textobj-quotes:
-  description: ..[ai]q -- any nearest quotes (OR ..q)
+  description: any nearest quotes of #'"`
+  # CHG mappings: [[o, q]]
   mappings: [[ox, aq, iq]]
   <<: *tou
 saihoooooooo/vim-textobj-space:
@@ -132,7 +147,7 @@ tpope/vim-rsi:
   lazy: 0  # Direct key mappings can't lazy
 
 bkad/CamelCaseMotion:
-  description: New motions [count],[wbe] for 'nov' modes in camel_case
+  description: motions '[count],[wbe]' for '[nov]' modes in camel_case
   # mappings: <Plug>  # BUG
   lazy: 0
 # }}}

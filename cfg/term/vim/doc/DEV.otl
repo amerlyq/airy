@@ -15,11 +15,7 @@ Leaders
 		:= But then I will need some other operator for single-char inserts --
 		: to work with other characters beside spaces.
 		: USE CamelMotion on Space? Or smart-word for urls-like strings?
-
-Operators
-	Improve 'gC' to copy-comment multiline/block selection
-	DEV '[ai]k' -- copy key until ':' -- useful for yaml
-	DEV space-insert
+		Reuse 'q<Space>' for directly surround by spaces
 		[_] FIX [Space]-insert mode after ENH stage
 		[_] DEV insert single char instead of my Limio
 			SEE $ vimb gh vim insert (seeen until 5th page)
@@ -29,6 +25,9 @@ Operators
 			: https://github.com/aur-archive/vim-insertchar
 			: https://github.com/mwgkgk/vim-operator-insert
 
+Operators
+	[_] Improve 'gC' to copy-comment multiline/block selection
+	[_] DEV '[ai]k' -- copy key until ':' -- useful for yaml
 
 	[_] DEV mapping to move in column like '{/}' -- on gG, g{, g}
 		for more simple C-v block selecting
@@ -67,6 +66,7 @@ Outline
 			: In 8 color term all them will have one color
 		After $ -- use complete bash syntax until end of line
 		SEE multi syntax regions for this -- or include all syntax into region
+		SEE ft=cucumber bundle/sideways.vim/examples/example.feature -- maybe as prototype?
 	[o] Vimoutliner
 		[_] TODO Remove insert mappings
 		2015-06-01 [X] Change mapping to more easily pressed :> use everywhere ',.'

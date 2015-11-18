@@ -2,7 +2,6 @@
 let $BUNDLES=expand('$CACHE/bundle')
 let $NEOBUNDLE=expand('$BUNDLES/neobundle.vim')
 
-
 if has('vim_starting')
   if !filereadable(expand('$NEOBUNDLE/README.md'))
     echo 'NeoBundle not found. Installing...'
@@ -12,11 +11,18 @@ if has('vim_starting')
   set runtimepath^=$NEOBUNDLE
 endif
 
+let g:neobundle#default_options = {}
+let g:neobundle#types#git#default_protocol = 'https'  " OR https, ssh
+let g:neobundle#types#git#clone_depth = 1           " Shallow copy
+let g:neobundle#types#git#enable_submodule = 1
 
-" USE:NEED: all items must have dict value
-" ALT: py3file load_yaml.py
-function! LoadFromYAMLs(cfgpaths, default)
-  if !exists(':PythonI') | finish | endif
+
+call neobundle#begin(expand('$BUNDLES'))
+" if neobundle#load_cache()
+NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
+
+function! LoadFromYAMLs(cfgpaths, default)  " ALT: py3file load_yaml.py
+  if !exists(':PythonI') | finish | endif   " SEE: core/detect.vim::PythonI
 PythonI << endofpython
 import vim, yaml
 fmt = "NeoBundle '{!s:s}', {}"
@@ -29,22 +35,11 @@ for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
 endofpython
 endfunc
 
-
-let g:neobundle#default_options = {}
-let g:neobundle#types#git#default_protocol = 'https'  " OR https, ssh
-let g:neobundle#types#git#clone_depth = 1           " Shallow copy
-let g:neobundle#types#git#enable_submodule = 1
-
-
-call neobundle#begin(expand('$BUNDLES'))
-  " if neobundle#load_cache()
-    NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
-    call SourcePlugins()
-    call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
-          \ 'plugins/*.yml', 0, 1), {'lazy': 1})
-    " NeoBundleSaveCache
-  " endif
-  call SourcePluginsCfg()
+call SourcePlugins()
+call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
+      \ 'plugins/*.yml', 0, 1), {'lazy': 1})
+" NeoBundleSaveCache
+" endif
+call SourcePluginsCfg()
 call neobundle#end()  " Load all listed non-lazy plugins
-
 " NeoBundleCheck

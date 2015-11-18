@@ -1,9 +1,8 @@
 "{{{1 Motions ============================
 if neobundle#tap('matchit.zip') "{{{
-  function! neobundle#hooks.on_post_source(bundle)
-    silent! execute 'doautocmd Filetype' &filetype
-  endfunction
-
+  fun! neobundle#hooks.on_post_source(bundle)
+    silent! exe 'doautocmd Filetype' &filetype
+  endf
   call neobundle#untap()
 endif "}}}
 
@@ -45,38 +44,36 @@ endif "}}}
 
 "{{{1 Operators ============================
 if neobundle#tap('vim-operator-surround')  "{{{
-  nmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
-  xmap <silent><unique> [Quote]a <Plug>(operator-surround-append)
-  " TRY Insert around one character only
-  nmap <silent><unique> [Quote]<Space> [Quote]al
-
-  nmap <silent><unique> [Quote]d <Plug>(operator-surround-delete)
-  xmap <silent><unique> [Quote]d <Plug>(operator-surround-delete)
-
-  nmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
-  xmap <silent><unique> [Quote]r <Plug>(operator-surround-replace)
+  for op in ['append', 'delete', 'replace']
+    call Map_nxo('[Quote]'.op[0], '<Plug>(operator-surround-'.op.')', 'nx')
+  endfor
   call neobundle#untap()
+
+  if neobundle#tap('vim-textobj-between')  "{{
+    " Surrounding symbols for current cursor position (like 'f`')
+    nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
+    nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
+    call neobundle#untap()
+  endif
+
+  if neobundle#tap('vim-textobj-quotes')  "{{{
+    " Outer quoted is the most useful:
+    " omap <silent><unique> [Quote] aq
+    call neobundle#untap()
+  endif "}}}
 
   if neobundle#tap('vim-textobj-anyblock')  "{{{
     " Current enclosing block of ({["'<`
     nmap <silent><unique> [Quote]b <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
     nmap <silent><unique> [Quote]B <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
-    " Surrounding symbols for current cursor position (like 'f`')
-    nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
-    nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
     " Explicit shortcuts
-    nmap <silent><unique> [Quote]Q <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)"
-    " for c in [['('], ['0', '('], ['{'], ['9', '{'], ['['],
-    " \ ['q', '"'], ['"'], ["'"], ['<'], ['.', '<'], ['`']]
-    "   exe printf("nmap <silent><unique> [Quote]%s <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)%s",
-    "       \ string(c[0]), string(1<len(c)? c[1] : c))
-    " endfor
-    nmap <silent><unique> [Quote]( <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)(
-    nmap <silent><unique> [Quote]{ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a){
-    nmap <silent><unique> [Quote][ <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)[
-    nmap <silent><unique> [Quote]' <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
-    nmap <silent><unique> [Quote]< <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)<
-    nmap <silent><unique> [Quote]` <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)`
+    nmap <silent><unique> [Quote]Q <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)"<Esc>
+    for cg in ['()0', '{}9', '[]8', '"2', "'1", '<>3.', '`4']
+      for c in split(cg, '\zs')
+        call Map_nxo('[Quote]'.c, '<Plug>(operator-surround-replace)'
+              \ .'<Plug>(textobj-anyblock-a)'.cg[0], 'nx')
+      endfor
+    endfor
     call neobundle#untap()
   endif "}}}
 endif "}}}
@@ -107,13 +104,6 @@ if neobundle#tap('vim-textobj-syntax')  "{{{
   omap <silent><unique> ah <Plug>(textobj-syntax-a)
   xmap <silent><unique> ih <Plug>(textobj-syntax-i)
   omap <silent><unique> ih <Plug>(textobj-syntax-i)
-  call neobundle#untap()
-endif "}}}
-
-
-if neobundle#tap("vim-textobj-quotes")  "{{{
-  " Outer quoted is the most useful:
-  " omap <silent><unique> [Quote] aq
   call neobundle#untap()
 endif "}}}
 

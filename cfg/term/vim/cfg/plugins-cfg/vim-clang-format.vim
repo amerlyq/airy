@@ -1,10 +1,9 @@
 " H100%, S45%
 " http://clang.llvm.org/docs/ClangFormatStyleOptions.html
-"
-" llvm, google, chromium, mozilla
-let g:clang_format#code_style='google'
 
 let g:clang_format#command = 'clang-format-3.5'
+let g:clang_format#code_style='google'  " llvm, google, chromium, mozilla
+
 
 "" For config information, execute clang-format -dump-config command.
 let g:clang_format#style_options = {

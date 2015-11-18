@@ -20,5 +20,5 @@ let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugin.
 let mods = [['\', '[Frame]'], ['q', '[Quote]'], ['<Space>', '[Space]']]
 for [fr, to] in mods
   call Map_nxo(fr, to)
-  call Map_nxo(to, '<Nop>', 'noremap')
+  call Map_nxo(to, '<Nop>', 'nxo', 'noremap')
 endfor
