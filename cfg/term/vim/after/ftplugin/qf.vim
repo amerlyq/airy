@@ -26,12 +26,12 @@ let s:qf_mappings = {
       \ 'H' : '<C-W><CR><C-w>K<C-w>b',
       \ 'x' : '<C-w><CR><C-w>T',
       \ 'X' : '<C-w><CR><C-w>TgT<C-W><C-W>',
-      \ '<Space>' : '<CR>',
+      \ 'gH' : ':try\| #older 99 \|catch/E380/\|endtry<CR>',
+      \ 'gL' : ':try\| #newer 99 \|catch/E381/\|endtry<CR>',
+      \ 'gh' : ':try\| #older    \|catch/E380/\|endtry<CR>',
+      \ 'gl' : ':try\| #newer    \|catch/E381/\|endtry<CR>',
       \ '<CR>' : '<CR>',
-      \ 'gH' : ':#older<CR> 99',
-      \ 'gL' : ':#newer<CR> 99',
-      \ 'gh' : ':#older<CR>',
-      \ 'gl' : ':#newer<CR>',
+      \ '<Space>' : '<CR>',
 \ }
 
 " SNIP: \ 'o' : '<CR>:#open<CR>',
