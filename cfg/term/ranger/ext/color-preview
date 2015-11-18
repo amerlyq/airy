@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -o pipefail
 
 # FIXME: python navigation is locked until preview generated
 #       TODO: -- simply skip files as if preview were disabled
@@ -9,21 +10,20 @@
 #   http://stackoverflow.com/questions/14690010/bash-trick-program-into-thinking-stdout-is-an-interactive-terminal
 # script -qc "vimcat -u ~/.vim/vimcatrc \"$path\"" /tmp/typescript
 
-set -o pipefail
-mkdir -p /tmp/preview
-
 fpath="${@: -1}"
 # eval '${@:1:($#-1)} "$ftmp"'
 
-EXT="${0%/*}"
-vimrc=$EXT/vimcatrc
-script=$EXT/vimcat.vim
+DIR="${0%/*}"
+vimrc=$DIR/vimcatrc
+script=$DIR/vimcat.vim
+pipe="${TMPDIR:-/tmp/preview}/${fpath##*/}"
 # OR choose your own extension from vim:ft=...
-pipe="/tmp/preview/${fpath##*/}"
+[[ -n "${pipe##*.}" ]] || pipe+=$(sed 's/.*\s+vim:.*ft=\(\w\+\).*/\1/; q' "$fpath")
+mkdir -p ${pipe%/*}
 
 trap "rm -f $pipe" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT
 [[ -p $pipe ]] || mkfifo $pipe
-(head -n 50 "$fpath" > $pipe) &
+{ head -n 50 "$fpath" > $pipe; } &
 
 # WARNING: In general we can't cut on width, or syntax will be messed up!
 # perl -lpe '$.>40&&last||($_=substr($_,0,80))' "$fpath" > "$ftmp"
@@ -35,6 +35,7 @@ trap "rm -f $pipe" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT
 # touch /tmp/preview/$!_$$
 
 if [[ $# -eq 1 ]]; then
+    #  --noplugins
     vim -E -X -R -i NONE -u ${vimrc} \
     -c "source ${script} | visual | call AnsiHighlight(\"">(cat)"\") | q" \
     -- $pipe </dev/tty >/dev/null 2>&1

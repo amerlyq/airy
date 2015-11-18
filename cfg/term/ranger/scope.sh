@@ -100,9 +100,9 @@ case "$extension" in
         try elinks -dump "$path" | fmt -s -w $width && exit 4
         try w3m    -dump "$path" | fmt -s -w $width && exit 4
         ;; # fall back to highlight/cat if the text browsers fail
-    otl)
-        try "$EXTDIR/color-preview" "$path" && exit 5 || exit 2
-        ;;
+    # otl)
+    #     try "$EXTDIR/color-preview" "$path" && exit 5 || exit 2
+    #     ;;
 esac
 
 
