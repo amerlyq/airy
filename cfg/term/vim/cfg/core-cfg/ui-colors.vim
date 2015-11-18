@@ -1,5 +1,3 @@
-" vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
-
 " WARNING: will not work nicely with light themes, as cursor will remain white
 "   I must use t_SI, t_EI here to setup colors? And integrate it with vim-term-focus...
 "   OR: simply toggle whole urxvt theme instead.

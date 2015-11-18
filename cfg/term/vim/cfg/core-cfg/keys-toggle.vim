@@ -1,6 +1,3 @@
-" vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
-
-
 " Local buffer
 nnoremap <unique> <Leader>ta :setl autoread! hls?<CR>
 nnoremap <unique> <Leader>th :setl hlsearch! hls?<CR>

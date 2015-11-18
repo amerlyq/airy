@@ -1,4 +1,3 @@
-" vim:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 " Name: Notches
 " Fast highlighting: match Error /ENOMEM/
 " CHECK: http://andrewradev.com/2011/08/06/making-vim-pretty-with-custom-colors/

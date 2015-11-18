@@ -15,17 +15,19 @@ if neobundle#tap('GoldenView.Vim') "{{{
   " ALSO :Disable*, :Enable*
   noremap <unique>      <Leader>tm <Plug>ToggleGoldenViewAutoResize
   " Do automatic/manual resizing of focused window, or split it
-  nmap <unique><silent> [Frame]vt  <Plug>ToggleGoldenViewAutoResize
-  nmap <unique><silent> [Frame]vr  <Plug>GoldenViewResize
-  nmap <unique><silent> [Frame]vs  <Plug>GoldenViewSplit
+  nmap <unique><silent> [Frame]wt  <Plug>ToggleGoldenViewAutoResize
+  nmap <unique><silent> [Frame]ws  <Plug>GoldenViewSplit
+  nmap <unique><silent> [Frame]wr  <Plug>GoldenViewResize
   " Jump to next/prev or choosen
-  nmap <unique><silent> [Frame]vn  <Plug>GoldenViewNext
-  nmap <unique><silent> [Frame]vp  <Plug>GoldenViewPrevious
+  nmap <unique><silent> [Frame]wn  <Plug>GoldenViewNext
+  nmap <unique><silent> [Frame]wp  <Plug>GoldenViewPrevious
   " Switch current window with one of others and toggle back
-  nmap <unique><silent> [Frame]vv  <Plug>GoldenViewSwitchToggle
-  nmap <unique><silent> [Frame]vM  <Plug>GoldenViewSwitchMain
-  nmap <unique><silent> [Frame]vL  <Plug>GoldenViewSwitchWithLargest
-  nmap <unique><silent> [Frame]vS  <Plug>GoldenViewSwitchWithSmallest
+  nmap <unique><silent> [Frame]ww  <Plug>GoldenViewSwitchToggle
+  nmap <unique><silent> [Frame]wm  <Plug>GoldenViewSwitchMain
+  nmap <unique><silent> [Frame]wl  <Plug>GoldenViewSwitchWithLargest
+  nmap <unique><silent> [Frame]wk  <Plug>GoldenViewSwitchWithSmallest
+  " Make windows equal (useful for vsplits on 1/4 of screen)
+  nmap <unique><silent> [Frame]w=  <Plug>GoldenViewResize<C-w>=
   " fun! neobundle#hooks.on_source(bundle)
   "   call GoldenView#ExtendProfile('small-height',
   "       \ { 'other_window_winheight': 2 })

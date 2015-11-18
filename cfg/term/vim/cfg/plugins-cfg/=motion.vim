@@ -1,5 +1,3 @@
-" vim:fdm=marker:fdl=2
-
 "{{{1 Motions ============================
 if neobundle#tap('matchit.zip') "{{{
   function! neobundle#hooks.on_post_source(bundle)

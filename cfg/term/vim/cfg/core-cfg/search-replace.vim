@@ -61,10 +61,16 @@ endif
 nnoremap <unique> <Leader>cd :%s;;;g<CR>
 vnoremap <unique> <Leader>cd  :s;;;g<CR>
 
-nnoremap <unique> <Leader>cv :%v//d<CR>
-vnoremap <unique> <Leader>cv  :v//d<CR>
+"Sfx: s///g<Left><Left>, 'norm '
+nnoremap <unique> <Leader>cX :%g//
+vnoremap <unique> <Leader>cX  :g//
+nnoremap <unique> <Leader>cV :%v//
+vnoremap <unique> <Leader>cV  :v//
+
 nnoremap <unique> <Leader>cx :%g//d<CR>
 vnoremap <unique> <Leader>cx  :g//d<CR>
+nnoremap <unique> <Leader>cv :%v//d<CR>
+vnoremap <unique> <Leader>cv  :v//d<CR>
 
 " Replace current vsel
 vnoremap <unique> <Leader>cs :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><Left><Left>

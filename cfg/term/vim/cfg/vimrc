@@ -52,9 +52,6 @@ call s:cfg('features/'.(IsAndroid() ? 'android' : 'clipboard').'.vim')
 
 " " Default home directory.
 " let t:cwd = getcwd()
-  " Open at last position
-au MyAutoCmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-        \| exe "normal g'\"" | endif
 
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
 set exrc secure modeline  " also parse 'vim:...' cmds from comments
