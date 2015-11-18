@@ -1,0 +1,37 @@
+---
+## Search/Replace
+rking/ag.vim:
+  description: The Silver searcher
+  autoload:
+    commands: [Ag, AgAdd, AgBuffer, AgFile, AgFromSearch, AgHelp, LAg, LAgAdd, LAgBuffer, LAgHelp]
+  external_commands: ag,
+
+stefandtw/quickfix-reflector.vim:
+  description: |
+      Delete entries from qf/loc wdws (or edit them as text) and save to apply
+      Useful for interactive replacing in many files found by :Ag, skiping needless.
+
+---
+## Substitute/Highlight
+t9md/vim-quickhl:
+  description: THINK Highlight choosen
+
+haya14busa/incsearch.vim:
+  description: Multiple hl for searching by / '?' or g/
+  autoload:
+    mappings: <Plug>
+
+haya14busa/vim-asterisk:
+  description: Smart highlight (don't do lazy -- I use it almost always)
+  autoload:
+    mappings: <Plug>
+
+osyo-manga/vim-anzu:
+  description: Index for search results
+  autoload:
+    mappings: <Plug>
+
+osyo-manga/vim-over:
+  description: Preview :substitute patterns
+  autoload:
+    commands: [OverCommandLine]

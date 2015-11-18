@@ -1,0 +1,249 @@
+Shougo/tabpagebuffer.vim:
+  filetypes: all
+
+Shougo/neomru.vim:
+  filetypes: all
+
+  #Yggdroot/indentLine:
+  #filetypes: all
+
+Shougo/unite-sudo: {}
+
+Shougo/echodoc.vim:
+  insert: 1
+
+  #Shougo/neocomplcache.vim:
+  #insert: 1
+
+Shougo/neocomplete.vim:
+  depends: Shougo/context_filetype.vim
+  insert: 1
+
+Shougo/deoplete.nvim:
+  depends: Shougo/context_filetype.vim
+  insert: 1
+  neovim: 1
+
+Shougo/neosnippet.vim:
+  depends: [Shougo/neosnippet-snippets, Shougo/context_filetype.vim]
+  insert: 1
+  filetypes: snippet
+  unite_sources: [neosnippet, neosnippet/user, neosnippet/runtime]
+
+Shougo/unite.vim:
+  depends: Shougo/neomru.vim
+  neovim: 1
+
+    [plugins.commands]
+    name: Unite
+    complete: 'customlist,unite#complete_source'
+
+Shougo/unite-build: {}
+
+Shougo/neossh.vim:
+  filetypes: [vimfiler, vimshell]
+  sources: ssh
+
+ujihisa/vimshell-ssh:
+  filetypes: vimshell
+
+Shougo/vim-vcs:
+  depends: thinca/vim-openbuf
+
+Shougo/vimfiler.vim:
+  depends: Shougo/unite.vim
+  mappings: <Plug>
+  explorer: '^\h\w*:'
+
+    [plugins.commands]
+    name: [VimFiler]
+    complete: 'customlist,vimfiler#complete'
+
+Shougo/vimshell.vim:
+  mappings: <Plug>
+
+    [plugins.commands]
+    name: VimShell
+    complete: 'customlist,vimshell#complete'
+
+yomi322/vim-gitcomplete:
+  filetypes: vimshell
+
+Shougo/vinarise.vim: {}
+
+    [plugins.commands]
+    name: Vinarise
+    complete: file
+
+vim-jp/vital.vim:
+  commands: Vitalize
+
+Shougo/junkfile.vim:
+  unite_sources: junkfile
+
+Shougo/unite-outline: {}
+
+hail2u/vim-css3-syntax: {}
+
+kana/vim-smartchr:
+  insert: 1
+
+ctrlpvim/ctrlp.vim: {}
+
+LeafCage/foldCC:
+  filetypes: vim
+
+mattn/webapi-vim: {}
+
+thinca/vim-prettyprint:
+  commands: PP
+
+thinca/vim-qfreplace:
+  filetypes: [unite, quickfix]
+
+thinca/vim-quickrun:
+  mappings: <Plug>
+
+thinca/vim-scouter: {}
+
+thinca/vim-ref:
+  unite_sources: ref
+
+thinca/vim-unite-history: {}
+
+vim-ruby/vim-ruby:
+  mappings: <Plug>
+  filetypes: ruby
+
+basyura/J6uil.vim:
+  unite_sources: J6uil
+  depends: mattn/webapi-vim
+
+    [plugins.commands]
+    name: J6uil
+    complete: 'custom,J6uil#complete#room'
+
+Shougo/unite-help: {}
+
+tsukkee/unite-tag: {}
+
+tyru/caw.vim:
+  mappings: <Plug>
+
+tyru/eskk.vim:
+  mappings: [[i, <Plug>], [c, <Plug>]]
+
+tyru/open-browser.vim:
+  mappings: <Plug>
+
+tyru/restart.vim:
+  gui: 1
+  commands: Restart
+
+tyru/winmove.vim:
+  mappings: <Plug>
+  gui: 1
+  augroup: winmove
+
+eagletmt/neco-ghc:
+  filetypes: haskell
+
+ujihisa/neco-look:
+  insert: 1
+
+ujihisa/unite-colorscheme: {}
+
+vim-jp/vimdoc-ja:
+  filetypes: help
+
+  #eignn/netrw.vim:
+  #commands: Explore
+
+osyo-manga/unite-quickfix: {}
+
+osyo-manga/unite-filetype: {}
+
+kana/vim-tabpagecd:
+  unite_sources: tab
+
+rhysd/accelerated-jk:
+  mappings: <Plug>
+
+vim-jp/autofmt: {}
+
+supermomonga/unite-kawaii-calc: {}
+
+godlygeek/csapprox:
+  terminal: 1
+
+thinca/vim-guicolorscheme:
+  terminal: 1
+
+aharisu/vim-gdev:
+  filetypes: scheme
+
+vim-jp/cpp-vim:
+  filetypes: cpp
+
+thinca/vim-ft-diff_fold:
+  filetypes: diff
+
+nsf/gocode:
+  rtp: vim
+  filetypes: go
+
+thinca/vim-ft-help_fold:
+  filetypes: help
+
+kana/vim-filetype-haskell:
+  filetypes: haskell
+
+JesseKPhillips/d.vim:
+  filetypes: d
+
+t9md/vim-choosewin:
+  mappings: <Plug>
+
+fatih/vim-go:
+  filetypes: go
+
+todesking/ruby_hl_lvar.vim:
+  filetypes: ruby
+
+syngan/vim-vimlint:
+  depends: ynkdir/vim-vimlparser
+
+kana/vim-operator-replace:
+  depends: kana/vim-operator-user
+  mappings: [[nx, <Plug>]]
+
+chikatoike/concealedyank.vim:
+  mappings: [[x, <Plug>(operator-concealedyank)]]
+
+saihoooooooo/glowshi-ft.vim:
+  mappings: <Plug>
+
+Rykka/riv.vim:
+  filetypes: rst
+
+kannokanno/previm:
+  filetypes: [markdown, rst, mkd]
+  depends: tyru/open-browser.vim
+
+Kocha/vim-unite-tig: {}
+
+osyo-manga/vim-jplus:
+  mappings: <Plug>
+
+osyo-manga/unite-vimpatches: {}
+
+sorah/unite-ghq: {}
+
+thinca/vim-themis:
+  filetypes: vim
+
+osyo-manga/vim-monster:
+  filetypes: ruby
+
+cespare/vim-toml:
+  filetypes: toml

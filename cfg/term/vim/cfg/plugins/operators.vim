@@ -1,5 +1,3 @@
-" vim:fdm=marker:fdl=1
-
 "{{{1 Motions ============================
 NeoBundleLazy 'matchit.zip', { 'autoload' : { 'mappings' : ['%', 'g%'] }}
 " Two-letters find on whole screen scope

@@ -1,4 +1,3 @@
-" vim:fdm=marker:fdl=1
 "{{{1 Apps ============================
 
 " Switch [c,cpp,cxx,cc] <-> [h,hpp]
@@ -10,6 +9,8 @@ NeoBundle 'kana/vim-altr'
 NeoBundle 'kopischke/vim-fetch'
 " View session auto create/restore on buffer edit, argdo, bufdo et al.
 NeoBundle 'kopischke/vim-stay'
+" Converts automatic folds into manual to reduce recomputation CPU load
+" NeoBundle 'konfekt/FastFold'
 
 NeoBundle 'Valloric/ListToggle'
 

@@ -1,4 +1,3 @@
-" vim:fdm=marker:fdl=1
 " Use ',' as leader for all plugins below
 
 " Asynchronous execution plugin for Vim

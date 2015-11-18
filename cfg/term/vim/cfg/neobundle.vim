@@ -13,14 +13,19 @@ if has('vim_starting')
 endif
 
 
+" USE:NEED: all items must have dict value
 " ALT: py3file load_yaml.py
-function! LoadFromYAML(path)
+function! LoadFromYAMLs(cfgpaths, default)
   if !exists(':PythonI') | finish | endif
 PythonI << endofpython
 import vim, yaml
-with open(vim.eval("a:path")) as f:
-  for src, opts in yaml.safe_load(f).items():
-      vim.command("NeoBundle '{!s:s}', {}".format(src, opts))
+fmt = "NeoBundle '{!s:s}', {}"
+cfgs, defs = map(vim.eval, ("a:cfgpaths", "a:default"))
+for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
+    with open(c) as f:
+        for doc in yaml.safe_load_all(f):
+            for src, opts in doc.items():
+                vim.command(fmt.format(src, dict(defs, **opts)))
 endofpython
 endfunc
 
@@ -35,7 +40,8 @@ call neobundle#begin(expand('$BUNDLES'))
   " if neobundle#load_cache()
     NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
     call SourcePlugins()
-    call LoadFromYAML(expand('$VIMHOME/cfg/plugins.yml'))
+    call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
+          \ 'plugins/*.yml', 0, 1), {'lazy': 1})
     " NeoBundleSaveCache
   " endif
   call SourcePluginsCfg()
