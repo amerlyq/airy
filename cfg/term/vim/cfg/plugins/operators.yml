@@ -4,25 +4,26 @@
 
 ---
 ## Operators
-kana/vim-operator-user:
-  description: Dependency of vim-clang-format
+kana/vim-operator-user: &opu
+  description: Dependency of 'vim-operator-*' and vim-clang-format
+  depends: kana/vim-operator-user
+  mappings: [[nx, <Plug>]]
 
 rhysd/vim-operator-surround:
   description: q[adr][ai]..-- manage block chars ({[... on boundaries of motion
-  # DONE mappings: [[nx, qa, qd, qr], [n, qb, qB, qf, qF, qQ, any of: ({["'<` ]
-  mappings: <Plug>
-
+  # CHG mappings: [[nx, qa, qd, qr], [n, qb, qB, qf, qF, qQ, any of: ({["'<` ]
+  <<: *opu
 kana/vim-operator-replace:
-  depends: kana/vim-operator-user
-  # DONE mappings: [[nxo, gr]]
-  mappings: <Plug>
-
+  depends: Replaces motion by register content
+  # CHG mappings: [[nxo, gr]]
+  <<: *opu
 tommcdo/vim-exchange:
   description: |
     Exchange text: cx{motion} on first, then cx{motion} on other.
     NOTE: swapped DFL keymaps for line/clear, as cxx is harder to press then cxc
     cxc -- line, X -- selection, cxx -- clear
-  # DONE mappings: [[x, X], [n, cx, cxc, cxx]]
+  # CHG mappings: [[x, X], [n, cx, cxc, cxx]]
+  <<: *opu
 
 # ALT: (overladen) 'tomtom/tcomment_vim'
 tpope/vim-commentary:
@@ -39,13 +40,16 @@ AndrewRadev/sideways.vim:
 # TODO {{{
 rhysd/vim-clang-format:
   description: Auto-formatter for c/cpp/obj-c
-Chiel92/vim-autoformat: # NOT operator, but placed near to 'vim-clang-format'
-  description: Autoformatting with one button, can use custom (like clang-styler)
+  <<: *opu
+Chiel92/vim-autoformat:
+  description: |
+      Autoformatting with one button, can use custom (like clang-styler)
+      ATTENTION: NOT operator, but placed near to 'vim-clang-format'
 # }}}
 
 ---
 ## Textobj
-kana/vim-textobj-user: &ox
+kana/vim-textobj-user: &tou
   description: Dependency ob 'vim-textobj-*'
   depends: kana/vim-operator-user
   mappings: [[ox, <Plug>]]
@@ -53,66 +57,66 @@ kana/vim-textobj-user: &ox
 kana/vim-textobj-fold:
   description: ..[ai]z
   mappings: [[ox, az, iz]]
-  <<: *ox
+  <<: *tou
 kana/vim-textobj-function:
   description: ..[ai][fF] (C/Java/Vimscript)
   mappings: [[ox, af, if, aF, iF]]
-  <<: *ox
+  <<: *tou
 kana/vim-textobj-indent:
   description: ..[ai][iI] -- python-like indented
   mappings: [[ox, ai, ii, aI, iI]]
-  <<: *ox
+  <<: *tou
 vimtaku/vim-textobj-keyvalue:
   description: key/value with/beside quotes and space
   mappings: [[ox, ak, ik, av, iv]]
-  <<: *ox
+  <<: *tou
 kana/vim-textobj-lastpat:  # OR:STD:NOTE: '..[ai]gn'
   description: last searched pattern
   mappings: [[ox, a/, i/]]
-  <<: *ox
+  <<: *tou
 kana/vim-textobj-line:
   description: line content only
   mappings: [[ox, al, il]]
-  <<: *ox
+  <<: *tou
 kana/vim-textobj-entire:
   description: whole buffer w/[o] empty lines (instead ggVG)
-  # DONE mappings: [[ox, aG, iG]]
-  <<: *ox
+  # CHG mappings: [[ox, aG, iG]]
+  <<: *tou
 kana/vim-textobj-syntax:
   description: highlighted syntax region
-  # DONE mappings: [[ox, ah, ih]]
-  <<: *ox
+  # CHG mappings: [[ox, ah, ih]]
+  <<: *tou
 coderifous/textobj-word-column.vim:
   description: ..[ai][cC] -- «smart» column
   mappings: [[ox, ac, ic, aC, iC]]
-  <<: *ox
+  <<: *tou
 lucapette/vim-textobj-underscore:
   description: ..[ai]_ -- part of _some_text_
   mappings: [[ox, a_, i_]]
-  <<: *ox
+  <<: *tou
 ## NOTE pairs by priority: ({["'<`
 # ALT (more old and in jp) 'osyo-manga/vim-textobj-multiblock'
 # CFG for buffer locally: let b:textobj_anyblock_buffer_local_blocks = [ ':', '*' ]
 rhysd/vim-textobj-anyblock:
   description: ..[ai]b -- content of closest pair
   mappings: [[ox, ab, ib]]
-  <<: *ox
+  <<: *tou
 thinca/vim-textobj-between:
   description: ..[ai]f..- between found symbols
   mappings: [[ox, af, if]]
-  <<: *ox
+  <<: *tou
 beloglazov/vim-textobj-quotes:
   description: ..[ai]q -- any nearest quotes (OR ..q)
   mappings: [[ox, aq, iq]]
-  <<: *ox
+  <<: *tou
 saihoooooooo/vim-textobj-space:
   description: space at indent or between words
-  # DONE mappings: [[ox, as, is]]
-  <<: *ox
+  # CHG mappings: [[ox, as, is]]
+  <<: *tou
 vimtaku/vim-textobj-sigil:
   description: choses $name{...} vars for bash/perl
-  # DONE mappings: [[ox, ag, ig]]
-  <<: *ox
+  # CHG mappings: [[ox, ag, ig]]
+  <<: *tou
 
 ---
 ##Motions
@@ -142,17 +146,19 @@ justinmk/vim-sneak:
 # ALT airblade/vim-gitgutter: (git only, but much faster file save)
 mhinz/vim-signify:
   description: inside vcs-aware changed area
-  # DONE mappings: [[x, aS, iS]]
+  # CHG mappings: [[x, aS, iS]]
   mappings: <Plug>
   commands: [SignifyFold, SignifyToggle, SignifyToggleHighlight, SignifyRefresh]
 
 ---
 ## Actions
-# TODO {{{
 tpope/vim-endwise:
   description: Automatic not-persistent closing statements
+  mappings: [[i, <CR>, <C-x><CR>]]
+# TODO {{{
 tpope/vim-repeat:
   description: Extend support for '.' command
+  mappings: <Plug>(Repeat
 tpope/vim-speeddating:
   description: Use CTRL-A/X to increment dates, times, and more
 # }}}
@@ -163,7 +169,7 @@ kana/vim-niceblock:
 
 terryma/vim-expand-region:
   mappings: [[x, <Plug>(expand_region_]]
-  # DONE mappings: [[x, +, -]]
+  # CHG mappings: [[x, +, -]]
   description: Expand/shrink current visual selection
 
 # FIND:THINK:
