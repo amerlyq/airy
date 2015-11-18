@@ -18,29 +18,29 @@ fpath="${@: -1}"
 EXT="${0%/*}"
 vimrc=$EXT/vimcatrc
 script=$EXT/vimcat.vim
-ftmp="/tmp/preview/${fpath##*/}"
-fout="${ftmp}.dump"
+# OR choose your own extension from vim:ft=...
+pipe="/tmp/preview/${fpath##*/}"
 
-trap "rm -f ${ftmp} ${fout}" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT
-# WARNING: We can't cut on width, or syntax will be messed up!
+trap "rm -f $pipe" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT
+[[ -p $pipe ]] || mkfifo $pipe
+(head -n 50 "$fpath" > $pipe) &
+
+# WARNING: In general we can't cut on width, or syntax will be messed up!
 # perl -lpe '$.>40&&last||($_=substr($_,0,80))' "$fpath" > "$ftmp"
 # awk 'NR>128{exit} {print substr($0,0,length)}' "$fpath" > "$ftmp"
-head -n 40 "$fpath" > "$ftmp"
 
+# BUG script waits at the end?
 # parent=$$
-# ( sleep 1 && kill -s TERM "$parent" >/dev/null 2>&1 ) & alarm=$!
-# disown $alarm
+# (sleep 1 && touch /tmp/$$= && kill -s KILL $parent >/dev/null 2>&1) & alert=$!
+# touch /tmp/preview/$!_$$
 
 if [[ $# -eq 1 ]]; then
     vim -E -X -R -i NONE -u ${vimrc} \
-    -c "source ${script} | visual | call AnsiHighlight(\"${fout}\") | q" \
-    -- "${ftmp}" </dev/tty >/dev/null 2>&1
-
-    cat -n "$fout"
+    -c "source ${script} | visual | call AnsiHighlight(\"">(cat)"\") | q" \
+    -- $pipe </dev/tty >/dev/null 2>&1
 else
-    $1 "$ftmp" | cat -n
+    pygmentize -g -f terminal256 -O style=solarizeddark $pipe
 fi
 
-# pgrep "$watcher" >/dev/null &&
-# kill -0 "$watcher" &&
-# kill -s TERM "$alarm" >/dev/null
+# kill -s KILL $alert >/dev/null 2>&1
+# touch /tmp/preview/$!_$alert

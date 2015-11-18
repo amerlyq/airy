@@ -109,13 +109,12 @@ esac
 case "$mimetype" in
 
     text/*|*/xml) # Syntax highlight for text files:
-        if command -v pygmentize >/dev/null; then
+        if hash pygmentize >/dev/null; then
             # WARNING: you must be sure to have 256 term and downloaded solarized
-            try pygmentize -g -f terminal256 -O style=solarizeddark \
-                "$path" && exit 5 || exit 2
+            try "$EXTDIR/color-preview" pygmentize "$path" && exit 5 || exit 2
+            # try pygmentize -g -f terminal256 -O style=solarizeddark,linenos=1 \
+            #     <(head -n 50 "$path") && exit 5 || exit 2
             # try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
-            ## Also highly loads CPU
-            # try "$EXTDIR/color-preview" pygmentize "$path" && exit 5 || exit 2
 
         elif command -v highlight >/dev/null; then
             # wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
@@ -127,9 +126,6 @@ case "$mimetype" in
                 --line-numbers --line-number-length=3 --replace-tabs=4 --no-trailing-nl \
                 --validate-input --style=$STYLE \
                 "$path" && exit 5 || exit 2
-        else
-            ## Really cool, but slow :(
-            try "$EXTDIR/color-preview" "$path" && exit 5 || exit 2
         fi ;;
 
     image/*) { # Ascii-previews of images:
