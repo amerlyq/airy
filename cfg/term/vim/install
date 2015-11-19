@@ -15,7 +15,11 @@ if distro arch; then
     pkg_inst -p 'vim' gvim-python3
     pkg_inst ctags vimpager
     # aur_inst zeal
-    echo "Err: not all"
+
+    ## For vim-clang-format and vim-autoformatter
+    pkg_inst -p 'clang-format' clang-tools-extra
+    pkg_inst astyle tidyhtml
+    aur_inst js-beautify  # FAIL python-autopep8 beautify-css
 
 elif distro ubuntu; then
     # for vimoutliner export in mindmap

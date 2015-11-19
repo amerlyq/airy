@@ -64,8 +64,6 @@ NeoBundleLazy 'dhruvasagar/vim-table-mode', {
 "OFF: NeoBundle 'terryma/vim-smooth-scroll'
 
 " ======================================
-" DEPRECATED: use vim-sneak
-" NeoBundle 'Lokaltog/vim-easymotion'
 " DEPRECATED: use Unite MRU
 " NeoBundle 'mhinz/vim-startify'
 " DEPRECATED: use 'kana/vim-altr'
@@ -75,9 +73,6 @@ NeoBundleLazy 'dhruvasagar/vim-table-mode', {
 " Or add them for each line of multiline selection
 " Ctrl-n  --> Ctrl-p, Ctrl-x, and <Esc>
 " NeoBundle 'kris89/vim-multiple-cursors'
-" DEPRECATED: use 'rhysd/vim-operator-surround'
-" Manage surrounding ('"<p>...) by replace cs"' or delete ds"
-" NeoBundle 'tpope/vim-surround'
 " DEPRECATED: use 'stefandtw/quickfix-reflector.vim'
 " NeoBundleLazy 'jceb/vim-editqf', { 'autoload' : { 'commands' :
 "             \ ['QFEdit', 'QFAddNote', 'QFAddPatternNote'] } }

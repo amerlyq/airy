@@ -8,7 +8,7 @@ augroup filetypedetect
   " Markdown
   " au BufRead,BufNewFile *.fza setf forestanza
   au BufRead,BufNewFile {*.mkd,*.markdown,*.md,*.mdown,*.mkdn}
-        \ setl filetype=mkd autoindent formatoptions=tcroqn2 comments=n:>
+        \ setl ft=markdown autoindent comments=n:>
   " Langs
   au BufRead,BufNewFile *.scala   setf scala
   au BufRead,BufNewfile *.n       setf nemerle

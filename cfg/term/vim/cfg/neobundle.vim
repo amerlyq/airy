@@ -42,4 +42,4 @@ call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
 " endif
 call SourcePluginsCfg()
 call neobundle#end()  " Load all listed non-lazy plugins
-" NeoBundleCheck
+NeoBundleCheck

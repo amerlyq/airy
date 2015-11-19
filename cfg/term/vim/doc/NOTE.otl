@@ -127,9 +127,11 @@ OPERATORS
 		https://github.com/kana/vim-submode
 	[_] Motions & textobj
 		[_] https://github.com/jeetsukumaran/vim-indentwise
-		[_] https://github.com/kana/vim-textobj-diff
 		[_] Paired mappings on [, ] for frequent commands
-			:? Maybe change toggling ,t.. -> [t.. and ]t..
+			:THINK Maybe change toggling ,t.. -> [t.. and ]t..
+			: https://github.com/tpope/vim-unimpaired
+		[_] Mappings to add empty lines or move/exchange/duplicate/fetch lines of text
+			: vim-scripts/LineJuggler:
 			: https://github.com/tpope/vim-unimpaired
 		[_] Consider motions for diff mode
 			: https://github.com/kana/vim-textobj-diff
@@ -139,23 +141,35 @@ OPERATORS
 			: https://github.com/tommcdo/vim-ninja-feet/
 		[_] Selection of pairs
 			: https://github.com/gorkunov/smartpairs.vim
+		2015-07-06 [X] ALT Try all plugins for textobj:
+			: https://github.com/kana/vim-textobj-user/wiki
+			: https://github.com/tommcdo
+
+	[_] Operators
 		[_] Sort
-			https://github.com/christoomey/vim-sort-motion
-			https://github.com/emonkak/vim-operator-sort
+			: https://github.com/christoomey/vim-sort-motion
+			: https://github.com/emonkak/vim-operator-sort
 		[_] Grep
-			https://github.com/inside/vim-grep-operator
+			: https://github.com/inside/vim-grep-operator
 		[_] Swap args in func
 			: http://blog.kamil.dworakowski.name/2007/09/swap-parameters-script-for-vim.html
 			: http://www.vim.org/scripts/script.php?script_id=2032
+
+	[_] Misc
+		[_] https://github.com/seletskiy/urxvt-vim-insert
+		[_] https://github.com/deris/vim-operator-insert
+		[_] https://github.com/kana/vim-smartchr
+		[_] https://github.com/osyo-manga/vim-operator-exec_command
+		[_] https://github.com/thinca/vim-quickrun
+		[_] https://github.com/osyo-manga/vim-jplus
+
+	<Actions
 		2015-05-26 [X] easymotion  :> Replaced by vim-sneak
 			2015-03-17 [X] maybe, move to 'q' key? Or combining with surround will work smoothly?
 			:> No combining -- overlapping x-mappings aren't possible
 			[X] ALT: https://github.com/justinmk/vim-sneak
 		2015-07-06 [X] text place exchange operator
 			: https://github.com/tommcdo/vim-exchange
-		2015-07-06 [X] ALT Try all plugins for textobj:
-			: https://github.com/kana/vim-textobj-user/wiki
-			: https://github.com/tommcdo
 		2015-07-06 [X] Navigation
 			[_] mappings to move between loci of entries of qf/loc list
 			: move to next/prev change in git signify (Use: ]c [c)
@@ -166,19 +180,13 @@ OPERATORS
 			: https://github.com/rhysd/vim-operator-surround
 
 	[_] DEV Consider switching to relative number in operator pending mode
-		https://github.com/jeffkreeftmeijer/vim-numbertoggle
-		http://www.vim.org/scripts/script.php?script_id=4212
-		http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/
-		http://vim.1045645.n5.nabble.com/Changing-line-numbers-from-normal-to-relative-td5723150.html
-		http://www.vim.org/scripts/script.php?script_id=4461
-		https://www.reddit.com/r/vim/comments/1hocx4/better_lines_numbers_for_vim/
-	SEE
-		https://github.com/deris/vim-operator-insert
-		https://github.com/seletskiy/urxvt-vim-insert
-		https://github.com/kana/vim-smartchr
-		https://github.com/osyo-manga/vim-operator-exec_command
-		https://github.com/thinca/vim-quickrun
-		https://github.com/osyo-manga/vim-jplus
+		: https://github.com/jeffkreeftmeijer/vim-numbertoggle
+		: http://www.vim.org/scripts/script.php?script_id=4212
+		: http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/
+		: http://vim.1045645.n5.nabble.com/Changing-line-numbers-from-normal-to-relative-td5723150.html
+		: http://www.vim.org/scripts/script.php?script_id=4461
+		: https://www.reddit.com/r/vim/comments/1hocx4/better_lines_numbers_for_vim/
+
 	2015-11-15 [X] Test in conjunction with : vim-operator-surround
 		:$ https://github.com/osyo-manga/vim-textobj-multiblock
 		:+ https://github.com/thinca/vim-textobj-between

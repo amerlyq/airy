@@ -51,25 +51,35 @@ Neovim
 		[_] syntax highlighting on right side of results (snippets)
 	[_] TODO On help window -- disable 'gh/gl' features to prohibit replace help buffer
 	[_] Paste "+ text on ',p' or else -- append newline to text and normalize as in urxvt
+	Replace cfgs loading order -- my settings/mappings first, plugins -- later
+		:= It's needed to not lose keymappings even on broken plugins (when I test them actively)
+		:= Plus with lazy loading most of plugins will load after my cfg anyway
 
 BUG plugins
 	[_] textobj-quote -- reacts only on double quote instead of any?
-		Also -- add pair of typographic quotes (maybe not in this plugin?)
+		[_] weird behaviour overall -- TEST it
+		[_] add pair of typographic quotes (maybe not in this plugin?)
 	[_] textobj-keyval -- seems broken? CHECK all the textobj
+		[_] DEV fork, as it works only for specified filetypes
+		:= Add default key-splitter (to work in yaml)
+		:= Specify whole list of filetypes on one splitter instead of individually
 	[_] commentary -- need inline comment -- to toggle and textobj
 	[_] sideways -- restore visual selection after jump on [a,  ]a
 		:= NEED for visual select several consecutive args
-	[_] expand-region -- different mappings in line-, char-, blockwise modes
+	[_] expand-region -- 'different' mappings in line-, char-, blockwise modes
 		:= TODO same key as mode -- expands, [g|Space][vV<C-V>] -- shrinks
 		:= I have done smth similar in keys-remap  :ALSO:SEE :h v_v
 	[_] textobj-anyblock -- deletes current character if there are no brackets!
-	[_] neobundle - patch if necessary
-		autoload/neobundle/autoload.vim:154
-			silent! execute mode.'unmap ' mapping
-	[_] Surround -- add symm mappings for closing block brackets
-		:= THINK adding space inside/outside brackets by involving [Space]
-	[_] ag -- FIX escaping '#' -> '\\#'
-	[_] ag -- DEV repeat last search
+	[_] Surround
+		[_] THINK adding space inside/outside brackets by involving [Space]
+			:= 4 variants: no/inner/outer/both
+		[_] THINK? Optimize direct brace mappings by getchar()
+		[_] ADD pair for "|" and ":"
+		2015-11-19 [X] add symm mappings for closing block brackets
+	[_] ag
+		[_] FIX escaping '#' -> '\\#'
+		[_] DEV repeat last search
+		[_] THINK vim-submode for search -- in context of source-navi
 
 
 SMALL
