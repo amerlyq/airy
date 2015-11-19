@@ -128,21 +128,6 @@ NeoBundle 'lyokha/vim-xkbswitch', { 'autoload' : {
     \ }, 'name' : 'vim-xkbswitch' }
 
 
-" ======================================
-
-"NeoBundleLazy 'docunext/closetag.vim', {
-"   \ 'autoload' : { 'filetypes' : ['html', 'xml'] } }
-" NeoBundle 'vim-scripts/DoxygenToolkit.vim'
-" NeoBundle 'hsanson/vim-android'
-" Web
-" NeoBundle 'mattn/emmet-vim'
-" NeoBundle 'cakebaker/scss-syntax.vim'
-" NeoBundle 'gorodinskiy/vim-coloresque'
-
-NeoBundle 'scrooloose/syntastic'
-
-" ======================================
-
 " When swap exists, it show process id, or you can diff swp with file on disk
 NeoBundle 'chrisbra/Recover.vim'
 

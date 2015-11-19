@@ -129,12 +129,10 @@ fun! s:RegConvert(reg, tp)
 endfunction
 command! -bang -nargs=1 RegConvert call s:RegConvert(<bang>0? '+': '"', <q-args>)
 
-let s:leader = g:mapleader | let mapleader = "\\"
-  nnoremap <leader>Y :call GetLineBookmark(v:count,'')<CR>
-  nnoremap <leader>t :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
-  vnoremap <leader>t :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
-  nnoremap <leader>T :RegConvert b
-let mapleader = s:leader
+nnoremap [Frame]Y :call GetLineBookmark(v:count,'')<CR>
+nnoremap [Frame]t :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
+vnoremap [Frame]t :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
+nnoremap [Frame]T :RegConvert b
 
 " UNUSED:
 " Swap registry

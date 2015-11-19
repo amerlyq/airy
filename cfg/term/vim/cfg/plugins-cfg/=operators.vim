@@ -194,26 +194,6 @@ if neobundle#tap('vim-sneak') "{{{
 endif "}}}
 
 
-if neobundle#tap('vim-signify')  "{{{
-  let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
-  let g:signify_sign_change = '~'
-  let g:signify_sign_delete = '-'
-  noremap <unique> [Frame]gg :<C-u>SignifyFold<CR>
-  " FIND:THINK: isn't :SignifyRefresh unnecessary?
-  noremap <unique> <leader>tg :<C-u>SignifyToggle \| SignifyRefresh<CR>
-  noremap <unique> <leader>tG :<C-u>SignifyToggleHighlight \| SignifyRefresh<CR>
-  "" Already mapped -- if busy: automaps <leader>gj and <leader>gk
-  nmap <silent><unique> ]c <Plug>(signify-next-hunk)
-  nmap <silent><unique> [c <Plug>(signify-prev-hunk)
-  " Textobj -- changed areas
-  xmap <silent><unique> aS <Plug>(signify-motion-outer-visual)
-  omap <silent><unique> aS <Plug>(signify-motion-outer-pending)
-  xmap <silent><unique> iS <Plug>(signify-motion-inner-visual)
-  omap <silent><unique> iS <Plug>(signify-motion-inner-pending)
-  call neobundle#untap()
-endif "}}}
-
-
 "{{{1 Actions ============================
 if neobundle#tap('vim-expand-region') "{{{
   xmap <silent><unique> + <Plug>(expand_region_expand)

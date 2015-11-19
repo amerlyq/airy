@@ -5,8 +5,6 @@ NeoBundle 'octol/vim-cpp-enhanced-highlight'
 " https://github.com/beyondmarc/opengl.vim
 NeoBundle 'vim-perl/vim-perl'
 
-
-"{{{1 Python ============================
 " WARNING: can't do them Lazy, as them will load on every
 "         new *.py fileopen (,f) and reset my autocmd for jedi autocomplete
 NeoBundle 'davidhalter/jedi-vim'
@@ -18,6 +16,21 @@ NeoBundle 'klen/python-mode'
 " USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
 " https://github.com/bps/vim-textobj-python
 
+NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
+    \   'filetypes' : ['tex', 'bib', 'latex'] },
+    \ 'external_commands': [ 'latexmk' ] }
+" {{{ LaTeX-Box
+" C-xC-o completion
+" [[ -> \begin
+" ]] -> \end / \right / whatever
+" n-f5 -- */ no-*
+" v-f7 -- wrap into command
+" ([ -- eqref
+" (( -- \left(
+" )) -- \item
+" }}} LaTeX-Box
+
+" NeoBundle 'hsanson/vim-android'
 
 
 "{{{1 Mark-up ============================
@@ -35,23 +48,16 @@ NeoBundleLazy 'elzr/vim-json', { 'autoload': { 'filetypes': [ 'json' ] }}
 " SEE:THINK: https://github.com/lmeijvogel/vim-yaml-helper
 NeoBundleLazy 'mrk21/yaml-vim', { 'autoload': { 'filetypes': [ 'yaml' ] }}
 
-
 NeoBundleLazy 'tpope/vim-markdown', {
     \ 'autoload' : { 'filetypes' : [ 'markdown' ] }}
 
-NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', { 'autoload' : {
-    \   'filetypes' : ['tex', 'bib', 'latex'] },
-    \ 'external_commands': [ 'latexmk' ] }
-" {{{ LaTeX-Box
-" C-xC-o completion
-" [[ -> \begin
-" ]] -> \end / \right / whatever
-" n-f5 -- */ no-*
-" v-f7 -- wrap into command
-" ([ -- eqref
-" (( -- \left(
-" )) -- \item
-" }}} LaTeX-Box
+"NeoBundleLazy 'docunext/closetag.vim', {
+"   \ 'autoload' : { 'filetypes' : ['html', 'xml'] } }
+" NeoBundle 'vim-scripts/DoxygenToolkit.vim'
+" Web
+" NeoBundle 'mattn/emmet-vim'
+" NeoBundle 'cakebaker/scss-syntax.vim'
+" NeoBundle 'gorodinskiy/vim-coloresque'
 
 
 "{{{1 Syntax ============================

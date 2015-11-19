@@ -13,15 +13,10 @@ let g:editqf_store_absolute_filename = 1
 " customized by defining a mapping in your vimrc. Default must be disabled:
 let g:editqf_no_mappings = 1
 
-" Leader '\' {{{
-let s:leader = g:mapleader
-let mapleader = "\\"
-nmap <leader>n <Plug>QFAddNote
-nmap <leader>N <Plug>QFAddNotePattern
+nmap <unique> [Frame]n <Plug>QFAddNote
+nmap <unique> [Frame]N <Plug>QFAddNotePattern
 " nmap <leader>l <Plug>LocAddNote
 " nmap <leader>L <Plug>LocAddNotePattern
-let mapleader = s:leader
-" }}}
 
 
 " The mappings [I,W,E] to change the type of quickfix entry can be turned off by setting:

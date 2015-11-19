@@ -26,45 +26,45 @@ else
   let s:theme_bkgr = 'dark'
 endif
 
-augroup PatchColorScheme
-  autocmd!
-augroup END
-
-if s:theme ==# 'transparent'
-  " Restore right colors for sign column in solarized
-  " TODO: check -- simply use this patch always. Will it work?
-  augroup PatchColorScheme "{{{2
-    au ColorScheme * hi DiffAdd    ctermbg=None
-    au ColorScheme * hi DiffChange ctermbg=None
-    au ColorScheme * hi DiffDelete ctermbg=None
-    au ColorScheme * hi DiffText   ctermbg=None
-    au ColorScheme * hi SignColumn ctermbg=None
-    au ColorScheme * hi LineNr     ctermbg=None
-    au ColorScheme * hi FoldColumn ctermbg=None
-    au ColorScheme * hi SpecialKey ctermbg=None
-  augroup END "}}}2
-else
-  au PatchColorScheme ColorScheme * highlight! link SignColumn LineNr
-endif
-
-augroup PatchColorScheme "{{{2
-  " au ColorScheme * hi! Folded ctermfg=3 ctermbg=NONE
-  " au ColorScheme * hi! FoldColumn ctermfg=4 ctermbg=NONE guifg=Cyan guibg=Grey
-  au ColorScheme * hi! lCursor guifg=NONE ctermbg=4 guibg=Cyan
-  au ColorScheme * hi! link ColorColumn StatusLineNC
+fun! s:PatchColorScheme()
+  if s:theme ==# 'transparent'
+    for g in [DiffAdd, DiffChange, DiffDelete, DiffText,
+      \       SignColumn, LineNr, FoldColumn, SpecialKey]
+      exe 'hi! '.g.' ctermbg=None'
+    endfor
+  else
+    " Restore right colors for sign column in solarized
+    " TODO: check -- simply use this patch always. Will it work?
+    hi! link SignColumn LineNr
+    hi! IndentGuidesOdd  ctermfg=8 ctermbg=0
+    hi! IndentGuidesEven ctermfg=8 ctermbg=0
+  endif
+  "  hi! Folded ctermfg=3 ctermbg=NONE
+  "  hi! FoldColumn ctermfg=4 ctermbg=NONE guifg=Cyan guibg=Grey
+  hi! lCursor guifg=NONE ctermbg=4 guibg=Cyan
+  hi! link ColorColumn StatusLineNC
   " Suppress transparency on reverse cursor of search results highlight
-  " au ColorScheme * hi! Search cterm=None ctermbg=3 ctermfg=0
+  "  hi! Search cterm=None ctermbg=3 ctermfg=0
   " The "NonText" highlighting will be used for "eol", "extends" and
   "  "precedes".  "SpecialKey" for "nbsp", "tab" and "trail".
-  au ColorScheme * hi! SpecialKey  ctermbg=None cterm=None
-  au ColorScheme * hi! NonText  ctermbg=None
-augroup END "}}}2
+  hi! SpecialKey  ctermbg=None cterm=None
+  hi! NonText  ctermbg=None
+  " Fix for GitGutter
+  " hi! GitGutterChange ctermfg=yellow guifg=darkyellow
+  " hi! GitGutterAdd ctermfg=green guifg=darkgreen
+  " hi! GitGutterDelete ctermfg=red guifg=darkred
+  " hi! GitGutterChangeDelete ctermfg=yellow guifg=darkyellow
+endf
 
+augroup PatchColorScheme
+  autocmd!
+  au ColorScheme * call s:PatchColorScheme()
+augroup END
 
 " for molokai
 " let g:rehash256 = 1
 " nocturne
-exec 'set background='. s:theme_bkgr
+let &background=s:theme_bkgr
 try
   if exists('$TMUX') && &t_Co <= 16
     color slate | else | color solarized
@@ -72,9 +72,3 @@ try
 catch /^Vim\%((\a\+)\)\=:E185/
   color slate
 endtry
-
-" Fix for GitGutter
-" hi! GitGutterChange ctermfg=yellow guifg=darkyellow
-" hi! GitGutterAdd ctermfg=green guifg=darkgreen
-" hi! GitGutterDelete ctermfg=red guifg=darkred
-" hi! GitGutterChangeDelete ctermfg=yellow guifg=darkyellow

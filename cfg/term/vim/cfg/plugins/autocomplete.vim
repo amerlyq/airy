@@ -1,8 +1,14 @@
+"{{{1 General ============================
+NeoBundle 'scrooloose/syntastic'
+
+
 "{{{1 Neo ============================
 " Async clang code completion.
 " Integration with neocomplete: for stdlib++, boost, etc (works on Windows)
 " http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
-NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
+NeoBundleLazy 'osyo-manga/vim-marching', {
+      \ 'filetypes': ['c', 'cpp'],
+      \ 'depends' : 'Shougo/vimproc.vim' }
 
 " THINK what can be useful to add
 " repository = 'Shougo/neoinclude.vim'
@@ -10,14 +16,14 @@ NeoBundle 'osyo-manga/vim-marching', { 'depends' : 'Shougo/vimproc.vim' }
 " repository = 'Shougo/neco-syntax'
 
 NeoBundleLazy 'Shougo/neocomplete.vim', {
-    \ 'autoload' : { 'insert': 1 },
+    \ 'insert': 1,
     \ 'depends' : [ 'Shougo/context_filetype.vim' ],
     \ 'vim_version' : '7.3.885',
-    \ 'disabled' : !has('lua') }
+    \ 'disabled' : !has('lua'), 'neovim': 0 }
 
 " DO: :UpdateRemotePlugins and restart. Then once execute :DeopleteEnable
 NeoBundleLazy 'Shougo/deoplete.nvim', {
-    \ 'autoload': { 'insert': 1 },
+    \ 'insert': 1,
     \ 'depends': [ 'Shougo/context_filetype.vim' ],
     \ 'neovim': 1 }
 

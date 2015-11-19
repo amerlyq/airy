@@ -10,6 +10,7 @@ set wrapscan    " Searches wrap around the end of the file.
 
 "" Make <C-L> (redraw screen) and turn off search highlighting until the next
 "" search,  http://vim.wikia.com/wiki/Example_vimrc
+nnoremap <unique> <Leader>tH :setl hlsearch! hls?<CR>
 nnoremap <unique> <C-l> :nohlsearch<CR><C-l>
 
 

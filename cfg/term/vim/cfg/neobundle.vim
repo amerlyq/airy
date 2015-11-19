@@ -1,6 +1,7 @@
 " Install neobundle if it doesn't exist
 let $BUNDLES=expand('$CACHE/bundle')
 let $NEOBUNDLE=expand('$BUNDLES/neobundle.vim')
+let $BUNDLECFGS=expand('$VIMHOME/cfg/plugins-cfg')
 
 if has('vim_starting')
   if !filereadable(expand('$NEOBUNDLE/README.md'))

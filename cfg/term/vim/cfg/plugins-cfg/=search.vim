@@ -1,3 +1,22 @@
+"{{{1 Search/Replace ============================
+if neobundle#tap('ag.vim') "{{{
+  " let g:ag_highlight=1
+  " CHG: all real mappings included into 'after/ftplugin/qf.vim'
+  let g:ag_apply_lmappings=0
+  let g:ag_apply_qmappings=0
+  let g:ag_mapping_message=0
+  " let g:ag_qhandler="botleft lopen 7"  "OR: copen 20"
+  let g:ag_prg="ag --smart-case --vimgrep"
+  fun! neobundle#hooks.on_source(bundle)
+    if split(system("ag --version"), "[ \n\r\t]")[2] <= '0.25.0'
+      let g:ag_prg="ag --smart-case --column --nogroup --noheading --ignore tags"
+    endif
+  endf
+  call neobundle#untap()
+endif "}}}
+
+
+"{{{1 Substitute/Highlight ============================
 if neobundle#tap('incsearch.vim') "{{{
   " LIOR: "{{{
   "   <Tab>/<S-Tab> between search on screen

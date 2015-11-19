@@ -9,20 +9,43 @@ zhaocai/GoldenView.Vim:
 
 ---
 ## Indicators
-nathanaelkane/vim-indent-guides:
-  description: Highlights first space of tab columns
+mhinz/vim-signify:
+  description: |  # TAGS: [textobj, signs]
+    Signs on changes and textobj on vcs-aware area
+    ALT: airblade/vim-gitgutter: (git only, but much faster file save)
+  mappings: [[xo, aS, iS], [n, '[c', ']c']]  # mappings: <Plug>
+  commands: [SignifyFold, SignifyToggle, SignifyToggleHighlight, SignifyRefresh]
+  lazy: 0  # EXPL: sourced on buffer read anyway. Disable individually by ft.
 
 kshenoy/vim-signature:
-  description: TRY Display, toggle and navigate marks
+  description: |  # TAGS: [textobj, signs]
+    Display, toggle and navigate by marks [a-zA-Z] and markers [0-9]
+    ATTENTION: Lazy startup, press m<Esc> to load and show existing marks
+    # ALSO:USE: m, m. m- m/ m? dm  CHG: m<Del> m<BS>
+  mappings: [[n, "m", "']", "'[", "`]", "`[", "]'", "['",
+                 "]`", "[`", "]-", "[-", "]=", "[="]]
+  commands: [SignatureToggleSigns, SignatureRefresh,
+             SignatureListMarks, SignatureListMarkers]
+
+t9md/vim-quickhl:  # TAGS: [operator, hl]
+  description: Highlight motion, lock current color<->regex
+  mappings: [[n, <Plug>(operator-quickhl-, <Plug>(quickhl-]]  # [[n, qh, qH, <Leader>?h]]
+  commands: [QuickhlManualList, QuickhlCwordToggle, QuickhlTagToggle,
+             QuickhlManualLockToggle, QuickhlManualLockWindowToggle]
+
+nathanaelkane/vim-indent-guides:  # TAGS: [hl]
+  description: Highlights first space of tab columns
+  lazy: 0  # EXPL: enable from the start
 
 ---
-## Statuslines
+## Statusline && colorschemes
 bling/vim-airline:
   description: Fast bottom/top status panels w/ integration
-  lazy: 0
+  lazy: 0  # EXPL: enable from the start
 
----
-## Colorschemes
 altercation/vim-colors-solarized:
-  lazy: 0
+  description: Sticked to this colorscheme 2+ years already...
+  mappings: [[nxi, <Plug>ToggleBackground]]
+  lazy: 0  # EXPL: enable from the start
+
 # tomasr/molokai: {}

@@ -17,20 +17,6 @@ let g:netrw_list_hide= '*.swp'
 set browsedir=current
 "}}}
 
-if neobundle#tap('neocomplete.vim') && has('lua') "{{{
-  let g:neocomplete#enable_at_startup = 1
-  let neobundle#hooks.on_source =
-        \ '~/.vim/rc/plugins/neocomplete.rc.vim'
-
-  call neobundle#untap()
-endif "}}}
-
-if neobundle#tap('neosnippet.vim') "{{{
-  let neobundle#hooks.on_source =
-        \ '~/.vim/rc/plugins/neosnippet.rc.vim'
-
-  call neobundle#untap()
-endif "}}}
 
 if neobundle#tap('echodoc.vim') "{{{
   let g:echodoc_enable_at_startup = 1
