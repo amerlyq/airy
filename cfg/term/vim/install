@@ -6,14 +6,14 @@ source ~/.shell/func.d/packages
 # clang-format-3.5          | for auto-formatting c/cpp code
 
 if distro arch; then
-    # SEE gtags (GNU Global) -- instead of ctags?
     # aur_inst neovim-git
-    pkg_inst neovim python-neovim python2-neovim
-    pkg_inst -p 'pip' python-pip
-    # Used 'gvim' instead of 'gvim-python3' for YouCompleteMe
-    #   and for pythoncomplete#Complete
-    pkg_inst -p 'vim' gvim-python3
+    pkg_inst -p 'neovim' neovim python-neovim python2-neovim
+    pkg_inst -p 'pip' python python-yaml python-jedi
+
+    ## External deps
+    # THINK:SEE gtags (GNU Global) -- instead of ctags?
     pkg_inst ctags vimpager
+    pkg_inst -p 'ag' the_silver_searcher
     # aur_inst zeal
 
     ## For vim-clang-format and vim-autoformatter
@@ -21,13 +21,17 @@ if distro arch; then
     pkg_inst astyle tidyhtml
     aur_inst js-beautify  # FAIL python-autopep8 beautify-css
 
+    # Used 'gvim' instead of 'gvim-python3' for YouCompleteMe
+    #   and for pythoncomplete#Complete
+    # pkg_inst -p 'vim' gvim-python3
+
 elif distro ubuntu; then
     # for vimoutliner export in mindmap
     pkg_inst vim-gtk exuberant-ctags 'python-pip' python-dev
+    pkg_inst python3 python3-yaml
     pkg_inst libclang-dev clang-format-3.5
     # sudo pip  install neovim
     # sudo pip3 install neovim
+    do_if -c 'sudo pip install --upgrade' pip jedi
     echo "Err: not all"
 fi
-
-do_if -c 'sudo pip install --upgrade' pip jedi
