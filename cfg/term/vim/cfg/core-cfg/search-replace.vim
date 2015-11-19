@@ -30,17 +30,6 @@ nnoremap <unique> <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
 noremap <unique> gs :norm <C-R>=v:count1<CR>f<C-R>=getline('.')[col('.')-1]<CR><CR>
 noremap <unique> gS :norm <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR><CR>
 
-": Ag working dir  searching
-" nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
-nnoremap <unique> <Leader>a :<C-U>Ag -w '<C-R><C-W>'<CR>
-vnoremap <unique> <Leader>a :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
-": Ag buffer search
-nnoremap <unique> g<Leader>a :<C-U>AgBuffer -w '<C-R><C-W>'<CR>
-vnoremap <unique> g<Leader>a :<C-U>AgBuffer -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
-": Ag current file searching (currently no jumping -- need Ag >= 0.25 with --vimgrep)
-nnoremap <unique> <Leader>A :<C-U>Ag -w '<C-R><C-W>' %:p<CR>
-vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<CR>
-
 
 ": Substitute current match
 " nnoremap <leader>cw :%s:\<<C-R><C-w>\>:<C-R><C-w>:g<Left><Left>

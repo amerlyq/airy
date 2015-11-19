@@ -1,5 +1,8 @@
 "{{{1 General ============================
 NeoBundle 'scrooloose/syntastic'
+" tpope/vim-endwise:
+"   description: Automatic not-persistent closing statements
+"   mappings: [[i, <CR>, <C-x><CR>]]
 
 
 "{{{1 Neo ============================

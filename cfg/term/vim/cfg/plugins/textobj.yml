@@ -1,0 +1,75 @@
+## Textobj
+kana/vim-textobj-user: &tou
+  description: Dependency of 'vim-textobj-*'
+  functions: textobj#user#
+  ## EXPL Loopback for following back-refs {{{
+  depends: kana/vim-textobj-user
+  mappings: [[ox, <Plug>]]  # }}}
+
+rhysd/vim-textobj-anyblock:
+  description: |
+    Content of closest block pair
+    NOTE pairs by priority ({[&quot'<`
+    DEPRECATED: - (old, in jap) osyo-manga/vim-textobj-multiblock
+  mappings: [[ox, ab, ib]]
+  <<: *tou
+thinca/vim-textobj-between:
+  description: Between same found symbols
+  mappings: [[ox, af, if]]
+  <<: *tou
+kana/vim-textobj-entire:
+  description: Whole buffer w/[o] empty lines (instead ggVG)
+  # CHG mappings: [[ox, aG, iG]]
+  <<: *tou
+kana/vim-textobj-fold:
+  description: Fold-marked regions
+  mappings: [[ox, az, iz]]
+  <<: *tou
+kana/vim-textobj-function:
+  description: Function definition+body (C/Java/Vimscript)
+  # CHG mappings: [[ox, aF, iF, agf, igf]]
+  <<: *tou
+kana/vim-textobj-indent:
+  description: Equally indented blocks (Python-like)
+  mappings: [[ox, ai, ii, aI, iI]]
+  <<: *tou
+vimtaku/vim-textobj-keyvalue:
+  description: |
+    Key/value with/beside quotes and space
+    WARNING:NEED:DEV: fork, as it works only for specified filetypes
+  mappings: [[ox, ak, ik, av, iv]]  # <Plug>(textobj-[key,value]-*
+  <<: *tou
+kana/vim-textobj-lastpat:  # OR:STD:NOTE: '..[ai]g[nN]'
+  description: Last searched pattern
+  mappings: [[ox, a/, i/]]
+  <<: *tou
+kana/vim-textobj-line:
+  description: Line content only (without \n)
+  mappings: [[ox, al, il]]
+  <<: *tou
+  # "slkd": "djjj"
+beloglazov/vim-textobj-quotes:
+  description: Any nearest quotes of #'"`
+  # CHG mappings: [[o, q]]
+  mappings: [[ox, aq, iq]]
+  <<: *tou
+vimtaku/vim-textobj-sigil:
+  description: Vars for bash/perl ( $name{...} )
+  # CHG mappings: [[ox, ad, id]]
+  <<: *tou
+saihoooooooo/vim-textobj-space:
+  description: Space between words or before indent
+  # CHG mappings: [[ox, as, is]]
+  <<: *tou
+kana/vim-textobj-syntax:
+  description: Highlighted syntax region
+  # CHG mappings: [[ox, ah, ih]]
+  <<: *tou
+coderifous/textobj-word-column.vim:
+  description: «Smart» words column
+  mappings: [[ox, ac, ic, aC, iC]]
+  <<: *tou
+lucapette/vim-textobj-underscore:
+  description: Parts, separated by '_' ( ...nameof_some_func )
+  mappings: [[ox, a_, i_]]
+  <<: *tou

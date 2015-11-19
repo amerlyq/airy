@@ -37,6 +37,9 @@ endofpython
 endfunc
 
 call SourcePlugins()
+" SEE
+"   http://www.yaml.org/refcard.html
+"   http://learnxinyminutes.com/docs/yaml/
 call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
       \ 'plugins/*.yml', 0, 1), {'lazy': 1})
 " NeoBundleSaveCache

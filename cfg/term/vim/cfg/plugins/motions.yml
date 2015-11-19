@@ -1,0 +1,24 @@
+## Motions
+matchit.zip:
+  description: STD plugin for matching pairs/triples of block expr
+  mappings: [[nvo, '%', 'g%', '[%', ']%'], [v, 'a%']]
+
+tpope/vim-rsi:
+  description: |
+      Readline style motions in insert and cmdline
+      SEE: http://www.vim.org/scripts/script.php?script_id=4359
+  lazy: 0  # Direct key mappings have no sense in being lazy
+
+bkad/CamelCaseMotion:
+  description: Motions in _camel_case_ for all modes
+  mappings: [<Leader>w, <Leader>b, <Leader>e]  # <Plug>CamelCaseMotion_
+# }}}
+
+justinmk/vim-sneak:
+  description: |
+      Two-letters find on whole screen scope
+      DEPRECATED:
+        - (bloated) Lokaltog/vim-easymotion
+        - (altered) https://github.com/rhysd/clever-f.vim
+  mappings: <Plug>Sneak
+  depends: tpope/vim-repeat

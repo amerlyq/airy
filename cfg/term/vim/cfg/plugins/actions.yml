@@ -1,0 +1,19 @@
+## Actions
+tpope/vim-repeat:
+  description: Dependency of support to '.' on <Plug> mappings
+  mappings: [[n, ., u, U, <C-r>]]  #<Plug>(Repeat
+  functions: repeat#
+
+tpope/vim-speeddating:
+  description: Use CTRL-A/X to increment dates, times, and more
+  mappings: [[nx, <C-a>, <C-x>], [n, d<C-a>, d<C-x>]]  # <Plug>SpeedDating
+  depends: tpope/vim-repeat
+
+kana/vim-niceblock:
+  description: On insert in VISUAL mode behave like as V-BLOCK
+  mappings: [[x, A, I, gI]]  # <Plug>(niceblock-
+
+terryma/vim-expand-region:
+  description: Expand/shrink current visual selection
+  # CHG mappings: [[x, +, -]]
+  mappings: [[x, <Plug>(expand_region_]]

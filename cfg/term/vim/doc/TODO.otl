@@ -51,6 +51,7 @@ Neovim
 		:= Plus with lazy loading most of plugins will load after my cfg anyway
 	[_] ADD [ia][0-9] with brackets (by analogy with anyblock)
 
+
 BUG plugins
 	[_] Airline + nrrwrgn -- add hook to nrrwrgn to change ailine variable
 		: if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
@@ -76,16 +77,25 @@ BUG plugins
 		:= I have done smth similar in keys-remap  :ALSO:SEE :h v_v
 	[_] textobj-anyblock -- deletes current character if there are no brackets!
 	[_] operator-surround
+		[_] BUG first append after lazy loading -- applies only to first char
+		2015-11-19 [X] direct append in visual mode
+		[_] THINK? direct-append operators for normal mode?
 		[_] THINK adding space inside/outside brackets by involving [Space]
 			:= 4 variants: no/inner/outer/both
 		[_] THINK? Optimize direct brace mappings by getchar()
 		[_] ADD pair for "|" and ":"
 		2015-11-19 [X] add symm mappings for closing block brackets
 		[_] BUG 0-9 -- in visual mode add ']' -->  [0]-9
+		[_] THINK:DEV: too many operators -- use vim-submode?
 	[_] ag
 		[_] FIX escaping '#' -> '\\#'
 		[_] DEV repeat last search
+		[_] ADD:DEV operator-search
+			: https://github.com/rgrinberg/vim-operator-gsearch
+			: https://github.com/osyo-manga/vim-operator-search
 		[_] THINK vim-submode for search -- in context of source-navi
+			http://d.hatena.ne.jp/thinca/20130131/1359567419
+			http://haya14busa.com/improve-x-with-vim-submode/
 
 
 SMALL
@@ -164,7 +174,7 @@ SEE & CHECK
 	[_] TRY: https://github.com/junegunn/fzf
 	[_] R-lang for vim
 		http://www.lepem.ufc.br/jaa/r-plugin.html
-	[_] Search by name and insert Unicode
+	2015-11-19 [X] Search by name and insert Unicode
 		https://github.com/chrisbra/unicode.vim
 	[_] ALT to unite.vim? But seems like less useful.
 		https://github.com/szw/vim-ctrlspace
