@@ -10,7 +10,8 @@ set -o pipefail
 #   http://stackoverflow.com/questions/14690010/bash-trick-program-into-thinking-stdout-is-an-interactive-terminal
 # script -qc "vimcat -u ~/.vim/vimcatrc \"$path\"" /tmp/typescript
 
-fpath="${@: -1}"
+height="${2:-50}"
+fpath="$3"
 # eval '${@:1:($#-1)} "$ftmp"'
 
 DIR="${0%/*}"
@@ -23,7 +24,7 @@ mkdir -p ${pipe%/*}
 
 trap "rm -f $pipe" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT
 [[ -p $pipe ]] || mkfifo $pipe
-{ head -n 50 "$fpath" > $pipe; } &
+{ head -n $((height)) "$fpath" > $pipe; } &
 
 # WARNING: In general we can't cut on width, or syntax will be messed up!
 # perl -lpe '$.>40&&last||($_=substr($_,0,80))' "$fpath" > "$ftmp"
@@ -34,7 +35,7 @@ trap "rm -f $pipe" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT
 # (sleep 1 && touch /tmp/$$= && kill -s KILL $parent >/dev/null 2>&1) & alert=$!
 # touch /tmp/preview/$!_$$
 
-if [[ $# -eq 1 ]]; then
+if [[ "$1" == vim ]]; then
     #  --noplugins
     vim -E -X -R -i NONE -u ${vimrc} \
     -c "source ${script} | visual | call AnsiHighlight(\"">(cat)"\") | q" \

@@ -7,8 +7,9 @@ die() { printf "Err: '$pr' %s${1+\n}" "$1"; exit 1; }
 unset dfr dto sudo
 cmd=link
 
-while getopts "csf:t:" opt; do case $opt
+while getopts "bcsf:t:" opt; do case $opt
 in c) cmd='copy'
+;; b) backup='_'
 ;; s) sudo='sudo'
 ;; f) dfr="$OPTARG"
 ;; t) dto="$OPTARG"
@@ -33,6 +34,9 @@ link() { local src="$1" dst="$2"
       $sudo mkdir -p "${dst%/*}"
       $sudo ln -svfT -- "$src" "$dst"
     else echo "-> L  $dst"; fi
+  elif [[ -n "$backup" && ! -e "${dst}$backup" ]]; then
+      $sudo mv -vfT  -- "$dst" "${dst}$backup"
+      $sudo ln -svfT -- "$src" "$dst"
   else die "refuse symlink over existing file/dir '$dst'"; fi
 }
 dispatch() { local src=$(readlink -e "${1:?No}") dst="${2:?No}"

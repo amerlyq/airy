@@ -101,7 +101,7 @@ case "$extension" in
         try w3m    -dump "$path" | fmt -s -w $width && exit 4
         ;; # fall back to highlight/cat if the text browsers fail
     # otl)
-    #     try "$EXTDIR/color-preview" "$path" && exit 5 || exit 2
+    #     try "$EXTDIR/color-preview" vim 128 "$path" && exit 5 || exit 2
     #     ;;
 esac
 
@@ -111,7 +111,8 @@ case "$mimetype" in
     text/*|*/xml) # Syntax highlight for text files:
         if hash pygmentize >/dev/null; then
             # WARNING: you must be sure to have 256 term and downloaded solarized
-            try "$EXTDIR/color-preview" pygmentize "$path" && exit 5 || exit 2
+            # XXX: $height not always valid?
+            try "$EXTDIR/color-preview" pygmentize 128 "$path" && exit 5 || exit 2
             # try pygmentize -g -f terminal256 -O style=solarizeddark,linenos=1 \
             #     <(head -n 50 "$path") && exit 5 || exit 2
             # try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
