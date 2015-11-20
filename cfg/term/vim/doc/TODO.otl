@@ -56,6 +56,14 @@ Neovim
 
 
 BUG plugins
+	XXX: neobundle -- recursive call -- red repeatable text
+		:= Maybe, it's due to can't stop search and return valid object for surround?
+		-- 'yq'
+			submode.vim:8
+				if !exists('g:airline#extensions#submode#prefix')
+		-- in case of 'vqa' for surround -- rarely
+		-- when replacing and dld repo for plugin (same name, different url)
+	[_] XXX: something accidentaly enables 'set list' in help/votl/curr buffer
 	[_] deoplete -- <C-v> on column after ': ' comment, Press <Tab> -- inserts space only for first line
 	[_] Airline + nrrwrgn -- add hook to nrrwrgn to change ailine variable
 		: if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
@@ -84,6 +92,8 @@ BUG plugins
 		:	checked, and textobj-user then deletes null-match as one symbol
 	[_] operator-surround
 		[_] BUG first append after lazy loading -- applies only to first char
+		[_] BUG repeat '.' applies to same region, and not same motion!
+			:= Hence 'veqa"' can't be reproduced correctly
 		2015-11-19 [X] direct append in visual mode
 		[_] THINK? direct-append operators for normal mode?
 		[_] THINK adding space inside/outside brackets by involving [Space]
@@ -100,8 +110,6 @@ BUG plugins
 			: https://github.com/rgrinberg/vim-operator-gsearch
 			: https://github.com/osyo-manga/vim-operator-search
 		[_] THINK vim-submode for search -- in context of source-navi
-			: http://d.hatena.ne.jp/thinca/20130131/1359567419
-			: http://haya14busa.com/improve-x-with-vim-submode/
 
 
 SMALL

@@ -15,6 +15,7 @@ set keymodel= "empty
 
 set ruler           " Show cursor position
 set showcmd         " Shows last command entered in the very bottom right
+set noshowmode      " Don't show current input mode (normal/visual/insert/...)
 set laststatus=2    " Show status line always
 " Custom command line when no airline or for it's bckgr splits
 " set statusline=%f\ %m\ %r\ line:%l/%L(%p%%)\ col:%c\ buf:%n\ (%b)(0x%B)
@@ -40,7 +41,6 @@ set shortmess=atTIO " No intro msg, etc
 set sessionoptions-=options
 
 
-set noshowmode
 set lazyredraw        " don't redraw screen while macros are executing
 set colorcolumn=+1    " show textwidth limit
 

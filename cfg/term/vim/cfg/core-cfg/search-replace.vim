@@ -26,7 +26,7 @@ command! -range SortBlock <line1>,<line2>sort i /\ze\%V/
 " find merge conflict markers
 nnoremap <unique> <Leader>! /\v^[<=>]{7}( <Bar>$)/<cr>
 
-" Find next character from under cursor (TODO replace with [% and ]%)
+" Find next character from under cursor (TODO? replace with [% and ]%?)
 noremap <unique> gs :norm <C-R>=v:count1<CR>f<C-R>=getline('.')[col('.')-1]<CR><CR>
 noremap <unique> gS :norm <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR><CR>
 

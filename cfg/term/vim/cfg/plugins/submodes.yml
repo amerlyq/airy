@@ -1,5 +1,7 @@
-## Submodes
-kana/vim-submode:  # CHECK mappings?
+# Submodes
+kana/vim-submode:
   description: Dependency of user modes with custom temporary remappings
   functions: submode#
-  mappings: [[nx, <Plug>]]
+  mappings: [[n, x]]  # <Plug>(submode-
+  commands: SubmodeRestoreOptions
+  lazy: 0
