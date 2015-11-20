@@ -4,6 +4,8 @@
 
 " ABSORBED:
 "   https://github.com/jeffkreeftmeijer/vim-numbertoggle
+" BUG:
+"   Disable inside ':<C-f>' CommandLine window
 
 " SEE:DEV: -- consider switching to relative number in operator pending mode
 "   'vim-scripts/RelOps'

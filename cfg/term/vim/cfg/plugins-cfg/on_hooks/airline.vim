@@ -5,10 +5,11 @@ endif
 
 " Use only necessary plugins
 let g:airline#extensions#disable_rtp_load = 1
-let g:airline_extensions = ['tabline', 'quickfix', 'submode']  " 'unite'
+let g:airline_extensions = ['tabline', 'quickfix', 'submode'] " 'unite'
 " TRY: 'hunks', 'syntastic', 'undotree', 'promptline'
 " POSSIBLE: 'branch', 'tmuxline', 'windowswap', 'virtualenv',
 " DISABLED: 'nrrwrgn' (conflict with lazy-loading), 'tagbar' (slow)
+" PLUG: 'anzu' (too inconspicuous)
 
 "" TABS and BUFFERS
 let g:airline#extensions#tabline#show_tabs = 1

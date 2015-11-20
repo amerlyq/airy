@@ -8,8 +8,8 @@ if neobundle#tap('ag.vim') "{{{
   " let g:ag_qhandler="botleft lopen 7"  "OR: copen 20"
   ": Ag working dir  searching
   " nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
-  nnoremap <unique> <Leader>a :<C-U>Ag -w '<C-R><C-W>'<CR>
-  vnoremap <unique> <Leader>a :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
+  nnoremap <unique> <Leader>a :<C-U>Ag -w '<C-r><C-w>'<CR>
+  vnoremap <unique> <Leader>a :<C-U>Ag -Q '<C-r>=GetVisualSelection(" ")<CR>'<CR>
   ": Ag buffer search
   nnoremap <unique> g<Leader>a :<C-U>AgBuffer -w '<C-R><C-W>'<CR>
   vnoremap <unique> g<Leader>a :<C-U>AgBuffer -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
@@ -48,43 +48,60 @@ if neobundle#tap('incsearch.vim') "{{{
   call neobundle#untap() "}}}
 
   if neobundle#tap('vim-anzu') "{{{ 'osyo-manga/vim-anzu'
-    map <unique> n <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
-    map <unique> N <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
+    "" NOTE: airline ext is good for terminal vim to not jump cursor in cmdline
+    " let g:airline#extensions#anzu#enabled = 1
+
+    " >  unite-anzu
+    "   "{Pattern} in matching lines are output in unite.vim
+    "   : Unite anzu: {pattern}
+    "" WARNING: double mappings not working lazy on first launch -- SEE neobundle.txt
+    " TRY: replace anzu-..-with-echo -> anzu-mode-..
+    " TRY: anzu-sign-matchline, anzu-mode, anzu-jump and anzu-jump-..
+    nmap <unique> <Leader>* <Plug>(anzu-echo-search-status)
+
+    " nnoremap <silent> <Plug>(anzu-mode-jump) :<C-u>call anzu#mode#start(@/, '<Plug>(anzu-jump)', '', '')<CR>
+    nmap <unique> <Leader># <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)<Plug>(anzu-echo-search-status)
+    map  <unique> n <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
+    map  <unique> N <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
     call neobundle#untap()
   endif "}}}
 
+
   if neobundle#tap('vim-asterisk') "{{{ 'haya14busa/vim-asterisk'
-    let g:asterisk#keeppos = 1  " while moving across matches.
-    map <unique> *   <Plug>(incsearch-nohl)<Plug>(asterisk-*)
-    map <unique> g*  <Plug>(incsearch-nohl)<Plug>(asterisk-g*)
-    map <unique> #   <Plug>(incsearch-nohl)<Plug>(asterisk-#)
-    map <unique> g#  <Plug>(incsearch-nohl)<Plug>(asterisk-g#)
-    " z-prefixed mappings doesn't move the cursor.
-    map <unique> z*  <Plug>(incsearch-nohl0)<Plug>(asterisk-z*)
-    map <unique> gz* <Plug>(incsearch-nohl0)<Plug>(asterisk-gz*)
-    map <unique> z#  <Plug>(incsearch-nohl0)<Plug>(asterisk-z#)
-    map <unique> gz# <Plug>(incsearch-nohl0)<Plug>(asterisk-gz#)
+    let g:asterisk#keeppos = 1  " Keep cursor inside match at same position
+    " EXPL: z-prefixed mappings doesn't move the cursor.
+    for k in ['*', '#', 'g*', 'g#', 'z*', 'z#', 'gz*', 'gz#']
+      exe 'map <unique> '.k.' <Plug>(incsearch-nohl'.(k=~#'z'?'0':'').')'.
+        \'<Plug>(asterisk-'.k.')<Plug>(anzu-update-search-status-with-echo)'
+    endfor
     call neobundle#untap()
   endif "}}}
 endif "}}}
 
 
 if neobundle#tap('vim-over') "{{{
-  " Over: THINK -- can be useless w/o imap timings, etc
-  " USE :<C-f> and then type in command window %s/.../.../g
-  " USE :OverCommandLine<CR> and in standalone input your expr: %s/../.../g
-  " let g:over_enable_auto_nohlsearch = 1
-  " let g:over_enable_cmd_window = 1
+  " TIP: :<C-f> and then type in command window %s/.../.../g
+  " USE: :OverCommandLine<CR> and in standalone input your expr:
+  "   %s/../.../g  OR  /...  OR  %g/.../d
+  let g:over_enable_auto_nohlsearch = 1
+  let g:over_enable_cmd_window = 0
   " let g:over_command_line_key_mappings = {}
-  " let g:over#command_line#search#enable_incsearch = 1
-  " let g:over#command_line#search#enable_move_cursor = 1
-  " map <unique> <silent> z; :<C-u>OverCommandLine<CR>
-  noremap  <unique><silent> <Leader>c; :<C-u>OverCommandLine<CR>
+  "" NOTE: this part is somewhat overlaps with incsearch.vim
+  let g:over#command_line#search#enable_incsearch = 1
+  let g:over#command_line#search#enable_move_cursor = 1
 
-  nnoremap <unique><silent> <Leader>cc :OverCommandLine %s;;;g<CR><Left><Left>
-  xnoremap <unique><silent> <Leader>cc :OverCommandLine  s;;;g<CR><Left><Left>
-
-  nnoremap <unique><silent> <Leader>cm :OverCommandLine %s;;<C-r>/;g<CR><Left><Left>
-  xnoremap <unique><silent> <Leader>cm :OverCommandLine  s;;<C-r>/;g<CR><Left><Left>
+  noremap  <unique><silent>  :  :OverCommandLine /<CR>
+  let s:subs = {
+  \ 'c': 's;;;g<CR><Left><Left>',
+  \ 'w': 's;;;g<CR><Left><Left>',
+  \ 'y': 's;;<C-r>/;g<CR><Left><Left>',
+  \ 'm': 's;;<C-r>/;g<CR><Left><Left>',
+  \ 'g': 'g//<CR>',
+  \ 'v': 'v//<CR>',
+  \}
+  for [c, r] in items(s:subs) | for m in ['n','x']
+    exe m.'noremap <unique><silent> <Leader>c'.c
+          \ .' :OverCommandLine '.(m=='n'?'%':'').r
+  endfor| endfor
   call neobundle#untap()
 endif "}}}

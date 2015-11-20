@@ -53,6 +53,9 @@ Neovim
 		http://stackoverflow.com/questions/8564206/is-it-possible-to-determine-in-an-operator-pending-mapping-whether-the-motion-wi
 		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : 'w'
 		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : '<Esc>cc' . v:count . '<Esc>'
+	[_] BUG RangerChooser -- after ':<C-f>' opens inside command line window instead of main
+	[_] Exit back to ranger/shell with cursor on current opened file in exit moment
+		:THINK:FIND: last viewed buffer with real file
 
 
 BUG plugins

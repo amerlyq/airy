@@ -24,17 +24,20 @@ godlygeek/tabular:  # CHECK:TRY? replace by another one?
 ---
 ## Substitute/Highlight
 haya14busa/incsearch.vim:  # CHECK
-  description: Multiple hl for searching by / '?' or g/
-  mappings: <Plug>
+  description: Multiple realtime hl for searching
+  mappings: <Plug>  # [/, ?, g/]
   depends: tpope/vim-repeat
 
 haya14busa/vim-asterisk:
-  description: Smart words and stay-here for '*/#'
-  mappings: <Plug>
+  description: Smart words bounds, and hl w/o jumping with 'z'
+  mappings: <Plug>  # [*, #, g*, g#, z*, z#, gz*, gz#]
 
-osyo-manga/vim-anzu:  # TODO:SETUP::
-  description: Index for search results
-  mappings: <Plug>
+osyo-manga/vim-anzu:  # TAGS: [search, airline]
+  description: Index status/preview for search results
+  functions: anzu#
+  mappings: <Plug>  # [n, N, <Leader>*, <Leader>#]
+  commands: [AnzuUpdateSearchStatus, AnzuSignMatchLine]
+  lazy: 0
 
 osyo-manga/vim-over:  # CHECK
   description: Preview :substitute patterns
