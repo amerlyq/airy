@@ -65,11 +65,13 @@ BUG plugins
 		-- when replacing and dld repo for plugin (same name, different url)
 	[_] XXX: something accidentaly enables 'set list' in help/votl/curr buffer
 	[_] deoplete -- <C-v> on column after ': ' comment, Press <Tab> -- inserts space only for first line
+		[_] In votl <BS> don't work in insert
 	[_] Airline + nrrwrgn -- add hook to nrrwrgn to change ailine variable
 		: if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
 		:	add(airline_extensions, 'nrrwrgn') | endif
 	[_] GoldenRation -- consecutive splits are different from V1/2 and 3xH1/3
 		:= Maybe need to setup layout (OR min screen width) in options?
+		[_] not sourced on native split -- like :h :sp :vs
 	[_] textobj-quote -- reacts only on double quote instead of any?
 		[_] weird behaviour overall -- TEST it
 		[_] add pair of typographic quotes (maybe not in this plugin?)

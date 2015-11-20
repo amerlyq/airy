@@ -54,7 +54,7 @@ if neobundle#tap('incsearch.vim') "{{{
   endif "}}}
 
   if neobundle#tap('vim-asterisk') "{{{ 'haya14busa/vim-asterisk'
-    let g:asterisk#keeppos = 1
+    let g:asterisk#keeppos = 1  " while moving across matches.
     map <unique> *   <Plug>(incsearch-nohl)<Plug>(asterisk-*)
     map <unique> g*  <Plug>(incsearch-nohl)<Plug>(asterisk-g*)
     map <unique> #   <Plug>(incsearch-nohl)<Plug>(asterisk-#)
