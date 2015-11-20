@@ -53,6 +53,7 @@ Neovim
 
 
 BUG plugins
+	[_] deoplete -- <C-v> on column after ': ' comment, Press <Tab> -- inserts space only for first line
 	[_] Airline + nrrwrgn -- add hook to nrrwrgn to change ailine variable
 		: if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
 		:	add(airline_extensions, 'nrrwrgn') | endif
@@ -76,6 +77,8 @@ BUG plugins
 		:= TODO same key as mode -- expands, [g|Space][vV<C-V>] -- shrinks
 		:= I have done smth similar in keys-remap  :ALSO:SEE :h v_v
 	[_] textobj-anyblock -- deletes current character if there are no brackets!
+		:= maybe because searchpos() returns [0,0] on not found, it's not
+		:	checked, and textobj-user then deletes null-match as one symbol
 	[_] operator-surround
 		[_] BUG first append after lazy loading -- applies only to first char
 		2015-11-19 [X] direct append in visual mode
@@ -94,8 +97,8 @@ BUG plugins
 			: https://github.com/rgrinberg/vim-operator-gsearch
 			: https://github.com/osyo-manga/vim-operator-search
 		[_] THINK vim-submode for search -- in context of source-navi
-			http://d.hatena.ne.jp/thinca/20130131/1359567419
-			http://haya14busa.com/improve-x-with-vim-submode/
+			: http://d.hatena.ne.jp/thinca/20130131/1359567419
+			: http://haya14busa.com/improve-x-with-vim-submode/
 
 
 SMALL

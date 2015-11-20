@@ -26,14 +26,6 @@ NeoBundleLazy 'Shougo/vimshell.vim', {
     \   'mappings' : ['<Plug>(vimshell_'],
     \ }}
 
-" Ultimate hex-editing system
-" depends on hexript for some optional scripts
-"   (now that repo 'rbtnn/hexript.vim' don't exists)
-NeoBundle 'Shougo/vinarise.vim', { 'autoload': {
-    \ 'commands' : ['Vinarise', 'VinariseDump'],
-    \ 'explorer' : 1 }}
-
-
 " Super-mega-replace for bunch of plugins
 " See: http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
 NeoBundle 'Shougo/unite.vim', { 'depends' : 'Shougo/neomru.vim' }
@@ -86,7 +78,6 @@ NeoBundleLazy 'gregsexton/gitv', { 'depends' : 'tpope/vim-fugitive',
 
 " View highlight groups under cursor
 "NeoBundle 'gerw/vim-HiLinkTrace'    ", { \ 'lazy': 1, \}
-
 " View relative line-numbers in operator-pending mode
 "NeoBundle 'vim-scripts/RelOps'
 

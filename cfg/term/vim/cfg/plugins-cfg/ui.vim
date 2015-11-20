@@ -27,6 +27,12 @@ if neobundle#tap('GoldenView.Vim') "{{{
 endif "}}}
 
 
+if neobundle#tap('GoldenView.Vim') "{{{
+    let g:lt_location_list_toggle_map = '[Tab]l'
+    let g:lt_quickfix_list_toggle_map = '[Tab]q'
+  call neobundle#untap()
+endif "}}}
+
 
 "{{{1 Indicators ============================
 if neobundle#tap('vim-signify')  "{{{
@@ -97,6 +103,7 @@ if neobundle#tap('vim-airline')  "{{{
     call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
   endfor
   let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/airline.vim'
+  call neobundle#untap()
 endif "}}}
 
 

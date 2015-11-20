@@ -5,6 +5,14 @@ NeoBundle 'jamessan/vim-gnupg'
 " Use !dict translations from inside vim
 NeoBundle 'szw/vim-dict'
 
+" Ultimate hex-editing system
+" depends on hexript for some optional scripts
+"   (now that repo 'rbtnn/hexript.vim' don't exists)
+NeoBundle 'Shougo/vinarise.vim', { 'autoload': {
+    \ 'commands' : ['Vinarise', 'VinariseDump'],
+    \ 'explorer' : 1 }}
+
+
 " W3m from vim
 "NeoBundle 'yuratomo/w3m.vim'
 

@@ -19,7 +19,6 @@ nnoremap <unique> <Leader>tM :let &mouse=(''==&mouse?'a':'')\|set mouse?<CR>
 
 " Toggle between number and relativenumber
 set number
-nnoremap <unique> <Leader>tn :set relativenumber! rnu?<CR>
 
 
 "\| :SyntasticCheck<CR>

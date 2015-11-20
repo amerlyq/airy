@@ -16,6 +16,11 @@ Leaders
 		: to work with other characters beside spaces.
 		: USE CamelMotion on Space? Or smart-word for urls-like strings?
 		Reuse 'q<Space>' for directly surround by spaces
+		DEV:THINK:XXX: use insert as chaining operator:
+			Press operator
+			Choose what symbol to insert
+			Then _any_ motion/textobj (if ending in INSERT else append a/i)
+			Return to NORMAL
 		[_] FIX [Space]-insert mode after ENH stage
 		[_] DEV insert single char instead of my Limio
 			SEE $ vimb gh vim insert (seeen until 5th page)
@@ -24,9 +29,16 @@ Leaders
 			: https://github.com/syngan/vim-operator-inserttext
 			: https://github.com/aur-archive/vim-insertchar
 			: https://github.com/mwgkgk/vim-operator-insert
+	[_] CHG <Tab> to operator mode
+		TAB-q, TAB-l -- toggle qf lists
+	[_] FIND: V-Block character column motions like '0' and '$' -- to fast select region
 
 Operators
+	>[_] Create vim-textobj-overhaul -- combine and improve all textobj into
+	>		one seamless obj map
 	[_] Improve 'gC' to copy-comment multiline/block selection
+	[_] Create 'g,[oO]' which leave comment untouched as default
+	[_] Create ',[oO]' which drops indent -- better use unimpared/etc to insert empty lines
 	[_] DEV '[ai]k' -- copy key until ':' -- useful for yaml
 
 	[_] DEV mapping to move in column like '{/}' -- on gG, g{, g}
@@ -67,6 +79,8 @@ Outline
 		After $ -- use complete bash syntax until end of line
 		SEE multi syntax regions for this -- or include all syntax into region
 		SEE ft=cucumber bundle/sideways.vim/examples/example.feature -- maybe as prototype?
+		SEE embedded syntax regions highlighting
+			: https://github.com/xolox/vim-notes
 	[o] Vimoutliner
 		[_] TODO Remove insert mappings
 		2015-06-01 [X] Change mapping to more easily pressed :> use everywhere ',.'

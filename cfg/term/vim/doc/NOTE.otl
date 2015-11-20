@@ -21,6 +21,7 @@ SEE
     THINK? https://github.com/inside/vim-search-pulse
 	THINK? https://github.com/AndrewRadev/undoquit.vim
 	[_] TODO -- see best vim plugins on bitbucket
+	https://github.com/todesking/qf_sbt.vim
 
 
 MISC
@@ -33,8 +34,12 @@ MISC
 		: https://github.com/xolox/vim-easytags
 		Source insight -- preview definition
 		: https://github.com/wesleyche/SrcExpl
+	Unite
+		https://github.com/sgur/unite-qf
 	[_] Qf buffer editing/replacing
-		[_] https://github.com/romainl/vim-qf
+		>[_] Tweaks: MERGE https://github.com/romainl/vim-qf
+		[_] (unite+, uniq hist for w:) https://github.com/tyru/qfhist.vim
+		[_] https://github.com/itchyny/vim-qfedit
 		[_] https://github.com/jceb/vim-editqf  ::> use quickfix-reflector.vim
 			[_] Port features like AddNote and Err/Warn/Note type change to my code
 			: Or put them into fork of quickfix-reflector!
@@ -48,12 +53,24 @@ MISC
 			: Very best for now
 		2015-07-06 [$] https://github.com/thinca/vim-qfreplace ::> NO: Too frail
 		<SEE>
+		[_] https://github.com/khorser/vim-qfnotes
+		: https://github.com/MarcWeber/vim-addon-qf-layout
+		: https://github.com/karlbright/qfdo.vim
 		: https://github.com/salsifis/vim-qfmanip
 		: https://github.com/Peeja/vim-cdo
 		: https://github.com/sk1418/QFGrep
 		: https://github.com/tomtom/quickfixsigns_vim
 		: https://github.com/nelstrom/vim-qargs
 			: http://stackoverflow.com/questions/5686206/search-replace-using-quickfix-list-in-vim/5686810#5686810
+		THINK
+			https://github.com/todesking/scoped_qf.vim
+			https://github.com/todesking/metascope.vim
+		Navigation
+			Choose window where to open item
+			: https://github.com/yssl/QFEnter
+			2015-08-19 [X] mappings to move between loci of entries of qf/loc list
+			: move to next/prev change in git signify (Use: ]c [c)
+			: move to next/prev spellchecking error (Use: ]s [s z=)
 	[_] ALT to tabular -- I can't set comfortable shortcus
 		: Check for operators and all possible dilimiters, regex (C-x)
 		https://github.com/junegunn/vim-easy-align
@@ -134,35 +151,71 @@ CLIPBOARD & HISTORY
 OPERATORS
 	[_] Submodes
 		https://github.com/kana/vim-submode
-	[_] Motions & textobj
-		[_] https://github.com/jeetsukumaran/vim-indentwise
+		https://github.com/aiya000/submode-window_move.vim
+		https://github.com/tek/vim-fieldtrip
+	Maps
 		[_] Paired mappings on [, ] for frequent commands
 			:THINK Maybe change toggling ,t.. -> [t.. and ]t..
 			: https://github.com/tpope/vim-unimpaired
 		[_] Mappings to add empty lines or move/exchange/duplicate/fetch lines of text
 			: vim-scripts/LineJuggler:
 			: https://github.com/tpope/vim-unimpaired
+			: https://github.com/svermeulen/vim-relative-line-op
+	[_] Motions & textobj
+		[_] Extend textobj
+			Till beg/end of any textobj by interwining [/]
+				https://github.com/tommcdo/vim-ninja-feet
+			[_] Operate directly on next/prev object instead of current
+				: https://github.com/ashleyh/vim-textobj-nl
+				[_] THINK Maybe, get only idea and apply it to all textobj?
+			[_] Union of operators
+				https://github.com/thinca/vim-operator-sequence
+			THINK:WTF https://github.com/kana/vim-operator-siege
+		[_] https://github.com/jeetsukumaran/vim-indentwise
+		[_] Indent -- compare with vim-..-space (could I use ..-space instead?)
+			USE mapping '..[ai]<Tab>'
+			: https://github.com/glts/vim-textobj-indblock
+		[_] Comment
+			: https://github.com/glts/vim-textobj-comment
+			: https://github.com/thinca/vim-textobj-comment
 		[_] Consider motions for diff mode
 			: https://github.com/kana/vim-textobj-diff
 		[_] Try motions for Latex
 			: https://github.com/rbonvall/vim-textobj-latex'
-		[_] Half-textobj motions
-			: https://github.com/tommcdo/vim-ninja-feet/
 		[_] Selection of pairs
 			: https://github.com/gorkunov/smartpairs.vim
+			: https://github.com/deris/vim-textobj-enclosedsyntax
+		[_] Until punctuation
+			: https://github.com/beloglazov/vim-textobj-punctuation
 		2015-07-06 [X] ALT Try all plugins for textobj:
 			: https://github.com/kana/vim-textobj-user/wiki
 			: https://github.com/tommcdo
 		[_] Last pasted (very useful!)
 			: https://github.com/gilligan/textobj-lastpaste
 			: https://github.com/saaguero/vim-textobj-pastedtext
+			: https://github.com/rhysd/vim-textobj-lastinserted
+		[_] Path
+			: https://github.com/paulhybryant/vim-textobj-path
+		[_] Var assignment
+			: https://github.com/Julian/vim-textobj-assignment
+		[_] Whole function call
+			>USE: https://github.com/syngan/vim-operator-furround
+			: https://github.com/machakann/vim-textobj-functioncall
+			: https://github.com/todesking/vim-textobj-methodcall
+			: https://github.com/anyakichi/vim-textobj-xbrackets
+		[_] Context like lua << EOF ... EOF
+			: https://github.com/osyo-manga/vim-textobj-context
+		[_] THINK of a ,spotential
+			: https://github.com/osyo-manga/vim-textobj-from_regexp/blob/master/doc/textobj-from_regexp.jax
 
 	[_] Operators
 		[_] Sort
 			: https://github.com/christoomey/vim-sort-motion
 			: https://github.com/emonkak/vim-operator-sort
-		[_] Grep
+		[_] Search-Grep
 			: https://github.com/inside/vim-grep-operator
+			: https://github.com/rgrinberg/vim-operator-gsearch
+			: https://github.com/osyo-manga/vim-operator-search
 		[_] Swap args in func
 			: http://blog.kamil.dworakowski.name/2007/09/swap-parameters-script-for-vim.html
 			: http://www.vim.org/scripts/script.php?script_id=2032
@@ -177,10 +230,18 @@ OPERATORS
 			wget -- select song name and create job to download it on operator
 			: https://github.com/osyo-manga/vim-operator-exec_command
 			: https://github.com/thinca/vim-quickrun
+			:    https://github.com/osyo-manga/shabadou.vim
+			:    https://github.com/jceb/vim-hier
+			:    https://github.com/osyo-manga/vim-watchdogs
+			:    https://github.com/KazuakiM/vim-qfsigns
 		2015-11-15 [X] Test in conjunction with : vim-operator-surround
 			:$ https://github.com/osyo-manga/vim-textobj-multiblock
 			:+ https://github.com/thinca/vim-textobj-between
 			:+ https://github.com/rhysd/vim-textobj-anyblock
+		[_] Camel-conversion
+			: https://github.com/tyru/operator-camelize.vim
+		[_] Word column
+			: https://github.com/osyo-manga/vim-operator-blockwise
 
 
 	Paste mode autotoggle
@@ -194,16 +255,13 @@ OPERATORS
 			[X] ALT: https://github.com/justinmk/vim-sneak
 		2015-07-06 [X] text place exchange operator
 			: https://github.com/tommcdo/vim-exchange
-		2015-07-06 [X] Navigation
-			2015-08-19 [X] mappings to move between loci of entries of qf/loc list
-			: move to next/prev change in git signify (Use: ]c [c)
-			: move to next/prev spellchecking error (Use: ]s [s z=)
 		2015-07-06 [X] ALT to vim-surround -- use on 'q' as operator
 			:: It can replace my ,<Space> shortcut for surrounding by spaces
 			:: Possibly it can surround visual blocks?
 			: https://github.com/rhysd/vim-operator-surround
 
 	[_] DEV Consider switching to relative number in operator pending mode
+		'vim-scripts/RelOps'
 		: https://github.com/jeffkreeftmeijer/vim-numbertoggle
 		: http://www.vim.org/scripts/script.php?script_id=4212
 		: http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/
@@ -228,7 +286,10 @@ EDIT
 		2015-07-06 [X] https://github.com/tpope/vim-commentary
 	Writers mode
 		https://github.com/reedes/vim-pencil
+		https://github.com/reedes/vim-textobj-sentence
+		https://github.com/rhysd/vim-textobj-continuous-line
 	JAPANESE INPUT
+		[_] https://github.com/deton/textobj-mbboundary.vim
 		[_] tyru/eskk.vim
 			: + SEE shougo-s-github dotfiles for eskk.vim settings
 

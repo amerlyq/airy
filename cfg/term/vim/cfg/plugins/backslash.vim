@@ -9,11 +9,8 @@ NeoBundle 'kana/vim-altr'
 NeoBundle 'kopischke/vim-fetch'
 " View session auto create/restore on buffer edit, argdo, bufdo et al.
 NeoBundle 'kopischke/vim-stay'
+" OFF: messed up my mappings -- READ the doc how to
 " Converts automatic folds into manual to reduce recomputation CPU load
 " NeoBundle 'konfekt/FastFold'
 
 NeoBundle 'Valloric/ListToggle'
-
-"OFF: " Ascii graph drawing in vim
-" NeoBundleLazy 'vim-scripts/DrawIt' , { 'autoload' : {
-"     \ 'commands' : 'DrawIt', 'mappings' : '<Plug>DrawItStart' }}

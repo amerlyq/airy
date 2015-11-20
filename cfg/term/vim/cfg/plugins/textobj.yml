@@ -11,11 +11,20 @@ rhysd/vim-textobj-anyblock:
     Content of closest block pair
     NOTE pairs by priority ({[&quot'<`
     DEPRECATED: - (old, in jap) osyo-manga/vim-textobj-multiblock
+    ALT: - (TODO: compare) https://github.com/Vesion/vim-textobj-surrounding
   mappings: [[ox, ab, ib]]
   <<: *tou
 thinca/vim-textobj-between:
   description: Between same found symbols
   mappings: [[ox, af, if]]
+  <<: *tou
+osyo-manga/vim-textobj-blockwise:
+  description: Apply to column of words w/o V-BLOCK selection
+  mappings: [[ox, I, A]]
+  <<: *tou
+rhysd/vim-textobj-conflict:
+  description: Jump/select git merge conflicts [<<< .A. === .B. >>>]
+  mappings: [[ox, a=, i=]]
   <<: *tou
 kana/vim-textobj-entire:
   description: Whole buffer w/[o] empty lines (instead ggVG)
@@ -33,10 +42,9 @@ kana/vim-textobj-indent:
   description: Equally indented blocks (Python-like)
   mappings: [[ox, ai, ii, aI, iI]]
   <<: *tou
-vimtaku/vim-textobj-keyvalue:
+amerlyq/vim-textobj-keyvalue:
   description: |
-    Key/value with/beside quotes and space
-    WARNING:NEED:DEV: fork, as it works only for specified filetypes
+    Key/value with/beside quotes and space (DEV: forked)
   mappings: [[ox, ak, ik, av, iv]]  # <Plug>(textobj-[key,value]-*
   <<: *tou
 kana/vim-textobj-lastpat:  # OR:STD:NOTE: '..[ai]g[nN]'
@@ -70,6 +78,8 @@ coderifous/textobj-word-column.vim:
   mappings: [[ox, ac, ic, aC, iC]]
   <<: *tou
 lucapette/vim-textobj-underscore:
-  description: Parts, separated by '_' ( ...nameof_some_func )
+  description: |
+    Parts, separated by '_' ( ...nameof_some_func )
+    ALT: - (TODO: compare) https://github.com/machakann/vim-textobj-delimited
   mappings: [[ox, a_, i_]]
   <<: *tou

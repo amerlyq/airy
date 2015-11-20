@@ -44,8 +44,10 @@ endif "}}}
 
 if neobundle#tap('vim-operator-replace') "{{{
   " THINK Could be used instead of my own paste-replace?
-  " xmap p <Plug>(operator-replace)
-  map <silent><unique> gr <Plug>(operator-replace)
+  nmap <silent><unique> gr <Plug>(operator-replace)
+  xmap <silent><unique> gr <Plug>(operator-replace)
+  nmap <silent><unique> gR <Plug>(operator-replace)$
+  xmap <silent><unique> gR <Plug>(operator-replace)$
   call neobundle#untap()
 endif "}}}
 

@@ -60,9 +60,12 @@ noremap <unique> [l :<C-U><C-R>=v:count1<CR>lprevious!<CR>
 " NOTE! you can use 'o<C-R>_' to keep indent and not insert any character
 nnoremap <unique> go o<Space><Esc>^"_D
 nnoremap <unique> gO O<Space><Esc>^"_D
+nnoremap <unique> g<Leader>o o<Space><Esc>"_D
+nnoremap <unique> g<Leader>O O<Space><Esc>"_D
 " TODO:DEV: visual mappings -- NEED enter one-cmd normal (FIND:HOW)
 " xnoremap <unique> go <C-o>go
 " xnoremap <unique> gO <C-o>gO
+"
 " ALT:
 " nnoremap <unique> go o<Space><C-u><Esc>
 " nnoremap <unique> gO O<Space><C-u><Esc>
