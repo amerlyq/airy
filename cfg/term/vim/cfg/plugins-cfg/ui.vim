@@ -27,9 +27,9 @@ if neobundle#tap('GoldenView.Vim') "{{{
 endif "}}}
 
 
-if neobundle#tap('GoldenView.Vim') "{{{
-    let g:lt_location_list_toggle_map = '[Tab]l'
-    let g:lt_quickfix_list_toggle_map = '[Tab]q'
+if neobundle#tap('ListToggle') "{{{
+    let g:lt_location_list_toggle_map = '[Unite]l'
+    let g:lt_quickfix_list_toggle_map = '[Unite]q'
   call neobundle#untap()
 endif "}}}
 

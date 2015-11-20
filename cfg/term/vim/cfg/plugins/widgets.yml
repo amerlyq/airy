@@ -1,0 +1,25 @@
+## Widgets
+Valloric/ListToggle:  # DEV:TODO: absorb and merge with reconciling qf mappings
+  description: Toggle qf and loci lists
+  mappings: ['[Unite]q', '[Unite]l']
+
+mbbill/undotree:  # CHECK
+  description: |
+      Undo tree
+      ALT: https://github.com/sjl/gundo.vim/
+  commands: UndotreeToggle
+
+majutsushi/tagbar:  # CHECK
+  description: Fast ctags
+  commands: TagbarToggle
+
+chrisbra/NrrwRgn:  # CHECK
+  description: |
+    Focus on line/selection/window in new buffer.
+    THINK:USAGE:ALT? to LineDiff?
+  commands: [NR, NW, NRV, NUD, NRP, NRM, NRL]
+  mappings: [<Plug>NrrwrgnDo, <Plug>NrrwrgnBangDo]
+
+AndrewRadev/linediff.vim:  # CHECK
+  description: Make diff for two regions in same/different buffers
+  commands: [Linediff, LinediffReset]

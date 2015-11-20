@@ -1,6 +1,6 @@
 ---
 ## Search/Replace
-rking/ag.vim:
+rking/ag.vim:  # DEV: mappings for submode
   description: The Silver searcher embedded into vim
   external_commands: ag
   commands: [Ag, AgAdd, AgBuffer, AgFile, AgFromSearch, AgHelp,
@@ -13,20 +13,29 @@ stefandtw/quickfix-reflector.vim:
   filetypes: qf  # DEV: for more precise triggering -- catch au-TextChanged
 
 ---
+## Format/Align
+godlygeek/tabular:  # CHECK:TRY? replace by another one?
+  description: |
+      Align paragraphs by patt
+      ALT:TODO:SEE: lion, etc
+  commands: [Tab, Tabularize]
+
+
+---
 ## Substitute/Highlight
-haya14busa/incsearch.vim:
+haya14busa/incsearch.vim:  # CHECK
   description: Multiple hl for searching by / '?' or g/
   mappings: <Plug>
   depends: tpope/vim-repeat
 
-haya14busa/vim-asterisk:
+haya14busa/vim-asterisk:  # CHECK
   description: Smart highlight (don't do lazy -- I use it almost always)
   mappings: <Plug>
 
-osyo-manga/vim-anzu:
+osyo-manga/vim-anzu:  # CHECK
   description: Index for search results
   mappings: <Plug>
 
-osyo-manga/vim-over:
+osyo-manga/vim-over:  # CHECK
   description: Preview :substitute patterns
   commands: OverCommandLine

@@ -1,0 +1,19 @@
+## United drop-down menus
+
+# SEE:
+#   http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
+
+Shougo/unite.vim:  # CHECK
+  description: Fast fuzzy access to list info sources. Dependency of 'unite-*'.
+  depends: Shougo/neomru.vim
+
+Shougo/unite-outline:  # CHECK
+  depends: Shougo/unite.vim
+  unite_sources: outline
+
+Shougo/neomru.vim:  # CHECK
+  depends: Shougo/unite.vim
+
+# thinca/vim-unite-history:
+#   depends: Shougo/unite.vim
+#   unite_sources: history/command

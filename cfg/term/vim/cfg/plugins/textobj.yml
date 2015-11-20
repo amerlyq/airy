@@ -2,9 +2,9 @@
 kana/vim-textobj-user: &tou
   description: Dependency of 'vim-textobj-*'
   functions: textobj#user#
-  ## EXPL Loopback for following back-refs {{{
+  ## EXPL: Loopback for '*tou' refs in yaml
   depends: kana/vim-textobj-user
-  mappings: [[ox, <Plug>]]  # }}}
+  mappings: [[ox, <Plug>]]
 
 rhysd/vim-textobj-anyblock:
   description: |
@@ -42,12 +42,12 @@ kana/vim-textobj-indent:
   description: Equally indented blocks (Python-like)
   mappings: [[ox, ai, ii, aI, iI]]
   <<: *tou
-amerlyq/vim-textobj-keyvalue:
+amerlyq/vim-textobj-keyvalue:  # DEV: forked
   description: |
-    Key/value with/beside quotes and space (DEV: forked)
+    Key/value with/beside quotes and space
   mappings: [[ox, ak, ik, av, iv]]  # <Plug>(textobj-[key,value]-*
   <<: *tou
-kana/vim-textobj-lastpat:  # OR:STD:NOTE: '..[ai]g[nN]'
+kana/vim-textobj-lastpat:  # OR:STD: '..[ai]g[nN]'
   description: Last searched pattern
   mappings: [[ox, a/, i/]]
   <<: *tou
@@ -62,7 +62,7 @@ beloglazov/vim-textobj-quotes:
   mappings: [[ox, aq, iq]]
   <<: *tou
 vimtaku/vim-textobj-sigil:
-  description: Vars for bash/perl ( $name{...} )
+  description: Vars for bash/perl (like $name{...} )
   # CHG mappings: [[ox, ad, id]]
   <<: *tou
 saihoooooooo/vim-textobj-space:
@@ -80,6 +80,6 @@ coderifous/textobj-word-column.vim:
 lucapette/vim-textobj-underscore:
   description: |
     Parts, separated by '_' ( ...nameof_some_func )
-    ALT: - (TODO: compare) https://github.com/machakann/vim-textobj-delimited
+    ALT:CHECK: - (compare code) https://github.com/machakann/vim-textobj-delimited
   mappings: [[ox, a_, i_]]
   <<: *tou

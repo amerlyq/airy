@@ -50,6 +50,9 @@ Neovim
 		:= It's needed to not lose keymappings even on broken plugins (when I test them actively)
 		:= Plus with lazy loading most of plugins will load after my cfg anyway
 	[_] ADD [ia][0-9] with brackets (by analogy with anyblock)
+		http://stackoverflow.com/questions/8564206/is-it-possible-to-determine-in-an-operator-pending-mapping-whether-the-motion-wi
+		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : 'w'
+		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : '<Esc>cc' . v:count . '<Esc>'
 
 
 BUG plugins
