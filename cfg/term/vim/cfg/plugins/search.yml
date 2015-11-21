@@ -35,10 +35,9 @@ haya14busa/vim-asterisk:
 osyo-manga/vim-anzu:  # TAGS: [search, airline]
   description: Index status/preview for search results
   functions: anzu#
-  mappings: <Plug>  # [n, N, <Leader>*, <Leader>#]
+  mappings: [<Plug>, [n, <Leader>#, <Leader>*]]  # ALSO [n, N]
   commands: [AnzuUpdateSearchStatus, AnzuSignMatchLine]
-  lazy: 0
 
-osyo-manga/vim-over:  # CHECK
-  description: Preview :substitute patterns
+osyo-manga/vim-over:
+  description: Preview replace %s/../../ and %g/../ or search /
   commands: OverCommandLine

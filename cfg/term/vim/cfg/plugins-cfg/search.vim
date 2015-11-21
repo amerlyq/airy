@@ -50,22 +50,18 @@ if neobundle#tap('incsearch.vim') "{{{
   if neobundle#tap('vim-anzu') "{{{ 'osyo-manga/vim-anzu'
     "" NOTE: airline ext is good for terminal vim to not jump cursor in cmdline
     " let g:airline#extensions#anzu#enabled = 1
-
-    " >  unite-anzu
+    " SEE unite-anzu
     "   "{Pattern} in matching lines are output in unite.vim
     "   : Unite anzu: {pattern}
-    "" WARNING: double mappings not working lazy on first launch -- SEE neobundle.txt
-    " TRY: replace anzu-..-with-echo -> anzu-mode-..
-    " TRY: anzu-sign-matchline, anzu-mode, anzu-jump and anzu-jump-..
-    nmap <unique> <Leader>* <Plug>(anzu-echo-search-status)
-
-    " nnoremap <silent> <Plug>(anzu-mode-jump) :<C-u>call anzu#mode#start(@/, '<Plug>(anzu-jump)', '', '')<CR>
-    nmap <unique> <Leader># <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)<Plug>(anzu-echo-search-status)
     map  <unique> n <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
     map  <unique> N <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
+    " FIXME: <Plug>(anzu-sign-matchline)
+    fun! neobundle#hooks.on_source(bundle)
+      nmap <silent><unique> <Leader>#  <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
+      nmap <silent><unique> <Leader>*  <Plug>(incsearch-nohl)<Plug>(anzu-n)<Plug>(anzu-mode)
+    endf
     call neobundle#untap()
   endif "}}}
-
 
   if neobundle#tap('vim-asterisk') "{{{ 'haya14busa/vim-asterisk'
     let g:asterisk#keeppos = 1  " Keep cursor inside match at same position
@@ -80,8 +76,8 @@ endif "}}}
 
 
 if neobundle#tap('vim-over') "{{{
-  " TIP: :<C-f> and then type in command window %s/.../.../g
-  " USE: :OverCommandLine<CR> and in standalone input your expr:
+  " STD:TIP: :<C-f> and then type in command window %s/.../.../g
+  " LIOR: :OverCommandLine<CR> and in standalone input your expr:
   "   %s/../.../g  OR  /...  OR  %g/.../d
   let g:over_enable_auto_nohlsearch = 1
   let g:over_enable_cmd_window = 0
