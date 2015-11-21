@@ -1,0 +1,68 @@
+---
+## Main
+octol/vim-cpp-enhanced-highlight:
+  filetypes: [c, cpp]
+# SEE: vim-scripts/DoxygenToolkit.vim:
+vim-perl/vim-perl:
+  filetypes: perl
+
+# FIXME: can't do them Lazy, as them will load on every
+#         new *.py fileopen (,f) and reset my autocmd for jedi autocomplete
+davidhalter/jedi-vim:
+  filetypes: python
+klen/python-mode:
+  filetypes: python
+# USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
+# https://github.com/bps/vim-textobj-python
+
+LaTeX-Box-Team/LaTeX-Box:
+    external_commands: latexmk
+    filetypes: [tex, bib, latex]
+      # mappings: [C-xC-o, [[, ]], ([, ((, )), F5, F7]
+
+# SEE:
+# hsanson/vim-android:
+# https://github.com/Shirk/vim-gas
+# https://github.com/beyondmarc/opengl.vim
+
+---
+## Mark-up
+amerlyq/vim-forestanza:
+  description: HACK jap ranobe translation/formatting
+  filetypes: forestanza
+
+vimoutliner/vimoutliner:
+  description: |
+      ALT: http://tiddlywiki.com  -- one-page wiki
+  filetypes: votl
+
+elzr/vim-json:
+  description: JSON Highlight and indent
+  filetypes: json
+
+mrk21/yaml-vim:
+  description: |
+    YAML Highlight and indent
+    SEE:THINK: https://github.com/lmeijvogel/vim-yaml-helper
+  filetypes: yaml
+
+tpope/vim-markdown:
+  filetypes: [mkd, markdown]
+
+## Web
+#docunext/closetag.vim:
+#   filetypes: [html, xml]
+# mattn/emmet-vim: {}
+# cakebaker/scss-syntax.vim: {}
+# gorodinskiy/vim-coloresque: {}
+
+---
+## Syntax highlight
+cespare/vim-toml:
+  filetypes: toml
+
+Matt-Deacalion/vim-systemd-syntax:
+  filetypes: systemd
+
+zaiste/tmux.vim:
+  filename_patterns: 'tmux.*conf'
