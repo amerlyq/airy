@@ -56,8 +56,8 @@ autocmd MyAutoCmd WinEnter * checktime
 nnoremap <unique> <Leader>ta  :setl autoread! hls?<CR>
 
 " UI
-set cursorline    " highlight currently focused line
-set number        " show line number
+set cursorline              " highlight currently focused line
+set number relativenumber   " show line number
 
 nnoremap <unique> <Leader>tc  :set cursorcolumn! cuc?<CR>
 nnoremap <unique> <Leader>tC  :set cursorline! cul?<CR>

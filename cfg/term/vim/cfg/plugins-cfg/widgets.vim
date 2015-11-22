@@ -33,22 +33,55 @@ endif "}}}
 
 if neobundle#tap('tagbar') "{{{
   nnoremap <silent><unique> [Unite]t  :TagbarToggle<CR>
+  " OR: TagbarOpenAutoClose,
+  " ALSO:SEE: TagbarTogglePause, TagbarShowTag
+  let g:tagbar_width = 30
+  let g:tagbar_zoomwidth = 0  " show longest visible tag, =<N> for fixed
+  let g:tagbar_autoclose = 1
+  " let g:tagbar_autofocus = 1
+  let g:tagbar_sort = 0  " Sort manually on 's'
+  let g:tagbar_compact = 1
+  let g:tagbar_indent = 2
+  " let g:tagbar_foldlevel = 2
+  let g:tagbar_autopreview = 1
   call neobundle#untap()
 endif "}}}
 
 
 if neobundle#tap('linediff.vim') "{{{
-  nnoremap <unique> [Frame]L  :LinediffReset<CR>
-  vnoremap <unique> [Frame]L  :Linediff<CR>
+  nnoremap <unique> [Frame]l  :LinediffReset<CR>
+  vnoremap <unique> [Frame]l  :Linediff<CR>
   call neobundle#untap()
 endif "}}}
 
 
 if neobundle#tap('NrrwRgn') "{{{
   " let g:nrrw_rgn_nohl = 1
+  " let g:nrrw_rgn_hl = 'Search'
   let g:nrrw_topbot_leftright = 'botright'
+  " let g:nrrw_rgn_protect = 'n'  " Disable nowrite on original buffer
+  "" Update cursor pos in original on move in nrrwrng
+  " let g:nrrw_rgn_update_orig_win = 1
+  "" Do commands on create/close
+  " let b:nrrw_aucmd_create = "set ft=csv|%ArrangeCol"
+  " let b:nrrw_aucmd_close  = "%UnArrangeColumn"
+  " let b:nrrw_aucmd_written = ':update'
+
+  "USAGE:HACK: Change filetype for opened region ':NN awk'
+  command! -nargs=* -bang -range -complete=filetype NN
+      \ :<line1>,<line2> call nrrwrgn#NrrwRgn('',<q-bang>)
+      \ | set filetype=<args>
+
+  "USAGE:HACK: Filter by pattern and open in split
+  "ALT: hide comments (temporary strip) by ':v/^#/NRP'
+  let s:subs = { 'F' : 'g//NRP<CR>:NRM<CR>' }
+  for [c, r] in items(s:subs) | for m in ['n','x']
+    exe m.'noremap <unique><silent> [Frame]'.c.' :'.(m=='n'?'%':'').r
+  endfor| endfor
+
+  " Operator to select region in split 'n', or in current buffer
   for [c, op] in items({'n': 'Do', 'N': 'BangDo'})
-    call Map_nxo('[Frame]'.c, '<Plug>NrrwrgnBangDo'.op)
+    call Map_nxo('[Frame]'.c, '<Plug>Nrrwrgn'.op)
   endfor
   call neobundle#untap()
 endif "}}}

@@ -5,24 +5,32 @@ Valloric/ListToggle:  # DEV:TODO: merge with qf mappings
 
 mbbill/undotree:
   description: |
-      Undo tree
-      ALT: https://github.com/sjl/gundo.vim/
+    - Tree of undo history with preview, timestamps and diff
+    - ALT: https://github.com/sjl/gundo.vim/
   commands: UndotreeToggle
 
-majutsushi/tagbar:  # CHECK
-  description: Fast ctags
-  commands: TagbarToggle
+majutsushi/tagbar:
+  description: |
+    - Fast code-outline viewer dependent on ctags
+    - Highlight current tag in Tagbar on CursorHold
+    - Help <F1>, can change sort order on 's', show prototype on <Space>
+  external_commands: ctags
+  command_prefix: Tagbar
 
-AndrewRadev/linediff.vim:  # CHECK
+AndrewRadev/linediff.vim:
   description: Make diff for two regions in same/different buffers
   commands: [Linediff, LinediffReset]
 
-chrisbra/NrrwRgn:  # CHECK
+chrisbra/NrrwRgn:
   description: |
-    - Focus on line/selection/window in new buffer.
+    - Focus on line/selection/window in new buffer (supports recursive)
+        * :diffthis on two separate files/regions (THINK:ALT? to LineDiff)
     - Can be used for focused substitution
-    - Multiselection in new buffer! :v/^#/NRP | NRM
-    - Tip -- completely delete blocks you don't want to change.
-    THINK:USAGE:ALT? to LineDiff? -- by :diffthis on two separate regions?
+        * completely delete blocks you don't want to change.
+    - :NUD -- when viewing unified diffs, show current chunk in split
+        * Repeat :NUD in unified diff window to update split-preview
+    - :NRP[!] -- prepare[clear_prev] selected lines for next :NRM
+    - :NRL -- reopen last selected region
+  functions: nrrwrgn#
   mappings: <Plug>Nrrwrgn
   commands: [NR, NW, NRV, NUD, NRP, NRM, NRL]

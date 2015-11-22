@@ -18,12 +18,11 @@
 if exists('g:loaded_auto_relnum') || &cp || v:version < 703 | finish
       \| else | let g:loaded_auto_relnum=1 | endif
 
-set number relativenumber
 let g:auto_relnum_focused = (&number && &rnu)
 
 nnoremap <silent><unique> <Leader>tn  :RelnumToggle<CR>
-command -bar -nargs=0 RelnumToggle  set number relativenumber! rnu?
-      \| let g:auto_relnum_focused=&rnu | call <SID>RelnumUpdate(&rnu)<CR>
+command! -bar -nargs=0 RelnumToggle  set relativenumber! rnu?
+      \| let g:auto_relnum_focused=&rnu | call <SID>RelnumUpdate(&rnu)
 
 function! s:RelnumUpdate(...)
   if !g:auto_relnum_focused | return | endif

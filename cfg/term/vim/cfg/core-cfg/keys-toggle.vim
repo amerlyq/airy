@@ -8,5 +8,5 @@ nnoremap <unique> <Leader>tM :let &mouse=(''==&mouse?'a':'')\|set mouse?<CR>
 ""showcmd! showmode! ruler!
 nnoremap <silent><unique> <Leader>tf :set number!
       \\| let &foldcolumn=(&fdc?0:2) \| let &laststatus=(&ls?0:2)
-      \\| SignifyToggle \| SignatureToggleSigns
-      \\| RelnumToggle \| AirlineToggle<CR>
+      \\| SignifyToggle \| RelnumToggle \| AirlineToggle
+      \\| SignatureToggleSigns<CR>
