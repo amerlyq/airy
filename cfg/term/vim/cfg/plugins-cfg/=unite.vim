@@ -1,14 +1,3 @@
-" Mappings
-
-" Toggle {{{
-nnoremap <Leader>tt :TagbarToggle<CR>
-let g:lt_location_list_toggle_map = '\l'
-let g:lt_quickfix_list_toggle_map = '\q'
-
-" }}}
-
-
-" Widgets {{{
 
 " UndoTree
 nnoremap <silent> <Leader>u :<C-U>UndotreeToggle<CR>
