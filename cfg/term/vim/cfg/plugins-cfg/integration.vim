@@ -1,3 +1,20 @@
+if neobundle#tap('vinarise.vim') "{{{
+  " detects binary file or large file automatically.
+  let g:vinarise_enable_auto_detect=0
+  let g:vinarise_detect_large_file_size=0
+  " name of command
+  let g:vinarise_objdump_command="objdump"
+  let g:vinarise_no_default_keymappings=1
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('vim-xkbswitch') "{{{
+  let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/xkbswitch.vim'
+  call neobundle#untap()
+endif "}}}
+
+
 if neobundle#tap('zeavim.vim') "{{{
   let g:zv_disable_mapping = 1
   nmap <unique> <silent> g?  <Plug>Zeavim
@@ -8,16 +25,5 @@ if neobundle#tap('zeavim.vim') "{{{
   " let g:zv_docsets_dir = has('unix') ?
   "             \ '~/Important!/docsets_Zeal/' :
   "             \ 'Z:/myUser/Important!/docsets_Zeal/'
-  call neobundle#untap()
-endif "}}}
-
-
-if neobundle#tap('vinarise.vim') "{{{
-  " detects binary file or large file automatically.
-  let g:vinarise_enable_auto_detect=0
-  let g:vinarise_detect_large_file_size=0
-  " name of command
-  let g:vinarise_objdump_command="objdump"
-  let g:vinarise_no_default_keymappings=1
   call neobundle#untap()
 endif "}}}

@@ -1,3 +1,9 @@
+if neobundle#tap('LaTeX-Box') "{{{
+  let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/latex-box.vim'
+  call neobundle#untap()
+endif "}}}
+
+
 "{{{1 Python =============================
 if neobundle#tap('jedi-vim') "{{{
   " ATTENTION:OFF: Because of neocomplete:
