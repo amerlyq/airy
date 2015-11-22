@@ -33,7 +33,7 @@ Neovim
 		:= You can use yml back-references for identical configs!
 		: http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
 
-	[_] Check my vim-focus on compatability and unnecessary
+	[_] Check my vim-focus-autocmd on compatability and unnecessity
 	[_] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves рывками
 	[_] Disable textwidth indicator column when screensize smaller then tw
@@ -53,6 +53,10 @@ Neovim
 	[_] BUG RangerChooser -- after ':<C-f>' opens inside command line window instead of main
 	[_] Exit back to ranger/shell with cursor on current opened file in exit moment
 		:THINK:FIND: last viewed buffer with real file
+	[_] BUG gf in *.vim opens file './.' instead of './<cword>'
+	[_] TODO:TRY: vim-plug and measure startup time, with caching -- <100 times>
+		:: REQ to improve mappings not only for <Plug>. THINK -- is necessary?
+		:: REQ caching for deferred loading to improve startup time more
 
 
 BUG plugins
@@ -62,36 +66,38 @@ BUG plugins
 			:	and add more shortcuts which I use in ZSH
 			:= Yes, rewrite is the best -- and replace <C-f> with <C-i>/<C-o>?
 		[_] After lazy loading first '*' on visual don't highlight
+		[_] If z* isn't on first character -- highlight isn't enabled
 		[_] After reopening file, n/N searches in backward direction!
 	[_] vim-stay -- text is folded on restore
-	2015-11-22 [X] XXX: neobundle -- recursive call -- red repeatable text
-		-- 'yq' or in case of 'vqa' for surround -- rarely
-		-- when replacing and dld repo for plugin (same name, different url)
+	[_] XXX: neobundle -- recursive call -- red repeatable text
+		2015-11-22 [X] -- 'yq' or in case of 'vqa' for surround -- rarely
 		:> Seems like it my fault with textobj-user depends on itself for backrefs
+		[_] -- when replacing and dld repo for plugin (same name, different url -- like 'ag')
+		[_] -- for ':Ag' when using 'command_prefix'
 	[_] XXX: something accidentaly enables 'set list' in help/votl/curr buffer
 	[_] BUG: vimoutliner -- has 'nmap' instead of 'nnoremap'
 		:= Therefore don't work with remapped ':'
 		:> TEMP disabled mapping, FIXME:DEV: plugin-replacement
 	[X] deoplete -- <C-v> on column after ': ' comment, Press <Tab> -- inserts space only for first line
-		2015-11-22 [X] In votl <BS> don't work in insert
-	[_] Airline + nrrwrgn -- add hook to nrrwrgn to change ailine variable
+		2015-11-22 [X] In votl <BS> don't work in insert :> update plugins
+	[_] Airline -- add hook to change ailine variable
 		: if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
 		:	add(airline_extensions, 'nrrwrgn') | endif
+		TODO:  nrrwrgn, submode, anzu
 	[_] GoldenRation -- consecutive splits are different from V1/2 and 3xH1/3
 		:= Maybe need to setup layout (OR min screen width) in options?
 		[_] not sourced on native split -- like :h :sp :vs
 	[_] textobj-quote -- reacts only on double quote instead of any?
 		[_] weird behaviour overall -- TEST it
 		[_] add pair of typographic quotes (maybe not in this plugin?)
-	[_] textobj-keyval -- seems broken? CHECK all the textobj
-		[_] DEV fork, as it works only for specified filetypes
+	[X] textobj-keyval -- seems broken? CHECK all the textobj
+		2015-11-22 [X] DEV fork, as it works only for specified filetypes
 		:= Add default key-splitter (to work in yaml)
 		:= Specify whole list of filetypes on one splitter instead of individually
-		[_] FIX duplicate tag
+		2015-11-22 [X] FIX duplicate tag
 		: [neobundle] Error generating helptags:
 		: [neobundle] Vim(helptags):E154: Duplicate tag "textobj-keyvalue"
 		:		in file bundle/.neobundle/doc/textobj-key-value.txt
-	[_] commentary -- need inline comment -- to toggle and textobj
 	[_] sideways -- restore visual selection after jump on [a,  ]a
 		:= NEED for visual select several consecutive args
 	[_] expand-region -- 'different' mappings in line-, char-, blockwise modes
@@ -122,6 +128,13 @@ BUG plugins
 		[_] THINK vim-submode for search -- in context of source-navi
 		[_] Definition lookup: ag+ctags
 			: https://github.com/gorkunov/smartgf.vim
+
+
+BUG: wontfix
+	[_] TEMP Recover.vim -- rubbish message in neovim
+		:> Created issue, wait for results
+	[_] TODO:DEV: commentary -- need inline comment -- to toggle and textobj
+		:> Unsupported by author, see issues.
 
 
 TODO: PULL REQ

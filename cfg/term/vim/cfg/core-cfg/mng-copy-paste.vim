@@ -81,16 +81,17 @@ noremap  zp "0p
 noremap  zP "0P
 
 " Operator mappings
-map <leader>y "+y
-map <leader>p "+p
-map <leader>P "+P
+nnoremap <leader>y "+y
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
 nnoremap g<leader>p  :put +<CR>
 nnoremap g<leader>P  :put!+<CR>
-map <leader>l "+d
-map <leader>L "+D
-" Send shizzle to the black hole (Remove)
-map <leader>r "_d
-map <leader>R "_D
+" DISABLED:[unused] Send shizzle to the black hole (Remove)
+" map <leader>l "+d
+" map <leader>L "+D
+" map <leader>r "_d
+" map <leader>R "_D
+
 " " Yank buffer's absolute path to X11 clipboard
 " nnoremap [unite]y :let @+=expand("%:p")<CR>:echo 'Copied to clipboard.'<CR>
 

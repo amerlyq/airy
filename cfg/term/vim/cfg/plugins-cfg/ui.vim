@@ -27,13 +27,6 @@ if neobundle#tap('GoldenView.Vim') "{{{
 endif "}}}
 
 
-if neobundle#tap('ListToggle') "{{{
-    let g:lt_location_list_toggle_map = '[Unite]l'
-    let g:lt_quickfix_list_toggle_map = '[Unite]q'
-  call neobundle#untap()
-endif "}}}
-
-
 "{{{1 Indicators ============================
 if neobundle#tap('vim-signify')  "{{{
   let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
@@ -56,6 +49,9 @@ endif "}}}
 
 
 if neobundle#tap('vim-signature')  "{{{
+  let g:SignatureIncludeMarkers = '!@#$%^&*()[]".'  " CHECK: >= 10
+  let g:SignaturePurgeConfirmation = 1
+  let g:SignaturePrioritizeMarks = 0
   let g:SignatureMap = { 'PurgeMarks': "m<Del>" }
   fun! neobundle#hooks.on_post_source(bundle)
     silent! exe 'doautocmd sig_autocmds BufEnter'

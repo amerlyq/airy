@@ -53,8 +53,8 @@ if neobundle#tap('incsearch.vim') "{{{
     " SEE unite-anzu
     "   "{Pattern} in matching lines are output in unite.vim
     "   : Unite anzu: {pattern}
-    map  <unique> n <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
-    map  <unique> N <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
+    map <unique> n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
+    map <unique> N  <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
     " FIXME: <Plug>(anzu-sign-matchline)
     fun! neobundle#hooks.on_source(bundle)
       nmap <silent><unique> <Leader>#  <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
@@ -89,15 +89,16 @@ if neobundle#tap('vim-over') "{{{
   " DISABLED: because of bug in 'vimoutliner' mappings
   " noremap  <unique><silent>  :  :OverCommandLine /<CR>
   let s:subs = {
-  \ 'c': 's;;;g<CR><Left><Left>',
-  \ 'w': 's;;;g<CR><Left><Left>',
-  \ 'y': 's;;<C-r>/;g<CR><Left><Left>',
-  \ 'm': 's;;<C-r>/;g<CR><Left><Left>',
-  \ 'g': 'g//<CR>',
-  \ 'v': 'v//<CR>',
+  \ 'c' : 's;;;g<CR><Left><Left>',
+  \ 'C' : 'g//<CR>',
+  \ 'rw': 's;;<C-r><C-w>;g<CR><Left><Left>',
+  \ 'ry': 's;;<C-r>";g<CR><Left><Left>',
+  \ 'r+': 's;;<C-r>+;g<CR><Left><Left>',
+  \ 'r/': 's;;<C-r>/;g<CR><Left><Left>',
+  \ 'R' : 'v//<CR>',
   \}
   for [c, r] in items(s:subs) | for m in ['n','x']
-    exe m.'noremap <unique><silent> <Leader>c'.c
+    exe m.'noremap <unique><silent> <Leader>'.c
           \ .' :OverCommandLine '.(m=='n'?'%':'').r
   endfor| endfor
   call neobundle#untap()

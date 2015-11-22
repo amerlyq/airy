@@ -1,5 +1,4 @@
----
-## Windows
+--- ## Windows
 zhaocai/GoldenView.Vim:
   description: |
       Nice automatic view/scale/ctrl for split windows
@@ -7,15 +6,14 @@ zhaocai/GoldenView.Vim:
   # lazy: 0
   mappings: [<Plug>GoldenView, <Plug>ToggleGoldenView]
 
----
-## Indicators
+--- ## Indicators
 mhinz/vim-signify:
   description: |  # TAGS: [textobj, signs]
     Signs on changes and textobj on vcs-aware area
     ALT: airblade/vim-gitgutter: (git only, but much faster file save)
   mappings: [[xo, aS, iS], [n, '[c', ']c']]  # mappings: <Plug>
   commands: [SignifyFold, SignifyToggle, SignifyToggleHighlight, SignifyRefresh]
-  lazy: 0  # EXPL: sourced on buffer read anyway. Disable individually by ft.
+  lazy: 0  # EXPL: show from the start. Disable individually by ft.
 
 kshenoy/vim-signature:
   description: |  # TAGS: [textobj, signs]
@@ -35,17 +33,16 @@ t9md/vim-quickhl:  # TAGS: [operator, hl]
 
 nathanaelkane/vim-indent-guides:  # TAGS: [hl]
   description: Highlights first space of tab columns
-  lazy: 0  # EXPL: enable from the start
+  lazy: 0  # EXPL: always show from the start
 
----
-## Statusline && colorschemes
+--- ## Statusline && colorschemes
 bling/vim-airline:
   description: Fast bottom/top status panels w/ integration
-  lazy: 0  # EXPL: enable from the start
+  lazy: 0  # EXPL: always show from the start
 
 altercation/vim-colors-solarized:
   description: Sticked to this colorscheme 2+ years already...
   mappings: [[nxi, <Plug>ToggleBackground]]
-  lazy: 0  # EXPL: enable from the start
+  lazy: 0  # EXPL: always show from the start
 
 # tomasr/molokai: {}

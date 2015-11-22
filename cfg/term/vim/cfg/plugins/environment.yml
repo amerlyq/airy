@@ -1,0 +1,38 @@
+--- ## Env
+amerlyq/vim-focus-autocmd:  # TODO:CHECK: on compatibility with neovim
+  description: Add support of FocusIn, FocusOut events into terminal vim
+  lazy: 0  # EXPL: always watch over focus events
+
+--- ## Path
+airblade/vim-rooter:
+  description: Change root working dir by auto/manual-cd in the repo
+  # CHG: mappings: <Leader>cd
+  commands: Rooter
+  # lazy: 0  # EXPL:USE: Only if you want for auto-cd to work
+
+kana/vim-altr:
+  description: Switch between alternative files [c,cpp,cxx,cc] <-> [h,hpp]
+  functions: altr#
+  mappings: [[nvoic, <Plug>]]  # <Plug>(altr-
+
+kopischke/vim-fetch:
+  description: Opens at pos file:line:col, file(line:col), file::method
+  # mappings: [[nx, gF]]
+  lazy: 0  # EXPL: watch over Buf*au for :e, :edit to work as expected
+
+--- ## State
+chrisbra/Recover.vim:
+  description: If swap exists -- allows to diff with swap, shows pid
+  lazy: 0  # EXPL: checks swap on vim start
+
+kopischke/vim-stay:
+  description: |
+      Session [folds,cursor,etc] auto save/restore
+      Works with buffer edit, argdo, bufdo, etc
+  # commands: [CleanViewdir, StayReload]
+  lazy: 0  # EXPL: always watch over Buf*au for save/restore state
+
+# OFF: messed up my mappings -- READ the doc how to
+# konfekt/FastFold:
+#   description: |
+#       Converts automatic folds into manual to reduce recomputation CPU load

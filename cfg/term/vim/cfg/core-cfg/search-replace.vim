@@ -36,23 +36,23 @@ noremap <unique> gS :norm! <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR>
 vnoremap <unique> <Leader>cs :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><Left><Left>
 " Replace last patt by current vsel
 " vnoremap <unique> <Leader>cv :<C-U>%s;;<C-R>=GetVisualSelection("")<CR>;g<CR>
-": Emulate 'tr' command -> vectored replacing of symbols
-noremap <unique> <leader>cR :s/.*/\=tr(submatch(0), '()', '[]')
+" UNUSED: Emulate 'tr' command -> vectored replacing of symbols
+" noremap <unique> <leader>cR :s/.*/\=tr(submatch(0), '()', '[]')
 
-
-": NOTE: some are replaced by vim-over
+" DEV:TODO: merge with vim-over definitions to exterminate duplicates
 let s:subs = {
-\ 'c': 's;;;g<Left><Left>',
-\ 'w': 's::<C-r><C-w>:g<Left><Left>',
-\ 'y': 's::<C-r>":g<Left><Left>',
-\ 'm': 's;;<C-r>/;g<Left><Left>',
-\ 'g': 'g//',
-\ 'v': 'v//',
-\ 'x': 's;;;g<CR>',
-\ 'd': 'g//d<CR>',
-\ 'f': 'v//d<CR>',
+\ 'c' : 's;;;g<Left><Left>',
+\ 'rw': 's::<C-r><C-w>:g<Left><Left>',
+\ 'ry': 's::<C-r>":g<Left><Left>',
+\ 'r+': 's::<C-r>+:g<Left><Left>',
+\ 'rm': 's;;<C-r>/;g<Left><Left>',
+\ 'C' : 'g//',
+\ 'R' : 'v//',
+\ 're': 's;;;g<CR>',
+\ 'rd': 'g//d<CR>',
+\ 'rf': 'v//d<CR>',
 \} " norm!, etc
 for [c, r] in items(s:subs)
-  if maparg('<Leader>c'.c) ==# '' | for m in ['n','x']
+  if maparg('<Leader>'.c) ==# '' | for m in ['n','x']
     exe m.'noremap <unique> <Leader>c'.c.' :'.(m=='n'?'%':'').r
 endfor | endif | endfor
