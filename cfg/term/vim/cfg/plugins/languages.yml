@@ -1,32 +1,34 @@
----
-## Main
+--- ## Main
 octol/vim-cpp-enhanced-highlight:
   filetypes: [c, cpp]
-# SEE: vim-scripts/DoxygenToolkit.vim:
+
 vim-perl/vim-perl:
   filetypes: perl
 
-# FIXME: can't do them Lazy, as them will load on every
-#         new *.py fileopen (,f) and reset my autocmd for jedi autocomplete
-davidhalter/jedi-vim:
-  filetypes: python
-klen/python-mode:
-  filetypes: python
-# USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
-# https://github.com/bps/vim-textobj-python
-
 LaTeX-Box-Team/LaTeX-Box:
-    external_commands: latexmk
-    filetypes: [tex, bib, latex]
-      # mappings: [C-xC-o, [[, ]], ([, ((, )), F5, F7]
+  external_commands: latexmk
+  filetypes: [tex, bib, latex]
+    # mappings: [C-xC-o, [[, ]], ([, ((, )), F5, F7]
 
 # SEE:
+# vim-scripts/DoxygenToolkit.vim:
 # hsanson/vim-android: {}
 # Shirk/vim-gas: {}
 # beyondmarc/opengl.vim: {}
 
----
-## Mark-up
+--- ## Python
+davidhalter/jedi-vim:
+  filetypes: python
+  # commands: Pyimport
+
+klen/python-mode:
+  filetypes: python
+  # mappings: [ [[, ]], [M, ]M, [ai]C, [ai]M ]
+
+# USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
+# https://github.com/bps/vim-textobj-python
+
+--- ## Mark-up
 amerlyq/vim-forestanza:
   description: HACK jap ranobe translation/formatting
   filetypes: forestanza
@@ -46,7 +48,7 @@ mrk21/yaml-vim:
   filetypes: yaml
 
 tpope/vim-markdown:
-  filetypes: [mkd, markdown]
+  filetypes: markdown
 
 ## Web
 #docunext/closetag.vim:
@@ -55,13 +57,13 @@ tpope/vim-markdown:
 # cakebaker/scss-syntax.vim: {}
 # gorodinskiy/vim-coloresque: {}
 
----
-## Syntax highlight
-cespare/vim-toml:
+--- ## Syntax highlight
+cespare/vim-toml:  # TODO:REMOVE
   filetypes: toml
 
 Matt-Deacalion/vim-systemd-syntax:
   filetypes: systemd
 
 zaiste/tmux.vim:
-  filename_patterns: 'tmux.*conf'
+  filetypes: tmux
+  # filename_patterns: 'tmux.*conf'

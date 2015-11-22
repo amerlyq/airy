@@ -6,6 +6,7 @@ if neobundle#tap('matchit.zip') "{{{
   call neobundle#untap()
 endif "}}}
 
+
 if neobundle#tap('vim-sneak') "{{{
 "  - s<Enter> repeats (even off-screen), <Tab> skips to next 56 matches,
 "  - any key that is _not_ a target label, performs its normal-mode function

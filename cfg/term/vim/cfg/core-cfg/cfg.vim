@@ -24,7 +24,7 @@ set whichwrap=<,>
 set backspace=indent,eol,start  " delete indent and newline
 
 set wrap breakindent
-noremap <unique> <Leader>tW :<C-u>setl wrap! breakindent!<CR>
+nnoremap <unique> <Leader>tw :setl breakindent! wrap! wrap?<CR>
 
 
 "{{{1 Completion ============================
@@ -53,4 +53,12 @@ set scrolljump=5  " minimum number of lines to scroll
 set keywordprg=:help
 " Check timestamp more for 'autoread'.
 autocmd MyAutoCmd WinEnter * checktime
-set cursorline      " highlight currently focused line
+nnoremap <unique> <Leader>ta  :setl autoread! hls?<CR>
+
+" UI
+set cursorline    " highlight currently focused line
+set number        " show line number
+
+nnoremap <unique> <Leader>tc  :set cursorcolumn! cuc?<CR>
+nnoremap <unique> <Leader>tC  :set cursorline! cul?<CR>
+nnoremap <unique> <Leader>tA  :let &laststatus=(&ls?0:2) \| :AirlineToggle<CR>

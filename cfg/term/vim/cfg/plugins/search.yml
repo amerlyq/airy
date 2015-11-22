@@ -3,12 +3,16 @@ albfan/ag.vim:  # CHECK:DEV: mappings for submode
   description: |
       The Silver searcher embedded into vim (fork_of: rking/ag.vim)
   external_commands: ag
-  command_prefix: [Ag, LAg]  # NEED:[neobundle] v:version >= 7.4.414
+  commands: [Ag, AgAdd, AgBuffer, AgFile, AgFromSearch, AgHelp,
+             LAg, LAgAdd, LAgBuffer, LAgHelp]
+  # NEED:[neobundle] v:version >= 7.4.414, REQ: fix List support
+  # command_prefix: [Ag, LAg]
 
 stefandtw/quickfix-reflector.vim:
   description: |
-      Delete entries from qf/loc wdws (or edit them as text) and save to apply
-      Useful for interactive replacing in many files found by :Ag, skiping needless.
+    - Delete needless entries from qf/loc wdws and save to correct jumps
+    - Change found text directly inside qf/loc and do replace on save
+    - NOTE: useful for interactive replacing in many files found by :Ag
   filetypes: qf  # DEV: for more precise triggering -- catch au-TextChanged
 
 --- ## Format/Align

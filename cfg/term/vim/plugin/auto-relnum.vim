@@ -21,10 +21,11 @@ if exists('g:loaded_auto_relnum') || &cp || v:version < 703 | finish
 set number relativenumber
 let g:auto_relnum_focused = (&number && &rnu)
 
-nnoremap <silent><unique> <Leader>tn  :set number relativenumber! rnu?
-      \\| let g:auto_relnum_focused=&rnu \| call <SID>RelNumUpdate(&rnu)<CR>
+nnoremap <silent><unique> <Leader>tn  :RelnumToggle<CR>
+command -bar -nargs=0 RelnumToggle  set number relativenumber! rnu?
+      \| let g:auto_relnum_focused=&rnu | call <SID>RelnumUpdate(&rnu)<CR>
 
-function! s:RelNumUpdate(...)
+function! s:RelnumUpdate(...)
   if !g:auto_relnum_focused | return | endif
   if a:0 > 0 | let &relativenumber = a:1 | endif
   let &numberwidth = max([&g:nuw, 4, 1+strlen(line('w$'))])  " TODO:RFC
@@ -33,15 +34,15 @@ endfunc
 " RFC: are all those au necessary? Maybe add/replace some?
 " TODO: restore my auto-focus plugin under neovim
 augroup auto_relnum
-  au InsertEnter    * call s:RelNumUpdate(v:insertmode != 'i')
-  au InsertLeave    * call s:RelNumUpdate(1)
-  au FocusGained    * call s:RelNumUpdate(1)
-  au FocusLost      * call s:RelNumUpdate(0)
-  au WinEnter       * call s:RelNumUpdate(1)
-  au WinLeave       * call s:RelNumUpdate(0)
+  au InsertEnter    * call s:RelnumUpdate(v:insertmode != 'i')
+  au InsertLeave    * call s:RelnumUpdate(1)
+  au FocusGained    * call s:RelnumUpdate(1)
+  au FocusLost      * call s:RelnumUpdate(0)
+  au WinEnter       * call s:RelnumUpdate(1)
+  au WinLeave       * call s:RelnumUpdate(0)
 
-  au BufNewFile     * call s:RelNumUpdate()
-  au BufReadPost    * call s:RelNumUpdate()
-  au FilterReadPost * call s:RelNumUpdate()
-  au FileReadPost   * call s:RelNumUpdate()
+  au BufNewFile     * call s:RelnumUpdate()
+  au BufReadPost    * call s:RelnumUpdate()
+  au FilterReadPost * call s:RelnumUpdate()
+  au FileReadPost   * call s:RelnumUpdate()
 augroup END

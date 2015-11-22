@@ -57,9 +57,13 @@ Neovim
 	[_] TODO:TRY: vim-plug and measure startup time, with caching -- <100 times>
 		:: REQ to improve mappings not only for <Plug>. THINK -- is necessary?
 		:: REQ caching for deferred loading to improve startup time more
+	[_] THINK:FIND? Duplicates of 'ftplugin/' dir of all plugins -- necessary for lazy loading?
+		:= Currently, seems like no? Neobundle can handle ftplugin/ itself?
 
 
 BUG plugins
+	[_] CHECK: jedi-vim new *.py fileopen (,f) resets ft/omnifunc
+	[_] committia.vim -- on 'gcu' tell about file modifiers read only, on close -- on vars
 	[_] incsearch
 		[_] C-f in '/' can't open search window
 			:? Maybe, rewrite vim-rsi -- to adjust it with neocomplete <C-x>?
@@ -143,6 +147,7 @@ TODO: PULL REQ
 	[_] ag -- propose plug mappings
 	[_] kana/vim-submode  --  commands -- +attach ref on my current config
 	[_] vim-indent-tab -- send patch as pull req, author is slow
+	[_] overseed relat-number
 
 
 SMALL

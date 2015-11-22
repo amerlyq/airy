@@ -34,7 +34,7 @@ let s:patterns = {
       \ 'Did': 'DONE|FIXED|EXPL|TEMP',
       \ 'Dev': 'DEV|ENH|HACK|RFC|SPL',
       \ 'Msg': 'NOTE|USE|USAGE|DFL|STD',
-      \ 'Tbd': 'TODO|CHECK|TRY|MOVE',
+      \ 'Tbd': 'TODO|CHECK|TRY|MOVE|REQ',
       \ 'Alt': 'ALT|OR|CASE|THINK|CHG',
       \ }
 

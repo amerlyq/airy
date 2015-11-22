@@ -1,16 +1,6 @@
-" My filetype file.
+if exists("did_load_filetypes") | finish | endif
 
-if exists("did_load_filetypes")
-  finish
-endif
-
-" THINK:FIND? Duplicates 'ftplugin/' dir of all plugins -- necessary for lazy loading
 augroup filetypedetect
-  " Markdown
-  " au BufRead,BufNewFile *.fza setf forestanza
-  " au BufRead,BufNewFile *.otl     setf votl
-  au BufRead,BufNewFile {*.mkd,*.markdown,*.md,*.mdown,*.mkdn}
-        \ setl ft=markdown autoindent comments=n:>
   " Langs
   au BufRead,BufNewFile *.scala   setf scala
   au BufRead,BufNewfile *.n       setf nemerle
@@ -23,14 +13,12 @@ augroup filetypedetect
   au BufRead,BufNewFile *.[sS] setl ft=gas syntax=gas
   au BufRead,BufNewFile *.hla  setl ft=hla syntax=hla
   " Configuration
-  au BufRead,BufNewFile {*tmux.conf*,Tmuxfile,*tmux/config}     setf tmux
   au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,Vagrantfile}
         \ setl ft=ruby fdm=syntax fdn=1
   " System
-  au BufRead,BufNewFile {*.log*,log-*}                         setf messages
-  au BufRead,BufNewFile {PKGBUILD,.AURINFO}                    setf sh
-  au BufRead,BufNewFile {*.automount,*.mount,*.path,*.service} setf systemd
-  au BufRead,BufNewFile {*.socket,*.swap,*.target,*.timer}     setf systemd
+  au BufRead,BufNewFile {*.log*,log-*}       setf messages
+  au BufRead,BufNewFile {PKGBUILD,.AURINFO}  setf sh
+  au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap} setf systemd
 augroup END
 
 " Use Zeal on Linux for context help
