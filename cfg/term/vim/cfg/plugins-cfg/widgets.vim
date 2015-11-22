@@ -19,6 +19,7 @@ if neobundle#tap('undotree') "{{{
   nnoremap <silent><unique> [Unite]u  :UndotreeToggle<CR>
   let g:undotree_WindowLayout = 2
   let g:undotree_SetFocusWhenToggle = 1
+  " Mappings inside widget
   function g:Undotree_CustomMap()
     nmap <buffer> <Space> <Plug>UndotreeEnter
     nmap <buffer> d <Plug>UndotreeDiffToggle
@@ -70,18 +71,21 @@ if neobundle#tap('NrrwRgn') "{{{
   "USAGE:HACK: Change filetype for opened region ':NN awk'
   command! -nargs=* -bang -range -complete=filetype NN
       \ :<line1>,<line2> call nrrwrgn#NrrwRgn('',<q-bang>)
-      \ | set filetype=<args>
+      \ | setl filetype=<args>
 
   "USAGE:HACK: Filter by pattern and open in split
-  "ALT: hide comments (temporary strip) by ':v/^#/NRP'
-  let s:subs = { 'F' : 'g//NRP<CR>:NRM<CR>' }
+  "NOTE: hide comments (temporary strip) by ':v/^#/NRP'
+  let s:subs = {
+  \ 'n' : 'g//NRP<CR>:NRM<CR>',
+  \ 'N' : 'v//NRP<CR>:NRM<CR>',
+  \}
   for [c, r] in items(s:subs) | for m in ['n','x']
-    exe m.'noremap <unique><silent> [Frame]'.c.' :'.(m=='n'?'%':'').r
+    exe m.'noremap <silent><unique> [Frame]'.c.' :'.(m=='n'?'%':'').r
   endfor| endfor
 
   " Operator to select region in split 'n', or in current buffer
   for [c, op] in items({'n': 'Do', 'N': 'BangDo'})
-    call Map_nxo('[Frame]'.c, '<Plug>Nrrwrgn'.op)
+    call Map_nxo('<Leader>'.c, '<Plug>Nrrwrgn'.op)
   endfor
   call neobundle#untap()
 endif "}}}

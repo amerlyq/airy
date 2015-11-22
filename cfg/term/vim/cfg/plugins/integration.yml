@@ -1,0 +1,82 @@
+--- ## Apps
+Shougo/vinarise.vim:  # CHECK:
+  description: |
+    - Ultimate hex-editing system
+    - depends on hexript for some optional scripts
+    - (now that repo rbtnn/hexript.vim don't exists?)
+  commands : [Vinarise, VinariseDump]
+  explorer: 1
+
+wmvanvliet/vim-ipython:  # CHECK:
+  description: (OR wilywampa/vim-ipython) Integration of python notebooks
+  external_commands: ipython
+
+szw/vim-dict:  # CHECK:
+  description: Use '!dict' translations from inside vim
+  external_commands: dict
+
+# W3m from vim
+#yuratomo/w3m.vim: {}
+
+# Viewing man in vim -- good, but no colors in git lg1, need to investigate
+# rkitover/vimpager: {}
+
+--- ## Services
+# BUG: no Lazy -- vim will pause ENTER on file open
+lyokha/vim-xkbswitch:  # CHECK:
+  description: Auto-switch for english/custom pair of langs on mode change
+  commands: EnableXkbSwitch
+  filetypes: [tex, latex, bib, markdown, votl, txt]
+
+chrisbra/unicode.vim:  # CHECK:
+  description: Search/preview unicode characters. Useful for font pictures.
+  commands: [Digraphs, SearchUnicode, UnicodeName,
+             UnicodeTable, DownloadUnicode]
+  mappings: [[n, <C-X><C-G>], [n, <C-X><C-Z>], [n, <F4>]]
+
+KabbAmine/zeavim.vim:  # CHECK:  WTF?
+  description: Docs online searcher in one button for word under cursor
+  ALT:
+    - Keithbsmiley/investigate.vim
+    - powerman/vim-plugin-viewdoc
+  external_commands: zeal
+  mappings: [<Plug>ZV, <Plug>Zeavim]
+
+# BUG: seems like can't do it lazy?
+jamessan/vim-gnupg:  # CHECK:
+  description: Edit and save encrypted '*.gpg' files in-place
+  external_commands: gpg
+
+--- ## VCS
+tpope/vim-git: {}  # CHECK:  WTF?
+
+# BUG seems like can't be loaded lazy? TRY more precisely
+#   SEE https://github.com/Shougo/neobundle.vim/issues/434
+rhysd/committia.vim:  # CHECK:
+  description: Multiwindow regime for git commit [--amend]
+  explorer: COMMIT_EDITMSG
+
+tpope/vim-fugitive:  # CHECK:  # TODO: use more often, analyze more of help
+  augroup: fugitive
+  functions: fugitive#
+  commands: [Git, Gstatus, Gdiff, Glog, Gbrowse]
+  # Gstatus, Glog, Gdiff, Gwrite, Gblame
+  # lazy: 0
+
+gregsexton/gitv:  # CHECK:  # TODO: use more often, analyze more of help
+  description: |
+    - See git tree and current file history for repo
+      # <cr>: view commit, <C-n/p>: jump to next/prev commit and <cr>.
+      # o: <cr> with split, O: tab, s: vsplit
+      # co: checkout, S: diffstat, yc: copy SHA
+      # x/X: next/previous branching point
+  # CHG: mappings: [ [Git]v, [Git]V ] -- file/full view
+  commands: Gitv
+  depends: tpope/vim-fugitive
+
+# THINK
+# lambdalisue/vim-gita: {}
+# lambdalisue/vim-gista:
+#   commands: Gista
+#   mappings: <Plug>
+#   unite_sources: gista
