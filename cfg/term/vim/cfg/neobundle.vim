@@ -32,6 +32,8 @@ for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
     with open(c) as f:
         for doc in yaml.safe_load_all(f):
             for src, opts in doc.items():
+                # Remove to fasten loading
+                [opts.pop(k, None) for k in ["description", "contract"]]
                 vim.command(fmt.format(src, dict(defs, **opts)))
 endofpython
 endfunc

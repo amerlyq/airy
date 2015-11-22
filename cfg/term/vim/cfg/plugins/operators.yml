@@ -2,7 +2,9 @@
 kana/vim-operator-user:
   description: Dependency of 'vim-operator-*' and vim-clang-format
   functions: operator#user#
-  mappings: [[nx, <Plug>]]
+  contract: &opu
+    mappings: [[nx, <Plug>]]
+    depends: kana/vim-operator-user
 
 rhysd/vim-operator-surround:
   description: |
@@ -11,14 +13,14 @@ rhysd/vim-operator-surround:
       - (TODO: compare code) https://github.com/machakann/vim-sandwich
     DEPRECATED:
       - (bloated) tpope/vim-surround
-  # CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({[&quot'<`] ]
-  mappings: [[nx, <Plug>]]
   depends:
     - kana/vim-operator-user
     ## For chained mappings (Optional)
     - thinca/vim-textobj-between
     - beloglazov/vim-textobj-quotes
     - rhysd/vim-textobj-anyblock
+  # CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({[&quot'<`] ]
+  <<: *opu
 
 ## DISABLED: |
 #     - For VISUAL (where I use append the most), original plugin is convenient
@@ -33,8 +35,7 @@ rhysd/vim-operator-surround:
 kana/vim-operator-replace:
   description: Replaces motion by register content
   # CHG mappings: [[nxo, gr]]
-  mappings: [[nx, <Plug>]]
-  depends: kana/vim-operator-user
+  <<: *opu
 
 tommcdo/vim-exchange:
   description: |
@@ -68,8 +69,8 @@ rhysd/vim-clang-format:
   commands: [ClangFormat, ClangFormatEchoFormattedCode]
   filetypes: [c, cpp, objc]
   depends:
-    - Shougo/vimproc.vim
     - kana/vim-operator-user
+    - Shougo/vimproc.vim
 
 Chiel92/vim-autoformat:
   description: |

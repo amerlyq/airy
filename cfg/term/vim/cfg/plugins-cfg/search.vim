@@ -8,7 +8,7 @@ if neobundle#tap('ag.vim') "{{{
   " let g:ag_qhandler="botleft lopen 7"  "OR: copen 20"
   ": Ag working dir  searching
   " nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
-  nnoremap <unique> <Leader>a :<C-U>Ag -w '<C-r><C-w>'<CR>
+  nnoremap <unique> <Leader>a :<C-U>Ag -w <C-r>=shellescape('<cword>')<CR><CR>
   vnoremap <unique> <Leader>a :<C-U>Ag -Q '<C-r>=GetVisualSelection(" ")<CR>'<CR>
   ": Ag buffer search
   nnoremap <unique> g<Leader>a :<C-U>AgBuffer -w '<C-R><C-W>'<CR>
@@ -86,7 +86,8 @@ if neobundle#tap('vim-over') "{{{
   let g:over#command_line#search#enable_incsearch = 1
   let g:over#command_line#search#enable_move_cursor = 1
 
-  noremap  <unique><silent>  :  :OverCommandLine /<CR>
+  " DISABLED: because of bug in 'vimoutliner' mappings
+  " noremap  <unique><silent>  :  :OverCommandLine /<CR>
   let s:subs = {
   \ 'c': 's;;;g<CR><Left><Left>',
   \ 'w': 's;;;g<CR><Left><Left>',

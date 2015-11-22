@@ -16,7 +16,6 @@ Neovim
 			: Seems like I need to try last AUR build, but build it on
 			:	android is troublesome...
 			:= As a workaround -- load custom vimrc on android?
-		[_] BUG of vim-stay -- text is folded on restore
 	2015-11-10 [X] Check neovim (for neovim-git better use pacaur instead of yaourt)
 	[_] ADD guards to each cfg file: g:did_load_<sname> = 1
 		:= this will allow s:cfg('dir/file') and then s:cfg('dir/*')
@@ -35,8 +34,6 @@ Neovim
 		: http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
 
 	[_] Check my vim-focus on compatability and unnecessary
-	[_] BUG vim -- press 'v$' -- will select end of line also! (in .otl at least)
-		:= Then deleting selection will cause joining lines!
 	[_] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves рывками
 	[_] Disable textwidth indicator column when screensize smaller then tw
@@ -59,16 +56,24 @@ Neovim
 
 
 BUG plugins
-	XXX: neobundle -- recursive call -- red repeatable text
-		:= Maybe, it's due to can't stop search and return valid object for surround?
-		-- 'yq'
-			submode.vim:8
-				if !exists('g:airline#extensions#submode#prefix')
-		-- in case of 'vqa' for surround -- rarely
+	[_] incsearch
+		[_] C-f in '/' can't open search window
+			:? Maybe, rewrite vim-rsi -- to adjust it with neocomplete <C-x>?
+			:	and add more shortcuts which I use in ZSH
+			:= Yes, rewrite is the best -- and replace <C-f> with <C-i>/<C-o>?
+		[_] After lazy loading first '*' on visual don't highlight
+		[_] After reopening file, n/N searches in backward direction!
+	[_] vim-stay -- text is folded on restore
+	2015-11-22 [X] XXX: neobundle -- recursive call -- red repeatable text
+		-- 'yq' or in case of 'vqa' for surround -- rarely
 		-- when replacing and dld repo for plugin (same name, different url)
+		:> Seems like it my fault with textobj-user depends on itself for backrefs
 	[_] XXX: something accidentaly enables 'set list' in help/votl/curr buffer
-	[_] deoplete -- <C-v> on column after ': ' comment, Press <Tab> -- inserts space only for first line
-		[_] In votl <BS> don't work in insert
+	[_] BUG: vimoutliner -- has 'nmap' instead of 'nnoremap'
+		:= Therefore don't work with remapped ':'
+		:> TEMP disabled mapping, FIXME:DEV: plugin-replacement
+	[X] deoplete -- <C-v> on column after ': ' comment, Press <Tab> -- inserts space only for first line
+		2015-11-22 [X] In votl <BS> don't work in insert
 	[_] Airline + nrrwrgn -- add hook to nrrwrgn to change ailine variable
 		: if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
 		:	add(airline_extensions, 'nrrwrgn') | endif
@@ -115,10 +120,14 @@ BUG plugins
 			: https://github.com/rgrinberg/vim-operator-gsearch
 			: https://github.com/osyo-manga/vim-operator-search
 		[_] THINK vim-submode for search -- in context of source-navi
+		[_] Definition lookup: ag+ctags
+			: https://github.com/gorkunov/smartgf.vim
 
 
 TODO: PULL REQ
+	[_] post configs -- neobundle, zsh-syntax, igorsam, mpogoda
 	[_] vim-airline -- on submode ext
+	[_] ag -- propose plug mappings
 	[_] kana/vim-submode  --  commands -- +attach ref on my current config
 	[_] vim-indent-tab -- send patch as pull req, author is slow
 
@@ -137,8 +146,6 @@ SMALL
 	[_] Toggling background directly in vim -- use urxvt codes to change
 		color of cursor for more contrast
 	[_] CHECK vim search inside syntax objects -- to search only in strings or in function names
-	[_] Definition lookup: ag+ctags
-		https://github.com/gorkunov/smartgf.vim
 	[_] SEE http://vimcasts.org/episodes/the-file-explorer/
 
 
@@ -156,8 +163,11 @@ BUG:
 		: https://github.com/Shougo/neocomplete.vim/issues/351
 		: https://groups.google.com/forum/#!msg/vim_dev/PbLFBAD5Xu8/bH_kew8vmJAJ
 	2015-07-28 [X] FIX gj/gk and j/k for wrapping text
-	[_] FIX? maybe bug from 'not back-moving cursor'
-		: -- V till end of line deletes also \n -- THINK: change behaviour?
+	2015-11-22 [X] FIX? -- press 'v$' -- will select end of line also!
+		:= Then deleting selection will cause joining lines!
+		:? maybe bug from 'not back-moving cursor'
+		:~ -- 'V' deletes also \n -- THINK? change behaviour?
+		:> Replaced vnoremap '$' -> 'g_'
 	[_] FIX russian xkb plugin
 		: Maybe, some of mapping map not as keysym but by keycodes?
 		[_] my own mappings simply don't work (like ,s or ,d)

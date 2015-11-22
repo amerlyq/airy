@@ -1,7 +1,8 @@
----
-## Search/Replace
-rking/ag.vim:  # DEV: mappings for submode
-  description: The Silver searcher embedded into vim
+---  ## Search/Replace
+albfan/ag.vim:  # DEV: mappings for submode
+  description: |
+      (fork+) The Silver searcher embedded into vim
+      OR: - (main trunk) rking/ag.vim
   external_commands: ag
   commands: [Ag, AgAdd, AgBuffer, AgFile, AgFromSearch, AgHelp,
              LAg, LAgAdd, LAgBuffer, LAgHelp]
@@ -12,8 +13,7 @@ stefandtw/quickfix-reflector.vim:
       Useful for interactive replacing in many files found by :Ag, skiping needless.
   filetypes: qf  # DEV: for more precise triggering -- catch au-TextChanged
 
----
-## Format/Align
+---  ## Format/Align
 godlygeek/tabular:  # CHECK:TRY? replace by another one?
   description: |
       Align paragraphs by patt
@@ -21,15 +21,14 @@ godlygeek/tabular:  # CHECK:TRY? replace by another one?
   commands: [Tab, Tabularize]
 
 
----
-## Substitute/Highlight
+---  ## Substitute/Highlight
 haya14busa/incsearch.vim:  # CHECK
   description: Multiple realtime hl for searching
   mappings: <Plug>  # [/, ?, g/]
   depends: tpope/vim-repeat
 
 haya14busa/vim-asterisk:
-  description: Smart words bounds, and hl w/o jumping with 'z'
+  description: Smart word bounds on '*', and hl w/o jumping by 'z'
   mappings: <Plug>  # [*, #, g*, g#, z*, z#, gz*, gz#]
 
 osyo-manga/vim-anzu:  # TAGS: [search, airline]

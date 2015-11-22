@@ -1,3 +1,7 @@
+setlocal nolist
+
+" Change only behaviour of ':h' buffers, but don't influence ft manually opened.
+if &buftype !=# 'help' | finish | endif
 " only  " Force the at the bottom, but then gh/gl disabled?
 
 let s:help_mappings = {

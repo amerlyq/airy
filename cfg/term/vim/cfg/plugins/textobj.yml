@@ -1,10 +1,10 @@
 ## Textobj
-kana/vim-textobj-user: &tou
+kana/vim-textobj-user:
   description: Dependency of 'vim-textobj-*'
   functions: textobj#user#
-  ## EXPL: Loopback for '*tou' refs in yaml
-  depends: kana/vim-textobj-user
-  mappings: [[ox, <Plug>]]
+  contract: &tou  ## EXPL: Loopback for '*tou' refs in yaml
+    depends: kana/vim-textobj-user
+    mappings: [[ox, <Plug>]]
 
 rhysd/vim-textobj-anyblock:
   description: |

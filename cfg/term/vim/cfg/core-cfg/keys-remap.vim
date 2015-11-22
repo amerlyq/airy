@@ -27,7 +27,9 @@ cnoremap <C-k> <C-\>e getcmdpos() == 1 ?
       \ '' : getcmdline()[:getcmdpos()-2]<CR>
 "}}}
 
-xnoremap <unique><expr> v mode()==#"\<C-v>" ? "v" : "\<C-v>"
+" Don't select eol spaces and '\n'. Instead use 'D' or 'DgJ'.
+xnoremap <unique> $  g_
+xnoremap <unique><expr> v  (mode() ==# "\<C-v>") ? "v" : "\<C-v>"
 "I;\<Esc>" : "\<C-v>I;\<Esc>"
 
 " Now 'a jump you to line and column, and `a only to line

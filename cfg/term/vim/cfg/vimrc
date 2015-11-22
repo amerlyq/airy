@@ -15,21 +15,10 @@ call s:cfg('core/leaders.vim')
 
 
 fun! SourcePlugins()
-  let g:mapleader="\\"
-  call s:cfg('plugins/backslash.vim')
-  let g:mapleader=","
-  call s:cfg('plugins/autocomplete.vim')
-  call s:cfg('plugins/comma.vim')
-  call s:cfg('plugins/integration.vim')
-  call s:cfg('plugins/languages.vim')
-  call s:cfg('plugins/search.vim')
-  call s:cfg('plugins/operators.vim')
-  call s:cfg('plugins/decoration.vim')
-  " TEMP call s:cfg('plugins/fun.vim')
+  call s:cfg('plugins/*.vim')
 endf
 
 fun! SourcePluginsCfg()
-  let g:mapleader=","
   call s:cfg('plugins-cfg/*.vim')
 endf
 

@@ -4,9 +4,11 @@ if exists("did_load_filetypes")
   finish
 endif
 
+" THINK:FIND? Duplicates 'ftplugin/' dir of all plugins -- necessary for lazy loading
 augroup filetypedetect
   " Markdown
   " au BufRead,BufNewFile *.fza setf forestanza
+  " au BufRead,BufNewFile *.otl     setf votl
   au BufRead,BufNewFile {*.mkd,*.markdown,*.md,*.mdown,*.mkdn}
         \ setl ft=markdown autoindent comments=n:>
   " Langs
