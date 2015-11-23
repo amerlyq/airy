@@ -1,0 +1,34 @@
+# ALT: names: inner/support/system
+
+# Asynchronous execution plugin for Vim
+# EXPL: NeoBundle uses it to update plugins
+Shougo/vimproc.vim:
+  external_commands: make
+  build:
+    windows: tools\\update-dll-mingw
+    cygwin: make -f make_cygwin.mak
+    mac: make -f make_mac.mak
+    linux: make
+    unix: gmake
+  lazy: 0
+
+#:Make cover for long-running tasks asynchronous (as like by ssh)
+tpope/vim-dispatch: {}
+
+
+# Shougo/vimshell.vim:
+#   description: Powerful shell implemented by Vim script
+#   external_commands: make
+#   mappings: <Plug>(vimshell_
+#   commands: [{name: VimShell, complete: customlist,vimshell#complete},
+#       VimShellExecute, VimShellInteractive, VimShellTerminal, VimShellPop]
+#   depends: Shougo/vimproc.vim
+
+# Shougo/vimfiler.vim:
+#   description: In unix terminal use snip-ranger-filechooser.vim
+#   explorer: 1
+#   mappings: <Plug>(vimfiler_
+#   commands: [{name: VimFiler, complete: customlist,vimfiler#complete},
+#       VimFilerExplorer, Edit, Read, Source, Write]
+#   depends: Shougo/unite.vim
+#   disabled: '!IsWindows()'
