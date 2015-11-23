@@ -28,7 +28,7 @@ let g:everywhere_activated = 1
 let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Did': 10,
       \ 'Dev': 4, 'Msg': 13, 'Tbd': 5, 'Alt': 3 }
 let s:patterns = {
-      \ 'Err': 'ERR%(OR)=|BUG|XXX|WTF',
+      \ 'Err': 'ERR%(OR)=|BUG|REGR|XXX|WTF',
       \ 'Fix': 'FIX%(ME)=|WARNING|ATTENTION|%(REM)OVE',
       \ 'Add': 'ADD|SEE|NEED|FIND|ALSO',
       \ 'Did': 'DONE|FIXED|EXPL|TEMP',

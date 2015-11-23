@@ -39,7 +39,8 @@ fun! s:PatchColorScheme()
     hi! IndentGuidesOdd  ctermfg=8 ctermbg=0
     hi! IndentGuidesEven ctermfg=8 ctermbg=0
   endif
-  "  hi! Folded ctermfg=3 ctermbg=NONE
+  hi! Folded cterm=bold ctermfg=11 ctermbg=0 guifg=Cyan guibg=DarkGrey
+  " hi! Folded cterm=underline ctermfg=11 ctermbg=NONE guifg=Cyan guibg=DarkGrey
   "  hi! FoldColumn ctermfg=4 ctermbg=NONE guifg=Cyan guibg=Grey
   hi! lCursor guifg=NONE ctermbg=4 guibg=Cyan
   hi! link ColorColumn StatusLineNC

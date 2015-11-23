@@ -1,6 +1,6 @@
 " set foldtext=RefinedFoldText()  " ALT getline(v:foldstart)
 set foldtext=CustomFoldText('\ ')
-
+let g:fold_extend_preview = 1
 
 "{{{1 Mappings ============================
 " Move between folds
@@ -13,6 +13,7 @@ nnoremap <unique> [Toggle]z :let &foldmethod={'manual': 'syntax',
 " nnoremap <unique> [Toggle]z :let &foldmethod=(&fdm=='manual'?'syntax':
 "     \ &fdm=='syntax'?'marker': 'manual') \| set foldenable fdm?<CR>
 nnoremap <unique> [Toggle]Z :let &fdc=(&fdc?0:2) \| set foldenable! fen?<CR>
+nnoremap <unique> [Toggle]e :let g:fold_extend_preview=!g:fold_extend_preview<CR>
 
 
 "{{{1 IMPL ============================
@@ -26,16 +27,52 @@ endfun
 " Modification of https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim
 " Always show some delimiters (the argument of CustomFoldText) and the tail of
 " the folded line, that is, the number of lines folded (absolute and relative)
+" XXX: slow on big files! -- seems like by my nextnonblank features!
+" TODO: tabs has bad clearness in crumpled *.c -- use digit at beginning
+" -- THINK: embed digit directly in foldcolumn? -- instead of default '+' for all
+" THINK: toggle highlight for folds -- more/less visible? Like Folded/Comment
+" DEV: collapse all block text in one line if len(s) is less then empty width
+
 fun! CustomFoldText(delim)
   let fs = v:foldstart
-  while getline(fs) =~ '^\s*$' | let fs = nextnonblank(fs + 1) | endwhile
-  if fs > v:foldend | let line = getline(v:foldstart)
-  else | let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
+  let line=''
+
+  if getline(fs) =~ '^\s*$'
+    let fs = nextnonblank(fs + 1)
   endif
+  let nsp = indent(fs)
+
+  " FIXME: duplicates header instead of merging fold zones
+  " if getline(fs) =~ '^\s*{\s*$'| let fs = prevnonblank(fs - 1) | endif
+  " let &v:foldstart = l:fs-1  # BUG: don't work?
+
+  if g:fold_extend_preview
+    if getline(fs) =~ '^\s*{\s*$'
+      let line = '{  '  " . repeat(' ', &tabwidth)
+      let fs = nextnonblank(fs + 1)
+    endif
+  endif
+
+  if fs == 0 || fs > v:foldend
+    let fs = v:foldstart
+    let nsp = indent(fs)
+  endif
+
+  let line .= substitute(getline(fs), '^\s\+', '', 'g')
+
   " Indent foldtext corresponding to foldlevel
-  let indent = repeat(' ',shiftwidth())
-  let foldLevelStr = repeat(indent, v:foldlevel-1)
-  let foldLineHead = substitute(line, '^\s*', foldLevelStr, '')
+  " let foldLevelStr = repeat(repeat(' ',shiftwidth()), v:foldlevel-1)
+  " let foldLineHead = substitute(line, '^\s*', foldLevelStr, '')
+
+  " SEE: \u2056 \ufbb8 \u272b
+  let m="\u2056"   " TODO: set through variable. Reuse airline symbs?
+  let lm = (v:foldlevel <= 1 ? l:m : string(v:foldlevel))
+  if nsp <= 1
+    let foldLineHead = l:m . l:line
+  else
+    let foldLineHead = l:lm . repeat(' ', nsp-2). l:m . l:line
+  endif
+
   " Size foldtext according to window width
   let w = winwidth(0) - 2 - &foldcolumn - (&number ? &numberwidth : 0)
   let foldSize = 1 + v:foldend - v:foldstart
