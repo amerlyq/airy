@@ -12,7 +12,8 @@ for [to, fr] in items(s:leads)
 endfor
 
 " EXPL: omap omitted for shortcut of '..q' textobj
-let s:leads = {'[Quote]': 'q', '[Unite]': '<Tab>', '[Git]': '[Frame]g'}
+let s:leads = {'[Quote]': 'q', '[Unite]': '<Tab>',
+  \ '[Toggle]': '<Leader>t', '[Replace]': '<Leader>r', '[Git]': '[Frame]g'}
 for [to, fr] in items(s:leads)
   call Map_nxo(fr, to, 'nx') | call Map_nxo(to, '<Nop>', 'nx', 'noremap')
 endfor

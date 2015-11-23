@@ -7,7 +7,7 @@ endif "}}}
 
 if neobundle#tap('neocomplete.vim') && has('lua') && !has('nvim') "{{{
   let g:neocomplete#enable_at_startup = 1
-  noremap <unique> <Leader>tN :<C-u>NeoCompleteToggle<CR>
+  noremap <unique> [Toggle]N :<C-u>NeoCompleteToggle<CR>
   let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/neocomplete.vim'
   call neobundle#untap()
 endif "}}}
@@ -26,7 +26,7 @@ endif "}}}
 
 
 if neobundle#tap('syntastic')  "{{{
-  noremap <unique> <Leader>tx :<C-u>SyntasticToggleMode<CR>
+  noremap <unique> [Toggle]x :<C-u>SyntasticToggleMode<CR>
   let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/syntastic.vim'
   call neobundle#untap()
 endif "}}}

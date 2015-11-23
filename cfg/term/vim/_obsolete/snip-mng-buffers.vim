@@ -11,7 +11,7 @@ set winwidth=80
 
 " magnifying when switching (more stable then 'hjkl<C-W>_' )
 let g:magnify_on = 1
-noremap <unique> <Leader>tm :<C-U>let g:magnify_on = !g:magnify_on  \|
+noremap <unique> [Toggle]m :<C-U>let g:magnify_on = !g:magnify_on  \|
       \ echo('  wmagnify = ' . (g:magnify_on ? 'on' : 'off'))<CR>
 autocmd WinEnter * call AutoMagnifying()
 function! AutoMagnifying()

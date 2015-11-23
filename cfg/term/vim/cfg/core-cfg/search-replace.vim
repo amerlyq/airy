@@ -10,7 +10,7 @@ set wrapscan    " Searches wrap around the end of the file.
 
 "" Make <C-L> (redraw screen) and turn off search highlighting until the next
 "" search,  http://vim.wikia.com/wiki/Example_vimrc
-nnoremap <unique> <Leader>tH :setl hlsearch! hls?<CR>
+nnoremap <unique> [Toggle]H :setl hlsearch! hls?<CR>
 nnoremap <unique> <C-l> :nohlsearch<CR><C-l>
 
 
@@ -33,7 +33,7 @@ noremap <unique> gS :norm! <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR>
 
 
 " Replace current vsel (OR:THINK: nnoremap for last vsel by gv?)
-vnoremap <unique> <Leader>cs :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><Left><Left>
+vnoremap <unique> [Replace]s :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><Left><Left>
 " Replace last patt by current vsel
 " vnoremap <unique> <Leader>cv :<C-U>%s;;<C-R>=GetVisualSelection("")<CR>;g<CR>
 " UNUSED: Emulate 'tr' command -> vectored replacing of symbols
@@ -41,18 +41,18 @@ vnoremap <unique> <Leader>cs :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><
 
 " DEV:TODO: merge with vim-over definitions to exterminate duplicates
 let s:subs = {
-\ 'c' : 's;;;g<Left><Left>',
-\ 'rw': 's::<C-r><C-w>:g<Left><Left>',
-\ 'ry': 's::<C-r>":g<Left><Left>',
-\ 'r+': 's::<C-r>+:g<Left><Left>',
-\ 'rm': 's;;<C-r>/;g<Left><Left>',
-\ 'C' : 'g//',
-\ 'R' : 'v//',
-\ 're': 's;;;g<CR>',
-\ 'rd': 'g//d<CR>',
-\ 'rf': 'v//d<CR>',
+\ '<Leader>c' : 's;;;g<Left><Left>',
+\ '<Leader>C' : 'g//',
+\ '<Leader>R' : 'v//',
+\ '[Replace]w': 's::<C-r><C-w>:g<Left><Left>',
+\ '[Replace]y': 's::<C-r>":g<Left><Left>',
+\ '[Replace]+': 's::<C-r>+:g<Left><Left>',
+\ '[Replace]m': 's;;<C-r>/;g<Left><Left>',
+\ '[Replace]e': 's;;;g<CR>',
+\ '[Replace]d': 'g//d<CR>',
+\ '[Replace]f': 'v//d<CR>',
 \} " norm!, etc
 for [c, r] in items(s:subs)
-  if maparg('<Leader>'.c) ==# '' | for m in ['n','x']
-    exe m.'noremap <unique> <Leader>c'.c.' :'.(m=='n'?'%':'').r
+  if maparg(c) ==# '' | for m in ['n','x']
+    exe m.'noremap <unique> '.c.' :'.(m=='n'?'%':'').r
 endfor | endif | endfor

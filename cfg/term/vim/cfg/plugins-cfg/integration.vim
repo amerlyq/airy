@@ -31,6 +31,14 @@ if neobundle#tap('zeavim.vim') "{{{
 endif "}}}
 
 
+if neobundle#tap('vim-gnupg') "{{{
+  " fun! neobundle#hooks.on_post_source(bundle)
+  "   silent! exe 'doautocmd GnuPG BufReadCmd'
+  " endf
+  call neobundle#untap()
+endif "}}}
+
+
 "{{{1 VCS ============================
 if neobundle#tap('vim-fugitive')  " Fugitive: {{{1
   autocmd BufReadPost fugitive://* set bufhidden=delete

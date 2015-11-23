@@ -4,8 +4,8 @@
 "   must be no error when file is already processed
 
 "{{{1 MAPS =================
-noremap <unique> <Leader>ct :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
-noremap <unique> <Leader>cT :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
+noremap <unique> [Replace]t  :s:^\t\+:\=repeat(" ", len(submatch(0))*' . &ts . ')<CR>
+noremap <unique> [Replace]T  :s:^\( \{'.&ts.'\}\)\+:\=repeat("\t", len(submatch(0))/' . &ts . ')<CR>
 
 
 "{{{1 CMDS =================

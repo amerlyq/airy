@@ -3,7 +3,7 @@ if neobundle#tap('GoldenView.Vim') "{{{
   let g:goldenview__enable_at_startup = 1
   let g:goldenview__enable_default_mapping = 0
   " ALSO :Disable*, :Enable*
-  noremap <unique>      <Leader>tm <Plug>ToggleGoldenViewAutoResize
+  noremap <unique>      [Toggle]m <Plug>ToggleGoldenViewAutoResize
   " Do automatic/manual resizing of focused window, or split it
   nmap <unique><silent> [Frame]wt  <Plug>ToggleGoldenViewAutoResize
   nmap <unique><silent> [Frame]ws  <Plug>GoldenViewSplit
@@ -34,8 +34,8 @@ if neobundle#tap('vim-signify')  "{{{
   let g:signify_sign_delete = '-'
   noremap <unique> [Frame]gg :<C-u>SignifyFold<CR>
   " FIND:THINK: isn't :SignifyRefresh unnecessary?
-  noremap <unique> <leader>tg :<C-u>SignifyToggleHighlight \| SignifyRefresh<CR>
-  noremap <unique> <leader>tG :<C-u>SignifyToggle<CR>
+  noremap <unique> [Toggle]g :<C-u>SignifyToggleHighlight \| SignifyRefresh<CR>
+  noremap <unique> [Toggle]G :<C-u>SignifyToggle<CR>
   "" Already mapped -- if busy: automaps <leader>gj and <leader>gk
   nmap <silent><unique> ]c <Plug>(signify-next-hunk)
   nmap <silent><unique> [c <Plug>(signify-prev-hunk)
@@ -64,7 +64,7 @@ if neobundle#tap('vim-quickhl')  "{{{
    map <unique> [Quote]h  <Plug>(operator-quickhl-manual-this-motion)
   nmap <unique> [Quote]H  <Plug>(quickhl-manual-reset)
   nmap <unique> <Leader>?h  :QuickhlManualList<CR>
-  nmap <unique> <Leader>th  <Plug>(quickhl-cword-toggle)
+  nmap <unique> [Toggle]h  <Plug>(quickhl-cword-toggle)
   nmap <unique> <Leader>Th  <Plug>(quickhl-manual-toggle)
   "" ATTENTION: unusable on big tag base (like kernels)
   nmap <unique> <Leader>TH  <Plug>(quickhl-tag-toggle)
@@ -74,7 +74,7 @@ endif "}}}
 
 
 if neobundle#tap('vim-indent-guides')  "{{{
-  nnoremap <unique> <Leader>tI :IndentGuidesToggle<CR>
+  nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>
   let g:indent_guides_enable_on_vim_startup = 1
   let g:indent_guides_exclude_filetypes = [
         \ 'votl', 'iav_term']  " SEE RangerChooser

@@ -85,4 +85,4 @@ command! -bar -bang -nargs=0 EverywhereNotchesList
       \ call s:everywhere_print(s:patterns)
       \ | syntax off | syntax on
 
-nnoremap <unique> <Leader>tT :EverywhereNotchesToggle<CR>
+nnoremap <unique> [Toggle]T :EverywhereNotchesToggle<CR>

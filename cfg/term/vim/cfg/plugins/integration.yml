@@ -42,10 +42,14 @@ KabbAmine/zeavim.vim:  # CHECK:  WTF?
   external_commands: zeal
   mappings: [<Plug>ZV, <Plug>Zeavim]
 
-# BUG: seems like can't do it lazy?
 jamessan/vim-gnupg:  # CHECK:
   description: Edit and save encrypted '*.gpg' files in-place
   external_commands: gpg
+  # augroup: GnuPG
+  filename_patterns: ['.gpg$', '.asc$', '.pgp$']
+  # filename_patterns: ['\.gpg$','\.asc$','\.pgp$']
+  # verbose: 1
+  lazy: 0  # BUG: seems like can't do it lazy?
 
 --- ## VCS
 tpope/vim-git: {}  # CHECK:  WTF?

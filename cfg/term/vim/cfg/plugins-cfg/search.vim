@@ -89,17 +89,16 @@ if neobundle#tap('vim-over') "{{{
   " DISABLED: because of bug in 'vimoutliner' mappings
   " noremap  <unique><silent>  :  :OverCommandLine /<CR>
   let s:subs = {
-  \ 'c' : 's;;;g<CR><Left><Left>',
-  \ 'C' : 'g//<CR>',
-  \ 'rw': 's;;<C-r><C-w>;g<CR><Left><Left>',
-  \ 'ry': 's;;<C-r>";g<CR><Left><Left>',
-  \ 'r+': 's;;<C-r>+;g<CR><Left><Left>',
-  \ 'r/': 's;;<C-r>/;g<CR><Left><Left>',
-  \ 'R' : 'v//<CR>',
+  \ '<Leader>c' : 's;;;g<CR><Left><Left>',
+  \ '<Leader>C' : 'g//<CR>',
+  \ '<Leader>R' : 'v//<CR>',
+  \ '[Replace]w': 's;;<C-r><C-w>;g<CR><Left><Left>',
+  \ '[Replace]y': 's;;<C-r>";g<CR><Left><Left>',
+  \ '[Replace]+': 's;;<C-r>+;g<CR><Left><Left>',
+  \ '[Replace]/': 's;;<C-r>/;g<CR><Left><Left>',
   \}
   for [c, r] in items(s:subs) | for m in ['n','x']
-    exe m.'noremap <unique><silent> <Leader>'.c
-          \ .' :OverCommandLine '.(m=='n'?'%':'').r
+    exe m.'noremap <unique><silent> '.c.' :OverCommandLine '.(m=='n'?'%':'').r
   endfor| endfor
   call neobundle#untap()
 endif "}}}

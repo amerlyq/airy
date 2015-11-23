@@ -2,10 +2,10 @@
 "   http://vim.wikia.com/wiki/Remove_trailing_spaces
 
 "{{{1 MAPS ====================
-noremap <unique> <Leader>tl :<C-u>set list! list?<CR>
-noremap <unique> <Leader>tL :<C-u>TrailingHighlight<CR>
+noremap <unique> [Toggle]l :<C-u>set list! list?<CR>
+noremap <unique> [Toggle]L :<C-u>TrailingHighlight<CR>
 
-noremap <unique> <leader>cE :<C-u>EmptyLinesCompress<CR>
+noremap <unique> [Replace]E :<C-u>EmptyLinesCompress<CR>
 
 
 "{{{1 CMDS ====================

@@ -13,11 +13,11 @@ set conceallevel=2      " Conceal all hidden beside having custom replacement
 
 
 "{{{1 Mappings ============================
-nnoremap <unique> <Leader>tz :let &foldmethod={'manual': 'syntax',
+nnoremap <unique> [Toggle]z :let &foldmethod={'manual': 'syntax',
     \ 'syntax': 'marker', 'marker': 'manual'}[&fdm] \| set fen fdm?<CR>
-" nnoremap <unique> <Leader>tz :let &foldmethod=(&fdm=='manual'?'syntax':
+" nnoremap <unique> [Toggle]z :let &foldmethod=(&fdm=='manual'?'syntax':
 "     \ &fdm=='syntax'?'marker': 'manual') \| set foldenable fdm?<CR>
-nnoremap <unique> <Leader>tZ :let &fdc=(&fdc?0:2) \| set foldenable! fen?<CR>
+nnoremap <unique> [Toggle]Z :let &fdc=(&fdc?0:2) \| set foldenable! fen?<CR>
 
 
 "{{{1 IMPL ============================

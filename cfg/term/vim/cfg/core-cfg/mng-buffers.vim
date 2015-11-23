@@ -3,7 +3,7 @@ set splitright  " focus new window after vertical splitting
 set splitbelow  " focus new window after horizontal splitting
 
 " Use on each window of split, to scroll in sync
-nnoremap <unique> <Leader>tb :setl scrollbind! scb?<CR>
+nnoremap <unique> [Toggle]b :setl scrollbind! scb?<CR>
 
 " switching
 noremap <unique> zh  <C-W>h
