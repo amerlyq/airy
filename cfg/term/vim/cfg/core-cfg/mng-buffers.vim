@@ -11,10 +11,6 @@ noremap <unique> zj  <C-W>j
 noremap <unique> zk  <C-W>k
 noremap <unique> zl  <C-W>l
 
-" Move between folds
-noremap <unique> zJ  zj
-noremap <unique> zK  zk
-
 " switch to adjacent buffer in current window
 noremap <unique> gh  :<C-U>bprev<CR>
 noremap <unique> gl  :<C-U>bnext<CR>

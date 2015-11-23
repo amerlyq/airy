@@ -27,18 +27,14 @@ Neovim
 	[_] https://github.com/neovim/neovim/wiki/Related-projects
 	[_] Search for async term cmds launcher plugin
 		If not found -- extract from ranger filechooser common code
-
 	2015-11-19 [X] DEV:THINK: For neobundle use generating yml -> plugins.vim
 		Generate plugins.vim by python/awk inside ./setup from plugins.yml
 		:= You can use yml back-references for identical configs!
 		: http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
-
 	[_] Check my vim-focus-autocmd on compatability and unnecessity
 	[_] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves рывками
 	[_] Disable textwidth indicator column when screensize smaller then tw
-	[_] Vimserver by rpc for LaTeX and FIX? ranger issue to not open vim in vim
-		https://github.com/neovim/neovim/issues/1531
 	[_] THINK autosave on stop writing? -- can be trouble on pause in insert mode
 		: for writing on android
 	2015-11-19 [X] TODO On help window -- disable 'gh/gl' features to prohibit replace help buffer
@@ -51,19 +47,27 @@ Neovim
 		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : 'w'
 		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : '<Esc>cc' . v:count . '<Esc>'
 	[_] BUG RangerChooser -- after ':<C-f>' opens inside command line window instead of main
-	[_] Exit back to ranger/shell with cursor on current opened file in exit moment
-		:THINK:FIND: last viewed buffer with real file
 	[_] BUG gf in *.vim opens file './.' instead of './<cword>'
 	[_] TODO:TRY: vim-plug and measure startup time, with caching -- <100 times>
 		:: REQ to improve mappings not only for <Plug>. THINK -- is necessary?
 		:: REQ caching for deferred loading to improve startup time more
+	[_] THINK:USAGE: NrrwRgn splits -- for editing lyrics tables?
+	2015-11-23 [X] TODO: replace all <Leader>t on [Toggle]t, then define [Toggle]=[Frame]t
+	2015-11-23 [X] Pause on file open (for certain files only?)
+		:> Culprit is vim-xkbswitch -- it's old bug, must see src
+
+
+Future
+	[_] Vimserver by rpc for LaTeX and FIX? ranger issue to not open vim in vim
+		https://github.com/neovim/neovim/issues/1531
+	[_] Exit back to ranger/shell with cursor on current opened file in exit moment
+		:THINK:FIND: last viewed buffer with real file
 	[_] THINK:FIND? Duplicates of 'ftplugin/' dir of all plugins -- necessary for lazy loading?
 		:= Currently, seems like no? Neobundle can handle ftplugin/ itself?
-	[_] THINK:USAGE: NrrwRgn splits -- for editing lyrics tables?
-	[_] TODO: replace all <Leader>t on [Toggle]t, then define [Toggle]=[Frame]t
 
 
 BUG plugins
+	[_] BUG: Tagbar -- open with preview -- deletes all manual folds in buffer
 	[_] NrrwRgn -- can't drop highlight after manually closing regions?
 		:= Like when opening two regions, :diffthis on them and then :q
 	[_] THINK: I use split more often than I think: :vs, :h, etc.
@@ -78,13 +82,14 @@ BUG plugins
 		[_] After lazy loading first '*' on visual don't highlight
 		[_] If z* isn't on first character -- highlight isn't enabled
 		[_] After reopening file, n/N searches in backward direction!
-	[_] vim-stay -- text is folded on restore
+	[_] vim-stay -- text is folded on restore -- if fdm=syntax changed to manual
 	[_] BUG: neobundle -- filename_pattern -- confusing regex rules
 	[_] XXX: neobundle -- recursive call -- red repeatable text
 		2015-11-22 [X] -- 'yq' or in case of 'vqa' for surround -- rarely
 		:> Seems like it my fault with textobj-user depends on itself for backrefs
 		[_] -- when replacing and dld repo for plugin (same name, different url -- like 'ag')
 		[_] -- for ':Ag' when using 'command_prefix'
+		[_] -- on new plugins install
 	[_] XXX: something accidentaly enables 'set list' in help/votl/curr buffer
 	[_] BUG: vimoutliner -- has 'nmap' instead of 'nnoremap'
 		:= Therefore don't work with remapped ':'

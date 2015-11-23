@@ -22,11 +22,11 @@ szw/vim-dict:  # CHECK:
 # rkitover/vimpager: {}
 
 --- ## Services
-# BUG: no Lazy -- vim will pause ENTER on file open
 lyokha/vim-xkbswitch:  # CHECK:
   description: Auto-switch for english/custom pair of langs on mode change
-  commands: EnableXkbSwitch
-  filetypes: [tex, latex, bib, markdown, votl, txt]
+  # commands: EnableXkbSwitch
+  # filetypes: [tex, latex, bib, markdown, votl, txt]
+  lazy: 0  # BUG:FIXME: no Lazy -- vim will pause 'ENTER on file open'
 
 chrisbra/unicode.vim:  # CHECK:
   description: Search/preview unicode characters. Useful for font pictures.

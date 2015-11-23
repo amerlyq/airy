@@ -38,3 +38,10 @@ else  " OR:STD:
   au MyAutoCmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
         \|    exe "normal! g'\"" | endif
 endif "}}}
+
+
+" if neobundle#tap('FastFold') "{{{
+"   let g:fastfold_fold_movement_commands = [']z', '[z', 'zJ', 'zK']
+"   call neobundle#untap()
+" else  " OR:STD:
+" endif "}}}
