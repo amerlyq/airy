@@ -7,21 +7,23 @@ cdauto() { local p="${@: -1}"
     [[ -z "$p" || -d "$p" ]] && \cd $@ || \cd ${@:1:-1} "${p%/*}"; }
 alias cd='cdauto'
 
-alias svim='sudo $EDITOR -u ~/.vim/vimrc'
-alias vi='$EDITOR -u ~/.vim/vimrc_basic'
+# WARNING: Use 'sudo' w/o user cfgs, so viminfo, swap won't've root rights!
+alias v='$EDITOR'
+alias sv='sudo v'
+alias vi='v -u NONE --noplugin'
+alias vb='v -u ~/.vim/vimrc_basic'
 scpvim(){ $EDITOR scp://${2:-srk}/"${1:-$(xsel -o)}"; }
-v() { #servername == syntex (must be for LaTeX)
-    local _V fl=~/.cache/vim/servername
-    if [ -f "$fl" ]; then
-        _V=$(cat "$fl")
-        $EDITOR --servername $_V --remote-silent $@
-        $EDITOR --servername $_V --remote-send ':redraw<CR>'
-    else
-        $EDITOR $@
-    fi
-}
-#alias vim='\vim --cmd "let g:loaded_youcompleteme = 1"'
-#alias ycm='\vim --cmd "let g:loaded_youcompleteme = 0"'
+
+# v() { #servername == syntex (must be for LaTeX)
+#     local _V fl=~/.cache/vim/servername
+#     if [[ -f "$fl" ]]; then
+#         _V=$(cat "$fl")
+#         $EDITOR --servername $_V --remote-silent $@
+#         $EDITOR --servername $_V --remote-send ':redraw<CR>'
+#     else
+#         $EDITOR $@
+#     fi
+# }
 
 alias s='source r.ranger'
 alias w3m='\w3m google.com'
