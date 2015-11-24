@@ -10,6 +10,14 @@ if neobundle#tap('vinarise.vim') "{{{
 endif "}}}
 
 
+if neobundle#tap('vim-dict') "{{{
+  " let g:dict_leave_pw = 0
+  " let g:dict_hosts = [ ["127.0.0.1", ["*"]] ]
+  " ["dict.org", ["all"]],
+  " ["dict.mova.org", ["slovnyk_en-pl", "slovnyk_pl-en"]] ]
+  call neobundle#untap()
+endif "}}}
+
 "{{{1 Services ============================
 if neobundle#tap('vim-xkbswitch') "{{{
   let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/xkbswitch.vim'

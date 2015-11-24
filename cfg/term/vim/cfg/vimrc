@@ -22,18 +22,12 @@ call s:cfg('neobundle.vim')
 filetype plugin indent on  " Required!
 syntax enable
 
-
-let g:mapleader=","
 call s:cfg('core-cfg/*.vim')
-" call s:source_rc('edit.rc.vim')
-" call s:source_rc('view.rc.vim')
-" call s:source_rc('filetype.rc.vim')
-" call s:source_rc('mappings.rc.vim')
 
+call s:cfg('features/'.(has('nvim') ? 'neovim' : 'vim').'.vim')
 call s:cfg('features/'.(IsAndroid() ? 'android' : 'clipboard').'.vim')
-" call s:cfg('features/'.(IsWindows() ? 'windows' : 'unix').'.vim')
-" call s:cfg('features/'.(has('gui_running') ? 'gui' : 'term').'.vim')
-" call s:cfg('features/'.(has('nvim') ? 'neovim' : 'vim').'.vim')
+call s:cfg('features/'.(IsWindows() ? 'windows' : 'unix').'.vim')
+call s:cfg('features/'.(has('gui_running') ? 'gui' : 'term').'.vim')
 
 " " Default home directory.
 " let t:cwd = getcwd()

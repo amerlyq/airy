@@ -12,9 +12,13 @@ wmvanvliet/vim-ipython:  # CHECK:
   description: (OR wilywampa/vim-ipython) Integration of python notebooks
   external_commands: ipython
 
-szw/vim-dict:  # CHECK:
-  description: Use '!dict' translations from inside vim
+amerlyq/vim-dict:
+  description: |
+    - HACK: forked for rich formatting, syntax HL, shorcuts
+    - Use '!dict' translations from inside vim
   external_commands: dict
+  mappings: [[nx, g=]]
+  commands: [Dict, DictShowDb]
 
 # W3m from vim
 #yuratomo/w3m.vim: {}
@@ -33,7 +37,7 @@ chrisbra/unicode.vim:  # CHECK:
   description: Search/preview unicode characters. Useful for font pictures.
   commands: [Digraphs, SearchUnicode, UnicodeName,
              UnicodeTable, DownloadUnicode]
-  mappings: [[n, <C-X><C-G>], [n, <C-X><C-Z>], [n, <F4>]]
+  mappings: [[n, <C-X><C-G>, <C-X><C-Z>, <F4>]]
 
 KabbAmine/zeavim.vim:  # CHECK:  WTF?
   description: Docs online searcher in one button for word under cursor

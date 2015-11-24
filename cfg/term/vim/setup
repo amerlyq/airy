@@ -60,10 +60,8 @@ fi
 ### PLUGINS ###
 if cfgOpt u || [[ ! -d "$VCACHE/bundle" ]]; then
     # FIXME: error on clean system, when NeoBundle is not installed yet
-    $EDITOR -E -X -R -i NONE -c "set nomore" \
-        +NeoBundleClearCache +NeoBundleInstall\! \
-        +qall </dev/tty ||:
-
+    $EDITOR -E -X -R -i NONE -c "set nomore" +NeoBundleClearCache +qall </dev/tty ||:
+    $EDITOR -E -X -R -i NONE -c "set nomore" +NeoBundleUpdate\! +qall </dev/tty ||:
     ! has_pr nvim || nvim -E -X -R -i NONE -c "set nomore" \
         +UpdateRemotePlugins +qall </dev/tty ||:
 fi
