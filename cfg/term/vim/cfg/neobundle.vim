@@ -14,15 +14,17 @@ endif
 
 let g:neobundle#default_options = {}
 let g:neobundle#install_max_processes = 8
-let g:neobundle#types#git#default_protocol = 'https'  " OR https, ssh
-let g:neobundle#types#git#clone_depth = 1           " Shallow copy
+let g:neobundle#types#git#default_protocol = 'https'  " OR https, git, ssh
+let g:neobundle#types#git#clone_depth = 1             " Shallow copy
 let g:neobundle#types#git#enable_submodule = 1
 
 
 call neobundle#begin(expand('$BUNDLES'))
 " if neobundle#load_cache()
-NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
 
+" SEE ref for yaml:
+"   http://www.yaml.org/refcard.html
+"   http://learnxinyminutes.com/docs/yaml/
 function! LoadFromYAMLs(cfgpaths, default)  " ALT: py3file load_yaml.py
   if !exists(':PythonI') | finish | endif   " SEE: core/detect.vim::PythonI
 PythonI << endofpython
@@ -39,15 +41,14 @@ for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
 endofpython
 endfunc
 
-call SourcePlugins()
-" SEE
-"   http://www.yaml.org/refcard.html
-"   http://learnxinyminutes.com/docs/yaml/
+NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
 call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
       \ 'plugins/*.yml', 0, 1), {'lazy': 1})
+
 " NeoBundleSaveCache
 " endif
 call SourcePluginsCfg()
 call neobundle#end()  " Load all listed non-lazy plugins
 
-NeoBundleCheck
+" Check new plugins if cache was cleared and plugins list reloaded:
+if exists('*LoadFromYAMLs') | NeoBundleCheck | endif
