@@ -33,9 +33,9 @@ endif "}}}
 
 if neobundle#tap('vim-gnupg') "{{{
   fun! neobundle#hooks.on_post_source(bundle)
-    edit  " Re-read buffer to initiate GnuPG autocommands
+    " edit  " Re-read buffer to initiate GnuPG autocommands
     " OR:TRY:
-    " silent! exe 'doautocmd BufReadCmd' expand('%')
+    silent! exe 'doautocmd BufReadCmd' expand('%')
     " silent! exe 'doautocmd FileReadCmd' expand('%')
     " silent! exe 'doautocmd GnuPG BufReadCmd'
   endf

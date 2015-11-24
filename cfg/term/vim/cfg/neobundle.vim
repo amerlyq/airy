@@ -28,7 +28,7 @@ call neobundle#begin(expand('$BUNDLES'))
 function! LoadFromYAMLs(cfgpaths, default)  " ALT: py3file load_yaml.py
   if !exists(':PythonI') | finish | endif   " SEE: core/detect.vim::PythonI
 PythonI << endofpython
-import vim, yaml, json
+import vim, yaml, json  # Use json to correct '\' escaping when print(dict)
 fmt = 'NeoBundle "{!s:s}", {!s}'
 cfgs, defs = map(vim.eval, ("a:cfgpaths", "a:default"))
 for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):

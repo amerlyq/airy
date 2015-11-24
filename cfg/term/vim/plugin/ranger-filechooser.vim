@@ -7,7 +7,7 @@
 
 
 "{{{1 MAPS ====================
-if IsWindows()
+if exists('*IsWindows') && IsWindows()
   let $SHELL='cmd.exe'  " Is any sense using git-msys under git instead?
   noremap <unique>  <Leader>f :<C-U>VimFiler<CR>
 else

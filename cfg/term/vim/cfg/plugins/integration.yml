@@ -45,8 +45,11 @@ KabbAmine/zeavim.vim:  # CHECK:  WTF?
 
 jamessan/vim-gnupg:  # CHECK:
   description: Edit and save encrypted '*.gpg' files in-place
-  external_commands: gpg
-  filename_patterns: ['\.gpg$', '\.asc$', '\.pgp$']
+  # external_commands: gpg
+  # filename_patterns: ['\.gpg$', '\.asc$', '\.pgp$']
+  explorer: '.*\.\(gpg\|asc\|pgp\)$'
+  # explorer: '.*mutt'
+  # explorer: 1
   # lazy: 0  # BUG: seems like can't do it lazy?
 
 --- ## VCS

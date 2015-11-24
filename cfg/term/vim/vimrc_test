@@ -1,0 +1,40 @@
+set nocompatible
+set encoding=utf-8
+
+let $NEOBUNDLE=expand('/tmp/bundle/neobundle.vim')
+if !filereadable(expand('$NEOBUNDLE/README.md'))
+  exe printf('!git clone --depth=1 %s',
+        \ 'https://github.com/Shougo/neobundle.vim') $NEOBUNDLE
+endif
+set runtimepath^=$NEOBUNDLE
+
+let g:neobundle#default_options = {}
+let g:neobundle#types#git#default_protocol = 'https'
+let g:neobundle#types#git#clone_depth = 1
+let g:neobundle#types#git#enable_submodule = 1
+
+call neobundle#begin(expand('/tmp/bundle'))
+  NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
+
+  " \ 'filename_patterns': ['\.gpg$', '\.asc$', '\.pgp$']
+  NeoBundle 'jamessan/vim-gnupg', {
+  \ 'explorer': '.*\.\(gpg\|asc\|pgp\)$',
+  \ 'lazy': 1,
+  \ }
+
+  if neobundle#tap('vim-gnupg') "{{{
+    fun! neobundle#hooks.on_post_source(bundle)
+      " edit
+      silent! exe 'doautocmd BufReadCmd' expand('%')
+      " silent! exe 'doautocmd FileReadCmd' expand('%')
+      " silent! exe 'doautocmd GnuPG BufReadCmd'
+    endf
+    call neobundle#untap()
+  endif "}}}
+
+call neobundle#end()
+
+filetype plugin indent on  " Required!
+syntax enable
+
+NeoBundleCheck
