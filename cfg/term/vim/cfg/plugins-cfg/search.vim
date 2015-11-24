@@ -89,7 +89,7 @@ if neobundle#tap('vim-over') "{{{
   " DISABLED: because of bug in 'vimoutliner' mappings
   " noremap  <unique><silent>  :  :OverCommandLine /<CR>
   let s:subs = {
-  \ '<Leader>c' : 's;;;g<CR><Left><Left>',
+  \ '<Leader>c' : 's;;<C-r>=SubsCount()<CR>;g<CR><Left><Left>',
   \ '<Leader>C' : 'g//<CR>',
   \ '<Leader>R' : 'v//<CR>',
   \ '[Replace]w': 's;;<C-r><C-w>;g<CR><Left><Left>',

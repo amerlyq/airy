@@ -40,14 +40,22 @@ vnoremap <unique> [Replace]s :<C-U>%s;\V<C-R>=GetVisualSelection("")<CR>;;g<CR><
 " noremap <unique> <leader>cR :s/.*/\=tr(submatch(0), '()', '[]')
 
 " DEV:TODO: merge with vim-over definitions to exterminate duplicates
+" DEV: '21,c': v:count for ',c' -- \2\1, use <expr> mapping, add backslash
+" BUG: adds visual markers '<, '> before subs.
+fun! SubsCount()
+  let rhs = (v:count ? substitute(string(v:count), '.', '\\&', 'g') : '')
+  return l:rhs
+endfun
+
 let s:subs = {
-\ '<Leader>c' : 's;;;g<Left><Left>',
+\ '<Leader>c' : 's;;<C-r>=SubsCount()<CR>;g<Left><Left>',
 \ '<Leader>C' : 'g//',
 \ '<Leader>R' : 'v//',
 \ '[Replace]w': 's::<C-r><C-w>:g<Left><Left>',
 \ '[Replace]y': 's::<C-r>":g<Left><Left>',
 \ '[Replace]+': 's::<C-r>+:g<Left><Left>',
 \ '[Replace]m': 's;;<C-r>/;g<Left><Left>',
+\ '[Replace]v': '<C-u>s;;<C-r>=GetVisualSelection(" ")<CR>;g<Left><Left>',
 \ '[Replace]e': 's;;;g<CR>',
 \ '[Replace]d': 'g//d<CR>',
 \ '[Replace]f': 'v//d<CR>',

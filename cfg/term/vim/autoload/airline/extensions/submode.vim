@@ -1,5 +1,6 @@
-" vim: et ts=2 sts=2 sw=2
-" @copyright (c) Dmytro Kolomoiets (amerlyq), 2015: MIT License
+" vim: ts=2 sts=2 sw=2
+" @copyright: Dmytro Kolomoiets (amerlyq), 2015
+" @license: MIT
 " @refs: https://github.com/kana/vim-submodule
 
 if !exists('*submode#current') | finish | endif
@@ -16,14 +17,12 @@ function! airline#extensions#submode#init(ext)
 endfunction
 
 function! airline#extensions#submode#apply(...)
-  let w:airline_section_b = get(w:, 'airline_section_b', g:airline_section_b)
-  if w:airline_section_b != ''
-    let w:airline_section_b .= s:spc . g:airline_left_alt_sep . s:spc
-  endif
-  let w:airline_section_b .= '%{airline#extensions#submode#get()}'
+  let w:airline_section_a = get(w:, 'airline_section_a', g:airline_section_a)
+  let w:airline_section_a .= '%{airline#extensions#submode#get()}'
 endfunction
 
 function! airline#extensions#submode#get()
   let l:nm = submode#current()
-  return (l:nm != '') ? g:airline#extensions#submode#prefix.l:nm : l:nm
+  return (l:nm == '') ? l:nm : s:spc.s:spc . g:airline_left_alt_sep
+      \ . s:spc . g:airline#extensions#submode#prefix . l:nm
 endfunction

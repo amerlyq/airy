@@ -26,6 +26,7 @@ command! -bar -nargs=0 RelnumToggle  set relativenumber! rnu?
 
 function! s:RelnumUpdate(...)
   if !g:auto_relnum_focused | return | endif
+  if &l:buftype =~ 'help\|nofile' || &l:previewwindow | return | endif
   if a:0 > 0 | let &relativenumber = a:1 | endif
   let &numberwidth = max([&g:nuw, 4, 1+strlen(line('w$'))])  " TODO:RFC
 endfunc
