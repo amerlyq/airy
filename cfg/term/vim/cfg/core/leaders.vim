@@ -5,6 +5,8 @@ let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugins.
 
 " NOTE more toggle prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
 " ALT ; m , + <Space>+ <C-Space> <Tab> <S-Tab> <Bar>
+"MPogoda thinks it's better change <Leader> to '-'
+
 
 let s:leads = {'[Frame]': '\', '[Space]': '<Space>'}
 for [to, fr] in items(s:leads)

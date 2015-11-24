@@ -6,6 +6,8 @@ let g:fold_extend_preview = 1
 " Move between folds
 noremap <silent><unique> zJ  zj
 noremap <silent><unique> zK  zk
+" Focus the current fold by closing all others
+nnoremap <silent><unique> ZZ mzzM`zzv
 
 " Toggle folds
 nnoremap <unique> [Toggle]z :let &foldmethod={'manual': 'syntax',

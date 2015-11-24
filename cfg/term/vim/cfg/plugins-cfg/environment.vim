@@ -30,6 +30,13 @@ endif "}}}
 
 
 "{{{1 State ============================
+if neobundle#tap('Recover.vim') "{{{
+  let g:RecoverPlugin_No_Check_Swapfile = 1
+  " XXX: Seems like don't work
+  " au MyAutoCmd SwapExists * nested  NeoBundleSource Recover.vim
+  call neobundle#untap()
+endif "}}}
+
 if neobundle#tap('vim-stay') "{{{
   " set viewoptions=cursor,folds,slash,unix   " Recommended
   call neobundle#untap()

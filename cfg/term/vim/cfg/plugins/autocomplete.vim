@@ -27,17 +27,18 @@ NeoBundleLazy 'Shougo/neocomplete.vim', {
     \ 'insert': 1,
     \ 'depends' : [ 'Shougo/context_filetype.vim' ],
     \ 'vim_version' : '7.3.885',
-    \ 'disabled' : !has('lua'), 'neovim': 0 }
+    \ 'disabled' : !has('lua') || has('nvim') }
 
 " DO: :UpdateRemotePlugins and restart. Then once execute :DeopleteEnable
 NeoBundleLazy 'Shougo/deoplete.nvim', {
     \ 'insert': 1,
-    \ 'depends': [ 'Shougo/context_filetype.vim' ],
+    \ 'depends': 'Shougo/context_filetype.vim',
     \ 'neovim': 1 }
 
 " ALT SirVer/ultisnips
 NeoBundleLazy 'Shougo/neosnippet.vim', {
-    \ 'autoload' : { 'filetypes': 'snippet', 'insert': 1 },
+    \ 'filetypes': 'snippet',
+    \ 'insert': 1,
     \ 'depends' : [
     \   'Shougo/context_filetype.vim',
     \   'Shougo/neosnippet-snippets',

@@ -1,9 +1,6 @@
 Shougo/tabpagebuffer.vim:
   filetypes: all
 
-Shougo/neomru.vim:
-  filetypes: all
-
   #Yggdroot/indentLine:
   #filetypes: all
 
@@ -11,32 +8,6 @@ Shougo/unite-sudo: {}
 
 Shougo/echodoc.vim:
   insert: 1
-
-  #Shougo/neocomplcache.vim:
-  #insert: 1
-
-Shougo/neocomplete.vim:
-  depends: Shougo/context_filetype.vim
-  insert: 1
-
-Shougo/deoplete.nvim:
-  depends: Shougo/context_filetype.vim
-  insert: 1
-  neovim: 1
-
-Shougo/neosnippet.vim:
-  depends: [Shougo/neosnippet-snippets, Shougo/context_filetype.vim]
-  insert: 1
-  filetypes: snippet
-  unite_sources: [neosnippet, neosnippet/user, neosnippet/runtime]
-
-Shougo/unite.vim:
-  depends: Shougo/neomru.vim
-  neovim: 1
-
-    [plugins.commands]
-    name: Unite
-    complete: 'customlist,unite#complete_source'
 
 Shougo/unite-build: {}
 
@@ -50,30 +21,9 @@ ujihisa/vimshell-ssh:
 Shougo/vim-vcs:
   depends: thinca/vim-openbuf
 
-Shougo/vimfiler.vim:
-  depends: Shougo/unite.vim
-  mappings: <Plug>
-  explorer: '^\h\w*:'
-
-    [plugins.commands]
-    name: [VimFiler]
-    complete: 'customlist,vimfiler#complete'
-
-Shougo/vimshell.vim:
-  mappings: <Plug>
-
-    [plugins.commands]
-    name: VimShell
-    complete: 'customlist,vimshell#complete'
-
 yomi322/vim-gitcomplete:
   filetypes: vimshell
 
-Shougo/vinarise.vim: {}
-
-    [plugins.commands]
-    name: Vinarise
-    complete: file
 
 vim-jp/vital.vim:
   commands: Vitalize
@@ -244,6 +194,3 @@ thinca/vim-themis:
 
 osyo-manga/vim-monster:
   filetypes: ruby
-
-cespare/vim-toml:
-  filetypes: toml

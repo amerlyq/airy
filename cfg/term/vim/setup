@@ -8,7 +8,7 @@ mkdir -p "${XDG_DATA_HOME:=$HOME/.cache}/shada"
 
 if distro arch; then
     mkdef editor $(which $EDITOR)
-    has_pr nvim && mkdef vim $(which $EDITOR) ||:
+    # has_pr nvim && mkdef vim $(which $EDITOR) ||:
 elif distro ubuntu; then
     for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
     # dst=~/.selected_editor

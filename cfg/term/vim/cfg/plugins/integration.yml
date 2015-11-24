@@ -4,8 +4,8 @@ Shougo/vinarise.vim:  # CHECK:
     - Ultimate hex-editing system
     - depends on hexript for some optional scripts
     - (now that repo rbtnn/hexript.vim don't exists?)
-  commands : [Vinarise, VinariseDump]
-  explorer: 1
+  commands: [{name: Vinarise, complete: file}, VinariseDump]
+  # explorer: 1
 
 wmvanvliet/vim-ipython:  # CHECK:
   description: (OR wilywampa/vim-ipython) Integration of python notebooks
@@ -45,11 +45,10 @@ KabbAmine/zeavim.vim:  # CHECK:  WTF?
 jamessan/vim-gnupg:  # CHECK:
   description: Edit and save encrypted '*.gpg' files in-place
   external_commands: gpg
-  # augroup: GnuPG
   filename_patterns: ['.gpg$', '.asc$', '.pgp$']
   # filename_patterns: ['\.gpg$','\.asc$','\.pgp$']
   # verbose: 1
-  lazy: 0  # BUG: seems like can't do it lazy?
+  # lazy: 0  # BUG: seems like can't do it lazy?
 
 --- ## VCS
 tpope/vim-git: {}  # CHECK:  WTF?

@@ -4,8 +4,12 @@
 #   http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
 
 Shougo/unite.vim:  # CHECK
-  description: Fast fuzzy access to list info sources. Dependency of 'unite-*'.
-  depends: Shougo/neomru.vim
+  description: Fast fuzzy access to List i-sources. Dependency of 'unite-*'.
+  neovim: 1
+  commands:
+    name: Unite
+    complete: customlist,unite#complete_source
+  # depends: Shougo/neomru.vim  # WTF? it was in Shougo config?
 
 Shougo/unite-outline:  # CHECK
   depends: Shougo/unite.vim
@@ -13,6 +17,7 @@ Shougo/unite-outline:  # CHECK
 
 Shougo/neomru.vim:  # CHECK
   depends: Shougo/unite.vim
+  # filetypes: all  # WTF? used by Shougo, but in help he warned it's BAD?
 
 # thinca/vim-unite-history:
 #   depends: Shougo/unite.vim

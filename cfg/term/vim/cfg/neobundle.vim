@@ -13,6 +13,7 @@ if has('vim_starting')
 endif
 
 let g:neobundle#default_options = {}
+let g:neobundle#install_max_processes = 8
 let g:neobundle#types#git#default_protocol = 'https'  " OR https, ssh
 let g:neobundle#types#git#clone_depth = 1           " Shallow copy
 let g:neobundle#types#git#enable_submodule = 1
