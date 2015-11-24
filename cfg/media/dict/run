@@ -1,10 +1,26 @@
 #!/bin/bash -e
 
-## Server: no demon
-case "$1" in --debug) dictd -d nofork -d init; exit ;; esac
+fvim() {
+    local DMENU='dmenu -i -p W: -b -nb #000000 -nf #999999 -sb #000000 -sf #31AC65 -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+    local fl=~/.cache/airy/dict-words.txt
+    touch "$fl"
+    word=$(cat "$fl" | $DMENU)
+    [[ -n "$word" ]] || return
+    echo "$word" >> "$fl"
+    x-terminal-emulator -name Float -e editor \
+        -c "Dict $word" -c "on"
+}
 
-if dict -h localhost -H >/dev/null; then
-    dict "$@" | w3m -T "text/html" | less +/Universal
-else
-    dict "$@" | less "+/$@"
-fi
+fshell() {
+    if dict -h localhost -H >/dev/null; then
+        dict "$@" | w3m -T "text/html" | less +/Universal
+    else
+        dict "$@" | less "+/$@"
+    fi
+}
+
+case "$1"
+in --debug) dictd -d nofork -d init  ## Server: no demon
+;; --vim) fvim $@
+;; *) fshell $@
+;; esac

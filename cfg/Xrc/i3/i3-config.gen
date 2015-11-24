@@ -232,6 +232,8 @@ wprf "\n### ================== Launchers =================== ###\n"
 STD_FMG="pcmanfm"
 command -v $STD_FMG >/dev/null 2>&1 || STD_FMG="nemo --no-desktop"
 
+wstr "$mod+y $exno r.dict --vim"
+
 w_header "Mode: Open"
 m_open="<O>pen : [n]cmpcpp, [h]top | vim[b], [p]idgin, [f]irefox, <k>rita | [m]usic"
     wmode_begin "$mod+o" 'open' "$m_open"
@@ -391,4 +393,3 @@ $bartheme}
 # "
 
 echo "W: $dst"
-
