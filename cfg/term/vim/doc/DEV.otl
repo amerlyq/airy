@@ -44,8 +44,8 @@ Operators
 	[_] DEV remap back 'g;' and 'g,' -- as them useful to jump between last changes
 		:= Smth with <C-..> would be useful -- as analogy to C-o and C-i
 		:= I've already lost <Tab> due to [Unite], so I need submode for all this?
-	[_] Integrate 'Konfekt/FoldText' in my 'fold.vim', but use left-adjusting
-		[_] RFC printing code, FIX aligning
+	[_] On key sends obj/sel to new buffer in split window in separate named tab
+		:= Useful for deffered analysis, focused on of several functions together
 
 	[_] DEV mapping to move in column like '{/}' -- on gG, g{, g}
 		for more simple C-v block selecting
@@ -73,6 +73,16 @@ Operators
 
 
 > Plugins
+
+Fold-pretty
+	[_] Integrate in my 'fold.vim', but use left-adjusting
+		: https://github.com/Konfekt/FoldText
+	[_] RFC printing code, FIX aligning
+	[_] Dynamic foldcolumn width
+		: https://github.com/thierr26/wibafoco
+	[_] SEE: why it's slow and is there sense to integrate
+		: https://github.com/Konfekt/FastFold
+	[_] Folding: check by 'au' if file contents {{{\d\{0,2\}, then set foldmethod=marker, setlocal foldmethod=manual
 
 Notches
 	Cycle through all notches

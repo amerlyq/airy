@@ -26,16 +26,16 @@ NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
 function! LoadFromYAMLs(cfgpaths, default)  " ALT: py3file load_yaml.py
   if !exists(':PythonI') | finish | endif   " SEE: core/detect.vim::PythonI
 PythonI << endofpython
-import vim, yaml
-fmt = "NeoBundle '{!s:s}', {}"
+import vim, yaml, json
+fmt = 'NeoBundle "{!s:s}", {!s}'
 cfgs, defs = map(vim.eval, ("a:cfgpaths", "a:default"))
 for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
-    with open(c) as f:
-        for doc in yaml.safe_load_all(f):
-            for src, opts in doc.items():
-                # Remove to fasten loading
-                [opts.pop(k, None) for k in ["description", "contract"]]
-                vim.command(fmt.format(src, dict(defs, **opts)))
+  with open(c) as f:
+    for doc in yaml.safe_load_all(f):
+      for src, opts in doc.items():
+        # Remove to fasten loading
+        [opts.pop(k, None) for k in ["description", "contract"]]
+        vim.command(fmt.format(src, json.dumps(dict(defs, **opts))))
 endofpython
 endfunc
 
@@ -49,4 +49,5 @@ call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
 " endif
 call SourcePluginsCfg()
 call neobundle#end()  " Load all listed non-lazy plugins
+
 NeoBundleCheck

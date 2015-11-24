@@ -49,7 +49,7 @@ endif "}}}
 
 
 if neobundle#tap('vim-signature')  "{{{
-  let g:SignatureIncludeMarkers = '!@#$%^&*()[]".'  " CHECK: >= 10
+  let g:SignatureIncludeMarkers = '!@#$%^&*()'  " CHECK: >= 10, USE? \"
   let g:SignaturePurgeConfirmation = 1
   let g:SignaturePrioritizeMarks = 0
   let g:SignatureMap = { 'PurgeMarks': "m<Del>" }

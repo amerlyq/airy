@@ -47,11 +47,14 @@ Neovim
 		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : 'w'
 		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : '<Esc>cc' . v:count . '<Esc>'
 	[_] BUG RangerChooser -- after ':<C-f>' opens inside command line window instead of main
+		:= simply execute 'tabnew' is invalid, in this window need 'itabnew<CR>'
 	[_] BUG gf in *.vim opens file './.' instead of './<cword>'
 	[_] TODO:TRY: vim-plug and measure startup time, with caching -- <100 times>
 		:: REQ to improve mappings not only for <Plug>. THINK -- is necessary?
 		:: REQ caching for deferred loading to improve startup time more
-	[_] THINK:USAGE: NrrwRgn splits -- for editing lyrics tables?
+	2015-11-24 [X] THINK:USAGE: NrrwRgn splits -- for editing lyrics tables?
+		:> Won't work -- need to edit different parts of same line --
+		:	impossible for NrrwRgn to merge changes back. Use simple :vs and merge manually
 	2015-11-23 [X] TODO: replace all <Leader>t on [Toggle]t, then define [Toggle]=[Frame]t
 	2015-11-23 [X] Pause on file open (for certain files only?)
 		:> Culprit is vim-xkbswitch -- it's old bug, must see src
@@ -90,7 +93,8 @@ BUG plugins
 		[_] If z* isn't on first character -- highlight isn't enabled
 		[_] After reopening file, n/N searches in backward direction!
 	[_] vim-stay -- text is folded on restore -- if fdm=syntax changed to manual
-	[_] BUG: neobundle -- filename_pattern -- confusing regex rules
+	2015-11-24 [X] BUG: neobundle -- filename_pattern -- confusing regex rules
+		:> Problem was in my python -- raw printing dict -- doubles backslashes
 	[_] XXX: neobundle -- recursive call -- red repeatable text
 		2015-11-22 [X] -- 'yq' or in case of 'vqa' for surround -- rarely
 		:> Seems like it my fault with textobj-user depends on itself for backrefs
@@ -300,8 +304,8 @@ vim
 		http://valloric.github.io/YouCompleteMe/
 	2015-07-06 [$] Setup Geeknote -- install newer vim? Connect to unstable?
 		:> Moved from evernote to plaintext git repository
-	[_] Folding: check by 'au' if file contents {{{\d\{0,2\}, then set foldmethod=marker, setlocal foldmethod=manual
-	[_] Try full virtual editing -- case: o<Esc>a  -- must delete line but stay indented
+	2015-11-24 [$] Try full virtual editing -- case: o<Esc>a  -- must delete line but stay indented
+		:> permanent virtual is uncomfortable, intention replaced with g{,}[oO]
 
 	[_] Color !cat
 		 http://www.vim.org/scripts/script.php?script_id=4325
