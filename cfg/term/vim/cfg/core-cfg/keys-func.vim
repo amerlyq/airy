@@ -3,6 +3,8 @@ command! -bar -bang -nargs=0 Sw write !sudo tee % >/dev/null
 " Execute command and place output in new buffer. (:new, :vnew, :tabnew)
 command! -bar -nargs=+ E new | r ! <args>
 
+cnorea  man  Man
+
 " Show highlight names under cursor
 map <F3> :echo 'hi<'.synIDattr(synID(line('.'), col('.'), 1), 'name')
     \.'> trans<'.synIDattr(synID(line('.'), col('.'), 0), 'name').'> lo<'
@@ -38,3 +40,23 @@ command! -bar -nargs=? Format2 set ts=2 sw=2 sts=2 fdl=99
 
 "" Append modeline to EOF
 " nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
+
+" DEV TRY redirect any vim command (like g] for tags) into new buffer to search
+"   ALT redirect into quickfix list
+fun! RedirectOutput(cmd)
+  redir => _
+  silent! exe a:cmd
+  redir END
+  return _
+endf
+command! -bar -range -nargs=+  R  call RedirectOutput(<q-args>)
+
+fun! MapFiltered(cmd)
+  let _ = RedirectOutput('map '.a:cmd)
+  let ms = filter(split(_, '\n'), 'match(v:val, "\\c^...\\S*<Plug>")')
+  " let command_names = join(map(split(_, '\n')[1:],
+  "       \ "matchstr(v:val, '[!\"b]*\\s\\+\\zs\\u\\w*\\ze')"))
+  tabnew | setl wfw wfh buftype=nofile bufhidden=wipe nobuflisted
+  call append(0, l:ms)
+endf
+command! -bar -range -nargs=*  Map  call MapFiltered(<q-args>)

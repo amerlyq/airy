@@ -14,7 +14,7 @@ smap <silent><unique> <C-k>  <Plug>(neosnippet_expand_or_jump)
 " imap <silent><unique> S  <Plug>(neosnippet_start_unite_snippet)
 " xmap <silent><unique> o  <Plug>(neosnippet_register_oneshot_snippet)
 
-inoremap <silent> (( <C-r>=neosnippet#anonymous('\left(${1}\right)${0}')<CR>
+" inoremap <silent> (( <C-r>=neosnippet#anonymous('\left(${1}\right)${0}')<CR>
 
 
 "" SuperTab like snippets behavior.

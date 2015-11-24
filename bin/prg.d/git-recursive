@@ -110,3 +110,19 @@ done
 for rep in "${LST[@]}"; do
     (cd "$DIR/$rep" && git_process "$rep")
 done
+
+exit
+
+# SEE https://raw.githubusercontent.com/sindresorhus/pure/master/async.zsh
+n=1
+function create_new_job {
+    ((n < ${#LST[@]})) || return
+    (cd "$DIR/$LST[$n]" && git_process "$LST[$n]" && kill -USR1 $$) &
+    ((n++))
+}
+trap create_new_job USR1
+create_new_job
+
+# for i in "${LST[@]}"; do
+#     (cd "$DIR/$rep" && git_process "$rep")
+# done

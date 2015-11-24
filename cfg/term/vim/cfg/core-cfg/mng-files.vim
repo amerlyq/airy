@@ -50,13 +50,3 @@ nnoremap <Leader>x :<C-U>Safebd<CR>
 
 " reload current buffer while discarding changes
 "nnoremap <Leader>e :edit!<cr>
-
-" DEV TRY redirect any vim command (like g] for tags) into new buffer to search
-"   ALT redirect into quickfix list
-fun! RedirectOutput(...)
-  redir @z
-  silent exe join(a:000, ' ')
-  redir END
-  new | put z
-endf
-command! -bar -nargs=+ R call RedirectOutput(<q-args>)
