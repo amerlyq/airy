@@ -6,11 +6,13 @@ endif "}}}
 
 "{{{1 Python =============================
 if neobundle#tap('jedi-vim') "{{{
-  " ATTENTION:OFF: Because of neocomplete:
-  let g:jedi#completions_command = ""  " Disable mappings, but allow omnifunc
+  " ATTENTION:OFF: Because of neocomplete/deoplete:
+  "   Disable mappings, but allow omnifunc:
+  let g:jedi#completions_command = ""
   let g:jedi#auto_vim_configuration = 0
   let g:jedi#show_call_signatures = 0
   let g:jedi#popup_select_first = 0
+
   " In runtime you can use:
   "   jedi#force_py_version_switch() OR jedi#force_py_version(py_version)
   if !has('nvim') | let g:jedi#force_py_version = 3 | endif

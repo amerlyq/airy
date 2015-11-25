@@ -13,14 +13,6 @@ tpope/vim-endwise:  # CHECK
 #NeoBundle xolox/vim-easytags, { depends: xolox/vim-misc }
 
 --- ## Neo-based
-osyo-manga/vim-marching:  # CHECK
-  description: |
-    - Async clang code completion.
-    - Integration with neocomplete: for stdlib++, boost, etc (works on Windows)
-    - http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
-  filetypes: [c, cpp]
-  depends: Shougo/vimproc.vim
-
 # THINK what can be useful to add
 # repository = Shougo/neoinclude.vim
 # repository = Shougo/neco-vim
@@ -43,6 +35,14 @@ Shougo/deoplete.nvim:  # CHECK
   insert: 1
   depends: Shougo/context_filetype.vim
 
+Shougo/neopairs.vim:  # CHECK
+  description: Insert block pairs automatically, compatible with deoplete
+  insert: 1
+
+Shougo/echodoc.vim:  # CHECK
+  description: Print documents (like function's arguments) in echo area.
+  insert: 1
+
 # ALT SirVer/ultisnips
 Shougo/neosnippet.vim:  # CHECK
   filetypes: snippet
@@ -57,10 +57,19 @@ Shougo/neosnippet.vim:  # CHECK
     - neosnippet/user
     - neosnippet/runtime
 
-# --- ## Others
-## Clang
+--- ## Others
+osyo-manga/vim-marching:  # CHECK
+  description: |
+    - Async clang code completion.
+    - Integration with neocomplete: for stdlib++, boost, etc (works on Windows)
+    - http://www.reddit.com/r/vim/comments/1x4mvg/vimmarching_with_neocomplete_doesnt_complete_c/
+  filetypes: [c, cpp]
+  depends: Shougo/vimproc.vim
+
+Rip-Rip/clang_complete:  # CHECK
+  filetypes: [c, cpp]
+  insert: 1
 #Lazy loading like this
-#Rip-Rip/clang_complete: {}  # CHECK
 #autocmd FileType c,cpp NeoBundleSource clang_complete
 
 
