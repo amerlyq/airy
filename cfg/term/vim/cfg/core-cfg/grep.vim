@@ -37,7 +37,8 @@ else
 endif
 
 if executable('cscope')
-  nnoremap <silent> <S-F1> :!cscope -b -q -R<CR>
+  " ATTENTION: w/o compression, because CCTree use outdated format
+  nnoremap <silent> <S-F1> :!cscope -bcqR<CR>
 endif
 
 " Show list of tags when there more then one entry.

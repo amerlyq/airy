@@ -27,16 +27,18 @@ augroup END
 
 
 "{{{1 Mouse in Term ============================
-if !has('nvim') && has('mouse')
-  set mouse=a           " support for mouse wheel and clicks
-  if has('mouse_sgr') || v:version > 703 || v:version == 703 && has('patch632')
-    set ttymouse=sgr
-  else
-    set ttymouse=xterm2
+if has('mouse')
+  if !has('nvim')
+    set mouse=a           " support for mouse wheel and clicks
+    if has('mouse_sgr') || v:version > 703 || v:version == 703 && has('patch632')
+      set ttymouse=sgr
+    else
+      set ttymouse=xterm2
+    endif
+    " Paste: USE 'set paste' on F2 before inserting
+    nnoremap <MiddleMouse> "+p
+    xnoremap <MiddleMouse> "+p
+    inoremap <MiddleMouse> <C-r><C-o>+
+    cnoremap <MiddleMouse> <C-r>+
   endif
-  " Paste: USE 'set paste' on F2 before inserting
-  nnoremap <MiddleMouse> "+p
-  xnoremap <MiddleMouse> "+p
-  inoremap <MiddleMouse> <C-r><C-o>+
-  cnoremap <MiddleMouse> <C-r>+
 endif

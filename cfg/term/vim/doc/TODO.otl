@@ -63,6 +63,7 @@ Neovim
 	[_] BUG:CHECK: when printing from pythin, funcs in disabled: are quoted and don't evaluates
 	[_] 1,c --> 's;;\1', 2,c --> 's;;\1\2' and cursor between them
 		: FIND: how to map ,1c and ,2c
+	[_] On android -- use mouse only to scroll, set scrooll-count = 1
 
 
 Future
@@ -75,6 +76,11 @@ Future
 
 
 BUG plugins
+	[_] BUG: submode C-f -- when 'f' at the buffer end -- breaks submode and uses normal 'f'
+	[_] gnupg -- can't do lazy
+	[_] CamelMotion -- don't load at all?
+	[_] ii/I -- which difference?
+	[_] ic/C -- do more dumb and stable
 	[_] REGR: Broken '<C-v>$A,<Esc>' -- inserts _column_ of comma instead of ',eol'
 		:= Could be result of 'echom' in neobundle#config#search or of niceblock.vim
 	[_] BUG: Tagbar -- open with preview -- deletes all manual folds in buffer
@@ -85,6 +91,7 @@ BUG plugins
 	[_] CHECK: jedi-vim new *.py fileopen (,f) resets ft/omnifunc
 	[_] committia.vim -- on 'gcu' tell about file modifiers read only, on close -- on vars
 	[_] incsearch
+		[_] Searching in reverse/backward direction after XXX: on 'n'
 		[_] C-f in '/' can't open search window
 			:? Maybe, rewrite vim-rsi -- to adjust it with neocomplete <C-x>?
 			:	and add more shortcuts which I use in ZSH
@@ -92,6 +99,7 @@ BUG plugins
 		[_] After lazy loading first '*' on visual don't highlight
 		[_] If z* isn't on first character -- highlight isn't enabled
 		[_] After reopening file, n/N searches in backward direction!
+		[_] After lazy first search of selection only highlight first letter
 	[_] vim-stay -- text is folded on restore -- if fdm=syntax changed to manual
 	2015-11-24 [X] BUG: neobundle -- filename_pattern -- confusing regex rules
 		:> Problem was in my python -- raw printing dict -- doubles backslashes

@@ -2,11 +2,22 @@
 fun! SMdef(nm, lhs, rhs, ...)
   call submode#enter_with(a:nm, get(a:, 1, 'n'), get(a:, 2, ''), a:lhs, a:rhs)
 endf
+fun! SMall(nm, ...)
+  for c in a:000 | call submode#enter_with(a:nm, 'n', '', c, c) | endfor
+endf
 fun! SMmap(nm, lhs, rhs, ...)
   call submode#map(a:nm, get(a:, 1, 'n'), get(a:, 2, ''), a:lhs, a:rhs)
 endf
+fun! SMpar(nm, ...)
+  for i in range(0, (a:0<2 ? 0 : a:0-1), 2)
+    call submode#map(a:nm, 'n', '', a:000[i], a:000[i+1])
+  endfor
+endf
+
 command! -nargs=+ SMDEF call SMdef(<f-args>)
+command! -nargs=+ SMALL call SMall(<f-args>)
 command! -nargs=+ SMmap call SMmap(<f-args>)
+command! -nargs=+ SMpar call SMpar(<f-args>)
 
 
 "{{{1 User-Submodes =====================
@@ -17,28 +28,35 @@ nnoremap <silent> <Plug>(fluent-x) :undojoin \| norm! "_x<CR>
 
 
 " Undo (chronological) navigation by [g---...]/[g+++...]
-SMDEF undo/redo  g- g-
-SMDEF undo/redo  g+ g+
-SMmap undo/redo  -  g-
-SMmap undo/redo  +  g+
+SMALL undo/redo g- g+
+SMmap undo/redo   -  g-
+SMmap undo/redo   +  g+
 
 
 " Switch gt / gT of tab pages by [gttt...]
-SMDEF jump/tab  gt gt
-SMDEF jump/tab  gT gT
+SMALL jump/tab  gt gT
 SMmap jump/tab  t  gt
 SMmap jump/tab  T  gT
 
 
 " Window resizing
-SMDEF winsize  <C-w>>  <C-w>>
-SMDEF winsize  <C-w><  <C-w><
-SMDEF winsize  <C-w>+  <C-w>-
-SMDEF winsize  <C-w>-  <C-w>+
-SMmap winsize       >  <C-w>>
-SMmap winsize       <  <C-w><
-SMmap winsize       +  <C-w>-
-SMmap winsize       -  <C-w>+
+SMALL winsize <C-w>> <C-w>< <C-w>- <C-w>+
+SMmap winsize   >  <C-w>>
+SMmap winsize   <  <C-w><
+SMmap winsize   +  <C-w>-
+SMmap winsize   -  <C-w>+
+
+
+" Page navigation
+SMALL bufscroll <C-f> <C-b> <C-u> <C-d>
+SMpar bufscroll  f <C-f>  b <C-b>  u <C-u>  d <C-d>  e <C-e>  y <C-y>
+
+" SMmap bufscroll   b  <C-b>
+" SMmap bufscroll   u  <C-u>
+" SMmap bufscroll   d  <C-d>
+" SMmap bufscroll   e  <C-e>
+" SMmap bufscroll   y  <C-y>
+
 
 
 " " File cycling
@@ -49,11 +67,11 @@ SMmap winsize       -  <C-w>+
 
 
 " DEV: Jumping in last changes
-SMDEF jump/chg  <C-o>  <C-o>
-SMmap jump/chg      o  <C-o>
-SMmap jump/chg      i  <C-i>
-SMmap jump/chg      j  g;
-SMmap jump/chg      k  g,
+SMALL jump/chg <C-o>
+SMmap jump/chg   o  <C-o>
+SMmap jump/chg   i  <C-i>
+SMmap jump/chg   j  g;
+SMmap jump/chg   k  g,
 
 
 " Move a tab page in the <Space> gttt...

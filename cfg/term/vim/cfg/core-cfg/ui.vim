@@ -48,6 +48,10 @@ set guicursor+=a:blinkwait0 " disable cursor blink in gvim
 "set guiheadroom=0
 
 if has("gui_running")
+  if !IsWindows()
+    noremap <ScrollWheelUp>   <C-Y>
+    noremap <ScrollWheelDown> <C-E>
+  endif
   if has("gui_gtk2")
     set guifont=PragmataPro\ 12,DejaVu\ Sans\ Mono\ for\ Powerline\ 11,DejaVu\ Sans\ Mono\ 11
   elseif has("x11")

@@ -32,6 +32,7 @@ Leaders
 	[_] CHG <Tab> to operator mode
 		TAB-q, TAB-l -- toggle qf lists
 	[_] FIND: V-Block character column motions like '0' and '$' -- to fast select region
+	[_] q[pP]['`"()...] -- inserts text and adds quotes
 
 
 Unite
@@ -83,6 +84,13 @@ Operators
 
 
 > Plugins
+
+Submode
+	C-ffff bbb eee yyy
+
+View-regime
+	Only read -- all insert/replace disabled
+	More convenient shortcuts for navigation -- ag, C-F, etc
 
 Dict
 	[_] Splits on right/left -- reuse choosing mechanism from tagbar
@@ -145,6 +153,7 @@ Manipulations
 			column and inserts newline
 		[_] ALT HACK edit each text in synced split, then combine
 			[_] Add automatic buffer split/combine by vertical '|' delimiters
+			[_] Toggle scrollbind on those buffers by itself
 		SEE
 		: https://github.com/dhruvasagar/vim-table-mode
 		: https://github.com/Stormherz/tablify
