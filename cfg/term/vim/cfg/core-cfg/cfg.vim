@@ -31,7 +31,7 @@ nnoremap <unique> [Toggle]w :setl breakindent! wrap! wrap?<CR>
 set foldenable
 set foldcolumn=2        " fold levels ruler on left (clickable)
 "set foldmethod=manual  " <expr|syntax|marker> -- syntax defines folds
-set foldlevel=0        " close folds below this depth, initially
+set foldlevel=0         " close folds below this depth, initially
 set foldlevelstart=99   " close folds below this depth, on enter
 " set foldopen=all        " open on cursor touch, DISABLED: prevents 'za' fold
 
@@ -57,8 +57,9 @@ noremap <unique> [Toggle]v :<C-u>let &virtualedit=(&ve=='all'?'block':'all')\|se
 
 
 "{{{1 Moving ============================
-set scrolloff=3   " context lines around cursor not hiding when scroll
-set scrolljump=5  " minimum number of lines to scroll
+set scrolloff=3     " context lines around cursor not hiding when scroll
+set scrolljump=5    " minimum number of lines to scroll
+set nostartofline   " keep column when  <C-[fbud]> or [ggGHML], :25
 
 
 " Set keyword help.

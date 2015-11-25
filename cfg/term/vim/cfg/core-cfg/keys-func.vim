@@ -11,7 +11,7 @@ map <F3> :echo 'hi<'.synIDattr(synID(line('.'), col('.'), 1), 'name')
     \.synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>'<CR>
 
 " reload updated settings in running vim instance
-nnoremap <S-F1> :autocmd! * \| source $MYVIMRC \| AirlineRefresh<CR>
+" nnoremap <S-F1> :autocmd! * \| source $MYVIMRC \| AirlineRefresh<CR>
 " make current vim as the main server
 nnoremap <S-F2> :call writefile([v:servername], expand("~/.cache/vim/servername"), "b") \| echo "ServerName: " . v:servername<CR>
 

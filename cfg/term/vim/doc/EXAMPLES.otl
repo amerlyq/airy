@@ -23,3 +23,7 @@ Votl
 		:CopyMatches -
 		\[X\] \_.\{-\}\n\s*\ze\[
 		:%s;;;
+
+Filters
+	By line length -- useful for lyrics adjustion
+		%!awk '{print length,$0}' | sort -n -r -s | cut -d" " -f2-

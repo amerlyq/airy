@@ -36,6 +36,10 @@ else
   nnoremap <silent> <F1> :!ctags --recurse<CR>
 endif
 
+if executable('cscope')
+  nnoremap <silent> <S-F1> :!cscope -b -q -R<CR>
+endif
+
 " Show list of tags when there more then one entry.
 " -- Same, Preview, Split --//--  Close preview:  C-w z, C-w C-z
 noremap <unique> g]   g<C-]>

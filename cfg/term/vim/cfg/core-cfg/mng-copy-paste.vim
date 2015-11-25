@@ -56,19 +56,6 @@ function! CopyStringInReg(r, str)
   call CountLinesInRegister(a:r, '@'. a:r .':')
 endfunction
 
-function! GetLineBookmark(tid, text, ...)
-  let path= a:0>=1 ? expand('%:p') : @%
-  let tab="\t"
-  "" Can't use, as values must be extracted from dst, not from src
-  "repeat(&et ? repeat(" ", &ts) : "\t", a:tid)
-  let prf= repeat(l:tab, a:tid)
-  let str=l:prf . path . ":" . line(".")
-  let str=l:str . (empty(a:text) ? "" : "\n" . l:prf . l:tab . a:text)
-  call CopyStringInReg('+', l:str)
-  " TODO: Add re-indenting of several lines (like 'for' or 'function' part)
-  " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
-endfunction
-
 
 " Be consistent with C and D which reach the end of line
 nnoremap Y y$
@@ -124,18 +111,44 @@ nnoremap <leader>; :<C-R>"
 vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
 
 
-" Convert unnamed to block register for pasting
-fun! s:RegConvert(reg, tp)
-  call setreg(a:reg, getreg(a:reg, 1), a:tp)
+"{{{1 Convert main reg type for pasting
+nnoremap <unique>  [Frame]T  :RegConvert<CR>
+
+command! -bang -nargs=1  RegConvert call s:RegConvert(<bang>0, <q-args>)
+
+fun! s:RegConvert(dfl, ...)
+  if &clipboard !~# 'unnamed'
+    let reg = (&clipboard =~# 'unnamedplus' ? '+' : '*')
+  else
+    let reg = (a:dfl? '+' : '"')
+  endif
+  let ct = getregtype(reg)
+  let nt = get(a:, 1, (ct=~#'c\|v' ? 'l' : (ct =~# 'l\|V' ? 'b' : 'c')))
+  call setreg(a:reg, getreg(a:reg, 1), l:nt)
+  echom printf('%s -> %s', a:reg, l:nt)
 endfunction
-command! -bang -nargs=1 RegConvert call s:RegConvert(<bang>0? '+': '"', <q-args>)
 
-nnoremap [Frame]Y :call GetLineBookmark(v:count,'')<CR>
-nnoremap [Frame]t :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
-vnoremap [Frame]t :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
-nnoremap [Frame]T :RegConvert b
 
-" UNUSED:
+"{{{1 Get src snippet with ref from current line
+nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count,'')<CR>
+nnoremap <unique>  [Frame]t  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
+vnoremap <unique>  [Frame]t  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
+
+function! GetLineBookmark(tid, text, ...)
+  let path= a:0>=1 ? expand('%:p') : @%
+  let tab="\t"
+  "" Can't use, as values must be extracted from dst, not from src
+  "repeat(&et ? repeat(" ", &ts) : "\t", a:tid)
+  let prf= repeat(l:tab, a:tid)
+  let str=l:prf . path . ":" . line(".")
+  let str=l:str . (empty(a:text) ? "" : "\n" . l:prf . l:tab . a:text)
+  call CopyStringInReg('+', l:str)
+  " TODO: Add re-indenting of several lines (like 'for' or 'function' part)
+  " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
+endfunction
+
+
+"{{{1 UNUSED:
 " Swap registry
 " noremap  <M-c> :let @a=@" \| let @"=@+ \| let @+=@a \| reg "+<CR><CR>
 " HACK xnoremap <silent> y "*y:let [@+,@"]=[@*,@*]<CR>

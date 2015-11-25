@@ -33,6 +33,16 @@ Leaders
 		TAB-q, TAB-l -- toggle qf lists
 	[_] FIND: V-Block character column motions like '0' and '$' -- to fast select region
 
+
+Unite
+	[_] Filter -- define list of my own named filters -- for processing buffer
+		Like count lines, sort by length, etc
+		Combine with vim-operator-pipe -- search variants
+		:Like: https://github.com/krisajenkins/vim-pipe
+	[_] Regexes -- list of searches from EXAMPLES -- function declarations, etc
+	[_] Populate list of useful operations from notes/regex/*
+
+
 Operators
 	>[_] Create vim-textobj-overhaul -- combine and improve all textobj into
 	>		one seamless obj map
@@ -133,7 +143,9 @@ Manipulations
 			insert empty lines to align)
 		= It could be simple map to ,.<Enter>, ,.<BS>, which moves whole
 			column and inserts newline
-		ALT HACK edit each text in synced split, then combine
+		[_] ALT HACK edit each text in synced split, then combine
+			[_] Add automatic buffer split/combine by vertical '|' delimiters
+		SEE
 		: https://github.com/dhruvasagar/vim-table-mode
 		: https://github.com/Stormherz/tablify
 		: https://github.com/vim-scripts/table_format.vim

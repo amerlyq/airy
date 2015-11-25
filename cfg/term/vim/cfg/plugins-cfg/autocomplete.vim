@@ -20,6 +20,22 @@ if neobundle#tap('deoplete.nvim') && has('nvim') "{{{
 endif "}}}
 
 
+if neobundle#tap('neopairs.vim')  "{{{
+  let g:neopairs#enable = 1
+  fun! neobundle#hooks.on_post_source(bundle)
+    let g:neopairs#pairs = g:neopairs#_pairs
+  endf
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('echodoc.vim')  "{{{
+  " set cmdheight=2
+  let g:echodoc_enable_at_startup = 1
+  call neobundle#untap()
+endif "}}}
+
+
 if neobundle#tap('neosnippet.vim')  "{{{
   let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/neosnippet.vim'
   call neobundle#untap()

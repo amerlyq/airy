@@ -27,3 +27,29 @@ INFO
 
 	How-to with desc and vimrc
 		http://konishchevdmitry.blogspot.com/2008/07/howto-vim.html
+
+
+Callgraphs
+	<IDEA>
+		Compiling by gcc/llvm to get exact callgraph is good -- but often irrelevant
+			- I need only draft analysis for overall structure
+			- SyntaxTree has no distinguishing for some language constructs
+		On other hand, using regexes is errorprone and don't cover all cases
+			- Like some other language constructs, derivative from those
+		Main problem -- analysis of resulting graph
+			- Displaying whole callgraph has no sense -- as can't be analyzed
+			- Need collapse logic blocks and allow to focus on small subgraphs
+				Showing skeleton linkage to overall structure
+			- Don't connect calls to procedures (like print-log and system libs)
+		THINK? Write in Lisp? -- would it have some benefits?
+		Altogether, parse by cscope/ctags and show outline -- isn't that the best?
+		TODO: Grep my notes by 'call\s\=graph'
+	Egypt -- graph by gcc
+		in make: CFLAGS+=-fdump-rtl-expand
+		cd /pj/dir/ && make && egypt **/*.expand | dot > ff.dot
+	Cflow -- indented outline of calls
+		cflow cdns.c | sed 's/^\s*//' | sort | uniq -c
+		cflow cdns.c | sed -rn '/\s(get_debug|log|testfw_|get_|set_)/d; />:$/s/^(\s*\S+)\(\).*/\1/p' >! cdns.txt
+	Llvm
+		: http://icsweb.inf.unisi.ch/cms/images/stories/ICS/slides/llvm-graphs.pdf
+		: http://stackoverflow.com/questions/9939794/how-to-use-llvm-to-generate-a-call-graph

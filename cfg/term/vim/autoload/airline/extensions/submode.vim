@@ -1,4 +1,4 @@
-" vim: ts=2 sts=2 sw=2
+" vim:ts=2:sts=2:sw=2
 " @copyright: Dmytro Kolomoiets (amerlyq), 2015
 " @license: MIT
 " @refs: https://github.com/kana/vim-submodule
@@ -23,6 +23,7 @@ endfunction
 
 function! airline#extensions#submode#get()
   let l:nm = submode#current()
-  return (l:nm == '') ? l:nm : s:spc.s:spc . g:airline_left_alt_sep
-      \ . s:spc . g:airline#extensions#submode#prefix . l:nm
+  ". g:airline_left_alt_sep
+  return (l:nm == '') ? l:nm : s:spc.s:spc.
+        \ g:airline#extensions#submode#prefix .s:spc. l:nm
 endfunction
