@@ -76,13 +76,18 @@ Future
 
 
 BUG plugins
+	2015-11-26 [X] BUG: broken Lazy for fugitive -- Gdiff don't work
+		:> FIXED call func to detect if current file inside repo
 	[_] BUG: submode C-f -- when 'f' at the buffer end -- breaks submode and uses normal 'f'
 	[_] gnupg -- can't do lazy
-	[_] CamelMotion -- don't load at all?
-	[_] ii/I -- which difference?
-	[_] ic/C -- do more dumb and stable
+	2015-11-26 [X] BUG: CamelMotion -- don't load at all? -- test inside vimscript
+		:> After plugin update you need to specify mappings explicitly or call its functions
+	2015-11-26 [X] ii/I -- which difference?  :>  SEE note in textobj.yml
+	[_] ic/C -- do more dumb and stable -- FIX:DEV: upper/bottom bounds detection
+		:= ALSO I can plugin allows another mappings with divergent textobj from 'iw/aw'
+		:	-?- Make operator-like textobj -- Like  d[qciw] or di[qcw]
 	[_] REGR: Broken '<C-v>$A,<Esc>' -- inserts _column_ of comma instead of ',eol'
-		:= Could be result of 'echom' in neobundle#config#search or of niceblock.vim
+		:= Could be result of niceblock.vim
 	[_] BUG: Tagbar -- open with preview -- deletes all manual folds in buffer
 	[_] NrrwRgn -- can't drop highlight after manually closing regions?
 		:= Like when opening two regions, :diffthis on them and then :q
@@ -91,6 +96,8 @@ BUG plugins
 	[_] CHECK: jedi-vim new *.py fileopen (,f) resets ft/omnifunc
 	[_] committia.vim -- on 'gcu' tell about file modifiers read only, on close -- on vars
 	[_] incsearch
+		[_] In new menu '/?' don't work C-Y to copy
+		[_] Can't use 'nN' in [ox] modes -- to delete until next/prev
 		[_] Searching in reverse/backward direction after XXX: on 'n'
 		[_] C-f in '/' can't open search window
 			:? Maybe, rewrite vim-rsi -- to adjust it with neocomplete <C-x>?
@@ -231,7 +238,6 @@ BUG:
 			[_] Use v:counter -- to setup several different scripts
 	[_] BUG: visual-block +Y yanks only column, but must be as +D, which deletes until end.
 	[_] BUG: broken swap diff :> Opened issue
-	[_] BUG: broken Lazy for fugitive
 	2015-08-12 [X] BUG: vim-altr -- [f ]f don't work for rule 'src/%.c' -> 'inc/%.h'
 		:> Need specific pattern description -- author was helpful
 	2015-11-15 [X] BUG: C-F on end of '/', C-D on emtpy ':' -- both opens menu, needs to disable it

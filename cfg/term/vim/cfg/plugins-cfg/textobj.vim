@@ -1,4 +1,20 @@
 "{{{1 Textobj ============================
+if neobundle#tap('vim-textobj-delimited')  "{{{
+  let g:textobj_delimited_no_default_key_mappings = 1
+  " forward
+  xmap <silent><unique> i_ <Plug>(textobj-delimited-forward-i)
+  omap <silent><unique> i_ <Plug>(textobj-delimited-forward-i)
+  xmap <silent><unique> a_ <Plug>(textobj-delimited-forward-a)
+  omap <silent><unique> a_ <Plug>(textobj-delimited-forward-a)
+  " backward
+  xmap <silent><unique> i<Leader>_ <Plug>(textobj-delimited-backward-i)
+  omap <silent><unique> i<Leader>_ <Plug>(textobj-delimited-backward-i)
+  xmap <silent><unique> a<Leader>_ <Plug>(textobj-delimited-backward-a)
+  omap <silent><unique> a<Leader>_ <Plug>(textobj-delimited-backward-a)
+  call neobundle#untap()
+endif "}}}
+
+
 if neobundle#tap('vim-textobj-entire')  "{{{
   let g:textobj_entire_no_default_key_mappings = 1
   xmap <silent><unique> aG <Plug>(textobj-entire-a)
@@ -51,5 +67,12 @@ if neobundle#tap('vim-textobj-syntax')  "{{{
   omap <silent><unique> ah <Plug>(textobj-syntax-a)
   xmap <silent><unique> ih <Plug>(textobj-syntax-i)
   omap <silent><unique> ih <Plug>(textobj-syntax-i)
+  call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('textobj-word-column.vim')  "{{{
+  " Make word-columns more dumb, as they are too much «smart» for me
+  " let g:textobj_word_column_no_smart_boundary_cols = 1
   call neobundle#untap()
 endif "}}}

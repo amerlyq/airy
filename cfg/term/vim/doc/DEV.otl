@@ -57,6 +57,14 @@ Operators
 		:= I've already lost <Tab> due to [Unite], so I need submode for all this?
 	[_] On key sends obj/sel to new buffer in split window in separate named tab
 		:= Useful for deffered analysis, focused on of several functions together
+	[_] operators on base of 'exchange'
+		[_] 'swap-parts'
+		: * Place cursor on delimiter/character
+		: * Exchange left and right expr around delimiter
+		:	= by default -- any \S in left and right
+		:	= more long -- input textobj which tested and applied on left and right for 'cx'
+		[_] THINK? 'delete-replace' on 'dx' -- which currently empty
+
 
 	[_] DEV mapping to move in column like '{/}' -- on gG, g{, g}
 		for more simple C-v block selecting
@@ -87,10 +95,13 @@ Operators
 
 Submode
 	C-ffff bbb eee yyy
+		[_] BUG: pass through regime original keys when at top/bottom of window
 
 View-regime
 	Only read -- all insert/replace disabled
 	More convenient shortcuts for navigation -- ag, C-F, etc
+	Toggle folds recursively by one key instead 'zA'
+	Disable relativenumber
 
 Dict
 	[_] Splits on right/left -- reuse choosing mechanism from tagbar

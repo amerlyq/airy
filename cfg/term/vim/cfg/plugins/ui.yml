@@ -36,6 +36,12 @@ nathanaelkane/vim-indent-guides:  # TAGS: [hl]
   description: Highlights first space of tab columns
   lazy: 0  # EXPL: always show from the start
 
+# BUG: breaks syntax colors in too many formats (zsh, cmake, etc...)
+#  -- Also is culprit for memory/autocmd leaks
+luochen1990/rainbow:
+  description: Correlate brackets/tags color with their nesting depth
+  filetypes: [lisp, vim, tex, xml, html, xhtml, php, css]
+
 --- ## Statusline && colorschemes
 bling/vim-airline:
   description: Fast bottom/top status panels w/ integration

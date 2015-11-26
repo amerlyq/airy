@@ -51,9 +51,9 @@ jamessan/vim-gnupg:  # CHECK:
   description: Edit and save encrypted '*.gpg' files in-place
   # external_commands: gpg
   # filename_patterns: ['\.gpg$', '\.asc$', '\.pgp$']
-  explorer: '.*\.\(gpg\|asc\|pgp\)$'
-  # explorer: '.*mutt'
+  # explorer: '.*\.\(gpg\|asc\|pgp\)$'
   # explorer: 1
+  commands: [GnuPG]  # HACK -- load-on-demand by calling non-existent command
   # lazy: 0  # BUG: seems like can't do it lazy?
 
 --- ## VCS
@@ -66,11 +66,9 @@ rhysd/committia.vim:  # CHECK:
   explorer: COMMIT_EDITMSG
 
 tpope/vim-fugitive:  # CHECK:  # TODO: use more often, analyze more of help
+  description: Git-frontend, overhaul
   augroup: fugitive
-  functions: fugitive#
-  commands: [Git, Gstatus, Gdiff, Glog, Gbrowse]
-  # Gstatus, Glog, Gdiff, Gwrite, Gblame
-  # lazy: 0
+  commands: [Git, Gstatus, Gdiff, Glog, Gbrowse, Gblame, Gwrite]
 
 gregsexton/gitv:  # CHECK:  # TODO: use more often, analyze more of help
   description: |

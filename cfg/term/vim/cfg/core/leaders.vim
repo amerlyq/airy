@@ -5,19 +5,35 @@ let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugins.
 
 " NOTE more toggle prefixes: use <Leader>T[key] and <Leader>t<leader>[key]
 " ALT ; m , + <Space>+ <C-Space> <Tab> <S-Tab> <Bar>
-"MPogoda thinks it's better change <Leader> to '-'
+"MPogoda thinks it's better change <Leader> L '-'
 
-
-let s:leads = {'[Frame]': '\', '[Space]': '<Space>'}
-for [to, fr] in items(s:leads)
-  call Map_nxo(fr, to) | call Map_nxo(to, '<Nop>', 'nxo', 'noremap')
-endfor
 
 " EXPL: omap omitted for shortcut of '..q' textobj
-let s:leads = {'[Quote]': 'q', '[Unite]': '<Tab>',
-  \ '[Toggle]': '<Leader>t', '[Replace]': '<Leader>r', '[Git]': '[Frame]g'}
-for [to, fr] in items(s:leads)
-  call Map_nxo(fr, to, 'nx') | call Map_nxo(to, '<Nop>', 'nx', 'noremap')
+let s:leads = {
+  \'nxo': {
+  \  'Frame': '\',
+  \  'Space': '<Space>',
+  \ },
+  \'nx': {
+  \  'Quote': 'q',
+  \  'Unite': '<Tab>',
+  \  'Toggle' : '<Leader>t',
+  \  'Replace': '<Leader>r',
+  \  'Git': '[^Frame]g',
+  \}}
+
+" ATTENTION:
+" If you need upper-case maps ([U [S ...) -- then use '[^Space]'
+"   = But you need replace prefix everywhere in vimrc with new '[^Space]'
+" If '^' sub-prefix has conflicts, use instead '<C-^>'.
+"   = However, it become even harder to type when manually searching by :map
+
+for [M, maps] in items(s:leads)
+  for [L, K] in items(maps)
+    let L = '['.L.']'
+    call Map_nxo(K, L, M)
+    call Map_nxo(L, '<Nop>', M, 'noremap')
+  endfor
 endfor
 
 " Restore original <C-i> behaviour

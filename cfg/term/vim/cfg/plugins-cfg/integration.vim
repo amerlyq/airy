@@ -40,12 +40,15 @@ endif "}}}
 
 
 if neobundle#tap('vim-gnupg') "{{{
+  let g:GPGDebugLevel = 1000
+  let g:GPGDebugLog = 'gpglog'
   fun! neobundle#hooks.on_post_source(bundle)
+    " echo 'hi'
     " edit  " Re-read buffer to initiate GnuPG autocommands
     " OR:TRY:
-    silent! exe 'doautocmd BufReadCmd' expand('%')
+    " silent! exe 'doautocmd BufReadCmd' expand('%')
     " silent! exe 'doautocmd FileReadCmd' expand('%')
-    " silent! exe 'doautocmd GnuPG BufReadCmd'
+    silent! exe 'do GnuPG BufReadCmd '
   endf
   call neobundle#untap()
 endif "}}}
@@ -59,6 +62,10 @@ if neobundle#tap('vim-fugitive')  " Fugitive: {{{1
   nnoremap <silent><unique> [Git]d :Gdiff<CR>
   nnoremap <silent><unique> [Git]w :Gwrite<CR>
   nnoremap <silent><unique> [Git]b :Gblame<CR>
+  " Check if inside some repository
+  fun! neobundle#hooks.on_post_source(bundle)
+    call fugitive#detect(expand('#:p'))
+  endf
   call neobundle#untap()
 endif
 

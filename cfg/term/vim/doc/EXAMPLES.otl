@@ -24,6 +24,12 @@ Votl
 		\[X\] \_.\{-\}\n\s*\ze\[
 		:%s;;;
 
+Motions
+	Vertical -- highlight 5th non-space
+		\%5c\S  -- real byte
+		\%5v\S  -- virtual column
+		.\{5}\S -- multibyte char
+
 Filters
 	By line length -- useful for lyrics adjustion
 		%!awk '{print length,$0}' | sort -n -r -s | cut -d" " -f2-

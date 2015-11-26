@@ -7,6 +7,16 @@ if neobundle#tap('matchit.zip') "{{{
 endif "}}}
 
 
+if neobundle#tap('CamelCaseMotion') "{{{
+  " OR:USE: call camelcasemotion#CreateMotionMappings('<leader>')
+  for c in split("w,b,e,ge", ',')
+    call Map_nxo('<Leader>'.c, '<Plug>CamelCaseMotion_'.c)
+    call Map_nxo('i<Leader>'.c, '<Plug>CamelCaseMotion_i'.c, 'ox')
+  endfor
+  call neobundle#untap()
+endif "}}}
+
+
 if neobundle#tap('vim-sneak') "{{{
 "  - s<Enter> repeats (even off-screen), <Tab> skips to next 56 matches,
 "  - any key that is _not_ a target label, performs its normal-mode function

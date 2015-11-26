@@ -92,6 +92,20 @@ if neobundle#tap('vim-indent-guides')  "{{{
 endif "}}}
 
 
+if neobundle#tap('rainbow')  "{{{
+  let g:rainbow_active = 1
+  let g:rainbow_conf = {'separately': {'*': 0}}
+  let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]  " BEST: lisp, vim
+  " Activates only specified languages
+  let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
+  let g:rainbow_conf.separately.lisp = {}
+  let g:rainbow_conf.separately.vim = {}
+  " 'sh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] }
+  " 'zsh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] }
+  call neobundle#untap()
+endif "}}}
+
+
 "{{{1 Status/Colors ============================
 if neobundle#tap('vim-airline')  "{{{
   let g:airline#extensions#tabline#buffer_idx_mode = 1

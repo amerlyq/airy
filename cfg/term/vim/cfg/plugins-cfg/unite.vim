@@ -3,8 +3,8 @@ if neobundle#tap('unite.vim') "{{{
   " -u outline
   " -n file/new
   " Replaces fuzzyfinder, recursive
-  nnoremap <silent> [Unite]n  :UniteNext<CR>
-  nnoremap <silent> [Unite]p  :UnitePrevious<CR>
+  nnoremap <silent><unique> [Unite]n  :UniteNext<CR>
+  nnoremap <silent><unique> [Unite]p  :UnitePrevious<CR>
 
   let s:maps = {
   \ 'f': 'files file_rec/async:!',

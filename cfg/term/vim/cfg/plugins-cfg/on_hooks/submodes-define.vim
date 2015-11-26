@@ -34,9 +34,9 @@ SMmap undo/redo   +  g+
 
 
 " Switch gt / gT of tab pages by [gttt...]
-SMALL jump/tab  gt gT
-SMmap jump/tab  t  gt
-SMmap jump/tab  T  gT
+SMALL jump/tab gt gT
+SMmap jump/tab   t  gt
+SMmap jump/tab   T  gT
 
 
 " Window resizing
@@ -74,16 +74,18 @@ SMmap jump/chg   j  g;
 SMmap jump/chg   k  g,
 
 
-" Move a tab page in the <Space> gttt...
-function! s:SIDP()
+" Move (reorder) a tab page by [Space]gttt...
+" TODO: change mapping prefix.
+" BUG: seems like '[Frame]' not work in submode?
+fun! s:SIDP()
   return '<SNR>' . matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SIDP$') . '_'
-endfunction
-function! s:movetab(nr)
+endf
+fun! s:movetab(nr)
   execute 'tabmove' g:V.modulo(tabpagenr() + a:nr - 1, tabpagenr('$'))
-endfunction
+endf
 let s:movetab = ':<C-u>call ' . s:SIDP() . 'movetab(%d)<CR>'
-call submode#enter_with('movetab', 'n', '', '<Space>gt', printf(s:movetab, 1))
-call submode#enter_with('movetab', 'n', '', '<Space>gT', printf(s:movetab, -1))
+call submode#enter_with('movetab', 'n', '', '<Leader>gt', printf(s:movetab, 1))
+call submode#enter_with('movetab', 'n', '', '<Leader>gT', printf(s:movetab, -1))
 call submode#map('movetab', 'n', '', 't', printf(s:movetab, 1))
 call submode#map('movetab', 'n', '', 'T', printf(s:movetab, -1))
 unlet s:movetab

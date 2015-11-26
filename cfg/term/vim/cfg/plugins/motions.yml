@@ -11,15 +11,19 @@ tpope/vim-rsi:
       DEV:TODO: replace by own -- to confront with ZSH, <C-f>, etc
   lazy: 0  # Direct key mappings have no sense in being lazy
 
-bkad/CamelCaseMotion:
-  description: Motions in _camel_case_ for all modes
-  mappings: [<Leader>w, <Leader>b, <Leader>e]  # <Plug>CamelCaseMotion_
+bkad/CamelCaseMotion:  # TAGS: [motion, textobj]
+  description: |
+    - Motions in _camel_case_ or CamelCase for all modes
+    DEPRECATED:
+      - (inferior) lucapette/vim-textobj-underscore
+    ALT:CHECK: - (compare code) https://github.com/machakann/vim-textobj-delimited
+  mappings: <Plug>CamelCaseMotion_
 
 justinmk/vim-sneak:
   description: |
-      Two-letters find on whole screen scope
-      DEPRECATED:
-        - (bloated) Lokaltog/vim-easymotion
-        - (altered) https://github.com/rhysd/clever-f.vim
+    - Two-letters find on whole screen scope
+    DEPRECATED:
+      - (bloated) Lokaltog/vim-easymotion
+      - (altered) https://github.com/rhysd/clever-f.vim
   mappings: <Plug>Sneak
   depends: tpope/vim-repeat
