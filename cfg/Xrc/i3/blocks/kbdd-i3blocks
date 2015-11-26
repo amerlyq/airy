@@ -5,8 +5,13 @@
 
 ifc="ru.gentoo.kbdd"
 mmb="layoutChanged"
-dbus-monitor --profile "interface='$ifc',member='$mmb'" |
-while read line; do
+cmd="dbus-monitor --profile interface=$ifc,member=$mmb"
+
+# Keep only one copy of monitor
+pids=$(pgrep -a dbus-monitor | awk "/$cmd/{print \$1}") && kill $pids
+pids=$(pgrep -a ${0##*/} | awk "!/$$/"'{print $1}') && kill $pids
+
+exec $cmd | while read line; do
     #echo $line | grep ActiveChanged && your_script_goes_here
     printf "$line\n"
     ~/.i3/blocks/update 2

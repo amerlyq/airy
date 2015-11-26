@@ -1,5 +1,10 @@
 #EXTM3U
 
+# HACK:
+# curl http://dir.xiph.org/search\?search\=anime\&page\=0 | sed -rn '/.*="(.listen\/[0-9]*\/listen\.m3u).*/s;;http://dir.xiph.org\1;p' | xargs curl
+
+http://header/============ ANIME ============
+
 #EXTINF:0,AnimeRadio.SU
 http://animeradio.su:8000/
 #EXTINF:0,any-anime.ru
@@ -7,12 +12,6 @@ http://radio2.flex.ru:8000/radionami
 
 #EXTINF:-1,AnimeAMAZE (mp3 @ 192 kbps)
 http://apple.neostreams.info:10007/
-
-#EXTINF:-1,RadioNomy (mp3 @ 192 kbps)
-#http://listen.radionomy.com/radio-anime.m3u   # Banned at work
-#http://listen.radionomy.com/animeclassicsradio2.m3u
-#http://listen.radionomy.com/bob-marley.m3u
-#http://listen.radionomy.com/kawaiiradio-official.m3u
 
 # Manually: http://8tracks.com/explore/anime
 
@@ -30,3 +29,85 @@ http://142.4.217.133:8874/stream
 
 #EXTINF:-1,ArmiTunes 128k
 http://armitunes.com:8000/
+
+
+
+http://header/============= NEW =============
+
+#EXTINF:-1,Nyanserver (mixes) (mp3 @ 128 kbps)
+http://nyanserver.com:8000/stream
+#EXTINF:-1,Phate (mp3 @ 192 kbps)
+http://phate.io/listen.mp3
+http://jpopsuki.fm:8000/autodj
+http://www.nexusnet.com.mx:8000/animenexus
+http://japanradio.ru:8000/play
+http://radio.otakunopodcast.com:8000/otakunoradio
+http://animeradio.ru:8000/any-anime.ru
+
+## Cool -- it setup both Artist and Title tags!
+# Books streaming?
+http://radio.gothicspider.com:8000/stream.ogg
+
+
+http://header/========== RadioNomy ==========
+#EXTINF:-1,RadioNomy (mp3 @ 192 kbps)
+http://streaming304.radionomy.com:80/japanaradio
+
+## ALT: servers -- 20[123478], 210
+http://header/--- SRV:201 ---
+http://streaming201.radionomy.com:80/anime3000
+http://streaming201.radionomy.com:80/Japan-Station
+http://streaming201.radionomy.com:80/MundoAnime
+http://streaming201.radionomy.com:80/radio-openings-animes
+http://streaming201.radionomy.com:80/SequelMJHR
+http://streaming201.radionomy.com:80/Subarashii
+
+http://header/--- SRV:202 ---
+http://streaming202.radionomy.com:80/animega
+http://streaming202.radionomy.com:80/AsiaDREAMRadioJapan
+http://streaming202.radionomy.com:80/JapanimradioOrthez-WebradioJaponaise
+http://streaming202.radionomy.com:80/Kamehouse-station
+http://streaming202.radionomy.com:80/Radio-Anime
+http://streaming202.radionomy.com:80/RadioJapanNext
+
+http://header/--- SRV:203 ---
+http://streaming203.radionomy.com:80/AnimeExtremonet
+http://streaming203.radionomy.com:80/1-Otaku-Music-Radio
+http://streaming203.radionomy.com:80/OtakudeshoRadio
+http://streaming203.radionomy.com:80/kawaiiradio-official
+http://streaming203.radionomy.com:80/Manganimema
+http://streaming203.radionomy.com:80/Tsumugi
+
+http://header/--- SRV:204 ---
+http://streaming204.radionomy.com:80/AnimeToday
+http://streaming204.radionomy.com:80/AnimetakuRadio
+http://streaming204.radionomy.com:80/J-PopProjectRadio
+http://streaming204.radionomy.com:80/JapanimradioOrthez-WebradioJaponaise
+http://streaming204.radionomy.com:80/OngakuRadio
+http://streaming204.radionomy.com:80/Radio-Otakus-Dream
+http://streaming204.radionomy.com:80/RadioAnimex-musicaanimeymuchomas-
+http://streaming204.radionomy.com:80/AnimeToday
+http://streaming204.radionomy.com:80/AnimetakuRadio
+http://streaming204.radionomy.com:80/J-PopProjectRadio
+http://streaming204.radionomy.com:80/JapanimradioOrthez-WebradioJaponaise
+
+http://header/--- SRV:207 ---
+http://streaming207.radionomy.com:80/AnimeClassicsRadioMOE
+http://streaming207.radionomy.com:80/AnimeRadioNet
+http://streaming207.radionomy.com:80/Animes-Station
+http://streaming207.radionomy.com:80/Japanjpopjrockanime
+
+http://header/--- SRV:208 ---
+http://streaming208.radionomy.com:80/--RAnime--J-Rock-Pop--
+http://streaming208.radionomy.com:80/-F-A-Radio-Animes
+http://streaming208.radionomy.com:80/AnimeMFRadio
+http://streaming208.radionomy.com:80/J-IDOLSPROJECTRADIO
+http://streaming208.radionomy.com:80/radioanimecom
+http://streaming208.radionomy.com:80/RadioAnimeMX
+
+http://header/--- SRV:210 ---
+http://streaming210.radionomy.com:80/AnimeRadioTenshi---
+http://streaming210.radionomy.com:80/Animes-Station
+http://streaming210.radionomy.com:80/Clan-Hinatasou
+http://streaming210.radionomy.com:80/J-ClubasiaDREAMradio
+http://streaming210.radionomy.com:80/RadioVocaloid

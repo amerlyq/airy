@@ -24,7 +24,7 @@
 
 wndtheme="
 font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-font pango:Ubuntu 9
+font pango:Sans 9
 # class                 border  backgr. text    indicator
 client.focused          #3cb371 #008080 #ffffff #ff4500
 client.focused_inactive #333333 #5f676a #ffffff #292d2e
@@ -34,7 +34,8 @@ client.urgent           #2f343a #900000 #ffffff #900000
 
 bartheme="
     font -misc-fixed-medium-r-normal--12-120-75-75-C-70-iso10646-1
-    #font pango:DejaVu Sans Mono 10
+    # font pango:DejaVu Sans Condensed 10
+    # font pango:PragmataPro 10
     colors {
         background          #000000
         statusline          #ffffff

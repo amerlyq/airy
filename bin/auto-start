@@ -10,8 +10,8 @@ MAXWAIT=30
 
 lau() {
     local pr="$1" args="${@:2}"
-    if which "$pr" > /dev/null || [ -f "$pr" ]
-    then if ! pgrep "$pr" > /dev/null; then
+    if hash "$pr" >/dev/null || [[ -f "$pr" ]]
+    then if ! pgrep "$pr" >/dev/null; then
             printf "exec:    $pr $args \n"
             $pr $args &
 
