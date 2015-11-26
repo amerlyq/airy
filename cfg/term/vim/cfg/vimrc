@@ -1,5 +1,5 @@
 " vim:ts=2:sw=2:sts=2
-fun! s:cfg(path)
+fun! _cfg(path)
   for f in globpath(expand($VIMHOME .'/cfg/'), a:path, 0, 1)
     exe 'source' fnameescape(f)
   endfor
@@ -7,27 +7,23 @@ endf
 
 com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 
-call s:cfg('core/detect.vim')
-call s:cfg('core/env.vim')
-call s:cfg('core/options.vim')
-call s:cfg('core/init.vim')
-call s:cfg('core/leaders.vim')
+call _cfg('core/detect.vim')
+call _cfg('core/env.vim')
+call _cfg('core/options.vim')
+call _cfg('core/init.vim')
+call _cfg('core/leaders.vim')
 
+call _cfg('neobundle.vim')
 
-fun! SourcePluginsCfg()
-  call s:cfg('plugins-cfg/*.vim')
-endf
-
-call s:cfg('neobundle.vim')
 filetype plugin indent on  " Required!
 syntax enable
 
-call s:cfg('core-cfg/*.vim')
+call _cfg('core-cfg/*.vim')
 
-call s:cfg('features/'.(has('nvim') ? 'neovim' : 'vim').'.vim')
-call s:cfg('features/'.(IsAndroid() ? 'android' : 'clipboard').'.vim')
-call s:cfg('features/'.(IsWindows() ? 'windows' : 'unix').'.vim')
-call s:cfg('features/'.(has('gui_running') ? 'gui' : 'term').'.vim')
+call _cfg('features/'.(has('nvim') ? 'neovim' : 'vim').'.vim')
+call _cfg('features/'.(IsAndroid() ? 'android' : 'clipboard').'.vim')
+call _cfg('features/'.(IsWindows() ? 'windows' : 'unix').'.vim')
+call _cfg('features/'.(has('gui_running') ? 'gui' : 'term').'.vim')
 
 " " Default home directory.
 " let t:cwd = getcwd()

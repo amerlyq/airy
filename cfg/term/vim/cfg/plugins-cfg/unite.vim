@@ -5,6 +5,7 @@ if neobundle#tap('unite.vim') "{{{
   " Replaces fuzzyfinder, recursive
   nnoremap <silent> [Unite]n  :UniteNext<CR>
   nnoremap <silent> [Unite]p  :UnitePrevious<CR>
+
   let s:maps = {
   \ 'f': 'files file_rec/async:!',
   \ 'F': 'files file',
@@ -21,6 +22,9 @@ if neobundle#tap('unite.vim') "{{{
     exe m.'noremap <unique><silent> [Unite]'.c
           \.' :Unite -buffer-name='.r.'<CR>'
   endfor| endfor
-  let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/unite.vim'
+
+  fun! neobundle#hooks.on_source(bundle)
+    call _cfg('plugins-cfg/unite/*.vim')
+  endf
   call neobundle#untap()
 endif "}}}

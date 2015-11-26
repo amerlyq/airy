@@ -47,7 +47,7 @@ call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
 
 " NeoBundleSaveCache
 " endif
-call SourcePluginsCfg()
+call _cfg('plugins-cfg/*.vim')
 call neobundle#end()  " Load all listed non-lazy plugins
 
 " Check new plugins if cache was cleared and plugins list reloaded:
