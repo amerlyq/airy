@@ -79,12 +79,13 @@ Future
 
 BUG plugins
 	[_] FIND: why textobj-space don't affect indents
-	[_] airline -- drops upper line colors when buffers are too many
+	[_] BUG: airline -- disappears highlighting of upper/bottom line if window smaller than text
+		:= CHECK if it's my submode-ext for airline
 	[_] REGR: 'xp' can't transpose characters ('x' didn't put into reg)
 	2015-11-26 [X] BUG: broken Lazy for fugitive -- Gdiff don't work
 		:> FIXED call func to detect if current file inside repo
 	[_] BUG: submode C-f -- when 'f' at the buffer end -- breaks submode and uses normal 'f'
-	[_] gnupg -- can't do lazy
+	[_] REQ: gnupg -- can't do lazy
 	2015-11-26 [X] BUG: CamelMotion -- don't load at all? -- test inside vimscript
 		:> After plugin update you need to specify mappings explicitly or call its functions
 	2015-11-26 [X] ii/I -- which difference?  :>  SEE note in textobj.yml
@@ -103,17 +104,23 @@ BUG plugins
 	[_] committia.vim -- on 'gcu' tell about file modifiers read only, on close -- on vars
 	[_] incsearch
 		[_] TRY? (instead) https://github.com/junegunn/vim-oblique
-		[_] In new menu '/?' don't work C-Y to copy
-		[_] Can't use 'nN' in [ox] modes -- to delete until next/prev
+		[_] REQ: In new menu '/?' don't work C-Y to copy
+		2015-11-27 [X] Trash instead of search: \v[ \t\u3000]+$|[ \u3000]+\ze\t$
+			:= Seems like it's my plugin trailing-space/empty lines  ::>  USE :histdel(1)
+		2015-11-27 [X] Can't use 'nN' in [ox] modes -- to delete until next/prev
+			:> Remapped to use anzu only in 'n' modes, so we lost status in 'ox'
+			:NOTE: can't print anzu-status in 'ox' modes, because of cursor movements
+			:NOTE: airline's for anzu-ext can't either -- when updating status,
+			:		vsel will be dropped. Plus I lose lazy loading.
 		[_] C-f in '/' can't open search window
 			:? Maybe, rewrite vim-rsi -- to adjust it with neocomplete <C-x>?
 			:	and add more shortcuts which I use in ZSH
 			:= Yes, rewrite is the best -- and replace <C-f> with <C-i>/<C-o>?
-		[_] After lazy loading first '*' on visual don't highlight
-		[_] If z* isn't on first character -- highlight isn't enabled
-		[_] After reopening file, n/N searches in backward direction!
-		[_] After lazy first search of selection only highlight first letter
+		[_] After lazy loading first '*' on vsel don't highlight
+			:= only when use 'vw', for 'evb' -- all works
+			[_] After lazy first search of selection only highlight first letter
 			: at work all OK? Only at home?
+		[_] If z* isn't on first character -- highlight isn't enabled
 	[_] vim-stay -- text is folded on restore -- if fdm=syntax changed to manual
 	2015-11-24 [X] BUG: neobundle -- filename_pattern -- confusing regex rules
 		:> Problem was in my python -- raw printing dict -- doubles backslashes

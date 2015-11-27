@@ -42,26 +42,50 @@ if neobundle#tap('incsearch.vim') "{{{
   " let g:incsearch#magic = '\m'
   " Highlight auto-disable when moving
   let g:incsearch#auto_nohlsearch = 1
+  let g:incsearch_cli_key_mappings = { "\<C-y>": {
+        \ 'key': "\<C-r>=CopyStringInReg('+',getcmdline())\<CR>\<C-h>",
+        \ 'noremap': 1 }}
   map <unique> /  <Plug>(incsearch-forward)
   map <unique> ?  <Plug>(incsearch-backward)
   map <unique> g/ <Plug>(incsearch-stay)
+  for c in ['n', 'N']|call Map_nxo(c, '<Plug>(incsearch-nohl-'.c.')')|endfor
   call neobundle#untap() "}}}
+
+
+  if neobundle#tap('incsearch-fuzzy.vim') "{{{ Extension: fuzzy/fuzzyspell
+    fun! s:cfg_fuzzy(...) abort
+      return extend(copy({'converters': [
+      \   incsearch#config#fuzzy#converter(),
+      \   incsearch#config#fuzzyspell#converter()
+      \ ]}), get(a:, 1, {}))
+    endf
+    noremap <silent><unique><expr>  z/  incsearch#go(<SID>cfg_fuzzy())
+    noremap <silent><unique><expr>  z?  incsearch#go(<SID>cfg_fuzzy({'command': '?'}))
+    noremap <silent><unique><expr>  zg? incsearch#go(<SID>cfg_fuzzy({'is_stay': 1}))
+    call neobundle#untap() "}}}
+  endif
+
 
   if neobundle#tap('vim-anzu') "{{{ 'osyo-manga/vim-anzu'
     "" NOTE: airline ext is good for terminal vim to not jump cursor in cmdline
-    " let g:airline#extensions#anzu#enabled = 1
+    let g:airline#extensions#anzu#enabled = 1
     " SEE unite-anzu
     "   "{Pattern} in matching lines are output in unite.vim
     "   : Unite anzu: {pattern}
-    " map <unique> n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
-    " map <unique> N  <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
     " FIXME: <Plug>(anzu-sign-matchline)
+    " NOTE:EXPL: w/o <unique> :: remaps after incsearch
+    nmap  n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
+    nmap  N  <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
+    " EXPL: inside hook to mitigate issue w/ lazy-load for multiple <Plug>-mappings
     fun! neobundle#hooks.on_source(bundle)
-      nmap <silent><unique> <Leader>#  <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
-      nmap <silent><unique> <Leader>*  <Plug>(incsearch-nohl)<Plug>(anzu-n)<Plug>(anzu-mode)
+      nmap <silent><unique> <Leader>#
+            \ <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
+      nmap <silent><unique> <Leader>*
+            \ <Plug>(incsearch-nohl)<Plug>(anzu-n)<Plug>(anzu-mode)
     endf
     call neobundle#untap()
   endif "}}}
+
 
   if neobundle#tap('vim-asterisk') "{{{ 'haya14busa/vim-asterisk'
     let g:asterisk#keeppos = 1  " Keep cursor inside match at same position
@@ -72,10 +96,12 @@ if neobundle#tap('incsearch.vim') "{{{
     endfor
     call neobundle#untap()
   endif "}}}
+
 endif "}}}
 
 
-"{{{ Substitution preview/helpers
+
+"{{{1 Substitution preview/helpers  ====================
 if neobundle#tap('vim-over') "{{{
   " STD:TIP: :<C-f> and then type in command window %s/.../.../g
   " LIOR: :OverCommandLine<CR> and in standalone input your expr:

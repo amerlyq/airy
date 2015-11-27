@@ -134,8 +134,8 @@ noremap <unique> ,g %
 noremap <unique> <expr> gv '`[' . strpart(getregtype(), 0, 1) . '`]'
 " selects the last text edited/pasted in INSERT, and reselect of last VISUAL
 noremap <unique> gV `[v`]
-" visually select a search result (default: 'gn, gN' -- much better!)
-nnoremap <unique> z/ //e<CR>v??<CR>
+" BAD: visually select a search result (default: 'gn, gN' -- much better!)
+" nnoremap <unique> z/ //e<CR>v??<CR>
 " Go to the first non-blank character of the line after paragraph motions
 noremap } }^
 
