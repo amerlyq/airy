@@ -76,6 +76,7 @@ Future
 
 
 BUG plugins
+	[_] REGR: 'xp' can't transpose characters ('x' didn't put into reg)
 	2015-11-26 [X] BUG: broken Lazy for fugitive -- Gdiff don't work
 		:> FIXED call func to detect if current file inside repo
 	[_] BUG: submode C-f -- when 'f' at the buffer end -- breaks submode and uses normal 'f'
@@ -86,16 +87,18 @@ BUG plugins
 	[_] ic/C -- do more dumb and stable -- FIX:DEV: upper/bottom bounds detection
 		:= ALSO I can plugin allows another mappings with divergent textobj from 'iw/aw'
 		:	-?- Make operator-like textobj -- Like  d[qciw] or di[qcw]
-	[_] REGR: Broken '<C-v>$A,<Esc>' -- inserts _column_ of comma instead of ',eol'
-		:= Could be result of niceblock.vim
+		:> Consider using another textobj -- ALT: vim-textobj-blockwise
+		:	--- Currently, single advantage -- smart word column
+		:	--- Possible advantage -- using another motions
+	2015-11-27 [X] REQ:REGR: Broken '<C-v>$A,<Esc>' -- inserts _column_ of comma instead of ',eol'
+		:= Could be result of niceblock.vim  :>  it's my mapping  $ -> g_
 	[_] BUG: Tagbar -- open with preview -- deletes all manual folds in buffer
 	[_] NrrwRgn -- can't drop highlight after manually closing regions?
 		:= Like when opening two regions, :diffthis on them and then :q
-	[_] THINK: I use split more often than I think: :vs, :h, etc.
-			Maybe GoldenView has no sense in being lazy?
 	[_] CHECK: jedi-vim new *.py fileopen (,f) resets ft/omnifunc
 	[_] committia.vim -- on 'gcu' tell about file modifiers read only, on close -- on vars
 	[_] incsearch
+		[_] TRY? (instead) https://github.com/junegunn/vim-oblique
 		[_] In new menu '/?' don't work C-Y to copy
 		[_] Can't use 'nN' in [ox] modes -- to delete until next/prev
 		[_] Searching in reverse/backward direction after XXX: on 'n'
@@ -110,12 +113,12 @@ BUG plugins
 	[_] vim-stay -- text is folded on restore -- if fdm=syntax changed to manual
 	2015-11-24 [X] BUG: neobundle -- filename_pattern -- confusing regex rules
 		:> Problem was in my python -- raw printing dict -- doubles backslashes
-	[_] XXX: neobundle -- recursive call -- red repeatable text
+	2015-11-27 [X] REQ:XXX: neobundle -- recursive call -- red repeatable text
 		2015-11-22 [X] -- 'yq' or in case of 'vqa' for surround -- rarely
 		:> Seems like it my fault with textobj-user depends on itself for backrefs
-		[_] -- when replacing and dld repo for plugin (same name, different url -- like 'ag')
-		[_] -- for ':Ag' when using 'command_prefix'
-		[_] -- on new plugins install
+		[X] -- when replacing and dld repo for plugin (same name, different url -- like 'ag')
+		[X] -- for ':Ag' when using 'command_prefix'
+		[X] -- on new plugins install
 	[_] XXX: something accidentaly enables 'set list' in help/votl/curr buffer
 		:= When <C-o> on file, which already opened in another vim, and cancel
 		:	-- dropped buffer settins?
@@ -128,9 +131,11 @@ BUG plugins
 		: if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
 		:	add(airline_extensions, 'nrrwrgn') | endif
 		TODO:  nrrwrgn, submode, anzu
-	[_] GoldenRation -- consecutive splits are different from V1/2 and 3xH1/3
+	[_] GoldenRatio -- consecutive splits are different from V1/2 and 3xH1/3
 		:= Maybe need to setup layout (OR min screen width) in options?
 		[_] not sourced on native split -- like :h :sp :vs
+		[_] THINK: I use split more often than I think: :vs, :h, etc.
+			: Maybe GoldenView has no sense in being lazy?
 	[_] textobj-quote -- reacts only on double quote instead of any?
 		[_] weird behaviour overall -- TEST it
 		[_] add pair of typographic quotes (maybe not in this plugin?)
@@ -150,8 +155,10 @@ BUG plugins
 	[_] textobj-anyblock -- deletes current character if there are no brackets!
 		:= maybe because searchpos() returns [0,0] on not found, it's not
 		:	checked, and textobj-user then deletes null-match as one symbol
+	[_] textobj-blockwise -- can be extended. Add '[ai][bqhd]' in on_post_source
+		: onoremap <expr> <Leader>iw textobj#blockwise#mapexpr("iw")
 	[_] operator-surround
-		[_] BUG first append after lazy loading -- applies only to first char
+		[_] BUG first 'vwqa' after lazy loading -- applies only to first char
 		[_] BUG repeat '.' applies to same region, and not same motion!
 			:= Hence 'veqa"' can't be reproduced correctly
 		2015-11-19 [X] direct append in visual mode

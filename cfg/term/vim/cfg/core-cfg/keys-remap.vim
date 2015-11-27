@@ -27,19 +27,15 @@ cnoremap <C-k> <C-\>e getcmdpos() == 1 ?
       \ '' : getcmdline()[:getcmdpos()-2]<CR>
 "}}}
 
-" Don't select eol spaces and '\n'. Instead use 'D' or 'DgJ'.
-xnoremap <unique> $  g_
 xnoremap <unique><expr> v  (mode() ==# "\<C-v>") ? "v" : "\<C-v>"
 "I;\<Esc>" : "\<C-v>I;\<Esc>"
 
 " Now 'a jump you to line and column, and `a only to line
 noremap <unique> ' `
 noremap <unique> ` '
-" noremap , <Nop>
 
 " Pinky stretching soothing
 cnoremap <unique> <C-o> <C-p>
-
 " Faster $3 ex-cmds
 noremap <unique> ;  :
 
@@ -78,8 +74,9 @@ nnoremap <unique> g<Leader>O  O<Space><Esc>"_D
 " nnoremap <silent> ]<Space> :<C-u>put =repeat(nr2char(10),v:count)<Bar>execute "'[-1"<CR>
 " nnoremap <silent> [<Space> :<C-u>put!=repeat(nr2char(10),v:count)<Bar>execute "']+1"<CR>
 
-" Insert commented out copy under current line, keeps cursor position
-nnoremap <unique><silent> gC :call RetainPos('.t.\|norm gcc')<CR>
+" HACK: Insert commented out copy under current line, keeps cursor position
+nnoremap <unique><silent> gC :call RetainPos(".t.\|norm gcc")<CR>
+xnoremap <unique><silent> gC :<C-u>call RetainPos("'<,'>t'>\|norm gvgc")<CR>
 
 
 " Built-in autocompletion, word, line
@@ -112,7 +109,7 @@ nnoremap <unique> <PageDown> <C-D>
 " noremap <unique><expr> <C-e> (line("w$") >= line('$') ? "j" : "3\<C-e>")
 " noremap <unique><expr> <C-y> (line("w0") <= 1         ? "k" : "3\<C-y>")
 
-" swap vertical line motions with wrapped text
+" Vertical line motions for wrapped text
 noremap <unique><expr> j v:count ? 'j' : 'gj'
 noremap <unique><expr> k v:count ? 'k' : 'gk'
 noremap <unique> gj j
@@ -123,17 +120,11 @@ noremap <unique> g0 ^
 noremap <unique> ,4 $
 noremap <unique> g4 A<Space><Esc>
 noremap <unique> ,g %
-" Swap v and CTRL-V was pitiful idea
-noremap <unique> ,v  <C-V>
 
 " " Use <C-Space> instead <C-@>
 " SEE: What is it?
 " nmap <C-Space>  <C-@>
 " cmap <C-Space>  <C-@>
-
-" Unused
-" map - $
-" map # %
 
 "" VISUAL
 " Select last paste
@@ -149,17 +140,18 @@ nnoremap <unique> z/ //e<CR>v??<CR>
 noremap } }^
 
 
-"" Indention
-nnoremap > >>_
-nnoremap < <<_
-" USE instead g< for last message -- ':mes' or ':norm! g<'
-nnoremap g> >
-nnoremap g< <
-" reselect visual block after indent
-xnoremap <unique> > >gv|
-xnoremap <unique> < <gv
+"" Indention.
+" USE: instead 'g<' -- ':mes' or ':norm! g<'
+nnoremap <unique>  >  >>_
+nnoremap <unique>  <  <<_
+nnoremap <unique>  g>  >
+nnoremap <unique>  g<  <
+" Re-select visual block after indent
+xnoremap <unique>  >  >gv|
+xnoremap <unique>  <  <gv
 
-" Drag current line/s vertically and auto-indent. (Use Overlay+hjkl)
+
+" HACK: Drag curr line/s vertically and auto-indent. (USE: Overlay+[hjkl])
 nnoremap <unique> <S-Up>    :m-2<CR>==
 nnoremap <unique> <S-Down>  :m+<CR>==
 xnoremap <unique> <S-Up>    :m-2<CR>gv=gv
@@ -174,7 +166,3 @@ xnoremap <unique> <S-Down>  :m'>+<CR>gv=gv
 " use Alt-Left and Alt-Right to move current tab to left or right
 " nnoremap <silent> <A-Left> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
 " nnoremap <silent> <A-Right> :execute 'silent! tabmove ' . tabpagenr()<CR>
-
-" Tab is Next window
-" nnoremap <Tab> <C-W>w
-" nnoremap <S-Tab> <C-W>W

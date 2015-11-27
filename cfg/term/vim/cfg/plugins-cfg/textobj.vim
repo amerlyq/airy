@@ -27,10 +27,10 @@ endif "}}}
 
 if neobundle#tap('vim-textobj-function')  "{{{
   let g:textobj_function_no_default_key_mappings = 1
-  xmap <silent><unique> aF  <Plug>(textobj-function-a)
-  omap <silent><unique> aF  <Plug>(textobj-function-a)
-  xmap <silent><unique> iF  <Plug>(textobj-function-i)
-  omap <silent><unique> iF  <Plug>(textobj-function-i)
+  xmap <silent><unique> agF <Plug>(textobj-function-a)
+  omap <silent><unique> agF <Plug>(textobj-function-a)
+  xmap <silent><unique> igF <Plug>(textobj-function-i)
+  omap <silent><unique> igF <Plug>(textobj-function-i)
   xmap <silent><unique> agf <Plug>(textobj-function-A)
   omap <silent><unique> agf <Plug>(textobj-function-A)
   xmap <silent><unique> igf <Plug>(textobj-function-I)

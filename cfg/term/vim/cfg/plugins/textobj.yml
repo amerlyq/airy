@@ -19,22 +19,22 @@ rhysd/vim-textobj-anyblock:
   mappings: [[ox, ab, ib]]
   <<: *tou
 thinca/vim-textobj-between:
-  description: Between same found symbols
+  description: Between identical found symbols in both directions
   mappings: [[ox, af, if]]
   <<: *tou
 osyo-manga/vim-textobj-blockwise:
-  description: Apply to column of words w/o V-BLOCK selection
-  mappings: [[ox, I, A]]
+  description: Use textobj of words column w/o V-BLOCK selection
+  lazy: 0  # EXPL: too much to remap:  (o:IA|x_b:ia)[wWspbBt<>[](){}'"`]
   <<: *tou
 rhysd/vim-textobj-conflict:
-  description: Jump/select git merge conflicts [<<< .A. === .B. >>>]
+  description: Jump/select git merge conflicts ['<<<' .A. '===' .B. '>>>']
   mappings: [[ox, a=, i=]]
   <<: *tou
 machakann/vim-textobj-delimited:  # CHECK:TRY:
   description: |
     - Direct textobj for N-th '_' partition (SEE name_of_some_func)
-    - SEE: Faster then CamelCaseMotion:  2,wdi,e  -->  d3i_
-  mappings: <Plug>  # [[ox, [ai]{N}(_,<Leader>_)]]
+    - EXPL: Faster then CamelCaseMotion:  2,wdi,e  -->  d3i_
+  # CHG mappings: [[ox, [ai]{N}(_|<Leader>_)]]
   <<: *tou
 kana/vim-textobj-entire:
   description: Whole buffer w/[o] empty lines (instead ggVG)
@@ -46,7 +46,7 @@ kana/vim-textobj-fold:
   <<: *tou
 kana/vim-textobj-function:
   description: Function definition+body (C/Java/Vimscript)
-  # CHG mappings: [[ox, aF, iF, agf, igf]]
+  # CHG mappings: [[ox, agF, igF, agf, igf]]
   <<: *tou
 kana/vim-textobj-indent:
   description: |
@@ -75,7 +75,6 @@ kana/vim-textobj-line:
   description: Line content only (without \n)
   mappings: [[ox, al, il]]
   <<: *tou
-  # "slkd": "djjj"
 beloglazov/vim-textobj-quotes:
   description: Any nearest quotes of #'"`
   # CHG mappings: [[o, q]]
@@ -93,7 +92,10 @@ kana/vim-textobj-syntax:
   description: Highlighted syntax region
   # CHG mappings: [[ox, ah, ih]]
   <<: *tou
-coderifous/textobj-word-column.vim:  # DEV:FIX: up/down bounds detection -- more smart
-  description: «Smart» words column
+coderifous/textobj-word-column.vim:
+  description: |
+    - «Smart» words column
+    # DEV:FIX: up/down bounds detection -- more smart
+    ALT? (column-mappings) osyo-manga/vim-textobj-blockwise
   mappings: [[ox, ac, ic, aC, iC]]
   <<: *tou
