@@ -4,7 +4,7 @@ Neovim
 			:> Make Deoplete loading lazy
 		2015-11-18 [X] Prompt 'Enter' on each save -- excess output line? SEE ui.vim last ENH
 			:> Seems like somehow fixed. Need more excessive testing.
-		[_] Double cursor on search by / or ,cr
+		[_] REQ: Double cursor on search by / or ,cr
 			:= Seems like this bug is related to t_vi/t_ve disabled in Neovim?
 		[_] No shell on ,z -- need to reuse code in ranger filechooser
 		[_] No pause on error at :make by ,m
@@ -16,6 +16,8 @@ Neovim
 			: Seems like I need to try last AUR build, but build it on
 			:	android is troublesome...
 			:= As a workaround -- load custom vimrc on android?
+		2015-11-27 [X] Searching in reverse/backward direction after XXX: on 'n'
+			:> shada-related. FIXED by 2015-11-23
 	2015-11-10 [X] Check neovim (for neovim-git better use pacaur instead of yaourt)
 	[_] ADD guards to each cfg file: g:did_load_<sname> = 1
 		:= this will allow s:cfg('dir/file') and then s:cfg('dir/*')
@@ -32,8 +34,8 @@ Neovim
 		:= You can use yml back-references for identical configs!
 		: http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
 	[_] Check my vim-focus-autocmd on compatability and unnecessity
-	[_] ENH Change number of visible lines before/after cursor depending on height
-		:= In small window it moves рывками
+	2015-11-27 [$] ENH Change number of visible lines before/after cursor depending on height
+		:= In small window it moves by spurts  ::> Enough to make: scrolljump=0 scrolloff=3
 	[_] Disable textwidth indicator column when screensize smaller then tw
 	[_] THINK autosave on stop writing? -- can be trouble on pause in insert mode
 		: for writing on android
@@ -76,6 +78,8 @@ Future
 
 
 BUG plugins
+	[_] FIND: why textobj-space don't affect indents
+	[_] airline -- drops upper line colors when buffers are too many
 	[_] REGR: 'xp' can't transpose characters ('x' didn't put into reg)
 	2015-11-26 [X] BUG: broken Lazy for fugitive -- Gdiff don't work
 		:> FIXED call func to detect if current file inside repo
@@ -101,7 +105,6 @@ BUG plugins
 		[_] TRY? (instead) https://github.com/junegunn/vim-oblique
 		[_] In new menu '/?' don't work C-Y to copy
 		[_] Can't use 'nN' in [ox] modes -- to delete until next/prev
-		[_] Searching in reverse/backward direction after XXX: on 'n'
 		[_] C-f in '/' can't open search window
 			:? Maybe, rewrite vim-rsi -- to adjust it with neocomplete <C-x>?
 			:	and add more shortcuts which I use in ZSH
@@ -110,6 +113,7 @@ BUG plugins
 		[_] If z* isn't on first character -- highlight isn't enabled
 		[_] After reopening file, n/N searches in backward direction!
 		[_] After lazy first search of selection only highlight first letter
+			: at work all OK? Only at home?
 	[_] vim-stay -- text is folded on restore -- if fdm=syntax changed to manual
 	2015-11-24 [X] BUG: neobundle -- filename_pattern -- confusing regex rules
 		:> Problem was in my python -- raw printing dict -- doubles backslashes

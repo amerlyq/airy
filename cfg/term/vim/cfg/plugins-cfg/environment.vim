@@ -8,7 +8,7 @@ if neobundle#tap('vim-rooter') "{{{
   nnoremap <silent><unique> [Frame]cd :Rooter<CR>
   call neobundle#untap()
 endif
-" STD:ALWAYS:
+" ALSO:STD:ALWAYS:
   nnoremap <silent><unique> [Frame]cw :lcd %:p:h \| pwd<CR>
   nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
 "}}}

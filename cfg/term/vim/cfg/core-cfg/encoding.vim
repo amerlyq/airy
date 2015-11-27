@@ -8,6 +8,7 @@ if IsWindows()
 elseif &termencoding == ""
   " Force terminal encoding
   let &termencoding = &encoding
+  language message C " Use English interface.
 endif
 
 setg fileencoding=utf-8

@@ -21,19 +21,3 @@ elseif has('python')
 else
   echom "No python support. Your bads, plugins will be not loaded"
 endif
-
-
-"{{{1 Maps helpers ==========
-fun! RetainPos(cmd)
-  " ALT line("."), col(".")
-  let l:pos = getcurpos()
-  silent! exe a:cmd
-  call setpos('.', l:pos)
-endf
-
-fun! Map_nxo(lhs, rhs, ...)
-  for m in split(a:0>0 ? a:1 : 'nxo', '\zs')
-    " echo m.(a:0>0 ? a:1 : 'map').' <silent><unique> '. a:fr .' '. a:to
-    exe m.(a:0>1 ? a:2 : 'map').' <silent><unique> '. a:lhs .' '. a:rhs
-  endfor
-endfun

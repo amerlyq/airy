@@ -8,6 +8,7 @@ function! CompileInDir(...)
   " set makeprg=ruby\ -c\ %
 endfunction
 
+com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 command! -bar -nargs=? CompilerInDir call CompileInDir(<args>)
 " \| cw
 noremap <unique><silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>

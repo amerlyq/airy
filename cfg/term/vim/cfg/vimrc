@@ -5,28 +5,29 @@ fun! _cfg(path)
   endfor
 endf
 
-com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
+" Set augroup for my vimrc autocmd
+augroup MyAutoCmd
+  autocmd!
+augroup END
 
-call _cfg('core/detect.vim')
-call _cfg('core/env.vim')
-call _cfg('core/options.vim')
-call _cfg('core/init.vim')
-call _cfg('core/leaders.vim')
-
+call _cfg('core/*.vim')
+call _cfg('core-cfg/*.vim')
+call _cfg('features/'.(has('nvim')        ? 'neovim'  : 'vim'      ).'.vim')
+call _cfg('features/'.(IsAndroid()        ? 'android' : 'clipboard').'.vim')
+call _cfg('features/'.(IsWindows()        ? 'windows' : 'unix'     ).'.vim')
+call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
 call _cfg('neobundle.vim')
 
 filetype plugin indent on  " Required!
 syntax enable
 
-call _cfg('core-cfg/*.vim')
-
-call _cfg('features/'.(has('nvim') ? 'neovim' : 'vim').'.vim')
-call _cfg('features/'.(IsAndroid() ? 'android' : 'clipboard').'.vim')
-call _cfg('features/'.(IsWindows() ? 'windows' : 'unix').'.vim')
-call _cfg('features/'.(has('gui_running') ? 'gui' : 'term').'.vim')
-
-" " Default home directory.
-" let t:cwd = getcwd()
+try
+  if exists('$TMUX') && &t_Co <= 16
+    color slate | else | color solarized
+  endif
+catch /^Vim\%((\a\+)\)\=:E185/
+  color slate
+endtry
 
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
-set exrc secure modeline  " also parse 'vim:...' cmds from comments
+set exrc secure modeline    " also parse 'vim:...' cmds from comments

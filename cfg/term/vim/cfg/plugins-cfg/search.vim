@@ -53,8 +53,8 @@ if neobundle#tap('incsearch.vim') "{{{
     " SEE unite-anzu
     "   "{Pattern} in matching lines are output in unite.vim
     "   : Unite anzu: {pattern}
-    map <unique> n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
-    map <unique> N  <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
+    " map <unique> n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
+    " map <unique> N  <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
     " FIXME: <Plug>(anzu-sign-matchline)
     fun! neobundle#hooks.on_source(bundle)
       nmap <silent><unique> <Leader>#  <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
@@ -75,6 +75,7 @@ if neobundle#tap('incsearch.vim') "{{{
 endif "}}}
 
 
+"{{{ Substitution preview/helpers
 if neobundle#tap('vim-over') "{{{
   " STD:TIP: :<C-f> and then type in command window %s/.../.../g
   " LIOR: :OverCommandLine<CR> and in standalone input your expr:
@@ -85,20 +86,36 @@ if neobundle#tap('vim-over') "{{{
   "" NOTE: this part is somewhat overlaps with incsearch.vim
   let g:over#command_line#search#enable_incsearch = 1
   let g:over#command_line#search#enable_move_cursor = 1
-
+  let s:cmdwrap = 'OverCommandLine %s<CR>'  " Used to wrap subs below
   " DISABLED: because of bug in 'vimoutliner' mappings
   " noremap  <unique><silent>  :  :OverCommandLine /<CR>
-  let s:subs = {
-  \ '<Leader>c' : 's;;<C-r>=SubsCount()<CR>;g<CR><Left><Left>',
-  \ '<Leader>C' : 'g//<CR>',
-  \ '<Leader>R' : 'v//<CR>',
-  \ '[Replace]w': 's;;<C-r><C-w>;g<CR><Left><Left>',
-  \ '[Replace]y': 's;;<C-r>";g<CR><Left><Left>',
-  \ '[Replace]+': 's;;<C-r>+;g<CR><Left><Left>',
-  \ '[Replace]/': 's;;<C-r>/;g<CR><Left><Left>',
-  \}
-  for [c, r] in items(s:subs) | for m in ['n','x']
-    exe m.'noremap <unique><silent> '.c.' :OverCommandLine '.(m=='n'?'%':'').r
-  endfor| endfor
   call neobundle#untap()
 endif "}}}
+"ALSO:STD:ALWAYS: {{{
+  " DEV: '21,c': v:count for ',c' -- \2\1, use <expr> mapping, add backslash
+  " BUG: adds visual markers '<, '> before subs.
+  fun! SubsCount()
+    let rhs = (v:count ? substitute(string(v:count), '.', '\\&', 'g') : '')
+    return l:rhs
+  endfun
+  let s:subs = {
+  \ '<Leader>c' : 's;;<C-r>=SubsCount()<CR>;g',
+  \ '<Leader>C' : 'g//',
+  \ '<Leader>R' : 'v//',
+  \ '[Replace]w': 's::<C-r><C-w>:g',
+  \ '[Replace]y': 's::<C-r>":g',
+  \ '[Replace]+': 's::<C-r>+:g',
+  \ '[Replace]m': 's;;<C-r>/;g',
+  \ '[Replace]v': '<C-u>s@@<C-r>=GetVisualSelection("")<CR>@g',
+  \ '[Replace]s': '<C-u>s@<C-r>=GetVisualSelection("")<CR>@@g',
+  \ '[Replace]e': 's;;;g<CR>',
+  \ '[Replace]d': 'g//d<CR>',
+  \ '[Replace]f': 'v//d<CR>',
+  \} " norm!, etc
+  for [c, r] in items(s:subs) | if maparg(c) ==# '' | for m in ['n','x']
+    exe printf('%snoremap <silent><unique>  %s  :'.(
+          \   exists('s:cmdwrap') && (r!~?'<CR>$') ? s:cmdwrap : '%s').'%s',
+          \ m, c, (m=='n'?'%':'').r, ((r=~#'\Wg$') ? '<Left><Left>' : '') )
+  endfor | endif | endfor
+  "}}}
+"}}} --Substitution--

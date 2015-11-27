@@ -1,74 +1,30 @@
 "{{{1 Textobj ============================
 if neobundle#tap('vim-textobj-delimited')  "{{{
   let g:textobj_delimited_no_default_key_mappings = 1
-  " forward
-  xmap <silent><unique> i_ <Plug>(textobj-delimited-forward-i)
-  omap <silent><unique> i_ <Plug>(textobj-delimited-forward-i)
-  xmap <silent><unique> a_ <Plug>(textobj-delimited-forward-a)
-  omap <silent><unique> a_ <Plug>(textobj-delimited-forward-a)
-  " backward
-  xmap <silent><unique> i<Leader>_ <Plug>(textobj-delimited-backward-i)
-  omap <silent><unique> i<Leader>_ <Plug>(textobj-delimited-backward-i)
-  xmap <silent><unique> a<Leader>_ <Plug>(textobj-delimited-backward-a)
-  omap <silent><unique> a<Leader>_ <Plug>(textobj-delimited-backward-a)
-  call neobundle#untap()
-endif "}}}
-
-
-if neobundle#tap('vim-textobj-entire')  "{{{
-  let g:textobj_entire_no_default_key_mappings = 1
-  xmap <silent><unique> aG <Plug>(textobj-entire-a)
-  omap <silent><unique> aG <Plug>(textobj-entire-a)
-  xmap <silent><unique> iG <Plug>(textobj-entire-i)
-  omap <silent><unique> iG <Plug>(textobj-entire-i)
+  call Map_textobj('_', 'delimited-forward')
+  call Map_textobj('<Leader>_', 'delimited-backward')
   call neobundle#untap()
 endif "}}}
 
 
 if neobundle#tap('vim-textobj-function')  "{{{
   let g:textobj_function_no_default_key_mappings = 1
-  xmap <silent><unique> agF <Plug>(textobj-function-a)
-  omap <silent><unique> agF <Plug>(textobj-function-a)
-  xmap <silent><unique> igF <Plug>(textobj-function-i)
-  omap <silent><unique> igF <Plug>(textobj-function-i)
-  xmap <silent><unique> agf <Plug>(textobj-function-A)
-  omap <silent><unique> agf <Plug>(textobj-function-A)
-  xmap <silent><unique> igf <Plug>(textobj-function-I)
-  omap <silent><unique> igf <Plug>(textobj-function-I)
+  call Map_textobj('gf', 'function')
+  call Map_textobj('gF', 'function', 'toupper')
   call neobundle#untap()
 endif "}}}
 
 
-if neobundle#tap('vim-textobj-sigil')  "{{{
-  let g:textobj_sigil_no_default_key_mappings = 1
-  xmap <silent><unique> ad <Plug>(textobj-sigil-a)
-  omap <silent><unique> ad <Plug>(textobj-sigil-a)
-  xmap <silent><unique> id <Plug>(textobj-sigil-i)
-  omap <silent><unique> id <Plug>(textobj-sigil-i)
-  call neobundle#untap()
-endif "}}}
-
-
+"{{{ Re-map bunch of textobj
 " TODO: maybe space/sigil change mappings to reverse -- G/Q?
-if neobundle#tap('vim-textobj-space')  "{{{
-  let g:textobj_space_no_default_key_mappings = 1
-  xmap <silent><unique> as <Plug>(textobj-space-a)
-  omap <silent><unique> as <Plug>(textobj-space-a)
-  xmap <silent><unique> is <Plug>(textobj-space-i)
-  omap <silent><unique> is <Plug>(textobj-space-i)
-  call neobundle#untap()
-endif "}}}
-
-
-if neobundle#tap('vim-textobj-syntax')  "{{{
-  let g:textobj_syntax_no_default_key_mappings = 1
-  " ATTENTION currently textobj-syntax-a acts the same as textobj-syntax-i
-  xmap <silent><unique> ah <Plug>(textobj-syntax-a)
-  omap <silent><unique> ah <Plug>(textobj-syntax-a)
-  xmap <silent><unique> ih <Plug>(textobj-syntax-i)
-  omap <silent><unique> ih <Plug>(textobj-syntax-i)
-  call neobundle#untap()
-endif "}}}
+let s:maps = {'G': 'entire', 'd': 'sigil', 's': 'space', 'h': 'syntax'}
+for [c, plug] in items(s:maps)
+  if neobundle#tap('vim-textobj-'.plug)
+    let g:textobj_{plug}_no_default_key_mappings = 1
+    call Map_textobj(c, plug)
+    call neobundle#untap()
+  endif
+endfor "}}}
 
 
 if neobundle#tap('textobj-word-column.vim')  "{{{

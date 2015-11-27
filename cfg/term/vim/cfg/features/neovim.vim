@@ -13,3 +13,6 @@ augroup END
 "     let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 "   endif
 " endif
+
+" Default home directory.
+let t:cwd = getcwd()
