@@ -1,4 +1,5 @@
-tnoremap   <ESC><ESC>   <C-\><C-n>
+" BAD: <ESC><ESC> -- consume single <ESC>, sent to client
+tnoremap   <C-\><ESC>   <C-\><C-n>
 
 " Share the histories
 augroup MyAutoCmd

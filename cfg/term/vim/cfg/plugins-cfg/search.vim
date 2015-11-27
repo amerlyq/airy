@@ -22,6 +22,8 @@ if neobundle#tap('ag.vim') "{{{
       let g:ag_prg="ag --smart-case --column --nogroup --noheading --ignore tags"
     endif
   endf
+  fun! neobundle#hooks.on_post_source(bundle)
+  endf
   call neobundle#untap()
 endif "}}}
 

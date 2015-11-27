@@ -10,16 +10,17 @@ endf
 fun! Map_nxo(lhs, rhs, ...)
   for m in split(a:0>0 ? a:1 : 'nxo', '\zs')
     " echo m.(a:0>0 ? a:1 : 'map').' <silent><unique> '. a:fr .' '. a:to
-    exe m.(a:0>1 ? a:2 : 'map').' <silent><unique> '. a:lhs .' '. a:rhs
+    exe m.get(a:, 2, 'map').' <silent><unique> '. a:lhs .' '. a:rhs
   endfor
 endfun
 
 
-fun! Map_block(prefix, mapping, mode)
-  let l:bchars = ['()0', '{}9', '[]8', '"2', "'1", '<>3.', '`4']
-  for cg in l:bchars | for c in split(cg, '\zs')
+fun! Map_blocks(prefix, mapping, ...)
+  let l:dfl = '(0;{9;[8;"2;''1;<3;`4'
+  for g in split(get(a:, 3, l:dfl), ';') | for i in range(1, strlen(g)-1)
     " for k in ['', '[Space]', 'g[Space]', '<Leader>[Space]']
-    call Map_nxo(a:prefix.c, a:mapping.cg[0], a:mode)
+    call Map_nxo(a:prefix.g[i], a:mapping.g[0],
+          \ get(a:, 1, 'ox'), get(a:, 2, 'noremap'))
   endfor | endfor
 endf
 

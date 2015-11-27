@@ -33,6 +33,11 @@ Leaders
 		TAB-q, TAB-l -- toggle qf lists
 	[_] FIND: V-Block character column motions like '0' and '$' -- to fast select region
 	[_] q[pP]['`"()...] -- inserts text and adds quotes
+	2015-11-27 [X] Disable textwidth indicator column when screensize smaller then tw
+	[_] Replace my direct mappings of ({["'... by  'omap <expr> Fun(getchar())'
+		http://stackoverflow.com/questions/8564206/is-it-possible-to-determine-in-an-operator-pending-mapping-whether-the-motion-wi
+		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : 'w'
+		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : '<Esc>cc' . v:count . '<Esc>'
 
 
 Unite

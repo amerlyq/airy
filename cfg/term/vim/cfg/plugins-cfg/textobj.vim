@@ -1,3 +1,8 @@
+" Aliases to blocks by numbers
+call Map_blocks('a', 'a', 'ox', 'noremap')
+call Map_blocks('i', 'i', 'ox', 'noremap')
+
+
 "{{{1 Textobj ============================
 if neobundle#tap('vim-textobj-delimited')  "{{{
   let g:textobj_delimited_no_default_key_mappings = 1

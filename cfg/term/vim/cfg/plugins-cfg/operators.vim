@@ -1,9 +1,12 @@
+let s:alias = '(()0;{{}9;[[]8;''''1;""2;<<>3;``4'
+
 "{{{1 Operators ============================
 if neobundle#tap('vim-operator-surround')  "{{{
   for op in ['append', 'delete', 'replace']
     call Map_nxo('[Quote]'.op[0], '<Plug>(operator-surround-'.op.')', 'nx')
   endfor
-  call Map_block('[Quote]', '<Plug>(operator-surround-append)', 'x')
+  let s:op = '<Plug>(operator-surround-append)'
+  call Map_blocks('[Quote]', s:op, 'x', 'map', s:alias)
   call neobundle#untap()
 
   if neobundle#tap('vim-textobj-between')  "{{
@@ -27,7 +30,7 @@ if neobundle#tap('vim-operator-surround')  "{{{
     " TODO:THINK:RFC: use getchar() instead of direct mappings?
     "   = Redirect if no such mappings exists (see inside op-surr src)
     let s:op = '<Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
-    call Map_block('[Quote]', s:op, 'n')
+    call Map_blocks('[Quote]', s:op, 'n', 'map', s:alias)
     call neobundle#untap()
   endif "}}}
 endif "}}}

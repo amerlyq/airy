@@ -36,24 +36,22 @@ Neovim
 	[_] Check my vim-focus-autocmd on compatability and unnecessity
 	2015-11-27 [$] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves by spurts  ::> Enough to make: scrolljump=0 scrolloff=3
-	[_] Disable textwidth indicator column when screensize smaller then tw
 	[_] THINK autosave on stop writing? -- can be trouble on pause in insert mode
 		: for writing on android
 	2015-11-19 [X] TODO On help window -- disable 'gh/gl' features to prohibit replace help buffer
 	[_] Paste "+ text on ',p' or else -- append newline to text and normalize as in urxvt
-	[_] Replace cfgs loading order -- my settings/mappings first, plugins -- later
+	2015-11-27 [X] Replace cfgs loading order -- my settings/mappings first, plugins -- later
 		:= It's needed to not lose keymappings even on broken plugins (when I test them actively)
 		:= Plus with lazy loading most of plugins will load after my cfg anyway
-	[_] ADD [ia][0-9] with brackets (by analogy with anyblock)
-		http://stackoverflow.com/questions/8564206/is-it-possible-to-determine-in-an-operator-pending-mapping-whether-the-motion-wi
-		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : 'w'
-		onoremap <expr> d (v:count == 0 \|\| v:operator != 'd') ? 'd' : '<Esc>cc' . v:count . '<Esc>'
+	2015-11-27 [X] ADD [ia][0-9] with brackets (by analogy with anyblock)
 	[_] BUG RangerChooser -- after ':<C-f>' opens inside command line window instead of main
 		:= simply execute 'tabnew' is invalid, in this window need 'itabnew<CR>'
+		:	THINK? is it possible to launch ranger in cmdwin w/o entry in history?
+		:	TRY? histdel('cmd', -1)
+		:= use autocmd: CmdwinEnter/CmdwinLeave  and check cmdwin-char
 	[_] BUG gf in *.vim opens file './.' instead of './<cword>'
-	[_] TODO:TRY: vim-plug and measure startup time, with caching -- <100 times>
-		:: REQ to improve mappings not only for <Plug>. THINK -- is necessary?
-		:: REQ caching for deferred loading to improve startup time more
+		:set includeexpr=substitute(v:fname,'\\.','/','g')
+		:* TRY in cdns/logs: vim: inex='/path/to/project/root/'.v:fname
 	2015-11-24 [X] THINK:USAGE: NrrwRgn splits -- for editing lyrics tables?
 		:> Won't work -- need to edit different parts of same line --
 		:	impossible for NrrwRgn to merge changes back. Use simple :vs and merge manually
@@ -75,6 +73,9 @@ Future
 		:THINK:FIND: last viewed buffer with real file
 	[_] THINK:FIND? Duplicates of 'ftplugin/' dir of all plugins -- necessary for lazy loading?
 		:= Currently, seems like no? Neobundle can handle ftplugin/ itself?
+	[_] TODO:TRY: vim-plug and measure startup time, with caching -- <100 times>
+		:: REQ to improve mappings not only for <Plug>. THINK -- is necessary?
+		:: REQ caching for deferred loading to improve startup time more
 
 
 BUG plugins
@@ -169,7 +170,8 @@ BUG plugins
 	[_] textobj-blockwise -- can be extended. Add '[ai][bqhd]' in on_post_source
 		: onoremap <expr> <Leader>iw textobj#blockwise#mapexpr("iw")
 	[_] operator-surround
-		[_] BUG first 'vwqa' after lazy loading -- applies only to first char
+		2015-11-28 [X] BUG first 'vwqa' after lazy loading -- applies only to first char
+			:> My fail, result of 'echom' on source inside neobundle#config#search
 		[_] BUG repeat '.' applies to same region, and not same motion!
 			:= Hence 'veqa"' can't be reproduced correctly
 		2015-11-19 [X] direct append in visual mode
@@ -177,10 +179,9 @@ BUG plugins
 		[_] THINK adding space inside/outside brackets by involving [Space]
 			:= 4 variants: no/inner/outer/both
 		[_] THINK? Optimize direct brace mappings by getchar()
-		[_] ADD pair for "|" and ":"
+		[_] ADD pairs for "|" and ":"
 		2015-11-19 [X] add symm mappings for closing block brackets
-		[_] BUG 0-9 -- in visual mode add ']' -->  [0]-9
-		[_] THINK:DEV: too many operators -- use vim-submode?
+		[_] THINK:DEV: too many operators (+Space!) -- use vim-submode?
 	[_] ag
 		[_] FIX escaping '#' -> '\\#'
 		[_] DEV repeat last search
