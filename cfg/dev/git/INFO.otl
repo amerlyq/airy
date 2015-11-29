@@ -74,6 +74,44 @@ To get a specific version of a file
 < See composition of those methods inside 'piony/scripts/show-changelog'
 
 
+Split branch in feature-branches
+	git checkout master
+	: o-o-X (master HEAD)
+	:     \ q1a--q1b (quickfix1 HEAD)
+	:              \ q2a--q2b (quickfix2 HEAD)
+	git rebase --onto master quickfix1 quickfix2
+	OR: git cherry-pick quickfix1..quickfix2
+	:      / q2a'--q2b' (new quickfix2 HEAD)
+	: o-o-X (master HEAD)
+	:      \ q1a--q1b (quickfix1 HEAD)
+
+Workflow to keep DEV on bleeding edge and allow to propose atomic PR
+	: ATTENTION: rebasing/deleting involves history rewriting and all local
+	:	copies of involved branches after forced push become out-of-sync
+	:	so them need to be re-cloned again.
+	* move  all your commits into separate ```dev_backup``` branch to preserv your work
+		git checkout master && git branch dev_backup
+	* revert your master and sync it with trunk origin
+		git reset --hard #hash_of_first_commit
+		git pull https://github.com/rking/ag.vim.git master
+	* create feature-branches on base of this synced master -- all of them from same ```master/HEAD```
+		git branch #(fix|feature|enhancement)_\w+
+	* isolate and distribute yours/mine changes between those feature-branches
+		git checkout #name && git cherry-pick #hash
+	* make tests and travis as separate dependent feature-branches
+	* squash all rejected/overwritten changes in FB before merging anywhere
+	* when all old features from ```dev_backup``` will be distributed, delete ```dev_backup``` branch.
+	* use ```master``` as main dev branch and merge all FB into it periodically for CI with travis
+	* rebase/merge ```master``` with ```trunk/master``` when PR accepted, delete corresponding FB.
+	* all complete features, with PR yet not merged by trunk, rebased on ```trunk/master``` separately
+	* all new features in progress
+		* branched from last ```master```
+		* after things done, branch is rebased onto last ```trunk/master```
+		* and merged back into ```master``` for testing with CI
+		* then sent to trunk maintainer for PR.
+	After PRs will be merged, you can delete those feature-branches, retaining clean branch list.
+
+
 Fork and Pull request
  http://wiki.apache.org/couchdb/ContributorWorkflow
 < See how to do this with 'hub' utility
@@ -83,15 +121,22 @@ Fork and Pull request
 		hub fork
 	Or add origin repo for upstream
 		git remote add --track master upstream https://github.com/hut/ranger.git
+		:OR: git remote add upstream https://github.com/rking/ag.vim
 	Show attached repositories
 		git remote -v
 		 origin	https://github.com/amerlyq/ranger (fetch)
 		 upstream	https://github.com/hut/ranger.git (fetch)
+	Rebase on master
+		git fetch upstream
+		git rebase upstream/master master
 	Merge with upstream
 		git fetch upstream
 		git checkout master
 		git merge upstream/master
 		<OR: git pull https://github.com/REP_OWNER/MAIN_REP.git BRANCH_NAME
+	Show current branches
+		git branch
+		git show-branch
 	Topic branch <jira-ticket>-[fix|feature]-<short-description>
 	: Isolated and branched off the history of your master branch, which
 	: also matches the current master branch in ASF
@@ -349,3 +394,6 @@ Create local git server
 		cd project && touch README && git add README
 		git commit -m "Initial import"
 		git push origin master
+
+Git notes
+	http://alblue.bandlem.com/2011/11/git-tip-of-week-git-notes.html

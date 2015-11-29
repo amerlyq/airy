@@ -33,7 +33,7 @@ fmt = 'NeoBundle "{!s:s}", {!s}'
 cfgs, defs = map(vim.eval, ("a:cfgpaths", "a:default"))
 for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
   with open(c) as f:
-    for doc in yaml.safe_load_all(f):
+    for doc in [doc for doc in yaml.safe_load_all(f) if doc is not None]:
       for src, opts in doc.items():
         # Remove to fasten loading
         [opts.pop(k, None) for k in ["description", "contract"]]

@@ -11,6 +11,7 @@
     # http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
 
 
+    lall     = log --color --date-order --graph --oneline --decorate --simplify-by-decoration --all
     lmsg     = log --oneline --decorate
     lname    = log --date=short --pretty=format:'%h | %ad | %><(18)%an | %d%<(50,trunc)%s'
     ldate    = log --pretty=format:'%C(yellow)%h%C(reset) | %C(white)%>(32,trunc)%aD%C(reset) | %C(bold green)%>(12,trunc)%ar%C(reset) | %s%C(bold red)%d%C(reset)'
@@ -66,4 +67,3 @@
     unstage = reset HEAD --
     up = "!git remote update -p; git merge --ff-only @{u}"
     backup = !"file=../`git describe`.tar && echo "Creating `readlink -f $file`" && tar cf $file ."
-

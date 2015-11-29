@@ -5,6 +5,7 @@ if neobundle#tap('ag.vim') "{{{
   let g:ag_apply_lmappings=0
   let g:ag_apply_qmappings=0
   let g:ag_mapping_message=0
+  let g:ag_no_default_mappings=0
   " let g:ag_qhandler="botleft lopen 7"  "OR: copen 20"
   ": Ag working dir  searching
   " nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
@@ -21,8 +22,6 @@ if neobundle#tap('ag.vim') "{{{
     if split(system("ag --version"), "[ \n\r\t]")[2] <= '0.25.0'
       let g:ag_prg="ag --smart-case --column --nogroup --noheading --ignore tags"
     endif
-  endf
-  fun! neobundle#hooks.on_post_source(bundle)
   endf
   call neobundle#untap()
 endif "}}}
