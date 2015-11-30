@@ -1,8 +1,8 @@
 " Set cpp tags file.
 "let &l:tags='./tags,tags,'.$DOTVIM.'/tags/cpp/tags'
 
-setlocal cindent
-setlocal commentstring=//\ %s
+setl cindent
+setl commentstring=//\ %s
 
 " Set path.
 if has('win32') || has('win64')

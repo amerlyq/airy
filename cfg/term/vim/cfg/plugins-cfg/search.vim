@@ -69,7 +69,7 @@ if neobundle#tap('incsearch.vim') "{{{
 
   if neobundle#tap('vim-anzu') "{{{ 'osyo-manga/vim-anzu'
     "" NOTE: airline ext is good for terminal vim to not jump cursor in cmdline
-    let g:airline#extensions#anzu#enabled = 1
+    " let g:airline#extensions#anzu#enabled = 1
     " SEE unite-anzu
     "   "{Pattern} in matching lines are output in unite.vim
     "   : Unite anzu: {pattern}

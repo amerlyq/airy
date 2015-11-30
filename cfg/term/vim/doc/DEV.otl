@@ -118,8 +118,8 @@ Fold-pretty
 	SEE:
 		http://vimcasts.org/transcripts/38/en/
 		https://github.com/kshenoy/vim-origami
-	[_] Integrate in my 'fold.vim', but use left-adjusting
-		: https://github.com/Konfekt/FoldText
+	2015-11-30 [X] Integrate in my 'fold.vim', but use left-adjusting
+		: https://github.com/Konfekt/FoldText  ::> right is the must!
 	[_] RFC printing code, FIX aligning
 	[_] Dynamic foldcolumn width
 		: https://github.com/thierr26/wibafoco
@@ -127,6 +127,25 @@ Fold-pretty
 	[_] SEE: why it's slow and is there sense to integrate
 		: https://github.com/Konfekt/FastFold
 	[_] Folding: check by 'au' if file contents {{{\d\{0,2\}, then set foldmethod=marker, setlocal foldmethod=manual
+	: TRY?DEV:USE: great idea and skeleton, but conflicts with my FoldText. SEE help.
+	[_] Extract foldexpr from LucHermitte/VimFold4C:
+		: ALSO: https://github.com/LucHermitte/lh-cpp
+	FoldText view decisions:
+		[_] Compress multiline func arguments and return types in oneline
+		[_] Compress return types if too many to '<--'
+		[_] Compress statements/arguments inside (...) if too many in eff tw
+		[_] Replace func/for/if/switch/etc by UTF-8 symbols to compress more
+	FoldText view to switch on the fly:
+		[_] Single solid horizontal separator instead any text at all (like VimFold4C).
+		: for ( cnt = 0; cnt < argc; ++cnt)
+		: ---------------------------------------------------------------
+		[_] Compress in one-liner until filled effective tw
+		: for ( cnt = 0; cnt < argc; ++cnt)
+		: { if (g_command_line[0] != '\0') { strcat(g_command_line, " ");
+		[_] Walk up one line and use construction header instead content
+		: for ( cnt = 0; cnt < argc; ++cnt) { ---------------------------
+		[_] Compress header and content
+		: for ( cnt = 0; cnt < argc; ++cnt) { if (g_command_line[0] !=...
 
 Notches
 	Cycle through all notches
