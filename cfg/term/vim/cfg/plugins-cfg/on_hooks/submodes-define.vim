@@ -49,6 +49,7 @@ SMmap winsize   -  <C-w>+
 
 " Page navigation
 SMALL bufscroll <C-f> <C-b> <C-u> <C-d>
+" SMpar bufscroll <C-f> <C-f>  <C-b> <C-b>  <C-u> <C-u>  <C-d> <C-d>  <C-e> <C-e>  <C-y> <C-y>
 SMpar bufscroll  f <C-f>  b <C-b>  u <C-u>  d <C-d>  e <C-e>  y <C-y>
 
 " SMmap bufscroll   b  <C-b>

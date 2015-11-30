@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+filter() {
+    # sed -r '/(<blockquote>)+([^<>]*)(<\/blockquote>)+/s//\2<br>/g'
+    cat
+}
+
 fvim() {
     local DMENU='dmenu -i -p W: -b -nb #000000 -nf #999999 -sb #000000 -sf #31AC65 -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
     local fl=~/.cache/airy/dict-words.txt
@@ -22,5 +27,6 @@ fshell() {
 case "$1"
 in --debug) dictd -d nofork -d init  ## Server: no demon
 ;; --vim) fvim $@
+;; --filter) filter $@ | pandoc -f html -t markdown | sed -r 's/(> )+/  /g; /^\s*$/d'
 ;; *) fshell $@
 ;; esac
