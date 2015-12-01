@@ -1,0 +1,113 @@
+> That looks crazy. I like it. +1 – VonC Jul 13 at 20:35
+Orphan Tags Binary Storage (OTABS)
+	* It is a pure git and git only solution -- it gets the job done without
+	  any 3rd party software (like git-annex) or 3rd party
+	  infrastructure (like github's LFS).
+	* It stores the binary files efficiently, i.e. it doesn't bloat the
+	  history of your repository.
+	* Git pull and git fetch, including git fetch --all are still bandwidth
+	  efficient, i.e. not all large binaries are pulled from the remote by default.
+	* It works on Windows.
+	* It stores everything in a single git repository.
+	* It allows for deletion of outdated binaries (unlike bup).
+
+ATTENTION:
+	* Don't use 'git clone' directly, or all binaries will be pulled!
+		git clone -b master --single-branch
+	* You'll have to periodically use a git gc trick to clean your repository
+	  from any files you don't want any more.
+	* It is not as efficient as bup or git-bigfiles. But it's respectively
+	  more suitable for what you're trying to do and more off-the-shelf. You
+	  are likely to run into trouble with hundreds of thousands of small files
+	  or with files in range of gigabytes, but read on for workarounds.
+
+Adding the Binary Files
+	: Create temporary branch with disconnected root, at the end -- delete it.
+	: But push on server custom tag instead (so fetch won't dld it w/o --tags)
+	gco --orphan Binary
+	git rm -r --cached * .gitignore (Keep .git only)
+	rm -rf *  (Keep .git only)
+	cp /home/user/yarxi_u.db .
+	gca "ADD yarxi_u.db, 2015-12-01"
+	git tag db151201
+	git push origin db151201
+	gco master
+	git branch -D Binary
+
+Checking out the Binary File
+	git fetch origin db151201
+	gco db151201 -- yarxi_u.db && git reset
+	echo yarxi_u.db >> .gitignore
+
+Completely Deleting the Binary File
+	* Delete the orphan tag on the remote
+		git push <remote> refs/tags/1.0.0bin
+	* Delete the orphan tag locally (deletes all other unreferenced tags)
+		git tag -l | xargs git tag -d && git fetch --tags.
+	* Use a git gc trick to delete your now unreferenced commit locally.
+		git -c gc.reflogExpire=0 -c gc.reflogExpireUnreachable=0 \
+				-c gc.rerereresolved=0 -c gc.rerereunresolved=0 \
+				-c gc.pruneExpire=now gc "$@".
+		> It will also delete all other unreferenced commits.
+	* If possible, repeat the git gc trick on the remote. It is possible if
+	you're self-hosting your repository and might not be possible with some
+	git providers, like github or in some corporate environments. If you're
+	hosting with a provider that doesn't give you ssh access to the remote
+	just let it be. It is possible that your provider's infrastructure will
+	clean your unreferenced commit in their own sweet time. If you're in a
+	corporate environment you can advice your IT to run a cron job garbage
+	collecting your remote once per week or so. Whether they do or don't will
+	not have any impact on your team in terms of bandwidth and storage, as
+	long as you advise your colleagues to always git clone -b master
+	--single-branch <url> instead of git clone.
+	* All your colleagues who want to get rid of outdated orphan tags need
+	only to apply steps 2-3.
+	* You can then repeat the steps 1-8 of Adding the Binary Files to create a
+	new orphan tag 2.0.0bin. If you're worried about your colleagues typing
+	git fetch <remote> --tags you can actually name it again 1.0.0bin. This
+	will make sure that the next time they fetch all the tags the old 1.0.0bin
+	will be unreferenced and marked for subsequent garbage collection (using
+	step 3). When you try to overwrite a tag on the remote you have to use -f
+	like this: git push -f <remote> <tagname>
+
+Afterword
+	* OTABS doesn't touch your master or any other source code/development
+	branches. The commit hashes, all of the history, and small size of these
+	branches is unaffected. If you've already bloated your source code history
+	with binary files you'll have to clean it up as a separate piece of work.
+	This script might be useful.
+	* Confirmed to work on Windows with git-bash.
+	* It is a good idea to apply a set of standard trics to make storage of
+	binary files more efficient. Frequent running of git gc (without any
+	additional arguments) makes git optimise underlying storage of your files
+	by using binary deltas. However, if your files are unlikely to stay
+	similar from commit to commit you can switch off binary deltas altogether.
+	Additionally, because it makes no sense to compress already compressed or
+	encrypted files, like .zip, .jpg or .crypt, git allows you to switch off
+	compression of the underlying storage. Unfortunately it's an
+	all-or-nothing setting affecting your source code as well.
+	* You might want to script up parts of OTABS to allow for quicker usage.
+	In particular, scripting steps 2-3 from Completely Deleting Binary Files
+	into an update git hook could give a compelling but perhaps dangerous
+	semantics to git fetch ("fetch and delete everything that is out of
+	date").
+	* You might want to skip the step 4 of Completely Deleting Binary Files to
+	keep a full history of all binary changes on the remote at the cost of the
+	central repository bloat. Local repositories will stay lean over time.
+	* In Java world it is possible to combine this solution with maven
+	--offline to create a reproducible offline build stored entirely in your
+	version control (it's easier with maven than with gradle). In Golang world
+	it is feasible to build on this solution to manage your GOPATH instead of
+	go get. In python world it is possible to combine this with virtualenv to
+	produce a self-contained development environment without relying on PyPi
+	servers for every build from scratch.
+	* If your binary files change very often, like build artifacts, it might
+	be a good idea to script a solution which stores 5 most recent versions of
+	the artifacts in the orphan tags monday_bin, tuesday_bin, ..., friday_bin,
+	and also an orphan tag for each release 1.7.8bin 2.0.0bin, etc. You can
+	rotate the weekday_bin and delete old binaries daily. This way you get the
+	best of two worlds: you keep the entire history of your source code but
+	only the relevant history of your binary dependencies. It is also very
+	easy to get the binary files for a given tag without getting entire source
+	code with all its history: git init && git remote add <name> <url> && git
+	fetch <name> <tag> should do it for you.
