@@ -1,8 +1,11 @@
 #!/bin/zsh
 
-# case "$1" in -s) bSEQ=1; shift ;; esac
 FUN="$1"; shift
-CMD="$@"
+case "${@: -1}"
+in -s) bSEQ=1; CMD="${@:1:$#-1}"
+;;  *) CMD="$@"
+;; esac
+
 DIR="$PWD"
 source ~/.shell/zsh/zshrc
 
@@ -112,7 +115,7 @@ pid=$$
 for rep in "${LST[@]}"; do
     # (($#jobstates <= 8)) || wait until USR1
      # && kill -USR1 $pid 2>/dev/null
-    (cd "$DIR/$rep" && git_process "$rep") #&
+     eval '(cd "$DIR/$rep" && git_process "$rep")' $( ((bSEQ)) || echo '&' )
 done
 wait
 exit
