@@ -29,10 +29,11 @@ vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
         cmd="$cmd$k "
     done
     printf "$cmd\n" | $EDITOR -R \
-        -c "set nolist | let g:magnify_on=0 | copen $cnt " \
-        -c "let g:syntastic_mode_map['mode']='passive'" \
-        -c "NeoCompleteDisable" -c "call histadd(':','$cmd')" -c ":$cmd" -
-    # | let g:ag_qhandler='botleft lopen 7'
+        -c "set nolist | copen $cnt " \
+        -c "call histadd(':','$cmd')" -c ":$cmd" -
+        # | let g:ag_qhandler='botleft lopen 7'
+        # | let g:magnify_on=0
+        # -c "let g:syntastic_mode_map['mode']='passive'" -c "NeoCompleteDisable" \
 }
 
 vimf(){ ag -g $@ | $EDITOR -; }

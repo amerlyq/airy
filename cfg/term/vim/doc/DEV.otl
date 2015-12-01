@@ -120,6 +120,7 @@ Fold-pretty
 		https://github.com/kshenoy/vim-origami
 	2015-11-30 [X] Integrate in my 'fold.vim', but use left-adjusting
 		: https://github.com/Konfekt/FoldText  ::> right is the must!
+	[_] DEV disable foldcolumn on BufWinEnter, if there are no folds found at all
 	[_] RFC printing code, FIX aligning
 	[_] Dynamic foldcolumn width
 		: https://github.com/thierr26/wibafoco
@@ -134,6 +135,7 @@ Fold-pretty
 		[_] Compress multiline func arguments and return types in oneline
 		[_] Compress return types if too many to '<--'
 		[_] Compress statements/arguments inside (...) if too many in eff tw
+			: compress from ',inside,' by one arg at a time: (arg1 ... argN)
 		[_] Replace func/for/if/switch/etc by UTF-8 symbols to compress more
 	FoldText view to switch on the fly:
 		[_] Single solid horizontal separator instead any text at all (like VimFold4C).
@@ -211,6 +213,7 @@ Manipulations
 		on ?? split list in column
 		: THINK -- search for yaml -- to flatten/unfold -- I saw smth on gh.
 		<ALL which github has>
+		: https://github.com/taku-o/vim-reorder-columns
 		: https://github.com/leothelocust/vim-makecols
 		: https://github.com/jesseschalken/list-text-object
 		: https://github.com/KabbAmine/lazyList.vim

@@ -1,6 +1,7 @@
 #!/bin/zsh
 
-ARG="$1"; shift
+# case "$1" in -s) bSEQ=1; shift ;; esac
+FUN="$1"; shift
 CMD="$@"
 DIR="$PWD"
 source ~/.shell/zsh/zshrc
@@ -78,7 +79,7 @@ function git_process {
     ## Additional verification of git repo existance
     git rev-parse --git-dir > /dev/null 2>&1 && bFound=1 || continue
     ## Print git info from zsh-specific prompt
-    case "$ARG" in st|pl|ph) gita_$ARG "$1" ;; esac
+    case "$FUN" in st|pl|ph) gita_$FUN "$1" ;; esac
     ## Also, exec any git commands after "Gs/Gt/Gl/Gd ..."
     eval ${CMD:+git $CMD}
 }
@@ -111,7 +112,7 @@ pid=$$
 for rep in "${LST[@]}"; do
     # (($#jobstates <= 8)) || wait until USR1
      # && kill -USR1 $pid 2>/dev/null
-    (cd "$DIR/$rep" && git_process "$rep") &
+    (cd "$DIR/$rep" && git_process "$rep") #&
 done
 wait
 exit

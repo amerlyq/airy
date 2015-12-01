@@ -1,9 +1,22 @@
-" Aliases to blocks by numbers
+" Aliases to STD blocks by numbers
 call Map_blocks('a', 'a', 'ox', 'noremap')
 call Map_blocks('i', 'i', 'ox', 'noremap')
 
 
 "{{{1 Textobj ============================
+if neobundle#tap('vim-ninja-feet')  "{{{
+  let g:ninja_feet_no_mappings = 1
+  omap <silent><unique>  <i  <Plug>(ninja-left-foot-inner)
+  omap <silent><unique>  <a  <Plug>(ninja-left-foot-a)
+  omap <silent><unique>  >i  <Plug>(ninja-right-foot-inner)
+  omap <silent><unique>  >a  <Plug>(ninja-right-foot-a)
+
+  nmap <silent><unique>  z<  <Plug>(ninja-insert)
+  nmap <silent><unique>  z>  <Plug>(ninja-append)
+  call neobundle#untap()
+endif "}}}
+
+
 if neobundle#tap('vim-textobj-delimited')  "{{{
   let g:textobj_delimited_no_default_key_mappings = 1
   call Map_textobj('_', 'delimited-forward')
