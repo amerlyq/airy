@@ -1,0 +1,66 @@
+#!/bin/bash -e
+# vim:ts=2:sw=2:sts=2
+set -o pipefail
+
+# ATTENTION: There is only 'AgAdd' as cummulative command!
+
+PATT='--:[QLG]?[-afh]'
+if (($#==0)) || [[ "$1" == '--help' ]]; then echo '
+Usage:
+    ag-vim '"$PATT"'  regex
+Examples:
+    H=10 ag-vim --:Qf "\bword\s"
+    ag-vim --:Qf "\bword\s" "\sWORD"
+    cat files.txt | ./ag-vim RGX..
+    ./ag-vim - [PATHS..] < regexes.txt
+Alias in ~/.bashrc:
+    alias agg="ag-vim --:G-"
+'; exit; fi
+
+die() { echo "$*"; exit 1; }
+
+declare -A VCMDS=(
+  [Q-]=Ag!  [Qa]=AgAdd!  [Qf]=AgFile!  [Qh]=AgHelp!
+  [L-]=LAg! [La]=LAgAdd! [Lf]=LAgFile! [Lh]=LAgHelp!
+  [G-]=AgGroup           [Gf]=AgGroupFile
+)
+
+if [[ -t 1 ]]; then  # Interactive (no pipe for /dev/stdout)
+  if [[ "$1" =~ ^$PATT$ ]]
+  then CMD="${VCMDS[${1:3}]}"; shift
+  else CMD="${VCMDS[Q-]}"; fi
+  # [[ -n "$CMD" ]] || die "Wrong cmd '$1'"
+fi
+
+# PRE="-R -c \"set nolist | let g:ag_qhandler='botleft lopen 7'\""
+PRE=($PRE); POST=($POST)
+[[ "$H" =~ ^[0-9]+$ ]] && PRE+=(-c "copen $H") || POST+=(-c only)
+[[ "$EDITOR" =~ vim ]] || EDITOR=vim
+
+
+# Check if input is from terminal or redirected from file/pipe '<'/'|'
+# elif [[ -p /dev/stdin ]] -- from pipe only, not from redirected file
+if [[ -t 0 ]]; then
+  REGEX=("$@"); PATHS=()
+elif [[ " $@ " =~ ' - ' ]]; then
+  REGEX=($(cat)); PATHS=("$@")
+else
+  REGEX=(); PATHS=($(cat))
+  for a in "$@"; do [[ "$a" == '-' ]] || REGEX+=("$a"); done
+fi
+
+
+vcmd(){ echo "+call histadd(':','$*')|$*"; }  #${PATHS[@]}
+if [[ -n "$CMD" ]]; then
+  srun=($EDITOR "${PRE[@]}" "$(vcmd $CMD ${REGEX[0]})")
+  for rgx in "${REGEX[@]:1}"; do
+    srun+=("$(vcmd AgAdd! $rgx)")
+  done
+  srun+=("${POST[@]}")
+  # echo "${srun[@]}"
+  exec "${srun[@]}"
+else
+  for rgx in "${REGEX[@]}"; do
+    ag $ARGS -- "$rgx" "${PATHS[@]}"
+  done
+fi
