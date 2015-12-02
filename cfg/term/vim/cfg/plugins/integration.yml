@@ -65,11 +65,16 @@ jamessan/vim-gnupg:  # CHECK:
 --- ## VCS
 tpope/vim-git: {}  # CHECK:  WTF?
 
-# BUG seems like can't be loaded lazy? TRY more precisely
-#   SEE https://github.com/Shougo/neobundle.vim/issues/434
-rhysd/committia.vim:  # CHECK:
-  description: Multiwindow regime for git commit [--amend]
-  explorer: COMMIT_EDITMSG
+jaxbot/github-issues.vim:  # FIXME:REQ: ssh credentials
+  # explorer: COMMIT_EDITMSG
+  # mappings: co, cc, <CR>
+  commands: [Gissues, Giadd, Gmiles]
+  disabled: '!has("python")'
+  lazy: 0  # XXX: lazy is conflicting with committia? Why?
+
+rhysd/committia.vim:
+  description: Multiwindow diff/note regime for git commit/[--amend]
+  lazy: 0  # Can't lazy. SEE https://github.com/Shougo/neobundle.vim/issues/434
 
 tpope/vim-fugitive:  # CHECK:  # TODO: use more often, analyze more of help
   description: Git-frontend, overhaul

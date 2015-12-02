@@ -55,6 +55,37 @@ endif "}}}
 
 
 "{{{1 VCS ============================
+if neobundle#tap('github-issues.vim')
+  let g:gissues_lazy_load = 1
+  let g:gissues_async_omni = 1
+  " let g:github_upstream_issues = 1
+  fun! neobundle#hooks.on_source(bundle)
+    "" USE:(encrypt): printf '<token>' | gpg -eo '<path>.gpg'
+    let path = expand('~/.cache/airy/gpg/github-token.gpg')
+    let cmd = 'gpg --use-agent --quiet --batch --decrypt '.shellescape(l:path)
+    let g:github_access_token = system(l:cmd)
+  endf
+  call neobundle#untap()
+endif
+
+
+if neobundle#tap('committia.vim')
+  let g:committia_hooks = {}
+  let g:committia_open_only_vim_starting = 1
+  " let g:committia_use_singlecolumn = 1  " FIXME:REQ: multicolumn has bug
+  " let g:committia_min_window_width = 160
+  fun! g:committia_hooks.edit_open(info)
+    setl spell
+    setl spell
+    " If no commit message, start with insert mode
+    if a:info.vcs ==# 'git' && getline(1) ==# '' | startinsert | end
+    "" Scroll the diff window from insert mode:
+    imap <buffer><C-j> <Plug>(committia-scroll-diff-down-half)
+    imap <buffer><C-k> <Plug>(committia-scroll-diff-up-half)
+  endf
+  call neobundle#untap()
+endif
+
 if neobundle#tap('vim-fugitive')  " Fugitive: {{{1
   autocmd BufReadPost fugitive://* set bufhidden=delete
   nnoremap <silent><unique> [Git]s :Gstatus<CR>

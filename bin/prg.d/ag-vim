@@ -3,14 +3,18 @@
 set -o pipefail
 
 # ATTENTION: There is only 'AgAdd' as cummulative command!
+# THINK:DEV: Create *-Add for other commands?
+# TODO: To remove restriction on 8 patterns need to add '-bar' for Ag commands
+# OR: directly call functions.
 
 PATT='--:[QLG]?[-afh]'
 if (($#==0)) || [[ "$1" == '--help' ]]; then echo '
 Usage:
-    ag-vim '"$PATT"'  regex
+    ag-vim '"$PATT"'  [regex..]   # $#<=8 (vim restrictions)
 Examples:
-    H=10 ag-vim --:Qf "\bword\s"
     ag-vim --:Qf "\bword\s" "\sWORD"
+    PRE=-R ag-vim --:Q- "text"
+    H=10 ag-vim --:Qf "\bword\s"
     cat files.txt | ./ag-vim RGX..
     ./ag-vim - [PATHS..] < regexes.txt
 Alias in ~/.bashrc:
@@ -18,7 +22,6 @@ Alias in ~/.bashrc:
 '; exit; fi
 
 die() { echo "$*"; exit 1; }
-
 declare -A VCMDS=(
   [Q-]=Ag!  [Qa]=AgAdd!  [Qf]=AgFile!  [Qh]=AgHelp!
   [L-]=LAg! [La]=LAgAdd! [Lf]=LAgFile! [Lh]=LAgHelp!
@@ -32,10 +35,11 @@ if [[ -t 1 ]]; then  # Interactive (no pipe for /dev/stdout)
   # [[ -n "$CMD" ]] || die "Wrong cmd '$1'"
 fi
 
+cprf() { [[ "${CMD:0:1}" == 'L' ]] && echo l || echo c; }
 # PRE="-R -c \"set nolist | let g:ag_qhandler='botleft lopen 7'\""
 PRE=($PRE); POST=($POST)
-[[ "$H" =~ ^[0-9]+$ ]] && PRE+=(-c "copen $H") || POST+=(-c only)
-[[ "$EDITOR" =~ vim ]] || EDITOR=vim
+[[ "$H" =~ ^[0-9]+$ ]] && PRE+=(-c "$(cprf)open $H") || POST+=(-c only)
+[[ "$EDITOR" =~ vim ]] || EDITOR=vim  # EXPL: matches vim/nvim with args
 
 
 # Check if input is from terminal or redirected from file/pipe '<'/'|'
@@ -60,6 +64,7 @@ if [[ -n "$CMD" ]]; then
   # echo "${srun[@]}"
   exec "${srun[@]}"
 else
+  # TODO: show usual 'ag' output instead of piped
   for rgx in "${REGEX[@]}"; do
     ag $ARGS -- "$rgx" "${PATHS[@]}"
   done

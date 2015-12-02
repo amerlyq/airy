@@ -35,6 +35,8 @@ for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
   with open(c) as f:
     for doc in [doc for doc in yaml.safe_load_all(f) if doc is not None]:
       for src, opts in doc.items():
+        if 'disabled' in opts:
+          opts['disabled'] = vim.eval(opts['disabled'])
         # Remove to fasten loading
         [opts.pop(k, None) for k in ["description", "contract"]]
         vim.command(fmt.format(src, json.dumps(dict(defs, **opts))))
