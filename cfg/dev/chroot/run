@@ -8,4 +8,5 @@ dir="${PWD#/cryptfs/chroots/lucid_i386}"
 schroot -c lucid_i386 -d "$dir" -- bash --rcfile <(echo "
     export BASHRC_EVAL='. /cryptfs/env; . /cryptfs/bash_extension.sh'
     . ~/.bashrc
+    EDITOR=vim
 ") ${@:+-c $@}
