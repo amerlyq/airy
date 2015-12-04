@@ -2,10 +2,11 @@
 
 # http://www.ex.ua/filelist/$id.urls
 
-if [ "${1:0:4}" == "http" ]; then
-    wget -c -i $1 --trust-server-names=on --restrict-file-names=nocontrol
-else
-    cat "$1" | while read line; do
+if [[ "$1" =~ ^http ]]; then
+    rm -vf "${1##*/}"
+    wget --continue --input-file="$1" --timestamping --trust-server-names=on --restrict-file-names=nocontrol
+elif [[ -f "$1" ]]; then
+    while read line; do
         wget -c -i --content-disposition $line
-    done
+    done < "$1"
 fi
