@@ -32,7 +32,8 @@ function! s:RelnumUpdate(...)
 endfunc
 
 " RFC: are all those au necessary? Maybe add/replace some?
-" TODO: restore my auto-focus plugin under neovim
+" BUG: when in insert and do focus in/out -- relativenumber resets!
+"       TODO:CHG: save/restore state on out/in
 augroup auto_relnum
   au InsertEnter    * call s:RelnumUpdate(v:insertmode != 'i')
   au InsertLeave    * call s:RelnumUpdate(1)
