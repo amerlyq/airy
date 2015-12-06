@@ -6,7 +6,9 @@ alias gremu='git clean -f --dry-run && echo "dry-run only; directly use git clea
 
 ## Status
 alias gt='git status -sb && (git stash list | cat)'
+alias gta='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
 alias gtb='git branch -a'
+alias gtn='git name-rev --name-only'  # Shows related to release tag name
 # alias gtt='git tag'
 
 ## Diff
@@ -36,6 +38,8 @@ alias gsw='git show'
 
 ## Pull
 alias gl='git pull --rebase --verbose'
+alias glf='git fetch -vp --all --progress'
+# After 'push -f' do: glf && gtr --hard origin/<branch>
 alias glc='git rebase --continue'
 # alias grs='git rebase --skip'
 alias gss='git stash save'

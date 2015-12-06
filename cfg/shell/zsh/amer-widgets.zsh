@@ -66,6 +66,13 @@ function complete-files() { compadd - $PREFIX*; }
 # }
 # compdef -k _complete_files complete-word '^X/'
 
+# Bind last executed command as 'abyss'. Reset: apply to 'abyss'
+zle -N set-fast-exec-cmd set_fast_exec_cmd
+function set_fast_exec_cmd {
+    local cmd="${BUFFER:-$(fc -ln -1)}"
+    bindkey  -s ',m' "^U$cmd\n"
+    bindkey -as ',m' "S$cmd\n"
+}
 
 ### TRAPS ###
 

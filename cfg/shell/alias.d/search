@@ -37,3 +37,4 @@ vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
 }
 
 vimf(){ ag -g $@ | $EDITOR -; }
+vimq(){ $EDITOR -q <(agi --vimgrep $@); }

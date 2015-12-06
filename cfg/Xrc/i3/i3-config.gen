@@ -218,6 +218,7 @@ msg_sys='<i3> : shu[t]down, [r]eboot, [l]ock | log[o]ut, [s]uspend, [h]ibernate 
     wmode_begin "$mCd+Delete" "$mSd+Escape" 'system' "$msg_sys"
         wlistf "$ts %s $exno ~/.i3/ext/i3exit %-9s ,$def" "l o s h r t" \
             lock logout suspend hibernate reboot shutdown
+        wmapf "$ts %%1 $exno xbacklight -set %%10 ,$def" ${digits% *}
         # c - reload the configuration file
         # n - restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
         wlistf "$ts %s %s" "c n" reload restart

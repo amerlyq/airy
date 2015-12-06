@@ -72,6 +72,7 @@ bindkey -a '\C-^' amer-past-current
 bindkey    '\C-o' amer-yank-output
 bindkey -a '\C-o' amer-yank-output
 
+bindkey '\C-x\C-m' set-fast-exec-cmd  # Save last cmdline to rerun by ',m'
 bindkey '\C-x\C-j' jh-prev-comp       # Run with last output autocomplete
 bindkey -a  '\C-u' jh-prev-comp       # Run with last output autocomplete
 bindkey '\C-x\C-e' edit-command-line
@@ -136,4 +137,3 @@ bindkey -M menuselect '^M' .accept-line
 #bindkey '^Y' yank-last-arg # No such func
 # bindkey '^\' character-search               # <C-4>, <C-\>
 # bindkey '^]' character-search-backward      # <C-5>, <C-]>
-
