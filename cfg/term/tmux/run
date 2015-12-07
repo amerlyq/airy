@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+## NEED: ~/.tmux.conf
+#   set -g focus-events on
+if [[ "$TERM" =~ 'rxvt' ]]; then
+  trap 'printf "\e]777;focus;off\x7"'  INT TERM EXIT
+  printf "\e]777;focus;on\x7"
+fi
+
+exec tmux $@

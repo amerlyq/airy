@@ -35,7 +35,7 @@ noremap <unique> ' `
 noremap <unique> ` '
 
 " Pinky stretching soothing
-cnoremap <unique> <C-o> <C-p>
+" cnoremap <unique> <C-o> <C-p>
 " Faster $3 ex-cmds
 noremap <unique> ;  :
 
