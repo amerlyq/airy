@@ -325,20 +325,19 @@ w_header "Windows: Assigning"
 w_header "Windows: Settings"
     # How to launch in floating regime? Simply create window with name starting with Float*.
     # floating enable running before launching of exec, so influence on previous focused wndw
-    wstr 'for_window [class="^Copyq" instance="^copyq"] border none'
-    # wstr 'for_window [class="^Pidgin" title="Buddy List"] move scratchpad'
     wstr 'for_window [class="^Conky"] border none'
     wstr 'for_window [class="^t-engine64"] border none'
     wstr 'for_window [instance="feh"] fullscreen'
     wstr 'for_window [title="^ElonaPlus"] fullscreen'
     wstr ''
     wmapf 'for_window [%s] floating enable, border pixel 3' \
-        'window_role="pop-up"' 'class="^Copyq" instance="^copyq"' \
+        'window_role="pop-up"' 'class="^copyq" instance="^copyq"' \
         'class="^Firefox" instance="^Download"' 'class="^Transmission-gtk"' \
         'class="^Pidgin"' 'class="^Skype"' \
         'instance="^PlayOnLinux"' \
         'class="(?i)'"$term"'" instance="(?i)^Float*"'
 
+    # wstr 'for_window [class="^Pidgin" title="Buddy List"] move scratchpad'
     wstr 'for_window [title="^Transmission" class="^Transmission-gtk" instance="^transmission-gtk"] move scratchpad'
     wstr 'for_window [class="^piony.py"] floating enable, border pixel 5'
 
