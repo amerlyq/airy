@@ -37,4 +37,4 @@ vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
 }
 
 vimf(){ ag -g $@ | $EDITOR -; }
-vimq(){ $EDITOR -q <(agi --vimgrep $@); }
+# vimq(){ $EDITOR -q <(agi --vimgrep $@); }  # Don't work in bash 4.1.5? in ubuntu12?

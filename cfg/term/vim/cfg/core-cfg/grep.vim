@@ -9,14 +9,13 @@ else
   " set grepprg=grep\ -inH " Use grep.
 endif
 
-if exists('&regexpengine')
-  " Use old regexp engine.
+if exists('&regexpengine')  " Use old regexp engine.
   " set regexpengine=1
+  " Doxygen syntax highlighting. Very slow on \c, \b. So set those:
+  set regexpengine=1          " Do not use NFA because doxygen style will be slow
+  let g:load_doxygen_syntax=1 " Load doxygen syntax by default
+  " manually: set syn=cpp.doxygen
 endif
-" Doxygen syntax highlighting. Very slow on \c, \b. So set those:
-set regexpengine=1          " Do not use NFA because doxygen style will be slow
-let g:load_doxygen_syntax=1 " Load doxygen syntax by default
-" manually: set syn=cpp.doxygen
 
 "{{{1 Ctags ============================
 set tags=./tags,tags,*/tags,~/.cache/vim/tags

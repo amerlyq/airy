@@ -36,7 +36,7 @@ command! -bar -nargs=0 -range TrailingHighlight
 
 "{{{1 IMPL ====================
 fun! UnobtrusiveSubF(...)
-  let l:pos = getcurpos()
+  let l:pos = (exists('getcurpos') ? getcurpos() : getpos('.'))
   silent! exe call(function("printf"), a:000)
   call histdel("search", -1)
   let @/ = histget("search", -1)

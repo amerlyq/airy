@@ -42,6 +42,8 @@ set sessionoptions-=options
 
 set lazyredraw        " don't redraw screen while macros are executing
 
-"" HACK: show textwidth limit only before text wraps on big enough screens
-au MyAutoCmd VimResized,WinEnter,WinLeave,BufWinEnter *
-      \ let &cc=((&tw > winwidth(0)-&fdc-&nuw-1) && &wrap ? '' : '+1')
+if exists('&cc')
+  "" HACK: show textwidth limit only before text wraps on big enough screens
+  au MyAutoCmd VimResized,WinEnter,WinLeave,BufWinEnter *
+        \ let &cc=((&tw > winwidth(0)-&fdc-&nuw-1) && &wrap ? '' : '+1')
+endif

@@ -68,10 +68,11 @@ if neobundle#tap('NrrwRgn') "{{{
   " let b:nrrw_aucmd_close  = "%UnArrangeColumn"
   " let b:nrrw_aucmd_written = ':update'
 
+  " BUG: don't work as expected? What it must to do at all?
   "USAGE:HACK: Change filetype for opened region ':NN awk'
-  command! -nargs=* -bang -range -complete=filetype NN
-      \ :<line1>,<line2> call nrrwrgn#NrrwRgn('',<q-bang>)
-      \ | setl filetype=<args>
+  " command! -nargs=* -bang -range -complete=filetype NN
+  "     \ :<line1>,<line2> call nrrwrgn#NrrwRgn('',<q-bang>)
+  "     \ | setl filetype=<args>
 
   "USAGE:HACK: Filter by pattern and open in split
   "NOTE: hide comments (temporary strip) by ':v/^#/NRP'

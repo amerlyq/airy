@@ -1,5 +1,5 @@
 if 0 | finish | endif  " NOTE: skip init for vim-tiny/small.
 " Set defaults as in nvim (those opts ignored by nvim)
 set nocompatible ttyfast
-let $VIMHOME=fnamemodify(expand('<sfile>'), ':h')
+let $VIMHOME=fnamemodify(resolve(expand('<sfile>')), ':h')
 execute 'source $VIMHOME/cfg/vimrc'

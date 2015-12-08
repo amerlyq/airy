@@ -22,30 +22,18 @@ let g:neobundle#types#git#enable_submodule = 1
 call neobundle#begin(expand('$BUNDLES'))
 " if neobundle#load_cache()
 
-" SEE ref for yaml:
-"   http://www.yaml.org/refcard.html
-"   http://learnxinyminutes.com/docs/yaml/
-function! LoadFromYAMLs(cfgpaths, default)  " ALT: py3file load_yaml.py
-  if !exists(':PythonI') | finish | endif   " SEE: core/detect.vim::PythonI
-PythonI << endofpython
-import vim, yaml, json  # Use json to correct '\' escaping when print(dict)
-fmt = 'NeoBundle "{!s:s}", {!s}'
-cfgs, defs = map(vim.eval, ("a:cfgpaths", "a:default"))
-for c in (cfgs if isinstance(cfgs, list) else (cfgs,)):
-  with open(c) as f:
-    for doc in [doc for doc in yaml.safe_load_all(f) if doc is not None]:
-      for src, opts in doc.items():
-        if 'disabled' in opts:
-          opts['disabled'] = vim.eval(opts['disabled'])
-        # Remove to fasten loading
-        [opts.pop(k, None) for k in ["description", "contract"]]
-        vim.command(fmt.format(src, json.dumps(dict(defs, **opts))))
-endofpython
-endfunc
-
 NeoBundleFetch 'Shougo/neobundle.vim'  " Manage self by itself
-call LoadFromYAMLs(globpath(expand($VIMHOME.'/cfg/'),
-      \ 'plugins/*.yml', 0, 1), {'lazy': 1})
+
+" Must not contain '\n' in path. Compat globpath <v7.4.279
+let s:ymls = split(globpath(expand($VIMHOME.'/cfg/'), 'plugins/*.yml'), '\n')
+let s:opts = {'lazy': 1}
+fun! LoadFromYAMLs(py, paths, default)
+  exe a:py expand($VIMHOME.'/cfg/yaml.py')
+endf
+ " If unsuccessful with auto-detected python, try to use python2
+if LoadFromYAMLs('PythonF', s:ymls, s:opts) == -1
+  call LoadFromYAMLs('pyfile', s:ymls, {'lazy': 1})
+endif
 
 " NeoBundleSaveCache
 " endif

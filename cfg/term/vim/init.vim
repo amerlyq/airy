@@ -1,2 +1,2 @@
-let $VIMHOME=fnamemodify(expand('<sfile>'), ':h')
+let $VIMHOME=fnamemodify(resolve(expand('<sfile>')), ':h')
 execute 'source $VIMHOME/cfg/vimrc'

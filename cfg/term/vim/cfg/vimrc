@@ -1,6 +1,6 @@
 " vim:ts=2:sw=2:sts=2
-fun! _cfg(path)
-  for f in globpath(expand($VIMHOME .'/cfg/'), a:path, 0, 1)
+fun! _cfg(path)  " Must not contain '\n' in path. Compat globpath <v7.4.279
+  for f in split(globpath(expand($VIMHOME .'/cfg/'), a:path), '\n')
     exe 'source' fnameescape(f)
   endfor
 endf

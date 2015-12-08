@@ -5,6 +5,7 @@ source ~/.shell/func.d/cfgsetup
 link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
 link "$PWD" "${XDG_CONFIG_HOME:=$HOME/.config}/nvim"
 mkdir -p "${XDG_DATA_HOME:=$HOME/.cache}/shada"
+# link "$PWD/vimrc" ~/.vimrc  # NOTE: For old vim <v7.3
 
 if distro arch; then
     mkdef editor $(which $EDITOR)
