@@ -10,16 +10,8 @@ exe "fun! IsSudo()   \nreturn".($SUDO_USER !=# '' && $USER !=# $SUDO_USER &&
 
 
 "{{{1 Cross-wrappers ==========
-if has('python3') && get(g:, 'pymode_python', '') !=# 'python'
-  command! -nargs=1 PythonI python3 <args>
-  command! -nargs=1 PythonF py3file <args>
-  PythonI PY3 = True
-  exe "fun! IPythonPyeval(arg)\nreturn py3eval (a:arg)\nendf"
-elseif has('python')
-  command! -nargs=1 PythonI python <args>
-  command! -nargs=1 PythonF pyfile <args>
-  PythonI PY3 = False
-  exe "fun! IPythonPyeval(arg)\nreturn pyeval (a:arg)\nendf"
-else
-  echom "No python support. Your bad, plugins can't be loaded."
-endif
+let s:py3 = ((has('python3')&&get(g:,'pymode_python','')!=#'python')?'3': '')
+exe 'comm! -nargs=1 PythonI python'.s:py3.' <args>'
+exe 'comm! -nargs=1 PythonF py'.s:py3.'file <args>'
+exe "fun! IPythonPyeval(arg)\nreturn py".s:py3."eval (a:arg)\nendf"
+exe 'PythonI PY3 = '.(s:py3!=#'' ? 'True' : 'False')

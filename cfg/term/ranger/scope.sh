@@ -127,6 +127,8 @@ case "$mimetype" in
                 --line-numbers --line-number-length=3 --replace-tabs=4 --no-trailing-nl \
                 --validate-input --style=$STYLE \
                 "$path" && exit 5 || exit 2
+        else
+            try cat -n "$path" && { dump | trim; exit 5; } || exit 2
         fi ;;
 
     image/*) { # Ascii-previews of images:

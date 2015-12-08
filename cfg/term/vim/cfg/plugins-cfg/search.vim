@@ -113,7 +113,7 @@ if neobundle#tap('vim-over') "{{{
   "" NOTE: this part is somewhat overlaps with incsearch.vim
   let g:over#command_line#search#enable_incsearch = 1
   let g:over#command_line#search#enable_move_cursor = 1
-  let s:cmdwrap = 'OverCommandLine %s<CR>'  " Used to wrap subs below
+  let s:cwrap = 'OverCommandLine %s<CR>'  " Used to wrap subs below
   " DISABLED: because of bug in 'vimoutliner' mappings
   " noremap  <unique><silent>  :  :OverCommandLine /<CR>
   call neobundle#untap()
@@ -140,8 +140,8 @@ endif "}}}
   \ '[Replace]f': 'v//d<CR>',
   \} " norm!, etc
   for [c, r] in items(s:subs) | if maparg(c) ==# '' | for m in ['n','x']
-    exe printf('%snoremap <silent><unique>  %s  :'.(
-          \   exists('s:cmdwrap') && (r!~?'<CR>$') ? s:cmdwrap : '%s').'%s',
+    exe printf('%snoremap '.(exists('s:cwrap') ? '<silent>' : '').'<unique> '
+          \.'%s :'.(exists('s:cwrap') && (r!~?'<CR>$') ? s:cwrap : '%s').'%s',
           \ m, c, (m=='n'?'%':'').r, ((r=~#'\Wg$') ? '<Left><Left>' : '') )
   endfor | endif | endfor
   "}}}

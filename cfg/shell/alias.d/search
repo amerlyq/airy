@@ -7,7 +7,11 @@ ff() { find . -type f -regex $@; }
 # grep -Ri 'name' . # find in all files
 # alias ff='find ./ | grep -i '
 
-agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S $@; }
+if hash ag >/dev/null 2>&1
+then agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S $@; }
+else agi() { grep -ri $@ .; }  # --include=*.{cc,h}
+fi
+
 agd() { find . -maxdepth 1 -type f | xargs agi $@; }    # in curr dir only
 agw() { agi -w $@; }
 agp() { agi --pager less $@; }

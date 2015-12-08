@@ -1,0 +1,25 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    pkg_inst cups ghostscript gsfonts
+    pkg_inst cups-pdf  # print in pdf
+    pkg_inst avahi  # network discovering
+fi
+
+# NEXT:
+#   sudo systemctl start org.cups.cupsd.service
+# If avahi:ALSO:
+#   sudo systemctl start cups-browsed.service
+# CHECK:
+# lsusb (for usb printer)
+# Open in browser:
+#   http://localhost:631 -> Administration -> Add Printer -> ipp
+#   ipp://172.24.102.62/ipp
+# Drivers -- will be showed in menu for printer, if installed
+#   paci brother-hl2250dn
+# Set margins: defaults for driver
+# CHECK:
+#   lpstat -a
+# PRINT:
+#   lpr <file>..
