@@ -81,6 +81,13 @@ Future
 
 
 BUG plugins
+	[_] github-issues -- conflicts with commitia in lazy mode?
+	[_] FIX russian xkb plugin
+		: Maybe, some of mapping map not as keysym but by keycodes?
+		[_] my own mappings simply don't work (like ,s or ,d)
+		[_] mappings on digits are wrong, as I replaced them.
+		> [_] Fix xkbmap plugin language switch -- to use dbus and reuse C-^?
+			: Because I remapped some keys in rus, naive mapping don't work anymore
 	[_] REQ: quickfix-reflector -- don't add saved lists to history of colder/cnewer
 	[_] BUG: ninja-feet [<>][ia] don't work with custom textobj? (I have remapped all)
 		:= Fork and develop fix?
@@ -257,10 +264,6 @@ BUG:
 		:? maybe bug from 'not back-moving cursor'
 		:~ -- 'V' deletes also \n -- THINK? change behaviour?
 		:> Replaced vnoremap '$' -> 'g_'
-	[_] FIX russian xkb plugin
-		: Maybe, some of mapping map not as keysym but by keycodes?
-		[_] my own mappings simply don't work (like ,s or ,d)
-		[_] mappings on digits are wrong, as I replaced them.
 	[_] FIX ,K to check if current file executable, and if not -- using last command in ':'
 		2015-03-27 [X] fix ,k ,K behaviour
 			,k by default must always run :./% -- to speed up work on open
