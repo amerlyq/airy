@@ -96,11 +96,13 @@ BUG plugins
 	[_] FIND: why textobj-space don't affect indents
 	[_] BUG: airline -- disappears highlighting of upper/bottom line if window smaller than text
 		:= CHECK if it's my submode-ext for airline
-	[_] REGR: 'xp' can't transpose characters ('x' didn't put into reg)
 	2015-11-26 [X] BUG: broken Lazy for fugitive -- Gdiff don't work
 		:> FIXED call func to detect if current file inside repo
-	[_] BUG: submode C-f -- when 'f' at the buffer end -- breaks submode and uses normal 'f'
-	[_] FIX?: submode C-f -- counter with keys like 'f' don't work?
+	[_] submode
+		[_] BUG: submode C-f -- when 'f' at the buffer end -- breaks submode and uses normal 'f'
+		[_] FIX?: submode C-f -- counter with keys like 'f' don't work?
+		[_] ENH: 'x' -- don't put in register on each delete, but copy on submode-exit
+		2015-12-10 [X] REGR: 'xp' can't transpose characters ('x' didn't put into reg)
 	[_] REQ: gnupg -- can't do lazy
 	2015-11-26 [X] BUG: CamelMotion -- don't load at all? -- test inside vimscript
 		:> After plugin update you need to specify mappings explicitly or call its functions
@@ -188,16 +190,20 @@ BUG plugins
 	[_] textobj-blockwise -- can be extended. Add '[ai][bqhd]' in on_post_source
 		: onoremap <expr> <Leader>iw textobj#blockwise#mapexpr("iw")
 	[_] operator-surround
+		[_] THINK keep current cursor position after appending brackets?
+			:= current relative to context != keep col
 		2015-11-28 [X] BUG first 'vwqa' after lazy loading -- applies only to first char
 			:> My fail, result of 'echom' on source inside neobundle#config#search
 		[_] BUG repeat '.' applies to same region, and not same motion!
 			:= Hence 'veqa"' can't be reproduced correctly
 		2015-11-19 [X] direct append in visual mode
-		[_] THINK? direct-append operators for normal mode?
+		2015-12-10 [X] THINK? direct-append operators for normal mode?
+			:> Seems like it works as is with default plugin?
 		[_] THINK adding space inside/outside brackets by involving [Space]
 			:= 4 variants: no/inner/outer/both
 		[_] THINK? Optimize direct brace mappings by getchar()
-		[_] ADD pairs for "|" and ":"
+		2015-12-10 [$] ADD pairs for "|" and ":"
+			:> Both | and : can be used as motion patters, therefore after qa.. don't work
 		2015-11-19 [X] add symm mappings for closing block brackets
 		[_] THINK:DEV: too many operators (+Space!) -- use vim-submode?
 	[_] ag

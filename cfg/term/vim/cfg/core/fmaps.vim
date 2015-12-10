@@ -16,8 +16,8 @@ endfun
 
 
 fun! Map_blocks(prefix, mapping, ...)
-  let l:dfl = '(0;{9;[8;"2;''1;<3;`4'
-  for g in split(get(a:, 3, l:dfl), ';') | for i in range(1, strlen(g)-1)
+  let l:aliases = get(a:, 3, '(0;{9;[8;"2;''1;<3;`4')
+  for g in split(l:aliases, ';') | for i in range(1, strlen(g)-1)
     " for k in ['', '[Space]', 'g[Space]', '<Leader>[Space]']
     call Map_nxo(a:prefix.g[i], a:mapping.g[0],
           \ get(a:, 1, 'ox'), get(a:, 2, 'noremap'))

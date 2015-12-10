@@ -22,9 +22,13 @@ command! -nargs=+ SMpar call SMpar(<f-args>)
 
 "{{{1 User-Submodes =====================
 " «Smart» x with group undo (REF: http://haya14busa.com/improve-x-with-vim-submode/)
-SMDEF fluent/x  x "_x
-SMmap fluent/x  x <Plug>(fluent-x) n r
-nnoremap <silent> <Plug>(fluent-x) :undojoin \| norm! "_x<CR>
+SMALL fluent/x  x X
+" ADD call submode#enter_with("fluent/x", 'n', 'r', 'gX', 'gX')
+SMmap fluent/x  x <Plug>(fluent-x-r) n r
+SMmap fluent/x  X <Plug>(fluent-x-l) n r
+" ATTENTION: don't use "_x because you wiil lose combining 'x' with 'p'!
+nnoremap <silent> <Plug>(fluent-x-r) :undojoin \| norm! x<CR>
+nnoremap <silent> <Plug>(fluent-x-l) :undojoin \| norm! X<CR>
 
 
 " Undo (chronological) navigation by [g---...]/[g+++...]

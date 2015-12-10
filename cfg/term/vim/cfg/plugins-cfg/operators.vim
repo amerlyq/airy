@@ -6,7 +6,17 @@ if neobundle#tap('vim-operator-surround')  "{{{
     call Map_nxo('[Quote]'.op[0], '<Plug>(operator-surround-'.op.')', 'nx')
   endfor
   let s:op = '<Plug>(operator-surround-append)'
+  "" Add brackets on qq
+  call Map_nxo('[Quote]q', s:op.'iW"', 'n')
+  call Map_nxo('[Quote]q', s:op.'"', 'x')
+  "" Add brackets by v<motion>q[<aliases>]
   call Map_blocks('[Quote]', s:op, 'x', 'map', s:alias)
+  "" Add brackets by qa<motion>[<aliases>]
+  let g:operator#surround#blocks = {'-': map(split(s:alias, ';'), "{
+  \  'keys' : split(v:val[1:], '\\zs'),
+  \  'block': split((v:val[0] =~ '[''`\"]' ? v:val[0:1] : v:val[1:2]), '\\zs'),
+  \  'motionwise' : ['char', 'line', 'block'],
+  \}") }
   call neobundle#untap()
 
   if neobundle#tap('vim-textobj-between')  "{{
