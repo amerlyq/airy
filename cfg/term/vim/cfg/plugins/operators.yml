@@ -1,10 +1,11 @@
 ## Operators
 kana/vim-operator-user:
   description: Dependency of 'vim-operator-*' and vim-clang-format
-  functions: operator#user#
+  functions: operator#user#define
   contract: &opu
     mappings: [[nx, <Plug>]]
     depends: kana/vim-operator-user
+  lazy: 0  # BUG: don't loads from inside 'ag.vim/plugin/' by lazy 'functions'
 
 rhysd/vim-operator-surround:
   description: |

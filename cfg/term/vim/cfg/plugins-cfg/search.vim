@@ -62,7 +62,7 @@ if neobundle#tap('incsearch.vim') "{{{
     endf
     noremap <silent><unique><expr>  z/  incsearch#go(<SID>cfg_fuzzy())
     noremap <silent><unique><expr>  z?  incsearch#go(<SID>cfg_fuzzy({'command': '?'}))
-    noremap <silent><unique><expr>  zg? incsearch#go(<SID>cfg_fuzzy({'is_stay': 1}))
+    noremap <silent><unique><expr>  z;  incsearch#go(<SID>cfg_fuzzy({'is_stay': 1}))
     call neobundle#untap() "}}}
   endif
 
