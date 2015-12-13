@@ -39,6 +39,8 @@ set shortmess=atTIO " No intro msg, etc
 
 " To be able safely save sessions and change settings between them
 set sessionoptions-=options
+" To not mess when :bnext after opening some more files by ranger
+set sessionoptions-=curdir
 
 set lazyredraw        " don't redraw screen while macros are executing
 

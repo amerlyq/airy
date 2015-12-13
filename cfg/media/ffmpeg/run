@@ -8,6 +8,12 @@ src=$(readlink -m "$1")
 dst="${src%/*}/fl-clip"
 mkdir -p "$dst"
 
+path="$dst/${1##*/}"
+
+if [[ -e "$path" ]]; then
+    mv -vfT --backup=t "$path" "${path%.*}_${RANDOM}.${path##*.}"
+fi
+
 ffmpeg -i "$1" \
     -ss "${2:-00:00}" -to "${3:--00:00}" -c copy \
-    "$dst/${1##*/}"
+    "$path"

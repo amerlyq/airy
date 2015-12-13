@@ -19,8 +19,10 @@ alias gdc='gdf --cached -w'
 alias gdcw='gdf --no-ext-diff --word-diff --cached -w'
 alias gdn='gdf --name-only'
 alias gdr='gdf --color-words'
-alias gdp='gdw HEAD~1 HEAD'
-alias gdl="gdw '@{1}..'"
+alias gdp='gdf HEAD~1 HEAD'
+alias gdp-='gdw HEAD~1 HEAD'
+alias gdl="gdf '@{1}..'"
+alias gdl-="gdw '@{1}..'"
 alias gds='gdf "stash@{0}"'
 alias gdfv='git difftool --tool="$EDITOR -d'
 alias gdfm='git difftool --tool=meld'
@@ -39,7 +41,7 @@ alias gsw='git show'
 
 ## Pull
 alias gl='git pull --rebase --verbose'
-alias glf='git fetch -vp --all --progress'
+alias glf='git fetch --all --progress --prune --verbose'
 # After 'push -f' do: glf && gtr --hard origin/<branch>
 alias glc='git rebase --continue'
 # alias grs='git rebase --skip'
@@ -50,7 +52,6 @@ alias gco='noglob git checkout'
 alias gcb='gco -b'  # For topic branches
 alias gcom='gco master'
 #alias gb='git branch'
-# alias gf='git fetch'
 
 ## Push
 alias gaa='git add --all'
@@ -64,7 +65,8 @@ alias gca='gaa && gcm'
 alias gsh='git push'
 # alias gsha='gsh --all'  # ATTENTION: branches deleted on one PC can be pushed again from another!
 # SEE http://longair.net/blog/2011/02/27/an-asymmetry-between-git-pull-and-git-push/
-alias gshb='gsh origin HEAD'  # Push current branch to server
+alias gshb='gsh --set-upstream origin HEAD'  # Push current branch to server
+alias gshf='gsh --force'
 
 
 ## Recursive repo
@@ -77,3 +79,4 @@ alias Gh='~/.bin/prg.d/git-recursive ph'
 
 # Faster gitk startup
 alias gk='gitk --all --max-count=200 --branches --remotes --tags &'
+alias gv='$EDITOR -c Gitv'
