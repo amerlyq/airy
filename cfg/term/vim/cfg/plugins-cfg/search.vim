@@ -2,11 +2,12 @@
 if neobundle#tap('ag.vim') "{{{
   " let g:ag_highlight=1
   " CHG: all real mappings included into 'after/ftplugin/qf.vim'
-  let g:ag_apply_lmappings=0
-  let g:ag_apply_qmappings=0
-  let g:ag_mapping_message=0
-  let g:ag_no_default_mappings=0
-  " let g:ag_qhandler="botleft lopen 7"  "OR: copen 20"
+  let g:ag = {}
+  let g:ag.apply_lmappings=0
+  let g:ag.apply_qmappings=0
+  let g:ag.mapping_message=0
+  let g:ag.no_default_mappings=0
+  " let g:ag.qhandler="botleft lopen 7"  "OR: copen 20"
   ": Ag working dir  searching
   " nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
   nnoremap <unique> <Leader>a :<C-U>Ag -w <C-r>=shellescape('<cword>')<CR><CR>
@@ -17,10 +18,10 @@ if neobundle#tap('ag.vim') "{{{
   ": Ag current file searching (currently no jumping -- need Ag >= 0.25 with --vimgrep)
   nnoremap <unique> <Leader>A :<C-U>Ag -w '<C-R><C-W>' %:p<CR>
   vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<CR>
-  let g:ag_prg="ag --smart-case --vimgrep"
+  let g:ag.prg="ag --smart-case --vimgrep"
   fun! neobundle#hooks.on_source(bundle)
     if split(system("ag --version"), "[ \n\r\t]")[2] <= '0.25.0'
-      let g:ag_prg="ag --smart-case --column --nogroup --noheading --ignore tags"
+      let g:ag.prg="ag --smart-case --column --nogroup --noheading --ignore tags"
     endif
   endf
   call neobundle#untap()
