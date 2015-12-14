@@ -12,6 +12,7 @@ else
 endif
 
 if s:theme ==# 'transparent'
+  set t_ut=y  " erase background
   let s:theme_bkgr = 'dark'
   let g:airline_theme = 'serene'
   let g:solarized_termtrans=1         " use term transparent color for bg
@@ -27,6 +28,7 @@ else
 endif
 
 fun! s:PatchColorScheme()
+  set t_ut=  " Don't erase bkgr. See http://sunaku.github.io/vim-256color-bce.html
   if s:theme ==# 'transparent'
     for g in [DiffAdd, DiffChange, DiffDelete, DiffText,
       \       SignColumn, LineNr, FoldColumn, SpecialKey]

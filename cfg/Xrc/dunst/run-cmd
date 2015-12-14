@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+if [[ -t 0 ]]
+then CMD=("${@:?No cmd specified}")
+else CMD=( $(cat) )
+fi
+
+run() {
+    shopt -s expand_aliases;
+    SHELL=/bin/bash source ~/.shell/aliases;
+    eval "${CMD[@]}"
+}
+
+exec 3>&1
+OUTPUT=$(run | tee >(>&3) | tail -5)
+exec 3>&-
+
+# echo "export DISPLAY=:0; export XAUTHORITY=~/.Xauthority; notify-send test" | at now+1minute
+notify-send --urgency=normal \
+    -i "$([[ $? = 0 ]] && echo terminal || echo error)" \
+    "${CMD[*]}" "$OUTPUT"

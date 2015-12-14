@@ -31,6 +31,7 @@ Prezto
 		[_] FIX reduce startup time -- it's too much for zsh+ranger
 			:= do all preparations async like for git?
 			:/ or make async ipc from ranger to zsh -- which is even better
+			:Maybe use 'paci dtach' to run zsh session and feed keys?
 
 Prompt
     >> [_] SEE new pure prompt in prezto -- there was created async.zsh module!
@@ -107,15 +108,20 @@ Configs
 
 
 zsh
+	[_] USE ,f to launch fzf? -- with its pop-up list
 	[_] Add mapping to save/execute some command (like in ranger/vim)
 		: USE it instead of '<C-p><CR>'
 		:= Instead ',k' can be merged with ',m' -- if empty -- abyss, if full -- command
 	[_] ADD mapping on C-S-r -- as reverse search instead of C-s
-	[_] ENH: Text insertion w/o triggering ',d' or ',s'
+	[_] ENH: Text insertion w/o triggering ',d' or ',s' ::> FIXED(in zsh>=v5.1)
+		>> http://zmwangx.github.io/blog/2015-09-21-zsh-51-and-bracketed-paste.html
+		:ALT:SEE https://cirw.in/blog/bracketed-paste for older ZSH
 		See plugin for urxvt/vim-insert -- with autotoggle 'set paste'?
 		:= Use mapping to use wrapper for replace/insert in cmdline:
 		:	> BUFFER="${BUFFER:0:POS}$(xsel -ob)${BUFFER:POS}"
 		:	like my _past_current widget! Also remap C-S-v in zsh?
+		[_] Port solution to bash
+			: http://unix.stackexchange.com/questions/202732/prevent-multi-line-paste-in-bash
 	2015-06-17 [X] ENH: in ~/.shenv reduce zsh startup time by pre-processing file
 		2015-06-17 [X] remove all 'export' where them are not needed
 		2015-06-17 [$] pre-evaluate all $(...) and insert values in appropriate places

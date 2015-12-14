@@ -1,0 +1,14 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| st     | suckless terminal -- lacks of all, but very small
+#| abduco | screen-like programs detaching NEW:ALT: to dtach
+#| dvtm   | tmux-like dwm-adhere split/tiling management
+
+if distro arch; then
+    pkg_inst 'st dvtm'
+    aur_inst 'abduco'
+
+elif distro ubuntu; then
+    pkg_inst 'st dtach'
+fi

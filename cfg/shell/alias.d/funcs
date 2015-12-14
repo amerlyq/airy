@@ -27,12 +27,8 @@ cmpb() { cmp -l $@ |
     gawk '{printf "%04X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)}'
 }
 
-timer() { echo "{ notify-send --urgency normal --expire-time=10000 -i typing-monitor -h int:x:500 -h int:y:500 'Alarm' 'GO and DO this'; beep }" | at now + ${1:-1} minutes; }
-# at 18:30
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+# Add an "alert" alias for long running commands. USAGE:  sleep 10; alert
+alias alert='notify-send --urgency=critical -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # alias notes='date +"%Y-%m-%d, %T" >> ./notes.otl && editor ./notes.otl'
 

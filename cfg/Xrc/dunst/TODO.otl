@@ -1,3 +1,6 @@
+See code for abilities
+	http://libnotify.sourcearchive.com/documentation/0.7.4-1/notify-send_8c_source.html
+
 http://www.galago-project.org/specs/notification/0.9/x211.html
 	#!/bin/sh
 	export DISPLAY=:0.0
@@ -53,5 +56,3 @@ user=`whoami` можно оставить, если мы запускаем ск
 	tail -n 0 -f /var/log/syslog | while read line ; do
 		notify-send --urgency normal --expire-time=2000  "New line in syslog:" "$line" ;
 	done
-
-

@@ -6,6 +6,7 @@ setlocal nowrap textwidth=0
 set nobuflisted
 
 " are we in a location list or a quickfix list?
+" SEE http://vim-dev.vim.narkive.com/kbQnvYDR/we-can-t-handle-type-which-it-s-quickfix-or-location-list
 let b:isLoc = len(getloclist(0)) > 0 ? 1 : 0
 let b:wPref = b:isLoc ? 'l' : 'c'
 

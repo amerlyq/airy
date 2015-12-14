@@ -14,21 +14,26 @@ alias -g  V='|& $EDITOR - '
 # alias -g TL='| tail -20 '
 
 ## Utils
-alias -g C='| wc -l '
-alias -g COL='| column -t '
-alias -g G="| noglob grep $AUTOCOLORS -i "
-alias -g G2="| noglob grep -C 2 $AUTOCOLORS -i "
-alias -g S='| noglob sed -rn '
-alias -g W="| while read line; do "
+alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-running cmds.
+
+## Filters
+alias -g C='|wc -l '
+alias -g T='|column -t '
+alias -g G="|noglob grep $AUTOCOLORS -i "
+alias -g G2="|noglob grep -C 2 $AUTOCOLORS -i "
+alias -g S='|noglob sed -rn '
+alias -g W='|while read line; do '
 
 ## Buffers
-alias -g A='| tee -a $TMPDIR/zsh-last-output '
-alias -g T='| tee $TMPDIR/zsh-last-output '
-alias -g O='cat $TMPDIR/zsh-last-output '
-alias -g X='xsel -ob '
-alias -g XN='| xsel -ib '
-alias -g XC='| xsel -ib && xsel -ob '
-alias -g XA='| xsel -ab && xsel -ob '
+alias -g XO='xsel -ob| '
+alias -g XN='|xsel -ib'
+alias -g XC='|tee >(xsel -ib)| '
+alias -g XA='|tee >(xsel -ab)| '
+
+alias -g FO='<$TMPDIR/zsh-last-output'
+alias -g FN='>$TMPDIR/zsh-last-output'
+alias -g FC='|tee    $TMPDIR/zsh-last-output| '
+alias -g FA='|tee -a $TMPDIR/zsh-last-output| '
 
 # alias -r @="printf \"$(xsel -ob)\n\""
 #   { xsel: Can't open display: (null)
