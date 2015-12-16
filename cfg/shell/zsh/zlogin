@@ -5,9 +5,9 @@
 {
   # Compile the completion dump to increase startup speed.
   zcompdump="${ZDOTDIR:-"$HOME/.cache/zsh"}/.zcompdump"
-  if [[ -s "$zcompdump" && (! -s "${zcompdump}.zwc" || "$zcompdump" -nt "${zcompdump}.zwc") ]]; then
-    zcompile "$zcompdump"
-  fi
+  if [[ -s "$zcompdump" && (! -s "${zcompdump}.zwc" ||
+        "$zcompdump" -nt "${zcompdump}.zwc") ]]
+  then zcompile "$zcompdump"; fi
 } &!
 
 # Print a random, hopefully interesting, adage.
@@ -24,4 +24,6 @@
 # don't place at ~/.zshrc, as it will erase scrollback on 's' in ranger
 printf '\e[99999;H\n\e[H'
 
-[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx
+if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+    exec startx
+fi

@@ -1,9 +1,10 @@
 # vim: ft=zsh
 # ~/.zshenv -- always sourced by zsh (before ~/.zshrc).
-[[ -d ~/.cache/zsh ]] && ZDOTDIR=~/.cache/zsh
+[[ ! -d ~/.cache/zsh ]] || ZDOTDIR=~/.cache/zsh
 
+# in $ man zshall --> there is recommended to use '[[ -o rcs ]]' ?
 # Ensure that a non-login, non-interactive shell has a defined environment.
-if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]
+if [[ -o rcs && "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]
 then source "${ZDOTDIR:-$HOME}/.zprofile"; fi
 
 # WARNING: Available even in Zsh scripts!
