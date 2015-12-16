@@ -1,0 +1,62 @@
+#!/bin/bash
+#   SEE >> http://www.linux-mag.com/id/4442/
+#   http://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables
+
+dst=~/.lesskey
+
+dump() { sed '2,$s/#.*$//;/^\s*$/d' >> "$dst"; }
+
+trap "rm -f '$dst'" INT TERM EXIT
+
+
+> "$dst"
+dump <<EOT
+#command
+h left-scroll
+l right-scroll
+EOT
+## One-char moving at a time -- cascaded parameters feeding:
+# h noaction 1\e(
+# l noaction 1\e)
+
+
+dump <<EOT
+#env
+# Set the default Less options. SEE $ man less, /LESS/
+LESS = -g -i -M -R -S -w -z-4 -j6
+EOT
+# -j- Add context lines when searching with '/',
+# Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
+# Remove -X and -F (exit if the content fits on one screen) to enable it.
+# NOTE: -FX also disabled as support for coloring output has broke
+
+
+dump <<EOT
+
+### Colors ###
+LESS_TERMCAP_mb=$(tput bold; tput setaf 2) # green
+LESS_TERMCAP_md=$(tput bold; tput setaf 6) # cyan
+
+# me | sgr0 | turn off bold, blink and underline
+LESS_TERMCAP_me=$(tput sgr0)
+
+# so | smso | start standout (reverse video) | black on yellow
+LESS_TERMCAP_so=$(tput bold; tput setaf 0; tput setab 7)
+# se      rmso      stop standout
+LESS_TERMCAP_se=$(tput rmso; tput sgr0)
+
+# us      smul      start underline
+LESS_TERMCAP_us=$(tput smul; tput bold; tput setaf 7) # white
+# ue      smue      stop underline
+LESS_TERMCAP_ue=$(tput rmul; tput sgr0)
+
+LESS_TERMCAP_mr=$(tput rev)
+LESS_TERMCAP_mh=$(tput dim)
+LESS_TERMCAP_ZN=$(tput ssubm)
+LESS_TERMCAP_ZV=$(tput rsubm)
+LESS_TERMCAP_ZO=$(tput ssupm)
+LESS_TERMCAP_ZW=$(tput rsupm)
+EOT
+
+# Build to ~/.less (OR copy to /etc/sysless)
+lesskey
