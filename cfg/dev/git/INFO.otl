@@ -161,7 +161,9 @@ Fork and Pull request
 	Push to your fork and Send Pull Request
 	 'git request-pull' [-p] <start> <url> [<end>]
 		git checkout 123-fix-ini-file
-		git push -u origin 123-fix-ini-file
+		git push --set-upstream origin 123-fix-ini-file
+			OR git push -u origin HEAD  # Push current branch to server
+			: SEE http://longair.net/blog/2011/02/27/an-asymmetry-between-git-pull-and-git-push/
 		? git request-pull -p master upstream 123-fix-ini-file
 		? git request-pull refs/remotes/upstream/master $(git config --get remote.origin.url) HEAD
 	< You can have different names for local and remote branch

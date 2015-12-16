@@ -1,19 +1,38 @@
 #!/bin/bash
+# Most of aliases contained at
+#   ~/.cache/zsh/.zprezto/modules/git/alias.zsh
 
 ## --- Git ---
-# git clean -f
-alias gremu='git clean -f --dry-run && echo "dry-run only; directly use git clean -f"'
-
 ## Status
-alias gt='git status -sb && (git stash list | cat)'
-alias gta='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
-alias gtb='git branch -a'
+# Re-defined
+alias gs='git status -sb && git --no-pager stash list'
+alias gca='gaa && gcm'
+alias gl='git pull --rebase --verbose'
+
+# Additional
+alias gaa='git add --all'
+alias gcom='gco master'
+alias glu='gss && gl && gsp'
+alias gfa='git fetch --all --progress --prune --verbose'
+# alias gcv='git commit --no-verify'
+
+# New
+alias gwRF='gwR origin/"$(git-branch-current 2> /dev/null)"'
+alias gbR='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
 alias gtn='git name-rev --name-only'  # Shows related to release tag name
 # alias gtt='git tag'
 
+# NOTE:
+#   gwc / gwC | clean | --dry-run / --force
+#   gfa && gwRF  | do on each client after 'push -f'
+#   giA -- Partial commit: select several hunks from files 'y' and diskard others 'd'.
+#        USE: 'git add -N <file>' before if untracked
+#   gp[aA] -- push all/+force ATTENTION: all deleted on server branches will recreate from user
+
+
 ## Diff
 alias gdf='noglob git diff'
-alias glF='gdf HEAD...origin'  # with fetched
+alias gdF='gdf HEAD...origin'  # with fetched
 alias gdw='gdf --no-ext-diff --word-diff --unified=0'  # OR -U0
 alias gdc='gdf --cached -w'
 alias gdcw='gdf --no-ext-diff --word-diff --cached -w'
@@ -24,9 +43,6 @@ alias gdp-='gdw HEAD~1 HEAD'
 alias gdl="gdf '@{1}..'"
 alias gdl-="gdw '@{1}..'"
 alias gds='gdf "stash@{0}"'
-alias gdfv='git difftool --tool="$EDITOR -d'
-alias gdfm='git difftool --tool=meld'
-alias gdv='gdfv'
 
 ## Log
 alias glg='git lgraph'
@@ -35,39 +51,14 @@ alias glF='git log -p HEAD..origin'  # with fetched
 alias gll='git lmsg'
 gln(){ git ldump -n ${1:-10}; } #or -1 for inf
 alias gff='git rev-list --all | xargs git grep'
-alias gsw='git show'
 # git grep -l --all-match -e <regexp1> # To search files with line
 # git log -G Foo --since=2009.1.1 --until=2010.1.1 -- path_containing_change # To search commits changing line
 
-## Pull
-alias gl='git pull --rebase --verbose'
-alias glf='git fetch --all --progress --prune --verbose'
-# After 'push -f' do: glf && gtr --hard origin/<branch>
-alias glc='git rebase --continue'
-# alias grs='git rebase --skip'
-alias gss='git stash save'
-alias gsp='git stash pop'
-alias glu='gss && gl && gsp'
-alias gco='noglob git checkout'
-alias gcb='gco -b'  # For topic branches
-alias gcom='gco master'
-#alias gb='git branch'
-
-## Push
-alias gaa='git add --all'
-# Partial commit: select several hunks from files 'y' and diskard others 'd'.
-alias gap='git add --patch '  # USE: 'git add -N <file>' before if untracked
-alias gtr='git reset'
-alias gcm='git commit -m'
-alias gcu='git commit --amend -v'
-alias gca='gaa && gcm'
-# alias gcv='git commit --no-verify'
-alias gsh='git push'
-# alias gsha='gsh --all'  # ATTENTION: branches deleted on one PC can be pushed again from another!
-# SEE http://longair.net/blog/2011/02/27/an-asymmetry-between-git-pull-and-git-push/
-alias gshb='gsh --set-upstream origin HEAD'  # Push current branch to server
-alias gshf='gsh --force'
-
+# Utils
+alias gk='gitk --all --max-count=200 --branches --remotes --tags &'
+alias gv='v -c Gitv'
+alias gvs='v -c Gstatus'
+alias gvd='git difftool'
 
 ## Recursive repo
 alias Gg='prg.d/git-recursive'
@@ -77,9 +68,3 @@ alias Gd='Gg st diff'
 alias Gw='Gd --unified=0 --no-ext-diff --unified=0 --exit-code --no-prefix --word-diff'
 alias Gl='Gg pl'
 alias Gh='Gg ph'
-
-# compdef prg.d/git-recursive=git
-
-# Faster gitk startup
-alias gk='gitk --all --max-count=200 --branches --remotes --tags &'
-alias gv='$EDITOR -c Gitv'

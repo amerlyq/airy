@@ -90,12 +90,15 @@ bindkey '\C-x\C-l' synchro-dir-pop
 # bindkey -s ',s' amer-toggle-ranger
 # bindkey -s  's' amer-toggle-ranger
 
-bindkey  -s ',s' '^Us\n'
-bindkey -as  's' 'Ss\n'
+# <Enter>
+bindkey  -s ',j' '\n'
 # quit
 bindkey  -s ',d' '^Uq\n'
 bindkey -as  'q' 'Sq\n'
 bindkey -as ',d' 'Sq\n'
+# ranger
+bindkey  -s ',s' '^Us\n'
+bindkey -as  's' 'Ss\n'
 # make
 bindkey  -s ',m' '^Uabyss\n'
 bindkey -as ',m' 'Sabyss\n'
