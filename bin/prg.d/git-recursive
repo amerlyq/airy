@@ -1,8 +1,9 @@
 #!/bin/zsh
 
+[[ "$THREADS" =~ [0-9]+ ]] || THREADS=8
 FUN="$1"; shift
 case "${@: -1}"
-in -s) bSEQ=1; CMD="${@:1:$#-1}"
+in -s) bSEQ=1; CMD="${@:1:$#-1}"  # ALT: THREADS=1 <prg>
 ;;  *) CMD="$@"
 ;; esac
 
@@ -44,7 +45,7 @@ function time_dt {
 function head_name {
     local name="$1"
     regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
-    print -P "%B%F{3}--[%f $name %F{3}]--%f%b\n"
+    print -P "\n%B%F{3}-----[%f $name %F{3}]-----%f%b"
 }
 
 function gita_st { # $1 -- rep name, $2 -- suffix
@@ -61,6 +62,7 @@ function gita_pl { head_name "$1"
     # remote=$(git ls-remote -h ${remote%/*} refs/heads/${remote##*/} | awk '{print $1}')
     # [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return
 
+    gita_st "$1"
     # Check if clean directory
     # ALT: git diff-index --name-only --ignore-submodules HEAD --
     if git diff-files --quiet --ignore-submodules --
@@ -84,7 +86,8 @@ function git_process {
     ## Print git info from zsh-specific prompt
     case "$FUN" in st|pl|ph) gita_$FUN "$1" ;; esac
     ## Also, exec any git commands after "Gs/Gt/Gl/Gd ..."
-    eval ${CMD:+git $CMD}
+    local gcfg=( -c color.status=always  -c color.ui=always )
+    eval ${CMD:+git ${gcfg[@]} $CMD}
 }
 
 # function traverse_dir { if [[ -d "$1/.git" ]]
@@ -111,15 +114,20 @@ for rep in "${LST[@]}"; do
     ((${WCOL=0} > $#rep)) || WCOL=$#rep
 done
 
-pid=$$
+function worker {
+    local pid=$$
+    (cd "$DIR/$1" && O="$(git_process "$1")"; echo "$O")
+}
+
 for rep in "${LST[@]}"; do
-    # (($#jobstates <= 8)) || wait until USR1
-     # && kill -USR1 $pid 2>/dev/null
-     eval '(cd "$DIR/$rep" && git_process "$rep")' $( ((bSEQ)) || echo '&' )
+    # EXPL process jobs in bunches
+    ((0==THREADS || $#jobstates < ${THREADS:-1})) || wait
+    eval worker "$rep" $( ((bSEQ)) || echo '&' )
 done
 wait
 exit
 
+# ALT: manual control of threads
 # SEE https://raw.githubusercontent.com/sindresorhus/pure/master/async.zsh
 n=0
 function create_new_job {
