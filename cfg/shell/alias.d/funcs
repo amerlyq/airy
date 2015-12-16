@@ -19,9 +19,9 @@ for i in hex dec bits; do
     alias $i='noglob '"$i"' '
 done
 
-strace2(){ ( "$@" 3>&1 1>&2- 2>&3- ) | $EDITOR - -c 'setf strace' ; }
-find_def(){ $SHELL -x >/dev/null |& ag --hidden -S "$*"; exit; }
+find_def(){ PROMT4="%N:%i:" $SHELL -x >/dev/null |& ag --hidden -S "$*"; exit; }
 alias find_def.a="find_def \"alias\""
+strace2(){ ( "$@" 3>&1 1>&2- 2>&3- ) | $EDITOR - -c 'setf strace' ; }
 
 # Works with long hex only
 ddh() { sudo dd if="$1" bs=1 count=$(h2dec ${2:-0}) skip=$(h2dec ${3:-0}); }

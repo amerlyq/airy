@@ -17,6 +17,7 @@ function prompt_amer_time_format {
 
 function prompt_amer_preexec {
   _prompt_amer_time_start="$SECONDS"
+  # print -rn -- $terminfo[el]  # Erase notification under prompt
 }
 
 function _prompt_amer_time_get {

@@ -72,7 +72,6 @@ bindkey -a '\C-^' amer-past-current
 bindkey    '\C-o' amer-yank-output
 bindkey -a '\C-o' amer-yank-output
 
-bindkey '\C-x\C-m' set-fast-exec-cmd  # Save last cmdline to rerun by ',m'
 bindkey '\C-x\C-j' jh-prev-comp       # Run with last output autocomplete
 bindkey -a  '\C-u' jh-prev-comp       # Run with last output autocomplete
 bindkey '\C-x\C-e' edit-command-line
@@ -89,9 +88,14 @@ bindkey '\C-x\C-l' synchro-dir-pop
 # bindkey    ',s' amer-toggle-ranger
 # bindkey -s ',s' amer-toggle-ranger
 # bindkey -s  's' amer-toggle-ranger
+# TODO: bindkey -s '<keystroke>' '^qfoo\n'
+#   where ^q is bound to 'push-line'.
+# It saves current cmdline, and restores it back after running foo
+
 
 # <Enter>
-bindkey  -s ',j' '\n'
+bindkey    ',j' .accept-line
+bindkey -a ',j' .accept-line
 # quit
 bindkey  -s ',d' '^Uq\n'
 bindkey -as  'q' 'Sq\n'
@@ -99,13 +103,10 @@ bindkey -as ',d' 'Sq\n'
 # ranger
 bindkey  -s ',s' '^Us\n'
 bindkey -as  's' 'Ss\n'
-# make
-bindkey  -s ',m' '^Uabyss\n'
-bindkey -as ',m' 'Sabyss\n'
-
-# TODO: bindkey -s '<keystroke>' '^qfoo\n'
-#   where ^q is bound to 'push-line'.
-# It saves current cmdline, and restores it back after running foo
+# make -- save and re-run last cmd by [,m]
+set_fast_exec_cmd 'abyss'
+bindkey '\C-x\C-m' set-fast-exec-cmd
+bindkey -a  '\C-m' set-fast-exec-cmd
 
 
 ### Miscellaneous

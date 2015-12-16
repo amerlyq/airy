@@ -14,6 +14,12 @@ function _prompt_amer_setup_prompts {
   PROMPT="%F{$color}${parts[1,2]}${parts[2]}%f"
   PROMPT+='%B%F{8}[%F{220}${_prompt_amer_pwd}%F{8}]%b'
   PROMPT+=' ${git_info:+${(e)git_info[details]}}${vcs_info_msg_1_}'
+  # Custom status line under prompt:
+  #   http://unix.stackexchange.com/questions/1022/display-stuff-below-the-prompt-at-a-shell-prompt
+  # PS1_2='[some status]'
+  # terminfo_down_sc="${terminfo[cud1]}${terminfo[cud1]}${terminfo[cuu1]}${terminfo[cuu1]}${terminfo[sc]}${terminfo[cud1]}"
+  # PROMPT+="%{${terminfo_down_sc}${PS1_2}${terminfo[rc]}%}"
+  # ++ see commented print in prompt_amer_preexec
   # Next line:
   PROMPT+="${prompt_newline}%F{$color}${parts[3]}%f"
   PROMPT+='${git_info:+${(e)git_info[icons]}}${vcs_info_msg_0_}'

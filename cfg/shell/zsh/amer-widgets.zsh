@@ -1,5 +1,7 @@
 # SEE
 #   print -s : http://linux.die.net/man/1/zshbuiltins
+# Show list of all widgets $ zle -la, or M-x in emacs, or ':' in vi
+#   http://sgeb.io/articles/zsh-zle-closer-look-custom-widgets/
 
 # If empty cmd line, copy last line from history
 zle -N amer-yank-current _yank_current
@@ -69,9 +71,11 @@ function complete-files() { compadd - $PREFIX*; }
 # Bind last executed command as 'abyss'. Reset: apply to 'abyss'
 zle -N set-fast-exec-cmd set_fast_exec_cmd
 function set_fast_exec_cmd {
-    local cmd="${BUFFER:-$(fc -ln -1)}"
+    local cmd="${*:-${BUFFER:-$(fc -ln -1)}}"
     bindkey  -s ',m' "^U$cmd\n"
     bindkey -as ',m' "S$cmd\n"
+    (($#)) || printf "\nSaved: '%s'\n" "$cmd"
+    # WARNING: don't output -- for key-mix setting? or eval "$cmd?"
 }
 
 ### TRAPS ###

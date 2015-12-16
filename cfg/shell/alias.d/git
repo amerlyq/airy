@@ -14,6 +14,9 @@ alias gaa='git add --all'
 alias gcom='gco master'
 alias glu='gss && gl && gsp'
 alias gfa='git fetch --all --progress --prune --verbose'
+# BUG: recursion?
+# gri(){ [[ "$1" =~ [0-9]+ ]] && git rebase -i HEAD~$* || git rebase -i $@; }
+# compdef grI=git-rebase
 # alias gcv='git commit --no-verify'
 
 # New

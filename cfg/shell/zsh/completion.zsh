@@ -12,9 +12,11 @@ fpath=(~/.shell/zsh/completion.d $fpath)
 ## To see it you may need to add the following line into your .zshrc:
 # zstyle ":completion:*:descriptions" format "%B%d%b"
 
-# compdef prg.d/git-recursive=git
 compdef prg.d/git-recursive=git
 for c in st pl ph; do eval "function _git-$c { _git; }"; done
+
+# SEE Partial completion for git subcommands (like my $ compdef grI=git-rebase)
+#   http://unix.stackexchange.com/questions/128199/how-do-i-set-zsh-autocompletion-rules-for-second-argument-of-function-to-an-ex
 
 # ALT?
 # autoload -Uz compinit && compinit
