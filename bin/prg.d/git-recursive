@@ -9,6 +9,7 @@ in -s) bSEQ=1; CMD="${@:1:$#-1}"  # ALT: THREADS=1 <prg>
 
 DIR="$PWD"
 source ~/.shell/zsh/zshrc
+GCFG=( -c color.status=always  -c color.ui=always )
 
 autoload -U regexp-replace
 
@@ -66,8 +67,8 @@ function gita_pl { head_name "$1"
     # Check if clean directory
     # ALT: git diff-index --name-only --ignore-submodules HEAD --
     if git diff-files --quiet --ignore-submodules --
-    then git pull --rebase --verbose
-    else git stash && git pull --rebase --verbose && git stash pop
+    then git ${GCFG[@]} pull --rebase --verbose
+    else git stash && git ${GCFG[@]} pull --rebase --verbose && git stash pop
     fi
     gita_st "$1" "\n"
 }
@@ -76,7 +77,7 @@ function gita_ph { head_name "$1"
     local branch=$(git rev-parse --abbrev-ref HEAD)
     local ahead=$(git rev-list HEAD...origin/"$branch" --ignore-submodules --count)
     (( $ahead )) || return
-    git push --verbose
+    git ${GCFG[@]} push --verbose
     gita_st "$1" "\n\n"
 }
 
@@ -86,8 +87,7 @@ function git_process {
     ## Print git info from zsh-specific prompt
     case "$FUN" in st|pl|ph) gita_$FUN "$1" ;; esac
     ## Also, exec any git commands after "Gs/Gt/Gl/Gd ..."
-    local gcfg=( -c color.status=always  -c color.ui=always )
-    eval ${CMD:+git ${gcfg[@]} $CMD}
+    eval ${CMD:+git ${GCFG[@]} $CMD}
 }
 
 # function traverse_dir { if [[ -d "$1/.git" ]]

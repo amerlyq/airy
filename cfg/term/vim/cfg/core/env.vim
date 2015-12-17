@@ -8,12 +8,13 @@ if isdirectory($XDG_CONFIG_HOME.'/vim')
 else
   let $CACHE=expand('~/.cache/vim')
 endif
+
 "" Create cache dirs
-" for d in split('bundle bckpdir spell swapdir undodir view')  " easytags.d
-"   if !isdirectory(expand('$CACHE/' . d))
-"     call mkdir(expand('$CACHE/' . d), 'p', 0700)
-"   endif
-" endfor
+for d in split('bundle bckpdir spell swapdir undodir view')  " easytags.d
+  if !isdirectory(expand('$CACHE/' . d))
+    call mkdir(expand('$CACHE/' . d), 'p', 0700)
+  endif
+endfor
 
 " NOTE The '//' at directory end: use full path for filename with '%' separators
 let $FALLBACK='~/.tmp,/var/tmp,/tmp'
