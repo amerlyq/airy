@@ -1,6 +1,6 @@
 " TODO: http://vim.wikia.com/wiki/Fold_quickfix_list_on_directory_or_file_names
 
-setlocal norelativenumber number
+setlocal number |try|set norelativenumber|catch/E518/|endt
 setlocal nowrap textwidth=0
 " Don't pop up quickfix buffers when doing :bn or :bp
 set nobuflisted

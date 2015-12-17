@@ -18,13 +18,13 @@ if neobundle#tap('ag.vim') "{{{
   ": Ag current file searching (currently no jumping -- need Ag >= 0.25 with --vimgrep)
   nnoremap <unique> <Leader>A :<C-U>Ag -w '<C-R><C-W>' %:p<CR>
   vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<CR>
-  let g:ag.prg="ag --smart-case --vimgrep"
-  fun! neobundle#hooks.on_source(bundle)
-    if split(system("ag --version"), "[ \n\r\t]")[2] <= '0.25.0'
-      let g:ag.prg="ag --smart-case --column --nogroup --noheading --ignore tags"
-    endif
-  endf
   call neobundle#untap()
+endif "}}}
+
+
+if neobundle#tap('vim-foldsearch') "{{{
+  " let g:foldsearch_highlight = 1
+  let g:foldsearch_disable_mappings = 1
 endif "}}}
 
 

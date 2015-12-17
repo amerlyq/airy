@@ -19,8 +19,7 @@ for i in hex dec bits; do
     alias $i='noglob '"$i"' '
 done
 
-find_def(){ PROMT4="%N:%i:" $SHELL -x >/dev/null |& ag --hidden -S "$*"; exit; }
-alias find_def.a="find_def \"alias\""
+find_def(){ (PROMPT4="%N:%i:" $SHELL -x >/dev/null |& ag --hidden -S "$*"; exit); }
 strace2(){ ( "$@" 3>&1 1>&2- 2>&3- ) | $EDITOR - -c 'setf strace' ; }
 
 # Works with long hex only

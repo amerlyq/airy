@@ -1,6 +1,11 @@
 " set foldtext=RefinedFoldText()  " ALT getline(v:foldstart)
-set foldtext=CustomFoldText('\ ')
+set foldtext=CustomFoldText('\ ',1)
 let g:fold_extend_preview = 1
+
+" INTEGRATION:
+" vim-foldsearch/autoload/foldsearch/foldsearch.vim:224
+"   set foldtext=CustomFoldText('\ ',0)
+
 
 "{{{1 Mappings ============================
 " Move between folds
@@ -35,32 +40,36 @@ endfun
 " THINK: toggle highlight for folds -- more/less visible? Like Folded/Comment
 " DEV: collapse all block text in one line if len(s) is less then empty width
 
-fun! CustomFoldText(delim)
+fun! CustomFoldText(delim, preview)
   let fs = v:foldstart
   let line=''
 
-  if getline(fs) =~ '^\s*$'
-    let fs = nextnonblank(fs + 1)
-  endif
-  let nsp = indent(fs)
-
-  " FIXME: duplicates header instead of merging fold zones
-  " if getline(fs) =~ '^\s*{\s*$'| let fs = prevnonblank(fs - 1) | endif
-  " let &v:foldstart = l:fs-1  # BUG: don't work?
-
-  if g:fold_extend_preview
-    if getline(fs) =~ '^\s*{\s*$'
-      let line = '{  '  " . repeat(' ', &tabwidth)
+  if a:preview
+    if getline(fs) =~ '^\s*$'
       let fs = nextnonblank(fs + 1)
     endif
-  endif
-
-  if fs == 0 || fs > v:foldend
-    let fs = v:foldstart
     let nsp = indent(fs)
-  endif
 
-  let line .= substitute(getline(fs), '^\s\+', '', 'g')
+    " FIXME: duplicates header instead of merging fold zones
+    " if getline(fs) =~ '^\s*{\s*$'| let fs = prevnonblank(fs - 1) | endif
+    " let &v:foldstart = l:fs-1  # BUG: don't work?
+
+    if g:fold_extend_preview
+      if getline(fs) =~ '^\s*{\s*$'
+        let line = '{  '  " . repeat(' ', &tabwidth)
+        let fs = nextnonblank(fs + 1)
+      endif
+    endif
+
+    if fs == 0 || fs > v:foldend
+      let fs = v:foldstart
+      let nsp = indent(fs)
+    endif
+
+    let line .= substitute(getline(fs), '^\s\+', '', 'g')
+  else
+    let nsp = 0
+  endif
 
   " Indent foldtext corresponding to foldlevel
   " let foldLevelStr = repeat(repeat(' ',shiftwidth()), v:foldlevel-1)

@@ -6,9 +6,32 @@ Cool manual
 	>>> BEST: https://github.com/tiimgreen/github-cheat-sheet
 	>>>		  http://habrahabr.ru/company/enterra/blog/241525/
 			http://mislav.net/2010/07/git-tips/
+		Low-level operations -- like merging trees, hacking, etc
+			https://www.kernel.org/pub/software/scm/git/docs/user-manual.html
 	Tips
 		http://mislav.net/2010/07/git-tips/
 		http://mislav.net/2014/02/hidden-documentation/
+		http://orga.cat/posts/most-useful-git-commands
+
+	[_] BUG: error: git lstd --graph died of signal 13
+		git lgraph | head -1
+		: SEE http://www.spinics.net/lists/git/msg196343.html
+		:> Problem in nested aliases + pager. With level1 works as expected:
+		:	git lstd --graph | head -1
+
+
+Change
+	Commiter/Author
+		Simple
+			git commit --amend --date="Wed Feb 16 14:00 2011 +0100"
+			GIT_COMMITTER_DATE="Wed Feb 16 14:00 2011 +0100" git commit --amend
+		Batch
+		: git filter-branch --env-filter \
+		: 	'if [ $GIT_COMMIT = 119f9ecf58069b265ab22f1f97d2b648faf932e0 ]
+		: 	then
+		: 		export GIT_AUTHOR_DATE="Fri Jan 2 21:38:53 2009 -0800"
+		: 		export GIT_COMMITTER_DATE="Sat May 19 01:01:01 2007 -0700"
+		: 	fi'
 
 git difftool -t meld <commit> <commit> [<path_to_file_to_compare>]
 
