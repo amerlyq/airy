@@ -2,6 +2,10 @@
 source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
+# Troubles with Adwaita in skype/gvim (DFL, not installed):
+# https://wiki.archlinux.org/index.php/GTK%2B
+#   cat /usr/share/gtk-2.0/gtkrc
+
 g2=~/.gtkrc-2.0
 g3=~/.config/gtk-3.0/settings.ini
 mkdir -p "${g3%/*}"
@@ -20,7 +24,7 @@ esac; fi
 tee -a $g2 $g3 >/dev/null <<EOT
 gtk-theme-name = "$GTK_THEME"
 # gtk-application-prefer-dark-theme = true
-gtk-font-name = "Sans 9"
+gtk-font-name = Sans 9
 
 ## Icons
 ## Name is defined in the theme's index file, it's NOT the name of its directory.
