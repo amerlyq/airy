@@ -1,5 +1,7 @@
 #!/bin/bash
 #   SEE >> http://www.linux-mag.com/id/4442/
+#          http://www.linux-mag.com/id/4145/
+#          := See that and try to move lesspipe from ~/.zprofile into ~/.lesskey
 #   http://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables
 
 dst=~/.lesskey
@@ -23,7 +25,8 @@ EOT
 dump <<EOT
 #env
 # Set the default Less options. SEE $ man less, /LESS/
-LESS = -g -i -M -R -S -w -z-4 -j6
+# -g
+LESS = -a -i -j6  -M -N -R -S -w -z-4 -x4
 EOT
 # -j- Add context lines when searching with '/',
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).

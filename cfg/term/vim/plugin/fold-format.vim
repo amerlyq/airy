@@ -1,3 +1,4 @@
+if &cp||exists('g:loaded_evfold')|finish|else|let g:loaded_evfold=1|endif
 " set foldtext=RefinedFoldText()  " ALT getline(v:foldstart)
 set foldtext=CustomFoldText('\ ',1)
 let g:fold_extend_preview = 1

@@ -1,3 +1,4 @@
+if &cp||exists('g:loaded_qffilter')|finish|else|let g:loaded_qffilter=1|endif
 " SEE: another snippet
 "   https://github.com/henrik/vim-qargs
 

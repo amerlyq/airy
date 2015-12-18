@@ -1,3 +1,5 @@
+if &cp||exists('g:loaded_remaps')|finish|else|let g:loaded_remaps=1|endif
+
 " Remaps gm so the cursor is moved to the middle of the current physical line.
 " Any leading or trailing whitespace is ignored: the cursor moves to the middle
 " of the text between the first and last non-whitespace characters.

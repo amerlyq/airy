@@ -58,14 +58,14 @@ Neovim
 		:> Won't work -- need to edit different parts of same line --
 		:	impossible for NrrwRgn to merge changes back. Use simple :vs and merge manually
 	2015-11-23 [X] TODO: replace all <Leader>t on [Toggle]t, then define [Toggle]=[Frame]t
-	2015-11-23 [X] Pause on file open (for certain files only?)
-		:> Culprit is vim-xkbswitch -- it's old bug, must see src
 	[_] REGR: Seems like current highlight for search+cursor has broken transparent background
 	[_] REGR: slow completion in votl?
 	[_] BUG:CHECK: when printing from pythin, funcs in disabled: are quoted and don't evaluates
 	[_] 1,c --> 's;;\1', 2,c --> 's;;\1\2' and cursor between them
 		: FIND: how to map ,1c and ,2c
 	[_] On android -- use mouse only to scroll, set scrooll-count = 1
+	[_] Deoplete -- don't work with russian? How about neocomplete?
+		:= If don't -- then it will be useless in text writing
 
 
 Future
@@ -89,6 +89,8 @@ BUG plugins
 		[_] mappings on digits are wrong, as I replaced them.
 		> [_] Fix xkbmap plugin language switch -- to use dbus and reuse C-^?
 			: Because I remapped some keys in rus, naive mapping don't work anymore
+		2015-11-23 [X] Pause on file open (for certain files only?)
+			:> Culprit is vim-xkbswitch -- it's old bug, must see src
 	[_] REQ: quickfix-reflector -- don't add saved lists to history of colder/cnewer
 	[_] BUG: ninja-feet [<>][ia] don't work with custom textobj? (I have remapped all)
 		:= Fork and develop fix?

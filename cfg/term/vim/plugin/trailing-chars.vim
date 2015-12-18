@@ -1,3 +1,4 @@
+if &cp||exists('g:loaded_trailing')|finish|else|let g:loaded_trailing=1|endif
 " SEE Remove trailing spaces before saving text files
 "   http://vim.wikia.com/wiki/Remove_trailing_spaces
 

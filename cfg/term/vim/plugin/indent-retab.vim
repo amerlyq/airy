@@ -1,3 +1,4 @@
+if &cp||exists('g:loaded_retab')|finish|else|let g:loaded_retab=1|endif
 " vim:ts=2:sw=2:sts=2
 " TODO:
 "   call with arg of right ts in which file looks like

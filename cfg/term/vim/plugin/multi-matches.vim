@@ -1,3 +1,4 @@
+if &cp||exists('g:loaded_mmatch')|finish|else|let g:loaded_mmatch=1|endif
 " vim: fdm=marker
 " COPY {{{1
 " Plugin to copy matches (search hits which may be multiline).

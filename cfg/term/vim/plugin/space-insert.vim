@@ -1,3 +1,4 @@
+if &cp||exists('g:loaded_ispace')|finish|else|let g:loaded_ispace=1|endif
 " <S-Space> work only in gvim, but <C-Space> -- everywhere?
 
 nnoremap <unique><silent> [Space]<Space>  i<Space><Esc>
