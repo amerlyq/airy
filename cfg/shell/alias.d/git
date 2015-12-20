@@ -8,20 +8,28 @@
 alias gs='git status -sb && git --no-pager stash list'
 alias gca='gaa && gcm'
 alias gl='git pull --rebase --verbose'
+alias gbl='git branch -va'
+alias gbL='git branch -v'
 
 # Additional
+alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
 alias gaa='git add --all'
 alias gcom='gco master'
 alias glu='gss && gl && gsp'
+
+alias gro='git rebase --onto'  # gro master HEAD~1  #: <dst> <point>
+alias grm='git rebase --preserve-merges'
+alias grim='gri --preserve-merges'  # BUG: with -i can be weird!
+
 alias gfa='git fetch --all --progress --prune --verbose'
+alias gwRc='gwR origin/"$(git-branch-current 2> /dev/null)"'
+
 # BUG: recursion?
 # gri(){ [[ "$1" =~ [0-9]+ ]] && git rebase -i HEAD~$* || git rebase -i $@; }
 # compdef grI=git-rebase
 # alias gcv='git commit --no-verify'
 
 # New
-alias gwRF='gwR origin/"$(git-branch-current 2> /dev/null)"'
-alias gbR='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
 alias gtn='git name-rev --name-only'  # Shows related to release tag name
 # alias gtt='git tag'
 

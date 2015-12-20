@@ -1,5 +1,6 @@
 # vim: ft=zsh
 # Executes commands at login post-zshrc.
+# BUG:WARNING: urxvt (but not st) sources this file on each startup!
 
 # Execute code that does not affect the current session in the background.
 {
@@ -22,7 +23,7 @@
 #  (force adding a line of scrollback after the initial window opening)
 # WARNING: must be launched only once after terminal start/reset!
 # don't place at ~/.zshrc, as it will erase scrollback on 's' in ranger
-printf '\e[99999;H\n\e[H'
+[[ ! "$TERM" =~ rxvt ]] || printf '\e[99999;H\n\e[H'
 
 if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
     exec startx
