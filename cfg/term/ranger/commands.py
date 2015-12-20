@@ -4,6 +4,25 @@ from ranger.ext.shell_escape import shell_quote
 import os
 
 
+class ag(Command):
+    """:ag 'regex'
+
+    Looks for a string in all marked paths or current dir
+    """
+    cmd = 'ag --smart-case --group --color --hidden --search-zip'
+    # def __init__(self):
+    #     self.patterns = []
+
+    def execute(self):
+        if self.rest(1):
+            action = ag.cmd.split() + self.rest(1).split()
+            action.extend(f.path for f in self.fm.thistab.get_selection())
+            self.fm.execute_command(action, flags='p')
+
+    # def tab(self):
+    #     return self.patterns
+
+
 class doc(Command):
     lst = ['DEV', 'EXAMPLES', 'INFO', 'LIOR', 'NOTE', 'SYNERGY', 'TODO']
     ext = '.otl'

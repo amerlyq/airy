@@ -17,7 +17,7 @@ fpath="$3"
 DIR="${0%/*}"
 vimrc=$DIR/vimcatrc
 script=$DIR/vimcat.vim
-pipe="${TMPDIR:-/tmp/preview}/${fpath##*/}"
+pipe="${TMPDIR:-/tmp}/.preview/${fpath##*/}"
 # OR choose your own extension from vim:ft=...
 [[ -n "${pipe##*.}" ]] || pipe+=$(sed 's/.*\s+vim:.*ft=\(\w\+\).*/\1/; q' "$fpath")
 mkdir -p ${pipe%/*}
