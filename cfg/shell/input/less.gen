@@ -4,6 +4,9 @@
 #          := See that and try to move lesspipe from ~/.zprofile into ~/.lesskey
 #   http://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables
 
+#   >>> http://unix.stackexchange.com/questions/107315/less-quit-if-one-screen-without-no-init
+#   := Snippets to print content in terminal
+
 dst=~/.lesskey
 
 dump() { sed '2,$s/#.*$//;/^\s*$/d' >> "$dst"; }
