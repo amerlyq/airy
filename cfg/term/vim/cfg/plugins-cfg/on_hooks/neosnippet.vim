@@ -1,6 +1,10 @@
 " Plugin key-mappings.
-imap <silent><unique> <C-k>  <Plug>(neosnippet_expand_or_jump)
-smap <silent><unique> <C-k>  <Plug>(neosnippet_expand_or_jump)
+imap <silent><unique><expr> <C-l>
+    \ neosnippet#expandable_or_jumpable() ?
+    \ "\<Plug>(neosnippet_expand_or_jump)" : "\<C-n>"
+
+" imap <silent><unique> <C-k>  <Plug>(neosnippet_expand_or_jump)
+" smap <silent><unique> <C-k>  <Plug>(neosnippet_expand_or_jump)
 " imap <silent><unique> L  <Plug>(neosnippet_jump_or_expand)
 " smap <silent><unique> L  <Plug>(neosnippet_jump_or_expand)
 " xmap <silent><unique> L  <Plug>(neosnippet_start_unite_snippet_target)

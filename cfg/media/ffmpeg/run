@@ -5,10 +5,11 @@
 # 3 - end
 
 src=$(readlink -m "$1")
-dst="${src%/*}/fl-clip"
+[[ -n "$dst" ]] || dst="${src%/*}/fl-clip"
 mkdir -p "$dst"
 
 path="$dst/${1##*/}"
+path="${path%.*}_${beg//:}.${path##*.}"
 
 if [[ -e "$path" ]]; then
     mv -vfT --backup=t "$path" "${path%.*}_${RANDOM}.${path##*.}"
@@ -17,3 +18,8 @@ fi
 ffmpeg -i "$1" \
     -ss "${2:-00:00}" -to "${3:--00:00}" -c copy \
     "$path"
+
+# ALT
+# ffmpeg -y -nostdin -ss $BEGIN -i "$SRC" -t $DURATION \
+#     -codec:v copy -codec:a copy -codec:d copy "$DST"
+# OR ffmpeg -ss $BEGIN -i $SRC -to $END -strict -2 ${DST}.mp4

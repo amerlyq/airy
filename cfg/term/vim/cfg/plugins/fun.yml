@@ -8,8 +8,9 @@ hari-rangarajan/CCTree:
   description: |
     - Display static callgraphs by reading a cscope database. Works for C programs
     - SEE https://sites.google.com/site/vimcctree/
-  # filetypes: [c]
+  filetypes: [c, cpp]  # To not interfere with Latex, etc
   commands: [CCTreeLoadDB]
+  # BUG: maps are defined even for other filetypes like Latex?
   mappings: [[n, <LocalLeader>f, <LocalLeader>r]]
   # depends: hari-rangarajan/ccglue  # SEE building, configuring to interact
 
