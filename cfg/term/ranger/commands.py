@@ -2,6 +2,9 @@ from ranger.api.commands import Command
 from ranger.ext.shell_escape import shell_quote
 
 import os
+from os import path as fs
+
+ag_patterns = []
 
 
 class ag(Command):
@@ -9,18 +12,36 @@ class ag(Command):
 
     Looks for a string in all marked paths or current dir
     """
-    cmd = 'ag --smart-case --group --color --hidden --search-zip'
-    # def __init__(self):
-    #     self.patterns = []
+    editor = os.getenv('EDITOR') or 'vim'
+    acmd = 'ag --smart-case --group --color --hidden --search-zip'
+
+    def _sel(self):
+        return [f.path for f in self.fm.thisdir.marked_items]
+
+    def _arg(self, i=1):
+        if self.rest(i):
+            ag_patterns.append(self.rest(i))
+        return ag_patterns[-1] if ag_patterns else ''
+
+    def _aug_vim(self, comm, args):
+        cmd = ' '.join([comm, args] + self._sel())
+        return [ag.editor, '-c', cmd, '-c', 'only']
+
+    def _choose(self):
+        if self.arg(1) == '-v':
+            return (self._aug_vim('Ag', self._arg(2)), '')
+        elif self.arg(1) == '-g':
+            return (self._aug_vim('AgGroup', self._arg(2)), '')
+        else:
+            return (ag.acmd.split() + [self._arg(1)] + self._sel(), '-p')
 
     def execute(self):
-        if self.rest(1):
-            action = ag.cmd.split() + self.rest(1).split()
-            action.extend(f.path for f in self.fm.thistab.get_selection())
-            self.fm.execute_command(action, flags='p')
+        cmd, flags = self._choose()
+        self.fm.execute_command(cmd, flags=flags)
 
-    # def tab(self):
-    #     return self.patterns
+    def tab(self):
+        return ['{} {}'.format(self.arg(0), p)
+                for p in reversed(ag_patterns)]
 
 
 class doc(Command):
@@ -31,21 +52,26 @@ class doc(Command):
     Search and open appropriate metafile in one of choosen directories
     """
 
-    def _nearest(self, validate):
+    def _nearest(self, fvalidate):
         for d in doc.loci:
-            path = os.path.join(self._dbase, d, self._dname)
-            if validate(path):
+            path = fs.join(self._dbase, d, self._dname)
+            if fvalidate(path):
                 return path
 
     def execute(self):
         self._dname = (self.arg(1) if self.arg(1) else doc.lst[0]) + doc.ext
         self._dbase = self.fm.thisdir.path
-        path = self._nearest(lambda x: os.path.isfile(x))
-        if not path:
-            path = self._nearest(lambda x: os.path.isdir(os.path.dirname(x)))
+        path = self._nearest(fs.isfile)
+        # WARNING: opens nested editor if file don't exists!
+        # DEV: check if 'file-chooser' regime and touch file before open
+        # if not fs.lexists(path):
+        #     open(path, 'a').close()
         if path:
             self.fm.select_file(path)
             self.fm.move(right=1)
+        else:
+            path = self._nearest(lambda x: fs.isdir(fs.dirname(x)))
+            self.fm.edit_file(path)
 
     def tab(self):
         return ['doc ' + nm for nm in doc.lst]
@@ -55,7 +81,7 @@ class doc(Command):
 #   function finish { tempfile='/tmp/aura/ranger_cwdir'; echo "$PWD" > "$tempfile"; }
 # `trap finish EXIT
 class cd_shelldir(Command):
-    lastdir = os.path.join(os.getenv('TMPDIR') or '/tmp', 'ranger_cwdir')
+    lastdir = fs.join(os.getenv('TMPDIR') or '/tmp', 'ranger_cwdir')
     """:cd_shelldir
     Goes to path from /tmp/<username>/ranger_cwdir
     """
@@ -75,25 +101,25 @@ class cd_shelldir(Command):
 class cda(Command):
     def execute(self):
         if self.arg(1) and self.arg(1)[0] == '-':
-            flags = self.arg(1)[1:]
+            # flags = self.arg(1)[1:]
             path = self.rest(2)
         else:
-            flags = ''
+            # flags = ''
             path = self.rest(1)
 
         if path[0:1] == '~':
-            path = os.path.expanduser(path)
-        if not os.path.exists(path):
+            path = fs.expanduser(path)
+        if not fs.exists(path):
             return self.fm.notify("No such: " + path, bad=True)
 
-        if os.path.isdir(path):
+        if fs.isdir(path):
             self.fm.cd(path)
-        elif os.path.isfile(path):
+        elif fs.isfile(path):
             self.fm.select_file(path)
 
 
 class actualee(Command):
-    FLS = os.path.join('/tmp', os.getenv('USER'), 'ranger_list')
+    FLS = fs.join('/tmp', os.getenv('USER'), 'ranger_list')
     """:actualee
     Use '~/.bin/actually' to apply secondary action to file/list
     """
@@ -156,8 +182,8 @@ class shell(Command):
         try:
             position_of_last_space = command.rindex(" ")
         except ValueError:
-            return (start + program + ' ' for program \
-                    in get_executables() if program.startswith(command))
+            return (start + program + ' ' for program in get_executables()
+                    if program.startswith(command))
         if position_of_last_space == len(command) - 1:
             selection = self.fm.thistab.get_selection()
             if len(selection) == 1:
@@ -166,8 +192,8 @@ class shell(Command):
                 return self.line + '%s '
         else:
             before_word, start_of_word = self.line.rsplit(' ', 1)
-            return (before_word + ' ' + file.shell_escaped_basename \
-                    for file in self.fm.thisdir.files \
+            return (before_word + ' ' + file.shell_escaped_basename
+                    for file in self.fm.thisdir.files
                     if file.shell_escaped_basename.startswith(start_of_word))
 
 
