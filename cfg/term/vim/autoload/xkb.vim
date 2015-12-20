@@ -26,7 +26,7 @@ fun! xkb#init()
   let g:xkb = { 'insert': 0, 'normal': 0, 'langs': ['us', 'ru', 'ua'] }
   augroup xkb_kbdd
     au!
-    autocmd InsertEnter * call xkb#enter()
-    autocmd InsertLeave * call xkb#leave()
+    autocmd InsertEnter,CmdwinEnter * call xkb#enter()
+    autocmd InsertLeave,CmdwinLeave * call xkb#leave()
   augroup END
 endf

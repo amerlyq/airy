@@ -23,8 +23,8 @@ command! -bar -nargs=0 -range=% EmptyLinesStripEnd
     \ <line2>)
 
 command! -bar -nargs=0 -range=% TrailingStrip
-    \ if g:trailing_strip | call UnobtrusiveSubF('%s,%s g/%s/s///ge',
-    \   <line1>, <line2>, '\v[ \t\u3000]+$|[ \u3000]+\ze\t$') | endif
+    \ call UnobtrusiveSubF('%s,%s g/%s/s///ge',
+    \   <line1>, <line2>, '\v[ \t\u3000]+$|[ \u3000]+\ze\t$')
 
 command! -bar -nargs=0 -range TrailingToggle
     \ call ToggleVariable('g:trailing_strip')
@@ -52,5 +52,5 @@ endf
 let g:trailing_strip = 1
 augroup TrailingStrip
   au!
-  au BufWritePre * EmptyLinesStripEnd | TrailingStrip
+  au BufWritePre * if g:trailing_strip|EmptyLinesStripEnd|TrailingStrip|en
 augroup END
