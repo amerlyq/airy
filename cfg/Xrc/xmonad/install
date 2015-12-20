@@ -1,0 +1,10 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+
+if distro arch; then
+    pkg_inst 'xmonad xmonad-contrib'
+
+elif distro ubuntu; then
+    pkg_inst 'xmonad xmonad-contrib'
+fi
