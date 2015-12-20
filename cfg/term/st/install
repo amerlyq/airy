@@ -6,8 +6,10 @@ source ~/.shell/func.d/packages
 #| dvtm   | tmux-like dwm-adhere split/tiling management
 
 if distro arch; then
+    git_inst -d 'amerlyq/st'
+    (cd "${CURR_DIR_PKG?No}/st" && ./install -mbi)
     pkg_inst 'dvtm'
-    aur_inst 'st-solarized abduco'
+    aur_inst 'abduco'
 
 elif distro ubuntu; then
     pkg_inst 'st dtach'
