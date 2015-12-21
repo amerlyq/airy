@@ -55,9 +55,16 @@ bling/vim-airline:
 #   description: Cursor line number inherits color from airline mode color
 #   lazy: 0  # EXPL: always show from the start
 
+frankier/neovim-colors-solarized-truecolor-only:
+  description: Fork which supports term TRUE_COLOR
+  disabled: '!exists("$NVIM_TUI_ENABLE_TRUE_COLOR")'  # Can't choose one of them. BUG in neobundle?
+  # mappings: [[nxi, <Plug>ToggleBackground]]
+  lazy: 0  # EXPL: always show from the start
+
 altercation/vim-colors-solarized:
   description: Sticked to this colorscheme 2+ years already...
-  mappings: [[nxi, <Plug>ToggleBackground]]
+  disabled: 'exists("$NVIM_TUI_ENABLE_TRUE_COLOR")'
+  # mappings: [[nxi, <Plug>ToggleBackground]]
   lazy: 0  # EXPL: always show from the start
 
 # tomasr/molokai: {}

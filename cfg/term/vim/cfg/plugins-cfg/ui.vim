@@ -117,7 +117,8 @@ if neobundle#tap('vim-airline')  "{{{
 endif "}}}
 
 
-if neobundle#tap('vim-colors-solarized')  "{{{
+if neobundle#tap('vim-colors-solarized') ||
+  \neobundle#tap('neovim-colors-solarized-truecolor-only') "{{{
   " nmap <unique> <F12> <Plug>ToggleBackground
   " xmap <unique> <F12> <Plug>ToggleBackground
   " imap <unique> <F12> <Plug>ToggleBackground

@@ -17,8 +17,6 @@ cfgs, defs = map(vim.eval, ("a:paths", "a:default"))
 
 def load_yml(doc):
     for src, opts in doc.items():
-        if 'disabled' in opts:
-            opts['disabled'] = vim.eval(opts['disabled'])
         # Remove to fasten loading
         [opts.pop(k, None) for k in ["description", "contract"]]
         try:

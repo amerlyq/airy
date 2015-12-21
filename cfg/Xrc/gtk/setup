@@ -43,3 +43,14 @@ fi
 
 # To disable scaling of bitmap fonts (which often makes them blurry), remove
 #   /etc/fonts/conf.d/10-scale-bitmap-fonts.conf
+
+dst=~/.Xresources
+echo "#define MAIN_DPI ${MAIN_DPI:-96}" > "$dst"
+for f in "$CURR_CACHE"/Xres-*; do
+    echo "#include \"$f\"" >> "$dst"
+done
+cat "$PWD/xfontrc" >> "$dst"
+echo "W: ~/.Xresources"
+! xrdb -load ~/.Xresources 2>&1 | grep 'error'
+# To see the current loaded resources
+#   xrdb -query -all

@@ -58,6 +58,8 @@ fi
 filter_find cfg setup | while read fl; do
     echo ">>> $fl <<<"; $fl $opts; done | pretty
 
+term_pref="$(has_pr st && echo st || has_pr urxvt && echo urxvt || echo xterm)"
+mkdef x-terminal-emulator $(which $term_pref)
 # ======================================================================
 
 header "DONE"

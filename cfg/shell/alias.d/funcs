@@ -13,7 +13,7 @@ bits() {
     printf "%d%s", (and($1,i) > 0), ++c%4==0?c%16==0?"   ":" ":"";
     printf"\n"; }'
 }
-
+szl() { ls -FaGl "$@" | awk '{s+=$4;print $4,$8} END {print s}'; }
 # Prevent expanding for functions
 for i in hex dec bits; do
     alias $i='noglob '"$i"' '

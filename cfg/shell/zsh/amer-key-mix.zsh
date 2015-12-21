@@ -105,8 +105,8 @@ bindkey  -s ',s' '^Us\n'
 bindkey -as  's' 'Ss\n'
 # make -- save and re-run last cmd by [,m]
 set_fast_exec_cmd 'abyss'
-bindkey '\C-x\C-m' set-fast-exec-cmd
-bindkey -a  '\C-m' set-fast-exec-cmd
+bindkey    '\C-x\C-m' set-fast-exec-cmd
+bindkey -a '\C-x\C-m' set-fast-exec-cmd
 
 
 ### Miscellaneous

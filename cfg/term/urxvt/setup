@@ -3,13 +3,9 @@ source ~/.shell/func.d/cfgsetup
 source ~/.shell/profile
 [[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
-# To see the current loaded resources
-#   xrdb -query -all
-
 ### LINKS ###
 link "$PWD" ~/.urxvt
-link "$PWD/themes/amer-${THEME}" ~/.cache/airy/theme-urxvt
-mkdef x-terminal-emulator $(which urxvt)
+link "$PWD/themes/amer-${THEME}" "$CURR_CACHE/theme-urxvt"
 
 
 # https://wiki.archlinux.org/index.php/Rxvt-unicode
@@ -30,22 +26,18 @@ mkdef x-terminal-emulator $(which urxvt)
 # Color schemes with scrshots:
 # http://linsovet.org.ua/terminal-color-schemes-2
 
-distro arch || LETTER_SPACE=-1
-dst=~/.Xresources
+dst="$CURR_CACHE/Xres-urxvt"
 # size=11
-cat > $dst << EOT
-#define LETTER_SPACE ${LETTER_SPACE:-0}
-#define MAIN_DPI ${MAIN_DPI:-96}
+cat > "$dst" << EOT
+#define LETTER_SPACE $(distro arch && ${LETTER_SPACE:-0} || LETTER_SPACE=-1)
 #define FONT_SIZE ${FONT_SIZE:-pixelsize=14}
-#include ".urxvt/etc/xtermrc"
-#include ".urxvt/etc/xfontrc"
-#include ".urxvt/urxvtrc"
+#include "$HOME/.urxvt/etc/xtermrc"
+#include "$HOME/.urxvt/urxvtrc"
 #include "$(if [[ -f ~/.cache/airy/theme-urxvt ]]
-then printf ".cache/airy/theme-urxvt"
-else printf ".urxvt/themes/amer-dark"
+then printf "$HOME/.cache/airy/theme-urxvt"
+else printf "$HOME/.urxvt/themes/amer-dark"
 fi)"
 EOT
-echo "W: ~/.Xresources"
-
+echo "W: $dst"
 # xrdb -merge -I"$PWD" urxvtrc "$dst"
-! xrdb -load ~/.Xresources 2>&1 | grep 'error'
+# ! xrdb -load ~/.Xresources 2>&1 | grep 'error'

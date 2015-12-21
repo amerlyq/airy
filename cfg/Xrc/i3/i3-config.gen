@@ -61,9 +61,10 @@ exi3="$exno i3-input -F "
 #   term="urxvt"        # i3-sensible-terminal
 #   eurx="$exno urxvt"  # Many times inside tmux demon was hanged, so it's better use separate processes
 # fi
-term=urxvt
-eurx="$exno $term"
-eflo="$eurx -name Float"
+hash x-terminal-emulator && TERMCMD=x-terminal-emulator || [[ -n "$TERMCMD" ]] \
+    || TERMCMD="$(hash st && echo st || hash urxvt && echo urxvt || echo xterm)"
+eurx="$exno $TERMCMD"
+eflo="$eurx $([[ $(readlink -m $TERMCMD)==$(which st) ]] && echo -c || echo -name) Float"
 ## Disabled: wnd name wrong setted in zsh only!
 #ecli="$exno urxvtcd -e \$SHELL -i -c " #--hold
 

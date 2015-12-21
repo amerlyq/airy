@@ -11,6 +11,10 @@ case "$TERM" in rxvt-*)
     # BUG: on android xterm is fake = trash symbs on cursor
     export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     export TERMCMD='urxvt'
+;; st-*)
+    export NVIM_TUI_ENABLE_TRUE_COLOR=1
+    export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    export TERMCMD='st'
 esac
 
 # FIXED: for working in schroot into old ubuntu
