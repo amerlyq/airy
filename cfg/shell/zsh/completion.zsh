@@ -12,6 +12,7 @@ fpath=(~/.shell/zsh/completion.d $fpath)
 ## To see it you may need to add the following line into your .zshrc:
 # zstyle ":completion:*:descriptions" format "%B%d%b"
 
+# SEE /usr/share/zsh/functions/Completion/Unix/_git
 compdef prg.d/git-recursive=git
 for c in st pl ph; do eval "function _git-$c { _git; }"; done
 

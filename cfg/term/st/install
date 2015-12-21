@@ -6,8 +6,12 @@ source ~/.shell/func.d/packages
 #| dvtm   | tmux-like dwm-adhere split/tiling management
 
 if distro arch; then
-    git_inst -d 'amerlyq/st'
-    (cd "${CURR_DIR_PKG?No}/st" && ./install -mbi)
+    if cfgOpt u; then
+        src="${TMPDIR:-/tmp}/st"
+        if [[ -e "$src" ]]; then (cd "$src" && git pull)
+        else (git clone "https://github.com/amerlyq/st" "$src")
+        fi && (cd "$src" && ./install -mbi)
+    fi
     pkg_inst 'dvtm'
     aur_inst 'abduco'
 

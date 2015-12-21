@@ -24,6 +24,21 @@
     lmine   = !git lstd --author=\"$(git config user.name) \"
     lcommit = !git linverse -u # Show modified files in last commit
 
+    logx = log --all --graph --decorate=short --color --format=format:'%C(bold blue)%h%C(reset)+%C(dim black)(%cr)%C(reset)+%C(auto)%d%C(reset)++\n+++       %C(bold black)%an%C(reset)%C(black): %s%C(reset)'
+    tree = log --all --graph --decorate=short --color --format=format:'%C(bold blue)%h%C(reset) %C(auto)%d%C(reset)\n         %C(black)[%cr]%C(reset)  %x09%C(black)%an: %s %C(reset)'
+    vtree = !bash -c '"                                                                             \
+        while IFS=+ read -r hash time branch message; do                                            \
+            timelength=$(echo \"$time\" | sed -r \"s:[^ ][[]([0-9]{1,2}(;[0-9]{1,2})?)?m::g\");     \
+            timelength=$(echo \"16+${#time}-${#timelength}\" | bc);                                 \
+            printf \"%${timelength}s    %s %s %s\n\" \"$time\" \"$hash\" \"$branch\" \"$message\";  \
+        done < <(git logx && echo);"'
+    stree = !bash -c '"                                                                             \
+        while IFS=+ read -r hash time branch message; do                                            \
+            timelength=$(echo \"$time\" | sed -r \"s:[^ ][[]([0-9]{1,2}(;[0-9]{1,2})?)?m::g\");     \
+            timelength=$(echo \"16+${#time}-${#timelength}\" | bc);                                 \
+            printf \"%${timelength}s    %s %s %s\n\" \"$time\" \"$hash\" \"$branch\" \"\";          \
+        done < <(git logx && echo);"'
+
 # --topo-order
 # file difference #add -p if needed
 
