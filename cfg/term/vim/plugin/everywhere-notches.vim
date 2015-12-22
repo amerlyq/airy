@@ -26,17 +26,15 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 
 let g:everywhere_activated = 1
 " UNUSED: 6 - light blue, 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
-let s:colors = { 'Err': 1, 'Fix': 9, 'Add': 2, 'Did': 10,
-      \ 'Dev': 4, 'Msg': 13, 'Tbd': 5, 'Alt': 3 }
 let s:patterns = {
-      \ 'Err': 'ERR%(OR)=|BUG|REGR|XXX|WTF',
-      \ 'Fix': 'FIX%(ME)=|WARNING|ATTENTION|%(REM)OVE',
-      \ 'Add': 'ADD|SEE|NEED|FIND|ALSO',
-      \ 'Did': 'DONE|FIXED|EXPL|TEMP',
-      \ 'Dev': 'DEV|ENH|HACK|RFC|SPL',
-      \ 'Msg': 'NOTE|USE|USAGE|DFL|STD',
-      \ 'Tbd': 'TODO|CHECK|TRY|MOVE|REQ',
-      \ 'Alt': 'ALT|OR|CASE|THINK|CHG',
+      \ 'Err': [ 1, "#dc322f", 'ERR%(OR)=|BUG|REGR|XXX|WTF'],
+      \ 'Fix': [ 9, "#dd6616", 'FIX%(ME)=|WARNING|ATTENTION|REM%(OVE)='],
+      \ 'Add': [ 2, "#859900", 'ADD|SEE|NEED|FIND|ALSO'],
+      \ 'Did': [10, "#586e75", 'DONE|FIXED|EXPL|TEMP'],
+      \ 'Dev': [ 4, "#268bd2", 'DEV|ENH|HACK|RFC|SPL'],
+      \ 'Msg': [13, "#6c71c4", 'NOTE|USE|USAGE|DFL|STD'],
+      \ 'Tbd': [ 5, "#d33682", 'TODO|CHECK|TRY|MOVE|REQ'],
+      \ 'Alt': [ 3, "#c5a900", 'ALT|OR|CASE|THINK|CHG'],
       \ }
 
 function! s:everywhere_print(patts)
@@ -49,15 +47,16 @@ endfunction
 
 
 function! s:everywhere_define(cols)
+  let locals = 'term=bold cterm=bold gui=bold ctermbg=None guibg=None'
   for [k,v] in items(a:cols)  "term=bold,underline guifg=#E01B1B
-    exec 'hi! Notch'. k .' term=bold cterm=bold ctermbg=None guibg=None ctermfg='. v
+    exec printf('hi! Notch%s %s ctermfg=%s guifg=%s', k, locals, v[0], v[1])
   endfor
 endfunction
 
 
 function! s:everywhere_matches(patts)
   for [k,v] in items(a:patts)
-    call matchadd('Notch'. k, '\v<('. v .')>[:?*]=', -1)
+    call matchadd('Notch'. k, '\v<('. v[2] .')>[:?*]=', -1)
   endfor
 endfunction
 
@@ -68,13 +67,13 @@ function! s:everywhere_enable(mode)
     autocmd!
     if g:everywhere_activated
       au Syntax * call s:everywhere_matches(s:patterns)
-      au ColorScheme * call s:everywhere_define(s:colors)
+      au ColorScheme * call s:everywhere_define(s:patterns)
     endif
   augroup END
 endfunction
 
 
-call s:everywhere_define(s:colors)
+call s:everywhere_define(s:patterns)
 call s:everywhere_enable(1)
 " autocmd WinEnter,VimEnter * call s:everywhere_enable(1)
 
