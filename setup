@@ -39,20 +39,28 @@ source ~/.shell/profile
 link "$PWD/bin" ~/.bin
 if cfgOpt u; then opts='-u'; fi
 if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
-echo "LIST: ${PKG_LIST[@]}"
-echo "SKIP: ${PKG_SKIP[@]}"
+printf "LIST: %s\n\n" "${PKG_LIST[*]}"
+printf "SKIP: %s\n\n" "${PKG_SKIP[*]}"
 
-frgx(){ echo "-regex '.*\\b$(sed 's/\s\+/\\|/g' <<< "$@")\\b.*'"; }
-filter_find() {
-    local choosen="-exec test -f '{}/install' -o -f '{}/setup' ';'"
-    local regected="$(frgx "${PKG_SKIP[@]}")"
-    for y in "${PKG_LIST[@]}"; do
-        eval find cfg -type d $(frgx $y) $choosen \! $regected -print
+frgx(){ local patt="\\b$*\\b"
+    [[ "$*" =~ ^/.*$ ]] && patt="cfg$patt" || patt=".*$patt"
+    [[ "$*" =~ ^.*/$ ]] && patt="${patt}.*"|| patt="$patt\$"
+    echo "$patt"
+}
+filter_find() { local accept regect
+    for n in "${PKG_SKIP[@]}"; do regect+="\\|$(frgx $n)"; done
+    for y in "${PKG_LIST[@]}"; do accept=$(frgx $y)
+        find cfg -type d -regex "$accept" \
+            -exec test -f '{}/install' -o -f '{}/setup' ';' \
+            \! -regex "${regect:2}" -printf "$PWD/%p\n"
     done
 }
 
 # Caching the active modules list
-mods="${CURR_CACHE?No}/modules"
+mods="${CURR_CACHE?No}/mods/mods" && mkdir -p "${mods%/*}"
+if cfgOpt r && [[ -f "$mods" ]]; then
+    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
+fi
 [[ -f "$mods" ]] || filter_find > "$mods"
 
 run(){ [[ ! -f "$1" ]] || "$1" ${@:1}; }
@@ -66,4 +74,4 @@ mkdef x-terminal-emulator $(which $term_pref)
 # ======================================================================
 
 header "DONE"
-if cfgOpt u; then i3-msg restart </dev/tty >/dev/null 2>&1 ||: ; fi
+# if cfgOpt u; then i3-msg restart </dev/tty >/dev/null 2>&1 ||: ; fi
