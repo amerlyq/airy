@@ -4,10 +4,7 @@
 -- Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
 
 local utils = require 'mp.utils'
-
-clip_begin = 0.0
-clip_end   = mp.get_property_native("length") or 0.0
-
+local g = { A = 0.0, B = mp.get_property_native("length") or 0.0 }
 
 -- Options
 mp.set_property("hr-seek-framedrop", "no")
@@ -18,107 +15,85 @@ mp.set_property("options/script-opts", "osc-layout=bottombar,osc-hidetimeout=-1"
 
 
 -- Behaviour
+-- Pause on open and eof
+function on_loaded() mp.set_property("pause", "yes") end
 function on_eof()
     mp.msg.log("info", "playback reached end of file")
     mp.set_property("pause", "yes")
     mp.commandv("seek", 100, "absolute-percent", "exact")
 end
-mp.register_event("eof-reached", on_eof)
--- Pause on open
--- function on_loaded() mp.set_property("pause", "yes") end
 -- mp.register_event("file-loaded", on_loaded)
+mp.register_event("eof-reached", on_eof)
 
--- mp.osd_message("loaded", 3)
-do return end
+
+-- Helpers
+local function nm(m) return 'clip_'..m end
+local function show_status(t, msg)
+  mp.msg.log(t, msg)
+  mp.osd_message(t .. ": " .. msg, 2)
+end
+
 
 -- Implementation
-function clip_rangemessage()
-    local duration = clip_end - clip_begin
-    local message = ""
-    message = message .. "begin=" .. string.format("%4.3f", clip_begin) .. "s "
-    message = message .. "end=" .. string.format("%4.3f", clip_end) .. "s "
-    message = message .. "duration=" .. string.format("% 4.3f", duration) .. "s "
-    return message
+-- at some later time, setting a/b markers might be used to visualize begin/end
+-- mp.set_property("ab-loop-a", g.A)
+-- mp.set_property("loop", 999)
+function mark_update(m)
+  show_status("info", string.format("[%s] % 4.3f  (%s - %s)",
+    m, g.B - g.A, os.date("%M:%S", g.A), os.date("%M:%S", g.B)))
 end
-
-function clip_rangeinfo()
-    local message = clip_rangemessage()
-    mp.msg.log("info", message)
-    mp.osd_message(message, 5)
+function h_mark_beg()
+  g.A = mp.get_property_native("playback-time")
+  g.B = math.max(g.A, g.B)
+  mark_update('A')
 end
-
-function clip_mark_begin_handler()
-    pt = mp.get_property_native("playback-time")
-
-    -- at some later time, setting a/b markers might be used to visualize begin/end
-    -- mp.set_property("ab-loop-a", pt)
-    -- mp.set_property("loop", 999)
-
-    clip_begin = pt
-    if clip_begin > clip_end then
-        clip_end = clip_begin
-    end
-
-    clip_rangeinfo()
-end
-
-function clip_mark_end_handler()
-    pt = mp.get_property_native("playback-time")
-
-    -- at some later time, setting a/b markers might be used to visualize begin/end
-    -- mp.set_property("ab-loop-b", pt)
-    -- mp.set_property("loop", 999)
-
-    clip_end = pt
-    if clip_end < clip_begin then
-        clip_begin = clip_end
-    end
-
-    clip_rangeinfo()
+function h_mark_end()
+  g.B = mp.get_property_native("playback-time")
+  g.A = math.min(g.A, g.B)
+  mark_update('B')
 end
 
 
-function clip_write_handler()
-    fname = "clip_13444.mp4"
-    local duration = clip_end - clip_begin
-    if duration == 0 then
-        message = "clip_write: empty clip at=" .. clip_begin
-        mp.osd_message(message, 3)
-        return
-    end
-
-    local srcname = mp.get_property_native("path")
-
-    local message = clip_rangemessage()
-    message = message .. "writing excerpt of source file '" .. srcname .. "'\n"
-    message = message .. "to destination file '" .. fname .. "'"
-    mp.msg.log("info", message)
-    mp.osd_message(message, 10)
-
-    local p = {}
-    p["cancellable"] = false
-    p["args"] = {}
-    p["args"][1] = "echo"  -- r.ffmpeg
-    p["args"][2] = tostring(clip_begin)
-    p["args"][3] = tostring(duration)
-    p["args"][4] = tostring(srcname)
-    p["args"][5] = tostring(fname)
-
-    local res = utils.subprocess(p)
-
-    if (res["error"] ~= nil) then
-        local message = "failed to run clip_copy\nerror message: " .. res["error"]
-        message = message .. "\nstatus = " .. res["status"] .. "\nstdout = " .. res["stdout"]
-        mp.msg.log("error", message)
-        mp.osd_message(message, 10)
-    else
-        mp.msg.log("info", "excerpt '" .. fname .. "' written.")
-        message = message .. "... done."
-        mp.osd_message(message, 10)
-    end
-
-    -- mp.commandv("run", "jimbobexcerpt_copy", clip_begin, duration, srcname, fname)
+-- function h_seek(pos) return loadstring([[return function()
+--     mp.commandv("seek", ]] .. pos .. [[, "absolute", "exact")
+-- end ]])(pos) end
+function h_seek_beg()
+  mp.set_property("pause", "yes")
+  mp.commandv("seek", g.A, "absolute", "exact")
 end
+function h_seek_end()
+  mp.set_property("pause", "yes")
+  mp.commandv("seek", g.B, "absolute", "exact")
+end
+
+function h_write()
+  if g.B - g.A == 0 then
+    show_status("error", "can't encode empty clip at=" .. g.A)
+    return
+  end
+  show_status("info", "sent to encoding")
+  local res = utils.subprocess({
+    cancellable = false, args = { "r.ffmpeg",
+      tostring(mp.get_property_native("path")),
+      tostring(g.A), tostring(g.B)
+  }})
+  if res["error"] ~= nil then
+    show_status("error", "Failed("..res["error"]..") encoding: "..res["stdout"])
+  else
+    show_status("info", "Success encoding: "..res["stdout"])
+  end
+end
+
+mp.add_forced_key_binding("y", nm("write"), h_write)
+mp.add_forced_key_binding("[", nm("mark_beg"), h_mark_beg)
+mp.add_forced_key_binding("]", nm("mark_end"), h_mark_end)
+mp.add_forced_key_binding("{", nm("seek_beg"), h_seek_beg)
+mp.add_forced_key_binding("}", nm("seek_end"), h_seek_end)
+
+
+-- mp.osd_message("loaded", 3)
+do return end -- Hack to return from script
+
 
 -- assume some plausible frame time until property "fps" is set.
 frame_time = 24.0 / 1001.0
@@ -218,31 +193,13 @@ function clip_frame_forward(kevent)
 end
 
 
-function h_seek(pos) return loadstring([[-- return function()
-    mp.commandv("seek", ]] .. pos .. [[, "absolute", "exact")
-end ]])(pos) end
-
+-- mp.add_key_binding("right", "clip_frame_forward", clip_frame_forward, { repeatable = true; complex = true })
 
 function clip_test(kevent)
     mp.msg.log("info", tostring(kevent))
     for k,v in pairs(kevent) do
         mp.msg.log("info", "kevent[" .. k .. "] = " .. tostring(v))
     end
-
     mp.commandv("seek", 0.0, "absolute", "exact")
 end
-
---
-mp.add_key_binding("[", "clip_mark_begin", clip_mark_begin_handler)
-mp.add_key_binding("]", "clip_mark_end", clip_mark_end_handler)
-mp.add_key_binding("shift+[", "clip_seek_begin", h_seek(clip_begin))
-mp.add_key_binding("shift+]", "clip_seek_end", h_seek(clip_end))
-mp.add_key_binding("y", "clip_write", clip_write_handler)
-
-mp.add_key_binding("right", "clip_frame_forward", clip_frame_forward, { repeatable = true; complex = true })
-
--- mp.add_key_binding("shift+mouse_btn3", "clip_test", clip_test, { repeatable = false; complex = true })
--- mp.add_key_binding("shift+mouse_btn4", "clip_test", clip_test, { repeatable = false; complex = true })
--- mp.add_key_binding("y", "clip_test", clip_test, { repeatable = false; complex = true })
-
-return clip
+mp.add_key_binding("y", "clip_test", clip_test, { repeatable = false; complex = true })

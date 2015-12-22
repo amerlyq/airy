@@ -1,25 +1,25 @@
 #!/bin/bash -e
-
-# 1 - fname
-# 2 - beg  [-][<HH>:]<MM>:<SS>[.<m>...] OR [-]<S>+[.<m>...]
-# 3 - end
+# USAGE: [-][<HH>:]<MM>:<SS>[.<m>...] OR [-]<S>+[.<m>...]
+fname="$1"
+beg="$2"
+end="$3"
 
 src=$(readlink -m "$1")
 [[ -n "$dst" ]] || dst="${src%/*}/fl-clip"
 mkdir -p "$dst"
 
-path="$dst/${1##*/}"
-path="${path%.*}_${beg//:}.${path##*.}"
+path="$dst/${fname##*/}"
+sfx=${beg%.*}; sfx="_${sfx//:}"
+path="${path%.*}${sfx}.${path##*.}"
 
 if [[ -e "$path" ]]; then
     mv -vfT --backup=t "$path" "${path%.*}_${RANDOM}.${path##*.}"
 fi
 
-ffmpeg -i "$1" \
-    -ss "${2:-00:00}" -to "${3:--00:00}" -c copy \
+ffmpeg -y -nostdin -i "$fname" \
+    -ss "${beg:-00:00}" -to "${end:--00:00}" \
+    -codec:v copy -codec:a copy -codec:d copy \
     "$path"
-
-# ALT
-# ffmpeg -y -nostdin -ss $BEGIN -i "$SRC" -t $DURATION \
-#     -codec:v copy -codec:a copy -codec:d copy "$DST"
+        # OR -c copy \
+# ALT ffmpeg -y -nostdin -ss $BEGIN -i "$SRC" -t $DURATION "$DST"
 # OR ffmpeg -ss $BEGIN -i $SRC -to $END -strict -2 ${DST}.mp4
