@@ -3,7 +3,7 @@ source ~/.shell/func.d/cfgsetup
 source ~/.shell/profile
 [[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
-if cfgOpt u; then
-    src="${CURR_DIR_PKG:?No}/st"
-    (cd "$src" && FNSZ="$FONT_SIZE" THEME="$THEME" ./install -mbi)
-fi
+if cfgOpt u; then (
+    cd "${CURR_DIR_PKG:?No}/st" && git checkout amerlyq
+    FNSZ="$FONT_SIZE" THEME="$THEME" ./install -mbi
+) fi

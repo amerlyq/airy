@@ -4,16 +4,7 @@ cd $(dirname $(readlink -m ${0}))
 source ~/.shell/func.d/cfgsetup
 echo "$THEME" > "${CURR_CACHE?No}/theme"
 
-if cfgOpt i && cfgOpt u; then
-    if distro arch; then
-        sudo pacman -Syu
-    elif distro ubuntu; then
-        sudo apt-get install gawk
-        echo "sudo apt-get update && sudo apt-get upgrade"
-    fi
-fi
 # ======================================================================
-
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
 header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
 pretty() { sed -r "s|/home/$(whoami)|\~|g
@@ -23,7 +14,17 @@ pretty() { sed -r "s|/home/$(whoami)|\~|g
         /.*\s-> L\s.*/s//$C4&$CR/; /.*\s-> C\s.*/s//$C3&$CR/;
             /\<(E|Err|ERR):\s.*/s//$C1&$CR/
 ";}
-
+# ======================================================================
+if cfgOpt i && cfgOpt u; then
+    if distro arch; then
+        sudo pacman -Syu --ignore=firefox
+        echo "ERR: firefox is frozen in pacman" | pretty
+        # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
+    elif distro ubuntu; then
+        sudo apt-get install gawk
+        echo "sudo apt-get update && sudo apt-get upgrade"
+    fi
+fi
 # ======================================================================
 ## Populate sensible configs
 if [[ -f ../erian/setup ]]; then
@@ -41,22 +42,24 @@ if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
 echo "LIST: ${PKG_LIST[@]}"
 echo "SKIP: ${PKG_SKIP[@]}"
 
-filter_find() { local y n
-    y="$(sed 's/ /|/g' <<< "${PKG_LIST[@]}")"
-    n="$(sed 's/ /|/g' <<< "${PKG_SKIP[@]}")"
-    if [[ -n "$y" ]]; then y='$0  ~ "\\y('"$y"')\\y"'; fi
-    if [[ -n "$n" ]]; then n='$0 !~ "\\y('"$n"')\\y"'; fi
-    if [[ -n "$y" && -n "$n" ]]; then n=" && $n"; fi
-    find "$1" -type f -name "$2" | awk "$y $n { print \$0 }" | sort -df
+frgx(){ echo "-regex '.*\\b$(sed 's/\s\+/\\|/g' <<< "$@")\\b.*'"; }
+filter_find() {
+    local choosen="-exec test -f '{}/install' -o -f '{}/setup' ';'"
+    local regected="$(frgx "${PKG_SKIP[@]}")"
+    for y in "${PKG_LIST[@]}"; do
+        eval find cfg -type d $(frgx $y) $choosen \! $regected -print
+    done
 }
 
-if cfgOpt i; then
-    filter_find cfg install | while read fl; do
-        echo ">>> $fl <<<"; $fl $opts; done | pretty
-fi
+# Caching the active modules list
+mods="${CURR_CACHE?No}/modules"
+[[ -f "$mods" ]] || filter_find > "$mods"
 
-filter_find cfg setup | while read fl; do
-    echo ">>> $fl <<<"; $fl $opts; done | pretty
+run(){ [[ ! -f "$1" ]] || "$1" ${@:1}; }
+while read d; do echo ">>> $d <<<"
+    ! cfgOpt i || run "$d/install" $opts
+    run "$d/setup" $opts
+done < "$mods" | pretty
 
 term_pref="$(has_pr st && echo st || has_pr urxvt && echo urxvt || echo xterm)"
 mkdef x-terminal-emulator $(which $term_pref)

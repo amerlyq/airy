@@ -6,7 +6,7 @@ Neovim
 			:> Seems like somehow fixed. Need more excessive testing.
 		[_] REQ: Double cursor on search by / or ,cr
 			:= Seems like this bug is related to t_vi/t_ve disabled in Neovim?
-		[_] No shell on ,z -- need to reuse code in ranger filechooser
+		2015-12-22 [X] No shell on ,z -- need to reuse code in ranger filechooser
 		[_] No pause on error at :make by ,m
 		[_] Error from make, when launched through abyss not from root dir
 		2015-11-18 [X] Automagnify -- fix height problems after split
@@ -36,8 +36,9 @@ Neovim
 	[_] Check my vim-focus-autocmd on compatability and unnecessity
 	2015-11-27 [$] ENH Change number of visible lines before/after cursor depending on height
 		:= In small window it moves by spurts  ::> Enough to make: scrolljump=0 scrolloff=3
-	[_] THINK autosave on stop writing? -- can be trouble on pause in insert mode
-		: for writing on android
+	2015-12-22 [$] THINK autosave on stop writing? -- can be trouble on pause in insert mode
+		:= for writing on android  ::> autocmd on write will mess buffer
+		::> problems if file was changed externally?
 	2015-11-19 [X] TODO On help window -- disable 'gh/gl' features to prohibit replace help buffer
 	[_] Paste "+ text on ',p' or else -- append newline to text and normalize as in urxvt
 	2015-11-27 [X] Replace cfgs loading order -- my settings/mappings first, plugins -- later
@@ -58,7 +59,8 @@ Neovim
 		:> Won't work -- need to edit different parts of same line --
 		:	impossible for NrrwRgn to merge changes back. Use simple :vs and merge manually
 	2015-11-23 [X] TODO: replace all <Leader>t on [Toggle]t, then define [Toggle]=[Frame]t
-	[_] REGR: Seems like current highlight for search+cursor has broken transparent background
+	2015-12-22 [X] REGR: Seems like current highlight for search+cursor has broken transparent background
+		:> Use 'st' instead 'urxvt'
 	[_] REGR: slow completion in votl?
 	[_] BUG:CHECK: when printing from pythin, funcs in disabled: are quoted and don't evaluates
 	[_] 1,c --> 's;;\1', 2,c --> 's;;\1\2' and cursor between them
