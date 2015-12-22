@@ -15,7 +15,7 @@ bits() {
 }
 szl() { ls -FaGl "$@" | awk '{s+=$4;print $4,$8} END {print s}'; }
 # Prevent expanding for functions
-for i in hex dec bits; do
+[[ "$SHELL" != zsh ]] || for i in hex dec bits; do
     alias $i='noglob '"$i"' '
 done
 

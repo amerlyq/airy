@@ -38,8 +38,8 @@ fun! s:PatchColorScheme()
     " Restore right colors for sign column in solarized
     " TODO: check -- simply use this patch always. Will it work?
     hi! link SignColumn LineNr
-    hi! IndentGuidesOdd  ctermfg=8 ctermbg=0
-    hi! IndentGuidesEven ctermfg=8 ctermbg=0
+    hi! IndentGuidesOdd  ctermfg=8 ctermbg=0 guifg=#002b36 guibg=#072f3b
+    hi! IndentGuidesEven ctermfg=8 ctermbg=0 guifg=#002b36 guibg=#072f3b
   endif
   hi! Folded cterm=bold ctermfg=11 ctermbg=0 gui=bold guifg=#657b83 guibg=#073240
   " hi! Folded cterm=underline ctermfg=11 ctermbg=NONE guifg=Cyan guibg=DarkGrey

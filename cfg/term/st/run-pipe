@@ -1,3 +1,4 @@
 #!/bin/bash -e
 
-xurls | dmenu -l 10 | xargs -r open
+xurls | awk -vi=1 '{printf "%02d %s\n",i++,$0}' |
+    dmenu -l 10 | cut -d' ' -f2- | xargs -I@ x-www-browser @
