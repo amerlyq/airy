@@ -46,7 +46,7 @@ fi
 
 dst=~/.Xresources
 echo "#define MAIN_DPI ${MAIN_DPI:-96}" > "$dst"
-for f in "$CURR_CACHE"/Xres-*; do
+for f in "${CURR_DIR_CACHE:?No}"/Xres-*; do
     echo "#include \"$f\"" >> "$dst"
 done
 cat "$PWD/xfontrc" >> "$dst"

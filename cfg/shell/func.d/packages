@@ -1,6 +1,7 @@
 # vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
 source ~/.shell/profile
 source ~/.shell/func.d/system
+trap_errors
 
 for arg in "$@"; do case "$arg" in
   # Re-install even if git pull is up-to-date (for broken builds)
@@ -9,11 +10,7 @@ for arg in "$@"; do case "$arg" in
 esac; done
 
 mkdir -vp "${CURR_DIR_PKG:?No in profile}"
-### Add current package to active mods list if absent
-CURR_CACHE=~/.cache/airy && mkdir -vp "$CURR_CACHE"
-# grep -q "$PWD" "$CURR_CACHE/mods/mods" ||
-#     echo "$PWD" >> "$CURR_CACHE/mods/mods"
-
+airy_cache_pwd_mod
 
 do_if() {
   local cmd pkgs bSkip=1 bAll=0 OPTIND=1

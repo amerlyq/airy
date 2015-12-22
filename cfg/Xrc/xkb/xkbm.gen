@@ -5,7 +5,7 @@ source ~/.shell/profile
 lang="${CURR_XKB_LANG:-us:1+am(ru):2+am(ua):3}"
 over="${1:-${CURR_XKB_OVER:-vim}}"
 
-dst="${CURR_CACHE?No}/keylayout.xkb"
+dst="${CURR_DIR_CACHE?No}/keylayout.xkb"
 cat > "$dst" <<EOT
 xkb_keymap {
     xkb_keycodes  { include "evdev+aliases(qwerty)" };

@@ -2,7 +2,9 @@
 cd $(dirname $(readlink -m ${0}))
 [[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell
 source ~/.shell/func.d/cfgsetup
-echo "$THEME" > "${CURR_CACHE?No}/theme"
+echo "$THEME" > "${CURR_DIR_CACHE?No}/theme"
+queue="${TMPDIR:-/tmp}/mods_installing"
+mods="${CURR_DIR_CACHE?No}/mods/mods" && mkdir -p "${mods%/*}"
 
 # ======================================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
@@ -15,7 +17,7 @@ pretty() { sed -r "s|/home/$(whoami)|\~|g
             /\<(E|Err|ERR):\s.*/s//$C1&$CR/
 ";}
 # ======================================================================
-if cfgOpt i && cfgOpt u; then
+if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then
     if distro arch; then
         sudo pacman -Syu --ignore=firefox
         echo "ERR: firefox is frozen in pacman" | pretty
@@ -27,7 +29,7 @@ if cfgOpt i && cfgOpt u; then
 fi
 # ======================================================================
 ## Populate sensible configs
-if [[ -f ../erian/setup ]]; then
+if [[ -f ../erian/setup ]] && [[ ! -f "$queue" ]]; then
     header "Erian private data"
     ../erian/setup "$ARGS" | pretty
 fi
@@ -36,6 +38,7 @@ fi
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
 source ~/.shell/profile
+mkdir -vp "${CURR_DIR_CACHE:?No}"
 link "$PWD/bin" ~/.bin
 if cfgOpt u; then opts='-u'; fi
 if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
@@ -56,21 +59,21 @@ filter_find() { local accept regect
     done
 }
 
-# Caching the active modules list
-mods="${CURR_CACHE?No}/mods/mods" && mkdir -p "${mods%/*}"
+# Caching the list of modules activated in profile
+run(){ [[ ! -f "$1" ]] || "$1" ${@:1}; }
 if cfgOpt r && [[ -f "$mods" ]]; then
     cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
 fi
-[[ -f "$mods" ]] || filter_find > "$mods"
+[[ -f "$mods"  ]] || filter_find > "$mods"
+[[ -f "$queue" ]] || cp -vT "$mods" "$queue"
 
-run(){ [[ ! -f "$1" ]] || "$1" ${@:1}; }
+[[ -n "$DISPLAY" ]] || export DISPLAY=:0.0
 while read d; do echo ">>> $d <<<"
     ! cfgOpt i || run "$d/install" $opts
     run "$d/setup" $opts
-done < "$mods" | pretty
-
-term_pref="$(has_pr st && echo st || has_pr urxvt && echo urxvt || echo xterm)"
-mkdef x-terminal-emulator $(which $term_pref)
+    sed -i '1d' "$queue"
+done <<< "$(<"$queue")" | pretty
+rm "$queue"
 # ======================================================================
 
 header "DONE"

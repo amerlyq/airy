@@ -1,0 +1,12 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+### AUTO ###
+term="$({ has_pr st && echo st; } ||
+        { has_pr urxvt && echo urxvt; } || echo xterm)"
+mkdef x-terminal-emulator $(which $term)
+
+(cd "${CURR_DIR_CACHE:?No}/bin"
+    link "r.${term:?No}"   "./r.t"
+    link "r.${term}-float" "./r.tf"
+)

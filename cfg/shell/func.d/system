@@ -1,6 +1,23 @@
 # vim: ft=sh
-# ====================== Configs =====================================
 
+### Err handling ###
+error() { echo "Err: ${PWD/$HOME/\~}/${0##*/}:L${1}: (${3:-1}) ${2}"; exit "${3:-1}"; }
+trap_errors(){
+    # FIXME: even with those options, pkgbuild errors are not catched?
+    # [[ $- =~ i ]] && return || exit
+    set -o errexit
+    set -o pipefail
+    trap 'error ${LINENO}' ERR
+    # SEE: http://mywiki.wooledge.org/BashFAQ/105
+}
+
+### Add current package to active mods list if absent
+airy_cache_pwd_mod() { local mods="${CURR_DIR_CACHE:?No}/mods/mods"
+[[ ! -t 0 ]] || [[ ! "$0" =~ ^${CURR_DIR_CFG:?No} ]] ||
+    grep -q "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
+}
+
+# ====================== Configs =====================================
 cfgOpt(){ [[ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]]; }
 cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 

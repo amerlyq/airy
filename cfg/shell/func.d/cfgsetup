@@ -1,16 +1,7 @@
 # vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
+source ~/.shell/profile
 source ~/.shell/func.d/system
-
-
-### Err handling ###
-# FIXME: even with those options, pkgbuild errors are not catched?
-# [[ $- =~ i ]] && return || exit
-set -o errexit
-set -o pipefail
-error() { echo "Err: ${PWD/$HOME/\~}/${0##*/}:L${1}: (${3:-1}) ${2}"; exit "${3:-1}"; }
-trap 'error ${LINENO}' ERR
-# SEE: http://mywiki.wooledge.org/BashFAQ/105
-
+trap_errors
 
 ### Argparse ###
 while getopts "cdirs:t:u" opt; do case $opt
@@ -23,8 +14,7 @@ in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="$OPTARG" ;; esac
 
 
 ### Choose theme
-CURR_CACHE=~/.cache/airy && mkdir -vp "$CURR_CACHE"
-if [[ ! "${THEME:=$(< "$CURR_CACHE/theme")}" =~ ^[a-z]+$ ]]
+if [[ ! "${THEME:=$(< "${CURR_DIR_CACHE:?No}/theme")}" =~ ^[a-z]+$ ]]
 then THEME=dark; fi
 
 
@@ -37,7 +27,7 @@ done;}
 
 
 if distro arch; then
-  mkdef() { link "${2?No bin}" "$CURR_CACHE/bin/${1?No name}"; }
+  mkdef() { link "${2?No bin}" "$CURR_DIR_CACHE/bin/${1?No name}"; }
   svc_enable() { systemctl is-enabled "$1" > /dev/null || sudo systemctl enable "$1"; }
   svc_restart() { sudo systemctl restart "$1"; }
   usvc_activate() { systemctl --user daemon-reload &&  # Refresh configurations
@@ -55,15 +45,12 @@ fi
 
 ### Go to current script's directory
 cd $(dirname $(readlink -m ${0}))
-
-### Add current package to active mods list if absent
-# grep -q "$PWD" "$CURR_CACHE/mods/mods" ||
-#     echo "$PWD" >> "$CURR_CACHE/mods/mods"
+airy_cache_pwd_mod
 
 ### Populate all run, run.pr1 scripts into mycache/bin
 for path in "$PWD/run"*; do
   [[ -f "$path" ]] || continue
-  link "$path" "$CURR_CACHE/bin/r.${PWD##*/}${path#$PWD/run}"
+  link "$path" "$CURR_DIR_CACHE/bin/r.${PWD##*/}${path#$PWD/run}"
 done
 # =============================== ALT ==================================
 

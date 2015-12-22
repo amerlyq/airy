@@ -8,7 +8,9 @@ CURR_HOST=${HOSTNAME:-$(uname -n)}
 
 
 ### Dirs ###
-CURR_DIR_PKG="${CURR_DIR_PKG:-$HOME/.cache/airy/pkg}"
+CURR_DIR_CFG=~/aura/airy/cfg
+CURR_DIR_CACHE=~/.cache/airy
+CURR_DIR_PKG="${CURR_DIR_PKG:-$CURR_DIR_CACHE/pkg}"
 CURR_DIR_HUB=~/hub
 CURR_DIR_SYNC=~/synchro
 CURR_DIR_VARS=~/.cache/airy/vars
@@ -17,10 +19,10 @@ CURR_DIR_VARS=~/.cache/airy/vars
 ### Load ###
 ## NOTE: installs folder of configs, instead whole or individual
 # Def: prs for headless ssh, cli/tui only
-PKG_LIST=(shell dev/etc git ranger tmux vim elinks)
-PKG_SKIP=(core io media Xrc eclipse sql latex kernel)
+PKG_LIST=(shell/ dev/etc git ranger tmux vim elinks)
+PKG_SKIP=(/core/ /io/ /media/ /Xrc/ eclipse sql latex kernel)
 
-if [[ -f ~/.cache/airy/profile ]]
-then source ~/.cache/airy/profile || return
+if [[ -f "$CURR_DIR_CACHE/profile" ]]
+then source "$CURR_DIR_CACHE/profile" || return
 # else source ~/aura/env || return
 fi
