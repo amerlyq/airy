@@ -18,7 +18,12 @@ class ag(Command):
     qarg = re.compile(r"""^(".*"|'.*')$""")
 
     def _sel(self):
-        return [f.path for f in self.fm.thisdir.marked_items]
+        d = self.fm.thisdir
+        if d.marked_items:
+            return [f.relative_path for f in d.marked_items]
+        if d.files_all and (len(d.files_all) != len(d.files)):
+            return [f.relative_path for f in d.files]
+        return []
 
     def _arg(self, i=1):
         if self.rest(i):
