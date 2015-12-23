@@ -29,15 +29,18 @@ set tagbsearch      " Use a binary search (need sorted tags file!)
 "{{{1 Ctags/Mappings ============================
 " Generate 'tags' file: DEPRECATEDBY easytags
 "" TODO -- generate tags into .git/ OR .hg/ if exists
-if executable('ctags-exuberant')
-  nnoremap <silent> <F1> :!ctags'-exuberant --recurse<CR>
-else
-  nnoremap <silent> <F1> :!ctags --recurse<CR>
+if executable('ctags') || executable('ctags-exuberant')
+  let s:ctags = 'ctags --recurse'
+  if executable('ctags-exuberant') | let s:ctags .= '--exuberant' | endif
+  command -bar -range -nargs=0 TagsGen call system(s:ctags)
+  nnoremap <silent> <F1> :<C-u>TagsGen<CR>
 endif
 
+" ATTENTION: w/o compression, because CCTree use outdated format
 if executable('cscope')
-  " ATTENTION: w/o compression, because CCTree use outdated format
-  nnoremap <silent> <S-F1> :!cscope -bcqR<CR>
+  let s:cscope = 'cscope -bcqR'
+  command -bar -range -nargs=0 CCgen call system(s:cscope)
+  nnoremap <silent> <S-F1> :<C-u>CCgen<CR>
 endif
 
 " Show list of tags when there more then one entry.

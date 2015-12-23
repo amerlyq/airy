@@ -1,6 +1,8 @@
 if neobundle#tap('CCTree') "{{{
   " Launch with default DB
-  command! -bar  CCTree  CCTreeLoadDB cscope.out
+  command! -bar  CCTree
+      \ if !filereadable('cscope.out') | CCgen | endif
+      \ CCTreeLoadDB cscope.out
 
   fun! neobundle#hooks.on_source(bundle)
     " Settings
