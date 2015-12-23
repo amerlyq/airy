@@ -1,5 +1,6 @@
 ranger
-	BUG: mappings to open *.otl 'O\w' open current file if *.otl not found
+	2015-12-23 [X] BUG: ag command -- don't support pattern with spaces in quotes '' / ""
+	2015-12-23 [X] BUG: mappings to open *.otl 'O\w' open current file if *.otl not found
 	[_] THINK: change ZSH mapping to ',f' -- to unite with vim mappings
 		:= On the other hand, ',s' was choosen as symm to 's/,s' inside ranger itself
 	2015-11-16 [X] FIXME new 'O*' edit - open in same vim, if filechooser
@@ -10,6 +11,7 @@ ranger
 		Populate links from fasd sorted by popularity into '>' keymaps
 		: You will need attach letter like [a-z]:cd path to each entry to keep
 		: sorting by frequency, not by alphabet.
+		:= May be deprecated by interactive background shell session
 	2015-06-18 [X] TODO: highlighting with timeout!
 	[_] Interactive highlight in vimserver based on vimcat, relaunched on crash?
 	[_] make use of local settings for choosen directories
@@ -28,8 +30,6 @@ ranger
 	[_] optimize navi speed/fps in dir for very large lists (preferably got on 'b')
 	[_] re-read output from scope.sh for lister on shortcut inside lister
 	2015-04-23 [X] FIX findfy command : add next/prev maps : UP/DOWN in cmap
-	[_] fix scpto/from
-		[_] Create its inner handful support inside ranger
 	[_] TODO create my own global mime extensions for scope.sh
 		http://www.alan-warren.com/2012/04/01/503/
 	[_] BUG: up/down for :findfy not works as expected
@@ -41,6 +41,9 @@ ranger
 	[_] ADD DEV :alias for fast scp -r pull current selected files on ssh to host
 		: it will be like sftp with ranger as viewer
 		FIND maybe sftp already implemented in ranger?
+		[_] fix scpto/from
+			[_] Create its inner handful support inside ranger
+		[_] Implement sftp and adb protocols in ranger to open explicit tab with remote operations
 	ADD waveform preview
 		https://github.com/beschulz/wav2png
 		https://github.com/MTG/freesound/tree/master/utils/audioprocessing
@@ -53,7 +56,6 @@ NEW
 		:SEE: it's not a big deal, as that file used as interface only one
 		: short instant when exiting from zsh _and_ returning into ranger. So
 		: it's always valid, as that events are consequent.
-	[_] Implement sftp and adb protocols in ranger to open explicit tab with remote operations
 	[_] BUG: seems like ranger for 'I' view re-launch ./scope.sh only on date change,
 		but it does it wrong for symlinks, as it can't track when they are updated!
 		(Hovewer that affects and vimb too, maybe it's general symlink property?)

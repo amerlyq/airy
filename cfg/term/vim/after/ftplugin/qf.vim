@@ -17,9 +17,16 @@ wincmd J
 " q/<Space> - close / jump,
 " o/O - preview/jump of and stay,        I - jump into and close,
 " x/X - exchange to tab foregr/backgr,   S/H - split vert/horz,
+" \ 'o' : '',
+fun! s:open_stay()
+  let l:w = bufwinnr("%")
+  exe 'norm!' "\<CR>"
+  exe l:w.'wincmd w'
+endf
+
 let s:qf_mappings = {
       \ 'q' : ':#close<CR>',
-      \ 'o' : '<CR><C-w>p',
+      \ 'o' : ':call <SID>open_stay()<CR>',
       \ 'm' : '<CR><C-w>pj',
       \ 'O' : '<CR>',
       \ 'I' : '<CR><C-w><C-w>:#close<CR>',

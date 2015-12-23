@@ -1,6 +1,7 @@
 from ranger.api.commands import Command
 from ranger.ext.shell_escape import shell_quote
 
+import re
 import os
 from os import path as fs
 
@@ -14,6 +15,7 @@ class ag(Command):
     """
     editor = os.getenv('EDITOR') or 'vim'
     acmd = 'ag --smart-case --group --color --hidden --search-zip'
+    qarg = re.compile(r"""^(".*"|'.*')$""")
 
     def _sel(self):
         return [f.path for f in self.fm.thisdir.marked_items]
@@ -23,17 +25,32 @@ class ag(Command):
             ag_patterns.append(self.rest(i))
         return ag_patterns[-1] if ag_patterns else ''
 
-    def _aug_vim(self, comm, args):
-        cmd = ' '.join([comm, args] + self._sel())
-        return [ag.editor, '-c', cmd, '-c', 'only']
+    def _quot(self, patt):
+        return patt if ag.qarg.match(patt) else shell_quote(patt)
+
+    def _bare(self, patt):
+        return patt[1:-1] if ag.qarg.match(patt) else patt
+
+    def _aug_vim(self, iarg, comm='Ag'):
+        patt = self._quot(self._arg(iarg))
+        cmd = ' '.join([comm, patt] + self._sel())
+        cmdl = [ag.editor, '-c', cmd, '-c', 'only']
+        return (cmdl, '')
+
+    def _aug_sh(self, iarg, flags=[]):
+        patt = self._bare(self._arg(iarg))
+        cmdl = ag.acmd.split() + flags + [patt] + self._sel()
+        return (cmdl, '-p')
 
     def _choose(self):
         if self.arg(1) == '-v':
-            return (self._aug_vim('Ag', self._arg(2)), '')
+            return self._aug_vim(2, 'Ag')
         elif self.arg(1) == '-g':
-            return (self._aug_vim('AgGroup', self._arg(2)), '')
+            return self._aug_vim(2, 'AgGroup')
+        elif self.arg(1) == '-l':
+            return self._aug_sh(2, ['--files-with-matches'])
         else:
-            return (ag.acmd.split() + [self._arg(1)] + self._sel(), '-p')
+            return self._aug_sh(1, [])
 
     def execute(self):
         cmd, flags = self._choose()

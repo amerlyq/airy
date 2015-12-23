@@ -1,8 +1,7 @@
 #!/bin/bash -e
-exec r.tf $EDITOR -c 'norm G$' <(cat -) &
+[[ -t 0 ]] && ARGS='"$@"' || ARGS='<(cat -)'
+eval "exec r.tf $EDITOR -c 'norm!G0' $ARGS &"
 
 # pipe="$(mktemp -ut "st-screen.XXX")"
 # trap "rm -f $pipe" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT
-# # [[ -p $pipe ]] || mkfifo $pipe
-# cat > $pipe
-# x-terminal-emulator -e editor -c 'norm G$' $pipe &
+# [[ -p $pipe ]] || mkfifo $pipe

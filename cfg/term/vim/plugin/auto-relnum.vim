@@ -18,15 +18,19 @@
 if exists('g:loaded_auto_relnum') || &cp || v:version < 703 | finish
       \| else | let g:loaded_auto_relnum=1 | endif
 
-let g:auto_relnum_focused = (&number && &rnu)
+let g:arelnum = {'focused': (&number && &rnu) }
+let g:arelnum.ignored = {'ft': 'qf', 'preview': 1, 'buftype': 'help\|nofile'}
 
 nnoremap <silent><unique> [Toggle]n  :RelnumToggle<CR>
 command! -bar -nargs=0 RelnumToggle  set relativenumber! rnu?
-      \| let g:auto_relnum_focused=&rnu | call <SID>RelnumUpdate(&rnu)
+      \| let g:arelnum.focused=&rnu | call <SID>RelnumUpdate(&rnu)
 
 function! s:RelnumUpdate(...)
-  if !g:auto_relnum_focused | return | endif
-  if &l:buftype =~ 'help\|nofile' || &l:previewwindow | return | endif
+  if !g:arelnum.focused | return | endif
+  if (&l:filetype =~ g:arelnum.ignored.ft) ||
+    \(g:arelnum.ignored.preview && &l:previewwindow) ||
+    \(&l:buftype =~ g:arelnum.ignored.buftype)
+    \| return | endif
   if a:0 > 0 | let &relativenumber = a:1 | endif
   let &numberwidth = max([&g:nuw, 4, 1+strlen(line('w$'))])  " TODO:RFC
 endfunc

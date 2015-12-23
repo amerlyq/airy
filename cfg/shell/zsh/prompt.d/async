@@ -30,6 +30,7 @@ function prompt_amer_update {
 
 function _prompt_vars_save {
   local cached="${_prompt_amer_data_pref}-${1:?No}"
+  # BUG: problems when zero free space left. Use mkfifo?
   _prompt_async_call_$1 >! "$cached"
 }
 
