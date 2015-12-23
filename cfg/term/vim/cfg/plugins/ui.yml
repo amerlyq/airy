@@ -57,13 +57,13 @@ bling/vim-airline:
 
 frankier/neovim-colors-solarized-truecolor-only:
   description: Fork which supports term TRUE_COLOR
-  disabled: '!exists("$NVIM_TUI_ENABLE_TRUE_COLOR")'  # Can't choose one of them. BUG in neobundle?
+  disabled: '!has("nvim")||!exists("$NVIM_TUI_ENABLE_TRUE_COLOR")'
   # mappings: [[nxi, <Plug>ToggleBackground]]
   lazy: 0  # EXPL: always show from the start
 
 altercation/vim-colors-solarized:
   description: Sticked to this colorscheme 2+ years already...
-  disabled: 'exists("$NVIM_TUI_ENABLE_TRUE_COLOR")'
+  disabled: 'has("nvim")&&exists("$NVIM_TUI_ENABLE_TRUE_COLOR")'
   # mappings: [[nxi, <Plug>ToggleBackground]]
   lazy: 0  # EXPL: always show from the start
 

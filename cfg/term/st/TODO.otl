@@ -11,16 +11,20 @@ REF
 
 BUG
 	[_] is '-c Float' really sets instance?
+	[_] gpg not launched? another order of zsh configs?
+	2015-12-23 [X] chroot -- no terminfo ::> install manually 'tic -s st.info'
 	[_] st
 		[_] st nvim                                                                                                                                                                                              ─(14:56:10)
 		: erresc: unknown csi ESC[8;18;212t
 	[_] vim
 		2015-12-22 [X] vim colors -- for my notches -- no guifg color in scheme
-		[_] when vim lose focus by i3+Enter -- black screen. No redraw?
+		2015-12-23 [X] when vim lose focus by i3+Enter -- black screen. No redraw?
 			:= Resembles redraw and Focus events (but not auto-relnum?)
 			:= Seems like problem contained in core-cfg/{ui-colors,ui}.vim
+			:= Problem persistent only for nvim. But not by colorscheme.
+			:> lazyredraw -- BUG? interference with nvim window resizing? REQ?
 		[_] vim autonumber on FocusGained -- double blink -- excess event in plugin?
-		[_] Broken general vim colorscheme in st, nvim works as expected
+		2015-12-23 [X] Broken general vim colorscheme in st, nvim works as expected
 	[_] dvtm
 		[_] compare with tmux -- google it, try use
 		[_] no scrollback bufer, but when use dvtm -- no TRUE_COLOR?

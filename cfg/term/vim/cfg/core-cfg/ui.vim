@@ -42,7 +42,9 @@ set sessionoptions-=options
 " To not mess when :bnext after opening some more files by ranger
 set sessionoptions-=curdir
 
-set lazyredraw        " don't redraw screen while macros are executing
+if !has('nvim') " BUG? interference with nvim window resizing?
+  set lazyredraw    " don't redraw screen while macros are executing
+endif
 
 if exists('&cc')
   "" HACK: show textwidth limit only before text wraps on big enough screens
