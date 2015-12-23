@@ -14,7 +14,7 @@ trap_errors(){
 ### Add current package to active mods list if absent
 airy_cache_pwd_mod() { local mods="${CURR_DIR_CACHE:?No}/mods/mods"
 [[ ! -t 0 ]] || [[ ! "$0" =~ ^${CURR_DIR_CFG:?No} ]] ||
-    grep -q "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
+    grep -q "^${0%/*}$" "$mods" || echo "${0%/*}" >> "$mods"
 }
 
 # ====================== Configs =====================================

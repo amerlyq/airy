@@ -18,14 +18,17 @@ in c) cmd='copy'
 ;; esac; done
 shift $((OPTIND-1))
 
+show() { local t="$1" src="$2" dst="$3" sfx
+  [[ "${src##*/}" == ${dst##*/} ]] || sfx=" (${src##*/})"
+  echo "-> $t  ${dst}${sfx}";
+}
 # echo "cmd=$cmd, sudo=$sudo, dto=$dto"
-
 copy() { local src="$1" dst="$2"
   if [[ ! -e "$dst" || ! -L "$dst" ]]; then
     if ! diff $args -q "$src" "$dst" >/dev/null 2>&1; then
       $sudo mkdir -p "${dst%/*}"
       $sudo cp $args -vfT -- "$src" "$dst"
-    else echo "-> C  $dst"; fi
+    else show C "$src" "$dst"; fi
   else die "refuse copy over existing link '$dst'"; fi
 }
 link() { local src="$1" dst="$2"
@@ -33,7 +36,7 @@ link() { local src="$1" dst="$2"
     if [[ ! "$src" -ef "$dst" ]]; then
       $sudo mkdir -p "${dst%/*}"
       $sudo ln -svfT -- "$src" "$dst"
-    else echo "-> L  $dst"; fi
+    else show L "$src" "$dst"; fi
   elif [[ -n "$backup" && ! -e "${dst}$backup" ]]; then
       $sudo mv -vfT  -- "$dst" "${dst}$backup"
       $sudo ln -svfT -- "$src" "$dst"
