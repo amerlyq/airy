@@ -25,6 +25,14 @@ function! GetVisualSelection(...)
   return a:0 >= 1 ? join(lines, a:1) : lines
 endfunction
 
+"ALT: http://vi.stackexchange.com/questions/2764/send-text-from-one-split-window-to-another
+function! CopyToBuffer() range
+  let l:lines = GetVisualSelection()
+  new
+  setl buftype=nofile bufhidden=wipe noswapfile nobuflisted nowrap
+  silent put =l:lines
+endfunction
+command! -bang -nargs=0 -range  CopyToBuffer call CopyToBuffer()
 """"""""""""""""""""""""""""""""""""""""""""""""""
 
 function! ShortestIndent(s1, s2)

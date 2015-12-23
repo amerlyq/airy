@@ -12,6 +12,7 @@ REF
 BUG
 	[_] is '-c Float' really sets instance?
 	[_] gpg not launched? another order of zsh configs?
+		:? Maybe some configs not executed due to errors by 'st' terminfo?
 	[_] displaying broken for images, bigger than viewport
 	2015-12-23 [X] chroot -- no terminfo ::> install manually 'tic -s st.info'
 	[_] st
@@ -25,6 +26,10 @@ BUG
 			:= Problem persistent only for nvim. But not by colorscheme.
 			:> lazyredraw -- BUG? interference with nvim window resizing? REQ?
 		[_] vim autonumber on FocusGained -- double blink -- excess event in plugin?
+			:> BUG:TODO:REQ: write bugreport to suckless mail list. Or patch?
+			:= FocusGained/Lost events are sent twice -- it's not cfg/ or plugin/
+			:= Seems like it's 'st' itself, as nvim and vim are equally blinks
+			:= Not my patches.
 		2015-12-23 [X] Broken general vim colorscheme in st, nvim works as expected
 	[_] dvtm
 		[_] compare with tmux -- google it, try use

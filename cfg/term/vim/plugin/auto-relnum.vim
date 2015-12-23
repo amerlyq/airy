@@ -35,10 +35,10 @@ function! s:RelnumUpdate(...)
   let &numberwidth = max([&g:nuw, 4, 1+strlen(line('w$'))])  " TODO:RFC
 endfunc
 
-" RFC: are all those au necessary? Maybe add/replace some?
 " BUG: when in insert and do focus in/out -- relativenumber resets!
 "       TODO:CHG: save/restore state on out/in
 augroup auto_relnum
+  autocmd!
   au InsertEnter    * call s:RelnumUpdate(v:insertmode != 'i')
   au InsertLeave    * call s:RelnumUpdate(1)
   au FocusGained    * call s:RelnumUpdate(1)
@@ -46,6 +46,7 @@ augroup auto_relnum
   au WinEnter       * call s:RelnumUpdate(1)
   au WinLeave       * call s:RelnumUpdate(0)
 
+  " RFC: are all those au necessary? Maybe add/replace some?
   au BufNewFile     * call s:RelnumUpdate()
   au BufReadPost    * call s:RelnumUpdate()
   au FilterReadPost * call s:RelnumUpdate()
