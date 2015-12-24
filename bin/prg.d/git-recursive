@@ -68,7 +68,7 @@ function gita_pl { head_name "$1"
     # ALT: git diff-index --name-only --ignore-submodules HEAD --
     if git diff-files --quiet --ignore-submodules --
     then git ${GCFG[@]} pull --rebase --verbose
-    else git stash && git ${GCFG[@]} pull --rebase --verbose && git stash pop
+    else git stash && git ${GCFG[@]} pull --all --rebase --preserve-merges --verbose && git stash pop
     fi
     gita_st "$1" "\n"
 }

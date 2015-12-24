@@ -25,8 +25,9 @@ if &diff
   " [c  Jump backwards to the previous start of a change.
   " ]c  Jump forwards to the next start of a change.
   " USE space and backspace to jump forward/backward through differences
-  nnoremap <space> :normal! ]c<CR>
-  nnoremap <backspace> :normal! [c<CR>
+  " DISABLED: conflicts with my Space leader and vim-sneak
+  " nnoremap <space> :normal! ]c<CR>
+  " nnoremap <backspace> :normal! [c<CR>
 
   " allows you to 'put' and 'obtain' changes in visual mode for the instances
   " where multiple changes are on concurrent lines and you don't want to make

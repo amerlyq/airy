@@ -19,9 +19,11 @@ pretty() { sed -r "s|/home/$(whoami)|\~|g
 # ======================================================================
 if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then
     if distro arch; then
-        sudo pacman -Syu --ignore=firefox
+        sudo pacman -Syu --ignore=firefox  # REM:BUG
         echo "ERR: firefox is frozen in pacman" | pretty
         # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
+        # Degrade manually:
+        #   pacman -U /var/cache/pacman/pkg/firefox-42.0-3-x86_64.pkg.tar.xz
     elif distro ubuntu; then
         sudo apt-get install gawk
         echo "sudo apt-get update && sudo apt-get upgrade"
@@ -44,7 +46,7 @@ if cfgOpt u; then opts='-u'; fi
 if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
 printf "LIST: %s\n\n" "${PKG_LIST[*]}"
 printf "SKIP: %s\n\n" "${PKG_SKIP[*]}"
-
+PKG_SKIP=( firefox )  # REM:BUG
 frgx(){ local patt="\\b$*\\b"
     [[ "$*" =~ ^/.*$ ]] && patt="cfg$patt" || patt=".*$patt"
     [[ "$*" =~ ^.*/$ ]] && patt="${patt}.*"|| patt="$patt\$"

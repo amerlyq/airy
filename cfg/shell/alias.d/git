@@ -14,6 +14,7 @@ alias gbL='git branch -v'
 # Additional
 alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
 alias gaa='git add --all'
+alias gcFd='gcF --date="$(date -R)"'
 alias gcom='gco master'
 alias glu='gss && gl && gsp'
 
@@ -44,6 +45,8 @@ alias gtn='git name-rev --name-only'  # Shows related to release tag name
 ## Diff
 alias gdf='noglob git diff'
 alias gdF='gdf HEAD...origin'  # with fetched
+alias gdo='gdf HEAD   origin/$(git-branch-current 2>/dev/null)'
+alias gdum='gdf master upstream/master'
 alias gdw='gdf --no-ext-diff --word-diff --unified=0'  # OR -U0
 alias gdc='gdf --cached -w'
 alias gdcw='gdf --no-ext-diff --word-diff --cached -w'
