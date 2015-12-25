@@ -12,8 +12,7 @@ fvim() {
     word=$(cat "$fl" | $DMENU)
     [[ -n "$word" ]] || return
     echo "$word" >> "$fl"
-    x-terminal-emulator -name Float -e editor \
-        -c "Dict $word" -c "on"
+    r.vim-new -c "Dict $word" -c "on"
 }
 
 fshell() {

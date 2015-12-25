@@ -22,12 +22,12 @@ kopischke/vim-fetch:
   lazy: 0  # EXPL: watch over Buf*au for :e, :edit to work as expected
 
 --- ## State
-chrisbra/Recover.vim:
-  description: |
-      If swap exists -- allows to diff with swap, shows pid
-      OR:STD: (R)ecover -- then ':DiffOrig', and after comparing -- ':update'
-  # disabled: 'has("nvim")'  # REQ:FIXME: can't fetch neovim recovery messages
-  lazy: 0  # EXPL: checks swap on vim start
+# chrisbra/Recover.vim:  # HACK: replaced by my commands Recover{Diff,End,Remove}
+#   description: |
+#       If swap exists -- allows to diff with swap, shows pid
+#       OR:STD: (R)ecover -- then ':DiffOrig', and after comparing -- ':update'
+#   # disabled: 'has("nvim")'  # REQ:FIXME: can't fetch neovim recovery messages
+#   lazy: 0  # EXPL: checks swap on vim start
 
 kopischke/vim-stay:
   description: |

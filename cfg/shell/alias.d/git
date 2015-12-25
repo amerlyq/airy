@@ -25,6 +25,14 @@ alias grim='gri --preserve-merges'  # BUG: with -i can be weird!
 alias gfa='git fetch --all --progress --prune --verbose'
 alias gwRc='gwR origin/"$(git-branch-current 2> /dev/null)"'
 
+gl-() { local current="$(git-branch-current 2> /dev/null)"
+git for-each-ref --format="%(refname:short) %(push:track)" refs/heads |
+    while read branch state; do if [[ -n "$state" ]]; then
+        git checkout "$branch" && git pull --rebase --verbose
+    fi; done
+    git checkout "$current"
+}
+
 # BUG: recursion?
 # gri(){ [[ "$1" =~ [0-9]+ ]] && git rebase -i HEAD~$* || git rebase -i $@; }
 # compdef grI=git-rebase

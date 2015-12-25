@@ -15,8 +15,8 @@ MNT="/media/${CURR_USER:-`whoami`}"
 DIR="$MNT/$LBL"
 
 if [[ -z "$LBL" ]]; then
-    printf "LABELS: " && cd /dev && ls --color=auto disk/by-label
-    printf "DISKS: " cd /dev && ls --color=auto sd?[0-9]
+    printf "LABELS: " && (cd /dev/disk/by-label && ls --color=auto ||:)
+    printf "DISKS: " && (cd /dev && ls sd?[0-9] ||:)
     printf "SAMBA: $(sed -rn '/^\s+(\w+)\)\s+dosamba.*/s//\1/p' $0 | xargs)\n"
     printf "ACTIVE: " && ls --color=auto "$MNT"
     exit
