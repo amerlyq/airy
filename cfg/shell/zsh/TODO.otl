@@ -44,9 +44,9 @@ Prezto
 
 Prompt
     >> [_] SEE new pure prompt in prezto -- there was created async.zsh module!
-	[_] BUG: nested shell in ranger -- no saved pwd when cd to any /usr/share/doc/..
-		: ~_prompt_amer_pwd
-	[_] BUG: -- if fast <CR> after urxvt start
+	2015-12-25 [X] BUG: nested shell in ranger -- no saved pwd when cd to any /usr/share/doc/..
+		: ~_prompt_amer_pwd ::> problem was in home dir expansion of 'print -D'
+	[_] BUG: -- if fast <CR> after urxvt start (and some else cases)
 		[_] double prompt
 			:= seems like it's result of prompt update by async git/vcs cmds
 			:? make them synchronize with time intervals as I thought before?
@@ -149,9 +149,6 @@ zsh
 		https://github.com/horosgrisa/fasd
 		2015-06-20 [$] ~/.oh-my-zsh/plugins/fasd/fasd.plugin.zsh ::> Switched to Prezto
 	[_] Check zsh profiling (debug starting and accept-line timing)
-	[_] append sudo and execute command instead of simply appending it
-		:DEV:HACK: cycle commands on press! Like pacs <-> paci
-		: And only if there no queue, then append sudo
 	[_] pre-execute command before starting interactive shell
 		http://www.zsh.org/mla/users/2005/msg00599.html
 	[_] ag in Sack
@@ -170,6 +167,9 @@ zsh
 	    в той же директории, что и сохранённая в /tmp/zsh_chosedir
 	[_] Aim: add quotes to nearest word by shortcut. (vim : by ", emc: by C-@)
 		Read zsh scripts in seize, find 'quote' realization
+	[_] Cycle: append sudo and execute command instead of simply appending it
+		:DEV:HACK: cycle commands on press! Like pacs <-> paci
+		: And only if there no queue, then append sudo
 	REF
 		http://zsh.sourceforge.net/Doc/Release/Zsh-Modules.html#The-zsh_002fzutil-Module
 		Commands to bind

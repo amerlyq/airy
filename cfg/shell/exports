@@ -13,11 +13,11 @@ if [[ ! -d "$TMPDIR" ]]; then
   export TMPDIR="/tmp/$LOGNAME"
   mkdir -p -m 700 "$TMPDIR"
 fi
-TMPPREFIX="${TMPDIR%/}/${SHELL##*/}"
 
 ### Path ###
-if [[ -d "$HOME/.bin" ]]; then export PATH="$HOME/.bin:$PATH"; fi
-if [[ -d "$HOME/.cache/airy/bin" ]]; then export PATH="$HOME/.cache/airy/bin:$PATH"; fi
+PATH="$HOME/.cache/airy/bin:$HOME/.bin:$PATH"
+PATH="/usr/local/bin:/usr/local/sbin:$PATH"
+export PATH
 
 ### Less ###
 [[ -r ~/.less ]] || export LESS='-a -i -j6 -M -N -R -S -w -z-4 -x4'

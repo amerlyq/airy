@@ -4,6 +4,8 @@
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
+TMPPREFIX="${TMPDIR:-/tmp}"
+TMPPREFIX="${TMPPREFIX%/}/${SHELL##*/}"
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -36,12 +38,7 @@ stty -echoctl
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
-export SHELL=$(which bash)
-
-# Alias definitions.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-source ~/.shell/bash/prompt
-source ~/.shell/aliases
+export SHELL=$(which bash)  # NEED: when bash is launched from inside zsh
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -57,8 +54,6 @@ fi
 # turn on directory spelling typos automagic
 shopt -s cdspell
 
-finish() { printf "%s" "$PWD" > "${TMPDIR:-/tmp}/ranger_cwdir"; }
-trap finish EXIT
-
-# Execute exported commands for chroot and ssh
-[[ -z "$BASHRC_EVAL" ]] || eval "$BASHRC_EVAL"
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+source ~/.shell/bash/prompt
+source ~/.shell/common

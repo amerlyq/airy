@@ -1,0 +1,11 @@
+# vim:ft=sh
+
+# Alias definitions.
+source ~/.shell/aliases
+
+# Execute exported commands for chroot and ssh
+[[ -z "$SHELLRC_EVAL" ]] || eval "$SHELLRC_EVAL"
+
+## Trap to sync bash/zsh and ranger working directories.
+trap '(set +C && printf "%s" "$PWD" > "${TMPDIR:-/tmp}/ranger_cwdir")' EXIT
+# OR NOTE: '>!' is because of 'unsetopt CLOBBER' by 'prezto:directory'
