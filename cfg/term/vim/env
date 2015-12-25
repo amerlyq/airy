@@ -1,0 +1,15 @@
+# vim:ft=sh
+unset NVIM_TUI_ENABLE_TRUE_COLOR
+unset NVIM_TUI_ENABLE_CURSOR_SHAPE
+
+case "$TERM"
+in rxvt-*)
+    # BUG: open vim inside vim -- thinks it's xterm
+    # BUG: on android xterm is fake = trash symbs on cursor
+    export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    export TERMCMD='urxvt'
+;; st-*)
+    export NVIM_TUI_ENABLE_TRUE_COLOR=1
+    export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    export TERMCMD='st'
+esac

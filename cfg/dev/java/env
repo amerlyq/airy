@@ -1,0 +1,11 @@
+# vim:ft=sh
+### Java SDK ###
+if [[ -d /usr/java/jdk1.8.0_31 ]]; then
+    # export JAVA32_HOME=/usr/lib/jvm/java-7-openjdk-i386
+    # export JAVA64_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+
+    #/usr/lib/jvm/java-8-oracle
+    export JAVA64_ORACLE_HOME=/usr/java/jdk1.8.0_31
+    export JAVA_HOME="$JAVA64_ORACLE_HOME"
+    export PATH="$PATH:$JAVA_HOME/bin:$JAVA_HOME/include"
+fi

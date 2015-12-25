@@ -1,10 +1,11 @@
 # vim: ft=zsh
 # ~/.zshenv -- always sourced by zsh (before ~/.zshrc).
+# If you want move it to ZDOTDIR also, then next line must reside in /etc/zshenv
 [[ ! -d ~/.cache/zsh ]] || ZDOTDIR=~/.cache/zsh
 
 # in $ man zshall --> there is recommended to use '[[ -o rcs ]]' ?
 # Ensure that a non-login, non-interactive shell has a defined environment.
-if [[ -o rcs && "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]
+if [[ -o rcs && ! -o LOGIN && "$SHLVL" -eq 1 && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]
 then source "${ZDOTDIR:-$HOME}/.zprofile"; fi
 
 # WARNING: Available even in Zsh scripts!

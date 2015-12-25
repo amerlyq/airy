@@ -1,54 +1,19 @@
 # vim: ft=zsh
 # Executes commands at login pre-zshrc.
 
-## Load std environment (EDITOR, LANG, etc)
-[[ ! -r ~/.shell/env ]] || source ~/.shell/env
+## Load std environment (EDITOR, TMPDIR, PATH, aura env profiles)
+[[ ! -r ~/.shell/exports ]] || source ~/.shell/exports
 
 ### Paths ###
+# Set the list of directories that Zsh searches for programs.
+path=( /usr/local/{bin,sbin} $path )
+# Set the the list of directories that cd searches.
+# cdpath=( $cdpath )
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path
 
-# Set the the list of directories that cd searches.
-# cdpath=(
-#   $cdpath
-# )
-
-# Set the list of directories that Zsh searches for programs.
-path=(
-  /usr/local/{bin,sbin}
-  $path
-)
-
-
-### Less ###
-[[ -r ~/.less ]] || export LESS='-a -i -j6 -M -N -R -S -w -z-4 -x4'
 # Set the Less input preprocessor.
 # Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
 if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
-
-
-### Temporary Files ###
-if [[ ! -d "$TMPDIR" ]]; then
-  export TMPDIR="/tmp/$LOGNAME"
-  mkdir -p -m 700 "$TMPDIR"
-fi
-
-TMPPREFIX="${TMPDIR%/}/zsh"
-
-
-### SSH-agent ###
-export GPG_TTY=$(tty)
-# Start the gpg-agent if not already running
-if ! pgrep -x -u "$USER" gpg-agent >/dev/null 2>&1; then
-    gpg-connect-agent /bye >/dev/null 2>&1
-fi
-unset SSH_AGENT_PID
-# SSH_AUTH_SOCK=$(gpg-connect-agent 'getinfo ssh_socket_name' /bye | awk '/^D/{print $2}')
-# [[ -S "$SSH_AUTH_SOCK" ]] && export SSH_AUTH_SOCK
-if [[ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]]; then
-    export SSH_AUTH_SOCK=~/.gnupg/S.gpg-agent.ssh
-fi
-# Refresh gpg-agent tty in case user switches into an X session
-gpg-connect-agent updatestartuptty /bye >/dev/null

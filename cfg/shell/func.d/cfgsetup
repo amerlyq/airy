@@ -48,9 +48,11 @@ cd $(dirname $(readlink -m ${0}))
 airy_cache_pwd_mod
 
 ### Populate all run, run.pr1 scripts into mycache/bin
-for path in "$PWD/run"*; do
-  [[ -f "$path" ]] || continue
+for path in "$PWD/run"*; do [[ -f "$path" ]] || continue
   link "$path" "$CURR_DIR_CACHE/bin/r.${PWD##*/}${path#$PWD/run}"
+done
+for path in "$PWD/env"*; do [[ -f "$path" ]] || continue
+  link "$path" "$CURR_DIR_CACHE/env/${PWD##*/}${path#$PWD/env}"
 done
 # =============================== ALT ==================================
 

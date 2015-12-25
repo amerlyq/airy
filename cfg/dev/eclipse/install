@@ -4,7 +4,9 @@ source ~/.shell/func.d/packages
 cfgOpt s || die 0 "N: Use only on purpose"
 
 if distro arch; then
-    echo "Err: no"
+    pkg_inst eclipse-java  # USE eclipse-java OR eclipse-cpp (conflicting)
+    aur_inst eclim
+    # http://eclim.org/install.html
 
 elif distro ubuntu; then
     pkg_inst eclipse eclipse-cdt

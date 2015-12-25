@@ -25,21 +25,13 @@
 
 # Only if running bash
 if [ -n "$BASH_VERSION" ]; then
+    [[ ! -r "$HOME/.shell/exports" ]] || source "$HOME/.shell/exports"
     # set PATH so it includes user's private bin if it exists
-    for path in ~/.cache/airy/bin ~/.bin
-    do if [[ -d "$path" ]]; then
-        grep -q "$path" <<< "$PATH" || PATH="$path:$PATH"
-    fi; done
-
-    if [[ ! -d "$TMPDIR" ]]; then
-        export TMPDIR="/tmp/$LOGNAME"
-        mkdir -p -m 700 "$TMPDIR"
-    fi
-
-    # include .bashrc if it exists
-    if [[ -f "$HOME/.bashrc" ]]; then
-        source "$HOME/.bashrc"
-    fi
+    # for path in ~/.cache/airy/bin ~/.bin
+    # do if [[ -d "$path" ]]; then
+    #     grep -q "$path" <<< "$PATH" || PATH="$path:$PATH"
+    # fi; done
+    [[ ! -r "$HOME/.bashrc" ]] || source "$HOME/.bashrc"
 fi
 
 ## Export variable for systemd/user units
