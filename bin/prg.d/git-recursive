@@ -1,19 +1,25 @@
 #!/bin/zsh
 
+# Options
+DIR="$PWD"
+if [[ ! "$DIR" =~ ^$HOME/ ]]; then
+    echo 'Err: run only from "$HOME/<subdir>/"'
+    exit 1
+fi
 [[ "$THREADS" =~ [0-9]+ ]] || THREADS=8
+GCFG=( -c color.status=always  -c color.ui=always )
+
+# Args
 FUN="$1"; shift
 case "${@: -1}"
 in -s) bSEQ=1; CMD="${@:1:$#-1}"  # ALT: THREADS=1 <prg>
 ;;  *) CMD="$@"
 ;; esac
 
-DIR="$PWD"
 source ~/.shell/zsh/zshrc
-GCFG=( -c color.status=always  -c color.ui=always )
-
 autoload -U regexp-replace
 
-
+# Impl
 function gita_omz {
     ## For Oh-My-Zsh
     printf "$PR_SET_CHARSET$AM_GIT%s$PR_NO_COLOUR %s$PR_NO_COLOUR" \
@@ -57,20 +63,31 @@ function gita_st { # $1 -- rep name, $2 -- suffix
     print -P "$(gita_prezto)\t $name  $stm - $(time_dt)$2"
 }
 
-function gita_pl { head_name "$1"
-    # ATTENTION: Checking remote updates has no sense, as its time ~= pull
-    # local remote=$(git rev-parse --abbrev-ref '@{u}')
-    # remote=$(git ls-remote -h ${remote%/*} refs/heads/${remote##*/} | awk '{print $1}')
-    # [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return
+# ATTENTION: Checking remote updates has no sense, as its time ~= pull
+# function check_remote {
+#   local remote=$(git rev-parse --abbrev-ref '@{u}')
+#   remote=$(git ls-remote -h ${remote%/*} refs/heads/${remote##*/} | awk '{print $1}')
+#   [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return 1
+# }
 
-    gita_st "$1"
-    # Check if clean directory
+# USE git-up, SEE http://aanandprasad.com/git-up/
+if ((!$+commands[git-up])); then
+  function git-up() { local clean=1 common
     # ALT: git diff-index --name-only --ignore-submodules HEAD --
-    if git diff-files --quiet --ignore-submodules --
-    then git ${GCFG[@]} pull --rebase --verbose
-    else git stash && git ${GCFG[@]} pull --all --rebase --preserve-merges --verbose && git stash pop
-    fi
-    gita_st "$1" "\n"
+    git diff-files --quiet --ignore-submodules -- || clean=0
+    ((clean)) || git stash
+    git ${GCFG[@]} pull --all --rebase --verbose 2>&1 # --rebase=preserve
+    ((clean)) || git stash pop
+
+    # ALT: with autostash and colored rebase
+    # git ${GCFG[@]} fetch --all --progress --prune --verbose
+    # common=$(git merge-base HEAD @{u}@{1})
+    # git ${GCFG[@]} rebase --autostash --onto @{u} $common
+  }
+fi
+
+function gita_pl { head_name "$1"
+    gita_st "$1" && git-up && gita_st "$1" "\n"
 }
 
 function gita_ph { head_name "$1"
