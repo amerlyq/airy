@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    aur_inst "jmtpfs"
+
+elif distro ubuntu; then
+    echo "Err: Not enough packages"
+fi

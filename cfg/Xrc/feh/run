@@ -1,16 +1,17 @@
 #!/bin/bash -e
 
+path=~/.cache/wallpaper
+
 # Set new wallpaper
 if [[ -n "$1" ]]; then
-    ln -svf "$(readlink -m "$1")" ~/.wallpaper
+    ln -svf "$(readlink -m "$1")" "$path"
 fi
 
 if [[ -f ~/.wallpaper ]]; then  # symlink to one wallpaper
     # Use parts of one wallpaper for all monitors
-    feh --no-xinerama --bg-fill ~/.wallpaper
+    feh --no-fehbg --no-xinerama --bg-fill "$path"
     # Multimonitor
     # feh --bg-scale 'pic1.png' --bg-scale 'pic2.png'
-elif [[ -d ~/.wallpaper ]]; then  # random wallpaper from dir
-    feh --bg-fill "$(find ~/.wallpaper/ | shuf -n1)"
+elif [[ -d "$path" ]]; then  # random wallpaper from dir
+    feh --no-fehbg --bg-fill "$(find "$path"/ | shuf -n1)"
 else xsetroot -gray; fi
-

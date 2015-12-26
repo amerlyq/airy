@@ -27,10 +27,7 @@ ranger
 		: Same problem with git --verbose when it shows changes for files with
 		: russian names -- then length of such names threated as doubled.
 	[_] optimize navi speed/fps in dir for very large lists (preferably got on 'b')
-	[_] re-read output from scope.sh for lister on shortcut inside lister
 	2015-04-23 [X] FIX findfy command : add next/prev maps : UP/DOWN in cmap
-	[_] TODO create my own global mime extensions for scope.sh
-		http://www.alan-warren.com/2012/04/01/503/
 	[_] BUG: up/down for :findfy not works as expected
 	[_] BUG: old desparate image stripping
 		:= It may be ralative to 'back_color_erase' option in terminfo
@@ -55,16 +52,25 @@ NEW
 		:SEE: it's not a big deal, as that file used as interface only one
 		: short instant when exiting from zsh _and_ returning into ranger. So
 		: it's always valid, as that events are consequent.
+	[_] BUG: 'I' view can't highlight with mouse -- may I miss smth in config?
+
+
+scope.sh
+	[_] Separate functions for filetypes and switches to choose funcs
+		:= Do it on top of default scope.sh, building viewers from scratch
+		:% And then send pull request
+	[_] Toggle w3m/img2txt/exif preview for image/video
+	[_] Add hang-out process checking to ranger scope.sh
+	[_] re-read output from scope.sh for lister on shortcut inside lister
+	[_] TODO create my own global mime extensions for scope.sh
+		http://www.alan-warren.com/2012/04/01/503/
 	[_] BUG: seems like ranger for 'I' view re-launch ./scope.sh only on date change,
 		but it does it wrong for symlinks, as it can't track when they are updated!
 		(Hovewer that affects and vimb too, maybe it's general symlink property?)
-	[_] BUG: 'I' view can't highlight with mouse -- may I miss smth in config?
-
 
 
 ranger
  NOTE: 1? 2? -- help for commands
-	[_] Add hang-out process checking to ranger scope.sh
 	[_] Integrate vim with ranger by repo or tmux or --syntex server like in latex
 		https://github.com/mikezackles/vranger
 		 http://unix.stackexchange.com/questions/82632/tmux-ranger-integration-opening-text-files-in-new-panes

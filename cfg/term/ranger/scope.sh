@@ -74,6 +74,12 @@ try() {
 }
 
 
+f_video() {
+    # Image preview for videos, disabled by default:
+    # ffmpegthumbnailer -i "$path" -o "$cached" -s 0 #&& exit 6
+    exiftool "$path" && exit 5 || exit 1
+}
+
 case "$extension" in
     # Archive extensions:
     7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
@@ -103,6 +109,7 @@ case "$extension" in
     # otl)
     #     try "$EXTDIR/color-preview" vim 128 "$path" && exit 5 || exit 2
     #     ;;
+    flv) f_video ;;
 esac
 
 
@@ -131,15 +138,15 @@ case "$mimetype" in
             try cat -n "$path" && { dump | trim; exit 5; } || exit 2
         fi ;;
 
-    image/*) { # Ascii-previews of images:
-        img2txt --gamma=0.6 --width="$width" "$path"
-        identify "$path"
-    } && exit 4 || exit 1 ;;
-
     video/*) { # Image preview for videos, disabled by default:
         # ffmpegthumbnailer -i "$path" -o "$cached" -s 0 #&& exit 6
         exiftool "$path" && exit 5
     } || exit 1 ;;
+
+    image/*) { # Ascii-previews of images:
+        # img2txt --gamma=0.6 --width="$width" "$path";
+        identify "$path"
+    } && exit 4 || exit 1 ;;
 
     audio/*) { # Display information about media files:
         exiftool "$path" && exit 5
