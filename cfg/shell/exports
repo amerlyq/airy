@@ -15,8 +15,9 @@ if [[ ! -d "$TMPDIR" ]]; then
 fi
 
 ### Path ###
-PATH="$HOME/.cache/airy/bin:$HOME/.bin:$PATH"
+!hash ruby>/dev/null 2>&1||PATH+=":$(ruby -e 'print Gem.user_dir')/bin"
 PATH="/usr/local/bin:/usr/local/sbin:$PATH"
+PATH="$HOME/.cache/airy/bin:$HOME/.bin:$PATH"
 export PATH
 
 ### Less ###
@@ -24,8 +25,10 @@ export PATH
 
 
 ### Aura mods profiles (links only) ###
-for L in ~/.cache/airy/env/*
-do [[ ! -L "$L" ]] || source "$L"; done
+if [[ -d ~/.cache/airy/env ]]; then
+    for L in ~/.cache/airy/env/*
+    do [[ ! -L "$L" ]] || source "$L"; done
+fi
 
 ### Alien profile (SSH server, anonymous)###
 if [[ -f ~/aura/env ]]; then source ~/aura/env; fi

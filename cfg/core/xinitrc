@@ -29,7 +29,7 @@ fi
 case $session in
    xmonad) exec xmonad ;;
     xterm) exec xterm -geometry 80x66+0+0 -name login ;;
-*|i3|i3wm) exec i3 > /var/log/i3.log 2>&1 ;;  # i3 -V -d all >> ~/.cache/i3.log 2>&1
+*|i3|i3wm) exec i3 >/var/tmp/i3_$(date +%Y%m%d_%H%M%S).log 2>&1 ;;  # i3 -V -d all >> ~/.cache/i3.log 2>&1
 esac
 
 # startx

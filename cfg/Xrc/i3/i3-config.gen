@@ -61,10 +61,18 @@ exi3="$exno i3-input -F "
 #   term="urxvt"        # i3-sensible-terminal
 #   eurx="$exno urxvt"  # Many times inside tmux demon was hanged, so it's better use separate processes
 # fi
-hash x-terminal-emulator && TERMCMD=x-terminal-emulator || [[ -n "$TERMCMD" ]] \
-    || TERMCMD="$(hash st && echo st || hash urxvt && echo urxvt || echo xterm)"
+if hash r.t
+then TERMCMD=r.t
+elif hash x-terminal-emulator
+then TERMCMD=x-terminal-emulator
+elif [[ -z "$TERMCMD" ]]
+then TERMCMD="$(hash st && echo st || hash urxvt && echo urxvt || echo xterm)"
+fi
 eurx="$exno $TERMCMD"
-eflo="$eurx $([[ $(readlink -m $TERMCMD)==$(which st) ]] && echo -c || echo -name) Float"
+if hash r.tf
+then eflo="$exno r.tf"
+else eflo="$eurx $([[ $(readlink -m $TERMCMD)==$(which st) ]] && echo -c || echo -name) Float"
+fi
 ## Disabled: wnd name wrong setted in zsh only!
 #ecli="$exno urxvtcd -e \$SHELL -i -c " #--hold
 
@@ -337,7 +345,8 @@ w_header "Windows: Settings"
         'class="^Firefox" instance="^Download"' 'class="^Transmission-gtk"' \
         'class="^Pidgin"' 'class="^Skype"' \
         'instance="^PlayOnLinux"' \
-        'class="(?i)'"$term"'" instance="(?i)^Float*"'
+        'class="(?i)^Float*" instance="(?i)'"$term"'"'  # For st
+        # 'class="(?i)'"$term"'" instance="(?i)^Float*"'  # For urxvt
 
     # wstr 'for_window [class="^Pidgin" title="Buddy List"] move scratchpad'
     wstr 'for_window [title="^Transmission" class="^Transmission-gtk" instance="^transmission-gtk"] move scratchpad'

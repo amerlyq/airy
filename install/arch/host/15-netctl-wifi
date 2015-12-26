@@ -21,6 +21,8 @@ Key='$(wpa_passphrase $SYS_ESSID ${SYS_WPASS:?No} |
 IP=static
 Address='${SYS_IP:?No}/24'
 Gateway='$gate'
+# WARNING: don't use comma between DNS, because '/etc/resolv.conf'
+# and 'gem' with bunch of other programs will become broken
 DNS=('$gate')
 Hidden=yes
 EOT

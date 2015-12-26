@@ -20,10 +20,14 @@ DEV
 
 
 BUG
-	[_] is '-c Float' really sets instance?
-	[_] gpg not launched? another order of zsh configs?
+	2015-12-26 [X] is '-c Float' really sets instance?
+		:> It's not, it was bug, closed at 2015-12-20
+	2015-12-26 [X] gpg not launched? another order of zsh configs?
 		:? Maybe some configs not executed due to errors by 'st' terminfo?
-	[_] displaying broken for images, bigger than viewport
+		::> Problem in non-login st session, when urxvt wrongly had login sessions
+	[_] REQ: w3m displaying broken for images, bigger than viewport w/h
+		:= works fine in urxvt
+		:= shrinking width/height in ext/img_display.py is no help
 	[_] when decreasing st window size -- screen lines are cropped and not restored
 	[_] disable black frame around floating st window
 	2015-12-23 [X] chroot -- no terminfo ::> install manually 'tic -s st.info'

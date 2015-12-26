@@ -1,5 +1,5 @@
 " For when you forget to sudo.. Really Write the file.
-command! -bar -bang -nargs=0 Sw write !sudo tee % >/dev/null
+command! -bar -bang -nargs=0 Sw silent write !sudo tee % >/dev/null
 " Execute command and place output in new buffer. (:new, :vnew, :tabnew)
 command! -bar -nargs=+ E new | r ! <args>
 
