@@ -27,4 +27,5 @@
 
 if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
     exec startx
+    # OR: exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
 fi

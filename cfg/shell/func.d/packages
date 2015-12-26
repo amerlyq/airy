@@ -33,10 +33,10 @@ do_if() {
 }
 
 if distro ubuntu; then
-  pkg_inst(){ do_if -c 'sudo apt-get --yes install' $@; }
-  pkg_make(){ sudo checkinstall --default $@; }
+  pkg_inst(){ do_if -c 'sudo apt-get --yes install' "$@"; }
+  pkg_make(){ sudo checkinstall --default "$@"; }
   deb_wget(){ wget_inst -d "$1" && sudo dpkg -i "$CURR_DIR_PKG/${2:-${1##*/}}"; }
-  deb_inst(){ do_if -c 'deb_wget' $@; }
+  deb_inst(){ do_if -c 'deb_wget' "$@"; }
   ppa_add(){
     local addr="${1#ppa:}"
     addr="${addr#*http://}"
@@ -47,15 +47,16 @@ if distro ubuntu; then
   }
 
 elif distro arch; then
-  pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' $@; }
+  pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' "$@"; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
   if has_pr pacaur; then
-    aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' $@; }
+    aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' "$@"; }
   elif has_pr yaourt; then
-    aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' $@; }
+    aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' "$@"; }
   else aur_inst(){ return 1; }
   fi
-  pip_inst(){ sudo pip3 install --upgrade $@; }
+  pip_inst(){ sudo pip3 install --upgrade "$@"; }
+  gem_inst(){ gem install "$@"; }
 fi
 
 

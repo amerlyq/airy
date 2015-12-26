@@ -1,5 +1,11 @@
 # vim:ft=sh
 
+### Aura mods profiles (links only) ###
+if [[ -d ~/.cache/airy/env ]]; then
+    for L in ~/.cache/airy/env/*
+    do [[ ! -L "$L" ]] || source "$L"; done
+fi
+
 # Alias definitions.
 source ~/.shell/aliases
 

@@ -26,7 +26,10 @@
 # Only if running bash
 if [ -n "$BASH_VERSION" ]; then
     [[ ! -r "$HOME/.shell/exports" ]] || source "$HOME/.shell/exports"
-    export PATH="$(awk -vRS=: '!a[$0]++{printf(NR>1?":%s":"%s"),$a[$1]}' <<<"$PATH")"
+    # Most of PATH constructed in /etc/profile and /etc/profile.d/
+    if hash awk >/dev/null 2>&1; then export PATH="$(
+        awk -vRS=: '!a[$0]++{printf(NR>1?":%s":"%s"),$a[$1]}' <<<"$PATH"
+    )"; fi
     [[ ! -r "$HOME/.bashrc" ]] || source "$HOME/.bashrc"
 fi
 
