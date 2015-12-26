@@ -3,13 +3,13 @@ source ~/.shell/profile
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD/gitignore" ~/.gitignore
+link -t ~/.config/git ignore attributes
 
 # Customization
 # http://git-scm.com/docs/git-config
 
 ### GENS ###
-dst=~/.gitconfig
+dst=~/.config/git/config
 > $dst
 if [[ -n "${WORK_NAME:=$MAIN_NAME}" &&
       -n "${WORK_MAIL:=$MAIN_MAIL}" ]]; then
@@ -19,4 +19,4 @@ if [[ -n "${WORK_NAME:=$MAIN_NAME}" &&
 fi
 cat "$PWD/cfg"/* >> $dst
 
-echo "W: ~/.gitconfig"
+echo "W: $dst"

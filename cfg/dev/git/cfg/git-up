@@ -1,0 +1,9 @@
+# vim: ft=gitconfig
+[git-up "fetch"]
+    all = true
+    prune = true
+
+[git-up "rebase"]
+;     arguments = --preserve-merges
+    auto = true
+    log-hook = 'git --no-pager diff --stat $1..$2'
