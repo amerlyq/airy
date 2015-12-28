@@ -29,11 +29,15 @@ BUG
 		:= works fine in urxvt
 		:= shrinking width/height in ext/img_display.py is no help
 	[_] when decreasing st window size -- screen lines are cropped and not restored
-	[_] disable black frame around floating st window
+	2015-12-28 [$] disable black frame around floating st window ::> option borderpx
 	2015-12-23 [X] chroot -- no terminfo ::> install manually 'tic -s st.info'
 	[_] st
 		[_] st nvim                                                                                                                                                                                              ─(14:56:10)
+		:= Read config.def.h from st and st.c -- there are control escape sequences
+		:= Open page with specs for xterm and decrypt these sequences manually
 		: erresc: unknown csi ESC[8;18;212t
+		: erresc: unknown csi ESC[8;30;100t
+		: erresc: unknown csi ESC[8;20;119t
 	[_] vim
 		2015-12-22 [X] vim colors -- for my notches -- no guifg color in scheme
 		2015-12-23 [X] when vim lose focus by i3+Enter -- black screen. No redraw?

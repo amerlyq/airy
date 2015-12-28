@@ -3,9 +3,11 @@ if neobundle#tap('vim-rooter') "{{{
   let g:rooter_manual_only = 1
   let g:rooter_disable_map = 1
   " let g:rooter_use_lcd = 1
-  " let g:rooter_patterns = g:rooter_patterns + [ 'setup' ]
   " Change working directory to that of the current file
   nnoremap <silent><unique> [Frame]cd :Rooter<CR>
+  fun! neobundle#hooks.on_post_source(bundle)
+    let g:rooter_patterns = g:rooter_patterns + [ '.pjroot', '.agignore' ]
+  endf
   call neobundle#untap()
 endif
 " ALSO:STD:ALWAYS:
