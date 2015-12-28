@@ -7,7 +7,7 @@ if [[ -n "$1" ]]; then
     ln -svf "$(readlink -m "$1")" "$path"
 fi
 
-if [[ -f ~/.wallpaper ]]; then  # symlink to one wallpaper
+if [[ -f "$path" ]]; then  # symlink to one wallpaper
     # Use parts of one wallpaper for all monitors
     feh --no-fehbg --no-xinerama --bg-fill "$path"
     # Multimonitor

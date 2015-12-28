@@ -19,7 +19,8 @@ if exists('g:loaded_auto_relnum') || &cp || v:version < 703 | finish
       \| else | let g:loaded_auto_relnum=1 | endif
 
 let g:arelnum = {'focused': (&number && &rnu) }
-let g:arelnum.ignored = {'ft': 'qf', 'preview': 1, 'buftype': 'help\|nofile'}
+let g:arelnum.ignored = {'ft': 'qf', 'preview': 1,
+      \ 'buftype': 'help\|nofile\|terminal'}
 
 nnoremap <silent><unique> [Toggle]n  :RelnumToggle<CR>
 command! -bar -nargs=0 RelnumToggle  set relativenumber! rnu?
