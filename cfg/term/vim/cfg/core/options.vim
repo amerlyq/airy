@@ -32,4 +32,7 @@ if has('gui_running')  " TODO TRY 'eg'; 'a' -- disabled because of 'copyq'
 " elseif exists('$DISPLAY')
 endif
 
-set viewoptions=cursor,folds,slash,unix   " What to save in :mkview
+
+" TODO: chech if there are saved unallowable/unnecessary localoptions
+set viewoptions=cursor,folds,localoptions,slash,unix   " What to save in :mkview
+" localoptions - try to save foldexpr for ':Fs', etc between sessions

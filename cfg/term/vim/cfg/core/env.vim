@@ -27,7 +27,6 @@ set backupdir=$CACHE/backup,$FALLBACK
 set backup writebackup backupcopy=auto
 " View
 set viewdir=$CACHE/view
-set viewoptions-=options viewoptions+=slash,unix
 " Spell
 " set runtimepath+=$VIMHOME
 set runtimepath^=$CACHE  " For ./spell
