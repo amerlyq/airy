@@ -76,6 +76,9 @@ if ((!$+commands[git-up])); then
     # ALT: git diff-index --name-only --ignore-submodules HEAD --
     git diff-files --quiet --ignore-submodules -- || clean=0
     ((clean)) || git stash
+    # BUG: troubles when you on feature-branch and ustream was rebased
+    #   Then you need only fetch instead of pull+rebase
+    #   However, you always can do git rebase --abort ...
     git ${GCFG[@]} pull --all --rebase --verbose  # --rebase=preserve
     ((clean)) || git stash pop
 
