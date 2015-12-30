@@ -70,7 +70,7 @@ function gita_st { # $1 -- rep name, $2 -- suffix
 #   [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return 1
 # }
 
-# USE git-up, SEE http://aanandprasad.com/git-up/
+# USE $ gem install git-up  # SEE http://aanandprasad.com/git-up/
 if ((!$+commands[git-up])); then
   function git-up() { local clean=1 common
     # ALT: git diff-index --name-only --ignore-submodules HEAD --

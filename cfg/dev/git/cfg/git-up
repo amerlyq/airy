@@ -6,4 +6,4 @@
 [git-up "rebase"]
 ;     arguments = --preserve-merges
     auto = true
-    log-hook = git --no-pager diff --stat $1..$2
+    log-hook = git -c color.ui=always --no-pager diff --stat $1..$2
