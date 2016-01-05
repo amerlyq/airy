@@ -2,22 +2,9 @@
 if neobundle#tap('ag.vim') "{{{
   " CHG: all real mappings included into 'after/ftplugin/qf.vim'
   let g:ag = {}
-  let g:ag.highlight=1
-  let g:ag.apply_lmappings=0
-  let g:ag.apply_qmappings=0
-  let g:ag.mapping_message=0
-  let g:ag.no_default_mappings=0
+  let g:ag.toggle = {'highlight': 0, 'mapping_message': 0}
+  let g:ag.use_default = {'qmappings': 0, 'lmappings': 0}
   " let g:ag.qhandler="botleft lopen 7"  "OR: copen 20"
-  ": Ag working dir  searching
-  " nnoremap <unique> <Leader>* :<C-U>Ag '<C-R>/'<CR>
-  nnoremap <unique> <Leader>a :<C-U>Ag -w <C-r>=shellescape('<cword>')<CR><CR>
-  vnoremap <unique> <Leader>a :<C-U>Ag -Q '<C-r>=GetVisualSelection(" ")<CR>'<CR>
-  ": Ag buffer search
-  nnoremap <unique> g<Leader>a :<C-U>AgBuffer -w '<C-R><C-W>'<CR>
-  vnoremap <unique> g<Leader>a :<C-U>AgBuffer -Q '<C-R>=GetVisualSelection(" ")<CR>'<CR>
-  ": Ag current file searching (currently no jumping -- need Ag >= 0.25 with --vimgrep)
-  nnoremap <unique> <Leader>A :<C-U>Ag -w '<C-R><C-W>' %:p<CR>
-  vnoremap <unique> <Leader>A :<C-U>Ag -Q '<C-R>=GetVisualSelection(" ")<CR>' %:p<CR>
   call neobundle#untap()
 endif "}}}
 

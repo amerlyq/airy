@@ -5,7 +5,8 @@ session=$1
 xrandr --auto
 xset b off  # No PC speaker in X
 xset s off  # No screensaver
-xset -dmps  # No energy saving
+# xset -dmps  # No energy saving
+xset dpms 1800 1800 1800  # BUG: can't disable energy saving?
 # USE xset -q -- to find out values
 # xsetroot -gray &
 # setterm -blank 0  # Disable blanking for virtual consoles

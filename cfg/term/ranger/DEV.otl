@@ -148,6 +148,15 @@ DEV
 			: on HD it will be 40-80 marks depending on font size
 		[_] OPTION -- show hints permanently -- then browse using whole keyboard in one stroke
 
+scope.sh
+	[_] toggle between current text previewers : default, hex, ag
+		:= Possible -- through setting env variables on scope.sh launch
+		:= So you tried explicit, than starts fallback sequence
+	[_] add 'ag' previewer
+		:= Exec ':view ag' then flip through files -- in pager you will see matches
+		:= use 'limit matches' option when preview
+		THINK enable 'ag preview' only on pair with populating dir by results filelist?
+		:= Then I could inspect files one-by-one
 
 ag integration
 	[_] Combine with native ':grep' command to make unified backend

@@ -1,0 +1,12 @@
+#!/bin/bash -e
+source ~/.shell/func.d/system
+
+has_pr ipython && CMD=(ipython) || CMD=(python)
+
+cfg='from pwn import *'
+
+if python -c "$cmd" >/dev/null 2>&1; then
+    CMD+=(-ic "$cmd")
+fi
+
+"${CMD[@]}"

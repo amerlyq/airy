@@ -36,10 +36,12 @@ wrkkey="grave $digits minus equal"
 wrksps="$(echo \$w{00..12})"
 
 # ---- Strings ----
-bs="bindsym"   ; t="    "       ; def='$def'     ; exno='$exno'
-mod="$bs \$mod"; mSd="$bs \$mSd"; mCd="$bs \$mCd"; mCS="$bs \$mCS"
-ts="$t$bs"     ; tod="$t$mod"   ; tSd="$t$mSd"   ; tCd="$t$mCd"   ; tCS="$t$mCS"
-exi3="$exno i3-input -F "
+bs="bindsym" ; t="    " ; ts="$t$bs" ; def='$def'
+exno='$exno' ; exi3="$exno i3-input -F "
+for m in mod mSd mCd mCS moM; do
+    declare $m="$bs \$$m"
+    eval "declare t${m:1}=\"$t\$$m\""
+done
 
 # ----- Terminal -----
 # Choose appropriate terminal (get current launched v-terminal)
@@ -273,7 +275,7 @@ w_header "Run: Prgs"
     wstr "$mod+Return $eurx -e zsh -ic r.ranger"
     wstr "$mSd+Return $eflo -e r.ranger"
     wstr "$mCd+Return $eflo"
-    wstr "$mCS+Return $eflo -e ipython -ic 'from pwn import *'"
+    wstr "$moM+Return $eflo -e r.python"
 
 w_header "Run: Menus"
     wstr "$mCd+d $exno j4-dmenu-desktop"    #ALT (slow): i3-dmenu-desktop

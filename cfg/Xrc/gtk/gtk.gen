@@ -15,15 +15,15 @@ echo '[Settings]' > $g3
 # GUI (use lxappearance): Adwaita, Hope-DT, FlatStudioGray, Mint-X, Ambiance
 if cfgOpt t || [[ -z "$GTK_THEME" ]]
 then case "${THEME}" in
-  lucid) GTK_THEME="Vertex-Light" ;;
- opaque) GTK_THEME="Vertex-Dark"  ;;
-  light) GTK_THEME="Vertex-Light" ;;
- dark|*) GTK_THEME="Vertex-Dark"  ;;
+  lucid) GTK_THEME="FlatStudioGray" ;;
+ opaque) GTK_THEME="FlatStudioDark"  ;;
+  light) GTK_THEME="FlatStudioLight" ;;
+ dark|*) GTK_THEME="FlatStudioDark"  ;;
 esac; fi
 
 tee -a $g2 $g3 >/dev/null <<EOT
 gtk-theme-name = "$GTK_THEME"
-# gtk-application-prefer-dark-theme = true
+gtk-application-prefer-dark-theme = true
 gtk-font-name = "Sans 9"
 
 ## Icons
