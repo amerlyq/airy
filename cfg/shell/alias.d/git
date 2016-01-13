@@ -30,7 +30,8 @@ alias gfa='git fetch --all --progress --prune --verbose'
 alias gwRc='gwR origin/"$(git-branch-current 2> /dev/null)"'
 
 # WARNING: works only in ZSH because it will not split arguments in words!
-gl-() { local current="$(git-branch-current 2> /dev/null)"
+# ALT: git-up
+glA() { local current="$(git-branch-current 2> /dev/null)"
 git for-each-ref --format="%(refname:short) %(push:track)" refs/heads |
     while read branch state; do if [[ -n "$state" ]]; then
         git checkout "$branch" && git pull --rebase --verbose
