@@ -25,9 +25,9 @@ sudo tee /etc/networks <<EOT
 link-local 169.254.0.0
 EOT
 
-fl=/etc/schroot/default/fstab
-line='/cryptfs/_/cfg  /cryptfs/_/cfg  none    rw,bind         0       0'
-if grep -qsw '/cryptfs' "$fl"
-then sudo sed -i "/\\/cryptfs.*/s||$line|" "$fl"
-else sudo sed -i "/\\/home/a\\$line" "$fl"
-fi
+# fl=/etc/schroot/default/fstab
+# line='/cryptfs/_/cfg  /cryptfs/_/cfg  none    rw,bind         0       0'
+# if grep -qsw '/cryptfs' "$fl"
+# then sudo sed -i "/\\/cryptfs.*/s||$line|" "$fl"
+# else sudo sed -i "/\\/home/a\\$line" "$fl"
+# fi

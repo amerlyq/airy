@@ -1,9 +1,10 @@
 # vim: ft=gdb
 # source /usr/share/peda/peda.py
 
-*.gdbinit* # origin from buildroot
+# *.gdbinit* # origin from buildroot
 set environment LD_BIND_NOW=1
 # turn off pagination
+set pagination off
 set height 0
 # Print C++ names in their source form rather than their mangled form
 set print asm-demangle
@@ -44,5 +45,5 @@ end
 
 # Use bta to print backtraces for the all threads
 define bta
-    thread apply all bt
+    thread apply all bt full
 end

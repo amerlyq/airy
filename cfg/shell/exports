@@ -15,7 +15,7 @@ if [[ ! -d "$TMPDIR" ]]; then
 fi
 
 ### Path ###
-!hash ruby>/dev/null 2>&1||PATH+=":$(ruby -e 'print Gem.user_dir')/bin"
+! hash ruby>/dev/null 2>&1||PATH+=":$(ruby -e 'print Gem.user_dir')/bin"
 PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 PATH="$HOME/.cache/airy/bin:$HOME/.bin:$PATH"
 export PATH

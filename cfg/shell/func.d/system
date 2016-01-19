@@ -22,10 +22,9 @@ cfgOpt(){ [[ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]]; }
 cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 
 distro(){
-    if [[ -e /etc/os-release ]]
-    then cat /etc/os-release
-    else uname -a
-    fi | grep -iq "$1"
+      if [[ -e /etc/os-release  ]]; then cat /etc/os-release
+    elif [[ -e /etc/lsb-release ]]; then cat /etc/lsb-release
+    else uname -a; fi | grep -iq "$1"
 }
 die() { local ret=$?
     if [[ "$1" =~ [0-9]+ ]]; then ret=$1; shift; fi

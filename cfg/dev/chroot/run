@@ -1,7 +1,11 @@
 #!/bin/bash -e
 
 dir="${PWD#/cryptfs/chroots/lucid_i386}"
-[[ "$dir" != "$PWD" ]] || dir=/cryptfs/workspace
+if [[ "$PWD" =~ ^/cryptfs/_/ ]]; then
+    dir="$PWD"
+elif [[ "$PWD" == $dir ]]; then
+    dir=/cryptfs/workspace
+fi
 
 # EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
 schroot -c lucid_i386 -d "$dir" -- bash --rcfile <(cat - <<EOT  ${@:+-c "$@"}

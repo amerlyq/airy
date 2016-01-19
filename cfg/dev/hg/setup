@@ -12,21 +12,3 @@ fi
 cat "$PWD/hgrc" >> $dst
 
 echo "W: ~/.hgrc"
-
-if cfgOpt i; then
-    # Setup local server for mirror
-    keys=/etc/mercurial-server/keys
-    sudo mkdir -p $keys/root/$USER
-    sudo cp ~/.ssh/id_rsa.pub $keys/root/$USER/$(hostname)
-    sudo -u hg /usr/share/mercurial-server/refresh-auth
-
-    cfg=/var/lib/mercurial-server
-    sudo sed -i '/^\(repos = \).*/s;;\1/cryptfs/mirror;' $cfg/.mercurial-server
-    echo "W: {/etc,/var/lib}/mercurial-server/*"
-fi
-
-if cfgOpt f; then
-    # Prepare to clone branch or sync mirror with upstream
-    sudo systemctl start sshd
-    # NEED:(bare repo) $ hg update null
-fi

@@ -1,0 +1,15 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+distro ubuntu || die "Not Ubuntu"
+grep -q '^DISTRIB_RELEASE=10.04$' /etc/lsb-release || die "Not 10.04"
+
+LST=()
+LST+=(python-setuptools)            # HAS: easy_install -- to install mercurial plugins
+LST+=(python-software-properties)   # HAS: add-apt-repository
+
+pkg_inst ${LST[@]}
+
+ppa_add ppa:mercurial-ppa/releases '--'
+pkg_inst mercurial
+
+# sudo easy_install mercurial_keyring

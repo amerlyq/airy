@@ -148,5 +148,12 @@ ftools
 	cd ~ && fincore --pages=false --summarize --only-cached *
 	 With this tool you can see what files are being cached within a give directory.
 
+pptx
+	paci libreoffice-fresh
+		libreoffice --headless --convert-to pdf filename.pptx
+	Extract text
+		unzip -qc "$1" ppt/slides/slide*.xml | grep -oP '(?<=\<a:t\>).*?(?=\</a:t\>)'
+		OR abiword --to=txt filename.pdf
+
 ALT:
 	glogg -- GUI for grep and colorizing big logs

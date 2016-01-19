@@ -3,4 +3,5 @@ source ~/.shell/func.d/cfgsetup
 
 if cfgOpt u; then
     ./config.gen
+    link -bst /etc/schroot/default fstab
 fi
