@@ -21,7 +21,7 @@ toggle() {
 
 case $BLOCK_BUTTON in
     1) toggle ;;
-    3) ~/.i3/ext/floaty ncmpcpp ;;
+    3) r.tf -e ncmpcpp ;;
     *) ;;
 esac #x=$BLOCK_X y=$BLOCK_Y
 
@@ -36,5 +36,3 @@ then notify-send --urgency normal --expire-time=1000 -h int:x:500 -h int:y:500 '
 fi
 
 printf "$track $prefix\n$track\n$color\n"
-
-

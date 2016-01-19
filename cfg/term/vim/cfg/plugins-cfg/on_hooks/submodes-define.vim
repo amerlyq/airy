@@ -52,17 +52,10 @@ SMmap winsize   -  <C-w>+
 
 
 " Page navigation
-SMALL bufscroll <C-f> <C-b> <C-u> <C-d>
-" SMpar bufscroll <C-f> <C-f>  <C-b> <C-b>  <C-u> <C-u>  <C-d> <C-d>  <C-e> <C-e>  <C-y> <C-y>
-SMpar bufscroll  f <C-f>  b <C-b>  u <C-u>  d <C-d>  e <C-e>  y <C-y>
-
-" SMmap bufscroll   b  <C-b>
-" SMmap bufscroll   u  <C-u>
-" SMmap bufscroll   d  <C-d>
-" SMmap bufscroll   e  <C-e>
-" SMmap bufscroll   y  <C-y>
-
-
+" DISABLED: screen isn't redrawed when scrolling through ~10MB files
+" SMALL bufscroll <C-f> <C-b> <C-u> <C-d>
+" " SMpar bufscroll <C-f> <C-f>  <C-b> <C-b>  <C-u> <C-u>  <C-d> <C-d>  <C-e> <C-e>  <C-y> <C-y>
+" SMpar bufscroll  f <C-f>  b <C-b>  u <C-u>  d <C-d>  e <C-e>  y <C-y>
 
 " " File cycling
 " SMDEF nextfile r  <Leader>j <Plug>(nextfile-next)

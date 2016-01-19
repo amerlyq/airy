@@ -1,6 +1,11 @@
 #!/bin/bash -e
-[[ -t 0 ]] && ARGS='"$@"' || ARGS='<(cat -)'
-eval "exec r.tf $EDITOR -c 'norm!G0' $ARGS &"
+if (($#)); then
+    ARGS='"$@"'
+elif [[ ! -t 0 ]]; then
+    ARGS='<(cat -)'
+fi
+echo "$ARGS" > /tmp/args
+eval "exec r.tf $EDITOR -c 'norm!G0' $ARGS"
 
 # pipe="$(mktemp -ut "st-screen.XXX")"
 # trap "rm -f $pipe" HUP INT QUIT ILL TRAP KILL BUS TERM EXIT

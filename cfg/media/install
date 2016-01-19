@@ -12,7 +12,7 @@ pkg_inst "graphviz imagemagick cups-pdf"
 
 if distro arch; then
     aur_inst 'fbless'
-    aur_inst pandoc-bin
+    pkg_inst pandoc
 
 elif distro ubuntu; then
     git_inst 'matimatik/fbless'
