@@ -110,10 +110,10 @@ nnoremap <unique> <PageDown> <C-D>
 " noremap <unique><expr> <C-y> (line("w0") <= 1         ? "k" : "3\<C-y>")
 
 " Vertical line motions for wrapped text
-noremap <unique><expr> j v:count ? 'j' : 'gj'
-noremap <unique><expr> k v:count ? 'k' : 'gk'
-noremap <unique> gj j
-noremap <unique> gk k
+noremap <unique><silent><expr> j v:count ? 'j' : 'gj'
+noremap <unique><silent><expr> k v:count ? 'k' : 'gk'
+noremap <unique><silent> gj j
+noremap <unique><silent> gk k
 
 " more stretching comfort
 noremap <unique> g0 ^

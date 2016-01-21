@@ -43,7 +43,17 @@ define findval
     end
 end
 
-# Use bta to print backtraces for the all threads
+# Use bta to print backtraces for all threads
 define bta
     thread apply all bt full
+end
+
+# Dump stack in 1-column: (like x/256x $sp-0x200)
+# USAGE: xc $sp-0x100 $sp+0x100
+define xc
+    set $start = $arg0
+    while ($start <= $arg1)
+        x/1xw $start
+        set $start = $start + 4
+    end
 end

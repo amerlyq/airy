@@ -139,6 +139,17 @@
 		(gdb) generate-core-file
 	 When a program dies with SIGSEGV, it normally dumps core on Unix.
 
+	Analysis (0x71075000 in ??)
+		(gdb) maintenance info sections
+		: 0x71075000->0x71076000 at 0x08f19000: load328 ALLOC LOAD HAS_CONTENTS
+			<WARNING: Can provide confused/incorrect info for coredump!
+			: Like 0x08f19000 -- shift in core and not physical address
+			ALT: mips-linux-readelf -l ./core.siege.5323
+		(gdb) x/32i $pc-0x40
+		(gdb) i sh
+			: shared library mappings
+		(gdb) i r || x/32w $sp
+
 
 ### Short-living programs ###
 	Main remote term

@@ -70,6 +70,10 @@ Neovim
 		:= If don't -- then it will be useless in text writing
 	2015-12-23 [X] ADD cscope invocation command
 	[_] Fix 'o' in qf -- after 'nvim -c 'Ag patt' -c only' -- not returns to qf window
+	[_] BUG: clipboard=unnamedplus don't work for vim in chroot?
+		:one vim in chroot and one in system
+		:= can't do anything about -- because clipboard replaced with 'unnamed'
+		:= need to use 'xsel' shell and export DISPLAY?
 
 
 Future
