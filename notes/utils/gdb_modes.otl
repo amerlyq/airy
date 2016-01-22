@@ -146,9 +146,31 @@
 			: Like 0x08f19000 -- shift in core and not physical address
 			ALT: mips-linux-readelf -l ./core.siege.5323
 		(gdb) x/32i $pc-0x40
+		(gdb) i r || x/32w $sp
 		(gdb) i sh
 			: shared library mappings
-		(gdb) i r || x/32w $sp
+		(gdb) info files
+			: all mappings
+		(gdb) find /w 0x08049000 0x0804a000 0x8048034
+			< Search for a pattern in the segment.
+			: 0x804903c
+			: 0x8049040
+			: 2 patterns found
+
+
+### Threads ###
+	Debug is easier if create coredump
+		http://processors.wiki.ti.com/index.php/Multithreaded_Debugging_Made_Easier_by_Forcing_Core_Dumps
+	Print pthread structure
+		https://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques/Deadlocks
+	Mapping
+		(gdb) info threads
+			: 12 Thread 4398053392560 (LWP 7234) 0x0000000010005740 in xxxx ()
+			: ...
+		(gdb) info proc 7234 status
+			> WARNING: works only on running process
+	Get TLS (thread-local storage)
+		http://stackoverflow.com/questions/10841219/thread-specific-data-from-linux-core-dump
 
 
 ### Short-living programs ###
