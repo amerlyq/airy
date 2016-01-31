@@ -112,6 +112,7 @@ if [[ "$monitors" ]]; then
 fi
 
 w_header "Autostart"
+    wstr "exec --no-startup-id ~/.i3/blocks/kbdd-i3blocks"
     wstr "exec_always --no-startup-id auto-start"
 
 # wstr "set \$refbar bash -c 'kill -s SIGRTMIN+1 \$(pidof i3blocks)'"

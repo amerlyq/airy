@@ -15,13 +15,13 @@ esac
 
 
 if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
-    # Stop the daemon and disable from starting on boot:
-    # Because being launched by init.d it has no access to ~/.ncmpcpp
-    # TODO: Maybe with systemd all will be ok?
     if distro arch; then
-        sudo systemctl stop mpd
+        usvc_activate mpd
 
     elif distro ubuntu; then
+        # Stop the daemon and disable from starting on boot:
+        # Because being launched by init.d it has no access to ~/.ncmpcpp
+        # Then run manually from ~/.xinitrc
         sudo service mpd stop
         sudo update-rc.d mpd disable
     fi
@@ -34,11 +34,9 @@ fi
 ### GENS ###
 ./state.gen
 
-if cfgOpt u; then
-    pgrep mpd && mpd --kill
-    pgrep mpd || if ! cfgOpt d; then mpd
-    else mpd --verbose --no-daemon --stdout > /tmp/mpd-verbose.log; fi
-
+if cfgOpt d; then
+    ! pgrep mpd || mpd --kill
+    mpd --verbose --no-daemon --stdout > /tmp/mpd-verbose.log
     ## Re-scan music folder
     # mpc update --wait
 fi

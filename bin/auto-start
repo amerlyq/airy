@@ -48,29 +48,10 @@ rcf() {
 
 
 ### ALWAYS ### --------------------------------------
-
-# setX da
+# BUG: No PulseAudio daemon running, or not running as session daemon.
 setX a
-[[ -f ~/.Xresources ]] && xrdb -load ~/.Xresources
-
-## Keylayout
-lau r.xkb
-lau r.xcape
-lau r.touchpad
-
-lau r.feh
-lau r.dunst
-
-# Focus certain wksp
-#i3-msg workspace "$(i3-msg -t get_workspaces | sed 's/.*"num":1,"name":"\([^"]*\).*/\1/')" &
-
 
 ### ONCE ### ----------------------------------------
-
-lau ~/.i3/blocks/kbdd-i3blocks
-lau mpd
-# Must be launched before installing wallpaper!
-lau compton
 lau copyq
 # lau syncthing >/tmp/syncthing.log 2>&1
 

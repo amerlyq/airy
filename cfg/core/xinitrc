@@ -1,37 +1,45 @@
-#!/bin/sh
+#!/bin/bash -e
 
-session=$1
+session="$1"
 
-xrandr --auto
-xset b off  # No PC speaker in X
-xset s off  # No screensaver
-# xset -dmps  # No energy saving
-xset dpms 1800 1800 1800  # BUG: can't disable energy saving?
-# USE xset -q -- to find out values
-# xsetroot -gray &
-# setterm -blank 0  # Disable blanking for virtual consoles
+# USAGE:
+#   startx
+#   startx ~/.xinitrc xmonad
+#   startx /full/path/to/window-manager
+#   ALT xinit -- :1 -nolisten tcp vt$XDG_VTNR
+#   pkill -15 Xorg
 
 # Merge in defaults and resources
-xin=/etc/X11/xinit
-if [[ -f  "$xin/.Xresources" ]]; then xrdb -merge  "$xin/.Xresources"; fi
-if [[ -f "$HOME/.Xresources" ]]; then xrdb -merge "$HOME/.Xresources"; fi
+XINT=/etc/X11/xinit
+[[ ! -f "$XINT/.Xresources" ]] || xrdb -merge "$XINT/.Xresources"
+[[ ! -f "$HOME/.Xresources" ]] || xrdb -merge "$HOME/.Xresources"
 
-# Start dbus, ...
-xindir=$xin/xinitrc.d
-if [[ -d $xin/xinitrc.d ]] ; then
-    for f in $xin/xinitrc.d/?*.sh ; do [[ -x "$f" ]] && source "$f" ; done
-    unset f
+# Start dbus, ... -- populated from packages
+if [[ -d "$XINT/xinitrc.d" ]] ; then
+    for f in "$XINT/xinitrc.d"/?*
+    do [[ ! -x "$f" ]] || source "$f"
+    done
 fi
 
 # Source X settings and programs
-[[ -f $HOME/.xprofile ]] && source $HOME/.xprofile
+# CHECK:SEE: double-sourcing of xprofile by DM
+#   https://wiki.archlinux.org/index.php/xprofile
+[[ ! -f "$HOME/.xprofile" ]] || source "$HOME/.xprofile"
 
+
+# BUG: may affect problems for multiple X-sessions
+lau(){ if hash $1 >/dev/null; then pgrep $1 >/dev/null || $@ & fi; }
+## Keylayout
+lau r.xkb
+lau r.xcape
+lau r.touchpad
+lau compton  # Must be launched before installing wallpaper!
+lau r.dunst
+lau r.feh
+
+# ADD https://wiki.archlinux.org/index.php/Running_program_in_separate_X_display
 # Launch session
-case $session in
-   xmonad) exec xmonad ;;
-    xterm) exec xterm -geometry 80x66+0+0 -name login ;;
-*|i3|i3wm) exec i3 >/var/tmp/i3_$(date +%Y%m%d_%H%M%S).log 2>&1 ;;  # i3 -V -d all >> ~/.cache/i3.log 2>&1
-esac
-
-# startx
-# xinit -- :1 -nolisten tcp vt$XDG_VTNR
+case "${session:=i3}"
+in xterm) exec xterm -geometry 80x66+0+0 -name login
+;; *) exec "$session"
+esac >/var/tmp/"${session}_$(date +%Y%m%d_%H%M%S).log" 2>&1

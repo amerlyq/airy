@@ -6,11 +6,5 @@ source ~/.shell/func.d/cfgsetup
 link "$PWD" ~/.i3
 mkdef x-window-manager $(which i3)
 
-if distro arch; then
-    # Link qdbus to qdbus-qt4 on Arch
-    #   SEE: https://wiki.archlinux.org/index.php/Qt#Installation
-    link /etc/xdg/qtchooser/4.conf ~/.config/qtchooser/default.conf
-fi
-
 ### GENS ###
 THEME=$THEME ./i3-config.gen

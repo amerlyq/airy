@@ -1,34 +1,18 @@
 # vim: ft=sh
 
-# X settings
-xrandr --size 1 &
-
+# xrandr --auto     # NEED? ALT xrandr --size 1 &
+# xsetroot -gray &  # NEED? ALT xsetroot -solid "#333333"
+# setterm -blank 0  # Disable blanking for virtual consoles
 # xscreensaver -no-splash &
-xsetroot -cursor_name left_ptr &
-xsetroot -solid "#333333"
+xsetroot -cursor_name left_ptr
 
-
-# http://fluxbox.sourceforge.net/docbook/en/html/app-setup.html
-# Disable DPMS turning off the screen
-xset -dpms
-xset s off
-# Disable bell
-xset -b
-
-# Coredumps
-# ulimit -c unlimited
-
-
-## Maybe better launch by systemd?
-#::  https://wiki.archlinux.org/index.php/GnuPG
-### GPG
-# [ -f .gnupg/gpg-agent.env ] && . .gnupg/gpg-agent.env
-# GPG_AGENT=$( echo ${GPG_AGENT_INFO:-0} | cut -d: -f1 )
-#
-# if [ -e $GPG_AGENT ]; then
-#     export GPG_AGENT_INFO
-#     export SSH_AUTH_SOCK
-#     export SSH_AGENT_PID
-# else
-#     eval $(gpg-agent --write-env-file ${HOME}/.gnupg/gpg-agent.env --enable-ssh-support --daemon )
-# fi
+# USE xset -q -- to find out values
+xset b off  # No PC speaker in X (bell)
+xset s off  # No screensaver
+xset dpms 0 0 0  # No energy saving
+# xset dpms 1800 1800 1800  # BUG: can't disable energy saving?
+# NOTE  XScreenSaver and xfce4-power-manager use their own DPMS settings and
+# override xset configuration. See XScreenSaver#DPMS and blanking settings and
+# Xfce#Display blanking for more information.
+#   SEE https://wiki.archlinux.org/index.php/Display_Power_Management_Signaling#Modifying_DPMS_and_screensaver_settings_using_xset
+#   http://fluxbox.sourceforge.net/docbook/en/html/app-setup.html

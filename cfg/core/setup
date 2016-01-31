@@ -2,17 +2,20 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-#link "$PWD/profile" ~/.profile
-echo "Err: FIXME"
+link "$PWD/xprofile" ~/.xprofile
+link "$PWD/xinitrc"  ~/.xinitrc
+
 if distro arch; then
     cfg=/etc/pacman.conf
     ! grep -q '^#Color\s*$' $cfg || sudo sed -ri '/^#(Color)\s*$/s//\1/' $cfg
     link "$PWD/pacaur.conf" ~/.config/pacaur/config
-fi
 
-# if distro ubuntu; then:
+    # Link qdbus to qdbus-qt4 on Arch
+    #   SEE: https://wiki.archlinux.org/index.php/Qt#Installation
+    link /etc/xdg/qtchooser/4.conf ~/.config/qtchooser/default.conf
+
 # update-alternatives : x-session-manager cinnamon-session-cinnamon
-if distro ubuntu; then (cd ./ubuntu
+elif distro ubuntu; then (cd ./ubuntu
     ./xsessionrc.gen
 
     if cfgOpt u; then
