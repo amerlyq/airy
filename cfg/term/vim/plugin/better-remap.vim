@@ -16,8 +16,8 @@ onoremap <silent> gm :call <SID>Gm()<CR>
 
 "{{{ CMDS =====
 command! -bar -nargs=0 -range=% RecoverRemove  call s:RecoverRemove()
-command! -bar -nargs=0 -range=% DiffRecover  call s:DiffRecover()
-command! -bar -nargs=0 -range=% DiffRecoverEnd  call s:DiffRecoverEnd()
+command! -bar -nargs=0 -range=% RecoverDiff  call s:DiffRecover()
+command! -bar -nargs=0 -range=% RecoverEnd  call s:DiffRecoverEnd()
 
 
 " BUG: undo don't work after writing new recover

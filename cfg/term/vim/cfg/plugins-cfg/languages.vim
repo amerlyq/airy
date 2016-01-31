@@ -3,6 +3,11 @@ if neobundle#tap('LaTeX-Box') "{{{
   call neobundle#untap()
 endif "}}}
 
+if neobundle#tap('haskellmode-vim') "{{{
+  let g:haddock_browser = "x-www-browser"
+  call neobundle#untap()
+endif "}}}
+
 
 "{{{1 Python =============================
 if neobundle#tap('jedi-vim') "{{{

@@ -1,7 +1,6 @@
 " ======================================
 " FUTURE:
 "" Haskell
-"NeoBundle 'lukerandall/haskellmode-vim' { 'autoload' : { 'filetypes' : ['haskell', 'hs'] }  }
 " eagletmt/ghcmod-vim
 " eagletmt/neco-ghc
 " dag/vim2hs

@@ -96,8 +96,8 @@ noremap <unique> R gR
 
 " history-window (when you mistakes) now on 'gq:'
 " Use q for formatting the current paragraph (or selection)
-" Ex-command availible by gQ
-noremap <unique> ,q q
+" Ex-command availible by gQ, cedit by 'Q:' o 'Q/'
+noremap <unique> Q q
 
 " retain relative cursor position when paging
 nnoremap <unique> <PageUp>   <C-U>
