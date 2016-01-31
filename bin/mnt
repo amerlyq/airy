@@ -4,6 +4,9 @@ source ~/.shell/profile
 # ???? instead of file name
 # sudo LC_ALL="ru_RU.UTF-8" ranger (don't work but helps)
 
+# Check unclear unmounted exfat
+# sudo fsck.exfat /dev/sdb1
+
 # Mount fs by SSH
 # https://ru.wikipedia.org/wiki/Mount
 
@@ -57,7 +60,7 @@ domnt() {
     # FIXME: it's empty for all disks on my laptop mint?
     TYPE="$(sudo blkid "$DEVPATH" | sed -rn 's/.*TYPE="(\w+)".*/\1/p')"  # TYPE=...
     case "$TYPE"
-    in vfat) MOPTS="rw,nosuid,nodev,noexec,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,\
+    in vfat|exfat) MOPTS="rw,nosuid,nodev,noexec,relatime,uid=1000,gid=1000,fmask=0133,dmask=0022,\
 codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
     ;; ntfs) MOPTS="uid=$CURR_USER,gid=users,dmask=022,fmask=133"  #
     ;; ext?) MOPTS=""

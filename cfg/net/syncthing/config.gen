@@ -1,6 +1,7 @@
 #!/bin/bash -e
 source ~/.shell/profile
 
+dir=/home/media/sync
 # NOTE If error with apikey or device id:  rm $dst, and re-generate.
 
 ## Create keys and basic config with hashed values
@@ -47,8 +48,8 @@ EOT
 
 
 wrt '<configuration version="11">'
-add_folder ~/sync/android ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
-add_folder ~/sync/fl ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
+add_folder "$dir/android" ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
+add_folder "$dir/fl" ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
 wrt
 add_device ${ANDR_ID:?No} ${ANDR_HOST:?No}
 add_device ${HOME_ID:?No} ${HOME_HOST:?No}

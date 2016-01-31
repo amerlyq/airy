@@ -56,7 +56,7 @@ run_single() { local pids
     # To be able to restart programms / reload configs for those which already launched!
     case "$1" in -r) shift; kill_prs "$1" ;; esac
     has_pr "$1" || [[ -f "$1" ]] || die "Err: no '$1'"
-    if ! grep_prs "$1" >/dev/null; then $* & fi
+    if ! grep_prs "$1" >/dev/null; then $@ & fi
 }
 
 # ====================================================================
