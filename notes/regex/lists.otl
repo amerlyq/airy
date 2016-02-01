@@ -22,6 +22,9 @@ Uniq from search lists
 	find DIR1 DIR2 -type f -exec sha1sum {} + | sort | \
 		uniq -u --check-chars 40 | cut -c 43-
 
+Sum column of numbers
+	<cmd> | paste -sd+ | bc
+
 LIST MANIPULATION
  PRIMER: http://www.skorks.com/2010/05/sort-files-like-a-master-with-the-linux-sort-command-bash/
 | sort -rnk5      | reverse numerical copare 5th column

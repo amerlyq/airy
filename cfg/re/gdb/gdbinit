@@ -8,6 +8,12 @@ set pagination off
 set height 0
 # Print C++ names in their source form rather than their mangled form
 set print asm-demangle
+
+# Keep command history between sessions
+set history filename ~/.cache/gdb_history
+set history save
+
+
 # Use findsym $sp $sp+1000 to get a dump of all symbols on the stack
 define findsym
     set $address = ($arg0)
