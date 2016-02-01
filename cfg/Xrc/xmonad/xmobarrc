@@ -1,0 +1,62 @@
+Config { lowerOnStart = True
+       , hideOnStart  = False
+       , persistent   = False
+       , font         = "xft:Monospace"
+       , border       = NoBorder
+       , borderColor  = "#ff0000"
+       , bgColor      = "#1b1d1e"
+       , fgColor      = "#a0a0a0"
+       , position     = Bottom
+       , commands     = [ Run DynNetwork
+                            [ "--High", "128000"
+                            , "--normal", "#a0a0a0"
+                            , "--high"  , "#ff5995"
+                            , "--suffix", "True"
+                            , "--template", "<fc=#ccccc6>net:</fc> <rx> <fc=#ccccc6>:</fc> <tx>"
+                            ]
+                            10
+                        , Run Battery
+                            [ "--template", "bat: <left>%"
+                            ]
+                            60
+                        , Run Cpu
+                            [ "--Low", "6"
+                            , "--High", "50"
+                            , "--normal", "#b6e354"
+                            , "--high"  , "#ff5995"
+                            , "--template", "<fc=#ccccc6>cpu:</fc> <total>%"
+                            ]
+                            10
+                        , Run Memory
+                            [ "--Low", "10"
+                            , "--High", "66"
+                            , "--normal", "#a0a0a0"
+                            , "--high", "#ff5995"
+                            , "--template", "<fc=#ccccc6>mem:</fc> <usedratio>%"]
+                            10
+                        , Run Date "%H:%M" "date" 10
+                        , Run Battery
+                            [ "--Low", "10"
+                            , "--High", "66"
+                            , "--low", "#ff5995"
+                            , "--normal", "#b6e354"
+                            , "--high", "#899ca1"
+                            , "--template", "<fc=#ccccc6>bat:</fc> <left>%"
+                            ]
+                            60
+                        , Run Volume "default" "Master"
+                            [ "--template", "<fc=#ccccc6>vol:</fc> <volume>% <status>"
+                            , "--"
+                            , "--onc", "#b6e354"
+                            , "--offc", "#ff5995"
+                            ]
+                            5
+                        , Run Kbd []
+                        , Run StdinReader
+                        ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%StdinReader%}{%battery% <fc=#ee9a00></fc> %default:Master% <fc=#ee9a00></fc> %cpu% <fc=#ee9a00></fc> %memory% <fc=#ee9a00></fc> %dynnetwork% <fc=#fd971f>%date% </fc><fc=#1b1d1e,#fd971f> %kbd% </fc>"
+       }
+
+-- vim: filetype=haskell

@@ -1,0 +1,15 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
+
+### LINKS ###
+link "$PWD/xmonad.hs" ~/.xmonad/xmonad.hs
+link "$PWD/xmobarrc" ~/.xmobarrc
+# mkdef x-window-manager $(which i3)
+
+### GENS ###
+# THEME=$THEME ./i3-config.gen
+
+if cfgOpt u; then
+    xmonad --recompile
+fi
