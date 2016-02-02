@@ -2,7 +2,8 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    aur_inst copyq
+    aur_inst copyq-git  # copyq -- last tag 2.5.0 is w/o my enhances
+    echo "Err: change to copyq when last tag > 2.5.0 in pkg"
 
 elif distro ubuntu; then
     # libxtst-dev (optional; auto-paste into some applications),

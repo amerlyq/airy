@@ -8,6 +8,7 @@ session="$1"
 #   startx /full/path/to/window-manager
 #   ALT xinit -- :1 -nolisten tcp vt$XDG_VTNR
 #   pkill -15 Xorg
+# SEE: https://wiki.archlinux.org/index.php/Xinitrc#On_the_command_line
 
 # Merge in defaults and resources
 XINT=/etc/X11/xinit
@@ -41,5 +42,6 @@ lau r.feh
 # Launch session
 case "${session:=i3}"
 in xterm) exec xterm -geometry 80x66+0+0 -name login
+;;    st) exec st -g 80x66+0+0 -name login
 ;; *) exec "$session"
 esac >/var/tmp/"${session}_$(date +%Y%m%d_%H%M%S).log" 2>&1

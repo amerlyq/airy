@@ -50,9 +50,23 @@ fun! lyrics#analyze(...)
   let [b, e] = call('s:gargs', a:000)
   " WARNING: you need to open buffers beforehand or getbufline() will be wrong!
   " ALT: fileread() but then you can't join 'nofile'/changed buffers correctly!
-  for k in g:buf.keys
-    let g:buf[k].lns = getbufline(bufname('^'.g:buf[k].path.'$'), b, e)
-    let g:buf[k].max = max(map(copy(g:buf[k].lns), 'strdisplaywidth(v:val)'))
+  for B in map(copy(g:buf.keys), 'g:buf[v:val]')
+    let B.lns = getbufline(bufname('^'.B.path.'$'), b, e)
+    let B.max = max(map(copy(B.lns), 'strdisplaywidth(v:val)'))
+
+    let m = 0
+    let B.bks = []
+    while m >= 0
+      let m = match(B.lns, '\v%(^[ \t\u3000]*$)@!', m)
+      if m < 0 | break | endif
+      let B.bks += [[m]]
+      let m = match(B.lns, '\v^[ \t\u3000]*$', m)
+      if m < 0
+        let B.bks[-1] += [len(B.lns) - 1]
+      else
+        let B.bks[-1] += [m - 1]
+      endif
+    endwhile
   endfor
 endf
 
@@ -61,13 +75,13 @@ endf
 " SEE https://groups.google.com/forum/#!topic/vim_dev/vBNoI0f1GU4
 fun! s:join_line(i)
   return join(map(copy(g:buf.keys), "printf(
-        \ '%-'.g:buf[v:val].max.'S', g:buf[v:val].lns[a:i])"), '|')
+        \ '%-'.g:buf[v:val].max.'S', get(g:buf[v:val].lns, a:i, ''))"), '|')
 endf
 
 fun! lyrics#join(...) range
   let [b, e] = call('s:gargs', a:000)
   call lyrics#analyze(b, e)
-  let N = min(map(copy(g:buf.keys), 'len(g:buf[v:val].lns)'))
+  let N = max(map(copy(g:buf.keys), 'len(g:buf[v:val].lns)'))
   tabnew | enew
   setl buftype=nofile
   call append(0, map(range(N), 's:join_line(v:val)'))
@@ -91,4 +105,41 @@ fun! lyrics#split(...) range
     call writefile(map(copy(lns), 's:strip(v:val['.i.'])'), f)
   endfor
   tabnew | call lyrics#load()
+endf
+
+
+fun! lyrics#shuffle(bang, ...) range
+  call call('lyrics#analyze', call('s:gargs', a:000))
+
+  let bks = g:buf[g:buf.keys[0]].bks
+  for k in g:buf.keys
+    if len(g:buf[k].bks) != len(bks)
+      echom "Err: unmatched number of blocks / verses"
+      return
+    endif
+  endfor
+
+  let lines = []
+  if a:bang
+    let N = min(map(copy(g:buf.keys), 'len(g:buf[v:val].lns)'))
+    for i in range(N)
+      let B = map(copy(g:buf.keys), 'g:buf[v:val].lns[i]')
+      if empty(filter(B, '!empty(v:val)')) | let B = [''] | endif
+      let lines += B + ['']
+    endfor
+  else
+    for i in range(len(bks))
+      for k in g:buf.keys
+        let [b, e] = g:buf[k].bks[i]
+        let lines += g:buf[k].lns[b : e] + ['']
+      endfor
+      let lines += ['']
+    endfor
+  endif
+
+  tabnew | enew
+  setl buftype=nofile
+  call append(0, lines)
+  TrailingStrip
+  norm! gg0
 endf
