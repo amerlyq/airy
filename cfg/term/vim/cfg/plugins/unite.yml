@@ -20,6 +20,14 @@ Shougo/neomru.vim:  # CHECK
   depends: Shougo/unite.vim
   # filetypes: all  # WTF? used by Shougo, but in help he warned it's BAD?
 
-# thinca/vim-unite-history:
-#   depends: Shougo/unite.vim
-#   unite_sources: history/command
+Shougo/neoyank.vim:  # CHECK
+  depends: Shougo/unite.vim
+  unite_sources: history/yank
+
+thinca/vim-unite-history:
+  depends: Shougo/unite.vim
+  unite_sources: history/command
+
+osyo-manga/unite-quickfix:
+  depends: Shougo/unite.vim
+  unite_sources: history/command

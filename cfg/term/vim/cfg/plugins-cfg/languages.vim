@@ -97,3 +97,19 @@ if neobundle#tap('python-mode') "{{{
 "     \ {'max-line-length': g:pymode_options_max_line_length})
   call neobundle#untap()
 endif "}}}
+
+
+"{{{1 Mark-up =============================
+if neobundle#tap('vimoutliner')  "{{{
+  fun! neobundle#hooks.on_post_source(bundle)
+    " Allows to create already [X] marks
+    let s:cmd ='call SafelyInsertCheckBox() <Bar> call SwitchBox() <Bar>'
+    if !exists('g:vo_checkbox_fast_calc') || g:vo_checkbox_fast_calc == 1
+      let s:cmd .= 'call CalculateMyBranch(line("."))'
+    else
+      let s:cmd .= 'call NewHMD(FindRootParent(line(".")))'
+    endif
+    exe 'noremap <silent><buffer> <localleader>cX :'.s:cmd.'<CR>'
+  endf
+  call neobundle#untap()
+endif "}}}

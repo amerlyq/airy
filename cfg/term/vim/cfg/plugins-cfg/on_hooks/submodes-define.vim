@@ -52,7 +52,7 @@ SMmap winsize   -  <C-w>+
 
 
 " Page navigation
-" DISABLED: screen isn't redrawed when scrolling through ~10MB files
+" BUG: screen isn't redrawed when scrolling through ~10MB files
 " SMALL bufscroll <C-f> <C-b> <C-u> <C-d>
 " " SMpar bufscroll <C-f> <C-f>  <C-b> <C-b>  <C-u> <C-u>  <C-d> <C-d>  <C-e> <C-e>  <C-y> <C-y>
 " SMpar bufscroll  f <C-f>  b <C-b>  u <C-u>  d <C-d>  e <C-e>  y <C-y>
@@ -64,12 +64,13 @@ SMmap winsize   -  <C-w>+
 " SMmap nextfile r  k <Plug>(nextfile-previous)
 
 
-" DEV: Jumping in last changes
-SMALL jump/chg <C-o>
-SMmap jump/chg   o  <C-o>
-SMmap jump/chg   i  <C-i>
-SMmap jump/chg   j  g;
-SMmap jump/chg   k  g,
+" " DEV: Jumping in last changes
+" BUG: activates not when expected, can't deactivate, works only partially
+" SMALL jump/chg <C-o>
+" SMmap jump/chg   o  <C-o>
+" SMmap jump/chg   i  <C-i>
+" SMmap jump/chg   j  g;
+" SMmap jump/chg   k  g,
 
 
 " Move (reorder) a tab page by [Space]gttt...

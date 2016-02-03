@@ -104,6 +104,11 @@ Submode
 	C-ffff bbb eee yyy
 		[_] BUG: pass through regime original keys when at top/bottom of window
 
+vim qf/grp vertical mode
+	[_] when there are too many results in qf/grp -- place it in left split wnd
+	[_] by preview on 'o' in qf/grp open results in right split wnd
+	[_] don't keep opened buffers in history -- do preview only
+
 View-regime
 	Only read -- all insert/replace disabled
 	More convenient shortcuts for navigation -- ag, C-F, etc
@@ -164,6 +169,16 @@ Relnum
 	Disable on filetypes [help, ?tagbar?, etc]
 
 Outline
+	THINK
+		Write back-end core in python
+		Provide interface to manipulate of outline DOM objects by API
+			: THINK? base it on XHTML-dom manipulation classes?
+		Use vim only as front-end to that API
+			Parse .otl and keep in sync the in-memory DOM at python
+			Convert current export format (.otl) into cursor position in DOM
+			Launch specific API by keymaps
+			Populate changes from in-memory DOM into export of (.otl)
+		Then I will be able create another front-end api like OpenGL, etc
 	DEV
 		THINK extend Markdown by indented outline syntax and new marks instead of own?
 		[_] TODO switchable colorschemes 'on the fly'
