@@ -1,0 +1,14 @@
+diff --git a/autoload/foldsearch/foldsearch.vim b/autoload/foldsearch/foldsearch.vim
+index de6bc27..de07edc 100644
+--- a/autoload/foldsearch/foldsearch.vim
++++ b/autoload/foldsearch/foldsearch.vim
+@@ -220,7 +220,8 @@ function! foldsearch#foldsearch#FoldSearchInit()
+     let w:foldsearch_foldminlines = &foldminlines
+ 
+     " modify settings
+-    let &foldtext = ""
++    " let &foldtext = ""
++    set foldtext=CustomFoldText('\ ',0)
+     let &foldmethod = "manual"
+     let &foldenable = 1
+     let &foldminlines = 0

@@ -64,3 +64,10 @@ copyq_edit() {
     copyq clipboard > "$fl" && "$EDITOR" -- "$fl" && copyq copy - < "$fl"
     trap "rm -f '$fl'" EXIT
 }
+
+exit() {  # When in SSH tmux, do detach on ',d' instead of exit
+    if [[ -z "$SSH_TTY" || -z "$TMUX" || -n "$RANGER_LEVEL" ]]
+    then builtin exit
+    else tmux detach
+    fi
+}

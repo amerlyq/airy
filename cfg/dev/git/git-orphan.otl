@@ -25,18 +25,18 @@ Adding the Binary Files
 	: Create temporary branch with disconnected root, at the end -- delete it.
 	: But push on server custom tag instead (so fetch won't dld it w/o --tags)
 	gco --orphan Binary
-	git rm -r --cached * .gitignore (Keep .git only)
-	rm -rf *  (Keep .git only)
+	git rm -r --cached ^(.git|yarxi_u.db)
+	rm -rf ^(.git|yarxi_u.db)
 	cp /home/user/yarxi_u.db .
-	gca "ADD yarxi_u.db, 2015-12-01"
-	git tag db151201
-	git push origin db151201
+	gca "ADD yarxi_u.db, 2010-07-19"
+	git tag db100719
+	git push origin db100719
 	gco master
 	git branch -D Binary
 
 Checking out the Binary File
-	git fetch origin db151201
-	gco db151201 -- yarxi_u.db && git reset
+	git fetch origin db100719
+	gco db100719 -- yarxi_u.db && git reset
 	echo yarxi_u.db >> .gitignore
 
 Completely Deleting the Binary File

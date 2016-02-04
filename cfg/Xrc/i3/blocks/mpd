@@ -19,10 +19,15 @@ toggle() {
     if [ -z "$track" ]; then track="stopped"; fi
 }
 
-case $BLOCK_BUTTON in
-    1) toggle ;;
-    3) r.tf -e ncmpcpp ;;
-    *) ;;
+case $BLOCK_BUTTON
+in 1) toggle
+;; 3) pids=$(pgrep ncmpcpp)
+    if [[ -z "$pids" ]]; then
+        r.tf -e ncmpcpp  # Can't launch with disown!
+    else
+        for pid in $pids; do kill $pid; done
+    fi
+;; *)
 esac #x=$BLOCK_X y=$BLOCK_Y
 
 case "$mode" in

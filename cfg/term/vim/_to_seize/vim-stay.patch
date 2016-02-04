@@ -1,0 +1,13 @@
+diff --git a/autoload/stay.vim b/autoload/stay.vim
+index 1d89f26..d0743b9 100644
+--- a/autoload/stay.vim
++++ b/autoload/stay.vim
+@@ -20,7 +20,7 @@ function! stay#ispersistent(bufnr, volatile_ftypes) abort
+   let l:bufpath = expand('#'.a:bufnr.':p')
+   return bufexists(a:bufnr)
+     \ && !empty(l:bufpath)
+-    \ && getbufvar(a:bufnr, 'stay_ignore', 0) isnot 1
++    \ && getbufvar(a:bufnr, 'stay_ignore') isnot 1
+     \ && getbufvar(a:bufnr, '&buflisted') is 1
+     \ && index(['', 'acwrite'], getbufvar(a:bufnr, '&buftype')) isnot -1
+     \ && getbufvar(a:bufnr, '&previewwindow') isnot 1

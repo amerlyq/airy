@@ -7,16 +7,18 @@ if neobundle#tap('unite.vim') "{{{
   nnoremap <silent><unique> [Unite]p  :UnitePrevious<CR>
 
   let s:maps = {
-  \ 'f': 'files file_rec/async:!',
-  \ 'F': 'files file',
   \ 'b': 'buffers -quick-match buffer bookmark',
-  \ '/': 'grep grep:.',
-  \ 'L': 'lines line',
-  \ ';': 'commands command',
-  \ ':': 'commands history/command',
+  \ 'e': 'MyCmd mycmd',
+  \ 'f': 'files file_rec/async:!',
   \ 'm': 'mrus file_mru',
-  \ 'y': 'yanks history/yank',
   \ 'o': 'Outline outline',
+  \ 's': 'MySub mysub',
+  \ 'y': 'yanks history/yank',
+  \ '/': 'grep grep:.',
+  \ ':': 'commands history/command',
+  \ ';': 'commands command',
+  \ 'F': 'files file',
+  \ 'L': 'lines line',
   \}
   for [c, r] in items(s:maps) | for m in ['n','x']
     exe m.'noremap <unique><silent> [Unite]'.c

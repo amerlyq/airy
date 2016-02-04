@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-session="$1"
+session="${1:-i3}"
 
 # USAGE:
 #   startx
@@ -40,7 +40,7 @@ lau r.feh
 
 # ADD https://wiki.archlinux.org/index.php/Running_program_in_separate_X_display
 # Launch session
-case "${session:=i3}"
+case "$session"
 in xterm) exec xterm -geometry 80x66+0+0 -name login
 ;;    st) exec st -g 80x66+0+0 -name login
 ;; *) exec "$session"
