@@ -47,7 +47,7 @@ if cfgOpt u; then opts='-u'; fi
 if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
 printf "LIST: %s\n\n" "${PKG_LIST[*]}"
 printf "SKIP: %s\n\n" "${PKG_SKIP[*]}"
-PKG_SKIP=( firefox )  # REM:BUG
+PKG_SKIP+=( firefox )  # REM:BUG
 frgx(){ local patt="\\b$*\\b"
     [[ "$*" =~ ^/.*$ ]] && patt="cfg$patt" || patt=".*$patt"
     [[ "$*" =~ ^.*/$ ]] && patt="${patt}.*"|| patt="$patt\$"
