@@ -4,7 +4,6 @@
 # Get both cwd and opened files (to sent in ranger):
 #   lsof -p 10006  # need filter out libraries
 
-my @cmd = ('unset RANGER_LEVEL && r.ranger');
 # --selectfile=<current_working_file>
 
 # For current file: $pid=$$
@@ -23,6 +22,8 @@ sub get_cwd {
     return $pwd;
 }
 
-my @args = ("x-terminal-emulator", "-cd", get_cwd(active_pid()), "-e", "zsh", "-ic");
+my @cmd = ("unset RANGER_LEVEL && cd '${\&get_cwd(active_pid())}' && r.ranger");
+my @args = ("r.t", "-e", "$ENV{'SHELL'}", "-ic");
 exec(@args, @cmd);  # unless fork;
-# DEBUG: "bash", "-c", "printf '$$\n$pr\n$pwd\n' | vim -"
+# DEBUG : "bash", "-c", "printf '$$\n$pr\n$pwd\n' | vim -"
+# BUG(r.t=st): child finished with error '256'

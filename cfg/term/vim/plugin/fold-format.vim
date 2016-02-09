@@ -23,6 +23,11 @@ nnoremap <unique> [Toggle]z :let &foldmethod={'manual': 'syntax',
 nnoremap <unique> [Toggle]Z :let &fdc=(&fdc?0:2) \| set foldenable! fen?<CR>
 nnoremap <unique> [Toggle]e :let g:fold_extend_preview=!g:fold_extend_preview<CR>
 
+fun! ParsFoldLevel(lnum)
+  return ( getline(a:lnum) =~ '^\s*$' && getline(a:lnum + 1) =~ '\S'
+         \ ? '<1' : 1 )
+endf
+comm! FoldPars set foldmethod=expr foldexpr=ParsFoldLevel(v:lnum)
 
 "{{{1 IMPL ============================
 fun! RefinedFoldText()

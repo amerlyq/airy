@@ -6,13 +6,22 @@ set environment LD_BIND_NOW=1
 # turn off pagination
 set pagination off
 set height 0
+
 # Print C++ names in their source form rather than their mangled form
 set print asm-demangle
+set print demangle on
+set demangle-style gnu-v3
+
+# Features for C++
+set print pretty on
+set print object on
+set print static-members on
+set print vtbl on
+
 
 # Keep command history between sessions
 set history filename ~/.cache/gdb_history
 set history save
-
 
 # Use findsym $sp $sp+1000 to get a dump of all symbols on the stack
 define findsym
