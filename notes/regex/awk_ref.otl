@@ -29,6 +29,9 @@ Delete 3rd column
 Join lines
 	awk '{ print $0; }' RS='\n' ORS=' :: ' < random_data.txt
 
+Split paragraphs into separate files
+	awk -v RS="" '{print $0 > $1".txt"}' file
+
 Now we remove duplicate values in the 3rd column based on pairing 1st and 2nd column as key :
 	awk '!x[$1,$2]++' FS=”,” data.txt
 
