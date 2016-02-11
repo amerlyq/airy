@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+# SEE:
+#   http://www.musicpd.org/doc/protocol/command_reference.html
+
+while : ; do
+    # EXPL: Explicit idle to react on changing song on same radio stream
+    mpc idle player >/dev/null
+    mark="$(date +'%Y-%d-%m %H:%M:%S')"
+    name="$(mpc current --format '%title%')"
+    echo "$mark | $name" >> ~/.mpd/history
+done

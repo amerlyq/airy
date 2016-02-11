@@ -15,9 +15,11 @@ nnoremap <unique> <C-l> :nohlsearch<CR><C-l>
 
 " Amazing custom search command. Thansk to Ingo: http://stackoverflow.com/a/24818933/1147859
 command! -nargs=+ Se execute 'vimgrep /' . [<f-args>][0] . '/ **/*.' . [<f-args>][1]
-command! -nargs=0 -range SortLine <line1>,<line2>call setline('.',join(sort(split(getline('.'),' ')),' '))
+command! -nargs=0 -range  SortInLine
+      \ <line1>,<line2>call setline('.',join(sort(split(getline('.'),' ')),' '))
 " Visual block sorting. Restore text _outside_ block:  gvyugvp
-command! -range SortBlock <line1>,<line2>sort i /\ze\%V/
+command! -bar -bang -range  SortByBlock
+      \ <line1>,<line2>sort<bang> i /\ze\%V/
 
 " Search opened buffers
 " http://vim.wikia.com/wiki/Search_using_quickfix_to_list_occurrences

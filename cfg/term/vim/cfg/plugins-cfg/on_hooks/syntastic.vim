@@ -9,6 +9,7 @@ let g:syntastic_warning_symbol='⚠'
 " the error window will be automatically closed when no errors are detected,
 " but not opened automatically.
 let g:syntastic_auto_loc_list=1
+" let g:syntastic_always_populate_loc_list=1
 
 " files that syntastic should neither check, nor include in error lists.
 " let g:syntastic_ignore_files=['\m^/usr/include/', '\m\c\*\.h$']
@@ -53,3 +54,6 @@ let g:syntastic_loc_list_height=5
 """ Python """
 let g:syntastic_python_checkers = []
 let g:syntastic_enable_perl_checker = 1
+
+""" Haskell """
+let g:syntastic_haskell_checkers = ['hlint']  " 'hdevtools', 'ghc-mod'
