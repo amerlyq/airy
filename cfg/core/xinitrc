@@ -29,13 +29,14 @@ fi
 
 
 # BUG: may affect problems for multiple X-sessions
-lau(){ if hash $1 >/dev/null; then pgrep $1 >/dev/null || $@ & fi; }
-## Keylayout
+# pgrep $1 >/dev/null || $@ &
+lau(){ if hash $1 >/dev/null 2>&1; then $@ & fi; }
+## Demons and session settings
 lau r.xkb
 lau r.xcape
 lau r.touchpad
-lau compton  # Must be launched before installing wallpaper!
 lau r.dunst
+lau compton  # Must be launched before installing wallpaper!
 lau r.feh
 
 # ADD https://wiki.archlinux.org/index.php/Running_program_in_separate_X_display

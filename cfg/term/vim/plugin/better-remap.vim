@@ -23,6 +23,8 @@ command! -bar -nargs=0 -range=% RecoverEnd  call s:DiffRecoverEnd()
 " BUG: undo don't work after writing new recover
 " DEV: auto-cancel ':recover' if I haven't saved (don't want to apply changes)
 " TODO: auto-choose '[E]dit' and then do 'DiffRecover'
+"   -- if swap exists -- on 'Edit anyway' load RecoverDiff automatically
+"   -- hook on 'recovery window/tab quit' to do RecoverEnd automatically
 
 "{{{ IMPL =====
 fun! s:RecoverRemove() abort
