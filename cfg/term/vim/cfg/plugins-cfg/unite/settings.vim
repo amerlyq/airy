@@ -29,16 +29,19 @@ call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
 let g:unite_source_menu_menus = {}  " For unite-menu.
 let g:unite_source_menu_menus.unite = {'description': 'Start unite sources'}
 let g:unite_source_menu_menus.unite.command_candidates = {
-      \       'history'    : 'Unite history/command',
-      \       'quickfix'   : 'Unite qflist -no-quit',
-      \       'resume'     : 'Unite -buffer-name=resume resume',
-      \       'directory'  : 'Unite -buffer-name=files '.
-      \             '-default-action=lcd directory_mru',
-      \       'mapping'    : 'Unite mapping',
-      \       'message'    : 'Unite output:message',
-      \       'scriptnames': 'Unite output:scriptnames',
-      \     }
-
+    \ 'history'    : 'Unite history/command',
+    \ 'quickfix'   : 'Unite qflist -no-quit',
+    \ 'resume'     : 'Unite -buffer-name=resume resume',
+    \ 'directory'  : 'Unite -buffer-name=files '
+    \    . '-default-action=lcd directory_mru',
+    \ 'mapping'    : 'Unite mapping',
+    \ 'message'    : 'Unite output:message',
+    \ 'scriptnames': 'Unite output:scriptnames',
+    \}
+let g:unite_source_menu_menus.mpd = {'description': 'Mpd related stuff'}
+let g:unite_source_menu_menus.mpd.command_candidates = {
+    \ 'mpd/history'    : 'Unite mpd/history',
+    \}
 
 "{{{1 Integration ============================
 " Use ag in unite grep source.
