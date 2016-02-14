@@ -3,20 +3,40 @@ FIND
 		: One -- for work-related windows, one for my own
 
 SEE
-	>>> http://lynnard.me/blog/2013/11/05/building-a-vim-like-xmonad-prompt-task-groups-topical-workspaces-float-styles-and-more/
-	>> https://ro-che.info/docs/xmonad/
-	>> http://learnyouahaskell.com/making-our-own-types-and-typeclasses
-	https://wiki.haskell.org/Xmonad
-	http://xmonad.org/xmonad-docs/xmonad/XMonad-StackSet.html
-	Intro:
-		> http://echo.rsmw.net/n00bfaq.html
-		http://prajitr.github.io/quick-haskell-syntax/
-		https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/Simple%20examples
-	https://en.wikibooks.org/wiki/Haskell/Indentation
-	>> http://www.stephendiehl.com/posts/vim_haskell.html
-	-- https://github.com/mcmaniac/xmonad/blob/master/xmonad.hs
+	Haskell
+		Ref
+			https://wiki.haskell.org/Learn_Haskell_in_10_minutes
+			https://en.wikibooks.org/wiki/Haskell/Indentation
+			>> http://learnyouahaskell.com/making-our-own-types-and-typeclasses
+		Intro
+			> http://echo.rsmw.net/n00bfaq.html
+			http://prajitr.github.io/quick-haskell-syntax/
+			https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/Simple%20examples
+		Workspace
+			>> http://www.stephendiehl.com/posts/vim_haskell.html
+	Xmonad
+		Ref
+			https://wiki.haskell.org/Xmonad
+			> https://wiki.haskell.org/Xmonad/General_xmonad.hs_config_tips
+			>>> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html#Editing_key_bindings
+			http://xmonad.org/xmonad-docs/xmonad/XMonad-StackSet.html
+		Blog
+			>> https://ro-che.info/docs/xmonad/
+			>>> http://lynnard.me/blog/2013/11/05/building-a-vim-like-xmonad-prompt-task-groups-topical-workspaces-float-styles-and-more/
+		Examples
+		: https://github.com/mcmaniac/xmonad/blob/master/xmonad.hs
+		: http://www.vicfryzel.com/2010/06/27/obtaining-a-beautiful-usable-xmonad-configuration/
+		: http://lpaste.net/52657
+	Bar
+		http://projects.haskell.org/xmobar/
+
+ENH:
+	Group/Sub-layout
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-Groups.html
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-SubLayouts.html
 
 BUG:
 	[_] compton casts shadow on border of windows, making it dim
 		:= new window becomes master and placed on the top
 		:= NEED: to always place active window to top of the stack
+	[_] xkb latching залипает for Mod4+a -- cycleWindows -- then you need only 'a'
