@@ -39,50 +39,7 @@ main = do
               , focusedBorderColor = "#a0a0a0"
               , layoutHook         = layoutHintsToCenter . smartBorders $ myLayout
               , manageHook         = myManageHook <+> namedScratchpadManageHook scratchpads
-              , handleEventHook    = myEventHook
-              , keys               = myKeys
-              , startupHook        = broadcastMessage $ SetStruts [] [minBound..maxBound]
               }
-
--- xmobar pretty printing stuff
-myPP :: PP
-myPP = xmobarPP { ppCurrent = xmobarColor orange ""
-                -- separator between elements
-                , ppSep     = xmobarColor orange "" " \xe0b1 "
-                -- order in which we have to show elements (title is ignored)
-                , ppOrder   = \(ws:l:_) -> [l, ws]
-                -- show only workspaces that are predefined by me
-                , ppHidden  = \w -> if elem w myWorkspaces then w else ""
-                -- short 'titles' for layouts
-                , ppLayout  = \n -> case n of
-                                "Full" -> "[ ]"
-                                "ResizableTall" -> "[|]"
-                                "Mirror ResizableTall" -> "[-]"
-                                _      -> n
-                }
--- dummy line. needed for statusBar function.
-toggleStrutsKey XConfig { XMonad.modMask = modMask } = (modMask, xK_b)
-
--- terminal i'm using
-myTerminal :: String
-myTerminal = "st"
-
--- list of workspaces
-myWorkspaces :: [String]
-myWorkspaces = words "` 1:main 2 3 4 5 6 7 8 9 0 - ="
-
--- colemak (origin)
--- myWorkspaces = words "a r s t d z x c v"
--- in case of dvorak:
--- myWorkspaces = words "a o e u i ; q j k"
-
--- Layouts
-myLayout = Full ||| tiled ||| Mirror tiled
-  where
-    tiled   = ResizableTall nmaster delta ratio []
-    nmaster = 1     -- number of windows in master pane
-    ratio   = toRational (2/(1+sqrt(5)::Double)) -- phi
-    delta   = 3/100 -- step of increasing
 
 -- How we should manage windows
 myManageHook :: ManageHook
@@ -117,9 +74,6 @@ myManageHook = composeAll
                 , ("Firefox", "r")
                 , ("Leechcraft", "a")
                 ] :: [(String,  String)]
-
--- eventHook
-myEventHook = docksEventHook <+> hintsEventHook <+> fullscreenEventHook
 
 -- Keys
 myKeys = \conf -> mkKeymap conf $
@@ -183,6 +137,3 @@ scratchpads = [ NS "dashboard" (myTerminal ++ " -c dashboard -e /bin/sh /home/tm
               , NS "term" (myTerminal ++ " -c term -e tmux") (className =? "term")
                   ( customFloating $ W.RationalRect 0 (2/3) 1 (1/3))
               ]
-
--- colors
-orange     = "#fd971f" :: String
