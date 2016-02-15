@@ -117,7 +117,7 @@ function! RangerChooser(select, ...)
     " MAPS: au TermOpen term://*fzf tnoremap <buffer> ...
     call s:execute_term(cmd, temps)
   else
-    exe 'Silent ' . cmd
+    exe 'silent !' . escape(cmd, '%#') | exe ':redraw!'
     call s:open_paths(s:read_file(temps))
   endif
 endfun

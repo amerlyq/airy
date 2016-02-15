@@ -100,3 +100,10 @@ Checking
 		: ...
 		: found 88435663767 bytes used err is 0
 		: ...
+
+Defragment
+	btrfs filesystem defragment -r -v /
+	: Note: The command above will defragment only file data.
+	: To defragment directory metadata for every directory in the file system,
+	: run this command:
+	find / -xdev -type d -print -exec btrfs filesystem defragment '{}' \;

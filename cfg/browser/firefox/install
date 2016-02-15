@@ -2,7 +2,8 @@
 source ~/.shell/func.d/packages
 has_pr X || die
 
-pkg_inst -p 'firefox' firefox
+# pkg_inst -p 'firefox' firefox
+echo "Err: firefox"
 
 if distro arch; then
     aur_inst -p 'firefox' pentadactyl-git

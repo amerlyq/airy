@@ -49,12 +49,17 @@ Config {
     , "--high", "#899ca1"
     , "--template", "<fc=#ccccc6>bat:</fc> <left>%"
     ] 60
+-- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
 -- , Run Volume "default" "Master"
 --     [ "--template", "<fc=#ccccc6>vol:</fc> <volume>% <status>"
 --     , "--"
 --     , "--onc", "#b6e354"
 --     , "--offc", "#ff5995"
 --     ] 5
+, Run MPD
+    [ "-t", "<composer> <title> (<album>) <track>/<plength> <statei> "
+    , "--", "-P", ">>", "-Z", "|", "-S", "><"
+    ] 10
 , Run Kbd []
 , Run StdinReader
 ] }

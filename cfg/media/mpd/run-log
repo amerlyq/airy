@@ -6,7 +6,11 @@
 while : ; do
     # EXPL: Explicit idle to react on changing song on same radio stream
     mpc idle player >/dev/null
-    mark="$(date +'%Y-%d-%m %H:%M:%S')"
     name="$(mpc current --format '%title%')"
-    echo "$mark | $name" >> ~/.mpd/history
+    [[ -n "$name" ]] || continue
+
+    mark="$(date +'%Y-%d-%m %H:%M:%S')"
+    idx="$(mpc playlist | awk -vnm="$name" \
+        'BEGIN{gsub(/[][^$.*?+{}\\()|]/,"\\\\&",nm)} $0 ~ nm {print NR;quit}')"
+    printf '%s |%2s| %s\n' "$mark" "${idx:-0}" "$name" >> ~/.mpd/history
 done

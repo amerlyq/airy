@@ -28,7 +28,7 @@ function! s:source.hooks.on_syntax(args, context) "{{{
   syntax match uniteSource__MpdHistory_Date display contained /[^|]\+\ze|/
       \ containedin=uniteSource__MpdHistory
       \ nextgroup=uniteSource__MpdHistory_Marker
-  syntax match uniteSource__MpdHistory_Marker display contained /|/
+  syntax match uniteSource__MpdHistory_Marker display contained /|\%(\s*\d\+\s*|\)\=/
       \ containedin=uniteSource__MpdHistory
       \ nextgroup=uniteSource__MpdHistory_Name
   syntax match uniteSource__MpdHistory_Name display contained /|\zs.*$/
@@ -36,12 +36,14 @@ function! s:source.hooks.on_syntax(args, context) "{{{
 
   highlight default link uniteSource__MpdHistory_Date Comment
   highlight default link uniteSource__MpdHistory_Marker Statement
+  highlight default link uniteSource__MpdHistory_Index Type
   highlight default link uniteSource__MpdHistory_Name Normal
 endfunction "}}}
 
 comm! -bang -nargs=? PutL
-      \ call append(line('.'), [substitute(<q-args>,'^[^|]\+|\s\+','','')])
-      \ | exec "norm!j".(<bang>0?'^': '>>>>')
+      \ call append(line('.'), [
+      \   substitute(<q-args>,'^[^|]\+|\%(\s*\d\+\s*|\)\=\s\+','','')
+      \ ]) | exec "norm!j".(<bang>0?'^': '>>>>')
 
 function! s:source.gather_candidates(args, context) "{{{
   let header = ['', ' <<<= Current =>>>  | '
