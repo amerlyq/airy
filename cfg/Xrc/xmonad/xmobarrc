@@ -1,4 +1,4 @@
--- vim: filetype=haskell
+-- vim: ft=haskell:ts=2:sw=2:sts=2
 Config {
   lowerOnStart = True
 , hideOnStart  = False
@@ -8,58 +8,60 @@ Config {
 , border       = NoBorder
 , borderWidth  = 2
 , borderColor  = "#000000"
-, bgColor      = "#1b1d1e"
-, fgColor      = "#a0a0a0"
+, bgColor      = "#000000" -- "#1b1d1e"
+, fgColor      = "#ffffff" -- "#a0a0a0"
 -- , alpha        = 220
 , position     = Bottom
 , sepChar      = "%"
 , alignSep     = "}{"
-, template     = "%StdinReader%}{%battery% <fc=#ee9a00></fc> %default:Master% <fc=#ee9a00></fc> %cpu% <fc=#ee9a00></fc> %memory% <fc=#ee9a00></fc> %dynnetwork% <fc=#fd971f>%date% </fc><fc=#1b1d1e,#fd971f> %kbd% </fc>"
+, template     = "%StdinReader%}{\
+  \<fc=#ee9a00></fc>\
+    \ %default:Master% \
+  \<fc=#ee9a00></fc>\
+    \ %cpu% \
+  \<fc=#ee9a00></fc>\
+    \ %memory% \
+  \<fc=#ee9a00></fc>\
+    \ %dynnetwork% \
+    \ %battery% \
+    \<fc=#1b1d1e,#fd971f> %kbd% </fc>\
+  \<fc=#fd971f> %date% </fc>"
 , commands     =
-[ Run DynNetwork
-    [ "--High", "128000"
-    , "--normal", "#a0a0a0"
-    , "--high"  , "#ff5995"
-    , "--suffix", "True"
-    , "--template", "<fc=#ccccc6>net:</fc> <rx> <fc=#ccccc6>:</fc> <tx>"
-    ] 10
-, Run Battery
-    [ "--template", "bat: <left>%"
-    ] 60
+[ Run Date "%d.%m.%Y %H:%M" "date" 10
 , Run Cpu
-    [ "--Low", "6"
-    , "--High", "50"
-    , "--normal", "#b6e354"
-    , "--high"  , "#ff5995"
-    , "--template", "<fc=#ccccc6>cpu:</fc> <total>%"
-    ] 10
+  [ "-t", "<fc=#ff44ff>☾</fc> <total>%"
+  , "-L", "20", "-l", "#b6e354"
+  , "-H", "60", "-h", "#cc0000"
+  , "-n", "#008888" ] 10
 , Run Memory
-    [ "--Low", "10"
-    , "--High", "66"
-    , "--normal", "#a0a0a0"
-    , "--high", "#ff5995"
-    , "--template", "<fc=#ccccc6>mem:</fc> <usedratio>%"
-    ] 10
-, Run Date "%H:%M" "date" 10
+  [ "-t", "<fc=#00bbff>♏</fc> <usedratio>%"
+  , "-L", "25", "-l", "#b6e354"
+  , "-H", "66", "-h", "#ff5995"
+  , "-n", "#008888" ] 10
+, Run DynNetwork
+  [ "-t", "<fc=#ccccc6>↓</fc><rx> <fc=#ccccc6>↑</fc><tx>"
+  , "--High", "128000"
+  , "--normal", "#a0a0a0"
+  , "--high"  , "#ff5995"
+  , "--suffix", "True" ] 10
 , Run Battery
-    [ "--Low", "10"
-    , "--High", "66"
-    , "--low", "#ff5995"
-    , "--normal", "#b6e354"
-    , "--high", "#899ca1"
-    , "--template", "<fc=#ccccc6>bat:</fc> <left>%"
-    ] 60
+  [ "-t", "<fc=#ccccc6>☯</fc> <left>%"
+  , "-L", "10", "-l", "#ff0000"
+  , "-H", "66", "-h", "#899ca1"
+  , "-n", "#b6e354" ] 60 -- #888800
 -- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
--- , Run Volume "default" "Master"
---     [ "--template", "<fc=#ccccc6>vol:</fc> <volume>% <status>"
---     , "--"
---     , "--onc", "#b6e354"
---     , "--offc", "#ff5995"
---     ] 5
+-- , Run Volume
+--   "default" "Master"
+--   [ "--template", "<fc=#ccccc6>vol:</fc> <volume>% <status>"
+--   , "--"
+--   , "--onc", "#b6e354"
+--   , "--offc", "#ff5995"
+--   ] 5
 , Run MPD
-    [ "-t", "<composer> <title> (<album>) <track>/<plength> <statei> "
-    , "--", "-P", ">>", "-Z", "|", "-S", "><"
-    ] 10
+  [ "-t", "<composer> <title> (<album>) <track>/<plength> <statei> [<flags>]"
+  , "--", "-P", ">>", "-Z", "|", "-S", "><"
+  ] 10
 , Run Kbd []
+, Run Locks
 , Run StdinReader
 ] }

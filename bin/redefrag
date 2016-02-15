@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+root="${1:-/}"
+btrfs filesystem defragment -r -v "$root"
+find "$root" -xdev -type d -print -exec btrfs filesystem defragment '{}' \;
