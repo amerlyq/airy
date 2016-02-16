@@ -3,14 +3,15 @@
 # SEE:
 #   http://www.musicpd.org/doc/protocol/command_reference.html
 
-while : ; do
-    # EXPL: Explicit idle to react on changing song on same radio stream
-    mpc idle player >/dev/null
+# EXPL: Explicit idle to react on changing song on same radio stream
+while mpc idle player >/dev/null
+do  # ALT: while : ; do mpc idle ...
     name="$(mpc current --format '%title%')"
-    [[ -n "$name" ]] || continue
-
+    [[ -n "$name" && "$name" != "$prev" ]] && prev="$name" || continue
+    idx="$(mpc status | sed -rn '2s|^\[playing\]\s#([0-9]+)/.*|\1|p')"
+    # ALT: idx="$(mpc playlist | awk -vnm="$name" \
+    #     'BEGIN{gsub(/[][^$.*?+{}\\()|]/,"\\\\&",nm)} $0 ~ nm {print NR;quit}')"
+    [[ -n  "$idx" ]] || continue
     mark="$(date +'%Y-%d-%m %H:%M:%S')"
-    idx="$(mpc playlist | awk -vnm="$name" \
-        'BEGIN{gsub(/[][^$.*?+{}\\()|]/,"\\\\&",nm)} $0 ~ nm {print NR;quit}')"
-    printf '%s |%2s| %s\n' "$mark" "${idx:-0}" "$name" >> ~/.mpd/history
+    printf '%s |%2s| %s\n' "$mark" "$idx" "$name" >> ~/.mpd/history
 done

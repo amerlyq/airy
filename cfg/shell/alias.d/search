@@ -2,6 +2,7 @@
 
 # --- Search ---
 f()  { find . -type f -iname "*$@*"; }
+fd() { find . -type d -iname "*$@*"; }
 ff() { find . -type f -regex $@; }
 # fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
 # grep -Ri 'name' . # find in all files

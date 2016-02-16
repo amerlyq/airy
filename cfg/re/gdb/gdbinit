@@ -60,6 +60,9 @@ end
 
 # Use bta to print backtraces for all threads
 define bta
+    # Make things like C++ or STL classes (as function parameters)
+    # not truncated (and shown as "...") in bt.
+    set print frame-arguments all
     thread apply all bt full
 end
 

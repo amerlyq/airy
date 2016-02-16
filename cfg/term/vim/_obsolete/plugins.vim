@@ -1,11 +1,9 @@
 " ======================================
 " FUTURE:
 "" Haskell
-" eagletmt/ghcmod-vim
 " eagletmt/neco-ghc
 " dag/vim2hs
 " Twinside/vim-haskellConceal
-" repository = 'itchyny/vim-haskell-indent'
 
 " Php
 " repository = 'shawncplus/phpcomplete.vim'
@@ -89,3 +87,6 @@ NeoBundleLazy 'dhruvasagar/vim-table-mode', {
 " DISABLED: completely destroys mouse selection. Has not much usecases.
 "NeoBundle 'joonty/vdebug', {
 "            \ 'autoload' : { 'filetypes' : [ 'python' ] } }
+" BUG: <CR>, 'o/O' exists from insert
+" itchyny/vim-haskell-indent:
+"   filetypes: [haskell, hs]

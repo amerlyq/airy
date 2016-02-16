@@ -92,6 +92,12 @@
 		when parent processes forks often loading various executables.
 
 
+### Resolve ?? symbols ###
+	SEE
+		http://nanxiao.me/en/use-pstack-to-track-threads-on-linux/
+		http://stackoverflow.com/questions/33273101/how-to-resolve-function-name-through-memory-address
+	List which debug-info packages should be installed
+		gdb --quiet -nx --readnever /proc/$pid/exe $pid can
 
 
 ### Core Dump / Segfault ###
@@ -105,6 +111,8 @@
 <: When coredump, pr shows '~$ Segmentation fault (core dumped)'
 	Enable creation of coredump (some system disabled by default)
 		ulimit -c unlimited
+		echo /home/yusuf/mycore > /proc/sys/kernel/core_pattern
+		: SEE http://linux.die.net/man/5/core
 	Find coredump file for executable
 	| # file core.1234 | # gdb core.1234 |
 	;OR: # echo "core_%e.%p" > /proc/sys/kernel/core_pattern
@@ -138,6 +146,18 @@
 	You can save current debug point of any program in gdb to coredump file:
 		(gdb) generate-core-file
 	 When a program dies with SIGSEGV, it normally dumps core on Unix.
+	Corrupted stack -- set frame manually
+		frame $bp [$pc]  # set frame address and current $pc
+		where 2
+		: where FRAMEADDR should be $sp in the caller.
+		: It behaved a bit erratically now to me on x86_64.
+		If/as this is not a common task one can use
+			eu-readelf -n corefile  # eu-readelf is readelf from elfutils
+		and patch the registers using hexedit
+		ALSO try 'set write'
+		Platform-dependent regs
+			(gdb) i all-registers
+
 
 	Analysis (0x71075000 in ??)
 		(gdb) maintenance info sections
