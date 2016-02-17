@@ -6,7 +6,7 @@
 # EXPL: Explicit idle to react on changing song on same radio stream
 while mpc idle player >/dev/null
 do  # ALT: while : ; do mpc idle ...
-    name="$(mpc current --format '%title%')"
+    name="$(mpc current --format '[[%artist% - ]%title%]|[@@ %name%]|[:: %file%]')"
     [[ -n "$name" && "$name" != "$prev" ]] && prev="$name" || continue
     idx="$(mpc status | sed -rn '2s|^\[playing\]\s#([0-9]+)/.*|\1|p')"
     # ALT: idx="$(mpc playlist | awk -vnm="$name" \

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-track=$( mpc status --format '%title%' |
+track=$( mpc status --format '[[%artist% - ]%title%]|[%name%]|[%file%]' |
     sed -n 'N;s/^\(.*\)\n\[.*\]\s\+#\(\S\+\)\s\+\(\S\+\)\s*.*/(\3) \1 < \2/p' )
 mode=$( mpc status | sed -n '2s/^\[\(.*\)\].*/\1/p' )
 
