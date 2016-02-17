@@ -3,9 +3,13 @@ source ~/.shell/func.d/packages
 
 
 if distro arch; then
-    pkg_inst 'xmonad xmonad-contrib xmobar'
+    pkg_inst 'xmonad xmonad-contrib'  # xmobar
+    cabal install xmobar --flags="with_dbus with_utf8 with_xft with_mpd with_alsa"
     aur_inst 'haskell-libmpd'
+    pkg_inst 'stalonetray'
 
 elif distro ubuntu; then
     pkg_inst 'xmonad xmonad-contrib'
+
+    echo "Err: not enough"
 fi

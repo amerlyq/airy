@@ -182,4 +182,4 @@ myPP = xmobarPP
 main :: IO ()
 main = xmonad =<< statusBar "xmobar" myPP toggleStrutsKey myCfg
   where
-    toggleStrutsKey XConfig { XMonad.modMask = modMask } = (modMask, xK_Escape)
+    toggleStrutsKey XConfig { XMonad.modMask = modMask } = (modMask, xK_b)  -- xK_Escape

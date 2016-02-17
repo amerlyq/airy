@@ -3,65 +3,75 @@ Config {
   lowerOnStart = True
 , hideOnStart  = False
 , persistent   = False
-, font         = "xft:PragmataPro:size=10,DejaVu Sans Mono:size=10,Droid Sans Fallback Full:size=9"
-, additionalFonts = [] -- To use by index in 'template' field
-, border       = NoBorder
-, borderWidth  = 2
-, borderColor  = "#000000"
+, allDesktops  = True
+, pickBroadest = False
+, overrideRedirect = False
+, position     = BottomP 0 45  -- Bottom
 , bgColor      = "#000000" -- "#1b1d1e"
 , fgColor      = "#ffffff" -- "#a0a0a0"
--- , alpha        = 220
-, position     = Bottom
+, alpha        = 230
+, font         = "xft:PragmataPro:size=10,DejaVu Sans Mono:size=10,Droid Sans Fallback Full:size=9"
+, additionalFonts = [] -- To use by index in 'template' field
+, iconOffset   = -1
+, textOffset   = -1
+, border       = NoBorder
+, borderWidth  = 1
+, borderColor  = "#000000"
+-- , iconRoot     = "~/.xmonad/icons"  # Make it symlink
 , sepChar      = "%"
 , alignSep     = "}{"
+-- \<fc=#1b1d1e,#fd971f>  %kbd%</fc>\
 , template     = "%StdinReader%}{\
-  \<fc=#ee9a00></fc>\
-    \ %default:Master% \
-  \<fc=#ee9a00></fc>\
-    \ %cpu% \
-  \<fc=#ee9a00></fc>\
-    \ %memory% \
-  \<fc=#ee9a00></fc>\
-    \ %dynnetwork% \
-    \ %battery% \
-    \<fc=#1b1d1e,#fd971f> %kbd% </fc>\
-  \<fc=#fd971f> %date% </fc>"
+  \<fc=#cc8000>  </fc>\
+    \%mpd%\
+  \<fc=#00cc00>  </fc>\
+    \%dynnetwork% %cpu%  %loadavg% %memory% %swap%\
+  \<fc=#0000cc>  </fc>\
+    \%battery% %default:Master% %bright%\
+  \<fc=#cc00cc>  </fc>\
+    \%lang% %leds% %date% "
 , commands     =
-[ Run Date "%d.%m.%Y %H:%M" "date" 10
+[ Run Date "<fc=#fd971f>%d.%m.%y</fc> ⌚ <fc=#ffffff>%H:%M</fc>" "date" 50
 , Run Cpu
   [ "-t", "<fc=#ff44ff>☾</fc> <total>%"
   , "-L", "20", "-l", "#b6e354"
   , "-H", "60", "-h", "#cc0000"
-  , "-n", "#008888" ] 10
+  , "-n", "#dd8800", "-w2" ] 10
 , Run Memory
   [ "-t", "<fc=#00bbff>♏</fc> <usedratio>%"
   , "-L", "25", "-l", "#b6e354"
   , "-H", "66", "-h", "#ff5995"
   , "-n", "#008888" ] 10
 , Run DynNetwork
-  [ "-t", "<fc=#ccccc6>↓</fc><rx> <fc=#ccccc6>↑</fc><tx>"
-  , "--High", "128000"
-  , "--normal", "#a0a0a0"
-  , "--high"  , "#ff5995"
-  , "--suffix", "True" ] 10
+  [ "-t", "<fc=#00ff00>↓</fc><rx>K <fc=#ff4400>↑</fc><tx>K"
+  , "-H", "128000", "-h", "#ff5995"
+  , "-n", "#a0a0a0" ] 10
 , Run Battery
   [ "-t", "<fc=#ccccc6>☯</fc> <left>%"
   , "-L", "10", "-l", "#ff0000"
   , "-H", "66", "-h", "#899ca1"
-  , "-n", "#b6e354" ] 60 -- #888800
--- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
--- , Run Volume
---   "default" "Master"
---   [ "--template", "<fc=#ccccc6>vol:</fc> <volume>% <status>"
---   , "--"
---   , "--onc", "#b6e354"
---   , "--offc", "#ff5995"
---   ] 5
+  , "-n", "#b6e354" ] 100 -- #888800
+, Run Volume "default" "Master"
+  [ "-t", "<status> <volume>%"
+  , "-L", "20", "-l", "#b6e354"
+  , "-H", "60", "-h", "#dd6600"
+  , "-n", "#ddffff", "-w2", "--"
+  , "-O", "♪", "-C", "#00dd00"
+  , "-o", "⎋", "-c", "#dd0000" ] 5
 , Run MPD
-  [ "-t", "<composer> <title> (<album>) <track>/<plength> <statei> [<flags>]"
-  , "--", "-P", ">>", "-Z", "|", "-S", "><"
-  ] 10
-, Run Kbd []
+  [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
+  , "-M", "30", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
+  ] 50
+-- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
+, Run Com "awk" [ "{print $1}", "/proc/loadavg" ] "loadavg" 10
+, Run Com "sh" ["/home/amerlyq/.i3/blocks/language"] "lang" 10
+, Run Com "python3" ["/home/amerlyq/.i3/blocks/leds"] "leds" 10
+, Run Swap
+  [ "-t", "<usedratio>%" ] 100
+, Run Brightness
+  [ "-t", "<fc=#cccc00>☀</fc> <percent>%", "--"
+  , "-D", "intel_backlight" ] 30
+-- , Run Kbd []
 , Run Locks
 , Run StdinReader
 ] }
