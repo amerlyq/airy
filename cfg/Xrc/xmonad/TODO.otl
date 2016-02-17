@@ -27,6 +27,7 @@ SEE
 		: https://github.com/mcmaniac/xmonad/blob/master/xmonad.hs
 		: http://www.vicfryzel.com/2010/06/27/obtaining-a-beautiful-usable-xmonad-configuration/
 		: http://lpaste.net/52657
+		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
 		: https://github.com/vicfryzel/xmonad-config/blob/master/xmonad.hs
 	Bar
 		https://wiki.archlinux.org/index.php/Xmobar
@@ -49,4 +50,7 @@ BUG
 		:= new window becomes master and placed on the top
 		:= NEED: to always place active window to top of the stack
 	[_] xkb latching залипает for Mod4+a -- cycleWindows -- then you need only 'a'
+		:= scenario norm: press and hold Alt, then click 'a', release Alt
+		:= scenario bad: press/release Alt, then click 'a', 'a'
 		:= maybe it's _double_ latching -- xmonad also treats *activator* as latcher
+		:> USE XMonad.Actions.CycleWS simpler functions

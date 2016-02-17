@@ -17,6 +17,7 @@ import XMonad.Util.EZConfig         (additionalKeys, mkKeymap)
 import Graphics.X11.ExtraTypes.XorgDefault  -- xK_ISO_Left_Tab
 
 import qualified XMonad.StackSet as W
+import XMonad.Actions.CycleWS       (toggleWS)
 import XMonad.Actions.CycleRecentWS (cycleWindowSets)
 
 import System.IO
@@ -51,19 +52,20 @@ myKeys cfg = mkKeymap cfg $
   , ("M-S-,"      , sendMessage MirrorShrink)
   , ("M-S-."      , sendMessage MirrorExpand)
   -- Layouts
+  , ("M-a"        , toggleWS)
   , ("M-<Space>"  , sendMessage NextLayout)
   -- , ("M-f"        , setLayout   $ avoidStruts Full)
   , ("M-w"        , withFocused $ windows . W.sink)  -- BUG
   , ("M-S-<Space>", setLayout   $ XMonad.layoutHook cfg)
   ] ++
-  -- cycling
-  let visWs w = map (W.greedyView `flip` w) (visTags w)
-      hidWs w = map (W.greedyView `flip` w) (hidTags w)
-      rctWs w = map (W.view `flip` w)       (map ($ hidTags w) [head, last])
-  in [ ("M-<Tab>"  , cycleWindowSets visWs [xK_Super_L] xK_Tab xK_ISO_Left_Tab)
-     , ("M-S-<Tab>", cycleWindowSets hidWs [xK_Super_L] xK_ISO_Left_Tab xK_Tab)
-     , ("M-a"      , cycleWindowSets rctWs [xK_Super_L] xK_a xK_a)
-  ] ++
+  -- cycling :: FIXME:CHG: latching modifier
+  -- let visWs w = map (W.greedyView `flip` w) (visTags w)
+  --     hidWs w = map (W.greedyView `flip` w) (hidTags w)
+  --     rctWs w = map (W.view `flip` w)       (map ($ hidTags w) [head, last])
+  -- in [ ("M-<Tab>"  , cycleWindowSets visWs [xK_Super_L] xK_Tab xK_ISO_Left_Tab)
+  --    , ("M-S-<Tab>", cycleWindowSets hidWs [xK_Super_L] xK_ISO_Left_Tab xK_Tab)
+  --    , ("M-a"      , cycleWindowSets rctWs [xK_Super_L] xK_a xK_a)
+  -- ] ++
   -- workspaces
   [ (m ++ i, windows $ f i) | i <- workspaces cfg
     , (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
