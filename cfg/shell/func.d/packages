@@ -6,6 +6,7 @@ trap_errors
 for arg in "$@"; do case "$arg" in
   # Re-install even if git pull is up-to-date (for broken builds)
   -u|--update) cfgOptAdd u ;;
+  -r) cfgOptAdd r ;;
   -s) cfgOptAdd s ;;
 esac; done
 
@@ -41,7 +42,7 @@ if distro ubuntu; then
     local addr="${1#ppa:}"
     addr="${addr#*http://}"
     addr="${addr%% *}"
-    ! grep -Rq "^$addr" /etc/apt/sources.list /etc/apt/sources.list.d/ || return
+    ! grep -FRq "$addr" /etc/apt/sources.list /etc/apt/sources.list.d/ || return 0
     sudo add-apt-repository ${2---yes} "$1"
     sudo apt-get update
   }

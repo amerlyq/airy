@@ -1,7 +1,27 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
+if cfgOpt i; then
+    prf=wily_amd64  # ALT: trusty_i386, lucid_i386
+    chroot="${CURR_DIR_CHROOT:?No}/$prf"
+
+    if cfgOpt c || [[ ! -e "$chroot" ]]; then
+        mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu/'
+        # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
+        # SEE: https://launchpad.net/ubuntu/+archivemirrors
+        PKGS="sudo,locales,software-properties-common,vim"  # HAS: add-apt-repository
+        sudo debootstrap --verbose --include="$PKGS" --variant buildd
+            --arch "${prf##*_}" "${prf%_*}" "$chroot" "$mirror"
+    fi
+
+    # TODO: Replace on double-mounting common point through fstab
+    sudo mkdir -p "$chroot/cryptfs"
+    sudo chown $USER:$USER "$chroot/cryptfs"
+    mkdir -p "$chroot/cryptfs/workspace"
+    link -sct "$chroot/usr/share/terminfo/s" /usr/share/terminfo/s/st-256color
+fi
+
 if cfgOpt u; then
     ./config.gen
-    link -bst /etc/schroot/default fstab
+    link -bst /etc/schroot/default cfg/fstab cfg/nssdatabases
 fi

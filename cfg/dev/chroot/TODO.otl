@@ -1,9 +1,46 @@
 SEE
-	https://sites.google.com/site/uxhakx/debootstrap-on-archlinux-howto
-	https://bbs.archlinux.org/viewtopic.php?id=100039
+	Full
+		https://wiki.ubuntu.com/DebootstrapChroot
+		https://habrahabr.ru/post/244373/
+
+	Small
+		https://sites.google.com/site/uxhakx/debootstrap-on-archlinux-howto
+		https://bbs.archlinux.org/viewtopic.php?id=100039
+
+ALT:CHECK:
+	docker
+		docker pull ubuntu:14.04
+		docker run -ti ubuntu /bin/bash
+	lxc
+		http://vasilisc.com/lxc-1-0-unprivileged-containers
+		: не все пакеты можно собрать в chroot-е. Я на днях собирал pulseaudio
+		: из trunk-а, и в chroot он не собрался (не стал копать, почему), а в
+		: lxc — с первого раза все собралось.
+		vagrant + lxc plugin
+	https://github.com/jordansissel/fpm
+	pbuilder
+	http://openbuildservice.org
 
 Install
-	Common
-		aur_inst debootstrap
-	Ubuntu 12
-		sudo debootstrap --arch amd64 lucid ~/sdk/chroot/ubuntu http://au.archive.ubuntu.com/ubuntu/
+	Ubuntu10
+		sudo apt-get install debootstrap schroot
+		./chroot_buildenv.sh --install --installdir /cryptfs/chroots/lucid_i386 --name lucid_i386 --tarball chrootenv_lucid_i386.tar.bz2
+
+BUG
+	Not working with schroot:
+	: sudo mount --bind /cryptfs/workspace /cryptfs/chroots/lucid_i386/home/dkolomoiets
+
+
+FIXED
+	Share system settings (will be used from /home dir)
+		mkdir -vp ~/.terminfo/r/
+		cp -v /usr/share/terminfo/r/rxvt-unicode-256color ~/.terminfo/r/
+		cp -v /usr/share/terminfo/s/st-256color ~/.terminfo/r/
+	Unknown group 'crontab' in statoverride file
+		vim /var/lib/dpkg/statoverride
+		: remove all error lines
+	i386 in amd64 chroot
+		sudo sh -c "echo 'foreign-architecture i386' > /etc/dpkg/dpkg.cfg.d/multiarch"
+		sudo dpkg --add-architecture i386
+		sudo apt-get update
+		sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386

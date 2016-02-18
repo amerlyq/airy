@@ -1,15 +1,26 @@
 #!/bin/bash -e
+source ~/.shell/profile
 
-dir="${PWD#/cryptfs/chroots/lucid_i386}"
-if [[ "$PWD" =~ ^/cryptfs/_/ ]]; then
-    dir="$PWD"
-elif [[ "$PWD" == $dir ]]; then
-    dir=/cryptfs/workspace
-fi
+# USE: 'r.chroot 1' -- to load second chroot from list
+case "$1" in [0-9]) index=$1; shift ;; esac
+prf="${CURR_CHROOTS[${index:-0}]:?No}"
+chroot="${CURR_DIR_CHROOT:?No}/$prf"
+
+# EXPL: Derive mounted/overrided PWD for chroot
+dir="$PWD"
+[[ "${dir#$chroot}" == "$dir" ]] || dir="${dir#$chroot}"
+unset ismounted && while read line; do
+    [[ "${dir#$line}" == "$dir" ]] || ismounted=1
+done < <(awk '/^\//{print$1}' /etc/schroot/default/fstab)
+[[ -n "$ismounted" || -d "$chroot$dir" ]] || dir=/cryptfs/workspace
 
 # EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
-schroot -c lucid_i386 -d "$dir" -- bash --rcfile <(cat - <<EOT  ${@:+-c "$@"}
-export SHELLRC_EVAL='. /cryptfs/_/cfg/env; . /cryptfs/_/cfg/bash_extension.sh; export DISPLAY='$DISPLAY'; export EDITOR=vim'
+schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT  ${@:+-c "$@"}
+export SHELLRC_EVAL='\
+    . /cryptfs/_/cfg/env;\
+    . /cryptfs/_/cfg/bash_extension.sh;\
+    export DISPLAY='$DISPLAY';\
+    export EDITOR=vim'
 . ~/.profile
 EOT
 )
