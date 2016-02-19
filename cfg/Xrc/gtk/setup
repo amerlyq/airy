@@ -45,9 +45,13 @@ fi
 #   /etc/fonts/conf.d/10-scale-bitmap-fonts.conf
 
 dst=~/.Xresources
-echo "#define MAIN_DPI ${MAIN_DPI:-96}" > "$dst"
+wstr(){ cat >> "$dst" <<<"$*"; }
+
+> "$dst"
+wstr "#define MAIN_DPI ${MAIN_DPI:-96}"
+wstr "xmessage*international: true"
 for f in "${CURR_DIR_CACHE:?No}"/Xres-*; do
-    echo "#include \"$f\"" >> "$dst"
+    wstr "#include \"$f\""
 done
 cat "$PWD/xfontrc" >> "$dst"
 echo "W: ~/.Xresources"

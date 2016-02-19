@@ -20,6 +20,8 @@ import qualified XMonad.StackSet as W
 import XMonad.Actions.CycleWS       (toggleWS)
 import XMonad.Actions.CycleRecentWS (cycleWindowSets)
 
+import Data.List    (isPrefixOf)
+
 import System.IO
 import System.Exit
 
@@ -44,6 +46,7 @@ myKeys cfg = mkKeymap cfg $
   , ("M-k"        , windows W.focusUp)
   ---- swap
   , ("M-S-h"      , windows W.swapMaster)
+  , ("M-S-l"      , windows W.shiftMaster)
   , ("M-S-j"      , windows W.swapDown)
   , ("M-S-k"      , windows W.swapUp)
   ---- edit
@@ -55,7 +58,9 @@ myKeys cfg = mkKeymap cfg $
   , ("M-a"        , toggleWS)
   , ("M-<Space>"  , sendMessage NextLayout)
   -- , ("M-f"        , setLayout   $ avoidStruts Full)
-  , ("M-w"        , withFocused $ windows . W.sink)  -- BUG
+  -- , ("M-w"        , withFocused $ windows . W.sink)
+  , ("M-C-w"      , withFocused $ windows . W.sink)
+  -- , ("M-S-w"      , withFocused $ windows . W.float)
   , ("M-S-<Space>", setLayout   $ XMonad.layoutHook cfg)
   ] ++
   -- cycling :: FIXME:CHG: latching modifier
@@ -148,17 +153,17 @@ myCfg = ewmh $ defaultConfig
   -- Hooks
   -- , startupHook = setWMName "LG3D"
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
-  , manageHook = manageHook defaultConfig <+> manageDocks
+  , manageHook = manageHook defaultConfig <+> myManageHook <+> manageDocks
   -- layoutHook defaultConfig
   -- layoutHintsToCenter
   , layoutHook = smartBorders . avoidStruts $ myLayout
-  , handleEventHook = mconcat [ handleEventHook defaultConfig, docksEventHook,
-                                hintsEventHook, fullscreenEventHook ]
+  , handleEventHook = myHandleEventHook
   -- Style
   , borderWidth        = 2
   , normalBorderColor  = "#000000"
   , focusedBorderColor = "#c050f0"
   }
+
 
 myLayout = tiled ||| Mirror tiled ||| Full
   where
@@ -166,6 +171,35 @@ myLayout = tiled ||| Mirror tiled ||| Full
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (2 / (1 + sqrt 5.0)) -- phi
     delta   = 3/100 -- step of increasing
+
+
+myManageHook :: ManageHook
+myManageHook = mconcat $
+  [ myIgnores    --> doIgnore     -- Don't manage
+  , myFloats     --> doFloat      -- Make floating
+  , isFullscreen --> doFullFloat  -- Auto-fullscreen
+  ] ++
+  [ x --> doShift w | (x, w) <- myShifts ]  -- ALT: doF (W.shift "doc")
+  where
+    wmhas t l = [ t =? x | x <- words l ]
+    myIgnores = foldr1 (<||>) $
+      wmhas className "stalonetray" ++
+      wmhas resource  "panel desktop_window kdesktop"
+    myFloats = foldr1 (<||>) $
+      [ ("Figure" `isPrefixOf`) <$> title, isDialog ] ++
+      wmhas className "Float feh Steam Gimp"
+    myShifts = map (\(x, y) -> (className =? x, y)) $
+      [ ("Firefox", "4")
+      ]
+
+
+myHandleEventHook = mconcat $
+  [ handleEventHook defaultConfig
+  , docksEventHook
+  , hintsEventHook
+  , fullscreenEventHook
+  ]
+
 
 myPP :: PP  -- xmobar pretty printing source
 myPP = xmobarPP
