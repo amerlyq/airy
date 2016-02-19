@@ -1,4 +1,4 @@
-# vim: ft=gdb
+# vim: ft=gdb:ts=2:sw=2:sts=2
 # source /usr/share/peda/peda.py
 
 # *.gdbinit* # origin from buildroot
@@ -25,53 +25,79 @@ set history save
 
 # Use findsym $sp $sp+1000 to get a dump of all symbols on the stack
 define findsym
-    set $address = ($arg0)
-    set $count = ($arg1)
-    set $end = $count
-    if( $address > $end )
-        set $end = $address + ( $count * 4 )
+  set $address = ($arg0)
+  set $count = ($arg1)
+  set $end = $count
+  if( $address > $end )
+    set $end = $address + ( $count * 4 )
+  end
+  while( $address < $end )
+    if( *$address != 0 )
+      printf "*0x%08X 0x%08X: ",$address,*$address
+      info symbol *$address
     end
-    while( $address < $end )
-        if( *$address != 0 )
-            printf "*0x%08X 0x%08X: ",$address,*$address
-            info symbol *$address
-        end
-        set $address = $address + 4
-    end
+    set $address = $address + 4
+  end
 end
 
 # Use findval addr count value to find symbol with a specific value
 define findval
-    set $address = ($arg0)
-    set $count = ($arg1)
-    set $value = ($arg2)
-    set $end = $count
-    if( $address > $end )
-        set $end = $address + ( $count * 4 )
+  set $address = ($arg0)
+  set $count = ($arg1)
+  set $value = ($arg2)
+  set $end = $count
+  if( $address > $end )
+    set $end = $address + ( $count * 4 )
+  end
+  while( $address < $end )
+    if( *$address == $value )
+      printf "*%08X %08X: ",$address,*$address
+      info symbol *$address
     end
-    while( $address < $end )
-        if( *$address == $value )
-            printf "*%08X %08X: ",$address,*$address
-            info symbol *$address
-        end
-    set $address = $address + 4
-    end
+  set $address = $address + 4
+  end
 end
 
 # Use bta to print backtraces for all threads
 define bta
-    # Make things like C++ or STL classes (as function parameters)
-    # not truncated (and shown as "...") in bt.
-    set print frame-arguments all
-    thread apply all bt full
+  # Make things like C++ or STL classes (as function parameters)
+  # not truncated (and shown as "...") in bt.
+  set print frame-arguments all
+  thread apply all bt full
+end
+
+# Print disassembled frames
+define frdis
+  if $argc == 0
+    info frame
+    disassemble $pc-0x30 $pc+0x30
+  end
+  if $argc == 1
+    set $i = 0
+    while( $i < $arg0 )
+      info frame
+      disassemble
+      up
+      set $i = $i + 1
+    end
+  end
+  if $argc == 2
+    set $i = $arg0
+    while( $i <= $arg1 )
+      frame $i
+      info frame
+      disassemble
+      set $i = $i + 1
+    end
+  end
 end
 
 # Dump stack in 1-column: (like x/256x $sp-0x200)
 # USAGE: xc $sp-0x100 $sp+0x100
 define xc
-    set $start = $arg0
-    while ($start <= $arg1)
-        x/1xw $start
-        set $start = $start + 4
-    end
+  set $start = $arg0
+  while ($start <= $arg1)
+    x/1xw $start
+    set $start = $start + 4
+  end
 end
