@@ -11,14 +11,15 @@ import XMonad.Hooks.ManageHelpers   (isFullscreen, doFullFloat, isDialog)
 import XMonad.Layout.LayoutHints    (layoutHintsToCenter, hintsEventHook)  -- honor size hints
 import XMonad.Layout.NoBorders      (smartBorders)  -- no borders on fullscreen
 import XMonad.Layout.ResizableTile  (ResizableTall(..), MirrorResize(..))
--- import XMonad.Hooks.SetWMName
+import XMonad.Layout.SimplestFloat  (simplestFloat)
+import XMonad.Layout.MultiToggle    (mkToggle, Toggle(..), single, (??), EOT(..))
+import qualified XMonad.Layout.MultiToggle.Instances as MI
 
 import XMonad.Util.EZConfig         (additionalKeys, mkKeymap)
-import Graphics.X11.ExtraTypes.XorgDefault  -- xK_ISO_Left_Tab
 
 import qualified XMonad.StackSet as W
-import XMonad.Actions.CycleWS       (toggleWS)
-import XMonad.Actions.CycleRecentWS (cycleWindowSets)
+import qualified XMonad.Actions.CycleWS as CC
+import XMonad.Util.WorkspaceCompare (getSortByIndex)
 
 import Data.List    (isPrefixOf)
 
@@ -39,7 +40,8 @@ myKeys cfg = mkKeymap cfg $
   , ("M-S-d"      , spawn "r.dmenu -n")
   , ("M-C-d"      , spawn "j4-dmenu-desktop")
   , ("M-\\"       , kill)
-  -- cycle through all windows
+  , ("M-S-q"      , kill)
+  , ("M-C-S-\\"   , spawn "~/.i3/ctl/wnd_active_kill")
   ---- focus
   , ("M-h"        , windows W.focusMaster)
   , ("M-j"        , windows W.focusDown)
@@ -55,26 +57,33 @@ myKeys cfg = mkKeymap cfg $
   , ("M-S-,"      , sendMessage MirrorShrink)
   , ("M-S-."      , sendMessage MirrorExpand)
   -- Layouts
-  , ("M-a"        , toggleWS)
   , ("M-<Space>"  , sendMessage NextLayout)
-  -- , ("M-f"        , setLayout   $ avoidStruts Full)
+  , ("M-f"        , sendMessage $ Toggle MI.FULL)
+  , ("M-/"        , sendMessage $ Toggle MI.MIRROR)
   -- , ("M-w"        , withFocused $ windows . W.sink)
   , ("M-C-w"      , withFocused $ windows . W.sink)
   -- , ("M-S-w"      , withFocused $ windows . W.float)
   , ("M-S-<Space>", setLayout   $ XMonad.layoutHook cfg)
   ] ++
-  -- cycling :: FIXME:CHG: latching modifier
-  -- let visWs w = map (W.greedyView `flip` w) (visTags w)
-  --     hidWs w = map (W.greedyView `flip` w) (hidTags w)
-  --     rctWs w = map (W.view `flip` w)       (map ($ hidTags w) [head, last])
-  -- in [ ("M-<Tab>"  , cycleWindowSets visWs [xK_Super_L] xK_Tab xK_ISO_Left_Tab)
-  --    , ("M-S-<Tab>", cycleWindowSets hidWs [xK_Super_L] xK_ISO_Left_Tab xK_Tab)
-  --    , ("M-a"      , cycleWindowSets rctWs [xK_Super_L] xK_a xK_a)
-  -- ] ++
+  -- Cycle through workspaces
+  let moveToNE  = CC.moveTo  CC.Next CC.NonEmptyWS
+      shiftToNE = CC.shiftTo CC.Next CC.NonEmptyWS
+      moveToE   = CC.moveTo  CC.Next CC.EmptyWS
+      shiftToE  = CC.shiftTo CC.Next CC.EmptyWS
+  in [ ("M-a"        , CC.toggleWS)
+     -- , ("M-S-a"      , CC.shiftToPrev >> CC.toggleWS)
+     , ("M-S-a"      , windows (W.shift "0") >> windows (W.view "0"))
+     , ("M-<Tab>"    , moveToNE)
+     , ("M-S-<Tab>"  , shiftToNE >> moveToNE)
+     , ("M-C-<Tab>"  , moveToE)
+     , ("M-C-S-<Tab>", shiftToE >> moveToE)
+     ] ++
   -- workspaces
-  [ (m ++ i, windows $ f i) | i <- workspaces cfg
-    , (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
-  ] ++
+  let lws = [ ("M-"  , windows . W.view)
+            , ("M-C-", windows . W.shift)
+            , ("M-S-", \w -> windows (W.shift w) >> windows (W.view w))
+            ]
+  in [ (m ++ i, f i) | i <- workspaces cfg, (m, f) <- lws] ++
   -- shortcuts
   -- media
   [ ("M-<Print>" , spawn "~/.i3/ext/screenshot")
@@ -151,8 +160,8 @@ myCfg = ewmh $ defaultConfig
   , workspaces  = words "` 1 2 3 4 5 6 7 8 9 0 - ="
   , keys        = myKeys
   -- Hooks
-  -- , startupHook = setWMName "LG3D"
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
+  , startupHook = windows . W.view . (!!1) . workspaces $ myCfg
   , manageHook = manageHook defaultConfig <+> myManageHook <+> manageDocks
   -- layoutHook defaultConfig
   -- layoutHintsToCenter
@@ -165,7 +174,10 @@ myCfg = ewmh $ defaultConfig
   }
 
 
-myLayout = tiled ||| Mirror tiled ||| Full
+myLayout = smartBorders
+     . mkToggle (MI.NOBORDERS ?? MI.FULL ?? EOT)
+     . mkToggle (single MI.MIRROR)
+     $ tiled ||| simplestFloat -- ||| Grid ||| Circle
   where
     tiled   = ResizableTall nmaster delta ratio []
     nmaster = 1     -- number of windows in master pane
@@ -178,20 +190,23 @@ myManageHook = mconcat $
   [ myIgnores    --> doIgnore     -- Don't manage
   , myFloats     --> doFloat      -- Make floating
   , isFullscreen --> doFullFloat  -- Auto-fullscreen
+  -- for_window [title="^ElonaPlus"] fullscreen
   ] ++
   [ x --> doShift w | (x, w) <- myShifts ]  -- ALT: doF (W.shift "doc")
   where
     wmhas t l = [ t =? x | x <- words l ]
     myIgnores = foldr1 (<||>) $
       wmhas className "stalonetray" ++
-      wmhas resource  "panel desktop_window kdesktop"
+      wmhas appName "panel desktop_window kdesktop"
     myFloats = foldr1 (<||>) $
       [ ("Figure" `isPrefixOf`) <$> title, isDialog ] ++
-      wmhas className "Float feh Steam Gimp"
+      wmhas className "Float copyq feh Steam Gimp Pidgin Skype piony.py Transmission-gtk"
     myShifts = map (\(x, y) -> (className =? x, y)) $
       [ ("Firefox", "4")
+      , ("Krita", "5")
+      , ("t-engine64", "8")
+      , ("Steam", "9")
       ]
-
 
 myHandleEventHook = mconcat $
   [ handleEventHook defaultConfig

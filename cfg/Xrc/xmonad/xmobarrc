@@ -11,7 +11,7 @@ Config {
 , fgColor      = "#ffffff" -- "#a0a0a0"
 , alpha        = 230
 , font         = "xft:PragmataPro:size=10,DejaVu Sans Mono:size=10,Droid Sans Fallback Full:size=9"
-, additionalFonts = [] -- To use by index in 'template' field
+, additionalFonts = ["xft:PragmataPro:size=8,DejaVu Sans Mono:size=8"]  -- USE: template = "<fn=1>...</fn>"
 , iconOffset   = -1
 , textOffset   = -1
 , border       = NoBorder
@@ -23,7 +23,7 @@ Config {
 -- \<fc=#1b1d1e,#fd971f>  %kbd%</fc>\
 , template     = "%StdinReader%}{\
   \<fc=#cc8000>  </fc>\
-    \%mpd%\
+    \<fn=1>%mpd%</fn>\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%  %cpu%  %loadavg%  %memory% %swap%\
   \<fc=#0000cc>  </fc>\

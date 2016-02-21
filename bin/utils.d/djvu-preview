@@ -1,0 +1,44 @@
+#!/bin/bash -e
+
+# SEE:
+# http://dwebschools.blogspot.com/2013/01/how-to-convert-djvu-file-to-jpeg.html
+
+# USE:
+case "$1" in -g) shift
+    find . -type d | while read pdir; do (
+        echo "DIR: $pdir"
+        for nm in "$pdir"/*.djvu; do
+            [[ -f "$nm" ]] || continue
+            dst="${nm%/*}/%/${nm##*/}"
+            "$0" "$nm" "${dst%.djvu}.jpg"
+        done
+    ) done
+    exit
+esac
+
+
+path="$1"
+dst="$2"
+if [[ -z "$dst" ]]; then
+    dst="${path##*/}"
+    dst="${path%.*}.jpg"
+fi
+[[ -d "${dst%/*}" ]] || mkdir -p "${dst%/*}"
+
+
+grid='3x3'
+# size='400x600'  # '683x768'
+size='600x800'
+
+total=$(djvused -e n "$path")
+pages=$(awk -vN=$total -vG=$((${grid/x/*})) 'BEGIN{a=1;for(i=2;i<=G;i++){a=a","int(i*N/G)};print a}')
+frame="$((${size%%x*}/${grid%%x*}))x$((${size##*x}/${grid##*x}))"
+
+ddjvu -format=pnm -page="$pages" -size="$frame" "$path" \
+| montage - -font DejaVu-Sans-Mono -background none \
+    -tile "$grid" -geometry +2+2 "$dst"
+
+osize=$(stat -c%s "$dst")
+((osize/=1024))
+
+echo "${osize}kB [$total] $dst"

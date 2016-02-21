@@ -23,16 +23,20 @@ SEE
 		Blog
 			>> https://ro-che.info/docs/xmonad/
 			>>> http://lynnard.me/blog/2013/11/05/building-a-vim-like-xmonad-prompt-task-groups-topical-workspaces-float-styles-and-more/
+			>>>> http://lynnard.me/blog/2013/11/05/building-a-vim-like-xmonad-prompt-task-groups-topical-workspaces-float-styles-and-more/
 		Examples
 		: https://github.com/mcmaniac/xmonad/blob/master/xmonad.hs
 		: http://www.vicfryzel.com/2010/06/27/obtaining-a-beautiful-usable-xmonad-configuration/
 		: http://lpaste.net/52657
 		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
 		: https://github.com/vicfryzel/xmonad-config/blob/master/xmonad.hs
+		: http://www.cgogolin.de/downloads/xmonad.hs
 		: https://raw.githubusercontent.com/chtaube/xmonad-config/master/xmonad.hs
+		>> https://gist.github.com/kmels/2882350
 	Bar
 		https://wiki.archlinux.org/index.php/Xmobar
 		http://projects.haskell.org/xmobar/
+		>>> https://github.com/tsiliakis/xmobar
 
 ENH
 	Group/Sub-layout
@@ -45,6 +49,32 @@ TODO
 	Add menu to xmobar -- to control windows -- float/kill/move/resize
 		:= resize: latch mouse down and activate resizing
 		:	after resize you can simply click Mouse1 again
+	Fullscreen/layout
+		ToggleLayouts
+			: import XMonad.Layout.ToggleLayouts  (toggleLayouts, ToggleLayout(..))
+			: , ("M-f"        , sendMessage ToggleLayout)
+			: myLayout = toggleLayouts Full tiled ||| toggleLayouts Full (Mirror tiled)
+	Cycling
+		FIXME:CHG: latching modifier
+		: import XMonad.Actions.CycleRecentWS (cycleWindowSets)
+		: import Graphics.X11.ExtraTypes.XorgDefault  -- xK_ISO_Left_Tab
+		: let visWs w = map (W.greedyView `flip` w) (visTags w)
+		:     hidWs w = map (W.greedyView `flip` w) (hidTags w)
+		:     rctWs w = map (W.view `flip` w)       (map ($ hidTags w) [head, last])
+		: in [ ("M-<Tab>"  , cycleWindowSets visWs [xK_Super_L] xK_Tab xK_ISO_Left_Tab)
+		:    , ("M-S-<Tab>", cycleWindowSets hidWs [xK_Super_L] xK_ISO_Left_Tab xK_Tab)
+		:    , ("M-a"      , cycleWindowSets rctWs [xK_Super_L] xK_a xK_a)
+		: ] ++
+	Cycle through workspaces
+		: let followTo :: CC.Direction1D -> CC.WSType -> X ()
+		: followTo dir t = CC.doTo dir t getSortByIndex (\w -> (windows (W.shift w)) >> (windows (W.greedyView w)))
+	Floating
+		http://stackoverflow.com/questions/19975180/xmonad-toggle-a-window-between-floating-and-tiled
+		http://stackoverflow.com/questions/9157349/xmonad-when-floating-a-window-move-or-resize-it
+
+	wmname
+		: import XMonad.Hooks.SetWMName
+		: , startupHook = setWMName "LG3D"
 
 BUG
 	[_] compton casts shadow on border of windows, making it dim
@@ -55,3 +85,4 @@ BUG
 		:= scenario bad: press/release Alt, then click 'a', 'a'
 		:= maybe it's _double_ latching -- xmonad also treats *activator* as latcher
 		:> USE XMonad.Actions.CycleWS simpler functions
+	[_] xmobar 'M+C' -- then 'leds' -- "Could not execute command 'python3'"
