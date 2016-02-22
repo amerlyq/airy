@@ -1,7 +1,15 @@
 #!/bin/bash -e
 
+dml(){ dmenu ${1+-l $1} -b -p 'Vimb:' \
+    -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31AC65' \
+    -fn '-misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+}
+run(){ [[ -n "$1" ]] && vimb open "$1"; }
+
 case "$1"
-in -p) vimb open "$(xsel -ob)"
-;; -s) vimb -C 'set scripts=true' open "$@"
-;;  *) vimb open "$@"
+in -p) shift; run "$(xsel -ob)"
+;; -h) shift; run "$(dml 16 < ~/.config/vimb/history)"
+;; -g) shift; run "$(dml < ~/.config/vimb/search)"
+;; -s) shift; vimb -C 'set scripts=true' ${@+open} "$@"
+;;  *) vimb ${@+open} "$@"
 ;; esac

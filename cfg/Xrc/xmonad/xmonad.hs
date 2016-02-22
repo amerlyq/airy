@@ -129,13 +129,18 @@ myKeys cfg = mkKeymap cfg $
      , (mPrs "f", spawn "firefox")
      , (mPrs "h", spawn "r.tf -e htop")
      , (mPrs "n", spawn "r.tf -e ncmpcpp")
-     , (mPrs "m", spawn "~/.mpd/move_current")
      , (mPrs "p", spawn "pidgin")
      , (mPrs "k", spawn "~/.i3/ctl/run-focus k")
      -- r.tf -e gksudo powertop
      -- r.tf -e gksudo tlp start
      -- nemo --no-desktop
      -- /usr/lib/cinnamon-settings/cinnamon-settings.py sound
+  ] ++
+  let mPrompt = ("M-p " ++)
+  in [ (mPrompt "b", spawn "r.vimb -h")
+     , (mPrompt "g", spawn "r.vimb -g")
+     , (mPrompt "d", spawn "r.dict --vim")
+     , (mPrompt "m", spawn "~/.mpd/move_current")
   ] ++
   let mCopyq = ("M-z " ++)
   in [ (mCopyq "e", spawn "copyq edit")

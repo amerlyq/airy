@@ -1,6 +1,8 @@
 #!/bin/bash -e
 source ~/.shell/profile
 
+# ALT: NOTE failed to setup schroot.conf to export only choosen env variables.
+
 # USE: 'r.chroot 1' -- to load second chroot from list
 case "$1" in [0-9]) index=$1; shift ;; esac
 prf="${CURR_CHROOTS[${index:-0}]:?No}"
@@ -15,19 +17,14 @@ done < <(awk '/^\//{print$1}' /etc/schroot/default/fstab)
 [[ -n "$ismounted" || -d "$chroot$dir" ]] || dir=/cryptfs/workspace
 
 # EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
-schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT  ${@:+-c "$@"}
+schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT
 export SHELLRC_EVAL='\
     . /cryptfs/_/cfg/env;\
     . /cryptfs/_/cfg/bash_extension.sh;\
     export DISPLAY='$DISPLAY';\
     export EDITOR=vim'
 . ~/.profile
+${@:+"$@"
+exit}
 EOT
 )
-# ALT: NOTE failed to setup schroot.conf to export only choosen env variables.
-# schroot -c lucid_i386 -d "$dir" -- bash --rcfile <(echo "
-#     export SHELLRC_EVAL='. /cryptfs/_/cfg/env; . /cryptfs/_/cfg/bash_extension.sh'
-#     export DISPLAY='$DISPLAY'
-#     . ~/.bashrc
-#     EDITOR=vim
-# ") ${@:+-c $@}

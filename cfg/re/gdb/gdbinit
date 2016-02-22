@@ -66,11 +66,20 @@ define bta
   thread apply all bt full
 end
 
+define dis
+  if $argc == 1
+    disassemble $arg0-0x40, $arg0+0x20
+  end
+  if $argc == 2
+    disassemble $arg0-$arg1, $arg0+$arg1
+  end
+end
+
 # Print disassembled frames
 define frdis
   if $argc == 0
     info frame
-    disassemble $pc-0x30 $pc+0x30
+    disassemble $pc-0x30, $pc+0x30
   end
   if $argc == 1
     set $i = 0
@@ -86,6 +95,7 @@ define frdis
     while( $i <= $arg1 )
       frame $i
       info frame
+      info registers
       disassemble
       set $i = $i + 1
     end
