@@ -3,8 +3,7 @@ source ~/.shell/func.d/cfgsetup
 [[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD/xmonad.hs" ~/.xmonad/xmonad.hs
-link "$PWD/xmobarrc" ~/.xmobarrc
+link -t ~/.xmonad "xmonad.hs" "xmobarrc"
 link "$PWD/stalonetrayrc" ~/.stalonetrayrc
 # mkdef x-window-manager $(which i3)
 
@@ -13,4 +12,5 @@ link "$PWD/stalonetrayrc" ~/.stalonetrayrc
 
 if cfgOpt u; then
     xmonad --recompile
+    ! has_pr X || xmonad --restart
 fi

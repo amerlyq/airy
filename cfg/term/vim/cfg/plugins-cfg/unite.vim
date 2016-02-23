@@ -25,6 +25,7 @@ if neobundle#tap('unite.vim') "{{{
     exe m.'noremap <unique><silent> [Unite]'.c
           \.' :Unite -buffer-name='.r.'<CR>'
   endfor| endfor
+  noremap <unique><silent> <S-Tab> :UniteResume<CR>
 
   fun! neobundle#hooks.on_source(bundle)
     call _cfg('plugins-cfg/unite/*.vim')

@@ -8,3 +8,7 @@ mkdef x-window-manager $(which i3)
 
 ### GENS ###
 THEME=$THEME ./i3-config.gen
+
+if cfgOpt u && has_pr X; then
+    i3-msg restart </dev/tty >/dev/null 2>&1 ||:
+fi

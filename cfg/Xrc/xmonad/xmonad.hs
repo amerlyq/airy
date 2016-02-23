@@ -10,8 +10,10 @@ import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, S
 import XMonad.Hooks.ManageHelpers   (isFullscreen, doFullFloat, isDialog)
 import XMonad.Layout.LayoutHints    (layoutHintsToCenter, hintsEventHook)  -- honor size hints
 import XMonad.Layout.NoBorders      (smartBorders)  -- no borders on fullscreen
-import XMonad.Layout.ResizableTile  (ResizableTall(..), MirrorResize(..))
+import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
 import XMonad.Layout.SimplestFloat  (simplestFloat)
+import XMonad.Layout.Grid           (Grid(..))
+import XMonad.Layout.Circle         (Circle(..))
 import XMonad.Layout.MultiToggle    (mkToggle, Toggle(..), single, (??), EOT(..))
 import qualified XMonad.Layout.MultiToggle.Instances as MI
 
@@ -56,6 +58,8 @@ myKeys cfg = mkKeymap cfg $
   , ("M-."        , sendMessage Expand)
   , ("M-S-,"      , sendMessage MirrorShrink)
   , ("M-S-."      , sendMessage MirrorExpand)
+  , ("M-["        , sendMessage $ IncMasterN   1)
+  , ("M-]"        , sendMessage $ IncMasterN (-1))
   -- Layouts
   , ("M-<Space>"  , sendMessage NextLayout)
   , ("M-f"        , sendMessage $ Toggle MI.FULL)
@@ -182,7 +186,7 @@ myCfg = ewmh $ defaultConfig
 myLayout = smartBorders
      . mkToggle (MI.NOBORDERS ?? MI.FULL ?? EOT)
      . mkToggle (single MI.MIRROR)
-     $ tiled ||| simplestFloat -- ||| Grid ||| Circle
+     $ tiled ||| simplestFloat ||| Grid ||| Circle
   where
     tiled   = ResizableTall nmaster delta ratio []
     nmaster = 1     -- number of windows in master pane
@@ -227,15 +231,19 @@ myPP = xmobarPP
   , ppSep     = xmobarColor "#fd971f" "" " \xe0b1 "           -- separator between elements
   , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
   , ppHidden  = \w -> if elem w (workspaces myCfg) then w else ""  -- only predefined by me
-  , ppLayout  = \n -> case n of                               -- short 'titles' for layouts
+  , ppLayout  = \nm -> case nm of                             -- short 'titles' for layouts
       "Full" -> "[ ]"
       "ResizableTall" -> "[|]"
       "Mirror ResizableTall" -> "[-]"
-      _ -> n
+      "Grid" -> "[#]"
+      "SimplestFloat" -> "( )"
+      "Circle" -> "(O)"
+      _ -> nm
   }
 
 
 main :: IO ()
-main = xmonad =<< statusBar "xmobar" myPP toggleStrutsKey myCfg
+main = xmonad =<< statusBar myCmdStatus myPP toggleStrutsKey myCfg
   where
+    myCmdStatus = "xmobar ~/.xmonad/xmobarrc"
     toggleStrutsKey XConfig { XMonad.modMask = modMask } = (modMask, xK_b)  -- xK_Escape

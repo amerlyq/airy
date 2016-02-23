@@ -1,17 +1,17 @@
 #!/bin/sh
 
 case $BLOCK_BUTTON in
-    1) ~/.i3/ext/lang + ;;
-    3) ~/.i3/ext/lang 0 ;;
+    1) r.xkb-lang + ;;
+    3) r.xkb-lang 0 ;;
     *) ;;
 esac
 
-INDEX=$( ~/.i3/ext/lang )
+LG=$( r.xkb-lang -n )
 
-case "${INDEX}" in
-    0) LG=US; color="#00AE00" ;;
-    1) LG=RU; color="#009EAF" ;;
-    2) LG=UA; color="#FFAA00" ;;
+case "${LG}" in
+    0) color="#00AE00" ;;
+    1) color="#009EAF" ;;
+    2) color="#FFAA00" ;;
     *) color="#C60101" ;;
 esac
 

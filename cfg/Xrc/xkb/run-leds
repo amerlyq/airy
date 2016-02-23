@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-from subprocess import check_output, CalledProcessError
+import sys
 import re
+from subprocess import check_output, CalledProcessError
 
 ''' Braile bits:
  1 4  | cyan  yellow |
@@ -38,6 +39,9 @@ code = 0x2800 + sum([(1 << i) for i, b in enumerate(state) if b])
 tr = list(map(list, zip(*[colors[i] for i, b in enumerate(state) if b])))
 
 ss = list(map(sum, tr)) if tr else [1, 1, 1]
-clr = "%02X"*3 % tuple(map(lambda v: v*255 // max(ss), ss))
+clr = "%02X"*3 % tuple(int(v * 255 / max(ss)) for v in ss)
 
-print("{0:c}\n{0:c}\n#{1:s}".format(code, clr))
+if len(sys.argv) > 1 and sys.argv[1] == 'i3':
+    print("{0:c}\n{0:c}\n#{1:s}".format(code, clr))
+else:
+    print("{0:c}".format(code))

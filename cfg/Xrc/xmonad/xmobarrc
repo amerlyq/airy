@@ -11,6 +11,7 @@ Config {
 , fgColor      = "#ffffff" -- "#a0a0a0"
 , alpha        = 230
 , font         = "xft:PragmataPro:size=10,DejaVu Sans Mono:size=10,Droid Sans Fallback Full:size=9"
+-- BUG: japanese can't be derived from additionalFonts?
 , additionalFonts = ["xft:PragmataPro:size=8,DejaVu Sans Mono:size=8"]  -- USE: template = "<fn=1>...</fn>"
 , iconOffset   = -1
 , textOffset   = -1
@@ -63,9 +64,9 @@ Config {
   , "-M", "30", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
   ] 50
 -- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
-, Run Com "awk" [ "{print $1}", "/proc/loadavg" ] "loadavg" 10
-, Run Com "sh" ["/home/amerlyq/.i3/blocks/language"] "lang" 10
-, Run Com "python3" ["/home/amerlyq/.i3/blocks/leds"] "leds" 10
+, Run Com "awk" [ "{print$1}", "/proc/loadavg" ] "loadavg" 10
+, Run Com "r.xkb-lang" [ "-N" ] "lang" 10
+, Run Com "r.xkb-leds" [] "leds" 10
 , Run Swap
   [ "-t", "<usedratio>%" ] 100
 , Run Brightness

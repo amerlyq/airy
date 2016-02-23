@@ -2,10 +2,19 @@
 # SHOW all dbus services
 #   qdbus-qt4
 
+# TODO: extract from ${CURR_XKB_LANG}
+LG=(us ru ua)
+
 # LG=$(setxkbmap -query | awk '/layout/{print toupper($2)}')
 
 # LG=$(xkb-switch -p | sed 's/am(\(.*\))\|\(\w\+\)/\U\1\2/')
 # $exno xkb-switch -s us [ru ua]
+
+WM=$(wmctrl -m | awk 'NR==1{print$2}')
+case "$WM"
+in i3) notifywm(){ ~/.i3/blocks/update lang; }
+;;  *) notifywm(){ :; }
+esac
 
 # Those maps drop focus from input fields in browser.
 #   Better use own layout switcher in ~/.Xrc/xkb
@@ -13,18 +22,19 @@ get_current() { qdbus ru.gentoo.KbddService \
     /ru/gentoo/KbddService ru.gentoo.kbdd.getCurrentLayout; }
 
 change() { dbus-send --dest=ru.gentoo.KbddService \
-    /ru/gentoo/KbddService ru.gentoo.kbdd.$@; }
+    /ru/gentoo/KbddService ru.gentoo.kbdd.$@; notifywm; }
 
 setnum() { change "set_layout uint32:$1"; }
 
-case "$1" in
-[0-9]) setnum $1 ;;
-   us) setnum 0 ;;
-   ru) setnum 1 ;;
-   ua) setnum 2 ;;
-    +) change 'next_layout' ;;
-    -) change 'next_layout' ;;
-    *) get_current ;;
-esac
+translate() { [[ $1 == -n ]] && echo ${LG[$2],,} || echo ${LG[$2]^^}; }
 
-~/.i3/blocks/update lang
+case "$1"
+in [0-9]) setnum $1
+;; -[nN]) translate $1 "$(get_current)"
+;; us) setnum 0
+;; ru) setnum 1
+;; ua) setnum 2
+;;  +) change 'next_layout'
+;;  -) change 'prev_layout'
+;; *) get_current
+esac

@@ -1,8 +1,18 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+#| bbe | binary sed
+# SEE:
+# http://xyne.archlinux.ca/projects/hexgrep/
+
 pkg_inst "lsof strace ltrace"
-aur_inst "xtrace-git"
+
+if distro arch; then
+    pkg_inst "bbe"
+    aur_inst "xtrace-git"
+elif distro ubuntu; then
+    pkg_inst ""
+fi
 
 # For ida:
 # paci wine wine-mono wine_gecko
