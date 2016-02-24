@@ -74,37 +74,32 @@ no_shrink true
 
 # parent_bg [<bool>]         # whether to use pseudo-transparency
                              # (looks better when reparented into smth like FvwmButtons)
-parent_bg true
+parent_bg false
 
 # pixmap_bg <path_to_xpm>    # use pixmap from specified xpm file for (tiled) background
 # pixmap_bg /home/user/.stalonetraybg.xpm
 
-# scrollbars <mode>          # enable/disable scrollbars; mode is either
-                             # vertical, horizontal, all or none (default)
-                             # NEW in 0.8.
-scrollbars none
+# none/vertical/horizontal/all -- use M1/MWheel
+scrollbars horizontal
 
-# scrollbars-size <size>     # scrollbars step in pixels; default is slot_size / 4
+# scrollbars-size <size>     # scrollbars step in pixels; def: slot_size / 4
 # scrollbars-step 8
 
-# scrollbars-step <step>     # scrollbars step in pixels; default is slot_size / 2
+# scrollbars-step <step>     # scrollbars step in pixels; def: slot_size / 2
 # scrollbars-step 32
 
-# slot_size <int>            # specifies size of icon slot, defaults to
-                             # icon_size NEW in 0.8.
+# slot_size <int>            # specifies size of icon slot, def: icon_size
 
-# skip_taskbar [<bool>]      # hide tray`s window from the taskbar
+# hide tray`s window from the taskbar
 skip_taskbar true
 
-# sticky [<bool>]            # make a tray`s window sticky across the
-                             # desktops/pages
+# make a tray`s window sticky across the desktops/pages
 sticky true
 
-# tint_color <color>         # set tinting color
-tint_color white
+# set tinting color
+tint_color "#000000"
 
-# tint_level <level>         # set tinting level; level ranges from 0 (disabled)
-                             # to 255
+# set tinting level (disabled) [0..255]
 tint_level 0
 
 # whether to use root-transparency (bkgr image must be set with Esetroot or compatible utility)

@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# ALT: add(s); popup("",s,1000)
+case "$1"
+in  [0-9]) copyq select "$1"
+;; +[0-9]) copyq eval 'var s="",i='"$1"'; while(i-->0) s+=str(read(i)); copy(s)'
+;; -[0-9]) copyq eval 'var s="",i=0; while(i++<'"$1"') s+=str(read(i)); copy(s)'
+esac 2>&1 >/dev/null

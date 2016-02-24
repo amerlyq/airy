@@ -44,6 +44,10 @@ case "$CURR_PROF" in home|laptop|gnote4)
     wacc land   $VAND_IPL   $VAND_USER
 ;; esac
 
+case "$CURR_PROF" in work)
+    wacc buld   $BULD_IPL $BULD_USER
+;; esac
+
 case "$CURR_PROF" in work_samsung)
     wacc srk    $SRK_IPL    $SRK_USER    srk_rsa
     wacc amazon $AMAZON_SRV $AMAZON_USER seclab-cloud.pem

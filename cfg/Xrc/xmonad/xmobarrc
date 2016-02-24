@@ -6,7 +6,7 @@ Config {
 , allDesktops  = True
 , pickBroadest = False
 , overrideRedirect = False
-, position     = BottomP 0 45  -- Bottom
+, position     = BottomP 0 56  -- Bottom
 , bgColor      = "#000000" -- "#1b1d1e"
 , fgColor      = "#ffffff" -- "#a0a0a0"
 , alpha        = 230
@@ -22,12 +22,13 @@ Config {
 , sepChar      = "%"
 , alignSep     = "}{"
 -- \<fc=#1b1d1e,#fd971f>  %kbd%</fc>\
+-- \<fn=1>%mpd%</fn>\
 , template     = "%StdinReader%}{\
   \<fc=#cc8000>  </fc>\
-    \<fn=1>%mpd%</fn>\
+    \%mpd%\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%  %cpu%  %loadavg%  %memory% %swap%\
-  \<fc=#0000cc>  </fc>\
+  \<fc=#0080cc>  </fc>\
     \%battery% %default:Master% %bright%\
   \<fc=#cc00cc>  </fc>\
     \%lang% %leds% %date% "

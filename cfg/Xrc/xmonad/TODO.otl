@@ -17,9 +17,14 @@ SEE
 	Xmonad
 		Ref
 			https://wiki.haskell.org/Xmonad
-			> https://wiki.haskell.org/Xmonad/General_xmonad.hs_config_tips
+			: http://xmonad.org/xmonad-docs/xmonad/XMonad-Operations.html
+			:	CHECK: hide/reveal
+			: http://xmonad.org/xmonad-docs/xmonad/XMonad-StackSet.html
+			SEE
+				https://wiki.haskell.org/Xmonad/General_xmonad.hs_config_tips
+				https://wiki.haskell.org/Xmonad/Frequently_asked_questions
 			>>> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html#Editing_key_bindings
-			http://xmonad.org/xmonad-docs/xmonad/XMonad-StackSet.html
+			: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html
 		Blog
 			>> https://ro-che.info/docs/xmonad/
 			>>> http://lynnard.me/blog/2013/11/05/building-a-vim-like-xmonad-prompt-task-groups-topical-workspaces-float-styles-and-more/
@@ -38,12 +43,26 @@ SEE
 		http://projects.haskell.org/xmobar/
 		>>> https://github.com/tsiliakis/xmobar
 
-ENH
-	Group/Sub-layout
-		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-Groups.html
-		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-SubLayouts.html
+THINK:ENH
 	Alt navi
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-Navigation2D.html
+		http://stackoverflow.com/questions/27747079/xmonad-is-there-a-way-to-bind-a-simultaneously-triggered-keychord
+	Menu pop
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-Commands.html
+	[_] M-a -- instead toggleWS use nextMatch/History?
+	[_] Each $ xmonad --restart # drops to wksp 1
+		how to make that action only from ~/.xinitrc but not when restart manually?
+		:= so, it must work on startuHook but not on --restart
+	[_] gmrun
+	[_] xkill
+	[_] Modular Configuration
+		: As of xmonad-0.9, any additional Haskell modules may be placed in ~/.xmonad/lib/ are available in GHC's searchpath. Hierarchical modules are supported: for example, the file ~/.xmonad/lib/XMonad/Stack/MyAdditions.hs could contain:
+		; module XMonad.Stack.MyAdditions (function1) where
+		; 	function1 = error "function1: Not implemented yet!"
+		: Your xmonad.hs may then import XMonad.Stack.MyAdditions as if that module was contained within xmonad or xmonad-contrib.
+	[_] RFC: 'let mCopyq = ("M-z " ++)' extract as function applying to list to create submaps
+	[_] optimize map lambda on tuple's 1st/2nd element -- CHECK: \f -> map (f *** id)
+		http://stackoverflow.com/questions/10818779/can-i-map-the-first-element-of-a-pair-without-arrows
 
 TODO
 	Add menu to xmobar -- to control windows -- float/kill/move/resize
@@ -66,17 +85,46 @@ TODO
 		:    , ("M-a"      , cycleWindowSets rctWs [xK_Super_L] xK_a xK_a)
 		: ] ++
 	Cycle through workspaces
+		: import XMonad.Util.WorkspaceCompare (getSortByIndex)
 		: let followTo :: CC.Direction1D -> CC.WSType -> X ()
 		: followTo dir t = CC.doTo dir t getSortByIndex (\w -> (windows (W.shift w)) >> (windows (W.greedyView w)))
-	Floating
-		http://stackoverflow.com/questions/19975180/xmonad-toggle-a-window-between-floating-and-tiled
-		http://stackoverflow.com/questions/9157349/xmonad-when-floating-a-window-move-or-resize-it
-
 	wmname
 		: import XMonad.Hooks.SetWMName
 		: , startupHook = setWMName "LG3D"
 
+
+FIND:(how to)
+	[_] toggle two different actions on one keybind?
+	[_] combine actions in keybindings
+		http://superuser.com/questions/562653/xmonad-bind-key-to-chain-of-commands
+
+
+FIXME
+	[_] focus back from master
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-GroupNavigation.html
+		> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-CycleWindows.html
+	[_] open new windows as slave (don't replace / keep master)
+		THINK:ENH: https://mail.haskell.org/pipermail/xmonad/2009-October/008930.html
+		:> manageHook = (doF W.swapDown) <+> manageHook defaultConfig
+	[_] stacking/tabbed layout as in i3
+		> https://www.reddit.com/r/xmonad/comments/g5z3g/ask_rxmonad_tabbed_master_area/
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-Tabbed.html
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-SubLayouts.html
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-Groups.html
+	[_] control floating window
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-FloatKeys.html
+		http://stackoverflow.com/questions/9157349/xmonad-when-floating-a-window-move-or-resize-it
+		http://stackoverflow.com/questions/19975180/xmonad-toggle-a-window-between-floating-and-tiled
+		> http://unix.stackexchange.com/questions/30865/dragging-and-resizing-floating-windows-in-xmonad-without-the-modkey
+	[_] toggle workspace on M-[0-9] back and forth
+	[_] move current window to prev WS
+		: ("M-S-a"      , shiftToPrev >> toggleWS)
+	[_]	force spawn on master pane
+		: ("M-S-u"      , spawn "r.t" >> windows W.swapMaster)
+
+
 BUG
+	[_] floating windows can be located deeper then tailed after restart?
 	[_] compton casts shadow on border of windows, making it dim
 		:= new window becomes master and placed on the top
 		:= NEED: to always place active window to top of the stack

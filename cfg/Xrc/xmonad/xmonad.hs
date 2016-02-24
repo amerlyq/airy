@@ -1,53 +1,51 @@
 -- vim: ts=2:sw=2:sts=2
 module Main (main) where
 
+---- Std
+import Data.List    (isPrefixOf)
+import System.IO
+import System.Exit
+
+---- Core
 import XMonad
 import XMonad.Config.Desktop
+import XMonad.Util.EZConfig         (mkKeymap)
 
+---- Actions
+import XMonad.Actions.CycleWS       (moveTo, shiftTo, toggleWS, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import qualified XMonad.Actions.GroupNavigation as GN
+
+---- Hooks
 import XMonad.Hooks.DynamicLog      (statusBar, xmobarPP, xmobarColor, PP(..))
 import XMonad.Hooks.EwmhDesktops    (ewmh, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, SetStruts(..), ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers   (isFullscreen, doFullFloat, isDialog)
-import XMonad.Layout.LayoutHints    (layoutHintsToCenter, hintsEventHook)  -- honor size hints
-import XMonad.Layout.NoBorders      (smartBorders)  -- no borders on fullscreen
-import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
-import XMonad.Layout.SimplestFloat  (simplestFloat)
+import XMonad.Hooks.InsertPosition  (insertPosition, Position(Below), Focus(Newer))
+
+---- Layouts
+import qualified XMonad.StackSet as W
+-- basis
+import XMonad.Layout.Tabbed         (simpleTabbed)
 import XMonad.Layout.Grid           (Grid(..))
 import XMonad.Layout.Circle         (Circle(..))
+import XMonad.Layout.SimplestFloat  (simplestFloat)
+-- modifiers
+import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
+import XMonad.Layout.PerWorkspace   (onWorkspace)
 import XMonad.Layout.MultiToggle    (mkToggle, Toggle(..), single, (??), EOT(..))
-import qualified XMonad.Layout.MultiToggle.Instances as MI
-
-import XMonad.Util.EZConfig         (additionalKeys, mkKeymap)
-
-import qualified XMonad.StackSet as W
-import qualified XMonad.Actions.CycleWS as CC
-import XMonad.Util.WorkspaceCompare (getSortByIndex)
-
-import Data.List    (isPrefixOf)
-
-import System.IO
-import System.Exit
+import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDERS))
+-- decorators
+import XMonad.Layout.LayoutHints    (layoutHintsToCenter, hintsEventHook)  -- honor size hints
+import XMonad.Layout.NoBorders      (smartBorders)  -- no borders on fullscreen
 
 
 myKeys cfg = mkKeymap cfg $
-  [ ("M-u"        , spawn $ terminal cfg)
-  , ("M-C-u"      , spawn "~/.i3/ctl/run-cwd")
--- bindsym $mSd+u split vertical  , $exno r.t
--- bindsym $mCS+u split horizontal, $exno r.t
-  , ("M-<Return>" , spawn "r.t -e zsh -ic r.ranger")
-  , ("M-C-<Return>", spawn "r.tf")
-  , ("M-S-<Return>", spawn "r.tf -e r.ranger")
-  , ("M-A-<Return>", spawn "r.tf -e r.python")
-  , ("M-d"        , spawn "r.dmenu")
-  , ("M-S-d"      , spawn "r.dmenu -n")
-  , ("M-C-d"      , spawn "j4-dmenu-desktop")
-  , ("M-\\"       , kill)
-  , ("M-S-q"      , kill)
-  , ("M-C-S-\\"   , spawn "~/.i3/ctl/wnd_active_kill")
   ---- focus
-  , ("M-h"        , windows W.focusMaster)
+  [ ("M-h"        , windows W.focusMaster)
   , ("M-j"        , windows W.focusDown)
   , ("M-k"        , windows W.focusUp)
+  , ("M-l"        , GN.nextMatch GN.History (return True))
+  , ("M-'"        , GN.nextMatchWithThis GN.Backward className)
   ---- swap
   , ("M-S-h"      , windows W.swapMaster)
   , ("M-S-l"      , windows W.shiftMaster)
@@ -58,109 +56,147 @@ myKeys cfg = mkKeymap cfg $
   , ("M-."        , sendMessage Expand)
   , ("M-S-,"      , sendMessage MirrorShrink)
   , ("M-S-."      , sendMessage MirrorExpand)
-  , ("M-["        , sendMessage $ IncMasterN   1)
-  , ("M-]"        , sendMessage $ IncMasterN (-1))
-  -- Layouts
-  , ("M-<Space>"  , sendMessage NextLayout)
-  , ("M-f"        , sendMessage $ Toggle MI.FULL)
-  , ("M-/"        , sendMessage $ Toggle MI.MIRROR)
+  , ("M-;"        , sendMessage . IncMasterN $  1)
+  , ("M-S-;"      , sendMessage . IncMasterN $ -1)
+  ---- float
   -- , ("M-w"        , withFocused $ windows . W.sink)
   , ("M-C-w"      , withFocused $ windows . W.sink)
   -- , ("M-S-w"      , withFocused $ windows . W.float)
-  , ("M-S-<Space>", setLayout   $ XMonad.layoutHook cfg)
+  -- Layouts
+  , ("M-n"        , sendMessage NextLayout)
+  , ("M-S-n"      , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
+  , ("M-f"        , sendMessage $ Toggle FULL)
+  , ("M-/"        , sendMessage $ Toggle MIRROR)
   ] ++
   -- Cycle through workspaces
-  let moveToNE  = CC.moveTo  CC.Next CC.NonEmptyWS
-      shiftToNE = CC.shiftTo CC.Next CC.NonEmptyWS
-      moveToE   = CC.moveTo  CC.Next CC.EmptyWS
-      shiftToE  = CC.shiftTo CC.Next CC.EmptyWS
-  in [ ("M-a"        , CC.toggleWS)
-     -- , ("M-S-a"      , CC.shiftToPrev >> CC.toggleWS)
+  let focusNextNE = moveTo  Next NonEmptyWS
+      focusPrevNE = moveTo  Prev NonEmptyWS
+      shiftNextNE = shiftTo Next NonEmptyWS
+      shiftPrevNE = shiftTo Prev NonEmptyWS
+      -- moveToE   = moveTo  Next EmptyWS
+      -- shiftToE  = shiftTo Next EmptyWS
+  in [ ("M-a"        , toggleWS)
+     --FIXME: , ("M-S-a"      , shiftToPrev >> toggleWS)
      , ("M-S-a"      , windows (W.shift "0") >> windows (W.view "0"))
-     , ("M-<Tab>"    , moveToNE)
-     , ("M-S-<Tab>"  , shiftToNE >> moveToNE)
-     , ("M-C-<Tab>"  , moveToE)
-     , ("M-C-S-<Tab>", shiftToE >> moveToE)
-     ] ++
-  -- workspaces
-  let lws = [ ("M-"  , windows . W.view)
-            , ("M-C-", windows . W.shift)
-            , ("M-S-", \w -> windows (W.shift w) >> windows (W.view w))
-            ]
-  in [ (m ++ i, f i) | i <- workspaces cfg, (m, f) <- lws] ++
-  -- shortcuts
-  -- media
-  [ ("M-<Print>" , spawn "~/.i3/ext/screenshot")
-  , ("M-y"       , spawn "r.dict --vim")
-  ---- volume
-  , ("M-<Home>"     , spawn "~/.i3/ext/volume 20%")
-  , ("M-<Page_Up>"  , spawn "~/.i3/ext/volume 2%+")
-  , ("M-<Page_Down>", spawn "~/.i3/ext/volume 2%-")
-  , ("M-<End>"      , spawn "~/.i3/ext/volume")
-  , ("<XF86AudioRaiseVolume>", spawn "~/.i3/ext/volume 2%+")
-  , ("<XF86AudioLowerVolume>", spawn "~/.i3/ext/volume 2%-")
-  , ("<XF86AudioMute>"       , spawn "~/.i3/ext/volume")
-  ---- mpd
-  , ("M-S-<Home>"      , spawn "mpc toggle")
-  , ("M-S-<Page_Up>"   , spawn "mpc prev")
-  , ("M-S-<Page_Down>" , spawn "mpc next")
-  , ("M-S-<End>"       , spawn "mpc seek +5 >/dev/null")
-  , ("<XF86Tools>"     , spawn "r.tf ncmpcpp")
-  , ("<XF86AudioPlay>" , spawn "mpc toggle")
-  , ("<XF86AudioNext>" , spawn "mpc next")
-  , ("<XF86AudioPrev>" , spawn "mpc prev")
-  , ("<XF86AudioStop>" , spawn "mpc stop")
-  , ("<XF86AudioPause>", spawn "mpc pause")
-  ---- misc
-  , ("<XF86Mail>"      , spawn "r.tf -e mutt")
-  , ("<XF86Search>"    , spawn "r.vimb -p")
-  , ("<XF86Calculator>", spawn "r.tf -e ipython")
-  , ("<XF86Sleep>"     , spawn "xset -d :0 dpms force off")
+     , ("M-<Tab>"    , focusNextNE)
+     , ("M-S-<Tab>"  , focusPrevNE)
+     , ("M-C-<Tab>"  , shiftNextNE >> focusNextNE)
+     , ("M-C-S-<Tab>", shiftPrevNE >> focusPrevNE)
+     -- , ("M-C-<Tab>"  , moveToE)
+     -- , ("M-C-S-<Tab>", shiftToE >> moveToE)
+     ]
+  ++
+  ---- Workspaces
+  [ (m ++ i, f i) | i <- workspaces cfg, (m, f) <-
+    [ ("M-"  , windows . W.view)
+    , ("M-C-", windows . W.shift)
+    , ("M-S-", \w -> windows (W.shift w) >> windows (W.view w))
+    --THINK:ALT:, ("M-S-", windows . W.shift >> windows . W.view)
+    ]
   ] ++
-  -- Submenus
-  ---- xmonad
-  let mWM = ("M-S-<Esc> " ++)
-  in [ (mWM "o" , io exitSuccess)
-     , (mWM "r" , spawn "sudo reboot")
-     , (mWM "t" , spawn "sudo poweroff")
-     , ("M-S-z"          , spawn "~/.i3/ext/i3exit lock")
-     , ("M-S-<Backspace>", restart "xmonad" True)
-     ] ++
-     [ (mWM i, spawn $ "xbacklight -set " ++ i ++ "0") | i <- map show [0..9]
+  ---- Shortcuts
+  spawnAll
+    [ ("M-u" , terminal cfg)
+    --FIXME: , ("M-S-u"      , spawn "r.t" >> windows W.swapMaster)
+    , ("M-C-u"        , "~/.i3/ctl/run-cwd")
+    , ("M-<Return>"   , "r.t -e zsh -ic r.ranger")
+    , ("M-C-<Return>" , "r.tf")
+    , ("M-S-<Return>" , "r.tf -e r.ranger")
+    , ("M-A-<Return>" , "r.tf -e r.python")
+    , ("M-d"          , "r.dmenu")
+    , ("M-S-d"        , "r.dmenu -n")
+    , ("M-C-d"        , "j4-dmenu-desktop")
+    , ("M-<Print>"    , "~/.i3/ext/screenshot")
+    , ("M-y"          , "r.dict --vim")
+    ] ++
+  spawnAll (feedCmd "~/.i3/ext/volume"
+    [ ("M-<Home>"     , "20%")
+    , ("M-<Page_Up>"  , "2%+")
+    , ("M-<Page_Down>", "2%-")
+    , ("M-<End>"      , "")
+    , ("<XF86AudioRaiseVolume>", "2%+")
+    , ("<XF86AudioLowerVolume>", "2%-")
+    , ("<XF86AudioMute>"       , "")
+    ]) ++
+  spawnAll (feedCmd "mpc"
+    [ ("M-S-<Home>"      , "toggle")
+    , ("M-S-<Page_Up>"   , "prev")
+    , ("M-S-<Page_Down>" , "next")
+    , ("M-S-<End>"       , "seek +5 >/dev/null")
+    , ("<XF86AudioPlay>" , "toggle")
+    , ("<XF86AudioNext>" , "next")
+    , ("<XF86AudioPrev>" , "prev")
+    , ("<XF86AudioStop>" , "stop")
+    , ("<XF86AudioPause>", "pause")
+    ]) ++
+  spawnAll  -- misc
+    [ ("<XF86Tools>"     , "r.tf ncmpcpp")
+    , ("<XF86Mail>"      , "r.tf -e mutt")
+    , ("<XF86Search>"    , "r.vimb -p")
+    , ("<XF86Calculator>", "r.tf -e ipython")
+    , ("<XF86Sleep>"     , "xset -d :0 dpms force off")
+    ] ++
+  ---- System
+  [ ("M-\\"     , kill)
+  , ("M-S-q"    , kill)
+  , ("M-C-S-\\" , spawn "~/.i3/ctl/wnd_active_kill")
+  , ("M-S-z"          , spawn "~/.i3/ext/i3exit lock")
+  , ("M-S-<Backspace>", restart "xmonad" True)
   ] ++
-  let mPrs = ("M-o " ++)
-  in [ (mPrs "b", spawn "vimb")
-     , (mPrs "f", spawn "firefox")
-     , (mPrs "h", spawn "r.tf -e htop")
-     , (mPrs "n", spawn "r.tf -e ncmpcpp")
-     , (mPrs "p", spawn "pidgin")
-     , (mPrs "k", spawn "~/.i3/ctl/run-focus k")
-     -- r.tf -e gksudo powertop
-     -- r.tf -e gksudo tlp start
-     -- nemo --no-desktop
-     -- /usr/lib/cinnamon-settings/cinnamon-settings.py sound
-  ] ++
-  let mPrompt = ("M-p " ++)
-  in [ (mPrompt "b", spawn "r.vimb -h")
-     , (mPrompt "g", spawn "r.vimb -g")
-     , (mPrompt "d", spawn "r.dict --vim")
-     , (mPrompt "m", spawn "~/.mpd/move_current")
-  ] ++
-  let mCopyq = ("M-z " ++)
-  in [ (mCopyq "e", spawn "copyq edit")
-     , (mCopyq "o", spawn "copyq toggle")
-     , (mCopyq "m", spawn "copyq menu")
-     , (mCopyq "a", spawn "copyq enable")
-     , (mCopyq "d", spawn "copyq disable")
-     ] ++ [ (mCopyq i, spawn $ "copyq select " ++ i) | i <- map show [0..9]
-  ]
+  ---- Submenus
+  --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
+  inGroup "M-S-<Esc>"  -- xmonad
+    [ ("o", io exitSuccess)
+    , ("n", refresh)  -- workspace normalizing (resize)
+    , ("r", spawn "sudo reboot")
+    , ("t", spawn "sudo poweroff")
+    ] ++
+  spawnMenu "M-S-<Esc>" (feedCmd "xbacklight -set"
+    [ (i, i ++ "0") | i <- map show [0..9]
+    ]) ++
+  spawnMenu "M-o"
+    [ ("b", "r.vimb")
+    , ("f", "firefox")
+    , ("h", "r.tf -e htop")
+    , ("n", "r.tf -e ncmpcpp")
+    , ("p", "pidgin")
+    , ("s", "skype")
+    , ("k", "~/.i3/ctl/run-focus k")
+    -- r.tf -e gksudo powertop
+    -- r.tf -e gksudo tlp start
+    -- nemo --no-desktop
+    -- /usr/lib/cinnamon-settings/cinnamon-settings.py sound
+    ] ++
+  spawnMenu "M-p"
+    [ ("b", "r.vimb -h")
+    , ("g", "r.vimb -g")
+    , ("d", "r.dict --vim")
+    , ("m", "~/.mpd/move_current")
+    ] ++
+  spawnMenu "M-z" (feedCmd "copyq"
+    [ ("e", "edit")
+    , ("o", "toggle")
+    , ("m", "menu")
+    , ("a", "enable")
+    , ("d", "disable")
+    ]) ++
+  spawnMenu "M-z" (feedCmd "r.copyq"
+    [ (m ++ i, k ++ i) | i <- map show [0..9], (m, k) <-
+      [("", ""), ("S-", "+"), ("C-", "-")]
+    ])
   ---- wacom M-<Insert>
   -- o ~/aura/airy/cfg/wacom/ctl/change-output ,$def
   -- $mod+m ~/aura/airy/cfg/wacom/ctl/change-mode -q && $upd wnd ,$def
   -- $mod+s ~/aura/airy/cfg/wacom/ctl/change-curve  ,$def
   where
+    inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)
+    feedCmd cmd  = map $ \(k, o) -> (k, cmd ++ " " ++ o)
+    spawnAll    = map $ \(k, s) -> (k, spawn $ s)
+    spawnMenu prf = (inGroup prf) . spawnAll
+    --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
     visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
+
 
 myCfg = ewmh $ defaultConfig
   { modMask = mod4Mask
@@ -171,10 +207,11 @@ myCfg = ewmh $ defaultConfig
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
   , startupHook = windows . W.view . (!!1) . workspaces $ myCfg
-  , manageHook = manageHook defaultConfig <+> myManageHook <+> manageDocks
+  , manageHook  = insertPosition Below Newer <+> myManageHook <+> manageDocks <+> manageHook defaultConfig
   -- layoutHook defaultConfig
   -- layoutHintsToCenter
   , layoutHook = smartBorders . avoidStruts $ myLayout
+  , logHook = GN.historyHook
   , handleEventHook = myHandleEventHook
   -- Style
   , borderWidth        = 2
@@ -184,14 +221,15 @@ myCfg = ewmh $ defaultConfig
 
 
 myLayout = smartBorders
-     . mkToggle (MI.NOBORDERS ?? MI.FULL ?? EOT)
-     . mkToggle (single MI.MIRROR)
-     $ tiled ||| simplestFloat ||| Grid ||| Circle
+    . onWorkspace (workspaces myCfg !! 4) Full
+    . mkToggle (NOBORDERS ?? FULL ?? EOT)
+    . mkToggle (single MIRROR)
+    $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
   where
     tiled   = ResizableTall nmaster delta ratio []
     nmaster = 1     -- number of windows in master pane
-    ratio   = toRational (2 / (1 + sqrt 5.0)) -- phi
-    delta   = 3/100 -- step of increasing
+    ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
+    delta   = 2/100 -- step of increasing
 
 
 myManageHook :: ManageHook
@@ -232,9 +270,10 @@ myPP = xmobarPP
   , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
   , ppHidden  = \w -> if elem w (workspaces myCfg) then w else ""  -- only predefined by me
   , ppLayout  = \nm -> case nm of                             -- short 'titles' for layouts
-      "Full" -> "[ ]"
       "ResizableTall" -> "[|]"
       "Mirror ResizableTall" -> "[-]"
+      "Tabbed Simplest" -> "=--"
+      "Full" -> "[ ]"
       "Grid" -> "[#]"
       "SimplestFloat" -> "( )"
       "Circle" -> "(O)"

@@ -27,7 +27,6 @@ in mpd)  ~/.bin/net.d/sir-mpd $ARGS
 ;; sirx) ssh sir -X ${ARGS:--t "$sstmux"}
 ;; stb)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 "root@192.168.1.$1"
 ;; rou)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 rou
-;; and)  TERM=xterm-256color ssh land
-;; *)    ssh $PRG ${ARGS:--o LocalCommand="$sstmux"}
-# ;; *)    ssh $PRG ${ARGS:--t "$sstmux"}
+;; land|buld) TERM=xterm-256color ssh $PRG
+;; *)    ssh $PRG ${ARGS:--o LocalCommand="$sstmux"}  # -t "$sstmux"
 esac

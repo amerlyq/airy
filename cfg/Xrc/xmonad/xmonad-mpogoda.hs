@@ -77,15 +77,6 @@ myManageHook = composeAll
 
 -- Keys
 myKeys = \conf -> mkKeymap conf $
-         [ ("M-u",          spawn       $ myTerminal )
-         , ("M-<Return>",   spawn       $ myTerminal ++ " -e r.ranger")
-         , ("M-S-<Return>", spawn       $ myTerminal ++ " -e tmux")
-         , ("M-C-<Esc>",    spawn       $ "xkill")
-         , ("M-d",          spawn       $ "r.dmenu")
-         -- cycle through all possible layouts
-         , ("M-<Space>",    sendMessage $ NextLayout)
-         -- restore default layout
-         , ("M-S-<Space>",  setLayout   $ XMonad.layoutHook conf)
          , ("M-n",          refresh)
          -- cycle through all windows
          , ("M-j",          windows     $ W.focusDown)

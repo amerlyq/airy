@@ -78,6 +78,9 @@ Neovim
 		: Error detected while processing function neosnippet#init#_initialize..<SNR>175_initialize_others:
 		: line   11: E216: No such group or event: TextChanged,TextChangedI * call neosnippet#handlers#_restore_unnamed_register()
 	2016-02-15 [X] BUG: my ranger -- if dir name has '%' -- then ',f' will expand it
+	[_] DEV: Hook :w event to check if current user has only (r-?) access and root has (?w?)
+		:= Then use :Sw to save buffer and automatically (L)oad result
+		:? But what about Windows?
 
 
 Future
