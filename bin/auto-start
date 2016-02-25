@@ -1,5 +1,8 @@
 #!/bin/bash
 source ~/.shell/profile
+echo "[auto-start]: '$CURR_PROF' profile"
+
+# BUG: may affect problems for multiple X-sessions
 
 # SEE -- double fork technique
 #   http://stackoverflow.com/questions/3430330/best-way-to-make-a-shell-script-daemon#
@@ -10,6 +13,9 @@ MAXWAIT=30
 # ( while kill -0 $$ 2>/dev/null && timeout 5 sdb root on; do
 #     sleep "${TIMEOUT:-5}"; done && kill -s SIGKILL $$ >/dev/null 2>/dev/null ) &
 # exec sdb shell $@
+
+# # pgrep $1 >/dev/null || $@ &
+# lau(){ if hash $1 >/dev/null 2>&1; then $@ & fi; }
 
 lau() {
     local pr="$1" args="${@:2}"
@@ -50,12 +56,22 @@ rcf() {
 ### ALWAYS ### --------------------------------------
 # BUG: No PulseAudio daemon running, or not running as session daemon.
 setX a
+r.touchpad
+r.xkb
 
-### ONCE ### ----------------------------------------
+# EXPL: don't launch other apps for one-app sessions
+[[ "$XDG_CURRENT_DESKTOP" =~ ^(i3|xmonad) ]] || exit
+
+### WM ###
+lau r.xcape
+lau r.dunst
+lau compton  # Must be launched before installing wallpaper!
+case "$XDG_CURRENT_DESKTOP"
+in xmonad) lau r.tray
+esac
+lau r.feh
+
+### USER ### ----------------------------------------
 lau copyq
-rcf r.mpd-log
-
-echo "PRF: $CURR_PROF"
 [[ ! "$CURR_PROF" =~ ^work ]] || lau skype
 [[ "$CURR_PROF" =~ ^(home|laptop) ]] || lau pidgin
-# i3-msg 'workspace number 1'

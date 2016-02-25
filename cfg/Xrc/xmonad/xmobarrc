@@ -10,9 +10,8 @@ Config {
 , bgColor      = "#000000" -- "#1b1d1e"
 , fgColor      = "#ffffff" -- "#a0a0a0"
 , alpha        = 230
-, font         = "xft:PragmataPro:size=10,DejaVu Sans Mono:size=10,Droid Sans Fallback Full:size=9"
--- BUG: japanese can't be derived from additionalFonts?
-, additionalFonts = ["xft:PragmataPro:size=8,DejaVu Sans Mono:size=8"]  -- USE: template = "<fn=1>...</fn>"
+, font         = "xft:PragmataPro:size=10,DejaVu Sans Mono:size=10,FreeSans:size=9,Droid Sans Fallback Full:size=9"
+, additionalFonts = ["xft:PragmataPro:size=8,Droid Sans Japanese:size=8"]
 , iconOffset   = -1
 , textOffset   = -1
 , border       = NoBorder
@@ -22,10 +21,9 @@ Config {
 , sepChar      = "%"
 , alignSep     = "}{"
 -- \<fc=#1b1d1e,#fd971f>  %kbd%</fc>\
--- \<fn=1>%mpd%</fn>\
 , template     = "%StdinReader%}{\
   \<fc=#cc8000>  </fc>\
-    \%mpd%\
+    \<fn=1>%mpd%</fn>\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%  %cpu%  %loadavg%  %memory% %swap%\
   \<fc=#0080cc>  </fc>\

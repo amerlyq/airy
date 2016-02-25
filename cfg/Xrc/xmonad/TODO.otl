@@ -23,12 +23,14 @@ SEE
 			SEE
 				https://wiki.haskell.org/Xmonad/General_xmonad.hs_config_tips
 				https://wiki.haskell.org/Xmonad/Frequently_asked_questions
+				https://wiki.haskell.org/Xmonad/Config_archive
 			>>> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html#Editing_key_bindings
 			: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html
 		Blog
 			>> https://ro-che.info/docs/xmonad/
 			>>> http://lynnard.me/blog/2013/11/05/building-a-vim-like-xmonad-prompt-task-groups-topical-workspaces-float-styles-and-more/
-			>>>> http://lynnard.me/blog/2013/11/05/building-a-vim-like-xmonad-prompt-task-groups-topical-workspaces-float-styles-and-more/
+			https://wiki.haskell.org/Xmonad/Config_archive/John_Goerzen%27s_Configuration
+			http://lynnard.me/blog/2014/01/06/supercharge-your-xmonad-colored-tabs-dynamic-prompt-window-slash-workspace-insert-position/
 		Examples
 		: https://github.com/mcmaniac/xmonad/blob/master/xmonad.hs
 		: http://www.vicfryzel.com/2010/06/27/obtaining-a-beautiful-usable-xmonad-configuration/
@@ -63,6 +65,15 @@ THINK:ENH
 	[_] RFC: 'let mCopyq = ("M-z " ++)' extract as function applying to list to create submaps
 	[_] optimize map lambda on tuple's 1st/2nd element -- CHECK: \f -> map (f *** id)
 		http://stackoverflow.com/questions/10818779/can-i-map-the-first-element-of-a-pair-without-arrows
+	[_] TRY: show [\d] in left-below corner for fullscreen, where \d -- number of active windows
+
+RFC
+	: myManageHook = composeAll . concat $
+	: [ [ className   =? c --> doFloat           | c <- myFloats]
+	: , [ title       =? t --> doFloat           | t <- myOtherFloats]
+	: , [ className   =? c --> doF (W.shift "3") | c <- webApps]
+	: , [ className   =? c --> doF (W.shift "4") | c <- ircApps]
+	: ]
 
 TODO
 	Add menu to xmobar -- to control windows -- float/kill/move/resize
@@ -92,11 +103,20 @@ TODO
 		: import XMonad.Hooks.SetWMName
 		: , startupHook = setWMName "LG3D"
 
+	USE:
+		> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-WindowGo.html
+		: import XMonad.Actions.WindowGo (runOrRaise)
+		: startup = do
+		: 	runOrRaise <String executable> (<Query Bool to find it>)
+		: 	runOrRaise "chromium" (className =? "Chromium")
+		: 	runOrRaise ...
+
 
 FIND:(how to)
 	[_] toggle two different actions on one keybind?
 	[_] combine actions in keybindings
 		http://superuser.com/questions/562653/xmonad-bind-key-to-chain-of-commands
+	[_] make operator :: (map f x) when x=list and (f x) when string
 
 
 FIXME
@@ -115,12 +135,15 @@ FIXME
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-FloatKeys.html
 		http://stackoverflow.com/questions/9157349/xmonad-when-floating-a-window-move-or-resize-it
 		http://stackoverflow.com/questions/19975180/xmonad-toggle-a-window-between-floating-and-tiled
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-ManageHelpers.html
+			: see more do*Float
 		> http://unix.stackexchange.com/questions/30865/dragging-and-resizing-floating-windows-in-xmonad-without-the-modkey
 	[_] toggle workspace on M-[0-9] back and forth
 	[_] move current window to prev WS
 		: ("M-S-a"      , shiftToPrev >> toggleWS)
 	[_]	force spawn on master pane
 		: ("M-S-u"      , spawn "r.t" >> windows W.swapMaster)
+	[_] launch auto-start on xmonad restart
 
 
 BUG
@@ -134,3 +157,10 @@ BUG
 		:= maybe it's _double_ latching -- xmonad also treats *activator* as latcher
 		:> USE XMonad.Actions.CycleWS simpler functions
 	2016-02-23 [X] xmobar 'M+C' -- then 'leds' -- "Could not execute command 'python3'"
+	[_] onWorkspace -- can't switch layout on '4' workspace afterwards -- only fixed list?
+		:= I want 'preffered' layout instead of 'single'
+	[_] new floating windows are hidden, borders are shadowed by upper windows
+		: myManageHook = composeAll $ [ insertPosition Below Newer
+		https://bbs.archlinux.org/viewtopic.php?id=98695
+		https://github.com/NickHu/dotxmonad/blob/master/xmonad.hs
+		http://wpr.cz/ccx/paste/2012-04-10/1.txt

@@ -50,8 +50,7 @@ do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
 has_pr(){ hash "$1" >/dev/null 2>&1; }
 # $(ps opid= -C ${1##*/})
 grep_prs(){ pgrep "(\/|^)${1##*/}(\s|\$)"; }
-kill_prs(){ local pids="$(grep_prs "$1")"
-    if [[ -n "$pids" ]]; then kill -TERM $pids; fi; }
+kill_prs(){ local pids="$(grep_prs "$1")"; [[ -z "$pids" ]] || kill -TERM $pids; }
 run_single() { local pids
     # To be able to restart programms / reload configs for those which already launched!
     case "$1" in -r) shift; kill_prs "$1" ;; esac

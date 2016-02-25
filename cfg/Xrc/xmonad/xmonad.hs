@@ -13,14 +13,15 @@ import XMonad.Util.EZConfig         (mkKeymap)
 
 ---- Actions
 import XMonad.Actions.CycleWS       (moveTo, shiftTo, toggleWS, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere)
 import qualified XMonad.Actions.GroupNavigation as GN
 
 ---- Hooks
 import XMonad.Hooks.DynamicLog      (statusBar, xmobarPP, xmobarColor, PP(..))
 import XMonad.Hooks.EwmhDesktops    (ewmh, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, SetStruts(..), ToggleStruts(..))
-import XMonad.Hooks.ManageHelpers   (isFullscreen, doFullFloat, isDialog)
-import XMonad.Hooks.InsertPosition  (insertPosition, Position(Below), Focus(Newer))
+import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
+import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 
 ---- Layouts
 import qualified XMonad.StackSet as W
@@ -191,7 +192,7 @@ myKeys cfg = mkKeymap cfg $
   where
     inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)
     feedCmd cmd  = map $ \(k, o) -> (k, cmd ++ " " ++ o)
-    spawnAll    = map $ \(k, s) -> (k, spawn $ s)
+    spawnAll    = map $ \(k, s) -> (k, spawn $ s)  -- TODO:USE: spawnHere
     spawnMenu prf = (inGroup prf) . spawnAll
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
@@ -207,7 +208,7 @@ myCfg = ewmh $ defaultConfig
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
   , startupHook = windows . W.view . (!!1) . workspaces $ myCfg
-  , manageHook  = insertPosition Below Newer <+> myManageHook <+> manageDocks <+> manageHook defaultConfig
+  , manageHook  = myManageHook <+> manageHook defaultConfig
   -- layoutHook defaultConfig
   -- layoutHintsToCenter
   , layoutHook = smartBorders . avoidStruts $ myLayout
@@ -233,29 +234,38 @@ myLayout = smartBorders
 
 
 myManageHook :: ManageHook
-myManageHook = mconcat $
-  [ myIgnores    --> doIgnore     -- Don't manage
-  , myFloats     --> doFloat      -- Make floating
-  , isFullscreen --> doFullFloat  -- Auto-fullscreen
+myManageHook = manageSpawn <+>
+  composeAll
+  [ isFullscreen --> topmost doFullFloat
+  , isDialog --> topmost doCenterFloat
+  ] <+>
+  composeFloat
+  [ ("Figure" `isPrefixOf`) <$> title
+  , let lst = "buddy_list Preferences"
+    in wmhas (stringProperty "WM_WINDOW_ROLE") lst
+  , let lst = "Float copyq feh Steam Gimp Pidgin Skype piony.py Transmission-gtk"
+    in wmhas className lst
+  ] <+>
   -- for_window [title="^ElonaPlus"] fullscreen
-  ] ++
-  [ x --> doShift w | (x, w) <- myShifts ]  -- ALT: doF (W.shift "doc")
+  composeAll
+  [ wmhas className "stalonetray" --> doIgnore
+  , wmhas appName "panel desktop_window kdesktop trayer" --> doIgnore
+  ] <+>
+  insertPosition Below Newer <+>
+  composeShift
+  [ ("4", "Firefox")
+  , ("5", "Krita")
+  , ("8", "t-engine64")
+  , ("9", "Steam")
+  ] <+> manageDocks
   where
-    wmhas t l = [ t =? x | x <- words l ]
-    myIgnores = foldr1 (<||>) $
-      wmhas className "stalonetray" ++
-      wmhas appName "panel desktop_window kdesktop"
-    myFloats = foldr1 (<||>) $
-      [ ("Figure" `isPrefixOf`) <$> title, isDialog ] ++
-      wmhas className "Float copyq feh Steam Gimp Pidgin Skype piony.py Transmission-gtk"
-    myShifts = map (\(x, y) -> (className =? x, y)) $
-      [ ("Firefox", "4")
-      , ("Krita", "5")
-      , ("t-engine64", "8")
-      , ("Steam", "9")
-      ]
+    wmhas t l = foldr1 (<||>) $ [ t =? x | x <- words l ]
+    topmost =  (<+> insertPosition Master Newer)
+    composeFloat = composeAll . map (--> topmost doFloat)
+    -- ALT: doF (W.shift "doc")
+    composeShift = composeAll . map (\(w, x) -> (className =? x --> doShift w))
 
-myHandleEventHook = mconcat $
+myHandleEventHook = composeAll $
   [ handleEventHook defaultConfig
   , docksEventHook
   , hintsEventHook
