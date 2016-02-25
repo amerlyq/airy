@@ -21,6 +21,17 @@ ${x11:+\n    ForwardX11 yes}
 
 dst=~/.ssh/config
 cat > $dst << EOT
+### Options ###
+# TCPKeepAlive=yes
+# ServerAliveInterval=15
+# ServerAliveCountMax=6
+# Compression=yes
+
+# Reconnect w/o password until at least one session is alive
+ControlMaster auto
+ControlPath /tmp/%r@%h:%p
+ControlPersist yes
+
 Host *
     SendEnv !LANG !LC_*
 

@@ -1,8 +1,20 @@
 #!/bin/bash -e
 
 # ALT: add(s); popup("",s,1000)
+# TODO: check if there is \n on end of lines (join lines which 'dd' in vim)
+
+fset=copy
+sep='\\n'
+
+while getopts "ajJ" o; do case $o
+in a) fset=add
+;; j) rsep=' '
+;; J) rsep=''
+;; esac; done || exit
+shift $((OPTIND-1))
+
 case "$1"
-in  [0-9]) copyq select "$1"
-;; +[0-9]) copyq eval 'var s="",i='"$1"'; while(i-->0) s+=str(read(i)); copy(s)'
-;; -[0-9]) copyq eval 'var s="",i=0; while(i++<'"$1"') s+=str(read(i)); copy(s)'
+in  [0-9]) copyq 'select' "$1"
+;; +[0-9]) copyq 'eval' "var s='',i=$1; while(i-->0) s+=str(read(i)) + '$sep'; $fset(s)"
+;; -[0-9]) copyq 'eval' "var s='',i=0; while(i++<$1) s+=str(read(i)) + '$sep'; $fset(s)"
 esac 2>&1 >/dev/null

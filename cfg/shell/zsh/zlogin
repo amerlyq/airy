@@ -25,7 +25,6 @@
 # don't place at ~/.zshrc, as it will erase scrollback on 's' in ranger
 [[ ! "$TERM" =~ rxvt ]] || printf '\e[99999;H\n\e[H'
 
-if [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-    exec startx
-    # OR: exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
+if [[ -z $DISPLAY && $XDG_VTNR -eq 1 && $UID > 0 ]]; then
+    exec startx  # OR: exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
 fi

@@ -162,6 +162,10 @@ mq -- refine changes in different commits (single workflow I would liked?)
 			:OR hg strip --keep -r .~2   # 3 commits
 		ALT to mq use
 
+		series of patches
+			hg log -l 2
+			hg export -r 8259:8260 > example.diff
+
 		last changeset
 			hg export -o FILE -r REV
 		one file through multiple changesets

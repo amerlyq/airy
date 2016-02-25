@@ -70,8 +70,9 @@ case "$XDG_CURRENT_DESKTOP"
 in xmonad) lau r.tray
 esac
 lau r.feh
+rcf r.mpd-log
 
 ### USER ### ----------------------------------------
 lau copyq
-[[ ! "$CURR_PROF" =~ ^work ]] || lau skype
 [[ "$CURR_PROF" =~ ^(home|laptop) ]] || lau pidgin
+[[ ! "$CURR_PROF" =~ ^work ]] || lau skype
