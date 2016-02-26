@@ -112,12 +112,13 @@ myKeys cfg = mkKeymap cfg $
   -- ALT:FIXME spawn "r.t" >> windows W.swapMaster
   -- BUG? M-C-<Space> don't work -- seems like it's hardware problem
   concat [
-    [ ("M-"   ++ k , spawnHere t)
-    , ("M-S-" ++ k , spawnAndDo (insertPosition Master Newer) t)
-    -- , ("M-C-" ++ k , spawnAndDo (return True --> doFloat) t)
+    [ ("M-"     ++ k , spawnHere t)
+    , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
+    , ("M-C-"   ++ k , spawnAndDo doFloat t)
+    , ("M-S-C-" ++ k , spawnAndDo doCenterFloat t)
     ]
     | (k, t) <-
-    [ ("<Space>", "r.t")  -- OR "r.tf"
+    [ ("<Space>", "r.t -e r.tmux")  -- OR "r.tf"
     , ("M1-<Space>", "~/.i3/ctl/run-cwd")
     , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
     ]
@@ -254,9 +255,10 @@ myManageHook = manageSpawn <+>
   ] <+>
   composeFloat
   [ ("Figure" `isPrefixOf`) <$> title
+  , ("Float" `isPrefixOf`) <$> appName
   , let lst = "buddy_list Preferences"
     in wmhas (stringProperty "WM_WINDOW_ROLE") lst
-  , let lst = "Float copyq feh Steam Gimp Pidgin Skype piony.py Transmission-gtk"
+  , let lst = "copyq feh Steam Gimp Pidgin Skype piony.py Transmission-gtk"
     in wmhas className lst
   ] <+>
   -- for_window [title="^ElonaPlus"] fullscreen

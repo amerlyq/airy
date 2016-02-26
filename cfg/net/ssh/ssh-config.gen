@@ -28,6 +28,7 @@ cat > $dst << EOT
 # Compression=yes
 
 # Reconnect w/o password until at least one session is alive
+# ATTENTION:BUG: on '$ Gl'
 ControlMaster auto
 ControlPath /tmp/%r@%h:%p
 ControlPersist yes

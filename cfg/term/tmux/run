@@ -2,9 +2,12 @@
 
 ## NEED: ~/.tmux.conf
 #   set -g focus-events on
-if [[ "$TERM" =~ 'rxvt' ]]; then
-  trap 'printf "\e]777;focus;off\x7"'  INT TERM EXIT
-  printf "\e]777;focus;on\x7"
-fi
+# if [[ "$TERM" =~ 'rxvt' ]]; then
+#   trap 'printf "\e]777;focus;off\x7"'  INT TERM EXIT
+#   printf "\e]777;focus;on\x7"
+# fi
 
-exec tmux $@
+# Exit session on kill
+name="st-$$"
+trap "tmux kill-session -t $name" INT TERM EXIT
+exec tmux new-session -s $name "$@"

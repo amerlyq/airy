@@ -1,6 +1,8 @@
 SEE
 	>>> https://github.com/tmux-plugins
 	[_] https://github.com/tmux-plugins/tmux-resurrect
+	<Blog
+		http://www.hamvocke.com/blog/a-guide-to-customizing-your-tmux-conf/
 
 CHECK
 	https://www.reddit.com/r/tmux/comments/3l5xf6/highlight_individual_tmux_panes/?
@@ -10,17 +12,38 @@ TRY
 		: Check focus events between windows -- instead of my 'vim-autofocus'
 
 TODO
+	[_] RFC:FIXME: whole process tree -- reduce links in resulting chain
 	[_] .vim/env :: TERMCMD='tmux split-window "$cmd"'
 		[_] Need command to run in split/window instead of true terminal
 		:= THINK: However, true terminal would be also appropriate to launch sometime?
 	[_] Broken vim FocusGain etc inside tmux
 		[_] need to repair it
 		:= https://github.com/tmux-plugins/vim-tmux-focus-events/issues/1
+	[_] BUG nvim colorscheme is not solarized
+		[_] Screen clearing -- right line part is transparent (bcfe)
 	[_] Change fork/st
 		[_] scrollback patch -- unnecessary after tmux-24bit-color, disable it
 		[_] change zsh to tmux in launching command inside st?
 			:ALT change r.t script to launch tmux on startup
 			THINK: what is more flexible way?
 		[_] Disable tmux status -- off by default
+	[_] Run command and show result
+		http://unix.stackexchange.com/questions/17116/prevent-pane-window-from-closing-when-command-completes-tmux
+	[_] TRY hide panel
+		http://unix.stackexchange.com/questions/145857/how-do-you-hide-a-pane
+	[_] hide status if one window
+	[_] one-time sessions w/o detach
+		TRY set-option -sg exit-unattached off
+		SEE https://github.com/tmux/tmux/issues/182
+	[_] THINK prevent tmux from nested sessions
+		FIND if there such option exists instead of wrapper bash
 
 	[_] BUG: when toggle status on|off -- promtline crawls and duplicates line-by-line
+	[_] BUG: r.tmux -- keeps first session in forked process
+		:= FIND how to prevent this or run tmux server beforehand (if it's server deal)
+		NEED run server and keep it -- but it exits if no sessions exist
+		:= therefore that first session was lingering in background
+		: SEE init.zsh:32 -- seems like it's possible to define default server session?
+		: # Create a 'prezto' session if no session has been defined in tmux.conf.
+		[_] BUG $RANGER_LEVEL = 1 in new terminals
+			:= arises when first session was launched manually from chain st->zsh->ranger->zsh
