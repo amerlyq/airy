@@ -13,7 +13,7 @@ import XMonad.Util.EZConfig         (mkKeymap)
 
 ---- Actions
 import XMonad.Actions.CycleWS       (moveTo, shiftTo, toggleWS, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
-import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere)
+import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere, spawnAndDo)
 import qualified XMonad.Actions.GroupNavigation as GN
 
 ---- Hooks
@@ -95,22 +95,42 @@ myKeys cfg = mkKeymap cfg $
     --THINK:ALT:, ("M-S-", windows . W.shift >> windows . W.view)
     ]
   ] ++
-  ---- Shortcuts
-  spawnAll
-    [ ("M-u" , terminal cfg)
-    --FIXME: , ("M-S-u"      , spawn "r.t" >> windows W.swapMaster)
-    , ("M-C-u"        , "~/.i3/ctl/run-cwd")
-    , ("M-<Return>"   , "r.t -e zsh -ic r.ranger")
-    , ("M-C-<Return>" , "r.tf")
-    , ("M-S-<Return>" , "r.tf -e r.ranger")
-    , ("M-A-<Return>" , "r.tf -e r.python")
-    , ("M-d"          , "r.dmenu")
-    , ("M-S-d"        , "r.dmenu -n")
-    , ("M-C-d"        , "j4-dmenu-desktop")
-    , ("M-<Print>"    , "~/.i3/ext/screenshot")
-    , ("M-y"          , "r.dict --vim")
+  ---- System
+  [ ("M-\\"     , kill)
+  , ("M-S-q"    , kill)
+  , ("M-S-<Backspace>", restart "xmonad" True)
+  ] ++
+  --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
+  inGroup "M-S-<Esc>"  -- xmonad
+    [ ("o", io exitSuccess)
+    , ("n", refresh)  -- workspace normalizing (resize)
+    , ("r", spawn "sudo reboot")
+    , ("t", spawn "sudo poweroff")
     ] ++
-  spawnAll (feedCmd "~/.i3/ext/volume"
+  ---- Shortcuts
+  -- main tools
+  -- ALT:FIXME spawn "r.t" >> windows W.swapMaster
+  -- BUG? M-C-<Space> don't work -- seems like it's hardware problem
+  concat [
+    [ ("M-"   ++ k , spawnHere t)
+    , ("M-S-" ++ k , spawnAndDo (insertPosition Master Newer) t)
+    -- , ("M-C-" ++ k , spawnAndDo (return True --> doFloat) t)
+    ]
+    | (k, t) <-
+    [ ("<Space>", "r.t")  -- OR "r.tf"
+    , ("M1-<Space>", "~/.i3/ctl/run-cwd")
+    , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
+    ]
+  ] ++
+  (spawnAll . concat) [
+    [ ("M-d"       , "r.dmenu")
+    , ("M-S-d"     , "r.dmenu -n")
+    , ("M-C-d"     , "j4-dmenu-desktop")
+    , ("M-<Print>" , "~/.i3/ext/screenshot")
+    , ("M-C-S-\\"  , "~/.i3/ctl/wnd_active_kill")
+    , ("M-S-z"     , "~/.i3/ext/i3exit lock")
+    ],
+    feedCmd "~/.i3/ext/volume"
     [ ("M-<Home>"     , "20%")
     , ("M-<Page_Up>"  , "2%+")
     , ("M-<Page_Down>", "2%-")
@@ -118,8 +138,8 @@ myKeys cfg = mkKeymap cfg $
     , ("<XF86AudioRaiseVolume>", "2%+")
     , ("<XF86AudioLowerVolume>", "2%-")
     , ("<XF86AudioMute>"       , "")
-    ]) ++
-  spawnAll (feedCmd "mpc"
+    ],
+    feedCmd "mpc"
     [ ("M-S-<Home>"      , "toggle")
     , ("M-S-<Page_Up>"   , "prev")
     , ("M-S-<Page_Down>" , "next")
@@ -129,71 +149,64 @@ myKeys cfg = mkKeymap cfg $
     , ("<XF86AudioPrev>" , "prev")
     , ("<XF86AudioStop>" , "stop")
     , ("<XF86AudioPause>", "pause")
-    ]) ++
-  spawnAll  -- misc
+    ],
+    -- NEED: spawnHere
+    -- misc
     [ ("<XF86Tools>"     , "r.tf ncmpcpp")
     , ("<XF86Mail>"      , "r.tf -e mutt")
     , ("<XF86Search>"    , "r.vimb -p")
     , ("<XF86Calculator>", "r.tf -e ipython")
     , ("<XF86Sleep>"     , "xset -d :0 dpms force off")
-    ] ++
-  ---- System
-  [ ("M-\\"     , kill)
-  , ("M-S-q"    , kill)
-  , ("M-C-S-\\" , spawn "~/.i3/ctl/wnd_active_kill")
-  , ("M-S-z"          , spawn "~/.i3/ext/i3exit lock")
-  , ("M-S-<Backspace>", restart "xmonad" True)
-  ] ++
-  ---- Submenus
-  --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
-  inGroup "M-S-<Esc>"  -- xmonad
-    [ ("o", io exitSuccess)
-    , ("n", refresh)  -- workspace normalizing (resize)
-    , ("r", spawn "sudo reboot")
-    , ("t", spawn "sudo poweroff")
-    ] ++
-  spawnMenu "M-S-<Esc>" (feedCmd "xbacklight -set"
+    ],
+    ---- Submenus
+    inGroup "M-S-<Esc>" $ feedCmd "xbacklight -set"
     [ (i, i ++ "0") | i <- map show [0..9]
-    ]) ++
-  spawnMenu "M-o"
+    ],
+    inGroup "M-o"
     [ ("b", "r.vimb")
     , ("f", "firefox")
-    , ("h", "r.tf -e htop")
-    , ("n", "r.tf -e ncmpcpp")
     , ("p", "pidgin")
     , ("s", "skype")
-    , ("k", "~/.i3/ctl/run-focus k")
+    , ("<Space>" , "r.tf")
+    , ("<Return>", "r.tf -e ranger")
+    , ("i"       , "r.tf -e ipython")
+    , ("n"       , "r.tf -e ncmpcpp")
+    , ("h"       , "r.tf -e htop")
+    -- , ("k", "~/.i3/ctl/run-focus k")
     -- r.tf -e gksudo powertop
     -- r.tf -e gksudo tlp start
     -- nemo --no-desktop
     -- /usr/lib/cinnamon-settings/cinnamon-settings.py sound
-    ] ++
-  spawnMenu "M-p"
+    ],
+    inGroup "M-u"
     [ ("b", "r.vimb -h")
     , ("g", "r.vimb -g")
     , ("d", "r.dict --vim")
     , ("m", "~/.mpd/move_current")
-    ] ++
-  spawnMenu "M-z" (feedCmd "copyq"
+    ],
+    inGroup "M-y"
+    [ ("b", "r.vimb -p")
+    ],
+    inGroup "M-z" $ feedCmd "copyq"
     [ ("e", "edit")
     , ("o", "toggle")
     , ("m", "menu")
     , ("a", "enable")
     , ("d", "disable")
-    ]) ++
-  spawnMenu "M-z" (feedCmd "r.copyq"
+    ],
+    inGroup "M-z" $ feedCmd "r.copyq"
     [ (m ++ i, k ++ i) | i <- map show [0..9], (m, k) <-
       [("", ""), ("S-", "+"), ("C-", "-")]
-    ])
-  ---- wacom M-<Insert>
-  -- o ~/aura/airy/cfg/wacom/ctl/change-output ,$def
-  -- $mod+m ~/aura/airy/cfg/wacom/ctl/change-mode -q && $upd wnd ,$def
-  -- $mod+s ~/aura/airy/cfg/wacom/ctl/change-curve  ,$def
+    ]
+    ---- wacom M-<Insert>
+    -- o ~/aura/airy/cfg/wacom/ctl/change-output ,$def
+    -- $mod+m ~/aura/airy/cfg/wacom/ctl/change-mode -q && $upd wnd ,$def
+    -- $mod+s ~/aura/airy/cfg/wacom/ctl/change-curve  ,$def
+  ]
   where
     inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)
     feedCmd cmd  = map $ \(k, o) -> (k, cmd ++ " " ++ o)
     spawnAll    = map $ \(k, s) -> (k, spawn $ s)  -- TODO:USE: spawnHere
-    spawnMenu prf = (inGroup prf) . spawnAll
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
     visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
@@ -211,7 +224,7 @@ myCfg = ewmh $ defaultConfig
   , manageHook  = myManageHook <+> manageHook defaultConfig
   -- layoutHook defaultConfig
   -- layoutHintsToCenter
-  , layoutHook = smartBorders . avoidStruts $ myLayout
+  , layoutHook = avoidStruts . smartBorders $ myLayout
   , logHook = GN.historyHook
   , handleEventHook = myHandleEventHook
   -- Style
@@ -232,7 +245,7 @@ myLayout = smartBorders
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
     delta   = 2/100 -- step of increasing
 
-
+-- RFC: composeAll . concat $ [ [
 myManageHook :: ManageHook
 myManageHook = manageSpawn <+>
   composeAll

@@ -21,7 +21,7 @@ SEE
 			:	CHECK: hide/reveal
 			: http://xmonad.org/xmonad-docs/xmonad/XMonad-StackSet.html
 			SEE
-				https://wiki.haskell.org/Xmonad/General_xmonad.hs_config_tips
+				[_] 48% https://wiki.haskell.org/Xmonad/General_xmonad.hs_config_tips
 				https://wiki.haskell.org/Xmonad/Frequently_asked_questions
 				https://wiki.haskell.org/Xmonad/Config_archive
 			>>> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html#Editing_key_bindings
@@ -104,6 +104,7 @@ TODO
 		: , startupHook = setWMName "LG3D"
 
 	USE:
+		spawn or bring up
 		> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-WindowGo.html
 		: import XMonad.Actions.WindowGo (runOrRaise)
 		: startup = do
@@ -147,10 +148,6 @@ FIXME
 
 
 BUG
-	[_] floating windows can be located deeper then tailed after restart?
-	[_] compton casts shadow on border of windows, making it dim
-		:= new window becomes master and placed on the top
-		:= NEED: to always place active window to top of the stack
 	[_] xkb latching залипает for Mod4+a -- cycleWindows -- then you need only 'a'
 		:= scenario norm: press and hold Alt, then click 'a', release Alt
 		:= scenario bad: press/release Alt, then click 'a', 'a'
@@ -164,3 +161,7 @@ BUG
 		https://bbs.archlinux.org/viewtopic.php?id=98695
 		https://github.com/NickHu/dotxmonad/blob/master/xmonad.hs
 		http://wpr.cz/ccx/paste/2012-04-10/1.txt
+		[_] floating windows can be located deeper then tailed after restart?
+		[_] compton casts shadow on border of windows, making it dim
+			:= new window becomes master and placed on the top
+			:= NEED: to always place active window to top of the stack
