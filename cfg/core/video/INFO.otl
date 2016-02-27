@@ -46,3 +46,12 @@ REF
 
 	nvidia-xconfig -o test
 	nvidia-xconfig -c /dev/null -o test
+
+Manual nvidia cfg
+: NEED only for manual nvidia configuration.  For Optimus use bumblebee!
+: Because you will not be able to configure multihead manually for Optimus.
+	< ~/.xinitrc
+		${video:+xrandr --setprovideroutputsource modesetting NVIDIA-0}
+		xrandr --auto  # OR: --size 1 &
+	cpf "$PWD/xorg.conf" /etc/X11/xorg.conf
+	cpf "$PWD/20-nvidia.conf" /etc/X11/xorg.conf.d/20-nvidia.conf

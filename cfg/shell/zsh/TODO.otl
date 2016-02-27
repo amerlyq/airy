@@ -49,10 +49,12 @@ Prezto
 
 Prompt
 	[_] BUG: when state is 'added+dirty' symbol '#' is half-cropped. Use another UTF?
-	: └▲◯♯╼
+		: └▲◯♯╼
+		:= Partially, those bugs due to fallback to more wide fonts
     >> [_] SEE new pure prompt in prezto -- there was created async.zsh module!
 	2015-12-25 [X] BUG: nested shell in ranger -- no saved pwd when cd to any /usr/share/doc/..
 		: ~_prompt_amer_pwd ::> problem was in home dir expansion of 'print -D'
+	[_] BUG: double prompt on window shrinking
 	[_] BUG: -- if fast <CR> after urxvt start (and some else cases)
 		[_] double prompt
 			:= seems like it's result of prompt update by async git/vcs cmds

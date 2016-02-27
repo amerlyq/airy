@@ -2,31 +2,15 @@
 source ~/.shell/func.d/cfgsetup
 
 # Main destination for Zsh
-ZDOTDIR=~/.cache/zsh
-mkdir -vp "$ZDOTDIR"
-PREZTO="$ZDOTDIR/.zprezto"
-
-if [[ ! -d "$PREZTO" ]]; then
-    git clone --recursive 'https://github.com/sorin-ionescu/prezto.git' "$PREZTO"
-    # git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
-fi
+PREZTO=~/.cache/zsh/.zprezto
 
 link "$PWD/zshenv" ~/.zshenv
-#link "$PWD/zlogin" ~/.zlogin
 link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
 link "$PWD/prompt.d" "$PREZTO/modules/prompt/functions/prompt.d"
-linkdir "$ZDOTDIR/." zlogin zprofile zshrc zpreztorc
+linkdir "${PREZTO%/*}/." zlogin zprofile zshrc zpreztorc
 
 # Choose default shell
 if [[ -z "$SSH_TTY" && "$(which zsh)" != ${SHELL?No} ]]; then
     sudo chsh -s /bin/bash  # Root login shell
     sudo usermod -s $(which zsh) "$(whoami)"  # User shell
-fi
-
-if cfgOpt u; then
-    # chsh -s /bin/zsh
-    # BUG: submodules aren't updated at all!
-    (cd "$PREZTO" && git pull &&
-        git submodule -q foreach git pull -q origin master)
-        # git submodule update --init --recursive --remote --merge)
 fi

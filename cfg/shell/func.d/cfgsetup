@@ -4,14 +4,16 @@ source ~/.shell/func.d/system
 trap_errors
 
 ### Argparse ###
+OPTIND=1
+CFG_ARGS=( "$@" )  # Backup default arguments
 while getopts "cdirs:t:u" opt; do case $opt
 in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="$OPTARG" ;; esac
 ;; [iucf]) : # Install/update/clean/force all configs/packages
 ;; [rd]) cfgOptAdd 'u'  # Reset/debug
-;; s) ARGS+=("$OPTARG")
+;; s) CFG_S+=("$OPTARG")
 ;; :|"?") die 1 "Err: need value for '-$opt'"
 ;; esac; cfgOptAdd "$opt"; done
-
+shift $((OPTIND - 1))
 
 ### Choose theme
 if [[ ! "${THEME:=$(< "${CURR_DIR_CACHE:?No}/theme")}" =~ ^[a-z]+$ ]]
@@ -20,9 +22,7 @@ then THEME=dark; fi
 
 ### LINKS ###
 link(){ ~/.bin/prg.d/linkcp $@; }
-linkdir(){ for nm in ${@:2}
-do link "$PWD/$nm" "${1?No pref}$nm"
-done;}
+linkdir(){ for nm in "${@:2}"; do link "$PWD/$nm" "${1?No}$nm"; done }
 # ALT linkdir(){ mkdir -p $2 && lndir "$1" $2; }
 
 

@@ -1,0 +1,7 @@
+Reconnect w/o password until at least one session is alive
+	ATTENTION:BUG: on '$ Gl' -- beware of http://rawsyntax.com/blog/faster-ssh-connections/
+	: ControlMaster auto
+	: # ALT: /tmp/%u/ssh/%r@%h:%p -- but you need to create this dir
+	: ControlPath ~/.ssh/sock/%r@%h:%p
+	: # ALT: yes
+	: ControlPersist 600

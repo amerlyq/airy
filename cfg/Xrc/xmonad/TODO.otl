@@ -54,6 +54,8 @@ THINK:ENH
 	Action on empty WS
 		https://mail.haskell.org/pipermail/xmonad/2012-February/012357.html
 	[_] M-a -- instead toggleWS use nextMatch/History?
+		Need to skip all windows in current WS
+		Cycle through all previous WS in history order?
 	[_] Each $ xmonad --restart # drops to wksp 1
 		how to make that action only from ~/.xinitrc but not when restart manually?
 		:= so, it must work on startuHook but not on --restart
@@ -105,6 +107,7 @@ TODO
 		: import XMonad.Hooks.SetWMName
 		: , startupHook = setWMName "LG3D"
 
+
 	USE:
 		spawn or bring up
 		> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-WindowGo.html
@@ -124,6 +127,7 @@ FIND:(how to)
 
 FIXME
 	[_] focus back from master
+		TODO: back in history, but in bound of current workspace
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-GroupNavigation.html
 		> http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-CycleWindows.html
 	[_] open new windows as slave (don't replace / keep master)
@@ -147,6 +151,8 @@ FIXME
 	[_]	force spawn on master pane
 		: ("M-S-u"      , spawn "r.t" >> windows W.swapMaster)
 	[_] launch auto-start on xmonad restart
+	[_] Set resizetile directly
+		: "M-C-," 1/2 ; "M-C-." default
 
 
 BUG

@@ -10,4 +10,4 @@ link -t  ~/.gnupg 'gpg.conf' 'gpg-agent.conf'
 #       But whole dir ./systemd/ or ./user/ could.
 # usvc_activate gpg-agent
 
-echo RELOADAGENT | gpg-connect-agent
+echo RELOADAGENT | tee >(gpg-connect-agent)

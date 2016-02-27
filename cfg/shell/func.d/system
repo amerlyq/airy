@@ -18,8 +18,9 @@ airy_cache_pwd_mod() { local mods="${CURR_DIR_CACHE:?No}/mods/mods"
 }
 
 # ====================== Configs =====================================
-cfgOpt(){ [[ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]]; }
-cfgOptAdd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
+cfgOpt(){ [[ "${CFG_OPTS/[$1]}" != "$CFG_OPTS" ]]; }
+cfgNo(){ ! cfgOpt $1; }
+cfgOptAdd() { CFG_OPTS="${CFG_OPTS/[$1]}${1}"; }
 
 distro(){
       if [[ -e /etc/os-release  ]]; then cat /etc/os-release

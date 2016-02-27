@@ -4,7 +4,6 @@ if (($#)); then
 elif [[ ! -t 0 ]]; then
     ARGS='<(cat -)'
 fi
-echo "$ARGS" > /tmp/args
 eval "exec r.tf $EDITOR -c 'norm!G0' $ARGS"
 
 # pipe="$(mktemp -ut "st-screen.XXX")"

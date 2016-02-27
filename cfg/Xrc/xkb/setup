@@ -3,11 +3,11 @@ source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
 if cfgOpt s; then
-    case "$ARGS"
+    case "$CFG_S"
     in elona) over="elona"
     ;; hum) over="hummer"
     ;; esac
-    echo "Layout: $ARGS"
+    echo "Layout: $CFG_S"
 fi
 
 "$PWD/xkbm.gen" $over

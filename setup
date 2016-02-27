@@ -5,6 +5,7 @@ source ~/.shell/func.d/cfgsetup
 echo "$THEME" > "${CURR_DIR_CACHE?No}/theme"
 queue="${TMPDIR:-/tmp}/mods_installing"
 mods="${CURR_DIR_CACHE?No}/mods/mods" && mkdir -p "${mods%/*}"
+link "$PWD/bin" ~/.bin
 
 # ======================================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
@@ -32,22 +33,21 @@ if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then
 fi
 # ======================================================================
 ## Populate sensible configs
-if [[ -f ../erian/setup ]] && [[ ! -f "$queue" ]]; then
+if ((!$#)) && [[ ! -f "$queue" ]] && [[ -f ../erian/setup ]]; then
     header "Erian private data"
-    ../erian/setup "$ARGS" | pretty
+    ../erian/setup "${CFG_ARGS[@]}" | pretty
 fi
 
 # ======================================================================
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
-source ~/.shell/profile
+source ~/.shell/profile  # Populate erian env in case of clean install
 mkdir -vp "${CURR_DIR_CACHE:?No}"
-link "$PWD/bin" ~/.bin
-if cfgOpt u; then opts='-u'; fi
-if cfgOpt s; then PKG_LIST=( ${ARGS[@]} ); PKG_SKIP=( ); fi
-printf "LIST: %s\n\n" "${PKG_LIST[*]}"
-printf "SKIP: %s\n\n" "${PKG_SKIP[*]}"
-PKG_SKIP+=( firefox )  # REM:BUG
+
+if cfgOpt r && [[ -f "$mods" ]]; then
+    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
+fi
+
 frgx(){ local patt="\\b$*\\b"
     [[ "$*" =~ ^/.*$ ]] && patt="cfg$patt" || patt=".*$patt"
     [[ "$*" =~ ^.*/$ ]] && patt="${patt}.*"|| patt="$patt\$"
@@ -62,15 +62,30 @@ filter_find() { local accept regect
     done
 }
 
-# Caching the list of modules activated in profile
-run(){ [[ ! -f "$1" ]] || "$1" ${@:1}; }
-if cfgOpt r && [[ -f "$mods" ]]; then
-    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
+# USAGE:(modules) ./setup [-s <exc1>].. inc1..
+PKG_SKIP+=( "${CFG_S[@]}" )
+PKG_SKIP+=( firefox )  # REM:BUG
+# ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
+#   if all $@ are concrete modules (don't end in '/')
+if (($#)) || cfgOpt s; then
+    ((!$#)) || PKG_LIST=( "$@" )
+    filter_find > "$queue"
+else
+    # Caching the list of modules activated in profile
+    [[ -f "$mods"  ]] || filter_find > "$mods"
+    [[ -f "$queue" ]] || cp -vT "$mods" "$queue"
 fi
-[[ -f "$mods"  ]] || filter_find > "$mods"
-[[ -f "$queue" ]] || cp -vT "$mods" "$queue"
 
-[[ -n "$DISPLAY" ]] || export DISPLAY=:0.0
+# ======================================================================
+run(){ [[ ! -f "$1" ]] || "$@"; }
+[[ -n "$DISPLAY" ]] || export DISPLAY=:0 #:0.0
+if cfgOpt u; then opts='-u'; fi
+
+# Modules statistics
+printf "${C15}LIST:$C12( %s )$CR\n" "${PKG_LIST[*]}"
+printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
+printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
+
 while read d; do echo ">>> $d <<<"
     ! cfgOpt i || run "$d/install" $opts
     run "$d/setup" $opts

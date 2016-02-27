@@ -3,5 +3,18 @@ source ~/.shell/func.d/packages
 
 pkg_inst zsh
 
+PREZTO=~/.cache/zsh/.zprezto
+if [[ ! -d "$PREZTO" ]]; then
+    mkdir -p "${PREZTO%/*}"
+    # git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
+    url='https://github.com/sorin-ionescu/prezto.git'
+    git clone --recursive $url "$PREZTO"
+fi
+
+# BUG: submodules aren't updated at all!
+(cd "$PREZTO" && git pull &&
+    git submodule -q foreach git pull -q origin master)
+    # git submodule update --init --recursive --remote --merge)
+
 # AUR has deprecated package since 2012, therefore git:
 do_if -c git_inst -p fasd 'clvv/fasd' ||:
