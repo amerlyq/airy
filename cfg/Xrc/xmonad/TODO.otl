@@ -70,6 +70,7 @@ THINK:ENH
 	[_] optimize map lambda on tuple's 1st/2nd element -- CHECK: \f -> map (f *** id)
 		http://stackoverflow.com/questions/10818779/can-i-map-the-first-element-of-a-pair-without-arrows
 	[_] TRY: show [\d] in left-below corner for fullscreen, where \d -- number of active windows
+	[_] show somewhere master windows count if it != 1
 
 RFC
 	: myManageHook = composeAll . concat $
@@ -151,8 +152,16 @@ FIXME
 	[_]	force spawn on master pane
 		: ("M-S-u"      , spawn "r.t" >> windows W.swapMaster)
 	[_] launch auto-start on xmonad restart
-	[_] Set resizetile directly
+	[_] Set ResizeTile directly to concrete value
 		: "M-C-," 1/2 ; "M-C-." default
+	[_] when last window on WS is closed, deactivate layout to default
+		:= or only mostly problematic one - fullscreen
+	[_] hide/unhide xmobar on M-S-f
+	[_] replace import XMonad.Config with direct code
+		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
+		:= need disable mod+Mouse1 from making windows floating (OR? maybe M-S-m1)
+	[_] when works doFloat hook -- make (x, y) -> (10, 10) instead (0, 0)
+		:= it's too close to screen borders, which feels bad
 
 
 BUG
@@ -174,3 +183,10 @@ BUG
 			:= Reason -- insertPosition Below Newer -- below moves Z-axes also
 			:= new window becomes master and placed on the top
 			:= NEED: to always place active window to top of the stack
+	[_] ranger -> *.html in slave window
+		riffle opens vimb in stack below
+		but after closing vimb, focus moves to next slave window, instead prev
+		:= maybe, to determine next focus on some event use history somehow?
+	[_] Intermitten ERR: executeFile
+		: System.Posix.Process.executeFile
+		: System.Environment.getEnvironment

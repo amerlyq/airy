@@ -39,8 +39,9 @@ esac
 
 # SEE: https://pbrisbin.com/posts/systemd-user/
 # READ: http://blog.codezen.org/2012/02/09/on-wayland-systemd-and-convergence/
-
 # Launch session
+# TRY: run startx in tmux to see logout messages
+#   http://jasonwryan.com/blog/2011/12/18/login/
 exec "${session[@]}" &
 if hash auto-start >/dev/null 2>&1; then
     sleep 2

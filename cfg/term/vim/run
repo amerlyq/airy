@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+exec $EDITOR
+
+# v() { #servername == syntex (must be for LaTeX)
+#     local _V fl=~/.cache/vim/servername
+#     if [[ -f "$fl" ]]; then
+#         _V=$(cat "$fl")
+#         $EDITOR --servername $_V --remote-silent $@
+#         $EDITOR --servername $_V --remote-send ':redraw<CR>'
+#     else
+#         $EDITOR $@
+#     fi
+# }

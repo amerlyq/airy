@@ -81,6 +81,12 @@ Neovim
 	[_] DEV: Hook :w event to check if current user has only (r-?) access and root has (?w?)
 		:= Then use :Sw to save buffer and automatically (L)oad result
 		:? But what about Windows?
+	[_] FIXME: when launching :term need to do: and then change it back to std
+		:= due to 'black' is indistinguishable from background
+		:= NEED transparent background in vim terminal
+		: highlight Normal ctermbg=none
+		: highlight NonText ctermbg=none
+		:? But how to make different colorschemes for different windows?
 
 
 Future

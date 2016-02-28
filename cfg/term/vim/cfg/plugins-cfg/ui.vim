@@ -123,7 +123,7 @@ if neobundle#tap('vim-colors-solarized') ||
   " xmap <unique> <F12> <Plug>ToggleBackground
   " imap <unique> <F12> <Plug>ToggleBackground
   let g:solarized_menu=0
-  if has('gui_running') || $TERM =~# '\v^%(rxvt|st|dvtm|screen)'  "\|nvim
+  if has('gui_running') || $TERM =~# '\v^%(rxvt|st|tmux|dvtm|screen)'  "\|nvim
     let g:solarized_termcolors=16  " Use only with pre-setup palette!
     let g:airline_theme = 'solarized'
   elseif &t_Co > 16  " If ~256 -- makes brown bg and bold font...

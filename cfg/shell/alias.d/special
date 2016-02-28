@@ -14,17 +14,6 @@ alias vi='v -u NONE --noplugin'
 alias vb='v -u ~/.vim/vimrc_basic'
 scpvim(){ $EDITOR scp://${2:-srk}/"${1:-$(xsel -o)}"; }
 
-# v() { #servername == syntex (must be for LaTeX)
-#     local _V fl=~/.cache/vim/servername
-#     if [[ -f "$fl" ]]; then
-#         _V=$(cat "$fl")
-#         $EDITOR --servername $_V --remote-silent $@
-#         $EDITOR --servername $_V --remote-send ':redraw<CR>'
-#     else
-#         $EDITOR $@
-#     fi
-# }
-
 alias s='source r.ranger'
 alias w3m='\w3m google.com'
 alias w3mh='\w3m -T "text/html"'
