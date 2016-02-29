@@ -168,6 +168,8 @@ myKeys cfg = mkKeymap cfg $
     , ("f", "firefox")
     , ("p", "pidgin")
     , ("s", "skype")
+    , ("s", "skype")
+    , ("S-<Space>", "r.t")
     , ("<Space>" , "r.tf")
     , ("<Return>", "r.tf -e ranger")
     , ("i"       , "r.tf -e ipython")

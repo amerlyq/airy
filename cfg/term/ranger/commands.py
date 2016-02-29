@@ -140,6 +140,38 @@ class cda(Command):
             self.fm.select_file(path)
 
 
+class nrenum(Command):
+    bmrk = re.compile(r'(.*)\{(\d+)([^\}]+)(\d+)\}$')
+
+    def execute(self):
+        chg = int(self.arg(1)) if self.arg(1) else 1
+        nm = self.fm.thisfile.relative_path
+        m = nrenum.bmrk.match(nm)
+        if not m:
+            return
+
+        name, state = m.group(1), m.group(3)
+        total, ready = int(m.group(2)), int(m.group(4))
+
+        if ready == total:
+            if state.startswith('@'):
+                ready += chg
+                total += chg if chg > 0 else 0
+        elif ready > total:
+            if state.startswith('@'):
+                total = ready if chg > 0 else total
+        elif ready < total:
+            ready += chg
+
+        if state.endswith('#') and ready == total:
+            state = state[:-1] + '$'
+        elif state.endswith('$') and ready < total:
+            state = state[:-1] + '#'
+
+        nm = "{:s}{{{:d}{:s}{:d}}}".format(name, total, state, ready)
+        return self.fm.execute_console('rename ' + nm)
+
+
 class actualee(Command):
     FLS = fs.join('/tmp', os.getenv('USER'), 'ranger_list')
     """:actualee
