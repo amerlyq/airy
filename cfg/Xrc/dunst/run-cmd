@@ -1,21 +1,33 @@
-#!/bin/bash -e
+#!/bin/bash
+# WARNING: Don't use -e or you won't be able to catch $?
 
 if [[ -t 0 ]]
 then CMD=("${@:?No cmd specified}")
 else CMD=( $(cat) )
 fi
 
-run() {
-    shopt -s expand_aliases;
-    SHELL=/bin/bash source ~/.shell/aliases;
-    eval "${CMD[@]}"
+run() { local err
+    shopt -s expand_aliases
+    SHELL=/bin/bash source ~/.shell/aliases
+    eval "${CMD[@]}" 2>&1
 }
 
-exec 3>&1
-OUTPUT=$(run | tee >(>&3) | tail -5)
-exec 3>&-
+# exec 3>&1
+# TRY stdbuf -oL -eL
+# OUTPUT=$(run | tee >(>&3) | tail -5)
+OUTPUT=$(run)
+err=$?
+# exec 3>&-
+
+if (($err)); then
+    OUTPUT+="\n<b>--[ ERR($err) ]--</b>"
+else
+    OUTPUT+="\n<b>++[ DONE ]++</b>"
+fi
 
 # echo "export DISPLAY=:0; export XAUTHORITY=~/.Xauthority; notify-send test" | at now+1minute
 notify-send --urgency=normal \
-    -i "$([[ $? = 0 ]] && echo terminal || echo error)" \
-    "${CMD[*]}" "$OUTPUT"
+    -i "$([[ $? = 0 ]] && echo terminal || echo error)" -- \
+    "${CMD[*]//&/&amp;}" "$OUTPUT"
+
+exit $err

@@ -1,4 +1,5 @@
 #!/bin/bash -e
+MODS_CACHE_DISABLE=1
 source ~/.shell/func.d/packages
 distro ubuntu || die "Not Ubuntu"
 grep -q '^DISTRIB_RELEASE=10.04$' /etc/lsb-release || die "Not 10.04"

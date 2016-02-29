@@ -11,6 +11,18 @@ CHECK
 TRY
 	[_] https://github.com/tmux-plugins/vim-tmux-focus-events
 		: Check focus events between windows -- instead of my 'vim-autofocus'
+	[_] Session sharing
+		https://spin.atomicobject.com/2012/01/28/less-perplexing-terminal-multiplexing-with-tmux/
+
+	NOTE: Xorg inside tmux
+		To run startx inside tmux
+			:/etc/X11/Xwrapper.config:  allowed_users=anybody
+		Make independent tmux servers
+			: tmux -L "vt$XDG_VTNR" ... -s "vt$XDG_VTNR"
+
+ENH:
+	[_] Re-attach to tmux sessions on exit
+		https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
 
 TODO
 	[_] RFC:FIXME: whole process tree -- reduce links in resulting chain
@@ -64,3 +76,6 @@ TODO
 		: # Create a 'prezto' session if no session has been defined in tmux.conf.
 		[_] BUG $RANGER_LEVEL = 1 in new terminals
 			:= arises when first session was launched manually from chain st->zsh->ranger->zsh
+		[_] THINK Maybe, use systemd to run first session?
+			:= Proc: works until at least one user session exist
+			https://bbs.archlinux.org/viewtopic.php?id=147118

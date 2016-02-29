@@ -87,6 +87,11 @@ urxvt
 		: scrollback with vim navigation and simple past into commandline
 		SEE: https://github.com/ervandew/urxvt-vim-scrollback
 	2015-09-21 [X] Also: search on github for urxvt -- you find many plugins
+	2016-02-29 [X] FIX for urxvt scrollback reflowing: mitigate content erasing
+		: (force adding a line of scrollback after the initial window opening)
+		WARNING: must be launched only once after terminal start/reset!
+		: don't place at ~/.zshrc, as it will erase scrollback on 's' in ranger
+		[[ ! "$TERM" =~ rxvt ]] || printf '\e[99999;H\n\e[H'  # USE? ~/.zlogin
 
 
 Themes

@@ -45,7 +45,7 @@ fi
 
 ### Go to current script's directory
 cd $(dirname $(readlink -m ${0}))
-airy_cache_pwd_mod
+[[ -n "$MODS_CACHE_DISABLE" ]] || airy_cache_pwd_mod
 
 ### Populate all run, run.pr1 scripts into mycache/bin
 for path in "$PWD/run"*; do [[ -f "$path" ]] || continue

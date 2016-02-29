@@ -22,6 +22,7 @@ import XMonad.Hooks.EwmhDesktops    (ewmh, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, SetStruts(..), ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
+import XMonad.Hooks.UrgencyHook     (withUrgencyHook, NoUrgencyHook(..))
 
 ---- Layouts
 import qualified XMonad.StackSet as W
@@ -38,6 +39,8 @@ import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDE
 -- decorators
 import XMonad.Layout.LayoutHints    (layoutHintsToCenter, hintsEventHook)  -- honor size hints
 import XMonad.Layout.NoBorders      (smartBorders)  -- no borders on fullscreen
+-- extension
+import XMonad.Util.NamedScratchpad  (namedScratchpadAction, namedScratchpadManageHook, NamedScratchpad(..), nonFloating, defaultFloating, customFloating)
 
 
 myKeys cfg = mkKeymap cfg $
@@ -66,7 +69,7 @@ myKeys cfg = mkKeymap cfg $
   -- Layouts
   , ("M-n"        , sendMessage NextLayout)
   , ("M-S-n"      , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
-  , ("M-f"        , sendMessage $ Toggle FULL)
+  , ("M-f"        , sendMessage ToggleStruts >> sendMessage (Toggle FULL))
   , ("M-/"        , sendMessage $ Toggle MIRROR)
   ] ++
   -- Cycle through workspaces
@@ -96,9 +99,8 @@ myKeys cfg = mkKeymap cfg $
     ]
   ] ++
   ---- System
-  [ ("M-\\"     , kill)
-  , ("M-S-q"    , kill)
-  , ("M-S-<Backspace>", restart "xmonad" True)
+  [ ("M-\\"  , kill)
+  , ("M-S-q" , kill)
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
   inGroup "M-S-<Esc>"  -- xmonad
@@ -106,6 +108,10 @@ myKeys cfg = mkKeymap cfg $
     , ("n", refresh)  -- workspace normalizing (resize)
     , ("r", spawn "sudo reboot")
     , ("t", spawn "sudo poweroff")
+    , ("f", refresh)  -- Correct size of the viewed windows
+    , ("x", restart "xmonad" True)
+    , ("c", spawn "r.dunst-notify xmonad recompile" >>
+            spawn "xmonad --recompile && xmonad --restart && r.dunst-notify OK")
     ] ++
   ---- Shortcuts
   -- main tools
@@ -123,6 +129,10 @@ myKeys cfg = mkKeymap cfg $
     , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
     ]
   ] ++
+  inGroup "M-i"  -- scratchpads
+    [ ("n" , namedScratchpadAction myScratchpads "ncmpcpp")
+    , ("h" , namedScratchpadAction myScratchpads "htop")
+    ] ++
   (spawnAll . concat) [
     [ ("M-d"       , "r.dmenu")
     , ("M-S-d"     , "r.dmenu -n")
@@ -168,13 +178,13 @@ myKeys cfg = mkKeymap cfg $
     , ("f", "firefox")
     , ("p", "pidgin")
     , ("s", "skype")
-    , ("s", "skype")
     , ("S-<Space>", "r.t")
     , ("<Space>" , "r.tf")
     , ("<Return>", "r.tf -e ranger")
     , ("i"       , "r.tf -e ipython")
-    , ("n"       , "r.tf -e ncmpcpp")
+    -- , ("n"       , "r.tf -e ncmpcpp")
     , ("h"       , "r.tf -e htop")
+    , ("v"       , "r.tf -e $EDITOR")
     -- , ("k", "~/.i3/ctl/run-focus k")
     -- r.tf -e gksudo powertop
     -- r.tf -e gksudo tlp start
@@ -215,7 +225,7 @@ myKeys cfg = mkKeymap cfg $
     visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
 
 
-myCfg = ewmh $ defaultConfig
+myCfg = ewmh $ withUrgencyHook NoUrgencyHook $ defaultConfig
   { modMask = mod4Mask
   -- Options
   , terminal    = "r.t"
@@ -248,6 +258,16 @@ myLayout = smartBorders
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
     delta   = 2/100 -- step of increasing
 
+
+-- myScratchpads :: [NamedScratchpad]
+myScratchpads =
+  [ NS "htop"    "r.t -n htop -e htop"       (appName =? "htop") defaultFloating
+  , NS "ncmpcpp" "r.t -n ncmpcpp -e ncmpcpp" (appName =? "ncmpcpp") nonFloating
+  , NS "ipython" "r.t -n ipython -e ipython" (appName =? "ipython")
+    (customFloating $ W.RationalRect 0 (2/3) 1 (1/3))
+  ]
+
+
 -- RFC: composeAll . concat $ [ [
 myManageHook :: ManageHook
 myManageHook = manageSpawn <+>
@@ -267,20 +287,23 @@ myManageHook = manageSpawn <+>
   composeAll
   [ wmhas className "stalonetray" --> doIgnore
   , wmhas appName "panel desktop_window kdesktop trayer" --> doIgnore
-  ] <+>
-  insertPosition Below Newer <+>
+  ]
+  <+> insertPosition Below Newer <+>
   composeShift
   [ ("4", "Firefox")
   , ("5", "Krita")
   , ("8", "t-engine64")
   , ("9", "Steam")
-  ] <+> manageDocks
+  ]
+  <+> namedScratchpadManageHook myScratchpads
+  <+> manageDocks
   where
     wmhas t l = foldr1 (<||>) $ [ t =? x | x <- words l ]
     topmost =  (<+> insertPosition Master Newer)
     composeFloat = composeAll . map (--> topmost doFloat)
     -- ALT: doF (W.shift "doc")
     composeShift = composeAll . map (\(w, x) -> (className =? x --> doShift w))
+
 
 myHandleEventHook = composeAll $
   [ handleEventHook defaultConfig

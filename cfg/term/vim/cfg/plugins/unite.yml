@@ -5,6 +5,7 @@
 
 Shougo/unite.vim:  # CHECK
   description: Fast fuzzy access to List i-sources. Dependency of 'unite-*'.
+  explorer: 1
   neovim: 1
   commands:
     name: Unite
@@ -26,8 +27,8 @@ Shougo/neoyank.vim:  # CHECK
 
 thinca/vim-unite-history:
   depends: Shougo/unite.vim
-  unite_sources: history/command
+  unite_sources: [history/command, history/search]
 
 osyo-manga/unite-quickfix:
   depends: Shougo/unite.vim
-  unite_sources: history/command
+  unite_sources: [quickfix, location_list]

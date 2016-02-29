@@ -7,7 +7,7 @@
   # Compile the completion dump to increase startup speed.
   zcompdump="${ZDOTDIR:-"$HOME/.cache/zsh"}/.zcompdump"
   if [[ -s "$zcompdump" && (! -s "${zcompdump}.zwc" ||
-        "$zcompdump" -nt "${zcompdump}.zwc") ]]
+    "$zcompdump" -nt "${zcompdump}.zwc") ]]
   then zcompile "$zcompdump"; fi
 } &!
 
@@ -19,12 +19,30 @@
 #   fi
 # fi
 
-## FIX for urxvt scrollback reflowing: mitigate content erasing
-#  (force adding a line of scrollback after the initial window opening)
-# WARNING: must be launched only once after terminal start/reset!
-# don't place at ~/.zshrc, as it will erase scrollback on 's' in ranger
-[[ ! "$TERM" =~ rxvt ]] || printf '\e[99999;H\n\e[H'
+while [[ -z "$TMUX" && -z "$VIM" && -z "$EMACS" ]] &&
+      [[ "$TTY" =~ /dev/tty[1-3] && "$UID" > 0 ]]
+do
+  TMUX_SERVER=vtsrv  # USE "vt$XDG_VTNR" to separate vt sessions
 
-if [[ -z $DISPLAY && $XDG_VTNR -eq 1 && $UID > 0 ]]; then
-    exec startx  # OR: exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
-fi
+  # Create main tmux session (if no session has been defined in tmux.conf)
+  if hash tmux &>/dev/null && tmux start-server; then
+    tmux has-session -t "$TMUX_SERVER" 2>/dev/null ||
+      tmux new-session -d -s "$TMUX_SERVER" "$SHELL"
+  fi
+
+  # Launch X only on tty1
+  if [[ -z "$DISPLAY" && "$XDG_VTNR" -eq 1 ]]; then
+    exec startx
+    # OR:1 exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
+    # OR:2 exec xinit -- :0 -novtswitch &>/dev/null & logout
+  else
+    exec tmux attach-session -t "$TMUX_SERVER"
+  fi
+
+  # FIXME: On exit cycle through all background sessions
+  # while [[ -z "$TMUX" ]]; do
+  #   tmux attach || break
+  # done
+
+  break
+done

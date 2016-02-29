@@ -40,6 +40,7 @@ SEE
 		: http://www.cgogolin.de/downloads/xmonad.hs
 		: https://raw.githubusercontent.com/chtaube/xmonad-config/master/xmonad.hs
 		>> https://gist.github.com/kmels/2882350
+		> https://github.com/rileyrg/xmonad/blob/master/xmonad.hs
 	Bar
 		https://wiki.archlinux.org/index.php/Xmobar
 		http://projects.haskell.org/xmobar/
@@ -53,6 +54,8 @@ THINK:ENH
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-Commands.html
 	Action on empty WS
 		https://mail.haskell.org/pipermail/xmonad/2012-February/012357.html
+	[_] Rotate all slave windows through master --> like tiled Circle
+		:= Useful when all slaves are too small to estimate which are unnecessary already
 	[_] M-a -- instead toggleWS use nextMatch/History?
 		Need to skip all windows in current WS
 		Cycle through all previous WS in history order?
@@ -187,6 +190,7 @@ BUG
 		riffle opens vimb in stack below
 		but after closing vimb, focus moves to next slave window, instead prev
 		:= maybe, to determine next focus on some event use history somehow?
-	[_] Intermitten ERR: executeFile
+	2016-02-29 [X] Intermitten ERR: executeFile
+		:> NEED paci xorg-xmessage to show errors
 		: System.Posix.Process.executeFile
 		: System.Environment.getEnvironment
