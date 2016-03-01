@@ -21,7 +21,7 @@ fi
 
 if [[ -t 0 ]]; then  # input from terminal
     # OR: vim "$NM" -c "normal i$env $shl<CR>"
-    vim +'norm G' "$NM"
+    $EDITOR +'norm G' "$NM"
 else  # redirected input from file '<' or pipe '|'
     cat >> "$NM"
 fi

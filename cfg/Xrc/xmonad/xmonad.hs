@@ -22,7 +22,7 @@ import XMonad.Hooks.EwmhDesktops    (ewmh, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, SetStruts(..), ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
-import XMonad.Hooks.UrgencyHook     (withUrgencyHook, NoUrgencyHook(..))
+import XMonad.Hooks.UrgencyHook     (withUrgencyHook, NoUrgencyHook(..), focusUrgent, clearUrgents)
 
 ---- Layouts
 import qualified XMonad.StackSet as W
@@ -50,6 +50,8 @@ myKeys cfg = mkKeymap cfg $
   , ("M-k"        , windows W.focusUp)
   , ("M-l"        , GN.nextMatch GN.History (return True))
   , ("M-'"        , GN.nextMatchWithThis GN.Backward className)
+  , ("M-z"        , focusUrgent)
+  , ("M-C-z"      , clearUrgents)
   ---- swap
   , ("M-S-h"      , windows W.swapMaster)
   , ("M-S-l"      , windows W.shiftMaster)
@@ -200,9 +202,9 @@ myKeys cfg = mkKeymap cfg $
     inGroup "M-y"
     [ ("b", "r.vimb -p")
     ],
-    inGroup "M-z" $ feedCmd "copyq"
+    inGroup "M-x" $ feedCmd "copyq"
     [ ("e", "edit")
-    , ("o", "toggle")
+    , ("x", "toggle")
     , ("m", "menu")
     , ("a", "enable")
     , ("d", "disable")
@@ -225,7 +227,9 @@ myKeys cfg = mkKeymap cfg $
     visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
 
 
-myCfg = ewmh $ withUrgencyHook NoUrgencyHook $ defaultConfig
+myCfg = ewmh $
+  withUrgencyHook NoUrgencyHook $
+  defaultConfig
   { modMask = mod4Mask
   -- Options
   , terminal    = "r.t"
