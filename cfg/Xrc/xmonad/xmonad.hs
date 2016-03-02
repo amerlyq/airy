@@ -14,6 +14,7 @@ import XMonad.Util.EZConfig         (mkKeymap)
 ---- Actions
 import XMonad.Actions.CycleWS       (moveTo, shiftTo, toggleWS, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
 import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere, spawnAndDo)
+import XMonad.Actions.WindowGo      (runOrRaise)
 import qualified XMonad.Actions.GroupNavigation as GN
 
 ---- Hooks
@@ -131,10 +132,28 @@ myKeys cfg = mkKeymap cfg $
     , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
     ]
   ] ++
-  inGroup "M-i"  -- scratchpads
-    [ ("n" , namedScratchpadAction myScratchpads "ncmpcpp")
-    , ("h" , namedScratchpadAction myScratchpads "htop")
-    ] ++
+  (inGroup "M-o" . concat) [ -- scratchpads
+    -- Open new or focus the already existing one
+    [ (nm!!0:[], namedScratchpadAction myScratchpads nm)
+    | nm <- ["ncmpcpp", "mutt", "ipython", "htop", "pidgin", "skype"]
+    ],
+    -- Open new window always
+    [ ("S-" ++ nm!!0:[], spawnHere $ "r.tf -e " ++ nm)
+    | nm <- ["ncmpcpp", "mutt", "ipython"]
+    ],
+    [ ("f" , runOrRaise "firefox" $ className =? "Firefox")
+    , ("b" , spawnHere "r.vimb")
+    , ("v" , spawnHere "r.tf -e $EDITOR")
+    , ("S-<Space>", spawnHere "r.t")
+    , ("<Space>"  , spawnHere "r.tf")
+    , ("<Return>" , spawnHere "r.tf -e ranger")
+    -- , ("k", "~/.i3/ctl/run-focus k")
+    -- r.tf -e gksudo powertop
+    -- r.tf -e gksudo tlp start
+    -- nemo --no-desktop
+    -- /usr/lib/cinnamon-settings/cinnamon-settings.py sound
+    ]
+  ] ++
   (spawnAll . concat) [
     [ ("M-d"       , "r.dmenu")
     , ("M-S-d"     , "r.dmenu -n")
@@ -175,24 +194,6 @@ myKeys cfg = mkKeymap cfg $
     inGroup "M-S-<Esc>" $ feedCmd "xbacklight -set"
     [ (i, i ++ "0") | i <- map show [0..9]
     ],
-    inGroup "M-o"
-    [ ("b", "r.vimb")
-    , ("f", "firefox")
-    , ("p", "pidgin")
-    , ("s", "skype")
-    , ("S-<Space>", "r.t")
-    , ("<Space>" , "r.tf")
-    , ("<Return>", "r.tf -e ranger")
-    , ("i"       , "r.tf -e ipython")
-    -- , ("n"       , "r.tf -e ncmpcpp")
-    , ("h"       , "r.tf -e htop")
-    , ("v"       , "r.tf -e $EDITOR")
-    -- , ("k", "~/.i3/ctl/run-focus k")
-    -- r.tf -e gksudo powertop
-    -- r.tf -e gksudo tlp start
-    -- nemo --no-desktop
-    -- /usr/lib/cinnamon-settings/cinnamon-settings.py sound
-    ],
     inGroup "M-u"
     [ ("b", "r.vimb -h")
     , ("g", "r.vimb -g")
@@ -204,7 +205,8 @@ myKeys cfg = mkKeymap cfg $
     ],
     inGroup "M-x" $ feedCmd "copyq"
     [ ("e", "edit")
-    , ("x", "toggle")
+    , ("M-x", "toggle")
+    , ("x",   "toggle")
     , ("m", "menu")
     , ("a", "enable")
     , ("d", "disable")
@@ -265,11 +267,16 @@ myLayout = smartBorders
 
 -- myScratchpads :: [NamedScratchpad]
 myScratchpads =
-  [ NS "htop"    "r.t -n htop -e htop"       (appName =? "htop") defaultFloating
-  , NS "ncmpcpp" "r.t -n ncmpcpp -e ncmpcpp" (appName =? "ncmpcpp") nonFloating
-  , NS "ipython" "r.t -n ipython -e ipython" (appName =? "ipython")
-    (customFloating $ W.RationalRect 0 (2/3) 1 (1/3))
+  [ NS nm ("r.t -n " ++ nm ++ " -e " ++ nm) (appName =? nm) mng | (nm, mng) <-
+    [ ("htop"   , defaultFloating), ("mutt"   , nonFloating)
+    , ("ncmpcpp", defaultFloating), ("ipython", bottomThirdFloating)
+    ]
+  ] ++
+  [ NS "pidgin" "pidgin" (className =? "Pidgin" <&&> title =? "Buddy List") defaultFloating
+  , NS "skype"  "skype"  (className =? "Skype"  <&&> appName =? "skype" ) defaultFloating
   ]
+  where
+    bottomThirdFloating = customFloating $ W.RationalRect 0 (2/3) 1 (1/3)
 
 
 -- RFC: composeAll . concat $ [ [

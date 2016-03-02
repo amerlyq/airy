@@ -6,22 +6,29 @@ source ~/.shell/profile
 
 # ==================== ~/.ssh/config ========================
 
+wprf() { printf "%s\n" "$*" >> "$dst"; }
+wset() { wprf "    $*"; }
 wacc() {
+    case "$1" in -k) keep=1; shift ;; esac
     local name=$1 host=$2 user=$3
     local idn="$4" x11=$5 port=$6 str
 
-echo -ne "Host ${name:?No}
-    HostName ${host:?No}
-    User ${user:?No}\
-${port:+\n    Port $port}\
-${idn:+\n    IdentityFile ~/.ssh/$idn}\
-${x11:+\n    ForwardX11 yes}
-\n" >> $dst;
+    wprf Host ${name:?No}
+    wset HostName ${host:?No}
+    wset User ${user:?No}
+    ${port:+wset Port $port}
+    ${idn:+ wset IdentityFile ~/.ssh/$idn}
+    ${keep:+wset ControlMaster auto}
+    ${x11:+ wset ForwardX11 yes}
+    wprf
 }
 
 dst=~/.ssh/config
 cat > $dst << EOT
-### Options ###
+### Options (common) ###
+ControlPath /tmp/%u/%r@%h:%p
+ControlPersist 600
+
 Host *
     SendEnv !LANG !LC_*
     # TCPKeepAlive=yes
@@ -50,7 +57,7 @@ case "$CURR_PROF" in home|laptop|gnote4)
 ;; esac
 
 case "$CURR_PROF" in work)
-    wacc buld   $BULD_IPL $BULD_USER
+    wacc -k buld   $BULD_IPL $BULD_USER
 ;; esac
 
 case "$CURR_PROF" in work_samsung)

@@ -24,8 +24,9 @@ while [[ -z "$TMUX" && -z "$VIM" && -z "$EMACS" ]] &&
 do
   TMUX_SERVER=vtsrv  # USE "vt$XDG_VTNR" to separate vt sessions
 
-  # Create main tmux session (if no session has been defined in tmux.conf)
+  # Create tmux main session stub (if no session has been defined in tmux.conf)
   if hash tmux &>/dev/null && tmux start-server; then
+    export TMUX_TMPDIR="$TMPDIR"
     tmux has-session -t "$TMUX_SERVER" 2>/dev/null ||
       tmux new-session -d -s "$TMUX_SERVER" "$SHELL"
   fi

@@ -9,6 +9,10 @@
 #   http://superuser.com/questions/117841/get-colors-in-less-command
 #   := lesspipe with pygmentize
 #   BUG: different coloring on launch and after resize. Seems ~/.less is read only after resize?
+# SEE:FIXED: :> http://unix.stackexchange.com/questions/87261/getting-unexpected-colorized-output-on-several-commands
+
+# USE:DEBUG -- to figure out color names of each man section
+# LESS_TERMCAP_DEBUG=1 man strstr
 
 dst=~/.lesskey
 
@@ -68,4 +72,4 @@ LESS_TERMCAP_ZW=$(tput rsupm)
 EOT
 
 # Build to ~/.less (OR copy to /etc/sysless)
-lesskey
+lesskey "$dst"
