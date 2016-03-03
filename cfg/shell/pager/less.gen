@@ -1,0 +1,31 @@
+#!/bin/bash
+dst=~/.lesskey
+trap "rm -f '$dst'" INT TERM EXIT
+> "$dst"
+
+dump() { sed '2,$s/#.*$//;/^\s*$/d' >> "$dst"; }
+
+dump <<EOT
+#command
+h left-scroll
+l right-scroll
+EOT
+## One-char moving at a time -- cascaded parameters feeding:
+# h noaction 1\e(
+# l noaction 1\e)
+
+
+dump <<EOT
+#env
+# Set the default Less options. SEE $ man less, /LESS/
+# -g -N
+LESS = -a -i -j6  -M -R -S -w -z-4 -x4
+EOT
+# -j- Add context lines when searching with '/',
+# Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
+# Remove -X and -F (exit if the content fits on one screen) to enable it.
+# NOTE: -FX also disabled as support for coloring output has broke
+
+
+# Build to ~/.less (OR copy to /etc/sysless)
+lesskey "$dst"

@@ -5,3 +5,14 @@ Reconnect w/o password until at least one session is alive
 	: ControlPath ~/.ssh/sock/%r@%h:%p
 	: # ALT: yes
 	: ControlPersist 600
+
+
+Enter ↵, ~, ?:
+	Supported escape sequences:
+		~.  - terminate session
+		~B  - send a BREAK to the remote system
+		~R  - Request rekey (SSH protocol 2 only)
+		~#  - list forwarded connections
+		~?  - this message
+		~~  - send the escape character by typing it twice
+	(Note that escapes are only recognized immediately after newline.)

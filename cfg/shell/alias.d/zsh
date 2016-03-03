@@ -45,6 +45,7 @@ alias -g FA='|tee -a $TMPDIR/zsh-last-output| '
 
 # Re-run last cmd as sudo (ALT: sudo `!!`)
 alias please='sudo $(fc -ln -1)'
+alias kill='\kill'  # FIXED pid completion by process name
 
 ## Shorts
 (( $+commands[jcalc] )) && alias jc='noglob jcalc'

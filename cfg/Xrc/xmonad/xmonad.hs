@@ -132,10 +132,11 @@ myKeys cfg = mkKeymap cfg $
     , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
     ]
   ] ++
-  (inGroup "M-o" . concat) [ -- scratchpads
+  ---- Scratchpads
+  (inGroup "M-o" . concat) [ [ ("M-o", windows $ W.view "NSP") ],
     -- Open new or focus the already existing one
     [ (nm!!0:[], namedScratchpadAction myScratchpads nm)
-    | nm <- ["ncmpcpp", "mutt", "ipython", "htop", "pidgin", "skype"]
+    | nm <- ["ncmpcpp", "mutt", "ipython", "htop", "pidgin", "skype", "lyrics"]
     ],
     -- Open new window always
     [ ("S-" ++ nm!!0:[], spawnHere $ "r.tf -e " ++ nm)
@@ -203,13 +204,21 @@ myKeys cfg = mkKeymap cfg $
     inGroup "M-y"
     [ ("b", "r.vimb -p")
     ],
-    inGroup "M-x" $ feedCmd "copyq"
-    [ ("e", "edit")
-    , ("M-x", "toggle")
-    , ("x",   "toggle")
-    , ("m", "menu")
-    , ("a", "enable")
-    , ("d", "disable")
+    (feedCmd "copyq" . concat) [
+      [ ("M-x", "toggle")
+      , ("M-S-x", "edit -1")
+      ],
+      inGroup "M-C-x"
+      [ ("a", "edit")  -- add new entry
+      , ("t", "eval 'copy(clipboard());paste()'") -- as plain text
+      , ("M-x", "toggle")
+      , ("x",   "toggle")
+      , ("m", "menu")
+      , ("n", "next")
+      , ("p", "previous")
+      , ("<Return>", "enable")
+      , ("<Backspace>", "disable")
+      ]
     ],
     inGroup "M-z" $ feedCmd "r.copyq"
     [ (m ++ i, k ++ i) | i <- map show [0..9], (m, k) <-
@@ -274,6 +283,7 @@ myScratchpads =
   ] ++
   [ NS "pidgin" "pidgin" (className =? "Pidgin" <&&> title =? "Buddy List") defaultFloating
   , NS "skype"  "skype"  (className =? "Skype"  <&&> appName =? "skype" ) defaultFloating
+  , NS "lyrics" "r.t -n lyrics -e $EDITOR ~/aura/lyfa/lists/music.otl" (appName =? "lyrics") nonFloating
   ]
   where
     bottomThirdFloating = customFloating $ W.RationalRect 0 (2/3) 1 (1/3)
