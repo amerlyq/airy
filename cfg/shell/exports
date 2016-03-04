@@ -21,7 +21,7 @@ hash nvim>/dev/null 2>&1 && EDITOR=nvim || EDITOR=vim
 export EDITOR VISUAL="$EDITOR"
 
 ### Less ###
-hash r.less>/dev/null 2>&1 && PAGER=r.less || PAGER=less
+hash r.pager>/dev/null 2>&1 && PAGER=r.pager || PAGER=less
 [[ -r ~/.less ]] || LESS='-a -i -j6 -M -N -R -S -w -z-4 -x4'
 export PAGER LESS
 # export MANPATH="/usr/local/man:$MANPATH"
