@@ -20,6 +20,7 @@ wacc() {
     ${idn:+ wset IdentityFile ~/.ssh/$idn}
     ${keep:+wset ControlMaster auto}
     ${x11:+ wset ForwardX11 yes}
+    # ${x11:+ wset ForwardX11Trusted yes}
     wprf
 }
 
@@ -50,7 +51,7 @@ if [[ -n "$HOME_SRV" ]]; then
 fi
 
 case "$CURR_PROF" in home|laptop|gnote4)
-    wacc lked   $KEDI_IPL   $KEDI_USER   lked_rsa #x11
+    wacc -k lked   $KEDI_IPL   $KEDI_USER   lked_rsa x11
     wacc lsir   $HOME_IPL   $HOME_USER   lsir_rsa x11
     wacc llap   $LAPT_IPL   $LAPT_USER   ''      x11
     wacc lrou   $ROUT_IPL   $ROUT_USER   rt_rsa '' $ROUT_PORT

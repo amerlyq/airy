@@ -1,4 +1,4 @@
-# vim: ft=zsh
+# vim:ft=zsh:ts=2:sw=2:sts=2
 # Executes commands at login post-zshrc.
 # BUG:WARNING: urxvt (but not st) sources this file on each startup!
 
@@ -19,31 +19,5 @@
 #   fi
 # fi
 
-while [[ -z "$TMUX" && -z "$VIM" && -z "$EMACS" ]] &&
-      [[ "$TTY" =~ /dev/tty[1-3] && "$UID" > 0 ]]
-do
-  TMUX_SERVER=vtsrv  # USE "vt$XDG_VTNR" to separate vt sessions
-
-  # Create tmux main session stub (if no session has been defined in tmux.conf)
-  if hash tmux &>/dev/null && tmux start-server; then
-    export TMUX_TMPDIR="$TMPDIR"
-    tmux has-session -t "$TMUX_SERVER" 2>/dev/null ||
-      tmux new-session -d -s "$TMUX_SERVER" "$SHELL"
-  fi
-
-  # Launch X only on tty1
-  if [[ -z "$DISPLAY" && "$XDG_VTNR" -eq 1 ]]; then
-    exec startx
-    # OR:1 exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
-    # OR:2 exec xinit -- :0 -novtswitch &>/dev/null & logout
-  else
-    exec tmux attach-session -t "$TMUX_SERVER"
-  fi
-
-  # FIXME: On exit cycle through all background sessions
-  # while [[ -z "$TMUX" ]]; do
-  #   tmux attach || break
-  # done
-
-  break
-done
+# BUG: seems like it causes long delay before Xorg on cold system
+((0==$#commands[r.init])) || exec r.init

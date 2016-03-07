@@ -1,4 +1,4 @@
-" vim: ts=2 sw=2 sts=2
+" vim:ts=2:sw=2:sts=2
 
 """ General """
 set nocompatible
@@ -9,10 +9,11 @@ language messages en_US.UTF-8
 
 
 """ Configs """
+let $VIMHOME=fnamemodify(resolve(expand('<sfile>')), ':h')
 let mapleader=","
-runtime! cfg/core-cfg/func-insert.vim
-runtime! cfg/core-cfg/keys-remap.vim
-runtime! cfg/core-cfg/mng-copy-paste.vim
+source $VIMHOME/cfg/core/options.vim
+source $VIMHOME/cfg/core-cfg/keys-remap.vim
+source $VIMHOME/cfg/features/clipboard.vim
 
 
 """ Settings """

@@ -16,3 +16,6 @@ xset dpms 0 0 0  # No energy saving (standby -> suspend -> off) (seconds)
 # Xfce#Display blanking for more information.
 #   SEE https://wiki.archlinux.org/index.php/Display_Power_Management_Signaling#Modifying_DPMS_and_screensaver_settings_using_xset
 #   http://fluxbox.sourceforge.net/docbook/en/html/app-setup.html
+
+xset r rate 250 40  # Keyboard repeat
+! hash r.xkb &>/dev/null || r.xkb

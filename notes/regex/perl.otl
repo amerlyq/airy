@@ -5,6 +5,10 @@ MAN
 		$ perl -MO=Deparse   -p  -e 1
 	: http://perldoc.perl.org/functions/pack.html
 
+SEE
+	Traps and tricks
+		>>> http://www.rexegg.com/regex-quantifiers.html
+
 One-liners collection
 	http://www.softpanorama.org/Scripting/Perlorama/perl_in_command_line.shtml#More_on_emulation_of_Unix_cut
 
@@ -29,4 +33,3 @@ Split by 4 little bytes
 	perl -lne 'binmode(STDIN) printf "0x%lx\n",unpack("N", $_)' ./pgtdump
 
 	perl -We 'while($nb=read(STDIN,$buf,4)){printf "0x%lx\n",unpack("N", $buf)}' ./pgtdump
-

@@ -217,8 +217,6 @@ NOTE
 		echo ls | nc -q 1 -U $SERIAL -P root -
 		{ printf "ls\n"; sleep 0.2; } | nc -q 0 -U /tmp/vbox-"$VNM"S0 -P root -
 		cat <file> | nc -q 1 -U /tmp/vbox-"$VNM"S0 -P root -
-	NOTE: Get scancodes interactively: sudo showkey -s
-		http://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html
 	<TODO> Think how to duplicate input/output from ttyS0 and tty0 showed on monitor.
 		>>> It simply don't work!  (moreover, tty0 don't work and tty1 used for autologin)
 		: 0f 8f 39 b9  # <Tab><Space>

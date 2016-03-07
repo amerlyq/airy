@@ -3,6 +3,6 @@
 case "$1"
 in --url) xurls | awk -vi=1 '{printf "%02d %s\n",i++,$0}' |
     dmenu -l 10 | cut -d' ' -f2- | xargs -I@ x-www-browser @
-;; --vim) eval "exec r.tf $EDITOR -c 'norm!G0' \
-    +EmptyLinesStripEnd <(cat -)"
+;; --vim) eval "exec r.tf $EDITOR --noplugin -u ~/.vim/vimrc_basic \
+    -c 'set nowrap|norm!G0' <(cat)"  # +EmptyLinesStripEnd
 esac

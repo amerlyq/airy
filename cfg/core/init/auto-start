@@ -1,0 +1,43 @@
+#!/bin/bash
+ARGS="$@"
+source ~/.shell/profile
+echo "[${0##*/}]: '$CURR_PROF' profile"
+
+# BUG: may affect problems for multiple X-sessions
+# ALT:(systemd/user) https://bbs.archlinux.org/viewtopic.php?id=170344
+
+# SEE -- double fork technique
+#   http://stackoverflow.com/questions/3430330/best-way-to-make-a-shell-script-daemon#
+
+### ALWAYS ### --------------------------------------
+# BUG: No PulseAudio daemon running, or not running as session daemon.
+setX a &
+r.touchpad &
+r.xcape &
+
+# EXPL: don't launch other apps for one-app sessions
+[[ $XDG_CURRENT_DESKTOP =~ ^(i3|xmonad)$ ]] || exit
+
+### WM ###
+r.dunst &
+# compton must be launched before installing wallpaper!
+compton -d ${DISPLAY:-:0} &
+[[ ! $XDG_CURRENT_DESKTOP =~ ^xmonad$ ]] || { r.tray & }
+r.feh &
+r.mpd-log &
+
+### USER ### ----------------------------------------
+copyq &
+[[ "$CURR_PROF" =~ ^(home|laptop) ]] || { pidgin & }
+[[ ! "$CURR_PROF" =~ ^work ]] || { skype & }
+
+### END ###
+case "${ARGS[@]}" in -w) wait ;; esac
+
+# Kill all childs
+# ( while kill -0 $$ 2>/dev/null && timeout 5 sdb root on; do
+#     sleep "${TIMEOUT:-5}"; done && kill -s SIGKILL $$ >/dev/null 2>/dev/null ) &
+# exec sdb shell $@
+
+# timeout 30 while ! xdotool search --onlyvisible --pid $mypid --name "$pr"
+# do sleep 1; done || notify "Error on executing: $pr $args" &

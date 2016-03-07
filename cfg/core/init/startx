@@ -1,0 +1,22 @@
+#!/bin/bash -e
+[[ -z $DISPLAY && $(tty) =~ ^/dev/tty[0-9]+$ ]] || exit
+
+# Create a file with auth information for the server.
+while [[ -e /tmp/.X${D:=0}-lock ]]; do ((D+=1)); done
+auth=$(mktemp -p "${TMPDIR:-/tmp}" serverauth.XXXXXXXXXX)
+trap "xauth remove :$D; rm -f '$auth'" \
+  EXIT ERR HUP INT QUIT ILL TRAP KILL BUS TERM
+xauth -qf "$auth" <<<"add :$D . $(/usr/bin/mcookie)"
+
+# Sync auth credentials between server and client
+if [[ $(xauth list :$D) ]]
+then xauth extract - :$D | xauth -f "$auth" merge -
+else xauth -qf "$auth" extract - :$D | xauth merge -
+fi
+
+# TODO: replace $auth by <(xauth list :$D)
+server=( /usr/bin/X :$D vt$XDG_VTNR -nolisten tcp -auth "$auth" )
+exec xinit "$@" -- "${server[@]}" & wait $!
+
+# FIND: why deallocated all and not only current one?
+! hash deallocvt &>/dev/null || deallocvt

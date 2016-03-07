@@ -141,7 +141,7 @@ class cda(Command):
 
 
 class nrenum(Command):
-    bmrk = re.compile(r'(.*)\{(\d+)([^\}]+)(\d+)\}$')
+    bmrk = re.compile(r'(.*)\{(\d+)([^}]+?)(\d+)\}$')
 
     def execute(self):
         chg = int(self.arg(1)) if self.arg(1) else 1

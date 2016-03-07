@@ -1,6 +1,7 @@
 #!/bin/bash -e
+shopt -s nullglob
 
-session=("${1:-xmonad}")
+session=("${@:-xmonad}")
 exec >/var/tmp/"${session}_$(date +%Y%m%d_%H%M%S).log" 2>&1
 export XDG_CURRENT_DESKTOP="$session"
 
@@ -8,44 +9,34 @@ export XDG_CURRENT_DESKTOP="$session"
 #   startx
 #   startx ~/.xinitrc xmonad
 #   startx /full/path/to/window-manager
-#   ALT xinit -- :1 -nolisten tcp vt$XDG_VTNR
 #   pkill -15 Xorg
+
 # SEE: https://wiki.archlinux.org/index.php/Xinitrc#On_the_command_line
+# SEE: https://pbrisbin.com/posts/systemd-user/
+# READ: http://blog.codezen.org/2012/02/09/on-wayland-systemd-and-convergence/
+# ADD https://wiki.archlinux.org/index.php/Running_program_in_separate_X_display
+# TRY: run startx in separate tmux server to see logout messages
+#   http://jasonwryan.com/blog/2011/12/18/login/
 
 # Merge in defaults and resources
 XINT=/etc/X11/xinit
-[[ ! -f "$XINT/.Xresources" ]] || xrdb -merge "$XINT/.Xresources"
+# [[ ! -f "$XINT/.Xresources" ]] || xrdb -merge "$XINT/.Xresources"
 [[ ! -f "$HOME/.Xresources" ]] || xrdb -merge "$HOME/.Xresources"
 
 # Start dbus, ... -- populated from packages
-if [[ -d "$XINT/xinitrc.d" ]] ; then
-    for f in "$XINT/xinitrc.d"/?*
-    do [[ ! -x "$f" ]] || source "$f"
-    done
-fi
+for f in "$XINT/xinitrc.d"/?*; do
+    [[ ! -x "$f" ]] || source "$f"; done
 
 # Source X settings and programs
 # CHECK:SEE: double-sourcing of xprofile by DM
 #   https://wiki.archlinux.org/index.php/xprofile
 [[ ! -f "$HOME/.xprofile" ]] || source "$HOME/.xprofile"
 
-
-# ADD https://wiki.archlinux.org/index.php/Running_program_in_separate_X_display
 case "$session"
 in xterm) session=(xterm -geometry 80x66+0+0 -name login)
 ;;    st) session=(st -g 80x66+0+0 -name login)
 esac
 
-
-# SEE: https://pbrisbin.com/posts/systemd-user/
-# READ: http://blog.codezen.org/2012/02/09/on-wayland-systemd-and-convergence/
 # Launch session
-# TRY: run startx in tmux to see logout messages
-#   http://jasonwryan.com/blog/2011/12/18/login/
-# DEV: replace startx by custom code to reduce SHLVL
-exec "${session[@]}" &
-if hash auto-start >/dev/null 2>&1; then
-    sleep 2
-    auto-start
-fi
-wait
+(hash auto-start &>/dev/null && auto-start -w) &
+exec "${session[@]}"
