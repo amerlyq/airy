@@ -144,9 +144,12 @@ class nrenum(Command):
     bmrk = re.compile(r'(.*)\{(\d+)([^}]+?)(\d+)\}$')
 
     def execute(self):
+        istotal = (self.arg(1)[0:2] == '-t')
+        if istotal:
+            self.shift()
         chg = int(self.arg(1)) if self.arg(1) else 1
-        nm = self.fm.thisfile.relative_path
-        m = nrenum.bmrk.match(nm)
+
+        m = nrenum.bmrk.match(self.fm.thisfile.relative_path)
         if not m:
             return
 
@@ -155,13 +158,16 @@ class nrenum(Command):
 
         if ready == total:
             if state.startswith('@'):
-                ready += chg
+                ready += chg if not istotal else 0
                 total += chg if chg > 0 else 0
         elif ready > total:
             if state.startswith('@'):
                 total = ready if chg > 0 else total
         elif ready < total:
-            ready += chg
+            if istotal:
+                total += chg
+            else:
+                ready += chg
 
         if state.endswith('#') and ready == total:
             state = state[:-1] + '$'

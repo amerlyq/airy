@@ -14,7 +14,7 @@ then xauth extract - :$D | xauth -f "$auth" merge -
 else xauth -qf "$auth" extract - :$D | xauth merge -
 fi
 
-# TODO: replace $auth by <(xauth list :$D)
+# TODO: replace $auth by <(xauth ?extract :$D)
 server=( /usr/bin/X :$D vt$XDG_VTNR -nolisten tcp -auth "$auth" )
 exec xinit "$@" -- "${server[@]}" & wait $!
 

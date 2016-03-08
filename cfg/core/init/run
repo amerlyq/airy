@@ -4,10 +4,9 @@
 [[ -z $TMUX && -z $VIM && -z $EMACS ]] || exit 0
 
 # Create tmux main session stub (if no session has been defined in tmux.conf)
-if [[ $XDG_VTNR = [2-3] ]] && hash tmux &>/dev/null; then
+if hash tmux &>/dev/null && tmux start-server; then
   TMUX_SERVER=VTsrv  # USE "vt$XDG_VTNR" to separate vt sessions
   [[ -z $TMPDIR ]] || export TMUX_TMPDIR=$TMPDIR
-  tmux start-server
   tmux has-session -t "$TMUX_SERVER" 2>/dev/null ||
     tmux new-session -d -s "$TMUX_SERVER" "$SHELL"
 fi
@@ -17,7 +16,7 @@ if [[ $XDG_VTNR = [1] && -z $DISPLAY ]]; then
   exec startx
   # OR:1 exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
   # OR:2 exec xinit -- :0 -novtswitch &>/dev/null & logout
-elif [[ -n $TMUX_SERVER ]]; then
+elif [[ $XDG_VTNR = [2-3] && -n $TMUX_SERVER ]]; then
   exec tmux attach-session -t "$TMUX_SERVER"
 else
   exec $SHELL

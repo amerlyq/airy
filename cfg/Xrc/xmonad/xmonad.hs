@@ -72,7 +72,7 @@ myKeys cfg = mkKeymap cfg $
   -- Layouts
   , ("M-n"        , sendMessage NextLayout)
   , ("M-S-n"      , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
-  , ("M-f"        , sendMessage ToggleStruts >> sendMessage (Toggle FULL))
+  , ("M-f"        , sendMessage (Toggle FULL) >> sendMessage ToggleStruts)
   , ("M-/"        , sendMessage $ Toggle MIRROR)
   ] ++
   -- Cycle through workspaces
@@ -263,7 +263,7 @@ myCfg = ewmh $
 
 
 myLayout = smartBorders
-    . onWorkspace (workspaces myCfg !! 4) Full
+    -- . onWorkspace (workspaces myCfg !! 4) Full
     . mkToggle (NOBORDERS ?? FULL ?? EOT)
     . mkToggle (single MIRROR)
     $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle

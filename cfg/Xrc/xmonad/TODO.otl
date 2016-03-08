@@ -159,6 +159,8 @@ FIXME
 		: "M-C-," 1/2 ; "M-C-." default
 	[_] when last window on WS is closed, deactivate layout to default
 		:= or only mostly problematic one - fullscreen
+		: https://mail.haskell.org/pipermail/xmonad/2012-February/012414.html
+		: http://xmonad.haskell.narkive.com/jYM0p2Em/reset-layout-to-default-on-last-window-close
 	[_] hide/unhide xmobar on M-S-f
 	[_] replace import XMonad.Config with direct code
 		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
@@ -168,6 +170,7 @@ FIXME
 
 
 BUG
+	[_] 'f' in mpv don't make fullscreen
 	[_] xkb latching залипает for Mod4+a -- cycleWindows -- then you need only 'a'
 		:= scenario norm: press and hold Alt, then click 'a', release Alt
 		:= scenario bad: press/release Alt, then click 'a', 'a'

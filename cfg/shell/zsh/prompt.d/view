@@ -3,6 +3,8 @@
 
 function _prompt_amer_setup_prompts {
   local color="$1" parts="$2"
+  # setopt transient_rprompt   # only show the rprompt on the current prompt
+  # ZLE_RPROMPT_INDENT=0
 
   # Set editor-info parameters.
   zstyle ':prezto:module:editor:info:completing' format '%B%F{1}…%f%b'
