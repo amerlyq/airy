@@ -143,7 +143,7 @@ myKeys cfg = mkKeymap cfg $
     | nm <- ["ncmpcpp", "mutt", "ipython"]
     ],
     [ ("f" , runOrRaise "firefox" $ className =? "Firefox")
-    , ("b" , spawnHere "r.vimb")
+    , ("b" , spawnHere "r.b")
     , ("v" , spawnHere "r.tf -e $EDITOR")
     , ("S-<Space>", spawnHere "r.t")
     , ("<Space>"  , spawnHere "r.tf")
@@ -187,7 +187,7 @@ myKeys cfg = mkKeymap cfg $
     -- misc
     [ ("<XF86Tools>"     , "r.tf ncmpcpp")
     , ("<XF86Mail>"      , "r.tf -e mutt")
-    , ("<XF86Search>"    , "r.vimb -p")
+    , ("<XF86Search>"    , "r.b -p")
     , ("<XF86Calculator>", "r.tf -e ipython")
     , ("<XF86Sleep>"     , "xset -d :0 dpms force off")
     ],
@@ -196,13 +196,13 @@ myKeys cfg = mkKeymap cfg $
     [ (i, i ++ "0") | i <- map show [0..9]
     ],
     inGroup "M-u"
-    [ ("b", "r.vimb -h")
-    , ("g", "r.vimb -g")
+    [ ("b", "r.b -h")
+    , ("g", "r.b -g")
     , ("d", "r.dict --vim")
     , ("m", "~/.mpd/move_current")
     ],
     inGroup "M-y"
-    [ ("b", "r.vimb -p")
+    [ ("b", "r.b -p")
     ],
     (feedCmd "copyq" . concat) [
       [ ("M-x", "toggle")
@@ -232,7 +232,7 @@ myKeys cfg = mkKeymap cfg $
   where
     inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)
     feedCmd cmd  = map $ \(k, o) -> (k, cmd ++ " " ++ o)
-    spawnAll    = map $ \(k, s) -> (k, spawn $ s)  -- TODO:USE: spawnHere
+    spawnAll    = map $ \(k, s) -> (k, spawn s)  -- TODO:USE: spawnHere
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
     visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
@@ -283,7 +283,7 @@ myScratchpads =
   ] ++
   [ NS "pidgin" "pidgin" (className =? "Pidgin" <&&> title =? "Buddy List") defaultFloating
   , NS "skype"  "skype"  (className =? "Skype"  <&&> appName =? "skype" ) defaultFloating
-  , NS "lyrics" "r.t -n lyrics -e $EDITOR ~/aura/lyfa/lists/music.otl" (appName =? "lyrics") nonFloating
+  , NS "lyrics" "cd ~/aura/lyfa/lists && r.t -n lyrics -e $EDITOR ./music.otl" (appName =? "lyrics") nonFloating
   ]
   where
     bottomThirdFloating = customFloating $ W.RationalRect 0 (2/3) 1 (1/3)
@@ -319,14 +319,14 @@ myManageHook = manageSpawn <+>
   <+> namedScratchpadManageHook myScratchpads
   <+> manageDocks
   where
-    wmhas t l = foldr1 (<||>) $ [ t =? x | x <- words l ]
+    wmhas t l = foldr1 (<||>) [ t =? x | x <- words l ]
     topmost =  (<+> insertPosition Master Newer)
     composeFloat = composeAll . map (--> topmost doFloat)
     -- ALT: doF (W.shift "doc")
     composeShift = composeAll . map (\(w, x) -> (className =? x --> doShift w))
 
 
-myHandleEventHook = composeAll $
+myHandleEventHook = composeAll
   [ handleEventHook defaultConfig
   , docksEventHook
   , hintsEventHook
@@ -339,7 +339,7 @@ myPP = xmobarPP
   { ppCurrent = xmobarColor "#fd971f" ""
   , ppSep     = xmobarColor "#fd971f" "" " \xe0b1 "           -- separator between elements
   , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
-  , ppHidden  = \w -> if elem w (workspaces myCfg) then w else ""  -- only predefined by me
+  , ppHidden  = \w -> if w `elem` workspaces myCfg then w else ""  -- only predefined by me
   , ppLayout  = \nm -> case nm of                             -- short 'titles' for layouts
       "ResizableTall" -> "[|]"
       "Mirror ResizableTall" -> "[-]"

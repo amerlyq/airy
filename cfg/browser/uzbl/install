@@ -1,0 +1,10 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    echo "Err: replace #branch next->master"
+    aur_inst 'uzbl-browser-next-git'
+
+elif distro ubuntu; then
+    echo "Err: no"
+fi

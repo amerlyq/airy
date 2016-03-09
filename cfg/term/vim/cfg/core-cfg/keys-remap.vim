@@ -33,6 +33,8 @@ xnoremap <unique><expr> v  (mode() ==# "\<C-v>") ? "v" : "\<C-v>"
 " Now 'a jump you to line and column, and `a only to line
 noremap <unique> ' `
 noremap <unique> ` '
+" Because 'ga' is used by me already
+noremap <unique> g8 ga
 
 " Pinky stretching soothing
 " cnoremap <unique> <C-o> <C-p>
@@ -116,8 +118,6 @@ noremap <unique><silent> gj j
 noremap <unique><silent> gk k
 
 " more stretching comfort
-noremap <unique> g0 ^
-noremap <unique> ,4 $
 noremap <unique> g4 A<Space><Esc>
 noremap <unique> ,g %
 

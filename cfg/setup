@@ -1,12 +1,20 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
+echo 'Defaults:'
+
 ### AUTO ###
 term="$({ has_pr st && echo st; } ||
         { has_pr urxvt && echo urxvt; } || echo xterm)"
 mkdef x-terminal-emulator $(which $term)
 
+mkdef www-browser $(which elinks)
+
+browser=r.qute
+mkdef x-www-browser $(which $browser)
+
 (cd "${CURR_DIR_CACHE:?No}/bin"
-    link "r.${term:?No}"   "./r.t"
-    link "r.${term}-float" "./r.tf"
+    link "r.${term:?No}"    ./r.t
+    link "r.${term}-float"  ./r.tf
+    link "${browser}"       ./r.b
 )

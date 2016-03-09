@@ -21,8 +21,7 @@ pretty() { sed -r "s|/home/$(whoami)|\~|g
 # NOTE: If problem with package update, firts update 'archlinux-keyring' pkg
 if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then
     if distro arch; then
-        sudo pacman -Syu --ignore=firefox  # REM:BUG
-        echo "ERR: firefox is frozen in pacman" | pretty
+        sudo pacman -Syu  # NOTE: --ignore=firefox
         # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
         # Degrade manually:
         #   pacman -U /var/cache/pacman/pkg/firefox-42.0-3-x86_64.pkg.tar.xz
@@ -49,8 +48,9 @@ if cfgOpt r && [[ -f "$mods" ]]; then
 fi
 
 frgx(){ local patt="\\b$*\\b"
-    [[ "$*" =~ ^/.*$ ]] && patt="cfg$patt" || patt=".*$patt"
-    [[ "$*" =~ ^.*/$ ]] && patt="${patt}.*"|| patt="$patt\$"
+    [[ "$*" =~ ^/$ ]] && patt="cfg" ||:
+    [[ "$*" =~ ^/.+$ ]] && patt="cfg$patt" || patt=".*$patt"
+    [[ "$*" =~ ^.+/$ ]] && patt="${patt}.*"|| patt="$patt\$"
     echo "$patt"
 }
 filter_find() { local accept regect
@@ -64,7 +64,6 @@ filter_find() { local accept regect
 
 # USAGE:(modules) ./setup [-s <exc1>].. inc1..
 PKG_SKIP+=( "${CFG_S[@]}" )
-PKG_SKIP+=( firefox )  # REM:BUG
 # ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
 #   if all $@ are concrete modules (don't end in '/')
 if (($#)) || cfgOpt s; then

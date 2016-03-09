@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
+    -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31AC65' \
+    -fn '-misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+}
+run(){ [[ -z "$@" ]] || exec qutebrowser "$@"; }
+
+case "$1"
+in -p) shift; run "$(xsel -ob)"
+;; -h) shift; run "$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)"
+# ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"
+# ;; -s) shift; exec qutebrowser -C 'set scripts=true' ${@+open} "$@"
+;;  *) exec qutebrowser "$@"
+;; esac

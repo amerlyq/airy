@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+export XDG_RUNTIME_DIR="${TMPDIR?}"
+
+exec uzbl-browser "$@"

@@ -10,8 +10,13 @@ g3=~/.config/gtk-3.0/settings.ini
 mkdir -p "${g3%/*}"
 echo '# include "/etc/gtk-2.0/gtkrc"' > $g2
 echo '[Settings]' > $g3
+wopt() {
+    printf '%s = "%s"\n' "$1" "${*:2}" >> $g2
+    printf '%s = %s\n'   "$1" "${*:2}" >> $g3
+}
 
 # GUI (use lxappearance): Adwaita, Hope-DT, FlatStudioGray, Mint-X, Ambiance
+# Vertex-Dark
 if cfgOpt t || [[ -z "$GTK_THEME" ]]
 then case "${THEME}" in
   lucid) GTK_THEME="FlatStudioGray" ;;
@@ -20,10 +25,9 @@ then case "${THEME}" in
  dark|*) GTK_THEME="FlatStudioDark"  ;;
 esac; fi
 
-tee -a $g2 $g3 >/dev/null <<EOT
-gtk-theme-name = "$GTK_THEME"
-gtk-application-prefer-dark-theme = true
-gtk-font-name = "Sans 9"
+wopt 'gtk-theme-name' "$GTK_THEME"
+wopt 'gtk-application-prefer-dark-theme' true
+wopt 'gtk-font-name' Sans 9
 
 ## Icons
 ## Name is defined in the theme's index file, it's NOT the name of its directory.
@@ -38,7 +42,7 @@ gtk-font-name = "Sans 9"
 
 ## Toolbar
 # gtk-toolbar-style=GTK_TOOLBAR_ICONS  # GTK_TOOLBAR_BOTH
-gtk-toolbar-icon-size = GTK_ICON_SIZE_SMALL_TOOLBAR
+wopt 'gtk-toolbar-icon-size' GTK_ICON_SIZE_SMALL_TOOLBAR
 # gtk-button-images=1
 # gtk-menu-images=1
 
@@ -53,7 +57,7 @@ gtk-toolbar-icon-size = GTK_ICON_SIZE_SMALL_TOOLBAR
 # gtk-xft-rgba=rgb
 
 #include "/home/do/.gtkrc-2.0.mine"
-EOT
+
 echo "W: {$g2, $g3}"
 
 # INFO:
