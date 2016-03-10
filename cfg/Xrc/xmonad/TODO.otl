@@ -72,6 +72,7 @@ THINK:ENH
 	[_] RFC: 'let mCopyq = ("M-z " ++)' extract as function applying to list to create submaps
 	[_] optimize map lambda on tuple's 1st/2nd element -- CHECK: \f -> map (f *** id)
 		http://stackoverflow.com/questions/10818779/can-i-map-the-first-element-of-a-pair-without-arrows
+		: CHECK Control.Arrow.first
 	[_] TRY: show [\d] in left-below corner for fullscreen, where \d -- number of active windows
 	[_] show somewhere master windows count if it != 1
 
@@ -167,10 +168,12 @@ FIXME
 		:= need disable mod+Mouse1 from making windows floating (OR? maybe M-S-m1)
 	[_] when works doFloat hook -- make (x, y) -> (10, 10) instead (0, 0)
 		:= it's too close to screen borders, which feels bad
+	[_] make on (re)start jumping to `windows (current || 1)`
 
 
 BUG
 	[_] 'f' in mpv don't make fullscreen
+	2016-03-09 [_] Why I need 'nm!!0:[]' instead of head nm?
 	[_] xkb latching залипает for Mod4+a -- cycleWindows -- then you need only 'a'
 		:= scenario norm: press and hold Alt, then click 'a', release Alt
 		:= scenario bad: press/release Alt, then click 'a', 'a'

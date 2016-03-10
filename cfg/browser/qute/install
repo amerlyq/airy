@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    pkg_inst 'qutebrowser'
+
+elif distro ubuntu; then
+    echo "Err: no"
+fi

@@ -5,7 +5,10 @@ has_pr X || die
 pkg_inst -p 'firefox' firefox
 
 if distro arch; then
-    aur_inst -p 'firefox' pentadactyl-git
+    echo "BROKEN:(signing) pentadactyl"
+    # aur_inst -p 'firefox' pentadactyl-git
+    echo "USE:(manually) https://github.com/willsALMANJ/pentadactyl-signed/releases"
+
     pkg_inst -p 'firefox' flashplugin
 elif distro ubuntu; then
     echo "Err: install manually pentadactyl and flashplugin"
