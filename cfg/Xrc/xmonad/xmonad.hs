@@ -3,6 +3,7 @@ module Main (main) where
 
 ---- Std
 import Data.List    (isPrefixOf)
+import Data.Ratio   ((%))
 import System.IO
 import System.Exit
 
@@ -10,9 +11,11 @@ import System.Exit
 import XMonad
 import XMonad.Config.Desktop
 import XMonad.Util.EZConfig         (mkKeymap)
+import XMonad.ManageHook            (liftX)
 
 ---- Actions
-import XMonad.Actions.CycleWS       (moveTo, shiftTo, toggleWS, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import XMonad.Actions.CycleWS       (moveTo, shiftTo, toggleWS', Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
 import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere, spawnAndDo)
 import XMonad.Actions.WindowGo      (runOrRaise)
 import qualified XMonad.Actions.GroupNavigation as GN
@@ -32,7 +35,9 @@ import XMonad.Layout.Tabbed         (simpleTabbed)
 import XMonad.Layout.Grid           (Grid(..))
 import XMonad.Layout.Circle         (Circle(..))
 import XMonad.Layout.SimplestFloat  (simplestFloat)
+import XMonad.Layout.IM             (withIM, Property(ClassName, Title, And))
 -- modifiers
+import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
 import XMonad.Layout.PerWorkspace   (onWorkspace)
 import XMonad.Layout.MultiToggle    (mkToggle, Toggle(..), single, (??), EOT(..))
@@ -50,6 +55,7 @@ myKeys cfg = mkKeymap cfg $
   , ("M-j"        , windows W.focusDown)
   , ("M-k"        , windows W.focusUp)
   , ("M-l"        , GN.nextMatch GN.History (return True))
+  -- FIXME, ("M-l"        , GN.nextMatchWithThis GN.History (ask >>= \w -> liftX (io $ withWindowSet $ W.findTag w)) )
   , ("M-'"        , GN.nextMatchWithThis GN.Backward className)
   , ("M-z"        , focusUrgent)
   , ("M-C-z"      , clearUrgents)
@@ -63,6 +69,22 @@ myKeys cfg = mkKeymap cfg $
   , ("M-."        , sendMessage Expand)
   , ("M-S-,"      , sendMessage MirrorShrink)
   , ("M-S-."      , sendMessage MirrorExpand)
+  , ("M-<Left>"   , withFocused $ keysMoveWindow (-10,0))
+  , ("M-<Right>"  , withFocused $ keysMoveWindow ( 10,0))
+  , ("M-<Up>"     , withFocused $ keysMoveWindow (0,-10))
+  , ("M-<Down>"   , withFocused $ keysMoveWindow (0, 10))
+  , ("M-C-<Left>" , withFocused $ keysMoveWindowTo ( 10, 10) (0,0))
+  , ("M-C-<Right>", withFocused $ keysMoveWindowTo (800,410) (0,0))
+  , ("M-C-<Up>"   , withFocused $ keysMoveWindowTo (800, 10) (0,0))
+  , ("M-C-<Down>" , withFocused $ keysMoveWindowTo ( 10,410) (0,0))
+  -- BUG: cant grow width/height -- problems with sizeHints?
+  , ("M-S-<Left>" , withFocused $ keysResizeWindow (-10,0) (1%2,1%2))
+  , ("M-S-<Rigth>", withFocused $ keysResizeWindow (10,0) (1%2,1%2))
+  , ("M-S-<Up>"   , withFocused $ keysResizeWindow (0,-10) (1%2,1%2))
+  , ("M-S-<Down>" , withFocused $ keysResizeWindow (0,10) (1%2,1%2))
+  -- , ("M-<Up>"     , withFocused $ keysAbsResizeWindow (-10,-10) (1024,752))
+  -- , ("M-<Down>"   , withFocused $ keysAbsResizeWindow (10,10) (1024,752))
+  -- , ("M-<>" , withFocused (keysMoveWindowTo (512,384) (1%2,1%2)))
   , ("M-;"        , sendMessage . IncMasterN $  1)
   , ("M-S-;"      , sendMessage . IncMasterN $ -1)
   ---- float
@@ -74,6 +96,7 @@ myKeys cfg = mkKeymap cfg $
   , ("M-S-n"      , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
   , ("M-f"        , sendMessage (Toggle FULL) >> sendMessage ToggleStruts)
   , ("M-/"        , sendMessage $ Toggle MIRROR)
+  , ("M-S-/"      , sendMessage $ Toggle REFLECTX)
   ] ++
   -- Cycle through workspaces
   let focusNextNE = moveTo  Next NonEmptyWS
@@ -82,7 +105,7 @@ myKeys cfg = mkKeymap cfg $
       shiftPrevNE = shiftTo Prev NonEmptyWS
       -- moveToE   = moveTo  Next EmptyWS
       -- shiftToE  = shiftTo Next EmptyWS
-  in [ ("M-a"        , toggleWS)
+  in [ ("M-a"        , toggleWS' ["NSP"])
      --FIXME: , ("M-S-a"      , shiftToPrev >> toggleWS)
      , ("M-S-a"      , windows (W.shift "0") >> windows (W.view "0"))
      , ("M-<Tab>"    , focusNextNE)
@@ -264,10 +287,13 @@ myCfg = ewmh $
 
 myLayout = smartBorders
     -- . onWorkspace (workspaces myCfg !! 4) Full
+    . onWorkspace (head $ workspaces myCfg) imLayer
     . mkToggle (NOBORDERS ?? FULL ?? EOT)
     . mkToggle (single MIRROR)
+    . mkToggle (single REFLECTX)
     $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
   where
+    imLayer = withIM (1%7) (Title "Buddy List") Grid
     tiled   = ResizableTall nmaster delta ratio []
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
@@ -346,6 +372,7 @@ myPP = xmobarPP
       "Tabbed Simplest" -> "=--"
       "Full" -> "[ ]"
       "Grid" -> "[#]"
+      "IM Grid" -> "|##"
       "SimplestFloat" -> "( )"
       "Circle" -> "(O)"
       _ -> nm

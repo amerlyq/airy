@@ -44,7 +44,9 @@ class ag(Command):
 
     def _aug_sh(self, iarg, flags=[]):
         patt = self._bare(self._arg(iarg))
-        cmdl = ag.acmd.split() + flags + [patt] + self._sel()
+        cmdl = ag.acmd.split() + flags + [patt]
+        if '-g' not in flags:
+            cmdl += self._sel()
         return (cmdl, '-p')
 
     def _choose(self):
@@ -54,12 +56,17 @@ class ag(Command):
             return self._aug_vim(2, 'AgGroup')
         elif self.arg(1) == '-l':
             return self._aug_sh(2, ['--files-with-matches'])
+        elif self.arg(1) == '-f':
+            return self._aug_sh(2, ['-g'])
+        elif self.arg(1) == '-p':
+            return self._aug_sh(2, [])
         else:
             return self._aug_sh(1, [])
 
     def execute(self):
         cmd, flags = self._choose()
         self.fm.execute_command(cmd, flags=flags)
+        self.fm.notify(cmd)
 
     def tab(self):
         return ['{} {}'.format(self.arg(0), p)

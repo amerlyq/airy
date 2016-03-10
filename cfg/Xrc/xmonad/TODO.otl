@@ -60,8 +60,9 @@ THINK:ENH
 		Need to skip all windows in current WS
 		Cycle through all previous WS in history order?
 	[_] Each $ xmonad --restart # drops to wksp 1
-		how to make that action only from ~/.xinitrc but not when restart manually?
+		[_] how to make that action only from ~/.xinitrc but not when restart manually?
 		:= so, it must work on startuHook but not on --restart
+		[_] make on (re)start jumping to `windows (current || 1)`
 	[_] gmrun
 	[_] xkill
 	[_] Modular Configuration
@@ -73,8 +74,12 @@ THINK:ENH
 	[_] optimize map lambda on tuple's 1st/2nd element -- CHECK: \f -> map (f *** id)
 		http://stackoverflow.com/questions/10818779/can-i-map-the-first-element-of-a-pair-without-arrows
 		: CHECK Control.Arrow.first
-	[_] TRY: show [\d] in left-below corner for fullscreen, where \d -- number of active windows
+	[_] TRY: show [ ]\d in left-below corner for fullscreen, where \d -- number of active windows
+		:= use special small subscript font <fc=1>
+		:TRY: simultaneously use superscript font for floating windows
 	[_] show somewhere master windows count if it != 1
+		:= use same subscript like for fullscreen?
+		:= but then how about two masters in fullscreen?
 
 RFC
 	: myManageHook = composeAll . concat $
@@ -165,15 +170,20 @@ FIXME
 	[_] hide/unhide xmobar on M-S-f
 	[_] replace import XMonad.Config with direct code
 		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
-		:= need disable mod+Mouse1 from making windows floating (OR? maybe M-S-m1)
+	[_] need disable mod+Mouse1 from making windows floating (OR? maybe M-S-m1)
+		:= Better solution: allow making floating only after (x*x+y*y > threshold)
 	[_] when works doFloat hook -- make (x, y) -> (10, 10) instead (0, 0)
 		:= it's too close to screen borders, which feels bad
-	[_] make on (re)start jumping to `windows (current || 1)`
+	[_] Replace EZConfig by manual submaps
+		[_] null/stop default action if any other key beside submap
+		[_] show indicator of current state
+		: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-Submap.html
+		[_] search in sources of Submap for in/out state variable to use for indicator
 
 
 BUG
 	[_] 'f' in mpv don't make fullscreen
-	2016-03-09 [_] Why I need 'nm!!0:[]' instead of head nm?
+	[_] Why I need 'nm!!0:[]' instead of head nm?
 	[_] xkb latching залипает for Mod4+a -- cycleWindows -- then you need only 'a'
 		:= scenario norm: press and hold Alt, then click 'a', release Alt
 		:= scenario bad: press/release Alt, then click 'a', 'a'
