@@ -22,11 +22,11 @@ xkb_compatibility "latch"  {
 
     // Long press -- latch, Short press -- Esc
     interpret Control_L {
-        action= SetMods(modifiers=Control);
+        action = LatchMods(modifiers=Control);
     };
 
     interpret Control_R {
-        action= LatchMods(modifiers=Control);
+        action = LatchMods(modifiers=Control);
     };
 
     interpret Alt_L+Any {

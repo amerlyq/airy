@@ -1,4 +1,4 @@
-// vim: ft=cpp
+// vim: ft=c
 
 default partial xkb_symbols "base"
 {
@@ -28,13 +28,13 @@ default partial xkb_symbols "base"
     // FnF9 -> disable screen
     // Fn10 -> Eject?
     // Fn11 -> Bluetooth?
-    key <I232>   {      [ XF86MonBrightnessDown ]       };
-    key <I233>   {      [ XF86MonBrightnessUp   ]       };
+    key <I232> { [ XF86MonBrightnessDown ] };
+    key <I233> { [ XF86MonBrightnessUp   ] };
 };
 
 partial function_keys
 xkb_symbols "fkey2vt" {
-    type="L2:SUPER"
+    key.type = "L2:SUPER";
 
     key <FK01> { [ F1,  XF86_Switch_VT_1  ] };
     key <FK02> { [ F2,  XF86_Switch_VT_2  ] };
