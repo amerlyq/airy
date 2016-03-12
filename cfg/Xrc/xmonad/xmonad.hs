@@ -3,7 +3,9 @@ module Main (main) where
 
 ---- Std
 import Data.List    (isPrefixOf)
+import Data.Maybe   (isJust,fromMaybe)
 import Data.Ratio   ((%))
+import qualified Data.Map as M
 import System.IO
 import System.Exit
 
@@ -45,6 +47,7 @@ import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDE
 -- decorators
 import XMonad.Layout.LayoutHints    (layoutHintsToCenter, hintsEventHook)  -- honor size hints
 import XMonad.Layout.NoBorders      (smartBorders)  -- no borders on fullscreen
+import XMonad.Layout.Spacing        (smartSpacing)
 -- extension
 import XMonad.Util.NamedScratchpad  (namedScratchpadAction, namedScratchpadManageHook, NamedScratchpad(..), nonFloating, defaultFloating, customFloating)
 
@@ -54,8 +57,7 @@ myKeys cfg = mkKeymap cfg $
   [ ("M-h"        , windows W.focusMaster)
   , ("M-j"        , windows W.focusDown)
   , ("M-k"        , windows W.focusUp)
-  , ("M-l"        , GN.nextMatch GN.History (return True))
-  -- FIXME, ("M-l"        , GN.nextMatchWithThis GN.History (ask >>= \w -> liftX (io $ withWindowSet $ W.findTag w)) )
+  , ("M-l"        , GN.nextMatchWithThis GN.History wkspName)
   , ("M-'"        , GN.nextMatchWithThis GN.Backward className)
   , ("M-z"        , focusUrgent)
   , ("M-C-z"      , clearUrgents)
@@ -88,9 +90,10 @@ myKeys cfg = mkKeymap cfg $
   , ("M-;"        , sendMessage . IncMasterN $  1)
   , ("M-S-;"      , sendMessage . IncMasterN $ -1)
   ---- float
-  -- , ("M-w"        , withFocused $ windows . W.sink)
+  -- THINK: jumps between last two float windows -- do combo M-w, M-l better then i3 model
+  , ("M-w"        , GN.nextMatch GN.History isFloat)
   , ("M-C-w"      , withFocused $ windows . W.sink)
-  -- , ("M-S-w"      , withFocused $ windows . W.float)
+  , ("M-S-w"      , withFocused $ float)
   -- Layouts
   , ("M-n"        , sendMessage NextLayout)
   , ("M-S-n"      , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
@@ -107,7 +110,9 @@ myKeys cfg = mkKeymap cfg $
       -- shiftToE  = shiftTo Next EmptyWS
   in [ ("M-a"        , toggleWS' ["NSP"])
      --FIXME: , ("M-S-a"      , shiftToPrev >> toggleWS)
+     --SEE: http://xmonad.org/xmonad-docs/xmonad-contrib/src/XMonad-Actions-CycleWS.html
      , ("M-S-a"      , windows (W.shift "0") >> windows (W.view "0"))
+     -- THINK: too insignificant usage with price of one useful key
      , ("M-<Tab>"    , focusNextNE)
      , ("M-S-<Tab>"  , focusPrevNE)
      , ("M-C-<Tab>"  , shiftNextNE >> focusNextNE)
@@ -259,6 +264,10 @@ myKeys cfg = mkKeymap cfg $
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
     visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
+    -- | Get params from current window
+    -- TRY? we could use simply W.tag on w? See src of toggleWS'
+    wkspName = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ fromMaybe "" $ W.findTag w ws) :: Query String
+    isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ M.member w $ W.floating ws) :: Query Bool
 
 
 myCfg = ewmh $
@@ -286,6 +295,7 @@ myCfg = ewmh $
 
 
 myLayout = smartBorders
+    -- . smartSpacing 3  -- I'm not sure yet if it nice or not
     -- . onWorkspace (workspaces myCfg !! 4) Full
     . onWorkspace (head $ workspaces myCfg) imLayer
     . mkToggle (NOBORDERS ?? FULL ?? EOT)
@@ -329,6 +339,9 @@ myManageHook = manageSpawn <+>
     in wmhas (stringProperty "WM_WINDOW_ROLE") lst
   , let lst = "copyq feh Steam Gimp Pidgin Skype piony.py Transmission-gtk"
     in wmhas className lst
+  , let lst = "PlayOnLinux"
+    in wmhas appName lst
+  , (className =? "Firefox" <&&> appName =? "Download")
   ] <+>
   -- for_window [title="^ElonaPlus"] fullscreen
   composeAll

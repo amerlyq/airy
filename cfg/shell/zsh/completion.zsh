@@ -16,6 +16,8 @@ fpath=(~/.shell/zsh/completion.d $fpath)
 compdef prg.d/git-recursive=git
 for c in st pl ph; do eval "function _git-$c { _git; }"; done
 
+compdef r.ssh=ssh
+
 # SEE Partial completion for git subcommands (like my $ compdef grI=git-rebase)
 #   http://unix.stackexchange.com/questions/128199/how-do-i-set-zsh-autocompletion-rules-for-second-argument-of-function-to-an-ex
 

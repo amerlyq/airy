@@ -5,3 +5,7 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 link -t ~/.config/qutebrowser \
     qutebrowser.conf keys.conf
+
+if cfgOpt r; then
+    qutebrowser :adblock-update :close
+fi

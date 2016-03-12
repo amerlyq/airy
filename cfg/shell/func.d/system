@@ -14,7 +14,7 @@ trap_errors(){
 ### Add current package to active mods list if absent
 airy_cache_pwd_mod() { local mods="${CURR_DIR_CACHE:?No}/mods/mods"
 [[ ! -t 0 ]] || [[ ! "$0" =~ ^${CURR_DIR_CFG:?No} ]] ||
-    grep -q "^${0%/*}$" "$mods" || echo "${0%/*}" >> "$mods"
+    grep -qxF "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
 }
 
 # ====================== Configs =====================================
@@ -25,7 +25,7 @@ cfgOptAdd() { CFG_OPTS="${CFG_OPTS/[$*]}$*"; }
 distro(){
       if [[ -e /etc/os-release  ]]; then cat /etc/os-release
     elif [[ -e /etc/lsb-release ]]; then cat /etc/lsb-release
-    else uname -a; fi | grep -iq "$1"
+    else uname -a; fi | grep -iqF "$1"
 }
 die() { local ret=$?
     if [[ "$1" =~ [0-9]+ ]]; then ret=$1; shift; fi

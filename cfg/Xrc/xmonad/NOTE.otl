@@ -7,3 +7,6 @@ Workspace layout
 
 Debug
 	https://ghc.haskell.org/trac/ghc/wiki/Debugging/CompiledCode
+
+	NOTE:(debug)
+		, ("M-w"        , gets windowset >>= \ss -> withFocused $ \w -> trace $ fromMaybe "" $ W.findTag w ss)

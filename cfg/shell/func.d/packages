@@ -42,7 +42,7 @@ if distro ubuntu; then
     local addr="${1#ppa:}"
     addr="${addr#*http://}"
     addr="${addr%% *}"
-    ! grep -FRq "$addr" /etc/apt/sources.list /etc/apt/sources.list.d/ || return 0
+    ! grep -qxFR "$addr" /etc/apt/sources.list /etc/apt/sources.list.d/ || return 0
     sudo add-apt-repository ${2---yes} "$1"
     sudo apt-get update
   }
