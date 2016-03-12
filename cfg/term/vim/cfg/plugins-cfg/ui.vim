@@ -63,7 +63,7 @@ endif "}}}
 if neobundle#tap('vim-quickhl')  "{{{
    map <unique> [Quote]h  <Plug>(operator-quickhl-manual-this-motion)
   nmap <unique> [Quote]H  <Plug>(quickhl-manual-reset)
-  nmap <unique> <Leader>?h  :QuickhlManualList<CR>
+  " USE:(directly) nmap <unique> <F1>h     :QuickhlManualList<CR>
   nmap <unique> [Toggle]h  <Plug>(quickhl-cword-toggle)
   nmap <unique> <Leader>Th  <Plug>(quickhl-manual-toggle)
   "" ATTENTION: unusable on big tag base (like kernels)

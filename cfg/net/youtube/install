@@ -2,8 +2,8 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst 'qutebrowser'
-    pkg_inst 'youtube-dl'  # for opening video by mpv
+    # need for opening video by mpv in qutebrowser
+    pkg_inst 'youtube-dl'
 
 elif distro ubuntu; then
     echo "Err: no"

@@ -112,11 +112,14 @@ cnoremap <C-y> <C-R>=CopyStringInReg('+', getcmdline())<CR><C-H>
 " To be able copy/paste regex snippets into vim/snippets/vim_regex.otl
 nnoremap <leader><Space>/ :<C-U>call CopyStringInReg('+', @/)<CR>
 vnoremap <leader><Space>/ :<C-U><C-R>=TrimLines(GetVisualSelection('\n')))<CR>
-nnoremap <leader>/ :<C-U>call CopyStringInReg('/', @+)<CR>
-noremap  <leader><Space>% :<C-U>call CopyStringInReg('+', @%)<CR>
+noremap  <leader>% :<C-U>call CopyStringInReg('+', @%)<CR>
 " Open commandline with copied text
 nnoremap <leader>; :<C-R>"
 vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
+
+" Directly search copied text
+nnoremap <leader>/ :<C-U>call setreg('/','\V'.@+,getregtype('/'))<CR>/<CR>
+nnoremap <leader>? :<C-U>call setreg('/','\V'.@+,getregtype('/'))<CR>?<CR>
 
 
 "{{{1 Convert main reg type for pasting
