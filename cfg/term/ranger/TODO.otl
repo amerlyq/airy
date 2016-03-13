@@ -61,6 +61,9 @@ scope.sh
 		:= Do it on top of default scope.sh, building viewers from scratch
 		:% And then send pull request
 	[_] Toggle w3m/img2txt/exif preview for image/video
+	[_] BUG: preview can't timeout -- many hanging processes
+		:ENH: at first simply show and fix preview w/o script, but run pygment in background
+		:When (and if) pygment done (no error, less < 5 sec) -- replace preview text
 	[_] Add hang-out process checking to ranger scope.sh
 	[_] re-read output from scope.sh for lister on shortcut inside lister
 	[_] TODO create my own global mime extensions for scope.sh

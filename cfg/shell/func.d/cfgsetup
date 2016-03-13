@@ -24,6 +24,14 @@ then THEME=dark; fi
 link(){ ~/.bin/prg.d/linkcp $@; }
 linkdir(){ for nm in "${@:2}"; do link "$PWD/$nm" "${1?No}$nm"; done }
 # ALT linkdir(){ mkdir -p $2 && lndir "$1" $2; }
+### Populate all run, run.pr1 scripts into mycache/bin
+linkmask(){ local nm mask=$1 fmt=$2
+  [[ ! -t 0 && $0 =~ ^${CURR_DIR_CFG:?} ]] || return 0
+  for src in "$mask"*; do [[ -f "$src" && -x "$src" ]] || continue
+    nm=$(printf "$fmt" "${PWD##*/}" "${src#$mask}")
+    link "$src" "$CURR_DIR_CACHE/$nm"
+  done
+}
 
 
 if distro arch; then
@@ -37,6 +45,9 @@ if distro arch; then
       sudo useradd -r -U -d /dev/null -s /usr/bin/nologin "$1"; }
 
 elif distro ubuntu; then
+  # ALT: Interactive choose defaults
+  #   sudo update-alternatives --config gnome-www-browser
+  #   update-alternatives --display x-session-manager
   mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
       sudo update-alternatives --set $1 "$2"; }
   svc_enable() { sudo update-rc.d "$1" defaults; }
@@ -47,37 +58,8 @@ fi
 cd $(dirname $(readlink -m ${0}))
 [[ -n "$MODS_CACHE_DISABLE" ]] || airy_cache_pwd_mod
 
-### Populate all run, run.pr1 scripts into mycache/bin
-for path in "$PWD/run"*; do [[ -f "$path" ]] || continue
-  link "$path" "$CURR_DIR_CACHE/bin/r.${PWD##*/}${path#$PWD/run}"
-done
-for path in "$PWD/env"*; do [[ -f "$path" ]] || continue
-  link "$path" "$CURR_DIR_CACHE/env/${PWD##*/}${path#$PWD/env}"
-done
-# =============================== ALT ==================================
-
-## Subdirectories:
-# for dir in "$PWD"/*; do if [[ -d "$dir" && -f "$dir/setup" ]]
-# then echo ">>> Cfg: $dir <<<"; "$dir/setup" "$ARGS"; fi; done
-## Packages
-# [[ "${PKG_LIST[@]} " =~ "${PWD##*/} " ]] || exit
-## Robust find with exec
-# find . -mindepth 2 -type f -wholename "*/setup" -not -exec \
-#     bash -c "echo '>>> {} <<<' && '{}' $ARGS || exit" \; -quit
-
-# ALT: Interactive choose defaults
-#   sudo update-alternatives --config gnome-www-browser
-#   update-alternatives --display x-session-manager
-
-# ALT: Check distro name and version: lsb_release -si
-# lsb_release -ds 2>/dev/null || cat /etc/*release 2>/dev/null | head -n1 || uname -om
-
-## ALT: Instead of my "$CURR_PLTF"
-# case "$OSTYPE" in
-#   cygwin|msys) echo "Windows"
-#   solaris*) echo "SOLARIS" ;;
-#   darwin*)  echo "OSX" ;;
-#   linux*)   echo "LINUX" ;;
-#   bsd*)     echo "BSD" ;;
-#   *)        echo "unknown: $OSTYPE" ;;
-# esac
+if [[ -z $MODS_RUN_DISABLE ]]; then
+  linkmask "$PWD/bin/" 'bin/r.%s-%s'
+  linkmask "$PWD/run"  'bin/r.%s%s'
+  linkmask "$PWD/env"  'env/r.%s%s'
+fi

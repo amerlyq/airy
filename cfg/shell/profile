@@ -2,6 +2,7 @@
 
 ### Profile Mgmt ###
 CURR_PROF="default"
+# ALT:TRY: $OSTYPE, maybe replace CURR_PLTF in all scripts?
 CURR_PLTF=$(expr substr $(uname -s) 1 5)
 CURR_USER=${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}
 CURR_HOST=${HOSTNAME:-$(uname -n)}
