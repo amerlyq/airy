@@ -1,8 +1,0 @@
-#!/bin/sh
-
-TEXT="${*:-(default text)}"
-# TEXT="<b>Music</b>\n<i>You have 15s to choose</i>" #<a href=a.html></a>
-# OPTS="-h int:x:500 -h int:y:500"
-OPTS="$OPTS -h string:bgcolor:#ffffff -h string:fgcolor:#000000"
-notify-send --urgency=low --expire-time=1200 $OPTS "$TEXT"
-# -i '/usr/share/icons/oxygen/32x32/status/mail-unread-new.png'

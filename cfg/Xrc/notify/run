@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+# Format: <b>Music</b>\n<i>You have 15s to choose</i>
+# <a href=a.html></a>
+EXPIRE=12
+
+CMD=(notify-send)
+while getopts 'p:t:uU' o; do case "$o"
+in t) EXPIRE=$OPTARG
+;; u) CMD+=( --urgency=low )
+;; U) CMD+=( --urgency=critical )
+;; p) CMD+=( -h int:value:$OPTARG )
+esac; done; shift $((OPTIND-1))
+
+CMD+=( --category notify --expire-time=$(($EXPIRE*100)) )
+# CMD+=( -h string:bgcolor:\#ffffff \
+#        -h string:fgcolor:\#000000 )
+# Pos: -h int:x:500 -h int:y:500
+# Icon: -i '/usr/share/icons/oxygen/32x32/status/mail-unread-new.png'
+# SEE: --app-name
+
+exec "${CMD[@]}" "${1:-(no text)}" "${*:2}"
