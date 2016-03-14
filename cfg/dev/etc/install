@@ -7,6 +7,8 @@ source ~/.shell/func.d/packages
 #| iotop   | Show disk r/w statistics for processes like htop (press 'a')
 #| dstat   | Versatile tool for generating system resource statistics
 #| jshon   | Bash json parser to use in scripts with i3-msg output # http://kmkeen.com/jshon/
+#| shyaml  | Read access to YAML files through command line # https://github.com/0k/shyaml
+# ALT:  jq (https://stedolan.github.io/jq/), paired with yaml2json (https://github.com/coolaj86/yaml2json).
 #| urlview | Extracting URLs from text files and displaying a menu from which
 #|_________|    you may launch a command to view a specific item
 #| mlocate | Searching indexed (daily or by 'sudo updatedb') files on arch
@@ -17,6 +19,7 @@ source ~/.shell/func.d/packages
 pkg_inst "at htop iotop dstat jshon"
 
 if distro arch; then
+    aur_inst shyaml
     pkg_inst -p 'locate' mlocate
     pkg_inst -p 'ag' the_silver_searcher
 

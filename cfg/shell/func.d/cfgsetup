@@ -26,7 +26,7 @@ linkdir(){ for nm in "${@:2}"; do link "$PWD/$nm" "${1?No}$nm"; done }
 # ALT linkdir(){ mkdir -p $2 && lndir "$1" $2; }
 ### Populate all run, run.pr1 scripts into mycache/bin
 linkmask(){ local nm mask=$1 fmt=$2
-  [[ ! -t 0 && $0 =~ ^${CURR_DIR_CFG:?} ]] || return 0
+  [[ -z $PS1 && $0 =~ ^${CURR_DIR_CFG:?} ]] || return 0
   for src in "$mask"*; do [[ -f "$src" && -x "$src" ]] || continue
     nm=$(printf "$fmt" "${PWD##*/}" "${src#$mask}")
     link "$src" "$CURR_DIR_CACHE/$nm"
