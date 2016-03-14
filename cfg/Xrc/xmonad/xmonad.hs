@@ -2,21 +2,27 @@
 module Main (main) where
 
 ---- Std
-import Data.List    (isPrefixOf)
+-- import Control.Arrow (second)
+import Data.List    (zipWith, isPrefixOf)
 import Data.Maybe   (isJust,fromMaybe)
 import Data.Ratio   ((%))
+import Data.Default (def)
 import qualified Data.Map as M
 import System.IO
 import System.Exit
 
 ---- Core
-import XMonad
-import XMonad.Config.Desktop
+import XMonad                       -- (float, kill, spawn, refresh, restart, doFloat, workspaces, windows, withFocused, sendMessage, Resize(Shrink, Expand), IncMasterN)
 import XMonad.Util.EZConfig         (mkKeymap)
-import XMonad.ManageHook            (liftX)
+import XMonad.Util.WorkspaceCompare (getSortByIndex)
+import XMonad.ManageHook            (liftX, className)
+
+---- Interaction
+import XMonad.Prompt.Shell          (shellPrompt)
+import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
 
 ---- Actions
-import XMonad.Actions.CycleWS       (moveTo, shiftTo, toggleWS', Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import XMonad.Actions.CycleWS       (doTo, moveTo, shiftTo, toggleWS', Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
 import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere, spawnAndDo)
 import XMonad.Actions.WindowGo      (runOrRaise)
@@ -51,6 +57,10 @@ import XMonad.Layout.Spacing        (smartSpacing)
 -- extension
 import XMonad.Util.NamedScratchpad  (namedScratchpadAction, namedScratchpadManageHook, NamedScratchpad(..), nonFloating, defaultFloating, customFloating)
 
+
+import XMonad.Config.Amer.EventHook  (myHandleEventHook)
+import XMonad.Config.Amer.Prompt     (myPromptTheme)
+import XMonad.Config.Amer.Scratchpad (myScratchpads)
 
 myKeys cfg = mkKeymap cfg $
   ---- focus
@@ -93,7 +103,7 @@ myKeys cfg = mkKeymap cfg $
   -- THINK: jumps between last two float windows -- do combo M-w, M-l better then i3 model
   , ("M-w"        , GN.nextMatch GN.History isFloat)
   , ("M-C-w"      , withFocused $ windows . W.sink)
-  , ("M-S-w"      , withFocused $ float)
+  , ("M-S-w"      , withFocused float)
   -- Layouts
   , ("M-n"        , sendMessage NextLayout)
   , ("M-S-n"      , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
@@ -102,27 +112,29 @@ myKeys cfg = mkKeymap cfg $
   , ("M-S-/"      , sendMessage $ Toggle REFLECTX)
   ] ++
   -- Cycle through workspaces
-  let focusNextNE = moveTo  Next NonEmptyWS
-      focusPrevNE = moveTo  Prev NonEmptyWS
-      shiftNextNE = shiftTo Next NonEmptyWS
-      shiftPrevNE = shiftTo Prev NonEmptyWS
-      -- moveToE   = moveTo  Next EmptyWS
-      -- shiftToE  = shiftTo Next EmptyWS
+  let focusNextE  = moveTo  Next EmptyWS
+      shiftNextE  = shiftTo Next EmptyWS
+      bringNextE  = doTo    Next EmptyWS getSortByIndex (\w -> windows (W.shift w) >> windows (W.view w))
+      -- focusNextNE = moveTo  Next NonEmptyWS
+      -- focusPrevNE = moveTo  Prev NonEmptyWS
+      -- shiftNextNE = shiftTo Next NonEmptyWS
+      -- shiftPrevNE = shiftTo Prev NonEmptyWS
   in [ ("M-a"        , toggleWS' ["NSP"])
      --FIXME: , ("M-S-a"      , shiftToPrev >> toggleWS)
      --SEE: http://xmonad.org/xmonad-docs/xmonad-contrib/src/XMonad-Actions-CycleWS.html
-     , ("M-S-a"      , windows (W.shift "0") >> windows (W.view "0"))
-     -- THINK: too insignificant usage with price of one useful key
-     , ("M-<Tab>"    , focusNextNE)
-     , ("M-S-<Tab>"  , focusPrevNE)
-     , ("M-C-<Tab>"  , shiftNextNE >> focusNextNE)
-     , ("M-C-S-<Tab>", shiftPrevNE >> focusPrevNE)
-     -- , ("M-C-<Tab>"  , moveToE)
-     -- , ("M-C-S-<Tab>", shiftToE >> moveToE)
+     , ("M-S-a" , windows (W.shift "0") >> windows (W.view "0"))
+     , ("M-<Backspace>"   , focusNextE)
+     , ("M-C-<Backspace>" , shiftNextE)
+     -- BUG: we focus one after that!
+     , ("M-S-<Backspace>" , bringNextE)
+     -- , ("M-<Tab>"    , focusNextNE)
+     -- , ("M-S-<Tab>"  , focusPrevNE)
+     -- , ("M-C-<Tab>"  , shiftNextNE >> focusNextNE)
+     -- , ("M-C-S-<Tab>", shiftPrevNE >> focusPrevNE)
      ]
   ++
   ---- Workspaces
-  [ (m ++ i, f i) | i <- workspaces cfg, (m, f) <-
+  [ (m ++ k, f nm) | (k, nm) <- myWorkspaces, (m, f) <-
     [ ("M-"  , windows . W.view)
     , ("M-C-", windows . W.shift)
     , ("M-S-", \w -> windows (W.shift w) >> windows (W.view w))
@@ -160,14 +172,22 @@ myKeys cfg = mkKeymap cfg $
     , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
     ]
   ] ++
+  ---- Interactions
+  inGroup "M-u"
+    [ ("t", inputPrompt def "Fire" ?+ \p -> spawn ("r.tf -e " ++ p))
+    , ("s", shellPrompt myPromptTheme)
+    ] ++
   ---- Scratchpads
-  (inGroup "M-o" . concat) [ [ ("M-o", windows $ W.view "NSP") ],
+  (inGroup "M-o" . concat) [
+    [ ("M-o", windows $ W.view "NSP")
+    , ("M-S-o", windows $ W.shift "NSP")
+    ],
     -- Open new or focus the already existing one
-    [ (nm!!0:[], namedScratchpadAction myScratchpads nm)
+    [ ([head nm], namedScratchpadAction myScratchpads nm)
     | nm <- ["ncmpcpp", "mutt", "ipython", "htop", "pidgin", "skype", "lyrics"]
     ],
     -- Open new window always
-    [ ("S-" ++ nm!!0:[], spawnHere $ "r.tf -e " ++ nm)
+    [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)
     | nm <- ["ncmpcpp", "mutt", "ipython"]
     ],
     [ ("f" , runOrRaise "firefox" $ className =? "Firefox")
@@ -226,7 +246,8 @@ myKeys cfg = mkKeymap cfg $
     inGroup "M-u"
     [ ("b", "r.b -h")
     , ("g", "r.b -g")
-    , ("d", "r.dict --vim")
+    , ("e", "r.dict --en --vim")
+    , ("r", "r.dict --ru --vim")
     , ("m", "~/.mpd/move_current")
     ],
     inGroup "M-y"
@@ -270,19 +291,27 @@ myKeys cfg = mkKeymap cfg $
     isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ M.member w $ W.floating ws) :: Query Bool
 
 
-myCfg = ewmh $
-  withUrgencyHook NoUrgencyHook $
-  defaultConfig
+myWorkspaces = concat
+  [ map (\k -> (k, k)) mainRow
+  , map (\k -> (leader [k], [k])) ['a' .. 'z']
+  , zipWith (\k nm -> (leader k, nm)) mainRow (words "~ ! @ # $ % ^ & * ( ) _ +")
+  ]
+  where
+    mainRow = words "` 1 2 3 4 5 6 7 8 9 0 - ="
+    leader = ("g " ++)  -- ALT: s, <Backspace>, <Tab>
+
+
+myCfg = ewmh $ withUrgencyHook NoUrgencyHook $ def
   { modMask = mod4Mask
   -- Options
   , terminal    = "r.t"
-  , workspaces  = words "` 1 2 3 4 5 6 7 8 9 0 - ="
+  , workspaces  = [ nm | (k, nm) <- myWorkspaces]
   , keys        = myKeys
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
   , startupHook = windows . W.view . (!!1) . workspaces $ myCfg
-  , manageHook  = myManageHook <+> manageHook defaultConfig
-  -- layoutHook defaultConfig
+  , manageHook  = myManageHook <+> manageHook def
+  -- layoutHook def
   -- layoutHintsToCenter
   , layoutHook = avoidStruts . smartBorders $ myLayout
   , logHook = GN.historyHook
@@ -310,25 +339,10 @@ myLayout = smartBorders
     delta   = 2/100 -- step of increasing
 
 
--- myScratchpads :: [NamedScratchpad]
-myScratchpads =
-  [ NS nm ("r.t -n " ++ nm ++ " -e " ++ nm) (appName =? nm) mng | (nm, mng) <-
-    [ ("htop"   , defaultFloating), ("mutt"   , nonFloating)
-    , ("ncmpcpp", defaultFloating), ("ipython", bottomThirdFloating)
-    ]
-  ] ++
-  [ NS "pidgin" "pidgin" (className =? "Pidgin" <&&> title =? "Buddy List") defaultFloating
-  , NS "skype"  "skype"  (className =? "Skype"  <&&> appName =? "skype" ) defaultFloating
-  , NS "lyrics" "cd ~/aura/lyfa/lists && r.t -n lyrics -e $EDITOR ./music.otl" (appName =? "lyrics") nonFloating
-  ]
-  where
-    bottomThirdFloating = customFloating $ W.RationalRect 0 (2/3) 1 (1/3)
-
-
--- RFC: composeAll . concat $ [ [
+-- RFC: mconcat . concat $ [ [
 myManageHook :: ManageHook
 myManageHook = manageSpawn <+>
-  composeAll
+  mconcat
   [ isFullscreen --> topmost doFullFloat
   , isDialog --> topmost doCenterFloat
   ] <+>
@@ -341,10 +355,10 @@ myManageHook = manageSpawn <+>
     in wmhas className lst
   , let lst = "PlayOnLinux"
     in wmhas appName lst
-  , (className =? "Firefox" <&&> appName =? "Download")
+  , className =? "Firefox" <&&> appName =? "Download"
   ] <+>
   -- for_window [title="^ElonaPlus"] fullscreen
-  composeAll
+  mconcat
   [ wmhas className "stalonetray" --> doIgnore
   , wmhas appName "panel desktop_window kdesktop trayer" --> doIgnore
   ]
@@ -360,17 +374,9 @@ myManageHook = manageSpawn <+>
   where
     wmhas t l = foldr1 (<||>) [ t =? x | x <- words l ]
     topmost =  (<+> insertPosition Master Newer)
-    composeFloat = composeAll . map (--> topmost doFloat)
+    composeFloat = mconcat . map (--> topmost doFloat)
     -- ALT: doF (W.shift "doc")
-    composeShift = composeAll . map (\(w, x) -> (className =? x --> doShift w))
-
-
-myHandleEventHook = composeAll
-  [ handleEventHook defaultConfig
-  , docksEventHook
-  , hintsEventHook
-  , fullscreenEventHook
-  ]
+    composeShift = mconcat . map (\(w, x) -> (className =? x --> doShift w))
 
 
 myPP :: PP  -- xmobar pretty printing source

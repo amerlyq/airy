@@ -12,6 +12,7 @@ SEE
 			> http://echo.rsmw.net/n00bfaq.html
 			http://prajitr.github.io/quick-haskell-syntax/
 			https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/Simple%20examples
+			>> http://www.toves.org/books/hslist/
 		Workspace
 			>> http://www.stephendiehl.com/posts/vim_haskell.html
 	Xmonad
@@ -38,7 +39,7 @@ SEE
 		: http://lpaste.net/52657
 		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
 		: https://github.com/vicfryzel/xmonad-config/blob/master/xmonad.hs
-		: http://www.cgogolin.de/downloads/xmonad.hs
+		@ http://www.cgogolin.de/downloads/xmonad.hs
 		: https://raw.githubusercontent.com/chtaube/xmonad-config/master/xmonad.hs
 		>> https://gist.github.com/kmels/2882350
 		> https://github.com/rileyrg/xmonad/blob/master/xmonad.hs
@@ -66,8 +67,10 @@ THINK:ENH
 		[_] make on (re)start jumping to `windows (current || 1)`
 	[_] gmrun
 	[_] xkill
-	[_] open next empty workspace for browser/etc (maybe on M-Tab?)
+	[_] open next empty workspace for browser/etc (maybe on M-Tab? Better <BS>)
 		THINK: what to do when all workspaces are exhausted?
+		: Maybe, provide additional wksp on M-`++[0-9-=], and use M-`-M-` for IM wksp
+		: ALT: use <BS> as prefix for wksp -- then could add even <BS>-[a-z]
 	[_] Modular Configuration
 		: As of xmonad-0.9, any additional Haskell modules may be placed in ~/.xmonad/lib/ are available in GHC's searchpath. Hierarchical modules are supported: for example, the file ~/.xmonad/lib/XMonad/Stack/MyAdditions.hs could contain:
 		; module XMonad.Stack.MyAdditions (function1) where
@@ -83,6 +86,10 @@ THINK:ENH
 	[_] show somewhere master windows count if it != 1
 		:= use same subscript like for fullscreen?
 		:= but then how about two masters in fullscreen?
+	[_] Bind to F1..F12 some macro functions to apply to all wksp? OR create macro on-the-fly?
+	[_] NEED: back to last in history non-empty workspace
+		:= useful after 'nextEmptyWS' and after simultaneously jumping on additional wksp like M-g [a-z]
+		:= Maybe, even replace default action on M-a, and move original to M-A-a
 
 RFC
 	: myManageHook = composeAll . concat $

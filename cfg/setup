@@ -13,6 +13,8 @@ mkdef www-browser $(which elinks)
 browser=r.qute
 mkdef x-www-browser $(which $browser)
 
+# mkdef x-window-manager $(which i3)
+
 (cd "${CURR_DIR_CACHE:?No}/bin"
     link "r.${term:?No}"    ./r.t
     link "r.${term}-float"  ./r.tf

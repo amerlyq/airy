@@ -9,10 +9,21 @@ fvim() {
     local DMENU='dmenu -i -p W: -b -nb #000000 -nf #999999 -sb #000000 -sf #31AC65 -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
     local fl=~/.cache/airy/dict-words.txt
     touch "$fl"
-    word=$(cat "$fl" | $DMENU)
+
+    # REM:HACK
+    [[ -z $lang ]] || { langprev=$(r.xkb-lang -n); r.xkb-lang $lang; }
+    word=$(cat "$fl" | $DMENU)  # KEEP
+    # WARNING: on errror won't be called, but we can't use trap or it will be
+    # run again on EXIT or some independent error/etc in inappropriate place
+    ${langprev:+r.xkb-lang $langprev}
+
     [[ -n "$word" ]] || return
     echo "$word" >> "$fl"
-    r.vim-new -c "Dict $word" -c "on"
+
+    # NEED:ENH: simultaneously translate word and then open vim
+    # exec r.vim-new -c "Dict $word" -c 'only'
+    # exec r.tf $EDITOR --noplugin -u ~/.vim/vimrc_basic -c 'setf markdown' <(dict "$word" | r.dict --filter)
+    exec r.tf $EDITOR -c 'setf markdown' <(dict "$word" | r.dict --filter)
 }
 
 fshell() {
@@ -23,9 +34,11 @@ fshell() {
     fi
 }
 
+case "$1" in --en|--ru) lang="${1#--}"; shift ;; esac
 case "$1"
 in --debug) dictd -d nofork -d init  ## Server: no demon
-;; --vim) fvim $@
+;; --vim) fvim "$@"
+# TODO: use python/xml instead of pandoc
 ;; --filter) filter $@ | pandoc -f html -t markdown | sed -r 's/(> )+/  /g; /^\s*$/d'
 ;; *) fshell $@
 ;; esac

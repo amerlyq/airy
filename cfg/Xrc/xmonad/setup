@@ -4,11 +4,9 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link -t ~/.xmonad  xmonad.hs xmobarrc
-# mkdef x-window-manager $(which i3)
+(cd cfg && linkdir ~/.xmonad/lib/XMonad/Config/Amer/ *)
 
 ### GENS ###
-# THEME=$THEME ./i3-config.gen
-
 if cfgOpt u; then
     xmonad --recompile
     ! has_pr X || xmonad --restart
