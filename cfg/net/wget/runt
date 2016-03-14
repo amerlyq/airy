@@ -1,0 +1,27 @@
+#!/bin/bash -e
+
+dldcmd=r.wgetf
+session=wget
+maincmd=r.ranger
+
+while getopts 'lc:o:t:w' o; do case "$o"
+in o) cd "$OPTARG"
+;; c) opencmd=$OPTARG
+;; l) dldcmd=r.wgetl
+;; t) session=$OPTARG
+;; w) maincmd="r.wget-watch '$PWD'"
+;; *) exit; esac; done; shift $((OPTIND-1))
+
+fnm=$(r.wget-nm "${@:?}")
+
+r.tmux-job -t "$session" -m "$maincmd" \
+  r.notify-cmd -n "Saved: $fnm" -f "Can't dld: $fnm" \
+    $dldcmd "${@:?}"
+
+if [[ $opencmd ]]; then
+  # WARNING: $1 must be real prg name, not bash wrapper
+  if ps -oargs= -C "$opencmd" | grep -qxF "$fnm"
+  then r.n -u 'Already opened!' "$fnm"
+  else ($opencmd "$fnm")  # trap 'wait' EXIT
+  fi
+fi

@@ -1,0 +1,5 @@
+#!/bin/bash -e
+exec curl --silent --location --head \
+  --write-out '%{url_effective}\n' \
+  "$@" 2>/dev/null \
+| sed -rn '$s|.*/([^/]+)$|\1|p'

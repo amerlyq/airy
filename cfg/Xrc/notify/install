@@ -2,6 +2,9 @@
 source ~/.shell/func.d/packages
 
 #| libnotify | notifier in window for long running commands (see bashrc) like $ sleep 10; alert
+# | inotify-tools | watch on downloaded files in dir and auto-open them
+
+pkg_inst -p inotifywait 'inotify-tools'
 
 if distro arch; then
     pkg_inst -p 'notify-send' libnotify

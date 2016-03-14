@@ -1,0 +1,8 @@
+#!/bin/bash -e
+# THINK: for downloading monitor for 'create' and then
+# -- create 'close_write' for each of them?
+
+# -t 300 -r
+exec inotifywait --quiet --monitor --event close_write \
+  --format '%w%f' "$@" \
+| xargs -rl r.notify-path 'Saved under'

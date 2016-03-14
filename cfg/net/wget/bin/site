@@ -1,10 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
 LINK="${1?Need link}"
 DOM="${LINK#*//}"
 DOM="${DOM%%/*}" #Comma-separated list
 
-wget --recursive --no-parent --no-clobber \
+exec wget --recursive --no-parent --no-clobber \
     --user-agent Mozilla -e robots=off \
     --page-requisites --adjust-extension --convert-links \
     --restrict-file-names=windows \

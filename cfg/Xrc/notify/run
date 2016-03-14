@@ -10,7 +10,7 @@ in t) EXPIRE=$OPTARG
 ;; u) CMD+=( --urgency=low )
 ;; U) CMD+=( --urgency=critical )
 ;; p) CMD+=( -h int:value:$OPTARG )
-esac; done; shift $((OPTIND-1))
+;; *) exit; esac; done; shift $((OPTIND-1))
 
 CMD+=( --category notify --expire-time=$(($EXPIRE*100)) )
 # CMD+=( -h string:bgcolor:\#ffffff \

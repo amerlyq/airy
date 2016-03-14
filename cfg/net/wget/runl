@@ -1,0 +1,16 @@
+#!/bin/bash -e
+# USE: http://www.ex.ua/filelist/$id.urls
+
+src=${@:$#}  # Link is always last argument
+
+die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
+
+[[ ${src:?} =~ '^http.*\.urls$' || -f $src ]] \
+|| die "Not urls list"
+
+file -i "$src" | grep -qF 'text/plain' \
+|| die "Not text/plain"
+
+[[ ! -f "$src" ]] || rm -v "$src"
+
+exec r.wgetf --input-file="$src" "${@:1:$#-1}"

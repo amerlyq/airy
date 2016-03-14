@@ -1,0 +1,8 @@
+#!/bin/bash -e
+# ALT: curl -O ftp://ftp.com/mp3/mus.zip --user login:paswd
+exec wget --continue \
+  --timestamping \
+  --content-disposition \
+  --restrict-file-names=nocontrol \
+  --trust-server-names=on \
+  "${@:?}"

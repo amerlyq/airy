@@ -1,0 +1,11 @@
+#!/bin/bash -e
+# EXPL: wraps command in start/end notifies
+
+while getopts 'n:f:' o; do case "$o"
+in n) normal="<i>$OPTARG</i>"
+;; f) failed="<i>$OPTARG</i>"
+;; *) exit; esac; done; shift $((OPTIND-1))
+
+"$@" \
+&& r.notify -t50  "OK" "\$ $*\n$normal" \
+|| r.notify -Ut0 "Failed ($?)" "\$ $*\n$failed"

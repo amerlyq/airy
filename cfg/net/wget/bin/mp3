@@ -1,0 +1,13 @@
+#!/bin/bash
+# USE: khinsider.com
+exec wget -O- "$@" \
+| sed -rn '/.*href="(https?:\/\/[^"]*\.mp3)".*/s//\1/p' \
+| wget -i- -O- \
+| sed -rn '/.*href="(https?:\/\/[^"]+\.mp3)">Click here to download.*/s//\1/p' \
+| r.wgetf -i-
+
+# USE: prime_music
+# exec wget -O- "$@" \
+# | sed '/^var myPlayList = /!d; s/{name/\n&/g' \
+# | sed -n '/.*mp3:\("[^}]*"\)}.*/s//\1/gp' \
+# | r.wgetf -i-

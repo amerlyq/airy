@@ -1,0 +1,18 @@
+#!/bin/bash -e
+hash tmux &>/dev/null && tmux start-server || exit
+
+session='jobs'
+maincmd=r.ranger  # USE:($2) r.ranger, htop, r.notify-watch
+
+while getopts 'm:t:' o; do case "$o"
+in t) session=$OPTARG
+;; m) maincmd=$OPTARG
+;; *) exit; esac; done; shift $((OPTIND-1))
+
+tmux has-session -t "$session" 2>/dev/null \
+|| tmux new-session -d -c "$PWD" -n "$maincmd" -s "$session" "$maincmd" \
+\; set-option -t "$session" status on
+
+# ATTENTION: Each starting command must be unique!
+tmux list-window -F '#{pane_start_command}' -t "$session" | grep -qxF "$*" \
+|| tmux new-window -d -c "$PWD" -n "$1-$$" -t "$session" "$@"

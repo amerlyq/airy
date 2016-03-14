@@ -1,9 +1,0 @@
-#!/bin/bash
-# Works for:
-#   khinsider.com
-
-wget -O- "$@" \
-| sed -rn '/.*href="(https?:\/\/[^"]*\.mp3)".*/s//\1/p' \
-| wget -i- -O- \
-| sed -rn '/.*href="(https?:\/\/[^"]+\.mp3)">Click here to download.*/s//\1/p' \
-| wget -i- --continue --timestamping --trust-server-names=on --content-disposition
