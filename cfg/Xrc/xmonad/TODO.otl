@@ -13,6 +13,8 @@ SEE
 			http://prajitr.github.io/quick-haskell-syntax/
 			https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/Simple%20examples
 			>> http://www.toves.org/books/hslist/
+			https://www.haskell.org/tutorial/monads.html
+			http://learnyouahaskell.com/a-fistful-of-monads
 		Workspace
 			>> http://www.stephendiehl.com/posts/vim_haskell.html
 	Xmonad
@@ -126,7 +128,19 @@ TODO
 	wmname
 		: import XMonad.Hooks.SetWMName
 		: , startupHook = setWMName "LG3D"
+	TRY: minimized windows -- are they enhance experience? Or individual wksp are better?
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-Minimize.html
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-BoringWindows.html
 
+	2016-03-14 [X] mark & goto like i3
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-TagWindows.html
+
+	TRY: sharing window between workspaces
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-CopyWindow.html
+
+	THINK: right/left docking persistent bar tab ~ 1/8 screen width
+		: -- to keep there small mpv  preview when watching amv and doing work
+		: -- some status widgets / load graphics
 
 	USE:
 		spawn or bring up
@@ -136,6 +150,8 @@ TODO
 		: 	runOrRaise <String executable> (<Query Bool to find it>)
 		: 	runOrRaise "chromium" (className =? "Chromium")
 		: 	runOrRaise ...
+
+		SEE: http://blog.komar.be/my-way-of-handling-pdfs-in-xmonad/
 
 
 FIND:(how to)

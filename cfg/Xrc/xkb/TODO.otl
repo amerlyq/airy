@@ -1,5 +1,6 @@
 Xkbmap
 	[_] Make VTE terminals on actual places of C-A-Fx (independent from mapping)
+	[_] THINK: after simultaneous press of mods --> maybe clear all mods, instead of only currently pressed ones?
 	[_] BUG: xcape is randomly crashed -- maybe too much combo?
 	[_] BUG: when pressing both Alt+Shift -- they aren't latched
 		:= Because of TwoKeys -- but how to reset this option?
@@ -78,6 +79,7 @@ Xkbmap
 	[_] Make F1-12 be accessible by mod+F1-12, and reuse them as-is for i3
 		: Shift must be kept as level for S-F1x -> F2x
 		:= Search useful but unused symbols to reuse as commands
+		:= Maybe use LEVEL2:SUPER and map them like [F13, F1]?
 
 	Overlay for hjkl navigation
 		WANNA: make overlay lctl->F13, where F13 = [ temporary disables overlay (as shift for Caps) ]

@@ -3,16 +3,18 @@ module Main (main) where
 
 ---- Std
 -- import Control.Arrow (second)
-import Data.List    (zipWith, isPrefixOf)
-import Data.Maybe   (isJust,fromMaybe)
-import Data.Ratio   ((%))
-import Data.Default (def)
+import Control.Monad (when, liftM2)
+import Data.List     (zipWith, isPrefixOf)
+import Data.Maybe    (isNothing,fromMaybe)
+import Data.Ratio    ((%))
+import Data.Default  (def)
 import qualified Data.Map as M
 import System.IO
 import System.Exit
 
 ---- Core
 import XMonad                       -- (float, kill, spawn, refresh, restart, doFloat, workspaces, windows, withFocused, sendMessage, Resize(Shrink, Expand), IncMasterN)
+import XMonad.Util.Run              (spawnPipe)
 import XMonad.Util.EZConfig         (mkKeymap)
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
 import XMonad.ManageHook            (liftX, className)
@@ -23,13 +25,15 @@ import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
 
 ---- Actions
 import XMonad.Actions.CycleWS       (doTo, moveTo, shiftTo, toggleWS', Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import XMonad.Actions.TagWindows    (setTags, focusUpTaggedGlobal, withTaggedGlobalP, shiftHere)
+import XMonad.Actions.CopyWindow    (copy, copyWindow, runOrCopy, killAllOtherCopies, kill1, wsContainingCopies)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
 import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere, spawnAndDo)
 import XMonad.Actions.WindowGo      (runOrRaise)
 import qualified XMonad.Actions.GroupNavigation as GN
 
 ---- Hooks
-import XMonad.Hooks.DynamicLog      (statusBar, xmobarPP, xmobarColor, PP(..))
+import XMonad.Hooks.DynamicLog      (pad, wrap, shorten, dynamicLogString, xmobarColor, defaultPP, PP(..))
 import XMonad.Hooks.EwmhDesktops    (ewmh, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, SetStruts(..), ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
@@ -134,15 +138,25 @@ myKeys cfg = mkKeymap cfg $
      ]
   ++
   ---- Workspaces
-  [ (m ++ k, f nm) | (k, nm) <- myWorkspaces, (m, f) <-
-    [ ("M-"  , windows . W.view)
-    , ("M-C-", windows . W.shift)
-    , ("M-S-", \w -> windows (W.shift w) >> windows (W.view w))
-    --THINK:ALT:, ("M-S-", windows . W.shift >> windows . W.view)
+  [ (m ++ k, windows $ f nm) | (k, nm) <- myWorkspaces, (m, f) <-
+    [ ("M-"  , W.view)
+    , ("M-C-", W.shift)
+    , ("M-S-", \w -> W.view w . W.shift w)
+    , ("M-C-S-", copy)
+    ]
+  ] ++
+  ---- Mark & Goto
+  -- NEED:DEV: back_and_forth -- to return window on their previous screen
+  -- -- if on currentFocused -- shiftHere was pressed again
+  [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [1..12], (m, f) <-
+    [ ("M-"  , \n -> focusUpTaggedGlobal ("F" ++ show n))
+    , ("M-C-", \n -> withFocused $ setTags ["F" ++ show n])
+    , ("M-S-", \n -> withTaggedGlobalP ("F" ++ show n) shiftHere)
     ]
   ] ++
   ---- System
-  [ ("M-\\"  , kill)
+  [ ("M-\\"  , kill1)
+  , ("M-C-\\", killAllOtherCopies)
   , ("M-S-q" , kill)
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
@@ -153,8 +167,8 @@ myKeys cfg = mkKeymap cfg $
     , ("t", spawn "sudo poweroff")
     , ("f", refresh)  -- Correct size of the viewed windows
     , ("x", restart "xmonad" True)
-    , ("c", spawn "r.dunst-notify xmonad recompile" >>
-            spawn "xmonad --recompile && xmonad --restart && r.dunst-notify OK")
+    , ("c", spawn "r.n xmonad recompile" >>
+            spawn "xmonad --recompile && xmonad --restart && r.n OK")
     ] ++
   ---- Shortcuts
   -- main tools
@@ -301,6 +315,19 @@ myWorkspaces = concat
     leader = ("g " ++)  -- ALT: s, <Backspace>, <Tab>
 
 
+myStartupHook = do
+  curr <- gets (W.currentTag . windowset)
+  -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
+  when (curr == head wsl) (windows . W.view $ wsl !! 1)
+  where
+    wsl = workspaces myCfg
+-- EXPL: to be able to use 'wmctrl' to get current wksp from scripts
+-- import XMonad.Hooks.SetWMName
+-- import XMonad.Hooks.EwmhDesktops
+-- import XMonad.Util.Cursor
+-- startupHook = setDefaultCursor xC_left_ptr <+>  ewmhDesktopsStartup >> setWMName "Xmonad"
+
+
 myCfg = ewmh $ withUrgencyHook NoUrgencyHook $ def
   { modMask = mod4Mask
   -- Options
@@ -309,12 +336,12 @@ myCfg = ewmh $ withUrgencyHook NoUrgencyHook $ def
   , keys        = myKeys
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
-  , startupHook = windows . W.view . (!!1) . workspaces $ myCfg
+  -- , startupHook = windows . W.view . (!!1) . workspaces $ myCfg
+  , startupHook = myStartupHook
   , manageHook  = myManageHook <+> manageHook def
   -- layoutHook def
   -- layoutHintsToCenter
   , layoutHook = avoidStruts . smartBorders $ myLayout
-  , logHook = GN.historyHook
   , handleEventHook = myHandleEventHook
   -- Style
   , borderWidth        = 2
@@ -379,27 +406,43 @@ myManageHook = manageSpawn <+>
     composeShift = mconcat . map (\(w, x) -> (className =? x --> doShift w))
 
 
-myPP :: PP  -- xmobar pretty printing source
-myPP = xmobarPP
-  { ppCurrent = xmobarColor "#fd971f" ""
-  , ppSep     = xmobarColor "#fd971f" "" " \xe0b1 "           -- separator between elements
-  , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
-  , ppHidden  = \w -> if w `elem` workspaces myCfg then w else ""  -- only predefined by me
-  , ppLayout  = \nm -> case nm of                             -- short 'titles' for layouts
-      "ResizableTall" -> "[|]"
-      "Mirror ResizableTall" -> "[-]"
-      "Tabbed Simplest" -> "=--"
-      "Full" -> "[ ]"
-      "Grid" -> "[#]"
-      "IM Grid" -> "|##"
-      "SimplestFloat" -> "( )"
-      "Circle" -> "(O)"
-      _ -> nm
-  }
+-- SEE how to combine CopyWindow and DynamicLog in more modular way
+--  https://bbs.archlinux.org/viewtopic.php?id=194863
+myLogHook h = do
+  GN.historyHook
 
+  copies <- wsContainingCopies
+  let check ws | ws `elem` copies = xmobarColor "#8888ff" "green" ws
+               | otherwise = ws  -- pad ws
+      predefined ws | ws `elem` workspaces myCfg = ws
+                    | otherwise = ""
+
+  -- xmobar pretty printing source
+  io . hPutStrLn h =<< dynamicLogString defaultPP
+    { ppCurrent = xmobarColor "#fd971f" ""
+    -- , ppVisible = wrap "(" ")"
+    , ppHidden  = check . predefined
+    -- , ppHiddenNoWindows = const ""
+    , ppUrgent  = xmobarColor "red" "yellow"
+    -- , ppTitle   = xmobarColor "green"  "" . shorten 40
+    -- , ppWsSep   = " "
+    , ppSep     = xmobarColor "#fd971f" "" " \xe0b1 "           -- separator between elements
+    , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
+    -- , ppSort    = getSortByIndex
+    -- , ppExtras  = []
+    , ppLayout  = \nm -> case nm of
+        "ResizableTall" -> "[|]"
+        "Mirror ResizableTall" -> "[-]"
+        "Tabbed Simplest" -> "=--"
+        "Full" -> "[ ]"
+        "Grid" -> "[#]"
+        "IM Grid" -> "|##"
+        "SimplestFloat" -> "( )"
+        "Circle" -> "(O)"
+        _ -> nm
+    }
 
 main :: IO ()
-main = xmonad =<< statusBar myCmdStatus myPP toggleStrutsKey myCfg
-  where
-    myCmdStatus = "xmobar ~/.xmonad/xmobarrc"
-    toggleStrutsKey XConfig { XMonad.modMask = modMask } = (modMask, xK_b)  -- xK_Escape
+main = do
+  h <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
+  xmonad myCfg { logHook = myLogHook h }
