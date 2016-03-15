@@ -84,7 +84,21 @@ function h_write()
   end
 end
 
+function h_move()
+  show_status("info", "moving to...")
+  local res = utils.subprocess({
+    cancellable = false, args = { "r.mpv-category",
+      tostring(mp.get_property_native("path"))
+  }})
+  if res["error"] ~= nil then
+    show_status("error", "Failed("..res["error"]..") moving: "..res["stdout"])
+  else
+    show_status("info", "Moved OK:"..res["stdout"])
+  end
+end
+
 mp.add_forced_key_binding("y", nm("write"), h_write)
+mp.add_forced_key_binding("M", nm("moving"), h_move)
 mp.add_forced_key_binding("[", nm("mark_beg"), h_mark_beg)
 mp.add_forced_key_binding("]", nm("mark_end"), h_mark_end)
 mp.add_forced_key_binding("{", nm("seek_beg"), h_seek_beg)

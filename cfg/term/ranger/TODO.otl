@@ -41,10 +41,6 @@ ranger
 		[_] fix scpto/from
 			[_] Create its inner handful support inside ranger
 		[_] Implement sftp and adb protocols in ranger to open explicit tab with remote operations
-	ADD waveform preview
-		https://github.com/beschulz/wav2png
-		https://github.com/MTG/freesound/tree/master/utils/audioprocessing
-			: SEE wav2png.py
 
 NEW
 	2015-06-11 [$] BUG: WARNING: Now even with many rangers, all of them has only one /tmp/aura/ranger_cwdir!!!
@@ -61,9 +57,6 @@ scope.sh
 		:= Do it on top of default scope.sh, building viewers from scratch
 		:% And then send pull request
 	[_] Toggle w3m/img2txt/exif preview for image/video
-	[_] BUG: preview can't timeout -- many hanging processes
-		:ENH: at first simply show and fix preview w/o script, but run pygment in background
-		:When (and if) pygment done (no error, less < 5 sec) -- replace preview text
 	[_] Add hang-out process checking to ranger scope.sh
 	[_] re-read output from scope.sh for lister on shortcut inside lister
 	[_] TODO create my own global mime extensions for scope.sh
@@ -71,6 +64,40 @@ scope.sh
 	[_] BUG: seems like ranger for 'I' view re-launch ./scope.sh only on date change,
 		but it does it wrong for symlinks, as it can't track when they are updated!
 		(Hovewer that affects and vimb too, maybe it's general symlink property?)
+	[_] ADD waveform preview
+		https://github.com/beschulz/wav2png
+		https://github.com/MTG/freesound/tree/master/utils/audioprocessing
+			: SEE wav2png.py
+
+	<text/plain syntax highlighting>
+	ALT:(colorizers)
+		http://freecode.com/projects/ccze
+		: http://lintut.com/colorize-log-files-on-linux-using-ccze-tool/
+		https://www-zeuthen.desy.de/~friebel/unix/lesspipe.html
+		> https://github.com/jingweno/ccat
+		http://www.gnu.org/software/src-highlite/
+		http://supercat.nosredna.net/
+		http://kassiopeia.juls.savba.sk/~garabik/software/grc/
+		: http://kassiopeia.juls.savba.sk/~garabik/software/grc/README.txt
+		:= TODO: embed into zsh preexec
+		https://schlueters.de/colorgcc.html
+		:= TODO: embed into my 'abyss'
+	[_] BUG: preview can't timeout -- many hanging processes
+		:ENH: at first simply show and fix preview w/o script, but run pygment in background
+		:When (and if) pygment done (no error, less < 5 sec) -- replace preview text
+		[_] TODO: split scope.sh in many small scripts at preview/*
+		[_] Manage from scope.sh only exec logic of those scripts
+		[_] Keep only one pygment server running (or one for each filetype?)
+		[_] Connect it to pipe, do put/get, add mutexes for simultaneous spawns
+		[_] Create one global directory to keep all previews permanently and update based on timestamps
+			:= maybe clean preview older then several weeks time (check last access time) once in week
+		[_] Always show plain cat at beginning, and launch pygment only if cursor hovers more than one second over file
+		[_] Show cat and run background pygment. Then replace preview by enhanced one if processed successfully
+		[_] Embed pygment.py as plugin directly into ranger
+	SEE:(scope.sh) check their run/err/catch code
+		https://github.com/nim65s/dotfiles/blob/master/.config/ranger/scope.sh
+		https://github.com/majutsushi/etc/blob/master/ranger/scope.sh
+		http://www.webprojekty.cz/ccx/paste/2012-01-17/0.html
 
 
 ranger

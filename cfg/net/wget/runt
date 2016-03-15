@@ -18,6 +18,14 @@ r.tmux-job -t "$session" -m "$maincmd" \
   r.notify-cmd -n "Saved: $fnm" -f "Can't dld: $fnm" \
     $dldcmd "${@:?}"
 
+# ADD: check if dld part of file is more then 5MB or sleep 4
+# DEV: close mpv after file moved
+# USE: env DSTDIR for r.dmenu-mv to be able to sort music
+# -- cd dir; DSTDIR=$PWD ranger -> mpv -> r.dmenu-mv
+# -- if playlist -- don't close, simply delete from list and move to next
+# ADD:(wget/bin/amvnews)
+# -- extracting text info from page with song/anime/description
+# -- parse page and find more appropriate link if possible
 if [[ $opencmd ]]; then
   # WARNING: $1 must be real prg name, not bash wrapper
   if ps -oargs= -C "$opencmd" | grep -qxF "$fnm"

@@ -1,0 +1,14 @@
+#!/bin/bash -e
+case "$1" in -n) nm=$2; shift 2 ;; esac
+
+dir=${1:?}
+shift
+choice=$(r.dmenu-dirs "$dir" "$nm") || exit
+dst=$dir/$choice
+
+[[ -d $dst ]] || mkdir -p "$dst"
+
+printf "\n%s: %s\n%s\n" \
+  "$(date +%Y%m%d_%H%M%S)" "$PWD" \
+  "$(mv -nvt "$dst" "${@:?}")" \
+  >> "$dir/.move.log"

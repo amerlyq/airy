@@ -229,34 +229,6 @@ SETUP
 	: NEED script to set-up necessary case for current box (through serial/ssh)
 		https://wiki.archlinux.org/index.php/Boot_debugging
 
-
-
-
-OPTIMIZE Boot time
-	[_] Boot time (both kernel and bootloader)
-	: http://events.linuxfoundation.org/sites/events/files/slides/12%20Lessons%20Learnt%20in%20Boot%20Time%20Reduction.pdf
-	: https://wiki.archlinux.org/index.php/Improve_boot_performance
-		check time
-		: systemd-analyze
-		measure data read (See at 7th column):
-		: cat /proc/diskstats
-		Use compression?
-		Maybe XFS would be best as for init+mount+r/w time?
-		Utilize 100% I/O and CPU on boot
-		Focus on delays -- enable logs and watch
-		'quiet' to disable printing
-		: perf, oprofile, strace, bootchart
-		E4rat
-			https://wiki.archlinux.org/index.php/Ext4#Tips_and_tricks
-			: E4rat is a preload application designed for the ext4 filesystem. It
-			: monitors files opened during boot, optimizes their placement on the
-			: partition to improve access time, and preloads them at the very
-			: beginning of the boot process. E4rat does not offer improvements
-			: with SSDs, whose access time is negligible compared to hard disks.
-	[_] Dracut -- gen minimal initramfs -- faster boot time
-		http://www.techradar.com/news/software/operating-systems/what-on-earth-is-dracut-1078647
-
-
 Games on
 	http://wikiwiki.jp/elonaplus/?FrontPage#q11e8183
 	http://te4.org/download

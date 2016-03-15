@@ -1,0 +1,23 @@
+#!/bin/bash -e
+source ~/.shell/profile
+# 1..9 <stars> / name <genre>
+
+case "${CURR_PROF:?No}"
+in home) dir=/media/${CURR_USER:?No}/Umi/Music/++
+;; *) dir=/home/media/music/++
+esac
+case "$1" in -l) ls "$dir/${2?}"; exit ;; esac
+
+if [[ -f $1 ]]; then path=$1; else
+  mdb=$(sed -rn '/^music_directory\s+"([^"]+)"$/s//\1/p' ~/.mpd/mpd.conf)
+  rpath=$(mpc current -f '%file%')
+  path=${mdb?}/${rpath?}
+  path=${path/#\~/$HOME}  # Guard to media_directory='~/...'
+  curr=$(mpc current -f '[%position%]')
+fi
+
+[[ -f $path ]] \
+  && r.dmenu-move -n 'MPD:' "$dir" "$path" \
+  || exit
+#Del current, interrupts cast by ssh: mpc del 0
+${curr+mpc next >/dev/null && mpc del $curr}

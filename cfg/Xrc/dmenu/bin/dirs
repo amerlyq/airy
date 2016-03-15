@@ -1,0 +1,10 @@
+#!/bin/bash -e
+${1:+cd "$1"}
+
+# ALT: better choice for such -- frezency like fzf
+# -- to sort possible dirs in order
+find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+| sort -n \
+| exec dmenu -i -b -p "${2:-Dirs:}" \
+  -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31658C' \
+  -fn '-misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'

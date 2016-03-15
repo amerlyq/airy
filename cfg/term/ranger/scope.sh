@@ -116,15 +116,15 @@ esac
 case "$mimetype" in
 
     text/*|*/xml) # Syntax highlight for text files:
-        if hash pygmentize >/dev/null; then
+        # if hash pygmentize >/dev/null; then
             # WARNING: you must be sure to have 256 term and downloaded solarized
             # XXX: $height not always valid?
-            try "$EXTDIR/color-preview" pygmentize 128 "$path" && exit 5 || exit 2
+            # try "$EXTDIR/color-preview" pygmentize 128 "$path" && exit 5 || exit 2
             # try pygmentize -g -f terminal256 -O style=solarizeddark,linenos=1 \
             #     <(head -n 50 "$path") && exit 5 || exit 2
             # try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
 
-        elif command -v highlight >/dev/null; then
+        if command -v highlight >/dev/null; then
             # wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
             # NOTE: Chg highlight -> /usr/bin/highlight
             # to workaround conflict with Mint embedded script /usr/local/bin/highlight
