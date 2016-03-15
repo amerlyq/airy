@@ -118,8 +118,12 @@ nnoremap <leader>; :<C-R>"
 vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
 
 " Directly search copied text
-nnoremap <leader>/ :<C-U>call setreg('/','\V'.@+,getregtype('/'))<CR>/<CR>
-nnoremap <leader>? :<C-U>call setreg('/','\V'.@+,getregtype('/'))<CR>?<CR>
+fun! s:putslash(s)
+  call histadd('/', a:s)
+  call setreg('/', a:s, getregtype('/'))
+endf
+nnoremap <leader>/ :<C-U>call <SID>putslash('\V'.@+)<CR>/<CR>
+nnoremap <leader>? :<C-U>call <SID>putslash('\V'.@+)<CR>?<CR>
 
 
 "{{{1 Convert main reg type for pasting

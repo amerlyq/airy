@@ -1,5 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/profile
+set -o pipefail
 
 # pc+us:1+ru(typewriter):2+ua(legacy):3
 lang="${CURR_XKB_LANG:-us:1+am(ru):2+am(ua):3}"
@@ -28,7 +29,7 @@ xkb_keymap {
     };
     xkb_symbols   {
         // ALT: include "pc"
-        include "srvr_ctrl(fkey2vt)"
+        include "media(fkey2vt)"  // srvr_ctrl
         include "pc(editing)"
         include "keypad(x11)"
         include "$lang"

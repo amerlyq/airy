@@ -11,16 +11,16 @@ default partial xkb_symbols "mods" {
 partial alphanumeric_keys
 xkb_symbols "keys"
 {
+    key.type = "ONE_LEVEL";
     key <ESC>  { [ Escape ] };
-    key <TAB>  { type="TWO_LEVEL", [ Tab, ISO_Left_Tab ] };
-    // key <SPCE> { type="L2:SUPER", [ space , Return ] };  // Multi_key
-    key <SPCE> { type="ONE_LEVEL", [ space ] };
-
     key <RTRN> { [ Return ] };
-    key <BKSP> { [ BackSpace, BackSpace ] };
+    key <BKSP> { [ BackSpace ] };
+    key <SPCE> { [ space ] };
+    // key <SPCE> { type="L2:SUPER", [ space , Return ] };  // Multi_key
 
-    key <PRSC> { type= "PC_ALT_LEVEL2", [ Print, Sys_Req ] };
-    key <PAUS> { type= "PC_CONTROL_LEVEL2", [ Pause, Break ] };
+    key <TAB>  { type="TWO_LEVEL", [ Tab, ISO_Left_Tab ] };
+    key <PRSC> { type="PC_ALT_LEVEL2", [ Print, Sys_Req ] };
+    key <PAUS> { type="PC_CONTROL_LEVEL2", [ Pause, Break ] };
 };
 
 
@@ -35,7 +35,6 @@ xkb_symbols "switches"
     // modifier_map Mod3   { Hyper_L, Hyper_R };
     // modifier_map Mod4   { Super_L, Super_R };
     // modifier_map Mod5   { ISO_Level3_Shift };
-
     key.type = "ONE_LEVEL";
 
     key <CAPS> { [ Control_L ] };
@@ -52,30 +51,43 @@ xkb_symbols "switches"
 
     // EXPL: xcape: -> Super_R, so dbl click-hold will cause lvl5
     // BUT: I temporarily don't use ISO_Level5_Shift
-    key <RCTL> { type="L2:SUPER", [ ISO_Level3_Shift, Control_R ] };
+    // BUG: not dropping Super modifier when activates Control
+    key <RCTL> {
+        type="L2:SUPER",
+        [ ISO_Level3_Shift, Control_R ],
+        actions= [ SetMods(modifiers=LevelThree), LatchMods(clearLocks,modifiers=Control) ]
+    };
     modifier_map  Mod5 { <RCTL> };
     key <MENU> { [ VoidSymbol ] };  // For VirtualBox
 
     // Obtain one more modifier by swaping Hyper
     // The extra key on many European keyboards.
-    key <LSGT> { [ Hyper_L ] };  // { [ less, greater, bar, brokenbar ] };
-    modifier_map  Mod3 { <LSGT> };
+    // key <LSGT> { [ Hyper_L ] };  // { [ less, greater, bar, brokenbar ] };
+    // modifier_map  Mod3 { <LSGT> };
     // key <HYPR> { [ space ] };
+    key <LSGT> { [ Multi_key ] };  // { [ less, greater, bar, brokenbar ] };
+    modifier_map  Mod3 { <LSGT> };
+
 
     // NOTE: can be used as clearMods!
-    key <LCTL> {
-        type="PC_CONTROL_LEVEL2",
-        [ Overlay1_Enable, Overlay1_Enable ],
-        actions= [ SetControls(ctrls=Overlay1), LockControls(ctrls=Overlay1) ]
-    };
-
+    // WARNING: there no LatchControls()
     // ALT: (lock) Overlay1_Enable --> SEE: compat/accessx
-    // ATTENTION: removed symbol to not interfere with latching xcape Control_L -> Control_R
-    key <SCLK> { [ VoidSymbol ], actions= [ LockControls(ctrls=Overlay1) ] };
     // BUG: key <SCLK> { [ ISO_Lock ] };
     // ALT: key <SCLK> { [ StickyKeys_Enable ], actions= [ LockControls(ctrls=StickyKeys) ] };
 
-    key <NMLK> { type="TWO_LEVEL", [ Num_Lock, Pointer_EnableKeys ] };  // Pointer_Accelerate
+    // THINK: use as Esc on releases instead of Multi_key?
+    key <LCTL> {
+        [ Overlay1_Enable ],
+        actions= [ SetControls(ctrls=Overlay1) ]
+    };
+    key <SCLK> {
+        [ Overlay1_Enable ],
+        actions= [ LockControls(ctrls=Overlay1) ]
+    };
+    key <NMLK> {  // Pointer_Accelerate
+        type="TWO_LEVEL",
+        [ Num_Lock, Pointer_EnableKeys ]
+    };
     modifier_map  Mod2 { Num_Lock };
 };
 

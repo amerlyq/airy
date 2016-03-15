@@ -34,18 +34,31 @@ default partial xkb_symbols "base"
 
 partial function_keys
 xkb_symbols "fkey2vt" {
-    key.type = "L2:SUPER";
+    key.type = "CTRL+ALT";
 
-    key <FK01> { [ F1,  XF86_Switch_VT_1  ] };
-    key <FK02> { [ F2,  XF86_Switch_VT_2  ] };
-    key <FK03> { [ F3,  XF86_Switch_VT_3  ] };
-    key <FK04> { [ F4,  XF86_Switch_VT_4  ] };
-    key <FK05> { [ F5,  XF86_Switch_VT_5  ] };
-    key <FK06> { [ F6,  XF86_Switch_VT_6  ] };
-    key <FK07> { [ F7,  XF86_Switch_VT_7  ] };
-    key <FK08> { [ F8,  XF86_Switch_VT_8  ] };
-    key <FK09> { [ F9,  XF86_Switch_VT_9  ] };
-    key <FK10> { [ F10, XF86_Switch_VT_10 ] };
-    key <FK11> { [ F11, XF86_Switch_VT_11 ] };
-    key <FK12> { [ F12, XF86_Switch_VT_12 ] };
+    key <FK13> { [ F1  ] };
+    key <FK14> { [ F2  ] };
+    key <FK15> { [ F3  ] };
+    key <FK16> { [ F4  ] };
+    key <FK17> { [ F5  ] };
+    key <FK18> { [ F6  ] };
+    key <FK19> { [ F7  ] };
+    key <FK20> { [ F8  ] };
+    key <FK21> { [ F9  ] };
+    key <FK22> { [ F10 ] };
+    key <FK23> { [ F11 ] };
+    key <FK24> { [ F12 ] };
+
+    key <FK01> { [ F13, F13, F13, F13, XF86_Switch_VT_1  ], overlay1=<FK13> };
+    key <FK02> { [ F14, F14, F14, F14, XF86_Switch_VT_2  ], overlay1=<FK14> };
+    key <FK03> { [ F15, F15, F15, F15, XF86_Switch_VT_3  ], overlay1=<FK15> };
+    key <FK04> { [ F16, F16, F16, F16, XF86_Switch_VT_4  ], overlay1=<FK16> };
+    key <FK05> { [ F17, F17, F17, F17, XF86_Switch_VT_5  ], overlay1=<FK17> };
+    key <FK06> { [ F18, F18, F18, F18, XF86_Switch_VT_6  ], overlay1=<FK18> };
+    key <FK07> { [ F19, F19, F19, F19, XF86_Switch_VT_7  ], overlay1=<FK19> };
+    key <FK08> { [ F20, F20, F20, F20, XF86_Switch_VT_8  ], overlay1=<FK20> };
+    key <FK09> { [ F21, F21, F21, F21, XF86_Switch_VT_9  ], overlay1=<FK21> };
+    key <FK10> { [ F22, F22, F22, F22, XF86_Switch_VT_10 ], overlay1=<FK22> };
+    key <FK11> { [ F23, F23, F23, F23, XF86_Switch_VT_11 ], overlay1=<FK23> };
+    key <FK12> { [ F24, F24, F24, F24, XF86_Switch_VT_12 ], overlay1=<FK24> };
 };

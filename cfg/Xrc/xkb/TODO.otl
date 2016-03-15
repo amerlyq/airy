@@ -80,6 +80,12 @@ Xkbmap
 		: Shift must be kept as level for S-F1x -> F2x
 		:= Search useful but unused symbols to reuse as commands
 		:= Maybe use LEVEL2:SUPER and map them like [F13, F1]?
+		:~ somewhat bad idea, as I will need to remap all [RAW+SUPER+CTRL+ALT]
+		:-- plus will need to press additional Super to switch vtN
+		:ALT: Use vtN as before on C-A-FN
+		:BUG: <C-v> in vim shows codes as <C-S-F1> when pressed <Mod-F1>
+		: CHECK: currently may be broken S-F1
+		:DONE: keep origin using overlay
 
 	Overlay for hjkl navigation
 		WANNA: make overlay lctl->F13, where F13 = [ temporary disables overlay (as shift for Caps) ]

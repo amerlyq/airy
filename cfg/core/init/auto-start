@@ -32,7 +32,11 @@ copyq &
 [[ ! "$CURR_PROF" =~ ^work ]] || { skype & }
 
 ### END ###
-case "${ARGS[@]}" in -w) wait ;; esac
+case "${ARGS[@]}" in -w)
+  # ATTENTION: every X app, started by hands not from xmonad will segfault on shutdown?
+  trap 'kill $(jobs -p)' TERM KILL QUIT INT
+  wait
+esac
 
 # Kill all childs
 # ( while kill -0 $$ 2>/dev/null && timeout 5 sdb root on; do

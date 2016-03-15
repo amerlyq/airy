@@ -148,10 +148,12 @@ myKeys cfg = mkKeymap cfg $
   ---- Mark & Goto
   -- NEED:DEV: back_and_forth -- to return window on their previous screen
   -- -- if on currentFocused -- shiftHere was pressed again
-  [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [1..12], (m, f) <-
-    [ ("M-"  , \n -> focusUpTaggedGlobal ("F" ++ show n))
-    , ("M-C-", \n -> withFocused $ setTags ["F" ++ show n])
-    , ("M-S-", \n -> withTaggedGlobalP ("F" ++ show n) shiftHere)
+  -- NOTE: F13..F24 -- remapped by xkb for xmonad exclusively
+  -- -- original F1..12 are accessed in overlay
+  [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [13..24], (m, f) <-
+    [ ("M-", \n -> withFocused $ setTags ["F" ++ show n])
+    , (""  , \n -> focusUpTaggedGlobal ("F" ++ show n))
+    , ("C-", \n -> withTaggedGlobalP ("F" ++ show n) shiftHere)
     ]
   ] ++
   ---- System
@@ -262,7 +264,7 @@ myKeys cfg = mkKeymap cfg $
     , ("g", "r.b -g")
     , ("e", "r.dict --en --vim")
     , ("r", "r.dict --ru --vim")
-    , ("m", "~/.mpd/move_current")
+    , ("m", "r.mpd-move")
     ],
     inGroup "M-y"
     [ ("b", "r.b -p")
@@ -374,11 +376,12 @@ myManageHook = manageSpawn <+>
   , isDialog --> topmost doCenterFloat
   ] <+>
   composeFloat
-  [ ("Figure" `isPrefixOf`) <$> title
-  , ("Float" `isPrefixOf`) <$> appName
-  , let lst = "buddy_list Preferences"
-    in wmhas (stringProperty "WM_WINDOW_ROLE") lst
-  , let lst = "copyq feh Steam Gimp Pidgin Skype piony.py Transmission-gtk"
+  [ ("Float" `isPrefixOf`) <$> appName
+  --XXX: ("Figure" `isPrefixOf`) <$> title
+  --EXPL: pidgin is tiled by XMonad.Layout.IM
+  -- , let lst = "buddy_list Preferences"
+  --   in wmhas (stringProperty "WM_WINDOW_ROLE") lst
+  , let lst = "copyq feh Steam Gimp piony.py Transmission-gtk"
     in wmhas className lst
   , let lst = "PlayOnLinux"
     in wmhas appName lst
@@ -391,7 +394,9 @@ myManageHook = manageSpawn <+>
   ]
   <+> insertPosition Below Newer <+>
   composeShift
-  [ ("4", "Firefox")
+  [ ("`", "Pidgin")
+  , ("`", "Skype")
+  , ("4", "Firefox")
   , ("5", "Krita")
   , ("8", "t-engine64")
   , ("9", "Steam")

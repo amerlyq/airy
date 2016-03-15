@@ -15,8 +15,9 @@ else xauth -qf "$auth" extract - :$D | xauth merge -
 fi
 
 # TODO: replace $auth by <(xauth ?extract :$D)
+[[ $# -eq 0 && -f ${0%/*}/xinitrc ]] && client=("${0%/*}/xinitrc") || client=("$@")
 server=( /usr/bin/X :$D vt$XDG_VTNR -nolisten tcp -auth "$auth" )
-exec xinit "$@" -- "${server[@]}" & wait $!
+exec xinit "${client[@]}" -- "${server[@]}" & wait $!
 
 # FIND: why deallocated all and not only current one?
 ! hash deallocvt &>/dev/null || deallocvt

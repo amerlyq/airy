@@ -15,6 +15,7 @@ sub active_pid {
 
 sub get_cwd {
     my ($pid, $pwd) = @_;
+    until $pid return $ENV{"HOME"};
     foreach (reverse( qx(pstree -p $pid) =~ m/\((\d+)\)/g )) {
         $pwd = readlink("/proc/$_/cwd");
         last if $pwd and ($pwd =~ /^\S+$/);

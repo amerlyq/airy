@@ -20,4 +20,6 @@
 # fi
 
 # BUG: seems like it causes long delay before Xorg on cold system
-((0==$#commands[r.init])) || exec r.init
+# ((0==$#commands[r.init])) || exec r.init
+dinit=~/aura/airy/cfg/core/init
+[[ -f $dinit/run ]] && exec $dinit/run || ((0==$#commands[r.init])) || exec r.init

@@ -38,6 +38,10 @@ in xterm) session=(xterm -geometry 80x66+0+0 -name login)
 esac
 
 # Launch session
-(hash auto-start &>/dev/null && auto-start -w) &
+if [[ -f ${0%/*}/auto-start ]]; then
+  ${0%/*}/auto-start -w &
+elif hash auto-start &>/dev/null; then
+  auto-start -w &
+fi
 exec "${session[@]}"
 # jobs -p | xargs -r kill

@@ -52,9 +52,8 @@ case "$ARG" in
     suspend|-s) sys_power Suspend   ;;
   hibernate|-h) sys_power Hibernate ;;
      logout|-o) scratchpad_is_empty && sys_logout    ;;
-     reboot|-r) scratchpad_is_empty && sudo reboot   ;;
-   shutdown|-t) scratchpad_is_empty && sudo poweroff ;;
+     reboot|-r) scratchpad_is_empty && sudo systemctl reboot   ;;
+   shutdown|-t) scratchpad_is_empty && sudo systemctl poweroff ;;
              *) echo "Usage: $0
     <[l]ock|log[o]ut|[s]uspend|[h]ibernate|[r]eboot|shu[t]down>"; exit 2
 esac
-

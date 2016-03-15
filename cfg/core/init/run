@@ -13,7 +13,7 @@ fi
 
 # Launch X only on tty1
 if [[ $XDG_VTNR = [1] && -z $DISPLAY ]]; then
-  exec startx
+  [[ -f ${0%/*}/startx ]] && exec ${0%/*}/startx || exec startx
   # OR:1 exec xinit -- :0 -nolisten tcp vt$XDG_VTNR
   # OR:2 exec xinit -- :0 -novtswitch &>/dev/null & logout
 elif [[ $XDG_VTNR = [2-3] && -n $TMUX_SERVER ]]; then
