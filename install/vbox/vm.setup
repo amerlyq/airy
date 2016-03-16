@@ -102,3 +102,7 @@ Type=simple
 ExecStart=
 ExecStart=-/usr/bin/agetty --autologin $user -s %I 115200,38400,9600 vt102
 EOT
+
+# Setup
+# scp {,ark:}/usr/share/terminfo/r/rxvt-unicode-256color
+scp {,ark:}/usr/share/terminfo/s/st-256color

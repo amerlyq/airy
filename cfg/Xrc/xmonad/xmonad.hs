@@ -76,8 +76,8 @@ myKeys cfg = mkKeymap cfg $
   , ("M-z"        , focusUrgent)
   , ("M-C-z"      , clearUrgents)
   ---- swap
-  , ("M-S-h"      , windows W.swapMaster)
-  , ("M-S-l"      , windows W.shiftMaster)
+  , ("M-S-h"      , windows W.shiftMaster)
+  , ("M-S-l"      , GN.nextMatchWithThis GN.History wkspName >> windows W.swapMaster)
   , ("M-S-j"      , windows W.swapDown)
   , ("M-S-k"      , windows W.swapUp)
   ---- edit

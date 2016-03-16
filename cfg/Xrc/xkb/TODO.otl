@@ -86,6 +86,11 @@ Xkbmap
 		:BUG: <C-v> in vim shows codes as <C-S-F1> when pressed <Mod-F1>
 		: CHECK: currently may be broken S-F1
 		:DONE: keep origin using overlay
+		: THINK:BROKEN:
+		: -- ranger used FN to jump to tab
+		: -- (in vim) it's uncomfortable to stretch to overlay+FN simultaneously
+		: -- main goal of FN was to bind them to different useful immediate
+		:  actions, individual for each programm, but I have occupied them for fast windows switching only
 
 	Overlay for hjkl navigation
 		WANNA: make overlay lctl->F13, where F13 = [ temporary disables overlay (as shift for Caps) ]

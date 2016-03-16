@@ -28,10 +28,11 @@ alias -g S='|noglob sed -rn '
 alias -g W='|while read line; do '
 
 ## Buffers
-alias -g XO='xsel -ob| '
-alias -g XN='|xsel -ib'
-alias -g XC='|tee >(xsel -ib)| '
-alias -g XA='|tee >(xsel -ab)| '
+if (($+commands[xsel])); then
+  alias XX='xsel -ob'
+  alias X='|tee >(xsel -ib)'
+  alias -g XA='|tee >(xsel -ab)'
+fi
 
 alias -g FO='<$TMPDIR/zsh-last-output'
 alias -g FN='>$TMPDIR/zsh-last-output'

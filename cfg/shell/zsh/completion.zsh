@@ -6,6 +6,9 @@ fpath=(~/.shell/zsh/completion.d $fpath)
 # autoload -U compinit
 # compinit
 
+# Don't expand aliases _before_ completion has finished. Like: git comm-[tab]
+setopt complete_aliases
+
 # show completion menu when number of options is at least 2
 # zstyle ':completion:*' menu select=2
 
@@ -17,6 +20,7 @@ compdef prg.d/git-recursive=git
 for c in st pl ph; do eval "function _git-$c { _git; }"; done
 
 compdef r.ssh=ssh
+compdef v=$EDITOR
 
 # SEE Partial completion for git subcommands (like my $ compdef grI=git-rebase)
 #   http://unix.stackexchange.com/questions/128199/how-do-i-set-zsh-autocompletion-rules-for-second-argument-of-function-to-an-ex

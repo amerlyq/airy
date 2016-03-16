@@ -9,7 +9,7 @@ let g:loaded_vimballPlugin = 1
 "" launch as $ agent tempfile url -- See: https://github.com/danchoi/elinks.vim
 "let g:netrw_http_cmd = "elinks-for-vim"
 " let g:netrw_home=$CACHE
-let g:loaded_netrwPlugin = 1
+" let g:loaded_netrwPlugin = 1  " ATTENTION: scp:// isn't working w/o netrw
 ""CASE Match {{{1 Temporary jumps to show matching parenthesis:
 " let g:loaded_matchparen = 1    " Matching parentheses: hooks on Cursor*,Win*
 " set showmatch matchtime=1 cpoptions-=m
