@@ -9,6 +9,7 @@ pkg_inst "lsof strace ltrace iftop"
 
 if distro arch; then
     pkg_inst "bbe"
+    pkg_inst "openbsd-netcat"
     aur_inst "xtrace-git"
 elif distro ubuntu; then
     pkg_inst ""

@@ -1,9 +1,20 @@
 #!/bin/bash -e
 
-if ! lsmod | grep -q '^vboxdrv\>'; then
-    sudo modprobe vboxdrv
-fi
+VNM=arch32k
 
-if ! pgrep VirtualBox >/dev/null; then
-    VirtualBox &
-fi
+! VBoxManage list runningvms | grep -q "\<$VNM\>" ||
+  exec ssh -p 2822 root@localhost
+
+for nm in vboxdrv vboxnetflt vboxpci vboxnetadp
+do lsmod | grep -q "^$nm\>" || sudo modprobe -a "$nm"; done
+VBoxHeadless --startvm "$VNM" --vrde off &
+
+close(){ ! VBoxManage list runningvms | grep -q "\<$VNM\>" ||
+  VBoxManage controlvm "$VNM" poweroff; }
+trap 'close' INT EXIT QUIT TERM ERR
+
+do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
+  do printf "."; sleep 0.5; done; echo; }; }
+do_sleep 8
+
+wait

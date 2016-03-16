@@ -1,48 +1,35 @@
 # vim: ft=sh
-source ~/.shell/profile || exit
-source ./funcs || exit
-source ./prf/${VBOX_PROF?No} || exit
+source ~/.shell/profile
 
-# =====================================================================
-
-### Autochoose {{{
+VNM=arch32k
+VBOX_HDD=10240
 
 # Guest type and CD
-if [[ "${VNM,,}" =~ arch ]]; then patt='Arch'; iso='archlinux'
+if [[ "${VNM,,}" =~ arch ]]; then patt_nm='Arch'; install_iso='archlinux'
 else exit_s "Unknown VNM='${VNM?No}' guest OS"; fi
-patt="${patt?No}.*"
-iso="${iso?No}*iso"
-
-
 # Guest platform 32/64
-  if [[ "$VNM" =~ 32 ]]; then patt="${patt}32"
-elif [[ "$VNM" =~ 64 ]]; then patt="${patt}64"
+  if [[ "$VNM" =~ 32 ]]; then patt_nm="${patt_nm?}.*32"
+elif [[ "$VNM" =~ 64 ]]; then patt_nm="${patt_nm?}.*64"
 else exit_s "VNM=$VNM must contain [32|64]"; fi
-
-
-# Search specified guest and iso
-install_iso="$(find "$VMs" -type f -name "$iso")"
-ost="$(VBoxManage list ostypes | awk '/^ID:.*'"$patt"'/{print $NF}')"
-
-unset patt iso
-### }}}
-
+ost="$(VBoxManage list ostypes | awk '/^ID:/{a=$NF} /^Desc.*'"$patt_nm"'/{print a;quit}')"
 
 # Use option '-w' on Linux to build for Windows: [[ "${ARGS/-w}" == ${ARGS} ]]
-case "${CURR_PLTF?No}"
+case "${CURR_PLTF?}"
 in Linux)
     sudo="sudo"
-    VMs="$HOME/VMs"
-    SERIAL="/tmp/vbox-${VNM?No}S0"
+    VMs="/home/media/VMs"
+    SERIAL="/tmp/vbox-${VNM?}"
 
 ;; MINGW)
     sudo=""
     VMs="${2:-/e/VMs}"
     PATH="$PATH:/c/Program Files/Oracle/VirtualBox"
     printf "\nYou need to run this script as Administrator!\n"
-    SERIAL='\\.\pipe\'"vbox-${VNM}S0"
+    SERIAL='\\.\pipe\'"vbox-${VNM}"
+;; *) echo "Unknown host platform"
+esac
 
-;; *) echo "Unknown host platform" ;; esac
-
+# Search specified guest and iso
+install_iso="$(find "$VMs" -type f -name "${install_iso?}*iso")"
 vimg="${VMs?No}/${VNM}/${VNM}.vdi"
 vbox="${vimg%.*}.vbox"

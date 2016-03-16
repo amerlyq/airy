@@ -1,10 +1,10 @@
 # vim: ft=sh
-source ~/.shell/func.d/system || exit
+source ~/.shell/func.d/system
 
 ### General ###
 is_assoc() { [[ "$(declare -p $1)" =~ "declare -A" ]]; }
 exit_s() { printf "${1+$1\n}"; exit ${?:-1}; }
-hopt() { [ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]; }
+hopt() { [[ "${CURR_OPTS/[$1]}" != "$CURR_OPTS" ]]; }
 oadd() { CURR_OPTS="${CURR_OPTS/[$1]}${1}"; }
 
 

@@ -1,0 +1,104 @@
+#!/bin/bash -e
+echo "Err: use manually"
+exit
+
+# Summary
+parted -s -a opt /dev/sda mklabel msdos
+parted -s -a opt /dev/sda mkpart primary ext4 1MB 100%
+mkfs.ext4 /dev/sda1
+# parted -s -a opt /dev/sda set 1 boot on
+mount /dev/sda1 /mnt
+lsblk
+
+pacstrap /mnt base grub os-prober sudo base-devel openssh linux-headers neovim ranger tmux
+genfstab -U -p /mnt > /mnt/etc/fstab
+
+# --
+arch-chroot /mnt /bin/bash
+
+LANG='en_US.UTF-8'
+sed -ri "s/^#(${LANG}.*)\$/\1/" /etc/locale.gen
+locale-gen
+echo LANG=$LANG > /etc/locale.conf
+export LANG
+rm -vf /etc/localtime
+ln -sv /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+hwclock --systohc --utc
+
+echo "root:root" | chpasswd
+echo "arch32k" > /etc/hostname
+echo "192.168.56.1 main" >> /etc/hosts
+sed -ri 's/^(127\.0\.0\.1\s+\S+\s+\S+).*$/\1 arch32k/' /etc/hosts
+
+ifc=($(ip link|sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
+cat > /etc/netctl/dhcp <<EOT
+Interface=${ifc[0]}
+Connection=ethernet
+IP=dhcp
+EOT
+netctl reenable dhcp
+
+cat > /etc/netctl/vbox <<EOT
+Interface=${ifc[1]}
+Connection=ethernet
+IP=static
+Address=('192.168.56.10/24')
+EOT
+netctl reenable vbox
+
+# Gateway='192.168.56.1'
+# DNS=('192.168.56.1')
+
+cat /etc/mkinitcpio.conf <<EOT
+MODULES=""
+BINARIES=""
+FILES=""
+HOOKS="base udev autodetect modconf block lvm2 filesystems keyboard fsck"
+EOT
+mkinitcpio -p linux
+
+cat > /etc/default/grub <<EOT
+GRUB_DEFAULT=0
+GRUB_SAVEDEFAULT=false
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_DISABLE_RECOVERY=true
+GRUB_DISABLE_OS_PROBER=true
+GRUB_DISABLE_SUBMENU=true
+GRUB_DISTRIBUTOR="Arch"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX=""
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial"
+GRUB_GFXPAYLOAD_LINUX=text
+GRUB_PRELOAD_MODULES="part_msdos"
+EOT
+grub-install --target=i386-pc --recheck /dev/sda
+grub-mkconfig -o /boot/grub/grub.cfg
+
+
+# user=user
+# id -g $user || groupadd $user
+# id -u $user || useradd -m -g $user -G users,wheel,uucp -s /bin/bash $user
+# gpasswd -a $user uucp  # FIND: useradd is not enough to add to group?
+# printf "%s" $user:$user | chpasswd
+
+systemctl enable sshd.service
+
+### Autologin in console and serial
+user=root
+fl=/etc/systemd/system/getty@tty1.service.d/override.conf
+mkdir -p ${fl%/*} && cat > $fl <<EOT
+[Service]
+Type=idle
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $user --noclear %I 115200 linux
+EOT
+
+fl=/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf
+mkdir -p ${fl%/*} && cat > $fl <<EOT
+[Service]
+Type=simple
+ExecStart=
+ExecStart=-/usr/bin/agetty --autologin $user -s %I 115200,38400,9600 vt102
+EOT

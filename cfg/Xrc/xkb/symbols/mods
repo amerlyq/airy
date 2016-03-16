@@ -58,7 +58,8 @@ xkb_symbols "switches"
         actions= [ SetMods(modifiers=LevelThree), LatchMods(clearLocks,modifiers=Control) ]
     };
     modifier_map  Mod5 { <RCTL> };
-    key <MENU> { [ VoidSymbol ] };  // For VirtualBox
+    key <MENU> { [ Hyper_L ] };  // For VirtualBox
+    modifier_map  Mod3 { <MENU> };
 
     // Obtain one more modifier by swaping Hyper
     // The extra key on many European keyboards.

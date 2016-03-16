@@ -5,10 +5,29 @@ source ~/.shell/func.d/packages
 #   http://www.linuxveda.com/2015/03/09/how-to-install-virtualbox-in-arch-linux/
 
 if distro arch; then
-    aur_inst 'virtualbox-bin'
-    pkg_inst 'virtualbox-host-modules'
+    # pacman -Si linux
+    # will install DKMS properly
+    pkg_inst linux-headers virtualbox virtualbox-guest-iso
+    # ALT:(conflict) aur_inst 'virtualbox-bin' 'virtualbox-host-modules'  # NOT FOUND
+    # SEE: https://forum.antergos.com/topic/818/can-t-run-my-vitualbox/4
     # dkms autoinstall  # For custom, also: pkg_inst virtualbox-host-dkms
-    # modprobe vboxdrv  # insert driver
+
+    # now this command should work :)
+    sudo modprobe -a vboxdrv vboxnetflt vboxpci vboxnetadp
+
+    # you may run this
+    # sudo /sbin/rcvboxdrv -h
+    # add current user to vboxusers group
+    # sudo gpasswd -a $USER vboxusers
+
+    # now add entries to /etc/modules-load.d/virtualbox.conf
+    # for startup
+    # vim /etc/modules-load.d/virtualbox.conf
+    # insert this:
+    #vboxdrv
+    #vboxnetadp
+    #vboxnetflt
+    #vboxpci
 
 elif distro ubuntu; then
     echo "Dld manually!"
@@ -17,4 +36,3 @@ elif distro ubuntu; then
     # pkg_inst "virtualbox-guest-additions virtualbox-guest-utils \
     #           virtualbox-guest-dkms virtualbox-guest-x11"
 fi
-

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-source ~/.shell/func.d/system && amScriptDir || exit
+source ~/.shell/func.d/system || exit
+cd $(dirname $(readlink -m ${0}))
+SCRIPT_DIR="$PWD"
+source ./vbox/hosts || exit  # Import some variables
 source ./vbox/funcs || exit
 source ./vbox/options || exit
-source ./vbox/hosts || exit  # Import some variables
-cd $(dirname $(readlink -m ${0}))
 
 ### Options chooser ###
 hlst=rhcispetl
@@ -12,7 +13,7 @@ case "$1" in
     +[$hlst]*) echo "::: no chain -- choosen options only :::"
         OPTS="${1##*+}" ;;
     *) exit_s "Need option -/+'$hlist'" ;; esac
-hopt r && { do_vm_run "$VNM" -y; exit_s; }
+# hopt r && { do_vm_run "$VNM" -y; exit_s; }
 if hopt -; then
     hopt h && oadd ctx # hidden -> create, shutdown, detach/snapshot
     hopt c && oadd s   # create -> serial, login
@@ -25,14 +26,14 @@ fi
 ### Create vbox and setup local repository server ###
 #####################################################
 hopt r && do_vm_off "$VNM" -y
-hopt c && "$SCRIPT_DIR/vbox/create.sh" -c
+# hopt c && "$SCRIPT_DIR/vbox/create.sh" -c
 hopt r && do_vm_run "$VNM" -y $(hopt h && echo '-h')
 
-hopt e && [ -d "$VMs/pkg" ] && { ( cd "$VMs/pkg" &&
-    python2 -m SimpleHTTPServer 23208 >/tmp/vbox-PackageServer.log 2>&1
-) & trap "kill -15 $!; exit 1" EXIT SIGINT SIGTERM; }
+# hopt e && [ -d "$VMs/pkg" ] && { ( cd "$VMs/pkg" &&
+#     python2 -m SimpleHTTPServer 23208 >/tmp/vbox-PackageServer.log 2>&1
+# ) & trap "kill -15 $!; exit 1" EXIT SIGINT SIGTERM; }
 
-hopt r && do_sleep 8  # WARNING: May be facing problems with timing!
+# hopt r && do_sleep 8  # WARNING: May be facing problems with timing!
 
 
 #####################################################
