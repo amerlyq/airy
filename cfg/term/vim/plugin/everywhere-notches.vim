@@ -27,13 +27,13 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 let g:everywhere_activated = 1
 " UNUSED: 6 - light blue, 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 let s:patterns = {
-      \ 'Err': [ 1, "#dc322f", 'ERR%(OR)=|BUG|REGR|XXX|WTF'],
+      \ 'Err': [ 1, "#dc322f", 'ERR%(OR)=|BUG|REGR|XXX|WTF|BAD'],
       \ 'Fix': [ 9, "#dd6616", 'BUT|FIX%(ME)=|WARNING|ATTENTION|REM%(OVE)='],
       \ 'Add': [ 2, "#859900", 'ADD|SEE|NEED|FIND|ALSO|BETTER'],
       \ 'Did': [10, "#586e75", 'DONE|FIXED|EXPL|TEMP'],
       \ 'Dev': [ 4, "#268bd2", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
       \ 'Msg': [13, "#6c71c4", 'NOTE|USE|USAGE|DFL|STD|SUMMARY'],
-      \ 'Tbd': [ 5, "#d33682", 'TODO|CHECK|TRY|MOVE|REQ'],
+      \ 'Tbd': [ 5, "#d33682", 'TODO|CHECK|TRY|MOVE|NOT|REQ'],
       \ 'Alt': [ 3, "#c5a900", 'ALT|OR|CASE|THINK|CHG'],
       \ }
 
