@@ -17,6 +17,7 @@ fnm=$(r.wget-nm "${@:?}")
 r.tmux-job -t "$session" -m "$maincmd" \
   r.notify-cmd -n "Saved: $fnm" -f "Can't dld: $fnm" \
     $dldcmd "${@:?}"
+r.notify "Started" "${@:?}"
 
 # ADD: check if dld part of file is more then 5MB or sleep 4
 # DEV: close mpv after file moved
@@ -30,6 +31,8 @@ if [[ $opencmd ]]; then
   # WARNING: $1 must be real prg name, not bash wrapper
   if ps -oargs= -C "$opencmd" | grep -qxF "$fnm"
   then r.n -u 'Already opened!' "$fnm"
-  else ($opencmd "$fnm")  # trap 'wait' EXIT
+  else
+    (($(stat -c%s) > 5*1024*1024)) || sleep 5
+    ($opencmd "$fnm")  # trap 'wait' EXIT
   fi
 fi
