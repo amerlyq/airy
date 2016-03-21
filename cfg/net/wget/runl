@@ -5,12 +5,15 @@ src=${@:$#}  # Link is always last argument
 
 die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 
-[[ ${src:?} =~ '^http.*\.urls$' || -f $src ]] \
+[[ ${src:?} =~ ^http.*\.urls$ || -f $src ]] \
 || die "Not urls list"
 
-file -i "$src" | grep -qF 'text/plain' \
+[[ ! -f $src ]] \
+|| file -i "$src" | grep -qF 'text/plain' \
 || die "Not text/plain"
 
-[[ ! -f "$src" ]] || rm -v "$src"
+# BROKEN: Remove current file if already downloaded
+# In case if its updated on server
+[[ -f "$src" ]] || rm -v "$src"
 
 exec r.wgetf --input-file="$src" "${@:1:$#-1}"

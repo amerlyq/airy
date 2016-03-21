@@ -77,12 +77,16 @@ if neobundle#tap('incsearch.vim') "{{{
 
 
   if neobundle#tap('vim-asterisk') "{{{ 'haya14busa/vim-asterisk'
-    let g:asterisk#keeppos = 1  " Keep cursor inside match at same position
+    " DISABLED: irritates sometimes, plus has highlighting bugs
+    ""let g:asterisk#keeppos = 1  " Keep cursor inside match at same position
     " EXPL: z-prefixed mappings doesn't move the cursor.
     for k in ['*', '#', 'g*', 'g#', 'z*', 'z#', 'gz*', 'gz#']
       exe 'map <unique> '.k.' <Plug>(incsearch-nohl'.(k=~#'z'?'0':'').')'.
         \'<Plug>(asterisk-'.k.')<Plug>(anzu-update-search-status-with-echo)'
     endfor
+    " Easier to press
+    map <unique> z8 <Plug>(incsearch-nohl0)<Plug>(asterisk-z*)
+        \<Plug>(anzu-update-search-status-with-echo)
     call neobundle#untap()
   endif "}}}
 
