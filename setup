@@ -18,7 +18,7 @@ pretty() { sed -r "s|/home/$(whoami)|\~|g
             /\<(E|Err|ERR):\s.*/s//$C1&$CR/
 ";}
 # ======================================================================
-if cfgOpt r && [[ -f $mods ]]; then rm "$queue"; fi
+if cfgOpt r && [[ -f $mods ]]; then rm -vf "$queue"; fi
 
 # NOTE: If problem with package update, firts update 'archlinux-keyring' pkg
 if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then

@@ -106,6 +106,24 @@ TODO
 	Add menu to xmobar -- to control windows -- float/kill/move/resize
 		:= resize: latch mouse down and activate resizing
 		:	after resize you can simply click Mouse1 again
+	Switch wksp by mouse click in xmobar
+		http://www.arch-ed.dk/xmobar-clickable-workspaces/
+		https://bbs.archlinux.org/viewtopic.php?id=185798
+		http://xmonad.org/xmonad-docs/xmonad-contrib/src/XMonad-Hooks-DynamicLog.html
+			: NEED? re-implement dynamic logger
+		: -- ENH:NEED: backward Map for wksp nm -> keyseq for xdotool
+		: -- WARNING: remove all possible tags <...> from input before passing
+		: -- NEED:ENH: use XMonad.EZConfig.parseSpecial to convert other keys
+		: toXdotool ' ' = " "
+		: toXdotool '-' = "+"
+		: toXdotool 'M' = "super"
+		: toXdotool 'C' = "ctrl"
+		: toXdotool 'S' = "shift"
+		: toXdotool 'A' = "alt"
+		: -- ALT to map()
+		: -- toXdotool [] = ""
+		: -- toXdotool (x:xs) = convert x ++ toXdotool xs
+		: id2xkey ws = concatMap toXdotool $ mkMap M.! ws
 	Fullscreen/layout
 		ToggleLayouts
 			: import XMonad.Layout.ToggleLayouts  (toggleLayouts, ToggleLayout(..))
@@ -149,6 +167,10 @@ TODO
 
 	[_] How in Layout.IM use second region for Skype
 		:= Or split left zone by vertical and use two masters
+
+	[_] Mouse drag-n-drop windows
+		XMonad.Layout.WindowSwitcherDecoration
+		many integrated into -> XMonad.Config.BlueTile
 
 	USE:
 		spawn or bring up

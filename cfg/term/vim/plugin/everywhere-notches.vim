@@ -34,7 +34,7 @@ let s:patterns = {
       \ 'Dev': [ 4, "#268bd2", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
       \ 'Msg': [13, "#6c71c4", 'NOTE|USE|USAGE|DFL|STD|SUMMARY'],
       \ 'Tbd': [ 5, "#d33682", 'TODO|CHECK|TRY|MOVE|NOT|REQ'],
-      \ 'Alt': [ 3, "#c5a900", 'ALT|OR|CASE|THINK|CHG'],
+      \ 'Alt': [ 3, "#c5a900", 'ALT|OR|CASE|THINK|IDEA|CHG'],
       \ }
 
 function! s:everywhere_print(patts)

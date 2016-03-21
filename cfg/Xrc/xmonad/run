@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+dnum=$(wmctrl -d | awk -vn=$1 'n==$NF{print$1;quit}')
+wmctrl -s $dnum

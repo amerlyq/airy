@@ -8,7 +8,7 @@ cdauto() { local p="${@: -1}"
 alias cd='cdauto'
 
 # WARNING: Use 'sudo' w/o user cfgs, so viminfo, swap won't've root rights!
-alias v='$EDITOR'
+alias v=$EDITOR
 alias sv='sudo v'
 alias vi='v -u NONE --noplugin'
 alias vb='v -u ~/.vim/vimrc_basic'

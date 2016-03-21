@@ -21,7 +21,7 @@ Config {
 , sepChar      = "%"
 , alignSep     = "}{"
 -- \<fc=#1b1d1e,#fd971f>  %kbd%</fc>\
-, template     = "%StdinReader%}{\
+, template     = "%UnsafeStdinReader%}{\
   \<fc=#cc8000>  </fc>\
     \<fn=1>%mpd%</fn>\
   \<fc=#00cc00>  </fc>\
@@ -73,5 +73,5 @@ Config {
   , "-D", "intel_backlight" ] 30
 -- , Run Kbd []
 , Run Locks
-, Run StdinReader
+, Run UnsafeStdinReader
 ] }

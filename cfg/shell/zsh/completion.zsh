@@ -7,7 +7,8 @@ fpath=(~/.shell/zsh/completion.d $fpath)
 # compinit
 
 # Don't expand aliases _before_ completion has finished. Like: git comm-[tab]
-setopt complete_aliases
+# WARNING: breaks auto-completion for 'gco', etc -- need to setup all manually
+# setopt complete_aliases
 
 # show completion menu when number of options is at least 2
 # zstyle ':completion:*' menu select=2
@@ -19,8 +20,10 @@ setopt complete_aliases
 compdef prg.d/git-recursive=git
 for c in st pl ph; do eval "function _git-$c { _git; }"; done
 
+# IDEA: place 'compdef' near aliases/functions inside alias.d
+#   -- and in bash create empty stub compdef(){} to resolve unknown function
+#   BUT I need to keep separate completion file for binaries anyway
 compdef r.ssh=ssh
-compdef v=$EDITOR
 
 # SEE Partial completion for git subcommands (like my $ compdef grI=git-rebase)
 #   http://unix.stackexchange.com/questions/128199/how-do-i-set-zsh-autocompletion-rules-for-second-argument-of-function-to-an-ex

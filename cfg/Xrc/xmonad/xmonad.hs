@@ -8,7 +8,9 @@ import Data.List     (zipWith, isPrefixOf)
 import Data.Maybe    (isNothing,fromMaybe)
 import Data.Ratio    ((%))
 import Data.Default  (def)
-import qualified Data.Map as M
+import Data.Char     (ord)
+import Text.Printf   (printf)
+import qualified Data.Map.Strict as M
 import System.IO
 import System.Exit
 
@@ -34,7 +36,7 @@ import qualified XMonad.Actions.GroupNavigation as GN
 
 ---- Hooks
 import XMonad.Hooks.DynamicLog      (pad, wrap, shorten, dynamicLogString, xmobarColor, defaultPP, PP(..))
-import XMonad.Hooks.EwmhDesktops    (ewmh, fullscreenEventHook)
+import XMonad.Hooks.EwmhDesktops    (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, SetStruts(..), ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
@@ -138,7 +140,7 @@ myKeys cfg = mkKeymap cfg $
      ]
   ++
   ---- Workspaces
-  [ (m ++ k, windows $ f nm) | (k, nm) <- myWorkspaces, (m, f) <-
+  [ (m ++ k, windows $ f nm) | (nm, k) <- myWorkspaces, (m, f) <-
     [ ("M-"  , W.view)
     , ("M-C-", W.shift)
     , ("M-S-", \w -> W.view w . W.shift w)
@@ -309,8 +311,8 @@ myKeys cfg = mkKeymap cfg $
 
 myWorkspaces = concat
   [ map (\k -> (k, k)) mainRow
-  , map (\k -> (leader [k], [k])) ['a' .. 'z']
-  , zipWith (\k nm -> (leader k, nm)) mainRow (words "~ ! @ # $ % ^ & * ( ) _ +")
+  , map (\k -> ([k], leader [k])) ['a' .. 'z']
+  , zipWith (\nm k -> (nm, leader k)) (words "~ ! @ # $ % ^ & * ( ) _ +") mainRow
   ]
   where
     mainRow = words "` 1 2 3 4 5 6 7 8 9 0 - ="
@@ -318,6 +320,7 @@ myWorkspaces = concat
 
 
 myStartupHook = do
+  ewmhDesktopsStartup
   curr <- gets (W.currentTag . windowset)
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
   when (curr == head wsl) (windows . W.view $ wsl !! 1)
@@ -330,11 +333,11 @@ myStartupHook = do
 -- startupHook = setDefaultCursor xC_left_ptr <+>  ewmhDesktopsStartup >> setWMName "Xmonad"
 
 
-myCfg = ewmh $ withUrgencyHook NoUrgencyHook $ def
+myCfg = withUrgencyHook NoUrgencyHook $ def
   { modMask = mod4Mask
   -- Options
   , terminal    = "r.t"
-  , workspaces  = [ nm | (k, nm) <- myWorkspaces]
+  , workspaces  = [ nm | (nm, k) <- myWorkspaces]
   , keys        = myKeys
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
@@ -422,11 +425,26 @@ myLogHook h = do
       predefined ws | ws `elem` workspaces myCfg = ws
                     | otherwise = ""
 
+      mkMap = M.fromList myWorkspaces
+      xsMap = M.fromList [("`", "grave"), ("-", "underscore"), ("=", "equal"), ("/", "slash")]
+      xdokey = ("xdotool key --delay 150 super+" ++) . key2xsym
+      -- wmctrl = printf "r.xmonad $'\\x%02x'" . ord
+      ppAction n cmd txt = "<action=`" ++ cmd ++ "` button=" ++ show n ++ ">" ++ txt ++ "</action>"
+
+      key2xsym ws = M.findWithDefault ws ws xsMap
+      id2keys ws = M.findWithDefault "0" ws mkMap
+      -- clickws ws = "<action=r.xmonad `>" ++ ws ++ "</action>"
+      -- clickws ws = ppAction 1 (wmctrl ws) ws
+      -- clickws ws = show (ord $ '') :: String
+      -- clickly = id
+      clickws ws = ppAction 1 (xdokey $ id2keys ws) ws
+      clickly ly = ppAction 1 (xdokey "f") (ppAction 3 (xdokey "n") ly)
+
   -- xmobar pretty printing source
   io . hPutStrLn h =<< dynamicLogString defaultPP
     { ppCurrent = xmobarColor "#fd971f" ""
-    -- , ppVisible = wrap "(" ")"
-    , ppHidden  = check . predefined
+    -- , ppVisible = wrap "(" ")" (xinerama only)
+    , ppHidden  = clickws . check . predefined
     -- , ppHiddenNoWindows = const ""
     , ppUrgent  = xmobarColor "red" "yellow"
     -- , ppTitle   = xmobarColor "green"  "" . shorten 40
@@ -435,7 +453,7 @@ myLogHook h = do
     , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
     -- , ppSort    = getSortByIndex
     -- , ppExtras  = []
-    , ppLayout  = \nm -> case nm of
+    , ppLayout  = clickly . \nm -> case nm of
         "ResizableTall" -> "[|]"
         "Mirror ResizableTall" -> "[-]"
         "Tabbed Simplest" -> "=--"
@@ -450,4 +468,4 @@ myLogHook h = do
 main :: IO ()
 main = do
   h <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
-  xmonad myCfg { logHook = myLogHook h }
+  xmonad $ ewmh myCfg { logHook = myLogHook h }

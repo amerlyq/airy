@@ -5,11 +5,12 @@ import Data.Default                 (def)
 import XMonad                       (handleEventHook)
 import XMonad.Layout.LayoutHints    (hintsEventHook)
 import XMonad.Hooks.ManageDocks     (docksEventHook)
-import XMonad.Hooks.EwmhDesktops    (fullscreenEventHook)
+import XMonad.Hooks.EwmhDesktops    (fullscreenEventHook, ewmhDesktopsEventHook)
 
 myHandleEventHook = mconcat
   [ handleEventHook def
   , docksEventHook
   , hintsEventHook
   , fullscreenEventHook
+  , ewmhDesktopsEventHook
   ]
