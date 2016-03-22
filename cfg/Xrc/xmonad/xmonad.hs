@@ -9,7 +9,7 @@ import Data.Maybe    (isNothing,fromMaybe)
 import Data.Ratio    ((%))
 import Data.Default  (def)
 import Data.Char     (ord)
-import Text.Printf   (printf)
+import Numeric       (showHex)
 import qualified Data.Map.Strict as M
 import System.IO
 import System.Exit
@@ -428,14 +428,14 @@ myLogHook h = do
       mkMap = M.fromList myWorkspaces
       xsMap = M.fromList [("`", "grave"), ("-", "underscore"), ("=", "equal"), ("/", "slash")]
       xdokey = ("xdotool key --delay 150 super+" ++) . key2xsym
-      -- wmctrl = printf "r.xmonad $'\\x%02x'" . ord
+      -- wmctrl ws = "r.xmonad $'\\x" ++ showHex (ord $ head ws) "'"
       ppAction n cmd txt = "<action=`" ++ cmd ++ "` button=" ++ show n ++ ">" ++ txt ++ "</action>"
 
       key2xsym ws = M.findWithDefault ws ws xsMap
       id2keys ws = M.findWithDefault "0" ws mkMap
       -- clickws ws = "<action=r.xmonad `>" ++ ws ++ "</action>"
       -- clickws ws = ppAction 1 (wmctrl ws) ws
-      -- clickws ws = show (ord $ '') :: String
+      -- clickws ws = showHex (ord 'n') ""
       -- clickly = id
       clickws ws = ppAction 1 (xdokey $ id2keys ws) ws
       clickly ly = ppAction 1 (xdokey "f") (ppAction 3 (xdokey "n") ly)
