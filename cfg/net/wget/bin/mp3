@@ -3,7 +3,7 @@
 exec wget -O- "$@" \
 | sed -rn '/.*href="(https?:\/\/[^"]*\.mp3)".*/s//\1/p' \
 | wget -i- -O- \
-| sed -rn '/.*href="(https?:\/\/[^"]+\.mp3)">Click here to download.*/s//\1/p' \
+| sed -rn '/.*href="(https?:\/\/[^"]+\.mp3)">(Click here to download|Download to Computer).*/s//\1/p' \
 | r.wgetf -i-
 
 # USE: prime_music

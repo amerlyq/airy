@@ -2,7 +2,7 @@
 module Main (main) where
 
 ---- Std
--- import Control.Arrow (second)
+import Control.Arrow (second)
 import Control.Monad (when, liftM2)
 import Data.List     (zipWith, isPrefixOf)
 import Data.Maybe    (isNothing,fromMaybe)
@@ -26,7 +26,7 @@ import XMonad.Prompt.Shell          (shellPrompt)
 import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
 
 ---- Actions
-import XMonad.Actions.CycleWS       (doTo, moveTo, shiftTo, toggleWS', Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import XMonad.Actions.CycleWS       (doTo, moveTo, shiftTo, toggleWS', toggleOrDoSkip, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
 import XMonad.Actions.TagWindows    (setTags, focusUpTaggedGlobal, withTaggedGlobalP, shiftHere)
 import XMonad.Actions.CopyWindow    (copy, copyWindow, runOrCopy, killAllOtherCopies, kill1, wsContainingCopies)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
@@ -35,7 +35,7 @@ import XMonad.Actions.WindowGo      (runOrRaise)
 import qualified XMonad.Actions.GroupNavigation as GN
 
 ---- Hooks
-import XMonad.Hooks.DynamicLog      (pad, wrap, shorten, dynamicLogString, xmobarColor, defaultPP, PP(..))
+import XMonad.Hooks.SetWMName       (setWMName)
 import XMonad.Hooks.EwmhDesktops    (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts, docksEventHook, SetStruts(..), ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
@@ -65,10 +65,13 @@ import XMonad.Util.NamedScratchpad  (namedScratchpadAction, namedScratchpadManag
 
 
 import XMonad.Config.Amer.EventHook  (myHandleEventHook)
+import XMonad.Config.Amer.LogHook    (myLogHook)
 import XMonad.Config.Amer.Prompt     (myPromptTheme)
 import XMonad.Config.Amer.Scratchpad (myScratchpads)
+import qualified XMonad.Config.Amer.Workspace as MyWksp
 
 myKeys cfg = mkKeymap cfg $
+  MyWksp.keys ++
   ---- focus
   [ ("M-h"        , windows W.focusMaster)
   , ("M-j"        , windows W.focusDown)
@@ -120,33 +123,29 @@ myKeys cfg = mkKeymap cfg $
   -- Cycle through workspaces
   let focusNextE  = moveTo  Next EmptyWS
       shiftNextE  = shiftTo Next EmptyWS
-      bringNextE  = doTo    Next EmptyWS getSortByIndex (\w -> windows (W.shift w) >> windows (W.view w))
-      -- focusNextNE = moveTo  Next NonEmptyWS
-      -- focusPrevNE = moveTo  Prev NonEmptyWS
+      bringNextE  = doTo    Next EmptyWS getSortByIndex (windows . \i -> W.view i . W.shift i)
+      -- bringNextE  = doTo    Next EmptyWS getSortByIndex (\w -> windows (W.shift w) >> windows (W.view w))
+      focusNextNE = moveTo  Next NonEmptyWS
+      focusPrevNE = moveTo  Prev NonEmptyWS
+      backNforth f = gets (W.currentTag . windowset) >>= toggleOrDoSkip ["NSP"] f
       -- shiftNextNE = shiftTo Next NonEmptyWS
       -- shiftPrevNE = shiftTo Prev NonEmptyWS
-  in [ ("M-a"        , toggleWS' ["NSP"])
-     --FIXME: , ("M-S-a"      , shiftToPrev >> toggleWS)
-     --SEE: http://xmonad.org/xmonad-docs/xmonad-contrib/src/XMonad-Actions-CycleWS.html
-     , ("M-S-a" , windows (W.shift "0") >> windows (W.view "0"))
+  in [ ("M-a"     , backNforth W.view)
+     , ("M-C-a"   , backNforth W.shift)
+     , ("M-S-a"   , backNforth $ \i -> W.view i . W.shift i)
+     , ("M-C-S-a" , backNforth copy)  -- BUG: don't work
+     -- TRY:THINK:DEV: swap workspaces backNforth -- so I could completely move primary wksp into secondary
+     -- BUG: them counts unused wksp from current one, NEED any from the start!
+     -- ALT: choose empty only from secondary wksp? -- Like on M-g <Space>
      , ("M-<Backspace>"   , focusNextE)
      , ("M-C-<Backspace>" , shiftNextE)
-     -- BUG: we focus one after that!
      , ("M-S-<Backspace>" , bringNextE)
-     -- , ("M-<Tab>"    , focusNextNE)
-     -- , ("M-S-<Tab>"  , focusPrevNE)
+     , ("M-<Tab>"    , focusNextNE)
+     , ("M-S-<Tab>"  , focusPrevNE)
      -- , ("M-C-<Tab>"  , shiftNextNE >> focusNextNE)
      -- , ("M-C-S-<Tab>", shiftPrevNE >> focusPrevNE)
      ]
   ++
-  ---- Workspaces
-  [ (m ++ k, windows $ f nm) | (nm, k) <- myWorkspaces, (m, f) <-
-    [ ("M-"  , W.view)
-    , ("M-C-", W.shift)
-    , ("M-S-", \w -> W.view w . W.shift w)
-    , ("M-C-S-", copy)
-    ]
-  ] ++
   ---- Mark & Goto
   -- NEED:DEV: back_and_forth -- to return window on their previous screen
   -- -- if on currentFocused -- shiftHere was pressed again
@@ -221,7 +220,7 @@ myKeys cfg = mkKeymap cfg $
     -- /usr/lib/cinnamon-settings/cinnamon-settings.py sound
     ]
   ] ++
-  (spawnAll . concat) [
+  (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     [ ("M-d"       , "r.dmenu")
     , ("M-S-d"     , "r.dmenu -n")
     , ("M-C-d"     , "j4-dmenu-desktop")
@@ -298,8 +297,7 @@ myKeys cfg = mkKeymap cfg $
   ]
   where
     inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)
-    feedCmd cmd  = map $ \(k, o) -> (k, cmd ++ " " ++ o)
-    spawnAll    = map $ \(k, s) -> (k, spawn s)  -- TODO:USE: spawnHere
+    feedCmd cmd = map $ \(k, o) -> (k, cmd ++ " " ++ o)
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
     visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
@@ -309,35 +307,20 @@ myKeys cfg = mkKeymap cfg $
     isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ M.member w $ W.floating ws) :: Query Bool
 
 
-myWorkspaces = concat
-  [ map (\k -> (k, k)) mainRow
-  , map (\k -> ([k], leader [k])) ['a' .. 'z']
-  , zipWith (\nm k -> (nm, leader k)) (words "~ ! @ # $ % ^ & * ( ) _ +") mainRow
-  ]
-  where
-    mainRow = words "` 1 2 3 4 5 6 7 8 9 0 - ="
-    leader = ("g " ++)  -- ALT: s, <Backspace>, <Tab>
-
-
 myStartupHook = do
-  ewmhDesktopsStartup
-  curr <- gets (W.currentTag . windowset)
+  ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
+  setWMName "LG3D"  -- Fixes problems with Java GUI programs
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
-  when (curr == head wsl) (windows . W.view $ wsl !! 1)
-  where
-    wsl = workspaces myCfg
--- EXPL: to be able to use 'wmctrl' to get current wksp from scripts
--- import XMonad.Hooks.SetWMName
--- import XMonad.Hooks.EwmhDesktops
--- import XMonad.Util.Cursor
--- startupHook = setDefaultCursor xC_left_ptr <+>  ewmhDesktopsStartup >> setWMName "Xmonad"
+  curr <- gets (W.currentTag . windowset)
+  when (curr == head MyWksp.all) $
+    windows . W.view $ MyWksp.primary !! 1
 
 
 myCfg = withUrgencyHook NoUrgencyHook $ def
   { modMask = mod4Mask
   -- Options
   , terminal    = "r.t"
-  , workspaces  = [ nm | (nm, k) <- myWorkspaces]
+  , workspaces  = MyWksp.all
   , keys        = myKeys
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
@@ -358,7 +341,7 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
 myLayout = smartBorders
     -- . smartSpacing 3  -- I'm not sure yet if it nice or not
     -- . onWorkspace (workspaces myCfg !! 4) Full
-    . onWorkspace (head $ workspaces myCfg) imLayer
+    . onWorkspace (head MyWksp.primary) imLayer
     . mkToggle (NOBORDERS ?? FULL ?? EOT)
     . mkToggle (single MIRROR)
     . mkToggle (single REFLECTX)
@@ -399,7 +382,11 @@ myManageHook = manageSpawn <+>
   composeShift
   [ ("`", "Pidgin")
   , ("`", "Skype")
-  , ("4", "Firefox")
+  , ("FF", "Firefox")
+  -- , ("MM", "mutt") -- TODO: make whole wksp similar to firefox
+  -- NOTE: strictly speaking, we don't need runOrRaise for mutt
+  -- -- only stick it to MM wksp and keys to jump on it
+  -- -- but with raise we get auto-launch and jumping even to moved for some reasons windows
   , ("5", "Krita")
   , ("8", "t-engine64")
   , ("9", "Steam")
@@ -413,57 +400,6 @@ myManageHook = manageSpawn <+>
     -- ALT: doF (W.shift "doc")
     composeShift = mconcat . map (\(w, x) -> (className =? x --> doShift w))
 
-
--- SEE how to combine CopyWindow and DynamicLog in more modular way
---  https://bbs.archlinux.org/viewtopic.php?id=194863
-myLogHook h = do
-  GN.historyHook
-
-  copies <- wsContainingCopies
-  let check ws | ws `elem` copies = xmobarColor "#8888ff" "green" ws
-               | otherwise = ws  -- pad ws
-      predefined ws | ws `elem` workspaces myCfg = ws
-                    | otherwise = ""
-
-      mkMap = M.fromList myWorkspaces
-      xsMap = M.fromList [("`", "grave"), ("-", "underscore"), ("=", "equal"), ("/", "slash")]
-      xdokey = ("xdotool key --delay 150 super+" ++) . key2xsym
-      -- wmctrl ws = "r.xmonad $'\\x" ++ showHex (ord $ head ws) "'"
-      ppAction n cmd txt = "<action=`" ++ cmd ++ "` button=" ++ show n ++ ">" ++ txt ++ "</action>"
-
-      key2xsym ws = M.findWithDefault ws ws xsMap
-      id2keys ws = M.findWithDefault "0" ws mkMap
-      -- clickws ws = "<action=r.xmonad `>" ++ ws ++ "</action>"
-      -- clickws ws = ppAction 1 (wmctrl ws) ws
-      -- clickws ws = showHex (ord 'n') ""
-      -- clickly = id
-      clickws ws = ppAction 1 (xdokey $ id2keys ws) ws
-      clickly ly = ppAction 1 (xdokey "f") (ppAction 3 (xdokey "n") ly)
-
-  -- xmobar pretty printing source
-  io . hPutStrLn h =<< dynamicLogString defaultPP
-    { ppCurrent = xmobarColor "#fd971f" ""
-    -- , ppVisible = wrap "(" ")" (xinerama only)
-    , ppHidden  = clickws . check . predefined
-    -- , ppHiddenNoWindows = const ""
-    , ppUrgent  = xmobarColor "red" "yellow"
-    -- , ppTitle   = xmobarColor "green"  "" . shorten 40
-    -- , ppWsSep   = " "
-    , ppSep     = xmobarColor "#fd971f" "" " \xe0b1 "           -- separator between elements
-    , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
-    -- , ppSort    = getSortByIndex
-    -- , ppExtras  = []
-    , ppLayout  = clickly . \nm -> case nm of
-        "ResizableTall" -> "[|]"
-        "Mirror ResizableTall" -> "[-]"
-        "Tabbed Simplest" -> "=--"
-        "Full" -> "[ ]"
-        "Grid" -> "[#]"
-        "IM Grid" -> "|##"
-        "SimplestFloat" -> "( )"
-        "Circle" -> "(O)"
-        _ -> nm
-    }
 
 main :: IO ()
 main = do
