@@ -10,4 +10,5 @@
 # Exit session on kill
 name="st-$$"
 trap "tmux kill-session -t $name" INT TERM EXIT
-exec tmux new-session -s $name "$@"
+# WARNING: to keep 'trap' working, don't use exec
+tmux new-session -s $name "$@"

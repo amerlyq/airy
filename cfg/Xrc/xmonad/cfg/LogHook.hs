@@ -20,6 +20,7 @@ escape = concatMap f :: String -> String where
   f x   = [x]
 mouse n cmd txt = "<action=`" ++ escape cmd ++ "` button=" ++ show n ++ ">" ++ txt ++ "</action>"
 wmctrl = ("r.xmonad " ++)  -- ALT: $'\\x" ++ showHex (ord $ head i) "'"
+-- ADD: wmctrl -r :ACTIVE: -b toggle,fullscreen -- Toggle fullscreen for current window only (not layout)
 
 -- mkMap = M.fromList MyWksp.keys
 xsMap = M.fromList [("`", "grave"), ("-", "underscore"), ("=", "equal"), ("/", "slash")]

@@ -19,7 +19,7 @@ let s:leads = {
   \  'Unite': '<Tab>',
   \  'Toggle' : '<Leader>t',
   \  'Replace': '<Leader>r',
-  \  'Git': '[^Frame]g',
+  \  'Git': '[Frame]g',
   \}}
 
 " ATTENTION:

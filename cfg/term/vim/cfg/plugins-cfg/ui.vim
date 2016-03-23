@@ -32,7 +32,7 @@ if neobundle#tap('vim-signify')  "{{{
   let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
   let g:signify_sign_change = '~'
   let g:signify_sign_delete = '-'
-  noremap <unique> [Frame]gg :<C-u>SignifyFold<CR>
+  noremap <unique> zS :<C-u>SignifyFold<CR>
   " FIND:THINK: isn't :SignifyRefresh unnecessary?
   noremap <unique> [Toggle]g :<C-u>SignifyToggleHighlight \| SignifyRefresh<CR>
   noremap <unique> [Toggle]G :<C-u>SignifyToggle<CR>

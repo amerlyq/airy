@@ -29,9 +29,7 @@ if &diff
   " nnoremap <space> :normal! ]c<CR>
   " nnoremap <backspace> :normal! [c<CR>
 
-  " allows you to 'put' and 'obtain' changes in visual mode for the instances
-  " where multiple changes are on concurrent lines and you don't want to make
-  " both changes
+  " USAGE: put/obtain only vsel instead of whole diff chunk
   vnoremap p :diffput <bar> diffupdate<enter>
   vnoremap o :diffget <bar> diffupdate<enter>
 endif

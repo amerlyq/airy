@@ -15,7 +15,7 @@
     lmsg     = log --oneline --decorate
     lname    = log --date=short --pretty=format:'%h | %ad | %><(18)%an | %d%<(50,trunc)%s'
     ldate    = log --pretty=format:'%C(yellow)%h%C(reset) | %C(white)%>(32,trunc)%aD%C(reset) | %C(bold green)%>(12,trunc)%ar%C(reset) | %s%C(bold red)%d%C(reset)'
-    lstd     = log --abbrev-commit --date=short --all --format=format:'%C(bold green)%ad%C(reset) %C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset) :%C(yellow)%h%C(reset)'
+    lstd     = log --abbrev-commit --date=short --all --format=format:'%C(bold green)%ad%C(reset) %C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset) %C(yellow)%h%C(reset)'
     linverse = log --abbrev-commit --date=short --all --format=format:'%C(bold reverse green)%ad%C(reset)%C(reverse white) %s %C(reset)%C(bold reverse red)%d%C(reset)%C(bold reverse blue) [%aN]%C(reset):%C(reverse yellow)%h%C(reset)'
 
     lgraph  = !git lstd --graph
