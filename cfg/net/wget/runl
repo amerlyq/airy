@@ -5,15 +5,20 @@ src=${@:$#}  # Link is always last argument
 
 die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 
-[[ ${src:?} =~ ^http.*\.urls$ || -f $src ]] \
-|| die "Not urls list"
+if [[ ${src:?} =~ ^http.*\.urls$ ]]; then
+  fnm=$(r.wget-nm "$src")
+  [[ ! -f $fnm ]] || rm -v "$fnm"
+  r.wgetf "$src"
+elif [[ -f $src ]]; then
+  fnm="$src"
+else die "Not urls list"
+fi
 
-[[ ! -f $src ]] \
-|| file -i "$src" | grep -qF 'text/plain' \
+[[ ! -f ${fnm?} ]] \
+|| file -i "$fnm" | grep -qF 'text/plain' \
 || die "Not text/plain"
 
 # BROKEN: Remove current file if already downloaded
 # In case if its updated on server
-[[ -f "$src" ]] || rm -v "$src"
 
-exec r.wgetf --input-file="$src" "${@:1:$#-1}"
+exec r.wgetf --input-file="$fnm" "${@:1:$#-1}"
