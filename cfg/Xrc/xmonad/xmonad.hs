@@ -5,7 +5,7 @@ module Main (main) where
 import Control.Arrow (second)
 import Control.Monad (when, liftM2)
 import Data.List     (zipWith, isPrefixOf)
-import Data.Maybe    (isNothing,fromMaybe)
+import Data.Maybe    (isNothing, isJust, fromMaybe)
 import Data.Ratio    ((%))
 import Data.Default  (def)
 import Data.Char     (ord)
@@ -26,7 +26,7 @@ import XMonad.Prompt.Shell          (shellPrompt)
 import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
 
 ---- Actions
-import XMonad.Actions.CycleWS       (doTo, moveTo, shiftTo, toggleWS', toggleOrDoSkip, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
+import XMonad.Actions.CycleWS       (doTo, moveTo, shiftTo, toggleWS', toggleOrDoSkip, findWorkspace, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
 import XMonad.Actions.TagWindows    (setTags, focusUpTaggedGlobal, withTaggedGlobalP, shiftHere)
 import XMonad.Actions.CopyWindow    (copy, copyWindow, runOrCopy, killAllOtherCopies, kill1, wsContainingCopies)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
@@ -77,7 +77,8 @@ myKeys cfg = mkKeymap cfg $
   , ("M-j"        , windows W.focusDown)
   , ("M-k"        , windows W.focusUp)
   , ("M-l"        , GN.nextMatchWithThis GN.History wkspName)
-  , ("M-'"        , GN.nextMatchWithThis GN.Backward className)
+  , ("M-;"        , GN.nextMatchWithThis GN.Forward className)
+  , ("M-S-;"      , GN.nextMatchWithThis GN.Backward className)
   , ("M-z"        , focusUrgent)
   , ("M-C-z"      , clearUrgents)
   ---- swap
@@ -106,8 +107,8 @@ myKeys cfg = mkKeymap cfg $
   -- , ("M-<Up>"     , withFocused $ keysAbsResizeWindow (-10,-10) (1024,752))
   -- , ("M-<Down>"   , withFocused $ keysAbsResizeWindow (10,10) (1024,752))
   -- , ("M-<>" , withFocused (keysMoveWindowTo (512,384) (1%2,1%2)))
-  , ("M-;"        , sendMessage . IncMasterN $  1)
-  , ("M-S-;"      , sendMessage . IncMasterN $ -1)
+  , ("M-'"        , sendMessage . IncMasterN $  1)
+  , ("M-S-'"      , sendMessage . IncMasterN $ -1)
   ---- float
   -- THINK: jumps between last two float windows -- do combo M-w, M-l better then i3 model
   , ("M-w"        , GN.nextMatch GN.History isFloat)
@@ -133,7 +134,7 @@ myKeys cfg = mkKeymap cfg $
   in [ ("M-a"     , backNforth W.view)
      , ("M-C-a"   , backNforth W.shift)
      , ("M-S-a"   , backNforth $ \i -> W.view i . W.shift i)
-     , ("M-C-S-a" , backNforth copy)  -- BUG: don't work
+     , ("M-C-S-a" , backNforth $ \i -> W.view i . copy i)
      -- TRY:THINK:DEV: swap workspaces backNforth -- so I could completely move primary wksp into secondary
      -- BUG: them counts unused wksp from current one, NEED any from the start!
      -- ALT: choose empty only from secondary wksp? -- Like on M-g <Space>
@@ -158,17 +159,17 @@ myKeys cfg = mkKeymap cfg $
     ]
   ] ++
   ---- System
-  [ ("M-\\"  , kill1)
+  [ ("M-\\"    , kill1)
   , ("M-C-\\", killAllOtherCopies)
-  , ("M-S-q" , kill)
+  , ("M-S-q"   , kill)
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
   inGroup "M-S-<Esc>"  -- xmonad
-    [ ("o", io exitSuccess)
-    , ("n", refresh)  -- workspace normalizing (resize)
-    , ("r", spawn "sudo reboot")
-    , ("t", spawn "sudo poweroff")
-    , ("f", refresh)  -- Correct size of the viewed windows
+    [ ("o", whenWindowsClosed $ io exitSuccess)
+    , ("r", whenWindowsClosed $ spawn "sudo reboot")
+    , ("t", whenWindowsClosed $ spawn "sudo poweroff")
+    , ("j", whenWindowsClosed $ spawn "r.tf")
+    , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("c", spawn "r.n xmonad recompile" >>
             spawn "xmonad --recompile && xmonad --restart && r.n OK")
@@ -305,7 +306,25 @@ myKeys cfg = mkKeymap cfg $
     -- TRY? we could use simply W.tag on w? See src of toggleWS'
     wkspName = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ fromMaybe "" $ W.findTag w ws) :: Query String
     isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ M.member w $ W.floating ws) :: Query Bool
+    whenWindowsClosed fX = fX
+    -- whenWindowsClosed fX = ask >>= (\ws -> if null (W.allWindows ws) then fX else spawn "r.n no")
+    -- whenWindowsClosed fX = do
+    --   ws <- gets
+    --   act <- fX
+    --   orr <- spawn "r.n no"
+    --   return $ if null (W.allWindows ws) then act else orr
 
+      -- curr <- gets (W.tag . W.workspace . W.current . windowset)
+      -- next <- findWorkspace getSortByIndex Next NonEmptyWS 1
+      -- if W.tag next /= curr && (isJust . W.stack $ curr)
+      -- then windows (W.view $ W.tag next) >> spawn "r.n Non-empty"
+      -- else fX
+
+      -- curr <- gets (W.currentTag . windowset)
+      -- if any (\w -> True) wks -- (isJust . W.stack)
+      -- then fX else moveTo Next NonEmptyWS >> liftX $ spawn "r.n Non-empty"
+      -- fX
+      -- return ()
 
 myStartupHook = do
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'

@@ -8,6 +8,7 @@ while getopts 'lc:o:t:w' o; do case "$o"
 in o) cd "$OPTARG"
 ;; c) opencmd=$OPTARG
 ;; l) dldcmd=r.wgetl
+;; y) dldcmd=youtube-dl  # FIXME:(can't get output name)
 ;; t) session=$OPTARG
 ;; w) maincmd="r.wget-watch '$PWD'"
 ;; *) exit; esac; done; shift $((OPTIND-1))

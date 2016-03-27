@@ -77,11 +77,22 @@ alias gdS='git stash show -p'
 alias glh='git fcommits'  # history for one file
 alias glB='git flines'    # blame formatted
 alias glg='git lgraph'
-alias glgs='glg --source --all -S'   # search <text> in all commits content
 alias glF='git log -p HEAD..origin'  # with fetched
 alias gll='git lmsg'
 gln(){ git ldump -n ${1:-10}; } #or -1 for inf
-alias gff='git rev-list --all | xargs git grep'
+
+alias ggs='glg --source --all -S'   # search <text> in all commits content
+alias ggx='git rev-list --all | xargs git grep'
+alias ggS='git log -S'
+alias ggG='git log -G'
+ggg(){ local rev  # WARNING:BROKEN:(shows same commit however many revisions)
+  (export GIT_PAGER=cat
+    git log --pretty=format:'%H' -G "$1" | while read rev; do
+    echo $rev
+    echo && git lgraph -n1 "$rev" && echo
+    git grep --color -n --break --heading "$1" "$rev"
+  done) }
+
 # git grep -l --all-match -e <regexp1> # To search files with line
 # git log -G Foo --since=2009.1.1 --until=2010.1.1 -- path_containing_change # To search commits changing line
 

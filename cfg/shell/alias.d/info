@@ -4,6 +4,7 @@
 alias path='echo -e ${PATH//:/\\n}'
 alias now='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
+alias date.='date +%Y%m%d_%H%M%S'
 
 # most often used commands
 alias top20='print -l $$${(o)history%% *} | uniq -c | sort -nr | head -n 20'
@@ -39,4 +40,3 @@ alias cpuinfo='lscpu'
 
 ## get GPU ram on desktop / laptop##
 alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
-

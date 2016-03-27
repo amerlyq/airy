@@ -1,0 +1,5 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+smbclient //${ROUT_IPL?}/share -N
+# ALT: ~/.bin/mnt -s router :OR: mount -t cifs
