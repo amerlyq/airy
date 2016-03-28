@@ -11,13 +11,12 @@ source ~/.shell/func.d/packages
 # dzen2, i3status
 # acpi, sysstat # for i3blocks: has 'mpstat' for cpu loading, 'acpi' for battery stat
 
+pkg_inst i3
+
 if distro arch; then
-    pkg_inst i3 i3lock
     aur_inst i3blocks
 
 elif distro ubuntu; then
-    pkg_inst i3 i3lock
-
     pkg_inst 'ruby-ronn'
     git_inst 'vivien/i3blocks'
 

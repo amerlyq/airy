@@ -164,14 +164,15 @@ myKeys = MyWksp.keys ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
   inGroup "M-S-<Esc>"  -- xmonad
     [ ("o", whenWindowsClosed $ io exitSuccess)
-    , ("r", whenWindowsClosed $ spawn "sudo reboot")
-    , ("t", whenWindowsClosed $ spawn "sudo poweroff")
+    , ("r", whenWindowsClosed $ spawn "sudo systemctl reboot")
+    , ("t", whenWindowsClosed $ spawn "sudo systemctl poweroff")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.n xmonad recompile && xmonad --recompile && xmonad --restart && r.n OK")
     ] ++
   ---- Shortcuts
   -- main tools
+  -- TODO: insert into M-o / M-S-o menus to be able open on new wksp
   concat [
     [ ("M-"     ++ k , spawnHere t)
     , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
@@ -190,9 +191,14 @@ myKeys = MyWksp.keys ++
     , ("s", shellPrompt myPromptTheme)
     ] ++
   ---- Scratchpads
-  (inGroup "M-o" . concat) [
+  -- TODO:ADD: M-s <Space> (export sPrf -- secondary prefix) -- jump to nearest next/prev(S-<Space>) empty wksp instead of <Bksp>
+  (concat . (`map` [
+      inGroup "M-o",
+      inGroup "M-S-o" . map (second (\f -> moveTo Next EmptyWS >> f))
+  ]) . flip ($) . concat) [
     [ ("M-o", windows $ W.view "NSP")
     , ("M-S-o", windows $ W.shift "NSP")
+    , ("f" , runOrRaise "firefox" $ className =? "Firefox")
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
@@ -202,8 +208,7 @@ myKeys = MyWksp.keys ++
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)
     | nm <- ["ncmpcpp", "mutt", "ipython"]
     ],
-    [ ("f" , runOrRaise "firefox" $ className =? "Firefox")
-    , ("b" , spawnHere "r.b")
+    [ ("b" , spawnHere "r.b")
     , ("v" , spawnHere "r.tf -e $EDITOR")
     , ("S-<Space>", spawnHere "r.t")
     , ("<Space>"  , spawnHere "r.tf")
@@ -219,9 +224,9 @@ myKeys = MyWksp.keys ++
     [ ("M-d"       , "r.dmenu")
     , ("M-S-d"     , "r.dmenu -n")
     , ("M-C-d"     , "j4-dmenu-desktop")
-    , ("M-<Print>" , "~/.i3/ext/screenshot")
+    , ("M-<Print>" , "r.capture-screen")
     , ("M-C-S-\\"  , "~/.i3/ctl/wnd_active_kill")
-    , ("M-S-z"     , "~/.i3/ext/i3exit lock")
+    , ("M-S-z"     , "r.lock")
     ],
     feedCmd "~/.i3/ext/volume"
     [ ("M-<Home>"     , "20%")
@@ -233,7 +238,9 @@ myKeys = MyWksp.keys ++
     , ("<XF86AudioMute>"       , "")
     ],
     feedCmd "mpc"
-    [ ("M-S-<Home>"      , "toggle")
+    [ ("M-o S-,"         , "next")
+    , ("M-o S-."         , "prev")
+    , ("M-S-<Home>"      , "toggle")
     , ("M-S-<Page_Up>"   , "prev")
     , ("M-S-<Page_Down>" , "next")
     , ("M-S-<End>"       , "seek +5 >/dev/null")

@@ -1,0 +1,28 @@
+#!/bin/bash -e
+
+# User-choosen bkgr
+pic=~/aura/screenlock.png
+
+if [[ ! -f $pic ]]; then
+  pic=${TMPDIR:?}/screenlock.png
+  scrot "$pic"  # Lock with cool bkgd
+  trap "rm '$pic'" EXIT
+
+  txt=${TMPDIR:?}/screenlock.txt
+  [[ ! -f $txt ]] || mogrify -scale 10% -scale 1000% \
+    -pointsize 72 -font DejaVu-Sans-Condensed -fill Yellow \
+    -annotate +200+200 "$(<"$txt")" "$pic"
+fi
+
+# Notifications demon pause/resume
+notify-send "DUNST_COMMAND_PAUSE"
+i3lock --dpms --nofork --color 111111 --image "$pic"
+notify-send "DUNST_COMMAND_RESUME"
+
+## With this you can hold backlight 3 sec longer
+## But then it will not off after wrong passwords!
+# xset dpms force on && sleep 3;
+# pgrep i3lock >/dev/null && xset dpms force off;
+# ALT:
+# xscreensaver-command -lock
+# xautolock -time 15 -locker '~/.local/bin/fuzzy_lock.sh'

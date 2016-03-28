@@ -33,8 +33,8 @@ keys = [ (m ++ k, windows $ f i) | (i, k) <- aliases, (m, f) <- actions]
 leader = ("s " ++)  -- ([s]econdary) ALT: g, <Backspace>, <Tab>
 aliases = concat
   [ map (\i -> (i, i)) primary
-  , zipWith (\i k -> (i, leader k)) secondary primary
   , map (\i -> (i, leader i)) immediate
+  , zipWith (\i k -> (i, leader k)) secondary primary
   ]
 
 actions =

@@ -2,29 +2,6 @@
 
 ARG="$1"
 
-sys_lock() {
-    local pic=~/aura/screenlock.png
-    if [ ! -f $pic ]; then
-        pic="${TMPDIR:-/tmp}/screenlock.png"
-        mkdir -p "${pic%/*}"
-        scrot $pic  # Lock with cool bkgd
-        mogrify -scale 10% -scale 1000% \
-            -pointsize 72 -font DejaVu-Sans-Condensed -fill Yellow \
-            -annotate +200+200 "$(</tmp/$USER/screentext)" $pic
-    fi
-    { notify-send "DUNST_COMMAND_PAUSE";   # pause notifications
-      i3lock --dpms --nofork --color 111111 --image $pic;
-      notify-send "DUNST_COMMAND_RESUME";  # resume notifications
-    } &
-    ## With this you can hold backlight 3 sec longer
-    ## But then it will not off after wrong passwords!
-    # xset dpms force on && sleep 3;
-    # pgrep i3lock >/dev/null && xset dpms force off;
-    # ALT:
-    # xscreensaver-command -lock
-    # xautolock -time 15 -locker '~/.local/bin/fuzzy_lock.sh'
-}
-
 scratchpad_is_empty(){
     if ! i3-msg -t get_tree | jshon | awk '/scratchpad_state/{a[$2]=0}
         END{exit (length(a)>1)}'; then
@@ -48,7 +25,7 @@ sys_power(){ #Suspend #Hibernate
 }
 
 case "$ARG" in
-       lock|-l) sys_lock            ;;
+       lock|-l) r.lock &            ;;
     suspend|-s) sys_power Suspend   ;;
   hibernate|-h) sys_power Hibernate ;;
      logout|-o) scratchpad_is_empty && sys_logout    ;;

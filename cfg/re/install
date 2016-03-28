@@ -1,11 +1,13 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-#| bbe | binary sed
+#| bbe  | binary sed
+#| nmap | Network exploration tool and security / port scanner
 # SEE:
 # http://xyne.archlinux.ca/projects/hexgrep/
 
 pkg_inst "lsof strace ltrace iftop"
+pkg_inst "nmap"
 
 if distro arch; then
     pkg_inst "bbe"
