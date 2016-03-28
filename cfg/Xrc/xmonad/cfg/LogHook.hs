@@ -6,11 +6,12 @@ module XMonad.Config.Amer.LogHook (myLogHook) where
 
 import qualified Data.Map.Strict as M
 import System.IO (hPutStrLn)
+import Data.Default  (def)
 
 import XMonad                         (io)
 import XMonad.Actions.CopyWindow      (wsContainingCopies)
 import XMonad.Actions.GroupNavigation (historyHook)
-import XMonad.Hooks.DynamicLog        (dynamicLogString, xmobarColor, defaultPP, PP(..))  -- pad, wrap, shorten,
+import XMonad.Hooks.DynamicLog        (dynamicLogString, xmobarColor, PP(..))  -- pad, wrap, shorten,
 
 import qualified XMonad.Config.Amer.Workspace as MyWksp
 
@@ -29,7 +30,7 @@ xdokey = ("xdotool key --delay 150 super+" ++) . key2xsym
 
 
 -- xmobar pretty printing source
-myStateLoggger copies = dynamicLogString defaultPP
+myStateLoggger copies = dynamicLogString def
   { ppCurrent = xmobarColor "#fd971f" ""
   -- , ppVisible = wrap "(" ")" (xinerama only)
   , ppHidden  = clickws . predefined

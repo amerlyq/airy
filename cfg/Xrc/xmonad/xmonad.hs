@@ -17,7 +17,7 @@ import System.Exit
 ---- Core
 import XMonad                       -- (float, kill, spawn, refresh, restart, doFloat, workspaces, windows, withFocused, sendMessage, Resize(Shrink, Expand), IncMasterN)
 import XMonad.Util.Run              (spawnPipe)
-import XMonad.Util.EZConfig         (mkKeymap)
+import XMonad.Util.EZConfig         (mkKeymap, checkKeymap)
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
 import XMonad.ManageHook            (liftX, className)
 
@@ -70,56 +70,54 @@ import XMonad.Config.Amer.Prompt     (myPromptTheme)
 import XMonad.Config.Amer.Scratchpad (myScratchpads)
 import qualified XMonad.Config.Amer.Workspace as MyWksp
 
-myKeys cfg = mkKeymap cfg $
-  MyWksp.keys ++
+myKeys = MyWksp.keys ++
   ---- focus
-  [ ("M-h"        , windows W.focusMaster)
-  , ("M-j"        , windows W.focusDown)
-  , ("M-k"        , windows W.focusUp)
-  , ("M-l"        , GN.nextMatchWithThis GN.History wkspName)
-  , ("M-;"        , GN.nextMatchWithThis GN.Forward className)
-  , ("M-S-;"      , GN.nextMatchWithThis GN.Backward className)
-  , ("M-z"        , focusUrgent)
-  , ("M-C-z"      , clearUrgents)
+  [ ("M-h"      , windows W.focusMaster)
+  , ("M-j"      , windows W.focusDown)
+  , ("M-k"      , windows W.focusUp)
+  , ("M-l"      , GN.nextMatchWithThis GN.History wkspName)
+  , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
+  , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
+  , ("M-z"      , focusUrgent)
+  , ("M-C-z"    , clearUrgents)
   ---- swap
-  , ("M-S-h"      , windows W.shiftMaster)
-  , ("M-S-l"      , GN.nextMatchWithThis GN.History wkspName >> windows W.swapMaster)
-  , ("M-S-j"      , windows W.swapDown)
-  , ("M-S-k"      , windows W.swapUp)
+  , ("M-S-h"    , windows W.shiftMaster)
+  , ("M-S-l"    , GN.nextMatchWithThis GN.History wkspName >> windows W.swapMaster)
+  , ("M-S-j"    , windows W.swapDown)
+  , ("M-S-k"    , windows W.swapUp)
   ---- edit
-  , ("M-,"        , sendMessage Shrink)
-  , ("M-."        , sendMessage Expand)
-  , ("M-S-,"      , sendMessage MirrorShrink)
-  , ("M-S-."      , sendMessage MirrorExpand)
-  , ("M-<Left>"   , withFocused $ keysMoveWindow (-10,0))
-  , ("M-<Right>"  , withFocused $ keysMoveWindow ( 10,0))
-  , ("M-<Up>"     , withFocused $ keysMoveWindow (0,-10))
-  , ("M-<Down>"   , withFocused $ keysMoveWindow (0, 10))
-  , ("M-C-<Left>" , withFocused $ keysMoveWindowTo ( 10, 10) (0,0))
-  , ("M-C-<Right>", withFocused $ keysMoveWindowTo (800,410) (0,0))
-  , ("M-C-<Up>"   , withFocused $ keysMoveWindowTo (800, 10) (0,0))
-  , ("M-C-<Down>" , withFocused $ keysMoveWindowTo ( 10,410) (0,0))
-  -- BUG: cant grow width/height -- problems with sizeHints?
-  , ("M-S-<Left>" , withFocused $ keysResizeWindow (-10,0) (1%2,1%2))
-  , ("M-S-<Rigth>", withFocused $ keysResizeWindow (10,0) (1%2,1%2))
-  , ("M-S-<Up>"   , withFocused $ keysResizeWindow (0,-10) (1%2,1%2))
-  , ("M-S-<Down>" , withFocused $ keysResizeWindow (0,10) (1%2,1%2))
-  -- , ("M-<Up>"     , withFocused $ keysAbsResizeWindow (-10,-10) (1024,752))
-  -- , ("M-<Down>"   , withFocused $ keysAbsResizeWindow (10,10) (1024,752))
-  -- , ("M-<>" , withFocused (keysMoveWindowTo (512,384) (1%2,1%2)))
-  , ("M-'"        , sendMessage . IncMasterN $  1)
-  , ("M-S-'"      , sendMessage . IncMasterN $ -1)
+  , ("M-,"      , sendMessage Shrink)
+  , ("M-."      , sendMessage Expand)
+  , ("M-S-,"    , sendMessage MirrorShrink)
+  , ("M-S-."    , sendMessage MirrorExpand)
+  , ("M-<L>"    , withFocused $ keysMoveWindow (-10,0))
+  , ("M-<R>"    , withFocused $ keysMoveWindow ( 10,0))
+  , ("M-<U>"    , withFocused $ keysMoveWindow (0,-10))
+  , ("M-<D>"    , withFocused $ keysMoveWindow (0, 10))
+  , ("M-C-<L>"  , withFocused $ keysMoveWindowTo ( 10, 10) (0,0))
+  , ("M-C-<R>"  , withFocused $ keysMoveWindowTo (800,410) (0,0))
+  , ("M-C-<U>"  , withFocused $ keysMoveWindowTo (800, 10) (0,0))
+  , ("M-C-<D>"  , withFocused $ keysMoveWindowTo ( 10,410) (0,0))
+  , ("M-S-<L>"  , withFocused $ keysResizeWindow (-10,0) (1%2,1%2))
+  , ("M-S-<R>"  , withFocused $ keysResizeWindow (10,0) (1%2,1%2))
+  , ("M-S-<U>"  , withFocused $ keysResizeWindow (0,-10) (1%2,1%2))
+  , ("M-S-<D>"  , withFocused $ keysResizeWindow (0,10) (1%2,1%2))
+  -- , ("M-<U>"      , withFocused $ keysAbsResizeWindow (-10,-10) (1024,752))
+  -- , ("M-<D>"      , withFocused $ keysAbsResizeWindow (10,10) (1024,752))
+  -- , ("M-<?>"      , withFocused (keysMoveWindowTo (512,384) (1%2,1%2)))
+  , ("M-'"      , sendMessage . IncMasterN $  1)
+  , ("M-S-'"    , sendMessage . IncMasterN $ -1)
   ---- float
   -- THINK: jumps between last two float windows -- do combo M-w, M-l better then i3 model
-  , ("M-w"        , GN.nextMatch GN.History isFloat)
-  , ("M-C-w"      , withFocused $ windows . W.sink)
-  , ("M-S-w"      , withFocused float)
+  , ("M-w"      , GN.nextMatch GN.History isFloat)
+  , ("M-C-w"    , withFocused $ windows . W.sink)
+  , ("M-S-w"    , withFocused float)
   -- Layouts
-  , ("M-n"        , sendMessage NextLayout)
-  , ("M-S-n"      , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
-  , ("M-f"        , sendMessage (Toggle FULL) >> sendMessage ToggleStruts)
-  , ("M-/"        , sendMessage $ Toggle MIRROR)
-  , ("M-S-/"      , sendMessage $ Toggle REFLECTX)
+  , ("M-n"      , sendMessage NextLayout)
+  , ("M-S-n"    , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
+  , ("M-f"      , sendMessage (Toggle FULL) >> sendMessage ToggleStruts)
+  , ("M-/"      , sendMessage $ Toggle MIRROR)
+  , ("M-S-/"    , sendMessage $ Toggle REFLECTX)
   ] ++
   -- Cycle through workspaces
   let focusNextE  = moveTo  Next EmptyWS
@@ -168,20 +166,16 @@ myKeys cfg = mkKeymap cfg $
     [ ("o", whenWindowsClosed $ io exitSuccess)
     , ("r", whenWindowsClosed $ spawn "sudo reboot")
     , ("t", whenWindowsClosed $ spawn "sudo poweroff")
-    , ("j", whenWindowsClosed $ spawn "r.tf")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
-    , ("c", spawn "r.n xmonad recompile" >>
-            spawn "xmonad --recompile && xmonad --restart && r.n OK")
+    , ("j", spawn "r.n xmonad recompile && xmonad --recompile && xmonad --restart && r.n OK")
     ] ++
   ---- Shortcuts
   -- main tools
-  -- ALT:FIXME spawn "r.t" >> windows W.swapMaster
-  -- BUG? M-C-<Space> don't work -- seems like it's hardware problem
   concat [
     [ ("M-"     ++ k , spawnHere t)
     , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
-    , ("M-C-"   ++ k , spawnAndDo doFloat t)
+    , ("M-C-"   ++ k , spawnAndDo doFloat t)  -- WARNING: if broken >> HW problem
     , ("M-S-C-" ++ k , spawnAndDo doCenterFloat t)
     ]
     | (k, t) <-
@@ -306,30 +300,14 @@ myKeys cfg = mkKeymap cfg $
     -- TRY? we could use simply W.tag on w? See src of toggleWS'
     wkspName = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ fromMaybe "" $ W.findTag w ws) :: Query String
     isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ M.member w $ W.floating ws) :: Query Bool
-    whenWindowsClosed fX = fX
-    -- whenWindowsClosed fX = ask >>= (\ws -> if null (W.allWindows ws) then fX else spawn "r.n no")
-    -- whenWindowsClosed fX = do
-    --   ws <- gets
-    --   act <- fX
-    --   orr <- spawn "r.n no"
-    --   return $ if null (W.allWindows ws) then act else orr
-
-      -- curr <- gets (W.tag . W.workspace . W.current . windowset)
-      -- next <- findWorkspace getSortByIndex Next NonEmptyWS 1
-      -- if W.tag next /= curr && (isJust . W.stack $ curr)
-      -- then windows (W.view $ W.tag next) >> spawn "r.n Non-empty"
-      -- else fX
-
-      -- curr <- gets (W.currentTag . windowset)
-      -- if any (\w -> True) wks -- (isJust . W.stack)
-      -- then fX else moveTo Next NonEmptyWS >> liftX $ spawn "r.n Non-empty"
-      -- fX
-      -- return ()
+    whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
+        then fX else moveTo Next NonEmptyWS >> spawn "r.n Non-empty" :: X()
 
 myStartupHook = do
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
   setWMName "LG3D"  -- Fixes problems with Java GUI programs
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
+  checkKeymap myCfg myKeys
   curr <- gets (W.currentTag . windowset)
   when (curr == head MyWksp.all) $
     windows . W.view $ MyWksp.primary !! 1
@@ -340,7 +318,7 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
   -- Options
   , terminal    = "r.t"
   , workspaces  = MyWksp.all
-  , keys        = myKeys
+  , keys        = (`mkKeymap` myKeys)
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
   -- , startupHook = windows . W.view . (!!1) . workspaces $ myCfg

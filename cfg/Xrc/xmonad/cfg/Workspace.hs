@@ -30,7 +30,7 @@ skipped = ["NSP"]
 
 keys = [ (m ++ k, windows $ f i) | (i, k) <- aliases, (m, f) <- actions]
 
-leader = ("g " ++)  -- ALT: s, <Backspace>, <Tab>
+leader = ("s " ++)  -- ([s]econdary) ALT: g, <Backspace>, <Tab>
 aliases = concat
   [ map (\i -> (i, i)) primary
   , zipWith (\i k -> (i, leader k)) secondary primary
