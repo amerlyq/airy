@@ -202,7 +202,7 @@ myKeys = MyWksp.keys ++
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
-    | nm <- ["ncmpcpp", "mutt", "ipython", "htop", "pidgin", "skype", "lyrics"]
+    | nm <- ["ncmpcpp", "mutt", "ipython", "j8", "htop", "pidgin", "skype", "lyrics"]
     ],
     -- Open new window always
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)
