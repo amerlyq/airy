@@ -238,8 +238,8 @@ myKeys = MyWksp.keys ++
     , ("<XF86AudioMute>"       , "")
     ],
     feedCmd "mpc"
-    [ ("M-o S-,"         , "next")
-    , ("M-o S-."         , "prev")
+    [ ("M-o ."           , "next")
+    , ("M-o ,"           , "prev")
     , ("M-S-<Home>"      , "toggle")
     , ("M-S-<Page_Up>"   , "prev")
     , ("M-S-<Page_Down>" , "next")
