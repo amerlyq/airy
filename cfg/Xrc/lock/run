@@ -7,9 +7,11 @@ if [[ ! -f $pic ]]; then
   pic=${TMPDIR:?}/screenlock.png
   scrot "$pic"  # Lock with cool bkgd
   trap "rm '$pic'" EXIT
+  mogrify -scale 10% -scale 1000% "$pic"
 
+  # TODO: apply text to user-choosen bkgr, not only to screenshot
   txt=${TMPDIR:?}/screenlock.txt
-  [[ ! -f $txt ]] || mogrify -scale 10% -scale 1000% \
+  [[ ! -f $txt ]] || mogrify \
     -pointsize 72 -font DejaVu-Sans-Condensed -fill Yellow \
     -annotate +200+200 "$(<"$txt")" "$pic"
 fi

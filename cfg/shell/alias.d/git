@@ -38,6 +38,13 @@ git for-each-ref --format="%(refname:short) %(push:track)" refs/heads |
     fi; done
     git checkout "$current"
 }
+# gcof(){
+#   # BUG: don't work (empty current), when you are detached (like gco HEAD~5)
+#   local current="$(git-branch-current 2> /dev/null)"
+#   local revs=($(git rev-list --ancestry-path HEAD..$current))
+#   local next=${revs[${1:--1}]}
+#   [[ -z $next ]] || git checkout $next
+# }
 
 # BUG: recursion?
 # gri(){ [[ "$1" =~ [0-9]+ ]] && git rebase -i HEAD~$* || git rebase -i $@; }
