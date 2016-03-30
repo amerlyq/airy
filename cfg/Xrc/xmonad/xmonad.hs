@@ -164,8 +164,8 @@ myKeys = MyWksp.keys ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
   inGroup "M-S-<Esc>"  -- xmonad
     [ ("o", whenWindowsClosed $ io exitSuccess)
-    , ("r", whenWindowsClosed $ spawn "sudo systemctl reboot")
-    , ("t", whenWindowsClosed $ spawn "sudo systemctl poweroff")
+    , ("r", whenWindowsClosed $ spawn "systemctl reboot")
+    , ("t", whenWindowsClosed $ spawn "systemctl poweroff")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.n xmonad recompile && xmonad --recompile && xmonad --restart && r.n OK")
