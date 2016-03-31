@@ -12,6 +12,16 @@ inoremap ,s <Esc>:update<CR>
 " inoremap j<Space>     j
 " onoremap j<Space>     j
 
+" Be consistent with C and D which reach the end of line
+nnoremap Y y$
+vnoremap Y $y
+" Prevent Paste loosing the register source. Deleted available by "- reg.
+"   http://stackoverflow.com/a/7797434/1147859
+vnoremap p pgvy
+vnoremap P Pgvy
+noremap  zp "0p
+noremap  zP "0P
+
 " Instead of whole line indention
 inoremap <C-t>  <C-v><TAB>
 " inoremap <C-d>  <Del>  DONE by vim-rsi

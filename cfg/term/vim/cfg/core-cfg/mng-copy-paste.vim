@@ -65,16 +65,6 @@ function! CopyStringInReg(r, str)
 endfunction
 
 
-" Be consistent with C and D which reach the end of line
-nnoremap Y y$
-vnoremap Y $y
-" Prevent Paste loosing the register source. Deleted available by "- reg.
-"   http://stackoverflow.com/a/7797434/1147859
-vnoremap p pgvy
-vnoremap P Pgvy
-noremap  zp "0p
-noremap  zP "0P
-
 " Operator mappings
 nnoremap <leader>y "+y
 nnoremap <leader>p "+p

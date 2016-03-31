@@ -46,6 +46,16 @@ git for-each-ref --format="%(refname:short) %(push:track)" refs/heads |
 #   [[ -z $next ]] || git checkout $next
 # }
 
+### Grep log message and execute command on it OR show log matches instead.
+# ATTENTION: can be bugged (not show all) in detached stated by using 'HEAD..'
+_gref(){ local cmd=$1 patt=${*:2}
+  local rev=($(git --no-pager log --pretty=format:'%h%n' -i --grep="$patt"))
+  case ${#rev} in 0) return 1 ;; 1) eval "$cmd" ;;
+  *) git lthis -i --grep="$patt" && echo ;; esac
+}
+alias gre="noglob _gref 'printf %s \$rev|tee >(xsel -ib) && echo'"
+alias gcog="noglob _gref 'git checkout \$rev'"
+
 # BUG: recursion?
 # gri(){ [[ "$1" =~ [0-9]+ ]] && git rebase -i HEAD~$* || git rebase -i $@; }
 # compdef grI=git-rebase
@@ -94,7 +104,7 @@ alias ggS='git log -S'
 alias ggG='git log -G'
 ggg(){ local rev  # WARNING:BROKEN:(shows same commit however many revisions)
   (export GIT_PAGER=cat
-    git log --pretty=format:'%H' -G "$1" | while read rev; do
+    git log --pretty=format:'%H%n' -G "$1" | while read rev; do
     echo $rev
     echo && git lgraph -n1 "$rev" && echo
     git grep --color -n --break --heading "$1" "$rev"

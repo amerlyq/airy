@@ -15,13 +15,14 @@
     lmsg     = log --oneline --decorate
     lname    = log --date=short --pretty=format:'%h | %ad | %><(18)%an | %d%<(50,trunc)%s'
     ldate    = log --pretty=format:'%C(yellow)%h%C(reset) | %C(white)%>(32,trunc)%aD%C(reset) | %C(bold green)%>(12,trunc)%ar%C(reset) | %s%C(bold red)%d%C(reset)'
-    lstd     = log --abbrev-commit --date=short --all --format=format:'%C(bold green)%ad%C(reset) %C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset) %C(yellow)%h%C(reset)'
+    lstd     = log --abbrev-commit --date=short --format=format:'%C(bold green)%ad%C(reset) %C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset) %C(yellow)%h%C(reset)'
     linverse = log --abbrev-commit --date=short --all --format=format:'%C(bold reverse green)%ad%C(reset)%C(reverse white) %s %C(reset)%C(bold reverse red)%d%C(reset)%C(bold reverse blue) [%aN]%C(reset):%C(reverse yellow)%h%C(reset)'
 
-    lgraph  = !git lstd --graph
+    lgraph  = !git lstd --all --graph
+    lthis   = !git --no-pager lstd --graph
     ldump   = !git --no-pager lgraph
-    lfiles  = !git lstd --decorate --numstat
-    lmine   = !git lstd --author=\"$(git config user.name) \"
+    lfiles  = !git lstd --all --decorate --diff-filter="ACDMRT" --name-status  # OR --numstat
+    lmine   = !git lstd --all --author=\"$(git config user.name) \"
     lcommit = !git linverse -u # Show modified files in last commit
 
     logx = log --all --graph --decorate=short --color --format=format:'%C(bold blue)%h%C(reset)+%C(dim black)(%cr)%C(reset)+%C(auto)%d%C(reset)++\n+++       %C(bold black)%an%C(reset)%C(black): %s%C(reset)'
