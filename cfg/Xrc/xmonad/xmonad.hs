@@ -50,6 +50,11 @@ import XMonad.Layout.Grid           (Grid(..))
 import XMonad.Layout.Circle         (Circle(..))
 import XMonad.Layout.SimplestFloat  (simplestFloat)
 import XMonad.Layout.IM             (withIM, Property(ClassName, Title, And))
+-- DEV:
+import qualified XMonad.Layout.Monitor as MON
+import XMonad.Layout.LayoutModifier (ModifiedLayout(..))  -- For Layout.Monitor
+import XMonad.Layout.LayoutScreens  (layoutScreens)
+import XMonad.Layout.TwoPane        (TwoPane(..))
 -- modifiers
 import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
@@ -116,6 +121,9 @@ myKeys = MyWksp.keys ++
   , ("M-n"      , sendMessage NextLayout)
   , ("M-S-n"    , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
   , ("M-f"      , sendMessage (Toggle FULL) >> sendMessage ToggleStruts)
+  , ("M-b"      , broadcastMessage MON.ToggleMonitor >> refresh)
+  , ("M-S-p"    , layoutScreens 2 (TwoPane 0.15 0.85))
+  , ("M-p"      , rescreen)  -- TODO: toggle show/hide second screen
   , ("M-/"      , sendMessage $ Toggle MIRROR)
   , ("M-S-/"    , sendMessage $ Toggle REFLECTX)
   ] ++
@@ -342,7 +350,36 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
   }
 
 
+-- NOTE: you need to launch $ mpv --x11-name overlay -- /path/to/file to activate it
+-- ALSO:CHECK: this window must be the unique one
+-- BUG: can't focus/close it at all. Control only by mouse. BAD.
+-- BETTER: sticking sliding workspace for column of windows on right
+-- > NEED: toggleable sublayout, inherited for all windows
+-- > BETTER: LayoutScreens
+--    ? but how to toggle show/hide for second one?
+--    ? maybe ability to have more then one column (like left+right ones) is even better?
+--    * need ability to mirror screens to horizontal layout
+--    * FIND: better navigation between screens (current one is too frustraiting)
+--    * USE: one/several separate, named workspaces for that panel/screen
+--    * TODO: show wksp for each screen in status as:  >1 2 > MON MPV  OR  >1 2 | MON MPV
+--    ~ THINK: create spacing between those screens?
+--    ~ IDEA: apply second screen as overlay with floating layout for main one
+--      > to manage monitors separately from other windows
+--      : then Layout.Monitor will be unnecessary
+-- ~ MAYBE:ALT:(sublayout) DynamicWorkspaceGroups
+--     http://mail.haskell.org/pipermail/xmonad/2015-July/014840.html
+myOverlay = MON.monitor
+  { MON.prop = MON.ClassName "mpv" `MON.And` MON.Resource "overlay"
+  , MON.rect = Rectangle (1920-320) 0 320 180  -- Lower right corner
+  , MON.persistent = True  -- avoid flickering
+  , MON.opacity = 1.0
+  , MON.visible = True  -- show on start
+  , MON.name = "mpv"  -- assign name to toggle independently
+  }
+
+
 myLayout = smartBorders
+    . ModifiedLayout myOverlay
     -- . smartSpacing 3  -- I'm not sure yet if it nice or not
     -- . onWorkspace (workspaces myCfg !! 4) Full
     . onWorkspace (head MyWksp.primary) imLayer
@@ -395,6 +432,7 @@ myManageHook = manageSpawn <+>
   , ("8", "t-engine64")
   , ("9", "Steam")
   ]
+  <+> MON.manageMonitor myOverlay
   <+> namedScratchpadManageHook myScratchpads
   <+> manageDocks
   where

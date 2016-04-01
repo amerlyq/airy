@@ -1,16 +1,7 @@
 "" INSERT "{{{
-" TODO TRY -- then I could replace ReleaseEsc on Caps by LatchCtrl
-" WARNING This will prevent you from writing such pairs at all (even paste)!
-" So, to paste text with them from term you need use 'set paste'
-" inoremap jj <Esc>
-inoremap jf <Esc>
-inoremap fj <Esc>
+
+" To put actual ',s' in insert use:  ,<C-d>s
 inoremap ,s <Esc>:update<CR>
-" cnoremap <expr> j
-"       \ getcmdline()[getcmdpos()-2] ==# 'j' ? "\<BS>\<C-c>" : 'j'
-" onoremap jj           <ESC>
-" inoremap j<Space>     j
-" onoremap j<Space>     j
 
 " Be consistent with C and D which reach the end of line
 nnoremap Y y$

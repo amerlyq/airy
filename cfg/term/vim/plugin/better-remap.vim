@@ -25,6 +25,7 @@ command! -bar -nargs=0 -range=% RecoverEnd  call s:DiffRecoverEnd()
 " TODO: auto-choose '[E]dit' and then do 'DiffRecover'
 "   -- if swap exists -- on 'Edit anyway' load RecoverDiff automatically
 "   -- hook on 'recovery window/tab quit' to do RecoverEnd automatically
+"   -- always open new tab with split -- so I could use it from existing session
 " SEE: how it was done in Linediff
 
 "{{{ IMPL =====

@@ -12,7 +12,8 @@ com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 command! -bar -nargs=? CompilerInDir call CompileInDir(<args>)
 " \| cw
 noremap <unique><silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
-noremap <unique><silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
+" DISABLED: with LatchCtrl C-j has detrimental effects in message.log.*
+" noremap <unique><silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
 fun! Abyss()
   let l:pmake = &makeprg
   let &makeprg = 'abyss'
