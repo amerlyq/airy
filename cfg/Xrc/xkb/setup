@@ -4,8 +4,7 @@ source ~/.shell/func.d/cfgsetup
 ### GENS ###
 if cfgOpt s; then
     case "$CFG_S"
-    in elona) over="elona"
-    ;; hum) over="hummer"
+    in elona|hummer|freesia) over="$CFG_S"
     ;; esac
     echo "Layout: $CFG_S"
 fi
