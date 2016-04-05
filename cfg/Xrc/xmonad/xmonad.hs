@@ -368,6 +368,7 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
 --      : then Layout.Monitor will be unnecessary
 -- ~ MAYBE:ALT:(sublayout) DynamicWorkspaceGroups
 --     http://mail.haskell.org/pipermail/xmonad/2015-July/014840.html
+-- ALT:BETTER? http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-IndependentScreens.html
 myOverlay = MON.monitor
   { MON.prop = MON.ClassName "mpv" `MON.And` MON.Resource "overlay"
   , MON.rect = Rectangle (1920-320) 0 320 180  -- Lower right corner
