@@ -18,7 +18,6 @@ import System.Exit
 import XMonad                       -- (float, kill, spawn, refresh, restart, doFloat, workspaces, windows, withFocused, sendMessage, Resize(Shrink, Expand), IncMasterN)
 import XMonad.Util.Run              (spawnPipe)
 import XMonad.Util.EZConfig         (mkKeymap, checkKeymap)
-import XMonad.Util.WorkspaceCompare (getSortByIndex)
 import XMonad.ManageHook            (liftX, className)
 
 ---- Interaction
@@ -26,7 +25,6 @@ import XMonad.Prompt.Shell          (shellPrompt)
 import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
 
 ---- Actions
-import XMonad.Actions.CycleWS       (doTo, moveTo, shiftTo, toggleWS', toggleOrDoSkip, findWorkspace, Direction1D(Prev, Next), WSType(NonEmptyWS, EmptyWS))
 import XMonad.Actions.TagWindows    (setTags, focusUpTaggedGlobal, withTaggedGlobalP, shiftHere)
 import XMonad.Actions.CopyWindow    (copy, copyWindow, runOrCopy, killAllOtherCopies, kill1, wsContainingCopies)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
@@ -55,6 +53,7 @@ import qualified XMonad.Layout.Monitor as MON
 import XMonad.Layout.LayoutModifier (ModifiedLayout(..))  -- For Layout.Monitor
 import XMonad.Layout.LayoutScreens  (layoutScreens)
 import XMonad.Layout.TwoPane        (TwoPane(..))
+-- import XMonad.Layout.IndependentScreens (withScreens)
 -- modifiers
 import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
@@ -74,8 +73,9 @@ import XMonad.Config.Amer.LogHook    (myLogHook)
 import XMonad.Config.Amer.Prompt     (myPromptTheme)
 import XMonad.Config.Amer.Scratchpad (myScratchpads)
 import qualified XMonad.Config.Amer.Workspace as MyWksp
+import qualified XMonad.Config.Amer.Navigation as MyNavi
 
-myKeys = MyWksp.keys ++
+myKeys = MyWksp.keys ++ MyNavi.keys ++
   ---- focus
   [ ("M-h"      , windows W.focusMaster)
   , ("M-j"      , windows W.focusDown)
@@ -122,42 +122,17 @@ myKeys = MyWksp.keys ++
   , ("M-S-n"    , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
   , ("M-f"      , sendMessage (Toggle FULL) >> sendMessage ToggleStruts)
   , ("M-b"      , broadcastMessage MON.ToggleMonitor >> refresh)
-  , ("M-S-p"    , layoutScreens 2 (TwoPane 0.15 0.85))
+  , ("M-S-p"    , layoutScreens 2 (TwoPane 0.15 0.85) >> windows (W.view "MON"))
   , ("M-p"      , rescreen)  -- TODO: toggle show/hide second screen
   , ("M-/"      , sendMessage $ Toggle MIRROR)
   , ("M-S-/"    , sendMessage $ Toggle REFLECTX)
   ] ++
-  -- Cycle through workspaces
-  let focusNextE  = moveTo  Next EmptyWS
-      shiftNextE  = shiftTo Next EmptyWS
-      bringNextE  = doTo    Next EmptyWS getSortByIndex (windows . \i -> W.view i . W.shift i)
-      -- bringNextE  = doTo    Next EmptyWS getSortByIndex (\w -> windows (W.shift w) >> windows (W.view w))
-      focusNextNE = moveTo  Next NonEmptyWS
-      focusPrevNE = moveTo  Prev NonEmptyWS
-      backNforth f = gets (W.currentTag . windowset) >>= toggleOrDoSkip ["NSP"] f
-      -- shiftNextNE = shiftTo Next NonEmptyWS
-      -- shiftPrevNE = shiftTo Prev NonEmptyWS
-  in [ ("M-a"     , backNforth W.view)
-     , ("M-C-a"   , backNforth W.shift)
-     , ("M-S-a"   , backNforth $ \i -> W.view i . W.shift i)
-     , ("M-C-S-a" , backNforth $ \i -> W.view i . copy i)
-     -- TRY:THINK:DEV: swap workspaces backNforth -- so I could completely move primary wksp into secondary
-     -- BUG: them counts unused wksp from current one, NEED any from the start!
-     -- ALT: choose empty only from secondary wksp? -- Like on M-g <Space>
-     , ("M-<Backspace>"   , focusNextE)
-     , ("M-C-<Backspace>" , shiftNextE)
-     , ("M-S-<Backspace>" , bringNextE)
-     , ("M-<Tab>"    , focusNextNE)
-     , ("M-S-<Tab>"  , focusPrevNE)
-     -- , ("M-C-<Tab>"  , shiftNextNE >> focusNextNE)
-     -- , ("M-C-S-<Tab>", shiftPrevNE >> focusPrevNE)
-     ]
-  ++
   ---- Mark & Goto
   -- NEED:DEV: back_and_forth -- to return window on their previous screen
   -- -- if on currentFocused -- shiftHere was pressed again
   -- NOTE: F13..F24 -- remapped by xkb for xmonad exclusively
   -- -- original F1..12 are accessed in overlay
+  -- THINK: is overlay convenient? I have vim/ranger/mutt which need F1..F12
   [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [13..24], (m, f) <-
     [ ("M-", \n -> withFocused $ setTags ["F" ++ show n])
     , (""  , \n -> focusUpTaggedGlobal ("F" ++ show n))
@@ -202,7 +177,7 @@ myKeys = MyWksp.keys ++
   -- TODO:ADD: M-s <Space> (export sPrf -- secondary prefix) -- jump to nearest next/prev(S-<Space>) empty wksp instead of <Bksp>
   (concat . (`map` [
       inGroup "M-o",
-      inGroup "M-S-o" . map (second (\f -> moveTo Next EmptyWS >> f))
+      inGroup "M-S-o" . map (second (\f -> MyNavi.nextEmpty W.view >> f))
   ]) . flip ($) . concat) [
     [ ("M-o", windows $ W.view "NSP")
     , ("M-S-o", windows $ W.shift "NSP")
@@ -287,6 +262,7 @@ myKeys = MyWksp.keys ++
       inGroup "M-C-x"
       [ ("a", "edit")  -- add new entry
       , ("t", "eval 'copy(clipboard());paste()'") -- as plain text
+      -- NOTE: paste() simply sends Shift-Insert -- therefore may be buggy in 'st'
       , ("M-x", "toggle")
       , ("x",   "toggle")
       , ("m", "menu")
@@ -316,7 +292,7 @@ myKeys = MyWksp.keys ++
     wkspName = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ fromMaybe "" $ W.findTag w ws) :: Query String
     isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ M.member w $ W.floating ws) :: Query Bool
     whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
-        then fX else moveTo Next NonEmptyWS >> spawn "r.n Non-empty" :: X()
+        then fX else MyNavi.nextNonEmpty W.view >> spawn "r.n Non-empty" :: X()
 
 myStartupHook = do
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
@@ -333,6 +309,7 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
   -- Options
   , terminal    = "r.t"
   , workspaces  = MyWksp.all
+  -- , workspaces  = withScreens 2 MyWksp.all
   , keys        = (`mkKeymap` myKeys)
   -- Hooks
   -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
@@ -368,7 +345,13 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
 --      : then Layout.Monitor will be unnecessary
 -- ~ MAYBE:ALT:(sublayout) DynamicWorkspaceGroups
 --     http://mail.haskell.org/pipermail/xmonad/2015-July/014840.html
+--     ADD workgroups -- to split my work_log/home_scripts screens
+--     IDEA:(for this only) xmobar shows all wksp in current group and blue names for other groups
+--       -- when focusing one of that groups -- its wksps replaces list in xmobar -- like fold/open tree structure
 -- ALT:BETTER? http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-IndependentScreens.html
+-- THINK: use named screens to skip screen panel when switching between actual monitors
+--    http://hackage.haskell.org/package/xmonad-contrib-0.11.2/docs/XMonad-Actions-PhysicalScreens.html
+
 myOverlay = MON.monitor
   { MON.prop = MON.ClassName "mpv" `MON.And` MON.Resource "overlay"
   , MON.rect = Rectangle (1920-320) 0 320 180  -- Lower right corner

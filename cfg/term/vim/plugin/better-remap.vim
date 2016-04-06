@@ -29,6 +29,7 @@ command! -bar -nargs=0 -range=% RecoverEnd  call s:DiffRecoverEnd()
 " SEE: how it was done in Linediff
 
 "{{{ IMPL =====
+
 fun! s:RecoverRemove() abort
   redir => _|sw|redir END
   let _ = substitute(_,'[\r\n]','','g')
@@ -43,22 +44,38 @@ fun! s:RecoverRemove() abort
 endf
 
 fun! s:DiffRecover() abort
+  call s:RecoverUnhook()
   tabnew | set bt=nofile
   file =Origin=
   read ++edit # | 0d_ | diffthis
   vsplit # | silent recover | diffthis
+  let t = tabpagenr()
+  exe "au recover_swap TabLeave ".t." call s:DiffRecoverEnd(".t.")"
+  exe "au recover_swap QuitPre {=Origin=,".expand('%:p')."} call s:DiffRecoverEnd(".t.")"
+  exe "au recover_swap BufDelete {=Origin=,".expand('%:p')."} call s:DiffRecoverEnd(".t.")"
 endf
 
-fun! s:DiffRecoverEnd() abort
-  bdelete =Origin=
+fun! s:DiffRecoverEnd(t) abort
+  call s:RecoverUnhook()
+  bdelete =Origin= " TODO: Check if exists
   windo diffoff
-  tabclose
+  exe 'tabclose' a:t
   call s:RecoverRemove()
+  " DEV: remove read-only attribute if choice was to delete swap
 endf
 
-" augroup recover_swap
-"   au!
-"   au SwapExists * call s:DiffRecover()
-"   " au BufWinEnter,InsertEnter,InsertLeave,FocusGained *
-"   " \ call recover#CheckSwapFileExists()
-" augroup END
+
+"{{{ HOOKS =====
+fun! s:RecoverHook() abort
+  au recover_swap BufEnter * call s:DiffRecover()
+endf
+
+fun! s:RecoverUnhook() abort
+  augroup recover_swap
+    au!
+    " TODO: use 'q' if responded 'pid' exists, else:
+    au SwapExists * exe "let v:swapchoice='o' | call s:RecoverHook()"
+  augroup END
+endf
+
+call s:RecoverUnhook()

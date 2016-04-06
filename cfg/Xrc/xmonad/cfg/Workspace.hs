@@ -1,6 +1,6 @@
 -- vim: ts=2:sw=2:sts=2
 module XMonad.Config.Amer.Workspace (
-   all, keys,
+   all, keys, actions,
    primary, secondary, immediate,
    named, skipped
 ) where
@@ -10,6 +10,7 @@ import Data.List                    (zipWith)
 import XMonad                       (windows)
 import XMonad.StackSet              (view, shift)
 import XMonad.Actions.CopyWindow    (copy)
+-- import XMonad.Layout.IndependentScreens (onCurrentScreen, workspaces')
 
 
 all = concat
@@ -24,11 +25,12 @@ secondary = words "~ ! @ # $ % ^ & * ( ) _ +"
 immediate = map (:[]) ['a' .. 'z']
 
 -- TODO: show those workspaces names in different color/style (like blue + italic?)
-named = ["FF", "MM"]
-skipped = ["NSP"]
+named = ["FF", "MM", "MON"]
+skipped = ["NSP", "MON"]
 
 
 keys = [ (m ++ k, windows $ f i) | (i, k) <- aliases, (m, f) <- actions]
+-- keys = [ (m ++ k, windows $ onCurrentScreen f i) | (i, k) <- aliases, (m, f) <- actions]
 
 leader = ("s " ++)  -- ([s]econdary) ALT: g, <Backspace>, <Tab>
 aliases = concat
@@ -40,6 +42,6 @@ aliases = concat
 actions =
   [ ("M-"     , view)
   , ("M-C-"   , shift)
-  , ("M-S-"   , \i -> view i . shift i)
+  , ("M-S-"   , \i -> view i . shift i)  -- ALT (\w -> windows (W.shift w) >> windows (W.view w))
   , ("M-C-S-" , copy)
   ]

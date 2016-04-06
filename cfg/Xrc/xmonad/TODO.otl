@@ -21,7 +21,7 @@ SEE
 	Xmonad
 		Ref
 			https://wiki.haskell.org/Xmonad
-			: http://xmonad.org/xmonad-docs/xmonad/XMonad-Operations.html
+			http://xmonad.org/xmonad-docs/xmonad/XMonad-Operations.html
 			:	CHECK: hide/reveal
 			: http://xmonad.org/xmonad-docs/xmonad/XMonad-StackSet.html
 			SEE
@@ -52,6 +52,10 @@ SEE
 		https://wiki.archlinux.org/index.php/Xmobar
 		http://projects.haskell.org/xmobar/
 		>>> https://github.com/tsiliakis/xmobar
+
+	CHECK
+		+ http://stackoverflow.com/questions/6232804/xmonad-set-screen-and-workspace
+		~ http://unix.stackexchange.com/questions/217213/getting-xmonad-to-show-name-of-current-workspace-in-xmobar
 
 THINK:ENH
 	Alt navi
@@ -234,6 +238,7 @@ FIXME
 		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
 	[_] need disable mod+Mouse1 from making windows floating (OR? maybe M-S-m1)
 		:= Better solution: allow making floating only after (x*x+y*y > threshold)
+		: http://xmonad.org/xmonad-docs/xmonad/src/XMonad-Config.html
 	[_] when works doFloat hook -- make (x, y) -> (10, 10) instead (0, 0)
 		:= it's too close to screen borders, which feels bad
 	[_] Replace EZConfig by manual submaps
@@ -247,6 +252,7 @@ BUG
 	[_] After floating window open/close, focus drops to Master window instead last slave
 	[_] 'f' in mpv don't make fullscreen -- SEE FullscreenMessage
 		https://github.com/mpv-player/mpv/issues/888
+		:BUT it works if mpv is floating!
 	[_] Why I need 'nm!!0:[]' instead of head nm?
 	[_] xkb latching залипает for Mod4+a -- cycleWindows -- then you need only 'a'
 		:= scenario norm: press and hold Alt, then click 'a', release Alt
