@@ -254,6 +254,7 @@ myKeys = MyWksp.keys ++ MyNavi.keys ++
     ],
     inGroup "M-y"
     [ ("b", "r.b -p")
+    , ("w", "r.notify-winclass")
     ],
     (feedCmd "copyq" . concat) [
       [ ("M-x", "toggle")

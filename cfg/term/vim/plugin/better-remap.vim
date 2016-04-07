@@ -22,11 +22,14 @@ command! -bar -nargs=0 -range=% RecoverEnd  call s:DiffRecoverEnd()
 
 " BUG: undo don't work after writing new recover
 " DEV: auto-cancel ':recover' if I haven't saved (don't want to apply changes)
-" TODO: auto-choose '[E]dit' and then do 'DiffRecover'
-"   -- if swap exists -- on 'Edit anyway' load RecoverDiff automatically
-"   -- hook on 'recovery window/tab quit' to do RecoverEnd automatically
-"   -- always open new tab with split -- so I could use it from existing session
 " SEE: how it was done in Linediff
+
+" TODO: use 'q' if responded 'pid' exists and file differs
+" ELSE: use 'e' if no pid -- and jump to diff
+" ELSE: if file the same -- use 'o' anyway and 'modifiable' off -- to warn user it was opened
+" ALSO: show notify 'it's already opened' (by !r.n and/or :echom)
+" ALSO: use 'cmp' before vimdiff to accelerate diffs on big > 1MB files
+" BUT: can we 'cmp' with 'swp'?!
 
 "{{{ IMPL =====
 
@@ -67,14 +70,15 @@ endf
 
 "{{{ HOOKS =====
 fun! s:RecoverHook() abort
+  if getfsize(expand('%:p')) > 1024*1024| return |en
   au recover_swap BufEnter * call s:DiffRecover()
+  let v:swapchoice='o'
 endf
 
 fun! s:RecoverUnhook() abort
   augroup recover_swap
     au!
-    " TODO: use 'q' if responded 'pid' exists, else:
-    au SwapExists * exe "let v:swapchoice='o' | call s:RecoverHook()"
+    au SwapExists * call s:RecoverHook()
   augroup END
 endf
 
