@@ -17,13 +17,23 @@ REG ADD "%MACHINEPOLICY%\System" /V EnableLUA /T REG_DWORD /D 0x0 /F
 ::REG ADD "%MACHINEPOLICY%\System" /V EnableLUA /T REG_DWORD /D 0x1 /F
 
 
-:: To enable hibernate
-::powercfg -h on
-
-
 :: Turn on/off Fast Boot
 ::REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /V HiberbootEnabled /T REG_dWORD /D 0x1 /F
 ::REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /V HiberbootEnabled /T REG_DWORD /D 0x0 /F
 
 :: Tweaks
 :: http://windows7themes.net/en-us/disable-disk-defragmentation-windows-7-ssd/
+
+:: UTC time (dual linux)
+:: [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation]
+::      "RealTimeIsUniversal"=dword:00000001
+
+:: Disable hibernation + fast boot (dual linux)
+:: [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
+:: "HibernateEnabled"=dword:00000000
+:: OR: To enable hibernate
+::powercfg -h on
+:: OR HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power
+:: HiberbootEnabled DWORD
+:: 0 = Turn off Fast Startup
+:: 1 = Turn on Fast Startup

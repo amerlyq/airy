@@ -1,7 +1,0 @@
-Windows Registry Editor Version 5.00
-
-; NEED: disable time synchronization in Windows - otherwise it will mess up the hardware clock.
-; Should Windows ask to update the clock due to DST changes, let it.
-; NOTE: for x64 may use QWORD
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation]
-     "RealTimeIsUniversal"=dword:00000001

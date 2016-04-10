@@ -13,4 +13,8 @@ if cfgOpt u; then
     dst='/usr/local/etc/vconsole.map'
     link -sc "${dst##*/}" "$dst"
     sudo tee /etc/vconsole.conf <<<"KEYMAP=$dst"
+    case ${CURR_PROF:?} in neo)
+      sudo tee -a /etc/vconsole.conf \
+        <<<"FONT=latarcyrheb-sun32\nFONT_MAP=8859-1"
+    esac
 fi

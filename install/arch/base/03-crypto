@@ -1,0 +1,83 @@
+#!/bin/bash -e
+exit
+
+## For UHD displays:
+setfont latarcyrheb-sun32 -m 8859-1
+# OR setfont  # To reset
+
+# SEE
+# https://gist.github.com/jasonwryan/4618490
+# https://gist.github.com/binaerbaum/535884a7f5b8a8697557
+
+# Add partition for encrypted lvm (dual-windows)
+# Firstly, create unallocated space under Windows.
+# SEE (gdisk example) http://www.rodsbooks.com/gdisk/walkthrough.html
+gdisk /dev/nvme0n1
+# n - new, number - 6, start/end -- default, type: 8e00 (lvm)
+# v - check, w - write+exit
+
+# Default AES cipher in XTS mode (effective key 256-bit)
+cryptsetup -s 512 luksFormat /dev/nvme0n1p6
+cryptsetup open --type luks /dev/nvme0n1p6 crypto-lvm
+# OR luksOpen?
+
+# Create LVM parts for SSD
+lvmdiskscan
+
+pvcreate --dataalignment 1m /dev/mapper/crypto-lvm
+pvdisplay
+pvs
+
+vgcreate lvm /dev/mapper/crypto-lvm
+vgdisplay
+vgs
+
+lvcreate lvm -Wy --yes -L 40G -n root
+lvcreate lvm -Wy --yes -L 40G -n home
+lvcreate lvm -Wy --yes -l +100%FREE -n media
+lvs
+
+# Format
+mkfs.btrfs -f /dev/mapper/lvm-root
+mkfs.btrfs -f /dev/mapper/lvm-home
+mkfs.ext4 /dev/mapper/lvm-media
+
+# Mount
+mount -o compress=lzo,autodefrag /dev/mapper/lvm-root /mnt
+mkdir /mnt/boot
+mount /dev/nvme0n1p1 /mnt/boot
+mkdir /mnt/home
+mount -o compress=lzo,autodefrag /dev/mapper/lvm-home /mnt/home
+mkdir /mnt/home/media
+mount /dev/mapper/lvm-home /mnt/home/media
+
+# Create loader.conf
+cat > /boot/loader/loader.conf <<EOT
+default arch
+timeout 3
+editor 0
+EOT
+
+# <UUID> is raw encrypted device /dev/nvme0n1p6 -- find by ':r!blkid' in vi
+cat > /boot/loader/entries/arch.conf <<EOT
+title Arch Linux Enc
+linux /vmlinuz-linux
+initrd /initramfs-linux.img
+options cryptdevice=UUID=<UUID>:lvm root=/dev/mapper/lvm-root rw
+EOT
+# WTF? intel_pstate=no_hwp
+
+# Sync
+cp /etc/nectl/{examples/,}wireless-wpa
+# THEN: edit /etc/netctl/wireless-wpa
+netctl start wireless-wpa
+timedatectl set-ntp true
+
+# Install
+pacstrap base base-devel lvm2 btrfs-progs ntp sudo polkit wpa_supplicant wget xorg-server xorg-server-utils xorg-xinit xf86-video-vesa mesa-libgl
+
+# ATTENTION:SEE:
+# https://wiki.archlinux.org/index.php/ASUS_Zenbook_Pro_UX501
+
+# END
+cryptsetup close crypto-lvm

@@ -14,6 +14,10 @@ HOOKS="base udev autodetect modconf block lvm2 filesystems keyboard fsck"
 #COMPRESSION_OPTIONS=""
 EOT
 
+# THINK: use systemd hook?
+# ALT: HOOKS="base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck"
+# WARNING: Create /etc/vconsole.conf beforehand if using 'consolefont'
+
 ## Re-create /boot/initrd.img-...
 mkinitcpio -p linux
 
