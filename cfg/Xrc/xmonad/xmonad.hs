@@ -76,6 +76,9 @@ import qualified XMonad.Config.Amer.Workspace as MyWksp
 import qualified XMonad.Config.Amer.Navigation as MyNavi
 
 myKeys = MyWksp.keys ++ MyNavi.keys ++
+  -- Additional keymap on empty workspace
+  -- [ ("<Return>" , whenRoot $ spawn "r.t") ] ++
+  -- rootKeys ++
   ---- focus
   [ ("M-h"      , windows W.focusMaster)
   , ("M-j"      , windows W.focusDown)
@@ -300,6 +303,9 @@ myKeys = MyWksp.keys ++ MyNavi.keys ++
     isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ M.member w $ W.floating ws) :: Query Bool
     whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
         then fX else MyNavi.nextNonEmpty W.view >> spawn "r.n Non-empty" :: X()
+    whenRoot fX = asks theRoot >>= \rw -> withFocused $ \cw -> when (cw == rw) fX :: X()
+    -- rootKeys = asks theRoot >>= \rw -> withFocused $ \cw -> [ ("<Return>" , spawn "r.t") | cw == rw]
+
 
 myStartupHook = do
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'

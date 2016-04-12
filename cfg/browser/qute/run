@@ -10,6 +10,6 @@ case "$1"
 in -p) shift; run "$(xsel -ob)"
 ;; -h) shift; run "$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)"
 # ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"
-# ;; -s) shift; exec qutebrowser -C 'set scripts=true' ${@+open} "$@"
+;; -s) shift; exec qutebrowser ':allow-javascript=true' "$@"
 ;;  *) exec qutebrowser "$@"
 ;; esac

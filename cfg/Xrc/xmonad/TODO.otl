@@ -1,6 +1,4 @@
 FIND
-	Is it possible to have two sets of desktops?
-		: One -- for work-related windows, one for my own
 
 SEE
 	Haskell
@@ -64,23 +62,28 @@ THINK:ENH
 	Menu pop
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-Commands.html
 	Action on empty WS
-		https://mail.haskell.org/pipermail/xmonad/2012-February/012357.html
+		Managehook which only shifts window if workspace is	empty
+			: https://mail.haskell.org/pipermail/xmonad/2012-February/012357.html
+		Reset layout to default on last window close
+			: https://mail.haskell.org/pipermail/xmonad/2012-February/012409.html
 	[_] Rotate all slave windows through master --> like tiled Circle
 		:= Useful when all slaves are too small to estimate which are unnecessary already
 	[_] M-a -- instead toggleWS use nextMatch/History?
 		Need to skip all windows in current WS
 		Cycle through all previous WS in history order?
-	[_] Each $ xmonad --restart # drops to wksp 1
-		[_] how to make that action only from ~/.xinitrc but not when restart manually?
+	2016-04-12 [X] Each $ xmonad --restart # drops to wksp 1
+		[X] how to make that action only from ~/.xinitrc but not when restart manually?
 		:= so, it must work on startuHook but not on --restart
-		[_] make on (re)start jumping to `windows (current || 1)`
+		[X] make on (re)start jumping to `windows (current || 1)`
+		:>= Jump to '1' only if you currently on '`' (very first workspace)
 	[_] gmrun
 	[_] xkill
 	[_] open next empty workspace for browser/etc (maybe on M-Tab? Better <BS>)
 		THINK: what to do when all workspaces are exhausted?
 		: Maybe, provide additional wksp on M-`++[0-9-=], and use M-`-M-` for IM wksp
 		: ALT: use <BS> as prefix for wksp -- then could add even <BS>-[a-z]
-	[_] Modular Configuration
+		NEED: search next empty from beginning, not from current one
+	2016-04-12 [X] Modular Configuration
 		: As of xmonad-0.9, any additional Haskell modules may be placed in ~/.xmonad/lib/ are available in GHC's searchpath. Hierarchical modules are supported: for example, the file ~/.xmonad/lib/XMonad/Stack/MyAdditions.hs could contain:
 		; module XMonad.Stack.MyAdditions (function1) where
 		; 	function1 = error "function1: Not implemented yet!"
@@ -93,7 +96,7 @@ THINK:ENH
 		:= use special small subscript font <fc=1>
 		:TRY: simultaneously use superscript font for floating windows
 	[_] show somewhere master windows count if it != 1
-		:= use same subscript like for fullscreen?
+		:= use same subscript like for fullscreen? ALT: superscript
 		:= but then how about two masters in fullscreen?
 	[_] Bind to F1..F12 some macro functions to apply to all wksp? OR create macro on-the-fly?
 	[_] NEED: back to last in history non-empty workspace
@@ -162,11 +165,6 @@ TODO
 
 	TRY: sharing window between workspaces
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-CopyWindow.html
-
-	THINK: right/left docking persistent bar tab/panel ~ 1/8 screen width
-		: -- to keep there small mpv  preview when watching amv and doing work
-		: -- some status widgets / load graphics
-		:= bottom/top panel seems also acceptable -- with video like 27:10
 
 	[_] ADD prompt for Xmonad commands -- to do doIgnore on mpv and make it docking
 		:= can be used as temporary alternative to completed wishes/functions
@@ -242,11 +240,17 @@ FIXME
 	[_] when works doFloat hook -- make (x, y) -> (10, 10) instead (0, 0)
 		:= it's too close to screen borders, which feels bad
 	[_] Replace EZConfig by manual submaps
-		[_] null/stop default action if any other key beside submap
-		[_] show indicator of current state
 		: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-Submap.html
-		[_] search in sources of Submap for in/out state variable to use for indicator
+		: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Util-EZConfig.html
+		[_] null/stop default action if any other key beside submap
+			: USE: submapDefault
+		[_] show indicator of current pending state
+			: search in sources of Submap for in/out state variable to use for indicator
 	[_] M-A-a -- move by history of wksps, and not only the two last
+	[_] Show keymaps help/legend for XMonad on specific keybinding
+		: Must be generated from current active mappings on the fly
+		[_] Generate image graph and install it as wallpaper to peek-through
+		[_] Show mappings as text outline in separate window (st+less)
 
 
 BUG
@@ -275,10 +279,41 @@ BUG
 			:= NEED: to always place active window to top of the stack
 		[_] BUG: new floating are always master -- breaks fullscreen experience
 	[_] ranger -> *.html in slave window
-		riffle opens vimb in stack below
-		but after closing vimb, focus moves to next slave window, instead prev
+		riffle opens r.b in stack below
+		but after closing r.b, focus moves to next slave window, instead prev
 		:= maybe, to determine next focus on some event use history somehow?
 	2016-02-29 [X] Intermitten ERR: executeFile
 		:> NEED paci xorg-xmessage to show errors
 		: System.Posix.Process.executeFile
 		: System.Environment.getEnvironment
+
+
+> DEV:(new features)
+
+[_] Right/left docking persistent bar tab/panel ~ 1/8 screen width
+	: -- to keep there small mpv  preview when watching amv and doing work
+	: -- some status widgets / load graphics
+	M-p [LRTB] -- open panel
+		: Overlapping (filling whole physical screen width/height) depends on opening order
+		:= bottom/top panel seems also acceptable -- with video like 27:10
+	M-p [lrtbm] -- jump to panel/main, backNforth
+	M-S-p [lrtbm] -- jump to panel/main, backNforth
+	M-[, M-] -- ignores panels and jumps only to actual screens
+	< Overlay monitor controls can be placed in same group M-p
+	NEED control screen panel as you would with windows
+		: change size by <,>; Rotate/Reflect by /,?
+		Always resize ratio between current/main screen
+			On main screen -- resize main and _all_ panels proportionally
+			On panel -- resize only _this_ panel, eating space from main
+
+[_] Create two sets of desktops: work-related and my own
+	DynamicWorkspaceGroups OR IndependentScreens
+	EXPL:USE: fictive virtual screen which switches/replaces current one
+	THINK: is there real necessity? I can use mixed layout to compose
+	all necessary work windows in one wksp and then jump by mark'n'go
+
+[_] Different/additional/simplified keybindings (for spawn/etc)
+	when current window is root OR no windows found on this wksp at all
+	BUG:FIND: the default key can't pass through xmonad to actual window
+	: https://mail.haskell.org/pipermail/xmonad/2012-February/012402.html
+	: MAYBE:SEE: sources of submapDefault -- there must be key pass-through

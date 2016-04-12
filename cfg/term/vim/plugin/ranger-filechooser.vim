@@ -21,6 +21,7 @@ endif
 
 "{{{1 CMDS ====================
 command! -bang -bar -nargs=? RangerChooser call RangerChooser(<bang>1, <q-args>)
+let g:ranger_cmd = ''
 
 
 "{{{1 IMPL ====================
@@ -108,6 +109,7 @@ function! RangerChooser(select, ...)
   let temps = {'result': tempname()}
   let path = expand((a:0>0 && a:1!='' ? a:1 : (a:select ? '%:p' : getcwd())), 1)
   let cmd = 'ranger --choosefiles=' . shellescape(temps.result)
+  if !empty(g:ranger_cmd)| let cmd .= ' --cmd='.shellescape(g:ranger_cmd) |en
   let cmd .= (a:select ? ' --selectfile=' : ' --cmd=cd\ ').shellescape(l:path)
   if has('nvim')
     if bufexists('term://*:FZF')
