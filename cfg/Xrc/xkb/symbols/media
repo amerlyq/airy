@@ -36,6 +36,10 @@ partial function_keys
 xkb_symbols "fkey2vt" {
     key.type = "CTRL+ALT";
 
+    // Remapped for xmonad to use exclusively (like direct window switching).
+    // So, original F1..12 are accessed in overlay.
+    // NOTE: somewhat inconvenient: I have vim/ranger/mutt which need F1..F12
+
     key <FK13> { [ F1  ] };
     key <FK14> { [ F2  ] };
     key <FK15> { [ F3  ] };

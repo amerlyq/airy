@@ -1,4 +1,5 @@
 #!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))
 
-DISPLAY=${DISPLAY:-:0}
-xkbcomp ~/.cache/airy/keylayout.xkm ${DISPLAY%%.*}
+./xkbm.gen $1
+./run-load

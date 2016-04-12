@@ -2,12 +2,6 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-if cfgOpt s; then
-    case "$CFG_S"
-    in elona|hummer|freesia) over="$CFG_S"
-    ;; esac
-    echo "Layout: $CFG_S"
+if has_pr X && [[ $DISPLAY ]]; then
+  ./run
 fi
-
-"$PWD/xkbm.gen" $over
-"$PWD/run"

@@ -1,10 +1,12 @@
 #!/bin/bash -e
 source ~/.shell/profile
+cd $(dirname $(readlink -m ${0}))
 set -o pipefail
 
-# pc+us:1+ru(typewriter):2+ua(legacy):3
-lang="${CURR_XKB_LANG:-us:1+am(ru):2+am(ua):3}"
-over="${1:-${CURR_XKB_OVER:-vim}}"
+over=${1:-${CURR_XKB_OVER:-vim}}
+ids=$(sed -rn '/.*xkb_symbols "([^"]+)".*/s//\1/p' ./symbols/overlay)
+grep -qxF "$over" <<<"$ids" || { echo "Unknown overlay: '$over'"; exit 1; }
+echo "Overlay: $over"
 
 dst="${CURR_DIR_CACHE?No}/keylayout.xkb"
 cat > "$dst" <<EOT
@@ -29,10 +31,12 @@ xkb_keymap {
     };
     xkb_symbols   {
         // ALT: include "pc"
-        include "media(fkey2vt)"  // srvr_ctrl
+        include "srvr_ctrl(fkey2vt)"
+        // OR:(deprecated) include "media(fkey2vt)"
         include "pc(editing)"
         include "keypad(x11)"
-        include "$lang"
+        // ALT: pc+us:1+ru(typewriter):2+ua(legacy):3
+        include "${CURR_XKB_LANG:-us:1+am(ru):2+am(ua):3}"
 
         include "typo(base)"   // lvl3 symbols on rows [1-4]
         // ALT: include "inet(evdev)+inet(logitech_base)"

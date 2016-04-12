@@ -25,7 +25,7 @@ import XMonad.Prompt.Shell          (shellPrompt)
 import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
 
 ---- Actions
-import XMonad.Actions.TagWindows    (setTags, focusUpTaggedGlobal, withTaggedGlobalP, shiftHere)
+import XMonad.Actions.TagWindows    (setTags, addTag, shiftHere, tagPrompt, tagDelPrompt, focusUpTaggedGlobal, withTaggedGlobal, withTaggedGlobalP, withTaggedP)
 import XMonad.Actions.CopyWindow    (copy, copyWindow, runOrCopy, killAllOtherCopies, kill1, wsContainingCopies)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
 import XMonad.Actions.SpawnOn       (manageSpawn, spawnHere, spawnAndDo)
@@ -130,15 +130,21 @@ myKeys = MyWksp.keys ++ MyNavi.keys ++
   ---- Mark & Goto
   -- NEED:DEV: back_and_forth -- to return window on their previous screen
   -- -- if on currentFocused -- shiftHere was pressed again
-  -- NOTE: F13..F24 -- remapped by xkb for xmonad exclusively
-  -- -- original F1..12 are accessed in overlay
-  -- THINK: is overlay convenient? I have vim/ranger/mutt which need F1..F12
-  [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [13..24], (m, f) <-
-    [ ("M-", \n -> withFocused $ setTags ["F" ++ show n])
-    , (""  , \n -> focusUpTaggedGlobal ("F" ++ show n))
-    , ("C-", \n -> withTaggedGlobalP ("F" ++ show n) shiftHere)
+  [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [1..12], (m, f) <-
+    [ ("M-S-", \n -> withFocused $ setTags ["F" ++ show n])
+    , ("M-"  , \n -> focusUpTaggedGlobal ("F" ++ show n))
+    , ("M-C-", \n -> withTaggedGlobalP ("F" ++ show n) shiftHere)
     ]
   ] ++
+  [ ("M-S-t", tagPrompt def focusUpTaggedGlobal)
+  , ("M-C-t", tagPrompt def (`withTaggedGlobalP` shiftHere))
+  , ("M-S-C-t", tagPrompt def (\s -> withTaggedP s (W.shiftWin "2")))
+  ] ++
+  inGroup "M-t"  -- tags
+    [ ("a", tagPrompt def (withFocused . addTag))
+    , ("x", tagDelPrompt def)
+    , ("w", tagPrompt def (`withTaggedGlobal` float))
+    ] ++
   ---- System
   [ ("M-\\"    , kill1)
   , ("M-C-\\", killAllOtherCopies)
@@ -208,7 +214,7 @@ myKeys = MyWksp.keys ++ MyNavi.keys ++
     , ("M-S-d"     , "r.dmenu -n")
     , ("M-C-d"     , "j4-dmenu-desktop")
     , ("M-<Print>" , "r.capture-screen")
-    , ("M-C-S-\\"  , "~/.i3/ctl/wnd_active_kill")
+    , ("M-S-C-\\"  , "~/.i3/ctl/wnd_active_kill")
     , ("M-S-z"     , "r.lock")
     ],
     feedCmd "~/.i3/ext/volume"
