@@ -21,15 +21,36 @@ Config {
 , sepChar      = "%"
 , alignSep     = "}{"
 -- \<fc=#1b1d1e,#fd971f>  %kbd%</fc>\
+-- TODO:ADD: iotop, nettop? -- to monitor disk and traffic;
+-- ALSO: battery saving prf: toggle/open_setup
 , template     = "%UnsafeStdinReader%}{\
   \<fc=#cc8000>  </fc>\
-    \<fn=1>%mpd%</fn>\
+    \<fn=1><action=`r.wm M-o_n` button=3>\
+      \<action=`mpc next` button=4>\
+        \<action=`mpc prev` button=5>\
+          \<action=`mpc toggle` button=1>\
+            \%mpd%\
+          \</action></action></action></action></fn>\
   \<fc=#00cc00>  </fc>\
-    \%dynnetwork%  %cpu%  %loadavg%  %memory% %swap%\
+    \%dynnetwork%\
+    \<action=`r.wm M-o_h` button=1>\
+      \ %cpu%  %loadavg%  %memory% %swap%\
+    \</action>\
   \<fc=#0080cc>  </fc>\
-    \%battery% %default:Master% %bright%\
+    \%battery%\
+    \<action=`r.audio 1$'\x25'+` button=4>\
+      \<action=`r.audio 1$'\x25'-` button=5>\
+        \<action=`r.audio` button=1>\
+          \ %default:Master%\
+        \</action></action></action>\
+    \<action=`xbacklight -inc 1` button=4>\
+      \<action=`xbacklight -dec 1` button=5>\
+        \<action=`xbacklight -set 30` button=3>\
+          \ %bright%\
+        \</action></action></action>\
   \<fc=#cc00cc>  </fc>\
-    \%lang% %leds% %date% "
+    \<action=`r.xkb-lang 0` button=3><action=`r.xkb-lang +` button=1>%lang% %leds%</action></action>\
+    \%date% "
 , commands     =
 [ Run Date "<fc=#fd971f>%d.%m.%y</fc> ⌚ <fc=#ffffff>%H:%M</fc>" "date" 50
 , Run Cpu

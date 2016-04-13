@@ -4,10 +4,17 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link -t ~/.xmonad  xmonad.hs xmobarrc
-(cd cfg && linkdir ~/.xmonad/lib/XMonad/Config/Amer/ *)
+lib=~/.xmonad/lib/XMonad
+(cd cfg && linkdir "$lib/Config/Amer/" *)
+(cd ext && linkdir "$lib/Util/Amer/" *)
 
 ### GENS ###
 if cfgOpt u; then
-    xmonad --recompile
-    ! has_pr X || xmonad --restart
+  dst="$lib/Hooks"
+  url='http://code.haskell.org/XMonadContrib/XMonad/Hooks/ServerMode.hs'
+  (mkdir -p "$dst" && wget "$url" -O "$dst/ServerMode.hs")
+  (cd "$lib/Util/Amer" && ghc --make ctl.hs)
+
+  xmonad --recompile
+  ! has_pr X || xmonad --restart
 fi

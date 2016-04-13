@@ -1,8 +1,15 @@
 -- vim: ts=2:sw=2:sts=2
-module XMonad.Config.Amer.Prompt (myPromptTheme) where
+module XMonad.Config.Amer.Prompt (
+    keys, myPromptTheme
+) where
 
 import Data.Default                 (def)
 import XMonad.Prompt
+import XMonad.Prompt.Shell          (shellPrompt)
+import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
+import XMonad.Actions.SpawnOn       (spawnHere)
+
+import XMonad.Config.Amer.Common    (inGroup)
 
 myPromptTheme = def
   { font = "-bitstream-bitstream vera sans-medium-r-*-*-14-*-*-*-*-*-*-*"
@@ -15,3 +22,8 @@ myPromptTheme = def
   , defaultText = " "
   , autoComplete = Just 1
   }
+
+keys = inGroup "M-u"
+  [ ("t", inputPrompt def "Fire" ?+ \p -> spawnHere ("r.tf -e " ++ p))
+  , ("s", shellPrompt myPromptTheme)
+  ]

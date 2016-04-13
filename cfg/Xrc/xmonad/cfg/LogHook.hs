@@ -20,7 +20,7 @@ escape = concatMap f :: String -> String where
   f '`' = "$'\\x60'"
   f x   = [x]
 mouse n cmd txt = "<action=`" ++ escape cmd ++ "` button=" ++ show n ++ ">" ++ txt ++ "</action>"
-wmctrl = ("r.xmonad " ++)  -- ALT: $'\\x" ++ showHex (ord $ head i) "'"
+wmctrl = ("r.wm -w " ++)  -- ALT: $'\\x" ++ showHex (ord $ head i) "'"
 -- ADD: wmctrl -r :ACTIVE: -b toggle,fullscreen -- Toggle fullscreen for current window only (not layout)
 
 -- mkMap = M.fromList MyWksp.keys
@@ -57,8 +57,9 @@ myStateLoggger copies = dynamicLogString def
     markcopy i = if i `elem` copies then xmobarColor "#8888ff" "green" i else i
     predefined i = if i `elem` MyWksp.all then i else ""
     -- ALT clickws i = mouse 1 (xdokey $ M.findWithDefault "0" i mkMap) i
-    clickws i = mouse 1 (wmctrl i) (markcopy i)
-    clickly ly = mouse 1 (xdokey "f") (mouse 3 (xdokey "n") ly)
+    clickws i = mouse 1 ("r.wm -w " ++ i) (markcopy i)
+    clickly ly = mouse 1 "r.wm M-n" (mouse 3 "r.wm M-S-n" ly)
+    -- clickly ly = mouse 1 (xdokey "f") (mouse 3 (xdokey "n") ly)
 
 
 myLogHook h = do
