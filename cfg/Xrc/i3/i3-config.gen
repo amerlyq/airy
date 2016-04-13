@@ -302,9 +302,9 @@ w_header "Control: media-keys"
     wstr "$bs XF86Sleep $exno xset -d :0 dpms force off"
 
 w_header "\n" "Control: volume"
-    wlistf "$mod+%-5s $exno ~/.i3/ext/volume %-3s" \
+    wlistf "$mod+%-5s $exno r.audio %-3s" \
         "Home Prior Next End" 20% 2%+ 2%- " "
-    wlistf "$bs %-20s $exno ~/.i3/ext/volume %-3s" \
+    wlistf "$bs %-20s $exno r.audio %-3s" \
         "XF86AudioRaiseVolume XF86AudioLowerVolume XF86AudioMute" \
         2%+ 2%- " "
 

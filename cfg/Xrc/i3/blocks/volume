@@ -9,7 +9,7 @@ case $BLOCK_BUTTON in
     3) ARG='-g' ;;
     *)  ;;
 esac
-${ARG+~/.i3/ext/dvolbar $ARG}
+# ${ARG+~/.i3/ext/dvolbar $ARG}
 
 VARS=$(amixer -M -D pulse get Master |
     sed -n '$s/.*\[\([0-9]\+\)%\].*\[\([onf]\{2,3\}\)\].*/VOL=\1;MUTE=\2/p')

@@ -1,37 +1,37 @@
-#!/bin/bash
+#!/bin/bash -e
 
-if [ "$1" == "-h" ]; then echo "
+if [[ $1 == -h ]]; then echo "
 audio        | Switch to next audio output
 audio [0-9]  | Set appropriate audio output
 "; exit; fi
 
 FL=~/.cache/audio_output
 ## Save option
-if [ -f "$FL" ]; then NEXT=$( cat "$FL" | sed q ); else NEXT=1; fi
-if [ -n  "$1" ]; then NEXT="$1"; fi
+if [[ -f $FL ]]; then NEXT=$( cat "$FL" | sed q ); else NEXT=1; fi
+if [[ -n  $1 ]]; then NEXT="$1"; fi
 echo "$NEXT" > "$FL"
 
 # Number of sound cards available
-NUMBER=$(pacmd "list-sinks" | grep card: | wc -l)
-if [ $NUMBER -le 1 ]; then exit; fi
+NUMBER=$(pacmd 'list-sinks' | grep card: | wc -l)
+((NUMBER>1)) || exit
 
 # The Pulseaudio index of the current default sound card
 CURRENT=$( pacmd list-sinks | awk '$1 == "*" && $2 == "index:" {print $3}' )
 CARDS=$( pacmd list-sinks | sed -n '/.*index: \([0-9]\+\)/s//\1/p' )
 INPUTS=$( pacmd list-sink-inputs | awk '$1 == "index:" {print $2}' )
 
-if [ -n "$NEXT" ]; then
-    cmin=${CARDS:0:1}
-    cmax=${CARDS:$((${#CARDS}-1)):1}
-    if (( $cmin > $NEXT || $NEXT > $cmax )); then
-        echo "Index of audio #$NEXT not in bounds of [$cmin,$cmax]"
-        exit
-    fi
+if [[ -n $NEXT ]]; then
+  cmin=${CARDS:0:1}
+  cmax=${CARDS:$((${#CARDS}-1)):1}
+  if (( $cmin > $NEXT || $NEXT > $cmax )); then
+    echo "Index of audio #$NEXT not in bounds of [$cmin,$cmax]"
+    exit 1
+  fi
 else
-    NEXT=$( echo "$CARDS" | sed "$(( $CURRENT + 2 ))!d" )
-    if [ -z "$NEXT" ]; then NEXT=0; fi
+  NEXT=$( echo "$CARDS" | sed "$(( $CURRENT + 2 ))!d" )
 fi
-pacmd "set-default-sink $NEXT" > /dev/null
+
+pacmd "set-default-sink ${NEXT:=0}" > /dev/null
 
 # Move all current inputs to the new default sound card
 for input in $INPUTS; do
@@ -47,4 +47,3 @@ echo "SET: audio #$NEXT"
 #     dir=${dir%*/}
 #     sudo -u ${dir##*/} /usr/bin/hdmi_sound_toggle
 # done
-

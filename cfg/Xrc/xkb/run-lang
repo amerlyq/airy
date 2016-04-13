@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 # SHOW all dbus services
 #   qdbus-qt4
 
@@ -34,7 +34,10 @@ in [0-9]) setnum $1
 ;; us) setnum 0
 ;; ru) setnum 1
 ;; ua) setnum 2
-;;  +) change 'next_layout'
-;;  -) change 'prev_layout'
-;; *) get_current
+;;  +) setnum $(( ($(get_current) + 1) % ${#LG[@]} ))
+# BUG: next_ don't work; prev_ switches only en/ru
+# ;;  +) change 'next_layout'
+# ;;  -) change 'prev_layout'
+;; '') get_current
+;;  *) exit 1
 esac
