@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+# btrfs filesystem df /
+#   http://www.nrtm.org/index.php/2012/03/13/the-joys-of-btrfs-and-opensuse-or-no-space-left-on-device/comment-page-1/
+
 root="${1:-/}"
 btrfs filesystem defragment -r -v "$root"
 find "$root" -xdev -type d -print -exec btrfs filesystem defragment '{}' \;
