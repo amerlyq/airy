@@ -80,7 +80,7 @@ fi
 
 # ======================================================================
 run(){ [[ ! -f "$1" ]] || "$@"; }
-[[ -n "$DISPLAY" ]] || export DISPLAY=:0 #:0.0
+[[ -z "$DISPLAY" ]] || export DISPLAY=:0 #:0.0  # Use host xserver if SSH
 if cfgOpt u; then opts='-u'; fi
 
 # Modules statistics
