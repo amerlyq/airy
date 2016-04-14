@@ -2,8 +2,6 @@
 
 # Don't forget to set primary PCH to card 0 or disable all others.
 # instead of <5% | 2dB>
-# apt-get intall xbindkeys
-# https://wiki.archlinux.org/index.php/Xbindkeys_(%D0%A0%D1%83%D1%81%D1%81%D
 
 WM=$(wmctrl -m | awk 'NR==1{print$2}')
 case "$WM"
@@ -11,7 +9,10 @@ in i3) notifywm(){ ~/.i3/blocks/update volume; }
 ;;  *) notifywm(){ :; }
 esac
 
-case "$1" in [0-9]*) CMD="$1 unmute" ;; esac
+# DEPRECATED: use 20% unmute directly
+# EXPL: this script is called too many times on wheel scroll
+# case "$1" in [0-9]*) CMD="$1 unmute" ;; esac
+
 amixer -q -D pulse set Master ${CMD:-toggle}
 # pactl set-sink-volume 0 -- 20%  # +10%
 # pactl set-sink-mute 0 toggle

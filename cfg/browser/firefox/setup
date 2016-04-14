@@ -8,5 +8,8 @@ link "$PWD/pterosaurrc" ~/.pterosaurrc
 # Make input fields with white background again when using dark theme
 # https://wiki.archlinux.org/index.php/Firefox#Unreadable_input_fields_with_dark_GTK.2B_themes
 # ALT: $ GTK_THEME=Adwaita:light firefox %u
-mprf=$(sed -rn '/Path=(.*)/s//\1/p' ~/.mozilla/firefox/profiles.ini)
-link -t ~/.mozilla/firefox/"$mprf/chrome" "$PWD/userContent.css"
+dst=~/.mozilla/firefox/profiles.ini
+if [[ -f $dst ]]; then
+  mprf=$(sed -rn '/Path=(.*)/s//\1/p' "$dst")
+  link -t ~/.mozilla/firefox/"$mprf/chrome" "$PWD/userContent.css"
+fi

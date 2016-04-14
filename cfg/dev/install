@@ -10,7 +10,7 @@ if distro arch; then
 
     # haskell
     pkg_inst "cabal-install c2hs"
-    ! cfgOpt r || cabal update
+    ! cfgOpt u || cabal update
     # cabal-install ghc-mod
     # cabal install hdevtools
 

@@ -16,5 +16,5 @@ if cfgOpt u; then
   (cd "$lib/Util/Amer" && ghc --make ctl.hs)
 
   xmonad --recompile
-  ! has_pr X || xmonad --restart
+  ! running_X || xmonad --restart
 fi

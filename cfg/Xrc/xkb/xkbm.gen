@@ -50,8 +50,10 @@ xkb_keymap {
 };
 EOT
 
-setxkbmap -option ""  # Reset keyboard layout
-xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 |
+if running_X; then
+  setxkbmap -option ""  # Reset keyboard layout
+  xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 |
     sed -r '/No symbols defined/d'
+fi
 
 echo "W: $dst"

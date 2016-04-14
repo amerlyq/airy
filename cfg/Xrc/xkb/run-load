@@ -1,4 +1,9 @@
 #!/bin/bash -e
+source ~/.shell/func.d/system
 
-DISPLAY=${DISPLAY:-:0}
-xkbcomp ~/.cache/airy/keylayout.xkm ${DISPLAY%%.*}
+src=~/.cache/airy/keylayout.xkm
+if [[ -f $src ]] && running_X; then
+  xkbcomp "$src" ${DISPLAY%%.*}
+else
+  echo "Err: no compiled *.xkm to load"
+fi

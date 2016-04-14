@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+id=$(xinput list | sed -rn '/.*FTE1001.*id=([0-9]+).*/s//\1/p')
+state=$(xinput list-props $id | awk '/Device Enabled/{print$NF}')
+
+# TODO: if no mouse connected and touchpad disabled --> mouse pointer off
+
+if ((state)); then
+  xinput disable $id
+  r.n -U Touchpad Disabled
+else
+  xinput enable $id
+  r.n Touchpad Enabled
+fi

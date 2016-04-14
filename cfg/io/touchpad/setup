@@ -1,2 +1,8 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
+
+if cfgOpt u; then
+  dst=/etc/X11/xorg.conf.d
+  link -st "$dst" 50-synaptics.conf
+  echo "NEED relogin/restart Xorg"
+fi

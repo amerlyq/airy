@@ -1,4 +1,5 @@
 #!/bin/bash -e
 
 id=$(xprop -root -notype 32x '\t$0' _NET_ACTIVE_WINDOW | awk '{print$NF}')
+xprop -id $id > /tmp/winclass
 r.n $(xprop -id $id WM_CLASS)

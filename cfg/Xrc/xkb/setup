@@ -2,6 +2,6 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-if has_pr X && [[ $DISPLAY ]]; then
+if running_X; then
   ./run
 fi

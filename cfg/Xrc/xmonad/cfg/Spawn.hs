@@ -72,8 +72,8 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("M-S-C-\\"  , "~/.i3/ctl/wnd_active_kill")
     , ("M-S-z"     , "r.lock")
     ],
-    feedCmd "~/.i3/ext/volume"
-    [ ("M-<Home>"     , "20%")
+    feedCmd "r.audio"
+    [ ("M-<Home>"     , "20% unmute")
     , ("M-<Page_Up>"  , "2%+")
     , ("M-<Page_Down>", "2%-")
     , ("M-<End>"      , "")

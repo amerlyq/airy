@@ -2,5 +2,5 @@
 source ~/.shell/func.d/cfgsetup
 
 dst=/usr/share/X11/xorg.conf.d
-link -s "$PWD/50-logitech.conf" "$dst/%"
+link -st "$dst" 50-logitech.conf
 echo "NEED relogin/restart Xorg"

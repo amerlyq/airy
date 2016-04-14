@@ -2,10 +2,11 @@
 cd $(dirname $(readlink -m ${0}))
 [[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell
 source ~/.shell/func.d/cfgsetup
-echo "$THEME" > "${CURR_DIR_CACHE?No}/theme"
+mkdir -p "${CURR_DIR_CACHE?No}"
+echo "$THEME" > "${CURR_DIR_CACHE}/theme"
 queue="${TMPDIR:-/tmp}/mods_installing"
 mods="${CURR_DIR_CACHE?No}/mods/mods" && mkdir -p "${mods%/*}"
-link "$PWD/bin" ~/.bin
+[[ -L ~/.bin ]] || ln -svT "$PWD/bin" ~/.bin
 
 # ======================================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
