@@ -54,7 +54,7 @@ do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
     do printf "."; sleep 0.5; done; echo; }; }
 
 has_pr(){ hash "$1" >/dev/null 2>&1; }
-running_X(){ has_pr X && [[ $DISPLAY && $TERM != linux ]]; }
+running_X(){ has_pr X && [[ $DISPLAY && ! $(tty) =~ ^/dev/tty ]]; }
 # $(ps opid= -C ${1##*/})
 grep_prs(){ pgrep "(\/|^)${1##*/}(\s|\$)"; }
 kill_prs(){ local pids="$(grep_prs "$1")"; [[ -z "$pids" ]] || kill -TERM $pids; }

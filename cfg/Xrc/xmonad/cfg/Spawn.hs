@@ -71,6 +71,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("M-<Print>" , "r.capture-screen")
     , ("M-S-C-\\"  , "~/.i3/ctl/wnd_active_kill")
     , ("M-S-z"     , "r.lock")
+    , ("M-o t"     , "r.touchpad-tgl")
     ],
     feedCmd "r.audio"
     [ ("M-<Home>"     , "20% unmute")
