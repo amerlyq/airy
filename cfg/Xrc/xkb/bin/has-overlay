@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
+cd $(dirname $(readlink -m ${0}))/..
 case "$1" in -q) shift; silent=1 ;; esac
 over=$1
 

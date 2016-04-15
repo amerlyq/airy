@@ -1,9 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/system
 
-# BUG: drops language to 0 on wksp-switch and notify-popup
-run_single kbdd
-
 # SEE: /usr/include/X11/keysymdef.h
 run_single -r xcape -t 250 -e "\
 ISO_Level3_Shift=Super_R;\

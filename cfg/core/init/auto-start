@@ -9,33 +9,11 @@ echo "[${0##*/}]: '$CURR_PROF' profile"
 # SEE -- double fork technique
 #   http://stackoverflow.com/questions/3430330/best-way-to-make-a-shell-script-daemon#
 
-### ALWAYS ### --------------------------------------
-# BUG: No PulseAudio daemon running, or not running as session daemon.
-r.audio-output &
-r.touchpad &
-r.xcape &
-
-# EXPL: don't launch other apps for one-app sessions
-[[ $XDG_CURRENT_DESKTOP =~ ^(i3|xmonad)$ ]] || exit
-
-### WM ###
-r.dunst &
-# compton must be launched before installing wallpaper!
-compton -d ${DISPLAY:-:0} &
-[[ ! $XDG_CURRENT_DESKTOP =~ ^xmonad$ ]] || { r.tray & }
-r.feh &
-r.mpd-log &
-
-### USER ### ----------------------------------------
-copyq &
-[[ "$CURR_PROF" =~ ^(home|laptop) ]] || { pidgin & }
-[[ ! "$CURR_PROF" =~ ^work ]] || { skype & }
-
-### END ###
+### TEAR-DOWN ###
 case "${ARGS[@]}" in -w)
   # ATTENTION: every X app, started by hands not from xmonad will segfault on shutdown?
+  trap 'wait' ERR EXIT
   trap 'kill $(jobs -p)' TERM KILL QUIT INT
-  wait
 esac
 
 # Kill all childs
@@ -45,3 +23,30 @@ esac
 
 # timeout 30 while ! xdotool search --onlyvisible --pid $mypid --name "$pr"
 # do sleep 1; done || notify "Error on executing: $pr $args" &
+
+
+### ALWAYS ### --------------------------------------
+# BUG: No PulseAudio daemon running, or not running as session daemon.
+r.audio-output &
+# r.touchpad &
+r.xkb-kbdd &
+r.xkb-xcape &
+
+# EXPL: don't launch other apps for one-app sessions
+# BUG: empty var on manual executing of script
+# BUT: do I really need to run it manually?
+# ALT: trap USR1 and relaunch all position -- to add all demons back into same group
+[[ $XDG_CURRENT_DESKTOP =~ ^(i3|xmonad)$ ]] || { echo "Not default WM" && exit; }
+
+### WM ### --------------------------------------
+r.dunst &
+# compton must be launched before installing wallpaper!
+compton -d ${DISPLAY:-:0} &
+[[ ! $XDG_CURRENT_DESKTOP =~ ^xmonad$ ]] || { r.tray & }
+r.feh &
+r.mpd-log &
+
+### USER ### ----------------------------------------
+copyq &
+[[ "$CURR_PROF" =~ ^(home|laptop|neo) ]] || { pidgin & }
+[[ ! "$CURR_PROF" =~ ^work ]] || { skype & }

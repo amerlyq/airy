@@ -7,12 +7,13 @@ source ~/.shell/func.d/packages
 # ALT:(xcape) https://gitlab.com/at-home-modifier/at-home-modifier-evdev/wikis/home
 #   -- aur_inst xf86-input-evdev-ahm
 
-
 if distro arch; then
-    aur_inst 'kbdd-git xcape xorg-xev'
+  aur_inst 'xkbset'  # NOTE: only yaourt?
+  aur_inst 'kbdd-git xcape xorg-xev'
 
 elif distro ubuntu; then
-    pkg_inst kbdd
-    # FIXED???, works after reboot only after you once press REAL Control_L
-    git_inst 'alols/xcape'
+  pkg_inst kbdd
+  # FIXED???, works after reboot only after you once press REAL Control_L
+  git_inst 'alols/xcape'
+  echo "Err: not enough"
 fi

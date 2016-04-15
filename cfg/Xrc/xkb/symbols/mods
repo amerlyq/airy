@@ -20,7 +20,8 @@ xkb_symbols "keys"
 
     key <TAB>  { type="TWO_LEVEL", [ Tab, ISO_Left_Tab ] };
     key <PRSC> { type="PC_ALT_LEVEL2", [ Print, Sys_Req ] };
-    key <PAUS> { type="PC_CONTROL_LEVEL2", [ Pause, Break ] };
+    // key <PAUS> { type="PC_CONTROL_LEVEL2", [ Pause, Break ] };
+    key <SCLK> { [ ISO_Lock ] };  // BUG:
 };
 
 
@@ -81,7 +82,7 @@ xkb_symbols "switches"
         [ Overlay1_Enable ],
         actions= [ SetControls(ctrls=Overlay1) ]
     };
-    key <SCLK> {
+    key <PAUS> {
         [ Overlay1_Enable ],
         actions= [ LockControls(ctrls=Overlay1) ]
     };
