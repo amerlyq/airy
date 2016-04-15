@@ -9,6 +9,7 @@ Troubleshoot
 
 Install 32
 	WINEPREFIX=$HOME/.wine32 WINEARCH='win32' wine 'wineboot'
+	WINEPREFIX=$HOME/.wine32 WINEARCH='win32' winetricks dotnet20 dotnet40 vcrun2010 vcrun2012
 
 # you can run through wine
 # download winetricks from http://winetricks.org/winetricks by running
@@ -17,6 +18,8 @@ Install 32
 # dependency-----wine
 # run winetricks
 # it has links to microsoft .netv2, v3 ,mono and other microsoft libraries download and install mono using winetricks
+
+
 # the config files of the manga downloader has to be in home folder
 # now run
 # wine /path/to/domdomsoft.exe

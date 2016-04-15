@@ -66,7 +66,7 @@ scratchpad = (concat . (`map` [
   ]
 
 media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
-    [ ("M-d"       , "r.dmenu")
+    [ ("M-d"       , "r.dmenu -c")
     , ("M-S-d"     , "r.dmenu -n")
     , ("M-C-d"     , "j4-dmenu-desktop")
     , ("M-<Print>" , "r.capture-screen")
@@ -110,7 +110,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     ],
     inGroup "M-u"
     [ ("b", "r.b -h")
-    , ("g", "r.b -g")
+    , ("g", "r.game -p")
     , ("e", "r.dict --en --vim")
     , ("r", "r.dict --ru --vim")
     , ("m", "r.mpd-move")

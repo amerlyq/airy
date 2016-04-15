@@ -1,0 +1,20 @@
+#!/bin/bash -e
+cd $(dirname $(readlink -m ${0}))/lib
+
+OPTS=(dmenu -p 'Play me:' -fn monospace:size=10
+     -nb '#000000' -nf '#b0e0e6' -sb '#227410' -sf '#ccaa00')
+
+case "$1" in -p) shift
+  game=$(ls | "${OPTS[@]}")
+;; *) game=$1 ;; esac
+
+[[ -f $game ]] || { r.n 'No such' "$game"; exit 1; }
+
+if r.xkb-has-overlay "$game"; then
+  r.xkb "$game" && xkbset ov1
+  # CHECK: called only one trap or sometimes multiple of them?
+  trap 'xkbset -ov1; r.xkb' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+fi
+
+r.wm -w g  # Jump to game workspace
+./"$game"

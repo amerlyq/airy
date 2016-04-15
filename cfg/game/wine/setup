@@ -1,0 +1,5 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+[[ -d ~/.wine32 ]]
+
+WINEPREFIX=~/.wine32 WINEARCH=win32 wine wineboot
