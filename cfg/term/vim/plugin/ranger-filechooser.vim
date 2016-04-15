@@ -109,7 +109,12 @@ function! RangerChooser(select, ...)
   let temps = {'result': tempname()}
   let path = expand((a:0>0 && a:1!='' ? a:1 : (a:select ? '%:p' : getcwd())), 1)
   let cmd = 'ranger --choosefiles=' . shellescape(temps.result)
-  if !empty(g:ranger_cmd)| let cmd .= ' --cmd='.shellescape(g:ranger_cmd) |en
+  if !empty(g:ranger_cmd)
+    let cmd .= ' --cmd='.shellescape(g:ranger_cmd)
+  " EXPL: show only messages.log when investigating them
+  elseif expand('%:t') =~# '^messages.log'
+    let cmd .= ' --cmd='.shellescape('filter messages.log')
+  endif
   let cmd .= (a:select ? ' --selectfile=' : ' --cmd=cd\ ').shellescape(l:path)
   if has('nvim')
     if bufexists('term://*:FZF')

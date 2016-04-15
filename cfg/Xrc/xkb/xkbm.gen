@@ -1,13 +1,10 @@
 #!/bin/bash -e
 source ~/.shell/profile
 source ~/.shell/func.d/system
-cd $(dirname $(readlink -m ${0}))
 set -o pipefail
 
 over=${1:-${CURR_XKB_OVER:-vim}}
-ids=$(sed -rn '/.*xkb_symbols "([^"]+)".*/s//\1/p' ./symbols/overlay)
-grep -qxF "$over" <<<"$ids" || { echo "Unknown overlay: '$over'"; exit 1; }
-echo "Overlay: $over"
+r.xkb-has-overlay $over
 
 dst="${CURR_DIR_CACHE?No}/keylayout.xkb"
 cat > "$dst" <<EOT

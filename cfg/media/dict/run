@@ -7,18 +7,23 @@ filter() {
 
 fvim() {
     local DMENU='dmenu -i -p W: -b -nb #000000 -nf #999999 -sb #000000 -sf #31AC65 -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
-    local fl=~/.cache/airy/dict-words.txt
+    local fl=~/.cache/airy/dict-words-${lang:-any}.txt
     touch "$fl"
 
-    # REM:HACK
-    [[ -z $lang ]] || { langprev=$(r.xkb-lang -n); r.xkb-lang $lang; }
+    if [[ $lang ]]; then
+      langprev=$(r.xkb-lang -n)
+      # ^BUG: Changes lang --> but it influences current window also!
+      # ALT: change language only after dmenu launched (wmctrl/xdotool &)
+      # BETTER: launch $DMENU & pid=$!; then wmctrl $pid wnd and wait $pid
+      { sleep 0.1; r.xkb-lang $lang; } &
+    fi
+
     word=$(cat "$fl" | $DMENU)  # KEEP
     # WARNING: on errror won't be called, but we can't use trap or it will be
     # run again on EXIT or some independent error/etc in inappropriate place
     ${langprev:+r.xkb-lang $langprev}
 
-    [[ -n "$word" ]] || return
-    echo "$word" >> "$fl"
+    [[ $word ]] && echo "$word" >> "$fl" || return
 
     # NEED:ENH: simultaneously translate word and then open vim
     # exec r.vim-new -c "Dict $word" -c 'only'

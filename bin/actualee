@@ -28,7 +28,7 @@ CMakeLists\.txt) sir ;;
 [[ -n "$v1" ]] && case "$EXT" in  # Extensions
 dot) dot -Tx11 "$NM"  ;;
 tpp) tpp "$NM"        ;;
- md) pandoc -o /tmp/pandoc.html "$FL" && x-www-browser /tmp/pandoc.html ;;
+ md) pandoc -o /tmp/pandoc.html "$FL" && r.b /tmp/pandoc.html ;;
 jar) java -jar "$NM" ;;
 # Launched w/o fork, because of poor cmd support: it opens new instance of
 # XMind instead of adding file to opened

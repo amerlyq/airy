@@ -8,7 +8,7 @@ import XMonad                       (spawn, windows, doFloat, (=?))
 import XMonad.StackSet              (view, shift)
 import XMonad.Actions.SpawnOn       (spawnHere, spawnAndDo)
 import XMonad.Actions.WindowGo      (runOrRaise)
-import XMonad.ManageHook            (className)
+import XMonad.ManageHook            (className, title, (<&&>))
 import XMonad.Hooks.ManageHelpers   (doCenterFloat)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Util.NamedScratchpad  (namedScratchpadAction)
@@ -42,10 +42,11 @@ scratchpad = (concat . (`map` [
     [ ("M-o", windows $ view "NSP")
     , ("M-S-o", windows $ shift "NSP")
     , ("f" , runOrRaise "firefox" $ className =? "Firefox")
+    , ("p" , runOrRaise "pidgin" $ className =? "Pidgin" <&&> title =? "Buddy List")
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
-    | nm <- ["ncmpcpp", "mutt", "ipython", "j8", "htop", "pidgin", "skype", "lyrics"]
+    | nm <- ["ncmpcpp", "mutt", "ipython", "j8", "htop", "skype", "lyrics"]
     ],
     -- Open new window always
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)

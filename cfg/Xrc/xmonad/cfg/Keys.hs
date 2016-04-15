@@ -50,10 +50,11 @@ myKeys = MyWksp.keys ++ MyNavi.keys ++ MyCtrl.keys ++ MyPrompt.keys ++ MySpawn.k
 --    http://hackage.haskell.org/package/xmonad-contrib-0.11.2/docs/XMonad-Actions-PhysicalScreens.html
 
 myOverlay = MON.monitor
-  { MON.prop = MON.ClassName "mpv" `MON.And` MON.Resource "overlay"
+  -- { MON.prop = MON.ClassName "mpv" `MON.And` MON.Resource "overlay"
+  { MON.prop = MON.ClassName "Conky" `MON.And` MON.Resource "Conky"
   , MON.rect = Rectangle (1920-320) 0 320 180  -- Lower right corner
   , MON.persistent = True  -- avoid flickering
-  , MON.opacity = 1.0
+  , MON.opacity = 0.4
   , MON.visible = True  -- show on start
-  , MON.name = "mpv"  -- assign name to toggle independently
+  , MON.name = "conky"  -- assign name to toggle independently
   }

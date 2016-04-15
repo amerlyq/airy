@@ -38,7 +38,7 @@ myStateLoggger copies = dynamicLogString def
   , ppUrgent  = xmobarColor "red" "yellow"
   -- , ppTitle   = xmobarColor "green"  "" . shorten 40
   -- , ppWsSep   = " "
-  , ppSep     = xmobarColor "#fd971f" "" " \xe0b1 "           -- separator between elements
+  , ppSep     = xmobarColor "#fd971f" "" (scrollws " \xe0b1 ") -- separator between elements
   , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
   -- , ppSort    = getSortByIndex
   -- , ppExtras  = []
@@ -59,6 +59,7 @@ myStateLoggger copies = dynamicLogString def
     -- ALT clickws i = mouse 1 (xdokey $ M.findWithDefault "0" i mkMap) i
     clickws i = mouse 1 ("r.wm -w " ++ i) (markcopy i)
     clickly ly = mouse 1 "r.wm M-n" (mouse 3 "r.wm M-S-n" ly)
+    scrollws s = mouse 4 "r.wm 'M-<Backspace>'" (mouse 5 "r.wm 'M-<Tab>'" s)
     -- clickly ly = mouse 1 (xdokey "f") (mouse 3 (xdokey "n") ly)
 
 

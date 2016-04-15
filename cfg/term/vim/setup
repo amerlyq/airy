@@ -51,7 +51,7 @@ fi
 if has_pr X && [[ ! -d ~/.fonts/"${FONT##*/}" ]]; then
     # Patched fonts for windows usage:
     src='https://github.com/Lokaltog/powerline-fonts'
-    [ ! -d "${FONT%/*}" ] && git clone --depth=1 "$src" "${FONT%/*}"
+    [[ -d "${FONT%/*}" ]] || git clone --depth=1 "$src" "${FONT%/*}"
     link -ct ~/.fonts "$FONT"
     fc-cache -vf ~/.fonts  # check active name with fc-list
     echo "Vim font '${FONT##*/}' installed"

@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+run(){ [[ -z "$@" ]] || exec elinks "$@"; }
+
+case "$1"
+in -p) shift; run "$(xsel -ob)"
+;; -g) shift; exec elinks "$@" 'encrypted.google.com'
+;;  *) exec elinks "${@}"
+;; esac

@@ -95,13 +95,13 @@ myLayout = smartBorders
     . ModifiedLayout myOverlay
     -- . smartSpacing 3  -- I'm not sure yet if it nice or not
     -- . onWorkspace (workspaces myCfg !! 4) Full
-    . onWorkspace (head MyWksp.primary) imLayer
     . mkToggle (NOBORDERS ?? FULL ?? EOT)
     . mkToggle (single MIRROR)
     . mkToggle (single REFLECTX)
+    . onWorkspace "IM" imLayer
     $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
   where
-    imLayer = withIM (1%7) (Title "Buddy List") Grid
+    imLayer = withIM (1%7) (ClassName "Pidgin" `And` Title "Buddy List") Grid
     tiled   = ResizableTall nmaster delta ratio []
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
@@ -114,30 +114,41 @@ myManageHook = manageSpawn <+>
   mconcat
   [ isFullscreen --> topmost doFullFloat
   , isDialog --> topmost doCenterFloat
+  -- , stringProperty "WM_WINDOW_ROLE" =? "buddy_list" -->
+  --   (ask >>= \w -> doF $ W.sink w) >> doShift "IM"
   ] <+>
   composeFloat
   [ ("Float" `isPrefixOf`) <$> appName
-  --XXX: ("Figure" `isPrefixOf`) <$> title
   --EXPL: pidgin is tiled by XMonad.Layout.IM
   -- , let lst = "buddy_list Preferences"
   --   in wmhas (stringProperty "WM_WINDOW_ROLE") lst
-  , let lst = "copyq feh Steam Gimp piony.py Transmission-gtk"
+  , let lst = "copyq feh Steam Gimp piony.py Transmission-gtk Xmessage"
     in wmhas className lst
-  , let lst = "PlayOnLinux"
+  , let lst = "PlayOnLinux Dialog"
     in wmhas appName lst
   , className =? "Firefox" <&&> appName =? "Download"
   ] <+>
   -- for_window [title="^ElonaPlus"] fullscreen
   mconcat
-  [ wmhas className "stalonetray" --> doIgnore
+  [ wmhas className "stalonetray Dunst" --> doIgnore
   , wmhas appName "panel desktop_window kdesktop trayer" --> doIgnore
+  -- TODO:FIND: exclude pop-up windows for Dunst/copyq from stealing focus
+  -- MAYBE: there bug in copyq WM_WINDOW_TYPE
+  -- CHECK:FIND: how to keep kbdd current layout on stealing
+  -- THINK:USE: another notifier:
+  -- -- http://nochair.net/posts/2010/10-25-freedesktop-notifications-xmobar.html
+  -- -- https://wiki.archlinux.org/index.php/Desktop_notifications
+  , foldr1 (<||>) [ stringProperty "WM_WINDOW_TYPE" =? x | x <-
+    [ "_NET_WM_WINDOW_TYPE_TOOLTIP"
+    , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
+    ] ] --> doIgnore
   ]
   <+> insertPosition Below Newer <+>
   composeShift
-  [ ("`", "Pidgin")
-  , ("`", "Skype")
+  [ ("IM", "Pidgin")
+  , ("IM", "Skype")
   , ("FF", "Firefox")
-  -- , ("MM", "mutt") -- TODO: make whole wksp similar to firefox
+  -- , ("MM", "mutt") -- TODO: make whole wksp similar to firefox (but I can have >1 mutt)
   -- NOTE: strictly speaking, we don't need runOrRaise for mutt
   -- -- only stick it to MM wksp and keys to jump on it
   -- -- but with raise we get auto-launch and jumping even to moved for some reasons windows

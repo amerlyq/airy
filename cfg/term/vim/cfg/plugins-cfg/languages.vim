@@ -4,7 +4,7 @@ if neobundle#tap('LaTeX-Box') "{{{
 endif "}}}
 
 if neobundle#tap('haskellmode-vim') "{{{
-  let g:haddock_browser = "x-www-browser"
+  let g:haddock_browser = "r.b"
   call neobundle#untap()
 endif "}}}
 

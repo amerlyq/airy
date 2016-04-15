@@ -31,7 +31,7 @@ translate() { [[ $1 == -n ]] && echo ${LG[$2],,} || echo ${LG[$2]^^}; }
 case "$1"
 in [0-9]) setnum $1
 ;; -[nN]) translate $1 "$(get_current)"
-;; us) setnum 0
+;; us|en) setnum 0
 ;; ru) setnum 1
 ;; ua) setnum 2
 ;;  +) setnum $(( ($(get_current) + 1) % ${#LG[@]} ))
@@ -39,5 +39,5 @@ in [0-9]) setnum $1
 # ;;  +) change 'next_layout'
 # ;;  -) change 'prev_layout'
 ;; '') get_current
-;;  *) exit 1
+;;  *) echo "Wrong arg to '$0'"; exit 1
 esac
