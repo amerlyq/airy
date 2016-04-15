@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 source ~/.shell/func.d/system
 
-lst=$(pgrep conky) && kill -TERM $lst
-conky &
+run_single conky

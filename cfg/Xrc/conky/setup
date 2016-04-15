@@ -1,6 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
+### GENS ###
+if cfgOpt r; then
+  conky -C > ~/.config/conky/conky.conf
+fi
+
 ### LINKS ###
 link "$PWD/conky.conf" ~/.config/conky/conky.conf
 
