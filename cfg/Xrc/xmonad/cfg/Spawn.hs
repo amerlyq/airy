@@ -74,6 +74,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("M-S-z"     , "r.lock")
     , ("M-o t"     , "r.touchpad-tgl")
     ],
+    -- ADD: prompt to set volume
     feedCmd "r.audio"
     [ ("M-<Home>"     , "20% unmute")
     , ("M-<Page_Up>"  , "2%+")
@@ -105,8 +106,9 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("<XF86Sleep>"     , "xset -d :0 dpms force off")
     ],
     ---- Submenus
-    inGroup "M-S-<Esc>" $ feedCmd "xbacklight -set"
-    [ (i, i ++ "0") | i <- map show [0..9]
+    inGroup "M-S-<Esc>" $ feedCmd "xbacklight -set" $ mconcat
+    [ [ (i, i ++ "0")   | i <- map show [1..9] ]
+    , [ (" 0 " ++ i, i) | i <- map show [1..9] ]
     ],
     inGroup "M-u"
     [ ("b", "r.b -h")

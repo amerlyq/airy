@@ -101,8 +101,8 @@ bindkey  -s ',d' '^Uq\n'
 bindkey -as  'q' 'Sq\n'
 bindkey -as ',d' 'Sq\n'
 # ranger
-bindkey  -s ',s' '^Us\n'
-bindkey -as  's' 'Ss\n'
+bindkey  -s ',s' '^Ur\n'
+bindkey -as  's' 'Sr\n'
 # make -- save and re-run last cmd by [,m]
 set_fast_exec_cmd 'abyss'
 bindkey    '\C-x\C-m' set-fast-exec-cmd

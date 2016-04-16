@@ -85,7 +85,7 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
   , layoutHook = avoidStruts . smartBorders $ myLayout
   , handleEventHook = myHandleEventHook
   -- Style
-  , borderWidth        = 2
+  , borderWidth        = 4
   , normalBorderColor  = "#000000"
   , focusedBorderColor = "#c050f0"
   }

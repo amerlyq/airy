@@ -1,7 +1,7 @@
 # vim: ft=sh
 # Don't launch, source only!
 
-if [ -d ~/.shell/alias.d ]; then
+if [[ -d ~/.shell/alias.d ]]; then
     for fl in ~/.shell/alias.d/*; do if [[ \
         "${SHELL##*/}" == zsh || \
         "${fl##*/}" != zsh*      \

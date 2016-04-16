@@ -16,5 +16,8 @@ fi
     git submodule -q foreach git pull -q origin master)
     # git submodule update --init --recursive --remote --merge)
 
-# AUR has deprecated package since 2012, therefore git:
-do_if -c git_inst -p fasd 'clvv/fasd' ||:
+if distro arch; then
+  aur_inst 'fasd'
+elif distro ubuntu; then
+  do_if -c git_inst -p fasd 'clvv/fasd' ||:
+fi
