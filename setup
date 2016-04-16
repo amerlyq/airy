@@ -2,10 +2,10 @@
 cd $(dirname $(readlink -m ${0}))
 [[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell
 source ~/.shell/func.d/cfgsetup
-mkdir -p "${CURR_DIR_CACHE?No}"
-echo "$THEME" > "${CURR_DIR_CACHE}/theme"
+mkdir -vp "${CURR_DIR_CACHE:?}"
+echo "$THEME" > "$CURR_DIR_CACHE/theme"
 queue="${TMPDIR:-/tmp}/mods_installing"
-mods="${CURR_DIR_CACHE?No}/mods/mods" && mkdir -p "${mods%/*}"
+mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ -L ~/.bin ]] || ln -svT "$PWD/bin" ~/.bin
 
 # ======================================================================
@@ -16,7 +16,7 @@ pretty() { sed -r "s|/home/$(whoami)|\~|g
         /^>>> /s//\n$C2\[/g; / <<<$/s//\]$CR/g
     /(C|W):\s.*/s//$C13&$CR/; /(N):\s.*/s//$C6&$CR/
         /.*\s-> L\s.*/s//$C4&$CR/; /.*\s-> C\s.*/s//$C3&$CR/;
-            /\<(E|Err|ERR):\s.*/s//$C1&$CR/
+            /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
 ";}
 # ======================================================================
 if cfgOpt r && [[ -f $mods ]]; then rm -vf "$queue"; fi
@@ -34,21 +34,10 @@ if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then
     fi
 fi
 # ======================================================================
-## Populate sensible configs
-if ((!$#)) && [[ ! -f "$queue" ]] && [[ -f ../erian/setup ]]; then
-    header "Erian private data"
-    ../erian/setup "${CFG_ARGS[@]}" | pretty
-fi
-
-# ======================================================================
 ## Setup all configs (private data must be initialized already)
 header "Airy cfgs"
-source ~/.shell/profile  # Populate erian env in case of clean install
-mkdir -vp "${CURR_DIR_CACHE:?No}"
-
-if cfgOpt r && [[ -f "$mods" ]]; then
-    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
-fi
+prf="${CURR_DIR_CACHE:?}/profile"  # Populate private env
+[[ $prf ]] && source "$prf" || echo "Wrn: not found '$prf'" | pretty
 
 frgx(){ local patt="\\b$*\\b"
     [[ "$*" =~ ^/$ ]] && patt="cfg" ||:
@@ -57,6 +46,11 @@ frgx(){ local patt="\\b$*\\b"
     echo "$patt"
 }
 filter_find() { local accept regect
+    # Source all manually linked mods from private repos
+    find -L "${CURR_DIR_CACHE:?}/mods" -type d \
+        -exec test -f '{}/install' -o -f '{}/setup' ';' \
+        -printf "$PWD/%p\n"
+
     for n in "${PKG_SKIP[@]}"; do regect+="\\|$(frgx $n)"; done
     for y in "${PKG_LIST[@]}"; do accept=$(frgx $y)
         find cfg -type d -regex "$accept" \
@@ -69,6 +63,11 @@ filter_find() { local accept regect
 PKG_SKIP+=( "${CFG_S[@]}" )
 # ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
 #   if all $@ are concrete modules (don't end in '/')
+
+if cfgOpt r && [[ -f "$mods" ]]; then
+    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
+fi
+
 if (($#)) || cfgOpt s; then
     ((!$#)) || PKG_LIST=( "$@" )
     filter_find > "$queue"
