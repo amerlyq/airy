@@ -77,10 +77,10 @@ case "$ACTION" in
  a) domtp ;;
  r) doram ;;
  o) doloop ;;
- s) case "${LBL:?No}" in
+ s) case "${LBL:?}" in
     # smbclient -L 192.168.1.1
-     android) dosamba ${ANDR_USER:?No} ${ANDR_IPL:?No} ;;
-      router) dosamba ${ROUT_USER:?No} ${ROUT_IPL:?No}/share ;;
+     android) dosamba ${ANDR_USER:?} ${ANDR_IPL:?} ;;
+      router) dosamba ${ROUT_USER:?} ${ROUT_IPL:?}/share ;;
     esac ;;
  u) sudo umount -v "$DIR"; clean || exit ;;
 #U) sudo umount -v -R "$MNT"/* && sudo rmdir -v "$MNT"/* ;;  # ERROR: No -R key
@@ -89,7 +89,7 @@ case "$ACTION" in
 esac
 
 ## WORK samba
-# wuser="${WORK_MAIL?No work mail}"; wuser="${wuser%@*}"
-#      seclab) dosamba $wuser ${SURC_SRV?No wsrv}/Exchange ;; #{Books}
+# wuser="${WORK_MAIL:?}"; wuser="${wuser%@*}"
+#      seclab) dosamba $wuser ${SURC_SRV:?}/Exchange ;; #{Books}
 #      $wuser) dosamba $wuser $SURC_SRV/$wuser ;;  #/{OR /exchange,/projects}
 #     install) dosamba $wuser s-file.${SURC_SRV#*.}/install ;;

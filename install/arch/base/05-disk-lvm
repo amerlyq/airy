@@ -3,7 +3,7 @@ source ~/sys_funcs
 is_enabled 'lvm' || exit 0
 
 ## Physical disk and LVM volume group name
-sd="${SYS_DISK:?No}"
+sd="${SYS_DISK:?}"
 
 ## If disk had lvm previously created, remove devices from memory
 #:> FIXED: pvcreate cant open exclusively mounted filesystem
@@ -47,12 +47,12 @@ vgs
 # vgchange -ay      # Makes the logical volumes known to the kernel
 
 order="${!SYS_PART[@]}"
-for i in ${order:?No}
+for i in ${order:?}
 do
-    nm="${SYS_PART[$i]:?No}"
-    sz="${SYS_SIZE[$i]:?No}"
-    fs="${SYS_FS[$i]:?No}"
-    dev="${SYS_PREF?No}${nm}"
+    nm="${SYS_PART[$i]:?}"
+    sz="${SYS_SIZE[$i]:?}"
+    fs="${SYS_FS[$i]:?}"
+    dev="${SYS_PREF:?}${nm}"
 
     [[ "$sz" =~ '%' ]] && lopt="-l $sz" || lopt="-L $sz"
     case "$fs" in swap) lopt+=' -C y' ;; esac

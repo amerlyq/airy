@@ -6,7 +6,7 @@ set -o pipefail
 over=${1:-${CURR_XKB_OVER:-vim}}
 r.xkb-has-overlay $over
 
-dst="${CURR_DIR_CACHE?No}/keylayout.xkb"
+dst="${CURR_DIR_CACHE:?}/keylayout.xkb"
 cat > "$dst" <<EOT
 xkb_keymap {
     xkb_keycodes  { include "evdev+aliases(qwerty)" };

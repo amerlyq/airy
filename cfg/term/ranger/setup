@@ -12,7 +12,7 @@ if cfgOpt u; then
 echo "USE: ranger --copy-config=all (Be Careful!), and see diff"; exit; fi
 
 
-case "${SHELL?No}" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
+case "${SHELL:?}" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
 RC="$RC $HOME/.cache/zsh/.zshrc"
 if ! grep -q "${TMPDIR:-/tmp}/ranger_cwdir" $RC 2>/dev/null; then
     echo "===========================

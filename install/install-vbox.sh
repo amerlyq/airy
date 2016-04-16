@@ -73,7 +73,7 @@ EOTINSTALL
 #####################################################
 # Non-interactive monitoring of installation (safe Ctrl-C to interrupt)
 hopt p && nc -d -U "$SERIAL" | tee "${SERIAL}.log"
-hopt r && wait ${VBOX_PID?No vbox pid}
+hopt r && wait ${VBOX_PID:?}
 
 if hopt x; then
 ## Unmount archiso from vbox and make snapshot

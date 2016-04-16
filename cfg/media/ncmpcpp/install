@@ -15,7 +15,7 @@ elif distro ubuntu; then
     git_inst -d "arybczak/ncmpcpp"
     if [[ "$GIT_IS_THE_SAME" -eq 1 ]]; then exit 0; fi
 
-    dir="${CURR_DIR_PKG?No}/ncmpcpp/"
+    dir="${CURR_DIR_PKG:?}/ncmpcpp/"
 
     # FIXED: Reason for this replace is that debian / ubuntu based distros no
     # longer have the '-mt' suffix for boost libraries

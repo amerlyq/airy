@@ -7,19 +7,19 @@ gate="${SYS_IP%.*}.1"
 
 ## Wifi
 wfcs=($(ip link | sed -rn '/^[0-9]+:\s+(w\w+):.*$/{s//\1/p}'))
-wfc=${wfcs[0]:?No}
+wfc=${wfcs[0]:?}
 
 
-cat > /etc/netctl/${nm?No} <<EOT
+cat > /etc/netctl/${nm:?} <<EOT
 Description='Home Wi-Fi static'
 Interface=$wfc
 Connection=wireless
 Security=wpa
-ESSID='${SYS_ESSID:?No}'
-Key='$(wpa_passphrase $SYS_ESSID ${SYS_WPASS:?No} |
+ESSID='${SYS_ESSID:?}'
+Key='$(wpa_passphrase $SYS_ESSID ${SYS_WPASS:?} |
     sed -rn '/.*psk=([0-9a-f]+).*/s//\1/p')'
 IP=static
-Address='${SYS_IP:?No}/24'
+Address='${SYS_IP:?}/24'
 Gateway='$gate'
 # WARNING: don't use comma between DNS, because '/etc/resolv.conf'
 # and 'gem' with bunch of other programs will become broken
@@ -37,7 +37,7 @@ echo ":: $nm is active"
 # Interface=$wfc
 # Connection=wireless
 # Security=wpa
-# ESSID="${SYS_ESSID:?No}"
+# ESSID="${SYS_ESSID:?}"
 # # Key='WirelessKey'
 # IP=static
 # # Priority=10

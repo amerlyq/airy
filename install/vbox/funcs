@@ -32,12 +32,12 @@ add_port_forward() {
 
 ### Actions ###
 do_vm_off() {
-if is_vm_exist "${1?No vbox name}" && is_vm_run "$1"; then
+if is_vm_exist "${1:?No vbox name}" && is_vm_run "$1"; then
     if [[ "$2" == "-y" ]] || amAskConfirm "Do you want shutdown VM='$1'? (y/n)"
     then VBoxManage controlvm "$1" poweroff; else return 1; fi
 fi; }
 
-do_vm_run() { is_vm_exist "${1?No vbox name}" || exit_s "There no such VM as '$1'"
+do_vm_run() { is_vm_exist "${1:?No vbox name}" || exit_s "There no such VM as '$1'"
     do_vm_off "$1" "$2" || exit_s "Rejected '$1' shutdown"
     if [[ "$2" == "-y" ]] || amAskConfirm "Launch VM='$1' is your wish? (y/n)"
     then case "$3" in  # ALT:
@@ -50,15 +50,15 @@ do_vm_run() { is_vm_exist "${1?No vbox name}" || exit_s "There no such VM as '$1
 
 ### Serial ###
 do_vm_keys() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
-    VBoxManage controlvm "${1?No vbox name}" keyboardputscancode ${line?No input}
+    VBoxManage controlvm "${1:?No vbox name}" keyboardputscancode ${line:?No input}
 done; }
 
 do_vm_socket() { sed 's/\s*#.*$//; /^\s*$/d' | while read line; do
-    printf "\n%s\n" "${line?No input}" | nc -U "${1?No vbox serial}"
+    printf "\n%s\n" "${line:?No input}" | nc -U "${1:?No vbox serial}"
 done; }
 
 do_vm_socket_copy() {
-    local serial="${1?No vbox serial}" src="${2?No src path}"
+    local serial="${1:?No vbox serial}" src="${2:?No src path}"
     if [ ! -e "$src" ]; then exit_s "Error: '$src' doesn't exist!"; fi
     # WARNING: when using netcat to transmit texts directly, don't use '&' on
     # the line ends, as it will consume all next linebreaks and merge text with

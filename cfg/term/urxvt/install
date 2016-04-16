@@ -12,5 +12,5 @@ elif distro ubuntu; then
 fi
 
 git_inst -d 'amerlyq/urxvt-ext-evolved'
-dir="${CURR_DIR_PKG?No}/urxvt-ext-evolved/"
+dir="${CURR_DIR_PKG:?}/urxvt-ext-evolved/"
 (cd "$dir" && ./setup)

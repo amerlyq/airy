@@ -3,7 +3,7 @@ source ~/sys_funcs
 is_enabled 'mbr' || exit 0
 
 ## Set MBR / GPT
-sd="${SYS_DISK:?No}"
+sd="${SYS_DISK:?}"
 parted -s -a opt $sd mklabel msdos
 lsblk $sd
 
@@ -11,12 +11,12 @@ lsblk $sd
 ## Profile for current disk
 prev_sz='1MB'
 order="${!SYS_PART[@]}"
-for i in ${order:?No}
+for i in ${order:?}
 do
-    num="${SYS_PART[$i]:?No}"
-    sz="${SYS_SIZE[$i]:?No}"
-    fs="${SYS_FS[$i]:?No}"
-    dev="${SYS_PREF?No}${num}"
+    num="${SYS_PART[$i]:?}"
+    sz="${SYS_SIZE[$i]:?}"
+    fs="${SYS_FS[$i]:?}"
+    dev="${SYS_PREF:?}${num}"
     opts="-s -a opt $sd mkpart primary"
 
     # TODO: primary only for boot, then create extended, all others -- logical
@@ -31,7 +31,7 @@ do
     ;; btrfs) mkfs.${fs} -f $dev
     ;;     *) die "Unknown FS" ;; esac
 
-    if [[ "${SYS_MNT[$i]:?No}" =~ boot$ ]]; then
+    if [[ "${SYS_MNT[$i]:?}" =~ boot$ ]]; then
         parted -s -a opt $sd set $num boot on
     fi
 

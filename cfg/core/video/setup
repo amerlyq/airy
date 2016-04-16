@@ -2,8 +2,8 @@
 source ~/.shell/func.d/cfgsetup
 
 if distro arch; then
-  case "${CURR_PROF?:No}"
-  in home)
+  case "${CURR_PROF:?}"
+  in home|neo)
     if ! id | grep -q bumblebee; then
       sudo gpasswd -a $(whoami) bumblebee
       die "!!! Re-login X session or reboot to update changes in Groups"

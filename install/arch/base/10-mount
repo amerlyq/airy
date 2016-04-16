@@ -6,15 +6,15 @@ source ~/sys_funcs
 
 
 ## Sort mount points alphabetically!
-order=( $(echo "${SYS_MNT[@]:?No}" | awk 'BEGIN{RS=" "} {a[$1]=i++} END{
+order=( $(echo "${SYS_MNT[@]:?}" | awk 'BEGIN{RS=" "} {a[$1]=i++} END{
         PROCINFO["sorted_in"]="@ind_str_asc"; for(i in a)print a[i]}') )
 
 
-for i in "${order[@]:?No}"
+for i in "${order[@]:?}"
 do
-    dev="${SYS_PREF?No}${SYS_PART[$i]:?No}"
-    dir="/mnt/${SYS_MNT[$i]:?No}"
-    fs="${SYS_FS[$i]:?No}"
+    dev="${SYS_PREF:?}${SYS_PART[$i]:?}"
+    dir="/mnt/${SYS_MNT[$i]:?}"
+    fs="${SYS_FS[$i]:?}"
     # fs="$(blkid $dev | sed -r 's/.*TYPE="(\w+)".*/\1/')"
 
     case "$fs"
@@ -25,5 +25,5 @@ do
 done
 
 ## Layout
-lsblk ${SYS_DISK:?No}
+lsblk ${SYS_DISK:?}
 echo ":: disk mounted"

@@ -7,8 +7,8 @@ echo 'Defaults:'
 term="$({ has_pr st && echo st; } ||
         { has_pr urxvt && echo urxvt; } || echo xterm)"
 
-(cd "${CURR_DIR_CACHE:?No}/bin"
-    link "r.${term:?No}"    ./r.t
+(cd "${CURR_DIR_CACHE:?}/bin"
+    link "r.${term:?}"      ./r.t
     link "r.${term}-float"  ./r.tf
     link "r.notify"         ./r.n
     link "r.qute"           ./r.b

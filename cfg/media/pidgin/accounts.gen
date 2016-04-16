@@ -52,7 +52,7 @@ if [ "$CURR_PROF" == "work_samsung" ]; then
 			<setting name='transport' type='string'>tcp</setting>
 			<setting name='useragent' type='string'>UCCAPI/15.0.4481.1000 OC/15.0.4481.1000 (Microsoft Lync)</setting>
 			<setting name='silence-suppression' type='bool'>0</setting>
-			<setting name='server' type='string'>${WORK_SRV_MSCMM?No var WORK_SRV_MSCMM}</setting>
+			<setting name='server' type='string'>${WORK_SRV_MSCMM:?}</setting>
 			<setting name='dont-publish' type='bool'>0</setting>
 		</settings>
 		<settings ui='gtk-gaim'>
@@ -67,7 +67,7 @@ if [ "$CURR_PROF" == "work" ]; then
     cat - << EOT >> $dst
 	<account>
 		<protocol>prpl-bigbrownchunx-skype</protocol>
-		<name>${MAIN_SKYPE?Need account for skype}</name>
+		<name>${MAIN_SKYPE:?}</name>
 		<alias>me</alias>
 		<statuses>
 			<status type='ONLINE' name='Online' active='true'>
@@ -187,4 +187,3 @@ echo "W: ~/.purple/accounts.xml"
 #     New mail notification: [_]
 # Advanced:
 #     Connection security:   Require encryption (SSL/TLS)
-

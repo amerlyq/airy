@@ -6,7 +6,7 @@ dir=~/.mpd
 # EXPL: playlists can't be grouped in subfolders:(
 (cd ./radio && linkdir ~/.mpd/playlists/ *)
 
-case "${CURR_PROF?:No}" in
+case "${CURR_PROF:?}" in
 # home) link "$PWD/mpd-sir.conf" "$dir/mpd.conf" ;;
    *) link "$PWD/mpd-own.conf" "$dir/mpd.conf" ;;
 esac

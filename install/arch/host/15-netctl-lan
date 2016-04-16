@@ -6,23 +6,23 @@ nm=eth_dhcp
 
 ### Network
 ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
-ifc=${ifcs[0]:?No}
+ifc=${ifcs[0]:?}
 
-cat > /etc/netctl/${nm?:No} <<EOT
+cat > /etc/netctl/${nm:?} <<EOT
 Description='General LAN dhcp connection'
-Interface=${ifc?:No}
+Interface=${ifc:?}
 Connection=ethernet
 IP=dhcp
 EOT
 
 nm=eth_static
 gate="${SYS_IP%.*}.1"
-cat > /etc/netctl/${nm?:No} <<EOT
+cat > /etc/netctl/${nm:?} <<EOT
 Description='Static LAN connection behind NAT'
-Interface=${ifc?:No}
+Interface=${ifc:?}
 Connection=ethernet
 IP=static
-Address=('${SYS_IP:?No}/24')
+Address=('${SYS_IP:?}/24')
 #Routes=('192.168.0.0/24 via 192.168.1.2')
 Gateway='$gate'
 DNS=('$gate')

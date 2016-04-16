@@ -16,7 +16,7 @@ TPAD_NM=$(xinput -list | grep Touchpad | sed "s@\W*\(\w*.*Touchpad\).*@\1@")
     echo $TPAD_NM
     echo O: [{left, middle, right}, {two-fing, three-fing}, {conf-vert-resolution, ..-horiz-...}]
     # See w/o grep -- there plenty of properties
-    xinput list-props "${TPAD_NM?No touchpad}"
+    xinput list-props "${TPAD_NM:?No touchpad}"
     #xinput list-props "$TPAD_NM" | grep Capabilities
     exit
 ;; -o|--options) synclient -l | sort; exit

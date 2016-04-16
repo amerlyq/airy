@@ -6,7 +6,7 @@ set -o pipefail
 is_assoc(){ [[ "$(declare -p $1)" =~ "declare -A" ]]; }  # && "${#SYS_SZ[@]}" == 5
  has_pr() { hash $1 >/dev/null 2>&1; }
     die() { local ret=$?; printf "%s${1+\n}" "$1"; exit $ret; }
-  wfile() { printf "%s" "${2?No text}" > "${1?No file name}"; }
+  wfile() { printf "%s" "${2:?No text}" > "${1:?No file}"; }
 wscript() { wfile "$1" "$2" && chmod u+x "$1"; }
 ## Split args on 'most' and 'last'
 # ${@:1:${#@}-1} "${@:${#@}}${L}"

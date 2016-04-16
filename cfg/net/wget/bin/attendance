@@ -8,8 +8,8 @@ parse(){ sed -r ' /(([0-9]{2}:?){3})/s//\n\1 \n/g' | sed -rn '
 }
 
 # IE: -A "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko"
-wmail="${WORK_MAIL?No mail}"
-wsrv="${WORK_SRV_ATTEND?No server}"
+wmail="${WORK_MAIL:?}"
+wsrv="${WORK_SRV_ATTEND:?}"
 get_page(){ curl -q --ntlm --user "${wmail%%@*}" "${wsrv}"; }
 
 if [[ "$1" == -v ]]; then get_page | r.b -

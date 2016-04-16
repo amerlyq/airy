@@ -6,10 +6,10 @@ VBOX_HDD=10240
 
 # Guest type and CD
 if [[ "${VNM,,}" =~ arch ]]; then patt_nm='Arch'; install_iso='archlinux'
-else exit_s "Unknown VNM='${VNM?No}' guest OS"; fi
+else exit_s "Unknown VNM='${VNM:?}' guest OS"; fi
 # Guest platform 32/64
-  if [[ "$VNM" =~ 32 ]]; then patt_nm="${patt_nm?}.*32"
-elif [[ "$VNM" =~ 64 ]]; then patt_nm="${patt_nm?}.*64"
+  if [[ "$VNM" =~ 32 ]]; then patt_nm="${patt_nm:?}.*32"
+elif [[ "$VNM" =~ 64 ]]; then patt_nm="${patt_nm:?}.*64"
 else exit_s "VNM=$VNM must contain [32|64]"; fi
 ost="$(VBoxManage list ostypes | awk '/^ID:/{a=$NF} /^Desc.*'"$patt_nm"'/{print a;quit}')"
 
@@ -18,7 +18,7 @@ case "${CURR_PLTF?}"
 in Linux)
     sudo="sudo"
     VMs="/home/media/VMs"
-    SERIAL="/tmp/vbox-${VNM?}"
+    SERIAL="/tmp/vbox-${VNM:?}"
 
 ;; MINGW)
     sudo=""
@@ -30,6 +30,6 @@ in Linux)
 esac
 
 # Search specified guest and iso
-install_iso="$(find "$VMs" -type f -name "${install_iso?}*iso")"
-vimg="${VMs?No}/${VNM}/${VNM}.vdi"
+install_iso="$(find "$VMs" -type f -name "${install_iso:?}*iso")"
+vimg="${VMs:?}/${VNM}/${VNM}.vdi"
 vbox="${vimg%.*}.vbox"
