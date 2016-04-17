@@ -26,7 +26,7 @@ fi
 if cfgOpt u; then
     # cfg=/etc/fonts/conf.d/10-scale-bitmap-fonts.conf
     # if [[ -L $cfg ]]; then rm $cfg; fi
-    sudo ln -svf /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d/70-no-bitmaps.conf
+    sudo ln -svf /etc/fonts/{conf.avail,conf.d}/70-no-bitmaps.conf
     mkfontscale ~/.fonts
     mkfontdir ~/.fonts
     sudo fc-cache -vf ~/.fonts  # fc-cache -fs >/dev/null
@@ -48,10 +48,10 @@ dst=~/.Xresources
 wstr(){ cat >> "$dst" <<<"$*"; }
 
 > "$dst"
-wstr "#define MAIN_DPI ${MAIN_DPI:-96}"
-wstr "xmessage*international: true"
-for f in "${CURR_DIR_CACHE:?No}"/Xres-*; do
-    wstr "#include \"$f\""
+wstr "#define MAIN_DPI  ${MAIN_DPI:-96}"
+wstr "#define FONT_SIZE ${FONT_SIZE:-size=10}"
+for f in "${CURR_DIR_CACHE:?}"/Xres-*; do
+  wstr "#include \"$f\""
 done
 cat "$PWD/xfontrc" >> "$dst"
 echo "W: ~/.Xresources"

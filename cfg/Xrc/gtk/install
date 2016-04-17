@@ -13,6 +13,9 @@ if distro arch; then
     # mate-themes numix-themes
     aur_inst -a "vertex-themes zukitwo-themes ceti-2-themes"
 
+    # Icons
+    pkg_inst "hicolor-icon-theme faenza-icon-theme"
+
     if grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
         # infinality supports only 96dpi
         pkg_inst -a infinality-bundle
