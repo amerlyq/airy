@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+if head -1 <<< "$3" | grep -q 'xmonad.hs'; then
+  r.n -U Error xmonad.hs
+  eval 'exec r.tf $EDITOR -c "set ft=haskell" <(cat - <<< "$3")'
+else
+  /usr/bin/xmessage "$@"
+fi

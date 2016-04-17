@@ -51,6 +51,7 @@ import XMonad.Layout.Spacing        (smartSpacing)
 import XMonad.Util.NamedScratchpad  (namedScratchpadManageHook)
 
 
+import XMonad.Config.Amer.Common     (bring)
 import XMonad.Config.Amer.EventHook  (myHandleEventHook)
 import XMonad.Config.Amer.LogHook    (myLogHook)
 import XMonad.Config.Amer.Scratchpad (myScratchpads)
@@ -144,7 +145,7 @@ myManageHook = manageSpawn <+>
     ] ] --> doIgnore
   ]
   <+> insertPosition Below Newer <+>
-  composeShift
+  composeBring
   [ ("IM", "Pidgin")
   , ("IM", "Skype")
   , ("FF", "Firefox")
@@ -164,7 +165,7 @@ myManageHook = manageSpawn <+>
     topmost =  (<+> insertPosition Master Newer)
     composeFloat = mconcat . map (--> topmost doFloat)
     -- ALT: doF (W.shift "doc")
-    composeShift = mconcat . map (\(w, x) -> (className =? x --> doShift w))
+    composeBring = mconcat . map (\(i, x) -> (className =? x --> doF (bring i)))
 
 
 main :: IO ()

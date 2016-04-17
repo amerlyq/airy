@@ -1,9 +1,12 @@
 -- vim: ts=2:sw=2:sts=2
 module XMonad.Config.Amer.Common (
-    inGroup, feedCmd
+    bring, inGroup, feedCmd
 ) where
 
 import qualified XMonad.StackSet as W
+
+-- ALT (\w -> windows (W.shift w) >> windows (W.view w))
+bring i = W.view i . W.shift i
 
 modsGrp key = zip $ (++ key) ["M-", "M-S-", "M-C-", "M-C-S-"]
 inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)

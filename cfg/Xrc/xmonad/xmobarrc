@@ -54,7 +54,10 @@ Config {
           \ %bright%\
         \</action></action></action>\
   \<fc=#cc00cc>  </fc>\
-    \<action=`r.xkb-lang 0` button=3><action=`r.xkb-lang +` button=1>%lang% %leds%</action></action>\
+    \<action=`r.xkb-lang 0` button=3>\
+      \<action=`r.xkb-lang +` button=1>\
+        \%lang% %leds% \
+      \</action></action>\
     \%date% "
 , commands     =
 [ Run Date "<fc=#fd971f>%d.%m.%y</fc> ⌚ <fc=#ffffff>%H:%M</fc>" "date" 50

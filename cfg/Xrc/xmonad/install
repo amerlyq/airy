@@ -3,7 +3,8 @@ source ~/.shell/func.d/packages
 
 
 if distro arch; then
-    pkg_inst 'xmonad xmonad-contrib xorg-xmessage wmctrl'  # xmobar
+    # DEPRECATED: xorg-xmessage -- use r.vim-xmessage
+    pkg_inst 'xmonad xmonad-contrib wmctrl'  # xmobar
     # pkg_inst 'haskell-unordered-containers'
 
     [[ -d ~/.cabal/bin ]] || echo "Err: Re-login session to add ~/.cabal/bin/xmobar into PATH"

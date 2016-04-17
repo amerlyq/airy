@@ -50,7 +50,7 @@ alias please='sudo $(fc -ln -1)'
 alias kill='\kill'  # FIXED pid completion by process name
 
 ## Shorts
-(( $+commands[jcalc] )) && alias jc='noglob jcalc'
+if (($+commands[jcalc])); then alias jc='noglob jcalc'; fi
 
 ## Std-like
 # alias agi='noglob agi'
@@ -81,9 +81,9 @@ psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
 # time stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # HIST_STAMPS="mm/dd/yyyy"
-case "$HIST_STAMPS" in
-    "mm/dd/yyyy") alias history='fc -fl 1' ;;
-    "dd.mm.yyyy") alias history='fc -El 1' ;;
-    "yyyy-mm-dd") alias history='fc -il 1' ;;
-               *) alias history='fc -l 1'  ;;
+case "$HIST_STAMPS"
+in "mm/dd/yyyy") alias history='fc -fl 1'
+;; "dd.mm.yyyy") alias history='fc -El 1'
+;; "yyyy-mm-dd") alias history='fc -il 1'
+;;            *) alias history='fc -l 1'
 esac

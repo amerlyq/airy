@@ -12,6 +12,7 @@ import XMonad.StackSet              (view, shift)
 import XMonad.Actions.CopyWindow    (copy)
 -- import XMonad.Layout.IndependentScreens (onCurrentScreen, workspaces')
 
+import XMonad.Config.Amer.Common    (bring)
 
 all = concat
   [ primary
@@ -42,6 +43,6 @@ aliases = concat
 actions =
   [ ("M-"     , view)
   , ("M-C-"   , shift)
-  , ("M-S-"   , \i -> view i . shift i)  -- ALT (\w -> windows (W.shift w) >> windows (W.view w))
+  , ("M-S-"   , bring)
   , ("M-C-S-" , copy)
   ]
