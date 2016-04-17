@@ -3,6 +3,8 @@ source ~/.shell/func.d/cfgsetup
 [[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 if cfgOpt u; then (
-    cd "${CURR_DIR_PKG:?No}/st" && git checkout amerlyq
-    FNSZ="$FONT_SIZE" THEME="$THEME" ./install -mbi
+  cd "${CURR_DIR_PKG:?No}/st" && git checkout amerlyq
+
+  fs=$(( ${MAIN_DPI:?} * 9/72 + 1))
+  FNSZ="$fs" THEME="$THEME" ./install -mbi
 ) fi

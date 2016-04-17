@@ -103,7 +103,6 @@ MAIN_SKYPE="<username>"
 
 ### HW ###
 MAIN_DPI=112
-FONT_SIZE='pixelsize=15'
 ```
 
 Profiles can be nested/inherited.
@@ -120,6 +119,6 @@ Example how to use profile vars in your own modules/scripts:
 #!/bin/bash -e
 source ~/.shell/profile
 ...
-./gtk.gen ${FONT_SIZE:?}
+./muttprf.gen ${MAIN_MAIL:?}
 ./gtk-theme.gen "${CURR_DIR_CACHE:?}/theme"
 ```

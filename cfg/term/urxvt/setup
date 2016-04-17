@@ -29,7 +29,6 @@ dst="${CURR_DIR_CACHE:?No}/Xres-urxvt"
 # size=11
 cat > "$dst" << EOT
 #define LETTER_SPACE $(distro arch && ${LETTER_SPACE:-0} || LETTER_SPACE=-1)
-#define FONT_SIZE ${FONT_SIZE:-pixelsize=14}
 #include "$HOME/.urxvt/etc/xtermrc"
 #include "$HOME/.urxvt/urxvtrc"
 #include "$(if [[ -f ~/.cache/airy/theme-urxvt ]]

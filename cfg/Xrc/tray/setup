@@ -3,4 +3,10 @@ source ~/.shell/func.d/cfgsetup
 [[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link -t ~/.config  stalonetrayrc
+dst=~/.config/stalonetrayrc
+link -c stalonetrayrc "$dst"
+
+iw=$(( ${MAIN_DPI:?} * 9/72 + 2 ))
+sed -ri '
+  /^(icon_size).*/s//\1 '$iw'/
+' "$dst"

@@ -48,8 +48,7 @@ dst=~/.Xresources
 wstr(){ cat >> "$dst" <<<"$*"; }
 
 > "$dst"
-wstr "#define MAIN_DPI  ${MAIN_DPI:-96}"
-wstr "#define FONT_SIZE ${FONT_SIZE:-size=10}"
+# wstr "#define MAIN_DPI  ${MAIN_DPI:-96}"
 for f in "${CURR_DIR_CACHE:?}"/Xres-*; do
   wstr "#include \"$f\""
 done
