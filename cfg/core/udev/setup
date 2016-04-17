@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+[[ ${CURR_PROF:?} =~ neo ]] || return
+
+### LINKS ###
+if cfgOpt u; then
+  link -st /etc/udev/rules.d \
+    70-wifi-powersave.rules
+fi

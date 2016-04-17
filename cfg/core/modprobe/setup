@@ -1,0 +1,13 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+[[ ${CURR_PROF:?} =~ neo ]] || return
+
+### LINKS ###
+if cfgOpt u; then
+  link -st /etc/modprobe.d \
+    alsa-base.conf i915.conf \
+    audio_powersave.conf iwlwifi.conf
+
+elif cfgOpt c; then
+  modprobe -c | grep i915  # snd_hda_intel\|snd-hda-intel
+fi

@@ -1,0 +1,16 @@
+DEBUG
+	CHECK xorg.conf errors by running 'xinit -- :2' in vt5 (any other)
+
+Values for MatchVendor, etc
+	SEE http://www.reactivated.net/writing_udev_rules.html
+		: Especially 'Finding suitable information from sysfs'.
+	SEE 'man udevadm'
+	EXPL: https://lists.freedesktop.org/archives/xorg/2014-December/056991.html
+
+	List all attributes
+		xinput -list-props 11
+			:> /dev/input/event13
+		udevadm info --query=all --path=$(udevadm info --query=path --name=/dev/input/event13)
+		: But the strings for the Vendor and the Product should be the same as
+		: for the MatchVendor and MatchProduct strings in the InputClass
+		: section of the xorg config file.

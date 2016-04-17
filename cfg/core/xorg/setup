@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+[[ ${CURR_PROF:?} =~ neo ]] || return
+
+### LINKS ###
+if cfgOpt u; then
+  link -st /etc/X11/xorg.conf.d \
+    90-monitor.conf  # 20-intel.conf
+fi
