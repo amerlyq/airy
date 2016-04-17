@@ -5,15 +5,15 @@ source ~/.shell/func.d/packages
 
 nvidia() { pkg_inst "nvidia nvidia-utils lib32-nvidia-utils"; }
 intel() { pkg_inst "xf86-video-intel libva libva-intel-driver"
-          pkg_inst "mesa mesa-libgl lib32-mesa-libgl"; }
+          pkg_inst "mesa mesa-demos mesa-libgl lib32-mesa-libgl"; }
 
 if distro arch; then
-    case "${CURR_PROF?:No}"
+    case "${CURR_PROF:?}"
     in laptop|work) intel
-    ;; home) intel && nvidia  ## Optimus:
+    ;; home|neo) intel && nvidia  ## Optimus:
         pkg_inst "bumblebee primus lib32-primus lib32-virtualgl"
-        # xorg-server-devel  NO: lib32-nvidia-libgl nvidia-libgl
-        # ADD: vulkan
+        pkg_inst "bbswitch"  # Only for laptops
+        pkg_inst vulkan-intel  # Only neo
     ;; kedi) pkg_inst "nvidia-340xx nvidia-340xx-libgl lib32-nvidia-340xx-libgl"
     ;; esac
 
