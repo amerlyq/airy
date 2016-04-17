@@ -2,9 +2,28 @@
 source ~/.shell/func.d/cfgsetup
 
 ## To disable default notification daemon
-# on Lubuntu: org.xfce.xfce4-notifyd.Notifications.service
-DFL=/usr/share/dbus-1/services/org.freedesktop.Notifications.service  # Ubuntu
-[[ -f "$DFL" ]] && sudo mv -n $DFL{,.disabled}
+if ! distro arch; then
+  dfl=/usr/share/dbus-1/services/
+  if distro ubuntu; then
+    dfl+=org.freedesktop.Notifications.service
+  elif distro lubuntu; then
+    dfl+=org.xfce.xfce4-notifyd.Notifications.service
+  fi
+  [[ ! -f $dfl ]] || sudo mv -n $dfl{,.disabled}
+fi
 
-### LINKS ###
-link "$PWD/dunstrc" ~/.config/dunst/dunstrc
+### GENS ###
+dst=~/.config/dunst/dunstrc
+link -c dunstrc "$dst"
+
+# BUG: external monitor -- different dpi
+fs=$(( (${MAIN_DPI:?} + 5) / 10 ))
+iw=$(( ((${MAIN_DPI:?} +8)/16 +3)/6 * 16 ))
+gw=$(( $(r.Xrc -w) * 2/5 ))
+sed -ri '
+  /^(\s+font = \w+).*/s//\1 '$fs'/
+  /^(\s+geometry = ")[0-9]+(x.*)/s//\1'$gw'\2/
+  /^(\s+icon_folders = ).*/s/16/'$iw'/g
+' "$dst"
+
+! grep_prs dunst || ./run

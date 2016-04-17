@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+# ALT: xwininfo
+dim() { xdpyinfo | awk '$1 ~ /dimensions/ {
+  split($2,arr,"x"); print '"$1"'
+}'; }
+
+case "$1"
+in  -w) dim 'int(arr[1])'
+;;  -h) dim 'int(arr[2])'
+;; -wh) dim 'int(arr[1]),int(arr[2])'
+esac

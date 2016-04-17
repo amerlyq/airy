@@ -1,8 +1,10 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
-
-# CHECK:(alternatives)
-#   https://wiki.archlinux.org/index.php/Desktop_notifications
-
 # from j4tools for i3 -- notifier in top-right corner
-pkg_inst "dunst"
+
+if distro arch; then
+  aur_inst 'dunst-git'  # OLD: dunst+dunstify -- 2014.07.29
+
+elif distro ubuntu; then
+  pkg_inst 'dunst'
+fi
