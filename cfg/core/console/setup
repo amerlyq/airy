@@ -1,0 +1,27 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+# ALT: sudo loadkeys "$dst"
+# SEE: man vconsole.conf
+
+### GENS ###
+if cfgOpt u; then
+
+  kmap='/usr/local/etc/vconsole.map'
+  link -sc vconsole.map "$kmap"
+
+  cfg=/etc/vconsole.conf
+  sudo tee "$cfg" <<<"KEYMAP=$kmap"
+  case ${CURR_PROF:?} in neo)
+    # ALT: LatGrkCyr-12x22, latarcyrheb-sun32
+    # WARNING: don't use FONT_MAP -- <BS> won't work!
+    sudo tee -a "$cfg" <<<"FONT=ter-u32n"
+  esac
+
+  # FIXED: apply fonts in appropriate moment
+  unit=/usr/lib/systemd/system/systemd-vconsole-setup.service
+  aft='After=sysinit.target'
+  bef='Before=shutdown.target'
+  grep -qxF "$bef" "$unit" || sudo sed -ri "/^Before=/d; /^\[Unit\]$/a\\$bef" "$unit"
+  grep -qxF "$aft" "$unit" || sudo sed -ri "/^After=/d;  /^\[Unit\]$/a\\$aft" "$unit"
+fi
