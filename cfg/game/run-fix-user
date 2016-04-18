@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+lst=(
+  'Desktop'
+  'My Documents'
+  'My Music'
+  'My Pictures'
+  'My Videos'
+)
+
+for L in "${lst[@]}"; do
+  [[ -L $L || ! -e $L ]]
+  rm "$L"
+  ln -svf /home/media/_play/_saves "$L"
+done

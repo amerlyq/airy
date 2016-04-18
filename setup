@@ -49,7 +49,7 @@ filter_find() { local accept regect
     # Source all manually linked mods from private repos
     find -L "${CURR_DIR_CACHE:?}/mods" -type d \
         -exec test -f '{}/install' -o -f '{}/setup' ';' \
-        -printf "$PWD/%p\n"
+        -printf "%p\n"
 
     for n in "${PKG_SKIP[@]}"; do regect+="\\|$(frgx $n)"; done
     for y in "${PKG_LIST[@]}"; do accept=$(frgx $y)
