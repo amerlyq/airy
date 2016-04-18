@@ -1,12 +1,30 @@
-#!/bin/bash -e
+#!/usr/bin/env perl
 
-# ALT: xwininfo
-dim() { xdpyinfo | awk '$1 ~ /dimensions/ {
-  split($2,arr,"x"); print '"$1"'
-}'; }
+# CHECK if w/o 90-monitor xrandr will return correct WxH
+# BAD ALT xwininfo, xdpyinfo
 
-case "$1"
-in  -w) dim 'int(arr[1])'
-;;  -h) dim 'int(arr[2])'
-;; -wh) dim 'int(arr[1]),int(arr[2])'
-esac
+use strict;
+use warnings;
+use strict 'vars';
+use Getopt::Std;
+
+my @state=();
+my %opts=();
+my $fg='owhxyWHdD';
+getopts($fg.'k', \%opts);
+
+foreach ( qx(xrandr -q) ) {
+  next unless $_ =~ m/^(\w+) connected (\d+)x(\d+)\+(\d+)\+(\d+) .*? (\d+)mm x (\d+)mm$/;
+  push @state, { 'o'=>$1, 'w'=>$2, h=>$3, x=>$4, y=>$5, W=>$6, H=>$7,
+    d=>int($2*25.4/$6), D=>int($3*25.4/$7) };
+}
+# TODO: sort keys by output type and place primary as very first
+
+# HACK limit to first output. FIXME DEV general way for multihead.
+foreach my $mon ($state[0]) {
+  local *pr = sub { print $_[0],"=" if $opts{'k'}; print "$mon->{$_[0]}\n" };
+  local *pro = sub { pr($_) if $opts{$_} };
+
+  pr('o') unless (keys %opts);
+  foreach (split //,$fg) { pro($_); }
+}
