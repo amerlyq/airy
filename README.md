@@ -29,9 +29,11 @@ Need more modules from some subdirectory?
 ./setup -u /  # choose currently preferred applications
 ./setup -iu   # once a week -- installs packages and update their configs
 ./setup -riu  # after adding new module or changing mods list in profile
-./setup -iu dev          # install all modules from 'cfg/dev/*'
-./setup -iu dev/         # launch setup/install from 'cfg/dev' only
-./setup -iu hex firefox  # install concrete modules with exact names anywhere
+# Install all modules:
+./setup -iu  dev         # with exact name '*/dev'
+./setup -iu  dev/        # all inside '*/dev/*' w/o 'dev' itself
+./setup -iu /dev/        # only 'cfg/dev' in root dir
+./setup -iu hex firefox  # multiple from any subdir
 ```
 > Better idea would be to create your own mods profile and keep it safe.
 
@@ -93,8 +95,8 @@ These text files usually non-executable and sourced by scripts explicitly.
 ```bash
 # vim: ft=sh
 CURR_PROF=home
-PKG_LIST=(shell shell/ core core/init io/audio io/touchpad io/logitech dev dev/python dev/ruby dev/etc dev/git dev/hg term/ re re/ Xrc Xrc/ net/ media media/ elinks firefox qute w3m game/ /)
-PKG_SKIP=(sql latex  nfs tftp skype serial xmind urxvt i3)
+PKG_LIST=(shell shell/ dev dev/ term/ xorg xorg/ net/ /)
+PKG_SKIP=(sql latex nfs tftp skype serial xmind urxvt i3)
 
 ### Git ###
 MAIN_NAME="<Full Name>"
@@ -105,12 +107,19 @@ MAIN_SKYPE="<username>"
 MAIN_DPI=112
 ```
 
+You can take advantage of bash expansion and compose more complex package set:
+```bash
+PKG_LIST=( /shell{,/} /core{,/init} /io/{audio,touchpad,logitech} /dev{,/{python,ruby,etc,git,hg}} /{term,re,xorg,net,media,browsers}{,/} /game / )
+
+PKG_SKIP=(/browser/{surf,uzbl,vimb} /dev/{eclipse,java,latex,sql,tizen} /io/{jtag,serial} /media/{skype,xmind} /net/{nfs,synergy,tftp} /term/urxvt /xorg/i3)
+```
+
 Profiles can be nested/inherited.
 This allows to distribute settings and nicely reuse parts of configs for similar hosts.
 ```bash
 source $CURR_DIR_PRF/home || return
 CURR_PROF=home_vbox
-PKG_SKIP+=( Xrc )
+PKG_SKIP+=( /browser/ )
 MAIN_MAIL="vboxuser@email.com"
 ```
 

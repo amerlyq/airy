@@ -170,11 +170,12 @@ myManageHook = manageSpawn <+>
     composeBring = mconcat . map (\(i, x) -> (className =? x --> doF (bring i)))
 
 
-getXrc f = fmap read (runProcessWithInput "r.Xrc" [f] "")
+catchStdout c f = fmap read (runProcessWithInput c [f] "")
+getXorg = catchStdout "r.xorg"
 
 main :: IO ()
 main = do
-  dpi <- getXrc "-d"
+  dpi <- getXorg "-d"
   h <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
   xmonad $ ewmh myCfg { logHook = myLogHook h
   , borderWidth = fromIntegral $ round (dpi / 60)
