@@ -12,9 +12,9 @@ in t) EXPIRE=$OPTARG
 ;; U) CMD+=( --urgency=critical )
 ;; i) CMD+=( --icon=$OPTARG )  # [,icon,...]
 ;; p) CMD+=( -h int:value:$OPTARG )
-;; a|c|i) ARGS+=( $o $OPTARG )
+;; a|c|i) ARGS+=( -$o $OPTARG )
 ;; *) exit; esac; done; shift $((OPTIND-1))
-[[ ${CMD[*]} =~ urgency=critical ]] || CMD+=( --expire-time=$(($EXPIRE*100)) )
+[[ ${CMD[*]} =~ urgency=critical ]] || CMD+=( -t $(($EXPIRE*100)) )
 
 # CMD+=( -h string:bgcolor:\#ffffff \
 #        -h string:fgcolor:\#000000 )

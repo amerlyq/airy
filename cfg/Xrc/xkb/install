@@ -7,6 +7,9 @@ source ~/.shell/func.d/packages
 # ALT:(xcape) https://gitlab.com/at-home-modifier/at-home-modifier-evdev/wikis/home
 #   -- aur_inst xf86-input-evdev-ahm
 
+# Obsolete by kbdd + dbus-send (set_layout), qdbus (notification)
+# git_install 'ierton/xkb-switch'
+
 if distro arch; then
   aur_inst 'xkbset'  # NOTE: only yaourt?
   aur_inst 'kbdd-git xcape xorg-xev'

@@ -3,7 +3,7 @@
 # So, in mutt it is just a matter of hitting v to view the attached HTML and
 # then m to send it to mailcap. For convenience, I bind Enter to that function in muttrc.
 #text/html; vimprobtab.sh %s &; test=test -n "$DISPLAY"; needsterminal;
-text/html; vimb %s; test=test -n "$DISPLAY"; nametemplate=%s.html
+text/html; r.b %s; test=test -n "$DISPLAY"; nametemplate=%s.html
 text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
 # text/html; elinks -dump %s ; copiousoutput
 application/*; ~/.config/ranger/scope.sh %s; copiousoutput

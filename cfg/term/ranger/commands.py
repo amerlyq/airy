@@ -37,8 +37,10 @@ class ag(Command):
         return patt[1:-1] if ag.qarg.match(patt) else patt
 
     def _aug_vim(self, iarg, comm='Ag'):
-        patt = self._quot(self._arg(iarg))
-        cmd = ' '.join([comm, patt] + self._sel())
+        # patt = self._quot(self._arg(iarg))
+        patt = self._arg(iarg)  # No need to quote in new ag.vim
+        # FIXME:(add support)  'AgPaths' + self._sel()
+        cmd = ' '.join([comm, patt])
         cmdl = [ag.editor, '-c', cmd, '-c', 'only']
         return (cmdl, '')
 
@@ -68,6 +70,7 @@ class ag(Command):
 
     def execute(self):
         cmd, flags = self._choose()
+        self.fm.notify(cmd)
         self.fm.execute_command(cmd, flags=flags)
 
     def tab(self):
