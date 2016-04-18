@@ -9,6 +9,7 @@ if has('vim_starting')
     exec printf('!git clone --depth=1 %s',
           \ 'https://github.com/Shougo/neobundle.vim') $NEOBUNDLE
   endif
+  " EXPL: plugins must be loaded first to decide individually 'b:did_ftplugin'
   set runtimepath^=$NEOBUNDLE
 endif
 

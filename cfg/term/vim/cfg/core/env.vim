@@ -8,6 +8,8 @@ if isdirectory($XDG_CONFIG_HOME.'/vim')
 else
   let $CACHE=expand('~/.cache/vim')
 endif
+" SEE:(paths order) :h 'runtimepath'
+set runtimepath^=$CACHE  " For ./spell and 'before'
 
 "" Create cache dirs
 for d in split('bundle bckp spell swap undo view')  " easytags.d
@@ -27,9 +29,6 @@ set backupdir=$CACHE/bckp,$FALLBACK
 set backup writebackup backupcopy=auto
 " View
 set viewdir=$CACHE/view
-" Spell
-" set runtimepath+=$VIMHOME
-set runtimepath^=$CACHE  " For ./spell
 
 if v:version >= 703
   set undodir=$CACHE/undo//,$FALLBACK
