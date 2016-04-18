@@ -7,7 +7,7 @@ state=$(xinput list-props $id | awk '/Device Enabled/{print$NF}')
 
 if ((state)); then
   xinput disable $id
-  r.n -U Touchpad Disabled
+  r.n -Ut2 Touchpad Disabled
 else
   xinput enable $id
   r.n Touchpad Enabled

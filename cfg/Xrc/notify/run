@@ -2,7 +2,6 @@
 
 # Format: <b>Music</b>\n<i>You have 15s to choose</i>
 # <a href=a.html></a>
-EXPIRE=12
 ARGS=( )
 CMD=( notify-send )
 
@@ -14,7 +13,10 @@ in t) EXPIRE=$OPTARG
 ;; p) CMD+=( -h int:value:$OPTARG )
 ;; a|c|i) ARGS+=( -$o $OPTARG )
 ;; *) exit; esac; done; shift $((OPTIND-1))
-[[ ${CMD[*]} =~ urgency=critical ]] || CMD+=( -t $(($EXPIRE*100)) )
+
+if [[ ! ${CMD[*]} =~ urgency=critical || $EXPIRE ]]; then
+  CMD+=( -t $((${EXPIRE:-12}*100)) )
+fi
 
 # CMD+=( -h string:bgcolor:\#ffffff \
 #        -h string:fgcolor:\#000000 )

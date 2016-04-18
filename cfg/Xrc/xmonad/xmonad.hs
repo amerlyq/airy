@@ -7,11 +7,10 @@ import Data.List     (isPrefixOf)
 import Data.Ratio    ((%))
 import Data.Default  (def)
 import System.IO
-import System.Process (readProcess)
 
 ---- Core
 import XMonad                       -- (float, kill, spawn, refresh, restart, doFloat, workspaces, windows, withFocused, sendMessage, Resize(Shrink, Expand), IncMasterN)
-import XMonad.Util.Run              (spawnPipe)
+import XMonad.Util.Run              (spawnPipe, runProcessWithInput)
 import XMonad.Util.EZConfig         (mkKeymap, checkKeymap)
 import XMonad.ManageHook            (className)
 
@@ -171,11 +170,12 @@ myManageHook = manageSpawn <+>
     composeBring = mconcat . map (\(i, x) -> (className =? x --> doF (bring i)))
 
 
+getXrc f = fmap read (runProcessWithInput "r.Xrc" [f] "")
+
 main :: IO ()
 main = do
-  -- BUG: crash X
-  -- dpi <- readProcess "r.Xrc" ["-d"] ""
+  dpi <- getXrc "-d"
   h <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
   xmonad $ ewmh myCfg { logHook = myLogHook h
-  , borderWidth = fromIntegral $ round (read "102" / 50)
+  , borderWidth = fromIntegral $ round (dpi / 60)
   }

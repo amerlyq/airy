@@ -141,6 +141,14 @@ Try only:
 
 # ========================================================
 
+Sample rate
+	arecord -f dat -r 60000 -D hw:0,0 -d 5 test.wav
+		: take notice on 'got = 48000'
+	sudo sed -ri '/; (default-sample-rate =).*/s//\1 48000/' /etc/pulse/daemon.conf
+	pulseaudio -k
+	pulseaudio --start
+
+# ========================================================
 Bugfix: Giving MPD proper permissions
 https://help.ubuntu.com/community/MPD
 
