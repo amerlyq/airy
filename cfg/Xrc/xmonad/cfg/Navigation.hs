@@ -39,6 +39,8 @@ doScreen d f = do
 keys = screens ++ panels ++ markNgo
 
 -- TRY:THINK:DEV: swap workspaces backNforth -- so I could completely move primary wksp into secondary
+-- DEV: backNforth -- return to last non empty (useful only rarely -- after closing all windows on wksp)
+-- DEV: backNforth -- move through whole history instead toggling only two last
 screens = [ (m ++ k, b f) | (k, b) <- groups, (m, f) <- actions]
 groups =
   [ ("a", backNforth)

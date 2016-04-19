@@ -5,6 +5,6 @@ source ~/.shell/func.d/cfgsetup
 if cfgOpt u; then (
   cd "${CURR_DIR_PKG:?No}/st" && git checkout amerlyq
 
-  fs=$(( ${MAIN_DPI:?} * 9/72 + 1))
-  FNSZ="$fs" THEME="$THEME" ./install -mbi
+  # [[ $FONT_ST ]] || FONT_ST=$(( ${MAIN_DPI:?} * 9/72 + 1))
+  FNSZ="$FONT_ST" THEME="$THEME" ./install -mbi
 ) fi

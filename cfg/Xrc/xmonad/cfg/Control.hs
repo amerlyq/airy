@@ -24,6 +24,7 @@ import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (MirrorResize(MirrorShrink, MirrorExpand))
 
 import XMonad.Config.Amer.Common     (inGroup)
+import XMonad.Config.Amer.Layout     (MyTransformers(STRUTS, GAPS))
 import XMonad.Config.Amer.Navigation (nextNonEmpty)
 
 -- | Get params from current window
@@ -89,7 +90,10 @@ movef =
 layouts =
   [ ("M-n"      , sendMessage NextLayout)
   , ("M-S-n"    , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
-  , ("M-f"      , sendMessage (Toggle FULL) >> sendMessage ToggleStruts)
+  , ("M-f"      , sendMessage $ Toggle FULL)  -- sendMessage (SetStruts [] [D]) >>
+  , ("M-S-f"    , sendMessage ToggleStruts)
+  , ("M-C-f"    , sendMessage $ Toggle STRUTS)
+  , ("M-S-C-f"  , sendMessage $ Toggle GAPS)
   , ("M-/"      , sendMessage $ Toggle MIRROR)
   , ("M-S-/"    , sendMessage $ Toggle REFLECTX)
   ]

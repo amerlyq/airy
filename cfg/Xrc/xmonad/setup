@@ -12,7 +12,7 @@ lib=~/.xmonad/lib/XMonad
 if cfgOpt u; then
   dst=~/.xmonad/xmobarrc
   link -c xmobarrc "$dst"
-  trayw=$(( 3 * (${MAIN_DPI:?} * 9/72 + 2) ))
+  trayw=$(( 3 * (${MAIN_DPI:?} * 9/72 + 4) + 6 ))
   sed -ri '/^(, position\s*= BottomP 0).*/s//\1 '$trayw'/' "$dst"
 
   dst="$lib/Hooks"

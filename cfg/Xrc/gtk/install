@@ -16,7 +16,8 @@ if distro arch; then
     # Icons
     pkg_inst "hicolor-icon-theme faenza-icon-theme"
 
-    if grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
+    if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
+      grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
         # infinality supports only 96dpi
         pkg_inst -a infinality-bundle
     fi

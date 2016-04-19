@@ -43,16 +43,16 @@ import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
 import XMonad.Layout.PerWorkspace   (onWorkspace)
 import XMonad.Layout.MultiToggle    (mkToggle, Toggle(..), single, (??), EOT(..))
-import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDERS))
+import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR))
 -- decorators
 import XMonad.Layout.LayoutHints    (layoutHintsToCenter, hintsEventHook)  -- honor size hints
 import XMonad.Layout.NoBorders      (smartBorders)  -- no borders on fullscreen
-import XMonad.Layout.Spacing        (smartSpacing)
 -- extension
 import XMonad.Util.NamedScratchpad  (namedScratchpadManageHook)
 
 
 import XMonad.Config.Amer.Common     (bring)
+import XMonad.Config.Amer.Layout     (MyTransformers(STRUTS, GAPS))
 import XMonad.Config.Amer.EventHook  (myHandleEventHook)
 import XMonad.Config.Amer.LogHook    (myLogHook)
 import XMonad.Config.Amer.Scratchpad (myScratchpads)
@@ -84,10 +84,10 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
   , manageHook  = myManageHook <+> manageHook def
   -- layoutHook def
   -- layoutHintsToCenter
-  , layoutHook = avoidStruts . smartBorders $ myLayout
+  , layoutHook = myLayout
   , handleEventHook = myHandleEventHook
   -- Style
-  , borderWidth        = 4
+  , borderWidth        = 2
   , normalBorderColor  = "#000000"
   , focusedBorderColor = "#c050f0"
   }
@@ -95,9 +95,11 @@ myCfg = withUrgencyHook NoUrgencyHook $ def
 
 myLayout = smartBorders
     . ModifiedLayout myOverlay
-    -- . smartSpacing 3  -- I'm not sure yet if it nice or not
     -- . onWorkspace (workspaces myCfg !! 4) Full
-    . mkToggle (NOBORDERS ?? FULL ?? EOT)
+    . mkToggle (single STRUTS)
+    . mkToggle (single FULL)
+    . avoidStruts
+    . mkToggle (single GAPS)
     . mkToggle (single MIRROR)
     . mkToggle (single REFLECTX)
     . onWorkspace "IM" imLayer
