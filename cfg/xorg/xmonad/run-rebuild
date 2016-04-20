@@ -1,0 +1,7 @@
+#!/bin/bash -e
+source ~/.shell/func.d/system
+
+r.n xmonad recompile
+xmonad --recompile
+! running_X || xmonad --restart
+r.n OK

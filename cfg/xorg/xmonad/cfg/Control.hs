@@ -32,7 +32,7 @@ import XMonad.Config.Amer.Navigation (nextNonEmpty)
 wkspName = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ fromMaybe "" $ W.findTag w ws) :: Query String
 isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ member w $ W.floating ws) :: Query Bool
 whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
-    then fX else nextNonEmpty W.view >> spawn "r.n Non-empty" :: X()
+    then fX else nextNonEmpty W.view >> spawn "r.n 'Shutdown warning:' 'Close all windows'" :: X()
 
 keys = focusing ++ swap ++ edit ++ movef ++ layouts ++ system
 
@@ -107,8 +107,8 @@ system =
   inGroup "M-S-<Esc>"  -- xmonad
     [ ("o", whenWindowsClosed $ io exitSuccess)
     , ("r", whenWindowsClosed $ spawn "systemctl reboot")
-    , ("t", whenWindowsClosed $ spawn "systemctl poweroff")
+    , ("t", whenWindowsClosed $ spawn "cd ~/aura && r.git synced && systemctl poweroff || r.n 'Shutdown warning:' 'Sync git in ~/aura/*'")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
-    , ("j", spawn "r.n xmonad recompile && xmonad --recompile && xmonad --restart && r.n OK")
+    , ("j", spawn "r.xmonad-rebuild")
     ]

@@ -15,11 +15,11 @@ if cfgOpt u; then
   trayw=$(( 3 * (${MAIN_DPI:?} * 9/72 + 4) + 6 ))
   sed -ri '/^(, position\s*= BottomP 0).*/s//\1 '$trayw'/' "$dst"
 
+  # THINK ServerMode.hs is too old in pacman/core, but wget is slow.
   dst="$lib/Hooks"
   url='http://code.haskell.org/XMonadContrib/XMonad/Hooks/ServerMode.hs'
   (mkdir -p "$dst" && wget "$url" -O "$dst/ServerMode.hs")
   (cd "$lib/Util/Amer" && ghc --make ctl.hs)
 
-  xmonad --recompile
-  ! running_X || xmonad --restart
+  fork_m r.xmonad-rebuild
 fi
