@@ -11,8 +11,9 @@ source ~/.shell/func.d/packages
 # git_install 'ierton/xkb-switch'
 
 if distro arch; then
-  aur_inst 'xkbset'  # NOTE: only yaourt?
-  aur_inst 'kbdd-git xcape xorg-xev'
+  pkg_inst -p 'xev' xorg-xev
+  aur_inst xcape xkbset  # NOTE: only yaourt?
+  aur_inst -p 'kbdd' kbdd-git
 
 elif distro ubuntu; then
   pkg_inst kbdd

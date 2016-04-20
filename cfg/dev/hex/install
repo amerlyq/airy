@@ -19,14 +19,14 @@ pkg_inst dhex
 # ==== X only ====
 has_pr X || die
 
-pkg_inst "meld bless"
+pkg_inst meld bless
 
 if distro arch; then
     aur_inst 'bvi'
     aur_inst -p 'wxHexEditor' wxhexeditor-git
 
 elif distro ubuntu; then
-    pkg_inst -p 'wxHexEditor' "wxhexeditor"
+    pkg_inst -p 'wxHexEditor' wxhexeditor
 fi
 
 # PM="wxHexEditor.tar.bz2"

@@ -4,11 +4,10 @@ source ~/.shell/func.d/packages
 #| tig  | git cli interactive (instead of gitk) http://jonas.nitro.dk/tig/manual.html
 
 if distro arch; then
-    pkg_inst "git tig"
+    pkg_inst git tig
 elif distro ubuntu; then
-    pkg_inst "git git-core git-doc tig"  #subversion
+    pkg_inst git git-core git-doc tig  #subversion
     if has_pr X; then pkg_inst "git-gui gitk"; fi
 fi
 
-gem_inst 'git-up'
-
+gem_inst git-up

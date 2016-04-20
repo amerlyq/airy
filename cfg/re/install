@@ -6,13 +6,13 @@ source ~/.shell/func.d/packages
 # SEE:
 # http://xyne.archlinux.ca/projects/hexgrep/
 
-pkg_inst "lsof strace ltrace iftop"
-pkg_inst "nmap"
+pkg_inst lsof strace ltrace iftop nmap
 
 if distro arch; then
-    pkg_inst "bbe"
-    pkg_inst "openbsd-netcat"
-    aur_inst "xtrace-git"
+    pkg_inst bbe
+    pkg_inst -p 'nc' openbsd-netcat
+    aur_inst -p 'xtrace' xtrace-git
+
 elif distro ubuntu; then
     pkg_inst ""
 fi

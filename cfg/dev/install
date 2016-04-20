@@ -3,16 +3,17 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     # pkg_inst "base-devel"  # In conflict with multilibs!
-    pkg_inst "gcc-multilib lib32-gcc-libs"
-    pkg_inst "valgrind-multilib"
-    pkg_inst "clisp"   # Lisp -pr-lang
+    pkg_inst -p 'gcc' gcc-multilib
+    pkg_inst -f '/usr/lib32/libstdc++.so' lib32-gcc-libs
+    pkg_inst -p 'valgrind' valgrind-multilib
+    pkg_inst c2hs clisp   # -pr-lang: haskell, lisp
 
     # SEE: http://code.jsoftware.com/wiki/Books
     # NEED: installed qt4/qmake to build
     # aur_inst "j8-git"  # J -pr-lang
 
     # haskell
-    pkg_inst "cabal-install c2hs"
+    pkg_inst -p 'cabal' cabal-install
     ! cfgOpt u || cabal update
     # cabal-install ghc-mod
     # cabal install hdevtools

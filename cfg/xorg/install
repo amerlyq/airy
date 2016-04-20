@@ -5,10 +5,10 @@ source ~/.shell/func.d/packages
 #| xbindkeys | to XF86AriseVolumeUp and other media keys works
 #| xdotool   | for correct working modes, and for ability naming worksps as focused wnds
 
-pkg_inst "xsel xbindkeys xdotool"
+pkg_inst xsel xbindkeys xdotool
 
 if distro arch; then
-    pkg_inst "xorg-xprop"
+    pkg_inst -p xprop xorg-xprop
 
 elif distro ubuntu; then
     echo "Err: No xprop"

@@ -3,7 +3,7 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     # TODO: aur: override compiling by make -j8 using env vars
-    aur_inst copyq-git  # copyq -- last tag 2.5.0 is w/o my enhances
+    aur_inst -p 'copyq' copyq-git  # copyq -- last tag 2.5.0 is w/o my enhances
     echo "Err: change to copyq when last tag > 2.5.0 in pkg"
 
 elif distro ubuntu; then

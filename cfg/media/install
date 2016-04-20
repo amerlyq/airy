@@ -7,11 +7,11 @@ source ~/.shell/func.d/packages
 # find ./ -iname "*.mp3" -print0 | xargs -0 mid3iconv -eCP1251 --remove-v1 -d
 
 # fbreader
-pkg_inst "graphviz imagemagick cups-pdf"
+pkg_inst graphviz imagemagick cups-pdf
 # libmagick++-dev
 
 if distro arch; then
-    aur_inst 'fbless'
+    aur_inst fbless
     pkg_inst pandoc
 
 elif distro ubuntu; then

@@ -12,7 +12,7 @@ if [[ ! -d "$PREZTO" ]]; then
 fi
 
 # BUG: submodules aren't updated at all!
-(cd "$PREZTO" && git-up &&
+! cfgOpt u || (cd "$PREZTO" && git-up &&
     git submodule -q foreach git pull -q origin master)
     # git submodule update --init --recursive --remote --merge)
 

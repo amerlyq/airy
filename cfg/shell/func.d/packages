@@ -60,8 +60,8 @@ elif distro arch; then
     aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' "$@"; }
   else aur_inst(){ return 1; }
   fi
-  pip_inst(){ sudo pip3 install --upgrade "$@"; }
-  gem_inst(){ gem install "$@"; }
+  pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
+  gem_inst(){ do_if -c 'gem install' "$@"; }
   cab_inst(){ do_if -c 'cabal install' "$@"; }
 fi
 

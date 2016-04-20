@@ -1,15 +1,18 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst python python-pip
+pkg_inst python
+pkg_inst -p 'pip' python-pip
 
 if distro arch; then
-    pkg_inst python2 python2-pip
+    pkg_inst python2
+    pkg_inst -p 'pip2' python2-pip
 
 elif distro ubuntu; then
     pkg_inst python3 python3-pip
+    pkg_inst -p 'pip3' python3-pip
 fi
 
-sudo pip3 install -U readline pyreadline ipython ipdb pudb
+pip_inst readline pyreadline ipython ipdb pudb
 # readline # for adequate navigation in IPython cmdline
 # ipdb     # pretty debugger for IPython

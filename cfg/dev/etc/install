@@ -16,7 +16,7 @@ source ~/.shell/func.d/packages
 # Desktop search: (USE 'whereis' along with which)
 #   https://wiki.archlinux.org/index.php/File_system_search
 
-pkg_inst "at htop iotop dstat jshon"
+pkg_inst at htop iotop dstat jshon
 
 if distro arch; then
     aur_inst shyaml
@@ -24,8 +24,7 @@ if distro arch; then
     pkg_inst -p 'ag' the_silver_searcher
 
 elif distro ubuntu; then
-    pkg_inst -p 'checkinstall' checkinstall
-    pkg_inst locate
+    pkg_inst checkinstall locate
     pkg_inst urlview  # No for arch?
     # pkg_inst silversearcher-ag
     pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev

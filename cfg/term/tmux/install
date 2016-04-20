@@ -4,9 +4,9 @@ source ~/.shell/func.d/packages
 #| tmux | multi-window customizable terminal with vi navigation, useful for SSH connections
 
 if distro arch; then
-    aur_inst 'tmux-git'
+    aur_inst -p 'tmux' tmux-git
     # pkg_inst 'tmux'
 
 elif distro ubuntu; then
-    pkg_inst 'tmux'
+    pkg_inst tmux
 fi

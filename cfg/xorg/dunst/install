@@ -3,8 +3,8 @@ source ~/.shell/func.d/packages
 # from j4tools for i3 -- notifier in top-right corner
 
 if distro arch; then
-  aur_inst 'dunst-git'  # OLD: dunst+dunstify -- 2014.07.29
+  aur_inst -p 'dunst' dunst-git  # OLD: dunst+dunstify -- 2014.07.29
 
 elif distro ubuntu; then
-  pkg_inst 'dunst'
+  pkg_inst dunst
 fi

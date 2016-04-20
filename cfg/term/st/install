@@ -6,14 +6,14 @@ source ~/.shell/func.d/packages
 #| dvtm   | tmux-like dwm-adhere split/tiling management
 
 if distro arch; then
-    if cfgOpt u; then
-        src="${CURR_DIR_PKG:?No}/st"
-        if [[ -e "$src" ]]; then (cd "$src" && git-up ||:)
-        else (git clone "https://github.com/amerlyq/st" "$src"); fi
-    fi
-    pkg_inst 'dvtm'
-    aur_inst 'abduco' 'xurls'
+  if cfgOpt u; then
+    src="${CURR_DIR_PKG:?No}/st"
+    [[ ! -d "$src" ]] || (git clone "https://github.com/amerlyq/st" "$src")
+    (cd "$src" && git-up ||:)
+  fi
+  pkg_inst dvtm
+  aur_inst abduco xurls
 
 elif distro ubuntu; then
-    pkg_inst 'st dtach'
+  pkg_inst st dtach
 fi
