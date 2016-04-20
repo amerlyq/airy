@@ -2,13 +2,23 @@
 shopt -s nullglob
 
 ### Err handling ###
-error() { echo "Err: ${PWD/$HOME/\~}/${0##*/}:L${1}: (${3:-1}) ${2}"; exit "${3:-1}"; }
+error() { local err=$?
+  case "$1"
+  in -e) (($err))||return 0; shift
+  ;;  *) (($#<3)) && err=-1 || err=$3
+  esac
+  local f=$(readlink -m "$0")
+  echo "Err: ${f/$HOME/\~}:${1}:(${3:-1}) ${2}"
+  exit "${err:?}"
+}
 trap_errors(){
     # FIXME: even with those options, pkgbuild errors are not catched?
     # [[ $- =~ i ]] && return || exit
     set -o errexit
     set -o pipefail
-    trap 'error ${LINENO}' ERR
+    trap 'error -e ${LINENO} \
+    "${FUNCNAME+[$FUNCNAME] }$BASH_COMMAND"
+    ' ERR EXIT
     # SEE: http://mywiki.wooledge.org/BashFAQ/105
 }
 
@@ -54,6 +64,11 @@ do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
     do printf "."; sleep 0.5; done; echo; }; }
 
 has_pr(){ hash "$1" >/dev/null 2>&1; }
+has_lib(){ ldconfig -p | awk '{print$1}' | grep -qF "$1"; }
+has_such(){ local -A chk=( [a]='false' [f]='test -f' [d]='test -d'
+    [p]='has_pr' [l]='has_lib'
+  ); local cmd="${chk[$1]}"; [[ ${cmd%% *} ]] || return 2; $cmd "$2"
+}
 running_X(){ has_pr X && [[ $DISPLAY && ! $(tty) =~ ^/dev/tty ]]; }
 # $(ps opid= -C ${1##*/})
 grep_prs(){ pgrep "(\/|^)${1##*/}(\s|\$)"; }

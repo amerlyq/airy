@@ -70,6 +70,7 @@ class ag(Command):
 
     def execute(self):
         cmd, flags = self._choose()
+        # BUG: ag -v -- nothing
         self.fm.notify(cmd)
         self.fm.execute_command(cmd, flags=flags)
 

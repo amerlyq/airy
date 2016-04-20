@@ -10,19 +10,26 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 
 # ======================================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
-header(){ printf "\n$(tput setaf ${2:-1})>>> %s <<<$(tput sgr0)\n" "$1"; }
+header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
 pretty() { sed -r "s|/home/$(whoami)|\~|g
               s|\~/\S+/cfg/||g;  />>>/!s|^|  |g
         /^>>> /s//\n$C2\[/g; / <<<$/s//\]$CR/g
-    /(C|W):\s.*/s//$C13&$CR/; /(N):\s.*/s//$C6&$CR/
+    /(C|W):\s.*/s//$C13&$CR/; /(I|N):\s.*/s//$C6&$CR/
         /.*\s-> L\s.*/s//$C4&$CR/; /.*\s-> C\s.*/s//$C3&$CR/;
             /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
 ";}
+
 # ======================================================================
-if cfgOpt r && [[ -f $mods ]]; then rm -vf "$queue"; fi
+if [[ -z $DISPLAY ]]; then  # Use host xserver if SSH
+    export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')
+fi
+if cfgOpt r && [[ -f $mods ]]; then
+    rm -vf "$queue"
+    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
+fi
 
 # NOTE: If problem with package update, firts update 'archlinux-keyring' pkg
-if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then
+if cfgOpt i && cfgOpt u && ((!$#)) && [[ ! -f "$queue" ]]; then
     if distro arch; then
         sudo pacman -Syu  # NOTE: --ignore=firefox
         # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
@@ -33,9 +40,9 @@ if cfgOpt i && cfgOpt u && [[ ! -f "$queue" ]]; then
         echo "sudo apt-get update && sudo apt-get upgrade"
     fi
 fi
+
 # ======================================================================
 ## Setup all configs (private data must be initialized already)
-header "Airy cfgs"
 prf="${CURR_DIR_CACHE:?}/profile"  # Populate private env
 [[ $prf ]] && source "$prf" || echo "Wrn: not found '$prf'" | pretty
 
@@ -47,7 +54,7 @@ frgx(){ local patt="\\b$*\\b"
 }
 filter_find() { local accept regect
     # Source all manually linked mods from private repos
-    find -L "${CURR_DIR_CACHE:?}/mods" -type d \
+    (($#)) || find -L "${CURR_DIR_CACHE:?}/mods" -type d \
         -exec test -f '{}/install' -o -f '{}/setup' ';' \
         -printf "%p\n"
 
@@ -63,14 +70,9 @@ filter_find() { local accept regect
 PKG_SKIP+=( "${CFG_S[@]}" )
 # ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
 #   if all $@ are concrete modules (don't end in '/')
-
-if cfgOpt r && [[ -f "$mods" ]]; then
-    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
-fi
-
 if (($#)) || cfgOpt s; then
     ((!$#)) || PKG_LIST=( "$@" )
-    filter_find > "$queue"
+    filter_find "$@" > "$queue"
 else
     # Caching the list of modules activated in profile
     [[ -f "$mods"  ]] || filter_find > "$mods"
@@ -78,21 +80,30 @@ else
 fi
 
 # ======================================================================
-run(){ [[ ! -f "$1" ]] || "$@"; }
-[[ -z "$DISPLAY" ]] || export DISPLAY=:0 #:0.0  # Use host xserver if SSH
-if cfgOpt u; then opts='-u'; fi
+# EXPL: -m (in main 'setup') forces single thread execution
+run(){ [[ ! -f "$1" ]] || "$@" $(cfgOpt m || echo -m); }
+r_install(){ cfgOpt i || return 0; run "$1/install" $(cfgOpt f && echo -u); }
+r_setup(){ run "$1/setup" $(cfgOpt u && echo -u); }
 
-# Modules statistics
+# Mods statistics
+header "Airy cfgs"
 printf "${C15}LIST:$C12( %s )$CR\n" "${PKG_LIST[*]}"
 printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
 printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
 
 while read d; do echo ">>> $d <<<"
-    ! cfgOpt i || run "$d/install" $opts
-    run "$d/setup" $opts
+    r_install "$d"
+    r_setup "$d"
     sed -i '1d' "$queue"
+# EXPL: copy $queue content to be not affected by 'sed'
 done <<< "$(<"$queue")" | pretty
 rm "$queue"
+
 # ======================================================================
 
+if [[ $(jobs -p) ]]; then
+    header "Waiting jobs to complete"
+    jobs -l
+    wait
+fi
 header "DONE"

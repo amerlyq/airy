@@ -6,9 +6,9 @@ trap_errors
 ### Argparse ###
 OPTIND=1
 CFG_ARGS=( "$@" )  # Backup default arguments
-while getopts "cdirs:t:u" opt; do case $opt
+while getopts "cdfimrs:t:u" opt; do case $opt
 in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="$OPTARG" ;; esac
-;; [iucf]) : # Install/update/clean/force all configs/packages
+;; [iucfm]) : # Install/update/clean/force all mods/main batch launch
 ;; [rd]) cfgOptAdd 'u'  # Reset/debug
 ;; s) CFG_S+=("$OPTARG")
 ;; :|"?") die 1 "Err: need value for '-$opt'"
@@ -21,6 +21,7 @@ then THEME=dark; fi
 
 
 ### LINKS ###
+fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
 link(){ ~/.bin/prg.d/linkcp $@; }
 linkdir(){ for nm in "${@:2}"; do link "$PWD/$nm" "${1:?No prf}$nm"; done }
 # ALT linkdir(){ mkdir -p $2 && lndir "$1" $2; }

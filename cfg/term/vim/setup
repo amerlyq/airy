@@ -74,5 +74,5 @@ fi
 dst="$VCACHE/bundle/unicode.vim/autoload/unicode/UnicodeData.txt"
 if [[ ! -f "$dst" ]]; then
     mkdir -p "${dst%/*}"
-    wget -c -O "$dst" 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt'
+    fork_m wget -c -O "$dst" 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt'
 fi

@@ -2,14 +2,14 @@
 source ~/.shell/func.d/packages
 has_pr X || die
 
-pkg_inst -p 'firefox' firefox
+pkg_inst firefox
 
 if distro arch; then
-    echo "BROKEN:(signing) pentadactyl"
+    echo "W: BROKEN:(signing) pentadactyl"
+    echo "N: USE:(manually) https://github.com/willsALMANJ/pentadactyl-signed/releases"
     # aur_inst -p 'firefox' pentadactyl-git
-    echo "USE:(manually) https://github.com/willsALMANJ/pentadactyl-signed/releases"
+    pkg_inst -f '/usr/lib/mozilla/plugins/libflashplayer.so' flashplugin
 
-    pkg_inst -p 'firefox' flashplugin
 elif distro ubuntu; then
     echo "Err: install manually pentadactyl and flashplugin"
 fi

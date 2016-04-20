@@ -14,23 +14,27 @@ mkdir -vp "${CURR_DIR_PKG:?No in profile}"
 [[ -n "$MODS_CACHE_DISABLE" ]] || airy_cache_pwd_mod
 
 do_if() {
-  local cmd pkgs bSkip=1 bAll=0 OPTIND=1
-  if cfgOpt u; then bSkip=0; bAll=1; fi
+  local cmd grp obj=p pkgs=() bQuiet=0 OPTIND=1
 
-  while getopts "ac:d:p:f:" opt; do case $opt
-  in d|f) eval "[[ -$opt $OPTARG ]]" || bSkip=0
-  ;; a) bAll=1; bSkip=0  # Always re-install the whole list w/o checking
+  # USE 'pacman -Ql <pkg>' to list files  ALT: pkgfile
+  while getopts "ac:d:f:l:p:q" o; do case $o
+  in [adflp]) obj=$o; grp=$OPTARG;
   ;; c) cmd="$OPTARG"
-  ;; p) bAll=1; has_pr "$OPTARG" || bSkip=0  # Need this pr
-  ;; :|"?") die 1 "Need value for '-${opt}'" >&2
-  ;; esac; done && shift $((OPTIND-1))
+  ;; q) bQuiet=1
+  ;; :|"?") die 1 "Need value for '-${o}'" >&2
+  esac; done && shift $((OPTIND-1))
 
-  if (($bAll)); then pkgs="$*"; else while (($#>0))
-  do has_pr "$1" || { bSkip=0; pkgs+=" $1"; }; shift
+  if ! cfgOpt u && [[ $grp ]]; then
+    if has_such "${obj:?}" "${grp:?}"
+    then (($bQuiet)) || echo "I: $* ($obj=$grp)"; return 0
+    else pkgs+=("$@"); fi
+  else while (($#>0)); do
+    if ! cfgOpt u && has_such "$obj" "$1"
+    then (($bQuiet)) || echo "I: $1"
+    else pkgs+=("$1"); fi; shift
   done; fi
-  # echo "$bAll,$bSkip : $cmd -- $pkgs"
 
-  (($bSkip)) || ${cmd:?No cmd} ${pkgs:?No pkgs}
+  ((!${#pkgs[@]})) || ${cmd:?} "${pkgs[@]}"
 }
 
 if distro ubuntu; then
@@ -58,6 +62,7 @@ elif distro arch; then
   fi
   pip_inst(){ sudo pip3 install --upgrade "$@"; }
   gem_inst(){ gem install "$@"; }
+  cab_inst(){ do_if -c 'cabal install' "$@"; }
 fi
 
 
