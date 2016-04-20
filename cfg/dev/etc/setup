@@ -6,6 +6,6 @@ source ~/.shell/func.d/cfgsetup
 link "$PWD/agignore" ~/.agignore
 
 if cfgOpt u; then
-    # Gen db for 'locate'
-    sudo updatedb --add-prunepaths /cryptfs
+  # Gen db for 'locate'
+  fork_m sudo updatedb --add-prunepaths /cryptfs
 fi

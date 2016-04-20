@@ -1,4 +1,4 @@
-#!/bin/zsh -e
+#!/bin/zsh
 
 # Options
 DIR=$PWD
@@ -15,8 +15,11 @@ FUN="$1"; shift
 case "$1" in -s) bSEQ=1; shift ;; esac  # ALT: THREADS=1 <prg>
 CMD=($@)
 
-source ~/.shell/zsh/zshrc
+if [[ $FUN != synced ]]; then
+  source ~/.shell/zsh/zshrc
+fi
 autoload -U regexp-replace
+TRAPUSR1(){ kill ${${(v)jobstates##*:*:}%=*} &>/dev/null; return 1; }
 
 # Impl
 function gita_omz {
@@ -28,6 +31,7 @@ function gita_omz {
 function gita_prezto {
     _prompt_amer_precmd_async_data="${TMPPREFIX}-prompt_amer_data"
     (( $+functions[git-info] )) || return
+    # BUG: git-info don't work if '#!/bin/zsh -e'
     git-info
     printf "%-16s" "${(%e)git_info[details]} ${(%e)git_info[icons]}"
 }
@@ -100,17 +104,18 @@ function gita_ph { head_name "$1"
     gita_st "$1" "\n\n"
 }
 
-function gita_ahead {
+function gita_synced {
     local branch=$(git rev-parse --abbrev-ref HEAD)
     local ahead=$(git rev-list HEAD...origin/"$branch" --ignore-submodules --count)
-    (( $ahead )) && kill -USR1 $PID || return
+    (( $ahead )) || return
+    kill -USR1 $PID &>/dev/null
 }
 
 function git_process {
     ## Additional verification of git repo existance
     git rev-parse --git-dir > /dev/null 2>&1 && bFound=1 || continue
     ## Print git info from zsh-specific prompt
-    case "$FUN" in st|pl|ph|ahead) gita_$FUN "$1" ;; esac
+    case "$FUN" in st|pl|ph|synced) gita_$FUN "$1" ;; esac
     ## Also, exec any git commands after "Gs/Gt/Gl/Gd ..."
     [[ -z ${CMD[@]} ]] || git ${GCFG[@]} ${CMD[@]}
 }
@@ -139,17 +144,18 @@ for rep in "${LST[@]}"; do
     ((${WCOL=0} > $#rep)) || WCOL=$#rep
 done
 
-function worker { local pid=$$
+function worker {
   (cd "$DIR/$1" && O=$(git_process "$1"); [[ -z $O ]] || echo "$O")
 }
 
-TRAPUSR1(){ kill ${${(v)jobstates##*:*:}%=*} &>/dev/null; return 1; }
-for rep in "${LST[@]}"; do
+function main {
+  for rep in "${LST[@]}"; do
     # EXPL process jobs in bunches
     ((0==THREADS || $#jobstates < ${THREADS:-1})) || wait
     eval worker "$rep" $( ((bSEQ)) || echo '&' )
-done
-wait
+  done && wait
+}
+main & wait
 exit
 
 # --------------------------------------------
