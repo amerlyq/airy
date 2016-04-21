@@ -1,40 +1,39 @@
 #!/bin/bash -e
-# vim: ft=sh
 source ~/.shell/func.d/packages
 
-# libclang-dev exuberant-ctags python-dev   | for autocompleter in vim
-# clang-format-3.5          | for auto-formatting c/cpp code
-
 if distro arch; then
-    # aur_inst neovim-git
-    pkg_inst -p 'neovim' neovim python-neovim python2-neovim
-    pkg_inst -p 'pip' python python-yaml python-jedi
+    pkg_inst -p 'neovim' neovim
+    pkg_inst -y 'neovim' python-neovim
+    pkg_inst -Y 'neovim' python2-neovim
+    pkg_inst -y 'yaml' python-yaml
+    pkg_inst -y 'jedi' python-jedi
 
     ## External deps
-    # THINK:SEE gtags (GNU Global) -- instead of ctags?
-    pkg_inst ctags cscope vimpager
-    pkg_inst -p 'ag' the_silver_searcher
     # aur_inst zeal
-
-    # For syntastic
-    pkg_inst 'hlint'
-
+    pkg_inst hlint
     ## For vim-clang-format and vim-autoformatter
     pkg_inst -p 'clang-format' clang-tools-extra
     pkg_inst astyle tidy
-    aur_inst js-beautify  # FAIL python-autopep8 beautify-css
-
-    # Used 'gvim' instead of 'gvim-python3' for YouCompleteMe
-    #   and for pythoncomplete#Complete
-    # pkg_inst -p 'vim' gvim-python3
+    aur_inst js-beautify  # BAD python-autopep8 beautify-css
 
 elif distro ubuntu; then
     # for vimoutliner export in mindmap
-    pkg_inst vim-gtk exuberant-ctags 'python-pip' python-dev
-    pkg_inst python3 python3-yaml
+    pkg_inst vim-gtk python3-yaml
+    # libclang-dev for autocompleter in vim
     pkg_inst libclang-dev clang-format-3.5
-    # sudo pip  install neovim
-    # sudo pip3 install neovim
-    do_if -c 'sudo pip install --upgrade' pip jedi
+    pip_inst jedi  # neovim
     echo "Err: not all"
+fi
+
+### PLUGINS ###
+VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"
+if cfgOpt u || [[ ! -d $VCACHE/bundle ]]; then
+    # BUG: returns non-zero errcode!
+    # FIXME: error on clean system, when NeoBundle is not installed yet
+    shvim() { $EDITOR -nesR -i NONE -u "$PWD/vimrc" \
+        -c "set nomore|redir!>/dev/stderr" -c "$1" \
+        -c "echo''|redir END|qall!" >/dev/null ||:; }
+    shvim 'NeoBundleClearCache'
+    shvim 'NeoBundleUpdate!'
+    ! has_pr nvim || shvim 'UpdateRemotePlugins'
 fi

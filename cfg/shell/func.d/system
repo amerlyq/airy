@@ -65,8 +65,11 @@ do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
 
 has_pr(){ hash "$1" >/dev/null 2>&1; }
 has_lib(){ ldconfig -p | awk '{print$1}' | grep -qF "$1"; }
+has_python(){ local v=($(python$1 --version))
+  [[ -d /usr/lib/python${v[1]%.*}/site-packages/$2 ]]
+}
 has_such(){ local -A chk=( [a]='false' [f]='test -f' [d]='test -d'
-    [p]='has_pr' [l]='has_lib'
+    [p]='has_pr' [l]='has_lib' [y]='has_python 3' [Y]='has_python 2'
   ); local cmd="${chk[$1]}"; [[ ${cmd%% *} ]] || return 2; $cmd "$2"
 }
 running_X(){ has_pr X && [[ $DISPLAY && ! $(tty) =~ ^/dev/tty ]]; }

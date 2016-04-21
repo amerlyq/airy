@@ -2,72 +2,23 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD" ~/.vim  #vim/vimrc vim/nvimrc vim/ycm_extra_conf.py
+link "$PWD" ~/.vim
 link "$PWD" "${XDG_CONFIG_HOME:=$HOME/.config}/nvim"
 mkdir -p "${XDG_DATA_HOME:=$HOME/.cache}/shada"
-# link "$PWD/vimrc" ~/.vimrc  # NOTE: For old vim <v7.3
-
-if distro arch; then
-    mkdef editor $(which $EDITOR)
-    # has_pr nvim && mkdef vim $(which $EDITOR) ||:
-elif distro ubuntu; then
-    for nm in vim view rview editor; do mkdef $nm $(which vim.gtk); done
-    # dst=~/.selected_editor
-    # wstr "SELECTED_EDITOR=\"$(which vim.gtk)\""
-fi
-
-# Dir for .swp, backup, ... files
 VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"
-FONT="$VCACHE/powerline-fonts/DejaVuSansMono"
-
-if cfgOpt c; then rm -rf "$VCACHE"; fi
+if cfgOpt c; then rm -rf "$VCACHE"/*; fi
+#touch ~/.vimtags  # For vim-easytags
 
 
 ### SPELL ###
 # WARNING: first clean install will always fail as uk*.sug file is absent!
-if [[ ! -d "$VCACHE/spell" ]]; then
+if [[ ! -d $VCACHE/spell ]]; then
     mkdir -p "$VCACHE/spell"
     src='http://ftp.vim.org/pub/vim/runtime/spell'
     for nm in ru en uk; do ( cd "$VCACHE/spell"
         wget "$src/${nm}.utf-8.spl" || echo "No spl: $nm"
         wget "$src/${nm}.utf-8.sug" || echo "No sug: $nm"
     ) done
-fi
-# For vim-easytags
-#touch ~/.vimtags
-
-
-### FONTS ###
-# FIXME: fonts are needless on headless system! Check what???
-# https://powerline.readthedocs.org/en/latest/installation/linux.html
-if has_pr X && [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
-    # See: https://wiki.archlinux.org/index.php/Font_Configuration
-    link -ct ~/.fonts  ~/.vim/res/PowerlineSymbols.otf
-    link -ct ~/.config/fontconfig/conf.d  ~/.vim/res/10-powerline-symbols.conf
-    fc-cache -vf ~/.fonts
-    echo "Powerline symbols configured"
-fi
-
-if has_pr X && [[ ! -d ~/.fonts/"${FONT##*/}" ]]; then
-    # Patched fonts for windows usage:
-    src='https://github.com/Lokaltog/powerline-fonts'
-    [[ -d "${FONT%/*}" ]] || git clone --depth=1 "$src" "${FONT%/*}"
-    link -ct ~/.fonts "$FONT"
-    fc-cache -vf ~/.fonts  # check active name with fc-list
-    echo "Vim font '${FONT##*/}' installed"
-fi
-
-
-### PLUGINS ###
-if cfgOpt u || [[ ! -d "$VCACHE/bundle" ]]; then
-    # BUG: returns non-zero errcode!
-    # FIXME: error on clean system, when NeoBundle is not installed yet
-    shvim() { $EDITOR -nesR -i NONE -u "$PWD/vimrc" \
-        -c "set nomore|redir!>/dev/stderr" -c "$1" \
-        -c "echo''|redir END|qall!" >/dev/null ||:; }
-    shvim 'NeoBundleClearCache'
-    shvim 'NeoBundleUpdate!'
-    ! has_pr nvim || shvim 'UpdateRemotePlugins'
 fi
 
 ### PLUG-RC ###

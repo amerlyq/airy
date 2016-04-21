@@ -3,25 +3,23 @@ source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
 
-for arg in "$@"; do case "$arg" in
-  # Re-install even if git pull is up-to-date (for broken builds)
-  -u|--update) cfgOptAdd u ;;
-  -r) cfgOptAdd r ;;
-  -s) cfgOptAdd s ;;
-esac; done
+# Re-install even if git pull is up-to-date (for broken builds)
+while getopts 'mrsu' o; do case $o
+in :|'?') die 1
+esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
-mkdir -vp "${CURR_DIR_PKG:?No in profile}"
-[[ -n "$MODS_CACHE_DISABLE" ]] || airy_cache_pwd_mod
+mkdir -vp "${CURR_DIR_PKG:?}"
+[[ $MODS_CACHE_DISABLE ]] || airy_cache_pwd_mod
 
 do_if() {
   local cmd grp obj=p pkgs=() bQuiet=0 OPTIND=1
 
   # USE 'pacman -Ql <pkg>' to list files  ALT: pkgfile
-  while getopts "ac:d:f:l:p:q" o; do case $o
-  in [adflp]) obj=$o; grp=$OPTARG;
+  while getopts "ac:d:f:l:p:qy:Y:" o; do case $o
+  in [adflpyY]) obj=$o; grp=$OPTARG;
   ;; c) cmd="$OPTARG"
   ;; q) bQuiet=1
-  ;; :|"?") die 1 "Need value for '-${o}'" >&2
+  ;; :|'?') die 1 "Need value for '-${o}'" >&2
   esac; done && shift $((OPTIND-1))
 
   if ! cfgOpt u && [[ $grp ]]; then

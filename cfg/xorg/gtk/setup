@@ -1,12 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-### LINKS ###
-# if [[ ${CURR_PROF:?} =~ ^neo ]]; then
-  link -t ~/.config/fontconfig fonts.conf
-  # OR: use infinality-bundle instead
-# fi
-
 ### GENS ###
 ./gtk.gen
 
@@ -20,27 +14,3 @@ if [[ -f "$cfg" ]]; then
     # gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme Vertex-Dark
     # Maybe install libgnomeui -- people says then theme will work?
 fi
-
-
-if cfgOpt u; then
-    # cfg=/etc/fonts/conf.d/10-scale-bitmap-fonts.conf
-    # if [[ -L $cfg ]]; then rm $cfg; fi
-    link -s /etc/fonts/{conf.avail,conf.d}/70-no-bitmaps.conf
-    mkfontscale ~/.fonts
-    mkfontdir ~/.fonts
-    sudo fc-cache -vf ~/.fonts  # fc-cache -fs >/dev/null
-fi
-
-dst=~/.Xresources
-wstr(){ cat >> "$dst" <<<"$*"; }
-
-> "$dst"
-# wstr "#define MAIN_DPI  ${MAIN_DPI:-96}"
-for f in "${CURR_DIR_CACHE:?}"/Xres-*; do
-  wstr "#include \"$f\""
-done
-cat "$PWD/xfontrc" >> "$dst"
-echo "W: ~/.Xresources"
-! xrdb -load ~/.Xresources 2>&1 | grep 'error'
-# To see the current loaded resources
-#   xrdb -query -all

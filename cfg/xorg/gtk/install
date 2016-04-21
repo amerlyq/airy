@@ -2,9 +2,6 @@
 source ~/.shell/func.d/packages
 has_pr X || die
 
-# SEE: good programming fonts
-#    http://input.fontbureau.com/
-
 if distro arch; then
     # Install 'Adwaita' to eliminate warnings in GTK apps
     pkg_inst gtk2 gtk3 gnome-themes-standard
@@ -16,15 +13,6 @@ if distro arch; then
     # Icons
     pkg_inst hicolor-icon-theme faenza-icon-theme
 
-    if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
-      grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
-        # infinality supports only 96dpi
-        pkg_inst -a infinality-bundle
-    fi
-    pkg_inst ttf-freefont ttf-droid ttf-dejavu otf-ipafont
-
-    # Install manually:
-    # aur_inst -a 'freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu'
 elif distro ubuntu; then
     echo "ERR: install manually"
     if [[ ! -d /usr/share/themes/Vertex-Dark ]]; then

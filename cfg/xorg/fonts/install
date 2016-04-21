@@ -1,0 +1,41 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+has_pr X || die
+
+# SEE: good programming fonts
+#    http://input.fontbureau.com/
+# https://powerline.readthedocs.org/en/latest/installation/linux.html
+
+if distro arch; then
+  if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
+    grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
+      # infinality supports only 96dpi
+      pkg_inst -a infinality-bundle
+  fi
+
+  pkg_inst -a ttf-freefont ttf-droid ttf-dejavu otf-ipafont
+  # Install manually:
+  # aur_inst -a 'freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu'
+  # pkg_inst powerline-fonts
+  # aur_inst ttf-dejavu-sans-mono-powerline-git
+
+elif distro ubuntu; then
+  echo "ERR: install manually"
+
+  if [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
+    link -ct ~/.fonts  "$PWD/PowerlineSymbols.otf"
+    link -ct ~/.config/fontconfig/conf.d  ~/.vim/res/10-powerline-symbols.conf
+    fc-cache -vf ~/.fonts
+    echo "Powerline symbols configured"
+  fi
+
+  FONT=~/.cache/vim/powerline-fonts/DejaVuSansMono
+  if [[ ! -d ~/.fonts/${FONT##*/} ]]; then
+    # Patched fonts for windows usage:
+    src='https://github.com/Lokaltog/powerline-fonts'
+    [[ -d "${FONT%/*}" ]] || git clone --depth=1 "$src" "${FONT%/*}"
+    link -ct ~/.fonts "$FONT"
+    fc-cache -vf ~/.fonts  # check active name with fc-list
+    echo "Vim font '${FONT##*/}' installed"
+  fi
+fi

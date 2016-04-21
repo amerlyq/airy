@@ -11,6 +11,7 @@ OPTIND=1
 while getopts 'cdfimrs:t:u' o; do case $o
 in t) THEME=$OPTARG
 ;; s) CFG_S+=("$OPTARG")
+;; :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme

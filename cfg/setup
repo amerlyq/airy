@@ -18,9 +18,12 @@ link "r.xmonad"           ./r.wm
 link "r.vim-xmessage"     ./xmessage
 link "/usr/bin/dunstify"  ./notify-send
 
+mkdef editor $(which $EDITOR)
+
 if distro ubuntu; then
   mkdef x-terminal-emulator $(which $term)
   mkdef www-browser $(which elinks)
   mkdef x-www-browser $(which qutebrowser)
   mkdef x-window-manager $(which xmonad)
+  for nm in vim view rview; do mkdef $nm $(which vim.gtk); done
 fi

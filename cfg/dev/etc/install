@@ -17,16 +17,20 @@ source ~/.shell/func.d/packages
 #   https://wiki.archlinux.org/index.php/File_system_search
 
 pkg_inst at htop iotop dstat jshon
+pkg_inst cscope
 
 if distro arch; then
-    aur_inst shyaml
-    pkg_inst -p 'locate' mlocate
-    pkg_inst -p 'ag' the_silver_searcher
+  # THINK:SEE gtags (GNU Global) -- instead of ctags?
+  pkg_inst ctags
+  pkg_inst -p 'ag' the_silver_searcher
+  pkg_inst -p 'locate' mlocate
+  aur_inst shyaml
 
 elif distro ubuntu; then
-    pkg_inst checkinstall locate
-    pkg_inst urlview  # No for arch?
-    # pkg_inst silversearcher-ag
-    pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
-    git_inst "ggreer/the_silver_searcher"
+  pkg_inst exuberant-ctags
+  pkg_inst checkinstall locate
+  pkg_inst urlview  # No for arch?
+  # pkg_inst silversearcher-ag
+  pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
+  git_inst "ggreer/the_silver_searcher"
 fi
