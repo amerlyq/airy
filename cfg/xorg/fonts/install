@@ -22,20 +22,21 @@ if distro arch; then
 elif distro ubuntu; then
   echo "ERR: install manually"
 
-  if [[ ! -f ~/.fonts/PowerlineSymbols.otf ]]; then
-    link -ct ~/.fonts  "$PWD/PowerlineSymbols.otf"
+  fndir=~/.local/share/fonts
+  if [[ ! -f $fndir/PowerlineSymbols.otf ]]; then
+    link -ct "$fndir"  "$PWD/PowerlineSymbols.otf"
     link -ct ~/.config/fontconfig/conf.d  ~/.vim/res/10-powerline-symbols.conf
-    fc-cache -vf ~/.fonts
+    fc-cache -vf "$fndir"
     echo "Powerline symbols configured"
   fi
 
   FONT=~/.cache/vim/powerline-fonts/DejaVuSansMono
-  if [[ ! -d ~/.fonts/${FONT##*/} ]]; then
+  if [[ ! -d $fndir/${FONT##*/} ]]; then
     # Patched fonts for windows usage:
     src='https://github.com/Lokaltog/powerline-fonts'
     [[ -d "${FONT%/*}" ]] || git clone --depth=1 "$src" "${FONT%/*}"
-    link -ct ~/.fonts "$FONT"
-    fc-cache -vf ~/.fonts  # check active name with fc-list
+    link -ct "$fndir" "$FONT"
+    fc-cache -vf "$fndir"  # check active name with fc-list
     echo "Vim font '${FONT##*/}' installed"
   fi
 fi

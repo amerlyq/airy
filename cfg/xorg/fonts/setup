@@ -9,12 +9,13 @@ source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
 if cfgOpt u; then
+    fndir=~/.local/share/fonts
     # cfg=/etc/fonts/conf.d/10-scale-bitmap-fonts.conf
     # if [[ -L $cfg ]]; then rm $cfg; fi
     link -s /etc/fonts/{conf.avail,conf.d}/70-no-bitmaps.conf
-    mkfontscale ~/.fonts
-    mkfontdir ~/.fonts
-    sudo fc-cache -vf ~/.fonts  # fc-cache -fs >/dev/null
+    mkfontscale "$fndir"
+    mkfontdir "$fndir"
+    fc-cache -vf "$fndir"  # fc-cache -fs >/dev/null
 fi
 
 dst=~/.Xresources
