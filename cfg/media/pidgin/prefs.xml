@@ -42,7 +42,7 @@
 			</pref>
 		</pref>
 		<pref name='savedstatus'>
-			<pref name='default' type='int' value='1426584263'/>
+			<pref name='default' type='int' value='1461180879'/>
 			<pref name='startup' type='int' value='0'/>
 			<pref name='startup_current_status' type='bool' value='1'/>
 			<pref name='idleaway' type='int' value='1430205090'/>
@@ -166,6 +166,11 @@
 				<pref name='locale' type='string' value='en'/>
 				<pref name='service' type='string' value='google'/>
 			</pref>
+			<pref name='nss_prefs'>
+				<pref name='cipher_list' type='stringlist'/>
+				<pref name='min_tls' type='int' value='0'/>
+				<pref name='max_tls' type='int' value='0'/>
+			</pref>
 		</pref>
 		<pref name='lopl'/>
 		<pref name='prpl'>
@@ -192,9 +197,11 @@
 					<pref name='notify_send' type='bool' value='1'/>
 					<pref name='notify_switch' type='bool' value='1'/>
 					<pref name='type_chat_nick' type='bool' value='0'/>
-					<pref name='method_count_xprop' type='bool' value='0'/>
+					<pref name='method_count_xprop' type='bool' value='1'/>
 					<pref name='method_raise' type='bool' value='0'/>
 					<pref name='method_present' type='bool' value='0'/>
+					<pref name='type_im_sys' type='bool' value='0'/>
+					<pref name='type_chat_sys' type='bool' value='0'/>
 				</pref>
 				<pref name='gestures'>
 					<pref name='visual' type='bool' value='0'/>
@@ -385,6 +392,9 @@
 				<pref name='only_available' type='bool' value='0'/>
 				<pref name='auto_loaded' type='bool' value='1'/>
 			</pref>
+			<pref name='relnot'>
+				<pref name='last_check' type='int' value='0'/>
+			</pref>
 		</pref>
 		<pref name='gtk-rlaager-album'>
 			<pref name='window_height' type='int' value='258'/>
@@ -404,13 +414,11 @@
 		<pref name='plugins'>
 			<pref name='loaded' type='pathlist'>
 				<item value='/usr/lib/purple-2/statenotify.so'/>
-				<item value='/usr/lib/purple-2/colorize.so'/>
-				<item value='/usr/lib/pidgin/enhancedhist.so'/>
-				<item value='/usr/lib/purple-2/pidgin-libnotify.so'/>
+				<item value='/usr/lib/pidgin/history.so'/>
+				<item value='/usr/lib/pidgin/notify.so'/>
 				<item value='/usr/lib/purple-2/ssl-nss.so'/>
 				<item value='/usr/lib/purple-2/psychic.so'/>
 				<item value='/usr/lib/purple-2/ssl.so'/>
-				<item value='/usr/lib/pidgin/switchspell.so'/>
 			</pref>
 			<pref name='gtk-plugin_pack-irssi'>
 				<pref name='textfmt' type='bool' value='1'/>
@@ -505,10 +513,10 @@
 			<pref name='list_visible' type='bool' value='1'/>
 			<pref name='list_maximized' type='bool' value='0'/>
 			<pref name='sort_type' type='string' value='alphabetical'/>
-			<pref name='x' type='int' value='1493'/>
-			<pref name='y' type='int' value='105'/>
-			<pref name='width' type='int' value='334'/>
-			<pref name='height' type='int' value='808'/>
+			<pref name='x' type='int' value='0'/>
+			<pref name='y' type='int' value='0'/>
+			<pref name='width' type='int' value='270'/>
+			<pref name='height' type='int' value='1058'/>
 			<pref name='theme' type='string' value=''/>
 		</pref>
 		<pref name='conversations'>
@@ -542,10 +550,10 @@
 				<pref name='height' type='int' value='390'/>
 			</pref>
 			<pref name='im'>
-				<pref name='x' type='int' value='566'/>
-				<pref name='y' type='int' value='313'/>
-				<pref name='width' type='int' value='782'/>
-				<pref name='height' type='int' value='429'/>
+				<pref name='x' type='int' value='274'/>
+				<pref name='y' type='int' value='0'/>
+				<pref name='width' type='int' value='1642'/>
+				<pref name='height' type='int' value='1058'/>
 				<pref name='animate_buddy_icons' type='bool' value='1'/>
 				<pref name='entry_height' type='int' value='54'/>
 				<pref name='show_buddy_icons' type='bool' value='1'/>
@@ -577,14 +585,7 @@
 			<pref name='blink' type='bool' value='0'/>
 			<pref name='show' type='string' value='always'/>
 			<pref name='gtk'>
-				<pref name='embedded' type='bool' value='0'/>
-			</pref>
-		</pref>
-	</pref>
-	<pref name='core'>
-		<pref name='plugins'>
-			<pref name='core-plugin_pack-google'>
-				<pref name='domain' type='string' value='www.google.com'/>
+				<pref name='embedded' type='bool' value='1'/>
 			</pref>
 		</pref>
 	</pref>
