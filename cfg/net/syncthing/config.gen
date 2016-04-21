@@ -6,19 +6,19 @@ dir=/home/media/sync
 
 ## Create keys and basic config with hashed values
 dst=~/.config/syncthing/config.xml
-did=$(syncthing -generate="${dst%/*}" | awk '/Device ID/{print $NF}')
+did=$(syncthing -generate="${dst%/*}" | awk '/Device ID/{print$NF}')
 apikey=$(sed -rn '/.*<apikey>(\S+)<\/apikey>.*/s//\1/p' $dst)
 
 
-> ${dst:?No}
-wrt() { printf "%s\n" "$@" >> ${dst:?No}; }
+> ${dst:?}
+wrt() { printf "%s\n" "$@" >> ${dst:?}; }
 wrt1() { wrt  "    $@"; }
 wrt2() { wrt1 "    $@"; }
 
 add_folder() {
     ## EXPL I use >60s update interval, because of 'inotify' service
-    cat>> ${dst:?No} <<EOT
-    <folder id="${1##*/}" path="${1:?No}" ro="false" \
+    cat>> ${dst:?} <<EOT
+    <folder id="${1##*/}" path="${1:?}" ro="false" \
         rescanIntervalS="3600" ignorePerms="false" autoNormalize="true">'
 EOT
     shift
@@ -39,8 +39,8 @@ EOT
 }
 
 add_device() {
-cat>> ${dst:?No} <<EOT
-    <device id="${1:?No}" name="${2:?No}" compression="metadata" introducer="false">
+cat>> ${dst:?} <<EOT
+    <device id="${1:?}" name="${2:?}" compression="metadata" introducer="false">
         <address>dynamic</address>
     </device>
 EOT
@@ -48,12 +48,12 @@ EOT
 
 
 wrt '<configuration version="11">'
-add_folder "$dir/android" ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
-add_folder "$dir/fl" ${ANDR_ID:?No} ${HOME_ID:?No} ${LAPT_ID:?No}
+add_folder "$dir/android" ${ANDR_ID:?} ${HOME_ID:?} ${LAPT_ID:?}
+add_folder "$dir/fl" ${ANDR_ID:?} ${HOME_ID:?} ${LAPT_ID:?}
 wrt
-add_device ${ANDR_ID:?No} ${ANDR_HOST:?No}
-add_device ${HOME_ID:?No} ${HOME_HOST:?No}
-add_device ${LAPT_ID:?No} ${LAPT_HOST:?No}
+add_device ${ANDR_ID:?} ${ANDR_HOST:?}
+add_device ${HOME_ID:?} ${HOME_HOST:?}
+add_device ${LAPT_ID:?} ${LAPT_HOST:?}
 wrt
 
 
@@ -61,7 +61,7 @@ wrt
 cat>> $dst <<EOT
     <gui enabled="true" tls="false">
         <address>127.0.0.1:8384</address>
-        <apikey>${apikey:?No}</apikey>
+        <apikey>${apikey:?}</apikey>
     </gui>
     <options>
         <listenAddress>0.0.0.0:22000</listenAddress>

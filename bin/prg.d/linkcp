@@ -1,58 +1,52 @@
 #!/bin/bash -e
 # vim: ts=2:sw=2:sts=2
-pr="${0##*/}"
-die() { printf "Err: '$pr' %s${1+\n}" "$1"; exit 1; }
-# echo ">> $*"
+die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 
-unset dfr dto sudo
-cmd=link
+unset sudo
+cmd=f_link
 
 OPTIND=1
-while getopts "bcsf:t:" opt; do case $opt
-in c) cmd='copy'
+while getopts 'bcsf:t:' o; do case $o
+in c) cmd='f_copy'
 ;; b) backup='_'
 ;; s) sudo='sudo'
-;; f) dfr="$OPTARG"
-;; t) dto="$OPTARG"
-;; :|"?") die "needs value for '-$opt'"
-;; *) die "invalid option '-$opt'"
-;; esac; done
-shift $((OPTIND-1))
+;; f) DFR=$OPTARG
+;; t) DTO=$OPTARG
+esac; done; shift $((OPTIND-1))
 
-show() { local t="$1" src="$2" dst="$3" sfx
-  [[ "${src##*/}" == ${dst##*/} ]] || sfx=" (${src##*/})"
+show() { local t=$1 src=$2 dst=$3 sfx
+  [[ ${src##*/} == ${dst##*/} ]] || sfx=" (${src#${src%/*/*}/})"
   echo "-> $t  ${dst}${sfx}";
 }
-# echo "cmd=$cmd, sudo=$sudo, dto=$dto"
-copy() { local src="$1" dst="$2"
-  if [[ ! -e "$dst" || ! -L "$dst" ]]; then
+f_copy() { local src=$1 dst=$2
+  [[ -e $dst || ! -L $dst ]] || rm "$dst"
+  if [[ ! -e $dst || ! -L $dst ]]; then
     if ! diff $args -q "$src" "$dst" >/dev/null 2>&1; then
       $sudo mkdir -p "${dst%/*}"
       $sudo cp $args -vfT -- "$src" "$dst"
     else show C "$src" "$dst"; fi
   else die "refuse copy over existing link '$dst'"; fi
 }
-link() { local src="$1" dst="$2"
-  if [[ ! -e "$dst" || -L "$dst" ]]; then
-    if [[ ! "$src" -ef "$dst" ]]; then
+f_link() { local src=$1 dst=$2
+  [[ -e $dst || ! -L $dst ]] || rm "$dst"
+  if [[ ! -e $dst || -L $dst ]]; then
+    if [[ ! $src -ef $dst ]]; then
       $sudo mkdir -p "${dst%/*}"
       $sudo ln -svfT -- "$src" "$dst"
     else show L "$src" "$dst"; fi
-  elif [[ -n "$backup" && ! -e "${dst}$backup" ]]; then
+  elif [[ $backup && ! -e ${dst}$backup ]]; then
       $sudo mv -vfT  -- "$dst" "${dst}$backup"
       $sudo ln -svfT -- "$src" "$dst"
   else die "refuse symlink over existing file/dir '$dst'"; fi
 }
-dispatch() { local src=$(readlink -e "${1:?No}") dst="${2:?No}"
+dispatch() { local src=$(readlink -e "${1:?}") dst="${2:?}"
   [[ -e "$src" ]] || die "no such file '${src:-$1}'"
   [[ -f "$src" ]] || args='-r'
-  ${cmd:?No} "$src" "$dst" | sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g"
+  ${cmd:?} "$src" "$dst" | sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g"
 }
 
-if [[ -z "$dto" ]]; then
+if [[ -z $DTO ]]; then
   dispatch "$1" "$2"
 else for nm in "$@"; do
-  dispatch "${dfr:+$dfr/}$nm" "$dto/${nm##*/}"
+  dispatch "${DFR:+$DFR/}$nm" "$DTO/${nm##*/}"
 done; fi
-# dst="${2/%%/${1##*/}}"  # Replaces path/% -> path/<src_file>
-# [[ ! "$dst" =~ %$ ]] || die "guards '$dst' expansion"

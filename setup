@@ -11,12 +11,18 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 # ======================================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
 header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
-pretty() { sed -r "s|/home/$(whoami)|\~|g
-              s|\~/\S+/cfg/||g;  />>>/!s|^|  |g
-        /^>>> /s//\n$C2\[/g; / <<<$/s//\]$CR/g
-    /(C|W):\s.*/s//$C13&$CR/; /(I|N):\s.*/s//$C6&$CR/
-        /.*\s-> L\s.*/s//$C4&$CR/; /.*\s-> C\s.*/s//$C3&$CR/;
-            /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
+pretty() { sed -r "
+  s|/home/$(whoami)|\~|g
+  s|\~/\S+/cfg/||g
+  />>>/!s|^|  |g
+  /^>>> \~\/aura\//s//\n$C9\[/g
+  /^>>> /s//\n$C2\[/g
+  / <<<$/s//\]$CR/g
+  /(C|W):\s.*/s//$C13&$CR/
+  /(I|N):\s.*/s//$C6&$CR/
+  /.*\s-> L\s.*/s//$C4&$CR/
+  /.*\s-> C\s.*/s//$C3&$CR/
+  /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
 ";}
 
 # ======================================================================

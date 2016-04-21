@@ -1,11 +1,11 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
 link -t ~/.config/qutebrowser \
-    qutebrowser.conf keys.conf
+  qutebrowser.conf keys.conf
 
-if cfgOpt r; then
-    qutebrowser :adblock-update :close
+if cfgOpt u; then
+  qutebrowser :adblock-update :close
 fi

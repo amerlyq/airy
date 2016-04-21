@@ -4,20 +4,19 @@ source ~/.shell/func.d/system
 trap_errors
 
 ### Argparse ###
-OPTIND=1
 CFG_ARGS=( "$@" )  # Backup default arguments
-while getopts "cdfimrs:t:u" opt; do case $opt
-in t) case "$OPTARG" in dark|light|lucid|opaque) THEME="$OPTARG" ;; esac
-;; [iucfm]) : # Install/update/clean/force all mods/main batch launch
-;; [rd]) cfgOptAdd 'u'  # Reset/debug
+OPTIND=1
+
+# [iucfmrd]: install/update/clean/force/main/reset/debug
+while getopts 'cdfimrs:t:u' o; do case $o
+in t) THEME=$OPTARG
 ;; s) CFG_S+=("$OPTARG")
-;; :|"?") die 1 "Err: need value for '-$opt'"
-;; esac; cfgOptAdd "$opt"; done
-shift $((OPTIND - 1))
+esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme
-if [[ ! "${THEME:=$(< "${CURR_DIR_CACHE:?}/theme")}" =~ ^[a-z]+$ ]]
-then THEME=dark; fi
+[[ $THEME ]] || THEME=$(<"${CURR_DIR_CACHE:?}/theme")
+[[ $THEME_ALLOWED ]] || THEME_ALLOWED='dark|light|lucid|opaque'
+[[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=dark
 
 
 ### LINKS ###

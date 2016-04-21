@@ -4,23 +4,23 @@ source ~/.shell/func.d/cfgsetup
 echo 'N: Defaults'
 
 ### AUTO ###
-term="$({ has_pr st && echo st; } ||
-        { has_pr urxvt && echo urxvt; } || echo xterm)"
+if has_pr st; then term=st
+elif has_pr urxvt; then term=urxvt
+else term=xterm; fi
 
-(cd "${CURR_DIR_CACHE:?No}/bin"
-    link "r.${term:?No}"      ./r.t
-    link "r.${term}-float"    ./r.tf
-    link "r.notify"           ./r.n
-    link "r.qute"             ./r.b
-    link "r.elinks"           ./r.bt
-    link "r.xmonad"           ./r.wm
-    link "r.vim-xmessage"     ./xmessage
-    link "/usr/bin/dunstify"  ./notify-send
-)
+cd "${CURR_DIR_CACHE:?}/bin"
+link "r.${term:?}"        ./r.t
+link "r.${term}-float"    ./r.tf
+link "r.notify"           ./r.n
+link "r.qute"             ./r.b
+link "r.elinks"           ./r.bt
+link "r.xmonad"           ./r.wm
+link "r.vim-xmessage"     ./xmessage
+link "/usr/bin/dunstify"  ./notify-send
 
 if distro ubuntu; then
   mkdef x-terminal-emulator $(which $term)
   mkdef www-browser $(which elinks)
   mkdef x-www-browser $(which qutebrowser)
-  mkdef x-window-manager $(which i3)
+  mkdef x-window-manager $(which xmonad)
 fi
