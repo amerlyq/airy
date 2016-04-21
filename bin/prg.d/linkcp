@@ -18,14 +18,24 @@ show() { local t=$1 src=$2 dst=$3 sfx
   [[ ${src##*/} == ${dst##*/} ]] || sfx=" (${src#${src%/*/*}/})"
   echo "-> $t  ${dst}${sfx}";
 }
+same_file() { diff -q "${1:?}" "${2:?}" &>/dev/null; }
+same_tree() { ! find "$1" -type f -printf '%P\0' \
+    |& xargs -r0I{} diff -q "${1:?}"/{} "${2:?}"/{} \
+    |& grep -qm1 '.*'  # ALT: read -t0 -N1
+}
 f_copy() { local src=$1 dst=$2
-  [[ -e $dst || ! -L $dst ]] || rm "$dst"
-  if [[ ! -e $dst || ! -L $dst ]]; then
-    if ! diff $args -q "$src" "$dst" >/dev/null 2>&1; then
-      $sudo mkdir -p "${dst%/*}"
-      $sudo cp $args -vfT -- "$src" "$dst"
-    else show C "$src" "$dst"; fi
-  else die "refuse copy over existing link '$dst'"; fi
+  [[ -f $src || -d $src ]] || die "wrong source filetype"
+  [[ ! -e $dst || ! -L $dst ]] || die "refuse copy over existing link '$dst'"
+  [[ -e $dst || ! -L $dst ]] || rm "$dst"  # EXPL: rm dangling links
+  if ([[ -f $src ]] && same_file "$src" "$dst")\
+  || ([[ -d $src ]] && same_tree "$src" "$dst")
+  then show C "$src" "$dst"; return; fi
+  $sudo mkdir -p "${dst%/*}"
+  $sudo cp -rvfT -- "$src" "$dst"  # -b
+  # THINK: maintaine file hash db in ~/.cache/airy/ to check if configs
+  # was changed in external means and refuse to copy over, or forcefully
+  # make numerical backup for them. Then you can merge changes manually!
+  # BUT: for each file it must be done individually! Can't use 'cp -r'!
 }
 f_link() { local src=$1 dst=$2
   [[ -e $dst || ! -L $dst ]] || rm "$dst"
@@ -39,14 +49,14 @@ f_link() { local src=$1 dst=$2
       $sudo ln -svfT -- "$src" "$dst"
   else die "refuse symlink over existing file/dir '$dst'"; fi
 }
-dispatch() { local src=$(readlink -e "${1:?}") dst="${2:?}"
-  [[ -e "$src" ]] || die "no such file '${src:-$1}'"
-  [[ -f "$src" ]] || args='-r'
+dispatch() { local src=$(readlink -e "${1:?}") dst=${2:?}
+  [[ -e $src ]] || die "no such file '${src:-$1}'"
   ${cmd:?} "$src" "$dst" | sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g"
 }
 
 if [[ -z $DTO ]]; then
   dispatch "$1" "$2"
 else for nm in "$@"; do
+  # WARNING: non-heterogenous (not keeping relative filenames)
   dispatch "${DFR:+$DFR/}$nm" "$DTO/${nm##*/}"
 done; fi
