@@ -43,8 +43,8 @@ focusing =
   , ("M-l"      , GN.nextMatchWithThis GN.History wkspName)
   , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
   , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
-  , ("M-z"      , focusUrgent)
-  , ("M-C-z"    , clearUrgents)
+  , ("M-q"      , focusUrgent)
+  , ("M-C-q"    , clearUrgents)
   ]
 
 swap =

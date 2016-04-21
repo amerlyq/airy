@@ -6,8 +6,8 @@ over=$1
 ids=$(sed -rn '/.*xkb_symbols "([^"]+)".*/s//\1/p' ./symbols/overlay)
 
 if ! grep -qxF "$over" <<<"$ids"; then
-  [[ $silent ]] || echo "Unknown overlay: '$over'"
+  [[ $silent ]] || echo "E: Unknown overlay: '$over'"
   exit 1
 else
-  [[ $silent ]] || echo "Overlay: $over"
+  [[ $silent ]] || echo "N: Overlay: $over"
 fi

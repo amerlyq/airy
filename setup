@@ -18,6 +18,7 @@ pretty() { sed -r "
   /^>>> \~\/aura\//s//\n$C9\[/g
   /^>>> /s//\n$C2\[/g
   / <<<$/s//\]$CR/g
+  /^\s\s\(.*\)$/s//$C10&$CR/
   /(C|W):\s.*/s//$C13&$CR/
   /(I|N):\s.*/s//$C6&$CR/
   /.*\s-> L\s.*/s//$C4&$CR/
@@ -87,7 +88,7 @@ fi
 
 # ======================================================================
 # EXPL: -m (in main 'setup') forces single thread execution
-run(){ [[ ! -f "$1" ]] || "$@" $(cfgOpt m || echo -m); }
+run(){ [[ -f "$1" ]] && "$@" $(cfgOpt m || echo -m) || echo "(no ${1##*/})"; }
 r_install(){ cfgOpt i || return 0; run "$1/install" $(cfgOpt f && echo -u); }
 r_setup(){ run "$1/setup" $(cfgOpt u && echo -u); }
 

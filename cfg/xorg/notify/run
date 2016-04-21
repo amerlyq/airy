@@ -23,4 +23,5 @@ fi
 # Pos: -h int:x:500 -h int:y:500
 # Icon: -i '/usr/share/icons/oxygen/32x32/status/mail-unread-new.png'
 
-exec "${CMD[@]}" "${ARGS[@]}" "${1:-(no text)}" "${*:2}"
+(($#)) && ARGS+=("${1:-}" "${*:2}") || ARGS+=('(no text)')
+exec "${CMD[@]}" "${ARGS[@]}"

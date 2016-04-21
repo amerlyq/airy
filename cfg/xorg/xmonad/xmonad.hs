@@ -23,7 +23,7 @@ import XMonad.Hooks.EwmhDesktops    (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts)
 import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
-import XMonad.Hooks.UrgencyHook     (withUrgencyHook, NoUrgencyHook(..))
+import XMonad.Hooks.UrgencyHook     (withUrgencyHook, BorderUrgencyHook(..))
 
 ---- Layouts
 import qualified XMonad.StackSet as W
@@ -69,7 +69,7 @@ myStartupHook = do
     windows . W.view $ MyWksp.primary !! 1
 
 
-myCfg = withUrgencyHook NoUrgencyHook $ def
+myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
   { modMask = mod4Mask
   -- Options
   , terminal    = "r.t"

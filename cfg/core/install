@@ -10,7 +10,9 @@ if distro arch; then
 
     # ALT packer (lightweight but less automatable and w/o shell completion)
     # gpg --recv-keys <KEYID> AND then you can sign it:  gpg --lsign-key <KEYID>
-    aur_inst 'pacaur'
+    aur_inst pacaur
+    pkg_inst pkgfile  # To investigate packages content w/o downloading
+    ! cfgOpt u || sudo pkgfile --update
 
 # http://askubuntu.com/questions/468466/why-this-occurs-error-diskfilter-writes-are-not-supported
 else
