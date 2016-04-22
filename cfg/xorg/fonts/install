@@ -2,10 +2,6 @@
 source ~/.shell/func.d/packages
 has_pr X || die
 
-# SEE: good programming fonts
-#    http://input.fontbureau.com/
-# https://powerline.readthedocs.org/en/latest/installation/linux.html
-
 if distro arch; then
   if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
     grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
@@ -13,7 +9,20 @@ if distro arch; then
       pkg_inst -a infinality-bundle
   fi
 
-  pkg_inst -a ttf-freefont ttf-droid ttf-dejavu otf-ipafont
+  pkg_inst -a ttf-freefont ttf-droid ttf-dejavu
+
+  fd=/usr/share/fonts
+  # SEE: https://github.com/adobe-fonts
+  # NOTE: http://adobe-fonts.github.io/source-code-pro/
+  # https://github.com/adobe-fonts/source-code-pro
+  pkg_inst -d "$fd/adobe-source-code-pro" adobe-source-code-pro-fonts
+  # https://github.com/adobe-fonts/source-han-sans
+  pkg_inst -d "$fd/adobe-source-han-sans" adobe-source-han-sans-jp-fonts
+  # NOTE: http://comicneue.com/
+  aur_inst -f "$fd/OTF/ComicNeue-Regular.otf" ttf-comic-neue
+  # NOTE: http://ipafont.ipa.go.jp/
+  pkg_inst -f "$fd/OTF/ipag.ttf" otf-ipafont
+
   # Install manually:
   # aur_inst -a 'freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu'
   # pkg_inst powerline-fonts

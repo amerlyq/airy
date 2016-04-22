@@ -35,7 +35,7 @@ pages=$(awk -vN=$total -vG=$((${grid/x/*})) 'BEGIN{a=1;for(i=2;i<=G;i++){a=a","i
 frame="$((${size%%x*}/${grid%%x*}))x$((${size##*x}/${grid##*x}))"
 
 ddjvu -format=pnm -page="$pages" -size="$frame" "$path" \
-| montage - -font DejaVu-Sans-Mono -background none \
+| montage - -font monospace -background none \
     -tile "$grid" -geometry +2+2 "$dst"
 
 osize=$(stat -c%s "$dst")

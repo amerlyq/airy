@@ -1,5 +1,8 @@
 > Fonts
 
+Blog
+	https://www.patreon.com/eevee?ty=h
+
 HiDPI
 	https://github.com/actionless/dotfiles/tree/master/theme-tp-hidpi
 
@@ -14,8 +17,10 @@ Fallbacks (unicode)
 	https://alexandre.deverteuil.net/blogue/unifont-and-rxvt-unicode/
 	https://people.mpi-inf.mpg.de/~uwe/misc/uw-ttyp0/sample-11x22b.html
 	: ttf-unifont
+
 Ref
-	https://freedesktop.org/software/fontconfig/fontconfig-user.html
+	<< https://freedesktop.org/software/fontconfig/fontconfig-user.html
+	>> https://eev.ee/blog/2015/05/20/i-stared-into-the-fontconfig-and-the-fontconfig-stared-back-at-me/
 
 Setup
 	To achieve system-wide effect, place the xml config inside
@@ -23,3 +28,14 @@ Setup
 	$ ln -s /etc/fonts/conf.avail/29-prettify.conf /etc/fonts/conf.d/29-prettify.conf
 	To disable scaling of bitmap fonts (which often makes them blurry), remove
 	$ rm /etc/fonts/conf.d/10-scale-bitmap-fonts.conf
+
+SEE: good programming fonts
+	http://input.fontbureau.com/
+	https://powerline.readthedocs.org/en/latest/installation/linux.html
+
+Debug
+> Unless it’s told otherwise, fontconfig assumes every font is sans-serif
+	Show fallbacks list
+		fc-match -s <font>
+	Show gnome dpi
+		gconftool-2 -g /desktop/gnome/font_rendering/dpi

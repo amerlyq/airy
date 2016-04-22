@@ -1,0 +1,4 @@
+#!/bin/bash -e
+# Search family used for glyph
+
+DISPLAY=:0 FC_DEBUG=4 pango-view --font=monospace -t ${1:-☺} | grep family:
