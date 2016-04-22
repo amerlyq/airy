@@ -43,6 +43,7 @@ focusing =
   , ("M-l"      , GN.nextMatchWithThis GN.History wkspName)
   , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
   , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
+  -- TODO: find what blocks 'M-z'
   , ("M-q"      , focusUrgent)
   , ("M-C-q"    , clearUrgents)
   ]

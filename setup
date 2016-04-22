@@ -46,6 +46,8 @@ if cfgOpt i && cfgOpt u && ((!$#)) && [[ ! -f "$queue" ]]; then
         sudo apt-get install gawk
         echo "sudo apt-get update && sudo apt-get upgrade"
     fi
+    # TODO:ADD: 'gem/python/cabal update && upgrade' if pr is found
+    # THINK:USE: it's own key '-y' instead of combo 'iu' ?
 fi
 
 # ======================================================================

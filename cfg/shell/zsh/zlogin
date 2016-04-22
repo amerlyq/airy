@@ -2,6 +2,7 @@
 # Executes commands at login post-zshrc.
 # BUG:WARNING: urxvt (but not st) sources this file on each startup!
 
+_dttime compdump
 # Execute code that does not affect the current session in the background.
 {
   # Compile the completion dump to increase startup speed.
@@ -10,6 +11,7 @@
     "$zcompdump" -nt "${zcompdump}.zwc") ]]
   then zcompile "$zcompdump"; fi
 } &!
+_dttime end-compdump
 
 # Print a random, hopefully interesting, adage.
 # if (( $+commands[fortune] )); then
@@ -24,3 +26,4 @@
 ((0==$#commands[r.init])) || r.init
 # dinit=~/aura/airy/cfg/core/init
 # [[ -f $dinit/run ]] && exec $dinit/run || ((0==$#commands[r.init])) || exec r.init
+_dttime end-zlogin

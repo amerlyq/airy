@@ -8,7 +8,7 @@ if hash tmux &>/dev/null && tmux start-server; then
   TMUX_SERVER=VTsrv  # USE "vt$XDG_VTNR" to separate vt sessions
   [[ -z $TMPDIR ]] || export TMUX_TMPDIR=$TMPDIR
   tmux has-session -t "$TMUX_SERVER" 2>/dev/null ||
-    tmux new-session -d -s "$TMUX_SERVER" "$SHELL"
+    tmux new-session -d -s "$TMUX_SERVER" "$SHELL" &
 fi
 
 # Launch X only on tty1

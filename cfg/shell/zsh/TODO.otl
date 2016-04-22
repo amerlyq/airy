@@ -4,17 +4,37 @@ REF
 
 	>>> [_] https://grml.org/zsh/zsh-lovers.html
 
-Profiling
+Profiling startup time
 	SEE
-		http://stackoverflow.com/questions/4351244/can-i-profile-my-zshrc-zshenv
+		> http://blog.xebia.com/profiling-zsh-shell-scripts/
 		https://kev.inburke.com/kevin/profiling-zsh-startup-time/
+		http://stackoverflow.com/questions/4351244/can-i-profile-my-zshrc-zshenv
 		http://stackoverflow.com/questions/8899890/zsh-script-and-prompt-profiling
-
-TASKS
+	[_] FIX reduce startup time -- it's too much for zsh+ranger
+		:= do all preparations async like for git?
+		:/ or make async ipc from ranger to zsh -- which is even better
+		:Maybe use 'paci dtach' to run zsh session and feed keys?
+		:SEE: ref/bash/redirections.otl
+		:>>> http://rachid.koucha.free.fr/tech_corner/pty_pdip.html
 	[_] Cache all plugins into one file
-	: Reduces disk-access time for no-SSD systems
+	: Reduces disk-access time for no-SSD systems, no need to resolve symlinks on login
 		https://github.com/tarjoilija/zgen
 		: ALT: inside zlogin compile all rc files in *.zwc
+	[_] TRY: pre-compile PATH in shell/setup (to be sourced by both bath/zsh)
+		: OR: cache whole 'shell/exports' into
+		: Don't re-use $ZDOTDIR/.zprofile -- as we need to source for bash also
+		: BETTER: use some already loaded inode like $HOME
+		[_] CHECK:(beforehand) abilities of 'zgen' plugin -- maybe it will combine all zsh configs?
+	[_] TRY: on login only load 'zshenv/zprofile' to setup env and ignore slow 'zshrc' with 'prezto'
+		[_] THINK: always use 'exec r.init' instead of 'r.init'
+			:+ we have only partially initialized shell -- so won't be able to use it fully after logoff
+			:+ SHLVL will be reduced, as planned
+		[_] CHECK: what to do with gpg-agent
+			:? is it necessary to run it from console or any first terminal will be sufficient?
+			: MAYBE move first gpg-agent init into global tmux session (accomplying separate thread)
+
+
+TASKS
 	[_] BUG: SHLVL=5 for tty which is much more than needed
 		: SHLVL=3 now, but why? Where located SHLVL=2?
 		:= TODO: integrate with ~/.profile and /etc/profile*
@@ -27,6 +47,7 @@ TASKS
 
 Prezto
 	SEE
+		> http://zanshin.net/2013/02/02/zsh-configuration-from-the-ground-up/
 		http://jeromedalbert.com/migrate-from-oh-my-zsh-to-prezto/
 		2015-06-11 [X] http://linhmtran168.github.io/blog/2013/12/15/ditching-oh-my-zsh-for-prezto/
 		http://jr0cket.co.uk/2013/09/hey-prezto-zsh-for-command-line-heaven.html
@@ -42,12 +63,6 @@ Prezto
 		[_] make different prompt colors for 16 and 256 term
 		[_] FIX inside ranger 'less' arguments or find workaround
 			:= as it prints content instead viewing, being launched from ranger
-		[_] FIX reduce startup time -- it's too much for zsh+ranger
-			:= do all preparations async like for git?
-			:/ or make async ipc from ranger to zsh -- which is even better
-			:Maybe use 'paci dtach' to run zsh session and feed keys?
-			:SEE: ref/bash/redirections.otl
-			:>>> http://rachid.koucha.free.fr/tech_corner/pty_pdip.html
 
 Prompt
 	[_] FIXME: timeout for nested shells, +notification
@@ -194,6 +209,7 @@ zsh
 		http://sourceforge.net/p/zsh/code/ci/master/tree/Completion/Unix/Command/_tmux
 		https://github.com/robbyrussell/oh-my-zsh/wiki/Customization
 		http://www.fastlinux.eu/about/
+		https://wiki.math.cmu.edu/iki/wiki/tips/20140625-zsh-expand-alias.html
 
 SEIZE
 	>>> http://habrahabr.ru/post/272581/

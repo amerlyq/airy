@@ -8,7 +8,7 @@ ff() { find . -type f -regex $@; }
 # grep -Ri 'name' . # find in all files
 # alias ff='find ./ | grep -i '
 
-if hash ag >/dev/null 2>&1
+if _has_pr ag
 then agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S $@; }
 else agi() { grep -ri $@ .; }  # --include=*.{cc,h}
 fi

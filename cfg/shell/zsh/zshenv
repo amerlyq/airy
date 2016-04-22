@@ -3,11 +3,20 @@
 # If you want move it to ZDOTDIR also, then next line must reside in /etc/zshenv
 [[ ! -d ~/.cache/zsh ]] || ZDOTDIR=~/.cache/zsh
 
+_has_pr(){ (( $#commands[$1] )); }
+_time_dt(){ local t=$(($(date +%s%N)/1000000))
+  [[ -z $_time_dt_prev ]] || echo "${1+$1  }$((t - _time_dt_prev))ms"
+  _time_dt_prev=$t
+}; unset _time_dt_prev;
+_dttime(){ _time_dt "$@"; }; _dttime  # naive zsh-profiling
+# _dttime(){ }
+
 # in $ man zshall --> there is recommended to use '[[ -o rcs ]]' ?
 # Ensure that a non-login, non-interactive shell has a defined environment.
-if [[ -o rcs && ! -o LOGIN && "$SHLVL" -eq 1 && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]
-then source "${ZDOTDIR:-$HOME}/.zprofile"; fi
+if [[ -o rcs && ! -o LOGIN && $SHLVL -eq 1 && -s ${ZDOTDIR:-$HOME}/.zprofile ]]
+then source "${ZDOTDIR:-$HOME}/.zprofile"; echo yes; fi
 
+_dttime end-zshenv
 # WARNING: Available even in Zsh scripts!
 # :> But as I mostly writing portable scripts in bash, it's not a problem.
 # WARNING: It should not contain commands that produce output or assume the

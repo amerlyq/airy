@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Vim navigation inside 'info' as in 'man'
-if hash pinfo >/dev/null 2>&1; then
+if _has_pr pinfo; then
     alias info='pinfo --vi-keys'
 else
     alias info='info --vi-keys'

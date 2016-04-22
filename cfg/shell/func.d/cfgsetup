@@ -38,6 +38,7 @@ linkmask(){ local nm mask=$1 fmt=$2
 if distro arch; then
   mkdef() { link "${2:?No bin}" "$CURR_DIR_CACHE/bin/${1:?No name}"; }
   svc_enable() { systemctl is-enabled "$1" > /dev/null || sudo systemctl enable "$1"; }
+  svc_disable() { systemctl is-enabled "$1" > /dev/null || return 0; sudo systemctl disable "$1"; }
   svc_restart() { sudo systemctl restart "$1"; }
   usvc_activate() { systemctl --user daemon-reload &&  # Refresh configurations
       systemctl --user enable "$1" && systemctl --user start "$1"; }
@@ -52,6 +53,7 @@ elif distro ubuntu; then
   mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
       sudo update-alternatives --set $1 "$2"; }
   svc_enable() { sudo update-rc.d "$1" defaults; }
+  svc_disable() { sudo update-rc.d -f "$1" remove; }
   svc_restart() { sudo service "$1" restart; }
 fi
 

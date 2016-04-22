@@ -2,29 +2,36 @@
 ### Vars ###
 export LANG="${LANG:-en_US.UTF-8}"  # FIXED: for schroot into old ubuntu
 export LC_NUMERIC="${LC_NUMERIC:-$LANG}"
+_dttime exports
 
 ### Temp ###
 if [[ ! -d "$TMPDIR" ]]; then
   export TMPDIR="/tmp/$LOGNAME"
   mkdir -p -m 700 "$TMPDIR"
 fi
+_dttime exp-tmpdir
 
 ### Path ###
-! hash ruby>/dev/null 2>&1||PATH+=":$(ruby -e 'print Gem.user_dir')/bin"
-PATH="/usr/local/bin:/usr/local/sbin:$PATH"
-! hash cabal>/dev/null 2>&1||PATH="$HOME/.cabal/bin:$PATH"
-PATH="$HOME/.cache/airy/bin:$HOME/.bin:$PATH"
+! _has_pr ruby || PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
+PATH=/usr/local/bin:/usr/local/sbin:$PATH
+_dttime exp-ruby
+! _has_pr cabal || PATH=$HOME/.cabal/bin:$PATH
+PATH=$HOME/.cache/airy/bin:$HOME/.bin:$PATH
 export PATH
+_dttime exp-cabal
 
 ### Vim ###
-hash nvim>/dev/null 2>&1 && EDITOR=nvim || EDITOR=vim
+_has_pr nvim && EDITOR=nvim || EDITOR=vim
 export EDITOR VISUAL="$EDITOR"
+_dttime exp-nvim
 
 ### Less ###
-hash r.pager>/dev/null 2>&1 && PAGER=r.pager || PAGER=less
+_has_pr r.pager && PAGER=r.pager || PAGER=less
 [[ -r ~/.less ]] || LESS='-a -i -j6 -M -N -R -S -w -z-4 -x4'
 export PAGER LESS
+_dttime exp-less
 # export MANPATH="/usr/local/man:$MANPATH"
 
 ### Alien profile (SSH server, anonymous)###
 if [[ -f ~/aura/env ]]; then source ~/aura/env; fi
+_dttime exp-env

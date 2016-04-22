@@ -2,6 +2,9 @@
 # add custom completion scripts
 fpath=(~/.shell/zsh/completion.d $fpath)
 
+# EXPL: speed up completion
+zstyle ':completion::complete:*' accept-exact '*(N)'
+
 # compsys initialization
 # autoload -U compinit
 # compinit

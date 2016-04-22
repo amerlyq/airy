@@ -1,24 +1,25 @@
 #!/bin/bash
-if hash pacaur >/dev/null 2>&1; then
+if _has_pr pacaur; then
     alias pacman='pacaur'
-elif hash yaourt >/dev/null 2>&1; then
+elif _has_pr yaourt; then
     alias pacman='yaourt'
 else
     alias pacman='sudo pacman'
 fi
 
 alias paci='pacman -S'     # install
-alias pacI='pacman -Su'    # install file
-alias pacu='pacman -Sy'    # refresh only
-alias pacU='pacman -Syu'   # '[u]pgrade all'
+alias pacu='pacman -Su'    # install file
+# alias pacU='pacman -U /var/cache/pacman/pkg'    # refresh only
+alias pacy='pacman -Sy'    # refresh only
+alias pacY='pacman -Syu'   # '[u]pgrade all'
 alias pacr='\pacman -Rs'   # '[r]emove'
 alias pacR='\pacman -Rs --nosave --recursive'
+alias pacq='pacman -Si'    # '[i]nfo'
 alias pacs='pacman -Ss'    # '[s]earch repos'
 alias pacS='pacman -Qs'    # '[s]earch local'
-alias pacS='pacman -Qo'    # 'path fr[o]m which package'
-alias pacI='pacman -Si'    # '[i]nfo'
-alias paclo='\pacman -Qdt'  # '[l]ist [o]rphans'
-# alias pacc='pacman -Scc'   # '[c]lean cache' (not currently installed)
+alias paco='\pacman -Qdt'  # '[l]ist [o]rphans'
+# alias pacc='pacman -Scc'   # '[c]lean cache' (all not currently installed)
 alias pacl='\pacman -Ql'   # '[l]ist [f]iles' (installed by a given package)
+alias pacL='\pacman -Qo'    # 'path fr[o]m which package'
 # alias pacexpl='pacman -D --asexp'  # 'mark as [expl]icit'
 # alias pacimpl='pacman -D --asdep'  # 'mark as [impl]icit'

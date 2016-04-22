@@ -25,12 +25,13 @@
 
 # Only if running bash
 if [ -n "$BASH_VERSION" ]; then
-    [[ ! -r "$HOME/.shell/exports" ]] || source "$HOME/.shell/exports"
+    _has_pr(){ hash "$1" >/dev/null 2>&1; }
+    [[ ! -r ~/.shell/exports ]] || source ~/.shell/exports
     # Most of PATH constructed in /etc/profile and /etc/profile.d/
-    if hash awk >/dev/null 2>&1; then export PATH="$(
+    if _has_pr awk; then export PATH=$(
         awk -vRS=: '!a[$0]++{printf(NR>1?":%s":"%s"),$a[$1]}' <<<"$PATH"
-    )"; fi
-    [[ ! -r "$HOME/.bashrc" ]] || source "$HOME/.bashrc"
+    ); fi
+    [[ ! -r ~/.bashrc ]] || source ~/.bashrc
 fi
 
 ## Export variable for systemd/user units
