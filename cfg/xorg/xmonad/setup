@@ -3,22 +3,22 @@ source ~/.shell/func.d/cfgsetup
 [[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link -t ~/.xmonad xmonad.hs
+link -t ~/.xmonad xmonad.hs xmobarrc
 lib=~/.xmonad/lib/XMonad
 (cd cfg && linkdir "$lib/Config/Amer/" *)
 (cd ext && linkdir "$lib/Util/Amer/" *)
 
 ### GENS ###
 if cfgOpt u; then
-  dst=~/.xmonad/xmobarrc
-  link -c xmobarrc "$dst"
-  trayw=$(( 3 * (${MAIN_DPI:?} * 9/72 + 4) + 6 ))
-  sed -ri '/^(, position\s*= BottomP 0).*/s//\1 '$trayw'/' "$dst"
+  # dst=~/.xmonad/xmobarrc
+  # link -c xmobarrc "$dst"
+  # trayw=$(( 3 * (${MAIN_DPI:?} * 9/72 + 4) + 6 ))
+  # sed -ri '/^(, position\s*= BottomP 0).*/s//\1 '$trayw'/' "$dst"
 
   # THINK ServerMode.hs is too old in pacman/core, but wget is slow.
   dst="$lib/Hooks"
   url='http://code.haskell.org/XMonadContrib/XMonad/Hooks/ServerMode.hs'
-  (mkdir -p "$dst" && wget "$url" -O "$dst/ServerMode.hs")
+  [[ -f $dst/ServerMode.hs ]] || (mkdir -p "$dst" && wget "$url" -O "$dst/ServerMode.hs")
   (cd "$lib/Util/Amer" && ghc --make ctl.hs)
 
   fork_m r.xmonad-rebuild

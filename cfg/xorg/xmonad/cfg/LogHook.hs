@@ -32,6 +32,7 @@ xdokey = ("xdotool key --delay 150 super+" ++) . key2xsym
 -- xmobar pretty printing source
 myStateLoggger copies = dynamicLogString def
   { ppCurrent = xmobarColor "#fd971f" ""
+  -- { ppCurrent = \t -> "<fc=#fd971f,#ffffff>" ++ t ++ "</fc>"
   -- , ppVisible = wrap "(" ")" (xinerama only)
   , ppHidden  = clickws . predefined
   -- , ppHiddenNoWindows = const ""
