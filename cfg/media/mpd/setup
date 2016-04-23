@@ -2,17 +2,16 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-dir=~/.mpd
 # EXPL: playlists can't be grouped in subfolders:(
-(cd ./radio && linkdir ~/.mpd/playlists/ *)
+link -t ~/.mpd/playlists ./radio/*
 
-case "${CURR_PROF:?}" in
-# home) link "$PWD/mpd-sir.conf" "$dir/mpd.conf" ;;
-   *) link "$PWD/mpd-own.conf" "$dir/mpd.conf" ;;
+case ${CURR_PROF:?} in
+# home) link "$PWD/mpd-sir.conf" ~/.mpd/mpd.conf ;;
+   *) link "$PWD/mpd-own.conf" ~/.mpd/mpd.conf ;;
 esac
 
 
-if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
+if cfgOpt c || [[ ! -e ~/.mpd/pid ]]; then
     if distro arch; then
         usvc_activate mpd
 
@@ -24,8 +23,8 @@ if cfgOpt c || [[ ! -e "$dir/pid" ]]; then
         sudo update-rc.d mpd disable
     fi
 
-    mkdir -p "$dir/playlists"
-    touch $dir/{db,log,pid,state}
+    mkdir -p ~/.mpd/playlists
+    touch ~/.mpd/{db,log,pid,state}
     # Check if running: sudo /etc/init.d/mp status | grep -c "is running"
 fi
 

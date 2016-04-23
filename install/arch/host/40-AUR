@@ -44,7 +44,7 @@ if grep -q '^\[archlinuxfr\]' /etc/pacman.conf; then
     LST="$LST package-query yaourt"
 fi
 pacman -S --noconfirm $LST
-!has_pr yaourt || yaourt -S --needed --noconfirm pacaur  # qingy
+! has_pr yaourt || yaourt -S --needed --noconfirm pacaur  # qingy
 
 # SEE manual installation for ARM
 # https://astrofloyd.wordpress.com/2015/01/17/installing-yaourt-on-arch-linux/

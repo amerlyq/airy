@@ -3,9 +3,12 @@
 # for examples
 
 # If not running interactively, don't do anything
-[[ $- != *i* ]] && return
-TMPPREFIX="${TMPDIR:-/tmp}"
-TMPPREFIX="${TMPPREFIX%/}/${SHELL##*/}"
+[[ $- == *i* ]] || return
+type -f _has_pr >/dev/null 2>&1 \
+  || _has_pr(){ hash "$1" >/dev/null 2>&1; }
+
+TMPPREFIX=${TMPDIR:-/tmp}
+TMPPREFIX=${TMPPREFIX%/}/${SHELL##*/}
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options

@@ -1,17 +1,20 @@
 #!/bin/bash -e
 # vim: ts=2:sw=2:sts=2
+exec > >(sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g")
 die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 
 unset sudo
 cmd=f_link
 
 OPTIND=1
-while getopts 'bcsf:t:' o; do case $o
+while getopts 'bcskf:t:p:' o; do case $o
 in c) cmd='f_copy'
 ;; b) backup='_'
 ;; s) sudo='sudo'
-;; f) DFR=$OPTARG
-;; t) DTO=$OPTARG
+;; k) keep=1       # Keep src relative subpath
+;; f) DFR=$OPTARG  # From directory
+;; t) DTO=$OPTARG  # Destination directory
+;; p) PFX=$OPTARG  # Add prefix (Like '.' for dotfiles)
 esac; done; shift $((OPTIND-1))
 
 show() { local t=$1 src=$2 dst=$3 sfx
@@ -51,12 +54,13 @@ f_link() { local src=$1 dst=$2
 }
 dispatch() { local src=$(readlink -e "${1:?}") dst=${2:?}
   [[ -e $src ]] || die "no such file '${src:-$1}'"
-  ${cmd:?} "$src" "$dst" | sed -r "s@(^|\W)$HOME@~@g; s@~/aura/airy/cfg@::@g"
+  ${cmd:?} "$src" "$dst"
 }
 
 if [[ -z $DTO ]]; then
   dispatch "$1" "$2"
 else for nm in "$@"; do
-  # WARNING: non-heterogenous (not keeping relative filenames)
-  dispatch "${DFR:+$DFR/}$nm" "$DTO/${nm##*/}"
+  # ALT linkdir(){ mkdir -p $2 && lndir "$DTO" $2; }
+  (($keep)) && dst=$nm || dst=${nm##*/}
+  dispatch "${DFR:+$DFR/}$nm" "${DTO:+$DTO/}${PFX}${dst}"
 done; fi

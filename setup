@@ -7,8 +7,10 @@ echo "$THEME" > "$CURR_DIR_CACHE/theme"
 queue="${TMPDIR:-/tmp}/mods_installing"
 mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ -L ~/.bin ]] || ln -svT "$PWD/bin" ~/.bin
+export PATH=~/.bin:$PATH
 
 # ======================================================================
+# THINK:USE: exec > >(pretty)  (BUT: pacman -Syu output, etc?)
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
 header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
 pretty() { sed -r "

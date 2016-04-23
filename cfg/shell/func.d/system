@@ -31,7 +31,7 @@ airy_cache_pwd_mod() { local mods="${CURR_DIR_CACHE:?No}/mods/mods"
 # ====================== Configs =====================================
 ajoin() { local IFS="$1"; shift; echo "$*"; }
 
-cfgOpt(){ [[ "${CFG_OPTS/[$*]}" != "$CFG_OPTS" ]]; }
+cfgOpt(){ [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]; }
 cfgNo(){ ! cfgOpt $1; }
 cfgOptAdd() { CFG_OPTS="${CFG_OPTS/[$*]}$*"; }
 

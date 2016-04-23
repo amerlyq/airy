@@ -42,7 +42,7 @@ r.xkb-xcape &
 r.dunst &
 # compton must be launched before installing wallpaper!
 compton -d ${DISPLAY:-:0} &
-[[ ! $XDG_CURRENT_DESKTOP =~ ^xmonad$ ]] || { r.tray & }
+# [[ ! $XDG_CURRENT_DESKTOP =~ ^xmonad$ ]] || { r.tray & }  # No need
 r.feh &
 r.mpd-log &
 

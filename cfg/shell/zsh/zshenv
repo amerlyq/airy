@@ -8,8 +8,8 @@ _time_dt(){ local t=$(($(date +%s%N)/1000000))
   [[ -z $_time_dt_prev ]] || echo "${1+$1  }$((t - _time_dt_prev))ms"
   _time_dt_prev=$t
 }; unset _time_dt_prev;
-_dttime(){ _time_dt "$@"; }; _dttime  # naive zsh-profiling
-# _dttime(){ }
+# _dttime(){ _time_dt "$@"; }; _dttime  # naive zsh-profiling
+_dttime(){ }
 
 # in $ man zshall --> there is recommended to use '[[ -o rcs ]]' ?
 # Ensure that a non-login, non-interactive shell has a defined environment.

@@ -7,10 +7,10 @@ PREZTO=~/.cache/zsh/.zprezto
 link "$PWD/zshenv" ~/.zshenv
 link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
 link "$PWD/prompt.d" "$PREZTO/modules/prompt/functions/prompt.d"
-linkdir "${PREZTO%/*}/." zlogin zprofile zshrc zpreztorc
+link -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc
 
 # Choose default shell
-if [[ -z "$SSH_TTY" && "$(which zsh)" != ${SHELL:?} ]]; then
+if [[ -z $SSH_TTY && $(which zsh) != ${SHELL:?} ]]; then
     sudo chsh -s /bin/bash  # Root login shell
     sudo usermod -s $(which zsh) "$(whoami)"  # User shell
 fi

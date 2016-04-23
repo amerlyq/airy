@@ -23,8 +23,6 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 ### LINKS ###
 fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
 link(){ ~/.bin/prg.d/linkcp $@; }
-linkdir(){ for nm in "${@:2}"; do link "$PWD/$nm" "${1:?No prf}$nm"; done }
-# ALT linkdir(){ mkdir -p $2 && lndir "$1" $2; }
 ### Populate all run, run.pr1 scripts into mycache/bin
 linkmask(){ local nm mask=$1 fmt=$2
   [[ -z $PS1 && $0 =~ ^${CURR_DIR_CFG:?} ]] || return 0

@@ -1,12 +1,12 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
 link -t ~/.xmonad xmonad.hs xmobarrc
 lib=~/.xmonad/lib/XMonad
-(cd cfg && linkdir "$lib/Config/Amer/" *)
-(cd ext && linkdir "$lib/Util/Amer/" *)
+link -t "$lib/Config/Amer" ./cfg/*
+link -t "$lib/Util/Amer"   ./ext/*
 
 ### GENS ###
 if cfgOpt u; then
