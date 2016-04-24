@@ -44,6 +44,7 @@ scratchpad = (concat . (`map` [
     , ("f" , runOrRaise "firefox" $ className =? "Firefox")
     , ("p" , runOrRaise "pidgin" $ className =? "Pidgin" <&&> stringProperty "WM_WINDOW_ROLE" =? "buddy_list")
     , ("s" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
+    , ("<F1>", namedScratchpadAction myScratchpads "help")
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)

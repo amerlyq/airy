@@ -6,13 +6,14 @@ module XMonad.Config.Amer.Control (
 import Data.Default     (def)
 import Data.Ratio       ((%))
 import Data.Map.Strict  (member)
-import Data.Maybe       (fromMaybe)
+import Data.Maybe       (maybe, fromMaybe, listToMaybe)
 import System.Exit      (exitSuccess)
 import XMonad hiding    (keys)
 import XMonad.StackSet              (view)
 import XMonad.ManageHook            (liftX, className)
 import XMonad.Hooks.ManageDocks     (ToggleStruts(..))
-import XMonad.Hooks.UrgencyHook     (focusUrgent, clearUrgents)
+import XMonad.Hooks.UrgencyHook     (withUrgents, clearUrgents)
+import XMonad.Actions.CycleWS       (toggleOrDoSkip)
 
 import XMonad.Actions.CopyWindow    (killAllOtherCopies, kill1)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
@@ -33,6 +34,10 @@ wkspName = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ fromMaybe "" $
 isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ member w $ W.floating ws) :: Query Bool
 whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
     then fX else nextNonEmpty W.view >> spawn "r.n 'Shutdown warning:' 'Close all windows'" :: X()
+-- FIXME: jump to urgent and back ALT: save last urgent and always jump to it even after urgentstate cleared
+-- backNforth f = gets (W.currentTag . windowset) >>= toggleOrDoSkip [] f
+-- urgentNback w = withUrgents $ maybe (backNforth $ W.view w) (windows . W.focusWindow) . listToMaybe $ w
+urgentNback = withUrgents $ maybe (return ()) (windows . W.focusWindow) . listToMaybe
 
 keys = focusing ++ swap ++ edit ++ movef ++ layouts ++ system
 
@@ -43,7 +48,7 @@ focusing =
   , ("M-l"      , GN.nextMatchWithThis GN.History wkspName)
   , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
   , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
-  , ("M-q"      , focusUrgent)
+  , ("M-q"      , urgentNback)
   , ("M-C-q"    , clearUrgents)
   ]
 
