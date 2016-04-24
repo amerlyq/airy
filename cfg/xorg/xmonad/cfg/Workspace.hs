@@ -10,6 +10,7 @@ import Data.List                    (zipWith)
 import XMonad                       (windows)
 import XMonad.StackSet              (view, shift)
 import XMonad.Actions.CopyWindow    (copy)
+import XMonad.Actions.SwapWorkspaces(swapWithCurrent)
 -- import XMonad.Layout.IndependentScreens (onCurrentScreen, workspaces')
 
 import XMonad.Config.Amer.Common    (bring)
@@ -45,4 +46,6 @@ actions =
   , ("M-C-"   , shift)
   , ("M-S-"   , bring)
   , ("M-C-S-" , copy)
+  -- THINK: maybe use it only for 'M-a', and bind smth else for wksp?
+  , ("M-M1-"  , swapWithCurrent)
   ]

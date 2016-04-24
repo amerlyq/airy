@@ -7,6 +7,7 @@ import Data.Default                 (def)
 import XMonad                       (gets, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen)
 import XMonad.StackSet              (view, shift, currentTag, shiftWin)
 import XMonad.Actions.CycleWS       (findWorkspace, screenBy, toggleOrDoSkip, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))
+import XMonad.Actions.GroupNavigation(nextMatch, Direction(History))
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
 
 import XMonad.Layout.TwoPane        (TwoPane(..))
@@ -23,6 +24,9 @@ import XMonad.Config.Amer.Workspace (skipped, actions)
 nextEmpty    f = findWorkspace getSortByIndex Next EmptyWS 1    >>= windows . f
 nextNonEmpty f = findWorkspace getSortByIndex Next NonEmptyWS 1 >>= windows . f
 backNforth   f = gets (currentTag . windowset) >>= toggleOrDoSkip skipped f
+backHistory  f = nextMatch History (return True) -- BUG: only toggles between two recent
+-- SEE: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-TopicSpace.html
+-- -- has history navigation between last workspaces
 
 -- Cycle through screens
 -- ALT (screenWorkspace 0 >>= flip whenJust (windows . view))
