@@ -9,7 +9,7 @@ if cfgOpt c; then while read line
 do rm -vf "${PWD}${line}"; done < "$PWD/.gitignore"; fi
 
 if cfgOpt u; then
-echo "USE: ranger --copy-config=all (Be Careful!), and see diff"; exit; fi
+echo "N: USE: ranger --copy-config=all (Be Careful!), and see diff"; exit; fi
 
 
 case "${SHELL:?}" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac

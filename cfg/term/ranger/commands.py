@@ -239,8 +239,11 @@ class shell(Command):
             if '%' in command:
                 command = self.fm.substitute_macros(command, escape=True)
 
-            if 'r' not in flags:
-                command = "source ~/.shell/aliases && eval " + shell_quote(command)
+            # FIXME:DEV:
+            # 'map s enter_shell' instead of 'chain shell $SHELL'
+            # ':shell' -- use $SHELL -i (BUT slow with prezto)
+            # if 'r' not in flags:
+            #     command = "source ~/.shell/aliases && eval " + shell_quote(command)
 
             self.fm.execute_command(command, flags=flags)
 

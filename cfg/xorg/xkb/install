@@ -12,8 +12,9 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst -p 'xev' xorg-xev
-  aur_inst xcape xkbset  # NOTE: only yaourt?
   aur_inst -p 'kbdd' kbdd-git
+  aur_inst xcape
+  ayr_inst xkbset  # NOTE: only yaourt installs w/o error?
 
 elif distro ubuntu; then
   pkg_inst kbdd

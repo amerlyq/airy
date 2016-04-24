@@ -9,6 +9,7 @@ if distro arch; then
 
     # pkg_inst 'haskell-unordered-containers'
     [[ -d ~/.cabal/bin ]] || echo "Err: Re-login session to add ~/.cabal/bin/xmobar into PATH"
+    pkg_inst -f '/usr/include/X11/xmp.h' libxpm
     aur_inst -d {/usr/share/doc/,}haskell-libmpd
     cab_inst -p 'xmobar' xmobar --flags="with_dbus with_utf8 with_xft with_mpd with_alsa"
 

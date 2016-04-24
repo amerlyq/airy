@@ -20,6 +20,7 @@ if [[ $FUN != synced ]]; then
 fi
 autoload -U regexp-replace
 TRAPUSR1(){ kill ${${(v)jobstates##*:*:}%=*} &>/dev/null; return 1; }
+# ALT:(trap USR1) http://unix.stackexchange.com/questions/48533/exit-shell-script-from-a-subshell
 
 # Impl
 function gita_omz {

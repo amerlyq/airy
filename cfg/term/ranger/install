@@ -3,10 +3,14 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     pkg_inst ranger fbida libcaca poppler p7zip unzip
-    pkg_inst pygmentize python-pygments
-    pip_inst pygments-style-solarized
+
+    # BUG: conflict with qutebrowser, etc
+    # pkg_inst pygmentize python-pygments
+    # pip_inst pygments-style-solarized
+
     # Pager preview
-    pkg_inst ffmpegthumbnailer perl-image-exiftool catdoc
+    pkg_inst ffmpegthumbnailer catdoc
+    pkg_inst -d '/usr/share/perl5/vendor_perl/Image/ExifTool' perl-image-exiftool
     # aur_inst -p 'wav2png' 'wav2png-git'
 
 else

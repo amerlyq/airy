@@ -2,6 +2,7 @@
 source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
+export PATH=${CURR_DIR_CACHE:?}/bin:$PATH
 
 ### Argparse ###
 CFG_ARGS=( "$@" )  # Backup default arguments
@@ -15,18 +16,20 @@ in t) THEME=$OPTARG
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme
-[[ $THEME ]] || THEME=$(<"${CURR_DIR_CACHE:?}/theme")
 [[ $THEME_ALLOWED ]] || THEME_ALLOWED='dark|light|lucid|opaque'
+[[ $THEME ]] || THEME=$(<"${CURR_DIR_CACHE:?}/theme") ||:
 [[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=dark
 
 
 ### LINKS ###
+# BUG: on error we can't exit from forked shell and fail main one!
 fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
-link(){ ~/.bin/prg.d/linkcp $@; }
+link(){ ~/.bin/prg.d/linkcp "$@"; }
 ### Populate all run, run.pr1 scripts into mycache/bin
 linkmask(){ local nm mask=$1 fmt=$2
-  [[ -z $PS1 && $0 =~ ^${CURR_DIR_CFG:?} ]] || return 0
-  for src in "$mask"*; do [[ -f "$src" && -x "$src" ]] || continue
+  # ALT:(-m) -z $PS1 -- BUT: we can't manually activate mod
+  cfgOpt m && [[ $0 =~ ^${CURR_DIR_CFG:?} ]] || return 0
+  for src in "$mask"*; do [[ -f $src && -x $src ]] || continue
     nm=$(printf "$fmt" "${PWD##*/}" "${src#$mask}")
     link "$src" "$CURR_DIR_CACHE/$nm"
   done
@@ -34,7 +37,9 @@ linkmask(){ local nm mask=$1 fmt=$2
 
 
 if distro arch; then
-  mkdef() { link "${2:?No bin}" "$CURR_DIR_CACHE/bin/${1:?No name}"; }
+  # TODO:DEV: add fallback -- for each arg until pr found OR err
+  mkdef() { link "$(which "${2:?No bin}")" \
+    "$CURR_DIR_CACHE/bin/${1:?No name}"; }
   svc_enable() { systemctl is-enabled "$1" > /dev/null || sudo systemctl enable "$1"; }
   svc_disable() { systemctl is-enabled "$1" > /dev/null || return 0; sudo systemctl disable "$1"; }
   svc_restart() { sudo systemctl restart "$1"; }
@@ -57,7 +62,7 @@ fi
 
 ### Go to current script's directory
 cd $(dirname $(readlink -m ${0}))
-[[ -n "$MODS_CACHE_DISABLE" ]] || airy_cache_pwd_mod
+[[ $MODS_CACHE_DISABLE ]] || airy_cache_pwd_mod
 
 if [[ -z $MODS_RUN_DISABLE ]]; then
   linkmask "$PWD/bin/" 'bin/r.%s-%s'

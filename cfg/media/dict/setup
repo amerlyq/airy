@@ -11,9 +11,14 @@ fi
 #   with no access to my config files inside home directory.
 link -sc ./cfg "$dir"
 
-if cfgOpt u; then
+if cfgOpt u ; then
+
+  dicts=/home/media/res/dicts
+  if [[ ! -d $dicts ]]
+  then echo "Wrn: install '*dict.dz' into '$dicts'"
+  else
     ## Add dictionaries to dictd
-    "$PWD/scripts/indexate"
+    ./scripts/indexate
     # echo "~/installer/Dics" >> /etc/dictd/dictd.order
 
     # sudo touch /var/lib/dictd/db.list
@@ -26,10 +31,12 @@ if cfgOpt u; then
 
     svc_enable  dictd
     svc_restart dictd
+  fi
 
     ### GEN ###
-    echo 'cd "$HOME/.wine/drive_c/Program Files (x86)/Yarxi" && wine yarxi.exe'\
-        | vienv -r sh "${CURR_DIR_CACHE:?No}/bin/r.yarxi"
+    # echo 'cd "$HOME/.wine/drive_c/Program Files (x86)/Yarxi" && wine yarxi.exe'\
+    #     | vienv -r sh "${CURR_DIR_CACHE:?No}/bin/r.yarxi"
+
 fi
 
 echo "C: 'dict' done"

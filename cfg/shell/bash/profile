@@ -26,6 +26,7 @@
 # Only if running bash
 if [ -n "$BASH_VERSION" ]; then
     _has_pr(){ hash "$1" >/dev/null 2>&1; }
+    type -f _dttime >/dev/null 2>&1 || _dttime(){ :; }
     [[ ! -r ~/.shell/exports ]] || source ~/.shell/exports
     # Most of PATH constructed in /etc/profile and /etc/profile.d/
     if _has_pr awk; then export PATH=$(

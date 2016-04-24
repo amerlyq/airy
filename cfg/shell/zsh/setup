@@ -5,12 +5,14 @@ source ~/.shell/func.d/cfgsetup
 PREZTO=~/.cache/zsh/.zprezto
 
 link "$PWD/zshenv" ~/.zshenv
-link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
-link "$PWD/prompt.d" "$PREZTO/modules/prompt/functions/prompt.d"
 link -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc
+if [[ -d $PREZTO ]]; then
+  link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
+  link "$PWD/prompt.d" "$PREZTO/modules/prompt/functions/prompt.d"
+fi
 
 # Choose default shell
-if [[ -z $SSH_TTY && $(which zsh) != ${SHELL:?} ]]; then
-    sudo chsh -s /bin/bash  # Root login shell
-    sudo usermod -s $(which zsh) "$(whoami)"  # User shell
+if has_pr zsh && [[ -z $SSH_TTY && $(which zsh) != ${SHELL:?} ]]; then
+  sudo chsh -s /bin/bash  # Root login shell
+  sudo usermod -s $(which zsh) "$(whoami)"  # User shell
 fi

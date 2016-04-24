@@ -14,7 +14,8 @@ if distro arch; then
 
     # haskell
     pkg_inst -p 'cabal' cabal-install
-    ! cfgOpt u || cabal update
+    if cfgOpt u || [[ ! -d ~/.cabal/packages ]]
+    then cabal update; fi
     # cabal-install ghc-mod
     # cabal install hdevtools
 

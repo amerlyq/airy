@@ -10,6 +10,7 @@ try:
 except ImportError:
     print("Err: yaml not found, INSTALL: python3-yaml, OR: pip3 install yaml")
     vim.command("return -1")
+    import sys; sys.exit(1)
 
 fmt = 'NeoBundle "{0:s}", {1:s}'
 cfgs, defs = map(vim.eval, ("a:paths", "a:default"))

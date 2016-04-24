@@ -1,7 +1,7 @@
 # vim: ft=sh
 
 ### Profile Mgmt ###
-CURR_PROF="default"
+CURR_PROF='default'
 # ALT:TRY: $OSTYPE, maybe replace CURR_PLTF in all scripts?
 CURR_PLTF=$(expr substr $(uname -s) 1 5)
 CURR_USER=${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}
@@ -12,7 +12,7 @@ CURR_HOST=${HOSTNAME:-$(uname -n)}
 CURR_DIR_CFG=~/aura/airy/cfg
 CURR_DIR_CACHE=~/.cache/airy
 CURR_DIR_CHROOT=/home/chroots
-CURR_DIR_PKG="${CURR_DIR_PKG:-$CURR_DIR_CACHE/pkg}"
+CURR_DIR_PKG=${CURR_DIR_PKG:-$CURR_DIR_CACHE/pkg}
 CURR_DIR_HUB=~/hub
 CURR_DIR_SYNC=~/synchro
 CURR_DIR_PRF=~/.cache/airy/prf
@@ -21,10 +21,10 @@ CURR_DIR_PRF=~/.cache/airy/prf
 ### Load ###
 ## NOTE: installs folder of configs, instead whole or individual
 # Def: prs for headless ssh, cli/tui only
-PKG_LIST=(shell/ dev/etc git ranger tmux vim elinks)
-PKG_SKIP=(/core/ /io/ /media/ /xorg/ eclipse sql latex kernel)
+PKG_LIST=(/net/wget /shell{,/} /dev /dev/{python,ruby,etc,git} /term/{ranger,tmux,vim} /browsers/elinks)
+PKG_SKIP=(/dev/{android,eclipse,hex,java,kernel,latex,sql} /{core,game,io,media,re,xorg}{,/} )
 
-if [[ -f "$CURR_DIR_CACHE/profile" ]]
+if [[ -f $CURR_DIR_CACHE/profile ]]
 then source "$CURR_DIR_CACHE/profile" || return
 # else source ~/aura/env || return
 fi

@@ -6,9 +6,11 @@
 [[ $- == *i* ]] || return
 type -f _has_pr >/dev/null 2>&1 \
   || _has_pr(){ hash "$1" >/dev/null 2>&1; }
+# BUG: cd has errors -- when '$ cd' in bash
+# BUG: bash can't '.a' to jump between dirs
 
-TMPPREFIX=${TMPDIR:-/tmp}
-TMPPREFIX=${TMPPREFIX%/}/${SHELL##*/}
+[[ -d ${TMPDIR:=/tmp} ]] || mkdir -p $TMPDIR
+TMPPREFIX=${TMPDIR%/}/${SHELL##*/}
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options

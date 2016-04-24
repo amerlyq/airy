@@ -3,8 +3,8 @@
 # --- Modify ---
 # ALT: use dir from last history -- cd !$:h
 # OR:  physical pwd for symlinks -- cd $(pwd -P) -- ALT: cd -P ~/ch
-cdauto() { local p="${@: -1}"
-    [[ -z "$p" || -d "$p" ]] && \cd $@ || \cd ${@:1:-1} "${p%/*}"; }
+cdauto() { local p; ((!$#)) || p=${@: -1}
+  [[ -z $p || -d $p ]] && cd "$@" || cd "${@:1:$#-1}" "${p%/*}"; }
 alias cd='cdauto'
 
 # WARNING: Use 'sudo' w/o user cfgs, so viminfo, swap won't've root rights!

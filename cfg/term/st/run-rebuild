@@ -1,0 +1,10 @@
+#!/bin/bash
+source ~/.shell/func.d/cfgsetup
+
+# pacman -Qi st-amerlyq-git &>/dev/null
+cd "${CURR_DIR_PKG:?}/st" && git checkout amerlyq
+
+# [[ $FONT_ST ]] || FONT_ST=$(( ${MAIN_DPI:?} * 9/72 + 1))
+# TODO: add '--noconfirm' and '--yes' to pacman in ./install
+#   -- so it could remove conflicting 'st' package
+FNSZ="$FONT_ST" THEME="$THEME" ./install -mbi

@@ -1,10 +1,7 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
-if cfgOpt u; then (
-  cd "${CURR_DIR_PKG:?No}/st" && git checkout amerlyq
-
-  # [[ $FONT_ST ]] || FONT_ST=$(( ${MAIN_DPI:?} * 9/72 + 1))
-  FNSZ="$FONT_ST" THEME="$THEME" ./install -mbi
-) fi
+if cfgOpt t || ! pacman -Qi st-amerlyq-git &>/dev/null; then
+  r.st-rebuild
+fi

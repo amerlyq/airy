@@ -5,8 +5,8 @@ export LC_NUMERIC="${LC_NUMERIC:-$LANG}"
 _dttime exports
 
 ### Temp ###
-if [[ ! -d "$TMPDIR" ]]; then
-  export TMPDIR="/tmp/$LOGNAME"
+if [[ ! -d $TMPDIR ]]; then
+  export TMPDIR=/tmp/$LOGNAME
   mkdir -p -m 700 "$TMPDIR"
 fi
 _dttime exp-tmpdir

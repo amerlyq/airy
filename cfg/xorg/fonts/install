@@ -3,15 +3,15 @@ source ~/.shell/func.d/packages
 has_pr X || die
 
 if distro arch; then
-  if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
-    grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
-      # infinality supports only 96dpi
-      pkg_inst -a infinality-bundle
-  fi
-
-  pkg_inst -a ttf-freefont ttf-droid ttf-dejavu
+  # if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
+  #   grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
+  #     # infinality supports only 96dpi
+  #     pkg_inst -a infinality-bundle
+  # fi
 
   fd=/usr/share/fonts
+  # ttf-freefont ttf-droid
+  pkg_inst -f "$fd/TTF/DejaVuSans.ttf" ttf-dejavu
   # SEE: https://github.com/adobe-fonts
   # NOTE: http://adobe-fonts.github.io/source-code-pro/
   # https://github.com/adobe-fonts/source-code-pro

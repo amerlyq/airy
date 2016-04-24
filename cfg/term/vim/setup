@@ -9,21 +9,21 @@ VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"
 if cfgOpt c; then rm -rf "$VCACHE"/*; fi
 #touch ~/.vimtags  # For vim-easytags
 
-
 ### SPELL ###
 # WARNING: first clean install will always fail as uk*.sug file is absent!
-if [[ ! -d $VCACHE/spell ]]; then
-    mkdir -p "$VCACHE/spell"
+dst=$VCACHE/spell
+if [[ ! -d $dst ]]; then
+    has_pr wget
+    mkdir -p "$dst"
     src='http://ftp.vim.org/pub/vim/runtime/spell'
-    for nm in ru en uk; do ( cd "$VCACHE/spell"
-        wget "$src/${nm}.utf-8.spl" || echo "No spl: $nm"
-        wget "$src/${nm}.utf-8.sug" || echo "No sug: $nm"
-    ) done
+    for nm in {ru,en,uk}.utf-8.{spl,sug}; do
+        wget "$src/$nm" -O "$dst/$nm" || echo "No spl: $nm"
+    done
 fi
 
 ### PLUG-RC ###
-dst="$VCACHE/bundle/unicode.vim/autoload/unicode/UnicodeData.txt"
-if [[ ! -f "$dst" ]]; then
+dst=$VCACHE/bundle/unicode.vim/autoload/unicode/UnicodeData.txt
+if [[ ! -f $dst && -d $VCACHE/bundle/unicode.vim ]]; then
     mkdir -p "${dst%/*}"
     fork_m wget -c -O "$dst" 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt'
 fi

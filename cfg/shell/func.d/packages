@@ -52,11 +52,12 @@ if distro ubuntu; then
 elif distro arch; then
   pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' "$@"; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
+  if has_pr yaourt; then
+    ayr_inst(){ do_if -c 'yaourt -S --needed --noconfirm' "$@"; }
+  fi
   if has_pr pacaur; then
     aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' "$@"; }
-  elif has_pr yaourt; then
-    aur_inst(){ do_if -c 'yaourt -S --needed --noconfirm' "$@"; }
-  else aur_inst(){ return 1; }
+  elif has_pr yaourt; then aur_inst(){ ayr_inst "$@"; }
   fi
   pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
   gem_inst(){ do_if -c 'gem install' "$@"; }

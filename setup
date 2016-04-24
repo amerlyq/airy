@@ -10,25 +10,6 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 export PATH=~/.bin:$PATH
 
 # ======================================================================
-# THINK:USE: exec > >(pretty)  (BUT: pacman -Syu output, etc?)
-for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
-header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
-pretty() { sed -r "
-  s|/home/$(whoami)|\~|g
-  s|\~/\S+/cfg/||g
-  />>>/!s|^|  |g
-  /^>>> \~\/aura\//s//\n$C9\[/g
-  /^>>> /s//\n$C2\[/g
-  / <<<$/s//\]$CR/g
-  /^\s\s\(.*\)$/s//$C10&$CR/
-  /(C|W):\s.*/s//$C13&$CR/
-  /(I|N):\s.*/s//$C6&$CR/
-  /.*\s-> L\s.*/s//$C4&$CR/
-  /.*\s-> C\s.*/s//$C3&$CR/
-  /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
-";}
-
-# ======================================================================
 if [[ -z $DISPLAY ]]; then  # Use host xserver if SSH
     export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')
 fi
@@ -53,9 +34,29 @@ if cfgOpt i && cfgOpt u && ((!$#)) && [[ ! -f "$queue" ]]; then
 fi
 
 # ======================================================================
+for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
+header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
+pretty() { sed -r "
+  s|/home/$(whoami)|\~|g
+  s|\~/\S+/cfg/||g
+  />>>/!s|^|  |g
+  /^>>> \~\/aura\//s//\n$C9\[/g
+  /^>>> /s//\n$C2\[/g
+  / <<<$/s//\]$CR/g
+  /^\s\s\(.*\)$/s//$C10&$CR/
+  /(C|W):\s.*/s//$C13&$CR/
+  /(I|N):\s.*/s//$C6&$CR/
+  /.*\s-> L\s.*/s//$C4&$CR/
+  /.*\s-> C\s.*/s//$C3&$CR/
+  /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
+";}
+
+# THINK:USE: exec > >(pretty)  (BUT: pacman -Syu output, jobs, etc?)
+exec > >(pretty)
+# ======================================================================
 ## Setup all configs (private data must be initialized already)
-prf="${CURR_DIR_CACHE:?}/profile"  # Populate private env
-[[ $prf ]] && source "$prf" || echo "Wrn: not found '$prf'" | pretty
+prf=${CURR_DIR_CACHE:?}/profile  # Populate private env
+[[ -f $prf ]] && source "$prf" || echo "Wrn: not found '$prf'"
 
 frgx(){ local patt="\\b$*\\b"
     [[ "$*" =~ ^/$ ]] && patt="cfg" ||:
@@ -92,7 +93,7 @@ fi
 
 # ======================================================================
 # EXPL: -m (in main 'setup') forces single thread execution
-run(){ [[ -f "$1" ]] && "$@" $(cfgOpt m || echo -m) || echo "(no ${1##*/})"; }
+run(){ if [[ -f $1 ]]; then "$@" $(cfgOpt m || echo -m); else echo "(no ${1##*/})"; fi; }
 r_install(){ cfgOpt i || return 0; run "$1/install" $(cfgOpt f && echo -u); }
 r_setup(){ run "$1/setup" $(cfgOpt u && echo -u); }
 
@@ -107,7 +108,7 @@ while read d; do echo ">>> $d <<<"
     r_setup "$d"
     sed -i '1d' "$queue"
 # EXPL: copy $queue content to be not affected by 'sed'
-done <<< "$(<"$queue")" | pretty
+done <<< "$(<"$queue")"
 rm "$queue"
 
 # ======================================================================

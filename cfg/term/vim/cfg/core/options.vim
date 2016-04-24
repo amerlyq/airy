@@ -34,5 +34,6 @@ endif
 
 
 " TODO: chech if there are saved unallowable/unnecessary localoptions
-set viewoptions=cursor,folds,localoptions,slash,unix   " What to save in :mkview
+" BAD: localoptions -- enforce wrong behaviour with 'vim-stay'
+set viewoptions=cursor,folds,slash,unix   " What to save in :mkview
 " localoptions - try to save foldexpr for ':Fs', etc between sessions

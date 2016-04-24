@@ -1,8 +1,8 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-src="${1:-/home/media/res/dicts}"
-[[ -d "$src" ]] || die "No dir with *.dict.dz specified"
+src=${1:-/home/media/res/dicts}
+[[ -d $src ]] || die "Err: No dir with *.dict.dz specified"
 
 ## Link directory to access it by 'nobody'
 dst=/usr/share/dictd

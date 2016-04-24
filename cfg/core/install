@@ -4,13 +4,14 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     # system drivers
-    pkg_inst 'xf86-input-mouse'
-    pkg_inst 'ntfs-3g'
+    pkg_inst -f '/usr/lib/xorg/modules/input/mouse_drv.so' xf86-input-mouse
+    pkg_inst -l 'ntfs-3g' ntfs-3g
     # sudo fc-cache && sudo mkfontscale && sudo mkfontdir
 
     # ALT packer (lightweight but less automatable and w/o shell completion)
-    # gpg --recv-keys <KEYID> AND then you can sign it:  gpg --lsign-key <KEYID>
-    aur_inst pacaur
+    # gpg --recv-keys <KEYID>  # if unknown public key
+    # AND then you can sign it:  gpg --lsign-key <KEYID>
+    ayr_inst pacaur
     pkg_inst pkgfile  # To investigate packages content w/o downloading
     ! cfgOpt u || sudo pkgfile --update
 
