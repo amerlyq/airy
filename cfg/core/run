@@ -1,6 +1,5 @@
 #!/bin/bash -e
-
-ARG="$1"
+source ~/.shell/func.d/system
 
 scratchpad_is_empty(){
     if ! i3-msg -t get_tree | jshon | awk '/scratchpad_state/{a[$2]=0}
@@ -24,13 +23,28 @@ sys_power(){ #Suspend #Hibernate
     #    /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart #Stop
 }
 
-case "$ARG" in
+if pgrep i3 &>/dev/null; then
+  no_windows(){ scratchpad_is_empty; }
+else no_windows(){ :; }; fi
+# OR: use ctl.hs to query windows list from xmonad
+
+confirm(){ [[ $(printf "yes\nno\n" | dmenu -p "$1?" -fn monospace-10) == yes ]]; }
+
+# TODO: add force shutdown, ignoring unpushed commits
+confirm_repo(){ local t=$1 dir=~/aura
+  if (cd "$dir" && r.git synced)
+  then confirm "Shutdown"
+  else r.n "$1 warning:" "Sync git in '$dir/*'"; return 1
+fi; }
+check(){ no_windows && repo_pushed; }
+
+case $1 in
        lock|-l) r.lock &            ;;
     suspend|-s) sys_power Suspend   ;;
   hibernate|-h) sys_power Hibernate ;;
-     logout|-o) scratchpad_is_empty && sys_logout    ;;
-     reboot|-r) scratchpad_is_empty && sudo systemctl reboot   ;;
-   shutdown|-t) scratchpad_is_empty && sudo systemctl poweroff ;;
-             *) echo "Usage: $0
+     logout|-o) no_windows && confirm "Logout" && sys_logout       ;;
+     reboot|-r) no_windows && confirm "Reboot" && systemctl reboot ;;
+   shutdown|-t) no_windows && confirm_repo "Shutdown" && systemctl poweroff ;;
+ *) echo "Usage: $0
     <[l]ock|log[o]ut|[s]uspend|[h]ibernate|[r]eboot|shu[t]down>"; exit 2
 esac

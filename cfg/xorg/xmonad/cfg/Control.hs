@@ -110,8 +110,8 @@ system =
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
   inGroup "M-S-<Esc>"  -- xmonad
     [ ("o", whenWindowsClosed $ io exitSuccess)
-    , ("r", whenWindowsClosed $ spawn "systemctl reboot")
-    , ("t", whenWindowsClosed $ spawn "cd ~/aura && r.git synced && systemctl poweroff || r.n 'Shutdown warning:' 'Sync git in ~/aura/*'")
+    , ("r", whenWindowsClosed $ spawn "r.core reboot")
+    , ("s", whenWindowsClosed $ spawn "r.core shutdown")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.xmonad-rebuild")
