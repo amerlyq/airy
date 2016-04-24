@@ -4,6 +4,7 @@ module XMonad.Config.Amer.Prompt (
 ) where
 
 import Data.Default                 (def)
+import XMonad                       (spawn)
 import XMonad.Prompt
 import XMonad.Prompt.Shell          (shellPrompt)
 import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
@@ -26,4 +27,6 @@ myPromptTheme = def
 keys = inGroup "M-u"
   [ ("t", inputPrompt def "Fire" ?+ \p -> spawnHere ("r.tf -e " ++ p))
   , ("s", shellPrompt myPromptTheme)
+  ] ++
+  [ ("M-C-z" , inputPrompt def "LockMsg" ?+ \p -> spawn ("r.lock " ++ p))
   ]

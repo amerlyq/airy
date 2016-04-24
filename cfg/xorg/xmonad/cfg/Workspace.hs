@@ -26,7 +26,7 @@ secondary = words "~ ! @ # $ % ^ & * ( ) _ +"
 immediate = map (:[]) ['a' .. 'z']
 
 -- TODO: show those workspaces names in different color/style (like blue + italic?)
-named = ["FF", "IM", "MM", "MON"]
+named = ["FF", "PI", "SK", "MM", "MON"]
 skipped = ["NSP", "MON"]
 
 

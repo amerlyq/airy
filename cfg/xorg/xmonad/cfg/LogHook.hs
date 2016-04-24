@@ -45,11 +45,15 @@ myStateLoggger copies = dynamicLogString def
   -- , ppExtras  = []
   , ppLayout  = clickly . \nm -> case nm of
       "ResizableTall" -> "[|]"
+      "ReflectX ResizableTall" -> "]|["
       "Mirror ResizableTall" -> "[-]"
+      "ReflectX Mirror ResizableTall" -> "]-["
       "Tabbed Simplest" -> "=--"
+      "ReflectX Tabbed Simplest" -> "--="
       "Full" -> "[ ]"
       "Grid" -> "[#]"
       "IM Grid" -> "|##"
+      "ReflectX IM Grid" -> "##|"
       "SimplestFloat" -> "( )"
       "Circle" -> "(O)"
       _ -> nm

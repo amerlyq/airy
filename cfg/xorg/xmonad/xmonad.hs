@@ -21,7 +21,7 @@ import XMonad.Actions.SpawnOn       (manageSpawn)
 import XMonad.Hooks.SetWMName       (setWMName)
 import XMonad.Hooks.EwmhDesktops    (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts)
-import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, isDialog)
+import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, doRectFloat, isDialog)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Hooks.UrgencyHook     (withUrgencyHook, BorderUrgencyHook(..))
 
@@ -32,13 +32,13 @@ import XMonad.Layout.Tabbed         (simpleTabbed)
 import XMonad.Layout.Grid           (Grid(..))
 import XMonad.Layout.Circle         (Circle(..))
 import XMonad.Layout.SimplestFloat  (simplestFloat)
-import XMonad.Layout.IM             (withIM, Property(ClassName, Title, And))
+import XMonad.Layout.IM             (gridIM, Property(ClassName, Title, Role, And, Not))
 -- DEV:
 import qualified XMonad.Layout.Monitor as MON
 import XMonad.Layout.LayoutModifier (ModifiedLayout(..))  -- For Layout.Monitor
 -- import XMonad.Layout.IndependentScreens (withScreens)
 -- modifiers
-import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
+import XMonad.Layout.Reflect        (reflectHoriz, REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (ResizableTall(ResizableTall), MirrorResize(MirrorShrink, MirrorExpand))
 import XMonad.Layout.PerWorkspace   (onWorkspace)
 import XMonad.Layout.MultiToggle    (mkToggle, Toggle(..), single, (??), EOT(..))
@@ -101,10 +101,12 @@ myLayout = smartBorders
     . mkToggle (single GAPS)
     . mkToggle (single MIRROR)
     . mkToggle (single REFLECTX)
-    . onWorkspace "IM" imLayer
+    . onWorkspace "PI" piLayer
+    . onWorkspace "SK" (reflectHoriz skLayer)
     $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
   where
-    imLayer = withIM (1%7) (ClassName "Pidgin" `And` Title "Buddy List") Grid
+    piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
+    skLayer = gridIM (1%7) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
     tiled   = ResizableTall nmaster delta ratio []
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
@@ -117,15 +119,15 @@ myManageHook = manageSpawn <+>
   mconcat
   [ isFullscreen --> topmost doFullFloat
   , isDialog --> topmost doCenterFloat
-  -- , stringProperty "WM_WINDOW_ROLE" =? "buddy_list" -->
   --   (ask >>= \w -> doF $ W.sink w) >> doShift "IM"
+  , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (3/10) (3/10))
   ] <+>
   composeFloat
   [ ("Float" `isPrefixOf`) <$> appName
   --EXPL: pidgin is tiled by XMonad.Layout.IM
   -- , let lst = "buddy_list Preferences"
   --   in wmhas (stringProperty "WM_WINDOW_ROLE") lst
-  , let lst = "copyq feh Steam Gimp piony.py Transmission-gtk Xmessage"
+  , let lst = "feh Steam Gimp piony.py Transmission-gtk"
     in wmhas className lst
   , let lst = "PlayOnLinux Dialog"
     in wmhas appName lst
@@ -148,8 +150,8 @@ myManageHook = manageSpawn <+>
   ]
   <+> insertPosition Below Newer <+>
   composeBring
-  [ ("IM", "Pidgin")
-  , ("IM", "Skype")
+  [ ("PI", "Pidgin")
+  , ("SK", "Skype")
   , ("FF", "Firefox")
   -- , ("MM", "mutt") -- TODO: make whole wksp similar to firefox (but I can have >1 mutt)
   -- NOTE: strictly speaking, we don't need runOrRaise for mutt

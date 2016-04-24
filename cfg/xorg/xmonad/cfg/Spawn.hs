@@ -8,8 +8,8 @@ import XMonad                       (spawn, windows, doFloat, (=?))
 import XMonad.StackSet              (view, shift)
 import XMonad.Actions.SpawnOn       (spawnHere, spawnAndDo)
 import XMonad.Actions.WindowGo      (runOrRaise)
-import XMonad.ManageHook            (className, title, (<&&>))
-import XMonad.Hooks.ManageHelpers   (doCenterFloat)
+import XMonad.ManageHook            (className, title, stringProperty, (<&&>))
+import XMonad.Hooks.ManageHelpers   (doCenterFloat, (/=?))
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Util.NamedScratchpad  (namedScratchpadAction)
 
@@ -42,11 +42,12 @@ scratchpad = (concat . (`map` [
     [ ("M-o", windows $ view "NSP")
     , ("M-S-o", windows $ shift "NSP")
     , ("f" , runOrRaise "firefox" $ className =? "Firefox")
-    , ("p" , runOrRaise "pidgin" $ className =? "Pidgin" <&&> title =? "Buddy List")
+    , ("p" , runOrRaise "pidgin" $ className =? "Pidgin" <&&> stringProperty "WM_WINDOW_ROLE" =? "buddy_list")
+    , ("s" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
-    | nm <- ["ncmpcpp", "mutt", "ipython", "j8", "htop", "skype", "lyrics"]
+    | nm <- ["ncmpcpp", "mutt", "ipython", "j8", "htop", "lyrics"]
     ],
     -- Open new window always
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)
@@ -122,12 +123,14 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("w", "r.notify-winclass")
     ],
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
-    (feedCmd "copyq" . concat) [
-      [ ("M-x", "toggle")
-      , ("M-S-x", "edit -1")
-      ],
-      inGroup "M-C-x"
+    feedCmd "copyq"
+    [ ("M-x", "toggle")
+    , ("M-C-x", "edit -1")
+    ],
+    (inGroup "M-S-x" . concat)
+    [ feedCmd "copyq"
       [ ("a", "edit")  -- add new entry
+      , ("e", "edit -1")  -- edit latest entry
       , ("t", "eval 'copy(clipboard());paste()'") -- as plain text
       -- NOTE: paste() simply sends Shift-Insert -- therefore may be buggy in 'st'
       , ("M-x", "toggle")
@@ -138,10 +141,10 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
       , ("<Return>", "enable")
       , ("<Backspace>", "disable")
       ]
-    ],
-    inGroup "M-z" $ feedCmd "r.copyq"
-    [ (m ++ i, k ++ i) | i <- map show [0..9], (m, k) <-
-      [("", ""), ("S-", "+"), ("C-", "-")]
+    , feedCmd "r.copyq"
+      [ (m ++ i, k ++ i) | i <- map show [0..9], (m, k) <-
+        [("", ""), ("S-", "+"), ("C-", "-")]
+      ]
     ]
     ---- wacom M-<Insert>
     -- o ~/aura/airy/cfg/wacom/ctl/change-output ,$def

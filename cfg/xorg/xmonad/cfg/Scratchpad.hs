@@ -12,9 +12,7 @@ myScratchpads =
     , ("ncmpcpp", defaultFloating), ("ipython", bottom_r34b3)
     ]
   ] ++
-  -- [ NS "pidgin" "pidgin" (className =? "Pidgin" <&&> title =? "Buddy List") defaultFloating
-  [ NS "skype"  "skype"  (className =? "Skype"  <&&> appName =? "skype" ) defaultFloating
-  , NS "lyrics" "cd ~/aura/lyfa/lists && r.t -n lyrics -e $EDITOR ./music.otl" (appName =? "lyrics") nonFloating
+  [ NS "lyrics" "cd ~/aura/lyfa/lists && r.t -n lyrics -e $EDITOR ./music.otl" (appName =? "lyrics") nonFloating
   , NS "j8"  "r.t -n j8 -e j8 -c"  (appName =? "j8" ) bottom_l14b3
   ]
   where
