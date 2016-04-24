@@ -24,7 +24,7 @@ import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDE
 import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (MirrorResize(MirrorShrink, MirrorExpand))
 
-import XMonad.Config.Amer.Common     (inGroup)
+import XMonad.Config.Amer.Common     (inGroup, backNforth)
 import XMonad.Config.Amer.Layout     (MyTransformers(STRUTS, GAPS))
 import XMonad.Config.Amer.Navigation (nextNonEmpty)
 
@@ -35,8 +35,7 @@ isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ member w $ W.f
 whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
     then fX else nextNonEmpty W.view >> spawn "r.n 'Shutdown warning:' 'Close all windows'" :: X()
 -- FIXME: jump to urgent and back ALT: save last urgent and always jump to it even after urgentstate cleared
--- backNforth f = gets (W.currentTag . windowset) >>= toggleOrDoSkip [] f
--- urgentNback w = withUrgents $ maybe (backNforth $ W.view w) (windows . W.focusWindow) . listToMaybe $ w
+-- urgentNback w = withUrgents $ maybe (backNforth [] $ W.view w) (windows . W.focusWindow) . listToMaybe $ w
 urgentNback = withUrgents $ maybe (return ()) (windows . W.focusWindow) . listToMaybe
 
 keys = focusing ++ swap ++ edit ++ movef ++ layouts ++ system

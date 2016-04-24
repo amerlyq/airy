@@ -1,16 +1,37 @@
 -- vim: ts=2:sw=2:sts=2
 module XMonad.Config.Amer.Common (
-    bring, inGroup, feedCmd
+    bring, backNforth, actions,
+    inGroup, feedCmd
 ) where
 
+import XMonad                         (gets, windowset)
+import XMonad.Actions.CopyWindow      (copy)
+import XMonad.Actions.CycleWS         (toggleOrDoSkip)
+import XMonad.Actions.SwapWorkspaces  (swapWithCurrent)
 import qualified XMonad.StackSet as W
+
+
+withMods k = zip $ (++ k) ["M-", "M-S-", "M-C-", "M-C-S-", "M-M1-"]
 
 -- ALT (\w -> windows (W.shift w) >> windows (W.view w))
 bring i = W.view i . W.shift i
 
-modsGrp key = zip $ (++ key) ["M-", "M-S-", "M-C-", "M-C-S-"]
+-- TRY:THINK:DEV: swap workspaces backNforth -- so I could completely move primary wksp into secondary
+-- DEV: backNforth -- return to last non empty (useful only rarely -- after closing all windows on wksp)
+-- DEV: backNforth -- move through whole history instead toggling only two last
+-- -- import XMonad.Actions.GroupNavigation(nextMatch, Direction(History))
+-- -- backHistory  f = nextMatch History (return True) -- BUG: only toggles between two recent
+-- -- SEE: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-TopicSpace.html
+-- -- has history navigation between last workspaces
+backNforth l f = gets (W.currentTag . windowset) >>= toggleOrDoSkip l f
+
+
+-- THINK: maybe use swapWithCurrent only for 'M-a', and bind smth else for wksp?
+actions :: (Eq s, Eq i, Ord a) => [(String, (i -> W.StackSet i l a s sd -> W.StackSet i l a s sd))]
+actions = withMods [""] [W.view, bring, W.shift, copy, swapWithCurrent]
+
 inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)
 feedCmd cmd = map $ \(k, o) -> (k, cmd ++ " " ++ o)
 
-hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
-visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]
+-- hidTags w = map W.tag $ W.hidden w ++ [W.workspace . W.current $ w]
+-- visTags w = map (W.tag . W.workspace) $ W.visible w ++ [W.current w]

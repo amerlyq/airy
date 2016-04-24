@@ -6,16 +6,15 @@ module XMonad.Config.Amer.Navigation (
 import Data.Default                 (def)
 import XMonad                       (gets, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen)
 import XMonad.StackSet              (view, shift, currentTag, shiftWin)
-import XMonad.Actions.CycleWS       (findWorkspace, screenBy, toggleOrDoSkip, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))
-import XMonad.Actions.GroupNavigation(nextMatch, Direction(History))
+import XMonad.Actions.CycleWS       (findWorkspace, screenBy, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
 
 import XMonad.Layout.TwoPane        (TwoPane(..))
 import XMonad.Layout.LayoutScreens  (layoutScreens)
 import XMonad.Actions.TagWindows    (setTags, addTag, shiftHere, tagPrompt, tagDelPrompt, focusUpTaggedGlobal, withTaggedGlobal, withTaggedGlobalP, withTaggedP)
 
-import XMonad.Config.Amer.Common    (inGroup)
-import XMonad.Config.Amer.Workspace (skipped, actions)
+import XMonad.Config.Amer.Common    (inGroup, actions, backNforth)
+import XMonad.Config.Amer.Workspace (skipped)
 
 
 -- Cycle through workspaces
@@ -23,10 +22,6 @@ import XMonad.Config.Amer.Workspace (skipped, actions)
 -- ALT: choose empty only from secondary wksp? -- Like on M-g <Space> instead <Backspace>
 nextEmpty    f = findWorkspace getSortByIndex Next EmptyWS 1    >>= windows . f
 nextNonEmpty f = findWorkspace getSortByIndex Next NonEmptyWS 1 >>= windows . f
-backNforth   f = gets (currentTag . windowset) >>= toggleOrDoSkip skipped f
-backHistory  f = nextMatch History (return True) -- BUG: only toggles between two recent
--- SEE: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-TopicSpace.html
--- -- has history navigation between last workspaces
 
 -- Cycle through screens
 -- ALT (screenWorkspace 0 >>= flip whenJust (windows . view))
@@ -42,12 +37,9 @@ doScreen d f = do
 
 keys = screens ++ panels ++ markNgo
 
--- TRY:THINK:DEV: swap workspaces backNforth -- so I could completely move primary wksp into secondary
--- DEV: backNforth -- return to last non empty (useful only rarely -- after closing all windows on wksp)
--- DEV: backNforth -- move through whole history instead toggling only two last
 screens = [ (m ++ k, b f) | (k, b) <- groups, (m, f) <- actions]
 groups =
-  [ ("a", backNforth)
+  [ ("a", backNforth skipped)
   , ("<Backspace>", nextEmpty)
   , ("<Tab>", nextNonEmpty)
   , ("[", doScreen (-1))

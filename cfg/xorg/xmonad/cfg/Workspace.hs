@@ -1,6 +1,6 @@
 -- vim: ts=2:sw=2:sts=2
 module XMonad.Config.Amer.Workspace (
-   all, keys, actions,
+   all, keys,
    primary, secondary, immediate,
    named, skipped
 ) where
@@ -9,11 +9,10 @@ import Prelude hiding (all)
 import Data.List                    (zipWith)
 import XMonad                       (windows)
 import XMonad.StackSet              (view, shift)
-import XMonad.Actions.CopyWindow    (copy)
-import XMonad.Actions.SwapWorkspaces(swapWithCurrent)
 -- import XMonad.Layout.IndependentScreens (onCurrentScreen, workspaces')
+import Data.Maybe       (maybe, fromMaybe, listToMaybe)
 
-import XMonad.Config.Amer.Common    (bring)
+import XMonad.Config.Amer.Common    (actions, backNforth)
 
 all = concat
   [ primary
@@ -32,6 +31,9 @@ skipped = ["NSP", "MON"]
 
 
 keys = [ (m ++ k, windows $ f i) | (i, k) <- aliases, (m, f) <- actions]
+-- TODO: backNforth on repeated press
+-- keys = [ (m ++ k, fromMaybe (backNforth [] f) (windows $ f i)) | (i, k) <- aliases, (m, f) <- actions]
+-- TODO: backNforth on current monitor only
 -- keys = [ (m ++ k, windows $ onCurrentScreen f i) | (i, k) <- aliases, (m, f) <- actions]
 
 leader = ("s " ++)  -- ([s]econdary) ALT: g, <Backspace>, <Tab>
@@ -39,13 +41,4 @@ aliases = concat
   [ map (\i -> (i, i)) primary
   , map (\i -> (i, leader i)) immediate
   , zipWith (\i k -> (i, leader k)) secondary primary
-  ]
-
-actions =
-  [ ("M-"     , view)
-  , ("M-C-"   , shift)
-  , ("M-S-"   , bring)
-  , ("M-C-S-" , copy)
-  -- THINK: maybe use it only for 'M-a', and bind smth else for wksp?
-  , ("M-M1-"  , swapWithCurrent)
   ]
