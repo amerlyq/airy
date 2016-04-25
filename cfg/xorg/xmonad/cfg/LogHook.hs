@@ -30,7 +30,7 @@ xdokey = ("xdotool key --delay 150 super+" ++) . key2xsym
 
 
 -- xmobar pretty printing source
-myStateLoggger copies = dynamicLogString def
+myStateLogger copies = dynamicLogString def
   { ppCurrent = xmobarColor "#fd971f" ""
   -- { ppCurrent = \t -> "<fc=#fd971f,#ffffff>" ++ t ++ "</fc>"
   -- , ppVisible = wrap "(" ")" (xinerama only)
@@ -71,4 +71,4 @@ myStateLoggger copies = dynamicLogString def
 myLogHook h = do
   historyHook
   copies <- wsContainingCopies
-  io . hPutStrLn h =<< myStateLoggger copies
+  io . hPutStrLn h =<< myStateLogger copies

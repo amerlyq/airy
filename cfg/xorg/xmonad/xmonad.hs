@@ -56,9 +56,12 @@ import XMonad.Config.Amer.EventHook  (myHandleEventHook)
 import XMonad.Config.Amer.LogHook    (myLogHook)
 import XMonad.Config.Amer.Scratchpad (myScratchpads)
 import XMonad.Config.Amer.Keys       (myKeys, myOverlay)
+import XMonad.Config.Amer.Mouse      (myMouseBindings)
 import qualified XMonad.Config.Amer.Workspace as MyWksp
 
 
+-- myStartupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
+-- myStartupHook = windows . W.view . (!!1) . workspaces $ myCfg
 myStartupHook = do
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
   setWMName "LG3D"  -- Fixes problems with Java GUI programs
@@ -69,6 +72,7 @@ myStartupHook = do
     windows . W.view $ MyWksp.primary !! 1
 
 
+-- TRY:CHG:(make more clean) def -> XConfig
 myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
   { modMask = mod4Mask
   -- Options
@@ -77,14 +81,14 @@ myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
   -- , workspaces  = withScreens 2 MyWksp.all
   , keys        = (`mkKeymap` myKeys)
   -- Hooks
-  -- , startupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
-  -- , startupHook = windows . W.view . (!!1) . workspaces $ myCfg
   , startupHook = myStartupHook
   , manageHook  = myManageHook <+> manageHook def
-  -- layoutHook def
-  -- layoutHintsToCenter
   , layoutHook = myLayout
   , handleEventHook = myHandleEventHook
+  -- Mouse
+  , mouseBindings      = myMouseBindings
+  , focusFollowsMouse = False
+  , clickJustFocuses = True
   -- Style
   , borderWidth        = 2
   , normalBorderColor  = "#000000"
@@ -92,6 +96,7 @@ myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
   }
 
 
+-- layoutHintsToCenter
 myLayout = smartBorders
     . ModifiedLayout myOverlay
     -- . onWorkspace (workspaces myCfg !! 4) Full
