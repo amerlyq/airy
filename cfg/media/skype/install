@@ -9,11 +9,10 @@ has_pr X || die
 #   https://community.skype.com/t5/Linux/Skype-group-chat-not-working-anymore/td-p/3987288
 
 if distro arch; then
-    # Currently not fully works
-    # https://github.com/EionRobb/skype4pidgin/blob/master/skypeweb/README.md
-    # aur_inst -a 'purple-skypeweb-git'
-    pkg_inst skype sni-qt  # multilib only
-    aur_inst -f '/usr/lib/purple-2/libskype.so' 'skype4pidgin-git'
+    pkg_inst skype # multilib only
+    # DEPRECATED: sni-qt  # tray icon for skype
+    # OBSOLETE:(cfg/media/pidgin already installed skypeweb plugin)
+    #   aur_inst -f '/usr/lib/purple-2/libskype.so' 'skype4pidgin-git'
 
 elif distro ubuntu; then
     # Чтобы не возникало проблем с установкой, нужно установить некоторые 32-битные библиотеки:

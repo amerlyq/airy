@@ -3,7 +3,13 @@ shopt -s nullglob
 
 session=("${@:-xmonad}")
 exec >/var/tmp/"${session}_$(date +%Y%m%d_%H%M%S).log" 2>&1
-export XDG_CURRENT_DESKTOP="$session"
+export XDG_CURRENT_DESKTOP=$session
+
+# Gnome keyring. CHECK: is it needed here? Or PAM is enough?
+#   https://wiki.archlinux.org/index.php/GNOME/Keyring
+if [[ -x /usr/bin/gnome-keyring-daemon ]]; then
+  eval "$(/usr/bin/gnome-keyring-daemon --start --components=secrets)"
+fi
 
 # USAGE:
 #   startx

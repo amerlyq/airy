@@ -95,6 +95,9 @@
 						<pref name='format_plural' type='string' value='/me plonks: %P.'/>
 					</pref>
 				</pref>
+				<pref name='findip'>
+					<pref name='notify' type='bool' value='1'/>
+				</pref>
 			</pref>
 			<pref name='core-plugin_pack-autoaccept'>
 				<pref name='path' type='string' value='/home/amer/.purple/autoaccept'/>
@@ -171,6 +174,14 @@
 				<pref name='min_tls' type='int' value='0'/>
 				<pref name='max_tls' type='int' value='0'/>
 			</pref>
+			<pref name='purple_gnome_keyring'>
+				<pref name='custom_keyring' type='bool' value='0'>
+					<pref name='keyring_name' type='string' value=''/>
+				</pref>
+				<pref name='auto_save' type='bool' value='1'/>
+				<pref name='auto_lock' type='bool' value='1'/>
+				<pref name='plug_status' type='int' value='1'/>
+			</pref>
 		</pref>
 		<pref name='lopl'/>
 		<pref name='prpl'>
@@ -197,7 +208,7 @@
 					<pref name='notify_send' type='bool' value='1'/>
 					<pref name='notify_switch' type='bool' value='1'/>
 					<pref name='type_chat_nick' type='bool' value='0'/>
-					<pref name='method_count_xprop' type='bool' value='1'/>
+					<pref name='method_count_xprop' type='bool' value='0'/>
 					<pref name='method_raise' type='bool' value='0'/>
 					<pref name='method_present' type='bool' value='0'/>
 					<pref name='type_im_sys' type='bool' value='0'/>
@@ -414,7 +425,10 @@
 		<pref name='plugins'>
 			<pref name='loaded' type='pathlist'>
 				<item value='/usr/lib/purple-2/statenotify.so'/>
+				<item value='/usr/lib/purple-2/purple-gnome-keyring.so'/>
 				<item value='/usr/lib/pidgin/history.so'/>
+				<item value='/usr/lib/pidgin/lastseen.so'/>
+				<item value='/usr/lib/purple-2/pidgin-libnotify.so'/>
 				<item value='/usr/lib/pidgin/notify.so'/>
 				<item value='/usr/lib/purple-2/ssl-nss.so'/>
 				<item value='/usr/lib/purple-2/psychic.so'/>
@@ -508,15 +522,15 @@
 			<pref name='show_buddy_icons' type='bool' value='1'/>
 			<pref name='show_empty_groups' type='bool' value='0'/>
 			<pref name='show_idle_time' type='bool' value='1'/>
-			<pref name='show_offline_buddies' type='bool' value='0'/>
+			<pref name='show_offline_buddies' type='bool' value='1'/>
 			<pref name='show_protocol_icons' type='bool' value='0'/>
 			<pref name='list_visible' type='bool' value='1'/>
 			<pref name='list_maximized' type='bool' value='0'/>
 			<pref name='sort_type' type='string' value='alphabetical'/>
 			<pref name='x' type='int' value='0'/>
 			<pref name='y' type='int' value='0'/>
-			<pref name='width' type='int' value='270'/>
-			<pref name='height' type='int' value='1058'/>
+			<pref name='width' type='int' value='274'/>
+			<pref name='height' type='int' value='1061'/>
 			<pref name='theme' type='string' value=''/>
 		</pref>
 		<pref name='conversations'>
@@ -543,7 +557,7 @@
 			<pref name='scrollback_lines' type='int' value='4000'/>
 			<pref name='chat'>
 				<pref name='entry_height' type='int' value='54'/>
-				<pref name='userlist_width' type='int' value='80'/>
+				<pref name='userlist_width' type='int' value='176'/>
 				<pref name='x' type='int' value='0'/>
 				<pref name='y' type='int' value='0'/>
 				<pref name='width' type='int' value='340'/>
@@ -553,7 +567,7 @@
 				<pref name='x' type='int' value='274'/>
 				<pref name='y' type='int' value='0'/>
 				<pref name='width' type='int' value='1642'/>
-				<pref name='height' type='int' value='1058'/>
+				<pref name='height' type='int' value='1057'/>
 				<pref name='animate_buddy_icons' type='bool' value='1'/>
 				<pref name='entry_height' type='int' value='54'/>
 				<pref name='show_buddy_icons' type='bool' value='1'/>
@@ -585,7 +599,14 @@
 			<pref name='blink' type='bool' value='0'/>
 			<pref name='show' type='string' value='always'/>
 			<pref name='gtk'>
-				<pref name='embedded' type='bool' value='1'/>
+				<pref name='embedded' type='bool' value='0'/>
+			</pref>
+		</pref>
+	</pref>
+	<pref name='core'>
+		<pref name='plugins'>
+			<pref name='core-plugin_pack-google'>
+				<pref name='domain' type='string' value='www.google.com'/>
 			</pref>
 		</pref>
 	</pref>

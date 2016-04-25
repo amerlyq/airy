@@ -24,6 +24,7 @@ esac
 # timeout 30 while ! xdotool search --onlyvisible --pid $mypid --name "$pr"
 # do sleep 1; done || notify "Error on executing: $pr $args" &
 
+# FIXME: move 'ALWAYS' (if possible), 'WM' and maybe 'USER' group into systemd@user
 
 ### ALWAYS ### --------------------------------------
 # BUG: No PulseAudio daemon running, or not running as session daemon.
@@ -48,5 +49,5 @@ r.mpd-log &
 
 ### USER ### ----------------------------------------
 copyq &
-[[ "$CURR_PROF" =~ ^(home|laptop|neo) ]] || { pidgin & }
-[[ ! "$CURR_PROF" =~ ^work ]] || { skype & }
+[[ $CURR_PROF =~ ^(home|laptop|neo) ]] || { pidgin & }
+# [[ ! "$CURR_PROF" =~ ^work ]] || { skype & }  # Obsolete

@@ -1,15 +1,15 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-### LINKS ###
-# WARNING: symlink is not enough, it will be replaced when you launch
-# pidgin! But maybe, even file will be overwritten...
-# link "$PWD/prefs.xml" ~/.purple/prefs.xml
-dst=~/.purple/prefs.xml
-link -c ./prefs.xml "$dst"
+### GENS ###
+acc=~/.purple/accounts.xml
+cfg=~/.purple/prefs.xml
 
-if cfgOpt u; then
-    ./accounts.gen
+if cfgOpt r || [[ ! -f $acc || ! -f $cfg ]]; then
+  # WARNING: symlink is not enough, it will be replaced when you launch pidgin!
+  link -c ./prefs.xml "$cfg"
+  ./accounts.gen
+  # gnome-keyring-daemon --replace
 fi
 
 echo "C: pidgin"

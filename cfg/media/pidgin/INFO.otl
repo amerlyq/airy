@@ -11,3 +11,31 @@ CLI interface
 		purple-remote "setstatus?status=available&message=$TEXT"
 	Более сложный вариант со случайной цитатой(найдено на просторах сети):
 		purple-remote "setstatus?status=available&message=$(wget -qO - http://greatwords.ru/random | sed -ne '/quote-p\|info-p/!b;s/<[^>]*>//g;s/ / /g;s/sclear();//;p' | fold -sw 160)
+
+
+>>> Manual profiles setup
+MS Office Communicator
+	Basic:
+		Protocol:              Office Communicator
+		Username:              ${WORK_MAIL}
+		Login:                 <empty>                   # OR repeat username
+		Password:              ${pswd:-'Could not extract password'}
+		Remember password      [X]
+		Local alias:           me
+	Advanced:
+		Server:                ${WORK_SRV_MSCMM}         # You can add port :5061
+		Connection type:       TCP                       # SSL not working
+		User-Agent:            UCCAPI/15.0.4481.1000 OC/15.0.4481.1000 (Microsoft Lync)
+								# OLD: UCCP/2.0.6362.221 OC/2.0.6362.221 (MS Office Communicator)
+		Authentication scheme: NTLM
+
+GoogleTalk
+	Basic:
+		Protocol:              XMPP
+		Username:              ${MAIN_MAIL%%@*}
+		Domain:                ${MAIN_MAIL#*@}
+		Password:              <empty>
+		Local alias:           me
+		New mail notification: [_]
+	Advanced:
+		Connection security:   Require encryption (SSL/TLS)

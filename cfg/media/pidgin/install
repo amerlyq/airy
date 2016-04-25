@@ -1,24 +1,27 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 has_pr X || die
-# | pidgin-sipe        | Office Communicator plugin
-# | pidgin-plugin-pack | Primarily for convenient history plugin
+# finch   | TUI interface to pidgin
 
 pkg_inst pidgin
 
-case "$CURR_PROF" in work_samsung)
-    pkg_inst -a 'pidgin-sipe'
-esac
-
 if distro arch; then
-    echo "Err: broken"
-    # pkg_inst 'pidgin-encryption'
+  # Plugin for Skype
+  aur_inst -f '/usr/lib/purple-2/libskypeweb.so' purple-skypeweb
+  # Plugin for MSN -- Office Communicator
+  # pkg_inst -a 'pidgin-sipe'
+
+  # Other plugins
+  pkg_inst -f '/usr/lib/pidgin/enhancedhist.so' purple-plugin-pack
+  pkg_inst -f '/usr/lib/purple-2/pidgin-libnotify.so' pidgin-libnotify
+  aur_inst -f '/usr/lib/purple-2/libskypeweb.so' purple-skypeweb
+
+  aur_inst -f '/usr/lib/purple-2/purple-gnome-keyring.so' purple-gnome-keyring
+  ssh=/etc/xdg/autostart/gnome-keyring-ssh.desktop
+  [[ ! -f $ssh ]] || sudo mv -vf ${ssh}{,_}
+  # pkg_inst 'pidgin-encryption'
 
 elif distro ubuntu; then
-    pkg_inst 'pidgin-plugin-pack myspell-ru'
+  # pidgin-plugin-pack | Primarily for convenient history plugin
+  pkg_inst 'pidgin-plugin-pack myspell-ru'
 fi
-
-
-### ON DEMAND ###
-# finch   | TUI interface to pidgin
-# tcpdump | if necessary to extract paswd

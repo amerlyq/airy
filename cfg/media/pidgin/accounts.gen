@@ -2,188 +2,90 @@
 source ~/.shell/profile
 
 dst=~/.purple/accounts.xml
-> $dst
+> "$dst"
 
-cat >> $dst << EOT
+gaim() { cat - <<EOT
+		<settings ui='gtk-gaim'>
+			<setting name='auto-login' type='bool'>1</setting>
+		</settings>
+		<current_error/>
+EOT
+}
+
+cat >> "$dst" <<EOT
 <?xml version='1.0' encoding='UTF-8' ?>
 
 <account version='1.0'>
+	<account>
+		<protocol>prpl-jabber</protocol>
+		<name>${MAIN_MAIL:?Need account for GoogleTalk}</name>
+		<alias>me</alias>
+		<settings>
+			<setting name='auth_plain_in_clear' type='bool'>0</setting>
+			<setting name='custom_smileys' type='bool'>1</setting>
+			<setting name='check-mail' type='bool'>1</setting>
+			<setting name='connection_security' type='string'>require_tls</setting>
+		</settings>
+$(gaim)
+	</account>
 EOT
 
-if [ "$CURR_PROF" == "work_samsung" ]; then
-    cat - << EOT >> $dst
+if [[ -f /usr/lib/purple-2/libskypeweb.so ]]; then
+  cat >> "$dst" <<EOT
+	<account>
+		<protocol>prpl-skypeweb</protocol>
+		<name>${MAIN_SKYPE:?}</name>
+		<alias>me</alias>
+		<settings>
+			<setting name='show-typing-as-icon' type='bool'>0</setting>
+			<setting name='show-typing-as-text' type='bool'>1</setting>
+		</settings>
+$(gaim)
+	</account>
+EOT
+fi
+
+if [[ -f /usr/lib/purple-2/libsipe.so ]]; then
+  cat >> "$dst" << EOT
 	<account>
 		<protocol>prpl-sipe</protocol>
-		<name>${WORK_MAIL?Need account for MSCommunicator},</name>
+		<name>${WORK_MAIL:?Need account for MSCommunicator}</name>
 		<password></password>
 		<alias>me</alias>
-		<statuses>
-			<status type='available' name='Available' active='true'>
-				<attributes/>
-			</status>
-			<status type='busy' name='Busy' active='false'>
-				<attributes/>
-			</status>
-			<status type='do-not-disturb' name='Do not disturb' active='false'>
-				<attributes/>
-			</status>
-			<status type='on-the-phone' name='In a call' active='false'>
-				<attributes/>
-			</status>
-			<status type='in-a-conference' name='In a conference' active='false'>
-				<attributes/>
-			</status>
-			<status type='away' name='Away' active='false'>
-				<attributes/>
-			</status>
-			<status type='be-right-back' name='Be right back' active='false'>
-				<attributes/>
-			</status>
-			<status type='invisible' name='Invisible' active='false'>
-				<attributes/>
-			</status>
-			<status type='offline' name='Offline' active='false'>
-				<attributes/>
-			</status>
-		</statuses>
 		<settings>
 			<setting name='authentication' type='string'>ntlm</setting>
 			<setting name='sso' type='bool'>0</setting>
 			<setting name='transport' type='string'>tcp</setting>
 			<setting name='useragent' type='string'>UCCAPI/15.0.4481.1000 OC/15.0.4481.1000 (Microsoft Lync)</setting>
-			<setting name='silence-suppression' type='bool'>0</setting>
 			<setting name='server' type='string'>${WORK_SRV_MSCMM:?}</setting>
 			<setting name='dont-publish' type='bool'>0</setting>
 		</settings>
-		<settings ui='gtk-gaim'>
-			<setting name='auto-login' type='bool'>1</setting>
-		</settings>
-		<current_error/>
+$(gaim)
 	</account>
 EOT
 fi
 
-if [ "$CURR_PROF" == "work" ]; then
-    cat - << EOT >> $dst
+if [[ -f /usr/lib/purple-2/libskype.so ]]; then
+  cat >> "$dst" <<EOT
 	<account>
 		<protocol>prpl-bigbrownchunx-skype</protocol>
 		<name>${MAIN_SKYPE:?}</name>
 		<alias>me</alias>
-		<statuses>
-			<status type='ONLINE' name='Online' active='true'>
-				<attributes/>
-			</status>
-			<status type='SKYPEME' name='SkypeMe' active='false'>
-				<attributes/>
-			</status>
-			<status type='AWAY' name='Away' active='false'>
-				<attributes/>
-			</status>
-			<status type='NA' name='Not Available' active='false'>
-				<attributes/>
-			</status>
-			<status type='DND' name='Do Not Disturb' active='false'>
-				<attributes/>
-			</status>
-			<status type='INVISIBLE' name='Invisible' active='false'>
-				<attributes/>
-			</status>
-			<status type='OFFLINE' name='Offline' active='false'>
-				<attributes/>
-			</status>
-		</statuses>
 		<settings>
 			<setting name='skype_autostart' type='bool'>1</setting>
-			<setting name='buddy_icon_timestamp' type='int'>0</setting>
-			<setting name='silence-suppression' type='bool'>0</setting>
 			<setting name='skype_sync' type='bool'>1</setting>
 			<setting name='voicevideoemblems' type='bool'>1</setting>
 			<setting name='skypeout_online' type='bool'>1</setting>
-			<setting name='buddy_icon'/>
 			<setting name='skype_path' type='string'></setting>
-			<setting name='use-global-buddyicon' type='bool'>1</setting>
 			<setting name='reject_all_auths' type='bool'>0</setting>
 		</settings>
-		<settings ui='gtk-gaim'>
-			<setting name='auto-login' type='bool'>1</setting>
-		</settings>
-		<current_error/>
+$(gaim)
 	</account>
 EOT
 fi
 
-cat >> $dst << EOT
-	<account>
-		<protocol>prpl-jabber</protocol>
-		<name>${MAIN_MAIL?Need account for GoogleTalk}/</name>
-		<alias>me</alias>
-		<statuses>
-			<status type='available' name='Available' active='true'>
-				<attributes/>
-			</status>
-			<status type='mood' name='Feeling' active='false'>
-				<attributes/>
-			</status>
-			<status type='freeforchat' name='Chatty' active='false'>
-				<attributes/>
-			</status>
-			<status type='away' name='Away' active='false'>
-				<attributes/>
-			</status>
-			<status type='extended_away' name='Extended away' active='false'>
-				<attributes/>
-			</status>
-			<status type='dnd' name='Do Not Disturb' active='false'>
-				<attributes/>
-			</status>
-			<status type='offline' name='Offline' active='false'>
-				<attributes/>
-			</status>
-		</statuses>
-		<settings>
-			<setting name='buddy_icon_timestamp' type='int'>0</setting>
-			<setting name='auth_plain_in_clear' type='bool'>0</setting>
-			<setting name='custom_smileys' type='bool'>1</setting>
-			<setting name='port' type='int'>5222</setting>
-			<setting name='ft_proxies' type='string'>proxy.eu.jabber.org</setting>
-			<setting name='check-mail' type='bool'>0</setting>
-			<setting name='connection_security' type='string'>require_tls</setting>
-			<setting name='use-global-buddyicon' type='bool'>1</setting>
-			<setting name='silence-suppression' type='bool'>0</setting>
-		</settings>
-		<settings ui='gtk-gaim'>
-			<setting name='auto-login' type='bool'>1</setting>
-		</settings>
-		<current_error/>
-	</account>
+cat >> "$dst" <<EOT
 </account>
 EOT
 
-echo "W: ~/.purple/accounts.xml"
-
-### Manual profiles setup
-## MS Office Communicator
-# Basic:
-#     Protocol:              Office Communicator
-#     Username:              ${WORK_MAIL}
-#     Login:                 <empty>                   # OR repeat username
-#     Password:              ${pswd:-'Could not extract password'}
-#     Remember password      [X]
-#     Local alias:           me
-# Advanced:
-#     Server:                ${WORK_SRV_MSCMM}         # You can add port :5061
-#     Connection type:       TCP                       # SSL not working
-#     User-Agent:            UCCAPI/15.0.4481.1000 OC/15.0.4481.1000 (Microsoft Lync)
-#                            # OLD: UCCP/2.0.6362.221 OC/2.0.6362.221 (MS Office Communicator)
-#     Authentication scheme: NTLM
-
-## GoogleTalk
-# Basic:
-#     Protocol:              XMPP
-#     Username:              ${MAIN_MAIL%%@*}
-#     Domain:                ${MAIN_MAIL#*@}
-#     Password:              <empty>
-#     Local alias:           me
-#     New mail notification: [_]
-# Advanced:
-#     Connection security:   Require encryption (SSL/TLS)
+echo "W: $dst"
