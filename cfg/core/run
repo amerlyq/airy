@@ -28,7 +28,11 @@ if pgrep i3 &>/dev/null; then
 else no_windows(){ :; }; fi
 # OR: use ctl.hs to query windows list from xmonad
 
-confirm(){ [[ $(printf "yes\nno\n" | dmenu -p "$1?" -fn monospace-10) == yes ]]; }
+if running_X; then
+  confirm(){ [[ $(printf "yes\nno\n" | dmenu -p "$1?" -fn monospace-10) == yes ]]; }
+else
+  confirm(){ printf '%s? ([y]es/[N]o)' "$1"; read a; [[ ${a,,} =~ ^y(es)?$ ]]; }
+fi
 
 # TODO: add force shutdown, ignoring unpushed commits
 confirm_repo(){ local t=$1 dir=~/aura

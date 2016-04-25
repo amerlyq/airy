@@ -6,6 +6,6 @@ source ~/.shell/func.d/cfgsetup
 link -t ~/.config/qutebrowser \
   qutebrowser.conf keys.conf
 
-if cfgOpt u; then
-  qutebrowser :adblock-update :close
+if cfgOpt r || [[ ! -f ~/.local/share/qutebrowser/blocked-hosts ]]; then
+  if running_X; then qutebrowser :adblock-update & fi
 fi
