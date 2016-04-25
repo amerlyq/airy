@@ -28,7 +28,7 @@ main = concat [
     ]
     | (k, t) <-
     [ ("<Space>", "r.t -e r.tmux")  -- OR "r.tf"
-    , ("M1-<Space>", "~/.i3/ctl/run-cwd")
+    , ("M1-<Space>", "~/.i3/ctl/run-cwd") -- FIXME
     , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
     ]
   ]
@@ -72,8 +72,6 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("M-S-d"     , "r.dmenu -n")
     , ("M-C-d"     , "j4-dmenu-desktop")
     , ("M-<Print>" , "r.capture-screen")
-    , ("M-S-C-\\"  , "~/.i3/ctl/wnd_active_kill")
-    , ("M-S-z"     , "r.lock")
     , ("M-o t"     , "r.touchpad-tgl")
     ],
     -- ADD: prompt to set volume
@@ -127,6 +125,8 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     feedCmd "copyq"
     [ ("M-x", "toggle")
     , ("M-C-x", "edit -1")
+    , ("M-c", "previous")
+    , ("M-v", "next")
     ],
     (inGroup "M-S-x" . concat)
     [ feedCmd "copyq"

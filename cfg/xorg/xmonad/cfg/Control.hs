@@ -92,26 +92,30 @@ movef =
   ]
 
 layouts =
-  [ ("M-n"      , sendMessage NextLayout)
+  [ ("M-/"      , sendMessage $ Toggle MIRROR)
+  , ("M-S-/"    , sendMessage $ Toggle REFLECTX)
+  , ("M-n"      , sendMessage NextLayout)
   , ("M-S-n"    , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
   , ("M-f"      , sendMessage $ Toggle FULL)  -- sendMessage (SetStruts [] [D]) >>
   , ("M-S-f"    , sendMessage ToggleStruts)
   , ("M-C-f"    , sendMessage $ Toggle STRUTS)
   , ("M-S-C-f"  , sendMessage $ Toggle GAPS)
-  , ("M-/"      , sendMessage $ Toggle MIRROR)
-  , ("M-S-/"    , sendMessage $ Toggle REFLECTX)
   ]
 
 system =
-  [ ("M-\\"    , kill1)
-  , ("M-C-\\", killAllOtherCopies)
-  , ("M-S-q"   , kill)
+  -- TODO: kill recursively all nested terminal programs
+  [ ("M-\\"     , kill1)
+  , ("M-C-\\"   , killAllOtherCopies)
+  -- TODO: kill even if window is frozen
+  , ("M-C-S-\\" , kill)
+  , ("M-S-z"    , spawn "r.lock")
+  -- , ("M-C-S-\\" , spawn "~/.i3/ctl/wnd_active_kill") -- FIXME
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
   inGroup "M-S-<Esc>"  -- xmonad
     [ ("o", whenWindowsClosed $ io exitSuccess)
     , ("r", whenWindowsClosed $ spawn "r.core reboot")
-    , ("s", whenWindowsClosed $ spawn "r.core shutdown")
+    , ("t", whenWindowsClosed $ spawn "r.core shutdown")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.xmonad-rebuild")
