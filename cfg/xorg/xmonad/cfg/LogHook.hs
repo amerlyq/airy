@@ -19,7 +19,7 @@ import qualified XMonad.Config.Amer.Workspace as MyWksp
 escape = concatMap f :: String -> String where
   f '`' = "$'\\x60'"
   f x   = [x]
-mouse n cmd txt = "<action=`" ++ escape cmd ++ "` button=" ++ show n ++ ">" ++ txt ++ "</action>"
+mouse b cmd s = "<action=`" ++ escape cmd ++ "` button=" ++ show b ++ ">" ++ s ++ "</action>"
 wmctrl = ("r.wm -w " ++)  -- ALT: $'\\x" ++ showHex (ord $ head i) "'"
 -- ADD: wmctrl -r :ACTIVE: -b toggle,fullscreen -- Toggle fullscreen for current window only (not layout)
 
@@ -34,7 +34,7 @@ myStateLogger copies = dynamicLogString def
   { ppCurrent = xmobarColor "#fd971f" ""
   -- { ppCurrent = \t -> "<fc=#fd971f,#ffffff>" ++ t ++ "</fc>"
   -- , ppVisible = wrap "(" ")" (xinerama only)
-  , ppHidden  = clickws . predefined
+  , ppHidden  = pHidden
   -- , ppHiddenNoWindows = const ""
   , ppUrgent  = xmobarColor "red" "yellow"
   -- , ppTitle   = xmobarColor "green"  "" . shorten 40
@@ -59,13 +59,18 @@ myStateLogger copies = dynamicLogString def
       _ -> nm
   }
   where
-    markcopy i = if i `elem` copies then xmobarColor "#8888ff" "green" i else i
-    predefined i = if i `elem` MyWksp.all then i else ""
     -- ALT clickws i = mouse 1 (xdokey $ M.findWithDefault "0" i mkMap) i
-    clickws i = mouse 1 ("r.wm -w " ++ i) (markcopy i)
+    clickws i  = mouse 1 ("r.wm -w " ++ i)
     clickly ly = mouse 1 "r.wm M-n" (mouse 3 "r.wm M-S-n" ly)
     scrollws s = mouse 4 "r.wm 'M-<Backspace>'" (mouse 5 "r.wm 'M-<Tab>'" s)
     -- clickly ly = mouse 1 (xdokey "f") (mouse 3 (xdokey "n") ly)
+    cCopy = xmobarColor "#8888ff" "green"
+    cName = xmobarColor "#aa9988" ""
+    cHidden i s | i `elem` copies = cCopy s
+                | i `elem` MyWksp.named = cName s
+                | otherwise = s
+    pHidden i | i `elem` MyWksp.all = cHidden i (clickws i i)
+              | otherwise = ""
 
 
 myLogHook h = do

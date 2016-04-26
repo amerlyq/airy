@@ -7,8 +7,8 @@ import Control.Arrow (second)
 import XMonad                       (spawn, windows, doFloat, (=?))
 import XMonad.StackSet              (view, shift)
 import XMonad.Actions.SpawnOn       (spawnHere, spawnAndDo)
-import XMonad.Actions.WindowGo      (runOrRaise)
-import XMonad.ManageHook            (className, title, stringProperty, (<&&>))
+import XMonad.Actions.WindowGo      (runOrRaise, raiseMaybe)
+import XMonad.ManageHook            (className, appName, title, stringProperty, (<&&>))
 import XMonad.Hooks.ManageHelpers   (doCenterFloat, (/=?))
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Util.NamedScratchpad  (namedScratchpadAction)
@@ -44,11 +44,13 @@ scratchpad = (concat . (`map` [
     , ("f" , runOrRaise "firefox" $ className =? "Firefox")
     , ("p" , runOrRaise "pidgin" $ className =? "Pidgin" <&&> stringProperty "WM_WINDOW_ROLE" =? "buddy_list")
     , ("s" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
+    -- FIXME: broken opening on new wksp?
+    , ("m" , raiseMaybe (spawn "r.t -n mutt -e mutt") (appName =? "mutt"))
     , ("<F1>", namedScratchpadAction myScratchpads "help")
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
-    | nm <- ["ncmpcpp", "mutt", "ipython", "j8", "htop", "lyrics"]
+    | nm <- ["ncmpcpp", "ipython", "j8", "htop", "lyrics"]
     ],
     -- Open new window always
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)

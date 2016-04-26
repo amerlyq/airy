@@ -155,17 +155,17 @@ myManageHook = manageSpawn <+>
     ] ] --> doIgnore
   ]
   <+> insertPosition Below Newer <+>
-  composeBring
-  [ ("PI", "Pidgin")
-  , ("SK", "Skype")
-  , ("FF", "Firefox")
-  -- , ("MM", "mutt") -- TODO: make whole wksp similar to firefox (but I can have >1 mutt)
+  mconcat
+  [ className =? "Pidgin" --> doF (bring "PI")
+  , className =? "Skype" --> doF (bring "SK")
+  , className =? "Firefox" --> doF (bring "FF")
+  -- , ("5", "Krita")
+  -- , ("8", "t-engine64")
+  -- , ("9", "Steam")
+  , appName =? "mutt" --> doF (bring "MM")  -- (but I can have >1 mutt)
   -- NOTE: strictly speaking, we don't need runOrRaise for mutt
   -- -- only stick it to MM wksp and keys to jump on it
   -- -- but with raise we get auto-launch and jumping even to moved for some reasons windows
-  , ("5", "Krita")
-  , ("8", "t-engine64")
-  , ("9", "Steam")
   ]
   <+> MON.manageMonitor myOverlay
   <+> namedScratchpadManageHook myScratchpads
@@ -174,8 +174,6 @@ myManageHook = manageSpawn <+>
     wmhas t l = foldr1 (<||>) [ t =? x | x <- words l ]
     topmost =  (<+> insertPosition Master Newer)
     composeFloat = mconcat . map (--> topmost doFloat)
-    -- ALT: doF (W.shift "doc")
-    composeBring = mconcat . map (\(i, x) -> (className =? x --> doF (bring i)))
 
 
 catchStdout c f = fmap read (runProcessWithInput c [f] "")
