@@ -5,7 +5,7 @@ source ~/.shell/func.d/packages
 if distro arch; then
     # system drivers
     pkg_inst -f '/usr/lib/xorg/modules/input/mouse_drv.so' xf86-input-mouse
-    pkg_inst -l 'ntfs-3g' ntfs-3g
+    pkg_inst -l ntfs-3g{,}
     # sudo fc-cache && sudo mkfontscale && sudo mkfontdir
 
     # ALT packer (lightweight but less automatable and w/o shell completion)
@@ -13,7 +13,11 @@ if distro arch; then
     # AND then you can sign it:  gpg --lsign-key <KEYID>
     ayr_inst pacaur
     pkg_inst pkgfile  # To investigate packages content w/o downloading
-    ! cfgOpt u || sudo pkgfile --update
+    if cfgOpt u || [[ ! -f /var/cache/pkgfile/core.files ]]; then
+      echo "Fix: move all such 'updates' in one separate script"
+      # THINK: maybe place them into 3rd script in dir -- update?
+      sudo pkgfile --update
+    fi
 
 # http://askubuntu.com/questions/468466/why-this-occurs-error-diskfilter-writes-are-not-supported
 else

@@ -6,6 +6,7 @@ if distro arch; then
     pkg_inst -p 'gcc' gcc-multilib
     pkg_inst -f '/usr/lib32/libstdc++.so' lib32-gcc-libs
     pkg_inst -p 'valgrind' valgrind-multilib
+    pkg_inst doxygen cppcheck  # C++
     pkg_inst c2hs clisp   # -pr-lang: haskell, lisp
 
     # SEE: http://code.jsoftware.com/wiki/Books
@@ -19,8 +20,6 @@ if distro arch; then
     # cabal-install ghc-mod
     # cabal install hdevtools
 
-    echo "Err: Not enough packages"
-
 elif distro ubuntu; then
     # Those libs also necessary to build x32 under x64 system
     LST="$LST build-essential gcc-multilib g++-multilib lib32stdc++6 "
@@ -30,7 +29,6 @@ elif distro ubuntu; then
     # LST="$LST google-perftools libgoogle-perftools-dev libgoogle-glog-dev google-mock"
     # Cross-compilers
     # LST="$LST gcc-arm-linux-gnueabi" #Or ...-androideabi
-    LST="$LST moreutils"
 
     pkg_inst $LST
     echo "Err: Not enough packages"
