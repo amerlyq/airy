@@ -17,7 +17,7 @@ mkdef r.wm        r.xmonad
 
 mkdef xmessage    r.vim-xmessage
 mkdef notify-send /usr/bin/dunstify
-mkdef editor      $EDITOR
+[[ -z $EDITOR ]] || mkdef editor      $EDITOR
 
 if distro ubuntu; then
   mkdef x-terminal-emulator $(which $term)

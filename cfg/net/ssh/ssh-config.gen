@@ -59,7 +59,7 @@ case "$CURR_PROF" in home|laptop|neo|gnote4)
 ;; esac
 
 case "$CURR_PROF" in work)
-    wacc -k buld   $BULD_IPL $BULD_USER
+    [[ -z $BULD_IPL ]] || wacc -k buld   $BULD_IPL $BULD_USER
 ;; esac
 
 case "$CURR_PROF" in work_samsung)

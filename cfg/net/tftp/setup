@@ -2,13 +2,13 @@
 source ~/.shell/func.d/cfgsetup
 
 # http://linux.die.net/man/8/tftpd
-dir=/cryptfs/tftpboot
+dir=${CURR_DIR_TFTP:-/cryptfs/tftpboot}
 
-if cfgOpt u; then
+if cfgOpt u && [[ -d $dir ]]; then
     add_sysuser tftp
 
     mkdir -p "$dir"
-    if [[ "$(stat -c '%u %g' "$dir")" != "$(id -u tftp) $(id -g tftp)" ]]
+    if [[ $(stat -c '%u %g' "$dir") != "$(id -u tftp) $(id -g tftp)" ]]
     then sudo chown -R tftp:tftp "$dir"; fi
 
     if distro arch; then
