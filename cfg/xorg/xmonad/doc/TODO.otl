@@ -1,4 +1,17 @@
-FIND
+CHG
+	[_] run xmobar in systemd --user unit
+		:> So, when restarting X xmobar won't overlap old windows
+		: systemd unit for xmobar -- must open and provide socket to its stdin
+		http://www.kodama.gr/2013/11/03/reading-from-named-pipes-in-xmobar/
+		https://wiki.haskell.org/Xmonad/Frequently_asked_questions#XMonad_is_frozen.21
+		https://wiki.haskell.org/Xmonad/Config_archive/John_Goerzen%27s_Configuration
+		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
+	[_] wrap unsafe operations in main to not drop X
+	[_] use same xmonbarrc for different hosts
+		https://github.com/davama/xmonad/
+		https://github.com/j1r1k/xmonad-config
+	[_] resolve circular dependencies to replace def -> myCfg or simply remove 'def'
+
 
 SEE
 	Haskell

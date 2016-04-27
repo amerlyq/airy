@@ -21,6 +21,13 @@ _dttime end-compdump
 #   fi
 # fi
 
+# if [[ $XDG_VTNR == 5 ]]; then
+#   # Set default console for X login
+#   # systemctl --user set-environment XDG_VTNR=5
+#   systemctl --user import-environment XDG_VTNR PATH
+#   # systemctl --user start xorg@0.socket  # display 0
+# fi
+
 # BUG: seems like it causes long delay before Xorg on cold system
 # OR: delay is caused by long connection (auth) to X
 ((0==$#commands[r.init])) || r.init

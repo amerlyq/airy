@@ -156,8 +156,9 @@ myManageHook = manageSpawn <+>
   ]
   <+> insertPosition Below Newer <+>
   mconcat
-  [ className =? "Pidgin" --> doF (bring "PI")
-  , className =? "Skype" --> doF (bring "SK")
+  -- EXPL: for IM 'shift' is more comfortable
+  [ className =? "Pidgin" --> doF (W.shift "PI")
+  , className =? "Skype" --> doF (W.shift "SK")
   , className =? "Firefox" --> doF (bring "FF")
   -- , ("5", "Krita")
   -- , ("8", "t-engine64")

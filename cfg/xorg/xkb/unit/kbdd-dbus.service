@@ -1,0 +1,14 @@
+[D-BUS Service]
+Name=ru.gentoo.KbddService
+SystemdService=dbus-ru.gentoo.KbddService.service
+
+# This service should not be bus activated if systemd isn't running,
+# so that activation won't conflict with the init script startup.
+Exec=/bin/false
+
+# [D-BUS Service]
+# Name=ru.gentoo.KbddService
+# Exec=/usr/bin/kbdd --nodaemon
+# User=%i
+# # Group=users
+# SystemdService=kbdd.service

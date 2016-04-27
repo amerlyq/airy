@@ -1,0 +1,25 @@
+# FIXED:(xorg=1.18) So before, I had the socket ready before any other units
+# could be launched (by waiting for x11.target which in turn waited
+# for x11.socket), but now x11.targetalso needs xorg.service up and running
+# before it can allow other units to launch.
+
+[Unit]
+Description=Xorg server at display %i
+Documentation=man:Xorg(1)
+Requires=xorg@%i.socket
+After=xorg@%i.socket
+# FIXED:(1) Add this line for xorg 1.18 to fix broken socket-activation
+# Before=xorg@%i.target
+
+[Service]
+Type=simple
+SuccessExitStatus=0 1
+ExecStart=/usr/bin/Xorg :%i -nolisten tcp -noreset -verbose 2 "vt${XDG_VTNR}"
+# ALT: ExecStart=/usr/bin/Xorg $DISPLAY -nolisten tcp -noreset -verbose 1 vt1
+
+[Install]
+Alias=xorg@%i.service
+# Also=x11@%i.socket x11@%i.target
+# x11@%i.socket
+# FIXED:(2) Add this line for xorg 1.18 to fix broken socket-activation
+# WantedBy=default.target

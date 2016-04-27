@@ -1,3 +1,9 @@
+> SEE Life w/o systemd
+	http://systemd-free.org/install.php
+
+BUG
+	[_] fix syncthing on neo
+
 Start user instance right after boot and keep beside sessions
 : USE for mpd
 	loginctl enable-linger username
@@ -8,3 +14,28 @@ Set many variables ~/.bash_profile
 
 SEE for autostart tmux session (to use instead of X)
 	https://wiki.archlinux.org/index.php/Systemd/User
+
+User
+	> https://pbrisbin.com/posts/systemd-user/
+	> Namely unit files must not be links, which is enforced with O_NOFOLLOW.
+	: Failed to execute operation: Too many levels of symbolic links
+	But there’s a hidden workaround: enable the file (full path), without creating the link in ~/.config/systemd/user beforehand
+	: https://foudil.fr/blog/199/systemd-user-units-and-links/
+
+		systemctl --user list-unit-files
+		systemctl --user show-environment
+
+	xorg as user
+		https://wiki.archlinux.org/index.php/Systemd/User#Xorg_as_a_systemd_user_service
+		https://bugs.freedesktop.org/show_bug.cgi?id=93072
+		https://www.reddit.com/r/archlinux/comments/3twekg/xorg_118_messes_with_socket_activation_in_systemd/
+		https://wiki.archlinux.org/index.php/General_troubleshooting#Session_permissions
+
+Dbus
+	https://fedoraproject.org/wiki/Packaging:Systemd?rd=Packaging:Guidelines:Systemd#DBus_activation
+
+SEE:(big list of user services)
+	https://github.com/soulik/systemd-config/tree/master/user
+	https://github.com/lemenkov/systemd-user-units/tree/master/user
+	> https://github.com/PaBLoX-CL/systemd-user-units/blob/master/xmonad@.service
+		https://github.com/PaBLoX-CL/dotfiles

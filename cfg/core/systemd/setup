@@ -1,0 +1,23 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+# To enable socket activation for xorg on display 0 and tty 2:
+# $ systemctl --user set-environment XDG_VTNR=2
+# $ systemctl --user start xorg@0.socket
+# -> Now running any X app will launch xorg on vt 2 automatically.
+
+if distro arch; then
+  link -sct /etc/X11 Xwrapper.config
+
+  link -ct ~/.config/systemd/user \
+    xorg@.socket {xorg,xmonad}@.service \
+    {wm,startup}@.target
+
+  systemctl --user daemon-reload
+  # systemctl --user enable xorg@0
+  # systemctl --user enable wm@0.target  # xmonad@0  #@${DISPLAY:?}
+
+elif distro ubuntu; then
+
+  echo "Err: use standart ~/.xinitrc instead of systemd"
+fi
