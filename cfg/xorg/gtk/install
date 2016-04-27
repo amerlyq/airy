@@ -4,14 +4,19 @@ has_pr X || die
 
 if distro arch; then
     # Install 'Adwaita' to eliminate warnings in GTK apps
-    pkg_inst gtk2 gtk3 gnome-themes-standard
+    pkg_inst -l 'gtk-x11-2.0' gtk2
+    pkg_inst -l 'gtk-3' gtk3
+    pkg_inst -d '/usr/share/themes/Adwaita' gnome-themes-standard
 
-    aur_inst gtk-theme-flatstudio
+    aur_inst -d '/usr/share/themes/FlatStudio' gtk-theme-flatstudio
     # mate-themes numix-themes
-    aur_inst vertex-themes zukitwo-themes ceti-2-themes
+    aur_inst -d '/usr/share/themes/Vertex'  vertex-themes
+    aur_inst -d '/usr/share/themes/Zukitwo' zukitwo-themes
+    aur_inst -d '/usr/share/themes/Ceti-2'  ceti-2-themes
 
     # Icons
-    pkg_inst hicolor-icon-theme faenza-icon-theme
+    pkg_inst -d '/usr/share/icons/hicolor' hicolor-icon-theme
+    pkg_inst -d '/usr/share/icons/Faenza'  faenza-icon-theme
 
 elif distro ubuntu; then
     echo "ERR: install manually"

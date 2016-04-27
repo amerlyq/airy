@@ -67,7 +67,7 @@ do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
 
 has_pr(){ hash "$1" >/dev/null 2>&1; }
 has_lib(){ grep -q '^\s*lib'"$1"'\.so\s' <(ldconfig -p); }
-has_python(){ local v=($(python$1 --version))
+has_python(){ local v=($(python$1 --version 2>&1))
   [[ -d /usr/lib/python${v[1]%.*}/site-packages/$2 ]]
 }
 has_such(){ local -A chk=( [a]='false' [f]='test -f' [d]='test -d'

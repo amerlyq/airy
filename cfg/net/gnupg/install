@@ -1,7 +1,8 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst gnupg keychain
+pkg_inst -p 'gpg' gnupg
+pkg_inst keychain
 
 if distro arch; then
     pkg_inst pinentry
