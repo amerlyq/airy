@@ -5,9 +5,9 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 if cfgOpt u; then
   link -st /etc/modprobe.d \
-    alsa-base.conf i915.conf \
-    audio_powersave.conf iwlwifi.conf
+    alsa-base.conf i915.conf iwlwifi.conf
 
 elif cfgOpt c; then
+  # modinfo
   modprobe -c | grep i915  # snd_hda_intel\|snd-hda-intel
 fi

@@ -26,7 +26,7 @@ if [[ -z "$LBL" ]]; then
 fi
 
 die() { printf "%s\n" "$*"; exit 1; }
-check() { grep -qsw "$1" /proc/mounts && die "Already mounted at '$1'!"; }
+check() { ! grep -qsw "$1" /proc/mounts || die "Already mounted at '$1'!"; }
 clean() { check "$1"
   [[ -d $1 ]] || return 0
   rmdir "$1" 2>/dev/null \
@@ -74,7 +74,7 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
 
 
 case "$ACTION" in
- m) domnt ;;
+ m) domnt "$DIR" ;;
  a) domtp "$DIR" ;;
  r) doram "$DIR" ;;
  o) doloop "$DIR" ;;  # You must launch it from iso's directory!
