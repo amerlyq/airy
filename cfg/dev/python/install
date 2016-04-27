@@ -4,15 +4,21 @@ source ~/.shell/func.d/packages
 pkg_inst python
 pkg_inst -p 'pip' python-pip
 
+# readline # for adequate navigation in IPython cmdline
+pip_inst -a readline  # BUG: no adequate condition
+pip_inst -y pyreadline{,}
+
 if distro arch; then
-    pkg_inst python2
-    pkg_inst -p 'pip2' python2-pip
+  pkg_inst ipython
+  pkg_inst -y {,python-}ipdb  # pretty debugger for IPython
+  pkg_inst -y {,python-}pudb
+  pkg_inst python2
+  pkg_inst -p 'pip2' python2-pip
 
 elif distro ubuntu; then
-    pkg_inst python3 python3-pip
-    pkg_inst -p 'pip3' python3-pip
+  pkg_inst python3 python3-pip
+  pkg_inst -p 'pip3' python3-pip
+  pip_inst -p 'IPython' ipython
+  pip_inst -y ipdb{,}
+  pip_inst -y pudb{,}
 fi
-
-pip_inst readline pyreadline ipython ipdb pudb
-# readline # for adequate navigation in IPython cmdline
-# ipdb     # pretty debugger for IPython

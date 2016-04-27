@@ -2,7 +2,11 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst ranger fbida libcaca poppler p7zip unzip
+    pkg_inst ranger unzip
+    pkg_inst -p 'fbi' fbida
+    pkg_inst -l 'caca' libcaca
+    pkg_inst -p 'pdftotext' poppler
+    pkg_inst -p '7z' p7zip
 
     # BUG: conflict with qutebrowser, etc
     # pkg_inst pygmentize python-pygments
