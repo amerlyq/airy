@@ -4,7 +4,7 @@ running_X || exit
 
 src=~/.cache/airy/keylayout.xkm
 if [[ -f $src ]]; then
-  xkbcomp "$src" ${DISPLAY%%.*}
+  [[ $SSH_TTY ]] || xkbcomp "$src" ${DISPLAY%%.*}
 else
   echo "Err: no compiled *.xkm to load"
 fi
