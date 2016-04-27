@@ -42,6 +42,7 @@ r.xkb-xcape &
 ### WM ### --------------------------------------
 r.dunst &
 # compton must be launched before installing wallpaper!
+# TODO: checking if drivers are available
 compton -d ${DISPLAY:-:0} &
 # [[ ! $XDG_CURRENT_DESKTOP =~ ^xmonad$ ]] || { r.tray & }  # No need
 r.feh &

@@ -9,6 +9,11 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ -L ~/.bin ]] || ln -svT "$PWD/bin" ~/.bin
 export PATH=~/.bin:$PATH
 
+# CHECK: some modules aren't installed (kedi has qute/install, but neo -- not)
+#   -- By SSH them also not visible
+# mpd 'setup' wasn't launched at all
+# NEED: log last run into file ~/.cache/airy/mods/setup.log
+
 # ======================================================================
 if [[ -z $DISPLAY ]]; then  # Use host xserver if SSH
     export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')

@@ -176,6 +176,7 @@ myManageHook = manageSpawn <+>
     composeFloat = mconcat . map (--> topmost doFloat)
 
 
+-- BUG:FIXME: unsafe io operation, catch error/exception instead of Xorg fail.
 catchStdout c f = fmap read (runProcessWithInput c [f] "")
 getXorg = catchStdout "r.xorg"
 
