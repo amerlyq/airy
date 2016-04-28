@@ -1,9 +1,10 @@
 [Unit]
 Description=Window Manager Target
-Wants=xorg@%i.socket
+Requires=xmonad@%i.service
+After=xmonad@%i.service
+# Requires=dbus.socket xorg@%i.target xmonad@%i.service
 # Wants=startup.target
-Requires=dbus.socket
 AllowIsolate=true
 
-[Install]
-Alias=default.target
+# [Install]
+# WantedBy=default.target

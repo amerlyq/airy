@@ -10,12 +10,13 @@ if distro arch; then
   link -sct /etc/X11 Xwrapper.config
 
   link -ct ~/.config/systemd/user \
-    xorg@.socket {xorg,xmonad}@.service \
-    {wm,startup}@.target
+    xorg@.{socket,target,service} \
+    xmonad@.service wm@.target
 
   systemctl --user daemon-reload
-  # systemctl --user enable xorg@0
-  # systemctl --user enable wm@0.target  # xmonad@0  #@${DISPLAY:?}
+  # systemctl --user enable wm@1.target xorg@1 xmonad@1
+  # systemctl --user enable xmo{bar,nad}@1
+  #@${DISPLAY:?}
 
 elif distro ubuntu; then
 

@@ -1,13 +1,11 @@
 [Unit]
 Description=xmonad
+Requires=xorg@%i.target
+After=xorg@%i.target
 # Before=startup.target
-After=xorg@%i.socket
-Requires=xorg@%i.socket
 
 [Service]
-# ExecStart=/usr/bin/xmonad
-ExecStart=%h/.cabal/bin/xmobar
-Environment=DISPLAY=:1
+ExecStart=/usr/bin/xmonad
 
-[Install]
-WantedBy=wm@%i.target
+# [Install]
+# WantedBy=wm@%i.target

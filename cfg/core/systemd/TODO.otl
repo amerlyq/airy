@@ -1,6 +1,10 @@
 > SEE Life w/o systemd
 	http://systemd-free.org/install.php
 
+REF
+	> man bootup
+	systemd-analyze plot > startupgraph.svg
+
 BUG
 	[_] fix syncthing on neo
 
@@ -25,6 +29,10 @@ User
 		systemctl --user list-unit-files
 		systemctl --user show-environment
 
+	hang/frozen xorg session
+		(tty1) DISPLAY=:1 st
+		(tty5) systemctl --user exit
+
 	xorg as user
 		https://wiki.archlinux.org/index.php/Systemd/User#Xorg_as_a_systemd_user_service
 		https://bugs.freedesktop.org/show_bug.cgi?id=93072
@@ -37,5 +45,6 @@ Dbus
 SEE:(big list of user services)
 	https://github.com/soulik/systemd-config/tree/master/user
 	https://github.com/lemenkov/systemd-user-units/tree/master/user
+	https://github.com/alezost/systemd-user-units
 	> https://github.com/PaBLoX-CL/systemd-user-units/blob/master/xmonad@.service
 		https://github.com/PaBLoX-CL/dotfiles

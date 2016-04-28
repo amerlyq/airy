@@ -5,21 +5,23 @@
 
 [Unit]
 Description=Xorg server at display %i
-Documentation=man:Xorg(1)
+# Documentation=man:Xorg(1)
+# FIXED:(1) Add this line for xorg 1.18 to fix broken socket-activation
+Before=xorg@%i.target
 Requires=xorg@%i.socket
 After=xorg@%i.socket
-# FIXED:(1) Add this line for xorg 1.18 to fix broken socket-activation
-# Before=xorg@%i.target
 
 [Service]
 Type=simple
 SuccessExitStatus=0 1
-ExecStart=/usr/bin/Xorg :%i -nolisten tcp -noreset -verbose 2 "vt${XDG_VTNR}"
+ExecStart=/usr/bin/Xorg :%i -nolisten tcp -noreset -verbose 2 -keeptty vt1
+# "vt${XDG_VTNR}"
+ExecStartPost=/usr/bin/systemctl --user set-environment DISPLAY=:%i
+ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY
 # ALT: ExecStart=/usr/bin/Xorg $DISPLAY -nolisten tcp -noreset -verbose 1 vt1
 
-[Install]
-Alias=xorg@%i.service
-# Also=x11@%i.socket x11@%i.target
-# x11@%i.socket
+# [Install]
+# Alias=xorg@%i.service
+# Also=xorg@%i.socket xorg@%i.target
 # FIXED:(2) Add this line for xorg 1.18 to fix broken socket-activation
-# WantedBy=default.target
+# WantedBy=xorg@%i.target
