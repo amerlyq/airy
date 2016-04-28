@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use strict 'vars';
+use Getopt::Std;
+
+my @state=();
+my %opts=();
+# TODO: enhance for >2 monitors
+my $fg='ablrsoABLRSO';  # above/below/left/right/same/only : main
+getopts($fg, \%opts);
+# TODO: if no option -- load from file ~/.cache/airy/monitors
+# ALT write whole command there as executable script.
+
+foreach ( qx(xrandr -q) ) {
+  next unless $_ =~ m/^([[:alnum:]-]+) connected .*$/;
+  # HACK first monitor is primary. TODO: sort them before that.
+  push @state, { 'o'=>$1, 'i'=>scalar(@state), 'p'=>!scalar(@state) };
+}
+
+# Split > head : tail
+# my $head = shift(@tail);
+
+my %type = (
+  a=>'--above',
+  b=>'--below',
+  l=>'--left-of',
+  r=>'--right-of',
+  s=>'--same-as',
+  o=>'--off'
+);
+
+my @cmd = ("xrandr");
+
+foreach my $mon (@state) {
+  push @cmd, ("--output", $mon->{o}, "--screen", $mon->{i}, "--auto");
+  push @cmd, "--primary" if $mon->{p};
+}
+
+# print @cmd;
+exec(@cmd)

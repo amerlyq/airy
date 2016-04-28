@@ -14,8 +14,9 @@ my $fg='owhxyWHdD';
 getopts($fg.'k', \%opts);
 
 foreach ( qx(xrandr -q) ) {
+  # Only list used monitors, skipping off'ed
   next unless $_ =~ m/^([[:alnum:]-]+) connected (\d+)x(\d+)\+(\d+)\+(\d+) .*? (\d+)mm x (\d+)mm$/;
-  push @state, { 'o'=>$1, 'w'=>$2, h=>$3, x=>$4, y=>$5, W=>$6, H=>$7,
+  push @state, { o=>$1, w=>$2, h=>$3, x=>$4, y=>$5, W=>$6, H=>$7,
     d=>int($2*25.4/$6), D=>int($3*25.4/$7) };
 }
 # TODO: sort keys by output type and place primary as very first
