@@ -14,10 +14,11 @@ After=xorg@%i.socket
 [Service]
 Type=simple
 SuccessExitStatus=0 1
-ExecStart=/usr/bin/Xorg :%i -nolisten tcp -noreset -verbose 2 -keeptty vt1
-# "vt${XDG_VTNR}"
-ExecStartPost=/usr/bin/systemctl --user set-environment DISPLAY=:%i
-ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY
+ExecStartPre=/usr/bin/systemctl --user import-environment XDG_VTNR
+ExecStart=/usr/bin/Xorg :%i -nolisten tcp -noreset -verbose 2 "vt${XDG_VTNR}"
+# -keeptty
+# ExecStartPost=/usr/bin/systemctl --user set-environment DISPLAY=:%i
+# ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY
 # ALT: ExecStart=/usr/bin/Xorg $DISPLAY -nolisten tcp -noreset -verbose 1 vt1
 
 # [Install]

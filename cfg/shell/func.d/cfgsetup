@@ -62,7 +62,7 @@ fi
 
 ### Go to current script's directory
 cd $(dirname $(readlink -m ${0}))
-[[ $MODS_CACHE_DISABLE ]] || airy_cache_pwd_mod
+airy_cache_pwd_mod
 
 if [[ -z $MODS_RUN_DISABLE ]]; then
   linkmask "$PWD/bin/" 'bin/r.%s-%s'

@@ -2,10 +2,11 @@
 source ~/.shell/func.d/cfgsetup
 
 if cfgOpt i; then
-    prf=wily_amd64  # ALT: trusty_i386, lucid_i386
-    chroot="${CURR_DIR_CHROOT:?No}/$prf"
+    # ALT: xenial_amd64, wily_amd64, trusty_i386, lucid_i386
+    prf=${CURR_CHROOTS[1]:?}
+    chroot=${CURR_DIR_CHROOT:?}/$prf
 
-    if cfgOpt c || [[ ! -e "$chroot" ]]; then
+    if cfgOpt c || [[ ! -e $chroot ]]; then
         mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu/'
         # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
         # SEE: https://launchpad.net/ubuntu/+archivemirrors

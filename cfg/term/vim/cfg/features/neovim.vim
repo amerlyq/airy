@@ -1,3 +1,7 @@
+" WARNING: on Ubuntu chroot may have problems with /usr/bin/python2
+let g:python_host_prog  = '/usr/bin/python2'
+let g:python3_host_prog = '/usr/bin/python3'
+
 " BAD: <ESC><ESC> -- consume single <ESC>, sent to client
 tnoremap   <C-\><ESC>   <C-\><C-n>
 

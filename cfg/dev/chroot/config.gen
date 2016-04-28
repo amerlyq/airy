@@ -8,8 +8,8 @@ sudo touch /etc/schroot/schroot.conf
 # type=directory  -- for /etc/schroot/$profile/* do mount in ./fstab, copy from ./copyfiles, update from ./nssdatabases
 
 make_prf() { local prf="$1" x32 CR=$'\n'
-    [[ ! $prf =~ i386 ]] || x32=1
-    sudo tee "/etc/schroot/chroot.d/${prf}.conf" <<EOT
+  [[ ! $prf =~ i386 ]] || x32=1
+  sudo tee "/etc/schroot/chroot.d/${prf}.conf" <<EOT
 [$prf]
 description=Build environment for $prf
 ${x32+personality=linux32$CR}\
@@ -18,14 +18,14 @@ users=$USER
 # groups=sudo
 profile=default
 type=directory
-directory=${CURR_DIR_CHROOT:?No}/$prf
+directory=${CURR_DIR_CHROOT:?}/$prf
 shell=/bin/bash
 EOT
 echo
 }
 
-for prf in "${CURR_CHROOTS[@]}"; do
-    make_prf "$prf"
+for prf in "${CURR_CHROOTS[@]:?}"; do
+  make_prf "$prf"
 done
 
 # Exists on Ubuntu, create manually on Arch

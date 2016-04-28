@@ -5,7 +5,9 @@ After=xorg@%i.target
 # Before=startup.target
 
 [Service]
-ExecStart=/usr/bin/xmonad
+ExecStartPre=/usr/bin/systemctl --user import-environment PATH
+ExecStart=/usr/bin/st
+# Environment=DISPLAY=:%i
 
 # [Install]
 # WantedBy=wm@%i.target

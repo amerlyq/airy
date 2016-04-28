@@ -9,7 +9,7 @@ in :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 mkdir -vp "${CURR_DIR_PKG:?}"
-[[ $MODS_CACHE_DISABLE ]] || airy_cache_pwd_mod
+airy_cache_pwd_mod
 
 do_if() {
   local cmd grp obj=p pkgs=() bQuiet=0 OPTIND=1
