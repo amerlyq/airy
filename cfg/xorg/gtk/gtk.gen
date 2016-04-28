@@ -26,7 +26,7 @@ then case "${THEME}" in
 esac; fi
 
 wopt 'gtk-theme-name' "$GTK_THEME"
-wopt 'gtk-application-prefer-dark-theme' true
+[[ ! ${GTK_THEME,,} =~ dark ]] || wopt 'gtk-application-prefer-dark-theme' true
 wopt 'gtk-font-name' Sans 9
 
 ## Icons
