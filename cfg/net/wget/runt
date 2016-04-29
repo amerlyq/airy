@@ -2,18 +2,26 @@
 
 dldcmd=r.wgetf
 session=wget
-maincmd=r.ranger
+maincmd='source r.ranger'
 
-while getopts 'lc:o:t:w' o; do case "$o"
-in o) cd "$OPTARG"
+while getopts 'lc:o:t:yw' o; do case $o
+in o) cd "${OPTARG/#\~/$HOME}"  # THINK: replace with dir= for youtube-dl, etc?
 ;; c) opencmd=$OPTARG
 ;; l) dldcmd=r.wgetl
-;; y) dldcmd=youtube-dl  # FIXME:(can't get output name)
+;; y) dldcmd=youtube-dl
 ;; t) session=$OPTARG
-;; w) maincmd="r.wget-watch '$PWD'"
-;; *) exit; esac; done; shift $((OPTIND-1))
+;; w) maincmd="r.notify-watch '$PWD'"
+;; *) exit 3; esac; done; shift $((OPTIND-1))
 
-fnm=$(r.wget-nm "${@:?}")
+
+
+if [[ $dldcmd =~ youtube ]]; then
+  fnm=$(youtube-dl --get-filename "${1:?}")
+  fnm=${fnm##*/}
+else
+  fnm=$(r.wget-nm "${@:?}")
+fi
+
 
 r.tmux-job -t "$session" -m "$maincmd" \
   r.notify-cmd -n "Saved: $fnm" -f "Can't dld: $fnm" \
@@ -33,7 +41,7 @@ if [[ $opencmd ]]; then
   if ps -oargs= -C "$opencmd" | grep -qxF "$fnm"
   then r.n -u 'Already opened!' "$fnm"
   else
-    (($(stat -c%s) > 5*1024*1024)) || sleep 5
+    (($(stat -c%s "$fnm") > 5*1024*1024)) || sleep 5
     ($opencmd "$fnm")  # trap 'wait' EXIT
   fi
 fi

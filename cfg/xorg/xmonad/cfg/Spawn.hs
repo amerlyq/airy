@@ -20,15 +20,22 @@ import XMonad.Config.Amer.Navigation (nextEmpty)
 keys = main ++ scratchpad ++ media
 
 -- TODO: insert into M-o / M-S-o menus to be able open on new wksp
-main = concat [
-    [ ("M-"     ++ k , spawnHere t)
+main = concat $
+  [ [ ("M-"     ++ k , spawnHere t)
+    , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
+    ] -- NOTE: We have M-o <Space> for floating terminal.
+    | (k, t) <-
+    [ ("<Space>", "r.t -e r.tmux")
+    , ("C-<Space>", "r.t")
+    ]
+  ] ++
+  [ [ ("M-"     ++ k , spawnHere t)
     , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
     , ("M-C-"   ++ k , spawnAndDo doFloat t)  -- WARNING: if broken >> HW problem
     , ("M-S-C-" ++ k , spawnAndDo doCenterFloat t)
     ]
     | (k, t) <-
-    [ ("<Space>", "r.t -e r.tmux")  -- OR "r.tf"
-    , ("M1-<Space>", "~/.i3/ctl/run-cwd") -- FIXME
+    [ ("M1-<Space>", "~/.i3/ctl/run-cwd") -- FIXME
     , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
     ]
   ]

@@ -5,6 +5,8 @@ die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 
 unset sudo
 cmd=f_link
+# THINK:(eliminate -s flag) BUT won't it be more destructive then using -s?
+#   -- automatic 'sudo' -- check if has [[ -w ]] rights and add sudo
 
 OPTIND=1
 while getopts 'bcskf:t:p:' o; do case $o
