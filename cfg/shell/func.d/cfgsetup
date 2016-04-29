@@ -24,11 +24,11 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 ### LINKS ###
 # BUG: on error we can't exit from forked shell and fail main one!
 fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
-link(){ ~/.bin/prg.d/linkcp "$@"; }
+link(){ linkcp "$@"; }
 ### Populate all run, run.pr1 scripts into mycache/bin
 linkmask(){ local nm mask=$1 fmt=$2
   # ALT:(-m) -z $PS1 -- BUT: we can't manually activate mod
-  cfgOpt m && [[ $0 =~ ^${CURR_DIR_CFG:?} ]] || return 0
+  cfgOpt m && [[ $(readlink -m $0) =~ ^${CURR_DIR_CFG:?} ]] || return 0
   for src in "$mask"*; do [[ -f $src && -x $src ]] || continue
     nm=$(printf "$fmt" "${PWD##*/}" "${src#$mask}")
     link "$src" "$CURR_DIR_CACHE/$nm"

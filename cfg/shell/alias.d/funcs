@@ -54,7 +54,7 @@ tmux_display_fix() {
 
     # Run this script outside of tmux! Set display for all sessions.
     #!!! I think you may want to look at tmux’s update-environment option, I’m pretty sure that this is the normal way of updating a tmux session’s vars.
-    for name in `tmux ls -F '#{session_name}'`; do
+    for name in $(tmux ls -F '#{session_name}'); do
         tmux setenv -g -t $name DISPLAY $DISPLAY
     done
 }
@@ -66,7 +66,7 @@ copyq_edit() {
 }
 
 exit() {  # When in SSH tmux, do detach on ',d' instead of exit
-    if [[ -z "$SSH_TTY" || -z "$TMUX" || -n "$RANGER_LEVEL" ]]
+    if [[ -z $SSH_TTY || -z $TMUX || $RANGER_LEVEL ]]
     then builtin exit
     else tmux detach
     fi

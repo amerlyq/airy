@@ -1,29 +1,13 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-if cfgOpt i; then
-    # ALT: xenial_amd64, wily_amd64, trusty_i386, lucid_i386
-    prf=${CURR_CHROOTS[1]:?}
-    chroot=${CURR_DIR_CHROOT:?}/$prf
-
-    if cfgOpt c || [[ ! -e $chroot ]]; then
-        mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu/'
-        # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
-        # SEE: https://launchpad.net/ubuntu/+archivemirrors
-        PKGS="sudo,locales,software-properties-common,vim"  # HAS: add-apt-repository
-        sudo debootstrap --verbose --include="$PKGS" --variant buildd
-            --arch "${prf##*_}" "${prf%_*}" "$chroot" "$mirror"
-    fi
-
-    # TODO: Replace on double-mounting common point through fstab
-    sudo mkdir -p "$chroot/cryptfs"
-    sudo chown $USER:$USER "$chroot/cryptfs"
-    mkdir -p "$chroot/cryptfs/workspace"
-    link -sct "$chroot/usr/share/terminfo/s" /usr/share/terminfo/s/st-256color
-fi
+# ATTENTION: currently all chroots are configured the same -- for identical kind of tasks.
+# TODO: replace by individual custom profiles, linking whole dir from pwd
 
 if cfgOpt u; then
-    ./config.gen
-    # TODO: replace by linking whole dir of my custom profile
-    link -bst /etc/schroot/default cfg/fstab cfg/nssdatabases
+  ./gen/config.gen
+  ./gen/fstab.gen
+  ./gen/nss.gen
+  ./gen/net.gen
+  ./gen/debinit
 fi

@@ -1,6 +1,7 @@
 SEE
 	Full
 		https://wiki.ubuntu.com/DebootstrapChroot
+		https://help.ubuntu.com/community/DebootstrapChroot
 		https://habrahabr.ru/post/244373/
 
 	Small
@@ -29,6 +30,9 @@ Install
 BUG
 	Not working with schroot:
 	: sudo mount --bind /cryptfs/workspace /cryptfs/chroots/lucid_i386/home/dkolomoiets
+	[_] FIXME Exit chroot after using 'xsel'
+	: E: 10mount: umount: /run/schroot/mount/xenial_amd64-e0515f5b-3eee-41a9-9135-58086206a3d1/home/dkolomoiets: target is busy
+	:= MAYBE Launching 'xsel' links some resources from $chroot/$HOME into host's Xorg, therefore can't umount them
 
 
 FIXED

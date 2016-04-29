@@ -2,14 +2,16 @@
 source ~/.shell/profile
 
 # File must exist to start schroot
-sudo touch /etc/schroot/schroot.conf
+conf=/etc/schroot/schroot.conf
+[[ -f $conf ]] || sudo touch "$conf"
 
 # personality -- if 32bit chroot on 64bit kernel
 # type=directory  -- for /etc/schroot/$profile/* do mount in ./fstab, copy from ./copyfiles, update from ./nssdatabases
 
-make_prf() { local prf="$1" x32 CR=$'\n'
+make_prf() { local prf=${1:?No prf} x32 CR=$'\n'
   [[ ! $prf =~ i386 ]] || x32=1
-  sudo tee "/etc/schroot/chroot.d/${prf}.conf" <<EOT
+  local cprof=${TMPDIR:?}/chroot_prf_$prf
+  cat > "$cprof" <<EOT
 [$prf]
 description=Build environment for $prf
 ${x32+personality=linux32$CR}\
@@ -21,18 +23,12 @@ type=directory
 directory=${CURR_DIR_CHROOT:?}/$prf
 shell=/bin/bash
 EOT
-echo
+  linkcp -bsc "$cprof" "/etc/schroot/chroot.d/${prf}.conf"
 }
 
 for prf in "${CURR_CHROOTS[@]:?}"; do
   make_prf "$prf"
 done
-
-# Exists on Ubuntu, create manually on Arch
-sudo tee /etc/networks <<EOT
-# symbolic names for networks, see networks(5) for more information
-link-local 169.254.0.0
-EOT
 
 # fl=/etc/schroot/default/fstab
 # line='/cryptfs/_/cfg  /cryptfs/_/cfg  none    rw,bind         0       0'

@@ -1,0 +1,11 @@
+#!/bin/bash -e
+# System databases to copy into the chroot from the host system.
+
+dbs=('# <database name>' protocols hosts passwd)
+# dbs+=( passwd shadow group gshadow services networks )
+
+nss=${TMPDIR:?}/chroot_nss
+printf '%s\n' "${dbs[@]}" > "$nss"
+
+# CHG: move 'default' to var (obsolete if we use linked dir with profiles)
+linkcp -bsc "$nss" /etc/schroot/default/nssdatabases

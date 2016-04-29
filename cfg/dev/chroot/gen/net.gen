@@ -1,0 +1,7 @@
+#!/bin/bash -e
+# Symbolic names for networks, see networks(5) for more information
+# NOTE: Exists on Ubuntu, create manually on Arch
+
+net=${TMPDIR:?}/chroot_net
+echo "link-local 169.254.0.0" > "$net"
+linkcp -bsc "$net" /etc/networks

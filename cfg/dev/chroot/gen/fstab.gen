@@ -1,0 +1,25 @@
+#!/bin/bash -e
+# fstab: static file system information for chroots.
+# Note that the mount point will be prefixed by the chroot path (CHROOT_PATH)
+
+source ~/.shell/profile
+mnt=(/proc /sys /dev /dev/pts /tmp /home/${USER:?} "${CURR_CHROOT_MOUNTS[@]}")
+
+# It may be desirable to have access to /run, especially if you wish
+# to run additional services in the chroot.  However, note that this
+# may potentially cause undesirable behaviour on upgrades, such as
+# killing services on the host.
+# mnt+=(/run  /run/lock  /dev/shm  /run/shm)
+
+fstab=${TMPDIR:?}/chroot_fstab
+> "$fstab"
+wmnt(){ printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$@" >> "$fstab"; }
+wmnt '# <file system>' '<mount point>' '<type>' '<options>' '<dump>' '<pass>'
+
+for m in "${mnt[@]}"; do
+  wmnt "$m" "$m" 'none' 'rw,bind' 0 0
+  # TODO: derive user from original dir
+  # sudo chown $USER:$USER "$chroot/cryptfs"
+done
+
+linkcp -sc "$fstab" /etc/schroot/default/fstab

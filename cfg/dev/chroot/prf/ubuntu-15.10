@@ -4,31 +4,15 @@ source ~/.shell/func.d/packages
 distro ubuntu || die "Not Ubuntu"
 grep -q '^DISTRIB_RELEASE=15.10$' /etc/lsb-release || die "Not 15.10"
 
-if cfgOpt r; then
-    # getent group sudo
+# getent group sudo
 
-    # add-apt-repository universe
-    # add-apt-repository multiverse
-    # 'deb http://archive.ubuntu.com/ubuntu wily main universe multiverse'
-    # ALSO: repeat 'deb ...' for wily-updates and wily-security
+# add-apt-repository universe
+# add-apt-repository multiverse
+# 'deb http://archive.ubuntu.com/ubuntu wily main universe multiverse'
+# ALSO: repeat 'deb ...' for wily-updates and wily-security
 
-    # Don't update several packages on each system refresh
-    # apt-mark hold initscripts udev plymouth mountall
-
-    entry="$USER ALL=(ALL) ALL"
-    su root -c "
-        tee /etc/apt/sources.list <<<'deb ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu wily main universe multiverse'
-        apt-get update
-        apt-get upgrade
-        apt-get install sudo locales
-        locale-gen 'en_US.UTF-8'
-        # sudo dpkg-reconfigure tzdata
-
-        sed -i '/^$entry/d' /etc/sudoers
-        tee -a /etc/sudoers <<< '$entry'
-        (cd /bin && ln -sfv bash sh)
-    "
-fi
+# Don't update several packages on each system refresh
+# apt-mark hold initscripts udev plymouth mountall
 
 # texinfo версии 4.13  - need for HR21 project
 # makedepend : from xutils-dev

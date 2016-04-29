@@ -1,0 +1,43 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+ARG=$1  # -i / -u
+
+debstrap(){ local chr=${1:?No chr} arch=${2:?No arch} nm=${3:?No nm}
+  # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
+  # SEE: https://launchpad.net/ubuntu/+archivemirrors
+  local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu/'
+  local PKGS="sudo,locales,software-properties-common,vim,tmux"  # HAS: add-apt-repository
+  [[ $ARG =~ i ]] || [[ ! -d $chr ]] || return 0
+  sudo debootstrap --verbose --include="$PKGS" --variant buildd \
+    --arch "$arch" "$nm" "$chr" "$mirror"
+}
+
+debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
+  [[ $ARG =~ u ]]  || [[ ! -f $chr/usr/bin/sudo ]] || return 0
+  local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu'
+  local entry="${USER:?} ALL=(ALL) ALL"
+
+  schroot -c "${chr##*/}" -d "/" -- su root -c "
+    (cd /bin && ln -sfv bash sh)
+
+    tee /etc/apt/sources.list <<<'deb $mirror $nm main universe multiverse'
+    apt-get update
+    apt-get upgrade
+
+    apt-get install sudo locales
+    locale-gen 'en_US.UTF-8'
+    # sudo dpkg-reconfigure tzdata
+
+    # NOTE: only after install/update 'sudo'
+    sed -i '/^$entry/d; \$a\\$entry' /etc/sudoers
+"; }
+
+dir=${CURR_DIR_CHROOT:?}
+[[ -d $dir ]] || sudo mkdir -p "$dir"
+for prf in "${CURR_CHROOTS[@]:?}"; do
+  debstrap "$dir/$prf" "${prf##*_}" "${prf%_*}"
+  debcfg "$dir/$prf" "${prf%_*}"
+  linkcp -sc {,"$dir/$prf"}/usr/share/terminfo/s/st-256color
+  linkcp -sc {,"$dir/$prf"}/usr/share/terminfo/t/tmux-256color
+done

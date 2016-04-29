@@ -14,7 +14,7 @@ in rxvt-*)
     export TERMCMD='st'
 ;; tmux-256color|screen-256color*)
     # Works only with tmux-24bit-color which after merge > v2.1.1
-    if tmux -V | grep -q 'tmux [2-9]\.[1-9]'; then
+    if _has_pr tmux && tmux -V | grep -q 'tmux [2-9]\.[2-9]'; then
         export NVIM_TUI_ENABLE_TRUE_COLOR=1
         export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     fi
