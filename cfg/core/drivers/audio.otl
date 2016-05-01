@@ -2,7 +2,33 @@ Dolby setup
 	SEE http://www.johannes-bauer.com/linux/dolby/
 
 High pitch sound snd_intel_hda
+	$ lspci G audio
+	: Intel Corporation Sunrise Point-H HD Audio
+	$ aplay -l
+	: Realtec ALC668 Analog
+	< alsa, that it doesn't suspend the device properly
+		https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=756150
+	$ cat /sys/module/snd_hda_intel/parameters/power_save
 	Looks like CONFIG_SND_HDA_CODEC_ANALOG=y is missing.
+	>> http://docs.slackware.com/howtos:hardware:audio_and_snd-hda-intel
+	http://www.troubleshooters.com/linux/sound/sound_troubleshooting.htm
+	https://thelinuxexperiment.com/fix-annoying-high-pitched-sound/
+	TRY: reconfiguring with alsaconf
+		https://forums-web2.gentoo.org/viewtopic-t-553075-start-0.html
+	$ alsactl init
+	:THINK:>>> Hardware is initialized using a generic method
+	: -- but what about booting after Windows?
+	http://www.alsa-project.org/main/index.php/Asoundrc
+	https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture
+		http://www.volkerschatz.com/noise/alsa.html
+		http://www.sabi.co.uk/Notes/linuxSoundALSA.html
+	~ https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1252733
+
+	$ paci linux-docs
+	: /usr/lib/modules/4.5.1-1-ARCH/build/Documentation/sound/alsa/HD-Audio-Models.txt
+
+	[_] TODO:FIND: compare snd-hda-intel device state after clean boot and reboot from Windows
+
 
 INFO
 	loginctl --no-pager

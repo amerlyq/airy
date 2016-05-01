@@ -1,9 +1,10 @@
 #!/bin/bash
-if [[ -z $ZSH_EVAL_CONTEXT || ! $ZSH_EVAL_CONTEXT =~ :file$ ]]\
-&& [[ -z $BASH_VERSION || ${0} == ${BASH_SOURCE[0]} ]]
-then echo "Err: you must source it, don't execute!"; exit 1; fi
+# EXPL: commented, because using r.ranger becomes contrintuitive.
+# if [[ -z $ZSH_EVAL_CONTEXT || ! $ZSH_EVAL_CONTEXT =~ :file$ ]]\
+# && [[ -z $BASH_VERSION || ${0} == ${BASH_SOURCE[0]} ]]
+# then echo "Err: you must source it, don't execute!"; exit 1; fi
 
-if ! _has_pr ranger
+if ! hash ranger &>/dev/null
 then echo "Err: install 'ranger' to use it"; return 1; fi
 
 # Don't allow to launch chain of rangers inside shells of other rangers

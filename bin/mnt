@@ -68,8 +68,8 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
     ;;    *) die "Unknown type '$TYPE'" ;; esac
     # -t "$TYPE"
     echo $MOPTS
-    dirmk "$1" && sudo mount "$DEVPATH" "$DIR" ${MOPTS:+-o $MOPTS} \
-        && chuser "$DIR" && echo "$DIR" || exit
+    dirmk "$1" && sudo mount "$DEVPATH" "$1" ${MOPTS:+-o $MOPTS} \
+        && chuser "$1" && echo "$1" || exit
 }
 
 
