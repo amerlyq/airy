@@ -20,23 +20,16 @@ import XMonad.Config.Amer.Navigation (nextEmpty)
 keys = main ++ scratchpad ++ media
 
 -- TODO: insert into M-o / M-S-o menus to be able open on new wksp
-main = concat $
+main = concat
   [ [ ("M-"     ++ k , spawnHere t)
     , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
-    ] -- NOTE: We have M-o <Space> for floating terminal.
+    ] -- NOTE: We have M-o <Space> for floating terminal instead of (spawnAndDo doCenterFloat t).
     | (k, t) <-
     [ ("<Space>", "r.t -e r.tmux")
-    , ("C-<Space>", "r.t")
-    ]
-  ] ++
-  [ [ ("M-"     ++ k , spawnHere t)
-    , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
-    , ("M-C-"   ++ k , spawnAndDo doFloat t)  -- WARNING: if broken >> HW problem
-    , ("M-S-C-" ++ k , spawnAndDo doCenterFloat t)
-    ]
-    | (k, t) <-
-    [ ("M1-<Space>", "~/.i3/ctl/run-cwd") -- FIXME
-    , ("<Return>", "r.t -e r.ranger")  -- OR -e zsh -ic
+    , ("C-<Space>", "r.t")  -- WARNING: if broken >> HW problem
+    , ("<Return>", "r.t -e r.tmux r.ranger")
+    , ("C-<Return>", "r.t -e r.ranger")
+    -- , ("M1-<Space>", "~/.i3/ctl/run-cwd") -- FIXME
     ]
   ]
 
@@ -64,10 +57,12 @@ scratchpad = (concat . (`map` [
     | nm <- ["ncmpcpp", "mutt", "ipython"]
     ],
     [ ("b" , spawnHere "r.b")
-    , ("v" , spawnHere "r.tf -e $EDITOR")
-    , ("S-<Space>", spawnHere "r.t")
-    , ("<Space>"  , spawnHere "r.tf")
-    , ("<Return>" , spawnHere "r.tf -e ranger")
+    , ("v" , spawnHere "r.tf -e $EDITOR") -- THINK: also open in [tmux]?
+    -- , ("S-<Space>", spawnHere "r.tf")
+    , ("<Space>"  , spawnAndDo doCenterFloat "r.t -e r.tmux")
+    , ("<Return>" , spawnAndDo doCenterFloat "r.tf -e r.tmux r.ranger")
+    , ("C-<Space>"  , spawnAndDo doCenterFloat "r.t")
+    , ("C-<Return>" , spawnAndDo doCenterFloat "r.t -e r.ranger")
     -- , ("k", "~/.i3/ctl/run-focus k")
     -- r.tf -e gksudo powertop
     -- r.tf -e gksudo tlp start

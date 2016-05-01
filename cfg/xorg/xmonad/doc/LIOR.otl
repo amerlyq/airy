@@ -23,10 +23,10 @@ Main
 | M-d        | dmenu
 
 < Actions : terminal, ranger
-| M-     | open in slave
-| M-S-   | open in master
-| M-C-   | open floating (impossible to press on some keyboards)
-| M-C-S- | open floating in center of screen
+| M-     | open in slave [tmux]
+| M-S-   | open in master [tmux]
+| M-C-   | open in slave [raw] [impossible to press on some keyboards]
+| M-C-S- | open in master [raw]
 
 
 >>> Workspaces
@@ -112,6 +112,10 @@ Float
 	| p/s |  pidgin / skype (contact list)
 	| n/h | ncmpcpp / htop
 	| i/v | ipython / vim
+	| <Space>    | floating terminal [tmux]
+	| <Return>   | floating ranger [tmux]
+	| C-<Space>  | floating terminal [raw]
+	| C-<Return> | floating ranger [raw]
 
 <copyq
 | M-x   | toggle (you can choose to paste any previously copied text by Enter)
