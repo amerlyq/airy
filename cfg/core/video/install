@@ -3,18 +3,18 @@ source ~/.shell/func.d/packages
 # [[ "$CURR_PROF" =~ ^(laptop|work) ]] || die
 # SEE https://01.org/linuxgraphics/downloads
 
-nvidia() { pkg_inst "nvidia nvidia-utils lib32-nvidia-utils"; }
-intel() { pkg_inst "xf86-video-intel libva libva-intel-driver"
-          pkg_inst "mesa mesa-demos mesa-libgl lib32-mesa-libgl"; }
+nvidia() { pkg_inst nvidia nvidia-utils lib32-nvidia-utils; }
+intel() { pkg_inst xf86-video-intel libva libva-intel-driver
+          pkg_inst mesa mesa-demos mesa-libgl lib32-mesa-libgl; }
 
 if distro arch; then
     case "${CURR_PROF:?}"
     in laptop|work) intel
     ;; home|neo) intel && nvidia  ## Optimus:
-        pkg_inst "bumblebee primus lib32-primus lib32-virtualgl"
-        pkg_inst "bbswitch"  # Only for laptops
+        pkg_inst bumblebee primus lib32-primus lib32-virtualgl
+        pkg_inst bbswitch  # Only for laptops
         pkg_inst vulkan-intel  # Only neo
-    ;; kedi) pkg_inst "nvidia-340xx nvidia-340xx-libgl lib32-nvidia-340xx-libgl"
+    ;; kedi) pkg_inst nvidia-340xx nvidia-340xx-libgl lib32-nvidia-340xx-libgl
     ;; esac
 
 elif distro ubuntu; then
@@ -38,6 +38,6 @@ elif distro ubuntu; then
     #:: Mesa warning: couldn't open libtxc_dxtn.so, software DXTn compression /
     #   decompression unavailable
     #> This may be needed to run games using textures in the S3TC format.
-    pkg_inst "libtxc-dxtn-s2tc0 libtxc-dxtn-s2tc0:i386"
-    pkg_inst "xserver-xorg-video-intel mesa-utils"
+    pkg_inst libtxc-dxtn-s2tc0 libtxc-dxtn-s2tc0:i386
+    pkg_inst xserver-xorg-video-intel mesa-utils
 fi

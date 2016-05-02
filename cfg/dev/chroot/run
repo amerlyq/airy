@@ -21,7 +21,7 @@ done < <(awk '/^\//{print$1}' /etc/schroot/default/fstab)
 # BUT: what tot do with --rcfile?
 # THINK: using tmux? how to be with nested sessions?
 schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT
-export DISPLAY=$DISPLAY SHELLRC_EVAL="${CURR_CHROOT_EVAL:?}"
+export DISPLAY=$DISPLAY SHELLRC_EVAL="${CURR_CHROOT_EVAL}"
 source ~/.profile
 ${@+"$@"
 exit}

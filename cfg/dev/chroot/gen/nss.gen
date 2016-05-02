@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # System databases to copy into the chroot from the host system.
 
-dbs=('# <database name>' protocols hosts passwd)
+dbs=('# <database name>' protocols hosts passwd group)
 # dbs+=( passwd shadow group gshadow services networks )
 
 nss=${TMPDIR:?}/chroot_nss
