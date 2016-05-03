@@ -47,7 +47,6 @@ myStateLogger copies = dynamicLogString def
       "ResizableTall" -> "[|]"
       "ReflectX ResizableTall" -> "]|["
       "Mirror ResizableTall" -> "[-]"
-      "Mirror ResizableTall" -> "[-]"
       "Mirror ReflectX ResizableTall" -> "]-["
       "Tabbed Simplest" -> "=--"
       "ReflectX Tabbed Simplest" -> "--="

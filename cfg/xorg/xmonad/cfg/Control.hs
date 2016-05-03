@@ -3,6 +3,7 @@ module XMonad.Config.Amer.Control (
     keys
 ) where
 
+import Control.Arrow    (second)
 import Data.Default     (def)
 import Data.Ratio       ((%))
 import Data.Map.Strict  (member)
@@ -24,7 +25,7 @@ import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDE
 import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
 import XMonad.Layout.ResizableTile  (MirrorResize(MirrorShrink, MirrorExpand))
 
-import XMonad.Config.Amer.Common     (inGroup, backNforth)
+import XMonad.Config.Amer.Common     (inGroup, feedCmd, backNforth)
 import XMonad.Config.Amer.Layout     (MyTransformers(STRUTS, GAPS))
 import XMonad.Config.Amer.Navigation (nextNonEmpty)
 
@@ -112,11 +113,18 @@ system =
   -- , ("M-C-S-\\" , spawn "~/.i3/ctl/wnd_active_kill") -- FIXME
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
-  inGroup "M-S-<Esc>"  -- xmonad
-    [ ("o", whenWindowsClosed $ io exitSuccess)
+
+  (inGroup "M-S-<Esc>" . concat)
+  [ [ ("o", whenWindowsClosed $ io exitSuccess)
     , ("r", whenWindowsClosed $ spawn "r.core reboot")
     , ("t", whenWindowsClosed $ spawn "r.core shutdown")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.xmonad-rebuild")
+    , ("-", spawn "r.core dpmsoff")
+    ],
+    map (second spawn) $ feedCmd "xbacklight -set" $ mconcat
+    [ [ (i, i ++ "0")   | i <- map show [1..9] ]
+    , [ (" 0 " ++ i, i) | i <- map show [1..9] ]
     ]
+  ]

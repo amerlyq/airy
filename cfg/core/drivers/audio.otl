@@ -2,7 +2,7 @@ Dolby setup
 	SEE http://www.johannes-bauer.com/linux/dolby/
 
 High pitch sound snd_intel_hda
-	$ lspci G audio
+	$ lspci -k G audio
 	: Intel Corporation Sunrise Point-H HD Audio
 	$ aplay -l
 	: Realtec ALC668 Analog
@@ -30,6 +30,15 @@ High pitch sound snd_intel_hda
 	[_] TODO:FIND: compare snd-hda-intel device state after clean boot and reboot from Windows
 	> http://avidemux.org/smif/index.php?topic=16271.0
 	http://soundprogramming.net/programming/alsa-tutorial-1-initialization/
+	~ https://bbs.archlinux.org/viewtopic.php?id=191041
+	FIND
+		snd-hda-intel initializing "whine" -coil
+		i915_audio_component_bind_ops
+		snd_hda_codec_realtek hdaudioC0D0
+
+	TRY
+		> https://pappp.net/?p=1499
+		sudo XAUTHORITY=/home/amer/.Xauthority hdajackretask
 
 
 INFO
@@ -118,14 +127,6 @@ sudo update-grub
 	sudo dpkg-reconfigure linux-sound-base
 	sudo alsa reload
 	sudo dpkg-reconfigure pulseaudio
-
-igorvek , у Вас TV-тьюнер [name: SAA7134 PCM]   встал на место
-Звуковой Карты , выложите вывод под [Sp]ойлер :
-
-	lspci | grep -i audio
-	lspci -k
-	alsactl init
-	aplay -l, aplay -L
 
 See docs:
 	/usr/src/linux/Documentation/sound/alsa/ALSA-Configuration.txt

@@ -2,6 +2,10 @@
 source ~/sys_funcs
 is_enabled 'lvm' || exit 0
 
+# NOTE:(list all modules)
+# $ mkinitcpio -M  # autodetected
+# $ mkinitcpio -v  # pulled by hooks
+
 ## Add lvm2 hook
 cfg=/etc/mkinitcpio.conf
 cp -vf --backup=t ${cfg}{,}

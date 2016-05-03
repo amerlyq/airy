@@ -80,10 +80,10 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     ],
     -- ADD: prompt to set volume
     feedCmd "r.audio"
-    [ ("M-<Home>"     , "20% unmute")
+    [ ("M-<Home>"     , "")
     , ("M-<Page_Up>"  , "2%+")
     , ("M-<Page_Down>", "2%-")
-    , ("M-<End>"      , "")
+    , ("M-<End>"      , "20% unmute")
     , ("<XF86AudioRaiseVolume>", "2%+")
     , ("<XF86AudioLowerVolume>", "2%-")
     , ("<XF86AudioMute>"       , "")
@@ -110,10 +110,6 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("<XF86Sleep>"     , "xset -d :0 dpms force off")
     ],
     ---- Submenus
-    inGroup "M-S-<Esc>" $ feedCmd "xbacklight -set" $ mconcat
-    [ [ (i, i ++ "0")   | i <- map show [1..9] ]
-    , [ (" 0 " ++ i, i) | i <- map show [1..9] ]
-    ],
     inGroup "M-u"
     [ ("b", "r.b -h")
     , ("g", "r.game -p")

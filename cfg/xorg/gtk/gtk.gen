@@ -17,16 +17,17 @@ wopt() {
 
 # GUI (use lxappearance): Adwaita, Hope-DT, FlatStudioGray, Mint-X, Ambiance
 # Vertex-Dark
-if cfgOpt t || [[ -z "$GTK_THEME" ]]
-then case "${THEME}" in
+if cfgOpt t || [[ -z $GTK_THEME ]]
+then case $THEME in
   lucid) GTK_THEME="FlatStudioGray" ;;
  opaque) GTK_THEME="FlatStudioDark"  ;;
   light) GTK_THEME="FlatStudioLight" ;;
- dark|*) GTK_THEME="FlatStudioDark"  ;;
+ dark|*) GTK_THEME="Adwaita"; GTK_DARK=1 ;;  # EXPL: to eliminate 'deprecated' warnings
 esac; fi
 
 wopt 'gtk-theme-name' "$GTK_THEME"
-[[ ! ${GTK_THEME,,} =~ dark ]] || wopt 'gtk-application-prefer-dark-theme' true
+# [[ ! ${GTK_THEME,,} =~ dark ]] ||
+[[ -z $GTK_DARK ]] || wopt 'gtk-application-prefer-dark-theme' true
 wopt 'gtk-font-name' Sans 9
 
 ## Icons

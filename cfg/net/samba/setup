@@ -5,7 +5,7 @@ source ~/.shell/func.d/cfgsetup
 #   https://wiki.archlinux.org/index.php/Samba/Tips_and_tricks
 
 ## Don't share samba in work network, only at home
-cfgOpt f || [[ "${CURR_PROF:?}" =~ laptop|home|neo ]] || die 0 "<Skip>"
+cfgOpt f || [[ ${CURR_PROF:?} =~ ^(laptop|home|neo)$ ]] || die 0 "<Skip>"
 
 echo "N: ATTENTION ! Generate password for samba user !"
 if cfgOpt r; then
@@ -16,18 +16,16 @@ if cfgOpt u; then
   ### GENS ###
   ./samba.gen
   if distro arch; then
-      sudo systemctl restart smbd
+    svc_enable smbd
+    svc_restart smbd
 
   elif distro ubuntu; then
       sudo service smbd restart
   fi
   # Once Samba has restarted, use this command
   # to check your smb.conf for any syntax errors
-  testparm -s
+  testparm -s >/dev/null
 fi
-
-## FIXME: not working as supposed:
-#if cfgOpt u && has_pr samba; then sudo service smbd stop
 
 # EXPL to see errors on start
 # sudo smbd -i

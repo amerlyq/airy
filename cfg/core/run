@@ -42,13 +42,14 @@ confirm_repo(){ local t=$1 dir=~/aura
 fi; }
 check(){ no_windows && repo_pushed; }
 
-case $1 in
-       lock|-l) r.lock &            ;;
-    suspend|-s) sys_power Suspend   ;;
-  hibernate|-h) sys_power Hibernate ;;
-     logout|-o) no_windows && confirm "Logout" && sys_logout       ;;
-     reboot|-r) no_windows && confirm "Reboot" && systemctl reboot ;;
-   shutdown|-t) no_windows && confirm_repo "Shutdown" && systemctl poweroff ;;
- *) echo "Usage: $0
+case $1
+in     lock|-l) r.lock &
+;;  suspend|-s) sys_power Suspend
+;;hibernate|-h) sys_power Hibernate
+;;   logout|-o) no_windows && confirm "Logout" && sys_logout
+;;   reboot|-r) no_windows && confirm "Reboot" && systemctl reboot
+;; shutdown|-t) no_windows && confirm_repo "Shutdown" && systemctl poweroff
+;;  dpmsoff|-d) xset -d $DISPLAY dpms force off
+;; *) echo "Usage: $0
     <[l]ock|log[o]ut|[s]uspend|[h]ibernate|[r]eboot|shu[t]down>"; exit 2
 esac

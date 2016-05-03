@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+case $1
+in -p) notify-send 'DUNST_COMMAND_PAUSE'
+;; -r) notify-send 'DUNST_COMMAND_RESUME'
+;; -t|*) # FIND: how to get current state to make toggle?
+esac

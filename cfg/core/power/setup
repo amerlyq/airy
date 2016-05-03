@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+[[ ${CURR_PROF:?} =~ neo ]] || return
+
+if distro arch; then
+  # Disable bluetooth
+  # THINK: replace by blacklisting?
+  svc_enable rfkill-block@bluetooth
+fi
