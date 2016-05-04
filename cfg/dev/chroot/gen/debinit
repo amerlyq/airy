@@ -14,10 +14,11 @@ debstrap(){ local chr=${1:?No chr} arch=${2:?No arch} nm=${3:?No nm}
 }
 
 debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
-  [[ $ARG =~ u ]]  || [[ ! -f $chr/usr/bin/sudo ]] || return 0
+  [[ $ARG =~ u ]] || ! grep -qF 'multiverse' /etc/apt/sources.list || return 0
   local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu'
   local entry="${USER:?} ALL=(ALL) ALL"
 
+  echo "Chrooting into root user:"
   schroot -c "${chr##*/}" -d "/" -- su root -c "
     (cd /bin && ln -sfv bash sh)
 
@@ -25,8 +26,7 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
     apt-get update
     apt-get upgrade
 
-    apt-get install sudo locales
-    locale-gen 'en_US.UTF-8'
+    locale-gen 'en_US.UTF-8'  # NEED: sudo, locales
     # sudo dpkg-reconfigure tzdata
 
     # NOTE: only after install/update 'sudo'

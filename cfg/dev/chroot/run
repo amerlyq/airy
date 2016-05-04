@@ -22,7 +22,7 @@ done < <(awk '/^\//{print$1}' /etc/schroot/default/fstab)
 # THINK: using tmux? how to be with nested sessions?
 schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT
 export DISPLAY=$DISPLAY SHELLRC_EVAL="${CURR_CHROOT_EVAL}"
-source ~/.profile
+source ~/.bash_profile
 ${@+"$@"
 exit}
 EOT
