@@ -15,9 +15,8 @@ After=xorg@%i.socket
 Type=simple
 SuccessExitStatus=0 1
 # BAD: ExecStartPre=/usr/bin/systemctl --user import-environment XDG_VTNR
-ExecStart=/usr/bin/Xorg :%i "vt${XDG_VTNR}" -nolisten tcp -noreset -verbose 2
+ExecStart=/usr/bin/Xorg :%i "vt${XDG_VTNR}" -nolisten tcp -noreset -keeptty -verbose 2
 # TODO: add 'stop' action
-# -keeptty
 # ExecStartPost=/usr/bin/systemctl --user set-environment DISPLAY=:%i
 # ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY
 # ALT: ExecStart=/usr/bin/Xorg $DISPLAY -nolisten tcp -noreset -verbose 1 vt1

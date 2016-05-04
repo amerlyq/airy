@@ -5,9 +5,9 @@ After=xorg@%i.target
 # Before=startup.target
 
 [Service]
-ExecStartPre=/usr/bin/systemctl --user import-environment PATH
+# ExecStartPre=/usr/bin/systemctl --user import-environment PATH
+Environment=DISPLAY=:%i
 ExecStart=/usr/bin/st
-# Environment=DISPLAY=:%i
 
 # [Install]
 # WantedBy=wm@%i.target

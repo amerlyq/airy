@@ -39,6 +39,13 @@ User
 		https://www.reddit.com/r/archlinux/comments/3twekg/xorg_118_messes_with_socket_activation_in_systemd/
 		https://wiki.archlinux.org/index.php/General_troubleshooting#Session_permissions
 
+
+	v /etc/X11/xinit/xinitrc.d/50-systemd-user.sh
+	: systemctl --user import-environment DISPLAY XAUTHORITY
+	: if which dbus-update-activation-environment >/dev/null 2>&1; then
+	: 		dbus-update-activation-environment DISPLAY XAUTHORITY
+	: fi
+
 Dbus
 	https://fedoraproject.org/wiki/Packaging:Systemd?rd=Packaging:Guidelines:Systemd#DBus_activation
 
