@@ -8,7 +8,10 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
   local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu'
   local user=${USER:?}
 
-  # BUG: can't chroot
+  # BUG: problems with groups transition
+  # FIND: export/login with only choosen groups on schroot
+  echo "W: security! change root/user passwords in chroot!"
+  # THINK:TRY: copy from host only necessary lines?
   sudo schroot -c "${chr##*/}" -d "/" -- bash -c "
     (cd /bin && ln -sfv bash sh)
 
@@ -19,14 +22,14 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
     locale-gen 'en_US.UTF-8'  # NEED: locales
     # sudo dpkg-reconfigure tzdata
 
-    id -g $user || groupadd $user
-    id -u $user || useradd -m -g $user -G users,wheel -s /bin/bash $user
+    id -g $user &>/dev/null || groupadd $user
+    id -u $user &>/dev/null || useradd -m -g $user -G users,uucp -s /bin/bash $user
     gpasswd -a $user uucp  # FIND: useradd is not enough to add to group?
     printf '%s' root:root   | chpasswd
     printf '%s' $user:$user | chpasswd
 
     # NOTE: only after install/update 'sudo'
-    sed -i '/^$user ALL/d; \$a\\$user ALL=(ALL) ALL' /etc/sudoers
+    sed -i '/^$user ALL.*/d; \$a\\$user ALL=(ALL) ALL' /etc/sudoers
 "; }
 
 dir=${CURR_DIR_CHROOT:?} && [[ -d $dir ]]

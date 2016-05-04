@@ -53,10 +53,11 @@ $if mode=vi
     "\e\C-]": character-search-backward
     # "\C-p": menu-complete
 
+    # TODO: move into bashrc 'bash -x ...' to not influence ipython
     # ZSH shortcuts -- keeps last line in past buffer
     ",j": "\n"
-    ",s": "\C-e\C-ur\n"
-    ",d": "\C-e\C-uq\n"
+    ",s": "\C-e\C-u r\n"
+    ",d": "\C-e\C-u q\n"
     ",m": "\C-e\C-uabyss\n"
 
     set keymap vi-command
@@ -70,11 +71,12 @@ $if mode=vi
     # "\ep":  yank-last-arg
     # "\C-x": re-read-init-file
 
+    # TODO:(ALSO) move into bashrc
     # ZSH shortcuts
     ",j": "\n"
-     "s": "ccr\n"
-     "q": "ccq\n"
-    ",d": "ccq\n
+     "s": "cc r\n"
+     "q": "cc q\n"
+    ",d": "cc q\n
     ",m": "ccabyss\n"
 
 $endif

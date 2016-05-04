@@ -93,16 +93,19 @@ bindkey '\C-x\C-l' synchro-dir-pop
 # It saves current cmdline, and restores it back after running foo
 
 
+# NOTE:USE: 'space' before command to not store into history
+# BUT: it will be available for 'C-p' anyway
+# CHECK: may break some yank/etc keymaps dependent on 'fc -l'
 # <Enter>
 bindkey    ',j' .accept-line
 bindkey -a ',j' .accept-line
 # quit
-bindkey  -s ',d' '^Uq\n'
-bindkey -as  'q' 'Sq\n'
-bindkey -as ',d' 'Sq\n'
+bindkey  -s ',d' '^U q\n'
+bindkey -as  'q' 'S q\n'
+bindkey -as ',d' 'S q\n'
 # ranger
-bindkey  -s ',s' '^Ur\n'
-bindkey -as  's' 'Sr\n'
+bindkey  -s ',s' '^U r\n'
+bindkey -as  's' 'S r\n'
 # make -- save and re-run last cmd by [,m]
 set_fast_exec_cmd 'abyss'
 bindkey    '\C-x\C-m' set-fast-exec-cmd
