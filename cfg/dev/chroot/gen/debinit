@@ -1,25 +1,15 @@
 #!/bin/bash -e
 source ~/.shell/profile
 
-ARG=$1  # -i / -u
-
-debstrap(){ local chr=${1:?No chr} arch=${2:?No arch} nm=${3:?No nm}
-  # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
-  # SEE: https://launchpad.net/ubuntu/+archivemirrors
-  local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu/'
-  local PKGS="sudo,locales,software-properties-common,vim,tmux"  # HAS: add-apt-repository
-  [[ $ARG =~ i ]] || [[ ! -d $chr ]] || return 0
-  sudo debootstrap --verbose --include="$PKGS" --variant buildd \
-    --arch "$arch" "$nm" "$chr" "$mirror"
-}
+ARG=$1  # -u
 
 debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
   [[ $ARG =~ u ]] || ! grep -qF 'multiverse' /etc/apt/sources.list &>/dev/null || return 0
   local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu'
-  local entry="${USER:?} ALL=(ALL) ALL"
+  local user=${USER:?}
 
-  echo "Chrooting into root user:"
-  schroot -c "${chr##*/}" -d "/" -- su root -c "
+  # BUG: can't chroot
+  sudo schroot -c "${chr##*/}" -d "/" -- bash -c "
     (cd /bin && ln -sfv bash sh)
 
     tee /etc/apt/sources.list <<<'deb $mirror $nm main universe multiverse'
@@ -29,15 +19,19 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
     locale-gen 'en_US.UTF-8'  # NEED: locales
     # sudo dpkg-reconfigure tzdata
 
+    id -g $user || groupadd $user
+    id -u $user || useradd -m -g $user -G users,wheel -s /bin/bash $user
+    gpasswd -a $user uucp  # FIND: useradd is not enough to add to group?
+    printf '%s' root:root   | chpasswd
+    printf '%s' $user:$user | chpasswd
+
     # NOTE: only after install/update 'sudo'
-    sed -i '/^$entry/d; \$a\\$entry' /etc/sudoers
+    sed -i '/^$user ALL/d; \$a\\$user ALL=(ALL) ALL' /etc/sudoers
 "; }
 
-dir=${CURR_DIR_CHROOT:?}
-[[ -d $dir ]] || sudo mkdir -p "$dir"
+dir=${CURR_DIR_CHROOT:?} && [[ -d $dir ]]
 for prf in "${CURR_CHROOTS[@]:?}"; do
-  debstrap "$dir/$prf" "${prf##*_}" "${prf%_*}"
-  debcfg "$dir/$prf" "${prf%_*}"
   linkcp -sc {,"$dir/$prf"}/usr/share/terminfo/s/st-256color
   linkcp -sc {,"$dir/$prf"}/usr/share/terminfo/t/tmux-256color
+  debcfg "$dir/$prf" "${prf%_*}"
 done

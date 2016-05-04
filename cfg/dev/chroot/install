@@ -16,3 +16,20 @@ if distro arch; then
 elif distro ubuntu; then
     echo "Err: not enough"
 fi
+
+
+debstrap(){ local chr=${1:?No chr} arch=${2:?No arch} nm=${3:?No nm}
+  # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
+  # SEE: https://launchpad.net/ubuntu/+archivemirrors
+  local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu/'
+  local PKGS="sudo,locales,software-properties-common,vim,tmux"  # HAS: add-apt-repository
+  cfgOpt r || [[ ! -d $chr ]] || return 0
+  sudo debootstrap --verbose --include="$PKGS" --variant buildd \
+    --arch "$arch" "$nm" "$chr" "$mirror"
+}
+
+dir=${CURR_DIR_CHROOT:?}
+[[ -d $dir ]] || sudo mkdir -p "$dir"
+for prf in "${CURR_CHROOTS[@]:?}"; do
+  debstrap "$dir/$prf" "${prf##*_}" "${prf%_*}"
+done
