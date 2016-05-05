@@ -1,7 +1,12 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-### LINKS ###
+### systemd ###
+link -sct /etc/X11 Xwrapper.config
+usvc_activate -e {main,wm}.target xorg.{socket,service}
+
+
+### startx ###
 link xprofile ~/.xprofile
 link xinitrc  ~/.xinitrc
-link -t "${CURR_DIR_CACHE?}/bin" startx auto-start
+link -t "${CURR_DIR_CACHE:?}/bin" startx auto-start

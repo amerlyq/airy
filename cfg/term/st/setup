@@ -5,3 +5,5 @@ source ~/.shell/func.d/cfgsetup
 if cfgOpt t || ! pacman -Qi st-amerlyq-git &>/dev/null; then
   r.st-rebuild
 fi
+
+usvc_activate st.service

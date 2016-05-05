@@ -21,12 +21,14 @@ _dttime end-compdump
 #   fi
 # fi
 
-# if [[ $XDG_VTNR == 5 ]]; then
-#   # Set default console for X login
-#   # systemctl --user set-environment XDG_VTNR=5
-#   systemctl --user import-environment XDG_VTNR PATH
-#   # systemctl --user start xorg@0.socket  # display 0
-# fi
+# NOTE: Only main Xorg session controlled by systemd.
+#   -- Other specialized servers are launched by 'startx' as before.
+if [[ $XDG_VTNR == 1 && ! -f /tmp/.X11-unix/X0 ]]; then
+  systemctl --user set-environment DISPLAY=:0
+  systemctl --user import-environment XDG_VTNR PATH
+  # TODO:FIND: how to 'exec' into main target
+  # systemctl --user start main.target
+fi
 
 # BUG: seems like it causes long delay before Xorg on cold system
 # OR: delay is caused by long connection (auth) to X

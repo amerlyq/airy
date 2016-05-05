@@ -3,14 +3,12 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 if distro arch; then
-  dbus=/usr/share/dbus-1/system-services
-  link -sc ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
+  # dbus=/usr/share/dbus-1/system-services
+  # link -sc ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
+  # BUG: usvc_activate -e kbdd.service
+  # https://bbs.archlinux.org/viewtopic.php?id=172798
+  usvc_activate -e xkb.service
 
-  # WARNING: 'start' can error on clean system install
-  sysd=~/.config/systemd/user
-  # sysd=/etc/systemd/user
-  link -c {./unit,"$sysd"}/kbdd.service
-  usvc_activate kbdd
 else
   echo "If no systemd -- run kbdd manually"
 fi

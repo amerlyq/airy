@@ -1,0 +1,11 @@
+[Unit]
+Description=Desktop Background - feh
+Requires=xorg.socket
+After=compton.service
+PartOf=wm.target
+
+[Service]
+ExecStart=/bin/sh -c 'r.feh'
+
+[Install]
+WantedBy=wm.target

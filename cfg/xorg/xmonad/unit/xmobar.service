@@ -1,0 +1,12 @@
+[Unit]
+Description=Status Bar - xmobar
+Requires=xorg.socket
+After=xmonad.service
+Before=wm.target
+PartOf=wm.target
+
+[Service]
+ExecStart=/usr/bin/xmobar %h/.xmonad/xmobarrc
+
+[Install]
+WantedBy=wm.target

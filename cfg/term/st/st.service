@@ -1,0 +1,12 @@
+[Unit]
+Description=Terminal Emulator - st
+Requires=xorg.socket
+After=xorg.socket
+Before=wm.target
+PartOf=wm.target
+
+[Service]
+ExecStart=/usr/bin/st -g 100x30
+
+[Install]
+WantedBy=wm.target

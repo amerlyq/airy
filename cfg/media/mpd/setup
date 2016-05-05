@@ -13,7 +13,7 @@ esac
 
 if cfgOpt c || [[ ! -e ~/.mpd/pid ]]; then
     if distro arch; then
-        usvc_activate mpd
+        echo usvc_activate mpd
 
     elif distro ubuntu; then
         # Stop the daemon and disable from starting on boot:

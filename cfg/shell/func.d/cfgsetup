@@ -43,8 +43,21 @@ if distro arch; then
   svc_enable() { systemctl is-enabled "$1" > /dev/null || sudo systemctl enable "$1"; }
   svc_disable() { systemctl is-enabled "$1" > /dev/null || return 0; sudo systemctl disable "$1"; }
   svc_restart() { sudo systemctl restart "$1"; }
-  usvc_activate() { systemctl --user daemon-reload &&  # Refresh configurations
-      systemctl --user enable "$1" && systemctl --user start "${1##*/}"; }
+  # TODO:USE:ALSO: for ubuntu >= 16 which has systemd
+  usvc_activate() { local h d dst=~/.config/systemd/user OPTIND=1
+    while getopts 'er' o; do case $o in [er]) h+=$o
+    ;; :|'?') die 1; esac; done; shift $((OPTIND - 1))
+
+    for f in "${@:?No svc lst}"; do d=./unit
+      [[ -f $d/$f ]] || d=${d%/*} && [[ -f $d/$f ]] || die 1 "Not found '$f'"
+      # ALT:CHECK:(faster startup) /etc/systemd/user
+      link -ct "$dst" "$d/$f" && systemctl --user daemon-reload
+      if systemctl --user is-enabled "$f" >/dev/null
+      then [[ $h =~ e ]] || systemctl --user disable "$f"
+      else [[ ! $h =~ e ]] || systemctl --user enable "$f"; fi
+      [[ ! $h =~ r ]] || systemctl --user start "$f"
+    done
+  }
   # System user for demons without shell access and without a home directory
   add_sysuser() { id "${1:?No user}" >/dev/null 2>&1 ||
       sudo useradd -r -U -d /dev/null -s /usr/bin/nologin "$1"; }

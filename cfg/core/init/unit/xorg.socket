@@ -1,0 +1,7 @@
+[Unit]
+Description=Xorg Socket
+Before=xorg.service
+PartOf=xorg.service
+
+[Socket]
+ListenStream=/tmp/.X11-unix/X0

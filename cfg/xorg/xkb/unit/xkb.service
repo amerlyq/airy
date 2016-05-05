@@ -1,0 +1,13 @@
+[Unit]
+Description=Cfg xkb
+Requires=xorg.socket
+After=wm.target
+PartOf=wm.target
+
+[Service]
+# Type=oneshot
+# RemainAfterExit=yes
+ExecStart=/usr/bin/xkbcomp %h/.cache/airy/keylayout.xkm $DISPLAY
+
+[Install]
+WantedBy=wm.target

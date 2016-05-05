@@ -1,0 +1,11 @@
+[Unit]
+Description=Window Compositor - compton
+Requires=xorg.socket
+After=wm.target
+PartOf=wm.target
+
+[Service]
+ExecStart=/usr/bin/compton -d $DISPLAY
+
+[Install]
+WantedBy=wm.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Window Manager - xmonad
+Requires=xorg.socket
+Before=wm.target
+PartOf=wm.target
+
+[Service]
+ExecStart=/usr/bin/xmonad
+
+[Install]
+RequiredBy=wm.target

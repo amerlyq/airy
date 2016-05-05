@@ -8,6 +8,9 @@ lib=~/.xmonad/lib/XMonad
 link -t "$lib/Config/Amer" ./cfg/*
 link -t "$lib/Util/Amer"   ./ext/*
 
+usvc_activate -e xmonad.service
+# usvc_activate -e {xmonad,xmobar}.service
+
 ### GENS ###
 if cfgOpt u; then
   # dst=~/.xmonad/xmobarrc

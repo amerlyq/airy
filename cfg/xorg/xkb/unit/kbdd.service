@@ -1,27 +1,20 @@
 [Unit]
-Description=kbdd daemon
+Description=Daemon kbdd
+Requires=wm.target
+After=wm.target
+Before=main.target
+PartOf=main.target
 
 [Service]
-Type=dbus
-BusName=ru.gentoo.KbddService
+# Type=dbus
+# BusName=ru.gentoo.KbddService
 ExecStart=/usr/bin/kbdd --nodaemon
 # User=%i
 # Group=users
-# Environment=DISPLAY=:0
 # Restart=on-failure
 # Restart=always
 # RestartSec=5
 
-# [Service]
-# Type=forking
-# PIDFile=%t/kbdd.pid
-# ExecStart=/usr/bin/kbdd
-# ExecStop=/usr/bin/pkill kbdd
-# Restart=always
-# RestartSec=5
-
 [Install]
-# WantedBy=multi-user.target
-Alias=dbus-ru.gentoo.KbddService.service
-WantedBy=graphical.target
-# WantedBy=environment.target
+# Alias=dbus-ru.gentoo.KbddService.service
+WantedBy=main.target
