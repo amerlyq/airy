@@ -4,13 +4,15 @@ source ~/.shell/profile
 ARG=$1  # -u
 
 debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
-  [[ $ARG =~ u ]] || ! grep -qF 'multiverse' /etc/apt/sources.list &>/dev/null || return 0
+  [[ $ARG =~ u ]] || ! grep -qF 'multiverse' "$chr/etc/apt/sources.list" &>/dev/null || return 0
   local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu'
   local user=${USER:?}
 
   # BUG: problems with groups transition
+  #   -- schroot groups: cannot find name for group ID 14
   # FIND: export/login with only choosen groups on schroot
-  echo "W: security! change root/user passwords in chroot!"
+  #   -- SEE http://unix.stackexchange.com/questions/160487/how-to-prevent-schroot-from-overridding-passwd-file-and-others-files-already-pre
+  echo "Wrn: security! change root/user passwords in chroot!"
   # THINK:TRY: copy from host only necessary lines?
   sudo schroot -c "${chr##*/}" -d "/" -- bash -c "
     (cd /bin && ln -sfv bash sh)

@@ -65,6 +65,8 @@ import qualified XMonad.Config.Amer.Workspace as MyWksp
 myStartupHook = do
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
   setWMName "LG3D"  -- Fixes problems with Java GUI programs
+  -- FIXME: skip on non-systemd MAYBE:BUG: one more notify on each --restart
+  spawn "systemd-notify --ready"
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
   checkKeymap myCfg myKeys
   curr <- gets (W.currentTag . windowset)

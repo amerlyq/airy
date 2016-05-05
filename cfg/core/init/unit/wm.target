@@ -1,7 +1,7 @@
 [Unit]
-Description=Window Manager
-Requires=xorg.socket
-Requires=dbus.socket
-Before=main.target
+Description=Window Manager for %u on %H
+Requires=xorg.target
+After=xorg.target
 PartOf=main.target
+Before=main.target
 AllowIsolate=true

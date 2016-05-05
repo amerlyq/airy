@@ -10,12 +10,10 @@ case ${CURR_PROF:?} in
    *) link "$PWD/mpd-own.conf" ~/.mpd/mpd.conf ;;
 esac
 
+usvc_activate -e {mpd,mpd-log}.service
 
 if cfgOpt c || [[ ! -e ~/.mpd/pid ]]; then
-    if distro arch; then
-        echo usvc_activate mpd
-
-    elif distro ubuntu; then
+    if distro ubuntu; then
         # Stop the daemon and disable from starting on boot:
         # Because being launched by init.d it has no access to ~/.ncmpcpp
         # Then run manually from ~/.xinitrc

@@ -3,8 +3,9 @@ source ~/.shell/func.d/cfgsetup
 
 ### systemd ###
 link -sct /etc/X11 Xwrapper.config
-usvc_activate -e {main,wm}.target xorg.{socket,service}
-
+usvc_activate -e \
+  {demons,main,wm}.target \
+  xorg.{socket,service,target}
 
 ### startx ###
 link xprofile ~/.xprofile

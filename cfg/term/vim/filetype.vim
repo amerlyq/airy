@@ -18,7 +18,7 @@ augroup filetypedetect
   " System
   au BufRead,BufNewFile {*.log*,log-*}       setf messages
   au BufRead,BufNewFile {PKGBUILD,.AURINFO}  setf sh
-  au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap} setf systemd
+  au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap,*.target,*.service} setf systemd
 augroup END
 
 " Use Zeal on Linux for context help

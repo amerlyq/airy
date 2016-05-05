@@ -6,8 +6,8 @@ source ~/.shell/func.d/packages
 # SEE:  http://archlinuxarm.org/forum/viewtopic.php?f=57&t=7386
 
 if distro arch; then
-    pkg_inst "tftp-hpa"
+  pkg_inst -p 'tftp' tftp-hpa
 
 elif distro ubuntu; then
-    pkg_inst "tftpd-hpa"
+  pkg_inst -p 'tftp' tftpd-hpa
 fi

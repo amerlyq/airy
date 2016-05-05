@@ -1,0 +1,11 @@
+#!/bin/bash -e
+# Tool to search cycle loading order in units
+# (because all such units won't be loaded)
+
+dst=${TMPDIR:-/tmp}/init.png
+
+# systemd-analyze --user verify main.target \
+# |& perl -lne 'print $1 if m{Found.*?on\s+([^/]+)}' \
+# | xargs --no-run-if-empty systemd-analyze dot \
+
+dot -Tx11 <(systemd-analyze --user dot)

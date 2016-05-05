@@ -3,7 +3,7 @@
 # Note that the mount point will be prefixed by the chroot path (CHROOT_PATH)
 
 source ~/.shell/profile
-mnt=(/proc /sys /dev /dev/pts /tmp /home/${USER:?} "${CURR_CHROOT_MOUNTS[@]}")
+mnt=(/proc /sys /dev /dev/shm /dev/pts /tmp /home/${USER:?} "${CURR_CHROOT_MOUNTS[@]}")
 
 # It may be desirable to have access to /run, especially if you wish
 # to run additional services in the chroot.  However, note that this

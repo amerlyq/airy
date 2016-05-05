@@ -1,9 +1,9 @@
 [Unit]
-Description=Daemon kbdd
+Description=PerWindow Layout - %P
 Requires=wm.target
 After=wm.target
-Before=main.target
 PartOf=main.target
+Before=main.target
 
 [Service]
 # Type=dbus
@@ -12,8 +12,8 @@ ExecStart=/usr/bin/kbdd --nodaemon
 # User=%i
 # Group=users
 # Restart=on-failure
-# Restart=always
-# RestartSec=5
+Restart=always
+RestartSec=5
 
 [Install]
 # Alias=dbus-ru.gentoo.KbddService.service

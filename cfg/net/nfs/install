@@ -5,7 +5,7 @@ source ~/.shell/func.d/packages
 # https://www.centos.org/docs/5/html/Deployment_Guide-en-US/s1-nfs-server-config-exports.html
 
 if distro arch; then
-    pkg_inst "nfs-utils"
+    pkg_inst -p 'rpc.nfsd' nfs-utils
 
 elif distro ubuntu; then
     pkg_inst "nfs-common nfs-kernel-server"

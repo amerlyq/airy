@@ -1,11 +1,15 @@
 [Unit]
-Description=Window Manager - xmonad
-Requires=xorg.socket
-Before=wm.target
+Description=Window Manager - %P
+Requires=xorg.target
 PartOf=wm.target
 
 [Service]
+# BUG: default 'xmonad' can't notify
+Type=notify
+NotifyAccess=all
+# BAD(forking), BAD(notify)
 ExecStart=/usr/bin/xmonad
+# ALT: ExecStart=/bin/sh -c %h/.xmonad/xmonad-x86_64-linux
 
 [Install]
 RequiredBy=wm.target

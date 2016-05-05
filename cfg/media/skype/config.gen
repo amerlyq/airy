@@ -8,7 +8,7 @@ cfg=~/.Skype/${MAIN_SKYPE:?}/config.xml
 
 sxml(){ local f=$1 a=$2 k=$3 v=$4
   grep -qF "$k" "$f" \
-    && sed -ri "/(<$k>)[^<>]+(<\/$k>)/s//\1$v\2/" "$f" \
+    && sed -ri "/(<$k>)[^<>]+(<\/$k>)/s||\1$v\2|" "$f" \
     || sed -ri "/<$a>/a\      <$k>$v<\/$k>" "$f"
 }
 sopt(){ sxml "$opt" "$@"; }

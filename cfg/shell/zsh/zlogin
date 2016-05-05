@@ -24,7 +24,7 @@ _dttime end-compdump
 # NOTE: Only main Xorg session controlled by systemd.
 #   -- Other specialized servers are launched by 'startx' as before.
 if [[ $XDG_VTNR == 1 && ! -f /tmp/.X11-unix/X0 ]]; then
-  systemctl --user set-environment DISPLAY=:0
+  systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
   systemctl --user import-environment XDG_VTNR PATH
   # TODO:FIND: how to 'exec' into main target
   # systemctl --user start main.target

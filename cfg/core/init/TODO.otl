@@ -4,9 +4,19 @@
 REF
 	> man bootup
 	systemd-analyze plot > startupgraph.svg
+	https://www.freedesktop.org/software/systemd/man/systemd.unit.html
 	https://www.freedesktop.org/software/systemd/man/systemd-analyze.html
 	https://www.freedesktop.org/software/systemd/man/systemd.service.html
 	> https://www.lucas-nussbaum.net/blog/?p=877
+
+USE:
+	Stop all other non-related targets (drop into raw Xorg)
+		systemctl --user isolate xorg[.target]
+
+DEBUG
+	Show dependency
+		systemctl --user show -p Requires,Wants,Requisite,BindsTo,PartOf,Before,After main.target
+
 
 BUG
 	[_] fix syncthing on neo

@@ -1,13 +1,18 @@
 [Unit]
-Description=Cfg xkb
-Requires=xorg.socket
-After=wm.target
-PartOf=wm.target
+Description=Xorg Keyboard Layout
+PartOf=xorg.target
+After=xorg.service
+ConditionFileNotEmpty=%h/.cache/airy/keylayout.xkm
+# OR ExecStart=-/... to suppress warnings
 
 [Service]
-# Type=oneshot
-# RemainAfterExit=yes
-ExecStart=/usr/bin/xkbcomp %h/.cache/airy/keylayout.xkm $DISPLAY
+Type=oneshot
+RemainAfterExit=yes
+# BUG: ExecStart=/usr/bin/xkbcomp %h/.cache/airy/keylayout.xkm ${DISPLAY}
+ExecStart=/bin/sh -c r.xkb-load
+ExecStop=/usr/bin/setxkbmap -option ""
 
 [Install]
-WantedBy=wm.target
+# MAYBE: Impossible to be part of {xorg,wm}.target?
+# CHECK: r.init-graph
+WantedBy=xorg.target

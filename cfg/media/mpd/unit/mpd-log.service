@@ -1,0 +1,14 @@
+[Unit]
+Description=MPD playback logger
+Requires=mpd.service
+After=mpd.service
+# CHECK: is it really necessary if we have 'WantedBy'?
+# PartOf=demons.target
+
+[Service]
+ExecStart=/bin/sh -c r.mpd-log
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=demons.target

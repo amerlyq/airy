@@ -1,12 +1,14 @@
 [Unit]
 Description=Xorg Server
 Requires=xorg.socket
-Before=main.target
-PartOf=main.target
+PartOf=xorg.target
 
 [Service]
 Type=simple
 SuccessExitStatus=0 1
+# SIGKILL
 # BAD: ExecStartPre=/usr/bin/systemctl --user set-environment DISPLAY=:0
-ExecStart=/usr/bin/Xorg "${DISPLAY}" "vt${XDG_VTNR}" -nolisten tcp -noreset -keeptty -verbose 2
+ExecStart=/usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -noreset -keeptty -verbose 2
+ExecStartPost=-/usr/bin/dbus-update-activation-environment DISPLAY=${DISPLAY}
+# XAUTHORITY
 # ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY
