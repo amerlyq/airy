@@ -1,9 +1,8 @@
 [Unit]
-Description=Terminal Emulator - st
-Requires=xorg.socket
-After=xorg.socket
-Before=wm.target
+Description=Terminal Emulator - %P
+Requires=xorg.target
 PartOf=wm.target
+Conflicts=xmonad.service
 
 [Service]
 ExecStart=/usr/bin/st -g 100x30

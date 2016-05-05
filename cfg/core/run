@@ -8,11 +8,6 @@ scratchpad_is_empty(){
     return 1; fi
 }
 
-sys_logout(){ i3-nagbar -t warning \
-    -m 'Logout: exit i3, end your X session, move to login screen' \
-    -b 'Yes, exit i3' 'i3-msg exit'
-}
-
 sys_power(){ #Suspend #Hibernate
     # PORTABLE: http://askubuntu.com/questions/1792/how-can-i-suspend-hibernate-from-command-line/131022#131022
     dbus-send --system --print-reply --dest="org.freedesktop.UPower" \
@@ -22,6 +17,16 @@ sys_power(){ #Suspend #Hibernate
     # dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" \
     #    /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart #Stop
 }
+
+# TODO: check if main session from systemd or startx  -- and then do
+# sys_logout(){ r.wm quit-wm; }
+sys_logout(){ systemctl --user stop main.target; }
+
+# MOVE: into i3/run : case quit-wm) sys_logout ;; esac
+# sys_logout(){ i3-nagbar -t warning \
+#   -m 'Logout: exit i3, end your X session, move to login screen' \
+#   -b 'Yes, exit i3' 'i3-msg exit'
+# }
 
 if pgrep i3 &>/dev/null; then
   no_windows(){ scratchpad_is_empty; }

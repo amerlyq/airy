@@ -115,7 +115,7 @@ system =
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
 
   (inGroup "M-S-<Esc>" . concat)
-  [ [ ("o", whenWindowsClosed $ io exitSuccess)
+  [ [ ("o", whenWindowsClosed $ spawn "r.core logout")
     , ("r", whenWindowsClosed $ spawn "r.core reboot")
     , ("t", whenWindowsClosed $ spawn "r.core shutdown")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
