@@ -1,0 +1,24 @@
+[Unit]
+Description=Terminal Multiplexer - %P
+Documentation=man:tmux(1)
+# After=gpg-agent.service
+
+[Service]
+# CHG?
+Type=forking
+# CHECK: creating very first session in wm/term w/o its forking
+# EXPL: maybe by setting TMUX_TMPDIR there is no need in first session
+# THINK: don't set this to simplify things -- so no need to set on login
+# Environment=TMUX_TMPDIR=%t
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/tmux start-server
+# ExecStartPost=/usr/bin/tmux new-session -d -s %u ${SHELL}
+ExecStop=/usr/bin/tmux kill-server
+# ExecStop=/usr/bin/tmux kill-session -t %u
+# EnvironmentFile=/tmp/gpg-agent-info
+# Restart=always
+
+[Install]
+WantedBy=demons.target
+# IDEA:BAD? using one tmux for multiple logged in users
+# WantedBy=multi-user.target

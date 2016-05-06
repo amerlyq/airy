@@ -1,0 +1,15 @@
+[Unit]
+Description=Util - %P
+Requires=xorg.target
+After=wm.target
+PartOf=main.target
+Before=main.target
+
+[Service]
+ExecStart=/usr/bin/dunst
+# ExecSuspend=killall -SIGUSR2 dunst
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=main.target

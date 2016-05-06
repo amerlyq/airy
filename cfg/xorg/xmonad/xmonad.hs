@@ -66,6 +66,8 @@ myStartupHook = do
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
   setWMName "LG3D"  -- Fixes problems with Java GUI programs
   -- FIXME: skip on non-systemd MAYBE:BUG: one more notify on each --restart
+  -- NEED: one-time env vars https://www.freedesktop.org/software/systemd/man/sd_notify.html
+  -- MAYBE: NOTIFY_SOCKET is set automatically when Type=notify?
   spawn "systemd-notify --ready"
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
   checkKeymap myCfg myKeys

@@ -7,6 +7,10 @@ usvc_activate -e \
   {demons,main,wm}.target \
   xorg.{socket,service,target}
 
+# Start user instance right after boot and keep beside sessions
+# loginctl enable-linger "${USER:?}"
+# USE:(to logoff) loginctl terminate-user "${USER:?}"
+
 ### startx ###
 link xprofile ~/.xprofile
 link xinitrc  ~/.xinitrc

@@ -1,0 +1,19 @@
+#!/bin/bash -e
+
+sys_logout(){ i3-nagbar -t warning \
+  -m 'Logout: exit i3, end your X session, move to login screen' \
+  -b 'Yes, exit i3' 'i3-msg exit'
+}
+
+scratchpad_is_empty(){
+    if ! i3-msg -t get_tree | jshon | awk '/scratchpad_state/{a[$2]=0}
+        END{exit (length(a)>1)}'; then
+    i3-input -l 1 -P "Your scratchpad isn't empty" -F "scratchpad show"
+    return 1; fi
+}
+
+case $1
+in quit-wm) sys_logout
+;; is-empty) scratchpad_is_empty
+;; *) i3-msg "$@"
+esac

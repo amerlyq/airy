@@ -1,0 +1,17 @@
+[Unit]
+Description=Util - %P
+ConditionHost=!neo
+Requires=xorg.target
+After=wm.target
+PartOf=main.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/pidgin
+# EXPL: Don't restart -- to close when needless
+# NOTE: to run instance on second Xorg -- use 'pidgin -m'
+# Restart=always
+# RestartSec=5
+
+[Install]
+WantedBy=main.target

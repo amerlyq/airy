@@ -1,13 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/system
 
-scratchpad_is_empty(){
-    if ! i3-msg -t get_tree | jshon | awk '/scratchpad_state/{a[$2]=0}
-        END{exit (length(a)>1)}'; then
-    i3-input -l 1 -P "Your scratchpad isn't empty" -F "scratchpad show"
-    return 1; fi
-}
-
 sys_power(){ #Suspend #Hibernate
     # PORTABLE: http://askubuntu.com/questions/1792/how-can-i-suspend-hibernate-from-command-line/131022#131022
     dbus-send --system --print-reply --dest="org.freedesktop.UPower" \
@@ -18,25 +11,20 @@ sys_power(){ #Suspend #Hibernate
     #    /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart #Stop
 }
 
-# TODO: check if main session from systemd or startx  -- and then do
-# sys_logout(){ r.wm quit-wm; }
-sys_logout(){ systemctl --user stop main.target; }
 
-# MOVE: into i3/run : case quit-wm) sys_logout ;; esac
-# sys_logout(){ i3-nagbar -t warning \
-#   -m 'Logout: exit i3, end your X session, move to login screen' \
-#   -b 'Yes, exit i3' 'i3-msg exit'
-# }
+if systemctl --user is-active main >/dev/null; then
+  sys_logout(){ systemctl --user stop main.target; }
+else
+  sys_logout(){ r.wm quit-wm; }
+fi
 
-if pgrep i3 &>/dev/null; then
-  no_windows(){ scratchpad_is_empty; }
-else no_windows(){ :; }; fi
-# OR: use ctl.hs to query windows list from xmonad
+# TODO: use ctl.hs to query windows list from xmonad
+no_windows(){ r.wm is-empty; }
 
 if running_X; then
   confirm(){ [[ $(printf "yes\nno\n" | dmenu -p "$1?" -fn monospace-10) == yes ]]; }
 else
-  confirm(){ printf '%s? ([y]es/[N]o)' "$1"; read a; [[ ${a,,} =~ ^y(es)?$ ]]; }
+  confirm(){ read -p "$1? ([y]es/[N]o): " a; [[ ${a,,} =~ ^y(es)?$ ]]; }
 fi
 
 # TODO: add force shutdown, ignoring unpushed commits
@@ -48,7 +36,7 @@ fi; }
 check(){ no_windows && repo_pushed; }
 
 case $1
-in     lock|-l) r.lock &
+in     lock|-l) r.lock &  # THINK: really fork -- or better not?
 ;;  suspend|-s) sys_power Suspend
 ;;hibernate|-h) sys_power Hibernate
 ;;   logout|-o) no_windows && confirm "Logout" && sys_logout

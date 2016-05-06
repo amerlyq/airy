@@ -36,6 +36,10 @@ keys = [ (m ++ k, windows $ f i) | (i, k) <- aliases, (m, f) <- actions]
 -- TODO: backNforth on current monitor only
 -- keys = [ (m ++ k, windows $ onCurrentScreen f i) | (i, k) <- aliases, (m, f) <- actions]
 
+-- MAYBE: change to leader-mod-letter for more consistent navigation
+-- (+) mod+leader -- additional functions/abilities/new wksps
+-- (+) mod+leader-letter -- another functions, not wksp jumping
+-- BUT:THINK: mods-leader-letter scheme have the less key presses for additional wksp
 leader = ("s " ++)  -- ([s]econdary) ALT: g, <Backspace>, <Tab>
 aliases = concat
   [ map (\i -> (i, i)) primary

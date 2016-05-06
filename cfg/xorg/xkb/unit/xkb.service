@@ -6,6 +6,7 @@ ConditionFileNotEmpty=%h/.cache/airy/keylayout.xkm
 # OR ExecStart=-/... to suppress warnings
 
 [Service]
+# CHECK:BUG: oneshot is not restarted on 'start main.target'?
 Type=oneshot
 RemainAfterExit=yes
 # BUG: ExecStart=/usr/bin/xkbcomp %h/.cache/airy/keylayout.xkm ${DISPLAY}

@@ -1,5 +1,5 @@
 [Unit]
-Description=PerWindow Layout - %P
+Description=Xorg Keyboard PerWindow - %P
 Requires=wm.target
 After=wm.target
 PartOf=main.target
@@ -13,7 +13,7 @@ ExecStart=/usr/bin/kbdd --nodaemon
 # Group=users
 # Restart=on-failure
 Restart=always
-RestartSec=5
+RestartSec=1
 
 [Install]
 # Alias=dbus-ru.gentoo.KbddService.service

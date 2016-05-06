@@ -5,6 +5,7 @@ REF
 	> man bootup
 	systemd-analyze plot > startupgraph.svg
 	https://www.freedesktop.org/software/systemd/man/systemd.unit.html
+	https://www.freedesktop.org/software/systemd/man/systemd.exec.html
 	https://www.freedesktop.org/software/systemd/man/systemd-analyze.html
 	https://www.freedesktop.org/software/systemd/man/systemd.service.html
 	> https://www.lucas-nussbaum.net/blog/?p=877
@@ -20,10 +21,6 @@ DEBUG
 
 BUG
 	[_] fix syncthing on neo
-
-Start user instance right after boot and keep beside sessions
-: USE for mpd
-	loginctl enable-linger username
 
 Set many variables ~/.bash_profile
 	xargs systemctl --user set-environment < /path/to/file.conf
