@@ -1,0 +1,7 @@
+[Unit]
+Description=Try notify
+
+[Service]
+Type=notify
+NotifyAccess=all
+ExecStart=/bin/sh -c 'bash -c "sleep 2; systemd-notify --ready"'

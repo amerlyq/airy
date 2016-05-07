@@ -30,7 +30,7 @@ noremap <unique><silent> <Leader>M <Esc>:<C-U>w \| Make<CR>
 let g:run_cmdline = ""
 function! s:RunCmdLine(bChange)
   if empty(g:run_cmdline)
-    let g:run_cmdline = "!$PWD/" . getreg('%')
+    let g:run_cmdline = '!' . expand('%:p')
     echo g:run_cmdline
   endif
   if a:bChange

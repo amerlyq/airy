@@ -2,17 +2,6 @@
 # Executes commands at login post-zshrc.
 # BUG:WARNING: urxvt (but not st) sources this file on each startup!
 
-_dttime compdump
-# Execute code that does not affect the current session in the background.
-{
-  # Compile the completion dump to increase startup speed.
-  zcompdump="${ZDOTDIR:-"$HOME/.cache/zsh"}/.zcompdump"
-  if [[ -s "$zcompdump" && (! -s "${zcompdump}.zwc" ||
-    "$zcompdump" -nt "${zcompdump}.zwc") ]]
-  then zcompile "$zcompdump"; fi
-} &!
-_dttime end-compdump
-
 # Print a random, hopefully interesting, adage.
 # if (( $+commands[fortune] )); then
 #   if [[ -t 0 || -t 1 ]]; then
@@ -21,13 +10,17 @@ _dttime end-compdump
 #   fi
 # fi
 
+# WARNING: can't be placed into ~/.zshenv because PATH then not constructed yet.
 # NOTE: Only main Xorg session controlled by systemd.
 #   -- Other specialized servers are launched by 'startx' as before.
-if [[ $XDG_VTNR == 1 && ! -f /tmp/.X11-unix/X0 ]]; then
+if [[ ! ($TMUX||$VIM||$EMACS) && $UID > 0 && $XDG_VTNR == 1
+&& ! -f /tmp/.X11-unix/X0 && $(tty) == /dev/tty1
+]]; then
   systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
   systemctl --user import-environment XDG_VTNR PATH
   # TODO:FIND: how to 'exec' into main target
-  # systemctl --user start main.target
+  setopt norcs  # Skip loading of all subsequent rc files
+  systemctl --user start main.target
 fi
 
 # BUG: seems like it causes long delay before Xorg on cold system
@@ -35,4 +28,4 @@ fi
 # ((0==$#commands[r.init])) || r.init
 # dinit=~/aura/airy/cfg/core/init
 # [[ -f $dinit/run ]] && exec $dinit/run || ((0==$#commands[r.init])) || exec r.init
-_dttime end-zlogin
+# _dttime end-zlogin

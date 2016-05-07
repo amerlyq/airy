@@ -1,0 +1,19 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# pulseaudio   | Need for usage pactl -- ncmpcpp and volume regulator in i3 config bindings.
+# alsa         | volume regulator
+# lib32-openal | necessary for XAudio2.7 to work under Wine
+
+if distro arch; then
+    pkg_inst alsa-{firmware,lib,plugins,utils,tools}
+    pkg_inst lib32-{alsa-{lib,plugins},libpulse,openal}
+    pkg_inst pulseaudio{,-alsa} libcanberra-pulse
+
+elif distro ubuntu; then
+    ## For Mint
+    # if ! grep -q snd-hda-intel /etc/modprobe.d/alsa-base.conf; then
+    #     echo 'options snd-hda-intel model=asus' | sudo tee -a /etc/modprobe.d/alsa-base.conf
+    # fi
+    echo "Err: "
+fi

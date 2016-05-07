@@ -6,6 +6,9 @@ PartOf=main.target
 Before=main.target
 
 [Service]
+# BUG: can't start if another instance already running
+ExecStartPre=/bin/bash -c 'systemctl --user is-active dunst \
+    >/dev/null || pkill -x dunst'
 ExecStart=/usr/bin/dunst
 # ExecSuspend=killall -SIGUSR2 dunst
 Restart=always

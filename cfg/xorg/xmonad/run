@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+# Allow to control main session from vtN
+[[ $DISPLAY ]] || export DISPLAY=:0
+
 case "$1"
 in -w) shift
   dnum=$(wmctrl -d | awk -vn=$1 'n==$NF{print$1;quit}')

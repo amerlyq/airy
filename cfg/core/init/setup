@@ -5,11 +5,14 @@ source ~/.shell/func.d/cfgsetup
 link -sct /etc/X11 Xwrapper.config
 usvc_activate -e \
   {demons,main,wm}.target \
-  xorg.{socket,service,target}
+  xorg.{socket,service,target} \
+  xinitrc.service
 
 # Start user instance right after boot and keep beside sessions
-# loginctl enable-linger "${USER:?}"
 # USE:(to logoff) loginctl terminate-user "${USER:?}"
+if cfgOpt u; then
+  sudo loginctl enable-linger "${USER:?}"
+fi
 
 ### startx ###
 link xprofile ~/.xprofile

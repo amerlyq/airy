@@ -1,15 +1,19 @@
 [Unit]
 Description=Window Manager - %P
 Requires=xorg.target
+After=xorg.target
+# Before=wm.target
+# FIXED: continues to run even if wm.target failed
 PartOf=wm.target
 
 [Service]
 # BUG: default 'xmonad' can't notify
+# TRY:FIND: notify by creating some file (inotify)
 # Type=notify
 # NotifyAccess=all
 # BAD(forking), BAD(notify)
-ExecStart=/usr/bin/xmonad
 Environment=XDG_CURRENT_DESKTOP=xmonad
+ExecStart=/usr/bin/xmonad
 # ALT: ExecStart=/bin/sh -c %h/.xmonad/xmonad-x86_64-linux
 
 [Install]

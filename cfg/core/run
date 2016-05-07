@@ -12,8 +12,8 @@ sys_power(){ #Suspend #Hibernate
 }
 
 
-if systemctl --user is-active main >/dev/null; then
-  sys_logout(){ systemctl --user stop main.target; }
+if systemctl --user is-active main.target >/dev/null; then
+  sys_logout(){ r.n Stopping main.target; systemctl --user stop main.target; }
 else
   sys_logout(){ r.wm quit-wm; }
 fi

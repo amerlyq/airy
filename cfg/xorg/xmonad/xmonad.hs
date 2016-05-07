@@ -7,6 +7,8 @@ import Data.List     (isPrefixOf)
 import Data.Ratio    ((%))
 import Data.Default  (def)
 import System.IO
+import System.Environment   (getEnv)
+import System.Posix.Process (getProcessID)
 
 ---- Core
 import XMonad                       -- (float, kill, spawn, refresh, restart, doFloat, workspaces, windows, withFocused, sendMessage, Resize(Shrink, Expand), IncMasterN)
@@ -68,7 +70,14 @@ myStartupHook = do
   -- FIXME: skip on non-systemd MAYBE:BUG: one more notify on each --restart
   -- NEED: one-time env vars https://www.freedesktop.org/software/systemd/man/sd_notify.html
   -- MAYBE: NOTIFY_SOCKET is set automatically when Type=notify?
-  spawn "systemd-notify --ready"
+  -- getProcessID >>= \p -> spawn $ "systemd-notify --ready --pid=" ++ show $ liftIO . p
+  pid <- liftIO getProcessID
+  trace $ show pid
+  -- import System.IO.Unsafe
+  -- myHome = unsafePerformIO $ getEnv "HOME"
+  soc <- io $ getEnv "NOTIFY_SOCKET"
+  trace $ show soc
+  spawn $ "systemd-notify --ready --pid=" ++ show pid
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
   checkKeymap myCfg myKeys
   curr <- gets (W.currentTag . windowset)

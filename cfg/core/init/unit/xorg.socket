@@ -1,7 +1,11 @@
 [Unit]
 Description=Xorg Socket
-Before=xorg.service
+# FIND: recommended way
 PartOf=xorg.service
+# CHECK: must be implicit
+Before=xorg.service
 
 [Socket]
 ListenStream=/tmp/.X11-unix/X0
+# SocketMode=0660
+# DirectoryMode=0700

@@ -7,6 +7,7 @@ CHG
 		https://wiki.haskell.org/Xmonad/Config_archive/John_Goerzen%27s_Configuration
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
 	[_] wrap unsafe operations in main to not drop X
+		http://stackoverflow.com/questions/27388099/how-to-get-the-process-id-of-a-created-process-in-haskell
 	[_] use same xmonbarrc for different hosts
 		https://github.com/davama/xmonad/
 		https://github.com/j1r1k/xmonad-config
@@ -47,6 +48,7 @@ SEE
 			https://wiki.haskell.org/Xmonad/Config_archive/John_Goerzen%27s_Configuration
 			http://lynnard.me/blog/2014/01/06/supercharge-your-xmonad-colored-tabs-dynamic-prompt-window-slash-workspace-insert-position/
 			> https://draftin.com/documents/490906?token=i8AJR0nv8RK3G8KYV07NXxzArVeDgkTBvPvj4qa3M8BkdX-mUs07C8ZGj6_T4mwZAr8A22gcRjkqgUr3PmHR2rM
+			>>> https://github.com/liskin/liskin-xmonad-conf/blob/master/xmonad.hs
 		Examples
 		: https://github.com/mcmaniac/xmonad/blob/master/xmonad.hs
 		: http://www.vicfryzel.com/2010/06/27/obtaining-a-beautiful-usable-xmonad-configuration/
@@ -120,6 +122,10 @@ THINK:ENH
 		:= Maybe, even replace default action on M-a, and move original to M-A-a
 	[_] Using NSP as tray -- to keep windows always there instead of tray
 		:THINK: automatically hide there any unfocused window from list (like copyq)
+	[_] ADD submenu/mod 'Wksp' to manage wksps instead of windows
+		:= swap/move wksp between positions
+		:= setup defaults / topical workplaces
+		:= setup screens settings
 
 RFC
 	: myManageHook = composeAll . concat $

@@ -6,7 +6,11 @@ PartOf=main.target
 Before=main.target
 
 [Service]
-ExecStart=/bin/sh -c '/usr/bin/xcape -d >/dev/null'
+ExecStartPre=/bin/bash -c 'systemctl --user is-active xcape \
+    >/dev/null || pkill -x xcape'
+ExecStart=/bin/sh -c '/usr/bin/xcape -d -t 250 -e "\
+    ISO_Level3_Shift=Super_R;Overlay1_Enable=Multi_key\
+    " >/dev/null'
 Restart=always
 RestartSec=1
 

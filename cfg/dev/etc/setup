@@ -8,6 +8,8 @@ link "$PWD/agignore" ~/.agignore
 if cfgOpt u; then
   # DISABLED: dfl unit don't have prunepaths and hangs on 'activating'
   svc_disable 'updatedb'
+  # svc_disable 'updatedb.timer'
+  # MAYBE:BETTER? simply fix /etc/updatedb.conf
   # Gen db for 'locate'
   fork_m sudo updatedb --add-prunepaths /cryptfs
 fi

@@ -1,9 +1,10 @@
 [Unit]
 Description=Util - %P
 ConditionHost=!neo
-Requires=xorg.target
+Requires=wm.target
 After=wm.target
 PartOf=main.target
+Before=main.target
 
 [Service]
 Type=idle

@@ -1,6 +1,6 @@
 [Unit]
 Description=Util - %P
-Requires=xorg.target
+Requires=wm.target
 After=wm.target
 PartOf=main.target
 Before=main.target
@@ -9,6 +9,7 @@ Before=main.target
 # NOTE: to run instance on second Xorg -- use 'copyq -s ses1'
 # ALT: use $DISPLAY or $XDG_VTNR as session name
 ExecStart=/usr/bin/copyq
+ExecStop=/usr/bin/copyq exit
 Restart=always
 RestartSec=5
 

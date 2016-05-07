@@ -13,6 +13,9 @@ _dttime(){ }
 
 # in $ man zshall --> there is recommended to use '[[ -o rcs ]]' ?
 # Ensure that a non-login, non-interactive shell has a defined environment.
+# BUT: it will slow down scripts startup
+# CHECK:BUG? all manually launched scripts have SHLVL>1
+#   --> so these lines for systemd-like services without inherited environment?
 if [[ -o rcs && ! -o LOGIN && $SHLVL -eq 1 && -s ${ZDOTDIR:-$HOME}/.zprofile ]]
 then source "${ZDOTDIR:-$HOME}/.zprofile"; fi
 

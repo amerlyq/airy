@@ -3,11 +3,16 @@ Description=Xorg Keyboard PerWindow - %P
 Requires=wm.target
 After=wm.target
 PartOf=main.target
-Before=main.target
+# Before=main.target
 
 [Service]
 # Type=dbus
 # BusName=ru.gentoo.KbddService
+# ALT:TRY:
+# Type=idle
+# NOTE:BAD: xmonad startup/EWMH initialized after this unit started.
+ExecStartPre=/bin/bash -c 'systemctl --user is-active kbdd \
+    >/dev/null || pkill -x kbdd; sleep 2'
 ExecStart=/usr/bin/kbdd --nodaemon
 # User=%i
 # Group=users
