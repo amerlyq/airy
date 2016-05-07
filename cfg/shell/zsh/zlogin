@@ -16,8 +16,11 @@
 if [[ ! ($TMUX||$VIM||$EMACS) && $UID > 0 && $XDG_VTNR == 1
 && ! -f /tmp/.X11-unix/X0 && $(tty) == /dev/tty1
 ]]; then
+  # WARNING: actual env for xmonad is big problem due to spawning
+  # ALSO:BAD: all spawned terminals will have incomplete env w/o ~/.shell/exports
+  # MAYBE:BETTER: generate env into file by ./setup and then source it into xmonad.service?
   systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
-  systemctl --user import-environment XDG_VTNR PATH
+  systemctl --user import-environment XDG_VTNR PATH TMPDIR EDITOR PAGER
   # TODO:FIND: how to 'exec' into main target
   setopt norcs  # Skip loading of all subsequent rc files
   systemctl --user start main.target

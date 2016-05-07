@@ -8,10 +8,11 @@ Before=main.target
 [Service]
 # NOTE: to run instance on second Xorg -- use 'copyq -s ses1'
 # ALT: use $DISPLAY or $XDG_VTNR as session name
+ExecStartPre=/bin/sh -c 'pkill -fx /usr/bin/copyq; true'
 ExecStart=/usr/bin/copyq
 ExecStop=/usr/bin/copyq exit
 Restart=always
-RestartSec=5
+RestartSec=3
 
 [Install]
 WantedBy=main.target

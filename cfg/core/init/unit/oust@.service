@@ -1,0 +1,8 @@
+[Unit]
+Description=Aux: extrude external - %i
+Before=%i.service
+PartOf=%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'systemctl --user is-active %i >/dev/null || pkill -x %i ||:'

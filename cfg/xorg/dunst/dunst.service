@@ -7,12 +7,13 @@ Before=main.target
 
 [Service]
 # BUG: can't start if another instance already running
-ExecStartPre=/bin/bash -c 'systemctl --user is-active dunst \
-    >/dev/null || pkill -x dunst'
+# MAYBE: check some socket?
+# TRY: rework to dbus-activated
+ExecStartPre=/bin/sh -c 'pkill -x dunst; true'
 ExecStart=/usr/bin/dunst
 # ExecSuspend=killall -SIGUSR2 dunst
 Restart=always
-RestartSec=2
+RestartSec=1
 
 [Install]
 WantedBy=main.target
