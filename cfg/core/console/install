@@ -2,7 +2,8 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  pkg_inst 'terminus-font'
+  pkg_inst -f '/usr/lib/xorg/modules/drivers/fbdev_drv.so' xf86-video-fbdev
+  pkg_inst -d '/usr/share/licenses/terminus-font' terminus-font
 
   # pkg_inst 'fbterm' "fbterm cantarell-fonts"
   ## Also, you need frame buffer driver:

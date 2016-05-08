@@ -6,11 +6,12 @@ PartOf=main.target
 Before=main.target
 
 [Service]
-Type=forking
 ExecStartPre=/bin/sh -c 'pkill -x xcape; true'
-ExecStart=/usr/bin/xcape -t 250 -e "
-    ISO_Level3_Shift=Super_R;
-    Overlay1_Enable=Multi_key"
+ExecStart=/bin/sh -c '/usr/bin/xcape -d -t 250 -e "\
+    ISO_Level3_Shift=Super_R;\
+    Overlay1_Enable=Multi_key\
+    " >/dev/null'
+ExecStop=/usr/bin/pkill -x xcape
 Restart=always
 RestartSec=1
 

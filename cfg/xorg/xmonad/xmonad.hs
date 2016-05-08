@@ -7,6 +7,7 @@ import Data.List     (isPrefixOf)
 import Data.Ratio    ((%))
 import Data.Default  (def)
 import System.IO
+-- import System.IO.Unsafe     (unsafePerformIO)
 import System.Environment   (getEnv)
 import System.Posix.Process (getProcessID)
 
@@ -73,7 +74,6 @@ myStartupHook = do
   -- getProcessID >>= \p -> spawn $ "systemd-notify --ready --pid=" ++ show $ liftIO . p
   pid <- liftIO getProcessID
   trace $ show pid
-  -- import System.IO.Unsafe
   -- myHome = unsafePerformIO $ getEnv "HOME"
   soc <- io $ getEnv "NOTIFY_SOCKET"
   trace $ show soc
@@ -196,6 +196,7 @@ getXorg = catchStdout "r.xorg"
 
 main :: IO ()
 main = do
+  spawn "/usr/bin/xsetroot -cursor_name left_ptr"
   dpi <- getXorg "-d"
   h <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
   xmonad $ ewmh myCfg { logHook = myLogHook h

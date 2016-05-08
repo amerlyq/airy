@@ -5,8 +5,7 @@ source ~/.shell/func.d/cfgsetup
 link -sct /etc/X11 Xwrapper.config
 usvc_activate -e \
   {demons,main,wm}.target \
-  xorg.{socket,service,target} \
-  xinitrc.service
+  xorg.{socket,service,target}
 
 # Start user instance right after boot and keep beside sessions
 # USE:(to logoff) loginctl terminate-user "${USER:?}"
