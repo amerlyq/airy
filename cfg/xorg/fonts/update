@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+fndir=~/.local/share/fonts
+
+mkfontscale "$fndir"
+mkfontdir "$fndir"
+fc-cache -vf "$fndir"
+# fc-cache -fs >/dev/null

@@ -6,10 +6,21 @@ PartOf=xorg.target
 [Service]
 Type=simple
 SuccessExitStatus=0 1
-# SIGKILL
 # BAD: ExecStartPre=/usr/bin/systemctl --user set-environment DISPLAY=:0
 ExecStart=/usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -noreset -keeptty -verbose 2 -dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25
-# BAD:(not executed at all? but it's simple...)
+# BAD:(not executed at all? but it's Type=simple...)
 ExecStartPost=-/usr/bin/dbus-update-activation-environment DISPLAY=${DISPLAY}
 # XAUTHORITY
 # ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY
+
+# SEE: https://alan-mushi.github.io/2014/10/26/execute-an-interactive-script-at-boot-with-systemd.html
+# TRY: to emulate 'exec into tty'
+# BAD: because occupies tty before main.target complete
+# MAYBE: don't work with socket-activated
+# StandardInput=tty
+# MAYBE: fails because xorg launched and occupied tty earlier then 's.r main.target' returns
+# StandardInput=tty-force
+# TTYPath=/dev/tty${XDG_VTNR}
+# TTYReset=yes
+# TTYVHangup=yes
+# TTYVTDisallocate=no

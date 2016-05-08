@@ -1,4 +1,5 @@
 -- vim: ts=2:sw=2:sts=2
+{-# LANGUAGE ScopedTypeVariables #-}
 module Main (main) where
 
 ---- Std
@@ -6,8 +7,11 @@ import Control.Monad (when)
 import Data.List     (isPrefixOf)
 import Data.Ratio    ((%))
 import Data.Default  (def)
+import System.Directory     (doesFileExist)
 import System.IO
+import System.IO.Error      (IOError)
 -- import System.IO.Unsafe     (unsafePerformIO)
+import Control.Exception    (handle)
 import System.Environment   (getEnv)
 import System.Posix.Process (getProcessID)
 
@@ -124,7 +128,7 @@ myLayout = smartBorders
     $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
-    skLayer = gridIM (1%7) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
+    skLayer = gridIM (1%6) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
     tiled   = ResizableTall nmaster delta ratio []
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
@@ -197,8 +201,23 @@ getXorg = catchStdout "r.xorg"
 main :: IO ()
 main = do
   spawn "/usr/bin/xsetroot -cursor_name left_ptr"
+  -- USE: Maybe Exception
+  -- handle (\(e :: IOException) -> print e >> return Nothing) $ do
+  --     h <- openFile "/some/path" ReadMode
+  --     return (Just h)
   dpi <- getXorg "-d"
-  h <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
+
+  xdg <- handle (\(e :: IOError) -> return "/run/user/1000") $ getEnv "XDG_RUNTIME_DIR"
+  let fifoName = xdg ++ "/xmobar/wm"
+  barExists <- doesFileExist fifoName
+  h <- if barExists
+    then openBinaryFile fifoName WriteMode
+    else spawnPipe "xmobar ~/.xmonad/xmobarrc"
+  hSetBuffering h LineBuffering
+
   xmonad $ ewmh myCfg { logHook = myLogHook h
   , borderWidth = fromIntegral $ round (dpi / 60)
   }
+
+  -- CHECK: is really necessary?
+  hClose h

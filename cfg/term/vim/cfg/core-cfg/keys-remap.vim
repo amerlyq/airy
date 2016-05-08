@@ -113,6 +113,7 @@ nnoremap <unique> <PageDown> <C-D>
 " noremap <unique><expr> <C-y> (line("w0") <= 1         ? "k" : "3\<C-y>")
 
 " Vertical line motions for wrapped text
+" BUG: 'showcmd' shows 'j' or 'gj' in haskell -- MAYBE au CursorMoved?
 noremap <unique><silent><expr> j v:count ? 'j' : 'gj'
 noremap <unique><silent><expr> k v:count ? 'k' : 'gk'
 noremap <unique><silent> gj j

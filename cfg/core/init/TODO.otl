@@ -15,6 +15,8 @@ USE:
 		systemctl --user isolate xorg[.target]
 
 DEBUG
+	SEE existing issues
+		https://github.com/systemd/systemd/blob/master/TODO
 	Show dependency
 		systemctl --user show -p Requires,Wants,Requisite,BindsTo,PartOf,Before,After main.target
 	> https://fedoraproject.org/wiki/How_to_debug_Systemd_problems

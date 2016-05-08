@@ -1,0 +1,9 @@
+[Unit]
+Description=Log Traffic
+DefaultDependencies=no
+After=default.target
+Before=shutdown.target poweroff.target reboot.target halt.target
+Conflicts=main.target
+
+[Install]
+RequiredBy=shutdown.target poweroff.target reboot.target halt.target

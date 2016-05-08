@@ -96,6 +96,11 @@ else
     [[ -f "$queue" ]] || cp -vT "$mods" "$queue"
 fi
 
+if cfgOpt u && [[ -d ~/.config/systemd/user ]]; then
+    echo "N: clean systemd user units"
+    rm -rf ~/.config/systemd/user/*
+fi
+
 # ======================================================================
 # EXPL: -m (in main 'setup') forces single thread execution
 run(){ if [[ -f $1 ]]; then "$@" $(cfgOpt m || echo -m); else echo "(no ${1##*/})"; fi; }

@@ -77,3 +77,5 @@ myLogHook h = do
   historyHook
   copies <- wsContainingCopies
   io . hPutStrLn h =<< myStateLogger copies
+  -- USE: to disable writing status when xmobar not launched
+  -- io . hPutStrLn h =<< myStateLogger { ppOutput = \s -> return () } copies

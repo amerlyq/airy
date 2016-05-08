@@ -1,0 +1,14 @@
+[Unit]
+Description=Status Bar Socket
+PartOf=wm.target
+
+[Socket]
+RuntimeDirectory=%P
+RemoveOnStop=true
+ListenFIFO=%t/%P/wm
+# BUG: can't write from xmonad/bash?
+# DirectoryMode=0700
+# SocketMode=0660
+
+[Install]
+WantedBy=wm.target

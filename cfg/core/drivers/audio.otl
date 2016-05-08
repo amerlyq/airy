@@ -2,6 +2,8 @@ Dolby setup
 	SEE http://www.johannes-bauer.com/linux/dolby/
 
 High pitch sound snd_intel_hda
+	$ cat /proc/bus/input/devices | grep -i name
+	: N: Name="HDA Intel PCH Headphone"
 	$ lspci -k G audio
 	: Intel Corporation Sunrise Point-H HD Audio
 	$ aplay -l
@@ -39,6 +41,25 @@ High pitch sound snd_intel_hda
 	TRY
 		> https://pappp.net/?p=1499
 		sudo XAUTHORITY=/home/amer/.Xauthority hdajackretask
+
+	Static noise
+		: http://askubuntu.com/questions/292786/static-background-noise-while-using-new-headset
+		/etc/pulse/default.pa
+		: load-module module-udev-detect tsched=0  # ADD: tshed=0
+		: # load-module module-suspend-on-idle     # comment it
+
+	CHECK:
+		Audio by ICEpower | Bang & Olufsen Technology
+		: Seems like it's tech mark for speakers.
+		: ASUS N73jq : options snd-hda-intel model=eeepc-p901
+
+	MAYBE:
+		? Problem from alsa-lib package
+			: why it called "alternative implementation"
+		? Need alsa-oss
+
+	SEE
+		http://xps13-9333.appspot.com/#background_noise
 
 
 INFO

@@ -1,13 +1,14 @@
 [Unit]
 Description=Tmux Server
 Documentation=man:tmux(1)
+PartOf=demons.target
 # After=gpg-agent.service
 
 [Service]
 Type=forking
 # THINK:CHG? use /bin/sh to reduce startup time? '-l' for login?
-ExecStart=/usr/bin/tmux start-server ';' new-session -d -s %u $SHELL
-ExecStop=-/usr/bin/tmux kill-server
+ExecStart=/usr/bin/tmux start-server ';' new-session -d -s %u $SHELL -l
+ExecStop=/usr/bin/tmux kill-server
 # EnvironmentFile=/tmp/gpg-agent-info
 Restart=always
 

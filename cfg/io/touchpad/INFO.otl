@@ -3,9 +3,10 @@ SEE
 
 First, know your device:
 	: and there are will be names of other buttons and devices
-	cat /proc/bus/input/devices |grep -i name
-	dmesg |grep input
+	cat /proc/bus/input/devices | grep -i name
+	dmesg | grep input
 	xinput list
+	xinput --list-props "..."
 
 synclient
 	: changes on the fly, but not permanent -- useful for dynamic scripts

@@ -22,6 +22,7 @@ if [[ ! ($TMUX||$VIM||$EMACS) && $UID > 0 && $XDG_VTNR == 1
   systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
   systemctl --user import-environment XDG_VTNR PATH TMPDIR EDITOR PAGER
   # TODO:FIND: how to 'exec' into main target
+  # SEE https://alan-mushi.github.io/2014/10/26/execute-an-interactive-script-at-boot-with-systemd.html
   setopt norcs  # Skip loading of all subsequent rc files
   systemctl --user start main.target
 fi

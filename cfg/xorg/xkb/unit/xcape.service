@@ -6,12 +6,11 @@ PartOf=main.target
 Before=main.target
 
 [Service]
-ExecStartPre=/bin/sh -c 'pkill -x xcape; true'
-ExecStart=/bin/sh -c '/usr/bin/xcape -d -t 250 -e "\
-    ISO_Level3_Shift=Super_R;\
-    Overlay1_Enable=Multi_key\
-    " >/dev/null'
-ExecStop=/usr/bin/pkill -x xcape
+ExecStartPre=/bin/sh -c 'pkill -x xcape; sleep 2'
+# BAD: splitting quoted expression into multiline
+ExecStart=/usr/bin/xcape -d -t 250 -e "ISO_Level3_Shift=Super_R;Overlay1_Enable=Multi_key"
+ExecStop=/usr/bin/kill $MAINPID
+StandardOutput=null
 Restart=always
 RestartSec=1
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Meanings of exit codes:
 # code | meaning    | action of ranger
@@ -53,6 +53,10 @@ dump() { /bin/echo "$output"; }
 # a common post-processing function used after most commands
 trim() { head -n "$maxln"; }
 
+# TODO: replace by traps to simplify processing
+# ALSO: try chain processing to produce more reach output by more long time commands
+# BUT: not each command (like EXIF) needs 'trim'
+# CHECK: minimize disk io
 try() {
     # (sleep 3 && echo hi && kill $$ >/dev/null 2>&1) & disown
     timeout --kill-after 5 --foreground 3 $@ | head -n "$maxln"

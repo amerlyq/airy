@@ -1,6 +1,6 @@
 [Unit]
 Description=Xorg Desktop Environment
-After=xorg.target
-Wants=wm.target
-After=wm.target
+PartOf=default.target
+After=default.target wm.target
 AllowIsolate=true
+# Conflicts=shutdown.target reboot.target halt.target

@@ -9,7 +9,7 @@ link -t "$lib/Config/Amer" ./cfg/*
 link -t "$lib/Util/Amer"   ./ext/*
 
 usvc_activate -e xmonad.service try.service
-# usvc_activate -e {xmonad,xmobar}.service
+usvc_activate -e xmobar.{service,socket}
 
 ### GENS ###
 if cfgOpt u; then

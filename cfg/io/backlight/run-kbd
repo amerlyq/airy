@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+val=${1:-0}
+max=$(( $(</sys/class/leds/asus::kbd_backlight/max_brightness) ))
+case $val
+in [0-$max]) echo "$val" | sudo tee /sys/class/leds/asus::kbd_backlight/brightness
+;; *) echo "Wrong value: '$val'. Use: [0-$max]."; exit 1
+esac

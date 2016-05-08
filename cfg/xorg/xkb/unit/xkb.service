@@ -1,8 +1,8 @@
 [Unit]
 Description=Xorg Keyboard Layout
 Requires=xorg.target
-PartOf=xorg.target
 After=xorg.target
+PartOf=xorg.target
 ConditionFileNotEmpty=%h/.cache/airy/keylayout.xkm
 # OR ExecStart=-/... to suppress warnings
 
@@ -10,13 +10,16 @@ ConditionFileNotEmpty=%h/.cache/airy/keylayout.xkm
 # CHECK:BUG: oneshot is not restarted on 'start main.target'?
 Type=oneshot
 RemainAfterExit=yes
-# BUG: ExecStart=/usr/bin/xkbcomp %h/.cache/airy/keylayout.xkm ${DISPLAY}
-# Environment=DISPLAY=:0
-ExecStart=/bin/sh -c r.xkb-load
-# BUG: drops layout even for :1
-# ExecStop=/usr/bin/setxkbmap -option ""
+ExecStartPre=/bin/sleep 1
+# BUG: hangs when 'xkbcomp' launched directly
+ExecStart=/usr/bin/xkbcomp %h/.cache/airy/keylayout.xkm ${DISPLAY}
+# ExecStart=/bin/sh -c '/usr/bin/xkbcomp %h/.cache/airy/keylayout.xkm ${DISPLAY}'
+# ExecStart=/bin/sh -c r.xkb-load
+
+# BAD?(don't use it) -- fails on shutdown
+# BUG:CHECK: drops layout even for :1
+# ExecStop=/usr/bin/setxkbmap -display ${DISPLAY} -option ""
 
 [Install]
-# MAYBE: Impossible to be part of {xorg,wm}.target?
-# CHECK: r.init-graph
+# MAYBE: Impossible to be part of {xorg,wm}.target? CHECK: r.init-graph
 WantedBy=xorg.target
