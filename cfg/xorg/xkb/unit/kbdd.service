@@ -16,6 +16,7 @@ ExecStart=/usr/bin/kbdd --nodaemon
 ExecStop=/usr/bin/pkill -x kbdd
 Restart=always
 RestartSec=1
+TimeoutStopSec=1
 
 [Install]
 # Alias=dbus-ru.gentoo.KbddService.service

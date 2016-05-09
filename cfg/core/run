@@ -18,13 +18,13 @@ else
   sys_logout(){ r.wm quit-wm; }
 fi
 
-# TODO: use ctl.hs to query windows list from xmonad
-no_windows(){ r.wm is-empty; }
-
 if running_X; then
   confirm(){ [[ $(printf "yes\nno\n" | dmenu -p "$1?" -fn monospace-10) == yes ]]; }
+  # TODO: use ctl.hs to query windows list from xmonad
+  no_windows(){ r.wm is-empty; }
 else
   confirm(){ read -p "$1? ([y]es/[N]o): " a; [[ ${a,,} =~ ^y(es)?$ ]]; }
+  no_windows(){ return 0; }
 fi
 
 # TODO: add force shutdown, ignoring unpushed commits

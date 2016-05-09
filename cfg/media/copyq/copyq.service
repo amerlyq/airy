@@ -1,7 +1,7 @@
 [Unit]
 Description=Util - %P
 Requires=wm.target
-After=wm.target
+After=home.mount wm.target
 PartOf=main.target
 Before=main.target
 
@@ -13,6 +13,7 @@ ExecStart=/usr/bin/copyq
 ExecStop=/usr/bin/copyq exit
 Restart=always
 RestartSec=3
+TimeoutStopSec=3
 
 [Install]
 WantedBy=main.target

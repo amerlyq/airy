@@ -9,10 +9,11 @@ Before=main.target
 ExecStartPre=/bin/sh -c 'pkill -x xcape; sleep 2'
 # BAD: splitting quoted expression into multiline
 ExecStart=/usr/bin/xcape -d -t 250 -e "ISO_Level3_Shift=Super_R;Overlay1_Enable=Multi_key"
-ExecStop=/usr/bin/kill $MAINPID
+ExecStop=/usr/bin/kill -SIGKILL $MAINPID
 StandardOutput=null
 Restart=always
 RestartSec=1
+TimeoutStopSec=1
 
 [Install]
 WantedBy=main.target
