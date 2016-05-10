@@ -14,7 +14,9 @@ dir=$PWD
 unset ismounted && while read line; do
     [[ ${dir#$line} == $dir ]] || ismounted=1
 done < <(awk '/^\//{print$1}' /etc/schroot/default/fstab)
-[[ $ismounted || -d ${chroot}${dir} ]] || dir=/cryptfs/workspace
+if ((!ismounted)) && [[ ! -d ${chroot}${dir} ]]; then
+  [[ -d $CURR_DIR_WORK ]] && dir=${CURR_DIR_WORK:?} || dir=$HOME
+fi
 
 # EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
 # TODO: use ZSH in chroot if available [[ -x ${chroot}$SHELL ]]

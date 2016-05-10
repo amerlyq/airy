@@ -84,8 +84,9 @@ myStartupHook = do
   spawn $ "systemd-notify --ready --pid=" ++ show pid
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
   checkKeymap myCfg myKeys
+  -- BUG: stopped to work?
   curr <- gets (W.currentTag . windowset)
-  when (curr == head MyWksp.all) $
+  when (curr == head MyWksp.all || curr == "PI") $
     windows . W.view $ MyWksp.primary !! 1
 
 

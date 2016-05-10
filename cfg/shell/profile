@@ -15,11 +15,12 @@ CURR_DIR_PKG=${CURR_DIR_PKG:-$CURR_DIR_CACHE/pkg}
 CURR_DIR_HUB=~/hub
 CURR_DIR_SYNC=~/synchro
 CURR_DIR_PRF=~/.cache/airy/prf
+CURR_DIR_WORK=/home/work
 
 ### Chroots ###
 CURR_DIR_CHROOT=/home/chroot
 CURR_CHROOTS=( )        # USE: xenial_amd64, wily_amd64, trusty_i386, lucid_i386
-CURR_CHROOT_MOUNTS=( )  # USE: /cryptfs /home/work
+CURR_CHROOT_MOUNTS=( )  # USE: /cryptfs /home/work OR ${CURR_DIR_WORK:?}
 CURR_CHROOT_EVAL=''
 
 

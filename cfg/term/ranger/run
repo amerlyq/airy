@@ -10,23 +10,20 @@ then echo "Err: install 'ranger' to use it"; return 1; fi
 # Don't allow to launch chain of rangers inside shells of other rangers
 [[ -z $RANGER_LEVEL ]] || exit
 
+# No need because it sourced?
+# trap "rm -f -- '$_ranger_tmp' > /dev/null" EXIT
+_ranger_tmp=${TMPDIR:-/tmp}/ranger_cwdir
+
 # FIXED: launch even inside terms w/o color support
 # export TERM=xterm-256color
 
-_ranger_run(){
-  # for rifle when open_with -t'
-  export TERMCMD='r.t'
-  # speed up ranger start time
-  export RANGER_LOAD_DEFAULT_RC=FALSE
-  _ranger_tmp=${TMPDIR:-/tmp}/ranger_cwdir
-  # No need because it sourced?
-  # trap "rm -f -- '$_ranger_tmp' > /dev/null" EXIT
+# TERMCMD -- for rifle when open_with -t'
+# .._RC -- speed up ranger start time
+TERMCMD='r.t' RANGER_LOAD_DEFAULT_RC=FALSE \
   ranger --choosedir="$_ranger_tmp" "${@:-$PWD}"
-}
 
 # Automatically change the directory in bash to the last visited one
 # after ranger quits. To undo the effect of this function,
 # you can type "cd -" to return to the original directory.
-(_ranger_run)
 [[ ! -f $_ranger_tmp ]] || dir=$(cat -- "$_ranger_tmp")
 [[ $dir == $PWD || ! -d $dir ]] || cd -- "$dir"

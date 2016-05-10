@@ -10,6 +10,5 @@ if cfgOpt u; then
   svc_disable 'updatedb'
   # svc_disable 'updatedb.timer'
   # MAYBE:BETTER? simply fix /etc/updatedb.conf
-  # Gen db for 'locate'
-  fork_m sudo updatedb --add-prunepaths /cryptfs
+  fork_m ./update
 fi

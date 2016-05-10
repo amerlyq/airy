@@ -2,7 +2,7 @@
 source ~/.shell/func.d/cfgsetup
 
 # http://linux.die.net/man/8/tftpd
-dir=${CURR_DIR_TFTP:-/cryptfs/tftpboot}
+dir=${CURR_DIR_TFTP:-${CURR_DIR_WORK:?}/tftpboot}
 
 if cfgOpt u && [[ -d $dir ]]; then
     add_sysuser tftp

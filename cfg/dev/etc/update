@@ -1,0 +1,6 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+# Gen db for 'locate'
+[[ -z $CURR_DIR_WORK ]] || args=( --add-prunepaths ${CURR_DIR_WORK:?} )
+sudo updatedb "${args[@]}"
