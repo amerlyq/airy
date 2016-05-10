@@ -6,5 +6,5 @@ After=xmonad.service
 PartOf=wm.target
 
 [Service]
-ExecStart=/home/amer/.cabal/bin/xmobar %h/.xmonad/xmobarrc
+ExecStart=/bin/sh -c 'exec %h/.cabal/bin/xmobar %h/.xmonad/xmobarrc'
 StandardInput=socket
