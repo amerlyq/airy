@@ -1,0 +1,27 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+dst=~/.imapfilter/acc.lua
+
+wopt(){ printf '%s\n' "$*" >> "$dst"; }
+wacc(){ local id=${1:?} user=${2:?} host=${3:?}
+cat>> "$dst" <<EOT
+table.insert(accs, '$id')
+$id = IMAP {
+  server = '$host',
+  username = '$user',
+  password = get_acc_passwd('$user'),
+  ssl = 'tls1.2'
+  -- port = 993
+}
+EOT
+}
+# DEPRECATED:(insecure) ssl = 'ssl3' USE: tls1.2
+
+> "$dst"
+wopt "accs = {}"
+
+# for creds in "${MAIL_CREDS[@]:?}"; do
+#   wacc ${creds:?}
+# done
+wacc ${MAIL_CREDS[1]:?}  # TEMP:REM

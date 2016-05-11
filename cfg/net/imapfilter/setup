@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+### LINKS ###
+dir=~/.imapfilter
+link -t "$dir" config.lua
+chmod 700 "$dir"
+
+### GENS ###
+./acc.gen
+# USE:CHECK: lua config.lua
