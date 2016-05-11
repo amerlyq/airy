@@ -55,7 +55,8 @@ if distro arch; then
       if ! systemctl --user is-enabled "$f" >/dev/null
       then [[ ! $h =~ e ]] || systemctl --user enable "$f"
       elif [[ ! $h =~ e ]]; then systemctl --user disable "$f"
-      elif cfgOpt f; then systemctl --user reenable "$f"; fi
+      elif cfgOpt f; then systemctl --user reenable "$f"
+      fi 2>&1
       [[ ! $h =~ r ]] || systemctl --user start "$f"
     done
   }

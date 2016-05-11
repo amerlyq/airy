@@ -1,0 +1,59 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+dst=${1:-$HOME/.mbsyncrc}
+mid=${2:?No mail id}
+muser=${3:?No mail account}
+mhost=${4:?No mail host}
+mpath=${5:-${CURR_DIR_WORK:?}/mail/$mid}
+
+wprf(){ printf "$*" >> "$dst"; }
+wopt(){ printf '%s %s\n' "${1:?}" "${2:?}" >> "$dst"; }
+
+# NOTE:ATTENTION:(syntax)
+#   Section starts from keyword and ends at empty line/EOF
+
+mkdir -p "$mpath"
+wopt IMAPAccount $mid
+wopt Host $mhost
+wopt User $muser
+
+# Pass *****
+# To store the password in an encrypted file use PassCmd instead of Pass
+# PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.mailpass.gpg"
+# WARNING: can have trouble to identify: muser != work_mail
+wopt PassCmd "\"~/.mutt/gpg-passwd ${muser:?}\""
+
+# Use SSL
+wopt SSLType IMAPS
+# The following line should work. If get certificate errors, uncomment the two following lines and read the "Troubleshooting" section.
+wopt CertificateFile /etc/ssl/certs/ca-certificates.crt
+#CertificateFile ~/.cert/imap.gmail.com.pem
+#CertificateFile ~/.cert/Equifax_Secure_CA.pem
+wprf '\n'
+
+wopt IMAPStore ${mid:?}-remote
+wopt Account $mid
+wprf '\n'
+
+wopt MaildirStore ${mid:?}-local
+wopt Path  "$mpath/"  # The trailing "/" is important
+wopt Inbox "$mpath/Inbox"
+wprf '\n'
+
+wopt Channel $mid
+wopt Master :$mid-remote:
+wopt Slave  :$mid-local:
+
+# Exclude everything under the internal [Gmail] folder, except the interesting folders
+# wopt Patterns '* ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail"'
+# Or include everything
+wopt Patterns '*'
+
+# Automatically create missing mailboxes, both locally and on the server
+wopt Create Both
+# Save the synchronization state files in the relevant directory
+wopt SyncState '*'
+wprf '\n# ----------\n\n'
+
+echo "W: $dst ($mid)"

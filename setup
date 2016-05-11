@@ -52,6 +52,8 @@ pretty() { sed -r "
   /(C|W|Fix):\s.*/s//$C13&$CR/
   /(I|N):\s.*/s//$C6&$CR/
   /.*\s(-> L\s|::\/.*->).*/s//$C4&$CR/
+  /~\/\.config\/systemd\/user\//s///g
+  /^(\s*)Created symlink from (.*) to (.*)\.$/s//\1$C9@@-\2 -> \3$CR/
   /.*\s-> C\s.*/s//$C3&$CR/
   /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
 ";}
@@ -96,7 +98,7 @@ else
     [[ -f "$queue" ]] || cp -vT "$mods" "$queue"
 fi
 
-if cfgOpt u && [[ -d ~/.config/systemd/user ]]; then
+if cfgOpt u && ((!$#)) && [[ -d ~/.config/systemd/user ]]; then
     echo "N: clean systemd user units"
     rm -rf ~/.config/systemd/user/*
 fi

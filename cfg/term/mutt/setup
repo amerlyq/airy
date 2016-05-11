@@ -1,9 +1,20 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
 link "$PWD" ~/.mutt
+# CHECK: Necessary?
+mail="${CURR_DIR_WORK:?}/mail"
+mkdir -p "$mail"
+link "$mail" ~/.mail
 
 ### GENS ###
-THEME=$THEME ./theme-solarized.gen
+THEME=$THEME ./gen/theme-solarized.gen
+
+dst=~/.mbsyncrc
+> "$dst"
+for creds in "${MAIL_CREDS[@]:?}"
+do ./gen/mbsyncrc.gen "$dst" ${creds:?}; done
+
+# USAGE: mbsync '$mid' OR mbsync -a
