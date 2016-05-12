@@ -1,0 +1,88 @@
+::-webkit-scrollbar { width: 0px; height: 0px; }
+
+/* SEE: http://www.w3schools.com/cssref/css_selectors.asp */
+
+/* http://www-archive.mozilla.org/unix/customizing.html */
+*:not(img) {
+    /* font-size: 1.04em; */
+    background-color: #101010 !important;
+}
+
+/* code,code>* { */
+/*     /1* white-space: pre; *1/ */
+/*     /1* margin-top: -1.00em; *1/ */
+/*     /1* display: block; *1/ */
+/*     font-size: 1.04em !important; */
+/*     font-family: bold !important; */
+/*     color: #ffffff !important; */
+/* } */
+
+div,pre,textarea,body,input,td,tr,p,strong {
+    background-image: none !important;
+    color: #bbccbb !important;
+}
+
+h1,h2,h3,h4,button {
+    color: #b8ddea !important;
+}
+
+a {
+    color: #70e070 !important;
+}
+a:hover,a:focus {
+    color: #7070e0 !important;
+}
+a:visited {
+    color: #e070b0 !important;
+}
+
+img {
+    opacity: .7;
+}
+img:hover {
+    opacity: 1;
+}
+
+/* ._hintLabel { */
+/*     -webkit-transform:translate(-4px,-4px); */
+/*     position: absolute; */
+/*     z-index: 100000; */
+/*     text-transform: uppercase !important; */
+/*     background-color: #e0e070 !important; */
+/*     font:bold 1.2em monospace !important; */
+/*     color: #000 !important; */
+/*     background-color: #000; */
+/*     margin: 0; */
+/*     padding: 0px 1px; */
+/*     border: 1px solid #444; */
+/*     opacity: 0.7; */
+/* } */
+/* ._hintElem._hintFocus { */
+/*     color: #f0f070 !important; */
+/* } */
+/* ._hintElem._hintFocus img { */
+/*     opacity: 1; */
+/* } */
+
+/* Repair unreadable input fields */
+input:not(.urlbar-input):not(.textbox-input):not(.form-control):not([type='checkbox']) {
+    -moz-appearance: none !important;
+    background-color: white;
+    color: black;
+}
+
+#downloads-indicator-counter {
+    color: white;
+}
+
+textarea {
+    -moz-appearance: none !important;
+    background-color: white;
+    color: black;
+}
+
+select {
+    -moz-appearance: none !important;
+    background-color: white;
+    color: black;
+}

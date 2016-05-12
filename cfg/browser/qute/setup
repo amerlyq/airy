@@ -4,8 +4,12 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link -t ~/.config/qutebrowser \
-  qutebrowser.conf keys.conf
+  qutebrowser.conf keys.conf theme
 
-if cfgOpt r || [[ ! -f ~/.local/share/qutebrowser/blocked-hosts ]]; then
-  if running_X; then qutebrowser :adblock-update & fi
-fi
+### THEME ###
+./run -t ${THEME:?}
+
+### UPDATE ###
+dst=~/.local/share/qutebrowser/blocked-hosts
+if running_X && (cfgOpt r || [[ ! -f $dst ]])
+then qutebrowser :adblock-update & fi

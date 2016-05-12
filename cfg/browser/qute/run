@@ -4,7 +4,7 @@ running_X || exec r.bt
 
 log=${TMPDIR:-/tmp}/qute/$(date +%Y%m%d_%H%M%S).log
 mkdir -p "${log%/*}"
-exec > $log 2>&1
+# exec > $log 2>&1
 
 export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
 
@@ -14,10 +14,25 @@ dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
 }
 run(){ ((!$#)) && r.n Browser "No args" || exec qutebrowser "$@"; }
 
+chtheme(){ local dir=~/.config/qutebrowser
+  local n L t=${1:+${1}.css}
+  if [[ -z $t ]]; then t=$(readlink -m "$dir/style.css")
+    mapfile -t L < <(find -L "$dir/theme" \
+      -type f -name '*.css' -printf '%f\n' | sort -n)
+    for((i=0; i<${#L[@]:?}; i++)); do
+      [[ ! $t =~ ${L[$i]}$ ]] || n=$((i+1))
+    done
+    n=$((n < ${#L[@]} ? n : 0))
+    t=${L[$n]}
+  fi
+  linkcp "$dir/theme/${t:?}" "$dir/style.css"
+}
+
 case "$1"
 in -p) shift; run "$(xsel -ob)"
 ;; -h) shift; run "$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)"
 # ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"
 ;; -s) shift; exec qutebrowser ':allow-javascript=true' "$@"
+;; -t) shift; chtheme "$@"
 ;;  *) exec qutebrowser "$@"
 ;; esac
