@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/system
+
+# THINK: extract into bash function lib?
+# OR into systemd env file to source by choosen prs?
+export GDK_SCALE=$(r.xorg -s)
+export GDK_DPI_SCALE=$(awk "BEGIN{print(1/$GDK_SCALE)}")
+
+usvc_run 'pidgin.service' exec pidgin

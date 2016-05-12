@@ -52,7 +52,7 @@ if distro arch; then
       [[ -f $d/$f ]] || d=${d%/*} && [[ -f $d/$f ]] || die 1 "Not found '$f'"
       # ALT:CHECK:(faster startup) /etc/systemd/user
       link -ct "$dst" "$d/$f" && systemctl --user daemon-reload
-      if ! systemctl --user is-enabled "$f" >/dev/null
+      if ! systemctl --user is-enabled "$f" &>/dev/null
       then [[ ! $h =~ e ]] || systemctl --user enable "$f"
       elif [[ ! $h =~ e ]]; then systemctl --user disable "$f"
       elif cfgOpt f; then systemctl --user reenable "$f"
