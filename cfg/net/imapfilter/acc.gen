@@ -21,7 +21,6 @@ EOT
 > "$dst"
 wopt "accs = {}"
 
-# for creds in "${MAIL_CREDS[@]:?}"; do
-#   wacc ${creds:?}
-# done
-wacc ${MAIL_CREDS[1]:?}  # TEMP:REM
+for creds in "${MAIL_CREDS[@]}"; do
+  wacc ${creds:?}
+done

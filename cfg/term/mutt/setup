@@ -14,7 +14,7 @@ THEME=$THEME ./gen/theme-solarized.gen
 
 dst=~/.mbsyncrc
 > "$dst"
-for creds in "${MAIL_CREDS[@]:?}"
+for creds in "${MAIL_CREDS[@]}"
 do ./gen/mbsyncrc.gen "$dst" ${creds:?}; done
 
 # USAGE: mbsync '$mid' OR mbsync -a
