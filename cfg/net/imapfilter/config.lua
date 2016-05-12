@@ -40,10 +40,18 @@ function filter(acc, m, nm, dst)
   m:contain_field('sender', nm):move_messages(dst)
 end
 
-function mv_subj(acc, m, patt, dst)
-  local lst = m:match_subject(patt)
-  lst:move_messages(acc[dst])
+function mv_subj(acc, m, dst, patt)
+  m:match_subject(patt):move_messages(acc[dst])
 end
+
+-- TEMP:FIXED: until I fix imapfilter code to support base64 match_subject
+-- SEE http://lua-users.org/wiki/BaseSixtyFour
+function mv_subj_any(acc, m, dst, tbl)
+  for i, s in pairs(tbl) do
+    m:contain_subject(s):move_messages(acc[dst])
+  end
+end
+
 
 -- function deleteold(m, days)
 --   todelete=m:is_older(days)-mine(m)
@@ -56,10 +64,12 @@ options.create = false    -- create mailbox only if received hint from server
 options.starttls = true   -- prefer tls over ssl
 options.subscribe = true  -- set new mailboxes as active to be recognized
 options.timeout = 30      -- wait server response
+-- options.charset = 'UTF-8'
 
 os.source('acc.lua')
 ---------------------------------------------
 load('acc = ' .. accs[1])()  -- TEMP:REM
+-- DEV: ignore inexistent files
 os.source('acc/'..accs[1]..'.lua')
 
 -- USE:DEBUG: get and print available mailboxes and folders

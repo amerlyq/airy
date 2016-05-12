@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-# TODO: use -e only if $cmd not empty
 
 # Get both cwd and opened files (to sent in ranger):
 #   lsof -p 10006  # need filter out libraries
 
 # --selectfile=<current_working_file>
 
+# TODO: use '$$' if run in interactive terminal
 # For current file: $pid=$$
 sub active_pid {
     my $wid = `xprop -root -notype _NET_ACTIVE_WINDOW` =~ /(\S+)$/;
@@ -15,7 +15,10 @@ sub active_pid {
 
 sub get_cwd {
     my ($pid, $pwd) = @_;
-    until $pid return $ENV{"HOME"};
+    # until $pid return $ENV{"HOME"};
+    # BUG don't work for 'tmux' sessions
+    # NEED find linked to tmux client shell in session
+    # TRY query imminent program pid from tmux session
     foreach (reverse( qx(pstree -p $pid) =~ m/\((\d+)\)/g )) {
         $pwd = readlink("/proc/$_/cwd");
         last if $pwd and ($pwd =~ /^\S+$/);
@@ -23,8 +26,13 @@ sub get_cwd {
     return $pwd;
 }
 
-my @cmd = ("unset RANGER_LEVEL && cd '${\&get_cwd(active_pid())}' && r.ranger");
-my @args = ("r.t", "-e", "$ENV{'SHELL'}", "-ic");
-exec(@args, @cmd);  # unless fork;
+chdir get_cwd(active_pid());
+exec @ARGV;
+
+# TODO: use -e only if $cmd not empty
+# my @cmd = ("cd '${\&get_cwd(active_pid())}' && /usr/bin/env -u RANGER_LEVEL r.ranger");
+# my @args = ("r.t", "-e", "$ENV{'SHELL'}", "-ic");
+# exec(@args, @cmd);  # unless fork;
+
 # DEBUG : "bash", "-c", "printf '$$\n$pr\n$pwd\n' | vim -"
 # BUG(r.t=st): child finished with error '256'

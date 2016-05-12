@@ -29,7 +29,7 @@ main = concat
     , ("C-<Space>", "r.t")  -- WARNING: if broken >> HW problem
     , ("<Return>", "r.t -e r.tmux r.ranger")
     , ("C-<Return>", "r.t -e r.ranger")
-    -- , ("M1-<Space>", "~/.i3/ctl/run-cwd") -- FIXME
+    , ("M1-<Space>", "run-xcwd r.t -e r.tmux")
     ]
   ]
 

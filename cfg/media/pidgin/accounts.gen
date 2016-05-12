@@ -23,7 +23,9 @@ cat >> "$dst" <<EOT
 		<settings>
 			<setting name='auth_plain_in_clear' type='bool'>0</setting>
 			<setting name='custom_smileys' type='bool'>1</setting>
-			<setting name='check-mail' type='bool'>1</setting>
+			<setting name='port' type='int'>5222</setting>
+			<setting name='connect_server' type='string'>talk.google.com</setting>
+			<setting name='check-mail' type='bool'>0</setting>
 			<setting name='connection_security' type='string'>require_tls</setting>
 		</settings>
 $(gaim)
@@ -37,8 +39,8 @@ if [[ -f /usr/lib/purple-2/libskypeweb.so ]]; then
 		<name>${MAIN_SKYPE:?}</name>
 		<alias>me</alias>
 		<settings>
-			<setting name='show-typing-as-icon' type='bool'>0</setting>
 			<setting name='show-typing-as-text' type='bool'>1</setting>
+			<setting name='show-typing-as-icon' type='bool'>0</setting>
 		</settings>
 $(gaim)
 	</account>

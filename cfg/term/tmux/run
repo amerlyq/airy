@@ -7,6 +7,10 @@
 #   printf "\e]777;focus;on\x7"
 # fi
 
+# BUG:
+# $ r.t -e tmux
+# > child finished with error '256'
+
 # Exit session on kill
 name="st-$$"
 trap "tmux kill-session -t $name" INT TERM EXIT
