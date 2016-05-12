@@ -18,13 +18,14 @@ sub dpi {
   return int($px*25.4/$mm + 0.5)
 }
 
-foreach ( qx(xrandr -q) ) {
+my @xout = ( qx(xrandr -q 2>/dev/null) ) or die "\n";
+foreach (@xout) {
   # Only list used monitors, skipping off'ed
   next unless $_ =~ m/^([[:alnum:]-]+) connected (\d+)x(\d+)\+(\d+)\+(\d+) .*? (\d+)mm x (\d+)mm$/;
   push @state, { o=>$1, w=>$2, h=>$3, x=>$4, y=>$5, W=>$6, H=>$7,
     d=>dpi($2,$6), D=>dpi($3,$7), s=>dpi($2,$6)/96 };
-    $state[-1]{'s'} = $state[-1]{'d'} / 96
 }
+
 # TODO: sort keys by output type and place primary as very first
 
 # HACK limit to first output. FIXME DEV general way for multihead.

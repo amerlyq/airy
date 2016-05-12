@@ -86,6 +86,10 @@ mkdir -p ~/aura && cd ~/aura
 git clone https://github.com/$yourname/$reponame
 cd $reponame && ./setup
 ```
+Note, that in case of using Xorg mods, to fully setup system you must run
+setup command inside Xorg session -- because some vars (like dpi)
+impossible to extract from plain console. Therefore on clean system install
+the setup script must be run twice -- in console and then in Xorg.
 
 
 ## Profile ##
@@ -102,9 +106,6 @@ PKG_SKIP=(sql latex nfs tftp skype serial xmind urxvt i3)
 MAIN_NAME="<Full Name>"
 MAIN_MAIL="username@gmail.com"
 MAIN_SKYPE="<username>"
-
-### HW ###
-MAIN_DPI=112
 ```
 
 You can take advantage of bash expansion and compose more complex package set:

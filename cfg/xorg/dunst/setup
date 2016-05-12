@@ -21,7 +21,7 @@ usvc_activate -e dunst.service
 # BUG: external monitor -- different dpi
 fs=$(( (${MAIN_DPI:?} + 5) / 10 ))
 iw=$(( ((${MAIN_DPI:?} +8)/16 +3)/6 * 16 ))
-gw=$(( $(r.xorg -w) * 2/5 ))
+gw=$(( $(r.xorg -w 2>/dev/null||echo 1280) * 2/5 ))
 sed -ri '
   /^(\s+font = \w+).*/s//\1 '$fs'/
   /^(\s+geometry = ")[0-9]+(x.*)/s//\1'$gw'\2/

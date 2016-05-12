@@ -45,7 +45,6 @@ PRIM="${MON[$INDP]}"; unset MON[$INDP];
 
 
 ## Set primary
-#if [ -z "$MAIN_DPI" ]; then MAIN_DPI=96; fi # --dpi $MAIN_DPI
 xrandr --output $PRIM --auto --primary
 echo "$PRIM" >> $FL
 

@@ -19,6 +19,7 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 [[ $THEME_ALLOWED ]] || THEME_ALLOWED='dark|light|lucid|opaque'
 [[ $THEME ]] || THEME=$(<"${CURR_DIR_CACHE:?}/theme") ||:
 [[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=dark
+[[ $MAIN_DPI ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
 
 
 ### LINKS ###
