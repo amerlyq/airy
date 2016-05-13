@@ -31,12 +31,12 @@ xdokey = ("xdotool key --delay 150 super+" ++) . key2xsym
 
 -- xmobar pretty printing source
 myStateLogger copies = dynamicLogString def
-  { ppCurrent = xmobarColor "#fd971f" ""
+  { ppCurrent = xmobarColor "#fd971f" "" . mouse 1 "r.wm M-a"
   -- { ppCurrent = \t -> "<fc=#fd971f,#ffffff>" ++ t ++ "</fc>"
   -- , ppVisible = wrap "(" ")" (xinerama only)
   , ppHidden  = pHidden
   -- , ppHiddenNoWindows = const ""
-  , ppUrgent  = xmobarColor "red" "yellow"
+  , ppUrgent  = \i -> xmobarColor "red" "yellow" (clickws i i)
   -- , ppTitle   = xmobarColor "green"  "" . shorten 40
   -- , ppWsSep   = " "
   , ppSep     = xmobarColor "#fd971f" "" (scrollws " \xe0b1 ") -- separator between elements
@@ -64,10 +64,8 @@ myStateLogger copies = dynamicLogString def
     clickly ly = mouse 1 "r.wm M-n" (mouse 3 "r.wm M-S-n" ly)
     scrollws s = mouse 4 "r.wm 'M-<Backspace>'" (mouse 5 "r.wm 'M-<Tab>'" s)
     -- clickly ly = mouse 1 (xdokey "f") (mouse 3 (xdokey "n") ly)
-    cCopy = xmobarColor "#8888ff" "green"
-    cName = xmobarColor "#aa9988" ""
-    cHidden i s | i `elem` copies = cCopy s
-                | i `elem` MyWksp.named = cName s
+    cHidden i s | i `elem` copies = xmobarColor "#8888ff" "green" s
+                | i `elem` MyWksp.named = xmobarColor "#aa9988" "" s
                 | otherwise = s
     pHidden i | i `elem` MyWksp.all = cHidden i (clickws i i)
               | otherwise = ""

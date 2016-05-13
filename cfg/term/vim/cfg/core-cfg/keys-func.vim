@@ -50,6 +50,8 @@ fun! RedirectOutput(cmd)
   return _
 endf
 command! -bar -range -nargs=+  R  call RedirectOutput(<q-args>)
+command! -bar -range -nargs=+  Rc
+      \ call setreg('+', RedirectOutput(<q-args>), getregtype('+'))
 
 fun! MapFiltered(cmd)
   let _ = RedirectOutput('map '.a:cmd)

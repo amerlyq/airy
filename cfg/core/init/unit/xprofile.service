@@ -1,0 +1,14 @@
+[Unit]
+Description=Xorg Settings
+Requires=xorg.target
+After=xorg.target
+PartOf=xorg.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/bin/sleep 1
+ExecStart=/bin/bash -c 'source ~/.xprofile'
+
+[Install]
+WantedBy=xorg.target

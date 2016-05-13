@@ -27,8 +27,6 @@ fi
 # Merge in defaults and resources
 XINT=/etc/X11/xinit
 # [[ ! -f "$XINT/.Xresources" ]] || xrdb -merge "$XINT/.Xresources"
-[[ ! -f "$HOME/.Xresources" ]] || xrdb -merge "$HOME/.Xresources"
-
 # Start dbus, ... -- populated from packages
 for f in "$XINT/xinitrc.d"/?*; do
     [[ ! -x "$f" ]] || source "$f"; done
