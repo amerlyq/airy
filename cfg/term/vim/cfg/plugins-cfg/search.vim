@@ -1,5 +1,5 @@
 "{{{1 Search/Replace ============================
-if neobundle#tap('ag.vim') "{{{
+if neobundle#tap('agn.vim') "{{{
   " CHG: all real mappings included into 'after/ftplugin/qf.vim'
   let g:ag = {}
   let g:ag.toggle = {'highlight': 0, 'mapping_message': 0}

@@ -3,9 +3,9 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     # pkg_inst "base-devel"  # In conflict with multilibs!
-    pkg_inst -p 'gcc' gcc-multilib
+    pkg_inst -p 'x86_64-pc-linux-gnu-gcc' gcc-multilib
     pkg_inst -f '/usr/lib32/libstdc++.so' lib32-gcc-libs
-    pkg_inst -p 'valgrind' valgrind-multilib
+    pkg_inst -f '/usr/lib/valgrind/callgrind-amd64-linux' valgrind-multilib
     pkg_inst doxygen cppcheck  # C++
     pkg_inst c2hs clisp   # -pr-lang: haskell, lisp
 

@@ -117,6 +117,7 @@ printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
 printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
 
 while read d; do echo ">>> $d <<<"
+    # BUG: some packages (like gcc-multilib) aren't replaced even with -u)
     r_install "$d"
     r_setup "$d"
     sed -i '1d' "$queue"
