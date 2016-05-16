@@ -26,7 +26,7 @@ fi
 # NOTE: If problem with package update, firts update 'archlinux-keyring' pkg
 if cfgOpt i && cfgOpt u && ((!$#)) && [[ ! -f "$queue" ]]; then
     if distro arch; then
-        sudo pacman -Syu  # NOTE: --ignore=firefox
+        sudo pacman -Syu ||: # NOTE: --ignore=firefox
         # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
         # Degrade manually:
         #   pacman -U /var/cache/pacman/pkg/firefox-42.0-3-x86_64.pkg.tar.xz
@@ -53,7 +53,8 @@ pretty() { sed -r "
   /(I|N):\s.*/s//$C6&$CR/
   /.*\s(-> L\s|::\/.*->).*/s//$C4&$CR/
   /~\/\.config\/systemd\/user\//s///g
-  /^(\s*)Created symlink from (.*) to (.*)\.$/s//\1$C9@@-\2 -> \3$CR/
+  /^(\s*)Created symlink from (.*) to (.*)\.$/s//\1@@-\2 -> \3/
+  /^\s*(-> @\s|@@-.*\s->\s).*/s//$C9&$CR/
   /.*\s-> C\s.*/s//$C3&$CR/
   /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
 ";}

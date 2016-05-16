@@ -6,9 +6,9 @@ source ~/.shell/func.d/cfgsetup
 link "$PWD/agignore" ~/.agignore
 
 if cfgOpt u; then
-  # DISABLED: dfl unit don't have prunepaths and hangs on 'activating'
-  svc_disable 'updatedb'
-  # svc_disable 'updatedb.timer'
-  # MAYBE:BETTER? simply fix /etc/updatedb.conf
-  fork_m ./update
+  # Prune work dir -- because it can contain too many src files
+  if ! grep -q "PRUNEPATHS .* ${CURR_DIR_WORK:?}" /etc/updatedb.conf; then
+    sudo sed -ri '/^(PRUNEPATHS = "[^"]+)"/s||\1 '"${CURR_DIR_WORK:?}"'"|' /etc/updatedb.conf
+  fi
+  fork_m sudo updatedb
 fi

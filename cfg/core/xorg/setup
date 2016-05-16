@@ -1,6 +1,5 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
-[[ ${CURR_PROF:?} =~ work ]] || exit
 
 ### LINKS ###
 if cfgOpt u; then
@@ -8,6 +7,6 @@ if cfgOpt u; then
   if [[ $(r.xorg -WH) =~ [0-9]+$'\n'[0-9]+ ]]; then
     f=/etc/X11/xorg.conf.d/90-monitor.conf
     linkcp -sc "${f##*/}" "$f"
-    sudo sed -ri '/^(\s+DisplaySize)\s.*$/s//\1 '"$(r.xorg -WH|xargs)" "$f"
+    sudo sed -ri '/^(\s+DisplaySize)\s.*$/s//\1 '"$(r.xorg -WH|xargs)/" "$f"
   fi
 fi

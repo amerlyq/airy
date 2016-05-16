@@ -4,10 +4,8 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD" ~/.mutt
-# CHECK: Necessary?
-mail="${CURR_DIR_WORK:?}/mail"
-mkdir -p "$mail"
-link "$mail" ~/.mail
+mkdir -p "${CURR_DIR_MAIL:?}"
+[[ $CURR_DIR_MAIL -ef ~/.mail ]] || link "$CURR_DIR_MAIL" ~/.mail
 
 ### GENS ###
 THEME=$THEME ./gen/theme-solarized.gen

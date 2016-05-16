@@ -15,13 +15,7 @@ fi
 if cfgOpt u; then
   ### GENS ###
   ./samba.gen
-  if distro arch; then
-    svc_enable smbd
-    svc_restart smbd
-
-  elif distro ubuntu; then
-      sudo service smbd restart
-  fi
+  svc_activate -er smbd
   # Once Samba has restarted, use this command
   # to check your smb.conf for any syntax errors
   testparm -s >/dev/null

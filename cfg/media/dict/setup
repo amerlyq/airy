@@ -29,8 +29,7 @@ if cfgOpt u ; then
         # pid=$(pgrep dictd) && sudo kill -SIGHUP $pid
     fi
 
-    svc_enable  dictd
-    svc_restart dictd
+    svc_activate -er dictd
   fi
 
     ### GEN ###

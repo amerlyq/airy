@@ -10,7 +10,7 @@ case ${CURR_PROF:?} in
    *) link "$PWD/mpd-own.conf" ~/.mpd/mpd.conf ;;
 esac
 
-usvc_activate -e {mpd,mpd-log}.service
+svc_activate -cue mpd.{socket,service} mpd-log.service
 
 if cfgOpt c || [[ ! -e ~/.mpd/pid ]]; then
     if distro ubuntu; then

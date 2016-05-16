@@ -8,7 +8,7 @@ if distro arch; then
       sudo gpasswd -a $(whoami) bumblebee
       die "!!! Re-login X session or reboot to update changes in Groups"
     fi
-    svc_enable  bumblebeed
+    svc_activate -e bumblebeed
   ;; esac
 
 elif distro ubuntu; then

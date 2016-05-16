@@ -16,7 +16,7 @@ fi
 dst=~/.config/dunst/dunstrc
 link -c dunstrc "$dst"
 
-usvc_activate -e dunst.service
+svc_activate -cue dunst.service
 
 # BUG: external monitor -- different dpi
 fs=$(( (${MAIN_DPI:?} + 5) / 10 ))

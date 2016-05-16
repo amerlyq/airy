@@ -5,8 +5,6 @@ source ~/.shell/func.d/cfgsetup
 ./config.gen
 
 if cfgOpt u; then
-    # http://docs.syncthing.net/users/autostart.html#systemd
-    svc_enable syncthing@$USER
-    svc_enable syncthing-inotify@$USER
-    svc_restart syncthing@$USER
+  # http://docs.syncthing.net/users/autostart.html#systemd
+  svc_activate -er syncthing{,-inotify}@${USER:?}
 fi

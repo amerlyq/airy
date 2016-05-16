@@ -13,12 +13,10 @@ if cfgOpt u && [[ -d $dir ]]; then
 
     if distro arch; then
         link -sc ./config /etc/conf.d/tftpd
-        svc_enable  tftpd
-        svc_restart tftpd
+        svc_activate -er tftpd
 
     elif distro ubuntu; then
         link -sc ./config /etc/default/tftpd-hpa
-        svc_enable  tftpd-hpa
-        svc_restart tftpd-hpa
+        svc_activate -er tftpd-hpa
     fi
 fi
