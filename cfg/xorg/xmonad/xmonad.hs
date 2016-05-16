@@ -13,7 +13,10 @@ import System.IO.Error      (IOError)
 -- import System.IO.Unsafe     (unsafePerformIO)
 import Control.Exception    (handle)
 import System.Environment   (getEnv)
-import System.Posix.Process (getProcessID)
+import System.Process       (readProcessWithExitCode)
+import System.Posix.Process (getProcessID, getParentProcessID, getProcessGroupID)
+import System.Posix.Signals (signalProcess, sigUSR1)
+import System.Exit          (ExitCode(ExitSuccess))
 
 ---- Core
 import XMonad                       -- (float, kill, spawn, refresh, restart, doFloat, workspaces, windows, withFocused, sendMessage, Resize(Shrink, Expand), IncMasterN)
@@ -67,27 +70,44 @@ import XMonad.Config.Amer.Mouse      (myMouseBindings)
 import qualified XMonad.Config.Amer.Workspace as MyWksp
 
 
--- myStartupHook = broadcastMessage $ SetStruts [] [minBound..maxBound]
--- myStartupHook = windows . W.view . (!!1) . workspaces $ myCfg
+-- notifySystemd = do
+--   -- FIXME: skip on non-systemd MAYBE:BUG: one more notify on each --restart
+--   -- NEED: one-time env vars https://www.freedesktop.org/software/systemd/man/sd_notify.html
+--   -- MAYBE: NOTIFY_SOCKET is set automatically when Type=notify?
+--   -- getProcessID >>= \p -> spawn $ "systemd-notify --ready --pid=" ++ show $ liftIO . p
+--   pid  <- liftIO getProcessID
+--   trace $ show pid
+--   -- myHome = unsafePerformIO $ getEnv "HOME"
+--   soc <- io $ getEnv "NOTIFY_SOCKET"
+--   trace $ show soc
+--   spawn $ "systemd-notify --ready --pid=" ++ show pid
+
+notifySystemd :: IO ()
+notifySystemd = do
+  -- (e, _, _) <- readProcessWithExitCode "/usr/bin/systemctl" ["--user", "is-active", "wm.target"] ""
+  -- trace $ show e
+  -- when (e == ExitSuccess) $ return ()
+  ppid <- liftIO getParentProcessID
+  trace $ show ppid
+  pgid <- liftIO getProcessGroupID
+  trace $ show pgid
+  signalProcess sigUSR1 ppid
+
+
+-- ATTENTION: launched twice when /usr/bin/xmonad started
 myStartupHook = do
+  -- broadcastMessage $ SetStruts [] [minBound..maxBound]
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
   setWMName "LG3D"  -- Fixes problems with Java GUI programs
-  -- FIXME: skip on non-systemd MAYBE:BUG: one more notify on each --restart
-  -- NEED: one-time env vars https://www.freedesktop.org/software/systemd/man/sd_notify.html
-  -- MAYBE: NOTIFY_SOCKET is set automatically when Type=notify?
-  -- getProcessID >>= \p -> spawn $ "systemd-notify --ready --pid=" ++ show $ liftIO . p
-  pid <- liftIO getProcessID
-  trace $ show pid
-  -- myHome = unsafePerformIO $ getEnv "HOME"
-  soc <- io $ getEnv "NOTIFY_SOCKET"
-  trace $ show soc
-  spawn $ "systemd-notify --ready --pid=" ++ show pid
+  liftIO notifySystemd
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
-  checkKeymap myCfg myKeys
   -- BUG: stopped to work?
   curr <- gets (W.currentTag . windowset)
   when (curr == head MyWksp.all || curr == "PI") $
     windows . W.view $ MyWksp.primary !! 1
+  liftIO notifySystemd
+  -- NOTE: must be the last
+  checkKeymap myCfg myKeys
 
 
 -- TRY:CHG:(make more clean) def -> XConfig
@@ -201,13 +221,12 @@ getXorg = catchStdout "r.xorg"
 
 main :: IO ()
 main = do
-  spawn "/usr/bin/xsetroot -cursor_name left_ptr"
   -- USE: Maybe Exception
   -- handle (\(e :: IOException) -> print e >> return Nothing) $ do
   --     h <- openFile "/some/path" ReadMode
   --     return (Just h)
-  dpi <- getXorg "-d"
 
+  -- TODO:MOVE: into 'withStatusBar' function (like exists for xmobar)
   xdg <- handle (\(e :: IOError) -> return "/run/user/1000") $ getEnv "XDG_RUNTIME_DIR"
   let fifoName = xdg ++ "/xmobar/wm"
   barExists <- doesFileExist fifoName
@@ -215,6 +234,10 @@ main = do
     then openBinaryFile fifoName WriteMode
     else spawnPipe "xmobar ~/.xmonad/xmobarrc"
   hSetBuffering h LineBuffering
+
+  -- TODO:CHG: query value from Xft.dpi by xmonad means instead!
+  -- BUT:TEMP: impossible as xprofile can be run only after xmonad
+  dpi <- getXorg "-d"
 
   xmonad $ ewmh myCfg { logHook = myLogHook h
   , borderWidth = fromIntegral $ round (dpi / 60)

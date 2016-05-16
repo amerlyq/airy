@@ -120,6 +120,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     inGroup "M-y"
     [ ("b", "r.b -p")
     , ("w", "r.notify-winclass")
+    , ("l", "echo wmctrl -l | r.notify-sh")
     ],
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     feedCmd "copyq"

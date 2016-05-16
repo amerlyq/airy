@@ -7,6 +7,7 @@ case "$1"
 in -w) shift
   dnum=$(wmctrl -d | awk -vn=$1 'n==$NF{print$1;quit}')
   exec wmctrl -s $dnum
+;; is-empty) shift; (( !$(wmctrl -l|wc -c) ))
 ;; *)
   dir=~/.xmonad/lib/XMonad/Util/Amer
   exec "$dir/ctl" "$@"

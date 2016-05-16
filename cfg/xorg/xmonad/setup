@@ -8,8 +8,8 @@ lib=~/.xmonad/lib/XMonad
 link -t "$lib/Config/Amer" ./cfg/*
 link -t "$lib/Util/Amer"   ./ext/*
 
-usvc_activate -e xmonad.service try.service
-usvc_activate -e xmobar.{service,socket}
+svc_activate -cue xmonad.service \
+  xmobar.{service,socket}
 
 ### GENS ###
 if cfgOpt u; then
@@ -22,6 +22,7 @@ if cfgOpt u; then
   dst="$lib/Hooks"
   url='http://code.haskell.org/XMonadContrib/XMonad/Hooks/ServerMode.hs'
   [[ -f $dst/ServerMode.hs ]] || (mkdir -p "$dst" && wget "$url" -O "$dst/ServerMode.hs")
+  # TRY: replace ctl.hs by bash/python XEvent script?
   (cd "$lib/Util/Amer" && ghc --make ctl.hs)
 
   fork_m r.xmonad-rebuild

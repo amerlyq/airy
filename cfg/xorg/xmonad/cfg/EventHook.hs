@@ -4,6 +4,7 @@ module XMonad.Config.Amer.EventHook (myHandleEventHook) where
 import Control.Arrow  (first)
 import Data.Default   (def)
 import XMonad                       (handleEventHook)
+import XMonad.StackSet              (allWindows)
 import XMonad.Layout.LayoutHints    (hintsEventHook)
 import XMonad.Hooks.ManageDocks     (docksEventHook)
 import XMonad.Hooks.EwmhDesktops    (fullscreenEventHook, ewmhDesktopsEventHook)
@@ -24,6 +25,9 @@ myHandleEventHook = mconcat
   where
     escape ' ' = '_'
     escape c = c
+    mapped = map (first (map escape)) myKeys
     srvCmds = do
       dfl <- defaultCommands
-      return $ dfl ++ map (first (map escape)) myKeys
+      -- isempty <- gets $ null . allWindows . windowset
+      -- service = [("is-empty", if isempty then return 0)]
+      return $ dfl ++ mapped
