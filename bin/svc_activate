@@ -1,0 +1,63 @@
+#!/bin/bash -e
+source ~/.shell/func.d/system
+trap_errors
+
+DIR=/etc/systemd/system
+sudo=sudo
+OPTIND=1
+
+# copy/enable/re-*/run/user
+while getopts 'ceru' o; do case $o
+in u) A=--user; unset sudo; DIR=~/.config/systemd/user
+      # ALT:CHECK:(faster startup) /etc/systemd/user
+;; :|'?') die 1
+esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
+(($#)) || die 1 "No svc list"
+# EXPL: split in stages -- to take dependency into account
+
+
+# ALSO: for ubuntu >= 16 which has systemd
+if has_pr systemd-notify && systemd-notify --booted; then
+
+  # Currently supports copying only for user units
+  if cfgOpt c && cfgOpt u; then
+    for f in "$@"; do
+      # MAYBE: move local svc searching into func.d/cfgsetup wrapper
+      [[ -f ./unit/$f ]] && f=./unit/$f \
+      || [[ -f ./$f ]] || die 1 "Not found '$f'"
+      linkcp -ct "$DIR" "$f"
+    done
+    systemctl $A daemon-reload
+  fi
+
+  cfgNo e || for f in "$@"; do
+    if ! systemctl $A is-enabled "$f" &>/dev/null
+    then $sudo systemctl $A enable "$f"
+    elif cfgOpt f; then $sudo systemctl $A reenable "$f"
+    else echo "-> @ $f"
+    fi 2>&1
+  done
+  # elif cfgNo e; then $sudo systemctl $A disable "$f"
+
+  cfgNo r || for f in "$@"; do
+    if ! systemctl $A is-active "$f" &>/dev/null
+    then $sudo systemctl $A start "$f"
+    else $sudo systemctl $A restart "$f"
+    fi 2>&1
+  done
+
+elif distro ubuntu; then
+
+  # Enable
+  for f in "$@"; do
+    if cfgOpt e
+    then $sudo update-rc.d "$f" defaults
+    else $sudo update-rc.d -f "$f" remove
+    fi 2>&1
+  done
+
+  # Run
+  cfgNo r || for f in "$@"; do
+    $sudo service "$1" restart 2>&1
+  done
+fi

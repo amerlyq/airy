@@ -31,7 +31,7 @@ same_tree() { ! find "$1" -type f -printf '%P\0' \
 f_copy() { local src=$1 dst=$2
   [[ -f $src || -d $src ]] || die "wrong source filetype"
   [[ ! -e $dst || ! -L $dst ]] || die "refuse copy over existing link '$dst'"
-  [[ -e $dst || ! -L $dst ]] || rm "$dst"  # EXPL: rm dangling links
+  [[ -e $dst || ! -L $dst ]] || $sudo rm "$dst"  # EXPL: rm dangling links
   if ([[ -f $src ]] && same_file "$src" "$dst")\
   || ([[ -d $src ]] && same_tree "$src" "$dst")
   then show C "$src" "$dst"; return; fi
@@ -43,7 +43,7 @@ f_copy() { local src=$1 dst=$2
   # BUT: for each file it must be done individually! Can't use 'cp -r'!
 }
 f_link() { local src=$1 dst=$2
-  [[ -e $dst || ! -L $dst ]] || rm "$dst"
+  [[ -e $dst || ! -L $dst ]] || $sudo rm "$dst"  # EXPL: rm dangling links
   if [[ ! -e $dst || -L $dst ]]; then
     if [[ ! $src -ef $dst ]]; then
       $sudo mkdir -p "${dst%/*}"
