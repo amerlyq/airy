@@ -2,8 +2,16 @@ Dolby setup
 	SEE http://www.johannes-bauer.com/linux/dolby/
 
 High pitch sound snd_intel_hda
+	$ journalctl -b
+	: snd_hda_intel 0000:00:1f.3: bound 0000:00:02.0 (ops i915_audio_component_bind_ops [i915])
+	: ...
+	: snd_hda_intel 0000:00:1f.3: IRQ timing workaround is activated for card #0. Suggest a bigger bdl_pos_adj.
+	: ...
+	: pulseaudio[659]: E: [alsa-source-ALC668 Analog] alsa-source.c: ALSA woke us up to read new data from the device, but there was actually nothing to read.
+	: pulseaudio[659]: E: [alsa-source-ALC668 Analog] alsa-source.c: Most likely this is a bug in the ALSA driver 'snd_hda_intel'. Please report this issue to the ALSA developers.s.s.s.
+	: pulseaudio[659]: E: [alsa-source-ALC668 Analog] alsa-source.c: We were woken up with POLLIN set -- however a subsequent snd_pcm_avail() returned 0 or another value < min_avail.
 	$ cat /proc/bus/input/devices | grep -i name
-	: N: Name="HDA Intel PCH Headphone"
+	: N: Name="HDA Intel PCH Headphone" (event9 in Xorg.log)
 	$ lspci -k G audio
 	: Intel Corporation Sunrise Point-H HD Audio
 	$ aplay -l
@@ -52,6 +60,10 @@ High pitch sound snd_intel_hda
 		Audio by ICEpower | Bang & Olufsen Technology
 		: Seems like it's tech mark for speakers.
 		: ASUS N73jq : options snd-hda-intel model=eeepc-p901
+
+		/usr/lib/systemd/system/alsa-restore.service
+		: Note that two different ALSA card state management schemes exist and they
+		: can be switched using a file exist check - /etc/alsa/state-daemon.conf .
 
 	MAYBE:
 		? Problem from alsa-lib package

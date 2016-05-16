@@ -1,13 +1,13 @@
 [Unit]
-Description=Util - %P
+Description=Media - %P
 # BUG: can't be launched even on demand
 # FIXME:FIND: how to add condition on automatic launch only
 # OR:(saw somewhere) ignore condition on manual launch
-# ConditionHost=!neo
-Requires=wm.target
-After=wm.target
-PartOf=main.target
-Before=main.target
+ConditionHost=!neo
+Requisite=xorg.target
+After=xorg.target wm.target
+# PartOf=main.target
+# Before=main.target
 
 [Service]
 Type=idle

@@ -1,9 +1,9 @@
 [Unit]
-Description=Util - %P
-Requires=xorg.target
+Description=DE - Notification Daemon - %P
+Requisite=wm.target
 After=wm.target
-PartOf=main.target
-Before=main.target
+# PartOf=main.target
+# Before=main.target
 
 [Service]
 # BUG: can't start if another instance already running
@@ -14,7 +14,7 @@ ExecStart=/usr/bin/dunst
 # ExecSuspend=killall -SIGUSR2 dunst
 Restart=always
 RestartSec=1
-TimeoutStopSec=2
+TimeoutStopSec=5
 
 [Install]
 WantedBy=main.target

@@ -1,15 +1,29 @@
 [Unit]
-Description=Xorg Server
+Description=Xorg - Server
+Conflicts=logoff.target
 Requires=xorg.socket
-PartOf=xorg.target
+After=xorg.socket
+# PartOf=xorg.target
+# Before=xorg.target
 
 [Service]
-Type=simple
-SuccessExitStatus=0 1
+SyslogIdentifier=xserver
+Type=forking
+# THINK:(bash) disown OR:(double-fork) (./prg &) & -- reparent to PID=1
+# -noreset
+# BUG: Xorg sends -USR1 before it's completely initialized!  -- only after WM started it's done
+ExecStart=/bin/sh -c "trap 'echo waited SIGUSR1 received; exit 0' USR1; (trap '' USR1;\
+exec /usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -keeptty -verbose 2 \
+    -dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25 \
+) & wait; exit 1"
+# ExecStop=/bin/sh -c 'kill $(cat /tmp/.X0-lock)'
+
+# Type=simple
+# SuccessExitStatus=0 1
 # BAD: ExecStartPre=/usr/bin/systemctl --user set-environment DISPLAY=:0
-ExecStart=/usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -noreset -keeptty -verbose 2 -dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25
+# ExecStart=/usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -noreset -keeptty -verbose 2 -dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25
 # BAD:(not executed at all? but it's Type=simple...)
-ExecStartPost=-/usr/bin/dbus-update-activation-environment DISPLAY=${DISPLAY}
+# ExecStartPost=-/usr/bin/dbus-update-activation-environment DISPLAY=${DISPLAY}
 # XAUTHORITY
 # ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY
 
@@ -24,3 +38,7 @@ ExecStartPost=-/usr/bin/dbus-update-activation-environment DISPLAY=${DISPLAY}
 # TTYReset=yes
 # TTYVHangup=yes
 # TTYVTDisallocate=no
+
+[Install]
+RequiredBy=xorg.target
+Also=xorg.socket

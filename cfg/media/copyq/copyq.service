@@ -1,16 +1,19 @@
 [Unit]
-Description=Util - %P
-Requires=wm.target
-After=home.mount wm.target
-PartOf=main.target
-Before=main.target
+Description=DE - Clipboard Manager - %P
+Requisite=xorg.target
+After=xorg.target wm.target
+# PartOf=main.target
+# Before=main.target
+# ALT: create replaceable .socket
+# RequiresMountsFor=%h/.config/copyq
 
 [Service]
 # NOTE: to run instance on second Xorg -- use 'copyq -s ses1'
 # ALT: use $DISPLAY or $XDG_VTNR as session name
 ExecStartPre=/bin/sh -c 'pkill -fx /usr/bin/copyq; true'
 ExecStart=/usr/bin/copyq
-ExecStop=/usr/bin/copyq exit
+# MAYBE:BUG: additional commands instead of replacement
+# ExecStop=/usr/bin/copyq exit
 Restart=always
 RestartSec=3
 TimeoutStopSec=3

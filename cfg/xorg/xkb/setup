@@ -18,7 +18,7 @@ if distro arch; then
   # dbus=/usr/share/dbus-1/system-services
   # link -sc ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
   # BUG: https://bbs.archlinux.org/viewtopic.php?id=172798
-  svc_activate -cue {xkb,kbdd,xcape}.service
+  svc_activate -cue {kbdd,xcape}.service
 else
   echo "If no systemd -- run kbdd manually"
 fi

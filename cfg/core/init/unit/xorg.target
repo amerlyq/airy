@@ -1,7 +1,4 @@
 [Unit]
-Description=Xorg Target
-Requires=dbus.socket
-Requires=xorg.service
-PartOf=main.target
-Before=main.target
+Description=Xorg - (Target)
+Conflicts=logoff.target
 AllowIsolate=true

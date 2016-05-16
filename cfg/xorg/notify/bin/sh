@@ -1,11 +1,13 @@
 #!/bin/bash
 # WARNING: Don't use -e or you won't be able to catch $?
 
+# BUG: empty cmd when used in xmonad like 'r.notify-sh wmctrl -l'
 if [[ -t 0 ]]
 then CMD=("${@:?No cmd specified}")
 else CMD=( $(cat) )
 fi
 
+_has_pr(){ hash "$1" >/dev/null 2>&1; }
 run() { local err
     shopt -s expand_aliases
     SHELL=/bin/bash source ~/.shell/aliases

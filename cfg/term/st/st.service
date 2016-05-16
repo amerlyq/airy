@@ -1,11 +1,11 @@
 [Unit]
-Description=Terminal Emulator - %P
+Description=DE - Terminal Emulator - %P
 Requires=xorg.target
-PartOf=wm.target
+# PartOf=wm.target
 Conflicts=xmonad.service
 
 [Service]
-ExecStart=/usr/bin/st -name login -g 100x30+0+0
+ExecStart=/usr/bin/st -n login -g 100x30+0+0
 
 [Install]
 WantedBy=wm.target

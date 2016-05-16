@@ -12,15 +12,16 @@ sys_power(){ #Suspend #Hibernate
 }
 
 # TODO: check method the current console was started
-if systemctl --user is-active main.target >/dev/null; then
-  sys_logout(){ systemctl --user stop main.target; }
-else
+if systemctl --user is-active xorg.target >/dev/null; then
+  sys_logout(){ systemctl --user start logoff.target; }
+elif running_X; then
   sys_logout(){ r.wm quit-wm; }
 fi
 
 if running_X; then
   confirm(){ [[ $(printf "yes\nno\n" | dmenu -p "$1?" -fn monospace-10) == yes ]]; }
   # TODO: use ctl.hs to query windows list from xmonad
+  # -- gets >>= trace . show . null . windows
   no_windows(){ r.wm is-empty; }
 else
   confirm(){ read -p "$1? ([y]es/[N]o): " a; [[ ${a,,} =~ ^y(es)?$ ]]; }

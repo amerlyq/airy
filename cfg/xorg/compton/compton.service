@@ -1,13 +1,13 @@
 [Unit]
-Description=Window Compositor - %P
-Requires=xorg.target
+Description=DE - Window Compositor - %P
+Requisite=wm.target
 After=wm.target
-PartOf=main.target
-Before=main.target
+# PartOf=main.target
+# Before=main.target
 
 [Service]
 ExecStart=/usr/bin/compton -d ${DISPLAY}
-TimeoutStopSec=3
+TimeoutStopSec=5
 
 [Install]
 WantedBy=main.target

@@ -1,20 +1,25 @@
 [Unit]
-Description=Window Manager - %P
+Description=DE - Window Manager - %P
+Conflicts=logoff.target
 Requires=xorg.target
-After=xorg.target
-# Before=wm.target
+After=xorg.target xmobar.service
+# Before=xprofile.service
 # FIXED: continues to run even if wm.target failed
-PartOf=wm.target
+# PartOf=wm.target
+# OnFailure=st.service
+# OnFailureJobMode=isolate
 
 [Service]
-# BUG: default 'xmonad' can't notify
+SyslogIdentifier=xmonad
+Type=forking
+Environment=XDG_CURRENT_DESKTOP=xmonad
+ExecStart=/bin/sh -c "trap 'exit 0' USR1; (exec '%h/.xmonad/xmonad-x86_64-linux') & wait; exit 1"
+
 # TRY:FIND: notify by creating some file (inotify)
 # Type=notify
 # NotifyAccess=all
 # BAD(forking), BAD(notify)
-Environment=XDG_CURRENT_DESKTOP=xmonad
-ExecStart=/usr/bin/xmonad
-# ALT: ExecStart=/bin/sh -c %h/.xmonad/xmonad-x86_64-linux
+# ExecStart=/usr/bin/xmonad
 
 [Install]
 RequiredBy=wm.target

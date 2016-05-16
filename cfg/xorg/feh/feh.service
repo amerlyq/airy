@@ -1,13 +1,14 @@
 [Unit]
-Description=Desktop Background - %P
-Requires=xorg.target
-After=compton.service
-PartOf=main.target
+Description=DE - Wallpaper - %P
+Requisite=wm.target
+After=wm.target compton.service
+# PartOf=main.target
 
 [Service]
-# Type=oneshot
+SyslogIdentifier=r.feh
+Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/sh -c r.feh
+ExecStart=/bin/sh -c '%h/.cache/airy/bin/r.feh'
 
 [Install]
 WantedBy=main.target

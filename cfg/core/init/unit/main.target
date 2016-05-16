@@ -1,6 +1,7 @@
 [Unit]
-Description=Xorg Desktop Environment
-PartOf=default.target
-After=default.target wm.target
+Description=DE - (Target) %u@%H
+Conflicts=logoff.target
+# PartOf=default.target
+# After=default.target wm.target
 AllowIsolate=true
 # Conflicts=shutdown.target reboot.target halt.target

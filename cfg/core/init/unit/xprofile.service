@@ -1,14 +1,19 @@
 [Unit]
-Description=Xorg Settings
-Requires=xorg.target
-After=xorg.target
-PartOf=xorg.target
+Description=Xorg - Settings - %P
+Requisite=xorg.target
+After=xorg.target xmonad.service
 
 [Service]
+SyslogIdentifier=xprofile
 Type=oneshot
 RemainAfterExit=yes
-ExecStartPre=/bin/sleep 1
-ExecStart=/bin/bash -c 'source ~/.xprofile'
+# ExecStartPre=/bin/sleep 1
+# ExecStart=/bin/sh -ec 'source ~/.xprofile'
+ExecStartPre=/usr/bin/xrdb -load %h/.Xresources
+ExecStart=/usr/bin/xset b off s off dpms 1200 0 0 r rate 250 40
+ExecStart=/usr/bin/xsetroot -cursor_name left_ptr
+# EXPL:CHECK: because we can't replace setxkbmap by xorg.conf
+ExecStart=/bin/sh -c '%h/.cache/airy/bin/r.xkb'
 
 [Install]
-WantedBy=xorg.target
+WantedBy=wm.target

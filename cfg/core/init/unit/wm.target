@@ -1,8 +1,9 @@
 [Unit]
-Description=Xorg WM %u@%H
-After=xorg.target
-PartOf=main.target
+Description=WM - (Target)
+Conflicts=logoff.target
+# After=xorg.target
+# PartOf=main.target
 AllowIsolate=true
 
 [Install]
-WantedBy=main.target
+RequiredBy=main.target

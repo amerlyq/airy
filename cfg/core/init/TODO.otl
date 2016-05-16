@@ -13,6 +13,7 @@ REF
 USE:
 	Stop all other non-related targets (drop into raw Xorg)
 		systemctl --user isolate xorg[.target]
+	WARNING: Don't use 'PartOf' as it's equivalent to 'After' and results in cyclic dependency
 
 DEBUG
 	SEE existing issues
@@ -24,6 +25,10 @@ DEBUG
 
 BUG
 	[_] fix syncthing on neo
+	[_] shutdown problems
+		: MAYBE PartOf -- is culprit. It guarantees order for stopping
+		: main.target. But by Conflicts=shutdown order can be screwed off.
+		: Some intermediate targets may be stopped before their childs.
 
 Set many variables ~/.bash_profile
 	xargs systemctl --user set-environment < /path/to/file.conf

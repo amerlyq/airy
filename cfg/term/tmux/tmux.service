@@ -1,9 +1,10 @@
 [Unit]
-Description=Tmux Server
+Description=Demon - Tmux Server
 Documentation=man:tmux(1)
-PartOf=demons.target
+# PartOf=demons.target
 # After=gpg-agent.service
-After=tmp.mount
+# After=tmp.mount
+RequiresMountsFor=/tmp
 
 [Service]
 Type=forking

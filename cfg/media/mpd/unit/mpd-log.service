@@ -1,13 +1,16 @@
 [Unit]
-Description=MPD playback logger
+Description=Demon - MPD playback logger
 Requires=mpd.service
 After=mpd.service
-PartOf=demons.target
+ConditionFileIsExecutable=%h/.cache/airy/bin/r.mpd-log
 
 [Service]
-ExecStart=/bin/sh -c r.mpd-log
+SyslogIdentifier=r.mpd-log
+# ATTENTION: my PATH is populated into environment only after login!
+# BETTER: insert pre-cached PATH into /etc/environment (NEED:DEV: cfg/shell mod)
+ExecStart=/bin/sh -ec '%h/.cache/airy/bin/r.mpd-log'
 Restart=always
-RestartSec=5
+RestartSec=3
 
 [Install]
 WantedBy=demons.target

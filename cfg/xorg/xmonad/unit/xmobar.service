@@ -1,10 +1,15 @@
 [Unit]
-Description=Status Bar - xmobar
-Requires=xorg.socket xmobar.socket
-After=xmonad.service
-# Before=wm.target
-PartOf=wm.target
+Description=DE - Status Bar - %P
+Conflicts=logoff.target
+Requires=xmobar.socket xorg.target
+After=xorg.target
+# After=xmobar.socket
 
 [Service]
+SyslogIdentifier=xmobar
 ExecStart=/bin/sh -c 'exec %h/.cabal/bin/xmobar %h/.xmonad/xmobarrc'
 StandardInput=socket
+
+[Install]
+WantedBy=wm.target
+Also=xmobar.socket
