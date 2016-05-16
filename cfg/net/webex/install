@@ -1,0 +1,17 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+
+if distro arch; then
+  # EXPL: webex is 32-bit only
+  aur_inst bin32-firefox lib32-flashplugin
+  aur_inst bin32-jre
+  aur_inst webex-meta
+
+  linkcp -st '/usr/lib/mozilla/plugins' \
+    /usr/lib32/jvm/java32-8-jre/jre/lib/i386/libnpjp2.so
+
+fi
+
+# JAVA_HOME=/usr/lib32/jvm/java32-8-jre
+# USAGE: $ bin32-firefox
