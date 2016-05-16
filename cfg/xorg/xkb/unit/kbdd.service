@@ -1,8 +1,8 @@
 [Unit]
-Description=Xorg Keyboard PerWindow - %P
-Requires=wm.target
-After=wm.target
-PartOf=main.target
+Description=Xorg - Layout PerWindow - %P
+Requisite=xorg.target
+After=xorg.target wm.target
+# PartOf=main.target
 # Before=main.target
 
 [Service]
@@ -11,9 +11,10 @@ PartOf=main.target
 # ALT:TRY:
 # Type=idle
 # NOTE:BAD: xmonad startup/EWMH initialized after this unit started.
-ExecStartPre=/bin/sh -c 'pkill -x kbdd; sleep 2'
+# ExecStartPre=/bin/sh -c 'pkill -x kbdd; sleep 2'
+ExecStartPre=/bin/sh -c 'pkill -x kbdd; true'
 ExecStart=/usr/bin/kbdd --nodaemon
-ExecStop=/usr/bin/pkill -x kbdd
+# ExecStop=/usr/bin/pkill -x kbdd
 Restart=always
 RestartSec=1
 TimeoutStopSec=1

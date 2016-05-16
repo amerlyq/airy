@@ -1,0 +1,27 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+lang=${CURR_XKB_LANG:-amer(us):1+amer(ru):2+amer(ua):3}
+over=${1:-${CURR_XKB_OVER:-vim}}
+r.xkb-has-overlay -q ${over:?}
+
+src="${TMPDIR:?}/00-keyboard.conf"
+cat> "$src" <<EOT
+# vim: ft=xf86conf
+# SEE: man xkeyboard-config
+Section "InputClass"
+    Identifier "system-keyboard"
+    MatchIsKeyboard "on"
+    # Driver "kbd"
+    Option "XkbOptions" ""
+    Option "XkbModel"   "pc104"
+    Option "XkbTypes"   "complete+amer"
+    Option "XkbCompat"  "amer"
+    Option "XkbLayout"  "amer,amer,amer"
+    Option "XkbVariant" "us,ru,ua"
+    Option "XkbSymbols" "amer(pc)+${lang}+amer(mod)+overlay($over)"
+EndSection
+EOT
+
+trap "rm '$src'" EXIT
+linkcp -sct /etc/X11/xorg.conf.d "$src"

@@ -1,0 +1,20 @@
+// vim: ft=cpp
+
+default partial
+xkb_compatibility "complete"
+{
+    include "basic"
+    augment "iso9995"
+    augment "mousekeys"
+    // DISABLED: don't know how to disable overall timeout
+    // augment "accessx(full)"
+    augment "misc"
+    augment "xfree86"
+    augment "level5"
+    // DONE: augment "caps(caps_lock)"
+
+    // CHECK:
+    replace "mods"
+    replace "langs(lock)"
+    replace "leds"
+};

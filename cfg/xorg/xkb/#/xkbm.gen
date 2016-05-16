@@ -1,0 +1,30 @@
+#!/bin/bash -e
+source ~/.shell/profile
+source ~/.shell/func.d/system
+trap_errors
+
+over=${1:-${CURR_XKB_OVER:-vim}}
+r.xkb-has-overlay $over
+
+# ALT: us:1+ru(typewriter):2+ua(legacy):3
+[[ $CURR_XKB_LANG ]] ||
+    CURR_XKB_LANG="amer(us):1+amer(ru):2+amer(ua):3"
+
+dst="${CURR_DIR_CACHE:?}/keylayout.xkb"
+cat > "$dst" <<EOT
+xkb_keymap {
+    xkb_keycodes  { include "evdev+aliases(qwerty)" };
+    xkb_types     { include "complete+amer" };
+    xkb_compat    { include "amer" };
+    xkb_symbols   { include "amer(pc)+$CURR_XKB_LANG+amer(mod)+overlay($over)" };
+    xkb_geometry  { include "pc(pc86)" };
+};
+EOT
+
+if running_X; then
+  setxkbmap -option ""  # Reset keyboard layout
+  xkbcomp -I"$PWD" "$dst" -xkm "${dst%.xkb}.xkm" 2>&1 |
+    sed -r '/No symbols defined/d'
+fi
+
+echo "W: $dst"

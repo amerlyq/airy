@@ -1,10 +1,37 @@
 // vim: ft=cpp
 
+default xkb_symbols "amer" {
+    include "amer(pc)+amer(us):1+amer(ru):2+amer(ua):3"
+    include "amer(mod)"
+};
+
+partial xkb_symbols "pc" {
+    // ALT: include "pc"
+    include "srvr_ctrl(fkey2vt)"
+    // OR:(deprecated) include "media(fkey2vt)"
+    include "pc(editing)"
+    include "keypad(x11)"
+};
+
+partial xkb_symbols "mod" {
+    include "typo(base)"   // lvl3 symbols on rows [1-4]
+    // ALT: include "inet(evdev)+inet(logitech_base)"
+    include "media"
+    replace "mods"
+};
+
+// -----------------------------
+
+partial alphanumeric_keys
+xkb_symbols "us" {
+    include "us"
+};
+
 partial alphanumeric_keys
 xkb_symbols "ru" {
     include "ru(common)"
-    include "am(nums)"
-    include "am(symb_lvl3)"
+    include "amer(nums)"
+    include "amer(symb_lvl3)"
     name[Group1]= "Russian (typewriter) mod_Amer";
 
     key <AD12> { [ Cyrillic_hardsign , Cyrillic_HARDSIGN ] };
@@ -14,8 +41,8 @@ xkb_symbols "ru" {
 partial alphanumeric_keys
 xkb_symbols "ua" {
     include "ua(legacy)"
-    include "am(nums)"
-    include "am(symb_lvl3)"
+    include "amer(nums)"
+    include "amer(symb_lvl3)"
     name[Group1]= "Ukrainian (typewriter) mod_Amer";
 
     // key <AD07> {[ Cyrillic_ghe, Cyrillic_GHE, Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ]};

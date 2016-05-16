@@ -3,7 +3,8 @@ cd $(dirname $(readlink -m ${0}))/..
 case "$1" in -q) shift; silent=1 ;; esac
 over=$1
 
-ids=$(sed -rn '/.*xkb_symbols "([^"]+)".*/s//\1/p' ./symbols/overlay)
+fl=./xkb/symbols/overlay
+ids=$(sed -rn '/.*xkb_symbols "([^"]+)".*/s//\1/p' "$fl")
 
 if ! grep -qxF "$over" <<<"$ids"; then
   [[ $silent ]] || echo "E: Unknown overlay: '$over'"

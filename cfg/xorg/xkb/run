@@ -1,5 +1,12 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
+source ~/.shell/profile
 
-./xkbm.gen $1
-r.xkb-load
+lang=${CURR_XKB_LANG:-amer(us):1+amer(ru):2+amer(ua):3}
+over=${1:-${CURR_XKB_OVER:-vim}}
+r.xkb-has-overlay ${over:?}
+
+# -print -verbose 10
+exec setxkbmap -display ${DISPLAY:?} -option "" -model pc104 \
+  -types 'complete+amer' -compat amer \
+  -layout amer,amer,amer -variant us,ru,ua \
+  -symbols "amer(pc)+${lang}+amer(mod)+overlay($over)"

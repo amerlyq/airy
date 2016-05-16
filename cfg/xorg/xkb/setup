@@ -2,18 +2,23 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
+link -skt '/usr/share/X11' xkb/{compat,symbols,types}/*
+
+if running_X; then
+  ./run
+fi
+
+### GENS ###
+# DISABLED:CHECK: because we can't replace setxkbmap by xorg.conf
+# MAYBE only XkbRules work
+# ./xkb-xorg.gen
+
+### SYSD ###
 if distro arch; then
   # dbus=/usr/share/dbus-1/system-services
   # link -sc ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
   # BUG: https://bbs.archlinux.org/viewtopic.php?id=172798
-  usvc_activate -e {xkb,kbdd,xcape}.service
-
+  svc_activate -cue {xkb,kbdd,xcape}.service
 else
   echo "If no systemd -- run kbdd manually"
-fi
-
-
-### GENS ###
-if running_X; then
-  ./run
 fi
