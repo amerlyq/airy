@@ -1,0 +1,14 @@
+[Unit]
+Description=Xorg - Gnome Keyring - %P
+Requisite=xorg.target
+After=xorg.target xprofile.service
+ConditionFileIsExecutable=/usr/bin/gnome-keyring-daemon
+
+[Service]
+SyslogIdentifier=gnome-keyring
+Type=simple
+RemainAfterExit=yes
+ExecStart=/usr/bin/gnome-keyring-daemon -f --start --components=secrets
+
+[Install]
+WantedBy=wm.target

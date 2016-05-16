@@ -3,6 +3,13 @@
 alias s.d='systemctl --user disable'
 alias s.e='systemctl --user enable'
 
+alias s.cc='systemd-analyze --user critical-chain'
+# USE: (--order|--require)
+alias s.cd='dot -Tx11 <(systemd-analyze --user dot)'  # Search cycles
+alias s.cs='systemd-analyze --user time'    # summary
+alias s.ct='systemd-analyze --user blame'   # sort by time
+alias s.cv='systemd-analyze --user verify'  # check svc list recursively
+
 alias s.a='systemctl --user --all'
 alias s.f='systemctl --user --failed'
 alias s.g='systemctl --user list-dependencies'
