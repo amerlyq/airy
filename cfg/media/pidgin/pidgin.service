@@ -11,7 +11,6 @@ After=xorg.target wm.target
 
 [Service]
 Type=idle
-ExecStartPre=-/usr/bin/gnome-keyring-daemon --start --components=secrets
 ExecStart=/usr/bin/pidgin
 # EXPL: Don't restart -- to close when needless
 # NOTE: to run instance on second Xorg -- use 'pidgin -m'

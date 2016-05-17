@@ -6,9 +6,9 @@ ConditionFileIsExecutable=/usr/bin/gnome-keyring-daemon
 
 [Service]
 SyslogIdentifier=gnome-keyring
-Type=simple
-RemainAfterExit=yes
 ExecStart=/usr/bin/gnome-keyring-daemon -f --start --components=secrets
 
 [Install]
 WantedBy=wm.target
+
+# SEE https://forums.bunsenlabs.org/viewtopic.php?id=1181

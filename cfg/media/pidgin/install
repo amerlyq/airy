@@ -17,8 +17,6 @@ if distro arch; then
   aur_inst -f '/usr/lib/purple-2/libskypeweb.so' purple-skypeweb
 
   aur_inst -f '/usr/lib/purple-2/purple-gnome-keyring.so' purple-gnome-keyring
-  ssh=/etc/xdg/autostart/gnome-keyring-ssh.desktop
-  [[ ! -f $ssh ]] || sudo mv -vf ${ssh}{,_}
   # pkg_inst 'pidgin-encryption'
 
 elif distro ubuntu; then

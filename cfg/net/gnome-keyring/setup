@@ -1,0 +1,25 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+svc_activate -cue gnome-keyring.service
+
+ssh=/etc/xdg/autostart/gnome-keyring-ssh.desktop
+[[ ! -f $ssh ]] || sudo mv -vf ${ssh}{,_}
+
+s=pam_gnome_keyring.so
+flg=/etc/pam.d/login
+if ! grep -qF "$s" "$flg"; then
+  sudo sed -i "/$s/d" "$flg"
+  sudo tee -a "$flg" >/dev/null <<EOT
+auth       optional     $s
+session    optional     $s    auto_start
+EOT
+fi
+
+fps=/etc/pam.d/passwd
+if ! grep -qF "$s" "$fps"; then
+  sudo sed -i "/$s/d" "$fps"
+  echo "password        optional        $s" | sudo tee -a "$fps" >/dev/null
+fi
+
+echo "W: {$flg,$fps}"
