@@ -1,0 +1,15 @@
+[Unit]
+Description=Demon - Dictd Dictionary Server
+After=network.target
+ConditionFileNotEmpty=/etc/dict/dictd.conf
+ConditionDirectoryNotEmpty=/usr/share/dictd
+
+[Service]
+Type=forking
+# EXPL: 143 = 128 + 15(SIGTERM)
+SuccessExitStatus=0 143
+# EnvironmentFile=-/etc/conf.d/dictd
+ExecStart=/usr/bin/dictd -c /etc/dict/dictd.conf -- -s
+
+[Install]
+WantedBy=multi-user.target

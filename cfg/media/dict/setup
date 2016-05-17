@@ -10,6 +10,7 @@ fi
 # Copy files instead of symlink, as dictd drops to 'nobody' user
 #   with no access to my config files inside home directory.
 link -sc ./cfg "$dir"
+svc_activate -cer dictd.service
 
 if cfgOpt u ; then
 
@@ -28,8 +29,6 @@ if cfgOpt u ; then
         # /etc/init.d/dictd restart
         # pid=$(pgrep dictd) && sudo kill -SIGHUP $pid
     fi
-
-    svc_activate -er dictd
   fi
 
     ### GEN ###
