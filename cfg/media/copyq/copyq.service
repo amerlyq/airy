@@ -1,9 +1,8 @@
 [Unit]
 Description=DE - Clipboard Manager - %P
 Requisite=xorg.target
-After=xorg.target wm.target
-# PartOf=main.target
-# Before=main.target
+After=dbus.service xorg.target wm.target
+Before=compton.service
 # ALT: create replaceable .socket
 # RequiresMountsFor=%h/.config/copyq
 

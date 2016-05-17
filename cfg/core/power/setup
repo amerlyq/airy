@@ -6,4 +6,5 @@ if distro arch; then :;
   # Disable bluetooth
   # THINK: replace by blacklisting?
   # svc_activate -e rfkill-block@bluetooth
+  linkcp -st '/etc/modprobe.d' blacklist-powersave.conf
 fi

@@ -1,7 +1,9 @@
 # vim:ft=sh
 
-alias s.d='systemctl --user disable'
-alias s.e='systemctl --user enable'
+alias s.u='systemctl --user'
+
+alias s.d='s.u disable'
+alias s.e='s.u enable'
 
 alias s.cc='systemd-analyze --user critical-chain'
 # USE: (--order|--require)
@@ -10,20 +12,21 @@ alias s.cs='systemd-analyze --user time'    # summary
 alias s.ct='systemd-analyze --user blame'   # sort by time
 alias s.cv='systemd-analyze --user verify'  # check svc list recursively
 
-alias s.a='systemctl --user --all'
-alias s.f='systemctl --user --failed'
-alias s.g='systemctl --user list-dependencies'
-alias s.i='systemctl --user list-unit-files'
-alias s.j='systemctl --user list-jobs'
-alias s.l='systemctl --user list-units'
+alias s.a='s.u --all'
+alias s.f='s.u --failed'
+alias s.g='s.u list-dependencies'
+alias s.i='s.u list-unit-files'
+alias s.j='s.u list-jobs'
+alias s.l='s.u list-units'
 
-alias s.r='systemctl --user start'
-alias s.s='systemctl --user status'
-alias s.t='systemctl --user stop'
+alias s.r='s.u start'
+alias s.s='s.u status'
+alias s.t='s.u stop'
 
-alias s.v='systemctl --user show-environment'
-alias s.vi='systemctl --user import-environment'
-alias s.vs='systemctl --user set-environment'
+alias s.v='s.u show-environment'
+alias s.vi='s.u import-environment'
+alias s.vs='s.u set-environment'
 
-alias s.X='loginctl terminate-user $USER'
+alias s.R='s.r main.target'
 alias s.B='journalctl -b'
+alias s.X='loginctl terminate-user $USER'
