@@ -19,15 +19,14 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 # ALSO: for ubuntu >= 16 which has systemd
 if has_pr systemd-notify && systemd-notify --booted; then
 
-  # Currently supports copying only for user units
-  if cfgOpt c && cfgOpt u; then
+  if cfgOpt c; then
     for f in "$@"; do
       # MAYBE: move local svc searching into func.d/cfgsetup wrapper
       [[ -f ./unit/$f ]] && f=./unit/$f \
       || [[ -f ./$f ]] || die 1 "Not found '$f'"
-      linkcp -ct "$DIR" "$f"
+      linkcp ${sudo+-s} -ct "$DIR" "$f"
     done
-    systemctl $A daemon-reload
+    $sudo systemctl $A daemon-reload
   fi
 
   cfgNo e || for f in "$@"; do

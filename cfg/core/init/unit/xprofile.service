@@ -9,6 +9,7 @@ Type=oneshot
 RemainAfterExit=yes
 # ExecStartPre=/bin/sleep 1
 # ExecStart=/bin/sh -ec 'source ~/.xprofile'
+ExecStartPre=/usr/bin/dbus-update-activation-environment DISPLAY XAUTHORITY
 ExecStartPre=/usr/bin/xrdb -load %h/.Xresources
 ExecStart=/usr/bin/xset b off s off dpms 1200 0 0 r rate 250 40
 ExecStart=/usr/bin/xsetroot -cursor_name left_ptr

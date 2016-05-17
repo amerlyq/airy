@@ -1,10 +1,10 @@
 [Unit]
 Description=DE - Clipboard Manager - %P
 Requisite=xorg.target
-After=dbus.service xorg.target wm.target
-Before=compton.service
+After=default.target dbus.service xorg.target wm.target compton.service
 # ALT: create replaceable .socket
 # RequiresMountsFor=%h/.config/copyq
+# MAYBE: it tries to launch Xorg on restart -- therefore hangs?
 
 [Service]
 # NOTE: to run instance on second Xorg -- use 'copyq -s ses1'
@@ -12,6 +12,7 @@ Before=compton.service
 ExecStartPre=/bin/sh -c 'pkill -fx /usr/bin/copyq; true'
 ExecStart=/usr/bin/copyq
 # MAYBE:BUG: additional commands instead of replacement
+# BAD: error on 'stop' of failed process
 # ExecStop=/usr/bin/copyq exit
 Restart=always
 RestartSec=3

@@ -1,0 +1,11 @@
+[Unit]
+Description=Aux: stop xorg process which hangs on shutdown
+After=default.target main.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl --user stop xcape kbdd copyq
+
+[Install]
+WantedBy=shutdown.target

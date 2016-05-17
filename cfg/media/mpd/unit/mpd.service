@@ -1,6 +1,6 @@
 [Unit]
 Description=Demon - Music Player Daemon
-After=network.target sound.target
+After=network.target sound.target mpd.socket
 
 [Service]
 ExecStart=/usr/bin/mpd --no-daemon

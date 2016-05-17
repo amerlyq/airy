@@ -11,8 +11,9 @@ alias -g  L='| less '
 alias -g LL='|& less -r '
 alias -g  V='|& $EDITOR - '
 if (($+commands[fzf])); then
-  alias -g  Z='|& fzf -m|xargs -d\\n '
-  alias -g Z@='|& fzf -m|xargs -d\\n -I@ '
+  alias -g Z='|& fzf -m|xargs -L1 '
+  alias -g Z@='Z -I@ '
+  alias -g ZY='|& fzf -m|xsel -ib'
 fi
 # alias -g TL='| tail -20 '
 

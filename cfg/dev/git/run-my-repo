@@ -12,7 +12,7 @@ gurl=$(git config --get remote.origin.url \
 git remote set-url origin "${gurl:?Not a git repo?}"
 echo "C: git remote url '${PWD#$HOME/}' -> $gurl"
 
-if [[ "${CURR_PROF?No}" == "work" ]]; then
+if [[ ${CURR_PROF:?} == work ]]; then
   git config --local user.name "${MAIN_NAME:?}"
   git config --local user.email "${MAIN_MAIL:?}"
   echo "C: git local {name, email} : {$MAIN_NAME, $MAIN_MAIL}"
