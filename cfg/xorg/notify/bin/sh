@@ -7,17 +7,10 @@ then CMD=("${@:?No cmd specified}")
 else CMD=( $(cat) )
 fi
 
-_has_pr(){ hash "$1" >/dev/null 2>&1; }
-run() { local err
-    shopt -s expand_aliases
-    SHELL=/bin/bash source ~/.shell/aliases
-    eval "${CMD[@]}" 2>&1
-}
-
 # exec 3>&1
 # TRY stdbuf -oL -eL
 # OUTPUT=$(run | tee >(>&3) | tail -5)
-OUTPUT=$(run)
+OUTPUT=$(r.shell "${CMD[@]}")
 err=$?
 # exec 3>&-
 

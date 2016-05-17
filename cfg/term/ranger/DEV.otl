@@ -15,7 +15,13 @@
 	Spawning subshell for one command a time is too slow, comparing to ':'.
 
 [X] # 1.5
-	I missed the legion of aliases, spawned in zsh.
+	> I missed the legion of aliases, spawned in zsh.
+	2015-06-02 [X] FIX shell -r cp ./%f /var // sudo: source: command not found  :> disable aliases for sudo
+	: Load aliases to shell (setopt aliases?). Using ~/.zshenv will crash git commands
+	: FIXME: http://askubuntu.com/questions/20953/sudo-source-command-not-found
+	: NOTE: shell -r ... works w/o sourcing, as there are no 'sudo source'
+	:	'map s enter_shell' instead of 'chain shell $SHELL'
+	: 	':shell' -- use $SHELL -i (BUT slow with prezto)
 
 [_] # 2
 	%%s with "..."  around each file. When escaping isn't enough.

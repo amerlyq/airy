@@ -219,60 +219,6 @@ class actualee(Command):
         return self._tab_directory_content()
 
 
-# Load aliases to shell (setopt aliases?). Using ~/.zshenv will crash git commands
-# NOTE: shell -r ... works w/o sourcing, as there are no 'sudo source'
-#   FIXME: http://askubuntu.com/questions/20953/sudo-source-command-not-found
-class shell(Command):
-    escape_macros_for_shell = True
-
-    def execute(self):
-        if self.arg(1) and self.arg(1)[0] == '-':
-            flags = self.arg(1)[1:]
-            command = self.rest(2)
-        else:
-            flags = ''
-            command = self.rest(1)
-
-        if not command and 'p' in flags:
-            command = 'cat %f'
-        if command:
-            if '%' in command:
-                command = self.fm.substitute_macros(command, escape=True)
-
-            # FIXME:DEV:
-            # 'map s enter_shell' instead of 'chain shell $SHELL'
-            # ':shell' -- use $SHELL -i (BUT slow with prezto)
-            # if 'r' not in flags:
-            #     command = "source ~/.shell/aliases && eval " + shell_quote(command)
-
-            self.fm.execute_command(command, flags=flags)
-
-    def tab(self):
-        from ranger.ext.get_executables import get_executables
-        if self.arg(1) and self.arg(1)[0] == '-':
-            command = self.rest(2)
-        else:
-            command = self.rest(1)
-        start = self.line[0:len(self.line) - len(command)]
-
-        try:
-            position_of_last_space = command.rindex(" ")
-        except ValueError:
-            return (start + program + ' ' for program in get_executables()
-                    if program.startswith(command))
-        if position_of_last_space == len(command) - 1:
-            selection = self.fm.thistab.get_selection()
-            if len(selection) == 1:
-                return self.line + selection[0].shell_escaped_basename + ' '
-            else:
-                return self.line + '%s '
-        else:
-            before_word, start_of_word = self.line.rsplit(' ', 1)
-            return (before_word + ' ' + file.shell_escaped_basename
-                    for file in self.fm.thisdir.files
-                    if file.shell_escaped_basename.startswith(start_of_word))
-
-
 class console(Command):
     """:console <command>
 

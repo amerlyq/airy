@@ -19,7 +19,7 @@ _ranger_tmp=${TMPDIR:-/tmp}/ranger_cwdir
 
 # TERMCMD -- for rifle when open_with -t'
 # .._RC -- speed up ranger start time
-TERMCMD='r.t' RANGER_LOAD_DEFAULT_RC=FALSE \
+TERMCMD='r.t' SHELL='r.shell' RANGER_LOAD_DEFAULT_RC=FALSE \
   ranger --choosedir="$_ranger_tmp" "${@:-$PWD}"
 
 # Automatically change the directory in bash to the last visited one

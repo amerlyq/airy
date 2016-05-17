@@ -48,7 +48,7 @@ endfunction
 
 
 function! s:everywhere_define(cols)
-  let locals = 'term=bold cterm=bold gui=bold ctermbg=None guibg=None'
+  let locals = 'term=bold cterm=bold gui=bold ctermbg=NONE guibg=NONE'
   for [k,v] in items(a:cols)  "term=bold,underline guifg=#E01B1B
     exec printf('hi! Notch%s %s ctermfg=%s guifg=%s', k, locals, v[0], v[1])
   endfor
