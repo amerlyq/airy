@@ -51,5 +51,6 @@ _dttime end-common
 # zprof  # HACK Profiling
 
 # Freciency completions and preexec (man fasd)
-eval "$(fasd --init auto)"
+# WARNING: quotes are essential!
+! _has_pr fasd || eval "$(fasd --init auto)"
 _dttime end-fasd

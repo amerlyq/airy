@@ -2,12 +2,17 @@
 # @ref: MIT, (c) amerlyq, 2015
 
 function _prompt_color {
-  local color="${1:-1}"
+  local color=${1:-1}
   ## Change main color according to environment variables
   #if (( $(echotc Co) < 256 )) ? 1,2,4 : 124,112,27; fi
-  if [[ -n "$SSH_TTY" ]]; then color=${2:-2}
-    if [[ "$HOST" =~ vbox ]]; then color=${3:-4}; fi
+  if [[ -n $SSH_TTY ]]; then color=${2:-2}
+    if [[ $HOST =~ vbox ]]; then color=${3:-4}; fi
   fi
+
+  if [[ -z $debian_chroot && -s /etc/debian_chroot ]]; then
+      debian_chroot=$(cat /etc/debian_chroot)
+  fi
+  [[ -z $debian_chroot ]] || color=${3:-4}
   # if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then ... else ... fi
   # TODO: dependant on availability -- colors and symbols
   print -rn "$color"
