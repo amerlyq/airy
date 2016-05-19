@@ -2,6 +2,7 @@
 source ~/.shell/func.d/packages
 
 #| ag      | The silver searcher -- 'ag' instead of 'grep' inside of git project -- very best!
+#| sift-bin| ALT:(grep) standalone parallel binary written in '.go'. Fastest?
 #| at      | Read commands from standard input or a specified file which are to
 #|_________|    be executed at a later time, using /bin/sh.
 #| iotop   | Show disk r/w statistics for processes like htop (press 'a')
@@ -26,6 +27,7 @@ if distro arch; then
   # THINK:SEE gtags (GNU Global) -- instead of ctags?
   pkg_inst ctags
   pkg_inst -p 'ag' the_silver_searcher
+  aur_inst -p 'sift' sift-bin
   pkg_inst -p 'locate' mlocate
   aur_inst shyaml
 

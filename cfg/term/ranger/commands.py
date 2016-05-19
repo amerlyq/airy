@@ -14,8 +14,9 @@ class ag(Command):
     Looks for a string in all marked paths or current dir
     """
     editor = os.getenv('EDITOR') or 'vim'
-    acmd = 'ag --smart-case --group --color --hidden --search-zip'
+    acmd = 'ag --smart-case --group --color --hidden'  # --search-zip
     qarg = re.compile(r"""^(".*"|'.*')$""")
+    # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
 
     def _sel(self):
         d = self.fm.thisdir
@@ -70,8 +71,8 @@ class ag(Command):
 
     def execute(self):
         cmd, flags = self._choose()
-        # BUG: ag -v -- nothing
-        self.fm.notify(cmd)
+        # self.fm.notify(cmd)
+        # TODO:ENH: cmd may be [..] -- no need to shell_escape
         self.fm.execute_command(cmd, flags=flags)
 
     def tab(self):
