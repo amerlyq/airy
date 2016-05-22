@@ -1,12 +1,20 @@
 #!/bin/bash -e
 source ~/.shell/profile
 
-lang=${CURR_XKB_LANG:-amer(us):1+amer(ru):2+amer(ua):3}
-over=${1:-${CURR_XKB_OVER:-vim}}
+# declare -A CURR_XKB=(
+#   [layout]='us,ua,ru' [variant]='basic,winkeys,winkeys'
+#   [overlay]='vim' [option]='misc:typo,amer:lvl3,amer:mods'
+# )
+
+# THINK: replace overlay for any layouts
+# MAYBE: is calling setxkbmap again with only '-option "over:$over"' enough?
+
+over=${1:-${CURR_XKB[overlay]:-vim}}
 r.xkb-has-overlay ${over:?}
 
-# -print -verbose 10
-exec setxkbmap -display ${DISPLAY:?} -option "" -model pc104 \
-  -types 'complete+amer' -compat amer \
-  -layout amer,amer,amer -variant us,ru,ua \
-  -symbols "amer(pc)+${lang}+amer(mod)+overlay($over)"
+# setxkbmap -query -verbose 10 -print
+exec setxkbmap -display ${DISPLAY:?} -option "" \
+  -model pc104 -rules amer \
+  -layout "${CURR_XKB[layout]:-us,ru,ua}" \
+  -variant "${CURR_XKB[variant]:-amer,amer,amer}" \
+  -option "${CURR_XKB[option]:-misc:typo,amer:nums,amer:lvl3,amer:mods},over:${over:?}"

@@ -2,8 +2,8 @@
 # SHOW all dbus services
 #   qdbus-qt4
 
-# TODO: extract from ${CURR_XKB_LANG}
-LG=(us ru ua)
+# ALT: extract from ${CURR_XKB_LANG}
+LG=( $(setxkbmap -query | sed -rn '/^layout:\s*/{s///;s/,/ /gp}') )
 
 # LG=$(setxkbmap -query | awk '/layout/{print toupper($2)}')
 

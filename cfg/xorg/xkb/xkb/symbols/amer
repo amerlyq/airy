@@ -24,15 +24,16 @@ partial xkb_symbols "mod" {
 
 partial alphanumeric_keys
 xkb_symbols "us" {
+    name[Group1]= "English (typewriter) mod_Amer";
     include "us"
 };
 
 partial alphanumeric_keys
 xkb_symbols "ru" {
-    include "ru(common)"
-    include "amer(nums)"
-    include "amer(symb_lvl3)"
     name[Group1]= "Russian (typewriter) mod_Amer";
+    include "ru(common)"
+    // include "amer(nums)"
+    // include "amer(lvl3)"
 
     key <AD12> { [ Cyrillic_hardsign , Cyrillic_HARDSIGN ] };
     key <AB10> { [ Cyrillic_io       , Cyrillic_IO       ] };
@@ -40,10 +41,10 @@ xkb_symbols "ru" {
 
 partial alphanumeric_keys
 xkb_symbols "ua" {
-    include "ua(legacy)"
-    include "amer(nums)"
-    include "amer(symb_lvl3)"
     name[Group1]= "Ukrainian (typewriter) mod_Amer";
+    include "ua(legacy)"
+    // include "amer(nums)"
+    // include "amer(lvl3)"
 
     // key <AD07> {[ Cyrillic_ghe, Cyrillic_GHE, Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ]};
     // key <AD12> { [ Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ] };
@@ -74,7 +75,7 @@ xkb_symbols "nums" {
 };
 
 partial alphanumeric_keys
-xkb_symbols "symb_lvl3" {
+xkb_symbols "lvl3" {
     // English symbols in cyrillic
     key <AD11> { [NoSymbol, NoSymbol, bracketleft , braceleft  ] }; // [
     key <AD12> { [NoSymbol, NoSymbol, bracketright, braceright ] }; //   ]
