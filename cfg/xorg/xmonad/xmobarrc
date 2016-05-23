@@ -93,6 +93,12 @@ Config {
 -- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
 , Run Com "awk" [ "{print$1}", "/proc/loadavg" ] "loadavg" 10
 , Run Com "r.xkb-lang" [ "-N" ] "lang" 10
+-- BUG: biased naming starts from amer(pc). CHECK:(src) Kbd plugin
+-- , Run Kbd
+--   [ ("amer(us)", "<fc=#00cc00>EN</fc>")
+--   , ("amer(ru)", "<fc=#0000cc>RU</fc>")
+--   , ("amer(ua)", "<fc=#ffcc00>UA</fc>")
+--   ]
 , Run Com "r.xkb-leds" [] "leds" 10
 , Run Swap
   [ "-t", "<usedratio>%" ] 100

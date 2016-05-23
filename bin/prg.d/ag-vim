@@ -6,6 +6,7 @@ set -o pipefail
 # THINK:DEV: Create *-Add for other commands?
 # TODO: To remove restriction on 8 patterns need to add '-bar' for Ag commands
 # OR: directly call functions.
+# NOTE: g:ag.last can be used to setup 'default' pattern to search by AgRepeat on vim start, evading arguments parsing. Can simplify script feeding.
 
 PATT='--:[QLG]?[-afh]'
 if (($#==0)) || [[ "$1" == '--help' ]]; then echo '

@@ -16,17 +16,14 @@
 
 // DFL: * = pc
 ! model = symbols
-  *     = amer(pc)
+  *     = amer(pc)+media
 
 // ALT: include "inet(evdev)+inet(logitech_base)"
 //      $evdevkbds    =   +inet(evdev)+inet(%m)
 
-! model = symbols
-  *     = +media
-
-// ! layout = symbols
 //   $nonlatin   = pc+us+%l%(v):2
-//   *     = pc+%l%(v)
+! layout = symbols
+  *      = +%l%(v)
 
 ! layout[1] variant[1] = symbols
   us        amer       = +amer(us):1
