@@ -29,6 +29,7 @@ Need more modules from some subdirectory?
 ./setup -u /  # choose currently preferred applications
 ./setup -iu   # once a week -- installs packages and update their configs
 ./setup -riu  # after adding new module or changing mods list in profile
+./setup -fri  # re-install pkgs one-by-one (when replacing by alternatives)
 # Install all modules:
 ./setup -iu  dev         # with exact name '*/dev'
 ./setup -iu  dev/        # all inside '*/dev/*' w/o 'dev' itself
@@ -118,7 +119,7 @@ PKG_SKIP=(/browser/{surf,uzbl,vimb} /dev/{eclipse,java,latex,sql,tizen} /io/{jta
 Profiles can be nested/inherited.
 This allows to distribute settings and nicely reuse parts of configs for similar hosts.
 ```bash
-source $CURR_DIR_PRF/home || return
+source "${CURR_DIR_PRF:?}/home" || return
 CURR_PROF=home_vbox
 PKG_SKIP+=( /browser/ )
 MAIN_MAIL="vboxuser@email.com"

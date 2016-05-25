@@ -18,6 +18,9 @@ distro ubuntu || die "Not Ubuntu"
 # makedepend : from xutils-dev
 # intltool - Ubuntu 10.04+ only.
 
+# NOTE: (hash sum mismatch)
+#   sudo apt-get clean && sudo apt-get update
+
 LST=(build-essential man-db dialog wget less gawk)
 LST+=(gcc-multilib g++-multilib lib32stdc++6)
 # BUG:(not found)  libc6-dbg:i386 unifdef

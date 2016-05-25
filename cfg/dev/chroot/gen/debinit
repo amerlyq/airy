@@ -10,8 +10,14 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
 
   # BUG: problems with groups transition
   #   -- schroot groups: cannot find name for group ID 14
+  # REF: it does not modify anything about the user environment unless you specifically tell it to. the list of effective groups is a process parameter, so those are inherited and not modified
+  # SEE: 'man sg' -- but it changes only active group
   # FIND: export/login with only choosen groups on schroot
   #   -- SEE http://unix.stackexchange.com/questions/160487/how-to-prevent-schroot-from-overridding-passwd-file-and-others-files-already-pre
+  # ALT: on Arch create new user 'ubuntu' for chroots only with ubuntu-like groups preset
+  # BUT: it will need 'wheel' group which will cause problems again
+  # ALT: copy only missing group lines into chroot/etc/group OR add by command
+  # BUT: may cause unknown problems when groups swapped 10 <-> 14
   echo "Wrn: security! change root/user passwords in chroot!"
   # THINK:TRY: copy from host only necessary lines?
   sudo schroot -c "${chr##*/}" -d "/" -- bash -c "
@@ -24,13 +30,15 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
     locale-gen 'en_US.UTF-8'  # NEED: locales
     # sudo dpkg-reconfigure tzdata
 
+    # ALT: sudo usermod -a -G sudo $USER
     id -g $user &>/dev/null || groupadd $user
-    id -u $user &>/dev/null || useradd -m -g $user -G users,uucp -s /bin/bash $user
+    id -u $user &>/dev/null || useradd -m -g $user -G users,uucp,sudo -s /bin/bash $user
     gpasswd -a $user uucp  # FIND: useradd is not enough to add to group?
     printf '%s' root:root   | chpasswd
     printf '%s' $user:$user | chpasswd
 
     # NOTE: only after install/update 'sudo'
+    # CHECK:ALT: add user to group 'sudo' is enough?
     sed -i '/^$user ALL.*/d; \$a\\$user ALL=(ALL) ALL' /etc/sudoers
 "; }
 
