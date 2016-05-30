@@ -473,6 +473,14 @@ Remove big/large/binary/old files
 		git reflog expire --all
 		git gc --aggressive --prune
 
+
+Remove 'origin/HEAD'
+: Points to branch checked out by default (i.e. when you clone).
+	git remote set-head origin -d
+
+Show author and commiter
+	git show --format=full
+
 Git notes
 	http://alblue.bandlem.com/2011/11/git-tip-of-week-git-notes.html
 
