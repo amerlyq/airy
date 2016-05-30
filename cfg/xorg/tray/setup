@@ -6,6 +6,7 @@ source ~/.shell/func.d/cfgsetup
 dst=~/.config/stalonetrayrc
 link -c stalonetrayrc "$dst"
 
+[[ $MAIN_DPI ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
 iw=$(( ${MAIN_DPI:?} * 9/72 + 2 ))
 sed -ri '
   /^(icon_size).*/s//\1 '$iw'/

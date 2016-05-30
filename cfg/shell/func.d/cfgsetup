@@ -17,10 +17,9 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme
 [[ $THEME_ALLOWED ]] || THEME_ALLOWED='dark|light|lucid|opaque'
+# ALT:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
 [[ $THEME ]] || THEME=$(<"${CURR_DIR_CACHE:?}/theme") ||:
-[[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=dark
-[[ $MAIN_DPI ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
-
+[[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
 
 ### LINKS ###
 # BUG: on error we can't exit from forked shell and fail main one!

@@ -18,6 +18,8 @@ fi
 dst=~/.Xresources
 wstr(){ cat >> "$dst" <<<"$*"; }
 
+[[ $MAIN_DPI ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
+
 > "$dst"
 wstr "#define MAIN_DPI  ${MAIN_DPI:?}"
 for f in "${CURR_DIR_CACHE:?}"/Xres-*; do
