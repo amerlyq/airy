@@ -4,8 +4,9 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   # EXPL: webex is 32-bit only
-  aur_inst bin32-firefox lib32-flashplugin
-  aur_inst bin32-jre
+  aur_inst bin32-firefox
+  aur_inst -f '/usr/share/licenses/lib32-flashplugin' lib32-flashplugin
+  aur_inst -d '/usr/share/doc/bin32-jre' bin32-jre
   aur_inst webex-meta
 
   linkcp -st '/usr/lib/mozilla/plugins' \

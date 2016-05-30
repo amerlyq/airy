@@ -24,7 +24,7 @@ if has_pr systemd-notify && systemd-notify --booted; then
       # MAYBE: move local svc searching into func.d/cfgsetup wrapper
       [[ -f ./unit/$f ]] && f=./unit/$f \
       || [[ -f ./$f ]] || die 1 "Not found '$f'"
-      if diff -q "$f" "${DIR:?}/$fl" &>/dev/null; then
+      if ! diff -q "$PWD/$f" "${DIR:?}/$fl" &>/dev/null; then
         do_replace=1
         linkcp ${sudo+-s} -ct "${DIR:?}" "$f"
       fi
