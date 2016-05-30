@@ -32,6 +32,7 @@ STYLE=freya
 maxln=128
 
 # Find out something about the file:
+# ALT: $ mimetype ...
 mimetype=$(file --mime-type -Lb "$path")
 extension="${path##*.}"
 extension="${extension,,}"

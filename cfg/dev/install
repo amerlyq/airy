@@ -6,7 +6,7 @@ if distro arch; then
     pkg_inst -p 'x86_64-pc-linux-gnu-gcc' gcc-multilib
     pkg_inst -f '/usr/lib32/libstdc++.so' lib32-gcc-libs
     pkg_inst -f '/usr/lib/valgrind/callgrind-amd64-linux' valgrind-multilib
-    pkg_inst doxygen cppcheck  # C++
+    pkg_inst doxygen # C++
     pkg_inst c2hs clisp   # -pr-lang: haskell, lisp
 
     # SEE: http://code.jsoftware.com/wiki/Books
@@ -25,7 +25,7 @@ elif distro ubuntu; then
     LST="$LST build-essential gcc-multilib g++-multilib lib32stdc++6 "
     LST="$LST make checkinstall pkg-config autoconf automake cmake" #binutils-gold
     #| libc6-dbg:i386 | need to prevent valgrind error with strlen -> strnlen
-    LST="$LST valgrind libc6-dbg:i386 gdb doxygen cppcheck"  #rabbit valkyrie  <GUI>
+    LST="$LST valgrind libc6-dbg:i386 gdb doxygen "  #rabbit valkyrie  <GUI>
     # LST="$LST google-perftools libgoogle-perftools-dev libgoogle-glog-dev google-mock"
     # Cross-compilers
     # LST="$LST gcc-arm-linux-gnueabi" #Or ...-androideabi

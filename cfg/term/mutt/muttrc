@@ -83,6 +83,8 @@ source $alias_file
 # macro index,pager I "!getmail"
 ## Fetch mail shortcut
 bind index G imap-fetch-mail
+# bind editor \Cp previous-entry
+# bind editor \Cn next-entry
 
 # Folder hooks
 folder-hook 'acc.amerlyq' 'source $my_cache/acc/amerlyq'
@@ -91,12 +93,18 @@ folder-hook 'acc.work'    'source $my_cache/acc/work'
 source $my_cache/acc/default    # Default account
 source $my_cache/theme          # Theme
 
-# Macros for switching accounts
+# Switch accounts
 macro index <f2> "<sync-mailbox><enter-command>\n\
 :source $my_cache/acc/amerlyq<enter><change-folder>!<enter>"
 macro index <f3> "<sync-mailbox><enter-command>\n\
 :source $my_cache/acc/work<enter><change-folder>!<enter>"
 macro index <f5> "<sync-mailbox><enter-command>\n\
+
+# Switch folders
+macro index,pager  ,i  "<change-folder>!<enter>"                "Go to inbox"
+macro index,pager  ,l  "<change-folder>^<enter>"                "Go to last"
+macro index,pager  ,s  "<change-folder>=Sent<enter>"            "Go to sent"
+macro index,pager  ,w  "<change-folder>=Work.Pj.opensrc<enter>" "Go to work"
 
 
 ## COMMANDS

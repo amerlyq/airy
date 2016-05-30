@@ -81,7 +81,7 @@ class ag(Command):
 
 
 class doc(Command):
-    lst = ['DEV', 'EXAMPLES', 'INFO', 'LIOR', 'NOTE', 'SYNERGY', 'TODO']
+    lst = ['DEV', 'EXAMPLES', 'INFO', 'HACK', 'LIOR', 'NOTE', 'SYNERGY', 'TODO']
     ext = '.otl'
     loci = ['doc', 'docs', '']
     """:doc [<name>]

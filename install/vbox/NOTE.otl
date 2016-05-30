@@ -1,0 +1,86 @@
+> Vbox
+
+< Serial Ports
+In settings
+	Port 1
+	[X] Enable Serial Port
+		Port Number: COM3  IRQ: 4  I/O Port: 0x3f8
+		Port Mode: Host Device
+					[ ] Create Pipe
+	Port/File Path: COM3
+
+The key here, which was not obvious to me, was to select "Host Device" and
+enter, seemingly redundantly, "COM1" as the host path. I did NOT select
+"Create Pipe".
+
+Better -- to forward simple USB device.  Then connect minicom to ttyUSB0 But
+your device will be blocked for host until exit guest.
+
+	minicom -s -c on
+	sudo cat /dev/ttyUSB0 | sed "/^E\//d; /\[TUNER\]/d; /SendMsearchResponse/d; /^info:/d; w $HOME/tztv" print "20089999\n97\n98\nls -l\n" | sudo tee /dev/ttyUSB0 
+
+< Fixing your virtualbox shared folder symlink error
+
+Operations such as installing node.js or python virtualenv to a virtualbox
+writable shared folder can fail if you try to do this as a linux (ubuntu)
+virtualbox guest running Windows 7 host.
+
+The cause is symlink permission.
+
+Typical error:
+
+ln -fs out/Release/node node ln: failed to create symbolic link `node':
+Read-only file system It can also be a "Protocol error".
+
+This happens even if your shared folder is writable.
+
+< Fix: Enable symlinks feature in VirtualBox
+
+Run at cmd prompt:
+
+VBoxManage setextradata YOURVMNAME
+VBoxInternal2/SharedFoldersEnableSymlinksCreate/YOURSHAREFOLDERNAME 1 Verify
+by running:
+
+VBoxManage getextradata YOURVMNAME enumerate If your user belongs to
+Administrators group then start VirtualBox with "Run as Administrator"!
+
+< If user is not in Administrators group
+
+By default Windows 7 security policy does not allow creating symlinks as it's
+a potential security threat. Run "secpol.msc" and navigate to "Local
+Policies-User Rights Assignments" and add your user to "Create symbolic
+links". I didn't try that but could be that after that virtualbox could be run
+as a regular user.
+
+Speculation: The controversy is that users with admin group seem to be unable
+to create symlinks even after granting the permission unless they use "run as
+admin". Maybe symlink privilege gets filtered out for regular runs when user
+belongs to Administrators. Any ideas?
+
+Let me know if it helps or if there's an easier way!
+
+
+Thanks a lot!  Yes, i can confirm that user which account type is
+"Administrator" can create symlinks, only when running VB with "run as
+administrator". It isn't cozily. I simply created new administrator account
+"admin" and changed my user account to "Standart". I did manipulations
+described on this post and all works fine. And now If i need to run some
+different app as administrator i simply choose "run as administrator" from
+dropdown menu and it asks me my "admin" user password. My system is Windows 8.
+
+
+For me, yes it worked for creating symlinks in shared folders from my Ubuntu
+guest OS. But now my init.d/rc.local script doesn't seem to get executed
+anymore, so the shared folders are no longer automatically mounted. I don't
+know why this change would cause this to happen. It doesn't make any
+difference if I start VirtualBox as administrator or not.
+
+Edit: The mount command shows that the folder is indeed being mounted, but for
+some reason it isn't accessible unless I manually mount it again. Then the
+'mount' command shows two identical entries for the mounted folder.
+
+I'll add that I've been using this VirtualBox and Ubuntu environment, with
+that same shared folder, for months without problem. Only after I applied this
+fix to be able to create symlinks, did I start experiencing this problem with
+folder access.
