@@ -24,9 +24,12 @@ if has_pr systemd-notify && systemd-notify --booted; then
       # MAYBE: move local svc searching into func.d/cfgsetup wrapper
       [[ -f ./unit/$f ]] && f=./unit/$f \
       || [[ -f ./$f ]] || die 1 "Not found '$f'"
-      linkcp ${sudo+-s} -ct "$DIR" "$f"
+      if diff -q "$f" "${DIR:?}/$fl" &>/dev/null; then
+        do_replace=1
+        linkcp ${sudo+-s} -ct "${DIR:?}" "$f"
+      fi
     done
-    $sudo systemctl $A daemon-reload
+    ((!do_replace)) || $sudo systemctl $A daemon-reload
   fi
 
   cfgNo e || for f in "$@"; do
@@ -41,6 +44,7 @@ if has_pr systemd-notify && systemd-notify --booted; then
   cfgNo r || for f in "$@"; do
     if ! systemctl $A is-active "$f" &>/dev/null
     then $sudo systemctl $A start "$f"
+      # BAD: always need sudo when used '-r'
     else $sudo systemctl $A restart "$f"
     fi 2>&1
   done
