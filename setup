@@ -105,6 +105,7 @@ if cfgOpt u && ((!$#)) && [[ -d ~/.config/systemd/user ]]; then
 fi
 
 # ======================================================================
+# FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
 # EXPL: -m (in main 'setup') forces single thread execution
 run(){ if [[ -f $1 ]]; then "$@" $(cfgOpt m || echo -m); else echo "(no ${1##*/})"; fi; }
 r_install(){ cfgOpt i || return 0; run "$1/install" $(cfgOpt f && echo -u); }

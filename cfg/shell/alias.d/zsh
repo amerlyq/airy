@@ -10,7 +10,9 @@ alias -g NO='&>/dev/null'
 alias -g  L='| less '
 alias -g LL='|& less -r '
 alias -g  V='|& $EDITOR - '
+# ALT:(fzf) https://github.com/garybernhardt/selecta
 if (($+commands[fzf])); then
+  # BAD: cat $(ls Z)  NEED: use xargs only if 0<$#
   alias -g Z='|& fzf -m|xargs -L1 '
   alias -g Z@='Z -I@ '
   alias -g ZY='|& fzf -m|xsel -ib'

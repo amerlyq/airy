@@ -21,7 +21,7 @@ export PATH
 _dttime exp-cabal
 
 ### Vim ###
-_has_pr nvim && EDITOR=nvim || EDITOR=vim
+EDITOR=r.vim && _has_pr $EDITOR || EDITOR=vim
 export EDITOR VISUAL=$EDITOR
 _dttime exp-nvim
 
