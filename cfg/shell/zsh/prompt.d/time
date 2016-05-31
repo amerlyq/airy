@@ -7,24 +7,33 @@ function prompt_amer_time_format {
   local minutes=$(( (dt /= 60) % 60 ))
   local hours=$(( (dt /= 60) % 24 ))
   local days=$(( dt / 24 ))
-  if (( $days > 0 )); then total+="${days}d"; color=9; fi
-  if (( $hours > 0 )); then total+="${hours}h"; color=13; fi
-  if (( $minutes > 0 )); then total+="${minutes}m"; color=1; fi
+  if (( $days > 0 )); then total+=${days}d; color=9; fi
+  if (( $hours > 0 )); then total+=${hours}h; color=13; fi
+  if (( $minutes > 0 )); then total+=${minutes}m; color=1; fi
   print -P "%F{$color}${total}${seconds}s"
 }
 
 # ============================================ #
 
 function prompt_amer_preexec {
-  _prompt_amer_time_start="$SECONDS"
+  _prompt_amer_time_start=$SECONDS
   # print -rn -- $terminfo[el]  # Erase notification under prompt
 }
 
 function _prompt_amer_time_get {
   # Calculate and print the elapsed time.
+  # ALT:(SECONDS) https://gist.github.com/jpouellet/5278239
   local dt=$(( SECONDS - _prompt_amer_time_start ))
-  if (( dt > 10 )); then
-    local hdt="$(prompt_amer_time_format ${dt})"
-    print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
-  fi
+
+  (( dt > 10 )) || return 0
+  local hdt=$(prompt_amer_time_format ${dt})
+  print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
+
+  (( dt > 120 )) || return 0
+  print -n '\a' >&2 # Urgent bell
+
+  # BAD: false-positive after: ranger, bash, schroot, etc
+  # if (($+commands[r.n])) && [[ $DISPLAY ]]; then
+  #   r.n -U 'ZSH' "$(fc -l -n -1)"
+  # fi
 }
