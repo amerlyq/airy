@@ -9,12 +9,16 @@ case "$1" in -p) shift
 ;; *) game=$1 ;; esac
 
 [[ -f $game ]] || { r.n 'No such' "$game"; exit 1; }
+ON_EXIT=('r.video-single 1')
 
 if r.xkb-has-overlay "$game"; then
   r.xkb "$game" && xkbset ov1
-  # CHECK: called only one trap or sometimes multiple of them?
-  trap 'xkbset -ov1; r.xkb' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+  ON_EXIT+=('xkbset -ov1' 'r.xkb')
 fi
 
 r.wm -w g  # Jump to game workspace
+
+# CHECK: called only one trap or sometimes multiple of them?
+trap 'for c in "${ON_EXIT[@]}"; do $c; done' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+
 ./"$game"

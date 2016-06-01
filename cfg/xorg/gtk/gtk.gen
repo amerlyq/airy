@@ -10,9 +10,10 @@ g3=~/.config/gtk-3.0/settings.ini
 mkdir -p "${g3%/*}"
 echo '# include "/etc/gtk-2.0/gtkrc"' > $g2
 echo '[Settings]' > $g3
-wopt() {
-    printf '%s = "%s"\n' "$1" "${*:2}" >> $g2
-    printf '%s = %s\n'   "$1" "${*:2}" >> $g3
+wopt() { local v=${*:2}
+  printf '%s = %s\n' "$1" "$v" >> $g3
+  [[ ! $v =~ " " ]] || v="\"$v\""
+  printf '%s = %s\n' "$1" "$v" >> $g2
 }
 
 # GUI (use lxappearance): Adwaita, Hope-DT, FlatStudioGray, Mint-X, Ambiance

@@ -5,6 +5,7 @@ source ~/.shell/profile
 # xosd-bin
 
 echo "NOTE: disable composition to reduce performance impact!"
+# BAD: export GDK_SCALE=0.3
 exec primusrun playonlinux
 # PRIMUS_VERBOSE=2 primusrun glxgears 2>&1 \
     # | sed -rn 's/.*display.*, (\S+) fps,.*/\1/p' > /tmp/wine
