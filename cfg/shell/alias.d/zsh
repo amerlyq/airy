@@ -25,17 +25,21 @@ alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-run
 ## Filters
 alias -g H='|head '
 alias -g C='|wc -l '
+alias -g S='|noglob sort -n'
 alias -g T='|column -t '
 alias -g W='|while read line; do '
 # ATTENTION: disallow aliases after commands requiring args
 alias -g G="|noglob grep $AUTOCOLORS -i"
 alias -g G2="|noglob grep -C 2 $AUTOCOLORS -i"
-alias -g S='|noglob sed -rn'
+alias -g SR='|noglob sed -rn'
+
+for i in {1..3}; do alias -g C$i="|noglob awk '{print\$$i}'"; done
+alias -g C\$="|noglob awk '{print\$NF}'"
 
 ## Buffers
 if (($+commands[xsel])); then
-  alias XX='xsel -ob'
-  alias X='|tee >(xsel -ib)'
+  alias -g XX='xsel -ob'
+  alias -g X='|tee >(xsel -ib)'
   alias -g XA='|tee >(xsel -ab)'
 fi
 
