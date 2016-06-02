@@ -5,17 +5,24 @@ session='jobs'
 maincmd=r.ranger  # USE:($2) r.ranger, htop, r.notify-watch
 name=main
 
-while getopts 'm:n:t:' o; do case "$o"
+while getopts 'm:n:t:j' o; do case "$o"
 in t) session=$OPTARG
 ;; n) name=$OPTARG
 ;; m) maincmd=$OPTARG
-;; *) exit; esac; done; shift $((OPTIND-1))
+;; j) jump2wnd=1
+;; *) exit 1; esac; done; shift $((OPTIND-1))
+(($#)) || exit 2
 
 if ! tmux has-session -t "$session" 2>/dev/null; then
   tmux new-session -d -c "$PWD" -n "$name" -s "$session" "$maincmd"
   tmux set-option -s -t "$session" status on
 fi
 
+wnm=${1:0:8}-$$
+wnm=${wnm/[.:]/_}
+
 # ATTENTION: Each starting command must be unique!
 tmux list-window -F '#{pane_start_command}' -t "$session" | grep -qxF "$*" \
-|| tmux new-window -d -c "$PWD" -n "$1-$$" -t "$session" "$@"
+|| tmux new-window -d -c "$PWD" -n "$wnm" -t "$session" "${@:?}"
+
+((!jump2wnd)) || tmux select-window -t "$session:=$wnm"

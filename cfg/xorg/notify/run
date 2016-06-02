@@ -14,7 +14,7 @@ in t) EXPIRE=$OPTARG
 ;; a|c|i) ARGS+=( -$o $OPTARG )
 ;; *) exit; esac; done; shift $((OPTIND-1))
 
-if [[ ! ${CMD[*]} =~ urgency=critical || $EXPIRE ]]; then
+if [[ ! ${CMD[*]} =~ urgency=critical ]] || ((EXPIRE > 0)); then
   CMD+=( -t $((${EXPIRE:-12}*100)) )
 fi
 

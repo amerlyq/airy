@@ -4,9 +4,11 @@ dldcmd=r.wgetf
 session=wget
 maincmd='source r.ranger'
 
-while getopts 'lc:o:t:yw' o; do case $o
+while getopts 'jlc:d:o:t:yw' o; do case $o
 in o) cd "${OPTARG/#\~/$HOME}"  # THINK: replace with dir= for youtube-dl, etc?
 ;; c) opencmd=$OPTARG
+;; j) jobargs=-j
+;; d) dldcmd=$OPTARG
 ;; l) dldcmd=r.wgetl
 ;; y) dldcmd=youtube-dl
 ;; t) session=$OPTARG
@@ -23,8 +25,8 @@ else
 fi
 
 
-r.tmux-job -t "$session" -m "$maincmd" \
-  r.notify-cmd -n "Saved: $fnm" -f "Can't dld: $fnm" \
+r.tmux-job -t "$session" -m "$maincmd" $jobargs -- \
+  r.notify-cmd -n 'Saved: $fnm' -f 'Failed dld: $fnm' -- \
     $dldcmd "${@:?}"
 r.notify "Started" "${@:?}"
 

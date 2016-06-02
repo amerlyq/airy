@@ -1,10 +1,69 @@
-#!/bin/bash
-# USE: khinsider.com
-exec wget -O- "$@" \
-| sed -rn '/.*href="(https?:\/\/[^"]*\.mp3)".*/s//\1/p' \
-| wget -i- -O- \
-| sed -rn '/.*href="(https?:\/\/[^"]+\.mp3)">(Click here to download|Download to Computer).*/s//\1/p' \
-| r.wgetf -i-
+#!/bin/bash -e
+# USE: khinsider.com, anime.thehylia.com
+set -o pipefail
+
+# TRY: in ncmpcpp emulate 'download current song'
+# -t -- MUST be launched from inside browser in tmux (keep tmux opened near browser)
+# BUG: need error in r.wgett when fzf chose nothing (like when Esc pressed)
+# -> FIXME: don't create folder if no links to dld
+
+CACHE=/tmp/music
+DST=/home/media/_dld/music
+
+mkdir -p "$CACHE"
+
+hasn(){ for o in "$@"; do [[ ! ${OPTS:=l} =~ [$o] ]] || return; done; }
+unset OPTS OPTIND
+while getopts 'njldtp' o
+do [[ $o != [:?] ]] && OPTS+=$o || exit
+done; shift $((OPTIND-1))
+(($#)) || exit 2
+
+
+album(){ sed -rn '/.*<h2>([^<]+)<\/h2>.*/{s//\1/p;q}' "$1"; }
+urlst(){ local lnm='Click here to download|Download to Computer'
+  if [[ -s ${1}.urls ]]; then cat "${1}.urls"; return; fi
+  sed -rn '/.*href="(https?:\/\/[^"]*\.mp3)".*/s//\1/p' "$1" \
+  | wget -q -i- -O- \
+  | sed -rn '/.*href="(https?:\/\/[^"]+\.mp3)">('"$lnm"').*/s//\1/p' \
+  | tee "${1}.urls"
+}
+# NOTE: delete album header from playlist, if you want to add it again
+_mpcl(){ mpc playlist -f '[%file%]'; }
+inmpc(){
+  _mpcl | grep -qxF "$1" || { printf '%s\n' "$1"; cat; } | mpc add
+  mpc play $(( $(_mpcl | grep -nxF "$1" | awk -F: '{print$1;exit}') ))
+  hasn j || r.wm M-o_n  # TEMP:HACK:(open/jump to ncmpcpp)
+}
+
+todld(){ local cmd=(cat) d=${DST:?}/${1:?}
+  trap "cd '$PWD'" RETURN INT TERM EXIT
+  mkdir -p "$d" && cd "$d"
+
+  hasn j || r.wm 'M-<F1>'  # TEMP:HACK:(mark wnd 'tmux a -t wget' by M-S-F1)
+  hasn t || cmd=(fzf --exit-0 --multi --no-sort --reverse --cycle --no-hscroll)
+  eval "${cmd[@]:?}" | r.wgetf -i-
+}
+
+# THINK:TODO: parallel 'for' to start 'mpc' before starting 'dld'
+for url in "${@:?}"; do
+  hasn pd || r.n 'Fetching...' "${url##*/}"
+
+  # EXPL: Save only first-level pages
+  f=$CACHE/${url##*/}
+  [[ -s $f ]] || f=$CACHE/$(r.wget-nm "$url")
+  [[ -s $f ]] || r.wgetf -q "$url" -O "$f"
+
+  # NOTE: order is dependent on the ops duration
+  hasn n || album "$f"
+  hasn l || urlst "$f"
+
+  hasn pd || nm=$(album "$f")
+  hasn  p || urlst "$f" | inmpc "http://===== ${nm:?} ====="
+  hasn  d || urlst "$f" | todld "${nm:?}"
+
+  hasn pd || r.n 'DONE' "${nm:?}"
+done
 
 # USE: prime_music
 # exec wget -O- "$@" \
