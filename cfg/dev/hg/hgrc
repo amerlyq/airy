@@ -4,6 +4,8 @@
 
 [defaults]
 qnew = -Ue
+# suppress noisy extdiff header message
+cdiff = -q
 
 [alias]
 # USE instead of 'hg log'
@@ -41,33 +43,49 @@ strip=
 ## Viewing
 graphlog=
 hgext.hgk=
+hgext.extdiff=
 
 [color]
-mode=terminfo
-## Colours for each label
-# default
-color.orange=202
-color.lightyellow=191
-color.darkorange=220
-color.brightyellow=226
+# mode=terminfo
 # log
 log.branch=cyan
-log.summary=lightyellow
-log.description=lightyellow
+log.summary=yellow
+log.description=yellow
 log.bookmark=green
-log.tag=darkorange
+log.tag=red
 log.activebookmark = green bold underline
 # changeset
-changeset.public=orange bold
+changeset.public=green bold
 changeset.secret=blue bold
-changeset.draft=brightyellow bold
+changeset.draft=yellow bold
 # desc
 desc.here=bold blue_background
+diff.diffline = bold
+diff.extended = cyan bold
+diff.file_a = red bold
+diff.file_b = green bold
+diff.hunk = magenta
+diff.deleted = red
+diff.inserted = green
+diff.changed = white
+diff.trailingwhitespace = bold red_background
+# status
+status.modified = yellow bold
+status.added = green bold
+status.removed = red bold
+status.deleted = cyan bold
+status.unknown = blue bold
+status.ignored = black bold
 
 [diff]
 git = 1
 showfunc = 1
 unified = 8
+
+[extdiff]
+# configure extended diff to use colordiff (requires colordiff installed in your system)
+cmd.cdiff = colordiff
+opts.cdiff = -uprN
 
 [histedit]
 ## So 'hg histedit' could work w/o args

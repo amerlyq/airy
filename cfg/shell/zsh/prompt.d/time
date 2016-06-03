@@ -24,16 +24,15 @@ function _prompt_amer_time_get {
   # Calculate and print the elapsed time.
   # ALT:(SECONDS) https://gist.github.com/jpouellet/5278239
   local dt=$(( SECONDS - _prompt_amer_time_start ))
-
   (( dt > 10 )) || return 0
-  local hdt=$(prompt_amer_time_format ${dt})
-  print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
 
-  (( dt > 120 )) || return 0
-  print -n '\a' >&2 # Urgent bell
+  local hdt=$(prompt_amer_time_format ${dt})
+  (( dt > 120 )) || hdt+='\a'  # Urgent bell
 
   # BAD: false-positive after: ranger, bash, schroot, etc
   # if (($+commands[r.n])) && [[ $DISPLAY ]]; then
   #   r.n -U 'ZSH' "$(fc -l -n -1)"
   # fi
+
+  print -P "%B%F{10}>>> elapsed time: ${hdt}%f%b"
 }

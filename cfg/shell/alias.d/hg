@@ -11,9 +11,9 @@ alias hgdp='hgdf -r .~1 -r .'
 
 # hg log --template "{node};{date|shortdate};{branch};{author};{join(splitlines(desc), ' ')};{diffstat};files: {join(files, ', ')}\n"
 alias hglg='hg log --graph --limit 50 --template "\t{desc|strip|firstline}\n\t\t{date|shortdate} [{author|user}] :{node|short} "'
-alias hglb='hg branches'
-alias hglbm='hg bookmarks'
-alias hglh='hg heads'
+alias hgbl='hg branches'
+# alias hglbm='hg bookmarks'
+alias hghl='hg heads'
 
 alias hga='hg add'
 alias hgaa='hg addremove'

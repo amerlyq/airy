@@ -3,6 +3,7 @@
 # User-choosen bkgr
 pic=~/aura/screenlock.png
 txt=${TMPDIR:?}/screenlock.txt
+dpms='--dpms'
 
 if [[ ! -f $pic ]]; then
   pic=${TMPDIR:?}/screenlock.png
@@ -12,15 +13,16 @@ if [[ ! -f $pic ]]; then
 
   # TODO: apply text to user-choosen bkgr, not only to screenshot
   ((!$#)) || cat > "${txt:?}" <<< "$*"
-  if [[ ! -f $txt ]]; then mogrify \
+  if [[ -f $txt ]]; then mogrify \
     -pointsize 72 -font DejaVu-Sans -fill Yellow \
     -annotate +200+200 "$(<"$txt")" "$pic"
+    unset dpms
   fi
 fi
 
 # Notifications demon pause/resume
 notify-send 'DUNST_COMMAND_PAUSE'
-i3lock --dpms --nofork --color 111111 --image "$pic"
+i3lock $dpms --nofork --color 111111 --image "$pic"
 notify-send 'DUNST_COMMAND_RESUME'
 
 ## With this you can hold backlight 3 sec longer

@@ -15,11 +15,11 @@ if neobundle#tap('unite.vim') "{{{
   \ 'o': 'Outline outline',
   \ 's': 'MySub mysub',
   \ 'y': 'yanks history/yank',
-  \ '/': 'grep grep:.',
+  \ 'g': 'grep grep:.',
   \ ':': 'commands history/command',
   \ ';': 'commands command',
   \ 'F': 'files file',
-  \ 'L': 'lines line',
+  \ '/': 'lines -start-insert line',
   \}
   for [c, r] in items(s:maps) | for m in ['n','x']
     exe m.'noremap <unique><silent> [Unite]'.c
