@@ -15,7 +15,7 @@ fi
 if cfgOpt u; then
   ### GENS ###
   ./samba.gen
-  svc_activate -er smbd
+  svc_activate -eR smbd
   # Once Samba has restarted, use this command
   # to check your smb.conf for any syntax errors
   testparm -s >/dev/null

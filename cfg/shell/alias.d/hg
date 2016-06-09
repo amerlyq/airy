@@ -11,6 +11,8 @@ alias hgdp='hgdf -r .~1 -r .'
 
 # hg log --template "{node};{date|shortdate};{branch};{author};{join(splitlines(desc), ' ')};{diffstat};files: {join(files, ', ')}\n"
 alias hglg='hg log --graph --limit 50 --template "\t{desc|strip|firstline}\n\t\t{date|shortdate} [{author|user}] :{node|short} "'
+
+alias hgcs='hg log --patch -r'
 alias hgbl='hg branches'
 # alias hglbm='hg bookmarks'
 alias hghl='hg heads'
@@ -19,7 +21,7 @@ alias hga='hg add'
 alias hgaa='hg addremove'
 alias hgcm='hg commit -m'
 alias hgca='hg commit --amend'
-alias hgcs='hg outgoing'  # Check what you're going to push
+alias hgout='hg outgoing'  # Check what you're going to push
 
 # Edit
 alias hgpop='hg strip --keep -r .'
@@ -30,6 +32,7 @@ alias hgpatch='hgcm "ADD feature" && hg export . > feature.patch && hgpop'
 
 alias hgb='hg branch'
 alias hgco='hg checkout'
+alias hgup='hg up -r'
 # alias hged='hg diffmerge'
 # pull and update
 # alias hgs='hg shelve'

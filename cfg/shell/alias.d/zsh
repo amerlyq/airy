@@ -1,22 +1,17 @@
 ## Global aliases. Zsh only
 [[ $SHELL =~ zsh$ ]] || return 0
+# ATTENTION: disallow aliases after commands requiring args
 
 # Expand in any place of cmdline.
 # Space at the end to allow expanding next command
 
 ## Consumers
-alias -g NE='2>/dev/null'
-alias -g NO='&>/dev/null'
+alias -g N0='&>/dev/null'
+alias -g N2='2>/dev/null'
 alias -g  L='| less '
 alias -g LL='|& less -r '
 alias -g  V='|& $EDITOR - '
-# ALT:(fzf) https://github.com/garybernhardt/selecta
-if (($+commands[fzf])); then
-  # BAD: cat $(ls Z)  NEED: use xargs only if 0<$#
-  alias -g Z='|& fzf -m|xargs -L1 '
-  alias -g Z@='Z -I@ '
-  alias -g ZY='|& fzf -m|xsel -ib'
-fi
+
 # alias -g TL='| tail -20 '
 
 ## Utils
@@ -28,25 +23,45 @@ alias -g C='|wc -l '
 alias -g S='|noglob sort -n'
 alias -g T='|column -t '
 alias -g W='|while read line; do '
-# ATTENTION: disallow aliases after commands requiring args
-alias -g G="|noglob grep $AUTOCOLORS -i"
-alias -g G2="|noglob grep -C 2 $AUTOCOLORS -i"
 alias -g SR='|noglob sed -rn'
 
 for i in {1..3}; do alias -g C$i="|noglob awk '{print\$$i}'"; done
 alias -g C\$="|noglob awk '{print\$NF}'"
 
-## Buffers
-if (($+commands[xsel])); then
-  alias -g XX='xsel -ob'
-  alias -g X='|tee >(xsel -ib)'
-  alias -g XA='|tee >(xsel -ab)'
+# Pipes
+if (($+commands[grep])); then
+  alias -g G="|noglob grep $AUTOCOLORS -i"
+  alias -g G\?='G -q'
+  alias -g G\?\?='G -qF'
+  alias -g G\?\?\?='G -qxF'
+  alias -g G2='G -C2'
 fi
 
-alias -g FO='<$TMPDIR/zsh-last-output'
-alias -g FN='>$TMPDIR/zsh-last-output'
-alias -g FC='|tee    $TMPDIR/zsh-last-output| '
-alias -g FA='|tee -a $TMPDIR/zsh-last-output| '
+if (($+commands[xargs])); then
+  # BAD: cat $(ls Z)  NEED: use xargs only if 0<$#
+  alias -g X='|xargs -r -L1 '
+fi
+
+if (($+commands[xsel])); then
+  alias -g Y='|tee >(xsel -ib)'
+  alias -g Y+='|tee >(xsel -ab)'
+  alias -g Y:='xsel -ob'
+fi
+
+if (($+commands[fzf])); then
+  # ALT:(fzf) https://github.com/garybernhardt/selecta
+  # --multi --no-sort --reverse --cycle --no-hscroll
+  alias -g F='|& fzf -m'
+  alias -g X@='F X '
+  alias -g Y@='F Y '
+  # alias -g Z:='Z@ -I{} '
+fi
+
+## Buffers
+_xsel_tmp_buf=${TMPDIR:-/tmp}/zsh-last-output
+alias -g YT='|tee    $_xsel_tmp_buf'
+alias -g YT+='|tee -a $_xsel_tmp_buf'
+alias -g YT:='cat $_xsel_tmp_buf'
 
 # alias -r @="printf \"$(xsel -ob)\n\""
 #   { xsel: Can't open display: (null)
@@ -58,7 +73,9 @@ alias please='sudo $(fc -ln -1)'
 alias kill='\kill'  # FIXED pid completion by process name
 
 ## Shorts
-if (($+commands[jcalc])); then alias jc='noglob jcalc'; fi
+if (($+commands[jcalc])); then
+  alias jc='noglob jcalc'
+fi
 
 ## Std-like
 # alias agi='noglob agi'

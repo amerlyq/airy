@@ -12,7 +12,7 @@ fi
 link -sc ./cfg "$dir"
 
 if cfgOpt u ; then
-  svc_activate -cer dictd.service
+  svc_activate -ceR dictd.service
 
   dicts=/home/media/res/dicts
   if [[ ! -d $dicts ]]

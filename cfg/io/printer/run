@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+if [[ $1 == -l ]]; then
+  echo "NOTE: use as -P <pr_nm> <file>.."
+  lpstat -a
+  exit
+fi
+
+svc_activate -r \
+  org.cups.cupsd.service \
+  cups-browsed.service
+
+# lpr -P <printer-name> <file>..
+lpr "$@"

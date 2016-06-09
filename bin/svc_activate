@@ -7,7 +7,7 @@ sudo=sudo
 OPTIND=1
 
 # copy/enable/re-*/run/user
-while getopts 'ceru' o; do case $o
+while getopts 'cerRu' o; do case $o
 in u) A=--user; unset sudo; DIR=~/.config/systemd/user
       # ALT:CHECK:(faster startup) /etc/systemd/user
 ;; :|'?') die 1
@@ -41,11 +41,11 @@ if has_pr systemd-notify && systemd-notify --booted; then
   done
   # elif cfgNo e; then $sudo systemctl $A disable "$f"
 
-  cfgNo r || for f in "$@"; do
-    if ! systemctl $A is-active "$f" &>/dev/null
-    then $sudo systemctl $A start "$f"
-      # BAD: always need sudo when used '-r'
-    else $sudo systemctl $A restart "$f"
+  cfgNo rR || for f in "$@"; do
+    if ! systemctl $A is-active "$f" &>/dev/null; then
+      $sudo systemctl $A start "$f"
+    elif cfgOpt R; then
+      $sudo systemctl $A restart "$f"
     fi 2>&1
   done
 

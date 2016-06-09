@@ -1,0 +1,8 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+    pkg_inst cups ghostscript gsfonts
+    pkg_inst cups-pdf  # print in pdf
+    pkg_inst avahi  # network discovering
+fi

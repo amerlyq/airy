@@ -10,8 +10,9 @@ function! s:Gm()
   let last_col  = virtcol('.')
   execute 'normal! ' . (first_col + last_col) / 2 . '|'
 endfunction
-nnoremap <silent> gm :call <SID>Gm()<CR>
-onoremap <silent> gm :call <SID>Gm()<CR>
+noremap  <unique><silent> gM gm
+nnoremap <unique><silent> gm :call <SID>Gm()<CR>
+onoremap <unique><silent> gm :call <SID>Gm()<CR>
 
 
 "{{{ CMDS =====
