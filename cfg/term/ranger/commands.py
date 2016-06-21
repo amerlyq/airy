@@ -162,6 +162,8 @@ class nrenum(Command):
         if istotal:
             self.shift()
         chg = int(self.arg(1)) if self.arg(1) else 1
+        if self.quantifier:
+            chg *= self.quantifier
 
         m = nrenum.bmrk.match(self.fm.thisfile.relative_path)
         if not m:

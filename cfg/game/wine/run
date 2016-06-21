@@ -6,7 +6,11 @@ source ~/.shell/profile
 
 echo "NOTE: disable composition to reduce performance impact!"
 # BAD: export GDK_SCALE=0.3
-exec primusrun playonlinux
+
+trap 'xrdb -load ~/.Xresources' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+xrdb -DMAIN_DPI=141 -load ~/.Xresources
+
+primusrun playonlinux
 # PRIMUS_VERBOSE=2 primusrun glxgears 2>&1 \
     # | sed -rn 's/.*display.*, (\S+) fps,.*/\1/p' > /tmp/wine
     # | osd_cat --lines=1 --color=yellow --font="-*-fixed-*-*-*-*-18-*-*-*-*-*-*-*"
