@@ -28,7 +28,7 @@ fi
 
 # EXPL: run vim if there are no 'nvim'
 for pr in nvim vis vim vi; do
-  if _has_pr nvim; then exec $pr "$@"; fi
+  if _has_pr $pr; then exec $pr "$@"; fi
 done
 exit 1  # ERR: if not found
 
