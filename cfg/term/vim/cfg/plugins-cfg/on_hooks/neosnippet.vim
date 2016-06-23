@@ -29,10 +29,11 @@ imap <silent><unique><expr> <C-l>
 "     \ "\<Plug>(neosnippet_expand_or_jump)"
 "     \: "\<TAB>"
 
+" EXPL:(commented) as conflicts 'conceal' options changed in plugins
 " For snippet_complete marker.
-if has('conceal')
-  set conceallevel=2 concealcursor=i
-endif
+" if has('conceal')
+"   set conceallevel=2 concealcursor=i
+" endif
 
 
 "" ADDITIONAL

@@ -19,7 +19,7 @@ call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
 call _cfg('neobundle.vim')
 
 filetype plugin indent on  " Required!
-syntax enable
+syntax enable  " only sets groups not set yet. Use 'on' to overwrite
 
 try
   if exists('$TMUX') && &t_Co <= 16
