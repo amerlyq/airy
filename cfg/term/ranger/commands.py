@@ -88,6 +88,8 @@ class doc(Command):
     Search and open appropriate metafile in one of choosen directories
     """
 
+    # TODO: find existing file with any extension.
+    # -- Though ext=.otl is preferred and default when creating new file.
     def _nearest(self, fvalidate):
         for d in doc.loci:
             path = fs.join(self._dbase, d, self._dname)
