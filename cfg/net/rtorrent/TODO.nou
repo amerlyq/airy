@@ -1,0 +1,40 @@
+Move/delete finished dld
+	http://ubuntuforums.org/showthread.php?t=1092286
+
+Choose files
+  rtorrent does allow you to control which file from a torrent to download
+  from the 'File list' view. From the main view get there by selecting the
+  particular torrent using up/down arrow keys so it is stared, then hit
+  right arrow to view details, then down arrow to select 'File list',
+  followed by right arrow to allow you to navigate the file list. Once you
+  are in the list of files you move up/down with the arrows keys to select
+  the file in question. Then hit the space-bar to toggle through the 'file
+  priority' options of whether the file is 'hig' (i.e. High priority),'off'
+  (i.e. don't download), or blank (i.e.  'normal'). The 'off' setting allows
+  you skip the file(s) in questio
+
+Automation (choose file)
+  ``` For proper automation you'd probably want to script it in python or
+  ruby using some torrent library, but if it's generally more flexible file
+  selection that you're after, then you could try utilizing the web
+  interfaces that many torrent clients offer.
+
+  As an example using Tixati client and a hypothetical torrent where there's
+  hundreds of directories that each have a subdirectory that you don't want
+  (let's say it's called "RUS"). So, after enabling web interface from
+  Tixati settings, you'd go to localhost:8888, open a javascript console and
+  write something like this:
+  ```
+  Snippet ```js
+    var jq = document.createElement('script');
+    jq.src = "//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js";
+    document.getElementsByTagName('head')[0].appendChild(jq);
+
+    $('.xferstable tr:has(td)').each(function(i,td){
+      var fname= $('td:eq(1)', td).text();
+      $('input', td).prop('checked', fname.match(/\\RUS\\/) == null);
+    })
+  ```
+
+  > ``` You can visually verify that it selected the files you wanted
+    and click Apply, et voilà. ```
