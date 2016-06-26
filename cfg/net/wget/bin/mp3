@@ -14,7 +14,7 @@ mkdir -p "$CACHE"
 
 hasn(){ for o in "$@"; do [[ ! ${OPTS:=l} =~ [$o] ]] || return; done; }
 unset OPTS OPTIND
-while getopts 'njldtp' o
+while getopts 'nojldtp' o
 do [[ $o != [:?] ]] && OPTS+=$o || exit
 done; shift $((OPTIND-1))
 (($#)) || exit 2
@@ -31,6 +31,7 @@ urlst(){ local lnm='Click here to download|Download to Computer'
 # NOTE: delete album header from playlist, if you want to add it again
 _mpcl(){ mpc playlist -f '[%file%]'; }
 inmpc(){
+  hasn o || mpc clear
   _mpcl | grep -qxF "$1" || { printf '%s\n' "$1"; cat; } | mpc add
   mpc play $(( $(_mpcl | grep -nxF "$1" | awk -F: '{print$1;exit}') ))
   hasn j || r.wm M-o_n  # TEMP:HACK:(open/jump to ncmpcpp)
