@@ -16,8 +16,8 @@ noremap <silent><unique> zK  zk
 nnoremap <silent><unique> ZZ mzzM`zzv
 
 " Toggle folds
-nnoremap <unique> [Toggle]z :let &foldmethod={'manual': 'syntax',
-    \ 'syntax': 'marker', 'marker': 'manual'}[&fdm] \| set fen fdm?<CR>
+nnoremap <unique> [Toggle]z :let &foldmethod=get({'manual': 'syntax',
+    \ 'syntax': 'marker', 'marker': 'manual'}, &fdm, 'manual') \| set fen fdm?<CR>
 " nnoremap <unique> [Toggle]z :let &foldmethod=(&fdm=='manual'?'syntax':
 "     \ &fdm=='syntax'?'marker': 'manual') \| set foldenable fdm?<CR>
 nnoremap <unique> [Toggle]Z :let &fdc=(&fdc?0:2) \| set foldenable! fen?<CR>
