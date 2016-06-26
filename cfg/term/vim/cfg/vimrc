@@ -18,14 +18,14 @@ call _cfg('features/'.(has('nvim')        ? 'neovim'  : 'vim'      ).'.vim')
 call _cfg('features/'.(IsAndroid()        ? 'android' : 'clipboard').'.vim')
 call _cfg('features/'.(IsWindows()        ? 'windows' : 'unix'     ).'.vim')
 call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
-call _cfg('neobundle.vim')
+call _cfg('dein.vim')
 
 filetype plugin indent on  " Required!
 syntax enable  " 'enable' only sets groups not set yet. Use 'on' to overwrite
 
 try
   if exists('$TMUX') && &t_Co <= 16
-    color slate | else | color solarized
+    color slate |else| color solarized
   endif
 catch /^Vim\%((\a\+)\)\=:E185/
   color slate

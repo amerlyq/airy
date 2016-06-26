@@ -42,7 +42,8 @@ imap <silent><unique><expr> <C-l>
 let g:neosnippet#enable_snipmate_compatibility = 1
 
 " Tell Neosnippet about the other snippets, like Honza's
-let g:neosnippet#snippets_directory='$BUNDLES/vim-snippets/snippets,$VIMHOME/snippets'
+" FIXME: search for */snippets/ in &rtp
+let g:neosnippet#snippets_directory='$VIMHOME/snippets'
 
 " enable the preview window feature in neocomplcache/neocomplete sources
 "let g:neosnippet#enable_preview=1
