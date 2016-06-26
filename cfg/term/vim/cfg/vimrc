@@ -1,4 +1,6 @@
 " vim:ts=2:sw=2:sts=2
+if &compatible| set nocompatible |en
+
 fun! _cfg(path)  " Must not contain '\n' in path. Compat globpath <v7.4.279
   for f in split(globpath(expand($VIMHOME .'/cfg/'), a:path), '\n')
     exe 'source' fnameescape(f)
@@ -19,7 +21,7 @@ call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
 call _cfg('neobundle.vim')
 
 filetype plugin indent on  " Required!
-syntax enable  " only sets groups not set yet. Use 'on' to overwrite
+syntax enable  " 'enable' only sets groups not set yet. Use 'on' to overwrite
 
 try
   if exists('$TMUX') && &t_Co <= 16
