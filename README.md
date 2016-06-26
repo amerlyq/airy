@@ -38,6 +38,7 @@ Need more modules from some subdirectory?
 ```
 > Better idea would be to create your own mods profile and keep it safe.
 
+NOTE: don't forget to update vim plugins by ./install -u once in a while
 
 ## Private parts ##
 
