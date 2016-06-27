@@ -24,20 +24,23 @@ if !dein#load_state($DEIN)| finish |en
 " ATTENTION: recache by 'call dein#recache_runtimepath()'
 call dein#begin($BUNDLES, [expand('<sfile>')]
   \ + split(globpath(expand('<sfile>:h'), 'plugins/*.yml'), '\n'))
+
+" THINK: how to remove duplicate 'dein.vim' from &rtp ?
+" -- CHECK: conflicts with 'load_state'
 call dein#add($DEIN)
+call _cfg('plugins/*.vim')
 
 call dein#add('frankier/neovim-colors-solarized-truecolor-only')
 call dein#add('tpope/vim-commentary')
-call dein#add('tpope/vim-rsi')
 
 " HACK'ed
 call dein#add('amerlyq/nou.vim', {'on_ft': 'nou'})
 call dein#add('amerlyq/forestanza.vim', {'on_ft': 'forestanza'})
 
-" CHECK: Override dev plugins ", 'fork'
+" CHECK: dev plugins override  ALSO: 'fork', 'vim*', 'unite-*'
 for d in ['pj'] | let s:path = expand('~/aura/'.d)
   if isdirectory(s:path) | call dein#local(s:path,
-      \ {'frozen': 1, 'merged': 0}, ['vim*', 'unite-*', '*.vim'])
+      \ {'frozen': 1, 'merged': 0}, ['*.vim'])
 endif | endfor
 
 " call _cfg('plugins-cfg/*.vim')
