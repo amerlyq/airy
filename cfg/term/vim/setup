@@ -12,6 +12,7 @@ if cfgOpt c; then rm -rf "$VCACHE"/*; fi
 
 ### SPELL ###
 # WARNING: first clean install will always fail as uk*.sug file is absent!
+# DEPRECATED:(use pacman with vim-spell-* -- but it won't work for nvim)
 dst=$VCACHE/spell
 if [[ ! -d $dst ]]; then
     has_pr wget

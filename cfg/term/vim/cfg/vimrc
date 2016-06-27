@@ -12,6 +12,8 @@ augroup MyAutoCmd
   autocmd!
 augroup END
 
+" NOTE: disables all '*/site' packages installed by pacman. SEE :h 'rtp'
+set runtimepath=$VIMHOME,$VIMRUNTIME
 call _cfg('core/*.vim')
 call _cfg('core-cfg/*.vim')
 call _cfg('features/'.(has('nvim')        ? 'neovim'  : 'vim'      ).'.vim')
@@ -19,6 +21,7 @@ call _cfg('features/'.(IsAndroid()        ? 'android' : 'clipboard').'.vim')
 call _cfg('features/'.(IsWindows()        ? 'windows' : 'unix'     ).'.vim')
 call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
 call _cfg('dein.vim')
+set runtimepath+=$VIMHOME/after  " Place after dein#end()
 
 filetype plugin indent on  " Required!
 syntax enable  " 'enable' only sets groups not set yet. Use 'on' to overwrite

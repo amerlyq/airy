@@ -15,10 +15,11 @@ if has('vim_starting')
   set shellslash  " Exchange path separator.
   set lines=32
   set columns=112
-  let &runtimepath = join([
-        \ expand('~/.vim'),
-        \ expand('$VIM/runtime'),
-        \ expand('~/.vim/after')], ',')
+  " DISABLED:(use common version)
+  " let &runtimepath = join([
+  "       \ expand('~/.vim'),
+  "       \ expand('$VIM/runtime'),
+  "       \ expand('~/.vim/after')], ',')
   " Fix the path of vimrc and gvimrc for Windows
   let $MYVIMRC=$VIMHOME . '/vimrc'
   let $MYGVIMRC=$VIMHOME . '/gvimrc'

@@ -6,7 +6,6 @@ let $BUNDLES=expand('$CACHE/bundle')
 let $BUNDLECFGS=expand('$VIMHOME/cfg/plugins-cfg')
 let $DEIN=expand('$BUNDLES/dein.vim')
 
-
 if has('vim_starting')
   " Install dein if it doesn't exist
   if !filereadable(expand('$DEIN/README.md'))
@@ -17,44 +16,36 @@ if has('vim_starting')
 endif
 
 set runtimepath^=$DEIN
-" if !dein#load_state($DEIN)| finish |en
-call dein#begin($BUNDLES)  " Does 'filetype off'
-" call dein#begin(s:path, [expand('<sfile>')]
-"      \ + split(glob('~/.vim/rc/*.toml'), '\n'))
+" ATTENTION: recache by 'call dein#clear_state()'
+if !dein#load_state($DEIN)| finish |en
 
- " Must not contain '\n' in path. Compat globpath <v7.4.279
-" let s:ymls = split(globpath(expand($VIMHOME.'/cfg/'), 'plugins/*.yml'), '\n')
-" let s:opts = {'lazy': 1}
-" fun! LoadFromYAMLs(py, paths, default)
-"   exe a:py expand($VIMHOME.'/cfg/yaml.py')
-" endf
- " If unsuccessful with auto-detected python, try to use python2
-" if LoadFromYAMLs('PythonF', s:ymls, s:opts) == -1
-"   call LoadFromYAMLs('pyfile', s:ymls, s:opts)
-" endif
-
+" Monitors changes in listed rc files. Does 'filetype off'.
+" NOTE: Must not contain '\n' in path. Compat globpath <v7.4.279
+" ATTENTION: recache by 'call dein#recache_runtimepath()'
+call dein#begin($BUNDLES, [expand('<sfile>')]
+  \ + split(globpath(expand('<sfile>:h'), 'plugins/*.yml'), '\n'))
 call dein#add($DEIN)
+
 call dein#add('frankier/neovim-colors-solarized-truecolor-only')
-call dein#add('tpope/vim-commentary')  ", {'on_ft': 'nou'}
-call dein#add('amerlyq/nou.vim')  ", {'on_ft': 'nou'}
+call dein#add('tpope/vim-commentary')
+call dein#add('tpope/vim-rsi')
 
-" call dein#load_dict({
-"   \ $DEIN : {},
-"   \ 'frankier/neovim-colors-solarized-truecolor-only' : {},
-"   \ 'tpope/vim-commentary' : {},
-"   \ 'amerlyq/nou.vim' : {},
-" \})
+" HACK'ed
+call dein#add('amerlyq/nou.vim', {'on_ft': 'nou'})
+call dein#add('amerlyq/forestanza.vim', {'on_ft': 'forestanza'})
 
-" NeoBundleSaveCache
-" endif
+" CHECK: Override dev plugins ", 'fork'
+for d in ['pj'] | let s:path = expand('~/aura/'.d)
+  if isdirectory(s:path) | call dein#local(s:path,
+      \ {'frozen': 1, 'merged': 0}, ['vim*', 'unite-*', '*.vim'])
+endif | endfor
+
 " call _cfg('plugins-cfg/*.vim')
 call dein#end()  " recaches runtimepath
-" call dein#save_state()
+call dein#save_state()
 
 " Check new plugins if cache was cleared and plugins list reloaded:
 " if exists('*LoadFromYAMLs') | NeoBundleCheck | endif
-
-
 if !has('vim_starting') && dein#check_install()
   " Installation check.
   call dein#install()

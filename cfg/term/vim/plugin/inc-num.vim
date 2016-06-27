@@ -1,14 +1,15 @@
 " SEE: http://vim.wikia.com/wiki/Making_a_list_of_numbers
 " TODO: make <C-a> work on %V zone, increasing each number by 1
 
-function! s:asc()
+fun! s:asc()
+  " CHECK: aren't it wrong -- resulting in 'a==0'?
   let a = line('.') - line("'<")
   let c = virtcol("'<")
   if a > 0
     execute 'normal! '.c.'|'.a."\<C-a>"
   endif
   normal `<
-endfunction
+endf
 
 " Replace column of identical numbers N by asceding sequence [N, N+dC]
-xnoremap <unique> <Leader><C-a> :call s:asc()<CR>
+noremap <unique> <Leader><C-a> :call s:asc()<CR>
