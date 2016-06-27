@@ -5,6 +5,6 @@ source ~/.shell/func.d/cfgsetup
 mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
 link -t  ~/.gnupg gpg{,-agent}.conf
 
-# svc_activate -cue gpg-agent
+svc_activate -cue gpg-agent.service
 
 echo RELOADAGENT | tee >(gpg-connect-agent)
