@@ -7,6 +7,7 @@ link "$PWD" "${XDG_CONFIG_HOME:=$HOME/.config}/nvim"
 mkdir -p "${XDG_DATA_HOME:=$HOME/.cache}/shada"
 VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"
 if cfgOpt c; then rm -rf "$VCACHE"/*; fi
+[[ -d $VCACHE/bundle ]] || ./update
 #touch ~/.vimtags  # For vim-easytags
 
 ### SPELL ###

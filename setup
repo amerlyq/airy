@@ -23,20 +23,8 @@ if cfgOpt r && [[ -f $mods ]]; then
     cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
 fi
 
-# NOTE: If problem with package update, firts update 'archlinux-keyring' pkg
-if cfgOpt i && cfgOpt u && ((!$#)) && [[ ! -f "$queue" ]]; then
-    if distro arch; then
-        sudo pacman -Syu ||: # NOTE: --ignore=firefox
-        # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
-        # Degrade manually:
-        #   pacman -U /var/cache/pacman/pkg/firefox-42.0-3-x86_64.pkg.tar.xz
-    elif distro ubuntu; then
-        sudo apt-get install gawk
-        echo "sudo apt-get update && sudo apt-get upgrade"
-    fi
-    # TODO:ADD: 'gem/python/cabal update && upgrade' if pr is found
-    # THINK:USE: it's own key '-y' instead of combo 'iu' ?
-fi
+# THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
+if cfgOpt i && cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; then ./update; fi
 
 # ======================================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
@@ -108,8 +96,6 @@ fi
 # FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
 # EXPL: -m (in main 'setup') forces single thread execution
 run(){ if [[ -f $1 ]]; then "$@" $(cfgOpt m || echo -m); else echo "(no ${1##*/})"; fi; }
-r_install(){ cfgOpt i || return 0; run "$1/install" $(cfgOpt f && echo -u); }
-r_setup(){ run "$1/setup" $(cfgOpt u && echo -u); }
 
 # Mods statistics
 header "Airy cfgs"
@@ -119,8 +105,9 @@ printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
 
 while read d; do echo ">>> $d <<<"
     # BUG: some packages (like gcc-multilib) aren't replaced even with -u)
-    r_install "$d"
-    r_setup "$d"
+    if cfgOpt i; then run "$d/install" $(cfgOpt f && echo -u); fi
+    run "$d/setup" $(cfgOpt u && echo -u)
+    if cfgOpt U; then run "$d/update" $(cfgOpt u && echo -u); fi
     sed -i '1d' "$queue"
 # EXPL: copy $queue content to be not affected by 'sed'
 done <<< "$(<"$queue")"

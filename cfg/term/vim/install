@@ -24,16 +24,3 @@ elif distro ubuntu; then
     pip_inst jedi  # neovim
     echo "Err: not all"
 fi
-
-### PLUGINS ###
-VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"
-if cfgOpt u || [[ ! -d $VCACHE/bundle ]]; then
-    # BUG: returns non-zero errcode!
-    # FIXME: error on clean system, when NeoBundle is not installed yet
-    shvim() { $EDITOR -nesR -i NONE -u "$PWD/vimrc" \
-        -c "set nomore|redir!>/dev/stderr" -c "$1" \
-        -c "echo''|redir END|qall!" >/dev/null ||:; }
-    shvim 'NeoBundleClearCache'
-    shvim 'NeoBundleUpdate!'
-    ! has_pr nvim || shvim 'UpdateRemotePlugins'
-fi

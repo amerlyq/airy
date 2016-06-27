@@ -8,8 +8,8 @@ export PATH=${CURR_DIR_CACHE:?}/bin:$PATH
 CFG_ARGS=( "$@" )  # Backup default arguments
 OPTIND=1
 
-# [iucfmrd]: install/update/clean/force/main/reset/debug
-while getopts 'cdfimrs:t:u' o; do case $o
+# Keys: clean/debug/force/install/main/reset/set:/theme:/upgrate/Update
+while getopts 'cdfimrs:t:uU' o; do case $o
 in t) THEME=$OPTARG
 ;; s) CFG_S+=("$OPTARG")
 ;; :|'?') die 1
