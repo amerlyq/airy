@@ -27,14 +27,17 @@ Config {
 -- ALSO: battery saving prf: toggle/open_setup
 -- button=4/5 on clock -> timer (show through r.n? OR directly in xmobar)
 -- FIND: <action> with pressed modifiers (ctrl/shift)
+
+
+-- BUG:(broken)
+-- \<fc=#cc8000>  </fc>\
+--   \<fn=1><action=`r.wm M-o_n` button=3>\
+--     \<action=`mpc next` button=4>\
+--       \<action=`mpc prev` button=5>\
+--         \<action=`mpc toggle` button=1>\
+--           \%mpd%\
+--         \</action></action></action></action></fn>\
 , template     = "%UnsafeStdinReader%}{\
-  \<fc=#cc8000>  </fc>\
-    \<fn=1><action=`r.wm M-o_n` button=3>\
-      \<action=`mpc next` button=4>\
-        \<action=`mpc prev` button=5>\
-          \<action=`mpc toggle` button=1>\
-            \%mpd%\
-          \</action></action></action></action></fn>\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%\
     \<action=`r.wm M-o_h` button=1>\
@@ -86,10 +89,13 @@ Config {
   , "-n", "#ddffff", "-w2", "--"
   , "-O", "♪", "-C", "#00dd00"
   , "-o", "⎋", "-c", "#dd0000" ] 5
-, Run MPD  -- TRY: '[[%artist% - ]%title%]|[%name%]|[%file%]'
-  [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
-  , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
-  ] 50
+
+-- BUG:(broken)
+-- , Run MPD  -- TRY: '[[%artist% - ]%title%]|[%name%]|[%file%]'
+--   [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
+--   , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
+--   ] 50
+
 -- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
 , Run Com "awk" [ "{print$1}", "/proc/loadavg" ] "loadavg" 10
 , Run Com "r.xkb-lang" [ "-N" ] "lang" 10
