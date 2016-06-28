@@ -1,3 +1,4 @@
+finish
 if neobundle#tap('unite.vim') "{{{
   " [Unite]h help
   " -u outline

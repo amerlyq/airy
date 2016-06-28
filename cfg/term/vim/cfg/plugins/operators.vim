@@ -10,6 +10,8 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
 " ALT: (TODO: compare code) https://github.com/machakann/vim-sandwich
 " CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({[&quot'<`] ]
 " NOTE: last 3 deps -- for chained mappings (Optional) -- in textobj.vim
+" DEPRECATED:
+"   - (bloated) tpope/vim-surround
 call dein#add('rhysd/vim-operator-surround', {
   \ 'on_map': [['nx', '<Plug>']],
   \ 'depends': [
@@ -18,8 +20,6 @@ call dein#add('rhysd/vim-operator-surround', {
   \   'beloglazov/vim-textobj-quotes',
   \   'rhysd/vim-textobj-anyblock',
   \ ]})
-" DEPRECATED:
-"   - (bloated) tpope/vim-surround
 
 
 "" (DISABLED) Allows direct char appends after surround
@@ -33,7 +33,7 @@ call dein#add('rhysd/vim-operator-surround', {
 "" Replaces motion by register content
 " CHG mappings: [[nxo, gr]]
 call dein#add('kana/vim-operator-replace', {
-  \ 'on_map': [['nx', '<Plug>']]
+  \ 'on_map': [['nx', '<Plug>']],
   \ 'depends': 'kana/vim-operator-user'})
 
 
@@ -45,10 +45,10 @@ call dein#add('tommcdo/vim-exchange', {
 
 
 "" Toggle commentstring, ADD textobj-comment
+" DEPRECATED: - (overladen) 'tomtom/tcomment_vim'
 call dein#add('tpope/vim-commentary', {
   \ 'on_map': ['gc', ['n', 'gcc', 'cgc', 'gcu']],
   \ 'on_cmd': 'Commentary'})
-" DEPRECATED: - (overladen) 'tomtom/tcomment_vim'
 
 
 "" Shift/jump func-args/list-item/table-cell, ADD textobj-args
@@ -57,8 +57,8 @@ call dein#add('tpope/vim-commentary', {
 "   - PeterRincker/vim-argumentative
 " CHG mappings: [[xo, aa, ia], [n, ga, gA, '[a', ']a']]
 call dein#add('AndrewRadev/sideways.vim', {
-  \ 'on_map': '<Plug>Sideways'
-  \ 'on_cmd': ['SidewaysLeft', 'SidewaysRight', 'SidewaysJumpLeft', 'SidewaysJumpRight']
+  \ 'on_map': '<Plug>Sideways',
+  \ 'on_cmd': ['SidewaysLeft', 'SidewaysRight', 'SidewaysJumpLeft', 'SidewaysJumpRight'],
   \ 'depends': 'tpope/vim-repeat'})
 
 

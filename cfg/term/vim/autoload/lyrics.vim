@@ -1,3 +1,5 @@
+""" lyrics-ed.vim
+
 fun! lyrics#init()
   if !exists('$TMPDIR')
     let $TMPDIR = fnamemodify(system('mktemp --dry-run --tmpdir'), ':h')

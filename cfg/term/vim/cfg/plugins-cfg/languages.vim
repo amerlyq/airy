@@ -1,3 +1,4 @@
+finish
 if neobundle#tap('LaTeX-Box') "{{{
   let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/latex-box.vim'
   call neobundle#untap()

@@ -1,3 +1,4 @@
+finish
 "{{{1 Path ============================
 if neobundle#tap('vim-rooter') "{{{
   let g:rooter_manual_only = 1

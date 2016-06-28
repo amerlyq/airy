@@ -1,10 +1,22 @@
+"" TEMP:(convert *.yml)
+" g/^\s\+description:\s\+/m-2
+" %s;;"" ;
+" %s;mappings:;\\ 'on_map':;
+" %s;functions:;\\ 'on_func':;
+" %s;depends:;\\ 'depends':;
+
+" let g:dein#install_log_filename = ''
+let g:dein#types#git#clone_depth = 1
+if executable('git-up')
+  let g:dein#types#git#pull_command = 'git-up'
+endif
 " let g:dein#install_progress_type = 'title'
 " let g:dein#install_message_type = 'none'
 " let g:dein#enable_notification = 1
 
 let $BUNDLES=expand('$CACHE/bundle')
-let $BUNDLECFGS=expand('$VIMHOME/cfg/plugins-cfg')
 let $DEIN=expand('$BUNDLES/dein.vim')
+let $DEINHOOKS=expand('$VIMHOME/cfg/plugins-cfg/on_hooks')
 
 if has('vim_starting')
   " Install dein if it doesn't exist
@@ -20,24 +32,23 @@ set runtimepath^=$DEIN
 if !dein#load_state($DEIN)| finish |en
 
 " Monitors changes in listed rc files. Does 'filetype off'.
-" NOTE: Must not contain '\n' in path. Compat globpath <v7.4.279
 " ATTENTION: recache by 'call dein#recache_runtimepath()'
 call dein#begin($BUNDLES, [expand('<sfile>')]
-  \ + split(globpath(expand('<sfile>:h'), 'plugins/*.yml'), '\n'))
+  \ + split(globpath(expand('<sfile>:h'), 'plugins/*.vim'), '\n'))
+" NOTE: Must not contain '\n' in path. Compat globpath <v7.4.279
 
 " THINK: how to remove duplicate 'dein.vim' from &rtp ?
 " -- CHECK: conflicts with 'load_state'
 call dein#add($DEIN)
-call _cfg('plugins/*.vim')
 
 call dein#add('frankier/neovim-colors-solarized-truecolor-only')
-call dein#add('tpope/vim-commentary')
+call _cfg('plugins/*.vim')
 
 " HACK'ed
 call dein#add('amerlyq/nou.vim', {'on_ft': 'nou'})
 call dein#add('amerlyq/forestanza.vim', {'on_ft': 'forestanza'})
 
-" CHECK: dev plugins override  ALSO: 'fork', 'vim*', 'unite-*'
+" HACK: dev plugins override  ALSO: 'fork', 'vim*', 'unite-*'
 for d in ['pj'] | let s:path = expand('~/aura/'.d)
   if isdirectory(s:path) | call dein#local(s:path,
       \ {'frozen': 1, 'merged': 0}, ['*.vim'])

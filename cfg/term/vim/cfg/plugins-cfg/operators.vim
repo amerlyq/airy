@@ -1,3 +1,4 @@
+finish
 let s:alias = '(()0;{{}9;[[]8;''''1;""2;<<>3;``4'
 
 "{{{1 Operators ============================
@@ -17,19 +18,16 @@ if neobundle#tap('vim-operator-surround')  "{{{
   \  'block': split((v:val[0] =~ '[''`\"]' ? v:val[0:1] : v:val[1:2]), '\\zs'),
   \  'motionwise' : ['char', 'line', 'block'],
   \}") }
-  call neobundle#untap()
 
   if neobundle#tap('vim-textobj-between')  "{{
     " Surrounding symbols for current cursor position (like 'f`')
     nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
     nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
-    call neobundle#untap()
   endif
 
   if neobundle#tap('vim-textobj-quotes')  "{{{
     " Quoted (outer) expr is the most useful:
     omap <silent><unique> q aq
-    call neobundle#untap()
   endif "}}}
 
   if neobundle#tap('vim-textobj-anyblock')  "{{{
@@ -41,7 +39,6 @@ if neobundle#tap('vim-operator-surround')  "{{{
     "   = Redirect if no such mappings exists (see inside op-surr src)
     let s:op = '<Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
     call Map_blocks('[Quote]', s:op, 'n', 'map', s:alias)
-    call neobundle#untap()
   endif "}}}
 endif "}}}
 
@@ -52,7 +49,6 @@ if neobundle#tap('vim-operator-replace') "{{{
   xmap <silent><unique> gr <Plug>(operator-replace)
   nmap <silent><unique> gR <Plug>(operator-replace)$
   xmap <silent><unique> gR <Plug>(operator-replace)$
-  call neobundle#untap()
 endif "}}}
 
 
@@ -61,7 +57,6 @@ if neobundle#tap('vim-exchange') "{{{
   nmap <silent><unique> cx  <Plug>(Exchange)
   nmap <silent><unique> cxc <Plug>(ExchangeLine)
   nmap <silent><unique> cxx <Plug>(ExchangeClear)
-  call neobundle#untap()
 endif "}}}
 
 
@@ -76,7 +71,6 @@ if neobundle#tap('sideways.vim')  "{{{
   " TODO replace with ',a' OR '<Tab>a', and move Ag to '[Frame]a]'
   noremap <silent><unique> [a :<C-u>SidewaysJumpLeft<CR>
   noremap <silent><unique> ]a :<C-u>SidewaysJumpRight<CR>
-  call neobundle#untap()
 endif "}}}
 
 
@@ -98,11 +92,9 @@ if neobundle#tap('vim-clang-format')  "{{{ H100%, S45%
       \ "Standard" : "C++11",
       \ }
       " \ "BreakBeforeBraces" : "Stroustrup",
-  call neobundle#untap()
 endif "}}}
 
 
 if neobundle#tap('vim-autoformat')  "{{{
   noremap <F6> :Autoformat<CR><CR>
-  call neobundle#untap()
 endif "}}}

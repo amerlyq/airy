@@ -1,3 +1,4 @@
+finish
 if neobundle#tap('CCTree') "{{{
   " Launch with default DB
   command! -bar  CCTree

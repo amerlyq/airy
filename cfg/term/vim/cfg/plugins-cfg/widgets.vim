@@ -1,3 +1,4 @@
+finish
 " Move to 'fun.vim'
 if neobundle#tap('DrawIt') "{{{
   map <unique> [Unite]DI  <Plug>DrawItStart

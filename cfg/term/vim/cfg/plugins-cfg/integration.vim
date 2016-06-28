@@ -1,3 +1,4 @@
+finish
 "{{{1 Apps ============================
 if neobundle#tap('vinarise.vim') "{{{
   " detects binary file or large file automatically.

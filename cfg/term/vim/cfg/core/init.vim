@@ -35,4 +35,4 @@ let g:loaded_logipat           = 1
 let g:loaded_tutor_mode_plugin = 1
 let g:loaded_spellfile_plugin  = 1
 let g:loaded_man               = 1
-" let g:loaded_matchit           = 1
+let g:loaded_matchit           = 1

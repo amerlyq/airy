@@ -1,3 +1,4 @@
+finish
 "{{{1 Search/Replace ============================
 if neobundle#tap('agn.vim') "{{{
   " CHG: all real mappings included into 'after/ftplugin/qf.vim'

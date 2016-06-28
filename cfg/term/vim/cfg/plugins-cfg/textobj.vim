@@ -1,3 +1,4 @@
+finish
 " Aliases to STD blocks by numbers
 call Map_blocks('a', 'a', 'ox', 'noremap')
 call Map_blocks('i', 'i', 'ox', 'noremap')

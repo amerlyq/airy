@@ -1,3 +1,4 @@
+finish
 "{{{1 Windows ============================
 if neobundle#tap('GoldenView.Vim') "{{{
   let g:goldenview__enable_at_startup = 1

@@ -1,3 +1,4 @@
+finish
 if neobundle#tap('syntastic')  "{{{
   noremap <unique> [Toggle]x :<C-u>SyntasticToggleMode<CR>
   let neobundle#hooks.on_source = '$BUNDLECFGS/on_hooks/syntastic.vim'
