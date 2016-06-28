@@ -3,6 +3,7 @@
 "" TEMP:(convert *.yml)
 " g/^\s\+description:\s\+/m-2|%s;;"" ;
 " %s;mappings:;\\ 'on_map':;
+" %s;commands:;\\ 'on_cmd':;
 " %s;functions:;\\ 'on_func':;
 " %s;depends:;\\ 'depends':;
 

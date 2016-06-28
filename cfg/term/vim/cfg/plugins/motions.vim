@@ -10,7 +10,7 @@ call dein#add('matchit.zip', {'frozen': 1,
 " SEE: http://www.vim.org/scripts/script.php?script_id=4359
 " DEV:TODO: replace by own -- to confront with ZSH, <C-f>, etc
 " NOTE: Direct key mappings have no sense of being lazy
-call dein#add('tpope/vim-rsi', {'lazy': 0})
+call dein#add('tpope/vim-rsi')
 
 
 "" Motions in _camel_case_ or CamelCase for all modes {{{1
@@ -21,7 +21,7 @@ call dein#add('tpope/vim-rsi', {'lazy': 0})
 call dein#add('bkad/CamelCaseMotion', {
   \ 'on_map': '<Plug>CamelCaseMotion_'})
 
-if dein#tap('bkad/CamelCaseMotion')
+if dein#tap('CamelCaseMotion')
   for c in split('w b e ge')
     call Map_nxo('<Leader>'.c, '<Plug>CamelCaseMotion_'.c)
     call Map_nxo('i<Leader>'.c, '<Plug>CamelCaseMotion_i'.c, 'ox')

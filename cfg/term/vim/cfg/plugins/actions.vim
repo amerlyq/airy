@@ -15,10 +15,9 @@ call dein#add('AndrewRadev/splitjoin.vim', {
 \\n   let g:splitjoin_join_mapping = ''
 \"})
 
-if dein#tap('AndrewRadev/splitjoin.vim')
-  echo 'BUG: not entering here at all'
-  nmap <unique><silent> gJ <Plug>SplitjoinJoin<CR>
-  nmap <unique><silent> gS <Plug>SplitjoinSplit<CR>
+if dein#tap('splitjoin.vim')
+  nmap <unique><silent> [Space]j <Plug>SplitjoinJoin<CR>
+  nmap <unique><silent> [Space]k <Plug>SplitjoinSplit<CR>
 endif
 
 
@@ -39,7 +38,7 @@ call dein#add('kana/vim-niceblock', {
 call dein#add('terryma/vim-expand-region', {
   \ 'on_map': [['nx', '<Plug>(expand_region_']]})
 
-if dein#tap('terryma/vim-expand-region')
+if dein#tap('vim-expand-region')
   call Map_nxo('+', '<Plug>(expand_region_expand)', 'nx')
   call Map_nxo('-', '<Plug>(expand_region_shrink)', 'nx')
 endif
