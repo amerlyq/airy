@@ -1,3 +1,5 @@
+""" NOTE: works only for Neovim / Vim7.4+
+
 "" TEMP:(convert *.yml)
 " g/^\s\+description:\s\+/m-2
 " %s;;"" ;

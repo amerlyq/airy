@@ -118,6 +118,9 @@ if neobundle#tap('vim-airline')  "{{{
 endif "}}}
 
 
+" ALT:(both) https://github.com/Samuel-Phillips/nvim-colors-solarized
+" DEV: simplified solarized -- with menu/etc removed
+"   -- possibly with re-defined colors for nou.vim?
 if neobundle#tap('vim-colors-solarized') ||
   \neobundle#tap('neovim-colors-solarized-truecolor-only') "{{{
   " nmap <unique> <F12> <Plug>ToggleBackground
