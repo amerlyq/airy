@@ -1,6 +1,9 @@
 "{{{1 Window ============================
+" NOT: load whole file on each unite-buffer open (might be slow?)
+
 autocmd MyAutoCmd FileType unite call s:unite_wmaps()
 " THINK:ALT: exe \"fun! s:unite_wmaps()\n".(readfile(key-maps.vim))."\nendf"
+
 function! s:unite_wmaps()
 
 

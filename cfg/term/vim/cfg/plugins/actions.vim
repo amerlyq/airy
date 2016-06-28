@@ -26,7 +26,7 @@ endif
 " STD: <Plug>SpeedDating
 call dein#add('tpope/vim-speeddating', {
   \ 'on_map': [['nx', '<C-a>', '<C-x>'], ['n', 'd<C-a>', 'd<C-x>']],
-  \ 'depends': 'tpope/vim-repeat'})
+  \ 'depends': 'vim-repeat'})
 
 
 "" On insert in VISUAL mode behave like as V-BLOCK {{{1

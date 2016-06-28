@@ -35,5 +35,5 @@ endif
 "   - (altered) https://github.com/rhysd/clever-f.vim
 call dein#add('justinmk/vim-sneak', {
   \ 'on_map': '<Plug>Sneak',
-  \ 'depends': 'tpope/vim-repeat',
+  \ 'depends': 'vim-repeat',
   \ 'hook_source': 'source $DEINHOOKS/vim-sneak.vim'})

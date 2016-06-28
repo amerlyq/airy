@@ -1,8 +1,7 @@
 """ NOTE: works only for Neovim / Vim7.4+
 
 "" TEMP:(convert *.yml)
-" g/^\s\+description:\s\+/m-2
-" %s;;"" ;
+" g/^\s\+description:\s\+/m-2|%s;;"" ;
 " %s;mappings:;\\ 'on_map':;
 " %s;functions:;\\ 'on_func':;
 " %s;depends:;\\ 'depends':;
@@ -42,8 +41,6 @@ call dein#begin($BUNDLES, [expand('<sfile>')]
 " THINK: how to remove duplicate 'dein.vim' from &rtp ?
 " -- CHECK: conflicts with 'load_state'
 call dein#add($DEIN)
-
-call dein#add('frankier/neovim-colors-solarized-truecolor-only')
 call _cfg('plugins/*.vim')
 
 " HACK'ed
