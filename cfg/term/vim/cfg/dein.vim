@@ -19,6 +19,8 @@ endif
 let $BUNDLES=expand('$CACHE/bundle')
 let $DEIN=expand('$BUNDLES/dein.vim')
 let $DEINHOOKS=expand('$VIMHOME/cfg/plugins-cfg/on_hooks')
+" ALT: using func '_hook()' to auto-distinguish 'add','source','post' parts
+"   (+) incapsulated naming of 'hooks' path
 
 if has('vim_starting')
   " Install dein if it doesn't exist

@@ -7,14 +7,14 @@
 call dein#add('mhinz/vim-signify', {'lazy': 0,
   \ 'on_map': [['xo', 'aS', 'iS'], ['n', '[c', ']c']],
   \ 'on_cmd': ['SignifyFold', 'SignifyToggle',
-  \            'SignifyToggleHighlight', 'SignifyRefresh'],
-  \ 'hook_source': "
-\\n  let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
-\\n  let g:signify_sign_change = '~'
-\\n  let g:signify_sign_delete = '-'
-\"})
+  \            'SignifyToggleHighlight', 'SignifyRefresh']})
 
+" ATTENTION: not in 'hook_source' because plugin isn't lazy
 if dein#tap('vim-signify')
+  let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
+  let g:signify_sign_change = '~'
+  let g:signify_sign_delete = '-'
+
   noremap <unique> zS :<C-u>SignifyFold<CR>
   " FIND:THINK: isn't :SignifyRefresh unnecessary?
   noremap <unique> [Toggle]g :<C-u>SignifyToggleHighlight\|SignifyRefresh<CR>
@@ -77,21 +77,24 @@ endif
 " NOTE: Make 1-wide guide, don't works on Hard-Tabs
 " NOTE: At the moment Terminal Vim only has basic support.
 "     -- So colors won't be autocalculated from your colorscheme.
-call dein#add('nathanaelkane/vim-indent-guides', {'lazy': 0,
-  \ 'hook_add': 'nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>',
-  \ 'hook_source': "
-\\n  let g:indent_guides_enable_on_vim_startup = 1
-\\n  let g:indent_guides_exclude_filetypes = ['votl', 'iav_term']
-\\n
-\\n  let g:indent_guides_guide_size = 1
-\\n  let g:indent_guides_start_level = 2
-\\n  let g:indent_guides_indent_levels = 20
-\\n  let g:indent_guides_tab_guides = 0
-\\n
-\\n  let g:indent_guides_auto_colors = 0
-\\n  let g:indent_guides_color_change_percent = 10
-\\n  let g:indent_guides_default_mapping = 0
-\"})
+call dein#add('nathanaelkane/vim-indent-guides')
+
+" ATTENTION: not in 'hook_source' because plugin isn't lazy
+if dein#tap('vim-indent-guides')
+  nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>
+
+  let g:indent_guides_enable_on_vim_startup = 1
+  let g:indent_guides_exclude_filetypes = ['votl', 'iav_term']
+
+  let g:indent_guides_guide_size = 1
+  let g:indent_guides_start_level = 2
+  let g:indent_guides_indent_levels = 20
+  let g:indent_guides_tab_guides = 0
+
+  let g:indent_guides_auto_colors = 0
+  let g:indent_guides_color_change_percent = 10
+  let g:indent_guides_default_mapping = 0
+endif
 
 
 
@@ -105,7 +108,7 @@ call dein#add('luochen1990/rainbow', {
   \ 'on_ft': ['lisp', 'vim', 'tex', 'xml', 'html', 'xhtml', 'php', 'css'],
   \ 'hook_source': "
 \\n  let g:rainbow_active = 1
-\\n  let g:rainbow_conf = {'separately': {'*': 0, 'lisp': {}, 'vim': {}}}
+\\n  let g:rainbow_conf = {'separately': { '*': 0, 'lisp': {}, 'vim': {} }}
 \\n  let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]
 \\n  let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
 \"})

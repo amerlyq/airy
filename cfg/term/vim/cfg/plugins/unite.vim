@@ -6,11 +6,13 @@ call dein#add('Shougo/neomru.vim', {'on_if': 1})
 call dein#add('Shougo/neoyank.vim', {'on_if': 1, 'on_source': 'unite.vim'})
 
 
+
 "" CHECK Auxiliary sources {{{1
 call dein#add('Shougo/unite-outline', {'on_source': 'unite.vim'})
 call dein#add('thinca/vim-unite-history', {'on_source': 'unite.vim'})
 call dein#add('osyo-manga/unite-quickfix', {'on_source': 'unite.vim'})
 call dein#add('tsukkee/unite-tag', {'on_source': 'unite.vim'})
+
 
 
 "" CHECK Fast fuzzy access to List i-sources. Dependency of 'unite-*'. {{{1

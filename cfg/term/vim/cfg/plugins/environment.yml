@@ -46,3 +46,10 @@ kopischke/vim-stay:
 #   # mappings: [[n, zuz, zx, zX, za, zA, zo, zO, zc, zC], ']z', '[z', zJ, zK]
 #   # commands: FastFoldUpdate
 #   lazy: 0  # EXPL: always converts in all buffers.
+
+finish
+# Buffer to view references with history
+# TRY:DEV: integrate my vim-dict into this to get viewer+history
+repo = 'thinca/vim-ref'
+on_map = {n = '<Plug>'}
+hook_source = 'source ~/.vim/rc/plugins/ref.rc.vim'

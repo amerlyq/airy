@@ -5,6 +5,7 @@
 " call dein#add('severin-lemaignan/vim-minimap', {'on_cmd': 'MinimapToggle'})
 
 
+
 "" Nice automatic view/scale/ctrl for split windows {{{1
 " SEE http://zhaocai.github.io/GoldenView.Vim
 " NOT:(lazy) because I split by many different ways from the start

@@ -1,10 +1,8 @@
 """ Actions
 
 "" Dependency of support to '.' on <Plug> mappings {{{1
-" STD: <Plug>(Repeat
-call dein#add('tpope/vim-repeat', {
-  \ 'on_func': 'repeat#',
-  \ 'on_map': [['n', '.', 'u', 'U', '<C-r>']]})
+call dein#add('tpope/vim-repeat')
+
 
 
 "" CHECK: Transforms various languages oneline <--> block constructions {{{1
@@ -21,6 +19,7 @@ if dein#tap('splitjoin.vim')
 endif
 
 
+
 "" Use CTRL-A/X to increment dates, times, and more {{{1
 " STD: <Plug>SpeedDating
 call dein#add('tpope/vim-speeddating', {
@@ -28,10 +27,12 @@ call dein#add('tpope/vim-speeddating', {
   \ 'depends': 'vim-repeat'})
 
 
+
 "" On insert in VISUAL mode behave like as V-BLOCK {{{1
 " STD: <Plug>(niceblock-
 call dein#add('kana/vim-niceblock', {
   \ 'on_map': [['x', 'A', 'I', 'gI']]})
+
 
 
 "" Expand/shrink current visual selection {{{1

@@ -1,12 +1,14 @@
 " Provides extra :Tabularize commands
-function! s:Tabi(bang, ...)
-    " Align on one-char, next word after one-char, or whole pattern
-    " let patt = (a:0 > 0) ? a:1 :
-    "             \ ((a:bang?'': '[') .nr2char(getchar()). (a:bang?'\s*\zs': ']'))
-    let patt = '[' .nr2char(getchar()). ']'
-    let aln = '/l'. v:count/10 .'r'. v:count%10
-    exec 'Tabularize /' . patt . aln
-endfunction
+
+fun! s:Tabi(bang, ...)
+  " Align on one-char, next word after one-char, or whole pattern
+  " let patt = (a:0 > 0) ? a:1 :
+  "             \ ((a:bang?'': '[') .nr2char(getchar()). (a:bang?'\s*\zs': ']'))
+  let patt = '[' .nr2char(getchar()). ']'
+  let aln = '/l'. v:count/10 .'r'. v:count%10
+  exe 'Tabularize /' . patt . aln
+endf
+
 command! -bang -nargs=? Tabi call s:Tabi(<bang>0, <q-args>)
 
 noremap         <unique>  [Frame]A  :Tabularize /<C-R>//l1r1

@@ -6,6 +6,7 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
   \ 'on_func': 'operator#user#define'})
 
 
+
 "" Manage surrounding block pairs ({[&quot'` over the motion {{{1
 " ALT: (TODO: compare code) https://github.com/machakann/vim-sandwich
 " CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({[&quot'<`] ]
@@ -17,12 +18,22 @@ call dein#add('rhysd/vim-operator-surround', {
   \ 'hook_add': 'source $DEINHOOKS/surround.vim'})
 
 
+
 "" (DISABLED) Allows direct char appends after surround {{{1
 " - For VISUAL (where I use append the most), original plugin is convenient
 " - THINK:ADD: direct operators for NORMAL?
 " 'osyo-manga/vim-operator-surround-before', {'if': 0,
 "   on_map: [[nx, <Plug>(operator-surround-append-before]]
 "   depends: ['vim-operator-user', 'vim-operator-surround']
+
+
+
+"" Run a command and show its result quickly.
+call dein#add('thinca/vim-quickrun', {
+  \ 'on_map': {'n': '<Plug>'},
+  \ 'on_cmd': 'QuickRun',
+  \ 'hook_add': 'nmap <silent> [Space]r <Plug>(quickrun)'})
+
 
 
 "" Replaces motion by register content {{{1
@@ -40,6 +51,7 @@ if dein#tap('vim-operator-replace')
 endif
 
 
+
 "" Exchange text: cx{motion} on first, then cx{motion} on other. {{{1
 " USAGE: line 'cxc' and clear 'cxx', as 'cxc' is more comfortable
 " CHG : [[x, X], [n, cx, cxc, cxx]]
@@ -54,11 +66,13 @@ if dein#tap('vim-exchange')
 endif
 
 
+
 "" Toggle commentstring, ADD textobj-comment {{{1
 " DEPRECATED: - (overladen) 'tomtom/tcomment_vim'
 call dein#add('tpope/vim-commentary', {
   \ 'on_map': ['gc', ['n', 'gcc', 'cgc', 'gcu']],
   \ 'on_cmd': 'Commentary'})
+
 
 
 "" Shift/jump func-args/list-item/table-cell, ADD textobj-args {{{1

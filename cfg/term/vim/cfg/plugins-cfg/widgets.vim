@@ -1,13 +1,5 @@
 finish
 " Move to 'fun.vim'
-if neobundle#tap('DrawIt') "{{{
-  map <unique> [Unite]DI  <Plug>DrawItStart
-  map <unique> [Unite]DS  <Plug>DrawItStop
-  map <unique> [Unite]Dsw <Plug>SaveWinPosn
-  map <unique> [Unite]Drw <Plug>RestoreWinPosn
-  call neobundle#untap()
-endif "}}}
-
 
 if neobundle#tap('ListToggle') "{{{
     let g:lt_location_list_toggle_map = '[Unite]l'

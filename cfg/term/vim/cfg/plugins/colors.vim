@@ -14,9 +14,11 @@ if dein#tap('vim-airline')
 endif "}}}
 
 
+
 " Cursor line number inherits color from airline mode color {{{1
 " TRY? interesting, but too distractive from cursor
 " call dein#add('ntpeters/vim-airline-colornum')
+
 
 
 "" Sticked to this colorscheme 2+ years already... {{{1
@@ -32,6 +34,7 @@ call dein#add('altercation/vim-colors-solarized', {
 call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
   \ 'if': 'has("nvim") && exists("$NVIM_TUI_ENABLE_TRUE_COLOR")',
   \ 'hook_add': 'source $DEINHOOKS/solarized.vim'})
+
 
 
 "" Alternative nice dark colorscheme {{{1
