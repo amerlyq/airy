@@ -18,7 +18,7 @@ endif
 
 let $BUNDLES=expand('$CACHE/bundle')
 let $DEIN=expand('$BUNDLES/dein.vim')
-let $DEINHOOKS=expand('$VIMHOME/cfg/plugins-cfg/on_hooks')
+let $DEINHOOKS=expand('$VIMHOME/cfg/hooks')
 " ALT: using func '_hook()' to auto-distinguish 'add','source','post' parts
 "   (+) incapsulated naming of 'hooks' path
 

@@ -12,4 +12,4 @@ shvim() { $EDITOR -nesR -i NONE -u "$PWD/vimrc" \
 
 [[ $1 != -u ]] || shvim 'if dein#check_update()| call dein#update() |en'
 shvim 'if dein#check_install()| call dein#install() |else| call dein#recache_runtimepath() |en'
-shvim 'call dein#clear_state()'
+shvim 'call dein#clear_state() | UpdateRemotePlugins'

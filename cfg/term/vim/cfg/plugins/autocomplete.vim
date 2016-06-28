@@ -47,7 +47,7 @@ call dein#add('Shougo/neocomplete.vim', {
 
 "" Like neocomplete but for neovim {{{1
 " ATTENTION: :UpdateRemotePlugins and restart. Then once execute :DeopleteEnable
-call dein#add('Shougo/deoplete.nvim', {'if': "has('nvim')",
+call dein#add('Shougo/deoplete.nvim', {'if': 'has("nvim")',
   \ 'on_i': 1,
   \ 'depends': 'context_filetype.vim',
   \ 'hook_source': "
@@ -87,6 +87,7 @@ call dein#add('Shougo/neosnippet.vim', {
   \ 'depends': ['neosnippet-snippets', 'context_filetype.vim'],
   \ 'hook_source': 'source $DEINHOOKS/neosnippet.vim'})
 
+call dein#add('Shougo/neosnippet-snippets', {'on_source': 'neosnippet.vim'})
 call dein#add('honza/vim-snippets', {'on_source': 'neosnippet.vim'})
 
 
