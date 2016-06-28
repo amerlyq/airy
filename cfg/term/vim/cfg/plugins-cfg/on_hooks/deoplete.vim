@@ -24,6 +24,7 @@ imap <silent><expr> <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 " <S-TAB>: completion back.
 inoremap <expr><S-Tab>  pumvisible() ? "\<C-p>" : "\<C-h>"
 " <C-h>, <BS>: close popup and delete backword char.
+" TRY: wrap expr in smth to prevent <C-h> from breaking in nvim
 inoremap <expr><C-h> deoplete#mappings#smart_close_popup()."\<C-h>"
 inoremap <expr><BS>  deoplete#mappings#smart_close_popup()."\<C-h>"
 " inoremap <expr> '  pumvisible() ? deoplete#mappings#close_popup() : "'"
