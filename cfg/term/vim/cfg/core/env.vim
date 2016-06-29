@@ -28,11 +28,14 @@ set backupdir=$CACHE/bckp,$FALLBACK
 set backup writebackup backupcopy=auto
 " View
 set viewdir=$CACHE/view
-
+" Undo
 if v:version >= 703
   set undodir=$CACHE/undo//,$FALLBACK
   set undofile
 endif
+" Tags
+set tags=./tags,tags,*/tags,~/.cache/vim/tags
+set tagbsearch      " Use a binary search (need sorted tags file!)
 if v:version < 703 || (v:version == 7.3 && !has('patch336'))  " Vim's bug.
   set notagbsearch
 endif

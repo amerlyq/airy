@@ -1,34 +1,34 @@
 "{{{1 Tab/Space ============================
-set grepformat=%f:%l:%c:%m
-if executable('ag')
-  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
-elseif executable('ack')
-  set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
-else
-  set grepprg=internal  " Use vimgrep.
-  " set grepprg=grep\ -inH " Use grep.
-endif
+" set grepformat=%f:%l:%c:%m
+" if executable('ag')
+"   set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+" elseif executable('ack')
+"   set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+" else
+"   set grepprg=internal  " Use vimgrep.
+"   " set grepprg=grep\ -inH " Use grep.
+" endif
 
-if exists('&regexpengine')  " Use old regexp engine.
-  " set regexpengine=1
-  " Doxygen syntax highlighting. Very slow on \c, \b. So set those:
-  set regexpengine=1          " Do not use NFA because doxygen style will be slow
-  let g:load_doxygen_syntax=1 " Load doxygen syntax by default
-  " manually: set syn=cpp.doxygen
-endif
+" if exists('&regexpengine')  " Use old regexp engine.
+"   " set regexpengine=1
+"   " Doxygen syntax highlighting. Very slow on \c, \b. So set those:
+"   set regexpengine=1          " Do not use NFA because doxygen style will be slow
+"   let g:load_doxygen_syntax=1 " Load doxygen syntax by default
+"   " manually: set syn=cpp.doxygen
+" endif
 
-"{{{1 Ctags ============================
-set tags=./tags,tags,*/tags,~/.cache/vim/tags
-set tagbsearch      " Use a binary search (need sorted tags file!)
+"{{{1 Ctags/Mappings ============================
+
 "" TODO Make tags placed in .git/tags file available in all levels of a repository
+" --> This idea is compatible with nou.vim concept of cross-links
 " let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
 " if gitroot != ''
 "     let &tags = &tags . ',' . gitroot . '/.git/tags'
 " endif
 
-"{{{1 Ctags/Mappings ============================
-" Generate 'tags' file: DEPRECATEDBY easytags
+" Generate 'tags' file: MAYBE:(deprecated by) easytags
 "" TODO -- generate tags into .git/ OR .hg/ if exists
+" TODO:CHG: replace by concrete 'r.*' scripts
 if executable('ctags') || executable('ctags-exuberant')
   let s:ctags = 'ctags --recurse'
   if executable('ctags-exuberant') | let s:ctags .= '--exuberant' | endif

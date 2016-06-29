@@ -1,13 +1,5 @@
 """ NOTE: works only for Neovim / Vim7.4+
 
-"" TEMP:(convert *.yml)
-" g/^\s\+description:\s\+/m-2|%s;;"" ;
-" g/^\v(\S+):/s;;call dein#add('\1', {;
-" %s;mappings:;\\ 'on_map':;
-" %s;commands:;\\ 'on_cmd':;
-" %s;functions:;\\ 'on_func':;
-" %s;depends:;\\ 'depends':;
-
 " let g:dein#install_log_filename = ''
 let g:dein#types#git#clone_depth = 1
 if executable('git-up')
