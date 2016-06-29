@@ -20,14 +20,14 @@ call dein#add('Shougo/vinarise.vim', {
 "" CHECK: Integration of python notebooks {{{1
 " OR wilywampa/vim-ipython
 call dein#add('wmvanvliet/vim-ipython', {
-  \ 'if': 'executable("ipython")'})
+  \ 'if': executable('ipython')})
 
 
 
 "" HACK: forked for rich formatting, syntax HL, shorcuts {{{1
 " Use '!dict' translations from inside vim
 call dein#add('amerlyq/vim-dict', {
-  \ 'if': 'executable("dict")',
+  \ 'if': executable('dict'),
   \ 'on_map': [['nx', 'g=']],
   \ 'on_cmd': ['Dict', 'DictShowDb']})
 " let g:dict_leave_pw = 0
@@ -83,7 +83,7 @@ call dein#add('chrisbra/unicode.vim', {
 "   - Keithbsmiley/investigate.vim
 "   - powerman/vim-plugin-viewdoc
 call dein#add('KabbAmine/zeavim.vim', {
-  \ 'if': 'executable("zeal")',
+  \ 'if': executable('zeal'),
   \ 'on_map': ['<Plug>ZV', '<Plug>Zeavim'],
   \ 'hook_source': "let g:zv_disable_mapping = 1",
   \ 'hook_add': "

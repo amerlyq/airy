@@ -4,7 +4,7 @@
 " NEED:[neobundle] v:version >= 7.4.414, REQ: fix List support
 " CHECK:DEV: mappings for submode
 call dein#add('amerlyq/agn.vim', {'lazy': 0,
-  \ 'if': 'executable("ag")',
+  \ 'if': executable('ag'),
   \ 'on_map': '<Plug>(ag-',
   \ 'depends': 'vim-operator-user'})
 

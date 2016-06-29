@@ -40,7 +40,7 @@ call dein#add('mbbill/undotree', {
 " Help <F1>, can change sort order on 's', show prototype on <Space>
 " ALSO:SEE: TagbarOpenAutoClose, TagbarTogglePause, TagbarShowTag
 call dein#add('majutsushi/tagbar', {
-  \ 'if': 'executable("ctags")',
+  \ 'if': executable('ctags'),
   \ 'on_cmd': 'Tagbar*',
   \ 'hook_add': 'nnoremap <silent><unique> [Unite]t  :TagbarToggle<CR>',
   \ 'hook_source': "

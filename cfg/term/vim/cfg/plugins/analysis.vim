@@ -20,5 +20,5 @@ call dein#add('hari-rangarajan/CCTree', {
 "" CHECK GNU GLOBAL 6.0 is a source code tagging system {{{1
 " SEE https://www.gnu.org/software/global/
 call dein#add('Shougo/unite.vim', {
-  \ 'if': 'executable("global")',
+  \ 'if': executable('global'),
   \ 'on_source': 'unite.vim'})

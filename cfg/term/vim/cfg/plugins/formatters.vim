@@ -22,9 +22,18 @@ call dein#add('thinca/vim-ft-help_fold', {'on_ft': 'help'})
 
 
 
+"" TRY?DEV:USE: great idea and skeleton, but conflicts with my FoldText. SEE help.
+" NOTE: not bad idea with single solid horizontal separator instead any text at all.
+"       Add this as separate toggle option.
+" LucHermitte/VimFold4C:
+"   description: Reactive vim fold plugin for C & C++ (and similar languages)
+"   \ 'on_ft': [c, cpp]
+
+
+
 "" Auto-formatter for c/cpp/obj-c {{{1
 call dein#add('rhysd/vim-clang-format', {
-  \ 'if': 'executable("clang-format")',
+  \ 'if': executable('clang-format'),
   \ 'on_map': '<Plug>(operator-clang-format)',
   \ 'on_cmd': ['ClangFormat', 'ClangFormatEchoFormattedCode'],
   \ 'on_ft': ['c', 'cpp', 'objc'],
@@ -35,7 +44,7 @@ call dein#add('rhysd/vim-clang-format', {
 
 "" (DISABLED) Autoformatting with one button, can use custom (like clang-styler) {{{1
 " ATTENTION: Not operator, but placed near to 'vim-clang-format'
-" 'if': 'executable("clang-format")||executable("astyle")||executable("tidy")',
+" 'if': executable("clang-format")||executable("astyle")||executable("tidy"),
 call dein#add('Chiel92/vim-autoformat', {'if': 0,
   \ 'on_cmd': ['Autoformat', 'NextFormatter', 'NextFormatter'],
   \ 'hook_add': 'noremap <unique> <F6> :Autoformat<CR><CR>'})
