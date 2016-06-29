@@ -30,24 +30,10 @@ call dein#add('scrooloose/syntastic', {'lazy': 0,
 
 
 
-"" CHECK: lua-based autocompletion framework, for all beside ycm {{{1
-" Need much less memory.
-" vim_version: 7.3.885
-call dein#add('Shougo/neocomplete.vim', {
-  \ 'if': '!has("lua") || has("nvim")',
-  \ 'on_event': 'InsertEnter',
-  \ 'depends': 'context_filetype.vim',
-  \ 'hook_add': 'noremap <unique> [Toggle]N :<C-u>NeoCompleteToggle<CR>',
-  \ 'hook_source': "
-\\n  let g:neocomplete#enable_at_startup = 1
-\\n  source $DEINHOOKS/neocomplete.vim
-\"})
-
-
-
 "" Like neocomplete but for neovim {{{1
 " ATTENTION: :UpdateRemotePlugins and restart. Then once execute :DeopleteEnable
-call dein#add('Shougo/deoplete.nvim', {'if': 'has("nvim")',
+call dein#add('Shougo/deoplete.nvim', {
+  \ 'if': 'has("nvim") && has("python3")',
   \ 'on_i': 1,
   \ 'depends': 'context_filetype.vim',
   \ 'hook_source': "
@@ -58,6 +44,21 @@ call dein#add('Shougo/deoplete.nvim', {'if': 'has("nvim")',
 " call dein#add('zchee/deoplete-clang', {'on_ft': ['c', 'cpp']})
 call dein#add('zchee/deoplete-jedi', {'on_ft': 'python'})
 " call dein#add('zchee/deoplete-go', {'on_i': 1, 'on_ft': 'go'})
+
+
+
+"" CHECK: lua-based autocompletion framework, for all beside ycm {{{1
+" Need much less memory.
+" vim_version: 7.3.885
+call dein#add('Shougo/neocomplete.vim', {
+  \ 'if': 'has("lua") && !dein#tap("deoplete.nvim")',
+  \ 'on_event': 'InsertEnter',
+  \ 'depends': 'context_filetype.vim',
+  \ 'hook_add': 'noremap <unique> [Toggle]N :<C-u>NeoCompleteToggle<CR>',
+  \ 'hook_source': "
+\\n  let g:neocomplete#enable_at_startup = 1
+\\n  source $DEINHOOKS/neocomplete.vim
+\"})
 
 
 

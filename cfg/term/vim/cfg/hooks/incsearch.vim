@@ -52,13 +52,14 @@ if dein#tap('vim-anzu')
   " NOTE:EXPL: w/o <unique> :: remaps after incsearch
   nmap  n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
   nmap  N  <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
+
   " EXPL: inside hook to mitigate issue w/ lazy-load for multiple <Plug>-mappings
-  fun! dein#hooks.on_source(bundle)
-    nmap <silent><unique> <Leader>#
-          \ <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
-    nmap <silent><unique> <Leader>*
-          \ <Plug>(incsearch-nohl)<Plug>(anzu-n)<Plug>(anzu-mode)
-  endf
+  call dein#config({'hook_source': "
+    \\n nmap <silent><unique>  <Leader>#
+    \     <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
+    \\n nmap <silent><unique>  <Leader>*
+    \     <Plug>(incsearch-nohl)<Plug>(anzu-n)<Plug>(anzu-mode)
+    \"})
 endif
 
 

@@ -12,38 +12,43 @@ let g:dein#types#git#clone_depth = 1
 if executable('git-up')
   let g:dein#types#git#pull_command = 'git-up'
 endif
+let g:dein#install_max_processes = 8
 " let g:dein#install_progress_type = 'title'
 " let g:dein#install_message_type = 'none'
 " let g:dein#enable_notification = 1
 
-let $BUNDLES=expand('$CACHE/bundle')
-let $DEIN=expand('$BUNDLES/dein.vim')
+let $DEINBASE=expand('$CACHE/dein')
 let $DEINHOOKS=expand('$VIMHOME/cfg/hooks')
 " ALT: using func '_hook()' to auto-distinguish 'add','source','post' parts
 "   (+) incapsulated naming of 'hooks' path
 
 if has('vim_starting')
-  " Install dein if it doesn't exist
-  if !filereadable(expand('$DEIN/README.md'))
+  if !filereadable($DEINBASE.'/dein.vim/autoload/dein.vim')
     echo 'Dein not found. Installing...'
-    exec printf('!git clone --depth=1 %s',
-          \ 'https://github.com/Shougo/dein.vim') $DEIN
+    exe printf('!git clone --depth=1 %s'
+        \, shellescape('https://github.com/Shougo/dein.vim')
+        \) fnameescape($DEINBASE.'/dein.vim')
   endif
 endif
 
-set runtimepath^=$DEIN
+set runtimepath^=$DEINBASE/dein.vim
+
+" NOTE: It overwrites your 'runtimepath' completely, you must
+"   not call it after change 'runtimepath' dynamically.
 " ATTENTION: recache by 'call dein#clear_state()'
-if !dein#load_state($DEIN)| finish |en
+" BUG:FIXME: dein#tap in 'plugins/*' will never be called!
+" if !dein#load_state($DEINBASE)| finish |en
+
 
 " Monitors changes in listed rc files. Does 'filetype off'.
 " ATTENTION: recache by 'call dein#recache_runtimepath()'
-call dein#begin($BUNDLES, [expand('<sfile>')]
+call dein#begin($DEINBASE, [expand('<sfile>')]
   \ + split(globpath(expand('<sfile>:h'), 'plugins/*.vim'), '\n'))
 " NOTE: Must not contain '\n' in path. Compat globpath <v7.4.279
 
 " THINK: how to remove duplicate 'dein.vim' from &rtp ?
 " -- CHECK: conflicts with 'load_state'
-call dein#add($DEIN)
+call dein#add('Shougo/dein.vim')
 call _cfg('plugins/*.vim')
 
 " HACK'ed
@@ -56,13 +61,13 @@ for d in ['pj'] | let s:path = expand('~/aura/'.d)
       \ {'frozen': 1, 'merged': 0}, ['*.vim'])
 endif | endfor
 
-" call _cfg('plugins-cfg/*.vim')
 call dein#end()  " recaches runtimepath
+" NEED? call dein#remote_plugins()
 call dein#save_state()
 
-" Check new plugins if cache was cleared and plugins list reloaded:
-" if exists('*LoadFromYAMLs') | NeoBundleCheck | endif
+
 if !has('vim_starting') && dein#check_install()
   " Installation check.
   call dein#install()
+  " NEED? call dein#clear_state()
 endif

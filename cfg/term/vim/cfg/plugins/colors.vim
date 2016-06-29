@@ -26,13 +26,14 @@ endif "}}}
 " DEV: simplified solarized -- with menu/etc removed
 "   -- possibly with re-defined colors for nou.vim?
 " CHECK: maybe 'if' is insufficient -- need activate both, and disable one?
-call dein#add('altercation/vim-colors-solarized', {
-  \ 'if': '!has("nvim") || !exists("$NVIM_TUI_ENABLE_TRUE_COLOR")',
-  \ 'hook_add': 'source $DEINHOOKS/solarized.vim'})
-
-"" Fork which supports term TRUE_COLOR {{{1
+"" Fork which supports term TRUE_COLOR
 call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
   \ 'if': 'has("nvim") && exists("$NVIM_TUI_ENABLE_TRUE_COLOR")',
+  \ 'hook_add': 'source $DEINHOOKS/solarized.vim'})
+
+"" Original obsolete theme for old vim {{{
+call dein#add('altercation/vim-colors-solarized', {
+  \ 'if': '!dein#tap("neovim-colors-solarized-truecolor-only")',
   \ 'hook_add': 'source $DEINHOOKS/solarized.vim'})
 
 
