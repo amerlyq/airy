@@ -43,10 +43,10 @@ call dein#add('kshenoy/vim-signature', {
   \            'SignatureListMarks', 'SignatureListMarkers'],
   \ 'hook_post_source': 'sil! exe "doautocmd sig_autocmds BufEnter"',
   \ 'hook_source': "
-\\n  let g:SignatureIncludeMarkers = '!@#$%^&*()'
-\\n  let g:SignaturePurgeConfirmation = 1
-\\n  let g:SignaturePrioritizeMarks = 0
-\\n  let g:SignatureMap = {'PurgeMarks': 'm<Del>'}
+\\n   let g:SignatureIncludeMarkers = '!@#$%^&*()'
+\\n   let g:SignaturePurgeConfirmation = 1
+\\n   let g:SignaturePrioritizeMarks = 0
+\\n   let g:SignatureMap = {'PurgeMarks': 'm<Del>'}
 \"})
 
 
@@ -107,8 +107,8 @@ endif
 call dein#add('luochen1990/rainbow', {
   \ 'on_ft': ['lisp', 'vim', 'tex', 'xml', 'html', 'xhtml', 'php', 'css'],
   \ 'hook_source': "
-\\n  let g:rainbow_active = 1
-\\n  let g:rainbow_conf = {'separately': { '*': 0, 'lisp': {}, 'vim': {} }}
-\\n  let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]
-\\n  let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
+\\n   let g:rainbow_active = 1
+\\n   let g:rainbow_conf = {'separately': { '*': 0, 'lisp': {}, 'vim': {} }}
+\\n   let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]
+\\n   let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
 \"})

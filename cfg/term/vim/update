@@ -4,14 +4,15 @@ cd $(dirname $(readlink -m ${0}))
 
 ### PLUGINS ###
 # BUG: returns non-zero errcode!
+# BUG: no parallel dld on nvim -- only vimproc works
 # FIXME: error on clean system, when NeoBundle is not installed yet
 # DEV:TODO: use 'g:dein#install_log_filename' instead of 'redir!'
 
-# -nesR -u "$PWD/vimrc" \
+# -nesR -u "$PWD/vimrc" ... -- ./vimrc
 shvim() { $EDITOR -neR \
   -c "set nomore|redir!>/dev/stderr" \
   -c "$1" \
-  -c "echo''|redir END|qall!" -- ./vimrc \
+  -c "echo''|redir END|qall!" \
   >/dev/null || return $(($?-1)); }
 
 cmd='call dein#clear_state()'

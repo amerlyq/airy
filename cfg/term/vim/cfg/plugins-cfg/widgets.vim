@@ -1,5 +1,4 @@
 finish
-" Move to 'fun.vim'
 
 if neobundle#tap('ListToggle') "{{{
     let g:lt_location_list_toggle_map = '[Unite]l'

@@ -5,6 +5,14 @@ call dein#add('tpope/vim-repeat')
 
 
 
+"" Selects a column of identical characters {{{1
+" Can also be used as a text object for an operator
+" On one-line vsel selects a block of identical columns.
+call dein#add('ngn/vim-column', {
+  \ 'on_map': '<Bar>'})
+
+
+
 "" CHECK: Transforms various languages oneline <--> block constructions {{{1
 call dein#add('AndrewRadev/splitjoin.vim', {
   \ 'on_map': [['n', '<Plug>Splitjoin']],

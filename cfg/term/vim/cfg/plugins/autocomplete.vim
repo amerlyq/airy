@@ -37,8 +37,8 @@ call dein#add('Shougo/deoplete.nvim', {
   \ 'on_i': 1,
   \ 'depends': 'context_filetype.vim',
   \ 'hook_source': "
-\\n    let g:deoplete#enable_at_startup = 1
-\\n    source $DEINHOOKS/deoplete.vim
+\\n   let g:deoplete#enable_at_startup = 1
+\\n   source $DEINHOOKS/deoplete.vim
 \"})
 
 " call dein#add('zchee/deoplete-clang', {'on_ft': ['c', 'cpp']})
@@ -56,8 +56,8 @@ call dein#add('Shougo/neocomplete.vim', {
   \ 'depends': 'context_filetype.vim',
   \ 'hook_add': 'noremap <unique> [Toggle]N :<C-u>NeoCompleteToggle<CR>',
   \ 'hook_source': "
-\\n  let g:neocomplete#enable_at_startup = 1
-\\n  source $DEINHOOKS/neocomplete.vim
+\\n   let g:neocomplete#enable_at_startup = 1
+\\n   source $DEINHOOKS/neocomplete.vim
 \"})
 
 

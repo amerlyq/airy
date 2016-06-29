@@ -2,6 +2,7 @@
 
 "" TEMP:(convert *.yml)
 " g/^\s\+description:\s\+/m-2|%s;;"" ;
+" g/^\v(\S+):/s;;call dein#add('\1', {;
 " %s;mappings:;\\ 'on_map':;
 " %s;commands:;\\ 'on_cmd':;
 " %s;functions:;\\ 'on_func':;
@@ -10,6 +11,7 @@
 " let g:dein#install_log_filename = ''
 let g:dein#types#git#clone_depth = 1
 if executable('git-up')
+  " EXPL:NEED: gitconfig: alias git-up = '!git-up'
   let g:dein#types#git#pull_command = 'git-up'
 endif
 let g:dein#install_max_processes = 8

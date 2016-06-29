@@ -15,10 +15,10 @@ call dein#add('zhaocai/GoldenView.Vim', {'lazy': 0,
 \\n   let g:goldenview__enable_at_startup = 1
 \\n   let g:goldenview__enable_default_mapping = 0
 \"})
-  " \ 'hook_post_source': "
-  " \\n  call GoldenView#ExtendProfile('small-height', {'other_window_winheight': 2})
-  " \\n  let g:goldenview__active_profile = 'small-height'
-  " \"})
+" \ 'hook_post_source': "
+" \\n   call GoldenView#ExtendProfile('small-height', {'other_window_winheight': 2})
+" \\n   let g:goldenview__active_profile = 'small-height'
+" \"})
 
 if dein#tap('GoldenView.Vim')
   " ALSO :Disable*, :Enable*
