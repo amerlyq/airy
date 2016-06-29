@@ -3,13 +3,18 @@
 
 # First time this function don't work, because right part isn't appeared yet?
 function prompt_amer_pwd {
-  local ppwd="${PWD/#$HOME/~}"
-  local strip_patt="%[Bbf]|%F{[0-9a-z]##}"
-  local sfx="${git_info[details]}${vcs_info_msg_1_}"
-  sfx="${(S)sfx//${~strip_patt}}"
+  local ppwd=${PWD/#$HOME/\~}
+  local sfx=${git_info[details]}${vcs_info_msg_1_}
+  # SEE: http://stackoverflow.com/questions/10564314/count-length-of-user-visible-string-for-zsh-prompt
+  local strip_patt='%([BSUbfksu]|([FBK]|){*})'
+  sfx=${#${(S%%)sfx//$~strip_patt/}}
+
+  ## ALT: Difference betwee full length and stripped normal chars
+  # local Lsfx="${#${$(print -P "$sfx")//\([^)]##\)/}}"
+  # Lsfx=$(( ${#$(print -P "$sfx")} - Lsfx ))
   ## ALT Strip color codes
   # sfx=$(print -P ${git_info[details]}${vcs_info_msg_1_} | sed 's/\x1b\[[0-9;]*m//g')
-  local wth=$(($COLUMNS - 6 - $#sfx))  # Drop prompt parts before and after path
+  local wth=$(($COLUMNS - 6 - $sfx))  # Drop prompt parts before and after path
 
   if [[ "$ppwd" == (#m)[/~] ]]; then  ## Keep first char '/' or '~' in path
     _prompt_amer_pwd="$MATCH"

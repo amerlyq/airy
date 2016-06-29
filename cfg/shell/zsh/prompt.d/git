@@ -12,7 +12,7 @@ function _prompt_amer_setup_git {
   zstyle ':prezto:module:git:info:added'     format '%%B%F{2}+%f%%b'
   zstyle ':prezto:module:git:info:ahead'     format '%F{13}▲%f'
   zstyle ':prezto:module:git:info:behind'    format '%F{13}▼%f'
-  zstyle ':prezto:module:git:info:branch'    format '%%B%F{92}(%b)%f%%b'
+  zstyle ':prezto:module:git:info:branch'    format '%%B$([[ %b == master ]]&&echo "%F{92}"||echo "%F{27}")(%b)%f%%b'
   #zstyle ':prezto:module:git:info:clean'    format '%F{2}✔%f'
   zstyle ':prezto:module:git:info:commit'    format '%%B%F{15}(%.7c)%f%%b'
   zstyle ':prezto:module:git:info:deleted'   format '%%B%F{1}✗%f%%b'

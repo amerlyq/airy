@@ -2,7 +2,6 @@
 
 # TODO: enhance status to show for all branches (at least pull/push)
 # http://stackoverflow.com/questions/7773939/show-git-ahead-and-behind-info-for-all-branches-including-remotes
-# DEV: show non-master branches in non-purple color (for better visibility)
 
 # Options
 DIR=$PWD
@@ -68,7 +67,10 @@ function gita_st { # $1 -- rep name, $2 -- suffix
     local name=$(printf "%+${WCOL:-17}s" "$1")
     # ALT "$(print -P "%F{6}${rep:h}/%f${rep:t}")"
     regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
-    print -P "$(gita_prezto)\t $name  $stm - $(time_dt)$2"
+    # TODO: replace awk by ZSH line-splitting
+    local fmt="\u251c\u2500%(refname:short) %(push:track)"
+    local psh=$(git for-each-ref --format="$fmt" refs/heads | awk '/^\S+\s\S/{print $0}')
+    print -P "$(gita_prezto)\t $name  $stm - $(time_dt)%F{35}${${psh#* }:+\n$psh\n\u2534}%f$2"
 }
 
 # ATTENTION: Checking remote updates has no sense, as its time ~= pull
