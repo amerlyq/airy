@@ -13,6 +13,11 @@ if dein#tap('DrawIt')
 endif
 
 
+"" Lingr -- remote workplace chat
+" repo = 'basyura/J6uil.vim'
+" depends = 'webapi-vim'
+" hook_source = 'source ~/.vim/rc/plugins/J6uil.rc.vim'
+
 
 """ Games
 

@@ -41,16 +41,6 @@ call dein#add('stefandtw/quickfix-reflector.vim', {
 
 """ Substitute/Highlight
 
-"" CHECK: Multiple realtime hl for searching {{{1
-" NOTE: vim_version: '7.3'
-" USE: [/, ?, g/]
-call dein#add('haya14busa/incsearch.vim', {
-  \ 'on_map': '<Plug>',
-  \ 'depends': 'vim-repeat',
-  \ 'hook_add': 'source $DEINHOOKS/incsearch.vim'})
-
-
-
 "" CHECK: Extension for -incsearch.vim- to provide fuzzy {{{1
 " USE: [z/, z?, zg/],
 call dein#add('haya14busa/incsearch-fuzzy.vim', {
@@ -75,6 +65,18 @@ call dein#add('osyo-manga/vim-anzu', {
   \ 'on_func': 'anzu#',
   \ 'on_map': ['<Plug>', ['n', '<Leader>#', '<Leader>*']],
   \ 'on_cmd': ['AnzuUpdateSearchStatus', 'AnzuSignMatchLine']})
+
+
+
+"" CHECK: Multiple realtime hl for searching {{{1
+" ATTENTION: place strictly after [incsearch-fuzzy.vim, vim-anzu, vim-asterisk]
+"   DEV:ALT: split in individual and #tap for 'incsearch' in each one
+" NOTE: vim_version: '7.3'
+" USE: [/, ?, g/]
+call dein#add('haya14busa/incsearch.vim', {
+  \ 'on_map': '<Plug>',
+  \ 'depends': 'vim-repeat',
+  \ 'hook_add': 'source $DEINHOOKS/incsearch.vim'})
 
 
 

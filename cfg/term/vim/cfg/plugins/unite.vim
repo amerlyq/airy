@@ -12,6 +12,7 @@ call dein#add('Shougo/unite-outline', {'on_source': 'unite.vim'})
 call dein#add('thinca/vim-unite-history', {'on_source': 'unite.vim'})
 call dein#add('osyo-manga/unite-quickfix', {'on_source': 'unite.vim'})
 call dein#add('tsukkee/unite-tag', {'on_source': 'unite.vim'})
+call dein#add('Shougo/unite-build', {'on_source': 'unite.vim'})
 
 
 

@@ -33,10 +33,11 @@ endif
 
 
 "" Two-letters find on whole screen scope {{{1
+" ALT: saihoooooooo/glowshi-ft.vim
 " DEPRECATED:
 "   - (bloated) Lokaltog/vim-easymotion
 "   - (altered) https://github.com/rhysd/clever-f.vim
 call dein#add('justinmk/vim-sneak', {
   \ 'on_map': '<Plug>Sneak',
   \ 'depends': 'vim-repeat',
-  \ 'hook_source': 'source $DEINHOOKS/vim-sneak.vim'})
+  \ 'hook_add': 'source $DEINHOOKS/vim-sneak.vim'})

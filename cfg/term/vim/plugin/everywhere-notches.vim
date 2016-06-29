@@ -3,6 +3,7 @@
 " CHECK: http://andrewradev.com/2011/08/06/making-vim-pretty-with-custom-colors/
 " FIXME: background for labels don't match, when cursor is on same line
 " THINK? use autocompletion/snippets to cycle through possible notches
+" DEV: combine with kana/vim-smartchr
 
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has("autocmd") || v:version <= 701 | finish | endif

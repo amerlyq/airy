@@ -28,11 +28,20 @@ call dein#add('rhysd/vim-operator-surround', {
 
 
 
-"" Run a command and show its result quickly.
+"" Run a command and show its result quickly. {{{1
 call dein#add('thinca/vim-quickrun', {
   \ 'on_map': {'n': '<Plug>'},
   \ 'on_cmd': 'QuickRun',
   \ 'hook_add': 'nmap <silent> [Space]r <Plug>(quickrun)'})
+
+
+
+"" CHECK open URI or search. Combinable with vim-quickrun ? {{{1
+call dein#add('tyru/open-browser.vim', {
+  \ 'hook_add': "
+\\n   nmap gx <Plug>(openbrowser-smart-search)
+\\n   vmap gx <Plug>(openbrowser-smart-search)
+\"})
 
 
 
@@ -72,6 +81,23 @@ endif
 call dein#add('tpope/vim-commentary', {
   \ 'on_map': ['gc', ['n', 'gcc', 'cgc', 'gcu']],
   \ 'on_cmd': 'Commentary'})
+
+" ALT: 'tyru/caw.vim', on_map = {nx = '<Plug>'}, hook_add = '''
+"   function! InitCaw() abort
+"     if !&l:modifiable
+"       silent! nunmap <buffer> gc
+"       silent! xunmap <buffer> gc
+"       silent! nunmap <buffer> gcc
+"       silent! xunmap <buffer> gcc
+"     else
+"       nmap <buffer> gc <Plug>(caw:prefix)
+"       xmap <buffer> gc <Plug>(caw:prefix)
+"       nmap <buffer> gcc <Plug>(caw:hatpos:toggle)
+"       xmap <buffer> gcc <Plug>(caw:hatpos:toggle)
+"     endif
+"   endfunction
+"   autocmd MyAutoCmd FileType * call InitCaw()
+" '''
 
 
 

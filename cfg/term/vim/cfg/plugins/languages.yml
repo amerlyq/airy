@@ -1,4 +1,5 @@
 --- ## Main
+# ALT: vim-jp/cpp-vim
 octol/vim-cpp-enhanced-highlight:
   filetypes: [c, cpp]
 
@@ -12,6 +13,10 @@ octol/vim-cpp-enhanced-highlight:
 lukerandall/haskellmode-vim:
   filetypes: [haskell, hs]
 
+# ALT repo = 'kana/vim-filetype-haskell'
+# ALT repo = 'itchyny/vim-haskell-indent'
+# on_ft = 'haskell'
+
 eagletmt/ghcmod-vim:
   description: Integration with syntastic
   external_commands: ghc-mod
@@ -24,6 +29,17 @@ LaTeX-Box-Team/LaTeX-Box:
   external_commands: latexmk
   filetypes: [tex, bib, latex]
     # mappings: [C-xC-o, [[, ]], ([, ((, )), F5, F7]
+
+# ALSO: https://github.com/ternjs/tern_for_vim
+# repo = 'marijnh/tern_for_vim'
+# on_ft = 'javascript'
+# build = 'npm install'
+#
+# repo = 'jiangmiao/simple-javascript-indenter'
+# on_ft = 'javascript'
+#
+# repo = 'jelera/vim-javascript-syntax'
+# on_ft = 'javascript'
 
 
 # ALT: 'thinca/vim-themis'
@@ -43,9 +59,20 @@ albfan/vader.vim:
 # albfan/JavaDecompiler.vim
 
 --- ## Python
+repo = 'hynek/vim-python-pep8-indent'
+on_ft = 'python'
+
 davidhalter/jedi-vim:
   filetypes: python
+  # on_ft = 'python'
+  # if = "!has('nvim')"
   # commands: Pyimport
+# hook_source = '''
+#   let g:jedi#completions_enabled = 0
+#   let g:jedi#auto_vim_configuration = 0
+#   let g:jedi#smart_auto_mappings = 0
+#   let g:jedi#show_call_signatures = 0
+# '''
 
 klen/python-mode:
   rev: develop
@@ -60,6 +87,9 @@ amerlyq/forestanza.vim:
   description: HACK jap ranobe translation/formatting
   on_ft: forestanza
 
+# Maybe useful in combo with:
+#   chikatoike/concealedyank.vim
+#   switchr
 amerlyq/nou.vim:
   description: HACK notes/outline
   on_ft: nou
@@ -78,6 +108,7 @@ mrk21/yaml-vim:
     SEE:THINK: https://github.com/lmeijvogel/vim-yaml-helper
   filetypes: yaml
 
+# ALT: repo = 'rcmdnk/vim-markdown'
 tpope/vim-markdown:
   filetypes: markdown
 
@@ -87,10 +118,11 @@ tpope/vim-markdown:
 # mattn/emmet-vim: {}
 # cakebaker/scss-syntax.vim: {}
 # gorodinskiy/vim-coloresque: {}
+# repo = 'hail2u/vim-css3-syntax'
 
 --- ## Syntax highlight
-cespare/vim-toml:  # TODO:REMOVE
-  filetypes: toml
+# cespare/vim-toml:  # TODO:REMOVE
+#   filetypes: toml
 
 Matt-Deacalion/vim-systemd-syntax:
   filetypes: systemd

@@ -40,3 +40,4 @@ call dein#add('altercation/vim-colors-solarized', {
 
 "" Alternative nice dark colorscheme {{{1
 call dein#add('tomasr/molokai')
+" call dein#add('cocopon/iceberg.vim')

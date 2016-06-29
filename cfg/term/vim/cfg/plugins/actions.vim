@@ -14,6 +14,7 @@ call dein#add('ngn/vim-column', {
 
 
 "" CHECK: Transforms various languages oneline <--> block constructions {{{1
+" ALT: osyo-manga/vim-jplus
 call dein#add('AndrewRadev/splitjoin.vim', {
   \ 'on_map': [['n', '<Plug>Splitjoin']],
   \ 'hook_source': "

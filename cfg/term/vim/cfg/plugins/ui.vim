@@ -5,6 +5,16 @@
 " call dein#add('severin-lemaignan/vim-minimap', {'on_cmd': 'MinimapToggle'})
 
 
+" TRY: direct jump to window
+" repo = 't9md/vim-choosewin'
+" on_map = {n = '<Plug>'}
+" hook_add = '''
+"   nmap g<C-w>  <Plug>(choosewin)
+"   let g:choosewin_overlay_enable = 1
+"   let g:choosewin_overlay_clear_multibyte = 1
+"   let g:choosewin_blink_on_land = 0
+" '''
+
 
 "" Nice automatic view/scale/ctrl for split windows {{{1
 " SEE http://zhaocai.github.io/GoldenView.Vim

@@ -24,7 +24,7 @@ call dein#add('scrooloose/syntastic', {'lazy': 0,
 """ Neo-based
 
 " THINK what can be useful to add {{{1
-" repository = Shougo/neoinclude.vim
+" repository = Shougo/neoinclude.vim, on_if = 1
 " repository = Shougo/neco-vim
 " repository = Shougo/neco-syntax
 
@@ -94,6 +94,14 @@ call dein#add('honza/vim-snippets', {'on_source': 'neosnippet.vim'})
 
 
 """ Others
+
+call dein#add('artur-shaik/vim-javacomplete2', {
+  \ 'on_ft': 'java',
+  \ 'hook_source': "
+\\n   autocmd MyAutoCmd FileType java setlocal omnifunc=javacomplete#Complete
+\"})
+
+
 
 " (DISABLED: Shougo) Async clang code completion. {{{1
 " Integration with neocomplete: for stdlib++, boost, etc (works on Windows)

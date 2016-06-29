@@ -1,8 +1,9 @@
 """ inner/support/system
 
 "" CHECK Async exec plugin for Vim. Dependency for Shougo plugins {{{1
+" FIXME: must be cloned with dein.vim on first install!
 " EXPL:(lazy: 0) NeoBundle uses it to update plugins
-call dein#add('Shougo/vimproc.vim', {'lazy': 0, 'build': 'make'})
+call dein#add('Shougo/vimproc.vim', {'build': 'make'})
 
 
 
@@ -23,6 +24,7 @@ call dein#add('Shougo/vimproc.vim', {'lazy': 0, 'build': 'make'})
 
 "" CHECK In unix terminal use snip-ranger-filechooser.vim {{{1
 " ALSO: [VimFiler, VimFilerExplorer, Edit, Read, Source, Write]
+" ALT: 'ctrlpvim/ctrlp.vim'
 call dein#add('Shougo/vimfiler.vim', {
   \ 'if': 'IsWindows()',
   \ 'on_map': {'n': '<Plug>'},
