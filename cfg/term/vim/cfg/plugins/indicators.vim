@@ -3,31 +3,15 @@
 "" Signs on changes and textobj on vcs-aware area {{{1
 " ALT: airblade/vim-gitgutter: (git only, but much faster file save)
 " EXPL: show from the start. Disable individually by ft.
-" CHG: <Plug>
+" FIND:THINK: isn't :SignifyRefresh unnecessary?
+" EXPL:(not lazy) so 'hook_source' can't be used
+" NOTE: Textobj -- changed areas
+"" Already mapped -- if busy: automaps <leader>gj and <leader>gk
 call dein#add('mhinz/vim-signify', {'lazy': 0,
   \ 'on_map': [['xo', 'aS', 'iS'], ['n', '[c', ']c']],
   \ 'on_cmd': ['SignifyFold', 'SignifyToggle',
-  \            'SignifyToggleHighlight', 'SignifyRefresh']})
-
-" ATTENTION: not in 'hook_source' because plugin isn't lazy
-if dein#tap('vim-signify')
-  let g:signify_vcs_list = [ 'git', 'hg', 'cvs' ]
-  let g:signify_sign_change = '~'
-  let g:signify_sign_delete = '-'
-
-  noremap <unique> zS :<C-u>SignifyFold<CR>
-  " FIND:THINK: isn't :SignifyRefresh unnecessary?
-  noremap <unique> [Toggle]g :<C-u>SignifyToggleHighlight\|SignifyRefresh<CR>
-  noremap <unique> [Toggle]G :<C-u>SignifyToggle<CR>
-  "" Already mapped -- if busy: automaps <leader>gj and <leader>gk
-  nmap <silent><unique> ]c <Plug>(signify-next-hunk)
-  nmap <silent><unique> [c <Plug>(signify-prev-hunk)
-  " Textobj -- changed areas
-  xmap <silent><unique> aS <Plug>(signify-motion-outer-visual)
-  omap <silent><unique> aS <Plug>(signify-motion-outer-pending)
-  xmap <silent><unique> iS <Plug>(signify-motion-inner-visual)
-  omap <silent><unique> iS <Plug>(signify-motion-inner-pending)
-endif
+  \            'SignifyToggleHighlight', 'SignifyRefresh'],
+  \ 'hook_add': 'source $DEINHOOKS/signify.add.vim'})
 
 
 
@@ -52,49 +36,33 @@ call dein#add('kshenoy/vim-signature', {
 
 
 "" Highlight motion, lock current color<->regex {{{1
+" USE:(directly) nmap <unique> <F1>h     :QuickhlManualList<CR>
+" ATTENTION: tag-toggle is unusable on big tag base (like kernels)
 " CHG: [[n, qh, qH, <Leader>?h]]
+" let g:quickhl_manual_colors = [ "ctermbg=..", ... ]
 call dein#add('t9md/vim-quickhl', {
   \ 'on_map': [['n', '<Plug>(operator-quickhl-', '<Plug>(quickhl-']],
   \ 'on_cmd': ['QuickhlManualList', 'QuickhlCwordToggle', 'QuickhlTagToggle',
   \            'QuickhlManualLockToggle', 'QuickhlManualLockWindowToggle'],
-  \ 'depends': 'vim-operator-user'})
-
-if dein#tap('vim-quickhl')
-   map <unique> [Quote]h    <Plug>(operator-quickhl-manual-this-motion)
-  nmap <unique> [Quote]H    <Plug>(quickhl-manual-reset)
-  " USE:(directly) nmap <unique> <F1>h     :QuickhlManualList<CR>
-  nmap <unique> [Toggle]h   <Plug>(quickhl-cword-toggle)
-  nmap <unique> <Leader>Th  <Plug>(quickhl-manual-toggle)
-  "" ATTENTION: unusable on big tag base (like kernels)
-  nmap <unique> <Leader>TH  <Plug>(quickhl-tag-toggle)
-  " let g:quickhl_manual_colors = [ "ctermbg=..", ... ]
-endif
+  \ 'depends': 'vim-operator-user',
+  \ 'hook_add': "
+\\n    map <unique> [Quote]h    <Plug>(operator-quickhl-manual-this-motion)
+\\n   nmap <unique> [Quote]H    <Plug>(quickhl-manual-reset)
+\\n   nmap <unique> [Toggle]h   <Plug>(quickhl-cword-toggle)
+\\n   nmap <unique> <Leader>Th  <Plug>(quickhl-manual-toggle)
+\\n   nmap <unique> <Leader>TH  <Plug>(quickhl-tag-toggle)
+\"})
 
 
 
 "" Highlights first space of tab columns {{{1
+" EXPL: not in 'hook_source' because plugin isn't lazy
 " SEE:(iav_term) RangerChooser
-" NOTE: Make 1-wide guide, don't works on Hard-Tabs
-" NOTE: At the moment Terminal Vim only has basic support.
-"     -- So colors won't be autocalculated from your colorscheme.
-call dein#add('nathanaelkane/vim-indent-guides')
-
-" ATTENTION: not in 'hook_source' because plugin isn't lazy
-if dein#tap('vim-indent-guides')
-  nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>
-
-  let g:indent_guides_enable_on_vim_startup = 1
-  let g:indent_guides_exclude_filetypes = ['votl', 'iav_term']
-
-  let g:indent_guides_guide_size = 1
-  let g:indent_guides_start_level = 2
-  let g:indent_guides_indent_levels = 20
-  let g:indent_guides_tab_guides = 0
-
-  let g:indent_guides_auto_colors = 0
-  let g:indent_guides_color_change_percent = 10
-  let g:indent_guides_default_mapping = 0
-endif
+call dein#add('nathanaelkane/vim-indent-guides', {
+  \ 'hook_add': "
+\\n   nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>
+\\n   source $DEINHOOKS/indent-guides.src.vim
+\"})
 
 
 

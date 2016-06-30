@@ -23,15 +23,10 @@ call dein#add('airblade/vim-rooter', {
 \\n   nnoremap <silent><unique> [Frame]cd :Rooter<CR>
 \"})
 
-" ATTENTION: breaks on load_state
-" ALSO:STD:ALWAYS:
-  nnoremap <silent><unique> [Frame]cw :lcd %:p:h \| pwd<CR>
-  nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
-"}}}
-
 
 
 "" Switch between alternative files [c,cpp,cxx,cc] <-> [h,hpp] {{{1
+" EXPL:(no <unique>) overrides my STD 'cycle through'
 call dein#add('kana/vim-altr', {
   \ 'on_func': 'altr#',
   \ 'on_map': [['nvoic', '<Plug>']],
@@ -39,13 +34,9 @@ call dein#add('kana/vim-altr', {
 \\n   call altr#define('%/src/%.c', '%/inc/%.h')
 \", 'hook_add': "
 \\n   nmap <unique> ]f  <Plug>(altr-forward)
-\\n   nmap <unique> [f  <Plug>(altr-back)
+\\n   nmap  [f  <Plug>(altr-back)
 \\n   command! -bar -nargs=0  A  call altr#forward()
 \"})
-
-" if !dein#tap('vim-altr')  " OR:STD: Cycle through *.h/*.cpp
-"   nnoremap <unique> [f :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
-" endif
 
 
 
@@ -76,11 +67,6 @@ call dein#add('kopischke/vim-fetch')
 " \ 'on_cmd': ['CleanViewdir', 'StayReload']
 call dein#add('kopischke/vim-stay')
 " set viewoptions=cursor,folds,slash,unix   " Recommended
-
-if !dein#tap('vim-stay')  " OR:STD: Open at last position
-  au MyAutoCmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-        \|    exe "normal! g'\"" | endif
-endif
 
 
 

@@ -20,12 +20,10 @@ call dein#add('AndrewRadev/splitjoin.vim', {
   \ 'hook_source': "
 \\n   let g:splitjoin_split_mapping = ''
 \\n   let g:splitjoin_join_mapping = ''
+\", 'hook_add': "
+\\n   nmap <unique><silent> [Space]j <Plug>SplitjoinJoin<CR>
+\\n   nmap <unique><silent> [Space]k <Plug>SplitjoinSplit<CR>
 \"})
-
-if dein#tap('splitjoin.vim')
-  nmap <unique><silent> [Space]j <Plug>SplitjoinJoin<CR>
-  nmap <unique><silent> [Space]k <Plug>SplitjoinSplit<CR>
-endif
 
 
 
@@ -46,9 +44,18 @@ call dein#add('kana/vim-niceblock', {
 
 "" Expand/shrink current visual selection {{{1
 call dein#add('terryma/vim-expand-region', {
-  \ 'on_map': [['nx', '<Plug>(expand_region_']]})
+  \ 'on_map': [['nx', '<Plug>(expand_region_']],
+  \ 'hook_add': "
+\\n   call Map_nxo('+', '<Plug>(expand_region_expand)', 'nx')
+\\n   call Map_nxo('-', '<Plug>(expand_region_shrink)', 'nx')
+\"})
 
-if dein#tap('vim-expand-region')
-  call Map_nxo('+', '<Plug>(expand_region_expand)', 'nx')
-  call Map_nxo('-', '<Plug>(expand_region_shrink)', 'nx')
-endif
+
+
+"" (DISABLED) Dependency of user modes with custom temporary remappings {{{1
+" ALT:USE: <Plug>(submode-
+call dein#add('kana/vim-submode', {'if': 0, 'lazy': 0,
+  \ 'on_func': 'submode#',
+  \ 'on_map': '[[n, x]]',
+  \ 'on_cmd': 'SubmodeRestoreOptions',
+  \ 'hook_source': 'source $DEINHOOKS/submodes-define.vim'})

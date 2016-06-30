@@ -22,3 +22,10 @@ call dein#add('hari-rangarajan/CCTree', {
 call dein#add('hewes/unite-gtags', {
   \ 'if': executable('global'),
   \ 'on_source': 'unite.vim'})
+
+
+
+" Alt: bb:abudden/taghighlight "(small and fast) from bitbucket {{{1
+" NOTE: easytags can make CursorMove very slow
+"   https://github.com/xolox/vim-easytags/issues/68#issuecomment-28480981
+"NeoBundle xolox/vim-easytags, { \ 'depends': xolox/vim-misc }

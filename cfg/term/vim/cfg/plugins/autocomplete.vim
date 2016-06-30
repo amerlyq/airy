@@ -13,13 +13,6 @@ call dein#add('scrooloose/syntastic', {
 
 
 
-" Alt: bb:abudden/taghighlight "(small and fast) from bitbucket {{{1
-" NOTE: easytags can make CursorMove very slow
-"   https://github.com/xolox/vim-easytags/issues/68#issuecomment-28480981
-"NeoBundle xolox/vim-easytags, { \ 'depends': xolox/vim-misc }
-
-
-
 """ Neo-based
 
 " THINK what can be useful to add {{{1
@@ -46,10 +39,10 @@ call dein#add('zchee/deoplete-jedi', {'on_ft': 'python'})
 
 
 "" CHECK: lua-based autocompletion framework, for all beside ycm {{{1
-" Need much less memory.
+" ATTENTION: place after 'deoplete'
 " vim_version: 7.3.885
 call dein#add('Shougo/neocomplete.vim', {
-  \ 'if': 'has("lua") && !dein#tap("deoplete.nvim")',
+  \ 'if': '!dein#tap("deoplete.nvim") && has("lua")',
   \ 'on_event': 'InsertEnter',
   \ 'depends': 'context_filetype.vim',
   \ 'hook_add': 'noremap <unique> [Toggle]N :<C-u>NeoCompleteToggle<CR>',

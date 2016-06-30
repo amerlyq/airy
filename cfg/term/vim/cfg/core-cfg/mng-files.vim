@@ -13,6 +13,20 @@ noremap <Leader>S :<C-U>write ++enc=utf8<CR>
 noremap <Leader><C-S> :saveas<Space>
 
 
+"" Change current path
+nnoremap <silent><unique> [Frame]cw :lcd %:p:h \| pwd<CR>
+nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
+
+
+" Cycle through *.h/*.cpp
+nnoremap <unique> [f :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+
+
+" STD: Open at last position (instead of vim-stay)
+"   au MyAutoCmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+"       \|    exe "normal! g'\"" | endif
+
+
 " BUG can't work in vim w/o redirections?
 " if executable('r.shell')
 "   set shell=r.shell

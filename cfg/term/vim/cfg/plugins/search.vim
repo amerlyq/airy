@@ -2,20 +2,18 @@
 
 "" HACK evolved rking/ag.vim {{{1
 " NEED:[neobundle] v:version >= 7.4.414, REQ: fix List support
+" CHG: all real mappings included into 'after/ftplugin/qf.vim'
 " CHECK:DEV: mappings for submode
+" let g:ag.qhandler="botleft lopen 7"  "OR: copen 20"
 call dein#add('amerlyq/agn.vim', {'lazy': 0,
   \ 'if': executable('ag'),
   \ 'on_map': '<Plug>(ag-',
-  \ 'depends': 'vim-operator-user'})
-
-if dein#tap('agn.vim')
-  " CHG: all real mappings included into 'after/ftplugin/qf.vim'
-  let g:ag = {}
-  let g:ag.toggle = {'highlight': 0, 'mapping_message': 0}
-  let g:ag.use_default = {'qmappings': 0, 'lmappings': 0}
-  " let g:ag.qhandler="botleft lopen 7"  "OR: copen 20"
-endif
-
+  \ 'depends': 'vim-operator-user',
+  \ 'hook_source': "
+\\n   let g:ag = {}
+\\n   let g:ag.toggle = {'highlight': 0, 'mapping_message': 0}
+\\n   let g:ag.use_default = {'qmappings': 0, 'lmappings': 0}
+\"})
 
 
 "" Focus on matching lines, errors, etc by folding away other lines {{{1

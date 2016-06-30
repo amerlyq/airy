@@ -49,18 +49,16 @@ call dein#add('tyru/open-browser.vim', {
 
 
 "" Replaces motion by register content {{{1
-" CHG mappings: [[nxo, gr]]
+" THINK Could be used instead of my own paste-replace?
 call dein#add('kana/vim-operator-replace', {
   \ 'on_map': [['nx', '<Plug>']],
-  \ 'depends': 'vim-operator-user'})
-
-if dein#tap('vim-operator-replace')
-  " THINK Could be used instead of my own paste-replace?
-  nmap <silent><unique> gr <Plug>(operator-replace)
-  xmap <silent><unique> gr <Plug>(operator-replace)
-  nmap <silent><unique> gR <Plug>(operator-replace)$
-  xmap <silent><unique> gR <Plug>(operator-replace)$
-endif
+  \ 'depends': 'vim-operator-user',
+  \ 'hook_add': "
+\\n   nmap <silent><unique> gr <Plug>(operator-replace)
+\\n   xmap <silent><unique> gr <Plug>(operator-replace)
+\\n   nmap <silent><unique> gR <Plug>(operator-replace)$
+\\n   xmap <silent><unique> gR <Plug>(operator-replace)$
+\"})
 
 
 
@@ -68,14 +66,13 @@ endif
 " USAGE: line 'cxc' and clear 'cxx', as 'cxc' is more comfortable
 " CHG : [[x, X], [n, cx, cxc, cxx]]
 call dein#add('tommcdo/vim-exchange', {
-  \ 'on_map': [['nx', '<Plug>(Exchange']]})
-
-if dein#tap('vim-exchange')
-  xmap <silent><unique> X   <Plug>(Exchange)
-  nmap <silent><unique> cx  <Plug>(Exchange)
-  nmap <silent><unique> cxc <Plug>(ExchangeLine)
-  nmap <silent><unique> cxx <Plug>(ExchangeClear)
-endif
+  \ 'on_map': [['nx', '<Plug>(Exchange']],
+  \ 'hook_add': "
+\\n   xmap <silent><unique> X   <Plug>(Exchange)
+\\n   nmap <silent><unique> cx  <Plug>(Exchange)
+\\n   nmap <silent><unique> cxc <Plug>(ExchangeLine)
+\\n   nmap <silent><unique> cxx <Plug>(ExchangeClear)
+\"})
 
 
 
@@ -108,21 +105,22 @@ call dein#add('tpope/vim-commentary', {
 " ALT:TODO:SEE:
 "   - sgur/vim-textobj-parameter
 "   - PeterRincker/vim-argumentative
+" NOTE: overrides 'ga -- print ascii for letter', do 'norm! ga' on demand
+" TODO replace [a ]a with ',a' OR '<Tab>a', and move Ag to '[Frame]a]'
 " CHG mappings: [[xo, aa, ia], [n, ga, gA, '[a', ']a']]
 call dein#add('AndrewRadev/sideways.vim', {
   \ 'on_map': '<Plug>Sideways',
-  \ 'on_cmd': ['SidewaysLeft', 'SidewaysRight', 'SidewaysJumpLeft', 'SidewaysJumpRight'],
-  \ 'depends': 'vim-repeat'})
-
-if dein#tap('sideways.vim')
-  xmap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
-  omap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
-  xmap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
-  omap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
-  " NOTE: overrides 'ga -- print ascii for letter', do 'norm! ga' on demand
-  nmap <silent><unique> ga <Plug>SidewaysLeft
-  nmap <silent><unique> gA <Plug>SidewaysRight
-  " TODO replace with ',a' OR '<Tab>a', and move Ag to '[Frame]a]'
-  noremap <silent><unique> [a :<C-u>SidewaysJumpLeft<CR>
-  noremap <silent><unique> ]a :<C-u>SidewaysJumpRight<CR>
-endif
+  \ 'on_cmd': 'Sideways*',
+  \ 'depends': 'vim-repeat',
+  \ 'hook_add': "
+\\n   xmap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
+\\n   omap <silent><unique> aa <Plug>SidewaysArgumentTextobjA
+\\n   xmap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
+\\n   omap <silent><unique> ia <Plug>SidewaysArgumentTextobjI
+\\n
+\\n   nmap <silent><unique> ga <Plug>SidewaysLeft
+\\n   nmap <silent><unique> gA <Plug>SidewaysRight
+\\n
+\\n   noremap <silent><unique> [a :<C-u>SidewaysJumpLeft<CR>
+\\n   noremap <silent><unique> ]a :<C-u>SidewaysJumpRight<CR>
+\"})

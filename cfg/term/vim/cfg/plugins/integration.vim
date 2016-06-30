@@ -4,13 +4,12 @@
 " - depends on hexript for some optional scripts
 " - (now that repo rbtnn/hexript.vim don't exists?)
 " THINK hook_add = 'let g:vinarise_enable_auto_detect = 1'
+" EXPL:(lazy) don't detects binary file or large file automatically.
 call dein#add('Shougo/vinarise.vim', {
   \ 'on_cmd': ['Vinarise', 'VinariseDump'],
   \ 'hook_source': "
-\\n   \" detects binary file or large file automatically.
 \\n   let g:vinarise_enable_auto_detect = 0
 \\n   let g:vinarise_detect_large_file_size  =  0
-\\n   \" name of command
 \\n   let g:vinarise_objdump_command = 'objdump'
 \\n   let g:vinarise_no_default_keymappings = 1
 \"})

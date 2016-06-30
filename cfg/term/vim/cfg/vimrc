@@ -15,6 +15,8 @@ augroup END
 " ENH: cat all vimrc in cached version at $VCACHE
 "   -- BUT some files contain 'finish' which obstructs merging
 "   -- ALSO what to do with _cfg(...) commands left inside scripts?
+" ENH: place some cfg in 'post' group to augment some commands/mappings
+"   if their respectful plugin is disabled/absent or no plugins at all.
 
 " NOTE: disables all '*/site' packages installed by pacman. SEE :h 'rtp'
 set runtimepath=$VIMHOME,$VIMRUNTIME

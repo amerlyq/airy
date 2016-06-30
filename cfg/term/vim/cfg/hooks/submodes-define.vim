@@ -57,17 +57,6 @@ SMALL jump/tab gt gT
 SMmap jump/tab   t  gt
 SMmap jump/tab   T  gT
 
-" Jump through matches + skip current pattern
-" FIND? better command with g// v//
-com! VPrev let s:t=0|exe "0,?? v//let s:t=line('.')"|exe s:t
-com! VNext let s:t=0|exe "//,$v//if !s:t|let s:t=line('.')|en"|exe s:t
-nnoremap <silent> <Plug>(next-skip-p)  :<C-u>VPrev<CR>
-nnoremap <silent> <Plug>(next-skip-n)  :<C-u>VNext<CR>
-nmap <unique><silent>  [n  <Plug>(next-skip-p)
-nmap <unique><silent>  ]n  <Plug>(next-skip-n)
-" SMALL next/skip [/ [?
-" SMDEF next/skip r  n  <Plug>(next-skip-p)
-" SMDEF next/skip r  N  <Plug>(next-skip-n)
 
 " Window resizing
 SMALL winsize <C-w>> <C-w>< <C-w>- <C-w>+

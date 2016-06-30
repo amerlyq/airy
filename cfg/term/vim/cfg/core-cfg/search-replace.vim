@@ -34,3 +34,17 @@ noremap <unique> gS :norm! <C-R>=v:count1<CR>F<C-R>=getline('.')[col('.')-1]<CR>
 
 " UNUSED: Emulate 'tr' command -> vectored replacing of symbols
 " noremap <unique> <leader>cR :s/.*/\=tr(submatch(0), '()', '[]')
+
+
+" Jump through matches + skip current pattern
+" FIND? better command with g// v//
+com! VPrev let s:t=0|exe "0,?? v//let s:t=line('.')"|exe s:t
+com! VNext let s:t=0|exe "//,$v//if !s:t|let s:t=line('.')|en"|exe s:t
+nnoremap <silent> <Plug>(next-skip-p)  :<C-u>VPrev<CR>
+nnoremap <silent> <Plug>(next-skip-n)  :<C-u>VNext<CR>
+nmap <unique><silent>  [n  <Plug>(next-skip-p)
+nmap <unique><silent>  ]n  <Plug>(next-skip-n)
+" OR:(vim-submode)
+" SMALL next/skip [/ [?
+" SMDEF next/skip r  n  <Plug>(next-skip-p)
+" SMDEF next/skip r  N  <Plug>(next-skip-n)

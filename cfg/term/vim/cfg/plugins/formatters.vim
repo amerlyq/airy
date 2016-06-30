@@ -10,6 +10,8 @@ call dein#add('godlygeek/tabular', {
 
 
 "" Automatic not-persistent closing statements {{{1
+" BUG:(intermitten) when editing prev-to-last char, inserting ',' and pressing <CR>
+"   -- than last char remains on the same line instead of dropping to next
 call dein#add('tpope/vim-endwise', {
   \ 'on_map': [['i', '<CR>', '<C-x><CR>']]})
 

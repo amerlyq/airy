@@ -21,14 +21,14 @@ call dein#add('tpope/vim-rsi')
 " DEPRECATED:
 "   - (inferior) lucapette/vim-textobj-underscore
 call dein#add('bkad/CamelCaseMotion', {
-  \ 'on_map': '<Plug>CamelCaseMotion_'})
+  \ 'on_map': '<Plug>CamelCaseMotion_',
+  \ 'hook_add': "
+\\n   for c in split('w b e ge')
+\\n     call Map_nxo('<Leader>'.c, '<Plug>CamelCaseMotion_'.c)
+\\n     call Map_nxo('i<Leader>'.c, '<Plug>CamelCaseMotion_i'.c, 'ox')
+\\n   endfor
+\"})
 
-if dein#tap('CamelCaseMotion')
-  for c in split('w b e ge')
-    call Map_nxo('<Leader>'.c, '<Plug>CamelCaseMotion_'.c)
-    call Map_nxo('i<Leader>'.c, '<Plug>CamelCaseMotion_i'.c, 'ox')
-  endfor
-endif
 
 
 

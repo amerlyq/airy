@@ -33,6 +33,7 @@ call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
   \ 'hook_add': 'source $DEINHOOKS/solarized.add.vim'})
 
 "" Original obsolete theme for old vim {{{
+" ATTENTION: place after '...solarized-truecolor...'
 call dein#add('altercation/vim-colors-solarized', {
   \ 'if': '!dein#tap("neovim-colors-solarized-truecolor-only")',
   \ 'hook_add': 'source $DEINHOOKS/solarized.add.vim'})
