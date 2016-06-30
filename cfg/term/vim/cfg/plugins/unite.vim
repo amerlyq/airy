@@ -8,6 +8,9 @@ call dein#add('Shougo/neoyank.vim', {'on_if': 1, 'on_source': 'unite.vim'})
 
 
 "" CHECK Auxiliary sources {{{1
+" ATTENTION: when unite.vim loads, 'on_source' will load all its plugins
+"   -- TRY: add on_source: [...] to unite.vim
+"   -- BUT? will it support sources loaded afterwards its loading?
 call dein#add('Shougo/unite-outline', {'on_source': 'unite.vim'})
 call dein#add('thinca/vim-unite-history', {'on_source': 'unite.vim'})
 call dein#add('osyo-manga/unite-quickfix', {'on_source': 'unite.vim'})

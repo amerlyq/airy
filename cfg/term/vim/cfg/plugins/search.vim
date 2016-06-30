@@ -41,47 +41,95 @@ call dein#add('stefandtw/quickfix-reflector.vim', {
 
 """ Substitute/Highlight
 
-"" CHECK: Extension for -incsearch.vim- to provide fuzzy {{{1
-" USE: [z/, z?, zg/],
-call dein#add('haya14busa/incsearch-fuzzy.vim', {
-  \ 'on_source': 'incsearch.vim',
+"" CHECK: Multiple realtime hl for searching {{{1
+" NOTE: vim_version: '7.3'
+call dein#add('haya14busa/incsearch.vim', {
+  \ 'on_source': ['incsearch-fuzzy.vim', 'vim-anzu', 'vim-asterisk'],
   \ 'on_map': '<Plug>',
-  \ 'depends': 'incsearch.vim'})
+  \ 'depends': 'vim-repeat',
+  \ 'hook_source': 'source $DEINHOOKS/incsearch.src.vim',
+  \ 'hook_add': "
+\\n   map <unique> /  <Plug>(incsearch-forward)
+\\n   map <unique> ?  <Plug>(incsearch-backward)
+\\n   map <unique> g/ <Plug>(incsearch-stay)
+\\n   for c in ['n', 'N']
+\\n     call Map_nxo(c, '<Plug>(incsearch-nohl-'.c.')')
+\\n   endfor
+\"})
 
 
 
-"" Smart word bounds on '*', and hl w/o jumping by 'z' {{{1
-" USE: [*, #, g*, g#, z*, z#, gz*, gz#]
-call dein#add('haya14busa/vim-asterisk', {
-  \ 'on_source': 'incsearch.vim',
-  \ 'on_map': '<Plug>'})
+"" CHECK: Extension for -incsearch.vim- {{{1
+" NOTE: combined fuzzy/fuzzyspell
+call dein#add('haya14busa/incsearch-fuzzy.vim', {
+  \ 'on_func': 'incsearch#config#fuzzy',
+  \ 'on_map': '<Plug>',
+  \ 'depends': 'incsearch.vim',
+  \ 'hook_add': "
+\\n   fun! s:cfg_fuzzy(...) abort
+\\n     return extend(copy({'converters': [
+\\n     \   incsearch#config#fuzzy#converter(),
+\\n     \   incsearch#config#fuzzyspell#converter()
+\\n     \ ]}), get(a:, 1, {}))
+\\n   endf
+\\n   noremap <silent><unique><expr>  z/  incsearch#go(<SID>cfg_fuzzy())
+\\n   noremap <silent><unique><expr>  z?  incsearch#go(<SID>cfg_fuzzy({'command': '?'}))
+\\n   noremap <silent><unique><expr>  z;  incsearch#go(<SID>cfg_fuzzy({'is_stay': 1}))
+\"})
 
 
 
 "" Index status/preview for search results (+airline) {{{1
-" USE:ALSO [n, N]
+" NOTE: airline ext is good for terminal vim to not jump cursor in cmdline
+" SEE unite-anzu -- {Pattern} in matching lines are output in unite.vim
+"   : Unite anzu: {pattern}
+" FIXME: <Plug>(anzu-sign-matchline)  " USE:ALSO [n, N]
+" EXPL:(w/o <unique>) :: remaps after incsearch
+" EXPL:(on_map) inside hook to mitigate issue w/ lazy-load for multiple <Plug>
+" THINK:MAYBE: combine ',#' view when using 'z*' or '/' instead of sep maps?
 call dein#add('osyo-manga/vim-anzu', {
-  \ 'on_source': 'incsearch.vim',
+  \ 'on_source': 'vim-asterisk',
   \ 'on_func': 'anzu#',
   \ 'on_map': ['<Plug>', ['n', '<Leader>#', '<Leader>*']],
-  \ 'on_cmd': ['AnzuUpdateSearchStatus', 'AnzuSignMatchLine']})
+  \ 'on_cmd': ['AnzuUpdateSearchStatus', 'AnzuSignMatchLine'],
+  \ 'hook_source': "
+\\n nmap <silent><unique>  <Leader>#
+\       <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
+\\n nmap <silent><unique>  <Leader>*
+\       <Plug>(incsearch-nohl)<Plug>(anzu-n)<Plug>(anzu-mode)
+\", 'hook_add': "
+\\n   nmap  n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
+\\n   nmap  N  <Plug>(incsearch-nohl)<Plug>(anzu-N-with-echo)
+\"})
 
 
 
-"" CHECK: Multiple realtime hl for searching {{{1
-" ATTENTION: place strictly after [incsearch-fuzzy.vim, vim-anzu, vim-asterisk]
-"   DEV:ALT: split in individual and #tap for 'incsearch' in each one
-" NOTE: vim_version: '7.3'
-" USE: [/, ?, g/]
-call dein#add('haya14busa/incsearch.vim', {
+"" Smart word bounds on '*', and hl w/o jumping by 'z' {{{1
+" DISABLED: irritates sometimes, plus has highlighting bugs
+"   let g:asterisk#keeppos = 1  " Keep cursor inside match at same position
+" EXPL: z-prefixed mappings doesn't move the cursor.
+" USE: [*, #, g*, g#, z*, z#, gz*, gz#], z8 -- Easier to press
+call dein#add('haya14busa/vim-asterisk', {
   \ 'on_map': '<Plug>',
-  \ 'depends': 'vim-repeat',
-  \ 'hook_add': 'source $DEINHOOKS/incsearch.vim'})
+  \ 'hook_add': "
+\\n   for k in ['*', '#', 'g*', 'g#', 'z*', 'z#', 'gz*', 'gz#']
+\\n     exe 'map <unique> '.k.' <Plug>(incsearch-nohl'.(k=~#'z'?'0':'').')'.
+\         '<Plug>(asterisk-'.k.')<Plug>(anzu-update-search-status-with-echo)'
+\\n   endfor
+\\n   exe 'map <unique> z8 <Plug>(incsearch-nohl0)<Plug>(asterisk-z*)'.
+\         '<Plug>(anzu-update-search-status-with-echo)'
+\"})
 
 
 
-"" Preview replace %s/../../ and %g/../ or search / {{{1
+"" Preview replace or search {{{1
+" LIOR: :OverCommandLine<CR> and in standalone input your expr:
+"   %s/../.../g  OR  /...  OR  %g/.../d
 " vim_version: '7.3'
 call dein#add('osyo-manga/vim-over', {
   \ 'on_cmd': 'OverCommandLine',
-  \ 'hook_add': 'source $DEINHOOKS/over.vim'})
+  \ 'hook_source': 'source $DEINHOOKS/over.src.vim',
+  \ 'hook_add': "
+\\n   let g:subs_wrap = 'OverCommandLine %s<CR>'
+\\n   source $DEINHOOKS/over.add.vim
+\"})
