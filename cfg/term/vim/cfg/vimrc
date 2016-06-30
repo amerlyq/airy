@@ -12,6 +12,10 @@ augroup MyAutoCmd
   autocmd!
 augroup END
 
+" ENH: cat all vimrc in cached version at $VCACHE
+"   -- BUT some files contain 'finish' which obstructs merging
+"   -- ALSO what to do with _cfg(...) commands left inside scripts?
+
 " NOTE: disables all '*/site' packages installed by pacman. SEE :h 'rtp'
 set runtimepath=$VIMHOME,$VIMRUNTIME
 call _cfg('core/*.vim')

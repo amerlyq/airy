@@ -1,14 +1,19 @@
-""" inner/support/system
+""" Inner/support/system
+
+"" Main package manager {{{1
+call dein#add('Shougo/dein.vim')
+
+
 
 "" CHECK Async exec plugin for Vim. Dependency for Shougo plugins {{{1
 " FIXME: must be cloned with dein.vim on first install!
 " EXPL:(lazy: 0) NeoBundle uses it to update plugins
-call dein#add('Shougo/vimproc.vim', {'build': 'make'})
+call dein#add('Shougo/vimproc.vim', {'lazy': 0, 'build': 'make'})
 
 
 
-"" (DISABLED) CHECK Make long-running tasks async {{{1
-" call dein#add('tpope/vim-dispatch', {'on_cmd': 'Make'})
+"" CHECK Make long-running tasks async {{{1
+call dein#add('tpope/vim-dispatch', {'on_cmd': 'Make'})
 
 
 
@@ -26,7 +31,7 @@ call dein#add('Shougo/vimproc.vim', {'build': 'make'})
 " ALSO: [VimFiler, VimFilerExplorer, Edit, Read, Source, Write]
 " ALT: 'ctrlpvim/ctrlp.vim'
 call dein#add('Shougo/vimfiler.vim', {
-  \ 'if': 'IsWindows()',
+  \ 'if': IsWindows(),
   \ 'on_map': {'n': '<Plug>'},
   \ 'on_if': 'isdirectory(bufname("%"))',
   \ 'depends': 'unite.vim'})

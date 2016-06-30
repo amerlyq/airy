@@ -25,3 +25,6 @@ elif distro ubuntu; then
     pip_inst jedi  # neovim
     echo "Err: not all"
 fi
+
+# Install vim plugins
+./update $(cfgOpt u && echo -u)

@@ -16,8 +16,8 @@ call dein#add('amerlyq/nou.vim', {
 
 
 "" TODO:REMOVE obsolete outliner {{{1
-call dein#add('vimoutliner/vimoutliner', {
-  \ 'on_ft': 'votl'})
+" call dein#add('vimoutliner/vimoutliner', {
+"   \ 'on_ft': 'votl'})
 
 
 

@@ -19,8 +19,10 @@ call dein#add('Shougo/vinarise.vim', {
 
 "" CHECK: Integration of python notebooks {{{1
 " OR wilywampa/vim-ipython
-call dein#add('wmvanvliet/vim-ipython', {
-  \ 'if': executable('ipython')})
+" BUG: don't work with system-wide python
+" call dein#add('wmvanvliet/vim-ipython', {
+"   \ 'if': executable('ipython'),
+"   \ 'on_ft': 'python'})
 
 
 
@@ -72,6 +74,8 @@ call dein#add('will133/vim-dirdiff', {
 
 "" CHECK Search/preview unicode characters. Useful for font pictures. {{{1
 call dein#add('chrisbra/unicode.vim', {
+  \ 'build': "sh -c 'mkdir -p autoload/unicode && cd autoload/unicode
+  \     && wget -c 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt'",
   \ 'on_cmd': ['Digraphs', 'SearchUnicode', 'UnicodeName',
   \             'UnicodeTable', 'DownloadUnicode'],
   \ 'on_map': [['n', '<C-X><C-G>', '<C-X><C-Z>', '<F4>']]})

@@ -4,16 +4,15 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 link "$PWD" ~/.vim
 link "$PWD" "${XDG_CONFIG_HOME:=$HOME/.config}/nvim"
-mkdir -p "${XDG_DATA_HOME:=$HOME/.cache}/shada"
-VCACHE=~/.cache/vim && mkdir -vp "$VCACHE"
-if cfgOpt c; then rm -rf "$VCACHE"/*; fi
-[[ -d $VCACHE/bundle ]] || ./update
-#touch ~/.vimtags  # For vim-easytags
+
+cache=${XDG_DATA_HOME:=~/.cache}
+mkdir -vp "$cache"/{shada,vim}
+cfgNo c || rm -rf "$cache"/vim/*
 
 ### SPELL ###
 # WARNING: first clean install will always fail as uk*.sug file is absent!
 # DEPRECATED:(use pacman with vim-spell-* -- but it won't work for nvim)
-dst=$VCACHE/spell
+dst=$cache/vim/runtime/spell
 if [[ ! -d $dst ]]; then
     has_pr wget
     mkdir -p "$dst"
@@ -23,9 +22,13 @@ if [[ ! -d $dst ]]; then
     done
 fi
 
-### PLUG-RC ###
-dst=$VCACHE/bundle/unicode.vim/autoload/unicode/UnicodeData.txt
-if [[ ! -f $dst && -d $VCACHE/bundle/unicode.vim ]]; then
-    mkdir -p "${dst%/*}"
-    fork_m wget -c -O "$dst" 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt'
-fi
+dir=$cache/vim/dein/repos/github.com/Shougo
+mkdir -vp "$dir"
+for r in Shougo/{dein,vimproc}.vim; do
+  dst=$dir/${r##*/}
+  if [[ ! -d $dst ]]; then
+    git clone --branch master --single-branch --depth=1 \
+      "https://github.com/$r" "$dst"
+    [[ ! -f $dst/Makefile ]] || (cd "$dst" && make)
+  fi
+done

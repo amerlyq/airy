@@ -1,24 +1,27 @@
 " vim: ft=vim
 
-set isfname-==  " Exclude = from isfilename.
-
 "" Dir for all cached files
-if isdirectory($XDG_CONFIG_HOME.'/vim')
-  let $CACHE=expand('$XDG_CONFIG_HOME/vim')
+if exists('$XDG_DATA_HOME')
+  let $VCACHE = $XDG_DATA_HOME.'/vim'
 else
-  let $CACHE=expand('~/.cache/vim')
+  let $VCACHE = expand('~/.cache/vim')
 endif
-set runtimepath^=$CACHE  " used for ./spell and 'before'
 
 "" Create cache dirs
-for d in split('bundle bckp spell swap undo view')  " easytags.d
-  if !isdirectory(expand('$CACHE/' . d))
-    call mkdir(expand('$CACHE/' . d), 'p', 0700)
+let $CACHE = $VCACHE.'/cache'
+for d in split('bundle bckp swap undo view')  " easytags.d
+  if !isdirectory(expand('$CACHE/'.d))
+    call mkdir(expand('$CACHE/'.d), 'p', 0700)
   endif
 endfor
 
+" Used for ./spell and 'before/' folder
+set runtimepath^=$VCACHE/runtime
+
+
 " NOTE The '//' at directory end: use full path for filename with '%' separators
-let $FALLBACK='~/.cache/tmp,~/.tmp,/var/tmp,/tmp'
+let $FALLBACK='~/.tmp,/var/tmp,/tmp'
+set isfname-==  " Exclude = from isfilename.
 " Swap
 set directory=$CACHE/swap//,$FALLBACK
 set swapfile
