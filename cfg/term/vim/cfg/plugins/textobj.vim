@@ -1,14 +1,5 @@
 """ Textobj
 
-"" Aliases to STD blocks by numbers {{{1
-" ATTENTION: skipped when load_state used
-" [ai][wWps] -- whole word, paragraph, sentence itself
-" [ai][()b{}B<>\[\]t'"`] -- content of *brackets*, tags, quotes
-call Map_blocks('a', 'a', 'ox', 'noremap')
-call Map_blocks('i', 'i', 'ox', 'noremap')
-
-
-
 "" Dependency of 'vim-textobj-*' {{{1
 " EXPL: autoload-only -- no sense in being lazy
 call dein#add('kana/vim-textobj-user', {'lazy': 0,
@@ -36,16 +27,32 @@ call dein#add('tommcdo/vim-ninja-feet', {
 " DEPRECATED: - (old, in jap) osyo-manga/vim-textobj-multiblock
 "  - (ALT:TODO: compare) https://github.com/Vesion/vim-textobj-surrounding
 "  - (AUGMENT? see gif) https://github.com/gcmt/wildfire.vim
+" CHECK: let b:textobj_anyblock_buffer_local_blocks = [ ':', '*' ]
+" ALSO: Current enclosing block of ({["'<`
+" TODO:THINK:RFC: use getchar() instead of direct mappings?
+"   DEV: = Redirect if no such mappings exists (see inside op-surr src)
 call dein#add('rhysd/vim-textobj-anyblock', {
   \ 'on_map': [['ox', 'ab', 'ib']],
-  \ 'depends': 'vim-textobj-user'})
+  \ 'depends': 'vim-textobj-user',
+  \ 'hook_add': "
+\\n   nmap <silent><unique> [Quote]b <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
+\\n   nmap <silent><unique> [Quote]B <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
+\\n   let s:op = '<Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
+\\n   call Map_blocks('[Quote]', s:op, 'n', 'map')
+\"})
 
 
 
 "" Between identical found symbols in both directions {{{1
+" ALSO: Surrounding symbols for current cursor position (like 'f`')
 call dein#add('thinca/vim-textobj-between', {
+  \ 'on_source': 'vim-operator-surround',
   \ 'on_map': [['ox', 'af', 'if']],
-  \ 'depends': 'vim-textobj-user'})
+  \ 'depends': 'vim-textobj-user',
+  \ 'hook_add': "
+\\n   nmap <silent><unique> [Quote]f <Plug>(operator-surround-replace)<Plug>(textobj-between-a)
+\\n   nmap <silent><unique> [Quote]F <Plug>(operator-surround-delete)<Plug>(textobj-between-a)
+\"})
 
 
 
@@ -155,10 +162,11 @@ call dein#add('kana/vim-textobj-line', {
 
 
 "" Any nearest quotes of #'"` {{{1
-" CHG 'on_map': [[o, q]]
+" Quoted (outer) expr is the most useful:
 call dein#add('beloglazov/vim-textobj-quotes', {
   \ 'on_map': [['ox', 'aq', 'iq']],
-  \ 'depends': 'vim-textobj-user'})
+  \ 'depends': 'vim-textobj-user',
+  \ 'hook_add': "omap <silent><unique> q aq"})
 
 
 

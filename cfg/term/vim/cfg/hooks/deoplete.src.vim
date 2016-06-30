@@ -1,3 +1,5 @@
+let g:deoplete#enable_at_startup = 1
+
 " set completeopt+=noinsert
 function! s:check_back_space() "{{{
   let col = col('.') - 1

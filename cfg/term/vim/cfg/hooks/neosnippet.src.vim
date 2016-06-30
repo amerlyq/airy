@@ -43,10 +43,10 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 
 " Tell Neosnippet about the other snippets, like Honza's
 " FIXME: search for */snippets/ in &rtp
-let g:neosnippet#snippets_directory='$VIMHOME/snippets'
+let g:neosnippet#snippets_directory = expand('$VIMHOME/snippets')
 
 " enable the preview window feature in neocomplcache/neocomplete sources
 "let g:neosnippet#enable_preview=1
 
 " directory for neosnippet cache
-let g:neosnippet#data_directory=expand("$CACHE/neosnippet")
+let g:neosnippet#data_directory = expand("$CACHE/neosnippet")

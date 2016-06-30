@@ -1,5 +1,4 @@
 """ Substitute/Highlight -- with dependent plugins
-if !dein#tap('incsearch.vim')| finish |en
 
 " LIOR: "{{{
 "   <Tab>/<S-Tab> between search on screen

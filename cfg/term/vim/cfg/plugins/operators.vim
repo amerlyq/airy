@@ -8,6 +8,7 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
 
 
 "" Manage surrounding block pairs ({[&quot'` over the motion {{{1
+" BUG: first surround on alias is wrong: veq2
 " ALT: (TODO: compare code) https://github.com/machakann/vim-sandwich
 " CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({[&quot'<`] ]
 " DEPRECATED:
@@ -15,7 +16,8 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
 call dein#add('rhysd/vim-operator-surround', {
   \ 'on_map': [['nx', '<Plug>']],
   \ 'depends': 'vim-operator-user',
-  \ 'hook_add': 'source $DEINHOOKS/surround.vim'})
+  \ 'hook_source': 'source $DEINHOOKS/surround.src.vim',
+  \ 'hook_add': 'source $DEINHOOKS/surround.add.vim'})
 
 
 

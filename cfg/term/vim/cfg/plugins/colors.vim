@@ -2,16 +2,17 @@
 " EXPL: always load/show from the start
 
 "" Fast bottom/top status panels w/ integration {{{1
+" USE: Directly pick buffer on [Frame]\d
 call dein#add('vim-airline/vim-airline-themes')
 call dein#add('bling/vim-airline', {
+  \ 'on_event': 'VimEnter',
   \ 'depends': 'vim-airline-themes',
-  \ 'hook_add': 'source $DEINHOOKS/airline.vim'})
-
-if dein#tap('vim-airline')
-  for i in range(1,9)  " Directly pick buffer on [Frame]\d
-    call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
-  endfor
-endif "}}}
+  \ 'hook_source': 'source $DEINHOOKS/airline.src.vim',
+  \ 'hook_add': "
+\\n   for i in range(1,9)
+\\n     call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
+\\n   endfor
+\"})
 
 
 
@@ -29,12 +30,12 @@ endif "}}}
 "" Fork which supports term TRUE_COLOR
 call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
   \ 'if': 'has("nvim") && exists("$NVIM_TUI_ENABLE_TRUE_COLOR")',
-  \ 'hook_add': 'source $DEINHOOKS/solarized.vim'})
+  \ 'hook_add': 'source $DEINHOOKS/solarized.add.vim'})
 
 "" Original obsolete theme for old vim {{{
 call dein#add('altercation/vim-colors-solarized', {
   \ 'if': '!dein#tap("neovim-colors-solarized-truecolor-only")',
-  \ 'hook_add': 'source $DEINHOOKS/solarized.vim'})
+  \ 'hook_add': 'source $DEINHOOKS/solarized.add.vim'})
 
 
 

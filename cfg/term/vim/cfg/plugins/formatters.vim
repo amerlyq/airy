@@ -3,9 +3,9 @@
 "" Align paragraphs by patt {{{1
 " ALT:TODO:TRY: another one: lion, etc
 call dein#add('godlygeek/tabular', {
-  \ 'on_cmd': ['Tab', 'Tabularize'],
-  \ 'hook_add': 'source $DEINHOOKS/tabular.vim'
-  \})
+  \ 'on_cmd': ['Tabi', 'Tabularize'],
+  \ 'hook_source': 'source $DEINHOOKS/tabular.src.vim',
+  \ 'hook_add': 'source $DEINHOOKS/tabular.add.vim'})
 
 
 
@@ -38,7 +38,7 @@ call dein#add('rhysd/vim-clang-format', {
   \ 'on_cmd': ['ClangFormat', 'ClangFormatEchoFormattedCode'],
   \ 'on_ft': ['c', 'cpp', 'objc'],
   \ 'depends': 'vim-operator-user',
-  \ 'hook_source': 'source $DEINHOOKS/clang-format.vim'})
+  \ 'hook_source': 'source $DEINHOOKS/clang-format.src.vim'})
 
 
 

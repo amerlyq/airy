@@ -85,7 +85,7 @@ call dein#add('vim-perl/vim-perl', {
 call dein#add('LaTeX-Box-Team/LaTeX-Box', {
   \ 'if': executable('latexmk'),
   \ 'on_ft': ['tex', 'bib', 'latex'],
-  \ 'hook_source': 'source $DEINHOOKS/latex-box.vim'})
+  \ 'hook_source': 'source $DEINHOOKS/latex-box.src.vim'})
 
 
 

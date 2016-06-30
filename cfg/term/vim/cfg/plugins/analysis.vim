@@ -12,7 +12,7 @@ call dein#add('hari-rangarajan/CCTree', {
   \ 'on_cmd': 'CCTreeLoadDB',
   \ 'hook_add': 'com! -bar CCTree'.
   \   ' if !filereadable("cscope.out")| CCgen |en| CCTreeLoadDB cscope.out',
-  \ 'hook_source': 'source $DEINHOOKS/cscope.vim',
+  \ 'hook_source': 'source $DEINHOOKS/cscope.src.vim',
   \ 'hook_post_source': 'CCTree'})
 
 

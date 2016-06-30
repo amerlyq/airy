@@ -40,4 +40,5 @@ endif
 call dein#add('justinmk/vim-sneak', {
   \ 'on_map': '<Plug>Sneak',
   \ 'depends': 'vim-repeat',
-  \ 'hook_add': 'source $DEINHOOKS/vim-sneak.vim'})
+  \ 'hook_source': 'source $DEINHOOKS/vim-sneak.src.vim',
+  \ 'hook_add': 'source $DEINHOOKS/vim-sneak.add.vim'})

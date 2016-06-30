@@ -68,7 +68,7 @@ call dein#add('will133/vim-dirdiff', {
 " \ 'on_cmd': EnableXkbSwitch
 " filetypes: [tex, latex, bib, markdown, votl, txt]
 " lazy: 0  # BUG:FIXME: no Lazy -- vim will pause 'ENTER on file open'
-" let neobundle#hooks.on_source = '$DEINHOOKS/xkbswitch.vim'
+" let neobundle#hooks.on_source = '$DEINHOOKS/xkbswitch.src.vim'
 
 
 

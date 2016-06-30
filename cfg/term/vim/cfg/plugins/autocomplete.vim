@@ -6,11 +6,10 @@ call dein#add('Shougo/context_filetype.vim', {'lazy': 0})
 
 
 "" CHECK: Check syntax on file save for many languages {{{1
-call dein#add('scrooloose/syntastic', {'lazy': 0,
-  \ 'hook_add': "
-\\n   noremap <unique> [Toggle]x :<C-u>SyntasticToggleMode<CR>
-\\n   source $DEINHOOKS/syntastic.vim
-\"})
+call dein#add('scrooloose/syntastic', {
+  \ 'on_event': 'BufWritePost',
+  \ 'hook_source': 'source $DEINHOOKS/syntastic.src.vim',
+  \ 'hook_add': "noremap <unique> [Toggle]x :<C-u>SyntasticToggleMode<CR>"})
 
 
 
@@ -36,10 +35,9 @@ call dein#add('Shougo/deoplete.nvim', {
   \ 'if': 'has("nvim") && has("python3")',
   \ 'on_i': 1,
   \ 'depends': 'context_filetype.vim',
-  \ 'hook_source': "
-\\n   let g:deoplete#enable_at_startup = 1
-\\n   source $DEINHOOKS/deoplete.vim
-\"})
+  \ 'hook_source': 'source $DEINHOOKS/deoplete.src.vim'})
+
+
 
 " call dein#add('zchee/deoplete-clang', {'on_ft': ['c', 'cpp']})
 call dein#add('zchee/deoplete-jedi', {'on_ft': 'python'})
@@ -55,10 +53,7 @@ call dein#add('Shougo/neocomplete.vim', {
   \ 'on_event': 'InsertEnter',
   \ 'depends': 'context_filetype.vim',
   \ 'hook_add': 'noremap <unique> [Toggle]N :<C-u>NeoCompleteToggle<CR>',
-  \ 'hook_source': "
-\\n   let g:neocomplete#enable_at_startup = 1
-\\n   source $DEINHOOKS/neocomplete.vim
-\"})
+  \ 'hook_source': 'source $DEINHOOKS/neocomplete.src.vim'})
 
 
 
@@ -86,7 +81,7 @@ call dein#add('Shougo/neosnippet.vim', {
   \ 'on_event': 'InsertCharPre',
   \ 'on_ft': 'snippet',
   \ 'depends': ['neosnippet-snippets', 'context_filetype.vim'],
-  \ 'hook_source': 'source $DEINHOOKS/neosnippet.vim'})
+  \ 'hook_source': 'source $DEINHOOKS/neosnippet.src.vim'})
 
 call dein#add('Shougo/neosnippet-snippets', {'on_source': 'neosnippet.vim'})
 call dein#add('honza/vim-snippets', {'on_source': 'neosnippet.vim'})
@@ -109,7 +104,7 @@ call dein#add('artur-shaik/vim-javacomplete2', {
 " call dein#add('osyo-manga/vim-marching', {
 "   \ 'on_ft': ['c', 'cpp'],
 "   \ 'depends': 'vimproc.vim',
-"   \ 'hook_source': 'source $DEINHOOKS/vim-marching.vim'})
+"   \ 'hook_source': 'source $DEINHOOKS/vim-marching.src.vim'})
 
 
 

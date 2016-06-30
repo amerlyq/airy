@@ -16,13 +16,23 @@ endfun
 
 
 fun! Map_blocks(prefix, mapping, ...)
-  let l:aliases = get(a:, 3, '(0;{9;[8;"2;''1;<3;`4')
-  for g in split(l:aliases, ';') | for i in range(1, strlen(g)-1)
-    " for k in ['', '[Space]', 'g[Space]', '<Leader>[Space]']
-    call Map_nxo(a:prefix.g[i], a:mapping.g[0],
+  for g in split(get(a:, 3, g:block_aliases), ';')
+    for i in range(1, strlen(g)-1)
+      " THINK: for k in ['', '[Space]', 'g[Space]', '<Leader>[Space]']
+      call Map_nxo(a:prefix.g[i], a:mapping.g[0],
           \ get(a:, 1, 'ox'), get(a:, 2, 'noremap'))
-  endfor | endfor
+    endfor
+  endfor
 endf
+
+
+"" Aliases to STD blocks by numbers
+" [ai][wWps] -- whole word, paragraph, sentence itself
+" [ai][()b{}B<>\[\]t'"`] -- content of *brackets*, tags, quotes
+let g:block_aliases = '(()0;{{}9;[[]8;''''1;""2;<<>3;``4'
+for p in ['a', 'i']
+  call Map_blocks(p, p, 'ox', 'noremap', '(0;{9;[8;"2;''1;<3;`4')
+endfor
 
 
 fun! Map_textobj(c, plug, ...)
