@@ -7,7 +7,7 @@ call dein#add('vim-airline/vim-airline-themes')
 call dein#add('bling/vim-airline', {
   \ 'on_event': 'VimEnter',
   \ 'depends': 'vim-airline-themes',
-  \ 'hook_source': 'source $DEINHOOKS/airline.src.vim',
+  \ 'hook_source': _hcat('airline.src'),
   \ 'hook_add': "
 \\n   for i in range(1,9)
 \\n     call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
@@ -30,13 +30,13 @@ call dein#add('bling/vim-airline', {
 "" Fork which supports term TRUE_COLOR
 call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
   \ 'if': 'has("nvim") && exists("$NVIM_TUI_ENABLE_TRUE_COLOR")',
-  \ 'hook_add': 'source $DEINHOOKS/solarized.add.vim'})
+  \ 'hook_add': _hcat('solarized.add')})
 
 "" Original obsolete theme for old vim {{{
 " ATTENTION: place after '...solarized-truecolor...'
 call dein#add('altercation/vim-colors-solarized', {
   \ 'if': '!dein#tap("neovim-colors-solarized-truecolor-only")',
-  \ 'hook_add': 'source $DEINHOOKS/solarized.add.vim'})
+  \ 'hook_add': _hcat('solarized.add')})
 
 
 

@@ -45,7 +45,7 @@ call dein#add('haya14busa/incsearch.vim', {
   \ 'on_source': ['incsearch-fuzzy.vim', 'vim-anzu', 'vim-asterisk'],
   \ 'on_map': '<Plug>',
   \ 'depends': 'vim-repeat',
-  \ 'hook_source': 'source $DEINHOOKS/incsearch.src.vim',
+  \ 'hook_source': _hcat('incsearch.src'),
   \ 'hook_add': "
 \\n   map <unique> /  <Plug>(incsearch-forward)
 \\n   map <unique> ?  <Plug>(incsearch-backward)
@@ -126,8 +126,6 @@ call dein#add('haya14busa/vim-asterisk', {
 " vim_version: '7.3'
 call dein#add('osyo-manga/vim-over', {
   \ 'on_cmd': 'OverCommandLine',
-  \ 'hook_source': 'source $DEINHOOKS/over.src.vim',
-  \ 'hook_add': "
-\\n   let g:subs_wrap = 'OverCommandLine %s<CR>'
-\\n   source $DEINHOOKS/over.add.vim
-\"})
+  \ 'hook_source': _hcat('over.src'),
+  \ 'hook_add': _hcat('over.add') . "\n"
+  \." let g:subs_wrap = 'OverCommandLine %s<CR>'"})

@@ -85,5 +85,5 @@ call dein#add('chrisbra/NrrwRgn', {
   \ 'on_func': 'nrrwrgn#',
   \ 'on_map': '<Plug>Nrrwrgn',
   \ 'on_cmd': ['NR', 'NW', 'NRV', 'NUD', 'NRP', 'NRM', 'NRL'],
-  \ 'hook_source': 'source $DEINHOOKS/nrrwrgn.src.vim',
-  \ 'hook_add': 'source $DEINHOOKS/nrrwrgn.add.vim'})
+  \ 'hook_source': _hcat('nrrwrgn.src'),
+  \ 'hook_add': _hcat('nrrwrgn.add')})

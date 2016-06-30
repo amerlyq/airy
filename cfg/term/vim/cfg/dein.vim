@@ -1,10 +1,14 @@
 """ NOTE: works only for Neovim / Vim7.4+
-let s:dein = $VCACHE.'/dein/repos/github.com/Shougo/dein.vim'
-if &rtp!~#'/dein.vim' && !filereadable(s:dein.'/autoload/dein.vim')|finish|en
 
-" CHECK: conflicts with 'load_state'
-exe 'set runtimepath^=' . fnameescape(s:dein)
-let $DEINHOOKS = $VIMHOME.'/cfg/hooks'
+"" Add dein to runtime
+for p in ['.dein', 'repos/github.com/Shougo/dein.vim']
+  let p = $VCACHE.'/dein/'.p
+  if filereadable(p.'/autoload/dein.vim')
+    exe 'set runtimepath^=' . fnameescape(p)
+    break
+  endif
+endfor
+if &rtp !~# '\v/%(\.dein|dein\.vim)>'| finish |en
 
 
 " let g:dein#install_log_filename = ''
@@ -18,11 +22,23 @@ let g:dein#install_max_processes = 8
 " let g:dein#enable_notification = 1
 
 
+" BUG: recaches only on second time after changing rc files
+"   -- OR first 'save_state' after chg rc saves wrong state
+"   -- NOTE: unrelated to dein#begin 'watched files'
+" ATTENTION: recache by 'call dein#clear_state()'
+if !dein#load_state($VCACHE.'/dein')| finish |en
+" echo '+ beg'
+
 " NOTE: It overwrites your 'runtimepath' completely, you must
 "   not call it after change 'runtimepath' dynamically.
-" ATTENTION: recache by 'call dein#clear_state()'
-" if !dein#load_state($VCACHE.'/dein')| finish |en
-" BUG:FIXME: dein#tap in 'plugins/*' will never be called!
+fun! _hcat(nm)
+  let cmd = IsWindows() ? 'type' : 'cat'
+  let path = $VIMHOME . '/cfg/hooks/' . a:nm . '.vim'
+  return system(cmd.' '.shellescape(path))
+  " OR: -- when 'load_state' isn't used
+  " return 'source '.fnameescape(path)
+endf
+
 
 " Monitors changes in listed rc files. Does 'filetype off'.
 " ATTENTION: recache by 'call dein#recache_runtimepath()'
@@ -38,13 +54,16 @@ for d in ['pj'] | let s:path = expand('~/aura/'.d)
 endif | endfor
 
 call dein#end()  " Recaches runtimepath
+" echo '+ end'
 call dein#save_state()
 
 
-if !has('vim_starting')
-  call dein#call_hook('source')
-  call dein#call_hook('post_source')
+" WARNING: Must be outside this file -- or ignored on 'load_state'
+"   OR: completely drop ability to reload 'vimrc'
+" if !has('vim_starting')
+"   call dein#call_hook('source')
+"   call dein#call_hook('post_source')
 
   " filetype plugin indent on
   " syntax enable
-endif
+" endif

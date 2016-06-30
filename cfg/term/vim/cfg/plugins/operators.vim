@@ -17,8 +17,8 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
 call dein#add('rhysd/vim-operator-surround', {
   \ 'on_map': [['nx', '<Plug>']],
   \ 'depends': 'vim-operator-user',
-  \ 'hook_source': 'source $DEINHOOKS/surround.src.vim',
-  \ 'hook_add': 'source $DEINHOOKS/surround.add.vim'})
+  \ 'hook_source': _hcat('surround.src'),
+  \ 'hook_add': _hcat('surround.add')})
 
 
 

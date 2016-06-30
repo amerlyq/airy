@@ -8,7 +8,7 @@ call dein#add('Shougo/context_filetype.vim', {'lazy': 0})
 "" CHECK: Check syntax on file save for many languages {{{1
 call dein#add('scrooloose/syntastic', {
   \ 'on_event': 'BufWritePost',
-  \ 'hook_source': 'source $DEINHOOKS/syntastic.src.vim',
+  \ 'hook_source': _hcat('syntastic.src'),
   \ 'hook_add': "noremap <unique> [Toggle]x :<C-u>SyntasticToggleMode<CR>"})
 
 
@@ -28,7 +28,7 @@ call dein#add('Shougo/deoplete.nvim', {
   \ 'if': 'has("nvim") && has("python3")',
   \ 'on_i': 1,
   \ 'depends': 'context_filetype.vim',
-  \ 'hook_source': 'source $DEINHOOKS/deoplete.src.vim'})
+  \ 'hook_source': _hcat('deoplete.src')})
 
 
 
@@ -46,7 +46,7 @@ call dein#add('Shougo/neocomplete.vim', {
   \ 'on_event': 'InsertEnter',
   \ 'depends': 'context_filetype.vim',
   \ 'hook_add': 'noremap <unique> [Toggle]N :<C-u>NeoCompleteToggle<CR>',
-  \ 'hook_source': 'source $DEINHOOKS/neocomplete.src.vim'})
+  \ 'hook_source': _hcat('neocomplete.src')})
 
 
 
@@ -74,7 +74,7 @@ call dein#add('Shougo/neosnippet.vim', {
   \ 'on_event': 'InsertCharPre',
   \ 'on_ft': 'snippet',
   \ 'depends': ['neosnippet-snippets', 'context_filetype.vim'],
-  \ 'hook_source': 'source $DEINHOOKS/neosnippet.src.vim'})
+  \ 'hook_source': _hcat('neosnippet.src')})
 
 call dein#add('Shougo/neosnippet-snippets', {'on_source': 'neosnippet.vim'})
 call dein#add('honza/vim-snippets', {'on_source': 'neosnippet.vim'})
@@ -97,7 +97,7 @@ call dein#add('artur-shaik/vim-javacomplete2', {
 " call dein#add('osyo-manga/vim-marching', {
 "   \ 'on_ft': ['c', 'cpp'],
 "   \ 'depends': 'vimproc.vim',
-"   \ 'hook_source': 'source $DEINHOOKS/vim-marching.src.vim'})
+"   \ 'hook_source': _hcat('vim-marching.src')})
 
 
 

@@ -40,5 +40,5 @@ call dein#add('bkad/CamelCaseMotion', {
 call dein#add('justinmk/vim-sneak', {
   \ 'on_map': '<Plug>Sneak',
   \ 'depends': 'vim-repeat',
-  \ 'hook_source': 'source $DEINHOOKS/vim-sneak.src.vim',
-  \ 'hook_add': 'source $DEINHOOKS/vim-sneak.add.vim'})
+  \ 'hook_source': _hcat('vim-sneak.src'),
+  \ 'hook_add': _hcat('vim-sneak.add')})

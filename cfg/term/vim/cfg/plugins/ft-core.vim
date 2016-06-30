@@ -27,7 +27,7 @@ call dein#add('hynek/vim-python-pep8-indent', {
 " on_cmd: Pyimport
 call dein#add('davidhalter/jedi-vim', {
   \ 'on_ft': 'python',
-  \ 'hook_source': 'source $DEINHOOKS/jedi-vim.src.vim'})
+  \ 'hook_source': _hcat('jedi-vim.src')})
 
 
 
@@ -85,7 +85,7 @@ call dein#add('vim-perl/vim-perl', {
 call dein#add('LaTeX-Box-Team/LaTeX-Box', {
   \ 'if': executable('latexmk'),
   \ 'on_ft': ['tex', 'bib', 'latex'],
-  \ 'hook_source': 'source $DEINHOOKS/latex-box.src.vim'})
+  \ 'hook_source': _hcat('latex-box.src')})
 
 
 

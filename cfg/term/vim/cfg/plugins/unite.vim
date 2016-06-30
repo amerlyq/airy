@@ -24,4 +24,4 @@ call dein#add('Shougo/unite-build', {'on_source': 'unite.vim'})
 call dein#add('Shougo/unite.vim', {
   \ 'depends': 'neomru.vim',
   \ 'hook_source': 'call _cfg("unite/*.vim")',
-  \ 'hook_add': 'source $DEINHOOKS/unite.add.vim'})
+  \ 'hook_add': _hcat('unite.add')})

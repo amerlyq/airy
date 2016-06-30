@@ -21,7 +21,7 @@
 " NOT:(lazy) because I split by many different ways from the start
 call dein#add('zhaocai/GoldenView.Vim', {'lazy': 0,
   \ 'on_map': ['<Plug>GoldenView', '<Plug>ToggleGoldenView'],
-  \ 'hook_add': 'source $DEINHOOKS/golden-view.add.vim',
+  \ 'hook_add': _hcat('golden-view.add'),
   \ 'hook_source': "
 \\n   let g:goldenview__enable_at_startup = 1
 \\n   let g:goldenview__enable_default_mapping = 0

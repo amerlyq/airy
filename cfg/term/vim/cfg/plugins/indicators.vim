@@ -11,7 +11,7 @@ call dein#add('mhinz/vim-signify', {'lazy': 0,
   \ 'on_map': [['xo', 'aS', 'iS'], ['n', '[c', ']c']],
   \ 'on_cmd': ['SignifyFold', 'SignifyToggle',
   \            'SignifyToggleHighlight', 'SignifyRefresh'],
-  \ 'hook_add': 'source $DEINHOOKS/signify.add.vim'})
+  \ 'hook_add': _hcat('signify.add')})
 
 
 
@@ -59,10 +59,8 @@ call dein#add('t9md/vim-quickhl', {
 " EXPL: not in 'hook_source' because plugin isn't lazy
 " SEE:(iav_term) RangerChooser
 call dein#add('nathanaelkane/vim-indent-guides', {
-  \ 'hook_add': "
-\\n   nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>
-\\n   source $DEINHOOKS/indent-guides.src.vim
-\"})
+  \ 'hook_add': _hcat('indent-guides.src') . "\n"
+  \." nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>"})
 
 
 

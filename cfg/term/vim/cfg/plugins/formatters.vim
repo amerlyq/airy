@@ -4,8 +4,8 @@
 " ALT:TODO:TRY: another one: lion, etc
 call dein#add('godlygeek/tabular', {
   \ 'on_cmd': ['Tabi', 'Tabularize'],
-  \ 'hook_source': 'source $DEINHOOKS/tabular.src.vim',
-  \ 'hook_add': 'source $DEINHOOKS/tabular.add.vim'})
+  \ 'hook_source': _hcat('tabular.src'),
+  \ 'hook_add': _hcat('tabular.add')})
 
 
 
@@ -40,7 +40,7 @@ call dein#add('rhysd/vim-clang-format', {
   \ 'on_cmd': ['ClangFormat', 'ClangFormatEchoFormattedCode'],
   \ 'on_ft': ['c', 'cpp', 'objc'],
   \ 'depends': 'vim-operator-user',
-  \ 'hook_source': 'source $DEINHOOKS/clang-format.src.vim'})
+  \ 'hook_source': _hcat('clang-format.src')})
 
 
 

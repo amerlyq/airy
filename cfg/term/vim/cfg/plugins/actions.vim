@@ -21,6 +21,7 @@ call dein#add('AndrewRadev/splitjoin.vim', {
 \\n   let g:splitjoin_split_mapping = ''
 \\n   let g:splitjoin_join_mapping = ''
 \", 'hook_add': "
+\\n   echo '--- add'
 \\n   nmap <unique><silent> [Space]j <Plug>SplitjoinJoin<CR>
 \\n   nmap <unique><silent> [Space]k <Plug>SplitjoinSplit<CR>
 \"})
@@ -58,4 +59,4 @@ call dein#add('kana/vim-submode', {'if': 0, 'lazy': 0,
   \ 'on_func': 'submode#',
   \ 'on_map': '[[n, x]]',
   \ 'on_cmd': 'SubmodeRestoreOptions',
-  \ 'hook_source': 'source $DEINHOOKS/submodes-define.vim'})
+  \ 'hook_source': _hcat('submodes-define')})
