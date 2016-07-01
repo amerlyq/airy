@@ -40,15 +40,6 @@ call dein#add('thinca/vim-quickrun', {
 
 
 
-"" CHECK open URI or search. Combinable with vim-quickrun ? {{{1
-call dein#add('tyru/open-browser.vim', {
-  \ 'hook_add': "
-\\n   nmap gx <Plug>(openbrowser-smart-search)
-\\n   vmap gx <Plug>(openbrowser-smart-search)
-\"})
-
-
-
 "" Replaces motion by register content {{{1
 " THINK Could be used instead of my own paste-replace?
 call dein#add('kana/vim-operator-replace', {
@@ -59,6 +50,16 @@ call dein#add('kana/vim-operator-replace', {
 \\n   xmap <silent><unique> gr <Plug>(operator-replace)
 \\n   nmap <silent><unique> gR <Plug>(operator-replace)$
 \\n   xmap <silent><unique> gR <Plug>(operator-replace)$
+\"})
+
+
+
+"" Converts snake/camel case of joined words {{{1
+" ALT: https://github.com/tpope/vim-abolish (SEE coersion -- 4 case converters)
+call dein#add('tyru/operator-camelize.vim', {
+  \ 'on_map': '<Plug>',
+  \ 'hook_add': "
+\\n   map <silent><unique> <Leader>~  <Plug>(operator-camelize-toggle)
 \"})
 
 

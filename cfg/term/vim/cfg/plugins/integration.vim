@@ -56,6 +56,18 @@ call dein#add('will133/vim-dirdiff', {
 
 
 
+"" CHECK open URI or search. Combinable with vim-quickrun ? {{{1
+" NOTE:(opinion) curr overkill for me -- as most of feas impl'ed in qute
+" ALT:CHG: r.b --target tab "$@" BUT how to choose target window (named)?
+call dein#add('tyru/open-browser.vim', {
+  \ 'hook_add': "
+\\n   let g:netrw_nogx = 1
+\\n   nmap gx <Plug>(openbrowser-smart-search)
+\\n   vmap gx <Plug>(openbrowser-smart-search)
+\"})
+
+
+
 """ Services
 
 " lyokha/vim-xkbswitch:  # HACK: replace by dbus-messages
