@@ -9,6 +9,13 @@ call dein#add('godlygeek/tabular', {
 
 
 
+"" HACK: lyrics multicolumn /multiverse editor to show in ncmpcpp
+call dein#add('amerlyq/lyrics-ed.vim', {
+  \ 'on_func': 'lyrics#',
+  \ 'on_cmd': ['LyricsLoad', 'Lyrics*']})
+
+
+
 "" Automatic not-persistent closing statements {{{1
 " BUG:(intermitten) when editing prev-to-last char, inserting ',' and pressing <CR>
 "   -- than last char remains on the same line instead of dropping to next

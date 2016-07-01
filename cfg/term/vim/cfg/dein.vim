@@ -10,6 +10,7 @@ for p in ['.dein', 'repos/github.com/Shougo/dein.vim']
 endfor
 
 if &rtp !~# '\v/%(\.dein|dein\.vim)>'| finish |en
+" FIXME: eliminate duplicate in &rtp for .dein on load_state
 let s:rtp = &rtp  " Back-up &rtp to restore on bad load_state
 
 
@@ -54,11 +55,11 @@ call dein#begin(s:dein, [expand('<sfile>')]
 
 call _cfg('plugins/*.vim')
 
-" HACK: dev plugins override  ALSO: 'fork', 'vim*', 'unite-*'
-for d in ['pj'] | let s:path = expand('~/aura/'.d)
-  if isdirectory(s:path) | call dein#local(s:path,
-      \ {'frozen': 1, 'merged': 0}, ['*.vim'])
-endif | endfor
+" HACK: dev plugins override
+" TODO: choose only currently actively developed ones
+"   -- MAYBE check last change date is lesser then 10days?
+call dein#local(expand('~/aura/vim'),
+  \ {'frozen': 1, 'merged': 0}, ['*.vim', 'vim*', 'unite-*'])
 
 call dein#end()  " Recaches runtimepath
 call dein#save_state()

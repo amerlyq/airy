@@ -9,6 +9,7 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
 
 "" Manage surrounding block pairs ({[&quot'` over the motion {{{1
 " BUG: first surround on alias is wrong: veq2
+" BUG: Impossible character to use as surround: qab\
 " FIXME: don't exclude surrounding spaces when adding quotes
 " ALT: (TODO: compare code) https://github.com/machakann/vim-sandwich
 " CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({[&quot'<`] ]

@@ -27,14 +27,10 @@ call dein#add('Shougo/vinarise.vim', {
 
 "" HACK: forked for rich formatting, syntax HL, shorcuts {{{1
 " Use '!dict' translations from inside vim
-call dein#add('amerlyq/vim-dict', {
+call dein#add('amerlyq/dictl.vim', {
   \ 'if': executable('dict'),
   \ 'on_map': [['nx', 'g=']],
-  \ 'on_cmd': ['Dict', 'DictShowDb']})
-" let g:dict_leave_pw = 0
-" let g:dict_hosts = [ ["127.0.0.1", ["*"]] ]
-" ["dict.org", ["all"]],
-" ["dict.mova.org", ["slovnyk_en-pl", "slovnyk_pl-en"]] ]
+  \ 'on_cmd': 'Dict'})
 
 
 

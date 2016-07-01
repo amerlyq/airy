@@ -49,15 +49,15 @@ call dein#add('kopischke/vim-fetch')
 
 """ State {{{1
 
-" chrisbra/Recover.vim:  # HACK: replaced by my commands Recover{Diff,End,Remove}
-"   description: |
-"       If swap exists -- allows to diff with swap, shows pid
-"       OR:STD: (R)ecover -- then ':DiffOrig', and after comparing -- ':update'
-"   # disabled: 'has("nvim")'  # REQ:FIXME: can't fetch neovim recovery messages
-"   lazy: 0  # EXPL: checks swap on vim start
-" let g:RecoverPlugin_No_Check_Swapfile = 1
-" XXX: Seems like don't work
-" au MyAutoCmd SwapExists * nested  NeoBundleSource Recover.vim
+" CHECK:(test on_event) HACK commands Recoverer{Diff,End,Remove}
+" DEPRECATED:
+"   chrisbra/Recover.vim (can't fetch neovim recovery messages)
+call dein#add('amerlyq/recoverer.vim', {
+  \ 'on_func': 'recoverer#',
+  \ 'on_event': 'SwapExists'
+  \})
+
+" OR:STD: (R)ecover -- then ':DiffOrig', and after comparing -- ':update'
 
 
 
