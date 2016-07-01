@@ -2,7 +2,7 @@
 if &compatible| set nocompatible |en
 
 fun! _cfg(path)  " Must not contain '\n' in path. Compat globpath <v7.4.279
-  for f in split(globpath(expand($VIMHOME .'/cfg/'), a:path), '\n')
+  for f in split(globpath($VIMHOME.'/cfg/', a:path), '\n')
     exe 'source' fnameescape(f)
   endfor
 endf
@@ -27,7 +27,6 @@ call _cfg('features/'.(IsAndroid()        ? 'android' : 'clipboard').'.vim')
 call _cfg('features/'.(IsWindows()        ? 'windows' : 'unix'     ).'.vim')
 call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
 call _cfg('dein.vim')
-" CHECK: troubles with save_state and &rtp
 set runtimepath+=$VIMHOME/after  " Place after dein#end()
 
 filetype plugin indent on  " Required!

@@ -84,12 +84,14 @@ call dein#add('haya14busa/incsearch-fuzzy.vim', {
 " FIXME: <Plug>(anzu-sign-matchline)  " USE:ALSO [n, N]
 " EXPL:(w/o <unique>) :: remaps after incsearch
 " EXPL:(on_map) inside hook to mitigate issue w/ lazy-load for multiple <Plug>
+" EXPL:(depends) fake dependency to force order in 'load_state'
 " THINK:MAYBE: combine ',#' view when using 'z*' or '/' instead of sep maps?
 call dein#add('osyo-manga/vim-anzu', {
   \ 'on_source': 'vim-asterisk',
   \ 'on_func': 'anzu#',
   \ 'on_map': ['<Plug>', ['n', '<Leader>#', '<Leader>*']],
   \ 'on_cmd': ['AnzuUpdateSearchStatus', 'AnzuSignMatchLine'],
+  \ 'depends': 'incsearch.vim',
   \ 'hook_source': "
 \\n nmap <silent><unique>  <Leader>#
 \       <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
@@ -127,5 +129,5 @@ call dein#add('haya14busa/vim-asterisk', {
 call dein#add('osyo-manga/vim-over', {
   \ 'on_cmd': 'OverCommandLine',
   \ 'hook_source': _hcat('over.src'),
-  \ 'hook_add': _hcat('over.add') . "\n"
-  \." let g:subs_wrap = 'OverCommandLine %s<CR>'"})
+  \ 'hook_add': "let g:subs_wrap = 'OverCommandLine %s<CR>'"
+  \."\n" . _hcat('over.add')})

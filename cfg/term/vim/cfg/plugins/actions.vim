@@ -21,7 +21,6 @@ call dein#add('AndrewRadev/splitjoin.vim', {
 \\n   let g:splitjoin_split_mapping = ''
 \\n   let g:splitjoin_join_mapping = ''
 \", 'hook_add': "
-\\n   echo '--- add'
 \\n   nmap <unique><silent> [Space]j <Plug>SplitjoinJoin<CR>
 \\n   nmap <unique><silent> [Space]k <Plug>SplitjoinSplit<CR>
 \"})
