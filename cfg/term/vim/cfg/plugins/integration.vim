@@ -60,7 +60,14 @@ call dein#add('will133/vim-dirdiff', {
 " NOTE:(opinion) curr overkill for me -- as most of feas impl'ed in qute
 " ALT:CHG: r.b --target tab "$@" BUT how to choose target window (named)?
 call dein#add('tyru/open-browser.vim', {
-  \ 'hook_add': "
+  \ 'on_map': '<Plug>(openbrowser-',
+  \ 'hook_source': "
+\ let g:openbrowser_browser_commands = [
+\   {'background': 0, 'name': 'r.b', 'args': ['{browser}', '{uri}']},
+\   {'background': 1, 'name': 'firefox', 'args': ['{browser}', '{uri}']},
+\   {'background': 0, 'name': 'w3m', 'args': ['{browser}', '{uri}']}
+\ ]
+\", 'hook_add': "
 \\n   let g:netrw_nogx = 1
 \\n   nmap gx <Plug>(openbrowser-smart-search)
 \\n   vmap gx <Plug>(openbrowser-smart-search)
