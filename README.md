@@ -22,8 +22,16 @@ cd airy && ./setup -iu
 ```
 Go make some tea, in one minute basic shell tools will be installed.
 
+System update after long term
+```bash
+./update
+./setup -fri
+./setup -iu
+```
+
 Need more modules from some subdirectory?
 ```bash
+./update      # updates all pkgs
 ./setup       # after changing setup scripts -- refreshes system configuration
 ./setup -u    # additionally executes -u script sections (sudo/update/etc)
 ./setup -u /  # choose currently preferred applications
