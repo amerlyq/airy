@@ -69,9 +69,12 @@ function gita_st { # $1 -- rep name, $2 -- suffix
     # ALT "$(print -P "%F{6}${rep:h}/%f${rep:t}")"
     regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
     # TODO: replace awk by ZSH line-splitting
+    local branch=$(git rev-parse --abbrev-ref HEAD)
     local fmt="\u251c\u2500%(refname:short) %(push:track)"
-    local psh=$(git for-each-ref --format="$fmt" refs/heads | awk '/^\S+\s\S/{print $0}')
-    print -P "$(gita_prezto)\t $name  $stm - $(time_dt)%F{35}${${psh#* }:+\n$psh\n\u2534}%f$2"
+    local psh=$(git for-each-ref --format="$fmt" refs/heads |
+        awk -vb="$branch" '$1~b"$"||$2==""{next}{print$0}')
+    [[ -z ${psh#* } ]] || psh="\n$psh\n\u2534"
+    print -P "$(gita_prezto)\t $name  $stm - $(time_dt)%F{35}$psh%f$2"
 }
 
 # ATTENTION: Checking remote updates has no sense, as its time ~= pull
