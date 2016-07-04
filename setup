@@ -7,7 +7,7 @@ echo "$THEME" > "$CURR_DIR_CACHE/theme"
 queue="${TMPDIR:-/tmp}/mods_installing"
 mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ -L ~/.bin ]] || ln -svT "$PWD/bin" ~/.bin
-export PATH=~/.bin:$PATH
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
 
 # CHECK: some modules aren't installed (kedi has qute/install, but neo -- not)
 #   -- By SSH them also not visible

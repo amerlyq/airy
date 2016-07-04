@@ -2,7 +2,8 @@
 source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
-export PATH=${CURR_DIR_CACHE:?}/bin:$PATH
+[[ :$PATH: == *:${CURR_DIR_CACHE:?}/bin:* ]] ||
+  export PATH=${CURR_DIR_CACHE:?}/bin:$PATH
 
 ### Argparse ###
 CFG_ARGS=( "$@" )  # Backup default arguments
