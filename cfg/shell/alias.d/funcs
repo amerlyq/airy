@@ -65,6 +65,8 @@ copyq_edit() {
     trap "rm -f '$fl'" EXIT
 }
 
+alias tmuxl='tmux list-sessions'
+
 exit() {  # When in SSH tmux, do detach on ',d' instead of exit
     if [[ -z $SSH_TTY || -z $TMUX || $RANGER_LEVEL ]]
     then builtin exit
