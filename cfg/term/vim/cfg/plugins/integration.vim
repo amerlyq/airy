@@ -58,11 +58,16 @@ call dein#add('will133/vim-dirdiff', {
 
 "" CHECK open URI or search. Combinable with vim-quickrun ? {{{1
 " NOTE:(opinion) curr overkill for me -- as most of feas impl'ed in qute
+" BUG: sometimes works in same thread, loading CPU. TEMP:FIX: ./setup -U vim
 " ALT:CHG: r.b --target tab "$@" BUT how to choose target window (named)?
 call dein#add('tyru/open-browser.vim', {
   \ 'on_map': '<Plug>(openbrowser-',
+  \ 'on_cmd': 'OpenBrowserSmartSearch',
   \ 'hook_source': "
-\ let g:openbrowser_browser_commands = [
+\\n   let g:openbrowser_use_vimproc = 1
+\\n   let g:openbrowser_no_default_menus = 1
+\\n   let g:openbrowser_force_foreground_after_open = 0
+\\n   let g:openbrowser_browser_commands = [
 \   {'background': 0, 'name': 'r.b', 'args': ['{browser}', '{uri}']},
 \   {'background': 1, 'name': 'firefox', 'args': ['{browser}', '{uri}']},
 \   {'background': 0, 'name': 'w3m', 'args': ['{browser}', '{uri}']}
