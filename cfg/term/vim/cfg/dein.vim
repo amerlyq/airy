@@ -31,6 +31,7 @@ let g:dein#install_max_processes = 8
 "   -- NOTE: unrelated to dein#begin 'watched files'
 "   -- ALSO: breaks saved &rtp in state_nvim.vim -- no '.dein' part
 "   => EXPL:WARNING: consequences of '<unique>' exception when 'load_state'
+" BUG: lazy on omap (ii, iz) -- bad first attempt -- messes up input
 
 " NOTE: It overwrites your 'runtimepath' completely, you must
 "   not call it after change 'runtimepath' dynamically.

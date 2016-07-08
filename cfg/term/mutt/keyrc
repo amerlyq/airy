@@ -1,0 +1,99 @@
+# vim:ft=muttrc
+### Key Bindings
+# REF
+#   http://www.mutt.org/doc/manual/#bind
+#   http://www.mutt.org/doc/manual/#generic-map
+# ALSO
+#   https://github.com/skanev/dotfiles/blob/master/mutt/mappings
+#   http://www.tldp.org/HOWTO/Mutt-GnuPG-PGP-HOWTO-7.html
+# SEE setup binds/etc depending on mailbox
+#   http://www.mutt.org/doc/manual/#folder-hook
+#   https://bitbucket.org/jasonwryan/shiv/src/tip/.mutt/muttrc
+#   http://unix.stackexchange.com/questions/172422/mutt-two-character-sequence-commands
+# FIXME: don't jump to next/prev message when current is read till end
+# FIXME: don't close pager when moving up from first entry
+
+## fetch mail by I
+# macro index,pager I "!getmail"
+## Fetch mail shortcut
+# bind index G imap-fetch-mail
+
+
+# STD: \e[ulc] -- make word upper/lower/capital
+# STD: \ed -- kill-eow
+# STD: \Cg -- abort (n/a)
+bind editor \Cq  backward-word
+bind editor \Ct  forward-word
+bind editor \Cp  history-down
+bind editor \Cn  history-up
+bind editor \Cx  complete-query
+
+bind browser  h  exit
+bind browser  l  select-entry
+# bind browser  j  next-entry       # generic
+# bind browser  k  previous-entry   # generic
+
+# EXPL: swap jk/JK for entry/undeleted
+bind index  l  display-message
+bind index  j  next-entry
+bind index  k  previous-entry
+bind index  J  next-undeleted
+bind index  K  previous-undeleted
+# bind index  <Down>  next-entry
+# bind index  <Up>    previous-entry
+
+bind pager  h  exit
+bind pager  l  view-attachments
+bind pager  J  next-line
+bind pager  K  previous-line
+# bind pager  J  next-entry      # generic
+# bind pager  K  previous-entry  # generic
+# TODO: generic
+bind pager \Cf  next-page
+bind pager \Cb  previous-page
+# bind pager  gg  top
+# bind pager  G   bottom
+# bind generic <Home> first-entry
+# bind generic G last-entry
+# STD:(generic)  [0-9] -- jump to number
+
+# # bind index x sync-mailbox
+# # bind pager x sync-mailbox
+
+# bind generic 1G first-entry
+# bind generic 1g first-entry
+# bind generic <Home> first-entry
+# bind generic <End> last-entry
+# bind pager  <Down>  next-line
+# bind pager  <Up>    previous-line
+# bind pager  <Right> view-attachments
+# bind pager  <Left>  exit
+# bind attach <Right> view-attach
+# bind attach <Left>  exit
+
+# bind pager i noop
+# bind pager \eD delete-thread
+# bind pager \eU undelete-thread
+# bind pager <Home> top
+# bind pager <End> bottom
+# bind pager G bottom
+# bind pager q exit
+# bind pager B bounce-message
+# bind pager b previous-page
+# bind pager <Insert> previous-entry
+# bind pager <Delete> next-entry
+
+# #bind index i fetch-mail
+# bind index \eD delete-thread
+# bind index \eU undelete-thread
+# bind index B bounce-message
+# bind index b previous-page
+# bind index <Home> first-entry
+# bind index <End> last-entry
+# bind index G last-entry
+# bind index <Right> display-message
+
+# bind pager b previous-page
+# bind pager - noop
+# bind pager <Space> next-page
+# bind alias <Tab> next-entry

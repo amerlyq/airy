@@ -1,6 +1,7 @@
 # show mail list before it's content
+set my_cfg=~/.mutt
 set my_cache=~/.cache/mutt
-set pager_index_lines=5
+set pager_index_lines=6
 
 set editor = "$EDITOR -c 'set spell spelllang=ru_yo,en_us,uk'"
 # set edit_headers          # see the headers when editing
@@ -77,14 +78,8 @@ set sort_alias = alias
 set reverse_alias = yes
 source $alias_file
 
-
 ## BINDING
-## fetch mail by I
-# macro index,pager I "!getmail"
-## Fetch mail shortcut
-bind index G imap-fetch-mail
-# bind editor \Cp previous-entry
-# bind editor \Cn next-entry
+source $my_cfg/keyrc
 
 # source $my_cache/gpgrc          # Keyring
 source $my_cache/acc/default    # Default account
