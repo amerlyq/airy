@@ -14,7 +14,7 @@ dir_build() {
     if [ -f "./compile" ]; then
         ./compile
     elif [ -f "./Makefile" ]; then
-        make # make -C "$BDR"
+        make -s # make -C "$BDR"
         # set makeprg=ruby\ -c\ %
     elif [ -f "./CMakeLists.txt" ]; then
         sir bR
@@ -37,7 +37,7 @@ run_build() {
     if [ -f "./run" ]; then
         ./run
     elif [ -f "./Makefile" ] && grep -q '^run:' ./Makefile; then
-        make run
+        make -s run
     elif [ -f "$BIN" ]; then
         "$BIN"
     fi

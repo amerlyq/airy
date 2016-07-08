@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
-export WINEPREFIX=~/.wine32
-export WINEARCH=win32
-exec "$@"
+if ! file -b "$1" | grep -qF x86-64; then
+  export WINEPREFIX=~/.wine32
+  export WINEARCH=win32
+fi
+exec wine "$@"
