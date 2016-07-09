@@ -32,6 +32,7 @@ call dein#add('tommcdo/vim-ninja-feet', {
 " TODO:THINK:RFC: use getchar() instead of direct mappings?
 "   DEV: = Redirect if no such mappings exists (see inside op-surr src)
 call dein#add('rhysd/vim-textobj-anyblock', {
+  \ 'on_source': 'vim-operator-surround',
   \ 'on_map': [['ox', 'ab', 'ib']],
   \ 'depends': 'vim-textobj-user',
   \ 'hook_add': "
