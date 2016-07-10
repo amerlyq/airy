@@ -14,14 +14,19 @@ cat >> $cfg <<EOT
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 
+## MinGW-w64: https://sourceforge.net/projects/mingw-w64-archlinux/
+[mingw-w64]
+SigLevel = Optional TrustAll
+Server = http://downloads.sourceforge.net/project/mingw-w64-archlinux/$arch
+
 ## AUR: https://archlinux.fr/yaourt-en
 [archlinuxfr]
 SigLevel = Never
 Server = http://repo.archlinux.fr/\$arch
 
-[infinality-bundle]
-SigLevel = Never
-Server = http://bohoomil.com/repo/\$arch
+# [infinality-bundle]
+# SigLevel = Never
+# Server = http://bohoomil.com/repo/\$arch
 
 #%END_AUR
 EOT
