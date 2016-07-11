@@ -76,6 +76,8 @@ has_such(){ local -A chk=( [a]='false' [f]='test -f' [d]='test -d'
     [p]='has_pr' [l]='has_lib' [y]='has_python 3' [Y]='has_python 2'
   ); local cmd="${chk[$1]}"; [[ ${cmd%% *} ]] || return 2; $cmd "$2"
 }
+
+# ALT:(running_X broken in raw console?) more stable -- xset q &>/dev/null
 running_X(){ has_pr X && [[ $DISPLAY && ! $(tty) =~ ^/dev/tty ]]; }
 # $(ps opid= -C ${1##*/})
 grep_prs(){ pgrep "(\/|^)${1##*/}(\s|\$)"; }
