@@ -150,10 +150,10 @@ myLayout = smartBorders
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
     skLayer = gridIM (1%6) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
-    tiled   = ResizableTall nmaster delta ratio []
+    tiled   = ResizableTall nmaster delta ratio [ratio]
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
-    delta   = 2/100 -- step of increasing
+    delta   = 1/100 -- step of increasing
 
 
 -- RFC: mconcat . concat $ [ [

@@ -1,4 +1,5 @@
 CHG
+    [_] BUG: delta in 'ResizableTall' has no effect
     [_] Notify when adding mark (like M-F1) in r.n or in xmobar
 	[_] run xmobar in systemd --user unit
 		:> So, when restarting X xmobar won't overlap old windows
@@ -290,9 +291,11 @@ FIXME
 	2016-05-13 [X]	force spawn on master pane
 		: ("M-S-<Space>"      , spawn "r.t" >> windows W.swapMaster)
 	[_] launch auto-start on xmonad restart
-	[_] Set ResizeTile directly to concrete value
+	[_] Set ResizeTile directly to concrete/exact value
 		> SEE http://blog.mired.org/2014/10/extending-behavior-of-xmonad-layouts.html
 		: "M-C-," 1/2 ; "M-C-." default
+        ALT: directly change layout 'on the fly'
+        TRY:ALT: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-Mosaic.html
 	[_] when last window on WS is closed, deactivate layout to default
 		:= or only mostly problematic one - fullscreen
 		: https://mail.haskell.org/pipermail/xmonad/2012-February/012414.html

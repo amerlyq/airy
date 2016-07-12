@@ -62,6 +62,8 @@ noremap <unique> [Toggle]v :<C-u>let &virtualedit=(&ve=='all'?'block':'all')\|se
 "{{{1 Moving ============================
 set scrolloff=3     " context lines visible at screen edge when scroll
 set scrolljump=0    " minimum number of lines to scroll, OR: =-50 (50%)
+set sidescroll=1    " horizontal scroll by 1 char (DFL:(0) -- half screen)
+set sidescrolloff=5 " keep N columns on side visible when scrolling
 set nostartofline   " keep column when  <C-[fbud]> or [ggGHML], :25
 
 
