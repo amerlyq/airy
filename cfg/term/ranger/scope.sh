@@ -1,4 +1,10 @@
 #!/bin/bash
+# TODO: rewrite into dash+exec
+# TRY: create execline variant
+#   http://skarnet.org/software/execline/
+# TEST: compare performance when looping through dir
+#   - discard first cold start results
+#   - redirect output to /dev/null
 
 # Meanings of exit codes:
 # code | meaning    | action of ranger
@@ -129,6 +135,8 @@ case "$mimetype" in
             #     <(head -n 50 "$path") && exit 5 || exit 2
             # try "$EXTDIR/pygmentation.py" "$path" && exit 5 || exit 2
 
+        try cat "$path" && { dump | trim; exit 5; } || exit 2
+
         if command -v highlight >/dev/null; then
             # wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
             # NOTE: Chg highlight -> /usr/bin/highlight
@@ -139,8 +147,6 @@ case "$mimetype" in
                 --line-numbers --line-number-length=3 --replace-tabs=4 --no-trailing-nl \
                 --validate-input --style=$STYLE \
                 "$path" && exit 5 || exit 2
-        else
-            try cat -n "$path" && { dump | trim; exit 5; } || exit 2
         fi ;;
 
     video/*) { # Image preview for videos, disabled by default:
@@ -149,9 +155,10 @@ case "$mimetype" in
     } || exit 1 ;;
 
     image/*) { # Ascii-previews of images:
-        # img2txt --gamma=0.6 --width="$width" "$path";
-        identify "$path"
-    } && exit 4 || exit 1 ;;
+        # img2txt --gamma=0.6 --width="$width" "$path" && exit 4
+        try exiftool "$path" && exit 5
+        try identify "$path" && exit 5
+    } || exit 1 ;;
 
     audio/*) { # Display information about media files:
         exiftool "$path" && exit 5

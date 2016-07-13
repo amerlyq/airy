@@ -3,6 +3,6 @@
 case "$1"
 in --url) xurls | awk -vi=1 '{printf "%02d %s\n",i++,$0}' |
     dmenu -l 10 | cut -d' ' -f2- | xargs -I@ r.b @
-;; --vim) exec r.tf $EDITOR --noplugin -u ~/.vim/vimrc_basic \
-    -c 'set nowrap nonu nornu nofen|norm!G0' <(cat)  # +EmptyLinesStripEnd
+;; --vim) exec r.tf $EDITOR -u ~/.vim/vimrc_basic \
+    +EmptyLinesStripEnd -c 'set nowrap nonu nornu nofen bt=nofile|norm!G0' <(cat)
 esac
