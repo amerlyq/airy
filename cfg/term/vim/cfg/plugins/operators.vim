@@ -101,6 +101,18 @@ call dein#add('tpope/vim-commentary', {
 "   autocmd MyAutoCmd FileType * call InitCaw()
 " '''
 
+call dein#add('haya14busa/vim-operator-flashy', {
+  \ 'on_map': '<Plug>(operator-flashy)',
+  \ 'depends': 'vim-operator-user',
+  \ 'hook_source': "
+\\n   hi def Flashy term=reverse cterm=reverse gui=reverse
+\\n   let g:operator#flashy#group = 'Flashy'
+\\n   let g:operator#flashy#flash_time = 130
+\", 'hook_add': "
+\\n    map <silent><unique> y <Plug>(operator-flashy)
+\\n   nmap <silent><unique> Y <Plug>(operator-flashy)$
+\\n   vmap <silent><unique> Y $<Plug>(operator-flashy)
+\"})
 
 
 "" Shift/jump func-args/list-item/table-cell, ADD textobj-args {{{1

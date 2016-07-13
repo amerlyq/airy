@@ -33,7 +33,7 @@ let g:everywhere_activated = 1
 let s:patterns = {
       \ 'Err': [ 1, "#dc322f", 'ERR%(OR)=|BUG|REGR|XXX|WTF|BAD'],
       \ 'Fix': [ 9, "#dd6616", 'BUT|FIX%(ME)=|WARNING|ATTENTION|REM%(OVE)='],
-      \ 'Add': [ 2, "#859900", 'ADD|SEE|NEED|FIND|ALSO|BETTER'],
+      \ 'Add': [ 2, "#859900", 'ADD|SEE|REF|NEED|FIND|ALSO|BETTER'],
       \ 'Did': [10, "#586e75", 'DONE|FIXED|EXPL|TEMP'],
       \ 'Dev': [ 4, "#268bd2", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
       \ 'Msg': [13, "#6c71c4", 'NOTE|USE|USAGE|DFL|STD|SUMMARY'],

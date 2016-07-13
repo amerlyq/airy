@@ -27,6 +27,7 @@ call _cfg('features/'.(IsAndroid()        ? 'android' : 'clipboard').'.vim')
 call _cfg('features/'.(IsWindows()        ? 'windows' : 'unix'     ).'.vim')
 call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
 call _cfg('dein.vim')
+call _cfg('core-post/*.vim')
 set runtimepath+=$VIMHOME/after  " Place after dein#end()
 
 filetype plugin indent on  " Required!

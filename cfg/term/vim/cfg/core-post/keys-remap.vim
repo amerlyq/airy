@@ -1,30 +1,26 @@
 "" INSERT "{{{
 
 " To put actual ',s' in insert use:  ,<C-d>s
-inoremap ,s <Esc>:update<CR>
+inoremap <unique> ,s <Esc>:update<CR>
 
 " Be consistent with C and D which reach the end of line
-nnoremap Y y$
-vnoremap Y $y
+if empty(maparg('Y','n'))| nnoremap <unique> Y y$ |en
+if empty(maparg('Y','v'))| vnoremap <unique> Y y$ |en
 " Prevent Paste loosing the register source. Deleted available by "- reg.
 "   http://stackoverflow.com/a/7797434/1147859
-vnoremap p pgvy
-vnoremap P Pgvy
-noremap  zp "0p
-noremap  zP "0P
+vnoremap <unique> p pgvy
+vnoremap <unique> P Pgvy
+noremap  <unique> zp "0p
+noremap  <unique> zP "0P
 
 " Instead of whole line indention
-inoremap <C-t>  <C-v><TAB>
+inoremap <unique> <C-t>  <C-v><TAB>
 " inoremap <C-d>  <Del>  DONE by vim-rsi
 " Enable undo for <C-w> and <C-u>.
-inoremap <C-w>  <C-g>u<C-w>
-inoremap <C-u>  <C-g>u<C-u>
+inoremap <unique> <C-w>  <C-g>u<C-w>
+inoremap <unique> <C-u>  <C-g>u<C-u>
 
-if has('gui_running')
-  inoremap <ESC> <ESC>
-endif
-
-cnoremap <C-k> <C-\>e getcmdpos() == 1 ?
+cnoremap <unique> <C-k> <C-\>e getcmdpos() == 1 ?
       \ '' : getcmdline()[:getcmdpos()-2]<CR>
 "}}}
 
@@ -87,11 +83,11 @@ xnoremap <unique><silent> gC :<C-u>call RetainPos("'<,'>t'>\|norm gvgc")<CR>
 " inoremap <C-space> <C-x><C-l>
 
 " Line split
-nnoremap K   a<CR><Right><Esc>
-xnoremap K   c<CR><Esc>
-nnoremap gK  i<CR><Right><Esc>
-nnoremap <C-k> i<CR><Right><Esc>:m .-2<CR>
-nnoremap gX  lxh
+nnoremap <unique> K   a<CR><Right><Esc>
+xnoremap <unique> K   c<CR><Esc>
+nnoremap <unique> gK  i<CR><Right><Esc>
+nnoremap <unique> <C-k> i<CR><Right><Esc>:m .-2<CR>
+nnoremap <unique> gX  lxh
 
 
 " Adequate replace tabs by parts, not entirely
