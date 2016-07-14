@@ -24,7 +24,8 @@ Build:
 Thoughts
 
 Git
-	Сделать скрипт, с помощью которого происходит коммит
+	[$] Сделать скрипт, с помощью которого происходит коммит
+    !! увы, нецелесообразно -- совмещать коммиты и тестирование
 		Автоматический стэш/ребэйс
 		Запуск всей группы тестов, если все ок
 		-- то и скриптов cppcheck, valgrind, codestyle
@@ -33,11 +34,6 @@ Git
 Struct:
 : There must be script, which deploys necessary directory sctruct and writes
 : all needed files (CMakeLists, build-run, etc) by configure time.
-	Root:  build, chain, cmake, common, libs, modules, scripts, ut
-	Module: inc|include, src|source, test, exec, data
-		exec  {cpp, h}
-		: Contains small one-file main(), building into different executables.
-		: Needed for small diff-api concept-proof demos (GUI, OpenGL, SDL).
 	cmake + scripts -> chain
 		: It has sense to join that dirs in one git submodule, which can be
 		: updated independently. Therefore {libs, dirs, opts} -> in another
@@ -47,22 +43,11 @@ Struct:
 	Отказ от submodule в пользу subtree (read!!!) однако я остановился на
 	подмодулях со скриптовой автоматизацией. Независимость -- наше всё!
 		http://habrahabr.ru/post/75964/
-	Работа с подмодулями
-	; git submodule add git://github.com/emzeat/google-glog glog
 
-Command-line options:
-	http://www.bahmanm.com/blogs/command-line-options-how-to-parse-in-bash-using-getopt
-	http://wiki.bash-hackers.org/howto/getopts_tutorial
-
-Minimal prj
-	: Заливать в репу на гитхабе запчасти от сбилденого универoсального проета.
-	: Это позволит постоянно его чуть-чуть допиливать из разных мести и
-	: подтаскивать на новые задачи готовую систему, не создавая её целый день.
+Auto-deploy:
 	: or even better: make script, which will create directory tree and CMakes
 	: depending on flags of wished system (lin, win, android, etc), download
 	: submodules in libs and creating simple tests by pattern.
-
-Auto-deploy:
 	Касательно моего базового приложения-скрипта с авторазвёртыванием проекта
 	: надо добавить возможность указывать либо скачивание из инета, либо
 	: папку со всеми либами для оффлайна (тесты, курлы итп)
@@ -75,26 +60,24 @@ Auto-deploy:
 	: один модуль со стандартным си-мейк файлом для него в уже
 	: готовом проекте. Но отличающийся именами модуля итп.
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+sir
+  Build-config:
+    : At git repos only script with vars (names, paths, etc) must be located,
+    : working as config or pom.xml file. It will be used for rebuild, being
+    : sourced by my build-system (searching up-dir recursively for this config)
+    : and such config must be in my global .gitignore at home (like tags, .clang, etc)
 
-
-Build-config:
-	: At git repos only script with vars (names, paths, etc) must be located,
-	: working as config or pom.xml file. It will be used for rebuild, being
-	: sourced by my build-system (searching up-dir recursively for this config)
-	: and such config must be in my global .gitignore at home (like tags, .clang, etc)
-
-Split build-run:
-	: make autogenerating build-run script for two profiles: work and others
-	: working profile can be combined by cat'ing and sed'ing some of my scripts
-	: all parts of build-run must be in ./bin
+  Split build-run:
+    : make autogenerating build-run script for two profiles: work and others
+    : working profile can be combined by cat'ing and sed'ing some of my scripts
+    : all parts of build-run must be in ./bin
 
 Libs in one place
 	I tired of waiting on libs to rebuild, though more of them built typically.
 	So, we create only one global dir for libs, and add this to PATH.
 		This dir will be composite from git submodule or such a script
-			with pulling, cloning, wgeting etc for list of different libs.
-				wget can pull binary versions, unpack them and put into dirs
+    with pulling, cloning, wgeting etc for list of different libs.
+      wget can pull binary versions, unpack them and put into dirs
 			updating and managing them
 			parsing params to script, to pull only necessary libs or all of them
 				: if you need to deploy workspace quickly, or can start
@@ -109,7 +92,3 @@ Libs in one place
 			:	Together with cmake pieces!!
 			 If lib must be build with specific flags or often rebuilded with
 			 different non-standard flags, it will be copied in any case.
-	+Tests:
-		Folder with wrapped modules, each module in it's own wrapper dir
-		This dir contains dirs of module, CMake snippet to include and some
-		gtest files with simple snips how-to use module.

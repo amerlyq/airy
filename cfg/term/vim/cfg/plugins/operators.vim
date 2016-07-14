@@ -101,6 +101,7 @@ call dein#add('tpope/vim-commentary', {
 "   autocmd MyAutoCmd FileType * call InitCaw()
 " '''
 
+" BAD:THINK: if plugin isn't installed -- 'y' won't work at all
 call dein#add('haya14busa/vim-operator-flashy', {
   \ 'on_map': '<Plug>(operator-flashy)',
   \ 'depends': 'vim-operator-user',

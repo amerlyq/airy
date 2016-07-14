@@ -173,6 +173,7 @@ call dein#add('beloglazov/vim-textobj-quotes', {
 
 "" Vars for bash/perl (like $name{...} ) {{{1
 " TODO: maybe space/sigil change mappings to reverse -- G/Q?
+" BAD: useless for sigils in cmake like ${VAR}
 " CHG 'on_map': [[ox, ad, id]]
 call dein#add('vimtaku/vim-textobj-sigil', {
   \ 'on_map': {'ox': '<Plug>'},
