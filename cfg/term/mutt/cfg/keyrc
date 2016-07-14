@@ -82,9 +82,14 @@ bind pager \Cb  previous-page
 # bind pager  <Right> view-attachments
 # bind pager  <Left>  exit
 
-bind attach <Return>    view-mailcap
-# bind attach <Right> view-attach
-# bind attach <Left>  exit
+bind attach  i  display-toggle-weed
+bind attach  l  view-mailcap
+bind attach  h  exit
+bind attach  g  first-entry
+bind attach  G  last-entry
+bind attach <Return>  view-mailcap
+bind attach <Right>   view-attach
+bind attach <Left>    exit
 
 # bind pager i noop
 # bind pager \eD delete-thread
