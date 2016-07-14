@@ -11,13 +11,10 @@ if [[ ! -d "$PREZTO" ]]; then
     git clone --recursive $url "$PREZTO"
 fi
 
-# BUG: submodules aren't updated at all!
-! cfgOpt u || (cd "$PREZTO" && git-up &&
-    git submodule -q foreach git pull -q origin master)
-    # git submodule update --init --recursive --remote --merge)
-
 if distro arch; then
   aur_inst 'fasd'
 elif distro ubuntu; then
   do_if -c git_inst -p fasd 'clvv/fasd' ||:
 fi
+
+./update $(cfgOpt u && echo -u)

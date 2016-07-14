@@ -1,0 +1,26 @@
+#!/usr/bin/zsh -e
+# Minuscule startup time enhancement
+# TODO: insert into demons.target.wants/zsh-comp.service
+cd ${0%/*}
+
+zdir=$ZDOTDIR
+[[ -d $zdir ]] || zdir=${ZDOTDIR:=$HOME}
+
+# Refresh commands list from PATH in current shell
+rehash
+
+zcompile ~/.zshenv
+zcompile ~/.zprofile $zdir/.zprofile ~/.shell/exports
+zcompile ~/.zlogin $zdir/.zlogin
+
+# Combine zshrc components into one file
+LST=()
+LST+=( $zdir/.{zshrc,zprezto{rc,/init.zsh}} )
+LST+=( ~/.shell/zsh/{amer-{widgets,key-mix},filetypes,completion}.zsh )
+LST+=( ~/.shell/common )
+zcompile ~/.zshrc ${LST[@]}
+
+# Compile the completion dump
+zcd=$zdir/.zcompdump
+if [[ -s $zcd && (! -s ${zcd}.zwc || $zcd -nt ${zcd}.zwc) ]]
+then zcompile $zcd; fi
