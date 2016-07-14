@@ -1,10 +1,4 @@
 #!/bin/bash
-# TODO: rewrite into dash+exec
-# TRY: create execline variant
-#   http://skarnet.org/software/execline/
-# TEST: compare performance when looping through dir
-#   - discard first cold start results
-#   - redirect output to /dev/null
 
 # Meanings of exit codes:
 # code | meaning    | action of ranger
@@ -96,8 +90,8 @@ case "$extension" in
     7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
     rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
         try als "$path" && { dump | trim; exit 0; }
-        try acat "$path" && { dump | trim; exit 3; }
-        try bsdtar -lf "$path" && { dump | trim; exit 0; }
+        # try acat "$path" && { dump | trim; exit 3; }
+        # try bsdtar -lf "$path" && { dump | trim; exit 0; }
         exit 1 ;;
     rar) try unrar -p- lt "$path" && { dump | trim; exit 0; } || exit 1 ;;
 

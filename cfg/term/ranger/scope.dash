@@ -1,0 +1,45 @@
+#!/bin/dash
+# vim:ft=sh
+# 0 | success    | show stdout
+# 1 | failure    | no preview
+# 2 | plain text | use ranger
+# 3 | fix width  | ignore width
+# 4 | fix height | ignore height
+# 5 | fix both   | never reload
+# 6 | image      | rgb preview
+
+path="$1"
+width="$2"
+height="$3"
+cached="$4"
+
+try(){ timeout --kill-after 5 3 "$@"; }
+trim(){ head -n "$height"; }
+fmt(){ command fmt -s -w "$width"; }
+
+case ${path##*.}
+in  7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
+    rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
+      try als -q "$path" | trim && exit 0
+;;  pdf) try pdftotext -q -l 10 -nopgbrk "$path" - | trim | fmt && exit 3
+;;  doc|xls|ppt) try catdoc "$path" | trim | fmt && exit 3
+;;  htm|html|xhtml) try elinks -dump "$path" | fmt && exit 3
+;;  *) mimetype=$(file --mime-type -Lb "$path")
+esac
+
+
+case "$mimetype"
+in text/*|*/xml) exit 2
+;; video/*|audio/*|image/*) exiftool "$path" && exit 5
+esac
+
+if [ -s "$path" ]; then
+  file -Lb "$path"  # | sed 's/,\s*/\n/g'
+  echo  # printf "<$(printf "=%.0s" {1..62})>\n"
+  maxcol=$(( (width-6)/7*2 ))  # actualwidth=$((height/2*7+6))
+  maxln=$(( height - 2 ))
+  try xxd -c "$maxcol" -l $((maxcol*maxln)) "$path" | sed 's/^0\{4\}//'
+  exit 4
+fi
+
+exit 1

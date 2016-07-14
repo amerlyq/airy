@@ -53,13 +53,19 @@ NEW
 		: short instant when exiting from zsh _and_ returning into ranger. So
 		: it's always valid, as that events are consequent.
 	[_] BUG: 'I' view can't highlight with mouse -- may I miss smth in config?
+    TRY: create execline variant BAD: conflict with imagemagick
+      http://skarnet.org/software/execline/
+      TEST: compare performance when looping through dir
+        - discard first cold start results
+        - redirect output to /dev/null
 
 
 scope.sh
 	[_] Separate functions for filetypes and switches to choose funcs
 		:= Do it on top of default scope.sh, building viewers from scratch
 		:% And then send pull request
-	[_] Toggle w3m/img2txt/exif preview for image/video
+	[_] Toggle w3m/img2txt/exif preview for image/video/audio
+        Do it through map '1zv' '2zv' -- to switch preview scope1.sh -> scope2.sh
 	[_] Add hang-out process checking to ranger scope.sh
 	[_] re-read output from scope.sh for lister on shortcut inside lister
 	[_] TODO create my own global mime extensions for scope.sh
