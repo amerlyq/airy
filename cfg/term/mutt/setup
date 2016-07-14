@@ -4,15 +4,30 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 link "$PWD" ~/.mutt
-mkdir -p "${CURR_DIR_MAIL:?}"
-[[ $CURR_DIR_MAIL -ef ~/.mail ]] || link "$CURR_DIR_MAIL" ~/.mail
+
+dst=~/.cache/mutt
+(cd "$dst" && ln -svf "acc/${MUTT_DEFAULT:?}" default)
 
 ### GENS ###
 THEME=$THEME ./gen/theme-solarized.gen
 
-dst=~/.mbsyncrc
-> "$dst"
-for creds in "${MAIL_CREDS[@]}"
-do ./gen/mbsyncrc.gen "$dst" ${creds:?}; done
+# Gen accounts list to switch
+> "$dst/index"
+for p in "$dst/acc"/*; do [[ -s $p ]] || continue
+  ((k+=1))
+  cat>> "$dst/index" <<EOT
+set my_acc=${p##*/} my_key=<F$k>
+source \$my_cfg/accrc
+EOT
+done
+
+# mkdir -p "${CURR_DIR_MAIL:?}"
+# [[ $CURR_DIR_MAIL -ef ~/.mail ]] || link "$CURR_DIR_MAIL" ~/.mail
+
+## Unused currently
+# dst=~/.mbsyncrc
+# > "$dst"
+# for creds in "${MAIL_CREDS[@]}"
+# do ./gen/mbsyncrc.gen "$dst" ${creds:?}; done
 
 # USAGE: mbsync '$mid' OR mbsync -a

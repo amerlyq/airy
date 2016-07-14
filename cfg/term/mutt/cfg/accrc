@@ -1,0 +1,10 @@
+# vim: ft=muttrc
+# @brief: Macro-file to generate account-hook
+# @args: set my_acc=work my_key=<f3>
+
+set my_dir=$my_cache/acc/$my_acc
+
+source $my_dir
+folder-hook  $folder "source $my_dir"
+account-hook $folder "set imap_user=$imap_user imap_pass=$imap_pass"
+macro index $my_key "<sync-mailbox><refresh><change-folder>$folder<enter>"

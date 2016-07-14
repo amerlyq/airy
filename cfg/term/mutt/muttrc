@@ -1,12 +1,17 @@
 # show mail list before it's content
-set my_cfg=~/.mutt
+set my_cfg=~/.mutt/cfg
 set my_cache=~/.cache/mutt
-set pager_index_lines=6
+
+# Show
+set pager_index_lines=6     # keep N lines of index on top of pager
+set pager_context=3         # context lines when going to next page
+set pager_stop=yes          # stop instead of displaying next mail
 
 set editor = "$EDITOR -c 'set spell spelllang=ru_yo,en_us,uk'"
 # set edit_headers          # see the headers when editing
 set sort = reverse-threads  # reverse-threads -- sort by newest conversation first
 set sort_aux = last-date-received
+set send_charset="us-ascii:utf-8"
 
 ## Show only important fields in the header
 # ignore *
@@ -69,22 +74,24 @@ unset pop_delete
 set header_cache = $my_cache/headers
 set message_cachedir = $my_cache/bodies
 set certificate_file = $my_cache/certificates
-# set signature = ~/.mutt/signature
+set message_cachedir = $my_cache/messages      # fetch imap msgs on disk instead of memory
+# set signature = ~/.mutt/signature  # Set in account
 
 
 ## ALIASES (fast access to contacts)
-set alias_file = $my_cache/acc/aliases
+set alias_file = $my_cache/aliases
 set sort_alias = alias
 set reverse_alias = yes
 source $alias_file
 
 ## BINDING
+# Speed up folders switch
+set sleep_time = 0
 source $my_cfg/keyrc
-
-# source $my_cache/gpgrc          # Keyring
-source $my_cache/acc/default    # Default account
-source $my_cache/acc/index      # List of switchable accounts
+# source $my_cfg/gpgrc          # Keyring
 source $my_cache/theme          # Theme
+source $my_cache/index          # List of accounts (generated)
+source $my_cache/default        # Default account (link)
 
 ## COMMANDS
 mailboxes +Inbox
@@ -93,8 +100,7 @@ mailboxes +Inbox
 #>  to any of the folders listed under mailboxes
 
 ## HTML enriched mails
-set mailcap_path=~/.mutt/mailcap
+set mailcap_path=$my_cfg/mailcap
 alternative_order text/plain text/enriched text/html     # save html for last
 set implicit_autoview=yes  # Load in pager if setting in .mailcap says 'copiousoutput'
-bind attach <return>    view-mailcap
 auto_view text/html                                      # view html automatically

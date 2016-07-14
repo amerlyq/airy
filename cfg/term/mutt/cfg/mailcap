@@ -5,6 +5,7 @@
 #text/html; vimprobtab.sh %s &; test=test -n "$DISPLAY"; needsterminal;
 text/html; r.b %s; test=test -n "$DISPLAY"; nametemplate=%s.html
 text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
+text/*; r.v %s
 # text/html; elinks -dump %s ; copiousoutput
 application/*; ~/.config/ranger/scope.sh %s; copiousoutput
 image/*; sxiv %s; test=test -n "$DISPLAY"

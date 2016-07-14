@@ -1,0 +1,59 @@
+RUN
+  [_] Run in tmux -- to detach from workspaces, but keep notifying system and fast access
+
+READ
+  Use [Google Mail] instead of [GMail].
+  In mutt press c followed by ? to bring up a list of available folders.
+    Sent and Bin are under GMail but other folders are under GoogleMail.
+    At least in my case
+
+SEND
+  Open on account (or use it to choose send from)
+    mutt -f imaps://user@gmail.com@imap.gmail.com
+    mutt -f /path/to/mail/john  # local folder on server
+  Message from file / shell output
+    mutt -s "subject" recipient@server.com < ~/message.txt
+    cat ./message.txt | mutt -s "Subject" user@gmail.com
+  With attachment
+    ... -a /tmp/file.jpg
+  Diff profile
+    cat ./message.txt | mutt -s "Subject" -e "source ~/.mutt/acc/work" -e "set smtp_pass=$(read -s p && echo $p)" user@gmail.com
+  Run macro on startup
+    mutt -e "push '<limit>all<enter>'"
+  print all variables
+    mutt -D
+
+For thunderbird
+: sudo apt-get install thunderbird
+  Server Type: POP3
+  Server Name: ${WORK_SRV_POP3}
+  Port: 995
+  Security: SSL/TLS
+  Authentication: Normal Password
+
+  Server Type: SMTP
+  Server Name: ${WORK_SRV_SMTP}
+  Port: 25
+  Security: SSL/TLS
+  Authentication: Normal Password
+
+RC
+  Multiline macro
+  : macro index <f2> ":set smtp_url = smtps://$imap_user@smtp.gmail.com:587\n\
+  : :set from = \"`echo ${MAIN_MAIL}`\"\n\
+  : :set realname = \"`echo ${MAIN_NAME}`\"\n\
+  : <change-folder>imaps://$imap_user@imap.gmail.com:993<enter>"
+
+  Change into mailbox
+  # macro index <f3> "<sync-mailbox><refresh><enter-command>\n\
+  # :source $my_cache/acc/work<enter><change-folder>!<enter>"
+  OR
+  # macro index <f2> '<change-folder>imaps://imap.gmail.com:933<enter>'
+
+  Account hook
+    Runs a command everytime Mutt calls a function related to an account, like IMAP syncing.
+    It does not require you to switch to any folder.
+
+Добавить POP3 getmail в cron для проверки раз 10 минут
+  # crontab -e
+  */10 * * * * /usr/bin/getmail

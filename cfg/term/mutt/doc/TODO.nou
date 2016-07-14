@@ -1,0 +1,150 @@
+TODO
+  TRY:ALT: http://www.neomutt.org/features.html
+  TRY: mutt -f <account> to open directly desired acc
+
+REF
+  http://www.mutt.org/doc/manual/
+  >> http://www.mutt.org/doc/manual/manual-4.html
+  http://www.mutt.org/doc/manual/manual-5.html
+  : mailcap
+  > https://wiki.archlinux.org/index.php/mutt
+  http://dev.mutt.org/trac/wiki/MailConcept
+
+mutt
+  Seize
+    >>> https://www.proteansec.com/linux/the-ultimate-guide-to-mutt/
+    > http://www.mutt.org/doc/devel/manual.html#functions
+    > https://wiki.archlinux.org/index.php/Mutt
+    https://github.com/andrewgaul/dotfiles/blob/master/muttrc
+    2015-09-04 [X] http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
+    https://bitbucket.org/jasonwryan/shiv/src/tip/.mutt/
+    https://github.com/gregf/dotfiles/blob/master/mutt/muttrc.bindings
+  Setup
+    > http://www.guckes.net/Mutt/setup.html
+    [_] Address book and thorough setup
+      >! https://wiki.debian.org/Mutt
+    Tips & tricks
+      >>> http://dev.mutt.org/trac/wiki/ConfigTricks
+      http://mph.puddingbowl.org/2014/12/have-some-mutt-macros/
+      http://wcm1.web.rice.edu/mutt-tips.html
+      http://realprogrammers.com/jump_start/mutt/
+
+  Read:
+    http://home.roadrunner.com/~computertaijutsu/mutt.html
+    http://port-denis.ucoz.ru/Xakep/krilataypochta.htm
+
+  >How-To
+    ADD Notify
+    >[_] http://www.codeovertones.com/2010/04/mutt-gmail-gdata-notify-send-perfect.html
+      http://code.google.com/p/altcanvas/source/browse/trunk/scripts/chkgmail
+      https://pypi.python.org/pypi/goobook/1.3a1
+        set query_command = "goobook query '%s'"
+    https://hynek.me/articles/my-mutt-gmail-setup/
+    https://hynek.me/articles/fleeing-from-gmail/
+    https://blog.bartbania.com/raspberry_pi/consolify-your-gmail-with-mutt/
+
+  Security
+    http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
+    http://codesorcery.net/old/mutt/mutt-gnupg-howto
+    http://jasonwryan.com/blog/2013/07/20/gnupg/
+
+  Useful additional additions
+    http://cedricduval.free.fr/mutt/patches/#trash
+  Smtp
+    https://nixtricks.wordpress.com/2010/05/05/mutt-configure-mutt-to-receive-email-via-imap-and-send-via-smtp/
+    > http://dev.mutt.org/trac/wiki/MuttGuide/UseIMAP
+
+  2015-04-24 [X] pop3+smtp one-account
+  [_] passwordless login (smth like private keys?)
+    [_] gpg keyring
+      For example, if you use gpg-agent to store your passphrase, then you
+      can encrypt each password as its own file:
+        echo password | gpg --encrypt -o ~/.acct1_pass
+        echo password2 | gpg --encrypt -o ~/.acct2_pass
+      Then put this into your muttrc:
+        set my_acct1_pass=`gpg --decrypt ~/.acct1_pass`
+        set my_acct2_pass=`gpg --decrypt ~/.acct2_pass`
+        account-hook account2 'set imap_pass=$my_acct2_pass'
+      set imap_pass = `gpg -d ~/.mutt/.pass.gpg | awk '/GMail:/ {print $2}'`
+        : The key to making that convenient, though, is using gpg-agent to store
+        : your passphrase (so you don't have to enter it multiple times).
+    [_] keyring for ssh keys
+  [_] separate mail fetcher
+    https://wiki.archlinux.org/index.php/Getmail
+  [_] separate mail sorter
+    https://wiki.archlinux.org/index.php/Procmail
+  [_] attachments
+    http://dev.mutt.org/trac/wiki/MuttFaq/Attachment
+  [_] html-rich
+    http://jasonwryan.com/blog/2012/05/12/mutt/
+  > [_] vim-like
+    http://wcm1.web.rice.edu/mutt-tips.html
+    http://www.noah.org/wiki/Mutt
+  [_] pgp encrypting mails on sent/receive
+    http://habrahabr.ru/post/135800/
+    http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
+
+  [_] multi-account
+    SEE: https://github.com/zanshin/dotfiles/tree/master/mutt
+    http://vsido.org/index.php?topic=618.0
+    https://pbrisbin.com/posts/two_accounts_in_mutt/
+    >>> https://dev.mutt.org/trac/wiki/UseCases/MultiAccounts
+    2015-06-15 [X] https://www.df7cb.de/blog/2010/Using_multiple_IMAP_accounts_with_Mutt.html
+    : Good way to setup multiple accs!
+    : source default by symlink + using different files on macrokeys
+
+GENERAL: man muttrc
+  http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
+  2015-07-02 [X] http://www.elho.net/mutt/maildir/
+
+  Integrate
+  : # Gmail-style keyboard shortcuts
+  : macro index,pager y "<enter-command>unset trash\n <delete-message>" "Gmail archive message"
+  : macro index,pager d "<enter-command>set trash=\"imaps://imap.googlemail.com/[GMail]/Bin\"\n <delete-message>" "Gmail delete message"
+  : macro index,pager gi "<change-folder>=INBOX<enter>" "Go to inbox"
+  : macro index,pager ga "<change-folder>=[Gmail]/All Mail<enter>" "Go to all mail"
+  : macro index,pager gs "<change-folder>=[Gmail]/Starred<enter>" "Go to starred messages"
+  : macro index,pager gd "<change-folder> =[Gmail]/Drafts<enter>" "Go to drafts"
+
+VIM+gpg:
+  http://blog.developwithpassion.com/2013/05/02/getting-up-and-running-with-a-sane-mutt-setup/
+
+  gpg
+    https://wiki.archlinux.org/index.php/GnuPG#gpg-agent
+    https://wiki.archlinux.org/index.php/SSH_keys_%28%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%29
+
+Filtering (IMAP)
+  Programs
+    BETTER: http://isync.sourceforge.net/
+      : 2016-05-11 [X] https://wiki.archlinux.org/index.php/Isync
+      2016-05-11 [X] https://bloerg.net/2013/10/09/syncing-mails-with-mbsync-instead-of-offlineimap.html
+      [_] https://gist.github.com/russell/6588466
+    BAD: http://www.offlineimap.org/
+      : https://wiki.archlinux.org/index.php/OfflineIMAP
+      2016-05-11 [X] >> http://blog.ezyang.com/2012/08/offlineimap-sucks/
+    http://www.dovecot.org/
+      : https://wiki.archlinux.org/index.php/dovecot
+      : https://en.wikipedia.org/wiki/Sieve_%28mail_filtering_language%29
+    pine OR:BETTER: mairix
+      https://pbrisbin.com/tags/mutt/
+      : see mairix setup
+    imapfilter
+      http://iranzo.github.io/blog/2015/08/28/filtering-email-with-imapfilter/
+  Offline sending and reading, see about 'alternates':
+    https://technosorcery.net/blog/2010/11/21/offline-email-with-gmail-mutt-postfix-and-offlineimap/
+    http://mutt.blackfish.org.uk/storage/
+    http://www.linuxquestions.org/questions/debian-26/mutt-experts-mutt-won%27t-use-the-maildir-i-specify-in-muttrc-749792/
+    : I'm using offlineimap along with mutt to achieve roughly what you want and I couldn't be happier.
+    : Besides, I'm also using notmuch (in AUR) to get super-fast Gmail-like search.
+    : IMHO, mutt was not designed to include serious networking support, like
+    : thunderbird. This is why I compile it off and use fetchmail for imaps and msmtp for smpts.
+  Imap filter
+    > http://roylez.info/2016-02-10-mutt-multi-imap-accounts/
+    >>> [_] http://jason.the-graham.com/2011/01/10/email_with_mutt_offlineimap_imapfilter_msmtp_archivemail/
+    > http://stevelosh.com/blog/2012/10/the-homely-mutt/#getting-email
+    https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
+      : https://wiki.archlinux.org/index.php/Notmuch
+    [$] http://mutt.blackfish.org.uk/filtering/
+      : BAD: site is down
+    http://baptiste-wicht.com/posts/2014/07/a-mutt-journey-filter-mails-with-imapfilter.html
+    http://blog.endpoint.com/2011/10/imapfilter-lua-email-mutt-filtering.html

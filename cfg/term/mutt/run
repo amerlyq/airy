@@ -1,4 +1,6 @@
 #!/bin/bash -e
+echo "E: broken"
+exit
 
 mutt -e "source ~/.cache/mutt/acc/default" \
      -e "set smtp_pass=$(read -p "Mutt pass:" -s p && echo $p)" \
