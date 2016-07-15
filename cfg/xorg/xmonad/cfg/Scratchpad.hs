@@ -17,7 +17,7 @@ myScratchpads =
     ]
   ] ++
   [ vim "lyrics" "~/aura/lyfa/lists/music.otl" nonFloating
-  , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.otl" defaultFloating
+  , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
   , term "j8" "j8 -c" bottom_l14b3
   ]
   where

@@ -1,70 +1,70 @@
->>> Help
+%%%% Help
 | M-o <F1> | open this file
 
->>> System
-System
+%%% System
+% System
 | M-S-<Esc> [r t o] | restart / shutdown (poweroff) / logoff (to console)
 | M-S-<Esc> [1..9]  | screen brightness 10% .. 90% (laptop only)
 | M-S-<Esc> 0[1..9] | screen brightness 1% .. 9%   (laptop only)
 | M-S-z             | lock screen (do it every time you go drink tea)
-	To unlock type your user password and Enter
-	On error wait until red circle 'Wrong' will disappear
-	If last lang wasn't EN, change to EN by RAlt before typing
-	If typed wrong letters -- <Backspace>
-	If don't know how many are wrong -- <C-u> to clear typed password
+  To unlock type your user password and Enter
+  On error wait until red circle 'Wrong' will disappear
+  If last lang wasn't EN, change to EN by RAlt before typing
+  If typed wrong letters -- <Backspace>
+  If don't know how many are wrong -- <C-u> to clear typed password
 
-Kill
+% Kill
 | M-\   | kill focused window (or only close its current copy -- see Actions)
 | M-C-\ | kill all other copies, but keep current one
 
-Main
+%% Main
 | M-<Space>  | terminal
 | M-<Return> | ranger
 | M-d        | dmenu
 
-< Actions : terminal, ranger
+% Actions : terminal, ranger
 | M-     | open in slave [tmux]
 | M-S-   | open in master [tmux]
 | M-C-   | open in slave [raw] [impossible to press on some keyboards]
 | M-C-S- | open in master [raw]
 
 
->>> Workspaces
-Names (key -> id)
+%%% Workspaces
+%% Names (key -> id)
 | M-  [` 1 2 3 4 5 6 7 8 9 0 - =] | ` 1 2 3 4 5 6 7 8 9 0 - =
 | M-s [a .. z]                    | a .. z
 | M-s [` 1 2 3 4 5 6 7 8 9 0 - =] | ~ ! @ # $ % ^ & * ( ) _ +
 | M-o [f p s m]                   | FF PI SK MM
 
 
-Monitors
+% Monitors
 | M-[  | next monitor
 | M-]  | prev monitor
 
-Back-n-forth
+% Back-n-forth
 | M-a | toggle between two last workspaces back-n-forth
 
-Urgent (like pidgin chat)
+% Urgent (like pidgin chat)
 | M-q   | quick jump to urgent window (pidgin/skype/etc)
 | M-C-q | clear urgents
 
 
-< Actions (key -> fn -> desc) : Workspaces, Monitors, Back-n-forth
+%% Actions (key -> fn -> desc) : Workspaces, Monitors, Back-n-forth
 | M-     | view  | jump to wksp
 | M-S-   | bring | jump and bring focused window with you
 | M-C-   | shift | send focused window to wksp
 | M-C-S- | copy  | duplicate focused window to wksp (close copy as always by M-\)
 | M-M1-  | swap  | exchange windows between current and choosen wksp
 
-Mark-n-go
-: Fast jumping between choosen windows
+%% Mark-n-go
+# Fast jumping between choosen windows
 | M-S- [F1 .. F12] | mark/attach window to key (firefox or one of pidgin chat)
 | M-   [F1 .. F12] | jump to marked window
 | M-C- [F1 .. F12] | bring marked window on current wksp
 | M-S-t            | show list of marked windows and jump to
 
 
->>> Windows
+%%% Windows
 Order
 | M-h  | host | focus master window
 | M-l  | last | focus slave window
@@ -80,14 +80,14 @@ Resize
 | M-S-. | expand slave
 
 Fulscreen
-: In fullscreen you can continue to use Order/Resize cmds to switch windows
+# In fullscreen you can continue to use Order/Resize cmds to switch windows
 | M-f     | toggle fullscreen (BUG: don't work on floating windows)
 | M-S-f   | toggle bottom bar
 | M-C-f   | toggle bottom bar in fullscreen
 | M-C-S-f | toggle gaps around windows (TRY it)
 
 Layout
-: Indicator in bottom left of bar shows current layout pictogram
+# Indicator in bottom left of bar shows current layout pictogram
 | M-/   | toggle vertical/horizontal split
 | M-S-/ | toggle reflect
 | M-n   | next layout
@@ -105,17 +105,17 @@ Float
 | M-C-<L/R/U/D> | place floating on grid
 
 
->>> Open
+%%% Open
 | M-o [..]   | open on current wksp or bring it if already opened
 | M-S-o [..] | open on new empty wksp or shift to it if already opened
-	| f/b | firefox / qutebrowser
-	| p/s |  pidgin / skype (contact list)
-	| n/h | ncmpcpp / htop
-	| i/v | ipython / vim
-	| <Space>    | floating terminal [tmux]
-	| <Return>   | floating ranger [tmux]
-	| C-<Space>  | floating terminal [raw]
-	| C-<Return> | floating ranger [raw]
+  | f/b | firefox / qutebrowser
+  | p/s |  pidgin / skype (contact list)
+  | n/h | ncmpcpp / htop
+  | i/v | ipython / vim
+  | <Space>    | floating terminal [tmux]
+  | <Return>   | floating ranger [tmux]
+  | C-<Space>  | floating terminal [raw]
+  | C-<Return> | floating ranger [raw]
 
 <copyq
 | M-x   | toggle (you can choose to paste any previously copied text by Enter)
@@ -124,20 +124,20 @@ Float
 | M-v   | choose older
 
 
->>> Media
-dict
-: You need to copy dictionaries to '/home/media/res/dicts' beforehand
-| M-u e | en -> ru
-| M-u r | ru -> en
+%%% Media
+% dict
+# You need to copy dictionaries to '/home/media/res/dicts' beforehand
+| M-i e | en -> ru
+| M-i r | ru -> en
 
-volume
+% volume
 | M-Home | 20% volume, unmute
 | M-PgUp | volume up
 | M-PgDn | volume down
 | M-End  | mute toggle
 
-ncmpcpp
-: Even without music, you can listen radio (open -> 2 -> <Enter> on some playlist)
+% ncmpcpp
+# Even without music, you can listen radio (open -> 2 -> <Enter> on some playlist)
 | M-S-Home | play/pause
 | M-S-PgUp | prev
 | M-S-PgDn | next
@@ -145,34 +145,34 @@ ncmpcpp
 | M-o ,    | prev
 
 
->>> Mouse
+%%% Mouse
 | M-MLeft   | focus window (first click on unfocused window only focuses -- not sent inside)
 | M-MRight  | drag / resize on click+hold+move (window as 3x3 grid -- 9 areas)
 | M-MMiddle | place in master
 | M-WhUp/Dn | place next/prev window in master
 
 
->>> Bar
+%%% Bar
 Workspaces
-	MLeft on wksp numbers to focus.
-	MLeft on layout icon to change layout or MRight to reset it.
+  MLeft on wksp numbers to focus.
+  MLeft on layout icon to change layout or MRight to reset it.
 
-Fields
-: Clickable both its icon and text
-	Song name
-		MLeft to play/pause
-		MRight to open ncmpcpp
-	net
-		: (nothing)
-	cpu/load/mem/swap
-		MLeft to open htop
-	battery
-		: (nothing)
-	volume
-		MLeft to mute
-		WhUp/Dn to change volume
-	lang
-		MLeft to cycle US/RU/UA
-		MRight to reset to US
-	braile
-		> indicator, shows which modifiers are currently pressed (latched)
+%% Fields
+# Clickable both its icon and text
+  Song name
+    MLeft to play/pause
+    MRight to open ncmpcpp
+  net
+    : (nothing)
+  cpu/load/mem/swap
+    MLeft to open htop
+  battery
+    : (nothing)
+  volume
+    MLeft to mute
+    WhUp/Dn to change volume
+  lang
+    MLeft to cycle US/RU/UA
+    MRight to reset to US
+  braile
+    > indicator, shows which modifiers are currently pressed (latched)

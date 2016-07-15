@@ -30,9 +30,10 @@ main = concat
     , ("<Return>", "r.t -e r.tmux r.ranger")
     , ("C-<Return>", "r.t -e r.ranger")
     , ("M1-<Space>", "run-xcwd r.t -e r.tmux")
-    , ("b" , "r.b")
+    , ("u" , "r.b")
     -- "r.b" open on new empty wksp
     -- "r.b" focus already opened one (like M-w works)
+    -- THINK: is "r.b" link suitable, if I use "u" anyway (url)
     -- THINK:ENH: make M-g * to go to already opened instead of using mods
     ]
   ]
@@ -113,15 +114,15 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("<XF86Sleep>"     , "xset -d :0 dpms force off")
     ],
     ---- Submenus
-    inGroup "M-u"
-    [ ("b", "r.b -h")
+    inGroup "M-i"
+    [ ("u", "r.b -h")
     , ("g", "r.game -p")
     , ("e", "r.dict --en --vim")
     , ("r", "r.dict --ru --vim")
     , ("m", "r.mpd-move")
     ],
     inGroup "M-y"
-    [ ("b", "r.b -p")
+    [ ("u", "r.b -p")
     , ("w", "r.notify-winclass")
     , ("l", "echo wmctrl -l | r.notify-sh")
     ],

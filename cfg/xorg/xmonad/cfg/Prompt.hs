@@ -24,7 +24,7 @@ myPromptTheme = def
   , autoComplete = Just 1
   }
 
-keys = inGroup "M-u"
+keys = inGroup "M-i"
   [ ("t", inputPrompt def "Fire" ?+ \p -> spawnHere ("r.tf -e " ++ p))
   , ("s", shellPrompt myPromptTheme)
   ] ++
