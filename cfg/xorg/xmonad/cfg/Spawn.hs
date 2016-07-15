@@ -30,6 +30,10 @@ main = concat
     , ("<Return>", "r.t -e r.tmux r.ranger")
     , ("C-<Return>", "r.t -e r.ranger")
     , ("M1-<Space>", "run-xcwd r.t -e r.tmux")
+    , ("b" , "r.b")
+    -- "r.b" open on new empty wksp
+    -- "r.b" focus already opened one (like M-w works)
+    -- THINK:ENH: make M-g * to go to already opened instead of using mods
     ]
   ]
 
@@ -56,8 +60,7 @@ scratchpad = (concat . (`map` [
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)
     | nm <- ["ncmpcpp", "mutt", "ipython"]
     ],
-    [ ("b" , spawnHere "r.b")
-    , ("v" , spawnHere "r.tf -e $EDITOR") -- THINK: also open in [tmux]?
+    [ ("v" , spawnHere "r.tf -e $EDITOR") -- THINK: also open in [tmux]?
     -- , ("S-<Space>", spawnHere "r.tf")
     , ("<Space>"  , spawnAndDo doCenterFloat "r.t -e r.tmux")
     , ("<Return>" , spawnAndDo doCenterFloat "r.tf -e r.tmux r.ranger")

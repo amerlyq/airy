@@ -16,7 +16,7 @@ import qualified XMonad.Config.Amer.Spawn as MySpawn
 
 -- CHECK: maybe I could incrementally add keys to global var in each module?
 myKeys = MyWksp.keys ++ MyNavi.keys ++ MyCtrl.keys ++ MyPrompt.keys ++ MySpawn.keys ++
-  [ ("M-b"      , broadcastMessage MON.ToggleMonitor >> refresh)
+  [ -- ("M-S-b"      , broadcastMessage MON.ToggleMonitor >> refresh)
   ]  -- ++ rootKeys
   where
     -- Additional keymap on empty workspace
