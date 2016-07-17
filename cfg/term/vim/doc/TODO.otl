@@ -467,6 +467,13 @@ PROFILING
 		: 17303 recvmsg(4, 0x7ffdc2d32400, 0)     = -1 EAGAIN (Resource temporarily unavailable)
 		: (repeat ~ 400 lines)
 		А ещё говорят тормозит cursorline...
+    Profile
+		:profile start profile.log
+		:profile func *
+		:profile file *
+		" At this point do slow actions
+		:profile pause
+		:noautocmd qall!
 	NOTE: If you want to know slow loading plugins, you should use
 				the external tool or |--startuptime|.
 		: https://github.com/hyiltiz/vim-plugins-profile

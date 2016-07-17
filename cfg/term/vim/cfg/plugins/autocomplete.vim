@@ -70,14 +70,15 @@ call dein#add('Shougo/echodoc.vim', {
 " ALT 'SirVer/ultisnips'
 " vim_version: 7.3.885  # NEED: event TextChanged,TextChangedI
 " unite_sources: neosnippet{,/user,/runtime}
-call dein#add('Shougo/neosnippet.vim', {
-  \ 'on_event': 'InsertCharPre',
-  \ 'on_ft': 'snippet',
-  \ 'depends': ['neosnippet-snippets', 'context_filetype.vim'],
-  \ 'hook_source': _hcat('neosnippet.src')})
+" DISABLED:(au CursorMoved) -- until I will start to use snippets
+" call dein#add('Shougo/neosnippet.vim', {
+"   \ 'on_event': 'InsertCharPre',
+"   \ 'on_ft': 'snippet',
+"   \ 'depends': ['neosnippet-snippets', 'context_filetype.vim'],
+"   \ 'hook_source': _hcat('neosnippet.src')})
 
-call dein#add('Shougo/neosnippet-snippets', {'on_source': 'neosnippet.vim'})
-call dein#add('honza/vim-snippets', {'on_source': 'neosnippet.vim'})
+" call dein#add('Shougo/neosnippet-snippets', {'on_source': 'neosnippet.vim'})
+" call dein#add('honza/vim-snippets', {'on_source': 'neosnippet.vim'})
 
 
 

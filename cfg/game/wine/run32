@@ -1,7 +1,18 @@
 #!/bin/bash -e
 
-if ! file -b "$1" | grep -qF x86-64; then
+# EXPL: necessary for 'file -b' checkings
+APP=${1%.exe}.exe; [[ -f $APP ]] || exit
+
+# Only for windows *.exe
+file -b "$APP" | grep -iq '^PE32' || exit
+
+if ! file -b "$APP" | grep -iqF 'x86-64'; then
+  # WINEPREFIX to not mess with default ~/.wine (and 32 bit)
   export WINEPREFIX=~/.wine32
   export WINEARCH=win32
 fi
+
+# WINEPATH to find dlls (or they should lie near *.exe)
+# export WINEPATH=/usr/${TARGET}/bin
+
 exec wine "$@"

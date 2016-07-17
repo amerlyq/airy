@@ -12,8 +12,11 @@ if distro arch; then
     # SEE: https://forum.antergos.com/topic/818/can-t-run-my-vitualbox/4
     # dkms autoinstall  # For custom, also: pkg_inst virtualbox-host-dkms
 
+    pkg_inst net-tools  # NEED for bridge network and host-only to assign host ip
+
     # now this command should work :)
-    sudo modprobe -a vboxdrv vboxnetflt vboxpci vboxnetadp
+    # sudo modprobe -a vboxdrv vboxnetflt vboxpci vboxnetadp
+    # sudo vboxreload  # reload modules after update
 
     # you may run this
     # sudo /sbin/rcvboxdrv -h
