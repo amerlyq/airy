@@ -466,7 +466,9 @@ PROFILING
 		: 17303 read(0, "j", 4096)                = 1
 		: 17303 recvmsg(4, 0x7ffdc2d32400, 0)     = -1 EAGAIN (Resource temporarily unavailable)
 		: (repeat ~ 400 lines)
-		А ещё говорят тормозит cursorline...
+		А ещё говорят тормозит :set cursorline
+        Slow scrolling -- syntax/regex profiling
+            http://eduncan911.com/software/fix-slow-scrolling-in-vim-and-neovim.html
     Profile
 		:profile start profile.log
 		:profile func *
