@@ -5,6 +5,13 @@
 # http://stackoverflow.com/questions/7773939/show-git-ahead-and-behind-info-for-all-branches-including-remotes
 # FIXME: remove currently active branch from showed list
 # THINK: replace my jobs by 'parallel' (and extract jobs in separate script)
+#   OR: try xarg -P 8
+# DEV:
+#   * go through all and do 'git fetch'
+#   = as I see status of all branches -- there no need for git-up
+#   * go find all 'behind w/o ahead' and make merges
+#     ALT: 'pull --rebase with stash' but w/o internet access
+#   * search '.freeze' file up in dir tree -- adding dir1/dir2/$rep accordingly
 
 # Options
 DIR=$PWD
@@ -87,7 +94,8 @@ function gita_st { # $1 -- rep name, $2 -- suffix
 # }
 
 # USE $ gem install git-up  # SEE http://aanandprasad.com/git-up/
-if ((!$+commands[git-up])); then
+# DISABLED:(git-up) -- became very bugged
+# if ((!$+commands[git-up])); then
   function git-up() { local clean=1 common
     # ALT: git diff-index --name-only --ignore-submodules HEAD --
     git diff-files --quiet --ignore-submodules -- || clean=0
@@ -103,7 +111,7 @@ if ((!$+commands[git-up])); then
     # common=$(git merge-base HEAD @{u}@{1})
     # git ${GCFG[@]} rebase --autostash --onto @{u} $common
   }
-fi
+# fi
 
 function gita_pl { head_name "$1"
     gita_st "$1" && git-up 2>&1 && gita_st "$1" "\n"
@@ -157,13 +165,17 @@ for rep in "${LST[@]}"; do
 done
 
 function worker {
-  (cd "$DIR/$1" && O=$(git_process "$1"); [[ -z $O ]] || echo "$O")
+  (cd "$DIR/$1" && O=$(git_process "$1");
+   [[ -z $O ]] || echo "$O")
 }
 
 function main {
   for rep in "${LST[@]}"; do
+    # EXPL don't update ignored repos
+    if [[ $FUN == pl ]] && grep -qsxF "$rep" $DIR/.freeze; then continue; fi
     # EXPL process jobs in bunches
     ((0==THREADS || $#jobstates < ${THREADS:-1})) || wait
+    [[ $FUN != pl ]] || echo ">> $rep"
     eval worker "$rep" $( ((bSEQ)) || echo '&' )
   done && wait
 }

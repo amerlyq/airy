@@ -198,18 +198,27 @@ Manipulations
 		: https://github.com/vim-scripts/swapcol.vim
 		: https://github.com/vimsmartcols/vimsmartcols
 	[_] DEV List manipulation (for forestanza?)
-        Delimiter textobj -- word separator: /,\s+/ /\s+/ /\s+\n\s+/
-		List textobj -- bare words and inside block of pairs
-			Srrnd: add/remove brackets -- treat whole list as textobj
-		Multiline list
-		Change list delimiter  ', ' -> '/' -> '|' -> '>' -> ',' -> ' + '
-			Space: no/left/right/surr
-			Delim: predefined/getchar
-		Apply operator to each element -- like surround, append/prepend, etc
-		Vertical lists (columns)
-		on 'J' join column with delimiter
-		on ?? split list in column
-		: THINK -- search for yaml -- to flatten/unfold -- I saw smth on gh.
+    textobj
+      whole list
+        ? As extension to textobj-user
+        bare words or all inside block of pairs
+        vertical lists (columns)
+      elements
+        word/keyword only
+          Space: no/left/right/surr
+      delimiter
+        separators: /./ /,\s+/ /\s+/ /\s+\n\s+/
+        predefined (usefule for multichar like ',\s', '->')
+        getchar (for 1 symbol as sep)
+    operators
+      srrnd: add/remove brackets to whole list
+      change list delimiter
+        ',\s' | '/' | '|' | '>' | ',' | '\s+\s'
+      ? DEV:FIND: applying operators _foreach_ element
+        # like surround, append/prepend, etc
+      on 'J' join column with delimiter
+      on ?? split list in column
+    THINK -- search for yaml -- to flatten/unfold -- I saw smth on gh.
 		<ALL which github has>
 		: https://github.com/taku-o/vim-reorder-columns
 		: https://github.com/leothelocust/vim-makecols
