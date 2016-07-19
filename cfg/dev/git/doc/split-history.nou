@@ -22,7 +22,7 @@ Check diff directly between commits (cherry)
 %%%% NEW (short)
 
   Clone clean tmp copy of repo to split
-    $ git clone /path/to/repo && cd repo
+    $ git clone --no-hardlinks /path/to/repo && cd repo
     $ git remote rm origin  # prevent incidential push to original repo
 
   Use subtree to split repo ALT@1
@@ -62,6 +62,9 @@ HACK change wrong date (NOTE: order of _pull branch_ is independent)
     $ git remote add origin <url-of-new-repository>
     $ git push -u origin master
 
+  Purge dir from original repo
+  # better also make copy | or clone with '--no-hardlinks'
+    $ git filter-branch --force --prune-empty --index-filter 'git rm -rf --cached --ignore-unmatch path/rel/folder' -- HEAD
 
 %%%% OLD (full)
 
@@ -171,10 +174,7 @@ Remove all other commits beside folder-in-question
 
   This will be much faster. As index-filter works on the index while
   tree-filter has to checkout and stage everything for every commit.
-  $ git filter-branch --index-filter "git rm -r -f --cached --ignore-unmatch ABC" --prune-empty HEAD
-  # You probably wish to use -f (force) on this command if you do it more than
-  # once, e.g., to remove two directories after they have been separated.
-  # Otherwise you will get "Cannot create a new backup."
+  $ git filter-branch -f --prune-empty --index-filter "git rm -r -f --cached --ignore-unmatch ABC" HEAD
 
 However, you can't "push" deletes to github and the like. If you try you'll get
 an error and you'll have to git pull before you can git push - and then you're

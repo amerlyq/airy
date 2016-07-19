@@ -1,0 +1,26 @@
+Regrouping commits
+: http://arjanvandergaag.nl/blog/clarify-git-history-with-merge-commits.html
+  Cancel rebase in vim
+    :%d|x  -- delete all and save
+    :cq!   -- exit with error code
+  Rebase non-interactively
+  : http://stackoverflow.com/questions/12394166/how-do-i-run-git-rebase-interactive-in-non-interactive-manner
+    GIT_SEQUENCE_EDITOR=<script> git rebase -i <params>
+    :: Fix typo in several last commits
+    : EDITOR="sed -i -e 's/borken/broken/g'" GIT_SEQUENCE_EDITOR="sed -i -e 's/pick/reword/g'" git rebase -i HEAD~5
+  Squash several into one
+    git rebase -i HEAD~3
+     This will bring you into your editor with some text that will look
+     something like this:
+     : pick df94881 Allow install to SD
+     : pick a7323e5 README Junkyism
+     : pick 3ead26f rm classpath from git
+    To squash those commits into one, change to something like this:
+     : pick df94881 Allow install to SD
+     : squash a7323e5 README Junkyism  (ALT:  s a7323e5 README...)
+     : squash 3ead26f rm classpath from git
+    Also, you can rearrange them before it and squash 1st and 3rd
+    : pick df94881 Allow install to SD
+    : squash 3ead26f rm classpath from git
+    : pick a7323e5 README Junkyism
+  Then change it's commit message in editor

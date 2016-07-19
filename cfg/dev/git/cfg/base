@@ -21,6 +21,9 @@
     ; if [[ $(git --version|awk '{n=split($NF,a,".");for(i=1;i<=n;i++)\
     ;     printf("%02d",a[i])}') > '01080000' ]]; then echo simple; else echo current; fi
 
+[commit]
+    verbose = true
+
 [format]
     pretty = oneline
 #[credential]

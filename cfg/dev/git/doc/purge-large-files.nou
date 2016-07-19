@@ -1,0 +1,36 @@
+Remove big/large/binary/old files
+  SEE
+    http://blog.jessitron.com/2013/08/finding-and-removing-large-files-in-git.html
+    2015-12-19 [X] http://naleid.com/blog/2012/01/17/finding-and-purging-big-files-from-git-history
+  SHA for each file
+    git rev-list --objects --all | sort -k 2
+  Unique files through all history
+    git rev-list --objects --all | sort -k 2 | cut -f 2 -d\  | uniq
+  Size statistics
+    git gc && git verify-pack -v .git/objects/pack/pack-*.idx \
+      | egrep "^\w+ blob\W+[0-9]+ [0-9]+ [0-9]+$" \
+      | sort -k 3 -n -r > bigobjects.txt
+    for SHA in `cut -f 1 -d\  < bigobjects.txt`; do
+      echo $(grep $SHA bigobjects.txt) $(grep $SHA allfileshas.txt) \
+      | awk '{print $1,$3,$7}' >> bigtosmall.txt
+    done
+  Purge from history
+    git filter-branch --prune-empty \
+    --index-filter 'git rm -rf --cached --ignore-unmatch <file>'\
+    --tag-name-filter cat -- --all
+  Check size reduction
+    git clone --no-hardlinks file:///full/path/to/repo repo-clean
+    du -s *(/)
+  Clean history
+  : By default, Git keeps changes around for 30 days before they can be
+  : garbage-collected. If you want to remove them now:
+    git reflog expire --expire=1.minute refs/heads/master
+    : all deletions up to 1 minute  ago available to be garbage-collected
+    git fsck --unreachable
+    : lists all the blobs(file contents) that will be garbage-collected
+    git prune && git gc
+  ALT:(aggressive) clean history (~/.bin/utils.d/gita-remove-all-history)
+    rm -rf .git/refs/original/
+    git reflog expire --all
+    git gc --aggressive --prune
+

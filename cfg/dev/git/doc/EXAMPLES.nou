@@ -1,0 +1,224 @@
+Change
+  Commiter/Author
+    Simple
+      git commit --amend --date="Wed Feb 16 14:00 2011 +0100"
+      GIT_COMMITTER_DATE="Wed Feb 16 14:00 2011 +0100" git commit --amend
+    Batch
+    : git filter-branch --env-filter \
+    :   'if [ $GIT_COMMIT = 119f9ecf58069b265ab22f1f97d2b648faf932e0 ]
+    :   then
+    :     export GIT_AUTHOR_DATE="Fri Jan 2 21:38:53 2009 -0800"
+    :     export GIT_COMMITTER_DATE="Sat May 19 01:01:01 2007 -0700"
+    :   fi'
+
+git difftool -t meld <commit> <commit> [<path_to_file_to_compare>]
+
+View old files
+  Current dir in older revision
+    git show 'HEAD~20:./'
+    git show 'master:HEAD~20:./'
+    git ls-tree 'HEAD~20'
+    git cat-file blob 'HEAD~20'
+
+
+Git Trick: Preview before pull
+  http://entrenchant.blogspot.com/2013/06/git-trick-preview-before-pull.html
+
+  Diff remote and origin before merge:
+    git fetch
+    git log HEAD..origin  # show the log entries between commit/origin
+    git log -p HEAD..origin  # show each patch
+    git diff HEAD...origin  # show a single diff
+    git merge
+
+Create Repository
+  mkdir meridia
+  cd meridia
+  git init
+  touch README
+  git add README
+  git commit -m 'first commit'
+  git remote add origin git@gitlab.com:freestylex/meridia.git
+  git push -u origin master
+Existing Git Repo?
+  cd existing_git_repo
+  git remote add origin git@gitlab.com:freestylex/meridia.git
+  git push -u origin master
+Workflow
+  git reset --hard ORIG_HEAD | hg update --clean (or 'hg up -C' for short)
+
+Ignore after commit
+  git rm --cached
+  git update-index --assume-unchanged [path]
+
+Add remote branch
+  git ls-remote --heads origin
+  git fetch $(git config --get remote.origin.url) fix-popen-shell:fix-popen-shell
+  git remote show origin
+  gco fix-popen-shell
+
+Reverting (unapplying) a bad commit:
+  git revert sha1_of_commit
+
+Delete
+  Delete a local branch:
+    git branch -d some_branch_name
+  Really delete a local branch, even if git complains about it in the previous command:
+    git branch -D some_branch_name
+  Delete a remote branch, e.g. in Github:
+    git push origin :some_branch_name
+
+dig through all the commits, even ones that were no longer part of the log
+because of an accidental overwriting during interactive rebasing
+  git reflog
+lists you all the blobs associated with the repo path
+  git rev-list --all --objects -- path/to/file.txt
+To get a specific version of a file
+  git cat-file -p commitid:path/to/file.txt
+< See composition of those methods inside 'piony/scripts/show-changelog'
+
+
+Split branch in feature-branches
+  git checkout master
+  : o-o-X (master HEAD)
+  :     \ q1a--q1b (quickfix1 HEAD)
+  :              \ q2a--q2b (quickfix2 HEAD)
+  git rebase --onto master quickfix1 quickfix2
+  OR: git cherry-pick quickfix1..quickfix2
+  :      / q2a'--q2b' (new quickfix2 HEAD)
+  : o-o-X (master HEAD)
+  :      \ q1a--q1b (quickfix1 HEAD)
+
+Workflow to keep DEV on bleeding edge and allow to propose atomic PR
+  : ATTENTION: rebasing/deleting involves history rewriting and all local
+  : copies of involved branches after forced push become out-of-sync
+  : so them need to be re-cloned again.
+  * move  all your commits into separate ```dev_backup``` branch to preserv your work
+    git checkout master && git branch dev_backup
+  * revert your master and sync it with trunk origin
+    git reset --hard #hash_of_first_commit
+    git pull https://github.com/rking/ag.vim.git master
+  * create feature-branches on base of this synced master -- all of them from same ```master/HEAD```
+    git branch #(fix|feature|enhancement)_\w+
+  * isolate and distribute yours/mine changes between those feature-branches
+    git checkout #name && git cherry-pick #hash
+  * make tests and travis as separate dependent feature-branches
+  * squash all rejected/overwritten changes in FB before merging anywhere
+  * when all old features from ```dev_backup``` will be distributed, delete ```dev_backup``` branch.
+  * use ```master``` as main dev branch and merge all FB into it periodically for CI with travis
+  * rebase/merge ```master``` with ```trunk/master``` when PR accepted, delete corresponding FB.
+  * all complete features, with PR yet not merged by trunk, rebased on ```trunk/master``` separately
+  * all new features in progress
+    * branched from last ```master```
+    * after things done, branch is rebased onto last ```trunk/master```
+    * and merged back into ```master``` for testing with CI
+    * then sent to trunk maintainer for PR.
+  After PRs will be merged, you can delete those feature-branches, retaining clean branch list.
+
+
+Feature branch
+  http://arjanvandergaag.nl/blog/clarify-git-history-with-merge-commits.html
+  SEE: http://ginsys.eu/git-and-github-keeping-a-feature-branch-updated-with-upstream/
+  SEE: http://railsware.com/blog/2014/08/11/git-housekeeping-tutorial-clean-up-outdated-branches-in-local-and-remote-repositories/
+  Local:
+    https://techbase.kde.org/Development/Git/Feature_Branch_Workflow
+    https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
+
+Replace master by detached commit
+  Localize detached commit to tmpbr
+    git branch tmpbr
+  Replace master by tmpbr (with strategy 'ours')
+    git checkout tmpbr
+    git merge -s ours master
+    git checkout master
+    git merge tmpbr
+  Clean
+    git branch -d tmpbr
+
+Selection
+  Full SHA1
+  Partial SHA1 - at least 4 characters and unique
+  branch^ first parent
+  branch^2 merge parent
+  branch~5 five first-parents back
+  branch:path/to/file directly get a blob
+  branch@{yesterday} local date based reference
+  branch@{5} the 5th last value of branch (locally)
+
+
+Patching
+ For example, I once used git diff to generate a patch for a folder that was
+ missing it's .git directory, and then applied that patch to a live
+ environment (patching a test VM):
+  git diff --no-index --diff-filter=MRC -- ./lib ../myapp/lib > my.patch
+  cd ../myapp/
+  git apply ../myapp-git/my.patch
+
+Grep
+  git grep -e foo --or -e bar --not -e baz
+   Grep for foo or bar, but exclude the expression baz.
+  git grep --untracked foo
+   Include untracked files in grep.
+  git grep --cached foo
+   Include cached (staged) files in grep.
+  git grep --no-index foo /var/bar
+   Use "git grep" instead of regular grep, grep for foo in /var/bar.
+
+
+Git hooks
+  Installing:
+    cp pre-commit.sh .git/hooks/pre-commit
+    chmod a+x .git/hooks/pre-commit
+  Examples:
+    deploying a static website
+    checking commits and doing cleanup
+    integration with external systems
+    email notifications
+  Deploying over git, with a post-update checkout hook
+
+Stash
+  git stash list
+  git stash apply stash@{0}
+  git stash drop stash@{0}
+
+Git works over ssh
+ If all you need is a place for storage, you just need sshd and disk space.
+  Setting up a remote repository
+    Make local repo, commit stuff, etc.
+    ssh to the server:
+      GIT_DIR=/path/to/repo git init --shared
+    Next, tell the local repo about the server:
+      git remote add origin git+ssh://hostname/path/to/repo
+    Push to the server from the local repo:
+      git push origin master
+    Clean up the local repo so that you can pull from the remote server:
+      git config branch.master.remote origin git config branch.master.merge refs/heads/master
+
+Whitelisting a directory (note: needs the rest of the path):
+  static/mixu.net/blog/*
+  !static/mixu.net/blog/assets/
+
+Resources
+  Create a orphan branch (no history) for storing documentation or resources:
+    git checkout --orphan
+
+Create local git server
+  On Server
+    mkdir -p /var/rep/project.git
+    cd /var/rep
+    chown user:group ./project.git
+    cd project.git
+    git init --bare --shared=group
+  On Client (first)
+    git clone ssh://yourserver.com/var/rep/project.git
+    cd project && touch README && git add README
+    git commit -m "Initial import"
+    git push origin master
+
+
+Remove 'origin/HEAD'
+: Points to branch checked out by default (i.e. when you clone).
+  git remote set-head origin -d
+
+Show author and commiter
+  git show --format=full

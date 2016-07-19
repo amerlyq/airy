@@ -1,0 +1,35 @@
+Log
+  lg = log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'\n--abbrev-commit --date=relative
+  Friendly dates
+    git log HEAD@{one.day.ago}
+  git log staging -1 -p -- my/subdir
+   Show the latest commit that affects the my/subdir path on the branch "staging" with the patch
+  git log --stat -- .
+   Show the changed files only in current dir.
+  git log --grep='.foo.'
+   Grep for a specific log message.
+  git log --since="1 week ago" --until="2 weeks ago"
+   Filter commits by date.
+  git shortlog -sn
+   Shows a "top contributors list" by commits.
+
+  git help log
+    git diff --cached  | diff with staged changes
+    git diff --binary  | create diff with patch
+    git diff -U file   | give you a unified diff
+    git diff HEAD^ --word-diff | Ignore whitespace?
+    git show HEAD      | changes inside last commit
+    git blame filename | last author for each text line
+    git blame abce1234^ path/to/file
+     See the blame, starting one commit before abce1234. E.g. when you
+     need to trace back a particular line of code in history.
+  Follow its renames, on all branches:
+    git log --follow --all --stat -- file.c | commits, changing file
+    git log --follow --all -p file.c        | same, with diff
+    tig --follow --all -p file.c            | same, in viewer
+   if the file named bar was once named foo, then git log -p bar (without
+   the --follow option) will only show the file's history up to the point
+   where it was renamed -- it won't show the file's history when it was
+   known as foo.
+  Commits
+    git diff --name-status --oneline HEAD~10 HEAD~5
