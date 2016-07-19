@@ -4,7 +4,7 @@ module XMonad.Config.Amer.Navigation (
 ) where
 
 import Data.Default                 (def)
-import XMonad                       (gets, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen)
+import XMonad                       (gets, spawn, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen)
 import XMonad.StackSet              (view, shift, currentTag, shiftWin)
 import XMonad.Actions.CycleWS       (findWorkspace, screenBy, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
@@ -55,7 +55,7 @@ panels =
 -- -- if on currentFocused -- shiftHere was pressed again
 markNgo =
   [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [1..12], (m, f) <-
-    [ ("M-S-", \n -> withFocused $ setTags ["F" ++ show n])
+    [ ("M-S-", \n -> withFocused (setTags ["F" ++ show n]) >> spawn ("r.n Marked F" ++ show n))
     , ("M-"  , \n -> focusUpTaggedGlobal ("F" ++ show n))
     , ("M-C-", \n -> withTaggedGlobalP ("F" ++ show n) shiftHere)
     ]

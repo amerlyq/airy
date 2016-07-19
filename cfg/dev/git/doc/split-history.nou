@@ -1,0 +1,203 @@
+%%%%% Split repository
+
+  http://gbayer.com/development/moving-files-from-one-git-repository-to-another-preserving-history/
+  https://help.github.com/articles/splitting-a-subfolder-out-into-a-new-repository/
+  http://blog.mattsch.com/2015/06/19/move-directory-from-one-repository-to-another-preserving-history/
+  http://stackoverflow.com/questions/1365541/how-to-move-files-from-one-git-repo-to-another-not-a-clone-preserving-history
+
+WARNING The problem with this is if files that are *currently* in
+directory 1 but previously were not will have history before the move lost.
+
+  http://stackoverflow.com/questions/14759345/how-to-split-a-git-repository-and-follow-directory-renames
+  http://stackoverflow.com/questions/6638019/detach-subdirectory-that-was-renamed-into-a-new-repo
+  http://stackoverflow.com/questions/359424/detachmove-subdirectory-into-separate-git-repository
+    !! http://stackoverflow.com/questions/359424/detachmove-subdirectory-into-separate-git-repository/17864475#17864475
+  http://stackoverflow.com/questions/1365541/how-to-move-files-from-one-git-repo-to-another-not-a-clone-preserving-history
+
+Check diff directly between commits (cherry)
+# To understand how 'subtree' splitted some commits.
+  http://stackoverflow.com/questions/1191282/how-to-see-the-changes-between-two-commits-without-commits-in-between
+
+
+%%%% NEW (short)
+
+  Clone clean tmp copy of repo to split
+    $ git clone /path/to/repo && cd repo
+    $ git remote rm origin  # prevent incidential push to original repo
+
+  Use subtree to split repo ALT@1
+    ! But it don't keep/recreate the same dir structure
+      [_] FIND: pulling external branch into subdirectory
+    ! And if you move files manually -- git log history will be available only with '--follow'
+      [_] CHECK: history after renaming is lost
+
+    $ git subtree split -P path/rel/folder -b folder-only-A --ignore-joins  # OR --rejoin
+    # NOTE: no leading/trailing prf/sfx for folder
+
+!!! HACK: you may export each part between folder renaming
+as separate branches and then rebase them onto each other
+
+HACK batch update commit messages
+# https://davidwalsh.name/update-git-commit-messages
+  $ git filter-branch -f --msg-filter 'sed "s/(cmake)//"' 6214898..HEAD
+
+HACK reset wrong author
+  $ git commit --amend --reset-author
+HACK change wrong date (NOTE: order of _pull branch_ is independent)
+  $ git log --pretty=format:%ad
+  $ git commit --amend --date="Wed Feb 16 14:00 2011 +0100"
+  $ GIT_COMMITTER_DATE="Wed Feb 16 14:00 2011 +0100" git commit --amend
+
+
+  Directly push in new repo
+    $ git push <new-repo> folder-only-A:master
+  OR use clean new repo (or dirty)
+    $ git init
+    # W/o --no-rebase you won't be able to rearrange merge order
+    $ git pull --no-rebase /path/to/repo-A folder-only-A:new
+    $ git rebase --onto master --root new
+    $ git checkout master
+    $ git merge new
+    $ git branch -d new
+    $ git remote add origin <url-of-new-repository>
+    $ git push -u origin master
+
+
+%%%% OLD (full)
+
+
+% Export
+Remove all other commits beside folder-in-question
+    ! BETTER:ALT@1:(subtree) for git>=1.7.11 (May 2012)
+    1) If directory never moved
+      # => the result will be repositoryA containing the contents of
+      #    directoryToKeep directly, which is also reflected in all the commits
+      $ git filter-branch --prune-empty --subdirectory-filter ./cmake/cross -- --all
+      # $ git filter-branch --prune-empty --subdirectory-filter <folder> <branch>
+
+    2) Keep history with renaming, if you know precise list
+      # One project was renamed NAME1 -> NAME2 -> NAME3 during its lifetime.
+      = Delete all beside these three dirs -> and move content into the root
+
+      $ git filter-branch --prune-empty --index-filter '
+      $   # Delete files which are NOT needed
+      $   git ls-files -z | egrep -zv  "^(NAME1|NAME2|NAME3)" |
+      $       xargs -0 -r git rm --cached -q
+      $   # Move files to root directory
+      $   git ls-files -s | sed -e "s-\t\(NAME1\|NAME2\|NAME3\)/-\t-" |
+      $     GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
+      $     git update-index --index-info &&
+      $     ( test ! -f "$GIT_INDEX_FILE.new" \
+      $       || mv -f "$GIT_INDEX_FILE.new" "$GIT_INDEX_FILE" )
+      $ '
+      NOTE I needed to test if "$GIT_INDEX_FILE.new" exists since import of svn
+      into git creates commits without any files (directory-only commits).
+      Needed only if the repo was created with 'git svn clone' initially.
+
+  Recreate directory structure
+    0) additional renaming commit, BUT old history accesible only with '--follow'
+      $ mkdir -p <directory 1>
+      $ git mv -k * <directory 1>
+      $ git add .
+      $ git commit
+
+    1) Don't want one massive commit
+      > managed to do what you say by replacing line 4 with
+      $ git filter-branch --tree-filter 'rm -rf $(ls | egrep -v <directory1>)' -- --all
+      which causes the filter to remove unneeded things instead of just
+      selecting that one directory.
+
+    2) Fixing commits pathes
+      $ git filter-branch --prune-empty --tree-filter '
+      $ if [[ ! -e foo/bar ]]; then
+      $ mkdir -p foo/bar
+      $ git ls-tree --name-only $GIT_COMMIT | xargs -I files mv files foo/bar
+      $ fi'
+
+    3) Rewriting commits history
+      Replace directoryToKeep with your actual directory before, and
+      execute the following command using index-filter this time:
+      $ git filter-branch --index-filter '
+      $   git ls-files -sz |
+      $   perl -0pe "s{\t}{\tdirectoryToKeep/}" |
+      $   GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
+      $     git update-index --clear -z --index-info &&
+      $     mv "$GIT_INDEX_FILE.new" "$GIT_INDEX_FILE"
+      $ ' HEAD
+
+
+% Clean-up
+  There might be old untracked files.
+  You can clean up the repository with the following commands:
+    $ git reset --hard
+    $ git gc --aggressive
+    $ git prune
+    $ git clean -df
+  Check all is OK
+    $ git log
+
+% Import
+  Use clean new repo
+    $ git init
+    $ git pull /path/to/repo-A folder-only-A
+    $ git remote add origin <url-of-new-repository>
+    $ git push -u origin master
+
+  OR Pull folder with history
+    $ git clone url/repo-B && cd repo-B
+    $ git remote add repo-A-branch /path/to/repo-A
+    $ git pull --no-rebase repo-A-branch master
+    $ git remote rm repo-A-branch
+    Make into repo
+    $ git remote -v
+    $ git remote set-url origin https://github.com/$user/$new_name.git
+    $ git push -u origin BRANCH-NAME
+
+  # SECURITY NOTE: this operation can be dangerous if you are trying to
+  # move isolated content from private repository into public one.
+  # filter-branch modifies history, but it seems, that all original
+  # objects, that were present in source repository, are left intact
+  # inside .git folder in the resulting repository. At least `git gc
+  # --aggressive --force` shows the same number of objects in both repos.
+  # Be careful.
+
+% Removing
+  [_] BUT how to remove exported folder from original repo ?
+
+  Of course, test it in a 'clone --no-hardlinks' repository first, and follow it with the reset, gc and prune commands Paul lists.
+  $ git filter-branch --prune-empty --tree-filter 'rm -rf <name-of-folder>' HEAD
+  # After that you can check that your file or folder no longer shows up in the git history at all
+  $ git log -- <name-of-folder> # should show nothing
+
+  This will be much faster. As index-filter works on the index while
+  tree-filter has to checkout and stage everything for every commit.
+  $ git filter-branch --index-filter "git rm -r -f --cached --ignore-unmatch ABC" --prune-empty HEAD
+  # You probably wish to use -f (force) on this command if you do it more than
+  # once, e.g., to remove two directories after they have been separated.
+  # Otherwise you will get "Cannot create a new backup."
+
+However, you can't "push" deletes to github and the like. If you try you'll get
+an error and you'll have to git pull before you can git push - and then you're
+back to having everything in your history.
+
+So if you want to delete history from the "origin" - meaning to delete it from
+github, bitbucket, etc - you'll need to delete the repo and re-push a pruned
+copy of the repo. But wait - there's more! - If you're really concerned about
+getting rid of a password or something like that you'll need to prune the
+backup (see below).
+
+% [NOT] clean local history
+So if you really want to empty the trash to reduce the clone size of a repo
+immediately you have to do all of this really weird stuff:
+  $ rm -rf .git/refs/original/ && \
+  $ git reflog expire --all && \
+  $ git gc --aggressive --prune=now
+
+  $ git reflog expire --all --expire-unreachable=0
+  $ git repack -A -d
+  $ git prune
+
+That said, I'd recommend not performing these steps unless you know that you
+need to - just in case you did prune the wrong subdirectory, y'know? The backup
+files shouldn't get cloned when you push the repo, they'll just be in your
+local copy.

@@ -193,10 +193,11 @@ call dein#add('rhysd/committia.vim', {
 
 
 "" CHECK Git-frontend, overhaul {{{1
+" BUG:(lazy) v +Gitv  -- Not a git repository
 " TODO: use more often, analyze more of help
 " ALT: lambdalisue/vim-gita
 " EXPL:(post-hook) Check if already inside some repository
-call dein#add('tpope/vim-fugitive', {
+call dein#add('tpope/vim-fugitive', {'lazy': 0,
   \ 'augroup': 'fugitive',
   \ 'on_cmd': ['Git', 'Gstatus', 'Gdiff', 'Glog',
   \   'Gbrowse', 'Gblame', 'Gwrite'],
