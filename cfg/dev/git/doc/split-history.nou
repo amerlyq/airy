@@ -61,6 +61,12 @@ HACK change wrong date (NOTE: order of _pull branch_ is independent)
     $ git branch -d new
     $ git remote add origin <url-of-new-repository>
     $ git push -u origin master
+  OR pull into orphan
+    $ git remote add repoB url_to_repoB
+    $ git fetch repoB
+    $ git checkout --orphan other-master
+    $ git rm -fr .
+    $ git merge repoB/master
 
   Purge dir from original repo
   # better also make copy | or clone with '--no-hardlinks'

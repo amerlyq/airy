@@ -173,11 +173,11 @@ call dein#add('jaxbot/github-issues.vim', {
 
 
 "" Multiwindow diff/note regime for git commit/[--amend] {{{1
-" EXPL: Can't lazy. SEE https://github.com/Shougo/neobundle.vim/issues/434
-" NOTE: If no commit message, start with insert mode
+" ATTENTION: for reword you need option:  .gitconfig/[commit]/verbose=true
 " FIXME:REQ: multicolumn has bug
 "   let g:committia_use_singlecolumn = 1
 "   let g:committia_min_window_width = 160
+" EXPL: If no commit message, start with insert mode
 call dein#add('rhysd/committia.vim', {
   \ 'hook_source': "
 \\n   let g:committia_hooks = {}
@@ -197,7 +197,7 @@ call dein#add('rhysd/committia.vim', {
 " TODO: use more often, analyze more of help
 " ALT: lambdalisue/vim-gita
 " EXPL:(post-hook) Check if already inside some repository
-call dein#add('tpope/vim-fugitive', {'lazy': 0,
+call dein#add('tpope/vim-fugitive', {
   \ 'augroup': 'fugitive',
   \ 'on_cmd': ['Git', 'Gstatus', 'Gdiff', 'Glog',
   \   'Gbrowse', 'Gblame', 'Gwrite'],
@@ -220,7 +220,7 @@ call dein#add('tpope/vim-fugitive', {'lazy': 0,
 "   co: checkout, S: diffstat, yc: copy SHA
 "   x/X: next/previous branching point
 " CHG: \ 'on_map': [ [Git]v, [Git]V ] -- file/full view
-call dein#add('gregsexton/gitv', {
+call dein#add('gregsexton/gitv', {'lazy': 0,
   \ 'on_cmd': 'Gitv',
   \ 'depends': 'vim-fugitive',
   \ 'hook_add': "

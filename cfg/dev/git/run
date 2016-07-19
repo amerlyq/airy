@@ -6,7 +6,9 @@
 # FIXME: remove currently active branch from showed list
 # THINK: replace my jobs by 'parallel' (and extract jobs in separate script)
 #   OR: try xarg -P 8
+#   MAYBE:(parallel) will be able to sort output and print as query available?
 # TRY git pull --autostash
+# ENH: status for submodules
 # DEV:
 #   * go through all and do 'git fetch'
 #     WARNING: fetch+rebase has unrepairable pitfalls
@@ -77,7 +79,7 @@ function head_name {
 
 function gita_st { # $1 -- rep name, $2 -- suffix
     local stm=$(git log -1 --pretty=format:'%ci' | awk '{print $2,$1}')
-    local name=$(printf "%+${WCOL:-17}s" "$1")
+    local name=$(printf "%-${WCOL:-17}s" "$1")
     # ALT "$(print -P "%F{6}${rep:h}/%f${rep:t}")"
     regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
     # TODO: replace awk by ZSH line-splitting
@@ -159,7 +161,8 @@ function git_process {
 ## DEV
 # Different color for found submodules (yellow), and show them only in status.
 # Allow to specify cmd together with status to apply for all repo, but disallow for pull/push.
-LST=( "$DIR"/**/.git(-/^D:h) )
+# LST=( "$DIR"/**/.git(-/^D:h) )
+LST=( "$DIR"/**/.git(-^D:h) )
 LST=( ${${^${^LST##$DIR}#/}:-.} )
 
 # Search min pr rep column width
