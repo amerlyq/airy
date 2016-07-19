@@ -19,9 +19,16 @@ set send_charset="us-ascii:utf-8"
 ## Order for display of the header fields
 # hdr_order From: Resent-From: Reply-To: X-Mailer: User-Agent: Date: To: Cc: Subject:
 set indent_str="> "         # Set quotemark to 1 byte
-# Collapse old messages
-set collapse_unread=no
+unset collapse_unread       # never collapse unread messages
+set uncollapse_jump         # jumps to first unread msg of thread on uncollapse
+set index_format="%M|%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
+ # %M
+# set index_format = "{%M} $index_format"
 folder-hook . 'push <collapse-all>'
+# folder-hook . 'push ":set collapse\_unread=no<enter>"'
+# SEE uncollapse_jump
+#   http://www.rdrop.com/docs/mutt/manual118.html
+# SEE auto_tag = true
 
 # confirmation skipping
 # set fast_reply=yes        # when replying, don't prompt for address

@@ -5,11 +5,15 @@
 #   http://www.mutt.org/doc/manual/#generic-map
 # ALSO
 #   https://github.com/skanev/dotfiles/blob/master/mutt/mappings
+#   !! https://github.com/mavam/dotfiles/blob/master/.mutt/keys
 #   http://www.tldp.org/HOWTO/Mutt-GnuPG-PGP-HOWTO-7.html
+# Collapsing
+#   http://technopragmatics.org/blog/2013/11/mutt-thread-collapsing-made-easy.html
 # SEE setup binds/etc depending on mailbox
 #   http://www.mutt.org/doc/manual/#folder-hook
 #   https://bitbucket.org/jasonwryan/shiv/src/tip/.mutt/muttrc
 #   http://unix.stackexchange.com/questions/172422/mutt-two-character-sequence-commands
+# WTF? list-reply
 # FIXME: don't jump to next/prev message when current is read till end
 # FIXME: don't close pager when moving up from first entry
 
@@ -21,13 +25,19 @@
 # TODO: move 'help' from <F1> to somewhere else. Like 'g?'
 
 # Switch folders
-macro index,pager  ,i  "<change-folder>!<enter>"       "Go to inbox"
-macro index,pager  ,l  "<change-folder>^<enter>"       "Go to last"
-macro index,pager  ,s  "<change-folder>=Sent<enter>"   "Go to sent"
+macro index,pager,browser  ,i  "<change-folder>!<enter>"       "Go to inbox"
+macro index,pager,browser  ,l  "<change-folder>^<enter>"       "Go to last"
+macro index,pager,browser  ,s  "<change-folder>=Sent<enter>"   "Go to sent"
 
 # EXPL: Trick to show contextual list of mailboxes
 macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'
+macro index \Ca <tag-pattern>~A<enter>   "select all"
+macro index  +  <limit>all<enter>        "limit reset"
 
+# EXPL: collapsing
+# macro index \R '<read-thread><collapse-thread><next-unread>' 'Mark the current thread as read'
+macro index '{' ':set my_oldcollapse_unread=$collapse_unread<enter>:set collapse_unread=yes<enter><collapse-thread>:set collapse_unread=$my_oldcollapse_unread<enter>' 'Collapse thread.'
+macro index '}' '{' '(Un)collapse thread.'
 # EXPL: Trick to open second copy of mutt to view mail beside editing answer
 # bind pager \Ce $TERMINAL -e mutt -R
 
@@ -41,10 +51,17 @@ bind editor \Cp  history-down
 bind editor \Cn  history-up
 bind editor \Cx  complete-query
 
-bind browser  h  exit
+bind browser  h  first-entry   # EXPL:(back) don't exists
 bind browser  l  select-entry
 # bind browser  j  next-entry       # generic
 # bind browser  k  previous-entry   # generic
+bind browser <Return>  view-file
+
+# TODO: generic
+bind index,pager  n  search-next
+bind index,pager  N  search-opposite
+bind index,pager \Cf next-page
+bind index,pager \Cb previous-page
 
 # EXPL: swap jk/JK for entry/undeleted
 bind index  l  display-message
@@ -52,18 +69,25 @@ bind index  j  next-entry
 bind index  k  previous-entry
 bind index  J  next-undeleted
 bind index  K  previous-undeleted
+bind index  H  top-page
+bind index  L  bottom-page
 # bind index  <Down>  next-entry
 # bind index  <Up>    previous-entry
+bind index <Space>  tag-entry
+bind index  za  collapse-thread
+bind index  zA  collapse-all
+bind index  =  limit
+bind index  0  first-entry
+bind index  G  last-entry
 
+# bind pager  ;  tag-prefix
 bind pager  h  exit
 bind pager  l  view-attachments
 bind pager  J  next-line
 bind pager  K  previous-line
 # bind pager  J  next-entry      # generic
 # bind pager  K  previous-entry  # generic
-# TODO: generic
-bind pager \Cf  next-page
-bind pager \Cb  previous-page
+
 # bind pager  gg  top
 # bind pager  G   bottom
 # bind generic <Home> first-entry

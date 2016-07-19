@@ -1,5 +1,7 @@
 SEE
   https://dev.mutt.org/trac/wiki/MuttFaq/Action
+  Re-link messages to other threads
+  https://heipei.net/2009/09/10/mutt-threading-like-a-pro/
 
 Index
   y - show mailboxes
@@ -27,15 +29,19 @@ Useful shortcuts
   u - удалить маркер на удаление для выбранного письма
   o - сортировка
   q - выход
+  `$` - sync mail and purge all deleted
 
 Prompt
 | C-g | reset prompt
 
 View
 | l~N | limit view to only unread messages
+limit from <email.addr>
+:l ~f <email.addr>
 
 Move
 | t  | tag current entry
 | T  | tag by sender rgx
-| ~e | tag by subject rgx
+|  ~A| tag all
+|  ~e| tag by subject rgx
 | ;s | move tagged into folder ([;]tag-prefix + [s]ave)

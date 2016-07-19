@@ -21,6 +21,7 @@ EOT
 > "$dst"
 wopt "accs = {}"
 
+# FIXME: directly parse ~/.cache/mutt/acc/* instead of MAIL_CREDS
 for creds in "${MAIL_CREDS[@]}"; do
   wacc ${creds:?}
 done
