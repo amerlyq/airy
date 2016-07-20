@@ -76,7 +76,7 @@ alias gtn='git name-rev --name-only'  # Shows related to release tag name
 
 
 ## Diff
-alias gdf='git diff'
+alias gdf='git diff -M'  # don't show renamed files
 alias gdfs='gdf --stat'
 alias gdF='gdf HEAD...origin'  # with fetched
 alias gdo='gdf HEAD   origin/$(git-branch-current 2>/dev/null)'

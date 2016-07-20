@@ -12,6 +12,9 @@ Cool manual
     http://mislav.net/2014/02/hidden-documentation/
     http://orga.cat/posts/most-useful-git-commands
 
+  !!! Merge vs Rebase -- where each one is appropriate
+    https://medium.com/@porteneuve/getting-solid-at-git-rebase-vs-merge-4fa1a48c53aa
+
   [_] BUG: error: git lstd --graph died of signal 13
     git lgraph | head -1
     : SEE http://www.spinics.net/lists/git/msg196343.html
@@ -26,6 +29,21 @@ BAD rebase (logical mistakes)
 
 TRY: Git notes
   http://alblue.bandlem.com/2011/11/git-tip-of-week-git-notes.html
+
+Merge: ignore some files
+https://medium.com/@porteneuve/how-to-make-git-preserve-specific-files-while-merging-18c92343826b
+  Suppose we have production and develop configs in different branches
+    * urls and ports -> {production / local} server
+  Keep develop config when merging from master:
+  $ git config --global merge.ours.driver true
+  $ echo 'email.json merge=ours' >> .gitattributes
+  $ git add .gitattributes
+  $ git commit -m 'chore: Preserve email.json during merges'
+  SEE https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes
+
+Reuse conflict resolutions for merges
+  Fix conflicts only once with git rerere
+    https://medium.com/@porteneuve/fix-conflicts-only-once-with-git-rerere-7d116b2cec67
 
 DEBUG
   GIT_TRACE=1 git log --graph
