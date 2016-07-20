@@ -1,23 +1,5 @@
 #!/bin/zsh
 
-# TODO: enhance status to show for all branches (at least pull/push)
-# TODO: show unpushed branches
-# http://stackoverflow.com/questions/7773939/show-git-ahead-and-behind-info-for-all-branches-including-remotes
-# FIXME: remove currently active branch from showed list
-# THINK: replace my jobs by 'parallel' (and extract jobs in separate script)
-#   OR: try xarg -P 8
-#   MAYBE:(parallel) will be able to sort output and print as query available?
-# TRY git pull --autostash
-# ENH: status for submodules
-# DEV:
-#   * go through all and do 'git fetch'
-#     WARNING: fetch+rebase has unrepairable pitfalls
-#       http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
-#   = as I see status of all branches -- there no need for git-up
-#   * go find all 'behind w/o ahead' and make merges
-#     ALT: 'pull --rebase with stash' but w/o internet access
-#   * search '.freeze' file up in dir tree -- adding dir1/dir2/$rep accordingly
-
 # Options
 DIR=$PWD
 if [[ ! $DIR =~ ^$HOME/ ]]; then

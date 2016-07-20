@@ -1,5 +1,8 @@
 WARNING
   !!! https://codingkilledthecat.wordpress.com/2012/04/28/why-your-company-shouldnt-use-git-submodules/
+  2016-07-20 [X] !! ALT:READ: https://developer.atlassian.com/blog/2015/05/the-power-of-git-subtree/
+  ! ALT: https://medium.com/@porteneuve/mastering-git-submodules-34c65e940407
+  ~ http://www.catalyst.net.nz/blog/git-submodule-misunderstood-beast-or-remorseless-slavering-monster
 SEE
   http://developer-reactions.ruilopes.com/reaction/1446458443000
 
@@ -29,3 +32,58 @@ Submodules
     cd ..
     git add vendor
     git commit -m 'Updated vendor to latest version'
+
+  Relocate (change url)
+    http://pa1gitsolutions.blogspot.com/2015/07/changing-git-submodules-urlbranch-to.html
+    $  git config --file=.gitmodules -l
+    $  git config --file=.gitmodules submodule.Submod.url https://github.com/username/ABC.git
+    $  git config --file=.gitmodules submodule.Submod.branch Development
+    $  git submodule sync
+    $  git submodule update --init --recursive --remote
+
+  Attach to branch and update to it
+    http://stackoverflow.com/questions/1777854/git-submodules-specify-a-branch-tag
+    $ git submodule foreach -q --recursive 'branch="$(git config -f $toplevel/.gitmodules submodule.$name.branch)"; git checkout $branch'
+    # SEE command variations at aforementioned link
+    [_] TODO: integrate to r.git
+
+  Ignore
+    http://www.nils-haldenwang.de/frameworks-and-tools/git/how-to-ignore-changes-in-git-submodules
+    | [submodule "bundle/fugitive"]
+    | path = bundle/fugitive
+    | url = git://github.com/tpope/vim-fugitive.git
+    | branch = master
+    | ignore = dirty
+
+  Self-containing
+    # Define origin to be the absolute path to this repository - we'll remove this later:
+    $ cd /tmp/main/
+    $ git remote add origin /tmp/main/
+
+    # Now add the submodule:
+    $ git submodule add -b gh-pages ./ gh-pages
+    Initialized empty Git repository in /tmp/main/gh-pages/.git/
+    Branch gh-pages set up to track remote branch gh-pages from origin.
+
+    # Now .gitmodules looks sensible:
+    $ cat .gitmodules
+    | [submodule "gh-pages"]
+    |     path = gh-pages
+    |     url = ./
+
+    # However, the origin for the submodule isn't what we want:
+    $ cd gh-pages
+    $ git remote -v
+    origin  /tmp/main/ (fetch)
+    origin  /tmp/main/ (push)
+
+    # So remove it and add the right origin (just ".."):
+    $ git remote rm origin
+    $ git remote add origin ..
+OR  $ git config remote.origin.url <new_url>
+
+    BAD: after 'init/sync' all 'origin' in submodules are replaced by full
+    links/paths of superrepo instead of //..
+      TRY: using $ git clone --origin <name> https://superrepo
+        SEE g? submodule -- READ 'add' (bottom part)
+      TRY: $ git submodule --reference

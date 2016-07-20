@@ -1,0 +1,39 @@
+%%%%% GIT
+
+%% r.git
+
+% FIND:ALT:(multiple git repo management)
+Tools
+  https://github.com/mixu/gr
+  http://myrepos.branchable.com/
+    https://github.com/joeyh/myrepos
+
+  HOWTO
+    http://stackoverflow.com/questions/816619/managing-many-git-repositories
+    http://www.slideshare.net/roidelapluie/working-with-multiple-git-repositories
+
+  IDEA:
+  ! https://www.perforce.com/company/newsletter/2012/11/managing-projects-across-git-repositories
+  ! http://blogs.atlassian.com/2014/04/git-project-dependencies/
+
+% TODO
+  [_] MOVE: multi-thread workers/jobs into sep script in //shell/zsh
+  [_] TODO: enhance status to show for all branches (at least pull/push)
+  [_] TODO: show unpushed branches
+    http://stackoverflow.com/questions/7773939/show-git-ahead-and-behind-info-for-all-branches-including-remotes
+  [_] FIXME: remove currently active branch from showed list
+  [_] THINK: replace my jobs by 'parallel' (and extract jobs in separate script)
+    OR: try xarg -P 8
+    MAYBE:(parallel) will be able to sort output and print as query available?
+  [_] TRY git pull --autostash
+  [_] ENH: status for submodules
+
+% DEV
+  * go through all and do 'git fetch'
+    WARNING: fetch+rebase has unrepairable pitfalls
+      http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
+  = as I see status of all branches -- there no need for git-up
+  * go find all 'behind w/o ahead' and make merges
+    ALT: 'pull --rebase with stash' but w/o internet access
+  * search '.freeze' file up in dir tree -- adding dir1/dir2/$rep accordingly
+    [_] Sync '.freeze' through private *mod*
