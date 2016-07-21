@@ -3,13 +3,14 @@ THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD" ~/.mutt
+linkcp "$PWD" ~/.mutt
+linkcp ./cfg/theme-$THEME ~/.cache/mutt/theme
 
 dst=~/.cache/mutt
 (cd "$dst" && ln -svf "acc/${MUTT_DEFAULT:?}" default)
 
 ### GENS ###
-THEME=$THEME ./gen/theme-solarized.gen
+# THEME=$THEME ./gen/theme-solarized.gen
 
 # Gen accounts list to switch
 > "$dst/index"

@@ -33,6 +33,7 @@ macro index,pager,browser  ,s  "<change-folder>=Sent<enter>"   "Go to sent"
 macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'
 macro index \Ca <tag-pattern>~A<enter>   "select all"
 macro index  +  <limit>all<enter>        "limit reset"
+macro generic,pager <f12> ":source ~/.mutt/muttrc<enter>"
 
 # EXPL: collapsing
 # macro index \R '<read-thread><collapse-thread><next-unread>' 'Mark the current thread as read'
@@ -74,11 +75,12 @@ bind index  L  bottom-page
 # bind index  <Down>  next-entry
 # bind index  <Up>    previous-entry
 bind index <Space>  tag-entry
-bind index  za  collapse-thread
-bind index  zA  collapse-all
+bind index  za collapse-thread
+bind index  Z  collapse-all
 bind index  =  limit
 bind index  0  first-entry
 bind index  G  last-entry
+bind index  I  flag-message
 
 # bind pager  ;  tag-prefix
 bind pager  h  exit

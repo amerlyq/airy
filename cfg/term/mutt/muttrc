@@ -28,7 +28,9 @@ folder-hook . 'push <collapse-all>'
 # folder-hook . 'push ":set collapse\_unread=no<enter>"'
 # SEE uncollapse_jump
 #   http://www.rdrop.com/docs/mutt/manual118.html
-# SEE auto_tag = true
+
+# NOTE: only in index; open in pager to apply func to current msg only.
+set auto_tag = yes          # auto-apply func to all tagged (w/o ';' prf)
 
 # confirmation skipping
 # set fast_reply=yes        # when replying, don't prompt for address
@@ -36,9 +38,10 @@ set include=ask-yes         # include original text on reply?
 # set forward_quote=yes     # include original text on forward?
 # set delete=yes            # don't ask for delete confirmation
 set print=ask-yes           # Ask before printing
+set confirmappend = no      # silent save on 's'
 
 set use_from = yes          # to ensure mutt doesn't put user@localhost.localhost
-set abort_nosubject=yes     # Cancel a message when subject is blank
+set abort_nosubject = yes   # Cancel a message when subject is blank
 set copy = yes              # keep copies of outgoing mail.
 set move = no
 
@@ -99,6 +102,9 @@ source $my_cfg/keyrc
 source $my_cache/theme          # Theme
 source $my_cache/index          # List of accounts (generated)
 source $my_cache/default        # Default account (link)
+
+# NOTE: setup inside accounts
+# save-hook . '=Spam'           # DFL folder to save/move
 
 ## COMMANDS
 mailboxes +Inbox
