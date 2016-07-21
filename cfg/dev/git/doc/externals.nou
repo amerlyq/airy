@@ -1,0 +1,50 @@
+%%% Externals (comparison +/-)
+
+% Nested + gitignore
+  + Completely unrelated
+  - Setup projects layout by external scripts
+
+% Submodule
+!!! https://medium.com/@porteneuve/mastering-git-submodules-34c65e940407
+  SEE
+    !!! https://codingkilledthecat.wordpress.com/2012/04/28/why-your-company-shouldnt-use-git-submodules/
+    ! ALT: https://medium.com/@porteneuve/mastering-git-submodules-34c65e940407
+    ~ http://www.catalyst.net.nz/blog/git-submodule-misunderstood-beast-or-remorseless-slavering-monster
+  * Useful when there are no pkg mgmt system for this prg language
+  + Fetch only choosen (depending on build configuration)
+    = {Traffic/codebase size} economy
+    == submodule for sep repo with (?large) binary files
+  ! never develop submodules from within container (by git design) !
+  >_ BETTER: use package management system with semantic versioning
+
+
+% Subtree
+!!! https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec
+  SEE
+    2016-07-20 [X] https://developer.atlassian.com/blog/2015/05/the-power-of-git-subtree/
+    ~  http://www.mos6581.org/git_subtree_alternative
+  + All necessary deps are kept in one repo (no denial of service)
+  + Adjusting external code for you repo by fixup commits
+  + Backport useful changes (minor) into external's remote
+  ! never develop subtree/folder from within container !
+    < Only container-related changes and minor fixes are sufficient
+  - Total repo size increase
+  - Subtree-specific “branch” gets merged on every git subtree pull / merge it will clutter your graph forever
+  - It won’t let you pick which local subtree commits to backport with git subtree push: it’s an all-or-nothing affair.
+   One of the key benefits of subtrees is to be able to mix container-specific
+   customizations with general-purpose fixes and enhancements.
+  >_ BETTER: git subrepo | aur/git-subrepo-git
+    https://github.com/ingydotnet/git-subrepo#readme
+
+% Manual subtree
+
+
+% Subrepo
+  https://raw.githubusercontent.com/ingydotnet/git-subrepo/master/doc/intro-to-subrepo.swim
+  + Transparent and clear history
+  + Comfortable gathering of all necessary deps
+    !!! ATTENTION: their license
+  ~ Still no workflow for project' own orphan branches
+  = Reasonable solution for later stages -- when deps are concluded and not developed much anymore
+  - Changes to subprojects are still commited into your *dev* branch
+  - Total repo size increase
