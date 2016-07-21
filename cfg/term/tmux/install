@@ -5,7 +5,10 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst tmux  # TrueColor support in version >=2.2
+  aur_inst -p fpp fpp-git  # Facebook PathPicker
 
 elif distro ubuntu; then
   pkg_inst tmux
 fi
+
+./update $(cfgOpt u && echo -u)

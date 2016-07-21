@@ -1,0 +1,18 @@
+#!/bin/bash -e
+source ~/.shell/func.d/system
+cd $(dirname $(readlink -m ${0}))
+
+# NOTE: install/update/clean plugins by [prefix + I/U/A-u]
+tpm=~/.tmux/plugins/tpm
+
+if [[ ! -d $tpm ]]; then
+  mkdir -p "${tpm%/*}"
+  git clone https://github.com/tmux-plugins/tpm "$tpm"
+elif [[ " $* " =~ " -u " ]]; then
+  (cd "$tpm" && git-up)
+fi
+
+# Update plugins
+"$tpm/scripts/install_plugins.sh" &>/dev/null
+"$tpm/scripts/update_plugin.sh" all
+tmux source-file ~/.tmux.conf #>/dev/null 2>&1

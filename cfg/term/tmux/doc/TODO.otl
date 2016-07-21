@@ -1,7 +1,5 @@
 SEE
 	READ https://github.com/ThomasAdam/tmux/blob/master/FAQ
-	>>> https://github.com/tmux-plugins
-	[_] https://github.com/tmux-plugins/tmux-resurrect
 	<Blog
 		http://www.hamvocke.com/blog/a-guide-to-customizing-your-tmux-conf/
 REF
@@ -11,16 +9,19 @@ CHECK
 	https://www.reddit.com/r/tmux/comments/3l5xf6/highlight_individual_tmux_panes/?
 
 CHECK:(plugins)
-	https://github.com/tmux-plugins/tmux-urlview
-	https://github.com/tmux-plugins/tmux-fpp
-	https://github.com/tmux-plugins/tmux-yank
-	https://github.com/tmux-plugins/tmux-copycat
-	https://github.com/tmux-plugins/tmux-continuum
-
-
-TRY
+	2016-07-21 [X] >>> https://github.com/tmux-plugins
+	2016-07-21 [X] https://github.com/tmux-plugins/tmux-fpp
+	2016-07-21 [X] https://github.com/tmux-plugins/tmux-yank
+	2016-07-21 [X] https://github.com/tmux-plugins/tmux-copycat
+	[_] https://github.com/tmux-plugins/tmux-urlview
+    > DEPRECATED: by tmux-copycat? NEED: urlview OR extract_url.
+	[_] https://github.com/tmux-plugins/tmux-continuum
+	[_] https://github.com/tmux-plugins/tmux-resurrect
 	[_] https://github.com/tmux-plugins/vim-tmux-focus-events
-		: Check focus events between windows -- instead of my 'vim-autofocus'
+	[_] https://github.com/tmux-plugins/tmux-pain-control
+	[_] https://github.com/tmux-plugins/tmux-prefix-highlight
+	[_] https://github.com/tmux-plugins/tmux-logging
+		Check focus events between windows -- instead of my 'vim-autofocus'
 	[_] Session sharing
 		https://spin.atomicobject.com/2012/01/28/less-perplexing-terminal-multiplexing-with-tmux/
     Relocate raw running process into tmux
@@ -110,6 +111,6 @@ BUG
 		: zsh/vim -- <C-h>; but ranger/neovim -- <BS>
 		: SEE: http://www.ibb.net/~anne/keyboard.html
 		:NO: bind-key -n C-h send-keys Escape "[104;5u"
-	[_] THINK Maybe, use systemd to run first session?
+	2016-07-21 [X] THINK Maybe, use systemd to run first session?
 		:= Proc: works until at least one user session exist
 		https://bbs.archlinux.org/viewtopic.php?id=147118

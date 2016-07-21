@@ -1,0 +1,78 @@
+# REF: screen (no tmux in router)
+  http://aperiodic.net/screen/quick_reference
+
+| % | Split a window vertically
+| " | Split the window horizontally
+| ; | Go to previous
+| x | Closing a pane
+| c | Create new window
+| w | Select window interactively
+| & | Close a window
+| z | Toggle zoom
+| d | detach window
+| , | Rename window
+| 0-9 | Switch to tmux window
+| n/p | Switch to next/prev window
+| \Co | Rotate windows
+
+# Arrow=[Up,Down,Right,Left]
+|   Arrow   | Move between active panes
+| <C-Arrow> | Change pane sizes
+>Hold Ctrl+b, don't release it and hold one of the arrow keys - resize pane.
+| <M-Arrow> |
+
+Copy Mode
+| [ | Scroll up the screen (use one of Up, Down, PgUp or PgDn to scroll up or down)
+| ] | In scroll mode you can copy text from history and then paste it this key. To exit insert mode press ESC
+| ? | Key bindings
+
+  $ tmux new -s session_name    $ Create a new tmux named session_name
+  $ tmux attach -t session_name $ Attaches to an existing tmux session
+  $ tmux switch -t session_name $ Switches to an existing session
+  $ tmux list-sessions          $ tmux ls
+  $ tmux list-keys              $ lists out every bound keys
+  $ tmux list-commands          $ commands and arguments
+  $ tmux info                   $ lists every session, window, pane, pid
+| <F12> | Reload current cfg (after changes)
+
+%%% Yank %%%  # Works with shells/repls/vim-cmdline
+| prefix + y | copies text from the command line to clipboard.
+| prefix + Y | copy pane current working directory to clipboard.
+
+% copy mode bindings
+| y   | copy selection to system clipboard
+| Y   | "put" selection - copy-paste into cmdline (w/o system clipboard)
+| A-y | performs both (deprecated, not useful)
+
+%%% Open %%%  # In tmux copy mode:
+| o   | "open" a highlighted selection with the system DFL (xdg-open)
+| C-o | open a highlighted selection with the $EDITOR
+
+%%% Open %%%  # In any tmux mode
+| f   | "fpp" for a new window with a Facebook PathPicker selection of your tty.
+
+%%% Urlview %%%  # In any tmux mode
+| u   | listing all urls on bottom pane
+
+%%% Copycat %%%  # Search (case insensitive -- by grep)
+| prefix + / | regex search
+
+% Predefined searches
+# Start "copycat mode" and jump to first match.
+| prefix + C-f | simple file search
+| prefix + C-g | jumping over git status files (best used after git status command)
+| prefix + A-h | jumping over SHA-1 hashes (best used after git log command)
+| prefix + C-u | url search (http, ftp and git urls)
+| prefix + C-d | number search (mnemonic d, as digit)
+| prefix + A-i | ip address search
+
+% "Copycat mode" bindings
+# These are enabled when you search with copycat:
+| n | jumps to the next match
+| N | jumps to the previous match
+
+% To copy a highlighted match:
+# Copying a highlighted match will take you "out" of copycat mode.
+# Paste with prefix + ] (DFL tmux paste).
+| Enter     | if you're using Tmux vi mode
+| C-w / A-w | if you're using Tmux emacs mode
