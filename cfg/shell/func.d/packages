@@ -114,6 +114,8 @@ git_pull() { [[ -d "$1" ]] && cd "$1" || return
   fi
 }
 
+# TODO: rewrite, so pull on -d worked only with -u
+# ALSO: need to choose where to copy
 git_inst() { # $0 -d pr_name
   local nobuild link prdir; case "$1" in -d) nobuild=1; shift ;; esac
   prdir=${1##*/} && prdir="$CURR_DIR_PKG/${prdir,,}"

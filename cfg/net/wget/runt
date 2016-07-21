@@ -26,7 +26,7 @@ fi
 
 
 r.tmux-job -t "$session" -m "$maincmd" $jobargs -- \
-  r.notify-cmd -n 'Saved: $fnm' -f 'Failed dld: $fnm' -- \
+  r.notify-cmd -n "Saved: $fnm" -f "Failed dld: $fnm" -- \
     $dldcmd "${@:?}"
 r.notify "Started" "${@:?}"
 

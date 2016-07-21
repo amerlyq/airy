@@ -20,6 +20,7 @@ augroup filetypedetect
   au BufRead,BufNewFile {PKGBUILD,.AURINFO}  setf sh
   au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap,*.target,*.service} setf systemd
   au BufRead ~/.purple/logs/*       setf pidgin
+  au BufRead ~/.cache/mutt/messages/*   setf mail
 augroup END
 
 " Use Zeal on Linux for context help
