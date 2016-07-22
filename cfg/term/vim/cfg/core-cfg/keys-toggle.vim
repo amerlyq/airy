@@ -1,6 +1,5 @@
 " Syntax highlighting
 nnoremap <unique> [Toggle]S :exe 'syn' exists("g:syntax_on")?'off':'enable'<CR>
-nnoremap <unique> [Toggle]s :setl spell! spelllang=en_us,ru_yo,uk spell?<CR>
 nnoremap <unique> [Toggle]M :let &mouse=(''==&mouse?'a':'')\|set mouse?<CR>
 
 " Toggle all UI elements NEED DEV save/restore current state instead hardcode!

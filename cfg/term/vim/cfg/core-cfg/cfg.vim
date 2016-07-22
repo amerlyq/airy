@@ -67,6 +67,13 @@ set sidescrolloff=4 " keep N columns on side visible when scrolling
 set nostartofline   " keep column when  <C-[fbud]> or [ggGHML], :25
 
 
+"{{{1 Spell ============================
+" NOTE: <count> before 'zg' 'zw' -- to access personal/project spellfile
+set spellfile=$VIMHOME/spell/en.utf-8.add  " One file of mixed content
+set spellcapcheck=  " Don't auto-capitilize suggested words
+nnoremap <unique> [Toggle]s  :setl spell! spelllang=en_us,ru_yo,uk spell?<CR>
+
+
 " Set keyword help.
 set keywordprg=:help
 " Check timestamp more for 'autoread'.

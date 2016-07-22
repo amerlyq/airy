@@ -15,9 +15,6 @@ for d in split('bundle bckp swap undo view')  " easytags.d
   endif
 endfor
 
-" Used for ./spell and 'before/' folder
-set runtimepath^=$VCACHE/runtime
-
 
 " NOTE The '//' at directory end: use full path for filename with '%' separators
 let $FALLBACK='~/.tmp,/var/tmp,/tmp'

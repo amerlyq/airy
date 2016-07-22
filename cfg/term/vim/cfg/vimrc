@@ -28,7 +28,11 @@ call _cfg('features/'.(IsWindows()        ? 'windows' : 'unix'     ).'.vim')
 call _cfg('features/'.(has('gui_running') ? 'gui'     : 'term'     ).'.vim')
 call _cfg('dein.vim')
 call _cfg('core-post/*.vim')
-set runtimepath+=$VIMHOME/after  " Place after dein#end()
+"" NOTE: Place &rtp fixup after dein#end()
+" [runtime] -- used for ./spell and 'before/' folder
+set runtimepath-=$VIMHOME,$VCACHE/runtime
+set runtimepath^=$VIMHOME,$VCACHE/runtime
+set runtimepath+=$VIMHOME/after
 
 filetype plugin indent on  " Required!
 syntax enable  " 'enable' only sets groups not set yet. Use 'on' to overwrite
