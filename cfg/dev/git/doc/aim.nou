@@ -1,0 +1,90 @@
+# site: publish
+%%% Git -- what for?
+
+Why you need history?
+What it's good for?
+
+You have local history -- don't need to save all in remote.
+  "Don't expose your crap"
+
+~~~~~~~~~~~~
+
+rollback project state
+  < unrepairable impl  # changes complexity
+  ~ backup
+  > VCS
+
+review last changes
+  ??? Why you look at them ???
+    frequent
+      messy bounds
+
+history exploration
+  ??? Why you want this ???
+    * forget course after prolonged dev pause
+    * responsibility for change (git blame)
+    * sense of change (commit message)
+    * involved subset of changes (diff)
+    cleanup
+      atomic
+
+broken till complete
+  < dld only releases/tags
+  > master / dev
+
+  master always builds
+    stable for users
+  ? tags -- insteaf of stable *master* branch
+    development -- directly in master
+
+! messy collaboration
+parallel features
+
+different ideas
+  < mixed stubs of uncomplete ideas  # logical complexity
+  > feature-branches
+
+many contributors
+
+code reusability
+  < write code again
+  > submodules
+
+
+!! Each new idea is not obliged to be on top of previous
+  Maybe some ideas are possible to synergize and compress in smaller concept
+
+
+none
+  * no VCS at all
+    = no need to commit
+  - always have broken features in dev
+  - bugs are hard to cure
+  ! breaks only once, but forever
+    # FIXED: frequent repo backup
+  ! impossible to collaborate
+    # maybe patches, but then quickly become irrelevant
+  >>> disorder
+    > contemting users
+    > no collaborators
+
+master
+  * commit everything (when remember)
+    = no need to think
+  + broken code is revertible
+  + look at last changes set
+  ~ messy collaboration
+  ~ messy history
+    # FIXED: filtering by aliases/scripts to log/diff
+  <_ same as *none*
+  >>> dump
+    > frightened users
+    > similar collaborators
+
+rebasing
+  * clean up history
+    = easier to read/navigate changes
+
+features
+  * group history
+    = faster to skip irrelevant changes
