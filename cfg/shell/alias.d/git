@@ -77,6 +77,8 @@ alias gtn='git name-rev --name-only'  # Shows related to release tag name
 
 ## Diff
 alias gdf='git diff -M'  # don't show renamed files
+# SEE: http://stackoverflow.com/questions/5685007/making-git-log-ignore-changes-for-certain-paths/21079437#21079437
+# git diff HEAD -- . ':!some/dir' -- exlude shanges
 alias gdfs='gdf --stat'
 alias gdF='gdf HEAD...origin'  # with fetched
 alias gdo='gdf HEAD   origin/$(git-branch-current 2>/dev/null)'
