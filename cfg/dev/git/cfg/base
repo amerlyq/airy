@@ -21,6 +21,9 @@
     ; if [[ $(git --version|awk '{n=split($NF,a,".");for(i=1;i<=n;i++)\
     ;     printf("%02d",a[i])}') > '01080000' ]]; then echo simple; else echo current; fi
 
+[branch]
+    autosetupmerge = true  # autotrack remote, when branching off remote
+
 [commit]
     verbose = true
 
@@ -54,6 +57,10 @@
     show-id = true
     ignore-space = all
     commit-order = topo
+
+[advice]
+    pushNonFastForward = false
+    statusHints = false
 #[web]
 #    browser = firefox
 #[http]
