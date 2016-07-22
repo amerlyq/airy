@@ -1,8 +1,21 @@
 %%% Externals (comparison +/-)
 
+REF
+  2016-07-22 [X] http://blogs.atlassian.com/2014/04/git-project-dependencies/
+  2016-07-22 [X] http://stackoverflow.com/questions/816619/managing-many-git-repositories
+
+%% Means/Workflows
+
 % Nested + gitignore
-  + Completely unrelated
-  - Setup projects layout by external scripts
+  + Completely unrelated histories
+  + Fast development cycle
+  + Independent tagging
+  - Setup/maintain projects layout by external scripts
+  - BAD branching API in deps requires branching in main -- hard to sync
+  - versions sync --> "What version of libA do I need to build libB from 3 months ago?"
+    2016-07-22 [X] http://programmers.stackexchange.com/questions/206668/using-multiple-git-repositories-instead-of-a-single-one-containing-many-apps-fro
+    > NEED auto-package metadata about the most recent commit in a project into manifest file
+  - harder to discover when bugs were introduced
 
 % Submodule
 !!! https://medium.com/@porteneuve/mastering-git-submodules-34c65e940407
@@ -11,11 +24,17 @@
     ! ALT: https://medium.com/@porteneuve/mastering-git-submodules-34c65e940407
     ~ http://www.catalyst.net.nz/blog/git-submodule-misunderstood-beast-or-remorseless-slavering-monster
   * Useful when there are no pkg mgmt system for this prg language
-  + Fetch only choosen (depending on build configuration)
+  + Fetch only chosen (depending on build configuration)
     = {Traffic/codebase size} economy
     == submodule for sep repo with (?large) binary files
+  - BAD uncomfortable for parallel development
   ! never develop submodules from within container (by git design) !
   >_ BETTER: use package management system with semantic versioning
+
+  Git repo as submodule of itself (orphan)
+    http://stackoverflow.com/questions/5296236/how-to-add-a-git-repo-as-a-submodule-of-itself-or-how-to-generate-github-page
+    http://blog.revathskumar.com/2014/07/publish-github-pages-using-git-submodules.html
+    https://github.com/shiftyp/submodule-gh-pages-example
 
 
 % Subtree
@@ -26,6 +45,7 @@
   + All necessary deps are kept in one repo (no denial of service)
   + Adjusting external code for you repo by fixup commits
   + Backport useful changes (minor) into external's remote
+  + Atomic commits; can't have a partial change to subproject state.
   ! never develop subtree/folder from within container !
     < Only container-related changes and minor fixes are sufficient
   - Total repo size increase
@@ -36,7 +56,10 @@
   >_ BETTER: git subrepo | aur/git-subrepo-git
     https://github.com/ingydotnet/git-subrepo#readme
 
+
 % Manual subtree
+  https://git-scm.com/book/en/v1/Git-Tools-Subtree-Merging            # DFL ref
+  https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec  # SEE first section
 
 
 % Subrepo
@@ -48,3 +71,62 @@
   = Reasonable solution for later stages -- when deps are concluded and not developed much anymore
   - Changes to subprojects are still commited into your *dev* branch
   - Total repo size increase
+
+
+%% Tools: multiple git repo management
+
+  mr = myrepos (perl, robust)
+    http://myrepos.branchable.com/
+      https://github.com/joeyh/myrepos
+    + like my r.git
+    + have conf file for all repos
+    + local conf for deps mgmt
+    ~ perl L>2K (MAYBE reasonable)
+
+  Gr - ?wrapper for mr (BAD node.js)
+  https://github.com/mixu/gr
+    + tagging repos (: @work) for flexible grouping
+
+  Peru
+    https://github.com/buildinspace/peru
+    + works like what I wanted from ext deps
+      * auto switching dependencies when ./build
+      * cloning into 'ignored' dirs
+      * saving hashes on update (however I thought about 'git-describe' )
+    + copying/choosing only specific files from repo
+    -- parallel development
+    > Good for deps handling
+
+  git-slave
+    http://gitslave.sourceforge.net/
+    2016-07-22 [X] http://www.slideshare.net/roidelapluie/working-with-multiple-git-repositories
+      > Nothing much useful. Mentioned clumsy git-slave as tool.
+    + Minimal interference with exiting Git repo structure.
+    ~ Can leave project in an inconsistent state if an operation partly succeeds.
+    ~ Difficult to visualize changes that affect multiple repositories.
+
+  Mu-repo (too similar to gitslave)
+    http://fabioz.github.io/mu-repo/
+
+  git-scan (BAD php)
+    https://github.com/totten/git-scan/
+  gitwalk (BAD coffescript, zsh-like)
+    https://github.com/pazdera/gitwalk
+  git-parallel (bash L>1K)
+    https://github.com/Witiko/git-parallel
+
+  Repo (gerrit)
+    https://code.google.com/p/git-repo/
+      https://source.android.com/source/using-repo.html
+    $ git clone git://android.git.kernel.org/tools/repo.git
+    $ ./repo help manifest
+      https://harrow.io/blog/using-repo-to-manage-complex-software-projects/
+    - Designed to implement one workflow, the Android one. May not work well for alternate workflow designs.
+    + Well-documented on Android site.
+    ~ Connects well to Gerrit.
+
+  Fusion (perforce)
+    2016-07-22 [X] https://www.perforce.com/company/newsletter/2012/11/managing-projects-across-git-repositories
+    + Combined repository works like pure Git
+    + No extra client-side tools or skills required
+    - Need an extra repo for integrating changes from your remapped repository to an original one.

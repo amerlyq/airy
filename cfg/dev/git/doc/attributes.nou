@@ -1,0 +1,18 @@
+REF
+  https://git-scm.com/docs/gitattributes
+    SEE text-diff for binaries
+
+% Diff: ignore
+.gitattribute:
+  Project.xcodeproj/* -diff
+
+% Merge: ignore some files
+https://medium.com/@porteneuve/how-to-make-git-preserve-specific-files-while-merging-18c92343826b
+  Suppose we have production and develop configs in different branches
+    * urls and ports -> {production / local} server
+  Keep develop config when merging from master:
+  $ git config --global merge.ours.driver true
+  $ echo 'email.json merge=ours' >> .gitattributes
+  $ git add .gitattributes
+  $ git commit -m 'chore: Preserve email.json during merges'
+  SEE https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes
