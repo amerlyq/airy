@@ -5,6 +5,15 @@ REF
 % Diff: ignore
 .gitattribute:
   Project.xcodeproj/* -diff
+  http://stackoverflow.com/questions/928646/how-do-i-tell-git-to-always-select-my-local-version-for-conflicted-merges-on-a-sp/930495#930495
+
+Folder ignore
+  http://stackoverflow.com/questions/3111515/how-to-setup-a-git-driver-to-ignore-a-folder-on-merge
+  $ git merge --no-commit --no-ff feature
+  $ git checkout HEAD -- ./dir
+  # OR $ git reset -- ./dir
+  $ git commit
+    ?_ How to reuse original commit message ?
 
 % Merge: ignore some files
 https://medium.com/@porteneuve/how-to-make-git-preserve-specific-files-while-merging-18c92343826b
