@@ -1,3 +1,6 @@
+Only current tree (exlude orphans)
+  $ git log -- $(git branch --contains $(git rev-list HEAD | tail -1))
+
 Log
   lg = log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'\n--abbrev-commit --date=relative
   Friendly dates

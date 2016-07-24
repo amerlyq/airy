@@ -18,6 +18,13 @@ https://github.com/timcharper/git-helpers
 https://github.com/nigelbabu/git-repo-tools
 ! https://github.com/Prelang/g  # zsh
 
+Nested repos
+  [_] zsh git status must show original repo name like: (repo/master)
+    : Because repos are renamed into dirs and its hard to remember
+    : For main repo it's not the case -- because current pwd has its name
+    ? Maybe include original repo name in this info ?
+      = container/branch/dir : repo/master
+
 % TODO
   [_] MOVE: multi-thread workers/jobs into sep script in //shell/zsh
   [_] TODO: enhance status to show for all branches (at least pull/push)
@@ -30,6 +37,9 @@ https://github.com/nigelbabu/git-repo-tools
   [_] TRY git pull --autostash
   [_] ENH: status for submodules
   [_] CHG: split name in two columns aligned on center -- dir | file
+    * for nested repos use another (blue) color
+    * nested repo path is treated as single name w/o splitting
+      = align on (dir/file) of container repo
   [_] FIX: filter-out colors from branch name instead of using '\t'
     : necessary for short branch names like 'doc' or 'dev'
   [_] filter list
@@ -40,6 +50,9 @@ https://github.com/nigelbabu/git-repo-tools
   [_] THINK by default git cmds -- and shell ones with '-c' OR shell by DFL?
     FIND: how to use aliases for each repo (expanding,autocomplete)
   [_] Provide autocomplete for zsh and source it inside
+  Many repos
+    [_] CHG: show last upd time only on demand
+    [_] TRY: processed status_only -- show in columns two/three columns
 
 % DEV
   * go through all and do 'git fetch'
