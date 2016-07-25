@@ -13,14 +13,12 @@
 #   http://www.mutt.org/doc/manual/#folder-hook
 #   https://bitbucket.org/jasonwryan/shiv/src/tip/.mutt/muttrc
 #   http://unix.stackexchange.com/questions/172422/mutt-two-character-sequence-commands
-# WTF? list-reply
+# WTF? list-reply (SEE: http://www.mutt.org/doc/manual/#lists)
 # FIXME: don't jump to next/prev message when current is read till end
 # FIXME: don't close pager when moving up from first entry
 
-## fetch mail by I
+## fetch mail by I with external pr
 # macro index,pager I "!getmail"
-## Fetch mail shortcut
-# bind index G imap-fetch-mail
 
 # TODO: move 'help' from <F1> to somewhere else. Like 'g?'
 
@@ -64,27 +62,39 @@ bind index,pager  N  search-opposite
 bind index,pager \Cf next-page
 bind index,pager \Cb previous-page
 
-# EXPL: swap jk/JK for entry/undeleted
+## Navigate
 bind index  l  display-message
+bind index  h  collapse-thread
+bind index  z  collapse-all
+bind index  =  limit
+# EXPL: swap jk/JK for entry/undeleted
 bind index  j  next-entry
 bind index  k  previous-entry
 bind index  J  next-undeleted
 bind index  K  previous-undeleted
+bind index  g  first-entry
+bind index  G  last-entry
 bind index  H  top-page
 bind index  L  bottom-page
 # bind index  <Down>  next-entry
 # bind index  <Up>    previous-entry
+## Mark
+bind index,pager  i  flag-message
+bind index  I  toggle-new
 bind index <Space>  tag-entry
-bind index  za collapse-thread
-bind index  Z  collapse-all
-bind index  =  limit
-bind index  0  first-entry
-bind index  G  last-entry
-bind index  I  flag-message
+## Write
+bind index  r  group-reply
+bind index  R  reply
+bind index  p  recall-message  # postponed
+bind index  F  sync-mailbox
+bind index  x  imap-fetch-mail
 
+
+### Pager
 # bind pager  ;  tag-prefix
 bind pager  h  exit
 bind pager  l  view-attachments
+bind pager  H  display-toggle-weed
 bind pager  J  next-line
 bind pager  K  previous-line
 # bind pager  J  next-entry      # generic
@@ -117,7 +127,6 @@ bind attach <Return>  view-mailcap
 bind attach <Right>   view-attach
 bind attach <Left>    exit
 
-# bind pager i noop
 # bind pager \eD delete-thread
 # bind pager \eU undelete-thread
 # bind pager <Home> top
