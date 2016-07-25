@@ -1,12 +1,25 @@
 TODO
   TRY:ALT: http://www.neomutt.org/features.html
-  TRY: mutt -f <account> to open directly desired acc
+  2016-07-25 [X] TRY: mutt -f <account> to open directly desired acc
   [_] FIX: on ';s' suggest '=pjname' folder instead of '=user'
     TRY: save-hook . '=INBOX.Archives.2015'
     ALT: direct save mapping 's,w' shared with move mapping ',w'
-  [_] THINK: don't confirm 'yes' on moving -- as I always can 'undelete'
-  [_] FIND tag the whole thread to move
+  2016-07-25 [X] THINK: don't confirm 'yes' on moving
+    : as I always can 'undelete' to cancels moving
+  2016-07-25 [X] FIND tag the whole thread to move
     ALT existing func to apply to whole
+    > tag-thread, tag-subthread
+  [_] Keys '\ + ..' -- filter current list
+    | \\ | all
+    | \d | today's
+    | \i | important
+    | \m | to me
+    | \o | others (spam, etc)
+    | \t | tagged
+  [_] ENH colorscheme
+    http://www.strcat.de/dotfiles/mutt.color
+    http://aperiodic.net/phil/configs/mutt/colors
+    https://wiki.archlinux.org/index.php/Mutt#Colors
 
 REF
   http://www.mutt.org/doc/manual/
@@ -21,6 +34,7 @@ mutt
     >>> https://www.proteansec.com/linux/the-ultimate-guide-to-mutt/
     > http://www.mutt.org/doc/devel/manual.html#functions
     > https://wiki.archlinux.org/index.php/Mutt
+    > https://www.earth.li/~huggie/mutt/muttrc.html
     https://github.com/andrewgaul/dotfiles/blob/master/muttrc
     2015-09-04 [X] http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
     https://bitbucket.org/jasonwryan/shiv/src/tip/.mutt/
