@@ -50,7 +50,7 @@ scratchpad = (concat . (`map` [
     , ("p" , runOrRaise "r.pidgin" $ className =? "Pidgin" <&&> stringProperty "WM_WINDOW_ROLE" =? "buddy_list")
     , ("s" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
     -- FIXME: broken opening on new wksp?
-    , ("m" , raiseMaybe (spawn "r.t -n mutt -e mutt") (appName =? "mutt"))
+    , ("m" , raiseMaybe (spawn "r.t -n mutt -e r.tmux mutt") (appName =? "mutt"))
     , ("<F1>", namedScratchpadAction myScratchpads "help")
     ],
     -- Open new or focus the already existing one
