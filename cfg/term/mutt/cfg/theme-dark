@@ -1,8 +1,81 @@
-# vim: filetype=muttrc
+# vim:ft=muttrc:ts=2:sw=2:sts=2
 
-# custom body highlights -----------------------------------------------
-# highlight my name and other personally relevant strings
-#color body          yellow          default         "(ethan|schoonover)"
+### Index ----------------------------------------------------------------
+# Reset. THINK: move into main muttrc macros? FIND: pre-color hooks
+uncolor index *
+
+## General
+color index   default         default   "~A"      # all messages
+color index   blue            default   "~U"      # unread messages
+color index   brightblue      default   "~N"      # new messages
+color index   red             default   "~F"      # flagged
+color index   brightred       default   "~F~U"    # flagged, unread
+
+# EXPL: can't determine usefulness
+# color index   default         default   "~R"      # read messages
+# color index   brightred       default   "~E"      # expired messages
+# color index   brightyellow    default   "~U~$"    # unread, unref msg (thread leafs like wiki)
+# color index   magenta         default   "~v"      # messages part of a collapsed thread
+# color index   red             default   "~D(!~p|~p)"               # deleted
+# color index   black           green     '(~C @zsh.org) | (~C @zsh.org)'
+
+## Directed to me
+color index   green           default   "~p"      # to me
+color index   brightcolor28   default   "~p~U"    # to me, unread
+color index   brightcolor70   default   "~p~N"    # to me, new
+color index   brightred       default   "~p~F"    # to me, flagged
+color index   red             default   "~p~U~F"  # to me, unread, flagged
+## From me
+color index   color9          default   "~P"      # from me
+color index   brightcolor9    default   "~P~U"    # from me, unread
+color index   color9          default   "~P~U~F"  # from me, unread, flagged
+
+# When the Subject indicates a reply (with ":re")
+# then there *must* be a reference to the previous message!
+# So if there is neither an In-Reply-To nor a References line
+# then it must have been sent with a crappy mailer....
+color index   magenta         default   "~s re: ! ~x . ! ~h 'in-reply-to: '"
+
+## Forwarded
+# NOTE: IMAP server-side searches =[bBh] aren't supported for color index patterns.
+#   => BAD performance for scrolling
+# set my_fwd = "~b(Forwarded\\ message\\ from)"
+set my_fwd = '(~s fwd: | ~s ^\\[.*@.*:.*\\]$)'
+color index   color13         default   "$my_fwd"    # forwarded
+color index   brightcolor13   default   "$my_fwd~U"  # forwarded, unread
+
+## General override status
+#color index   green           default   "~S"      # superseded
+#color index   brightred       red       "~="      # duplicated
+color index   yellow          default   "~Q"      # have been replied
+color index   brightyellow    default   "~Q~U"    # have been replied, unread
+color index   black           red       "~D"      # deleted
+color index   white           magenta   "~T"      # tagged
+
+# Uncollapsed thread
+# color index    yellow        default       "~(~N)"         # messages in threads with some unread
+
+## Collapsed thread
+color index   default         brightblack   "~v"            # no unread
+color index   blue            brightblack   "~v~(~U)"       # some unread
+color index   brightblue      brightblack   "~v~(~N)"       # some new
+color index   red             brightblack   "~v~(~F)!~N"    # flagged, no unread
+color index   brightred       brightblack   "~v~(~F~N)"     # flagged, some unread
+# color index   brightcyan      brightblack   "~N~v~(~N)"     # unread parent
+# color index   green           brightblack   "~N~v~(~F~N)"   # unread parent & flagged
+# color index   green           brightblack   "~N~v~(~F)"     # unread parent, no unread inside, but some flagged
+color index   green           brightblack   "~v~(~p)"       # to me, no unread
+color index   brightgreen     brightblack   "~v~(~U~p)"     # to me, some unread
+color index   brightcolor34   brightblack   "~v~(~N~p)"     # to me, some new
+color index   color9          brightblack   "~v~(~P)"       # from me, no unread
+color index   brightcolor9    brightblack   "~v~(~P~U)"     # from me, some unread
+
+## Thread overlay status
+color index   red             brightblack   "~v~(~D)"     # with deleted (all/partial)
+color index   white           brightmagenta "~v~(~T)"     # with tagged
+color index   brightred       brightblack   "~v~(~D~U)"   # with deleted (all/partial)
+color index   brightwhite     brightmagenta "~v~(~T~U)"   # with tagged
+
 # custom index highlights ----------------------------------------------
 # messages which mention my name in the body
 #color index         yellow          default         "~b \"phil(_g|\!| gregory| gold)|pgregory\" !~N !~T !~F !~p !~P"
@@ -15,11 +88,19 @@
 #color index         J_magent        cyan            "~x \"(mithrandir|aragorn)\\.aperiodic\\.net|thorin\\.hillmgt\\.com\" ~T !~F !~p !~P"
 #color index         J_magent        red             "~x \"(mithrandir|aragorn)\\.aperiodic\\.net|thorin\\.hillmgt\\.com\" ~F !~p !~P"
 
-# for background in 16 color terminal, valid background colors include:
-# base03, bg, black, any of the non brights
+# custom body highlights -----------------------------------------------
+# highlight my name and other personally relevant strings
+#color body          yellow          default         "(ethan|schoonover)"
 
 # basic colors ---------------------------------------------------------
-color normal        brightyellow    default
+# monocolor screen
+mono  bold          bold
+mono  underline     underline
+mono  indicator     reverse
+mono  error         bold
+
+# 16-color
+color normal        default         default
 color error         red             default
 color tilde         black           default
 color message       cyan            default
@@ -31,63 +112,14 @@ color status        brightblue      white
 color indicator     brightblack     yellow
 color tree          yellow          default         # arrow in threads
 
-# basic monocolor screen
-mono  bold          bold
-mono  underline     underline
-mono  indicator     reverse
-mono  error         bold
-
-# index ----------------------------------------------------------------
-
-#color index    red             default       "~D(!~p|~p)"               # deleted
-#color index    black           default       ~F                         # flagged
-#color index    brightred       default       ~=                         # duplicate messages
-#color index    brightgreen     default       "~A!~N!~T!~p!~Q!~F!~D!~P"  # the rest
-#color index    J_base          default       "~A~N!~T!~p!~Q!~F!~D"      # the rest, new
-
-color index    red           default       "~A"            # all messages
-color index    brightred     default       "~E"            # expired messages
-color index    brightblue    default       "~N"            # new messages
-color index    blue          default       "~O"            # old messages
-color index    default       default       "~R"            # read messages
-color index    yellow        default       "~Q"            # messages that have been replied to
-color index    brightblue    default       "~U"            # unread messages
-color index    brightyellow  default       "~U~$"          # unread, unreferenced messages (thread leafs)
-color index    magenta       default       "~v"            # messages part of a collapsed thread
-color index    color9        default       "~P"            # messages from me
-
-color index    green         default       "~p!~F"         # messages to me
-color index    brightgreen   default       "~N~p!~F"       # new messages to me
-color index    brightgreen   default       "~U~p!~F"       # unread messages to me
-color index    green         default       "~R~p!~F"       # read messages to me
-color index    red           default       "~F"            # flagged messages
-color index    brightred     default       "~F~p"          # flagged messages to me
-color index    red           default       "~N~F"          # new flagged messages
-color index    red           default       "~N~F~p"        # new flagged messages to me
-color index    red           default       "~U~F~p"        # new flagged messages to me
-color index    black         red           "~D"            # deleted messages
-color index    default       brightblack   "~v~(!~N)"      # collapsed thread with no unread
-color index    brightblue    brightblack   "~v~(~N)"       # collapsed thread with some unread
-color index    brightcyan    brightblack   "~N~v~(~N)"     # collapsed thread with unread parent
-color index    red           brightblack   "~v~(~F)!~N"    # collapsed thread with flagged, no unread
-color index    cyan          brightblack   "~v~(~F~N)"     # collapsed thread with some unread & flagged
-color index    green         brightblack   "~N~v~(~F~N)"   # collapsed thread with unread parent & flagged
-color index    green         brightblack   "~N~v~(~F)"     # collapsed thread with unread parent, no unread inside, but some flagged
-color index    brightgreen   brightblack   "~v~(~p)"       # collapsed thread with unread parent, no unread inside, some to me directly
-color index    yellow        red           "~v~(~D)"       # thread with deleted (doesn't differentiate between all or partial)
-color index    yellow        default       "~(~N)"         # messages in threads with some unread
-#color index    green         default       "~S"           # superseded messages
-color index    white         magenta       "~T"            # tagged messages
-#color index    brightred     red           "~="           # duplicated messages
-
-# message headers ------------------------------------------------------
+### message headers ------------------------------------------------------
 
 #color header        brightgreen     default         "^"
 color hdrdefault    brightgreen     default
 color header        brightyellow    default         "^(From)"
 color header        blue            default         "^(Subject)"
 
-# body -----------------------------------------------------------------
+### body -----------------------------------------------------------------
 
 color quoted        blue            default
 color quoted1       cyan            default
@@ -140,6 +172,8 @@ color body          red             default         "([a-z][a-z0-9+-]*://(((([a-
 # Border lines.
 color body          brightmagenta     default         "( *[-+=#*~_]){6,}"
 
+
+# THINK: move into acc?
 #folder-hook .                  "color status        J_black         J_status        "
 #folder-hook gmail/inbox        "color status        J_black         yellow          "
 #folder-hook gmail/important    "color status        J_black         yellow          "
