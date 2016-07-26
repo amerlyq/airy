@@ -4,11 +4,11 @@ module XMonad.Config.Amer.Spawn (
 ) where
 
 import Control.Arrow (second)
-import XMonad                       (spawn, windows, doFloat, (=?))
-import XMonad.StackSet              (view, shift)
+import XMonad                       (spawn, windows, doShift, doFloat, withWindowSet, (=?))
+import XMonad.StackSet              (view, shift, currentTag)
 import XMonad.Actions.SpawnOn       (spawnHere, spawnAndDo)
 import XMonad.Actions.WindowGo      (runOrRaise, raiseMaybe)
-import XMonad.ManageHook            (className, appName, title, stringProperty, (<&&>))
+import XMonad.ManageHook            (className, appName, title, stringProperty, (<&&>), (<+>))
 import XMonad.Hooks.ManageHelpers   (doCenterFloat, (/=?))
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Util.NamedScratchpad  (namedScratchpadAction)
@@ -21,8 +21,8 @@ keys = main ++ scratchpad ++ media
 
 -- TODO: insert into M-o / M-S-o menus to be able open on new wksp
 main = concat
-  [ [ ("M-"     ++ k , spawnHere t)
-    , ("M-S-"   ++ k , spawnAndDo (insertPosition Master Newer) t)
+  [ [ ("M-"     ++ k , spawnHereAt Below  t)
+    , ("M-S-"   ++ k , spawnHereAt Master t)
     ] -- NOTE: We have M-o <Space> for floating terminal instead of (spawnAndDo doCenterFloat t).
     | (k, t) <-
     [ ("<Space>", "r.t -e r.tmux")
@@ -37,6 +37,8 @@ main = concat
     -- THINK:ENH: make M-g * to go to already opened instead of using mods
     ]
   ]
+  where
+    spawnHereAt pos cmd = withWindowSet $ \ws -> spawnAndDo (doShift (currentTag ws) <+> insertPosition pos Newer) cmd
 
 ---- Scratchpads
 -- TODO:ADD: M-s <Space> (export sPrf -- secondary prefix) -- jump to nearest next/prev(S-<Space>) empty wksp instead of <Bksp>

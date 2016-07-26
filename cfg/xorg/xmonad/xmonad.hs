@@ -38,6 +38,7 @@ import XMonad.Hooks.UrgencyHook     (withUrgencyHook, BorderUrgencyHook(..))
 ---- Layouts
 import qualified XMonad.StackSet as W
 -- basis
+import XMonad.Layout.TrackFloating  (trackFloating)
 import XMonad.Layout.Tabbed         (simpleTabbed)
 import XMonad.Layout.Grid           (Grid(..))
 import XMonad.Layout.Circle         (Circle(..))
@@ -146,6 +147,7 @@ myLayout = smartBorders
     . mkToggle (single REFLECTX)
     . onWorkspace "PI" piLayer
     . onWorkspace "SK" (reflectHoriz skLayer)
+    . trackFloating
     $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
@@ -160,8 +162,8 @@ myLayout = smartBorders
 myManageHook :: ManageHook
 myManageHook = manageSpawn <+>
   mconcat
-  [ isFullscreen --> topmost doFullFloat
-  , isDialog --> topmost doCenterFloat
+  [ isFullscreen --> doFullFloat
+  , isDialog --> doCenterFloat
   --   (ask >>= \w -> doF $ W.sink w) >> doShift "IM"
   -- FIXME: bring copyq into between windows stack -- check on first window of fullscreen wksp
   , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (3/10) (3/10))
@@ -191,8 +193,8 @@ myManageHook = manageSpawn <+>
     [ "_NET_WM_WINDOW_TYPE_TOOLTIP"
     , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
     ] ] --> doIgnore
-  ]
-  <+> insertPosition Below Newer <+>
+  ] <+>
+  -- insertPosition Below Newer <+>
   mconcat
   -- EXPL: for IM 'shift' is more comfortable
   [ className =? "Pidgin" --> doF (W.shift "PI")
@@ -211,8 +213,8 @@ myManageHook = manageSpawn <+>
   <+> manageDocks
   where
     wmhas t l = foldr1 (<||>) [ t =? x | x <- words l ]
-    topmost =  (<+> insertPosition Master Newer)
-    composeFloat = mconcat . map (--> topmost doFloat)
+    -- topmost =  (<+> insertPosition Master Newer)
+    composeFloat = mconcat . map (--> doFloat)
 
 
 -- BUG:FIXME: unsafe io operation, catch error/exception instead of Xorg fail.

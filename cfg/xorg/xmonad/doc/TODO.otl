@@ -257,10 +257,12 @@ FIND:(how to)
 
 
 FIXME
-	[_] BUG:(focus moves to slave)
+	2016-07-26 [X] BUG:(focus moves to slave)
 		* scratchpads show/hide not affects this
 		- Focus master, open (new one) M-o l then close/hide
 		- Create master and slave, focus master, open and close new slave
+		! culprit are "topmost" and 'insertPosition Below Newer' in manageHook
+		> Use XMonad.Layout.TrackFloating instead
 	[_] Jump to last urgent window by M-q
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-UrgencyHook.html
 		http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Util-ExtensibleState.html
