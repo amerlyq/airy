@@ -34,6 +34,8 @@ Nested repos
   [_] THINK: replace my jobs by 'parallel' (and extract jobs in separate script)
     OR: try xarg -P 8
     MAYBE:(parallel) will be able to sort output and print as query available?
+      https://www.gnu.org/software/parallel/parallel_tutorial.html
+      $ printf "%s\n" ./**/.git(-^D:h) | parallel 'cd {} && git pull --verbose --all --rebase --autostash'
   [_] TRY git pull --autostash
   [_] ENH: status for submodules
   [_] CHG: split name in two columns aligned on center -- dir | file

@@ -227,5 +227,11 @@ Remove 'origin/HEAD'
 : Points to branch checked out by default (i.e. when you clone).
   git remote set-head origin -d
 
+Remove tracking of unnecessary orphan branches (clean glg)
+  $ git branch -d -r origin/$remote_branch
+    !! this won't delete the branch in remote repo, nor in local !!
+  $ git branch --unset-upstream [$local_branch]
+    # make pull/push unaware of remote previous existence
+
 Show author and commiter
   git show --format=full
