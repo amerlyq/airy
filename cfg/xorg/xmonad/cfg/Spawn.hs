@@ -117,8 +117,8 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     inGroup "M-i"
     [ ("u", "r.b -h")
     , ("g", "r.game -p")
-    , ("e", "r.dict --en --vim")
-    , ("r", "r.dict --ru --vim")
+    , ("e", "r.dict --en --dmenu")
+    , ("r", "r.dict --ru --dmenu")
     , ("m", "r.mpd-move")
     ],
     inGroup "M-y"
