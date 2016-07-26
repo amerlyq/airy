@@ -9,8 +9,8 @@
 # 6 | image      | rgb preview
 
 path="$1"
-width="$2"
-height="$3"
+width="${2:-$(tput cols)}"
+height="${3:-$(tput lines)}"  # OR '-0' for all
 cached="$4"
 
 try(){ timeout --kill-after 5 3 "$@"; }
