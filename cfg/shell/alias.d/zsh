@@ -20,10 +20,11 @@ alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-run
 ## Filters
 alias -g H='|head '
 alias -g C='|wc -l '
-alias -g S='|noglob sort -n'
 alias -g T='|column -t '
 alias -g W='|while read line; do '
 alias -g SR='|noglob sed -rn'
+alias -g SN='|noglob sort -n'
+alias -g SU='|noglob sort -u'
 
 for i in {1..3}; do alias -g C$i="|noglob awk '{print\$$i}'"; done
 alias -g C\$="|noglob awk '{print\$NF}'"

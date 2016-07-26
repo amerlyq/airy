@@ -38,7 +38,7 @@ Branch/Tag
   List branches
     $ cvs log -h 2>&1 | awk -F"[.:]" '/^\t/&&$(NF-1)==0{print $1}' | awk '{print $1}' | sort -u
   This will bring up tags too, but tags and branches are basically the same in CVS.
-    $ cvs rlog -h -l -b module1
+    $ cvs rlog -h -l -b module1  # only pwd w/o subdirs
   Lists all tags and braches for each and any file together with the revision it belongs to.
     $ cvs status -v [<file>]
     BAD: initially uploads current wkdir to server
@@ -49,3 +49,8 @@ Branch/Tag
   # You don't have to do an actual checkout. You can use the -n option to only simulate this:
     $ cvs -n co -r$tag $module
     $ cvs log -N -S -r$tag &> ../cvs-one-branch.log
+
+
+CVS/Tag
+  * N is for tags, T is for branches.
+  * If any file in a directory is a tag the whole directory is treated as a tag.
