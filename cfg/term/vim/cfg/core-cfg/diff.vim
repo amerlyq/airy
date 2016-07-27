@@ -1,9 +1,14 @@
-" NOTE diffopt=iwhite  to find what is -common- between buffers
+set diffopt=filler,context:3
 
-nnoremap [Frame]dD :diffoff<CR>
-nnoremap [Frame]dd :diffupdate<CR>
-nnoremap [Frame]dt :diffthis<CR>
-nnoremap [Frame]dT :DiffOrig<CR>
+noremap  <unique> [Frame]di :<C-u>set diffopt=icase<CR>
+noremap  <unique> [Frame]df :<C-u>exe 'set diffopt=filler,context:'.v:count<CR>
+" NOTE:(iwhite) to find what is -common- between buffers
+noremap  <unique> [Frame]dw :<C-u>set diffopt=iwhite<CR>
+
+nnoremap <unique> [Frame]dx :diffoff<CR>
+nnoremap <unique> [Frame]dd :diffupdate<CR>
+nnoremap <unique> [Frame]dt :diffthis<CR>
+nnoremap <unique> [Frame]do :DiffOrig<CR>
 " nnoremap <silent> <expr> ,d ":\<C-u>".(&diff?"diffoff":"diffthis")."\<CR>"
 
 " Disable paste.
@@ -12,6 +17,10 @@ au MyAutoCmd InsertLeave * if &l:diff | diffupdate | endif
 " Randy Morris' convenient diff mappings
 " http://www.reddit.com/r/vim/comments/kz84u#c2oiq1a
 if &diff
+" FIXME: convert to <buffer> mappings
+" FIXME: run on each 'diff' activation
+" ALT:FIND: nice plugin for 'diff'
+
   " allows you to 'do undo' ('undo a change in the opposite window')
   nnoremap du :wincmd w <Bar> undo <Bar> wincmd w <Bar> diffupdate<enter>
   " updates the highlighting and folding when undoing a change
