@@ -8,8 +8,6 @@ uncolor index *
 color index   default         default   "~A"      # all messages
 color index   blue            default   "~U"      # unread messages
 color index   brightblue      default   "~N"      # new messages
-color index   red             default   "~F"      # flagged
-color index   brightred       default   "~F~U"    # flagged, unread
 
 # EXPL: can't determine usefulness
 # color index   default         default   "~R"      # read messages
@@ -23,12 +21,12 @@ color index   brightred       default   "~F~U"    # flagged, unread
 color index   green           default   "~p"      # to me
 color index   brightcolor28   default   "~p~U"    # to me, unread
 color index   brightcolor70   default   "~p~N"    # to me, new
-color index   brightred       default   "~p~F"    # to me, flagged
-color index   red             default   "~p~U~F"  # to me, unread, flagged
+# color index   red             default   "~p~F"    # to me, flagged
+# color index   brightred       default   "~p~U~F"  # to me, unread, flagged
 ## From me
 color index   color9          default   "~P"      # from me
 color index   brightcolor9    default   "~P~U"    # from me, unread
-color index   color9          default   "~P~U~F"  # from me, unread, flagged
+# color index   color9          default   "~P~U~F"  # from me, unread, flagged
 
 # When the Subject indicates a reply (with ":re")
 # then there *must* be a reference to the previous message!
@@ -49,6 +47,8 @@ color index   brightcolor13   default   "$my_fwd~U"  # forwarded, unread
 #color index   brightred       red       "~="      # duplicated
 color index   yellow          default   "~Q"      # have been replied
 color index   brightyellow    default   "~Q~U"    # have been replied, unread
+color index   red             default   "~F"      # flagged
+color index   brightred       default   "~F~U"    # flagged, unread
 color index   black           red       "~D"      # deleted
 color index   white           magenta   "~T"      # tagged
 
