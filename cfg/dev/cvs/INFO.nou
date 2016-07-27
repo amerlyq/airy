@@ -1,16 +1,14 @@
-> CVS
+%%%%% CVS
+
+REF
 > http://www.cs.umb.edu/~srevilak/cvs.html
 > http://web.mit.edu/gnu/doc/html/cvs_20.html
 : http://pfspd.sourceforge.net/cvs.html
-: https://www-e815.fnal.gov/webspace/cvs/commands.html
-  status
-    cvs -q -n update
-    cvs status -qq
-    cvs -q status "$@" | grep '^[?F]' | grep -v 'Up-to-date'
-    cvst (:my alias:)
-
+https://www-e815.fnal.gov/webspace/cvs/commands.html
 http://wiki.audacityteam.org/wiki/CVS_Tips_and_Tricks
+!! https://netbeans.org/community/sources/branches.html
 
+% CMP:(cvs/svn/git)
 > https://git.wiki.kernel.org/index.php/GitSvnCrashCourse
   git clone == cvs/svn checkout
   git pull == cvs/svn update
@@ -30,26 +28,24 @@ CVS mirror
   https://wiki.mozilla.org/How_to_Create_a_CVS_Mirror
   http://www.toptip.ca/2010/02/linux-create-cvs-repository-on-local.html
 
-Branch/Tag
+% Branch/Tag
   http://www.astro.princeton.edu/~rhl/cvs-branches.html
-  http://ioctl.org/unix/cvs/branches/
   !! http://cvsgui.sourceforge.net/howto/cvsdoc/cvs_5.html
+  http://ioctl.org/unix/cvs/branches/
+  http://glacier.lbl.gov/DAQ/cvs_branch.html
+  http://www.bioinf.uni-freiburg.de/~mmann/HowTo/cvs_branches.html
+  http://docstore.mik.ua/orelly/other/cvs/cvs-CHP-4-SECT-1.htm
+  http://www.badgertronics.com/writings/cvs/labeling-n-branching.html
+  http://commons.oreilly.com/wiki/index.php/Essential_CVS/Using_CVS/Tagging_and_Branching
 
-  List branches
-    $ cvs log -h 2>&1 | awk -F"[.:]" '/^\t/&&$(NF-1)==0{print $1}' | awk '{print $1}' | sort -u
-  This will bring up tags too, but tags and branches are basically the same in CVS.
-    $ cvs rlog -h -l -b module1  # only pwd w/o subdirs
-  Lists all tags and braches for each and any file together with the revision it belongs to.
-    $ cvs status -v [<file>]
-    BAD: initially uploads current wkdir to server
-
-  List files in tag
-  !! http://versioncontrol.wikia.com/wiki/List_history_on_branch
-  # This will give you the names of all the files tagged TagName in module ModuleName.
-  # You don't have to do an actual checkout. You can use the -n option to only simulate this:
-    $ cvs -n co -r$tag $module
-    $ cvs log -N -S -r$tag &> ../cvs-one-branch.log
-
+  Google:
+    why cvs branch two tags
+    cvs distinguish tag branch
+    cvs check tags same branch
+    how cvs works
+    cvs tag subset
+    cvs branch why two tag
+    cvs what is commit
 
 CVS/Tag
   * N is for tags, T is for branches.
