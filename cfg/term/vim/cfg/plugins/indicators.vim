@@ -72,9 +72,11 @@ call dein#add('nathanaelkane/vim-indent-guides', {
 "   'zsh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] }
 call dein#add('luochen1990/rainbow', {
   \ 'on_ft': ['lisp', 'vim', 'tex', 'xml', 'html', 'xhtml', 'php', 'css'],
+  \ 'on_cmd': 'RainbowToggle*',
+  \ 'hook_add': "noremap <unique> [Toggle]r :<C-u>RainbowToggle<CR>",
   \ 'hook_source': "
 \\n   let g:rainbow_active = 1
-\\n   let g:rainbow_conf = {'separately': { '*': 0, 'lisp': {}, 'vim': {} }}
+\\n   let g:rainbow_conf = {'separately': { '*': {}, 'lisp': {}, 'vim': {} }}
 \\n   let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]
 \\n   let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
 \"})
