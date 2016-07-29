@@ -24,7 +24,10 @@ macro index,browser  ,s  "<change-folder>=Sent<enter>"   "Go to sent"
 # EXPL: Trick to show contextual list of mailboxes
 macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'
 macro index \Ca <tag-pattern>~A<enter>   "select all"
+# TRY: combine with \Ca by ternary op checking if there are tagged entries
+# macro index \Ca <untag-pattern>~A<enter>   "deselect all"
 macro index  +  <limit>all<enter>        "limit reset"
+macro index '"' <limit>all<enter>        "limit reset"
 macro generic,pager <f12> ":source ~/.mutt/muttrc<enter>"
 
 # EXPL: collapsing
