@@ -4,8 +4,8 @@
 inoremap <unique> ,s <Esc>:update<CR>
 
 " Be consistent with C and D which reach the end of line
-if empty(maparg('Y','n'))| nnoremap <unique> Y y$ |en
-if empty(maparg('Y','v'))| vnoremap <unique> Y y$ |en
+if empty(maparg('Y','n'))| exe 'nnoremap <unique> Y y$' |en
+if empty(maparg('Y','v'))| exe 'vnoremap <unique> Y y$' |en
 " Prevent Paste loosing the register source. Deleted available by "- reg.
 "   http://stackoverflow.com/a/7797434/1147859
 vnoremap <unique> p pgvy
