@@ -2,6 +2,7 @@
 source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
+cwd_script
 [[ :$PATH: == *:${CURR_DIR_CACHE:?}/bin:* ]] ||
   export PATH=${CURR_DIR_CACHE:?}/bin:$PATH
 
@@ -54,8 +55,6 @@ elif distro ubuntu; then
       sudo update-alternatives --set $1 "$2"; }
 fi
 
-### Go to current script's directory
-cd $(dirname $(readlink -m ${0}))
 airy_cache_pwd_mod
 
 if [[ -z $MODS_RUN_DISABLE ]]; then

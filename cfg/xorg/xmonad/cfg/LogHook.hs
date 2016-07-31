@@ -7,6 +7,7 @@ module XMonad.Config.Amer.LogHook (myLogHook) where
 import qualified Data.Map.Strict as M
 import System.IO (hPutStrLn)
 import Data.Default  (def)
+import Text.Regex    (mkRegex, subRegex)
 
 import XMonad                         (io)
 import XMonad.Actions.CopyWindow      (wsContainingCopies)
@@ -43,7 +44,7 @@ myStateLogger copies = dynamicLogString def
   , ppOrder   = \(ws:l:_) -> [l, ws]                          -- elems order (title ignored)
   -- , ppSort    = getSortByIndex
   -- , ppExtras  = []
-  , ppLayout  = clickly . \nm -> case nm of
+  , ppLayout  = clickly . \nm -> case nmFilter nm of
       "ResizableTall" -> "[|]"
       "ReflectX ResizableTall" -> "]|["
       "Mirror ResizableTall" -> "[-]"
@@ -69,6 +70,7 @@ myStateLogger copies = dynamicLogString def
                 | otherwise = s
     pHidden i | i `elem` MyWksp.all = cHidden i (clickws i i)
               | otherwise = ""
+    nmFilter nm = subRegex (mkRegex "SmartSpacing\\s+[0-9]+\\s*") nm ""
 
 
 myLogHook h = do

@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
+cd "$(readlink -m "${0%/*}")"
 [[ -L ~/.shell ]] || ln -svT "$PWD/cfg/shell" ~/.shell
 source ~/.shell/func.d/cfgsetup
 mkdir -vp "${CURR_DIR_CACHE:?}"
@@ -13,20 +13,9 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 #   -- By SSH them also not visible
 # mpd 'setup' wasn't launched at all
 # NEED: log last run into file ~/.cache/airy/mods/setup.log
+# TODO: ./setup -U -- do only ./update w/o ./setup
 
-# ======================================================================
-if [[ -z $DISPLAY ]]; then  # Use host xserver if SSH
-    export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')
-fi
-if cfgOpt r && [[ -f $mods ]]; then
-    rm -vf "$queue"
-    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
-fi
-
-# THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
-if cfgOpt i && cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; then ./update; fi
-
-# ======================================================================
+### Colorize output ====================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
 header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
 pretty() { sed -r "
@@ -41,7 +30,7 @@ pretty() { sed -r "
   /(I|N):\s.*/s//$C6&$CR/
   /.*\s(-> L\s|::\/.*->).*/s//$C4&$CR/
   /~\/\.config\/systemd\/user\//s///g
-  /^(\s*)Created symlink from (.*) to (.*)\.$/s//\1@@-\2 -> \3/
+  /^(\s*)Created symlink (from )?(.*) (to|→) (.*)\.$/s//\1@@-\3 -> \5/
   /^\s*(-> @\s|@@-.*\s->\s).*/s//$C9&$CR/
   /.*\s-> C\s.*/s//$C3&$CR/
   /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
@@ -49,8 +38,26 @@ pretty() { sed -r "
 
 # THINK:USE: exec > >(pretty)  (BUT: pacman -Syu output, jobs, etc?)
 exec > >(pretty)
-# ======================================================================
-## Setup all configs (private data must be initialized already)
+
+### Prepare state ======================================================
+if [[ -z $DISPLAY ]]; then  # Use host xserver if SSH
+    export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')
+fi
+if cfgOpt r && [[ -f $mods ]]; then
+    rm -vf "$queue"
+    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
+fi
+
+started_anew(){ cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; }
+# THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
+if started_anew && cfgOpt i; then ./update; fi
+if started_anew && [[ -d ~/.config/systemd/user ]]; then
+    echo "N: clean systemd user units"
+    rm -rf ~/.config/systemd/user/*
+fi
+
+### Setup all configs ==================================================
+# NOTE: private data must be initialized already
 prf=${CURR_DIR_CACHE:?}/profile  # Populate private env
 [[ -f $prf ]] && source "$prf" || echo "Wrn: not found '$prf'"
 
@@ -87,12 +94,7 @@ else
     [[ -f "$queue" ]] || cp -vT "$mods" "$queue"
 fi
 
-if cfgOpt u && ((!$#)) && [[ -d ~/.config/systemd/user ]]; then
-    echo "N: clean systemd user units"
-    rm -rf ~/.config/systemd/user/*
-fi
-
-# ======================================================================
+### Mods ===============================================================
 # FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
 # EXPL: -m (in main 'setup') forces single thread execution
 run(){ if [[ -f $1 ]]; then "$@" $(cfgOpt m || echo -m); else echo "(no ${1##*/})"; fi; }
@@ -113,8 +115,7 @@ while read d; do echo ">>> $d <<<"
 done <<< "$(<"$queue")"
 rm "$queue"
 
-# ======================================================================
-
+### Post-install =======================================================
 if [[ $(jobs -p) ]]; then
     header "Waiting jobs to complete"
     jobs -l

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/system
-running_X || exec r.bt
+running_X || [[ $1 == -t ]] || exec r.bt
 
 log=${TMPDIR:-/tmp}/qute/$(date +%Y%m%d_%H%M%S).log
 mkdir -p "${log%/*}"
