@@ -37,6 +37,11 @@ Renderer
 
 bumblebee setup
 	https://gist.github.com/cpburnz/21694595b6dfffebf964
+  Find current active card
+    $ cat /proc/acpi/bbswitch
+      0000:01:00.0 OFF
+  Manually ON/OFF nvidia card
+    $ sudo echo ON >> /proc/acpi/bbswitch
 
 Monitors EDID
 	paci read-edid

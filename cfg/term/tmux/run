@@ -11,6 +11,14 @@
 # $ r.t -e tmux
 # > child finished with error '256'
 
+# FIXME: don't kill tmux session:
+#  - if it was manually detached beforehand
+#  - if I have attached one window to another -- don't kill session on close of either one
+
+# THINK: allow to connect nested session?
+#   OR: auto-exit main tmux before establishing nested session
+#     => if main tmux -- has only one window in main terminal
+
 # Exit session on kill
 name="st-$$"
 trap "tmux kill-session -t $name" INT TERM EXIT
