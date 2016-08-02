@@ -11,6 +11,7 @@ READ
 
 SEND
   Open on account (or use it to choose send from)
+    BUG: uses DFL instead of choosen by -f ... when mail is sent from cmdline
     mutt -f imaps://user@gmail.com@imap.gmail.com
     mutt -f /path/to/mail/john  # local folder on server
   Message from file / shell output
@@ -18,6 +19,7 @@ SEND
     cat ./message.txt | mutt -s "Subject" user@gmail.com
   With attachment
     ... -a /tmp/file.jpg
+    echo | mutt -s "subject" -a ./file -- user@gmail.com
   Diff profile
     cat ./message.txt | mutt -s "Subject" -e "source ~/.mutt/acc/work" -e "set smtp_pass=$(read -s p && echo $p)" user@gmail.com
   Run macro on startup

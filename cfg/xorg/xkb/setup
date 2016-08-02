@@ -4,6 +4,7 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 link -skt '/usr/share/X11' xkb/{compat,rules,symbols,types}/*
 
+# CHECK: maybe broken, as airy/setup sets DISPLAY=:0
 if running_X; then
   ./run
 fi

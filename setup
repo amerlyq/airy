@@ -50,8 +50,8 @@ fi
 
 started_anew(){ cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; }
 # THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
-if started_anew && cfgOpt i; then ./update; fi
-if started_anew && [[ -d ~/.config/systemd/user ]]; then
+if started_anew "$@" && cfgOpt i; then ./update; fi
+if started_anew "$@" && [[ -d ~/.config/systemd/user ]]; then
     echo "N: clean systemd user units"
     rm -rf ~/.config/systemd/user/*
 fi
