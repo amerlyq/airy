@@ -17,6 +17,8 @@ SEND
   Message from file / shell output
     mutt -s "subject" recipient@server.com < ~/message.txt
     cat ./message.txt | mutt -s "Subject" user@gmail.com
+  Message from pipe, but edit afterwards
+    mutt -i <(cmd) -s "subject" user@gmail.org
   With attachment
     ... -a /tmp/file.jpg
     echo | mutt -s "subject" -a ./file -- user@gmail.com

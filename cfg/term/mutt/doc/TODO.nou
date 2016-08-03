@@ -31,9 +31,19 @@ TODO
   [_] macro on 'c' -- change dir into current before showing folder list
   [_] FIXME: don't re-source password on 'c' or acc switch
     * BUT prompt on launch only for passwd of curr acc (others -- on demand)
+  [_] BUG:FIXME: mail not saved into 'Sent' when sent from cmdline
+    http://stackoverflow.com/questions/21860791/mutt-send-email-without-saving-it-to-sent-folder
+  [_] DEV:FIX: passwd prompts 3-times by multiple 'source' commands in ./cfg/accrc
+    * NEED somehow cache password for each acc in its own var
+    * Check if its var empty and only then query to gpg-passwd
+      CHECK account-hook if it's sufficient for this operation
+      THINK: must be before 'source $acc' to populate $my_pass for $imap_pass assign
+        BUT at the same time must be after it to populate $my_pass_key by which we query mutt-passwd
+    ? maybe piping "source ../accrc |" will help somehow?
+    [_] MOVE mutt/gpg-passwd -> mutt/bin/passwd (fix accs for kedi)
 
 REF
-  http://www.mutt.org/doc/manual/
+  !!! http://www.mutt.org/doc/manual/
   >> http://www.mutt.org/doc/manual/manual-4.html
   http://www.mutt.org/doc/manual/manual-5.html
   : mailcap
@@ -50,6 +60,9 @@ mutt
     2015-09-04 [X] http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
     https://bitbucket.org/jasonwryan/shiv/src/tip/.mutt/
     https://github.com/gregf/dotfiles/blob/master/mutt/muttrc.bindings
+    Deferred notmuch (read later)
+      https://github.com/larsks/mutt-utils/blob/master/notmuch/muttrc.deferred
+        https://github.com/larsks/mutt-utils
   Setup
     > http://www.guckes.net/Mutt/setup.html
     [_] Address book and thorough setup

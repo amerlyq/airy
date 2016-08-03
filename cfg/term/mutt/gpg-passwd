@@ -1,11 +1,18 @@
 #!/bin/bash -e
 
-key="${1:?No}"
+[[ -t 0 ]] && key=${1:?} || key=${1:$(ifne cat)}
 path=~/.cache/airy/gpg/mutt.gpg
 
 # source "gpg -d ~/.mutt/passwords.gpg |"
 # source `FILE=$HOME/.muttaliases; if [ ! -s "$FILE" ]; then FILE=/dev/null;fi;echo "$FILE"`
-if [[ -s "$path" ]]; then
-    gpg --use-agent --quiet --batch --decrypt "$path" |
-        awk '/'"$key"'/{printf"%s",$NF;exit}'
+if [[ -s $path ]]; then
+  pass=$(gpg --use-agent --quiet --batch --decrypt "$path" \
+    | awk '/'"$key"'/{printf"%s",$NF;exit}')
 fi
+
+if [[ -z $pass ]]; then
+  read -esp "Mutt pass ($key): " pass </dev/tty
+  echo >/dev/tty
+fi
+
+printf "%s" "$pass"

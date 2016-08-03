@@ -1,6 +1,6 @@
 #!/bin/bash -e
 THEME_ALLOWED='dark|light'
-echo A:$PWD
+
 source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 linkcp "$PWD" ~/.mutt
@@ -13,7 +13,7 @@ dst=~/.cache/mutt
 # THEME=$THEME ./gen/theme-solarized.gen
 
 # Gen accounts list to switch
-> "$dst/index"
+echo '# vim:ft=muttrc' > "$dst/index"
 for p in "$dst/acc"/*; do [[ -s $p ]] || continue
   ((k+=1))
   cat>> "$dst/index" <<EOT

@@ -14,3 +14,16 @@ CPU
 Video
   nvidia-smi -a
   nvidia-smi -q -d TEMPERATURE
+
+  Power down discrete GPU (neo)
+  # Idle temperature drops ~50C -> ~42C
+    $ paci acpi_call
+    Until next reboot
+    $ sudo modprobe acpi_call
+    $ sudo /usr/share/acpi_call/examples/turn_off_gpu.sh
+    # Trying \_SB.PCI0.PEG0.PEGP._OFF: works!
+    Persistent:
+    $ echo acpi_call | sudo tee /etc/modules-load.d/acpi_call.conf
+    $ cat /etc/tmpfiles.d/acpi_call.conf
+    # w /proc/acpi/call - - - - \\_SB.PCI0.PEG0.PEGP._OFF
+        : it writes specific OFF signal into /proc/acpi/call
