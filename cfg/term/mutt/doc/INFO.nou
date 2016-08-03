@@ -60,6 +60,11 @@ RC
     Runs a command everytime Mutt calls a function related to an account, like IMAP syncing.
     It does not require you to switch to any folder.
 
+  HACK: shell
+    source "gpg -d ~/.mutt/passwords.gpg |"
+    source `FILE=$HOME/.muttaliases; if [ ! -s "$FILE" ]; then FILE=/dev/null;fi;echo "$FILE"`
+
+
 Добавить POP3 getmail в cron для проверки раз 10 минут
   # crontab -e
   */10 * * * * /usr/bin/getmail

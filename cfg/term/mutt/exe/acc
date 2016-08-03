@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+dir=~/.cache/mutt
+
+[[ $ACC ]] || ACC=$1
+[[ $ACC ]] || ACC=$(basename "$(readlink "$dir/default")")
+[[ -f $dir/acc/$ACC ]] || exit 3
+
+echo "set my_acc_dfl=$ACC"

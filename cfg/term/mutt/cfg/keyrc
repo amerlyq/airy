@@ -21,7 +21,7 @@ macro index,browser  ,i  "<change-folder>!<enter>"       "Go to inbox"
 macro index,browser  ,l  "<change-folder>^<enter>"       "Go to last"
 macro index,browser  ,s  "<change-folder>=Sent<enter>"   "Go to sent"
 
-# EXPL: Trick to show contextual list of mailboxes
+# HACK: show mailboxes list for current acc (BUT from root only)
 macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'
 macro index \Ca <tag-pattern>~A<enter>   "select all"
 # TRY: combine with \Ca by ternary op checking if there are tagged entries

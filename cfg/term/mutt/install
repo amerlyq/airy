@@ -1,11 +1,12 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-#| mutt | console mail client
+#| mutt    | console mail client
+#| neomutt | mutt with many patches
 
 if distro arch; then
-    pkg_inst mutt isync
-    aur_inst imapfilter
+    pkg_inst isync
+    aur_inst neomutt imapfilter
 
 elif distro ubuntu; then
     pkg_inst 'mutt'

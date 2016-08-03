@@ -41,6 +41,7 @@ TODO
         BUT at the same time must be after it to populate $my_pass_key by which we query mutt-passwd
     ? maybe piping "source ../accrc |" will help somehow?
     [_] MOVE mutt/gpg-passwd -> mutt/bin/passwd (fix accs for kedi)
+  [_] BUG: broken next session if enter wrong password -- partial source?
 
 REF
   !!! http://www.mutt.org/doc/manual/
@@ -57,12 +58,19 @@ mutt
     > https://wiki.archlinux.org/index.php/Mutt
     > https://www.earth.li/~huggie/mutt/muttrc.html
     https://github.com/andrewgaul/dotfiles/blob/master/muttrc
+    http://myhome.iolfree.ie/~gavcos/muttrc.html
     2015-09-04 [X] http://proft.me/2014/06/26/mutt-luchshij-pochtovyj-klient/
     https://bitbucket.org/jasonwryan/shiv/src/tip/.mutt/
     https://github.com/gregf/dotfiles/blob/master/mutt/muttrc.bindings
     Deferred notmuch (read later)
       https://github.com/larsks/mutt-utils/blob/master/notmuch/muttrc.deferred
         https://github.com/larsks/mutt-utils
+    Folder hooks examples
+      https://github.com/redondos/mutt/blob/master/.mutt/sourced/folder-hooks
+    Multi-window mutt with Screen
+      https://op-co.de/blog/posts/mulit-window_mutt/
+    Write in markdown
+      http://unix.stackexchange.com/questions/108485/send-email-written-in-markdown-using-mutt
   Setup
     > http://www.guckes.net/Mutt/setup.html
     [_] Address book and thorough setup
@@ -100,6 +108,7 @@ mutt
 
   2015-04-24 [X] pop3+smtp one-account
   [_] passwordless login (smth like private keys?)
+    ALT: https://dilawarnotes.wordpress.com/2014/01/28/using-mutt-saving-password-and-writing-mail-in-markdown/
     [_] gpg keyring
       For example, if you use gpg-agent to store your passphrase, then you
       can encrypt each password as its own file:

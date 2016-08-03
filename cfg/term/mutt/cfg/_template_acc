@@ -1,0 +1,41 @@
+# vim: ft=muttrc
+# WARNING: don't substitute variables here
+#   -- to be able to parse values directly by bash
+
+set realname = "User"
+set from = user@gmail.com
+
+set imap_user = user@gmail.com
+# ALT:(work) user@company.com
+# OR:(pop)
+# set pop_user = user
+# set pop_host = pops://user@pop3.company.com:995
+
+set smtp_url = smtps://user@gmail.com@smtp.gmail.com
+# ALT: smtp://$imap_user@smtp.gmail.com:587
+# ALT: smtps://$imap_user:$imap_pass@smtp.gmail.com
+# ALT:(work) smtps://user@smtp.company.com:25
+
+# EXPL: [$imap_user@...] -- prefixed only to have diff folders for each account
+# WARNING: Don't end $folder in '/'
+set folder = imaps://user@gmail.com@imap.gmail.com
+# ALT: imaps://user@gmail.com@imap.gmail.com:993/subfolder
+# ALT:(work) imaps://user@imap.company.com
+
+set spoolfile = "=INBOX"   # OR +[Gmail]/Important
+set postponed = "+[Gmail]/Drafts"
+
+# Gmail's SMTP server stores msg in '[Gmail]/Sent Mail' automatically
+unset record   # EXPL:(unset) to get rid of duplicates for Gmail
+# ALT: set record = "=Sent"
+
+# WARN: directory must exist on server; NEED patch to work
+set trash     = "=Trash"
+
+# set signature = "John Doe"
+# set signature = "/path/to/sig/file"
+
+# Account mappings
+macro index,browser  ,w  "<change-folder>=project1<enter>"  "Go to work project #1"
+
+color status white cyan

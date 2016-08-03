@@ -22,10 +22,8 @@ set indent_str="> "         # Set quotemark to 1 byte
 unset collapse_unread       # never collapse unread messages
 set uncollapse_jump         # jumps to first unread msg of thread on uncollapse
 set index_format="%M|%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
- # %M
+# %M
 # set index_format = "{%M} $index_format"
-folder-hook . 'push <collapse-all>'
-# folder-hook . 'push ":set collapse\_unread=no<enter>"'
 # SEE uncollapse_jump
 #   http://www.rdrop.com/docs/mutt/manual118.html
 
@@ -45,10 +43,8 @@ set abort_nosubject = yes   # Cancel a message when subject is blank
 set copy = yes              # keep copies of outgoing mail.
 set move = no
 
-# activate TLS if available on the server
-set ssl_starttls = yes
-# always use SSL when connecting to a server
-set ssl_force_tls=yes
+set ssl_starttls = yes  # activate TLS if available on the server
+set ssl_force_tls= yes  # always use SSL when connecting to a server
 # Display download progress every 5K
 set net_inc=5
 
@@ -76,15 +72,15 @@ set pop_reconnect = yes
 set pop_checkinterval = 60
 unset pop_delete
 # Similar to IMAP, a pop_authenticators option also exists
-
+# MAYBE: cures problem of not prompting for password on cmdline send
+# set smtp_authenticators = 'gssapi:login'
 
 ## DIRS
 # set folder = ~/work/mail
 # keep a cache of headers for faster loading (1.5.9+?)
-set header_cache = $my_cache/headers
-set message_cachedir = $my_cache/bodies
-set certificate_file = $my_cache/certificates
+set header_cache     = $my_cache/headers
 set message_cachedir = $my_cache/messages      # fetch imap msgs on disk instead of memory
+set certificate_file = $my_cache/certificates
 # set signature = ~/.mutt/signature  # Set in account
 
 
@@ -94,26 +90,33 @@ set sort_alias = alias
 set reverse_alias = yes
 source $alias_file
 
+
 ## BINDING
 # Speed up folders switch
 set sleep_time = 0
 source $my_cfg/keyrc
 # source $my_cfg/gpgrc          # Keyring
 source $my_cache/theme          # Theme
-source $my_cache/index          # List of accounts (generated)
-source $my_cache/default        # Default account (link)
 
-# NOTE: setup inside accounts
+# BUT:TRY:FIX using unmailboxes -- impossible to watch multiple accounts simultaneously
+folder-hook  . 'unmailboxes *'  # Necessary to reset connections
+source $my_cache/index          # List of accounts (generated)
+# Query DFL acc from env ACC=... or from symlink ./default
+source "~/.mutt/exe/acc $my_acc_dfl |"
+# BUG:(mutt -f ...) loads dfl password anyways
+#   => NEED check if '-f' was used; OR: always use $ ACC=... mutt
+set my_acc = $my_acc_dfl
+source $my_cfg/acc-load
+
+# NOTE: setup inside accounts. BUT? how to reset on account switch?
 # save-hook . '=Spam'           # DFL folder to save/move
 
-## COMMANDS
-mailboxes +Inbox
-# mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.gmail.com/family
-#>  config includes a macro bound to the 'y' key which will allow you to change
-#>  to any of the folders listed under mailboxes
+folder-hook . 'push <collapse-all>'
+# folder-hook . 'push ":set collapse\_unread=no<enter>"'
+
 
 ## HTML enriched mails
-set mailcap_path=$my_cfg/mailcap
+set mailcap_path = $my_cfg/mailcap
 alternative_order text/plain text/enriched text/html     # save html for last
 set implicit_autoview=yes  # Load in pager if setting in .mailcap says 'copiousoutput'
 auto_view text/html                                      # view html automatically

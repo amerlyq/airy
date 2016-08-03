@@ -1,0 +1,38 @@
+#!/bin/bash -e
+while getopts 'm' o; do
+[[ $o =~ :|\? ]] && exit 1 || OPTS=${OPTS/[$*]}$*
+done; shift $((OPTIND - 1))
+
+# prf(){ printf '%s' "$@"; }
+
+key=${1:-$([[ -t 0 ]]||ifne cat)}
+key=${key:?}
+pass=$2
+
+## Debug
+> /tmp/mut
+echo "\$2=$pass" >> /tmp/mut
+prf(){ printf '%s' "$@" | tee -a /tmp/mut; }
+
+path=~/.cache/airy/gpg/mutt.gpg
+if [[ -z $pass && -s $path ]]; then
+  pass=$(gpg --use-agent --quiet --batch --decrypt "$path" \
+    | awk -vk="\\\y$key\\\y" '$1~k{print$NF;exit}')
+fi
+
+if [[ -z $pass ]]; then
+  read -esp "Mutt pass ($key): " pass </dev/tty
+  echo >/dev/tty
+fi
+
+if [[ $OPTS =~ m ]]; then
+  prf "set my_pass=$pass"
+  if [[ $key =~ ^[a-zA-Z]+$ ]]
+  then prf "; set my_pass_$key=$pass"
+  else echo 'Err: key must be =~ \w+' >/dev/tty; fi
+else
+  prf "$pass"
+fi
+
+## Debug
+echo>> /tmp/mut
