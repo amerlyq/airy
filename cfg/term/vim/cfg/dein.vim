@@ -25,6 +25,8 @@ let g:dein#install_max_processes = 8
 " let g:dein#install_message_type = 'none'
 " let g:dein#enable_notification = 1
 
+" WARN: post hooks must be called manually; place before 'load_state'
+autocmd MyAutoCmd VimEnter * nested call dein#call_hook('post_source')
 
 " BUG: recaches only on second time after changing rc files
 "   -- OR first 'save_state' after chg rc saves wrong state

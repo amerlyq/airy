@@ -197,13 +197,13 @@ call dein#add('rhysd/committia.vim', {
 " TODO: use more often, analyze more of help
 " ALT: lambdalisue/vim-gita
 " EXPL:(post-hook) Check if already inside some repository
-call dein#add('tpope/vim-fugitive', {
+call dein#add('tpope/vim-fugitive', {'lazy': 0,
   \ 'augroup': 'fugitive',
   \ 'on_cmd': ['Git', 'Gstatus', 'Gdiff', 'Glog',
   \   'Gbrowse', 'Gblame', 'Gwrite'],
   \ 'hook_post_source': "call fugitive#detect(expand('#:p'))",
   \ 'hook_add': "
-\\n   autocmd BufReadPost fugitive://* set bufhidden=delete
+\\n   autocmd BufReadPost fugitive://* setl bufhidden=delete
 \\n   nnoremap <silent><unique> [Git]s :Gstatus<CR>
 \\n   nnoremap <silent><unique> [Git]l :Glog<CR>
 \\n   nnoremap <silent><unique> [Git]d :Gdiff<CR>
@@ -220,7 +220,7 @@ call dein#add('tpope/vim-fugitive', {
 "   co: checkout, S: diffstat, yc: copy SHA
 "   x/X: next/previous branching point
 " CHG: \ 'on_map': [ [Git]v, [Git]V ] -- file/full view
-call dein#add('gregsexton/gitv', {'lazy': 0,
+call dein#add('gregsexton/gitv', {
   \ 'on_cmd': 'Gitv',
   \ 'depends': 'vim-fugitive',
   \ 'hook_add': "
