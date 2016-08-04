@@ -1,7 +1,7 @@
 # vim:ft=muttrc
 # @brief: executes on folder-hook for each account
-# @args: set my_acc=...
+# @args: set my_acc=... my_pass=...
 
 source "$my_cfg/acc-purge"
 source "$my_cache/acc/$my_acc"
-source "~/.mutt/exe/pass -m $my_acc \$my_pass_$my_acc |"
+source "~/.mutt/exe/pass -m $my_acc $my_pass |"

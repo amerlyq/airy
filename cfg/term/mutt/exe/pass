@@ -3,16 +3,16 @@ while getopts 'm' o; do
 [[ $o =~ :|\? ]] && exit 1 || OPTS=${OPTS/[$*]}$*
 done; shift $((OPTIND - 1))
 
-# prf(){ printf '%s' "$@"; }
+prf(){ printf '%s' "$@"; }
 
 key=${1:-$([[ -t 0 ]]||ifne cat)}
 key=${key:?}
 pass=$2
 
 ## Debug
-> /tmp/mut
-echo "\$2=$pass" >> /tmp/mut
-prf(){ printf '%s' "$@" | tee -a /tmp/mut; }
+# > /tmp/mut
+# echo "\$2=$pass" >> /tmp/mut
+# prf(){ printf '%s' "$@" | tee -a /tmp/mut; }
 
 path=~/.cache/airy/gpg/mutt.gpg
 if [[ -z $pass && -s $path ]]; then
@@ -35,4 +35,4 @@ else
 fi
 
 ## Debug
-echo>> /tmp/mut
+# echo>> /tmp/mut

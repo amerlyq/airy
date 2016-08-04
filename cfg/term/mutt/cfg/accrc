@@ -21,7 +21,7 @@ mailboxes =INBOX
 #>  to any of the folders listed under mailboxes
 
 # WARN: folder-hook not run on cmdline sent
-folder-hook  "$folder"   "set my_acc=$my_acc; source $my_cfg/acc-load"
+folder-hook  "$folder"   "set my_acc=$my_acc my_pass=\$my_pass_$my_acc; source $my_cfg/acc-load"
 
 # CHECK: is it enough to query passwd only on folder-hook
 #   -- What about simultaneous watching mailboxes?
