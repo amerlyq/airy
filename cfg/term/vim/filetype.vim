@@ -16,6 +16,7 @@ augroup filetypedetect
   au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,Vagrantfile}
         \ setl ft=ruby fdm=syntax fdn=1
   " System
+  au BufRead,BufNewFile *.gpg     setf gpg
   au BufRead,BufNewFile {*.log*,log-*}       setf messages
   au BufRead,BufNewFile {PKGBUILD,.AURINFO}  setf sh
   au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap,*.target,*.service} setf systemd

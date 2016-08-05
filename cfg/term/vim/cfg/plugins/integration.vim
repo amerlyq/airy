@@ -125,11 +125,13 @@ call dein#add('KabbAmine/zeavim.vim', {
 "" CHECK Edit and save encrypted '*.gpg' files in-place {{{1
 " HACK -- load-on-demand by calling non-existent command
 " BUG: seems like can't do it lazy?
+"   ALT: rewrite to more lightweight
 " external_\ 'on_cmd': gpg
 " filename_patterns: ['\.gpg$', '\.asc$', '\.pgp$']
 " explorer: '.*\.\(gpg\|asc\|pgp\)$'
 " explorer: 1
 call dein#add('jamessan/vim-gnupg', {
+  \ 'on_ft': 'gpg',
   \ 'on_cmd': ['GnuPG'],
   \ 'hook_post_source': "silent! exe 'do GnuPG BufReadCmd '",
   \ 'hook_source': "
