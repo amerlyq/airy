@@ -4,7 +4,7 @@
 function! CompileInDir(...)
   let run = a:0 >= 1  ?  a:1 . ' '  :  '!'
   " 'actualee ' . @% . ' || ' .
-  exec l:run . 'abyss || { [ $? -eq 255 ] && abyss ' . @% . '}'
+  exec l:run . 'abyss -a || { (($?==10)) && abyss -f '.shellescape(@%).'; }'
   " set makeprg=ruby\ -c\ %
 endfunction
 
@@ -17,8 +17,7 @@ noremap <unique><silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
 fun! Abyss()
   let l:pmake = &makeprg
   let &makeprg = 'abyss'
-  Make
-  let &makeprg = l:pmake
+  try| Make |finally| let &makeprg = l:pmake |endtry
 endfun
 noremap <unique><silent> <Leader>m <Esc>:<C-U>w \| call Abyss()<CR>
 noremap <unique><silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>

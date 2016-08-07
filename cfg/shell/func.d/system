@@ -16,12 +16,24 @@ trap_errors(){
     # [[ $- =~ i ]] && return || exit
     set -o errexit
     set -o pipefail
+    # Let shell functions inherit ERR trap.  Same as `set -E'.
+    set -o errtrace
+    # Trigger error when expanding unset variables.  Same as `set -u'.
+    # set -o nounset
+
+    #  Trap non-normal exit signals: 1/HUP, 2/INT, 3/QUIT, 15/TERM, ERR
     # BUG: wrong LINENO for correct command
     # MAYBE: used previous LINENO instead of current?
     trap 'error -e ${LINENO} \
     "${FUNCNAME+[$FUNCNAME] }$BASH_COMMAND"
-    ' ERR EXIT
+    ' HUP INT QUIT TERM ERR
     # SEE: http://mywiki.wooledge.org/BashFAQ/105
+
+    # NOTE setting ERR trap does implicit `set -o errexit' or `set -e'.
+    # NOTE 9/KILL cannot be trapped.
+    # NOTE 0/EXIT isn't trapped because:
+    #  - with ERR trap defined, trap would be called twice on error
+    #  - with ERR trap defined, syntax errors exit with status 0, not 2
 }
 
 ### Go to current script's directory

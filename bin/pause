@@ -1,25 +1,25 @@
-#!/bin/bash
-
-# if [ $? -ne 0 ]; then pause; exit; fi
-
-ERR="${1?'You need $? as first argument'}"
+#!/bin/bash -e
+msg="Press any key to continue"
+ret=${1:?You need \$? as first argument}
 shift
 
-MSG="Press any key to continue"
+while getopts 'AaEeNn' o
+do OPTS+=$o; done; shift $((OPTIND-1))
 
-PROMPT="<======== $MSG ($(date +"%T")) ====($ERR)==>"
+set -o errtrace
+trap 'exit $ret' HUP INT QUIT TERM ERR EXIT
 
-pstop() { read -n 1 -sp "$PROMPT " tmp && printf "$@\n"; }
+pstop(){ local tmp; read -n 1 -s tmp; }
 
-case "$1" in
-    -p) shift; printf "$PROMPT $@\n" ;;
-    -e) shift; if [ "$ERR" != "0" ]; then pstop $@; fi ;;
-     *) pstop $@ ;;
-esac
+[[ $OPTS =~ A ]] && { pstop; exit; }
+[[ $OPTS =~ E ]] && { ((ret)) && pstop; exit; }
+[[ $OPTS =~ N ]] && { exit; }
 
-# if [ "$CURR_PLTF" == "MINGW" ]; then
-#     # -s = silent, -n1 = only one symbol needed to continue after the insert
-#     read -sn1 -p "Paused: press any key to continue..."
-# fi
+stat(){ printf "<======== %s($(date +"%T")) ====($ret)==>%s\n" \
+  "${1:+$1 }" "${*:+ ${*:2}}"; }
 
-exit $ERR
+[[ $OPTS =~ a ]] && { stat "$msg" "$@"; pstop; exit; }
+[[ $OPTS =~ e ]] && { ((ret))&&{ stat "$msg" "$@"; pstop; }||stat '' "$@"; exit; }
+[[ $OPTS =~ n ]] && { stat '' "$@"; exit; }
+
+stat "$msg" "$@"; pstop
