@@ -4,6 +4,7 @@
 
 # Priority for files:
 #   #1 modeline in file
+#   .abyss
 #   compile
 #   Makefile
 #   CMakeLists.txt
@@ -11,13 +12,17 @@
 
 set -o pipefail
 set -o errtrace
+
+# THINK split pause from abyss
+#   + remove excessive flags; most linux-way
+#   - can't derive last used $PWD and actual compiler for pause info
 trap 'pause $? $_pargs "${0##*/}" "${*:-: ${PWD/$HOME/\~}}"
 ' HUP INT QUIT TERM ERR EXIT
 
 _run=1
 _quiet=1
 _pargs=-N
-GWD=$(git rev-parse --show-toplevel 2>/dev/null)  # --git-dir
+GWD=$(git rev-parse --show-toplevel 2>/dev/null||:)  # --git-dir
 
 while getopts 'aAc:eEfnNqpr' o
 do case $o
@@ -52,17 +57,18 @@ run() {
   return 12
 }
 
-chain() { local ret=$?; ((ret==$1))||return $ret; }
+ignore() { local ret=$?; ((ret==$1))||return $ret; }
 build() {
   [[ $OPTS =~ f ]] && { file_build "$@"; return; }
   # Recursive search for project root dir
   while [[ $PWD != / ]]; do
-    dir_build "$@" && return || chain 10
+    dir_build "$@" && return || ignore 10
     cd ..
   done
   # NOTE: not much sense to apply after recursive traversing
   [[ $GWD ]] && { cd "$GWD" && dir_build "$@"; return; }
+  return 13
 }
 
 build "$@"
-((!_run)) || run || chain 12
+((!_run)) || run || ignore 12
