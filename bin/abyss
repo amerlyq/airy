@@ -16,8 +16,8 @@ set -o errtrace
 # THINK split pause from abyss
 #   + remove excessive flags; most linux-way
 #   - can't derive last used $PWD and actual compiler for pause info
-trap 'pause $? $_pargs "${0##*/}" "${*:-: ${PWD/$HOME/\~}}"
-' HUP INT QUIT TERM ERR EXIT
+onexit(){ pause $? $_pargs "${0##*/}" "${*:-: ${PWD/$HOME/\~}}"; }
+trap 'onexit' HUP INT QUIT TERM ERR
 
 _run=1
 _quiet=1
@@ -36,14 +36,29 @@ esac; OPTS+=$o; done; shift $((OPTIND-1))
 [[ $OPTS =~ f && $# -eq 1 ]] && BIN=${1%.*} || BIN=${PWD##*/}
 BIN=$(realpath -m "${BIN:?}.bin")
 
+ignore() { local ret=$?; ((ret==$1))||return $ret; }
+
+# NEED: if ${GWD:+$GWD/.git/abyss} -- directly $ cd $GWD
+# WARN: can't use abyss <args> inside .git/abyss commands
+abyssrc() { for f in .abyss .git/abyss; do
+  [[ -f $f ]] && { eval $(sed -n "/^${1:?}:\s/s///p" "$f"); return; }
+done; return 12
+}
+
 dir_build() {
-  [[ -f ./compile ]] && { ./compile "$@"; return; }
-  [[ -f ./Makefile ]] && { make ${_quiet:+-s} "$@"; return; }
+  (($#)) || { abyssrc 'build' && return || ignore 12; }
+
+  [[ -f compile ]] && { ./compile "$@"; return; }
+  [[ -f .git/compile ]] && { ./.git/compile "$@"; return; }
+
+  [[ -f Makefile ]] && { make ${_quiet:+-s} "$@"; return; }
   # EXPL: skip cmake-only git subdirs beside git root
-  [[ -f ./CMakeLists.txt && (-z $GWD||$GWD == $PWD) ]] && { sir bR "$@"; return; }
+  [[ -f CMakeLists.txt && (-z $GWD||$GWD == $PWD) ]] && {
+      sir bR "$@"; return; }
   return 10
 }
 
+# USE: key 'recipe'
 file_build() { case "$1"
 in *.c  ) gcc -O1 -g3 -o "$BIN" -I "$PWD" "$@"; return
 ;; *.cpp) g++ -O1 -g3 -o "$BIN" -I "$PWD" -std=c++11 "$@"; return
@@ -51,13 +66,17 @@ esac; return 11
 }
 
 run() {
-  [[ -f ./run ]] && { ./run; return; }
-  [[ -f ./Makefile ]] && grep -q '^run:' ./Makefile && { make -s run; return; }
+  (($#)) || { abyssrc 'run' && return || ignore 12; }
+
+  [[ -f run ]] && { ./run; return; }
+  [[ -f .git/run ]] && { ./.git/run; return; }  # OR .git/dfl-run
+
+  [[ -f Makefile ]] && grep -q '^run:' Makefile && {
+      make ${_quiet:+-s} run; return; }
   [[ -f ${BIN:?} ]] && { "$BIN"; return; }
   return 12
 }
 
-ignore() { local ret=$?; ((ret==$1))||return $ret; }
 build() {
   [[ $OPTS =~ f ]] && { file_build "$@"; return; }
   # Recursive search for project root dir
@@ -71,4 +90,5 @@ build() {
 }
 
 build "$@"
-((!_run)) || run || ignore 12
+((!_run)) || run "$@" || ignore 12
+onexit  # success
