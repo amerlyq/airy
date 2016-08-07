@@ -11,17 +11,17 @@ endfunction
 com! -nargs=1 Silent | exe ':silent !'.<q-args> | exe ':redraw!'
 command! -bar -nargs=? CompilerInDir call CompileInDir(<args>)
 " \| cw
-noremap <unique><silent> <F5> <Esc>:<C-U>w \| CompilerInDir<CR>
+noremap <unique><silent> <F5> <Esc>:<C-U>up \| CompilerInDir<CR>
 " DISABLED: with LatchCtrl C-j has detrimental effects in message.log.*
-" noremap <unique><silent> <C-J> <Esc>:<C-U>w \| CompilerInDir 'Silent'<CR>
-fun! Abyss()
-  let l:pmake = &makeprg
-  let &makeprg = 'abyss'
-  try| Make |finally| let &makeprg = l:pmake |endtry
-endfun
-noremap <unique><silent> <Leader>m <Esc>:<C-U>w \| call Abyss()<CR>
-noremap <unique><silent> <Leader>j <Esc>:<C-U>w \| Silent actualee %<CR>
-noremap <unique><silent> <Leader>M <Esc>:<C-U>w \| Make<CR>
+" noremap <unique><silent> <C-J> <Esc>:<C-U>up \| CompilerInDir 'Silent'<CR>
+
+com! -bar -bang -nargs=* Abyss let s:mp=&mp
+    \|set mp=abyss|try|exe 'Make<bang> <args>'|cat|final|let &mp=s:mp|endt
+noremap <unique><silent> <Leader>m <Esc>:<C-U>up \| Abyss -r \| cw<CR>
+noremap <unique><silent> <Leader>M <Esc>:<C-U>up \| Abyss!<CR>
+noremap <unique><silent> [Unite]<Leader>m <Esc>:Copen<CR>
+
+noremap <unique><silent> <Leader>j <Esc>:<C-U>up \| Silent actualee %<CR>
 
 " map <F9> :!gcc -o %< % <enter><CR><C-w>
 

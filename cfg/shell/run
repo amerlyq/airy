@@ -10,7 +10,7 @@ then shift 2; fi
 || export SHELL=/bin/bash
 
 # USE: Interactive shell
-(($#)) || exec ${SHELL:?}
+[[ $1 != -c ]] && exec ${SHELL:?} "$@"
 
 # USE: Cmdline populated with aliases
 [[ $1 != -c ]] || shift

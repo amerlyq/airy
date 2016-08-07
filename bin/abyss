@@ -22,8 +22,8 @@ GWD=$(git rev-parse --show-toplevel 2>/dev/null)  # --git-dir
 while getopts 'aAc:eEfnNqpr' o
 do case $o
 in c) cd "$OPTARG"  # ALT: make -C "$PWD/build"
-;; q) ((_quiet=!_quiet))
-;; r) ((_run=!_run))
+;; q) _quiet=$((!_quiet))
+;; r) _run=$((!_run))
 ;; [aAeEnN]) _pargs=-$o
 esac; OPTS+=$o; done; shift $((OPTIND-1))
 ((_quiet))||unset _quiet

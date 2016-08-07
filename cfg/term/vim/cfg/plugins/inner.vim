@@ -13,7 +13,9 @@ call dein#add('Shougo/vimproc.vim', {'lazy': 0, 'build': 'make'})
 
 
 "" CHECK Make long-running tasks async {{{1
-call dein#add('tpope/vim-dispatch', {'on_cmd': 'Make'})
+call dein#add('tpope/vim-dispatch', {
+  \ 'on_cmd': ['Make', 'Dispatch', 'FocusDispatch', 'Start'],
+  \ 'hook_post_source': "FocusDispatch abyss -r"})
 
 
 
