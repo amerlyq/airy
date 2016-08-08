@@ -1,0 +1,47 @@
+#!/bin/bash -e
+hash tmux &>/dev/null && tmux start-server || exit
+
+nm='parallel'
+
+while getopts 't:' o; do case $o
+in t) nm=$OPTARG
+;; *) exit 1; esac; done; shift $((OPTIND-1))
+(($#)) && CMDS=( "$@" ) || exit 2
+
+win_cnt(){ tmux list-windows -t "$nm" 2>/dev/null | wc -l; }
+pane_run(){ tmux send-keys -t "$nm" "$*" "C-m"; }
+pane_nm(){ local p=${1:?}; p=${p:0:12}; p=${p/[.:]/_}
+  pane_run 'printf "\e]2;%s\e\\" '"${p:?}"; }
+pane_first(){
+  # EXPL: jump to first window (based on tmux.conf)
+  tmux select-window -t "$nm:0" 2>/dev/null ||
+    tmux select-window -t "$nm:1"
+  tmux select-pane -t "$nm:0" 2>/dev/null ||
+    tmux select-pane -t "$nm:1"
+}
+
+
+# EXPL: connect to existing session
+tmux has-session -t "$nm" 2>/dev/null ||
+  tmux new-session -d -s "$nm" -n "$nm-$((1+$(win_cnt)))"
+# OR:(clean)  tmux kill-session -t $nm
+# OR:(ignore) exit
+
+# NOTE: necessary only when no -n... and no "$maincmd"
+# tmux rename-window -t "$nm:0" "$wnm" 2>/dev/null ||
+#     tmux rename-window -t "$nm:1" "$wnm"
+
+for cmd in "${CMDS[@]}"; do
+  # EXPL: splits windows until "too small" error, then creates new window
+  if tmux split-window -t "$nm" -v; then
+    tmux select-layout -t "$nm" even-vertical
+  else
+    tmux new-window -t "$nm" -n "$nm-$((1+$(win_cnt)))"
+  fi
+  pane_nm "$cmd"
+  pane_run "$cmd"
+done
+
+pane_first
+# THINK: Only on demand?
+tmux attach -t "$nm"
