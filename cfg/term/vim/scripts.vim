@@ -8,7 +8,9 @@ fun! s:has(p, ...)
   return (0 <= match(L, a:p))
 endf
 
-if s:has('\v^\u\l{2} \d{2} \d{2}:\d{2}:\d{2} \S', 1)
+if s:has('diff --git ', 2)
+  set ft=diff
+elseif s:has('\v^\u\l{2} \d{2} \d{2}:\d{2}:\d{2} \S', 1)
   set ft=messages
 elseif s:has('^Disassembly of section')
   set ft=gas
