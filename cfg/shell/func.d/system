@@ -37,8 +37,8 @@ trap_errors(){
 }
 
 ### Go to current script's directory
-cwd_script(){ cd "$(realpath "${0%/*}")"; }  # even around symlinked
-cwd_origin(){ cd "$(readlink "${0%/*}")"; }  # only around original file
+cwd_script(){ cd "$(realpath -e "${0%/*}")"; }  # even around symlinked
+cwd_origin(){ cd "$(readlink -e "${0%/*}")"; }  # only around original file
 ### Add current package to active mods list if absent
 airy_cache_pwd_mod() {
   [[ -z $MODS_CACHE_DISABLE && ${0##*/} =~ ^(install|setup)$ ]] || return 0
@@ -46,13 +46,14 @@ airy_cache_pwd_mod() {
   [[ ! -t 0 ]] || [[ ! $0 =~ ^${CURR_DIR_CFG:?} ]] ||
     grep -qxF "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
 }
+is_empty_dir(){ [[ $(find "${1:-.}" -maxdepth 0 -type d -empty) ]]; }
 
 # ====================== Configs =====================================
 ajoin() { local IFS="$1"; shift; echo "$*"; }
 
-cfgOpt(){ [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]; }
-cfgNo(){ ! cfgOpt $1; }
-cfgOptAdd() { CFG_OPTS="${CFG_OPTS/[$*]}$*"; }
+cfgOpt(){ [[ $OPTS =~ [$1] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
+cfgOptAdd() { local o=$*; o=${o// }; CFG_OPTS=${CFG_OPTS//[$o]}$o; }
+cfgNo(){ ! cfgOpt $1; }  # ALT:CHECK: cfgOpt ^ab
 
 distro(){
     # ALT: Check distro name and version: lsb_release -si
@@ -77,6 +78,7 @@ amAskConfirm() {
     esac
 }
 
+help_from_ifhas() { sed -rn '/^(\s*)(el)?if\s+has (\w+)[^;]*;[^#]+#\s*(.*)$/s//\1 -\3  \4/p' "$0"; }
 # ====================== Process =====================================
 
 do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1

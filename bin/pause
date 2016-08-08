@@ -9,14 +9,15 @@ do OPTS+=$o; done; shift $((OPTIND-1))
 set -o errtrace
 trap 'exit $ret' HUP INT QUIT TERM ERR EXIT
 
-pstop(){ local tmp; read -n 1 -s tmp; }
+pstop(){ local tmp; read -n 1 -s tmp </dev/tty; }
 
 [[ $OPTS =~ A ]] && { pstop; exit; }
 [[ $OPTS =~ E ]] && { ((ret)) && pstop; exit; }
 [[ $OPTS =~ N ]] && { exit; }
 
+# WARN: redirect status to tty when catching output
 stat(){ printf "<======== %s($(date +"%T")) ====($ret)==>%s\n" \
-  "${1:+$1 }" "${*:+ ${*:2}}"; }
+  "${1:+$1 }" "${*:+ ${*:2}}" >/dev/tty; }
 
 [[ $OPTS =~ a ]] && { stat "$msg" "$@"; pstop; exit; }
 [[ $OPTS =~ e ]] && { ((ret))&&{ stat "$msg" "$@"; pstop; }||stat '' "$@"; exit; }

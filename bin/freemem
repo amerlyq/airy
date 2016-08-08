@@ -1,0 +1,15 @@
+#!/bin/bash -e
+# SEE /proc/sys/vm/swappiness -- lower by 10-20. =60 - optimum
+
+free
+sync
+echo 3 | sudo tee /proc/sys/vm/drop_caches
+
+# BUG:FIXME: on 'neo' I have no swap! So don't need to enable!
+# CHECK: if swapon -s returns error when no swap active
+# ALSO:CHECK: as swapoff -a must return err if no swap -- all must work as is?
+if swapon --show >/dev/null; then
+  sudo swapoff -a && sudo swapon -a
+fi
+
+free
