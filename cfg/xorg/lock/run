@@ -18,10 +18,13 @@ if [[ ! -f $pic ]]; then
 fi
 
 # Notifications demon pause/resume
-trap "notify-send DUNST_COMMAND_RESUME" HUP INT TERM ERR EXIT
+trap "
+xset dpms $(xset q|awk '/Standby:/{print$2}')
+notify-send DUNST_COMMAND_RESUME
+" HUP INT TERM ERR EXIT
 notify-send 'DUNST_COMMAND_PAUSE'
 
-[[ -f $txt ]] || xset dpms force off
+[[ -f $txt ]] || xset dpms 10 dpms force off
 i3lock --nofork --color 111111 --image "$pic"
 
 ## With this you can hold backlight 3 sec longer
