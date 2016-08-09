@@ -32,3 +32,13 @@ wlistf(){ local i str key
             sed "s|%1|${key[i-1]}|g; s|%2|${!i}|g" >> $dst
     done; wstr ''
 }; export -f wlistf
+
+wopt(){ shopt -s extglob
+  local cfg=${1:?} opt=${2:?} val; shift 2; val=$*
+  [[ $opt =~ [^A-Za-z0-9_] ]] \
+    && { echo "Wrong chars in option [$opt]"; exit 1; }
+  [[ $val == @(\"*\"|[yn0]|[1-9]*([0-9])) ]] || $val="\"$val\""
+  if (($#))
+  then sed -ri "/^#?\s*?(${opt:?}).*/s//\1=${val:?}/" "$cfg"
+  else sed -ri "/^#?\s*?(${opt:?}.*)/s//# \1/" "$cfg"; fi
+}

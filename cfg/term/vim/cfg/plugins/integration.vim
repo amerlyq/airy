@@ -198,6 +198,8 @@ call dein#add('rhysd/committia.vim', {
 " BUG:(lazy) v +Gitv  -- Not a git repository
 " TODO: use more often, analyze more of help
 " ALT: lambdalisue/vim-gita
+"   SEE: https://lambdalisue.github.io/vimconf2015/#1
+"   ALSO: http://b.hatena.ne.jp/heavenshell/vim/git/
 " EXPL:(post-hook) Check if already inside some repository
 call dein#add('tpope/vim-fugitive', {'lazy': 0,
   \ 'augroup': 'fugitive',
