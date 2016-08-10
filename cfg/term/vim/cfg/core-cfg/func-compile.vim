@@ -15,17 +15,21 @@ noremap <unique><silent> <F5> <Esc>:<C-U>up \| CompilerInDir<CR>
 " DISABLED: with LatchCtrl C-j has detrimental effects in message.log.*
 " noremap <unique><silent> <C-J> <Esc>:<C-U>up \| CompilerInDir 'Silent'<CR>
 
-fun! Abyss(bang, args)
+fun! Abyss(bang, args) abort
   let l:mp = &mp
   set mp=abyss
-  try|exe (bang ? 'Make' : 'make').' '.a:args
-  catch|final|let &mp=l:mp|endt
+  try
+    exe (a:bang ? 'Make' : 'make').' '.a:args
+  catch
+  final
+    let &mp=l:mp
+  endt
 endf
 
 com! -bar WinCheck let s:wn=winnr()|windo checktime|exe s:wn.'wincmd w'
 com! -bar -bang -nargs=* Abyss call Abyss(<bang>0,<q-args>)|WinCheck
 
-noremap <unique><silent> <Leader>m <Esc>:<C-U>up \| Abyss -r \| cw<CR>
+noremap <unique><silent> <Leader>m <Esc>:<C-U>up \| Abyss -r \| cw<CR><CR>
 noremap <unique><silent> <Leader>M <Esc>:<C-U>up \| Abyss!<CR>
 noremap <unique><silent> [Unite]<Leader>m <Esc>:!<CR>
 noremap <unique><silent> [Unite]<Leader>M <Esc>:Copen<CR>
