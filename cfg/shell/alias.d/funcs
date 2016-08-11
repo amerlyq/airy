@@ -66,6 +66,7 @@ copyq_edit() {
 }
 
 alias tmuxl='tmux list-sessions'
+alias tmuxa='_(){ tmux attach-session ${*:+-t "$@"}; }; _'
 
 exit() {  # When in SSH tmux, do detach on ',d' instead of exit
     if [[ -z $SSH_TTY || -z $TMUX || $RANGER_LEVEL ]]
