@@ -51,7 +51,7 @@ is_empty_dir(){ [[ $(find "${1:-.}" -maxdepth 0 -type d -empty) ]]; }
 # ====================== Configs =====================================
 ajoin() { local IFS="$1"; shift; echo "$*"; }
 
-cfgOpt(){ [[ $OPTS =~ [$1] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
+cfgOpt(){ [[ $CFG_OPTS =~ [$*] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
 cfgOptAdd() { local o=$*; o=${o// }; CFG_OPTS=${CFG_OPTS//[$o]}$o; }
 cfgNo(){ ! cfgOpt $1; }  # ALT:CHECK: cfgOpt ^ab
 
