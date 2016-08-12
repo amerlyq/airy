@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+# TODO: different time in first column
+#   -a session_activity
+#   -c session_created
+#   -l session_last_attached
+# TODO: parse and replace time in first column by awk two-dirs-io with
+#   date +'%F %T'
+# TODO: populate info by cmd in current active pane
+
+fmt='#{session_created} #{t:session_created}| #S #{session_windows} #{?session_attached,@#{?session_many_attached,+, }, } #{session_group}'
+
+exec tmux list-sessions -F "$fmt" |sort -n|awk '{$1=""}1'|column -to' '
