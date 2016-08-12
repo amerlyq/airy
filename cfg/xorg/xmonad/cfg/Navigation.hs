@@ -53,6 +53,8 @@ panels =
 
 -- NEED:DEV: back_and_forth -- to return window on their previous screen
 -- -- if on currentFocused -- shiftHere was pressed again
+-- FIXME: don't show 'Marked' message on empty WS (skip marking completely)
+--  TODO: post current window title in marking message
 markNgo =
   [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [1..12], (m, f) <-
     [ ("M-S-", \n -> withFocused (setTags ["F" ++ show n]) >> spawn ("r.n Marked F" ++ show n))
