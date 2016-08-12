@@ -1,0 +1,24 @@
+#!/bin/bash -n
+
+alias tmuxl='r.tmux-list'
+# BAD: completion don't work
+# alias tmuxa='_(){ tmux attach-session ${*:+-t"$@"}; }; _'
+alias tmuxa='tmux attach-session -t'
+alias tmuxk='tmux kill-session -t'
+
+tmux_display_fix() {
+    # When re-attach on ssh, DISPLAY could change and xsel become unavailable
+
+    # Run this script outside of tmux! Set display for all sessions.
+    #!!! I think you may want to look at tmux’s update-environment option, I’m pretty sure that this is the normal way of updating a tmux session’s vars.
+    for name in $(tmux ls -F '#{session_name}'); do
+        tmux setenv -g -t $name DISPLAY $DISPLAY
+    done
+}
+
+exit() {  # When in SSH tmux, do detach on ',d' instead of exit
+  if [[ -z $SSH_TTY || -z $TMUX || $RANGER_LEVEL ]]
+  then builtin exit
+  else tmux detach
+  fi
+}
