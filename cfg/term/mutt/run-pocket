@@ -1,0 +1,11 @@
+#!/bin/bash -e
+# BUG: how to input password from inside [qute]?
+# TRY: adding passwords to keyring after entering once?
+
+url=${1:?}
+
+export ACC=amerlyq
+
+mutt -s " " add@getpocket.com <<< "$url" \
+&& r.n 'Sent to Pocket' "$url" \
+|| r.n -U 'Error: Pocket' "$url"
