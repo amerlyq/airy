@@ -1,10 +1,14 @@
 if &cp||exists('g:loaded_trailing')|finish|else|let g:loaded_trailing=1|endif
 " SEE Remove trailing spaces before saving text files
 "   http://vim.wikia.com/wiki/Remove_trailing_spaces
+" SEIZE
+"   https://github.com/search?q=vim+strip
+"   https://github.com/search?q=vim+trail
 
 "{{{1 MAPS ====================
 noremap <unique> [Toggle]l :<C-u>set list! list?<CR>
-noremap <unique> [Toggle]L :<C-u>TrailingHighlight<CR>
+noremap <unique> [Toggle]L :<C-u>StripTrailingHighlight<CR>
+noremap <unique> [Toggle]t :<C-u>StripToggleEmptyEndLines<CR>
 
 noremap <unique> [Replace]E :<C-u>EmptyLinesCompress<CR>
 
@@ -18,19 +22,22 @@ command! -bar -nargs=0 -range=% EmptyLinesRemove
     \ call UnobtrusiveSubF('%s,%s g/%s/d_', <line1>, <line2>,
     \   '^[ \t\u3000]*$')
 
-command! -bar -nargs=0 -range=% EmptyLinesStripEnd
+command! -bar -nargs=0 -range=% StripEmptyEndLines
     \ call UnobtrusiveSubF('/%s/,%sd_', '\v^%(\_[\n \t\u3000]*\S)@!',
     \ <line2>)
 
-command! -bar -nargs=0 -range=% TrailingStrip
+command! -bar -nargs=0 -range StripToggleEmptyEndLines
+    \ call ToggleVariable('g:strip_empty_end_lines')
+
+command! -bar -nargs=0 -range=% StripTrailingSpace
     \ call UnobtrusiveSubF('%s,%s g/%s/s///ge',
     \   <line1>, <line2>, '\v[ \t\u3000]+$|[ \u3000]+\ze\t$')
 
-command! -bar -nargs=0 -range TrailingToggle
-    \ call ToggleVariable('g:trailing_strip')
+command! -bar -nargs=0 -range StripToggleTrailingSpace
+    \ call ToggleVariable('g:strip_trailing_space')
 
 " DEV THINK make independent from solarized high-contrast
-command! -bar -nargs=0 -range TrailingHighlight
+command! -bar -nargs=0 -range StripTrailingHighlight
     \ let g:solarized_visibility=("low"==g:solarized_visibility?"high": "low")
     \| colorscheme solarized
 
@@ -49,8 +56,11 @@ fun! ToggleVariable(name)
   echo '  '.a:name.' = '.({a:name} ? 'on' : 'off')
 endf
 
-let g:trailing_strip = 1
+let g:strip_empty_end_lines = 1
+let g:strip_trailing_space  = 1
 augroup TrailingStrip
   au!
-  au BufWritePre * if g:trailing_strip|EmptyLinesStripEnd|TrailingStrip|en
+  au BufWritePre *
+      \ if g:strip_empty_end_lines|StripEmptyEndLines|en
+      \|if g:strip_trailing_space |StripTrailingSpace|en
 augroup END
