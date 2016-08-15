@@ -14,11 +14,19 @@
 source $my_cfg/acc-purge
 source $my_cache/acc/$my_acc
 
+# BAD: queries password before it will be setup
+# TRY: accumulate into variable and then set once after all accounts
+# ALT: set mailbox inside hook (BUT how to set it only once? OR mutt itself won't set it again?)
+#   => inside acc-load
+# CHECK: if =INBOX will expand immeiately in accumulating var, or expand to last acc only on final 'mailboxes $my_mboxes'
 # Watch over this dir, add to list on 'y'
 mailboxes =INBOX
 # mailboxes imaps://imap.gmail.com/INBOX    # Space-delimited list: imaps://imap.gmail.com/family
 #>  config includes a macro bound to the 'y' key which will allow you to change
 #>  to any of the folders listed under mailboxes
+# NOTE: when watching multi-acc mailboxes it may be necessary to impl 'close this mailbox' command to unsubscribe
+# TODO: autosort Quora and dev@suckless.org by gmail --> and add them to mailboxes to watch over new mails
+#   BUT: then I won't receive those messages on my phone? How to watch new messages even there?
 
 # WARN: folder-hook not run on cmdline sent
 folder-hook  "$folder"   "set my_acc=$my_acc my_pass=\$my_pass_$my_acc; source $my_cfg/acc-load"

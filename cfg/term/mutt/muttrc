@@ -59,7 +59,8 @@ set beep_new
 # And poll the current mailbox more often (not needed with IDLE in post 1.5.11)
 set timeout=20
 set imap_keepalive = 900
-# Automatically poll subscribed mailboxes for new mail (new in 1.5.11)
+# Auto-poll all imap folders for new mail by adding to mailboxes (new in 1.5.11)
+# BAD:CHECK conflicts with multi-acc mailboxes
 set imap_check_subscribed
 
 
@@ -99,7 +100,11 @@ source $my_cfg/keyrc
 source $my_cache/theme          # Theme
 
 # BUT:TRY:FIX using unmailboxes -- impossible to watch multiple accounts simultaneously
-folder-hook  . 'unmailboxes *'  # Necessary to reset connections
+# NOTE: useful for sidebar to show only mailboxes from current account
+# SEE: https://gist.github.com/miguelmota/9456162
+folder-hook  . 'unmailboxes *'  # Necessary to reset connections to switch acc
+# DISABLED: to allow multi-acc mailboxes
+
 source $my_cache/index          # List of accounts (generated)
 # Query DFL acc from env ACC=... or from symlink ./default
 source "~/.mutt/exe/acc $my_acc_dfl |"
