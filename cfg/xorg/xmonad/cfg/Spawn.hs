@@ -25,11 +25,11 @@ main = concat
     , ("M-S-"   ++ k , spawnHereAt Master t)
     ] -- NOTE: We have M-o <Space> for floating terminal instead of (spawnAndDo doCenterFloat t).
     | (k, t) <-
-    [ ("<Space>", "r.t -e r.tmux")
-    , ("C-<Space>", "r.t")  -- WARNING: if broken >> HW problem
-    , ("<Return>", "r.t -e r.tmux r.ranger")
-    , ("C-<Return>", "r.t -e r.ranger")
-    , ("M1-<Space>", "run-xcwd r.t -e r.tmux")
+    [ ("<Space>", "r.t")
+    , ("<Return>", "r.t r.ranger")
+    , ("C-<Space>", "r.t -M")  -- WARNING: if broken >> HW problem
+    , ("C-<Return>", "r.t -M r.ranger")
+    , ("M1-<Space>", "run-xcwd r.t")
     , ("u" , "r.b")
     -- "r.b" open on new empty wksp
     -- "r.b" focus already opened one (like M-w works)
@@ -52,7 +52,7 @@ scratchpad = (concat . (`map` [
     , ("p" , runOrRaise "r.pidgin" $ className =? "Pidgin" <&&> stringProperty "WM_WINDOW_ROLE" =? "buddy_list")
     , ("s" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
     -- FIXME: broken opening on new wksp?
-    , ("m" , raiseMaybe (spawn "r.t -n mutt -e r.tmux mutt") (appName =? "mutt"))
+    , ("m" , raiseMaybe (spawn "r.t -n mutt -e mutt") (appName =? "mutt"))
     , ("<F1>", namedScratchpadAction myScratchpads "help")
     ],
     -- Open new or focus the already existing one
@@ -65,10 +65,10 @@ scratchpad = (concat . (`map` [
     ],
     [ ("v" , spawnHere "r.tf -e $EDITOR") -- THINK: also open in [tmux]?
     -- , ("S-<Space>", spawnHere "r.tf")
-    , ("<Space>"  , spawnAndDo doCenterFloat "r.t -e r.tmux")
-    , ("<Return>" , spawnAndDo doCenterFloat "r.tf -e r.tmux r.ranger")
-    , ("C-<Space>"  , spawnAndDo doCenterFloat "r.t")
-    , ("C-<Return>" , spawnAndDo doCenterFloat "r.t -e r.ranger")
+    , ("<Space>"  , spawnAndDo doCenterFloat "r.t")
+    , ("<Return>" , spawnAndDo doCenterFloat "r.tf r.ranger")
+    , ("C-<Space>"  , spawnAndDo doCenterFloat "r.t -M")
+    , ("C-<Return>" , spawnAndDo doCenterFloat "r.t -M r.ranger")
     -- , ("k", "~/.i3/ctl/run-focus k")
     -- r.tf -e gksudo powertop
     -- r.tf -e gksudo tlp start

@@ -11,42 +11,18 @@
 # $ r.t -e tmux
 # > child finished with error '256'
 
-# FIXME: don't kill tmux session:
-#  - if it was manually detached beforehand
-#   = CHECK if closing TERM will make attached == 0 or keep it == 1
-#  - if I have attached one window to another -- don't kill session on close of either one
-#   = kill only if attached if == 1 ?
-
 # THINK: allow to connect nested session?
 #   OR: auto-exit main tmux before establishing nested session
 #     => if main tmux -- has only one window in main terminal
 #   BUT exit main session isn't nice when its tmux--zsh--ranger--zsh--tmux
 
-# Exit session on kill
-# (
-# trap "touch /tmp/st/$$.HUP ;exit" HUP
-# trap "touch /tmp/st/$$.INT ;exit" INT
-# trap "touch /tmp/st/$$.QUIT;exit" QUIT
-# trap "touch /tmp/st/$$.TERM;exit" TERM
-# wait $$
-# touch /tmp/st/$$.end
-# ) &
-
-# tmux list-clients -t st-$$ 2>/dev/null > /tmp/st/$$.trap;
-# tmux kill-session -t st-$$
-
-# tmux list-clients -t st-$$ 2>/dev/null |
-# { read -r _ && ! read -r _; } &&
-
 # WARNING: to keep 'trap' working, don't use exec
 #   NOTE: bkgr jobs can't wait $$ at all
-# CHECK: if using 'set -o errtrace' will help propagate trap
-# FIND: if possible to force traps on process by its parent
-# touch /tmp/st/$$.beg
-# tmux new-session -s st-$$ "$@"
-# while :; do echo "alive"; sleep 1; done
+# CHECK: if using 'set -o errtrace' will help propagate trap ::> NOT
+# FIND: if possible to force traps on process by its parent ::> NOT
 
-name="st-$$"
-trap "tmux kill-session -t $name" INT TERM EXIT
-# WARNING: to keep 'trap' working, don't use exec
-tmux new-session -s $name "$@"
+trap "tmux list-clients -t st-$$ 2>/dev/null |
+{ read -r _ && ! read -n1 -r _; } &&
+tmux kill-session -t st-$$
+" INT TERM EXIT
+tmux new-session -s st-$$ -- "$@"
