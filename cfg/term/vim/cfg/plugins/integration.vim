@@ -196,16 +196,17 @@ call dein#add('rhysd/committia.vim', {
 
 "" CHECK Git-frontend, overhaul {{{1
 " BUG:(lazy) v +Gitv  -- Not a git repository
+" BUG:(non-lazy) :Gitv -- tries to open current dir instead of file
 " TODO: use more often, analyze more of help
 " ALT: lambdalisue/vim-gita
 "   SEE: https://lambdalisue.github.io/vimconf2015/#1
 "   ALSO: http://b.hatena.ne.jp/heavenshell/vim/git/
 " EXPL:(post-hook) Check if already inside some repository
-call dein#add('tpope/vim-fugitive', {'lazy': 0,
+call dein#add('tpope/vim-fugitive', {
   \ 'augroup': 'fugitive',
   \ 'on_cmd': ['Git', 'Gstatus', 'Gdiff', 'Glog',
   \   'Gbrowse', 'Gblame', 'Gwrite'],
-  \ 'hook_post_source': "call fugitive#detect(expand('#:p'))",
+  \ 'hook_post_source': "call fugitive#detect(expand('%:p'))",
   \ 'hook_add': "
 \\n   autocmd BufReadPost fugitive://* setl bufhidden=delete
 \\n   nnoremap <silent><unique> [Git]s :Gstatus<CR>
