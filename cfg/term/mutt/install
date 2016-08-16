@@ -5,9 +5,10 @@ source ~/.shell/func.d/packages
 #| neomutt | mutt with many patches
 
 if distro arch; then
-    pkg_inst isync
-    aur_inst neomutt imapfilter
+  pkg_inst isync
+  aur_inst -p neomutt
+  aur_inst imapfilter
 
 elif distro ubuntu; then
-    pkg_inst 'mutt'
+  pkg_inst 'mutt'
 fi
