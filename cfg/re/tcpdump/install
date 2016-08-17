@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  pkg_inst -p 'tshark' wireshark-cli
+
+elif distro ubuntu; then
+  echo "Err: fixme"
+fi

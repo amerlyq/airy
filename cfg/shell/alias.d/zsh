@@ -10,12 +10,12 @@ alias -g N0='&>/dev/null'
 alias -g N2='2>/dev/null'
 alias -g  L='| less '
 alias -g LL='|& less -r '
-alias -g  V='|& $EDITOR - '
-alias -g VR='|& $EDITOR -R - '
+alias -g  V='|& $EDITOR -R - '  # USE ':set noro' to edit
 
 # alias -g TL='| tail -20 '
 
 ## Utils
+# BUG: shows command from ~+2 history
 alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-running cmds.
 
 ## Filters

@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
+ifc=${ifcs[0]:?}
+
+sudo tcpdump -lvvvASs 0 -i enp3s0 host example.com and tcp port http -w /tmp/dump.pcap
+# tshark -r /tmp/dump.pcap -T pdml
