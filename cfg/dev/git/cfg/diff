@@ -24,6 +24,11 @@
     cmd = meld $LOCAL $REMOTE
     prompt = false
 
+# ALT: GIT_EXTERNAL_DIFF='diff -ipu "$2" "$5" #' git diff --ext-diff
+[difftool "idiff"]
+    cmd = diff -ipu $LOCAL $REMOTE
+    prompt = false
+
 #[difftool "beyondcompare"]
 #    path = /c/development/tools/beyondcompare/
 #    cmd = /c/development/tools/beyondcompare/bcomp.exe \"$LOCAL\" \"$REMOTE\" -nobackups -title1=\"Old Version\" -title2=\"New Version\"
