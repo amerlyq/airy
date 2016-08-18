@@ -20,6 +20,9 @@ import XMonad.Actions.CopyWindow    (killAllOtherCopies, kill1)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
 import qualified XMonad.Actions.GroupNavigation as GN
 import qualified XMonad.StackSet as W
+import qualified XMonad.Layout.BoringWindows as B
+import XMonad.Layout.Minimize       (minimizeWindow, MinimizeMsg(..))
+import XMonad.Layout.Maximize       (maximizeRestore)
 import XMonad.Layout.MultiToggle    (Toggle(..))
 import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDERS))
 import XMonad.Layout.Reflect        (REFLECTX(REFLECTX))
@@ -42,9 +45,9 @@ urgentNback = withUrgents $ maybe (return ()) (windows . W.focusWindow) . listTo
 keys = focusing ++ swap ++ edit ++ movef ++ layouts ++ system
 
 focusing =
-  [ ("M-h"      , windows W.focusMaster)
-  , ("M-j"      , windows W.focusDown)
-  , ("M-k"      , windows W.focusUp)
+  [ ("M-h"      , B.focusMaster)
+  , ("M-j"      , B.focusDown)
+  , ("M-k"      , B.focusUp)
   , ("M-l"      , GN.nextMatchWithThis GN.History wkspName)
   , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
   , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
@@ -95,12 +98,17 @@ movef =
 layouts =
   [ ("M-/"      , sendMessage $ Toggle MIRROR)
   , ("M-S-/"    , sendMessage $ Toggle REFLECTX)
+  , ("M-C-/"    , withFocused $ sendMessage . maximizeRestore)
   , ("M-n"      , sendMessage NextLayout)
   , ("M-S-n"    , sendMessage FirstLayout)  -- ALT: setLayout $ XMonad.layoutHook cfg
   , ("M-f"      , sendMessage $ Toggle FULL)  -- sendMessage (SetStruts [] [D]) >>
   , ("M-S-f"    , sendMessage ToggleStruts)
   , ("M-C-f"    , sendMessage $ Toggle STRUTS)
   , ("M-S-C-f"  , sendMessage $ Toggle GAPS)
+  , ("M-b"      , withFocused minimizeWindow)
+  , ("M-S-b"    , sendMessage RestoreNextMinimizedWin)
+  , ("M-C-b"    , B.clearBoring)
+  , ("M-S-C-b"  , B.markBoring)
   ]
 
 system =

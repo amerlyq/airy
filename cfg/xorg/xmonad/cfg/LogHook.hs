@@ -49,6 +49,10 @@ myStateLogger copies = dynamicLogString def
       "ReflectX ResizableTall" -> "]|["
       "Mirror ResizableTall" -> "[-]"
       "Mirror ReflectX ResizableTall" -> "]-["
+      "TwoPane" -> "|="
+      "ReflectX TwoPane" -> "=|"
+      "Mirror TwoPane" -> "/="
+      "Mirror ReflectX TwoPane" -> "=/"
       "Tabbed Simplest" -> "=--"
       "ReflectX Tabbed Simplest" -> "--="
       "Full" -> "[ ]"
@@ -70,7 +74,7 @@ myStateLogger copies = dynamicLogString def
                 | otherwise = s
     pHidden i | i `elem` MyWksp.all = cHidden i (clickws i i)
               | otherwise = ""
-    nmFilter nm = subRegex (mkRegex "SmartSpacing\\s+[0-9]+\\s*") nm ""
+    nmFilter nm = subRegex (mkRegex "(SmartSpacing\\s+[0-9]+|Maximize|Minimize)\\s*") nm ""
 
 
 myLogHook h = do

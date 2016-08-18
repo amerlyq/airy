@@ -38,13 +38,18 @@ import XMonad.Hooks.UrgencyHook     (withUrgencyHook, BorderUrgencyHook(..))
 ---- Layouts
 import qualified XMonad.StackSet as W
 -- basis
+import XMonad.Layout.Fullscreen     (fullscreenFocus, fullscreenManageHook)
 import XMonad.Layout.TrackFloating  (trackFloating)
 import XMonad.Layout.Tabbed         (simpleTabbed)
+import XMonad.Layout.TwoPane        (TwoPane(..))
 import XMonad.Layout.Grid           (Grid(..))
 import XMonad.Layout.Circle         (Circle(..))
 import XMonad.Layout.SimplestFloat  (simplestFloat)
 import XMonad.Layout.IM             (gridIM, Property(ClassName, Title, Role, And, Not))
 -- DEV:
+import XMonad.Layout.BoringWindows  (boringWindows)
+import XMonad.Layout.Minimize       (minimize)
+import XMonad.Layout.Maximize       (maximize)
 import qualified XMonad.Layout.Monitor as MON
 import XMonad.Layout.LayoutModifier (ModifiedLayout(..))  -- For Layout.Monitor
 -- import XMonad.Layout.IndependentScreens (withScreens)
@@ -139,16 +144,20 @@ myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
 myLayout = smartBorders
     . ModifiedLayout myOverlay
     -- . onWorkspace (workspaces myCfg !! 4) Full
+    . fullscreenFocus
+    . maximize
     . mkToggle (single STRUTS)
     . mkToggle (single FULL)
     . avoidStruts
     . mkToggle (single GAPS)
     . mkToggle (single MIRROR)
     . mkToggle (single REFLECTX)
+    . boringWindows
+    . minimize
     . onWorkspace "PI" piLayer
     . onWorkspace "SK" (reflectHoriz skLayer)
     . trackFloating
-    $ tiled ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
+    $ tiled ||| TwoPane (1/100) (1/2) ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
     skLayer = gridIM (1%6) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
@@ -160,7 +169,7 @@ myLayout = smartBorders
 
 -- RFC: mconcat . concat $ [ [
 myManageHook :: ManageHook
-myManageHook = manageSpawn <+>
+myManageHook = manageSpawn <+> fullscreenManageHook <+>
   mconcat
   [ isFullscreen --> doFullFloat
   , isDialog --> doCenterFloat

@@ -6,8 +6,10 @@ import Data.Default   (def)
 import XMonad                       (handleEventHook)
 import XMonad.StackSet              (allWindows)
 import XMonad.Layout.LayoutHints    (hintsEventHook)
+-- BAD: don't react to mpv 'f'
+import XMonad.Layout.Fullscreen     (fullscreenEventHook)
 import XMonad.Hooks.ManageDocks     (docksEventHook)
-import XMonad.Hooks.EwmhDesktops    (fullscreenEventHook, ewmhDesktopsEventHook)
+import XMonad.Hooks.EwmhDesktops    ({-fullscreenEventHook,-} ewmhDesktopsEventHook)
 import XMonad.Hooks.ServerMode      (serverModeEventHookCmd')
 import XMonad.Actions.Commands      (defaultCommands)
 
