@@ -1,25 +1,70 @@
-// Мониторинг HTTP, how-to, necessary apps:
+Мониторинг HTTP, how-to, necessary apps:
   http://www.wireshark.org/docs/wsug_html_chunked/AppTools.html
+  !! https://wiki.wireshark.org/Tools  # Review for long list of analyzers/generators/etc
 
 > apt-get install tcpdump tshark wireshark
-| rawcap (win), tcpdump (unix) | можно перехватывать пакеты из сетевых
+| rawcap (win), tcpdump (unix), dumpcap (wireshark) | можно перехватывать пакеты из сетевых
 |           | соединений или лупбэка и сливать их в дамп файл
-| wireshark | позволяет просматривать и фильтровать эти дамп файлы
+| wireshark | позволяет просматривать и фильтровать эти дамп файлы -- (! with colored filtering !)
 | strings   | отображает все текстовые строки, игнорируя бинарные данные -- для быстрого анализа разных ответов сети
 | ss        | another util to investigate sockets
 | editcap   | позволяет отрезать кусок пакета (in wireshark pkg)
 
+ALT
+  captcp + graphs
+    http://research.protocollabs.com/captcp/
+    http://www.jauu.net/2012/10/24/captcp-throughput-graphs-and-wireshark/
+    http://www.jauu.net/2013/01/23/captcp-gnuplot-beauty/
+
 USAGE
   tshark
     http://stackoverflow.com/questions/32384074/tshark-sip-protocol-display-collapse/32396230#32396230
+    $ tshark -G fields G tcp C3 G ^tcp\\. V
+  aliases
+    https://github.com/jgoulah/dotfiles/blob/master/zsh/aliases.zsh
 
 TLS/SSL decryption
-  https://wiki.wireshark.org/SSL
-  https://habrahabr.ru/company/billing/blog/261301/
-  https://habrahabr.ru/post/253521/
-    https://jimshaver.net/2015/02/11/decrypting-tls-browser-traffic-with-wireshark-the-easy-way/
-  https://wirewatcher.wordpress.com/2010/07/20/decrypting-ssl-traffic-with-wireshark-and-ways-to-prevent-it/
-  https://minnmyatsoe.com/2016/01/using-tshark-to-decrypt-ssl-tls-packets/
+  Decrypting
+    + 2016-08-18 [X] https://habrahabr.ru/company/billing/blog/261301/
+    + https://wirewatcher.wordpress.com/2010/07/20/decrypting-ssl-traffic-with-wireshark-and-ways-to-prevent-it/
+    ++ https://minnmyatsoe.com/2016/01/using-tshark-to-decrypt-ssl-tls-packets/
+    https://wiki.wireshark.org/SSL
+  Session key logging
+    + 2016-08-18 [X] https://habrahabr.ru/post/253521/
+      2016-08-18 [X] https://jimshaver.net/2015/02/11/decrypting-tls-browser-traffic-with-wireshark-the-easy-way/
+    $ export SSLKEYLOGFILE=~/path/to/sslkeylog.log
+  MITM
+    https://blog.heckel.xyz/2013/08/04/use-sslsplit-to-transparently-sniff-tls-ssl-connections/
+    https://www.roe.ch/SSLsplit
+    https://moxie.org/software/sslstrip/
+    $ intercepter-ng
+    # Charles, Fiddler, Mallory Proxy, MITMPROXY, WebScarab, Burp Proxy, Zaproxy
+      http://www.enhanceie.com/Fiddler/help/httpsdecryption.asp
+    WARN: channel-binded authorization IIS
+      https://blogs.msdn.microsoft.com/fiddler/2010/10/15/fiddler-and-channel-binding-tokens/
+  HTTPS
+    2016-08-18 [X] https://habrahabr.ru/post/188042/
+    https://en.wikipedia.org/wiki/Server_Name_Indication
+    + 2016-08-18 [X] https://habrahabr.ru/post/191954/
+      https://github.com/alexbers/manual-tls  # Demo with DH and logging
+        More ssl/tls in Python:
+          Toytls:  https://github.com/bjornedstrom/toytls
+          Tlslite: https://trevp.net/tlslite/
+      Бесплатный сервис, выводящий информацию о настройках https на узле и о возможных слабостях настройки:
+        www.ssllabs.com/ssltest/index.html
+      Most of modern attacks on https (BEAST, CRIME, BREACH, LUCKY 13, слабости RC4 и.т.д)
+        www.isecpartners.com/media/106031/ssl_attacks_survey.pdf
+
+Extract files from //*.pcap and streams
+  GUI: “File” –> “Export” –> “Objects” –> HTTP”
+  https://code.google.com/archive/p/nfex
+  https://isc.sans.edu/diary/Tools+for+extracting+files+from+pcaps/6961
+  https://pypi.python.org/pypi/tcpextract/1.1
+  http://justniffer.sourceforge.net/#!/justniffer_grab_http_traffic
+    http://www.cockos.com/assniffer/
+  https://ask.wireshark.org/questions/32474/how-to-decompress-http-contents-with-tshark
+  ~ http://www.behindthefirewalls.com/2014/01/extracting-files-from-network-traffic-pcap.html
+  + http://www.xplico.org/
 
 Snippet
   ip addr show dev eth0
@@ -33,12 +78,26 @@ Snippet
   Wireshark -> Follow TCP Stream -> Find 'USERID'
     If not found -> Filter Out This Stream (to remove tcp-entries w/o 'USERID')
 
-
+Annotate one-line info by some fields
+  Display content_* fields of all HTTP response packets carrying an image
+  $ tshark -R "http.response and http.content_type contains image" \
+    -z "proto,colinfo,http.content_length,http.content_length" \
+    -z "proto,colinfo,http.content_type,http.content_type" \
+    -r /tmp/dump.pcap
+  # 439  12.717117 66.249.89.127 -> 192.168.1.108 HTTP HTTP/1.1 200 OK  (GIF89a)  http.content_type == "image/gif"  http.content_length == 35
 
 TUT
-  (+++) https://danielmiessler.com/study/
+  +++ https://danielmiessler.com/study/
   http://www.securitywizardry.com/
   https://danielmiessler.com/study/tcpdump/
+  Books
+    https://www.packtpub.com/networking-and-servers/instant-traffic-analysis-tshark-how-instant
+    https://www.packtpub.com/networking-and-servers/cissp-21-days
+
+  Coding your own protocol dissectors
+    + http://www.linuxtopia.org/online_books/network_security/wireshark_development_guide/wireshark_ChapterDissection.html
+    http://www.tcpdump.org/pcap.html
+    + https://wiki.wireshark.org/Lua
 
   from old-db
     http://www.k-max.name/linux/tcpdump-v-primerax/
@@ -73,6 +132,9 @@ USAGE
     tcpdump -nnvXSs 0 -c2 icmp
 
 FILTERING EXPRESSIONS
+  REF
+    $ man pcap-filter $
+    $ man tcpdump
   type=[host,net,port]
   dir=[src and/or dst]
   MIX: and / &&,  or / ||,  not / !

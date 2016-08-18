@@ -1,7 +1,15 @@
 #!/bin/bash -e
 
-ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
-ifc=${ifcs[0]:?}
+# DFL: first ifc from tcpdump -D
+# ifcs=($(ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p}'))
+# ifc=${ifcs[0]:?}
 
-sudo tcpdump -lvvvASs 0 -i enp3s0 host example.com and tcp port http -w /tmp/dump.pcap
+# sudo tcpdump -lvvvASs 0 -i enp3s0 host example.com and tcp port http -w /tmp/dump.pcap
+
+# Only capture pkgs with some data
+# sudo tcpdump -veA -Qout 'tcp port 80 and (((ip[2:2] - ((ip[0]&0xf)<<2)) - ((tcp[12]&0xf0)>>2)) != 0)'
+
+tshark -pQV -f 'tcp port 80 and (((ip[2:2] - ((ip[0]&0xf)<<2)) - ((tcp[12]&0xf0)>>2)) != 0)'
+# OR:(-V) -Otcp
+
 # tshark -r /tmp/dump.pcap -T pdml

@@ -1,7 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
+### LINKS ###
+# linkcp -t ~/.wireshark preferences
+# ALSO: disabled_protos hosts subnets ethers manuf services ipxnets
+
 if ! id | grep -q '(wireshark)'; then
   sudo gpasswd -a "${CURR_USER:?}" wireshark
-  die "!!! Re-login X session or reboot to update changes in Groups"
+  die "!!! Re-login user session or reboot to update changes in Groups"
 fi
