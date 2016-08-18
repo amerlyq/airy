@@ -1,5 +1,5 @@
 #!/bin/bash -e
-exec r.tf $EDITOR -c "set ft=haskell" <(cat - <<< "$*")
+exec r.tf -M $EDITOR -c "set ft=haskell" <(cat - <<< "$*")
 
 # if head -1 <<< "$3" | grep -q 'xmonad.hs'; then
 #   r.n -U Error xmonad.hs

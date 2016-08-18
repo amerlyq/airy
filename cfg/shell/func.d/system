@@ -38,7 +38,7 @@ trap_errors(){
 
 ### Go to current script's directory
 cwd_script(){ cd "$(realpath -e "${0%/*}")"; }  # even around symlinked
-cwd_origin(){ cd "$(readlink -e "${0%/*}")"; }  # only around original file
+cwd_origin(){ cd "$(dirname "$(readlink -e "$0")")"; }  # only around original file
 ### Add current package to active mods list if absent
 airy_cache_pwd_mod() {
   [[ -z $MODS_CACHE_DISABLE && ${0##*/} =~ ^(install|setup)$ ]] || return 0
