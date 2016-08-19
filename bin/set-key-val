@@ -1,5 +1,8 @@
 #!/bin/bash -e
 ### Set key-value pair for kernel config
+## NOTE: double-comment ('##') to keep duplicate options
+#   no $3 => find/append and comment out
+#   else => uncomment/append and set val (even if empty)
 shopt -s extglob
 
 cfg=${1:?}
@@ -19,8 +22,14 @@ fi
 # EXPL: quote value argument for kernel config (if present and non-atomic)
 [[ $# -eq 0 || $val == @(\"*\"|[yn0]|[1-9]*([0-9])) ]] || val="\"$val\""
 
-# NEED gawk 4.1.0 (10/05/2013)
-exec gawk -i inplace -vo="${key:?}" -vv="$val" '
+# NEED:(-i inplace) gawk 4.1.0 (10/05/2013)
+#   BUG: ENDFILE block prints to tty, not into file
+#     => can't use '-i inplace'
+tmp=${cfg}.tmp
+mv "$cfg" "$tmp"
+trap "rm '$tmp'" EXIT
+
+gawk -vo="${key:?}" -vv="$val" '
   BEGIN { p="^#?\\s*?"o"\\y(.*)$" }
   $0 !~ p { print $0 }
   match($0,p,a) { has=1
@@ -31,4 +40,4 @@ exec gawk -i inplace -vo="${key:?}" -vv="$val" '
     if(v!="") { print o"="v }
     else { print "# "o" is not set" }
   }}
-' "$cfg"
+' "$tmp" > "$cfg"

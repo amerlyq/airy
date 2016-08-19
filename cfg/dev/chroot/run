@@ -26,7 +26,6 @@ fi
 exec schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT
 export DISPLAY=$DISPLAY SHELLRC_EVAL="${CURR_CHROOT_EVAL}"
 source ~/.bash_profile
-${@+"$@"
-exit}
+${@+trap exit INT HUP QUIT TERM; "$@"; exit}
 EOT
 )

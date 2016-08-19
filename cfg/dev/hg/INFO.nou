@@ -1,93 +1,101 @@
 REF
-	https://www.mercurial-scm.org/wiki/Workflows
-	https://www.mercurial-scm.org/wiki/TipsAndTricks
+  https://www.mercurial-scm.org/wiki/Workflows
+  https://www.mercurial-scm.org/wiki/TipsAndTricks
 
-	https://mercurial.selenic.com/wiki/GitConcepts
-	https://developer.mozilla.org/en-US/docs/Mercurial/Using_Mercurial
-	2015-10-09 [X] http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html
-	http://gregoryszorc.com/blog/2014/06/23/please-stop-using-mq/
+  https://mercurial.selenic.com/wiki/GitConcepts
+  https://developer.mozilla.org/en-US/docs/Mercurial/Using_Mercurial
+  2015-10-09 [X] http://mozilla-version-control-tools.readthedocs.org/en/latest/hgmozilla/index.html
+  http://gregoryszorc.com/blog/2014/06/23/please-stop-using-mq/
 
-	vs git
-		https://docs.python.org/devguide/gitdevs.html
-		> http://gregoryszorc.com/blog/2013/05/12/thoughts-on-mercurial-%28and-git%29/
+  vs git
+    https://docs.python.org/devguide/gitdevs.html
+    > http://gregoryszorc.com/blog/2013/05/12/thoughts-on-mercurial-%28and-git%29/
 READ
-	>>> https://sethrobertson.github.io/GitBestPractices/
+  >>> https://sethrobertson.github.io/GitBestPractices/
 
 > TECH
 
+Clone
+  https://www.mercurial-scm.org/wiki/HardlinkedClones
+  Partial local clone w/o hard links (to compress branch into tar)
+    $ hg clone --debug --pull --uncompressed --rev "$tag" /path/to/repo "$dst"
+    # WARN: cloning by tag doesn't contain that tag itself (need clone rev+1)!
+  Shallow clone (need special server configuration)
+    https://bitbucket.org/facebook/remotefilelog
+
 Branch
-	hg branch mybranch
-	hg push --new-branch -b mybranch
+  hg branch mybranch
+  hg push --new-branch -b mybranch
 
 FeatureBranch
-	REF
-		http://stevelosh.com/blog/2009/08/a-guide-to-branching-in-mercurial/#branching-with-bookmarks
-	Create a new bookmark for the new feature I'm developing.
-		hg bookmark gps/my-new-feature
-		: make changes to files
-		hg commit, ..., hg commit, ..., hg commit
-	Look at DAG to choose which reorder (being on gps/my-new-features)
-		hg log --graph
-		hg histedit 5e907ed10e22
-		: this opens an editor where I can say what changes to make
-	Start a new feature.
-		hg up central
-		: (leaving bookmark gps/my-new-feature)
-		hg bookmark gps/feature2  # Now on (gps/feature2)
-		hg commit, ..., hg commit, ..., hg commit
-	I got review on my original feature. Let's push it.
-		hg up gps/my-new-feature  # (being on gps/feature2)
-		: (activating bookmark gps/marionette-restart)
-		hg pull gecko
-		hg rebase -d fx-team
-	Verify what I'm about to push
-		hg out -r . fx-team
-		hg push -r . fx-team
-	And delete the bookmark that I don't need any more.
-		hg bookmark -d gps/my-new-feature
+  REF
+    http://stevelosh.com/blog/2009/08/a-guide-to-branching-in-mercurial/#branching-with-bookmarks
+  Create a new bookmark for the new feature I'm developing.
+    hg bookmark gps/my-new-feature
+    : make changes to files
+    hg commit, ..., hg commit, ..., hg commit
+  Look at DAG to choose which reorder (being on gps/my-new-features)
+    hg log --graph
+    hg histedit 5e907ed10e22
+    : this opens an editor where I can say what changes to make
+  Start a new feature.
+    hg up central
+    : (leaving bookmark gps/my-new-feature)
+    hg bookmark gps/feature2  # Now on (gps/feature2)
+    hg commit, ..., hg commit, ..., hg commit
+  I got review on my original feature. Let's push it.
+    hg up gps/my-new-feature  # (being on gps/feature2)
+    : (activating bookmark gps/marionette-restart)
+    hg pull gecko
+    hg rebase -d fx-team
+  Verify what I'm about to push
+    hg out -r . fx-team
+    hg push -r . fx-team
+  And delete the bookmark that I don't need any more.
+    hg bookmark -d gps/my-new-feature
 
 FeatureBranch
-	Reference to place where we started -- we mark clean state before work
-		hg bookmark loc-main
-		hg bookmark loc-feature
-		:OR hg bookmark -r 7300 feature-fix && hg up feature-fix
-	Changes
-		hg commit -m 'some fix'
-	Merge feature
-		hg update -c loc-main
-		hg merge loc-feature
-		hg commit -m 'Merge <feature>'
-	Move any bookmark to current tip to work in main after feature merge
-		hg book -f loc-feature
-	Delete
-		hg book -d loc-feature
-	To actually delete the changeset as well requires the mq extension.
-		hg tag -r hgweb-fix hgweb-fix-tag
-		hg bookmark -d hgweb-fix
-		hg strip hgweb-fix-tag
-	Look up
-		hg log -prf loc-main:0
-		hg id -r.
+  Reference to place where we started -- we mark clean state before work
+    hg bookmark loc-main
+    hg bookmark loc-feature
+    :OR hg bookmark -r 7300 feature-fix && hg up feature-fix
+  Changes
+    hg commit -m 'some fix'
+  Merge feature
+    hg update -c loc-main
+    hg merge loc-feature
+    hg commit -m 'Merge <feature>'
+  Move any bookmark to current tip to work in main after feature merge
+    hg book -f loc-feature
+  Delete
+    hg book -d loc-feature
+  To actually delete the changeset as well requires the mq extension.
+    hg tag -r hgweb-fix hgweb-fix-tag
+    hg bookmark -d hgweb-fix
+    hg strip hgweb-fix-tag
+  Look up
+    hg log -prf loc-main:0
+    hg id -r.
 
 Bookmarks
 : Activated only with direct 'hg up <bkmk>', not by --rev (as multiple on one)
 : Each commit/strip moves active bkmk, behaving as head
-	Push your bookmark onto server (default: local only .hg/bookmarks)
-		hg push -B my-bookmark user
-		: works only with publishing repositories (check on bitbucket)
-		hg pull -B bkmk
-		: for getting relevant changesets for bkmk on hg<v2.3
-	Branch landing
-		hg up <SHA-1 or label>
-		: Before landing, we need to rebase our unlanded changesets on top of
-		: the latest changeset from an integration branch:
-		hg pull inbound
-		hg rebase -d inbound
-		: If you need to add r= reviewer attribution to the commit message, do that now:
-		hg histedit
-			: Change the action to m for all the changesets and proceed to
-			: update commit messages accordingly.
-		hg push -r . inbound
+  Push your bookmark onto server (default: local only .hg/bookmarks)
+    hg push -B my-bookmark user
+    : works only with publishing repositories (check on bitbucket)
+    hg pull -B bkmk
+    : for getting relevant changesets for bkmk on hg<v2.3
+  Branch landing
+    hg up <SHA-1 or label>
+    : Before landing, we need to rebase our unlanded changesets on top of
+    : the latest changeset from an integration branch:
+    hg pull inbound
+    hg rebase -d inbound
+    : If you need to add r= reviewer attribution to the commit message, do that now:
+    hg histedit
+      : Change the action to m for all the changesets and proceed to
+      : update commit messages accordingly.
+    hg push -r . inbound
 
 THINK
 : FIND which ALT it has? -- group changes in different commits on fly
@@ -96,97 +104,97 @@ THINK
 mq -- refine changes in different commits (single workflow I would liked?)
 : https://www.mercurial-scm.org/wiki/MqTutorial
 : ALSO see 6.3 in https://www.mercurial-scm.org/wiki/MqTutorial
-	Momentarily stop working on the original change.
-	Add any outstanding portions of that change into your current patch.
-	Create a new patch.
-	Fix the problem you discovered.
-	Add that fix into the new patch.
-	Return to your original patch.
+  Momentarily stop working on the original change.
+  Add any outstanding portions of that change into your current patch.
+  Create a new patch.
+  Fix the problem you discovered.
+  Add that fix into the new patch.
+  Return to your original patch.
 
 > hg
-	DevCycle
-		hg status
-		hg diff
-		hg commit [<filename>..]
-		: To add new files to the repository and to remove obsolete ones use
-		hg addremove
-		: Check what you're going to push
-		hg outgoing
-	Local branch
-		hg commit
-		...
-		hg strip --keep -r .  #.~2
-		: And now commit unified
-		hg commit
-	Rebase
-		: SEE https://www.mercurial-scm.org/wiki/RebaseExtension
-		hg rebase --dest .~2 --base . --collapse
+  DevCycle
+    hg status
+    hg diff
+    hg commit [<filename>..]
+    : To add new files to the repository and to remove obsolete ones use
+    hg addremove
+    : Check what you're going to push
+    hg outgoing
+  Local branch
+    hg commit
+    ...
+    hg strip --keep -r .  #.~2
+    : And now commit unified
+    hg commit
+  Rebase
+    : SEE https://www.mercurial-scm.org/wiki/RebaseExtension
+    hg rebase --dest .~2 --base . --collapse
 
-	Objects
-		changeset, revision, nodeid, heads
-	Status
-		hg id
-		hg status
-	List for checkout
-		hg branches
-	Remove untracked
-		hg purge --all
-		: hg --config "extensions.purge=" purge --all
-		rm .hgignore && hg purge -a && hg rev -a
-		: clean completely
-	Revert changes
-		hg up -C
-	Graph
-		hg log -G -T '{node|short} {desc}'
-		hg glog
-			: hg --config "extensions.graphlog=" glog > ../hmc.log
-		hg view
-		hg serve
-			: navigate in local browser
-	Stash -- could be used as ALT to mq
-		hg shelve -n tmp-chgs
-		hg unshelve tmp-chgs
-		hg shelve -d tmp-chgs
+  Objects
+    changeset, revision, nodeid, heads
+  Status
+    hg id
+    hg status
+  List for checkout
+    hg branches
+  Remove untracked
+    hg purge --all
+    : hg --config "extensions.purge=" purge --all
+    rm .hgignore && hg purge -a && hg rev -a
+    : clean completely
+  Revert changes
+    hg up -C
+  Graph
+    hg log -G -T '{node|short} {desc}'
+    hg glog
+      : hg --config "extensions.graphlog=" glog > ../hmc.log
+    hg view
+    hg serve
+      : navigate in local browser
+  Stash -- could be used as ALT to mq
+    hg shelve -n tmp-chgs
+    hg unshelve tmp-chgs
+    hg shelve -d tmp-chgs
 
-	See types of files in repo
-		hg manifest S 's/.*\.(\w+)$/\1/p' | sort | uniq -c | sort -n
-	Patch
-		>> http://dwm.suckless.org/customisation/patch_queue
-		with mq (SEE in .hg/patches/)
-		: after editing some source code, you can use hg qref to update your patch file.
-			hg qnew name.patch
-				: edit commit msg
-				hg qref -e
-		instead mq
-			hg commit
-			hg export . > myfeature.patch
-			: If you need to make further changes to your patch, you can back
-			: out that last commit, leaving the changes in place, using:
-			hg strip --keep -r .
-			:OR hg strip --keep -r .~2   # 3 commits
-		ALT to mq use
+  See types of files in repo
+    hg manifest S 's/.*\.(\w+)$/\1/p' | sort | uniq -c | sort -n
+  Patch
+    >> http://dwm.suckless.org/customisation/patch_queue
+    with mq (SEE in .hg/patches/)
+    : after editing some source code, you can use hg qref to update your patch file.
+      hg qnew name.patch
+        : edit commit msg
+        hg qref -e
+    instead mq
+      hg commit
+      hg export . > myfeature.patch
+      : If you need to make further changes to your patch, you can back
+      : out that last commit, leaving the changes in place, using:
+      hg strip --keep -r .
+      :OR hg strip --keep -r .~2   # 3 commits
+    ALT to mq use
 
-		series of patches
-			hg log -l 2
-			hg export -r 8259:8260 > example.diff
+    series of patches
+      hg log -l 2
+      hg export -r 8259:8260 > example.diff
 
-		last changeset
-			hg export -o FILE -r REV
-		one file through multiple changesets
-			hg diff file.c -r 20:30 > new.diff
-			: As a more versatile approach, you can use -I (include file pattern) / -X (exclude).
-		apply style
-			mercurial
-				hg patch -p1
-				: p1 instead of p0 -- due to a quirk of Mercurial diff output
-			git (with renames, deletions and binary files)
-				hg import --no-commit
+    last changeset
+      hg export -o FILE -r REV
+    one file through multiple changesets
+      hg diff file.c -r 20:30 > new.diff
+      : As a more versatile approach, you can use -I (include file pattern) / -X (exclude).
+    apply style
+      mercurial
+        hg patch -p1
+        : p1 instead of p0 -- due to a quirk of Mercurial diff output
+      git (with renames, deletions and binary files)
+        hg import --no-commit
 
-	Local repo ignore -- .hg/hgignore
-		Edit .hg/hgrc:
-		: [ui]
-		: ignore = /path/to/repo/.hg/hgignore
-		EXPL Full path is necessary to work from a repo subdir
+  Local repo ignore -- .hg/hgignore
+    Edit .hg/hgrc:
+    : [ui]
+    : ignore = /path/to/repo/.hg/hgignore
+    EXPL Full path is necessary to work from a repo subdir
 
 
 
@@ -307,7 +315,7 @@ git branch -a                    hg branches
 
 |                                                           Edit ~/.hgrc section
 | git config --global user.(name|email) ...                 "[ui]", key
-|															"username", value
+|                             "username", value
 |                                                             "First Last <
 |                                                             mail@example.org >"
 
@@ -324,22 +332,22 @@ xargs rm                                                    the inverted slash
 
 
 Troubleshooting
-	dotencode
-		: If an older Mercurial version tries to access a repository that was
-		: created by a newer Mercurial version, an error message like
-		> abort: requirement 'dotencode' not supported!
-		: may be displayed, which means the Mercurial version used to access
-		: that repository doesn't know how to interpret it, because accessing
-		: it would require knowledge about the 'dotencode' capability.
+  dotencode
+    : If an older Mercurial version tries to access a repository that was
+    : created by a newer Mercurial version, an error message like
+    > abort: requirement 'dotencode' not supported!
+    : may be displayed, which means the Mercurial version used to access
+    : that repository doesn't know how to interpret it, because accessing
+    : it would require knowledge about the 'dotencode' capability.
 
-		If such an error message appears, a newer Mercurial version must be
-		used to access the repository or the repository must be converted to
-		an older format understood by that version
-			hg clone --pull
+    If such an error message appears, a newer Mercurial version must be
+    used to access the repository or the repository must be converted to
+    an older format understood by that version
+      hg clone --pull
 
-		The format configuration option may be used to instruct Mercurial to
-		create older repository formats. For example, to convert a 'dotencode'
-		repository into the previous format, the command
-			hg --config format.dotencode=0 clone --pull repoA repoB
-		can be used, which of course requires a Mercurial version that
-		supports the 'dotencode' capability.
+    The format configuration option may be used to instruct Mercurial to
+    create older repository formats. For example, to convert a 'dotencode'
+    repository into the previous format, the command
+      hg --config format.dotencode=0 clone --pull repoA repoB
+    can be used, which of course requires a Mercurial version that
+    supports the 'dotencode' capability.
