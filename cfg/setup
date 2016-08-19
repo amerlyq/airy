@@ -8,7 +8,7 @@ if has_pr st; then term=st
 elif has_pr urxvt; then term=urxvt
 else term=xterm; fi
 
-mkdef r.t         $(which ${term:?})
+mkdef r.t         ${term:?}
 mkdef r.tf        r.${term}-float
 mkdef r.n         r.notify
 mkdef r.b         r.qute
