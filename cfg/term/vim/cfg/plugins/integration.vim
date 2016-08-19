@@ -243,3 +243,13 @@ call dein#add('gregsexton/gitv', {
 "   let g:gista#github_user = 'Shougo'
 "   let g:gista#directory = expand('$CACHE/gista')
 " '''
+
+
+" HACK: adding syntax highlight
+call dein#add('amerlyq/vim-tshark', {
+  \ 'on_ft': 'tshark',
+  \ 'hook_source': "
+\\n   let g:tshark_nested_folds = 1
+\\n   let g:tshark_detail_opts = '-V -x -t r'
+\\n   let g:tshark_summary_opts = '-t r'
+\"})
