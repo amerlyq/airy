@@ -29,19 +29,43 @@ TLS/SSL decryption
     + https://wirewatcher.wordpress.com/2010/07/20/decrypting-ssl-traffic-with-wireshark-and-ways-to-prevent-it/
     ++ https://minnmyatsoe.com/2016/01/using-tshark-to-decrypt-ssl-tls-packets/
     https://wiki.wireshark.org/SSL
+    ? http://www.root9.net/2012/11/ssl-decryption-with-wireshark-private.html
+    ? https://ask.wireshark.org/questions/29936/decrypting-ssl-traffic-in-wireshark-processed-by-sslsniff
+    ++ http://security.stackexchange.com/questions/35639/decrypting-tls-in-wireshark-when-using-dhe-rsa-ciphersuites/42350#42350
+      # debug when decryption not working
   Session key logging
     + 2016-08-18 [X] https://habrahabr.ru/post/253521/
       2016-08-18 [X] https://jimshaver.net/2015/02/11/decrypting-tls-browser-traffic-with-wireshark-the-easy-way/
-    $ export SSLKEYLOGFILE=~/path/to/sslkeylog.log
+    Usage
+      $ SSLKEYLOGFILE=ff.keylog firefox
+      $ tshark -T text -w ff.pcap
+      $ tshark -V -o ssl.keylog_file:ff.keylog -o ssl.debug_file:debug.txt -r ff.pcap
   MITM
-    https://blog.heckel.xyz/2013/08/04/use-sslsplit-to-transparently-sniff-tls-ssl-connections/
-    https://www.roe.ch/SSLsplit
     https://moxie.org/software/sslstrip/
     $ intercepter-ng
     # Charles, Fiddler, Mallory Proxy, MITMPROXY, WebScarab, Burp Proxy, Zaproxy
       http://www.enhanceie.com/Fiddler/help/httpsdecryption.asp
     WARN: channel-binded authorization IIS
       https://blogs.msdn.microsoft.com/fiddler/2010/10/15/fiddler-and-channel-binding-tokens/
+    sslsplit vs mitmproxy
+      http://security.stackexchange.com/questions/112845/what-is-the-difference-between-mitmproxy-and-sslsplit
+    sslsplit
+      https://blog.heckel.xyz/2013/08/04/use-sslsplit-to-transparently-sniff-tls-ssl-connections/
+      https://www.roe.ch/SSLsplit
+    mitmproxy
+      https://blog.heckel.xyz/2013/07/01/how-to-use-mitmproxy-to-read-and-modify-https-traffic-of-your-phone/
+      https://mitmproxy.org/
+      + http://docs.mitmproxy.org/en/stable/modes.html
+      + http://main.lv/writeup/mitmproxy.md
+      Usage
+        > [qute] :open mitm.it
+        $ sudo cp mitmproxy-ca-cert.pem /etc/ca-certificates/trust-source/anchors/mitmproxy-ca-cert.crt
+        $ sudo trust extract-compat
+        > [qute] :set network proxy http://localhost:8080
+          OR $ https_proxy=http://localhost:8080 firefox
+        $ mitmproxy --port 8080 -w qute.mitm
+        > [qute] :open https://example.com
+        $ mitmproxy -r qute.mitm
   HTTPS
     2016-08-18 [X] https://habrahabr.ru/post/188042/
     https://en.wikipedia.org/wiki/Server_Name_Indication
@@ -54,6 +78,8 @@ TLS/SSL decryption
         www.ssllabs.com/ssltest/index.html
       Most of modern attacks on https (BEAST, CRIME, BREACH, LUCKY 13, слабости RC4 и.т.д)
         www.isecpartners.com/media/106031/ssl_attacks_survey.pdf
+  Kali Linux -- Penetration Testing Tools
+    http://tools.kali.org/
 
 Extract files from //*.pcap and streams
   GUI: “File” –> “Export” –> “Objects” –> HTTP”
@@ -65,6 +91,7 @@ Extract files from //*.pcap and streams
   https://ask.wireshark.org/questions/32474/how-to-decompress-http-contents-with-tshark
   ~ http://www.behindthefirewalls.com/2014/01/extracting-files-from-network-traffic-pcap.html
   + http://www.xplico.org/
+  ? https://ask.wireshark.org/questions/23606/decrypting-browser-https-wrapped-into-stunnel-ssl
 
 Snippet
   ip addr show dev eth0

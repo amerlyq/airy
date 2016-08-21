@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# ATT: https://www.archlinux.org/news/ca-certificates-update/
+# dir=/etc/ca-certificates/trust-source/anchors/
+# /usr/local/share/ca-certificates/*.crt -> $dir
+# /etc/ssl/certs/*.pem -> $dir/*.crt
+# Instead of update-ca-certificates, run trust extract-compat
+
 if [ "$1" == "-d" ]
 then CLR=1; shift; fi
 
