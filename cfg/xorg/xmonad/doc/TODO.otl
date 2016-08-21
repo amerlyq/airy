@@ -397,3 +397,10 @@ BUG
 	: MAYBE:SEE: sources of submapDefault -- there must be key pass-through
 	: ALT: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-BorderResize.html
 	: -- somehow it will pass mouse clicks
+
+[_] Make main window boring
+	Skip main window(s) in heterogeneous layouts (Tall, TwoPane, IM, ...)
+		Jump to main only by M-h (remember last used main win)
+		M-j/k cycles through slave windows only OR stopped at top/bot borders
+	Multi main wins -- like slaves -- M-j/k cycles only through main wins
+	Single main win: M-j/k jumps to top/bot slave win OR cycles to itself like in multi
