@@ -12,6 +12,9 @@ Type=forking
 # THINK:(bash) disown OR:(double-fork) (./prg &) & -- reparent to PID=1
 # -noreset
 # BUG: Xorg sends -USR1 before it's completely initialized!  -- only after WM started it's done
+# CHECK: exec discards [trap '' USR1] ? Or for USR1 it's not true?
+# MAYBE: no need in inner [trap '' USR1] -- it simply used instead of ':'
+#   => http://stackoverflow.com/questions/20725925/get-pid-of-current-subshell
 ExecStart=/bin/sh -c "trap 'echo waited SIGUSR1 received; exit 0' USR1; (trap '' USR1;\
 exec /usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -keeptty -verbose 2 \
     -dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25 \

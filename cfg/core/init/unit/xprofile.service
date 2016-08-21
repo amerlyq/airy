@@ -2,6 +2,9 @@
 Description=Xorg - Settings - %P
 Requisite=xorg.target
 After=xorg.target xmonad.service
+# CHECK why I can't load it before xmonad?
+# MAYBE split file in two?
+# Before=xmonad.service
 
 [Service]
 SyslogIdentifier=xprofile
