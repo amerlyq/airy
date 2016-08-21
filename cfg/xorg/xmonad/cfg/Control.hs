@@ -20,6 +20,9 @@ import XMonad.Actions.CopyWindow    (killAllOtherCopies, kill1)
 import XMonad.Actions.FloatKeys     (keysMoveWindow, keysMoveWindowTo, keysResizeWindow, keysAbsResizeWindow)
 import qualified XMonad.Actions.GroupNavigation as GN
 import qualified XMonad.StackSet as W
+-- BAD: boring windows disallow focusing other windows in fullscreen
+--  TRY: sep layout instead of toggle https://github.com/0/.../blob/master/xmonad/xmonad.hs
+--  TRY: Simplest from Tips of http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-BoringWindows.html
 import qualified XMonad.Layout.BoringWindows as B
 import XMonad.Layout.Minimize       (minimizeWindow, MinimizeMsg(..))
 import XMonad.Layout.Maximize       (maximizeRestore)
@@ -45,9 +48,9 @@ urgentNback = withUrgents $ maybe (return ()) (windows . W.focusWindow) . listTo
 keys = focusing ++ swap ++ edit ++ movef ++ layouts ++ system
 
 focusing =
-  [ ("M-h"      , B.focusMaster)
-  , ("M-j"      , B.focusDown)
-  , ("M-k"      , B.focusUp)
+  [ ("M-h"      , windows W.focusMaster)
+  , ("M-j"      , windows W.focusDown)
+  , ("M-k"      , windows W.focusUp)
   , ("M-l"      , GN.nextMatchWithThis GN.History wkspName)
   , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
   , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
