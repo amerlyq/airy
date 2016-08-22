@@ -46,6 +46,8 @@ fun! s:PatchColorScheme()
   "  hi! FoldColumn ctermfg=4 ctermbg=NONE guifg=Cyan guibg=Grey
   hi! lCursor guifg=NONE ctermbg=4 guibg=Cyan
   hi! link ColorColumn StatusLineNC
+  " TRY (v.1.5.0?)
+  hi! link QuickFixLine TermCursor
   " Suppress transparency on reverse cursor of search results highlight
   "  hi! Search cterm=None ctermbg=3 ctermfg=0
   " The "NonText" highlighting will be used for "eol", "extends" and
