@@ -18,8 +18,9 @@ READ
 Clone
   https://www.mercurial-scm.org/wiki/HardlinkedClones
   Partial local clone w/o hard links (to compress branch into tar)
-    $ hg clone --debug --pull --uncompressed --rev "$tag" /path/to/repo "$dst"
     # WARN: cloning by tag doesn't contain that tag itself (need clone rev+1)!
+    $ hg log --rev "children($tag)" /path/to/repo
+    $ hg clone --debug --pull --uncompressed --rev "$rev" /path/to/repo "$dst"
   Shallow clone (need special server configuration)
     https://bitbucket.org/facebook/remotefilelog
 
