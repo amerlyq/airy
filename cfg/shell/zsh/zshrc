@@ -24,6 +24,11 @@ _dttime end-prezto
 
 
 ### Opts ###
+## Disable shared history between terminals (auto-importing)
+# OR:USE: zle keymap 'set-local-history' to toggle exclusive history movement
+# USE: $ fc -RI $ to manually import history from other terminals
+setopt nosharehistory
+setopt incappendhistory
 ## Disable suspending on <C-s>, <C-q>
 setopt noflowcontrol
 [[ $- != *i* ]] || stty stop '' -ixoff -ixon
