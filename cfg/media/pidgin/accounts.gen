@@ -39,7 +39,7 @@ if [[ -f /usr/lib/purple-2/libskypeweb.so ]]; then
 		<name>${MAIN_SKYPE:?}</name>
 		<alias>me</alias>
 		<settings>
-			<setting name='show-typing-as-text' type='bool'>1</setting>
+			<setting name='show-typing-as-text' type='bool'>0</setting>
 			<setting name='show-typing-as-icon' type='bool'>0</setting>
 		</settings>
 $(gaim)
@@ -80,6 +80,28 @@ if [[ -f /usr/lib/purple-2/libskype.so ]]; then
 			<setting name='skypeout_online' type='bool'>1</setting>
 			<setting name='skype_path' type='string'></setting>
 			<setting name='reject_all_auths' type='bool'>0</setting>
+		</settings>
+$(gaim)
+	</account>
+EOT
+fi
+
+if [[ $MAIN_TELEGRAM ]] && [[ -f /usr/lib/purple-2/telegram-purple.so ]]; then
+  cat >> "$dst" <<EOT
+	<account>
+		<protocol>prpl-telegram</protocol>
+		<name>${MAIN_TELEGRAM:?}</name>
+		<alias>me</alias>
+		<statuses/>
+		<settings>
+			<setting name='media-size-threshold' type='int'>8192</setting>
+			<setting name='send-read-notifications' type='bool'>1</setting>
+			<setting name='inactive-days-offline' type='int'>7</setting>
+			<setting name='compat-verification' type='bool'>0</setting>
+			<setting name='display-read-notifications' type='bool'>0</setting>
+			<setting name='accept-secret-chats' type='string'>ask</setting>
+			<setting name='history-retrieve-days' type='int'>0</setting>
+			<setting name='auto-join-group-chats' type='bool'>1</setting>
 		</settings>
 $(gaim)
 	</account>
