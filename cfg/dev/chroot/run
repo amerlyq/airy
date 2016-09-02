@@ -26,6 +26,8 @@ fi
 exec schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT
 export DISPLAY=$DISPLAY SHELLRC_EVAL="${CURR_CHROOT_EVAL}"
 source ~/.bash_profile
-${@+trap exit INT HUP QUIT TERM; "$@"; exit}
+${@+trap 'exit 1' INT HUP QUIT TERM; "$@"; exit}
 EOT
 )
+# NOTE: vars from rcfile aren't inherited for -c!
+# ${@+-c 'trap "exit 1" INT HUP QUIT TERM; "$@"' "$0" "$@"}
