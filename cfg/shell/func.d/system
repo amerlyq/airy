@@ -37,6 +37,8 @@ trap_errors(){
 }
 
 ### Go to current script's directory
+# BAD: both realpath and readlink => same path on symlinked script
+#   => TRY: "$(realpath "${0%/*}")/${0##*/}"
 cwd_script(){ cd "$(realpath -e "${0%/*}")"; }  # even around symlinked
 cwd_origin(){ cd "$(dirname "$(readlink -e "$0")")"; }  # only around original file
 ### Add current package to active mods list if absent
