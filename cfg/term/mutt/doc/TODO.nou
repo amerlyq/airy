@@ -32,7 +32,14 @@ TODO
   [_] FIXME: don't re-source password on 'c' or acc switch
     * BUT prompt on launch only for passwd of curr acc (others -- on demand)
   [_] BUG:FIXME: mail not saved into 'Sent' when sent from cmdline
-    http://stackoverflow.com/questions/21860791/mutt-send-email-without-saving-it-to-sent-folder
+    ALT: use Bcc
+      https://encrypted.google.com/search?q=mutt+bcc+myself
+      So, any mail will be stored in folder, from which it was sent, or in default mailbox in case, if message was started from command line.
+        set record=+default
+        folder-hook . "set record=^"
+      OR: set record=+<account_name>/Sent
+        # http://stackoverflow.com/questions/21860791/mutt-send-email-without-saving-it-to-sent-folder
+    NOTE: 'set record="=Sent"  # NEED fcc to work for cmdline-send
   [_] DEV:FIX: passwd prompts 3-times by multiple 'source' commands in ./cfg/accrc
     * NEED somehow cache password for each acc in its own var
     * Check if its var empty and only then query to gpg-passwd
