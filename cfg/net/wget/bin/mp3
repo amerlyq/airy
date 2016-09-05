@@ -33,6 +33,7 @@ urlst(){ local lnm='Click here to download|Download to Computer'
 # NOTE: delete album header from playlist, if you want to add it again
 # DEV: after mpc add -> substitute '%XX' -> \xXX in songs names
 #   ALT: generate complete playlist (? on stdin ?) instead of 'mpc add'
+# TODO: remove 'Instrumental' 'off vocal' 'TV size' from both mpc and fzf
 _mpcl(){ mpc playlist -f '[%file%]'; }
 inmpc(){
   hasn o || mpc clear

@@ -59,6 +59,8 @@ myStateLogger copies = dynamicLogString def
       "Grid" -> "[#]"
       "IM Grid" -> "|##"
       "ReflectX IM Grid" -> "##|"
+      "Mirror IM Grid" -> "/##"
+      "Mirror ReflectX IM Grid" -> "##/"
       "SimplestFloat" -> "( )"
       "Circle" -> "(O)"
       _ -> nm
