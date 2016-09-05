@@ -1,0 +1,46 @@
+TODO
+  FIND how I did on mint with hdmi wired to nvidia
+    https://github.com/Bumblebee-Project/Bumblebee/wiki/Multi-monitor-setup
+
+  FIND: Non-xinerama multi-head with separate X sessions
+    https://zuttobenkyou.wordpress.com/2009/10/04/linux-nvidia-xinerama-guide-rotating-just-one-monitor-in-a-dual-head-setup/
+
+  ALSO:(different dpi)
+    http://superuser.com/questions/522453/xrandr-dpi-on-multihead-linux
+    http://askubuntu.com/questions/393400/is-it-possible-to-have-two-different-dpi-configurations-for-two-different-screen
+
+Wacom
+  ALT:(wacom + qt + dual monitor) -- search problems
+    => Problem in how screen is mapped
+    https://bugs.kde.org/show_bug.cgi?id=346744
+
+Zaphod mode (separate screens)
+# seems like this mode allows on one PC multiple users-- each with it's own monitor/keyboard/mouse
+  https://www.phoronix.com/forums/forum/linux-graphics-x-org-drivers/open-source-amd-linux/14280-separate-screens-with-xrandr
+  https://russ.garrett.co.uk/2013/04/15/driving-monitoring-displays-in-linux/
+
+Multihead
+  https://wiki.archlinux.org/index.php/multihead
+  http://wiki.compiz.org/Development/Multihead
+  http://www.linuxquestions.org/questions/linux-hardware-18/separate-x-screens-is-this-possible-with-intel-hd-graphics-4175563730/
+  https://01.org/linuxgraphics/documentation/how-set-dual-head-intel-graphics-randr-1.2
+
+Bumblebee
+  https://github.com/Bumblebee-Project/Bumblebee/wiki/Multi-monitor-setup
+  https://github.com/Bumblebee-Project/Bumblebee/issues/21
+
+ALT:HACK: run another Xorg and enable second monitor only there
+
+Nvidia/Optimus -- dual screen
+  https://www.reddit.com/r/archlinux/comments/2kkrsr/dual_monitor_intelnvidia/
+  http://us.download.nvidia.com/XFree86/Linux-x86/304.125/README/configtwinview.html
+  http://us.download.nvidia.com/XFree86/Linux-x86/304.125/README/configmultxscreens.html
+  http://us.download.nvidia.com/XFree86/Linux-x86/304.125/README/xconfigoptions.html
+
+  $ xrandr --listproviders
+  $ nvidia-xconfig --query-gpu-info
+
+XMonad
+  http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-IndependentScreens.html
+  https://mail.haskell.org/pipermail/xmonad/2011-April/011251.html
+  + https://www.reddit.com/r/xmonad/comments/ndww5/dual_screens_multi_monitors_tips_and_tricks/

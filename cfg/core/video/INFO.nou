@@ -1,0 +1,84 @@
+Freeze : xorg freeze skylake
+  ~ bumblebee + nvidia
+    > https://bbs.archlinux.org/viewtopic.php?id=207646
+  https://bbs.archlinux.org/viewtopic.php?id=205728
+  https://github.com/linuxenko/ubuntu-skylake-i915-video-fix
+  https://bugzilla.kernel.org/show_bug.cgi?id=109081
+
+Other intel abilities
+  http://xps13-9333.appspot.com/
+  Rapid Start
+  Smart Connect
+
+HW info
+  http://www.binarytides.com/linux-commands-hardware-info/
+
+Testing repo
+: linux, linux-firmware, nvidia, bbswitch
+  /etc/pacman.conf
+    Uncomment [testing*] and move _after_ [core/extra/community/multilib]
+    pacman -Syu
+    pacman -Syu testing/linux testing/linux-firmware
+    pacman -Syu testing/nvidia testing/nvidia-settings
+    pacman -Syu community-testing/bbswitch
+  NOTE: nvidia-settings needed to monitor GPU load
+  ALT: conky-nv or conky-lua-nv
+  ALSO: nvidia-smi -a
+
+Get VGA card and display GPU vendor
+  lspci -vnn | grep VGA -A 12
+  lshw -numeric -C display
+  sudo lshw -numeric -C display
+To find your motherboard model, use dmidecode or inxi command.
+  sudo dmidecode -t baseboard | grep -i 'Product'
+  inxi -M
+Renderer
+  glxinfo | grep OpenGL
+
+bumblebee setup
+  https://gist.github.com/cpburnz/21694595b6dfffebf964
+  Find current active card
+    $ cat /proc/acpi/bbswitch
+      0000:01:00.0 OFF
+  Manually ON/OFF nvidia card
+    $ sudo echo ON >> /proc/acpi/bbswitch
+
+Monitors EDID
+  paci read-edid
+  sudo get-edid | parse-edid
+  > http://kodi.wiki/view/Creating_and_using_edid.bin_via_xorg.conf
+
+After logging in, you can also check that both drivers are running with the following commands:
+  lsmod | egrep "i915|nvidia"
+
+  glxinfo| grep "OpenGL version string"
+  : OpenGL version string: 4.4.0 NVIDIA 337.19
+  vdpauinfo | grep -i string
+  : Information string: NVIDIA VDPAU Driver Shared Library  337.19  Tue Apr 29 19:51:41 PDT 2014
+
+
+REF
+  http://archlinux.org.ru/forum/topic/12113/?page=1
+  https://wiki.archlinux.org/index.php/Xorg#Multiple_monitors
+  https://wiki.ubuntu.com/X/Config/Multihead
+  http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/
+  https://forums.opensuse.org/showthread.php/506693-Nvidia-settings-How-to-disable-panning
+
+
+  nvidia-settings --assign CurrentMetaMode="DFP-0: 1920x1200 { ViewPortIn=800x600, ViewPortOut=1600x1200+160+0 }"
+
+  nv-control-dpy --print-metamodes
+  nv-control-dpy --print-current-metamode
+  nv-control-dpy --add-metamode "DFP-0: 1280x1024 @1280x1024 +1280+0, DFP-1: nvidia-auto-select @1280x1024 +0+103"
+
+  nvidia-xconfig -o test
+  nvidia-xconfig -c /dev/null -o test
+
+Manual nvidia cfg
+: NEED only for manual nvidia configuration.  For Optimus use bumblebee!
+: Because you will not be able to configure multihead manually for Optimus.
+  < ~/.xinitrc
+    ${video:+xrandr --setprovideroutputsource modesetting NVIDIA-0}
+    xrandr --auto  # OR: --size 1 &
+  cpf "$PWD/xorg.conf" /etc/X11/xorg.conf
+  cpf "$PWD/20-nvidia.conf" /etc/X11/xorg.conf.d/20-nvidia.conf

@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+xrandr --output eDP1 --auto --primary \
+  --output HDMI1 --auto --below eDP1
+# xrandr --output eDP1 --auto --primary \
+#   --output HDMI1 --auto --scale 2x2 --below eDP1
+
+# ALT:(fb)
+# xrandr --output eDP1 --auto --pos 0x2160 \
+#   --output HDMI1 --auto --scale 2x2 --pos 0x0 --fb 3840x4320
+# xrandr --output eDP1 --auto --pos 0x0 \
+#   --output HDMI1 --auto --scale 2x2 --pos 3840x0 --fb 7680x2160
+
+# NOTE
+#   You may adjust the "sharpness" parameter on your monitor settings to adjust the blur level introduced with scaling.
