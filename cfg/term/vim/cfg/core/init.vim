@@ -15,6 +15,8 @@ let g:loaded_vimballPlugin = 1
 " let g:loaded_netrw             = 1
 " let g:loaded_netrwSettings     = 1
 " let g:loaded_netrwFileHandlers = 1
+" let g:netrw_dirhistmax = 0  " Completely disable creation of '.netrwhist'
+let g:netrw_home = $CACHE
 
 ""CASE Match {{{1 Temporary jumps to show matching parenthesis:
 " let g:loaded_matchparen = 1    " Matching parentheses: hooks on Cursor*,Win*
