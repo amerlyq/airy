@@ -241,6 +241,11 @@ class nrenum(Command):
             else:
                 ready += chg
 
+        if ready < 0:
+            ready = 0
+        if total < 0:
+            total = 0
+
         if state.endswith('#') and ready == total:
             state = state[:-1] + '$'
         elif state.endswith('$') and ready < total:
