@@ -1,0 +1,10 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+
+if distro arch; then
+    pkg_inst krita
+
+elif distro ubuntu; then
+    pkg_inst calligra-krita
+fi

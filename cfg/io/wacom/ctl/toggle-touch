@@ -4,5 +4,4 @@ source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
 state=$(xsetwacom get "$WTOUCH" "Touch" \
     | awk '/on/{print "OFF"} /off/{print "ON"}')
-xsetwacom set "$WTOUCH" Touch $state && wnotify "Touch is $state"
-
+xsetwacom set "$WTOUCH" Touch $state && r.n "Wacom" "Touch is $state"

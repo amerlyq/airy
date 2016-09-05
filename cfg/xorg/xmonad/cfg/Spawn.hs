@@ -153,9 +153,11 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
       [ (m ++ i, k ++ i) | i <- map show [0..9], (m, k) <-
         [("", ""), ("S-", "+"), ("C-", "-")]
       ]
+    ],
+    ---- Wacom M-<Insert>
+    inGroup "M-g"
+    [ ("o", "~/aura/airy/cfg/wacom/ctl/change-output")
+    , ("m", "~/aura/airy/cfg/wacom/ctl/change-mode -q")  -- && $upd wnd
+    , ("s", "~/aura/airy/cfg/wacom/ctl/change-curve")
     ]
-    ---- wacom M-<Insert>
-    -- o ~/aura/airy/cfg/wacom/ctl/change-output ,$def
-    -- $mod+m ~/aura/airy/cfg/wacom/ctl/change-mode -q && $upd wnd ,$def
-    -- $mod+s ~/aura/airy/cfg/wacom/ctl/change-curve  ,$def
   ]

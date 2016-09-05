@@ -1,17 +1,18 @@
-#!/bin/bash
+#!/bin/bash -e
 # vim: ft=sh
+CURR_DIR_PKG=~/.cache/krita
 source ~/.shell/func.d/packages
-if [ $? -eq 1 ]; then exit 1; fi
 
 # Main Blog: how to build and setup krita
 #   http://www.davidrevoy.com/article218/guide-my-hardware-and-software-for-digital-painting
 #   http://www.ramonmiranda.com/2012/09/new-set-for-krita-software-45-or-later.html
 
-mkdir -p ~/.kde4/env
-printf "export KDEDIRS=\$HOME/kde4/inst:\$KDEDIRS
-export PATH=\$HOME/kde4/inst/bin:\$PATH
-"  > ~/.kde4/env/env.sh
-apt_noprompt krita kdelibs-bin kdelibs5-data kdelibs5-plugins oxygen-icon-theme
+# CHECK: Ubuntu-only?
+# mkdir -p ~/.kde4/env
+# printf "export KDEDIRS=\$HOME/kde4/inst:\$KDEDIRS
+# export PATH=\$HOME/kde4/inst/bin:\$PATH
+# "  > ~/.kde4/env/env.sh
+# apt_noprompt krita kdelibs-bin kdelibs5-data kdelibs5-plugins oxygen-icon-theme
 
 # Хорошие сеты кистей
 #   https://krita.org/learn/resources/
@@ -19,11 +20,12 @@ apt_noprompt krita kdelibs-bin kdelibs5-data kdelibs5-plugins oxygen-icon-theme
 
 ## Brushsets
 
-# Windows: c:\Users\USERNAME\AppData\Roaming\krita\share\apps\krita
-dst=~/.kde/share/apps/krita
+# ALT:(Windows) c:\Users\USERNAME\AppData\Roaming\krita\share\apps\krita
+# ALT:(Ubuntu) dst=~/.kde/share/apps/krita
+dst=~/.local/share/krita
 
 nm="deevad-krita-brushpresets"
-git_install "Deevad/$nm" -d
+git_inst -d "Deevad/$nm"
 rsync -abvu "$CURR_DIR_PKG/$nm/" "$dst/" # -izP
 # http://meemodraws.deviantart.com/art/Krita-Brush-Pack-311306611
 

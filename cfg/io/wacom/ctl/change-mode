@@ -24,15 +24,17 @@ next() { ## Choose next
 }
 
 
+# FIXME:
 ## Indicator
 wledf=$(ls /sys/bus/usb/devices/*/wacom_led/status_led0_select)
 if [ -f "$wledf" ]; then
     ledmsg="Change wacom led file permission to indicate current mode"
+    # TODO: replace by udev rule (arch wiki)
     [ -w "$wledf" ] || gksudo -m "$ledmsg" chmod 666 "$wledf"
     bLed=1
 fi
-fled() { [ -n "$bLed" -a -n "$1" ] && echo "$1" > "$wledf"; }
-
+# fled() { [ -n "$bLed" -a -n "$1" ] && echo "$1" > "$wledf"; }
+fled(){ :; }
 
 ## Next
 mod="$1"
@@ -88,5 +90,4 @@ zoom) wacom "$WPAD" <<< '
 ' ;;
 *) esac
 
-case "$arg" in -s) echo "$mod" ;; -q) ;; *) wnotify "Mode <b>$mod</b>" ;; esac
-
+case "$arg" in -s) echo "$mod" ;; -q) ;; *) r.n "Wacom: mode" "$mod" ;; esac

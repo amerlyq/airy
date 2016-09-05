@@ -3,7 +3,8 @@ source ~/.shell/func.d/packages
 
 
 if distro arch; then
-    pkg_inst "xf86-input-wacom"
+    pkg_inst -p xsetwacom "xf86-input-wacom"
+    # NEED: restart Xorg to apply udev
     # pkg_inst calligra-krita
 
 elif distro ubuntu; then
