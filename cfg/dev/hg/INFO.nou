@@ -62,6 +62,17 @@ FeatureBranch
     :OR hg bookmark -r 7300 feature-fix && hg up feature-fix
   Changes
     hg commit -m 'some fix'
+  Merge default
+    hg up $br
+    hg merge $def
+    hgcm "Merge $def to $nm"
+  Test merge correctness
+    BAD: branches with hyphen 'some-name'
+    $ trap 'exit 1' INT \
+      function merge { diff <(hg diff -g -r $fea_tmpl\^ -r $fea_tmpl) <(hg diff -g -r $1\^ -r $1); } \
+      function branch { diff <(hg diff -g -r $curr_default -r $1) <(hg diff -g -r $prev_default -r $1\^); } \
+      while IFS= read -r b; do merge $b && branch $b || echo "Error: $b"; \
+      done < <(hg branches | awk '/^feature_/{print$1}') | tee ../merge.log
   Merge feature
     hg update -c loc-main
     hg merge loc-feature
