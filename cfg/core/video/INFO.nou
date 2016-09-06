@@ -13,6 +13,9 @@ Other intel abilities
 HW info
   http://www.binarytides.com/linux-commands-hardware-info/
 
+NOTE which display port wired to which GPU
+  $ xrandr -q $ extra hyphens (like LVDS-1-2) mostly used for Nvidia
+
 Testing repo
 : linux, linux-firmware, nvidia, bbswitch
   /etc/pacman.conf
@@ -56,12 +59,17 @@ After logging in, you can also check that both drivers are running with the foll
   vdpauinfo | grep -i string
   : Information string: NVIDIA VDPAU Driver Shared Library  337.19  Tue Apr 29 19:51:41 PDT 2014
 
+Optimus Prime (nouveau only?)
+  ~ http://dchambers.github.io/articles/driving-multiple-monitors-on-an-optimus-laptop/
+  http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/
+
+SEE
+  https://wiki.archlinux.org/index.php/hybrid_graphics
 
 REF
   http://archlinux.org.ru/forum/topic/12113/?page=1
   https://wiki.archlinux.org/index.php/Xorg#Multiple_monitors
   https://wiki.ubuntu.com/X/Config/Multihead
-  http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/
   https://forums.opensuse.org/showthread.php/506693-Nvidia-settings-How-to-disable-panning
 
 
