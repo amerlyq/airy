@@ -7,6 +7,12 @@ if distro arch; then
     # NEED: restart Xorg to apply udev
     # pkg_inst calligra-krita
 
+  # ALSO paci input-wacom-dkms
+  # modprobe wacom_dkms
+  # modprobe wacom_w8001_dkms
+  # rmmod wacom
+  # rmmod wacom_w8001
+
 elif distro ubuntu; then
     LST="$LST build-essential autoconf libtool"
     LST="$LST libX11-dev libxi-dev x11proto-input-dev xserver-xorg-dev libxrandr-dev libncurses5-dev"
