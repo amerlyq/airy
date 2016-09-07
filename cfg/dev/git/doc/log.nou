@@ -36,3 +36,12 @@ Log
    known as foo.
   Commits
     git diff --name-status --oneline HEAD~10 HEAD~5
+
+Blame
+  Evolution of line range
+  # http://stackoverflow.com/questions/5098256/git-blame-prior-commits
+    $ git log --format=format:%H -- nou.vim | xargs -rL1 git --no-pager blame -L20,+1 -- nou.vim | uniq
+    # git blame -L10,+10 -- nou.vim
+    $ git log --pretty=short -u -L20,1:nou.vim
+    OR whole history $ git log -p -M --follow --stat -- nou.vim
+    ALT: recursive-blame

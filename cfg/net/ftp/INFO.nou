@@ -1,0 +1,43 @@
+https://wiki.archlinux.org/index.php/list_of_applications#FTP_clients
+  lftp  /2016
+  tnftp /2015
+  ncftp /2011
+    http://www.ncftp.com/ncftp/
+  gftp  /2008
+
+ftp-fs
+  https://wiki.archlinux.org/index.php/CurlFtpFS
+  USAGE:
+    $ sudo modprobe fuse
+    $ curlftpfs ftp.server.com /tmp/ftp -o user=$USER
+    $ fusermount -u /tmp/ftp
+  root-user
+    $ sudo curlftpfs ftp.server.com /tmp/ftp -o user=$USER,allow_other
+    $ sudo fusermount -u /tmp/ftp
+  OR: ~/.netrc chmod 600
+    machine ftp.server.com
+    login username
+    password mypassword
+  THEN $ curlftpfs -o ssl,utf8 ftp://ftp.server.com /tmp/ftp
+
+wput
+# A command line tool to upload files to FTP site, the opposite to wget
+  USE instead of lftp in my scripts
+    http://installion.co.uk/ubuntu/vivid/universe/w/wput/install/index.html
+  $ wput -B ./file.tgz ftp://user:pass@ftp.server.com/dir/file.tgz
+
+TRY:
+  extra/snarf 7.0-6
+      Command-line URL retrieval tool (http/ftp/gopher)
+  community/aria2 1.26.0-1
+      Download utility that supports HTTP(S), FTP, BitTorrent, and Metalink
+  community/vsftpd 3.0.3-2
+      Very Secure FTP daemon
+        https://wiki.archlinux.org/index.php/Very_Secure_FTP_Daemon
+
+  community/obexfs 0.12-4 [installed]
+      FUSE based filesystem using ObexFTP (currently beta).
+  community/obexftp 0.24-7 [installed]
+      A tool for transfer files to/from any OBEX enabled device
+  community/obextool 0.35-4
+      A front-end of obexftp

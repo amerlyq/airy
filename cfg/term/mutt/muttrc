@@ -6,12 +6,30 @@ set my_cache=~/.cache/mutt
 set pager_index_lines=6     # keep N lines of index on top of pager
 set pager_context=3         # context lines when going to next page
 set pager_stop=yes          # stop instead of displaying next mail
+set menu_scroll=yes         # just scroll one line instead of full page
 
 set editor = "$EDITOR -c 'set spell spelllang=ru_yo,en_us,uk'"
 # set edit_headers          # see the headers when editing
 set sort = reverse-threads  # reverse-threads -- sort by newest conversation first
+# set strict_threads = yes  # don't group any mail with same subject (group only by recepient)
 set sort_aux = last-date-received
 set send_charset="us-ascii:utf-8"
+# set assumed_charset="cp-1251"  # if no charset in msg -- it's probably windows
+set simple_search="~f %s | ~C %s | ~s %s"  # by default search in To/Cc/Subject
+
+
+# TODO: setup pager view
+# # show spam score (from SpamAssassin only) when reading a message
+# spam "X-Spam-Score: ([0-9\\.]+).*" "SA: %1"
+# set pager_format = " %C - %[%H:%M] %.20v, %s%* %?H? [%H] ?"
+
+# # do not show all headers, just a few
+# ignore          *
+# unignore        From To Cc Bcc Date Subject
+# # and in this order
+# unhdr_order     *
+# hdr_order       From: To: Cc: Bcc: Date: Subject:
+
 
 ## Show only important fields in the header
 # ignore *

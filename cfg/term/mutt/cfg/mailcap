@@ -6,6 +6,8 @@
 text/html; r.b %s; test=test -n "$DISPLAY"; nametemplate=%s.html
 text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
 # text/html; elinks -dump %s ; copiousoutput
+application/msword; antiword '%s'; copiousoutput; description=Word Document; nametemplate=%s.doc
+# application/pdf; pdftotext '%s' -; copiousoutput; description=PDF Document; nametemplate=%s.pdf
 application/*; ~/.config/ranger/scope.dash %s; copiousoutput
 image/*; sxiv %s; test=test -n "$DISPLAY"
 text/*; $EDITOR %s
