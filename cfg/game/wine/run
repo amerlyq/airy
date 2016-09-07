@@ -9,6 +9,7 @@ echo "NOTE: disable composition to reduce performance impact!"
 
 trap 'xrdb -load ~/.Xresources' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
 xrdb -DMAIN_DPI=141 -load ~/.Xresources
+# ALT: echo Xft.dpi: 144 | xrdb -merge
 
 primusrun playonlinux
 # PRIMUS_VERBOSE=2 primusrun glxgears 2>&1 \

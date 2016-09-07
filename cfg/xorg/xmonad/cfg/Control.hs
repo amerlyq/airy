@@ -10,7 +10,6 @@ import Data.Map.Strict  (member)
 import Data.Maybe       (maybe, fromMaybe, listToMaybe)
 import System.Exit      (exitSuccess)
 import XMonad hiding    (keys)
-import XMonad.StackSet              (view)
 import XMonad.ManageHook            (liftX, className)
 import XMonad.Hooks.ManageDocks     (ToggleStruts(..))
 import XMonad.Hooks.UrgencyHook     (withUrgents, clearUrgents)
@@ -125,6 +124,10 @@ system =
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
 
+  inGroup "M-g"
+  [ ("1", screenWorkspace 0 >>= flip whenJust (windows . W.view))
+  , ("2", screenWorkspace 1 >>= flip whenJust (windows . W.view))
+  ] ++
   (inGroup "M-S-<Esc>" . concat)
   [ [ ("o", whenWindowsClosed $ spawn "r.core logout")
     , ("r", whenWindowsClosed $ spawn "r.core reboot")

@@ -29,6 +29,7 @@ Testing repo
   ALSO: nvidia-smi -a
 
 Get VGA card and display GPU vendor
+  $ lspci | grep 'VGA|3D'
   lspci -vnn | grep VGA -A 12
   lshw -numeric -C display
   sudo lshw -numeric -C display
@@ -50,6 +51,12 @@ Monitors EDID
   paci read-edid
   sudo get-edid | parse-edid
   > http://kodi.wiki/view/Creating_and_using_edid.bin_via_xorg.conf
+  ALT:(if get-edid broked)
+  $ find /sys -name edid -exec sh -c 'parse-edid < {}' \;
+
+  NOTE: xrandr resets DisplaySize to keep dpi constant
+    SEE '--fbmm' in $ man xrandr
+    => edid shows real value, but it's not used in Xorg!
 
 After logging in, you can also check that both drivers are running with the following commands:
   lsmod | egrep "i915|nvidia"
@@ -62,9 +69,13 @@ After logging in, you can also check that both drivers are running with the foll
 Optimus Prime (nouveau only?)
   ~ http://dchambers.github.io/articles/driving-multiple-monitors-on-an-optimus-laptop/
   http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/
+  http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-19-2/
 
 SEE
   https://wiki.archlinux.org/index.php/hybrid_graphics
+  http://http.download.nvidia.com/XFree86/Linux-x86/319.32/README/randr14.html
+  + https://wiki.gentoo.org/wiki/Xorg/Multiple_monitors
+    # https://encrypted.google.com/search?q=xorg%20multiple%20screens
 
 REF
   http://archlinux.org.ru/forum/topic/12113/?page=1

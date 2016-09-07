@@ -18,6 +18,18 @@ Zaphod mode (separate screens)
 # seems like this mode allows on one PC multiple users-- each with it's own monitor/keyboard/mouse
   https://www.phoronix.com/forums/forum/linux-graphics-x-org-drivers/open-source-amd-linux/14280-separate-screens-with-xrandr
   https://russ.garrett.co.uk/2013/04/15/driving-monitoring-displays-in-linux/
+  +++ http://askubuntu.com/questions/278115/dual-screen-setup-in-ubuntu-with-intel-hd-graphics
+    # https://encrypted.google.com/search?q=xorg+multiple+screens+intel
+  xorg.conf for 4 monitors:  https://gist.github.com/mattcl/2444397
+  - can't use same keyboard/mouse for :0.1 screen
+    -> synergy can help
+  ALT:HACK: run another Xorg and enable second monitor only there
+    http://superuser.com/questions/562657/x-on-one-monitor-a-bare-tty-terminal-on-another-linux
+    https://encrypted.google.com/search?q=linux+xserver+per+display
+  Multiseat
+    https://help.ubuntu.com/community/MultiseatX
+    http://unix.stackexchange.com/questions/19340/how-can-i-run-a-separate-x-session-on-a-different-physical-display
+      # note on synergy
 
 Multihead
   https://wiki.archlinux.org/index.php/multihead
@@ -29,7 +41,6 @@ Bumblebee
   https://github.com/Bumblebee-Project/Bumblebee/wiki/Multi-monitor-setup
   https://github.com/Bumblebee-Project/Bumblebee/issues/21
 
-ALT:HACK: run another Xorg and enable second monitor only there
 
 Nvidia/Optimus -- dual screen
   https://www.reddit.com/r/archlinux/comments/2kkrsr/dual_monitor_intelnvidia/

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# NOTE: find all dependent pkgs
+#   => use $ pactree -r <pkg> $ before 'pacX' -- its cool!
+
 if _has_pr pacaur; then
   alias pacman='pacaur'
 elif _has_pr yaourt; then
