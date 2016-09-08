@@ -1,13 +1,20 @@
 #!/bin/bash -e
 THEME_ALLOWED='dark|light'
-
 source ~/.shell/func.d/cfgsetup
+
 ### LINKS ###
 linkcp "$PWD" ~/.mutt
 linkcp ./cfg/theme-$THEME ~/.cache/mutt/theme
 
 dst=~/.cache/mutt
 (cd "$dst" && ln -svf "acc/${MUTT_DEFAULT:?}" default)
+
+# Relocate ~/.mail if necessary
+# FIND:WTF: $MAIL = /var/spool/mail/dkolomoiets
+#   CHECK: use $MAIL instead of $CURR_DIR_MAIL ?
+mkdir -p "${CURR_DIR_MAIL:?}"
+[[ $CURR_DIR_MAIL -ef ~/.mail ]] || linkcp "$CURR_DIR_MAIL" ~/.mail
+
 
 ### GENS ###
 # THEME=$THEME ./gen/theme-solarized.gen
@@ -22,13 +29,12 @@ source \$my_cfg/accrc
 EOT
 done
 
-# mkdir -p "${CURR_DIR_MAIL:?}"
-# [[ $CURR_DIR_MAIL -ef ~/.mail ]] || link "$CURR_DIR_MAIL" ~/.mail
 
-## Unused currently
+# THINK:MAYBE: write config by hands instead of generation?
+# USAGE: mbsync '$mid' OR mbsync -a
+# ATT: place at bottom
 # dst=~/.mbsyncrc
 # > "$dst"
 # for creds in "${MAIL_CREDS[@]}"
 # do ./gen/mbsyncrc.gen "$dst" ${creds:?}; done
-
-# USAGE: mbsync '$mid' OR mbsync -a
+# THEN: notmuch setup; notmuch new

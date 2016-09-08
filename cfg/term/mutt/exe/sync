@@ -1,0 +1,8 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+mkdir -p ~/.mail/"${MUTT_DEFAULT:?}"
+# -c ~/.mbsyncrc
+# --all
+# -l
+exec mbsync "${MUTT_DEFAULT:?}"

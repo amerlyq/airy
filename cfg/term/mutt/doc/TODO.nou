@@ -84,6 +84,7 @@ REF
 mutt
   Seize
     !!! https://dev.mutt.org/trac/wiki/UserPages
+    !! http://www.usenix.org.uk/content/mutt.html
       http://www.davep.org/mutt/
     >>> https://www.proteansec.com/linux/the-ultimate-guide-to-mutt/
     > http://www.mutt.org/doc/devel/manual.html#functions
@@ -100,15 +101,34 @@ mutt
       https://op-co.de/blog/posts/mulit-window_mutt/
     Write in markdown
       http://unix.stackexchange.com/questions/108485/send-email-written-in-markdown-using-mutt
-  Notmuch (search all folders)
+
+% Notmuch (search all folders)
+    USAGE:
+      !!! https://notmuchmail.org/mutttips/
+        :set nm_default_uri="notmuch:///home/user/.mail/<acc>"
+        :push <vfolder-from-query>
+    BAD: need specify full path in config (strictly binded to system)
+      => TRY generate config
+    SEE
+      https://notmuchmail.org/notmuch-mutt/
+        https://notmuchmail.org/howto/
+      https://github.com/tsto/notmuchfs
+    THINK: integrate in neovim frontend (like notmuch-vim frontend)
     !!! https://anarc.at/blog/2016-05-12-email-setup/
       http://blog.tshirtman.fr/2013/3/17/mutt-offlineimap-notmuch-nottoomuch
     FIND: directly using imap / notmuch gmail imap
+      CHECK: set nm_record
       # https://encrypted.google.com/search?q=notmuch%20imap
       Seems like impossible -- after all, use 'mbsync' (in term/mutt)?
         https://notmuchmail.org/howto/
     ALSO: by using mbsync -- check if it can monitor multiple mailboxes from multiple accounts
+      https://wiki.archlinux.org/index.php/Isync
       BUT: how to gather this local info inside mutt?
+      SEE: mswatch to initiate sync
+        OR:(cron): https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
+      [_] FIXME: can't sync deleted folder
+        BAD: if removed from server -- won't be removed on local
+        # master Junk cannot be opened and slave Junk not empty
     !!! 2016-09-07 [X] SEE 'notmuch' usage at neomutt site
     + http://tobias.kleemann.net/2011/05/mutt-notmuch-searching-multiple-mailboxes-in-mutt/
     https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
@@ -118,8 +138,6 @@ mutt
         https://github.com/larsks/mutt-utils
     Inst
       ! http://www.neomutt.org/feature/notmuch/
-      https://notmuchmail.org/howto/
-        https://notmuchmail.org/notmuch-mutt/
       https://github.com/tsto/notmuchfs
       http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/
   Setup
@@ -139,6 +157,8 @@ mutt
     adressbook database instead of aliases
       + https://dev.mutt.org/trac/wiki/QueryCommand
         https://dev.mutt.org/trac/wiki/QueryCommand/MuttLdapSearch
+    SEE nottoomuch
+      http://blog.tshirtman.fr/2013/3/17/mutt-offlineimap-notmuch-nottoomuch
     ADD Notify
     >[_] http://www.codeovertones.com/2010/04/mutt-gmail-gdata-notify-send-perfect.html
       http://code.google.com/p/altcanvas/source/browse/trunk/scripts/chkgmail

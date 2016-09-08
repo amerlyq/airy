@@ -1,11 +1,11 @@
 #!/bin/bash -e
-source ~/.shell/profile
+# source ~/.shell/profile
 
-dst=${1:-$HOME/.mbsyncrc}
-mid=${2:?No mail id}
-muser=${3:?No mail account}
-mhost=${4:?No mail host}
-mpath=${5:-${CURR_DIR_WORK:?}/mail/$mid}
+dst=${1:-~/.mbsyncrc}
+mid=${2:-${MUTT_DEFAULT:?}}
+muser=${3:?}
+mhost=${4:?}
+mpath=${5:-~/.mail/$mid}
 
 wprf(){ printf "$*" >> "$dst"; }
 wopt(){ printf '%s %s\n' "${1:?}" "${2:?}" >> "$dst"; }
@@ -22,7 +22,7 @@ wopt User $muser
 # To store the password in an encrypted file use PassCmd instead of Pass
 # PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.mailpass.gpg"
 # WARNING: can have trouble to identify: muser != work_mail
-wopt PassCmd "\"~/.mutt/gpg-passwd ${muser:?}\""
+wopt PassCmd "\"~/.mutt/exe/pass ${muser:?}\""
 
 # Use SSL
 wopt SSLType IMAPS
