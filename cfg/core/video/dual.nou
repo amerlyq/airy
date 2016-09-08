@@ -12,6 +12,16 @@ TODO
     http://superuser.com/questions/522453/xrandr-dpi-on-multihead-linux
     http://askubuntu.com/questions/393400/is-it-possible-to-have-two-different-dpi-configurations-for-two-different-screen
 
+  DEV: multiple ./90-monitor-*.conf to
+    TRY: switching between configs
+      http://willem.engen.nl/projects/disper/
+
+  TRY:HACK: lightweight multiseat
+   So, each user has its own keyboard/mouse and monitor
+    [_] Multiple Xorg
+    [_] Real Zaphod mode
+    [_] Gaming together -- merging/uniting/redirecting input from many devices
+
 Wacom
   ALT:(wacom + qt + dual monitor) -- search problems
     => Problem in how screen is mapped
@@ -33,6 +43,15 @@ Zaphod mode (separate screens)
     https://help.ubuntu.com/community/MultiseatX
     http://unix.stackexchange.com/questions/19340/how-can-i-run-a-separate-x-session-on-a-different-physical-display
       # note on synergy
+
+Xinerama
+  !! https://wiki.archlinux.org/index.php/multihead#Xinerama
+  https://awesome.naquadah.org/wiki/Using_Multiple_Screens#Xinerama
+  https://help.ubuntu.com/community/XineramaHowTo
+  + http://davelargo.blogspot.com/2010/01/xrandr-no-more-xinerama.html
+  XMonad
+    $ ghc -e 'Graphics.X11.Xinerama.compiledWithXinerama'
+    $ ghc -e 'Graphics.X11.openDisplay [] >>= Graphics.X11.Xinerama.getScreenInfo'
 
 Multihead
   https://wiki.archlinux.org/index.php/multihead
@@ -61,3 +80,4 @@ XMonad
   https://bbs.archlinux.org/viewtopic.php?id=132319
   https://mail.haskell.org/pipermail/xmonad/2011-January/010997.html
   http://stackoverflow.com/questions/23271662/how-does-xmonad-assign-numbers-to-screens-and-screens-to-two-monitors
+  [_] FIXME -- smartBorders for dual-screen
