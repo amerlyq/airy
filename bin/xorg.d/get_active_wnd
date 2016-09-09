@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
+set -o pipefail
 
 wid=$(xprop -root | awk '/^_NET_ACTIVE_WINDOW/{print $NF}')
-xprop -id $wid | awk '
+xprop -id "$wid" | awk '
     /^WM_CLASS/ { c=$NF; match($0,/"[^"]+"/,a) }
     /^WM_NAME/ { n=substr($0,index($0, "\""))}
     END { printf("class=%s instance=%s title=%s\n", c,a[0],n) }
 '
-
