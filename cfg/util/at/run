@@ -1,0 +1,7 @@
+#!/bin/bash -e
+# USAGE: at 18:30, at now + 5 minutes
+
+# Run 'atd' jobs daemon
+svc_activate -r atd.service
+
+exec at "$@"

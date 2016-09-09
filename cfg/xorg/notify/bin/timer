@@ -1,16 +1,14 @@
 #!/bin/bash -e
 
-TIME="${1:-1}"
+TIME=${1:-1}
 
-[[ ! "$TIME" =~ ^[0-9]+$ ]] || TIME+=' minutes'
-
+[[ ! $TIME =~ ^[0-9]+$ ]] || TIME+=' minutes'
 
 # watch -n 900 "notify-send -t 10000 'Look away. Rest your eyes'"
-# USE: at 18:30
-at now + $TIME <<EOT
+r.at now + $TIME <<EOT
 { notify-send \
-    --urgency normal --expire-time=10000 \
+    --urgency normal \
     -i typing-monitor -h int:x:500 -h int:y:500 \
-    'Alarm' 'Timer expiered';
+    'Alarm' 'Timer expired';
 beep }
 EOT
