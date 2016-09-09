@@ -43,6 +43,9 @@ whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
 -- FIXME: jump to urgent and back ALT: save last urgent and always jump to it even after urgentstate cleared
 -- urgentNback w = withUrgents $ maybe (backNforth [] $ W.view w) (windows . W.focusWindow) . listToMaybe $ w
 urgentNback = withUrgents $ maybe (return ()) (windows . W.focusWindow) . listToMaybe
+-- ENH: urgent_pullNback
+-- TRY: UrgencyHook::FocusHook -- to store wksp tag of urgent window
+pullUrgents = withUrgents $ maybe (return ()) (windows . \a ws -> W.shiftWin (W.currentTag ws) a ws) . listToMaybe
 
 keys = focusing ++ swap ++ edit ++ movef ++ layouts ++ system
 
@@ -54,6 +57,7 @@ focusing =
   , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
   , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
   , ("M-q"      , urgentNback)
+  , ("M-S-q"    , pullUrgents)
   , ("M-C-q"    , clearUrgents)
   ]
 
