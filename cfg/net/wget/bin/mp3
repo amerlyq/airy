@@ -6,8 +6,9 @@ set -o pipefail
 # -t -- MUST be launched from inside browser in tmux (keep tmux opened near browser)
 # BUG: need error in r.wgett when fzf chose nothing (like when Esc pressed)
 # -> FIXME: don't create folder if no links to dld
-# FIXME: clear playlist only directly before new urls list is ready
-# DEV: when populating 'mpc' -- replace in song name '%20 -> <Space>' in comment
+# 2016-09-09 [X] FIXME: clear playlist only directly before new urls list is ready
+# 2016-09-09 [X] DEV: when populating 'mpc' -- replace in song name '%20 -> <Space>' in comment
+# MOVE: functions into cfg/media/mpd/ctl/*
 
 CACHE=/tmp/music
 DST=/home/media/_dld/music
@@ -30,16 +31,37 @@ urlst(){ local lnm='Click here to download|Download to Computer'
   | sed -rn '/.*href="(https?:\/\/[^"]+\.mp3)">('"$lnm"').*/s//\1/p' \
   | tee "${1}.urls"
 }
+
+# WARN: some songs may be removed by mistake
+_filtered(){ sed -r '/[^A-Za-z](Instrumental|Karaoke|off%20vocal|TV%20size)\b/d'; }
+
+tom3u(){ local t f=${1:?}.m3u h=${2:?}
+  [[ -s $f ]] && { cat "$f"; return; }
+  printf '#EXTM3U\n\n%s\n\n' "$h" > "$f"
+  _filtered | while IFS= read -r line; do
+    t=$line; t=${t##*/}; t=${t%.*}
+    # SEE URL-decoding  # OR t=${t//%20/ }
+    #   http://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
+    printf '#EXTINF:-1, %b\n%s\n\n' "${t//%/\\x}" "$line" >> "$f"
+  done
+}
+
 # NOTE: delete album header from playlist, if you want to add it again
-# DEV: after mpc add -> substitute '%XX' -> \xXX in songs names
-#   ALT: generate complete playlist (? on stdin ?) instead of 'mpc add'
-# TODO: remove 'Instrumental' 'off vocal' 'TV size' from both mpc and fzf
 _mpcl(){ mpc playlist -f '[%file%]'; }
-inmpc(){
-  hasn o || mpc clear
-  _mpcl | grep -qxF "$1" || { printf '%s\n' "$1"; cat; } | mpc add
-  mpc play $(( $(_mpcl | grep -nxF "$1" | awk -F: '{print$1;exit}') ))
-  hasn j || r.wm M-o_n  # TEMP:HACK:(open/jump to ncmpcpp)
+inmpc(){ local f=${1:?} h=${2:?} nm='wget-mp3'
+  local pl=~/.mpd/playlists/${nm}.m3u
+  if ! _mpcl | grep -qxF "$h"; then
+    cat | tom3u "$f" "$h"
+    ln -sf "$f.m3u" "$pl"
+    hasn o || mpc clear
+    mpc load "$nm"
+    # ALT:(simple) { printf '%s\n' "$h"; cat; } | mpc add
+  fi
+  mpc play $(( $(_mpcl | grep -nxF "$h" | awk -F: '{print$1;exit}') ))
+  hasn j || ~/.bin/xorg.d/make_urgent 'ncmpcpp'
+  # ALT:TEMP:HACK:(open/jump to ncmpcpp)
+  # hasn j || r.wm M-o_n
+  #   BAD: closes already opened instance -- BETTER: make window urgent
 }
 
 todld(){ local cmd=(cat) d=${DST:?}/${1:?}
@@ -48,7 +70,7 @@ todld(){ local cmd=(cat) d=${DST:?}/${1:?}
 
   hasn j || r.wm 'M-<F1>'  # TEMP:HACK:(mark wnd 'tmux a -t wget' by M-S-F1)
   hasn t || cmd=(fzf --exit-0 --exact --multi --no-sort --reverse --cycle --no-hscroll)
-  eval "${cmd[@]:?}" | r.wgetf -i-
+  _filtered | eval "${cmd[@]:?}" | r.wgetf -i-
 }
 
 # THINK:TODO: parallel 'for' to start 'mpc' before starting 'dld'
@@ -65,7 +87,7 @@ for url in "${@:?}"; do
   hasn l || urlst "$f"
 
   hasn pd || nm=$(album "$f")
-  hasn  p || urlst "$f" | inmpc "http://===== ${nm:?} ====="
+  hasn  p || urlst "$f" | inmpc "$f" "http://===== ${nm:?} ====="
   hasn  d || urlst "$f" | todld "${nm:?}"
 
   hasn pd || r.n 'DONE' "${nm:?}"

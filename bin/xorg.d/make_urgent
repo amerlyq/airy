@@ -1,0 +1,6 @@
+#!/bin/dash
+### Urgent by 'instance' (EX: 'ncmpcpp' -- scratchpad)
+exec wmctrl -xr "${1:?}" -b add,demands_attention
+
+# ALT: $ xdotool set_window --urgency 1 window=<window_id>
+#   https://www.reddit.com/r/archlinux/comments/tbj6w/setting_wm_urgent_hint/
