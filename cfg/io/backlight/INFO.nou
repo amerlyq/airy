@@ -43,3 +43,6 @@ Add to bootloader:
 On work -- where no backlight -- disable to eliminate boot error
   sudo systemctl disable systemd-backlight@backlight:acpi_video0.service
   OR sudo systemctl mask systemd-backlight
+
+Keyboard backlight
+  $ echo 3 | sudo tee /sys/devices/platform/asus-nb-wmi/leds/asus::kbd_backlight/brightness

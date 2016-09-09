@@ -15,6 +15,8 @@ augroup filetypedetect
   " Configuration
   au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,Vagrantfile}
         \ setl ft=ruby fdm=syntax fdn=1
+  " -- override default runtime mistake 'ft=hog'
+  au BufRead,BufNewFile *.rules setl ft=udevrules
   " System
   au BufRead,BufNewFile *.gpg     setf gpg
   au BufRead,BufNewFile {*.log*,log-*}       setf messages
