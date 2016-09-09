@@ -102,4 +102,10 @@ zoom) fled 1 64; wacom "$WPAD" <<< '
 ' ;;
 *) esac
 
-case "$arg" in -s) echo "$mod" ;; -q) ;; *) r.n "Wacom: mode" "$mod" ;; esac
+state(){ local p=/tmp/wacom_bar
+  r.n "Wacom: mode" "$1"
+  [[ -p $p ]] || mkfifo "$p"
+  printf '%s\n' "$1" > "$p"
+}
+
+case "$arg" in -s) echo "$mod" ;; -q) ;; *) state "$mod" ;; esac

@@ -29,19 +29,20 @@ Config {
 -- FIND: <action> with pressed modifiers (ctrl/shift)
 
 
--- BUG:(broken)
--- \<fc=#cc8000>  </fc>\
---   \<fn=1><action=`r.wm M-o_n` button=3>\
---     \<action=`mpc next` button=4>\
---       \<action=`mpc prev` button=5>\
---         \<action=`mpc toggle` button=1>\
---           \%mpd%\
---         \</action></action></action></action></fn>\
-, template     = "%UnsafeStdinReader%}{\
+, template = "%UnsafeStdinReader%}{\
+  \%wacom%\
+  \<fc=#cc8000>  </fc>\
+    \<fn=1><action=`r.wm M-o_n` button=3>\
+      \<action=`mpc next` button=4>\
+        \<action=`mpc prev` button=5>\
+          \<action=`mpc toggle` button=1>\
+            \%mpd%\
+          \</action></action></action></action></fn>\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%\
+  \<fc=#00cc80>  </fc>\
     \<action=`r.wm M-o_h` button=1>\
-      \ %cpu%  %loadavg%  %memory% %swap%\
+      \%cpu%  %loadavg%  %memory% %swap%\
     \</action>\
   \<fc=#0080cc>  </fc>\
     \%battery%\
@@ -61,7 +62,7 @@ Config {
         \%lang% %leds% \
       \</action></action>\
     \%date% "
-, commands     =
+, commands =
 [ Run Date "<fc=#fd971f>%d.%m.%y</fc> ⌚ <fc=#ffffff>%H:%M</fc>" "date" 50
 , Run Cpu
   [ "-t", "<fc=#ff44ff>☾</fc> <total>%"
@@ -76,7 +77,7 @@ Config {
 , Run DynNetwork
   [ "-t", "<fc=#00ff00>↓</fc><rx>K <fc=#ff4400>↑</fc><tx>K"
   , "-H", "128000", "-h", "#ff5995"
-  , "-n", "#a0a0a0" ] 10
+  , "-n", "#a0a0a0", "-m", "3" ] 10
 , Run Battery
   [ "-t", "<fc=#ccccc6>☯</fc> <left>%"
   , "-L", "10", "-l", "#ff0000"
@@ -89,13 +90,10 @@ Config {
   , "-n", "#ddffff", "-w2", "--"
   , "-O", "♪", "-C", "#00dd00"
   , "-o", "⎋", "-c", "#dd0000" ] 5
-
--- BUG:(broken)
--- , Run MPD  -- TRY: '[[%artist% - ]%title%]|[%name%]|[%file%]'
---   [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
---   , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
---   ] 50
-
+, Run MPD  -- TRY: '[[%artist% - ]%title%]|[%name%]|[%file%]'
+  [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
+  , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
+  ] 50
 -- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
 , Run Com "awk" [ "{print$1}", "/proc/loadavg" ] "loadavg" 10
 , Run Com "r.xkb-lang" [ "-N" ] "lang" 10
@@ -111,7 +109,7 @@ Config {
 , Run Brightness
   [ "-t", "<fc=#cccc00>☀</fc> <percent>%", "--"
   , "-D", "intel_backlight" ] 30
--- , Run Kbd []
 , Run Locks
 , Run UnsafeStdinReader
+, Run PipeReader " :/tmp/wacom_bar" "wacom"
 ] }

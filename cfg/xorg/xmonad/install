@@ -10,10 +10,9 @@ if distro arch; then
     # pkg_inst 'haskell-unordered-containers'
     [[ -d ~/.cabal/bin ]] || echo "Err: Re-login session to add ~/.cabal/bin/xmobar into PATH"
     pkg_inst -l 'Xpm' libxpm
-    echo "Err: disabled haskell-libmpd"
     # NOTE:(install by yaourt) remove bytestring, containers, filepath, time
-    # aur_inst -d {/usr/share/doc/,}haskell-libmpd
-    cab_inst -p 'xmobar' xmobar --flags="with_dbus with_utf8 with_xft with_alsa"  # with_mpd
+    aur_inst -d {/usr/share/doc/,}haskell-libmpd
+    cab_inst -p 'xmobar' xmobar --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
 
 elif distro ubuntu; then
     pkg_inst 'xmonad xmonad-contrib'
