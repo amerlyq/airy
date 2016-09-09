@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
 source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 
@@ -26,23 +26,35 @@ next() { ## Choose next
 
 # FIXME:
 ## Indicator
-wledf=$(ls /sys/bus/usb/devices/*/wacom_led/status_led0_select)
-if [ -f "$wledf" ]; then
-    ledmsg="Change wacom led file permission to indicate current mode"
-    # TODO: replace by udev rule (arch wiki)
-    [ -w "$wledf" ] || gksudo -m "$ledmsg" chmod 666 "$wledf"
-    bLed=1
-fi
-# fled() { [ -n "$bLed" -a -n "$1" ] && echo "$1" > "$wledf"; }
-fled(){ :; }
+fled(){
+  [[ ${1:?} =~ ^[0-3]$ ]] || return
+  printf '%s\n' "${1:?}" > /tmp/wacom_led/status_led0_select
+  [[ $2 =~ ^[0-9]+$ ]] && (($2>=32)) && (($2<128)) || (($2==0)) || return
+  printf '%s\n' "$2" > /tmp/wacom_led/status0_luminance
+}
+
+# ALT:(poll each time)
+# wledf=$(wpath)  # OR: wledf=$(cat /tmp/wacom_led)
+# wledf=$(realpath -e "/sys${wledf%/*/*/*}/wacom_led/status_led0_select")
+# fled(){ printf '%s\n' "${1:?}" > "$wledf"; }
+
+# ALT:(ubuntu) wledf=$(ls /sys/bus/usb/devices/*/wacom_led/status_led0_select)
+# NOTE: after re-plugging wacom need to update file (so, udev rule is better)
+# [[ -s $pledf ]] || find /sys/devices -type f -name 'status_led0_select' > "$pledf"
+# NOTE: replaced by udev rule (arch wiki)
+# if [[ -f $wledf ]]; then
+#     ledmsg="Change wacom led file permission to indicate current mode"
+#     [[ -w $wledf ]] || gksudo -m "$ledmsg" chmod 666 "$wledf"
+#     bLed=1
+# fi
 
 ## Next
 mod="$1"
 case "$mod" in -?) arg="$mod"; shift; mod="$1" ;; esac
 
-if [ -z "$mod" ]; then
+if [[ -z $mod ]]; then
     next $(curr)
-else case "$mod" in
+else case $mod in
     --next) next $(curr) ;;
  --refresh) mod=$(curr) ;;
    --reset) next ;;
@@ -53,37 +65,37 @@ echo "$mod" > ${TMPDIR:-/tmp}/wacom_mod
 
 ## Orienting on inner half-circle due to hands position
 case "$mod" in
-rotate) fled 1; wacom "$WPAD" <<< '
+rotate) fled 1 32; wacom "$WPAD" <<< '
     Button  1    "key 5"  # reset
     AbsWheelDown "key 6"  # right
     AbsWheelUp   "key 4"  # left
 ';;
-undo) fled 3; wacom "$WPAD" <<< '
+undo) fled 3 32; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown "key +Control_L Z -Control_L"        # prev
     AbsWheelUp   "key +Control_L shift Z -Control_L"  # next
 ' ;;
-brush) fled 0; wacom "$WPAD" <<< '
+brush) fled 0 32; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown "key ["  # small
     AbsWheelUp   "key ]"  # big
 ' ;;
-layer) fled 2; wacom "$WPAD" <<< '
+layer) fled 2 32; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown "key PgDn"
     AbsWheelUp   "key PgUp"
 ' ;;
-color) wacom "$WPAD" <<< '
+color) fled 2 64; wacom "$WPAD" <<< '
     Button  1    "key X"  # swap b/f
     AbsWheelDown "key K"  # dark
     AbsWheelUp   "key L"  # light
 ' ;;
-opacity) wacom "$WPAD" <<< '
+opacity) fled 0 64; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown "key I"  # opaque
     AbsWheelUp   "key O"  # transparent
 ' ;;
-zoom) wacom "$WPAD" <<< '
+zoom) fled 1 64; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown 5
     AbsWheelUp   4

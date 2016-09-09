@@ -8,12 +8,12 @@ source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 wacom "$WPAD" << EOT
     Button  2  "key shift"
     Button  3  "key ctrl"
-    # Button  8  "key +Control_L Z -Control_L"        # Redo without pick-up
-    Button  8  "key +Super_L insert m"              # Change mode
+    # Button  8  "key +Control_L Z -Control_L"      # Redo without pick-up
+    Button  8  "key +Super_L insert -Super_L m"     # Change mode
     Button  1  "key E"                              # Toggle brush/erase
     Button  9  "key ctrl shift A"
-    Button 10  "key +Super_L insert s"     # Change curve sensitivity
-    Button 11  "key +Super_L a"            # Back to previous workspace
+    Button 10  "key +Super_L insert -Super_L s"     # Change curve sensitivity
+    Button 11  "key +Super_L a -Super_L"            # Back to previous workspace
 
     AbsWheelDown    "key ["
     AbsWheelUp      "key ]"
@@ -49,4 +49,3 @@ EOT
 wacom "$WCURSOR" << EOT
     #Threshold       27
 EOT
-

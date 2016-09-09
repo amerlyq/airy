@@ -1,0 +1,31 @@
+### udev rules for wacom tablets
+# SEE /usr/lib/udev/rules.d/65-libwacom.rules
+# SEE:(obsolete) http://pkgbuild.com/git/aur-mirror.git/tree/wacom-udev/10-wacom.rules
+
+## Give the users group permissions to set Wacom device LEDs.
+# ACTION=="add", SUBSYSTEM=="hid", DRIVERS=="wacom", RUN+="/bin/sh -c 'chown :users /sys/%p/wacom_led/*"
+# ACTION=="add", SUBSYSTEM=="hid", DRIVERS=="wacom", RUN+="/bin/sh -c 'echo /sys/%p/wacom_led > /tmp/wacom_led'"
+# ALT:TRY:HACK: (BUT can't create in sysfs)
+# SUBSYSTEM=="hid", DRIVERS=="wacom", RUN+="/bin/ln -sfT /sys/%p/wacom_led /sys/class/leds/wacom::leds"
+
+## Dev symlinks
+KERNEL!="event[0-9]*", GOTO="wacom_end"
+
+ACTION=="remove", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/usr/bin/rm -f /tmp/wacom_led"
+
+ACTION!="add|change", GOTO="wacom_end"
+
+## Provide path
+ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c 'p=$sys%p; ln -s ${p%/*/*/*}/wacom_led /tmp/wacom_led'"
+## Give the users group permissions to set Wacom device LEDs.
+ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c 'chown :users /tmp/wacom_led/*"
+
+# WARN:XXX: may conflict simultaneous usb and wireless connect
+
+# Wacom Wireless Accessory Kit
+ENV{ID_BUS}=="usb", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0084", SYMLINK+="input/wacom-wireless"
+# Wacom Intuos Pro S
+ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", SYMLINK+="input/wacom"
+# ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c 'chown :users /sys/%p/wacom_led/*"
+
+LABEL="wacom_end"

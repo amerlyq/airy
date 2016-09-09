@@ -6,7 +6,15 @@ Search for device name
  So, WACOM_NM="Wacom Intuos Pro S Pen pad"
 
 Show abilities
-  xinput list-props $WACOM_NM
+  $ xinput list-props $WACOM_NM
+
+  Device Node
+    $ wid=$(xsetwacom --list devices | awk '$10=="PAD"{printf$8}')
+    $ wev=$(xinput --list-props 10 | sed -rn '/.*Device Node .*"([^"]+)".*/s//\1/p')
+  Attributes
+    $ udevadm info -a -n $wev
+  Path in /sys
+    $ udevadm info -q path -n $wev
 
 Get events for calibration
  Using the -proximity switch will tell you when you've gone beyond the tablets edge

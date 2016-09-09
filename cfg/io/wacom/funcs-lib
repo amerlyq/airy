@@ -8,16 +8,20 @@
 # === 10             #
 # --- 11 ------------+
 
-DEV="$(xsetwacom list devices | awk '
-    {tp=$10; sub(/\s+id:.*/,""); printf "W%s=\"%s\" ",tp,$0}')"
-[[ -n "$DEV" ]] && eval "$DEV" || exit  # if wacom disconnected
+DEV=$(xsetwacom --list devices | awk '
+    {tp=$10; sub(/\s+id:.*/,""); printf "W%s=\"%s\" ",tp,$0}')
+[[ $DEV ]] && eval "$DEV" || exit  # if wacom disconnected
 
-wacom() { sed -r 's/#.*$//; /^\s*$/d;
-    s/\s*(.*)/xsetwacom set "'"$1"'" \1/' | bash; }
+wnode(){ xinput --list-props "$WPAD" \
+  | sed -rn '/.*Device Node .*"([^"]+)".*/s//\1/p'; }
+
+wpath(){ udevadm info -q path -n $(wnode); }
+
+wacom() { sed -r 's/^\s+//; s/#.*$//; s/\s+$//; /^\s*$/d' \
+  | xargs -rL1 xsetwacom set "$1"; }
 
 wnotify() { notify-send --expire-time=500 -h \
     int:x:500 -h int:y:500 '<b>Wacom:</b> <i>profile</i>' "$1"; }
 
 
 # wnotify "${BASH_SOURCE[1]##*/}"
-

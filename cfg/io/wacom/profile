@@ -1,20 +1,22 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 # source ~/.shell/func.d/bash-profiler
-cd $(dirname $(readlink -m ${0}))
+cd "$(realpath -e "${0%/*}")"
 
-WND_ACTIVE="$(~/.i3/ctl/get_active_wnd)"
+WND_ACTIVE=$(~/.bin/xorg.d/get_active_wnd)
 
-for pf in ./profile.d/*; do
-    line="$(sed -n '/^#:\s*\(.*\)$/{s//\1/p;q}' "$pf")"
+for pf in ./profile.d/*; do [[ -x $pf ]] || continue
+    line=$(sed -n '/^#:\s*\(.*\)$/{s//\1/p;q}' "$pf")
     if [ -z "$line" ]; then continue; fi
     if ! awk "/${line}/ {exit 1}" <<< "$WND_ACTIVE"; then
-        WCURR_PROF="${pf##*/}"
-        WCURR_MODE=" : $(cat ${TMPDIR:-/tmp}/wacom_mod)"
+        WCURR_PROF=${pf##*/}
+        WCURR_MODE=" : $(cat ${TMPDIR:-/tmp}/wacom_mod 2>/dev/null || echo zoom)"
     fi
 done
 
 echo "${WCURR_PROF}${WCURR_MODE}"
-[[ $WCURR_PROF == $(cat ${TMPDIR:-/tmp}/wacom_prof) ]] && exit
+
+prf=${TMPDIR:-/tmp}/wacom_prof
+grep -qsxF "$WCURR_PROF" "$prf" && exit
 echo "$WCURR_PROF" > ${TMPDIR:-/tmp}/wacom_prof
 
 ./profile.d/default >/dev/null
