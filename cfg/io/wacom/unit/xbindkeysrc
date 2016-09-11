@@ -1,8 +1,45 @@
-"firefox"
-    m:0x10 + b:10   (mouse)
-"xterm"
-    m:0x10 + b:11   (mouse)
-"xdotool key ctrl-z"
-    m:0x10 + b:12   (mouse)
-"send-notify Test "No need for escaping the quotes""
-    m:0x10 + b:13   (mouse)
+# vim:ft=conf
+
+# Modifier
+"r.wacom change-mode -q"  # && $upd wnd
+    m:0x0 + b:13
+"r.wacom change-output"
+    m:0x1 + b:13
+"r.wacom change-curve"
+    m:0x4 + b:13
+"r.wacom show-curves"
+    m:0x5 + b:13
+
+# Back'n'forth to prev wksp
+"r.xmonad M-a"
+    m:0x0 + b:18
+
+# ALT: Ring for krita
+"xdotool key ["  # small
+    m:0x0 + b:20
+"xdotool key ]"  # big
+    m:0x0 + b:21
+"r.wacom change-mode -q"  # +mode
+    m:0x4 + b:20
+"r.wacom change-mode -q"  # -mode
+    m:0x4 + b:21
+"r.wacom change-mode -q"  # +group
+    m:0x1 + b:20
+"r.wacom change-mode -q"  # -group
+    m:0x1 + b:21
+
+# Test
+# "xdotool key shift"
+#     m:0x0 + b:11
+# "xdotool key control"
+#     m:0x0 + b:12
+
+# Debug
+# "r.n Wacom "text""
+#     m:0x10 + b:13
+
+# History
+# "xterm"
+#     m:0x10 + b:1
+# "xdotool key ctrl-z"
+#     m:0x10 + b:12

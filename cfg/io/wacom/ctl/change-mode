@@ -7,7 +7,9 @@ source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
 #   : similar to my trackball capturing mouse wheel or alt-back
 #   show in i3bar also "profile : mode" instead of notify
 
-curr() { cat ${TMPDIR:-/tmp}/wacom_mod
+fmod=${TMPDIR:-/tmp}/wacom_mod
+
+curr() { [[ -s $fmod ]] && cat "$fmod"
     # | awk '$1 == '"$(cat ${TMPDIR:-/tmp}/wacom_prof)"' {print $2}'
 }
 
@@ -99,6 +101,10 @@ zoom) fled 1 64; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown 5
     AbsWheelUp   4
+' ;;
+history) fled 2 64; wacom "$WPAD" <<< '
+    AbsWheelDown "key ctrl r"  # redo
+    AbsWheelUp   "key ctrl z"  # undo without pick-up
 ' ;;
 *) esac
 

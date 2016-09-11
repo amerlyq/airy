@@ -1,0 +1,10 @@
+#!/bin/bash -e
+cd "$(realpath -e "${0%/*}")"
+export PATH=$PWD:$PATH
+
+# prf=${1:?}
+prf=krita
+cfg=${PWD%/*}/unit/xbindkeysrc
+
+prf-$prf
+exec xbindkeys -n -f "$cfg"

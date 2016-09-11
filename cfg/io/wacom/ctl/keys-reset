@@ -1,0 +1,18 @@
+#!/bin/bash -e
+cd "$(realpath -e "${0%/*}")"
+source "${PWD%/*}/funcs-lib"
+
+wacom "$WPAD" <<EOT
+  Button   2  "button +11 "
+  Button   3  "button +12 "
+  Button   8  "button +13 "
+
+  Button   1  "button +10 "
+
+  Button   9  "button +16 "
+  Button  10  "button +17 "
+  Button  11  "button +18 "
+
+  AbsWheelDown "20"
+  AbsWheelUp   "21"
+EOT

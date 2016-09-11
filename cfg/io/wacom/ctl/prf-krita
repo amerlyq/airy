@@ -1,0 +1,15 @@
+#!/bin/bash -e
+cd "$(realpath -e "${0%/*}")"
+source "${PWD%/*}/funcs-lib"
+
+wacom "$WPAD" <<EOT
+  Button   2  "key shift"
+  Button   3  "key ctrl"
+  Button   8  "13"        # Change mode
+  Button   1  "key E"     # Toggle brush/erase
+  Button   9  "key ctrl shift A"
+  Button  10  "key L"
+  Button  11  "18"        # Back'n'forth
+  AbsWheelDown  "key ["
+  AbsWheelUp    "key ]"
+EOT

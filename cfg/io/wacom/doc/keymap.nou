@@ -1,0 +1,47 @@
+WARN: can't sync 'button release' event and xdotool 'release' simulation
+  MAYBE plain modifiers must be mapped as-is through xsetwacom
+  ALSO only cmdline scripts have sense to be mapped through xbindkeys
+
+WARN: xbindkeys grabs wacom input completely
+  -- can't combine modifiers with other wacom buttons
+  => BAD don't use for remap at all
+    only actual scripts must be called this way
+
+TRY:HACK: using Guile -- call switch-mode through 'Ring' with 'Mod' pressed
+  OR simply use 'shift + b:20' to call script here
+    BUT it will work only when Ring is remapped to 20/21
+      so, mode switching won't work when Ring directly mapped to keys
+
+[_] HACK: configure on the fly
+  * xbindkeys
+    * used only instead of XMonad case to directly call scripts
+    * always uses the same list of keys 10..32 (? is 32 limit ?) bound to scripts
+  * xsetwacom
+    sets picked buttons only with key number corresponding to script from xbindkeys
+  ALT:
+    xsetwacom -- remap all to 10..32
+    xbindkeys -- all map to script 'r.wacom-use <key>'
+    r.wacom-use -- choose current mapping based on Prf/Pr/Wnd/Wksp
+    BUT:BAD: release modifiers event and input grabbing
+
+
+Structure
+  ++ Completely independent setup structure (browser/krita/gaming/etc...)
+  -- BUT:
+    Can't easily share identical mods/grps
+      => USE symlinks THINK is enough ?
+    Many processes to actually call mod -- CHECK startup time
+  Structure
+    ./prf
+      ├── _default
+      ├── firefox
+      └── krita
+          ├── grp
+          │   ├── draw  # brush+undo
+          │   ├── ink   # layer+brush
+          │   └── view  # zoom+layer
+          ├── mod
+          │   ├── brush
+          │   ├── layer
+          │   └── zoom
+          └── xbindkeysrc

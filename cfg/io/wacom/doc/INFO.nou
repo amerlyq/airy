@@ -35,9 +35,17 @@ REF
   Get tablet abilities
     man wacom
     man xsetwacom
-    xsetwacom list         | modes
+    xsetwacom list             | modes
     xsetwacom list parameters  | options
     xsetwacom list modifiers   | keyboard
+  Default configs
+    $ xsetwacom -x --get $wid all
+    $ xsetwacom -s --get $wid all
+  Current State
+    $ xinput get-button-map 11
+    $ xinput list-props 11
+    $ xinput query-state 11
+
 
   Get available keys for your keyboard
     man dumpkeys
@@ -70,7 +78,7 @@ SETS
   https://wiki.archlinux.org/index.php/Wacom_Tablet#Pressure_curves
 
   RelWheelDown   "key minus"    # Zoom out
-  RelWheelUp     "key plus"   # Zoom in
+  RelWheelUp     "key plus"     # Zoom in
   StripLeftDown  "key minus"      # zoom out
   StripLeftUp    "key shift plus" # zoom in
   StripRightDown "key alt down"   # brush radius (must be mapped in GIMP)
@@ -98,14 +106,12 @@ Area shrink (to keep aspect ration)
   xsetwacom --set "$DEVICE" Area 0 0 "$NEWAREAX" "$NEWAREAY"
 
 
-Also need profile with default settings
-  xsetwacom -s get "Wacom Intuos Pro S Pen pad" all
-
-
 BUGS
   Shaking
     This is a common problem with dual CRT's, took me years to find the solution!
-    In your Wacom control panel go to the "tablet mode" tab and try each of the different settings (Standard, Recognition and Single Mode). For me setting it to recognition stopped the jitters.
+    In your Wacom control panel go to the "tablet mode" tab and try each
+    of the different settings (Standard, Recognition and Single Mode).
+    For me setting it to recognition stopped the jitters.
   Warning:
     Changing Mode to either Absolute or Relative in stylus/eraser stops
     the mouse from being able to pull guidelines out of the ruler in Gimp.
