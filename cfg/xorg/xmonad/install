@@ -11,7 +11,8 @@ if distro arch; then
     [[ -d ~/.cabal/bin ]] || echo "Err: Re-login session to add ~/.cabal/bin/xmobar into PATH"
     pkg_inst -l 'Xpm' libxpm
     # NOTE:(install by yaourt) remove bytestring, containers, filepath, time
-    aur_inst -d {/usr/share/doc/,}haskell-libmpd
+    # aur_inst -d {/usr/share/doc/,}haskell-libmpd
+    cab_inst -d {~/.cabal/packages/hackage.haskell.org/,}libmpd
     cab_inst -p 'xmobar' xmobar --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
 
 elif distro ubuntu; then

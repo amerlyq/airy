@@ -9,6 +9,8 @@ if distro arch; then
   # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
   # Degrade manually:
   #   pacman -U /var/cache/pacman/pkg/firefox-42.0-3-x86_64.pkg.tar.xz
+  # TODO:
+  # cfgOpt u && pacaur -Syu ||:
 
 elif distro ubuntu; then
   sudo apt-get install gawk

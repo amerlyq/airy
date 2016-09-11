@@ -1,7 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-svc_activate -cue pidgin.service
+if [[ $CURR_PROF != neo ]]; then
+  svc_activate -cue pidgin.service
+fi
 
 ### GENS ###
 acc=~/.purple/accounts.xml
