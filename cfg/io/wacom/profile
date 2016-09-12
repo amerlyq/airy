@@ -3,6 +3,7 @@
 cd "$(realpath -e "${0%/*}")"
 
 WND_ACTIVE=$(~/.bin/xorg.d/get_active_wnd)
+# ALT: eval "$(xdotool getmouselocation --shell)" -> $WINDOW
 
 for pf in ./profile.d/*; do [[ -x $pf ]] || continue
     line=$(sed -n '/^#:\s*\(.*\)$/{s//\1/p;q}' "$pf")

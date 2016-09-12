@@ -1,0 +1,30 @@
+Area aspect ratio
+  Sizes
+    Phys: 157 mm x 98 mm = 1.602
+    LPts: 31496 x 19685 = 1.600
+    Wide: 16:9  = 1.777
+    Wide: 16:10 = 1.600
+    A4:  sqrt 2 = 1.414
+
+TODO
+  2016-09-12 [X] Restrict drawing area to 16:9 monitor
+    => below ~10% won't be reachable
+    https://gist.github.com/Quackmatic/6c19fe907945d735c045
+  2016-09-12 [X] Restrict mouse moving to 16:10 canvas only
+    => BUT ifc on left/right (~5.5% each) will be impossible to rich!
+  2016-09-12 [X] Precision Region around cursor -- recreate functionality
+
+  [_] Portret regime for tablet
+    * Read and create appropriate matrix to map only _part_ of monitor
+    http://linuxwacom.sourceforge.net/wiki/index.php/Dual_and_Multi-Monitor_Set_Up#MapToOutput
+    [_] BAD: TwinView
+      http://linuxwacom.sourceforge.net/index_old.php/howto/multimonitor
+      https://bbs.archlinux.org/viewtopic.php?pid=797617
+
+  [_] Split ./ctl/map-area to multiple scripts
+    => Create cool arch structure, similar to planned ./prf/*
+      * outputs
+      * parts of tablet
+        # sometimes drawing on some parts of tablet is easier than on others
+      * zones
+      * rotations

@@ -15,14 +15,10 @@ wacom
     [_] default config
     [_] move gksudo chmod 666 for led into udev rule
 
-FIXME
-  [_] Restrict drawing area to 16:9 monitor
-    https://gist.github.com/Quackmatic/6c19fe907945d735c045
-  OR restrict mouse moving to A4 canvas only
-    => BUT ifc on left/right (~7% each) will be impossible to rich!
-
 FIND
   [_] Wacom Hower Click -- click w/o touching
+    => CHECK: yet devices report it as nonexistent?
+      $ xsetwacom -s --get $wid all
   [_] /dev/input for touching keys without pressing
     -- to show tooltip for keys or simulate soundless press
       => soundless press to switch-mode in group, full press -- to switch whole group

@@ -85,26 +85,6 @@ SETS
   StripRightUp   "key alt up"
 
 
-Portret regime for tablet -- read and create appropriate matrix to map only _part_ of monitor
- http://linuxwacom.sourceforge.net/wiki/index.php/Dual_and_Multi-Monitor_Set_Up#MapToOutput
-  xsetwacom set "Wacom Intuos4 6x9 stylus" MapToOutput VGA1
-  xsetwacom set "device name" Rotate half #none, half, cw, ccw
-  OR
-  xinput set-prop "Serial Wacom Tablet stylus" --type=float "Coordinate Transformation Matrix" 0 0.333333 0.666666 -1 0 1 0 0 1
-  TwinView
-   http://linuxwacom.sourceforge.net/index_old.php/howto/multimonitor
-    https://bbs.archlinux.org/viewtopic.php?pid=797617
-
-Area shrink (to keep aspect ration)
-: xsetwacom --set "Your device name here" ResetArea
-: xsetwacom --get "Your device name here" Area
-  AREAX=16704
-  AREAY=12064
-: New values respecint aspect ratio:
-  RATIOAREAY=$(( AREAX * HEIGHT / WIDTH ))
-  RATIOAREAX=$(( AREAY * WIDTH / HEIGHT ))
-  xsetwacom --set "$DEVICE" Area 0 0 "$NEWAREAX" "$NEWAREAY"
-
 
 BUGS
   Shaking

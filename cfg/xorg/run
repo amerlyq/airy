@@ -18,7 +18,7 @@ sub dpi {
   return int($px*25.4/$mm + 0.5)
 }
 
-my @xout = ( qx(xrandr -q 2>/dev/null) ) or die "\n";
+my @xout = ( qx(xrandr -q --current 2>/dev/null) ) or die "\n";
 foreach (@xout) {
   # Only list used monitors, skipping off'ed
   next unless $_ =~ m/^([[:alnum:]-]+) connected (?:primary )?(\d+)x(\d+)\+(\d+)\+(\d+) .*? (\d+)mm x (\d+)mm$/;

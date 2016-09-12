@@ -27,6 +27,7 @@ TRY:HACK: using Guile -- call switch-mode through 'Ring' with 'Mod' pressed
 
 Structure
   ++ Completely independent setup structure (browser/krita/gaming/etc...)
+    Link general scripts in ctl/etc into subfolders
   -- BUT:
     Can't easily share identical mods/grps
       => USE symlinks THINK is enough ?
@@ -36,11 +37,12 @@ Structure
       ├── _default
       ├── firefox
       └── krita
-          ├── grp
+          ├── curve
+          ├── group
           │   ├── draw  # brush+undo
           │   ├── ink   # layer+brush
           │   └── view  # zoom+layer
-          ├── mod
+          ├── mode
           │   ├── brush
           │   ├── layer
           │   └── zoom
