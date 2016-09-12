@@ -1,0 +1,31 @@
+# USAGE:
+#   cp -vft "$dst" PKGBUILD
+#   makepkg -s -f
+#   sudo pacman -U crosstool-ng-1.21.0-1-x86_64.pkg.tar.xz
+
+pkgname=crosstool-ng
+pkgver=1.21.0
+pkgrel=1
+pkgdesc='Cross-toolchain generator'
+arch=('i686' 'x86_64')
+url='http://crosstool-ng.org/'
+license=('GPL')
+depends=('ncurses' 'make')
+makedepends=( 'git' 'flex' 'bison' 'gperf' 'wget' 'help2man')
+options=('!makeflags')
+source=(http://crosstool-ng.org/download/$pkgname/$pkgname-$pkgver.tar.bz2)
+md5sums=('SKIP')
+
+build() {
+  local cwd=${PWD%/*}
+  cd $pkgname-$pkgver
+  patch --no-backup-if-mismatch -g0 -p1 -f -i "$cwd"/crosstool-ng.patch
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+  install -Dm644 ct-ng.comp "$pkgdir"/usr/share/bash-completion/completions/ct-ng
+}
