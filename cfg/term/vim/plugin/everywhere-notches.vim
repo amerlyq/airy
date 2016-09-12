@@ -38,7 +38,7 @@ let s:patterns = {
       \ 'Inf': [ 6, "#2aa198", 'INFO?'],
       \ 'Did': [10, "#586e75", 'DONE|FIXED|EXPL|TEMP'],
       \ 'Dev': [ 4, "#268bd2", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
-      \ 'Msg': [13, "#6c71c4", 'NOTE|USE|USAGE|DFL|STD|SUMMARY'],
+      \ 'Msg': [13, "#6c71c4", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG'],
       \ 'Tbd': [ 5, "#d33682", 'TODO|CHECK|TRY|MOVE|NOT|REQ|MAYBE'],
       \ 'Alt': [ 3, "#c5a900", 'ALT|OR|CASE|THINK|IDEA|CHG'],
       \ }
