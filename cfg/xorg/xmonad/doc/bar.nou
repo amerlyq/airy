@@ -1,0 +1,55 @@
+%%%% xmobar
+
+REF
+  http://projects.haskell.org/xmobar/
+    > https://github.com/tsiliakis/xmobar
+  https://wiki.archlinux.org/index.php/Xmobar
+
+% Integration
+  2016-09-13 [X] run xmobar in systemd --user unit
+    > So, when restarting X xmobar won't overlap old windows
+    \ systemd unit for xmobar -- must open and provide socket to its stdin
+    http://www.kodama.gr/2013/11/03/reading-from-named-pipes-in-xmobar/
+    https://wiki.haskell.org/Xmonad/Frequently_asked_questions#XMonad_is_frozen.21
+    https://wiki.haskell.org/Xmonad/Config_archive/John_Goerzen%27s_Configuration
+    http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
+
+% Notify
+  + http://stackoverflow.com/questions/6232804/xmonad-set-screen-and-workspace
+  ~ http://unix.stackexchange.com/questions/217213/getting-xmonad-to-show-name-of-current-workspace-in-xmobar
+  [_] TRY: Integrate notification daemon
+    http://nochair.net/posts/2010/10-25-freedesktop-notifications-xmobar.html
+  [_] Show current window 'mark' and other attributes in xmobar section
+
+
+DEV
+  2016-09-13 [X] Notify when adding mark (like M-F1) in r.n
+
+  [_] Add menu to xmobar -- to control windows -- float/kill/move/resize
+    = resize: latch mouse down and activate resizing
+    after resize you can simply click Mouse1 again
+
+  [_] Write my sections as xmobar plugins -- for async update
+    := lang, volume, etc
+    : https://github.com/jaor/xmobar
+
+  [_] Switch wksp by mouse click in xmobar
+    http://www.arch-ed.dk/xmobar-clickable-workspaces/
+    https://bbs.archlinux.org/viewtopic.php?id=185798
+    http://xmonad.org/xmonad-docs/xmonad-contrib/src/XMonad-Hooks-DynamicLog.html
+    > http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-Commands.html
+      ? NEED? re-implement dynamic logger
+    Snippet
+       -- ENH:NEED: backward Map for wksp nm -> keyseq for xdotool
+       -- WARNING: remove all possible tags <...> from input before passing
+       -- NEED:ENH: use XMonad.EZConfig.parseSpecial to convert other keys
+       toXdotool ' ' = " "
+       toXdotool '-' = "+"
+       toXdotool 'M' = "super"
+       toXdotool 'C' = "ctrl"
+       toXdotool 'S' = "shift"
+       toXdotool 'A' = "alt"
+       -- ALT to map()
+       -- toXdotool [] = ""
+       -- toXdotool (x:xs) = convert x ++ toXdotool xs
+       id2xkey ws = concatMap toXdotool $ mkMap M.! ws

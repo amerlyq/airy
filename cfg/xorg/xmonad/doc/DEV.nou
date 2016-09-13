@@ -1,0 +1,48 @@
+%%% DEV:(new features)
+
+[_] Right/left docking persistent bar tab/panel ~ 1/8 screen width
+  : -- to keep there small mpv  preview when watching amv and doing work
+  : -- some status widgets / load graphics
+  M-p [LRTB] -- open panel
+    : Overlapping (filling whole physical screen width/height) depends on opening order
+    := bottom/top panel seems also acceptable -- with video like 27:10
+  M-p [lrtbm] -- jump to panel/main, backNforth
+  M-S-p [lrtbm] -- jump to panel/main, backNforth
+  M-[, M-] -- ignores panels and jumps only to actual screens
+  < Overlay monitor controls can be placed in same group M-p
+  NEED control screen panel as you would with windows
+    : change size by <,>; Rotate/Reflect by /,?
+    Always resize ratio between current/main screen
+      On main screen -- resize main and _all_ panels proportionally
+      On panel -- resize only _this_ panel, eating space from main
+
+[_] Create two sets of desktops: work-related and my own
+  DynamicWorkspaceGroups OR IndependentScreens
+  EXPL:USE: fictive virtual screen which switches/replaces current one
+  THINK: is there real necessity? I can use mixed layout to compose
+  all necessary work windows in one wksp and then jump by mark'n'go
+
+[_] Different/additional/simplified keybindings (for spawn/etc)
+  when current window is root OR no windows found on this wksp at all
+  BUG:FIND: the default key can't pass through xmonad to actual window
+  : https://mail.haskell.org/pipermail/xmonad/2012-February/012402.html
+  : MAYBE:SEE: sources of submapDefault -- there must be key pass-through
+  : ALT: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-BorderResize.html
+  : -- somehow it will pass mouse clicks
+
+[_] Make main window boring
+  Skip main window(s) in heterogeneous layouts (Tall, TwoPane, IM, ...)
+    Jump to main only by M-h (remember last used main win)
+    M-j/k cycles through slave windows only OR stopped at top/bot borders
+  Multi main wins -- like slaves -- M-j/k cycles only through main wins
+  Single main win: M-j/k jumps to top/bot slave win OR cycles to itself like in multi
+
+[_] Push back pulled windows
+  # Need to add properties to each window: prev wksp, prev pos
+  [_] Pull and push back
+    * Marked wnds on keymap
+    * Recalled by name through prompt
+  [_] Cancel last push
+    * Shift w/o focus (~ 'M-C-[0-9]')
+    Track history of pushed windows to recall all of them
+  [_] Cycle on pull/push for last window
