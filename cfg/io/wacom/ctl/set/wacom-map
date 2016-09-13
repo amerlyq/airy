@@ -1,0 +1,12 @@
+#!/bin/sh
+# USAGE: $ ./$0 wid area out rot
+wid=${1:?}
+xsw(){ xsetwacom --set "$wid" "$@"; }
+wset(){ [ "$1" = - ] && return; [ "$1" = % ] && xsw $2 || xsw $3 $1; }
+
+# ATT: Rotate before MapTo
+wset "${4:?}" "Rotate none" Rotate
+wset "${2:?}" "ResetArea" Area
+wset "${3:?}" "MapToOutput desktop" MapToOutput
+
+# OR xinput set-prop "$wid" --type=float "Coordinate Transformation Matrix" 0 0.333333 0.666666 -1 0 1 0 0 1

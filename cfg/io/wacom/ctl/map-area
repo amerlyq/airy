@@ -1,47 +1,38 @@
 #!/bin/bash -e
+SWD=$(readlink -e "$0"); SWD=${SWD%/*}
+PATH=$SWD/get:$SWD/set:$PATH
 set -o pipefail
+
+# ALT:(broken?) KeepShape option
 
 output=$1  # [<output>|desktop|WxH+X+Y|next]
 # FIXME: tested only for rotate=none
 rotate=$2  # [none|half|cw|ccw]
 region=$3  # [full|center|WxH+X+Y] -- WxH+X+Y is related to output
 
-_xrandr=$(xrandr -q --current)
+# HACK: export before 'xbindkeys' to propagate cached env var
+_xr=${_XRANDR:-$(query-xrandr)}
 
-qmons(){ sed -rn '/^(\S+) connected.*/s//\1/p' <<< "$_xrandr"; }
-qscrn(){ sed -rn '/^Screen .*, current ([0-9]+) x ([0-9]+),.*/{s//\1x\2+0+0/p;q}' <<< "$_xrandr"; }
-qdisp(){ sed -rn "s/^${1:?}"' connected.* ([0-9]+x[0-9]+\+[0-9]+\+[0-9]+).*/\1/p' <<< "$_xrandr"; }
-qwids(){ xsetwacom --list devices | gawk -vT="STYLUS|ERASER" '$NF~T{print$(NF-2)}'; }
-
-# ALT:(broken?) KeepShape option
 new_area(){ local w=${1:?} h=${2:?}
   read -r ax ay aw ah
   # keep_width: 16:9 => 10/9 => 1
-  (( (w/h) / (aw/ah) )) && { nx=$aw; ny=$((aw*oh/ow)); } || { nx=$((ah*ow/oh)); ny=$ah; }
+  (( (w/h) / (aw/ah) )) && { nx=$aw; ny=$((aw*h/w)); } || { nx=$((ah*w/h)); ny=$ah; }
   printf '%d %d %d %d\n' "$ax" "$ay" "$nx" "$ny"
 }
 
 map_wid() { local wid=${1:?} geom=${2:?}
-  xsetwacom --set "$wid" ResetArea
-  local area=( $(xsetwacom --get "$wid" Area | new_area "$ow" "$oh") )
-  # BAD: rotation don't keep aspect? Don't rotate tablet area?
-  # ATT: Rotate before MapTo
-  xsetwacom --set "$wid" Rotate "${rotate:=none}"
-  xsetwacom --set "$wid" Area "${area[@]}"
-  xsetwacom --set "$wid" MapToOutput "$geom"
-  # OR xinput set-prop "$wid" --type=float "Coordinate Transformation Matrix" 0 0.333333 0.666666 -1 0 1 0 0 1
+  local area=$(wacom-area-max "$wid" | new_area "$ow" "$oh")
+  wacom-map "$wid" "$area" "$geom" "$rotate"
 }
 
-mons=( $(qmons) )
-wids=( $(qwids) )
+mons=( $(list-outputs <<< "$_xr") )
 
-[[ $output ]] || { IFS='|'; printf 'USAGE: %s|desktop|WxH+X+Y|next\n' "${mons[*]// /|}"; exit; }
 [[ $output =~ ^[0-9]+$ ]] && { ((output < ${#mons[@]})) && output=${mons[$output]} || exit; }
 
 case ${output:=${mons[0]}}
-in desktop) geom=$(qscrn)
+in desktop) geom=$(geom-screen <<< "$_xr")
 ;;  [0-9]*) geom=$output
-;;       *) geom=$(qdisp "$output")
+;;       *) geom=$(geom-display "$output" <<< "$_xr")
 esac
 IFS='x+' read -r ow oh ox oy <<< "$geom"
 
@@ -66,6 +57,5 @@ in full) geom=$output
 ;; *) geom=$region
 esac
 
-for wid in "${wids[@]}"; do
-  map_wid "$wid" "$geom"
-done
+while read -r wid; do map_wid "$wid" "$geom"
+done < <(wacom-ids 'STYLUS|ERASER')

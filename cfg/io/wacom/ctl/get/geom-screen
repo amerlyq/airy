@@ -1,0 +1,4 @@
+#!/bin/sh
+exec sed -rn "
+/^Screen ${1:-\S+}"':.*, current ([0-9]+) x ([0-9]+),.*/{
+  s//\1x\2+0+0/p;q}'

@@ -6,6 +6,11 @@ Area aspect ratio
     Wide: 16:10 = 1.600
     A4:  sqrt 2 = 1.414
 
+Precision control
+  < We flip to eraser to move drawing frame and then flip to stylus to draw inside
+  * Stylus -- always in precision frame
+  * Eraser -- always in whole screen mode
+
 TODO
   2016-09-12 [X] Restrict drawing area to 16:9 monitor
     => below ~10% won't be reachable
@@ -20,6 +25,19 @@ TODO
     [_] BAD: TwinView
       http://linuxwacom.sourceforge.net/index_old.php/howto/multimonitor
       https://bbs.archlinux.org/viewtopic.php?pid=797617
+        ```
+    !!! NOTE: there is sense to reuse old 'area' on Rotate,
+    if you change 'output' accordingly to aspect ```
+
+    WARN: *Rotate* don't affect *Area* at all (!aspect not kept!)
+      => NEED to re-evaluate mapped area and rotate it ourself
+
+
+  [_] DEV: reuse old values
+    * USE safe set of unescaped characters: /[a-zA-Z0-9,._+:@%-]/
+      ? BAD? equal sign '='
+    /-/ -- reuse
+    /%/ -- reset
 
   [_] Split ./ctl/map-area to multiple scripts
     => Create cool arch structure, similar to planned ./prf/*
@@ -28,3 +46,8 @@ TODO
         # sometimes drawing on some parts of tablet is easier than on others
       * zones
       * rotations
+
+DEBUG
+  [_] profiling operations time
+    Using ENV vars
+      $ _xrandr=${_XRANDR:-$(xrandr -q --current)}
