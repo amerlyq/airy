@@ -1,0 +1,15 @@
+#!/usr/bin/python
+# USAGE:
+#   ./$0 [0x]2a4488
+
+import sys
+import colorsys
+
+a = sys.argv[1]
+if a[0:2] == '0x':
+    a = a[2:]
+
+rgb = [int(a[i:i+2], 16)/255 for i in range(0, 6, 2)]
+hls = colorsys.rgb_to_hls(*rgb)
+
+print("{:g} {:g} {:g}".format(hls[0], hls[2], hls[1]))

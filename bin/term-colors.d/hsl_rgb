@@ -1,0 +1,12 @@
+#!/usr/bin/python
+# USAGE:
+#   ./$0 .4 .8 .2
+
+import sys
+import colorsys
+
+a = sys.argv
+hls = map(float, [a[1], a[3], a[2]])
+rgb = [int(c*255) for c in colorsys.hls_to_rgb(*hls)]
+
+print("0x{:02x}{:02x}{:02x}".format(*rgb))
