@@ -101,6 +101,15 @@ call dein#add('chrisbra/unicode.vim', {
 
 
 
+"" Show RGB color conversion table
+call dein#add('guns/xterm-color-table.vim', {
+  \ 'on_cmd': 'XtermColorTable',
+  \ 'hook_source': "
+\\n   let g:XtermColorTableDefaultOpen = 'tabnew'
+\"})
+
+
+
 "" CHECK Docs online searcher in one button for word under cursor {{{1
 " ALT: vim-ref (similar?)
 "   - Keithbsmiley/investigate.vim
