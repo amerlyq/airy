@@ -2,15 +2,17 @@
 " Fast highlighting: match Error /ENOMEM/
 " CHECK: http://andrewradev.com/2011/08/06/making-vim-pretty-with-custom-colors/
 " FIXME: background for labels don't match, when cursor is on same line
+" BUG: conflicts in perl: syntax '\u+:' has no hi!
 " THINK? use autocompletion/snippets to cycle through possible notches
 " DEV: combine with kana/vim-smartchr
 "   https://github.com/AndrewRadev/switch.vim
 "   integrate into Unite and deoplete (show candidates on specific button)
-" CHG: colors must have different tint then used in 'nou' outline/markup
+" 2016-09-14 [X] CHG: colors must have different tint then used in 'nou' outline/markup
 
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has("autocmd") || v:version <= 701 | finish | endif
 
+"" STD
 " Black
 " DarkBlue
 " DarkGreen
@@ -28,19 +30,37 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 " Yellow, LightYellow
 " White
 
+"" Solarized
+" base02    #073642  0 black    235 #262626
+" red       #dc322f  1 red      160 #d70000
+" green     #859900  2 green     64 #5f8700
+" yellow    #b58900  3 yellow   136 #af8700
+" blue      #268bd2  4 blue      33 #0087ff
+" magenta   #d33682  5 magenta  125 #af005f
+" cyan      #2aa198  6 cyan      37 #00afaf
+" base2     #eee8d5  7 white    254 #d7d7af
+" base03    #002b36  8 brblack  234 #1c1c1c
+" orange    #cb4b16  9 brred    166 #d75f00
+" base01    #586e75 10 brgreen  240 #4e4e4e
+" base00    #657b83 11 bryellow 241 #585858
+" base0     #839496 12 brblue   244 #808080
+" violet    #6c71c4 13 brmagenta 61 #5f5faf
+" base1     #93a1a1 14 brcyan   245 #8a8a8a
+" base3     #fdf6e3 15 brwhite  230 #ffffd7
+
 let g:everywhere_activated = 1
-" UNUSED: 6 - light blue, 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
+" UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 " TODO: use more guifg for nvim with the same ctermfg
 let s:patterns = {
-      \ 'Err': [ 1, "#dc322f", 'ERR%(OR)=|BUG|REGR|XXX|WTF|BAD'],
-      \ 'Fix': [ 9, "#dd6616", 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
-      \ 'Add': [ 2, "#859900", 'ADD|SEE|REF|NEED|FIND|ALSO|BETTER'],
-      \ 'Inf': [ 6, "#2aa198", 'INFO?'],
-      \ 'Did': [10, "#586e75", 'DONE|FIXED|EXPL|TEMP'],
-      \ 'Dev': [ 4, "#268bd2", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
-      \ 'Msg': [13, "#6c71c4", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG'],
-      \ 'Tbd': [ 5, "#d33682", 'TODO|CHECK|TRY|MOVE|NOT|REQ|MAYBE'],
-      \ 'Alt': [ 3, "#c5a900", 'ALT|OR|CASE|THINK|IDEA|CHG'],
+      \ 'Err': [160, "#d70000", 'ERR%(OR)=|BUG|REGR|XXX|WTF|BAD'],
+      \ 'Add': [ 64, "#5f8700", 'ADD|SEE|REF|NEED|FIND|ALSO|BETTER'],
+      \ 'Alt': [136, "#af8700", 'ALT|OR|CASE|THINK|IDEA|CHG|EXG'],
+      \ 'Dev': [ 33, "#0087ff", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
+      \ 'Tbd': [125, "#af005f", 'TODO|CHECK|TRY|MOVE|NOT|REQ|MAYBE'],
+      \ 'Inf': [ 37, "#00afaf", 'INFO?|VAR'],
+      \ 'Fix': [166, "#d75f00", 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
+      \ 'Did': [240, "#4e4e4e", 'DONE|FIXED|EXPL|TEMP'],
+      \ 'Msg': [ 61, "#5f5faf", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG'],
       \ }
 
 function! s:everywhere_print(patts)
