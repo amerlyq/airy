@@ -50,17 +50,17 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 
 let g:everywhere_activated = 1
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
-" TODO: use more guifg for nvim with the same ctermfg
+" TODO:(nvim) split groups : dif guifg and same ctermfg
 let s:patterns = {
-      \ 'Err': [160, "#d70000", 'ERR%(OR)=|BUG|REGR|XXX|WTF|BAD'],
-      \ 'Add': [ 64, "#5f8700", 'ADD|SEE|REF|NEED|FIND|ALSO|BETTER'],
-      \ 'Alt': [136, "#af8700", 'ALT|OR|CASE|THINK|IDEA|CHG|EXG'],
+      \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD'],
+      \ 'Add': [ 76, "#5faf00", 'ADD|SEE|REF|NEED|FIND|ALSO|BETTER'],
+      \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|EXG'],
       \ 'Dev': [ 33, "#0087ff", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
-      \ 'Tbd': [125, "#af005f", 'TODO|CHECK|TRY|MOVE|NOT|REQ|MAYBE'],
-      \ 'Inf': [ 37, "#00afaf", 'INFO?|VAR'],
-      \ 'Fix': [166, "#d75f00", 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
-      \ 'Did': [240, "#4e4e4e", 'DONE|FIXED|EXPL|TEMP'],
-      \ 'Msg': [ 61, "#5f5faf", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG'],
+      \ 'Tbd': [169, "#ff5faf", 'TODO|CHECK|TRY|MOVE|NOT|REQ|MAYBE'],
+      \ 'Inf': [ 38, "#00afdf", 'INFO?|VAR'],
+      \ 'Fix': [202, "#ff5f00", 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
+      \ 'Did': [243, "#767676", 'DONE|FIXED|EXPL|TEMP'],
+      \ 'Msg': [ 62, "#5f5fdf", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG'],
       \ }
 
 function! s:everywhere_print(patts)
@@ -82,7 +82,7 @@ endfunction
 
 function! s:everywhere_matches(patts)
   for [k,v] in items(a:patts)
-    call matchadd('Notch'. k, '\v<('. v[2] .')>[:?*]=', -1)
+    call matchadd('Notch'. k, '\v<('. v[2] .')>[:?!*.]=', -1)
   endfor
 endfunction
 
