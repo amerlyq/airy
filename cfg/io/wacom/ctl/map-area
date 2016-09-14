@@ -3,27 +3,12 @@ SWD=$(readlink -e "$0"); SWD=${SWD%/*}
 PATH=$SWD/get:$SWD/set:$PATH
 set -o pipefail
 
-# ALT:(broken?) KeepShape option
-
 output=$1  # [<output>|desktop|WxH+X+Y|next]
-# FIXME: tested only for rotate=none
 rotate=$2  # [none|half|cw|ccw]
 region=$3  # [full|center|WxH+X+Y] -- WxH+X+Y is related to output
 
 # HACK: export before 'xbindkeys' to propagate cached env var
 _xr=${_XRANDR:-$(query-xrandr)}
-
-new_area(){ local w=${1:?} h=${2:?}
-  read -r ax ay aw ah
-  # keep_width: 16:9 => 10/9 => 1
-  (( (w/h) / (aw/ah) )) && { nx=$aw; ny=$((aw*h/w)); } || { nx=$((ah*w/h)); ny=$ah; }
-  printf '%d %d %d %d\n' "$ax" "$ay" "$nx" "$ny"
-}
-
-map_wid() { local wid=${1:?} geom=${2:?}
-  local area=$(wacom-area-max "$wid" | new_area "$ow" "$oh")
-  wacom-map "$wid" "$area" "$geom" "$rotate"
-}
 
 mons=( $(list-outputs <<< "$_xr") )
 
@@ -36,26 +21,57 @@ in desktop) geom=$(geom-screen <<< "$_xr")
 esac
 IFS='x+' read -r ow oh ox oy <<< "$geom"
 
+
 # HACK:TEMP: many hardcoded values/regimes
 # TODO: affect vars/aspect by rotation
 case ${region:=full}
-in full) geom=$output
+in full)
+  geom=$output
+
 ;; center)
   nw=$((oh*16/10))
   nx=$((ox+(ow - oh*16/10)/2))
   ow=$nw; ox=$nx
   geom=${ow}x${oh}+${ox}+${oy}
+
 ;; cursor)
-  eval "$(xdotool getmouselocation --shell)"
+  read mx my scr wnd < <(query-mouse)
   zone='1/5'
   nw=$((oh*16/10*$zone))
   nh=$((oh*$zone))
-  nx=$((X-nw/2))
-  ny=$((Y-nh/2))
+  nx=$((mx-nw/2))
+  ny=$((my-nh/2))
   ow=$nw; oh=$nh; ox=$nx; oy=$ny
   geom=${ow}x${oh}+${ox}+${oy}
-;; *) geom=$region
+
+;; *)
+  geom=$region
 esac
 
-while read -r wid; do map_wid "$wid" "$geom"
+map_wid() { local wid=${1:?}
+  read -r ax ay aX aY < <(wacom-area-max "$wid")
+  local aw=$((aX-ax)) ah=$((aY-ay)) w=$ow h=$oh
+
+  g=0  # 0..100%
+  # keep_width: 16:9 => 10/9 => 1
+  # BAD: fail when aw<ah
+  if (( (w/h) / (aw/ah) )); then
+    # FIX: BROKEN
+    nx=$ax
+    ny=$((ay + aw*h/w))
+    nX=$aX
+    nY=$((ny + aw*h/w))
+  else
+    nx=$ax
+    ny=$ay
+    nX=$((ax + ah*w/h))
+    nY=$aY
+  fi
+
+  local area="$nx $ny $nX $nY"
+
+  wacom-map "$wid" "$area" "$geom" "$rotate"
+}
+
+while read -r wid; do map_wid "$wid"
 done < <(wacom-ids 'STYLUS|ERASER')

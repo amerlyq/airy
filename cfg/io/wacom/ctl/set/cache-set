@@ -1,0 +1,4 @@
+#!/bin/sh
+d=${TMPDIR:-/tmp}/wacom
+mkdir -p "$d"
+printf '%s\n' "${2:?}" > "$d/${1:?}"

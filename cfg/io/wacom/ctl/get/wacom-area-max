@@ -1,6 +1,6 @@
 #!/bin/sh
-wid=${1:?}
-area=$(xsetwacom --get "$wid" Area)
-xsetwacom --set "$wid" ResetArea
-xsetwacom --get "$wid" Area
-xsetwacom --set "$wid" Area $area
+id=${1:?}
+area=$(xsetwacom --get "$id" Area)
+xsetwacom --set "$id" ResetArea
+xsetwacom --get "$id" Area
+exec xsetwacom --set "$id" Area ${area:?}

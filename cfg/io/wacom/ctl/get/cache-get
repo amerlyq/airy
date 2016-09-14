@@ -1,0 +1,3 @@
+#!/bin/sh
+f=${TMPDIR:-/tmp}/wacom/${1:?}
+test -s "$f" && exec cat -- "$f" || printf '%s\n' "${2:?}"

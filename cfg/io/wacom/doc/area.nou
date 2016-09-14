@@ -1,4 +1,5 @@
 Area aspect ratio
+  [_] ALT:(broken?) KeepShape option
   Sizes
     Phys: 157 mm x 98 mm = 1.602
     LPts: 31496 x 19685 = 1.600
@@ -47,21 +48,26 @@ TODO
   2016-09-12 [X] Restrict mouse moving to 16:10 canvas only
     => BUT ifc on left/right (~5.5% each) will be impossible to rich!
   2016-09-12 [X] Precision Region around cursor -- recreate functionality
+  [_] Overlay on desktop
+    * to show current frame on screen by blacking out surroundings
+    http://askubuntu.com/questions/328543/drawing-over-the-desktop
+
+  [_] THINK cache args to //wacom-map (one arg per line)
+    * read from cache write-only option MapToOutput
+    * incremental setup -- reuse prev vals w/o specifying them on cmdline
 
   [_] Portret regime for tablet
     [_] ALSO:NEED: apply Rotate to "TOUCH|CURSOR"
+      * driver always applies area mapping before rotation
+        WARN: *Rotate* don't affect *Area* at all (!aspect not kept!)
+          => NEED to re-evaluate mapped area and rotate it ourself
+        NOTE: there is sense to reuse old 'area' on Rotate,
+          if you change 'output' accordingly to aspect
     * Read and create appropriate matrix to map only _part_ of monitor
     http://linuxwacom.sourceforge.net/wiki/index.php/Dual_and_Multi-Monitor_Set_Up#MapToOutput
     [_] BAD: TwinView
       http://linuxwacom.sourceforge.net/index_old.php/howto/multimonitor
       https://bbs.archlinux.org/viewtopic.php?pid=797617
-        ```
-    !!! NOTE: there is sense to reuse old 'area' on Rotate,
-    if you change 'output' accordingly to aspect ```
-
-    WARN: *Rotate* don't affect *Area* at all (!aspect not kept!)
-      => NEED to re-evaluate mapped area and rotate it ourself
-
 
   [_] DEV: reuse old values
     * USE safe set of unescaped characters: /[a-zA-Z0-9,._+:@%-]/
