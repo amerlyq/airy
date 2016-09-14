@@ -6,10 +6,35 @@ Area aspect ratio
     Wide: 16:10 = 1.600
     A4:  sqrt 2 = 1.414
 
-Precision control
-  < We flip to eraser to move drawing frame and then flip to stylus to draw inside
-  * Stylus -- always in precision frame
-  * Eraser -- always in whole screen mode
+%% Regimes %% (keep aspect)
+  ? [_] THINK practical application for deformed aspect
+  Full scale
+    * 16:9 : top/mid/bot -- 0..100%
+  Area scale
+    * small WxH+X+Y area to full output
+    + VAR zoom
+  Best fit frame
+    * 16:10 : lft/cen/rht -- 0..100%
+    => move frame by mouse (control snapping)
+  Precision frame
+    * VAR zoom --> WxH+X+Y output frame
+      - full area => force the same frame aspect
+      - partial best fit area 0..100% <= according to frame aspect
+    Modes
+      predefined regions (x,y,zoom) for fast access
+      mouse-centered frame
+        We flip to eraser to move drawing frame and then flip to stylus to draw inside
+          * Stylus -- always in precision frame
+          * Eraser -- always in whole screen mode
+  === Union
+    scale / precision => can be united by VAR:'zoom' for >1 and <1
+    full / best fit => VAR:'zoom' for =1+/-0 -- singularity
+      => however, float on cmdline is pain
+      ? better to make two independent zooms
+        => I need float anyways -> integers are too crude for scaling
+          SEE http://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks
+        ALT: fractions ~= '3/2' | '4/5' | '18/5'
+          BUT: awkward when trying to _slightly_ increase value
 
 TODO
   2016-09-12 [X] Restrict drawing area to 16:9 monitor
@@ -20,6 +45,7 @@ TODO
   2016-09-12 [X] Precision Region around cursor -- recreate functionality
 
   [_] Portret regime for tablet
+    [_] ALSO:NEED: apply Rotate to "TOUCH|CURSOR"
     * Read and create appropriate matrix to map only _part_ of monitor
     http://linuxwacom.sourceforge.net/wiki/index.php/Dual_and_Multi-Monitor_Set_Up#MapToOutput
     [_] BAD: TwinView
