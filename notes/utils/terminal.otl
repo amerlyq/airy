@@ -10,6 +10,9 @@ TODO: create outline graph to generate web-site for those text-proc utils
   $ renameutils -- deurlname to decode url file paths
     http://unix.stackexchange.com/questions/76500/how-to-remove-uri-encoding-from-file-names
 
+Filenames '.' and '..'
+	http://unix.stackexchange.com/questions/148563/how-to-rename-file-to-dot-dot
+
 Math tools (arithmetics in bash)
 	!!! http://unix.stackexchange.com/questions/40786/how-to-do-integer-float-calculations-in-bash-or-other-languages-frameworks
 
@@ -169,9 +172,6 @@ Reverse lines
 Remove last lines
 	tac file.txt | sed "1,$n{d}" | tac > newfile
 	head -n -2 myfile.txt > newfile
-
-Copy several last entries
-	copyq read {0..2}
 
 Ubuntu gnome terminal, disable cursor blinking
 	gconftool-2 --set /apps/gnome-terminal/profiles/Default/cursor_blink_mode --type string off
