@@ -53,7 +53,7 @@ let g:everywhere_activated = 1
 " TODO:(nvim) split groups : dif guifg and same ctermfg
 let s:patterns = {
       \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD'],
-      \ 'Add': [ 76, "#5faf00", 'ADD|SEE|REF|NEED|FIND|ALSO|BETTER'],
+      \ 'Add': [ 76, "#5faf00", 'ADD|SEE|READ|REF|NEED|FIND|ALSO|BETTER'],
       \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|EXG'],
       \ 'Dev': [ 33, "#0087ff", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
       \ 'Tbd': [169, "#ff5faf", 'TODO|CHECK|TRY|MOVE|NOT|REQ|MAYBE'],
