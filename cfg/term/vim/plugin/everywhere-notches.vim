@@ -2,6 +2,9 @@
 " Fast highlighting: match Error /ENOMEM/
 " CHECK: http://andrewradev.com/2011/08/06/making-vim-pretty-with-custom-colors/
 " FIXME: background for labels don't match, when cursor is on same line
+" [_] FIXME: some notches (~ FIXME) are straigt instead of italic like comments
+"   => Seems like it's result from combining (hi! + hi! link) from normal and post- hi! methods
+"   !! THINK:TRY maybe it can be used to combine hi! in my nou.vim ?
 " BUG: conflicts in perl: syntax '\u+:' has no hi!
 " THINK? use autocompletion/snippets to cycle through possible notches
 " DEV: combine with kana/vim-smartchr

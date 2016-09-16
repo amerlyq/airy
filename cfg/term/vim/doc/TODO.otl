@@ -1,4 +1,8 @@
 Neovim
+	[_] BUG: last char on line falls on next line when hit <CR>
+		create $ echo ALT > f $, open $ v f $, edit 'gO ALT <CR>'
+		=> seems like reason is related to lazy loading of 'deoplete.nvim'
+			bugges for any \w{3}, but normal for \w{2} and \w{4}
     [_] BUG: nvim 'blinks' when opening file from ranger
         Shows shell under 'ranger', then shows empty bkgr in vim, only then -- actual file
 	2016-07-02 [X] MOVE to new horizon https://github.com/Shougo/dein.vim
