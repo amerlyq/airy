@@ -1,0 +1,134 @@
+#!/bin/bash -e
+SWD=$(readlink -e "$0"); SWD=${SWD%/*}
+PATH=$SWD/get:$SWD/set:$PATH
+set -o pipefail
+
+# BAD: time ./$0 => 40..120 mS
+
+mode=$1         # [area|frame]
+rotate=$2       # [none|half|cw|ccw]
+output=desktop  # [ {<output>|1..9} | {desktop|0} | {WxH+X+Y|%WxH+X+Y} | next ]
+region=cursor   # [full|center|cursor|WxH+X+Y] -- use WxH+X+Y relative to $output ?
+
+
+# Query wacom =================================================================
+sid=$(wacom-ids 'STYLUS')
+[[ $mode ]] || mode=$(cache-get map area)
+cache-set map "$mode"
+[[ $rotate ]] || read -r rotate < <(wacom-rotation "$sid")
+
+IFS=' ' read -r ax ay aX aY < <(wacom-area-max "$sid")
+aw=$((aX-ax))
+ah=$((aY-ay))
+aa=$(dc -e "6k $aw $ah /p")
+ag=0  # alignment: 0..100%
+
+
+# Query output ================================================================
+# HACK: export before 'xbindkeys' to propagate cached env var
+export _XRANDR=${_XRANDR:-$(query-xrandr)}
+
+# Decode numerical $output to named one
+case $output
+in [1-9]) output=$(list-outputs <<< "$_XRANDR" | nth-line "$output")
+;;     0) output=desktop
+esac
+
+# Convert $output to region's $geom
+case ${output:?}
+in  desktop) geom=$(geom-screen <<< "$_XRANDR")
+;; [0-9]*x*) geom=$output
+;;  %[0-9]*) { echo 'no impl -- scale by percent'; exit 2; }  # W=%*ow; X=%*(ow-W)
+;;        *) geom=$(geom-display "$output" <<< "$_XRANDR")
+esac
+
+IFS='x+' read -r ow oh ox oy <<< "$geom"
+oa=$(dc -e "6k $ow $oh /p")
+og=0  # alignment: 0..100%
+
+
+# =============================================================================
+# HACK:TEMP: many hardcoded values/regimes
+# TODO: affect vars/aspect by rotation
+# USE: dc/bc
+frame_center(){
+  nw=$((oh*16/10))
+  nx=$((ox+(ow - oh*16/10)/2))
+  ow=$nw; ox=$nx
+  frame=${ow}x${oh}+${ox}+${oy}
+}
+
+frame_cursor(){ local zoom=${1:?}
+  read mx my scr wnd < <(query-mouse)
+  nw=$((oh*16/10*$zoom))
+  nh=$((oh*$zoom))
+  nx=$((mx-nw/2))
+  ny=$((my-nh/2))
+  ow=$nw; oh=$nh; ox=$nx; oy=$ny
+  frame=${ow}x${oh}+${ox}+${oy}
+}
+
+# MOVE: inside 'frame)' mode
+# # Adjust aspect: $geom <=> $area
+# case ${region:?}
+# in full) frame=$output
+# ;; center) frame_center
+# ;; cursor) frame_cursor '1/5'
+# ;; *) frame=$region
+# esac
+
+
+# Adjust ======================================================================
+case ${mode:?}
+in area)   # adjust area to full output
+  # BAD: no rotation
+  frame=$output
+  if (( $(bc -l <<< "$oa >= $aa") ))
+  then  # fit to tablet width
+    read -r ny nY < <(bc -l <<< "h=$aw/$oa; y=$ay+$ag/100*($ah - h);"'
+                      scale=0; print y/1," ",(y+h)/1,"\n"')
+    area="$ax $ny $aX $nY"
+  else  # fit to tablet height
+    read -r nx nX < <(bc -l <<< "w=$ah*$oa; x=$ax+$ag/100*($aw - w);"'
+                      scale=0; print x/1," ",(x+w)/1,"\n"')
+    area="$nx $ay $nX $aY"
+  fi
+
+;; frame)  # adjust frame to full tablet
+  # BAD: wrong mx/my for dual-screen (need shift bias to output)
+  read mx my scr wnd < <(query-mouse)
+  # BAD: no rotation
+  # asp=$aa
+  # [[ $rotate =~ cw ]] && asp=$(dc -e "6k 1 $asp / p")
+  area="$ax $ay $aX $aY"  # OR: '%' to ResetArea
+  if (( $(bc -l <<< "$oa <= $aa") ))
+  then  # fit to output width
+    # NEED: unlinear conversion [$mx -> $og] to ease aligning
+    #   => otherwise strict left/right align will be possible only with cursor at left/right most position
+    # bnd=3
+    # ((my<oh/bnd)) && og=0 || ((my>oh-oh/bnd)) && og=100 || og=$(((my-oh/bnd)/(oh - 2*oh/bnd)))
+    og=$(( 100*my/oh ))
+    read -r ny nh < <(bc -l <<< "h=$ow/$aa; y=$oy+$og/100*($oh - h);"'
+                      scale=0; print y/1," ",h/1,"\n"')
+    frame="${ow}x${nh}+${ox}+${ny}"
+  else  # fit to output height
+    og=$(( 100*(mx+1)/ow ))
+    # FIXME: lost 4 pixels for right-most alignment
+    read -r nx nw < <(bc -l <<< "w=$oh*$aa; x=$ox+$og/100*($ow - w);"'
+                      scale=0; print x/1," ",w/1,"\n"')
+    frame="${nw}x${oh}+${nx}+${oy}"
+  fi
+
+;; *) exit 1
+esac
+
+
+# Apply =======================================================================
+# TEMP:REM
+echo AREA: $area
+echo FRAME: $frame
+echo ROTATE: $rotate
+
+# while read -r wid; do
+#   wacom-map "$wid" "$area" "$frame" "$rotate"
+# done < <(wacom-ids 'STYLUS|ERASER')

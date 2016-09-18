@@ -1,0 +1,2 @@
+#!/bin/sh
+exec sed -n "$(printf '%d\n' "$1")"'{p;q};$q1'
