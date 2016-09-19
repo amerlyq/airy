@@ -54,15 +54,17 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 let g:everywhere_activated = 1
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 " TODO:(nvim) split groups : dif guifg and same ctermfg
+" E.G. exampli gratia (~ example given)
+" I.E. id est (~ in especial, effectively)
 let s:patterns = {
       \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD'],
-      \ 'Add': [ 76, "#5faf00", 'ADD|SEE|READ|REF|NEED|FIND|ALSO|BETTER'],
-      \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|EXG'],
-      \ 'Dev': [ 33, "#0087ff", 'DEV|ENH|HACK|RFC|SPL|DECIDE'],
-      \ 'Tbd': [169, "#ff5faf", 'TODO|CHECK|TRY|MOVE|NOT|REQ|MAYBE'],
+      \ 'Add': [ 76, "#5faf00", 'ADD|SEE|READ|REF|NEED|FIND|ALSO|BET%(TER)?|E\.G'],
+      \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|I\.E'],
+      \ 'Dev': [ 33, "#0087ff", 'DEV|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECIDE'],
+      \ 'Tbd': [169, "#ff5faf", 'TODO|CHECK|TRY|MOVE|NOT|REQ%(UIRE)?|MAYBE'],
       \ 'Inf': [ 38, "#00afdf", 'INFO?|VAR'],
       \ 'Fix': [202, "#ff5f00", 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
-      \ 'Did': [243, "#767676", 'DONE|FIXED|EXPL|TEMP'],
+      \ 'Did': [243, "#767676", 'DONE|FIXED|EXPL%(AIN)?|TEMP'],
       \ 'Msg': [ 62, "#5f5fdf", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG'],
       \ }
 
