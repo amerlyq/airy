@@ -15,7 +15,7 @@ fi
 if cfgOpt u; then
   ### GENS ###
   ./samba.gen
-  svc_activate -eR smbd
+  svc_activate -eR smbd  # MAYBE:ALSO nmbd
   # Once Samba has restarted, use this command
   # to check your smb.conf for any syntax errors
   testparm -s >/dev/null
@@ -24,3 +24,12 @@ fi
 # EXPL to see errors on start
 # sudo smbd -i
 # ATTENTION sudo chmod 0755 /var/cache/samba/msg
+
+## Samba >4.5.0
+# BUG: crash nmbd:
+#  https://bbs.archlinux.org/viewtopic.php?id=216957
+#   => downgrading of package tevent 0.9.30 to version 0.9.29 had fixed a problem
+# BAD: client can't connect
+#  https://bbs.archlinux.org/viewtopic.php?id=217088
+#   - Enable NTLMv1 in Samba
+#  https://www.samba.org/samba/history/samba-4.5.0.html

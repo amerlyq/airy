@@ -4,6 +4,7 @@ source ~/.shell/func.d/write || exit
 CURR_USER="${CURR_USER:-$(whoami)}"
 
 #=========================== INFO ==============================
+# DFL: /etc/samba/smb.conf.default
 
 # To access your network share use your username (<user_name>) and password
 # through the path "smb://<HOST_IP_OR_NAME>/<folder_name>/" (Linux users) or
@@ -83,6 +84,10 @@ wopt 'max log size = 1000'
 # Security mode. Most people will want user level security. See
 # security_level.txt for details.
 wopt 'security = user'
+
+# EXPL: re-enable NTLMv1 for >=v.4.5 (less secure)
+# SEE: https://www.samba.org/samba/history/samba-4.5.0.html
+wopt 'ntlm auth = yes'
 
 # We want Samba to log a minimum amount of information to syslog. Everything
 # should go to /var/log/samba/log.{smbd,nmbd} instead. If you want to log
