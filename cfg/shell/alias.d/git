@@ -1,6 +1,7 @@
 #!/bin/bash
 # Most of aliases contained at
 #   ~/.cache/zsh/.zprezto/modules/git/alias.zsh
+# NOTE: similar to prezto: create funcs with full names, and then alias them
 
 ## --- Git ---
 alias gc1='noglob git clone --single-branch --depth=1'
@@ -14,6 +15,7 @@ alias gca='gaa && gcm'
 # http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
 # It's like: git rebase --onto @{u} $(git merge-base HEAD @{u}@{1}) OK, that syntax ("@{u}@{1}")
 alias gl='git pull --rebase --verbose'
+alias glu='gss && gl && gsp'
 alias gbl='git branch -va'
 alias gbL='git branch -v'
 
@@ -21,9 +23,9 @@ alias gbL='git branch -v'
 alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
 alias gaa='git add --all'
 alias ga.='gaa .'
-alias gcFd='gcF --date="$(date -R)"'
+gcfd(){ local d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
+alias gcsd='git --no-pager log --pretty=tformat:%ad%n%cd HEAD~..HEAD'
 alias gcom='gco master'
-alias glu='gss && gl && gsp'
 
 alias gCd='git diff $(gCl)'
 alias gro='git rebase --onto'  # gro master HEAD~1  #: <dst> <point>
