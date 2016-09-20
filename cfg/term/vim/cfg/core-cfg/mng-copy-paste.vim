@@ -100,8 +100,9 @@ nnoremap <leader>Y mz^vg_:<C-U>call CopyStringInReg('+', GetVisualSelection("\n"
 " Copy from prompt ':' or '/'. Paste in them by <C-R>+ or <C-R>".
 cnoremap <C-y> <C-R>=CopyStringInReg('+', getcmdline())<CR><C-H>
 " To be able copy/paste regex snippets into vim/snippets/vim_regex.otl
-nnoremap <leader><Space>/ :<C-U>call CopyStringInReg('+', @/)<CR>
-vnoremap <leader><Space>/ :<C-U><C-R>=TrimLines(GetVisualSelection('\n')))<CR>
+" DISABLED: conflicts with Limio -- '<Leader><Space>' paused
+" nnoremap <leader><Space>/ :<C-U>call CopyStringInReg('+', @/)<CR>
+" vnoremap <leader><Space>/ :<C-U><C-R>=TrimLines(GetVisualSelection('\n')))<CR>
 noremap  <leader>% :<C-U>call CopyStringInReg('+', @%)<CR>
 " Open commandline with copied text
 nnoremap <leader>; :<C-R>"

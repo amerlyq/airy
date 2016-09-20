@@ -54,7 +54,9 @@ endf
 " ATTENTION: recache by 'call dein#recache_runtimepath()'
 
 call dein#begin(s:dein, [expand('<sfile>')]
-  \ + split(globpath(expand('<sfile>:h'), 'plugins/*.vim'), '\n'))
+  \ + globpath(expand('<sfile>:h'), 'plugins/*.vim', 0, 1)
+  \ + globpath(expand('<sfile>:h'), 'hooks/*.vim', 0, 1)
+  \)
 
 call _cfg('plugins/*.vim')
 

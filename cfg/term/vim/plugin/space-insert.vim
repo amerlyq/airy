@@ -2,11 +2,11 @@ if &cp||exists('g:loaded_ispace')|finish|else|let g:loaded_ispace=1|endif
 " <S-Space> work only in gvim, but <C-Space> -- everywhere?
 
 nnoremap <unique><silent> [Space]<Space>  i<Space><Esc>
-vnoremap <unique><silent> [Space]<Space>  c<Space><C-r>"<Space><Esc>
+xnoremap <unique><silent> [Space]<Space>  c<Space><C-r>"<Space><Esc>
 
-" BUG: leaves [Space] active after inserting
-nnoremap <unique><silent> <Leader><Space> a<Space><Left><Left><Space><Esc>
-" xmap <unique><silent> [Space]<Space>  [Quote]a<Space>
+" ALT: use 'q<Space> from 'rhysd/vim-operator-surround'
+nnoremap <unique><silent> <Leader><Space>  a<Space><Left><Left><Space><Esc>
+xmap     <unique><silent> <Leader><Space>  [Quote]a<Space>
 
 nnoremap <unique><silent> [Space]i  :<C-u>Limio i<CR>
 xnoremap <unique><silent> [Space]i  :<C-u>Limio I<CR>
