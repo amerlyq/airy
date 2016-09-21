@@ -54,6 +54,7 @@ if !has("autocmd") || v:version <= 701 | finish | endif
 let g:everywhere_activated = 1
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 " TODO:(nvim) split groups : dif guifg and same ctermfg
+" Latin abbrev: SEE https://en.wikipedia.org/wiki/List_of_Latin_abbreviations
 " E.G. exampli gratia (~ example given)
 " I.E. id est (~ in especial, effectively)
 let s:patterns = {

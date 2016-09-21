@@ -118,27 +118,35 @@ nnoremap <leader>? :<C-U>call <SID>putslash('\V'.@+)<CR>?<CR>
 
 
 "{{{1 Convert main reg type for pasting
-nnoremap <unique>  [Frame]T  :RegConvert<CR>
+" SEE: https://github.com/mutewinter/UnconditionalPaste
+nnoremap <silent><unique>  [Frame]t  :RegConvert<CR>
 
-command! -bang -nargs=1  RegConvert call s:RegConvert(<bang>0, <q-args>)
+command! -range=0 -bang -nargs=?  RegConvert call s:RegConvert(<bang>0, <q-args>)
 
-fun! s:RegConvert(dfl, ...)
-  if &clipboard !~# 'unnamed'
-    let reg = (&clipboard =~# 'unnamedplus' ? '+' : '*')
+fun! s:RegConvert(...)
+  " CHG: use v:register -- seems like it equivalent to my 'reg'
+  if &clipboard =~# 'unnamed'
+    let reg = (&clipboard =~# 'plus' ? '+' : '*')
   else
-    let reg = (a:dfl? '+' : '"')
+    let reg = (get(a:, 1) ? '+' : '"')
   endif
   let ct = getregtype(reg)
-  let nt = get(a:, 1, (ct=~#'c\|v' ? 'l' : (ct =~# 'l\|V' ? 'b' : 'c')))
-  call setreg(a:reg, getreg(a:reg, 1), l:nt)
-  echom printf('%s -> %s', a:reg, l:nt)
+  let nt = get(a:, 2, '')
+  if nt ==# ''
+    " DISABLED:(cycling) let nt = (ct=~#'c\|v' ? 'l' : (ct =~# 'l\|V' ? 'b' : 'c'))
+    let nt = {0: 'c', 1: 'V', 2: 'b'}[v:count]  " EXPL: direct set
+  endif
+  " CHECK type change isn't sufficient -- need remove newlines and whitespaces
+  call setreg(reg, getreg(reg, 1), nt)
+  echo printf('"%s: %s -> %s', reg, ct, nt)
 endfunction
 
 
 "{{{1 Get src snippet with ref from current line
+" ALT: use keymap [Frame]b because of 'bookmark'
 nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count,'')<CR>
-nnoremap <unique>  [Frame]t  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
-vnoremap <unique>  [Frame]t  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
+nnoremap <unique>  [Frame]y  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
+vnoremap <unique>  [Frame]y  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
 
 function! GetLineBookmark(tid, text, ...)
   let path= a:0>=1 ? expand('%:p') : @%
