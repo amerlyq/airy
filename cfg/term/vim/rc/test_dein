@@ -1,0 +1,42 @@
+" vim:ft=vim:ts=2:sw=2:sts=2
+if &compatible| set nocompatible |en
+set encoding=utf-8
+
+let s:dein = '/tmp/dein'
+let s:dein_d = s:dein . '/repos/github.com/Shougo/dein.vim'
+
+if !filereadable(s:dein_d.'/README.md')
+  exe '!git clone --branch master --single-branch --depth=1'
+    \ 'https://github.com/Shougo/dein.vim' s:dein_d
+endif
+
+set rtp=$VIMRUNTIME
+for p in [s:dein.'/.dein', s:dein_d]
+  if filereadable(p.'/autoload/dein.vim')
+    exe 'set runtimepath^=' . fnameescape(p)
+    break
+  endif
+endfor
+
+let g:dein#types#git#clone_depth = 1
+call dein#begin(s:dein, [expand('<sfile>')])
+
+call dein#add('Shougo/context_filetype.vim', {'lazy': 0})
+call dein#add('Shougo/deoplete.nvim', {
+  \ 'if': 'has("nvim")',
+  \ 'on_i': 1,
+  \ 'depends': 'context_filetype.vim',
+  \ 'hook_source': "
+\\n   let g:deoplete#enable_at_startup = 1
+\"})
+
+call dein#end()
+
+if !filereadable(s:dein.'/merged')
+  if dein#check_install()| call dein#install()
+  else| call dein#recache_runtimepath()| endif
+  call dein#remote_plugins()
+endif
+
+filetype plugin indent on
+syntax enable
