@@ -1,6 +1,9 @@
 #!/bin/bash -e
 # SEE /proc/sys/vm/swappiness -- lower by 10-20. =60 - optimum
 
+# DEV: allow user to drop cache
+#   http://stackoverflow.com/questions/13646925/allowing-a-non-root-user-to-drop-cache
+
 free
 sync
 echo 3 | sudo tee /proc/sys/vm/drop_caches
