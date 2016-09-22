@@ -120,8 +120,12 @@ nnoremap <leader>? :<C-U>call <SID>putslash('\V'.@+)<CR>?<CR>
 "{{{1 Convert main reg type for pasting
 " SEE: https://github.com/mutewinter/UnconditionalPaste
 nnoremap <silent><unique>  [Frame]t  :RegConvert<CR>
+" Force in-line
+nnoremap <silent><unique>  [Frame]p  :RegConvert b<CR>p
+nnoremap <silent><unique>  [Frame]P  :RegConvert b<CR>P
 
-command! -range=0 -bang -nargs=?  RegConvert call s:RegConvert(<bang>0, <q-args>)
+command! -bar -range=0 -bang -nargs=?  RegConvert
+    \ call s:RegConvert(<bang>0, <q-args>)
 
 fun! s:RegConvert(...)
   " CHG: use v:register -- seems like it equivalent to my 'reg'

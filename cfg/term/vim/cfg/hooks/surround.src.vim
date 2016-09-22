@@ -11,8 +11,8 @@ let g:operator#surround#blocks = {'-': [
   \  'block': [v:val[0].' ', ' '.v:val[1]],
   \  'motionwise' : ['char', 'line', 'block'],
   \ }") +
-  \ map(split(g:block_aliases, ';')[:2], "{
-  \  'keys' : split(v:val[-3:], '\\zs'),
+  \ map(split(g:block_aliases, ';'), "{
+  \  'keys' : split(v:val[-2:], '\\zs'),
   \  'block': split(v:val[-3:-2], '\\zs'),
   \  'motionwise' : ['char', 'line', 'block'],
   \ }") }
