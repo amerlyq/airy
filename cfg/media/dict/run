@@ -31,7 +31,7 @@ fdmenu() {
 fvim() {
     # NEED:ENH: simultaneously translate word and then open vim
     exec r.vim-new -c "Dict $1" -c 'only' -c "call histadd(':', 'Dict $1')"
-    # exec r.tf $EDITOR --noplugin -u ~/.vim/vimrc_basic -c 'setf markdown' <(dict "$word" | r.dict --filter)
+    # exec r.tf $EDITOR --noplugin -u ~/.vim/rc/basic -c 'setf markdown' <(dict "$word" | r.dict --filter)
     # exec r.tf $EDITOR -c 'setf markdown' <(dict "$word" |& r.dict --filter)
 }
 
