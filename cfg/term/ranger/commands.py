@@ -167,7 +167,7 @@ class df(Command):
 
         cidx = list(self.fm.tabs).index(self.fm.current_tab)
         # Cross-tab compare specified tab
-        if self.quantifier:
+        if self.quantifier is not None:
             tidx = self.quantifier
         else:
             tidx = (cidx + 1) % len(self.fm.tabs)
@@ -218,7 +218,7 @@ class nrenum(Command):
         if istotal:
             self.shift()
         chg = int(self.arg(1)) if self.arg(1) else 1
-        if self.quantifier:
+        if self.quantifier is not None:
             chg *= self.quantifier
 
         m = nrenum.bmrk.match(self.fm.thisfile.relative_path)
@@ -303,6 +303,43 @@ class console(Command):
         self.fm.open_console(command, position=pos)
         if not command:
             self.fm.ui.console.history_move(-self.quantifier)
+
+
+class flat_inode(Command):
+    """:flat_inode [-t] [<[fdl]>] [<level>]
+
+    Set/Toggle inode flattened view
+        <quantifier> augments missing argument: level or [fdl] bitmask
+    """
+    def q_inode_mask(self, q):
+        return '' if q is None else ('f' if q & 0x1 else '') + \
+            ('d' if q & 0x2 else '') + ('l' if q & 0x4 else '')
+
+    def q_flat(self, q):
+        return -1 if self.quantifier is None else self.quantifier
+
+    def execute(self):
+        toggle = self.arg(1) == '-t'
+        if toggle:
+            self.shift()
+
+        if re.match('^-?\d+$', self.arg(1)):
+            t = self.arg(2) or self.q_inode_mask(self.quantifier)
+            q = self.arg(1)
+        else:
+            t = self.arg(1)
+            q = self.arg(2) or self.q_flat(self.quantifier)
+
+        if toggle and q == self.fm.thisdir.flat \
+           and self.fm.thisdir.inode_type_filter:
+            t, q = '', 0
+
+        self.fm.notify(self.fm.thisdir.inode_type_filter)
+        cmd = 'chain filter_inode_type ' + t + '; flat ' + str(q)
+        self.fm.execute_console(cmd)
+
+    def tab(self):
+        return list('dfl')
 
 
 class edit(Command):
