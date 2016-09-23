@@ -1,0 +1,510 @@
+Neovim
+  2016-09-22 [X] BUG: last char on line falls on next line when hit <CR>
+    create: $ echo ALT > f $, open $ v f $, edit 'gO ALT <CR>'
+      * bugges for any \w{3}, but normal for \w{2} and \w{4}
+    ::: culprit: ('tpope/vim-endwise', {'on_map': [['i', '<CR>', '<C-x><CR>']]})
+      ALSO: on edit '$ch,<CR>' -- cursor drops, but last char remains as is
+  [_] FIXME: nvim 'blinks' when opening file from ranger
+      * Shows shell under 'ranger' -- ranger bug/feature? Like switching to term's second buffer?
+        - independent of terminal (xterm acts the same)
+        - time depends on nvim startup time
+        - shell blinks irritate even with short startup time (disabled vimrc)
+      * Shows empty bkgr in vim, only then -- actual file
+        - seems like its STD behaviour even for vim
+        - simply time increases for nvim+syntax+solarized and solid bkgr is more noticeable
+  [_] BUG: autoindent erases already present characters
+    sh: case $1\nin -c)\nin -d)\nesac --> then replace second 'in' by typing *R;;*
+  2016-07-02 [X] MOVE to new horizon https://github.com/Shougo/dein.vim
+  BUG neovim
+    2015-11-17 [X] Cursor blinks once after startup
+      ::: Make Deoplete loading lazy
+    2015-11-18 [X] Prompt 'Enter' on each save -- excess output line? SEE ui.vim last ENH
+      ::: Seems like somehow fixed. Need more excessive testing.
+    [_] REQ: Double cursor on search by / or ,cr
+      := Seems like this bug is related to t_vi/t_ve disabled in Neovim?
+    2015-12-22 [X] No shell on ,z -- need to reuse code in ranger filechooser
+    [_] No pause on error at :make by ,m
+    [_] Error from make, when launched through abyss not from root dir
+    2015-11-18 [X] Automagnify -- fix height problems after split
+      ::: Use plugin GoldenRatio.Vim
+    [_] Err xsel no X launched/present?
+      := It's result of *has('clipboard')* inside several plugins
+      : Seems like I need to try last AUR build, but build it on
+      : android is troublesome...
+      := As a workaround -- load custom vimrc on android?
+    2015-11-27 [X] Searching in reverse/backward direction after XXX: on 'n'
+      ::: shada-related. FIXED by 2015-11-23
+  2015-11-10 [X] Check neovim (for neovim-git better use pacaur instead of yaourt)
+  [_] ADD guards to each cfg file: g:did_load_<sname> = 1
+    := this will allow s:cfg('dir/file') and then s:cfg('dir/*')
+    : so you can change loading order for some files, but rest on regex
+    := also will eliminate <unique> mapping problem, but not reload them
+    : Checks and installs all not installed bundles -- only on :so $MYVIMRC
+    : WARNING :so don't work gracely with <unique> mappings...at all.
+    :   Maybe, clear all mapping before reloading? But then plugins will broke
+  [_] https://github.com/neovim/neovim/wiki/Related-projects
+  [_] Search for async term cmds launcher plugin
+    If not found -- extract from ranger filechooser common code
+  2015-11-19 [X] DEV:THINK: For neobundle use generating yml -> plugins.vim
+    Generate plugins.vim by python/awk inside ./setup from plugins.yml
+    := You can use yml back-references for identical configs!
+    : http://genkisugimoto.com/blog/manage-vim-plugins-via-yaml/
+  [_] Check my vim-focus-autocmd on compatability and unnecessity
+  2015-11-27 [$] ENH Change number of visible lines before/after cursor depending on height
+    := In small window it moves by spurts  ::: Enough to make: scrolljump=0 scrolloff=3
+  2015-12-22 [$] THINK autosave on stop writing? -- can be trouble on pause in insert mode
+    := for writing on android  ::: autocmd on write will mess buffer
+    ::: problems if file was changed externally?
+  2015-11-19 [X] TODO On help window -- disable 'gh/gl' features to prohibit replace help buffer
+  [_] Paste "+ text on ',p' or else -- append newline to text and normalize as in urxvt
+  2015-11-27 [X] Replace cfgs loading order -- my settings/mappings first, plugins -- later
+    := It's needed to not lose keymappings even on broken plugins (when I test them actively)
+    := Plus with lazy loading most of plugins will load after my cfg anyway
+  2015-11-27 [X] ADD [ia][0-9] with brackets (by analogy with anyblock)
+  [_] BUG RangerChooser -- after ':<C-f>' opens inside command line window instead of main
+    Distinguish '/' and ':' cmdlines -- provide different mappings
+    : SEE http://vi.stackexchange.com/questions/3180/run-a-cmap-only-when-searching
+    := simply execute 'tabnew' is invalid, in this window need 'itabnew<CR>'
+    : THINK? is it possible to launch ranger in cmdwin w/o entry in history?
+    : TRY? histdel('cmd', -1)
+    := use autocmd: CmdwinEnter/CmdwinLeave  and check cmdwin-char
+  [_] BUG gf in *.vim opens file './.' instead of './<cword>'
+    :set includeexpr=substitute(v:fname,'\\.','/','g')
+    :* TRY in cdns/logs: vim: inex='/path/to/project/root/'.v:fname
+  2015-11-24 [X] THINK:USAGE: NrrwRgn splits -- for editing lyrics tables?
+    ::: Won't work -- need to edit different parts of same line --
+    : impossible for NrrwRgn to merge changes back. Use simple :vs and merge manually
+  2015-11-23 [X] TODO: replace all <Leader>t on [Toggle]t, then define [Toggle]=[Frame]t
+  2015-12-22 [X] REGR: Seems like current highlight for search+cursor has broken transparent background
+    ::: Use 'st' instead 'urxvt'
+  [_] REGR: slow completion in votl?
+  [_] BUG:CHECK: when printing from pythin, funcs in disabled: are quoted and don't evaluates
+  [_] 1,c --> 's;;\1', 2,c --> 's;;\1\2' and cursor between them
+    : FIND: how to map ,1c and ,2c
+  [_] On android -- use mouse only to scroll, set scrooll-count = 1
+  [_] Deoplete -- don't work with russian? How about neocomplete?
+    := If don't -- then it will be useless in text writing
+  2015-12-23 [X] ADD cscope invocation command
+  [_] Fix 'o' in qf -- after 'nvim -c 'Ag patt' -c only' -- not returns to qf window
+  [_] BUG: clipboard=unnamedplus don't work for vim in chroot?
+    :one vim in chroot and one in system
+    := can't do anything about -- because clipboard replaced with 'unnamed'
+    := need to use 'xsel' shell and export DISPLAY?
+  [_] BUG: old vim in Ubuntu-10.04
+    : Error detected while processing function neosnippet#init#_initialize..<SNR>175_initialize_others:
+    : line   11: E216: No such group or event: TextChanged,TextChangedI * call neosnippet#handlers#_restore_unnamed_register()
+  2016-02-15 [X] BUG: my ranger -- if dir name has '%' -- then ',f' will expand it
+  [_] DEV: Hook :w event to check if current user has only (r-?) access and root has (?w?)
+    := Then use :Sw to save buffer and automatically (L)oad result
+    :? But what about Windows?
+  [_] FIXME: when launching :term need to do: and then change it back to std
+    := due to 'black' is indistinguishable from background
+    := NEED transparent background in vim terminal
+    : highlight Normal ctermbg=none
+    : highlight NonText ctermbg=none
+    :? But how to make different colorschemes for different windows?
+  [_] BUG: different colorschemes (maybe problem with st)
+    * <A-Space> on normal terminal -- normal colors (no)
+    * <A-Space> on term of:  tmux-zsh-ranger-nvim-ranger-> forked term
+      -- light blue text, opaque black bkgr
+
+Future
+  [_] Vimserver by rpc for LaTeX and FIX? ranger issue to not open vim in vim
+    https://github.com/neovim/neovim/issues/1531
+  [_] Exit back to ranger/shell with cursor on current opened file in exit moment
+    :THINK:FIND: last viewed buffer with real file
+  [_] THINK:FIND? Duplicates of 'ftplugin/' dir of all plugins -- necessary for lazy loading?
+    := Currently, seems like no? Neobundle can handle ftplugin/ itself?
+  [_] TODO:TRY: vim-plug and measure startup time, with caching -- <100 times>
+    :: REQ to improve mappings not only for <Plug>. THINK -- is necessary?
+    :: REQ caching for deferred loading to improve startup time more
+  [_] Cfg: don't install all the packages on servers -- only necessary (two lists)
+
+
+BUG plugins
+  [_] BUG: <N> then 'v' -> selects some chars, intead of passing counter further to textobj
+  [_] github-issues -- conflicts with commitia in lazy mode?
+  [_] FIX russian xkb plugin
+    : Maybe, some of mapping map not as keysym but by keycodes?
+    [_] my own mappings simply don't work (like ,s or ,d)
+    [_] mappings on digits are wrong, as I replaced them.
+    > [_] Fix xkbmap plugin language switch -- to use dbus and reuse C-^?
+      : Because I remapped some keys in rus, naive mapping don't work anymore
+    2015-11-23 [X] Pause on file open (for certain files only?)
+      ::: Culprit is vim-xkbswitch -- it's old bug, must see src
+  [_] REQ: quickfix-reflector -- don't add saved lists to history of colder/cnewer
+  [_] BUG: ninja-feet [<>][ia] don't work with custom textobj? (I have remapped all)
+    := Fork and develop fix?
+  [_] FIXME: Seems like pwd changes on moving between buffers.
+    := CHECK culprit -- badly configured vim-rooter? But seems like no.
+  [_] FIND: why textobj-space don't affect indents
+  [_] BUG: airline -- disappears highlighting of upper/bottom line if window smaller than text
+    := CHECK if it's my submode-ext for airline
+  2015-11-26 [X] BUG: broken Lazy for fugitive -- Gdiff don't work
+    ::: FIXED call func to detect if current file inside repo
+  [_] submode
+    [_] BUG: submode C-f -- when 'f' at the buffer end -- breaks submode and uses normal 'f'
+    [_] FIX?: submode C-f -- counter with keys like 'f' don't work?
+    [_] ENH: 'x' -- don't put in register on each delete, but copy on submode-exit
+    2015-12-10 [X] REGR: 'xp' can't transpose characters ('x' didn't put into reg)
+  [_] REQ: gnupg -- can't do lazy
+  2015-11-26 [X] BUG: CamelMotion -- don't load at all? -- test inside vimscript
+    ::: After plugin update you need to specify mappings explicitly or call its functions
+  2015-11-26 [X] ii/I -- which difference?  :::  SEE note in textobj.yml
+  [_] ic/C -- do more dumb and stable -- FIX:DEV: upper/bottom bounds detection
+    := ALSO I can plugin allows another mappings with divergent textobj from 'iw/aw'
+    : -?- Make operator-like textobj -- Like  d[qciw] or di[qcw]
+    ::: Consider using another textobj -- ALT: vim-textobj-blockwise
+    : --- Currently, single advantage -- smart word column
+    : --- Possible advantage -- using another motions
+  2015-11-27 [X] REQ:REGR: Broken '<C-v>$A,<Esc>' -- inserts _column_ of comma instead of ',eol'
+    := Could be result of niceblock.vim  :::  it's my mapping  $ -> g_
+  [_] BUG: Tagbar -- open with preview -- deletes all manual folds in buffer
+  [_] NrrwRgn -- can't drop highlight after manually closing regions?
+    := Like when opening two regions, :diffthis on them and then :q
+  [_] CHECK: jedi-vim new *.py fileopen (,f) resets ft/omnifunc
+  [_] committia.vim -- on 'gcu' tell about file modifiers read only, on close -- on vars
+    : Error detected while processing function
+    : committia#open..<SNR>169_open_singlecolumn..<SNR>169_open_diff_window..<SNR>169_open_window:
+    : line    8: E21: Cannot make changes, 'modifiable' is off
+  [_] incsearch
+    [_] TRY? (instead) https://github.com/junegunn/vim-oblique
+    [_] REQ: In new menu '/?' don't work C-Y to copy
+    2015-11-27 [X] Trash instead of search: \v[ \t\u3000]+$|[ \u3000]+\ze\t$
+      := Seems like it's my plugin trailing-space/empty lines  :::  USE :histdel(1)
+    2015-11-27 [X] Can't use 'nN' in [ox] modes -- to delete until next/prev
+      ::: Remapped to use anzu only in 'n' modes, so we lost status in 'ox'
+      :NOTE: can't print anzu-status in 'ox' modes, because of cursor movements
+      :NOTE: airline's for anzu-ext can't either -- when updating status,
+      :   vsel will be dropped. Plus I lose lazy loading.
+    [_] C-f in '/' can't open search window
+      :? Maybe, rewrite vim-rsi -- to adjust it with neocomplete <C-x>?
+      : and add more shortcuts which I use in ZSH
+      := Yes, rewrite is the best -- and replace <C-f> with <C-i>/<C-o>?
+    [_] After lazy loading first '*' on vsel don't highlight
+      := only when use 'vw', for 'evb' -- all works
+      [_] After lazy first search of selection only highlight first letter
+      : at work all OK? Only at home?
+    >[_] If z* isn't on first character -- highlight isn't enabled
+  [_] vim-stay -- text is folded on restore -- if fdm=syntax changed to manual
+  2015-11-24 [X] BUG: neobundle -- filename_pattern -- confusing regex rules
+    ::: Problem was in my python -- raw printing dict -- doubles backslashes
+  2015-11-27 [X] REQ:XXX: neobundle -- recursive call -- red repeatable text
+    2015-11-22 [X] -- 'yq' or in case of 'vqa' for surround -- rarely
+    ::: Seems like it my fault with textobj-user depends on itself for backrefs
+    [X] -- when replacing and dld repo for plugin (same name, different url -- like 'ag')
+    [X] -- for ':Ag' when using 'command_prefix'
+    [X] -- on new plugins install
+  [_] XXX: something accidentaly enables 'set list' in help/votl/curr buffer
+    := When <C-o> on file, which already opened in another vim, and cancel
+    : -- dropped buffer settins?
+  [_] BUG: vimoutliner -- has 'nmap' instead of 'nnoremap'
+    := Therefore don't work with remapped ':'
+    ::: TEMP disabled mapping, FIXME:DEV: plugin-replacement
+  [X] deoplete -- <C-v> on column after ': ' comment, Press <Tab> -- inserts space only for first line
+    2015-11-22 [X] In votl <BS> don't work in insert ::: update plugins
+  [_] Airline -- add hook to change ailine variable
+    : if exists(airline_extensions) && 'nrrwrng' not in g:airline_extensions
+    : add(airline_extensions, 'nrrwrgn') | endif
+    TODO:  nrrwrgn, submode, anzu
+  [_] GoldenRatio -- consecutive splits are different from V1/2 and 3xH1/3
+    := Maybe need to setup layout (OR min screen width) in options?
+    [_] not sourced on native split -- like :h :sp :vs
+    [_] THINK: I use split more often than I think: :vs, :h, etc.
+      : Maybe GoldenView has no sense in being lazy?
+  [_] textobj-quote -- reacts only on double quote instead of any?
+    [_] weird behaviour overall -- TEST it
+    [_] add pair of typographic quotes (maybe not in this plugin?)
+  [X] textobj-keyval -- seems broken? CHECK all the textobj
+    2015-11-22 [X] DEV fork, as it works only for specified filetypes
+    := Add default key-splitter (to work in yaml)
+    := Specify whole list of filetypes on one splitter instead of individually
+    2015-11-22 [X] FIX duplicate tag
+    : [neobundle] Error generating helptags:
+    : [neobundle] Vim(helptags):E154: Duplicate tag "textobj-keyvalue"
+    :   in file bundle/.neobundle/doc/textobj-key-value.txt
+  [_] sideways -- restore visual selection after jump on [a,  ]a
+    := NEED for visual select several consecutive args
+  [_] expand-region -- 'different' mappings in line-, char-, blockwise modes
+    := TODO same key as mode -- expands, [g|Space][vV<C-V>] -- shrinks
+    := I have done smth similar in keys-remap  :ALSO:SEE :h v_v
+  [_] textobj-anyblock -- deletes current character if there are no brackets!
+    := maybe because searchpos() returns [0,0] on not found, it's not
+    : checked, and textobj-user then deletes null-match as one symbol
+  [_] textobj-blockwise -- can be extended. Add '[ai][bqhd]' in on_post_source
+    : onoremap <expr> <Leader>iw textobj#blockwise#mapexpr("iw")
+  [_] operator-surround
+    [_] THINK keep current cursor position after appending brackets?
+      := current relative to context != keep col
+    2015-11-28 [X] BUG first 'vwqa' after lazy loading -- applies only to first char
+      ::: My fail, result of 'echom' on source inside neobundle#config#search
+    [_] BUG repeat '.' applies to same region, and not same motion!
+      := Hence 'veqa"' can't be reproduced correctly
+    2015-11-19 [X] direct append in visual mode
+    2015-12-10 [X] THINK? direct-append operators for normal mode?
+      ::: Seems like it works as is with default plugin?
+    [_] THINK adding space inside/outside brackets by involving [Space]
+      := 4 variants: no/inner/outer/both
+    [_] THINK? Optimize direct brace mappings by getchar()
+    2015-12-10 [$] ADD pairs for "|" and ":"
+      ::: Both | and : can be used as motion patters, therefore after qa.. don't work
+    2015-11-19 [X] add symm mappings for closing block brackets
+    [_] THINK:DEV: too many operators (+Space!) -- use vim-submode?
+  [_] ag
+    [_] FIX escaping '#' -> '\\#'
+    [_] DEV repeat last search
+    [_] ADD:DEV operator-search
+      : https://github.com/rgrinberg/vim-operator-gsearch
+      : https://github.com/osyo-manga/vim-operator-search
+    [_] THINK vim-submode for search -- in context of source-navi
+    [_] Definition lookup: ag+ctags
+      : https://github.com/gorkunov/smartgf.vim
+
+
+BUG: wontfix
+  [_] TEMP Recover.vim -- rubbish message in neovim
+    ::: Created issue, wait for results
+  [_] TODO:DEV: commentary -- need inline comment -- to toggle and textobj
+    ::: Unsupported by author, see issues.
+
+
+TODO: PULL REQ
+  [_] REQ SignatureToggleSigns -- add -bar option
+  [_] post configs -- neobundle, zsh-syntax, igorsam, mpogoda
+  [_] vim-airline -- on submode ext
+  2016-07-02 [$] ag -- propose plug mappings
+  [_] kana/vim-submode  --  commands -- +attach ref on my current config
+  2016-07-02 [X] vim-indent-tab -- send patch as pull req, author is slow
+  [_] overseed relat-number
+
+
+SMALL
+  2015-06-08 [X] for commenter -- add prefix: '!' in Xresources and ':' in votl
+  :CHECK: how to do this for tcomment
+  2015-11-13 [X] BUG: after saving, can't use n/N -- bad regex of trailing space!
+    2015-11-13 [X] Replace TrailingSpaceShow by high-contrast airline highlight
+  [_] When opening file, which opened in another vim (pid exists), focus its window instead.
+    :SEE Bring back opened window instead of dull msg about swapfile
+    :   NeoBundle 'svintus/vim-editexisting'
+  2015-11-15 [X] TODO: When updating vim plugins, how to run it in non-interactive?
+  [_] SEE Tips vim + git + fugitive
+    http://mislav.uniqpath.com/2014/02/hidden-documentation/
+  [_] Toggling background directly in vim -- use urxvt codes to change
+    color of cursor for more contrast
+  [_] CHECK vim search inside syntax objects -- to search only in strings or in function names
+  [_] SEE http://vimcasts.org/episodes/the-file-explorer/
+
+
+BUG:
+  >[_] Can't enable perl check in syntastic
+  [_] Slowness after some time of working inside 'xkb/symbols/am|mods'
+  [_] BUG: open python file, then ",f" and open new .py -- pycomplete will be broken
+    : maybe, something relative: if you open .otl -- you get no syntax highlighting
+  [_] FIX youcompleteme <BS> -- deletes all letters beside first, instead of one letter only
+    : maybe it's result of simultaneous working neocomplete -- try to disable it
+  [_] BUG: vim not only slow, but also SEGFAULT -- enable coredumps and see
+    := Reason in garbage collector + lua. See coredumps:
+    coredumpctl list; coredumctl info 1832; coredumpctl gdb 1832; bt
+    SEE:
+    : https://github.com/Shougo/neocomplete.vim/issues/351
+    : https://groups.google.com/forum/#!msg/vim_dev/PbLFBAD5Xu8/bH_kew8vmJAJ
+  2015-07-28 [X] FIX gj/gk and j/k for wrapping text
+  2015-11-22 [X] FIX? -- press 'v$' -- will select end of line also!
+    := Then deleting selection will cause joining lines!
+    :? maybe bug from 'not back-moving cursor'
+    :~ -- 'V' deletes also \n -- THINK? change behaviour?
+    ::: Replaced vnoremap '$' -> 'g_'
+  [_] FIX ,K to check if current file executable, and if not -- using last command in ':'
+    2015-03-27 [X] fix ,k ,K behaviour
+      ,k by default must always run :./% -- to speed up work on open
+      ,K must replace current default run cmd with last from ':'
+      [_] Use v:counter -- to setup several different scripts
+  [_] BUG: visual-block +Y yanks only column, but must be as +D, which deletes until end.
+  [_] BUG: broken swap diff ::: Opened issue
+  2015-08-12 [X] BUG: vim-altr -- [f ]f don't work for rule 'src/%.c' -> 'inc/%.h'
+    ::: Need specific pattern description -- author was helpful
+  2015-11-15 [X] BUG: C-F on end of '/', C-D on emtpy ':' -- both opens menu, needs to disable it
+    := SEE :h cedit -- it's mapped to C-F by vim-rsi
+  2015-03-26 [X] BUG: 'gcc' comments are old-style again
+  2015-06-01 [X] BUG: auto-paste mode on insert don't work, verify, add F2 to insert. ::: Disabled.
+  2015-06-01 [X] BUG: in insert for fast presses: <S-F12>, etc. ::: Alt-keys removed.
+    ::: Result of <Esc> + any key (+notimeout) + mappings in term-alt-keys.
+  2015-06-01 [X] BUG: mouse highlight don't work  ::: Culprit is 'vdebug'. Removed.
+  2015-05-26 [X] BUG: mix of incsearch, others! Find higlighting-as-you-type in '/' or ':s;..;' !
+  2015-06-01 [X] BUG: \ej == ê, can test by writing and executing macro. How do not interpret \e.. ?
+    ::: Seems one only way -- use Xresources to remap all. Or don't use mappings.
+    May be something with urxvt, check in gvim
+      http://www.postseek.com/meta/d160afe88c57fc895e41a0843093ac15
+    Yes, it is -- read 'cryptic characters'
+      http://vim.wikia.com/wiki/Get_Alt_key_to_work_in_terminal?useskin=monobook
+  2015-06-01 [X] BUG: ttimeoutlen or similar -- after some editing, two-key combo timing is too fast
+    : problem is in mappings of <M-..> at term-alt-keys.vim. ::: Disabled maps and timeout.
+
+
+SEE & CHECK
+  [_] Integrate xiki (can be already deprecated by neovim :term)
+    http://xiki.org/
+    http://stackoverflow.com/questions/24465655/configure-vim-to-use-xiki
+  [_] Check spacemacs
+    https://github.com/syl20bnr/spacemacs
+  [_] TRY: https://github.com/junegunn/fzf
+  [_] R-lang for vim
+    http://www.lepem.ufc.br/jaa/r-plugin.html
+  [_] CHECK MindMap integration?
+    https://processing.org/
+    https://github.com/sophacles/vim-processing
+  [_] Graphviz
+    https://github.com/wannesm/wmgraphviz.vim
+    https://github.com/dahu/VimCallGraph
+  [_] Gmail in vim (need Ruby)
+    http://danielchoi.com/software/vmail.html
+
+  <Diff
+    vim llvm + plugin == на синт разбор
+    http://pig-monkey.com/2013/04/4/password-management-vim-gnupg/
+
+
+vim:
+  2015-11-15 [$] move cfb/bundle -> plugins, cfg/snip-* -> ext, plugins.vim -> neobundle.vim
+  [_] READ vim vs PyCharm3 in Idea
+    http://andrewbrookins.com/tech/one-year-later-an-epic-review-of-pycharm-2-7-from-a-vim-users-perspective/
+  [_] ADD vim-hooks -- custom scripts on save and other events in vim
+    https://github.com/ahw/vim-hooks
+  [_] Remap 'ge' with motion 'prev-to-last' letter? (See: CamelMotion plugin)
+  [_] Change Bookmarking 2\t --> to trigger let g:tin=v:count instead of one-time setting?
+    or simply use \T or g\t for permanent setting and \t for one-time
+  [_] comment each mapping with regex to extract placeholders from binding
+    [_] for continuous group of maps use that regex for each
+    [~] develop format
+    [_] mark several files
+    [_] create parser
+
+  [_] mark by some symbol in comments each mapping/option for export to 'simplified vimrc'
+    : to generate vimrc for others or for me on other computers (buildserver)
+  2015-07-06 [X] load spellchecking in vim_install
+    2015-07-06 [X] install -u must run vim_install in update regime
+
+  [_] Autoreplacing: choose delimiter from [:|/;@] on ,cc ,cy depending on expression
+     Or escape delimiter symbols in expression
+  [_] Delay on saving -- by means of syntastic -- move it in asynchronous mode
+
+vim
+  [_] Map next/prev buf, etc on [a [b, ]a ]b
+  2015-07-06 [X] Delete all tabs besides indent. (retab! then script to retab all besides?)
+  [_] Integrate: http://learnvimscriptthehardway.stevelosh.com/
+  [_] Suppress syntastic headers error
+    https://github.com/scrooloose/syntastic/issues/676
+  2015-06-01 [X] Add <unique> attr to my shortcuts
+  [_] Create toggle for multi-windows with fixed or autoresize
+  [_] Install Ycm back -- but activate only for c/c++
+    http://www.alexeyshmalko.com/2014/youcompleteme-ultimate-autocomplete-plugin-for-vim/
+    http://valloric.github.io/YouCompleteMe/
+  2015-07-06 [$] Setup Geeknote -- install newer vim? Connect to unstable?
+    ::: Moved from evernote to plaintext git repository
+  2015-11-24 [$] Try full virtual editing -- case: o<Esc>a  -- must delete line but stay indented
+    ::: permanent virtual is uncomfortable, intention replaced with g{,}[oO]
+
+  [_] Color !cat
+     http://www.vim.org/scripts/script.php?script_id=4325
+  [_] Make-shift-auto
+     http://www.vim.org/scripts/script.php?script_id=4278
+     http://tuxion.com/2011/09/30/vim-makeprg.html
+
+  Integrate shell
+    http://h0rr0rr-drag0n.blogspot.com/2010/11/shell-vim.html
+  [_] C++: http://vim.wikia.com/wiki/Category%3aC%2B%2B
+
+  [_] Run in term without '!'
+    See 'system()' and 'show output in split'
+      http://learnvimscriptthehardway.stevelosh.com/chapters/52.html
+    For asynch run, search plugins already installed!
+
+SEIZE
+  http://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
+  SEE: plugins list
+    https://raw.githubusercontent.com/lambdalisue/vim-castle/7545bcea880a28f85947ee47e4b2e9cfc281f804/home/.vim/vimrc
+  vim-go:  http://howivim.com/2016/fatih-arslan/
+>>>> [_] https://github.com/Shougo/shougo-s-github
+  Must-see -- kana's dotfiles (as creator textobj/operator/vimmode)
+    http://kana.github.io/config/vim/
+    https://github.com/kana/config/tree/master/vim
+
+>>>> https://github.com/wilywampa/vimconfig
+  : Он постоянно и непрерывно что-то в них пилит. Может что-то хорошее?
+
+>>> [_] https://github.com/rafi/vim-config
+  [_] copy and refine whole 'ftplugin' dir
+  [_] see some secure plugins from 'plugin', 'autoload/unite/sources'
+> https://github.com/tpope/tpope/blob/c0af0f5ecb6f26d98e668bf1a81617e918952274/.vimrc#L482
+  : https://github.com/rafi/vim-config/blob/master/config/neobundle.vim
+
+  https://github.com/WolfgangMehner/vim-plugins
+  http://www.alexeyshmalko.com/2014/youcompleteme-ultimate-autocomplete-plugin-for-vim/
+  http://vimcasts.org/episodes/fugitive-vim---a-complement-to-command-line-git/
+
+  http://nvie.com/posts/how-i-boosted-my-vim/
+  http://statico.github.io/vim.html
+  How to setup lazy
+    https://github.com/RsrchBoy/vimfiles/blob/master/vimrc
+
+>>> http://usevim.com/
+
+  [_] Seize
+    http://www.bicrement.com/articles/2014/my-favorite-vimrc-and-plugins.html
+    http://www.vim.org/scripts/script.php?script_id=4449
+    https://github.com/jackfranklin/dotfiles
+        https://dotfiles.github.io/
+            https://github.com/xero/dotfiles
+
+  >[_] Search inside useful hacks and tips
+    https://github.com/romainl/dotvim
+  [_] Integrate this tips:
+    [_] https://github.com/benmills/vimux
+    [_] http://vim.wikia.com/wiki/Replace_a_word_with_yanked_text
+    [_] http://vimhelp.appspot.com/vim_faq.txt.html#faq-20.4
+    [_] !! http://dalibornasevic.com/posts/43-12-vim-tips
+      : Very big good faq!
+    [_] http://amix.dk/vim/vimrc.html
+
+  Tips
+    http://uw-freelancer.github.io/blog/vim-vdebug/
+    http://uw-freelancer.github.io/blog/insanely-faster-vim-buffer-switching/
+    https://netguru.co/blog/win-vim-hacks
+
+  Libs for vimscript
+    http://www.vim.org/scripts/script.php?script_id=4433
+
+
+PROFILING
+  [_] Slow
+    autocmd на CursorMoved
+    := strace -o /tmp/sprof -f vim ./cfgsetup
+    : 17303 read(0, "j", 4096)                = 1
+    : 17303 recvmsg(4, 0x7ffdc2d32400, 0)     = -1 EAGAIN (Resource temporarily unavailable)
+    : (repeat ~ 400 lines)
+    А ещё говорят тормозит :set cursorline
+        Slow scrolling -- syntax/regex profiling
+            http://eduncan911.com/software/fix-slow-scrolling-in-vim-and-neovim.html
+    Profile
+    :profile start profile.log
+    :profile func *
+    :profile file *
+    " At this point do slow actions
+    :profile pause
+    :noautocmd qall!
+  NOTE: If you want to know slow loading plugins, you should use
+        the external tool or |--startuptime|.
+    : https://github.com/hyiltiz/vim-plugins-profile
+    Use to get statistics on long load
+      vim --startuptime profile.log
+    Very verbose with timings
+      vim -V12
+      vim -V20/tmp/vimlog
+  Debug
+    Hit Enter -- find who is cause screen to scroll up (only first reason remembered)
+      :v:scrollstart
+    Loadorder of *.vim by
+      :scriptnames
+    Source line and selection in vim
+    : vnoremap <Leader>S y:execute @@<CR>:echo 'Sourced selection.'<CR>
+    : nnoremap <Leader>S ^vg_y:execute @@<CR>:echo 'Sourced line.'<CR>

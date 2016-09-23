@@ -7,7 +7,7 @@ let current_compiler = "abyss"
 let s:cpo_save = &cpo
 set cpo&vim
 
-if exists(":CompilerSet") != 2		" older Vim always used :setlocal
+if exists(":CompilerSet") != 2  " older Vim always used :setlocal
   command -nargs=* CompilerSet setlocal <args>
 endif
 

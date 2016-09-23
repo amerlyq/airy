@@ -25,9 +25,9 @@ while \r in the replacement inserts a newline.
 
 
 Replace all and move on previous position (as without moving at all)
-	I just type Ctrl+O after the replace to get back the the previous location.
-	:%s/pat/str/g|norm!``
-	:%s/pat/str/g|''
+  I just type Ctrl+O after the replace to get back the the previous location.
+  :%s/pat/str/g|norm!``
+  :%s/pat/str/g|''
 
 Если, например, надо быстро понять, как глобальная переменная (sic! — а что делать, в legacy-коде они встречаются) используется в модуле.
 :g//t$ — скопировать строки, содержащие подсвеченное значение, в конец файла.
@@ -45,8 +45,8 @@ Replace all and move on previous position (as without moving at all)
 :'<,'>s/$/\r/g
 
 Пронумеровать содержимое тегов
-	;let i=1 | g/\v\<h3\>\zs/s//\=i.". "/ | let i=i+1
-	<h3>1. Heading 1</h3>
-	<p>Lorem ipsum</p>
-	<h3>2. Heading 2</h3>
-	<p>Lorem ipsum</p>
+  :let i=1 | g/\v\<h3\>\zs/s//\=i.". "/ | let i=i+1
+  <h3>1. Heading 1</h3>
+  <p>Lorem ipsum</p>
+  <h3>2. Heading 2</h3>
+  <p>Lorem ipsum</p>

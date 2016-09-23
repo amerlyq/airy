@@ -17,7 +17,7 @@ let s:source = {
       \ }
 
 function! s:source.hooks.on_init(args, context) "{{{
-  let path = expand('$VIMHOME/doc/commands.otl')
+  let path = expand('$VIMHOME/doc/commands.vim')
   let a:context.source__command = readfile(path)
 endfunction "}}}
 
