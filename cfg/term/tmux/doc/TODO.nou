@@ -1,0 +1,118 @@
+SEE
+  READ https://github.com/ThomasAdam/tmux/blob/master/FAQ
+  <Blog
+    http://www.hamvocke.com/blog/a-guide-to-customizing-your-tmux-conf/
+REF
+  >> http://tmuxp.readthedocs.io/en/latest/about_tmux.html
+
+CHECK
+  https://www.reddit.com/r/tmux/comments/3l5xf6/highlight_individual_tmux_panes/?
+
+CHECK:(plugins)
+  2016-07-21 [X] >>> https://github.com/tmux-plugins
+  2016-07-21 [X] https://github.com/tmux-plugins/tmux-fpp
+  2016-07-21 [X] https://github.com/tmux-plugins/tmux-yank
+  2016-07-21 [X] https://github.com/tmux-plugins/tmux-copycat
+  [_] https://github.com/tmux-plugins/tmux-urlview
+    > DEPRECATED: by tmux-copycat? NEED: urlview OR extract_url.
+  [_] https://github.com/tmux-plugins/tmux-continuum
+  [_] https://github.com/tmux-plugins/tmux-resurrect
+  [_] https://github.com/tmux-plugins/vim-tmux-focus-events
+  [_] https://github.com/tmux-plugins/tmux-pain-control
+  [_] https://github.com/tmux-plugins/tmux-prefix-highlight
+  [_] https://github.com/tmux-plugins/tmux-logging
+    Check focus events between windows -- instead of my 'vim-autofocus'
+  [_] Session sharing
+    https://spin.atomicobject.com/2012/01/28/less-perplexing-terminal-multiplexing-with-tmux/
+    Relocate raw running process into tmux
+        http://monkeypatch.me/blog/move-a-running-process-to-a-new-screen-shell.html
+        ! http://serverfault.com/questions/55880/moving-an-already-running-process-to-screen
+
+  NOTE: Xorg inside tmux
+    To run startx inside tmux
+      :/etc/X11/Xwrapper.config:  allowed_users=anybody
+    Make independent tmux servers
+      : tmux -L "vt$XDG_VTNR" ... -s "vt$XDG_VTNR"
+
+ENH:
+  [_] Re-attach to tmux sessions on exit
+    https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
+
+TODO
+  [_] map PgUp/PgDn to directly invoke tmux backlog navigation
+    => useful for shell BUT:BAD: vim, etc -- shadows prg mappings
+  2016-03-07 [X] RFC:FIXME: whole process tree -- reduce links in resulting chain
+  [_] .vim/env :: TERMCMD='tmux split-window "$cmd"'
+    [_] Need command to run in split/window instead of true terminal
+    := THINK: However, true terminal would be also appropriate to launch sometime?
+  [_] Broken vim FocusGain etc inside tmux
+    [_] need to repair it
+    := https://github.com/tmux-plugins/vim-tmux-focus-events/issues/1
+  2016-02-28 [X] BUG nvim colorscheme is not solarized
+    := http://sunaku.github.io/tmux-24bit-color.html#usage
+    :> set -ga terminal-overrides ",st-256color:Tc"
+  2016-03-07 [X] Screen clearing -- right line part is transparent (bcfe)
+  2016-02-28 [X] SEE: how to preserve name of origin/previous terminal
+    : http://blog.sanctum.geek.nz/terminal-colour-tolerance/
+    :> ~/.term.conf: TMUX_TERM=$TERM
+  2016-03-07 [X] Related terminfo and italic/standout problem
+    : CHECK:(at end) http://tmux.cvs.sourceforge.net/viewvc/tmux/tmux/FAQ
+    : set -g terminal-overrides 'rxvt-unicode*:sitm@,ritm@'
+    : USE: echo '\e[3mitalics\e[m' '\e[7mstandout\e[m'
+    :> use TERM=tmux-256color
+  2016-02-28 [X] Change fork/st
+    2016-02-28 [X] scrollback patch -- unnecessary after tmux-24bit-color, disable it
+    2016-02-28 [X] change zsh to tmux in launching command inside st?
+      :ALT change r.t script to launch tmux on startup
+      :> THINK: what is more flexible way? -- use tmux only in xmonad
+  [_] auto-hide tmux status only if one window
+    : Disable tmux status -- off by default -- only after full setup
+    : TRY tmux set-hook -g 'before-new-window' 'set status on'
+  [_] Run command and show result
+    http://unix.stackexchange.com/questions/17116/prevent-pane-window-from-closing-when-command-completes-tmux
+  [_] TRY hide pane
+    http://unix.stackexchange.com/questions/145857/how-do-you-hide-a-pane
+  [_] one-time sessions w/o detach
+    TRY set-option -sg exit-unattached off
+    SEE https://github.com/tmux/tmux/issues/182
+    NEED: nice closing all windows/panes without interrupting (like unsaved vim)
+    : READ: https://github.com/tmux-plugins/tmux-resurrect/issues/120
+    : -- tmux-sessionist
+  2016-02-28 [X] THINK prevent tmux from nested sessions ::> auto built-in
+    : FIND if there such option exists instead of wrapper bash
+  [_] When running ssh, need raw terminal w/o tmux to avoid nested sessions
+    :- Problems: double-modifier, invalid terminfo on remote server for your term
+    : FIX r.ssh to check on $TMUX
+
+BUG
+  [_] 'users' shows one new login user for each tmux. WTF? CHECK: if zlogin sourced each time
+  [_] sockets in /tmp/tmux-1000 beside $TMPDIR/tmux-1000
+  [_] promtline crawls and duplicates line-by-line
+    when toggle status on|off
+      : http://superuser.com/questions/382503/how-can-i-put-a-newline-in-my-zsh-prompt-without-causing-terminal-redraw-issues
+      :> use precmd
+    on width resize
+      : http://www.dribin.org/dave/blog/archives/2004/01/25/zsh_win_resize/
+    <Toggle linewrap in pane
+    : printf '\033[?7h' || printf '\033[?7l'
+  [_] status powerline symbol -- inconsistent bg on blue-gray sections bound
+  [_] after closing/opening windows -> resize (intermitten)
+    := tmux/vim don't refresh screen -- only solid background
+  2016-03-07 [X] BUG: xmonad M-f -- can't fullscreen vim/etc -- not sending resize event?
+  2016-03-07 [X] BUG: r.tmux -- keeps first session in forked process
+    :>  created cfg/core/init/run to run on zlogin and create first session
+    := FIND how to prevent this or run tmux server beforehand (if it's server deal)
+    NEED run server and keep it -- but it exits if no sessions exist
+    := therefore that first session was lingering in background
+    : SEE init.zsh:32 -- seems like it's possible to define default server session?
+    : # Create a 'prezto' session if no session has been defined in tmux.conf.
+    2016-03-07 [X] BUG $RANGER_LEVEL = 1 in new terminals
+      := arises when first session was launched manually from chain st->zsh->ranger->zsh
+      :> always run first session on login
+  [_] C-h/Backspace don't work as expected
+    : zsh/vim -- <C-h>; but ranger/neovim -- <BS>
+    : SEE: http://www.ibb.net/~anne/keyboard.html
+    :NO: bind-key -n C-h send-keys Escape "[104;5u"
+  2016-07-21 [X] THINK Maybe, use systemd to run first session?
+    := Proc: works until at least one user session exist
+    https://bbs.archlinux.org/viewtopic.php?id=147118
