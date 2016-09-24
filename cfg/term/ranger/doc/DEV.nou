@@ -1,0 +1,181 @@
+[X] press_enter(),
+  Change std ranger msg core/runner.py:39 to some terminal variable
+  It's to distinguish several outputs easily
+[X] Context
+  Popen, popen_kws, action
+    < Need use 'executable' arg
+      https://docs.python.org/2/library/subprocess.html#subprocess.Popen
+
+[_] Autocompletion on <Tab> in ':' line
+  : Ability was added in plugin functional
+  : but how to add zsh completion there?
+
+[X] # 1
+  I use zsh with extended globbing, etc, and miss it in ranger.
+  Spawning subshell for one command a time is too slow, comparing to ':'.
+
+[X] # 1.5
+  > I missed the legion of aliases, spawned in zsh.
+  2015-06-02 [X] FIX shell -r cp ./%f /var // sudo: source: command not found  :> disable aliases for sudo
+  : Load aliases to shell (setopt aliases?). Using ~/.zshenv will crash git commands
+  : FIXME: http://askubuntu.com/questions/20953/sudo-source-command-not-found
+  : NOTE: shell -r ... works w/o sourcing, as there are no 'sudo source'
+  : 'map s enter_shell' instead of 'chain shell $SHELL'
+  :   ':shell' -- use $SHELL -i (BUT slow with prezto)
+
+[_] # 2
+  %%s with "..."  around each file. When escaping isn't enough.
+  fix '%d/%f' problem with '' and spaces in name
+
+[X] # 3
+  I never liked the idea of trailing whitespaces in config file.
+  My plugin to vim always discards them on saving.
+  Additional ' ' after command will not make any harm, even if that command don't need it.
+  But you could suppress it by -p0 flag when really-really need such behaviour.
+  So I changed default behaviour to this in sake of consistency with other conf files.
+
+[$] # 3.5
+  Preview of terminal under ranger toggle by one key
+    mapped to ,z
+  But are you need to keep ability scrolling, etc in this preview?
+    Scroll by urxvt embedded instruments
+  Of course yes! How it's done in ranger now?
+
+[_] # 4
+  Multiwindow support. To be able split ranger on two window and make diffs easily
+    ALT (or in addition): shared copy/cut buffers between picked ranger
+    sessions -- to open several rangers and cross-moving files in them
+
+[_] # 5
+  Reset tab number to 1, when there only one tab last.
+  Or shift every tabs numbers to fill gap in sequence.
+  = Impossible -- cause you must be able to undo tab closing!
+
+[$] # 6
+  find on 'f' -- be able to stick to only dir or only files names
+    Simply combine 'filter_inode' and 'find'
+
+[_] # 7 Prompt --
+  For long output (like agi) prompt is more suitable in bottom place.
+  \\=== Press ENTER to continue === (13:53:41) === agi 'some\(' ===>>
+  Last part of this prompt could be written as in actualee script
+  [_] Customizable with embedded macro -- great in conjunction with creating
+      custom macro like date, time, etc
+  Make hooks pre- and post- command execution. Link post- with default prompt.
+  [_] Must output error code of last command
+
+[X] # 8
+  Distinguish action "right" as Editor, and 'L', 'C-j', <CR> as viewers
+  But!!! Complete some end-product before!
+
+[$] # 9
+  For new feature on 'b' -- and ticket for ':filter' -- when hiding dirs
+  and enables 'b' -- there must be only dirs shown! Now it will show nothing.
+    Already done -- all works
+
+[_] Integrate zsh 'j' into ranger -- jumping for relevant directory list
+  := It must sync with ZSH list or completely reuse ZSH 'j'-core.
+
+[_] Virtual file system -- abstraction from filesystem access
+  Will be able to load file with internet link and browse through them
+  as in filesystem. Where tags could be root superfolders and form tag tree inside
+  NOTE: this can be used even for browsing through mindmap or sourcecode!
+    : like callgraph or class diagramm
+
+[_] gv/gV -- jump to last pasted file in current dir, each next press moves to
+  next pasted (if list)
+
+Completely detach ranger interface from filemanager
+: You can use frontend with navigation for all tasks which involve lists of entries!
+  [_] Show all found files inside browser
+    [_] add function to show find results
+      : Ranger already can show all files under dir on 'b'
+  [_] Show any other results -- like from 'ag' -- list of entries
+    Each entry can be opened like any other file, but at specified line/column!
+  [_] Show history of previous commands
+  [_] Errors of make
+
+[_] actualee
+  [X] empty -- dump all, sorted by current first, then others
+  [_] don't execute if has no 'x' in permissions
+  [_] selection -- dump to list all selected files
+  [_] argument -- treat as regex. Filename will match themselves.
+
+[_] Show copying speed around percents on Task view
+[_] Show position/number (like 6/44) in right bottom even when you marking files
+[_] Switch between two last tabs on Tab (works good with <F-..> tab_open ..)
+[_] Switch to previous tab, by pressing on current tab button <F-..> again
+[_] Viewer on 'I' -- select text by mouse, cursor enable for kbd select
+[_] Viewer/lister -- search/highlight/copy text in 'I' regime (maybe urxvt is enough?)
+[_] To be able to edit list of yanked files -- need to add function 'mark_yanked' similar to 'mark_tag'
+
+  [_] 'cp' -- cd on path in buffer, if file -- select it
+    2015-09-23 [X] cd in dir of file
+    [_] select each file from clipboard
+    [_] THINK use regex to extract all pathes from any text, or only exact pathes?
+    [_] THINK Check validity with my urxvt path regex?
+
+  DEV Send:
+  : from subprocess import Popen, PIPE
+  : p = Popen(['xsel','-ob'], stdin=PIPE)
+  : p.communicate(input='Hello, World')
+
+DEV
+  [_] Ipc with interactive zsh instance in separate thread.
+    := Seems like it will need headless terminal emulator written in python?
+    := Sockets are better: http://www.theochem.uni-duisburg.de/cgi-bin/info2www?(zsh)The+zsh/net/socket+Module
+    :http://www.zsh.org/mla/users/2007/msg00785.html
+    :SEE: tmux-vim async integration -- how vim launches commands inside separate panel
+    Faster -- as it loads once and always works
+    Relaunching when it crashes
+    All aliases and abilities can be available from ranger's ':'
+    SEE maybe you even be able to create terminal and attach that
+      background zsh to it? However, scrollback will not be restored?
+
+  [_] Being at '/', left panel is empty -- but you can use it for network/bookmarks!
+    Also, using that panel -- you must not do it central, simply move focus and control to left
+    Such behaviour may be possible for any path! Being anywhere open list on left and choose!
+
+  [_] DEV: on press 'f' of '/' highlight or underline 'minimal unique letters' in file list
+    : so you will instantly see shortest keystroke to jump.
+    [_] Highlight on all three columns -- use previous and next folder also?
+    : You can create highlight, but before actual jump you will need
+    : automatically move in prev/next folder
+    [_] Highlight pressed keystrokes on all files in dir
+    [_] Highlighting numbers of preview lines (3rd column) -- to open in vim exactly at that line
+    SEE: two possible cases (add switcher) -- one-time and interactive
+    : Cases can be linked with :findfy regimes -- filtering / searching
+      [_] Create global unique codes for whole directory once on 'f' press
+      [_] On each letter press, when dir is filtered, rebuild unique codes for remained files
+      : Of course, only remaining part of word (after last letter
+      : in :findfy) must be taken into account
+    [_] More simple variant -- set marks as in browser -- linear
+        alphabetical, not dependent on name, only on position
+      : on HD it will be 40-80 marks depending on font size
+    [_] OPTION -- show hints permanently -- then browse using whole keyboard in one stroke
+
+scope.sh
+  [_] toggle between current text previewers : default, hex, ag
+    := Possible -- through setting env variables on scope.sh launch
+    := So you tried explicit, than starts fallback sequence
+  [_] add 'ag' previewer
+    := Exec ':view ag' then flip through files -- in pager you will see matches
+    := use 'limit matches' option when preview
+    THINK enable 'ag preview' only on pair with populating dir by results filelist?
+    := Then I could inspect files one-by-one
+
+ag integration
+  [_] Combine with native ':grep' command to make unified backend
+  [_] Populate current dir with flat files, filtered by 'find' results on 'F'
+    := similarly as it was did in :flat command
+  2015-12-23 [X] DEV: if files list is filtered -- use it instead of current dir
+  2015-12-23 [X] DEV: support for paths from 'b' -- flat directory view
+  2015-12-23 [X] BUG:  don't support pattern with spaces in quotes '' / ""
+ [_] ar | load matching filelist into ranger panel to choose
+    ~ load all files as flat list
+    * BETTER keep tree but filter only matching files in each dir
+      => then I will be able to flatten on 'b'
+ [_] am | same as *ar*, but directly load matches -- to jump on them
+    => need virtual filenames like 'file:lnum:col:match'
+    OR show only 'file:lnum:col' and list matches in preview
+      => need virtual files to work with preview

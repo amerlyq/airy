@@ -38,6 +38,9 @@ class ag(Command):
         return patt[1:-1] if ag.qarg.match(patt) else patt
 
     def _aug_vim(self, iarg, comm='Ag'):
+        if self.arg(iarg) == '-Q':
+            self.shift()
+            comm = 'sil AgSet def.e.literal 1|' + comm
         # patt = self._quot(self._arg(iarg))
         patt = self._arg(iarg)  # No need to quote in new ag.vim
         # FIXME:(add support)  'AgPaths' + self._sel()
@@ -59,7 +62,7 @@ class ag(Command):
         if self.arg(1) == '-v':
             return self._aug_vim(2, 'Ag')
         elif self.arg(1) == '-g':
-            return self._aug_vim(2, 'AgGroup')
+            return self._aug_vim(2, 'sil AgView grp|Ag')
         elif self.arg(1) == '-l':
             return self._aug_sh(2, ['--files-with-matches', '--count'])
         elif self.arg(1) == '-p':  # paths
