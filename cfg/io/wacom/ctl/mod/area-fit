@@ -1,0 +1,71 @@
+#!/bin/bc -ql
+# SEE: http://www.linuxjournal.com/article/2544
+
+# Args
+ax=read()  # bbox area top left x (def=0)
+ay=read()  # bbox area top left y (def=0)
+aw=read()-ax  # bbox area width (def=31496)
+ah=read()-ay  # bbox area height (def=19685)
+ro=read()  # rotation of tablet (def=0)
+
+ow=read()  # output width (def=3840)
+oh=read()  # output height (def=2160)
+gx=read()  # zone rect pos x in % (def=0)
+gy=read()  # zone rect pos y in % (def=0)
+
+
+# Pre-evaluated constants
+aa = aw / ah  # area aspect
+oa = ow / oh  # output aspect
+
+# REF ----------| cr sr | pr mr |1-m 1-p
+#   0: +(ax,ay) |  1  0 |  1  1 |  0  0
+#  90: +(aX,ay) |  0  1 |  1 -1 |  1  0
+# 180: +(aX,aY) | -1  0 | -1 -1 |  1  1
+# -90: +(ax,aY) |  0 -1 | -1  1 |  0  1
+
+ro = 2*a(1) * ro/90  # ro to radians
+cr = c(ro)  # cos(ro)
+sr = s(ro)  # sin(ro)
+pr = cr + sr  # plus
+mr = cr - sr  # minus
+
+
+# Common
+define round(x) { auto z,r; z=scale; scale=0
+  r=(x + 0.5)/1; scale=z; return r }
+
+
+# Relative zone rect at rotated area (sticks to side)
+# TODO rot =~ cw && swap $ow <-> $oh OR na = $oh / $ow
+if (oa >= aa) {  # fit to tablet width
+  zw = aw
+  zh = aw/oa
+  zx = ax
+  zy = round(ay + gy/100*(ah - zh))
+} else {  # fit to tablet height
+  zw = ah*oa
+  zh = ah
+  zx = round(ax + gx/100*(aw - zw))
+  zy = ay
+}
+
+
+# Rect top-left and bottom-right pts in origin CS
+x0 = zx + zw*(1 - pr)/2
+y0 = zy + zh*(1 - mr)/2
+x1 = zx + zw*(1 + pr)/2
+y1 = zy + zh*(1 + mr)/2
+
+# Basis shift relative to origin CS
+bx = ax + aw*(1 - mr)/2
+by = ay + ah*(1 - pr)/2
+
+# Transform zone pts to origin CS basis
+define void csrot(x,y) {
+  x_ = bx + x*cr - y*sr
+  y_ = by + x*sr + y*cr
+}
+
+csrot(x0,y0); print x_," ",y_," "
+csrot(x1,y1); print x_," ",y_,"\n"

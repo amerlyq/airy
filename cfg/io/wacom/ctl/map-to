@@ -10,12 +10,17 @@ rotate=$2       # [none|half|cw|ccw]
 output=desktop  # [ {<output>|1..9} | {desktop|0} | {WxH+X+Y|%WxH+X+Y} | next ]
 region=cursor   # [full|center|cursor|WxH+X+Y] -- use WxH+X+Y relative to $output ?
 
+# NEED: f(rot): use effective width/height
+# %WxH+X+Y: W = %W*ew, X = %X*(ew-W)
 
 # Query wacom =================================================================
 sid=$(wacom-ids 'STYLUS')
 [[ $mode ]] || mode=$(cache-get map area)
 cache-set map "$mode"
+
 [[ $rotate ]] || read -r rotate < <(wacom-rotation "$sid")
+declare -A _rot=([none]=0 [cw]=90 [half]=180 [ccw]=-90)
+ro=$(( ${_rot[$rotate]:?} ))
 
 IFS=' ' read -r ax ay aX aY < <(wacom-area-max "$sid")
 aw=$((aX-ax))
@@ -81,18 +86,18 @@ frame_cursor(){ local zoom=${1:?}
 # Adjust ======================================================================
 case ${mode:?}
 in area)   # adjust area to full output
-  # BAD: no rotation
+  # DEV:TODO: rotation
+  # BAD: we must compare aspects _after_ rotate
+  #   $oa >= $aa (16:9 > 16:10 && 16:9 > 10:16)
+  #   $oa <  $aa (9:16 < 16:10 && 9:16 < 10:16) rotated monitor
+  #   BUT (4:3 < 16:10 && 4:3 > 10:16)
+  #
+  # IDEA: by setting DFL:$a* beforehand -- you may adjust (shrink)
+  #   bounding box to additionally fit/scale active zone on any rotate
+
   frame=$output
-  if (( $(bc -l <<< "$oa >= $aa") ))
-  then  # fit to tablet width
-    read -r ny nY < <(bc -l <<< "h=$aw/$oa; y=$ay+$ag/100*($ah - h);"'
-                      scale=0; print y/1," ",(y+h)/1,"\n"')
-    area="$ax $ny $aX $nY"
-  else  # fit to tablet height
-    read -r nx nX < <(bc -l <<< "w=$ah*$oa; x=$ax+$ag/100*($aw - w);"'
-                      scale=0; print x/1," ",(x+w)/1,"\n"')
-    area="$nx $ay $nX $aY"
-  fi
+  area=$(printf '%s %s %s\n' "${ax:?} ${ay:?} ${aX:?} ${aY:?} ${ro:?}" \
+    "${ow:?} ${oh:?}" "${gx:?} ${gy:?}" | area-fit)
 
 ;; frame)  # adjust frame to full tablet
   # BAD: wrong mx/my for dual-screen (need shift bias to output)
