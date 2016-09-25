@@ -43,7 +43,7 @@ endif
 
 
 "{{{1 Completion ============================
-set matchpairs+=<:>,=:;     " Match pairs (NOTE ;/= is useful for C/Java)
+set matchpairs+=<:>     " Match pairs
 set infercase       " ignore case on insert completion.
 " In python this scratch window made me angry
 " autocmd FileType python setlocal completeopt-=preview
