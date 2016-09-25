@@ -69,14 +69,43 @@ class ag(Command):
             return self._aug_sh(2, ['-g'])
         elif self.arg(1) == '-f':
             return self._aug_sh(2, [])
+        elif self.arg(1) == '-r':
+            return self._aug_sh(2, ['--files-with-matches'])
         else:
             return self._aug_sh(1, [])
+
+    def _catch(self, cmd):
+        from subprocess import check_output, CalledProcessError
+        try:
+            out = check_output(cmd)
+        except CalledProcessError:
+            return None
+        else:
+            return out[:-1].decode('utf-8').splitlines()
+
+    # DEV
+    # NOTE: regex becomes very big for big dirs
+    # BAD: flat ignores 'filter' for nested dirs
+    def _filter(self, lst, thisdir):
+        # filter /^rel_dir/ on lst
+        # get leftmost path elements
+        # make regex '^' + '|'.join(re.escape(nm)) + '$'
+        thisdir.temporary_filter = re.compile(file_with_matches)
+        thisdir.refilter()
+
+        for f in thisdir.files_all:
+            if f.is_directory:
+                # DEV: each time filter-out one level of files from lst
+                self._filter(lst, f)
 
     def execute(self):
         cmd, flags = self._choose()
         # self.fm.notify(cmd)
         # TODO:ENH: cmd may be [..] -- no need to shell_escape
-        self.fm.execute_command(cmd, flags=flags)
+        if self.arg(1) != '-r':
+            self.fm.execute_command(cmd, flags=flags)
+        else:
+            self._filter(self._catch(cmd))
 
     def tab(self):
         return ['{} {}'.format(self.arg(0), p)
@@ -342,7 +371,7 @@ class flat_inode(Command):
         self.fm.execute_console(cmd)
 
     def tab(self):
-        return list('dfl')
+        return ['flat_inode ' + t for t in 'dfl']
 
 
 class edit(Command):
@@ -361,3 +390,17 @@ class edit(Command):
 
     def tab(self):
         return self._tab_directory_content()
+
+
+class unfilter(Command):
+    def unfilter(self, d):
+        # BAD: d.files_all == None ???
+        # [self.unfilter(f) for f in d.files_all if f.is_directory]
+        d.filter = None
+        d.refilter()
+        # for f in d.files_all:
+        #     if f.is_directory:
+        #         self.unfilter(f)
+
+    def execute(self):
+        self.unfilter(self.fm.thisdir)

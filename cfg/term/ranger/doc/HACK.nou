@@ -1,0 +1,113 @@
+TODO
+  NEED scan ranger sources
+    FIND concrete code parts to rewrite which I will touch
+      = attach refs to the issue
+      = point concrete actions I will take in rewriting
+    Gather more usecases which demand such refactoring
+  FIND each and every file manager (Windows/Linux/Android)
+    !!! compare with vifm
+      https://github.com/vifm
+    = SEE integration features with system/apps/services
+    = THINK how tree-structure used in them
+  [_] Sam's structural regex -- apply to files in dir
+  [_] Operation undo history -- also view in ranger's tree view
+
+NOTE: completely fork-out
+  I need to read all the issues/pull-req on ranger/vifm
+    => Because there may contain some great vision
+  ? is there need for compatibility with python2 ?
+  ? MAYBE use C++ or haskell instead of python ?
+    BUT vifm has 104k lines in C vs ranger 15k in python
+    SEE
+      https://github.com/hasufell/hsfm
+      https://github.com/michaeldever/haskellfm
+    TUI
+      http://stackoverflow.com/questions/6924009/hscurses-or-ncurses-which-one-to-use
+      https://www.reddit.com/r/haskell/comments/31maqb/textual_ui_in_haskell/
+  => Anyway, I can use 'ranger' as prototype and integrate my ideas there first
+  and then use its architecture and found flaws to develop C++/haskell variant
+  => ALSO:(reverse-prototype) I can develop simple skeleton with my splitted
+  architecture to test my vision before refactoring ranger codebase in its direction
+    * it also allows to test ideas directly in my small framework
+    * this prototype will be the first step for haskell port
+
+ALT
+  Similar Ideology:
+    https://wiki.haskell.org/Manatee
+      https://hackage.haskell.org/package/manatee-filemanager
+
+
+Refactoring and evolution
+  IDEA: reasons
+    Usability
+      tiling WM -- many instances in many terminals
+      low usability of task manager
+      low usability of preview window
+    Performance
+      slow access / dir listing
+        kernel/firmware sources
+        always slow flattening
+        when I need load all recursive -- for 'ag' search results
+    splitted modules
+      don't load all python code at once
+      future extensibility
+    Problems with functionality
+      vim great -- because it's somewhat more universal interface than ranger
+      slow fs -- like network fs with slow ping : sshfs, curlfs, nfs, imapfs
+        > disable metainfo/preview only for choosen dirs
+      many hardcoded defaults/routines which are impossible to extend/disable
+        ~ like using file.basename in directory.py/refilter()
+        ~ or always loading file metainfo on directory read
+      open vim inside ranger inside vim -- need to return action
+
+  SPLIT:
+    [$] riffle -- as independent program (like actualee)
+      - allow to use it independently from shell
+      >> Already exists installed '/usr/bin/rifle' from 'ranger/scripts'
+    * low-level independent accessors
+      - possible to replace choosen ones by imported C .so
+    * virtualized tree-structure to represent any tree info
+      >> prowide instruments to work with trees
+        * textobj and operators
+        * substitution on selection with virtual backup and showing post-diff
+        * load and parse output directly from tools -- use ranger as viewer for their output
+      >> integration with graphviz to interpret graphs in one click
+      - filesystem
+      - lists of yanked/tagged/etc -- i.a. recursive
+      - 'find' results
+      - ag :: search matches
+      - cscope :: namespace/class/function
+      - nou :: outlines
+      - mailbox, etc
+      - fs tree diff / rsync diff
+      - ps processes flat/tree
+      - installed packages
+      - logs
+        * so, you can grep some matching lines, and move them into subdirs to organize investigation
+      - elf/pe headers structure, symbols and functions objdumps in preview
+      - web navigation -- extract links list
+      - mp3 splitted by soundcloud-like wavefront
+      - music src like fruity-loops splitted by instruments
+      - mindmaps
+      - ncmpcpp integration
+      - mutt integration
+      - pidgin integration
+        = dirs as users, files as date + user + message's oneline summary, preview -- complete message
+    * flexible interchangable ifc
+      - ranger-like three panels
+      - total-commander like two panels
+      - quadro-commander like four-panels
+      - allow preview to represent custom info
+        * allow info directly from python libs, not only from scope.sh
+      - custom one-panel with 5 micro preview at bottom for each path element
+      - sublime-like dir preview
+    * embedding into other gui
+      >> also embedding nvim into ranger
+      - ncurses
+      - nvim / gvim
+      - browser, etc
+    * allow toggleable server-mode (vim-like)
+      - connect to same background ranger instance on demand
+      - share choosen info between instances
+      - keep background interactive shell (eliminate its startup time)
+        = seems like I need nvim-like virtual terminal to virtualize IA with term escape codes
