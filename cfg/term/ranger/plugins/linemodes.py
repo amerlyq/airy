@@ -1,8 +1,11 @@
 # USAGE: :linemode <name>
 
+import os
+import re
+from time import strftime, localtime
+
 import ranger.api
 from ranger.core.linemode import LinemodeBase
-from time import strftime, localtime
 
 
 @ranger.api.register_linemode
@@ -17,6 +20,21 @@ class BytesizeLinemode(LinemodeBase):
             return str(f.stat.st_size)
         else:
             raise NotImplementedError
+
+
+@ranger.api.register_linemode
+class LinksLinemode(LinemodeBase):
+    name = "links"
+
+    def filetitle(self, f, metadata):
+        if not f.is_link:
+            return f.relative_path
+        try:
+            dst = os.readlink(f.path)
+        except:
+            dst = '?'
+        dst = re.sub('^' + re.escape(os.getenv('HOME')), '~', dst)
+        return '{} → {}'.format(f.relative_path, dst)
 
 
 @ranger.api.register_linemode
