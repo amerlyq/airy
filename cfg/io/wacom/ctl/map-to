@@ -86,18 +86,12 @@ frame_cursor(){ local zoom=${1:?}
 # Adjust ======================================================================
 case ${mode:?}
 in area)   # adjust area to full output
-  # DEV:TODO: rotation
-  # BAD: we must compare aspects _after_ rotate
-  #   $oa >= $aa (16:9 > 16:10 && 16:9 > 10:16)
-  #   $oa <  $aa (9:16 < 16:10 && 9:16 < 10:16) rotated monitor
-  #   BUT (4:3 < 16:10 && 4:3 > 10:16)
-  #
   # IDEA: by setting DFL:$a* beforehand -- you may adjust (shrink)
   #   bounding box to additionally fit/scale active zone on any rotate
-
   frame=$output
-  area=$(printf '%s %s %s\n' "${ax:?} ${ay:?} ${aX:?} ${aY:?} ${ro:?}" \
-    "${ow:?} ${oh:?}" "${gx:?} ${gy:?}" | area-fit)
+  area=$(printf '%s %s %s\n' \
+    "${ax:?} ${ay:?} ${aX:?} ${aY:?}"  "${ow:?} ${oh:?}" \
+    "${gx:?} ${gy:?} ${gw:?} ${gh:?} ${ro:?}" | area-fit)
 
 ;; frame)  # adjust frame to full tablet
   # BAD: wrong mx/my for dual-screen (need shift bias to output)

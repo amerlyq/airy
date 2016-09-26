@@ -2,27 +2,36 @@
 # SEE: http://www.linuxjournal.com/article/2544
 
 # Args
+# (gx,gy): 0,0 -- top-left, 50,50 -- center
+
 ax=read()  # bbox area top left x (def=0)
 ay=read()  # bbox area top left y (def=0)
-aw=read()-ax  # bbox area width (def=31496)
+aw=read()-ax  # bbox area width  (def=31496)
 ah=read()-ay  # bbox area height (def=19685)
+
+ow=read()  # output width  (def=3840)
+oh=read()  # output height (def=2160)
+
+gx=read()/100  # zone rect rel pos x in % (def=0)
+gy=read()/100  # zone rect rel pos y in % (def=0)
+gw=read()/100  # zone rect rel width  in % (def=0: fit)
+gh=read()/100  # zone rect rel height in % (def=0: fit)
+
 ro=read()  # rotation of tablet (def=0)
 
-ow=read()  # output width (def=3840)
-oh=read()  # output height (def=2160)
-gx=read()  # zone rect pos x in % (def=0)
-gy=read()  # zone rect pos y in % (def=0)
+
+# Common
+define abs(x) { if (x>=0) { return x } else { return -x } }
+define round(x) { auto z,r; z=scale; scale=0
+  r=(x + 0.5)/1; scale=z; return r }
 
 
-# Pre-evaluated constants
-aa = aw / ah  # area aspect
-oa = ow / oh  # output aspect
-
-# REF ----------| cr sr | pr mr |1-m 1-p
+## Pre-evaluated constants
+# REF ----------| cr sr | pr mr |1-p 1-m
 #   0: +(ax,ay) |  1  0 |  1  1 |  0  0
-#  90: +(aX,ay) |  0  1 |  1 -1 |  1  0
+#  90: +(aX,ay) |  0  1 |  1 -1 |  0  1
 # 180: +(aX,aY) | -1  0 | -1 -1 |  1  1
-# -90: +(ax,aY) |  0 -1 | -1  1 |  0  1
+# -90: +(ax,aY) |  0 -1 | -1  1 |  1  0
 
 ro = 2*a(1) * ro/90  # ro to radians
 cr = c(ro)  # cos(ro)
@@ -31,27 +40,46 @@ pr = cr + sr  # plus
 mr = cr - sr  # minus
 
 
-# Common
-define round(x) { auto z,r; z=scale; scale=0
-  r=(x + 0.5)/1; scale=z; return r }
+# Effective width/height of rotated tablet
+if (round(abs(cr))) { ew=aw; eh=ah; } else { ew=ah; eh=aw; }
+ea = ew/eh  # effective area aspect
+oa = ow/oh  # output aspect
 
 
-# Relative zone rect at rotated area (sticks to side)
-# TODO rot =~ cw && swap $ow <-> $oh OR na = $oh / $ow
-if (oa >= aa) {  # fit to tablet width
-  zw = aw
-  zh = aw/oa
-  zx = ax
-  zy = round(ay + gy/100*(ah - zh))
-} else {  # fit to tablet height
-  zw = ah*oa
-  zh = ah
-  zx = round(ax + gx/100*(aw - zw))
-  zy = ay
+## Relative zone rect at rotated area (sticks to side)
+if (gw == 0 && gh == 0) {
+  # Fit to tablet width/height
+  if (ea <= oa) { zw=ew; zh=zw/oa; } else { zh=eh; zw=zh*oa }
+  #  $oa >= $aa (16:9 > 16:10 && 16:9 > 10:16) landscape
+  #  $oa <  $aa (9:16 < 16:10 && 9:16 < 10:16) portret
+  #  $oa ?? $aa ( 4:3 < 16:10 &&  4:3 > 10:16) mixed
+} else if (gw !=0 && gh !=0) {
+  # Force rect aspect
+  #   => anisotropic scaling is active only if _both_ area and frame were fixed
+  #   => frame imports area aspect if fw,fh=0 (frame auto-fit)
+  # ALT: force gw|gh depending on ea/oa, and fit another dimension
+  #   => BUT then we lose ability to force aspect
+  zw=gw*ew
+  zh=gh*eh
 }
+# WTF?TODO when only one (gw !=0 ^ gh !=0)
+#   * force gw|gh i.e. landscape and fit for portret
+#     * rather inconsistent in usage -- THINK: all cases possible
+#   * force gw|gh only when possible (shrink down), fit otherwise
+#     ? seems nice, but rather nonoptimal ifc?
+#   * always force gw|gh and then crop frame (where excessive)
+#     ? wouldn't liked to affect frame here -- too tight coupling
+
+# Relative positioning
+zx = gx*(ew - zw)
+zy = gy*(eh - zh)
 
 
 # Rect top-left and bottom-right pts in origin CS
+#   0   |   90  |  180  |  -90  |
+# zx,zy | zx,zY | zX,zY | zX,zy |
+# zX,zY | zX,zy | zx,zy | zx,zY |
+
 x0 = zx + zw*(1 - pr)/2
 y0 = zy + zh*(1 - mr)/2
 x1 = zx + zw*(1 + pr)/2
@@ -63,9 +91,12 @@ by = ay + ah*(1 - pr)/2
 
 # Transform zone pts to origin CS basis
 define void csrot(x,y) {
-  x_ = bx + x*cr - y*sr
-  y_ = by + x*sr + y*cr
+  x_ = round(bx + x*cr - y*sr)
+  y_ = round(by + x*sr + y*cr)
 }
 
+# DEV:ALSO: print resulting frame
+#   => because I need access to z* for f* fitting
 csrot(x0,y0); print x_," ",y_," "
 csrot(x1,y1); print x_," ",y_,"\n"
+quit
