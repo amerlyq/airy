@@ -7,6 +7,28 @@ Area aspect ratio
     Wide: 16:10 = 1.600
     A4:  sqrt 2 = 1.414
 
+Modes
+  # pp - parametric
+  100z100  100w100
+    fixed rects
+    distort aspect
+    ignore *pp*
+  100z100  100w0
+    derive single '0' dim by opposite aspect
+    allows out-of-bounds dim
+    *pp*=0..1 for fit..distort
+      use remaining dim till screen edge if originally smaller
+      use whole screen till whole dim if out-of-bounds
+  100z100  0w0
+    derive both '0' as earlier
+    fit both dims inside screen rect
+  0z0  0w0
+    *pp*=0..1 for tablet..screen
+
+  WzH  WwH
+    -- additionally move rect by gx,gy
+
+
 %% Regimes %% (keep aspect)
   ? [_] THINK practical application for deformed aspect
   Full scale
