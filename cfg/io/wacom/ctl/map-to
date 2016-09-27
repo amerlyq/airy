@@ -1,6 +1,6 @@
 #!/bin/bash -e
 SWD=$(readlink -e "$0"); SWD=${SWD%/*}
-PATH=$SWD/get:$SWD/set:$PATH
+PATH=$SWD/get:$SWD/mod:$SWD/set:$PATH
 set -o pipefail
 
 # BAD: time ./$0 => 40..120 mS
@@ -88,10 +88,23 @@ case ${mode:?}
 in area)   # adjust area to full output
   # IDEA: by setting DFL:$a* beforehand -- you may adjust (shrink)
   #   bounding box to additionally fit/scale active zone on any rotate
-  frame=$output
-  area=$(printf '%s %s %s\n' \
-    "${ax:?} ${ay:?} ${aX:?} ${aY:?}"  "${ow:?} ${oh:?}" \
-    "${gx:?} ${gy:?} ${gw:?} ${gh:?} ${ro:?}" | area-fit)
+
+  # THINK: how directly convert '%' -> 0 for gz ?
+  # TRY: directly catch whole rect in var like $ IFS='% x+' read -r area <<< "$4"
+  # THINK: how extract '+' or '-' separators to extract from bottom-right?
+  #   <= WxH-X-Y -- counted from bottom right also allowed format?
+
+  IFS='% x+' read -r gz gw gh gx gy <<< "0 %0x0+0+0"
+  IFS='% x+' read -r fz fw fh fx fy <<< "0 %0x0+0+0"
+
+  readarray -tn2 out < <(area-frame <<< "
+    ${ro:?} ${ax:?} ${ay:?} ${aX:?} ${aY:?}
+            ${ow:?} ${oh:?} ${ox:?} ${oy:?}
+    ${gz:?} ${gx:?} ${gy:?} ${gw:?} ${gh:?}
+    ${fz:?} ${fw:?} ${fh:?} ${fx:?} ${fy:?}
+  ")
+  area=${out[0]}
+  frame=${out[1]}
 
 ;; frame)  # adjust frame to full tablet
   # BAD: wrong mx/my for dual-screen (need shift bias to output)
