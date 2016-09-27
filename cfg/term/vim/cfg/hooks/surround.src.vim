@@ -7,12 +7,12 @@ let g:operator#surround#blocks = {'-': [
   \ {'block': ['${', '}'], 'motionwise': ['char', 'line'], 'keys': ['$', '4']}
   \] +
   \ map(split('();{};[]', ';'), "{
-  \  'keys' : [v:val[0]],
+  \  'keys' : [v:val[1]],
   \  'block': [v:val[0].' ', ' '.v:val[1]],
   \  'motionwise' : ['char', 'line', 'block'],
   \ }") +
   \ map(split(g:block_aliases, ';'), "{
-  \  'keys' : split(v:val[-2:], '\\zs'),
+  \  'keys' : [v:val[0], v:val[-1]],
   \  'block': split(v:val[-3:-2], '\\zs'),
   \  'motionwise' : ['char', 'line', 'block'],
   \ }") }
