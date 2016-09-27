@@ -1,0 +1,6 @@
+#!/bin/sh
+exec /usr/bin/env -i -- \
+  PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin" \
+  SHELL=/bin/bash SHLVL=1 LANG="$LANG" TERM="$TERM" \
+  USER="$USER" HOME="$HOME" \
+  "$@"
