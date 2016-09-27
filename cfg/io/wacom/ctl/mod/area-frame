@@ -1,5 +1,6 @@
 #!/bin/bc -ql
 # SEE:(bc) http://www.linuxjournal.com/article/2544
+# E.G: http://phodd.net/gnu-bc/index.html#logic
 
 # NOTE:
 #   z0x0,w0x0 -> z0x0,w100x100 = full fit
@@ -57,15 +58,18 @@ fx=read()/100  # frame rel pos x  in % (def=0)
 fy=read()/100  # frame rel pos y  in % (def=0)
 
 ###############################################################################
-## Common
-define abs(x) { if (x>=0) { return x } else { return -x } }
+## Functions
+define abs(x) { if (x>=0) return x else return -x }
+define max(x,y) { if (x>=y) return x else return y }
+define min(x,y) { if (x<=y) return x else return y }
+define xor(x,y) { return !((!x)-(!y)) }  # CHECK: if need round(..)
 define round(x) { auto z,r; z=scale; scale=0
   r=(x + 0.5)/1; scale=z; return r }
 
 # Transform zone pts to origin CS basis
 define void csrot(x,y) {
-  x_ = round(bx + x*cr - y*sr)
-  y_ = round(by + x*sr + y*cr)
+  x_ = bx + x*cr - y*sr
+  y_ = by + x*sr + y*cr
 }
 
 
@@ -90,12 +94,50 @@ by = ay + ah*(1 - pr)/2
 ###############################################################################
 ## Defaults
 # Effective width/height of rotated tablet
-if (round(abs(cr))) { ew=aw; eh=ah; } else { ew=ah; eh=aw; }
+if (round(abs(cr))) { ew=aw; eh=ah } else { ew=ah; eh=aw }
 ea = ew/eh  # effective area aspect
 oa = ow/oh  # output aspect
 
-# Prefer tablet shrink to screen
-if (gw==0 && gh==0 && ww==0 && wh==0) { ww=100; wh=100 }
+# Eval max *w,*h beforehand
+if (gw==0) zw=ew else zw=gw*ew
+if (gh==0) zh=eh else zh=gh*eh
+if (fw==0) ww=ow else ww=fw*ow
+if (fh==0) wh=oh else wh=fh*oh
+
+za = zw/zh
+wa = ww/wh
+
+# aspect of max rect bounded to whole screen
+# FIND How to derive zx,zy before zw,zh -- if them are specified in percent?
+#    :: for this case zw=f(zx) -> so ignore width: zx=gx*ow, zw=ow-zx
+# THINK more profound alg to involve relative gx instead of absolute
+#   * zx = gx*(ew - zw); zw = ew - zx/gx;
+#   => must only affect side which is ==0
+if (gw==0 && gh!=0 && fw!=0 && fh==0) { zx=gx*ew; wx=fx*ow }
+if (gw!=0 && gh==0 && fw==0 && fh!=0) { zy=gy*ew; wy=fy*ow }
+
+# ALT: directly modify zw,zh,ww,wh instead of using zb,wb if it's third case
+zb = (ew-zx)/(eh-zy)
+wb = (ow-wx)/(oh-wy)
+
+if (gw!=0 && gh!=0 && fw!=0 && fh!=0) {  }  # Fixed rects
+else if (gw==0 && gh==0 && fw==0 && fh==0) { za = wa }    # Defaults (fit to screen)
+else if (gw!=0 && gh!=0 && (fw==0 || fh==0)) { wa = za }  # Fit to tablet
+else if ((gw==0 || gh==0) && fw!=0 && fh!=0) { za = wa }  # Fit to screen
+# Max fit intersection
+# else if (xor(gw,fw) && xor(gh,fh)) {
+else if (gw!=0 && gh==0 && fw!=0 && fh==0) { wa = za = max(zb,wb) }  # zWx0 wWx0
+else if (gw==0 && gh!=0 && fw==0 && fh!=0) { wa = za = min(zb,wb) }  # z0xH w0xH
+# Which aspect is preffered ?
+#   * check boundary conditions for %100x0+0+0
+#   * use coef (non-linear) pa (preffered aspect)
+#     -- to morph between bounded area and bounded window aspects
+#       wa = za = pa*zb + (1-pa)*wb   # CHECK if true for landscape/portret/mixed combo
+#         => Not enough -- you also need to fit into matching region
+#   => in case of fitting -> need to correct resulting both zw,zh and ww,wh
+#
+else if (gw!=0 && gh==0 && fw==0 && fh!=0) { wa = za = ?? }  # zWx0 w0xH
+else if (gw==0 && gh!=0 && fw!=0 && fh==0) { wa = za = ?? }  # z0xH wWx0
 
 
 ###############################################################################
@@ -103,32 +145,17 @@ if (gw==0 && gh==0 && ww==0 && wh==0) { ww=100; wh=100 }
 #  $oa >= $aa (16:9 > 16:10 && 16:9 > 10:16) landscape
 #  $oa <  $aa (9:16 < 16:10 && 9:16 < 10:16) portret
 #  $oa ?? $aa ( 4:3 < 16:10 &&  4:3 > 10:16) mixed
-
-# FIXME:USE za=wa -- but how to re-order this recursive dep?
-#   * gw!=0&&gh!=0 -- no need for za
-#   * gw!=0&&fw!=0 -- max fit intersection ? THINK
-za = oa
-if (gw==0) zw=ew else zw=gw*ew
-if (gh==0) zh=eh else zh=gh*eh
+# THINK: use zb,wb instead of ea,za for fitting rect ?
 if (gw==0 && (gh!=0 || ea> za)) zw=zh*za
 if (gh==0 && (gw!=0 || ea<=za)) zh=zw/za
-za = zw/zh
-
-# Relative positioning
 zx = gx*(ew - zw)
 zy = gy*(eh - zh)
 
 
 ###############################################################################
 ## Window for frame
-wa = za
-if (fw==0) ww=ow else ww=fw*ow
-if (fh==0) wh=oh else wh=fh*oh
 if (fw==0 && (fh!=0 || oa> wa)) ww=wh*wa
 if (fh==0 && (fw!=0 || oa<=wa)) wh=ww/wa
-wa = ww/wh
-
-# Screen window positioning
 wx = ox + fx*(ow - ww)
 wy = oy + fy*(oh - wh)
 
@@ -147,7 +174,8 @@ y1 = zy + zh*(1 + mr)/2
 ###############################################################################
 ## Output
 # Area (tablet)
-csrot(x0,y0); print x_," ",y_," "
-csrot(x1,y1); print x_," ",y_,"\n"
+csrot(x0,y0); print round(x_)," ",round(y_)," "
+csrot(x1,y1); print round(x_)," ",round(y_),"\n"
 # Frame (output)
-print round(ww),"x",round(wh),"+",round(wx),"+",round(wy),"\n"
+print round(ww),"x",round(wh),"+"
+print round(ox + wx),"+",round(oy + wy),"\n"
