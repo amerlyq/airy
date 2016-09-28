@@ -17,6 +17,7 @@ call dein#add('tpope/vim-rsi')
 
 "" Motions in _camel_case_ or CamelCase for all modes {{{1
 " ALT:CHECK: - (compare code) https://github.com/machakann/vim-textobj-delimited
+" ALT: https://github.com/Julian/vim-textobj-variable-segment
 " NOT:(needless loading): camelcasemotion#CreateMotionMappings('<leader>')
 " DEPRECATED:
 "   - (inferior) lucapette/vim-textobj-underscore
