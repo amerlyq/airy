@@ -13,7 +13,7 @@ Modes
   #   -- as actually I need to enable _fitting_ and not _distorting_
   #   -- BUT I already use '0' in WxH to enable auto-derive (? auto-derive != fit ?)
   #   ALT: treat fixed size 100z100 only as bbox -- and actually choose fit..distort by pp
-  #   -- BUT what about cross-derive morph: 0z100 100w0 ?
+  #   -- BUT what about cross-derive morph/blend: 0z100 100w0 ?
   Full-full: 100z100  100w100
     fixed rects
     distort aspect
@@ -23,6 +23,7 @@ Modes
       *fy* to align
     allows out-of-bounds dim
       *fy* to pan (the same align to sides)
+    *pp*=0..1 : fit=inner..outer
     *pp*=0..1 for fit..distort
       use remaining dim till screen edge if originally smaller
       use whole screen till whole dim if out-of-bounds
@@ -34,16 +35,23 @@ Modes
     *pp*=0..1 to prefer tablet..screen
     ? behavior, if enabled auto-derive but not fit?
       ~ then it will be out-of-bounds
+  Bind-derive: 100z0  0w0
+    ???
 
-  pp -- prefer (maximize on) tablet..screen
+  *pp* -- prefer (maximize on) tablet..screen
+    * no aspect distortion
+    = *pp*=0..1 ~= `[100x0..0x100]` BUT in relation to Rotate
+      E.G. z16:10 + w9:16
+        | 0.0 | maximize tablet, crop screen
+        | 1.0 | pan tablet, maximize screen
+        | 0.5 | half-pan tablet and half-crop screen
     Derive-maxfit: 100z0  100w0  OR  0z100  0w100
     Derive-derive: 100z0  0w100  OR  0z100  100w0
-    * no aspect distortion
-    * z16:10 vs w9:16
-      p=0.0: maxmize tablet, crop screen
-      p=1.0: pan tablet, maximize screen
-      p=0.5: half-pan tablet and half-crop screen
-    * *fx,fy* align consistently with fixed window
+    * always derive max possible dims
+      - derive max dim even for partial Wx0|0xH
+      - blend between them by *pp*
+      - position by *fx,fy* only after deriving complete
+        ! *fx,fy* align consistently with fixed window
 
   WzH  WwH
     -- additionally move rect by gx,gy
