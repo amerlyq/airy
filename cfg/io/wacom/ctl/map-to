@@ -94,12 +94,13 @@ in area)   # adjust area to full output
   # THINK: how extract '+' or '-' separators to extract from bottom-right?
   #   <= WxH-X-Y -- counted from bottom right also allowed format?
 
+  pp=0  # preferred aspect
   IFS='% x+' read -r gz gw gh gx gy <<< "0 %0x0+0+0"
   IFS='% x+' read -r fz fw fh fx fy <<< "0 %0x0+0+0"
 
   readarray -tn2 out < <(area-frame <<< "
     ${ro:?} ${ax:?} ${ay:?} ${aX:?} ${aY:?}
-            ${ow:?} ${oh:?} ${ox:?} ${oy:?}
+    ${ow:?} ${oh:?} ${ox:?} ${oy:?} ${pp:?}
     ${gz:?} ${gx:?} ${gy:?} ${gw:?} ${gh:?}
     ${fz:?} ${fw:?} ${fh:?} ${fx:?} ${fy:?}
   ")

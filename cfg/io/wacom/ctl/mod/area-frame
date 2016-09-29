@@ -2,35 +2,6 @@
 # SEE:(bc) http://www.linuxjournal.com/article/2544
 # E.G: http://phodd.net/gnu-bc/index.html#logic
 
-# NOTE:
-#   z0x0,w0x0 -> z0x0,w100x100 = full fit
-#   z100x100,w0x0 = reverse fit (dead screen areas)
-# ? z100x0,w0x100 = ???
-#   (gx,gy): 0,0 -- top-left, 50,50 -- center
-
-# DEV: gz,fz -- not in use
-
-# WTF?TODO when only one (gw !=0 ^ gh !=0)
-#   * force gw|gh i.e. landscape and fit for portret
-#     * rather inconsistent in usage -- THINK: all cases possible
-#   * force gw|gh only when possible (shrink down), fit otherwise
-#     ? seems nice, but rather nonoptimal ifc?
-#   * always force gw|gh and then crop frame (where excessive)
-#     ? wouldn't liked to affect frame here -- too tight coupling
-# Force rect aspect
-#   => anisotropic scaling is active only if _both_ area and frame were fixed
-#   => frame imports area aspect if fw,fh=0 (frame auto-fit)
-# ALT: force gw|gh depending on ea/oa, and fit another dimension
-#   => BUT then we lose ability to force aspect
-
-# NOTE: when one of window dims is bigger then output dims -- we pan window (~ 120x240+-10+-10)
-#   BUT: then in dual-screen cursor will move outside of output instead of sticking to the side
-#     => ALT manually reset values to the closest output side
-# ALSO: when zone is larger then area -- similarly pan area
-#   BUT: unintuitive -- because to move active frame on screen we must change
-#     area's gx,gy and vice versa == THINK about it
-
-
 ###############################################################################
 ## Args
 ro=read()  # rotation of tablet (def=0)
@@ -44,6 +15,9 @@ ow=read()  # output width  (def=3840)
 oh=read()  # output height (def=2160)
 ox=read()  # output pos x  (def=0)
 oy=read()  # output pos y  (def=0)
+# Aspect
+# FIND: what if pp!=[0..1]
+pp=read()  # preferred aspect=[tablet..screen]=[0..1] (def=0)
 # Gauge rel rect
 gz=read()      # zone absolute coords (def=0) -- but relative to rotated area ?
 gx=read()/100  # zone rel pos x  in % (def=0)
@@ -63,6 +37,7 @@ define abs(x) { if (x>=0) return x else return -x }
 define max(x,y) { if (x>=y) return x else return y }
 define min(x,y) { if (x<=y) return x else return y }
 define xor(x,y) { return !((!x)-(!y)) }  # CHECK: if need round(..)
+define blend(p,x,y) { return p*x + (1-p)*y }
 define round(x) { auto z,r; z=scale; scale=0
   r=(x + 0.5)/1; scale=z; return r }
 
@@ -71,7 +46,6 @@ define void csrot(x,y) {
   x_ = bx + x*cr - y*sr
   y_ = by + x*sr + y*cr
 }
-
 
 ###############################################################################
 ## Pre-evaluated constants
@@ -98,67 +72,58 @@ if (round(abs(cr))) { ew=aw; eh=ah } else { ew=ah; eh=aw }
 ea = ew/eh  # effective area aspect
 oa = ow/oh  # output aspect
 
-# Eval max *w,*h beforehand
-if (gw==0) zw=ew else zw=gw*ew
-if (gh==0) zh=eh else zh=gh*eh
-if (fw==0) ww=ow else ww=fw*ow
-if (fh==0) wh=oh else wh=fh*oh
-
+# DEV: gz,fz -- not in use
+# THINK:DEV:(force aspect): if (gz,fz==2) aspect=W,H OR directly aspect=gz,fz
+# Assume unadjusted max: *w, *h, *a
+if (!gw) zw=ew else zw=gw*ew
+if (!gh) zh=eh else zh=gh*eh
+if (!fw) ww=ow else ww=fw*ow
+if (!fh) wh=oh else wh=fh*oh
 za = zw/zh
 wa = ww/wh
 
-# aspect of max rect bounded to whole screen
-# FIND How to derive zx,zy before zw,zh -- if them are specified in percent?
-#    :: for this case zw=f(zx) -> so ignore width: zx=gx*ow, zw=ow-zx
-# THINK more profound alg to involve relative gx instead of absolute
-#   * zx = gx*(ew - zw); zw = ew - zx/gx;
-#   => must only affect side which is ==0
-if (gw==0 && gh!=0 && fw!=0 && fh==0) { zx=gx*ew; wx=fx*ow }
-if (gw!=0 && gh==0 && fw==0 && fh!=0) { zy=gy*ew; wy=fy*ow }
-
-# ALT: directly modify zw,zh,ww,wh instead of using zb,wb if it's third case
-zb = (ew-zx)/(eh-zy)
-wb = (ow-wx)/(oh-wy)
-
-if (gw!=0 && gh!=0 && fw!=0 && fh!=0) {  }  # Fixed rects
-else if (gw==0 && gh==0 && fw==0 && fh==0) { za = wa }    # Defaults (fit to screen)
-else if (gw!=0 && gh!=0 && (fw==0 || fh==0)) { wa = za }  # Fit to tablet
-else if ((gw==0 || gh==0) && fw!=0 && fh!=0) { za = wa }  # Fit to screen
-# Max fit intersection
-# else if (xor(gw,fw) && xor(gh,fh)) {
-else if (gw!=0 && gh==0 && fw!=0 && fh==0) { wa = za = max(zb,wb) }  # zWx0 wWx0
-else if (gw==0 && gh!=0 && fw==0 && fh!=0) { wa = za = min(zb,wb) }  # z0xH w0xH
-# Which aspect is preffered ?
-#   * check boundary conditions for %100x0+0+0
-#   * use coef (non-linear) pa (preffered aspect)
-#     -- to morph between bounded area and bounded window aspects
-#       wa = za = pa*zb + (1-pa)*wb   # CHECK if true for landscape/portret/mixed combo
-#         => Not enough -- you also need to fit into matching region
-#   => in case of fitting -> need to correct resulting both zw,zh and ww,wh
-#
-else if (gw!=0 && gh==0 && fw==0 && fh!=0) { wa = za = ?? }  # zWx0 w0xH
-else if (gw==0 && gh!=0 && fw!=0 && fh==0) { wa = za = ?? }  # z0xH wWx0
-
+# Choose common aspect for auto-derived dims
+pa = pp
+if (gw && gh && (!fw || !fh)) pa=0  # Fit to tablet
+if ((!gw || !gh) && fw && fh) pa=1  # Fit to screen
+if (!gw || !gh || !fw || !fh) za=wa=blend(pa,za,wa)
 
 ###############################################################################
 ## Relative zone rect at rotated area (sticks to side)
 #  $oa >= $aa (16:9 > 16:10 && 16:9 > 10:16) landscape
-#  $oa <  $aa (9:16 < 16:10 && 9:16 < 10:16) portret
+#  $oa <  $aa (9:16 < 16:10 && 9:16 < 10:16) portrait
 #  $oa ?? $aa ( 4:3 < 16:10 &&  4:3 > 10:16) mixed
-# THINK: use zb,wb instead of ea,za for fitting rect ?
-if (gw==0 && (gh!=0 || ea> za)) zw=zh*za
-if (gh==0 && (gw!=0 || ea<=za)) zh=zw/za
-zx = gx*(ew - zw)
-zy = gy*(eh - zh)
 
+# CHECK: if all true TODO: .sh with bunch of testcases
+# WTF: WxH Wx0 = OK
+# WTF: WxH 0x0 = blend
+# WTF: Wx0 0x0
+# WTF: xor(W,H)
+# WTF: 0x0 0x0
+
+# Parametric dims for zone, window
+pz = pw = 0  # OR =pp ?
+if (!gw) if (gh) pz = 0 else if (ea> za) pz = pp
+if (!gh) if (gw) pz = 1 else if (ea<=za) pz = 1-pp
+if (!fw) if (fh) pw = 0 else if (oa> wa) pw = pp
+if (!fh) if (fw) pw = 1 else if (oa<=wa) pw = 1-pp
+
+# NOTE: ignore fixed rects
+if (!gw || !gh) {
+  zw = blend(pz, zh*za, zw)
+  zh = blend(pz, zh, zw/za)
+}
+if (!fw || !fh) {
+  ww = blend(pw, wh*wa, ww)
+  wh = blend(pw, wh, ww/wa)
+}
 
 ###############################################################################
-## Window for frame
-if (fw==0 && (fh!=0 || oa> wa)) ww=wh*wa
-if (fh==0 && (fw!=0 || oa<=wa)) wh=ww/wa
-wx = ox + fx*(ow - ww)
-wy = oy + fy*(oh - wh)
-
+## Relative positions for zone/window
+zx = gx*(ew - zw)
+zy = gy*(eh - zh)
+wx = fx*(ow - ww)
+wy = fy*(oh - wh)
 
 ###############################################################################
 ## Rect top-left and bottom-right pts in origin CS
@@ -173,9 +138,10 @@ y1 = zy + zh*(1 + mr)/2
 
 ###############################################################################
 ## Output
-# Area (tablet)
+# Area (tablet: absolute to Rotate=none)
 csrot(x0,y0); print round(x_)," ",round(y_)," "
 csrot(x1,y1); print round(x_)," ",round(y_),"\n"
-# Frame (output)
+
+# Frame (output: absolute to screen pos)
 print round(ww),"x",round(wh),"+"
 print round(ox + wx),"+",round(oy + wy),"\n"

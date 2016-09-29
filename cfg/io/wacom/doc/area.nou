@@ -3,86 +3,86 @@ Area aspect ratio
   Sizes
     Phys: 157 mm x 98 mm = 1.602
     LPts: 31496 x 19685 = 1.600
-    Wide: 16:9  = 1.777
     Wide: 16:10 = 1.600
+    Scrn: 16:9  = 1.777
     A4:  sqrt 2 = 1.414
-
-Modes
-  # pp - parametric preference
-  #   MAYBE: use pp=[0..1] for distort..fit
-  #   -- as actually I need to enable _fitting_ and not _distorting_
-  #   -- BUT I already use '0' in WxH to enable auto-derive (? auto-derive != fit ?)
-  #   ALT: treat fixed size 100z100 only as bbox -- and actually choose fit..distort by pp
-  #   -- BUT what about cross-derive morph/blend: 0z100 100w0 ?
-  Full-full: 100z100  100w100
-    fixed rects
-    distort aspect
-    ignore *pp* (always =1)
-  Full-derive: 100z100  100w0
-    derive single '0' dim by opposite aspect
-      *fy* to align
-    allows out-of-bounds dim
-      *fy* to pan (the same align to sides)
-    *pp*=0..1 : fit=inner..outer
-    *pp*=0..1 for fit..distort
-      use remaining dim till screen edge if originally smaller
-      use whole screen till whole dim if out-of-bounds
-      THINK:WTF combine positioning with *fy* and aspect?
-  Full-maxfit: 100z100  0w0
-    derive both '0' as earlier
-    fit both dims inside screen rect
-  Maxfit-maxfit: 0z0  0w0
-    *pp*=0..1 to prefer tablet..screen
-    ? behavior, if enabled auto-derive but not fit?
-      ~ then it will be out-of-bounds
-  Bind-derive: 100z0  0w0
-    ???
-
-  *pp* -- prefer (maximize on) tablet..screen
-    * no aspect distortion
-    = *pp*=0..1 ~= `[100x0..0x100]` BUT in relation to Rotate
-      E.G. z16:10 + w9:16
-        | 0.0 | maximize tablet, crop screen
-        | 1.0 | pan tablet, maximize screen
-        | 0.5 | half-pan tablet and half-crop screen
-    Derive-maxfit: 100z0  100w0  OR  0z100  0w100
-    Derive-derive: 100z0  0w100  OR  0z100  100w0
-    * always derive max possible dims
-      - derive max dim even for partial Wx0|0xH
-      - blend between them by *pp*
-      - position by *fx,fy* only after deriving complete
-        ! *fx,fy* align consistently with fixed window
-
-  WzH  WwH
-    -- additionally move rect by gx,gy
 
 
 %% Regimes %% (keep aspect)
-  ? [_] THINK practical application for deformed aspect
-  Full scale
-    * 16:9 : top/mid/bot -- 0..100%
-  Area scale
-    * small WxH+X+Y area to full output
-    * describe area in float percents for portability
-    + VAR zoom
-  Best fit frame
-    * 16:10 : lft/cen/rht -- 0..100%
-    => move frame by mouse (control snapping)
-  Precision frame
-    * VAR zoom --> WxH+X+Y output frame
-      - full area => force the same frame aspect
-      - partial best fit area 0..100% <= according to frame aspect
-    Modes
-      predefined regions (x,y,zoom) for fast access
-      mouse-centered frame
-        We flip to eraser to move drawing frame and then flip to stylus to draw inside
-          * Stylus -- always in precision frame
-          * Eraser -- always in whole screen mode
-  Fit to window
-    * current window
-    * window id
-    => derive area and frame based on window geometry
-  === Union
+  Format: %WxH+X+Y  # D -- physical dimension
+    W,H=[0..100]
+      Using 0 in place of any W,H -- auto-derive W,H from others
+      0x0 -- fit into phys rect
+    X,Y=[0..100]
+      W = D | ignore X,Y
+      W < D | X,Y -- relative pos to screen D
+      W > D | X,Y -- pan in bounds of screen D
+
+% Variants
+  [_] THINK:DEV: force aspect -- use *gz,fz*=mode2 OR pass aspect=*gz,fz*
+  { WxH WxH }  # full-full
+    ignore *pp* (always =1)
+    fix rects as specified
+    anisotropic: aspect distortion (only in this mode)
+      ? [_] THINK practical application for deformed aspect
+  { WxH Wx0 | WxH 0xH | Wx0 WxH | 0xH WxH }  # full-derive
+    ignore *pp* (always =1)
+    aspect from WxH
+    derive single '0' dim by opposite aspect
+      *x,y* to align in bounds OR pan when dim is out-of-bounds
+        [0..100] -- top/mid/bot  # alg the same
+  { WxH 0x0 | 0x0 WxH }  # full-maxfit -- scale rect to full
+    derive both '0' as earlier
+    aspect from WxH
+    *pp*=0..1 : fit rect=[inner..outer] in respect to Rotation
+      E.G. z16:10 + w9:16
+        | 0.0 | maximize tablet, crop screen
+        | 1.0 | pan tablet, maximize screen (~ 120x240+-10+-10)
+          BUT: then in dual-screen cursor will move outside of output instead of sticking to the side
+            ? ALT manually reset values to the closest output side
+          BUT: unintuitive -- because to move active frame on screen we must change
+            ! area's gx,gy and vice versa == THINK about it
+        | 0.5 | half-pan tablet and half-crop screen
+  { 0x0 0x0 }  # maxfit-maxfit
+    *pp*=0..1 to prefer aspect=[tablet..screen]  # maximizes accordingly
+      morph between bounded area and bounded window aspects
+      NEED non-linear coef scaling
+      NOTE dead screen areas
+    no aspect distortion
+    Best fit frame
+      * 16:10 : lft/cen/rht -- 0..100%
+      => move frame by mouse (control snapping)
+  { Wx0 0x0 | 0xH 0x0 | 0x0 Wx0 | 0x0 0xH }  # bind-derive
+    tablet=[fit..pan], screen=[crop..fit]
+    derive both '0' as earlier
+  { Wx0 Wx0 | 0xH 0xH | Wx0 0xH | 0xH Wx0 }  # cross-derive morph/blend intersection
+    *pp*=0..1 : prefer aspect=[tablet..screen]
+    always derive max possible dims (and other by aspect)
+      - derive max dim even for partial Wx0|0xH
+      - blend between them by *pp*
+      - position by *fx,fy* only after deriving complete
+        => *fx,fy* align consistently with fixed window
+
+  <<_ ALT:(profound alg): remaining screen rect instead of max possible
+    Aspects: zb = (ew-zx)/(eh-zy), wb = (ow-wx)/(oh-wy)
+    => Use remaining dim till screen edge if originally smaller
+       zw=f(zx) ~= ew - zx/gx, zx=gx*ow, wa=za=max(zb,wb)
+    use whole screen till whole dim if out-of-bounds
+    THINK combine positioning with *fy* and aspect?
+
+% Modes
+  Frame
+    predefined regions (x,y,zoom) for fast access
+    mouse-centered frame
+      We flip to eraser to move drawing frame and then flip to stylus to draw inside
+        * Stylus -- always in precision frame
+        * Eraser -- always in whole screen mode
+    Fit to window
+      * current window
+      * window id
+      => derive area and frame based on window geometry
+
+  Union
     scale / precision => can be united by VAR:'zoom' for >1 and <1
     full / best fit => VAR:'zoom' for =1+/-0 -- singularity
       => however, float on cmdline is pain
@@ -93,15 +93,7 @@ Modes
           $ echo '..' | bc
         ALT: fractions ~= '3/2' | '4/5' | '18/5'
           BUT: awkward when trying to _slightly_ increase value
-  === USE
-    area <-- output
-      rot <- wacom rot
-      asp <- output w/h
-      area ^= rot(asp)
-    frame <-- area
-      rot <- wacom rot
-      asp <- wacom w/h
-      output ^= rot(asp)
+
 
 TODO
   2016-09-12 [X] Restrict drawing area to 16:9 monitor
