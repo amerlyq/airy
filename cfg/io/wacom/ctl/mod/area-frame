@@ -19,17 +19,17 @@ oy=read()  # output pos y  (def=0)
 # FIND: what if pp!=[0..1]
 pp=read()  # preferred aspect=[tablet..screen]=[0..1] (def=0)
 # Gauge rel rect
-gz=read()      # zone absolute coords (def=0) -- but relative to rotated area ?
-gx=read()/100  # zone rel pos x  in % (def=0)
-gy=read()/100  # zone rel pos y  in % (def=0)
-gw=read()/100  # zone rel width  in % (def=0: fit)
-gh=read()/100  # zone rel height in % (def=0: fit)
+gz=read()  # use absolute coords (but relative to rotated area) (def=0)
+gx=read()  # zone rel pos x  in % (def=0)
+gy=read()  # zone rel pos y  in % (def=0)
+gw=read()  # zone rel width  in % (def=0: fit)
+gh=read()  # zone rel height in % (def=0: fit)
 # Frame rel rect
-fz=read()      # frame absolute coords (def=0)
-fw=read()/100  # frame rel width  in % (def=0: fit)
-fh=read()/100  # frame rel height in % (def=0: fit)
-fx=read()/100  # frame rel pos x  in % (def=0)
-fy=read()/100  # frame rel pos y  in % (def=0)
+fz=read()  # use absolute coords (def=0)
+fw=read()  # frame rel width  in % (def=0: fit)
+fh=read()  # frame rel height in % (def=0: fit)
+fx=read()  # frame rel pos x  in % (def=0)
+fy=read()  # frame rel pos y  in % (def=0)
 
 ###############################################################################
 ## Functions
@@ -37,6 +37,7 @@ define abs(x) { if (x>=0) return x else return -x }
 define max(x,y) { if (x>=y) return x else return y }
 define min(x,y) { if (x<=y) return x else return y }
 define xor(x,y) { return !((!x)-(!y)) }  # CHECK: if need round(..)
+define qabs(b,x,y) { if(b) return x else return y*x/100 }
 define blend(p,x,y) { return p*x + (1-p)*y }
 define round(x) { auto z,r; z=scale; scale=0
   r=(x + 0.5)/1; scale=z; return r }
@@ -72,21 +73,20 @@ if (round(abs(cr))) { ew=aw; eh=ah } else { ew=ah; eh=aw }
 ea = ew/eh  # effective area aspect
 oa = ow/oh  # output aspect
 
-# DEV: gz,fz -- not in use
-# THINK:DEV:(force aspect): if (gz,fz==2) aspect=W,H OR directly aspect=gz,fz
 # Assume unadjusted max: *w, *h, *a
-if (!gw) zw=ew else zw=gw*ew
-if (!gh) zh=eh else zh=gh*eh
-if (!fw) ww=ow else ww=fw*ow
-if (!fh) wh=oh else wh=fh*oh
+if (!gw) zw=ew else zw=qabs(gz, gw, ew)
+if (!gh) zh=eh else zh=qabs(gz, gh, eh)
+if (!fw) ww=ow else ww=qabs(fz, fw, ow)
+if (!fh) wh=oh else wh=qabs(fz, fh, oh)
 za = zw/zh
 wa = ww/wh
 
+# THINK:DEV:(force aspect): if (gz,fz==2) aspect=W,H OR directly aspect=gz,fz
 # Choose common aspect for auto-derived dims
 pa = pp
 if (gw && gh && (!fw || !fh)) pa=0  # Fit to tablet
 if ((!gw || !gh) && fw && fh) pa=1  # Fit to screen
-if (!gw || !gh || !fw || !fh) za=wa=blend(pa,za,wa)
+if (!gw || !gh || !fw || !fh) za=wa=blend(pa, za, wa)
 
 ###############################################################################
 ## Relative zone rect at rotated area (sticks to side)
@@ -102,28 +102,24 @@ if (!gw || !gh || !fw || !fh) za=wa=blend(pa,za,wa)
 # WTF: 0x0 0x0
 
 # Parametric dims for zone, window
-pz = pw = 0  # OR =pp ?
-if (!gw) if (gh) pz = 0 else if (ea> za) pz = pp
-if (!gh) if (gw) pz = 1 else if (ea<=za) pz = 1-pp
-if (!fw) if (fh) pw = 0 else if (oa> wa) pw = pp
-if (!fh) if (fw) pw = 1 else if (oa<=wa) pw = 1-pp
+zp = wp = 0  # OR =pp ?
+if (!gw) if (gh) zp=0 else if (ea> za) zp=pp
+if (!gh) if (gw) zp=1 else if (ea<=za) zp=1-pp
+if (!fw) if (fh) wp=0 else if (oa> wa) wp=pp
+if (!fh) if (fw) wp=1 else if (oa<=wa) wp=1-pp
 
 # NOTE: ignore fixed rects
-if (!gw || !gh) {
-  zw = blend(pz, zh*za, zw)
-  zh = blend(pz, zh, zw/za)
-}
-if (!fw || !fh) {
-  ww = blend(pw, wh*wa, ww)
-  wh = blend(pw, wh, ww/wa)
-}
+if (!gw || !gh) zw = blend(zp, zh*za, zw)
+if (!gw || !gh) zh = blend(zp, zh, zw/za)
+if (!fw || !fh) ww = blend(wp, wh*wa, ww)
+if (!fw || !fh) wh = blend(wp, wh, ww/wa)
 
 ###############################################################################
 ## Relative positions for zone/window
-zx = gx*(ew - zw)
-zy = gy*(eh - zh)
-wx = fx*(ow - ww)
-wy = fy*(oh - wh)
+zx = qabs(gz, gx, ew-zw)
+zy = qabs(gz, gy, eh-zh)
+wx = qabs(fz, fx, ow-ww)
+wy = qabs(fz, fy, oh-wh)
 
 ###############################################################################
 ## Rect top-left and bottom-right pts in origin CS
