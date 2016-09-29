@@ -11,6 +11,7 @@
 "   https://github.com/AndrewRadev/switch.vim
 "   integrate into Unite and deoplete (show candidates on specific button)
 " 2016-09-14 [X] CHG: colors must have different tint then used in 'nou' outline/markup
+" BUG: open *.bc and *.nou. Then :vert ball -- in right wnd notches has no hi!
 
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has("autocmd") || v:version <= 701 | finish | endif
