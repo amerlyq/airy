@@ -8,6 +8,10 @@ SEE
 		https://sites.google.com/site/uxhakx/debootstrap-on-archlinux-howto
 		https://bbs.archlinux.org/viewtopic.php?id=100039
 
+USAGE
+	Self-chroot scripts
+		$ [[ -s /etc/debian_chroot ]] || ! hash r.chroot &>/dev/null || exec r.chroot "$0" "$@"
+
 ALT:CHECK:
 	docker
 		docker pull ubuntu:14.04

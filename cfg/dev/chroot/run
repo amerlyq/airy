@@ -19,15 +19,40 @@ if ((!ismounted)) && [[ ! -d ${chroot}${dir} ]]; then
   [[ -d $CURR_DIR_WORK ]] && dir=${CURR_DIR_WORK:?} || dir=$HOME
 fi
 
-# EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
+# EXPL: filter-out env vars before command
+# USAGE: $ r.chroot A=4 B=some <cmd>
+# ALT: use eval in: $ bash -ic 'eval "$@"' "$0" "$@"
+_env=()
+for arg in "$@"; do
+  [[ $arg =~ ^[[:alpha:]_][[:alnum:]_]*= ]] || break
+  _env+=( "$arg" )
+  shift
+done
+
+# NOTE: source ~/.bash_profile by forcing interactive shell
+# ATT: -l is not enough to activate SHELLRC_EVAL
+# MAYBE:(exec) will be excessive limitation for cmdline?
+((!$#)) && set -- "$SHELL" || set -- bash -ic 'exec "$@"' "$0" "$@"
 # TODO: use ZSH in chroot if available [[ -x ${chroot}$SHELL ]]
-# BUT: what tot do with --rcfile?
 # THINK: using tmux? how to be with nested sessions?
-exec schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT
-export DISPLAY=$DISPLAY SHELLRC_EVAL="${CURR_CHROOT_EVAL}"
-source ~/.bash_profile
-${@+trap 'exit 1' INT HUP QUIT TERM; "$@"; exit}
-EOT
-)
+
+# EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
+exec schroot -c "$prf" -d "$dir" -- env \
+  DISPLAY="$DISPLAY" SHELLRC_EVAL="${CURR_CHROOT_EVAL}" \
+  "${_env[@]}" "$@"
+
+
+# ALT:DEPRECATED:
+# BUG: using 2>&1 don't exit interactive shell
+#   $ r.chroot pwd |& cat
+#   $ r.chroot pwd 2>/dev/null
+# BUT: what tot do with --rcfile?
+# exec schroot -c "$prf" -d "$dir" -- bash --rcfile <(cat - <<EOT
+# export DISPLAY=$DISPLAY SHELLRC_EVAL="${CURR_CHROOT_EVAL}"
+# source ~/.bash_profile
+# ${@+trap 'exit 1' INT HUP QUIT TERM; "$@"; exit}
+# EOT
+# )
+
 # NOTE: vars from rcfile aren't inherited for -c!
 # ${@+-c 'trap "exit 1" INT HUP QUIT TERM; "$@"' "$0" "$@"}
