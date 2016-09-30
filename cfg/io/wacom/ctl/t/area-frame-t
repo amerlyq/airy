@@ -1,0 +1,110 @@
+#!/bin/bash -e
+SWD=$(readlink -e "$0"); SWD=${SWD%/*}
+PATH=${SWD%/*}/mod:$PATH
+set -o pipefail
+
+trap 'onexit $((ret)) $((num))' INT HUP QUIT TERM EXIT
+onexit(){ (($1)) || return 0; printf 'Failed(%d): %d total\n' "$1" "$2"; exit "$1"; }
+ret=0
+
+area="0 0 31496 19685"
+scrn="3840x2160+0+0"
+
+main() { local args out
+  IFS='%x+' read -r gw gh gx gy <<< "${zone#%}"
+  IFS='%x+' read -r fw fh fx fy <<< "${wind#%}"
+  args="
+    ${ro:?} ${ax:?} ${ay:?} ${aX:?} ${aY:?}
+    ${ow:?} ${oh:?} ${ox:?} ${oy:?} ${pp:?}
+    ${gz:?} ${gx:?} ${gy:?} ${gw:?} ${gh:?}
+    ${fz:?} ${fw:?} ${fh:?} ${fx:?} ${fy:?}
+  "
+  # echo "$args"
+  readarray -tn2 out < <(area-frame <<< "$args")
+  printf '%s : %s\n' "${out[@]}"
+}
+
+single(){ local ro=${1:?} pp=${2:?} zone=${3:?} wind=${4:?}
+  local _rot gz fz
+  declare -A _rot=([none]=0 [cw]=90 [half]=180 [ccw]=-90)
+  IFS=' ' read -r ax ay aX aY <<< "$area"
+  IFS='x+' read -r ow oh ox oy <<< "$scrn"
+  ro=$(( ${_rot[$ro]:?} ))
+  [[ $zone =~ ^% ]] && gz=0 || gz=1
+  [[ $wind =~ ^% ]] && fz=0 || fz=1
+  main
+}
+
+t(){ local out=$(single ${1:?})
+  [[ $2 == -- ]] || { printf "t '%s' -- '%s'\n" "$1" "$out"; return 0; }
+  ((++idx))
+  if [[ $out != ${3:?} ]]; then ((++num))
+    printf -- '%d. ----- [%s] -----\n>> ERR: %s\n> NEED: %s\n\n' \
+      "$((idx))" "$1" "$out" "$3"
+    ((ret)) || ret=1
+  fi
+}
+
+## Constants
+zero='%0x0+0+0'
+full='%100x100+0+0'
+
+crop='3456x2160+0+0'
+pan='3840x2400+0+0'
+
+## Tests
+num=0
+idx=0
+
+# Full area, distort aspect, ignore: {ro,pp}
+t "none 0 $full $full" -- "$area : $scrn"
+t "cw   0 $full $full" -- "$area : $scrn"
+t "half 0 $full $full" -- "$area : $scrn"
+t "ccw  0 $full $full" -- "$area : $scrn"
+
+# One dimension, no pp influence
+t "none 0 $full %100x0+0+0" -- "$area : $pan"
+t "none 0 $full %0x100+0+0" -- "$area : $crop"
+t "none 0 %100x0+0+0 $full" -- "0 0 31496 17717 : $scrn"
+t "none 0 %0x100+0+0 $full" -- "0 0 34996 19685 : $scrn"
+
+t "none 0 $full $zero" -- "$area : $crop"
+t "none 0 $zero $full" -- "0 0 31496 17717 : $scrn"
+
+t "none 0 %100x0+0+0 %100x0+0+0" -- "$area : $pan"
+t "none 0 %100x0+0+0 %0x100+0+0" -- "$area : $crop"
+t "none 0 %0x100+0+0 %100x0+0+0" -- "$area : $pan"
+t "none 0 %0x100+0+0 %0x100+0+0" -- "$area : $crop"
+
+t "none 0 %100x0+0+0 $zero" -- "$area : $crop"
+t "none 0 %0x100+0+0 $zero" -- "$area : $crop"
+t "none 0 $zero %100x0+0+0" -- "$area : $pan"
+t "none 0 $zero %0x100+0+0" -- "$area : $crop"
+
+# Area auto
+t "none 0 $zero $zero" -- "$area : $crop"
+t "cw   0 $zero $zero" -- "$area : 1350x2160+0+0"
+t "half 0 $zero $zero" -- "$area : $crop"
+t "ccw  0 $zero $zero" -- "$area : 1350x2160+0+0"
+
+# Frame auto (BAD)
+t "none 1 $zero $zero" -- "0 0 34996 19685 : $scrn"
+t "cw   1 $zero $zero" -- "$area : $scrn"
+t "half 1 $zero $zero" -- "$area : $scrn"
+t "ccw  1 $zero $zero" -- "$area : $scrn"
+
+# Blend
+# t "none 0.5 $zero $zero" -- "$area : $crop"
+
+# BAD: no fit
+# t "none 1 $zero $zero"
+
+## Misc
+t "none 0 $full %0x0+50+0" -- "$area : 3456x2160+192+0"  # Align
+# BAD: pan -239 instead of 240 -- maybe its normal for negative?
+# t "none 0 $full %100x0+0+100" -- "$area : 3840x2400+0+-240"  # Pan
+t "none 0 $full %0x0+100+0" -- "$area : 3456x2160+384+0"
+t "none 0 %50x50+0+0 %50x50+0+0" -- "0 0 15748 9843 : 1920x1080+0+0"
+t "none 0 %50x50+50+50 %50x50+50+50" -- "7874 4921 23622 14764 : 1920x1080+960+540"
+
+# TODO: test rotated screen

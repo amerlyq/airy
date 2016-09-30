@@ -38,7 +38,7 @@ define max(x,y) { if (x>=y) return x else return y }
 define min(x,y) { if (x<=y) return x else return y }
 define xor(x,y) { return !((!x)-(!y)) }  # CHECK: if need round(..)
 define qabs(b,x,y) { if(b) return x else return y*x/100 }
-define blend(p,x,y) { return p*x + (1-p)*y }
+define blend(p,x,y) { return (1-p)*x + p*y }
 define round(x) { auto z,r; z=scale; scale=0
   r=(x + 0.5)/1; scale=z; return r }
 
