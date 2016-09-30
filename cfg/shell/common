@@ -11,6 +11,8 @@ fi
 source ~/.shell/aliases
 
 # Execute exported commands for chroot and ssh
+# BAD: can't be used for non-interactive shell (like r.chroot)
+#   $ bash -ic '"$@"' "$0" "$@"
 [[ -z $SHELLRC_EVAL ]] || eval "$SHELLRC_EVAL"
 
 ## Trap to sync bash/zsh and ranger working directories.

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# BAD? zsh launched raw or after ranger -- has SHELL=/usr/bin/zsh
+#   instead of =.../r.shell. OR it's intended behaviour?
+
 # EXPL: simplify when r.shell -c $SHELL
 if [[ $# == 2 && $1 == -c && ($2 == $SHELL || $2 == '$SHELL') ]]
 then shift 2; fi
