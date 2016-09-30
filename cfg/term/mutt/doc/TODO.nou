@@ -1,4 +1,14 @@
 TODO
+  [_] BAD: I load all available prf in seq _after_ options was set
+    FIXME: Any excessive var from 'prf' will overwrite options defined earlier
+      => it will influence all other prf which depends on default
+        2016-09-30 [X] E.G. BUG:REGR 'Sent' not saved for 'work' prf
+    ALT:TRY: load profiles before default options.
+      BUT:CHECK: if prf may use/depend (maybe in future) some vars from defaults
+        => Then loading defaults after prf becomes impossible
+    BETTER?: move all wild options into 'defaults' and source them before each profile switch
+      => CHECK: performance
+
   TRY:ALT: http://www.neomutt.org/features.html
   2016-07-25 [X] TRY: mutt -f <account> to open directly desired acc
   [_] FIX: on ';s' suggest '=pjname' folder instead of '=user'
