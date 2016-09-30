@@ -15,14 +15,16 @@ region=cursor   # [full|center|cursor|WxH+X+Y] -- use WxH+X+Y relative to $outpu
 
 # Query wacom =================================================================
 sid=$(wacom-ids 'STYLUS')
-[[ $mode ]] || mode=$(cache-get map area)
+[[ $mode ]] || mode=$(cache-get map 'area')
 cache-set map "$mode"
 
 [[ $rotate ]] || read -r rotate < <(wacom-rotation "$sid")
 declare -A _rot=([none]=0 [cw]=90 [half]=180 [ccw]=-90)
 ro=$(( ${_rot[$rotate]:?} ))
 
-IFS=' ' read -r ax ay aX aY < <(wacom-area-max "$sid")
+# EXPL: to create --dry-run for testing purposes w/o queries to devices
+[[ $maxarea ]] || read -r maxarea < <(wacom-area-max "$sid")
+IFS=' ' read -r ax ay aX aY <<< "$maxarea"
 aw=$((aX-ax))
 ah=$((aY-ay))
 aa=$(dc -e "6k $aw $ah /p")

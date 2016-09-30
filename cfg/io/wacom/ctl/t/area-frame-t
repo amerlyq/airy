@@ -3,9 +3,9 @@ SWD=$(readlink -e "$0"); SWD=${SWD%/*}
 PATH=${SWD%/*}/mod:$PATH
 set -o pipefail
 
-trap 'onexit $((ret)) $((num))' INT HUP QUIT TERM EXIT
+trap 'onexit $((_ret)) $((num))' INT HUP QUIT TERM EXIT
 onexit(){ (($1)) || return 0; printf 'Failed(%d): %d total\n' "$1" "$2"; exit "$1"; }
-ret=0
+_ret=0
 
 area="0 0 31496 19685"
 scrn="3840x2160+0+0"
@@ -19,7 +19,6 @@ main() { local args out
     ${gz:?} ${gx:?} ${gy:?} ${gw:?} ${gh:?}
     ${fz:?} ${fw:?} ${fh:?} ${fx:?} ${fy:?}
   "
-  # echo "$args"
   readarray -tn2 out < <(area-frame <<< "$args")
   printf '%s : %s\n' "${out[@]}"
 }
@@ -41,13 +40,15 @@ t(){ local out=$(single ${1:?})
   if [[ $out != ${3:?} ]]; then ((++num))
     printf -- '%d. ----- [%s] -----\n>> ERR: %s\n> NEED: %s\n\n' \
       "$((idx))" "$1" "$out" "$3"
-    ((ret)) || ret=1
+    ((_ret)) || _ret=1
   fi
 }
 
 ## Constants
 zero='%0x0+0+0'
 full='%100x100+0+0'
+noH='%100x0+0+0'
+noW='%0x100+0+0'
 
 crop='3456x2160+0+0'
 pan='3840x2400+0+0'
@@ -61,25 +62,33 @@ t "none 0 $full $full" -- "$area : $scrn"
 t "cw   0 $full $full" -- "$area : $scrn"
 t "half 0 $full $full" -- "$area : $scrn"
 t "ccw  0 $full $full" -- "$area : $scrn"
+t "none 1 $full $full" -- "$area : $scrn"
+t "cw   1 $full $full" -- "$area : $scrn"
+t "half 1 $full $full" -- "$area : $scrn"
+t "ccw  1 $full $full" -- "$area : $scrn"
 
 # One dimension, no pp influence
-t "none 0 $full %100x0+0+0" -- "$area : $pan"
-t "none 0 $full %0x100+0+0" -- "$area : $crop"
-t "none 0 %100x0+0+0 $full" -- "0 0 31496 17717 : $scrn"
-t "none 0 %0x100+0+0 $full" -- "0 0 34996 19685 : $scrn"
+t "none 0 $full $noH" -- "$area : $pan"
+t "none 0 $full $noW" -- "$area : $crop"
+t "none 0 $noH $full" -- "0 0 31496 17717 : $scrn"
+t "none 0 $noW $full" -- "0 0 34996 19685 : $scrn"
+t "none 1 $full $noH" -- "$area : $pan"
+t "none 1 $full $noW" -- "$area : $crop"
+t "none 1 $noH $full" -- "0 0 31496 17717 : $scrn"
+t "none 1 $noW $full" -- "0 0 34996 19685 : $scrn"
 
 t "none 0 $full $zero" -- "$area : $crop"
 t "none 0 $zero $full" -- "0 0 31496 17717 : $scrn"
 
-t "none 0 %100x0+0+0 %100x0+0+0" -- "$area : $pan"
-t "none 0 %100x0+0+0 %0x100+0+0" -- "$area : $crop"
-t "none 0 %0x100+0+0 %100x0+0+0" -- "$area : $pan"
-t "none 0 %0x100+0+0 %0x100+0+0" -- "$area : $crop"
+t "none 0 $noH $noH" -- "$area : $pan"
+t "none 0 $noH $noW" -- "$area : $crop"
+t "none 0 $noW $noH" -- "$area : $pan"
+t "none 0 $noW $noW" -- "$area : $crop"
 
-t "none 0 %100x0+0+0 $zero" -- "$area : $crop"
-t "none 0 %0x100+0+0 $zero" -- "$area : $crop"
-t "none 0 $zero %100x0+0+0" -- "$area : $pan"
-t "none 0 $zero %0x100+0+0" -- "$area : $crop"
+t "none 0 $noH $zero" -- "$area : $crop"
+t "none 0 $noW $zero" -- "$area : $crop"
+t "none 0 $zero $noH" -- "$area : $pan"
+t "none 0 $zero $noW" -- "$area : $crop"
 
 # Area auto
 t "none 0 $zero $zero" -- "$area : $crop"
@@ -87,7 +96,7 @@ t "cw   0 $zero $zero" -- "$area : 1350x2160+0+0"
 t "half 0 $zero $zero" -- "$area : $crop"
 t "ccw  0 $zero $zero" -- "$area : 1350x2160+0+0"
 
-# Frame auto (BAD)
+# Frame auto (BAD: no fit but pan)
 t "none 1 $zero $zero" -- "0 0 34996 19685 : $scrn"
 t "cw   1 $zero $zero" -- "$area : $scrn"
 t "half 1 $zero $zero" -- "$area : $scrn"
@@ -95,9 +104,6 @@ t "ccw  1 $zero $zero" -- "$area : $scrn"
 
 # Blend
 # t "none 0.5 $zero $zero" -- "$area : $crop"
-
-# BAD: no fit
-# t "none 1 $zero $zero"
 
 ## Misc
 t "none 0 $full %0x0+50+0" -- "$area : 3456x2160+192+0"  # Align
@@ -107,4 +113,7 @@ t "none 0 $full %0x0+100+0" -- "$area : 3456x2160+384+0"
 t "none 0 %50x50+0+0 %50x50+0+0" -- "0 0 15748 9843 : 1920x1080+0+0"
 t "none 0 %50x50+50+50 %50x50+50+50" -- "7874 4921 23622 14764 : 1920x1080+960+540"
 
-# TODO: test rotated screen
+
+### Test portrait screen
+pscrn="1080x1920+0+0"
+p(){ local scrn=$pscrn; t "$@"; }
