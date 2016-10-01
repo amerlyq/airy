@@ -4,6 +4,7 @@ PATH=${SWD%/*}/mod:$PATH
 set -o pipefail
 
 trap 'onexit $((_ret)) $((num))' INT HUP QUIT TERM EXIT
+# BUG: no err on script exit
 onexit(){ (($1)) || return 0; printf 'Failed(%d): %d total\n' "$1" "$2"; exit "$1"; }
 _ret=0
 
@@ -35,7 +36,7 @@ single(){ local ro=${1:?} pp=${2:?} zone=${3:?} wind=${4:?}
 }
 
 t(){ local out=$(single ${1:?})
-  [[ $2 == -- ]] || { printf "t '%s' -- '%s'\n" "$1" "$out"; return 0; }
+  [[ $2 == -- ]] || { printf 't "%s" -- "%s"\n' "$1" "$out"; return 0; }
   ((++idx))
   if [[ $out != ${3:?} ]]; then ((++num))
     printf -- '%d. ----- [%s] -----\n>> ERR: %s\n> NEED: %s\n\n' \
@@ -53,7 +54,7 @@ noW='%0x100+0+0'
 crop='3456x2160+0+0'
 pan='3840x2400+0+0'
 
-## Tests
+### Tests --------------------------------------------------------
 num=0
 idx=0
 
@@ -77,8 +78,18 @@ t "none 1 $full $noW" -- "$area : $crop"
 t "none 1 $noH $full" -- "0 0 31496 17717 : $scrn"
 t "none 1 $noW $full" -- "0 0 34996 19685 : $scrn"
 
+
+# Fit other
 t "none 0 $full $zero" -- "$area : $crop"
 t "none 0 $zero $full" -- "0 0 31496 17717 : $scrn"
+t "half 0 $full $zero" -- "$area : $crop"
+t "half 0 $zero $full" -- "0 1968 31496 19685 : $scrn"
+
+t "none 1 $full $zero" -- "$area : $pan"
+t "none 1 $zero $full" -- "0 0 34996 19685 : $scrn"
+t "half 1 $full $zero" -- "$area : $pan"
+t "half 1 $zero $full" -- "-3500 0 31496 19685 : $scrn"
+
 
 t "none 0 $noH $noH" -- "$area : $pan"
 t "none 0 $noH $noW" -- "$area : $crop"
@@ -102,16 +113,18 @@ t "cw   1 $zero $zero" -- "$area : $scrn"
 t "half 1 $zero $zero" -- "$area : $scrn"
 t "ccw  1 $zero $zero" -- "$area : $scrn"
 
-# Blend
-# t "none 0.5 $zero $zero" -- "$area : $crop"
 
-## Misc
+### Misc ---------------------------------------------------------
+
+# Shift
 t "none 0 $full %0x0+50+0" -- "$area : 3456x2160+192+0"  # Align
-# BAD: pan -239 instead of 240 -- maybe its normal for negative?
-# t "none 0 $full %100x0+0+100" -- "$area : 3840x2400+0+-240"  # Pan
 t "none 0 $full %0x0+100+0" -- "$area : 3456x2160+384+0"
+t "none 0 $full %100x0+0+100" -- "$area : 3840x2400+0+-240"  # Pan
+# Scale
 t "none 0 %50x50+0+0 %50x50+0+0" -- "0 0 15748 9843 : 1920x1080+0+0"
 t "none 0 %50x50+50+50 %50x50+50+50" -- "7874 4921 23622 14764 : 1920x1080+960+540"
+# Blend
+t "none 0.5 $zero $zero" -- "0 0 32371 19426 : 3744x2188+0+0"
 
 
 ### Test portrait screen

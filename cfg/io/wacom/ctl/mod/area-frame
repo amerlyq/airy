@@ -37,10 +37,14 @@ define abs(x) { if (x>=0) return x else return -x }
 define max(x,y) { if (x>=y) return x else return y }
 define min(x,y) { if (x<=y) return x else return y }
 define xor(x,y) { return !((!x)-(!y)) }  # CHECK: if need round(..)
-define qabs(b,x,y) { if(b) return x else return y*x/100 }
-define blend(p,x,y) { return (1-p)*x + p*y }
-define round(x) { auto z,r; z=scale; scale=0
-  r=(x + 0.5)/1; scale=z; return r }
+define rabs(b,x,y) { if(b) return round(x) else return round(y*x/100) }
+define qblend(p,x,y) { return (1-p)*x + p*y }
+define rblend(p,x,y) { return round(qblend(p,x,y)) }
+define round(x) { auto z,r
+  z=scale; scale=0
+  if (x>=0) r=(x + 0.5)/1 else r=(x - 0.5)/1
+  scale=z; return r
+}
 
 # Transform zone pts to origin CS basis
 define void csrot(x,y) {
@@ -50,21 +54,21 @@ define void csrot(x,y) {
 
 ###############################################################################
 ## Pre-evaluated constants
-# REF ----------| cr sr | pr mr |1-p 1-m
+# REF ----------| cr sr |c+s c-s| pr  mr
 #   0: +(ax,ay) |  1  0 |  1  1 |  0  0
 #  90: +(aX,ay) |  0  1 |  1 -1 |  0  1
 # 180: +(aX,aY) | -1  0 | -1 -1 |  1  1
 # -90: +(ax,aY) |  0 -1 | -1  1 |  1  0
 
 ro = 2*a(1) * ro/90  # ro to radians
-cr = c(ro)  # cos(ro)
-sr = s(ro)  # sin(ro)
-pr = cr + sr  # plus
-mr = cr - sr  # minus
+cr = round(c(ro))  # cos(ro)
+sr = round(s(ro))  # sin(ro)
+pr = round((1 - (cr + sr))/2)  # plus
+mr = round((1 - (cr - sr))/2)  # minus
 
 # Basis shift relative to origin CS
-bx = ax + aw*(1 - mr)/2
-by = ay + ah*(1 - pr)/2
+bx = ax + aw*mr
+by = ay + ah*pr
 
 ###############################################################################
 ## Defaults
@@ -74,10 +78,10 @@ ea = ew/eh  # effective area aspect
 oa = ow/oh  # output aspect
 
 # Assume unadjusted max: *w, *h, *a
-if (!gw) zw=ew else zw=qabs(gz, gw, ew)
-if (!gh) zh=eh else zh=qabs(gz, gh, eh)
-if (!fw) ww=ow else ww=qabs(fz, fw, ow)
-if (!fh) wh=oh else wh=qabs(fz, fh, oh)
+if (!gw) zw=ew else zw=rabs(gz, gw, ew)
+if (!gh) zh=eh else zh=rabs(gz, gh, eh)
+if (!fw) ww=ow else ww=rabs(fz, fw, ow)
+if (!fh) wh=oh else wh=rabs(fz, fh, oh)
 za = zw/zh
 wa = ww/wh
 
@@ -86,7 +90,7 @@ wa = ww/wh
 pa = pp
 if (gw && gh && (!fw || !fh)) pa=0  # Fit to tablet
 if ((!gw || !gh) && fw && fh) pa=1  # Fit to screen
-if (!gw || !gh || !fw || !fh) za=wa=blend(pa, za, wa)
+if (!gw || !gh || !fw || !fh) za=wa=qblend(pa, za, wa)
 
 ###############################################################################
 ## Relative zone rect at rotated area (sticks to side)
@@ -96,7 +100,7 @@ if (!gw || !gh || !fw || !fh) za=wa=blend(pa, za, wa)
 
 # CHECK: if all true TODO: .sh with bunch of testcases
 # WTF: WxH Wx0 = OK
-# WTF: WxH 0x0 = blend
+# WTF: WxH 0x0 = rblend
 # WTF: Wx0 0x0
 # WTF: xor(W,H)
 # WTF: 0x0 0x0
@@ -109,17 +113,17 @@ if (!fw) if (fh) wp=0 else if (oa> wa) wp=pp
 if (!fh) if (fw) wp=1 else if (oa<=wa) wp=1-pp
 
 # NOTE: ignore fixed rects
-if (!gw || !gh) zw = blend(zp, zh*za, zw)
-if (!gw || !gh) zh = blend(zp, zh, zw/za)
-if (!fw || !fh) ww = blend(wp, wh*wa, ww)
-if (!fw || !fh) wh = blend(wp, wh, ww/wa)
+if (!gw || !gh) zw = rblend(zp, zh*za, zw)
+if (!gw || !gh) zh = rblend(zp, zh, zw/za)
+if (!fw || !fh) ww = rblend(wp, wh*wa, ww)
+if (!fw || !fh) wh = rblend(wp, wh, ww/wa)
 
 ###############################################################################
 ## Relative positions for zone/window
-zx = qabs(gz, gx, ew-zw)
-zy = qabs(gz, gy, eh-zh)
-wx = qabs(fz, fx, ow-ww)
-wy = qabs(fz, fy, oh-wh)
+zx = rabs(gz, gx, ew-zw)
+zy = rabs(gz, gy, eh-zh)
+wx = rabs(fz, fx, ow-ww)
+wy = rabs(fz, fy, oh-wh)
 
 ###############################################################################
 ## Rect top-left and bottom-right pts in origin CS
@@ -127,17 +131,17 @@ wy = qabs(fz, fy, oh-wh)
 # zx,zy | zx,zY | zX,zY | zX,zy |
 # zX,zY | zX,zy | zx,zy | zx,zY |
 
-x0 = zx + zw*(1 - pr)/2
-y0 = zy + zh*(1 - mr)/2
-x1 = zx + zw*(1 + pr)/2
-y1 = zy + zh*(1 + mr)/2
+x0 = zx + zw*pr
+y0 = zy + zh*mr
+x1 = zx + zw*(1 - pr)
+y1 = zy + zh*(1 - mr)
 
 ###############################################################################
 ## Output
 # Area (tablet: absolute to Rotate=none)
-csrot(x0,y0); print round(x_)," ",round(y_)," "
-csrot(x1,y1); print round(x_)," ",round(y_),"\n"
+csrot(x0,y0); print x_," ",y_," "
+csrot(x1,y1); print x_," ",y_,"\n"
 
 # Frame (output: absolute to screen pos)
-print round(ww),"x",round(wh),"+"
-print round(ox + wx),"+",round(oy + wy),"\n"
+print ww,"x",wh,"+"
+print ox + wx,"+",oy + wy,"\n"
