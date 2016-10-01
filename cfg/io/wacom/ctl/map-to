@@ -4,132 +4,110 @@ PATH=$SWD/get:$SWD/mod:$SWD/set:$PATH
 set -o pipefail
 
 # BAD: time ./$0 => 40..120 mS
+# THINK:(output): use abs WxH+X+Y relative to $output ?
 
-mode=$1         # [area|frame]
-rotate=$2       # [none|half|cw|ccw]
-output=desktop  # [ {<output>|1..9} | {desktop|0} | {WxH+X+Y|%WxH+X+Y} | next ]
-region=cursor   # [full|center|cursor|WxH+X+Y] -- use WxH+X+Y relative to $output ?
+[[ $1 == -h ]] && { dry_run=1; shift; }
+zone=$1     # [full|auto|[%]WxH+X+Y]
+frame=$2    # [full|auto|cursor|[%]WxH+X+Y]
+rotate=$3   # [none|half|cw|ccw]
+output=$4   # [ {<output>|1..9} | {desktop|0} | WxH+X+Y || next ]
 
-# NEED: f(rot): use effective width/height
-# %WxH+X+Y: W = %W*ew, X = %X*(ew-W)
 
 # Query wacom =================================================================
+cache(){ [[ ${!1?} ]] || read -r "$1" < <(cache-get "$1" "${2?}"); cache-set "$1" "${!1}"; }
+cache zone 'auto'
+cache frame 'auto'
+cache output 'desktop'
+
 sid=$(wacom-ids 'STYLUS')
-[[ $mode ]] || mode=$(cache-get map 'area')
-cache-set map "$mode"
-
-[[ $rotate ]] || read -r rotate < <(wacom-rotation "$sid")
-declare -A _rot=([none]=0 [cw]=90 [half]=180 [ccw]=-90)
-ro=$(( ${_rot[$rotate]:?} ))
-
-# EXPL: to create --dry-run for testing purposes w/o queries to devices
-[[ $maxarea ]] || read -r maxarea < <(wacom-area-max "$sid")
-IFS=' ' read -r ax ay aX aY <<< "$maxarea"
-aw=$((aX-ax))
-ah=$((aY-ay))
-aa=$(dc -e "6k $aw $ah /p")
-ag=0  # alignment: 0..100%
+# HACK: use defaults when wacom disabled
+[[  ${rotate:=${sid:+$(wacom-rotation "$sid")}} ]] || rotate=none
+[[ ${maxarea:=${sid:+$(wacom-area-max "$sid")}} ]] || maxarea='0 0 31496 19685'
 
 
 # Query output ================================================================
 # HACK: export before 'xbindkeys' to propagate cached env var
 export _XRANDR=${_XRANDR:-$(query-xrandr)}
 
-# Decode numerical $output to named one
-case $output
-in [1-9]) output=$(list-outputs <<< "$_XRANDR" | nth-line "$output")
-;;     0) output=desktop
-esac
-
-# Convert $output to region's $geom
+# Decode numerical to named one, then convert to $maxgeom
 case ${output:?}
-in  desktop) geom=$(geom-screen <<< "$_XRANDR")
-;; [0-9]*x*) geom=$output
-;;  %[0-9]*) { echo 'no impl -- scale by percent'; exit 2; }  # W=%*ow; X=%*(ow-W)
-;;        *) geom=$(geom-display "$output" <<< "$_XRANDR")
+in [0-9]*x* ) maxgeom=$output; output=desktop
+;; 0|desktop) output=desktop; maxgeom=$(geom-screen <<< "$_XRANDR");
+;; [1-9] | *)
+  output=$(list-outputs <<< "$_XRANDR" | nth-line "$output")
+  maxgeom=$(geom-display "$output" <<< "$_XRANDR")
 esac
 
-IFS='x+' read -r ow oh ox oy <<< "$geom"
-oa=$(dc -e "6k $ow $oh /p")
-og=0  # alignment: 0..100%
 
-# =============================================================================
-frame_cursor(){ local zoom=${1:?}
-  read mx my scr wnd < <(query-mouse)
-  nw=$((oh*16/10*$zoom))
-  nh=$((oh*$zoom))
-  nx=$((mx-nw/2))
-  ny=$((my-nh/2))
-  ow=$nw; oh=$nh; ox=$nx; oy=$ny
-  frame=${ow}x${oh}+${ox}+${oy}
+# Functions ===================================================================
+parse(){ local _rot
+  # Rotate -> degree
+  declare -A _rot=([none]=0 [cw]=90 [half]=180 [ccw]=-90)
+  ro=$(( ${_rot[${rotate:?}]:?} ))
+
+  # Relative or absolute
+  [[ $zone =~ ^% ]] && gz=0 || gz=1
+  [[ $frame =~ ^% ]] && fz=0 || fz=1
+
+  # THINK: extract '-' sep from WxH-X-Y for pos counted from bottom-right?
+  #   !! BUT keep negative values 120x240+-10+-10
+  IFS='x+' read -r gw gh gx gy <<< "${zone#%}"
+  IFS='x+' read -r fw fh fx fy <<< "${frame#%}"
 }
 
-# MOVE: inside 'frame)' mode
-# # Adjust aspect: $geom <=> $area
-# case ${region:?}
-# in full) frame=$output
-# ;; center) frame_center
-# ;; cursor) frame_cursor '1/5'
-# ;; *) frame=$region
-# esac
+accommodate() { local args out
+  args="
+  ${ro:?} ${ax:?} ${ay:?} ${aX:?} ${aY:?}
+  ${ow:?} ${oh:?} ${ox:?} ${oy:?} ${pp:?}
+  ${gz:?} ${gx:?} ${gy:?} ${gw:?} ${gh:?}
+  ${fz:?} ${fw:?} ${fh:?} ${fx:?} ${fy:?}
+  "
+  readarray -tn2 out < <(area-frame <<< "$args")
+  area=${out[0]}  # OR: '%' to ResetArea
+  frame=${out[1]}
+}
+
+cursor_rect(){
+  # BAD: wrong mx/my for dual-screen (need shift bias to output)
+  read mx my scr wnd < <(query-mouse)
+  # NEED: unlinear fx=f(mx) to ease aligning (otherwise only extremum pos used)
+  # bnd=3; ((my<oh/bnd)) && og=0 || ((my>oh-oh/bnd)) && og=100 || og=$(((my-oh/bnd)/(oh - 2*oh/bnd)))
+  frame="%0x0+$((100*mx/ox))+$((100*my/oy))"
+}
 
 
 # Adjust ======================================================================
-case ${mode:?}
-in area)   # adjust area to full output
-  # THINK: how directly convert '%' -> 0 for gz ?
-  # TRY: directly catch whole rect in var like $ IFS='% x+' read -r area <<< "$4"
-  # THINK: how extract '+' or '-' separators to extract from bottom-right?
-  #   <= WxH-X-Y -- counted from bottom right also allowed format?
+IFS=' ' read -r ax ay aX aY <<< "$maxarea"
+IFS='x+' read -r ow oh ox oy <<< "$maxgeom"
 
-  pp=0  # preferred aspect
-  IFS='% x+' read -r gz gw gh gx gy <<< "0 %0x0+0+0"
-  IFS='% x+' read -r fz fw fh fx fy <<< "0 %0x0+0+0"
-
-  readarray -tn2 out < <(area-frame <<< "
-    ${ro:?} ${ax:?} ${ay:?} ${aX:?} ${aY:?}
-    ${ow:?} ${oh:?} ${ox:?} ${oy:?} ${pp:?}
-    ${gz:?} ${gx:?} ${gy:?} ${gw:?} ${gh:?}
-    ${fz:?} ${fw:?} ${fh:?} ${fx:?} ${fy:?}
-  ")
-  area=${out[0]}
-  frame=${out[1]}
-
-;; frame)  # adjust frame to full tablet
-  # BAD: wrong mx/my for dual-screen (need shift bias to output)
-  read mx my scr wnd < <(query-mouse)
-  # BAD: no rotation
-  # asp=$aa
-  # [[ $rotate =~ cw ]] && asp=$(dc -e "6k 1 $asp / p")
-  area="$ax $ay $aX $aY"  # OR: '%' to ResetArea
-  if (( $(bc -l <<< "$oa <= $aa") ))
-  then  # fit to output width
-    # NEED: unlinear conversion [$mx -> $og] to ease aligning
-    #   => otherwise strict left/right align will be possible only with cursor at left/right most position
-    # bnd=3
-    # ((my<oh/bnd)) && og=0 || ((my>oh-oh/bnd)) && og=100 || og=$(((my-oh/bnd)/(oh - 2*oh/bnd)))
-    og=$(( 100*my/oh ))
-    read -r ny nh < <(bc -l <<< "h=$ow/$aa; y=$oy+$og/100*($oh - h);"'
-                      scale=0; print y/1," ",h/1,"\n"')
-    frame="${ow}x${nh}+${ox}+${ny}"
-  else  # fit to output height
-    og=$(( 100*(mx+1)/ow ))
-    # FIXME: lost 4 pixels for right-most alignment
-    read -r nx nw < <(bc -l <<< "w=$oh*$aa; x=$ox+$og/100*($ow - w);"'
-                      scale=0; print x/1," ",w/1,"\n"')
-    frame="${nw}x${oh}+${nx}+${oy}"
-  fi
-
-;; *) exit 1
+case ${zone:?}
+in full) zone='%100x100+0+0'
+;; auto) zone='%0x0+50+50'
+;; [%0-9]*x*) zone=$zone
+;; *) exit 2
 esac
 
+# Adjust aspect: $geom <=> $area
+case ${frame:?}
+in full) frame='%100x100+0+0'; # =$output
+;; auto) frame='%0x0+50+50'
+;; [%0-9]*x*) frame=$frame
+;; cursor) cursor_rect  # '1/5'
+;; *) exit 3
+esac
+
+pp=0  # aspect=[tablet..screen]
+parse
+accommodate
 
 # Apply =======================================================================
-# TEMP:REM
-echo AREA: $area
-echo FRAME: $frame
-echo ROTATE: $rotate
-
-# while read -r wid; do
-#   wacom-map "$wid" "$area" "$frame" "$rotate"
-# done < <(wacom-ids 'STYLUS|ERASER')
+if ((dry_run)); then
+  echo AREA: $area
+  echo FRAME: $frame
+  echo ROTATE: $rotate
+else
+  wids=$(wacom-ids 'STYLUS|ERASER')
+  while read -r wid; do
+    wacom-map "$wid" "$area" "$frame" "$rotate"
+  done <<< "${wids:?Connect wacom tablet}"
+fi
