@@ -2,6 +2,9 @@
 # SEE:(bc) http://www.linuxjournal.com/article/2544
 # E.G: http://phodd.net/gnu-bc/index.html#logic
 
+# THINK:DEV:(force aspect): if (gz,fz==2) aspect=W,H OR directly aspect=gz,fz
+# DEV: limit panning window to one output/screen by min(ow,zblend(...))
+
 ###############################################################################
 ## Args
 ro=read()  # rotation of tablet (def=0)
@@ -85,7 +88,6 @@ if (!fh) wh=oh else wh=rabs(fz, fh, oh)
 za = zw/zh
 wa = ww/wh
 
-# THINK:DEV:(force aspect): if (gz,fz==2) aspect=W,H OR directly aspect=gz,fz
 # Choose common aspect for auto-derived dims
 pa = pp
 if (gw && gh && (!fw || !fh)) pa=0  # Fit to tablet
@@ -98,21 +100,16 @@ if (!gw || !gh || !fw || !fh) za=wa=qblend(pa, za, wa)
 #  $oa <  $aa (9:16 < 16:10 && 9:16 < 10:16) portrait
 #  $oa ?? $aa ( 4:3 < 16:10 &&  4:3 > 10:16) mixed
 
-# CHECK: if all true TODO: .sh with bunch of testcases
-# WTF: WxH Wx0 = OK
-# WTF: WxH 0x0 = rblend
-# WTF: Wx0 0x0
-# WTF: xor(W,H)
-# WTF: 0x0 0x0
-
 # Parametric dims for zone, window
-zp = wp = 0  # OR =pp ?
 if (!gw) if (gh) zp=0 else if (ea> za) zp=pp
 if (!gh) if (gw) zp=1 else if (ea<=za) zp=1-pp
 if (!fw) if (fh) wp=0 else if (oa> wa) wp=pp
 if (!fh) if (fw) wp=1 else if (oa<=wa) wp=1-pp
 
-# NOTE: ignore fixed rects
+# For auto [0x0 0x0] -- always fit inside
+if (!gw && !gh && !fw && !fh) { zp = wp = pp }
+
+# NOTE: ignore fixed rects (zp,wp -- always set on conditions)
 if (!gw || !gh) zw = rblend(zp, zh*za, zw)
 if (!gw || !gh) zh = rblend(zp, zh, zw/za)
 if (!fw || !fh) ww = rblend(wp, wh*wa, ww)
@@ -138,10 +135,12 @@ y1 = zy + zh*(1 - mr)
 
 ###############################################################################
 ## Output
+# NOTE: apply 'round' to tolerate floats in input()
+
 # Area (tablet: absolute to Rotate=none)
-csrot(x0,y0); print x_," ",y_," "
-csrot(x1,y1); print x_," ",y_,"\n"
+csrot(x0,y0); print round(x_)," ",round(y_)," "
+csrot(x1,y1); print round(x_)," ",round(y_),"\n"
 
 # Frame (output: absolute to screen pos)
-print ww,"x",wh,"+"
-print ox + wx,"+",oy + wy,"\n"
+print round(ww),"x",round(wh),"+"
+print round(ox + wx),"+",round(oy + wy),"\n"

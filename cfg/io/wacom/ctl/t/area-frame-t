@@ -45,73 +45,91 @@ t(){ local out=$(single ${1:?})
   fi
 }
 
-## Constants
+### Constants ----------------------------------------------------
 zero='%0x0+0+0'
 full='%100x100+0+0'
-noH='%100x0+0+0'
-noW='%0x100+0+0'
+fixW='%100x0+0+0'
+fixH='%0x100+0+0'
 
-crop='3456x2160+0+0'
-pan='3840x2400+0+0'
+cTop='0 0 31496 17717'
+cRgt='20423 0 31496 19685'
+cBot='0 1968 31496 19685'
+cLft='0 0 11073 19685'
+
+pRgt='0 0 34996 19685'
+
+hCrp='3456x2160+0+0'
+vCrp='1350x2160+0+0'
+hPan='3840x2400+0+0'  # horz tablet
+vPan='3840x6144+0+0'  # vert tablet
 
 ### Tests --------------------------------------------------------
 num=0
 idx=0
 
 # Full area, distort aspect, ignore: {ro,pp}
-t "none 0 $full $full" -- "$area : $scrn"
-t "cw   0 $full $full" -- "$area : $scrn"
-t "half 0 $full $full" -- "$area : $scrn"
-t "ccw  0 $full $full" -- "$area : $scrn"
-t "none 1 $full $full" -- "$area : $scrn"
-t "cw   1 $full $full" -- "$area : $scrn"
-t "half 1 $full $full" -- "$area : $scrn"
-t "ccw  1 $full $full" -- "$area : $scrn"
+for r in none cw half ccw; do for p in 0 1; do
+  t "$r $p $full $full" -- "$area : $scrn"
+done; done
+
 
 # One dimension, no pp influence
-t "none 0 $full $noH" -- "$area : $pan"
-t "none 0 $full $noW" -- "$area : $crop"
-t "none 0 $noH $full" -- "0 0 31496 17717 : $scrn"
-t "none 0 $noW $full" -- "0 0 34996 19685 : $scrn"
-t "none 1 $full $noH" -- "$area : $pan"
-t "none 1 $full $noW" -- "$area : $crop"
-t "none 1 $noH $full" -- "0 0 31496 17717 : $scrn"
-t "none 1 $noW $full" -- "0 0 34996 19685 : $scrn"
+t "none 0 $full $fixW" -- "$area : $hPan"
+t "none 0 $full $fixH" -- "$area : $hCrp"
+t "none 0 $fixW $full" -- "$cTop : $scrn"
+t "none 0 $fixH $full" -- "$pRgt : $scrn"
+t "none 1 $full $fixW" -- "$area : $hPan"
+t "none 1 $full $fixH" -- "$area : $hCrp"
+t "none 1 $fixW $full" -- "$cTop : $scrn"
+t "none 1 $fixH $full" -- "$pRgt : $scrn"
 
 
-# Fit other
-t "none 0 $full $zero" -- "$area : $crop"
-t "none 0 $zero $full" -- "0 0 31496 17717 : $scrn"
-t "half 0 $full $zero" -- "$area : $crop"
-t "half 0 $zero $full" -- "0 1968 31496 19685 : $scrn"
-
-t "none 1 $full $zero" -- "$area : $pan"
-t "none 1 $zero $full" -- "0 0 34996 19685 : $scrn"
-t "half 1 $full $zero" -- "$area : $pan"
+# Fit other rect, scale pp=[inner..outer]
+t "none 0 $full $zero" -- "$area : $hCrp"
+t "cw   0 $full $zero" -- "$area : $vCrp"
+t "half 0 $full $zero" -- "$area : $hCrp"
+t "ccw  0 $full $zero" -- "$area : $vCrp"
+t "none 0 $zero $full" -- "$cTop : $scrn"
+t "cw   0 $zero $full" -- "$cRgt : $scrn"
+t "half 0 $zero $full" -- "$cBot : $scrn"
+t "ccw  0 $zero $full" -- "$cLft : $scrn"
+t "none 1 $full $zero" -- "$area : $hPan"
+t "cw   1 $full $zero" -- "$area : $vPan"
+t "half 1 $full $zero" -- "$area : $hPan"
+t "ccw  1 $full $zero" -- "$area : $vPan"
+t "none 1 $zero $full" -- "$pRgt : $scrn"
+t "cw   1 $zero $full" -- "0 0 31496 55993 : $scrn"
 t "half 1 $zero $full" -- "-3500 0 31496 19685 : $scrn"
+t "ccw  1 $zero $full" -- "0 -36308 31496 19685 : $scrn"
 
 
-t "none 0 $noH $noH" -- "$area : $pan"
-t "none 0 $noH $noW" -- "$area : $crop"
-t "none 0 $noW $noH" -- "$area : $pan"
-t "none 0 $noW $noW" -- "$area : $crop"
+# Cross-derive
+t "none 0 $fixW $fixW" -- "$area : $hPan"
+t "none 0 $fixW $fixH" -- "$area : $hCrp"
+t "none 0 $fixH $fixW" -- "$area : $hPan"
+t "none 0 $fixH $fixH" -- "$area : $hCrp"
+t "none 1 $fixW $fixW" -- "$cTop : $scrn"
+t "none 1 $fixW $fixH" -- "$cTop : $scrn"
+t "none 1 $fixH $fixW" -- "$pRgt : $scrn"
+t "none 1 $fixH $fixH" -- "$pRgt : $scrn"
 
-t "none 0 $noH $zero" -- "$area : $crop"
-t "none 0 $noW $zero" -- "$area : $crop"
-t "none 0 $zero $noH" -- "$area : $pan"
-t "none 0 $zero $noW" -- "$area : $crop"
 
-# Area auto
-t "none 0 $zero $zero" -- "$area : $crop"
-t "cw   0 $zero $zero" -- "$area : 1350x2160+0+0"
-t "half 0 $zero $zero" -- "$area : $crop"
-t "ccw  0 $zero $zero" -- "$area : 1350x2160+0+0"
+# Only one dim
+t "none 0 $fixW $zero" -- "$area : $hCrp"
+t "none 0 $fixH $zero" -- "$area : $hCrp"
+t "none 0 $zero $fixW" -- "$area : $hPan"
+t "none 0 $zero $fixH" -- "$area : $hCrp"
 
-# Frame auto (BAD: no fit but pan)
-t "none 1 $zero $zero" -- "0 0 34996 19685 : $scrn"
-t "cw   1 $zero $zero" -- "$area : $scrn"
-t "half 1 $zero $zero" -- "$area : $scrn"
-t "ccw  1 $zero $zero" -- "$area : $scrn"
+
+# Auto, always fit inside: pp=[area..frame],
+t "none 0 $zero $zero" -- "$area : $hCrp"
+t "cw   0 $zero $zero" -- "$area : $vCrp"
+t "half 0 $zero $zero" -- "$area : $hCrp"
+t "ccw  0 $zero $zero" -- "$area : $vCrp"
+t "none 1 $zero $zero" -- "$cTop : $scrn"
+t "cw   1 $zero $zero" -- "$cRgt : $scrn"
+t "half 1 $zero $zero" -- "$cBot : $scrn"
+t "ccw  1 $zero $zero" -- "$cLft : $scrn"
 
 
 ### Misc ---------------------------------------------------------
@@ -126,7 +144,8 @@ t "none 0 %50x50+50+50 %50x50+50+50" -- "7874 4921 23622 14764 : 1920x1080+960+5
 # Blend
 t "none 0.5 $zero $zero" -- "0 0 32371 19426 : 3744x2188+0+0"
 
+### Test absolute coords
 
-### Test portrait screen
+### Test external portrait screen
 pscrn="1080x1920+0+0"
 p(){ local scrn=$pscrn; t "$@"; }

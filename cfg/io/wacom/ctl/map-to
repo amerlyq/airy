@@ -53,18 +53,7 @@ IFS='x+' read -r ow oh ox oy <<< "$geom"
 oa=$(dc -e "6k $ow $oh /p")
 og=0  # alignment: 0..100%
 
-
 # =============================================================================
-# HACK:TEMP: many hardcoded values/regimes
-# TODO: affect vars/aspect by rotation
-# USE: dc/bc
-frame_center(){
-  nw=$((oh*16/10))
-  nx=$((ox+(ow - oh*16/10)/2))
-  ow=$nw; ox=$nx
-  frame=${ow}x${oh}+${ox}+${oy}
-}
-
 frame_cursor(){ local zoom=${1:?}
   read mx my scr wnd < <(query-mouse)
   nw=$((oh*16/10*$zoom))
@@ -88,9 +77,6 @@ frame_cursor(){ local zoom=${1:?}
 # Adjust ======================================================================
 case ${mode:?}
 in area)   # adjust area to full output
-  # IDEA: by setting DFL:$a* beforehand -- you may adjust (shrink)
-  #   bounding box to additionally fit/scale active zone on any rotate
-
   # THINK: how directly convert '%' -> 0 for gz ?
   # TRY: directly catch whole rect in var like $ IFS='% x+' read -r area <<< "$4"
   # THINK: how extract '+' or '-' separators to extract from bottom-right?

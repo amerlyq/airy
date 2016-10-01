@@ -20,6 +20,8 @@ Area aspect ratio
 
 % Variants
   [_] THINK:DEV: force aspect -- use *gz,fz*=mode2 OR pass aspect=*gz,fz*
+  IDEA: by setting DFL:$a* beforehand -- you may adjust (shrink)
+    bounding box to additionally fit/scale active zone on any rotate
   { WxH WxH }  # full-full
     ignore *pp* (always =1)
     fix rects as specified
@@ -34,6 +36,8 @@ Area aspect ratio
   { WxH 0x0 | 0x0 WxH }  # full-maxfit -- scale rect to full
     derive both '0' as earlier
     aspect from WxH
+    CHECK if pan for area has any effect on screen
+      ~ it can have no effect, if xsetwacom crops before mapping
     *pp*=0..1 : fit rect=[inner..outer] in respect to Rotation
       E.G. z16:10 + w9:16
         | 0.0 | maximize tablet, crop screen
