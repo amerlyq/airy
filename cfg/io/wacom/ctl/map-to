@@ -21,8 +21,21 @@ cache output 'desktop'
 
 sid=$(wacom-ids 'STYLUS')
 # HACK: use defaults when wacom disabled
-[[  ${rotate:=${sid:+$(wacom-rotation "$sid")}} ]] || rotate=none
 [[ ${maxarea:=${sid:+$(wacom-area-max "$sid")}} ]] || maxarea='0 0 31496 19685'
+
+arr_idx() { local k=$1 i=0; shift; for v in "$@"
+  do [[ $v == $k ]] && echo "$i" && return 0
+  ((++i)); done; return 1
+}
+next_rot(){ local idx dir=${1:-+} _rot=( none cw half ccw )
+  idx=$(arr_idx "$rotate" "${_rot[@]}")
+  idx=$(( (idx $dir 1) % ${#_rot} ))
+  printf '%s\n' "${_rot[ $idx ]}"
+}
+# Incremental rotation
+[[ $rotate == [+-] ]] && { rot_dir=$rotate; unset rotate; }
+[[  ${rotate:=${sid:+$(wacom-rotation "$sid")}} ]] || rotate=none
+[[ $rot_dir ]] && rotate=$(next_rot $rot_dir)
 
 
 # Query output ================================================================
@@ -82,7 +95,7 @@ IFS='x+' read -r ow oh ox oy <<< "$maxgeom"
 
 case ${zone:?}
 in full) zone='%100x100+0+0'
-;; auto) zone='%0x0+50+50'
+;; auto) zone='%0x0+0+0'
 ;; [%0-9]*x*) zone=$zone
 ;; *) exit 2
 esac
