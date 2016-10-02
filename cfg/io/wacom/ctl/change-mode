@@ -13,17 +13,19 @@ curr() { [[ -s $fmod ]] && cat "$fmod"
     # | awk '$1 == '"$(cat ${TMPDIR:-/tmp}/wacom_prof)"' {print $2}'
 }
 
-next() { ## Choose next
-    case "$1" in
-    brush)   mod=rotate  ;;
-    rotate)  mod=undo    ;;
-    undo)    mod=layer   ;;
-    layer)   mod=color   ;;
-    color)   mod=opacity ;;
-    opacity) mod=zoom    ;;
-    zoom)    mod=brush   ;;
-    *) mod=zoom ;; esac
-}
+# next() { ## Choose next
+#     case "$1" in
+#     brush)   mod=rotate  ;;
+#     rotate)  mod=undo    ;;
+#     undo)    mod=layer   ;;
+#     layer)   mod=color   ;;
+#     color)   mod=opacity ;;
+#     opacity) mod=zoom    ;;
+#     zoom)    mod=brush   ;;
+#     *) mod=zoom ;; esac
+# }
+
+next(){ local -A n=([zoom]=undo [undo]=zoom); mod=${n[$1]:-zoom}; }
 
 
 # FIXME:
@@ -51,8 +53,8 @@ fled(){
 # fi
 
 ## Next
-mod="$1"
-case "$mod" in -?) arg="$mod"; shift; mod="$1" ;; esac
+case $1 in -?*) arg=$1; shift ;; esac
+mod=$1
 
 if [[ -z $mod ]]; then
     next $(curr)
@@ -74,9 +76,10 @@ rotate) fled 1 32; wacom "$WPAD" <<< '
 ';;
 undo) fled 3 32; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
-    AbsWheelDown "key +Control_L Z -Control_L"        # prev
-    AbsWheelUp   "key +Control_L shift Z -Control_L"  # next
+    AbsWheelDown "key ctrl shift Z"   # redo
+    AbsWheelUp   "key ctrl Z"         # undo
 ' ;;
+# THINK: Has not much sense, as there is 'Shift + MMove=Lft/Rgt"
 brush) fled 0 32; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown "key ["  # small
@@ -99,19 +102,22 @@ opacity) fled 0 64; wacom "$WPAD" <<< '
 ' ;;
 zoom) fled 1 64; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
-    AbsWheelDown 5
-    AbsWheelUp   4
+    AbsWheelDown 4
+    AbsWheelUp   5
 ' ;;
-history) fled 2 64; wacom "$WPAD" <<< '
-    AbsWheelDown "key ctrl r"  # redo
-    AbsWheelUp   "key ctrl z"  # undo without pick-up
-' ;;
-*) esac
+# history) fled 2 64; wacom "$WPAD" <<< '
+#     AbsWheelDown "key ctrl z"  # undo without pick-up
+#     AbsWheelUp   "key ctrl r"  # redo
+# ' ;;
+esac
 
+# DEV: complete status line:
+#   => touchpad ON/OFF, $group, $mode, curve firm/soft
 state(){ local p=/tmp/wacom_bar
-  r.n "Wacom: mode" "$1"
   [[ -p $p ]] || mkfifo "$p"
   printf '%s\n' "$1" > "$p"
 }
 
-case "$arg" in -s) echo "$mod" ;; -q) ;; *) state "$mod" ;; esac
+[[ $arg =~ h ]] && echo "$mod"
+[[ $arg =~ n ]] && r.n "Wacom: mode" "$mod"
+[[ $arg =~ p ]] && state "$mod"

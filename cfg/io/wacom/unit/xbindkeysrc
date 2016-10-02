@@ -1,13 +1,25 @@
 # vim:ft=conf
+## Modifiers :: m:0xXX
+#  0x1 - Shift
+#  0x2 - Lock
+#  0x4 - Control
+#  0x8  - Mod1 (Meta)
+#  0x10 - Mod2 (Num)
+#  0x20 - Mod3 (Hyper)
+#  0x40 - Mod4 (Super)
+#  0x80 - Mod5 (ISO_Level3_Shift)
+
+# NOTE: latching modifiers work even for wacom
+#   => you can easily press seq: Shift, Control, <key>
 
 # Modifier
-"r.wacom change-mode -q"  # && $upd wnd
+"r.wacom change-mode -p"  # && $upd wnd
     m:0x0 + b:13
-"r.wacom change-output"
+"r.wacom map-to auto auto +"  # change-output
     m:0x1 + b:13
-"r.wacom change-curve"
+"r.wacom map-to auto full -"
     m:0x4 + b:13
-"r.wacom show-curves"
+"r.wacom change-curve"  # show-curves
     m:0x5 + b:13
 
 # Back'n'forth to prev wksp
