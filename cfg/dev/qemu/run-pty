@@ -1,0 +1,6 @@
+#!/bin/bash -e
+tmp=${TMPDIR:-/tmp}/qemu
+mkdir -p "$tmp"
+
+# trap 'kill $(jobs -p)' TERM KILL QUIT INT EXIT
+exec socat PTY,link="$tmp/pts",wait-slave $(tty),rawer

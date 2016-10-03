@@ -1,0 +1,203 @@
+REF
+  http://wiki.qemu.org/download/qemu-doc.html
+    => MAYBE see more about -net* switches
+  +++ http://nairobi-embedded.org/qemu_monitor_console.html
+
+  NOTE: key bind
+    SEE: http://wiki.qemu.org/download/qemu-doc.html#mux_005fkeys
+    | <C-a>   | DFL prefix for *qemu* monitor commands
+    | -echr 7 | set prefix in num_ascii
+    | <C-a> b | Send break (magic sysrq in Linux)
+
+  SEE |UART|
+    https://geektimes.ru/post/253786/
+    https://ru.wikipedia.org/wiki/%D0%A3%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D0%B0%D1%81%D0%B8%D0%BD%D1%85%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%B9_%D0%BF%D1%80%D0%B8%D1%91%D0%BC%D0%BE%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%82%D1%87%D0%B8%D0%BA
+    http://easyelectronics.ru/tag/uart
+    http://s-engineer.ru/rabotaem-s-uart-na-avr/
+    https://github.com/ytai/ioio/wiki/UART
+
+  SEE lsof + unix socket : end-point
+    http://serverfault.com/questions/252723/how-to-find-other-end-of-unix-socket-connection
+
+
+%%% Serial port
+  REF
+    ++ http://www.tldp.org/HOWTO/Serial-HOWTO-10.html
+    http://nairobi-embedded.org/qemu_serial_terminal_redirection.html
+    http://wiki.qemu.org/Features/ChardevFlowControl
+    https://blackdot.be/2013/07/qemu-kvm-monitor-and-serial-console-over-sockets-with-minicom/
+    http://www.makelinux.net/alp/047
+  USAGE:
+    -serial pty
+      copy path /dev/pts/N allocated on qemu launch
+      Connect:
+        $ picocom /dev/pts/N
+          => BETTER: allows connections inside tmux -- to copy on-screen text
+        $ st -l /dev/pts/N
+    -serial unix:path[,server][,nowait][,reconnect=seconds]
+       E.G: -serial unix:/tmp/ttyS0,server,nowait
+       ALT: -chardev socket,id=tmp,path="$tmp/ttyS0",server -device isa-serial,chardev=tmp
+    -serial mon:stdio
+      Switch mux by `<C-a> c` to monitor/ttyS0
+    -mon [chardev=]name[,mode=readline|control][,default]
+       E.G: -chardev socket,server,nowait,path=monitor,id=monitor -mon chardev=monitor,mode=readline
+       ALT: -chardev stdio,mux=on,id=char0 -mon chardev=char0,mode=readline,default
+  THINK: preallocate device
+    ++ http://tldp.org/HOWTO/Text-Terminal-HOWTO-7.html
+    http://stackoverflow.com/questions/52187/virtual-serial-port-for-linux
+    + http://technostuff.blogspot.com/2008/10/some-useful-socat-commands.html
+    Recovery by stty after socat
+      http://stackoverflow.com/questions/26373006/using-socat-for-raw-serial-connection
+    $ socat PTY,link=/tmp/pts $(tty),rawer
+    ALT:
+      $ sudo mknod -m 666 /tmp/ttyS0 c 4 64
+      $ socat -d -d PTY,raw,echo=0 PTY,raw,echo=0
+      $ socat PTY,link=/dev/ttyS10 PTY,link=/dev/ttyS11
+  Connect
+    $ nc -U /tmp/ttyS0
+    $ socat UNIX-CLIENT:/tmp/ttyS0 -
+      BAD:FIND: no support for escape seq inside term (E.G. Up/Down arrows)
+      SEE:
+        socat UNIX-CLIENT:/tmp/ttyS0 "EXEC:picocom -"
+        socat UNIX-CLIENT:/tmp/ttyS0 PTY
+    NEED: use socat to convert //unix.sock -> //pty
+      # Impossible direct connect to *.sock
+      $ picocom -b 115200 /tmp/pty
+      $ st -l /tmp/pty 115200
+  DFL:HACK:
+    New terminal <M-Space>
+      $ tty
+      # /dev/pts/3
+      $ sleep 10d
+     USE: -chardev tty,id=pts,path=/dev/pts/3 -device isa-serial,chardev=pts
+  ALSO: kernel options
+    Menu: <Tab> to open kernel cmdline editor
+    Add: console=ttyS0 OR console=ttyS0,115200n8
+  E.G:
+  $ qemu -nographic -serial mon:stdio -append 'console=ttyS0' binary.img
+  $ qemu -nographic -kernel ./bzImage -hda ./image.hda -append "root=/dev/sda console=ttyS0"
+  $ qemu -kernel linux-3.9.2/arch/x86/boot/bzImage -serial stdio -append "root=/dev/ram0 console=ttyAMA0 console=ttyS0"
+
+
+%%%% Kernel debug
+  REF:
+    http://wiki.qemu.org/download/qemu-doc.html#gdb_005fusage
+     -gdb <dev> || -s
+    https://bugzilla.redhat.com/show_bug.cgi?id=1354090
+  http://nairobi-embedded.org/debugging_qemu_with_gdb_ddd.html
+  https://github.com/arapov/wrap-qemukvm
+
+
+%% DFL Options
+  Config
+    NOTE: at startup loads cfgs from //sysconfdir and //datadir
+     | -readconfig file      | instead of cmdline options
+     | -writeconfig {-|file} | save combined options to config
+     | -nodefconfig          | ignore both //sysconfdir and //datadir
+     | -no-user-config       | ignore only //sysconfdir
+  Connectors
+    https://kashyapc.com/2013/03/31/multiple-ways-to-access-qemu-machine-protocol-qmp/
+    E.G:(type) socket vc file pipe serial pty stdio braille tty …
+      TRY: pty  # Create a new pseudo-terminal on the host and connect to it
+    |UART|
+       -serial chardev:char1
+      ALT: $ qemu -chardev tty,id=$id,path=$path
+    HELP
+      $ qemu-system-x86_64 -device help  # |& grep -i serial
+      $ qemu-system-x86_64 -device isa-serial,help
+    ctl
+       -mon [chardev=]name[,mode=readline|control][,default]
+  Disk
+    WARN: cannot use -hdc and -cdrom at the same time
+       -hda file.img   | == -drive file=file,index=0,media=disk
+       -cdrom file.iso | == -drive file=file,index=2,media=cdrom
+       -mtdblock file  | on-board Flash memory image (Android-like)
+       -sd file        | [micro]SD-card
+    By default, interface is "ide" and index is automatically incremented
+       -drive file=a -drive file=b" | == -hda a -hdb b
+    E.G:(formats) file ssh qcow2 raw vdi tftp ftp http nfs …
+      HELP $ qemu-img -h
+    Network
+      SSH:
+         -drive file=ssh://user@host/path/to/disk.img
+         -drive file.driver=ssh,file.user=$user,file.host=$host,file.port=22,file.path=/path/to/disk.img
+      WEB:  {http|https|ftp|ftps|tftp}://[<username>[:<password>]@]<host>/<path>
+        E.G: boot from a remote Fedora 20 live ISO image
+          $ qemu --drive media=cdrom,file=http://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
+          $ qemu --drive media=cdrom,file.driver=http,file.url=http://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
+        E.G: boot from a remote Fedora 20 cloud image using a local overlay for writes, copy-on-read, and a readahead of 64k
+          $ qemu-img create -f qcow2 -o backing_file='json:{"file.driver":"http",, "file.url":"https://dl.fedoraproject.org/Fedora-x86_64.qcow2",, "file.readahead":"64k"}' /tmp/Fedora.qcow2
+          $ qemu --drive file=/tmp/Fedora.qcow2,copy-on-read=on
+
+  Display
+    -vga std
+  Net
+    HELP $ qemu -net nic,model=help
+    -net user
+      DFL net: 10.0.2.0/24
+      DFL host: 10.0.2.2  # net+2
+  SSH access
+    use password-less access from |Clean guest|
+      $ ssh -p 2122 user@localhost
+       -net user,hostfwd=tcp:127.0.0.1:6001-:6000
+       -net user,hostfwd=tcp::5555-:23
+    ALT:OBSOLETE:(-redir)
+       -net user -net nic,model=rtl8139 -redir tcp:2122::22
+    Reverse-access
+      # open 10.10.1.1:4321 on bootup, connect 10.0.2.100:1234 to it whenever the guest accesses it
+      $ qemu -net user,guestfwd=tcp:10.0.2.100:1234-tcp:10.10.1.1:4321
+
+
+% Clean guest
+  Arch + virtio
+    https://bbs.archlinux.org/viewtopic.php?id=133623
+    http://allskyee.blogspot.com/2013/12/over-weekend-i-decided-to-give-arch.html
+    https://turlucode.com/qemu-kvm-on-arch-linux-guide/
+    http://lifeisabug.com/kvm-virtualization-arch-linux-host-system-qemu-virtio-hugepages-systemd/
+  Create user w/o password
+    $ passwd -d user
+  Setup eth0/DHCP
+  Setup 'sshd'
+    PermitEmptyPasswords yes
+    UsePAM no
+  Setup sudo
+    ALL = (ALL) NOPASSWD: ALL
+
+
+%% Performance
+  REF
+    https://wiki.archlinux.org/index.php/QEMU#Virtual_machine_runs_too_slowly
+
+  Restore state
+     -loadvm file
+     -mem-path file
+
+  INFO: KVM support
+    NOTE: with KVM some supported arch can't be emulated
+      http://www.michurin.net/tools/qemu.html
+    Check sequentially
+      CPU: $ grep -E '(vmx|svm)' /proc/cpuinfo
+      Kernel: $ zgrep KVM /proc/config.gz
+      LKM: $ lsmod | grep -i kvm
+      Qemu: (qemu) info kvm
+
+
+% DEBUG
+  Logging
+    $ qemu-system-x86_64 -d help
+    $ qemu-system-x86_64 -d mmu -D /tmp/log  # ? -dfilter
+     -trace [events=file][,file=file]
+  Show log on both qemu and in your terminal
+    Kernel: console=ttyAMA0,115200 console=tty mem=256M highres=off console=ttyS0
+  To boot the system you need two images
+    1) zImage or bZimage (in case of x86)
+    2) initrd rootfs -root file system
+      If absent -- use busybox for creating initrd which contain minimal rootfile system
+        http://stackoverflow.com/questions/22409516/how-to-compile-busybox/22475170#22475170
+  Protect host memory from guest faults/crash
+    https://wiki.archlinux.org/index.php/QEMU#Enabling_IOMMU_.28Intel_VT-d.2FAMD-Vi.29_support
+
+  Service / systemd
+     -pidfile "$tmp/pid" -daemonize -watchdog model -chroot dir -runas user
+    QMP ctl protocol: http://wiki.qemu.org/QMP
+      https://negotiator.readthedocs.io/en/latest/

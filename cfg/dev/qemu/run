@@ -1,0 +1,23 @@
+#!/bin/bash -e
+SWD=$(readlink -e "$0"); SWD=${SWD%/*}
+tmp=${TMPDIR:-/tmp}/qemu
+mkdir -p "$tmp"
+
+# Run socat if port not available yet
+if [[ ! -c $tmp/pts ]]; then
+  r.t "$SWD/run-pty" &
+  sleep 1
+fi
+
+# TEMP:REM:
+(($#)) || set -- '/home/media/res/archlinux-2016.04.01-dual.iso'
+
+# Create disk img beforehand
+# img=/tmp/qemu-img
+# [[ -f $img ]] || qemu-img create -f raw "$img" 4G
+
+# Guard for already launched qemu
+[[ -s $tmp/pid ]] && ps -p "$(<"$tmp/pid")" >/dev/null \
+|| "$SWD/run-iso" "$@"
+
+wait

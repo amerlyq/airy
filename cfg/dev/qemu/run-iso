@@ -1,0 +1,56 @@
+#!/bin/bash -e
+tmp=${TMPDIR:-/tmp}/qemu
+mkdir -p "$tmp"
+
+iso=$(realpath -e "${1:?}")
+
+# THINK:TRY: -nodefaults
+cmd=( qemu-system-x86_64 )
+
+## Environment
+# cmd+=( -name "${0##*/}" )  # OR: "${iso##*/}"
+# For scripting / systemd unit
+cmd+=( -pidfile "$tmp/pid" )
+# Terminal only
+cmd+=( -nographic )
+# On guest OFF keep monitor ON to save snapshots/re-launch
+cmd+=( -no-shutdown )
+# Keep $img unchanged, write in temp files instead
+# cmd+=( -snapshot )
+
+
+## Performance (SEE NOTE.nou)
+# Virtualization
+cmd+=( -enable-kvm -machine type=pc,accel=kvm )
+# Emulate the host's exact CPU
+cmd+=( -cpu host )
+
+
+## System
+# Memory
+cmd+=( -m 4G )
+# Boot from iso
+cmd+=( -cdrom "${iso:?}" -boot order=d )
+# Use hdd img. EXPL:(commented) no need for cdrom-only
+# cmd+=( -drive file="${img:?}",format=raw )  # ALSO: readonly
+
+## Output
+# Redirect qemu control shell
+cmd+=( -monitor stdio )  # OR /dev/pts/11
+# cmd+=( -chardev socket,server,nowait,path="$tmp/mon",id=mon -mon chardev=mon,mode=readline )
+
+# Redirect kernel serial
+# NOTE: repeat '-serial ...' to connect to second serial (ttyS1, etc)
+# cmd+=( -serial unix:"$tmp/ttyS0",server )  # ,nowait
+# ALT: cmd+=( -chardev socket,id=tmp,path="$tmp/ttyS0",server -device isa-serial,chardev=tmp )
+# num=9  # NOTE: use existing pty
+# cmd+=( -chardev tty,id=pts$num,path=/dev/pts/$num -device isa-serial,chardev=pts$num )
+# cmd+=( -serial stdio )
+# cmd+=( -serial mon:stdio )  # NOTE: mux cycling <C-a> c
+# ALT:(only disable <C-c>):USE: -chardev stdio,id=io,signal=off
+# NOTE: copy /dev/pts/N path from stdio to connect picocom/st
+# cmd+=( -serial pty )
+cmd+=( -chardev tty,id=pts,path="$tmp/pts" -device isa-serial,chardev=pts )
+
+# XXX?(any reasons to use?) export LANG=C
+exec "${cmd[@]}"
