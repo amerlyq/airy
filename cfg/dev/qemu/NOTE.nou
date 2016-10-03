@@ -19,6 +19,18 @@ REF
   SEE lsof + unix socket : end-point
     http://serverfault.com/questions/252723/how-to-find-other-end-of-unix-socket-connection
 
+  Create qemu img from dir
+    http://serverfault.com/questions/246835/convert-directory-to-qemu-kvm-virtual-disk-image
+
+  Socat
+    + http://technostuff.blogspot.com/2008/10/some-useful-socat-commands.html
+    https://github.com/craSH/socat/blob/master/EXAMPLES
+    http://sudanlandge.blogspot.com/2013/04/socat-examples.html
+    http://www.geeklab.info/2011/12/playing-with-the-sockets-socat-and-netcat/
+    Chat:
+      $ socat TCP-L:5555,fork READLINE
+      $ socat TCP:192.168.1.2:5555 READLINE
+
 
 %%% Serial port
   REF
@@ -45,7 +57,6 @@ REF
   THINK: preallocate device
     ++ http://tldp.org/HOWTO/Text-Terminal-HOWTO-7.html
     http://stackoverflow.com/questions/52187/virtual-serial-port-for-linux
-    + http://technostuff.blogspot.com/2008/10/some-useful-socat-commands.html
     Recovery by stty after socat
       http://stackoverflow.com/questions/26373006/using-socat-for-raw-serial-connection
     $ socat PTY,link=/tmp/pts $(tty),rawer

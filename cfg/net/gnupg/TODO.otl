@@ -142,6 +142,7 @@ Revocation
 		gpg --import /mnt/amerlyq.gpg-public.asc /mnt/amerlyq.gpg-private.asc
 		gpg --edit-key $GPGKEY   # ALT --homedir=/mnt/.gnupg
 		USE gpg> list, key 2, revkey, save
+		Extend: gpg> key 1, expire, save
 		: Send the updated key to the keyservers
 		gpg --send-key --keyserver <server> $GPGKEY
 
