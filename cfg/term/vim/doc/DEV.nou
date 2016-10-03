@@ -125,6 +125,21 @@ Fold-pretty
     http://vimcasts.org/transcripts/38/en/
     https://github.com/kshenoy/vim-origami
     http://learnvimscriptthehardway.stevelosh.com/chapters/49.html
+  Fold matches
+    https://github.com/carbonscott/vim-smartfold
+    https://github.com/vim-scripts/foldutil.vim
+    https://github.com/jkramer/vim-narrow
+    https://github.com/gavocanov/foldsearches.vim
+      https://github.com/thoughtstream/Damian-Conway-s-Vim-Setup/blob/master/plugin/foldsearches.vim
+  Filtering search results
+    Find lnum for search results
+    Split file on regions -- in mid between each pair of lnum
+      => So when unfolding your cursor will be on match at the center of region
+    Fold each region with transparent foldtext and hi! -- as original syntax
+      => '+' marker on right for folded line is enough -- no need to standout 'fg/bg' more than that
+    When jumping between new matches: 'n/N' in old folded regions
+      * open region to preview result's context
+      * fold region back when jumping to next match
   2015-11-30 [X] Integrate in my 'fold.vim', but use left-adjusting
     : https://github.com/Konfekt/FoldText  ::> right is the must!
   [_] DEV disable foldcolumn on BufWinEnter, if there are no folds found at all
