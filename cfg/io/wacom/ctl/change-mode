@@ -25,7 +25,10 @@ curr() { [[ -s $fmod ]] && cat "$fmod"
 #     *) mod=zoom ;; esac
 # }
 
-next(){ local -A n=([zoom]=undo [undo]=zoom); mod=${n[$1]:-zoom}; }
+next(){ declare -A n
+  n=([zoom]=undo [undo]=zoom)
+  # n=([zoom]=rotate [rotate]=undo [undo]=zoom)
+  mod=${n[${1:-default}]:-zoom}; }
 
 
 # FIXME:
