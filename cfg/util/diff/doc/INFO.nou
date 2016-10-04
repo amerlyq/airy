@@ -1,0 +1,69 @@
+%%%%% Compare fs
+
+%%%% Reproducible Builds
+  https://wiki.debian.org/ReproducibleBuilds
+
+% Directories
+  $ diff <(find $a -type f|xargs md5sum|sort) <(find $b -type f|xargs md5sum|sort)
+  TRY
+    # http://askubuntu.com/questions/12473/file-and-directory-comparison-tool
+    dirdiff
+    diffuse
+      # I often use Diffuse for one killer feature - the ability to manually set merge anchors. It doesn't do directories (yet), but for individual and messy diffs, the anchors feature is awesome.
+    hashdeep
+      http://askubuntu.com/questions/37483/check-the-correctness-of-copied-files/37644#37644
+    FreeFileSync
+      http://www.freefilesync.org/
+  rsync
+    The rsync utility first popped into my mind when I saw your question. Doing
+    something like below could quickly show what files are in directory a but not in b:
+      $ rsync -nrcv /tmp/a /tmp/b
+      # -n will run it as a "dry run" and make no changes, but just print out the files that would be updated
+      # -r will recurse into the directories
+      # -c will compare based on file checksum
+      # -v will print the output to stdout verbosely
+      This is a good option because you can compare the contents of the files
+      as well to make sure they match. rsync's delta algorithm is optimized for
+      this type of use case. Then if you want to make b match the contents of
+      a, you can just remove the -n option to perform the actual sync.
+
+Some related questions:
+
+http://stackoverflow.com/questions/19396718/compare-files-in-two-directory-on-remote-server-using-unix
+http://unix.stackexchange.com/questions/57305/rsync-compare-directories
+
+
+% Binaries comparison
+  $ cmp -l file1.bin file2.bin | gawk '{printf"%08X %02X %02X\n",$1-1,strtonum(0$2),strtonum(0$3)}'
+  $ diff -y <(xxd foo1.bin) <(xxd foo2.bin) | colordiff
+  Method that works for byte addition / deletion
+    $ diff <(od -An -tx1 -w1 -v file1) <(od -An -tx1 -w1 -v file2)
+  ALT:
+  # http://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
+    vbindiff
+      https://www.cjmweb.net/vbindiff/
+    jdiff
+      http://jojodiff.sourceforge.net/
+    ++ bindiff  # Graph-like comparison
+      https://security.googleblog.com/2016/03/bindiff-now-available-for-free.html
+      https://www.zynamics.com/software.html
+    bsdiff
+      bsdiff and bspatch are tools for building and applying patches to binary files.
+    ALSO:TRY:
+      wdiff, dwdiff -- for minimal diffs (see current prezto func as altr)
+      sdiff -- side by side diff
+      diffc -- python altr to colordiff
+      vim-diffchar -- characterwise line diff instead of chunkwise
+
+% Elfs comparison
+  THINK: how to ignore only adress minor shifts?
+    # http://stackoverflow.com/questions/3231641/comparing-generated-executables-for-equivilance
+  $ f=opt/f512/lwipcglue/lib/libtd_ipc_client.so
+  $ diff <(objdump -x std/$f) <(objdump -x expat/$f)
+  $ diff -I 'addiu' <(objdump -d std/$f) <(objdump -d expat/$f)
+  ALT: for each significant section from $ objdump -x $ do
+    $ objcopy -j <section> | md5sum
+  ALT
+    eu-elfcmp
+      http://www.linuxfromscratch.org/blfs/view/svn/general/elfutils.html
+      SRC: https://git.fedorahosted.org/cgit/elfutils.git/tree/src/elfcmp.c

@@ -1,0 +1,32 @@
+#!/bin/bash -e
+set -o pipefail
+
+[[ $1 == -s ]] && { size_only=1; shift; }
+[[ $1 == -d ]] && { elf_args=( "$1" ); shift; }
+
+rgx_bin='^Binary files (.*) and (.*) differ$'
+passthrough(){ printf '%s\n' "${1:-$line}"; continue; }
+
+diff -r --no-dereference \
+  -x 'VERSION.TXT' -x 'announcement.xml' \
+  "$@" \
+| grep -E -v '^File .*(/dev/\S+ is a \w+ special file) while file .*\1$' \
+| grep -E -v '^Binary files .*(/usr/lib/terminfo/\S+) and .*\1 differ$' \
+| while IFS= read -r line; do
+  [[ $line =~ $rgx_bin ]] || passthrough
+  f1=${BASH_REMATCH[1]}
+  f2=${BASH_REMATCH[2]}
+
+  if ((size_only)); then
+    s1=$(command stat -c%s "$f1")
+    s2=$(command stat -c%s "$f2")
+    (( s1 == s2 )) || passthrough
+  else
+    file -b "$f1" | grep -q '\bELF\s' || passthrough
+    file -b "$f2" | grep -q '\bELF\s' || passthrough
+    diff=$(r.diff-elf "${elf_args[@]}" "$f1" "$f2" \
+          |& sed 's/^eu-elfcmp: .* differ:\s/\t/'
+    ) || { printf '%s\n' "$line" && printf '%s\n' "$diff"; }
+  fi
+done \
+| colordiff

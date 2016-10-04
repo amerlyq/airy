@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# VIZ: cmp diff diff3 sdiff
+pkg_inst -p 'diff' diffutils
+
+# VIZ: eu-*: addr2line ar elfcmp elfcompress elflint findtextrel
+#   make-debug-archive nm objdump ranlib readelf size stack strings strip unstrip
+pkg_inst -p 'eu-elfcmp' elfutils

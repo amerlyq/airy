@@ -1,0 +1,7 @@
+#!/bin/bash -e
+set -o pipefail
+exec cmp -l "$@" | gawk '{
+  a=strtonum(0$2)
+  b=strtonum(0$3)
+  printf"%08X  %02X %02X  %c %c\n",$1-1,a,b,a,b
+}'

@@ -1,0 +1,38 @@
+#!/bin/bash -e
+
+# DFL: elfutils/eu-elfcmp
+[[ $1 == -d ]] || exec eu-elfcmp --verbose --ignore-build-id "$@"
+
+shift
+f1=${1:?}
+f2=${2:?}
+set -- "$f1" "$f2"
+
+# TEMP:SEP:
+XCT_PRF=/opt/mips-unknown-linux-uclibc/bin/mips-linux-uclibc-
+
+objdump(){ local f=${@: -1}
+  (cd "${f%/*}" && "${XCT_PRF}objdump" "${@:1:$#-1}" "${f##*/}")
+}
+
+dhead(){
+  # ALT: temp files
+  local o1=$(objdump -wx "$1")
+  local o2=$(objdump -wx "$2")
+  # WARN: process substitution can't catch errors
+  diff <(cat<<<"$o1") <(cat<<<"$o2")
+}
+
+dasm(){
+  local o1=$(objdump -wCD "$1")
+  local o2=$(objdump -wCD "$2")
+  # TRY:(ignore) -I 'addiu'
+  diff <(cat<<<"$o1") <(cat<<<"$o2")
+}
+
+if ! diff -q "$@" &>/dev/null; then
+  # BAD: no message 'f1 f2 differ' from diff to delimit output
+  # BUT: it must be shown only if next line will show error
+  # ALT: filter output from 'diff -r' and delete output line if no diff
+  dhead "$@" && dasm "$@"
+fi
