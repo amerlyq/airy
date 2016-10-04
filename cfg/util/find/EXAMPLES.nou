@@ -1,0 +1,41 @@
+Examples & tips
+  http://www.softpanorama.info/Tools/Find/find_examples.shtml
+
+Заменить подстроку во многих файлах:
+  perl -i -pe 's/Windows/Linux/;' test\*
+Чтобы провести ту же операцию во всех поддиректориях:
+  $ find. -name '*.txt' -print | xargs perl -pi -e's/Windows/Linux/ig' *.txt
+Или вы хотите сделать то же самое для на обычных файлов со множеством
+переносов строк и странных символов (файл — в другой кодировке):
+  $ find -type f -name '*.txt' -print0 | xargs --nul
+linux - Как из терминала заменить слово в файлах в Ubuntu?
+  grep -lr -e 'было' . | xargs sed -i 's/было/стало/g'
+
+Поиск всех файлов в текущей директории с определённым именем, отсеивание по
+маске и подсчёт их количества
+  $ find ./ -name CMakeLists.txt | grep .txt | wc -l
+
+Удаление всех файлов рекурсивно по заданной маске
+  $ find ./ -name "*~" -exec rm {} \;
+
+Все встречающиеся строки с инклюд в файле
+  $ grep '#include' ./sdrmtEpubPacker.h
+  $ grep -r '#include' ./
+
+Find all ELF
+  NOTE: don't match '^ELF' as 'file -b' output may contain '^setuid ELF'
+  $ find . -executable -exec sh -c 'file -b "{}" | grep -q "\bELF\s"' \; -print
+  And filter by only containing 'ioctl' symbol
+  $ ... | while read pr; do nm -C -n "$pr" 2>/dev/null| grep -q ioctl && printf '%s\n' "$pr"; done
+
+Ignore files with 'Permission denied!'
+  $ find / ! -readable -prune -o <other conditions like -name> -print
+
+Total file size
+  Estimate
+    $ find . -type f -name "*.py" -exec du -shc {} + | sed '$!d'
+  Exact
+    $ find . -type f -name "*.otl" -exec ls -l {} + | awk '{sz+=$5}END{print sz}'
+
+Convert all files in dir into utf8
+  $ find . -name '*.*' -exec iconv --verbose -f windows-1251 -t utf-8 -o {} {} \;

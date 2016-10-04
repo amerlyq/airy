@@ -48,12 +48,6 @@ Latex
 	when you need search package with appropriate file
 		apt-file -x search '/textcomp.sty$'
 
-Total file size
-	estimate
-		find . -type f -name "*.py" -exec du -shc {} + | sed '$!d'
-	exact
-		find . -type f -name "*.otl" -exec ls -l {} + | awk '{sz+=$5}END{print sz}'
-
 Image
 	Get image information
 	; identify -verbose picture.jpg
@@ -131,8 +125,6 @@ Flags from nemo:
 Ascii
 	$ figlet -- output text by it's big ascii version (each pixel by character)
 
-Convert all files in dir into utf8
-	find . -name '*.*' -exec iconv --verbose -f windows-1251 -t utf-8 -o {} {} \;
 
 Convert binary to c-hex
 	cat hello2.o | xxd -p -c 1 | awk '{ print "0x"$1","}' | xargs
