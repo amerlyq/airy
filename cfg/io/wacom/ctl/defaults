@@ -1,0 +1,11 @@
+#!/bin/bash -e
+SWD=$(readlink -e "$0"); SWD=${SWD%/*}
+PATH=$SWD/get:$SWD/mod:$SWD/set:$SWD:$PATH
+
+toggle-touch off
+keys-reset
+prf-krita
+change-mode -p zoom
+change-curve soft
+map-to full auto none
+keys-bind

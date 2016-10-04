@@ -23,3 +23,8 @@ linux - Как из терминала заменить слово в файла
 Все встречающиеся строки с инклюд в файле
 	grep '#include' ./sdrmtEpubPacker.h
 	grep -r '#include' ./
+
+Find all ELF
+	$ find . -executable -exec sh -c 'file -b "{}" | grep -q "^ELF\s"' \; -print
+	And filter by only containing 'ioctl' symbol
+	$ ... | while read pr; do nm -C -n "$pr" 2>/dev/null| grep -q ioctl && printf '%s\n' "$pr"; done

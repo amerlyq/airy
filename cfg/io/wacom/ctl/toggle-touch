@@ -1,7 +1,16 @@
-#!/usr/bin/env bash
-SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
-source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
+#!/bin/bash -e
+SWD=$(readlink -e "$0"); SWD=${SWD%/*}
+source "${SWD%/*}/funcs-lib"
 
-state=$(xsetwacom get "$WTOUCH" "Touch" \
-    | awk '/on/{print "OFF"} /off/{print "ON"}')
-xsetwacom set "$WTOUCH" Touch $state && r.n "Wacom" "Touch is $state"
+s=$1
+
+if [[ -z $s ]]; then
+  s=$(xsetwacom get "$WTOUCH" Touch)
+  declare -A _s=([on]=off [off]=on)
+  s=${_s[${s:?}]:?}
+fi
+s=${s^^}
+
+xsetwacom set "$WTOUCH" Touch "${s:?}"
+
+r.n 'Wacom: Touch' "${s:?}"

@@ -1,16 +1,24 @@
-#!/usr/bin/env bash
-SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
-source "${SCRIPT_PATH%/*/*}/funcs-lib" || exit 1
+#!/bin/bash -e
+SWD=$(readlink -e "$0"); SWD=${SWD%/*}
+PATH=$SWD/get:$SWD/mod:$SWD/set:$SWD:$PATH
+source "${SWD%/*}/funcs-lib"
 
-curve=$(cat ${TMPDIR:-/tmp}/wacom_curve)
-case "$curve" in
-    soft) curve=firm; bezier="50 0 20 75" ;;
-firm|norm|*) curve=soft; bezier="20 0 10 100" ;;
+curve=$1
+
+if [[ -z $curve ]]; then
+  read -r curve < <(cache-get curve default)
+  declare -A _curve=([soft]=firm [firm]=soft)
+  curve=${_curve[${curve:?}]:-default}
+fi
+cache-set curve "$curve"
+
+case $curve
+in soft) bezier=( 20 0 10 100 )
+;; firm|default|*) bezier=( 50 0 20 75 )
 esac
-echo "$curve" > ${TMPDIR:-/tmp}/wacom_curve
 
 for w in "$WSTYLUS" ; do #"$WERASER"
-    xsetwacom set "$w" PressureCurve "$bezier"
+  xsetwacom set "$w" PressureCurve "${bezier[@]}"
 done
 
 r.n "Wacom: Curve" "$curve"
