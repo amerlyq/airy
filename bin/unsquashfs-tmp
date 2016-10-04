@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+img=$(realpath -e "${1:?}")
+dst=${2:?}
+
+[[ $dst == /* ]] || dst=/tmp/squashfs/$dst
+
+sudo rm -rf "$dst"
+mkdir -p "$dst"
+
+# NOTE:(sudo) no effect '-user-xattrs'
+sudo unsquashfs -force -d "$dst" "$img"
+sudo find "$dst" ! -type l ! -perm -o=r -exec chmod o+r {} \;

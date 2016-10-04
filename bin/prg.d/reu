@@ -20,6 +20,8 @@ if file -b "$fl" | grep -q '^[^,]*, ARM,'; then
         arch=arm; pref="armv7l-tizen-linux-gnueabi-"
 else arch=i386; fi
 
+# ALT:(func disasm)
+#   http://stackoverflow.com/questions/22769246/disassemble-one-function-using-objdump
 funcOnly() { ${pref}nm -nS ${1?Need file name} |
 perl -lane '/'"${2?Need symbol name}"'/ and do {
     $s=hex(@F[0]); $e=$s+hex(@F[1]);
@@ -65,4 +67,3 @@ esac
 [ -t 1 ] && printf "=> ${pref}${cmd%% *} ${cmd#* } ${fl}\n"
 
 ${pref}${cmd%% *} ${cmd#* } ${fl}
-
