@@ -1,51 +1,77 @@
-#!/bin/bash
-# About 'file' command
+#!/bin/bash -e
+set -o pipefail
+set -o errtrace
+
+# REF:(file ...)
 #   https://www.ibm.com/developerworks/community/blogs/58e72888-6340-46ac-b488-d31aa4058e9c/entry/get_over_extensions_use_file_command_to_determine_file_types_in_linux?lang=en
 
-## Prompt: always/newer/on_error
-case "$1" in -[aen]) ARGS="$1"; shift ;; *) ARGS='-e' ;; esac
+onexit(){ exec pause $? $_pargs "${0##*/}" "${*:-: ${PWD/$HOME/\~}}"; }
+# trap 'onexit' HUP INT QUIT TERM ERR
+trap 'onexit' HUP QUIT TERM ERR  # INT -- better to return immediately
 
-NM="$1"
-NAME="${NM%/*}"
-EXT="${NAME##*.}"
-TYPE=$(file -i "$NM" | sed 's/.*:\s*\(\S*\);\s.*/\1/;q')
-FL="$(readlink -m "$NM")"
+_list=0
+_quiet=1
+_pargs=-N
+
+while getopts 'aAc:eEflnNqp' o
+do case $o
+in c) cd "$OPTARG"  # ALT: make -C "$PWD/build"
+;; q) _quiet=$((!_quiet))
+;; l) _list=$((!_list))
+;; [aAeEnN]) _pargs=-$o
+esac; OPTS+=$o; done; shift $((OPTIND-1))
+((_quiet))||unset _quiet
+
+path=${1:?}
+shift
+args=( "$@" )
 
 
-finish() { local ERR=$?; if [[
-    "$ARGS" == '-a' || ("$ARGS" != '-n' && "$ERR" != 0)
-]]; then pause $ERR "$NAME" || exit $ERR; fi
-} && trap finish INT TERM EXIT
+by_name(){ local name=${1%/*}
+case ${name:?}
+in  [Mm]akefile*) make ${_quiet:+-s} -f "$1"
+;;  CMakeLists.txt) sir
+;;  *) return 10
+esac; }
 
 
-# Names
-case "$NAME" in  # Names
-      Makefile*) make -f "$NAME" ;;
-CMakeLists\.txt) sir ;;
-*) v1=false ;; esac
-
-
-[[ -n "$v1" ]] && case "$EXT" in  # Extensions
-dot) dot -Tx11 "$NM"  ;;
-tpp) tpp "$NM"        ;;
- md) pandoc -o /tmp/pandoc.html "$FL" && r.b /tmp/pandoc.html ;;
-jar) java -jar "$NM" ;;
+by_ext(){ local ext=${1##*.}
+case ${ext:?}
+in dot) dot -Tx11 "$1"
+;; tpp) tpp "$1"
+;;  md) pandoc -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
+;; jar) java -jar "$1"
 # Launched w/o fork, because of poor cmd support: it opens new instance of
 # XMind instead of adding file to opened
-xmind) XMind -noSplash -- "$1" ;;
-*) v2=false ;; esac
+;; xmind) XMind -noSplash -- "$1"
+;; *) return 11
+esac; }
 
 
-[[ -n "$v2" ]] && case "$TYPE" in  # Types
- text/x-python) "$FL"  ;;
-application/x*) "$FL"  ;;
-       text/x*) if [[ -x "$FL" ]]; then "$FL"; exit
-                else echo "Non-executable '$FL'"; fi ;;
-       video/*) [ "$2" == "-l" ] && mpv --playlist="$3" || mpv $(ls) ;;
-*) v3=false ;; esac
+by_mime(){ local mime=$(file --brief --mime-type "$1")
+case ${mime:?}
+in text/x-python) "$1"
+;; application/x*) "$1"
+;; text/x*) "$1"
+;; video/*) ((_list)) && { mpv --playlist="${args[@]}"; return; } || mpv "$1"
+;; *) return 12
+esac; }
 
 
-[[ -n "$v3" ]] && case "$EXT" in
-py) python "$FL" ;;
- *) { stat -c '%A' "$FL" | grep -q x; } && "$FL"
-;; esac
+by_ext_post(){ local ext=${1##*.}
+case ${ext:?}
+in py) python "$1"
+;;  *) [[ -x $1 ]] && "$1" || return 13
+esac; }
+
+
+ignore() { local ret=$?; ((ret==$1))||return $ret; }
+chain(){ local path=${1:?}
+  by_name "$path" && return || ignore 10
+  by_ext "$path"  && return || ignore 11
+  by_mime "$path" && return || ignore 12
+  by_ext_post "$path" && return
+}
+
+chain "$path"
+onexit  # success

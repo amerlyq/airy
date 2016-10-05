@@ -3,6 +3,7 @@ msg="Press any key to continue"
 ret=${1:?You need \$? as first argument}
 shift
 
+## [Stop|prompt]: [Aa]lways/on[Ee]rror/[Nn]ever
 while getopts 'AaEeNn' o
 do OPTS+=$o; done; shift $((OPTIND-1))
 
@@ -16,11 +17,11 @@ pstop(){ local tmp; read -n 1 -s tmp </dev/tty; }
 [[ $OPTS =~ N ]] && { exit; }
 
 # WARN: redirect status to tty when catching output
-stat(){ printf "<======== %s($(date +"%T")) ====($ret)==>%s\n" \
+prompt(){ printf "<======== %s($(date +"%T")) ====($ret)==>%s\n" \
   "${1:+$1 }" "${*:+ ${*:2}}" >/dev/tty; }
 
-[[ $OPTS =~ a ]] && { stat "$msg" "$@"; pstop; exit; }
-[[ $OPTS =~ e ]] && { ((ret))&&{ stat "$msg" "$@"; pstop; }||stat '' "$@"; exit; }
-[[ $OPTS =~ n ]] && { stat '' "$@"; exit; }
+[[ $OPTS =~ a ]] && { prompt "$msg" "$@"; pstop; exit; }
+[[ $OPTS =~ e ]] && { ((ret))&&{ prompt "$msg" "$@"; pstop; }||prompt '' "$@"; exit; }
+[[ $OPTS =~ n ]] && { prompt '' "$@"; exit; }
 
-stat "$msg" "$@"; pstop
+prompt "$msg" "$@"; pstop

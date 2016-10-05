@@ -288,26 +288,30 @@ class nrenum(Command):
 
 
 class actualee(Command):
-    FLS = fs.join('/tmp', os.getenv('USER'), 'ranger_list')
+    FLST = fs.join('/tmp', os.getenv('USER'), 'ranger_list')
     """:actualee
     Use '~/.bin/actually' to apply secondary action to file/list
     """
     def execute(self):
+        cmd = ['actualee']
+
         if self.arg(1) and self.arg(1)[0] == '-':
-            flags = self.arg(1)
+            cmd += [self.arg(1)]
+            self.shift()
         else:
-            flags = '-e'
+            cmd += ['-e']
 
         s = [f.path for f in self.fm.thisdir.files]
         index = s.index(self.fm.thisfile.path)
-        with open(actualee.FLS, 'w') as f:
+        with open(actualee.FLST, 'w') as f:
             f.write("\n".join(s[index:] + s[:index]))
+            cmd += ['-l']
 
         if self.fm.thisfile.is_file:
+            cmd += [self.fm.thisfile.path]
+            cmd += [actualee.FLST]
             # if 'x' in file.get_permission_string():
-            command = 'cd %d && actualee ' + flags + ' %f -l ' + actualee.FLS
-            command = self.fm.substitute_macros(command, escape=True)
-            self.fm.execute_command(command)
+            self.fm.execute_command(cmd)
         else:
             self.fm.move(right=1)
 
