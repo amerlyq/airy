@@ -6,15 +6,6 @@ has_pr X || die
 link "$PWD/pentadactylrc" ~/.pentadactylrc
 link "$PWD/pterosaurrc" ~/.pterosaurrc
 
-# THINK:(sync userscripts)
-# > https://github.com/greasemonkey/greasemonkey/issues/2335
-# http://stackoverflow.com/questions/28560090/how-to-sync-locally-hosted-greasemonkey-scripts-across-multiple-machines
-
-# SEE
-#   https://wiki.archlinux.org/index.php/firefox_tweaks
-
-# Make input fields with white background again when using dark theme
-# https://wiki.archlinux.org/index.php/Firefox#Unreadable_input_fields_with_dark_GTK.2B_themes
 # ALT: $ GTK_THEME=Adwaita:light firefox %u
 dst=~/.mozilla/firefox/profiles.ini
 if [[ -f $dst ]]; then
