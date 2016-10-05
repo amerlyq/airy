@@ -34,6 +34,10 @@ CHECK:(plugins)
     Make independent tmux servers
       : tmux -L "vt$XDG_VTNR" ... -s "vt$XDG_VTNR"
 
+DEBUG
+  Keymap
+    $ tmux list-keys -tvi-copy G '\by\b'
+
 ENH:
   [_] Re-attach to tmux sessions on exit
     https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
