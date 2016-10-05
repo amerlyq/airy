@@ -1,0 +1,10 @@
+INFO
+  Get gcc version
+    Structured
+      $ readelf -p .comment file
+    Hex/ascii dump
+      $ objdump -sj .comment file
+    ALT
+      $ strings -a file | grep -i gcc
+  ALSO info
+    $ readelf -n file
