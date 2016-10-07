@@ -5,4 +5,5 @@ mkdir -p ~/.mail/"${MUTT_DEFAULT:?}"
 # -c ~/.mbsyncrc
 # --all
 # -l
-exec mbsync "${MUTT_DEFAULT:?}"
+mbsync "${MUTT_DEFAULT:?}"
+# THEN: notmuch new

@@ -135,7 +135,8 @@ set nm_default_uri = notmuch://$HOME/.mail/$my_acc
 
 # NOTE: setup inside accounts. BUT? how to reset on account switch?
 # save-hook . '=Spam'           # DFL folder to save/move
-
+#
+folder-hook . 'set record=^'  # Save mail in cwd instead of '=Sent'
 folder-hook . 'push <collapse-all>'
 # folder-hook . 'push ":set collapse\_unread=no<enter>"'
 
