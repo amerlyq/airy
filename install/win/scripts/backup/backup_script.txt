@@ -1,0 +1,132 @@
+%DRIVE1ST%
+ if not exist \!backup md \!backup
+ if not exist \!backup\Departments md \!backup\Departments
+ if not exist \!backup\Exchange md \!backup\Exchange
+ if not exist \!backup\MEDEA_rdisk md \!backup\MEDEA_rdisk
+ cd \!backup
+
+
+rem это если архив будет большим - кусками бить -v357888k
+ rem *******************
+ rem rar a -r -m5 -v357888k -dh -x*.mp3 -x*.fcd -x*.avi -x*.exe -w%DRIVE2ND%\ -p%PASSWD% %DIRNAME%\%FILENAME%_new %SOURCEDIR%
+ rem *******************
+ rem архивирование пошло, не берём мультимедиа файлы
+ rem *******************
+ rar a -r -dh -x*.mp3 -x*.fcd -x*.avi -x*.exe -x*.jpg -x*.tif -p%PASSWD% %DIRNAME%\%FILENAME%_new %SOURCEDIR%
+ goto next4
+
+ :next4
+ rem **********************************
+ rem *** Create repair disk on \\SERVER
+ rem **********************************
+ SET DIRNAME=MEDEA_rdisk
+ SET FILENAME=MEDEA_rdisk
+ SET SOURCEDIR=%windir%\repair
+ %windir%\system32\rdisk.exe /s-
+ rar a -r -m5 -dh -w%DRIVE2ND%\ -p%PASSWD% %DIRNAME%\%FILENAME%_new %SOURCEDIR%\*.*
+ if not exist %DIRNAME%\%FILENAME%_new.rar goto next5
+ del %DIRNAME%\%FILENAME%_old.rar
+ ren %DIRNAME%\%FILENAME%.rar %FILENAME%_old.rar
+ ren %DIRNAME%\%FILENAME%_new.rar %FILENAME%.rar
+ copy %DIRNAME%\%FILENAME%.rar %COPYTO%\%DIRNAME%
+
+
+********************
+********************
+********************
+
+
+RD "%archdir%"
+ @ Удаляем каталог, в котором находились файлы для архивирования.
+
+set today=%DATE:~0,2%_%Date:~3,2%_%date:~6,4%
+ Time /T>settime.txt
+ FOR /F %%i in (settime.txt) do Set NowTime=%%i:
+ xcopy D:\eMule\Temp\*.met D:\eMule\bak\%TODAY%\%NowTime:~0,2%_%NowTime:~3,2%\
+
+color 9F
+ for %%f in (*.vdb) do 7z.exe a base.7z %%f
+ COPY /b 7ZSD_LZMA.sfx + config.txt + base.7z base.exe
+ COPY base.exe A:\base.exe
+
+
+Чтобы не делать лишних переходов и сократить текст батника можно убрать строки с IF
+ и записать:
+ COPY base.exe %Choice%:\base.exe
+ set choice=
+
+
+
+*************************
+
+Нашел у сэбэ вот такой вот *.bat делает с бэкапов ротации в 15 дней,месяц,год.Предварительно создаем папки с соответствующими названиями (дэйли,монфли,ирли =) ).Сразу скажу,батник не мой,но может кому то будет полезен,посему и выкладываю.If есть какие то замечания,предложения,пишите обязательно.Умных людей не грех почитать ):
+
+ @if "%1."=="." goto error проверка на пустые значения
+
+ @if %1==daily set i=15 дни.глубина ротации файлов
+ @if %1==monthly set i=1
+ @if %1==yearly set i=1
+
+ @if not exist d:\НОВАЯ_ПАПКА\%1 goto error
+ d: выбрали диск
+ cd d:\НОВАЯ_ПАПКА\%1 папка,где валяются бэкапы
+
+ rem Сжатие файлов
+ dir /a:d /b > listing
+ for /f %%f in (listing) do "c:\program files\winrar\winrar.exe" a..\..\archive\%1\%%f_0.rar %%f
+ del /q listing
+
+ rem Ротация файлов
+ cd ..\..\archive\%1
+
+ :loop
+
+ if %i%==-1 goto end условие выхода из цикла
+ set /a j=%i+1 создается оператор j со значением i+1, i в нашем случае =15 см выше
+ ren *_%i%.rar *_%j%.rar
+ set /a i=%i-1
+
+ goto loop
+
+ :error
+
+ @echo Палюбому ошипка:неверный или пустой параметр!
+ @pause
+
+ :end
+
+
+**********************
+
+
+может кому будет полезен (Dandy777 например )элегантный способ архивирования всех файлов в текущем каталоге и ниже (рекурсивно) самое главное в скрипте: один файл - один архив
+
+ :)
+
+ файл 1
+
+ echo off
+ @rem Рекурсия по всем каталогам начиная с текущего, архивирование файлов старше 2х лет
+ @rem Файлы исключения:
+ @rem *.bat
+ @rem *.cmd
+ @rem *.RAR
+ @rem *.JPG
+ @rem *.EXE
+ @rem *.avi
+ @rem *.arj
+
+ @for /R %%f in (*.*) do call arch.cmd "%%f"
+
+
+ файл 2 (arch.cmd)
+
+
+ @rem Обрабатывать файлы, изменённые до <даты> (ГГГГММДДЧЧММСС) - ключ -tb
+
+ @winrar a -ed -df -tb2006-10-16 -m5 -ow -y -ep1 -idq -inul -ilogLog.txt -x@exlude.lst %1.rar %1
+
+
+ файл 3 (exlude.lst) расширения-исключения вносим в столбик )
+
+ Запускаем файл 1, скрипт обрабатывает все файлы старше 2х лет, кроме списка исключения (*.rar, *.avi, *.jpg), с максимальной компрессией, без вывода сообщений с ответом "да" на все вопросы, логированием ошибок, с сохранением ACL фала.. В общем, с ключиками rar'a играйте кому как нужно.. :)
