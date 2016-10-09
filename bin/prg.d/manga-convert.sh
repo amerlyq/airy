@@ -6,6 +6,17 @@ source ~/.shell/func.d/system || exit
 #   http://commons.wikimedia.org/wiki/Help:Creating_a_DjVu_file
 #   http://debiania.blogspot.com/2010/06/djvu-linux.html
 
+## Book pages conveyor
+# DjVu
+# FSCapture
+# PDF
+# PsInput
+# PsOutput
+# Restored
+# RestorerBk
+# ScTailor
+# ZFsNum
+
 
 if [ "$CURR_PLTF" == "MINGW" ]; then
     pr7zip="/c/Program Files/7-Zip"
