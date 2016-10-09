@@ -37,5 +37,23 @@ Total file size
   Exact
     $ find . -type f -name "*.otl" -exec ls -l {} + | awk '{sz+=$5}END{print sz}'
 
-Convert all files in dir into utf8
-  $ find . -name '*.*' -exec iconv --verbose -f windows-1251 -t utf-8 -o {} {} \;
+
+Batch and encoding (charset) of files
+  Copy set to dir
+    $ mkdir -p /tmp/convert
+    $ cp -t /tmp/convert *
+    $ cd /tmp/convert
+    $ git init && git add --all && git commit -m 'init'
+  Count files with each encoding
+    $ find . -type f -exec file -b --mime-encoding {} \; | sort | uniq -c
+  Filter one encoding
+    $ find . -type f -exec sh -c "file -b --mime-encoding '{}' | grep -qxF 'iso-8859-1'" \; -exec ls -l {} \;
+  Convert all by 'iconv'
+    $ find . -type f -exec iconv --verbose -f windows-1251 -t utf-8 -o {} {} \;
+  ALT: Batch convert by vim
+    $ find . -type f -exec file -i {} \; G iso-8859-1 | sed 's/^\([^:]\+\):.*/"\1"/' > /tmp/lst
+    $ cat /tmp/lst | xargs -I file vim -c "set nomore" -S cmm.vim file
+    Convert
+      :write ++enc=utf8 ++ff=unix ++nobin
+    Find non-ascii to save as plain text
+      /[^[:print:]]/

@@ -1,6 +1,16 @@
 " Workflow manipulation
 " http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_%28Part_3%29
 
+"" Appoint a line feed.
+" ALT: :set fenc=utf8
+" enc: [koi8-r, imb866, cp1251, cp866, utf8, reg:utf-16le, ucs-2le, ucs-2]
+" ff: [unix, dos, mac]
+com! -bang -bar -complete=file -nargs=? Wunix
+  \ write<bang> ++enc=utf8 ++ff=unix ++nobin <args> | edit <args>
+com! -bang -bar -complete=file -nargs=? Ewin
+  \ edit<bang> ++enc=cp1251 ++ff=dos ++nobin <args>
+
+
 " Save, Drop, File
 " ATTENTION be aware, that :update will not create NEW files like touch!
 noremap <Leader>s :<C-U>update<CR>
@@ -8,8 +18,7 @@ noremap <Leader>s :<C-U>update<CR>
 noremap <Leader>d :<C-U>q<CR>
 noremap <Leader>D :<C-U>qa<CR>
 " cnoremap <Leader>d <C-E><C-U>q<CR>
-" SAVE: {koi8-r, imb866, cp-1251, utf8, reg:utf-16le, :set fenc=utf8}
-noremap <Leader>S :<C-U>write ++enc=utf8<CR>
+noremap <Leader>S :<C-U>Wunix<CR>
 noremap <Leader><C-S> :saveas<Space>
 
 

@@ -24,21 +24,3 @@ set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNO
 " You need reset them after keymap, so very first insert/search
 " would be in latin. And then <C-^> toggles these options.
 set iminsert=0 imsearch=0
-
-
-"{{{1 CMDS ============================
-"" Opening with a specific character code again.
-command! -bang -bar -complete=file -nargs=? Eutf8
-      \ edit<bang> ++enc=utf-8 <args>
-command! -bang -bar -complete=file -nargs=? Eutf16
-      \ edit<bang> ++enc=ucs-2le <args>
-command! -bang -bar -complete=file -nargs=? Eutf16be
-      \ edit<bang> ++enc=ucs-2 <args>
-
-"" Appoint a line feed.
-command! -bang -complete=file -nargs=? Wunix
-      \ write<bang> ++fileformat=unix <args> | edit <args>
-command! -bang -complete=file -nargs=? Wdos
-      \ write<bang> ++fileformat=dos <args> | edit <args>
-command! -bang -complete=file -nargs=? Wmac
-      \ write<bang> ++fileformat=mac <args> | edit <args>

@@ -38,13 +38,3 @@ else
   fg $_V && unset _V
 fi
 }
-
-Batch and encoding (charset) of files
-  All in subdirs
-    $ ls **/*(.c)
-    $ iconv -f CP1251 -t UTF-8 *.srt
-  Count files with each encoding
-    $ find . -type f -exec file -i {} \; | sed '/.*charset=\(\S\+\)$/s//\1/' | sort | uniq -c
-  Batch convert by vim
-    $ find . -type f -exec file -i {} \; G iso-8859-1 | sed 's/^\([^:]\+\):.*/"\1"/' > /tmp/lst
-    $ cat /tmp/lst | xargs -I file vim -c "set nomore" -S cmm.vim file
