@@ -208,6 +208,10 @@ class df(Command):
         csel = len(ctab.thisdir.marked_items)
         tsel = len(ttab.thisdir.marked_items)
 
+        # DEV: df cidx!=tidx: search file with same name in tidx
+        #   -- if no such file == show error
+        #   BUT: then can't compare different names in tabs fast
+        #       -- 'cause need to 'vsel' them before compare
         if cidx == tidx and csel == 0:
             self.fm.notify("curr_tab: select targets to compare", bad=True)
         elif cidx != tidx and csel == 0 and tsel == 0:
