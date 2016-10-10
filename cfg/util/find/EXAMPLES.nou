@@ -48,6 +48,10 @@ Batch and encoding (charset) of files
     $ find . -type f -exec file -b --mime-encoding {} \; | sort | uniq -c
   Filter one encoding
     $ find . -type f -exec sh -c "file -b --mime-encoding '{}' | grep -qxF 'iso-8859-1'" \; -exec ls -l {} \;
+  Find all DOS line-endings
+    $ find . -not -type d -exec sh -c 'file "$1" | grep -qF CRLF' '' "{}" \; -print
+  Convert one by 'vim'
+    $ find . -type f -exec sh -c "file -b --mime-encoding '{}' | grep -qxF 'us-ascii'" \; -print X -I{} r.vim -n +Wunix +quit "{}"
   Convert all by 'iconv'
     $ find . -type f -exec iconv --verbose -f windows-1251 -t utf-8 -o {} {} \;
   ALT: Batch convert by vim
