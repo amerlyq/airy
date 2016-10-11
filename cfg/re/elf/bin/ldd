@@ -1,0 +1,56 @@
+#!/bin/bash -e
+# Works by invoking the run-time dynamic linker as a command
+# and setting the env LD_TRACE_LOADED_OBJECTS to a non-empty value.
+
+rtlds=(
+  '/usr/lib/ld-linux.so.2'
+  '/usr/lib64/ld-linux-x86-64.so.2'
+  '/usr/libx32/ld-linux-x32.so.2'
+)
+
+# data: warn=yes
+# func: warn=yes bind_now=yes
+# verb: verbose=yes
+# unus: unused=yes
+
+cmd=()
+cmd+=( LD_TRACE_LOADED_OBJECTS=1 )
+cmd+=( LD_WARN=$warn )
+cmd+=( LD_BIND_NOW=$bind_now )
+cmd+=( LD_LIBRARY_VERSION=\$verify_out )
+cmd+=( LD_VERBOSE=$verbose )
+# if test "$unused" = yes; then
+#   cmd+=( LD_DEBUG=\"${LD_DEBUG:+$LD_DEBUG,}unused\" )
+# fi
+
+try_trace() (
+  output=$(eval "${cmd[@]}" '"$@"' 2>&1; rc=$?; printf 'x'; exit $rc)
+  rc=$?
+  printf '%s' "${output%x}"
+  return $rc
+)
+
+for file do
+  (($#<1)) || printf '%s\n' "${file}:"
+  [[ -f $file && -x $file ]] || exit
+
+  RTLD=
+  ret=1
+  for rtld in "${rtlds[@]}"; do
+    [[ -x $rtld ]] || continue
+    verify_out=$("$rtld" --verify "$file") || (($?==2)) || continue
+    ret=$?
+    RTLD=$rtld
+    break
+  done
+
+  case $ret
+  # ($?==5) means process invoked with __libc_enable_secure: do fall back
+  in 0) try_trace "$file" || { (($?==5)) && try_trace "$RTLD" "$file" || exit 1; }
+  # This can be a non-ELF binary or not binary at all.
+  ;; 1) nonelf "$file" || { echo $" not a dynamic executable"; exit 1; }
+  ;; 2) try_trace "$RTLD" "$file" || exit 1
+  ;; *) exit $?
+  esac
+
+done

@@ -2,14 +2,14 @@ Examples & tips
   http://www.softpanorama.info/Tools/Find/find_examples.shtml
 
 Заменить подстроку во многих файлах:
-  perl -i -pe 's/Windows/Linux/;' test\*
+  $ perl -i -pe 's/Windows/Linux/;' test\*
 Чтобы провести ту же операцию во всех поддиректориях:
   $ find. -name '*.txt' -print | xargs perl -pi -e's/Windows/Linux/ig' *.txt
 Или вы хотите сделать то же самое для на обычных файлов со множеством
 переносов строк и странных символов (файл — в другой кодировке):
   $ find -type f -name '*.txt' -print0 | xargs --nul
 linux - Как из терминала заменить слово в файлах в Ubuntu?
-  grep -lr -e 'было' . | xargs sed -i 's/было/стало/g'
+  $ grep -lr -e 'было' . | xargs sed -i 's/было/стало/g'
 
 Поиск всех файлов в текущей директории с определённым именем, отсеивание по
 маске и подсчёт их количества
@@ -17,10 +17,6 @@ linux - Как из терминала заменить слово в файла
 
 Удаление всех файлов рекурсивно по заданной маске
   $ find ./ -name "*~" -exec rm {} \;
-
-Все встречающиеся строки с инклюд в файле
-  $ grep '#include' ./sdrmtEpubPacker.h
-  $ grep -r '#include' ./
 
 Find all ELF
   NOTE: don't match '^ELF' as 'file -b' output may contain '^setuid ELF'
