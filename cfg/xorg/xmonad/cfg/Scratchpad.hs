@@ -16,7 +16,7 @@ myScratchpads =
     , ("ipython", customFloating $ RationalRect (1/4) (2/3) 1 (1/3))
     ]
   ] ++
-  [ vim "lyrics" "~/aura/lyfa/lists/music.otl" nonFloating
+  [ vim "lyrics" "~/aura/lyfa/lists/music.nou" nonFloating
   , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
   , term "j8" "j8 -c" bottom_l14b3
   ]
