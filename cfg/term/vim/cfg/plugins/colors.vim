@@ -3,7 +3,7 @@
 
 "" Fast bottom/top status panels w/ integration {{{1
 " USE: Directly pick buffer on [Frame]\d
-call dein#add('vim-airline/vim-airline-themes')
+call dein#add('vim-airline/vim-airline-themes', {'lazy': 0})
 call dein#add('bling/vim-airline', {
   \ 'on_event': 'VimEnter',
   \ 'depends': 'vim-airline-themes',
