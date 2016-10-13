@@ -5,5 +5,7 @@ mkdir -p ~/.mail/"${MUTT_DEFAULT:?}"
 # -c ~/.mbsyncrc
 # --all
 # -l
+# USE:(err_1: -V) to find out file to remove/resync: <dir>/.uidvalidty
 mbsync "${MUTT_DEFAULT:?}"
-# THEN: notmuch new
+# Indexate db
+notmuch new
