@@ -19,11 +19,6 @@
 # Plugins
 bind index,pager  \\ vfolder-from-query
 
-# Switch folders
-macro index,browser  ,i  "<change-folder>!<enter>"       "Go to inbox"
-macro index,browser  ,l  "<change-folder>^<enter>"       "Go to last"
-macro index,browser  ,s  "<change-folder>=Sent<enter>"   "Go to sent"
-
 # HACK: show mailboxes list for current acc (BUT from root only)
 macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'
 macro index \Ca <tag-pattern>~A<enter>   "select all"
@@ -46,8 +41,8 @@ macro index '}' '{' '(Un)collapse thread.'
 # STD: \Cg -- abort (n/a)
 bind editor \Cq  backward-word
 bind editor \Ct  forward-word
-bind editor \Cp  history-down
-bind editor \Cn  history-up
+bind editor \Cp  history-up
+bind editor \Cn  history-down
 bind editor \Cx  complete-query
 
 bind browser  h  first-entry   # EXPL:(back) don't exists

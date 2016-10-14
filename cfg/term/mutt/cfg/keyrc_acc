@@ -1,0 +1,13 @@
+# vim:ft=muttrc
+
+# Switch folders
+macro index,browser  ,i  "<change-folder>!<enter>"       "Go to inbox"
+macro index,browser  ,l  "<change-folder>^<enter>"       "Go to last"
+
+# SEE http://stackoverflow.com/questions/14448179/offlineimap-and-mutt-with-gmails-all-mail-folder/14779416#14779416
+# FIXED: macro quoting:  s/ /<quote-char><space>/g
+# ALT: percent quoting:  s/ /%20/g
+# ALT: suppress space behaviour:  'bind editor <space> noop'
+
+macro index,browser  ,s  "<change-folder>$record<enter>"      "Go to sent"
+macro index,browser  ,w  "<change-folder>$my_fd_main<enter>"  "Go to work"
