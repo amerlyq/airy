@@ -45,13 +45,14 @@ command! -bar -nargs=? Format2 set ts=2 sw=2 sts=2 fdl=99
 "   ALT redirect into quickfix list
 fun! RedirectOutput(cmd)
   redir => _
-  silent! exe a:cmd
+  silent exe a:cmd
   redir END
   return _
 endf
-command! -bar -range -nargs=+  R  call RedirectOutput(<q-args>)
-command! -bar -range -nargs=+  Rc
-      \ call setreg('+', RedirectOutput(<q-args>), getregtype('+'))
+command! -bar -range -nargs=+  Rnew
+  \ enew|call append(0, RedirectOutput(<q-args>))
+command! -bar -range -nargs=+  R
+  \ call setreg('+', RedirectOutput(<q-args>), getregtype('+'))
 
 fun! MapFiltered(cmd)
   let _ = RedirectOutput('map '.a:cmd)

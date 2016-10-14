@@ -28,7 +28,6 @@ let &statusline="%{winnr('$')>1?'['.winnr().'/'.winnr('$')"
     \ . "%m%{printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))}"
 
 
-set confirm         " ask user before aborting an action
 set novisualbell    " don't flash the screen
 set shortmess=atTIO " No intro msg, etc
 " set cmdheight=2   " No hit <CR> twice after :make (but lose one view line)

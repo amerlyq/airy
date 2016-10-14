@@ -2,7 +2,7 @@
 " EXPL: always load/show from the start
 
 "" Fast bottom/top status panels w/ integration {{{1
-" USE: Directly pick buffer on [Frame]\d
+" USE: Directly pick buffer on <M-1..9> OR [Frame]1..9
 call dein#add('vim-airline/vim-airline-themes', {'lazy': 0})
 call dein#add('bling/vim-airline', {
   \ 'on_event': 'VimEnter',
@@ -11,6 +11,7 @@ call dein#add('bling/vim-airline', {
   \ 'hook_add': "
 \\n   for i in range(1,9)
 \\n     call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
+\\n     call Map_nxo('<M-'.i.'>', '<Plug>AirlineSelectTab'.i, 'n')
 \\n   endfor
 \"})
 

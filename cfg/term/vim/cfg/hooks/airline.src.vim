@@ -18,7 +18,9 @@ let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#show_close_button = 1
 let g:airline#extensions#tabline#tab_nr_type = 2
 let g:airline#extensions#tabline#exclude_preview = 1
-let g:airline#extensions#tabline#buffer_min_count = 2
+let g:airline#extensions#tabline#buffer_min_count = (argc()<2 ? 2 : 0)
+" DISABLED: has priority over buffers
+" let g:airline#extensions#tabline#tab_min_count = 2
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
 "" GIT signify + fugitive, gitgutter, etc
