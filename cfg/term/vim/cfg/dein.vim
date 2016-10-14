@@ -2,7 +2,7 @@
 let s:dein = $VCACHE.'/dein'
 
 "" Add dein to runtime
-for p in ['.dein', 'repos/github.com/Shougo/dein.vim']
+for p in ['repos/github.com/Shougo/dein.vim', '.dein']
   if filereadable(s:dein.'/'.p.'/autoload/dein.vim')
     exe 'set runtimepath^=' . fnameescape(s:dein.'/'.p)
     break

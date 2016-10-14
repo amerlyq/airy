@@ -1,7 +1,7 @@
 """ Inner/support/system
 
 "" Main package manager {{{1
-call dein#add('Shougo/dein.vim')
+call dein#add('Shougo/dein.vim', {'lazy': 1})
 
 
 

@@ -22,13 +22,10 @@ if [[ ! -d $dst ]]; then
     done
 fi
 
-dir=$cache/vim/dein/repos/github.com/Shougo
-mkdir -vp "$dir"
-for r in Shougo/{dein,vimproc}.vim; do
-  dst=$dir/${r##*/}
-  if [[ ! -d $dst ]]; then
-    git clone --branch master --single-branch --depth=1 \
-      "https://github.com/$r" "$dst"
-    [[ ! -f $dst/Makefile ]] || (cd "$dst" && make)
-  fi
-done
+
+gdld(){ [[ -d $2 ]] && return || mkdir -vp "${2%/*}"
+  git clone --branch master --single-branch --depth=1 "https://github.com/$1" "$2"
+  [[ ! -f $2/Makefile ]] || (cd "$2" && make)
+}
+gdld 'Shougo/dein.vim'    "$cache/vim/dein/repos/github.com/Shougo/dein.vim"
+gdld 'Shougo/vimproc.vim' "$cache/vim/dein/repos/github.com/Shougo/vimproc.vim"
