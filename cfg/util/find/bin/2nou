@@ -1,0 +1,6 @@
+#!/bin/sh
+exec find . -type f -name '*.otl' -exec sh -c '
+  set -- "$1" "${1%.otl}.nou"
+  mv -v -- "$@"
+  r.vim "$2" +retab +Wunix +quit
+' '' "{}" \;
