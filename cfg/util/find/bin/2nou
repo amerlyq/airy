@@ -1,6 +1,7 @@
 #!/bin/sh
-exec find . -type f -name '*.otl' -exec sh -c '
-  set -- "$1" "${1%.otl}.nou"
+ext=${1:-otl}  # ALT: ext='*'
+exec find . -type f -name "*.$ext" -exec sh -c '
+  set -- "$1" "${1%.'"$ext"'}.nou"
   mv -v -- "$@"
   r.vim "$2" +retab +Wunix +quit
 ' '' "{}" \;

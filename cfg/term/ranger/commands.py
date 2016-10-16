@@ -113,25 +113,29 @@ class ag(Command):
 
 
 class doc(Command):
-    lst = ['DEV', 'EXAMPLES', 'INFO', 'HACK', 'LIOR', 'NOTE', 'SYNERGY', 'TODO']
-    ext = '.nou'
+    lst = {'d': 'DEV', 'e': 'EXAMPLES', 'i': 'INFO', 'h': 'HACK',
+           'g': 'LEGEND', 'l': 'LIOR', 'n': 'NOTE',
+           's': 'SYNERGY', 't': 'TODO'}
+    ext = ['.nou', '.otl', '.txt', '']
     loci = ['doc', 'docs', '']
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories
     """
 
     # TODO: find existing file with any extension.
+    # NEED: priority if exists multiple files with same extension
     # -- Though ext=.nou is preferred and default when creating new file.
-    def _nearest(self, fvalidate):
+    def _nearest(self, pwd, nm, fvalidate):
         for d in doc.loci:
-            path = fs.join(self._dbase, d, self._dname)
-            if fvalidate(path):
-                return path
+            for e in doc.ext:
+                path = fs.join(pwd, d, nm + e)
+                if fvalidate(path):
+                    return path
 
     def execute(self):
-        self._dname = (self.arg(1) if self.arg(1) else doc.lst[0]) + doc.ext
-        self._dbase = self.fm.thisdir.path
-        path = self._nearest(fs.isfile)
+        nm = self.arg(1) if self.arg(1) else doc.lst['t']
+        pwd = self.fm.thisdir.path
+        path = self._nearest(pwd, nm, fs.isfile)
         # WARNING: opens nested editor if file don't exists!
         # DEV: check if 'file-chooser' regime and touch file before open
         # if not fs.lexists(path):
@@ -140,11 +144,11 @@ class doc(Command):
             self.fm.select_file(path)
             self.fm.move(right=1)
         else:
-            path = self._nearest(lambda x: fs.isdir(fs.dirname(x)))
+            path = self._nearest(pwd, nm, lambda x: fs.isdir(fs.dirname(x)))
             self.fm.edit_file(path)
 
     def tab(self):
-        return ['doc ' + nm for nm in doc.lst]
+        return ['doc ' + nm for nm in doc.lst.values()]
 
 
 # Need this in the end of ~/.bashrc or ~/.zshrc
