@@ -66,6 +66,10 @@ Refactoring and evolution
       >> Already exists installed '/usr/bin/rifle' from 'ranger/scripts'
     * low-level independent accessors
       - possible to replace choosen ones by imported C .so
+      - approximators -- accessor info quering from DFL commands
+        * through SSH like sshfs
+        * ranger is launched only on host
+        * target system only uses DFL commands
     * virtualized tree-structure to represent any tree info
       >> prowide instruments to work with trees
         * textobj and operators
@@ -73,6 +77,7 @@ Refactoring and evolution
         * load and parse output directly from tools -- use ranger as viewer for their output
       >> integration with graphviz to interpret graphs in one click
       - filesystem
+      - archive navigation
       - lists of yanked/tagged/etc -- i.a. recursive
       - 'find' results
       - ag :: search matches
@@ -85,7 +90,7 @@ Refactoring and evolution
       - logs
         * so, you can grep some matching lines, and move them into subdirs to organize investigation
       - elf/pe headers structure, symbols and functions objdumps in preview
-      - web navigation -- extract links list
+      - web navigation -- extract links list / tree
       - mp3 splitted by soundcloud-like wavefront
       - music src like fruity-loops splitted by instruments
       - mindmaps
@@ -111,3 +116,5 @@ Refactoring and evolution
       - share choosen info between instances
       - keep background interactive shell (eliminate its startup time)
         = seems like I need nvim-like virtual terminal to virtualize IA with term escape codes
+        * add '-s' server flag to :shell and make it DFL
+        * replace entering into shell by switching to already launched one (with scrollback?)
