@@ -31,6 +31,12 @@ esac
 
 case "$mimetype"
 in text/*|*/xml) exit 2
+;; application/x-executable)
+  file -Lb "$path"
+  echo
+  try nm -n "$path" | trim && exit 4
+  # ALT: ldd
+  # ALT: readelf -dW
 ;; video/*|audio/*|image/*) exiftool "$path" && exit 5
 esac
 
