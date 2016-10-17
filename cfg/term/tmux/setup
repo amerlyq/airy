@@ -1,9 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
+[[ $THEME =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD/tmux.conf" ~/.tmux.conf
-link "$PWD/theme-${THEME}.conf" ~/.cache/airy/theme-tmux.conf
+linkcp "$PWD/tmux.conf" ~/.tmux.conf
+linkcp "$PWD/theme-${THEME}.conf" ~/.cache/airy/theme-tmux.conf
 
-svc_activate -cue tmux.service
+if distro arch; then
+  svc_activate -cue tmux
+fi

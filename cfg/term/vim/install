@@ -20,13 +20,17 @@ if distro arch; then
 
 elif distro ubuntu; then
     # for vimoutliner export in mindmap
-    pkg_inst vim-gtk python3-yaml
+    pkg_inst vim-gtk #python3-yaml
+
+    ppa_add 'ppa:neovim-ppa/unstable'
+    pkg_inst neovim
+
     # libclang-dev for autocompleter in vim
-    pkg_inst libclang-dev clang-format-3.5
+    # pkg_inst libclang-dev clang-format-3.5
     pip_inst jedi  # neovim
     echo "Err: not all"
 fi
 
 # Install vim plugins
 # BAD: firstly NEED 'setup' for 'dein'
-./update $(cfgOpt u && echo -u)
+# ./update $(cfgOpt u && echo -u)
