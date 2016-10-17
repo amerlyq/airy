@@ -6,28 +6,28 @@
 
 PRG="$1"
 shift
-ARGS="${@}"
-[[ ! "$TERM" =~ tmux ]] || export TERM="${TERM/tmux/screen}"
+# HACK:(use if tmux-256color can't be copied)
+# [[ ! $TERM =~ tmux ]] || export TERM=${TERM/tmux/screen}
 
 # pane_name()  { tmux send-keys "printf '\\033]2;%s\\033\\\\' '$1'" 'C-m'; }
 # $(pane_name p1)
-SESSION='main'
+ssnm='main'
 sstmux="
 which zsh >/dev/null && export SHELL=\$(which zsh)
-which tmux >/dev/null && if ! tmux has-session -t $SESSION
+which tmux >/dev/null && if ! tmux has-session -t $ssnm
 then
-    tmux new-session -d -s $SESSION -n '$PRG'
-    tmux rename-window -t $SESSION:1 'work'
+    tmux new-session -d -s $ssnm -n '$PRG'
+    tmux rename-window -t $ssnm:1 'work'
 fi
-tmux -2 attach -t $SESSION
+tmux -2 attach -t $ssnm
 "
 
-case "$PRG"
-in mpd)  ~/.bin/net.d/sir-mpd $ARGS
-;; srkz) ssh srk -t zsh $ARGS
-;; sirx) ssh sir -X ${ARGS:--t "$sstmux"}
+case $PRG
+in mpd)  ~/.bin/net.d/sir-mpd "$@"
+;; bsrv) ssh -X bsrv -t zsh "$@"
+;; sirx) ssh sir -X "${@:--t "$sstmux"}"
 ;; stb)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 "root@192.168.1.$1"
 # ;; rou)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 rou
-;; land|buld) TERM=xterm-256color ssh $PRG
-;; *)    ssh $PRG ${ARGS:--o LocalCommand="$sstmux"}  # -t "$sstmux"
+;; land|buld) TERM=xterm-256color ssh "$PRG"
+;; *) ssh "$PRG" "${@:--o LocalCommand="$sstmux"}"
 esac
