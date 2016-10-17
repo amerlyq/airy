@@ -4,13 +4,19 @@ source ~/.shell/func.d/packages
 # SEE https://joeyh.name/code/moreutils/
 # TODO: read man on each util
 pkg_inst -p 'zrun' moreutils
-pkg_inst parallel tree fzf
+pkg_inst parallel tree
+
 
 # SEE:ALT:(fzf) -- search 'interactive filtering'
 #   ~ https://github.com/mooz/percol
 #   ~ https://github.com/keiji0/canything
 #   + https://github.com/zsh-users/zaw
 #   + https://github.com/peco/peco
+
+if distro arch; then
+  pkg_ins fzf
+fi
+
 
 # TRY:(cmdline util) align like 'column -t', but allow
 #   --ignore <rgx> unrelated 'rows'

@@ -20,7 +20,8 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 ### Choose theme
 [[ $THEME_ALLOWED ]] || THEME_ALLOWED='dark|light|lucid|opaque'
 # ALT:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
-[[ $THEME ]] || THEME=$(<"${CURR_DIR_CACHE:?}/theme") ||:
+[[ $THEME ]] || [[ ! -f ${CURR_DIR_CACHE:?}/theme ]] \
+|| THEME=$(<"${CURR_DIR_CACHE:?}/theme")
 [[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
 
 ### LINKS ###
