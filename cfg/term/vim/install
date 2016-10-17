@@ -24,6 +24,8 @@ elif distro ubuntu; then
 
     ppa_add 'ppa:neovim-ppa/unstable'
     pkg_inst neovim
+    # NOTE: duplicated for $ ssh -X
+    pkg_inst xsel
 
     # libclang-dev for autocompleter in vim
     # pkg_inst libclang-dev clang-format-3.5
