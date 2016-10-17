@@ -46,10 +46,10 @@ if distro ubuntu; then
   deb_wget(){ wget_inst -d "$1" && sudo dpkg -i "$CURR_DIR_PKG/${2:-${1##*/}}"; }
   deb_inst(){ do_if -c 'deb_wget' "$@"; }
   ppa_add(){
-    local addr="${1#ppa:}"
-    addr="${addr#*http://}"
-    addr="${addr%% *}"
-    ! grep -qxFR "$addr" /etc/apt/sources.list /etc/apt/sources.list.d/ || return 0
+    local addr=${1#ppa:}
+    addr=${addr#*http://}
+    addr=${addr%% *}
+    grep -qrF "$addr" /etc/apt/sources.list /etc/apt/sources.list.d/ && return 0
     sudo /usr/bin/add-apt-repository ${2---yes} "$1"
     sudo /usr/bin/apt-get update
   }

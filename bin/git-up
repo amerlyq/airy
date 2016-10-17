@@ -4,7 +4,7 @@
 # if ((!$+commands[git-up])); then
 
 clean=1
-gcfg=( -c color.status=always  -c color.ui=always )
+cgit(){ git -c color.status=always -c color.ui=always "$@"; }
 
 # ALT: git diff-index --name-only --ignore-submodules HEAD --
 git diff-files --quiet --ignore-submodules -- || clean=0
@@ -13,7 +13,8 @@ git diff-files --quiet --ignore-submodules -- || clean=0
 # BUG: troubles when you on feature-branch and ustream was rebased
 #   Then you need only fetch instead of pull+rebase
 #   However, you always can do git rebase --abort ...
-git "${gcfg[@]}" pull --all --rebase --verbose  # --rebase=preserve
+cgit fetch --all
+cgit pull --rebase --verbose  # --rebase=preserve
 
 ((clean)) || git stash pop
 
