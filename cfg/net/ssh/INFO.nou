@@ -1,0 +1,41 @@
+Reconnect w/o password until at least one session is alive
+  ATTENTION:BUG: on '$ Gl' -- beware of http://rawsyntax.com/blog/faster-ssh-connections/
+    ControlMaster auto
+    # ALT: /tmp/%u/ssh/%r@%h:%p -- but you need to create this dir
+    ControlPath ~/.ssh/sock/%r@%h:%p
+    # ALT: yes
+    ControlPersist 600
+
+
+Control Sockets
+  To be able send many request w/o retype password to SSH
+  You can do this cleanly with an ssh 'control socket'. To talk to an
+  already-running SSH process and get it's pid, kill it etc. Use the 'control
+  socket' (-M for master and -S for socket) as follows:
+    $ ssh -M -S my-ctrl-socket -fnNT -L 50000:localhost:3306 jm@sampledomain.com
+    $ ssh -S my-ctrl-socket -O check jm@sampledomain.com
+  Master running (pid=3517)
+    $ ssh -S my-ctrl-socket -O exit jm@sampledomain.com
+  Exit request sent.
+  Note that my-ctrl-socket will be an actual file that is created.
+
+
+Allow password access
+  /etc/ssh/sshd_config
+    PasswordAuthentication no
+    ...
+    # ATT: at the end of file ('Match' affects all lines till end of file)
+    Match address 192.168.1.0/24
+      PasswordAuthentication yes
+  $ sudo service ssh restart
+
+
+Enter ↵, ~, ?:
+  Supported escape sequences:
+  | ~. | terminate session
+  | ~B | send a BREAK to the remote system
+  | ~R | Request rekey (SSH protocol 2 only)
+  | ~# | list forwarded connections
+  | ~? | this message
+  | ~~ | send the escape character by typing it twice
+  (Note that escapes are only recognized immediately after newline.)

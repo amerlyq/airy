@@ -39,8 +39,8 @@ trap_errors(){
 ### Go to current script's directory
 # BAD:DFL: both realpath and readlink => same path on symlinked script
 # ALT: DIR="$(cd "$(dirname "$0")" && pwd)"
-# ALSO:(realpath) has --relative-* flags
-cwd_script(){ cd "$(realpath -se "${0%/*}")"; }  # even around symlinked
+# ALSO:(realpath) has --relative-* flags and --strip
+cwd_script(){ cd "${0%/*}"; }  # even around symlinked
 cwd_origin(){ cd "$(dirname "$(readlink -e "$0")")"; }  # only around original file
 ### Add current package to active mods list if absent
 airy_cache_pwd_mod() {
