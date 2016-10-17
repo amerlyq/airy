@@ -3,14 +3,14 @@ source ~/.shell/func.d/cfgsetup
 
 # Main destination for Zsh
 PREZTO=~/.cache/zsh/.zprezto
-link -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc
+linkcp -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc
 if [[ -d $PREZTO ]]; then
-  link "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
-  link "$PWD/prompt.d" "$PREZTO/modules/prompt/functions/prompt.d"
+  linkcp "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
+  linkcp "$PWD/prompt.d" "$PREZTO/modules/prompt/functions/prompt.d"
 fi
 
 # We must have symlink anyway to keep paths actual
-link ./zshenv ~/.zshenv
+linkcp ./zshenv ~/.zshenv
 # Refresh cache
 ./update
 

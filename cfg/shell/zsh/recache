@@ -4,7 +4,9 @@
 cd ${0%/*}
 
 zdir=$ZDOTDIR
-[[ -d $zdir ]] || zdir=${ZDOTDIR:=$HOME}
+[[ -d $zdir ]] || zdir=~/.cache/zsh
+[[ -d $zdir ]] || zdir=$HOME
+ZDOTDIR=$zdir
 
 # Refresh commands list from PATH in current shell
 rehash

@@ -36,6 +36,10 @@ do_if() {
   ((!${#pkgs[@]})) || ${cmd:?} "${pkgs[@]}"
 }
 
+pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
+cab_inst(){ do_if -c 'cabal install' "$@"; }
+
+
 if distro ubuntu; then
   pkg_inst(){ do_if -c 'sudo /usr/bin/apt-get --yes install' "$@"; }
   pkg_make(){ sudo checkinstall --default "$@"; }
@@ -49,6 +53,7 @@ if distro ubuntu; then
     sudo /usr/bin/add-apt-repository ${2---yes} "$1"
     sudo /usr/bin/apt-get update
   }
+  gem_inst(){ do_if -c 'sudo gem install' "$@"; }
 
 elif distro arch; then
   pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' "$@"; }
@@ -60,9 +65,7 @@ elif distro arch; then
     aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' "$@"; }
   elif has_pr yaourt; then aur_inst(){ ayr_inst "$@"; }
   fi
-  pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
   gem_inst(){ do_if -c 'gem install' "$@"; }
-  cab_inst(){ do_if -c 'cabal install' "$@"; }
 fi
 
 

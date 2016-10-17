@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+# USE $ gem install git-up  # SEE http://aanandprasad.com/git-up/
+# if ((!$+commands[git-up])); then
+
+clean=1
+gcfg=( -c color.status=always  -c color.ui=always )
+
+# ALT: git diff-index --name-only --ignore-submodules HEAD --
+git diff-files --quiet --ignore-submodules -- || clean=0
+((clean)) || git stash
+
+# BUG: troubles when you on feature-branch and ustream was rebased
+#   Then you need only fetch instead of pull+rebase
+#   However, you always can do git rebase --abort ...
+git "${gcfg[@]}" pull --all --rebase --verbose  # --rebase=preserve
+
+((clean)) || git stash pop
+
+# ALT: with autostash and colored rebase
+# git ${GCFG[@]} fetch --all --progress --prune --verbose
+# common=$(git merge-base HEAD @{u}@{1})
+# git ${GCFG[@]} rebase --autostash --onto @{u} $common

@@ -81,28 +81,9 @@ function gita_st { # $1 -- rep name, $2 -- suffix
 #   [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return 1
 # }
 
-# USE $ gem install git-up  # SEE http://aanandprasad.com/git-up/
-# DISABLED:(git-up) -- became very bugged
-# if ((!$+commands[git-up])); then
-  function git-up() { local clean=1 common
-    # ALT: git diff-index --name-only --ignore-submodules HEAD --
-    git diff-files --quiet --ignore-submodules -- || clean=0
-    ((clean)) || git stash
-    # BUG: troubles when you on feature-branch and ustream was rebased
-    #   Then you need only fetch instead of pull+rebase
-    #   However, you always can do git rebase --abort ...
-    git ${GCFG[@]} pull --all --rebase --verbose  # --rebase=preserve
-    ((clean)) || git stash pop
-
-    # ALT: with autostash and colored rebase
-    # git ${GCFG[@]} fetch --all --progress --prune --verbose
-    # common=$(git merge-base HEAD @{u}@{1})
-    # git ${GCFG[@]} rebase --autostash --onto @{u} $common
-  }
-# fi
-
 function gita_pl { head_name "$1"
-    gita_st "$1" && git-up 2>&1 && gita_st "$1" "\n"
+    # DISABLED:(ruby/git-up) -- became very bugged
+    gita_st "$1" && ~/.bin/git-up 2>&1 && gita_st "$1" "\n"
 }
 
 function gita_ph { head_name "$1"
