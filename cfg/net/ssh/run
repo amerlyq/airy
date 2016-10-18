@@ -8,6 +8,7 @@ PRG="$1"
 shift
 # HACK:(use if tmux-256color can't be copied)
 # [[ ! $TERM =~ tmux ]] || export TERM=${TERM/tmux/screen}
+# HACK:ALT: tmux -2
 
 # pane_name()  { tmux send-keys "printf '\\033]2;%s\\033\\\\' '$1'" 'C-m'; }
 # $(pane_name p1)
@@ -19,13 +20,13 @@ then
     tmux new-session -d -s $ssnm -n '$PRG'
     tmux rename-window -t $ssnm:1 'work'
 fi
-tmux -2 attach -t $ssnm
+tmux attach -t $ssnm
 "
 
 case $PRG
 in mpd)  ~/.bin/net.d/sir-mpd "$@"
-;; bsrv) ssh -X bsrv -t zsh "$@"
-;; sirx) ssh sir -X "${@:--t "$sstmux"}"
+;; bsrv) ssh bsrv   ${@:--t "$sstmux"}
+;; sirx) ssh sir -X ${@:--t "$sstmux"}
 ;; stb)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 "root@192.168.1.$1"
 # ;; rou)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 rou
 ;; land|buld) TERM=xterm-256color ssh "$PRG"

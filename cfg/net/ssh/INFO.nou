@@ -36,6 +36,8 @@ Connect headless SSH
   $ scp /usr/share/terminfo/s/st-256color bsrv:/tmp
   $ scp /usr/share/terminfo/t/tmux-256color bsrv:/tmp
   $ ssh -t bsrv 'for f in st-256color tmux-256color; do sudo mv -v "/tmp/$f" "/usr/share/terminfo/${f:0:1}/$f"; done'
+  Disable ubuntu welcome garbage on ssh login
+    sudo chmod -x /etc/update-motd.d/*
   Relogin: after 'chsh' to ZSH (kill shared connection)
   $ ssh -O exit bsrv
 
