@@ -1,6 +1,9 @@
 set pages-per-row 2
 set adjust-open width
-# set font terminus 8
+set font monospace 8
+
+# BAD: dead borders region on left and right
+# https://www.reddit.com/r/linuxquestions/comments/32h8xu/zathura_pdf_black_borders/
 
 ### Keymap ###
 map = zoom in
@@ -11,8 +14,11 @@ map f zoom width
 map , recolor
 
 ### Color scheme ###
-set default-bg "#002B36"
-set default-fg "#93A1A1"
+
+# FIXME: broken bkgr (mixed blue/black) for fullscreen/fit/double
+# set default-bg "#002B36"
+# set default-fg "#93A1A1"
+
 set statusbar-bg "#002B36"
 set statusbar-fg "#93A1A1"
 set inputbar-bg "#93A1A1"
@@ -24,4 +30,5 @@ set inputbar-fg "#002B36"
 set recolor-darkcolor "#cccccc"
 set recolor-lightcolor "#050505"
 set recolor-keephue true
-set recolor true
+# DISABLED: (I more often use light then not)
+# set recolor true

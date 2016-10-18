@@ -1,6 +1,7 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
+# THEME=light  # TEMP:CHG: .../theme/{PWD##*/}
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD/zathurarc-${THEME}"  ~/.config/zathura/zathurarc
+linkcp  zathurarc-"${THEME}"  ~/.config/zathura/zathurarc

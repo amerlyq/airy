@@ -18,8 +18,10 @@ in t) THEME=$OPTARG
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme
+# DEV: must be placed after 'airy_cache_pwd_mod' for individual themes
 [[ $THEME_ALLOWED ]] || THEME_ALLOWED='dark|light|lucid|opaque'
-# ALT:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
+# DEV:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
+# TODO: use THEME_DEFAULT if set, else -- .../theme/default
 [[ $THEME ]] || [[ ! -f ${CURR_DIR_CACHE:?}/theme ]] \
 || THEME=$(<"${CURR_DIR_CACHE:?}/theme")
 [[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
