@@ -4,8 +4,8 @@
 #   instead of =.../r.shell. OR it's intended behaviour?
 
 # EXPL: simplify when r.shell -c $SHELL
-if [ "$#" -eq 2 ] && [ "$1" == -c ]
-then if [ "$2" == "$SHELL" ] || [ "$2" == '$SHELL' ]
+if [ "$#" -eq 2 ] && [ "$1" = -c ]
+then if [ "$2" = "$SHELL" ] || [ "$2" = '$SHELL' ]
 then shift 2; fi; fi
 
 # EXPL: overwrite when SHELL=r.shell

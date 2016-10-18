@@ -13,6 +13,7 @@ function _prompt_vars_source {
   fi
 }
 
+# BUG:(ssh): prompt_amer_update:2: bad substitution
 function prompt_amer_update {
   # BUG on each USR1 will source all the info instead only necessary
   for smod in ${_prompt_async_calls[@]}; do

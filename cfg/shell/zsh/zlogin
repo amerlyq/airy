@@ -10,22 +10,27 @@
 #   fi
 # fi
 
+# Login guards
+# NOTE:(return 1) as wrong usage of login shell
+[[ -z $TMUX && -z $VIM && -z $EMACS ]] || return
+[[ $UID > 0 && $XDG_VTNR == 1 ]] || return 1
+[[ ! -f /tmp/.X11-unix/X0 && $(tty) == /dev/tty1 ]] || return 1
+
 # WARNING: can't be placed into ~/.zshenv because PATH then not constructed yet.
 # NOTE: Only main Xorg session controlled by systemd.
 #   -- Other specialized servers are launched by 'startx' as before.
-if [[ ! ($TMUX||$VIM||$EMACS) && $UID > 0 && $XDG_VTNR == 1
-&& ! -f /tmp/.X11-unix/X0 && $(tty) == /dev/tty1
-]]; then
-  # WARNING: actual env for xmonad is big problem due to spawning
-  # ALSO:BAD: all spawned terminals will have incomplete env w/o ~/.shell/exports
-  # MAYBE:BETTER: generate env into file by ./setup and then source it into xmonad.service?
-  systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
-  systemctl --user import-environment XDG_VTNR PATH TMPDIR EDITOR PAGER
-  # TODO:FIND: how to 'exec' into main target
-  # SEE https://alan-mushi.github.io/2014/10/26/execute-an-interactive-script-at-boot-with-systemd.html
-  setopt norcs  # Skip loading of all subsequent rc files
-  systemctl --user start main.target
-fi
+
+# WARNING: actual env for xmonad is big problem due to spawning
+# ALSO:BAD: all spawned terminals will have incomplete env w/o ~/.shell/exports
+# MAYBE:BETTER: generate env into file by ./setup and then source it into xmonad.service?
+
+systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
+systemctl --user import-environment XDG_VTNR PATH TMPDIR EDITOR PAGER
+
+# TODO:FIND: how to 'exec' into main target
+# SEE https://alan-mushi.github.io/2014/10/26/execute-an-interactive-script-at-boot-with-systemd.html
+setopt norcs  # Skip loading of all subsequent rc files
+systemctl --user start main.target
 
 # BUG: seems like it causes long delay before Xorg on cold system
 # OR: delay is caused by long connection (auth) to X
