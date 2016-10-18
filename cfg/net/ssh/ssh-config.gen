@@ -20,7 +20,7 @@ wacc() {
     ${idn:+ wset IdentityFile ~/.ssh/$idn}
     ${keep:+wset ControlMaster auto}
     ${x11:+ wset ForwardX11 yes}  # DFL: disabled at sshd
-    # ${x11:+ wset ForwardX11Trusted yes}
+    ${x11:+ wset ForwardX11Trusted yes}
     wprf
 }
 
@@ -58,7 +58,7 @@ case "$CURR_PROF" in home|laptop|neo|gnote4)
 ;; esac
 
 case "$CURR_PROF" in work)
-    [[ -z $BSRV_IPL ]] || wacc -k bsrv   $BSRV_IPL $BSRV_USER
+    [[ -z $BSRV_IPL ]] || wacc -k bsrv   $BSRV_IPL $BSRV_USER '' x11
 ;; esac
 
 case "$CURR_PROF" in work_samsung)
