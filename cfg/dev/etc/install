@@ -2,6 +2,8 @@
 source ~/.shell/func.d/packages
 
 #| ag      | The silver searcher -- 'ag' instead of 'grep' inside of git project -- very best!
+#   NOTE: ag --ignore 'usr/lib' -- if contains '/' treated as literal path
+#   NOTE: ag --ignore 'python*' -- if not '/' then glob each path component
 #| sift-bin| ALT:(grep) standalone parallel binary written in '.go'. Fastest?
 #| at      | Read commands from standard input or a specified file which are to
 #|_________|    be executed at a later time, using /bin/sh.

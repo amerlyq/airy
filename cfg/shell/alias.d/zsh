@@ -65,6 +65,7 @@ _xsel_tmp_buf=${TMPDIR:-/tmp}/zsh-last-output
 alias -g YT='|tee    $_xsel_tmp_buf'
 alias -g YT+='|tee -a $_xsel_tmp_buf'
 alias -g YT:='cat $_xsel_tmp_buf'
+alias YTv='v $_xsel_tmp_buf'
 
 # alias -r @="printf \"$(xsel -ob)\n\""
 #   { xsel: Can't open display: (null)

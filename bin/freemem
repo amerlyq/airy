@@ -17,7 +17,8 @@ sync
 # BUG:FIXME: on 'neo' I have no swap! So don't need to enable!
 # CHECK: if swapon -s returns error when no swap active
 # ALSO:CHECK: as swapoff -a must return err if no swap -- all must work as is?
-if [[ $o =~ w ]] && swapon --show >/dev/null; then
+# NOTE:(14.04) used deprecated '-s' instead of new '--show'
+if [[ $o =~ w ]] && swapon -s >/dev/null; then
   sudo swapoff -a && sudo swapon -a
 fi
 
