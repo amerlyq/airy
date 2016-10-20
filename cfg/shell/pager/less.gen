@@ -3,9 +3,10 @@ dst=~/.lesskey
 trap "rm -f '$dst'" INT TERM EXIT
 > "$dst"
 
-dump() { sed '2,$s/#.*$//;/^\s*$/d' >> "$dst"; }
+# SEE:(cmdlist) https://github.com/SaintGimp/less/blob/master/lesskey.c
 
-dump <<EOT
+dump() { sed '2,$s/#.*$//;/^\s*$/d' >> "$dst"; }
+dump <<'EOT'
 #command
 h left-scroll
 l right-scroll
@@ -15,7 +16,20 @@ EOT
 # l noaction 1\e)
 
 
-dump <<EOT
+dump <<'EOT'
+#line-edit
+^P up
+^N down
+^B left
+^F right
+^A home
+^E end
+^W word-backspace
+^I expand
+EOT
+
+
+dump <<'EOT'
 #env
 # Set the default Less options. SEE $ man less, /LESS/
 # -g -N
