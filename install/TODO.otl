@@ -125,6 +125,16 @@ Installing another kernel (for fallback on broken system)
 	: GRUB_DEFAULT="1>2"  # Count lts entry (menu>submenu) order in /boot/grub/grub.cfg
 	grub-mkconfig -o /boot/grub/grub.cfg
 
+Mount .vmdk
+	скорее заработает второй метод (kpartx)
+		http://www.commandlinefu.com/commands/view/12554/mount-a-vmware-virtual-disk-.vmdk-file-on-a-linux-box
+		http://serverfault.com/questions/709192/loop-back-mount-a-vmdk-flat-image-on-a-linux-box
+	многообещающе
+		http://stackoverflow.com/questions/22327728/mounting-vmdk-disk-image
+	выглядит более детализированно
+		https://ramslack.wordpress.com/2013/01/06/mounting-vmdk-files-in-linux/
+	касательно оффсета (если надо смещение), здесь что-то есть по нему
+		http://rand0mbits.blogspot.com/2014/04/mounting-vmdk-files-in-linux.html
 
 [_] Give my complete auto installation to Igor to test)
 	Window managers -- switcher for multiprofiling work/media
