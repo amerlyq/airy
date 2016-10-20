@@ -32,7 +32,7 @@ Allow password access
 
 Connect headless SSH
 # THINK:MOVE: in ./airy/README.md?
-  $ ssh bsrv 'mkdir -p ~/.ssh && cat > ~/.ssh/authorized_keys' < ~/.ssh/id_rsa.pub
+  $ ssh bsrv 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys' < ~/.ssh/id_rsa.pub
   $ scp /usr/share/terminfo/s/st-256color bsrv:/tmp
   $ scp /usr/share/terminfo/t/tmux-256color bsrv:/tmp
   $ ssh -t bsrv 'for f in st-256color tmux-256color; do sudo mv -v "/tmp/$f" "/usr/share/terminfo/${f:0:1}/$f"; done'
