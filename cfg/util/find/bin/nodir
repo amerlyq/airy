@@ -1,0 +1,2 @@
+#!/bin/sh
+exec find "$1" -type d \( -regextype egrep -regex "$2" \) -prune -o "${@:3}" -print
