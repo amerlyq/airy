@@ -2,15 +2,17 @@
 source ~/.shell/func.d/system
 
 # NOTE: If problem with package update, firts update 'archlinux-keyring' pkg
+# ALSO: $ gpg --recv-keys 249B39D24F25E3B6
 
 if distro arch; then
-  # CHECK will it upgrade AUR pkgs
-  sudo pacman -Syu ||: # NOTE: --ignore=firefox
+  if [[ " $* " =~ " -u " ]]; then
+    pacaur -Syu ||:
+  else
+    sudo pacman -Syu ||: # NOTE: --ignore=firefox
+  fi
   # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
   # Degrade manually:
   #   pacman -U /var/cache/pacman/pkg/firefox-42.0-3-x86_64.pkg.tar.xz
-  # TODO:
-  # cfgOpt u && pacaur -Syu ||:
 
 elif distro ubuntu; then
   sudo apt-get install gawk

@@ -26,8 +26,9 @@ bindkey '^Q' backward-word
 
 
 ## Editing
-bindkey '^_' undo
 bindkey '^Z' undo
+bindkey '^_' redo
+# bindkey '\M-z' redo
 bindkey '^D' delete-char
 bindkey '^H' backward-delete-char
 bindkey '^?' backward-delete-char
