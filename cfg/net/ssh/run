@@ -23,6 +23,14 @@ fi
 tmux attach -t $ssnm
 "
 
+# HACK: nested tmux by ssh -- temporary switch host prefix
+# ALT: change prf on remote (nested) -- add to $sstmux
+#   tmux set prefix $(test -n "$TMUX" && echo C-s || echo C-l)
+if [[ $PRG == bsrv ]] && [[ $TMUX ]]; then
+  trap 'tmux unbind C-s \; set -u prefix' HUP INT QUIT TERM ERR EXIT
+  tmux set prefix C-s \; bind C-s send-prefix
+fi
+
 case $PRG
 in mpd)  ~/.bin/net.d/sir-mpd "$@"
 ;; bsrv) ssh bsrv   ${@:--t "$sstmux"}
