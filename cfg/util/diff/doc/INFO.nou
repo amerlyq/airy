@@ -40,6 +40,9 @@ http://unix.stackexchange.com/questions/57305/rsync-compare-directories
   $ diff -y <(xxd foo1.bin) <(xxd foo2.bin) | colordiff
   Method that works for byte addition / deletion
     $ diff <(od -An -tx1 -w1 -v file1) <(od -An -tx1 -w1 -v file2)
+  HACK:
+    Combine hex grep + diff
+      http://xyne.archlinux.ca/projects/hexgrep/
   ALT:
   # http://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
     vbindiff

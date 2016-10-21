@@ -58,6 +58,9 @@ if [[ ! -f ${vbox:?} ]]; then
 
     # FIXME: do it only once!
     # Add host-only network in Host vbox and check it:
+    # NOTE:NEED: net-tools OR manually raise ifc
+    #   https://bbs.archlinux.org/viewtopic.php?id=131711
+    #   https://bbs.archlinux.org/viewtopic.php?pid=1178607#p1178607
     if ! VBoxManage list -l hostonlyifs | grep -q "${VBOX_NET:?}"; then
         VBoxManage hostonlyif create
         VBoxManage dhcpserver add --ifname "$VBOX_NET" --enable
