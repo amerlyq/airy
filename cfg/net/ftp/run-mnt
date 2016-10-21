@@ -1,0 +1,19 @@
+#!/bin/bash -e
+source ~/.shell/profile
+
+[[ ! $1 =~ -u ]] || { unmount=1; shift; }
+
+# WARN:ALSO: you need creds in ~/.netrc 600
+d=${1:-${CURR_DIR_FTP:?}}
+f=${2:-${WORK_FTP:?}}
+
+
+ismnt(){ grep -qsFw "$1" /proc/mounts; }
+
+if ((unmount)); then
+  ismnt "$d" && fusermount -u "$d"
+  rmdir -v "$d"
+else
+  mkdir -vp "$d"
+  ismnt "$d" || curlftpfs -o utf8 "ftp://$f" "$d"
+fi
