@@ -5,15 +5,18 @@ source ~/.shell/profile
 # In other case you will not be able to pull this gurl
 
 # git remote show origin | grep "Push *URL" | sed "s@.*:.*:\(.*\$\)@\1@"
+info="git:"
+
+if [[ ${CURR_PROF:?} == work ]]; then
+  git config --local user.name "${MAIN_NAME:?}"
+  git config --local user.email "${MAIN_MAIL:?}"
+  info+="($MAIN_NAME <$MAIN_MAIL>)"
+fi
 
 gurl=$(git config --get remote.origin.url \
   | sed '{s@.*git\(.*\)\.com/@g\1:@}')
 
 git remote set-url origin "${gurl:?Not a git repo?}"
-echo "C: git remote url '${PWD#$HOME/}' -> $gurl"
+info+=", $gurl <- '${PWD#$HOME/}'"
 
-if [[ ${CURR_PROF:?} == work ]]; then
-  git config --local user.name "${MAIN_NAME:?}"
-  git config --local user.email "${MAIN_MAIL:?}"
-  echo "C: git local {name, email} : {$MAIN_NAME, $MAIN_MAIL}"
-fi
+printf 'C: %s\n' "$info"
