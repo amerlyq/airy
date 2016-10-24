@@ -2,6 +2,7 @@
 
 url=$1
 nm=${2:-upstream}
+push=${3:-}
 
 if git remote | grep -qxF "$nm"; then
   git remote set-url "$nm" "$url"
@@ -9,4 +10,6 @@ else
   git remote add -f -t master -m master "$nm" "$url"
 fi
 
-git remote set-url --push "$nm" DISABLE
+if [[ -z $push ]]; then
+  git remote set-url --push "$nm" DISABLE
+fi
