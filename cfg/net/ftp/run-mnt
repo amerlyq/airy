@@ -12,7 +12,7 @@ ismnt(){ grep -qsFw "$1" /proc/mounts; }
 
 if ((unmount)); then
   ismnt "$d" && fusermount -u "$d"
-  rmdir -v "$d"
+  rmdir -vp "$d"
 else
   mkdir -vp "$d"
   ismnt "$d" || curlftpfs -o utf8 "ftp://$f" "$d"

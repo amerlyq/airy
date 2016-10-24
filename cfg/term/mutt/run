@@ -3,5 +3,10 @@
 # NOTE:(/dev/tty) otherwise 'read' will catch piped msg text
 read -esp "Mutt pass: " pass </dev/tty
 echo
+
+# Directory for attach
+d=~/.mail/attach
+mkdir -p "$d" && cd "$d"
+
 exec mutt -e "source ~/.cache/mutt/default" \
   -e "set smtp_pass=$pass" "$@"

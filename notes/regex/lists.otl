@@ -30,6 +30,7 @@ LIST MANIPULATION
 | sort -rnk5      | reverse numerical copare 5th column
 | sort -k 3.3     | third column, start comparison from its 3rd char
 | sort -k 3.3,3.5 | compare chars 3..5 from 3rd column
+| sort -t: -k2,2  | sort on 2nd column, fallback to whole line if identical
 | comm            | Compare two sorted files line by line.
 | join            | Join the lines of two files which share a common field of data.
 | uniq -u         | print only unique

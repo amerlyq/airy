@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+
+[[ ! $1 =~ -u ]] || { unmount=1; shift; }
+
+# ATT: only first entry used
+dir=${1:-$(showmount -d | sed -n '2{p;q}')}
+mnt=${2:-/mnt}
+
+if ((unmount)); then
+  sudo mount "$(hostname):$dir" "$mnt"
+else
+  sudo umount "$mnt"
+fi
+
+showmount -a
+mount | tail -5 | column -t
