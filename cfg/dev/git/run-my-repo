@@ -10,13 +10,13 @@ info="git:"
 if [[ ${CURR_PROF:?} == work ]]; then
   git config --local user.name "${MAIN_NAME:?}"
   git config --local user.email "${MAIN_MAIL:?}"
-  info+="($MAIN_NAME <$MAIN_MAIL>)"
+  info+="($MAIN_NAME <$MAIN_MAIL>),"
 fi
 
 gurl=$(git config --get remote.origin.url \
   | sed '{s@.*git\(.*\)\.com/@g\1:@}')
 
 git remote set-url origin "${gurl:?Not a git repo?}"
-info+=", $gurl <- '${PWD#$HOME/}'"
+info+=" $gurl <- '${PWD#$HOME/}'"
 
 printf 'C: %s\n' "$info"
