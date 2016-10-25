@@ -1,4 +1,11 @@
 ranger
+  [_] BUG: using ':shell pwd' at symlinked dir -- expands it
+    = pwd = logical path how you reached phys dir
+      -- only actual prg know it CHECK: kernel has the same inode/path
+    http://stackoverflow.com/questions/11047965/pwd-from-bash-from-python-expand-symlinks
+      => so entering shell on 's' and returning back -- you are teleported
+    http://stackoverflow.com/questions/442442/how-to-know-when-you-are-in-a-symbolic-link
+      TRY: os.popen("pwd").read().strip("\n") OR os.getenv("PWD")
   [_] SEIZE: ranger + ZSH
     https://github.com/Vifon
   [_] BUG: shows 'pause (130)' twice (run script on <CR> and interrupt by <C-c>)

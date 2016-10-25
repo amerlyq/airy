@@ -163,9 +163,13 @@ class cd_shelldir(Command):
         try:
             fname = self.fm.confpath(cd_shelldir.lastdir)
             with open(fname, 'r') as f:
-                self.fm.cd(f.readline().rstrip())
+                path = f.readline().rstrip()
         except IOError:
             return self.fm.notify(cd_shelldir.lastdir, bad=True)
+
+        # FIXED: expanded pwd symlink teleporting
+        if path != fs.realpath(self.fm.thisdir.path):
+            self.fm.cd(path)
 
     def tab(self):
         return self._tab_directory_content()  # Generic function
