@@ -7,6 +7,7 @@ dir=${1:-$(showmount -d | sed -n '2{p;q}')}
 mnt=${2:-/mnt}
 
 if ((unmount)); then
+  # WARN:(/etc/hosts) 'hostname' must be bound to subnet ip
   sudo mount "$(hostname):$dir" "$mnt"
 else
   sudo umount "$mnt"
