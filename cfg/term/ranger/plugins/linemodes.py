@@ -1,6 +1,7 @@
 # USAGE: :linemode <name>
 
 import os
+import sys
 import re
 from time import strftime, localtime
 
@@ -79,3 +80,25 @@ class XPermLinemode(LinemodeBase):
 
     def infostring(self, f, metadata):
         return f.get_permission_string()
+
+
+@ranger.api.register_linemode
+class XAttrLinemode(LinemodeBase):
+    name = "xattr"
+
+    def get(self, f):
+        # return ''.join(os.listxattr(f.path))  # BAD: empty list
+        from subprocess import check_output, CalledProcessError
+        try:
+            xattr = check_output(['lsattr', '-d', f.path]).strip().split()[0]
+        except (CalledProcessError, IndexError):
+            raise NotImplementedError
+        if sys.version_info[0] >= 3:
+            xattr = xattr.decode("utf-8")
+        return xattr
+
+    def filetitle(self, f, metadata):
+        return f.relative_path
+
+    def infostring(self, f, metadata):
+        return self.get(f)

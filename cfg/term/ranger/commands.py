@@ -420,3 +420,37 @@ class unfilter(Command):
 
     def execute(self):
         self.unfilter(self.fm.thisdir)
+
+
+# BAD: not refreshes modeline until cursor moved
+class xattr(Command):
+    def _toggle(self, v, f):
+        from ranger.container.fsobject import FileSystemObject
+        lm = FileSystemObject.linemode_dict[self.__class__]
+        try:
+            attr = lm().get(f)
+        except NotImplementedError as e:
+            return self.fm.notify(str(e), bad=True)
+        for c in v:
+            t = '-' if c in attr else '+'
+            # XXX: os.setxattr is something else
+            self.fm.execute_command(['chattr', t + c, f])
+
+    def execute(self):
+        # DEV: use %s by default
+        if not self.arg(1) or not self.arg(1)[1:]:
+            return self.fm.notify("Need xattr value: '+-=[...]'", bad=True)
+
+        t = self.arg(1)[0]
+        v = self.arg(1)[1:]
+        f = self.arg(2) or '%s'
+        f = self.fm.substitute_macros(f, escape=False)
+
+        # BAD: '%' currently don't work (? macro expansion ?)
+        if t not in '+-=%':
+            return self.fm.notify("Wrong xattr modifier", bad=True)
+
+        if '%' == t:
+            self._toggle(v, f)
+        else:
+            self.fm.execute_command(['chattr', t + v, f])
