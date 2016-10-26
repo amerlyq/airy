@@ -84,13 +84,14 @@ class XPermLinemode(LinemodeBase):
 
 @ranger.api.register_linemode
 class XAttrLinemode(LinemodeBase):
+    """list file attributes on a Linux second extended file system"""
     name = "xattr"
 
-    def get(self, f):
-        # return ''.join(os.listxattr(f.path))  # BAD: empty list
+    def xattr_get(self, f):
+        # XXX: lsattr != os.listxattr  (BAD: empty list)
         from subprocess import check_output, CalledProcessError
         try:
-            xattr = check_output(['lsattr', '-d', f.path]).strip().split()[0]
+            xattr = check_output(['lsattr', '-d', f]).strip().split()[0]
         except (CalledProcessError, IndexError):
             raise NotImplementedError
         if sys.version_info[0] >= 3:
@@ -101,4 +102,4 @@ class XAttrLinemode(LinemodeBase):
         return f.relative_path
 
     def infostring(self, f, metadata):
-        return self.get(f)
+        return self.xattr_get(f.path)

@@ -422,35 +422,55 @@ class unfilter(Command):
         self.unfilter(self.fm.thisdir)
 
 
-# BAD: not refreshes modeline until cursor moved
 class xattr(Command):
-    def _toggle(self, v, f):
+    """:xattr [-+=!][aAcCdDeijsStTu] <file>
+
+    Change file attributes on a Linux file system
+    """
+
+    def xattr_set(self, mode, f):
+        if not isinstance(f, list):
+            f = [f]
+        # XXX: chattr != os.setxattr
+        self.fm.execute_command(['chattr', mode] + f)
+
+    def xattr_toggle(self, value, files):
         from ranger.container.fsobject import FileSystemObject
-        lm = FileSystemObject.linemode_dict[self.__class__]
-        try:
-            attr = lm().get(f)
-        except NotImplementedError as e:
-            return self.fm.notify(str(e), bad=True)
-        for c in v:
-            t = '-' if c in attr else '+'
-            # XXX: os.setxattr is something else
-            self.fm.execute_command(['chattr', t + c, f])
+        xattr_get = FileSystemObject.linemode_dict['xattr'].xattr_get
+        for f in (files if isinstance(files, list) else [files]):
+            try:
+                cv = xattr_get(f)
+            except NotImplementedError as e:
+                return self.fm.notify(e, bad=True)
+            for c in value:
+                t = '-' if c in cv else '+'
+                self.xattr_set(t + c, f)
 
     def execute(self):
-        # DEV: use %s by default
         if not self.arg(1) or not self.arg(1)[1:]:
             return self.fm.notify("Need xattr value: '+-=[...]'", bad=True)
 
-        t = self.arg(1)[0]
-        v = self.arg(1)[1:]
-        f = self.arg(2) or '%s'
-        f = self.fm.substitute_macros(f, escape=False)
+        mod = self.arg(1)[0]
+        value = self.arg(1)[1:]
+        import shlex
+        files = shlex.split(self.rest(2))
 
-        # BAD: '%' currently don't work (? macro expansion ?)
-        if t not in '+-=%':
-            return self.fm.notify("Wrong xattr modifier", bad=True)
+        for c in value:
+            if c not in 'aAcCdDeijsStTu':
+                return self.fm.notify("Wrong xattr value", bad=True)
 
-        if '%' == t:
-            self._toggle(v, f)
+        if files:
+            files = [self.fm.substitute_macros(f, escape=False) for f in files]
         else:
-            self.fm.execute_command(['chattr', t + v, f])
+            cdir = self.fm.thisdir
+            if cdir.marked_items:
+                files = [f.relative_path for f in cdir.marked_items]
+            else:
+                files = [cdir.thisfile]
+
+        if mod in '+-=':
+            self.xattr_set(mod + value, files)
+        elif mod == '!':
+            self.xattr_toggle(value, files)
+        else:
+            return self.fm.notify("Wrong xattr modifier", bad=True)

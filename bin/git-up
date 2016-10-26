@@ -8,7 +8,7 @@ cgit(){ git -c color.status=always -c color.ui=always "$@"; }
 
 # ALT: git diff-index --name-only --ignore-submodules HEAD --
 git diff-files --quiet --ignore-submodules -- || clean=0
-((clean)) || git stash
+((clean)) || cgit stash
 
 # BUG: troubles when you on feature-branch and ustream was rebased
 #   Then you need only fetch instead of pull+rebase
@@ -16,7 +16,7 @@ git diff-files --quiet --ignore-submodules -- || clean=0
 cgit fetch --all
 cgit pull --rebase --verbose  # --rebase=preserve
 
-((clean)) || git stash pop
+((clean)) || cgit stash pop
 
 # ALT: with autostash and colored rebase
 # git ${GCFG[@]} fetch --all --progress --prune --verbose
