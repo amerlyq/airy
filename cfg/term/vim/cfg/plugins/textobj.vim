@@ -204,6 +204,18 @@ call dein#add('kana/vim-textobj-syntax', {
 
 
 
+"" Diff hunks navigation {{{1
+call dein#add('kana/vim-textobj-diff', {
+  \ 'on_map': {'ox': '<Plug>'},
+  \ 'depends': 'vim-textobj-user',
+  \ 'hook_source': 'let g:textobj_diff_no_default_key_mappings = 1',
+  \ 'hook_add': "
+\\n   call Map_textobj('H', 'diff-file')
+\\n   call Map_textobj('[Frame]d', 'diff-hunk')
+\"})
+
+
+
 "" «Smart» words column {{{1
 " DEV:FIX: up/down bounds detection -- more smart
 " ALT? (column-mappings) osyo-manga/vim-textobj-blockwise

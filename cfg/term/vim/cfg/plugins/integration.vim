@@ -41,6 +41,15 @@ call dein#add('will133/vim-dirdiff', {
 
 
 
+"" CHECK supports 'ignoring' parts of diff {{{1
+" ALSO: https://github.com/junkblocker/patchreview-vim
+" SEE:
+"   http://vim.1045645.n5.nabble.com/Moving-diff-hunks-td1175653.html
+"   https://github.com/search?p=2&q=vim+diff&ref=searchresults&type=Repositories&utf8=%E2%9C%93
+call dein#add('chrisbra/vim-diff-enhanced', {
+  \ 'on_cmd': ['EnhancedDiff', 'PatienceDiff', 'EnhancedDiffIgnorePat']})
+
+
 """ Web
 
 " W3m from vim {{{1
