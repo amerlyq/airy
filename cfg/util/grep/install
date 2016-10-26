@@ -1,0 +1,23 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+#| ag      | The silver searcher -- 'ag' instead of 'grep' inside of git project -- very best!
+#   NOTE: ag --ignore 'usr/lib' -- if contains '/' treated as literal path
+#   NOTE: ag --ignore 'python*' -- if not '/' then glob each path component
+
+#| sift-bin| ALT:(grep) standalone parallel binary written in '.go'. Fastest?
+#   BUT: no support for look-ahead/behind:  (?=..), (?<=..)
+
+# VIZ: grep egrep fgrep
+pkg_inst grep
+
+
+if distro arch; then
+  pkg_inst -p 'ag' the_silver_searcher
+  aur_inst -p 'sift' sift-bin
+
+elif distro ubuntu; then
+  # pkg_inst silversearcher-ag
+  pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
+  git_inst "ggreer/the_silver_searcher"
+fi

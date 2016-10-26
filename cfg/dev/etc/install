@@ -1,12 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-#| ag      | The silver searcher -- 'ag' instead of 'grep' inside of git project -- very best!
-#   NOTE: ag --ignore 'usr/lib' -- if contains '/' treated as literal path
-#   NOTE: ag --ignore 'python*' -- if not '/' then glob each path component
-#| sift-bin| ALT:(grep) standalone parallel binary written in '.go'. Fastest?
-#| at      | Read commands from standard input or a specified file which are to
-#|_________|    be executed at a later time, using /bin/sh.
 #| iotop   | Show disk r/w statistics for processes like htop (press 'a')
 #| dstat   | Versatile tool for generating system resource statistics
 #| jshon   | Bash json parser to use in scripts with i3-msg output # http://kmkeen.com/jshon/
@@ -22,14 +16,12 @@ source ~/.shell/func.d/packages
 # sift ALT to grep, faster then ag, single independent binary
 # https://sift-tool.org/performance
 
-pkg_inst at htop iotop dstat jshon
+pkg_inst htop iotop dstat jshon
 pkg_inst cscope
 
 if distro arch; then
   # THINK:SEE gtags (GNU Global) -- instead of ctags?
   pkg_inst ctags rsync
-  pkg_inst -p 'ag' the_silver_searcher
-  aur_inst -p 'sift' sift-bin
   pkg_inst -p 'locate' mlocate
   aur_inst shyaml
 
@@ -37,7 +29,4 @@ elif distro ubuntu; then
   pkg_inst exuberant-ctags
   pkg_inst checkinstall locate
   pkg_inst urlview  # No for arch?
-  # pkg_inst silversearcher-ag
-  pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
-  git_inst "ggreer/the_silver_searcher"
 fi

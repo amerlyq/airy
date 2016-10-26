@@ -1,0 +1,11 @@
+#!/bin/sh -eu
+
+fs=${1:-:}  # grep
+col=${2:-1} # 1st column
+
+# ALT:BETTER: perl
+#   http://unix.stackexchange.com/questions/145902/aggregate-and-group-text-file-in-perl-or-bash
+#   http://stackoverflow.com/questions/22562335/perl-grouping-data-from-two-columns
+exec awk -vFS="$fs" -vOFS="$fs" -vc="$col" \
+  '$c!=h{h=$c;print"\n"h} {for(i=c;i<NF;++i)$i=$(i+1);$NF="";print$0}' \
+  "${@:3}"

@@ -11,6 +11,23 @@ TODO
     https://github.com/fs/git-awesome-diff
   [_] SEE:ALT: https://www.mkssoftware.com/docs/man1/diff.1.asp
 
+  [_] DEV compare configs (python?)
+    [_] TODO: find my earlier notes on such ALG
+    * specify key mask
+      //ranger/rc.conf:
+        keys: map\s+\w+
+        cmds: (?<=map\b\s+\w+\s+).*
+    * sort keys from one file in order from another (main)
+      - sort together with commented ones /^(#\s*)?.../
+      - if main contains multiple keys
+        = prefer first/last uncommented one
+    * if new keys -- place them relative to
+      - other matching keys
+      - section header (dump all before/after matching keys in group)
+    * correctly put back adjacent comments/headers in sorted file
+    * format by placeholders from main one (non-keys: empty lines, comments)
+    * diff them
+
 
 HACK
   [_] DEV: TUI, similar to my 'smdf' : SEE scripts in //smdf/cmp
