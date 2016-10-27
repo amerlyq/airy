@@ -7,16 +7,18 @@
 
 ## Consumers
 alias -g N0='&>/dev/null'
+alias -g N1=' >/dev/null'
 alias -g N2='2>/dev/null'
+alias -g N+='2>&1'
 
 ## Viewers
 if (($+commands[$PAGER])); then
   alias -g L='| $PAGER '
-  alias -g LL='|& $PAGER -r '
+  alias -g LL='| $PAGER -r '
 fi
 
 if (($+commands[$EDITOR])); then
-  alias -g V='|& $EDITOR -R - '  # USE ':set noro' to edit
+  alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
   alias -g VQ='V -c "cgetb|copen"'
   alias -g VG='V -c "set cole=0 fdl=1|setf ag_grp"'
 fi
@@ -62,7 +64,7 @@ fi
 if (($+commands[fzf])); then
   # ALT:(fzf) https://github.com/garybernhardt/selecta
   # --multi --no-sort --reverse --cycle --no-hscroll
-  alias -g F='|& fzf -m'
+  alias -g F='| fzf -m'
   alias -g X@='F X '
   alias -g Y@='F Y '
   # alias -g Z:='Z@ -I{} '
