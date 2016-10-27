@@ -2,7 +2,8 @@
 tmp=${TMPDIR:-/tmp}/qemu
 mkdir -p "$tmp"
 
-iso=$(realpath -e "${1:?}")
+iso=${1:?}
+[[ -f $iso ]]
 
 # THINK:TRY: -nodefaults
 cmd=( qemu-system-x86_64 )

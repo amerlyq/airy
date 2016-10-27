@@ -39,7 +39,10 @@ trap_errors(){
 ### Go to current script's directory
 # BAD:DFL: both realpath and readlink => same path on symlinked script
 # ALT: DIR="$(cd "$(dirname "$0")" && pwd)"
+# ALT: reliable $(cd "${BIN%/*}" && pwd)/${BIN##*/} BUT:BAD: tailing '/..'
+# ALT:FAST: abspath(){ local f=$1; case $f in /*) ;; *) f=$PWD/$f ;; esac; printf '%s\n' "$f"; }
 # ALSO:(realpath) has --relative-* flags and --strip
+#   => normalize path but keep symlinks -- so binary has actual path in $0
 # NOTE:WARN:("$0" may be relative):
 #   first apply all 'readlink $0' -- and only then do 'cd'
 cwd_script(){ cd "${0%/*}"; }  # even around symlinked

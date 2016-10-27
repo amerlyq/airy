@@ -88,7 +88,10 @@ case "$ACTION" in
         home) dosamba "$DIR" ${LAPT_USER:?} ${LAPT_IPL:?}/home ;;
        media) dosamba "$DIR" ${LAPT_USER:?} ${LAPT_IPL:?}/media ;;
     esac ;;
- u) sudo umount -v "$DIR"; clean "$DIR" || exit ;;
+# SEE umount troubleshooting:
+#   http://oletange.blogspot.com/2012/04/umount-device-is-busy-why.html
+ u) sudo umount -v "$DIR" || { lsof "$DIR"; exit 1; }
+    clean "$DIR" || exit ;;
  U) sudo umount -v "$MNT"/* ||:; sudo rmdir -v "$MNT"/* ;;
  i) sudo blkid ;;  # Get table disk/label/filesystems
  *) echo "Error: '$ACTION'" ;;

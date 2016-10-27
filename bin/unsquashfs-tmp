@@ -3,9 +3,10 @@
 # Ubuntu:
 # http://unix.stackexchange.com/questions/90323/how-to-use-unsquashfs-with-lzma
 
-img=$(realpath -e "${1:?}")
+img=${1:?}
 dst=${2:?}
 
+[[ -f $img ]]
 [[ $dst == /* ]] || dst=/tmp/squashfs/$dst
 
 sudo rm -rf "$dst"

@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd "$(realpath -e "${0%/*}")"
+cd "$(readlink -e "${0%/*}")"
 export PATH=$PWD:$PATH
 
 # prf=${1:?}

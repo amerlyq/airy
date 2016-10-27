@@ -34,7 +34,7 @@ esac; OPTS+=$o; done; shift $((OPTIND-1))
 ((_quiet))||unset _quiet
 
 [[ $OPTS =~ f && $# -eq 1 ]] && BIN=${1%.*} || BIN=${PWD##*/}
-BIN=$(realpath -m "${BIN:?}.bin")
+BIN=$(readlink -s "${BIN:?}.bin")
 
 ignore() { local ret=$?; ((ret==$1))||return $ret; }
 

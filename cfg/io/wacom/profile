@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # source ~/.shell/func.d/bash-profiler
-cd "$(realpath -e "${0%/*}")"
+cd "$(readlink -e "${0%/*}")"
 
 WND_ACTIVE=$(~/.bin/xorg.d/get_active_wnd)
 # ALT: eval "$(xdotool getmouselocation --shell)" -> $WINDOW
