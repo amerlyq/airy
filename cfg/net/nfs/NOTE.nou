@@ -1,0 +1,50 @@
+Setup exports
+  NOTE: for each 'mount --bind' point you need one entry in /etc/exports
+		BAD? Export root as is and each mounted fs with fsid=0
+  $ mkdir -p /home/nfs
+  /etc/exports
+      /home/nfs 192.168.1.0/24(rw,sync,nohide,no_root_squash,no_subtree_check)
+
+  $ sudo exportfs -ra  # refresh list
+  $ sudo service nfs-kernel-server restart
+
+
+Unpack
+  $ sudo rm -rf /home/nfs/*
+  $ sudo tar xzv -C /home/nfs -f file.tgz
+  OR unpack to /path/to/nfs and 'mount --bind'
+  $ sudo mount --bind /path/to/nfs /home/nfs
+
+
+Boot
+  $ boot -z -elf 192.168.1.2:/vmlinuz "root=/dev/nfs nfsroot=192.168.1.2:/home/nfs rw ip=dhcp ..."
+
+
+DEBUG
+  $ showmount -d  # show
+  $ showmount -e "$(hostname)"
+  # WARN:(/etc/hosts) 'hostname' must be bound to subnet ip
+  Check by mounting on host
+    $ sudo mount -t nfs "$(hostname):/home/nfs" /mnt
+    # hostname/its_ip must be valid for specified exports
+  Verifying whether NFS shared directories are configured correctly:
+    $ sudo exportfs -sv  # show
+  Check status of all RPC utility prs
+    $ rpcinfo -p  # show RPC vers/proto for 'nfs'
+    $ rpcinfo -p G '\b2\b.*tcp.*nfs'
+  /etc/init.d/nfs-kernel-server
+
+
+Setup server
+  Arch: /etc/sysconfig/nfs
+    RPCMOUNTDOPTS=""    # USE:(--manage-gids) if $(groups|wc -w)>16  (NFS limitation)
+    RPCSVCGSSDARGS=""   # USE:(-p 20048) for static ports from /etc/services
+    RPCNFSDARGS="-V 2"  # USE:(-N 2 -N 3) for V4 only
+  Ubunutu: (14.04) /etc/default/nfs-kernel-server
+    RPCMOUNTDOPTS="--manage-gids"
+    RPCSVCGSSDOPTS=""
+    RPCNFSDOPTS=""
+  Arch: (OLD) /etc/conf.d/nfs-server.conf
+    NFSD_OPTS="-V 2"  # To support NFSv2 (CFE/UBoot)
+    MOUNTD_OPTS="--manage-gids"
+    SVCGSSD_OPTS=""

@@ -3,8 +3,8 @@ source ~/.shell/func.d/cfgsetup
 
 if cfgOpt u; then
     if distro arch; then
-        link -sct /etc/conf.d 'nfs-server.conf'
-        svc_activate -eR rpcbind nfs-server nfs-mountd
+        linkcp -sc nfs.conf /etc/sysconfig/nfs
+        svc_activate -eR nfs-config rpcbind rpc-statd nfs-mountd nfs-server
 
     elif distro ubuntu; then
         echo "Err: No NFS config conversion. Works by default?"
