@@ -1,0 +1,19 @@
+%%%%% CFE
+
+REF
+  https://wiki.openwrt.org/doc/techref/bootloader/cfe
+
+USAGE
+  $ help
+  $ printenv
+  $ setenv -p IP 'ifconfig eth0 -auto'
+  $ setenv -p NFS 'boot ...'
+  $ setenv -p STARTUP '$IP; printenv; $NFS'
+    # Load by default
+  $ setenv -p F3 '$STARTUP'
+    # Load on keypress F3
+
+Flash
+  $ flash -noheader 192.168.1.2:/vmlinuz flash1.kernel
+  $ flash -noheader 192.168.1.2:/squashfs flash1.rootfs
+  $ boot ... "root=/dev/mtdblock2 rootfstype=squashfs ro console=ttyS0,115200 .."
