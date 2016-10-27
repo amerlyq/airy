@@ -1,41 +1,4 @@
-#!/usr/bin/expect
-# SEE:
-#   > http://wiki.tcl.tk/10025
-#   +++ http://www.tldp.org/HOWTO/Serial-HOWTO-10.html
-#   http://stackoverflow.com/questions/17360580/copy-text-in-minicom-doesnt-get-copied-completely
-#   https://github.com/keesj/A13-OlinuXino-playground/blob/master/bare/07_cstartup/upload.expect
-#   http://stackoverflow.com/questions/11768739/how-to-use-a-variable-in-regexp-expression-tcl-expect
-# REF: http://www.tldp.org/HOWTO/Remote-Serial-Console-HOWTO/preparation-setspeed.html
-
-## picocom
-# Exit: C-a,C-x,  --escape x
-# Resize (shell inside com): stty rows lines cols columns
-# ALT minicom -w  # -c -o
-# ALT screen /dev/ttyUSB0 115200
-
-if { $argc > 0 } { set arg [lindex $argv 0] } else { set arg 0 }
-if [ regexp "\[0-9\]" $arg ] { set dev "/dev/ttyUSB$arg" } else { set dev $arg }
-puts ">>> $dev <<<"
-
-# For picocom use '\r' instead of '\n'
-spawn picocom --baud 115200 --flow n --databits 8 --parity n $dev
-sleep 1
-
-# Check if already logged-in
-
-set timeout 1
-send "\r\003\003\003"
-expect {
-    -re "HR\[0-9\]\+.*\n.*#" {}
-    timeout {
-        set src "/cryptfs/_/cfg/expect-login"
-        if {[file exists $src]} { source $src }
-    }
-}
-
-# ALT expect-login
-# expect "login:" { send "user\r" }
-# expect "passw:" { send "pass\r" }
-# timeout { puts "\nErr\n"; exit 1 }
-
-interact
+#!/bin/sh -eu
+dev=${1:-0}
+case $dev in [0-9]) dev=/dev/ttyUSB$dev ;; esac
+exec picocom --baud 115200 --flow n --databits 8 --parity n "$dev"
