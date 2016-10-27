@@ -29,6 +29,9 @@ call dein#add('AndrewRadev/splitjoin.vim', {
 
 "" Use CTRL-A/X to increment dates, times, and more {{{1
 " STD: <Plug>SpeedDating
+" FIXME:
+" BAD: d<C-..> overlaps with 'ag_grp' shortcut 'd'
+" BAD: <C-x> overlaps with unicode.vim '<C-x><C-..>'
 call dein#add('tpope/vim-speeddating', {
   \ 'on_map': [['nx', '<C-a>', '<C-x>'], ['n', 'd<C-a>', 'd<C-x>']],
   \ 'depends': 'vim-repeat'})

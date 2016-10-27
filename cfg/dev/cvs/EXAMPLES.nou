@@ -24,5 +24,11 @@ List files in tag
   $ cvs log -N -S -r$tag &> ../cvs-one-branch.log
 
 Diff
+  Diff between tags
+    $ cvs diff -r tag1 -r tag2 > ../cvs.diff
+  Update log (with binaries)
+    $ cp -vr . ../tmp && cd ../tmp
+    $ cvs -n co -rtag1 .
+    $ cvs -n co -rtag2 . |& tee ../cvs.diff
   Diff between branches
     $ cvs -q rdiff -s -D 2000-01-01 -r yourTagName ModuleName
