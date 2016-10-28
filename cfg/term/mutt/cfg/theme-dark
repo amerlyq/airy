@@ -1,5 +1,9 @@
 # vim:ft=muttrc:ts=2:sw=2:sts=2
 
+# THINK: define VAR my_c_* for each color type and source that file before colorscheme
+#   => use $my_c_* instead of directly specifying colors below
+#   => allows to switch colors easily or adapt to 8c/16c terminals
+
 ### Index ----------------------------------------------------------------
 # Reset. THINK: move into main muttrc macros? FIND: pre-color hooks
 uncolor index *
@@ -37,7 +41,7 @@ color index   magenta         default   "~s re: ! ~x . ! ~h 'in-reply-to: '"
 ## Forwarded
 # NOTE: IMAP server-side searches =[bBh] aren't supported for color index patterns.
 #   => BAD performance for scrolling
-# set my_fwd = "~b(Forwarded\\ message\\ from)"
+# set my_fwd = '~b "(Forwarded\\ message\\ from)"'
 set my_fwd = '(~s fwd: | ~s ^\\[.*@.*:.*\\]$)'
 color index   color13         default   "$my_fwd"    # forwarded
 color index   brightcolor13   default   "$my_fwd~U"  # forwarded, unread
@@ -59,16 +63,17 @@ color index   white           magenta   "~T"      # tagged
 color index   default         brightblack   "~v"            # no unread
 color index   blue            brightblack   "~v~(~U)"       # some unread
 color index   brightblue      brightblack   "~v~(~N)"       # some new
-color index   red             brightblack   "~v~(~F)!~N"    # flagged, no unread
-color index   brightred       brightblack   "~v~(~F~N)"     # flagged, some unread
 # color index   brightcyan      brightblack   "~N~v~(~N)"     # unread parent
 # color index   green           brightblack   "~N~v~(~F~N)"   # unread parent & flagged
 # color index   green           brightblack   "~N~v~(~F)"     # unread parent, no unread inside, but some flagged
-color index   green           brightblack   "~v~(~p)"       # to me, no unread
-color index   brightgreen     brightblack   "~v~(~U~p)"     # to me, some unread
-color index   brightcolor34   brightblack   "~v~(~N~p)"     # to me, some new
 color index   color9          brightblack   "~v~(~P)"       # from me, no unread
 color index   brightcolor9    brightblack   "~v~(~P~U)"     # from me, some unread
+color index   green           brightblack   "~v~(~p)"       # to me, no unread
+## ENH: unread = inverted BUT: bkgr bright* != frgr bright*
+color index   brightblack     color28       "~v~(~p~U)"     # to me, some unread
+color index   brightblack     color70       "~v~(~p~N)"     # to me, some new
+color index   red             brightblack   "~v~(~F)"       # flagged, no unread
+color index   brightred       brightblack   "~v~(~F~U)"     # flagged, some unread
 
 ## Thread overlay status
 color index   red             brightblack   "~v~(~D)"     # with deleted (all/partial)

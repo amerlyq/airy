@@ -1,6 +1,9 @@
 TODO
   [_] allow to manually collapse unread threads on 'h'
     => ALSO check their colorscheme
+  [_] BUG: fix 'save =Sent to current dir' for case of virtual dir of 'notmuch'
+    new: save to =INBOX / last dir before virtual
+    reply: save to same dir as mail itself (extract its dir)
   [_] BAD: I load all available prf in seq _after_ options was set
     FIXME: Any excessive var from 'prf' will overwrite options defined earlier
       => it will influence all other prf which depends on default
