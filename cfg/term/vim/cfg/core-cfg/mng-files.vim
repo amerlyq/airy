@@ -12,7 +12,6 @@ com! -bang -bar -complete=file -nargs=? Ewin
 
 " FIXED:(E173):SEE http://vim.1045645.n5.nabble.com/Re-how-to-suppress-quot-E173-1-more-file-to-edit-quot-td5716336.html#a5716344
 " ALT: if argc()>1|sil blast|sil bfirst|en
-" BUG:(recoverer.vim) exit: catching erases message 'delete swap (y/n)' and hangs
 set noconfirm   " abort action on unsaved for Qfast to work
 com! -bar Qfast try|sil quit|catch/:E37/|conf quit
   \|catch/:E173/|try|sil qall|catch/E37/|conf qall|endt|endt
