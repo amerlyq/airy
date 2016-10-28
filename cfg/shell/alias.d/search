@@ -9,13 +9,16 @@ ff() { find . -type f -regex $@; }
 # alias ff='find ./ | grep -i '
 
 if _has_pr ag
-then agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S $@; }
-else agi() { grep -ri $@ .; }  # --include=*.{cc,h}
+then agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S "$@"; }
+else agi() { grep -ri "$@" .; }  # --include=*.{cc,h}
 fi
 
-agd() { find . -maxdepth 1 -type f | xargs agi $@; }    # in curr dir only
-agw() { agi -w $@; }
-agp() { agi --pager less $@; }
+# DEV: highlight: call ag#syntax#himatch_pcre("${@: -1}")
+agg() { ag --group -s "$@" 2>/dev/null | $EDITOR -R - -c "set cole=0 fdl=1|setf ag_grp"; }
+
+agd() { find . -maxdepth 1 -type f | xargs ag "$@"; }    # in curr dir only
+agw() { agi -w "$@"; }
+agp() { agi --pager less "$@"; }
 agpdf() {
     find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep --with-filename --label="{}" --color "your pattern"' \;
 }

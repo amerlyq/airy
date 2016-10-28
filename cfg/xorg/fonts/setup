@@ -18,6 +18,7 @@ fi
 dst=~/.Xresources
 wstr(){ cat >> "$dst" <<<"$*"; }
 
+# BUG: boot linux with hdmi2 on => wrong xrandr order => wrong DPI
 [[ $MAIN_DPI ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
 
 > "$dst"

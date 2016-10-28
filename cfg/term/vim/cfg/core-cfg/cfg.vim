@@ -84,6 +84,7 @@ nnoremap <unique> [Toggle]a  :setl autoread! hls?<CR>
 " UI
 set cursorline              " highlight currently focused line
 set number |try|set relativenumber|catch/E518/|endt   " show line number
+" BAD: long lines dont match syntax at all FIXME: always match at beginning
 set synmaxcol=200   " limit syntax hi to first 120 chars only
 
 nnoremap <unique> [Toggle]c  :set cursorcolumn! cuc?<CR>
