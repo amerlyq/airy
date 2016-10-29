@@ -12,18 +12,19 @@ noremap <unique> [Toggle]t :<C-u>StripToggleEmptyEndLines<CR>
 
 noremap <unique> [Replace]E :<C-u>EmptyLinesCompress<CR>
 
+let s:sp = '[ \t\xa0\u3000]'
 
 "{{{1 CMDS ====================
 command! -bar -nargs=0 -range=% EmptyLinesCompress
     \ call UnobtrusiveSubF('%s,%s s/%s//', <line1>, <line2>,
-    \   '\v.\n\zs([ \t\u3000])*\n\ze.|^\1*\n\1*\_$')
+    \   '\v.\n\zs('.s:sp.')*\n\ze.|^\1*\n\1*\_$')
 
 command! -bar -nargs=0 -range=% EmptyLinesRemove
     \ call UnobtrusiveSubF('%s,%s g/%s/d_', <line1>, <line2>,
-    \   '^[ \t\u3000]*$')
+    \   '^'.s:sp.'*$')
 
 command! -bar -nargs=0 -range=% StripEmptyEndLines
-    \ call UnobtrusiveSubF('/%s/,%sd_', '\v^%(\_[\n \t\u3000]*\S)@!',
+    \ call UnobtrusiveSubF('/%s/,%sd_', '\v^%(\_(\n|'.s:sp.')*\S)@!',
     \ <line2>)
 
 command! -bar -nargs=0 -range StripToggleEmptyEndLines
@@ -31,7 +32,7 @@ command! -bar -nargs=0 -range StripToggleEmptyEndLines
 
 command! -bar -nargs=0 -range=% StripTrailingSpace
     \ call UnobtrusiveSubF('%s,%s g/%s/s///ge',
-    \   <line1>, <line2>, '\v[ \t\u3000]+$|[ \u3000]+\ze\t$')
+    \   <line1>, <line2>, '\v'.s:sp.'+$|[ \xa0\u3000]+\ze\t$')
 
 command! -bar -nargs=0 -range StripToggleTrailingSpace
     \ call ToggleVariable('g:strip_trailing_space')
