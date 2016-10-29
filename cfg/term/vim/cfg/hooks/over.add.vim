@@ -13,6 +13,7 @@ fun! SubsCount()
   return l:rhs
 endf
 
+" FIXME: ',rd' deletes only first line of multiline regex
 let s:subs = {
   \ '<Leader>c' : 's;;<C-r>=SubsCount()<CR>;g',
   \ '<Leader>C' : 'g//',

@@ -2,13 +2,16 @@
 source ~/.shell/func.d/system
 
 # NOTE: If problem with package update, firts update 'archlinux-keyring' pkg
+#   E.G: signature from "Ambrevar <ambrevar@gmail.com>" is unknown trust
+#        corrupted (invalid or corrupted package (PGP signature)
+#     => CHECK expiration date $ pacman-key -l ambrevar
 # ALSO: $ gpg --recv-keys 249B39D24F25E3B6
 
 if distro arch; then
   if [[ " $* " =~ " -u " ]]; then
-    pacaur -Syu ||:
+    pacaur -Syu
   else
-    sudo pacman -Syu ||: # NOTE: --ignore=firefox
+    sudo pacman -Syu  # NOTE: --ignore=firefox
   fi
   # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
   # Degrade manually:
