@@ -13,6 +13,15 @@ call dein#add('vim-scripts/DrawIt', {
 
 
 
+" Map: <LocalLeader>l[lvi]
+call dein#add('wannesm/wmgraphviz.vim', {
+  \ 'on_cmd': ['GraphvizCompile', 'GraphvizShow', 'GraphvizInteractiv'],
+  \ 'on_map': '<LocalLeader>l',
+  \ 'on_ft': 'dot'
+  \})
+
+
+
 "" Lingr -- remote workplace chat
 " repo = 'basyura/J6uil.vim'
 " depends = 'webapi-vim'
