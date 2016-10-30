@@ -24,7 +24,7 @@ command! -bar -nargs=0 -range=% EmptyLinesRemove
     \   '^'.s:sp.'*$')
 
 command! -bar -nargs=0 -range=% StripEmptyEndLines
-    \ call UnobtrusiveSubF('/%s/,%sd_', '\v^%(\_(\n|'.s:sp.')*\S)@!',
+    \ call UnobtrusiveSubF('/%s/,%sd_', '\v^%(\_[\n'.s:sp[1:-2].']*\S)@!',
     \ <line2>)
 
 command! -bar -nargs=0 -range StripToggleEmptyEndLines
