@@ -1,0 +1,14 @@
+[Unit]
+Description=Demon - MPD-cast - (Socket)
+
+[Socket]
+RuntimeDirectory=%P
+ListenStream=%t/%P/socket
+ListenStream=127.0.0.1:6601
+Backlog=5
+KeepAlive=true
+PassCredentials=true
+
+[Install]
+WantedBy=sockets.target
+Also=mpd.service

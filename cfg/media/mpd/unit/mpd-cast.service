@@ -1,10 +1,10 @@
 [Unit]
-Description=Demon - Music Player Daemon
+Description=Demon - MPD-cast
 After=network.target sound.target mpd.socket
 
 [Service]
 Environment=XDG_CONFIG_HOME=%h/.config
-ExecStart=/usr/bin/mpd --no-daemon
+ExecStart=/usr/bin/mpd --no-daemon $XDG_CONFIG_HOME/mpd/mpd-cast.conf
 
 # allow MPD to use real-time priority 50
 LimitRTPRIO=50

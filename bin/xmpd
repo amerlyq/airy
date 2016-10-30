@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 source ~/.shell/profile || exit
 
+echo BAD: broken
+exit 1
+
 loopback() {
     local cfg=~/".shell/../media/mpd/mpd-own.conf"
     if ! pgrep -f "mpd \S+\.${cfg##*.}"; then

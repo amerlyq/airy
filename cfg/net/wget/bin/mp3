@@ -49,7 +49,7 @@ tom3u(){ local t f=${1:?}.m3u h=${2:?}
 # NOTE: delete album header from playlist, if you want to add it again
 _mpcl(){ mpc playlist -f '[%file%]'; }
 inmpc(){ local f=${1:?} h=${2:?} nm='wget-mp3'
-  local pl=~/.mpd/playlists/${nm}.m3u
+  local pl=~/.config/mpd/playlists/${nm}.m3u
   if ! _mpcl | grep -qxF "$h"; then
     cat | tom3u "$f" "$h"
     ln -sf "$f.m3u" "$pl"

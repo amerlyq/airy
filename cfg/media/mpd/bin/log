@@ -12,6 +12,6 @@ do  # ALT: while : ; do mpc idle ...
     # ALT: idx="$(mpc playlist | awk -vnm="$name" \
     #     'BEGIN{gsub(/[][^$.*?+{}\\()|]/,"\\\\&",nm)} $0 ~ nm {print NR;quit}')"
     [[ -n  "$idx" ]] || continue
-    mark="$(date +'%Y-%d-%m %H:%M:%S')"
+    mark="$(date +'%Y-%m-%d %H:%M:%S')"
     printf '%s |%2s| %s\n' "$mark" "$idx" "$name" >> ~/.mpd/history
 done

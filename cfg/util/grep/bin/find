@@ -1,0 +1,2 @@
+#!/bin/sh -eu
+exec find . -path "$1" -exec grep -iH "${@:1}" -- {} \;

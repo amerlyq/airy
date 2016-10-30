@@ -1,6 +1,50 @@
-TRY:
-  Clients can communicate with each others over “channels”
+TODO:
+  [_] TRY:IDEA: Clients can communicate with each others over “channels”
+  [_] mpd -- capture/record/rip streaming radio in mp3, splitting on song change
+  [_] Playlists for radio
+    http://www.tristancollins.me/computing/bbc-streaming-radio-script-for-mpd/
+  [_] SEE: play file online from position (w/o pre-bufferizing beginning chunk)
 
-SEE
+  [_] BUG: play file online, immediately do ncmpcpp seek => resets to beginning
+    MAYBE: only when you start seeking before 'buffer_before_play' is filled
+      => 0% -- immediate seek -- immediately resets
+      => 50% -- pause 2-3s before playback -- immediate seek -- waits and resets
+      => 100% -- immediate seek hangs out playback indefinitely
+    MAYBE:BUG? in mpd 'curl' plugin when accessing non-streaming online files w/o resume download support?
+
+
+REF
+  !!! https://www.musicpd.org/doc/user/
+    https://www.musicpd.org/doc/user/config_audio_outputs.html
   /usr/share/doc/mpc/mppledit
+  http://mpd.wikia.com/wiki/FAQ
   http://mpd.wikia.com/wiki/Music_Player_Daemon_Browser_Stream_Setup
+  http://mpd.wikia.com/wiki/Music_Player_Daemon_Is_There_An_Equalizer
+  ++ http://mpd.wikia.com/wiki/PulseAudio
+
+
+HACK
+  ++ http://mpd.wikia.com/wiki/Hacks
+  https://wiki.archlinux.org/index.php/Music_Player_Daemon/Tips_and_tricks
+  Show supported formats
+    $ mpd --version
+
+
+Bit-perfect config
+  ++ INFO https://lacocina.nl/how-to-setup-a-bit-perfect-digital-audio-streaming-client-with-free-software-with-ltsp-and-mpd
+  ! https://www.musicpd.org/doc/user/advanced_usage.html
+  https://lacocina.nl/audiophile-mpd
+    https://github.com/ronalde/mpd-configure
+  SEE: http://drona.csa.iisc.ernet.in/~uday/alsamch.shtml
+
+
+DEBUG
+  SEE: https://wiki.archlinux.org/index.php/Music_Player_Daemon/Troubleshooting
+  CHECK if running
+    $ sudo /etc/init.d/mp status | grep -c "is running"
+  Database corrupted
+    CHECK config errors (like wrong path in FIFO audio_output, etc)
+    $ mpd --kill
+    $ mpd --verbose --no-daemon --stdout | tee /tmp/mpd-verbose.log
+  Re-scan music folder
+    $ mpc update --wait
