@@ -1,6 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-# VIZ: progress
-# ALT: bar
-pkg_inst progress
+if distro arch; then
+  # VIZ: progress
+  pkg_inst progress
+
+elif distro ubuntu; then
+  # ALT: bar
+  pkg_inst bar
+fi

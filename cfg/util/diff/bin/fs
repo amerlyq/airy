@@ -1,8 +1,11 @@
 #!/bin/bash -e
 set -o pipefail
 
-[[ $1 == -s ]] && { size_only=1; shift; }
-[[ $1 == -d ]] && { elf_args=( "$1" ); shift; }
+O=; while getopts 'dsS' o; do case $o
+in s) size_only=1
+;; S) size_only=1; size_show=1  # BAD: broken colodiff (regex)
+;; d) elf_args=( -d )
+esac; O+=$o; done; shift $((OPTIND-1))
 
 rgx_bin='^Binary files (.*) and (.*) differ$'
 passthrough(){ printf '%s\n' "${1:-$line}"; continue; }
@@ -20,7 +23,7 @@ diff -r --no-dereference \
   if ((size_only)); then
     s1=$(command stat -c%s "$f1")
     s2=$(command stat -c%s "$f2")
-    (( s1 == s2 )) || passthrough
+    (( s1 == s2 )) || passthrough ${size_show+"$line ($((s2 - s1))b)"}
   else
     file -b "$f1" | grep -q '\bELF\s' || passthrough
     file -b "$f2" | grep -q '\bELF\s' || passthrough

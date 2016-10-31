@@ -34,6 +34,7 @@ in text/*|*/xml) exit 2
 ;; application/x-executable)
   file -Lb "$path"
   echo
+  # DEV: sort symbols in columns: imported (U), exported (T), data (D)
   try nm -n "$path" | trim && exit 4
   # ALT: ldd
   # ALT: readelf -dW
