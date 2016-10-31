@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+# ALT: control directly from 'ncmpcpp' menu '7/outputs' on <Enter>
+
+O=; while getopts 'ot' o; do O+=$o; done; shift $((OPTIND-1))
+o=${1:-mpd-bitperfect}
+only=1  # DFL: control all outputs instead of single one
+
+isOn(){ mpc outputs | grep -qF "($1) is disabled"; }
+on(){ mpc enable ${only+only} "$1"; }
+off(){ mpc disable ${only+only} "$1"; }
+
+[[ $O =~ o ]] && unset only || only=1
+[[ $O =~ t ]] && isOn "$o" && cmd=off || cmd=on
+
+"$cmd" "$o"
+
+# DEV: toggle bitperfect/pulse simultaneously
+# [[ $o =~ bitperfect ]] && isOn "$o" && off mpd-pulse

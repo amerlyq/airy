@@ -11,7 +11,7 @@ cfg=~/.purple/prefs.xml
 
 if cfgOpt r || [[ ! -f $acc || ! -f $cfg ]]; then
   # WARNING: symlink is not enough, it will be replaced when you launch pidgin!
-  link -c ./prefs.xml "$cfg"
+  linkcp -c ./prefs.xml "$cfg"
   ./accounts.gen
   # gnome-keyring-daemon --replace
 fi

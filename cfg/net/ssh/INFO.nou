@@ -45,12 +45,16 @@ Connect headless SSH
   = $ ./cfg/dev/chroot/prf/ubuntu-15.10
 
 
-Enter ↵, ~, ?:
-  Supported escape sequences:
-  | ~. | terminate session
+Supported escape sequences:
+  USAGE: *↵~.* to terminate frozen ssh session
+  NOTE: escapes are only recognized immediately after newline.
+    Enter ↵, ~, ?:
+  | ~? | this message (help)
+  | ~. | terminate connection (and any multiplexed sessions)
+  | ~& | background ssh (when waiting for connections to terminate)
+  | ~# | list forwarded connections
+  | ~~ | send the escape character by typing it twice
   | ~B | send a BREAK to the remote system
   | ~R | Request rekey (SSH protocol 2 only)
-  | ~# | list forwarded connections
-  | ~? | this message
-  | ~~ | send the escape character by typing it twice
-  (Note that escapes are only recognized immediately after newline.)
+  | ~C | open a command line
+  | ~^Z| suspend ssh

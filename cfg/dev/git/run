@@ -9,7 +9,7 @@ if [[ ! $DIR =~ ^$HOME/ ]]; then
 fi
 PID=$$
 [[ $THREADS =~ [0-9]+ ]] || THREADS=8
-GCFG=( -c color.status=always  -c color.ui=always )
+GCFG=( --no-pager  -c color.status=always  -c color.ui=always )
 
 # Args
 FUN="$1"; shift
@@ -136,7 +136,7 @@ done
 
 function worker {
   (cd "$DIR/$1" && O=$(git_process "$1");
-   [[ -z $O ]] || echo "$O")
+   [[ -z $O ]] || printf '%s\n' "$O")
 }
 
 function main {

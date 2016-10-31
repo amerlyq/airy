@@ -13,6 +13,7 @@ in t) session=$OPTARG
 ;; *) exit 1; esac; done; shift $((OPTIND-1))
 (($#)) || exit 2
 
+# SEE: tmux new-session -As "$session"
 if ! tmux has-session -t "$session" 2>/dev/null; then
   tmux new-session -d -c "$PWD" -n "$name" -s "$session" "$maincmd"
   tmux set-option -s -t "$session" status on

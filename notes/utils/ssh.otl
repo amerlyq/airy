@@ -51,8 +51,21 @@ X over SSH
 Launch in virtual X on remote machine
 	http://habrahabr.ru/post/113928/
 
-SSH over UDP
-	https://mosh.mit.edu/
+
+SSH over UDP (for unstable connection)
+	https://mosh.org/
+	https://play.google.com/store/apps/details?id=com.sonelli.juicessh
+
+	Я расскажу страшную тайну. SSH соединение через VPN (проверял на openvpn)
+	подверженно точно такому же реконнекту. То есть я поработал с ноута через
+	сотовый модем, закрыл ноут, уехал, через час дома по вайфаю, открыл ноут и
+	через минуту, после автоматического реконнекта openvpn, все ssh-соединения
+	живы.
+
+	Отлично, у меня давно, чтоб, в частности, не морочиться с
+	антибрутфорсерами, SSH на всех серверах на специально выделенном IPv6 —
+	адресе. И везде на клиентах IPv6 через брокеров или VPN.
+
 
 Check fingerprint (/tmp/local/etc/dropbear)
 	find . -name "*_key.pub" -exec ssh-keygen -lf {} \;
@@ -91,19 +104,3 @@ Xvfb over SSH
 	Xprop
 		: May be useful to manually set properties. However was not too helpful.
 		xprop -id $wid -f _NET_WM_WINDOW_OPACITY 32c -set _NET_WM_WINDOW_OPACITY 0x7fffffff
-
-
-
-
-Supported escape sequences: ~?
-	> Exit frozen ssh session: press <CR>~.
- (Note that escapes are only recognized immediately after newline.)
-	~.  - terminate connection (and any multiplexed sessions)
-	~B  - send a BREAK to the remote system
-	~C  - open a command line
-	~R  - Request rekey (SSH protocol 2 only)
-	~^Z - suspend ssh
-	~#  - list forwarded connections
-	~&  - background ssh (when waiting for connections to terminate)
-	~?  - this message
-	~~  - send the escape character by typing it twice

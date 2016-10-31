@@ -86,6 +86,7 @@ $(gaim)
 EOT
 fi
 
+# NOTE:(manual setup): MAIN_TELEGRAM='+...' ./accounts.gen
 if [[ $MAIN_TELEGRAM ]] && [[ -f /usr/lib/purple-2/telegram-purple.so ]]; then
   cat >> "$dst" <<EOT
 	<account>
