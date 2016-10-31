@@ -9,7 +9,8 @@ if [[ ! $DIR =~ ^$HOME/ ]]; then
 fi
 PID=$$
 [[ $THREADS =~ [0-9]+ ]] || THREADS=8
-GCFG=( --no-pager  -c color.status=always  -c color.ui=always )
+# WARN: color.ui works only if no other color.* set in .gitconfig
+GCFG=( --no-pager -c color.ui=always )
 
 # Args
 FUN="$1"; shift

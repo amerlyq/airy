@@ -3,11 +3,11 @@ source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
 dst=~/.hgrc
-> $dst
-if [[ -n "${WORK_NAME:=$MAIN_NAME}" &&
-      -n "${WORK_MAIL:=$MAIN_MAIL}" ]]
-then printf "[ui]\nusername=%s <%s>\n\n" "$WORK_NAME" "$WORK_MAIL" >> $dst
+> "$dst"
+if [[ ${WORK_NAME:=$MAIN_NAME} ]] \
+&& [[ ${WORK_MAIL:=$MAIN_MAIL} ]]; then
+  printf "[ui]\nusername=%s <%s>\n\n" "$WORK_NAME" "$WORK_MAIL" >> "$dst"
 fi
-cat "$PWD/hgrc" >> $dst
+cat ./hgrc >> "$dst"
 
 echo "W: ~/.hgrc"

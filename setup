@@ -75,6 +75,8 @@ filter_find() { local accept regect
         -exec test -f '{}/install' -o -f '{}/setup' ';' \
         -printf "%p\n"
 
+    # CHECK: don't ignore explicit path inside PKG_LIST
+    #   => even if it also contained in PKG_SKIP
     for n in "${PKG_SKIP[@]}"; do regect+="\\|$(frgx $n)"; done
     for y in "${PKG_LIST[@]}"; do accept=$(frgx $y)
         find cfg -type d -regex "$accept" \
