@@ -30,9 +30,17 @@ dasm(){
   diff <(cat<<<"$o1") <(cat<<<"$o2")
 }
 
+dstrings(){
+  local o1=$(strings "$1" | sort)
+  local o2=$(strings "$2" | sort)
+  # TRY:(ignore) -I 'addiu'
+  diff <(cat<<<"$o1") <(cat<<<"$o2")
+}
+
 if ! diff -q "$@" &>/dev/null; then
   # BAD: no message 'f1 f2 differ' from diff to delimit output
   # BUT: it must be shown only if next line will show error
   # ALT: filter output from 'diff -r' and delete output line if no diff
-  dhead "$@" && dasm "$@"
+  # TODO: separate options to control, instead of fallback
+  dhead "$@" && dasm "$@" && dstrings "$@"
 fi

@@ -1,4 +1,10 @@
 TODO
+  [_] BUG: mutt dir frozen =INBOX when opened
+    = mark as 'unread' some mail in thread with attributes 'from me' and 'in-reply-to'
+    =INBOX has only that marked one as unread
+    interface jumps on this single 'unread' on changedir and opens thread
+    => ERR: no message is visible
+    MAYBE problem in colorscheme tweak inside this commit
   [_] allow to manually collapse unread threads on 'h'
     => ALSO check their colorscheme
   [_] BUG: fix 'save =Sent to current dir' for case of virtual dir of 'notmuch'

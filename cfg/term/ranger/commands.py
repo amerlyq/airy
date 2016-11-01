@@ -220,6 +220,8 @@ class df(Command):
         #   -- if no such file == show error
         #   BUT: then can't compare different names in tabs fast
         #       -- 'cause need to 'vsel' them before compare
+        # DEV: df multiselection to multiselection
+        #   => treat like dirs %d %D compare with only selected files
         if cidx == tidx and csel == 0:
             self.fm.notify("curr_tab: select targets to compare", bad=True)
         elif cidx != tidx and csel == 0 and tsel == 0:

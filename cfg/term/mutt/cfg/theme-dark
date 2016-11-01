@@ -49,8 +49,8 @@ color index   brightcolor13   default   "$my_fwd~U"  # forwarded, unread
 ## General override status
 #color index   green           default   "~S"      # superseded
 #color index   brightred       red       "~="      # duplicated
-color index   yellow          default   "~Q!~P"      # have been replied
-color index   brightyellow    default   "~Q~U"    # have been replied, unread
+color index   yellow          default   "~Q!~P"   # have been replied
+color index   brightcolor214  default   "~Q~U"    # have been replied, unread
 color index   red             default   "~F"      # flagged
 color index   brightred       default   "~F~U"    # flagged, unread
 color index   black           red       "~D"      # deleted
@@ -60,6 +60,7 @@ color index   white           magenta   "~T"      # tagged
 # color index    yellow        default       "~(~N)"         # messages in threads with some unread
 
 ## Collapsed thread
+## ENH: unread = inverted BUT: bkgr bright* != frgr bright*
 color index   default         brightblack   "~v"            # no unread
 color index   blue            brightblack   "~v~(~U)"       # some unread
 color index   brightblue      brightblack   "~v~(~N)"       # some new
@@ -67,13 +68,13 @@ color index   brightblue      brightblack   "~v~(~N)"       # some new
 # color index   green           brightblack   "~N~v~(~F~N)"   # unread parent & flagged
 # color index   green           brightblack   "~N~v~(~F)"     # unread parent, no unread inside, but some flagged
 color index   color9          brightblack   "~v~(~P)"       # from me, no unread
-color index   brightcolor9    brightblack   "~v~(~P~U)"     # from me, some unread
 color index   green           brightblack   "~v~(~p)"       # to me, no unread
-## ENH: unread = inverted BUT: bkgr bright* != frgr bright*
-color index   brightblack     color28       "~v~(~p~U)"     # to me, some unread
-color index   brightblack     color70       "~v~(~p~N)"     # to me, some new
 color index   red             brightblack   "~v~(~F)"       # flagged, no unread
+color index   brightcolor9    brightblack   "~v~(~P~U)"     # from me, some unread
+color index   brightcolor214  brightblack   "~v~(~Q~U)"     # replied, some unread
+color index   brightblack     color28       "~v~(~p~U!~Q)"  # to me, some unread
 color index   brightred       brightblack   "~v~(~F~U)"     # flagged, some unread
+color index   brightblack     color70       "~v~(~p~N!~Q)"  # to me, some new
 
 ## Thread overlay status
 color index   red             brightblack   "~v~(~D)"     # with deleted (all/partial)
