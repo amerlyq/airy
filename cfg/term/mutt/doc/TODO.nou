@@ -1,10 +1,12 @@
 TODO
-  [_] BUG: mutt dir frozen =INBOX when opened
+  [_] BUG:(intermitten) mutt dir frozen =INBOX (only inbox?) when opened
     = mark as 'unread' some mail in thread with attributes 'from me' and 'in-reply-to'
     =INBOX has only that marked one as unread
     interface jumps on this single 'unread' on changedir and opens thread
-    => ERR: no message is visible
-    MAYBE problem in colorscheme tweak inside this commit
+    => ERR: 'no message is visible'
+    2016-11-02 [X] NOT problem in colorscheme
+    Intermitten: need special combination/order of threads and independent messages to be evident
+    Hotfix: 'unset uncollapse_jump' and reload folder
   [_] allow to manually collapse unread threads on 'h'
     => ALSO check their colorscheme
   [_] BUG: fix 'save =Sent to current dir' for case of virtual dir of 'notmuch'
