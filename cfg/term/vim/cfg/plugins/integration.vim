@@ -106,7 +106,7 @@ call dein#add('chrisbra/unicode.vim', {
   \     wget -c http://www.unicode.org/Public/UNIDATA/UnicodeData.txt"',
   \ 'on_cmd': ['Digraphs', 'SearchUnicode', 'UnicodeName',
   \             'UnicodeTable', 'DownloadUnicode'],
-  \ 'on_map': [['n', '<C-X><C-G>', '<C-X><C-Z>', '<F4>']]})
+  \ 'on_map': [['nx', '<F4>'], ['i', '<C-X><C-G>', '<C-X><C-Z>']]})
 
 
 
