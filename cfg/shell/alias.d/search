@@ -8,8 +8,11 @@ ff() { find . -type f -regex $@; }
 # grep -Ri 'name' . # find in all files
 # alias ff='find ./ | grep -i '
 
+# DFL: fixed case and group view for piping results
+alias ag='ag -s --group'
+
 if _has_pr ag
-then agi() { ag -G '^(?:(?!/build/|/libs/|/tags$).)*$' -S "$@"; }
+then agi() { command ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' "$@"; }
 else agi() { grep -ri "$@" .; }  # --include=*.{cc,h}
 fi
 
