@@ -28,13 +28,18 @@ call dein#add('AndrewRadev/splitjoin.vim', {
 
 
 "" Use CTRL-A/X to increment dates, times, and more {{{1
-" STD: <Plug>SpeedDating
-" FIXME:
-" BAD: d<C-..> overlaps with 'ag_grp' shortcut 'd'
-" BAD: <C-x> overlaps with unicode.vim '<C-x><C-..>'
+" FIXED:BAD: d<C-..> overlaps with 'ag_grp' shortcut 'd'
+" FIXME:BAD: <C-x> overlaps with unicode.vim '<C-x><C-..>'
+" TRY:(nou.vim) shorter year in date
+"   => hook_post_source: SpeedDatingFormat %y-%m-%d
 call dein#add('tpope/vim-speeddating', {
-  \ 'on_map': [['nx', '<C-a>', '<C-x>'], ['n', 'd<C-a>', 'd<C-x>']],
-  \ 'depends': 'vim-repeat'})
+  \ 'on_map': [['nx', '<Plug>SpeedDating']],
+  \ 'depends': 'vim-repeat',
+  \ 'hook_add': "
+\\n   let g:speeddating_no_mappings = 1
+\\n   call Map_nxo('<C-a>', '<Plug>SpeedDatingUp',   'nx')
+\\n   call Map_nxo('<C-x>', '<Plug>SpeedDatingDown', 'nx')
+\"})
 
 
 
