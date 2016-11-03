@@ -14,7 +14,7 @@ import XMonad.Layout.LayoutScreens  (layoutScreens)
 import XMonad.Actions.TagWindows    (setTags, addTag, shiftHere, tagPrompt, tagDelPrompt, focusUpTaggedGlobal, withTaggedGlobal, withTaggedGlobalP, withTaggedP)
 
 import XMonad.Config.Amer.Common    (inGroup, actions, backNforth)
-import XMonad.Config.Amer.Workspace (skipped)
+import XMonad.Config.Amer.Workspace (skipped, immediate)
 
 
 -- Cycle through workspaces
@@ -55,12 +55,19 @@ panels =
 -- -- if on currentFocused -- shiftHere was pressed again
 -- FIXME: don't show 'Marked' message on empty WS (skip marking completely)
 --  TODO: post current window title in marking message
+-- BAD: for 'ext/ctl' need to def all cmds explicitly -- no args possible ?
+tagMark t = withFocused (setTags [t]) >> spawn ("r.n Marked " ++ t)
+tagFocus = focusUpTaggedGlobal
+tagShift t = withTaggedGlobalP t shiftHere
+tagActions = [ ("M-S-", tagMark), ("M-", tagFocus), ("M-C-", tagShift) ]
+
 markNgo =
-  [ (m ++ "<F" ++ show n ++ ">", f n) | n <- [1..12], (m, f) <-
-    [ ("M-S-", \n -> withFocused (setTags ["F" ++ show n]) >> spawn ("r.n Marked F" ++ show n))
-    , ("M-"  , \n -> focusUpTaggedGlobal ("F" ++ show n))
-    , ("M-C-", \n -> withTaggedGlobalP ("F" ++ show n) shiftHere)
-    ]
+  [ (m ++ "<" ++ k ++ ">", f ("_" ++ k))
+  | k <- map (\n -> "F" ++ show n) [1..12], (m, f) <- tagActions
+  ] ++
+  -- M-e
+  [ (m ++ "e " ++ k, f ("_" ++ k))
+  | k <- immediate, (m, f) <- tagActions
   ] ++
   [ ("M-S-t", tagPrompt def focusUpTaggedGlobal)
   , ("M-C-t", tagPrompt def (`withTaggedGlobalP` shiftHere))
