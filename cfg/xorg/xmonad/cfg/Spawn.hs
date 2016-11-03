@@ -79,9 +79,10 @@ scratchpad = (concat . (`map` [
   ]
 
 media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
-    [ ("M-d"       , "r.dmenu -c")
-    , ("M-S-d"     , "r.dmenu -n")
-    , ("M-C-d"     , "j4-dmenu-desktop")
+    -- [e]xecute cmd/name
+    [ ("M-e"       , "r.dmenu -c")
+    , ("M-S-e"     , "r.dmenu -n")
+    , ("M-C-e"     , "j4-dmenu-desktop")
     , ("M-<Print>" , "r.capture-screen")
     , ("M-o t"     , "r.touchpad-tgl")
     ],

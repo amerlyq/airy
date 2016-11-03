@@ -20,7 +20,7 @@
 %% Main
 | M-<Space>  | terminal (st)
 | M-<Return> | file-manager (ranger)
-| M-d        | launcher (dmenu)
+| M-e        | [e]xecute (dmenu)
 | M-u        | browser (qutebrowser)
 
 % Actions : terminal, ranger
@@ -33,8 +33,9 @@
 %%% Workspaces
 %% Names (key -> id)
 | M-  [` 1 2 3 4 5 6 7 8 9 0 - =] | ` 1 2 3 4 5 6 7 8 9 0 - =
-| M-s [a .. z]                    | a .. z
-| M-s [` 1 2 3 4 5 6 7 8 9 0 - =] | ~ ! @ # $ % ^ & * ( ) _ +
+Secondary [d]esktop wksp
+| M-d [a .. z]                    | a .. z
+| M-d [` 1 2 3 4 5 6 7 8 9 0 - =] | ~ ! @ # $ % ^ & * ( ) _ +
 | M-o [f p s m]                   | FF PI SK MM
 
 
@@ -51,19 +52,28 @@
 | M-C-q | clear urgents
 
 
-%% Actions (key -> fn -> desc) : Workspaces, Monitors, Back-n-forth
+%% Actions (prf -> fn -> desc) : Workspaces, Monitors, Back-n-forth
 | M-     | view  | jump to wksp
 | M-S-   | bring | jump and bring focused window with you
 | M-C-   | shift | send focused window to wksp
 | M-C-S- | copy  | duplicate focused window to wksp (close copy as always by M-\)
 | M-M1-  | swap  | exchange windows between current and choosen wksp
 
-%% Mark-n-go
-# Fast jumping between choosen windows
-| M-S- [F1 .. F12] | mark/attach window to key (firefox or one of pidgin chat)
-| M-   [F1 .. F12] | jump to marked window
-| M-C- [F1 .. F12] | bring marked window on current wksp
-| M-S-t            | show list of marked windows and jump to
+
+%%% Mark-n-go
+# Fast jumping between choosen windows (tags)
+
+%% Names (key -> tag)
+| M-  [F1 .. F12] | [_F1 .. _F12]
+| M-s [a .. z]    | [_a .. _z]
+
+%% Actions (prf -> fn -> desc)
+| M-S-  | mark  | mark/attach window to key (firefox or one of pidgin chat)
+| M-    | view  | jump to marked window
+| M-C-  | bring | bring marked window on current wksp
+
+% Menu
+| M-S-t | show list of marked windows and jump to
 
 
 %%% Windows

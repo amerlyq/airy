@@ -60,13 +60,14 @@ tagMark t = withFocused (setTags [t]) >> spawn ("r.n Marked " ++ t)
 tagFocus = focusUpTaggedGlobal
 tagShift t = withTaggedGlobalP t shiftHere
 tagActions = [ ("M-S-", tagMark), ("M-", tagFocus), ("M-C-", tagShift) ]
+leader = ("s " ++)  -- M-s -- [s]eek tag. EXPL: the least pain to press
+quote = ("_" ++)
 
 markNgo =
-  [ (m ++ "<" ++ k ++ ">", f ("_" ++ k))
+  [ (m ++ "<" ++ k ++ ">", f . quote $ k)
   | k <- map (\n -> "F" ++ show n) [1..12], (m, f) <- tagActions
   ] ++
-  -- M-e
-  [ (m ++ "e " ++ k, f ("_" ++ k))
+  [ (m ++ leader k, f . quote $ k)
   | k <- immediate, (m, f) <- tagActions
   ] ++
   [ ("M-S-t", tagPrompt def focusUpTaggedGlobal)

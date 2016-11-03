@@ -40,7 +40,7 @@ keys = [ (m ++ k, windows $ f i) | (i, k) <- aliases, (m, f) <- actions]
 -- (+) mod+leader -- additional functions/abilities/new wksps
 -- (+) mod+leader-letter -- another functions, not wksp jumping
 -- BUT:THINK: mods-leader-letter scheme have the less key presses for additional wksp
-leader = ("s " ++)  -- ([s]econdary) ALT: g, <Backspace>, <Tab>
+leader = ("d " ++)  -- M-d -- [d]esktop wksp. ALT: g, <Backspace>, <Tab>
 aliases = concat
   [ map (\i -> (i, i)) primary
   , map (\i -> (i, leader i)) immediate
