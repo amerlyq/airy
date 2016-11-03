@@ -4,7 +4,7 @@
 # ssh -t example.com "cd /foo/bar; exec \$SHELL -l"
 # { SS=autossh && hash $SS >/dev/null 2>&1; } || SS=ssh
 
-PRG="$1"
+prg=$1
 shift
 # HACK:(use if tmux-256color can't be copied)
 # [[ ! $TERM =~ tmux ]] || export TERM=${TERM/tmux/screen}
@@ -17,7 +17,7 @@ sstmux="
 which zsh >/dev/null && export SHELL=\$(which zsh)
 which tmux >/dev/null && if ! tmux has-session -t $ssnm
 then
-    tmux new-session -d -s $ssnm -n '$PRG'
+    tmux new-session -d -s $ssnm -n '$prg'
     tmux rename-window -t $ssnm:1 'work'
 fi
 tmux attach -t $ssnm
@@ -26,17 +26,19 @@ tmux attach -t $ssnm
 # HACK: nested tmux by ssh -- temporary switch host prefix
 # ALT: change prf on remote (nested) -- add to $sstmux
 #   tmux set prefix $(test -n "$TMUX" && echo C-s || echo C-l)
-if [[ $PRG == bsrv ]] && [[ $TMUX ]]; then
+if [[ $prg == bsrv ]] && [[ $TMUX ]]; then
   trap 'tmux unbind C-s \; set -u prefix' HUP INT QUIT TERM ERR EXIT
   tmux set prefix C-s \; bind C-s send-prefix
 fi
 
-case $PRG
+old=( -oKexAlgorithms=+diffie-hellman-group1-sha1 )
+
+case $prg
 in mpd)  ~/.bin/net.d/sir-mpd "$@"
 ;; bsrv) ssh bsrv   ${@:--t "$sstmux"}
 ;; sirx) ssh sir -X ${@:--t "$sstmux"}
-;; stb)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 "root@192.168.1.$1"
-# ;; rou)  ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 rou
-;; land|buld) TERM=xterm-256color ssh "$PRG"
-;; *) ssh "$PRG" "${@:--o LocalCommand="$sstmux"}"
+;; stb)  ssh "${old[@]}" "root@192.168.1.$1" "${@:2}"
+# ;; rou)  ssh "${old[@]}" rou
+;; land|buld) TERM=xterm-256color ssh "$prg"
+;; *) ssh "$prg" "${@:--o LocalCommand="$sstmux"}"
 esac
