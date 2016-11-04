@@ -205,13 +205,19 @@ call dein#add('kana/vim-textobj-syntax', {
 
 
 "" Diff hunks navigation {{{1
+" Formats: diff --context, diff --unified, git diff
 call dein#add('kana/vim-textobj-diff', {
-  \ 'on_map': {'ox': '<Plug>'},
+  \ 'on_ft': 'diff',
+  \ 'on_map': '<Plug>',
   \ 'depends': 'vim-textobj-user',
   \ 'hook_source': 'let g:textobj_diff_no_default_key_mappings = 1',
   \ 'hook_add': "
-\\n   call Map_textobj('H', 'diff-file')
-\\n   call Map_textobj('[Frame]d', 'diff-hunk')
+\\n   call Map_nxo('iD', '<Plug>(textobj-diff-file)', 'ox')
+\\n   call Map_nxo('iH', '<Plug>(textobj-diff-hunk)', 'ox')
+\\n   call Map_nxo('[d', '<Plug>(textobj-diff-hunk-p)')
+\\n   call Map_nxo(']d', '<Plug>(textobj-diff-hunk-n)')
+\\n   call Map_nxo('[D', '<Plug>(textobj-diff-file-p)')
+\\n   call Map_nxo(']D', '<Plug>(textobj-diff-file-n)')
 \"})
 
 
