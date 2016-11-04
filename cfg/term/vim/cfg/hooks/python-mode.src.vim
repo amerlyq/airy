@@ -4,6 +4,7 @@
 " <C-c>d     Rope show documentation
 " <C-c>f     Rope find occurrences
 " <Leader>b     Set, unset breakpoint (g:pymode_breakpoint enabled)
+let g:pymode_python = 'python3'  " NOTE: must be set for 'yield from'
 let g:pymode_options = 0
 let g:pymode_trim_whitespaces = 0
 
@@ -41,7 +42,8 @@ let g:pymode_syntax_space_errors = g:pymode_syntax_all
 " Linting (code checking)
 let g:pymode_lint = 1
 " From: pylint, pep8, mccabe, pep257, pyflakes.
-let g:pymode_lint_checker = "pylint,pep8"
+" let g:pymode_lint_checker = "pylint,pep8"
+let g:pymode_lint_checkers = ['pyflakes', 'pep8']
 let g:pymode_lint_ignore="E266,E501"
 "E266,E501 -- multiple '#' in comments and line width > 80
 "W391 -- empty line at EOF, better keep it enabled for fluent git auto-merge
