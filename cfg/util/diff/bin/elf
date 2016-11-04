@@ -1,12 +1,15 @@
 #!/bin/bash -e
 
+O=; while getopts 'adhs' o; do case $o
 # DFL: elfutils/eu-elfcmp
-[[ $1 == -d ]] || exec eu-elfcmp --verbose --ignore-build-id "$@"
+in d) exec eu-elfcmp --verbose --ignore-build-id "${@:2}"
+esac; O+=$o; done; shift $((OPTIND-1))
 
-shift
 f1=${1:?}
 f2=${2:?}
 set -- "$f1" "$f2"
+args=( "$@" )
+[[ $O ]] || O=hs
 
 # TEMP:SEP:
 XCT_PRF=/opt/mips-unknown-linux-uclibc/bin/mips-linux-uclibc-
@@ -41,6 +44,9 @@ if ! diff -q "$@" &>/dev/null; then
   # BAD: no message 'f1 f2 differ' from diff to delimit output
   # BUT: it must be shown only if next line will show error
   # ALT: filter output from 'diff -r' and delete output line if no diff
-  # TODO: separate options to control, instead of fallback
-  dhead "$@" && dasm "$@" && dstrings "$@"
+  show_diff(){ [[ $O =~ $1 ]] && { "${@:2}" "${args[@]}" || err=$?; }; }
+  show_diff 'h' dhead
+  show_diff 's' dstrings
+  show_diff 'a' dasm
+  exit "$err"
 fi
