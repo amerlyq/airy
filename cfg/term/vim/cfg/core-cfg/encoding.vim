@@ -20,7 +20,28 @@ set fileformats=unix,dos,mac  " Line endings
 
 "{{{1 Locale ============================
 set keymap=russian-jcukenwin
-set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
-" You need reset them after keymap, so very first insert/search
-" would be in latin. And then <C-^> toggles these options.
+
+" WARN: can't remap from symbols/numbers -- causes double-remapping
+" BUG: don't work remapping for ',' and ';' (:help insists, escaping must work)
+let &langmap = ''
+  \.'ЙЦУКЕНГШЩЗХЪ'.';'
+  \.'QWERTYUIOP{}'
+  \.','
+  \.'ФЫВАПРОЛДЖЭ'.';'
+  \.'ASDFGHJKL:"'
+  \.','
+  \.'ЯЧСМИТЬБЮЁ'.';'
+  \.'ZXCVBNM<>?'
+  \.','
+  \.'йцукенгшщзхъ'.';'
+  \.'qwertyuiop[]'
+  \.','
+  \.'фывапролджэ'.';'
+  \.'asdfghjkl\;'''
+  \.','
+  \.'ячсмитьбюё'.';'
+  \.'zxcvbnm\,./'
+
+" WARN: place after &langmap/&keymap to reset default lang to latin
+" NOTE: <C-^> toggles these options.
 set iminsert=0 imsearch=0
