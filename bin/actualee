@@ -44,6 +44,7 @@ in dot) dot -Tx11 "$1"
 # Launched w/o fork, because of poor cmd support: it opens new instance of
 # XMind instead of adding file to opened
 ;; xmind) XMind -noSplash -- "$1"
+;; nb) Mathematica -- "$1" &
 ;; *) return 11
 esac; }
 
