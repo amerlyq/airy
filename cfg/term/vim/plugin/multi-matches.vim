@@ -55,7 +55,7 @@ endfunction
 " This works with multiline matches.
 " Work on a copy of buffer so unforeseen problems don't change it.
 " Global function that can be called from other scripts.
-function! GetMatches(line1, line2, pattern, wholelines, linenums)
+function! s:GetMatches(line1, line2, pattern, wholelines, linenums)
   let savelz = &lazyredraw
   set lazyredraw
   let lines = getline(1, line('$'))
@@ -64,7 +64,7 @@ function! GetMatches(line1, line2, pattern, wholelines, linenums)
   silent put =lines
   1d
   let hits = []
-  let sub = a:line1 . ',' . a:line2 . 's/' . escape(a:pattern, '/')
+  let sub = a:line1 . ',' . a:line2 . 's/' . a:pattern
   if a:wholelines
     let numlist = []  " numbers of lines containing a match
     let rep = '/\=s:MatchLineNums(numlist, submatch(0))/e'
@@ -93,9 +93,10 @@ endfunction
 " Search pattern is given in argument, or is the last-used search pattern.
 function! s:CopyMatches(bang, line1, line2, args, wholelines)
   let l = matchlist(a:args, '^\%(\([a-zA-Z"*+-]\)\%($\|\s\+\)\)\?\(.*\)')
-  let reg = empty(l[1]) ? '+' : l[1]
-  let pattern = empty(l[2]) ? @/ : l[2]
-  let hits = GetMatches(a:line1, a:line2, pattern, a:wholelines, a:bang)
+  " WARN: must use @" reg in neovim when 'set clipboard=unnamedplus'
+  let reg = empty(l[1]) ? '"' : l[1]
+  let pattern = empty(l[2]) ? @/ : escape(l[2], '/')
+  let hits = s:GetMatches(a:line1, a:line2, pattern, a:wholelines, a:bang)
   let msg = 'No non-empty matches'
   if !empty(hits)
     if reg == '-'
@@ -105,7 +106,8 @@ function! s:CopyMatches(bang, line1, line2, args, wholelines)
       " Jump to first line of hits and scroll to middle.
       ''+1normal! zz
     else
-      execute 'let @' . reg . ' = join(hits, "\n") . "\n"'
+      call setreg(reg, hits, 'V')
+      " DEPRECATED: execute 'let @' . reg . ' = join(hits, "\n") . "\n"'
     endif
     let msg = 'Number of matches: ' . len(hits)
   endif
@@ -128,8 +130,8 @@ function! DeleteLines(pattern) range
     echo 'Error: buffer contains pattern used to delete lines'
     return
   endif
-  let pattern = empty(a:pattern) ? @/ : a:pattern
-  let sub = a:firstline . ',' . a:lastline . 's/' . escape(pattern, '/')
+  let pattern = empty(a:pattern) ? @/ : escape(a:pattern, '/')
+  let sub = a:firstline . ',' . a:lastline . 's/' . pattern
   " Retain newline if it is last character so do not delete following line.
   let rep = '/\=delid . (submatch(0) =~ "\n$" ? "\r" : "")/e'
   execute sub . rep . (&gdefault ? '' : 'g')
