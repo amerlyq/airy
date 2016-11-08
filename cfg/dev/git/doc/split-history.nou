@@ -31,8 +31,9 @@ Check diff directly between commits (cherry)
     ! And if you move files manually -- git log history will be available only with '--follow'
       [_] CHECK: history after renaming is lost
 
-    $ git subtree split -P path/rel/folder -b folder-only-A --ignore-joins  # OR --rejoin
-    # NOTE: no leading/trailing prf/sfx for folder
+    WARN: no leading/trailing prf/sfx for folder
+    $ git subtree split -P path/rel/folder -b folder-only-A --ignore-joins
+      # OR --rejoin for incremental split
 
 !!! HACK: you may export each part between folder renaming
 as separate branches and then rebase them onto each other
