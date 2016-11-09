@@ -30,7 +30,7 @@ call dein#add('kshenoy/vim-signature', {
 \\n   let g:SignatureIncludeMarkers = '!@#$%^&*()'
 \\n   let g:SignaturePurgeConfirmation = 1
 \\n   let g:SignaturePrioritizeMarks = 0
-\\n   let g:SignatureMap = {'PurgeMarks': 'm<Del>'}
+\\n   let g:SignatureMap = {'DeleteMark': 'm<Space>', 'PurgeMarks': 'm<Del>'}
 \"})
 
 

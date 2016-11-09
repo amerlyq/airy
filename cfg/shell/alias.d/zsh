@@ -34,7 +34,7 @@ alias -g C='|wc -l'
 alias -g T='|column -t'
 alias -g W='|while read line; do'
 alias -g NE='|grep -v ''^\s*$'''
-alias -g SR='|noglob sed -rn'
+alias -g S='|noglob sed -rn'
 alias -g SN='|noglob sort -n'
 alias -g SU='|noglob sort -u'
 # alias -g TL='| tail -20 '
@@ -44,7 +44,7 @@ alias -g C\$="|awk '{print\$NF}'"
 
 # Pipes
 if (($+commands[grep])); then
-  alias -g G="|noglob grep $AUTOCOLORS -i"
+  alias -g G="|noglob grep $AUTOCOLORS -E -i"
   alias -g G\?='G -q'
   alias -g G\?\?='G -qF'
   alias -g G\?\?\?='G -qxF'
