@@ -1,0 +1,22 @@
+Analyzing 'traceroute' output
+  https://habrahabr.ru/post/129627/
+  https://habrahabr.ru/post/281272/
+
+ALSO
+  $ traceroute example.com
+  $ tracepath example.com
+
+READ
+  https://www.digitalocean.com/community/tutorials/how-to-use-traceroute-and-mtr-to-diagnose-network-issues
+  http://serverfault.com/questions/585862/why-mtr-is-much-faster-than-traceroute
+
+Resolve unknown ip
+  $ curl ipinfo.io/23.66.166.151
+
+  OR: offline db (therefore out-of-date)
+    http://unix.stackexchange.com/questions/7399/ip-to-country-console-command
+    $ geoiplookup example.com
+
+Resolve whole path
+  $ mtr example.com
+  $ mtr -n -c1 --report example.com | tee >/dev/tty | awk '$2~/^[0-9.]+$/{print$2}' | xargs -rL1 -I{} curl ipinfo.io/{}

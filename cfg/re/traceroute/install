@@ -1,0 +1,10 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  pkg_inst mtr traceroute
+  pkg_inst -p 'tracepath' iputils
+
+elif distro ubuntu; then
+  echo "Err: fixme"
+fi

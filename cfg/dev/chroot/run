@@ -3,6 +3,7 @@ source ~/.shell/profile
 
 # ALT: NOTE failed to setup schroot.conf to export only choosen env variables.
 # BAD: can't exit on error in awk (try run r.chroot inside r.chroot)
+# BUG: r.chroot non-interactive uses non-login 'bash' -> my r.* links absent in $PATH
 
 # USE: 'r.chroot 1' -- to load second chroot from list
 case "$1" in [0-9]) index=$1; shift ;; esac

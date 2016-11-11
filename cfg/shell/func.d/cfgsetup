@@ -36,7 +36,9 @@ linkmask(){ local nm mask=$1 fmt=$2
   cfgOpt m && [[ $(readlink -m $0) =~ ^${CURR_DIR_CFG:?} ]] || return 0
   # EXPL: can't use '-x $src' because of 'env'
   for src in "$mask"*; do [[ -s $src ]] || continue
-    nm=$(printf "$fmt" "${PWD##*/}" "${src#$mask}")
+    nm=$fmt
+    nm=${nm//%d/${PWD##*/}}
+    nm=${nm//%n/${src#$mask}}
     linkcp "$src" "${CURR_DIR_CACHE:?}/$nm"
   done
 }
@@ -61,7 +63,7 @@ fi
 airy_cache_pwd_mod
 
 if [[ -z $MODS_RUN_DISABLE ]]; then
-  linkmask "$PWD/bin/" 'bin/r.%s-%s'
-  linkmask "$PWD/run"  'bin/r.%s%s'
-  linkmask "$PWD/env"  'env/%s%s'
+  linkmask "$PWD/bin/" 'bin/r.%d-%n'
+  linkmask "$PWD/run"  'bin/r.%d%n'
+  linkmask "$PWD/env"  'env/%d%n'
 fi
