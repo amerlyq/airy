@@ -37,7 +37,7 @@ esac; }
 
 by_ext(){ local ext=${1##*.}
 case ${ext:?}
-in dot) dot -Tx11 "$1"
+in dot|gv) dot -Tx11 "$1"
 ;; tpp) tpp "$1"
 ;;  md) pandoc -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
 ;; jar) java -jar "$1"

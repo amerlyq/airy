@@ -1,7 +1,12 @@
 Manuals
   [_] provider
     binutils, cal
+  [_] formats
+    jhson
   [_] filter
     cat, awk
   [_] channel
     ssh, nc, pipe
+
+List
+$ pacl coreutils S 's@.*/bin/(.*)@\1@p' |xargs
