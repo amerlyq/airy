@@ -1,0 +1,35 @@
+#!/bin/bash -eu
+source ~/.shell/profile
+# ALT:TRY: aur/sshmnt, aur/sftpman, aur/autosshfs-git
+
+unmount=
+[[ ! ${1:-} =~ -u ]] || { unmount=1; shift; }
+
+d=${1:-${CURR_DIR_BSRV:?}}  # /home/bsrv
+s=${2:-${BSRV_SRC:?}}       # ${usr}@${host}:${dir}
+
+# NOT: user,allow_other
+opts="idmap=user,transform_symlinks"  # identityfile=$HOME/.ssh/id_rsa,
+opts+=",default_permissions,uid=$(id -u),gid=$(id -g)"
+
+ismnt(){ grep -qsFw "$1" /proc/mounts; }
+
+if ((unmount)); then
+  ismnt "$d" && fusermount -u "$d"
+  rmdir -vp "$d"
+else
+  mkdir -vp "$d"
+  ismnt "$d" || sshfs -o "$opts" "$s" "$d" -C
+fi
+
+# ALT: one-time
+#   trap "fusermount -u $d && rmdir $d" INT TERM EXIT
+#   mkdir -p $d && sshfs -o $opts $s $d -C
+#   r.ranger $d
+
+## SEE: reverse sshfs!
+# http://blog.dhampir.no/content/reverse-sshfs-mounts-fs-push
+
+# paci vde2  # for dpipe
+# Reverse sshfs
+# dpipe /usr/lib/openssh/sftp-server = ssh CLIENT sshfs :/mnt/remote/path /mnt/local/path -o slave
