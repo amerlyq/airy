@@ -2,52 +2,52 @@ Show data
 | info  | showing things about the program being debugged
 | show  | showing things about the debugger
 | print | print value of expression
-| x		| examines memory at specified address
+| x   | examines memory at specified address
 
 Code sources
-	Simple
-	| l | list  | list next 10 lines
-	| list -    | list previous 10 lines
-	| list 101  | list 10 lines around line 101
-	| list 1,10 | list lines 1 to 10
-	| list main | list lines around function
-	Complex
-	| info line 22      | print addresses for object code for line 22
-	| info line *0x2c4e | print line number of object code at address
-	| list *0x22e4      | list source at address
-	| list basic.c:main | list from another file basic.c
-	Directory
-	| cd dir        	| change current directory to \fIdir\fR
-	| pwd				| print working directory
-	| dir dirname       | add directory to source path
-	| dir				| reset source path to nothing
-	| show directories  | show source path
-	| search regexpr    | forward current for regular expression
-	| reverse-search regexpr | backward search for regular expression
+  Simple
+  | l | list  | list next 10 lines
+  | list -    | list previous 10 lines
+  | list 101  | list 10 lines around line 101
+  | list 1,10 | list lines 1 to 10
+  | list main | list lines around function
+  Complex
+  | info line 22      | print addresses for object code for line 22
+  | info line *0x2c4e | print line number of object code at address
+  | list *0x22e4      | list source at address
+  | list basic.c:main | list from another file basic.c
+  Directory
+  | cd dir          | change current directory to \fIdir\fR
+  | pwd       | print working directory
+  | dir dirname       | add directory to source path
+  | dir       | reset source path to nothing
+  | show directories  | show source path
+  | search regexpr    | forward current for regular expression
+  | reverse-search regexpr | backward search for regular expression
 
 Controls
 | <CR>          | Repeat previous
 | r      | run  | run
-| kill			| to safely recompile src and 'run' again, w/o exiting gdb and savig breakpoints where them are
-	: See http://www.chemie.fu-berlin.de/chemnet/use/info/gdb/gdb_8.html
-| q	     | quit |
-| where	 | show where execution halted
-| bt			| show backtrace for when application crashed
+| kill      | to safely recompile src and 'run' again, w/o exiting gdb and savig breakpoints where them are
+  : See http://www.chemie.fu-berlin.de/chemnet/use/info/gdb/gdb_8.html
+| q      | quit |
+| where  | show where execution halted
+| bt      | show backtrace for when application crashed
 
 Moving
 | n <count>     | next 1 - exec next line of code completely
-| u	[<lineNo>]  | until - continue to the end of current cycle(for,while,etc)
+| u [<lineNo>]  | until - continue to the end of current cycle(for,while,etc)
 | c [<ign_cnt>] | continue | until next breakpoint (ignoring count) or exit
 | s   | step    |
 | fin | finish  | natural continue to end of frame (return from step inside)
-| ret <val>		| emergetncy instant return from step inside
+| ret <val>   | emergetncy instant return from step inside
 
 Print
 | p v.sz        | print v.sz
 | p/x expr      | print in hex
-| p $        	| print last value
+| p $         | print last value
 | p *$->next    | print thru list
-| p $1        	| print value 1 from value history
+| p $1          | print value 1 from value history
 | p ::gx        | force scope to be global
 | p 'basic.c'::gx  | global scope in named file (>=4.6)
 | p array[i]@count | artificial array - print array range
@@ -61,113 +61,113 @@ Breakpoints
 | break *addrss | before executing instruction at address (like 0x400882)
 | b *_start+5   | ... на адресе символа плюс смещение (полезно когда нет сорцов)
 | tb  | tbreak  | temporary breakpoint -- stop once on, then auto removed
-	info breakpoints		   | list of all
-	disable 2 -- disable 2nd breakpoint from list (or enable 2)
-	ignore 2 5 -- skip 2nd breakpoint 5 times
-	save breakpoint /tmp/bps
+  info breakpoints       | list of all
+  disable 2 -- disable 2nd breakpoint from list (or enable 2)
+  ignore 2 5 -- skip 2nd breakpoint 5 times
+  save breakpoint /tmp/bps
 commands <breakNo> ... end   set gdb commands with breakpoint
 ignore <breakNo> count       ignore bpt N-1 times before activation
 condition <breakNo> expression         break only if condition is true
  condition 2 i == 20         example: break on breakpoint 2 if i equals 20
-	| delete 1       | delete a breakpoint by number
-	| delete         | delete all breakpoints (prompted)
-	| clear          | delete breakpoints at current line
-	| clear function | delete breakpoints at function
-	| clear line     | delete breakpoints at line
+  | delete 1       | delete a breakpoint by number
+  | delete         | delete all breakpoints (prompted)
+  | clear          | delete breakpoints at current line
+  | clear function | delete breakpoints at function
+  | clear line     | delete breakpoints at line
 
 Advance -- continue to this temporary breakpoint
-	advance <location as for breakpoint>
+  advance <location as for breakpoint>
  To continue to a specific location, use the advance command, specifying a
  location like those shown in the "Breakpoints" section, above. Here's an
  example which advances from the current location until the function
  subsubfunction() is called:
 
 Print array/memory area
-	: int *array = (int *) malloc (len * sizeof (int));
-	p *array@len
+  : int *array = (int *) malloc (len * sizeof (int));
+  p *array@len
 
 Display
-	display [аргумент]  | на каждый останов/шаг принтить переменную/выражение
-	display				| list all autoprinting vars
-	info display
-	disable display <#number>
-	enable display <#number>
-	delete display <#number>
-	 Опять-таки, если не указать номер переменной, то очистится весь список
-	 отображаемых переменных.
+  display [аргумент]  | на каждый останов/шаг принтить переменную/выражение
+  display       | list all autoprinting vars
+  info display
+  disable display <#number>
+  enable display <#number>
+  delete display <#number>
+   Опять-таки, если не указать номер переменной, то очистится весь список
+   отображаемых переменных.
 
-	info file
-	 To see sections of file where you can set breakpoints
+  info file
+   To see sections of file where you can set breakpoints
 
 
 Изменение значения переменной
-	set <оператор присваивания>
-	print <оператор присваивания>
-	> This, along with the 'jump' command, can help you repeat sections of
-	> code without restarting the program.
+  set <оператор присваивания>
+  print <оператор присваивания>
+  > This, along with the 'jump' command, can help you repeat sections of
+  > code without restarting the program.
 
 (gdb) info locals      print local automatics only
 (gdb) info functions regexp         print function names
 (gdb) info variables  regexp        print global variable names
-	ptype name			| print type definition
-	whatis expression   | print type of expression
-	whatis x
-	 TYPE = WORD
-	p x
-	 $1 = 1
-	set x=2
-	p x=x-2
-	 $3 = 0
+  ptype name      | print type definition
+  whatis expression   | print type of expression
+  whatis x
+   TYPE = WORD
+  p x
+   $1 = 1
+  set x=2
+  p x=x-2
+   $3 = 0
 
 Watchpoints
-	info watchpoints			show current watchpoints
-	wa | watch <expression>
-	rw | rwatch
-	aw | awatch
-		Выполнение программы приостанавливается всякий раз, когда значение
-		указанной переменной изменяется/считывается/то либо другое.
+  info watchpoints      show current watchpoints
+  wa | watch <expression>
+  rw | rwatch
+  aw | awatch
+    Выполнение программы приостанавливается всякий раз, когда значение
+    указанной переменной изменяется/считывается/то либо другое.
 
  Так как yes выводит бесконечное число символов, то лучше бы их нам не видеть
  в отладчике, а вывод программы можно направить на другую консоль. Откройте
  новый терминал, наберите команду и вы получите имя консоли. Должно вылезти
  что-то вроде этого:
-	$ who is i
-	 localhost.localdomain!root pts/3 Apr 26 13:24
+  $ who is i
+   localhost.localdomain!root pts/3 Apr 26 13:24
  Вот теперь просто привязываем к ней.
-	(gdb) tty /dev/pts/3
+  (gdb) tty /dev/pts/3
 
 RE
-	Dump in Intel format
-	; set disassembly-flavor intel		| отображать ассемблер в синтаксисе intel
-	Examine memory content
-	 help x | show formats for x
-	| x/NFU [addr]	  | x/12xw &msg Examine contents of memory in given format
-	| x/5i $pc		  | Process counter -- disas 5 current instructions
-	| x/10xb main	  | Inspect instruction bytes of main function in hex
-	| x/10w           | Stack -- 10 elems of 4 bytes with addresses
-	| x/10g $rsp	  | Stack -- 8 bytes words (giantic)
-	| x/gf  &gd1      | print double on address
-	| x/5i 0x0804844a | Disasm memory of stack by address
-	| x/s  0x080484f0 | String by address
-	| x/s  $rdi		  | dump string by address from register
+  Dump in Intel format
+  ; set disassembly-flavor intel    | отображать ассемблер в синтаксисе intel
+  Examine memory content
+   help x | show formats for x
+  | x/NFU [addr]    | x/12xw &msg Examine contents of memory in given format
+  | x/5i $pc      | Process counter -- disas 5 current instructions
+  | x/10xb main   | Inspect instruction bytes of main function in hex
+  | x/10w           | Stack -- 10 elems of 4 bytes with addresses
+  | x/10g $rsp    | Stack -- 8 bytes words (giantic)
+  | x/gf  &gd1      | print double on address
+  | x/5i 0x0804844a | Disasm memory of stack by address
+  | x/s  0x080484f0 | String by address
+  | x/s  $rdi     | dump string by address from register
 
-	| info float
-	| disas 0x00400576		| disassemble
-	| disas main			| function
-	| disas/r				| Show instructions in raw
-	| disass $pc-32, $pc+32 | scope of current executed code
-	| si, ni | stepi, nexti | move in machine instructions
-	| i reg  | info [all-]registers |
->	| i f    | info current frame |
-	Show registers
-		info registers
-		 prints out the contents of every register, including all the segment
-		 registers. This is often too much information. The "print" command is much
-		 more useful.
-		print/d $ecx
-		print/x $ecx
-		print/t $ecx
-		 print out the ECX register in decimal, hexadecimal, and binary
+  | info float
+  | disas 0x00400576    | disassemble
+  | disas main      | function
+  | disas/r       | Show instructions in raw
+  | disass $pc-32, $pc+32 | scope of current executed code
+  | si, ni | stepi, nexti | move in machine instructions
+  | i reg  | info [all-]registers |
+> | i f    | info current frame |
+  Show registers
+    info registers
+     prints out the contents of every register, including all the segment
+     registers. This is often too much information. The "print" command is much
+     more useful.
+    print/d $ecx
+    print/x $ecx
+    print/t $ecx
+     print out the ECX register in decimal, hexadecimal, and binary
 
 
 
@@ -178,63 +178,63 @@ RE
  binary and 'c' for ASCII. The size field is also a single letter with 'b' for
  byte, 'h' for 16-bit word (half word) and 'w' for a 32-bit word. For example,
  if your program has a label "msg", the following commands:
-	x/12cb &msg x/12db &msg x/12xh &msg x/12xw &msg
+  x/12cb &msg x/12db &msg x/12xh &msg x/12xw &msg
  will print out respectively the contents of memory starting at msg in the
  following manner: the next 12 bytes as ASCII characters, the next 12 bytes as
  decimal numbers, the next 12 16-bit words in hex, and the next 12 32-bit words
  in hex.
 
 Sometimes, as you are tracing your program, you are really interested in the contents of a specific register. If you issue the command:
-	Display
-	| info display | will list all the active displays.
-	| undisplay	   | to remove an item on this list
-	| set disassemble-next-line on  |
-		or for older then gdb 7.0 use
-	| disp/i $pc   | use to see the asm codes on each '<CR>' command
-		: where /i is the format, you can remember it best by thinking
-		: "instruction" and $pc being the instruction pointer, also known as
-		: program counter
-	| display $eax
-	| display/i $eip
-	 A very good use of the display command is to have the next instruction of
-	 the program printed whenever the program is halted.
+  Display
+  | info display | will list all the active displays.
+  | undisplay    | to remove an item on this list
+  | set disassemble-next-line on  |
+    or for older then gdb 7.0 use
+  | disp/i $pc   | use to see the asm codes on each '<CR>' command
+    : where /i is the format, you can remember it best by thinking
+    : "instruction" and $pc being the instruction pointer, also known as
+    : program counter
+  | display $eax
+  | display/i $eip
+   A very good use of the display command is to have the next instruction of
+   the program printed whenever the program is halted.
 
 Also good to know
  Sometimes when stepping through assembly the regs and asm views will get
  borked. Simply execute the respective layout commands again to restore them
  to their old glory:
-	(gdb) layout asm
-	(gdb) layout regs
+  (gdb) layout asm
+  (gdb) layout regs
 
 Detect tracing in Linux and how to struggle
-	http://reverseengineering.stackexchange.com/questions/1930/detecting-tracing-in-linux
-	Struggle:
-	clear call to ptrace with NOP
-		(gdb) set write
-		(gdb) set {unsigned int}$pc = 0x90909090
-		(gdb) set {unsigned char}($pc+4) = 0x90
-		(gdb) set write off
-		x/10i $pc
-	Alternative:
-		Manipulate the program counter (instruction pointer) instead:
-			set $pc+=5 or the more explicit set $pc=$pc+5
-			jump *$pc+5
+  http://reverseengineering.stackexchange.com/questions/1930/detecting-tracing-in-linux
+  Struggle:
+  clear call to ptrace with NOP
+    (gdb) set write
+    (gdb) set {unsigned int}$pc = 0x90909090
+    (gdb) set {unsigned char}($pc+4) = 0x90
+    (gdb) set write off
+    x/10i $pc
+  Alternative:
+    Manipulate the program counter (instruction pointer) instead:
+      set $pc+=5 or the more explicit set $pc=$pc+5
+      jump *$pc+5
 
 
 Замена в памяти переменных на стёке, переданных в функцию
-	 Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
-	 x/i $eip 0x4006d585 <_IO_puts+21>: mov 0x8(%ebp),%esi
-	(gdb) set {char}0x8048e59='X'
-	(gdb) set {char}0x8048e5a='A'
-	(gdb) set {char}0x8048e5b='K'
-	(gdb) set {char}0x8048e5c='E'
-	(gdb) set {char}0x8048e5d='P'
-	x/3sw 0x8048e59
-	 0x8048e59 <_IO_stdin_used+437>: "XAKEP\004\b"
+   Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
+   x/i $eip 0x4006d585 <_IO_puts+21>: mov 0x8(%ebp),%esi
+  (gdb) set {char}0x8048e59='X'
+  (gdb) set {char}0x8048e5a='A'
+  (gdb) set {char}0x8048e5b='K'
+  (gdb) set {char}0x8048e5c='E'
+  (gdb) set {char}0x8048e5d='P'
+  x/3sw 0x8048e59
+   0x8048e59 <_IO_stdin_used+437>: "XAKEP\004\b"
 
 TIPS
-	For experiments on patching you need simple programm which will be executed
-	  over and over again -- so move all your code in cycle.
+  For experiments on patching you need simple programm which will be executed
+    over and over again -- so move all your code in cycle.
 
 Поиск в памяти:
 (gdb) x/d or x 'address' show decimal
@@ -298,8 +298,8 @@ the state of stack frames further back in the calling sequence. You can use
 the up and down commands for this.
 
 ### Stack ###
-	info locals      print automatic variables in frame
-	info args         print function parameters
+  info locals      print automatic variables in frame
+  info args         print function parameters
 | bt    | stack backtrace
 | frame | show current execution position
 | up    | move up stack trace (from func to its caller -- till main)

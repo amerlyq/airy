@@ -1,0 +1,41 @@
+Before you go
+  1. Start from thinking of Use Case
+  2. Productivity:
+    Stepping through a program is less productive than thinking harder and
+    adding output statements and self-checki ng code at critical places.
+  3. When to use GDB?
+    -- core file
+    -- when a problem can be reproduced
+    -- repeating errors
+    -- self-educating
+  4. When not?
+    Other tools, traces
+
+
+Compile
+  Embed additional macros definitions
+    $ g++ -gdwarf-2 -g3 -Wall a.cpp -o prog
+  x64 launch x86
+    $ g++ -m32 -g a.cpp -o prog
+
+Run | r | run |
+  ; gdb -silent --args /bin/ping google.com
+  (gdb) run arg1 > output.log
+  (gdb) run arg1 arg2
+   run w/o args uses the same arguments used by the previous run
+  (gdb) set args arg1 arg2
+   set args without arguments – removes all arguments.
+  (gdb) show args
+
+Attach
+  (gdb) attach 'pid'
+  (gdb) attach 1127 // example
+  (gdb) detach
+
+Load
+  Object File manipulation
+    file object         load new file for debug (sym+exec)
+    file                discard sym+exec file info
+    symbol-file object      load only symbol table
+    exec-file object    specify object to run (not sym-file)
+    core-file core      post-mortem debugging
