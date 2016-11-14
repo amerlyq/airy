@@ -31,9 +31,10 @@ for arg in "$@"; do
 done
 
 # NOTE: source ~/.bash_profile by forcing interactive shell
-# ATT: -l is not enough to activate SHELLRC_EVAL
+# ATT: -l is not enough to activate SHELLRC_EVAL -- use '-i'
+# ATT: -l must be used anyway -- to compose PATH VAR
 # MAYBE:(exec) will be excessive limitation for cmdline?
-((!$#)) && set -- "$SHELL" || set -- bash -ic 'exec "$@"' "$0" "$@"
+((!$#)) && set -- "$SHELL" || set -- bash -lic 'exec "$@"' "$0" "$@"
 # TODO: use ZSH in chroot if available [[ -x ${chroot}$SHELL ]]
 # THINK: using tmux? how to be with nested sessions?
 
