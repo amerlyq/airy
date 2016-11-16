@@ -45,7 +45,9 @@ function mv_subj(acc, m, dst, patt)
 end
 
 -- TEMP:FIXED: until I fix imapfilter code to support base64 match_subject
--- SEE http://lua-users.org/wiki/BaseSixtyFour
+-- SEE: http://lua-users.org/wiki/BaseSixtyFour
+-- REQ: https://github.com/lefcha/imapfilter/issues/127
+-- SEE: https://maildrop.cc/
 function mv_subj_any(acc, m, dst, tbl)
   for i, s in pairs(tbl) do
     m:contain_subject(s):move_messages(acc[dst])

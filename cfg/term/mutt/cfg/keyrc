@@ -18,6 +18,8 @@
 
 # Plugins
 bind index,pager  \\ vfolder-from-query
+macro index,pager  S  "| ~/.mutt/exe/save /tmp/msg/"
+# <enter>
 
 # HACK: show mailboxes list for current acc (BUT from root only)
 macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'

@@ -30,6 +30,11 @@ set simple_search="~f %s | ~C %s | ~s %s"  # by default search in To/Cc/Subject
 # unhdr_order     *
 # hdr_order       From: To: Cc: Bcc: Date: Subject:
 
+# Preproc <pipe-message>
+set pipe_decode = yes  # weed hdr and decode msg
+# set pipe_sep = "\n"  # sep mult tagged msgs
+# set pipe_split = yes   # send EOF after each msg (read in cycle)
+set wait_key = no  # don't show prompt after shell/pipe cmds (show when ret!=0)
 
 ## Show only important fields in the header
 # ignore *

@@ -1,0 +1,15 @@
+#!/bin/bash -eu
+# Save mail from stdin to file
+# NEED: set pipe_decode=yes
+#   => controls what happens to headers and mime parts when you save
+
+d=$1
+f=${2:-mail}
+msg=$(cat)
+
+mkdir -p "$d"
+<<<"$msg" "$d/$f".eml
+
+# mail_date=$(<<<"$message" grep -oPm 1 '^Date: ?\K.*')
+# formatted_date=$(date -d"$mail_date" +%y%m%d)
+# subject=$(<<<"$message" grep -oPm 1 '^Subject: ?\K.*' | sed 's,/,∕,g')
