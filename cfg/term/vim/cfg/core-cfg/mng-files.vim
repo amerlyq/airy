@@ -6,7 +6,9 @@
 " enc: [koi8-r, imb866, cp1251, cp866, utf8, reg:utf-16le, ucs-2le, ucs-2]
 " ff: [unix, dos, mac]
 com! -bang -bar -complete=file -nargs=? Wunix
-  \ write<bang> ++enc=utf8 ++ff=unix ++nobin <args> | edit <args>
+  \| set nobomb
+  \| write<bang> ++enc=utf8 ++ff=unix ++nobin <args>
+  \| edit <args>
 com! -bang -bar -complete=file -nargs=? Ewin
   \ edit<bang> ++enc=cp1251 ++ff=dos ++nobin <args>
 
