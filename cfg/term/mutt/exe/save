@@ -8,7 +8,7 @@ f=${2:-mail}
 msg=$(cat)
 
 mkdir -p "$d"
-<<<"$msg" "$d/$f".eml
+<<<"$msg" cat > "$d/$f".eml
 
 # mail_date=$(<<<"$message" grep -oPm 1 '^Date: ?\K.*')
 # formatted_date=$(date -d"$mail_date" +%y%m%d)

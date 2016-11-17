@@ -30,6 +30,7 @@ command! -bar -nargs=0 -range=% StripEmptyEndLines
 command! -bar -nargs=0 -range StripToggleEmptyEndLines
     \ call ToggleVariable('g:strip_empty_end_lines')
 
+" DEV: if &ft==mail  =>  don't touch line '^--\s$'
 command! -bar -nargs=0 -range=% StripTrailingSpace
     \ call UnobtrusiveSubF('%s,%s g/%s/s///ge',
     \   <line1>, <line2>, '\v'.s:sp.'+$|[ \xa0\u3000]+\ze\t$')
