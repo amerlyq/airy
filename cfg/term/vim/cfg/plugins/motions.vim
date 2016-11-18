@@ -35,6 +35,7 @@ call dein#add('bkad/CamelCaseMotion', {
 
 "" Two-letters find on whole screen scope {{{1
 " ALT: saihoooooooo/glowshi-ft.vim
+" FIND: load plugin also on 'i_CTRL-o'
 " DEPRECATED:
 "   - (bloated) Lokaltog/vim-easymotion
 "   - (altered) https://github.com/rhysd/clever-f.vim
