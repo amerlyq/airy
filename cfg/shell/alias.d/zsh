@@ -22,6 +22,11 @@ if (($+commands[$EDITOR])); then
   alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
   alias -g VQ='V -c "cgetb|copen"'
   alias -g VG='V -c "set cole=0 fdl=1|setf ag_grp"'
+  alias -g VV='|vipe|'
+  # ALT:(vipe): V :w!tee
+  # SEE: http://stackoverflow.com/questions/3219479/how-to-write-buffer-content-to-stdout
+  # NOTE: You cannot simply put vim inside a pipe, because then Vim cannot display its UI.
+  #   $ { FROMCMD | vim - 8>&1 >&9 | tac | tac | TOCMD; } 9>&1
 fi
 
 ## Utils
@@ -53,7 +58,8 @@ fi
 
 if (($+commands[xargs])); then
   # BAD: cat $(ls Z)  NEED: use xargs only if 0<$#
-  alias -g X='|xargs -r -L1 '
+  alias -g XA='|xargs -r -L1 -d\\n'
+  alias -g X='|sed -n /./p XA'
 fi
 
 if (($+commands[xsel])); then
