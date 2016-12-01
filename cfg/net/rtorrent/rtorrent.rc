@@ -24,12 +24,14 @@ download_rate = 0
 upload_rate = 50
 
 # Default directory to save the downloaded torrents. (: ./ or  ~/rdld)
-directory = ./leeching
+# directory = ./leeching
+directory = ./
 
 # Default session directory. Make sure you don't run multiple instance
 # of rtorrent using the same session directory. Perhaps using a
 # relative path?
-session = ./.rtorrent
+# session = ./.rtorrent
+session = ./
 
 # Watch a directory for new torrents, and stop those that have been
 # deleted. (or ~/Downloads/watch/*.torrent)
@@ -57,7 +59,7 @@ ratio.upload.set=250M
 system.method.set = group.seeding.ratio.command, d.close=
 
 # Move files to ./unsorted when download completes
-system.method.set_key = event.download.finished,move_complete,"execute=mv,-n,$d.get_base_path=,./unsorted/;d.set_directory=./unsorted/"
+# system.method.set_key = event.download.finished,move_complete,"execute=mv,-n,$d.get_base_path=,./unsorted/;d.set_directory=./unsorted/"
 
 # Port range to use for listening.
 port_range = 33101-33199
