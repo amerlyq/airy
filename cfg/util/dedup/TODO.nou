@@ -1,0 +1,22 @@
+REF rmlint
+  + https://bbs.archlinux.org/viewtopic.php?id=191247
+    http://rmlint.readthedocs.io/en/latest/
+    https://github.com/sahib/rmlint
+
+
+ALT: FSLint, fdupes
+  http://www.pixelbeat.org/fslint/
+
+
+NEED names similarity filter (dictionary range)
+  https://www.linux.com/learn/how-sort-and-remove-duplicate-photos-linux
+   Note that any possible method of doing this will invariably have to compare
+   every single file on your system to every single other file.
+   You can reduce the time by checking for matching st_sizes, eliminating those
+   with only one of the same, and then only calculating md5sums for matching st_sizes.
+
+
+USAGE
+  $ rmlint -o fdupes:stdout . VV YT
+  $ v YT.
+  $ YT: X rm
