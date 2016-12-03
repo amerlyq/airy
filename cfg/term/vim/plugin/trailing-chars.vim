@@ -7,8 +7,8 @@ if &cp||exists('g:loaded_trailing')|finish|else|let g:loaded_trailing=1|endif
 
 "{{{1 MAPS ====================
 noremap <unique> [Toggle]l :<C-u>set list! list?<CR>
-noremap <unique> [Toggle]L :<C-u>StripTrailingHighlight<CR>
-noremap <unique> [Toggle]t :<C-u>StripToggleEmptyEndLines<CR>
+noremap <unique> [Toggle]L :<C-u>ToggleTrailingHighlight<CR>
+noremap <unique> [Toggle]t :<C-u>ToggleEmptyLinesStripEnd<CR>
 
 noremap <unique> [Replace]E :<C-u>EmptyLinesCompress<CR>
 
@@ -17,17 +17,18 @@ let s:sp = '[ \t\xa0\u3000]'
 "{{{1 CMDS ====================
 command! -bar -nargs=0 -range=% EmptyLinesCompress
     \ call UnobtrusiveSubF('%s,%s s/%s//', <line1>, <line2>,
-    \   '\v.\n\zs('.s:sp.')*\n\ze.|^\1*\n\1*\_$')
+    \   '\v'.'%(%^|\_^('.s:sp.')*\n\zs)%(\1*\n)+')
+    \| EmptyLinesStripEnd
 
 command! -bar -nargs=0 -range=% EmptyLinesRemove
     \ call UnobtrusiveSubF('%s,%s g/%s/d_', <line1>, <line2>,
     \   '^'.s:sp.'*$')
 
-command! -bar -nargs=0 -range=% StripEmptyEndLines
+command! -bar -nargs=0 -range=% EmptyLinesStripEnd
     \ call UnobtrusiveSubF('/%s/,%sd_', '\v^%(\_[\n'.s:sp[1:-2].']*\S)@!',
     \ <line2>)
 
-command! -bar -nargs=0 -range StripToggleEmptyEndLines
+command! -bar -nargs=0 -range ToggleEmptyLinesStripEnd
     \ call ToggleVariable('g:strip_empty_end_lines')
 
 " DEV: if &ft==mail  =>  don't touch line '^--\s$'
@@ -35,11 +36,11 @@ command! -bar -nargs=0 -range=% StripTrailingSpace
     \ call UnobtrusiveSubF('%s,%s g/%s/s///ge',
     \   <line1>, <line2>, '\v'.s:sp.'+$|[ \xa0\u3000]+\ze\t$')
 
-command! -bar -nargs=0 -range StripToggleTrailingSpace
+command! -bar -nargs=0 -range ToggleStripTrailingSpace
     \ call ToggleVariable('g:strip_trailing_space')
 
 " DEV THINK make independent from solarized high-contrast
-command! -bar -nargs=0 -range StripTrailingHighlight
+command! -bar -nargs=0 -range ToggleTrailingHighlight
     \ let g:solarized_visibility=("low"==g:solarized_visibility?"high": "low")
     \| colorscheme solarized
 
@@ -63,6 +64,6 @@ let g:strip_trailing_space  = 1
 augroup TrailingStrip
   au!
   au BufWritePre *
-      \ if g:strip_empty_end_lines|StripEmptyEndLines|en
-      \|if g:strip_trailing_space |StripTrailingSpace|en
+      \ if g:strip_trailing_space |StripTrailingSpace|en
+      \|if g:strip_empty_end_lines|EmptyLinesStripEnd|en
 augroup END
