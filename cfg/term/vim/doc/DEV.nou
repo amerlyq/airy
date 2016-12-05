@@ -242,3 +242,25 @@ Manipulations
     : https://github.com/KabbAmine/lazyList.vim
     : https://github.com/FooSoft/vim-argwrap
     : https://github.com/KabbAmine/lazyList.vim
+
+
+Diff (restricted)
+  TRY: https://github.com/chrisbra/vim-diff-enhanced
+    BAD: when highlighting diff -- specified patt not ignored
+      => IgnorePat only filters-out identical lines (beside pattern)
+      DEV: treat patt as equal and don't hi! it
+    :EnhancedDiff default
+    :EnhancedDiffIgnorePat! \v^\d+:\d+:             # set list BUG: adds instead of reset
+    :let g:enhanced_diff_ignore_pat = []            # TEMP: workaround to reset
+    :EnhancedDiffIgnorePat ^\d.*\%<9c [<replace>]   # add to list
+    :EnhancedDiffDisable
+  DEV: https://github.com/amerlyq/vim-py3diff
+    http://stackoverflow.com/questions/8861910/ignore-lines-with-particular-words-in-vimdiff-output
+    https://www.reddit.com/r/vim/comments/29kdg7/make_vimdiff_ignore_certain_patterns/
+    http://unix.stackexchange.com/questions/17040/how-to-diff-files-ignoring-comments-lines-starting-with
+  :h diffexpr
+  :h patchexpr
+  :h diff-diffexpr
+  Cases
+    * diff AgGroup -- ignore numbers at beg /\v^\d+:\d+:/
+    * diff .conf -- ignore all comments (filter out)
