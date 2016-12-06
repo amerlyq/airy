@@ -109,7 +109,8 @@ Display
 (gdb) info locals      print local automatics only
 (gdb) info functions regexp         print function names
 (gdb) info variables  regexp        print global variable names
-  ptype name      | print type definition
+  ptype name          | print type definition
+    # with "set print object on" it gets prefixed with type = /* real type = D * */ but then so does "whatis"
   whatis expression   | print type of expression
   whatis x
    TYPE = WORD
@@ -142,15 +143,14 @@ RE
   Examine memory content
    help x | show formats for x
   | x/NFU [addr]    | x/12xw &msg Examine contents of memory in given format
-  | x/5i $pc      | Process counter -- disas 5 current instructions
-  | x/10xb main   | Inspect instruction bytes of main function in hex
+  | x/5i $pc        | Process counter -- disas 5 current instructions
+  | x/10xb main     | Inspect instruction bytes of main function in hex
   | x/10w           | Stack -- 10 elems of 4 bytes with addresses
-  | x/10g $rsp    | Stack -- 8 bytes words (giantic)
+  | x/10gax $rsp    | Stack -- 8 bytes words (giantic)
   | x/gf  &gd1      | print double on address
   | x/5i 0x0804844a | Disasm memory of stack by address
   | x/s  0x080484f0 | String by address
   | x/s  $rdi     | dump string by address from register
-
   | info float
   | disas 0x00400576    | disassemble
   | disas main      | function
