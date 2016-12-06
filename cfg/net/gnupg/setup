@@ -3,8 +3,11 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-link -t  ~/.gnupg gpg{,-agent}.conf
+linkcp -t  ~/.gnupg gpg{,-agent}.conf
 
-svc_activate -cue gpg-agent.service
+# svc_activate -cue gpg-agent.service
+svc_activate -cue -f /usr/share/doc/gnupg/examples/systemd-user \
+  gpg-agent-ssh.socket gpg-agent.service gpg-agent.socket
+  # dirmngr.service dirmngr.socket
 
 echo RELOADAGENT | tee >(gpg-connect-agent)

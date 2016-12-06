@@ -5,11 +5,13 @@ trap_errors
 DIR=/etc/systemd/system
 sudo=sudo
 OPTIND=1
+from=./unit
 
 # copy/enable/re-*/run/user
-while getopts 'cerRu' o; do case $o
+while getopts 'cef:rRu' o; do case $o
 in u) A=--user; unset sudo; DIR=~/.config/systemd/user
       # ALT:CHECK:(faster startup) /etc/systemd/user
+;; f) from=$OPTARG
 ;; :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 (($#)) || die 1 "No svc list"
@@ -22,7 +24,7 @@ if has_pr systemd-notify && systemd-notify --booted; then
   if cfgOpt c; then
     for f in "$@"; do
       # MAYBE: move local svc searching into func.d/cfgsetup wrapper
-      [[ -f ./unit/$f ]] && f=./unit/$f \
+      [[ -f $from/$f ]] && f=$from/$f \
       || [[ -f ./$f ]] || die 1 "Not found '$f'"
       if ! diff -q "$PWD/$f" "${DIR:?}/$fl" &>/dev/null; then
         do_replace=1
