@@ -10,6 +10,7 @@ has_pr X || die
 
 if distro arch; then
     aur_inst skype # multilib only
+    # aur_inst -p 'skypeforlinux' skypeforlinux-bin
     # DEPRECATED: sni-qt  # tray icon for skype
     # OBSOLETE:(cfg/media/pidgin already installed skypeweb plugin)
     #   aur_inst -f '/usr/lib/purple-2/libskype.so' 'skype4pidgin-git'
