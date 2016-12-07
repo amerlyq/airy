@@ -116,3 +116,36 @@ fun! CustomFoldText(delim, preview)
   let expansionString = repeat(a:delim, lengthMiddle)
   return foldLineHead . expansionString . foldLineTail
 endf
+
+
+
+":[range]RenderClosedFolds
+"   Replace all lines currently hidden inside closed folds
+"   with a single line representing 'foldtext'.
+" http://stackoverflow.com/questions/30583388/how-can-i-save-in-vim-a-file-with-the-actual-fold-text-43-lines
+fun! s:RenderClosedFolds()
+  if line('.') == foldclosed('.')
+    let l:result = foldtextresult('.')
+    call setline('.', l:result)
+    execute printf('syntax match renderedFold "\V\^%s\$" containedin=ALL keepend', escape(l:result, '"\'))
+  else
+    delete _
+  endif
+endf
+
+fun! s:ToggleRenderClosedFolds(line1, line2)
+  hi def link renderedFold Folded
+  let l:entire = (a:line1 == 1 && a:line2 == line('$'))
+  if l:entire| syntax clear renderedFold |en
+  let l:fdm = &l:foldmethod
+  setlocal foldmethod=manual
+  try
+    exe a:line1.','.a:line2.'folddoclosed call <SID>RenderClosedFolds()'
+  finally
+    if l:entire| setlocal nofoldenable |en
+    let &l:foldmethod = l:fdm
+  endtry
+endf
+
+command! -bar -range=% RenderClosedFolds
+    \ call s:ToggleRenderClosedFolds(<line1>, <line2>)
