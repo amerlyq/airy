@@ -150,11 +150,12 @@ RE
   | x/gf  &gd1      | print double on address
   | x/5i 0x0804844a | Disasm memory of stack by address
   | x/s  0x080484f0 | String by address
-  | x/s  $rdi     | dump string by address from register
-  | info float
-  | disas 0x00400576    | disassemble
+  | x/s  $rdi       | dump string by address from register
+  | info float      |
+  | disas 0x00400576| disassemble
   | disas main      | function
-  | disas/r       | Show instructions in raw
+  | disass/r        | show raw instructions
+  | disass/m        | WARN don't use /m for src lines intervining -- it skips some assembler lines
   | disass $pc-32, $pc+32 | scope of current executed code
   | si, ni | stepi, nexti | move in machine instructions
   | i reg  | info [all-]registers |
