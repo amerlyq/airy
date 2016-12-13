@@ -5,7 +5,7 @@ module XMonad.Config.Amer.Navigation (
 
 import Data.Default                 (def)
 import XMonad                       (gets, spawn, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen)
-import XMonad.StackSet              (view, shift, currentTag, shiftWin)
+import XMonad.StackSet              (view, greedyView, shift, currentTag, shiftWin)
 import XMonad.Actions.CycleWS       (findWorkspace, screenBy, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
 
@@ -35,16 +35,23 @@ doScreen d f = do
     Just ws -> windows (f ws)
 
 
-keys = screens ++ panels ++ markNgo
+keys = screens ++ nwksps ++ panels ++ markNgo
 
-screens = [ (m ++ k, b f) | (k, b) <- groups, (m, f) <- actions]
+nwksps = [ (m ++ k, b f) | (k, b) <- groups, (m, f) <- actions]
 groups =
   [ ("a", backNforth skipped)
   , ("<Backspace>", nextEmpty)
   , ("<Tab>", nextNonEmpty)
-  , ("[", doScreen (-1))
-  , ("]", doScreen 1)
   ]
+
+-- NOTE: M-M1-[ must swap whole wksp between screens, keeping their numbers
+-- HACK: any more conviniet needs to re-implement greedyView
+screens =
+  [ (m ++ k, b f)
+  | (k, b) <- [ ("[", doScreen (-1)), ("]", doScreen 1) ]
+  , (m, f) <- take 4 actions ++ [ ("M-M1-", greedyView) ]
+  ]
+
 
 panels =
   [ ("M-S-p"    , layoutScreens 2 (TwoPane 0.15 0.85) >> windows (view "MON"))
