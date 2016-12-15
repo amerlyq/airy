@@ -33,8 +33,9 @@ command! -bar -nargs=0 -range ToggleEmptyLinesStripEnd
 
 " DEV: if &ft==mail  =>  don't touch line '^--\s$'
 command! -bar -nargs=0 -range=% StripTrailingSpace
-    \ call UnobtrusiveSubF('%s,%s g/%s/s///ge',
-    \   <line1>, <line2>, '\v'.s:sp.'+$|[ \xa0\u3000]+\ze\t$')
+    \ call UnobtrusiveSubF('%s,%s v/%s/s/%s//ge', <line1>, <line2>
+    \, get(b:, 'strip_trailing_skip', g:strip_trailing_skip)
+    \, '\v'.s:sp.'+$|[ \xa0\u3000]+\ze\t$')
 
 command! -bar -nargs=0 -range ToggleStripTrailingSpace
     \ call ToggleVariable('g:strip_trailing_space')
@@ -59,6 +60,8 @@ fun! ToggleVariable(name)
   echo '  '.a:name.' = '.({a:name} ? 'on' : 'off')
 endf
 
+" ALT: join('|', map('%('.v:val.')'))
+let g:strip_trailing_skip = '\v%(\S$)'
 let g:strip_empty_end_lines = 1
 let g:strip_trailing_space  = 1
 augroup TrailingStrip
