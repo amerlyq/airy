@@ -108,6 +108,7 @@ class ag(Command):
             self._filter(self._catch(cmd))
 
     def tab(self):
+        # BAD:(:ag <prev_patt>) when input alias ':agv' and then <Tab>
         return ['{} {}'.format(self.arg(0), p)
                 for p in reversed(ag_patterns)]
 

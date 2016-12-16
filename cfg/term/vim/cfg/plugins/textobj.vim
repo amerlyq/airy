@@ -185,11 +185,12 @@ call dein#add('vimtaku/vim-textobj-sigil', {
 
 "" Space between words or before indent {{{1
 " CHG 'on_map': [[ox, as, is]]
+" DEV: remap i<Space> to search previous space instead of its current op
 call dein#add('saihoooooooo/vim-textobj-space', {
   \ 'on_map': {'ox': '<Plug>'},
   \ 'depends': 'vim-textobj-user',
   \ 'hook_source': 'let g:textobj_space_no_default_key_mappings = 1',
-  \ 'hook_add': "call Map_textobj('s', 'space')"})
+  \ 'hook_add': "call Map_textobj('<Space>', 'space')"})
 
 
 
