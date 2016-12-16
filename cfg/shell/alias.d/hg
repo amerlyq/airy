@@ -12,6 +12,7 @@ alias hgdp='hgdf -r .~1 -r .'
 
 # hg log --template "{node};{date|shortdate};{branch};{author};{join(splitlines(desc), ' ')};{diffstat};files: {join(files, ', ')}\n"
 alias hglg='hg log --graph --limit 250 --template "\t{desc|strip|firstline}\n\t\t{date|shortdate} [{author|user}] :{node|short} "'
+alias hglg.='hglg -b .'
 
 alias hgcs='hg log --patch -r'
 alias hgbl='hg branches'

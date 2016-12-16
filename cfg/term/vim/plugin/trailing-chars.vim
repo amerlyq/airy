@@ -20,6 +20,11 @@ command! -bar -nargs=0 -range=% EmptyLinesCompress
     \   '\v'.'%(%^|\_^('.s:sp.')*\n\zs)%(\1*\n)+')
     \| EmptyLinesStripEnd
 
+" USAGE:(after receiving mail): Unix-Win-Unix when excessive newlines doubled
+command! -bar -nargs=0 -range=% EmptyLinesReduce
+    \ call UnobtrusiveSubF('%s,%s s///', <line1>, <line2>,
+    \   '\v'.'\S\n\zs\n')
+
 command! -bar -nargs=0 -range=% EmptyLinesRemove
     \ call UnobtrusiveSubF('%s,%s g/%s/d_', <line1>, <line2>,
     \   '^'.s:sp.'*$')

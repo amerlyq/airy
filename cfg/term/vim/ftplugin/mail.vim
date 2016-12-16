@@ -1,4 +1,4 @@
-setl commentstring=> %s
+setl commentstring=>\ %s
 setlocal textwidth=68
 setlocal spell
 
