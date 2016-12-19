@@ -36,6 +36,7 @@ set foldcolumn=2        " fold levels ruler on left (clickable)
 set foldlevel=0         " close folds below this depth, initially
 set foldlevelstart=99   " close folds below this depth, on enter
 " set foldopen=all      " open on cursor touch, DISABLED: prevents 'za' fold
+set fillchars=fold:\    " don't place extra dashes on scr right after foldtext
 
 if has('conceal')
   set concealcursor=cv  " Concealing -- hide in command and visual modes.

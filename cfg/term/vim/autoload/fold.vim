@@ -93,5 +93,26 @@ fun! fold#debug()
   call append(line('1'), lvls)
 endf
 
+" set debug=msg fdm=expr fde=fold#shell_prompt(v:lnum)
+fun! fold#shell_prompt(lnum)
+  let cl = getline(a:lnum)
+  return (cl =~# '^[┌]' ? '>1' : '=')
+endf
+" ALT: set fdm=marker fmr=└╼\ ,┌──
+" BAD:(nested by default) set fdm=marker fmr=┌──,>>>\
+"   FIXED: setlocal foldmethod=expr foldexpr=getline(v:lnum)=~#'^>>>'?'>1':'='
+"   BET: vim:set foldmethod=expr foldexpr=getline(v\:lnum)=~\'>>>\'?\'>1\'\:\'=\' foldlevel=0 foldclose= :
+
+" TODO:(right-aligned) extract ZSH time if available ALT extract path
+" source ~/.vim/autoload/fold.vim
+" set fdt=fold#shell_text()
+fun! fold#shell_text()
+  let fld = getline(v:foldstart, v:foldend)
+  let idx = match(fld, '^└')
+  let line = idx<0 ?'': fld[idx]
+  let cmd = substitute(line, '\v%(^└\S*╼\s)|%(\s+\u*─\(\d\d:\d\d:\d\d\)$)', '', 'g')
+  return '$ '.cmd
+endf
+
 "---------------------------------------------------------
 let &cpo=s:cpo_save

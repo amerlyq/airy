@@ -56,6 +56,8 @@ scptar() {
 }
 alias scpto='scptar -s '
 alias scpfr='scptar '
+# ALT: scp must be double-escaped due to shell expansion on both client and host
+#   ls X{} scp "{}" host:"~/'{}'"
 
 # Deploy instant server for exposing files in current directory to LAN
 alias http-server='/usr/bin/env python2 -m SimpleHTTPServer 8000'

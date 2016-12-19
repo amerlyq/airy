@@ -6,6 +6,7 @@ let g:fold_extend_preview = 1
 " INTEGRATION:
 " vim-foldsearch/autoload/foldsearch/foldsearch.vim:224
 "   set foldtext=CustomFoldText('\ ',0)
+" http://vim.wikia.com/wiki/Customize_text_for_closed_folds
 
 
 "{{{1 Mappings ============================
@@ -83,10 +84,10 @@ fun! CustomFoldText(delim, preview)
 
   " SEE: \u2056 \ufbb8 \u272b
   let m="\u2056"   " TODO: set through variable. Reuse airline symbs?
-  let lm = (v:foldlevel <= 1 ? l:m : string(v:foldlevel))
   if nsp <= 1
     let foldLineHead = l:m . l:line
   else
+    let lm = (v:foldlevel <= 1 ? l:m : string(v:foldlevel))
     let foldLineHead = l:lm . repeat(' ', nsp-2). l:m . l:line
   endif
 
