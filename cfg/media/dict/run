@@ -52,6 +52,6 @@ in --debug) dictd -d nofork -d init  ## Server: no demon
 ;; --dmenu) fdmenu "$@"
 ;; --vim) shift; fvim "$@"
 # TODO: use python/xml instead of pandoc
-;; --filter) filter $@ | pandoc -f html -t markdown | sed -r 's/(> )+/  /g; /^\s*$/d'
+;; --filter) filter $@ | iconv -t utf-8 | pandoc -f html -t markdown | sed -r 's/(> )+/  /g; /^\s*$/d'
 ;; *) fshell $@
 ;; esac
