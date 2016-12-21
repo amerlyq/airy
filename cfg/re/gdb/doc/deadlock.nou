@@ -1,0 +1,81 @@
+%%%% Deadlock
+% Search for thread, which blocked the current one
+Program terminated with signal 6, Aborted.
+#0  0x2ab27b6c in pthread_cond_wait () from /lib/libpthread.so.0
+(gdb) thread 110
+[Switching to thread 110 (process 4359)]#0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
+(gdb) bt
+#0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
+#1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
+...
+(gdb) f 1
+#1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
+(gdb) p* (pthread_mutex_t*)$a0
+$1 = {
+  __data = {
+    __lock = 2,
+    __count = 0,
+    __owner = 4391,
+    __kind = 0,
+    __nusers = 1,
+    __spins = 0
+  },
+  __size = "\000\000\000\002\000\000\000\000\000\000\021'\000\000\000\000\000\000\000\001\000\000\000",
+  __align = 2
+}
+(gdb) thread 100
+[Switching to thread 100 (process 4391)]#0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
+(gdb) bt
+#0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
+#1  0x2ac820d0 in usleep () from /lib/libc.so.0
+...
+
+
+% Recursive frames: how to coerce gdb into giving a backtrace
+SEE
+  + http://fragglet.livejournal.com/19646.html
+  http://stackoverflow.com/questions/9809810/gdb-corrupted-stack-frame-how-to-debug
+
+  (gdb) thr 100
+  [Switching to thread 100 (LWP 4391)]
+  (gdb) bt
+  #0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
+  #1  0x2ab2b8f0 in nanosleep () from /lib/libpthread.so.0
+  Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+
+
+% Patch read-only regs in coredump
+# = setting cooked regs
+http://stackoverflow.com/questions/9809810/gdb-corrupted-stack-frame-how-to-debug
+http://cygwin.com/ml/gdb/2011-02/msg00042.html
+  http://cygwin.com/ml/gdb/2011-02/msg00047.html
+  $ frame FRAMEADDR PCADDR  # where FRAMEADDR should be $sp in the caller.
+  $ eu-readelf -n corefile  # and patch the registers using hexedit,
+  TRY $ set write
+
+
+% GDB Scripting
+  http://www.univ-orleans.fr/SCIENCES/INFO/RESSOURCES/webada/doc/gnat/gdb_24.html
+    http://unix.stackexchange.com/questions/151502/how-to-save-the-result-of-printf-to-a-variable-in-gdb
+  Python
+    http://sourceware.org/gdb/current/onlinedocs/gdb/Python.html#Python
+  Lisp
+    https://github.com/tromey/gdb-refactoring-scripts
+
+
+% Coredump in radare2
+  https://github.com/radare/radare2/issues/152
+  https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
+
+
+  TRY: connecting radare2 to gdbserver ALSO use gdb as gdb server
+    https://github.com/radare/radare2/issues/217
+    http://sourceware.org/gdb/onlinedocs/gdb/Server.html
+    http://sourceware.org/gdb/onlinedocs/gdb/Connecting.html
+
+  REF
+    https://2016.hack.lu/
+    http://archive.hack.lu/2015/
+      http://archive.hack.lu/2015/radare2-workshop-slides.pdf
+    https://radare.gitbooks.io/radare2book/content/introduction/basic_debugger_session.html
+    http://radare.today/posts/using-radare2/
