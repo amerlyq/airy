@@ -307,3 +307,17 @@ Filtering (IMAP)
       : BAD: site is down
     http://baptiste-wicht.com/posts/2014/07/a-mutt-journey-filter-mails-with-imapfilter.html
     http://blog.endpoint.com/2011/10/imapfilter-lua-email-mutt-filtering.html
+
+
+Text reflow
+  DEV:G:(vim mail reflow)
+    [_] vim mustn't delete single space on soft-break
+    [_] must reflow text/qout joining lines ending in '\s'
+    [_] on wrap must insert soft-break
+      set formatoptions+=w
+  SEE:CHECK:
+    http://brianbuccola.com/line-breaks-in-mutt-and-vim/
+  http://www.256bit.org/~chrisbra/cms/vim_as_e-mail_editor.html#format
+  http://vim.wikia.com/wiki/Fix_email_quotations_with_long_lines
+  ALSO
+    https://github.com/vdanen/mutt-scripts/blob/master/mutt/muttrc

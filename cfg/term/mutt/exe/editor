@@ -1,0 +1,11 @@
+#!/bin/sh -eu
+
+# cat "$@"
+
+exec $EDITOR -c '
+set tw=0 wm=0 nowrap nolinebreak
+set spell spelllang=ru_yo,en_us,uk
+' "$@"
+# set formatoptions-=w
+
+# exec $EDITOR -u NONE --noplugin "$@"

@@ -10,5 +10,5 @@ application/msword; antiword '%s'; copiousoutput; description=Word Document; nam
 # application/pdf; pdftotext '%s' -; copiousoutput; description=PDF Document; nametemplate=%s.pdf
 application/*; ~/.config/ranger/scope.dash %s; copiousoutput
 image/*; sxiv %s; test=test -n "$DISPLAY"
-text/*; $EDITOR %s
-*/*; $EDITOR %s
+text/*; ~/.mutt/exe/editor %s
+*/*; ~/.mutt/exe/editor %s
