@@ -1,0 +1,61 @@
+TODO
+  [_] FIXME r.n м'ясо -> м&apos;ясо
+
+See code for abilities
+  http://libnotify.sourcearchive.com/documentation/0.7.4-1/notify-send_8c_source.html
+
+http://www.galago-project.org/specs/notification/0.9/x211.html
+  #!/bin/sh
+  export DISPLAY=:0.0
+  PATH=/usr/bin/:/bin/
+  notify-send --urgency normal --expire-time=10000 -i typing-monitor -h int:x:500 -h int:y:500 "Пора сделать перерыв" "Глазам нужен отдых"
+
+А как-то можно изменить стиль отображения надписи, допустим фон или цвет текста?
+нет, не прокатило, пробывал так
+  notify-send "Hello for Me" и notify-send "Hello for Me" и notify-send "Hello for Me". Думаю тут надо .gtkrc-2.0 копать
+
+Насчет DISPLAY=:0.0. Жестковбитый DISPLAY — не хорошо. Он время от времени
+может меняться, даже, если всего один пользователь за компьютером. Кроме того,
+если ты закрыл сессию и ушел, крон будет все равно работать и ошибки будут
+сыпаться тебе в почту.
+Лучше определять его автоматом, например, с помощью вот такой вот функции:
+  # get_display [USER] — Returns $DISPLAY of USER.
+  # If first param is omitted, then $LOGNAME will be used.
+  get_display () {
+  who \
+  | grep ${1:-$LOGNAME} \
+  | perl -ne 'if ( m!\(\:(\d+)\)$! ) {print ":$1.0\n"; $ok = 1; last} END {exit !$ok}'
+  }
+
+И в скрипте поправить вот так (в одной строчке нельзя, так как export сбивает $?):
+  DISPLAY=$(get_display) || exit
+  export DISPLAY
+
+
+Отличная статья, но в современных системах экспорта DISPLAY уже недостаточно,
+чтобы показывать сообщения правильному пользователю. Необходимо находить и
+экспортировать также DBUS_SESSION_BUS_ADDRESS, как это описано в
+habrahabr.ru/post/126849/#comment_4183443, а именно:
+  init_notify() {
+    user=`whoami`
+    pids=`pgrep -u $user nautilus`
+    for pid in $pids; do
+      # find DBUS session bus for this session
+      DBUS_SESSION_BUS_ADDRESS=`grep -z DBUS_SESSION_BUS_ADDRESS /proc/$pid/environ | sed -e 's/DBUS_SESSION_BUS_ADDRESS=//'`
+      # use it
+      export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
+    done
+  }
+  if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    init_notify
+  fi
+user=`whoami` можно оставить, если мы запускаем скрипт для одного пользователя
+и из-под его учётной записи, если же нам нужно оповещать разных пользователей,
+то в статье уже описан способ работы через $LOGNAME.
+
+
+
+А можно его как-то прикрутить к tail'у? Чтобы следить за изменениями файла
+  tail -n 0 -f /var/log/syslog | while read line ; do
+    notify-send --urgency normal --expire-time=2000  "New line in syslog:" "$line" ;
+  done

@@ -1,0 +1,45 @@
+Set:
+ http://www.catonmat.net/blog/set-operations-in-unix-shell/
+  unique in bigger N not appearing in list M
+  ;comm -23 <(command_which_generate_N|sort) <(command_which_generate_M|sort)
+   comm without option display 3 columns of output: 1: only in first file,
+   2: only in second file, 3: in both files. -23 removes the second and
+   third columns.
+  ; awk 'FNR==NR{ array[$0];next} { if ( $1 in array ) next; print $1}' "M" "N"
+   But this form badly works with spaces. Why?
+
+Books
+    http://regex.learncodethehardway.org/book/
+
+Combine (mix) two list pairing line by line
+  paste -d '\n' file1 file2
+Combine each two lines in one
+  paste -d " "  - - < filename
+
+Uniq from search lists
+  find DIR1 DIR2 -type f -exec sha1sum '{}' \+ | sort | \
+    uniq -c --check-chars 40 | egrep '^ *1 ' | cut -c 51-
+  find DIR1 DIR2 -type f -exec sha1sum {} + | sort | \
+    uniq -u --check-chars 40 | cut -c 43-
+
+Sum column of numbers
+  <cmd> | paste -sd+ | bc
+
+LIST MANIPULATION
+ PRIMER: http://www.skorks.com/2010/05/sort-files-like-a-master-with-the-linux-sort-command-bash/
+| sort -rnk5      | reverse numerical copare 5th column
+| sort -k 3.3     | third column, start comparison from its 3rd char
+| sort -k 3.3,3.5 | compare chars 3..5 from 3rd column
+| sort -t: -k2,2  | sort on 2nd column, fallback to whole line if identical
+| comm            | Compare two sorted files line by line.
+| join            | Join the lines of two files which share a common field of data.
+| uniq -u         | print only unique
+
+
+LOG filtering
+  cut -d' ' --complement -f1-3
+  sort -u -k 1.1,1.59
+
+Commands execution
+  cat -n .xinitrc
+  sed '10q;d' .xinitrc | bash

@@ -1,0 +1,112 @@
+Usage
+  http://help.ubuntu.ru/fullcircle/25/%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D1%8B
+  http://www.cyberciti.biz/networking/nmap-command-examples-tutorials/
+
+Very useful MANY commands (one-file)
+  http://www.drivenoutside.com/Linux%20Commands.html
+
+Control
+  <C-A-t> | New terminal
+  <S-PgUp,PgDn> | scroll output buffer
+  <C-R>   | Reverse search in input history, push again <C-R> to jump to
+        previous similar input, <C-G> -- abort to CLI
+  <C-S> | forward-search, needs to disable suspend on <C-s>
+  <C-Z>   | suspend program, to resume: $ fg<CR>
+  <C-s> and <C-q> | have been used for decades to do software flow control
+    http://en.wikipedia.org/wiki/Software_flow_control
+     You'll probably want to avoid mapping those key sequences in general.
+     Or disable: $ stty -ixon
+  <C-H> | показать скрытые файлы
+  Insert from buffers:
+    '*' -- Mouse3
+    '+' -- Alt+Mouse3
+
+File size
+  ls -l
+  ls -lh
+  du -sh  | dir and it's content size
+
+Free space on disk
+  df -H
+  df -h
+
+Move into previous dir
+  cd -
+
+Dir
+  mkdir -p /tmp/dir1/dir2  | Create dir and all subsequent if not exist
+
+Copy
+  cp src/ .   | copy all files in current dir
+  cp -a src/ dst/ | recursive: dir and hidden files
+  cp -r src/ dst/ | w/o hidden
+
+Rights
+  > chmod [augo][+-][rwx] /path/file
+  u — пользователю
+  g — группе
+  o — остальным
+  x — доступ на исполнение
+  r — на чтение
+  w — на запись
+  To launch a script you must set rights
+    chmode 777 ( <name> | * )
+
+  chown и chgrp - поменять владельца/группу (либо использовать более общую команду setfacl).
+  Текущие права доступа можно посмотреть через ls и getfacl.
+
+Search
+  locate .mkv      | find all video with extension
+  locate libgomp.а | list of pathes to a library
+  whereis vim    | path to a binary
+
+
+Processes
+  ps aux   | often
+  ps w     |
+  ps -la   | curr user
+  ps -ela  | all users
+  ps -a    | basic
+  top
+  pstree
+  <You can avoid ‘ps aux | grep httpd | grep -v grep’
+    by using ‘ps aux | grep [h]ttpd’ .
+
+
+Misc
+  | wc -l | line count
+  | wc -b | size in bytes
+  | uname -a | system info
+  | sudo restart lightdm | restart x-server
+  How to show output on terminal and save to a file at the same time?
+    sudo command -option | tee log
+
+
+Processes manipulate
+  | ./eclipse & | Launch in bckgr
+  | wait [n]    | wait, until background job exits
+
+Redirection
+  Kernell < null
+    http://www.thin.kiev.ua/unix/39-unix/170-archwiki.html
+  Перенаправление потоков вывода и ошибок вместе в файл или конвейер:
+    find / -name .profile > results.txt 2>&1
+    ./scripts/pdrm-build-only.sh 2>&1 | grep "error:"
+
+http://robots.thoughtbot.com/the-unix-shells-humble-if
+http://ingvar.blog.redpill-linpro.com/2007/12/04/associative-arrays-in-bash/
+  http://wiki.bash-hackers.org/scripting/terminalcodes#erasing_text
+** thor ~ $ ** !net executes for me…
+** thor ~ $ ** netstat -ntu | awk '{print $5}' | grep -e ^[0-9]
+http://www.cyberciti.biz/tips/check-unix-linux-configuration-file-for-syntax-errors.html
+
+To find the current values of all your environment variables and functions in
+Unix (https://kb.iu.edu/d/agat) , if you are using the sh, ksh, or bash
+shell (https://kb.iu.edu/d/agvf) , at the prompt, enter:
+  set
+readline -- terminal, vim-insert text manipulation
+  http://cnswww.cns.cwru.edu/php/chet/readline/rluserman.html
+  https://wiki.archlinux.org/index.php/readline#Macros
+sed newline
+  echo "a,b" | sed -e $'s/,/\\\\\n/g'
+  sed 's/, /\r/g' file3.txt > file4.txt

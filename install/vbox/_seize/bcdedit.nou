@@ -1,0 +1,32 @@
+Infinite repair loop solution.
+
+You can use bcdedit to add a second item in the Windows boot manager menu. The
+Windows boot manager then will show you a menu with a list of boot options
+(one for Native boot and one for VBox boot). Each menu item is associated with
+a boot loader entry in the BCD Windows registry.  A boot loader entry can be
+created manually (using bcdedit) or automatically by the repair procedure.  To
+append the new boot loader entry to the menu, you can use
+  [ bcdedit /displayorder {ID} /addlast ]
+ where ID is the GUID of the boot loader entry.
+
+Solve the infinite repair loop problem you can:
+  Boot with VBox and follow automatic repair from Windows Installation DVD.
+This creates the boot loadere entry and makes it the deafult boot option. At
+this point Native boot would not work because the default boot option is not
+applicable to Native boot.
+  Boot again VBox with Windows Installation DVD inserted and choose Repair
+  your Computer/Command Prompt.
+
+  bcdedit
+   you will see the boot manager entry and  the default boot loader entry
+  bcdedit /enum all
+   you will see all the entries. Search a boot loader entry whose device and
+   osdevice properties are set to “unknown” (there can be more than one, if
+   you have used automatic fix many times) and copy its ID.
+  bcdedit /displayorder {ID} /addlast
+   Now you have added a new item to the boot menu.
+  bcdedit
+   you will see one boot manager entry (whose displayorder property
+   now contains two values) and two boot loader entries.
+Optionally, change boot loaders descriptions by using bcdedit.
+  Boot and select the correct boot menu item.

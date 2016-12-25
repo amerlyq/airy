@@ -1,0 +1,39 @@
+% Slides
+  http://www.shallowsky.com/linux/LinuxPresentations.html
+
+pdfpc
+  : I use pdfpc for presentations, i.e., ideally my PDF slides are shown in
+  : full screen on the projector (VGA1) while the presenters notes are shown
+  : on my laptop display (LVDS1).
+  :
+  : When using pdfpc and i3 with two displays, it does not work as expected.
+  : Either I see only the presenter notes on ONE display and nothing on the
+  : other or I see the full-screen slides on ONE display and nothing on the
+  : other.
+
+ioslides
+  http://rmarkdown.rstudio.com/ioslides_presentation_format.html
+  https://github.com/rstudio/rmarkdown
+
+
+% Terminal slides
+  http://unix.stackexchange.com/questions/131702/is-there-any-cli-terminal-slideshow-app
+  http://www.ngolde.de/tpp.html
+    BUG:(for ruby>2.1) ruby: symbol lookup error: /usr/lib/ruby/vendor_ruby/2.3.0/x86_64-linux/ncurses_bin.so: undefined symbol: rb_thread_select
+    http://www.hecticgeek.com/2012/02/tpp-command-line-text-presentation-ubuntu-linux/
+  https://github.com/jaspervdj/patat
+    $ cabal install patat
+    $ st -f monospace:size=20 -e patat file
+    DEV: can be adapted to .nou by plugin to Pandoc
+      https://hackage.haskell.org/package/pandoc
+      https://hackage.haskell.org/package/pandoc-1.19.1/docs/Text-Pandoc-Readers-Markdown.html
+      http://pandoc.org/MANUAL.html#custom-writers
+  https://github.com/tybenz/vimdeck
+    https://github.com/amerlyq/vimdeck
+    TODO: adapt to .nou format
+  http://tools.suckless.org/sent/
+    USAGE: https://en.wikipedia.org/wiki/Takahashi_method
+      BAD: even with monospace font -- it's ugly for code blocks
+    $ paci sent-git farbfeld
+    $ git clone http://git.suckless.org/sent
+    $ make && ./sent example

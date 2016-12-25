@@ -1,0 +1,88 @@
+> The man page is the complete reference, but it's very long.
+| C-a ? (lists keybindings) | See help
+
+< Getting in
+| screen -S <name> | start a new screen session with  name
+| screen -ls       | list running /screens
+| screen -x        | attach to a  session
+| screen -r <name> | … to session with name
+| screen -d <name> | detach a running session
+                   screen -dRR (Attaches to a screen session. If the session is
+the “ultimate      attached elsewhere, detaches that other display. If no
+attach”            session exists, creates one. If multiple sessions exist,
+                   uses the first one.)
+
+< Escape key
+: All screen commands are prefixed by an escape key, by default C-a (that's
+: Control-a, sometimes written ^a). To send a literal C-a to the programs in
+: screen, use C-a a. This is useful when when working with screen within screen.
+: For example C-a a n will move screen to a new window on the screen within
+: screen.
+
+< Getting out
+| C-a d   | detach
+| C-a D D | detach and logout (quick exit)
+| C-a \   | exit screen and all programs
+| C-a C-\ | force-exit screen (not recommended)
+
+< Window Management
+| C-a c                    | create new window
+| C-a C-a                  | change to last-visited active window
+| C-a <[0-9]>              | change to window by number
+| C-a ' <number or title>  | change to window by number or name
+| C-a n or C-a <space>     | change to next window in list
+| C-a p or C-a <backspace> | change to previous window in list
+| C-a "                    | see window list (allow to select)
+| C-a w                    | show window bar (if you don't have)
+| C-a k (not recommended)  | kill current window
+| C-a \ (not recommended)  | kill all windows
+| C-a A                    | rename current window
+
+<Split screen
+| C-a S          | split display horizontally
+| C-a | or C-a V | split display vertically (for the vanilla vertical screen patch)
+| C-a tab        | jump to next display region
+| C-a X          | remove current region
+| C-a Q          | remove all regions but the current one
+| C-a :resize -h 10
+
+<Misc
+| C-a C-l            | redraw window
+| C-a [ or C-a <esc> | enter copy mode (also used for viewing scrollback buffer)
+| C-a ]              | paste
+| C-a M              | monitor window for activity
+| C-a _              | monitor window for silence
+| C-a C-v            | enter digraph (for producing non-ASCII characters)
+| C-a x              | lock (password protect) display
+| C-a :              | enter screen command
+| C-a H              | enable logging in the screen session
+
+
+<Scripting
+send a command to a named session
+  screen -S <name> -X <command>
+create a new window and run ping example.com
+  screen -S <name> -X screen ping example.com
+stuff characters into the input buffer using bash to expand a newline character (from here)
+  screen -S <name> [-p <page>] -X stuff $'quit\r'
+  e.g.
+  : # run bash within screen
+  : screen -AmdS bash_shell bash
+  : # run top within that bash session
+  : screen -S bash_shell -p 0 -X stuff $'top\r'
+  :
+  : # ... some time later
+  :
+  : # stuff 'q' to tell top to quit
+  : screen -S bash_shell -X stuff 'q'
+  : # stuff 'exit\n' to exit bash session
+  : screen -S bash_shell -X stuff $'exit\r'
+
+  One-by-one
+  : screen -AmdS myscr -p 0 bash
+  : screen -S myscr -X stuff $'./level03 & kill -STOP $!\r'
+  : screen -S myscr -X split
+  : screen -S myscr -X focus
+  : screen -S myscr -X command c
+  : screen -S myscr -X stuff $'gdb ./level03 -p '
+  : screen -S myscr -r

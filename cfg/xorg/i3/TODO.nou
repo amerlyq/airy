@@ -1,0 +1,157 @@
+i3
+  Replace with Xmonad
+    http://www.linuxandlife.com/2011/11/how-to-configure-xmonad-arch-linux.html
+
+FEATURES
+  [_] Advanced kill -- kill only most-foreground process (like vim) not
+      touching underlying zsh and urxvt.
+  2015-09-07 [X] Launch shell/ranger in cwd of any current focused most foreground process.
+    := Port function from my urxvt plugin focus-cwd.
+    := Use mCd+u
+  [_] mod+Tab must toggle between last two windows on one wksp?
+    := For simplicity of mark&go feature
+  [_] Interesting solution with dmenu
+    http://surf.suckless.org/files/quick_search
+  [_] SEE wmctrl
+    http://stackoverflow.com/questions/2250757/is-there-a-linux-command-to-determine-the-window-ids-associated-with-a-given-pro
+
+> All abilities are primarily in submenus -- and only often used are duplicated to simple shortcuts
+  [_] list keysym mappings for i3
+    [X] list global used
+    [X] list unused
+    [_] list tree for all modes
+  [_] i3 save markers between sessions -- fast mappings on shortcuts
+    [_] use mod+s for fixed named markers (vim, ranger, firefox, etc)
+    [_] mSd+s must understand which type of window it's on, and change appropriate shortcut to this window
+    [_] mCd+s will launch app even if there is one exist
+  [_] i3 copyq shortcuts, and remove copyq own shortcuts
+    [_] debug copyq-edit()
+    [X] copyq default floating
+    : xclip -o > /tmp/xclipboard && $EDITOR /tmp/xclipboard
+      [_] BUG: moving by one pixel each time i'm opening it
+  2015-03-19 [X] i3 separate ./dmenu directory
+    2015-03-19 [X] move launching dmenu from i3 to script in that dir
+    2015-03-19 [X] same do for dbus lang changing
+  2015-03-19 [X] additional desktops
+    2015-03-18 [X] use 'grave' as 0 workspace for scratch monitoring
+    2015-03-18 [X] use 'minus, equal' monitors as 11,12
+    2015-03-19 [X] temporarily don't skip mCS+[789] for lang chg, but create possibility
+  [_] container settings
+    fast 1,2,3 sizes for window
+  [_] wrksp settings
+    2015-03-17 [X] toggle bar
+    [_] change layout on predefined (current -- left half, others -- right column, etc)
+    [_] focus one of unnumbered (named) workspaces
+    2015-03-18 [X] rename wrksp
+    [_] choose/highlight all windows
+    [_] detach all as floating desktop
+    [_] save/load layout
+    [_] kill all windows
+  [_] Disallow using mSd+[hjkl] for floating detached desktops from several windows
+    -> better case would be moving them inside floating window only, without re-attaching to tiled
+  [_] Launching prs from empty screen -- use i3-ipc?
+    : need event of choosing dsktp -- and sending mod+o to it if empty)
+    : many of other shortcuts must do 'mode default' before execution
+  [_] Split on mSd+[nm] must move to right/below? window and merge them
+  2015-03-18 [X] m..+U must point split and then create window
+  [_] mSd+[,./] must make such layout for all windows on workspace
+  [_] mCd+f -- must focus to fullscreen window -- but which if many?
+  [_] mCS+[0-9] must move all windows from specified desktop to current
+  [_] mCd+semicolon must focus deepest child, mCS -- all of parents chain only?
+  2015-04-04 [X] mCS+backslash -- as kill -SIGKILL $pr
+  [_] mCd,mCS +[hjkl] -- choose from two possible cases
+    [$] move window to another output
+    : (+) comfortable, (-) not consistent with ]/[, not too frequent ops
+    [X] detach/attach (float) window from tiled and move to screen corner
+    : more logical, but need absolute positioning for floats
+      [_] optionally change size of window to predefined size ((1/4 - 2/25)*screen)
+      : by another 'Edit' shortcut or automatically when moving
+    [_] advanced float tiling: use '~/.i3/ext/move_by_grid 3:22' or 2:11
+    : precaching results from xrandr in /tmp : not needed: use xrandr -q -current
+    : detecting current output
+  [_] Make several setter scripts (xev, xprop) launching from i3 shortcuts dev menu
+  [_] Cut too long song names when showed on i3bar -- otherwise there are artefacts
+  [_] Consolidate: $mod open or focus to app if already opened, or open copy if $mSd
+    Consider: ncmpcpp, firefox, pidgin("Buddy list"), gvim
+    [_] key to hide in scratchpad (hide only, not toggle)
+    [_] loop through unmarked windows in scratchpad
+    [_] overlay to show which window has which mark
+    [_] focus to last opened window
+    : maybe key press must ressurect notify with mark
+    : or mark always showed on bar as two letter/number
+    : I can use separate top bar for debug information like in Unity:
+    : window header, scratch headers, their marks, etc
+  2015-03-18 [X] try menu inside menu (use for Open)
+  [_] run/autostart on specified workspace and start on 1
+  2015-03-24 [X] border -- instead '1pixel' do 'border pixel $s_border'
+    : can't set for 'border toggle' -- only direct mappings
+    2015-03-24 [X] Create submenu for borders
+  [_] organize scripts as bash filter functions which use same output of
+    i3-msg -t get_tree | jshon | tee >(pbcopy) >(do_stuff) >(do_more_stuff) | grep errors
+  [_] use 0 wrksp as own scratch desktop -- moving wnds back and forth
+  [_] generate 'ignore' complementary keys on wmode_end
+    parse end of written dst file, create complementary list to received
+    from get_available_keys, identical shortcuts to message 'not implemented'
+  [$] auto disable border if window is only one?
+    : there is fullscreen for this
+  [_] Toggle container horizontal autoexpanding (like Mod4+e+[1-4]) when focus
+    : depends on focus events from ipc
+  [_] BUG: when disable/enable HDMI monitor and updated xrandr, i3wm output
+    rect (i3-msg -t get_outputs) shows smaller resolution than actual display
+  2015-03-11 [X] Dont poweroff i3wm if scratchpad isn't empty
+    [_] Allow force closing in i3-input
+  [_] Additional informational bar on the top
+    [_] hidden by default, but when opened, ncmpcpp must migrate onto it
+
+
+i3
+  [_] Help-overlay with lior through dzen2 on $mod+Control+F1
+  [_] fix: make somehow do not wrap left-right containers, sticking to borders
+   it will help to straight focus into wished window
+  [_] Make autoresizing windows (add resize command to focus)
+   Principle: when you focus up, it's height increases by some value
+   when focus down, it will decreses and then the height of bottom window
+   will be increased (as gradient). May be inconvinient -- when all wds are
+   normal sized  (2x2) -- it's undefined which are the larger (needs relative layout data).
+  [_] Make warps -- one-button switcher between two (or more) wdws
+  [_] Make one more bar (hidden), which will show some system info on appear?
+  [_] Dunst/i3-notify on screenshot instead of sound (aplay -qN ~/.i3/screenshot.wav)!
+  [_] Intergrate scripts into i3blocks
+    https://blog.deimos.fr/2014/04/21/i3block-alternative-status-bar-for-i3-my-contributions/
+  [_] Todo signal to update bar on udev: flash/headphones/charging insert,
+  [_] Investigate
+    https://github.com/ultrabug/py3status
+    # https://github.com/lee-/i3-bw or use bmon in a scratch terminal
+    # status_command /home/michieljoris/.i3/i3-bw 5 /sys/class/net/wlan0/statistics/rx_bytes /sys/class/net/wlan0/statistics/tx_bytes
+
+  < This will not get you auto-mount and a logout button in the bar.
+  However, the first is managed by udev/udisks(2)
+    https://wiki.archlinux.org/index.php/Udev#UDisks
+
+  Think about workflows
+   One of possible: open all needed windows, tag it and straight-jump.
+  Autorenaming workspaces into
+    #:name_of_focused~all_amount
+    : There are how to do subscription on events in Python
+    :  https://github.com/ziberna/i3-py
+    : This will help to map empty wksp, chging launch regime on event:
+  Launch on empty desktop
+    Auto enter in this regime
+    Press only one key to launch
+  [$] Layouts -- can't make to work (shell scripts with i3-msg are better)
+    i3-save-tree --workspace 2:home > ~/ss.json
+    vim ~/ss.json | uncomment lines in swallow section
+    i3-msg "workspace number 2; append_layout $HOME/ss.json"
+  [_] Make default wksp names file, to reset names when needed
+  [_] Fast choose of window, based on [{uio},{jkl},{m,.}] layout (numpad analogue)
+  See forum. There are many interesting things:
+    https://faq.i3wm.org/questions/scope:all/sort:activity-desc/page:2/
+  Plugins
+    https://github.com/enkore/j4-dmenu-desktop
+    https://github.com/proxypoke/quickswitch-for-i3
+  [_] dunst
+    make notifications when marking windows, or see all available marks
+  Gallery
+    http://www.linux.org.ru/tag/i3
+  [_] % Tips
+    https://faq.i3wm.org/question/4323/force-i3-to-use-only-one-monitor-mac-os-x/

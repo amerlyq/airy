@@ -1,0 +1,99 @@
+TODO:
+  http://www.ict.griffith.edu.au/anthony/info/shell/
+  >> http://matt.might.net/articles/sculpting-text/
+
+-------------------------------------------------------------------------------
+Match string  "foo"  which is not followed by string  "bar"
+
+[1]    ^foo$            match
+[2]    ^foobar$         NOMATCH
+[3]    ^foo foobar$     match first foo
+[4]    ^fooba$          match
+[5]    ^abc foobar$     NOMATCH
+
+The complexity of this problem is that no programs seem to have RE's that
+don't match a group of characters. Thus a program with RE's and conditionals
+is required to do this.
+
+Perl 5 has such a negitive match EG: /foo(?!bar)/
+construct (?X..)  where X is a control with the following meanings
+  :   just match
+  =   lookahead match
+  !   lookahead negation
+  #   comment (legible regepxs at last)
+  a-z embedded option (like /i)
+
+There are problems however
+   should   'foo(?!ba.*r)bar'
+   match    'foobazbar'
+
+Once you use constructs like "*" inside a negative pattern, it often
+gets complicated to figure out what the pattern really means.  But
+perhaps we can still have negative patterns as long as we specify some
+restrictions as to the interpretation or even use of things like "*"
+inside those patterns.  ... ???
+                     Lloyd Zusman <ljz@panix.com>
+
+Solutions:
+
+sed 'h
+   s/foobar/+/g
+   /foo/!d
+   g'                     David W. Tamkin <dattier@MCS.COM>
+
+egrep 'foo$|foob$|fooba$|foo[^b]|foob[^a]|fooba[^r]'
+NOTE: this solution quickly becomes unwieldy if the
+`bar' part becomes longer, to put it mildly.  So in a practical rather
+than a theoretical sense, Lloyd is absolutely right.
+                Harald Hanche-Olsen <hanche@imf.unit.no>
+
+-------------------------------------------------------------------------------
+Match Delimited Text
+|> The input file has a declaration something like the following with
+|> several comments in a single line:
+|>
+|>    input a, b, /* comment  */ c, /* comment ******************* */ d;
+|>
+|> I need to delete the comments in between and write the declaration as
+|>
+|>    input a, b, c, d;
+|>
+|> NOTE: the c, must not be deleted.
+
+It's a standard match-delimited-text problem, and the general solution is:
+
+  1: match the opening delimiter
+  2: match stuff that's not the closing delimiter
+  3: match the closing delimiter
+
+In this case, the opening delimiter is "/*" so the regex is "/\*".
+The closing delimiter is "*/", so that regex is "\*/".
+
+Stuff that's not the closing delimiter would be
+    A) anything that's not /                  (regex "[^/]" )
+   and  B) any / so long as it has no * before it (regex "[^*]/")
+
+Combining them with an indication to say "as much as is there", we get:
+
+    ([^/]|[^*]/)*
+
+So the whole regex, wrapped in some perl, would be:
+
+                 s#/\*([^/]|[^*]/)*\*/##g;
+part number from above:          111222222222222233
+
+Note that there's another way to conceptually look at the "stuff not the
+closing delimiter". That'd be:
+    A) anything not a *   (regex "[^*]")
+   and  B) any * so long as it's not followed by a / (regex "\*[^/]")
+
+That would lead to
+    s#/\*([^*]|\*[^/])*\*/##g;
+
+However, since the "\*[^/]" eats a character, it could eat the third * in
+the string "/* commet **/" and we'd wedgie the regex and it wouldn't match.
+The first way described above only eats characters we've already had a
+chance to check aren't the ending, so it won't wedgie.
+                 Jeffrey Friedl  <jfriedl@nff.ncl.omron.co.jp>
+
+-------------------------------------------------------------------------------

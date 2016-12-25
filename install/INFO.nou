@@ -1,0 +1,107 @@
+Dump boot msgs
+  Screen after login
+    sudo setterm -dump 1 -file tty1.log
+  journalctl /usr/lib/systemd/systemd -b
+
+USB keyboard for boot and grub:
+  : My USB legacy support was set to 'Auto'. I remember switching it to
+  : 'Enabled' previously. Somehow it was switched back to Auto. So I changed
+  : it to Enabled and everything went running smoothly. I can now enter bios
+  : settings and also choose OS from the Grub OS list
+
+  : However the bios setting for "Fast Boot" had additional setting for usb
+  : support, which was disabled (implying usb will only become available
+  : after os loads). Changing it to Partial (usb with keyboard and mouse
+  : available) or Full Initialization (Full Support of all usb devices at
+  : any time) solved the problem.
+
+  : It has been currently set to Partial Initialization to get some balance
+  : between boot speed and minimal support needed.
+
+
+From grub2 loop iso
+  menuentry "ArchLinux ISO" {
+    loopback loop (hd0,3)/iso/arch.iso
+    linux    (loop)/boot/vmlinuz26 findiso=/iso/arch.iso lang=en locale=en_US.UTF-8 archisolabel=ARCHISO_KE1AECIE ramdisk_size=75%
+    initrd   (loop)/boot/archiso_pata.img
+    boot
+  }
+  menuentry "Arch Net Install Try" {
+    set isofile="/archlinux-2011.08.19-netinstall-i686.iso"
+    loopback loop (hd0,3)$isofile
+    linux (loop)/arch/boot/i686/vmlinuz archisolabel=ARCH_201108 img_dev=/dev/sdb3 img_loop=$isofile earlymodules=loop
+    initrd (loop)/arch/boot/i686/archiso.img
+  }
+
+SEE: docs with possible entries to boot archiso
+  https://github.com/djgera/archiso/tree/master/docs
+  https://patchwork.archlinux.org/patch/573/
+
+-menuentry "Arch Linux (x86_64)" {
+-    set isofile="/<TARGET-PATH>/archlinux-<YYYY>.<MM>.<DD>-<ARCH>.iso"
+-    loopback loop (hd<D>,<P>)$isofile
+-    linux (loop)/arch/boot/x86_64/vmlinuz archisolabel=<FS-LABEL> img_label=<TARGET-FS-LABEL> img_loop=$isofile
+-    initrd (loop)/arch/boot/x86_64/archiso.img
+-}
+  menuentry "Arch64iso" --class iso {
+    set isofile="/amer/VMs/_res/archlinux-2015.06.01-dual.iso"
+    loopback loop (hd0,msdos7)$isofile
+    linux (loop)/arch/boot/x86_64/vmlinuz archisolabel=ARCH_201506 img_dev=/dev/sda7 img_loop=$isofile
+    initrd (loop)/arch/boot/x86_64/archiso.img
+  }
+
+Display partitions known to GRUB.
+  ls
+Display the contents of the / folder on /dev/sdXY
+  ls (hdX,Y)/<Tab>
+To mount an ISO via the GRUB terminal, determine the location/path of the ISO file, then:
+  loopback loop (hdX,Y)/<path>/<filename.iso>
+  : loopback loop (hd0,5)/my_isos/ubuntu-12.04-desktop-amd64.iso
+Once mounted via the above command, the ISO can be inspected using the ls
+command. The ISO will be mounted on "(loop)".
+  ls (loop)/
+  ls (loop)/casper
+On an Ubuntu ISO, this should display vmlinuz and initrd.img, among other files.
+
+
+
+
+
+>>> Cool filesystems
+mtpfs: mounting MTP devices like Creative Zen music players
+adbfs-git — Mount an Android device filesystem.
+  http://collectskin.com/adbfs/ || adbfs-gitAUR
+  := exchange with android
+virtualbox-fuse:virtualbox-fuse allows mounting of Virtualbox VDI images
+vdfuse — Mounting VirtualBox disk images (VDI/VMDK/VHD).
+  https://github.com/muflone/virtualbox-includes || vdfuseAUR
+zipfs: read/write archive
+  := use it for /Umi/Dev-Linux/userscript-master.zip
+
+xmlfs — Mount XML files as directory tree.
+  https://github.com/halhen/xmlfs || xmlfsAUR
+GmailFS: Filesystem which stores data as mail in Gmail
+GDriveFS A filesystem-bridge to a Google Drive account.
+copy-fuse:
+  A Python FUSE layer for accessing files stored on Copy.com.
+  := setup fileexchange when server offline
+CloudFusion
+  Linux file system (FUSE) to access cloud storages like Dropbox, Sugarsync,
+  Amazon S3, Google Storage, and Google Drive. Also supports WebDAV.
+PNGDrive:
+  A FUSE filesystem that claims to secretly store your files within images.
+  You can specify a bit mask and a password, the data will then be encrypted
+  and then stored inside the image.
+dbfs:
+  The Oracle Database File System (DBFS) creates a standard file system
+  interface on top of files and directories that are stored in database
+  tables.
+VolatileFS: A commercial RAM disk using FUSE
+  := check is it better than tmpfs
+SoundCloudFS:
+  An open source filesystem that allows Linux systems to mount SoundCloud
+  streams so that they can be opened with the user's own choice of software.
+
+
+OpenWrt
+    http://www.jauu.net/2015/03/03/complete-openwrt-guide/

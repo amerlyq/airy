@@ -1,0 +1,70 @@
+DEBUG
+  Last full boot/shutdown log, which you can't access in other way
+    journalctl -b -1 -n20
+  You can see what takes the most time
+    strace startx
+    : Try strace with the -f switch, as it will record the child processes
+    : too. Also, use -v for a more detailed output. And log the output to
+    : a file using -o <filename>
+  > SEE https://wiki.archlinux.org/index.php/General_troubleshooting#Session_permissions
+    : how to debug kernel modules, hardware, etc
+    : CHECK: maybe I could find problem of alsa audio?
+  Check times
+    lastlog
+  Check memory faults
+    http://www.cyberciti.biz/faq/linux-how-do-i-find-out-causes-for-memory-faults/
+
+Fancontrol
+    Switch to manual/max speed
+        $ pwmconfig
+
+BUG
+  https://github.com/systemd/systemd/issues/1961
+
+SEE
+  https://wiki.archlinux.org/index.php/improve_boot_performance
+  https://wiki.archlinux.org/index.php/maximizing_performance
+
+Cases
+  * I faced exactly the same and realised that it was related to the use of
+  a too large cache tmpfs on a conventional HDD which was synced by a
+  profile sync daemon. I disabled the cache tmpfs and now it starts up again
+  instantly.
+
+Ubuntu
+  service --status-all
+
+Disk monitor
+  https://dev.yorhel.nl/ncdu
+    https://github.com/guns/ncdu
+
+
+UEFI Boot Windows by shortcut
+  https://bbs.archlinux.org/viewtopic.php?id=140049
+
+OPTIMIZE Boot time
+  [_] Boot time (both kernel and bootloader)
+  : http://events.linuxfoundation.org/sites/events/files/slides/12%20Lessons%20Learnt%20in%20Boot%20Time%20Reduction.pdf
+  : https://wiki.archlinux.org/index.php/Improve_boot_performance
+    check time
+    : systemd-analyze
+    measure data read (See at 7th column):
+    : cat /proc/diskstats
+    Use compression?
+    Maybe XFS would be best as for init+mount+r/w time?
+    Utilize 100% I/O and CPU on boot
+    Focus on delays -- enable logs and watch
+    'quiet' to disable printing
+    : perf, oprofile, strace, bootchart
+    : https://wiki.archlinux.org/index.php/Bootchart
+    E4rat
+      https://wiki.archlinux.org/index.php/Ext4#Tips_and_tricks
+      : E4rat is a preload application designed for the ext4 filesystem. It
+      : monitors files opened during boot, optimizes their placement on the
+      : partition to improve access time, and preloads them at the very
+      : beginning of the boot process. E4rat does not offer improvements
+      : with SSDs, whose access time is negligible compared to hard disks.
+  [_] Dracut -- gen minimal initramfs -- faster boot time
+    http://www.techradar.com/news/software/operating-systems/what-on-earth-is-dracut-1078647
+    > https://web.archive.org/web/20150430223035/http://archlinux.me/brain0/2010/02/13/early-userspace-in-arch-linux/
+      : initramfs history and ideas

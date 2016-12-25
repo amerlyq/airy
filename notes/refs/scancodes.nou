@@ -1,0 +1,67 @@
+sed for css tables
+ cat scancodes1.html | sed -n 's|.*<center><tt>\(.*\)</tt>.*|\1|p' | sed '3,$!d'| sed 's/ /_/g' | sed "s/'/S_QUOTE/" | sed 's/\\/\\\\/;s/\//\\\//' | xargs | sed 's/\(\S\+\s\S\+\s\S\+\s\S\+\s\S\+\s\S\+\s\S\+\s\S\+\s\S\+\s\)/\1\n/g' > scancodes.otl
+ cat scancodes1.html | \w3m -T text/html > scan.txt   ## More simple, more quality
+
+101-, 102-, and 104-key keyboards:
+  A   1E   9E   9        0A         8A             [         1A      9A
+  B   30   B0   `        29         89             INSERT    E0,52   E0,D2
+  C   2E   AE   -        0C         8C             HOME      E0,47   E0,97
+  D   20   A0   =        0D         8D             PG_UP     E0,49   E0,C9
+  E   12   92   \        2B         AB             DELETE    E0,53   E0,D3
+  F   21   A1   BKSP     0E         8E             END       E0,4F   E0,CF
+  G   22   A2   SPACE    39         B9             PG_DN     E0,51   E0,D1
+  H   23   A3   TAB      0F         8F             U_ARROW   E0,48   E0,C8
+  I   17   97   CAPS     3A         BA             L_ARROW   E0,4B   E0,CB
+  J   24   A4   L_SHFT   2A         AA             D_ARROW   E0,50   E0,D0
+  K   25   A5   L_CTRL   1D         9D             R_ARROW   E0,4D   E0,CD
+  L   26   A6   L_GUI    E0,5B      E0,DB          NUM       45      C5
+  M   32   B2   L_ALT    38         B8             KP_/      E0,35   E0,B5
+  N   31   B1   R_SHFT   36         B6             KP_*      37      B7
+  O   18   98   R_CTRL   E0,1D      E0,9D          KP_-      4A      CA
+  P   19   99   R_GUI    E0,5C      E0,DC          KP_+      4E      CE
+  Q   10   90   R_ALT    E0,38      E0,B8          KP_EN     E0,1C   E0,9C
+  R   13   93   APPS     E0,5D      E0,DD          KP_.      53      D3
+  S   1F   9F   ENTER    1C         9C             KP_0      52      D2
+  T   14   94   ESC      01         81             KP_1      4F      CF
+  U   16   96   F1       3B         BB             KP_2      50      D0
+  V   2F   AF   F2       3C         BC             KP_3      51      D1
+  W   11   91   F3       3D         BD             KP_4      4B      CB
+  X   2D   AD   F4       3E         BE             KP_5      4C      CC
+  Y   15   95   F5       3F         BF             KP_6      4D      CD
+  Z   2C   AC   F6       40         C0             KP_7      47      C7
+  0   0B   8B   F7       41         C1             KP_8      48      C8
+  1   02   82   F8       42         C2             KP_9      49      C9
+  2   03   83   F9       43         C3             ]         1B      9B
+  3   04   84   F10      44         C4             ;         27      A7
+  4   05   85   F11      57         D7             '       28      A8
+  5   06   86   F12      58         D8             ,         33      B3
+  6   07   87   PRNT_SCR E0,2A,E0,37 E0,B7,E0,AA   .         34      B4
+  7   08   88   SCROLL   46         C6             /         35      B5
+  8   09   89   PAUSE    E1,1D,45   -NONE-
+
+ACPI Scan Codes:
+  Key   Make Code   Break Code
+  Power   E0, 5E  E0, DE
+  Sleep   E0, 5F  E0, DF
+  Wake  E0, 63  E0, E3
+
+Windows Multimedia Scan Codes:
+  Key_Make         Code   Break_Code
+  Next_Track       E0,19  E0,99
+  Previous_Track   E0,10  E0,90
+  Stop             E0,24  E0,A4
+  Play/Pause       E0,22  E0,A2
+  Mute             E0,20  E0,A0
+  Volume_Up        E0,30  E0,B0
+  Volume_Down      E0,2E  E0,AE
+  Media_Select     E0,6D  E0,ED
+  E-Mail           E0,6C  E0,EC
+  Calculator       E0,21  E0,A1
+  My_Computer      E0,6B  E0,EB
+  WWW_Search       E0,65  E0,E5
+  WWW_Home         E0,32  E0,B2
+  WWW_Back         E0,6A  E0,EA
+  WWW_Forward      E0,69  E0,E9
+  WWW_Stop         E0,68  E0,E8
+  WWW_Refresh      E0,67  E0,E7
+  WWW_Favorites    E0,66  E0,E6

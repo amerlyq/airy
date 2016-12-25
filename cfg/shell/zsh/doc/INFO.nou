@@ -1,0 +1,80 @@
+> Very Cool Man
+  http://www.rayninfo.co.uk/tips/zshtips.html
+  http://www.bash2zsh.com/
+Banks
+  https://github.com/sorin-ionescu/prezto
+
+Tips
+  Structural organizing and aliases
+    https://justin.abrah.ms/dotfiles/zsh.html
+
+Auto-suggests processes to kill or options
+  kill <tab> || kill chr‹tab›↓↓
+  git <tab>
+Remote scp suggestions
+ It will only work if you’ve password-less access to the remote, i.e. when
+ you’ve pre-shared rsa/dsa keys.
+  scp root@192.168.2.20:‹tab›‹tab›↓→
+  scp sir:~/<tab>
+Known SSH hosts
+ Zsh will suggest usernames & hosts based on where you’ve previously sshed to.
+  ssh ro‹tab›10‹tab›‹tab›‹tab›↓→
+Filesystem navigation
+  /‹tab›‹tab›↓→
+  Expansion
+    cd /u/lo/b <tab>
+  Replacing in last cd
+    cd bin share
+  Batch renaming
+    zmv '(*).txt' 'tmp_$1.html'
+  $PATH <tab>
+  Alt-/ to move through argument history
+Arguments/switches completion
+  nmap -‹tab›‹tab›↓
+    More completion
+     https://github.com/zsh-users/zsh-completions/tree/master/src
+Read-only vars
+  http://unix.stackexchange.com/questions/66627/is-there-anyway-to-set-a-readonly-environment-variable
+
+Globbing
+  Open anywhere in hierarchy
+    cat **/*.css | grep '#rule'
+
+Search definitions
+  alias | sed -r 's/^([^=]+)=.*/\1/' | while read a; do whence -va "$a"; done
+
+zsh-syntax-highlighting on command line
+  cd ~/.oh-my-zsh/custom/plugins
+  git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
+  # define where custom plugins live:
+  ZSH_CUSTOM=~/.oh-my-zsh/custom/
+  # Make sure plugins section contains zsh-syntax-highlighting:
+  plugins=(history-substring-search zsh-syntax-highlighting)
+
+> SEE more at
+: http://zsh.sourceforge.net/Doc/Release/Expansion.html#Expansion
+ls -l *(.L-50)    # list file size less than 50 bytes (the . ignores directories)
+ls -l *(Lm+50)  # list file size larger/greater than 50 mb
+ls -l *(m1)       # list files modified exactly 1 day ago
+ls -l *(.m4)      # as above but ignoring the directory.
+ls -lt  **/*.py(.om[1,20]) # list 20 newest python (.py) files anywhere in directory hierarchy
+
+
+ZSH ##  Switch to Zsh as Your Shell
+ Most come up using Bash as I did, and have to be shown the merits of another
+ shell. After having multiple people rave about it I gave it a chance and
+ haven’t gone back. Some features:
+  * Expand [remote] paths ` ve/pl/re --> vendor/plugins/redmine `
+  * Expand variables: ` $PATH --> /your/full/path `
+  * Intelligent correction: ` /pbulic/html ` becomes ` /public/html `
+  * Spelling correction
+  * Shared command history across running shells
+  * Highly themable prompts
+  * Most of your Bash configuration will work seamlessly
+  * Can emulate Bash when run as /bin/sh
+  * Supports vim mode commands
+  * [ OhMyZsh ](https://github.com/robbyrussell/oh-my-zsh) support
+ The last one is critical, as _ ohmyzsh _ makes using the shell an absolute
+ pleasure by including a massive number of plugins (rails, git, OS X, brew,
+ etc.), over 80 terminal themes, and an auto-updater. Definitely [ give it a
+ try. ](https://github.com/robbyrussell/oh-my-zsh)

@@ -1,0 +1,41 @@
+SEE:
+  REF
+    http://radare.org/r/
+    http://radare.org/r/pics.html
+    http://radare.today/page/3/
+    > http://radare.today/visual-mode/
+    >> http://phrack.org/issues/66/14.html
+  EXPL
+    http://dukebarman.pro/na-radare-kak-na-ladoni/
+    https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
+  Cheetsheets
+    https://github.com/pwntester/cheatsheets/blob/master/radare2.md
+
+Usage
+  > e asm.syntax = att
+  See mips
+    radare2 -A -a mips ./libsome.so
+  Reopen
+    oo
+  Info on cmd
+    rasm2 -w <cmd>
+    rasm2 -a mips -b32  -d 27586001
+    radare2 -a mips -b32 file.bin
+  Demangle
+    e asm.demangle = true
+    e bin.demangle = true
+    : You can grep through the output for all the vars that have the pattern demangle with
+    > e??~demangle<Tab>
+    Individual demangle
+      iD cxx _ZNSo3putEc
+  Shift section vma
+    (gdb) info files
+    [r2]> S 0x0003ef70 0x2c0e5f70 0x6a4a0 0x6a4a0 .text r-x
+  Map region as function '_clean'
+    af _clean 0x2c0eb104
+    pdf@_clean
+  Disasm
+    radare2 -c 'aa;pdf@main' ./level09
+  Analyze stack
+    ad@esp
+    pxw@esp
