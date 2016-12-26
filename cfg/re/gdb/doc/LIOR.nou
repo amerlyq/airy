@@ -2,21 +2,24 @@ Show data
 | info  | showing things about the program being debugged
 | show  | showing things about the debugger
 | print | print value of expression
-| x   | examines memory at specified address
+| x     | examines memory at specified address
+
+set language <Tab>
+  shows all conventions, supported by gdb = all compilable langs
 
 Code sources
-  Simple
+% Simple
   | l | list  | list next 10 lines
   | list -    | list previous 10 lines
   | list 101  | list 10 lines around line 101
   | list 1,10 | list lines 1 to 10
   | list main | list lines around function
-  Complex
-  | info line 22      | print addresses for object code for line 22
+% Complex
+! | info line 22      | print addresses for object code for line 22
   | info line *0x2c4e | print line number of object code at address
   | list *0x22e4      | list source at address
   | list basic.c:main | list from another file basic.c
-  Directory
+% Directory
   | cd dir          | change current directory to \fIdir\fR
   | pwd       | print working directory
   | dir dirname       | add directory to source path
@@ -51,9 +54,15 @@ Print
 | p ::gx        | force scope to be global
 | p 'basic.c'::gx  | global scope in named file (>=4.6)
 | p array[i]@count | artificial array - print array range
+  E.G. p *&a[550]@4 -- print from array or std::vector elements 550..553
+  ALT: p (int[1024]) *ptr (BUT: does not work for 'operator[]')
+  AKT: p {CObject*} (($node = *$node) + 8) -- poor man loop to traverse std::list on <Enter>
 | p/x &main     print address of function
 
 | printf "%08X\n", i
+
+Pipe
+| !cmd | shell cmd | execute 'cmd', no catch
 
 Breakpoints
 | b  func       | Function
@@ -146,7 +155,8 @@ RE
   | x/5i $pc        | Process counter -- disas 5 current instructions
   | x/10xb main     | Inspect instruction bytes of main function in hex
   | x/10w           | Stack -- 10 elems of 4 bytes with addresses
-  | x/10gax $rsp    | Stack -- 8 bytes words (giantic)
+  | x/10gax $rsp    | Stack -- 8 bytes words (gigantic)
+  | p $_ and p $__  | Print addr/mem of last examined unit (1/2/4/8 bytes)
   | x/gf  &gd1      | print double on address
   | x/5i 0x0804844a | Disasm memory of stack by address
   | x/s  0x080484f0 | String by address
@@ -159,6 +169,7 @@ RE
   | disass $pc-32, $pc+32 | scope of current executed code
   | si, ni | stepi, nexti | move in machine instructions
   | i reg  | info [all-]registers |
+  | i reg eax | info [all-]registers eax |
 > | i f    | info current frame |
   Show registers
     info registers

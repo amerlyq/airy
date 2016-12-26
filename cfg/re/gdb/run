@@ -1,0 +1,12 @@
+#!/bin/bash -e
+# TODO: depend on ./.gdbinit where you set all necessary file, core, directories, etc
+
+# -ex "layout regs" -ex "layout asm" -ex "b *0x4006b5"
+
+args=( "${GDB:-gdb}" -q )
+for ex in "$@"; do args+=( -ex "$ex" ); done
+
+# TRY: using fd=3 as file for logging -- must be opened before usage == redirect into stdout ?
+# BUT: wtf with fd in chroot ?
+
+exec "${args[@]}"

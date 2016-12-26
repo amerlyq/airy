@@ -10,8 +10,11 @@ SEE:
     https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
   Cheetsheets
     https://github.com/pwntester/cheatsheets/blob/master/radare2.md
+  SEE There are also sdb!
+    ? https://github.com/radare/radare2/tree/master/shlr/sdb
 
-Usage
+
+%% USAGE
   > e asm.syntax = att
   See mips
     radare2 -A -a mips ./libsome.so
@@ -39,3 +42,21 @@ Usage
   Analyze stack
     ad@esp
     pxw@esp
+
+
+%% Coredump
+  https://github.com/radare/radare2/issues/152
+  https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
+
+
+  TRY: connecting radare2 to gdbserver ALSO use gdb as gdb server
+    https://github.com/radare/radare2/issues/217
+    http://sourceware.org/gdb/onlinedocs/gdb/Server.html
+    http://sourceware.org/gdb/onlinedocs/gdb/Connecting.html
+
+  REF
+    https://2016.hack.lu/
+    http://archive.hack.lu/2015/
+      http://archive.hack.lu/2015/radare2-workshop-slides.pdf
+    https://radare.gitbooks.io/radare2book/content/introduction/basic_debugger_session.html
+    http://radare.today/posts/using-radare2/

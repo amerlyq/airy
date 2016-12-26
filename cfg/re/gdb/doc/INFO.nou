@@ -28,7 +28,6 @@ Variables / examine data
 
 SEE
   http://www.csee.umbc.edu/portal/help/nasm/nasm.shtml
-  http://www.yolinux.com/TUTORIALS/src/dbinit_stl_views-1.03.txt
 
 Book & Man
   http://www.cs.rit.edu/~csci243/resources/gdb.pdf
@@ -38,8 +37,32 @@ Ref
   https://sourceware.org/gdb/current/onlinedocs/gdb/
   http://www.gnu.org/software/gdb/documentation/
 
+Env vars (python only)
+  http://stackoverflow.com/questions/9814185/how-to-access-environment-variables-inside-gdbinit-and-inside-gdb-itself
 
-Extending
+SEIZE Init
+  ++ https://github.com/gdbinit/gdbinit
+  https://github.com/gdbinit/hydra
+  http://mammon.github.io/gdb_init.txt
+
+
+%% CLI Front-ends
+  +++ pwndbg
+    https://github.com/pwndbg/pwndbg
+      https://github.com/pwndbg/pwndbg/blob/master/FEATURES.md
+  ++ gef -- peda-ng (cross-platform)
+    https://github.com/hugsy/gef
+  gdb peda -- colored frontend for gdb
+    https://github.com/longld/peda
+    http://ropshell.com/peda/
+  ++ voltron -- extension with separate views
+    https://github.com/snare/voltron
+  mona.py -- win extension for reversing
+    https://www.corelan.be/index.php/2011/07/14/mona-py-the-manual/
+    https://github.com/corelan/mona
+
+
+%% Extending
   Composition, Python, Aliases
    http://www.univ-orleans.fr/sciences/info/ressources/webada/doc/gnat/gdb_24.html
    https://docs.python.org/devguide/gdb.html
@@ -54,6 +77,30 @@ Extending
       (gdb) set history save on/off
       (gdb) show history
       (gdb) show commands
+
+  Catch output
+    file
+      http://www.univ-orleans.fr/SCIENCES/INFO/RESSOURCES/webada/doc/gnat/gdb_24.html
+      http://stackoverflow.com/questions/6885923/redirecting-stori%E2%80%8C%E2%80%8Bng-output-of-shell-i%E2%80%8C%E2%80%8Bnto-gdb-variable
+    mkfifo
+      + TRY: -- open /tmp/gdb.$PID into fd=&3 for whole _this_ gdb session
+      http://stackoverflow.com/questions/8410439/how-to-avoid-echo-closing-fifo-named-pipes-funny-behavior-of-unix-fifos
+    python
+      http://unix.stackexchange.com/questions/151502/how-to-save-the-result-of-printf-to-a-variable-in-gdb
+      http://stackoverflow.com/questions/9963501/storing-shell-output-into-gdb-variable-in-gdbinit
+  GDB scripts
+    http://sourceware.org/gdb/current/onlinedocs/gdb/Command-Files.html#Command-Files
+    - http://ftp.gnu.org/old-gnu/Manuals/gdb/html_chapter/gdb_18.html
+      $ gdb -x <file name> ...
+  Python
+    http://sourceware.org/gdb/current/onlinedocs/gdb/Python.html#Python
+    https://sourceware.org/gdb/wiki/PythonGdbTutorial
+    $ (gdb) python x=gdb.execute("info registers", False, True); print x
+    xxd-like formatted memory dump (python)
+      http://qkxue.net/info/152843/Useful-GDB-Tricks
+  Lisp
+    https://github.com/tromey/gdb-refactoring-scripts
+
 
 Miscellaneous
   (gdb) define command ... end        define user command
@@ -197,10 +244,6 @@ Google is your friend.
   // PHP and Python
   http://jaredforsyth.com/projects/vim-debug
   :ConqueGdb --args test arg1 arg2
-
-// GDB scripts
-  http://sourceware.org/gdb/current/onlinedocs/gdb/Command-Files.html#Command-Files
-  А дальше gdb -x <file name> ...
 
 
 List of debuggers Some widely used debuggers are

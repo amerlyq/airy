@@ -1,4 +1,8 @@
 %%%% Deadlock
+
+SEE
+  http://yusufonlinux.blogspot.com/2010/11/debugging-core-using-gdb.html
+
 % Search for thread, which blocked the current one
 Program terminated with signal 6, Aborted.
 #0  0x2ab27b6c in pthread_cond_wait () from /lib/libpthread.so.0
@@ -31,6 +35,28 @@ $1 = {
 ...
 
 
+
+%% Threads
+  Debug is easier if create coredump
+    http://processors.wiki.ti.com/index.php/Multithreaded_Debugging_Made_Easier_by_Forcing_Core_Dumps
+  Print pthread structure
+    https://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques/Deadlocks
+  Mapping
+    (gdb) info threads
+      : 12 Thread 4398053392560 (LWP 7234) 0x0000000010005740 in xxxx ()
+      : ...
+    (gdb) info proc 7234 status
+      > WARNING: works only on running process
+  Get TLS (thread-local storage)
+    http://stackoverflow.com/questions/10841219/thread-specific-data-from-linux-core-dump
+  Save func arguments/buffer into file
+    http://tamkovich.com/2011/03/core-dump-for-multithreading-app/
+
+
+% Locked mutex / refcount on exit
+  http://kfunk.org/2014/08/29/scripting-gdb-to-execute-commands-at-particular-breakpoints/
+
+
 % Recursive frames: how to coerce gdb into giving a backtrace
 SEE
   + http://fragglet.livejournal.com/19646.html
@@ -52,30 +78,3 @@ http://cygwin.com/ml/gdb/2011-02/msg00042.html
   $ frame FRAMEADDR PCADDR  # where FRAMEADDR should be $sp in the caller.
   $ eu-readelf -n corefile  # and patch the registers using hexedit,
   TRY $ set write
-
-
-% GDB Scripting
-  http://www.univ-orleans.fr/SCIENCES/INFO/RESSOURCES/webada/doc/gnat/gdb_24.html
-    http://unix.stackexchange.com/questions/151502/how-to-save-the-result-of-printf-to-a-variable-in-gdb
-  Python
-    http://sourceware.org/gdb/current/onlinedocs/gdb/Python.html#Python
-  Lisp
-    https://github.com/tromey/gdb-refactoring-scripts
-
-
-% Coredump in radare2
-  https://github.com/radare/radare2/issues/152
-  https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
-
-
-  TRY: connecting radare2 to gdbserver ALSO use gdb as gdb server
-    https://github.com/radare/radare2/issues/217
-    http://sourceware.org/gdb/onlinedocs/gdb/Server.html
-    http://sourceware.org/gdb/onlinedocs/gdb/Connecting.html
-
-  REF
-    https://2016.hack.lu/
-    http://archive.hack.lu/2015/
-      http://archive.hack.lu/2015/radare2-workshop-slides.pdf
-    https://radare.gitbooks.io/radare2book/content/introduction/basic_debugger_session.html
-    http://radare.today/posts/using-radare2/
