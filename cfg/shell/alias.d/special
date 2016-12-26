@@ -10,6 +10,8 @@ cdauto() { local p; ((!$#)) || p=${@: -1}
   else builtin cd "${@:1:$#-1}" "${p%/*}";
 fi; }
 alias cd='cdauto'
+alias gdb='gdb -q'            # no way to silent through .gdbinit
+alias readelf='readelf -W'    # don't wrap lines
 
 # WARNING: Use 'sudo' w/o user cfgs, so viminfo, swap won't've root rights!
 alias v=$EDITOR
