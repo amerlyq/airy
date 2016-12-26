@@ -1,0 +1,7 @@
+#!/bin/sh -eu
+
+sfx=${PWD##*/}  #$$
+tmp=${GTMP:-/tmp/gdb/$sfx}
+
+[[ ${1-x} == -d ]] && mkdir -p "$tmp"
+printf '%s\n' "$tmp"

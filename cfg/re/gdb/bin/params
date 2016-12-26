@@ -1,0 +1,22 @@
+#!/bin/sh -eu
+# SEE:BAD:(-L) http://unix.stackexchange.com/questions/34248/how-can-i-find-broken-symlinks
+
+ROOT=$(find "$PWD" -maxdepth 1 \( -type d -o -type l -xtype d \) -exec test -d "{}/lib" -a -d "{}/usr/lib" \; -print -quit)
+CORE=$(find "$PWD" ! -readable -prune -o -type f -name "core.*" -print -quit)
+
+pr=${CORE##*/core.}; pr=${pr%%.*}
+EXE=$(find -H "$ROOT" ! -readable -prune -o -type f -name "$pr" -print -quit)
+
+
+if file -b "$EXE" | grep -qwF ARM; then
+  unset xct_gdb
+elif file -b "$EXE" | grep -qwF MIPS; then
+  xct_gdb='/opt/mips-unknown-linux-uclibc/bin/mips-linux-gdb'
+fi
+
+# SRC="$pj/src"
+BDR="$PJROOT/buildroot"
+GDB=$(ls "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb) || GDB=$xct_gdb
+
+export GDB ROOT CORE EXE SRC BDR
+exec r.gdb-session "$@"

@@ -1,0 +1,9 @@
+#!/bin/sh -eu
+
+cd "$(r.gdb-tmp -d)"
+
+# ALT: mnt to /nfs
+# MAYBE: remove 'sh -u' -- if I want allow partial session setup
+for nm in GDB ROOT CORE EXE SRC BDR
+do [[ -z ${!nm+x} ]] || [[ ${!nm} -ef ${nm,,} ]] || ln -sfT "${!nm}" "${nm,,}"
+done

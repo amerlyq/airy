@@ -1,0 +1,26 @@
+#!/bin/sh -eu
+
+# NOTE: necessary only for toolchain (if session found)
+[[ -s /etc/debian_chroot ]] && cmd=() || cmd=( r.chroot )
+cmd+=( ./gdb -q )
+
+
+# TODO: generate only for toolchain
+# BAD:(batch processing) session must be created single time and then reused again and again (don't rm $tmp)
+# ALT: all shell cmds must be called from inside single gdb session and resulsts sourced back (rm $tmp on exit)
+tmp=$(r.gdb-tmp)
+if [[ ! -d $tmp ]]; then
+  r.gdb-params
+  r.gdb-cfg
+fi
+cd "$tmp"
+
+
+cmd+=( -x init.cfg )
+# TODO: activate only on specific flags ?
+# if [[ -t 0 ]]
+# then printf '%s\n' "${@:?}" > cmd
+# else cat > cmd
+# fi
+
+exec "${cmd[@]}" "$@"
