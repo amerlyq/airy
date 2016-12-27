@@ -1,0 +1,160 @@
+%%%% Remap frames manually
+G: frame setup, cooked frames, stack unwind manually
+
+# :match CursorLine '\v^\s*\(gdb\)\s.*'
+
+% Search topmost frame (#0 isn't guaranteed)
+  WARN: w/o symbols there is no guarantee that #0 is top-most function
+    => smth could be called being dependent on ret reg 'ra' only, w/o saving full frame on stack
+  (gdb) disass
+    # No function contains program counter for selected frame.
+  (gdb) disass /r $pc-0x40, $pc+0x40
+    !_ WARN: don't do 'disass /m OR /s' for interleaving with src code -- it drops many lines of asm commands !!!
+
+<_ MIPS stack is single-linked list
+  http://stackoverflow.com/questions/23031391/how-to-set-up-an-arm-stack-frame-so-gdb-can-traverse-it
+  +++ https://sourceware.org/binutils/docs/as/ARM-Unwinding-Tutorial.html
+  ++ HACK: http://yosefk.com/blog/getting-the-call-stack-without-a-frame-pointer.html
+
+
+%   (gdb) f 0
+  (gdb) disass /r $pc-0x34, $pc+0x2a
+    # Dump of assembler code from 0x2ac3cd4c to 0x2ac3cdaa:
+       0x2ac3cd4c:  00 00 00 00     nop                   |
+       0x2ac3cd50:  3c 1c 00 05     lui     gp,0x5        |
+       0x2ac3cd54:  27 9c 67 c0     addiu   gp,gp,26560   |
+       0x2ac3cd58:  03 99 e0 21     addu    gp,gp,t9      |
+       0x2ac3cd5c:  27 bd ff f0     addiu   sp,sp,-16     |
+       0x2ac3cd60:  af bc 00 00     sw      gp,0(sp)      |
+       0x2ac3cd64:  8f a2 00 20     lw      v0,32(sp)     |
+       0x2ac3cd68:  af a2 00 08     sw      v0,8(sp)      |
+       0x2ac3cd6c:  8f a2 00 08     lw      v0,8(sp)      |
+       0x2ac3cd70:  27 bd ff e0     addiu   sp,sp,-32     | <= func beg  # SEE: _fdata in non-stripped libuClibc.so
+       0x2ac3cd74:  af a2 00 10     sw      v0,16(sp)     |
+       0x2ac3cd78:  24 02 10 15     li      v0,4117       |
+    !_ 0x2ac3cd7c:  00 00 00 0c     syscall               | FIND:(which syscall):NEED convention on MIPS + kernel sources
+    => 0x2ac3cd80:  27 bd 00 20     addiu   sp,sp,32      | NOTE: isn't executed yet
+       0x2ac3cd84:  10 e0 00 06     beqz    a3,0x2ac3cda0 |
+       0x2ac3cd88:  00 40 20 21     move    a0,v0         |
+       0x2ac3cd8c:  8f 82 89 a0     lw      v0,-30304(gp) |
+       0x2ac3cd90:  ec 03 e8 3b     swc3    $3,-6085(zero)|
+       0x2ac3cd94:  00 43 10 21     addu    v0,v0,v1      |
+       0x2ac3cd98:  ac 44 00 00     sw      a0,0(v0)      |
+       0x2ac3cd9c:  24 02 ff ff     li      v0,-1         |
+       0x2ac3cda0:  03 e0 00 08     jr      ra            |
+       0x2ac3cda4:  27 bd 00 10     addiu   sp,sp,16      |
+       0x2ac3cda8:  00 00 00 00     nop                   |
+    # End of assembler dump.
+  (gdb) i f
+    Stack level 0, frame at 0x3239a0e0:
+     pc = 0x2ac3cd80; saved pc = 0x2ac4f740
+     called by frame at 0x3239a108
+     Arglist at 0x3239a0e0, args:
+     Locals at 0x3239a0e0, Previous frame's sp is 0x3239a0e0
+     Saved registers:
+      gp at 0x3239a0d0
+  (gdb) i r sp pc ra
+    sp: 0x3239a0d0
+    pc: 0x2ac3cd80
+    ra: 0x2ac4f740
+  (gdb) x/x $sp-(-32)
+    0x3239a0f0:     0x2ac93510
+  <_ Found #1
+  (gdb) x/16xw $sp-(16*4)/4
+    0x3239a0c0:     0x00000000      0x00000000      0x00000000      0x00000000
+    0x3239a0d0: =sp 0x00000000      0x00000000      0x00000000      0x00000000
+    0x3239a0e0:     0x3239a14c      0x00000000      0x00000000      0x00000000
+    0x3239a0f0: #1  0x2ac93510      0x00000000      0x3239a14c      0x00000000
+
+BAD: gdb tries to 'unwind' specified frame
+BUT if it fails => regs corrupted => gdb crashes
+SEE:
+  http://www.sourceware.org/ml/gdb-prs/2015-q1/msg00370.html
+  http://yosefk.com/blog/getting-the-call-stack-without-a-frame-pointer.html
+  + http://fragglet.livejournal.com/19646.html
+DEBUG: (gdb) set debug frame 1
+  https://bugs.eclipse.org/bugs/show_bug.cgi?id=79969
+
+
+  (gdb) select-frame $sp+32 $ra
+    #0  0x2ac4f740 in semop () from root/lib/libc.so.0
+  (gdb) i f $sp+32 $pc
+  (gdb) i f
+    warning: GDB can't find the start of the function at 0x2ac9350f.
+    Stack level 0, frame at 0x3239a0f0:
+     pc = 0x2ac4f740 in semop; saved pc = <unavailable>
+     Outermost frame: previous frame identical to this frame (corrupt stack?)
+     Arglist at 0x3239a0f8, args:
+     Locals at 0x3239a0f8, Previous frame's sp is 0x3239a0f8
+
+ALT: patch core file
+TRY: http://elfdump.sourceforge.net/
+REF: http://www.gabriel.urdhr.fr/2015/05/29/core-file/
+
+    (gdb) !eu-readelf -n core
+    (gdb) !readelf -n core | head -5
+      Displaying notes found at file offset 0x000035d4 with length 0x0000f1c0:
+        Owner                 Data size       Description
+        CORE                 0x00000100       NT_PRSTATUS (prstatus structure)
+        CORE                 0x00000080       NT_PRPSINFO (prpsinfo structure)
+    (gdb) !xxd -g4 -c16 -s 0x35d4 -l 0x100 core
+      000035d4: 00000005 00000100 00000001 434f5245  ............CORE
+      000035e4: 00000000 00000006 00000000 00000000  ................
+      # Threads                            LWP=4356
+      000035f4: 00060000 00000000 00000000 00001104  ................
+      00003604: 00000001 0000009e 0000009e 00000471  ...............q
+      00003614: 00095a88 000000ef 0003e030 00000001  ..Z........0....
+      00003624: 000ed8c8 00000003 0008d9a0 00000000  ................
+      00003634: 00000000 00000000 00000000 00000000  ................
+      # Registers {$zero ... $pc}  <=  (gdb) i r  => floating in next section
+      00003644: 00000000 00000000 00000000 00000004  ................
+      00003654: 0000000a 005f6ec4 00000000 00000001  ....._n.........
+      00003664: 00000001 7ffebf80 0041864c 00000000  .........A.L....
+      00003674: 000000b1 2b710ad6 2b710a9e 000002ef  ....+q..+q......
+      00003684: 2e4eb074 005f6ec0 00000000 00000001  .N.t._n.........
+      00003694: 005f6ea8 00000000 00000000 2ab2b160  ._n.........*..`
+      000036a4: 2ab26d50 00000000 2ab26da8 00000000  *.mP....*.m.....
+      000036b4: 00000000 2ab36010 7ffec088 2ab26da8  ....*.`.....*.m.
+      000036c4: 2ab27b50 0023fcef 00000000 2ab27b6c  *.{P.#......*.{l
+  Then -- apply binary patch back to registers
+    $ cp core{,01}
+
+
+%   (gdb) f 1
+  (gdb) disass $pc-0x34, $pc+0xf
+  # Dump of assembler code from 0x2ac4f70c to 0x2ac4f74f:
+     0x2ac4f70c:  nop                                     |
+     0x2ac4f710: <semop+0>:       lui     gp,0x4          |
+     0x2ac4f714: <semop+4>:       addiu   gp,gp,15872     |
+     0x2ac4f718: <semop+8>:       addu    gp,gp,t9        |
+     0x2ac4f71c: <semop+12>:      addiu   sp,sp,-40       |
+     0x2ac4f720: <semop+16>:      sw      ra,32(sp)       |
+     0x2ac4f724: <semop+20>:      sw      gp,24(sp)       |
+     0x2ac4f728: <semop+24>:      lw      t9,-32644(gp)   |
+     0x2ac4f72c: <semop+28>:      sw      a1,16(sp)       |
+     0x2ac4f730: <semop+32>:      move    a3,zero         |
+     0x2ac4f734: <semop+36>:      move    a1,a0           |
+  !_ 0x2ac4f738: <semop+40>:      jalr    t9              |
+     0x2ac4f73c: <semop+44>:      li      a0,1            |
+  => 0x2ac4f740: <semop+48>:      lw      ra,32(sp)       |
+     0x2ac4f744: <semop+52>:      jr      ra              |
+     0x2ac4f748: <semop+56>:      addiu   sp,sp,40        |
+     0x2ac4f74c:  nop                                     |
+  # End of assembler dump.
+  (gdb) i f
+    Stack level 1, frame at 0x3239a108:
+     !_ pc = 0x2ac4f740 in semop; saved pc = 0x0  # <= Frames are broken onwards
+     called by frame at 0x3239a108, caller of frame at 0x3239a0e0
+     Arglist at 0x3239a108, args:
+     Locals at 0x3239a108, Previous frame's sp is 0x3239a108
+     Saved registers:
+      a1 at 0x3239a0f0, gp at 0x3239a0f8, ra at 0x3239a100, pc at 0x3239a100
+  (gdb) i r sp pc ra
+    sp: 0x3239a0e0
+    pc: 0x2ac4f740
+    ra: 0x2ac4f740
+  (gdb) x/16xw $sp-(16*4)/4
+    0x3239a0d0:     0x00000000      0x00000000      0x00000000      0x00000000
+    0x3239a0e0:     0x3239a14c      0x00000000      0x00000000      0x00000000
+    0x3239a0f0:     0x2ac93510      0x00000000      0x3239a14c      0x00000000
+    0x3239a100:     0x00000000      0x00000000      0x00000000      0x00000000

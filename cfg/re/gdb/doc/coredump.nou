@@ -6,6 +6,8 @@ SEE
     https://epipro.wordpress.com/2013/01/15/linux-processes-structure-hangs-and-core-dumps/
   +++ http://www.gabriel.urdhr.fr/2015/05/29/core-file/
     # ALSO:SEE: reference at the bottom of article
+    SEE:(core fmt) <linux/elfcore.h> / struct elf_prstatus
+      /buildroot/toolchain_build_mips/linux-pac-hr54/include/linux/elfcore.h
   http://www.ibm.com/support/knowledgecenter/ssw_aix_61/com.ibm.aix.files/core.htm
   https://backtrace.io/blog/whats-a-coredump/
 
@@ -85,6 +87,7 @@ Launch:
     If/as this is not a common task one can use
       eu-readelf -n corefile  # eu-readelf is readelf from elfutils
     and patch the registers using hexedit
+      SEE http://gdb.sourceware.narkive.com/G4dBK3Zc/setting-cooked-registers-desirable-feature-for-coredump-analysis-but-results-in-error
     ALSO try 'set write'
     Platform-dependent regs
       (gdb) i all-registers

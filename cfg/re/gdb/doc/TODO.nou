@@ -5,9 +5,37 @@ gdb
   [_] python support
 
 TODO
+  [_] CHG: default shell in GDB to r.shell -- ZSH with aliases
   [_] TRY: manually strip libc.so and gdbhost from the same uClibc version
+    MAYBE: problem in not fully patched new 7.11 instead of 7.5 or 6.6
+    TRY: set trust-readonly-sections on
+      http://www.delorie.com/gnu/docs/gdb/gdb_125.html
+  [_] TRY: rebuild gdbhost to support Python/Guile
+    ? based on 'ct' OR reconfigure buildroot ?
   [_] TRY: manually mark-up ':frame' in ?? () libc function
     based on boundaries of named func from issue's bt
   [_] TRY: valgrind for MIPS
     http://stackoverflow.com/questions/18009140/how-to-run-valgrind-to-find-out-memory-leaks-on-my-embedded-mipsel-linux-box
     G: https://encrypted.google.com/search?q=valgrind%20mips
+
+DEMO
+  [_] search frames / code w/o symbols -- ?? ()
+    split on frames
+    look at asm
+    look at src
+    create regex to search
+      combo for 'if' 'for' etc
+  [_] broken regs :: $pc = 0x0
+    => restore frames from stack
+  [_] broken stack :: $pc = 0x0 :: E.G. siege
+    * search through upper/lower frames beside $sp
+    * determine messed up stack region
+    * through valid frames (E.G. #4..#12) determine last valid call
+    * through imaginary frames (E.G #-1..#-99) determine possible functions called from inside crashed one
+    => narrow down region of possible function calls with problems
+  [_] save gdb working session -- to restore manual frames after exit
+  [_] diff langs linkage
+    * each '*.o' can be in its own lang => diff call conventions and stack layouts
+    * even MIPS can have diff ABI for its '*.o'
+    * GCC '-fomit-frame-pointer' -> prefers registers to make 'frameless' library functions
+    => hard to traverse/decode full stack (E.G. siege)
