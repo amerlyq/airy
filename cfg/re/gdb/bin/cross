@@ -1,5 +1,8 @@
 #!/bin/sh -eu
 
+refresh=0
+case ${1+$1} in -R) refresh=1; shift; esac  # TEMP
+
 # NOTE: necessary only for toolchain (if session found)
 [[ -s /etc/debian_chroot ]] && cmd=() || cmd=( r.chroot )
 cmd+=( ./gdb -q )
@@ -8,8 +11,9 @@ cmd+=( ./gdb -q )
 # TODO: generate only for toolchain
 # BAD:(batch processing) session must be created single time and then reused again and again (don't rm $tmp)
 # ALT: all shell cmds must be called from inside single gdb session and resulsts sourced back (rm $tmp on exit)
+# DEV: allow overriding symlinks/cfg by specifying ROOT, etc in 'compile' scripts -- when cdir has multiple
 tmp=$(r.gdb-tmp)
-if [[ ! -d $tmp ]]; then
+if [[ ! -d $tmp ]] || ((refresh)); then
   r.gdb-params
   r.gdb-cfg
 fi
@@ -24,3 +28,4 @@ cmd+=( -x init.cfg )
 # fi
 
 exec "${cmd[@]}" "$@"
+# exec r2 -a mips "$file" "$core"

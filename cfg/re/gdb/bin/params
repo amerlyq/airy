@@ -1,11 +1,12 @@
 #!/bin/sh -eu
 # SEE:BAD:(-L) http://unix.stackexchange.com/questions/34248/how-can-i-find-broken-symlinks
 
-ROOT=$(find "$PWD" -maxdepth 1 \( -type d -o -type l -xtype d \) -exec test -d "{}/lib" -a -d "{}/usr/lib" \; -print -quit)
-CORE=$(find "$PWD" ! -readable -prune -o -type f -name "core.*" -print -quit)
+ROOT=$(find "$PWD" -maxdepth 1 \( -type d -o -type l -xtype d \) -exec test -d "{}/lib" -a -d "{}/usr/lib" -a -f "{}/VERSION.TXT" \; -print -quit)
+CORE=$(find "$PWD" ! -readable -prune -o -type f -regex '^.*/core\.[^/]+\.[0-9]+$' -print -quit)
 
 pr=${CORE##*/core.}; pr=${pr%%.*}
 EXE=$(find -H "$ROOT" ! -readable -prune -o -type f -name "$pr" -print -quit)
+echo "$EXE"
 
 
 if file -b "$EXE" | grep -qwF ARM; then
@@ -15,8 +16,9 @@ elif file -b "$EXE" | grep -qwF MIPS; then
 fi
 
 # SRC="$pj/src"
-BDR="$PJROOT/buildroot"
-GDB=$(ls "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb) || GDB=$xct_gdb
+BDR=$PJROOT/buildroot
+GDB=$(ls -d "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb) || GDB=$xct_gdb
+LIBS=$(ls -d "$BDR"/build_*/staging_dir/lib)
 
-export GDB ROOT CORE EXE SRC BDR
+export GDB ROOT CORE EXE SRC BDR LIBS
 exec r.gdb-session "$@"
