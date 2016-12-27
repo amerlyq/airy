@@ -10,6 +10,8 @@ endf
 
 if s:has('diff --git ', 2)
   set ft=diff
+elseif s:has('^#!\S*guile\s')
+  set ft=scheme
 elseif s:has('\v^\u\l{2} \d{2} \d{2}:\d{2}:\d{2} \S', 1)
   set ft=messages
 elseif s:has('^Disassembly of section')

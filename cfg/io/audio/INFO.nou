@@ -16,6 +16,9 @@ Better quality
     http://mpd.wikia.com/wiki/Music_Player_Daemon_Is_There_An_Equalizer
     http://www.webupd8.org/2011/04/system-wide-pulseaudio-equalizer.html
 
+Status
+  $ cat /proc/asound/card*/pcm0p/sub0/hw_params
+
 Mixers
   amixer
   alsamixer  # TUI
@@ -25,6 +28,21 @@ Test microphone level
 
 Test pulseaudio
   pactl stat
+
+Reorder audio cards
+  http://superuser.com/questions/626606/how-to-make-alsa-pick-a-preferred-sound-device-automatically
+  http://superuser.com/questions/53957/what-do-alsa-devices-like-hw0-0-mean-how-do-i-figure-out-which-to-use
+  https://forums.opensuse.org/showthread.php/465666-How-to-order-multiple-sound-cards-with-ALSA-when-some-are-using-the-same-module
+    + https://gist.github.com/UedaTakeyuki/926f6e89ec48fcde0b6f
+  https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture#Set_the_default_sound_card
+  +++ http://alsa.opensrc.org/MultipleCards#How_to_choose_a_particular_order_for_multiple_installed_cards
+  +++ https://wiki.archlinux.org/index.php/Talk:Advanced_Linux_Sound_Architecture
+    http://alsa.opensrc.org/MultipleCards#Ordering_multiple_cards_of_the_same_type
+  http://alsa-project.org/main/index.php/Matrix:Module-emu10k1
+  $ cat /proc/asound/card*/id
+  $ v /etc/modprobe.d/alsa-base.conf
+    options snd-hda-intel id=PCH,HDMI index=1,0
+
 
 High pitch sound snd_intel_hda
   $ journalctl -b
