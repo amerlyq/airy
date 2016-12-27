@@ -1,0 +1,10 @@
+#!/usr/bin/guile -s
+; USAGE ./test 7
+!#
+(display "Test")
+(newline)
+(define (factorial n)
+  (if (zero? n) 1
+    (* n (factorial (- n 1)))))
+(display (factorial (string->number (cadr (command-line)))))
+(newline)
