@@ -1,5 +1,6 @@
 %%%% Remap frames manually
 G: frame setup, cooked frames, stack unwind manually
+# ~77368 / thr 42
 
 # :match CursorLine '\v^\s*\(gdb\)\s.*'
 
@@ -18,6 +19,8 @@ G: frame setup, cooked frames, stack unwind manually
 
 
 %   (gdb) f 0
+  (gdb) bt
+    #0  0x2ac3cd80 in ?? () from root/lib/libc.so.0
   (gdb) disass /r $pc-0x34, $pc+0x2a
     # Dump of assembler code from 0x2ac3cd4c to 0x2ac3cdaa:
        0x2ac3cd4c:  00 00 00 00     nop                   |
@@ -59,7 +62,7 @@ G: frame setup, cooked frames, stack unwind manually
     ra: 0x2ac4f740
   (gdb) x/x $sp-(-32)
     0x3239a0f0:     0x2ac93510
-  <_ Found #1
+  <_ Found #1 ::: $sp=0x3239a0f0 | $pc=0x2ac4f740
   (gdb) x/16xw $sp-(16*4)/4
     0x3239a0c0:     0x00000000      0x00000000      0x00000000      0x00000000
     0x3239a0d0: =sp 0x00000000      0x00000000      0x00000000      0x00000000
@@ -67,7 +70,7 @@ G: frame setup, cooked frames, stack unwind manually
     0x3239a0f0: #1  0x2ac93510      0x00000000      0x3239a14c      0x00000000
 
 BAD: gdb tries to 'unwind' specified frame
-BUT if it fails => regs corrupted => gdb crashes
+BUT if it fails => regs corrupted => frames aren't connected in chain => gdb crashes
 SEE:
   http://www.sourceware.org/ml/gdb-prs/2015-q1/msg00370.html
   http://yosefk.com/blog/getting-the-call-stack-without-a-frame-pointer.html
@@ -90,6 +93,7 @@ DEBUG: (gdb) set debug frame 1
 ALT: patch core file
 TRY: http://elfdump.sourceforge.net/
 REF: http://www.gabriel.urdhr.fr/2015/05/29/core-file/
+REF: http://man7.org/linux/man-pages/man5/elf.5.html -- SEE: Nhdr
 
     (gdb) !eu-readelf -n core
     (gdb) !readelf -n core | head -5
@@ -97,27 +101,55 @@ REF: http://www.gabriel.urdhr.fr/2015/05/29/core-file/
         Owner                 Data size       Description
         CORE                 0x00000100       NT_PRSTATUS (prstatus structure)
         CORE                 0x00000080       NT_PRPSINFO (prpsinfo structure)
-    (gdb) !xxd -g4 -c16 -s 0x35d4 -l 0x100 core
-      000035d4: 00000005 00000100 00000001 434f5245  ............CORE
-      000035e4: 00000000 00000006 00000000 00000000  ................
-      # Threads                            LWP=4356
-      000035f4: 00060000 00000000 00000000 00001104  ................
-      00003604: 00000001 0000009e 0000009e 00000471  ...............q
-      00003614: 00095a88 000000ef 0003e030 00000001  ..Z........0....
-      00003624: 000ed8c8 00000003 0008d9a0 00000000  ................
-      00003634: 00000000 00000000 00000000 00000000  ................
-      # Registers {$zero ... $pc}  <=  (gdb) i r  => floating in next section
-      00003644: 00000000 00000000 00000000 00000004  ................
-      00003654: 0000000a 005f6ec4 00000000 00000001  ....._n.........
-      00003664: 00000001 7ffebf80 0041864c 00000000  .........A.L....
-      00003674: 000000b1 2b710ad6 2b710a9e 000002ef  ....+q..+q......
-      00003684: 2e4eb074 005f6ec0 00000000 00000001  .N.t._n.........
-      00003694: 005f6ea8 00000000 00000000 2ab2b160  ._n.........*..`
-      000036a4: 2ab26d50 00000000 2ab26da8 00000000  *.mP....*.m.....
-      000036b4: 00000000 2ab36010 7ffec088 2ab26da8  ....*.`.....*.m.
-      000036c4: 2ab27b50 0023fcef 00000000 2ab27b6c  *.{P.#......*.{l
+  Search section related to your thread
+    (gdb) thr 42
+      [Switching to thread 42 (LWP 4780)]
+    $ readelf -n core | awk '/offset/{s=strtonum($7)} /CORE/{s+=12+8;l=strtonum($2)} /NT_PRS/{printf"0x%x 0x%x\n",s,l} /CORE/{s+=l}' >! reg.sec
+      # NOTE: s += 12 + 8 = sizeof(Nhdr) + aligned(int(*s))
+    $ <reg.sec xargs -rn2 sh -euc 'echo $((0x$(xxd -p -s$(($1+24)) -l4 core))) "$1"' '' | awk -vt=4780 '$1==t{print$2}'
+      0x90b8   # NOTE: 24 = position for thread id
+  Investigate thread section
+    (gdb) i r
+              zero       at       v0       v1       a0       a1       a2       a3
+     R0   00000000 00010000 00000004 00000003 00000001 00010002 00000001 00000001
+                t0       t1       t2       t3       t4       t5       t6       t7
+     R8   00000000 879d1bc0 867b59c8 879d1ba8 30165750 ffffffff 00000000 2aabed00
+                s0       s1       s2       s3       s4       s5       s6       s7
+     R16  2aac7000 3239f530 2ab21f18 00000000 00000000 2ab2cc30 00100000 2ab2cc30
+                t8       t9       k0       k1       gp       sp       s8       ra
+     R24  000000dd 2ac3cd50 00000000 00000000 2ac93510 3239a0d0 00100000 2ac4f740
+                sr       lo       hi      bad    cause       pc
+          00008413 000ee7b2 00000077 3239efa4 00800020 2ac3cd80
+               fsr      fir
+          00000004 00000000
+    # Registers {$zero ... $pc}  <=  (gdb) i r  => floating in next section
+    $ xxd -g4 -c16 -s 0x90b8 -o-0x90b8 -l0x100 core
+      00000000: 00000006 00000000 00000000 00060000  ................
+      00000010: 00000000 00000000 000012ac 00000001  ................
+      00000020: 0000009e 0000009e 00000000 00000000  ................
+      00000030: 00000000 00000000 00000001 000ed8c8  ................
+      00000040: 00000003 0008d9a0 00000000 00000000  ................
+      00000050: 00000000 00000000 00000000 00000000  ................
+      00000060: 00000000 00010000 00000004 00000003  ................
+      00000070: 00000001 00010002 00000001 00000001  ................
+      00000080: 00000000 879d1bc0 867b59c8 879d1ba8  .........{Y.....
+      00000090: 30165750 ffffffff 00000000 2aabed00  0.WP........*...
+      000000a0: 2aac7000 3239f530 2ab21f18 00000000  *.p.29.0*.......
+      000000b0: 00000000 2ab2cc30 00100000 2ab2cc30  ....*..0....*..0
+      000000c0: 000000dd 2ac3cd50 00000000 00000000  ....*..P........
+      000000d0: 2ac93510 3239a0d0 00100000 2ac4f740  *.5.29......*..@
+      000000e0: 000ee7b2 00000077 2ac3cd80 3239efa4  .......w*...29..
+      000000f0: 00008413 00800020 00000000 00000001  ....... ........
+    # NOTE:(offset): sp=0xd4 pc=0xe8 ra=0xdc
   Then -- apply binary patch back to registers
+    # NEED: $sp=0x3239a0f0 | $pc=0x2ac4f740
     $ cp core{,01}
+    $ echo "00000d4: 3239a0f0" | xxd -r -s 0x90b8 - core01
+    $ echo "00000e8: 2ac4f740" | xxd -r -s 0x90b8 - core01
+    $ xxd -g4 -c16 -s 0x90b8 -o-0x90b8 -l0x100 core01
+    $ wdiff c0 c1
+  (gdb) bt
+    #0  0x2ac4f740 in semop () from root/lib/libc.so.0
 
 
 %   (gdb) f 1

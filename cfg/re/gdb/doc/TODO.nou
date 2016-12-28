@@ -3,24 +3,49 @@ gdb
   [_] color printing
   [_] pretty printing seize
   [_] python support
+  [_] BET: SEIZE work wiki for gdb
 
 TODO
   [_] CHG: default shell in GDB to r.shell -- ZSH with aliases
     $ SHELL=$(which r.shell) gdb
+    BAD: r.chroot r.shell ...
+    BAD: r.shell -c gdb -q -iex "set auto-load safe-path $PWD"
   [_] TRY: manually strip libc.so and gdbhost from the same uClibc version
     MAYBE: problem in not fully patched new 7.11 instead of 7.5 or 6.6
     TRY: set trust-readonly-sections on
       http://www.delorie.com/gnu/docs/gdb/gdb_125.html
+    ALSO:
+      + http://reverseengineering.stackexchange.com/questions/1935/how-to-handle-stripped-binaries-with-gdb-no-source-no-symbols-and-gdb-only-sho
+      + https://blogs.gnome.org/alexl/2005/08/26/the-art-of-decoding-backtraces-without-debug-info/
   [_] TRY: rebuild gdbhost to support Python/Guile
     ? based on 'ct' OR reconfigure buildroot ?
-  [_] TRY: manually mark-up ':frame' in ?? () libc function
+    http://lists.busybox.net/pipermail/buildroot/2014-September/106309.html
+    http://lists.busybox.net/pipermail/buildroot/2014-September/106314.html
+    ./buildroot/toolchain/gdb/gdb.mk
+  2016-12-28 [X] TRY: manually mark-up ':frame' in ?? () libc function
     based on boundaries of named func from issue's bt
+    BAD: gdb has broken manual unwinding by :frame
   [_] TRY: valgrind for MIPS
     http://stackoverflow.com/questions/18009140/how-to-run-valgrind-to-find-out-memory-leaks-on-my-embedded-mipsel-linux-box
     G: https://encrypted.google.com/search?q=valgrind%20mips
+  2016-12-28 [X] TRY: mips-readelf -a core for decoding
+    => same results as with general x86_64 readelf
+    ! only 'eu-readelf' provides decrypted registers -- and there is no HOST build with support for MIPS
+  2016-12-28 [X] Save ptype in variable to use in objects print
+    IDEA: ::> seems impossible
+      (gdb) set $tt = ptype some_obj
+      (gdb) p *($tt)ptr
+  [_] FIND: backtrace decoration
+    * show not original '$cdir' paths but existing ones after 'substitute-path'
+    * show relative path even for absolute ones -- being relative to one of 'directories' where it found
+    * always show 'from ... .so' even when debug smb / src lines are available
+      https://sourceware.org/gdb/onlinedocs/gdb/Print-Settings.html
+      https://sourceware.org/gdb/onlinedocs/gdb/Backtrace.html
+      http://visualgdb.com/gdbreference/commands/set_backtrace_past-entry
+
 
 DEMO
-  [_] search frames / code w/o symbols -- ?? ()
+  [_] Determine relation -- search frames / code w/o symbols -- ?? ()
     split on frames
     look at asm
     look at src
@@ -34,9 +59,20 @@ DEMO
     * through valid frames (E.G. #4..#12) determine last valid call
     * through imaginary frames (E.G #-1..#-99) determine possible functions called from inside crashed one
     => narrow down region of possible function calls with problems
+    DEV: (gdb) dump binary memory ...
+      => then parse by awk, etc to create linked lists of memory
   [_] save gdb working session -- to restore manual frames after exit
+    http://stackoverflow.com/questions/24446036/saving-and-restarting-a-paused-gdb-session
+    http://stackoverflow.com/questions/40145270/how-to-save-gdb-setup-information-inside-gdb-session
+    http://stackoverflow.com/questions/1707167/how-to-dump-the-entire-gdb-session-to-a-file-including-commands-i-type-and-thei
   [_] diff langs linkage
     * each '*.o' can be in its own lang => diff call conventions and stack layouts
     * even MIPS can have diff ABI for its '*.o'
     * GCC '-fomit-frame-pointer' -> prefers registers to make 'frameless' library functions
     => hard to traverse/decode full stack (E.G. siege)
+  [_] scripting
+    -iex
+    ~/.gdbinit
+    ./.gdbinit  # ALSO:(ext) python, guile
+    -ex
+    -x

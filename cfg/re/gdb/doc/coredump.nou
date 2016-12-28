@@ -1,6 +1,14 @@
 %%% Core Dump / Segfault
 
-Structure / format of corefile
+%% Resolve ?? symbols
+  SEE
+    http://nanxiao.me/en/use-pstack-to-track-threads-on-linux/
+    http://stackoverflow.com/questions/33273101/how-to-resolve-function-name-through-memory-address
+  List which debug-info packages should be installed
+    gdb --quiet -nx --readnever /proc/$pid/exe $pid can
+
+
+%% Structure / format of corefile
 SEE
   +++ REF process startup structures -- and corefile
     https://epipro.wordpress.com/2013/01/15/linux-processes-structure-hangs-and-core-dumps/

@@ -111,14 +111,6 @@ SEE: https://sourceware.org/gdb/wiki/STLSupport
     when parent processes forks often loading various executables.
 
 
-### Resolve ?? symbols ###
-  SEE
-    http://nanxiao.me/en/use-pstack-to-track-threads-on-linux/
-    http://stackoverflow.com/questions/33273101/how-to-resolve-function-name-through-memory-address
-  List which debug-info packages should be installed
-    gdb --quiet -nx --readnever /proc/$pid/exe $pid can
-
-
 ### Short-living programs ###
   Main remote term
     ./prg -a -b & kill -STOP $! && echo $! > /tmp/dbgpid

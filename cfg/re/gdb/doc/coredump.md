@@ -6,7 +6,6 @@ patat:
     incrementalLists: false
     wrap: true
     theme:
-        # bulletListMarkers: '=+'
         emph: [dullGreen, onVividBlack, bold]
         imageTarget: [onDullWhite, vividRed]
 ---
@@ -86,7 +85,8 @@ Signals
 lw 0(sp)
 ```
 
-# Logging
+# Hacks
+## Logging
 
 
 # TEMP: breaking
@@ -99,3 +99,10 @@ wait for it
 . . .
 
 Dary!
+
+# Hacks
+## Launch
+```bash
+    $ gdb -q
+```
+* what if chroot ? Use only for that command
