@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+# BETTER:(!sudo) compile inside /tmp then create PKGBUILD
+#   for that specific arch to install into /opt
+
+mkdir -p /tmp/ct
+ln -svfT "$PWD/cfg/mips/config" /tmp/ct/.config
+ln -svfT "$PWD/cfg/mips/uclibc.config" /tmp/ct/uclibc.config
+cd /tmp/ct
+ct-ng build
