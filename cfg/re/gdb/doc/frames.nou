@@ -60,6 +60,12 @@ G: frame setup, cooked frames, stack unwind manually
     sp: 0x3239a0d0
     pc: 0x2ac3cd80
     ra: 0x2ac4f740
+
+Search for 'addiu sp,sp,N'
+  (gdb) dump memory dump $pc-0x100 $pc
+  $ xxd -g4 -c4 -b dump | awk '$2~/^001001/{for(i=1;i<12;++i){printf substr($2,1,1)}print substr($2,i)}' | xargs -rn1 sh -c 'echo "obase=10;ibase=2;$1"|bc' ''
+  # ALT: sh -c 'printf "%d\n" $((2#$1))' ''
+  $ xxd -g4 -c4 -b dump | awk -vc=13 '$2~/^001001/{for(i=1;i<c;++i){printf substr($2,c,1)}print substr($2,i)}' | perl -lpe '$_=unpack("L",pack("B*",$_))'
   (gdb) x/x $sp-(-32)
     0x3239a0f0:     0x2ac93510
   <_ Found #1 ::: $sp=0x3239a0f0 | $pc=0x2ac4f740
