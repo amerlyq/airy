@@ -13,6 +13,15 @@
     http://stackoverflow.com/questions/593724/redirect-stderr-stdout-of-a-process-after-its-been-started-using-command-lin/593764#593764
     https://blogs.oracle.com/ahl/entry/inside_nohup_p
 
+  Pass VAR to $SHELL
+    (gdb) set $val = 2
+    (gdb) eval "shell echo %d", $val
+    (gdb) python gdb.execute("shell echo " + str(gdb.parse_and_eval("$val")))
+    (gdb) guile (use-modules (gdb))(value->integer (parse-and-eval "$val"))
+
+  Set ENV from expr inside gdb
+    http://stackoverflow.com/questions/34726206/set-environment-variable-in-gdb-from-output-of-command
+
 ### C++ classes, etc ###
 | list class::member     | list member in class
 | b TestClass::testFunc(int) | 'class::member' -- w/o body, may get menu

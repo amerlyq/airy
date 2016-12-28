@@ -27,5 +27,6 @@ cmd+=( -x init.cfg )
 # else cat > cmd
 # fi
 
+export SHELL=$(which r.shell)
 exec "${cmd[@]}" "$@"
 # exec r2 -a mips "$file" "$core"

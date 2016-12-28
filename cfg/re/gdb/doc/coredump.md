@@ -2,7 +2,7 @@
 # title: 'GDB & MIPS Coredump'
 # author: 'amerlyq'
 patat:
-    columns: 40
+    # columns: 40
     incrementalLists: false
     wrap: true
     theme:
