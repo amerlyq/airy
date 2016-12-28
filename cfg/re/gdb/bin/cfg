@@ -5,10 +5,12 @@
 #   * list of relative src dirs to setup 'SRC_DIRS'
 # TODO:THINK: substitute-path by empty to search rel path in dirs
 
+# NOTE:(pagination off): no need when running with '-batch'
+
 cat> "$(r.gdb-tmp)"/init.cfg <<EOT
 # vim:ft=gdb
-# set auto-load safe-path $PWD
-set pagination off                # NOTE: no need to disable when running with '-batch'
+# set auto-load safe-path "$PWD"
+set pagination off
 set logging overwrite on
 set print thread-events off
 # OR: sysroot
@@ -16,7 +18,7 @@ set solib-absolute-prefix root
 set solib-search-path libs
 ${OLD_BDR+set substitute-path $OLD_BDR bdr}
 set directories src:\$cdir:\$cwd${SRC_DIRS+:$SRC_DIRS}
-exec-file exe
+file exe
 core-file core
 set logging on log.cfg
 EOT

@@ -113,6 +113,25 @@ define xc
   end
 end
 
+# SEE: http://stackoverflow.com/questions/12286311/gdb-backtrace-find-total-number-of-frame
+define btl
+  set print frame-arguments all
+  # relative absolute basename
+  set filename-display relative
+  if $argc == 0
+    echo USE: btl <count> TODO: auto-parse this string OR python\n
+    bt -1
+  end
+  if $argc == 1
+    set $i = 0
+    while( $i <= $arg0 )
+      select-frame $i
+      frame
+      set $i = $i + 1
+    end
+    select-frame 0
+  end
+
 # define pipe
 #   set logging off
 #   set logging on /tmp/gdb.pipe
