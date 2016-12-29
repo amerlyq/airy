@@ -16,7 +16,7 @@ elif file -b "$EXE" | grep -qwF MIPS; then
 fi
 
 # SRC="$pj/src"
-BDR=$PJROOT/buildroot
+[[ -n $BDR ]] || BDR=$PJROOT/buildroot
 GDB=$(ls -d "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb) || GDB=$xct_gdb
 LIBS=$(ls -d "$BDR"/build_*/staging_dir/lib)
 
