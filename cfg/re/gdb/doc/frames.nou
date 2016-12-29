@@ -64,17 +64,20 @@ G: frame setup, cooked frames, stack unwind manually
     pc: 0x2ac3cd80
     ra: 0x2ac4f740
 
-  New frame
+  !_ New frame
   (gdb) p/x $sp+32
     $1 = 0x3239a0f0
   (gdb) p/x $ra
     $2 = 0x2ac4f740
 
+
 Search for 'addiu sp,sp,N'
   (gdb) dump memory dump $pc-0x100 $pc
-  $ xxd -g4 -c4 -b dump | awk '$2~/^001001/{for(i=1;i<12;++i){printf substr($2,1,1)}print substr($2,i)}' | xargs -rn1 sh -c 'echo "obase=10;ibase=2;$1"|bc' ''
-  # ALT: sh -c 'printf "%d\n" $((2#$1))' ''
-  $ xxd -g4 -c4 -b dump | awk -vc=13 '$2~/^001001/{for(i=1;i<c;++i){printf substr($2,c,1)}print substr($2,i)}' | perl -lpe '$_=unpack("L",pack("B*",$_))'
+  $ xxd -g4 -c4 -b dump | awk -vc=12 '$2~/^001001/{for(i=1;i<c;++i){printf substr($2,c,1)}print substr($2,i)}' | perl -lpe '$_=unpack("l",pack("L",oct("0b".$_)))'
+    # SEE: http://stackoverflow.com/questions/483655/how-do-i-convert-a-binary-string-to-a-number-in-perl
+    # ALT:BAD: only unsigned results
+    #   xargs -rn1 sh -c 'printf "%d\n" $((2#$1))' ''
+    #   xargs -rn1 sh -c 'echo "obase=10;ibase=2;$1"|bc' ''
   (gdb) x/x $sp-(-32)
     0x3239a0f0:     0x2ac93510
   <_ Found #1 ::: $sp=0x3239a0f0 | $pc=0x2ac4f740
@@ -168,11 +171,12 @@ REF: http://man7.org/linux/man-pages/man5/elf.5.html -- SEE: Nhdr
   (gdb) bt
     #0  0x2ac4f740 in semop () from root/lib/libc.so.0
 
-  New frame
+  !_ New frame
   (gdb) p/x $sp+40
     $1 = 0x3239a118
   (gdb) x/x $sp
     0x3239a0f0:     0x2ac93510  # =ra
+
 
 %   (gdb) f 1
   (gdb) disass $pc-0x34, $pc+0xf
