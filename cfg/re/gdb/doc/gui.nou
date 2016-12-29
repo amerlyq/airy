@@ -1,0 +1,55 @@
+%% CLI
+  +++ pwndbg
+    https://github.com/pwndbg/pwndbg
+      https://github.com/pwndbg/pwndbg/blob/master/FEATURES.md
+  ++ gef -- peda-ng (cross-platform)
+    https://github.com/hugsy/gef
+    https://gef.readthedocs.io/en/latest/config/
+  gdb peda -- colored frontend for gdb
+    https://github.com/longld/peda
+    http://ropshell.com/peda/
+  ++ voltron -- extension with separate views
+    https://github.com/snare/voltron
+  mona.py -- win extension for reversing
+    https://www.corelan.be/index.php/2011/07/14/mona-py-the-manual/
+    https://github.com/corelan/mona
+
+
+%% TUI
+  Built-in
+    $ gdb -tui ./pr
+    (gdb) layout asm | src | regs | split
+    (gdb) <C-x> a
+     NOTE: the registers with white/gray background show that a value has
+     changed. Not too meaningful when we just started the program,
+     but mighty useful when stepping through code later on.
+
+     WARN: Sometimes when stepping through assembly the regs and asm views will
+     get borked. Simply execute the respective layout commands again to restore
+     them to their old glory:
+      (gdb) layout asm
+      (gdb) layout regs
+  ALT: cgdb
+    * Honestly, I think that you're better off sticking with cgdb.
+    * personally I starting using cgdb and have never looked back. –  Grammin
+    http://cgdb.github.io/
+  Conque-GDB
+    http://www.vim.org/scripts/script.php?script_id=4582
+    $ ConqueGdb --args test arg1 arg2
+  А я ddd люблю.
+    http://www.gnu.org/software/ddd/
+     GNU DDD is a graphical front-end for command-line debuggers such as
+     GDB, DBX, WDB, Ladebug, JDB, XDB, the Perl debugger, the bash
+     debugger bashdb, the GNU Make debugger remake, or the Python debugger
+     pydb. Interactive graphical data display, where data structures are
+     displayed as graphs
+  clewn
+    http://clewn.sourceforge.net/
+    http://pyclewn.sourceforge.net/
+  PHP and Python
+    http://jaredforsyth.com/projects/vim-debug
+  Check out this thread:
+    http://stackoverflow.com/questions/185043/gvim-and-gdb-for-c
+  By the way, you do use the gdb ed command, do you?
+    * The combination of pure gdb + ed + ctags is killer, IMHO –  sehe Jul 14 '11 at 15:19
+    http://blog.sanctum.geek.nz/actually-using-ed/

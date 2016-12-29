@@ -1,0 +1,38 @@
+%%% Print STL containers in coredump
+  http://yosefk.com/blog/very-funny-gdb-ve-ery-funny.html
+    http://www.yolinux.com/TUTORIALS/src/dbinit_stl_views-1.03.txt
+
+
+%%% C++ classes, etc %%%
+| list class::member     | list member in class
+| b TestClass::testFunc(int) | 'class::member' -- w/o body, may get menu
+  ptype class         print class members
+  print *this         print contents of this pointer
+  rbreak regexpr      useful for breakpoint on overloaded member name
+
+
+%%% STL Containers, Boost, templates, etc %%%
+SEE: https://sourceware.org/gdb/wiki/STLSupport
+<incomplete type>
+  Run it in gdb and try to 'print *str' and you'll get an 'incomplete type'
+   response. However, try 'disassemble get_string' and then 'print *str' and
+   it'll display the struct and values properly. I have no idea why this
+   works, but it does.
+  However, works only for pointers; not for stringstreams.
+   For them you need libstdc++6.4.8-dbg
+  Or to use the libstdc++ debug mode, compile your application with the
+  compiler flag -D_GLIBCXX_DEBUG as all other libs you need.
+   https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html#debug_mode.using.mode
+  ALT: Commands file, ex. .gdbinit: pretty printing
+  STL debug of stringstreams, etc
+    I got what I needed by recompiling everything (not just one or two
+    translation units) with -D_GLIBCXX_DEBUG. Then I can just do p istm.tellg()
+
+  |set print object on| -- deduce type of polymorphous object
+    (gdb) p $99
+      $129 = (CObject *) 0xfe545f0
+    (gdb) set print object on
+    (gdb) p $99
+      $130 = (CUnit *) 0xfe545f0
+  |set print pretty on/off| -- indent fields in structures
+  |set print static on/off| -- omit static members on obj print

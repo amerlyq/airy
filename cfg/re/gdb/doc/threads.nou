@@ -1,0 +1,42 @@
+%%%% Threads
+  Debug is easier if create coredump
+    http://processors.wiki.ti.com/index.php/Multithreaded_Debugging_Made_Easier_by_Forcing_Core_Dumps
+  Print pthread structure
+    https://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques/Deadlocks
+  Mapping
+    (gdb) info threads
+      : 12 Thread 4398053392560 (LWP 7234) 0x0000000010005740 in xxxx ()
+      : ...
+    (gdb) info proc 7234 status
+      > WARNING: works only on running process
+  Get TLS (thread-local storage)
+    http://stackoverflow.com/questions/10841219/thread-specific-data-from-linux-core-dump
+  Locked mutex / refcount on exit
+    http://kfunk.org/2014/08/29/scripting-gdb-to-execute-commands-at-particular-breakpoints/
+  Save func arguments/buffer into file
+    http://tamkovich.com/2011/03/core-dump-for-multithreading-app/
+
+
+%%% Multi-threads %%%
+: Use case: debugging specific thread, while controlling behavior of others.
+  facilities for debugging multi-thread programs:
+    - automatic notification of new threads
+    - ‘thread threadno’, to switch among threads
+    - ‘info threads’, to inquire about existing threads
+    - thread-specific breakpoints
+    - set mode for locking scheduler during execution
+      (gdb) set scheduler-locking step/on/off
+    others: Interrupted System Calls
+  (gdb) i threads
+  (gbd) b foo.cpp:13 thread 28 if x > li
+  Forking -- choose which to lead
+    set follow-fork-mode ask || parent/child
+  In addition, catchpoints come in handy:
+    catch exec
+   Catchpoint works as a breakpoint. Every time a call to exec() syscall is
+   detected, GDB stops. This allows you to set any breakpoint (i.e. break
+   main) in the newly loaded executable before continuing. Another
+   catchpoint catch fork works similarly for fork() syscall detection.
+  It is especially convenient:
+    when both parent and child has to be followed (set detach-on-fork off);
+    when parent processes forks often loading various executables.

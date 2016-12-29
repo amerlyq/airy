@@ -1,73 +1,37 @@
-### Output Pipe Redirection ###
-   Like backtrace from coredump
-  printf "set logging on gdb.log\nbt 10\nq\n" > cmd_gdb && \
-    gdb -x cmd_gdb -e /tmp/MrsAgent -c /tmp/Coredump 2>/dev/null
-
-  | show logging | Show the current values of the logging settings.
-  | set logging [on|off]    | Enable/Disable at all
-  | set logging file <file> | Name of the current logfile (default: gdb.txt)
-  | set logging overwrite [on|off] | To overwrite logfile each time (default: append)
-  | set logging redirect [on|off]  | Log only to logfile (default: both terminal and logfile)
-
-  Process output redirection
-    http://stackoverflow.com/questions/593724/redirect-stderr-stdout-of-a-process-after-its-been-started-using-command-lin/593764#593764
-    https://blogs.oracle.com/ahl/entry/inside_nohup_p
-
-  Pass VAR to $SHELL
-    (gdb) set $val = 2
-    (gdb) eval "shell echo %d", $val
-    (gdb) python gdb.execute("shell echo " + str(gdb.parse_and_eval("$val")))
-    (gdb) guile (use-modules (gdb))(value->integer (parse-and-eval "$val"))
-
-  Set ENV from expr inside gdb
-    http://stackoverflow.com/questions/34726206/set-environment-variable-in-gdb-from-output-of-command
-
-### C++ classes, etc ###
-| list class::member     | list member in class
-| b TestClass::testFunc(int) | 'class::member' -- w/o body, may get menu
-  ptype class         print class members
-  print *this         print contents of this pointer
-  rbreak regexpr      useful for breakpoint on overloaded member name
-
-### STL Containers, Boost, templates, etc ###
-SEE: https://sourceware.org/gdb/wiki/STLSupport
-<incomplete type>
-  Run it in gdb and try to 'print *str' and you'll get an 'incomplete type'
-   response. However, try 'disassemble get_string' and then 'print *str' and
-   it'll display the struct and values properly. I have no idea why this
-   works, but it does.
-  However, works only for pointers; not for stringstreams.
-   For them you need libstdc++6.4.8-dbg
-  Or to use the libstdc++ debug mode, compile your application with the
-  compiler flag -D_GLIBCXX_DEBUG as all other libs you need.
-   https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html#debug_mode.using.mode
-  ALT: Commands file, ex. .gdbinit: pretty printing
-  STL debug of stringstreams, etc
-    I got what I needed by recompiling everything (not just one or two
-    translation units) with -D_GLIBCXX_DEBUG. Then I can just do p istm.tellg()
-
-  |set print object on| -- deduce type of polymorphous object
-    (gdb) p $99
-      $129 = (CObject *) 0xfe545f0
-    (gdb) set print object on
-    (gdb) p $99
-      $130 = (CUnit *) 0xfe545f0
-  |set print pretty on/off| -- indent fields in structures
-  |set print static on/off| -- omit static members on obj print
+%%% Print Manipulations
+  Basically you can query the registers by prepending a dollar sign, e.g.
+    p $ecx
+  or use them in expressions:
+    p $esi + $ebx + 4
+  You can dereference the memory using the * operator (like in C):
+    p *$ecx
+  will print the contents of the memory location pointed to by ecx.
+  While you can't directly type in assembly code, you can translate the expression into something more high-level, like this:
+    p $eax - ($esi * $ebx)
+  Also, you can convert to various types using casts to C data-types, e.g.
+    p (char)$ecx
+  would print the contents of ecx as a character.
+    p *(char**)$ecx
+  which would interpret ecx as a pointer to char*, which you then dereference. So you'd see the contents of the string at the address contained in ecx.
+  This is just the tip of the iceberg though. gdb is very powerful tool. You might also find the display command useful. It's basically the same as print, except it will repeat the print command whenever the code is stopped (useful with breakpoints). You can examine most registers using info registers, or info all-registers if you're masochistic.
+  You can also change the contents of registers, using set:
+    set $eax = 20
 
 
-### Breakpoints from sourcecode ###
-  <It's a one-line in any Unix, try:
-  : #include <signal.h>
-  : #define BREAK_HERE raise(SIGINT)
-  : int main(int argc, char *argv[]){
-  : int i,j;
-  :   for(j=0,i=0;i<20;i++) {
-  :     j+=i;
-  :     if(j>20) BREAK_HERE;
-  :   }
-  : return 0;
-  : }
+%%% Breakpoints from sourcecode %%%
+It's a one-line in any Unix, try:
+    ```
+    #include <signal.h>
+    #define BREAK_HERE raise(SIGINT)
+    int main(int argc, char *argv[]){
+    int i,j;
+      for(j=0,i=0;i<20;i++) {
+        j+=i;
+        if(j>20) BREAK_HERE;
+      }
+    return 0;
+    }
+  ```
   > (gdb) run
    Program received signal SIGINT, Interrupt.
    0x705b28a0 in kill () from /usr/lib/libc.2
@@ -75,7 +39,7 @@ SEE: https://sourceware.org/gdb/wiki/STLSupport
   You will have to step twice to come back out of the raise() call into your code.
 
 
-### Signals ###
+%%% Signals %%%
   Print a table of all the signals and how gdb handle each one.
     i handle
     info signals        print signal setup
@@ -86,32 +50,7 @@ SEE: https://sourceware.org/gdb/wiki/STLSupport
     signal <signo|0>        continue and send [no] signal to program
 
 
-### Multi-threads ###
-: Use case: debugging specific thread, while controlling behavior of others.
-  facilities for debugging multi-thread programs:
-    - automatic notification of new threads
-    - ‘thread threadno’, to switch among threads
-    - ‘info threads’, to inquire about existing threads
-    - thread-specific breakpoints
-    - set mode for locking scheduler during execution
-      (gdb) set scheduler-locking step/on/off
-    others: Interrupted System Calls
-  (gdb) i threads
-  (gbd) b foo.cpp:13 thread 28 if x > li
-  Forking -- choose which to lead
-    set follow-fork-mode ask || parent/child
-  In addition, catchpoints come in handy:
-    catch exec
-   Catchpoint works as a breakpoint. Every time a call to exec() syscall is
-   detected, GDB stops. This allows you to set any breakpoint (i.e. break
-   main) in the newly loaded executable before continuing. Another
-   catchpoint catch fork works similarly for fork() syscall detection.
-  It is especially convenient:
-    when both parent and child has to be followed (set detach-on-fork off);
-    when parent processes forks often loading various executables.
-
-
-### Short-living programs ###
+%%% Short-living programs %%%
   Main remote term
     ./prg -a -b & kill -STOP $! && echo $! > /tmp/dbgpid
   Host
@@ -132,21 +71,21 @@ SEE: https://sourceware.org/gdb/wiki/STLSupport
     < then twice continue to skip SIGSTOP and once more to jump to main()
 
 
-### Remote debugging ###
-: https://sourceware.org/gdb/onlinedocs/gdb/Server.html
-: - GDB runs on one machine (host) and the program being debugged
-:   (exe.verXYZ.stripped ) runs on another (target).
-: - GDB communicates via Serial or TCP/IP.
-: - Host and target: exactly match between the executables and libraries,
-:   with one exception: stripped on the target.
+%%% Remote debugging %%%
+  https://sourceware.org/gdb/onlinedocs/gdb/Server.html
+   - GDB runs on one machine (host) and the program being debugged
+     (exe.verXYZ.stripped ) runs on another (target).
+   - GDB communicates via Serial or TCP/IP.
+   - Host and target: exactly match between the executables and libraries,
+     with one exception: stripped on the target.
   Connect gdb to code sources in different place
     (gdb) set substitute-path /usr/src/mnt/cross ""
     (gdb) dir /your/path/verXYZ
   Remote (10.10.0.225)
-    ; gdbserver :9999 program_stripped
-    ; ./gdbserver :9999 -attach <pid>
+    $ gdbserver :9999 program_stripped
+    $ ./gdbserver :9999 -attach <pid>
   Host
-    ; gdb program
+    $ gdb program
     (gdb) handle SIGTRAP nostop noprint pass
      to avoid pausing when launching the threads
     (gdb) target remote 10.10.0.225:9999
@@ -154,15 +93,36 @@ SEE: https://sourceware.org/gdb/wiki/STLSupport
     http://www.kandroid.org/online-pdk/guide/debugging_gdb.html
 
 
-% Hard-fault of CPU
-  http://support.code-red-tech.com/CodeRedWiki/DebugHardFault
-  http://support.code-red-tech.com/CodeRedWiki/UsingGDB
-  https://www.lpcware.com/content/forum/gdb-command-line-and-vector-catch
+%%% Examining stack frames
+If you're stopped at a breakpoint or at an error, you may also want to examine
+the state of stack frames further back in the calling sequence. You can use
+the up and down commands for this.
 
-% Non-native core dumping
-  Python
-    https://gist.github.com/toolness/d56c1aab317377d5d17a
-    ++ http://www.brendangregg.com/blog/2016-08-09/gdb-example-ncurses.html
-      E.G. python+ncurses
-  Java
-    https://www.javacodegeeks.com/2013/02/analysing-a-java-core-dump.html
+### Stack ###
+  info locals      print automatic variables in frame
+  info args         print function parameters
+| bt    | stack backtrace
+| f     |frame | show current execution position
+  How to know where you are (file, next execution line)?
+    (gdb) f
+  How to find out why your program stopped?
+    (gdb) i prog
+| up    | move up stack trace (from func to its caller -- till main)
+ (gdb) up
+ #1  0x08048441 in main (argc=2, argv=0xffd9add4) at reassemble.c:28
+ 28        buggy_function ();
+| down  | move down stack trace (from func to its callee -- away from main)
+ (gdb) down
+ #0  0x080483f1 in buggy_function () at reassemble.c:20
+ 20        int len = strlen (s);
+
+The commands above are really helpful if you're stuck at a segfault and want
+to know the arguments and local vars of the faulting function's caller (or
+that function's caller, etc.)
+
+
+%%% Checkpoint -- a snapshot of a program’s state
+  BAD: not available for most 'gdb' builds
+    (gdb) checkpoint
+    (gdb) i checkpoint
+    (gdb) restart checkpoint-id

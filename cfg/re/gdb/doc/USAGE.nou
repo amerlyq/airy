@@ -1,0 +1,119 @@
+% Noise
+  Disable copyright
+    # Regretfully -- no option exists/possible, only cmdline
+    $ gdb -q
+    $ alias gdb='gdb -q'
+    $ ./gdb
+      #!/bin/sh -eu
+      exec /path/to/cross/gdb -q "$@"
+  Disable irritating "press <space> for more"
+    =>_ you have scrollback
+    # NOTE: no need when running with '-batch'
+    (gdb) set pagination off
+  Disable long listing of threads: [New LWP 9107] ...
+    =>_ list on demand by '(gdb) i th'
+    (gdb) set print thread-events off
+
+% History
+  Command
+    (gdb) set history filename fname
+    (gdb) set history save on/off
+    (gdb) show history
+    (gdb) show commands
+
+  Values
+   * printed by the 'print' command
+    (gdb) p 42
+    (gdb) show values
+      $1 = 44
+
+  Convenience vars
+   + for your own purposes
+   - BUT: regretfully can't be used anywhere
+    (gdb) set $tbl = *table_ptr
+    (gdb) show conv
+
+
+% Startup
+https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
+  * /etc/gdb/gdbinit
+  * ~/.gdbinit
+  * $ -iex 'pre-cmd' -ix 'pre-script'
+  * ./.gdbinit  # NEED: 'set auto-load local-gdbinit'
+  * python/guile extensions
+  * $ -ex 'post-cmd' -x 'post-script'
+  * Reads the command history recorded in the history file
+
+
+% Pass VAR to $SHELL
+  (gdb) set $val = 2
+  (gdb) eval "shell echo %d", $val
+  (gdb) python gdb.execute("shell echo " + str(gdb.parse_and_eval("$val")))
+  (gdb) guile (use-modules (gdb))(value->integer (parse-and-eval "$val"))
+
+
+% Piping
+| show logging                    | Show the current values of the logging settings.
+| set logging [on|off]            | Enable/Disable at all
+| set logging file <file>         | Name of the current logfile (default: gdb.txt)
+| set logging overwrite [on|off]  | To overwrite logfile each time (default: append)
+| set logging redirect [on|off]   | Log only to logfile (default: both terminal and logfile)
+
+  cmds: shell -> gdb -> shell
+    $ vim ./.gdbinit  # make setup for cross-compile
+    $ printf 'set logging on /tmp/gdb.log\n%\n' "bt 10" > script
+    $ gdb -batch -x script file core
+
+  args: gdb -> shell -> gdb
+    (gdb) eval "shell ./filter %d > ./callback", $sp
+    (gdb) source ./callback
+
+  bins: gdb -> shell -> gdb
+    (gdb) dump memory dump $pc-0x100 $pc
+    (gdb) !./filter dump | xxd ... | sed/awk/perl ... > ./callback
+    (gdb) source ./callback
+
+
+% Call any function
+  = all functions available to the debugger
+  ! program is running and in a sane state
+
+  E.G. print to stdout
+    (gdb) call (void)puts("hello")
+
+
+% Env vars (python only)
+  http://stackoverflow.com/questions/9814185/how-to-access-environment-variables-inside-gdbinit-and-inside-gdb-itself
+  Set ENV from expr inside gdb
+    http://stackoverflow.com/questions/34726206/set-environment-variable-in-gdb-from-output-of-command
+
+
+% Repl
+  shell (interactive) in $cwd
+    (gdb) !
+  edit - compile - test
+    (gdb) edit
+    (gdb) shell gcc crash.c -o crash -gstabs+
+    (gdb) run
+  misc
+    (gdb) define command ... end  | define user command
+    (gdb) <CR>                    | repeat last command
+    (gdb) shell command args      | execute shell command
+    (gdb) source file             | load gdb commands from file
+    (gdb) quit                    | quit gdb
+    (gdb) ESC-CTRL-J              | switch to vi edit mode from emacs edit mode
+
+
+% Short paths in bt
+  Convenience variables don't work, only raw paths
+    (gdb) set $exe = "/path/to/pr"
+    (gdb) file $exe
+  Use symlinks and access from cfg by rel paths (run gdb from there)
+    $ cd /tmp/gdb
+    $ ln -vsfT /path/to/pr exe
+    $ gdb
+    (gdb) file exe
+  Or course, all necessary dirs and even gdb also can be symlinks
+    $ ./gdb
+  NOTE: spaces in filenames supported for >~v7.0 (beside REGR in v7.4)
+    (gdb) file "ex e"  # OR 'ex e'

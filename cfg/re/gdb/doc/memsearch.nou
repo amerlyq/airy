@@ -1,0 +1,65 @@
+REF
+Memory contents can be examined using the "x" command. The "x" command is
+optionally followed by a "/", a count field, a format field, a size field and
+finally a memory address. The count field is a number in decimal. The format
+field is a single letter with 'd' for decimal, 'x' for hexadecimal, 't' for
+binary and 'c' for ASCII. The size field is also a single letter with 'b' for
+byte, 'h' for 16-bit word (half word) and 'w' for a 32-bit word. For example,
+if your program has a label "msg", the following commands:
+x/12cb &msg x/12db &msg x/12xh &msg x/12xw &msg
+will print out respectively the contents of memory starting at msg in the
+following manner: the next 12 bytes as ASCII characters, the next 12 bytes as
+decimal numbers, the next 12 16-bit words in hex, and the next 12 32-bit words
+in hex.
+
+% Search
+(gdb) x/d or x 'address' show decimal
+(gdb) x/100s 'address' show next 100 decimals
+(gdb) x 0x0804846c show decimal at 0x0804846c
+(gdb) x/s 'address' show strings at address
+(gdb) x/105 0x0804846c show 105 strings at 0x0804846c
+(gdb) x/x 'address' show hexadecimal address
+(gdb) x/10x 0x0804846c show 10 addresses at 0x0804846c
+(gdb) x/b 0x0804846c show byte at 0x0804846c
+(gdb) x/10b 0x0804846c-10 show byte at 0x0804846c-10
+(gdb) x/10b 0x0804846c+20 show byte at 0x0804846c+20
+(gdb) x/20i 0x0804846c show 20 assembler instructions at address
+Список всех секций в исполняемом файле:
+(gdb) maintenance info sections // or
+(gdb) mai i s
+Executable file:
+    `/home/hack/homepage/challenge/buf/basic', file type
+elf32-i386.
+    0x080480f4->0x08048107 at 0x000000f4: .interp ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x08048108->0x08048128 at 0x00000108: .note.ABI-tag
+ALLOC LOAD READONLY DATA HAS_CONTENTS
+    0x08048128->0x08048158 at 0x00000128: .hash ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x08048158->0x080481c8 at 0x00000158: .dynsym ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x080481c8->0x08048242 at 0x000001c8: .dynstr ALLOC
+LOAD READONLY DATA HAS_CONTENTS
+    0x08048242->0x08048250 at 0x00000242: .gnu.version
+ALLOC LOAD READONLY DATA
+HAS_CONTENTS
+...
+Бряк на адрес:
+(gdb) disassemble main
+Dump of assembler code for function main:
+0x8048400 <main>: push %ebp
+0x8048401 <main+1>: mov %esp,%ebp
+0x8048403 <main+3>: sub $0x408,%esp
+0x8048409 <main+9>: add $0xfffffff8,%esp
+0x804840c <main+12>: mov 0xc(%ebp),%eax
+0x804840f <main+15>: add $0x4,%eax
+0x8048412 <main+18>: mov (%eax),%edx
+0x8048414 <main+20>: push %edx
+0x8048415 <main+21>: lea 0xfffffc00(%ebp),%eax
+...
+(gdb) break *0x8048414 // example
+Breakpoint 1 at 0x8048414
+(gdb) break main // example
+Breakpoint 2 at 0x8048409
+(gdb)
+И так далее :)

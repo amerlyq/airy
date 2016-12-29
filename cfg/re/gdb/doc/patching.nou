@@ -1,0 +1,44 @@
+%% Patch read-only regs in coredump
+# = setting cooked regs
+http://stackoverflow.com/questions/9809810/gdb-corrupted-stack-frame-how-to-debug
+http://cygwin.com/ml/gdb/2011-02/msg00042.html
+  http://cygwin.com/ml/gdb/2011-02/msg00047.html
+  $ frame FRAMEADDR PCADDR  # where FRAMEADDR should be $sp in the caller.
+  $ eu-readelf -n corefile  # and patch the registers using hexedit,
+  TRY $ set write
+
+Cooked corefile with user-defined RAM and regs
+  http://stackoverflow.com/questions/17858728/manually-generate-elf-core-dump
+  http://stackoverflow.com/questions/17972945/core-dump-note-section
+
+
+% Running prg
+Замена в памяти переменных на стёке, переданных в функцию
+   Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
+   x/i $eip 0x4006d585 <_IO_puts+21>: mov 0x8(%ebp),%esi
+  (gdb) set {char}0x8048e59='X'
+  (gdb) set {char}0x8048e5a='A'
+  (gdb) set {char}0x8048e5b='K'
+  (gdb) set {char}0x8048e5c='E'
+  (gdb) set {char}0x8048e5d='P'
+  x/3sw 0x8048e59
+   0x8048e59 <_IO_stdin_used+437>: "XAKEP\004\b"
+
+  !!! TIP
+    For experiments on patching you need simple programm which will be executed
+      over and over again -- so move all your code in cycle.
+
+
+% Detect tracing in Linux and how to struggle
+  http://reverseengineering.stackexchange.com/questions/1930/detecting-tracing-in-linux
+  Struggle:
+  clear call to ptrace with NOP
+    (gdb) set write
+    (gdb) set {unsigned int}$pc = 0x90909090
+    (gdb) set {unsigned char}($pc+4) = 0x90
+    (gdb) set write off
+    x/10i $pc
+  Alternative:
+    Manipulate the program counter (instruction pointer) instead:
+      set $pc+=5 or the more explicit set $pc=$pc+5
+      jump *$pc+5

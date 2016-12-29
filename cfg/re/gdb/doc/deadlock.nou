@@ -1,162 +1,36 @@
 %%%% Deadlock
+# ~77368
 
 SEE
   http://yusufonlinux.blogspot.com/2010/11/debugging-core-using-gdb.html
-  https://wiki.archlinux.org/index.php/Step-by-step_debugging_guide
 
-% Search for thread, which blocked the current one %  # ~77368
-Program terminated with signal 6, Aborted.
-#0  0x2ab27b6c in pthread_cond_wait () from /lib/libpthread.so.0
-(gdb) thread 110
-[Switching to thread 110 (process 4359)]#0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
-(gdb) bt
-#0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
-#1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
-...
-(gdb) f 1
-#1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
-(gdb) p* (pthread_mutex_t*)$a0
-$1 = {
-  __data = {
-    __lock = 2,
-    __count = 0,
-    __owner = 4391,
-    __kind = 0,
-    __nusers = 1,
-    __spins = 0
-  },
-  __size = "\000\000\000\002\000\000\000\000\000\000\021'\000\000\000\000\000\000\000\001\000\000\000",
-  __align = 2
-}
-(gdb) thread 100
-[Switching to thread 100 (process 4391)]#0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
-(gdb) bt
-#0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
-#1  0x2ac820d0 in usleep () from /lib/libc.so.0
-...
-
-
-%% Shell
-  Interactive (TEMP)
-    (gdb) !
-
-
-%% Short paths in bt
-  Convenience variables don't work, only raw paths
-    (gdb) set $exe = "/path/to/pr"
-    (gdb) file $exe
-  Use symlinks and access from cfg by rel paths (run gdb from there)
-    $ cd /tmp/gdb
-    $ ln -vsfT /path/to/pr exe
-    $ gdb
-    (gdb) file exe
-  Or course, all necessary dirs and even gdb also can be symlinks
-    $ ./gdb
-  NOTE: spaces in filenames supported for >~v7.0 (beside REGR in v7.4)
-    (gdb) file "ex e"  # OR 'ex e'
-
-
-%% Loading symbols from non-stripped .so %%  # USE: 131026
-# BET: No need to manually copy library
-  Stripped 'default' -- has only absolutely necessary symbols for dynamic linking
-    (gdb) !readelf -S root/lib/libstdc++.so |grep sym
-      [ 2] .dynsym           DYNSYM          000062bc 0062bc 010730 10   A  3   3  4
-  Unstripped version has complete set of symbols
-    (gdb) !readelf -S libs/libstdc++.so |grep sym
-      [ 2] .dynsym           DYNSYM          000062bc 0062bc 010730 10   A  3   3  4
-      [38] .symtab           SYMTAB          00000000 41c658 0342a0 10     39 9146  4
-  Loading additional symbols from unstripped library over partially stripped sysroot
-  # NOTE: this will only decode already shown ?? symbols. You need to reload 'file' to rebuild 'bt'
-    (gdb) info sharedlibrary libstdc++.so
-      From        To          Syms Read   Shared Object Library
-      0xb6a5de18  0xb6aa8ed0  Yes (*)     root/lib/libstdc++.so.6
-      (*): Shared library is missing debugging information.
-    (gdb) add-symbol-file libs/libstdc++.so 0xb6a5de18
-      add symbol table from file "libs/libstdc++.so" at
-              .text_addr = 0xb6a5de18
-      (y or n) y
-      Reading symbols from libs/libstdc++.so...done.
-  Decode whole 'bt' -- NEED to reload 'file'
-    (gdb) file exe
-    (gdb) bt
-
-
-%% Unlimited bt on MIPS stack %%  # ~77368
-BET: http://visualgdb.com/gdbreference/commands/set_backtrace_past-entry
-  Real bt for comparison
-      #0  0x2ac3cd80 in _fdata () from root/lib/libc.so.0
-      #1  0x2ac4f740 in semop () from root/lib/libc.so.0
-      #2  0x2aabf280 in _dlRenderThread (arg=0x0) at drawlist_command.c:203
-      #3  0x2ab2203c in start_thread () from root/lib/libpthread.so.0
-      #4  0x2ab2c350 in __thread_start () from root/lib/libpthread.so.0
-      # Backtrace stopped: frame did not save the PC
-  USE 'heuristic-fence-post'
-    (gdb) set backtrace limit 0
-    (gdb) thr 42
-      # [Switching to thread 42 (LWP 4780)]
-      #0  0x2ac3cd80 in ?? () from root/lib/libc.so.0
-    (gdb) i f
-      Stack level 0, frame at 0x0:
-       pc = 0x2ac3cd80; saved pc = <unavailable>
-       Outermost frame: outermost
-       Arglist at unknown address.
-       Locals at unknown address, Previous frame's sp in sp
-    (gdb) set heuristic-fence-post -1   # HACK; OR:USE: 1000 (bytes)
-    (gdb) bt
-      #0  0x2ac3cd80 in ?? () from root/lib/libc.so.0
-      #1  0x2ac4f740 in semop () from root/lib/libc.so.0
-      #2  0x00000000 in ?? ()
-      # Backtrace stopped: frame did not save the PC
-    (gdb) set heuristic-fence-post 0    # DFL
-      # warning: GDB can't find the start of the function at 0x2ac3cd80.
-    (gdb) bt
-      #0  0x2ac3cd80 in ?? () from root/lib/libc.so.0
-
-
-
-%% Threads
-  Debug is easier if create coredump
-    http://processors.wiki.ti.com/index.php/Multithreaded_Debugging_Made_Easier_by_Forcing_Core_Dumps
-  Print pthread structure
-    https://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques/Deadlocks
-  Mapping
-    (gdb) info threads
-      : 12 Thread 4398053392560 (LWP 7234) 0x0000000010005740 in xxxx ()
-      : ...
-    (gdb) info proc 7234 status
-      > WARNING: works only on running process
-  Get TLS (thread-local storage)
-    http://stackoverflow.com/questions/10841219/thread-specific-data-from-linux-core-dump
-  Save func arguments/buffer into file
-    http://tamkovich.com/2011/03/core-dump-for-multithreading-app/
-
-
-% Locked mutex / refcount on exit
-  http://kfunk.org/2014/08/29/scripting-gdb-to-execute-commands-at-particular-breakpoints/
-
-
-% Recursive frames: how to coerce gdb into giving a backtrace
-SEE
-  + http://fragglet.livejournal.com/19646.html
-  http://stackoverflow.com/questions/9809810/gdb-corrupted-stack-frame-how-to-debug
-
-  (gdb) thr 100
-  [Switching to thread 100 (LWP 4391)]
+% Search for thread, which blocked the current one
+    # Program terminated with signal 6, Aborted.
+    #0  0x2ab27b6c in pthread_cond_wait () from /lib/libpthread.so.0
+  (gdb) thread 110
+    [Switching to thread 110 (process 4359)]#0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
   (gdb) bt
-  #0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
-  #1  0x2ab2b8f0 in nanosleep () from /lib/libpthread.so.0
-  Backtrace stopped: previous frame identical to this frame (corrupt stack?)
-
-
-% Patch read-only regs in coredump
-# = setting cooked regs
-http://stackoverflow.com/questions/9809810/gdb-corrupted-stack-frame-how-to-debug
-http://cygwin.com/ml/gdb/2011-02/msg00042.html
-  http://cygwin.com/ml/gdb/2011-02/msg00047.html
-  $ frame FRAMEADDR PCADDR  # where FRAMEADDR should be $sp in the caller.
-  $ eu-readelf -n corefile  # and patch the registers using hexedit,
-  TRY $ set write
-
-Cooked corefile with user-defined RAM and regs
-  http://stackoverflow.com/questions/17858728/manually-generate-elf-core-dump
-  http://stackoverflow.com/questions/17972945/core-dump-note-section
+    #0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
+    #1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
+  ...
+  (gdb) f 1
+    #1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
+  (gdb) p* (pthread_mutex_t*)$a0
+    $1 = {
+      __data = {
+        __lock = 2,
+        __count = 0,
+        __owner = 4391,
+        __kind = 0,
+        __nusers = 1,
+        __spins = 0
+      },
+      __size = "\000\000\000\002\000\000\000\000\000\000\021'\000\000\000\000\000\000\000\001\000\000\000",
+      __align = 2
+    }
+  (gdb) thread 100
+    [Switching to thread 100 (process 4391)]#0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
+  (gdb) bt
+    #0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
+    #1  0x2ac820d0 in usleep () from /lib/libc.so.0
+    ...

@@ -56,8 +56,10 @@ Print
 | p array[i]@count | artificial array - print array range
   E.G. p *&a[550]@4 -- print from array or std::vector elements 550..553
   ALT: p (int[1024]) *ptr (BUT: does not work for 'operator[]')
-  AKT: p {CObject*} (($node = *$node) + 8) -- poor man loop to traverse std::list on <Enter>
-| p/x &main     print address of function
+  ALT: p {CObject*} (($node = *$node) + 8) -- poor man loop to traverse std::list on <Enter>
+  CHG: p/x (char[10]) *($ebx) | change representation of string
+    # $90 =  {0x61, 0x73, 0x64, 0x66, 0x61, 0x73, 0x64, 0x66, 0x65, 0xa}
+| p/x &main     | print address of function
 
 | printf "%08X\n", i
 
@@ -65,6 +67,7 @@ Pipe
 | !cmd | shell cmd | execute 'cmd', no catch
 
 Breakpoints
+http://www.unknownroad.com/rtfm/gdbtut/gdbbreak.html
 | b  func       | Function
 | b  file.c:39  | file:line
 | break *addrss | before executing instruction at address (like 0x400882)
@@ -184,19 +187,6 @@ RE
 
 
 
- Memory contents can be examined using the "x" command. The "x" command is
- optionally followed by a "/", a count field, a format field, a size field and
- finally a memory address. The count field is a number in decimal. The format
- field is a single letter with 'd' for decimal, 'x' for hexadecimal, 't' for
- binary and 'c' for ASCII. The size field is also a single letter with 'b' for
- byte, 'h' for 16-bit word (half word) and 'w' for a 32-bit word. For example,
- if your program has a label "msg", the following commands:
-  x/12cb &msg x/12db &msg x/12xh &msg x/12xw &msg
- will print out respectively the contents of memory starting at msg in the
- following manner: the next 12 bytes as ASCII characters, the next 12 bytes as
- decimal numbers, the next 12 16-bit words in hex, and the next 12 32-bit words
- in hex.
-
 Sometimes, as you are tracing your program, you are really interested in the contents of a specific register. If you issue the command:
   Display
   | info display | will list all the active displays.
@@ -211,119 +201,3 @@ Sometimes, as you are tracing your program, you are really interested in the con
   | display/i $eip
    A very good use of the display command is to have the next instruction of
    the program printed whenever the program is halted.
-
-Also good to know
- Sometimes when stepping through assembly the regs and asm views will get
- borked. Simply execute the respective layout commands again to restore them
- to their old glory:
-  (gdb) layout asm
-  (gdb) layout regs
-
-Detect tracing in Linux and how to struggle
-  http://reverseengineering.stackexchange.com/questions/1930/detecting-tracing-in-linux
-  Struggle:
-  clear call to ptrace with NOP
-    (gdb) set write
-    (gdb) set {unsigned int}$pc = 0x90909090
-    (gdb) set {unsigned char}($pc+4) = 0x90
-    (gdb) set write off
-    x/10i $pc
-  Alternative:
-    Manipulate the program counter (instruction pointer) instead:
-      set $pc+=5 or the more explicit set $pc=$pc+5
-      jump *$pc+5
-
-
-Замена в памяти переменных на стёке, переданных в функцию
-   Breakpoint 1, 0x4006d585 in _IO_puts (str=0x8048e59 "y") at ioputs.c:32
-   x/i $eip 0x4006d585 <_IO_puts+21>: mov 0x8(%ebp),%esi
-  (gdb) set {char}0x8048e59='X'
-  (gdb) set {char}0x8048e5a='A'
-  (gdb) set {char}0x8048e5b='K'
-  (gdb) set {char}0x8048e5c='E'
-  (gdb) set {char}0x8048e5d='P'
-  x/3sw 0x8048e59
-   0x8048e59 <_IO_stdin_used+437>: "XAKEP\004\b"
-
-TIPS
-  For experiments on patching you need simple programm which will be executed
-    over and over again -- so move all your code in cycle.
-
-Поиск в памяти:
-(gdb) x/d or x 'address' show decimal
-(gdb) x/100s 'address' show next 100 decimals
-(gdb) x 0x0804846c show decimal at 0x0804846c
-(gdb) x/s 'address' show strings at address
-(gdb) x/105 0x0804846c show 105 strings at 0x0804846c
-(gdb) x/x 'address' show hexadecimal address
-(gdb) x/10x 0x0804846c show 10 addresses at 0x0804846c
-(gdb) x/b 0x0804846c show byte at 0x0804846c
-(gdb) x/10b 0x0804846c-10 show byte at 0x0804846c-10
-(gdb) x/10b 0x0804846c+20 show byte at 0x0804846c+20
-(gdb) x/20i 0x0804846c show 20 assembler instructions at address
-Список всех секций в исполняемом файле:
-(gdb) maintenance info sections // or
-(gdb) mai i s
-Executable file:
-    `/home/hack/homepage/challenge/buf/basic', file type
-elf32-i386.
-    0x080480f4->0x08048107 at 0x000000f4: .interp ALLOC
-LOAD READONLY DATA HAS_CONTENTS
-    0x08048108->0x08048128 at 0x00000108: .note.ABI-tag
-ALLOC LOAD READONLY DATA HAS_CONTENTS
-    0x08048128->0x08048158 at 0x00000128: .hash ALLOC
-LOAD READONLY DATA HAS_CONTENTS
-    0x08048158->0x080481c8 at 0x00000158: .dynsym ALLOC
-LOAD READONLY DATA HAS_CONTENTS
-    0x080481c8->0x08048242 at 0x000001c8: .dynstr ALLOC
-LOAD READONLY DATA HAS_CONTENTS
-    0x08048242->0x08048250 at 0x00000242: .gnu.version
-ALLOC LOAD READONLY DATA
-HAS_CONTENTS
-...
-Бряк на адрес:
-(gdb) disassemble main
-Dump of assembler code for function main:
-0x8048400 <main>: push %ebp
-0x8048401 <main+1>: mov %esp,%ebp
-0x8048403 <main+3>: sub $0x408,%esp
-0x8048409 <main+9>: add $0xfffffff8,%esp
-0x804840c <main+12>: mov 0xc(%ebp),%eax
-0x804840f <main+15>: add $0x4,%eax
-0x8048412 <main+18>: mov (%eax),%edx
-0x8048414 <main+20>: push %edx
-0x8048415 <main+21>: lea 0xfffffc00(%ebp),%eax
-...
-(gdb) break *0x8048414 // example
-Breakpoint 1 at 0x8048414
-(gdb) break main // example
-Breakpoint 2 at 0x8048409
-(gdb)
-И так далее :)
-
-
-.....................................
-
-Examining stack frames
-
-If you're stopped at a breakpoint or at an error, you may also want to examine
-the state of stack frames further back in the calling sequence. You can use
-the up and down commands for this.
-
-### Stack ###
-  info locals      print automatic variables in frame
-  info args         print function parameters
-| bt    | stack backtrace
-| frame | show current execution position
-| up    | move up stack trace (from func to its caller -- till main)
- (gdb) up
- #1  0x08048441 in main (argc=2, argv=0xffd9add4) at reassemble.c:28
- 28        buggy_function ();
-| down  | move down stack trace (from func to its callee -- away from main)
- (gdb) down
- #0  0x080483f1 in buggy_function () at reassemble.c:20
- 20        int len = strlen (s);
-
-The commands above are really helpful if you're stuck at a segfault and want
-to know the arguments and local vars of the faulting function's caller (or
-that function's caller, etc.)

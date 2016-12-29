@@ -1,0 +1,26 @@
+%% Extending
+  Composition, Python, Aliases
+   http://www.univ-orleans.fr/sciences/info/ressources/webada/doc/gnat/gdb_24.html
+   https://docs.python.org/devguide/gdb.html
+  Catch output
+    file
+      http://www.univ-orleans.fr/SCIENCES/INFO/RESSOURCES/webada/doc/gnat/gdb_24.html
+      http://stackoverflow.com/questions/6885923/redirecting-stori%E2%80%8C%E2%80%8Bng-output-of-shell-i%E2%80%8C%E2%80%8Bnto-gdb-variable
+    mkfifo
+      + TRY: -- open /tmp/gdb.$PID into fd=&3 for whole _this_ gdb session
+      http://stackoverflow.com/questions/8410439/how-to-avoid-echo-closing-fifo-named-pipes-funny-behavior-of-unix-fifos
+    python
+      http://unix.stackexchange.com/questions/151502/how-to-save-the-result-of-printf-to-a-variable-in-gdb
+      http://stackoverflow.com/questions/9963501/storing-shell-output-into-gdb-variable-in-gdbinit
+  GDB scripts
+    http://sourceware.org/gdb/current/onlinedocs/gdb/Command-Files.html#Command-Files
+    - http://ftp.gnu.org/old-gnu/Manuals/gdb/html_chapter/gdb_18.html
+      $ gdb -x <file name> ...
+  Python
+    http://sourceware.org/gdb/current/onlinedocs/gdb/Python.html#Python
+    https://sourceware.org/gdb/wiki/PythonGdbTutorial
+    $ (gdb) python x=gdb.execute("info registers", False, True); print x
+    xxd-like formatted memory dump (python)
+      http://qkxue.net/info/152843/Useful-GDB-Tricks
+  Lisp
+    https://github.com/tromey/gdb-refactoring-scripts
