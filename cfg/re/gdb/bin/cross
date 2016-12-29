@@ -6,7 +6,11 @@ case ${1+$1} in -R) refresh=1; shift; esac  # TEMP
 # NOTE: necessary only for toolchain (if session found)
 [[ -s /etc/debian_chroot ]] && cmd=() || cmd=( r.chroot )
 cmd+=( ./gdb -q )
+
+# Local ./.gdbinit is too late for this option
 cmd+=( -iex "set auto-load safe-path $PWD" )
+# BAD: this opt can't tolerate symlinks
+# cmd+=( -iex "set auto-load local-gdbinit" )
 
 
 # TODO: generate only for toolchain

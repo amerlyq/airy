@@ -4,12 +4,10 @@
 #   * 'cdir' to setup 'OLD_BDR'
 #   * list of relative src dirs to setup 'SRC_DIRS'
 # TODO:THINK: substitute-path by empty to search rel path in dirs
-
-# NOTE:(pagination off): no need when running with '-batch'
+#   ::> impossible
 
 cat> "$(r.gdb-tmp)"/init.cfg <<EOT
 # vim:ft=gdb
-# set auto-load safe-path "$PWD"
 set pagination off
 set logging overwrite on
 set print thread-events off
