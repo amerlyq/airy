@@ -15,6 +15,8 @@ SEE
   ...
   (gdb) f 1
     #1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
+  (gdb) thread apply all p* (pthread_mutex_t*)$a0
+  (gdb) thread apply 1 4 5 90 p* (pthread_mutex_t*)$a0
   (gdb) p* (pthread_mutex_t*)$a0
     $1 = {
       __data = {
@@ -28,6 +30,7 @@ SEE
       __size = "\000\000\000\002\000\000\000\000\000\000\021'\000\000\000\000\000\000\000\001\000\000\000",
       __align = 2
     }
+  (gdb) i thr
   (gdb) thread 100
     [Switching to thread 100 (process 4391)]#0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
   (gdb) bt

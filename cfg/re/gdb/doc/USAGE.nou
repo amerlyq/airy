@@ -16,21 +16,22 @@
 
 % History
   Command
-    (gdb) set history filename fname
-    (gdb) set history save on/off
+    (gdb) set history filename ~/.cache/gdb_history
+    (gdb) set history save on
     (gdb) show history
     (gdb) show commands
 
   Values
    * printed by the 'print' command
-    (gdb) p 42
+    (gdb) p $sp
     (gdb) show values
-      $1 = 44
+      $1 = 0x7f4444883f
+    (gdb) x/x $1
 
   Convenience vars
    + for your own purposes
    - BUT: regretfully can't be used anywhere
-    (gdb) set $tbl = *table_ptr
+    (gdb) set $tbl = *table_ptr->(*(char*)name+12))
     (gdb) show conv
 
 
@@ -61,12 +62,14 @@ https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
 
   cmds: shell -> gdb -> shell
     $ vim ./.gdbinit  # make setup for cross-compile
-    $ printf 'set logging on /tmp/gdb.log\n%\n' "bt 10" > script
+    $ printf 'set logging on /tmp/gdb.log\n%s\n' "bt 10" > script
     $ gdb -batch -x script file core
+    ALT: $ gdb -batch -ex 'set logging on /tmp/gdb.log' -ex 'bt 10' file core
 
   args: gdb -> shell -> gdb
     (gdb) eval "shell ./filter %d > ./callback", $sp
     (gdb) source ./callback
+      # set $ret = 0x....
 
   bins: gdb -> shell -> gdb
     (gdb) dump memory dump $pc-0x100 $pc

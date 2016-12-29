@@ -1,14 +1,14 @@
-  * Corefile format
+  * 2016-12-29 [X] Corefile format
     = what you can and cannot find there
-  * Manual augmenting stripped symbols and picking debug sections
+  * 2016-12-29 [X] Manual augmenting stripped symbols and picking debug sections
     = not each problem can be resolved by copying libc.so.0
   * Parsing/unwinding bare stack with no symbols
-    - your whole backtrace is #0 0xb69add08 ?? (), you are sad
+    - 2016-12-29 [X] your whole backtrace is #0 0xb69add08 ?? (), you are sad
     - you have #0 0x00000000 ?? (), so you are even sadder
     = cases of corrupted subset of registers $sp, $pc, $ra
     = cases of corrupted stack itself
     = find stack for your thread
-    + demo for MIPS (ARM/Intel -- only on demand)
+    + 2016-12-29 [X] demo for MIPS (ARM/Intel -- only on demand)
   * Mental parsing of STL structs in memory dump
     + demo for std::map
     = you can't call methods when executable is not running (e.g. coredump)
