@@ -16,9 +16,15 @@ elif file -b "$EXE" | grep -qwF MIPS; then
 fi
 
 # SRC="$pj/src"
-[[ -n $BDR ]] || BDR=$PJROOT/buildroot
+[[ -n ${BDR-} ]] || BDR=$PJROOT/buildroot
 GDB=$(ls -d "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb) || GDB=$xct_gdb
 LIBS=$(ls -d "$BDR"/build_*/staging_dir/lib)
 
-export GDB ROOT CORE EXE SRC BDR LIBS
-exec r.gdb-session "$@"
+# THINK: move exporting into 'session' MAYBE rename 'session' -> 'env'
+#   => this file must only print key-value results
+# SEE: exporting from conf
+#   http://stackoverflow.com/questions/19331497/set-environment-variables-from-file
+cd "$(r.gdb-tmp -d)"
+links=( GDB ROOT CORE EXE SRC BDR LIBS )
+echo "links=( ${links[*]} )" > ./env
+for nm in "${links[@]}"; do echo "${nm}=${!nm-}" >> ./env; done

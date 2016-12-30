@@ -4,11 +4,10 @@ mkln(){ [[ -z $1 ]] || [[ $1 -ef $2 ]] || ln -sfT "$1" "$2"; }
 
 init=$PWD/gdbinit
 cd "$(r.gdb-tmp -d)"
+source ./env
 
 # ALT: mnt to /nfs
 # MAYBE: remove 'sh -u' -- if I want allow partial session setup
-for nm in GDB ROOT CORE EXE SRC BDR LIBS
-do mkln "${!nm-}" "${nm,,}"
-done
+for nm in "${links[@]}"; do mkln "${!nm-}" "${nm,,}"; done
 
 [[ ! -s $init ]] || mkln "$init" .gdbinit

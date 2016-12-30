@@ -20,6 +20,7 @@ cmd+=( -iex "set auto-load safe-path $PWD" )
 tmp=$(r.gdb-tmp)
 if [[ ! -d $tmp ]] || ((refresh)); then
   r.gdb-params
+  r.gdb-session
   r.gdb-cfg
 fi
 cd "$tmp"

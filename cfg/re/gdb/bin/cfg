@@ -6,11 +6,15 @@
 # TODO:THINK: substitute-path by empty to search rel path in dirs
 #   ::> impossible
 
-cat> "$(r.gdb-tmp)"/init.cfg <<EOT
+cd "$(r.gdb-tmp -d)"
+source ./env
+
+cat> ./init.cfg <<EOT
 # vim:ft=gdb
 set pagination off
 set logging overwrite on
 set print thread-events off
+set data-directory "${GDB%/*}"
 # OR: sysroot
 set solib-absolute-prefix root
 set solib-search-path libs
