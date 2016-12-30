@@ -13,6 +13,11 @@
   Disable long listing of threads: [New LWP 9107] ...
     =>_ list on demand by '(gdb) i th'
     (gdb) set print thread-events off
+  FIX:(when --with-python): missing python modules
+    # Python Exception <type 'exceptions.NameError'> Installation error: gdb.execute_unwinders function is missing:
+    # Python Exception <type 'exceptions.ImportError'> No module named gdb.frames:
+    (gdb) set data-directory /path/to/buildroot/toolchain_build_*/gdbhost-*/gdb
+
 
 % History
   Command

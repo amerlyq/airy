@@ -27,9 +27,10 @@ LST+=(gcc-multilib g++-multilib lib32stdc++6)
 LST+=(make pkg-config autoconf automake cmake bison flex texinfo fakeroot)
 LST+=(xutils-dev cvs tcl gettext intltool libncurses5-dev libxml2-dev zlib1g-dev sqlite3)
 LST+=(xsel zsh vim gdb git mercurial unzip)  # rsync openssh-client command-not-found
-LST+=(python3)
+LST+=(python-dev python3)
 # BUG:(corrupted install) sgml-base xml-core
 
 if cfgOpt u; then
-    pkg_inst ${LST[@]}
+  pkg_inst ${LST[@]}
+  # sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 10
 fi

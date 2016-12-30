@@ -196,6 +196,15 @@ User/groups
     1001->1012, 1002->1011, 1012->1002, 1011->1001
 
 Package mgrs
+  List installed packages
+    $ apt list --installed | grep py
+    $ dpkg -S /usr/bin/python*
+  Update links
+    $ sudo update-alternatives --config python
+      # update-alternatives: error: no alternatives for python
+    $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 10
+    MAYBE:(if not fixed after re-login): $ sudo ln -sv python2.7 /usr/bin/python
+
   | pacman -U <file>   | install from disk
   | pacman -Qo <file>  | search which pkg contains
   | pacman -Ql <pkg>   | list all pkg files

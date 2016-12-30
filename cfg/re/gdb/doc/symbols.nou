@@ -23,6 +23,14 @@
     (gdb) bt
 
 
+%%% Generate debug symbols
+  Add debug smbs to uClibc
+    $ ./buildroot/toolchain_build_mips/uClibc-ng-1.0.15
+    $ make menuconfig
+    -> Development/debugging options
+      -> Enable debug symbols
+
+
 %% Unlimited bt on MIPS stack %%  # ~77368
 BET: http://visualgdb.com/gdbreference/commands/set_backtrace_past-entry
   Real bt for comparison

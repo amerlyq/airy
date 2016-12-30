@@ -26,7 +26,19 @@ TODO
     ? based on 'ct' OR reconfigure buildroot ?
     http://lists.busybox.net/pipermail/buildroot/2014-September/106309.html
     http://lists.busybox.net/pipermail/buildroot/2014-September/106314.html
-    ./buildroot/toolchain/gdb/gdb.mk
+      ./buildroot/toolchain/gdb/gdb.mk
+    ++ http://askubuntu.com/questions/513626/cannot-compile-gdb7-8-with-python-support
+      NEED: python-dev
+      TRY: $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 10
+    = FIX for chroot / bsrv
+      checking for python2.7... no
+      checking for python... /usr/bin/python
+      checking for python2.7... yes
+      checking for python... /usr/bin/python
+      checking for python version... 2.7
+      checking for python platform... linux2
+      checking for python script directory... ${prefix}/lib/python2.7/dist-packages
+      checking for python extension module directory... ${exec_prefix}/lib/python2.7/dist-packages
   2016-12-28 [X] TRY: manually mark-up ':frame' in ?? () libc function
     based on boundaries of named func from issue's bt
     BAD: gdb has broken manual unwinding by :frame
