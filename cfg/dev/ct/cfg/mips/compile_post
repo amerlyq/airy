@@ -1,0 +1,17 @@
+#!/bin/bash -e
+### After build
+nm=mips-unknown-linux-uclibc
+cd "$nm"
+
+ln -svfT ../include "$nm/sys-include"
+ln -svfT ../libexec "$nm/libexec"
+
+mv -vf "$nm/lib" "$nm/lib_backup"
+ln -svfT ../lib "$nm/lib"
+
+ln -svfT "$nm/sysroot" sysroot
+
+ln -svfT "$nm" lib/gcc/mips-linux-uclibc
+ln -svfT "$nm" lib/gcc/mips-linux
+ln -svfT "$nm" mips-linux-uclibc
+ln -svfT "$nm" mips-linux

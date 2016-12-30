@@ -1,0 +1,41 @@
+Build ct-ng (PKGBUILD)
+$ mkcd ./toolchain
+$ ct-ng menuconfig
+  # and setup vars
+  # OR: use ready config -> rm $1 .config
+
+toolchain
+├── build.log
+├── buildroot
+│   ...
+├── compile
+├── compile_post
+├── config -> /usr/lib/ct-ng.1.21.0/config
+├── config.gen
+│   ...
+├── mips-unknown-linux-uclibc
+│   ├── bin
+│   ├── build.log.bz2
+│   ├── include
+│   ├── lib
+│   ├── libexec
+│   ├── mips-linux -> mips-unknown-linux-uclibc
+│   ├── mips-linux-uclibc -> mips-unknown-linux-uclibc
+│   ├── mips-unknown-linux-uclibc
+│   ├── share
+│   ├── sysroot -> mips-unknown-linux-uclibc/sysroot
+│   └── utils
+├── patches
+│   ├── binutils
+│   ├── gcc
+│   ├── gdb
+│   ├── linux
+│   └── uClibc
+├── tarballs
+│   ├── binutils-2.24.tar.bz2 -> /path/to/buildroot/dl/binutils-2.24.tar.bz2
+│   ├── gcc-4.8.2.tar.bz2 -> /path/to/buildroot/dl/gcc-4.8.2.tar.bz2
+│   ├── gdb-7.5.tar.bz2 -> /path/to/buildroot/dl/gdb-7.5.tar.bz2
+│   ├── linux-2.6.18.8.tar.bz2 -> /path/to/buildroot/dl/linux-2.6.18.8.tar.bz2
+│   ├── linux-3.3.8.tar.bz2 -> /path/to/buildroot/dl/linux-3.3.8.tar.bz2
+│   └── uClibc-0.9.32.1.tar.bz2 -> /path/to/buildroot/dl/uClibc-0.9.32.1.tar.bz2
+└── uclibc-config
