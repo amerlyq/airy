@@ -6,6 +6,7 @@ patat:
     incrementalLists: false
     wrap: true
     theme:
+        bulletListMarkers: '*-'
         emph: [dullGreen, onVividBlack, bold]
         imageTarget: [onDullWhite, vividRed]
 ---

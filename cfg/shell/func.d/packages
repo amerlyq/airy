@@ -73,7 +73,10 @@ pkg_build() {
     # It can be, that 'autoreconf' can replace my own vehicle.
     local prdir="$1"; shift; cd "$prdir"
 
-    if [[ -f ./CMakeLists.txt ]]; then
+    cabal=$(find . -maxdepth 1 -name '*.cabal' -print -quit)
+    if [[ $cabal ]]; then
+      cabal install "$cabal"
+    elif [[ -f ./CMakeLists.txt ]]; then
       mkdir -p ./build && bdir="$_"
       cmake -E chdir ./build cmake "" "$prdir" || return
       cd ./build && pkg_make
