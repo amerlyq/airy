@@ -12,9 +12,16 @@ List all attributes
   $ xinput -list-props 11
     => /dev/input/event13
   $ udevadm info --query=all --path=$(udevadm info --query=path --name=/dev/input/event13)
-  # But the strings for the Vendor and the Product should be the same as
+  # BUT the strings for the Vendor and the Product should be the same as
   # for the MatchVendor and MatchProduct strings in the InputClass
   # section of the xorg config file.
+  # BUT this lists the product names with _ instead of spaces. In my case it
+  # was Truly_Ergonomic_Computer_Keyboard instead of Truly Ergonomic Computer
+  # Keyboard. xinput list shows it correctly, but vendor and product name
+  # together in one line.
+  OR
+    http://fedoraproject.org/wiki/Input_device_configuration:
+    $ udevadm info --export-db | grep ID_MODEL
 
 Working with xinput
   http://unix.stackexchange.com/questions/83236/how-to-use-all-buttons-of-steelseries-cataclysm-mmo-gaming-mouse-in-xorg-gnome
