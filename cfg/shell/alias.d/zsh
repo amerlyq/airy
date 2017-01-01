@@ -42,6 +42,8 @@ alias -g NE='|grep -v ''^\s*$'''
 alias -g S='|noglob sed -u -rn'
 alias -g SN='|noglob sort -n'
 alias -g SU='|noglob sort -u'
+# ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'
+alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
 # alias -g TL='| tail -20 '
 
 for i in {1..5}; do alias -g C$i="|awk '{print\$$i}'"; done

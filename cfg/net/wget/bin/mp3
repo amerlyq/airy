@@ -69,7 +69,9 @@ todld(){ local cmd=(cat) d=${DST:?}/${1:?}
   mkdir -p "$d" && cd "$d"
 
   hasn j || r.wm 'M-<F12>'  # TEMP:HACK:(mark wnd 'tmux a -t wget' by M-S-F1)
-  hasn t || cmd=(r.fzf --exact --multi --no-sort --reverse)  #  --cycle
+  hasn t || cmd=(r.fzf --exact --multi --no-sort --reverse
+    --preview 't={};t=${t##*/};printf "%b\n" "${t//\%/\\x}"'
+    --preview-window=down:1)  #  --cycle
   _filtered | "${cmd[@]:?}" | r.wgetf -i-
 }
 

@@ -20,14 +20,16 @@ Status
   $ cat /proc/asound/card*/pcm0p/sub0/hw_params
 
 Mixers
-  amixer
-  alsamixer  # TUI
+  $ amixer
+  $ alsamixer  # TUI
 
 Test microphone level
-  arecord -vvv -f dat /dev/null
+  $ arecord -vvv -f dat /dev/null
 
 Test pulseaudio
-  pactl stat
+  $ pactl stat
+  $ pactl list short sinks
+  $ pacmd list-sinks
 
 Reorder audio cards
   http://superuser.com/questions/626606/how-to-make-alsa-pick-a-preferred-sound-device-automatically
