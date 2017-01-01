@@ -69,8 +69,8 @@ todld(){ local cmd=(cat) d=${DST:?}/${1:?}
   mkdir -p "$d" && cd "$d"
 
   hasn j || r.wm 'M-<F12>'  # TEMP:HACK:(mark wnd 'tmux a -t wget' by M-S-F1)
-  hasn t || cmd=(fzf --exit-0 --exact --multi --no-sort --reverse --cycle --no-hscroll)
-  _filtered | eval "${cmd[@]:?}" | r.wgetf -i-
+  hasn t || cmd=(r.fzf --exact --multi --no-sort --reverse)  #  --cycle
+  _filtered | "${cmd[@]:?}" | r.wgetf -i-
 }
 
 # THINK:TODO: parallel 'for' to start 'mpc' before starting 'dld'

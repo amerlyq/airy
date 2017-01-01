@@ -6,19 +6,7 @@ source ~/.shell/func.d/packages
 pkg_inst -p 'zrun' moreutils
 pkg_inst parallel tree
 
-
-# SEE:ALT:(fzf) -- search 'interactive filtering'
-#   ~ https://github.com/mooz/percol
-#   ~ https://github.com/keiji0/canything
-#   + https://github.com/zsh-users/zaw
-#   + https://github.com/peco/peco
-
-if distro arch; then
-  pkg_inst fzf
-fi
-
-
 # TRY:(cmdline util) align like 'column -t', but allow
-#   --ignore <rgx> unrelated 'rows'
-#   --choose <rgx> desired ones
+#   --ignore <rgx>|<idx_list> unrelated 'rows'
+#   --choose <rgx>|<idx_list> desired ones
 # FIND: similar existing prs

@@ -1,0 +1,15 @@
+#!/bin/sh -eu
+export FZF_DEFAULT_OPTS="
+  --exit-0
+  --tabstop=4
+  --inline-info
+  --no-hscroll
+  --bind=\
+esc:toggle,\
+ctrl-s:toggle-all,\
+ctrl-c:cancel,\
+ctrl-o:jump,\
+ctrl-v:toggle-preview,\
+alt-s:deselect-all
+"
+exec fzf "$@"
