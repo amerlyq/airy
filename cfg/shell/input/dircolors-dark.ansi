@@ -1,3 +1,43 @@
+# Exact Solarized Dark color theme for the color GNU ls utility.
+# Designed for dircolors (GNU coreutils) 5.97
+#
+# This simple theme was simultaneously designed for these terminal color schemes:
+# - Solarized dark  (best)
+# - Solarized light
+# - default dark
+# - default light
+# with a slight optimization for Solarized Dark.
+#
+# How the colors were selected:
+# - Terminal emulators often have an option typically enabled by default that makes
+#   bold a different color.  It is important to leave this option enabled so that
+#   you can access the entire 16-color Solarized palette, and not just 8 colors.
+# - We favor universality over a greater number of colors.  So we limit the number
+#   of colors so that this theme will work out of the box in all terminals,
+#   Solarized or not, dark or light.
+# - We choose to have the following category of files:
+#   NORMAL & FILE, DIR, LINK, EXEC and
+#   editable text including source, unimportant text, binary docs & multimedia source
+#   files, viewable multimedia, archived/compressed, and unimportant non-text
+# - For uniqueness, we stay away from the Solarized foreground colors are -- either
+#   base00 (brightyellow) or base0 (brightblue).  However, they can be used if
+#   you know what the bg/fg colors of your terminal are, in order to optimize the display.
+# - 3 different options are provided: universal, solarized dark, and solarized light.
+#   The only difference between the universal scheme and one that's optimized for
+#   dark/light is the color of "unimportant" files, which should blend more with the
+#   background
+# - We note that blue is the hardest color to see on dark bg and yellow is the hardest
+#   color to see on light bg (with blue being particularly bad).  So we choose yellow
+#   for multimedia files which are usually accessed in a GUI folder browser anyway.
+#   And blue is kept for custom use of this scheme's user.
+# - See table below to see the assignments.
+
+
+# Installation instructions:
+# This file goes in the /etc directory, and must be world readable.
+# You can copy this file to .dir_colors in your $HOME directory to override
+# the system defaults.
+
 # COLOR needs one of these arguments: 'tty' colorizes output to ttys, but not
 # pipes. 'all' adds color characters to all output. 'none' shuts colorization
 # off.
@@ -55,20 +95,24 @@ TERM screen-256color
 TERM screen-256color-bce
 TERM screen-256color-s
 TERM screen-256color-bce-s
+TERM screen-256color-italic
 TERM screen-bce
 TERM screen-w
 TERM screen.linux
+TERM screen.xterm-256color
 TERM screen.xterm-new
 TERM st
 TERM st-meta
 TERM st-256color
 TERM st-meta-256color
+TERM tmux
 TERM tmux-256color
 TERM vt100
 TERM xterm
 TERM xterm-new
 TERM xterm-16color
 TERM xterm-256color
+TERM xterm-256color-italic
 TERM xterm-88color
 TERM xterm-color
 TERM xterm-debian
@@ -169,13 +213,16 @@ EXEC 01;31  # Unix
 
 # Source text
 .h 32
+.hpp 32
 .c 32
 .C 32
 .cc 32
 .cpp 32
 .cxx 32
 .objc 32
+.cl 32
 .sh 32
+.bash 32
 .csh 32
 .zsh 32
 .el 32
@@ -216,6 +263,9 @@ EXEC 01;31  # Unix
 .p 32
 .pod 32
 .tex 32
+.go 32
+.sql 32
+.csv 32
 
 ### Multimedia formats
 
@@ -257,6 +307,7 @@ EXEC 01;31  # Unix
 .aac 33
 .au  33
 .flac 33
+.m4a 33
 .mid 33
 .midi 33
 .mka 33
@@ -265,6 +316,7 @@ EXEC 01;31  # Unix
 .mpeg 33
 .mpg 33
 .ogg  33
+.opus 33
 .ra 33
 .wav 33
 
@@ -281,6 +333,7 @@ EXEC 01;31  # Unix
 .m4v 33
 .mkv 33
 .mov 33
+.MOV 33
 .mp4 33
 .mp4v 33
 .mpeg 33
@@ -303,12 +356,18 @@ EXEC 01;31  # Unix
 .doc 31
 .docx 31
 .rtf 31
+.odt 31
 .dot 31
 .dotx 31
+.ott 31
 .xls 31
 .xlsx 31
+.ods 31
+.ots 31
 .ppt 31
 .pptx 31
+.odp 31
+.otp 31
 .fla 31
 .psd 31
 
