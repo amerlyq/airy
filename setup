@@ -16,6 +16,14 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 # TODO: ./setup -U -- do only ./update w/o ./setup
 # TRY:ALT:(my setup) -- dot mgmt by SEE https://github.com/thoughtbot/rcm
 
+# TODO: load aliases from modes
+# * file with whole pathes
+# * dir with symlinks
+# * BAD: dump all files into single one
+#   + reduce startup time
+#   !! shell-specific unportable aliases (ZSH)
+#   !! 'return' to interrupt sourcing will affect whole dump
+
 ### Colorize output ====================================================
 for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
 header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
