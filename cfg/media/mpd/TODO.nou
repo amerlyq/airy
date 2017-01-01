@@ -12,6 +12,15 @@ TODO:
       => 100% -- immediate seek hangs out playback indefinitely
     MAYBE:BUG? in mpd 'curl' plugin when accessing non-streaming online files w/o resume download support?
 
+  [_] BUG: mpd+alsa conflicts with any other sound source (like pulseaudio or mpv+alsa)
+    G: mpd alsa no sound
+    http://unix.stackexchange.com/questions/64914/mpd-no-audio-output-with-pulseaudio-no-mixing-with-alsa
+      https://bbs.archlinux.org/viewtopic.php?id=155456
+        https://bbs.archlinux.org/viewtopic.php?pid=1212425#p1212425
+        HACK: $ v /usr/lib/systemd/system/mpd.service
+        # [Service]
+        # User=%u
+        # PAMName=system-local-login
 
 REF
   !!! https://www.musicpd.org/doc/user/
