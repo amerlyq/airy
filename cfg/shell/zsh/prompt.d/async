@@ -68,5 +68,6 @@ function prompt_amer_precmd {
   trap prompt_amer_update USR1  # Re-establish trap each time
 
   _prompt_amer_time_get
+  [ -z $_prompt_amer_time ] || print -P $_prompt_amer_time
   _prompt_amer_async_exec
 }

@@ -17,7 +17,6 @@ zstyle ':prezto:load' zfunction 'zargs' 'zmv'
 ## Set the Prezto modules to load (browse modules).
 # The order matters: ...completion/>fasd/>...syntax/>history/>prompt/>$
 zstyle ':prezto:load' pmodule \
-  'environment'               \
   'editor'                    \
   'history'                   \
   'directory'                 \
@@ -36,7 +35,7 @@ zstyle ':prezto:load' pmodule \
 # ALIEN: dnf, dpkg(Mint), emacs, gnu-utility, haskell, homebrew, macports,
 #       node, ocaml, osx, perl(Mac), rails, ruby, screen, wakeonlan, yum
 # DOUBTS: archive, gpg/ssh, helper, python, terminal
-# SEIZED: tmux, pacman(Arch)
+# SEIZED: environment, tmux, pacman(Arch)
 
 
 ### Editor ###
@@ -77,6 +76,11 @@ zstyle ':prezto:module:prompt' theme 'amer'  # def: sorin
 zstyle ':prezto:module:syntax-highlighting' highlighters \
     main brackets pattern # cursor
     # root (DISABLED: irritating red highlight of root cmdline)
+
+# Disable:(seized by alias.d/colored)
+zstyle ':prezto:module:utility:ls' color 'no'
+zstyle ':prezto:module:utility:grep' color 'no'
+
 
 ## Set syntax highlighting styles.
 # zstyle ':prezto:module:syntax-highlighting' styles \

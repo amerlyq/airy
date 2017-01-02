@@ -1,27 +1,35 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
 
+function prompt_precmd {
+  # HACK: fetch err code immediately on precmd before overwritten
+  local p=$(prompt_top $(print -P '%?'))
+  [[ -z $p ]] || print -P $p
+  # HACK: don't append timer on empty <CR>
+  prompt_elapsed_reset
+}
+
+function prompt_preexec {
+  prompt_elapsed_reset
+}
+
 function prompt_amer_setup {
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   prompt_opts=(cr percent subst)
-  _prompt_amer_precmd_async_pid=0
-  _prompt_amer_data_pref="${TMPDIR:-/tmp}/zsh-cache"
-  _prompt_amer_start_time=$SECONDS
 
-  # Load required functions.
   autoload -Uz add-zsh-hook
-  # WARNING (time-consuming) Add hook for calling vcs_info before each command.
-  autoload -Uz vcs_info
-
   # Add hook for calling git-info before each command.
-  add-zsh-hook preexec prompt_amer_preexec
-  add-zsh-hook precmd  prompt_amer_precmd
+  add-zsh-hook preexec prompt_preexec
+  add-zsh-hook precmd  prompt_precmd
 
-  # At startup dirpath must already be visible
-  prompt_amer_pwd
+  # _prompt_amer_precmd_async_pid=0
+  # _prompt_amer_data_pref="${TMPDIR:-/tmp}/zsh-cache"
 
-  _prompt_amer_setup_git
-  _prompt_amer_setup_vcs  # NOTE vcs_info cfg
+  # WARNING (time-consuming) Add hook for calling vcs_info before each command.
+  # autoload -Uz vcs_info
+  # _prompt_amer_setup_git
+  # _prompt_amer_setup_vcs  # NOTE vcs_info cfg
+
   _prompt_amer_setup_prompts "$(_prompt_color $@)" "$(_prompt_parts)"
 }

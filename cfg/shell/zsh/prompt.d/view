@@ -2,42 +2,49 @@
 # @ref: MIT, (c) amerlyq, 2015
 
 function _prompt_amer_setup_prompts {
-  local color="$1" parts="$2"
+  local color=$1 parts=$2
   # setopt transient_rprompt   # only show the rprompt on the current prompt
   # ZLE_RPROMPT_INDENT=0
 
-  # Set editor-info parameters.
-  zstyle ':prezto:module:editor:info:completing' format '%B%F{1}…%f%b'
-  zstyle ':prezto:module:editor:info:keymap:primary' format "${parts[5]}"
-  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{3}♺%f'
+  # Set $editor_info params
   zstyle ':prezto:module:editor:info:keymap:alternate' format "${parts[4]}"
+  zstyle ':prezto:module:editor:info:keymap:primary' format "${parts[5]}"
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format "${parts[6]}"
 
-  # First line:
-  PROMPT="%F{$color}${parts[1,2]}${parts[2]}%f"
-  PROMPT+='%B%F{8}[%F{220}${_prompt_amer_pwd}%F{8}]%b'
-  PROMPT+='${git_info:+ ${(e)git_info[details]}}${vcs_info_msg_1_:+ $vcs_info_msg_1_}'
+  ## Top env
+  _prompt_elapsed='%B%F{10}>>> elapsed time: ${elapsed}%f%b'
+  _prompt_status='${jobstatus}${elapsed}${fill}${err}'
+  _prompt_env="%F{$color}${parts[1,2]}${parts[2]}%f"
+  # _prompt_env+='%B%F{10}${RANGER_LEVEL+R}${VIM+V}%f%b'
+  _prompt_env+='%B%F{8}[%F{220}${ppwd}%F{8}]%f%b'
+  _prompt_env+='${fill}'"%F{$color}${parts[2]}"'%B%F{8}(%F{3}${date}%F{8})%f%b'
+
+  ## Left
+  PROMPT="%F{$color}${parts[3]}%f"
+  PROMPT+='${git_info:+${(e)git_info[icons]}}${vcs_info_msg_0_}'
+  PROMPT+="%F{$color}"'${editor_info[overwrite]:-${editor_info[keymap]}}%f'
+  PROMPT+='%(!. %B%F{196}#%f%b.) '  # WTF
+
+  ## Right
+  # BUG: tmux + term resize => wrap + merge => duplicates prompt pieces
+  #   https://github.com/tmux/tmux/issues/516
+  #   BUT: resizing tmux panel works almost as expected
+  # unset RPROMPT  # TEMP:FIXED
+  RPROMPT="%F{$color\\}${parts[2]}%f"
+  RPROMPT+='${git_info:+ ${(e)git_info[details]}}${vcs_info_msg_1_:+ $vcs_info_msg_1_}'
+  [[ $SSH_TTY ]] && RPROMPT+='%B%F{8}(%F{6}%n%f%F{8}@%f%F{2}%m%F{8})%f%b'
+
+  ## Bottom status
+  ## BET: don't use it -- it can interfere with ZSH completion menus
   # Custom status line under prompt:
   #   http://unix.stackexchange.com/questions/1022/display-stuff-below-the-prompt-at-a-shell-prompt
   # PS1_2='[some status]'
-  # terminfo_down_sc="${terminfo[cud1]}${terminfo[cud1]}${terminfo[cuu1]}${terminfo[cuu1]}${terminfo[sc]}${terminfo[cud1]}"
+  # terminfo_down_sc="${terminfo[cud1]}${terminfo[cud1]}${terminfo[cuu1]}"
+  # terminfo_down_sc+="${terminfo[cuu1]}${terminfo[sc]}${terminfo[cud1]}"
   # PROMPT+="%{${terminfo_down_sc}${PS1_2}${terminfo[rc]}%}"
   # ++ see commented print in prompt_amer_preexec
-  # Next line:
-  PROMPT+="${prompt_newline}%F{$color}${parts[3]}%f"
-  PROMPT+='${git_info:+${(e)git_info[icons]}}${vcs_info_msg_0_}'
-  PROMPT+="%F{$color}"'${editor_info[keymap]}%f%(!. %B%F{196}#%f%b.) '
 
-  # Right prompt
-  RPROMPT='${editor_info[overwrite]} %(?::%F{1}%?↵ %f)'
-  RPROMPT+='${RANGER_LEVEL:+"%B%F{10}R%f%b"}'
-  RPROMPT+='${VIM:+"%B%F{10}V%f%b"}'
-  RPROMPT+="%F{$color}${parts[2]}%f"
-  RPROMPT+='${SSH_TTY:+"%B%F{8}(%F{6}%n%f%F{8}@%f%F{2}%m%F{8})%f%b"}'
-  RPROMPT+='%B%F{8}(%F{3}%*%F{8})%f%b'
-
-  ## Jobs
-  # [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"  # \u2699
-
-  # Suggestion prompt
+  ## Suggestion
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{1}…%f%b'
   SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
 }

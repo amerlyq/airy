@@ -1,0 +1,52 @@
+# vim: ft=zsh:ts=2:sw=2:sts=2
+
+# HACK: keep 1 space on the right side => so prompts won't merge on term resize
+# BUG: tmux-wrap-redraw -- merges it anyway
+# CHECK: precmd called on each resize ?
+
+function prompt_len { local line=${1?}
+  # SEE: http://stackoverflow.com/questions/10564314/count-length-of-user-visible-string-for-zsh-prompt
+  # CHECK:BAD: ([FBK]|) -- second branch is empty == intentional match anything ?
+  local strip_patt='%([BSUbfksu]|([FBK]|){*})'
+  printf '%s\n' ${#${(S%%)line//$~strip_patt/}}
+  ## ALT: Difference betwee full length and stripped normal chars
+  # local len="${#${$(print -P "$line")//\([^)]##\)/}}"
+  # len=$(( ${#$(print -P "$line")} - len ))
+  ## ALT Strip color codes
+  # len=$(print -P $line | sed 's/\x1b\[[0-9;]*m//g')
+}
+
+
+function prompt_top { local err=$1
+  local nrest fill
+  local dt elapsed jobl cstatus
+  local date top ppwd
+
+  # Status
+  # TODO: migrate date into 'status' if term width small but path is too long
+  (($err)) && err=" %F{1}$err↵%f" || err=''
+  # ALT:BAD: prompt_len '%(?::%F{1}%?↵ %f)'
+
+  jobstatus=$(jobs -l | wc -l)  # \u2699
+  ((jobstatus)) && jobstatus="%F{9}⚙${jobstatus} %f" || jobstatus=''
+  read -r dt elapsed <<< "$(prompt_elapsed)"
+
+  cstatus=${(e)_prompt_status}
+  if [[ $err ]]; then
+    nrest=$(( $COLUMNS - $(prompt_len "$cstatus") ))
+    fill=$(printf "%${nrest}s")
+  fi
+  # WARN: must be added after 'fill' evaluated
+  elapsed+=$(prompt_elapsed_urgent "$dt")
+  [[ -z $cstatus ]] || printf '%s\n' "${(e)_prompt_status}"
+
+
+  # Top
+  fill=''
+  date=$(print -P '%*')
+  top=${(e)_prompt_env}
+  nrest=$(( $COLUMNS - $(prompt_len "$top") ))
+  ppwd=$(prompt_pwd $nrest)
+  fill=$(printf "%$(( $nrest - $#ppwd ))s")
+  printf '%s\n' "${(e)_prompt_env}"
+}
