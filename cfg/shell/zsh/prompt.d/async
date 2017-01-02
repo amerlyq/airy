@@ -3,71 +3,37 @@
 # @brief Compute slow commands in the background.
 #   NOTE Must be the last commands of function for prompt refresh to work.
 
-
-function _prompt_vars_source {
-  local cached="${_prompt_amer_data_pref}-${1:?No}"
-  if [[ -s "$cached" ]]; then
-    alias typeset='typeset -g'
-    source "$cached"
-    unalias typeset
-  fi
-}
-
-# BUG:(ssh): prompt_amer_update:2: bad substitution
-function prompt_amer_update {
-  # BUG on each USR1 will source all the info instead only necessary
-  for smod in ${_prompt_async_calls[@]}; do
-    _prompt_vars_source $smod
-    typeset -g _prompt_amer_async_pid_$smod=0  # Reset PID.  OR unset ...
-    # echo ${_prompt_amer_async_pid_${smod}}
+function prompt_update {
+  typeset -g _prompt_async_pid=0  # Reset PID
+  for c in $_prompt_async_calls; do
+    # THINK: directly use typeset -g instead of source env=$(< $tmp/f1 < $tmp/f2)
+    [[ -s $_prompt_tmp/$c ]] || continue
+    # alias typeset='typeset -g'
+    source $_prompt_tmp/$c
+    # unalias typeset
   done
-
-  # DEV (pid==0 for all pids || (time > 0.5)) --> update_now()
-  # Redisplay prompt.
-  prompt_amer_pwd
-  # FIXED:(segfault)
-  # SEE: https://github.com/zsh-users/zsh-syntax-highlighting/issues/230
+  # FIXED:(segfault): https://github.com/zsh-users/zsh-syntax-highlighting/issues/230
   zle && zle .reset-prompt
 }
 
-
-function _prompt_vars_save {
-  local cached="${_prompt_amer_data_pref}-${1:?No}"
-  # BUG: problems when zero free space left. Use mkfifo?
-  _prompt_async_call_$1 >! "$cached"
-}
-
-# BUG prompt will be refreshed after each async -- several times on each command
-# DEV refresh once after all results (unset pid on kill or end, check all pids before refresh)
-#   WARNING Will not work, because '&' launches another env, so can't sync variables
-function _prompt_amer_async_exec {
-  # Call submodule (git, vcs, ...) and signal completion to parent process.
-  for smod in ${_prompt_async_calls[@]}; do
-    (( $+functions[_prompt_async_call_$smod] )) || continue
-
-    # Kill the old process of slow commands if it is still running.
-    local vpid="_prompt_amer_async_pid_${smod}"
-    # printf "%s - %s\n" "${smod}" "${(P)vpid}" >&2
-    if (( ${(P)vpid:-0} > 0 )); then
-        kill -TERM "${(P)vpid}" &>/dev/null
-    fi
-
-    ( _prompt_vars_save $smod && kill -USR1 $$ ) &!
-    # EXPL Make var global, so *_update would know it
-    typeset -g ${vpid}=$!
-
-    # print -r ${_prompt_amer_async_pid_${smod}}
+function prompt_async_exec {
+  for c in $_prompt_async_calls; do
+    _prompt_async_call_$c >! $_prompt_tmp/$c &
   done
+  wait && kill -USR1 ${1:?}
 }
 
-function prompt_amer_precmd {
-  setopt LOCAL_OPTIONS        # On return restore all changed options
-  unsetopt XTRACE KSH_ARRAYS  # Drop env influence on prompt itself
-
-  # THINK maybe better setup this in *_setup?
-  trap prompt_amer_update USR1  # Re-establish trap each time
-
-  _prompt_amer_time_get
-  [ -z $_prompt_amer_time ] || print -P $_prompt_amer_time
-  _prompt_amer_async_exec
+function prompt_async {
+  # Kill the old process of slow commands if it is still running.
+  #   => because you could 'cd' or 'git add' => anticipated status is obsolete
+  # THINK: smart reset -- for long async cmds >> prompt renew
+  #   * until new prompt it can run no more than 20s
+  #   * if new prompt is faster than async but < 5s -- return w/o killing
+  # BUT: 'timeout' is expensive, 'sleep+kill' need fork,
+  # ALSO: '{{ cmd; }|{ sleep 5; kill 0; }}' don't work
+  kill $_prompt_async_pid &>/dev/null
+  # Re-establish trap each time (if user have changed it)
+  trap prompt_update USR1
+  prompt_async_exec $$ &!
+  typeset -g _prompt_async_pid=$!
 }

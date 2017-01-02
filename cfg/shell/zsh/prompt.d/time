@@ -11,7 +11,7 @@ function prompt_elapsed_format { local dt=$1
   (($minutes> 0 )) && { color=1;  t=${minutes}m$t; }
   (( $hours > 0 )) && { color=13; t=${hours}h$t; }
   (( $days  > 0 )) && { color=9;  t=${days}d$t; }
-  printf '%s\n' "%F{$color}${t}"
+  print -r "%F{$color}${t}"
 }
 
 # ============================================ #
@@ -29,12 +29,13 @@ function prompt_elapsed { local dt elapsed
     elapsed=$(prompt_elapsed_format ${dt})
     elapsed=${(e)_prompt_elapsed}
   fi
-  printf '%d %s\n' "$dt" "$elapsed"
+  print -r $dt $elapsed
 }
 
 function prompt_elapsed_urgent { local dt=${1:?}
-  (( dt > 60 )) || printf '\a'  # Urgent bell
-
+  # NOTE: ~60s for switching mind to another task
+  (( dt > 60 )) || return
+  printf '\a'  # Urgent bell
   # BAD: false-positive after: ranger, bash, schroot, etc
   # if (($+commands[r.n])) && [[ $DISPLAY ]]; then
   #   r.n -U 'ZSH' "$(fc -l -n -1)"

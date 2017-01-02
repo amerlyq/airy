@@ -1,9 +1,5 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 
-# HACK: keep 1 space on the right side => so prompts won't merge on term resize
-# BUG: tmux-wrap-redraw -- merges it anyway
-# CHECK: precmd called on each resize ?
-
 function prompt_len { local line=${1?}
   # SEE: http://stackoverflow.com/questions/10564314/count-length-of-user-visible-string-for-zsh-prompt
   # CHECK:BAD: ([FBK]|) -- second branch is empty == intentional match anything ?
@@ -17,36 +13,39 @@ function prompt_len { local line=${1?}
 }
 
 
-function prompt_top { local err=$1
-  local nrest fill
-  local dt elapsed jobl cstatus
-  local date top ppwd
+function prompt_top {
+  local nrest fill whole
+  local err dt elapsed jobl
+  local date ppwd
 
   # Status
-  # TODO: migrate date into 'status' if term width small but path is too long
-  (($err)) && err=" %F{1}$err↵%f" || err=''
+  whole=${(e)_prompt_status}  # Dump status skeleton only
   # ALT:BAD: prompt_len '%(?::%F{1}%?↵ %f)'
+  ((${1:?})) && err=" %F{1}$1↵%f" || err=''
 
   jobstatus=$(jobs -l | wc -l)  # \u2699
   ((jobstatus)) && jobstatus="%F{9}⚙${jobstatus} %f" || jobstatus=''
-  read -r dt elapsed <<< "$(prompt_elapsed)"
+  read -r dt elapsed <<< $(prompt_elapsed)
 
-  cstatus=${(e)_prompt_status}
-  if [[ $err ]]; then
-    nrest=$(( $COLUMNS - $(prompt_len "$cstatus") ))
-    fill=$(printf "%${nrest}s")
+  if [[ $whole != ${(e)_prompt_status} ]]; then
+    whole=${(e)_prompt_status}
+    if [[ $err ]]; then
+      nrest=$(( $COLUMNS - $(prompt_len $whole) ))
+      fill=$(printf "%${nrest}s")
+    fi
+    # WARN: must be added after 'fill' evaluated
+    elapsed+=$(prompt_elapsed_urgent $dt)
+    print -r ${(e)_prompt_status}
   fi
-  # WARN: must be added after 'fill' evaluated
-  elapsed+=$(prompt_elapsed_urgent "$dt")
-  [[ -z $cstatus ]] || printf '%s\n' "${(e)_prompt_status}"
 
 
   # Top
-  fill=''
+  unset whole nrest fill
+  # TODO: migrate date into 'status' if term width small but path is too long
   date=$(print -P '%*')
-  top=${(e)_prompt_env}
-  nrest=$(( $COLUMNS - $(prompt_len "$top") ))
+  whole=${(e)_prompt_env}
+  nrest=$(( $COLUMNS - $(prompt_len $whole) ))
   ppwd=$(prompt_pwd $nrest)
   fill=$(printf "%$(( $nrest - $#ppwd ))s")
-  printf '%s\n' "${(e)_prompt_env}"
+  print -r ${(e)_prompt_env}
 }

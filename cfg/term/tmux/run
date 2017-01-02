@@ -20,6 +20,8 @@
 #   NOTE: bkgr jobs can't wait $$ at all
 # CHECK: if using 'set -o errtrace' will help propagate trap ::> NOT
 # FIND: if possible to force traps on process by its parent ::> NOT
+# BAD: can't be rewritten in 'dash' -- too complex trap necessary
+#   https://lists.gnu.org/archive/html/help-bash/2013-04/msg00059.html
 
 trap "tmux list-clients -t st-$$ 2>/dev/null |
 { read -r _ && ! read -n1 -r _; } &&

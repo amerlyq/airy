@@ -3,8 +3,18 @@
 
 function prompt_precmd {
   # HACK: fetch err code immediately on precmd before overwritten
-  local p=$(prompt_top $(print -P '%?'))
+  local err=$(print -P '%?')
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS SH_WORD_SPLIT
+
+  local p=$(prompt_top $err)
   [[ -z $p ]] || print -P $p
+
+  # BAD: git/vcs info is one step behide of any cmd (cd .. / gb ..)
+  # IDEA:HACK: clear sourced vcs vars before async
+  #   => at least changing dir to non-vcs will hide vcs info
+  #   BUT: on long info fetch prompt termporarily becomes w/o vcs info
+  prompt_async
   # HACK: don't append timer on empty <CR>
   prompt_elapsed_reset
 }
@@ -14,22 +24,22 @@ function prompt_preexec {
 }
 
 function prompt_amer_setup {
-  setopt LOCAL_OPTIONS
-  unsetopt XTRACE KSH_ARRAYS
+  setopt LOCAL_OPTIONS        # On return restore all changed options
+  unsetopt XTRACE KSH_ARRAYS  # Drop env influence on prompt itself
+  unsetopt SH_WORD_SPLIT
   prompt_opts=(cr percent subst)
+
+  _prompt_tmp=${TMPDIR:-/tmp}/zsh
+  mkdir -p $_prompt_tmp
 
   autoload -Uz add-zsh-hook
   # Add hook for calling git-info before each command.
   add-zsh-hook preexec prompt_preexec
   add-zsh-hook precmd  prompt_precmd
 
-  # _prompt_amer_precmd_async_pid=0
-  # _prompt_amer_data_pref="${TMPDIR:-/tmp}/zsh-cache"
-
   # WARNING (time-consuming) Add hook for calling vcs_info before each command.
-  # autoload -Uz vcs_info
-  # _prompt_amer_setup_git
-  # _prompt_amer_setup_vcs  # NOTE vcs_info cfg
-
-  _prompt_amer_setup_prompts "$(_prompt_color $@)" "$(_prompt_parts)"
+  autoload -Uz vcs_info
+  _prompt_setup_git
+  _prompt_setup_vcs  # NOTE vcs_info cfg
+  _prompt_amer_setup_prompts $(_prompt_color $@) $(_prompt_parts)
 }

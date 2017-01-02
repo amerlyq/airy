@@ -11,5 +11,5 @@ function prompt_pwd {
     (($w && $#p >= $w )) && p="%$w>…>…/${p:t}%<<"
   fi
   unset MATCH
-  print -P "$p"  # NEED: to collapse path segments
+  print -P $p  # NEED: to collapse path segments
 }

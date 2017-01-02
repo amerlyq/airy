@@ -1,13 +1,14 @@
 # vim: ft=zsh:ts=2:sw=2:sts=2
 # @ref: MIT, (c) amerlyq, 2015
 
-_prompt_modules=(cfg view path time status init)  # cfg async git vcs
-# _prompt_async_calls=(git vcs)
+_prompt_modules=(cfg async git vcs view path time status init)
+_prompt_async_calls=(git vcs)
 
 # Load dependencies.
 pmodload 'helper'
-for inc in "${_prompt_modules[@]}"; do
-  source "${${(%):-%x}%/*}/prompt.d/$inc"; done
+for inc in "${_prompt_modules[@]}"
+do source "${${(%):-%x}%/*}/prompt.d/$inc"; done
+
 
 function prompt_amer_help {
   cat <<EOT

@@ -20,3 +20,8 @@ setopt NOTIFY             # Report status of background jobs immediately.
 unsetopt BG_NICE          # Don't run all background jobs at a lower priority.
 unsetopt HUP              # Don't kill jobs on shell exit.
 unsetopt CHECK_JOBS       # Don't report on jobs when shell exit.
+
+# WARN: zsh you have running jobs
+# If I exit again, my jobs are killed. But zsh accept some useful option to overide this :
+# setopt NO_HUP
+# setopt NO_CHECK_JOBS

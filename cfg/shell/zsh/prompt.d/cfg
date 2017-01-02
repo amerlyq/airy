@@ -15,7 +15,7 @@ function _prompt_color {
   [[ -z $debian_chroot ]] || color=${3:-4}
   # if [[ $TERM = *256color* || $TERM = *rxvt* ]]; then ... else ... fi
   # TODO: dependant on availability -- colors and symbols
-  print -r "$color"
+  print -r $color
 }
 
 function _prompt_parts {

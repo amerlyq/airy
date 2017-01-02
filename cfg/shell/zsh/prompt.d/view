@@ -2,40 +2,44 @@
 # @ref: MIT, (c) amerlyq, 2015
 
 function _prompt_amer_setup_prompts {
-  local color=$1 parts=$2
   # setopt transient_rprompt   # only show the rprompt on the current prompt
   # ZLE_RPROMPT_INDENT=0
+  local color=$1 parts=$2 line
+  line="%F{$color}${parts[2]}%f"
 
   # Set $editor_info params
-  zstyle ':prezto:module:editor:info:keymap:alternate' format "${parts[4]}"
-  zstyle ':prezto:module:editor:info:keymap:primary' format "${parts[5]}"
-  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format "${parts[6]}"
+  zstyle ':prezto:module:editor:info:keymap:alternate' format ${parts[4]}
+  zstyle ':prezto:module:editor:info:keymap:primary' format ${parts[5]}
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ${parts[6]}
 
   ## Top env
   _prompt_elapsed='%B%F{10}>>> elapsed time: ${elapsed}%f%b'
-  _prompt_status='${jobstatus}${elapsed}${fill}${err}'
-  _prompt_env="%F{$color}${parts[1,2]}${parts[2]}%f"
-  # _prompt_env+='%B%F{10}${RANGER_LEVEL+R}${VIM+V}%f%b'
+  _prompt_status="%F{$color}╸%f"'${jobstatus}${elapsed}${fill}${err}'
+  _prompt_env="%F{$color}${parts[1]}%f"
+  # THINK: instead of pos-based placeholders -- simply concat all letters
+  # THINK: letter for chroot
+  _prompt_env+='${${RANGER_LEVEL+"%B%F{10}R%f%b"}:-"'$line'"}'
+  _prompt_env+='${${VIM+"%B%F{10}V%f%b"}:-"'$line'"}'
   _prompt_env+='%B%F{8}[%F{220}${ppwd}%F{8}]%f%b'
-  _prompt_env+='${fill}'"%F{$color}${parts[2]}"'%B%F{8}(%F{3}${date}%F{8})%f%b'
+  _prompt_env+='${git_info:+"'$line'"${(e)git_info[details]}}'
+  _prompt_env+='${vcs_info_msg_1_:+"'$line'"$vcs_info_msg_1_}'
+  _prompt_env+='${fill}'$line'%B%F{8}(%F{3}${date}%F{8})%f%b'
 
   ## Left
   PROMPT="%F{$color}${parts[3]}%f"
   PROMPT+='${git_info:+${(e)git_info[icons]}}${vcs_info_msg_0_}'
   PROMPT+="%F{$color}"'${editor_info[overwrite]:-${editor_info[keymap]}}%f'
-  PROMPT+='%(!. %B%F{196}#%f%b.) '  # WTF
+  PROMPT+='%(!. %B%F{196}#%f%b.) '  # EXPL: if root
 
   ## Right
   # BUG: tmux + term resize => wrap + merge => duplicates prompt pieces
   #   https://github.com/tmux/tmux/issues/516
   #   BUT: resizing tmux panel works almost as expected
-  # unset RPROMPT  # TEMP:FIXED
-  RPROMPT="%F{$color\\}${parts[2]}%f"
-  RPROMPT+='${git_info:+ ${(e)git_info[details]}}${vcs_info_msg_1_:+ $vcs_info_msg_1_}'
-  [[ $SSH_TTY ]] && RPROMPT+='%B%F{8}(%F{6}%n%f%F{8}@%f%F{2}%m%F{8})%f%b'
+  unset RPROMPT  # TEMP:FIXED
+  [[ $SSH_TTY ]] && RPROMPT+=$line'%B%F{8}(%F{6}%n%f%F{8}@%f%F{2}%m%F{8})%f%b'
 
   ## Bottom status
-  ## BET: don't use it -- it can interfere with ZSH completion menus
+  ## BET: don't use it -- it can interfere with ZSH completion menus and can make crap in tmux
   # Custom status line under prompt:
   #   http://unix.stackexchange.com/questions/1022/display-stuff-below-the-prompt-at-a-shell-prompt
   # PS1_2='[some status]'
