@@ -30,7 +30,7 @@ call dein#add('bling/vim-airline', {
 " CHECK: maybe 'if' is insufficient -- need activate both, and disable one?
 "" Fork which supports term TRUE_COLOR
 call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
-  \ 'if': 'has("nvim") && exists("$NVIM_TUI_ENABLE_TRUE_COLOR")',
+  \ 'if': 'has("nvim")',
   \ 'hook_add': _hcat('solarized.add')})
 
 "" Original obsolete theme for old vim {{{

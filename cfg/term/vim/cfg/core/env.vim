@@ -36,7 +36,7 @@ endif
 " Tags
 set tags=./tags,tags,*/tags,~/.cache/vim/tags
 set tagbsearch      " Use a binary search (need sorted tags file!)
-if v:version < 703 || (v:version == 7.3 && !has('patch336'))  " Vim's bug.
+if v:version < 703 || (v:version == 703 && !has('patch336'))  " Vim's bug.
   set notagbsearch
 endif
 

@@ -1,18 +1,25 @@
 #!/bin/bash
+# Enable color support of ls and also add handy aliases
+# BAD: if ssh from another (achromatic) terminal
 
-# enable color support of ls and also add handy aliases
-if [[ -x /usr/bin/dircolors ]]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    AUTOCOLORS='--color=auto'
-    alias ls="ls $AUTOCOLORS"
-    #alias dir='dir $AUTOCOLORS'
-    #alias vdir='vdir $AUTOCOLORS'
+alias ls='ls --group-directories-first --color=auto'
 
-    alias  grep="grep $AUTOCOLORS"
-    alias fgrep="fgrep $AUTOCOLORS"
-    alias egrep="egrep $AUTOCOLORS"
+#alias dir='dir --color=auto'
+#alias vdir='vdir --color=auto'
 
-    # EXPL: already in 'prezto'
-    # alias diff='colordiff'
+alias  grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
 
+# EXPL: already in 'prezto'
+# alias diff='colordiff'
+
+
+### Colorscheme
+if [[ -x /usr/bin/dircolors ]] && [[ -s ~/.config/dircolors ]]; then
+  LS_COLORS=$(eval "$(dircolors -b ~/.config/dircolors)"; printf '%s\n' "$LS_COLORS")
 fi
+alias ls="${LS_COLORS:+LS_COLORS='$LS_COLORS' }${aliases[ls]:-ls}"
+
+GREP_COLORS="mt=37;45"
+alias grep="${GREP_COLORS:+GREP_COLORS='$GREP_COLORS' }${aliases[grep]:-grep}"

@@ -1,4 +1,6 @@
 ranger
+  [_] FIND:CHECK: riffle 'has X' by SSH to another Ubuntu
+    !!! must return 'no X' terminal-only -- for correct opening of files
   [_] BUG: using ':shell pwd' at symlinked dir -- expands it
     = pwd = logical path how you reached phys dir
       -- only actual prg know it CHECK: kernel has the same inode/path
@@ -98,6 +100,13 @@ NEW
 
 
 scope.sh
+  [_] TRY: img view 24bit terminal
+    https://github.com/hzeller/timg
+    https://github.com/daleroberts/tv
+  [_] TRY: video view in preview
+    ALT:BAD:(some text blinks anyway) --quiet
+      https://github.com/mpv-player/mpv/issues/3791
+    $ mpv --really-quiet --vo=tct %s
   [_] unite with xdg-open or alternatives
     https://wiki.archlinux.org/index.php/Xdg-open_(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9)
   [_] Separate functions for filetypes and switches to choose funcs

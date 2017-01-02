@@ -3,7 +3,7 @@
 _has_pr(){ hash "$1" >/dev/null 2>&1; }
 
 if _has_pr nvim; then
-  unset NVIM_TUI_ENABLE_TRUE_COLOR
+  # unset NVIM_TUI_ENABLE_TRUE_COLOR
   unset NVIM_TUI_ENABLE_CURSOR_SHAPE
 
   case "$TERM"
@@ -13,13 +13,13 @@ if _has_pr nvim; then
     export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     export TERMCMD='urxvt'
   ;; st-*)
-    export NVIM_TUI_ENABLE_TRUE_COLOR=1
+    # export NVIM_TUI_ENABLE_TRUE_COLOR=1
     export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     export TERMCMD='st'
   ;; tmux-256color|screen-256color*)
     # Works only with tmux-24bit-color which after merge > v2.1.1
     if _has_pr tmux && tmux -V | grep -q 'tmux [2-9]\.[2-9]'; then
-        export NVIM_TUI_ENABLE_TRUE_COLOR=1
+        # export NVIM_TUI_ENABLE_TRUE_COLOR=1
         export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     fi
     # export TERMCMD='tmux split-window "$cmd"'

@@ -1,3 +1,8 @@
+" True colors in 'hi!' nvim>=v1.5 OR vim>=v7.4.1770
+if has('nvim') || (has('+termguicolors') && (v:version > 704 || (v:version == 704 && has('patch1770'))))
+  set termguicolors
+en
+
 exe "fun! IsWindows()\nreturn".(has('win32') || has('win64'))."\nendf"
 exe "fun! IsAndroid()\nreturn".('android'==#$USER&&$TERM=~#'^xterm')."\nendf"
 

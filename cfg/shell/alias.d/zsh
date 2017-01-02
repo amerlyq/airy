@@ -48,10 +48,13 @@ alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
 
 for i in {1..5}; do alias -g C$i="|awk '{print\$$i}'"; done
 alias -g C\$="|awk '{print\$NF}'"
+# Prints columns 1 2 3 ... n.
+function slit { awk "{ print ${(j:,:):-\$${^@}} }"; }
+alias -g CN='|slit'
 
 # Pipes
 if (($+commands[grep])); then
-  alias -g G="|noglob grep $AUTOCOLORS -E -i"
+  alias -g G="|noglob ${aliases[grep]:-grep} $AUTOCOLORS -E -i"
   alias -g G\?='G -q'
   alias -g G\?\?='G -qF'
   alias -g G\?\?\?='G -qxF'

@@ -1,8 +1,8 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD" ~/.shell
-link "$PWD/input/dircolors-${THEME}.ansi" ~/.dircolors
-link "$PWD/input/inputrc" ~/.inputrc
+linkcp "$PWD" ~/.shell
+linkcp "input/dircolors-${THEME}.ansi" ~/.config/dircolors
+linkcp "input/inputrc" ~/.inputrc

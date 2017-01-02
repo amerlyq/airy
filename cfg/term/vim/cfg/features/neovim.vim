@@ -14,9 +14,6 @@ augroup END
 " SEE: https://github.com/neovim/neovim/issues/2897#issuecomment-115464516
 " Terminal base colors used by UIs with RGB capabilities (other use predefined)
 if exists('$NVIM_TUI_ENABLE_TRUE_COLOR')
-  " True colors nvim>=v1.5
-  set termguicolors
-
   let g:terminal_color_0  = '#2e3436'
   let g:terminal_color_1  = '#cc0000'
   let g:terminal_color_2  = '#4e9a06'
