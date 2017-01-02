@@ -113,13 +113,15 @@ alias ggs='glg --source --all -S'   # search <text> in all commits content
 alias ggx='git rev-list --all | xargs git grep'
 alias ggS='git log -S'
 alias ggG='git log -G'
-ggg(){ local rev  # WARNING:BROKEN:(shows same commit however many revisions)
-  (export GIT_PAGER=cat
-    git log --pretty=format:'%H%n' -G "$1" | while read rev; do
-    echo $rev
-    echo && git lgraph -n1 "$rev" && echo
-    git grep --color -n --break --heading "$1" "$rev"
-  done) }
+ggg(){ git --no-pager log --pretty=format:'%H' -G "$1" \
+| while IFS= read -r rev; do echo && git --no-pager lstd --graph -n1 "$rev" && echo
+  git --no-pager grep --color -I -n -e "$@" "$rev" | cut -d: -f2-
+  # --break --heading
+done; }
+ggh(){ git --no-pager log --pretty=format:'%H' -G "$1" \
+| while IFS= read -r rev; do
+  git --no-pager grep --color -I -h -e "$@" "$rev" | awk '{$1=$1}1'
+done; }
 
 # git grep -l --all-match -e <regexp1> # To search files with line
 # git log -G Foo --since=2009.1.1 --until=2010.1.1 -- path_containing_change # To search commits changing line
