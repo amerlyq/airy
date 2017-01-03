@@ -1,11 +1,11 @@
 #!/bin/sh -eu
 # SEE:BAD:(-L) http://unix.stackexchange.com/questions/34248/how-can-i-find-broken-symlinks
 
-ROOT=$(find "$PWD" -maxdepth 1 \( -type d -o -type l -xtype d \) -exec test -d "{}/lib" -a -d "{}/usr/lib" -a -f "{}/VERSION.TXT" \; -print -quit)
-CORE=$(find "$PWD" ! -readable -prune -o -type f -regex '^.*/core\.[^/]+\.[0-9]+$' -print -quit)
+ROOT=$(find "$PWD" -maxdepth 1 -xtype d -exec test -d "{}/lib" -a -d "{}/usr/lib" -a -f "{}/VERSION.TXT" \; -print -quit)
+CORE=$(find "$PWD" -maxdepth 2 ! -readable -prune -o -xtype f -regex '^.*/core\.[^/]+\.[0-9]+$' -print -quit)
 
 pr=${CORE##*/core.}; pr=${pr%%.*}
-EXE=$(find -H "$ROOT" ! -readable -prune -o -type f -name "$pr" -print -quit)
+EXE=$(find -H "$ROOT" ! -readable -prune -o -xtype f -name "$pr" -print -quit)
 echo "$EXE"
 
 
@@ -18,6 +18,7 @@ fi
 # SRC="$pj/src"
 [[ -n ${BDR-} ]] || BDR=$PJROOT/buildroot
 GDB=$(ls -d "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb) || GDB=$xct_gdb
+GDB_DATA=${GDB%/*}
 LIBS=$(ls -d "$BDR"/build_*/staging_dir/lib)
 
 # THINK: move exporting into 'session' MAYBE rename 'session' -> 'env'
@@ -25,6 +26,6 @@ LIBS=$(ls -d "$BDR"/build_*/staging_dir/lib)
 # SEE: exporting from conf
 #   http://stackoverflow.com/questions/19331497/set-environment-variables-from-file
 cd "$(r.gdb-tmp -d)"
-links=( GDB ROOT CORE EXE SRC BDR LIBS )
+links=( GDB GDB_DATA ROOT CORE EXE SRC BDR LIBS )
 echo "links=( ${links[*]} )" > ./env
 for nm in "${links[@]}"; do echo "${nm}=${!nm-}" >> ./env; done

@@ -17,6 +17,8 @@ cmd+=( -iex "set auto-load safe-path $PWD" )
 # BAD:(batch processing) session must be created single time and then reused again and again (don't rm $tmp)
 # ALT: all shell cmds must be called from inside single gdb session and resulsts sourced back (rm $tmp on exit)
 # DEV: allow overriding symlinks/cfg by specifying ROOT, etc in 'compile' scripts -- when cdir has multiple
+# FIXME: all links, env and cfg _must_ be regenerated (use simple make?)
+#   <= if $CWD/compile or any of scripts $SWD/* changed
 tmp=$(r.gdb-tmp)
 if [[ ! -d $tmp ]] || ((refresh)); then
   r.gdb-params
