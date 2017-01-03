@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+set -o pipefail
+# WARN: color.ui works only if no other color.* set in .gitconfig
+exec r.git-find | parallel -0 -k \
+  r.git-status {} '&&' \
+  git -C {} -c color.ui=always --no-pager \
+  "$@" '2>&1' #'&&' echo

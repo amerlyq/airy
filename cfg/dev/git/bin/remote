@@ -10,7 +10,7 @@ else
   git remote add -f -t master -m master "$nm" "$url"
 fi
 
-if [ -z "$push" ]; then
+if [[ -z $push ]]; then
   git remote set-url --push "$nm" DISABLE
 fi
 

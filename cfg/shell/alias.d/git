@@ -9,7 +9,7 @@ alias gir1='gir HEAD~'
 alias g\?='git help'
 ## Status
 # Re-defined
-alias gs='git status -sb && git --no-pager stash list'
+alias gs='git status -sbu && git --no-pager stash list'
 alias gca='gaa && gcm'
 # SEE: http://gitolite.com/git-pull--rebase
 # http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
@@ -133,10 +133,11 @@ alias gvs='v +Gstatus +only'
 alias gvd='git difftool'
 
 ## Recursive repo
-alias Gg='r.git'
-alias Gt='Gg st'  # summary
-alias Gs='Gt status -su'
-alias Gd='Gg st diff'
+alias Gg='r.git-all'
+alias Gu='r.git-all-status'
+alias Gs='Gu ~/aura'
+alias Gt='Gg status -su'
+alias Gd='Gg diff'
 alias Gw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
-alias Gl='Gg pl'
-alias Gp='Gg ph'
+alias Gl='r.git-all-pull'
+alias Gp='r.git-all-push'

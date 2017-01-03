@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+## WARNING:
+# Will find even submodules as separate repo!
+# It's useful for status, but could be very bad for pull/push/<cmd>
+if [[ ! ${1:-$PWD} =~ ^$HOME/ ]]; then
+  echo 'Guard: run only from $HOME' >&2
+  exit 1
+fi
+exec find "${1:-$PWD}" \( -type d -o -type l -xtype d \) \
+  -name .git -prune "${@:2}" -printf '%h\0'

@@ -30,7 +30,7 @@ fi
 
 # TODO: add force shutdown, ignoring unpushed commits
 confirm_repo(){ local t=$1 dir=~/aura
-  if (cd "$dir" && r.git synced)
+  if r.git-all-synced "$dir"
   then confirm "Shutdown"
   else r.n "$1 warning:" "Sync git in '$dir/*'"; return 1
 fi; }

@@ -49,6 +49,10 @@ Profiling startup time
 
 
 TASKS
+  [_] BUG: after sourcing .zshrc -- on each 'function { ... }' does 'cd' into ~/ or /
+    even in interactive mode in any terminal ! You can't define function
+    TEST: r.git-status
+    HACK: define all funcs before sourcing .zshrc
   [_] BAD: empty autocompletion eats scroll up line-by-line $ v /zzz<Tab>
   [_] expandable abbrevs
     http://blog.patshead.com/2011/07/automatically-expanding-zsh-global-aliases-as-you-type.html

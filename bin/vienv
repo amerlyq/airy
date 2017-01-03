@@ -1,18 +1,18 @@
 #!/bin/bash -e
 
-case "$1" in -r) bReplace=1; shift ;; esac
-shl="$1"
-NM="${2:-`tempfile`}"
+case $1 in -r) bReplace=1; shift ;; esac
+shl=$1
+NM=${2:-$(tempfile)}
 env='#!/usr/bin/env'
 
-if [[ -n "$bReplace" || ! -f "$NM" ]]; then
+if [[ $bReplace || ! -f $NM ]]; then
     # Python recognizes encoding: "coding[:=]\s*([-\w.]+)"
     case "$shl"
     in  pl) sb="$env perl\n\nuse strict;\nuse warnings;"
     ;; py2) sb="$env python2\n# vim: fileencoding=utf-8"
     ;; py3) sb="$env python3"
-    ;;  sh) sb="#!/bin/bash -e"
-    ;;  zh) sb="#!/usr/bin/zsh -e"
+    ;;  sh) sb="#!/bin/bash -eu"
+    ;;  zh) sb="#!/usr/bin/zsh -eu"
     ;;   *) sb="$env $shl"
     esac
     printf "%b\n\n\n" "$sb" > "$NM"  # Compatible with 'echo -e'

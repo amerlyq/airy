@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+set -o pipefail
+cd "${1:-$PWD}"
+exec r.git-find | parallel -0 git --no-pager -C {} \
+  for-each-ref --format='"%(push:track)"' refs/heads \
+| { ! grep -q '\S'; }

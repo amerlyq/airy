@@ -1,0 +1,70 @@
+#!/bin/zsh -u
+set -o pipefail
+# BUG: git-info don't work if '#!/bin/zsh -e'
+# USAGE: WCOL=20 r.git-status [repos...]
+
+cwd=$PWD
+repos=( $@ )
+names=( ${${^${^repos##$cwd}#/}:-.} )
+[[ ${WCOL-} ]] || for nm in $names; do
+  ((${WCOL=0} > $#nm)) || WCOL=$#nm
+done
+
+function gita_omz {
+    ## For Oh-My-Zsh
+    printf "$PR_SET_CHARSET$AM_GIT%s$PR_NO_COLOUR %s$PR_NO_COLOUR" \
+        "$(git_prompt_info)" "$(git_prompt_status)" | sed 's/[%{}]//g'
+}
+
+function gita_prezto {
+  (( $+functions[git-info] )) || return
+  git-info
+  printf "%-16s" "${(%e)git_info[details]} ${(%e)git_info[icons]}"
+}
+
+## Time scale and colora are different from prompt_time_format.
+function time_dt {
+    local dt=$((`date +%s`-`git log --pretty=format:'%at' -1 2>/dev/null`))
+    local seconds=$(( dt % 60 ))
+    local minutes=$(( (dt /= 60) % 60 ))
+    local hours=$(( (dt /= 60) % 24 ))
+    local days=$(( dt / 24 ))
+    local total=""
+    if (( $days > 0 )); then total="${days} d"
+    elif (( $days > 0 )); then total="${days}d ${hours}h"
+    elif (( $hours > 0 )); then total="${hours}:${minutes}:"
+    elif (( $minutes > 0 )); then total="${minutes}:${seconds}s"
+    else total="${seconds}s"; fi
+    printf "%6s" "$total"
+}
+
+function gita_st { local rep=$1 sfx=${2-}
+  stm=$(git log -1 --pretty=format:'%ci' | awk '{print$2,$1}')
+  name=$(printf "%-${WCOL:-17}s\n" "$rep" | sed 's|[^/]\+/|%F{6}\0%f|')
+
+  # ALT:(builtin slower then sed):
+  #   autoload -U regexp-replace
+  #   regexp-replace name '[^\/]+/' '%F{6}$MATCH%f'
+  # ALT:CHECK:(faster?) "$(print -P "%F{6}${rep:h}/%f${rep:t}")"
+
+  # TODO: replace awk by ZSH line-splitting
+  branch=$(git rev-parse --abbrev-ref HEAD)
+
+  fmt="\u251c\u2500%(refname:short) %(push:track)"
+  psh=$(git for-each-ref --format="$fmt" refs/heads |
+      awk -vb="$branch" '$1~b"$"||$2==""{next}{print$0}')
+
+  [[ -z ${psh#* } ]] || psh="\n$psh\n\u2534"
+  print -P "$(gita_prezto) \t$name \t$stm - $(time_dt)%F{35}$psh%f$sfx"
+}
+
+unsetopt no_unset
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ||:  # Block dirty code in prezto
+  source ~/.shell/zsh/zpreztorc
+fi
+setopt no_unset
+
+for ((i=1; i<=$#repos; i++)); do
+  (cd $repos[$i] && gita_st $names[$i])
+done

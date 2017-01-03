@@ -1,10 +1,13 @@
-#!/bin/bash -e
+#!/bin/sh -eu
 
 # USE $ gem install git-up  # SEE http://aanandprasad.com/git-up/
 # if ((!$+commands[git-up])); then
 
+cwd=${1:-$PWD}
 clean=1
 cgit(){ git -c color.status=always -c color.ui=always "$@"; }
+
+cd "$cwd"
 
 # ALT: git diff-index --name-only --ignore-submodules HEAD --
 git diff-files --quiet --ignore-submodules -- || clean=0
@@ -22,3 +25,10 @@ cgit pull --rebase --verbose  # --rebase=preserve
 # git ${GCFG[@]} fetch --all --progress --prune --verbose
 # common=$(git merge-base HEAD @{u}@{1})
 # git ${GCFG[@]} rebase --autostash --onto @{u} $common
+
+# ATTENTION: Checking remote updates has no sense, as its time ~= pull
+# function check_remote {
+#   local remote=$(git rev-parse --abbrev-ref '@{u}')
+#   remote=$(git ls-remote -h ${remote%/*} refs/heads/${remote##*/} | awk '{print $1}')
+#   [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return 1
+# }
