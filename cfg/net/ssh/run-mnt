@@ -16,7 +16,7 @@ ismnt(){ grep -qsFw "$1" /proc/mounts; }
 
 if ((unmount)); then
   ismnt "$d" && fusermount -u "$d"
-  rmdir -vp "$d"
+  rmdir -vp --ignore-fail-on-non-empty "$d"
 else
   mkdir -vp "$d"
   ismnt "$d" || sshfs -o "$opts" "$s" "$d" -C

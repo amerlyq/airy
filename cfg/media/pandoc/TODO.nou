@@ -1,0 +1,49 @@
+%%%% pandoc -- convert between markups
+
+REF
+  http://johnmacfarlane.net/pandoc/
+
+USAGE
+  $ pandoc -o result.md ./%f
+
+SEE vim-pandoc
+  https://github.com/jgm/pandoc/wiki/Pandoc-Extras
+  Decide: maybe integrate converting mindmaps into pandoc instead of developing own tool?
+    (+) community, spreading, learn Haskell
+    (-) not every mardown could be described as MM
+
+%% .nou
+  [_] vim -- tweak syntax hi! for plain .md
+    http://technicalpickles.com/posts/using-markdown-in-vim/
+    more distinct bulletlist '*' -- orange
+    less standing out headers '#' -- green
+
+  DEV: can be adapted to .nou by plugin to Pandoc
+    https://hackage.haskell.org/package/pandoc
+    https://hackage.haskell.org/package/pandoc-1.19.1/docs/Text-Pandoc-Readers-Markdown.html
+    http://pandoc.org/MANUAL.html#custom-writers
+    ALSO
+      https://discuss.atom.io/t/altering-colors-of-markdown-list-markers/19387
+    BUT: colors are supported only for code
+      http://stackoverflow.com/questions/11509830/how-to-add-color-to-githubs-readme-md-file
+      http://stackoverflow.com/questions/35465557/how-to-apply-color-in-markdown
+      pandoc -- pygments
+        CHECK:FIND:(src)? it directly calls 'pygmentize' binary ?
+          <= code snippets from &Isabelle
+      Github -- Linguist
+    ALT: manual color augment
+      https://github.com/github/markup/issues/369
+        = embedded html attr
+      http://stackoverflow.com/questions/30880200/pandoc-what-are-the-available-syntax-highlighters
+        = HTML:<span> + custom.css, Latex:template % $highlighting-macros$
+    Using scripts with intermediate filters
+      https://groups.google.com/forum/#!topic/julia-users/eKDFT9oVBC4
+    Adding new hi! lang into pandoc
+        https://github.com/jgm/pandoc/issues/46
+      Existing one from Kate
+        ~ http://blog.jeci.fr/post/87994249356/adding-new-highlighting-language-into-pandoc
+      Language J -- generate own custom .xml for J lang
+        +++ https://analyzethedatanotthedrivel.org/2012/09/20/pandoc-based-j-syntax-highlighting/
+        Isabelle: #lang https://proofcraft.org/blog/syntax-highlighting.html
+    BET: use only jekyll + pygments for hi!
+      ~ http://benjam.info/blog/posts/2015-02-05-nanoc-pandoc-pygments/

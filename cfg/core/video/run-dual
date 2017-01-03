@@ -1,6 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/profile
-[[ "$CURR_PROF" =~ ^home ]] || exit
+set -o pipefail
+[[ $CURR_PROF =~ ^home ]] || exit
+
+# xrandr --output VGA1 --auto --output HDMI2 --off
+# xrandr --output VGA1 --auto --primary --output HDMI2 --auto --left-of VGA1
+# r.feh
 
 setm() { local sz=${1:-1920x1080}; shift
     if ! xrandr -q | sed '/^VGA1/,/^\S/!d' | grep -q "$sz"; then

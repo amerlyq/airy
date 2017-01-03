@@ -5,9 +5,14 @@ source ~/.shell/func.d/packages
 #|                | 'tabbed' -- generic tabbed fronted for surf, st, uzbl, urxvt and xterm
 
 if distro arch; then
-    # aur_inst dmenu-frecency-git ||
-    pkg_inst dmenu
+  # aur_inst dmenu-frecency-git ||
+  pkg_inst dmenu
+
+  # aur_inst wjt
+  # SEE: https://github.com/ianremmler/wjt
+  #   * dmenu-based full-width mouse slider
+  #   * use for volume/brightness/ncmpcpp_pos_seek control
 
 elif distro ubuntu; then
-    pkg_inst suckless-tools
+  pkg_inst suckless-tools
 fi
