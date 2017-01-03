@@ -7,6 +7,8 @@ REF
 
 CHECK
   https://www.reddit.com/r/tmux/comments/3l5xf6/highlight_individual_tmux_panes/?
+  scripting in Tcl for extending tmux
+    https://github.com/ershov/tmux/blob/master/README-tmux-scripting.pod
 
 CHECK:(plugins)
   2016-07-21 [X] >>> https://github.com/tmux-plugins
@@ -43,6 +45,14 @@ ENH:
     https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
 
 TODO
+  [_] BUG: unsupported 'copy-pipe -x' -- remain in copy-mode after pipe
+    << Due to modal keybinding of tmux which don't support >1 args
+    TRY:(fast dirty patching in PKGBUILD)
+      https://github.com/atweiden/pkgbuilds/commit/c1923f9d66a646c4aef3ea0c1df471a37f6b2e07
+    ALT:DEV: copy into tmux buffer by 'copy-selection -x' then immediately pipe result into 'xsel'
+      https://groups.google.com/forum/#!forum/tmux-users
+    REQ: https://github.com/tmux-plugins/tmux-yank/issues/40
+    ALSO: http://stackoverflow.com/questions/32374907/tmux-mouse-copy-mode-jumps-to-bottom
   [_] 'tmuxa' switch to choosen session (instead of nesting)
     E.G. connect from clean st+tmux (instead of raw st) to '-t wget' session
     IDEA: attach session to session through tmux ':cmd'
