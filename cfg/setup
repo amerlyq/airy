@@ -3,6 +3,12 @@ source ~/.shell/func.d/cfgsetup
 
 echo 'N: Defaults'
 
+# WARN: those short-links don't exist on ./setup -friu
+#   => can't be used inside scripts at all
+#   !! even long-links will exist only after *mod* was resolved
+#   BET: don't use interdependent links between *mod* at all
+#   ALT: use 'make' etc for deps graph resolving -- BUT: sins like systemd
+
 ### AUTO ###
 if has_pr st; then term=st
 elif has_pr urxvt; then term=urxvt

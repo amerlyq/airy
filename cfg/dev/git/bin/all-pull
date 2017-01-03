@@ -5,7 +5,7 @@ set -o pipefail
 # стэш, merge итп -- парсить и заменять на значки
 cd "${1:-$PWD}"
 exec r.git-find \
-  | grep -zvsxF -f <(awk -vp="$cwd" '{print p"/"$0}' "$PWD/.freeze") \
+  | grep -zvsxF -f <(awk -vp="$PWD" '{print p"/"$0}' "$PWD/.freeze") \
   | parallel -0 -j1 -k '
   echo && r.git-status {} &&
   git-up {} 2>&1 &&
