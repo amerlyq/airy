@@ -1,3 +1,14 @@
+% Debug symbols
+  uClibc
+    http://stackoverflow.com/questions/21049575/unable-to-get-unstripped-runtime-libs-from-buildroot
+    http://stackoverflow.com/questions/10475040/gcc-g-vs-g3-gdb-flag-what-is-the-difference
+    Enable debug
+      $ cd ./buildroot/toolchain_build_mips/uClibc-0.9.33.2
+      $ r.chroot make menuconfig
+    OR $ vim .config  # = uClibc-ng-1.0.15-arm.config
+     UCLIBC_EXTRA_CFLAGS="-marm -g3 -ggdb"
+     DODEBUG=y
+
 % Noise
   Disable copyright
     # Regretfully -- no option exists/possible, only cmdline

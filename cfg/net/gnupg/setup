@@ -6,8 +6,10 @@ mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
 linkcp -t  ~/.gnupg gpg{,-agent}.conf
 
 # svc_activate -cue gpg-agent.service
-svc_activate -cue -f /usr/share/doc/gnupg/examples/systemd-user \
-  gpg-agent-ssh.socket gpg-agent.service gpg-agent.socket
-  # dirmngr.service dirmngr.socket
+d=/usr/share/doc/gnupg/examples/systemd-user
+svc_activate -cue -f "$d" gpg-agent-ssh.socket gpg-agent.socket
+svc_activate -cu -f "$d" gpg-agent.service
+# dirmngr.service dirmngr.socket
+
 
 echo RELOADAGENT | tee >(gpg-connect-agent)

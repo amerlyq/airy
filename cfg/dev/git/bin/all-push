@@ -4,3 +4,6 @@ cd "${1:-$PWD}"
 exec r.git-find | parallel -0 -j1 -k '
   r.git-push {} 2>&1 &&
   r.git-status {} && echo && echo'
+
+# BUG: err code 34 after r.git-all-push
+#   TEST: create local git bare repo and clone from it for testing push

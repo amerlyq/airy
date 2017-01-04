@@ -25,3 +25,5 @@ unsetopt CHECK_JOBS       # Don't report on jobs when shell exit.
 # If I exit again, my jobs are killed. But zsh accept some useful option to overide this :
 # setopt NO_HUP
 # setopt NO_CHECK_JOBS
+
+setopt pipe_fail          # Exit pipe with rightmost non-zero code
