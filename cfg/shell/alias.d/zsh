@@ -54,18 +54,23 @@ alias -g CN='|slit'
 
 # Pipes
 if (($+commands[grep])); then
-  alias -g G="|noglob ${aliases[grep]:-grep} $AUTOCOLORS -E -i"
-  alias -g G\?='G -q'
-  alias -g G\?\?='G -qF'
-  alias -g G\?\?\?='G -qxF'
+  # foreach c ($(<<<'q i F x C2')) alias -g G${c: -1}="G -$c"; end
+  alias -g  G="|${aliases[grep]:-grep} -E"
+  alias -g GF="|${aliases[grep]:-grep} -F"
+  alias -g Gq='G -q'
+  alias -g Gi='G -i'
+  alias -g Gx='G -x'
   alias -g G2='G -C2'
 fi
 
 if (($+commands[xargs])); then
-  # BAD: cat $(ls Z)  NEED: use xargs only if 0<$#
-  alias -g XA='|xargs -rn1 -d\\n'
-  alias -g X='|sed -n /./p XA'
-  alias -g X{}='X -I{}'
+  # BAD:(alias resolves anywhere):
+  #   cat $(ls Z); a=(q C2); for i in q C2; do ..
+  # NEED: use xargs only if 0<$#
+  # NOTE: allow aliases resolution after xargs
+  alias -g XA='|xargs -rn1 -d\\n '
+  alias -g X='|sed -n /./p XA '
+  alias -g X{}='X -I{} '
   # NOTE: xargs fork faster then parallel shell
   # | xargs -0 -rn1 -P$(nproc) -I{} "$@"
   # WARN:(broken pipe):  xargs | head -1  USE: parallel --dry-run
@@ -80,7 +85,7 @@ fi
 if (($+commands[fzf])); then
   # ALT:(fzf) https://github.com/garybernhardt/selecta
   # --multi --no-sort --reverse --cycle --no-hscroll
-  alias -g F='| fzf -m'
+  alias -g F='|r.fzf -m'
   alias -g X@='F X '
   alias -g Y@='F Y '
   # alias -g Z:='Z@ -I{} '
