@@ -14,7 +14,9 @@ function _prompt_amer_setup_prompts {
 
   ## Top env
   _prompt_elapsed='%B%F{10}>>> elapsed time: ${elapsed}%f%b'
-  _prompt_status="%F{$color}╸%f"'${jobstatus}${elapsed}${fill}${err}'
+  _prompt_status="%F{$color}╸%f"
+  _prompt_status+='${err:+$err }${elapsed:+$elapsed }'
+  _prompt_status+='${fill}${jobnum}'
   _prompt_env="%F{$color}${parts[1]}%f"
   # THINK: instead of pos-based placeholders -- simply concat all letters
   # THINK: letter for chroot

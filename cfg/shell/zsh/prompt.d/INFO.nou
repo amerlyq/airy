@@ -3,10 +3,32 @@ SEE:
   http://eseth.org/2010/hg-in-zsh.html
 DEV
   https://github.com/whiteinge/dotfiles/blob/master/.zsh_shouse_prompt
+SEIZE:ALT:(sync):
+  https://github.com/mafredri/zsh-async
+  http://www.anishathalye.com/2015/02/07/an-asynchronous-shell-prompt/
 BUG:
-  [_] crash 'st' when press and hold <CR>
-    MAYBE: too many proc create-kill
-    CPU: load ~80% (Bash: ~5%)
+  [_] (intermitten) crashed zsh (!with 'st') inside any repo when press and hold <CR>
+    ~ too many processes create/kill per second
+    ~ data-racing for kill of async bundle
+    ~ 'kill 0' inside timer's code
+      2017-01-04 [X] CHECK: temporary remove it ::: no effect
+    ~ syntax highlighting crashes inner zsh
+      2017-01-04 [X] CHECK: it by disabling plugin ::: BUG! seems like culprit
+    Log:
+     ...
+     ┌R─[~/aura/fork/ranger]─(customizable_prompt)
+     └╼
+     ┌R─[~/aura/fork/ranger]─(customizable_prompt)
+     └╼ [2]  + 3600 suspended (tty output)
+     ╸⚙1 >>> elapsed time: 14s
+     ┌──[~/aura/airy]
+     └╼
+  [_] high cpu load with <CR> on press and hold
+    ~80% kill/reset on each prompt
+    ~35% wait completion with timeout
+    ~21% w/o async
+    ~12% w/o hooks
+    ~05% bash
 
 Features:
   - two-line theme to separate cmds output easily

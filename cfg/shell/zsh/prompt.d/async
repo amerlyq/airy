@@ -4,7 +4,7 @@
 #   NOTE Must be the last commands of function for prompt refresh to work.
 
 function prompt_update {
-  typeset -g _prompt_async_pid=0  # Reset PID
+  typeset -g _prompt_async_pid=''  # Reset PID
   for c in $_prompt_async_calls; do
     # THINK: directly use typeset -g instead of source env=$(< $tmp/f1 < $tmp/f2)
     [[ -s $_prompt_tmp/$c ]] || continue
@@ -17,23 +17,42 @@ function prompt_update {
 }
 
 function prompt_async_exec {
+  local update=${1:?} timer
+  # NOTE: 'timeout' is expensive, 'sleep+kill' need fork,
+  # ALSO: '{{ cmd; }|{ sleep 5; kill 0; }}' don't work
+
+  # EXPL: terminate itself w/o waiting for next prompt to kill
+  #   * if terminal left alone or user launched long session with ranger/etc
+  #   * send signal to update prompt before killing to reset $pid variable
+  { sleep 10; kill -USR1 $update; kill 0; } & timer=$!
+
   for c in $_prompt_async_calls; do
     _prompt_async_call_$c >! $_prompt_tmp/$c &
   done
-  wait && kill -USR1 ${1:?}
+
+  # EXPL: wait all jobs beside sleep ALT: array[$array[(i)value]]=()
+  wait ${${${(v)jobstates##*:*:}%=*}/$timer}
+  # EXPL: suppress err on 'kill nonexistent' and msg 'was killed'
+  { kill $timer && wait $timer; kill -USR1 $update; } 2>/dev/null
 }
 
 function prompt_async {
-  # Kill the old process of slow commands if it is still running.
-  #   => because you could 'cd' or 'git add' => anticipated status is obsolete
-  # THINK: smart reset -- for long async cmds >> prompt renew
-  #   * until new prompt it can run no more than 20s
-  #   * if new prompt is faster than async but < 5s -- return w/o killing
-  # BUT: 'timeout' is expensive, 'sleep+kill' need fork,
-  # ALSO: '{{ cmd; }|{ sleep 5; kill 0; }}' don't work
-  kill $_prompt_async_pid &>/dev/null
   # Re-establish trap each time (if user have changed it)
   trap prompt_update USR1
+
+  # EXPL: terminate all stale async jobs if too slow
+  if ((_prompt_async_pid)); then
+    local dt=$(( SECONDS - _prompt_async_start ))
+    if (( dt > 30 )); then
+      kill -- $_prompt_async_pid 2>/dev/null
+      kill -USR1 $$  # Reset PID and load all data which ready
+    fi
+  fi
+
+  # EXPL: terminate all async jobs if too slow
+  ((_prompt_async_pid)) && return
+
   prompt_async_exec $$ &!
   typeset -g _prompt_async_pid=$!
+  typeset -g _prompt_async_start=$SECONDS
 }

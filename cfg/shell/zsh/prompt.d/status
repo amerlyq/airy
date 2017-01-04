@@ -15,27 +15,27 @@ function prompt_len { local line=${1?}
 
 function prompt_top {
   local nrest fill whole
-  local err dt elapsed jobl
+  local err dt elapsed jobnum
   local date ppwd
 
   # Status
   whole=${(e)_prompt_status}  # Dump status skeleton only
   # ALT:BAD: prompt_len '%(?::%F{1}%?↵ %f)'
-  ((${1:?})) && err=" %F{1}$1↵%f" || err=''
+  ((${1:?})) && err="%F{1}$1↵%f" || err=''
 
-  jobstatus=$(jobs -l | wc -l)  # \u2699
-  ((jobstatus)) && jobstatus="%F{9}⚙${jobstatus} %f" || jobstatus=''
+  jobnum=$(jobs -l | wc -l)  # \u2699
+  ((jobnum)) && jobnum="%F{9}⚙${jobnum}%f" || jobnum=''
   read -r dt elapsed <<< $(prompt_elapsed)
 
   if [[ $whole != ${(e)_prompt_status} ]]; then
     whole=${(e)_prompt_status}
-    if [[ $err ]]; then
-      nrest=$(( $COLUMNS - $(prompt_len $whole) ))
-      fill=$(printf "%${nrest}s")
-    fi
+    nrest=$(( $COLUMNS - $(prompt_len $whole) ))
+    fill=$(printf "%${nrest}s")
     # WARN: must be added after 'fill' evaluated
     elapsed+=$(prompt_elapsed_urgent $dt)
-    print -r ${(e)_prompt_status}
+    whole=${(e)_prompt_status}
+    # EXPL: remove trailing spaces (cancel $fill if nothing on right)
+    print -r ${whole%${whole##*[![:space:]]}}
   fi
 
 
