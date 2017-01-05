@@ -13,3 +13,12 @@ TUT
   https://www.linux-mips.org/wiki/Distributions
   https://www.linux-mips.org/wiki/Toolchains
   https://briolidz.wordpress.com/2012/02/07/building-embedded-arm-systems-with-crosstool-ng/
+
+
+IDEA: if you develop buildroot
+  Create mirror with all necessary pkgs
+    ! Mirrors are the best -- keep old/new/etc versions, dld only necessary !
+    ! Don't push your packages into buildroot repo !
+  Builds MUST be binary identical
+    ! Compare resulting binaries byte to byte
+    ! Verify correctness of any upgrade by simple diff

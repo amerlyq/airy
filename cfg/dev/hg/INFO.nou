@@ -31,6 +31,10 @@ Branch
   hg branch mybranch
   hg push --new-branch -b mybranch
 
+Changes /\.0\s/ inside single file
+  $ hg log --patch -- file |awk '/changeset:/{r=$2} /^[-+].*\.0\s/{print r,$0}'
+  $ hg grep --follow --all '\.0\s' -- file
+
 FeatureBranch
   REF
     http://stevelosh.com/blog/2009/08/a-guide-to-branching-in-mercurial/#branching-with-bookmarks

@@ -228,7 +228,6 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
 
 -- BUG:FIXME: unsafe io operation, catch error/exception instead of Xorg fail.
 catchStdout c f = fmap read (runProcessWithInput c [f] "")
-getXorg = catchStdout "r.xorg"
 
 main :: IO ()
 main = do
@@ -248,7 +247,7 @@ main = do
 
   -- TODO:CHG: query value from Xft.dpi by xmonad means instead!
   -- BUT:TEMP: impossible as xprofile can be run only after xmonad
-  dpi <- getXorg "-d"
+  dpi <- catchStdout "r.xorg" "-d"
 
   xmonad $ ewmh myCfg { logHook = myLogHook h
   , borderWidth = fromIntegral $ round (dpi / 60)

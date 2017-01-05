@@ -1,6 +1,6 @@
 -- vim: ts=2:sw=2:sts=2
 module XMonad.Config.Amer.Common (
-    bring, backNforth, actions,
+    bring, backNforth, actions, actionMons,
     inGroup, feedCmd
 ) where
 
@@ -25,10 +25,15 @@ bring i = W.view i . W.shift i
 -- -- has history navigation between last workspaces
 backNforth l f = gets (W.currentTag . windowset) >>= toggleOrDoSkip l f
 
+-- EXPL: don't focus to secondary screen at all
+isVisible w ws = any ((w ==) . W.tag . W.workspace) (W.visible ws)
+lazyView w ws = if isVisible w ws then ws else W.view w ws
 
 -- THINK: maybe use swapWithCurrent only for 'M-a', and bind smth else for wksp?
-actions :: (Eq s, Eq i, Ord a) => [(String, (i -> W.StackSet i l a s sd -> W.StackSet i l a s sd))]
-actions = withMods [""] [W.view, bring, W.shift, copy, swapWithCurrent]
+actions :: (Eq s, Eq i, Ord a) => [(String, i -> W.StackSet i l a s sd -> W.StackSet i l a s sd)]
+actions = withMods [""] [lazyView, bring, W.shift, copy, swapWithCurrent]
+actionMons :: (Eq s, Eq i, Ord a) => [(String, i -> W.StackSet i l a s sd -> W.StackSet i l a s sd)]
+actionMons = withMods [""] [W.view, bring, W.shift, copy, W.greedyView]
 
 inGroup prf = map $ \(k, f) -> (prf ++ " " ++ k, f)
 feedCmd cmd = map $ \(k, o) -> (k, cmd ++ " " ++ o)

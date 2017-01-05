@@ -5,7 +5,7 @@ module XMonad.Config.Amer.Navigation (
 
 import Data.Default                 (def)
 import XMonad                       (gets, spawn, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen)
-import XMonad.StackSet              (view, greedyView, shift, currentTag, shiftWin)
+import XMonad.StackSet              (view, shift, currentTag, shiftWin)
 import XMonad.Actions.CycleWS       (findWorkspace, screenBy, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
 
@@ -13,7 +13,7 @@ import XMonad.Layout.TwoPane        (TwoPane(..))
 import XMonad.Layout.LayoutScreens  (layoutScreens)
 import XMonad.Actions.TagWindows    (setTags, addTag, shiftHere, tagPrompt, tagDelPrompt, focusUpTaggedGlobal, withTaggedGlobal, withTaggedGlobalP, withTaggedP)
 
-import XMonad.Config.Amer.Common    (inGroup, actions, backNforth)
+import XMonad.Config.Amer.Common    (inGroup, actions, actionMons, backNforth)
 import XMonad.Config.Amer.Workspace (skipped, immediate)
 
 
@@ -49,7 +49,7 @@ groups =
 screens =
   [ (m ++ k, b f)
   | (k, b) <- [ ("[", doScreen (-1)), ("]", doScreen 1) ]
-  , (m, f) <- take 4 actions ++ [ ("M-M1-", greedyView) ]
+  , (m, f) <- actionMons
   ]
 
 

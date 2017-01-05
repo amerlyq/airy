@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+s=$1
+d=$2
+
+fs(){ find "$1" -exec stat --printf=%s {} \; -printf ' %P\n' \
+  | LC_ALL=C sort -k2,2; }
+
+exec diff -y --suppress-common-lines <(fs "$s") <(fs "$d") | awk '
+  /\s\|\s/{print $4-$1,$2} /\s>\s/{print" > "$3} /\s<$/{print" < "$2}
+' | LC_ALL=C sort -g

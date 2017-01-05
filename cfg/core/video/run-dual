@@ -6,6 +6,7 @@ set -o pipefail
 # xrandr --output VGA1 --auto --output HDMI2 --off
 # xrandr --output VGA1 --auto --primary --output HDMI2 --auto --left-of VGA1
 # r.feh
+# r.wm restart-wm
 
 setm() { local sz=${1:-1920x1080}; shift
     if ! xrandr -q | sed '/^VGA1/,/^\S/!d' | grep -q "$sz"; then
