@@ -8,3 +8,6 @@ fs(){ find "$1" -exec stat --printf=%s {} \; -printf ' %P\n' \
 exec diff -y --suppress-common-lines <(fs "$s") <(fs "$d") | awk '
   /\s\|\s/{print $4-$1,$2} /\s>\s/{print" > "$3} /\s<$/{print" < "$2}
 ' | LC_ALL=C sort -g
+
+# Total size diff
+# /usr/bin/diff -u s d | sed -n '1,2d; /^-/s||off/|p; /^+/s||dev/|p' | xargs -rn1 -d\\n stat -c'%s %n' | sed '/^.*\sdev/s//-&/' |awk '{a+=$1} END {print a}'

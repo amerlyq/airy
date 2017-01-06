@@ -2,7 +2,7 @@
 # WARN: security hole :: executed as root from udev!
 #   TRY: using 'at' directly from udev rule to drop permissions
 
-echo "$*" > /tmp/hello
+printf '%s' "$*" > /tmp/hello
 exit
 
 # OBSOLETE: no need in user unit
