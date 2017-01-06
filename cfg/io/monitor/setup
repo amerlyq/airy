@@ -1,0 +1,13 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+[[ ${CURR_PROF:?} =~ neo ]] || return
+
+### LINKS ###
+svc_activate -c monitors.service
+
+linkcp -sct /etc/udev/rules.d -f unit \
+  95-monitor-hotplug.rules
+
+if cfgOpt u; then
+  sudo udevadm control --reload-rules
+fi

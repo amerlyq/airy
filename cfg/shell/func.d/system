@@ -71,7 +71,7 @@ distro(){
     else uname -a; fi | grep -iqF "$1"
 }
 die() { local ret=$?
-    if [[ "$1" =~ [0-9]+ ]]; then ret=$1; shift; fi
+    if [[ $1 =~ [0-9]+ ]]; then ret=$1; shift; fi
     printf "%s${1+\n}" "$1"
     # For case when you source this functions to interactive shell
     [[ $PS1 ]] && return $ret || exit $ret
@@ -92,7 +92,7 @@ help_from_ifhas() { sed -rn '/^(\s*)(el)?if\s+has (\w+)[^;]*;[^#]+#\s*(.*)$/s//\
 do_sleep() { sleep "$1" & { while kill -0 $! >/dev/null 2>&1
     do printf "."; sleep 0.5; done; echo; }; }
 
-has_pr(){ hash "$1" >/dev/null 2>&1; }
+has_pr(){ hash "$1" &>/dev/null; }
 has_lib(){ grep -q '^\s*lib'"$1"'\.so\s' <(ldconfig -p); }
 has_python(){ local v=($(python$1 --version 2>&1))
   [[ -d /usr/lib/python${v[1]%.*}/site-packages/$2 ]]

@@ -20,9 +20,9 @@ Reload
   $ sudo udevadm trigger /dev/input/event4
 
 DEBUG
-  Monitor special variables on plug/unplug events
+  Monitor/catch special variables (attributes) on plug/unplug events
   # env ID_VENDOR_ID, ID_MODEL_ID <--> attr idVendor, idProduct
-    $ udevadm monitor --environment --udev
+    $ udevadm monitor --environment --udev  # --kernel
   Test symlinks, etc
     $ udevadm test $(udevadm info -q path -n [device name]) 2>&1
   If rules fail to reload automatically after changes

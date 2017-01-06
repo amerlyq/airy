@@ -1,0 +1,12 @@
+[Unit]
+Description=Udev - Monitors Hotplug - %P
+# ConditionFileIsExecutable=%h/.cache/airy/bin/r.monitor-refresh
+# BindsTo=...
+
+[Service]
+Type=oneshot
+# RemainAfterExit=false
+ExecStart=/home/amer/.cache/airy/bin/r.monitor-refresh -on
+ExecStop=/home/amer/.cache/airy/bin/r.monitor-refresh -off
+# ExecStart=/bin/sh -c 'exec %h/.cache/airy/bin/r.monitor-refresh -on'
+# ExecStop=/bin/sh -c 'exec %h/.cache/airy/bin/r.monitor-refresh -off'
