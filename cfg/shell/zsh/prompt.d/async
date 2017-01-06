@@ -17,7 +17,7 @@ function prompt_update {
 }
 
 function prompt_async_exec {
-  local update=${1:?} timer
+  local update=${1:?} timer pids=()
   # NOTE: 'timeout' is expensive, 'sleep+kill' need fork,
   # ALSO: '{{ cmd; }|{ sleep 5; kill 0; }}' don't work
 
@@ -27,11 +27,12 @@ function prompt_async_exec {
   { sleep 10; kill -USR1 $update; kill 0; } & timer=$!
 
   for c in $_prompt_async_calls; do
-    _prompt_async_call_$c >! $_prompt_tmp/$c &
+    _prompt_async_call_$c >! $_prompt_tmp/$c & pids+=($!)
   done
 
   # EXPL: wait all jobs beside sleep ALT: array[$array[(i)value]]=()
-  wait ${${${(v)jobstates##*:*:}%=*}/$timer}
+  # wait ${${${(v)jobstates##*:*:}%=*}/$timer}
+  wait $pids
   # EXPL: suppress err on 'kill nonexistent' and msg 'was killed'
   { kill $timer && wait $timer; kill -USR1 $update; } 2>/dev/null
 }

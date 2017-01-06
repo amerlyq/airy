@@ -37,7 +37,7 @@ function prompt_elapsed_urgent { local dt=${1:?}
   (( dt > 60 )) || return
   printf '\a'  # Urgent bell
   # BAD: false-positive after: ranger, bash, schroot, etc
-  # if (($+commands[r.n])) && [[ $DISPLAY ]]; then
+  # if (($+commands[r.n])) && [[ -n $DISPLAY ]]; then
   #   r.n -U 'ZSH' "$(fc -l -n -1)"
   # fi
 }

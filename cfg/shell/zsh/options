@@ -26,4 +26,6 @@ unsetopt CHECK_JOBS       # Don't report on jobs when shell exit.
 # setopt NO_HUP
 # setopt NO_CHECK_JOBS
 
-setopt pipe_fail          # Exit pipe with rightmost non-zero code
+{ # New options (may be unavailable)
+  setopt pipe_fail        # Exit pipe with rightmost non-zero code
+} 2>/dev/null

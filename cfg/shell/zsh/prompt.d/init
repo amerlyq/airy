@@ -3,11 +3,11 @@
 
 function prompt_precmd {
   # HACK: fetch err code immediately on precmd before overwritten
-  local err=$(print -P '%?')
+  local err=$(print -P '%?') p
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS SH_WORD_SPLIT
 
-  local p=$(prompt_top $err)
+  p=$(prompt_top $err)
   [[ -z $p ]] || print -P $p
 
   # BAD: git/vcs info is one step behide of any cmd (cd .. / gb ..)

@@ -12,9 +12,10 @@ fi
 
 ## Git branch and status
 GIT_PS1_SHOWDIRTYSTATE=true
-__git_ps1() {
+__git_ps1() { local fmt='(%s)'
     ref=$(git symbolic-ref -q HEAD 2> /dev/null) || return
-    printf "${1:-(%s)}" "${ref#refs/heads/}"
+    # DEV: repo status markers
+    printf "${1:-$fmt}" "${ref#refs/heads/}"
 }
 __svn_rev_ps1() {
     local DIRTY REV=$(svn info 2>/dev/null | grep Revision | sed -e 's/Revision: //')
@@ -49,7 +50,7 @@ if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
   PS1+="${prompt_parts:1:1}$F00$Fbold[$F03\w$F00]$Fsgr0"
   PS1+="${SSH_TTY:+ ~ $F06\u@\h$Fsgr0}"
   PS1+="${debian_chroot:+ :: $F06$debian_chroot$Fsgr0}"
-  PS1+="\$([[ \$? == 0 ]] || echo \" $F01\$?↵$Fsgr0\")"
+  PS1+='$(ret=$?; ((!$ret))||echo " '"$F01"'${ret}↵'"$Fsgr0"'")'
   PS1+="\n$prompt_color${prompt_parts:2:1}$F13\$(__git_ps1)"
   PS1+="$prompt_color${prompt_parts:4:1}$Fsgr0 "
   # \u - username, \A,\t - time w/out :SS, \!,\# - history/command number
