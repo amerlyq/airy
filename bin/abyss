@@ -36,6 +36,8 @@ esac; OPTS+=$o; done; shift $((OPTIND-1))
 [[ $OPTS =~ f && $# -eq 1 ]] && BIN=${1%.*} || BIN=${PWD##*/}
 BIN=$(realpath -s "${BIN:?}.bin")
 
+# CHECK:BETTER: no local var -- no need for func
+#   return $(( $?==1 ? 0 : $? ))
 ignore() { local ret=$?; ((ret==$1))||return $ret; }
 
 # NEED: if ${GWD:+$GWD/.git/abyss} -- directly $ cd $GWD
