@@ -1,12 +1,17 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
-# [[ ${CURR_PROF:?} =~ neo ]] || exit
+
+### GENS ###
+# THINK: embed %VAR% replacing into svc_activate
+tmp="${TMPDIR:-/tmp}/monitor-hotplug@.service"
+trap "rm -f '$tmp'" EXIT
+cp -fT "unit/${tmp##*/}" "$tmp"
+sed -i '/%USER%/s//'"$CURR_USER"'/' "$tmp"
+svc_activate -c -f "${tmp%/*}" "${tmp##*/}"
 
 ### LINKS ###
-svc_activate -c monitors.service
-
-linkcp -sct /etc/udev/rules.d -f unit \
-  95-monitor-hotplug.rules
+# THINK: embed *.rules support into svc_activate
+linkcp -sct '/etc/udev/rules.d' unit/95-monitor-hotplug.rules
 
 if cfgOpt u; then
   sudo udevadm control --reload-rules

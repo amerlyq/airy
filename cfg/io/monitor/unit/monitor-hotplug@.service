@@ -1,0 +1,17 @@
+# NOTE: '%USER%' is replaced by current user in './setup' script
+
+[Unit]
+Description=Udev - Monitor Hotplug - %P
+ConditionFileIsExecutable=/home/%USER%/.cache/airy/bin/r.monitor-refresh
+# BindsTo=...
+
+[Service]
+Type=oneshot
+TimeoutStartSec=15
+RemainAfterExit=false
+User=%USER%
+Environment=DEVPATH=%I
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/%USER%/.Xauthority
+Environment=PATH=/home/%USER%/.cache/airy/bin:/usr/local/bin:/usr/bin
+ExecStart=/bin/sh -c 'exec r.monitor-refresh'

@@ -1,35 +1,11 @@
-#!/bin/bash -eu
-# WARN: security hole :: executed as root from udev!
-#   TRY: using 'at' directly from udev rule to drop permissions
+#!/bin/sh -eu
+# WARN: disable executing as root from udev (!!! security hole)
+(( $(id -u) )) || { echo "Err: not allowed running as root" >&2; exit 2; }
+# WARN: prevent calling additional time on card0 init (even w/o monitor)
+#   -- before user login and even before X starts
+xset q &>/dev/null || exit 0
+# ----------------
 
-printf '%s' "$*" > /tmp/hello
-exit
-
-# OBSOLETE: no need in user unit
-# udev will wait for our script to finish before the monitor is available
-# for use, so we will use the `at` command to run our command again as
-# another user:
-# if [ "$1" != "forked" ]; then
-#     echo "$(dirname $0)/$(basename $0) forked" | at now
-#     exit
-# fi
-
-# OBSOLETE: no need in user unit
-# udev runs as root, so we need to tell it how to connect to the X server:
-# export DISPLAY=:0
-# export XAUTHORITY=/home/tylermenezes/.Xauthority
-
-# Find out the device path to our graphics card:
-cardPath=$(udevadm info -q path -n /dev/dri/card0)
-shaHdmi=$(sha1sum -b /sys/$cardPath/card0-HDMI-A-1/edid | cut -f1 -d " ")
-# Detect if the monitor is connected and, if so, the monitor's ID:
-conHdmi=$(xrandr | sed -n '/HDMI1 connected/p')
-
-case ${conHdmi+$shaHdmi}
-in 81042c4737ba0fd7666a1cbe17ce81abca3dbd6f) # Home
-  xrandr --output eDP1 --auto --primary --output HDMI1 --auto --below eDP1
-;; yyyyyyyyyyyyyyyy) # Presentation
-  xrandr --output eDP1 --auto --primary --output HDMI1 --auto --same-as eDP1
-;; *) # Other
-  xrandr --output eDP1 --auto --output HDMI1 --off
-esac
+r.monitor-hotplug
+r.feh
+r.wm restart-wm

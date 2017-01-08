@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+# USAGE: $ [DEVPATH=..] ./$0
+
+set -o pipefail
+
+# Extract monitor IDs from device path to graphics card
+[[ ${DEVPATH-} ]] || DEVPATH=$(udevadm info -q path -n /dev/dri/card0)
+empty_hash=$(printf '' | sha1sum -b | cut -f1 -d' ')
+
+find "/sys/$DEVPATH" -maxdepth 1 -type d \
+  -exec test -f {}/edid \; -execdir sha1sum -b {}/edid \; \
+| grep -vF "$empty_hash" || { echo "Err: no monitor edid found" >&2; exit 3; }

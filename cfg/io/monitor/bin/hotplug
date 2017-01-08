@@ -1,0 +1,48 @@
+#!/bin/bash -eu
+# USAGE:
+#   env $ [DEVPATH=..] [CURR_MONITORS=..] ./$0
+# stdin $ echo '[<sha1>|*] eDP1 --primary' | ./$0
+
+set -o pipefail
+set -o noglob
+
+# Config
+reflow(){ sed 's/#.*$//;s/^\s*//;s/\s*$//;/^$/d'; }
+[[ -t 0 ]] || config=$(reflow)
+if [[ -z $config ]]; then
+  [[ ${CURR_MONITORS-} ]] || source ~/.shell/profile
+  config=$(reflow <<< "$CURR_MONITORS")
+fi
+
+# Find connected active displays
+xlist(){ xrandr -q | sed -rn '/^([[:alnum:]-]+) '"$1"'.*/s//\1/p'; }
+conn=( $(xlist 'connected ') )
+discon=( $(xlist 'disconnected [^(]') )
+active(){ [[ " ${conn[@]} " =~ " $1 " ]]; }
+shas=( $(r.monitor-edid-hash | cut -f1 -d' ') )
+has(){ [[ " ${shas[@]} " =~ " $1 " ]]; }
+
+# Construct xrandr arguments
+add(){ cmd+=( --output "$1" "${@:2}" )
+  [[ " ${@:2} " =~ " --off " ]] || cmd+=( --auto ); }
+parse_line(){
+  if [[ $1 =~ [0-9a-f]{40} ]]; then
+    has "$1" || return 0 && shift
+  elif [[ $1 == '*' ]]; then shift; fi
+  active "$1" || return 0 && add "$@"
+}
+
+cmd=()  # Construct ordered list of active monitors
+while read -ra args; do (( ${#args[@]} )) || continue
+  parse_line "${args[@]}"; done <<< "$config"
+
+# HACK: use first mon as primary if not determined
+# if [[ " ${cmd[@]} " =~ " --primary " ]]
+# then cmd=( "${cmd[@]:0:2}" --primary "${cmd[@]:2}" ); fi
+
+# Find enabled but disconnected w/o '\*' (--auto will disable them)
+for m in "${discon[@]}"; do add "$m"; done
+
+# HACK: standalone 'xrandr' -- don't print to stdout
+#   => no cmd => no monitor at all => assume Xorg error
+(( ${#cmd[@]} )) && exec xrandr "${cmd[@]}"
