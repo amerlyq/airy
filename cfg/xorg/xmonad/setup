@@ -3,10 +3,10 @@ THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link -t ~/.xmonad xmonad.hs xmobarrc
+linkcp -t ~/.xmonad xmonad.hs xmobarrc
 lib=~/.xmonad/lib/XMonad
-link -t "$lib/Config/Amer" ./cfg/*
-link -t "$lib/Util/Amer"   ./ext/*
+linkcp -t "$lib/Config/Amer" ./cfg/*
+linkcp -t "$lib/Util/Amer"   ./ext/*
 
 svc_activate -cue xmonad.service \
   xmobar.{service,socket}
@@ -14,12 +14,12 @@ svc_activate -cue xmonad.service \
 ### GENS ###
 if cfgOpt u; then
   # dst=~/.xmonad/xmobarrc
-  # link -c xmobarrc "$dst"
+  # linkcp -c xmobarrc "$dst"
   # trayw=$(( 3 * (${MAIN_DPI:?} * 9/72 + 4) + 6 ))
   # sed -ri '/^(, position\s*= BottomP 0).*/s//\1 '$trayw'/' "$dst"
 
   # THINK ServerMode.hs is too old in pacman/core, but wget is slow.
-  dst="$lib/Hooks"
+  dst=$lib/Hooks
   url='http://code.haskell.org/XMonadContrib/XMonad/Hooks/ServerMode.hs'
   [[ -f $dst/ServerMode.hs ]] || (mkdir -p "$dst" && wget "$url" -O "$dst/ServerMode.hs")
   # TRY: replace ctl.hs by bash/python XEvent script?

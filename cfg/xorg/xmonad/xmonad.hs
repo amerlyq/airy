@@ -3,17 +3,20 @@
 module Main (main) where
 
 ---- Std
-import Control.Monad (when)
+import Control.Monad (when, unless)
 import Data.List     (isPrefixOf)
 import Data.Ratio    ((%))
 import Data.Default  (def)
+import Data.Maybe    (maybe, fromMaybe, fromJust, isJust)
+import Text.Read     (readMaybe)
 import System.Directory     (doesFileExist)
 import System.IO
 import System.IO.Error      (IOError)
 -- import System.IO.Unsafe     (unsafePerformIO)
 import Control.Exception    (handle)
-import System.Environment   (getEnv)
+import System.Environment   (getArgs, getEnv, lookupEnv)
 import System.Process       (readProcessWithExitCode)
+import System.Posix.Types   (ProcessID)
 import System.Posix.Process (getProcessID, getParentProcessID, getProcessGroupID)
 import System.Posix.Signals (signalProcess, sigUSR1)
 import System.Exit          (ExitCode(ExitSuccess))
@@ -75,6 +78,21 @@ import XMonad.Config.Amer.Keys       (myKeys, myOverlay)
 import XMonad.Config.Amer.Mouse      (myMouseBindings)
 import qualified XMonad.Config.Amer.Workspace as MyWksp
 
+------ User State
+-- import qualified XMonad.Util.ExtensibleState as XS
+---- Glob
+-- newtype BoolWasRestarted = BoolWasRestarted Bool
+-- instance ExtensionClass BoolWasRestarted where
+--   initialValue = BoolWasRestarted False
+---- Get (startupHook)
+-- restarted <- XS.get :: X BoolWasRestarted
+-- case restarted of
+--   BoolWasRestarted b -> trace $ show "hi"
+---- Put (main)
+-- args <- getArgs
+-- when ("--replace" `elem` args) $ XS.put (BoolWasRestarted True)
+-- ALT: newIORef (BoolWasRestarted True)
+
 
 -- notifySystemd = do
 --   -- FIXME: skip on non-systemd MAYBE:BUG: one more notify on each --restart
@@ -88,16 +106,27 @@ import qualified XMonad.Config.Amer.Workspace as MyWksp
 --   trace $ show soc
 --   spawn $ "systemd-notify --ready --pid=" ++ show pid
 
-notifySystemd :: IO ()
-notifySystemd = do
+notifySystemd :: X ()
+notifySystemd = liftIO $ do
+  sppid <- lookupEnv "NOTIFY_PPID"
+  when (isJust sppid) $ do
+    -- trace $ show $ fromJust sppid
+    let ippid = readMaybe (fromJust sppid) :: Maybe ProcessID
+    when (isJust ippid) $ do
+      ppid <- getParentProcessID  -- getProcessGroupID
+      -- trace $ show ppid
+      when (fromJust ippid == ppid) $
+        signalProcess sigUSR1 ppid
+
   -- (e, _, _) <- readProcessWithExitCode "/usr/bin/systemctl" ["--user", "is-active", "wm.target"] ""
   -- trace $ show e
   -- when (e == ExitSuccess) $ return ()
-  ppid <- liftIO getParentProcessID
-  trace $ show ppid
-  pgid <- liftIO getProcessGroupID
-  trace $ show pgid
-  signalProcess sigUSR1 ppid
+
+  -- BAD: default xmonad don't support additional args
+  -- args <- getArgs
+  -- trace $ show args
+  -- unless (null args) $
+  --   maybe (return()) (signalProcess sigUSR1) (readMaybe (head args) :: Maybe ProcessID)
 
 
 -- ATTENTION: launched twice when /usr/bin/xmonad started
@@ -105,13 +134,12 @@ myStartupHook = do
   -- broadcastMessage $ SetStruts [] [minBound..maxBound]
   ewmhDesktopsStartup  -- EXPL: to be able to use 'wmctrl'
   setWMName "LG3D"  -- Fixes problems with Java GUI programs
-  liftIO notifySystemd
+  notifySystemd
   -- FIXME: dirty fix to not jump to 1st wksp on each restart beside startup
   -- BUG: stopped to work?
   curr <- gets (W.currentTag . windowset)
   when (curr == head MyWksp.all || curr == "PI") $
     windows . W.view $ MyWksp.primary !! 1
-  liftIO notifySystemd
   -- NOTE: must be the last
   checkKeymap myCfg myKeys
 
@@ -237,8 +265,9 @@ main = do
   --     return (Just h)
 
   -- TODO:MOVE: into 'withStatusBar' function (like exists for xmobar)
-  xdg <- handle (\(e :: IOError) -> return "/run/user/1000") $ getEnv "XDG_RUNTIME_DIR"
-  let fifoName = xdg ++ "/xmobar/wm"
+  xdg <- lookupEnv "XDG_RUNTIME_DIR"
+  -- ALT:(old): xdg <- handle (\(e :: IOError) -> return "/run/user/1000") $ getEnv "XDG_RUNTIME_DIR"
+  let fifoName = fromMaybe "/run/user/1000" xdg ++ "/xmobar/wm"
   barExists <- doesFileExist fifoName
   h <- if barExists
     then openBinaryFile fifoName WriteMode

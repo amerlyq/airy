@@ -27,6 +27,8 @@ backNforth l f = gets (W.currentTag . windowset) >>= toggleOrDoSkip l f
 
 -- EXPL: don't focus to secondary screen at all
 isVisible w ws = any ((w ==) . W.tag . W.workspace) (W.visible ws)
+-- FIXME: instead of 'ignore' create any empty desktop and use swapping 'greedyView'
+--  => CHECK: bring/shift/copy/swap -- them must work as expected
 lazyView w ws = if isVisible w ws then ws else W.view w ws
 
 -- THINK: maybe use swapWithCurrent only for 'M-a', and bind smth else for wksp?
