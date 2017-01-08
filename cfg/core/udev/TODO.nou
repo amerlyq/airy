@@ -3,6 +3,10 @@ REF
   http://linux.die.net/man/7/udev
   + http://www.signal11.us/oss/udev/
   http://www.reactivated.net/writing_udev_rules.html
+  +++ http://blog.fraggod.net/2015/01/12/starting-systemd-service-instance-for-device-from-udev.html
+    http://blog.fraggod.net/2012/06/16/proper-ish-way-to-start-long-running-systemd-service-on-udev-event-device-hotplug.html
+  ++ http://stackoverflow.com/questions/33071589/execution-of-udevs-run-statement-after-systemctl-start-of-service
+    http://unix.stackexchange.com/questions/63232/what-is-the-correct-way-to-write-a-udev-rule-to-stop-a-service-under-systemd
 
 FAQ
   https://doc.opensuse.org/documentation/html/openSUSE_121/opensuse-reference/cha.udev.html
@@ -29,3 +33,14 @@ DEBUG
     $ sudo udevadm control --reload
   To manually force udev to trigger your rules
     $ udevadm trigger
+
+
+BAD
+  !!! BAD: using scripts in /home/* -- security hole
+  !!! BAD: scripts must fork and exit immediately to reduce udev pause
+    KERNEL=="card0", SUBSYSTEM=="drm", ACTION=="add", ENV{DISPLAY}=":0", RUN+="/home/user/bin/monitor-refresh -on"
+
+  SEE: http://superuser.com/questions/1033270/how-do-i-use-envsystemd-user-wants-in-udev-rule
+  !!! BAD: works only for ACTION="add" (see sources)
+    SUBSYSTEM=="drm", ACTION=="change", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}="monitors.service"
+    # ENV{SYSTEMD_READY}=1

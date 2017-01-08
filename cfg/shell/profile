@@ -32,7 +32,7 @@ CURR_CHROOT_EVAL=''
 PKG_LIST=(/net/wget /shell{,/} /util{,/} /dev /dev/{python,ruby,etc,git} /term/{ranger,tmux,vim} /browsers/elinks)
 PKG_SKIP=(/dev/{android,eclipse,hex,java,kernel,latex,sql} /{core,game,io,media,re,xorg}{,/} )
 
-if [[ -f $CURR_DIR_CACHE/profile ]]
+if [[ -s $CURR_DIR_CACHE/profile ]]
 then source "$CURR_DIR_CACHE/profile" || return
 # else source ~/aura/env || return
 fi
