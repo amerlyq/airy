@@ -4,8 +4,9 @@ set -o pipefail
 # Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит,
 # стэш, merge итп -- парсить и заменять на значки
 cd "${1:-$PWD}"
+ignore=$([[ ! -s ./.freeze ]] || awk -vp="$PWD" '{print p"/"$0}' ./.freeze)
 exec r.git-find \
-  | grep -zvsxF -f <(awk -vp="$PWD" '{print p"/"$0}' "$PWD/.freeze") \
+  | grep -zvsxF -f <(<<<"$ignore") \
   | parallel -0 -j1 -k '
   echo && r.git-status {} &&
   git-up {} 2>&1 &&
