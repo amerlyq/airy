@@ -32,11 +32,13 @@ Nested repos
   [_] TODO: show unpushed branches
     http://stackoverflow.com/questions/7773939/show-git-ahead-and-behind-info-for-all-branches-including-remotes
   [_] FIXME: remove currently active branch from showed list
-  [_] THINK: replace my jobs by 'parallel' (and extract jobs in separate script)
-    OR: try xarg -P 8
+  2017-01-03 [X] THINK: replace my jobs by 'parallel' (and extract jobs in separate script)
+    OR:TRY: xarg -P 8
     MAYBE:(parallel) will be able to sort output and print as query available?
       https://www.gnu.org/software/parallel/parallel_tutorial.html
       $ printf "%s\n" ./**/.git(-^D:h) | parallel 'cd {} && git pull --verbose --all --rebase --autostash'
+    2017-01-04 [X] extract r.git thread pools into aeternum
+    2017-01-06 [X] BUG: r.git-all-push -- error code 36/34/39
   [_] TRY git pull --autostash
   [_] ENH: status for submodules
   [_] CHG: split name in two columns aligned on center -- dir | file
