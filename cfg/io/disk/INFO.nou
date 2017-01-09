@@ -1,0 +1,15 @@
+Disk failures
+  smartctl
+    https://www.thomas-krenn.com/en/wiki/SMART_tests_with_smartctl
+    http://proft.me/2012/02/10/smartd-monitoring-sostoyaniya-zhestkogo-diska/
+    https://habrahabr.ru/company/ua-hosting/blog/273715/
+  btrfs
+     btrfs blk_update_request i/o error :: dev sda sector XXXXXXXXX
+    http://www.spinics.net/lists/linux-btrfs/msg51445.html
+    Identify the corrupted files
+      $ badblocks -n /dev/sdX
+      list files part of a BTRFS block
+        http://unix.stackexchange.com/questions/196824/how-to-list-files-part-of-a-btrfs-block
+  fsck
+    http://askubuntu.com/questions/424580/i-o-error-dev-sda-sector-xxxxxxxxxx
+    https://btrfs.wiki.kernel.org/index.php/Btrfsck
