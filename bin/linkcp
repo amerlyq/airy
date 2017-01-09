@@ -15,11 +15,12 @@ cmd=f_link
 #   -- automatic 'sudo' -- check if has [[ -w ]] rights and add sudo
 
 OPTIND=1
-while getopts 'bcskf:t:p:' o; do case $o
+while getopts 'bcskrf:t:p:' o; do case $o
 in c) cmd='f_copy'
 ;; b) backup='_'
 ;; s) sudo='sudo'
 ;; k) keep=1       # Keep src relative subpath
+;; r) relative=1   # Symlink dst relative to src
 ;; f) DFR=$OPTARG  # From directory
 ;; t) DTO=$OPTARG  # Destination directory
 ;; p) PFX=$OPTARG  # Add prefix (Like '.' for dotfiles)
@@ -48,16 +49,17 @@ f_copy() { local src=$1 dst=$2
   # make numerical backup for them. Then you can merge changes manually!
   # BUT: for each file it must be done individually! Can't use 'cp -r'!
 }
+mkln(){ $sudo ln -svfT${relative:+r} -- "$@"; }
 f_link() { local src=$1 dst=$2
   [[ -e $dst || ! -L $dst ]] || $sudo rm "$dst"  # EXPL: rm dangling links
   if [[ ! -e $dst || -L $dst ]]; then
     if [[ ! $src -ef $dst ]]; then
       $sudo mkdir -p "${dst%/*}"
-      $sudo ln -svfT -- "$src" "$dst"
+      mkln "$src" "$dst"
     else show L "$src" "$dst"; fi
   elif [[ $backup && ! -e ${dst}$backup ]]; then
       $sudo mv -vfT  -- "$dst" "${dst}$backup"
-      $sudo ln -svfT -- "$src" "$dst"
+      mkln "$src" "$dst"
   else die "refuse symlink over existing file/dir '$dst'"; fi
 }
 dispatch() { local src=$(readlink -e "${1:?}") dst=${2:?}

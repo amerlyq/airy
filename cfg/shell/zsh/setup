@@ -5,8 +5,8 @@ source ~/.shell/func.d/cfgsetup
 PREZTO=~/.cache/zsh/.zprezto
 linkcp -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc
 if [[ -d $PREZTO ]]; then
-  linkcp "$PWD/prompt" "$PREZTO/modules/prompt/functions/prompt_amer_setup"
-  linkcp "$PWD/prompt.d" "$PREZTO/modules/prompt/functions/prompt.d"
+  linkcp ./prompt "$PREZTO/modules/prompt/functions/prompt_amer_setup"
+  linkcp ./prompt.d "$PREZTO/modules/prompt/functions/prompt.d"
 fi
 
 # We must have symlink anyway to keep paths actual
@@ -15,7 +15,7 @@ linkcp ./zshenv ~/.zshenv
 ./update
 
 # Choose default shell
-if has_pr zsh && [[ -z $SSH_TTY && $(which zsh) != ${SHELL:?} ]]; then
+if has_pr zsh && [[ -z ${SSH_TTY-} && $(which zsh) != ${SHELL:?} ]]; then
   sudo chsh -s /bin/bash  # Root login shell
   sudo usermod -s "$(which zsh)" "$(whoami)"  # User shell
 fi

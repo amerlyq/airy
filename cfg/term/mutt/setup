@@ -20,7 +20,7 @@ mkdir -p "${CURR_DIR_MAIL:?}"
 # THEME=$THEME ./gen/theme-solarized.gen
 
 # Gen accounts list to switch
-echo '# vim:ft=muttrc' > "$dst/index"
+k=0; echo '# vim:ft=muttrc' > "$dst/index"
 for p in "$dst/acc"/*; do [[ -s $p ]] || continue
   ((k+=1))
   cat>> "$dst/index" <<EOT

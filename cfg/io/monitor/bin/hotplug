@@ -9,7 +9,7 @@ set -o noglob
 # Config
 reflow(){ sed 's/#.*$//;s/^\s*//;s/\s*$//;/^$/d'; }
 [[ -t 0 ]] || config=$(reflow)
-if [[ -z $config ]]; then
+if [[ -z ${config-} ]]; then
   [[ ${CURR_MONITORS-} ]] || source ~/.shell/profile
   config=$(reflow <<< "$CURR_MONITORS")
 fi

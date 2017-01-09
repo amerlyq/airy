@@ -103,8 +103,8 @@ if (($#)) || cfgOpt s; then
     filter_find "$@" > "$queue"
 else
     # Caching the list of modules activated in profile
-    [[ -f "$mods"  ]] || filter_find > "$mods"
-    [[ -f "$queue" ]] || cp -vT "$mods" "$queue"
+    [[ -f $mods  ]] || filter_find > "$mods"
+    [[ -f $queue ]] || cp -vT "$mods" "$queue"
 fi
 
 ### Mods ===============================================================

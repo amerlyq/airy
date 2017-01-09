@@ -1,6 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/system
-running_X || [[ $1 == -t ]] || exec r.bt
+running_X || [[ ${1-} == -t ]] || exec r.bt
 
 log=${TMPDIR:-/tmp}/qute/$(date +%Y%m%d_%H%M%S).log
 mkdir -p "${log%/*}"
@@ -28,7 +28,7 @@ chtheme(){ local dir=~/.config/qutebrowser
   linkcp "$dir/theme/${t:?}" "$dir/style.css"
 }
 
-case "$1"
+case ${1-}
 in -p) shift; run "$(xsel -ob)"
 ;; -h) shift; run "$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)"
 # ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"

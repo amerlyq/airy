@@ -1,5 +1,11 @@
 # vim: ft=sh
+set -euo pipefail
 shopt -s nullglob
+
+# Trigger error when expanding unset variables
+# set -o errexit
+# set -o nounset
+# set -o xtrace
 
 ### Err handling ###
 error() { local err=$?
@@ -14,12 +20,8 @@ error() { local err=$?
 trap_errors(){
     # FIXME: even with those options, pkgbuild errors are not catched?
     # [[ $- =~ i ]] && return || exit
-    set -o errexit
-    set -o pipefail
     # Let shell functions inherit ERR trap.  Same as `set -E'.
     set -o errtrace
-    # Trigger error when expanding unset variables.  Same as `set -u'.
-    # set -o nounset
 
     #  Trap non-normal exit signals: 1/HUP, 2/INT, 3/QUIT, 15/TERM, ERR
     # BUG: wrong LINENO for correct command
@@ -49,7 +51,7 @@ cwd_script(){ cd "${0%/*}"; }  # even around symlinked
 cwd_origin(){ cd "$(dirname "$(readlink -e "$0")")"; }  # only around original file
 ### Add current package to active mods list if absent
 airy_cache_pwd_mod() {
-  [[ -z $MODS_CACHE_DISABLE && ${0##*/} =~ ^(install|setup)$ ]] || return 0
+  [[ -z ${MODS_CACHE_DISABLE-} && ${0##*/} =~ ^(install|setup)$ ]] || return 0
   local mods=${CURR_DIR_CACHE:?}/mods/mods
   [[ ! -t 0 ]] || [[ ! $0 =~ ^${CURR_DIR_CFG:?} ]] ||
     grep -qxF "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
@@ -59,8 +61,8 @@ is_empty_dir(){ [[ $(find "${1:-.}" -maxdepth 0 -type d -empty) ]]; }
 # ====================== Configs =====================================
 ajoin() { local IFS="$1"; shift; echo "$*"; }
 
-cfgOpt(){ [[ $CFG_OPTS =~ [$*] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
-cfgOptAdd() { local o=$*; o=${o// }; CFG_OPTS=${CFG_OPTS//[$o]}$o; }
+cfgOpt(){ [[ ${CFG_OPTS-} =~ [$*] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
+cfgOptAdd() { local a=$* o=${CFG_OPTS-}; a=${a// }; CFG_OPTS=${o//[$a]}$a; }
 cfgNo(){ ! cfgOpt $1; }  # ALT:CHECK: cfgOpt ^ab
 
 distro(){
@@ -99,7 +101,7 @@ has_python(){ local v=($(python$1 --version 2>&1))
 }
 has_such(){ local -A chk=( [a]='false' [f]='test -f' [d]='test -d'
     [p]='has_pr' [l]='has_lib' [y]='has_python 3' [Y]='has_python 2'
-  ); local cmd="${chk[$1]}"; [[ ${cmd%% *} ]] || return 2; $cmd "$2"
+  ); local cmd=${chk[$1]}; [[ -n ${cmd%% *} ]] || return 2; $cmd "$2"
 }
 
 # ALT:(running_X broken in raw console?) more stable -- xset q &>/dev/null

@@ -13,12 +13,13 @@ mkdir -vp "${CURR_DIR_PKG:?}"
 airy_cache_pwd_mod
 
 do_if() {
-  local cmd grp obj=p pkgs=() bQuiet=0 OPTIND=1
+  local cmd='' grp='' obj=p pkgs=() bQuiet=0 OPTIND=1
 
   # USE 'pacman -Ql <pkg>' to list files  ALT: pkgfile
   while getopts "ac:d:f:l:p:qy:Y:" o; do case $o
-  in [adflpyY]) obj=$o; grp=$OPTARG;
-  ;; c) cmd="$OPTARG"
+  in a) obj=$o  # always
+  ;; [dflpyY]) obj=$o; grp=$OPTARG
+  ;; c) cmd=$OPTARG
   ;; q) bQuiet=1
   ;; :|'?') die 1 "Need value for '-${o}'" >&2
   esac; done && shift $((OPTIND-1))
@@ -71,7 +72,7 @@ fi
 
 pkg_build() {
     # It can be, that 'autoreconf' can replace my own vehicle.
-    local prdir="$1"; shift; cd "$prdir"
+    local prdir=$1; shift; cd "$prdir"
 
     cabal=$(find . -maxdepth 1 -name '*.cabal' -print -quit)
     if [[ $cabal ]]; then
@@ -96,8 +97,8 @@ pkg_build() {
 
 
 wget_inst() {
-  local nobuild link fl prdir; case "$1" in -d) nobuild=1; shift ;; esac
-  fl="$CURR_DIR_PKG/${1##*/}" && prdir="${fl%.tar.gz}"
+  local dobuild=1 link fl prdir; case "$1" in -d) dobuild=0; shift ;; esac
+  fl=$CURR_DIR_PKG/${1##*/} && prdir=${fl%.tar.gz}
   [[ "${1//'://'}" == $1 ]] && link="https://sf.com/$1" || link="$1"
 
   if [[ -d "$prdir" ]]; then rm -rf "$prdir"; fi
@@ -105,7 +106,7 @@ wget_inst() {
     --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) \
 Gecko/20100101 Firefox/12.0" #--max-redirect=2
 
-  if [[ -z "$nobuild" ]]; then
+  if ((dobuild)); then
     atool -X "$prdir" "$fl"
     pkg_build "$prdir";
   fi
@@ -125,26 +126,25 @@ git_pull() { [[ -d "$1" ]] && cd "$1" || return
 # TODO: rewrite, so pull on -d worked only with -u
 # ALSO: need to choose where to copy
 git_inst() { # $0 -d pr_name
-  local nobuild link prdir; case "$1" in -d) nobuild=1; shift ;; esac
+  local dobuild=1 link prdir; case "$1" in -d) dobuild=0; shift ;; esac
   prdir=${1##*/} && prdir="$CURR_DIR_PKG/${prdir,,}"
   [[ "${1//'://'}" == $1 ]] && link="https://github.com/$1" || link="$1"
 
   #--depth 1 -- disabled by cause of automerges
   if [[ -d "$prdir" ]]; then git_pull "$prdir"
   else git clone --depth 1 "$link" "$prdir" && cd "$prdir"; fi
-  if ! cfgOpt u && [[ "$GIT_IS_THE_SAME" -eq 1 ]]; then
-      echo "C: Up to date, no re-build"
-  elif [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
+  if ! cfgOpt u && ((GIT_IS_THE_SAME==1)); then
+    echo "C: Up to date, no re-build"
+  elif ((dobuild)); then pkg_build "$prdir"; fi
 }
 
 
 hg_inst() {
-  local nobuild link prdir; case "$1" in -d) nobuild=1; shift ;; esac
+  local dobuild=1 link prdir; case "$1" in -d) dobuild=0; shift ;; esac
   prdir=${1##*/} && prdir="$CURR_DIR_PKG/${prdir,,}"
   [[ "${1//'://'}" == $1 ]] && link="https://bitbucket.com/$1" || link="$1"
 
-  if [[ -d "$prdir" ]]; then cd "$prdir" && hg pull
+  if [[ -d $prdir ]]; then cd "$prdir" && hg pull
   else hg clone "$link" "$prdir" && cd "$prdir"; fi
-
-  if [[ -z "$nobuild" ]]; then pkg_build "$prdir"; fi
+  ((!dobuild))|| pkg_build "$prdir"
 }

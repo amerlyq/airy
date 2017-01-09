@@ -19,12 +19,12 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme
 # DEV: must be placed after 'airy_cache_pwd_mod' for individual themes
-[[ $THEME_ALLOWED ]] || THEME_ALLOWED='dark|light|lucid|opaque'
+[[ ${THEME_ALLOWED-} ]] || THEME_ALLOWED='dark|light|lucid|opaque'
 # DEV:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
 # TODO: use THEME_DEFAULT if set, else -- .../theme/default
-[[ $THEME ]] || [[ ! -f ${CURR_DIR_CACHE:?}/theme ]] \
+[[ ${THEME-} ]] || [[ ! -f ${CURR_DIR_CACHE:?}/theme ]] \
 || THEME=$(<"${CURR_DIR_CACHE:?}/theme")
-[[ $THEME =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
+[[ ${THEME:?} =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
 
 ### LINKS ###
 # BUG: on error we can't exit from forked shell and fail main one!
@@ -62,7 +62,7 @@ fi
 
 airy_cache_pwd_mod
 
-if [[ -z $MODS_RUN_DISABLE ]]; then
+if [[ -z ${MODS_RUN_DISABLE-} ]]; then
   linkmask "$PWD/bin/" 'bin/r.%d-%n'
   linkmask "$PWD/run"  'bin/r.%d%n'
   linkmask "$PWD/env"  'env/%d%n'
