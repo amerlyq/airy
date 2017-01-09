@@ -54,19 +54,23 @@ TODO
 
 BUG
   Cell rendering issues
-    [_] artifacts (scratches) on bg fill SEE :XtermColorTable
+    ::: seems fixed by updating font.conf and font itself
+    2017-01-09 [X] artifacts (scratches) on bg fill SEE :XtermColorTable
       ~ chars position 'floats' -> letters overlapping stands out
       TRY: dejavu font, default xfontconfig
-    [_] horizontal lines cripping on each other (ncmpcpp)
+    2017-01-09 [X] horizontal lines cripping on each other (ncmpcpp)
       SEE:(mail) [dev] [st] bitmap font and chscale 1< line drawing bug
   Font rendering issues
-    [_] bad antialiasing
-    [_] intermitten inter-letter gaps (resize font)
+    [_] bad antialiasing CHECK! on 96dpi
+    2017-01-09 [X] intermittenly changing inter-letter gaps
+      = resize font in ncmpcpp -- see horizontal/vertical lines
+        ::: new font -- slight overlap on cell borders for several discreet font sizes (small..tiny)
       ? unconfigured fontconfig
         SEE: https://wiki.archlinux.org/index.php/Fontconfig
       ? fallback fonts -- wront wchar_t width in pixels
         TRY: use another fallback fonts / don't use any
     [_] BUG fat russian bold (+italic) -- like in comments after some time
+      ~ related to fonts w/o bold/italic typefaces -- generated through '90-synthesis.conf' only
   Fb images
     [_] REQ: w3m displaying broken for images, bigger than viewport w/h
       = works fine in urxvt
@@ -97,6 +101,29 @@ BUG
       ::: invalid issue :: according to specs VT100 have no scrollback and can't resize at all
     2015-12-28 [$] disable black frame around floating st window ::> option borderpx
     2015-12-23 [X] chroot -- no terminfo ::> install manually 'tic -sx st.info'
+  Program logic
+    2017-01-09 [X] CHECK: removing 'st' patch for startup lines
+      ::: FIXED in mainline
+      Requisites:
+        * multiple fallback fonts for 'monospace'
+        * hi dpi to distinguish different font sizes by eye
+      Running on HiDPI with 'pixelsize' -- all works as expected:
+        $ st -f monospace:pixelsize=35
+      Using relative font size, only first font treats 'size' as relative.
+      But all consequent fonts treat that size like it's absolute:
+        $ st -f monospace:size=10  # only first font ~= pixelsize=35
+        $ st -f monospace:size=35  # only fallbacks ~= pixelsize=35
+      However, if after that I use <C-S-Home> -- fonts will be reloaded
+      and size for all symbols becomes correct.
+      # diff --git a/st.c b/st.c
+      # index 2594c65..6529f56 100644
+      # --- a/st.c
+      # +++ b/st.c
+      # @@ -4399,2 +4399,4 @@ run:
+      #     selinit();
+      # +   xunloadfonts();
+      # +   xloadfonts(usedfont, defaultfontsize);
+      #     run();
 
 
 vim

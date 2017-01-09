@@ -7,10 +7,8 @@ BUG
 TODO
   2017-01-08 [X] 2nd monitor (xmonad + xrandr)
     [_] BUG? r.b -- don't opened second window
+    [_] (system freeze): unplug after monitor is disabled by its front-button
   2017-01-09 [X] fontconfig setup from scratch
-    [_] CHECK:FIX: bold russian after some time
-    [_] CHECK: removing 'st' patch for startup lines
-      FIND how I tested that in mail thread
   [_] audio system (pulse+mpd)
   [_] convert .nou to .md for jekyll
   [_] gdb read full man
@@ -23,6 +21,9 @@ TODO
     [_] gnome keyring fixup
       http://www.linuxquestions.org/questions/linux-desktop-74/openbox-autostart-gnome-keyring-daemon-message-4175547333/
   [_] fine-tune touchpad
+  [_] THINK: hide info from journalctl to access only by root
+    => pentadactyl/qutebrowser print too much -- maybe personal info included
+    BUT? I must log it under that user anyway to investigate errors ?
 
   [_] DEV: './setup -a'
     + do cleanup only in this mode
@@ -31,16 +32,35 @@ TODO
     + traverse -full- scenario for each *mod* to fail earlier
   [_] CHG: use pacaur instead of pacman on pkg update
   [_] USE them or disable/deinstall them
-    zeal
-    wxhexedit
-    xcape
-    ttf-comic-neue
-    zuki-themes (and other unused themes)
-    magnet2torrent-git
-  subjects to move to .cu
-    fpp xurls
-  replace by more appropriate
-    peda
+      zeal
+        + nice for multiple docs (perl, haskell, etc)
+        TODO:(setup) gen font size and spec docs list
+        TODO: menu on Menu ?
+      wxhexedit
+      xcape
+        + still useful 'multi' on overlay
+      ttf-comic-neue
+      zuki-themes (and other unused themes)
+      magnet2torrent-git
+    subjects to move to .cu
+      fpp xurls
+    replace by more appropriate
+      peda
+
+  [_] (airy,aeternum) -- host gh-pages with all *.nou
+    Mark files for publishing with some #hashtag after modeline
+      Maybe even add modeline with publish options
+    Symlink/copy them into _posts, or directly convert into *.md
+      Derive publish header from modeline
+  [_] Create ./etc OR ./profile
+    # To keep template fileset with mods for new accounts
+    * one very simple with small set of features
+    * one rich with all settings
+  [_] move to ssh-agent/ssh-add from my own ghub:...
+    https://wiki.archlinux.org/index.php/SSH_keys
+    ALT: rewrite url in each **/<submodule>/config
+      ? are there analog to 'git config' ?
+      ? or use directly $ gS foreach 'git remote'
 
 
 Deploy:
