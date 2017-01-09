@@ -1,8 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash -eu
+[[ " $* " =~ " -u " ]] && rescan=1 || rescan=''
 
 fndir=~/.local/share/fonts
 
-mkfontscale "$fndir"
-mkfontdir "$fndir"
-fc-cache -vf "$fndir"
+if ((rescan)); then
+  mkfontscale "$fndir"
+  mkfontdir "$fndir"
+fi
+
+fc-cache -v${rescan+f} "$fndir"
 # fc-cache -fs >/dev/null

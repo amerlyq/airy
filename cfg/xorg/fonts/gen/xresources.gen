@@ -1,0 +1,25 @@
+#!/bin/bash -eu
+source ~/.shell/profile
+source ~/.shell/func.d/system
+trap_errors
+cwd_script
+
+
+dst=~/.Xresources
+wstr(){ cat >> "$dst" <<<"$*"; }
+
+# BUG: boot linux with hdmi2 on => wrong xrandr order => wrong DPI
+[[ ${MAIN_DPI-} ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
+
+> "$dst"
+wstr "#ifndef MAIN_DPI"
+wstr "# define MAIN_DPI  ${MAIN_DPI:?}"
+wstr "#endif"
+for f in "${CURR_DIR_CACHE:?}"/Xres-*; do
+  wstr "#include \"$f\""
+done
+cat ./xfontrc >> "$dst"
+echo "W: ~/.Xresources"
+! xrdb -load ~/.Xresources 2>&1 | grep 'error'
+# To see the current loaded resources
+#   xrdb -query -all

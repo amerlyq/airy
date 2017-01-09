@@ -10,6 +10,7 @@ if distro arch; then
   # fi
 
   fd=/usr/share/fonts
+  # SEE: luxi-mono, mikachan, stix, croscore
   # ttf-freefont ttf-droid
   # ATT: https://www.archlinux.org/news/ttf-dejavu-237-will-require-forced-upgrade/
   pkg_inst -f "$fd/TTF/DejaVuSans.ttf" ttf-dejavu
@@ -20,6 +21,7 @@ if distro arch; then
   pkg_inst -d "$fd/adobe-source-code-pro" adobe-source-code-pro-fonts
   pkg_inst -d "$fd/adobe-source-sans-pro" adobe-source-sans-pro-fonts
   pkg_inst -d "$fd/adobe-source-serif-pro" adobe-source-serif-pro-fonts
+  # ALT: ttf-arphic-{ukai,uming}, 0-lohit-*
   # https://github.com/adobe-fonts/source-han-sans
   pkg_inst -d "$fd/adobe-source-han-sans" adobe-source-han-sans-jp-fonts
   # NOTE: http://comicneue.com/
@@ -34,6 +36,7 @@ if distro arch; then
 
 elif distro ubuntu; then
   echo "ERR: install manually"
+  exit
 
   fndir=~/.local/share/fonts
   if [[ ! -f $fndir/PowerlineSymbols.otf ]]; then
