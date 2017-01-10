@@ -15,12 +15,12 @@ shift
 ssnm='main'
 sstmux="
 which zsh >/dev/null && export SHELL=\$(which zsh)
-which tmux >/dev/null && if ! tmux has-session -t $ssnm
-then
-    tmux new-session -d -s $ssnm -n '$prg'
-    tmux rename-window -t $ssnm:1 'work'
+which tmux >/dev/null &&
+if ! tmux has-session -t '$ssnm' 2>/dev/null; then
+  tmux new-session -d -s '$ssnm' -n '$prg'
+  tmux rename-window -t '$ssnm':1 'work'
 fi
-tmux attach -t $ssnm
+tmux attach -t '$ssnm'
 "
 
 # HACK: nested tmux by ssh -- temporary switch host prefix
