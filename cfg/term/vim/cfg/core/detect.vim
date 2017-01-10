@@ -1,10 +1,13 @@
 " True colors in 'hi!' nvim>=v1.5 (160511) OR vim>=v7.4.1770 (1799?)
-" FIXME: disable in 'tmux <v2.2'
-" BUG: has('&termguicolors') == always false
-" BUG: no support in vim8 ?
-"   || (v:version > 704 || (v:version == 704 && has('patch1770')))
-if has('nvim')
+" FIXME: disable in 'tmux <v2.2' ALT: disable Tc support inside tmux.conf
+if has('termguicolors')
   set termguicolors
+  " FIXED: st + vim8  OR:USE: s/;/:/g for other non-xterm
+  if !has('nvim')
+    " || (v:version > 704 || (v:version == 704 && has('patch1770')))
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  en
 en
 
 exe "fun! IsWindows()\nreturn".(has('win32') || has('win64'))."\nendf"

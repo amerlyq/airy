@@ -8,4 +8,6 @@ linkcp "$PWD/theme-${THEME}.conf" ~/.cache/airy/theme-tmux.conf
 
 if distro arch; then
   svc_activate -cue tmux.service
+elif distro ubuntu; then
+  linkcp -s /usr/bin/tmux-next /usr/local/bin/tmux
 fi
