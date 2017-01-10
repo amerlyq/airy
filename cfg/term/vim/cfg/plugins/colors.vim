@@ -25,20 +25,24 @@ call dein#add('bling/vim-airline', {
 
 "" Sticked to this colorscheme 2+ years already... {{{1
 " ALT:(both) https://github.com/Samuel-Phillips/nvim-colors-solarized
+
+call dein#add('lifepillar/vim-solarized8', {
+  \ 'hook_add': _hcat('solarized.add')})
+
 " DEV: simplified solarized -- with menu/etc removed
 "   -- possibly with re-defined colors for nou.vim?
 " CHECK: maybe 'if' is insufficient -- need activate both, and disable one?
 "" Fork which supports term TRUE_COLOR
-call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
-  \ 'if': 'has("nvim")',
-  \ 'hook_add': _hcat('solarized.add')})
+" call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
+"   \ 'if': 'has("nvim")',
+"   \ 'hook_add': _hcat('solarized.add')})
 "  && exists("$NVIM_TUI_ENABLE_TRUE_COLOR")
 
 "" Original obsolete theme for old vim {{{
 " ATTENTION: place after '...solarized-truecolor...'
-call dein#add('altercation/vim-colors-solarized', {
-  \ 'if': '!dein#tap("neovim-colors-solarized-truecolor-only")',
-  \ 'hook_add': _hcat('solarized.add')})
+" call dein#add('altercation/vim-colors-solarized', {
+"   \ 'if': '!dein#tap("neovim-colors-solarized-truecolor-only")',
+"   \ 'hook_add': _hcat('solarized.add')})
 
 
 

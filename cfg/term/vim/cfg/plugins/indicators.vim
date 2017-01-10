@@ -78,5 +78,6 @@ call dein#add('luochen1990/rainbow', {
 \\n   let g:rainbow_active = 1
 \\n   let g:rainbow_conf = {'separately': { '*': {}, 'lisp': {}, 'vim': {} }}
 \\n   let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]
+\\n   let g:rainbow_conf.guifgs = ['#df0000', '#ff5f00', '#dfaf00', '#00af00', '#0087ff', '#af00ff']
 \\n   let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
 \"})

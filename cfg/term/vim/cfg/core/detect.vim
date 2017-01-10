@@ -1,5 +1,9 @@
-" True colors in 'hi!' nvim>=v1.5 OR vim>=v7.4.1770
-if has('nvim') || (has('+termguicolors') && (v:version > 704 || (v:version == 704 && has('patch1770'))))
+" True colors in 'hi!' nvim>=v1.5 (160511) OR vim>=v7.4.1770 (1799?)
+" FIXME: disable in 'tmux <v2.2'
+" BUG: has('&termguicolors') == always false
+" BUG: no support in vim8 ?
+"   || (v:version > 704 || (v:version == 704 && has('patch1770')))
+if has('nvim')
   set termguicolors
 en
 
