@@ -112,10 +112,11 @@ Gecko/20100101 Firefox/12.0" #--max-redirect=2
   fi
 }
 
-git_pull() { [[ -d "$1" ]] && cd "$1" || return
+# DEV: replace/merge by 'git-up'
+git_pull() { [[ -d $1 ]] && cd "$1" || return
   git fetch origin master && if [[ $(
     git rev-list HEAD...origin/master --count
-  ) == 0 ]]; then GIT_IS_THE_SAME=1; fi
+  ) == 0 ]]; then git_is_the_same=1; fi
 
   if git diff-files --quiet --ignore-submodules --
   then git pull --rebase --verbose
@@ -127,15 +128,19 @@ git_pull() { [[ -d "$1" ]] && cd "$1" || return
 # ALSO: need to choose where to copy
 git_inst() { # $0 -d pr_name
   local dobuild=1 link prdir; case "$1" in -d) dobuild=0; shift ;; esac
-  prdir=${1##*/} && prdir="$CURR_DIR_PKG/${prdir,,}"
-  [[ "${1//'://'}" == $1 ]] && link="https://github.com/$1" || link="$1"
+  prdir=${1##*/} && prdir=$CURR_DIR_PKG/${prdir,,}
+  [[ ${1//'://'} == $1 ]] && link="https://github.com/$1" || link="$1"
 
   #--depth 1 -- disabled by cause of automerges
-  if [[ -d "$prdir" ]]; then git_pull "$prdir"
+  if [[ -d $prdir ]]; then git_pull "$prdir"
   else git clone --depth 1 "$link" "$prdir" && cd "$prdir"; fi
-  if ! cfgOpt u && ((GIT_IS_THE_SAME==1)); then
+
+  if ! cfgOpt u && ((git_is_the_same)); then
     echo "C: Up to date, no re-build"
-  elif ((dobuild)); then pkg_build "$prdir"; fi
+    return 0
+  fi
+  unset git_is_the_same
+  ((!dobuild)) || pkg_build "$prdir"
 }
 
 

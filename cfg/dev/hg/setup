@@ -4,8 +4,8 @@ source ~/.shell/func.d/cfgsetup
 ### GENS ###
 dst=~/.hgrc
 > "$dst"
-if [[ ${WORK_NAME:=$MAIN_NAME} ]] \
-&& [[ ${WORK_MAIL:=$MAIN_MAIL} ]]; then
+if [[ ${WORK_NAME:=${MAIN_NAME-}} ]] \
+&& [[ ${WORK_MAIL:=${MAIN_MAIL-}} ]]; then
   printf "[ui]\nusername=%s <%s>\n\n" "$WORK_NAME" "$WORK_MAIL" >> "$dst"
 fi
 cat ./hgrc >> "$dst"

@@ -32,6 +32,7 @@ call dein#add('bling/vim-airline', {
 call dein#add('frankier/neovim-colors-solarized-truecolor-only', {
   \ 'if': 'has("nvim")',
   \ 'hook_add': _hcat('solarized.add')})
+"  && exists("$NVIM_TUI_ENABLE_TRUE_COLOR")
 
 "" Original obsolete theme for old vim {{{
 " ATTENTION: place after '...solarized-truecolor...'

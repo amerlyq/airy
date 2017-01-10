@@ -47,5 +47,5 @@ function prompt_top {
   nrest=$(( $COLUMNS - $(prompt_len $whole) ))
   ppwd=$(prompt_pwd $nrest)
   fill=$(printf "%$(( $nrest - $#ppwd ))s")
-  print -r ${(e)_prompt_env}
+  print -r "${(e)_prompt_env}"
 }

@@ -25,15 +25,16 @@ if distro arch; then
     # cabal install hdevtools
 
 elif distro ubuntu; then
-    # Those libs also necessary to build x32 under x64 system
-    LST="$LST build-essential gcc-multilib g++-multilib lib32stdc++6 "
-    LST="$LST make checkinstall pkg-config autoconf automake cmake" #binutils-gold
-    #| libc6-dbg:i386 | need to prevent valgrind error with strlen -> strnlen
-    LST="$LST valgrind libc6-dbg:i386 gdb doxygen "  #rabbit valkyrie  <GUI>
-    # LST="$LST google-perftools libgoogle-perftools-dev libgoogle-glog-dev google-mock"
-    # Cross-compilers
-    # LST="$LST gcc-arm-linux-gnueabi" #Or ...-androideabi
+  pkgs=()
+  # Those libs also necessary to build x32 under x64 system
+  pkgs+=( build-essential gcc-multilib g++-multilib lib32stdc++6 )
+  pkgs+=( make checkinstall pkg-config autoconf automake cmake ) #binutils-gold
+  #| libc6-dbg:i386 | need to prevent valgrind error with strlen -> strnlen
+  pkgs+=( valgrind libc6-dbg:i386 gdb doxygen )  #rabbit valkyrie  <GUI>
+  # pkgs=( google-perftools libgoogle-perftools-dev libgoogle-glog-dev google-mock)
+  # Cross-compilers
+  # pkgs=( gcc-arm-linux-gnueabi) #Or ...-androideabi
 
-    pkg_inst $LST
-    echo "Err: Not enough packages"
+  pkg_inst "${pkgs[@]}"
+  echo "Err: Not enough packages"
 fi

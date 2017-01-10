@@ -41,6 +41,7 @@ call dein#add('stefandtw/quickfix-reflector.vim', {
 
 "" CHECK: Multiple realtime hl for searching {{{1
 " NOTE: vim_version: '7.3'
+" FIXED:('if': 0): for 'nvim segfault encode_tv2string()' or ':mess incsearch recursive'
 call dein#add('haya14busa/incsearch.vim', {
   \ 'on_source': ['incsearch-fuzzy.vim', 'vim-anzu', 'vim-asterisk'],
   \ 'on_map': '<Plug>',
@@ -60,6 +61,7 @@ call dein#add('haya14busa/incsearch.vim', {
 "" CHECK: Extension for -incsearch.vim- {{{1
 " NOTE: combined fuzzy/fuzzyspell
 call dein#add('haya14busa/incsearch-fuzzy.vim', {
+  \ 'if': 'dein#tap("incsearch.vim")',
   \ 'on_func': 'incsearch#config#fuzzy',
   \ 'on_map': '<Plug>',
   \ 'depends': 'incsearch.vim',
@@ -87,6 +89,7 @@ call dein#add('haya14busa/incsearch-fuzzy.vim', {
 " EXPL:(depends) fake dependency to force order in 'load_state'
 " THINK:MAYBE: combine ',#' view when using 'z*' or '/' instead of sep maps?
 call dein#add('osyo-manga/vim-anzu', {
+  \ 'if': 'dein#tap("incsearch.vim")',
   \ 'on_source': 'vim-asterisk',
   \ 'on_func': 'anzu#',
   \ 'on_map': ['<Plug>', ['n', '<Leader>#', '<Leader>*']],
@@ -110,6 +113,7 @@ call dein#add('osyo-manga/vim-anzu', {
 " EXPL: z-prefixed mappings doesn't move the cursor.
 " USE: [*, #, g*, g#, z*, z#, gz*, gz#], z8 -- Easier to press
 call dein#add('haya14busa/vim-asterisk', {
+  \ 'if': 'dein#tap("incsearch.vim")',
   \ 'on_map': '<Plug>',
   \ 'hook_add': "
 \\n   for k in ['*', '#', 'g*', 'g#', 'z*', 'z#', 'gz*', 'gz#']

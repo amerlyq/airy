@@ -95,7 +95,7 @@ filter_find() { local accept regect
 }
 
 # USAGE:(modules) ./setup [-s <exc1>].. inc1..
-PKG_SKIP+=( "${CFG_S[@]}" )
+PKG_SKIP+=( ${CFG_S[@]+"${CFG_S[@]}"} )
 # ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
 #   if all $@ are concrete modules (don't end in '/')
 if (($#)) || cfgOpt s; then
