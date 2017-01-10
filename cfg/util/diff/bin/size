@@ -11,3 +11,4 @@ exec diff -y --suppress-common-lines <(fs "$s") <(fs "$d") | awk '
 
 # Total size diff
 # /usr/bin/diff -u s d | sed -n '1,2d; /^-/s||off/|p; /^+/s||dev/|p' | xargs -rn1 -d\\n stat -c'%s %n' | sed '/^.*\sdev/s//-&/' |awk '{a+=$1} END {print a}'
+#   => ALT: $ du -sb off dev |awk '1==NR{a=$1}2==NR{b=$1}END{print b-a}'

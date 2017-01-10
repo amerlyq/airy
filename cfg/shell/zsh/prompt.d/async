@@ -12,6 +12,8 @@ function prompt_update {
     source $_prompt_tmp/$c
     # unalias typeset
   done
+  # DEV: don't reset prompt if files empty or if values are the same as before
+  #   => CHECK: maybe will fix some tmux errors ?
   # FIXED:(segfault): https://github.com/zsh-users/zsh-syntax-highlighting/issues/230
   zle && zle .reset-prompt
 }

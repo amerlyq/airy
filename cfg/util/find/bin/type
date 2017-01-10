@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+set -o pipefail
+find "${1-$PWD}" \
+  \( -type d -printf '%P (D)\n' \) -o \
+  \( -type f -printf '%P (F)\n' \) -o \
+  \( -type l -printf '%P (L)\n' \) -o \
+  \( ! -type f ! -type l  ! -type d -printf '%P (*)\n' \) \
+| LC_ALL=C sort -k1,1

@@ -3,4 +3,4 @@ set -o pipefail
 exec find "${2:-.}" \
   -regextype egrep -regex ".*/${1:?}" \
   -printf '%T@ %f\n' \
-| sort -rnk1 | sed 's/^\S\+\s\+//;q'
+| LC_ALL=C sort -rnk1 | sed 's/^\S\+\s\+//;q'
