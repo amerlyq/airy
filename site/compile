@@ -1,8 +1,0 @@
-#!/bin/sh -eu
-cd "${0%/*}/gh-pages"
-
-# OR bundle update OR bundle update github-pages
-[[ -s Gemfile.lock ]] || bundle install
-[[ -s _config.yml ]] || bundle exec jekyll new . --force
-
-bundle exec jekyll build  # -V

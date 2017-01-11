@@ -1,17 +1,30 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-if cfgOpt r; then
-  d='gh-pages'
-  printf "/%s/\n" "$d" > .gitignore
+clone_orphan() { local d=$1
+  printf "/%s/\n" "$d" >> .gitignore
+  find "$d" -maxdepth 0 -type d -empty | read && rmdir "$d"
   if [[ ! -d $d ]]; then
     mkdir -p "$d"
     u=$(git remote get-url origin) || u=$PWD
     git clone "$u" "$d" --single-branch -b "${d##*/}"
   fi
   r.git-my-repo "$d"
-  git branch -r | grep -qF origin/"$d" && git branch -dr origin/"$d"
+  if git branch -r | grep -qF origin/"$d"; then
+    git branch -dr origin/"$d"
+  fi
+}
+
+if cfgOpt r; then
+  > ./.gitignore
+  clone_orphan 'gh-pages'
+  clone_orphan 'site-src'
 fi
+
+### GENS ###
+# OR bundle update OR bundle update github-pages
+# [[ -s Gemfile.lock ]] || bundle install
+# [[ -s _config.yml ]] || bundle exec jekyll new . --force
 
 ### LINKS ###
 # linkcp -t ~/.config/git ignore attributes
