@@ -16,7 +16,7 @@ clone_orphan() { local d=$1
 }
 
 if cfgOpt r; then
-  > ./.gitignore
+  echo '/_build/' > ./.gitignore
   clone_orphan 'gh-pages'
   clone_orphan 'site-src'
 fi

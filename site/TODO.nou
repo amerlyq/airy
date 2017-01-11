@@ -1,0 +1,18 @@
+Fix relative paths to work on serve/local/remote
+  http://ricostacruz.com/til/relative-paths-in-jekyll
+  ~ https://github.com/jekyll/jekyll-help/issues/241
+  http://stackoverflow.com/questions/7985081/how-to-deploy-a-jekyll-site-locally-with-css-js-and-background-images-included
+
+  + http://jekyllrb.com/docs/github-pages/
+  https://jekyllrb.com/news/
+  Relative links in 2016
+    http://stackoverflow.com/questions/16316311/github-pages-and-relative-paths/41127983#41127983
+    https://github.com/blog/2289-publishing-with-github-pages-now-as-easy-as-1-2-3
+    https://github.com/blog/2228-simpler-github-pages-publishing
+
+HACK
+  !! https://ilovesymposia.com/2015/01/04/some-things-i-learned-while-building-a-site-on-github-pages/
+
+  Use wget to convert all links to relative for offline site
+    http://stackoverflow.com/questions/7985081/how-to-deploy-a-jekyll-site-locally-with-css-js-and-background-images-included
+    $ wget --recursive --no-clobber --page-requisites --html-extension --convert-links --restrict-file-names=windows --domains localhost http://localhost:4000

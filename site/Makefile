@@ -43,8 +43,9 @@ serve: $(PID)
 
 # TODO: sync lock to concrete window (until exited)
 .PHONY: run
-run: serve
-	r.b http://localhost:4000 2>/dev/null
+run: $(O)/web.url serve
+	r.b "http://localhost:4000/$$(cut -d/ -f4- "$<")/" 2>/dev/null
+# ALT: jekyll serve --baseurl ""
 
 
 
@@ -56,3 +57,7 @@ $(O)/web.url: | $(O)
 .PHONY: web
 web: $(O)/web.url
 	r.b "$$(<$<)" 2>/dev/null
+
+
+update:
+	cd "$(SRC)" && bundle install
