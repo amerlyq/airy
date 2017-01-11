@@ -3,6 +3,10 @@
 # Ubuntu:
 # http://unix.stackexchange.com/questions/90323/how-to-use-unsquashfs-with-lzma
 
+# Extract compression method from superblock
+#   http://superuser.com/questions/919025/what-was-the-squashfs-compression-method
+# ALT: >v4.3 unsquashfs -s ..
+
 img=${1:?}
 dst=${2:?}
 

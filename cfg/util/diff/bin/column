@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+# USAGE: ./$0 | sort -g -k1,1 | column -t > dflzma
+
+
+def readkv(nm):
+    with open(nm) as f:
+        return {l.split(' ')[1].strip(): int(l.split(' ')[0]) for l in f}
+
+
+def cmpkv(o, m):
+    return {k: (v / o[k] * 100) for k, v in m.items() if k in o and o[k]}
+
+
+def main():
+    d = readkv('d')
+    ld = readkv('ld')
+    sd = cmpkv(d, ld)
+
+    o = readkv('o')
+    lo = readkv('lo')
+    so = cmpkv(o, lo)
+
+    for k, v in cmpkv(so, sd).items():
+        if abs(v-100) > 0.01:
+            print("{:.2f} {:.2f} {:.2f} {:d} {:d} {:d} {:d} {:d} {:d} {:s}"
+                  .format(v, so[k], sd[k],
+                          ld[k] - lo[k], lo[k], ld[k],
+                          d[k] - o[k], o[k], d[k],
+                          k))
+
+if __name__ == '__main__':
+    main()
