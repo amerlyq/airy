@@ -4,7 +4,10 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     # DEPRECATED: xorg-xmessage -- use r.vim-xmessage
-    pkg_inst xmonad wmctrl  # xmobar
+    # FIXED:(>v0.12): 'getWindowAttributes' crash on Wine or Pidgin close
+    aur_inst -p 'xmonad' xmonad-git
+    # ALT: pkg_inst xmonad
+    pkg_inst wmctrl
     pkg_inst -d {/usr/share/doc/,}xmonad-contrib
 
     # pkg_inst 'haskell-unordered-containers'
@@ -14,6 +17,7 @@ if distro arch; then
     # aur_inst -d {/usr/share/doc/,}haskell-libmpd
     cab_inst -d {~/.cabal/packages/hackage.haskell.org/,}libmpd
     cab_inst -p 'xmobar' xmobar --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
+    # ALT: pkg_inst xmobar
 
 elif distro ubuntu; then
     pkg_inst 'xmonad xmonad-contrib'
