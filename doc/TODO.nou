@@ -14,6 +14,17 @@ Manuals
       Sculpting text with regex, grep, sed, awk, emacs and vim
         http://matt.might.net/articles/sculpting-text/
         https://news.ycombinator.com/item?id=8100491
+    REF
+      http://www.gnu.org/software/coreutils/manual/coreutils.html#toc_Formatting-file-contents
+      transpose table
+        http://stackoverflow.com/questions/1729824/transpose-a-file-in-bash
+        $ rs -c' ' -C' ' -T
+          https://packages.debian.org/jessie/rs
+        $ ruby -e 'puts readlines.map(&:split).transpose.map{|x|x*" "}'
+        $ jq -R . | jq -s -r 'map(./" ")|transpose|map(join(" "))[]'
+        http://www.thelinuxrain.com/articles/transposing-rows-and-columns-3-methods
+        $ datamash transpose --no-strict
+          https://www.gnu.org/software/datamash/
   [_] channel
     ssh, nc, pipe, tar.gz, zip
 
