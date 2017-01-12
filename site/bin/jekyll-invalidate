@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+fpid=$1
+pgrep -F "$fpid" &>/dev/null || rm -f "$fpid"

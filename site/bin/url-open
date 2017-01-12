@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+# DEV: block exit until opened browser window closed
+u=$1
+exec r.b "$u" 2>/dev/null
+# $$(cut -d/ -f4- "$<")/

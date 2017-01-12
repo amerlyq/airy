@@ -1,0 +1,11 @@
+#!/bin/sh -eu
+s=$1
+d=$(cd "$2" && pwd)
+cd "$s"  # NOTE: pwd must contain Gemfile
+exec bundle exec jekyll build --destination "$d"
+# -V
+
+# NOTE: I can leave 'basedir' empty inside _config.yml
+#   < because wget will convert any link into relative anyway
+
+# MAYBE: keep Gemfile inside gh-pages trash ?

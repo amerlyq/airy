@@ -1,0 +1,21 @@
+#!/bin/sh -eu
+# https://www.gnu.org/software/wget/manual/html_node/Recursive-Retrieval-Options.html
+d=$1
+u=$2
+shift 2
+opts=(
+  --recursive
+  --page-requisites
+  --convert-links
+  --prefer-family=IPv4
+  --no-parent
+  --domains localhost
+  --execute robots=off
+  --timestamping
+  --no-host-directories
+  --cut-dirs=$(<<< "$u" sed -r 's|^[a-z]{3,5}://||; s|/$||' | awk -F/ '{print NF-1}')
+  --adjust-extension
+  --restrict-file-names=windows
+  --directory-prefix="$d"
+)
+exec wget "${opts[@]}" "$u" "$@"

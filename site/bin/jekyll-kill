@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+fpid=$1
+pkill -F "$fpid" &>/dev/null ||:
+rm -f "$fpid"

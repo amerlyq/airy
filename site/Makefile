@@ -1,63 +1,57 @@
+.DEFAULT_GOAL = open
+
 .SUFFIXES:
 .NOTPARALLEL:
-.DEFAULT_GOAL = build
 .SHELLFLAGS := -euo pipefail -c
 SHELL := $(shell which bash)
+TMP := $(or $(TMPDIR),/tmp)/jekyll
+MWD := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+export PATH := $(MWD)/bin:$(PATH)
 
-PWD := $(shell pwd)
 O   ?= _build
 SRC ?= site-src
-DST ?= $(PWD)/gh-pages
-JKL := bundle exec jekyll
-PID := $(O)/jekyll.pid
-LOG := $(O)/jekyll.log
+CFG ?= $(SRC)/_config.yml
+DST ?= gh-pages
+SRV ?= http://localhost:4000
 
 
-$(O): ; +@mkdir -p "$@"
+$(O) $(TMP): ; +@mkdir -p "$@"
 
-# NOTE: pwd must contain Gemfile
-# MAYBE: keep Gemfile inside gh-pages trash ?
+# DEV: list all blog files or generated site as deps
+# 	=> for 'serve' there is no need if using '--watch'
 .PHONY: build
-build: $(SRC)/_config.yml | $(DST)
-	cd "$(SRC)" && $(JKL) build -d "$(firstword $|)"  # -V
+build: $(CFG) | $(O)
+	jekyll-build "$(SRC)" "$(O)"
 
+.PHONY: open serve invalidate
+open: serve
+	url-open "$(SRV)"
+serve: invalidate $(TMP)/pid
+invalidate:
+	jekyll-invalidate "$(TMP)/pid"
+$(TMP)/pid: $(CFG) | $(O) $(TMP)
+	jekyll-kill "$@"
+	jekyll-serve "$(SRC)" "$(O)" "$(@D)/log" > "$@"
 
-
-# => Use `--no-watch` to disable auto-regeneration.
-$(PID): $(SRC)/_config.yml | $(DST) $(O)
-	$(MAKE) --no-print-directory kill
-	(cd "$(SRC)" && $(JKL) serve -d "$(firstword $|)" \
-	  --skip-initial-build --watch --detach \
-	) > "$(LOG)"
-	sed -rn "6s/.*with pid '([0-9]+)'.*/\1/p" "$(LOG)" > "$@"
-
-.PHONY: kill
-kill:
-	@pkill -F "$(PID)" &>/dev/null || true
-	@rm -f "$(PID)"
-
-.PHONY: serve
-serve: $(PID)
-	pgrep -F "$<" >/dev/null || \
-	  { rm -f "$<"; $(MAKE) --no-print-directory "$<"; }
-
-# TODO: sync lock to concrete window (until exited)
-.PHONY: run
-run: $(O)/web.url serve
-	r.b "http://localhost:4000/$$(cut -d/ -f4- "$<")/" 2>/dev/null
-# ALT: jekyll serve --baseurl ""
-
-
-
-$(O)/web.url: | $(O)
-	git remote get-url origin \
-	  | sed -r 's|^.*:([^/]+)/(.*)|https://\1.github.io/\2|' \
-	  > "$@"
+.PHONY: publish
+publish: $(DST)/.nojekyll
+$(DST)/.nojekyll: $(O)/index.html | serve
+	fetch-relative "$(@D)" "$(SRV)"
+	touch "$@"
 
 .PHONY: web
-web: $(O)/web.url
-	r.b "$$(<$<)" 2>/dev/null
+web: $(TMP)/url
+	url-open "$$(<$<)"
+$(TMP)/url: | $(TMP)
+	url-hosted > "$@"
 
-
+.PHONY: update
 update:
 	cd "$(SRC)" && bundle install
+.PHONY: clean
+clean:
+	jekyll-kill "$@"
+	rm -rf "$(O)" "$(TMP)"
+.PHONY: kill
+kill:
+	jekyll-kill "$@"

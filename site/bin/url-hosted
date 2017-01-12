@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+cd "${1:-$PWD}"
+o=$(git remote get-url origin)
+exec sed -r 's|^.*:([^/]+)/(.*)|https://\1.github.io/\2|' <<< "$o"
