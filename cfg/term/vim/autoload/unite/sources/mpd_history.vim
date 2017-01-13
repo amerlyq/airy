@@ -19,7 +19,7 @@ let s:source = {
       \ }
 
 function! s:source.hooks.on_init(args, context) "{{{
-  let path = expand('$HOME/.mpd/history')
+  let path = expand('$HOME/.config/mpd/history')
   let a:context.source__command = readfile(path)
 endfunction "}}}
 

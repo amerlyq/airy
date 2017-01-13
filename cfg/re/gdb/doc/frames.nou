@@ -73,6 +73,7 @@ G: frame setup, cooked frames, stack unwind manually
 
 Search for 'addiu sp,sp,N'
   (gdb) dump memory dump $pc-0x100 $pc
+  # FIXME:(finish): not thoroughly tested for MIPS
   $ xxd -g4 -c4 -b dump | awk -vc=12 '$2~/^001001/{for(i=1;i<c;++i){printf substr($2,c,1)}print substr($2,i)}' | perl -lpe '$_=unpack("l",pack("L",oct("0b".$_)))'
     # SEE: http://stackoverflow.com/questions/483655/how-do-i-convert-a-binary-string-to-a-number-in-perl
     # ALT:BAD: only unsigned results

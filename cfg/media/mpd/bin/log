@@ -1,17 +1,21 @@
-#!/bin/bash -e
-
+#!/bin/bash -eu
+set -o pipefail
 # SEE:
 #   http://www.musicpd.org/doc/protocol/command_reference.html
 
+dst=~/.config/mpd/history
+fmt='[[%artist% - ]%title%]|[@@ %name%]|[:: %file%]'
+prev=
+
+# ALT: while : ; do mpc idle ...
 # EXPL: Explicit idle to react on changing song on same radio stream
-while mpc idle player >/dev/null
-do  # ALT: while : ; do mpc idle ...
-    name="$(mpc current --format '[[%artist% - ]%title%]|[@@ %name%]|[:: %file%]')"
-    [[ -n "$name" && "$name" != "$prev" ]] && prev="$name" || continue
-    idx="$(mpc status | sed -rn '2s|^\[playing\]\s#([0-9]+)/.*|\1|p')"
-    # ALT: idx="$(mpc playlist | awk -vnm="$name" \
-    #     'BEGIN{gsub(/[][^$.*?+{}\\()|]/,"\\\\&",nm)} $0 ~ nm {print NR;quit}')"
-    [[ -n  "$idx" ]] || continue
-    mark="$(date +'%Y-%m-%d %H:%M:%S')"
-    printf '%s |%2s| %s\n' "$mark" "$idx" "$name" >> ~/.mpd/history
+while mpc idle player >/dev/null; do
+  name=$(mpc current --format "$fmt")
+  [[ -n $name && $name != $prev ]] && prev=$name || continue
+  idx=$(mpc status | sed -rn '2s|^\[playing\]\s#([0-9]+)/.*|\1|p')
+  # ALT: idx="$(mpc playlist | awk -vnm="$name" \
+  #     'BEGIN{gsub(/[][^$.*?+{}\\()|]/,"\\\\&",nm)} $0 ~ nm {print NR;quit}')"
+  [[ -n $idx ]] || continue
+  mark=$(date +'%Y-%m-%d %H:%M:%S')
+  printf '%s |%2s| %s\n' "$mark" "$idx" "$name" >> "$dst"
 done
