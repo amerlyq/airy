@@ -71,6 +71,7 @@ if (($+commands[xargs])); then
   #   cat $(ls Z); a=(q C2); for i in q C2; do ..
   # NEED: use xargs only if 0<$#
   # NOTE: allow aliases resolution after xargs
+  alias -g X0='|xargs -r0 '
   alias -g XA='|xargs -rn1 -d\\n '
   alias -g X='|sed -n /./p XA '
   alias -g X{}='X -I{} '
