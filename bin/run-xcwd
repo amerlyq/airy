@@ -13,12 +13,19 @@ sub active_pid {
     return $1;
 }
 
+# FIXME tmux session
+#   BUG pstree method don't work for 'tmux' sessions
+#   TRY query imminent program pid from tmux session
+# NEED find linked to tmux client shell in session
+#   http://superuser.com/questions/911870/tmux-get-pwd-of-another-pane-in-a-bash-script
+#   https://woss.name/articles/tmux-new-windows-in-current-directory/
+#   https://coderwall.com/p/jpsa7q/tmux-windows-and-pane-split-s-on-current-directory
+#   https://zerokspot.com/weblog/2012/05/20/tmux-split-window-and-pwd/
+#   + http://superuser.com/questions/302187/can-i-get-tmux-split-screen-to-retain-the-pwd/729914#729914
+
 sub get_cwd {
     my ($pid, $pwd) = @_;
     # until $pid return $ENV{"HOME"};
-    # BUG don't work for 'tmux' sessions
-    # NEED find linked to tmux client shell in session
-    # TRY query imminent program pid from tmux session
     foreach (reverse( qx(pstree -p $pid) =~ m/\((\d+)\)/g )) {
         $pwd = readlink("/proc/$_/cwd");
         last if $pwd and ($pwd =~ /^\S+$/);
