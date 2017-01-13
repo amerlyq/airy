@@ -99,6 +99,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     feedCmd "mpc"
     [ ("M-o ."           , "next")
     , ("M-o ,"           , "prev")
+    , ("M-o <Delete>"    , "del 0")
     , ("M-S-<Home>"      , "toggle")
     , ("M-S-<Page_Up>"   , "prev")
     , ("M-S-<Page_Down>" , "next")
