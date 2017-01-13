@@ -13,24 +13,22 @@ export PATH := $(MWD)/bin:$(PATH)
 O   ?= _build
 SRC ?= site-src
 DST ?= gh-pages
-DIR ?= cfg/game
-GEN ?= $(SRC)/src
+DIR ?= cfg/re/gdb
+GEN ?= $(SRC)/src/mods
 CFG ?= $(SRC)/_config.yml
 
 .PHONY: all
 all: clean convert build open
 
-$(O) $(TMP): ; +@mkdir -p "$@"
+$(O) $(TMP) $(GEN): ; +@mkdir -p "$@"
 
 # DEV: use all *.nou as deps to convert by mask
 # 	-- by 'make' or in parallel by 'parallel'
 # TRY: using 'collections' instead of 'pages'
 # 	https://jekyllrb.com/docs/collections/
-.PHONY: convert copy
-convert: | copy
-	nou-all-2md "$(GEN)/$(DIR)"
-copy: | $(GEN)
-	nou-rsync "$(DIR)" "$(firstword $|)"
+.PHONY: convert
+convert: | $(GEN)
+	nou-convert "$(DIR)" "$(firstword $|)"
 
 # DEV: list all blog files or generated site as deps
 # 	=> for 'serve' there is no need if using '--watch'

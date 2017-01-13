@@ -1,8 +1,12 @@
 #!/bin/sh -eu
 s=$1
-d=${2:-${s%.nou}.md}
+d=$2
+d=${d%.*}.md
 
+[[ -d ${d%/*} ]] || mkdir -p "${d%/*}"
 cp -fT "$s" "$d"
+
+# TODO: copy regex rules from .nou syntax
 ex - "$d" <<'EOT'
 0a
 ---

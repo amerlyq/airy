@@ -1,4 +1,0 @@
-#!/bin/sh -eu
-d=$1
-PATH=$(cd "${0%/*}" && pwd):$PATH
-exec find "$d" -type f -name '*.nou' -printf '%P\n' -execdir nou-2md {} \;

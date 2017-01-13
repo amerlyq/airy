@@ -1,6 +1,0 @@
-#!/bin/sh -eu
-d=$1
-t=$(cd "$2" && pwd)
-cd "$(git rev-parse --show-toplevel)"
-find "$d" -type f -name '*.nou' -exec cp --parents -t "$t" {} \;
-# -printf '%P\n'
