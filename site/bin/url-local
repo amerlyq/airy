@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+cd "${1:-$PWD}"
+o=$(git remote get-url origin)
+printf '%s/%s/\n' "http://localhost:4000" "$(cut -d/ -f2- <<<"$o")"

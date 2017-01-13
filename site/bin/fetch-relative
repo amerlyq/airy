@@ -1,5 +1,4 @@
 #!/bin/sh -eu
-# https://www.gnu.org/software/wget/manual/html_node/Recursive-Retrieval-Options.html
 d=$1
 u=$2
 shift 2
@@ -19,3 +18,7 @@ opts=(
   --directory-prefix="$d"
 )
 exec wget "${opts[@]}" "$u" "$@"
+
+# REF: https://www.gnu.org/software/wget/manual/html_node/Recursive-Retrieval-Options.html
+# NOTE: Use wget to convert all links to relative for offline site
+#   http://stackoverflow.com/questions/7985081/how-to-deploy-a-jekyll-site-locally-with-css-js-and-background-images-included

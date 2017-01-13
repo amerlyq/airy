@@ -13,10 +13,22 @@ Fix relative paths to work on serve/local/remote
 HACK
   !! https://ilovesymposia.com/2015/01/04/some-things-i-learned-while-building-a-site-on-github-pages/
 
-  Use wget to convert all links to relative for offline site
-    http://stackoverflow.com/questions/7985081/how-to-deploy-a-jekyll-site-locally-with-css-js-and-background-images-included
-    $ wget --recursive --no-clobber --page-requisites --html-extension --convert-links --restrict-file-names=windows --domains localhost http://localhost:4000
 
 nginx
   https://www.digitalocean.com/community/tutorials/controlling-urls-and-links-in-jekyll
   https://jekyllrb.com/docs/deployment-methods/
+
+SEE
+  http://jekyllbootstrap.com/usage/blog-configuration.html
+
+TODO
+  [_] *.nou syntax highlighting
+    https://jekyllrb.com/docs/templates/
+    http://mycyberuniverse.com/web/syntax-highlighting-jekyll.html
+    https://demisx.github.io/jekyll/2014/01/13/improve-code-highlighting-in-jekyll.html
+    https://sacha.me/articles/jekyll-rouge/
+    http://stackoverflow.com/questions/15672530/how-do-i-get-in-line-code-with-jekyll-and-pygments
+    http://stackoverflow.com/questions/8648390/syntax-highlighting-markdown-code-blocks-in-jekyll-without-using-liquid-tags
+
+BAD
+  [_] feed.xml has wrong links to localhost:4000 instead of hosted

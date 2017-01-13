@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 s=$1
 d=$(cd "$2" && pwd)
 log=${3:-${TMPDIR:-/tmp}/jekyll.log}
@@ -6,7 +6,7 @@ cd "$s"
 
 # => Use '--no-watch' to disable auto-regeneration.
 # --skip-initial-build
-bundle exec jekyll serve --detach --watch \
-  --destination "$d" &> "$log"
+bundle exec jekyll serve --watch \
+  --destination "$d" --trace --detach &> "$log"
 
 sed -rn "/^Server detached with pid '([0-9]+)'.*/s//\1/p" "$log"

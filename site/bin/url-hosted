@@ -1,4 +1,6 @@
 #!/bin/bash -eu
 cd "${1:-$PWD}"
 o=$(git remote get-url origin)
+# BAD:(ssh alias): works only for 'ghub:user/repo' format
 exec sed -r 's|^.*:([^/]+)/(.*)|https://\1.github.io/\2|' <<< "$o"
+# ALT: sed -r 's@^([a-z]{3,5}://|[[:alnum:]_]+:)@@; s@/$@@'

@@ -2,7 +2,7 @@
 s=$1
 d=$(cd "$2" && pwd)
 cd "$s"  # NOTE: pwd must contain Gemfile
-exec bundle exec jekyll build --destination "$d"
+exec bundle exec jekyll build --trace --destination "$d"
 # -V
 
 # NOTE: I can leave 'basedir' empty inside _config.yml

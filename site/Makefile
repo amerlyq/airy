@@ -1,7 +1,9 @@
-.DEFAULT_GOAL = open
+.DEFAULT_GOAL = all
 
 .SUFFIXES:
 .NOTPARALLEL:
+.DELETE_ON_ERROR:
+MAKEFLAGS += --warn-undefined-variables
 .SHELLFLAGS := -euo pipefail -c
 SHELL := $(shell which bash)
 TMP := $(or $(TMPDIR),/tmp)/jekyll
@@ -10,12 +12,25 @@ export PATH := $(MWD)/bin:$(PATH)
 
 O   ?= _build
 SRC ?= site-src
-CFG ?= $(SRC)/_config.yml
 DST ?= gh-pages
-SRV ?= http://localhost:4000
+DIR ?= cfg/game
+GEN ?= $(SRC)/src
+CFG ?= $(SRC)/_config.yml
 
+.PHONY: all
+all: clean convert build open
 
 $(O) $(TMP): ; +@mkdir -p "$@"
+
+# DEV: use all *.nou as deps to convert by mask
+# 	-- by 'make' or in parallel by 'parallel'
+# TRY: using 'collections' instead of 'pages'
+# 	https://jekyllrb.com/docs/collections/
+.PHONY: convert copy
+convert: | copy
+	nou-all-2md "$(GEN)/$(DIR)"
+copy: | $(GEN)
+	nou-rsync "$(DIR)" "$(firstword $|)"
 
 # DEV: list all blog files or generated site as deps
 # 	=> for 'serve' there is no need if using '--watch'
@@ -23,9 +38,10 @@ $(O) $(TMP): ; +@mkdir -p "$@"
 build: $(CFG) | $(O)
 	jekyll-build "$(SRC)" "$(O)"
 
+# BAD: on 'make open' doesn't rebuild by itself by '--watch'
 .PHONY: open serve invalidate
-open: serve
-	url-open "$(SRV)"
+open: $(TMP)/loc | serve
+	url-open "$$(<"$<")"
 serve: invalidate $(TMP)/pid
 invalidate:
 	jekyll-invalidate "$(TMP)/pid"
@@ -35,23 +51,25 @@ $(TMP)/pid: $(CFG) | $(O) $(TMP)
 
 .PHONY: publish
 publish: $(DST)/.nojekyll
-$(DST)/.nojekyll: $(O)/index.html | serve
-	fetch-relative "$(@D)" "$(SRV)"
+$(DST)/.nojekyll: $(TMP)/loc $(O)/index.html | serve
+	fetch-relative "$(@D)" "$$(<"$<")"
 	touch "$@"
 
 .PHONY: web
-web: $(TMP)/url
-	url-open "$$(<$<)"
-$(TMP)/url: | $(TMP)
+web: $(TMP)/web
+	url-open "$$(<"$<")"
+$(TMP)/web: | $(TMP)
 	url-hosted > "$@"
+$(TMP)/loc: | $(TMP)
+	url-local > "$@"
 
 .PHONY: update
 update:
 	cd "$(SRC)" && bundle install
 .PHONY: clean
 clean:
-	jekyll-kill "$@"
-	rm -rf "$(O)" "$(TMP)"
+	jekyll-kill "$(TMP)/pid"
+	rm -rf "$(O)" "$(TMP)" "$(GEN)/$(DIR)"
 .PHONY: kill
 kill:
-	jekyll-kill "$@"
+	jekyll-kill "$(TMP)/pid"
