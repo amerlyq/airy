@@ -8,6 +8,19 @@ from os import path as fs
 ag_patterns = []
 
 
+# BAD: ranger crash on exit if '--choosedir' path was deleted by 3rd party
+def tmpfile(nm):
+    tmp = os.getenv('RANGER_TMPDIR')
+    if tmp is None:
+        tmp = os.getenv('TMPDIR')
+        if tmp is None:
+            tmp = '/tmp'
+        tmp = fs.join('ranger')
+        if not fs.exists(tmp):
+            os.mkdir(tmp)
+    return fs.join(tmp, nm)
+
+
 class ag(Command):
     """:ag 'regex'
 
@@ -152,13 +165,11 @@ class doc(Command):
         return ['doc ' + nm for nm in doc.lst.values()]
 
 
-# Need this in the end of ~/.bashrc or ~/.zshrc
-#   function finish { tempfile='/tmp/aura/ranger_cwdir'; echo "$PWD" > "$tempfile"; }
-# `trap finish EXIT
+# NOTE:NEED: in ~/.bashrc or ~/.zshrc save $PWD (not pwd) on trap EXIT
 class cd_shelldir(Command):
-    lastdir = fs.join(os.getenv('TMPDIR') or '/tmp', 'ranger_cwdir')
+    lastdir = tmpfile('cwd')
     """:cd_shelldir
-    Goes to path from /tmp/<username>/ranger_cwdir
+    Goes to path from /tmp/<username>/ranger/cwd
     """
     def execute(self):
         try:
@@ -303,7 +314,7 @@ class nrenum(Command):
 
 
 class actualee(Command):
-    FLST = fs.join('/tmp', os.getenv('USER'), 'ranger_list')
+    FLST = tmpfile('buffer')
     """:actualee
     Use '~/.bin/actually' to apply secondary action to file/list
     """

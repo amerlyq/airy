@@ -95,7 +95,7 @@ if (($+commands[fzf])); then
 fi
 
 ## Buffers
-_xsel_tmp_buf=${TMPPREFIX:-${TMPDIR:-/tmp}}/fc-output
+_xsel_tmp_buf=${TMPPREFIX:-${TMPDIR:-/tmp}}/output
 alias -g YT='|tee $_xsel_tmp_buf'
 alias -g YT+='|tee -a $_xsel_tmp_buf'
 alias -g YT:='cat $_xsel_tmp_buf'

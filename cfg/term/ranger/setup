@@ -20,6 +20,6 @@ if ! grep -q "${TMPDIR:-/tmp}/ranger_cwdir" $RC 2>/dev/null; then
     # To sync zsh and ranger working directories:"
     case "$SHELL" in *bash) printf 'finish()'
     ;; *zsh) printf 'function finish' ;; esac
-    echo '{ echo "$PWD" > "${TMPDIR:-/tmp}/ranger_cwdir"; }
+    echo '{ echo "$PWD" > "${TMPDIR:-/tmp}/ranger/cwd"; }
     trap finish EXIT'
 fi

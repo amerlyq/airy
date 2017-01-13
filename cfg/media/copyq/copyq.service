@@ -9,7 +9,8 @@ After=default.target dbus.service xorg.target wm.target compton.service
 [Service]
 # NOTE: to run instance on second Xorg -- use 'copyq -s ses1'
 # ALT: use $DISPLAY or $XDG_VTNR as session name
-ExecStartPre=/bin/sh -c 'pkill -fx /usr/bin/copyq; true'
+Environment=TMPDIR=/tmp/%u/copyq
+ExecStartPre=/bin/sh -euc 'mkdir -p "$TMPDIR"; pkill -fx /usr/bin/copyq || true'
 ExecStart=/usr/bin/copyq
 # MAYBE:BUG: additional commands instead of replacement
 # BAD: error on 'stop' of failed process
