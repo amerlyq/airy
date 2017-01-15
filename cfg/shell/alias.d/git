@@ -137,12 +137,15 @@ alias gvs='v +Gstatus +only'
 alias gvd='git difftool'
 
 ## Recursive repo
-# __rgit_dfl_dir=~/aura
-alias Gg='r.git-all'
+# __rgit_dfl=~/aura  # TODO: set dfl dir in profile
+# TODO: r.git-all-status "${2:-${1:-$__rgit_dfl}}"
+#   = from any dir user '.' to replace dfl dir by current
+#   ALT: filter-out dfl dir from args list -- scripts could use PWD
+alias Ga='r.git-all'
 alias Gu='r.git-all-status'
 alias Gs='Gu ~/aura'
-alias Gt='Gg ~/aura status -su'
-alias Gd='Gg ~/aura diff'
+alias Gt='Ga ~/aura status -su'
+alias Gd='Ga ~/aura diff'
 alias Gw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
 alias Gl.='r.git-all-pull'
 alias Gl='Gl. ~/aura'

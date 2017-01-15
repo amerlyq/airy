@@ -107,18 +107,43 @@ TODO
       https://bbs.archlinux.org/viewtopic.php?id=68167
 
   [_] DEV: './setup -a'
-    + do cleanup only in this mode
+    + [_] do cleanup only in this mode
       = symlinks/configs/fonts-links/fontcache/etc
       [_] make separate '-c' for cleanup-only mode
-    + traverse -full- scenario for each *mod* to fail earlier
-    move from 'cfgsetup' to 'system'
-    use it's own flags handler
-    ALT: separate
-    rename to 'maint'
-    move colorizing stuff in ./func.d
-    ? what to do by default ?
+    + [_] traverse -full- scenario for each *mod* to fail earlier
+    [_] move from 'cfgsetup' to 'system'
+    [_] use it's own flags handler
+    [_] ALT: separate
+    [_] rename to 'maint'
+      ALT: use root Makefile
+    [_] move colorizing stuff in ./func.d
+    ? [_] what to do by default ?
       only update 'packman' pkgs ? but we have 'pacman -Syu'
-  [_] CHG: use pacaur instead of pacman on pkg update
+    [_] encapsulate deploy system into independent 'airy' mod
+      all notes can be kept there
+    [_] keep all mods inside ./mod directory
+      ? and create symlinks for categories tree inside ./_build ?
+      ALT: keep categories tree as it is and create symlinks into ./mod
+      ? ALSO:THINK: sep ./mymod for contents of ./bin and sparse functions ?
+        => also *mod* in ./mymod  work as switch proxy to multiple providers (like browsers)
+      ? beside ./mod need ./_obsolete dir
+      ? USE symlinks to *mod* instead of 'PKG_LIST'
+        + no need for recursive 'find'
+        + explicit list -- and user directly see which links were broken
+        + sep rel symlins list can be commited to own repo
+        - git <v2.10.2 on Windows will replace symlinks by text files
+          = so I can commit relative symblinks without problem
+    [_] Add alias file for some cfgs -- and on ./setup gather >> ~/.cache/airy/aliases
+      => instead of 'return' from sourced files use 'if..fi' guards
+    [_] gather all artifacts into '_build' dir instead of ~/.cache/airy/
+      [_] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
+      [_] add support for XDG_... env vars to determine symlink targets
+    [_] harden system security by using linkcp copy into sys dirs instead of symlinks
+    [_] TRY: generate PKGBUILD for each *mod* through my scripts set
+      + this allows clean uninstall previous versions
+      ALT: generate single package from whole 'airy'
+    [_] CHG: use pacaur instead of pacman on pkg update
+  [_] NOTE: 'git augment' -- even share for doc can be changed
   [_] USE them or disable/deinstall them
       zeal
         + nice for multiple docs (perl, haskell, etc)
@@ -160,7 +185,6 @@ TODO
 
 
 Deploy:
-  [_] Add alias file for some cfgs -- and on ./setup gather >> ~/.cache/airy/aliases
   [_] add to installation script setting passwd for root and samba
   [_] Shares -- in private profile
   2015-06-05 [X] Insert vim installation and update check ALSO in vim_install (one-button)
@@ -223,6 +247,7 @@ For my bone:
 
 
 TODO
+  [_] FIND: C++ best doc gen -- for docs dir
   SEIZE
     http://www.michurin.net/
     http://nairobi-embedded.org/category/index.html
@@ -286,6 +311,18 @@ TODO
     http://dev-lab.info/2013/08/%D1%88%D0%BF%D0%B0%D1%80%D0%B3%D0%B0%D0%BB%D0%BA%D0%B0-%D0%BF%D0%BE-git-%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B-%D1%81%D0%BB%D0%B8%D1%8F%D0%BD/
   2014-12-01 12:56:13 [X] Git ENH
     http://blog.mixu.net/2012/04/06/git-tips-and-tricks/
+
+
+Kernel:
+  [_] combine through static objs -- instances of shared agent singleton with fields
+  [_] Собрать оболочку пошагово -- полный cmake комплект
+  [_] LKM конструктор -- папка с хидерами mem/proc
+    склеить через макросы логов поток вывода воедино
+
+Asm:
+  [_] 92-98 -- поделать вручную с опкодами и в IDAPro
+  [_] hacker pick inducted arm overwrite code
+
 
 > THEME
   [_] BUG: qt4 has plain style, when qt5 same as gtk FIX!
