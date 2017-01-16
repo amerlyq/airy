@@ -39,6 +39,8 @@ alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-run
 ## Filters
 alias -g H='|head'
 alias -g C='|wc -l'
+alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
+# ALT: |perl -nle '$s+=(split)[1];END{print $s}'
 alias -g T='|column -t'
 alias -g W='|while read line; do'
 alias -g NE="|grep -v '^\s*\$'"
