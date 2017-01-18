@@ -5,6 +5,8 @@
 #   * list of relative src dirs to setup 'SRC_DIRS'
 # TODO:THINK: substitute-path by empty to search rel path in dirs
 #   ::> impossible
+# ATT: 'substitute-path' don't change visible paths (in 'bt' or 'list')
+#   it simply uses new pathes when accesses sources content
 
 cd "$(r.gdb-tmp -d)"
 source ./env

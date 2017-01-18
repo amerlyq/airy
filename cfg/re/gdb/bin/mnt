@@ -1,0 +1,17 @@
+#!/bin/sh -eu
+mnt=/mnt/gdb
+cd "$(r.gdb-tmp -d)"
+source ./env
+
+# NOTE: if rel symlinks don't work, mount $ROOT to /mnt to simplify gdb paths
+if [[ ! -d $mnt ]]; then
+  sudo mkdir -p "$mnt"
+  sudo chown "$USER:$USER" "$mnt"
+fi
+
+mnt (){ grep -qswF "$1" /proc/mounts || sudo mount --bind "$2" "$1"; }
+umnt(){ grep -qswF "$1" /proc/mounts && sudo umount "$1" ||:; }
+
+# trap 'umnt "$mnt"' EXIT
+# umnt "$mnt"
+mnt "$mnt" "$nfs"

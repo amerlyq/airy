@@ -1,0 +1,31 @@
+#!/bin/sh -eu
+# USAGE: cd bug/issue; r.gdb-gen; v ./compile # fix all paths; ./compile
+
+dst=./compile
+[[ -e $dst ]] && { echo "Err: '$dst' already exists!"; exit 1; }
+
+echo '#!/bin/sh -eu' > "$dst"
+chmod u+x "$dst"
+cat>> "$dst" <<'EOT'
+### ARM
+
+# ROOT=$PWD/sysroot
+# EXE=$ROOT/usr/bin/prg
+# CORE=$PWD/core.prg.*
+
+pj=/work/project/branch
+export SRC=$pj/sources
+export BDR=$pj/buildroot
+export OLD_BDR=/data/project/buildroot
+
+src=(
+  "src/component"
+  "src/nested/component"
+  "/work/external/src"
+  "bdr/toolchain_build_arm/uClibc-ng-1.0.15"
+)
+export SRC_DIRS=$(IFS=:;printf '%s\n' "${src[*]// /\\ }")
+
+# GDB=$BDR/toolchain_build_arm/...
+exec r.gdb-cross "$@"
+EOT

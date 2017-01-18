@@ -4,6 +4,7 @@ refresh=0
 case ${1+$1} in -R) refresh=1; shift; esac  # TEMP
 
 # NOTE: necessary only for toolchain (if session found)
+# BET:ALT: generate ./gdb script containing 'r.chroot' based on full gdb path
 [[ -s /etc/debian_chroot ]] && cmd=() || cmd=( r.chroot )
 cmd+=( ./gdb -q )
 

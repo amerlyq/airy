@@ -76,6 +76,9 @@ https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
 | set logging overwrite [on|off]  | To overwrite logfile each time (default: append)
 | set logging redirect [on|off]   | Log only to logfile (default: both terminal and logfile)
 
+  vals: gdb -> python -> gdb
+    (gdb) python gdb.execute("set $y=\"" + os.uname()[4] + "\"")
+
   cmds: shell -> gdb -> shell
     $ vim ./.gdbinit  # make setup for cross-compile
     $ printf 'set logging on /tmp/gdb.log\n%s\n' "bt 10" > script
@@ -136,3 +139,8 @@ https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
     $ ./gdb
   NOTE: spaces in filenames supported for >~v7.0 (beside REGR in v7.4)
     (gdb) file "ex e"  # OR 'ex e'
+  ALT: replace paths afterwards
+    set logging on bt.cfg
+    bt
+    set logging off
+    shell sed -i 's|$sysroot||g' bt.cfg
