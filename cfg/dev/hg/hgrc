@@ -100,3 +100,8 @@ defaultrev=only(.)
 [hooks]
 # To prevent accidental pushes instead of qpush in mq
 pre-push = printf 'Are you sure you want to push to remote? (y/n): '; read R; [ x"$R" == "xy" ]
+
+[ui]
+# For <v1.5 -- relative to PWD, after -- relative to repo root
+# So in chroot -- commit only from repo root
+ignore = .hg/hgignore

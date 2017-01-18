@@ -31,6 +31,7 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
 link(){ linkcp "$@"; }
 ### Populate all run, run.pr1 scripts into mycache/bin
+# RFC: generalize into 'linkcp' to support batch '-b'
 linkmask(){ local nm mask=$1 fmt=$2
   # ALT:(-m) -z $PS1 -- BUT: we can't manually activate mod
   cfgOpt m && [[ $(readlink -m $0) =~ ^${CURR_DIR_CFG:?} ]] || return 0
