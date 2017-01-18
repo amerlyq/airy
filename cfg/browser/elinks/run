@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
-run(){ [[ -z "$@" ]] || exec elinks "$@"; }
-
 case "$1"
-in -p) shift; run "$(xsel -ob)"
-;; -g) shift; exec elinks "$@" 'encrypted.google.com'
-;;  *) exec elinks "${@}"
+in -p) shift; url=$(xsel -ob); (( ${#url} > 0 )) || exit; set -- "$@" "$url"
+;; -g) shift; url='encrypted.google.com'; set -- "$@" "$url"
+;; -d) shift; set -- -no-connect -localhost -dump-width 200 -dump 1 -default-mime-type text/html "$@"
 ;; esac
+
+exec elinks "$@"
