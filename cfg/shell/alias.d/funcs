@@ -1,7 +1,7 @@
 #!/bin/bash -n
 
-hex() { printf "%08lx\n" $(($@)); }
-dec() { printf "%ld\n" $(($@)); }
+hex() { printf "%08lx\n" $(($*)); }
+dec() { printf "%s\n" $(($*)); }
 # perl -e "print unpack('s',pack 's', hex('ffaa'))"
 d2hex() { { [ -t 0 ] && echo "$1" || cat; } | perl -ne 'printf("%x\n", int($_))'; }
 h2dec() { { [ -t 0 ] && echo "$1" || cat; } | perl -ne 'printf("%u\n", hex($_))'; }
@@ -15,9 +15,8 @@ bits() {
 }
 szl() { ls -FaGl "$@" | awk '{s+=$4;print $4,$8} END {print s}'; }
 # Prevent expanding for functions
-[ "$SHELL" != zsh ] || for i in hex dec bits gdf; do
-    alias $i='noglob '"$i"' '
-done
+[[ $SHELL != *zsh ]] || for fn in hex dec bits gdf
+do alias $fn="noglob ${aliases[$fn]:-$fn} "; done
 
 find_def(){ (PROMPT4="%N:%i:" $SHELL -x >/dev/null |& ag --hidden -S "$*"; exit); }
 strace2(){ ( "$@" 3>&1 1>&2- 2>&3- ) | $EDITOR - -c 'setf strace' ; }

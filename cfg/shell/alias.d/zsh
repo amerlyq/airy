@@ -25,7 +25,7 @@ if (($+commands[$EDITOR])); then
   alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
   alias -g VQ='V -c "cgetb|copen"'
   alias -g VG='V -c "set cole=0 fdl=1|setf ag_grp"'
-  alias -g VV='|vipe|'
+  alias -g V@='|vipe| '
   # ALT:(vipe): V :w!tee
   # SEE: http://stackoverflow.com/questions/3219479/how-to-write-buffer-content-to-stdout
   # NOTE: You cannot simply put vim inside a pipe, because then Vim cannot display its UI.
