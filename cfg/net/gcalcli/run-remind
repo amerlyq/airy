@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+mins=${1:-10}
+exec r.gcalcli remind "$mins" \
+  "r.n -U -a gcalcli 'gcalcli' '%s'"

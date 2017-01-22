@@ -1,0 +1,12 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+
+### LINKS ###
+acc=$(dcache)/main
+
+if cfgOpt r; then
+  # Initiate OAuth2 to generate ~/.gcalcli_oauth
+  gcalcli list
+  # Secondary acc
+  # gcalcli --configFolder ~/work list
+fi

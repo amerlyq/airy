@@ -1,0 +1,20 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  # aur_inst gcalcli
+  # BAD:(gcalcli-git): OAuth2 don't start automatically
+  # BAD:(gcalcli-git): can't add events beside 'Quick'
+  # aur_inst -p gcalcli{,-git}
+  if cfgOpt u; then  # v4.0a2
+    dst=$(dcache 'pacaur/gcalcli-git')
+    linkcp -ct "$dst" ./PKGBUILD
+    (cd "$dst" && updpkgsums && makepkg -sf)
+  fi
+
+  aur_inst -Y {,python2-}vobject
+  pkg_inst -Y {,python2-}parsedatetime
+
+elif distro ubuntu; then
+  echo "Err: fix use pip2"
+fi
