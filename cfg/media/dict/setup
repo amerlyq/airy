@@ -2,14 +2,13 @@
 source ~/.shell/func.d/cfgsetup
 
 if distro arch; then
-    dir=/etc/dict
+  dir=/etc/dict
 elif distro ubuntu; then
-    dir=/etc/dictd
+  dir=/etc/dictd
 fi
-
 # Copy files instead of symlink, as dictd drops to 'nobody' user
 #   with no access to my config files inside home directory.
-link -sc ./cfg "$dir"
+linkcp -c ./cfg "$dir"
 
 if cfgOpt u ; then
   svc_activate -ceR dictd.service

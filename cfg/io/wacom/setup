@@ -1,11 +1,11 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-linkcp -f unit -st /etc/X11/xorg.conf.d \
+linkcp -t /etc/X11/xorg.conf.d -f unit \
   52-wacom-options.conf
 
 # ATT: Can't use symlinks
 #   -- udev triggers only on symlink creation
 #   -- on reboot its not triggered at all
-linkcp -f unit -sct /etc/udev/rules.d \
+linkcp -ct /etc/udev/rules.d -f unit \
   99-wacom.rules

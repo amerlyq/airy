@@ -40,8 +40,8 @@ elif distro ubuntu; then
 
   fndir=~/.local/share/fonts
   if [[ ! -f $fndir/PowerlineSymbols.otf ]]; then
-    link -ct "$fndir"  "$PWD/PowerlineSymbols.otf"
-    link -ct ~/.config/fontconfig/conf.d  ~/.vim/res/10-powerline-symbols.conf
+    linkcp -ct "$fndir"  "$PWD/PowerlineSymbols.otf"
+    linkcp -ct ~/.config/fontconfig/conf.d  ~/.vim/res/10-powerline-symbols.conf
     fc-cache -vf "$fndir"
     echo "Powerline symbols configured"
   fi
@@ -51,7 +51,7 @@ elif distro ubuntu; then
     # Patched fonts for windows usage:
     src='https://github.com/Lokaltog/powerline-fonts'
     [[ -d "${FONT%/*}" ]] || git clone --depth=1 "$src" "${FONT%/*}"
-    link -ct "$fndir" "$FONT"
+    linkcp -ct "$fndir" "$FONT"
     fc-cache -vf "$fndir"  # check active name with fc-list
     echo "Vim font '${FONT##*/}' installed"
   fi

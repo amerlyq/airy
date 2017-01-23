@@ -4,7 +4,7 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 dst=~/.config/stalonetrayrc
-link -c stalonetrayrc "$dst"
+linkcp -c stalonetrayrc "$dst"
 
 [[ $MAIN_DPI ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
 iw=$(( ${MAIN_DPI:?} * 9/72 + 2 ))

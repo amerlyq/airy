@@ -3,7 +3,7 @@ source ~/.shell/func.d/cfgsetup
 
 if cfgOpt u; then
     if distro arch; then
-        linkcp -sc nfs.conf /etc/sysconfig/nfs
+        linkcp -c nfs.conf /etc/sysconfig/nfs
         svc_activate -eR nfs-config rpcbind rpc-statd nfs-mountd nfs-server
 
     elif distro ubuntu; then

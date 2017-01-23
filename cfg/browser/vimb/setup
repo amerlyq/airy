@@ -5,5 +5,5 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 dir=~/.config/vimb
 # Skip if you only toggle them
-cfgOpt t || link -t "$dir" config 'dld-start' theme setup
-link "$dir/theme/${THEME}.css" "$dir/style.css"
+cfgOpt t || linkcp -t "$dir" config 'dld-start' theme setup
+linkcp "$dir/theme/${THEME}.css" "$dir/style.css"

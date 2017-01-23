@@ -23,7 +23,7 @@ type=directory
 directory=${CURR_DIR_CHROOT:?}/$prf
 shell=/bin/bash
 EOT
-  linkcp -bsc "$cprof" "/etc/schroot/chroot.d/${prf}.conf"
+  linkcp -bc "$cprof" "/etc/schroot/chroot.d/${prf}.conf"
 }
 
 for prf in "${CURR_CHROOTS[@]:?}"; do

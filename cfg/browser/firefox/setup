@@ -3,12 +3,12 @@ source ~/.shell/func.d/cfgsetup
 has_pr X || die
 
 ### LINKS ###
-link "$PWD/pentadactylrc" ~/.pentadactylrc
-link "$PWD/pterosaurrc" ~/.pterosaurrc
+linkcp {,~/.}pentadactylrc
+linkcp {,~/.}pterosaurrc
 
 # ALT: $ GTK_THEME=Adwaita:light firefox %u
 dst=~/.mozilla/firefox/profiles.ini
 if [[ -f $dst ]]; then
   mprf=$(sed -rn '/Path=(.*)/s//\1/p' "$dst")
-  link -t ~/.mozilla/firefox/"$mprf/chrome" "$PWD/userContent.css"
+  linkcp -t ~/.mozilla/firefox/"$mprf/chrome" userContent.css
 fi

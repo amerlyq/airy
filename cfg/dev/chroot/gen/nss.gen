@@ -9,4 +9,4 @@ nss=${TMPDIR:?}/chroot_nss
 printf '%s\n' "${dbs[@]}" > "$nss"
 
 # CHG: move 'default' to var (obsolete if we use linked dir with profiles)
-linkcp -bsc "$nss" /etc/schroot/default/nssdatabases
+linkcp -bc "$nss" /etc/schroot/default/nssdatabases

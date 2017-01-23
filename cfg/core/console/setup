@@ -8,7 +8,7 @@ source ~/.shell/func.d/cfgsetup
 if cfgOpt u; then
 
   kmap='/usr/local/etc/vconsole.map'
-  link -sc vconsole.map "$kmap"
+  linkcp -c vconsole.map "$kmap"
 
   cfg=/etc/vconsole.conf
   sudo tee "$cfg" <<<"KEYMAP=$kmap"

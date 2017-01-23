@@ -29,7 +29,6 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 ### LINKS ###
 # BUG: on error we can't exit from forked shell and fail main one!
 fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
-link(){ linkcp "$@"; }
 ### Populate all run, run.pr1 scripts into mycache/bin
 # RFC: generalize into 'linkcp' to support batch '-b'
 linkmask(){ local nm mask=$1 fmt=$2

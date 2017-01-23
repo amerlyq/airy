@@ -2,12 +2,10 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link -skt '/usr/share/X11' xkb/{compat,rules,symbols,types}/*
+linkcp -kt '/usr/share/X11' xkb/{compat,rules,symbols,types}/*
 
 # CHECK: maybe broken, as airy/setup sets DISPLAY=:0
-if running_X; then
-  ./run
-fi
+running_X && ./run
 
 ### GENS ###
 # DISABLED:CHECK: because we can't replace setxkbmap by xorg.conf
@@ -17,7 +15,7 @@ fi
 ### SYSD ###
 if distro arch; then
   # dbus=/usr/share/dbus-1/system-services
-  # link -sc ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
+  # linkcp -c ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
   # BUG: https://bbs.archlinux.org/viewtopic.php?id=172798
   svc_activate -cue {kbdd,xcape}.service
 else

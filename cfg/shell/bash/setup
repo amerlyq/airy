@@ -2,10 +2,10 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD/bashrc" ~/.bashrc
+linkcp {,~/.}bashrc
 
 if distro arch; then
-    link "$PWD/profile" ~/.bash_profile
+  linkcp {,~/.bash_}profile
 elif distro ubuntu; then
-    link "$PWD/profile" ~/.profile
+  linkcp {,~/.}profile
 fi

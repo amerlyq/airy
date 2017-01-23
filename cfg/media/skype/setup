@@ -5,7 +5,7 @@ source ~/.shell/func.d/cfgsetup
 dst=~/.Skype/${MAIN_SKYPE:?}/config.xml
 if cfgOpt r || [[ ! -f $dst ]]; then
   rm -f "$dst"
-  link -c "${dst##*/}" "$dst"
+  linkcp -c "${dst##*/}" "$dst"
 fi
 
 if cfgOpt u; then

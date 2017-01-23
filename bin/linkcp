@@ -1,8 +1,9 @@
 #!/bin/bash -e
-# vim: ts=2:sw=2:sts=2
 
 # DEV: generalize file list to support batch '-b' format instead of linkmask
 # DEV: disallow '-o/-C' any symlink overwrite / clobbering -- strict mode
+# DEV: reuse 'rel_search' func from svc_activate
+# THINK: embed 'envsubs' from svc_activate directly into 'linkcp'
 
 exec > >(sed -r "
   s@(^|\W)$HOME@\1~@g
@@ -13,21 +14,17 @@ exec > >(sed -r "
 ")
 die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 
-unset sudo
 cmd=f_link
-# THINK:(eliminate -s flag) BUT won't it be more destructive then using -s?
-#   -- automatic 'sudo' -- check if has [[ -w ]] rights and add sudo
 
-OPTIND=1
-while getopts 'bcskrf:t:p:' o; do case $o
+OPTIND=1; while getopts 'bckrf:t:p:' o; do case $o
 in c) cmd='f_copy'
 ;; b) backup='_'
-;; s) sudo='sudo'
 ;; k) keep=1       # Keep src relative subpath
 ;; r) relative=1   # Symlink dst relative to src
 ;; f) DFR=$OPTARG  # From directory
 ;; t) DTO=$OPTARG  # Destination directory
 ;; p) PFX=$OPTARG  # Add prefix (Like '.' for dotfiles)
+;; :|'?') die 1
 esac; done; shift $((OPTIND-1))
 
 show() { local t=$1 src=$2 dst=$3 sfx
@@ -39,7 +36,12 @@ same_tree() { ! find "$1" -type f -printf '%P\0' \
     |& xargs -r0I{} diff -q "${1:?}"/{} "${2:?}"/{} \
     |& grep -qm1 '.*'  # ALT: read -t0 -N1
 }
-f_copy() { local src=$1 dst=$2
+has_perm(){ local d=$(readlink -m "$1")
+  until [[ -e $d || $d == / ]]; do d=${d%/*}
+  done; [[ -w $d ]]
+}
+f_copy() { local src=$1 dst=$2 sudo=''
+  has_perm "$dst" || sudo=sudo  # BUT won't it be more destructive then using -s?
   [[ -f $src || -d $src ]] || die "wrong source filetype"
   [[ ! -e $dst || ! -L $dst ]] || die "refuse copy over existing link '$dst'"
   [[ -e $dst || ! -L $dst ]] || $sudo rm "$dst"  # EXPL: rm dangling links
@@ -53,17 +55,17 @@ f_copy() { local src=$1 dst=$2
   # make numerical backup for them. Then you can merge changes manually!
   # BUT: for each file it must be done individually! Can't use 'cp -r'!
 }
-mkln(){ $sudo ln -svfT${relative:+r} -- "$@"; }
-f_link() { local src=$1 dst=$2
+f_link() { local src=$1 dst=$2 sudo=''
+  has_perm "$dst" || sudo=sudo
   [[ -e $dst || ! -L $dst ]] || $sudo rm "$dst"  # EXPL: rm dangling links
   if [[ ! -e $dst || -L $dst ]]; then
     if [[ ! $src -ef $dst ]]; then
       $sudo mkdir -p "${dst%/*}"
-      mkln "$src" "$dst"
+      $sudo ln -svfT${relative:+r} -- "$src" "$dst"
     else show L "$src" "$dst"; fi
   elif [[ $backup && ! -e ${dst}$backup ]]; then
       $sudo mv -vfT  -- "$dst" "${dst}$backup"
-      mkln "$src" "$dst"
+      $sudo ln -svfT${relative:+r} -- "$src" "$dst"
   else die "refuse symlink over existing file/dir '$dst'"; fi
 }
 dispatch() { local src=$(readlink -e "${1:?}") dst=${2:?}

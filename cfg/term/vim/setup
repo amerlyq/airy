@@ -2,8 +2,9 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD" ~/.vim
-link "$PWD" "${XDG_CONFIG_HOME:=$HOME/.config}/nvim"
+config=${XDG_CONFIG_HOME:=~/.config}/nvim
+linkcp "$PWD" ~/.vim
+linkcp "$PWD" "$config"
 
 cache=${XDG_DATA_HOME:=~/.cache}
 mkdir -vp "$cache"/{shada,vim}

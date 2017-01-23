@@ -4,4 +4,4 @@
 
 net=${TMPDIR:?}/chroot_net
 echo "link-local 169.254.0.0" > "$net"
-linkcp -bsc "$net" /etc/networks
+linkcp -bc "$net" /etc/networks

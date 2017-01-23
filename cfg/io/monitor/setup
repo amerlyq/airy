@@ -7,7 +7,7 @@ svc_activate -cE monitor-hotplug@.service
 ### LINKS ###
 # THINK: embed *.rules support into svc_activate
 #   ALT: create 'udev_activate' or r.udev-cfg
-linkcp -sct '/etc/udev/rules.d' unit/95-monitor-hotplug.rules
+linkcp -ct '/etc/udev/rules.d' unit/95-monitor-hotplug.rules
 
 if cfgOpt u; then
   sudo udevadm control --reload-rules

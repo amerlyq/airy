@@ -3,6 +3,6 @@ source ~/.shell/func.d/cfgsetup
 
 if cfgOpt u; then
   dst=/etc/X11/xorg.conf.d
-  linkcp -st "$dst" 50-synaptics.conf
+  linkcp -t "$dst" 50-synaptics.conf
   echo "Wrn: NEED relogin/restart Xorg"
 fi

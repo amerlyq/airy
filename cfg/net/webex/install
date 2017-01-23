@@ -9,7 +9,7 @@ if distro arch; then
   aur_inst -d '/usr/share/doc/bin32-jre' bin32-jre
   aur_inst webex-meta
 
-  linkcp -st '/usr/lib/mozilla/plugins' \
+  linkcp -t '/usr/lib/mozilla/plugins' \
     /usr/lib32/jvm/java32-8-jre/jre/lib/i386/libnpjp2.so
 
 fi

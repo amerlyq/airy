@@ -7,7 +7,7 @@ if cfgOpt r; then
 fi
 
 ### LINKS ###
-link "$PWD/conky.conf" ~/.config/conky/conky.conf
+linkcp -t ~/.config/conky conky.conf
 
 ## Reload cfg
 lst=$(pgrep conky) && kill -USR1 $lst ||:

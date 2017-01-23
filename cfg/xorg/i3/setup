@@ -1,13 +1,13 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD" ~/.i3
+linkcp "$PWD" ~/.i3
 
 ### GENS ###
-THEME=$THEME ./i3-config.gen
+THEME="$THEME" ./i3-config.gen
 
 if cfgOpt u && running_X; then
-    i3-msg restart </dev/tty >/dev/null 2>&1 ||:
+  i3-msg restart </dev/tty >/dev/null 2>&1 ||:
 fi

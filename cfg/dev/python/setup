@@ -2,8 +2,8 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-link "$PWD/pdbrc" ~/.pdbrc
+linkcp {,~/.}pdbrc
 # DFL: generate by $ ipython profile create
-link -t ~/.ipython/profile_default 'ipython_config.py'
+linkcp -t ~/.ipython/profile_default 'ipython_config.py'
 # pudb.cfg
 # sudo chown -R $USER:$USER ~/.config/pudb

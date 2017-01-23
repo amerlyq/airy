@@ -12,11 +12,11 @@ if cfgOpt u && [[ -d $dir ]]; then
     then sudo chown -R tftp:tftp "$dir"; fi
 
     if distro arch; then
-        link -sc ./config /etc/conf.d/tftpd
+        linkcp -c ./config /etc/conf.d/tftpd
         svc_activate -eR tftpd
 
     elif distro ubuntu; then
-        link -sc ./config /etc/default/tftpd-hpa
+        linkcp -c ./config /etc/default/tftpd-hpa
         svc_activate -eR tftpd-hpa
     fi
 fi

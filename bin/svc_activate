@@ -1,7 +1,13 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/system
 trap_errors
+
 # THINK: rename to 'r.systemd-cfg' or cross-pltf wrapper 'r.svc-cfg'
+# BAD: systemd units can't be used for init.d and upstart
+#   * split script into several: r.{systemd,initd,upstart}-cfg
+#   * access init scripts by proxy of r.svc -- linked by mkdef
+#   SEE: http://unix.stackexchange.com/questions/196166/how-to-find-out-if-a-system-uses-sysv-upstart-or-systemd-initsystem
+# THINK: embed 'envsubs' directly into 'linkcp'
 
 dst=/etc/systemd/system
 from=./unit
@@ -45,7 +51,7 @@ fi
 
 
 # MAYBE: for file searching move to sep script or cfgsetup func
-search(){ local f=$1
+rel_search(){ local f=$1
   if [[ ${f:0:1} == / ]]; then f=$f
   elif [[ -f $from/$f ]]; then f=$from/$f
   elif [[ -f ./$f ]]; then f=$f
@@ -57,7 +63,7 @@ copyall(){ local t tmp have_changed=0
   tmp=$(dtemp 'svc')
   trap "rm -rf '$tmp'" RETURN
   for f in "$@"; do
-    f=$(search "$f")
+    f=$(rel_search "$f")
     if ((envsubs)); then
       t=${tmp:?}/${f##*/}
       env-subs "$f" "$t"
@@ -67,7 +73,7 @@ copyall(){ local t tmp have_changed=0
     # NOTE: for diff to work -- always do 'envsubs'
     if ! diff -q "$t" "$f" &>/dev/null; then
       # ALT:TRY: $ systemctl link *.service
-      linkcp ${sudo:+-s} -c "$f" "$t"
+      linkcp -c "$f" "$t"
       have_changed=1
     fi
   done

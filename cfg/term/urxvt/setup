@@ -1,10 +1,10 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD" ~/.urxvt
-link "$PWD/themes/amer-${THEME}" "${CURR_DIR_CACHE:?No}/theme-urxvt"
+linkcp "$PWD" ~/.urxvt
+linkcp "$PWD/themes/amer-${THEME}" "${CURR_DIR_CACHE:?No}/theme-urxvt"
 
 
 # https://wiki.archlinux.org/index.php/Rxvt-unicode

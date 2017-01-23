@@ -149,6 +149,9 @@ TODO
       + this allows clean uninstall previous versions
       ALT: generate single package from whole 'airy'
     [_] CHG: use pacaur instead of pacman on pkg update
+    2017-01-23 [X] remove 'sudo' from linkcp
+    2017-01-23 [X] rename all 'link' func into 'linkcp' script
+      $ find -type d -name site -prune -o -type f -executable -exec grep -PHn '(?<!ip )\blink\b' {} \; VQ
   [_] NOTE: 'git augment' -- even share for doc can be changed
   [_] USE them or disable/deinstall them
       zeal

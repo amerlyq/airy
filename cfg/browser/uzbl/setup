@@ -1,7 +1,7 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link -t ~/.config/uzbl \
-    config style.css  # scripts
+linkcp -t ~/.config/uzbl \
+  config style.css  # scripts

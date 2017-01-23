@@ -1,7 +1,7 @@
 #!/bin/bash -e
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-[[ "$THEME" =~ ^(dark|light)$ ]] || THEME=dark
 
 ### LINKS ###
-link "$PWD/script.js" ~/.surf/script.js
-link "$PWD/../vimb/theme/${THEME}.css" ~/.surf/style.css
+linkcp script.js ~/.surf/script.js
+linkcp ../vimb/theme/"${THEME}.css" ~/.surf/style.css

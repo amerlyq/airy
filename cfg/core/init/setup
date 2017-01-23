@@ -2,7 +2,7 @@
 source ~/.shell/func.d/cfgsetup
 
 ### systemd ###
-link -sct /etc/X11 Xwrapper.config
+linkcp -ct /etc/X11 Xwrapper.config
 svc_activate -cue \
   {demons,main,wm,logoff}.target \
   xorg.{socket,service,target} \
@@ -15,6 +15,6 @@ if cfgOpt u; then
 fi
 
 ### startx ###
-link xprofile ~/.xprofile
-link xinitrc  ~/.xinitrc
-link -t "${CURR_DIR_CACHE:?}/bin" startx auto-start
+linkcp {,~/.}xprofile
+linkcp {,~/.}xinitrc
+linkcp -t "${CURR_DIR_CACHE:?}/bin" startx auto-start
