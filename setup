@@ -63,7 +63,8 @@ if started_anew "$@"; then
     # THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
     cfgOpt i && ./update $(cfgOpt U && echo -u) >/dev/tty
     # BAD: if symlinks will be always deleted, r.xorg will be never used in core/xorg
-    cfgOpt f && { echo "N: clean r.* symlinks"; rm -rf ~/.cache/airy/bin/*; }
+    cfgOpt f && { echo "N: clean r.* symlinks"; rm -rf "${CURR_DIR_CACHE:?}/bin"/*; }
+    cfgOpt f && { echo "N: clean aliases cache"; rm -rf "${CURR_DIR_CACHE:?}/aliases"; }
     { echo "N: clean systemd user units"; rm -rf ~/.config/systemd/user/*; }
 fi
 

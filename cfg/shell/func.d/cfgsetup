@@ -72,30 +72,29 @@ fi
 
 # TODO:DEV: dump aliases and functions individually for each shell after configure
 #   => faster startup from single file
-# TODO: allow multiple files for aliases per each mod
 # FIXME: don't source other files named 'aliases' beside in ./mod dir
 # WARN: for timestamping you need non-regex name w/o spaces: $m = \S+
 # BAD: if $f was manually edited -- NEED to regenerate anyway
 # NOTE: keep short 'mod' name to allow mods moving
 # SEE: http://fahdshariff.blogspot.com/2012/12/sed-mutli-line-replacement-between-two.html
 # DEV: generalize and extract into separate script
-_alias_append(){ local s f b e t tt m=${PWD##*/}
-  s=$PWD/mod/aliases
-  cfgOpt m || return 0
+_alias_append(){ local s f b e t tt m
+  s=$(readlink -e "$1")
+  m=${PWD##*/}/${s##*/}
   [[ ! -s $s ]] && return
   f=${CURR_DIR_CACHE:?}/aliases
   [[ -s $f ]] || (set +C; echo '# vim:ft=sh' > "$f")
   b="_alias_cat(){# $m"
   e="}; _alias_cat"
   t=$(command stat -c%Y "$s")
-  tt=$(sed -n "/^$b\s*\([0-9]\{10\}\)\$/{s//\1/p;q}" "$f")
+  tt=$(sed -n "\|^$b\s*\([0-9]\{10\}\)\$|{s//\1/p;q}" "$f")
   (( t == tt )) && return
   sed -i "
-  /^$b/,/^$e$/ {
-    /^$b/{
+  \|^$b|,\|^$e$| {
+    \|^$b|{
       i $b $t\\n# $s
       r $s
-    }; /^$e$/b; d
+    }; \|^$e$|b; d
   }
   \$ {
     a\\\n\\n$b $t\\n# $s
@@ -103,4 +102,14 @@ _alias_append(){ local s f b e t tt m=${PWD##*/}
     a $e
   }" "$f"
   echo "W: aliases '$m'"
-}; _alias_append
+}
+
+# NOTE: supports file ./alias or directory ./alias/*
+_alias_mod(){ cfgOpt m || return 0
+  local e=./alias
+  if [[ -d $e ]]; then
+    for a in "$e"/*; do _alias_append "$a"; done
+  elif [[ -f $e ]]; then
+    _alias_append "$e"
+  fi
+}; _alias_mod
