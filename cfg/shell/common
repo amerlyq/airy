@@ -3,8 +3,8 @@
 ### Aura mods profiles (links only) ###
 # FIXME: what if user want to overwrite some of my aliases?
 if [[ -d ~/.cache/airy/env ]]; then
-    for L in ~/.cache/airy/env/*
-    do [[ ! -L "$L" ]] || source "$L"; done
+  for L in ~/.cache/airy/env/*
+  do [[ ! -L "$L" ]] || source "$L"; done
 fi
 
 # Alias definitions.
@@ -16,6 +16,9 @@ source ~/.shell/aliases
 [[ -z $SHELLRC_EVAL ]] || eval "$SHELLRC_EVAL"
 
 ## Trap to sync bash/zsh and ranger working directories.
-trap '(set +C && printf "%s" "$PWD" > \
-  "${RANGER_TMPDIR:-${TMPDIR:-/tmp}/ranger}/cwd")' EXIT
-# OR NOTE: '>!' is because of 'unsetopt CLOBBER' by 'prezto:directory'
+trap '_ranger_cwd' EXIT
+_ranger_cwd(){
+  local tmp=${RANGER_TMPDIR:-${TMPDIR:-/tmp}/ranger}
+  builtin test -d "$tmp" || command mkdir -p "$tmp"
+  (set +C && printf "%s" "$PWD" > "$tmp/cwd")  # Disable clobbering
+}

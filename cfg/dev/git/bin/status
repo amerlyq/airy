@@ -1,12 +1,12 @@
 #!/bin/zsh -u
-set -o pipefail
+setopt pipefail 2>/dev/null
 # BUG: git-info don't work if '#!/bin/zsh -e'
 # USAGE: WCOL=20 r.git-status [repos...]
 
 cwd=$PWD
 repos=( $@ )
 names=( ${${^${^repos##$cwd}#/}:-.} )
-[[ ${WCOL-} ]] || for nm in $names; do
+(( ${WCOL-} )) || for nm in $names; do
   ((${WCOL=0} > $#nm)) || WCOL=$#nm
 done
 
@@ -52,7 +52,8 @@ function gita_st { local rep=$1 sfx=${2-}
 
   fmt="\u251c\u2500%(refname:short) %(push:track)"
   psh=$(git for-each-ref --format="$fmt" refs/heads |
-      awk -vb="$branch" '$1~b"$"||$2==""{next}{print$0}')
+        awk -vb="$branch" '$1~b"$"||$2==""{next}{print$0}'
+      ) ||:  # Block nonexistent '%(push:track)' in git v1.9.1
 
   [[ -z ${psh#* } ]] || psh="\n$psh\n\u2534"
   print -P "$(gita_prezto) \t$name \t$stm - $(time_dt)%F{35}$psh%f$sfx"
