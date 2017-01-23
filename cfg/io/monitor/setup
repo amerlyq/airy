@@ -2,15 +2,11 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-# THINK: embed %VAR% replacing into svc_activate
-tmp="${TMPDIR:-/tmp}/monitor-hotplug@.service"
-trap "rm -f '$tmp'" EXIT
-cp -fT "unit/${tmp##*/}" "$tmp"
-sed -i '/%USER%/s//'"$CURR_USER"'/' "$tmp"
-svc_activate -c -f "${tmp%/*}" "${tmp##*/}"
+svc_activate -cE monitor-hotplug@.service
 
 ### LINKS ###
 # THINK: embed *.rules support into svc_activate
+#   ALT: create 'udev_activate' or r.udev-cfg
 linkcp -sct '/etc/udev/rules.d' unit/95-monitor-hotplug.rules
 
 if cfgOpt u; then

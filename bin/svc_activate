@@ -1,73 +1,93 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/system
 trap_errors
+# THINK: rename to 'r.systemd-cfg' or cross-pltf wrapper 'r.svc-cfg'
 
-# TRY: special symlinking
-#    systemctl link /root/systemd/forwjour.service
-
-DIR=/etc/systemd/system
-A=''  # system-wide
-sudo=sudo
-OPTIND=1
+dst=/etc/systemd/system
 from=./unit
+sudo=sudo
+envsubs=0
+A=''  # system-wide
 
 # copy/enable/re-*/run/user
-while getopts 'cef:rRu' o; do case $o
-in u) A=--user; sudo=''; DIR=~/.config/systemd/user
+OPTIND=1; while getopts 'ceEf:rRu' o; do case $o
+in u) A=--user; sudo=''; dst=~/.config/systemd/user
       # ALT:CHECK:(faster startup) /etc/systemd/user
 ;; f) from=$OPTARG
+;; E) envsubs=1
 ;; :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 (($#)) || die 1 "No svc list"
-# EXPL: split in stages -- to take dependency into account
 
 
-# ALSO: for ubuntu >= 16 which has systemd
+# NOTE: find out current init system
 if has_pr systemd-notify && systemd-notify --booted; then
 
-  if cfgOpt c; then
-    do_replace=0
-    for f in "$@"; do
-      # MAYBE: move local svc searching into func.d/cfgsetup wrapper
-      [[ -f $from/$f ]] && f=$from/$f \
-      || [[ -f ./$f ]] || die 1 "Not found '$f'"
-      if ! diff -q "$PWD/$f" "${DIR:?}/$f" &>/dev/null; then
-        do_replace=1
-        linkcp ${sudo+-s} -ct "${DIR:?}" "$f"
-      fi
-    done
-    ((!do_replace)) || $sudo systemctl $A daemon-reload
-  fi
+doreload(){ $sudo systemctl $A daemon-reload; }
+isenable(){ systemctl $A is-enabled "$@" &>/dev/null; }
+doenable(){ $sudo systemctl $A enable "$@"; }
+reenable(){ $sudo systemctl $A reenable "$@"; }
+isrun(){ systemctl $A is-active "$@" &>/dev/null; }
+dorun(){ $sudo systemctl $A start "$@"; }
+rerun(){ $sudo systemctl $A restart "$@"; }
 
-  cfgNo e || for f in "$@"; do
-    if ! systemctl $A is-enabled "$f" &>/dev/null
-    then $sudo systemctl $A enable "$f"
-    elif cfgOpt f; then $sudo systemctl $A reenable "$f"
-    else echo "-> @ $f"
-    fi 2>&1
-  done
-  # elif cfgNo e; then $sudo systemctl $A disable "$f"
+else # WARN:BAD: 'if distro ubuntu' -- messed 14.10, systemd 16.04
 
-  cfgNo rR || for f in "$@"; do
-    if ! systemctl $A is-active "$f" &>/dev/null; then
-      $sudo systemctl $A start "$f"
-    elif cfgOpt R; then
-      $sudo systemctl $A restart "$f"
-    fi 2>&1
-  done
+doreload(){ return 0; }
+isenable(){ return 1; }
+doenable(){ $sudo update-rc.d "$@" defaults; }
+reenable(){ $sudo update-rc.d -f "$@" remove; doenable "$@"; }
+isrun(){ return 0; }
+dorun(){ $sudo service "$@" restart 2>&1; }
+rerun(){ dorun "$@"; }
 
-elif distro ubuntu; then
-
-  # Enable
-  for f in "$@"; do
-    if cfgOpt e
-    then $sudo update-rc.d "$f" defaults
-    else $sudo update-rc.d -f "$f" remove
-    fi 2>&1
-  done
-
-  # Run
-  cfgNo r || for f in "$@"; do
-    $sudo service "$1" restart 2>&1
-  done
 fi
+
+
+# MAYBE: for file searching move to sep script or cfgsetup func
+search(){ local f=$1
+  if [[ ${f:0:1} == / ]]; then f=$f
+  elif [[ -f $from/$f ]]; then f=$from/$f
+  elif [[ -f ./$f ]]; then f=$f
+  else die 1 "Not found '$f'"
+  fi && printf '%s\n' "$(readlink -e "$f")"
+}
+
+copyall(){ local t tmp have_changed=0
+  tmp=$(dtemp 'svc')
+  trap "rm -rf '$tmp'" RETURN
+  for f in "$@"; do
+    f=$(search "$f")
+    if ((envsubs)); then
+      t=${tmp:?}/${f##*/}
+      env-subs "$f" "$t"
+      f=$t
+    fi
+    t=${dst:?}/${f##*/}
+    # NOTE: for diff to work -- always do 'envsubs'
+    if ! diff -q "$t" "$f" &>/dev/null; then
+      # ALT:TRY: $ systemctl link *.service
+      linkcp ${sudo:+-s} -c "$f" "$t"
+      have_changed=1
+    fi
+  done
+  ((!have_changed)) || doreload
+}
+
+enableall(){ for f in "$@"; do
+  if ! isenable "$f"; then doenable "$f"
+  elif cfgOpt f; then reenable "$f"
+  else echo "-> @ $f"; fi 2>&1
+done;}
+
+runall(){ for f in "$@"; do
+  if ! isrun "$f"; then dorun "$f"
+  elif cfgOpt R; then rerun "$f"
+  fi 2>&1
+done;}
+
+
+# EXPL: split in stages -- to take dependency into account
+cfgNo c  || copyall "$@"
+cfgNo e  || enableall "$@"  # OR:ALSO: && $sudo systemctl $A disable "$f"
+cfgNo rR || runall "$@"

@@ -1,0 +1,33 @@
+#!/bin/sh -eu
+
+lp='%[{]'
+mp='[A-Z_][A-Z_0-9]*'
+rp='[}]'
+dryrun=
+inplace=
+
+OPTIND=1; while getopts 'dil:m:r:' o; do case $o
+in [lmr]) declare ${o}p=$OPTARG
+;; d) t=/dev/stdout; dryrun=1
+;; i) t=$(mktemp); inplace=1
+esac; done; shift $((OPTIND-1))
+
+f=$1
+t=${t:-$2}
+
+# WARN: unrestricted recursive substitution
+# FIXME: -- endless loop for USER='%USER%' -- set depth limit ?
+gawk -vl="$lp" -vm="$mp" -vr="$rp" '{
+  while(match($0, l m r)) {
+    k = substr($0, RSTART, RLENGTH)
+    k = gensub(l"("m")"r, "\\1", "1", k)
+    v = ENVIRON[k]
+    if (length(v)==0) {
+      print "No env: "k > /dev/stderr
+      exit 4
+    }
+    gsub(l k r, v)
+  }; print
+}' "$f" > "$t"
+
+((!inplace)) || mv -f "$t" "$f"
