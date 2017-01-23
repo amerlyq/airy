@@ -1,0 +1,14 @@
+[Unit]
+Description=Xorg - XAutoLock - %P
+Requisite=xorg.target
+After=xorg.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/xautolock -time 10 -locker r.lock -detectsleep
+Restart=always
+RestartSec=1
+TimeoutStopSec=5
+
+[Install]
+WantedBy=main.target
