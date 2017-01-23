@@ -4,6 +4,12 @@ NOTE
     man -K gawk
     man -wK gawk
 
+DEV: jump in man
+  $ man(){ local p=${@:$#}; MANPAGER="$PAGER -p \$'${p//\'/\\\'}'" command man "${@:1:$#-1}"; }
+  BET: use env var instead of last arg
+  $ MANPAGER="r.pager -p fragment" man PKGBUILD
+  $ S='regex' man command
+
 SEE
   http://www.linux-mag.com/id/4442/
   http://www.linux-mag.com/id/4145/
