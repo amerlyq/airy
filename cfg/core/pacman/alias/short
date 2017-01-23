@@ -1,19 +1,4 @@
-#!/bin/bash
-
-# NOTE: find all dependent pkgs
-#   => use $ pactree -r <pkg> $ before 'pacX' -- its cool!
-
-if _has_pr pacaur; then
-  alias pacman='pacaur'
-elif _has_pr yaourt; then
-  alias pacman='yaourt'
-else
-  alias pacman='sudo \pacman'
-fi
-
-if [[ $SHELL =~ zsh$ ]]; then
-  alias pacman="noglob ${${$(alias pacman)#*=}:-pacman}"
-fi
+# vim:ft=sh
 
 # USE: -r/-a to use repo/aur only
 alias pacg='pacman -Sg'    # show list of package [g]roup
@@ -41,19 +26,3 @@ alias pacY='pacman -Syu'   # '[u]pgrade all'
 # Synchronizes the local package database against the repositories then
 # upgrades outdated packages.
 # alias pacU="sudo pacman --sync --refresh --sysupgrade"
-
-alias pacman-list-orphans='\pacman --query --deps --unrequired'
-alias pacman-remove-orphans='sudo pacman --remove --recursive $(pacman-list-orphans)'
-pacman-list-explicit(){ \pacman --query --explicit --info | awk '
-    BEGIN{FS=":"} /^Name|^Description/{print$2}
-'; }
-pacman-list-disowned(){
-  local tmp=${TMPDIR:-/tmp}/pacman-disowned-$UID-$$
-  local db=$tmp/db fs=$tmp/fs
-  trap  'rm -rf "$tmp"' EXIT
-  mkdir "$tmp"
-  pacman --quiet --query --list | sort --unique > "$db"
-  find /bin /etc /lib /sbin /usr ! -name lost+found \
-    \( -type d -printf '%p/\n' -o -print \) | sort > "$fs"
-  comm -23 "$fs" "$db"
-}

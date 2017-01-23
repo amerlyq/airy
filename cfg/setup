@@ -30,5 +30,6 @@ if distro ubuntu; then
   mkdef www-browser $(which elinks)
   mkdef x-www-browser $(which qutebrowser)
   mkdef x-window-manager $(which xmonad)
+  # mkdef x-session-manager cinnamon-session-cinnamon
   for nm in vim view rview; do mkdef $nm $(which vim.gtk); done
 fi

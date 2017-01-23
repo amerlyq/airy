@@ -1,0 +1,14 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+distro ubuntu || exit
+
+cd ./gen
+
+./xsessionrc.gen
+
+if cfgOpt u; then
+  echo "N: hosts, rc-local, nosudo_reboot"
+  ./hosts.gen
+  ./rc-local.gen
+  ./nosudo_reboot
+fi

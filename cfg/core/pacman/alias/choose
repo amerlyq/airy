@@ -1,0 +1,13 @@
+# vim:ft=sh
+
+if _has_pr pacaur; then
+  alias pacman='pacaur'
+elif _has_pr yaourt; then
+  alias pacman='yaourt'
+else
+  alias pacman='sudo \pacman'
+fi
+
+if [[ $SHELL =~ zsh$ ]]; then
+  alias pacman="noglob ${${$(alias pacman)#*=}:-pacman}"
+fi

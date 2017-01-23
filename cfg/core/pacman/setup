@@ -1,0 +1,16 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+distro arch || exit
+
+cfg=/etc/pacman.conf
+grep -q '^#Color\s*$' "$cfg" && sudo sed -ri '/^#(Color)\s*$/s//\1/' "$cfg"
+linkcp pacaur.conf ~/.config/pacaur/config
+
+# TODO setup pacaur to use -j4..-j8 in /etc/makepkg.conf
+# OR: system-wide export MAKEFLAGS="-j$(expr $(nproc) \+ 1)"
+#   http://unix.stackexchange.com/questions/268221/use-multi-threaded-make-by-default
+
+# Step 4: When you use yaourt an option is given to edit the PKGBUILD.
+#   Make sure there is a line in the PKGBUILD which says options=('!makeflags').
+#   If it is not there, you will need to add this line, otherwise multi-core
+#   compilation will not proceed.
