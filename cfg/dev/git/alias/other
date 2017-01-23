@@ -1,4 +1,4 @@
-#!/bin/bash
+# vim:ft=sh
 # Most of aliases contained at
 #   ~/.cache/zsh/.zprezto/modules/git/alias.zsh
 # NOTE: similar to prezto: create funcs with full names, and then alias them
@@ -81,72 +81,8 @@ alias gtn='git name-rev --name-only'  # Shows related to release tag name
 #        USE: 'git add -N <file>' before if untracked
 #   gp[aA] -- push all/+force ATTENTION: all deleted on server branches will recreate from user
 
-
-## Diff
-alias gdf='git diff -M'  # don't show renamed files
-# SEE: http://stackoverflow.com/questions/5685007/making-git-log-ignore-changes-for-certain-paths/21079437#21079437
-# git diff HEAD -- . ':!some/dir' -- exlude shanges
-alias gdfs='gdf --stat'
-alias gdF='gdf HEAD...origin'  # with fetched
-alias gdo='gdf HEAD   origin/$(git-branch-current 2>/dev/null)'
-alias gdum='gdf master upstream/master'
-alias gdw='gdf --no-ext-diff --word-diff --unified=0'  # OR -U0
-alias gdc='gdf --cached -w'
-alias gdcw='gdf --no-ext-diff --word-diff --cached -w'
-alias gdn='gdf --name-status'
-alias gdr='gdf --color-words'
-alias gdp='gdf HEAD~1 HEAD'
-alias gdp-='gdw HEAD~1 HEAD'
-alias gdl="gdf '@{1}..'"
-alias gdl-="gdw '@{1}..'"
-alias gds='gdf "stash@{0}"'
-alias gdS='git stash show -p'
-alias gdi='git difftool -t idiff'  # case-insensitive
-alias gd.='gdf .'
-
-## Log
-alias glh='git fcommits'  # history for one file
-alias glB='git flines'    # blame formatted
-alias glg='git lgraph'
-alias glg.='glg -- .'
-alias glF='git log -p HEAD..origin'  # with fetched
-alias gll='git lmsg'
-gln(){ git ldump -n ${1:-10}; } #or -1 for inf
-
-alias ggs='glg --source --all -S'   # search <text> in all commits content
-alias ggx='git rev-list --all | xargs git grep'
-alias ggS='git log -S'
-alias ggG='git log -G'
-ggg(){ git --no-pager log --pretty=format:'%H' -G "$1" \
-| while IFS= read -r rev; do echo && git --no-pager lstd --graph -n1 "$rev" && echo
-  git --no-pager grep --color -I -n -e "$@" "$rev" | cut -d: -f2-
-  # --break --heading
-done; }
-ggh(){ git --no-pager log --pretty=format:'%H' -G "$1" \
-| while IFS= read -r rev; do
-  git --no-pager grep --color -I -h -e "$@" "$rev" | awk '{$1=$1}1'
-done; }
-
-# git grep -l --all-match -e <regexp1> # To search files with line
-# git log -G Foo --since=2009.1.1 --until=2010.1.1 -- path_containing_change # To search commits changing line
-
 # Utils
 alias gk='gitk --all --max-count=200 --branches --remotes --tags &'
 alias gv='v -R +Gitv +tabonly -- " "'
 alias gvs='v +Gstatus +only'
 alias gvd='git difftool'
-
-## Recursive repo
-# __rgit_dfl=~/aura  # TODO: set dfl dir in profile
-# TODO: r.git-all-status "${2:-${1:-$__rgit_dfl}}"
-#   = from any dir user '.' to replace dfl dir by current
-#   ALT: filter-out dfl dir from args list -- scripts could use PWD
-alias Ga='r.git-all'
-alias Gu='r.git-all-status'
-alias Gs='Gu ~/aura'
-alias Gt='Ga ~/aura status -su'
-alias Gd='Ga ~/aura diff'
-alias Gw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
-alias Gl.='r.git-all-pull'
-alias Gl='Gl. ~/aura'
-alias Gp='r.git-all-push ~/aura'

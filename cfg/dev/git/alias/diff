@@ -1,0 +1,22 @@
+# vim:ft=sh
+## Diff
+alias gdf='git diff -M'  # don't show renamed files
+# SEE: http://stackoverflow.com/questions/5685007/making-git-log-ignore-changes-for-certain-paths/21079437#21079437
+# git diff HEAD -- . ':!some/dir' -- exlude shanges
+alias gdfs='gdf --stat'
+alias gdF='gdf HEAD...origin'  # with fetched
+alias gdo='gdf HEAD   origin/$(git-branch-current 2>/dev/null)'
+alias gdum='gdf master upstream/master'
+alias gdw='gdf --no-ext-diff --word-diff --unified=0'  # OR -U0
+alias gdc='gdf --cached -w'
+alias gdcw='gdf --no-ext-diff --word-diff --cached -w'
+alias gdn='gdf --name-status'
+alias gdr='gdf --color-words'
+alias gdp='gdf HEAD~1 HEAD'
+alias gdp-='gdw HEAD~1 HEAD'
+alias gdl="gdf '@{1}..'"
+alias gdl-="gdw '@{1}..'"
+alias gds='gdf "stash@{0}"'
+alias gdS='git stash show -p'
+alias gdi='git difftool -t idiff'  # case-insensitive
+alias gd.='gdf .'
