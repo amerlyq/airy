@@ -4,7 +4,7 @@ source ~/.shell/func.d/cfgsetup
 ### systemd ###
 linkcp -ct /etc/X11 Xwrapper.config
 svc_activate -cue \
-  {demons,main,wm,logoff}.target \
+  wm.target \
   xorg.{socket,service,target} \
   xprofile.service
 

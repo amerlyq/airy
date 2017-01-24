@@ -1,0 +1,5 @@
+#!/bin/bash -e
+source ~/.shell/func.d/cfgsetup
+has_pr systemd-notify && systemd-notify --booted || exit
+
+svc_activate -cue {demons,logoff,main}.target
