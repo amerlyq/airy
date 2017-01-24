@@ -16,6 +16,8 @@ Environment=XDG_CURRENT_DESKTOP=xmonad
 # BUG: USR1 is uncatched on '--restart' -- systemd trying to reconnect to bus on USR1
 ExecStart=/bin/sh -c 'trap "exit 0" USR1; NOTIFY_PPID=$$$$ %h/.xmonad/xmonad-x86_64-linux & wait; exit 1'
 # ExecStart=/bin/sh -c "trap 'exit 0' USR1; (exec '%h/.xmonad/xmonad-x86_64-linux') & wait; exit 1"
+Restart=on-abnormal
+RestartSec=5
 
 # TRY:FIND: notify by creating some file (inotify)
 # Type=notify
