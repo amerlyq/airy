@@ -2,11 +2,4 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-if cfgOpt u && [[ $CURR_PROF != neo ]]; then
-  # linkcp -t /etc/X11/xorg.conf.d 20-intel.conf
-  if [[ $(r.xorg -WH 2>/dev/null) =~ [0-9]+$'\n'[0-9]+ ]]; then
-    f=/etc/X11/xorg.conf.d/90-monitor.conf
-    linkcp -c "${f##*/}" "$f"
-    sudo sed -ri '/^(\s+DisplaySize)\s.*$/s//\1 '"$(r.xorg -WH|xargs)/" "$f"
-  fi
-fi
+linkcp -t /etc/X11/xorg.conf.d 20-intel.conf
