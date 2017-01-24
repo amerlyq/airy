@@ -24,6 +24,14 @@ call dein#add('airblade/vim-rooter', {
 \"})
 
 
+"" Extract the selection into a new file with same extension
+" ALT: https://github.com/lucerion/vim-extract
+" USAGE: :Xtract newfilename<CR>
+" FIXME: move from fork to 'rstacruz' when fixed trailing dot
+call dein#add('specious/vim-xtract', {
+  \ 'on_cmd': 'Xtract'})
+
+
 
 "" Switch between alternative files [c,cpp,cxx,cc] <-> [h,hpp] {{{1
 " EXPL:(no <unique>) overrides my STD 'cycle through'
