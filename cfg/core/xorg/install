@@ -1,5 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
+# MOVE: into 'wm' *mod*
 
 #| xsel      | clipboard tool for rxvt extensions
 #| xbindkeys | to XF86AriseVolumeUp and other media keys works
@@ -8,10 +9,8 @@ source ~/.shell/func.d/packages
 pkg_inst xsel xbindkeys xdotool
 
 if distro arch; then
-    pkg_inst -p xprop xorg-xprop
+  pkg_inst -p 'xprop' xorg-xprop
 
 elif distro ubuntu; then
-    echo "Err: No xprop"
+  echo "Err: No xprop"
 fi
-
-# xbacklight

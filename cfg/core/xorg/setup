@@ -2,4 +2,10 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
+linkcp -ct /etc/X11 Xwrapper.config
+
+svc_activate -cue \
+  xorg.{socket,service,target} \
+  wm.target xprofile.service
+
 linkcp -t /etc/X11/xorg.conf.d 20-intel.conf

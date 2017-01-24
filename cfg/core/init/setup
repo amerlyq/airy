@@ -1,13 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-### systemd ###
-linkcp -ct /etc/X11 Xwrapper.config
-svc_activate -cue \
-  wm.target \
-  xorg.{socket,service,target} \
-  xprofile.service
-
 ### startx ###
 linkcp {,~/.}xprofile
 linkcp {,~/.}xinitrc
