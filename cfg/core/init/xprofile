@@ -1,23 +1,30 @@
 # vim: ft=sh
-# EXPL: ignore if non-existent
-# xrdb -load ~/.Xresources
+
+# TODO: ignore if non-existent
+xrdb -load ~/.Xresources &
 
 # xrandr --auto     # NEED? ALT xrandr --size 1 &
 # xsetroot -gray &  # NEED? ALT xsetroot -solid "#333333"
 # setterm -blank 0  # Disable blanking for virtual consoles
 # xscreensaver -no-splash &
+
 # SEE:(available cursors) /usr/include/X11/cursorfont.h
-xsetroot -cursor_name left_ptr
+xsetroot -cursor_name left_ptr &
+
 
 # USE xset -q -- to find out values
-xset b off  # No PC speaker in X (bell)
-xset s off  # No screensaver
-# xset dpms 0 0 0  # No energy saving (standby -> suspend -> off) (seconds)
-xset dpms 1800 0 0
+# b -- PC speaker in X (bell)
+# s -- screensaver
+# dpms -- energy saving (standby -> suspend -> off) (seconds)
+# r -- keyboard repeat
+xset b off s off \
+  dpms 1200 0 0  \
+  r rate 250 40  &
+
 # NOTE  XScreenSaver and xfce4-power-manager use their own DPMS settings and
 # override xset configuration. See XScreenSaver#DPMS and blanking settings and
 # Xfce#Display blanking for more information.
 #   SEE https://wiki.archlinux.org/index.php/Display_Power_Management_Signaling#Modifying_DPMS_and_screensaver_settings_using_xset
 #   http://fluxbox.sourceforge.net/docbook/en/html/app-setup.html
 
-xset r rate 250 40  # Keyboard repeat
+wait
