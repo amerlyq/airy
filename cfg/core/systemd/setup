@@ -3,3 +3,9 @@ source ~/.shell/func.d/cfgsetup
 has_pr systemd-notify && systemd-notify --booted || exit
 
 svc_activate -cue {demons,logoff,main}.target
+
+# Start user instance right after boot and keep beside sessions
+# USE:(to logoff) loginctl terminate-user "${USER:?}"
+if cfgOpt u; then
+  sudo loginctl enable-linger "${USER:?}"
+fi

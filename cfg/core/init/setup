@@ -8,12 +8,6 @@ svc_activate -cue \
   xorg.{socket,service,target} \
   xprofile.service
 
-# Start user instance right after boot and keep beside sessions
-# USE:(to logoff) loginctl terminate-user "${USER:?}"
-if cfgOpt u; then
-  sudo loginctl enable-linger "${USER:?}"
-fi
-
 ### startx ###
 linkcp {,~/.}xprofile
 linkcp {,~/.}xinitrc
