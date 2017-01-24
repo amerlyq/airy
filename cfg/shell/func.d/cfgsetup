@@ -87,7 +87,7 @@ _alias_append(){ local s f b e t tt m
   e="}; _alias_cat"
   t=$(command stat -c%Y "$s")
   tt=$(sed -n "\|^$b\s*\([0-9]\{10\}\)\$|{s//\1/p;q}" "$f")
-  (( t == tt )) && return
+  (( t == tt )) && echo "* A: $m" && return
   sed -i "
   \|^$b|,\|^$e$| {
     \|^$b|{
@@ -100,7 +100,7 @@ _alias_append(){ local s f b e t tt m
     r $s
     a $e
   }" "$f"
-  echo "W: aliases '$m'"
+  echo "+! A: $m"
 }
 
 # NOTE: supports file ./alias or directory ./alias/*

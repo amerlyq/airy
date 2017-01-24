@@ -1,5 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
+# MOVE: into cfg/airy/bin/defaults
 
 echo 'N: Defaults'
 
@@ -8,6 +9,7 @@ echo 'N: Defaults'
 #   !! even long-links will exist only after *mod* was resolved
 #   BET: don't use interdependent links between *mod* at all
 #   ALT: use 'make' etc for deps graph resolving -- BUT: sins like systemd
+#   ALT: run once before system install and once after
 
 ### AUTO ###
 if has_pr st; then term=st
