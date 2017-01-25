@@ -30,7 +30,7 @@ call dein#add('tpope/vim-speeddating', {
 
 
 "" Change textobj and propagate through the buffer {{{1
-" ALT: haya14busa/incsearch.vim + osyo-manga/vim-over
+" ALT: 'haya14busa/vim-asterisk' + 'osyo-manga/vim-over'
 call dein#add('AndrewRadev/multichange.vim', {
   \ 'on_cmd': 'Multichange',
   \ 'on_map': [['n', '[Space]m']],

@@ -130,6 +130,7 @@ call dein#add('haya14busa/vim-asterisk', {
 " LIOR: :OverCommandLine<CR> and in standalone input your expr:
 "   %s/../.../g  OR  /...  OR  %g/.../d
 " vim_version: '7.3'
+" ALT: AndrewRadev/multichange.vim
 call dein#add('osyo-manga/vim-over', {
   \ 'on_cmd': 'OverCommandLine',
   \ 'hook_source': _hcat('over.src'),
