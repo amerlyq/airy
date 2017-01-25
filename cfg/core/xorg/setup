@@ -8,4 +8,6 @@ svc_activate -cue \
   xorg.{socket,service,target} \
   wm.target xprofile.service
 
-linkcp -t /etc/X11/xorg.conf.d 20-intel.conf
+if lspci | grep -q 'VGA.*:\sIntel\s'; then
+  linkcp -t /etc/X11/xorg.conf.d 20-intel.conf
+fi

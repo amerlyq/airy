@@ -15,6 +15,7 @@ linkcp ./zshenv ~/.zshenv
 ./update
 
 # Choose default shell
+# BAD: when ./setup is called from ranger with SHELL=r.shell
 if has_pr zsh && [[ -z ${SSH_TTY-} && $(which zsh) != ${SHELL:?} ]]; then
   sudo chsh -s /bin/bash  # Root login shell
   sudo usermod -s "$(which zsh)" "$(whoami)"  # User shell

@@ -148,5 +148,5 @@ fun! s:ToggleRenderClosedFolds(line1, line2)
   endtry
 endf
 
-command! -bar -range=% RenderClosedFolds
+command! -bar -range=% PrintFolds
     \ call s:ToggleRenderClosedFolds(<line1>, <line2>)

@@ -165,6 +165,12 @@ TODO
     2017-01-23 [X] remove 'sudo' from linkcp
     2017-01-23 [X] rename all 'link' func into 'linkcp' script
       $ find -type d -name site -prune -o -type f -executable -exec grep -PHn '(?<!ip )\blink\b' {} \; VQ
+    [_] instead of using ./prf/* files -- use separate pieces of profile in each private *mod*
+      * PKG_LIST is placed inside of *airy* mod
+      * all profile pieces can be combined into single ./profile with non-exported environment for *airy*
+      * even regular *mod* can contain pieces of profile inside of it
+      * differs from ./env -- because ./env is always sourced into interactive sessions
+
   [_] NOTE: 'git augment' -- even share for doc can be changed
   [_] USE them or disable/deinstall them
       zeal

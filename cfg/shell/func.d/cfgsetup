@@ -83,7 +83,7 @@ _alias_append(){ local s f b e t tt m
   [[ ! -s $s ]] && return
   f=${CURR_DIR_CACHE:?}/aliases
   [[ -s $f ]] || (set +C; echo '# vim:ft=sh' > "$f")
-  b="_alias_cat(){# $m"
+  b="_alias_cat(){  # $m"
   e="}; _alias_cat"
   t=$(command stat -c%Y "$s")
   tt=$(sed -n "\|^$b\s*\([0-9]\{10\}\)\$|{s//\1/p;q}" "$f")
