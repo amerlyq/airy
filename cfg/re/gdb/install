@@ -4,13 +4,21 @@ source ~/.shell/func.d/packages
 pkg_inst 'gdb'
 
 if distro arch; then
-    pkg_inst -f '/usr/lib/python3.5/site-packages/six.py' 'python2-six'
-    aur_inst -f '/usr/share/peda/peda.py' peda-git
-    # ALT dual compatible: https://github.com/zachriggle/peda
+  pkg_inst -f '/usr/lib/python3.5/site-packages/six.py' 'python2-six'
+  aur_inst -f '/usr/share/pwndbg/gdbinit.py' pwndbg-git
+  # aur_inst -f '/usr/share/peda/peda.py' peda-git
+  # ALT dual compatible: https://github.com/zachriggle/peda
 
-elif distro ubuntu; then
-    git_inst ""
+elif distro ubuntu; then :
+  # sudo apt-get install python-psutil
+  # git clone https://github.com/pwndbg/pwndbg
+  # cd pwndbg && ./setup.sh
+
+  # ALT: for embedded gdb
+  #   sudo /usr/bin/python2.7 -m pip install --target /usr/local/lib/python2.7/dist-packages -Ur requirements.txt
+  #   for d in capstone unicorn; do (cd "$d" && sudo UNICORN_QEMU_FLAGS="--python=$(which python2)" ./make.sh install; cd bindings/python && sudo /usr/bin/python2.7 -m pip install --target /usr/local/lib/python2.7/dist-packages . ); done
+  # echo "Comment-out pwndbg from ~/.gitinit !!!"
+
+  # FIXED: (gdb) python gdb.COMPLETE_EXPRESSION = gdb.COMPLETE_SYMBOL
+  # USAGE: (gdb) source ~/.cache/airy/pkg/pwndbg/gdbinit.py
 fi
-
-# Enable peda:
-# echo 'source /usr/share/peda/peda.py' >> .gdbinit
