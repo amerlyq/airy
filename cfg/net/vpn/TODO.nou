@@ -5,7 +5,7 @@ USAGE
     $ pass "vpn/user" | openconnect --non-inter --passwd-on-stdin \
       --user="$VPN_USER" --authgroup="$VPN_GROUP" --pfs --authenticate "$VPN_SERVER"
     $ [[ -n $COOKIE && -n $FINGERPRINT ]] || exit 1
-    $ openconnect --non-inter --pfs --disable-ipv6 --reconnect-timeout=60 \
+    $ sudo openconnect --non-inter --pfs --disable-ipv6 --reconnect-timeout=60 \
       "$VPN_SERVER" --servercert "$FINGERPRINT" --cookie-on-stdin <<< "$COOKIE"
   ALSO
     DEBUG: --syslog --timestamp --verbose
@@ -26,6 +26,7 @@ TODO
       http://serverfault.com/questions/631037/how-to-route-only-specific-openvpn-traffic-through-a-openvpn-based-on-ip-filteri
       http://serverfault.com/questions/788910/openvpn-only-route-a-specific-ip-addresses-through-vpn
       http://stackoverflow.com/questions/29972745/redirect-only-web-requrements-through-vpn
+      [_] OLD: split https authorization (keys, cookies) by openvpn and content providing by regular net
 
     [_] bind apps to specific IP
       http://daniel-lange.com/archives/53-Binding-applications-to-a-specific-IP.html
