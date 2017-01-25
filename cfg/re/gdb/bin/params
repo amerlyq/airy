@@ -1,15 +1,19 @@
 #!/bin/sh -eu
 # SEE:BAD:(-L) http://unix.stackexchange.com/questions/34248/how-can-i-find-broken-symlinks
 
-ROOT=$(find "$PWD" -maxdepth 1 -xtype d -exec test -d "{}/lib" -a -d "{}/usr/lib" -a -f "{}/VERSION.TXT" \; -print -quit)
-CORE=$(find "$PWD" -maxdepth 2 ! -readable -prune -o -xtype f -regex '^.*/core\.[^/]+\.[0-9]+$' -print -quit)
+search(){ local t=$1 k=$2; shift 2
+  if test "$t" "${!k-}"
+  then v=$(readlink -e "${!k}")
+  else v=$( "$@" ); fi
+  readonly "$k=$v"
+}
+
+search -d ROOT find "$PWD" -maxdepth 1 -xtype d -exec test -d "{}/lib" -a -d "{}/usr/lib" -a -f "{}/VERSION.TXT" \; -print -quit
+search -f CORE find "$PWD" -maxdepth 2 ! -readable -prune -o -xtype f -regex '^.*/core\.[^/]+\.[0-9]+$' -print -quit
 # ALT: search archive with cores, then:
 #   tar --wildcards -C "$PWD" -zxvf "$CORE" 'core.*'
-
 pr=${CORE##*/core.}; pr=${pr%%.*}
-EXE=$(find -H "$ROOT" ! -readable -prune -o -xtype f -name "$pr" -print -quit)
-echo "$EXE"
-
+search -f EXE find -H "$ROOT" ! -readable -prune -o -xtype f -name "$pr" -print -quit
 
 if file -b "$EXE" | grep -qwF ARM; then
   unset xct_gdb
@@ -19,9 +23,9 @@ fi
 
 # [[ -n ${SRC-} ]] || SRC=$PJROOT/src
 # [[ -n ${BDR-} ]] || BDR=$PJROOT/buildroot
-GDB=$(ls -d "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb) || GDB=$xct_gdb
-GDB_DATA=${GDB%/*}
-LIBS=$(ls -d "$BDR"/build_*/staging_dir/lib)
+search -f GDB ls -d "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb || GDB=$xct_gdb
+search -d GDB_DATA echo "${GDB%/*}"
+search -d LIBS ls -d "$BDR"/build_*/staging_dir/lib
 
 # THINK: move exporting into 'session' MAYBE rename 'session' -> 'env'
 #   => this file must only print key-value results
