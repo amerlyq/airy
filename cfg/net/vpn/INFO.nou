@@ -1,0 +1,56 @@
+ALT
+  Wire Guard (modern)
+    https://www.wireguard.io/
+
+
+%% openconnect (SSL)
+  NEED: vpnc must be installed
+    $ openconnect -h
+  Authenticate only (w/o sudo) and print login info
+    $ openconnect --authenticate vpnserver
+
+  REF
+    2017-01-25 [X] https://wiki.archlinux.org/index.php/OpenConnect
+    http://www.infradead.org/openconnect/connecting.html
+    2017-01-25 [X] http://math.cmu.edu/~svasey/old-homepage-archive-2013/projects/old-stuff/openconnect-helpers_en.html
+  Routing whole traffic
+    2017-01-24 [X] https://nicholasyager.com/howto/2014/02/26/connecting-to-cisco-ipsec-vpn-on-linux.html
+  UC Irvine (UCI) VPN
+    + http://www.socsci.uci.edu/~jstern/uci_vpn_ubuntu/ubuntu-openconnect-uci-instructions.html
+    http://www.oit.uci.edu/kb/vpn-linux/
+      = SEE at bottom
+    $ openconnect -s /etc/vpnc/vpnc-script -u UCInetID -v vpn.uci.edu
+    # When prompt :> choose Group to use: pick UCI or UCIFull
+  openvpn
+    2017-01-24 [X] https://medium.com/@v4runvs/using-openconnect-instead-of-cisco-anyconnect-vpn-agent-d7bc7d9b1631
+    $ sudo openvpn --mktun --dev tun1
+    $ sudo ifconfig tun1 up
+    $ sudo openconnect -s /etc/vpnc/vpnc-script --user=user --authgroup=group --interface=tun1 gateway
+
+
+%% vpnc (IPSec)
+  /etc/vpnc/vpnc.conf
+  $ sudo vpnc vpnc.conf
+  $ sudo vpnc-disconnect
+  $ ip link $ OR $ ps aux | grep vpnc
+
+  REF
+    2017-01-24 [X] https://wiki.archlinux.org/index.php/Vpnc
+    2017-01-24 [X] http://feyhoa.org.ua/archives/1210
+      = SEE comments
+  netctl
+    2017-01-24 [X] https://michaelheap.com/arch-linux-netctl-and-vpnc-cisco-vpn/
+  router
+    https://github.com/openwrt/packages/blob/master/net/vpnc/README
+      OLD: https://wiki.openwrt.org/doc/howto/vpn.client.vpnc
+
+
+%% anyconnect
+  REF
+    http://www.oit.uci.edu/kb/vpn-linux/
+  network cert
+    http://chip0k.blogspot.com/2014/05/cisco-anyconnect-vpn-client-arch-linux.html
+
+
+%% cisco-vpnclient (OBSOLETE)
+  https://bbs.archlinux.org/viewtopic.php?id=171991

@@ -1,0 +1,64 @@
+USAGE
+  Interactive
+    $ openconnect SRV --user=USR --authgroup=GRP --pfs --disable-ipv6 --reconnect-timeout=60
+  Two-stage
+    $ pass "vpn/user" | openconnect --non-inter --passwd-on-stdin \
+      --user="$VPN_USER" --authgroup="$VPN_GROUP" --pfs --authenticate "$VPN_SERVER"
+    $ [[ -n $COOKIE && -n $FINGERPRINT ]] || exit 1
+    $ openconnect --non-inter --pfs --disable-ipv6 --reconnect-timeout=60 \
+      "$VPN_SERVER" --servercert "$FINGERPRINT" --cookie-on-stdin <<< "$COOKIE"
+  ALSO
+    DEBUG: --syslog --timestamp --verbose
+    Demon: --background --pid-file=..
+    Hardening: --pfs --no-system-trust --cafile=..
+
+
+TODO
+  ++ [_] netctl
+    https://wiki.archlinux.org/index.php/OpenConnect#Integration_in_netctl
+
+  [_] fine-tupe ip route rules
+    SEE: http://baturin.org/docs/iproute2/
+    [_] only choosen traffic must be goint through VPN
+      G: linux vpn redirect only ip
+      ! http://superuser.com/questions/983727/route-only-specific-traffic-through-vpn
+      http://superuser.com/questions/457020/openvpn-only-route-a-specific-ip-addresses-through-vpn
+      http://serverfault.com/questions/631037/how-to-route-only-specific-openvpn-traffic-through-a-openvpn-based-on-ip-filteri
+      http://serverfault.com/questions/788910/openvpn-only-route-a-specific-ip-addresses-through-vpn
+      http://stackoverflow.com/questions/29972745/redirect-only-web-requrements-through-vpn
+
+    [_] bind apps to specific IP
+      http://daniel-lange.com/archives/53-Binding-applications-to-a-specific-IP.html
+
+    [_] whole traffic going through VPN
+      +? https://airvpn.org/topic/16697-force-all-traffic-through-vpn-on-linux-killswitch/
+      ++ https://sweetcode.io/routing-all-traffic-through-a-vpn-gateway-on-linux/
+      $ ip route add <SERVER IP> via <CURRENT GATEWAY> dev <INTERFACE>
+      $ ip route add default via <VPN IP ADDRESS> dev <INTERFACE>
+      $ ip route delete default via <ORIGNIAL GATEWAY> dev <INTERFACE>
+
+    [_] VPN routing of DNS
+      http://security.stackexchange.com/questions/13900/if-i-use-a-vpn-who-will-resolve-my-dns-requests
+      +++ REF: http://www.isaserver.org/img/upl/vpnkitbeta2/dnsvpn.htm
+
+    [_] keep VPN active but don't reroute any traffic
+
+  [_] restore previous routing
+    delete all and add DFL back
+      $ ip rule flush && ip rule add priority 32767 lookup default
+    save/restore current rules
+      $ ip ro save scope global table all > ./bckp
+      $ ip ro flush scope global && ip ro restore < ./bckp
+
+  [_] NetworkManager
+    https://www.archlinux.org/packages/extra/i686/networkmanager-openconnect/files/
+      https://wiki.archlinux.org/index.php/NetworkManager
+    ALT: connman
+      https://github.com/aldebaran/connman/blob/master/doc/vpn-config-format.txt
+
+
+BUG
+  [_] BAD: --setuid="$USER" -- broken on exit
+    # Cannot open "/proc/sys/net/ipv4/route/flush": Permission denied
+    http://lists.infradead.org/pipermail/openconnect-devel/2013-August/001176.html
+    https://patchwork.ozlabs.org/patch/514804/

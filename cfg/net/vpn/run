@@ -1,0 +1,72 @@
+#!/bin/bash -eu
+# USAGE:DFL: non-interactive config = ./tmpl/vpn.conf
+# USAGE:ALT: env vars VPN_* from some profile
+set -o pipefail
+
+# THINK: simplify by using only 'config' variant
+pr=openconnect
+cfg=~/.cache/airy/vpn.conf
+pidf=${TMPDIR:-/tmp}/vpn.pid
+background=0
+interactive=0
+verbose=0
+
+trap 'pgrep -f "$pidf" >/dev/null || rm -f "$pidf"' EXIT
+pids(){ pgrep -f "$pidf" || pgrep "$pr"; }
+sigsend(){ local p; readarray -t p <<< "$(pids)"
+  (( ! ${#p[@]} )) || sudo kill "$@" -- "${p[@]}"; }
+
+while getopts 'bc:ikprv' o; do case $o
+in b) background=1
+;; c) cfg=$OPTARG  # Use: '' to force disabling
+;; i) interactive=1
+;; k) sigsend -INT; exit  # clean shutdown
+;; r) sigsend -USR2; exit  # reconnect on IP change
+;; p) pids; exit
+;; v) verbose=1
+;; :|'?') exit 2
+esac; done; shift $((OPTIND - 1))
+
+gpgdb=${VPN_GPG:-~/.cache/airy/gpg/vpn.gpg}
+
+if [[ -s $cfg ]]; then
+  # HACK: extract server from config's comments (no native support)
+  [[ -n ${server:=${1-}} ]] \
+  || server=$(sed -rn '/^#\s*server\s*=\s*(.*)\s*$/s//\1/p' "$cfg")
+else
+  server=${1-${VPN_SERVER-}}
+  user=${2-${VPN_USER:?}}
+  group=${3-${VPN_GROUP:?}}
+fi
+
+
+opts=( /usr/bin/"$pr" "$server" )
+((verbose)) && opts+=( --timestamp --verbose )
+((background)) && opts+=( --background --pid-file="$pidf" )
+
+[[ -s $cfg ]] \
+&& opts+=( --config="$cfg" ) \
+|| opts+=( --user="$user" --authgroup="$group" --pfs --disable-ipv6 )
+
+
+# BET? https://wiki.archlinux.org/index.php/Pass $ pass(){ pass 'vpn/user'; }
+pass(){ /usr/bin/gpg --use-agent --quiet --batch --decrypt "$1" \
+  | /usr/bin/awk -vk="$2" '$1~("\\y"k"\\y"){print$NF;exit}'; }
+vpnauth(){ "${opts[@]}" --authenticate "$@"; }
+
+# EXPL: first time -- only auth w/o sudo
+if ((interactive)) || [[ ! -s $gpgdb ]]; then
+  # THINK:DEV: if [[ -t 0 ]] always read pass from stdin ?
+  session=$( vpnauth )
+else
+  # THINK:RFC: replace pipe by $ exec < <(pass ...) $ BUT: need to restore &1
+  session=$( pass "$user@$server" "$gpgdb" | vpnauth --non-inter --passwd-on-stdin )
+fi
+
+
+unset COOKIE FINGERPRINT
+eval "$session"
+[[ -n $COOKIE && -n $FINGERPRINT ]] || exit 1
+
+execcon(){ exec sudo "${opts[0]}" --reconnect-timeout=60 "${opts[@]:1}" "$@"; }
+execcon --non-inter --servercert "$FINGERPRINT" --cookie-on-stdin <<< "$COOKIE"
