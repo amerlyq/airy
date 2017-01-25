@@ -116,3 +116,9 @@ Launch:
     0x804903c
     0x8049040
     2 patterns found
+  ALT: search all sections
+    (gdb) i r pc
+      pc: 0x2ceb1778
+    $ ./compile -q -batch -ex 'maint info section' > sec
+    $ awk -vv="0x2ceb1768" -F'\\s+|->' '!/->/{next} (strtonum($3)>0 && strtonum($4)-strtonum($3)>0x4) {print"echo "$7": ";print"find /w "$3", "$4"-0x4, "v}' sec >! bsrc
+    $ ./compile -q -batch -ex "source $PWD/bsrc" | grep -vF 'Pattern not found.'
