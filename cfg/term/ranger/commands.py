@@ -62,11 +62,14 @@ class ag(Command):
         return (cmdl, '')
 
     def _aug_sh(self, iarg, flags=[]):
-        if self.arg(iarg) == '-Q':
-            self.shift()
-            flags = ['--literal'] + flags
-        patt = self._bare(self._arg(iarg))
-        cmdl = ag.acmd.split() + flags + [patt]
+        if iarg == 1:
+            cmdl = ag.acmd.split() + self.rest(iarg).split()
+        else:
+            if self.arg(iarg) == '-Q':
+                self.shift()
+                flags = ['--literal'] + flags
+            patt = self._bare(self._arg(iarg))
+            cmdl = ag.acmd.split() + flags + [patt]
         if '-g' not in flags:
             cmdl += self._sel()
         return (cmdl, '-p')
