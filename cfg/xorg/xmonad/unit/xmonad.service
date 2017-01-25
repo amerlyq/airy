@@ -3,7 +3,7 @@ Description=DE - Window Manager - %P
 Conflicts=logoff.target
 Requires=xorg.target
 After=xorg.target xmobar.service
-# Before=xprofile.service
+Before=xprofile.service
 # FIXED: continues to run even if wm.target failed
 # PartOf=wm.target
 # OnFailure=st.service
