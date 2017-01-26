@@ -513,15 +513,16 @@ PROFILING
     " At this point do slow actions
     :profile pause
     :noautocmd qall!
-  NOTE: If you want to know slow loading plugins, you should use
-        the external tool or |--startuptime|.
-    : https://github.com/hyiltiz/vim-plugins-profile
+
+  NOTE If you want to know slow loading plugins, you should use the external tool or |--startuptime|.
+      https://github.com/hyiltiz/vim-plugins-profile
     Use to get statistics on long load
-      vim --startuptime profile.log
+      $ vim --startuptime profile.log
     Very verbose with timings
       vim -V12
       vim -V20/tmp/vimlog
-  Debug
+
+  DEBUG
     Hit Enter -- find who is cause screen to scroll up (only first reason remembered)
       :v:scrollstart
     Loadorder of *.vim by

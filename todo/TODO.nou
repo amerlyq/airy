@@ -114,6 +114,9 @@ TODO
       - attacker know what to expect from content by filename
     [_] FIND:(leaks clarification): https://lists.zx2c4.com/pipermail/password-store/
     [_] OR:REQ! send Qs to mail list
+  [_] BAD: dein.vim -- can't create 'on_map' if user mapping exists
+    ::: silent! nnoremap <unique><silent> J :call dein#autoload#_on_map('J', 'splitjoin.vim','n')<CR>
+    TODO: look at all plugin mappings and fix my overrides
 
   [_] DEV: './setup -a'
     + [_] do cleanup only in this mode

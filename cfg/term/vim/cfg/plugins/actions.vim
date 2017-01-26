@@ -44,15 +44,18 @@ call dein#add('AndrewRadev/multichange.vim', {
 "" CHECK: Transforms various languages oneline <--> block constructions {{{1
 " ALT: osyo-manga/vim-jplus
 " BAD: don't work with lazy loading
+" BAD: lazy dein can't reuse any already mapped keys like 'J/K'
+" BAD: fallback only to builtin 'J/K', ignoring user keymaps
 call dein#add('AndrewRadev/splitjoin.vim', {'on_if': 1,
   \ 'on_cmd': ['SplitjoinJoin', 'SplitjoinSplit'],
+  \ 'on_map': [['n', '[Space]j', '[Space]k']],
   \ 'hook_add': "
-\\n   let g:splitjoin_split_mapping = ''
-\\n   let g:splitjoin_join_mapping = ''
-\\n   nnoremap <unique><silent> [Space]j :SplitjoinJoin<CR>
-\\n   nnoremap <unique><silent> [Space]k :SplitjoinSplit<CR>
+\\n   let g:splitjoin_join_mapping = '[Space]j'
+\\n   let g:splitjoin_split_mapping = '[Space]k'
 \"})
 " 'hook_post_source': 'sil! exe "do FileType" &ft',
+" \\n   nnoremap <unique><silent> [Space]j :SplitjoinJoin<CR>
+" \\n   nnoremap <unique><silent> [Space]k :SplitjoinSplit<CR>
 
 
 
