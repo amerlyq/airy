@@ -3,7 +3,7 @@
 case "$1"
 in -p) shift; url=$(xsel -ob); (( ${#url} > 0 )) || exit; set -- "$@" "$url"
 ;; -g) shift; url='encrypted.google.com'; set -- "$@" "$url"
-;; -d) shift; set -- -no-connect -localhost -dump-width 200 -dump 1 -default-mime-type text/html "$@"
+;; -d) shift; set -- -dump-width 200 -dump 1 -default-mime-type text/html "$@";  # -no-connect -localhost
 ;; esac
 
 exec elinks "$@"

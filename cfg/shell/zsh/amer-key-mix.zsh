@@ -45,6 +45,9 @@ bindkey '\e[2~' overwrite-mode    # Insert
 bindkey '\M-f'  forward-word      # Alt-f
 bindkey '\M-b'  backward-word     # Alt-b
 bindkey '\M-d'  kill-word         # Alt-d
+# bindkey '\eOc'  forward-word      # control + right arrow
+# bindkey '\eOd'  backward-word     # control + left arrow
+# bindkey '\e[3^' kill-word         # control + delete
 
 
 # History completion on pgup and pgdown
@@ -114,6 +117,7 @@ bindkey -a '\C-x\C-m' set-fast-exec-cmd
 
 
 ### Miscellaneous
+bindkey '^I' expand-or-complete-prefix
 bindkey ' ' magic-space  # [Space] - do history expansion
 ## On <F12> in vim mode loads config debug aliases
 bindkey -as '^[[24~' '0d$isource ~/.shell/func.d/debug\n\e'

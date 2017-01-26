@@ -14,15 +14,6 @@ setopt promptsubst
 autoload -U colors
 colors
 
-## [user@machine]%             dir[~] jobs[0]
-if [ $(whoami) = "root" ] ; then
-    PROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[red]%}%n%{$reset_color%}%{$fg_bold[white]%}@%{$reset_color%}%{$fg_bold[blue]%}%m%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%}%# "
-    RPROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[blue]%}%~%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%} %{$fg_bold[yellow]%}[%{$reset_color%}%{$fg_bold[yellow]%}%j%{$reset_color%}%{$fg_bold[yellow]%}]%{$reset_color%}"
-else
-    PROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[green]%}%n%{$reset_color%}%{$fg_bold[white]%}@%{$reset_color%}%{$fg_bold[blue]%}%m%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%}%# "
-    RPROMPT="%{$fg_bold[blue]%}[%{$reset_color%}%{$fg_bold[blue]%}%~%{$reset_color%}%{$fg_bold[blue]%}]%{$reset_color%} %{$fg_bold[yellow]%}[%{$reset_color%}%{$fg_bold[yellow]%}%j%{$reset_color%}%{$fg_bold[yellow]%}]%{$reset_color%}"
-fi
-
 ##################
 # TAB COMPLETION #
 ##################
@@ -67,42 +58,3 @@ zstyle ':completion:*:approximate:*' max-errors 1 numeric
 ## completion for pacman (Arch Linux)
 zstyle ':completion:*:pacman:*' force-list always
 zstyle ':completion:*:*:pacman:*' menu yes select
-
-####################
-# JOBS (PROCESSES) #
-####################
-
-## display PID on suspend
-setopt longlistjobs
-
-## alert if something failed
-setopt printexitvalue
-
-## report background processes events immediately
-setopt notify
-
-## report background processes status when closing a shell
-#setopt nocheckjobs
-
-## don't kill background processes when closing a shell
-#setopt nohup
-
-################
-# KEY BINDINGS #
-################
-
-bindkey "^[[7~" beginning-of-line                           # Home
-bindkey "^[[8~" end-of-line                                 # End
-bindkey "^[[3~" delete-char                                 # Del
-bindkey "^[[5~" history-beginning-search-backward           # PageUp
-bindkey "^[[6~" history-beginning-search-forward            # PageDown
-bindkey "^[[A" up-line-or-history                           # Up Arrow
-bindkey "^[[B" down-line-or-history                         # Down Arrow
-bindkey "^[Oc" forward-word                                 # control + right arrow
-bindkey "^[Od" backward-word                                # control + left arrow
-bindkey "^H" backward-kill-word                             # control + backspace
-bindkey "^[[3^" kill-word                                   # control + delete
-bindkey "^R" history-incremental-pattern-search-backward    # control + r
-bindkey "^S" history-incremental-pattern-search-forward     # control + s
-# completion in the middle of a line
-bindkey '^i' expand-or-complete-prefix

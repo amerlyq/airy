@@ -5,26 +5,24 @@ autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
 
 # General
-setopt BRACE_CCL          # Allow brace character class list expansion.
-setopt COMBINING_CHARS    # Combine zero-length punctuation characters (accents)
+setopt brace_ccl          # Allow brace character class list expansion.
+setopt combining_chars    # Combine zero-length punctuation characters (accents)
                           # with the base character.
-setopt RC_QUOTES          # Allow 'Henry''s Garage' instead of 'Henry'\''s Garage'.
-unsetopt MAIL_WARNING     # Don't print a warning message if a mail file has been accessed.
-unsetopt SH_WORD_SPLIT    # Don't split value by words -- only on demand by
+setopt rc_quotes          # Allow 'Henry''s Garage' instead of 'Henry'\''s Garage'.
+setopt no_mail_warning    # Don't print a warning message if a mail file has been accessed.
+setopt no_sh_word_split   # Don't split value by words -- only on demand by
                           #   http://zsh.sourceforge.net/FAQ/zshfaq03.html
 
 # Jobs
-setopt LONG_LIST_JOBS     # List jobs in the long format by default.
-setopt AUTO_RESUME        # Attempt to resume existing job before creating a new process.
-setopt NOTIFY             # Report status of background jobs immediately.
-unsetopt BG_NICE          # Don't run all background jobs at a lower priority.
-unsetopt HUP              # Don't kill jobs on shell exit.
-unsetopt CHECK_JOBS       # Don't report on jobs when shell exit.
-
 # WARN: zsh you have running jobs
-# If I exit again, my jobs are killed. But zsh accept some useful option to overide this :
-# setopt NO_HUP
-# setopt NO_CHECK_JOBS
+# If I exit again, my jobs are killed. But zsh accept some useful option to overide this : nohup nocheckjobs
+setopt long_list_jobs     # List jobs on suspend in the long format by default.
+setopt auto_resume        # Attempt to resume existing job before creating a new process.
+setopt notify             # Report status of background jobs immediately.
+setopt no_bg_nice         # Don't run all background jobs at a lower priority.
+setopt no_hup             # Don't kill jobs on shell exit.
+setopt no_check_jobs      # Don't report on jobs when shell exit.
+setopt print_exit_value   # Alert if something failed
 
 { # New options (may be unavailable)
   setopt pipe_fail        # Exit pipe with rightmost non-zero code
