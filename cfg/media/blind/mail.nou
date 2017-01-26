@@ -1,0 +1,44 @@
+Hello World!
+
+I am pleased to announce the first release of blind[0]:
+version 1.0[1].
+
+blind command line video editor designed primarily for
+creating new videos. blind uses a raw video format with
+a very simple container. The raw video uses CIE XYZ
+encoded with `double`s, with an alpha channel. The blind
+tools avoid using parameters give in the command line
+as much as possible, and instead use videos, for examples
+to blurring a video you use blind-gauss-blur, but
+gauss-blur does not have an option for selecting the
+standard deviation, instead it expects a video file with
+these values, which allows for non-uniform blurring and
+time-based blurring.
+
+To use blind, you need to have ffmpeg installed. ffmpeg
+is used by the tool that convert video file into the
+format blind uses, and by the tool that makes the
+conversion in the opposite direction. You may also want
+to have ImageMagick installed this is however optional,
+but if you do not have it installed, you will have to
+manually specify either farbfeld or PAM when converting
+to or frame images. No other image format is supported
+without ImageMagick.
+
+blind is a video-only editor, you have to use other
+tools for editing the audio. ffmpeg can be used to add
+audio into a video file, extract audio, or concatenate
+audio file.
+
+One problem at the moment is that, unless you want to
+rip your hair out, you will need a shell that supports
+process substitution, which unfortunately is not too
+common. Korn shell, Bash, and if I am not mistaken, rc,
+are the only shells I know that supports this. However,
+I'm working a sh(1p)-implementation (that will not
+support even close to everything sh(1p) specifies)
+that will support process substitution as well as
+provide access to pipe(3) for more complicated pipelines.
+
+[0] http://tools.suckless.org/blind/
+[1] http://dl.suckless.org/tools/blind-1.0.tar.gz
