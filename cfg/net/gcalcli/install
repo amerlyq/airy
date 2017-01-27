@@ -6,10 +6,13 @@ if distro arch; then
   # BAD:(gcalcli-git): OAuth2 don't start automatically
   # BAD:(gcalcli-git): can't add events beside 'Quick'
   # aur_inst -p gcalcli{,-git}
-  if cfgOpt u; then  # v4.0a2
-    dst=$(dcache 'pacaur/gcalcli-git')
-    linkcp -ct "$dst" ./PKGBUILD
-    (cd "$dst" && updpkgsums && makepkg -sf)
+
+  pkg=gcalcli-git
+  dst=$(dcache "pacaur/$pkg")/PKGBUILD
+  if cfgOpt u || [[ ! -f $dst ]]; then  # v4.0a2
+    linkcp -c ./PKGBUILD "$dst"
+    (cd "${dst%/*}" && updpkgsums && makepkg -sf &&
+      paccache -d "$pkg" && sudo pacman -U --noconfirm "$pkg"-*.xz)
   fi
 
   aur_inst -Y {,python2-}vobject

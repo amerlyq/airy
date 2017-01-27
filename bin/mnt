@@ -60,6 +60,7 @@ domnt() { local TYPE DEVPATH=/dev/disk/by-label/$LBL
     [[ -e $DEVPATH ]] || die "No device at path"
 
     # Flash drive:  http://linuxsam.livejournal.com/18176.html
+    # ALT: mount -t vfat -o user,rw,fmask=0111,dmask=0000,codepage=866,nls=iso8859-5,utf8,noexec
 
     # FIXME: it's empty for all disks on my laptop mint?
     TYPE="$(sudo blkid "$DEVPATH" | sed -rn 's/.*TYPE="(\w+)".*/\1/p')"  # TYPE=...

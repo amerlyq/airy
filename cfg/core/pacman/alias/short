@@ -3,9 +3,9 @@
 # USE: -r/-a to use repo/aur only
 alias pacg='pacman -Sg'    # show list of package [g]roup
 alias paci='pacman -S'     # install
-alias pacI='pacman -U'     # install from files
+alias pacI='pacman -U'     # install from files on disk
 alias pacl='\pacman -Ql'   # list files (installed by a given package)
-alias pacL='\pacman -Qo'   # show path fr[o]m which package
+alias pacL='\pacman -Qo'   # show pkgs which contain arg path
 alias pacLr='_(){ command pacman -Qo "$(which "$1")"; }; _ '
 alias paco='\pacman -Qdt'  # list [o]rphans
 alias pacq='pacman -Si'    # info

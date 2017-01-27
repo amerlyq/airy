@@ -10,9 +10,6 @@ TODO: create outline graph to generate web-site for those text-proc utils
   $ renameutils  # deurlname to decode url file paths
     http://unix.stackexchange.com/questions/76500/how-to-remove-uri-encoding-from-file-names
 
-Toolsets
-  http://moo.nac.uci.edu/~hjm/ManipulatingDataOnLinux.html
-
 Filenames '.' and '..'
   http://unix.stackexchange.com/questions/148563/how-to-rename-file-to-dot-dot
 
@@ -23,25 +20,19 @@ Math tools (arithmetics in bash)
 Tips & tricks
   http://users.softlab.ece.ntua.gr/~ttsiod/tricks.html
   http://www.shellhacks.com/
+  Command-line gems for many utils and languages. Very useful.
+    http://www.commandlinefu.com/
 
 Bash re-run multiple consequtive commands
   hi --> fc 636 638 => editor => execute
   OR: hi --> eval "`fc -ln 636 638`"
   OR: fc -ln 636 638 | xsel -ib --> M-m
 
-ZSH
-  Cheetsheet (14p) | http://www.bash2zsh.com/
-  http://www.bash2zsh.com/zsh_refcard/refcard.pdf
-
 Build 32bit on 64 bit Linux using a configure script
  Then you can call configure as you said, specifyiong a 32-bit host and passing 32-bit compilation flags:
   ./configure --host=i686-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
 
 JavaSDK -- if ppa for 'oracle-java8-installer' added, but can't install Java
-
-Less
-  | v | you can invoke system default editor from within less, by pressing v.
-  http://www.computerhope.com/unix/uless.htm
 
 Grep in zip
   zgrep 'put-your-text-here' /your-file-path-here/file.gz
@@ -64,12 +55,6 @@ Diff
   | diff -r  dir1 dir2 | with file diffs
   | diff -rq dir1 dir2 | only notification about difference
 
-Fonts
-  https://wiki.archlinux.org/index.php/Font_Configuration#Fontconfig_configuration
-  http://www.x.org/archive/X11R6.8.0/doc/fonts2.html
-  Create your own
-    http://fontforge.github.io/en-US/
-
 Timerout
   timeout 5 /path/to/slow/command with options
   $COMMAND 2>&1 >/dev/null & WPID=$!; sleep $TIMEOUT && kill $! & KPID=$!; wait $WPID
@@ -80,12 +65,8 @@ Timerout
 Search man articles by part of name
   man -k passwd
 
-
 Child process
   http://unix.stackexchange.com/questions/124127/kill-all-descendant-processes
-
-Recover deleted files
-  http://www.opennet.ru/base/sys/recover_file10.txt.html
 
 Get the chmod numerical value for a file
   stat --format '%a' <file>
@@ -172,7 +153,7 @@ Remove last lines
 Ubuntu gnome terminal, disable cursor blinking
   gconftool-2 --set /apps/gnome-terminal/profiles/Default/cursor_blink_mode --type string off
 
-Outlook
+Outlook -- paste copybuffer into mail as plain text
   http://www.tech-recipes.com/rx/43875/outlook-2013-paste-as-plain-text-without-style-formatting/
 
 User/groups
@@ -205,9 +186,6 @@ Package mgrs
     $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 10
     MAYBE:(if not fixed after re-login): $ sudo ln -sv python2.7 /usr/bin/python
 
-  | pacman -U <file>   | install from disk
-  | pacman -Qo <file>  | search which pkg contains
-  | pacman -Ql <pkg>   | list all pkg files
   apt-get  -->  /var/cache/apt/archives/*.deb
   | if add-apt-repository not found:  | sudo apt-get python-software-properties
   | to remove unavailable ppa:        | sudo apt-get install ppa-purge, sudo ppa-purge [the ppa you want to remove]
