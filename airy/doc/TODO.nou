@@ -25,7 +25,14 @@ maint
 
 
 structure
-  [_] rename ./my -> ./gen[eral] | ./abs[tract] | ./choice | ./case
+  Abstraction: defaults -> ./mod -> ./pkg
+    [_] rename ./cfg -> ./pkg (for named main/aur pkgs only)
+    2017-01-27 [X] rename ./my -> ./mod
+      ALT: ./gen[eral] | ./abs[tract] | ./choice | ./case
+    [_] link by ./airy/defaults general ./mod with choosen ./pkg
+    [_] create category symlinks to choose variant ./pkg/{..} -> ./mod/$mod/use/*
+      THINK:BAD: excessive systemd cohesion -- we will be restricted by linked mods
+      BUT: we need symlinks somewhere anyways -- MAYBE in ./_build/use
   [_] store all control scripts inside //mod dir in each *mod*
   [_] THINK: use ./tmpl OR ./etc
   [_] create DFL ./tmpl/profile for *airy*
