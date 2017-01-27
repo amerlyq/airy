@@ -1,10 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-#| meld | cool text/directory comparator
-#| dhex | small ncurses binary diff programm with configurable controls
-#| bvi  | small vi-like editor with binary search on '\'
-
 #| wxHexEditor | gui hex edit / compare tool, can mark selection with tags
 #   * You can work with delete/insert bytes to file, more than once, without creating temp file!
 #   * Could open your devices on Linux, Windows or MacOSX.
@@ -14,15 +10,16 @@ source ~/.shell/func.d/packages
 #   * Added Sorted Tag Saving / Loading
 #   * Save selection as a dump file feature for make life easier.
 
-pkg_inst dhex
+pkg_inst dhex  # small ncurses binary diff programm with configurable controls
+distro arch && aur_inst bvi  # small vi-like editor with binary search on '\'
 
 # ==== X only ====
 has_pr X || die
 
-pkg_inst meld bless
+pkg_inst meld  # cool text/directory comparator
+pkg_inst bless
 
 if distro arch; then
-    aur_inst 'bvi'
     aur_inst -p 'wxHexEditor' wxhexeditor-git
 
 elif distro ubuntu; then

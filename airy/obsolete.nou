@@ -18,3 +18,34 @@
       all log send into /tmp/logfile
       filter all unnecessary info from output
       in the end show report with success and errors
+
+TODO
+  2014-11-30 [X] ALT: source erian profiles
+   Пусковой скрипт для установки должен находиться в erian: оттуда он будет
+   клонировать репозиторий в airy, бросать в него симлинк, запускать
+   инсталляцию системы и в конце концов выполнять функцию по установке
+   ссылки на репу самого erian.
+   Then: airy_profiles add to gitignore!
+  2014-11-30 [X] erian consists only from docs, profiles
+  2014-11-30 [X] Сделать скрипт install.sh принимающим target
+  2014-11-30 [X] <ALT> Разделить скрипт установки программ на отдельные модули
+   -- например установка только вима или urxvt итд по target на каждый
+   модуль и на каждую связку интеграции (например объединение
+   urxvt+vim+tmux) -- это позволит пользователям ставить всё выборочно
+   и не обязательно на чистую систему.
+   Плюс локализуются изменения, симлинки и конфиги отдельно на каждый
+   таргет, а всё общее вынесется в функции. Будет большая модульность.
+  2014-11-30 [X] Dir with profiles on erian
+    must make symlink into airy/deploy/profiles to work with it.
+    But then we will not be able to make erian the part of profile.
+    And it must be downloaded manually before! airy.
+  2014-11-30 [X] Names of autopulling repos (like erian) must also be part of profile to hide
+  2014-11-30 [X] all scripts -- need source funcs, or echoes error msgs, w/o installation
+  2014-11-30 [X] make deploy 'default' full profile, which partially applied for 'guest'
+  2014-11-30 [X] each will source 'default' and others to rewrite only necessary fields
+  2014-11-30 [X] in deploy your own profiles must distribute through private repos
+  2014-11-30 [X] Fix pristine dot's with awk concatenation
+  2014-11-30 [X] Test deploy on clear vbox snapshot my installation config
+   Они требуют существенной доработки порядка подгрузки функций
+   Ведь так получается, что у меня используются симлинки ещё до того, как
+   они буду проброшены!!!

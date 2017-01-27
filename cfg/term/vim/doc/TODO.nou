@@ -1,8 +1,3 @@
-Vis
-  Structural Regex (Sam editor)
-    https://asciinema.org/a/41361
-    http://www.perlmonks.org/?node_id=665719
-
 Neovim
   [_] BUG: 'gO' don't work for 'ru' layout -- jumps to file beg
   2017-01-10 [X] nvim + vimscript = no rainbow on main system, but has by ssh to ubuntu
@@ -277,6 +272,8 @@ BUG plugins
     [_] THINK vim-submode for search -- in context of source-navi
     [_] Definition lookup: ag+ctags
       : https://github.com/gorkunov/smartgf.vim
+    2015-03-10 [X] ag.vim -- remap 'go' for preview to 'v', and etc -- do fork and pull rqst
+      >> Have done own hacks to autoload/ftplugin/qf.vim, and I'm pleased now.
 
 
 BUG: wontfix
@@ -311,6 +308,26 @@ SMALL
     color of cursor for more contrast
   [_] CHECK vim search inside syntax objects -- to search only in strings or in function names
   [_] SEE http://vimcasts.org/episodes/the-file-explorer/
+  2015-03-10 [X] Remap pasting in block-wise mode so on 'P' current selection
+      prepended by register content instead of replacing
+    >> Unneeded: simply use 'p/P' in normal mode -- slightly uncomfortable, but simple
+  2014-11-30 [X] Vim Change 'Space' to insert several characters if press count before it
+  2014-11-30 [X] WRONG: for \ts combo syntax on ignores my changes in highlighting in ui.vim
+  2014-11-30 [X] vim MUST: http://dougblack.io/words/a-good-vimrc.html
+  2014-11-30 [X] Fix vim tcomment style for C.
+  2014-11-30 [X] BUG: vim -- C-N in plugin multi-edit
+  2014-11-30 [X] My vim copy-paste > get rid of "press enter problem" (cut first line only)
+  2014-11-30 [X] BUG: after reloading vim by ':e' Airline disables, maybe smth also
+    Bottom bar appear again after insert-mode, upper -- will never
+    It seems problem in 'after' settings 'syntax on', which was in otl
+  2014-11-30 [X] BUG: Airline disables after ':so $MYVIMRC' :>  Use ':AirlineRefresh'
+  2014-11-30 [X] check AirLineToggle on VBox to meashure CPU loading in the work process
+    :> So, it's only a few. 'syntax on' does much more
+  2014-11-30 [X] notate vim surround
+  2014-11-30 [X] Change vim colors of bkgr in ruler, which has ~,+ etc for git
+  2014-11-30 [X] make vim russian autoswitch for all -- not only for latex
+    I think better is manually choosen formats. Get the habit comment cpp in english!
+
 
 
 BUG:
