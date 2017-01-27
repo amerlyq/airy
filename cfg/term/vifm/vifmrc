@@ -1,3 +1,5 @@
+" vim: ft=vim
+
 set vicmd=vim
 set trash
 set history=100
@@ -40,8 +42,8 @@ command run !! ./%f
 command make !!make
 command vgrep vim "+grep %a"
 
-filextype *.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm feh %f 
-filextype *.pdf,*.dvju evince %f 
+filextype *.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm feh %f
+filextype *.pdf,*.dvju evince %f
 
 nmap gb :file &<cr>l
 
