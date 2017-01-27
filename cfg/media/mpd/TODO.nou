@@ -4,6 +4,12 @@ TODO:
   [_] Playlists for radio
     http://www.tristancollins.me/computing/bbc-streaming-radio-script-for-mpd/
   [_] SEE: play file online from position (w/o pre-bufferizing beginning chunk)
+  [_] SEE: $ playerctl $ instead of 'mpc'
+  [_] DEV: wrapper 'r.mpd' for 'mpc' and generate 'undo' ops to store in history log
+    * track/undo deleted songs
+    * track adding/replacing playlists
+    * track/undo deleted/moved/renamed files
+    ALT: write complete plugin for 'mpd' introducing undo ops with binary store fmt
 
   [_] BUG: play file online, immediately do ncmpcpp seek => resets to beginning
     MAYBE: only when you start seeking before 'buffer_before_play' is filled

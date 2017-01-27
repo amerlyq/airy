@@ -7,6 +7,14 @@ ALT:(curl) eye catching
 Basic    # -b "$cook" --cookie "$cook"
   curl -q --ntlm --user "${WORK_MAIL%%@*}" "${WORK_SRV_ATTEND}" 2>/dev/null | sed -r '/^<div id="masterViewContent">/,/^<\/div>/!d' | \w3m -T text/html | cat
 
+TODO
+  2015-04-09 [X] myspot -- use curl + Google browser identity + cookies + authorithation to get to http://myspot
+  [_] wget with redirection, cookies and user-agent
+    TEST: wget_it "http://sourceforge.net/projects/mht2htm/files/latest/download" "mht2htm.zip"
+    http://stackoverflow.com/questions/1324421/how-to-get-past-the-login-page-with-wget
+    http://unix.stackexchange.com/questions/45959/wget-is-returning-an-html-page-instead-of-original-file
+
+
 Cookie:
   7 TAB-separated fields meaning: domain, tailmatch, path, secure, expires, name, value
 

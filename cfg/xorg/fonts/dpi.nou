@@ -1,0 +1,50 @@
+%%%% wrong dpi
+HiDPI laptop and FullHD monitor have different linear size of graphic elements
+  * assumably, font also have different sizes
+  ! terminal font size seems wrong comparing to size in inches
+
+Linear font size in 'st' even after all settings is wrong
+  $ st -f monospace:pixelsize=101
+    => cursor must become 1 inch in height
+    ?? MAYBE font height is lesser then cursor height ??
+      # and only coincidentally it's 96/101 of full height
+      28mm > 25.4mm => seems like fontheight is truly lesser then cell height
+        => SEE in //st.c how much lesser
+    TRY: with forced half-dpi
+
+Settings have no effect
+  $ xdpyinfo G 'dim|reso'
+    dimensions:    1920x1080 pixels (506x285 millimeters)
+    resolution:    96x96 dots per inch
+  $ xrandr --dpi 101 && xdpyinfo G 'dim|reso'
+    dimensions:    1920x1080 pixels (482x271 millimeters)
+    resolution:    101x101 dots per inch
+  $ xrdb -query G dpi
+    Xft*dpi:        96
+  $ v ~/.Xresources && xrdb -load ~/.Xresources && xrdb -query G dpi
+    Xft*dpi:        102
+
+Seems like 'fontconfig' fixes 'pixelsize' and not 'size'
+  # <match target="pattern"><edit name="dpi" mode="assign"><double>250</double></edit></match>
+  $ DISPLAY=:0 FC_DEBUG=4 pango-view --font=monospace -t a G dpi
+    FcConfigSubstitute donePattern has 38 elts (size 48)
+      size: 4.608(f)(s)
+      pixelsize: 16(f)(s)
+      dpi: 250(f)(w)
+  https://www.freedesktop.org/software/fontconfig/fontconfig-user.html
+    Seems like 'dpi' is one of font properties ?
+    MAYBE it functionally restricts some other attributes ?
+  http://unix.stackexchange.com/questions/41062/forcing-font-size-based-on-language-in-fonts-conf
+    Apparently you cannot change the <size> of a font, but setting its <pixelsize> works perfectly. Very useful to force a given size on bitmap fonts.
+      ? MAYBE: my current font is fixed (hand-adjusted) => therefore pixelsize always 16 ?
+        => TRY: edit font params in fontconfig OR symlink to 10-scale-bitmap-fonts.conf (already have?)
+
+SEE:
+  https://encrypted.google.com/search?q=linux+fontconfig+wrong+dpi
+  https://bbs.archlinux.org/viewtopic.php?id=161277
+  https://github.com/adobe/brackets/issues/8059
+  https://lists.freedesktop.org/archives/fontconfig/2010-May/003433.html
+  + http://scanline.ca/dpi/
+  https://encrypted.google.com/search?q=linux%20fontconfig%20dpi%20no%20effect
+  https://bbs.archlinux.org/viewtopic.php?id=41635
+  https://encrypted.google.com/search?q=fontconfig%20pixelsize

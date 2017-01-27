@@ -1,96 +1,22 @@
-BUG
-  2014-12-05 [X] i3blocks after boot loads not always
-  2015-09-21 [X] Replace name and email in devq work
-  [_] BUG: ssh -t => tmux fonts problems. I must get rid of '-t' in r.ssh
-
-
 TODO
-  2017-01-08 [X] 2nd monitor (xmonad + xrandr)
-    [_] BUG? r.b -- don't opened second window
-    [_] (system freeze): unplug after monitor is disabled by its front-button
-  2017-01-09 [X] fontconfig setup from scratch
-  !! [_] wrong dpi ?
-    = Linear font size in 'st' even after all settings is wrong
-      $ st -f monospace:pixelsize=101
-        => cursor must become 1 inch in height
-        ?? MAYBE font height is lesser then cursor height ??
-          # and only coincidentally it's 96/101 of full height
-          28mm > 25.4mm => seems like fontheight is truly lesser then cell height
-            => SEE in //st.c how much lesser
-        TRY: with forced half-dpi
-    Settings have no effect
-      $ xdpyinfo G 'dim|reso'
-        dimensions:    1920x1080 pixels (506x285 millimeters)
-        resolution:    96x96 dots per inch
-      $ xrandr --dpi 101 && xdpyinfo G 'dim|reso'
-        dimensions:    1920x1080 pixels (482x271 millimeters)
-        resolution:    101x101 dots per inch
-      $ xrdb -query G dpi
-        Xft*dpi:        96
-      $ v ~/.Xresources && xrdb -load ~/.Xresources && xrdb -query G dpi
-        Xft*dpi:        102
-    Seems like 'fontconfig' fixes 'pixelsize' and not 'size'
-      # <match target="pattern"><edit name="dpi" mode="assign"><double>250</double></edit></match>
-      $ DISPLAY=:0 FC_DEBUG=4 pango-view --font=monospace -t a G dpi
-        FcConfigSubstitute donePattern has 38 elts (size 48)
-          size: 4.608(f)(s)
-          pixelsize: 16(f)(s)
-          dpi: 250(f)(w)
-      https://www.freedesktop.org/software/fontconfig/fontconfig-user.html
-        Seems like 'dpi' is one of font properties ?
-        MAYBE it functionally restricts some other attributes ?
-      http://unix.stackexchange.com/questions/41062/forcing-font-size-based-on-language-in-fonts-conf
-        Apparently you cannot change the <size> of a font, but setting its <pixelsize> works perfectly. Very useful to force a given size on bitmap fonts.
-          ? MAYBE: my current font is fixed (hand-adjusted) => therefore pixelsize always 16 ?
-            => TRY: edit font params in fontconfig OR symlink to 10-scale-bitmap-fonts.conf (already have?)
-    SEE:
-      https://encrypted.google.com/search?q=linux+fontconfig+wrong+dpi
-      https://bbs.archlinux.org/viewtopic.php?id=161277
-      https://github.com/adobe/brackets/issues/8059
-      https://lists.freedesktop.org/archives/fontconfig/2010-May/003433.html
-      + http://scanline.ca/dpi/
-      https://encrypted.google.com/search?q=linux%20fontconfig%20dpi%20no%20effect
-      https://bbs.archlinux.org/viewtopic.php?id=41635
-      https://encrypted.google.com/search?q=fontconfig%20pixelsize
   [_] audio system (pulse+mpd)
-  [_] convert .nou to .md for jekyll
-  [_] vim + ru -- usability
+  [_] fine-tune touchpad
+
+  [_] FIX:(fine-tune): vim + ru -- usability
+  [_] import my i3 todo features to XMonad
+    [_] ALSO move i3 scripts into //my/wm
+
   [_] gdb read full man
   [_] zsh read full man -- workflow w/o ranger at all
   [_] keyboard training -- in my remapped layout (ru)
-  [_] blender and video/image processing -- for amv
-  [_] G: vim/linux full text search
-    https://xapian.org/features
-      https://linux.die.net/man/1/quest
-    http://www.linux-magazine.com/Issues/2013/153/Full-Text-Search-Engines
+
   [_] haskell -- practice syntax (to enhance understanding of theory)
     +++ https://lotz84.github.io/haskellbyexample/
       https://github.com/mmcgrana/gobyexample
     http://www.cambridge.org/catalogue/catalogue.asp?isbn=0521644089
     http://stackoverflow.com/questions/3111997/nice-small-simple-real-life-programming-example-in-haskell
     ~ https://wiki.haskell.org/Example_code
-  [_] s.B errors
-    [_] gnome keyring fixup
-      http://www.linuxquestions.org/questions/linux-desktop-74/openbox-autostart-gnome-keyring-daemon-message-4175547333/
-    [_] compton+xmonad SIGINT/SIGTERM
-      => (always) -- wine32 + CookNotes
-      => similar intermitten ERR when closing Pidgin on <C-/> -- system hangs ?
-       Jan 11 00:20:56 neo udisksd[19845]: Acquired the name org.freedesktop.UDisks2 on the system message bus
-       Jan 11 00:20:57 neo compton[1359]: [    21.00 ] error    9 BadDrawable  request   14 minor    0 serial   3991: "BadDrawable (invalid Pixmap or Window parameter)"
-       Jan 11 00:20:57 neo compton[1359]: [    21.00 ] error    4 BadPixmap    request   54 minor    0 serial   4016: "BadPixmap (invalid Pixmap parameter)"
-       ...
-       Jan 11 00:20:57 neo xmonad[1203]: user error (Error in function getWindowAttributes)
-       Jan 11 00:20:57 neo xmonad[1203]: xmonad-x86_64-linux: user error (Error in function getWindowAttributes)
-       Jan 11 00:20:57 neo compton[1359]: [   552.44 ] error    3 BadWindow    request   15 minor    0 serial 212550: "BadWindow (invalid Window parameter)"
-       Jan 11 00:20:57 neo systemd[731]: xmonad.service: Main process exited, code=exited, status=1/FAILURE
-       Jan 11 00:20:57 neo xmonad[1203]: 00:20:57 INFO: SIGINT/SIGTERM received, shutting down!
-       Jan 11 00:20:57 neo xmonad[1203]: 00:20:57 INFO: Do the same again to forcefully quit.
-       Jan 11 00:20:57 neo systemd[731]: xmonad.service: Unit entered failed state.
-       Jan 11 00:20:57 neo systemd[731]: xmonad.service: Failed with result 'exit-code'.
-  [_] fine-tune touchpad
-  [_] THINK: hide info from journalctl to access only by root
-    => pentadactyl/qutebrowser print too much -- maybe personal info included
-    BUT? I must log it under that user anyway to investigate errors ?
+
   [_] nvim ':<cmd>' = cursor switches to 'bar' -- maybe due to nvim v0.20 > v0.17
   [_] nvim rework my /{ui\,ui-colors\,colors} for less code and more consistent experience
   [_] sshfs -- prevent system hangs after long idle time -- need to kill ssh
@@ -118,238 +44,57 @@ TODO
   [_] BAD: dein.vim -- can't create 'on_map' if user mapping exists
     ::: silent! nnoremap <unique><silent> J :call dein#autoload#_on_map('J', 'splitjoin.vim','n')<CR>
     TODO: look at all plugin mappings and fix my overrides
-
-  [_] DEV: './setup -a'
-    + [_] do cleanup only in this mode
-      = symlinks/configs/fonts-links/fontcache/etc
-      [_] make separate '-c' for cleanup-only mode
-    + [_] traverse -full- scenario for each *mod* to fail earlier
-    [_] restructure ./main to gather all files before processing
-      [_] separate groups for setup/install/update/aliases
-      [_] gather all packages to install/update
-      [_] gather all aliases to dump
-    [_] store all control scripts inside //mod dir in each *mod*
-    ! [_] return err if single-word *mod* in PKG_LIST isn't unique throughout all mods
-    [_] keep dfl ./profile inside 'airy'
-    [_] move from 'cfgsetup' to 'system'
-    [_] use it's own flags handler
-    [_] ALT: separate
-    [_] rename to 'maint'
-      ALT: use root Makefile
-    [_] move colorizing stuff in ./func.d
-    ? [_] what to do by default ?
-      only update 'packman' pkgs ? but we have 'pacman -Syu'
-    [_] encapsulate deploy system into independent 'airy' mod
-      = all notes can be kept there
-      [_] create ./ctl dir in pj root -- it's different kind of *mod* after all
-      [_] ./maint must be simple wrapper and actually call ./ctl/run
-      [_] MOVE colorize() into ./ctl/bin/colorize
-    [_] keep all mods inside ./mod directory
-      ? and create symlinks for categories tree inside ./_build ?
-      ALT: keep categories tree as it is and create symlinks into ./mod
-      ? ALSO:THINK: sep ./mymod for contents of ./bin and sparse functions ?
-        => also *mod* in ./mymod  work as switch proxy to multiple providers (like browsers)
-      ? beside ./mod need ./_obsolete dir
-      ? USE symlinks to *mod* instead of 'PKG_LIST'
-        + no need for recursive 'find'
-        + explicit list -- and user directly see which links were broken
-        + sep rel symlins list can be commited to own repo
-        - git <v2.10.2 on Windows will replace symlinks by text files
-          = so I can commit relative symblinks without problem
-    [_] Add alias file for some cfgs -- and on ./setup gather >> ~/.cache/airy/aliases
-      => instead of 'return' from sourced files use 'if..fi' guards
-    [_] gather all artifacts into '_build' dir instead of ~/.cache/airy/
-      [_] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
-      [_] add support for XDG_... env vars to determine symlink targets
-    [_] harden system security by using linkcp copy into sys dirs instead of symlinks
-    [_] TRY: generate PKGBUILD for each *mod* through my scripts set
-      + this allows clean uninstall previous versions
-      ALT: generate single package from whole 'airy'
-    [_] CHG: use pacaur instead of pacman on pkg update
-    2017-01-23 [X] remove 'sudo' from linkcp
-    2017-01-23 [X] rename all 'link' func into 'linkcp' script
-      $ find -type d -name site -prune -o -type f -executable -exec grep -PHn '(?<!ip )\blink\b' {} \; VQ
-    [_] instead of using ./prf/* files -- use separate pieces of profile in each private *mod*
-      * PKG_LIST is placed inside of *airy* mod
-      * all profile pieces can be combined into single ./profile with non-exported environment for *airy*
-      * even regular *mod* can contain pieces of profile inside of it
-      * differs from ./env -- because ./env is always sourced into interactive sessions
-
   [_] ranger
     [_] Compare other /usr/share/doc/ranger/examples
     [_] Check if image preview is fixed for 'st' and 'st+tmux'
-  [_] NOTE: 'git augment' -- even share for doc can be changed
-  [_] SEE: pqiv (found in ranger/riffle.conf)
-  [_] USE them or disable/deinstall them
-      zeal
-        + nice for multiple docs (perl, haskell, etc)
-        TODO:(setup) gen font size and spec docs list
-        TODO: menu on Menu ?
-      wxhexedit
-      xcape
-        + still useful 'multi' on overlay
-      ttf-comic-neue
-      zuki-themes (and other unused themes)
-      magnet2torrent-git
-    subjects to move to .cu
-      fpp xurls
-    replace by more appropriate
-      peda
-  [_] FIND: resume reading position inside man/pager/less to continue reading
-
   [_] query tmux cwd for xmonad <M-M1-Space> -- open r.t in cwd by run-xcwd
-  [_] (airy,aeternum) -- host gh-pages with all *.nou
-    Mark files for publishing with some #hashtag after modeline
-      Maybe even add modeline with publish options
-    Symlink/copy them into _posts, or directly convert into *.md
-      Derive publish header from modeline
-  [_] Create ./etc OR ./profile
-    # To keep template fileset with mods for new accounts
-    * one very simple with small set of features
-    * one rich with all settings
-  [_] move to ssh-agent/ssh-add from my own ghub:...
-    https://wiki.archlinux.org/index.php/SSH_keys
-    ALT: rewrite url in each **/<submodule>/config
-      ? are there analog to 'git config' ?
-      ? or use directly $ gS foreach 'git remote'
-  [_] restore deleted files
-    http://www.linux.org/threads/undelete-files-on-linux-systems.4316/
-  [_] make wrapper 'r.mpd' for 'mpc' and generate 'undo' ops to store in history log
-    * track/undo deleted songs
-    * track adding/replacing playlists
-    * track/undo deleted/moved/renamed files
-    ALT: write complete plugin for 'mpd' introducing undo ops with binary store fmt
 
 
-Deploy:
-  [_] add to installation script setting passwd for root and samba
-  [_] Shares -- in private profile
-  2015-06-05 [X] Insert vim installation and update check ALSO in vim_install (one-button)
-    : then delete it from list and try install again
-  2015-09-21 [X] Move install profile choosing (fast with apt-get only, or full with compile)
-    to git_install script, checking for flag and skipping if there isn't one
-    :> Concept is replaced with smart re-build only on diff
-  2015-09-21 [X] Проблема группирования -- по объекту (bash,vim,git) или по
-    стратегии (cfg, deploy, notes) решается через 'ln -r' симлинки в репе
-    :> По объекту группировка выгоднее если есть шоткаты быстрого доступа (..r, .cm)
-  2015-09-21 [$] Зависание установки geeknote из-за необходимости вводить пароль и логин
-    := Сделать его устанавливаемым только вручную!
-    :> Отказ от использования в пользу гит репозитория
-  2015-06-05 [X] Некоторые конфиги имеет смысл запускать только после установки программ!
-    choose_default -- после всех соотвествующих дефолтов (zsh, etc.)
-    vim -- после установки vim'а...
-    erian/install.sh -- which will install repos -- after all configs
-  2015-09-21 [X] Сделать автоматическое изменение локальных кредентиалов пользователя в репах
-    : individually for airy and devq
-    :> DONE by erian -- simply clone all repos from its install script
-  2015-09-21 [$] пароли для dir620 -- in profile
-    :хотя если я всё равно буду подключаться по SSH -- то проще
-    :использовать приватные ключи.
-
-RFC for REPO
-  [_] Move dev dirs erian_old -> devq
-  [_] Подписать все скрипты и файлики в строке 2
-    # MIT-License (c) 2014 amerlyq@gmail.com
+USE them or disable/deinstall them
+    zeal
+      + nice for multiple docs (perl, haskell, etc)
+      TODO:(setup) gen font size and spec docs list
+      TODO: menu on Menu ?
+    wxhexedit
+    xcape
+      + still useful 'multi' on overlay
+    ttf-comic-neue
+    zuki-themes (and other unused themes)
+    magnet2torrent-git
+  subjects to move to .cu
+    fpp xurls
+  replace by more appropriate
+    peda -> pwndbg ?
 
 
-  pristine.sh
-    default set must be small and fast in install, true necessary
-      first launch if don't exist file this script must:
-        dowload it, next -- skip
-          but dld again when added --update or --download
-        compile it, next -- skip
-          recompile only with flag --compile [app name] (concrete or all)
-          : it's long and mustn't be in default
-    script must parse args to be able load profiles
-      insert flag system similar to build-run script
-    empty launch must update installed set of apt-gets groups
-      so you need .cfg file for this (or option with flags in shenv)
-      wchg line PRISTINE_INSTALLED_GROUPS="${a}w"
-      Simpler: use conf file '.pristine' inside ~/pkg folder
-    [_] Add check into pristine if one of packages not found
-    [_] Make installation with progressbar:
-      all log send into /tmp/logfile
-      filter all unnecessary info from output
-      in the end show report with success and errors
-
-  [_] Backuping repo script :
-    Сделать скрипт, который бы подтаскивал репозитории на указанную
-    букву жёсткого диска. Тоесть по-сути использовать вышеобозначенный
-    скрипт для манипуляции кучей репозиториев. Это позволит сохранять
-    настройки и не зависеть от падающих серверов.
-
-For my bone:
-  Example of good git repo with multi-doxygen
-    https://github.com/ValveSoftware/steamos_mesa
-
-
-TODO
+DEV tools
   [_] FIND: C++ best doc gen -- for docs dir
-  !! [_] analyze my bookmarks (backups) and remove them from browsers
-  SEIZE
-    http://www.michurin.net/
-    http://nairobi-embedded.org/category/index.html
-  Network resources sharing
-    http://proft.me/2013/05/15/nfs-razdacha-fajlov-po-seti-pod-arch-linux-ubuntu/
-  SEIZE bash scripts
-    [_] https://github.com/erikw/dotfiles/tree/personal/bin
-    [_] https://github.com/guns/haus  # ALSO:SEE other stuff
-  2015-07-09 [$] Alias to goldendict  ::> Use cli 'dict'
-  2016-07-14 [$] Update i3-block pr and modules
+    Example of good git repo with multi-doxygen
+      https://github.com/ValveSoftware/steamos_mesa
   [_] Clang own style of formatting
     http://clang.llvm.org/docs/ClangFormat.html
     http://clang.llvm.org/docs/ClangFormatStyleOptions.html
-  [_] Fix synergy errors in debug mode with 'not found display'
-      Simply launch it
-  [_] convert to utf8 on unix and move into lyfa.
-    file -i *
-    enca -L ru *
-  2015-09-21 [$] Set backlight on mint. Again, afger Nvidia drivers
-    http://habrahabr.ru/post/236353/
-    ::> Moved to Archlinux, no problem. But maybe again useful for nvidia?
-  [_] Copy new setted gperftools script to sir.d
-  [_] Script on sys-start-up, which : cat ~/TODO | sed UNDONE | notify-send
-  [_] Ssh with two ip profiles -- for local net and for www.
-  [_] Split SSH on local and global parts, selected automatically
-  2015-09-21 [X] Find vim python completer and debugger
-  [_] Wuala
-    [X] move files.
-    [_] Find another file-saving.  Use copy.com? Torrent-sync? rsync?
-  [_] Rerun test every time as files in dir changes. Is it useful?
-    := May be useful for tests and demo in different windows
-    https://github.com/tartley/rerun
-  [_] Integrate script command for terminal
-    | 'script -afeq /tmp/log11'
-   Be aware: vim or ncurses is not logged appropriately! How to exclude?
-    See powerfull alternative: ah [ https://github.com/9seconds/ah ]
-      http://habrahabr.ru/post/242207/
-  [_] Rsync to ranger
-    | rsync -azP -nv --delete d1/ d2
-    : --exclude=pattern_to_exclude --include=pattern_to_include
-  [_] All uniques (remove all repeating)
-    | grep -Fvx -f umi media
-  [_] Use fim (fbi with vi-keys) intead of w3mimagedisplay
-    http://www.nongnu.org/fbi-improved/
-  Info with vim bindings
-    info info Advanced | vim -R -
-    info --vi-keys | but the supposed "vi" key bindings are really weird.
-    customise keybindings using the infokey tool (see Customizing Key Bindings and Variables).
-    A sample vi .infokey source file is already provided (see infokey source format).
-    It's worth learning GNU Info (info info-stnd) because it's the proper tool for viewing info files.
-    But the real way to read info files is with Emacs' Info mode (type C-h i).
-      Is it has sense to try mastering Emacs?
-
   [_] Xbindkeys src -- investigate how to hook on keyboard globally
+    => to develop my own kbd hooks
+
+
+TODO
+  !! [_] analyze my bookmarks (backups) and remove them from browsers
+  !! [_] aggregate last changes for week in all TODO under repo -- use this instead of single file
+  [_] Move dev dirs erian_old -> devq
+
   [_] FIX all the Makefiles of kedi and push them in aeternum
     O/%.o -> %.o, and %.c -> ?, .SUFFIXIES
     Group names (.._LST, .._DIR), changable in one group at beginning
     Dirs vars after that
     g++ and gcc targets, tests target;
-  [_] Blog seize
-    http://dev-lab.info/2013/08/%D1%88%D0%BF%D0%B0%D1%80%D0%B3%D0%B0%D0%BB%D0%BA%D0%B0-%D0%BF%D0%BE-git-%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B-%D1%81%D0%BB%D0%B8%D1%8F%D0%BD/
-  2014-12-01 12:56:13 [X] Git ENH
-    http://blog.mixu.net/2012/04/06/git-tips-and-tricks/
-
+  [$] Подписать все скрипты и файлики в строке 2
+    # MIT-License (c) 2014 amerlyq@gmail.com
+  [_] Backuping repo script :
+    Сделать скрипт, который бы подтаскивал репозитории на указанную
+    букву жёсткого диска. Тоесть по-сути использовать вышеобозначенный
+    скрипт для манипуляции кучей репозиториев. Это позволит сохранять
+    настройки и не зависеть от падающих серверов.
 
 Kernel:
   [_] combine through static objs -- instances of shared agent singleton with fields
@@ -360,51 +105,12 @@ Kernel:
 Asm:
   [_] 92-98 -- поделать вручную с опкодами и в IDAPro
   [_] hacker pick inducted arm overwrite code
-
-
-> THEME
-  [_] BUG: qt4 has plain style, when qt5 same as gtk FIX!
-[_] 40% Light white theme with inverted solarized in bash, vim, i3, ranger and else
-  [_] i3
-  [_] palette for i3blocks plugins
-  [X] urxvt
-  [X] vim
-  [_] ranger
-  [_] tmux
-  [X] 'highlight' in ranger
-  [_] 0% Tweaks
-    [_] cursor
-    [_] accent colors
-  [_] ? Make cursor color toggle in term when :set backgr? Save previous cursor color
-  [_] Choose one of variants: global color swap inside urxvt, or swap individually
-  [X] Add wrapper to urxvt to be able launch from i3 one ligth/dark/transp instance
-    It will be differ from default installed by theme
-
-TASKS
-  Kbuild> Read from :831
-    https://android.googlesource.com/kernel/common/+/android-3.10-adf/Documentation/kbuild/makefiles.txt
-  make> Read from 8.4
-    http://www.gnu.org/software/make/manual/make.html#File-Name-Functions
-  python> PEP
-    https://www.python.org/dev/peps/pep-0008/
-  python> Context managing (with + context)
-    http://preshing.com/20110920/the-python-with-statement-by-example/
-  >[_] MOVE his notes to me!!!
-    https://danielmiessler.com/study/
-  [_] Create ~/.bin/options-mixup
-  [_] LastPass, fix server, dump passwords to cryptocontainer
-  [_] vim_install: add spellcheck dld
-  [_] binary file parse on perl
-  [_] setup Wacom under linux with all bash bindings
-
-
-HW
-  [_] vbox laptop access web camera
-  [_] TRY: vmware sphere or cytrix -- thin client, virtualization
-    to be able switch between linux and windows when gaming (inject vcard)
-
+  [_] LEA and MOV in Intel manual
 
 Langs
   [_] Altogether::  JNI: java <-> cpp, Android, SDL
     http://www.dinomage.com/2013/05/howto-sdl-on-android-part-2-platform-details/
-  [_] LEA and MOV in Intel manual
+
+TASKS
+  [_] Create ~/.bin/options-mixup
+  [_] LastPass, fix server, dump passwords to cryptocontainer

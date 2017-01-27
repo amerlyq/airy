@@ -237,3 +237,18 @@ Remove tracking of unnecessary orphan branches (clean glg)
 
 Show author and commiter
   git show --format=full
+
+Status scripting
+  Check if pull needed
+    [[ $(git rev-parse HEAD) == $(git ls-remote $(git rev-parse --abbrev-ref @{u})) ]]
+    git rev-list HEAD...origin/master --count
+    [ "`git log --pretty=%H ...refs/heads/master^ | head -n 1`" = "`git ls-remote origin -h refs/heads/master |cut -f1`" ]
+  Faster checking if there are new commints in upstream before pull
+    : but works only if 'git fetch' before?
+    git rev-list HEAD@{upstream}..HEAD
+  Unstaged changes
+    if ! git diff-files --quiet --ignore-submodules --; then
+      git diff-files --name-status -r --ignore-submodules -- >&2
+  Uncommited changes
+    if ! git diff-index --cached --quiet HEAD --ignore-submodules --; then
+      git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2

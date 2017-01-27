@@ -22,6 +22,11 @@ SEE
   http://jekyllbootstrap.com/usage/blog-configuration.html
 
 TODO
+  [_] (airy,aeternum) -- host gh-pages with all *.nou
+    Mark files for publishing with some #hashtag after modeline
+      Maybe even add modeline with publish options
+    Symlink/copy them into _posts, or directly convert into *.md
+      Derive publish header from modeline
   [_] *.nou syntax highlighting
     https://jekyllrb.com/docs/templates/
     http://mycyberuniverse.com/web/syntax-highlighting-jekyll.html
@@ -29,6 +34,8 @@ TODO
     https://sacha.me/articles/jekyll-rouge/
     http://stackoverflow.com/questions/15672530/how-do-i-get-in-line-code-with-jekyll-and-pygments
     http://stackoverflow.com/questions/8648390/syntax-highlighting-markdown-code-blocks-in-jekyll-without-using-liquid-tags
+  [_] BET: convert .nou to .md for jekyll
+    $ find -type d -name site -prune -o -type f -executable -exec grep -PHn '(?<!ip )\blink\b' {} \; VQ
 
 BAD
   [_] feed.xml has wrong links to localhost:4000 instead of hosted

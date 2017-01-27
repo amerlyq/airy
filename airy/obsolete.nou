@@ -1,0 +1,20 @@
+%%%%% OBSOLETE
+  pristine.sh
+    default set must be small and fast in install, true necessary
+      first launch if don't exist file this script must:
+        dowload it, next -- skip
+          but dld again when added --update or --download
+        compile it, next -- skip
+          recompile only with flag --compile [app name] (concrete or all)
+          : it's long and mustn't be in default
+    script must parse args to be able load profiles
+      insert flag system similar to build-run script
+    empty launch must update installed set of apt-gets groups
+      so you need .cfg file for this (or option with flags in shenv)
+      wchg line PRISTINE_INSTALLED_GROUPS="${a}w"
+      Simpler: use conf file '.pristine' inside ~/pkg folder
+    [_] Add check into pristine if one of packages not found
+    [_] Make installation with progressbar:
+      all log send into /tmp/logfile
+      filter all unnecessary info from output
+      in the end show report with success and errors

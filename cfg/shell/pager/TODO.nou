@@ -22,10 +22,24 @@ SEE
   http://superuser.com/questions/117841/get-colors-in-less-command
   := lesspipe with pygmentize
 
+
+TODO
+  [_] FIND: resume reading position inside man/pager/less/info to continue reading man pages
   2016-03-02 [X] BUG: different coloring on launch and after resize. Seems ~/.less is read only after resize?
     :> SEE:FIXED: http://unix.stackexchange.com/questions/87261/getting-unexpected-colorized-output-on-several-commands
     :>> termcap vars are imported from env before ~/.lesskey
     : ALSO: export MANPAGER=less-color
+
+  [_] Customize 'info' (vim keys, etc)
+    http://www.gnu.org/software/texinfo/manual/info-stnd/html_node/Custom-Key-Bindings.html
+    $ info --vi-keys $  # but the supposed "vi" key bindings are really weird.
+    $ info info Advanced | vim -R -
+      * customise keybindings using the infokey tool (see Customizing Key Bindings and Variables).
+      * A sample vi .infokey source file is already provided (see infokey source format).
+      * It's worth learning GNU Info (info info-stnd) because it's the proper tool for viewing info files.
+    Emacs: the real way to read info files is with Emacs' Info mode (type C-h i).
+      Is it has sense to try mastering Emacs?
+
 
 CHECK
   export LESS="--RAW-CONTROL-CHARS"

@@ -4,10 +4,6 @@
 <    --Winston Churchill
 < I didn't believe in evil until I dated it.
 
-: Use-ready secure distro
-Kali-linux
-  http://docs.kali.org/general-use/kali-linux-virtual-box-guest
-
 Wifi crack + Kali
   http://habrahabr.ru/post/225483/
 
@@ -94,13 +90,6 @@ iptables
   sudo iptables -A OUTPUT -d 192.168.1.0/24 -m owner --cmd-owner sshd -j DROP
   sudo iptables -A OUTPUT -d 127.0.0.1 -m owner --cmd-owner sshd -j DROP
   sudo iptables -A OUTPUT -d 127.0.0.1 --dport <mpd-listen-port> -j ACCEPT
-
-Check browser certificates
-  http://security.stackexchange.com/questions/49006/list-of-certificate-authorities-in-browsers-and-mobile-platforms
-  https://wiki.mozilla.org/CA:IncludedCAs
-
-Check site certificate
-  http://www.cyberciti.biz/faq/test-ssl-certificates-diagnosis-ssl-certificate/
 
 Prevent server port scanning
   http://sysadm.pp.ua/linux/xtables-addons.html

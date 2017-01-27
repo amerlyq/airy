@@ -75,16 +75,16 @@ call dein#add('tyru/open-browser.vim', {
   \ 'hook_source': "
 \\n   let g:openbrowser_use_vimproc = 1
 \\n   let g:openbrowser_no_default_menus = 1
-\\n   let g:openbrowser_force_foreground_after_open = 1
+\\n   let g:openbrowser_force_foreground_after_open = 0
 \\n   let g:openbrowser_browser_commands = [
-\   {'background': 0, 'name': 'r.b', 'args': ['{browser}', '{uri}']},
+\   {'background': 1, 'name': 'r.b', 'args': ['{browser}', '{uri}']},
 \   {'background': 1, 'name': 'firefox', 'args': ['{browser}', '{uri}']},
 \   {'background': 0, 'name': 'w3m', 'args': ['{browser}', '{uri}']}
 \ ]
 \", 'hook_add': "
 \\n   let g:netrw_nogx = 1
-\\n   nmap gx <Plug>(openbrowser-smart-search)
-\\n   vmap gx <Plug>(openbrowser-smart-search)
+\\n   nmap <silent><unique> gx <Plug>(openbrowser-smart-search)
+\\n   vmap <silent><unique> gx <Plug>(openbrowser-smart-search)
 \"})
 
 

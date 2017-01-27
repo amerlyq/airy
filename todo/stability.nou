@@ -1,0 +1,18 @@
+Boot errors $ s.B
+  [_] gnome keyring fixup
+    http://www.linuxquestions.org/questions/linux-desktop-74/openbox-autostart-gnome-keyring-daemon-message-4175547333/
+  [_] compton+xmonad SIGINT/SIGTERM
+    => (always) -- wine32 + CookNotes
+    => similar intermitten ERR when closing Pidgin on <C-/> -- system hangs ?
+     Jan 11 00:20:56 neo udisksd[19845]: Acquired the name org.freedesktop.UDisks2 on the system message bus
+     Jan 11 00:20:57 neo compton[1359]: [    21.00 ] error    9 BadDrawable  request   14 minor    0 serial   3991: "BadDrawable (invalid Pixmap or Window parameter)"
+     Jan 11 00:20:57 neo compton[1359]: [    21.00 ] error    4 BadPixmap    request   54 minor    0 serial   4016: "BadPixmap (invalid Pixmap parameter)"
+     ...
+     Jan 11 00:20:57 neo xmonad[1203]: user error (Error in function getWindowAttributes)
+     Jan 11 00:20:57 neo xmonad[1203]: xmonad-x86_64-linux: user error (Error in function getWindowAttributes)
+     Jan 11 00:20:57 neo compton[1359]: [   552.44 ] error    3 BadWindow    request   15 minor    0 serial 212550: "BadWindow (invalid Window parameter)"
+     Jan 11 00:20:57 neo systemd[731]: xmonad.service: Main process exited, code=exited, status=1/FAILURE
+     Jan 11 00:20:57 neo xmonad[1203]: 00:20:57 INFO: SIGINT/SIGTERM received, shutting down!
+     Jan 11 00:20:57 neo xmonad[1203]: 00:20:57 INFO: Do the same again to forcefully quit.
+     Jan 11 00:20:57 neo systemd[731]: xmonad.service: Unit entered failed state.
+     Jan 11 00:20:57 neo systemd[731]: xmonad.service: Failed with result 'exit-code'.
