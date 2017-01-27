@@ -5,20 +5,20 @@ import ranger.api
 old_hook_init = ranger.api.hook_init
 
 
-def aura_options(fm):
-    # default, jungle, snow, solarized
-    fpath = os.path.expanduser('~/.cache/airy/theme')
+def get_colorscheme(fm):
     try:
+        fpath = os.path.expanduser('~/.cache/airy/theme')
         with open(fm.confpath(fpath), 'r') as f:
             theme = f.readline()
     except IOError:
         theme = "dark"
+
     theme = {"dark": "solarized", "light": "solarized"
              }.get(theme, "solarized")
 
     if "256color" not in os.getenv('TERM'):
         theme = "default"
-    fm.execute_console("set colorscheme " + str(theme))
+    return str(theme)
 
 
 def aura_pathes(fm):
@@ -41,7 +41,7 @@ def aura_pathes(fm):
 
 def hook_init(fm):
     old_hook_init(fm)
-    aura_options(fm)
+    fm.execute_console('set colorscheme ' + get_colorscheme(fm))
     aura_pathes(fm)
 
     # DISABLED: I already have two sets: <F1>..<F9> and <A-1>..<A-9>
