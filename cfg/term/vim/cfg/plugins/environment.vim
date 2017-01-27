@@ -74,6 +74,7 @@ call dein#add('amerlyq/recoverer.vim')
 " Works with buffer edit, argdo, bufdo, etc
 " EXPL:(non-lazy) always watch over Buf*au for save/restore state
 " \ 'on_cmd': ['CleanViewdir', 'StayReload']
+" ALT: tpope/vim-obsession
 call dein#add('kopischke/vim-stay')
 " set viewoptions=cursor,folds,slash,unix   " Recommended
 

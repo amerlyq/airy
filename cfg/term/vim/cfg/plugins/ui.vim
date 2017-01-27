@@ -5,15 +5,18 @@
 " call dein#add('severin-lemaignan/vim-minimap', {'on_cmd': 'MinimapToggle'})
 
 
-" TRY: direct jump to window
-" repo = 't9md/vim-choosewin'
-" on_map = {n = '<Plug>'}
-" hook_add = '''
-"   nmap g<C-w>  <Plug>(choosewin)
-"   let g:choosewin_overlay_enable = 1
-"   let g:choosewin_overlay_clear_multibyte = 1
-"   let g:choosewin_blink_on_land = 0
-" '''
+"" Tmux-like jump to window by index
+" ALT: [Frame]\\
+" THINK: remove all my 'z[lLhH]' mappings
+call dein#add('t9md/vim-choosewin', {
+  \ 'on_map': '<Plug>(choosewin)',
+  \ 'hook_source': "
+\\n   let g:choosewin_overlay_enable = 1
+\\n   let g:choosewin_overlay_clear_multibyte = 1
+\\n   let g:choosewin_blink_on_land = 0
+\", 'hook_add': "
+\\n   nmap <silent><unique>  <C-j>  <Plug>(choosewin)
+\"})
 
 
 "" Nice automatic view/scale/ctrl for split windows {{{1

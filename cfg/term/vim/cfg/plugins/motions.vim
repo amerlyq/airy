@@ -32,7 +32,6 @@ call dein#add('bkad/CamelCaseMotion', {
 
 
 
-
 "" Two-letters find on whole screen scope {{{1
 " ALT: saihoooooooo/glowshi-ft.vim
 " FIND: load plugin also on 'i_CTRL-o'
@@ -44,3 +43,21 @@ call dein#add('justinmk/vim-sneak', {
   \ 'depends': 'vim-repeat',
   \ 'hook_source': _hcat('vim-sneak.src'),
   \ 'hook_add': _hcat('vim-sneak.add')})
+
+
+
+"" Jump to line with -/=/+ indent
+call dein#add('jeetsukumaran/vim-indentwise', {
+  \ 'on_map': '<Plug>(IndentWise',
+  \ 'hook_add': "
+\\n   map <silent><unique>  [,  <Plug>(IndentWisePreviousLesserIndent)
+\\n   map <silent><unique>  [/  <Plug>(IndentWisePreviousEqualIndent)
+\\n   map <silent><unique>  [.  <Plug>(IndentWisePreviousGreaterIndent)
+\\n   map <silent><unique>  ],  <Plug>(IndentWiseNextLesserIndent)
+\\n   map <silent><unique>  ]/  <Plug>(IndentWiseNextEqualIndent)
+\\n   map <silent><unique>  ].  <Plug>(IndentWiseNextGreaterIndent)
+\\n   map <silent><unique>  [_  <Plug>(IndentWisePreviousAbsoluteIndent)
+\\n   map <silent><unique>  ]_  <Plug>(IndentWiseNextAbsoluteIndent)
+\\n   map <silent><unique>  [<Space> <Plug>(IndentWiseBlockScopeBoundaryBegin)
+\\n   map <silent><unique>  ]<Space> <Plug>(IndentWiseBlockScopeBoundaryEnd)
+\"})

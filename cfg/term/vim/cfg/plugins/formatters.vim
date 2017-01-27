@@ -38,6 +38,7 @@ call dein#add('thinca/vim-ft-help_fold', {'on_ft': 'help'})
 
 
 "" Auto-formatter for c/cpp/obj-c {{{1
+" 'hook_add': "map gQ  <Plug>(operator-clang-format)",
 call dein#add('rhysd/vim-clang-format', {
   \ 'if': executable('clang-format'),
   \ 'on_map': '<Plug>(operator-clang-format)',

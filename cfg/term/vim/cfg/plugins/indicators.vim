@@ -58,6 +58,7 @@ call dein#add('t9md/vim-quickhl', {
 "" Highlights first space of tab columns {{{1
 " EXPL: not in 'hook_source' because plugin isn't lazy
 " SEE:(iav_term) RangerChooser
+" TRY:ALT: https://github.com/Yggdroot/indentLine
 call dein#add('nathanaelkane/vim-indent-guides', {
   \ 'hook_add': _hcat('indent-guides.src') . "\n"
   \." nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>"})
@@ -67,6 +68,7 @@ call dein#add('nathanaelkane/vim-indent-guides', {
 "" Correlate brackets/tags color with their nesting depth {{{1
 " BUG: breaks syntax colors in too many formats (zsh, cmake, etc...)
 "  -- Also is culprit for memory/autocmd leaks
+" ALT: 'kien/rainbow_parentheses.vim'
 " BETTER: lisp, vim --> Activates only specified languages
 "   'sh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] }
 "   'zsh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] }

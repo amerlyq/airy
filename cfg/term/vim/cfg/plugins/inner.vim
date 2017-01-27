@@ -39,3 +39,8 @@ call dein#add('Shougo/vimfiler.vim', {
   \ 'depends': 'unite.vim'})
 " hook_add = 'nnoremap <silent>   [Space]v   :<C-u>VimFiler -invisible<CR>'
 " hook_source = 'source ~/.vim/rc/plugins/vimfiler.rc.vim'
+
+
+" autocmd! BufWritePost * Neomake
+" let g:neomake_cpp_enable_makers = ['clang', 'clangtidy']
+" let g:neomake_cpp_clang_args = ['-std=c++14']

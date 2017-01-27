@@ -19,7 +19,6 @@ set commentstring=#\ %s  " Use sh-style comments by default instead of c-style
 "{{{1 Multiline ============================
 set linebreak         " wrap only on \s chars
 " set breakat=\ \	;:,!?
-set showbreak=..
 " Move by arrow keys on previous/next line around ends of line in command mode
 set whichwrap=<,>
 set backspace=indent,eol,start  " delete indent and newline
