@@ -50,9 +50,10 @@ alias mountf='sudo fdisk -l'
 # --- Shorts for non-root ---
 if (( EUID != 0 )); then  # --calibrate
     SUDOLST=(chown mount umount powertop apt-get dpkg
-             dpkg-reconfigure reboot poweroff halt shutdown)
+             dpkg-reconfigure reboot poweroff halt shutdown
+             hibernate hibernate-ram)
     for nm in "${SUDOLST[@]}"; do
-        alias $nm='sudo '"$nm"' '
+        alias $nm='sudo '"$nm"
     done
     unset SUDOLST
 fi

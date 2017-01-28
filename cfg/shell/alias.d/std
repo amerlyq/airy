@@ -31,10 +31,13 @@ alias h='history'
 alias q='exit'
 
 alias df='df -H'
-alias du="du -ch"
+alias da='\du -sch'
+alias du='\du -ch'
 alias duh='du --max-depth=1' #Or: du -hd1
+
 alias mkdir='mkdir -pv'
 # mkdcd() { mkdir -p "$@" && cd "$_"; }
+alias rmdir.='cd ..; rmdir "$OLDPWD" || cd "$OLDPWD"'
 
 # alias _='sudo'
 # alias g='grep -in'

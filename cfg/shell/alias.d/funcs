@@ -28,6 +28,8 @@ ddb() { dd if="$1" bs=1 count=$((${2:-0})) skip=$((${3:-0})); }  #of="${1}.part"
 cmpb() { cmp -l $@ |
     gawk '{printf "%04X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)}'
 }
+# make a backup of a file
+bk() { cp -a "$1" "$1.$(date --iso-8601=seconds)"; }
 
 # Add an "alert" alias for long running commands. USAGE:  sleep 10; alert
 alias alert='notify-send --urgency=critical -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'

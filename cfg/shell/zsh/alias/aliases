@@ -17,8 +17,8 @@ alias -g NN='|tee /dev/tty'
 
 ## Viewers
 if (($+commands[$PAGER])); then
-  alias -g L='| $PAGER '
-  alias -g LL='| $PAGER -r '
+  alias -g L='| "$PAGER" '
+  alias -g LL='|& "$PAGER" -r '
 fi
 
 if (($+commands[$EDITOR])); then
