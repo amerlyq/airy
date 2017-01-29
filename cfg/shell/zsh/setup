@@ -1,6 +1,16 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
+# Choose default shell
+if cfgOpt r; then
+  # BAD: when ./setup is called from ranger with SHELL=r.shell
+  #   $(which zsh) != ${SHELL:?}
+  if has_pr zsh && [[ -z ${SSH_TTY-} ]]; then
+    sudo chsh -s /bin/bash  # Root login shell
+    sudo usermod -s "$(which zsh)" "$(whoami)"  # User shell
+  fi
+fi
+
 # Main destination for Zsh
 PREZTO=~/.cache/zsh/.zprezto
 linkcp -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc
@@ -13,10 +23,3 @@ fi
 linkcp ./zshenv ~/.zshenv
 # Refresh cache
 ./update
-
-# Choose default shell
-# BAD: when ./setup is called from ranger with SHELL=r.shell
-if has_pr zsh && [[ -z ${SSH_TTY-} && $(which zsh) != ${SHELL:?} ]]; then
-  sudo chsh -s /bin/bash  # Root login shell
-  sudo usermod -s "$(which zsh)" "$(whoami)"  # User shell
-fi
