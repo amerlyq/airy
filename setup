@@ -59,6 +59,13 @@ if cfgOpt r && [[ -f $mods ]]; then
     cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
 fi
 
+clean_tags(){ local d=$1
+  [[ ! -d $d ]] && return
+  find "$d" -type l -delete
+  find "$d" -type d -empty -delete
+  [[ ! -d $d ]]  # find deletes $d itself
+}
+
 started_anew(){ cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; }
 if started_anew "$@"; then
     # THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
@@ -67,6 +74,7 @@ if started_anew "$@"; then
     cfgOpt f && { echo "N: clean r.* symlinks"; rm -rf "${CURR_DIR_CACHE:?}/bin"/*; }
     cfgOpt f && { echo "N: clean aliases cache"; rm -rf "${CURR_DIR_CACHE:?}/aliases"; }
     { echo "N: clean systemd user units"; rm -rf ~/.config/systemd/user/*; }
+    { echo "N: clean tags"; clean_tags "_build/tags"; }
 fi
 
 ### Setup all configs ==================================================
@@ -109,6 +117,27 @@ else
     [[ -f $queue ]] || cp -vT "$mods" "$queue"
 fi
 
+# DEV: add one of _[un]used tags by checking in PKG_LIST
+link_tags(){ local dst=$1 ts ta
+  mkdir -p "$dst"
+  pushd "$dst" >/dev/null
+  while IFS= read -r d; do [[ -f $d/setup ]] || continue
+    ts=$(sed -rn '/^#\s*tags:((\s*[[:alnum:]_]+)+)/s//\1/p' "$d/setup")
+    [[ $ts =~ ^\s*$ ]] && ta=() || readarray -t ta <<< "$ts"
+    for t in "${ta[@]}"; do
+      [[ "$t/${d##*/}" -ef $d ]] && continue
+      mkdir -p "$t"
+      ln -snTr "$d" "$t/${d##*/}"
+    done
+  done <<< "$(<"$mods")"
+  popd >/dev/null
+}
+
+# TODO: sep key '-g' to generate tags, info, etc
+if cfgOpt d; then
+  link_tags '_build/tags'
+fi
+
 ### Mods ===============================================================
 # FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
 # EXPL: -m (in main 'setup') forces single thread execution
@@ -120,7 +149,7 @@ printf "${C15}LIST:$C12( %s )$CR\n" "${PKG_LIST[*]}"
 printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
 printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
 
-while read d; do echo ">>> $d <<<"
+while IFS= read -r d; do echo ">>> $d <<<"
     # BUG: some packages (like gcc-multilib) aren't replaced even with -u)
     if cfgOpt i; then run "$d/install" $(cfgOpt f && echo -u); fi
     run "$d/setup" $(cfgOpt u && echo -u)
