@@ -1,25 +1,12 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
+cfgNo c || git clean -Xdi -- "$PWD"
+
 ### LINKS ###
 linkcp "$PWD" ~/.config/ranger
 
-
-if cfgOpt c; then while read line
-do rm -vf "${PWD}${line}"; done < "$PWD/.gitignore"; fi
-
 if cfgOpt u; then
-echo "N: USE: ranger --copy-config=all (Be Careful!), and see diff"; exit; fi
-
-
-case "${SHELL:?}" in *bash) RC=~/.bashrc ;; *zsh) RC=~/.zshrc ;; esac
-RC="$RC $HOME/.cache/zsh/.zshrc"
-if ! grep -q "${TMPDIR:-/tmp}/ranger_cwdir" $RC 2>/dev/null; then
-    echo "===========================
-    >>> Place in your shell's config ($RC):
-    # To sync zsh and ranger working directories:"
-    case "$SHELL" in *bash) printf 'finish()'
-    ;; *zsh) printf 'function finish' ;; esac
-    echo '{ echo "$PWD" > "${TMPDIR:-/tmp}/ranger/cwd"; }
-    trap finish EXIT'
+  echo "N: USE: ranger --copy-config=all (Be Careful!), and see diff"
+  echo "W: for 'auto-cwd' on exit use '_ranger_cwd()' from ~/.shell/common"
 fi
