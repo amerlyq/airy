@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+pkg_inst bluez bluez-utils obexfs
+
+if ! id | grep -q '(lp)'; then
+  sudo usermod -aG lp "${CURR_USER:?No}"
+  printf "\n!!! Re-login in this shell/session or reboot to update changes in Groups\n"
+fi
