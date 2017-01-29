@@ -16,7 +16,7 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
 " DEPRECATED:
 "   - (bloated) tpope/vim-surround
 call dein#add('rhysd/vim-operator-surround', {
-  \ 'on_map': [['nx', '<Plug>']],
+  \ 'on_map': [['nxo', '<Plug>']],
   \ 'depends': 'vim-operator-user',
   \ 'hook_source': _hcat('surround.src'),
   \ 'hook_add': _hcat('surround.add')})
@@ -36,7 +36,9 @@ call dein#add('rhysd/vim-operator-surround', {
 call dein#add('thinca/vim-quickrun', {
   \ 'on_map': {'n': '<Plug>'},
   \ 'on_cmd': 'QuickRun',
-  \ 'hook_add': 'nmap <silent> [Space]r <Plug>(quickrun)'})
+  \ 'hook_add': "
+\\n   nmap <silent> [Space]r <Plug>(quickrun)
+\"})
 
 
 
@@ -57,7 +59,7 @@ call dein#add('kana/vim-operator-replace', {
 "" Converts snake/camel case of joined words {{{1
 " ALT: https://github.com/tpope/vim-abolish (SEE coersion -- 4 case converters)
 call dein#add('tyru/operator-camelize.vim', {
-  \ 'on_map': '<Plug>',
+  \ 'on_map': [['nxo', '<Plug>']],
   \ 'hook_add': "
 \\n   map <silent><unique> <Leader>~  <Plug>(operator-camelize-toggle)
 \"})
@@ -103,7 +105,7 @@ call dein#add('tpope/vim-commentary', {
 
 " BAD:THINK: if plugin isn't installed -- 'y' won't work at all
 call dein#add('haya14busa/vim-operator-flashy', {
-  \ 'on_map': '<Plug>(operator-flashy)',
+  \ 'on_map': [['nxo', '<Plug>(operator-flashy)']],
   \ 'depends': 'vim-operator-user',
   \ 'hook_source': "
 \\n   hi def Flashy term=reverse cterm=reverse gui=reverse
@@ -124,7 +126,7 @@ call dein#add('haya14busa/vim-operator-flashy', {
 " TODO replace [a ]a with ',a' OR '<Tab>a', and move Ag to '[Frame]a]'
 " CHG mappings: [[xo, aa, ia], [n, ga, gA, '[a', ']a']]
 call dein#add('AndrewRadev/sideways.vim', {
-  \ 'on_map': '<Plug>Sideways',
+  \ 'on_map': [['nxo', '<Plug>Sideways']],
   \ 'on_cmd': 'Sideways*',
   \ 'depends': 'vim-repeat',
   \ 'hook_add': "

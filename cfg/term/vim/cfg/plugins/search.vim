@@ -7,7 +7,7 @@
 " let g:ag.qhandler="botleft lopen 7"  "OR: copen 20"
 call dein#add('amerlyq/agn.vim', {'lazy': 0,
   \ 'if': executable('ag'),
-  \ 'on_map': '<Plug>(ag-',
+  \ 'on_map': [['nx', '<Plug>(ag-']],
   \ 'depends': 'vim-operator-user',
   \ 'hook_source': "
 \\n   let g:ag = {}
@@ -44,7 +44,7 @@ call dein#add('stefandtw/quickfix-reflector.vim', {
 " FIXED:('if': 0): for 'nvim segfault encode_tv2string()' or ':mess incsearch recursive'
 call dein#add('haya14busa/incsearch.vim', {
   \ 'on_source': ['incsearch-fuzzy.vim', 'vim-anzu', 'vim-asterisk'],
-  \ 'on_map': '<Plug>',
+  \ 'on_map': [['nxo', '<Plug>']],
   \ 'depends': 'vim-repeat',
   \ 'hook_source': _hcat('incsearch.src'),
   \ 'hook_add': "
@@ -63,7 +63,7 @@ call dein#add('haya14busa/incsearch.vim', {
 call dein#add('haya14busa/incsearch-fuzzy.vim', {
   \ 'if': 'dein#tap("incsearch.vim")',
   \ 'on_func': 'incsearch#config#fuzzy',
-  \ 'on_map': '<Plug>',
+  \ 'on_map': [['nxo', '<Plug>']],
   \ 'depends': 'incsearch.vim',
   \ 'hook_add': "
 \\n   fun! s:cfg_fuzzy(...) abort
@@ -92,7 +92,7 @@ call dein#add('osyo-manga/vim-anzu', {
   \ 'if': 'dein#tap("incsearch.vim")',
   \ 'on_source': 'vim-asterisk',
   \ 'on_func': 'anzu#',
-  \ 'on_map': ['<Plug>', ['n', '<Leader>#', '<Leader>*']],
+  \ 'on_map': [['n', '<Plug>', '<Leader>#', '<Leader>*']],
   \ 'on_cmd': ['AnzuUpdateSearchStatus', 'AnzuSignMatchLine'],
   \ 'depends': 'incsearch.vim',
   \ 'hook_source': "
@@ -114,7 +114,7 @@ call dein#add('osyo-manga/vim-anzu', {
 " USE: [*, #, g*, g#, z*, z#, gz*, gz#], z8 -- Easier to press
 call dein#add('haya14busa/vim-asterisk', {
   \ 'if': 'dein#tap("incsearch.vim")',
-  \ 'on_map': '<Plug>',
+  \ 'on_map': [['nxo', '<Plug>']],
   \ 'hook_add': "
 \\n   for k in ['*', '#', 'g*', 'g#', 'z*', 'z#', 'gz*', 'gz#']
 \\n     exe 'map <unique> '.k.' <Plug>(incsearch-nohl'.(k=~#'z'?'0':'').')'.

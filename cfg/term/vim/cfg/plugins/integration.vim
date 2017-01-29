@@ -70,7 +70,7 @@ call dein#add('chrisbra/vim-diff-enhanced', {
 " BUG: sometimes works in same thread, loading CPU. TEMP:FIX: ./setup -U vim
 " ALT:CHG: r.b --target tab "$@" BUT how to choose target window (named)?
 call dein#add('tyru/open-browser.vim', {
-  \ 'on_map': '<Plug>(openbrowser-',
+  \ 'on_map': [['nx', '<Plug>(openbrowser-']],
   \ 'on_cmd': 'OpenBrowserSmartSearch',
   \ 'hook_source': "
 \\n   let g:openbrowser_use_vimproc = 1
@@ -125,7 +125,7 @@ call dein#add('guns/xterm-color-table.vim', {
 "   - powerman/vim-plugin-viewdoc
 call dein#add('KabbAmine/zeavim.vim', {
   \ 'if': executable('zeal'),
-  \ 'on_map': ['<Plug>ZV', '<Plug>Zeavim'],
+  \ 'on_map': [['nv', '<Plug>ZV', '<Plug>Zeavim']],
   \ 'hook_source': "let g:zv_disable_mapping = 1",
   \ 'hook_add': "
 \\n   nmap <unique> <silent> g?  <Plug>Zeavim

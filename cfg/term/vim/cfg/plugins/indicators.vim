@@ -41,7 +41,7 @@ call dein#add('kshenoy/vim-signature', {
 " CHG: [[n, qh, qH, <Leader>?h]]
 " let g:quickhl_manual_colors = [ "ctermbg=..", ... ]
 call dein#add('t9md/vim-quickhl', {
-  \ 'on_map': [['n', '<Plug>(operator-quickhl-', '<Plug>(quickhl-']],
+  \ 'on_map': [['nv', '<Plug>(operator-quickhl-', '<Plug>(quickhl-']],
   \ 'on_cmd': ['QuickhlManualList', 'QuickhlCwordToggle', 'QuickhlTagToggle',
   \            'QuickhlManualLockToggle', 'QuickhlManualLockWindowToggle'],
   \ 'depends': 'vim-operator-user',

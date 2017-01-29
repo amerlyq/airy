@@ -3,7 +3,7 @@
 "" CHECK: Ascii graph drawing in vim {{{1
 call dein#add('vim-scripts/DrawIt', {
   \ 'on_cmd': 'DrawIt',
-  \ 'on_map': '<Plug>DrawIt',
+  \ 'on_map': [['n', '<Plug>DrawIt']],
   \ 'hook_add': "
 \\n   map <unique> [Unite]DI  <Plug>DrawItStart
 \\n   map <unique> [Unite]DS  <Plug>DrawItStop

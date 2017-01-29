@@ -39,7 +39,7 @@ call dein#add('bkad/CamelCaseMotion', {
 "   - (bloated) Lokaltog/vim-easymotion
 "   - (altered) https://github.com/rhysd/clever-f.vim
 call dein#add('justinmk/vim-sneak', {
-  \ 'on_map': '<Plug>Sneak',
+  \ 'on_map': [['nxo', '<Plug>Sneak']],
   \ 'depends': 'vim-repeat',
   \ 'hook_source': _hcat('vim-sneak.src'),
   \ 'hook_add': _hcat('vim-sneak.add')})
@@ -48,7 +48,7 @@ call dein#add('justinmk/vim-sneak', {
 
 "" Jump to line with -/=/+ indent
 call dein#add('jeetsukumaran/vim-indentwise', {
-  \ 'on_map': '<Plug>(IndentWise',
+  \ 'on_map': [['nxo', '<Plug>(IndentWise']],
   \ 'hook_add': "
 \\n   map <silent><unique>  [,  <Plug>(IndentWisePreviousLesserIndent)
 \\n   map <silent><unique>  [/  <Plug>(IndentWisePreviousEqualIndent)

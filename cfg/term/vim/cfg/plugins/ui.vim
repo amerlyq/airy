@@ -9,7 +9,7 @@
 " ALT: [Frame]\\
 " THINK: remove all my 'z[lLhH]' mappings
 call dein#add('t9md/vim-choosewin', {
-  \ 'on_map': '<Plug>(choosewin)',
+  \ 'on_map': [['n', '<Plug>(choosewin)']],
   \ 'hook_source': "
 \\n   let g:choosewin_overlay_enable = 1
 \\n   let g:choosewin_overlay_clear_multibyte = 1
@@ -23,7 +23,7 @@ call dein#add('t9md/vim-choosewin', {
 " SEE http://zhaocai.github.io/GoldenView.Vim
 " NOT:(lazy) because I split by many different ways from the start
 call dein#add('zhaocai/GoldenView.Vim', {'lazy': 0,
-  \ 'on_map': ['<Plug>GoldenView', '<Plug>ToggleGoldenView'],
+  \ 'on_map': [['n', '<Plug>GoldenView', '<Plug>ToggleGoldenView']],
   \ 'hook_add': _hcat('golden-view.add'),
   \ 'hook_source': "
 \\n   let g:goldenview__enable_at_startup = 1

@@ -83,7 +83,7 @@ call dein#add('AndrewRadev/linediff.vim', {
 " ALSO: NN, [[ nx, <Leader>[nN], [Frame][nN] ]]
 call dein#add('chrisbra/NrrwRgn', {
   \ 'on_func': 'nrrwrgn#',
-  \ 'on_map': '<Plug>Nrrwrgn',
+  \ 'on_map': [['nx', '<Plug>Nrrwrgn']],
   \ 'on_cmd': ['NR', 'NW', 'NRV', 'NUD', 'NRP', 'NRM', 'NRL'],
   \ 'hook_source': _hcat('nrrwrgn.src'),
   \ 'hook_add': _hcat('nrrwrgn.add')})

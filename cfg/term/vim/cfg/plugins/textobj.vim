@@ -9,7 +9,7 @@ call dein#add('kana/vim-textobj-user', {'lazy': 0,
 
 "" Use only part of any [ai].. textobj {{{1
 call dein#add('tommcdo/vim-ninja-feet', {
-  \ 'on_map': '<Plug>(ninja',
+  \ 'on_map': {'no': '<Plug>(ninja'},
   \ 'hook_source': 'let g:ninja_feet_no_mappings = 1',
   \ 'hook_add': "
 \\n   omap <silent><unique>  <i  <Plug>(ninja-left-foot-inner)
@@ -209,7 +209,7 @@ call dein#add('kana/vim-textobj-syntax', {
 " Formats: diff --context, diff --unified, git diff
 call dein#add('kana/vim-textobj-diff', {
   \ 'on_ft': 'diff',
-  \ 'on_map': '<Plug>',
+  \ 'on_map': [['nxo', '<Plug>']],
   \ 'depends': 'vim-textobj-user',
   \ 'hook_source': "
 \\n   let g:textobj_diff_no_default_key_mappings = 1

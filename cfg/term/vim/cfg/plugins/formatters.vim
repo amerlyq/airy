@@ -41,7 +41,7 @@ call dein#add('thinca/vim-ft-help_fold', {'on_ft': 'help'})
 " 'hook_add': "map gQ  <Plug>(operator-clang-format)",
 call dein#add('rhysd/vim-clang-format', {
   \ 'if': executable('clang-format'),
-  \ 'on_map': '<Plug>(operator-clang-format)',
+  \ 'on_map': [['nx', '<Plug>(operator-clang-format)']],
   \ 'on_cmd': ['ClangFormat', 'ClangFormatEchoFormattedCode'],
   \ 'on_ft': ['c', 'cpp', 'objc'],
   \ 'depends': 'vim-operator-user',
@@ -49,9 +49,9 @@ call dein#add('rhysd/vim-clang-format', {
 
 
 
-"" (DISABLED) Autoformatting with one button, can use custom (like clang-styler) {{{1
+"" Autoformatting with one button, can use custom (like clang-styler) {{{1
 " ATTENTION: Not operator, but placed near to 'vim-clang-format'
 " 'if': executable("clang-format")||executable("astyle")||executable("tidy"),
-call dein#add('Chiel92/vim-autoformat', {'if': 0,
+call dein#add('Chiel92/vim-autoformat', {
   \ 'on_cmd': ['Autoformat', 'NextFormatter', 'NextFormatter'],
   \ 'hook_add': 'noremap <unique> <F6> :Autoformat<CR><CR>'})
