@@ -64,6 +64,20 @@ elif distro arch; then
   fi
   if has_pr pacaur; then
     aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' "$@"; }
+    loc_inst(){ do_if -c 'pkg_make' "$@"; }
+    # WARN: pkgs not from AUR can break pacaur
+    pkg_make(){ local p
+      p=$(readlink -e "${1:?}")
+      ( set -e
+        source "$p"
+        cd "$(dcache "pacaur/$pkgname")"
+        linkcp -ct "$PWD" "$p"
+        updpkgsums && makepkg -sf
+        paccache -d "$pkgname"
+        sudo pacman -U --needed --noconfirm \
+          "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
+      ) || return
+    }
   elif has_pr yaourt; then aur_inst(){ ayr_inst "$@"; }
   fi
   gem_inst(){ do_if -c 'gem install' "$@"; }

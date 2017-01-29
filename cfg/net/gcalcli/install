@@ -7,13 +7,7 @@ if distro arch; then
   # BAD:(gcalcli-git): can't add events beside 'Quick'
   # aur_inst -p gcalcli{,-git}
 
-  pkg=gcalcli-git
-  dst=$(dcache "pacaur/$pkg")/PKGBUILD
-  if cfgOpt u || [[ ! -f $dst ]]; then  # v4.0a2
-    linkcp -c ./PKGBUILD "$dst"
-    (cd "${dst%/*}" && updpkgsums && makepkg -sf &&
-      paccache -d "$pkg" && sudo pacman -U --noconfirm "$pkg"-*.xz)
-  fi
+  loc_inst -p 'gcalcli' ./PKGBUILD  # v4.0a2
 
   aur_inst -Y {,python2-}vobject
   pkg_inst -Y {,python2-}parsedatetime
