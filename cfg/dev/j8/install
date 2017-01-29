@@ -1,0 +1,11 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+# SEE: http://code.jsoftware.com/wiki/Books
+
+if distro arch; then
+  # NEED: installed qt4/qmake to build
+  # aur_inst "j8-git"  # J -pr-lang
+
+  export CARCH=$(uname -m)
+  loc_inst -p 'j8' ./PKGBUILD
+fi
