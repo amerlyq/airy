@@ -6,28 +6,43 @@
 # 3 | fix width  | ignore width
 # 4 | fix height | ignore height
 # 5 | fix both   | never reload
-# 6 | image      | rgb preview
+# 6 | image      | rgb preview $cached points
+# 7 | image      | image file directly
 
 path="$1"
 width="${2:-$(tput cols)}"
 height="${3:-$(tput lines)}"  # OR '-0' for all
 cached="$4"
+preview_images="$5" # True|False
 
 try(){ timeout --kill-after 5 3 "$@"; }
 trim(){ head -n "$height"; }
 fmt(){ command fmt -s -w "$width"; }
+safepipe() { "$@"; test $? = 0 -o $? = 141; }
 
 # TRY: antiword (CHG catdoc)
 case ${path##*.}
-in  7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
-    rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
-      try als -q "$path" | trim && exit 0
-;;  pdf) try pdftotext -q -l 10 -nopgbrk "$path" - | trim | fmt && exit 3
-;;  doc|xls|ppt) try catdoc "$path" | trim | fmt && exit 3
-;;  htm|html|xhtml) try elinks -dump "$path" | fmt && exit 3
-;;  *) mimetype=$(file --mime-type -Lb "$path")
+in a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
+   rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
+     try als -q "$path" | trim && exit 0
+     try acat "$path" | trim && exit 0
+;; 7z) try 7z -p l "$path" | trim && exit 0  # DFL: use empty passwd
+;; rar) try unrar -p- lt "$path" | trim && exit 0  # DFL: use empty passwd
+;; pdf) try pdftotext -q -l 10 -nopgbrk "$path" - | trim | fmt && exit 3
+;; doc|xls|ppt) try catdoc "$path" | trim | fmt && exit 3
+;; odt|ods|odp|sxw) try odt2txt "$path" | trim | fmt && exit 3
+;; htm|html|xhtml) try elinks -dump "$path" | fmt && exit 3
+;; *) mimetype=$(file --mime-type -Lb "$path")
 esac
 
+
+if [ "$preview_images" = True ]; then
+  case "$mimetype"
+  in image/svg+xml) convert "$path" "$cached" && exit 6
+  ;; video/*) ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6
+  ;; image/*) exit 7
+  esac
+fi
 
 case "$mimetype"
 in text/*|*/xml) exit 2
@@ -40,6 +55,7 @@ in text/*|*/xml) exit 2
   # ALT: readelf -dW
 ;; video/*|audio/*|image/*) exiftool "$path" && exit 5
 esac
+
 
 if [ -s "$path" ]; then
   file -Lb "$path"  # | sed 's/,\s*/\n/g'
