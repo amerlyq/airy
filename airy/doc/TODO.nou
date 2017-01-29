@@ -2,6 +2,7 @@ maint
   [_] encapsulate deploy system into independent 'airy' mod
   [_] rename 'setup' to 'maint' OR 'ctl' ALT: use root Makefile
   [_] ./maint must be simple wrapper and actually call ./airy/run
+    => applies r.airy to each mod inside ./pkg dir
   [_] MOVE colorizing stuff in ./func.d OR:BET: ./ctl/bin/colorize
   [_] MOVE ./func.d -> *airy*
   [_] one list install to accelerate process
@@ -25,16 +26,28 @@ maint
 
 
 structure
+  [_] Add VAR 'tags' to generate symlinked categories into ./_build
+    cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
+    [_] TODO:TEMP: for each 'setup' add '# tags: .. .. ..' after /^source ~\/.*cfgsetup/
+      ALSO: search all non-'setup' for that regex
+        -- must source / traverse all mods and not only choosen ones from PKG_LIST
+      ALSO: link all ./pkg/* w/o mod file in root --> ./_build/{wrong|trash|empty|bad}
   Abstraction: defaults -> ./mod -> ./pkg
     [_] rename ./cfg -> ./pkg (for named main/aur pkgs only)
     2017-01-27 [X] rename ./my -> ./mod
       ALT: ./gen[eral] | ./abs[tract] | ./choice | ./case
     [_] link by ./airy/defaults general ./mod with choosen ./pkg
+    [_] show error if some ./mod was added, but its default wasn't =set or wasn't =installed
     [_] create category symlinks to choose variant ./pkg/{..} -> ./mod/$mod/use/*
       THINK:BAD: excessive systemd cohesion -- we will be restricted by linked mods
       BUT: we need symlinks somewhere anyways -- MAYBE in ./_build/use
-  [_] store all control scripts inside //mod dir in each *mod*
+  [_] BET: use file ( ./mod | ./airy ) = like PKGBUILD with functions
+    + each function -- works w/o sudo -- and only locally for user 'nobody'
+      = only generates arguments for r.airy funcs
+    + in future can be adapted/converted into PKGBUILD or *.deb
+    BAD:ALT:(suboptimal): store all control scripts inside //mod dir in each *mod*
   [_] THINK: use ./tmpl OR ./etc
+  [_] THINK: user's mod dir -- link into ./_build/user OR even ~/.config/airy -- as any other pr
   [_] create DFL ./tmpl/profile for *airy*
     -- can be deprecated by per-mod profile segments
     # To keep template fileset with mods for new accounts
