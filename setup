@@ -8,17 +8,14 @@ queue="${TMPDIR:-/tmp}/mods_installing"
 mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ -L ~/.bin ]] || ln -svT "$PWD/bin" ~/.bin
 [[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
+[[ -n $DISPLAY ]] || export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')  # Use host xserver if SSH
 
 ### Colorize output ====================================================
+# WARN: for {pacman, jobs, etc} USE >/dev/tty
+exec > >(tee ~/.cache/airy/mods/setup.log | r.airy-pretty)
 header(){ printf "{{{ %s }}}\n" "$1"; }
 
-# THINK:USE: exec > >(pretty)  (BUT: pacman -Syu output, jobs, etc?)
-exec > >(tee ~/.cache/airy/mods/setup.log | r.airy-pretty)
-
 ### Prepare state ======================================================
-if [[ -z $DISPLAY ]]; then  # Use host xserver if SSH
-    export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')
-fi
 if cfgOpt r && [[ -f $mods ]]; then
     rm -vf "$queue"
     cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
@@ -40,46 +37,22 @@ fi
 prf=${CURR_DIR_CACHE:?}/profile  # Populate private env
 [[ -f $prf ]] && source "$prf" || echo "Wrn: not found '$prf'"
 
-frgx(){ local patt="\\b$*\\b"
-    [[ "$*" =~ ^/$ ]] && patt="cfg" ||:
-    [[ "$*" =~ ^/.+$ ]] && patt="cfg$patt" || patt=".*$patt"
-    [[ "$*" =~ ^.+/$ ]] && patt="${patt}.*"|| patt="$patt\$"
-    echo "$patt"
-}
-filter_find() { local accept regect
-    # Source all manually linked mods from private repos
-    (($#)) || find -L "${CURR_DIR_CACHE:?}/mods" -type d \
-        -exec test -f '{}/install' -o -f '{}/setup' ';' \
-        -printf "%p\n"
-
-    # CHECK: don't ignore explicit path inside PKG_LIST
-    #   => even if it also contained in PKG_SKIP
-    for n in "${PKG_SKIP[@]}"; do regect+="\\|$(frgx $n)"; done
-    for y in "${PKG_LIST[@]}"; do accept=$(frgx $y)
-        find cfg -type d -regex "$accept" \
-            -exec test -f '{}/install' -o -f '{}/setup' ';' \
-            \! -regex "${regect:2}" -printf "$PWD/%p\n"
-    done
-}
-
 # USAGE:(modules) ./setup [-s <exc1>].. inc1..
 PKG_SKIP+=( ${CFG_S[@]+"${CFG_S[@]}"} )
 # ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
 #   if all $@ are concrete modules (don't end in '/')
 if (($#)) || cfgOpt s; then
     ((!$#)) || PKG_LIST=( "$@" )
-    filter_find "$@" > "$queue"
+    r.airy-filter-mods "$@" > "$queue"
 else
     # Caching the list of modules activated in profile
-    [[ -f $mods  ]] || filter_find > "$mods"
+    [[ -f $mods  ]] || r.airy-filter-mods > "$mods"
     [[ -f $queue ]] || cp -vT "$mods" "$queue"
 fi
 
 # TODO: sep key '-g' to generate tags, info, etc
-if cfgOpt d; then
-  # DEV: add one of _[un]used tags by checking in PKG_LIST
-  r.airy-link-tags -t "_build/tags" -f "$mods"
-fi
+# DEV: add one of _[un]used tags by checking in PKG_LIST
+cfgNo d || r.airy-link-tags -t "_build/tags" -f "$mods"
 
 ### Mods ===============================================================
 # FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
@@ -104,8 +77,7 @@ rm "$queue"
 
 ### Post-install =======================================================
 if [[ $(jobs -p) ]]; then
-    header "Waiting jobs to complete"
-    jobs -l
-    wait
+  header "Waiting jobs to complete"
+  jobs -l && wait
 fi
 header "DONE"

@@ -1,0 +1,35 @@
+#!/bin/bash -eu
+# USAGE: PKG_LIST=.. PKG_SKIP=.. CURR_DIR_CACHE=.. ./$0 ...
+# NOTE:(obsolete): based on sep scripts: install/setup
+cwd=$PWD
+dnm=cfg
+
+source ~/.shell/profile
+cd "$cwd"
+
+frgx(){ local p="\\b$*\\b"
+  [[ "$*" =~ ^/$ ]] && p=$dnm
+  [[ "$*" =~ ^/.+$ ]] && p=${dnm}$p || p=".*$p"
+  [[ "$*" =~ ^.+/$ ]] && p="${p}.*" || p=$p'$'
+  printf '%s\n' "$p"
+}
+
+user_mods(){ find -L "$@" -type d \
+  -exec test -f '{}/install' -o -f '{}/setup' \; -print
+}
+
+# DEV:ALT: use ./$0 "$@" -- "$@" to merge list/skip pkg and remove env deps
+filter_find() { local accept regect
+  # CHECK: don't ignore explicit path inside PKG_LIST
+  #   => even if it also contained in PKG_SKIP
+  for n in "${PKG_SKIP[@]:?}"; do regect+="\\|$(frgx $n)"; done
+  for y in "${PKG_LIST[@]:?}"; do accept=$(frgx $y)
+      find "$dnm" -type d -regex "$accept" \
+          -exec test -f '{}/install' -o -f '{}/setup' ';' \
+          \! -regex "${regect:2}" -printf "$cwd/%p\n"
+  done
+}
+
+# Source all manually linked mods from private repos
+(($#)) || user_mods "${CURR_DIR_CACHE:?}/mods"
+filter_find "$@"
