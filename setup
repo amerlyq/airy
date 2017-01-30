@@ -10,6 +10,9 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
 [[ -n $DISPLAY ]] || export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')  # Use host xserver if SSH
 
+## Populate bin/r.airy-*
+./airy/setup -m
+
 ### Colorize output ====================================================
 # WARN: for {pacman, jobs, etc} USE >/dev/tty
 exec > >(tee ~/.cache/airy/mods/setup.log | r.airy-pretty)
@@ -25,11 +28,7 @@ started_anew(){ cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; }
 if started_anew "$@"; then
     # THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
     cfgOpt i && ./update $(cfgOpt U && echo -u) >/dev/tty
-    # BAD: if symlinks will be always deleted, r.xorg will be never used in core/xorg
-    cfgOpt f && { echo "N: clean r.* symlinks"; rm -rf "${CURR_DIR_CACHE:?}/bin"/*; }
-    cfgOpt f && { echo "N: clean aliases cache"; rm -rf "${CURR_DIR_CACHE:?}/aliases"; }
-    { echo "N: clean systemd user units"; rm -rf ~/.config/systemd/user/*; }
-    { echo "N: clean tags"; r.airy-link-tags -t "_build/tags" -d; }
+    cfgOpt f && r.airy-clean '_build'
 fi
 
 ### Setup all configs ==================================================

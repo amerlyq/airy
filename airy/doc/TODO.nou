@@ -130,10 +130,28 @@ linkcp
   ! [_] harden system perms security by using linkcp copy into sys dirs instead of symlinks
 
 
-other
+PKGMOD
+  [_] BAD: package can't touch any /home or /tmp path
+    https://wiki.archlinux.org/index.php/Arch_packaging_standards#Directories
+    ? is it enough for me to use system-wide dirs and cache ?
   [_] TRY: generate PKGBUILD for each *mod* through my scripts set
-    + this allows clean uninstall previous versions
-    ALT: generate single package from whole 'airy'
+    + this allows clean uninstall previous versions based on $pkgver
+      >> remove cleaning for ./systemd/user and ./bin symlinks
+    +++ can resolve deps graph between my own moduls
+      >> support any order of mods in PKG_LIST
+    NEED: my own local AUR mirror for my mods only
+      * pacman-like already built -- generate on first ./setup and rebuild all on changes
+      * BET: aur-like build-on-demand -- but need access to
+    ALT: generate single package //airy-$USER.pkg.tar.xz from whole 'airy'
+      + no need for my own AUR local mirror
+        => install by simple $ makepkg && pacman -U
+      + package is individual for an
+  [_] convert pkgbuild to deb
+    http://www.overclock.net/t/1339466/converting-an-aur-slackbuild-script-for-use-in-debian
+    http://archlinux.org.ru/forum/topic/15919/
+
+
+other
   2015-09-21 [X] Replace name and email in devq work
   2015-06-05 [X] Insert vim installation and update check ALSO in vim_install (one-button)
     then delete it from list and try install again
