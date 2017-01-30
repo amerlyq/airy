@@ -1,16 +1,23 @@
+ALT:(dot-mgmt)
+  TRY: https://github.com/thoughtbot/rcm
+
+
 maint
   [_] encapsulate deploy system into independent 'airy' mod
   [_] rename 'setup' to 'maint' OR 'ctl' ALT: use root Makefile
   [_] ./maint must be simple wrapper and actually call ./airy/run
     => applies r.airy to each mod inside ./pkg dir
-  [_] MOVE colorizing stuff in ./func.d OR:BET: ./ctl/bin/colorize
+  2017-01-30 [X] MOVE colorizing stuff in ./func.d OR:BET: ./bin/pretty
   [_] MOVE ./func.d -> *airy*
   [_] one list install to accelerate process
     simply check status of apt-get =100
-  [$] Simultaneously -i -u -- doing all
-  [_] make opt '-c' for cleanup-only mode
-    = symlinks/configs/fonts-links/fontcache/etc
-    [_] do cleanup also in mode '-a'
+  Options
+    [$] Simultaneously -i -u -- doing all
+    [_] ./setup -U -- do only ./update w/o ./setup
+    [_] untie install-u and setup-u for short comprehensive orthogonal options
+    [_] make opt '-c' for cleanup-only mode
+      = symlinks/configs/fonts-links/fontcache/etc
+      [_] do cleanup also in mode '-a'
   [_] make opt '-w/-d' for width/depth traversing
     width: -full- scenario per mode to fail earlier
     depth: all mods per -single- op
@@ -23,15 +30,17 @@ maint
   [_] use it's own flags set/handler instead of 'cfgsetup'
   [_] THINK: DFL no flags -- what to do by default ?
     only update 'packman' pkgs ? but we have 'pacman -Syu'
+    !!! [_] BET: show info/status !!!
+  2016-08-19 [X] NEED: log last run into file ~/.cache/airy/mods/setup.log
 
 
 structure
   [_] Add VAR 'tags' to generate symlinked categories into ./_build
-    cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
-    [_] TODO:TEMP: for each 'setup' add '# tags: .. .. ..' after /^source ~\/.*cfgsetup/
-      ALSO: search all non-'setup' for that regex
-        -- must source / traverse all mods and not only choosen ones from PKG_LIST
-      ALSO: link all ./pkg/* w/o mod file in root --> ./_build/{wrong|trash|empty|bad}
+    2017-01-30 [X] ALT:TEMP: for each 'setup' add '# tags: .. .. ..' after /^source ~\/.*cfgsetup/
+    [_] cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
+      [_] ALT: link all ./pkg/* w/o mod file in root --> ./_build/{wrong|trash|empty|bad}
+    [_] ALSO: search all non-'pretty' for that regex
+      -- must source / traverse all mods and not only choosen ones from PKG_LIST
   Abstraction: defaults -> ./mod -> ./pkg
     [_] rename ./cfg -> ./pkg (for named main/aur pkgs only)
     2017-01-27 [X] rename ./my -> ./mod
@@ -41,7 +50,7 @@ structure
     [_] create category symlinks to choose variant ./pkg/{..} -> ./mod/$mod/use/*
       THINK:BAD: excessive systemd cohesion -- we will be restricted by linked mods
       BUT: we need symlinks somewhere anyways -- MAYBE in ./_build/use
-  [_] BET: use file ( ./mod | ./airy ) = like PKGBUILD with functions
+  [_] BET: use file ( ./mod | ./airy | ./AIRYPKG ) = like PKGBUILD with functions
     + each function -- works w/o sudo -- and only locally for user 'nobody'
       = only generates arguments for r.airy funcs
     + in future can be adapted/converted into PKGBUILD or *.deb
@@ -71,8 +80,15 @@ structure
       - git <v2.10.2 on Windows will replace symlinks by text files
         = so I can commit relative symblinks without problem
   2017-01-27 [X] Add alias file for some cfgs -- and on ./setup gather >> ~/.cache/airy/aliases
-    => instead of 'return' from sourced files use 'if..fi' guards
-    ::: ALT: wrap each sourced file into function and call it immediately
+    + dump all files into single one
+      + reduce startup time
+      !! shell-specific unportable aliases (ZSH)
+      !! 'return' to interrupt sourcing will affect whole dump
+      ::: wrap each sourced file into function and call it immediately
+        => ALT:(non-robust): instead of 'return' from sourced files use 'if..fi' guards
+    ~ file list with whole pathes
+    ~ dir with symlinks to aliases
+
   [_] gather all artifacts into '_build' dir instead of ~/.cache/airy/
     [_] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
     [_] add support for XDG_... env vars into 'cfgsetup' to determine symlink targets

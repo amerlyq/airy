@@ -1,0 +1,26 @@
+#!/bin/bash -eu
+
+CR=$(tput sgr0)
+for n in {0..15}; do
+  readonly C$n=$(tput setaf "$n")
+done
+
+exec sed -r "
+  s|$HOME|\~|g
+  s|\~/\S+/cfg/||g
+  />>>|\{\{\{/!s|^|  |g
+  /^\{\{\{ .* \}\}\}$/s//\n$C15\0$CR/
+  /^>>> \~\/aura\//s//\n$C9\[/
+  /^>>> /s//\n$C2\[/
+  / <<<$/s//\]$CR/
+  /^\s\s\(.*\)$/s//$C10&$CR/
+  /(C|W|Fix):\s.*/s//$C13&$CR/
+  /(I|N):\s.*/s//$C6&$CR/
+  /(\+!|\*) A:\s.*/s//$C3&$CR/
+  /.*\s(-> L\s|(::\/|\*\s).*->).*/s//$C4&$CR/
+  /~\/\.config\/systemd\/user\//s///g
+  /^(\s*)Created symlink (from )?(.*) (to|→) (.*)\.$/s//\1@@-\3 -> \5/
+  /^\s*(-> @\s|@@-.*\s->\s).*/s//$C9&$CR/
+  /.*\s-> C\s.*/s//$C3&$CR/
+  /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
+"

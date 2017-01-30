@@ -9,46 +9,11 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ -L ~/.bin ]] || ln -svT "$PWD/bin" ~/.bin
 [[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
 
-# CHECK: some modules aren't installed (kedi has qute/install, but neo -- not)
-#   -- By SSH them also not visible
-# mpd 'setup' wasn't launched at all
-# NEED: log last run into file ~/.cache/airy/mods/setup.log
-# TODO: ./setup -U -- do only ./update w/o ./setup
-# TRY:ALT:(my setup) -- dot mgmt by SEE https://github.com/thoughtbot/rcm
-# TODO: untie install-u and setup-u for short comprehensive orthogonal options
-
-# TODO: load aliases from modes
-# * file with whole pathes
-# * dir with symlinks
-# * BAD: dump all files into single one
-#   + reduce startup time
-#   !! shell-specific unportable aliases (ZSH)
-#   !! 'return' to interrupt sourcing will affect whole dump
-
 ### Colorize output ====================================================
-for n in {0..15}; do declare C${n}=$(tput setaf ${n:?}); done && CR=$(tput sgr0)
-header(){ printf "\n$C2>>> %s <<<$CR\n" "$1"; }
-pretty() { sed -r "
-  s|/home/$(whoami)|\~|g
-  s|\~/\S+/cfg/||g
-  />>>/!s|^|  |g
-  /^>>> \~\/aura\//s//\n$C9\[/g
-  /^>>> /s//\n$C2\[/g
-  / <<<$/s//\]$CR/g
-  /^\s\s\(.*\)$/s//$C10&$CR/
-  /(C|W|Fix):\s.*/s//$C13&$CR/
-  /(I|N):\s.*/s//$C6&$CR/
-  /(\+!|\*) A:\s.*/s//$C3&$CR/
-  /.*\s(-> L\s|(::\/|\*\s).*->).*/s//$C4&$CR/
-  /~\/\.config\/systemd\/user\//s///g
-  /^(\s*)Created symlink (from )?(.*) (to|→) (.*)\.$/s//\1@@-\3 -> \5/
-  /^\s*(-> @\s|@@-.*\s->\s).*/s//$C9&$CR/
-  /.*\s-> C\s.*/s//$C3&$CR/
-  /\<(E|Err|Wrn|ERR):\s.*/s//$C1&$CR/
-";}
+header(){ printf "{{{ %s }}}\n" "$1"; }
 
 # THINK:USE: exec > >(pretty)  (BUT: pacman -Syu output, jobs, etc?)
-exec > >(tee ~/.cache/airy/mods/setup.log | pretty)
+exec > >(tee ~/.cache/airy/mods/setup.log | r.airy-pretty)
 
 ### Prepare state ======================================================
 if [[ -z $DISPLAY ]]; then  # Use host xserver if SSH
@@ -59,13 +24,6 @@ if cfgOpt r && [[ -f $mods ]]; then
     cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
 fi
 
-clean_tags(){ local d=$1
-  [[ ! -d $d ]] && return
-  find "$d" -type l -delete
-  find "$d" -type d -empty -delete
-  [[ ! -d $d ]]  # find deletes $d itself
-}
-
 started_anew(){ cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; }
 if started_anew "$@"; then
     # THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
@@ -74,7 +32,7 @@ if started_anew "$@"; then
     cfgOpt f && { echo "N: clean r.* symlinks"; rm -rf "${CURR_DIR_CACHE:?}/bin"/*; }
     cfgOpt f && { echo "N: clean aliases cache"; rm -rf "${CURR_DIR_CACHE:?}/aliases"; }
     { echo "N: clean systemd user units"; rm -rf ~/.config/systemd/user/*; }
-    { echo "N: clean tags"; clean_tags "_build/tags"; }
+    { echo "N: clean tags"; r.airy-link-tags -t "_build/tags" -d; }
 fi
 
 ### Setup all configs ==================================================
@@ -117,25 +75,10 @@ else
     [[ -f $queue ]] || cp -vT "$mods" "$queue"
 fi
 
-# DEV: add one of _[un]used tags by checking in PKG_LIST
-link_tags(){ local dst=$1 ts ta
-  mkdir -p "$dst"
-  pushd "$dst" >/dev/null
-  while IFS= read -r d; do [[ -f $d/setup ]] || continue
-    ts=$(sed -rn '/^#\s*tags:((\s*[[:alnum:]_]+)+)/s//\1/p' "$d/setup")
-    [[ $ts =~ ^\s*$ ]] && ta=() || readarray -t ta <<< "$ts"
-    for t in "${ta[@]}"; do
-      [[ "$t/${d##*/}" -ef $d ]] && continue
-      mkdir -p "$t"
-      ln -snTr "$d" "$t/${d##*/}"
-    done
-  done <<< "$(<"$mods")"
-  popd >/dev/null
-}
-
 # TODO: sep key '-g' to generate tags, info, etc
 if cfgOpt d; then
-  link_tags '_build/tags'
+  # DEV: add one of _[un]used tags by checking in PKG_LIST
+  r.airy-link-tags -t "_build/tags" -f "$mods"
 fi
 
 ### Mods ===============================================================
@@ -145,9 +88,9 @@ run(){ if [[ -f $1 ]]; then "$@" $(cfgOpt m || echo -m); else echo "(no ${1##*/}
 
 # Mods statistics
 header "Airy cfgs"
-printf "${C15}LIST:$C12( %s )$CR\n" "${PKG_LIST[*]}"
-printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
-printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
+# printf "${C15}LIST:$C12( %s )$CR\n" "${PKG_LIST[*]}"
+# printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
+# printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
 
 while IFS= read -r d; do echo ">>> $d <<<"
     # BUG: some packages (like gcc-multilib) aren't replaced even with -u)

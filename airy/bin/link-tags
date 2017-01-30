@@ -1,0 +1,54 @@
+#!/bin/bash -eu
+set -euo pipefail
+
+mods=( "$PWD" )
+opts=()
+
+# t=to dst f=from file r=reset d=delete D=destruct
+while getopts 'Ddf:t:r' o; do case $o in :|'?') exit 1
+;; t) dst=$(readlink -m "$OPTARG")
+;; f) readarray -t mods < "$OPTARG"  # WARN: empty/misconfigured lines
+esac; opts+=$o; done; shift $((OPTIND - 1))
+((!$#)) || mods=( "$@" )
+
+# Extract tags from modeline /# tags: .../
+extract_tags(){ sed -rn '
+  /^#+\s*tags:(([[:space:],]*[[:alnum:]_]+)+).*/s//\1/p' "$@"
+}
+
+# Make link for each tag
+link_tags(){ local l d=$1 m=$2
+  [[ $3 == -- ]] && shift 3 || return
+  for t in "$@"; do
+    l=$d/$t/${m##*/}
+    [[ $l -ef $m ]] && continue
+    mkdir -p "${l%/*}"
+    ln -snrT "$m" "$l"
+  done
+}
+
+# Err: if contains some foreign files/links
+clean_links(){ local d=$1
+  [[ ! -d $d ]] && return
+  find "$d" -type l -delete
+  find "$d" -type d -empty -delete
+  [[ ! -d $d ]]  # find deletes $d itself
+}
+
+[[ $opts =~ r ]] && clean_links "${dst:?}"
+[[ $opts =~ d ]] && { clean_links "${dst:?}"; exit; }
+[[ $opts =~ D ]] && { rm -rf "${dst:?}"; exit; }
+
+for m in "${mods[@]}"; do
+  [[ -s $m/setup ]] || continue
+  ts=$(extract_tags "$m/setup")
+
+  read -ra ta <<< "$ts"
+  for i in "${!ta[@]}"; do [[ -n ${ta[i]} ]] || unset ta[i]; done
+
+  if [[ -z ${dst-} ]]; then
+    printf '%s\n' "${ta[@]}"
+  else
+    link_tags "${dst:?}" "$m" -- "${ta[@]}"
+  fi
+done
