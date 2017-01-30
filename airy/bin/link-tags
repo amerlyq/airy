@@ -2,10 +2,9 @@
 set -euo pipefail
 
 mods=( "$PWD" )
-opts=()
 
 # t=to dst f=from file r=reset d=delete D=destruct
-while getopts 'Ddf:t:r' o; do case $o in :|'?') exit 1
+opts=; while getopts 'Ddf:t:r' o; do case $o in :|'?') exit 1
 ;; t) dst=$(readlink -m "$OPTARG")
 ;; f) readarray -t mods < "$OPTARG"  # WARN: empty/misconfigured lines
 esac; opts+=$o; done; shift $((OPTIND - 1))

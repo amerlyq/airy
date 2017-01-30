@@ -1,35 +1,36 @@
 #!/bin/bash -eu
-# USAGE: PKG_LIST=.. PKG_SKIP=.. CURR_DIR_CACHE=.. ./$0 ...
-# NOTE:(obsolete): based on sep scripts: install/setup
-cwd=$PWD
-dnm=cfg
-
-source ~/.shell/profile
-cd "$cwd"
+# USAGE cd ./cfg && ./$0 "${mods[@]}" -- "${skip[@]}"
+# NOTE:(obsolete): search is based on install/setup scripts
+cwd=$(readlink -e "$PWD")
+prf=${cwd##*/}
 
 frgx(){ local p="\\b$*\\b"
-  [[ "$*" =~ ^/$ ]] && p=$dnm
-  [[ "$*" =~ ^/.+$ ]] && p=${dnm}$p || p=".*$p"
+  [[ "$*" =~ ^/$ ]] && p=$prf
+  [[ "$*" =~ ^/.+$ ]] && p=$prf$p || p=".*$p"
   [[ "$*" =~ ^.+/$ ]] && p="${p}.*" || p=$p'$'
   printf '%s\n' "$p"
 }
 
-user_mods(){ find -L "$@" -type d \
-  -exec test -f '{}/install' -o -f '{}/setup' \; -print
-}
+# FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
+# CHECK: don't ignore explicit path inside PKG_LIST
+#   => even if it also contained in PKG_SKIP
+filter_find() { local accept regect=''
+  for s in "${skip[@]}"; do regect+="\\|$(frgx "$s")"; done
+  regect=${regect:2}
 
-# DEV:ALT: use ./$0 "$@" -- "$@" to merge list/skip pkg and remove env deps
-filter_find() { local accept regect
-  # CHECK: don't ignore explicit path inside PKG_LIST
-  #   => even if it also contained in PKG_SKIP
-  for n in "${PKG_SKIP[@]:?}"; do regect+="\\|$(frgx $n)"; done
-  for y in "${PKG_LIST[@]:?}"; do accept=$(frgx $y)
-      find "$dnm" -type d -regex "$accept" \
-          -exec test -f '{}/install' -o -f '{}/setup' ';' \
-          \! -regex "${regect:2}" -printf "$cwd/%p\n"
+  for m in "${mods[@]:?}"; do accept=$(frgx "$m")
+    find -H "$cwd" -type d -regex ".*/\($accept\)" \
+      -exec test -f '{}/install' -o -f '{}/setup' \; \
+      \! -regex ".*/\($regect\)" -print
   done
 }
 
-# Source all manually linked mods from private repos
-(($#)) || user_mods "${CURR_DIR_CACHE:?}/mods"
-filter_find "$@"
+arg_split(){ local i; for((i=1;i<=$#;++i)); do
+  [[ ${!i} == -- ]] && break; done; echo "$i"; }
+
+# WARN: don't use any Emacs regex symbol for *mod* name
+idx=$(arg_split "$@")
+mods=( "${@:1:idx-1}" )
+skip=( "${@:idx+1}" )
+
+filter_find
