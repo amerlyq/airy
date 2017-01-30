@@ -1,0 +1,15 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# haskell
+pkg_inst c2hs # -pr-lang: haskell
+
+# SEE: https://hackage.haskell.org/package/cabalg
+pkg_inst -p 'cabal' cabal-install
+
+
+if cfgOpt u || [[ ! -d ~/.cabal/packages ]]
+then ./update; fi
+
+# cabal-install ghc-mod
+# cabal install hdevtools

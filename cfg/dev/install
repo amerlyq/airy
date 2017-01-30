@@ -7,15 +7,6 @@ if distro arch; then
     pkg_inst -f '/usr/lib32/libstdc++.so' lib32-gcc-libs
     pkg_inst -f '/usr/lib/valgrind/callgrind-amd64-linux' valgrind-multilib
     pkg_inst doxygen # C++
-    pkg_inst c2hs clisp   # -pr-lang: haskell, lisp
-
-    # haskell
-    # SEE: https://hackage.haskell.org/package/cabalg
-    pkg_inst -p 'cabal' cabal-install
-    if cfgOpt u || [[ ! -d ~/.cabal/packages ]]
-    then cabal update; fi
-    # cabal-install ghc-mod
-    # cabal install hdevtools
 
 elif distro ubuntu; then
   pkgs=()
