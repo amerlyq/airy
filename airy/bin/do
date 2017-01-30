@@ -1,0 +1,24 @@
+#!/bin/bash -eu
+
+mods=( "$PWD" )
+
+# RFC: more logical flags
+opts=; while getopts 'mifuU' o; do case $o in :|'?') exit 1
+# ;; t) dst=$(readlink -m "$OPTARG")
+# ;; f) readarray -t mods < "$OPTARG"  # WARN: empty/misconfigured lines
+esac; opts+=$o; done; shift $((OPTIND - 1))
+((!$#)) || mods=( "$@" )
+
+# TODO: boolean ops for flags \s = or atom, \w = and (in any order)
+has(){ [[ $opts =~ [$*] ]]; }
+
+# EXPL: -m (in main 'setup') forces single thread execution
+run(){ if [[ -f $1 ]]; then "$@" $(has m || echo -m); else echo "(no ${1##*/})"; fi; }
+
+for m in "${mods[@]}"; do
+  echo ">>> $m <<<"
+  # BUG: some packages (like gcc-multilib) aren't replaced even with -u)
+  if has i; then run "$m/install" $(has f && echo -u); fi
+  run "$m/setup" $(has u && echo -u)
+  if has U; then run "$m/update" $(has u && echo -u); fi
+done

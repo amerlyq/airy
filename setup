@@ -11,6 +11,7 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 [[ -n $DISPLAY ]] || export DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')  # Use host xserver if SSH
 
 ## Populate bin/r.airy-*
+# BAD: no colorizing => recursive deps with r.airy-pretty
 ./airy/setup -m
 
 ### Colorize output ====================================================
@@ -52,25 +53,26 @@ fi
 cfgNo d || r.airy-link-tags -t "_build/tags" -f "$mods"
 
 ### Mods ===============================================================
-# FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
-# EXPL: -m (in main 'setup') forces single thread execution
-run(){ if [[ -f $1 ]]; then "$@" $(cfgOpt m || echo -m); else echo "(no ${1##*/})"; fi; }
-
 # Mods statistics
 header "Airy cfgs"
 # printf "${C15}LIST:$C12( %s )$CR\n" "${PKG_LIST[*]}"
 # printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
 # printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
 
-while IFS= read -r d; do echo ">>> $d <<<"
-    # BUG: some packages (like gcc-multilib) aren't replaced even with -u)
-    if cfgOpt i; then run "$d/install" $(cfgOpt f && echo -u); fi
-    run "$d/setup" $(cfgOpt u && echo -u)
-    if cfgOpt U; then run "$d/update" $(cfgOpt u && echo -u); fi
-    sed -i '1d' "$queue"
-# EXPL: copy $queue content to be not affected by 'sed'
-done <<< "$(<"$queue")"
-rm "$queue"
+# THINK:TODO: use /tmp for $queue BUT what if you need reboot on half-install ?
+#   => ? rewrite ./setup to don't repeat pkgs compiling
+#   BUT what if I need to continue whole recompile all of the rest after interrupt ?
+consume_queue(){ local tmp=$1
+  while IFS= read -r d; do
+    r.airy-do "$d"
+    sed -i '1d' "$tmp"
+  # EXPL: load $tmp content in memory to be not affected by 'sed'
+  done <<< "$(<"$tmp")"
+  rm "$tmp"
+}
+
+[[ -s $queue ]] || cp -vT "$mods" "$queue"
+consume_queue "$queue"
 
 ### Post-install =======================================================
 if [[ $(jobs -p) ]]; then
