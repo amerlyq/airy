@@ -22,6 +22,14 @@ set solib-absolute-prefix root
 set solib-search-path libs
 ${OLD_BDR+set substitute-path $OLD_BDR bdr}
 set directories src:\$cdir:\$cwd${SRC_DIRS+:$SRC_DIRS}
+
+## Place into local ./.gdbinit
+## FIXED:(pwndbg): unsupported operand types
+# set endian big
+# set architecture mips
+# python gdb.COMPLETE_EXPRESSION = gdb.COMPLETE_SYMBOL
+# source ~/.cache/airy/pkg/pwndbg/gdbinit.py
+
 file exe
 core-file core
 set logging on log.cfg
