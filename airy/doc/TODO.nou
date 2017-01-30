@@ -26,6 +26,9 @@ maint
       * parallel execution for individual ./update
       * gather all aliases to dump
   [_] ENH return err if single-word *mod* in PKG_LIST isn't unique throughout all mods
+    * check only PKG_LIST config
+    * allowed to have multiple mods with same name in different locs (treated as the same mod)
+      ? how to adequately order them ?
   [_] move sourcing from 'cfgsetup' to 'system'
   [_] use it's own flags set/handler instead of 'cfgsetup'
   [_] THINK: DFL no flags -- what to do by default ?

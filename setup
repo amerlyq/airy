@@ -33,10 +33,6 @@ if started_anew "$@"; then
 fi
 
 ### Setup all configs ==================================================
-# NOTE: private data must be initialized already
-prf=${CURR_DIR_CACHE:?}/profile  # Populate private env
-[[ -f $prf ]] && source "$prf" || echo "Wrn: not found '$prf'"
-
 # USAGE:(modules) ./setup [-s <exc1>].. inc1..
 PKG_SKIP+=( ${CFG_S[@]+"${CFG_S[@]}"} )
 # ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
@@ -46,6 +42,8 @@ if (($#)) || cfgOpt s; then
     r.airy-filter-mods "$@" > "$queue"
 else
     # Caching the list of modules activated in profile
+    # DEV: sort user mods to be directly before mods from ./pkg
+    #   -- to disable together mods with identical name
     [[ -f $mods  ]] || r.airy-filter-mods > "$mods"
     [[ -f $queue ]] || cp -vT "$mods" "$queue"
 fi
