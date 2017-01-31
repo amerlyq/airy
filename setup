@@ -67,9 +67,10 @@ header "Airy cfgs"
 # THINK:TODO: use /tmp for $queue BUT what if you need reboot on half-install ?
 #   => ? rewrite ./setup to don't repeat pkgs compiling
 #   BUT what if I need to continue whole recompile all of the rest after interrupt ?
-consume_queue(){ local tmp=$1
+consume_queue(){ local tmp=$1 opts
+  opts=$(tr -cd 'mifuU' <<< "${CFG_OPTS-}")
   while IFS= read -r d; do
-    r.airy-do "$d"
+    r.airy-do ${opts:+-"$opts"} "$d"
     sed -i '1d' "$tmp"
   # EXPL: load $tmp content in memory to be not affected by 'sed'
   done <<< "$(<"$tmp")"
