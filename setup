@@ -20,11 +20,6 @@ exec > >(tee ~/.cache/airy/mods/setup.log | r.airy-pretty)
 header(){ printf "{{{ %s }}}\n" "$1"; }
 
 ### Prepare state ======================================================
-if cfgOpt r && [[ -f $mods ]]; then
-    rm -vf "$queue"
-    cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
-fi
-
 started_anew(){ cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; }
 if started_anew "$@"; then
     # THINK:USE: it's own key '-y/-p' instead of combo 'iu' ?
@@ -50,6 +45,7 @@ if (($#)) || cfgOpt s; then
   filter_mods '_build/user' 'cfg' > "$queue"
 else
   # Caching the list of modules activated in profile
+  # cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
   [[ -f $mods  ]] || filter_mods '_build/user' 'cfg' > "$mods"
 fi
 
@@ -64,21 +60,8 @@ header "Airy cfgs"
 # printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
 # printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
 
-# THINK:TODO: use /tmp for $queue BUT what if you need reboot on half-install ?
-#   => ? rewrite ./setup to don't repeat pkgs compiling
-#   BUT what if I need to continue whole recompile all of the rest after interrupt ?
-consume_queue(){ local tmp=$1 opts
-  opts=$(tr -cd 'mifuU' <<< "${CFG_OPTS-}")
-  while IFS= read -r d; do
-    r.airy-do ${opts:+-"$opts"} "$d"
-    sed -i '1d' "$tmp"
-  # EXPL: load $tmp content in memory to be not affected by 'sed'
-  done <<< "$(<"$tmp")"
-  rm "$tmp"
-}
-
-[[ -s $queue ]] || cp -vT "$mods" "$queue"
-consume_queue "$queue"
+opts=$(tr -cd 'mifuU' <<< "${CFG_OPTS-}")
+r.airy-each -if "$mods" -- r.airy-do ${opts:+-"$opts"}
 
 ### Post-install =======================================================
 if [[ $(jobs -p) ]]; then

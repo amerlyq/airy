@@ -1,0 +1,33 @@
+#!/bin/bash -eu
+
+queue=${TMPDIR:-/tmp}/airy-queue.txt
+
+# c=cache, f=from, i=incremental, r=reset
+opts=; while getopts 'c:f:ir' o; do case $o in :|'?') exit 1
+;; c) queue=$(readlink -f "$OPTARG")
+;; f) from=$OPTARG
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
+(($#)) && cmd=( "$@" ) || exit
+
+mods=()
+mappend(){ readarray -tO "${#mods[@]}" mods; }
+
+if has i; then
+  has r && rm -f "$queue"
+  [[ -s $queue ]] && mappend < "$queue"
+fi
+
+if ! has i || [[ ! -s $queue ]]; then
+  [[ -t 0 ]] || mappend
+  mappend < "$from"
+  has i && printf "%s\n" "${mods[@]}" > "$queue"
+fi
+
+for i in "${!mods[@]}"; do [[ ${mods[i]} ]] || unset mods[i]; done
+for m in "${mods[@]}"; do
+  "${cmd[@]}" "$m"
+  has i && sed -i '1d' "$queue"
+done
+
+! has i || rm -f "$queue"
