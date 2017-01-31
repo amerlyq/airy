@@ -117,7 +117,8 @@ end
 define btl
   set print frame-arguments all
   # relative absolute basename
-  set filename-display relative
+  # BAD:(comment-out): No symbol "filename" in current context.
+  # set filename-display relative
   if $argc == 0
     echo USE: btl <count> TODO: auto-parse this string OR python\n
     bt -1

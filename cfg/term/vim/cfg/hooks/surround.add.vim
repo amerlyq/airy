@@ -5,9 +5,9 @@ endfor
 
 let s:op = '<Plug>(operator-surround-append)'
 
-"" Word-based quoting
-call Map_nxo('[Quote]w', s:op.'iw', 'n')
-call Map_nxo('[Quote]W', s:op.'iW', 'n')
+"" Word-based quoting (reversed by frecency)
+call Map_nxo('[Quote]w', s:op.'iW', 'n')
+call Map_nxo('[Quote]W', s:op.'iw', 'n')
 " DEV: xmap 'qw..' -- add quotes to each word in selection
 " call Map_nxo('[Quote]<Space>', s:op.' ', 'x')
 

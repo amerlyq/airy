@@ -124,6 +124,9 @@ bind pager <Up>   previous-line
 # bind pager - noop
 # bind pager <Space> next-page
 
+macro attach ,c "<pipe-entry>r.gcalcli --calendar='work' import\n"
+macro attach ,C "<pipe-entry>r.gcalcli import -d\n"
+
 bind attach  i  display-toggle-weed
 bind attach  l  view-mailcap
 bind attach  h  exit
