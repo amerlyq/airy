@@ -14,11 +14,6 @@ mods="$CURR_DIR_CACHE/mods/mods" && mkdir -p "${mods%/*}"
 # BAD: no colorizing => recursive deps with r.airy-pretty
 ./airy/setup -m
 
-### Colorize output ====================================================
-# WARN: for {pacman, jobs, etc} USE >/dev/tty
-exec > >(tee ~/.cache/airy/mods/setup.log | r.airy-pretty)
-header(){ printf "{{{ %s }}}\n" "$1"; }
-
 ### Prepare state ======================================================
 started_anew(){ cfgOpt u && ((!$#)) && [[ ! -f $queue ]]; }
 if started_anew "$@"; then
@@ -27,45 +22,5 @@ if started_anew "$@"; then
     cfgOpt f && r.airy-clean '_build'
 fi
 
-### Setup all configs ==================================================
-
-## ALSO: sources all manually linked mods from private repos
-# DEV: sort user mods to be directly before mods from ./pkg
-#   -- to disable together mods with identical name
-filter_mods(){ for d in "$@"; do (cd _build/user &&
-  r.airy-filter-mods "${PKG_LIST[@]}" -- "${PKG_SKIP[@]}"
-) done; }
-
-# USAGE:(modules) ./setup [-s <exc1>].. inc1..
-PKG_SKIP+=( ${CFG_S[@]+"${CFG_S[@]}"} )
-# ENH: make strictly PKG_SKIP=( "${CFG_S[@]}" )
-#   if all $@ are concrete modules (don't end in '/')
-if (($#)) || cfgOpt s; then
-  ((!$#)) || PKG_LIST=( "$@" )
-  filter_mods '_build/user' 'cfg' > "$queue"
-else
-  # Caching the list of modules activated in profile
-  # cp -vf --backup=numbered "$mods" "$mods" && rm "$mods"
-  [[ -f $mods  ]] || filter_mods '_build/user' 'cfg' > "$mods"
-fi
-
-# TODO: sep key '-g' to generate tags, info, etc
-# DEV: add one of _[un]used tags by checking in PKG_LIST
-cfgNo d || r.airy-link-tags -t "_build/tags" -f "$mods"
-
-### Mods ===============================================================
-# Mods statistics
-header "Airy cfgs"
-# printf "${C15}LIST:$C12( %s )$CR\n" "${PKG_LIST[*]}"
-# printf "${C15}SKIP:$C12( %s )$CR\n" "${PKG_SKIP[*]}"
-# printf "${C13}NMOD:  $C9=%d$CR\n" "$(wc -l < "$queue")"
-
-opts=$(tr -cd 'mifuU' <<< "${CFG_OPTS-}")
-r.airy-each -if "$mods" -- r.airy-do ${opts:+-"$opts"}
-
-### Post-install =======================================================
-if [[ $(jobs -p) ]]; then
-  header "Waiting jobs to complete"
-  jobs -l && wait
-fi
-header "DONE"
+dopts=$(tr -cd 'mifuU' <<< "${CFG_OPTS-}")
+r.airy -s ${dopts:+-"$dopts"}

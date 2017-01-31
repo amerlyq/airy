@@ -16,11 +16,13 @@ mappend(){ readarray -tO "${#mods[@]}" mods; }
 if has i; then
   has r && rm -f "$queue"
   [[ -s $queue ]] && mappend < "$queue"
-fi
+  [[ -s $queue ]] && head="{{{ continue... }}}" || head="{{{ Incremental }}}"
+else head="{{{ Non-incremental }}}"; fi
 
 if ! has i || [[ ! -s $queue ]]; then
+  # CHECK: can be bad in nested scripts -- by catching unused stdin
   [[ -t 0 ]] || mappend
-  mappend < "$from"
+  [[ -s ${from-} ]] && mappend < "${from-}"
   has i && printf "%s\n" "${mods[@]}" > "$queue"
 fi
 
@@ -31,3 +33,9 @@ for m in "${mods[@]}"; do
 done
 
 ! has i || rm -f "$queue"
+
+if [[ $(jobs -p) ]]; then
+  printf "{{{ %s }}}\n" "Waiting jobs to complete"
+  jobs -l && wait
+fi
+echo "{{{ DONE }}}"

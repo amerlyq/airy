@@ -1,0 +1,60 @@
+#!/bin/bash -eu
+# NOTE: for skip-only due to getopts you need two double hypen
+#   ./$0 -- -- ...  # skip-only
+source ~/.shell/profile
+
+
+### Cmdline
+# a=all, g=generate
+opts=; while getopts 'agsmifuU' o; do case $o in :|'?') exit 1
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
+
+for((i=1;i<=$#;++i)); do [[ ${!i} == -- ]] && break; done
+mods=( "${@:1:i-1}" )
+skip=( "${@:i+1}" )
+defaults=$(( !${#mods[@]} && !${#skip[@]} ))
+
+
+### Profile
+(( ${#mods[@]} )) || mods=( "${PKG_LIST[@]}" )
+(( ${#skip[@]} )) || skip=( "${PKG_SKIP[@]}" )
+
+
+### Environment
+cd "$(dirname "$(readlink -e "$0")")"
+cd "$(git rev-parse --show-toplevel)"
+
+airy=$PWD
+cache=$airy/_build
+
+# WARN: for {pacman, jobs, etc} USE >/dev/tty
+exec > >(tee "$cache/setup.log" | r.airy-pretty)  # colorize
+# Do only if you run setup/install/etc
+# date +'%Y%m%d_%H%M%S'
+
+
+### Searching mods
+search_mods(){ for d in "$@"; do (cd "$d" &&
+  r.airy-filter-mods "${mods[@]}" -- "${skip[@]}") done; }
+
+if ((!defaults)) || [[ ! -s $cache/mods ]]; then
+  lmods=$(search_mods '_build/user' 'cfg')
+fi
+# cp -vf --backup=numbered "$cache/mods" "$cache/mods" && rm "$cache/mods"
+if ((defaults)); then [[ -s $cache/mods ]] \
+  && lmods=$(< "$cache/mods") \
+  || cat > "$cache/mods" <<< "$lmods"
+fi
+
+
+### Processing
+# INFO: general + for each mod -- if specified on cmdline!
+# (( ${#opts} )) || r.airy-info <<< "$lmods"
+# ALSO:(statistics): ${#mods[@]} | ${#skip[@]} | $(wc -l < "$queue")
+
+dopts=$(tr -cd 'mifuU' <<< "${opts-}")
+has s && r.airy-each -i -- r.airy-do ${dopts:+-"$dopts"} <<< "$lmods"
+
+# DEV: add one of _[un]used tags by checking in PKG_LIST
+! has g || r.airy-link-tags -t "$cache/tags" -f "$cache/mods"
