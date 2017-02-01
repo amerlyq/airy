@@ -1,8 +1,25 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # NOTE: prolog must be completely independent
 
-### MAIN ###
-source ~/.shell/func.d/cfgsetup
+airy=$(dirname "$(readlink -e "$0")")
+repo=$(git -C "$airy" rev-parse --show-toplevel)
+cache=$repo/_build
+bin=$cache/bin
+
 
 ### LINKS ###
-# linkcp "$PWD" ~/.airy
+# FIXME: Subject to completely eliminate = ? replace by env var ?
+[[ -L ~/.shell ]] || ln -svT "$repo/cfg/shell" ~/.shell
+[[ -L ~/.bin   ]] || ln -svT "$repo/bin" ~/.bin
+
+
+mkdir -p "$bin"
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
+[[ :$PATH: == *:$bin:* ]] || export PATH=$bin:$PATH
+
+
+### MAIN ###
+# NOTE: populate symlinks from ./bin
+#   !!! can be resolved by separating 'linkmask' -- and cfgsetup !!!
+#     => then call it from main script to add into std $cache/bin
+source ~/.shell/func.d/cfgsetup

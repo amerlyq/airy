@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+# Use host xserver if setup through SSH
+[[ -n $DISPLAY ]] || DISPLAY=$(xauth list | sed -rn '1s/^[^:]*(:[0-9]+).*/\1/p')
+[[ -n $DISPLAY ]] || DISPLAY=$(dir /tmp/.X11-unix | tr 'X' ':' | head -1)
+[[ -n $DISPLAY ]] || DISPLAY=:0
+printf '%s\n' "$DISPLAY"

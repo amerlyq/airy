@@ -22,7 +22,7 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 [[ ${THEME_ALLOWED-} ]] || THEME_ALLOWED='dark|light|lucid|opaque'
 # DEV:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
 # TODO: use THEME_DEFAULT if set, else -- .../theme/default
-[[ ${THEME-} ]] || [[ ! -f ${CURR_DIR_CACHE:?}/theme ]] \
+[[ ${THEME-} ]] || [[ ! -s ${CURR_DIR_CACHE:?}/theme ]] \
 || THEME=$(<"${CURR_DIR_CACHE:?}/theme")
 [[ ${THEME:?} =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
 

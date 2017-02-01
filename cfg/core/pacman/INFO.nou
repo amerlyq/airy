@@ -1,3 +1,20 @@
+PGP signature
+  !! when problem with package update, first update 'archlinux-keyring' pkg
+   E.G: signature from "Ambrevar <ambrevar@gmail.com>" is unknown trust
+     corrupted (invalid or corrupted package (PGP signature)
+  Check expiration date
+    $ pacman-key -l ambrevar
+  Add his public key
+    $ gpg --recv-keys 249B39D24F25E3B6
+
+
+Revert broken new package
+  $ sudo pacman -Syu  --ignore=firefox
+  # OR: /etc/pacman.conf: IgnorePkg=firefox ; IgnoreGroup=core
+  Degrade manually:
+    $ pacman -U /var/cache/pacman/pkg/firefox-42.0-3-x86_64.pkg.tar.xz
+
+
 NOTE: find all dependent pkgs
   $ pactree -r <pkg>  $ before 'pacX' -- its cool!
 

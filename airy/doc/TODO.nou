@@ -41,6 +41,7 @@ maint
 
 
 structure
+  [_] MOVE ./bin -> ./ctl and populate prgs from ./bin with unchanged names
   [_] Add VAR 'tags' to generate symlinked categories into ./_build
     2017-01-30 [X] ALT:TEMP: for each 'setup' add '# tags: .. .. ..' after /^source ~\/.*cfgsetup/
     [_] cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
@@ -131,6 +132,10 @@ linkcp
   2017-01-23 [X] remove 'sudo' from linkcp
   2017-01-23 [X] rename all 'link' func into 'linkcp' script
   ! [_] harden system perms security by using linkcp copy into sys dirs instead of symlinks
+  [_] MOVE: linkcp, svc_activate into 'airy' in ./bin
+  [_] THINK: optimize ./bin <Tab> time -- scripts can be copied instead of symlinks
+    BAD: scripts can be dependent on in-dir stuff through 'readlink'
+  [_] THINK: split into 'mlink' and 'mcopy' ?
 
 
 PKGMOD

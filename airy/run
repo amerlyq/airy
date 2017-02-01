@@ -1,8 +1,6 @@
 #!/bin/bash -eu
 # NOTE: for skip-only due to getopts you need two double hypen
 #   ./$0 -- -- ...  # skip-only
-source ~/.shell/profile
-
 
 ### Cmdline
 # a=all, g=generate
@@ -10,24 +8,33 @@ opts=; while getopts 'agsmifuU' o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
 has(){ [[ $opts =~ [$*] ]]; }
 
+# DEV: allow install mods by full paths (or . )
 for((i=1;i<=$#;++i)); do [[ ${!i} == -- ]] && break; done
 mods=( "${@:1:i-1}" )
 skip=( "${@:i+1}" )
 defaults=$(( !${#mods[@]} && !${#skip[@]} ))
 
 
+### Environment
+airy=$(dirname "$(readlink -e "$0")")
+repo=$(git -C "$airy" rev-parse --show-toplevel)
+cache=$repo/_build
+bin=$cache/bin
+
+# BAD:FIXME: cfgsetup must copy all r.airy-* into "$bin"
+mkdir -p "$bin"
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
+[[ :$PATH: == *:$bin:* ]] || export PATH=$bin:$PATH
+"$airy/setup" -m  # BAD!RFC: dirty code duplication
+
+
 ### Profile
+source ~/.shell/profile
 (( ${#mods[@]} )) || mods=( "${PKG_LIST[@]}" )
 (( ${#skip[@]} )) || skip=( "${PKG_SKIP[@]}" )
 
 
-### Environment
-cd "$(dirname "$(readlink -e "$0")")"
-cd "$(git rev-parse --show-toplevel)"
-
-airy=$PWD
-cache=$airy/_build
-
+### Run
 # WARN: for {pacman, jobs, etc} USE >/dev/tty
 exec > >(tee "$cache/setup.log" | r.airy-pretty)  # colorize
 # Do only if you run setup/install/etc
