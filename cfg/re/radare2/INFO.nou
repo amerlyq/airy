@@ -34,6 +34,12 @@ SEE:
   Shift section vma
     (gdb) info files
     [r2]> S 0x0003ef70 0x2c0e5f70 0x6a4a0 0x6a4a0 .text r-x
+  Shift base address
+    e bin.baddr = 0x6e81e120
+    ALT: $ r2 -B 0x6e81e120 lib.so
+  Disassemble
+    # aaa
+    pd
   Map region as function '_clean'
     af _clean 0x2c0eb104
     pdf@_clean

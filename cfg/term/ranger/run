@@ -22,7 +22,10 @@ export RANGER_TMPDIR=${TMPDIR:-/tmp}/ranger
 
 # TERMCMD -- for rifle when open_with -t'
 # .._RC -- speed up ranger start time
-TERMCMD='r.t' SHELL="$(which r.shell)" RANGER_LOAD_DEFAULT_RC=FALSE \
+# TODO:(termcmd) if inside tmux -- use 'tmux new-window', etc
+RANGER_LOAD_DEFAULT_RC=FALSE \
+  TERMCMD="$(which st)" \
+  SHELL="$(which r.shell)" \
   ranger --choosedir="$RANGER_TMPDIR/cwd" "${@:-$PWD}"
 
 # Automatically change the directory in bash to the last visited one
