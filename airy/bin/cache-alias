@@ -1,0 +1,49 @@
+#!/bin/bash -eu
+# WARN: for timestamping you need non-regex name w/o spaces: $a = \S+
+
+mod=${PWD##*/}
+from='alias'  # NOTE: either file or dir
+output=${TMPDIR:-/tmp}/airy-cache-alias
+
+header='# vim:ft=sh'
+begfmt='_alias_cat(){  # %s'
+endfmt='}; _alias_cat'
+
+# q=quiet
+opts=; while getopts 'f:m:o:q' o; do case $o in :|'?') exit 1
+;; m) mod=$OPTARG
+;; f) from=$(readlink -e "$OPTARG")
+;; o) output=$(readlink -f "$OPTARG")
+esac; opts+=$o; done; shift $((OPTIND - 1))
+log(){ [[ $opts =~ q ]] || printf '%s\n' "$@"; }
+
+section_append(){ local f=$1 s a b e t tt
+  s=$(readlink -e "$2")
+  a=$mod/${s##*/}
+  b=$(printf "$begfmt" "$a")
+  e=$(printf "$endfmt" "$a")
+  t=$(command stat -c%Y "$s")
+  tt=$(sed -n "\|^$b\s*\([0-9]\{10\}\)\$|{s//\1/p;q}" "$f")
+  (( t == tt )) && log "* A: $a" && return
+  sed -i "
+  \|^$b|,\|^$e$| {
+    \|^$b|{
+      i $b $t\\n# $s
+      r $s
+    }; \|^$e$|b; d
+  }
+  \$ {
+    a\\\n\\n$b $t\\n# $s
+    r $s
+    a $e
+  }" "$f"
+  log "+! A: $a"
+}
+
+[[ -s $output ]] || (set +C; printf '%s\n' "$header" > "$output")
+[[ -d $from ]] && lst=( "$from"/* ) || lst=( "$from" )
+
+for f in "${lst[@]}"; do
+  [[ -s $f ]] || continue
+  section_append "$output" "$f"
+done

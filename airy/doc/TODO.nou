@@ -86,15 +86,6 @@ structure
       + sep rel symlins list can be commited to own repo
       - git <v2.10.2 on Windows will replace symlinks by text files
         = so I can commit relative symblinks without problem
-  2017-01-27 [X] Add alias file for some cfgs -- and on ./setup gather >> ~/.cache/airy/aliases
-    + dump all files into single one
-      + reduce startup time
-      !! shell-specific unportable aliases (ZSH)
-      !! 'return' to interrupt sourcing will affect whole dump
-      ::: wrap each sourced file into function and call it immediately
-        => ALT:(non-robust): instead of 'return' from sourced files use 'if..fi' guards
-    ~ file list with whole pathes
-    ~ dir with symlinks to aliases
 
   [_] gather all artifacts into '_build' dir instead of ~/.cache/airy/
     [_] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
@@ -136,6 +127,27 @@ linkcp
   [_] THINK: optimize ./bin <Tab> time -- scripts can be copied instead of symlinks
     BAD: scripts can be dependent on in-dir stuff through 'readlink'
   [_] THINK: split into 'mlink' and 'mcopy' ?
+
+
+cache-alias
+  [_] DEV: generalize to cache any file types beside storing shell aliases
+  [_] FIXME:(restrict): don't source other files named 'aliases' beside in ./mod dir
+  [_] THINK: keep short 'mod' name instead of 'path' to allow mods moving
+    => can be changed back to 'full path' when all mods placed in single dir
+  [_] TODO:DEV: dump aliases and functions individually for each shell after configure
+    => faster startup from single file
+  [_] BAD: if $f was manually edited -- NEED to regenerate anyway
+    SEE: http://fahdshariff.blogspot.com/2012/12/sed-mutli-line-replacement-between-two.html
+
+  2017-01-27 [X] Add alias file for some cfgs -- and on ./setup gather >> ~/.cache/airy/aliases
+    + dump all files into single one
+      + reduce startup time
+      !! shell-specific unportable aliases (ZSH)
+      !! 'return' to interrupt sourcing will affect whole dump
+      ::: wrap each sourced file into function and call it immediately
+        => ALT:(non-robust): instead of 'return' from sourced files use 'if..fi' guards
+    ~ file list with whole pathes
+    ~ dir with symlinks to aliases
 
 
 PKGMOD
