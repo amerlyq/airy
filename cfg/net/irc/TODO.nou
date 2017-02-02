@@ -1,0 +1,61 @@
+SEE
+  https://www.reddit.com/r/archlinux/comments/3gv77g/why_do_we_use_irc_still/
+  http://askubuntu.com/questions/743/coolest-looking-terminal-irc-client
+
+
+USAGE
+  REF
+    ++ https://irssi.org/documentation/startup/
+    http://tldp.org/HOWTO/IRC/beginners.html
+    https://wiki.archlinux.org/index.php/irssi
+    https://meta.wikimedia.org/wiki/IRC/Instructions
+    ++ https://botbot.me/how-to-setup-irc-channel/
+    v /etc/irssi.conf
+
+  Web: http://webchat.freenode.net/
+  $ irssi
+   /NETWORK LIST
+   /CONNECT Freenode
+   /JOIN #irssi
+   /SET hilight_nick_matches_everywhere ON
+
+  Auth with SASL
+     /NETWORK ADD -sasl_mechanism plain -sasl_username myuser -sasl_password mypass freenode
+     /SERVER ADD -auto -ssl -ssl_verify -ssl_capath /etc/ssl/certs -net freenode irc.freenode.net 6697
+     /SAVE
+     !! restart irssi
+
+  https://freenode.net/kb/answer/registration
+    ! Expires after 10 weeks from last log in
+     /msg NickServ REGISTER pass user@example.com
+
+  Save windows layout
+     /layout save
+
+History
+  Bouncers to be logged 24/7
+    http://superuser.com/questions/636414/how-to-see-chat-history-in-irc-channel
+    https://github.com/FruitieX/znc-backlog
+    https://robots.thoughtbot.com/running-weechat-on-a-server-for-irc-backlogs
+    http://nerderati.com/2010/11/29/perpetual-irc-the-proxy-edition/
+  Bot to log
+
+Passwords
+  https://github.com/irssi/irssi/issues/6
+
+ALT
+  +++ TRY: bitlbee
+    XMPP -> IRC
+
+  irssi (perl)
+  wheechat
+  epic + splitfire
+    http://www.epicsol.org/
+
+  suckless
+    http://swtch.com/irc/
+    http://c9x.me/irc/
+    http://www.r-36.net/src/Various/ircc.tgz
+    http://plan9.bell-labs.com/sources/contrib/fgb/rc/ircrc
+    http://tools.suckless.org/sic
+    https://github.com/ec429/quIRC
