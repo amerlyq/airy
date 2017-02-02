@@ -105,6 +105,13 @@ TODO
     * merge and enumerate comments for keys with identical vals in same file order
     * for different vals print all vals list and enumerate comments, add mark to search conflicts
     * Keys for PR: print only difference for key-vals: clean, sort, diff
+    NEED:
+      Filter list by list
+        cat data | grep -f subset
+      Modify list by list
+        cat data | awk 'BEGIN{ while(getline < "subset"){ a[$0]=1 }} /^0x/{ split($0,k,"/"); print(a[k[length(k)]]?"@ ":"  ")$0 }'
+      Sort list by list
+        = DEV this
 
 nou:
   [_] script 'todo'
