@@ -5,13 +5,53 @@ SEE:
     http://radare.today/page/3/
     > http://radare.today/visual-mode/
     >> http://phrack.org/issues/66/14.html
+    + http://reverseengineering.stackexchange.com/questions/1842/what-are-the-main-features-of-radare2
   EXPL
     http://dukebarman.pro/na-radare-kak-na-ladoni/
     https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
   Cheetsheets
     https://github.com/pwntester/cheatsheets/blob/master/radare2.md
+    https://radare.gitbooks.io/radare2book/content/introduction/commandline_flags.html
   SEE There are also sdb!
     ? https://github.com/radare/radare2/tree/master/shlr/sdb
+    http://radare.today/posts/solving-crackmes-with-ldpreload/
+  TUT
+    ++ https://retro.moe/2015/11/18/disassembling-6502-code-with-radare-part-i/
+    ++ https://blog.techorganic.com/2016/03/08/radare-2-in-0x1e-minutes/
+    +++ http://radare.tv/a/1
+    ++ https://techstarspace.wordpress.com/2015/04/23/reverse-engineering-1-getting-familiar-with-radare2/
+    http://phrack.org/issues/66/14.html
+    https://www.praetorian.com/blog/reversing-and-exploiting-embedded-devices-part-1-the-software-stack
+    http://developers-club.com/posts/274617/
+    http://davidjwalling.blogspot.com/2016/10/radare2-redux-single-step-debug-64-bit.html
+  Detouring
+    http://www.doc.ic.ac.uk/teaching/distinguished-projects/2012/m.kwan%2520.pdf
+
+    https://linux.conf.au/wiki/Tutorials/Reverse_engineering_embedded_software_using_Radare2
+    https://github.com/pastcompute/lca2015-radare2-tutorial
+    https://github.com/pastcompute/radare2
+  IDA cmp
+    http://solidsec.blogspot.com/2015/10/tool-radare-2-open-source-alternative.html
+  Hack collaboration tools
+    http://lockboxx.blogspot.com/2015/11/cooperative-infrastructure-for-security.html
+  Reverse
+    https://insinuator.net/2016/08/reverse-engineering-with-radare2-intro/
+    https://insinuator.net/2016/08/reverse-engineering-with-radare2-part-1/
+    https://insinuator.net/2016/08/reverse-engineering-with-radare2-part-2/
+    https://insinuator.net/2016/10/reverse-engineering-with-radare2-part-3/
+  !!! Tools
+    http://wiki.yobi.be/wiki/Reverse-Engineering
+    http://pax0r.com/staff/tools2016/
+  DEBUG
+    http://reverseengineering.stackexchange.com/questions/11207/how-to-debug-like-gdb-with-radare2
+    https://github.com/radare/radare2/wiki/Migration-from-ida-or-GDB
+
+ALSO
+  inguma, bokken, pyew
+    http://ingumadev.blogspot.com/
+
+Radare2 in docker
+  http://jango.si/post/running-radare2-in-docker/
 
 
 %% USAGE
@@ -35,8 +75,15 @@ SEE:
     (gdb) info files
     [r2]> S 0x0003ef70 0x2c0e5f70 0x6a4a0 0x6a4a0 .text r-x
   Shift base address
-    e bin.baddr = 0x6e81e120
-    ALT: $ r2 -B 0x6e81e120 lib.so
+    Only for PIE binds
+      $ r2 -B 0x6e81e120 lib.so   # BAD: doing something wrong
+      OR: e bin.baddr = 0x6e81e120
+    Map file at given address
+      $ r2 -m 0x6e81e120 lib.so   # BAD: don't work ?
+    > oa 0x6e81e120 ./lib.so      # BAD: don't work ?
+    > o ./lib.so 0x6e81e120       # BET: seems to work
+      NOTE: open library twice -- at beginning and then at address of choice
+        => ALT: use actual ELF binary as first one
   Disassemble
     # aaa
     pd
@@ -48,6 +95,30 @@ SEE:
   Analyze stack
     ad@esp
     pxw@esp
+  Load-time relocation of shared libs
+    http://eli.thegreenplace.net/2011/08/25/load-time-relocation-of-shared-libraries/
+
+  Loading shared libs -- static environment
+    EXPL: Why vaddr = ph offset
+      https://github.com/radare/radare2/issues/4155
+    +++ http://michalmalik.github.io/elf-dynamic-segment-struggles
+    ==> https://radare.gitbooks.io/radare2book/content/basic_commands/mapping_files.html
+    https://github.com/radare/radare2/issues/4816
+    REQ: I can directly ask #radare on freenode
+      https://github.com/radare/radare2/issues/1000#issuecomment-94160750
+
+CFG
+  Analysis speed
+    http://radare.today/posts/analysis-by-default/
+
+Shell
+  Shell interaction $ radare2 /sbin/init
+  [0x000096e9]> pd | wc -l  # (print number of lines in outout!)
+  [0x0000974d]> pd `a_program_calculates_address.sh`  # (disassembly, etc)
+  [0x0000974d]> pd > somefile.txt  # (redirection)
+  [0x0000974d]> !ls -l  # (shell command output)
+  [0x0000974d]> f | less  # (browse all flags)
+  [0x0000974d]> pD `echo 42`  # (inline substitution, disassemble 42 bytes)
 
 
 %% Coredump
