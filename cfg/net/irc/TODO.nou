@@ -1,7 +1,33 @@
+REF
+  https://en.wikipedia.org/wiki/Internet_Relay_Chat
+
 SEE
   https://www.reddit.com/r/archlinux/comments/3gv77g/why_do_we_use_irc_still/
   http://askubuntu.com/questions/743/coolest-looking-terminal-irc-client
 
+Setup
+  https://gist.github.com/ffledgling/5768485
+  http://paquier.xyz/manuals/archlinux/misc-configuration/irssi/
+  http://askubuntu.com/questions/61549/how-do-i-configure-irssi
+  + http://pbraun.nethence.com/unix/chat/irssi.html
+  http://misc.nybergh.net/pub/irssi/config.example
+
+TODO
+  [_] certificate instead of password
+    https://freenode.net/kb/answer/certfp
+  [_] ? history ?
+  [_] ? another irc client with non-intrusive configuration ?
+  [_] G: WTF chatnet
+  2017-02-03 [X] request cloak
+    http://freenode.net/kb/answer/cloaks
+  [_] anonymity -- use bouncing ?
+    https://en.wikipedia.org/wiki/IRC_bouncer
+    http://superuser.com/questions/528816/how-to-hide-public-ip-adress-on-irc-channel
+    http://superuser.com/questions/564983/how-do-i-hide-my-username-in-irc
+
+Code of conduct
+  Don't use PM directly -- ask for them in common chat and wait on them
+    READ: https://www.drupal.org/irc/usage
 
 USAGE
   REF
@@ -12,6 +38,9 @@ USAGE
     ++ https://botbot.me/how-to-setup-irc-channel/
     v /etc/irssi.conf
 
+  Navigation
+    https://joost.vunderink.net/blog/2011/12/02/irssi-tricks-navigating-around/
+
   Web: http://webchat.freenode.net/
   $ irssi
    /NETWORK LIST
@@ -21,16 +50,22 @@ USAGE
 
   Auth with SASL
      /NETWORK ADD -sasl_mechanism plain -sasl_username myuser -sasl_password mypass freenode
-     /SERVER ADD -auto -ssl -ssl_verify -ssl_capath /etc/ssl/certs -net freenode irc.freenode.net 6697
+     /SERVER ADD -auto -ssl -ssl_verify -ssl_capath /etc/ssl/certs -network freenode chat.freenode.net 6697
      /SAVE
      !! restart irssi
 
   https://freenode.net/kb/answer/registration
-    ! Expires after 10 weeks from last log in
+    !! Expires after 10 weeks from last log in
      /msg NickServ REGISTER pass user@example.com
+     >> SEE your mailbox
+     /msg NickServ VERIFY REGISTER user xxxxxxxxxxxx
 
   Save windows layout
      /layout save
+
+  Ignore crap beside choosen channels
+     /ignore * joins parts quits
+     /ignore -except #suckless,#radare joins parts quits
 
 History
   Bouncers to be logged 24/7
@@ -42,6 +77,10 @@ History
 
 Passwords
   https://github.com/irssi/irssi/issues/6
+
+Security
+  ? Create separate user only for irc ?
+    http://tldp.org/HOWTO/IRC/beginners.html
 
 ALT
   +++ TRY: bitlbee
