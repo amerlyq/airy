@@ -94,6 +94,12 @@ call dein#add('terryma/vim-expand-region', {
 
 
 
+""" Selections -- mark and retrieve (save/load) {{{1
+" BAD: seems like can't be remapped because of <script> param in mapping
+" call dein#add('iago-lito/vim-visualMarks', {'lazy': 0}}
+
+
+
 "" (DISABLED) Dependency of user modes with custom temporary remappings {{{1
 " ALT:USE: <Plug>(submode-
 call dein#add('kana/vim-submode', {'if': 0, 'lazy': 0,
