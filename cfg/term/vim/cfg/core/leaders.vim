@@ -32,7 +32,7 @@ for [M, maps] in items(s:leads)
   for [L, K] in items(maps)
     let L = '['.L.']'
     call Map_nxo(K, L, M)
-    call Map_nxo(L, '<Nop>', M, 'noremap')
+    call Map_nxo(L, '<Nop>', M, 0, 'noremap')
   endfor
 endfor
 

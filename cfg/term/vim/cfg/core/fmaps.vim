@@ -8,9 +8,18 @@ endf
 
 
 fun! Map_nxo(lhs, rhs, ...)
-  for m in split(a:0>0 ? a:1 : 'nxo', '\zs')
+  let modes = get(a:, 1, 'nxo')   " =modes
+  let augmt = get(a:, 2, 0)       " 0=unique, 1=augment, 2=override
+  let mapcmd= get(a:, 3, 'map')   " map/noremap
+  for m in split(modes, '\zs')
     " echo m.(a:0>0 ? a:1 : 'map').' <silent><unique> '. a:fr .' '. a:to
-    exe m.get(a:, 2, 'map').' <silent><unique> '. a:lhs .' '. a:rhs
+    if augmt==1 && mapcheck(a:lhs, m) !=# '' | continue |en
+    try|exe join([m.mapcmd, '<silent>',
+          \ (augmt==2 ? '' : '<unique>'), a:lhs, a:rhs])
+    catch /^Vim\%((\a\+)\)\=:E227/
+      echo v:exception
+      verbose exe mapcmd.' '.a:lhs
+    endt
   endfor
 endfun
 
@@ -20,7 +29,7 @@ fun! Map_blocks(prefix, mapping, ...)
     for i in range(1, strlen(g)-1)
       " THINK: for k in ['', '[Space]', 'g[Space]', '<Leader>[Space]']
       call Map_nxo(a:prefix.g[i], a:mapping.g[0],
-          \ get(a:, 1, 'ox'), get(a:, 2, 'noremap'))
+          \ get(a:, 1, 'ox'), 0, get(a:, 2, 'noremap'))
     endfor
   endfor
 endf

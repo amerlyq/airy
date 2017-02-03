@@ -1,6 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/system
-cd $(dirname $(readlink -m ${0}))
+cd "$(dirname "$(readlink -e "$0")")"
 
 ### PLUGINS ###
 # BUG: returns non-zero errcode!
@@ -8,6 +8,7 @@ cd $(dirname $(readlink -m ${0}))
 # FIXME: error on clean system, when NeoBundle is not installed yet
 # DEV:TODO: use 'g:dein#install_log_filename' instead of 'redir!'
 
+# NOTE: EDITOR=vim ./update
 # -nesR -u "$PWD/vimrc" ... -- ./vimrc
 shvim() { $EDITOR -nR \
   -c "set nomore|redir!>/dev/stderr" \

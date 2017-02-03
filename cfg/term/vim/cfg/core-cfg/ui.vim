@@ -1,7 +1,8 @@
 set list            " display otherwise invisible characters
 set listchars=tab:▸\ ,trail:·,extends:»,precedes:«,nbsp:␣  " ❯❮, eol:¬
 " if IsWindows()| set listchars=tab:\\_,trail:-,extends:>,precedes:<,nbsp:~ |en
-set showbreak=\ ↪  " =..
+" set showbreak=\ ↪
+set showbreak=..
 
 set nowildmenu      " visual tab-completion variants menu in command mode
 set wildmode=list:longest,full          "instead of first-choosing
