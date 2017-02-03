@@ -18,13 +18,16 @@ call dein#add('ngn/vim-column', {
 " FIXME:BAD: <C-x> overlaps with unicode.vim '<C-x><C-..>'
 " TRY:(nou.vim) shorter year in date
 "   => hook_post_source: SpeedDatingFormat %y-%m-%d
+" BAD: can't restore visual selection after <C-a>
+" xnoremap <silent> <Plug>(speeddating+) :<C-u>call speeddating#incrementvisual(v:count1)<Bar>exe 'norm!`['.strpart(getregtype(),0,1).'`]'<CR>
 call dein#add('tpope/vim-speeddating', {
   \ 'on_map': [['nx', '<Plug>SpeedDating']],
+  \ 'on_func': 'speeddating#',
   \ 'depends': 'vim-repeat',
+  \ 'hook_source': "let g:speeddating_no_mappings = 1",
   \ 'hook_add': "
-\\n   let g:speeddating_no_mappings = 1
-\\n   call Map_nxo('<C-a>', '<Plug>SpeedDatingUp',   'nx')
-\\n   call Map_nxo('<C-x>', '<Plug>SpeedDatingDown', 'nx')
+\\n   call Map_nxo('<C-a>', '<Plug>SpeedDatingUp',  'nx', 1)
+\\n   call Map_nxo('<C-x>', '<Plug>SpeedDatingDown','nx', 1)
 \"})
 
 
@@ -46,7 +49,7 @@ call dein#add('AndrewRadev/multichange.vim', {
 " BAD: don't work with lazy loading
 " BAD: lazy dein can't reuse any already mapped keys like 'J/K'
 " BAD: fallback only to builtin 'J/K', ignoring user keymaps
-call dein#add('AndrewRadev/splitjoin.vim', {'on_if': 1,
+call dein#add('AndrewRadev/splitjoin.vim', {'lazy': 0,
   \ 'on_cmd': ['SplitjoinJoin', 'SplitjoinSplit'],
   \ 'on_map': [['n', '[Space]j', '[Space]k']],
   \ 'hook_add': "
@@ -62,9 +65,15 @@ call dein#add('AndrewRadev/splitjoin.vim', {'on_if': 1,
 "" Change textobj and propagate through the buffer {{{1
 " SEE: g:switch_definitions, {b|g}:switch_custom_definitions
 call dein#add('AndrewRadev/switch.vim', {
-  \ 'on_map': [['n', '-', '+']],
+  \ 'on_func': 'switch#',
   \ 'on_cmd': ['Switch', 'SwitchReverse'],
-  \ 'hook_source': _hcat('switch.src')})
+  \ 'hook_source': _hcat('switch.src'),
+  \ 'hook_add': "
+\\n   nnoremap <silent> <Plug>(switch+date) :<C-u>if !switch#Switch()<Bar> call speeddating#increment(v:count1) <Bar>en<CR>
+\\n   nnoremap <silent> <Plug>(switch-date) :<C-u>if !switch#Switch({'reverse': 1})<Bar> call speeddating#increment(-v:count1) <Bar>en<CR>
+\\n   call Map_nxo('<C-a>', '<Plug>(switch+date)', 'n', 2)
+\\n   call Map_nxo('<C-x>', '<Plug>(switch-date)', 'n', 2)
+\"})
 
 
 

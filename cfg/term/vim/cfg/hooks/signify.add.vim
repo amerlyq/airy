@@ -1,6 +1,7 @@
-let g:signify_vcs_list = ['git', 'hg', 'cvs']
+let g:signify_vcs_list = ['git', 'hg']
 let g:signify_sign_change = '~'
 let g:signify_sign_delete = '-'
+" let g:signify_update_on_focusgained = 1
 
 noremap <unique> zS :<C-u>SignifyFold<CR>
 noremap <unique> [Toggle]g :<C-u>SignifyToggleHighlight\|SignifyRefresh<CR>

@@ -32,6 +32,7 @@ call dein#add('tpope/vim-dispatch', {
 "" CHECK In unix terminal use snip-ranger-filechooser.vim {{{1
 " ALSO: [VimFiler, VimFilerExplorer, Edit, Read, Source, Write]
 " ALT: 'ctrlpvim/ctrlp.vim'
+" WARN: 'on_if' can break vim-signify
 call dein#add('Shougo/vimfiler.vim', {
   \ 'if': IsWindows(),
   \ 'on_map': {'n': '<Plug>'},

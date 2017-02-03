@@ -2,8 +2,8 @@
 " SEE: http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
 
 "" CHECK Unite main sources {{{1
-call dein#add('Shougo/neomru.vim', {'on_if': 1})
-call dein#add('Shougo/neoyank.vim', {'on_if': 1, 'on_source': 'unite.vim'})
+call dein#add('Shougo/neomru.vim', {'lazy': 0})
+call dein#add('Shougo/neoyank.vim', {'lazy': 0})
 
 
 
