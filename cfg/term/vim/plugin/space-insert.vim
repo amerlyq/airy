@@ -8,15 +8,21 @@ xnoremap <unique><silent> [Space]<Space>  c<Space><C-r>"<Space><Esc>
 nnoremap <unique><silent> <Leader><Space>  a<Space><Left><Left><Space><Esc>
 xmap     <unique><silent> <Leader><Space>  [Quote]a<Space>
 
-nnoremap <unique><silent> [Space]i  :<C-u>Limio i<CR>
-xnoremap <unique><silent> [Space]i  :<C-u>Limio I<CR>
+" BAD:FIXME: don't query for inserted char on repeat
+"   http://vimcasts.org/episodes/creating-repeatable-mappings-with-repeat-vim/
+nnoremap <silent> <Plug>(limio-i)  :<C-u>Limio i<Bar>call repeat#set("\<Plug>(limio-i)")<CR>
+xnoremap <silent> <Plug>(limio-I)  :<C-u>Limio I<Bar>call repeat#set("\<Plug>(limio-I)")<CR>
+nnoremap <silent> <Plug>(limio-a)  :Limio a<Bar>call repeat#set("\<Plug>(limio-a)")<CR>
+xnoremap <silent> <Plug>(limio-A)  :<C-u>Limio A<Bar>call repeat#set("\<Plug>(limio-A)")<CR>
+nnoremap <silent> <Plug>(limio-s)  :Limio s<Bar>call repeat#set("\<Plug>(limio-s)")<CR>
+xnoremap <silent> <Plug>(limio-S)  :<C-u>Limio S<Bar>call repeat#set("\<Plug>(limio-S)")<CR>
 
-nnoremap <unique><silent> [Space]a  :Limio a<CR>
-xnoremap <unique><silent> [Space]a  :<C-u>Limio A<CR>
-
-nnoremap <unique><silent> [Space]s  :Limio s<CR>
-xnoremap <unique><silent> [Space]s  :<C-u>Limio S<CR>
-
+nmap <unique><silent>  [Space]i  <Plug>(limio-i)
+xmap <unique><silent>  [Space]i  <Plug>(limio-I)
+nmap <unique><silent>  [Space]a  <Plug>(limio-a)
+xmap <unique><silent>  [Space]a  <Plug>(limio-A)
+nmap <unique><silent>  [Space]s  <Plug>(limio-s)
+xmap <unique><silent>  [Space]s  <Plug>(limio-S)
 
 command! -bar -nargs=1 Limio call LimitedInput(<q-args>)
 " silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
