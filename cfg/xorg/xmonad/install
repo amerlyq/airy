@@ -5,8 +5,9 @@ source ~/.shell/func.d/packages
 if distro arch; then
     # DEPRECATED: xorg-xmessage -- use r.vim-xmessage
     # FIXED:(>v0.12): 'getWindowAttributes' crash on Wine or Pidgin close
-    aur_inst -p 'xmonad' xmonad-git
-    # ALT: pkg_inst xmonad
+    # aur_inst -p 'xmonad' xmonad-git
+
+    pkg_inst xmonad
     pkg_inst wmctrl
     pkg_inst -d {/usr/share/doc/,}xmonad-contrib
 
