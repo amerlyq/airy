@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+# tags: net chat
+source ~/.shell/func.d/cfgsetup
+
+### GENS ###
+export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
+env-subs cfg/weechat.conf ~/.weechat/config

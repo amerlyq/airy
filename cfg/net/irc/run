@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+cd "$(dirname "$(readlink -e "$0")")"
+d=~/.weechat
+exec > "$d/weechat_fifo"
+exec < "$d/config"
+exec sed '/^#.*$/s///; /^\s*$/d; s/^/*/'
