@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+# source ~/.shell/profile
+cache=${CURR_DIR_CACHE-}
+
+if [[ -z $cache ]]; then
+  airy=$(dirname "$(readlink -e "$0")")
+  repo=$(git -C "$airy" rev-parse --show-toplevel)
+  cache=$repo/_build
+fi
+
+printf '%s\n' "$cache"

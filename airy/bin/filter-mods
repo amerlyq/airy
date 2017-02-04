@@ -17,14 +17,14 @@ frgx(){ local p="\\b$*\\b"
 #   => even if it also contained in PKG_SKIP
 # DEV: sort user mods to be directly before mods from ./pkg
 #   -- to limit influence scope and to group mods with identical name
-filter_find() { local accept regect=''
-  for s in "${skip[@]}"; do regect+="\\|$(frgx "$s")"; done
-  regect=${regect:2}
+filter_find() { local accept reject=''
+  for s in "${skip[@]}"; do reject+="\\|$(frgx "$s")"; done
+  reject=${reject:2}
 
   for m in "${mods[@]:?}"; do accept=$(frgx "$m")
     find -H "$cwd" -type d -regex ".*/\($accept\)" \
       -exec test -f '{}/install' -o -f '{}/setup' \; \
-      \! -regex ".*/\($regect\)" -print
+      \! -regex ".*/\($reject\)" -print
   done
 }
 

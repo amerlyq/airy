@@ -1,14 +1,11 @@
 #!/bin/bash -eu
-cwd=$PWD
-source ~/.shell/profile
-cd "$cwd"
-
-dir=$1  # _build
+cache=${1:-$(r.airy-get-cache)}
+cd "$cache" || exit 0
 
 rmdc(){ find "$1" -xdev -depth -mindepth 1 -delete; }
 
 echo "N: clean tags"
-r.airy-link-tags -t "$dir/tags" -d
+r.airy-link-tags -t "$cache/tags" -d
 
 # BAD: when deleting all together -- must run whole setup for other cleared areas
 #   NEED: clean only systemd ==> link only systemd
@@ -16,9 +13,9 @@ echo "N: clean systemd user units"
 rmdc ~/.config/systemd/user
 
 echo "N: clean aliases cache"
-rm -f "${CURR_DIR_CACHE:?}/aliases"
+rm -f "$cache/aliases"
 
 ## WARN! finally remove symlinks, as all next r.* calls become invalid
 # BAD: if symlinks will be always deleted, r.xorg will be never used in core/xorg
 echo "N: clean r.* symlinks"
-rmdc "${CURR_DIR_CACHE:?}/bin"
+rmdc "$cache/bin"
