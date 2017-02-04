@@ -72,8 +72,9 @@ elif distro arch; then
         source "$p"
         cd "$(dcache "pacaur/$pkgname")"
         linkcp -ct "$PWD" "$p"
-        updpkgsums && makepkg -sf
-        paccache -d "$pkgname"
+        makepkg -sf  # updpkgsums &&
+        source PKGBUILD  # EXPL: updated on build values for pkgver, etc
+        paccache -df "$pkgname"
         sudo pacman -U --needed --noconfirm \
           "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
       ) || return
