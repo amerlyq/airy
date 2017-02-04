@@ -38,10 +38,21 @@ USAGE
     ++ https://botbot.me/how-to-setup-irc-channel/
     v /etc/irssi.conf
 
+  Startup
+    https://weechat.org/files/doc/stable/weechat_quickstart.en.html
+     /secure passphrase this is my secret passphrase
+    Then add a secured data with your freenode password:
+     /secure set freenode_password xxxxxxx
+
   Navigation
     https://joost.vunderink.net/blog/2011/12/02/irssi-tricks-navigating-around/
 
-  Web: http://webchat.freenode.net/
+  Status for users
+    '/who freenode/staff/*'; some may also be on '/stats p'
+
+  Web:
+    http://webchat.freenode.net/
+    http://irc.lc/oftc/realname/t4nk@@@
   $ irssi
    /NETWORK LIST
    /CONNECT Freenode
@@ -96,19 +107,46 @@ Bouncer
       +? https://matrix.org/blog/2015/06/22/the-matrix-org-irc-bridge-now-bridges-all-of-freenode/
     VPS -- install
       https://www.digitalocean.com/community/tutorials/how-to-install-znc-an-irc-bouncer-on-an-ubuntu-vps
+      https://gist.github.com/freebroccolo/11381154
   Router
     http://webcache.googleusercontent.com/search?q=cache:uizP7zllBWUJ:http://www.snbforums.com/threads/n66u-and-an-irc-bouncer.14391/%2Basus+router+irc+bounce&hl=ru&ct=clnk
     http://www.snbforums.com/threads/n66u-and-an-irc-bouncer.14391/
     https://asciinema.org/a/7999
       ALSO:(mpd): https://asciinema.org/a/9018
 
+  Solarized
+    http://benoliver999.com/2014/02/18/weechatconf/
+
 ALT
-  +++ TRY: bitlbee
-    XMPP -> IRC
+  United
+    +++ TRY: bitlbee
+      XMPP -> IRC
+      https://www.bitlbee.org/main.php/news.r.html
+      |bitlbee|
+      |bitlbee-libpurple|
+      |bitlbee-discord-git|
+    ? skype
+      https://sameroom.io/blog/connecting-skype-to-irc/
+
+  znc + bitlbee = skype + gtalk + ...
+    ! http://william.weiskopf.me/irc/
+    !!! https://www.dont-panic.cc/capi/2011/12/10/a-geeks-unified-instant-messaging-setup/comment-page-1/
+    SEE: ./skype.nou
+
+
+  Comparison
+    +++ https://wiki.archlinux.org/index.php/List_of_applications/Internet#IRC_clients
+    https://en.wikipedia.org/wiki/Comparison_of_Internet_Relay_Chat_clients
+    http://profectium.blogspot.com/2013/07/comparison-of-irc-clients.html
 
   irssi (perl)
-  wheechat
-  epic + splitfire
+    https://scripts.irssi.org/
+  weechat
+    REF
+      https://weechat.org/files/doc/devel/weechat_quickstart.en.html#join_part_irc_channels
+      https://garbas.si/2015/i-love-weechat.html
+    ++ https://github.com/susam/inwee
+  epic + splitfire (ircll)
     http://www.epicsol.org/
 
   suckless

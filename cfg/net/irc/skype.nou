@@ -1,0 +1,70 @@
+Bitlbee (server), Weechat (client), setup for chatting with Skype and Google Hangouts (Gtalk)
+
+#weechat   #skype4py   #bitlbee   #gtalk
+
+I have to say it was pretty frustrating getting Skype to work with the Skype4py plugin. GTalk was super easy
+
+Download the latest bitlbee source and run the following command
+
+# Compile and install bitlbee for Skype and openssl use
+./configure --skype=1 --debug=1 --ssl=openssl
+make
+sudo make install
+
+# Create a little startup script for bitlbee service to run
+nano bitlbee.sh
+sudo /usr/local/sbin/bitlbee -c /etc/bitlbee/bitlbee.conf
+(save and exit)
+
+# Download Skype4Py separately and run the following commands
+cd skype4py
+sudo python setup.py install
+mkdir ~/.skyped/
+cp /usr/local/etc/skyped/skyped.conf /usr/local/etc/skyped/skyped.cnf .
+echo -n <yourskypepass> | sha1sum
+# Take the result that comes out here and copy the DIGITS ONLY, don't copy the spaces and the hyphen that are after the sum
+nano skyped.conf
+# paste in your sum next to password =
+# set the username field to your skype username
+# set the key and cert paths equal to your home directory and full file path to the certs we are about to create /home/<username>/.skyped/
+# exit and save
+
+openssl req -new -x509 -days 365 -nodes -config skyped.cnf -out skyped.cert.pem -keyout skyped.key.pem
+
+# Start Bitlbee, Skyped, and weechat
+1.) bitlbee.sh
+2.) skyped -n -d
+3.) weechat
+
+# Connect weechat to bitlbee
+1.) /connect localhost
+2.) CTRL+P (to switch windows...this should be documented better)
+
+# Proceed with adding accounts now
+# GTalk:
+1.) account add jabber <email> <pass>
+2.) account jabber on
+
+# Skype:
+1.) account add skype <username> <pass>
+2.) account skype on
+
+After that all should be working correctly now.
+
+# Errors I received
+1.) `Username and/or password is WRONG`. I believe initially that was due to the fact that I compiled bitlbee with --ssl=nss and I used openssl to generate my certificates.
+OR it could have been the fact that I built and installed skype4py after making bitlbee
+OR it could be simply on initial setup of skype in bitlbee I didn't run a `save` command after adding the account, and bitlbee for some reason needed to only read skypes credentials based off of the configuration file, which is stored in /var/lib/bitlbee/<username>.xml.
+
+I wasn't sure really how to determine what bitlbee was looking at for the username and pass for skype so I modified the following source code file
+<bitlbee-3.4/protocols/skype/skyped.py>
+
+line = options.conn.recv(1024)
+if line.startswith("USERNAME") and line.split(' ')[1].strip() == options.config.username:
+        ret += 1
+line = options.conn.recv(1024)
+if line.startswith("PASSWORD") and hashlib.sha1(line.split(' ')[1].strip()).hexdigest() == options.config.password:
+        ret += 1
+dprint("Username=" + options.config.username)
+dprint("Password=" + options.config.password)
+# I added the two dprint lines just to make sure my username and password were pulling from the correct directory </home/<username>/.skyped/skyped.conf> file. After re-compiling the source code I was able to see the username and pass print out in the terminal that was running skyped -n -d. ﻿
