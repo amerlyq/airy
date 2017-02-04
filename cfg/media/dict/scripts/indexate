@@ -1,5 +1,4 @@
 #!/bin/bash -e
-source ~/.shell/func.d/cfgsetup
 
 src=${1:-/home/media/res/dicts}
 [[ -d $src ]] || die "Err: No dir with *.dict.dz specified"
@@ -7,7 +6,7 @@ src=${1:-/home/media/res/dicts}
 ## Link directory to access it by 'nobody'
 dst=/usr/share/dictd
 [[ ! -e $dst || -L $dst ]] || sudo mv -vf -- $dst ${dst}_
-[[ "$src" -ef $dst ]] || sudo ln -sfvT "$src" $dst
+[[ $src -ef $dst ]] || sudo ln -sfvT "$src" $dst
 
 
 ## Generate database of all dictionaries in 'dir'

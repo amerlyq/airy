@@ -1,9 +1,9 @@
 #!/bin/bash -e
-source ~/.shell/func.d/cfgsetup
+source ~/.shell/profile
 
 genssh(){ # $1 -- @mail, $2 -- path/to/key
-    local mail="$1" idn=~/.ssh/"$2"
-    if cfgOpt u || [[ ! -f "$idn" ]]; then
+    local mail=$1 idn=~/.ssh/"$2"
+    if [[ ! -f $idn ]]; then
         ssh-keygen -t rsa -C "$mail" -N "" -f "$idn"
         echo "!!! Copy generated *.pub key to your servers"
     fi

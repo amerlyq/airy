@@ -1,9 +1,20 @@
 #!/bin/bash -e
-source ~/.shell/func.d/cfgsetup
 
 # Troubles with Adwaita in skype/gvim (DFL, not installed):
 # https://wiki.archlinux.org/index.php/GTK%2B
 #   cat /usr/share/gtk-2.0/gtkrc
+
+theme=${1:-${GTK_THEME-}}
+
+# GUI (use lxappearance): Adwaita, Hope-DT, FlatStudioGray, Mint-X, Ambiance, Vertex-Dark
+case $theme
+in  lucid) GTK_THEME="FlatStudioGray"
+;; opaque) GTK_THEME="FlatStudioDark"
+;;  light) GTK_THEME="FlatStudioLight"
+# EXPL: to eliminate 'deprecated' warnings
+;; dark|*) GTK_THEME="Adwaita"; GTK_DARK=1
+esac
+
 
 g2=~/.gtkrc-2.0
 g3=~/.config/gtk-3.0/settings.ini
@@ -16,16 +27,6 @@ wopt() { local v=${*:2}
   printf '%s = %s\n' "$1" "$v" >> $g2
 }
 
-# GUI (use lxappearance): Adwaita, Hope-DT, FlatStudioGray, Mint-X, Ambiance
-# Vertex-Dark
-if cfgOpt t || [[ -z ${GTK_THEME-} ]]; then
-case $THEME
-in  lucid) GTK_THEME="FlatStudioGray"
-;; opaque) GTK_THEME="FlatStudioDark"
-;;  light) GTK_THEME="FlatStudioLight"
-# EXPL: to eliminate 'deprecated' warnings
-;; dark|*) GTK_THEME="Adwaita"; GTK_DARK=1
-esac; fi
 
 wopt 'gtk-theme-name' "${GTK_THEME:?}"
 # [[ ! ${GTK_THEME,,} =~ dark ]] ||

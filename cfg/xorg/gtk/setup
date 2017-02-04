@@ -1,9 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: xorg
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-./gtk.gen
+./gtk.gen "$THEME"
 
 ## Use gtk themes for Qt4
 cfg=~/.config/Trolltech.conf
