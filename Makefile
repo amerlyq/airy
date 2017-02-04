@@ -14,3 +14,16 @@ install:
 .PHONY: update
 update:
 	r.airy -siu
+
+.PHONY: clean
+clean:
+	r.airy-clean _build
+
+.PHONY: log
+log:
+	r.airy-pretty < _build/setup.log | less -r
+
+.PHONY: tags
+tags: _build/tags
+_build/tags: _build/mods
+	r.airy-link-tags -t _build/tags -f _build/mods
