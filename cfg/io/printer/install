@@ -2,7 +2,7 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst cups ghostscript gsfonts
-    pkg_inst cups-pdf  # print in pdf
-    pkg_inst avahi  # network discovering
+  pkg_inst cups ghostscript gsfonts
+  pkg_inst -d '/usr/lib/cups' cups-pdf  # virtual pdf printer
+  pkg_inst avahi  # network discovering
 fi

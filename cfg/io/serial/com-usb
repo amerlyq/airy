@@ -72,6 +72,11 @@ hopt s && ssh srk 'LOGDUMP="'$RMDIR/show-log'"
 
 
 # Filtering Serial output
-#ALT: ansifilter OR (to disable buffering completely): stdbuf -i0 -o0 -e0 command
 cat "$PORT" | stdbuf -oL -eL tr -cd "[:print:]\033\n" |
     awk -v fa="$DIR/$FA" -v ff="$DIR/$FF" "$BODY"
+
+# ALT: ansifilter OR (to disable buffering completely): stdbuf -i0 -o0 -e0 command
+## DEPRECATED: by 'tr ...'
+# wget_inst 'http://www.andre-simon.de/zip/ansifilter-1.10.tar.gz'
+## DISABLED: Can't compile by the reason of <lua.hpp> is inside its own directory...
+# wget_install 'http://www.andre-simon.de/zip/highlight-3.19.tar.gz'

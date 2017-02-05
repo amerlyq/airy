@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  # fbreader
+  aur_inst fbless
+
+elif distro ubuntu; then
+  git_inst 'matimatik/fbless'
+fi

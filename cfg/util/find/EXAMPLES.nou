@@ -21,6 +21,9 @@ linux - Как из терминала заменить слово в файла
 Search all archives
   $ find . \( -name 'hmc*.tar.gz' -o -name 'hmc*.tgz' \) -exec tar tf {} \; | grep -i uclibc
 
+Convert mp3 tags to utf8  # ALT: mutagen
+  $ find ./ -iname "*.mp3" -print0 | xargs -0 mid3iconv -eCP1251 --remove-v1 -d
+
 Find all ELF
   NOTE: don't match '^ELF' as 'file -b' output may contain '^setuid ELF'
   $ find . -executable -exec sh -c 'file -b "{}" | grep -q "\bELF\s"' \; -print
