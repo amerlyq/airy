@@ -1,2 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash -eu
+# tag: mod
+THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
+
+### LINKS ###
+linkcp "cfg/dircolors-${THEME}.ansi" ~/.config/dircolors
