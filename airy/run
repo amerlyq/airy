@@ -21,12 +21,10 @@ defaults=$(( !${#mods[@]} && !${#skip[@]} ))
 ### Environment
 airy=$(dirname "$(readlink -e "$0")")
 "$airy/setup" -m  # BAD!RFC: dirty code duplication
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
 
 repo=$(git -C "$airy" rev-parse --show-toplevel)
-cache=$repo/_build
-
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
-[[ :$PATH: == *:$cache/bin:* ]] || export PATH=$cache/bin:$PATH
+build=$repo/_build
 
 
 ### Profile
@@ -37,25 +35,25 @@ source ~/.shell/profile
 
 ### Run
 # WARN: for {pacman, jobs, etc} USE >/dev/tty
-exec > >(tee "$cache/setup.log" | r.airy-pretty)  # colorize
-# Do only if you run setup/install/etc
-# date +'%Y%m%d_%H%M%S'
+exec > >(tee "$build/setup.log" | r.airy-pretty)  # colorize
+# Do only if you run setup/install/etc $ date +'%Y%m%d_%H%M%S'
+# "$build/log/$(date +'%Y%m%d_%H%M%S').log"
 
 
 ### Searching mods
 search_mods(){ for d in "$@"; do (cd "$d" &&
   r.airy-filter-mods "${mods[@]}" -- "${skip[@]}") done; }
 
-if ((!defaults)) || [[ ! -s $cache/mods ]]; then
+if ((!defaults)) || [[ ! -s $build/mods ]]; then
   # BAD:HACK: allowed mixed 'mods' and 'paths'
   # BAD: order of mod dirs -- some user mods must be 'before' and some 'after'
   [[ ${mods[*]} == . ]] && lmods=$PWD \
-  || lmods=$(search_mods "$cache/cfg/mod"/* "$repo/cfg" "$repo/mod")
+  || lmods=$(search_mods "$build/cfg/mod"/* "$repo/cfg" "$repo/mod")
 fi
-# cp -vf --backup=numbered "$cache/mods" "$cache/mods" && rm "$cache/mods"
-if ((defaults)); then [[ -s $cache/mods ]] \
-  && lmods=$(< "$cache/mods") \
-  || cat > "$cache/mods" <<< "$lmods"
+# cp -vf --backup=numbered "$build/mods" "$build/mods" && rm "$build/mods"
+if ((defaults)); then [[ -s $build/mods ]] \
+  && lmods=$(< "$build/mods") \
+  || cat > "$build/mods" <<< "$lmods"
 fi
 
 
@@ -68,4 +66,4 @@ dopts=$(tr -cd 'mifuU' <<< "${opts-}")
 has s && r.airy-each -i -- r.airy-do ${dopts:+-"$dopts"} <<< "$lmods"
 
 # DEV: add one of _[un]used tags by checking in PKG_LIST
-! has g || r.airy-link-tags -t "$cache/tags" -f "$cache/mods"
+! has g || r.airy-link-tags -t "$build/tags" -f "$build/mods"

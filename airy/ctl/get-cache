@@ -1,13 +1,13 @@
 #!/bin/bash -eu
 # source ~/.shell/profile
-cache=${CURR_DIR_CACHE-}
+path=${CURR_DIR_CACHE-}
 
 # THINK:DEV: by '$1' request different dirs (bin, cfg, pkg, ...)
 
-if [[ -z $cache ]]; then
+if [[ -z $path ]]; then
   airy=$(dirname "$(readlink -e "$0")")
   repo=$(git -C "$airy" rev-parse --show-toplevel)
-  cache=$repo/_build
+  path=$repo/_build
 fi
 
-printf '%s\n' "$cache"
+printf '%s\n' "$path"

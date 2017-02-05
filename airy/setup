@@ -5,15 +5,15 @@
 
 cd "$(dirname "$(readlink -e "$0")")"
 repo=$(git -C "$PWD" rev-parse --show-toplevel)
-cache=$repo/_build
+build=$repo/_build
 
 
 ### LINKS ###
 [[ :$PATH: == *:$PWD/bin:* ]] || export PATH=$PWD/bin:$PATH
-./ctl/cache-links -t "$cache/bin" -q
+./ctl/cache-links -t "$build/bin" -q
 
-linkcp -q "$cache/bin" ~/.bin
-linkcp -q "$cache/cfg" ~/.config/airy
+linkcp -q "$build/bin" ~/.bin
+linkcp -q "$build/cfg" ~/.config/airy
 linkcp -q "$repo/cfg/shell" ~/.shell  # REM
 
 [[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH

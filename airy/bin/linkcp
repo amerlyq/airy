@@ -67,10 +67,11 @@ dispatch() { local src=$(readlink -e "${1:?}") dst=${2:?}
 }
 
 
+bin=$(readlink -m ~/.bin)
 ((quiet)) || exec > >(sed -r "
+  s@$bin/@* @g
   s@(^|\W)$HOME@\1~@g
   s@~/aura/airy/cfg@::@g
-  s@~/aura/airy/_build/bin/@* @g
   s/(^|\s)'/\1/g
   s/'(\s|$)/\1/g
 ")
