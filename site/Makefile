@@ -8,7 +8,7 @@ MAKEFLAGS += --warn-undefined-variables
 SHELL := $(shell which bash)
 TMP := $(or $(TMPDIR),/tmp)/jekyll
 MWD := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-export PATH := $(MWD)/bin:$(PATH)
+export PATH := $(MWD)/exe:$(PATH)
 
 O   ?= _build
 SRC ?= site-src
