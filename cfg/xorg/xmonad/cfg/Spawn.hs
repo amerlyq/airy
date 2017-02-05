@@ -29,7 +29,7 @@ main = concat
     , ("<Return>", "r.t r.ranger")
     , ("C-<Space>", "r.t -M")  -- WARNING: if broken >> HW problem
     , ("C-<Return>", "r.t -M r.ranger")
-    , ("M1-<Space>", "run-xcwd r.t")
+    , ("M1-<Space>", "r.wm-run-xcwd r.t")
     , ("u" , "r.b")
     -- "r.b" open on new empty wksp
     -- "r.b" focus already opened one (like M-w works)

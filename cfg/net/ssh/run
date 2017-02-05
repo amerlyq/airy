@@ -34,7 +34,7 @@ fi
 old=( -oKexAlgorithms=+diffie-hellman-group1-sha1 )
 
 case $prg
-in mpd)  ~/.bin/net.d/sir-mpd "$@"
+in mpd)  r.mpd-sir "$@"
 ;; bsrv) ssh bsrv   ${@:--t "$sstmux"}
 ;; sirx) ssh sir -X ${@:--t "$sstmux"}
 ;; stb)  ssh "${old[@]}" "root@192.168.1.$1" "${@:2}"

@@ -33,5 +33,8 @@ if distro ubuntu; then
   mkdef x-www-browser $(which qutebrowser)
   mkdef x-window-manager $(which xmonad)
   # mkdef x-session-manager cinnamon-session-cinnamon
+  # Mint:
+  #   sudo mdmsetup     | login screen
+  #   cinnamon-settings | other sets
   for nm in vim view rview; do mkdef $nm $(which vim.gtk); done
 fi

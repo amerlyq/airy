@@ -33,5 +33,5 @@ compdef r.ssh=ssh
 
 # ALT?
 # autoload -Uz compinit && compinit
-# compdef _git ~/.bin/prg.d/git-recursive   # Use X completion for Y command
+# compdef _git r.git-all   # Use X completion for Y command
 # compdef '_dispatch git git' Gg          # Seems like must work for aliases

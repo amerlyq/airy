@@ -2,7 +2,7 @@
 # source ~/.shell/func.d/bash-profiler
 cd "$(readlink -e "${0%/*}")"
 
-WND_ACTIVE=$(~/.bin/xorg.d/get_active_wnd)
+WND_ACTIVE=$(r.wm-get-active-wnd)
 # ALT: eval "$(xdotool getmouselocation --shell)" -> $WINDOW
 
 for pf in ./profile.d/*; do [[ -x $pf ]] || continue

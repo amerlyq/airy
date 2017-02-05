@@ -4,6 +4,9 @@ cd "$cache" || exit 0
 
 rmdc(){ find "$1" -xdev -depth -mindepth 1 -delete; }
 
+echo "N: clean mods cache"
+rm -f "$cache/mods"
+
 echo "N: clean tags"
 r.airy-link-tags -t "$cache/tags" -d
 

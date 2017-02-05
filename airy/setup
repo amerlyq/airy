@@ -6,20 +6,14 @@
 cd "$(dirname "$(readlink -e "$0")")"
 repo=$(git -C "$PWD" rev-parse --show-toplevel)
 cache=$repo/_build
-bin=$cache/bin
 
 
 ### LINKS ###
-# FIXME: Subject to completely eliminate = ? replace by env var ?
-[[ -L ~/.shell ]] || ln -svT "$repo/cfg/shell" ~/.shell
-[[ -L ~/.bin   ]] || ln -svT "$repo/bin" ~/.bin
-
-
-mkdir -p "$bin"
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
-[[ :$PATH: == *:$bin:* ]] || export PATH=$bin:$PATH
-
-
-### MAIN ###
+[[ :$PATH: == *:$PWD/bin:* ]] || export PATH=$PWD/bin:$PATH
 ./ctl/cache-links -t "$cache/bin" -q
-./ctl/cache-alias -o "$cache/aliases"
+
+linkcp -q "$cache/bin" ~/.bin
+linkcp -q "$repo/cfg/shell" ~/.shell  # REM
+
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
+r.airy-cache-alias -o "$cache/aliases"

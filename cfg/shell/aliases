@@ -22,13 +22,9 @@ fi
 
 
 # Source all pathes shortcuts
-while read k p; do alias $k='cd '"$p"
+[[ ! -s ~/.shell/pathes ]] || while read k p; do alias $k='cd '"$p"
 done < <(sed 's/\s*#.*$//; /^\s*$/d' ~/.shell/pathes)
 
 # For 'vienv' fast shebang template
-while read sfx; do alias vi$sfx='vienv '"$sfx"
-done < <(sed -rn '/case/,/esac/{/\s*(in|;;)\s+(\w+)\).*/s//\2/p}' ~/.bin/vienv)
-
-# For 'reu' binary investigation tool
-while read i; do alias re$i='~/.bin/prg.d/reu '"$i"' '
-done < <(sed -rn '/case/,/esac/{/\s*(\w+)\)\s.*/s//\1/p}' ~/.bin/prg.d/reu)
+! which vienv &>/dev/null || while read sfx; do alias vi$sfx='vienv '"$sfx"
+done < <(sed -rn '/case/,/esac/{/\s*(in|;;)\s+(\w+)\).*/s//\2/p}' "$(which vienv)")

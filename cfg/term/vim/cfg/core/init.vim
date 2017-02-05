@@ -9,7 +9,7 @@ let g:loaded_vimballPlugin = 1
 
 ""CASE Netrw {{{1 Allows one to view the contents of an http hyperlink via CTRL-W_CTRL-F
 "" launch as $ agent tempfile url -- See: https://github.com/danchoi/elinks.vim
-"let g:netrw_http_cmd = "elinks-for-vim"
+"let g:netrw_http_cmd = "~/.vim/exe/elinks-for-vim"
 " let g:netrw_home=$CACHE
 " let g:loaded_netrwPlugin = 1  " ATTENTION: scp:// isn't working w/o netrw
 " let g:loaded_netrw             = 1

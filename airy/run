@@ -46,7 +46,7 @@ search_mods(){ for d in "$@"; do (cd "$d" &&
 if ((!defaults)) || [[ ! -s $cache/mods ]]; then
   # BAD:HACK: allowed mixed 'mods' and 'paths'
   [[ ${mods[*]} == . ]] && lmods=$PWD \
-  || lmods=$(search_mods "$cache/user" "$repo/cfg")
+  || lmods=$(search_mods "$cache/user" "$repo/cfg" "$repo/mod")
 fi
 # cp -vf --backup=numbered "$cache/mods" "$cache/mods" && rm "$cache/mods"
 if ((defaults)); then [[ -s $cache/mods ]] \

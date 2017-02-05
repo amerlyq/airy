@@ -58,7 +58,7 @@ inmpc(){ local f=${1:?} h=${2:?} nm='wget-mp3'
     # ALT:(simple) { printf '%s\n' "$h"; cat; } | mpc add
   fi
   mpc play $(( $(_mpcl | grep -nxF "$h" | awk -F: '{print$1;exit}') ))
-  hasn j || ~/.bin/xorg.d/make_urgent 'ncmpcpp'
+  hasn j || r.wm-make-urgent 'ncmpcpp'
   # ALT:TEMP:HACK:(open/jump to ncmpcpp)
   # hasn j || r.wm M-o_n
   #   BAD: closes already opened instance -- BETTER: make window urgent

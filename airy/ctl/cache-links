@@ -14,7 +14,7 @@ prf=${prf//%d/${PWD##*/}}
 
 bins(){ local i a=()
   for((i=1;i<=$#;++i)); do [[ ${!i} == -- ]] && break; done
-  for f in "${@:i+1}"; do [[ -x $f && -s $f ]] && a+=("$f"); done
+  for f in "${@:i+1}"; do [[ -f $f && -x $f && -s $f ]] && a+=("$f"); done
   linkcp ${quiet:+-q} -t "$bin" "${@:1:i-1}" -- "${a[@]}"
 }
 

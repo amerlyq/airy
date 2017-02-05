@@ -3,8 +3,8 @@ source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
 cwd_script
-cache=${CURR_DIR_CACHE:?}
-# cache=$(r.airy-get-cache)
+# cache=${CURR_DIR_CACHE:?}
+cache=$(r.airy-get-cache)
 [[ :$PATH: == *:$cache/bin:* ]] || export PATH=$cache/bin:$PATH
 
 ### Argparse ###
