@@ -15,6 +15,10 @@ install:
 update:
 	r.airy -siu
 
+.PHONY: defaults
+defaults:
+	r.airy-defaults
+
 .PHONY: clean
 clean:
 	r.airy-clean _build

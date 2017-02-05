@@ -59,6 +59,7 @@ structure
     [_] create category symlinks to choose variant ./pkg/{..} -> ./mod/$mod/use/*
       THINK:BAD: excessive systemd cohesion -- we will be restricted by linked mods
       BUT: we need symlinks somewhere anyways -- MAYBE in ./_build/use
+    [_] allow augmenting by user-specified defaults in his profile / mods
   [_] BET: use file ( ./mod | ./airy | ./AIRYPKG ) = like PKGBUILD with functions
     + each function -- works w/o sudo -- and only locally for user 'nobody'
       = only generates arguments for r.airy funcs

@@ -26,21 +26,6 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 # BUG: on error we can't exit from forked shell and fail main one!
 fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
 
-if distro arch; then
-  # TODO:DEV: add fallback -- for each arg until pr found OR err
-  mkdef() { linkcp "$(which "${2:?No bin}")" ~/.bin/"${1:?No name}"; }
-  # System user for demons without shell access and without a home directory
-  add_sysuser() { id "${1:?No user}" >/dev/null 2>&1 ||
-      sudo useradd -r -U -d /dev/null -s /usr/bin/nologin "$1"; }
-
-elif distro ubuntu; then
-  # ALT: Interactive choose defaults
-  #   sudo update-alternatives --config gnome-www-browser
-  #   update-alternatives --display x-session-manager
-  mkdef() { update-alternatives --get-selections | grep -q "^$1.*$2\$" ||
-      sudo update-alternatives --set $1 "$2"; }
-fi
-
 if cfgOpt m; then
   repo=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
   r.airy-cache-links -t ~/.bin -p "$([[ $repo =~ q$ ]]&&echo q||echo r).%d-"

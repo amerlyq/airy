@@ -1,8 +1,5 @@
 #!/bin/bash -e
-source ~/.shell/func.d/cfgsetup
-# MOVE: into cfg/airy/bin/defaults
-
-echo 'N: Defaults'
+source ~/.shell/func.d/system
 
 # WARN: those short-links don't exist on ./setup -friu
 #   => can't be used inside scripts at all
@@ -11,11 +8,25 @@ echo 'N: Defaults'
 #   ALT: use 'make' etc for deps graph resolving -- BUT: sins like systemd
 #   ALT: run once before system install and once after
 
+if distro arch; then
+  # TODO:DEV: add fallback -- for each arg until pr found OR err
+  mkdef() { linkcp "$(which "${2:?}")" ~/.bin/"${1:?}"; }
+elif distro ubuntu; then
+  mkdef() { local nm=${1:?} pr=${2:?}; pr=$(which "$pr")
+    update-alternatives --get-selections | grep -q "^$nm.*$pr\$" ||
+    sudo update-alternatives --set "$nm" "$pr"
+  }
+  # ALT: Interactive choose defaults
+  #   sudo update-alternatives --config gnome-www-browser
+  #   update-alternatives --display x-session-manager
+fi
+
 ### AUTO ###
 if has_pr st; then term=st
 elif has_pr urxvt; then term=urxvt
 else term=xterm; fi
 
+echo 'N: Defaults'
 mkdef r.t         ${term:?}
 mkdef r.tf        r.${term}-float
 mkdef r.n         r.notify
@@ -28,13 +39,13 @@ mkdef notify-send /usr/bin/dunstify
 [[ -z $EDITOR ]] || mkdef editor      $EDITOR
 
 if distro ubuntu; then
-  mkdef x-terminal-emulator $(which $term)
-  mkdef www-browser $(which elinks)
-  mkdef x-www-browser $(which qutebrowser)
-  mkdef x-window-manager $(which xmonad)
+  mkdef www-browser         elinks
+  mkdef x-www-browser       qutebrowser
+  mkdef x-window-manager    xmonad
+  mkdef x-terminal-emulator "$term"
   # mkdef x-session-manager cinnamon-session-cinnamon
   # Mint:
   #   sudo mdmsetup     | login screen
   #   cinnamon-settings | other sets
-  for nm in vim view rview; do mkdef $nm $(which vim.gtk); done
+  for nm in vim view rview; do mkdef "$nm" vim.gtk; done
 fi

@@ -132,5 +132,8 @@ usvc_run(){ local svc=${1:?No svc}; shift
   elif ! systemctl --user is-active "$svc" &>/dev/null
   then systemctl --user start "$svc"; fi
 }
+# System user for demons without shell access and without a home directory
+add_sysuser() { id "${1:?}" >/dev/null 2>&1 ||
+    sudo useradd -r -U -d /dev/null -s /usr/bin/nologin "$1"; }
 
 # ====================================================================
