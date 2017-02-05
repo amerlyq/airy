@@ -1,35 +1,28 @@
-#!/bin/bash -e
-
-# DEV: generalize file list to support batch '-b' format instead of linkmask
-# DEV: disallow '-o/-C' any symlink overwrite / clobbering -- strict mode
-# DEV: reuse 'rel_search' func from svc_activate
-# THINK: embed 'envsubs' from svc_activate directly into 'linkcp'
-
-exec > >(sed -r "
-  s@(^|\W)$HOME@\1~@g
-  s@~/aura/airy/cfg@::@g
-  s@~/.cache/airy/bin/@* @g
-  s/(^|\s)'/\1/g
-  s/'(\s|$)/\1/g
-")
+#!/bin/bash -eu
+# HACK: when using '-t' -- no error for empty glob
+set -euo pipefail
 die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 
 cmd=f_link
+keep=0
+quiet=0
+backup=''
 
-OPTIND=1; while getopts 'bckrf:t:p:' o; do case $o
-in c) cmd='f_copy'
+while getopts 'bckqrf:t:p:s:' o; do case $o in :|'?') die 1
+;; c) cmd='f_copy'
 ;; b) backup='_'
 ;; k) keep=1       # Keep src relative subpath
+;; q) quiet=1      # No verbose messages
 ;; r) relative=1   # Symlink dst relative to src
-;; f) DFR=$OPTARG  # From directory
-;; t) DTO=$OPTARG  # Destination directory
-;; p) PFX=$OPTARG  # Add prefix (Like '.' for dotfiles)
-;; :|'?') die 1
+;; f) dfrom=$OPTARG  # From directory
+;; t) dto=$OPTARG  # Destination directory
+;; p) pfx=$OPTARG  # Add prefix (Like '.' for dotfiles)
+;; s) subs=$OPTARG # Substitution for dst names
 esac; done; shift $((OPTIND-1))
 
 show() { local t=$1 src=$2 dst=$3 sfx
   [[ ${src##*/} == ${dst##*/} ]] || sfx=" (${src#${src%/*/*}/})"
-  echo "-> $t  ${dst}${sfx}";
+  ((quiet)) || echo "-> $t  ${dst}${sfx-}";
 }
 same_file() { diff -q "${1:?}" "${2:?}" &>/dev/null; }
 same_tree() { ! find "$1" -type f -printf '%P\0' \
@@ -63,7 +56,7 @@ f_link() { local src=$1 dst=$2 sudo=''
       $sudo mkdir -p "${dst%/*}"
       $sudo ln -svfT${relative:+r} -- "$src" "$dst"
     else show L "$src" "$dst"; fi
-  elif [[ $backup && ! -e ${dst}$backup ]]; then
+  elif [[ -n $backup && ! -e ${dst}$backup ]]; then
       $sudo mv -vfT  -- "$dst" "${dst}$backup"
       $sudo ln -svfT${relative:+r} -- "$src" "$dst"
   else die "refuse symlink over existing file/dir '$dst'"; fi
@@ -73,10 +66,20 @@ dispatch() { local src=$(readlink -e "${1:?}") dst=${2:?}
   ${cmd:?} "$src" "$dst"
 }
 
-if [[ -z $DTO ]]; then
+
+((quiet)) || exec > >(sed -r "
+  s@(^|\W)$HOME@\1~@g
+  s@~/aura/airy/cfg@::@g
+  s@~/.cache/airy/bin/@* @g
+  s/(^|\s)'/\1/g
+  s/'(\s|$)/\1/g
+")
+
+if [[ -z ${dto-} ]]; then
   dispatch "$1" "$2"
 else for nm in "$@"; do
-  # ALT linkdir(){ mkdir -p $2 && lndir "$DTO" $2; }
-  (($keep)) && dst=$nm || dst=${nm##*/}
-  dispatch "${DFR:+$DFR/}$nm" "${DTO:+$DTO/}${PFX}${dst}"
+  # ALT linkdir(){ mkdir -p $2 && lndir "$dto" $2; }
+  ((keep)) && dst=$nm || dst=${nm##*/}
+  [[ ${subs-} ]] && dst=${dst/${subs%/*}/${subs##*/}}
+  dispatch "${dfrom:+$dfrom/}$nm" "${dto:+$dto/}${pfx-}${dst}"
 done; fi

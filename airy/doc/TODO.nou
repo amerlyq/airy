@@ -127,6 +127,18 @@ linkcp
   [_] THINK: optimize ./bin <Tab> time -- scripts can be copied instead of symlinks
     BAD: scripts can be dependent on in-dir stuff through 'readlink'
   [_] THINK: split into 'mlink' and 'mcopy' ?
+  2017-02-04 [X] quiet linking on '-q'
+  2017-02-05 [X] DEV: generalize file list to support batch format instead of linkmask
+    ::: added '-s' for name substitution to be combined with prefix
+  [_] DEV: disallow '-o/-C' any symlink overwrite / clobbering -- strict mode
+  [_] DEV: reuse 'rel_search' func from svc_activate
+  [_] THINK: embed 'envsubs' from svc_activate directly into 'linkcp' for copy mode
+  2017-02-05 [X] TODO: convert 'linkmask' group to function like 'dcache' ::: r.airy-cache-links
+
+
+cache_section
+  [_] ALSO: gather 'env' files like 'alias'
+    linkmask "$PWD/env"  'env/%d%n'
 
 
 cache-alias
