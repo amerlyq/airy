@@ -1,14 +1,20 @@
 #!/bin/bash -e
+set -euo pipefail
+
+# TODO: use ctl.hs to query windows list from xmonad
+# -- gets >>= trace . show . null . windows
 
 # Allow to control main session from vtN
-[[ $DISPLAY ]] || export DISPLAY=:0
+# [[ ${DISPLAY-} ]] || export DISPLAY=:0
+
+on_desk(){ local n=$1 d
+  d=$(wmctrl -d | awk -vn="$n" 'n==$NF{print$1;quit}')
+  exec wmctrl -s "$d"
+}
+is_empty(){ local nw; nw=$(wmctrl -l|wc -l); ((!nw)); }
 
 case "$1"
-in -w) shift
-  dnum=$(wmctrl -d | awk -vn=$1 'n==$NF{print$1;quit}')
-  exec wmctrl -s $dnum
-;; is-empty) shift; (( !$(wmctrl -l|wc -c) ))
-;; *)
-  dir=~/.xmonad/lib/XMonad/Util/Amer
-  exec "$dir/ctl" "$@"
+in -w) shift; on_desk "$1"
+;; is-empty) shift; is_empty
+;; *) cd ~/.xmonad/lib/XMonad/Util/Amer; exec ./ctl "$@"
 esac

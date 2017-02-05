@@ -1,0 +1,40 @@
+#!/bin/bash -eu
+
+insideX(){ xset q &>/dev/null; }
+# ALT: [[ ${DISPLAY-} && ! $(tty) =~ ^/dev/tty ]]
+
+# TODO: check method the current console was started
+if systemctl --user is-active xorg.target >/dev/null; then
+  sys_logout(){ systemctl --user start logoff.target; }
+elif insideX; then
+  sys_logout(){ r.wm quit-wm; }
+fi
+
+if insideX && [[ ! -t 0 ]]; then
+  err(){ r.n -U "Err: (blocked)" "$1"; return 1; }
+else
+  err(){ printf "Err: (blocked) %s\n" "$1"; return 1; }
+fi
+
+if insideX; then
+  no_windows(){ r.wm is-empty && return
+    r.wm focus-non-empty; err "Close all windows"; }
+else
+  no_windows(){ true; }
+fi
+
+no_tmux(){ [[ -z $(tmux list-sessions 2>/dev/null) ]] || err "Look into tmux sessions"; }
+synced_repo(){ r.git-all-synced "$1" || err "Sync git in '$1/*'"; }
+
+ask(){ confirm -r "$@" || exit 0; }
+chk_wnd(){ no_windows || ask "Ignore opened windows?"; }
+chk_tmux(){ no_tmux || ask "Ignore tmux sessions?"; }
+chk_repo(){ synced_repo ~/aura || ask "Ignore unsynced git?"; }
+
+# DEV: check network connections (ssh/etc or port forwarding)
+
+case $1
+in   logout|-o) chk_wnd && chk_tmux && ask "Logout?" && sys_logout
+;;   reboot|-r) chk_wnd && chk_tmux && ask "Reboot?" && systemctl reboot
+;; shutdown|-t) chk_wnd && chk_tmux && chk_repo && ask "Shutdown?" && systemctl poweroff
+esac

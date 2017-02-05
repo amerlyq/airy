@@ -14,6 +14,7 @@ import XMonad.Hooks.ServerMode      (serverModeEventHookCmd')
 import XMonad.Actions.Commands      (defaultCommands)
 
 import XMonad.Config.Amer.Keys      (myKeys)
+import XMonad.Config.Amer.Navigation (focusNonEmpty)
 
 myHandleEventHook = mconcat
   [ handleEventHook def
@@ -28,8 +29,9 @@ myHandleEventHook = mconcat
     escape ' ' = '_'
     escape c = c
     mapped = map (first (map escape)) myKeys
+    special = [("focus-non-empty", focusNonEmpty)]
     srvCmds = do
       dfl <- defaultCommands
       -- isempty <- gets $ null . allWindows . windowset
       -- service = [("is-empty", if isempty then return 0)]
-      return $ dfl ++ mapped
+      return $ dfl ++ mapped ++ special

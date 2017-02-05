@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+
+sys_power(){ #Suspend #Hibernate
+    # PORTABLE: http://askubuntu.com/questions/1792/how-can-i-suspend-hibernate-from-command-line/131022#131022
+    dbus-send --system --print-reply --dest="org.freedesktop.UPower" \
+        /org/freedesktop/UPower org.freedesktop.UPower.$1
+    # sudo pm-suspend -- from pm-utils for Debian-based distros.
+    # ALT: (sleep 0.5 && systemctl suspend) & #systemctl poweroff
+    # dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" \
+    #    /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart #Stop
+}
+
+case $1
+in   suspend|-s) sys_power Suspend
+;; hibernate|-h) sys_power Hibernate
+esac

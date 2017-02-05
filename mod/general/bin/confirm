@@ -1,0 +1,14 @@
+#!/bin/bash -eu
+[[ $1 == -r ]] && { c=(no yes); shift; } || c=(yes no)
+
+if [[ ! -t 0 ]] && xset q &>/dev/null; then
+  confirm(){ dmenu -p "$1" -fn monospace-10 <<< "$2"; }
+else
+  confirm(){ read -p "$1 ($(paste -sd/ <<< "$2")): " </dev/tty
+    printf '%s\n' "$REPLY"; }
+fi
+
+c=$(printf '%s\n' "${c[@]}")
+a=$(confirm "$1" "$c")
+
+[[ ${a,,} =~ ^y(es)?$ ]] || exit $?

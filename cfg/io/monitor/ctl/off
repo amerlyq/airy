@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+# ALT: sudo vbetool dpms [on/off]       # Permanent (ignores mouse and kbd)
+exec xset -d "$DISPLAY" dpms force off  # Until mouse moves

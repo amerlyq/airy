@@ -38,8 +38,11 @@ import XMonad.Config.Amer.Navigation (nextNonEmpty)
 -- TRY? we could use simply W.tag on w? See src of toggleWS'
 wkspName = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ fromMaybe "" $ W.findTag w ws) :: Query String
 isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ member w $ W.floating ws) :: Query Bool
-whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
-    then fX else nextNonEmpty W.view >> spawn "r.n 'Shutdown warning:' 'Close all windows'" :: X()
+
+-- DEPRECATED:(by focusNonEmpty)
+-- whenWindowsClosed fX = withWindowSet $ \ws -> if null (W.allWindows ws)
+--     then fX else nextNonEmpty W.view >> spawn "r.n 'Shutdown warning:' 'Close all windows'" :: X()
+
 -- FIXME: jump to urgent and back ALT: save last urgent and always jump to it even after urgentstate cleared
 -- urgentNback w = withUrgents $ maybe (backNforth [] $ W.view w) (windows . W.focusWindow) . listToMaybe $ w
 urgentNback = withUrgents $ maybe (return ()) (windows . W.focusWindow) . listToMaybe
@@ -133,13 +136,13 @@ system =
   , ("2", screenWorkspace 1 >>= flip whenJust (windows . W.view))
   ] ++
   (inGroup "M-S-<Esc>" . concat)
-  [ [ ("o", whenWindowsClosed $ spawn "r.core logout")
-    , ("r", whenWindowsClosed $ spawn "r.core reboot")
-    , ("t", whenWindowsClosed $ spawn "r.core shutdown")
+  [ [ ("o", spawn "r.core logout")
+    , ("r", spawn "r.core reboot")
+    , ("t", spawn "r.core shutdown")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.xmonad-rebuild")
-    , ("-", spawn "r.core dpmsoff")
+    , ("-", spawn "r.monitor-off")
     ],
     map (second spawn) $ feedCmd "xbacklight -set" $ mconcat
     [ [ (i, i ++ "0")   | i <- map show [1..9] ]

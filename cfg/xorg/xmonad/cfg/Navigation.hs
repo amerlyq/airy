@@ -1,11 +1,12 @@
 -- vim: ts=2:sw=2:sts=2
 module XMonad.Config.Amer.Navigation (
-    keys, doScreen, nextEmpty, nextNonEmpty
+    keys, doScreen, nextEmpty, nextNonEmpty, focusNonEmpty
 ) where
 
+import Control.Monad  (unless)
 import Data.Default                 (def)
-import XMonad                       (gets, spawn, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen)
-import XMonad.StackSet              (view, shift, currentTag, shiftWin)
+import XMonad                       (gets, spawn, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen, withWindowSet)
+import XMonad.StackSet              (view, shift, currentTag, shiftWin, allWindows)
 import XMonad.Actions.CycleWS       (findWorkspace, screenBy, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))
 import XMonad.Util.WorkspaceCompare (getSortByIndex)
 
@@ -22,6 +23,7 @@ import XMonad.Config.Amer.Workspace (skipped, immediate)
 -- ALT: choose empty only from secondary wksp? -- Like on M-g <Space> instead <Backspace>
 nextEmpty    f = findWorkspace getSortByIndex Next EmptyWS 1    >>= windows . f
 nextNonEmpty f = findWorkspace getSortByIndex Next NonEmptyWS 1 >>= windows . f
+focusNonEmpty = withWindowSet $ \ws -> unless (null . allWindows $ ws) (nextNonEmpty view)
 
 -- Cycle through screens
 -- ALT (screenWorkspace 0 >>= flip whenJust (windows . view))

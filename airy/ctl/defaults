@@ -49,3 +49,6 @@ if distro ubuntu; then
   #   cinnamon-settings | other sets
   for nm in vim view rview; do mkdef "$nm" vim.gtk; done
 fi
+
+# DFL: Qt4 SEE: https://wiki.archlinux.org/index.php/Qt#Installation
+# linkcp /etc/xdg/qtchooser/4.conf ~/.config/qtchooser/default.conf ||:
