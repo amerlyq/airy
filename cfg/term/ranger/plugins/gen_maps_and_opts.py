@@ -7,7 +7,7 @@ old_hook_init = ranger.api.hook_init
 
 def get_colorscheme(fm):
     try:
-        fpath = os.path.expanduser('~/.cache/airy/theme')
+        fpath = os.path.expanduser('~/.config/airy/theme')
         with open(fm.confpath(fpath), 'r') as f:
             theme = f.readline()
     except IOError:

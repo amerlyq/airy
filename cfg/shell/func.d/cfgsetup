@@ -1,11 +1,9 @@
-# vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
+# vim: ft=sh
 source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
 cwd_script
-# cache=${CURR_DIR_CACHE:?}
-cache=$(r.airy-get-cache)
-[[ :$PATH: == *:$cache/bin:* ]] || export PATH=$cache/bin:$PATH
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
 
 ### Argparse ###
 CFG_ARGS=( "$@" )  # Backup default arguments
@@ -21,7 +19,7 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 [[ ${THEME_ALLOWED-} ]] || THEME_ALLOWED='dark|light|lucid|opaque'
 # DEV:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
 # TODO: use THEME_DEFAULT if set, else -- .../theme/default
-[[ ${THEME-} ]] || [[ ! -s $cache/theme ]] || THEME=$(<"$cache/theme")
+[[ ${THEME-} ]] || [[ ! -s $config/theme ]] || THEME=$(<"$config/theme")
 [[ ${THEME-} =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
 
 ### LINKS ###
@@ -30,8 +28,7 @@ fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
 
 if distro arch; then
   # TODO:DEV: add fallback -- for each arg until pr found OR err
-  mkdef() { linkcp "$(which "${2:?No bin}")" \
-    "$cache/bin/${1:?No name}"; }
+  mkdef() { linkcp "$(which "${2:?No bin}")" ~/.bin/"${1:?No name}"; }
   # System user for demons without shell access and without a home directory
   add_sysuser() { id "${1:?No user}" >/dev/null 2>&1 ||
       sudo useradd -r -U -d /dev/null -s /usr/bin/nologin "$1"; }
@@ -46,7 +43,7 @@ fi
 
 if cfgOpt m; then
   repo=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
-  r.airy-cache-links -t "$cache/bin" -p "$([[ $repo =~ q$ ]]&&echo q||echo r).%d-"
-  r.airy-cache-alias -o "$cache/aliases"
+  r.airy-cache-links -t ~/.bin -p "$([[ $repo =~ q$ ]]&&echo q||echo r).%d-"
+  r.airy-cache-alias
   airy_cache_pwd_mod
 fi

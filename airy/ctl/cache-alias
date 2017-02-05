@@ -40,7 +40,7 @@ section_append(){ local f=$1 s a b e t tt
   log "+! A: $a"
 }
 
-[[ -n $output ]] || output=$(r.airy-get-cache)
+[[ -n $output ]] || output=$(r.airy-get-cache)/cfg/aliases
 [[ -s $output ]] || (set +C; printf '%s\n' "$header" > "$output")
 [[ -d $from ]] && lst=( "$from"/* ) || lst=( "$from" )
 

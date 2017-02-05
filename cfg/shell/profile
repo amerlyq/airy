@@ -14,10 +14,13 @@ CURR_DIR_CACHE=~/.cache/airy
 CURR_DIR_PKG=${CURR_DIR_PKG:-$CURR_DIR_CACHE/pkg}
 CURR_DIR_HUB=~/hub
 CURR_DIR_SYNC=~/synchro
-CURR_DIR_PRF=~/.cache/airy/prf
+CURR_DIR_PRF=~/.config/airy/prf
 CURR_DIR_MAIL=~/.mail
 CURR_DIR_WORK=/home/work
 CURR_DIR_MUSIC=/home/media/music
+
+cache=${XDG_CACHE_HOME:-$HOME/.cache}/airy
+config=${XDG_CONFIG_HOME:-$HOME/.config}/airy
 
 ### Chroots ###
 CURR_DIR_CHROOT=/home/chroot
@@ -32,7 +35,7 @@ CURR_CHROOT_EVAL=''
 PKG_LIST=(/net/wget /shell{,/} /util{,/} /dev /dev/{python,ruby,etc,git} /term/{ranger,tmux,vim} /browsers/elinks)
 PKG_SKIP=(/dev/{android,eclipse,hex,java,kernel,latex,sql} /{core,game,io,media,re,xorg}{,/} )
 
-if [[ -s $CURR_DIR_CACHE/profile ]]
-then source "$CURR_DIR_CACHE/profile" || return
+if [[ -s ~/.config/airy/profile ]]
+then source ~/.config/airy/profile || return
 # else source ~/aura/env || return
 fi

@@ -3,7 +3,7 @@
 "   OR: simply toggle whole urxvt theme instead.
 if !exists('g:forced_theme')
   try  " Load theme name
-    let s:theme = readfile(expand('$HOME/.cache/airy/theme'))[0]
+    let s:theme = readfile(expand('$HOME/.config/airy/theme'))[0]
   catch /^Vim\%((\a\+)\)\=:E484/
     let s:theme = 'dark'
   endtry

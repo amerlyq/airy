@@ -1,11 +1,11 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: term
 THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 linkcp "$PWD" ~/.urxvt
-linkcp "$PWD/themes/amer-${THEME}" "${CURR_DIR_CACHE:?No}/theme-urxvt"
+linkcp "$PWD/themes/amer-${THEME}" "$config/theme-urxvt"
 
 
 # https://wiki.archlinux.org/index.php/Rxvt-unicode
@@ -32,8 +32,8 @@ cat > "$dst" << EOT
 #define LETTER_SPACE $(distro arch && ${LETTER_SPACE:-0} || LETTER_SPACE=-1)
 #include "$HOME/.urxvt/etc/xtermrc"
 #include "$HOME/.urxvt/urxvtrc"
-#include "$(if [[ -f ~/.cache/airy/theme-urxvt ]]
-then printf "$HOME/.cache/airy/theme-urxvt"
+#include "$(if [[ -f ~/.config/airy/theme-urxvt ]]
+then printf "$HOME/.config/airy/theme-urxvt"
 else printf "$HOME/.urxvt/themes/amer-dark"
 fi)"
 EOT

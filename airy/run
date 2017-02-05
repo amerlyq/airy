@@ -1,4 +1,7 @@
 #!/bin/bash -eu
+set -euo pipefail
+shopt -s nullglob
+
 # NOTE: for skip-only due to getopts you need two double hypen
 #   ./$0 -- -- ...  # skip-only
 
@@ -45,8 +48,9 @@ search_mods(){ for d in "$@"; do (cd "$d" &&
 
 if ((!defaults)) || [[ ! -s $cache/mods ]]; then
   # BAD:HACK: allowed mixed 'mods' and 'paths'
+  # BAD: order of mod dirs -- some user mods must be 'before' and some 'after'
   [[ ${mods[*]} == . ]] && lmods=$PWD \
-  || lmods=$(search_mods "$cache/user" "$repo/cfg" "$repo/mod")
+  || lmods=$(search_mods "$cache/cfg/mod"/* "$repo/cfg" "$repo/mod")
 fi
 # cp -vf --backup=numbered "$cache/mods" "$cache/mods" && rm "$cache/mods"
 if ((defaults)); then [[ -s $cache/mods ]] \

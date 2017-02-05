@@ -18,7 +18,7 @@ ExecStartPre=/usr/bin/xrdb -load %h/.Xresources
 ExecStart=/usr/bin/xset b off s off dpms 1200 0 0 r rate 250 40
 ExecStart=/usr/bin/xsetroot -cursor_name left_ptr
 # EXPL:CHECK: because we can't replace setxkbmap by xorg.conf
-ExecStart=/bin/sh -c '%h/.cache/airy/bin/r.xkb'
+ExecStart=/bin/sh -c '%h/.bin/r.xkb'
 
 [Install]
 WantedBy=wm.target

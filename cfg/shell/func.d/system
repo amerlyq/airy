@@ -53,7 +53,7 @@ cwd_origin(){ cd "$(dirname "$(readlink -e "$0")")"; }  # only around original f
 ### Add current package to active mods list if absent
 airy_cache_pwd_mod() {
   [[ -z ${MODS_CACHE_DISABLE-} && ${0##*/} =~ ^(install|setup)$ ]] || return 0
-  local mods=${CURR_DIR_CACHE:?}/mods/mods
+  local mods=$(r.airy-get-cache)/mods
   [[ ! -t 0 ]] || [[ ! $0 =~ ^${CURR_DIR_CFG:?} ]] ||
     grep -qxF "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
 }

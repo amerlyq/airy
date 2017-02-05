@@ -2,8 +2,8 @@
 
 ### Aura mods profiles (links only) ###
 # FIXME: what if user want to overwrite some of my aliases?
-if [[ -d ~/.cache/airy/env ]]; then
-  for L in ~/.cache/airy/env/*
+if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/airy/env ]]; then
+  for L in "${XDG_CONFIG_HOME:-$HOME/.config}/airy/env"/*
   do [[ ! -L "$L" ]] || source "$L"; done
 fi
 

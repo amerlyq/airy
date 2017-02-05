@@ -16,7 +16,7 @@ echo "N: clean systemd user units"
 rmdc ~/.config/systemd/user
 
 echo "N: clean aliases cache"
-rm -f "$cache/aliases"
+rm -f "$cache/cfg/aliases"
 
 ## WARN! finally remove symlinks, as all next r.* calls become invalid
 # BAD: if symlinks will be always deleted, r.xorg will be never used in core/xorg

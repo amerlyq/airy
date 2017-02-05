@@ -10,8 +10,8 @@ if [[ -d ~/.shell/alias.d ]]; then
 fi
 
 # Source combined alias cache from all *mod*s
-if [[ -s ${CURR_DIR_CACHE:-$HOME/.cache/airy}/aliases ]]; then
-  source "${CURR_DIR_CACHE:-$HOME/.cache/airy}/aliases"
+if [[ -s ${XDG_CONFIG_HOME:-$HOME/.config}/airy/aliases ]]; then
+  source "${XDG_CONFIG_HOME:-$HOME/.config}/airy/aliases"
 fi
 
 ## Inspired by Vivek Gite <vivek@nixcraft.com>

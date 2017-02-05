@@ -2,7 +2,7 @@
 
 [Unit]
 Description=Udev - Monitor Hotplug - %P
-ConditionFileIsExecutable=%{HOME}/.cache/airy/bin/r.monitor-refresh
+ConditionFileIsExecutable=%{HOME}/.bin/r.monitor-refresh
 # BindsTo=...
 
 [Service]
@@ -13,5 +13,5 @@ User=%{USER}
 Environment=DEVPATH=%I
 Environment=DISPLAY=%{DISPLAY}
 Environment=XAUTHORITY=%{HOME}/.Xauthority
-Environment=PATH=%{HOME}/.cache/airy/bin:/usr/local/bin:/usr/bin
+Environment=PATH=%{HOME}/.bin:/usr/local/bin:/usr/bin
 ExecStart=/bin/sh -c 'exec r.monitor-refresh'
