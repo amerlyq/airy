@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+# GUI: rabbit valkyrie
+
+if distro arch; then
+  pkg_inst -f '/usr/lib/valgrind/callgrind-amd64-linux' valgrind-multilib
+elif distro ubuntu; then
+  # NEED: libc6-dbg:i386 -- to prevent ERR:(strlen -> strnlen) in valgrind
+  pkg_inst valgrind libc6-dbg:i386
+fi

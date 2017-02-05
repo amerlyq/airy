@@ -1,0 +1,22 @@
+#!/bin/bash -eu
+exe=${1:?}; shift
+opts=(
+  --fullpath-after="${exe%/*}/"
+  --log-file="${exe}.log"
+  --tool=memcheck
+  --leak-check=full
+  --num-callers=12
+  --undef-value-errors=yes
+  --error-exitcode=1  # instead of returning code of programm
+  --track-origins=yes  # show function creating 'Uninitialised value was created by a stack allocation'
+  --show-reachable=yes
+  # --read-var-info=yes  # slow, but more precise and descriptive errors
+  # --vex-iropt-precise-memory-exns=yes
+)
+exec valgrind "${opts[@]}" "${@:2}" -- "${exe}" "${@:1:1}"
+
+# --db-attach yes --time-stamp=yes --show-below-main=yes
+#  --verbose --read-var-info=yes --show-reachable=yes --track-fds=yes --gen-suppressions=all --suppressions=<filename>
+
+# TO COPY
+# --log-file="./pr.log" --tool=memcheck --leak-check=full --num-callers=12 --undef-value-errors=yes --error-exitcode=1

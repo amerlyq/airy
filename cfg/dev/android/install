@@ -2,8 +2,10 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    aur_inst "jmtpfs"
+  aur_inst "jmtpfs"
 
 elif distro ubuntu; then
-    echo "Err: Not enough packages"
+  # Cross-compilers
+  # pkgs=( gcc-arm-linux-gnueabi) #Or ...-androideabi
+  echo "Err: Not enough packages"
 fi

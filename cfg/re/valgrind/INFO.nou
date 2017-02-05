@@ -1,0 +1,67 @@
+
+LIOR:(vgdb)
+| mo help | monitor help
+| mo l    | leak_check      | summary like at the end
+| mo l f  | leak_check full
+| (gdb) who_points_at <addr> | This will give you hints on from where this particular memory is referenced. Usually these are the places that are just overwritten, and the memory at <addr> gets lost.
+
+REF
+  http://man7.org/linux/man-pages/man1/vgdb.1.html
+  http://stackoverflow.com/questions/20625116/how-to-use-valgrind-or-gdb-to-find-double-free-error-in-omxplayer
+  http://web.stanford.edu/class/cs107/guide_valgrind.html
+  https://sourceware.org/gdb/current/onlinedocs/gdb/Connecting.html
+  http://tromey.com/blog/?p=731
+  http://www.responsive.se/thomas/2013/09/20/debugging-memory-leaks-with-valgrind-and-gdb/
+
+  Best: with expamples
+    http://billiob.net/blog/20140330_vgdb.html
+
+Has sense use on build-server -- because it's very slow
+Compile with -O0 -g
+
+
+GUI:
+  http://alleyoop.sourceforge.net/
+  http://kcachegrind.sourceforge.net/html/Home.html
+
+Man:
+  http://wiki.eclipse.org/Linux_Tools_Project/Valgrind/User_Guide
+  http://valgrind.org/docs/manual/manual-core.html#manual-core.options
+  http://valgrind.org/docs/manual/cl-manual.html
+
+Fuji (job)
+  http://www.amazon.com/gp/product/0316778494
+
+Debug
+  http://www.cprogramming.com/debuggers.html
+
+GDB is capable of debugging remote programs, like for device software development, by using a remote protocol to communicate with a proxy within the device.
+vgdb is a small process that connects GDB with the Valgrind process.
+
+SUPPRESSION
+  In case you write your own suppression rules, remember that if you use the "real" c++ class name (e.g. QListView::Show()), you should switch the demangle option to false:
+  --demangle=no
+  . The easiest way to generate a suppression rule file is to fast valgrind to generate it itself, using the --gen-suppressions=all option in the command line. After each error, in valgrind output, the corresponding suppression rule is written. Just copy-and-paste it into your suppression file. To be more generic, wildcard characters * can be used. As an example, here is a list of suppression rules that prevents valgrind from outputing errors related to the ROOT framework, for a specific program (called Delphes).
+
+  If the embedded gdbserver is enabled but no gdb is currently
+  being used, the vgdb command line utility can send "monitor
+  commands" to Valgrind from a shell. The Valgrind core provides
+  a set of Valgrind monitor commands. A tool can optionally
+  provide tool specific monitor commands, which are documented
+  in the tool specific chapter.
+
+Tech:
+   Hook up your program under GDB and Valgrind
+   Put a break at where you think the memory is lost
+   Continue there and run a leak check
+   If there is no leak yet, slowly proceed forward, doing a leak check after each step or at every new breakpoint
+   Once you see a leak, that leak occurred between the last stop and this
+   Restart and take even smaller steps, with leak checks in between every one of them, an pinpoint the exact statement that creates the leak.
+
+REMOTE
+  So run vgdb --port=2345, and then (gdb) target remote host:2345 as usual.
+  I found time now to try this: ( valgrind --track-origins=yes --vgdb=yes --vgdb-error=0 $opt_executable $opt_executable_args | tee $myprogramlog; ) & sleep 5; vgdb --port=2345 I get: listening on port 2345 ...connected. relaying data between gdb and process 4853 and then (gdb) target remote host:2345 the processes terminate .. So I can't debug with it, not even run it. Any ideas? –  highsciguy Apr 16 '13 at 13:28
+
+FIXED
+  valgrind: установка либы libc6-dbg:i386 спасает ситуацию с strlen
+  если нет, есть решение в виде бандажа на сорцы https://bugs.kde.org/show_bug.cgi?id=286864

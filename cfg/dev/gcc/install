@@ -1,0 +1,14 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  # pkg_inst "base-devel"  # In conflict with multilibs!
+  pkg_inst -p 'x86_64-pc-linux-gnu-gcc' gcc-multilib
+  pkg_inst -f '/usr/lib32/libstdc++.so' lib32-gcc-libs
+
+elif distro ubuntu; then
+  pkgs=()  # Those libs also necessary to build x32 under x64 system
+  pkgs+=( build-essential gcc-multilib g++-multilib lib32stdc++6 )
+  pkgs+=( make checkinstall pkg-config autoconf automake cmake )
+  pkg_inst "${pkgs[@]}"
+fi
