@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+# strace -- trace system calls, is much easier and safer to use.
+pkg_inst strace
+
+# ltrace -- can trace both system calls and library calls
+#   -- is more prone to crash traced processes than strace.
+pkg_inst ltrace
+
+if distro arch; then
+  aur_inst -p 'xtrace' xtrace-git
+fi

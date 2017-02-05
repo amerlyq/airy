@@ -42,8 +42,8 @@ nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
 
 
 " BUG can't work in vim w/o redirections?
-" if executable('r.shell')
-"   set shell=r.shell
+" if executable('r.sh')
+"   set shell=r.sh
 "   set shellcmdflag=
 " elseif exists('$SHELL')
   " WARNING Don't use '-i':  'stty: standard input: Inappropriate ioctl for device'

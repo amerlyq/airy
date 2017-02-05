@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+# nmap -- network exploration tool and security / port scanner
+pkg_inst nmap
+
+if distro arch; then
+  pkg_inst -p 'nc' openbsd-netcat
+fi

@@ -10,6 +10,12 @@ source ~/.shell/func.d/packages
 pkg_inst netctl wpa_supplicant dialog
 pkg_inst wpa_actiond
 
+# iw phy
+# sudo iw dev wlp3s0 scan
+# sudo iwlist wlp3s0 scan | sed -n '/(Channel/p'
+# iwlist wlp3s0 freq
+pkg_inst iw network-manager
+
 ## GUI -- for netctl
 # http://arcanis.name/ru/projects/netctl-gui/
 

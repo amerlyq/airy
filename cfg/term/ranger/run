@@ -25,7 +25,7 @@ export RANGER_TMPDIR=${TMPDIR:-/tmp}/ranger
 # TODO:(termcmd) if inside tmux -- use 'tmux new-window', etc
 RANGER_LOAD_DEFAULT_RC=FALSE \
   TERMCMD="$(which st)" \
-  SHELL="$(which r.shell)" \
+  SHELL="$(which r.sh)" \
   ranger --choosedir="$RANGER_TMPDIR/cwd" "${@:-$PWD}"
 
 # Automatically change the directory in bash to the last visited one
