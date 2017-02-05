@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+# Searching indexed (daily or by 'sudo updatedb') files on arch
+
+if distro arch; then
+  pkg_inst -p 'locate' mlocate
+
+elif distro ubuntu; then
+  pkg_inst locate
+fi

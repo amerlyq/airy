@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  pkg_inst xurls  # REQ:(st)
+  aur_inst -p fpp fpp-git  # REQ:(tmux) Facebook PathPicker
+
+elif distro ubuntu; then
+  #| urlview | Extracting URLs from text files and displaying a menu
+  #   -- from which you may launch a command to view a specific item
+  pkg_inst urlview  # No for arch?
+fi

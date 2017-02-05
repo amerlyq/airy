@@ -1,7 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-#| bbe  | binary sed
 #| nmap | Network exploration tool and security / port scanner
 # SEE:
 # http://xyne.archlinux.ca/projects/hexgrep/
@@ -9,7 +8,6 @@ source ~/.shell/func.d/packages
 pkg_inst lsof strace ltrace iftop nmap
 
 if distro arch; then
-    pkg_inst bbe
     pkg_inst -p 'nc' openbsd-netcat
     aur_inst -p 'xtrace' xtrace-git
 

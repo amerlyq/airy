@@ -14,7 +14,7 @@ if distro arch; then
   if cfgOpt u; then (cd "$src" && git-up && "${0%/*}/run-rebuild"); fi
 
   pkg_inst dvtm
-  aur_inst abduco xurls
+  aur_inst abduco
 
 elif distro ubuntu; then
   pkg_inst st dtach
