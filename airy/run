@@ -17,15 +17,13 @@ defaults=$(( !${#mods[@]} && !${#skip[@]} ))
 
 ### Environment
 airy=$(dirname "$(readlink -e "$0")")
+"$airy/setup" -m  # BAD!RFC: dirty code duplication
+
 repo=$(git -C "$airy" rev-parse --show-toplevel)
 cache=$repo/_build
-bin=$cache/bin
 
-# BAD:FIXME: cfgsetup must copy all r.airy-* into "$bin"
-mkdir -p "$bin"
 [[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
-[[ :$PATH: == *:$bin:* ]] || export PATH=$bin:$PATH
-"$repo/airy/setup" -m  # BAD!RFC: dirty code duplication
+[[ :$PATH: == *:$cache/bin:* ]] || export PATH=$cache/bin:$PATH
 
 
 ### Profile
@@ -46,7 +44,9 @@ search_mods(){ for d in "$@"; do (cd "$d" &&
   r.airy-filter-mods "${mods[@]}" -- "${skip[@]}") done; }
 
 if ((!defaults)) || [[ ! -s $cache/mods ]]; then
-  lmods=$(search_mods '_build/user' 'cfg')
+  # BAD:HACK: allowed mixed 'mods' and 'paths'
+  [[ ${mods[*]} == . ]] && lmods=$PWD \
+  || lmods=$(search_mods "$cache/user" "$repo/cfg")
 fi
 # cp -vf --backup=numbered "$cache/mods" "$cache/mods" && rm "$cache/mods"
 if ((defaults)); then [[ -s $cache/mods ]] \

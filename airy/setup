@@ -1,8 +1,10 @@
 #!/bin/bash -eu
 # NOTE: prolog must be completely independent
+# BAD!RFC: dirty code duplication
+#   => ALT: call ./run from ./setup to pre-initialize
 
-airy=$(dirname "$(readlink -e "$0")")
-repo=$(git -C "$airy" rev-parse --show-toplevel)
+cd "$(dirname "$(readlink -e "$0")")"
+repo=$(git -C "$PWD" rev-parse --show-toplevel)
 cache=$repo/_build
 bin=$cache/bin
 
@@ -19,7 +21,5 @@ mkdir -p "$bin"
 
 
 ### MAIN ###
-# NOTE: populate symlinks from ./bin
-#   !!! can be resolved by separating 'linkmask' -- and cfgsetup !!!
-#     => then call it from main script to add into std $cache/bin
-source ~/.shell/func.d/cfgsetup
+./bin/cache-links -t "$cache/bin" -q
+./bin/cache-alias -o "$cache/aliases"

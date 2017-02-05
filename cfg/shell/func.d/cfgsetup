@@ -3,18 +3,17 @@ source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
 cwd_script
-[[ :$PATH: == *:${CURR_DIR_CACHE:?}/bin:* ]] ||
-  export PATH=${CURR_DIR_CACHE:?}/bin:$PATH
+cache=${CURR_DIR_CACHE:?}
+# cache=$(r.airy-get-cache)
+[[ :$PATH: == *:$cache/bin:* ]] || export PATH=$cache/bin:$PATH
 
 ### Argparse ###
 CFG_ARGS=( "$@" )  # Backup default arguments
-OPTIND=1
 
 # Keys: clean/debug/force/install/main/reset/set:/theme:/upgrate/Update
-while getopts 'cdfimrs:t:uU' o; do case $o
-in t) THEME=$OPTARG
+OPTIND=1; while getopts 'cdfimrs:t:uU' o; do case $o in :|'?') die 1
+;; t) THEME=$OPTARG
 ;; s) CFG_S+=("$OPTARG")
-;; :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme
@@ -22,34 +21,17 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 [[ ${THEME_ALLOWED-} ]] || THEME_ALLOWED='dark|light|lucid|opaque'
 # DEV:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
 # TODO: use THEME_DEFAULT if set, else -- .../theme/default
-[[ ${THEME-} ]] || [[ ! -s ${CURR_DIR_CACHE:?}/theme ]] \
-|| THEME=$(<"${CURR_DIR_CACHE:?}/theme")
-[[ ${THEME:?} =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
+[[ ${THEME-} ]] || [[ ! -s $cache/theme ]] || THEME=$(<"$cache/theme")
+[[ ${THEME-} =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
 
 ### LINKS ###
 # BUG: on error we can't exit from forked shell and fail main one!
 fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
-### Populate all run, run.pr1 scripts into mycache/bin
-# RFC: generalize into 'linkcp' to support batch '-b'
-linkmask(){ local nm mask=$1 fmt=$2
-  # ALT:(-m) -z $PS1 -- BUT: we can't manually activate mod
-  # BAD: only ./airy/cfg [[ $(readlink -m $0) =~ ^${CURR_DIR_CFG:?} ]]
-  # BAD: current version isn't great either DEV: AIRYPKG file
-  cfgOpt m && [[ ${0##*/} == setup ]] || return 0
-  # EXPL: can't use '-x $src' because of 'env'
-  for src in "$mask"*; do [[ -s $src ]] || continue
-    nm=$fmt
-    nm=${nm//%d/${PWD##*/}}
-    nm=${nm//%n/${src#$mask}}
-    linkcp "$src" "${CURR_DIR_CACHE:?}/$nm"
-  done
-}
-
 
 if distro arch; then
   # TODO:DEV: add fallback -- for each arg until pr found OR err
   mkdef() { linkcp "$(which "${2:?No bin}")" \
-    "${CURR_DIR_CACHE:?}/bin/${1:?No name}"; }
+    "$cache/bin/${1:?No name}"; }
   # System user for demons without shell access and without a home directory
   add_sysuser() { id "${1:?No user}" >/dev/null 2>&1 ||
       sudo useradd -r -U -d /dev/null -s /usr/bin/nologin "$1"; }
@@ -62,13 +44,9 @@ elif distro ubuntu; then
       sudo update-alternatives --set $1 "$2"; }
 fi
 
-airy_cache_pwd_mod
-
-# TODO: convert to function like 'dcache'
-if [[ -z ${MODS_RUN_DISABLE-} ]]; then
-  linkmask "$PWD/bin/" 'bin/r.%d-%n'
-  linkmask "$PWD/run"  'bin/r.%d%n'
-  linkmask "$PWD/env"  'env/%d%n'
+if cfgOpt m; then
+  repo=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
+  r.airy-cache-links -t "$cache/bin" -p "$([[ $repo =~ q$ ]]&&echo q||echo r).%d-"
+  r.airy-cache-alias -o "$cache/aliases"
+  airy_cache_pwd_mod
 fi
-
-cfgNo m || r.airy-cache-alias -o "${CURR_DIR_CACHE:?}/aliases"
