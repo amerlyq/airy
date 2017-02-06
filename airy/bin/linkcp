@@ -29,7 +29,8 @@ same_tree() { ! find "$1" -type f -printf '%P\0' \
     |& xargs -r0I{} diff -q "${1:?}"/{} "${2:?}"/{} \
     |& grep -qm1 '.*'  # ALT: read -t0 -N1
 }
-has_perm(){ local d=$(readlink -m "$1")
+# BAD: $(readlink -m "$1") resolves dangling symlinks :: NEED path of link itself
+has_perm(){ local d=$1; [[ ${d:0:1} == / ]] || d=$PWD/$d
   until [[ -e $d || $d == / ]]; do d=${d%/*}
   done; [[ -w $d ]]
 }

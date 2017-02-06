@@ -7,7 +7,7 @@ shopt -s nullglob
 
 ### Cmdline
 # a=all, g=generate
-opts=; while getopts 'agsmifuU' o; do case $o in :|'?') exit 1
+opts=; while getopts 'agrsmifuU' o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
 has(){ [[ $opts =~ [$*] ]]; }
 
@@ -39,6 +39,7 @@ exec > >(tee "$build/setup.log" | r.airy-pretty)  # colorize
 # Do only if you run setup/install/etc $ date +'%Y%m%d_%H%M%S'
 # "$build/log/$(date +'%Y%m%d_%H%M%S').log"
 
+has r && rm -f "$build/mods"
 
 ### Searching mods
 search_mods(){ for d in "$@"; do (cd "$d" &&
@@ -63,7 +64,8 @@ fi
 # ALSO:(statistics): ${#mods[@]} | ${#skip[@]} | $(wc -l < "$queue")
 
 dopts=$(tr -cd 'mifuU' <<< "${opts-}")
-has s && r.airy-each -i -- r.airy-do ${dopts:+-"$dopts"} <<< "$lmods"
+has s && r.airy-each -i $(has r && echo -r) -- \
+  r.airy-do ${dopts:+-"$dopts"} <<< "$lmods"
 
 # DEV: add one of _[un]used tags by checking in PKG_LIST
 ! has g || r.airy-link-tags -t "$build/tags" -f "$build/mods"

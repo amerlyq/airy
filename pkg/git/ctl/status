@@ -62,7 +62,7 @@ function gita_st { local rep=$1 sfx=${2-}
 unsetopt no_unset
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ||:  # Block dirty code in prezto
-  source ~/.shell/zsh/zpreztorc
+  source "${ZDOTDIR:-$HOME}/.zpreztorc"
 fi
 setopt no_unset
 

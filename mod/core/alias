@@ -1,5 +1,5 @@
 # vim:ft=sh
 
-((!EUID)) || for nm in
+((!EUID)) || for nm in \
 reboot poweroff halt shutdown hibernate hibernate-ram
 do alias $nm='sudo '"$nm"; done

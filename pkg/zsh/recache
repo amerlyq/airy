@@ -26,3 +26,5 @@ zcompile $zdir/.zshrc ${lst[@]}
 zcd=$zdir/.zcompdump
 if [[ -s $zcd && (! -s ${zcd}.zwc || $zcd -nt ${zcd}.zwc) ]]
 then zcompile $zcd; fi
+
+[[ -s ~/.config/airy/aliases ]] && zcompile ~/.config/airy/aliases
