@@ -2,4 +2,9 @@
 source ~/.shell/func.d/packages
 # Supports images (xterm, framebuffer console), but it doesn’t support JavaScript.
 
-pkg_inst w3m w3m-img
+if distro arch; then
+  pkg_inst w3m
+
+elif distro ubuntu; then
+  pkg_inst w3m w3m-img
+fi
