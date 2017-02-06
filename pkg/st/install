@@ -11,6 +11,7 @@ if distro arch; then
   # THINK:BUG: can't catch errors
   # TRY: http://unix.stackexchange.com/questions/48533/exit-shell-script-from-a-subshell
   pkg_inst -l 'Xft' libxft
+  # BAD: requires password on key -- because it's symlinked on my dev repo
   if cfgOpt u; then (cd "$src" && git-up && "${0%/*}/run-rebuild"); fi
 
   pkg_inst dvtm

@@ -2,14 +2,6 @@
 source ~/.shell/func.d/packages
 distro arch || exit
 
-# gpg --recv-keys <KEYID>  # if unknown public key
-# AND then you can sign it:  gpg --lsign-key <KEYID>
-
-# ALT packer (lightweight but less automatable and w/o shell completion)
+# TRY:ALT: packer (lightweight but less automatable and w/o shell completion)
 ayr_inst pacaur
-
 pkg_inst pkgfile  # To investigate packages content w/o downloading
-
-if cfgOpt u || [[ ! -f /var/cache/pkgfile/core.files ]]; then
-  ./update
-fi

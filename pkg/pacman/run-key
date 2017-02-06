@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+
+# gpg --recv-keys <KEYID>  # if unknown public key
+# AND then you can sign it:  gpg --lsign-key <KEYID>
+
+if [[ " $* " =~ " -l " ]]
+then exec pacman-key -l "$@"  # packer_name
+else exec gpg --recv-keys "$@"  # 249B39D24F25E3B6
+fi

@@ -16,6 +16,3 @@ if distro arch; then
 elif distro ubuntu; then
   do_if -c git_inst -p fasd 'clvv/fasd' ||:
 fi
-
-# BAD: clean system
-# ./update $(cfgOpt u && echo -u)

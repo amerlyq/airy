@@ -8,6 +8,7 @@ pkg_inst c2hs # -pr-lang: haskell
 pkg_inst -p 'cabal' cabal-install
 
 
+# CHECK: need immediate ./update for clean install when processing mods all setup before all update ?
 if cfgOpt u || [[ ! -d ~/.cabal/packages ]]
 then ./update; fi
 
