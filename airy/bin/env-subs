@@ -3,17 +3,19 @@
 lp='%[{]'
 mp='[A-Z_][A-Z_0-9]*'
 rp='[}]'
-dryrun=
-inplace=
 
-OPTIND=1; while getopts 'dil:m:r:' o; do case $o
-in [lmr]) declare ${o}p=$OPTARG
-;; d) t=/dev/stdout; dryrun=1
-;; i) t=$(mktemp); inplace=1
-esac; done; shift $((OPTIND-1))
+opts=; while getopts 'dipl:m:r:' o; do case $o in :|'?') exit 1
+;; [lmr]) declare ${o}p=$OPTARG
+esac; opts+=$o; done; shift $((OPTIND-1))
+has(){ [[ $opts =~ [$*] ]]; }
 
 f=$1
-t=${t:-$2}
+t=${2:--}
+
+has i && t=$(mktemp)
+has d && t=-
+[[ $t == - ]] && t=/dev/stdout
+has p && mkdir -p "${t%/*}"
 
 # WARN: unrestricted recursive substitution
 # FIXME: -- endless loop for USER='%USER%' -- set depth limit ?
@@ -30,4 +32,4 @@ gawk -vl="$lp" -vm="$mp" -vr="$rp" '{
   }; print
 }' "$f" > "$t"
 
-((!inplace)) || mv -f "$t" "$f"
+has d || ! has i || mv -f "$t" "$f"
