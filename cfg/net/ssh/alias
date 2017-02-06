@@ -1,0 +1,22 @@
+# vim:ft=sh
+
+# ALT: scp must be double-escaped due to shell expansion on both client and host
+#   ls X{} scp "{}" host:"~/'{}'"
+#   scp file1 file2 ... fileN user@host:~/Downloads/
+scptar() {
+    local srv src z TP
+    case "$1" in
+        -z)   z="z"; shift ;;  # compression
+        -s) TP="$1"; shift ;;  # send
+    esac
+    srv="${1?Need server}"
+    src="$(readlink -m "${2?Need dir path}")"
+    pack="cd \"${src%/*}\" && tar cvf$z - \"${src##*/}\""
+    unpack="tar xvf$z - ${3+-C "$3"}"
+    case "$TP" in
+        -s)  bash -c "$pack" | ssh "$srv" "$unpack" ;;
+         *)  ssh "$srv" "$pack" | bash -c "$unpack" ;;
+    esac
+}
+alias scpto='scptar -s '
+alias scpfr='scptar '

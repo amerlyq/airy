@@ -1,9 +1,6 @@
 # vim:ft=zsh
-[[ $SHELL =~ zsh$ ]] || return 0  ## Global aliases. Zsh only
+[[ -n $ZSH_NAME ]] || return 0  ## Global aliases. Zsh only
 # ATTENTION: disallow aliases after commands requiring args
-
-# Prevent running 'ranger' if not exists in chroot
-(($+commands[ranger])) || alias r='exit'
 
 # Expand in any place of cmdline.
 # Space at the end to allow expanding next command

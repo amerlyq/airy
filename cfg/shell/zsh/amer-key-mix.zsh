@@ -120,7 +120,9 @@ bindkey -a '\C-x\C-m' set-fast-exec-cmd
 bindkey '^I' expand-or-complete-prefix
 bindkey ' ' magic-space  # [Space] - do history expansion
 ## On <F12> in vim mode loads config debug aliases
-bindkey -as '^[[24~' '0d$isource ~/.shell/func.d/debug\n\e'
+# printf "~=> rc-reload-*  actualizes last config version"
+bindkey -as '^[[24~' '0d$isource "${ZDOTDIR:-$HOME}/.zshrc" && echo "ZSH config reloaded"\n\e'
+
 ## Handle SIGINT when completing
 # bindkey '^I' interruptible-expand-or-complete
 ## Autocomplete paths only on <S-Tab> (SEE: amer-widgets)

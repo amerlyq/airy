@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+exec > >(gawk '{
+  printf "%04X %02X %02X\n", $1-1, strtonum(0$2), strtonum(0$3)
+}')
+exec cmp -l "$@"

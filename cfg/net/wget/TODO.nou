@@ -5,7 +5,9 @@ ALT:(curl) eye catching
   https://github.com/jkbrzt/httpie
 
 Basic    # -b "$cook" --cookie "$cook"
-  curl -q --ntlm --user "${WORK_MAIL%%@*}" "${WORK_SRV_ATTEND}" 2>/dev/null | sed -r '/^<div id="masterViewContent">/,/^<\/div>/!d' | \w3m -T text/html | cat
+  $ curl -q --ntlm --user "${WORK_MAIL%%@*}" "${WORK_SRV_ATTEND}" 2>/dev/null | sed -r '/^<div id="masterViewContent">/,/^<\/div>/!d' | \w3m -T text/html | cat
+  $ alias header='curl -I'
+  $ alias headerc='curl -I --compress'
 
 TODO
   2015-04-09 [X] myspot -- use curl + Google browser identity + cookies + authorithation to get to http://myspot

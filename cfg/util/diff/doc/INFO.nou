@@ -68,10 +68,7 @@ http://unix.stackexchange.com/questions/57305/rsync-compare-directories
   $ diff -I 'addiu' <(objdump -d std/$f) <(objdump -d expat/$f)
   ALT: for each significant section from $ objdump -x $ do
     $ objcopy -j <section> | md5sum
-  ALT
-    eu-elfcmp
-      http://www.linuxfromscratch.org/blfs/view/svn/general/elfutils.html
-      SRC: https://git.fedorahosted.org/cgit/elfutils.git/tree/src/elfcmp.c
+  ALT: eu-elfcmp
   Hex to ascii
     NOTE: use to compare elf .rodata sections
     $ echo 70642f68742f7070 | xxd -r -p

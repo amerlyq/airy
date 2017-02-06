@@ -1,0 +1,32 @@
+# vim:ft=sh
+
+# TODO: filter tree by pid args parent--childs (useful to list branch for $$)
+# ALSO: sort in order of starting time
+alias p='ps --group 0 --deselect --forest -o user,pid,pgid,pcpu,pmem,etime,args'
+
+# alias psg='ps aux | grep ' # Rewritten by zsh
+alias topstat='dstat -cdnpmgs --top-bio --top-cpu'
+
+## get top process eating memory
+alias psmem='ps auxf | sort -nr -k 4'
+alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+## get top process eating cpu ##
+alias pscpu='ps auxf | sort -nr -k 3'
+alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
+## Get server cpu info ##
+alias cpuinfo='lscpu'
+## older system use /proc/cpuinfo ##
+##alias cpuinfo='less /proc/cpuinfo' ##
+
+term_tree() { local leaf=$$
+  ps -eo pid,ppid,command | awk -v leaf="$leaf" '
+  {parent[$1]=$2;command[$1]=$3;}
+  function print_ancestry(pid)
+  {
+      printf("%s|%05s\n",command[pid],pid); // parent[pid];
+      if(pid!=1) print_ancestry(parent[pid])
+  };
+  END{\
+      print_ancestry(leaf)
+  }' | column -t -s '|'
+}

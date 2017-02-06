@@ -35,7 +35,6 @@ nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
 
 
 
-
 " STD: Open at last position (instead of vim-stay)
 "   au MyAutoCmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
 "       \|    exe "normal! g'\"" | endif
@@ -58,8 +57,9 @@ nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
 "   " Go inside shell to see output of commands like ':! ..'. Return on <C-d>
 "   noremap <silent> <Leader>Z :<C-u>shell<CR>
 " endif
-" command! -bar -nargs=+ Z  exe '!zsh -c "source ~/.shell/aliases; eval '.<q-args>.'"'
-" command! -bar -nargs=+ Z call RedirectOutput('!zsh -c "source ~/.shell/aliases; eval '.<q-args>.'"')
+
+" command! -bar -nargs=+ Z  exe '!r.sh -c <q-args>'
+" command! -bar -nargs=+ Z call RedirectOutput('!r.sh -c <q-args>')
 " nnoremap <unique> <Leader>z  :Z<Space>
 " vnoremap <unique> <Leader>z  :!
 " set shell=$SHELL\ -c\ source\ ~/.shell/aliases\ \&\&\ eval\ "ls"

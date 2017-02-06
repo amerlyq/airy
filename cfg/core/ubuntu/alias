@@ -1,0 +1,11 @@
+# vim:ft=sh
+
+# dpkg dpkg-reconfigure
+((!EUID)) || alias apt-get='sudo apt-get'
+
+alias apti='apt-get install'
+alias apts='apt-cache search'
+alias update='apt-get update && apt-get upgrade'
+
+# alias debup='aptitude update && aptitude safe-upgrade'
+# alias debup_old='aptitude update && aptitude upgrade'

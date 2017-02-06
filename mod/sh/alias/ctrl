@@ -1,0 +1,22 @@
+# vim:ft=sh
+
+alias sudo='sudo '  # Allow using sudo with aliases
+# alias su='sudo -i'
+# alias _='sudo'
+
+alias q='exit'
+# alias j='jobs -l'
+
+alias mkdir='mkdir -pv'
+# mkdcd() { mkdir -p "$@" && cd "$_"; }
+alias rmdir.='cd ..; rmdir "$OLDPWD" || cd "$OLDPWD"'
+
+# make a backup of a file
+bk() { cp -a "$1" "$1.$(date --iso-8601=seconds)"; }
+
+# clear screen for real (it does not work in Terminology)
+alias cls=' echo -ne "\033c"'
+
+# Push and pop directories on directory stack
+alias pu='pushd'
+alias po='popd'

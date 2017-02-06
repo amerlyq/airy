@@ -12,7 +12,8 @@ fi
 _dttime exp-tmpdir
 
 ### Path ###
-! _has_pr ruby || PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
+! _has_pr ruby || [[ :$PATH: == *:$HOME/.gem/ruby:* ]] \
+|| PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
 _dttime exp-ruby
 ! _has_pr cabal || PATH=$HOME/.cabal/bin:$PATH

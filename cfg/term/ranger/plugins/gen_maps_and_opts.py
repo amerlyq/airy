@@ -23,7 +23,7 @@ def get_colorscheme(fm):
 
 def aura_pathes(fm):
     ## Generate key bindings for fast directory jumping
-    fpathes = os.path.expanduser('~/.shell/pathes')
+    fpathes = os.path.expanduser('~/.config/airy/pathes')
     lst = []
     try:
         fname = fm.confpath(fpathes)

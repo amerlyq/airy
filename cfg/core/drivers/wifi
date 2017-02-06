@@ -29,13 +29,12 @@ pkg_inst iw network-manager
 #   netctl status wlan_static
 
 # General
-# LST="$LST util-linux procps hostapd iproute2 iw haveged"
+# LST="$LST hostapd iw haveged"
 # (or procps-ng)
 # haveged (optional) -- entropy for randomness
 # iwconfig (you only need this if 'iw' can not recognize your adapter)
 
 # For 'NATed' or 'None' Internet sharing method
-# LST="$LST dnsmasq iptables"
-
-# apt_noprompt $LST
+# apt_noprompt dnsmasq
 # git_install 'oblique/create_ap'
+# alias wifi="netctl-auto switch-to"

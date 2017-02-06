@@ -1,0 +1,7 @@
+# vim:ft=sh
+
+copyq_edit() {
+  local fl=`tempfile`
+  copyq clipboard > "$fl" && "$EDITOR" -- "$fl" && copyq copy - < "$fl"
+  trap "rm -f '$fl'" EXIT
+}

@@ -1,0 +1,5 @@
+# vim: ft=sh
+
+# Source all pathes shortcuts
+[[ ! -s ~/.config/airy/pathes ]] || while read -r k p; do alias $k="cd $p"
+done < <(sed 's/\s*#.*$//; /^\s*$/d' ~/.config/airy/pathes)

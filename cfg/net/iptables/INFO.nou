@@ -1,0 +1,5 @@
+
+WTF
+  $ sudo iptables -A OUTPUT -d 192.168.1.0/24 -m owner --cmd-owner sshd -j DROP
+  $ sudo iptables -A OUTPUT -d 127.0.0.1 -m owner --cmd-owner sshd -j DROP
+  $ sudo iptables -A OUTPUT -d 127.0.0.1 --dport <mpd-listen-port> -j ACCEPT

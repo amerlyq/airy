@@ -1,6 +1,7 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
+export SHELL=/usr/bin/bash  # NEED: when bash run from zsh
 
 # If not running interactively, don't do anything
 [[ $- == *i* ]] || return
@@ -43,7 +44,6 @@ stty -echoctl
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
-export SHELL=$(which bash)  # NEED: when bash is launched from inside zsh
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile

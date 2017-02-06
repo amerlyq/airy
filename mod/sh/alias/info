@@ -1,0 +1,18 @@
+# vim:ft=sh
+
+alias path='echo -e ${PATH//:/\\n}'
+
+alias \?='which'     # search path
+alias \?\?='whatis'  # search in man-db
+alias \?\?\?='whereis'  # desktop search
+# SEE: https://wiki.archlinux.org/index.php/File_system_search
+
+alias df='df -H'
+alias da='\du -sch'
+alias du='\du -ch'
+alias duh='du --max-depth=1' #Or: du -hd1
+
+alias now='date +"%T"'
+alias nowdate='date +"%d-%m-%Y"'
+alias date.='date +%Y%m%d_%H%M%S'
+# alias notes='date +"%Y-%m-%d, %T" >> ./notes.otl && editor ./notes.otl'

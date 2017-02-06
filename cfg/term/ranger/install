@@ -1,47 +1,30 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-if distro arch; then
-    pkg_inst ranger unzip dash
-    pkg_inst -p 'fbi' fbida
-    pkg_inst -l 'caca' libcaca
-    pkg_inst -p 'pdftotext' poppler
-    pkg_inst -p '7z' p7zip
-    pkg_inst xchm  # for win-help and some books in *.chm
-
-    # BUG: conflict with qutebrowser, etc
-    # pkg_inst pygmentize python-pygments
-    # pip_inst pygments-style-solarized
-
-    # Pager preview
-    pkg_inst ffmpegthumbnailer catdoc
-    pkg_inst -d '/usr/share/perl5/vendor_perl/Image/ExifTool' perl-image-exiftool
-    # aur_inst -p 'wav2png' 'wav2png-git'
-
-else
-    pkg_inst fbi caca-utils poppler-utils w3m-img p7zip-full zip
-
-    pkg_build() { sudo python3 setup.py install; }
-    git_inst 'hut/ranger'  # 'amerlyq/ranger'
-fi
-
-#| fbi        | framebuffer image viewer for terminal
-#| poppler    | (pdftotext) for pdf previews
-#| caca-utils | (img2txt) Colour AsCii Art library.
-#|   cacaview | image viewer for the terminal. The user can zoom and scroll
-#|            | the image, set the dithering method or enable anti-aliasing.
-#|   cacaball | tiny graphic program that renders animated ASCII metaballs
-#|            | on the screen
-#|   cacafire | port of AALib's aafire and displays burning ASCII art flames
-#|   cacademo | simple application that shows the libcaca rendering features
-#|            | such as line and ellipses drawing, triangle filling and
-#|            | sprite blitting.
-
-pkg_inst w3m atool unrar mediainfo colordiff highlight
-#| w3m | supports images (xterm, framebuffer console), but it doesn’t support JavaScript.
-#| atool      | previews of archives
 #| highlight  | syntax highlighting of code
 #| mediainfo or perl-image-exiftool # viewing information about media files
+pkg_inst highlight mediainfo
 
-# pkg_inst sharutils  # or some uuencode
-# git_inst 'rkitover/vimpager'
+if distro arch; then
+  pkg_inst ranger
+  pkg_inst -p 'fbi' fbida  # framebuffer image viewer for terminal
+  # VIZ:(caca) img2txt caca-config cacaclock cacademo cacafire cacaplay cacaserver cacaview
+  pkg_inst -l 'caca' libcaca  # colour ASCII art library
+  pkg_inst -p 'pdftotext' poppler  # for pdf previews
+  pkg_inst xchm  # for win-help and some books in *.chm
+
+  # BUG: conflict with qutebrowser, etc
+  # pkg_inst pygmentize python-pygments
+  # pip_inst pygments-style-solarized
+
+  # Pager preview
+  pkg_inst ffmpegthumbnailer catdoc
+  pkg_inst -d '/usr/share/perl5/vendor_perl/Image/ExifTool' perl-image-exiftool
+  # aur_inst -p 'wav2png' 'wav2png-git'
+
+else
+  pkg_build() { sudo python3 setup.py install; }
+  git_inst 'hut/ranger'  # 'amerlyq/ranger'
+
+  pkg_inst fbi caca-utils poppler-utils
+fi

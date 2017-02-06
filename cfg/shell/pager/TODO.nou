@@ -55,7 +55,7 @@ ALT
   Vimpager
   BUG: no colors in git diff, etc -- google 'vimpager colors'
   SEE: https://wiki.archlinux.org/index.php/Man#Colored_man_pages
-  : if [[ "${SHELL##*/}" == zsh ]] && (( $+commands[vimpager] )); then
+  : if hash vimpager &>/dev/null; then
   :   export PAGER=vimpager
   :   alias less=$PAGER
   :   alias zless=$PAGER

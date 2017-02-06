@@ -1,0 +1,15 @@
+# vim:ft=sh
+_airy=${XDG_CONFIG_HOME:-$HOME/.config}/airy
+
+### Aura mods profiles (links only) ###
+# FIXME: what if user want to overwrite some of my aliases?
+[[ ! -d $_airy/env ]] || for f in "$_airy/env"/*
+do [[ -L $f ]] && source "$f"; done
+
+# Source combined alias cache from all *mod*s
+[[ ! -s $_airy/aliases ]] || source "$_airy/aliases"
+
+# Execute exported commands for chroot and ssh
+# BAD: can't be used for non-interactive shell (like r.chroot)
+#   $ bash -ic '"$@"' "$0" "$@"
+[[ -z $SHELLRC_EVAL ]] || eval "$SHELLRC_EVAL"

@@ -1,0 +1,7 @@
+# vim:ft=sh
+
+# {ifconfig eth0; ifconfig wlan0}  | awk '/inet addr/{print substr($2,6)}'
+alias scanip='nmap -sn 192.168.0.0/24'
+alias myip='curl -s http://www.myip.ch | grep -oE "([0-9]+\.?)+"'
+alias ports='netstat -tulanp'
+alias openports='netstat --all --numeric --programs --inet'

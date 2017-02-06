@@ -1,0 +1,23 @@
+# vim:ft=sh
+
+alias cal='cal -m'
+alias sort='LC_ALL=C sort'    # fix sorting order
+
+alias free='free -hmlt'
+alias reswap='sudo swapoff -a && sudo swapon -a && free'
+
+((!EUID)) || for nm in chown mount umount
+do alias $nm="sudo $nm"; done
+
+alias chownm='chown $USER:$USER'  # USE this exclusively
+alias chownr='chown root:root'
+
+alias mountl='command mount | column -t'
+alias mountf='sudo fdisk -l'
+
+alias ping='\ping -c 5'
+alias pingfast='\ping -c 100 -s.2'
+alias pingg='pingfast 8.8.8.8'
+
+alias make='make -j4'         # multithread build
+alias sha1='openssl sha1'

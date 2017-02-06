@@ -23,7 +23,8 @@ else
   no_windows(){ true; }
 fi
 
-no_tmux(){ [[ -z $(tmux list-sessions 2>/dev/null) ]] || err "Look into tmux sessions"; }
+tmuxls(){ tmux list-sessions 2>/dev/null | grep -v "^$USER: 1 windows"; }
+no_tmux(){ [[ -z $(tmuxls) ]] || err "Look into tmux sessions"; }
 synced_repo(){ r.git-all-synced "$1" || err "Sync git in '$1/*'"; }
 
 ask(){ confirm -r "$@" || exit 0; }

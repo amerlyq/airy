@@ -1,5 +1,7 @@
 # vim: ft=sh
 
 # For 'reu' binary investigation tool
-while IFS= read -r i; do alias re$i='reu '"$i"' '
+! hash reu &>/dev/null || while IFS= read -r i; do alias re$i="reu $i"
 done < <(sed -rn '/case/,/esac/{/\s*(\w+)\)\s.*/s//\1/p}' "$(which reu)")
+
+alias readelf='readelf -W'    # don't wrap lines

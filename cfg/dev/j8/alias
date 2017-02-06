@@ -1,5 +1,4 @@
-# vim:ft=zsh
-[[ $SHELL =~ zsh$ ]] || return 0
-if (($+commands[jcalc])); then
+# vim:ft=sh
+if [[ -n $ZSH_NAME ]]; then
   alias jc='noglob jcalc'
 fi

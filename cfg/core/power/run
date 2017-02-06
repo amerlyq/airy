@@ -10,6 +10,7 @@ sys_power(){ #Suspend #Hibernate
     #    /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart #Stop
 }
 
+# ALT: pm-suspend && xlock -mode matrix
 case $1
 in   suspend|-s) sys_power Suspend
 ;; hibernate|-h) sys_power Hibernate

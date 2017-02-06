@@ -82,14 +82,11 @@ SSL keys, etc
     https://www.madboa.com/geek/openssl/
     https://www.sslshopper.com/article-most-common-openssl-commands.html
 
-iptables
+Proxy
  https://wiki.archlinux.org/index.php/proxy_settings
   firefox -> socks
   ssh -D remote
    maybe use proxy with authorizathion on remote end? like ccproxy, privoxy
-  sudo iptables -A OUTPUT -d 192.168.1.0/24 -m owner --cmd-owner sshd -j DROP
-  sudo iptables -A OUTPUT -d 127.0.0.1 -m owner --cmd-owner sshd -j DROP
-  sudo iptables -A OUTPUT -d 127.0.0.1 --dport <mpd-listen-port> -j ACCEPT
 
 Prevent server port scanning
   http://sysadm.pp.ua/linux/xtables-addons.html

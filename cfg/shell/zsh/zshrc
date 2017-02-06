@@ -4,9 +4,9 @@ TMPPREFIX="${${TMPDIR:-/tmp}%/}/${SHELL##*/}"
 _dttime zshrc
 
 ## Add completions and themes from custom place
-# fpath=(~/.shell/zsh/completion.d $fpath ~/.shell/zsh/theme.d)
+# fpath=(${ZDOTDIR}/cfg/completion.d $fpath ${ZDOTDIR}/cfg/theme.d)
 
-source ~/.shell/zsh/options
+source ${ZDOTDIR}/cfg/options
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
@@ -43,15 +43,15 @@ setopt globdots
 # You will see errors in tty if one of them is not found:
 # source ~/.shell/env  # FIXME: must be already sourced through .zprofile/.zshenv, but is not!
 _dttime gpg
-source ~/.shell/zsh/modules/gpg.zsh
+source ${ZDOTDIR}/cfg/modules/gpg.zsh
 _dttime end-gpg
-source ~/.shell/zsh/amer-widgets.zsh
+source ${ZDOTDIR}/cfg/amer-widgets.zsh
 _dttime end-widgets
-source ~/.shell/zsh/amer-key-mix.zsh
+source ${ZDOTDIR}/cfg/amer-key-mix.zsh
 _dttime end-keys
-source ~/.shell/zsh/filetypes.zsh
+source ${ZDOTDIR}/cfg/filetypes.zsh
 _dttime end-filetypes
-source ~/.shell/zsh/completion.zsh
+source ${ZDOTDIR}/cfg/completion.zsh
 _dttime end-completion
 source ~/.shell/common
 _dttime end-common
@@ -59,5 +59,5 @@ _dttime end-common
 
 # Freciency completions and preexec (man fasd)
 # WARNING: quotes are essential!
-! _has_pr fasd || eval "$(fasd --init auto)"
-_dttime end-fasd
+# ! _has_pr fasd || eval "$(fasd --init auto)"
+# _dttime end-fasd

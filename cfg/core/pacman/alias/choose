@@ -8,6 +8,7 @@ else
   alias pacman='sudo \pacman'
 fi
 
-if [[ $SHELL =~ zsh$ ]]; then
-  alias pacman="noglob ${${$(alias pacman)#*=}:-pacman}"
+if [[ -n $ZSH_NAME ]]; then
+  alias pacman="noglob ${aliases[pacman]:-pacman}"
+  # alias pacman="noglob ${${$(alias pacman)#*=}:-pacman}"
 fi

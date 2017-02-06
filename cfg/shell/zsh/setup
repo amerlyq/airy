@@ -14,6 +14,7 @@ fi
 
 # Main destination for Zsh
 PREZTO=~/.cache/zsh/.zprezto
+linkcp "$PWD" "${PREZTO%/*}/cfg"
 linkcp -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc
 if [[ -d $PREZTO ]]; then
   linkcp ./prompt "$PREZTO/modules/prompt/functions/prompt_amer_setup"
@@ -21,6 +22,6 @@ if [[ -d $PREZTO ]]; then
 fi
 
 # We must have symlink anyway to keep paths actual
-linkcp ./zshenv ~/.zshenv
+linkcp {,~/.}zshenv
 # Refresh cache
 ./update

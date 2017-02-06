@@ -1,4 +1,4 @@
-#!/usr/bin/zsh -e
+#!/usr/bin/zsh -eu
 # Minuscule startup time enhancement
 # TODO: insert into demons.target.wants/zsh-comp.service
 cd ${0%/*}
@@ -12,15 +12,15 @@ ZDOTDIR=$zdir
 rehash
 
 zcompile ~/.zshenv
-zcompile ~/.zprofile $zdir/.zprofile ~/.shell/exports
-zcompile ~/.zlogin $zdir/.zlogin
+zcompile $zdir/.zprofile $zdir/.zprofile ~/.shell/exports
+zcompile $zdir/.zlogin $zdir/.zlogin
 
 # Combine zshrc components into one file
-LST=()
-LST+=( $zdir/.{zshrc,zprezto{rc,/init.zsh}} )
-LST+=( ~/.shell/zsh/{amer-{widgets,key-mix},filetypes,completion}.zsh )
-LST+=( ~/.shell/common )
-zcompile ~/.zshrc ${LST[@]}
+lst=()
+lst+=( $zdir/.{zshrc,zprezto{rc,/init.zsh}} )
+lst+=( ./{amer-{widgets,key-mix},filetypes,completion}.zsh )
+lst+=( ~/.shell/common )
+zcompile $zdir/.zshrc ${lst[@]}
 
 # Compile the completion dump
 zcd=$zdir/.zcompdump
