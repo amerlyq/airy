@@ -4,6 +4,40 @@ ALT:(dot-mgmt)
 !! NOTE: all [airy] system uses only local ./_build paths
 
 
+pkglst
+  !!! [_] remove sourcing ./pkgs file from 'profile' with reading by 'readarray'
+    = (long operation -- sourced in each cfgsetup)
+  [_] TODO: mark as obsolete (or another word instead of 'obsolete' -- SEE how AUR marks such old cases)
+    VIZ: surf uzbl vimb eclipse java latex sql tizen webex synergy urxvt i3 tray
+  [_] TODO: check PKG_LIST on errors (err on inexistant pkgs and warn on duplicates)
+    => keep 'r.airy-find-pkgs' script, but replace it by direct access to paths in ./pkg/* by ./run
+  [_] apply unique to non-sorted lists -- to reorder some items in top of list
+    E.G. PKG_LIST=( xorg ... sorted list | unique )
+  [_] airy dirs structure
+     ls ./airy/* -- flat list
+    _build
+    _obsolete  # ALT: use tags: obsolete instead and filter-out from auto-tag 'active'
+    _site # aux gen from mods
+    _todo # notes + tasks
+    airy  # mng 'airy' by itself -- add to ./pkgs
+  [_] TODO: install, notes => redistribute
+  [_] TODO: vim diff between list ./pkg/* and file ./pkgs to easily see and add new pkgs
+    => embed into makefile
+  [_] TODO: compare all pacman pakages from PKG_LIST with installed on system
+    and suggest to user to remove excessive ones
+    (after reducing PKG_LIST to maintain cleaner system)
+  [_] FIND: soft to sort deps graphs by before/after -- maybe there are some in AUR ?
+  [_] TODO!!! reorder pkg: firstly -- the most necessary tools (zsh,vim,ranger)
+    = so even if system breaks, it must become somewhat more usable then default to fix all troubles
+    => ENH: append to PKG_LIST instead of overwrite
+      * HACK:(non-robust): make reasonable default group with necessary deps in default system ~/.shell/profile
+        BUT: I can't enforce 'xorg' to be present on all systems
+          ? => therefore reasonable default is impossible ?
+  [_] TODO: move 'defaults' in its own module and add as last entry of list
+    when using 'r.airy -d' (NEED: replace '-d' for recache by smth else)
+    [_] WARN: must be added after reading cached list, not before !!
+
+
 maint
   [_] encapsulate deploy system into independent 'airy' mod
   2017-02-04 [X] rename 'setup' to 'maint' OR 'ctl' ALT: use root Makefile
