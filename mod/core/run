@@ -27,10 +27,10 @@ tmuxls(){ tmux list-sessions 2>/dev/null | grep -v "^$USER: 1 windows"; }
 no_tmux(){ [[ -z $(tmuxls) ]] || err "Look into tmux sessions"; }
 synced_repo(){ r.git-all-synced "$1" || err "Sync git in '$1/*'"; }
 
-ask(){ confirm -r "$@" || exit 0; }
-chk_wnd(){ no_windows || ask "Ignore opened windows?"; }
-chk_tmux(){ no_tmux || ask "Ignore tmux sessions?"; }
-chk_repo(){ synced_repo ~/aura || ask "Ignore unsynced git?"; }
+ask(){ confirm "$@" || exit 0; }
+chk_wnd(){ no_windows || ask -r "Ignore opened windows?"; }
+chk_tmux(){ no_tmux || ask -r "Ignore tmux sessions?"; }
+chk_repo(){ synced_repo ~/aura || ask -r "Ignore unsynced git?"; }
 
 # DEV: check network connections (ssh/etc or port forwarding)
 
