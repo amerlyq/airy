@@ -32,8 +32,8 @@ CURR_CHROOT_EVAL=''
 ### Load ###
 ## NOTE: installs folder of configs, instead whole or individual
 # Def: prs for headless ssh, cli/tui only
-PKG_LIST=(/net/wget /shell{,/} /util{,/} /dev /dev/{python,ruby,etc,git} /term/{ranger,tmux,vim} /browsers/elinks)
-PKG_SKIP=(/dev/{android,eclipse,hex,java,kernel,latex,sql} /{core,game,io,media,re,xorg}{,/} )
+PKG_LIST=(wget shell bash zsh util grep python ruby git term ranger tmux vim elinks)
+PKG_SKIP=()
 
 [[ ! -s $config/profile ]] || source "$config/profile"
 # source ~/aura/env
