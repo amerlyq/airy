@@ -1,11 +1,17 @@
 # vim: ft=sh
+# BAD: always overwrites vars when sourced in some script
+#   !!! cant change env vars on cmdline or by 'env'
+# TEMP:REM?
+type -f _dttime &>/dev/null || _dttime(){ :; }
+type -f _has_pr &>/dev/null || _has_pr(){ hash "$1" &>/dev/null; }
+
 ### Vars ###
 export LANG=${LANG:-en_US.UTF-8}  # FIXED: for schroot into old ubuntu
-export LC_NUMERIC=${LC_NUMERIC:-$LANG}
+export LC_NUMERIC=${LC_NUMERIC:-${LANG-}}
 _dttime exports
 
 ### Temp ###
-if [[ ! -d $TMPDIR ]]; then
+if [[ ! -d ${TMPDIR-} ]]; then
   export TMPDIR=/tmp/$LOGNAME
   mkdir -p -m 700 "$TMPDIR"
 fi

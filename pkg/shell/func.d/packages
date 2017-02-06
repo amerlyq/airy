@@ -66,17 +66,30 @@ elif distro arch; then
     aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' "$@"; }
     loc_inst(){ do_if -c 'pkg_make' "$@"; }
     # WARN: pkgs not from AUR can break pacaur
-    pkg_make(){ local p
+    pkg_make(){ local p d
       p=$(readlink -e "${1:?}")
       ( set -e
         source "$p"
-        cd "$(dcache "pacaur/$pkgname")"
+        d=$CURR_DIR_PKG/$pkgname
+        mkdir -p "$d" && cd "$d"
+        # cd "$(dcache "pacaur/$pkgname")"
         linkcp -ct "$PWD" "$p"
-        makepkg -sf  # updpkgsums &&
-        source PKGBUILD  # EXPL: updated on build values for pkgver, etc
-        paccache -df "$pkgname"
-        sudo pacman -U --needed --noconfirm \
-          "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
+        # WARN:(-f): removed 'force' to mitigate idle rebuild
+        #   => enforce rebuild by incrementing 'pkgrel=1' in PKGBUILD
+        # THINK: using '-C' for clean builds (re-dld all src)
+        makepkg -si --needed --noconfirm
+        # updpkgsums &&  # REM: 'makepkg' has flag for this
+        # source PKGBUILD  # EXPL: updated on build values for pkgver, etc
+        # paccache -df "$pkgname"  # REM: prefer to keep old versions
+        # BAD:(yes): -- can answer some wrong question
+        # sudo sh -c 'yes | pacman -U --needed "$@"' '' \
+        #  "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
+        # NOTE: remove '--noconfirm' -- to read answer from stdin
+        # BET: wrap in 'expect' to answer only question about conflict
+        # BUT: you need 'expect' installed on clean system...
+        # ALT: wait fail, manually remove package, then 'make continue'
+        # sudo pacman -U --needed --noconfirm \
+        #   "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
       ) || return
     }
   elif has_pr yaourt; then aur_inst(){ ayr_inst "$@"; }

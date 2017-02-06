@@ -1,6 +1,5 @@
 #!/bin/bash -e
 # tags: shell
+## WARN: link before usage as very first *mod*
+linkcp "$(dirname "$(readlink -e "$0")")" ~/.shell
 source ~/.shell/func.d/cfgsetup
-
-### LINKS ###
-linkcp "$PWD" ~/.shell
