@@ -6,8 +6,9 @@ shopt -s nullglob
 #   ./$0 -- -- ...  # skip-only
 
 ### Cmdline
-# a=all, g=generate
-opts=; while getopts 'agrsmifuU' o; do case $o in :|'?') exit 1
+# a=all, x=reset_queue, g=generate
+dop=maiIsSuUrR
+opts=; while getopts "x${dop}dg" o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
 has(){ [[ $opts =~ [$*] ]]; }
 
@@ -21,7 +22,7 @@ defaults=$(( !${#mods[@]} && !${#skip[@]} ))
 ### Environment
 airy=$(dirname "$(readlink -e "$0")")
 "$airy/setup" -m  # BAD!RFC: dirty code duplication
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=$HOME/.bin:$PATH
+source ~/.shell/exports
 
 repo=$(git -C "$airy" rev-parse --show-toplevel)
 build=$repo/_build
@@ -32,19 +33,25 @@ source ~/.shell/profile
 (( ${#mods[@]} )) || mods=( "${PKG_LIST[@]}" )
 (( ${#skip[@]} )) || skip=( "${PKG_SKIP[@]}" )
 
+# BUG:FIX: when _build/mods generated -- '-d' has no effect !
+has d && mods+=( defaults )
+
 
 ### Run
 # WARN: for {pacman, jobs, etc} USE >/dev/tty
-exec > >(tee "$build/setup.log" | r.airy-pretty)  # colorize
-# Do only if you run setup/install/etc $ date +'%Y%m%d_%H%M%S'
-# "$build/log/$(date +'%Y%m%d_%H%M%S').log"
+# ALT:(tee -a): individual files "$build/log/$(date +'%Y%m%d_%H%M%S').log"
+exec > >(tee -a "$build/setup.log" | r.airy-pretty)  # colorize
+printf '=%.0s' {1..30}
+printf ' %s ' "$(date +'%Y%m%d_%H%M%S')"
+printf '=%.0s' {1..30}
+printf '\n$ %s %s\n'  "$0" "$*"
 
-has r && rm -f "$build/mods"
 
 ### Searching mods
 search_mods(){ for d in "$@"; do (cd "$d" &&
   r.airy-filter-mods "${mods[@]}" -- "${skip[@]}") done; }
 
+has x && rm -f "$build/mods"
 if ((!defaults)) || [[ ! -s $build/mods ]]; then
   # BAD:HACK: allowed mixed 'mods' and 'paths'
   # BAD: order of mod dirs -- some user mods must be 'before' and some 'after'
@@ -63,9 +70,10 @@ fi
 # (( ${#opts} )) || r.airy-info <<< "$lmods"
 # ALSO:(statistics): ${#mods[@]} | ${#skip[@]} | $(wc -l < "$queue")
 
-dopts=$(tr -cd 'mifuU' <<< "${opts-}")
-has s && r.airy-each -i $(has r && echo -r) -- \
-  r.airy-do ${dopts:+-"$dopts"} <<< "$lmods"
+# TODO: rename 'recache'/'rR' to smth another to free up '-r' for general reset/remove
+dopts=$(tr -cd "$dop" <<< "${opts-}")
+has "$dop" && r.airy-each -i $(has x && echo -r) -- \
+  r.airy-do ${dopts:+"-$dopts"} <<< "$lmods"
 
 # DEV: add one of _[un]used tags by checking in PKG_LIST
 ! has g || r.airy-link-tags -t "$build/tags" -f "$build/mods"

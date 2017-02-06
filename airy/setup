@@ -1,4 +1,5 @@
 #!/bin/bash -eu
+# tags: airy
 # NOTE: prolog must be completely independent
 # BAD!RFC: dirty code duplication
 #   => ALT: call ./run from ./setup to pre-initialize
@@ -9,13 +10,16 @@ build=$repo/_build
 
 
 ### LINKS ###
-[[ :$PATH: == *:$PWD/bin:* ]] || export PATH=$PWD/bin:$PATH
+[[ :$PATH: == *:$PWD/bin:* ]] || export PATH=$PWD/bin:$PATH  # :linkcp
 ./ctl/cache-links -t "$build/bin" -q
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH  # :r.airy-*
+
 linkcp -q ./pathes "$build/cfg/pathes"
 
 linkcp -q "$build/bin" ~/.bin
 linkcp -q "$build/cfg" ~/.config/airy
-linkcp -q "$repo/pkg/shell" ~/.shell  # REM
+# BAD: can't be used independent in ./pkg/shell/setup
+# -- due to $PATH (linkcp) on clean setup
+linkcp -q "$repo/pkg/shell" ~/.shell
 
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
 r.airy-cache-alias

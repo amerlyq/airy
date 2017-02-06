@@ -3,7 +3,7 @@
 mods=( "$PWD" )
 
 # RFC: more logical flags
-opts=; while getopts 'mifuU' o; do case $o in :|'?') exit 1
+opts=; while getopts 'maiIsSuUrR' o; do case $o in :|'?') exit 1
 # ;; t) dst=$(readlink -m "$OPTARG")
 # ;; f) readarray -t mods < "$OPTARG"  # WARN: empty/misconfigured lines
 esac; opts+=$o; done; shift $((OPTIND - 1))
@@ -18,8 +18,8 @@ run(){ if [[ -f $1 ]]; then "$@" $(has m || echo -m); else echo "(no ${1##*/})";
 for m in "${mods[@]}"; do
   echo ">>> $m <<<"
   # BUG: some packages (like gcc-multilib) aren't replaced even with -u)
-  if has i; then run "$m/install" $(has f && echo -u); fi
-  run "$m/setup" $(has u && echo -u)
-  if has U; then run "$m/update" $(has u && echo -u); fi
-  if has R; then run "$m/recache" $(has u && echo -u); fi
+  if has iIa; then run "$m/install" $(has Ia && echo -u); fi
+  if has sSa; then run "$m/setup"   $(has Sa && echo -u); fi
+  if has uUa; then run "$m/update"  $(has Ua && echo -u); fi
+  if has rRa; then run "$m/recache" $(has Ra && echo -u); fi
 done
