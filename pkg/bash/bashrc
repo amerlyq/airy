@@ -68,5 +68,8 @@ if [[ -n $DISPLAY ]]; then
 fi
 
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-source ~/.shell/bash/prompt
+
+BASH_AIRY=$(readlink -e "$BASH_SOURCE")
+BASH_AIRY=${BASH_AIRY%/*}
+source "$BASH_AIRY/prompt"
 source ~/.shell/common
