@@ -4,4 +4,5 @@ source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
 export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
-env-subs cfg/weechat.conf ~/.weechat/config
+weechat -a -r '/exec -sh env-subs ./cfg/weechat.conf|./run' -r /quit
+# ALT: { sleep 0.5; ./run "$cfg"; ./run <<< "/quit"; } & weechat -a; wait
