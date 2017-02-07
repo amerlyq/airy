@@ -20,7 +20,7 @@ let s:kbdd_insert = &insertmode
 " THINK:(create my own) ~/.vim/keymap/russian-amer.vim
 
 fun! xkb#get()
-  return split(system(s:kbdd_get))[-1]
+  return get(split(system(s:kbdd_get)), -1)
 endf
 
 fun! xkb#set(i)
