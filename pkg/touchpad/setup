@@ -2,8 +2,6 @@
 # tags: io
 source ~/.shell/func.d/cfgsetup
 
-if cfgOpt u; then
-  dst=/etc/X11/xorg.conf.d
-  linkcp -t "$dst" 50-synaptics.conf
-  echo "Wrn: NEED relogin/restart Xorg"
-fi
+dst=/etc/X11/xorg.conf.d
+linkcp -t "$dst" 50-synaptics.conf
+# echo "Wrn: NEED relogin/restart Xorg"
