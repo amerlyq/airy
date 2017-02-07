@@ -4,5 +4,12 @@ source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
 export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
-weechat -a -r '/exec -sh env-subs ./cfg/weechat.conf|./run' -r /quit
+
 # ALT: { sleep 0.5; ./run "$cfg"; ./run <<< "/quit"; } & weechat -a; wait
+if [[ -p ~/.weechat/weechat_fifo ]]
+then env-subs ./cfg/weechat.conf|./run
+else echo ' ' | weechat -a \
+  -r '/set sec.crypt.passphrase_file="/dev/stdin"' \
+  -r '/exec -sh env-subs ./cfg/weechat.conf|./run' \
+  -r /quit
+fi
