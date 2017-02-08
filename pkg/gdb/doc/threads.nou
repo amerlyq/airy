@@ -40,3 +40,22 @@
   It is especially convenient:
     when both parent and child has to be followed (set detach-on-fork off);
     when parent processes forks often loading various executables.
+
+
+%%% Memory forensic
+
+Correlate allocated section 'load3' with thread number
+  All .reg/section offset and size
+    $ readelf -n core | awk '/offset/{s=strtonum($7)} /CORE/{s+=12+8;l=strtonum($2)} /NT_PRS/{printf"0x%x 0x%x\n",s,l} /CORE/{s+=l}' >! reg.sec
+      # NOTE: s += 12 + 8 = sizeof(Nhdr) + aligned(int(*s))
+      # NOTE:(offset): LWP=0x18 sp=0xd4 pc=0xe8 ra=0xdc
+  Table offset, thread LWP, $sp -- (threads numbered order as in gdb)
+    $ <reg.sec xargs -rn2 sh -euc 'f(){ echo 0x$(xxd -p -s$(($1+$2)) -l4 core); }; echo "$1" $(($(f $1 0x18))) $(f $1 0xd4)' '' |column -t >! reg.lwp.sp
+  Threads stack sections
+    $ readelf -a core |awk '$1=="LOAD"{print$3,$6,$2,$5}' >! all.sec
+    $ awk 'FNR==NR {a[n]=strtonum($1);b[n]=a[n]+strtonum($2);p[n]=$3;q[n]=$4;n++;next} FNR!=NR{sp=strtonum($3);for(i=0;i<n;++i){if(a[i]<=sp&&sp<b[i]){printf"%d 0x%x 0x%x %s %s\n",$2,a[i],b[i],p[i],q[i];next}}}' all.sec reg.lwp.sp |column -t >! reg.lwp.sec
+  Filter thread/stack with entries from :: 0x00417000 - 0x11c64000 is load3
+    $ <reg.lwp.sec xargs -rn5 sh -euc 'xxd -p -g4 -c4 -s$4 -l$5 core|awk "{a=strtonum(\"0x\"\$1);if(0x00417000<=a&&a<0x11c64000){exit 1}}"||echo "$1"' ''
+    $ <reg.lwp.sec xargs -rn5 sh -euc 'printf "%s " "$1"; xxd -p -g4 -c4 -s$4 -l$5 core|awk "{a=strtonum(\"0x\"\$1);if(0x00417000<=a&&a<0x11c64000){++n;if(n>=9999)exit}}END{print n}"' '' |column -t >! load3.lwp.ref
+  Search
+    $ cat -n load3.lwp.ref| sort -rn -k3,3 |head

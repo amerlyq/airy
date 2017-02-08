@@ -102,6 +102,11 @@ https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
 
   E.G. print to stdout
     (gdb) call (void)puts("hello")
+  Print IPv4 value:
+    (gdb) p (char*)inet_ntoa(&my_ip4_addr)
+  Print IPv6 value:
+    (gdb) p (void*)malloc(64)
+    (gdb) p (char*)inet_ntop(10,&my_ip6_addr,$1,64)
 
 
 % Env vars (python only)

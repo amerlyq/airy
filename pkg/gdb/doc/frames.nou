@@ -161,7 +161,7 @@ REF: http://man7.org/linux/man-pages/man5/elf.5.html -- SEE: Nhdr
 
       000000e0: 000ee7b2 00000077 2ac3cd80 3239efa4  .......w*...29..
       000000f0: 00008413 00800020 00000000 00000001  ....... ........
-    # NOTE:(offset): sp=0xd4 pc=0xe8 ra=0xdc
+    # NOTE:(offset): LWP=0x18 sp=0xd4 pc=0xe8 ra=0xdc
   Then -- apply binary patch back to registers
     # NEED: $sp=0x3239a0f0 | $pc=0x2ac4f740
     $ cp core{,01}
