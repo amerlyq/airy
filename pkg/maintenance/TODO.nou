@@ -71,3 +71,8 @@ OPTIMIZE Boot time
     http://www.techradar.com/news/software/operating-systems/what-on-earth-is-dracut-1078647
     > https://web.archive.org/web/20150430223035/http://archlinux.me/brain0/2010/02/13/early-userspace-in-arch-linux/
       : initramfs history and ideas
+
+Dump boot msgs
+  Screen after login
+    sudo setterm -dump 1 -file tty1.log
+  journalctl /usr/lib/systemd/systemd -b
