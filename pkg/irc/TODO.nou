@@ -1,6 +1,15 @@
 REF
   https://en.wikipedia.org/wiki/Internet_Relay_Chat
 
+LIOR
+  REF
+    ++ https://weechat.org/files/doc/stable/weechat_user.en.html#key_bindings
+    https://github.com/weechat/weechat/wiki/Miscellaneous
+  ALSO
+    /key list
+    Keycode: <A-k> <your_key>
+    $ infocmp -L1
+
 SEE
   https://www.reddit.com/r/archlinux/comments/3gv77g/why_do_we_use_irc_still/
   http://askubuntu.com/questions/743/coolest-looking-terminal-irc-client
@@ -21,6 +30,7 @@ TODO
     https://freenode.net/kb/answer/certfp
   [_] ? history ?
   [_] ? another irc client with non-intrusive configuration ?
+    weechat
   [_] G: WTF chatnet
   2017-02-03 [X] request cloak
     http://freenode.net/kb/answer/cloaks
@@ -81,6 +91,23 @@ USAGE
   Ignore crap beside choosen channels
      /ignore * joins parts quits
      /ignore -except #suckless,#radare joins parts quits
+
+WeeChat
+  +++ cfg: https://gist.github.com/pascalpoitras/8406501
+    ALSO: https://weechat.org/files/doc/stable/weechat_user.en.html#trigger_commands
+      = apply for very smart content filtering
+  [_] filter out all join/quit -- beside smart filter on choosen channels
+    https://weechat.org/files/doc/weechat_faq.en.html#filter_irc_join_part_quit
+    https://weechat.org/files/doc/weechat_faq.en.html#filter_irc_join_channel_messages
+    http://dev.weechat.org/post/2008/10/25/Smart-IRC-join-part-quit-message-filter
+    Smartfiltering, so only entry and leave messages are posted for those who
+    have spoken recently. Use /sfilter to turn on smart filtering for the current
+    buffer and /rmsfilter to turn it back off.
+       /set irc.look.smart_filter "on"
+       /alias sfilter filter add irc_smart_$server_$channel irc.$server.$channel irc_smart_filter *
+       /alias rmsfilter filter del irc_smart_$server_$channel
+  Encryption / cert
+    https://blog.catpipegrep.com/tag/weechat.html
 
 History
   Bouncers to be logged 24/7
