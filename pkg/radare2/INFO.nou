@@ -1,3 +1,5 @@
+irc: freenode/#radare (r2tg -- telegram bot)
+
 SEE:
   REF
     http://radare.org/r/
@@ -76,10 +78,13 @@ Radare2 in docker
     (gdb) info files
     [r2]> S 0x0003ef70 0x2c0e5f70 0x6a4a0 0x6a4a0 .text r-x
   Shift base address
-    Only for PIE binds
-      $ r2 -B 0x6e81e120 lib.so   # BAD: doing something wrong
+    Load at base address: offs = 0 (elf header)
+      $ r2 -a mips -B $((text_va - text_offs)) lib.so  # E.G. $((0x6e81e120-0x27120))
       OR: e bin.baddr = 0x6e81e120
+      * works for PIE binds
+      * .so have 'va' => so use 'baddr'
     Map file at given address
+      !!! -m is suposed to be used only to map the paddr
       $ r2 -m 0x6e81e120 lib.so   # BAD: don't work ?
     > oa 0x6e81e120 ./lib.so      # BAD: don't work ?
     > o ./lib.so 0x6e81e120       # BET: seems to work
@@ -107,6 +112,10 @@ Radare2 in docker
     https://github.com/radare/radare2/issues/4816
     REQ: I can directly ask #radare on freenode
       https://github.com/radare/radare2/issues/1000#issuecomment-94160750
+
+  Regex/filtering ops
+    : ?@?
+    https://github.com/radare/radare2/issues/5695
 
 CFG
   Analysis speed
