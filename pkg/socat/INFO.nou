@@ -1,0 +1,16 @@
+Broadcast terminal by ssh in read-only through socat
+  http://www.gabriel.urdhr.fr/2016/10/18/terminal-sharing/
+
+TCP over TCP is BAD -- use IP over UDP
+  http://sites.inka.de/~W1011/devel/tcp-tcp.html
+
+SEE: notes in ./qemu *mod*
+
+Socat
+  + http://technostuff.blogspot.com/2008/10/some-useful-socat-commands.html
+  https://github.com/craSH/socat/blob/master/EXAMPLES
+  http://sudanlandge.blogspot.com/2013/04/socat-examples.html
+  http://www.geeklab.info/2011/12/playing-with-the-sockets-socat-and-netcat/
+  Chat:
+    $ socat TCP-L:5555,fork READLINE
+    $ socat TCP:192.168.1.2:5555 READLINE

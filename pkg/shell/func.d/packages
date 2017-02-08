@@ -87,6 +87,8 @@ elif distro arch; then
         # NOTE: remove '--noconfirm' -- to read answer from stdin
         # BET: wrap in 'expect' to answer only question about conflict
         # BUT: you need 'expect' installed on clean system...
+        # $ expect -c 'spawn pacman -Syu
+        #     expect { -re "^in conflict.*" { send "yes\r"; interact } }'
         # ALT: wait fail, manually remove package, then 'make continue'
         # sudo pacman -U --needed --noconfirm \
         #   "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
