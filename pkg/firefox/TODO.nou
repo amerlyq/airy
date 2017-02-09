@@ -34,3 +34,16 @@ TODO
     Page Hacker
     Scriptish (old)
     All-in-One Sidebar
+
+  Adobe flash player
+    $ sudo apt-get purge adobe-flash{plugin,-properties-gtk}
+    $ sudo apt-get install flashplugin-installer
+
+
+ALT: palemoon
+# manual install by script pminstall.sh from http://pm4linux.sf.net
+  pm="pminstaller.tar.bz2"
+  pmsi="$CURR_DIR_PKG/$pm"
+  rm -f "$pmsi"
+  wget_it "http://sourceforge.net/projects/pm4linux/files/latest/download?source=files" "$pm"
+  cd "$CURR_DIR_PKG" && tar xvfj "$pmsi" && bash "${pmsi%.tar.*}.sh"
