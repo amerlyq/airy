@@ -8,7 +8,7 @@ case "$1" in
         # convert -rotate 90 "$2" "$2"
         ;;
 "C-c")
-        echo -n "$2" | xclip -selection clipboard
+        echo -n "$2" | xsel -ib
         ;;
 "C-w")
         # nitrogen --save --set-zoom-fill "$2"
