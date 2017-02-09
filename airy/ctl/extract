@@ -1,0 +1,37 @@
+#!/bin/bash -eu
+set -euo pipefail
+
+cmd=( printf '%s\n' )
+mods=( "$PWD" )
+
+# t=to dst f=from file r=reset d=delete D=destruct
+opts=; while getopts 'ak:f:' o; do case $o in :|'?') exit 1
+;; k) key=$OPTARG
+;; f) readarray -t mods < "$OPTARG"  # WARN: empty/misconfigured lines
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
+((!$#)) || cmd=( "$@" )
+
+alldirs(){ find -H "$@" -mindepth 0 -maxdepth 1 -type d \
+  -regextype egrep -regex '.*/[[:alnum:]_-]+$'; }
+
+if has a; then
+  build=$(r.airy-get-cache)
+  mods=( $(alldirs "${build%/*}" "$build/cfg/mod"/*) )  # BAD
+fi
+
+# Extract keys from modeline /# key: .../
+extract_key(){ local k=$1; shift
+  [[ $k =~ [[:alnum:]_-] ]] || exit
+  sed -rn '/^#+\s*'"$k"':(([[:space:],]*[[:alnum:]_]+)+).*/s//\1/p' "$@"
+}
+
+for m in "${mods[@]}"; do
+  [[ -s $m/setup ]] || continue
+  ts=$(extract_key "${key:?}" "$m/setup")
+
+  read -ra ta <<< "$ts"
+  for i in "${!ta[@]}"; do [[ -n ${ta[i]} ]] || unset ta[i]; done
+
+  "${cmd[@]}" "${ta[@]}"
+done

@@ -17,19 +17,26 @@ pkglst
      ls ./airy/* -- flat list
     _build
     _obsolete  # ALT: use tags: obsolete instead and filter-out from auto-tag 'active'
-    _site # aux gen from mods
-    _todo # notes + tasks
-    airy  # mng 'airy' by itself -- add to ./pkgs
+    _site  # aux gen from mods
+    _todo  # notes + tasks
+    airy   # mng 'airy' by itself -- add to ./pkgs
   2017-02-09 [X] TODO: install, notes => redistribute
   [_] TODO: vim diff between list ./pkg/* and file ./pkgs to easily see and add new pkgs
     => embed into makefile
   [_] TODO: compare all pacman pakages from PKG_LIST with installed on system
     and suggest to user to remove excessive ones
     (after reducing PKG_LIST to maintain cleaner system)
-  [_] FIND: soft to sort deps graphs by before/after -- maybe there are some in AUR ?
+  2017-02-09 [X] FIND: soft to sort deps graphs by before/after -- maybe there are some in AUR ?
     $ sed 'deps' | tsort
       https://en.wikipedia.org/wiki/Tsort
     ALT: https://sourceforge.net/projects/dep-trace/
+  [_] DEV extract 'deps:' and apply 'tsort' on them :: split ./airy/ctl scripts
+    [_] gather '-a' all mods from all locations
+    [_] sort mods intervening
+      (? HOW to make mutual deps after/before for identically named pkgs ?)
+    [_] create table: name, repo/name, fullpath
+    [_] sort table topologically
+    [_] reuse these parts of funcs orthogonally everywhere in airy
   [_] split 'deps:'
     * required (r.xorg in ./setup -- BUT! not always, really) and optional (r.n in ./run )
     * necessary at 'setup' and at 'runtime'
