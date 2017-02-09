@@ -20,13 +20,19 @@ pkglst
     _site # aux gen from mods
     _todo # notes + tasks
     airy  # mng 'airy' by itself -- add to ./pkgs
-  [_] TODO: install, notes => redistribute
+  2017-02-09 [X] TODO: install, notes => redistribute
   [_] TODO: vim diff between list ./pkg/* and file ./pkgs to easily see and add new pkgs
     => embed into makefile
   [_] TODO: compare all pacman pakages from PKG_LIST with installed on system
     and suggest to user to remove excessive ones
     (after reducing PKG_LIST to maintain cleaner system)
   [_] FIND: soft to sort deps graphs by before/after -- maybe there are some in AUR ?
+    $ sed 'deps' | tsort
+      https://en.wikipedia.org/wiki/Tsort
+    ALT: https://sourceforge.net/projects/dep-trace/
+  [_] split 'deps:'
+    * required (r.xorg in ./setup -- BUT! not always, really) and optional (r.n in ./run )
+    * necessary at 'setup' and at 'runtime'
   [_] TODO!!! reorder pkg: firstly -- the most necessary tools (zsh,vim,ranger)
     = so even if system breaks, it must become somewhat more usable then default to fix all troubles
     => ENH: append to PKG_LIST instead of overwrite
@@ -36,12 +42,13 @@ pkglst
   [_] TODO: move 'defaults' in its own module and add as last entry of list
     when using 'r.airy -d' (NEED: replace '-d' for recache by smth else)
     [_] WARN: must be added after reading cached list, not before !!
+      BUT: all mods must be gathered from all locations
 
 
 maint
-  [_] encapsulate deploy system into independent 'airy' mod
+  2017-02-09 [X] encapsulate deploy system into independent 'airy' mod
   2017-02-04 [X] rename 'setup' to 'maint' OR 'ctl' ALT: use root Makefile
-  [_] ./maint must be simple wrapper and actually call ./airy/run
+  2017-02-09 [X] ./maint must be simple wrapper and actually call ./airy/run
     => applies r.airy to each mod inside ./pkg dir
   2017-01-30 [X] MOVE colorizing stuff in ./func.d OR:BET: ./bin/pretty
   [_] MOVE ./func.d -> *airy*
@@ -49,8 +56,8 @@ maint
     simply check status of apt-get =100
   Options
     [$] Simultaneously -i -u -- doing all
-    [_] ./setup -U -- do only ./update w/o ./setup
-    [_] untie install-u and setup-u for short comprehensive orthogonal options
+    2017-02-09 [X] ./setup -U -- do only ./update w/o ./setup
+    2017-02-09 [X] untie install-u and setup-u for short comprehensive orthogonal options
     [_] make opt '-c' for cleanup-only mode
       = symlinks/configs/fonts-links/fontcache/etc
       [_] do cleanup also in mode '-a'
@@ -65,8 +72,10 @@ maint
     * check only PKG_LIST config
     * allowed to have multiple mods with same name in different locs (treated as the same mod)
       ? how to adequately order them ?
-  [_] move sourcing from 'cfgsetup' to 'system'
-  [_] use it's own flags set/handler instead of 'cfgsetup'
+    * when prepending dash -- exclude previously added mod
+      E.G. ( mod1 mod2 ... -mod1 ) == ( mod2 ... )
+  2017-02-09 [X] move sourcing from 'cfgsetup' to 'system'
+  2017-02-09 [X] use it's own flags set/handler instead of 'cfgsetup'
   [_] THINK: DFL no flags -- what to do by default ?
     only update 'packman' pkgs ? but we have 'pacman -Syu'
     !!! [_] BET: show info/status/statistics !!!
@@ -77,7 +86,7 @@ maint
 
 
 structure
-  [_] MOVE ./bin -> ./ctl and populate prgs from ./bin with unchanged names
+  2017-02-09 [X] MOVE ./bin -> ./ctl and populate prgs from ./bin with unchanged names
   [_] Add VAR 'tags' to generate symlinked categories into ./_build
     2017-01-30 [X] ALT:TEMP: for each 'setup' add '# tags: .. .. ..' after /^source ~\/.*cfgsetup/
     [_] cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
@@ -85,7 +94,7 @@ structure
     [_] ALSO: search all non-'pretty' for that regex
       -- must source / traverse all mods and not only choosen ones from PKG_LIST
   Abstraction: defaults -> ./mod -> ./pkg
-    [_] rename ./cfg -> ./pkg (for named main/aur pkgs only)
+    2017-02-09 [X] rename ./cfg -> ./pkg (for named main/aur pkgs only)
     2017-01-27 [X] rename ./my -> ./mod
       ALT: ./gen[eral] | ./abs[tract] | ./choice | ./case
     [_] link by ./airy/defaults general ./mod with choosen ./pkg
@@ -100,7 +109,7 @@ structure
     + in future can be adapted/converted into PKGBUILD or *.deb
     BAD:ALT:(suboptimal): store all control scripts inside //mod dir in each *mod*
   [_] THINK: use ./tmpl OR ./etc
-  [_] THINK: user's mod dir -- link into ./_build/user OR even ~/.config/airy -- as any other pr
+  2017-02-09 [X] THINK: user's mod dir -- link into ./_build/user OR even ~/.config/airy -- as any other pr
   [_] create DFL ./tmpl/profile for *airy*
     -- can be deprecated by per-mod profile segments
     # To keep template fileset with mods for new accounts
@@ -111,13 +120,13 @@ structure
     * Each ./my/* will source this file and will actually create symlinks
     [_] TODO: use DFL version in airy and override/augment by user's version
     ALT:THINK: use xdg-open for system-wide permission protected links
-  [_] keep all mods inside flat ./mod directory instead of tree in ./cfg
-    ? and create symlinks for categories tree inside ./_build ?
-    ALT: keep categories tree as it is and create symlinks into ./mod
+  2017-02-09 [X] keep all mods inside flat ./mod directory instead of tree in ./cfg
+    ? 2017-02-09 [X] and create symlinks for categories tree inside ./_build ?
+    [$] ALT: keep categories tree as it is and create symlinks into ./mod
     ? ALSO:THINK: sep ./mymod for contents of ./bin and sparse functions ?
       => also *mod* in ./mymod  work as switch proxy to multiple providers (like browsers)
     ? beside ./mod need ./_obsolete dir
-    ? USE symlinks to *mod* instead of 'PKG_LIST'
+    ? [_] ALT:USE symlinks to *mod* instead of 'PKG_LIST'
       + no need for recursive 'find'
       + explicit list -- and user directly see which links were broken
       + sep rel symlins list can be commited to own repo
@@ -125,7 +134,7 @@ structure
         = so I can commit relative symblinks without problem
 
   [_] gather all artifacts into '_build' dir instead of ~/.cache/airy/
-    [_] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
+    [$] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
     [_] add support for XDG_... env vars into 'cfgsetup' to determine symlink targets
   [_] instead of using ./prf/* files -- use separate pieces of profile in each private *mod*
     * PKG_LIST is placed inside of *airy* mod
@@ -160,7 +169,7 @@ linkcp
   2017-01-23 [X] remove 'sudo' from linkcp
   2017-01-23 [X] rename all 'link' func into 'linkcp' script
   ! [_] harden system perms security by using linkcp copy into sys dirs instead of symlinks
-  [_] MOVE: linkcp, svc_activate into 'airy' in ./bin
+  2017-02-09 [X] MOVE: linkcp, svc_activate into 'airy' in ./bin
   [_] THINK: optimize ./bin <Tab> time -- scripts can be copied instead of symlinks
     BAD: scripts can be dependent on in-dir stuff through 'readlink'
   [_] THINK: split into 'mlink' and 'mcopy' ?
