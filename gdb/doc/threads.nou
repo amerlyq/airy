@@ -11,8 +11,6 @@
       > WARNING: works only on running process
   Get TLS (thread-local storage)
     http://stackoverflow.com/questions/10841219/thread-specific-data-from-linux-core-dump
-  Locked mutex / refcount on exit
-    http://kfunk.org/2014/08/29/scripting-gdb-to-execute-commands-at-particular-breakpoints/
   Save func arguments/buffer into file
     http://tamkovich.com/2011/03/core-dump-for-multithreading-app/
 
@@ -42,8 +40,23 @@
     when parent processes forks often loading various executables.
 
 
-%%% Memory forensic
+%%% Locked resources
+Locked mutex / refcount on exit / memory leak
+  2017-02-09 [X] http://kfunk.org/2014/08/29/scripting-gdb-to-execute-commands-at-particular-breakpoints/
+    (gdb) break QMutex::QMutex
+    (gdb) commands $bpnum  # on last set breakpoint
+        silent
+        backtrace 10
+        continue
+      end
+    (gdb) set pagination off
+    (gdb) set logging on gdb.log
+    (gdb) run
+    $ kill -STOP "$pid"  # stop when enough log, or wait until crash
+    => Then analyze log by $ sort | uniq -c
 
+
+%%% Memory forensic
 Correlate allocated section 'load3' with thread number
   All .reg/section offset and size
     $ readelf -n core | awk '/offset/{s=strtonum($7)} /CORE/{s+=12+8;l=strtonum($2)} /NT_PRS/{printf"0x%x 0x%x\n",s,l} /CORE/{s+=l}' >! reg.sec
