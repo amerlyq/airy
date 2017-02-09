@@ -59,6 +59,11 @@ Delete column
   is similar to:
     awk '{$3="";sub("  "," ")}{print}'
 
+Match if-else
+  http://stackoverflow.com/questions/14478722/awk-shortened-if-then-else-with-regex
+  (awk) m = /REGEX/ { matching-action } !m { NOT-matching-action }
+  E.G. $ awk -vn=5 'm=$2~"^0+$"{z++;if(z<=n){print}} !m{if(z>n)print"... ("z" lines)";z=0;print}'
+
 Shell variables
   Use awk's ~ operator, and you don't need to provide a literal regex on the right-hand side:
     function _process () {

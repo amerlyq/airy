@@ -29,7 +29,7 @@ _dttime exp-cabal
 
 ### Vim ###
 EDITOR=r.vim && _has_pr $EDITOR || EDITOR=vim
-VISUAL="$EDITOR -R -c 'set nolist'"
+VISUAL="$EDITOR -R"  # BAD:(space in args):  +set\ nolist
 export EDITOR VISUAL
 _dttime exp-nvim
 

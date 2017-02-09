@@ -19,8 +19,8 @@ tmux_display_fix() {
 # NOTE: w/o $ret can't return right code from 'r.chroot'
 exit() { local ret=$?
   # When in SSH tmux, do detach on ',d' instead of exit
-  if [ -z "${SSH_TTY-}" ] || [ -z "${TMUX-}" ] || [ "${RANGER_LEVEL-}" ]
-  then builtin exit $ret
-  else tmux detach
+  if [[ -n ${SSH_TTY-} && -z ${TMUX-} && -z ${RANGER_LEVEL-} ]]
+  then tmux detach
+  else builtin exit $ret
   fi
 }

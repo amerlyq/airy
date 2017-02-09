@@ -17,7 +17,7 @@ bits() {
 }
 szl() { ls -FaGl "$@" | awk '{s+=$4;print $4,$8} END {print s}'; }
 
-[[ -n $ZSH_NAME ]] || for fn in hex dec bits gdf
+[[ -z $ZSH_NAME ]] || for fn in hex dec bits gdf
 do alias $fn="noglob ${aliases[$fn]:-$fn} "; done
 
 # Works with long hex only

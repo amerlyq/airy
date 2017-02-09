@@ -5,8 +5,11 @@ hash ranger &>/dev/null \
 && alias r='source r.ranger' \
 || alias r='exit'
 
-## Trap to sync bash/zsh and ranger working directories.
-trap '_ranger_cwd' EXIT
+## Trap to sync on exit bash/zsh and ranger working directories.
+[[ $ZSH_NAME ]] \
+&& zshexit() { _ranger_cwd; } \
+|| trap _ranger_cwd EXIT
+
 _ranger_cwd(){
   local tmp=${RANGER_TMPDIR:-${TMPDIR:-/tmp}/ranger}
   builtin test -d "$tmp" || command mkdir -p "$tmp"
