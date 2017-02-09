@@ -56,7 +56,7 @@ if ((!defaults)) || [[ ! -s $build/mods ]]; then
   # BAD:HACK: allowed mixed 'mods' and 'paths'
   # BAD: order of mod dirs -- some user mods must be 'before' and some 'after'
   [[ ${mods[*]} == . ]] && lmods=$PWD \
-  || lmods=$(search_mods "$build/cfg/mod"/* "$repo/pkg")  # "$repo/mod"
+  || lmods=$(search_mods "$build/cfg/mod"/* "$repo")
 fi
 # cp -vf --backup=numbered "$build/mods" "$build/mods" && rm "$build/mods"
 if ((defaults)); then [[ -s $build/mods ]] \
