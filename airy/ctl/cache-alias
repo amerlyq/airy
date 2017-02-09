@@ -17,6 +17,7 @@ opts=; while getopts 'f:m:o:q' o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
 log(){ [[ $opts =~ q ]] || printf '%s\n' "$@"; }
 
+# BAD: can't update, append only. After removing appended -- deletes rest of file
 section_append(){ local f=$1 s a b e t tt
   s=$(readlink -e "$2")
   a=$mod/${s##*/}
