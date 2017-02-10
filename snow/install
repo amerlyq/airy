@@ -4,4 +4,7 @@ source ~/.shell/func.d/packages
 pkg_inst espeakup
 aur_inst edbrowse-git
 
-# aur_inst emacspeak-git  # BAD: can't build
+# aur_inst emacspeak-git
+# BAD:FIXED: pkgbuild
+#  prepare(): sed -i '\@^\${ECI}/ALSA\s\+@s///' Makefile
+#  build(): make -> make emacspeak espeak outloud
