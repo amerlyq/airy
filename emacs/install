@@ -2,6 +2,7 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  pkg_inst emacs-evil
-  # aur_inst emacspeak-git  # BAD: can't build
+  pkg_inst emacs
+  # pkg_inst emacs-evil
+  git_inst -d 'syl20bnr/spacemacs'
 fi

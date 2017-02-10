@@ -165,7 +165,7 @@ git_inst() { # $0 -d pr_name
   if [[ -d $prdir ]]; then git_pull "$prdir"
   else git clone --depth 1 "$link" "$prdir" && cd "$prdir"; fi
 
-  if ! cfgOpt u && ((git_is_the_same)); then
+  if ! cfgOpt u && ((${git_is_the_same-})); then
     echo "C: Up to date, no re-build"
     return 0
   fi
