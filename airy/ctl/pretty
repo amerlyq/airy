@@ -5,13 +5,13 @@ for n in {0..15}; do
   readonly C$n=$(tput setaf "$n")
 done
 
-exec sed -r "
+exec sed -u -r "
   s|$HOME|\~|g
   />>>|\{\{\{/!s|^|  |
   /^\{\{\{ .* \}\}\}$/s//\n$C15\0$CR/
 
   /^>>> .* <<<$/{
-    # s|^>>> \~/aura/airy/pkg/|\n$C2\[|
+    s|^>>> \~/aura/airy/([[:alnum:]_-]+\s)|\n$C2\[\1|
     s|^>>> \~/aura/airy/|\n$C13\[|
     s|^>>> |\n$C9\[|
     s| <<<$|\]$CR|

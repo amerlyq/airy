@@ -17,5 +17,5 @@ then env-subs ./cfg/weechat.conf | ./run-pipe
 else WEECHAT_PASSPHRASE=' ' weechat -a \
   -r '/set sec.crypt.passphrase_file /dev/stdin' \
   -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
-  -r /quit
+  -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
 fi

@@ -1,6 +1,7 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/system
-exec <> /dev/tty
+exec < /dev/tty
+exec > /dev/tty
 # BAD: unreasonable for kedi
-echo "BAD: requires Gemfile, which don't exist on clean system"
+echo "ERR: requires Gemfile, which don't exist on clean system"
 # exec bundle update

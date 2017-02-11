@@ -1,6 +1,6 @@
-#!/bin/bash -e
-source ~/.shell/func.d/system
-cd "$(dirname "$(readlink -e "$0")")"
+#!/bin/bash -eu
+source ~/.shell/exports  # for $EDITOR only
+set -euo pipefail
 
 ### PLUGINS ###
 # BUG: returns non-zero errcode!
@@ -11,10 +11,10 @@ cd "$(dirname "$(readlink -e "$0")")"
 # NOTE: EDITOR=vim ./update
 # -nesR -u "$PWD/vimrc" ... -- ./vimrc
 shvim() { $EDITOR -nR \
-  -c "set nomore|redir!>/dev/stderr" \
+  -c "set nomore|redir!>/dev/tty" \
   -c "$1" \
   -c "echo''|redir END|qall!" \
-  >/dev/null ||:; }  # return $(($?-1)); }
+  >/dev/null </dev/tty ||:; }  # return $(($?-1)); }
 
 cmd='call dein#clear_state()'
 [[ ! " $* " =~ " -u " ]] || cmd+='|call dein#update()'
