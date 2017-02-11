@@ -5,12 +5,12 @@ if distro arch; then
   # aur_inst gcalcli
   # BAD:(gcalcli-git): OAuth2 don't start automatically
   # BAD:(gcalcli-git): can't add events beside 'Quick'
-  # aur_inst -p gcalcli{,-git}
+  # aur_inst gcalcli-git
 
-  loc_inst -p 'gcalcli' ./PKGBUILD  # v4.0a2
+  loc_inst -P 'gcalcli-amerlyq-git' ./PKGBUILD  # v4.0a2
 
-  aur_inst -Y {,python2-}vobject
-  pkg_inst -Y {,python2-}parsedatetime
+  aur_inst python2-vobject
+  pkg_inst python2-parsedatetime
 
 elif distro ubuntu; then
   echo "Err: fix use pip2"

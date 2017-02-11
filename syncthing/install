@@ -6,9 +6,9 @@ source ~/.shell/func.d/packages
 # https://github.com/syncthing/syncthing/releases/download/v0.11.3/syncthing-linux-amd64-v0.11.3.tar.gz
 
 if distro arch; then
-    pkg_inst 'syncthing' 'syncthing-inotify'
+  pkg_inst syncthing syncthing-inotify
 
 elif distro ubuntu; then
-    ppa_add 'ppa:ytvwld/syncthing'
-    pkg_inst 'syncthing'
+  ppa_add 'ppa:ytvwld/syncthing'
+  pkg_inst syncthing
 fi

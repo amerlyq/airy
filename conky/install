@@ -7,10 +7,10 @@ pkg_inst conky
 
 
 if distro arch; then
-  pkg_inst -p 'i2cget' i2c-tools
+  pkg_inst i2c-tools
 
 elif distro ubuntu; then
-  pkg_inst -p 'sensors' lm-sensors
+  pkg_inst lm-sensors
 fi
 
 

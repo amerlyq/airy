@@ -1,17 +1,17 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst 'steam'
+pkg_inst steam
 
 if distro arch; then
-    aur_inst "steam-appmanifest-git"
+  aur_inst steam-appmanifest-git
 # aur/steam-libs -- broken deps
 # aur/steamcurses-git
 # aur/steamworlddig
 
 elif distro ubuntu; then
-    # For 14.04
-    pkg_inst "lib32z1 lib32ncurses5 lib32bz2-1.0"
+  # For 14.04
+  pkg_inst lib32z1 lib32ncurses5 lib32bz2-1.0
 fi
 
 # For older ubuntu:

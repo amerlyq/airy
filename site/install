@@ -2,7 +2,8 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  gem_inst jekyll bundler
+  gem_inst -p {,}bundler
+  gem_inst -p {,}jekyll
 
 elif distro ubuntu; then
   :

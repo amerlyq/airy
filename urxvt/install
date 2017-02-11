@@ -5,10 +5,10 @@ source ~/.shell/func.d/packages
 # | urxvt | fast terminal, image support, perl extensions
 
 if distro arch; then
-    aur_inst -p urxvt 'rxvt-unicode-patched' || pkg_inst -p urxvt 'rxvt-unicode'
+    aur_inst rxvt-unicode-patched || pkg_inst rxvt-unicode
 
 elif distro ubuntu; then
-    pkg_inst -p urxvt 'rxvt-unicode-256color'
+    pkg_inst rxvt-unicode-256color
 fi
 
 git_inst -d 'amerlyq/urxvt-ext-evolved'

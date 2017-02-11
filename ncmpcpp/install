@@ -4,8 +4,8 @@ source ~/.shell/func.d/packages
 #   http://crunchbang.org/forums/viewtopic.php?id=37882
 
 if distro arch; then
-    pkg_inst ncmpcpp  # aur_inst -p 'ncmppcpp' ncmpcpp-git
-    # aur_inst -p 'lyvi' lyvi-git  # TUI Lyrics viewer
+  pkg_inst ncmpcpp  # aur_inst ncmpcpp-git
+  # aur_inst lyvi-git  # TUI Lyrics viewer
 
 elif distro ubuntu; then
     pkg_inst "automake libtool libboost-all-dev libmpdclient-dev libncurses5-dev
@@ -22,7 +22,7 @@ elif distro ubuntu; then
     # sed -i "s/^\(AS_IF\|AC_ARG_VAR\)(/# \1(/" "$dir/configure.ac"
 
     # FIXED: checkinstall has troubles with version format '0.7_pre'
-    pkg_make(){ sudo make install $@ || exit; }
+    pkg_make(){ sudo make install "$@" || exit; }
 
     # ABSENT: tag editor, tiny tag editor, artist info
     pkg_build "$dir" --enable-outputs --enable-visualizer --enable-clock \

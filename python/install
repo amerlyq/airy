@@ -2,14 +2,14 @@
 source ~/.shell/func.d/packages
 
 pkg_inst python
-pkg_inst -p 'pip' python-pip
+pkg_inst python-pip
 
 if distro arch; then
   pkg_inst ipython
-  pkg_inst -y {,python-}ipdb  # pretty debugger for IPython
-  pkg_inst -y {,python-}pudb
+  pkg_inst python-ipdb  # pretty debugger for IPython
+  pkg_inst python-pudb
   pkg_inst python2
-  pkg_inst -p 'pip2' python2-pip
+  pkg_inst python2-pip
 
   # NOTE: place at bottom, after installing 'pip3'
   # readline # for adequate navigation in IPython cmdline
@@ -19,7 +19,7 @@ if distro arch; then
 
 elif distro ubuntu; then
   pkg_inst python3 python3-pip
-  pkg_inst -p 'pip3' python3-pip
+  pkg_inst python3-pip
   pip_inst -p 'IPython' ipython
   pip_inst -y ipdb{,}
   pip_inst -y pudb{,}

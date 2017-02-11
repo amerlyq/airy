@@ -171,6 +171,10 @@ install
     + AUR pkgs will be updated only by 'pacaur -Syu' w/o duplicating requests in each 'install'
     ~ then '-I' can be removed from 'r.airy -a' (watch over its misusage)
     + OR replace '-u' by '-r' to _reinstall_ packages only on direct demand from user
+  [_] DEV: extend '-P' key in 'do_if' to auto-choose appropriate 'has_pkg' for pacman/gem/pip/etc
+  [_] BAD: 'git_inst' don't respect 'do_if' keys
+    FIND: /\v_inst \zs-\w '?[^ '}]+['} ]*/
+  [_] FIX: 'loc_inst' can't auto-derive pkg name '-P' from the same arg ./PKGBUILD
   [_] do_if -> system
   [_] do_if must accept commands from stdin
     = Aim -- in all ./setup files to simplify upgrade sections
@@ -213,6 +217,7 @@ cache_section
 
 
 cache-alias
+  [_] BUG: if exists -- replaces it, BUT adds duplicate section at the end anyways
   [_] DEV: generalize to cache any file types beside storing shell aliases
   [_] cache/generate 'pathes' from general and user private parts (like aliases)
   [_] FIXME:(restrict): don't source other files named 'aliases' beside in ./mod dir

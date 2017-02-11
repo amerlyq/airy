@@ -6,9 +6,9 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst isync notmuch
-  aur_inst -p 'mutt' neomutt
+  aur_inst neomutt
   aur_inst imapfilter
 
 elif distro ubuntu; then
-  pkg_inst 'mutt'
+  pkg_inst mutt
 fi

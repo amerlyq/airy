@@ -4,8 +4,7 @@ source ~/.shell/func.d/packages
 pkg_inst zathura
 
 if distro arch; then
-  pkg_inst -f '/usr/lib/zathura/djvu.so' zathura-djvu
-  pkg_inst -f '/usr/lib/zathura/pdf.so' zathura-pdf-mupdf
+  pkg_inst zathura-djvu zathura-pdf-mupdf
 fi
 #deb_wget "http://http.us.debian.org/debian/pool/main/z/zathura/zathura_0.2.9-2_amd64.deb"
 

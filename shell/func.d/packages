@@ -25,7 +25,7 @@ do_if() {
 
   # NOTE: with 'grp' check whole group as whole
   #   without 'grp' check each arg individually
-  if ! cfgOpt u && [[ $grp ]]; then
+  if ! cfgOpt u && [[ ${grp-} ]]; then
     if has_such "${obj:?}" "${grp:?}"
     then ((bQuiet)) || echo "I: $* ($obj=$grp)"; return 0
     else pkgs+=("$@"); fi

@@ -5,7 +5,7 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst git tig
-  gem_inst git-up
+  gem_inst -p {,}git-up
 
 elif distro ubuntu; then
   pkg_inst git git-core git-doc tig  #subversion

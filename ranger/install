@@ -7,10 +7,10 @@ pkg_inst highlight mediainfo
 
 if distro arch; then
   pkg_inst ranger
-  pkg_inst -p 'fbi' fbida  # framebuffer image viewer for terminal
+  pkg_inst fbida  # framebuffer image viewer for terminal
   # VIZ:(caca) img2txt caca-config cacaclock cacademo cacafire cacaplay cacaserver cacaview
-  pkg_inst -l 'caca' libcaca  # colour ASCII art library
-  pkg_inst -p 'pdftotext' poppler  # for pdf previews
+  pkg_inst libcaca  # colour ASCII art library
+  pkg_inst poppler  # for pdf previews
   pkg_inst xchm  # for win-help and some books in *.chm
 
   # BUG: conflict with qutebrowser, etc
@@ -19,8 +19,8 @@ if distro arch; then
 
   # Pager preview
   pkg_inst ffmpegthumbnailer catdoc
-  pkg_inst -d '/usr/share/perl5/vendor_perl/Image/ExifTool' perl-image-exiftool
-  # aur_inst -p 'wav2png' 'wav2png-git'
+  pkg_inst perl-image-exiftool
+  # aur_inst wav2png-git'
 
 else
   pkg_build() { sudo python3 setup.py install; }

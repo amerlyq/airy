@@ -4,15 +4,15 @@ source ~/.shell/func.d/packages
 pkg_inst zsh
 
 PREZTO=~/.cache/zsh/.zprezto
-if [[ ! -d "$PREZTO" ]]; then
-    mkdir -p "${PREZTO%/*}"
-    # git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
-    url='https://github.com/sorin-ionescu/prezto.git'
-    git clone --recursive $url "$PREZTO"
+if [[ ! -d $PREZTO ]]; then
+  mkdir -p "${PREZTO%/*}"
+  # git clone https://github.com/robbyrussell/oh-my-zsh.git $ZSH_DIR
+  url='https://github.com/sorin-ionescu/prezto.git'
+  git clone --recursive "$url" "$PREZTO"
 fi
 
 if distro arch; then
-  aur_inst 'fasd'
+  aur_inst fasd
 elif distro ubuntu; then
   do_if -c git_inst -p fasd 'clvv/fasd' ||:
 fi

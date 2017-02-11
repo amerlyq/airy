@@ -22,10 +22,10 @@ pkg_inst meld  # cool text/directory comparator
 pkg_inst bless
 
 if distro arch; then
-    aur_inst -p 'wxHexEditor' wxhexeditor-git
+  aur_inst wxhexeditor-git
 
 elif distro ubuntu; then
-    pkg_inst -p 'wxHexEditor' wxhexeditor
+  pkg_inst wxhexeditor
 fi
 
 # PM="wxHexEditor.tar.bz2"

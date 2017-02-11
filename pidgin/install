@@ -7,17 +7,17 @@ pkg_inst pidgin
 
 if distro arch; then
   # Plugin for Skype
-  # BUG:(old version) pkg_inst -f '/usr/lib/purple-2/libskypeweb.so' purple-skypeweb
-  aur_inst -f '/usr/lib/purple-2/libskypeweb.so' purple-skypeweb-git
-  # aur_inst -f '/usr/lib/purple-2/telegram-purple.so' telegram-purple
+  # BUG:(old version) pkg_inst purple-skypeweb
+  aur_inst purple-skypeweb-git
+  # aur_inst telegram-purple
   # Plugin for MSN -- Office Communicator
-  # pkg_inst -a 'pidgin-sipe'
+  # pkg_inst pidgin-sipe
 
   # Other plugins
-  pkg_inst -f '/usr/lib/pidgin/enhancedhist.so' purple-plugin-pack
-  pkg_inst -f '/usr/lib/purple-2/pidgin-libnotify.so' pidgin-libnotify
+  pkg_inst purple-plugin-pack
+  pkg_inst pidgin-libnotify
 
-  aur_inst -f '/usr/lib/purple-2/purple-gnome-keyring.so' purple-gnome-keyring
+  aur_inst purple-gnome-keyring
   # pkg_inst 'pidgin-encryption'
 
 elif distro ubuntu; then

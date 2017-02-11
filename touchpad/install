@@ -3,8 +3,8 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   # device drivers
-  pkg_inst -f '/usr/lib/xorg/modules/input/synaptics_drv.so' xf86-input-synaptics
-  # pkg_inst -f '/usr/lib/xorg/modules/input/libinput_drv.so' xf86-input-libinput
+  pkg_inst xf86-input-synaptics
+  # pkg_inst xf86-input-libinput
 
 elif distro ubuntu; then
   echo "Err: "

@@ -113,7 +113,7 @@ has_python(){ local v=($(python$1 --version 2>&1))
 has_such(){ local -A chk=( [a]='false' [f]='test -f' [d]='test -d'
     [P]='has_pkg' [p]='has_pr' [l]='has_lib'
     [y]='has_python 3' [Y]='has_python 2'
-  ); ${!chk[${1:?}]:?} "${2:?}" || return 2
+  ); ${chk[${1:?}]:?} "${2:?}"
 }
 
 # ALT:(running_X broken in raw console?) more stable -- xset q &>/dev/null

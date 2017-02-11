@@ -11,8 +11,8 @@ source ~/.shell/func.d/packages
 
 
 if distro arch; then
-  # aur_inst -p java jdk  # BAD:(changed names)
-  pkg_inst -d '/usr/lib/jvm/java-8-openjdk' jdk8-openjdk
+  # aur_inst jdk  # BAD:(changed names)
+  pkg_inst jdk8-openjdk
   cfgNo u || sudo archlinux-java set 'java-8-openjdk'
 
 

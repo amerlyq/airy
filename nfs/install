@@ -2,7 +2,7 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  pkg_inst -p 'rpc.nfsd' nfs-utils
+  pkg_inst nfs-utils
 
 elif distro ubuntu; then
   pkg_inst rpcbind nfs-common nfs-kernel-server

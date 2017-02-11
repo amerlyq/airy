@@ -1,11 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
+
 #| ffmpeg    | http://ffmpeg.org/download.html#build-linux
+pkg_inst ffmpeg
 
-if distro arch; then
-    pkg_inst ffmpeg
-
-elif distro ubuntu; then
-    ppa_add 'ppa:mc3man/trusty-media'
-    pkg_inst ffmpeg
+if distro ubuntu; then
+  ppa_add 'ppa:mc3man/trusty-media'
 fi

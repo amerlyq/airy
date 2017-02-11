@@ -22,7 +22,7 @@ alias pacY='pacman -Syu'   # '[u]pgrade all'
 # alias pacc='pacman -Scc'   # '[c]lean cache' (all not currently installed)
 # alias pacexpl='pacman -D --asexp'  # 'mark as [expl]icit'
 # alias pacimpl='pacman -D --asdep'  # 'mark as [impl]icit'
-alias pac-last='tac /var/log/pacman.log | sed -rn '/\[PACMAN\]/q;/installed|updated/p' | tac'
+alias pac-last='tac /var/log/pacman.log | sed -rn "/\[PACMAN\]/q;/installed|updated/p" | tac'
 
 # Synchronizes the local package database against the repositories then
 # upgrades outdated packages.

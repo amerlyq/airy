@@ -4,9 +4,9 @@ source ~/.shell/func.d/packages
 pkg_inst gdb
 
 if distro arch; then
-  pkg_inst -f '/usr/lib/python3.5/site-packages/six.py' 'python2-six'
-  aur_inst -f '/usr/share/pwndbg/gdbinit.py' pwndbg-git
-  # aur_inst -f '/usr/share/peda/peda.py' peda-git
+  pkg_inst python2-six  # WTF?
+  aur_inst pwndbg-git
+  # aur_inst peda-git
   # ALT dual compatible: https://github.com/zachriggle/peda
 
 elif distro ubuntu; then :

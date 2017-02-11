@@ -5,13 +5,12 @@ has_pr X || die
 pkg_inst firefox
 
 if distro arch; then
-  # aur_inst -p 'firefox' pentadactyl-git
+  # aur_inst pentadactyl-git
   # echo "W: BROKEN:(signing) pentadactyl"
   # echo "N: (update pentadactyl manually): https://github.com/willsALMANJ/pentadactyl-signed/releases"
-  aur_inst -f '/usr/lib/firefox/browser/extensions/pentadactyl-signed@willsalmanj.github.com.xpi' \
-    firefox-pentadactyl-signed
+  aur_inst firefox-pentadactyl-signed
   # MAYBE:BUG:(flashplugin path):BET? /usr/lib/firefox
-  pkg_inst -f '/usr/lib/mozilla/plugins/libflashplayer.so' flashplugin
+  pkg_inst flashplugin
 
 elif distro ubuntu; then
   echo "Err: install manually pentadactyl and flashplugin"

@@ -5,17 +5,17 @@ source ~/.shell/func.d/packages
 if distro arch; then
     # DEPRECATED: xorg-xmessage -- use r.vim-xmessage
     # FIXED:(>v0.12): 'getWindowAttributes' crash on Wine or Pidgin close
-    # aur_inst -p 'xmonad' xmonad-git
+    # aur_inst xmonad-git
 
     pkg_inst xmonad
     pkg_inst wmctrl
-    pkg_inst -d {/usr/share/doc/,}xmonad-contrib
+    pkg_inst xmonad-contrib
 
     # pkg_inst 'haskell-unordered-containers'
     [[ -d ~/.cabal/bin ]] || echo "Err: Re-login session to add ~/.cabal/bin/xmobar into PATH"
-    pkg_inst -l 'Xpm' libxpm
+    pkg_inst libxpm
     # NOTE:(install by yaourt) remove bytestring, containers, filepath, time
-    # aur_inst -d {/usr/share/doc/,}haskell-libmpd
+    # aur_inst haskell-libmpd
     cab_inst -d {~/.cabal/packages/hackage.haskell.org/,}libmpd
     cab_inst -p 'xmobar' xmobar --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
     # ALT: pkg_inst xmobar

@@ -4,13 +4,13 @@ source ~/.shell/func.d/packages
 # SEE
 #   http://masterpatricko.blogspot.com/2011/04/development-and-build-environments_20.html
 
-pkg_inst 'schroot'
+pkg_inst schroot
 
 if distro arch; then
-    aur_inst 'debootstrap'
+    aur_inst debootstrap
     # Install for ubuntu
-    aur_inst -p 'gpg1' -- --asdeps gnupg1
-    aur_inst -d '/usr/share/doc/ubuntu-keyring' -- --asdeps ubuntu-keyring
+    aur_inst -- --asdeps gnupg1
+    aur_inst -- --asdeps ubuntu-keyring
     # One or more PGP signatures could not be verified!
     # gpg --recv-keys 2071B08A33BD3F06
 

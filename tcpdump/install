@@ -3,8 +3,8 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst tcpdump sslsplit  # mitmproxy
-  pkg_inst -p 'tshark' wireshark-cli
-  pkg_inst -p 'wireshark' wireshark-qt
+  pkg_inst wireshark-cli
+  pkg_inst wireshark-qt
 
 elif distro ubuntu; then
   echo "Err: fixme"

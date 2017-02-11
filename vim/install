@@ -2,19 +2,17 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst -p 'nvim' neovim
-    pkg_inst -p 'vim' gvim  # necessary for 'xxd'
-    pkg_inst -y 'neovim' python-neovim
-    pkg_inst -Y 'neovim' python2-neovim
-    # pkg_inst -y 'yaml' python-yaml
-    pkg_inst -y 'jedi' python-jedi
+    pkg_inst neovim gvim  # necessary for 'xxd'
+    pkg_inst python-neovim python2-neovim
+    # pkg_inst python-yaml
+    pkg_inst python-jedi
     pkg_inst ghc-mod
 
     ## External deps
-    aur_inst -p zeal zeal-git
+    aur_inst zeal-git
     pkg_inst hlint
     ## For vim-clang-format and vim-autoformatter
-#    pkg_inst -p 'clang-format' clang-tools-extra
+#    pkg_inst clang-tools-extra
 #    pkg_inst astyle tidy / tidy-html5-git
 #    aur_inst js-beautify  # BAD python-autopep8 beautify-css
 
@@ -24,7 +22,7 @@ elif distro ubuntu; then
 
     ppa_add 'ppa:neovim-ppa/unstable'
     pkg_inst neovim
-    # NOTE: duplicated for $ ssh -X
+    # REM:NOTE: duplicated for $ ssh -X
     pkg_inst xsel
 
     # libclang-dev for autocompleter in vim
@@ -32,7 +30,3 @@ elif distro ubuntu; then
     pip_inst jedi  # neovim
     echo "Err: not all"
 fi
-
-# Install vim plugins
-# BAD: firstly NEED 'setup' for 'dein'
-# ./update $(cfgOpt u && echo -u)
