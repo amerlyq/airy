@@ -5,32 +5,33 @@ trap_errors
 cwd_script
 
 # Re-install even if git pull is up-to-date (for broken builds)
-while getopts 'mrsu' o; do case $o
-in :|'?') die 1
+while getopts 'mrsu' o; do case $o in :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 mkdir -vp "${CURR_DIR_PKG:?}"
 airy_cache_pwd_mod
 
 do_if() {
-  local cmd='' grp='' obj=p pkgs=() bQuiet=0 OPTIND=1
+  local cmd grp obj=P pkgs=() bQuiet=0 OPTIND=1
 
   # USE 'pacman -Ql <pkg>' to list files  ALT: pkgfile
-  while getopts "ac:d:f:l:p:qy:Y:" o; do case $o
-  in a) obj=$o  # always
-  ;; [dflpyY]) obj=$o; grp=$OPTARG
+  while getopts "qac:d:f:l:p:P:y:Y:" o; do case $o
+  in :|'?') die 1 "Need value for '-${o}'" >&2
+  ;; a) obj=$o  # always
+  ;; [dflpPyY]) obj=$o; grp=$OPTARG
   ;; c) cmd=$OPTARG
   ;; q) bQuiet=1
-  ;; :|'?') die 1 "Need value for '-${o}'" >&2
-  esac; done && shift $((OPTIND-1))
+  esac; done; shift $((OPTIND-1))
 
+  # NOTE: with 'grp' check whole group as whole
+  #   without 'grp' check each arg individually
   if ! cfgOpt u && [[ $grp ]]; then
     if has_such "${obj:?}" "${grp:?}"
-    then (($bQuiet)) || echo "I: $* ($obj=$grp)"; return 0
+    then ((bQuiet)) || echo "I: $* ($obj=$grp)"; return 0
     else pkgs+=("$@"); fi
   else while (($#>0)); do
-    if ! cfgOpt u && has_such "$obj" "$1"
-    then (($bQuiet)) || echo "I: $1"
+    if ! cfgOpt u && has_such "${obj:?}" "$1"
+    then ((bQuiet)) || echo "I: $1"
     else pkgs+=("$1"); fi; shift
   done; fi
 
@@ -42,6 +43,7 @@ cab_inst(){ do_if -c 'cabal install' "$@"; }
 
 
 if distro ubuntu; then
+  has_pkg(){ dpkg -l "$@" &>/dev/null; }  # CHECK: if working
   pkg_inst(){ do_if -c 'sudo /usr/bin/apt-get --yes install' "$@"; }
   pkg_make(){ sudo checkinstall --default "$@"; }
   deb_wget(){ wget_inst -d "$1" && sudo dpkg -i "$CURR_DIR_PKG/${2:-${1##*/}}"; }
@@ -57,6 +59,7 @@ if distro ubuntu; then
   gem_inst(){ do_if -c 'sudo gem install' "$@"; }
 
 elif distro arch; then
+  has_pkg(){ pacman -Qq "$@" &>/dev/null; }
   pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' "$@"; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
   if has_pr yaourt; then

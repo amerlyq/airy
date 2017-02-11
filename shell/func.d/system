@@ -111,8 +111,9 @@ has_python(){ local v=($(python$1 --version 2>&1))
   [[ -d /usr/lib/python${v[1]%.*}/site-packages/$2 ]]
 }
 has_such(){ local -A chk=( [a]='false' [f]='test -f' [d]='test -d'
-    [p]='has_pr' [l]='has_lib' [y]='has_python 3' [Y]='has_python 2'
-  ); local cmd=${chk[$1]}; [[ -n ${cmd%% *} ]] || return 2; $cmd "$2"
+    [P]='has_pkg' [p]='has_pr' [l]='has_lib'
+    [y]='has_python 3' [Y]='has_python 2'
+  ); ${!chk[${1:?}]:?} "${2:?}" || return 2
 }
 
 # ALT:(running_X broken in raw console?) more stable -- xset q &>/dev/null
