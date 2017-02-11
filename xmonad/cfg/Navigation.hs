@@ -42,7 +42,7 @@ keys = screens ++ nwksps ++ panels ++ markNgo
 nwksps = [ (m ++ k, b f) | (k, b) <- groups, (m, f) <- actions]
 groups =
   [ ("a", backNforth skipped)
-  , ("<Backspace>", nextEmpty)
+  -- , ("<Backspace>", nextEmpty)
   , ("<Tab>", nextNonEmpty)
   ]
 
