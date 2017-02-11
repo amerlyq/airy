@@ -38,6 +38,10 @@ pkglst
     [_] create table: name, repo/name, fullpath
     [_] sort table topologically
     [_] reuse these parts of funcs orthogonally everywhere in airy
+  [_] DEV: individual 'deps:' in setup/install/update/recache
+    [_] 'wide' mode : gather all 'deps:' in single list before processing
+    [_] 'depth' mode : use 'deps:' separately
+    [_] THINK: individual deps per script's execution ?
   [_] split 'deps:'
     * required (r.xorg in ./setup -- BUT! not always, really) and optional (r.n in ./run )
     * necessary at 'setup' and at 'runtime'
@@ -162,6 +166,11 @@ setup
 
 
 install
+  [_] TRY: extend 'do_if' to check if 'pkg' installed by name using pacman/pacaur
+    + to always install/gather conflicting packages even w/o '-u'
+    + AUR pkgs will be updated only by 'pacaur -Syu' w/o duplicating requests in each 'install'
+    ~ then '-I' can be removed from 'r.airy -a' (watch over its misusage)
+    + OR replace '-u' by '-r' to _reinstall_ packages only on direct demand from user
   [_] do_if -> system
   [_] do_if must accept commands from stdin
     = Aim -- in all ./setup files to simplify upgrade sections
@@ -171,6 +180,13 @@ install
   2016-07-14 [X] pkg_inst and aur_inst -> don't do anything, if already installed -- even on '-u'
     Because it must be done by '-Ss'
   [_] CHG: use pacaur instead of pacman on pkg update
+
+
+update
+  [_] pacman/pacaur -- specify ignore list -- accumulate it throughtout all *mods*
+    USE: --ignore pkg1,pkg2,...
+    = android-*/mingw, texlive, libreoffice-fresh, ?firefox, wxhexeditor
+    SEE: pacaur -Syu
 
 
 linkcp
