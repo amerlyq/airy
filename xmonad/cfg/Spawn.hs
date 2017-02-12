@@ -121,7 +121,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     ---- Submenus
     inGroup "M-i"
     [ ("u", "r.b -h")
-    , ("g", "r.game -p")
+    , ("g", "r.playonlinux -p")
     , ("e", "r.dict --en --dmenu")
     , ("r", "r.dict --ru --dmenu")
     , ("m", "r.mpd-move")

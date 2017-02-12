@@ -84,8 +84,8 @@ distro(){
     else uname -a; fi | grep -iqF "$1"
 }
 die() { local ret=$?
-    if [[ $1 =~ [0-9]+ ]]; then ret=$1; shift; fi
-    printf "%s${1+\n}" "$1"
+    if [[ ${1-} =~ [0-9]+ ]]; then ret=$1; shift; fi
+    (($#)) && printf "%s${1+\n}" "$1"
     # For case when you source this functions to interactive shell
     [[ ${PS1-} ]] && return $ret || exit $ret
 }
