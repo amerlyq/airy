@@ -1,0 +1,33 @@
+# vim:ft=dosini
+[options]
+; lazy-load=1
+hide-info-box=1
+scale-image-up=1
+watch-files=changes-only
+
+[keybindings]
+k  { goto_file_relative(-1) }
+j  { goto_file_relative(1) }
+J  { goto_file_relative(10) }
+K  { goto_file_relative(-10) }
+
+<Control>p  { goto_directory_relative(-1) }
+<Control>n  { goto_directory_relative(1) }
+
+d  { quit() }
+q  { quit() }
+r  { reload() }
+f  { toggle_fullscreen() }
+
+l  { set_scale_level_relative(1.1) }
+h  { set_scale_level_relative(0.9) }
+t  { toggle_scale_mode(0) }
+
+/  { flip_horizontally() }
+?  { flip_vertically() }
+
+i  { toggle_info_box() }
+g  { jump_dialog() }
+
+,  { rotate_right() }
+.  { rotate_left() }
