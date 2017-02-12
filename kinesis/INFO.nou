@@ -1,0 +1,44 @@
+Basic reprogramming
+  Remap a Key (progm + F12)
+    * ([kp+]'src action' -> [kp+]'dst loci key') = {repeat in pairs}, progm
+    NOTE: 'src action' are taken from DFL qwerty/dworak with win thumbs
+    WARN: keypd/progm can't be remapped
+  Swap = two sep remaps
+  ! Macro shadows remap on same key
+  Erase remap == (restore original action)
+    (progm + F12) => tap 'key' twice
+  Erase macro == (assign empty macro)
+    (progm + F11) => tap 'key' => progm
+  Soft Reset (progm + shift + F9)
+    = erase all macros/remaps in current active layout
+    = re-enables macro playback
+
+
+Power User Mode (progm + shift + esc)
+
+
+Firmware
+  1. Dld: http://www.kinesis-ergo.com/advantage2-resources/
+    ./Advantage2_1.0.168.upd
+  2. Enable Power User Mode (progm + shift + esc). All four LEDs will flash 4 times.
+  3. Open the v-drive (progm + F1).
+  4. Open the “firmware” folder.
+  5. Copy and paste the new firmware file into the firmware folder.
+  6. Rename the firmware file “update.upd”.
+    WARN: After a successful firmware update, the “update.upd” file will be auto-deleted
+  7. Optional: Unmount the v-drive.
+  8. Initiate Firmware Update (program + shift + U).
+    The update process normally takes 10-12 seconds to complete.
+    During which time the keyboard will be inactive.
+    WARN: Do not unplug or type on the keyboard during this step.
+  9. After 12 seconds, tap the Keypad key to test the keyboard.
+    When the keypad LED illuminates the keyboard is active again.
+  10. Run a Status Report to confirm the new version of firmware was successfully installed.
+  11. If the keyboard does not wake up after 12-15 seconds,
+    perform a Hard Reset (Right Ctrl + F9 while plugging it in).
+
+
+Hard reset
+  Press and hold (DFL RCtrl + F9 while plugging in kbd) = 4xLEDs flashes
+  Release keys = 4xLEDs flash x4 = complete
+  = Erases all remaps/macros/state
