@@ -13,18 +13,17 @@ source ~/.shell/profile
 # Mount fs by SSH
 # https://ru.wikipedia.org/wiki/Mount
 
+mnt=/media/${CURR_USER:-`whoami`}
+action=m
+
 # Disk mounting util
-if [[ -n $1 && ${#1} -le 2 ]]; then ACTION=$1; shift; else ACTION=m; fi
+if [[ -n $1 && ${#1} -le 2 ]]; then action=$1; shift; fi
 
-LBL=$1
-MNT=/media/${CURR_USER:-`whoami`}
-DIR=$MNT/$LBL
-
-if [[ -z "$LBL" ]]; then
+if ((!$#)); then
     printf "LABELS: " && (cd /dev/disk/by-label 2>/dev/null && ls --color=auto || echo)
     printf "DISKS:  " && (cd /dev && ls sd?[0-9] 2>/dev/null || echo)
     printf "SAMBA:  " && (sed -rn '/^\s+(\w+)\)\s+dosamba.*/s//\1/p' "$0" | xargs || echo)
-    printf "ACTIVE: " && (ls --color=auto "$MNT") && echo || echo
+    printf "ACTIVE: " && (ls --color=auto "$mnt") && echo || echo
     exit
 fi
 
@@ -44,19 +43,19 @@ dirmk() { clean "$1"
 }
 
 
-# Need package 'jmtpfs', unmount by fusermount -u "$DIR"
+# Need package 'jmtpfs', unmount by fusermount -u "$dir"
 domtp() { dirmk "$1" && jmtpfs "$1"; }
 doram() { dirmk "$1" && sudo mount -t ramfs -o size=100m ramfs "$1" && chuser "$1"; }
 dosamba() { dirmk "$1" \
   && sudo mount -t cifs -o user="${2:?No user}" "//${3:?No share}/" "$1" \
   && chuser "$1" && echo "$1" || exit
 }
-doloop() { local DEVPATH=$PWD/$LBL
+doloop() { local DEVPATH=$PWD/${1##*/}
     [[ -f $DEVPATH ]] || die "Error: no such file '$DEVPATH'"
     dirmk "$1" && sudo mount -o loop,ro "$DEVPATH" "$1" || exit
 }
-domnt() { local TYPE DEVPATH=/dev/disk/by-label/$LBL
-    [[ -L $DEVPATH ]] || DEVPATH=/dev/$LBL
+domnt() { local TYPE DEVPATH=/dev/disk/by-label/${1##*/}
+    [[ -L $DEVPATH ]] || DEVPATH=/dev/${1##*/}
     [[ -e $DEVPATH ]] || die "No device at path"
 
     # Flash drive:  http://linuxsam.livejournal.com/18176.html
@@ -77,25 +76,29 @@ codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remo
 }
 
 
-case "$ACTION" in
- m) domnt "$DIR" ;;
- a) domtp "$DIR" ;;
- r) doram "$DIR" ;;
- o) doloop "$DIR" ;;  # You must launch it from iso's directory!
- s) case "${LBL:?}" in
-    # smbclient -L 192.168.1.1
-     android) dosamba "$DIR" ${ANDR_USER:?} ${ANDR_IPL:?} ;;
-      router) dosamba "$DIR" ${ROUT_USER:?} ${ROUT_IPL:?}/share ;;
-        home) dosamba "$DIR" ${LAPT_USER:?} ${LAPT_IPL:?}/home ;;
-       media) dosamba "$DIR" ${LAPT_USER:?} ${LAPT_IPL:?}/media ;;
-    esac ;;
-# SEE umount troubleshooting:
-#   http://oletange.blogspot.com/2012/04/umount-device-is-busy-why.html
- u) sudo umount -v "$DIR" || { lsof "$DIR"; exit 1; }
-    clean "$DIR" || exit ;;
- U) sudo umount -v "$MNT"/* ||:; sudo rmdir -v "$MNT"/* ;;
- i) sudo blkid ;;  # Get table disk/label/filesystems
- *) echo "Error: '$ACTION'" ;;
+apply(){ local lbl=$1 dir=$mnt/$1
+  case $action
+  in m) domnt "$dir"
+  ;; a) domtp "$dir"
+  ;; r) doram "$dir"
+  ;; o) doloop "$dir"  # You must launch it from iso's directory!
+  ;; s) case ${lbl:?}  # smbclient -L 192.168.1.1
+    in android) dosamba "$dir" ${ANDR_USER:?} ${ANDR_IPL:?}
+    ;;  router) dosamba "$dir" ${ROUT_USER:?} ${ROUT_IPL:?}/share
+    ;;    home) dosamba "$dir" ${LAPT_USER:?} ${LAPT_IPL:?}/home
+    ;;   media) dosamba "$dir" ${LAPT_USER:?} ${LAPT_IPL:?}/media
+    esac
+  # SEE umount troubleshooting:
+  #   http://oletange.blogspot.com/2012/04/umount-device-is-busy-why.html
+  ;; u) sudo umount -v "$dir" || { lsof "$dir"; exit 1; }; clean "$dir" || exit
+  esac
+}
+
+case $action
+in [marosu]) for l in "$@"; do apply "$l"; done
+;; U) sudo umount -v "$mnt"/* ||:; sudo rmdir -v "$mnt"/*
+;; i) sudo blkid  # Get table disk/label/filesystems
+;; *) echo "Error: '$action'"
 esac
 
 ## WORK samba
