@@ -1,24 +1,41 @@
-#!/bin/bash -e
-cd ~/.config/airy/game
+#!/bin/bash -eu
+set -euo pipefail
 
-OPTS=(dmenu -p 'Play me:' -fn monospace:size=10
-     -nb '#000000' -nf '#b0e0e6' -sb '#227410' -sf '#ccaa00')
+lib=~/.config/airy/game
+on_exit=('r.video-single 1')
 
-case "$1" in -p) shift
-  game=$(ls | "${OPTS[@]}")
-;; *) game=$1 ;; esac
+choose(){ dmenu -p 'Play me:' -fn monospace:size=10
+     -nb '#000000' -nf '#b0e0e6' -sb '#227410' -sf '#ccaa00'; }
 
-[[ -f $game ]] || { r.n 'No such' "$game"; exit 1; }
-ON_EXIT=('r.video-single 1')
+overlay(){ local nm=$1
+  # DEV: separate overlays to be provided directly by wrapper in $config/games
+  #   FIND: setxkbmap append sep file or at least dir.
+  if r.xkb-has-overlay "$nm"; then
+    r.xkb "$nm" && xkbset ov1
+    on_exit+=('xkbset -ov1' 'r.xkb')
+  fi
+}
 
-if r.xkb-has-overlay "$game"; then
-  r.xkb "$game" && xkbset ov1
-  ON_EXIT+=('xkbset -ov1' 'r.xkb')
+game(){ nm=$1; overlay "$nm"; cmd=$lib/$nm
+  [[ -f $cmd ]] || { r.n 'No such game' "$cmd"; exit 1; }
+}
+
+if (($#)); then case $1
+  in -p) shift; game "$(cd "$lib" && ls | choose)"
+  ;; -n) shift; game "$1"
+  ;;  *) exit 1
+esac; else
+  nm=playonlinux
+  cmd=( primusrun "$(which "$nm")" )
+  on_exit+=('xrdb -load ~/.Xresources')
+  xrdb -DMAIN_DPI=141 -load ~/.Xresources
+  r.video-single 2
 fi
 
-r.wm -w g  # Jump to game workspace
-
 # CHECK: called only one trap or sometimes multiple of them?
-trap 'for c in "${ON_EXIT[@]}"; do $c; done' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+onexit(){ for c in "${on_exit[@]}"; do eval "$c"; done; }
+trap 'onexit' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
 
-./"$game"
+# TODO: query and return to current wksp on exit
+r.wm -w g  # Jump to game workspace
+"${cmd[@]}"
