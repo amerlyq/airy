@@ -1,0 +1,10 @@
+if-else
+  REF:
+    http://www.pement.org/sed/ifelse.txt
+    http://docstore.mik.ua/orelly/unix/sedawk/ch06_04.htm
+  Replace^insert in line
+    $ sed 's/^ab/A/; t; s/^a/B/; t; s/^/C/' file
+  BAD: Replace^insert in block -- don't work !!
+    < sed has no cond-var to track replacing happened
+    ~> use awk: $ awk '/A/{f=1} !f; /B/{print "entry"; f=0}' file
+    ~> use grep && sed || echo
