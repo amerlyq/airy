@@ -9,8 +9,8 @@ header='# vim:ft=sh'
 begfmt='_alias_cat(){  # %s'
 endfmt='}; _alias_cat'
 
-# q=quiet
-opts=; while getopts 'f:m:o:q' o; do case $o in :|'?') exit 1
+# q=quiet, r=reset (always replace)
+opts=; while getopts 'f:m:o:qr' o; do case $o in :|'?') exit 1
 ;; m) mod=$OPTARG
 ;; f) from=$(readlink -e "$OPTARG")
 ;; o) output=$(readlink -f "$OPTARG")
@@ -18,26 +18,28 @@ esac; opts+=$o; done; shift $((OPTIND - 1))
 log(){ [[ $opts =~ q ]] || printf '%s\n' "$@"; }
 
 # BAD: can't update, append only. After removing appended -- deletes rest of file
-section_append(){ local f=$1 s a b e t tt
+section_recache(){ local f s a b e t tt timestamp=1
+  [[ $1 == -r ]] && { timestamp=0; shift; }
+  f=$1
   s=$(readlink -e "$2")
   a=$mod/${s##*/}
   b=$(printf "$begfmt" "$a")
   e=$(printf "$endfmt" "$a")
   t=$(command stat -c%Y "$s")
-  tt=$(sed -n "\|^$b\s*\([0-9]\{10\}\)\$|{s//\1/p;q}" "$f")
-  (( t == tt )) && log "* A: $a" && return
-  sed -i "
-  \|^$b|,\|^$e$| {
-    \|^$b|{
-      i $b $t\\n# $s
-      r $s
-    }; \|^$e$|b; d
-  }
-  \$ {
-    a\\\n\\n$b $t\\n# $s
-    r $s
-    a $e
-  }" "$f"
+  if ((timestamp)); then
+    tt=$(sed -n "\|^$b\s*\([0-9]\{10\}\)\$|{s//\1/p;q}" "$f")
+    (( t == tt )) && log "* A: $a" && return
+  fi
+  if grep -q "$b\b" "$f"; then sed -i "
+    \|^$b|,\|^$e$| {
+      \|^$b|{
+        i $b $t\n# $s
+        r $s
+      }; \|^$e$|b; d
+    }" "$f"
+  else
+    printf '\n\n%s\n# %s\n%s\n%s\n' "$b $t" "$s" "$(<"$s")" "$e" >> "$f"
+  fi
   log "+! A: $a"
 }
 
@@ -47,5 +49,5 @@ section_append(){ local f=$1 s a b e t tt
 
 for f in "${lst[@]}"; do
   [[ -s $f ]] || continue
-  section_append "$output" "$f"
+  section_recache $([[ $opts =~ r ]] && printf -r) "$output" "$f"
 done
