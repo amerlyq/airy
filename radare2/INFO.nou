@@ -147,3 +147,10 @@ Shell
       http://archive.hack.lu/2015/radare2-workshop-slides.pdf
     https://radare.gitbooks.io/radare2book/content/introduction/basic_debugger_session.html
     http://radare.today/posts/using-radare2/
+
+  Disassemble
+    https://samsymons.com/blog/reverse-engineering-with-radare2-part-1/
+    $ xxd -p -g4 -c4 -s $((text_off)) lib.so | head | xargs -rn1 rasm2 -a mips -d
+    > px @ $pc  # => hexstring 40045c00
+    $ rafind2 -x 40045c00 lib.so  # => 0x1debc
+    DEV: split any ./core-nm file into ./core-nm/{reg\,load\,inf}/* to repair/analyze corrupted core file

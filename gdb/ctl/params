@@ -4,7 +4,7 @@
 search(){ local t=$1 k=$2; shift 2
   if test "$t" "${!k-}"
   then v=$(readlink -e "${!k}")
-  else v=$( "$@" ); fi
+  else [[ ${!k+x} ]] || v=$( "$@" ); fi
   readonly "$k=$v"
 }
 

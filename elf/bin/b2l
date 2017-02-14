@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+
+# SEE: http://www.m0rd0r.eu/little-endian-to-big-endian-in-perl/
+## NOTE: for simple string reverse there is 'rev' util. But I need byte-wise.
+# DEV: allow on '-p' to supply hexstring
+# DEV: convert to perl-only script
+
+end=N
+[[ ${1-} =~ ^[NL]$ ]] && { end=$1; shift; }
+
+exec perl -We '
+  my $n=4;
+  if ($#ARGV >= 0) { open($in, "<", $ARGV[0]); }
+  else { $in = *STDIN; }
+  while(read($in, $buf, $n)) {
+    printf "%08lx\n", unpack("'$end'", $buf) if length($buf) == $n;
+  }
+' "$@"
