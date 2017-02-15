@@ -21,7 +21,7 @@ alias egrep="grep -E"
 if [[ -x /usr/bin/dircolors ]] && [[ -s ~/.config/dircolors ]]; then
   LS_COLORS=$(eval "$(dircolors -b ~/.config/dircolors)"; printf '%s\n' "$LS_COLORS")
 fi
-alias ls="${LS_COLORS:+LS_COLORS='$LS_COLORS' }${aliases[ls]:-ls}"
+_alias_ -b "${LS_COLORS:+LS_COLORS='$LS_COLORS' }" ls
 
 GREP_COLORS="mt=37;45"
-alias grep="${GREP_COLORS:+GREP_COLORS='$GREP_COLORS' }${aliases[grep]:-grep}"
+_alias_ -b "${GREP_COLORS:+GREP_COLORS='$GREP_COLORS' }" grep

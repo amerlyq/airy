@@ -6,8 +6,7 @@ alias sort='LC_ALL=C sort'    # fix sorting order
 alias free='free -hmlt'
 alias reswap='sudo swapoff -a && sudo swapon -a && free'
 
-((!EUID)) || for nm in chown mount umount
-do alias $nm="sudo $nm"; done
+((!EUID)) || _alias_ -b 'sudo ' chown mount umount
 
 alias chownm='chown $USER:$USER'  # USE this exclusively
 alias chownr='chown root:root'

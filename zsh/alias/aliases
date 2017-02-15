@@ -1,5 +1,5 @@
 # vim:ft=zsh
-[[ -n $ZSH_NAME ]] || return 0  ## Global aliases. Zsh only
+[[ -n ${ZSH_NAME-} ]] || return 0  ## Global aliases. Zsh only
 # ATTENTION: disallow aliases after commands requiring args
 
 # Expand in any place of cmdline.

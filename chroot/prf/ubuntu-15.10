@@ -21,7 +21,7 @@ distro ubuntu || die "Not Ubuntu"
 # NOTE: (hash sum mismatch)
 #   sudo apt-get clean && sudo apt-get update
 
-pkgs=(build-essential man-db dialog wget less gawk)
+pkgs=(build-essential man-db dialog wget less gawk bc)
 pkgs+=(gcc-multilib g++-multilib lib32stdc++6)
 # BUG:(not found)  libc6-dbg:i386 unifdef
 pkgs+=(make pkg-config autoconf automake cmake bison flex texinfo fakeroot)

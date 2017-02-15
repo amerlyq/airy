@@ -1,5 +1,25 @@
 # vim: ft=sh
 
+# o=overwrite (1 - always use rhs, 0 - use rhs only on newdef)
+_alias_(){ local a b e t v overwrite=0 OPTIND=1
+  while getopts 'gsob:e:' o; do case $o in :|'?') return 1
+  ;; [be]) declare $o=$OPTARG
+  ;; [gs]) t+=$o
+  ;; o) overwrite=1
+  esac; done; shift $((OPTIND - 1))
+  for a in "$@"; do
+    k=${a%%=*}
+    v=${a#*=}; [[ $v != $a ]] || v=''  # HACK:RFC
+    if ((!overwrite)); then
+      a=${ZSH_NAME:+${aliases[$k]-}}
+      [[ $a ]] || a=${BASH:+${BASH_ALIASES[$k]-}}
+      [[ -n $v && -n $a ]] && continue
+      v=$a
+    fi
+    builtin alias ${t:+-}${t-} $k="${b-}${v:-$k}${e-}"
+  done
+}
+
 # Source all pathes shortcuts
 [[ ! -s ~/.config/airy/pathes ]] || while read -r k p; do alias $k="cd $p"
 done < <(sed 's/\s*#.*$//; /^\s*$/d' ~/.config/airy/pathes)

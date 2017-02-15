@@ -38,12 +38,14 @@ Reorder audio cards
     + https://gist.github.com/UedaTakeyuki/926f6e89ec48fcde0b6f
   https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture#Set_the_default_sound_card
   +++ http://alsa.opensrc.org/MultipleCards#How_to_choose_a_particular_order_for_multiple_installed_cards
+    = SEE Ordering multiple cards of the same type
   +++ https://wiki.archlinux.org/index.php/Talk:Advanced_Linux_Sound_Architecture
     http://alsa.opensrc.org/MultipleCards#Ordering_multiple_cards_of_the_same_type
   http://alsa-project.org/main/index.php/Matrix:Module-emu10k1
   $ cat /proc/asound/card*/id
   $ v /etc/modprobe.d/alsa-base.conf
     options snd-hda-intel id=PCH,HDMI index=1,0
+  $ aplay -l
 
 
 High pitch sound snd_intel_hda

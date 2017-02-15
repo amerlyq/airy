@@ -7,7 +7,11 @@ alias \?\?='whatis'  # search in man-db
 alias \?\?\?='whereis'  # desktop search
 # SEE: https://wiki.archlinux.org/index.php/File_system_search
 
-alias df='df -H'
+if hash pydf &>/dev/null
+then alias df='pydf'
+else alias df='df -H'
+fi
+
 alias da='\du -sch'
 alias du='\du -ch'
 alias duh='du --max-depth=1' #Or: du -hd1

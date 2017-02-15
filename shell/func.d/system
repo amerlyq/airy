@@ -27,7 +27,7 @@ trap_errors(){
     # BUG: wrong LINENO for correct command
     # MAYBE: used previous LINENO instead of current?
     trap 'error -e ${LINENO} \
-    "${FUNCNAME+[$FUNCNAME] }$BASH_COMMAND"
+    "${FUNCNAME+[$FUNCNAME] }${BASH_COMMAND-}"
     ' HUP INT QUIT TERM ERR
     # SEE: http://mywiki.wooledge.org/BashFAQ/105
 

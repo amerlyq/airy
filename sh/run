@@ -26,7 +26,7 @@ exec ${SHELL:?} -c '
 type -f _has_pr &>/dev/null || _has_pr(){ hash "$1" &>/dev/null; }
 (( $(id -u) )) || HOME=/home/${SUDO_USER:-${USER:-${USERNAME:?}}}
 source ~/.config/airy/aliases
-if [[ -n $ZSH_NAME ]]; then
+if [[ -n ${ZSH_NAME-} ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/modules/git/alias.zsh"
   setopt aliases
 else

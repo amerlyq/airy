@@ -1,0 +1,64 @@
+#!/bin/zsh -eu
+set -euo pipefail
+
+# SEE:VAR https://www.gnu.org/software/bash/manual/bashref.html#Bash-Variables
+
+# if [[ -n ${BASH-} ]]; then
+#   trap 'printf "Err:%s: %s\n" \
+#     ${LINENO} ${BASH_LINENO[$i]} ${FUNCNAME[$i]} \
+#     "${FUNCNAME+[$FUNCNAME] }${BASH_COMMAND-}"
+#   ' HUP INT QUIT TERM ERR EXIT
+# fi
+
+# HACK: http://www.zsh.org/mla/workers/2008/msg01109.html
+# print $functrace
+# print $funcfiletrace
+# print $funcsourcetrace
+# print $funcstack
+
+# TODO: run conditionally by SHELL -- to check sep bash/zsh
+# exec "$SHELL" "$0"
+
+# bash: ${BASH_ALIASES[ls]}
+# zsh: ${aliases[ls]}
+
+# BUG: can't extend aliases by overriding with extended value
+# => pacman, colorize*
+
+
+# WARN: when sourcing from bash -- not all aliases available!
+# => setting ZSH_NAME in bash is wrong because of 'alias -g'
+
+f=$(r.airy-get-cache)/cfg/aliases
+
+# BAD:HACK: ignore if rhs =~ (aliases|ALIASES)[ls]
+#   => it's already extended on def
+# && [[ ${a#*=} != *aliases[${a%%=*}]* ]]
+# && [[ ${a#*=} != *ALIASES[${a%%=*}]* ]]
+
+# NOTE: support multiple aliases on single line: alias {a,b}=cmd
+# WARN: _alias_() is ignored -- it never overwrites, only extends
+alias(){ local t k
+  [[ $1 =~ '^-[gs]$' ]] && { t=$1; shift; }
+  for a in "$@"; do k=${a%%=*}
+    if builtin alias ${t-} "$k" &>/dev/null; then
+      if [[ -n ${ZSH_NAME-} ]]; then
+        print $funcfiletrace[1]:
+      elif [[ -n ${BASH-} ]]; then
+        echo "${BASH_SOURCE[1]}:${BASH_LINENO[0]}:"
+        echo "${BASH_SOURCE[*]}"
+        echo "${BASH_LINENO[*]}"
+        # echo "${FUNCNAME[*]}"
+        # echo "${BASH_COMMAND}"  # user only with errexit trap
+      fi
+      echo "Err:(duplicate): $k"
+      exit 1
+    fi
+    builtin alias ${t-} "$a"
+  done
+}
+
+type -f _has_pr >/dev/null 2>&1 \
+  || _has_pr(){ hash "$1" >/dev/null 2>&1; }
+
+source "$f"

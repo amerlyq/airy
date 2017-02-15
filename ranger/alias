@@ -6,7 +6,7 @@ hash ranger &>/dev/null \
 || alias r='exit'
 
 ## Trap to sync on exit bash/zsh and ranger working directories.
-[[ $ZSH_NAME ]] \
+[[ -n ${ZSH_NAME-} ]] \
 && zshexit() { _ranger_cwd; } \
 || trap _ranger_cwd EXIT
 
