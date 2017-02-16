@@ -50,6 +50,6 @@ source ~/.shell/common
 
 # Freciency completions and preexec (man fasd)
 # WARNING: quotes are essential!
-# ! _has_pr fasd || eval "$(fasd --init auto)"
+# (( ! $#commands[fasd ] )) || eval "$(fasd --init auto)"
 
 ((!_perf_enable)) || source r.sh-perf-trace

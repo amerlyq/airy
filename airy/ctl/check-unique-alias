@@ -1,8 +1,9 @@
-#!/bin/zsh -eu
+#!/bin/sh -eu
+test "${_EXEC-}" = 1 || _EXEC=1 exec "$SHELL" "$0" "$@"
 set -euo pipefail
+(($#)) || set -- $(r.airy-get-cache)/cfg/aliases
 
 # SEE:VAR https://www.gnu.org/software/bash/manual/bashref.html#Bash-Variables
-
 # if [[ -n ${BASH-} ]]; then
 #   trap 'printf "Err:%s: %s\n" \
 #     ${LINENO} ${BASH_LINENO[$i]} ${FUNCNAME[$i]} \
@@ -16,25 +17,11 @@ set -euo pipefail
 # print $funcsourcetrace
 # print $funcstack
 
-# TODO: run conditionally by SHELL -- to check sep bash/zsh
-# exec "$SHELL" "$0"
-
-# bash: ${BASH_ALIASES[ls]}
-# zsh: ${aliases[ls]}
-
-# BUG: can't extend aliases by overriding with extended value
-# => pacman, colorize*
-
-
 # WARN: when sourcing from bash -- not all aliases available!
 # => setting ZSH_NAME in bash is wrong because of 'alias -g'
-
-f=$(r.airy-get-cache)/cfg/aliases
-
-# BAD:HACK: ignore if rhs =~ (aliases|ALIASES)[ls]
-#   => it's already extended on def
-# && [[ ${a#*=} != *aliases[${a%%=*}]* ]]
-# && [[ ${a#*=} != *ALIASES[${a%%=*}]* ]]
+# WARN: in zsh, all aliases from prezto aren't taken into account
+#   => only aliases in *airy* matter
+# TRY: adapt for 'dash'
 
 # NOTE: support multiple aliases on single line: alias {a,b}=cmd
 # WARN: _alias_() is ignored -- it never overwrites, only extends
@@ -58,7 +45,4 @@ alias(){ local t k
   done
 }
 
-type -f _has_pr >/dev/null 2>&1 \
-  || _has_pr(){ hash "$1" >/dev/null 2>&1; }
-
-source "$f"
+for f in "$@"; do source "$f"; done

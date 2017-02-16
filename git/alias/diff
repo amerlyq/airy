@@ -20,3 +20,5 @@ alias gds='gdf "stash@{0}"'
 alias gdS='git stash show -p'
 alias gdi='git difftool -t idiff'  # case-insensitive
 alias gd.='gdf .'
+
+[[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' gdf

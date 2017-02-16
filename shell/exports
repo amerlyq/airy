@@ -2,44 +2,39 @@
 # BAD: always overwrites vars when sourced in some script
 #   !!! cant change env vars on cmdline or by 'env'
 # TEMP:REM?
-type -f _dttime &>/dev/null || _dttime(){ :; }
-type -f _has_pr &>/dev/null || _has_pr(){ hash "$1" &>/dev/null; }
+if type -f _has_pr &>/dev/null; then true
+elif [[ -n ${BASH-} ]]; then _has_pr(){ hash "$1" &>/dev/null; }
+elif [[ -n ${ZSH_NAME-} ]]; then _has_pr(){ (( $#commands[$1] )); }
+fi
 
 ### Vars ###
 export LANG=${LANG:-en_US.UTF-8}  # FIXED: for schroot into old ubuntu
 export LC_NUMERIC=${LC_NUMERIC:-${LANG-}}
-_dttime exports
 
 ### Temp ###
 if [[ ! -d ${TMPDIR-} ]]; then
   export TMPDIR=/tmp/$LOGNAME
   mkdir -p -m 700 "$TMPDIR"
 fi
-_dttime exp-tmpdir
 
 ### Path ###
 ! _has_pr ruby || [[ :$PATH: == *:$HOME/.gem/ruby:* ]] \
 || PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
-_dttime exp-ruby
 ! _has_pr cabal || PATH=$HOME/.cabal/bin:$PATH
 PATH=$HOME/.bin:$PATH
 export PATH
-_dttime exp-cabal
 
 ### Vim ###
 EDITOR=r.vim && _has_pr $EDITOR || EDITOR=vim
 VISUAL="$EDITOR -R"  # BAD:(space in args):  +set\ nolist
 export EDITOR VISUAL
-_dttime exp-nvim
 
 ### Less ###
 _has_pr r.pager && PAGER=r.pager || PAGER=less
 [[ -r ~/.less ]] || LESS='-a -i -j6 -M -N -R -S -w -z-4 -x4'
 export PAGER LESS
-_dttime exp-less
 # export MANPATH="/usr/local/man:$MANPATH"
 
 ### Alien profile (SSH server, anonymous)###
 if [[ -f ~/aura/env ]]; then source ~/aura/env; fi
-_dttime exp-env

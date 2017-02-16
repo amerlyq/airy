@@ -17,8 +17,7 @@ bits() {
 }
 szl() { ls -FaGl "$@" | awk '{s+=$4;print $4,$8} END {print s}'; }
 
-[[ -z ${ZSH_NAME-} ]] || for fn in hex dec bits gdf
-do alias $fn="noglob ${aliases[$fn]:-$fn} "; done
+[[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' hex dec bits
 
 # Works with long hex only
 ddh() { sudo dd if="$1" bs=1 count=$(h2dec ${2:-0}) skip=$(h2dec ${3:-0}); }

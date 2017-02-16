@@ -1,9 +1,14 @@
 # vim: ft=sh
 
+if type -f _has_pr &>/dev/null; then true
+elif [[ -n ${BASH-} ]]; then _has_pr(){ hash "$1" &>/dev/null; }
+elif [[ -n ${ZSH_NAME-} ]]; then _has_pr(){ (( $#commands[$1] )); }
+fi
+
 # o=overwrite (1 - always use rhs, 0 - use rhs only on newdef)
 _alias_(){ local a b e t v overwrite=0 OPTIND=1
   while getopts 'gsob:e:' o; do case $o in :|'?') return 1
-  ;; [be]) declare $o=$OPTARG
+  ;; [be]) declare $o="$OPTARG"
   ;; [gs]) t+=$o
   ;; o) overwrite=1
   esac; done; shift $((OPTIND - 1))
@@ -13,7 +18,7 @@ _alias_(){ local a b e t v overwrite=0 OPTIND=1
     if ((!overwrite)); then
       a=${ZSH_NAME:+${aliases[$k]-}}
       [[ $a ]] || a=${BASH:+${BASH_ALIASES[$k]-}}
-      [[ -n $v && -n $a ]] && continue
+      [[ -n $v && -n $a && -z $b && -z $e ]] && continue
       v=$a
     fi
     builtin alias ${t:+-}${t-} $k="${b-}${v:-$k}${e-}"

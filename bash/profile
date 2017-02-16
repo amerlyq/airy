@@ -24,12 +24,10 @@
 # export SSH_AUTH_SOCK   # enable gpg-agent for ssh
 
 # Only if running bash
-if [ -n "$BASH_VERSION" ]; then
-    _has_pr(){ hash "$1" >/dev/null 2>&1; }
-    type -f _dttime >/dev/null 2>&1 || _dttime(){ :; }
+if [ -n "${BASH-}" ]; then
     [[ ! -r ~/.shell/exports ]] || source ~/.shell/exports
     # Most of PATH constructed in /etc/profile and /etc/profile.d/
-    if _has_pr awk; then export PATH=$(
+    if hash awk &>/dev/null; then export PATH=$(
         awk -vRS=: '!a[$0]++{printf(NR>1?":%s":"%s"),$a[$1]}' <<<"$PATH"
     ); fi
     [[ ! -r ~/.bashrc ]] || source ~/.bashrc

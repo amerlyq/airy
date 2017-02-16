@@ -13,8 +13,6 @@ export SHELL=/usr/bin/zsh  # NEED: when zsh run from bash
 # If you want move it to ZDOTDIR also, then next line must reside in /etc/zshenv
 [[ ! -d ~/.cache/zsh ]] || ZDOTDIR=~/.cache/zsh
 
-_has_pr(){ (( $#commands[$1] )); }
-
 # in $ man zshall --> there is recommended to use '[[ -o rcs ]]' ?
 # Ensure that a non-login, non-interactive shell has a defined environment.
 # BUT: it will slow down scripts startup

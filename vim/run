@@ -1,10 +1,10 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
 # NOTE: $NVIM_TUI_ENABLE_TRUE_COLOR
 #   = replaced by ':set termguicolors' for >160511
 #   = no longer sets 'has("gui_running")' for >160204
 
-_has_pr(){ hash "$1" >/dev/null 2>&1; }
+_has_pr(){ hash "$1" &>/dev/null; }
 
 if _has_pr nvim; then
   # unset NVIM_TUI_ENABLE_TRUE_COLOR
@@ -32,7 +32,7 @@ fi
 
 # EXPL: run vim if there are no 'nvim'
 for pr in nvim vis vim vi; do
-  if _has_pr $pr; then exec $pr "$@"; fi
+  if _has_pr "$pr"; then exec "$pr" "$@"; fi
 done
 exit 1  # ERR: if not found
 
