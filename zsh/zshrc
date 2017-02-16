@@ -1,7 +1,6 @@
 # vim: ft=zsh
 # zmodload zsh/zprof  # HACK Profiling
 TMPPREFIX="${${TMPDIR:-/tmp}%/}/${SHELL##*/}"
-_dttime zshrc
 
 ## Add completions and themes from custom place
 # fpath=(${ZDOTDIR}/cfg/completion.d $fpath ${ZDOTDIR}/cfg/theme.d)
@@ -12,7 +11,6 @@ source ${ZDOTDIR}/cfg/options
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ||:  # Block dirty code in prezto
 fi
-_dttime end-prezto
 
 ## workaround for handling TERM variable in multiple tmux sessions
 # https://wiki.archlinux.org/index.php/Tmux#Correct_the_TERM_variable_according_to_terminal_type
@@ -42,22 +40,16 @@ setopt globdots
 ### User Cfg ###
 # You will see errors in tty if one of them is not found:
 # source ~/.shell/env  # FIXME: must be already sourced through .zprofile/.zshenv, but is not!
-_dttime gpg
 source ${ZDOTDIR}/cfg/modules/gpg.zsh
-_dttime end-gpg
 source ${ZDOTDIR}/cfg/amer-widgets.zsh
-_dttime end-widgets
 source ${ZDOTDIR}/cfg/amer-key-mix.zsh
-_dttime end-keys
 source ${ZDOTDIR}/cfg/filetypes.zsh
-_dttime end-filetypes
 source ${ZDOTDIR}/cfg/completion.zsh
-_dttime end-completion
 source ~/.shell/common
-_dttime end-common
 # zprof  # HACK Profiling
 
 # Freciency completions and preexec (man fasd)
 # WARNING: quotes are essential!
 # ! _has_pr fasd || eval "$(fasd --init auto)"
-# _dttime end-fasd
+
+((!_perf_enable)) || source r.sh-perf-trace

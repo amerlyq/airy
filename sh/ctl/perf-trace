@@ -1,0 +1,25 @@
+#!/bin/bash -eu
+# USAGE: toggle by 'source r.sh-prof-trace'
+# ALT: strace -c ls
+
+## PROFILING BEG
+if [[ -z ${_prof_enabled-} ]] || ((!_prof_enabled)); then
+  _prof_name=/tmp/profiling.$$
+  _prof_enabled=1
+  [[ -d ${_prof_name%/*} ]] || mkdir -p "${_prof_name%/*}"
+  exec 3>&2 2> >(tee "$_prof_name" | sed -u 's/^.*$/now/' \
+    | date -f - +'%s.%N' > $_prof_name.time)
+  set -x
+else
+  set +x
+  exec 2>&3 3>&-
+  _prof_enabled=0
+fi
+
+## OBSOLETE:(naive profiling): slow -- multiple forks, less precision
+# _time_dt(){ local t=$(($(date +%s%N)/1000000))
+#   [[ -z $_time_dt_prev ]] || echo "${1+$1  }$((t - _time_dt_prev))ms"
+#   _time_dt_prev=$t
+# }; unset _time_dt_prev;
+# # _dttime(){ _time_dt "$@"; }; _dttime  # naive zsh-profiling
+# _dttime(){ }

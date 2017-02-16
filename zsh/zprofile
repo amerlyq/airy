@@ -3,7 +3,6 @@
 
 ## Load std environment (EDITOR, TMPDIR, PATH, aura env profiles)
 [[ ! -r ~/.shell/exports ]] || source ~/.shell/exports
-_dttime end-exports
 
 ### Paths ###
 # Set the list of directories that Zsh searches for programs.
@@ -12,11 +11,9 @@ _dttime end-exports
 # cdpath=( $cdpath )
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path
-_dttime end-typeset
 
 # Set the Less input preprocessor.
 # Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
 if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
-_dttime end-lesspipe

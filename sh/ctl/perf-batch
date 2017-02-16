@@ -1,0 +1,14 @@
+#!/bin/bash -eu
+
+# REF
+#   http://stackoverflow.com/questions/2683279/how-to-detect-if-a-script-is-being-sourced
+#   http://stackoverflow.com/a/28776166/4749047
+## Source args if used standalone
+# if [[ -n $BASH && ${BASH_SOURCE[0]} != $0 ]] \
+# || [[ -n $ZSH_NAME && $ZSH_EVAL_CONTEXT != toplevel ]]
+
+source r.sh-perf-trace
+for f in "$@"; do source "$f"; done
+((!_perf_enable)) || source r.sh-perf-trace
+
+exec r.sh-perf-parse /tmp/profiling.$$

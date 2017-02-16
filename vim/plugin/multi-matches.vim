@@ -3,6 +3,7 @@ if &cp||exists('g:loaded_mmatch')|finish|else|let g:loaded_mmatch=1|endif
 " COPY {{{1
 " Plugin to copy matches (search hits which may be multiline).
 "   http://vim.wikia.com/wiki/Copy_search_matches
+"   http://vim.wikia.com/wiki/Folding_with_Regular_Expression
 " Version 2012-05-03 from http://vim.wikia.com/wiki/VimTip478
 "
 " :CopyMatches      copy matches to clipboard (each match has newline added)
