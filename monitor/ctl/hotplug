@@ -45,4 +45,10 @@ for m in "${discon[@]}"; do add "$m"; done
 
 # HACK: standalone 'xrandr' -- don't print to stdout
 #   => no cmd => no monitor at all => assume Xorg error
-(( ${#cmd[@]} )) && exec xrandr "${cmd[@]}"
+(( ${#cmd[@]} )) || exit
+
+# NOTE: prefer dpi from --primary display
+[[ ${MAIN_DPI-} ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||:)
+xrdb ${MAIN_DPI:+-DMAIN_DPI=$MAIN_DPI} -load ~/.Xresources
+
+exec xrandr "${cmd[@]}"
