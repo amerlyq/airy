@@ -10,29 +10,6 @@ SEIZE
   https://github.com/amerlyq/airy/tree/master/ranger/plugins
 
 
-USAGE: compatible with my general xkb
-  Modifiers
-     actual/inner   |    function    |    key caps
-    --------------- | -------------- | -----------------
-    [delete]>[lalt] | Super (XMonad) | LCommand -> Delete
-    [lalt]>[lctrl]  | Overlay (Xkb)  | LAlt -> LCommand
-    [lctrl]>[lwin]  | Alt/Meta       | RWin -> LAlt :: *direct edit*
-
-    [rctrl]>[ralt]  | Lang en/ru     | LCommand -> RAlt :: *direct edit*
-    [pup]>[rctrl]   | vim: easy C-b  | RAlt -> PgUp
-    [pdown]>[escape]| vim: easy C-[  | Esc -> PgDn
-
-  Duplicate shadowed keys on keypad level
-    [kp-delete]>[delete]
-    [kp-pup]>[pup]
-    [kp-pdown]>[pdown]
-
-  NOTE:(keep):
-    intl-\ | Multi_key
-    rwin   | Lvl3 / VBox
-    caps   | LCtrl
-
-
 THINK
   [_] CHECK: corruption bug is due to peculiar remaps order in config ?
   [_] BET: sep xkb (no-xkb) for kinesis only to eliminate manual editing of configs
@@ -48,9 +25,18 @@ THINK
 
 
 TODO
+  [_] CHECK: how to be with udev rule, when kbd plug-in/out w/o Xorg started ?
   [_] setxkbmap per kbd (to remain kinesis unaffected)
-    http://superuser.com/questions/75817/two-keyboards-on-one-computer-when-i-write-with-a-i-want-a-us-keyboard-layout
-    https://wiki.archlinux.org/index.php/Keyboard_configuration_in_Xorg
-    http://askubuntu.com/questions/337351/two-keyboards-two-language-layouts
+    SEE: r.touchpad-tgl for scripts
+    FIND laptop kbd from 'xorg logs' or interactively with 'xinput query-state'
+      ? 'AT Translated Set 2 keyboard' BUT how to find it in general case for any laptop ?
+    BET: apply setxkbmap only to choosen kbd, and keep core device unaffected
+      BAD: impossible -- as I need layout/variant and latching applied also to kinesis
+    SEE
+      http://superuser.com/questions/75817/two-keyboards-on-one-computer-when-i-write-with-a-i-want-a-us-keyboard-layout
+      https://wiki.archlinux.org/index.php/Keyboard_configuration_in_Xorg
+      http://askubuntu.com/questions/337351/two-keyboards-two-language-layouts
+    REF http://www.linux.org/threads/cool-tricks-with-xinput-device.6178/
+      = cool tricks
   [_] FIND: why kinesis have 2 devices in xinput ?
     maybe, thats why r.xkb drops after opening inner drive

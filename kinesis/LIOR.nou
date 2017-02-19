@@ -1,0 +1,22 @@
+USAGE: compatible with my general xkb
+
+Modifiers
+|   actual/inner  |    function    |    key caps
+| --------------- | -------------- | -----------------
+| [delete]>[lalt] | Super (XMonad) | LCommand -> Delete
+| [lalt]>[lctrl]  | Overlay (Xkb)  | LAlt -> LCommand
+| [lctrl]>[lwin]  | Alt/Meta       | RWin -> LAlt :: *direct edit*
+
+| [rctrl]>[ralt]  | Lang en/ru     | LCommand -> RAlt :: *direct edit*
+| [pup]>[rctrl]   | vim: easy C-b  | RAlt -> PgUp
+| [pdown]>[escape]| vim: easy C-[  | Esc -> PgDn
+
+Duplicate shadowed keys on keypad level
+  [kp-delete]>[delete]
+  [kp-pup]>[pup]
+  [kp-pdown]>[pdown]
+
+NOTE:(keep):
+  intl-\ | Multi_key
+  rwin   | Lvl3 / VBox
+  caps   | LCtrl
