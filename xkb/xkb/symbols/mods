@@ -40,27 +40,36 @@ xkb_symbols "switches"
     key.type = "ONE_LEVEL";
 
     key <CAPS> { [ Control_L ] };
-    key <RWIN> { [ Control_R ] };
-    modifier_map  Control { <CAPS>, <RWIN> };
+    key <RCTL> { [ Control_R ] };
+    modifier_map  Control { <CAPS>, <RCTL> };
     // modifier_map  Lock { Caps_Lock };
 
     key <LWIN> { type="TWO_LEVEL", [ Alt_L, Meta_L ] };
     modifier_map  Mod1 { <LWIN> };
+    // key <RWIN> { type="TWO_LEVEL", [ Alt_R, Meta_R ] };
+    // modifier_map  Mod1 { <LWIN>, <RWIN> };
+
+    // ALSO: used for VirtualBox
+    key <RWIN> { [ ISO_Level3_Shift ] };
+    modifier_map  Mod5 { <RWIN> };
 
     key <LALT> { [ Super_L ] };
     key <SUPR> { [ Super_R ] };
     modifier_map  Mod4 { <LALT>, <SUPR> };
 
-    // EXPL: xcape: -> Super_R, so dbl click-hold will cause lvl5
-    // BUT: I temporarily don't use ISO_Level5_Shift
-    // BUG: not dropping Super modifier when activates Control
-    key <RCTL> {
-        type="L2:SUPER",
-        [ ISO_Level3_Shift, Control_R ],
-        actions= [ SetMods(modifiers=LevelThree), LatchMods(clearLocks,modifiers=Control) ]
-    };
-    modifier_map  Mod5 { <RCTL> };
-    key <MENU> { [ Hyper_L ] };  // For VirtualBox
+    /// DISABLED: for kinesis to press <C-b>
+    /// EXPL: xcape: -> Super_R, so dbl click-hold will cause lvl5
+    /// BUT: I temporarily don't use ISO_Level5_Shift
+    /// BUG: not dropping Super modifier when activates Control
+    // key <RCTL> {
+    //     type="L2:SUPER",
+    //     [ ISO_Level3_Shift, Control_R ],
+    //     actions= [ SetMods(modifiers=LevelThree), LatchMods(clearLocks,modifiers=Control) ]
+    // };
+    // modifier_map  Mod5 { <RCTL> };
+
+    // key <MENU> { [ Menu ] };
+    key <MENU> { [ Hyper_L ] };  // For VirtualBox; ALT: RWIN:lvl3
     modifier_map  Mod3 { <MENU> };
 
     // Obtain one more modifier by swaping Hyper
