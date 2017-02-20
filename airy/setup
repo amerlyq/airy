@@ -14,12 +14,10 @@ build=$repo/_build
 ./ctl/cache-links -t "$build/bin" -q
 [[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH  # :r.airy-*
 
+linkcp -q {,~/.}shell
 linkcp -q ./pathes "$build/cfg/pathes"
 
 linkcp -q "$build/bin" ~/.bin
 linkcp -q "$build/cfg" ~/.config/airy
-# BAD: can't be used independent in ./pkg/shell/setup
-# -- due to $PATH (linkcp) on clean setup
-linkcp -q "$repo/shell" ~/.shell
 
 r.airy-cache-alias
