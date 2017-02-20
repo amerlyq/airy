@@ -74,7 +74,7 @@ ajoin() { local IFS="$1"; shift; echo "$*"; }
 
 cfgOpt(){ [[ ${CFG_OPTS-} =~ [$*] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
 cfgOptAdd() { local a=$* o=${CFG_OPTS-}; a=${a// }; CFG_OPTS=${o//[$a]}$a; }
-cfgNo(){ ! cfgOpt $1; }  # ALT:CHECK: cfgOpt ^ab
+cfgNo(){ ! cfgOpt "$@"; }  # ALT:CHECK: cfgOpt ^ab
 
 distro(){
     # ALT: Check distro name and version: lsb_release -si

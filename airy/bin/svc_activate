@@ -1,6 +1,5 @@
 #!/bin/bash -eu
-source ~/.shell/func.d/system
-trap_errors
+set -euo pipefail
 
 # THINK: rename to 'r.systemd-cfg' or cross-pltf wrapper 'r.svc-cfg'
 # BAD: systemd units can't be used for init.d and upstart
@@ -16,18 +15,19 @@ envsubs=0
 A=''  # system-wide
 
 # copy/enable/re-*/run/user
-OPTIND=1; while getopts 'ceEf:rRu' o; do case $o
-in u) A=--user; sudo=''; dst=~/.config/systemd/user
+opts=; while getopts 'ceEf:rRu' o; do case $o in :|'?') exit 1
+;; u) A=--user; sudo=''; dst=~/.config/systemd/user
       # ALT:CHECK:(faster startup) /etc/systemd/user
 ;; f) from=$OPTARG
 ;; E) envsubs=1
-;; :|'?') die 1
-esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
-(($#)) || die 1 "No svc list"
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
+(($#)) || { echo "No svc list"; exit 1; }
 
 
 # NOTE: find out current init system
-if has_pr systemd-notify && systemd-notify --booted; then
+if hash systemd-notify &>/dev/null \
+  && systemd-notify --booted; then
 
 doreload(){ $sudo systemctl $A daemon-reload; }
 isenable(){ systemctl $A is-enabled "$@" &>/dev/null; }
@@ -55,18 +55,18 @@ rel_search(){ local f=$1
   if [[ ${f:0:1} == / ]]; then f=$f
   elif [[ -f $from/$f ]]; then f=$from/$f
   elif [[ -f ./$f ]]; then f=$f
-  else die 1 "Not found '$f'"
+  else { echo "Not found '$f'"; exit 1; }
   fi && printf '%s\n' "$(readlink -e "$f")"
 }
 
 copyall(){ local t tmp have_changed=0
-  tmp=$(dtemp 'svc')
+  tmp=${TMPDIR:-/tmp}/svc
   trap "rm -rf '$tmp'" RETURN
   for f in "$@"; do
     f=$(rel_search "$f")
     if ((envsubs)); then
       t=${tmp:?}/${f##*/}
-      env-subs "$f" "$t"
+      env-subs -p "$f" "$t"
       f=$t
     fi
     t=${dst:?}/${f##*/}
@@ -82,18 +82,18 @@ copyall(){ local t tmp have_changed=0
 
 enableall(){ for f in "$@"; do
   if ! isenable "$f"; then doenable "$f"
-  elif cfgOpt f; then reenable "$f"
+  elif has f; then reenable "$f"
   else echo "-> @ $f"; fi 2>&1
 done;}
 
 runall(){ for f in "$@"; do
   if ! isrun "$f"; then dorun "$f"
-  elif cfgOpt R; then rerun "$f"
+  elif has R; then rerun "$f"
   fi 2>&1
 done;}
 
 
 # EXPL: split in stages -- to take dependency into account
-cfgNo c  || copyall "$@"
-cfgNo e  || enableall "$@"  # OR:ALSO: && $sudo systemctl $A disable "$f"
-cfgNo rR || runall "$@"
+has c && copyall "$@"
+has e && enableall "$@"  # OR:ALSO: && $sudo systemctl $A disable "$f"
+! has rR || runall "$@"
