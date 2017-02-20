@@ -1,0 +1,8 @@
+Copy directory
+  NOTE: trailing slash is mandatory to use dir content only
+  $ rsync -rnvv dir1/ dir2
+  http://unix.stackexchange.com/questions/102211/rsync-ignore-owner-group-time-and-perms
+  $ rsync -rnvv --size-only --progress dir1/ dir2
+  :shell -w rsync -rain --size-only %f/ %F
+  $ rsync -rvz --no-perms --no-owner --no-group ...
+  https://www.electrictoolbox.com/rsync-ignore-existing-update-newer/
