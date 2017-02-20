@@ -19,6 +19,7 @@ Settings have no effect
   $ xrandr --dpi 101 && xdpyinfo G 'dim|reso'
     dimensions:    1920x1080 pixels (482x271 millimeters)
     resolution:    101x101 dots per inch
+      !! used in qutebrowser for header/footer status
   $ xrdb -query G dpi
     Xft*dpi:        96
   $ v ~/.Xresources && xrdb -load ~/.Xresources && xrdb -query G dpi
@@ -38,6 +39,10 @@ Seems like 'fontconfig' fixes 'pixelsize' and not 'size'
     Apparently you cannot change the <size> of a font, but setting its <pixelsize> works perfectly. Very useful to force a given size on bitmap fonts.
       ? MAYBE: my current font is fixed (hand-adjusted) => therefore pixelsize always 16 ?
         => TRY: edit font params in fontconfig OR symlink to 10-scale-bitmap-fonts.conf (already have?)
+  [_] TRY: compare visual font size in 'pango-view' and 'st'
+    NOTE: in r.playonlinux despite xrandr resize, 'st' font kept at reasonable size
+      xrdb -DMAIN_DPI=141 -load ~/.Xresources
+      r.video-single 2
 
 SEE:
   https://encrypted.google.com/search?q=linux+fontconfig+wrong+dpi

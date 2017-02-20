@@ -21,7 +21,8 @@ if [[ -n $1 && ${#1} -le 2 ]]; then action=$1; shift; fi
 
 if ((!$#)); then
     printf "LABELS: " && (cd /dev/disk/by-label 2>/dev/null && ls --color=auto || echo)
-    printf "DISKS:  " && (cd /dev && ls sd?[0-9] 2>/dev/null || echo)
+    printf "DISKS:  " && (cd /dev && ls sd? 2>/dev/null || echo)
+    printf "PARTS:  " && (cd /dev && ls sd?[0-9] 2>/dev/null || echo)
     printf "SAMBA:  " && (sed -rn '/^\s+(\w+)\)\s+dosamba.*/s//\1/p' "$0" | xargs || echo)
     printf "ACTIVE: " && (ls --color=auto "$mnt") && echo || echo
     exit
