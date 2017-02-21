@@ -18,35 +18,13 @@ symlinks and terminal tools, preserving your system as much as possible.
 ```bash
 mkdir -p ~/aura && cd ~/aura
 git clone https://github.com/amerlyq/airy
-cd airy && ./setup -iu
+cd airy
+make           # install basic 'airy' symlinks
+make all       # clean all and then install pkgs
+make continue  # to continue installation after error was fixed
 ```
 Go make some tea, in one minute basic shell tools will be installed.
 
-System update after long term
-```bash
-./update
-./setup -fri
-./setup -iu
-```
-
-Need more modules from some subdirectory?
-```bash
-./update      # updates all pkgs
-./setup       # after changing setup scripts -- refreshes system configuration
-./setup -u    # additionally executes -u script sections (sudo/update/etc)
-./setup -u /  # choose currently preferred applications
-./setup -iu   # once a week -- installs packages and update their configs
-./setup -riu  # after adding new module or changing mods list in profile
-./setup -fri  # re-install pkgs one-by-one (when replacing by alternatives)
-# Install all modules:
-./setup -iu  dev         # with exact name '*/dev'
-./setup -iu  dev/        # all inside '*/dev/*' w/o 'dev' itself
-./setup -iu /dev/        # only 'cfg/dev' in root dir
-./setup -iu hex firefox  # multiple from any subdir
-```
-> Better idea would be to create your own mods profile and keep it safe.
-
-NOTE: don't forget to update vim plugins by ./install -u once in a while
 
 ## Private parts ##
 
@@ -72,22 +50,23 @@ repo
 Main `repo/setup` must be launched on clean system before everything else.
 It will symlink your choosen profile/modules and launches system setup.
 ```bash
-#!/bin/bash -e
-cd $(dirname $(readlink -m ${0}))
-main=~/aura/airy
-cache=${CURR_DIR_CACHE:-~/.cache/airy}
+#!/bin/bash -eu
+cd "$(dirname "$(readlink -e "$0")")"
+
+airy=~/aura/airy
+[[ -d $airy ]] || (mkdir -p "${airy%/*}" &&
+  git clone 'https://github.com/amerlyq/airy' "$airy")
+
+config=${XDG_CONFIG_HOME:-~/.config}/airy
+[[ -d ~/.bin && -L $config ]] || (cd "$airy" && make install)
+[[ -L $config ]] || (echo 'Err: $config must be symlink'; exit)
+
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
+
 repo=$(git rev-parse --show-toplevel)
-mkdir -p "$cache/mods"
-
-ln -svfT "$PWD/prf" "$cache/prf"
-ln -svfT "$PWD/prf/$(hostname)" "$cache/profile"
-ln -svfT "$PWD/mods" "$cache/mods/${repo##*/}"
-## OR: link only choosen modules
-# ln -svfT "$PWD/mods/fonts" "$cache/mods/fonts"
-
-[[ -d $main ]] || (mkdir -p "${main%/*}" &&
-    git clone 'https://github.com/amerlyq/airy' "$main")
-"$main/setup" -riu
+linkcp "$repo/prf" "$config/prf"
+linkcp "$repo/prf/$(hostname)" "$config/profile"
+linkcp "$repo/mods" "$config/mod/${repo##*/}"
 ```
 
 In such way your own clean system setup will be as simple as:
@@ -109,8 +88,7 @@ These text files usually non-executable and sourced by scripts explicitly.
 ```bash
 # vim: ft=sh
 CURR_PROF=home
-PKG_LIST=(shell shell/ dev dev/ term/ xorg xorg/ net/ /)
-PKG_SKIP=(sql latex nfs tftp skype serial xmind urxvt i3)
+PKG_LIST=( airy pacman git zsh vim ranger tmux xorg )
 
 ### Git ###
 MAIN_NAME="<Full Name>"
@@ -118,19 +96,12 @@ MAIN_MAIL="username@gmail.com"
 MAIN_SKYPE="<username>"
 ```
 
-You can take advantage of bash expansion and compose more complex package set:
-```bash
-PKG_LIST=( /shell{,/} /core{,/init} /io/{audio,touchpad,logitech} /dev{,/{python,ruby,etc,git,hg}} /{term,re,xorg,net,media,browsers}{,/} /game / )
-
-PKG_SKIP=(/browser/{surf,uzbl,vimb} /dev/{eclipse,java,latex,sql,tizen} /io/{jtag,serial} /media/{skype,xmind} /net/{nfs,synergy,tftp} /term/urxvt /xorg/i3)
-```
-
 Profiles can be nested/inherited.
 This allows to distribute settings and nicely reuse parts of configs for similar hosts.
 ```bash
 source "${CURR_DIR_PRF:?}/home" || return
 CURR_PROF=home_vbox
-PKG_SKIP+=( /browser/ )
+PKG_SKIP+=( browser )
 MAIN_MAIL="vboxuser@email.com"
 ```
 

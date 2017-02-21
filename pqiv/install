@@ -1,7 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst pqiv
+if distro arch; then
+  aur_inst pqiv
+fi
 
 # BET:TRY: pqiv + libspectre poppler imagemagick
 # https://github.com/phillipberndt/pqiv/

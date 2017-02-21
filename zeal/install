@@ -1,0 +1,9 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  aur_inst zeal-git
+
+elif distro ubuntu; then
+  pkg_inst zeal
+fi

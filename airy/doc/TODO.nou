@@ -4,6 +4,10 @@ ALT:(dot-mgmt)
 !! NOTE: all [airy] system uses only local ./_build paths
 !! NOTE: use $ sudo -k $ to test applying continuously
 
+BAD: env-subs breaks when VAR don't exists = like $DISPLAY by SSH
+BUT: we can't define it to :0 -- as that var is essential for setup
+  and setup _must_ break when smth isn't right
+WARN: how to be on clean system from console -- for initial setup ?
 
 pkglst
   !!! [_] remove sourcing ./pkgs file from 'profile' with reading by 'readarray'
@@ -106,6 +110,7 @@ structure
       [_] ALT: link all ./pkg/* w/o mod file in root --> ./_build/{wrong|trash|empty|bad}
     [_] ALSO: search all non-'pretty' for that regex
       -- must source / traverse all mods and not only choosen ones from PKG_LIST
+    [_] WTF: when mods in diff dirs has same name and same tags? it's impossible to add them into same path name
   Abstraction: defaults -> ./mod -> ./pkg
     2017-02-09 [X] rename ./cfg -> ./pkg (for named main/aur pkgs only)
     2017-01-27 [X] rename ./my -> ./mod

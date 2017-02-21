@@ -1,15 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-#| wxHexEditor | gui hex edit / compare tool, can mark selection with tags
-#   * You can work with delete/insert bytes to file, more than once, without creating temp file!
-#   * Could open your devices on Linux, Windows or MacOSX.
-#   * Allows Linux Process Memory Editing operations
-#   * Has x86 disassembly support
-#   * Comparison of binary files (scroll two views at once), allows merge of near results.
-#   * Added Sorted Tag Saving / Loading
-#   * Save selection as a dump file feature for make life easier.
-
 pkg_inst dhex  # small ncurses binary diff programm with configurable controls
 pkg_inst bbe  # binary sed
 aur_inst hexgrep # http://xyne.archlinux.ca/projects/hexgrep/
@@ -20,18 +11,3 @@ has_pr X || die
 
 pkg_inst meld  # cool text/directory comparator
 pkg_inst bless
-
-if distro arch; then
-  aur_inst wxhexeditor-git
-
-elif distro ubuntu; then
-  pkg_inst wxhexeditor
-fi
-
-# PM="wxHexEditor.tar.bz2"
-# PM_SCR="$CURR_DIR_PKG/$PM"
-# wget_it "http://sourceforge.net/projects/wxhexeditor/files/latest/download?source=files" "$PM"
-# rm -f "$PM_SCR"
-# cd "$CURR_DIR_PKG"
-# tar xvfj "$PM_SCR"
-# # bash "${PM_SCR%.tar.*}.sh"

@@ -2,7 +2,7 @@
 shopt -s nullglob
 
 while getopts 'qt:p:' o; do case $o in :|'?') exit 1
-;; t) bin=$(readlink -e "$OPTARG")
+;; t) bin=$(readlink -m "$OPTARG")
 ;; p) prf=$OPTARG
 ;; q) quiet=1
 esac; done; shift $((OPTIND - 1))

@@ -1,0 +1,17 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  aur_inst wxhexeditor-git
+
+elif distro ubuntu; then
+  pkg_inst wxhexeditor
+fi
+
+# PM="wxHexEditor.tar.bz2"
+# PM_SCR="$CURR_DIR_PKG/$PM"
+# wget_it "http://sourceforge.net/projects/wxhexeditor/files/latest/download?source=files" "$PM"
+# rm -f "$PM_SCR"
+# cd "$CURR_DIR_PKG"
+# tar xvfj "$PM_SCR"
+# # bash "${PM_SCR%.tar.*}.sh"
