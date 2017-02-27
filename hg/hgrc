@@ -88,12 +88,18 @@ unified = 8
 
 [extdiff]
 # configure extended diff to use colordiff (requires colordiff installed in your system)
+cmd.ddiff = diff
+opts.ddiff = -ur
 cmd.cdiff = colordiff
 opts.cdiff = -uprN
 cmd.vdiff = r.vim
 opts.vdiff = -d
 cmd.meld = meld
 opts.meld =
+# NOTE: diff for review filtering based on changes
+cmd.wdiff = git
+opts.wdiff = diff --no-index --word-diff
+# SEE: git diff -S/-G, TRY:  --word-diff=porcelain
 
 [histedit]
 ## So 'hg histedit' could work w/o args

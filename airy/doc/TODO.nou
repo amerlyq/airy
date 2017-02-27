@@ -42,6 +42,8 @@ pkglst
     [_] create table: name, repo/name, fullpath
     [_] sort table topologically
     [_] reuse these parts of funcs orthogonally everywhere in airy
+    [_] after tsort by deps graph, use numeric stable sort by priority 'coef'
+      = so, pacman/vim/ranger will be at the top
   [_] DEV: individual 'deps:' in setup/install/update/recache
     [_] 'wide' mode : gather all 'deps:' in single list before processing
     [_] 'depth' mode : use 'deps:' separately
@@ -59,6 +61,31 @@ pkglst
     when using 'r.airy -d' (NEED: replace '-d' for recache by smth else)
     [_] WARN: must be added after reading cached list, not before !!
       BUT: all mods must be gathered from all locations
+  [_] BET: poll 'defaults' script after each *mod* to populate symlink immediately
+    Compare *mod* with user defaults config
+    $ cat private/defaults
+      # <mod> <sym1> [<sym2>..]
+      vim editor
+      st r.t
+    THINK: use general 'defaults' in *airy* and augment/override by user
+
+
+filter-mods
+  [_] script 'cache-mods' to gen all mods *db*
+  [_] CHG: filter-mods :: grep *db* instead of using 'find -regex'
+    [_] match mods by //name and //sub/path
+    [_] allow explicit ./rel and /full paths to mods -- even if not in *db*
+  [_] FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
+    ~ err on any entry not found in cached *db*
+  [_] boolean ops priority :: exp-skip > exp-list > imp-skip > imp-list
+    # list -- skip => interception
+    path/mod -- path/ => path/mod
+    path/mod -- path/mod => _none_
+  [_] THINK: find errors: *mods* with same name, but different goal
+    + user private settings must be allowed as pre/post hooks
+      => THINK: sep private user mods (as any other repo)
+        make explicit user settings only as ./pre , ./post hooks
+    - but diff mods with same name -- aren't allowed
 
 
 maint
