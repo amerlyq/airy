@@ -124,6 +124,7 @@ endf
 "   Replace all lines currently hidden inside closed folds
 "   with a single line representing 'foldtext'.
 " http://stackoverflow.com/questions/30583388/how-can-i-save-in-vim-a-file-with-the-actual-fold-text-43-lines
+" DEV: print in new buffer to work with large/nomodify files
 fun! s:RenderClosedFolds()
   if line('.') == foldclosed('.')
     let l:result = foldtextresult('.')
