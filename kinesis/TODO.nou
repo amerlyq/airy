@@ -40,3 +40,19 @@ TODO
       = cool tricks
   [_] FIND: why kinesis have 2 devices in xinput ?
     maybe, thats why r.xkb drops after opening inner drive
+
+
+BUG
+  don't work under usb20 on old laptop
+    https://bugs.archlinux.org/task/45427#comment136621
+    https://bbs.archlinux.org/viewtopic.php?pid=1539348#p1539348
+    http://superuser.com/questions/1010284/kinesis-advantage-not-being-detected-on-linux
+    https://github.com/systemd/systemd/issues/340
+
+    https://www.reddit.com/r/archlinux/comments/3fi0i0/question_about_udev_rules_for_usb_keyboards/
+      $ lsusb  -v
+    $ udevadm monitor --environment --udev  # on unplug
+    $ udevadm info -a -p $(udevadm info -q path -n /dev/video2)
+      $ udevadm info -a -p /devices/pci0000:00/0000:00:14.0/usb1/1-6
+      ATTRS{idProduct}=="0002"
+      ATTRS{idVendor}=="1d6b"
