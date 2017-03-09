@@ -20,12 +20,31 @@ THINK
     [kp-end]>[end]
   [_] more easy usage for hardware keypad overlay
     [lctrl]>[kpshift]
-    [home]>[lwin]
-    [end]>[escape]
+    [kp-lctrl]>[kpshift]  # kpshift must be remapped on both levels
+    1:
+      [home]>[escape]
+      [end]>[lalt]
+      # BAD: can't press kpshift and them by single finger
+      [kp-home]>[home]
+      [kp-end]>[end]
+    2:
+      [home]>[lwin]
+      [end]>[escape]
 
 
 TODO
+  [_] REQ: ask why conditioning is necessary
+    ? only to init right file format ?
+    ? or there is some symmetrical inner workings ?
+  [_] TRY:DEV: test-script with corruption > 3/5 of tries
+  [_] CHECK: if kbd corrupts in charge port even w/o manual edit
+  [_] hex cmp fs dumps 'broken.bin' with 'working.bin'
+    ALSO: cmp different 'broken.bin' between themself
   [_] CHECK: how to be with udev rule, when kbd plug-in/out w/o Xorg started ?
+    G: udev keyboard layout
+      bind per kbd 'id' (use VAR $DEVICE* from udev) -- for embedded kbd ~~ like r.monitor-edid
+      http://askubuntu.com/questions/337411/how-to-permanently-assign-a-different-keyboard-layout-to-a-usb-keyboard
+    BUT kinesis have two 'xinput' devices -- how to detect the main one ?
   [_] setxkbmap per kbd (to remain kinesis unaffected)
     SEE: r.touchpad-tgl for scripts
     FIND laptop kbd from 'xorg logs' or interactively with 'xinput query-state'
