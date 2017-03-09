@@ -24,6 +24,12 @@ TODO:
       => 100% -- immediate seek hangs out playback indefinitely
     MAYBE:BUG? in mpd 'curl' plugin when accessing non-streaming online files w/o resume download support?
 
+  [_] BUG: pulse no audio
+    ~ MAYBE: can't connect to pulse user session -- conflicts
+      < systemd --user mpd
+      < user session activated before login
+      < pulse available only per user session
+    TRY: https://rudd-o.com/linux-and-free-software/how-to-make-pulseaudio-run-once-at-boot-for-all-your-users
   [_] BUG: mpd+alsa conflicts with any other sound source (like pulseaudio or mpv+alsa)
     G: mpd alsa no sound
     http://unix.stackexchange.com/questions/64914/mpd-no-audio-output-with-pulseaudio-no-mixing-with-alsa

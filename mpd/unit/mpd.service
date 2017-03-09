@@ -1,9 +1,15 @@
+# .include /usr/lib/systemd/system/mpd.service
+# [Service]
+# User=%{USER}
+# PAMName=system-local-login
+
 [Unit]
 Description=Demon - Music Player Daemon
-After=network.target sound.target mpd.socket
+After=network.target sound.target
 
 [Service]
 Environment=XDG_CONFIG_HOME=%h/.config
+Type=notify
 ExecStart=/usr/bin/mpd --no-daemon
 
 # allow MPD to use real-time priority 50
