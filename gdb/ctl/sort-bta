@@ -1,0 +1,14 @@
+#!/bin/sh -eu
+# EXPL: sort GDB backtrace 'tread apply all bt' to compare by vimdiff
+# NEED: \n at beg of file $1
+
+test -t 0 && { exec < "$1"; shift; }
+test -t 1 && { exec > "${1:-/dev/stdout}"; shift; }
+
+exec sed -r '
+  s/^$/\x00/
+  /^(Thread|Backtrace|warning:)\s/d
+  s/^#[0-9]+\s+(0x[0-9a-f]+\s+in\s+)?//
+  s/\s\(.*//
+  s/0x[0-9a-f]+/0x@/g
+' | sort -zsd | tr -d '\0'
