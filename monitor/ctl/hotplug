@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 # USAGE:
-#   env $ [DEVPATH=..] [CURR_MONITORS=..] ./$0
+#   env $ [DEVPATH=..] [MONITOR_XRANDR=..] ./$0
 # stdin $ echo '[<sha1>|*] eDP1 --primary' | ./$0
 
 set -o pipefail
@@ -10,23 +10,26 @@ set -o noglob
 reflow(){ sed 's/#.*$//;s/^\s*//;s/\s*$//;/^$/d'; }
 [[ -t 0 ]] || config=$(reflow)
 if [[ -z ${config-} ]]; then
-  [[ ${CURR_MONITORS-} ]] || source ~/.shell/profile
-  config=$(reflow <<< "$CURR_MONITORS")
+  [[ ${MONITOR_XRANDR-} ]] || source ~/.shell/profile
+  config=$(reflow <<< "$MONITOR_XRANDR")
 fi
 
 # Find connected active displays
 xlist(){ xrandr -q | sed -rn '/^([[:alnum:]-]+) '"$1"'.*/s//\1/p'; }
 conn=( $(xlist 'connected ') )
 discon=( $(xlist 'disconnected [^(]') )
-active(){ [[ " ${conn[@]} " =~ " $1 " ]]; }
 shas=( $(r.monitor-edid-hash | cut -f1 -d' ') )
-has(){ [[ " ${shas[@]} " =~ " $1 " ]]; }
+active(){ [[ " ${conn[@]} " =~ " $1 " ]]; }   # HACK: match whole words
+has(){ [[ " ${shas[@]} " =~ " $1" ]]; }       # HACK: match <beg> of any word
+
+# THINK: deprecate '*', implying it by default, if no sha1 found
+#   BAD: can be confused with output abbrev
 
 # Construct xrandr arguments
 add(){ cmd+=( --output "$1" "${@:2}" )
   [[ " ${@:2} " =~ " --off " ]] || cmd+=( --auto ); }
 parse_line(){
-  if [[ $1 =~ [0-9a-f]{40} ]]; then
+  if [[ $1 =~ ^[0-9a-f]{8,40}$ ]]; then
     has "$1" || return 0 && shift
   elif [[ $1 == '*' ]]; then shift; fi
   active "$1" || return 0 && add "$@"

@@ -34,12 +34,20 @@ DEV r.monitor-dpi
 
 
 TODO
+  [_] THINK:CHECK:BAD? if two identical monitors have the same edid/hash ?
+    => how to construct their `id` ?
+  2017-03-12 [X] DEV: allow matching on first 8..40 symbols instead of whole edid-hash
   [_] BUG: writes bad `DisplaySize` if '--primary' external monitor
   [_] BUG: if plugged on boot -- enabled as mirror and r.monitor-hotplug don't work
   [_] CHECK: how to be with udev rule, when monitor plug-in/out w/o Xorg started ?
   2017-01-08 [X] can't wake up after dpms
     ::: switch 'Input' to 'HDMI' only (no 'auto')
   [_] BUG: again can't wake up -- if HDMI primary and only eDP1 off
+    CHECK: after drivers upgrade
+    https://wiki.archlinux.org/index.php/intel_graphics#DRI3_issues
+      + https://bbs.archlinux.org/viewtopic.php?id=215930
+      https://bugs.chromium.org/p/chromium/issues/detail?id=370022
+    G: linux hdmi dpms can't wake up
   [_] DEV: in hotplug replace dpi depending on --primary
   [_] FIX: r.video-single apply to primary desktop with named profile instead of percent
     * main -- general max auto size
