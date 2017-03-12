@@ -88,7 +88,7 @@ These text files usually non-executable and sourced by scripts explicitly.
 ```bash
 # vim: ft=sh
 CURR_PROF=home
-PKG_LIST=( airy pacman git zsh vim ranger tmux xorg )
+AIRY_MODS=( airy pacman git zsh vim ranger tmux xorg )
 
 ### Git ###
 MAIN_NAME="<Full Name>"
@@ -101,7 +101,7 @@ This allows to distribute settings and nicely reuse parts of configs for similar
 ```bash
 source "${CURR_DIR_PRF:?}/home" || return
 CURR_PROF=home_vbox
-PKG_SKIP+=( browser )
+AIRY_SKIP+=( browser )
 MAIN_MAIL="vboxuser@email.com"
 ```
 

@@ -71,6 +71,10 @@ dtemp(){ dpwdsfx "${TMPDIR:-/tmp}" "$@"; }
 
 # ====================== Configs =====================================
 ajoin() { local IFS="$1"; shift; echo "$*"; }
+# USAGE:(array) cjoin 'MY_VAR[@]' OR:(verify input): local a="${1:?}[@]"
+cjoin(){ set -- ${!1:+"${!1}"}; (($#))||return 0
+  printf -- '--ignore '; (IFS=,;printf '%s\n' "${*// /\\ }")
+}
 
 cfgOpt(){ [[ ${CFG_OPTS-} =~ [$*] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
 cfgOptAdd() { local a=$* o=${CFG_OPTS-}; a=${a// }; CFG_OPTS=${o//[$a]}$a; }

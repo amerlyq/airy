@@ -9,7 +9,7 @@ has_pr X || die
 #   https://community.skype.com/t5/Linux/Skype-group-chat-not-working-anymore/td-p/3987288
 
 if distro arch; then
-    aur_inst skype # multilib only
+    aur_inst skype  # multilib only  # DEPS: lib32-qt4
     # aur_inst skypeforlinux-bin
     # DEPRECATED: sni-qt  # tray icon for skype
     # OBSOLETE:(cfg/media/pidgin already installed skypeweb plugin)

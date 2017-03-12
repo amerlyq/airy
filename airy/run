@@ -30,8 +30,8 @@ build=$repo/_build
 
 ### Profile
 source ~/.shell/profile
-(( ${#mods[@]} )) || mods=( "${PKG_LIST[@]}" )
-(( ${#skip[@]} )) || skip=( "${PKG_SKIP[@]}" )
+(( ${#mods[@]} )) || mods=( "${AIRY_MODS[@]}" )
+(( ${#skip[@]} )) || skip=( "${AIRY_SKIP[@]}" )
 
 # BUG:FIX: when _build/mods generated -- '-d' has no effect !
 has d && mods+=( defaults )
@@ -75,5 +75,5 @@ dopts=$(tr -cd "$dop" <<< "${opts-}")
 has "$dop" && r.airy-each -i $(has x && echo -r) -- \
   r.airy-do ${dopts:+"-$dopts"} <<< "$lmods"
 
-# DEV: add one of _[un]used tags by checking in PKG_LIST
+# DEV: add one of _[un]used tags by checking in AIRY_MODS
 ! has g || r.airy-link-tags -t "$build/tags" -f "$build/mods"

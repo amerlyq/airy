@@ -10,14 +10,15 @@ BUT: we can't define it to :0 -- as that var is essential for setup
 WARN: how to be on clean system from console -- for initial setup ?
 
 pkglst
+  2017-03-12 [X] rename private file ./pkgs -> ./mods
   !!! [_] remove sourcing ./pkgs file from 'profile' with reading by 'readarray'
     = (long operation -- sourced in each cfgsetup)
   [_] TODO: mark as obsolete (or another word instead of 'obsolete' -- SEE how AUR marks such old cases)
     VIZ: surf uzbl vimb eclipse java latex sql tizen webex synergy urxvt i3 tray
-  [_] TODO: check PKG_LIST on errors (err on inexistant pkgs and warn on duplicates)
+  [_] TODO: check AIRY_MODS on errors (err on inexistant pkgs and warn on duplicates)
     => keep 'r.airy-find-pkgs' script, but replace it by direct access to paths in ./pkg/* by ./run
   [_] apply unique to non-sorted lists -- to reorder some items in top of list
-    E.G. PKG_LIST=( xorg ... sorted list | unique )
+    E.G. AIRY_MODS=( xorg ... sorted list | unique )
   [_] airy dirs structure
      ls ./airy/* -- flat list
     _build
@@ -28,9 +29,9 @@ pkglst
   2017-02-09 [X] TODO: install, notes => redistribute
   [_] TODO: vim diff between list ./pkg/* and file ./pkgs to easily see and add new pkgs
     => embed into makefile
-  [_] TODO: compare all pacman pakages from PKG_LIST with installed on system
+  [_] TODO: compare all pacman pakages from AIRY_MODS with installed on system
     and suggest to user to remove excessive ones
-    (after reducing PKG_LIST to maintain cleaner system)
+    (after reducing AIRY_MODS to maintain cleaner system)
   2017-02-09 [X] FIND: soft to sort deps graphs by before/after -- maybe there are some in AUR ?
     $ sed 'deps' | tsort
       https://en.wikipedia.org/wiki/Tsort
@@ -53,7 +54,7 @@ pkglst
     * necessary at 'setup' and at 'runtime'
   [_] TODO!!! reorder pkg: firstly -- the most necessary tools (zsh,vim,ranger)
     = so even if system breaks, it must become somewhat more usable then default to fix all troubles
-    => ENH: append to PKG_LIST instead of overwrite
+    => ENH: append to AIRY_MODS instead of overwrite
       * HACK:(non-robust): make reasonable default group with necessary deps in default system ~/.shell/profile
         BUT: I can't enforce 'xorg' to be present on all systems
           ? => therefore reasonable default is impossible ?
@@ -75,7 +76,7 @@ filter-mods
   [_] CHG: filter-mods :: grep *db* instead of using 'find -regex'
     [_] match mods by //name and //sub/path
     [_] allow explicit ./rel and /full paths to mods -- even if not in *db*
-  [_] FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
+  [_] FIXME: check wrong entries in AIRY_MODS/SKIP (like mistake with 'browsers')
     ~ err on any entry not found in cached *db*
   [_] boolean ops priority :: exp-skip > exp-list > imp-skip > imp-list
     # list -- skip => interception
@@ -84,7 +85,18 @@ filter-mods
   [_] THINK: find errors: *mods* with same name, but different goal
     + user private settings must be allowed as pre/post hooks
       => THINK: sep private user mods (as any other repo)
-        make explicit user settings only as ./pre , ./post hooks
+        [_] make explicit user settings only as ./pre , ./post hooks
+          OR: extension ./setup-pre, ./setup-post and complete override by ./setup
+        [_] ALT: use number prefix like in 'config.d' for relative reordering
+          +++ determine order between all hooks/extensions/overrides
+          * < 50-* = pre hooks
+          * = 50-* = airy mods (assign as automatic DFL value, read from VAR in *airy*)
+          * > 50-* = post hooks
+          BET: multiple hook points 20/50/80 for hooks between op levels
+            = (symlinks, gens, etc) -- *mod*-specific, if general isn't possible
+          BET: sfx instead of prf :: *-40 for sorting
+        [_] TRY:ALSO: sep numbering/ordering for install/setup/update/recache
+        [_] rename private ./mods -> ./hooks ?
     - but diff mods with same name -- aren't allowed
 
 
@@ -112,8 +124,8 @@ maint
       * aggregate pkg_inst, etc to ./install | ./update
       * parallel execution for individual ./update
       * gather all aliases to dump
-  [_] ENH return err if single-word *mod* in PKG_LIST isn't unique throughout all mods
-    * check only PKG_LIST config
+  [_] ENH return err if single-word *mod* in AIRY_MODS isn't unique throughout all mods
+    * check only AIRY_MODS config
     * allowed to have multiple mods with same name in different locs (treated as the same mod)
       ? how to adequately order them ?
     * when prepending dash -- exclude previously added mod
@@ -136,7 +148,7 @@ structure
     [_] cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
       [_] ALT: link all ./pkg/* w/o mod file in root --> ./_build/{wrong|trash|empty|bad}
     [_] ALSO: search all non-'pretty' for that regex
-      -- must source / traverse all mods and not only choosen ones from PKG_LIST
+      -- must source / traverse all mods and not only choosen ones from AIRY_MODS
     [_] WTF: when mods in diff dirs has same name and same tags? it's impossible to add them into same path name
   Abstraction: defaults -> ./mod -> ./pkg
     2017-02-09 [X] rename ./cfg -> ./pkg (for named main/aur pkgs only)
@@ -171,7 +183,7 @@ structure
     ? ALSO:THINK: sep ./mymod for contents of ./bin and sparse functions ?
       => also *mod* in ./mymod  work as switch proxy to multiple providers (like browsers)
     ? beside ./mod need ./_obsolete dir
-    ? [_] ALT:USE symlinks to *mod* instead of 'PKG_LIST'
+    ? [_] ALT:USE symlinks to *mod* instead of 'AIRY_MODS'
       + no need for recursive 'find'
       + explicit list -- and user directly see which links were broken
       + sep rel symlins list can be commited to own repo
@@ -182,7 +194,7 @@ structure
     [$] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
     [_] add support for XDG_... env vars into 'cfgsetup' to determine symlink targets
   [_] instead of using ./prf/* files -- use separate pieces of profile in each private *mod*
-    * PKG_LIST is placed inside of *airy* mod
+    * AIRY_MODS is placed inside of *airy* mod
     * all profile pieces can be combined into single ./profile with non-exported environment for *airy*
     * even regular *mod* can contain pieces of profile inside of it
     * differs from ./env -- because ./env is always sourced into interactive sessions
@@ -224,6 +236,7 @@ update
     USE: --ignore pkg1,pkg2,...
     = android-*/mingw, texlive, libreoffice-fresh, ?firefox, wxhexeditor
     SEE: pacaur -Syu
+    ALT: use 'ignore' or 'skip' file in private dir
 
 
 linkcp
@@ -280,7 +293,7 @@ PKGMOD
     + this allows clean uninstall previous versions based on $pkgver
       >> remove cleaning for ./systemd/user and ./bin symlinks
     +++ can resolve deps graph between my own moduls
-      >> support any order of mods in PKG_LIST
+      >> support any order of mods in AIRY_MODS
     NEED: my own local AUR mirror for my mods only
       * pacman-like already built -- generate on first ./setup and rebuild all on changes
       * BET: aur-like build-on-demand -- but need access to

@@ -12,9 +12,9 @@ frgx(){ local p="\\b$*\\b"
   printf '%s\n' "$p"
 }
 
-# FIXME: check wrong entries in PKG_LIST/SKIP (like mistake with 'browsers')
-# CHECK: don't ignore explicit path inside PKG_LIST
-#   => even if it also contained in PKG_SKIP
+# FIXME: check wrong entries in AIRY_MODS/SKIP (like mistake with 'browsers')
+# CHECK: don't ignore explicit path inside AIRY_MODS
+#   => even if it also contained in AIRY_SKIP
 # DEV: sort user mods to be directly before mods from ./pkg
 #   -- to limit influence scope and to group mods with identical name
 filter_find() { local accept reject=''
