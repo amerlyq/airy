@@ -1,8 +1,8 @@
 # vim:ft=sh
 
-alias pacman-list-orphans='\pacman --query --deps --unrequired'
+alias pacman-list-orphans='command pacman --query --deps --unrequired'
 alias pacman-remove-orphans='sudo pacman --remove --recursive $(pacman-list-orphans)'
-pacman-list-explicit(){ \pacman --query --explicit --info | awk '
+pacman-list-explicit(){ command pacman --query --explicit --info | awk '
     BEGIN{FS=":"} /^Name|^Description/{print$2}
 '; }
 pacman-list-disowned(){
@@ -10,7 +10,7 @@ pacman-list-disowned(){
   local db=$tmp/db fs=$tmp/fs
   trap  'rm -rf "$tmp"' EXIT
   mkdir "$tmp"
-  pacman --quiet --query --list | sort --unique > "$db"
+  command pacman --quiet --query --list | sort --unique > "$db"
   find /bin /etc /lib /sbin /usr ! -name lost+found \
     \( -type d -printf '%p/\n' -o -print \) | sort > "$fs"
   comm -23 "$fs" "$db"
