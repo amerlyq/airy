@@ -25,7 +25,16 @@ VBox
    fi
 
 
+DEV r.monitor-dpi
+  [_] NEED diff dpi for monitors on diff distance
+    = user specified hashmap `mon[edid]=dpi`
+  [_] Switch all possible dpi at once
+    BAD qutebrowser body 'dpi' is unaffected and related only to screen width?
+  [_] For multiple 'DISPLAY=:0.1' switch dpi individually
+
+
 TODO
+  [_] BUG: writes bad `DisplaySize` if '--primary' external monitor
   [_] BUG: if plugged on boot -- enabled as mirror and r.monitor-hotplug don't work
   [_] CHECK: how to be with udev rule, when monitor plug-in/out w/o Xorg started ?
   2017-01-08 [X] can't wake up after dpms

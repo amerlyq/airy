@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+# USAGE: $ MAIN_DPI=192 r.monitor-dpi
+
+# WARN: must be executed after 'xrandr --primary' applied
+# NOTE: prefer dpi from --primary display
+[[ ${MAIN_DPI-} ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||:)
+xrdb ${MAIN_DPI:+-DMAIN_DPI=$MAIN_DPI} -load ~/.Xresources
+[[ -z ${MAIN_DPI-} ]] || xrandr --dpi "$MAIN_DPI"

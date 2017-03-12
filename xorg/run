@@ -29,6 +29,7 @@ foreach (@xout) {
 # HACK sort keys by output type and place primary as very first
 # BAD if no one is primary (like when startup with both plugged-in)
 #   => random choice of main on different systems
+# FIXME if single mon and no primary -> use that as primary
 @state = reverse sort { $a->{p} cmp $b->{p} } @state;
 
 # HACK limit to first output. FIXME DEV general way for multihead.
