@@ -19,13 +19,14 @@ pkglst
     => keep 'r.airy-find-pkgs' script, but replace it by direct access to paths in ./pkg/* by ./run
   [_] apply unique to non-sorted lists -- to reorder some items in top of list
     E.G. AIRY_MODS=( xorg ... sorted list | unique )
+    BET: use 'tsort' and raise err on repetition
   [_] airy dirs structure
-     ls ./airy/* -- flat list
-    _build
-    _obsolete  # ALT: use tags: obsolete instead and filter-out from auto-tag 'active'
-    _site  # aux gen from mods
-    _todo  # notes + tasks
-    airy   # mng 'airy' by itself -- add to ./pkgs
+    2017-03-12 [X] ls ./airy/* -- flat list
+    2017-03-12 [X] _build
+    [_] _obsolete  # ALT: use tags: obsolete instead and filter-out from auto-tag 'active'
+    [_] _site  # aux gen from mods
+    2017-03-12 [X] _doc  # notes + tasks
+    2017-03-12 [X] airy   # mng 'airy' by itself -- add to ./pkgs
   2017-02-09 [X] TODO: install, notes => redistribute
   [_] TODO: vim diff between list ./pkg/* and file ./pkgs to easily see and add new pkgs
     => embed into makefile
@@ -169,6 +170,7 @@ structure
   2017-02-09 [X] THINK: user's mod dir -- link into ./_build/user OR even ~/.config/airy -- as any other pr
   [_] create DFL ./tmpl/profile for *airy*
     -- can be deprecated by per-mod profile segments
+    USE profile 'override' by hooks from user mods
     # To keep template fileset with mods for new accounts
     * one very simple with small set of features
     * one rich with all settings
