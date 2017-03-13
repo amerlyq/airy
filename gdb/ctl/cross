@@ -28,6 +28,10 @@ if [[ ! -d $tmp ]] || ((refresh)); then
 fi
 cd "$tmp"
 
+# Log each session into sep files
+mkdir -p log
+ln -sfT "$tmp/log/$(date +%Y%m%d_%H%M%S).cfg" log.cfg
+
 cmd+=( -x init.cfg )
 # TODO: activate only on specific flags ?
 # if [[ -t 0 ]]

@@ -1,4 +1,4 @@
-# vim: ft=sh:ts=2:sw=2:sts=2:fdm=marker:fdl=1
+# vim: ft=sh
 source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
@@ -66,7 +66,7 @@ elif distro arch; then
     ayr_inst(){ do_if -c 'yaourt -S --needed --noconfirm' "$@"; }
   fi
   if has_pr pacaur; then
-    aur_inst(){ do_if -c 'pacaur -S --needed --noconfirm' "$@"; }
+    aur_inst(){ do_if -c 'pacaur --aur -S --needed --noconfirm' "$@"; }
     loc_inst(){ do_if -c 'pkg_make' "$@"; }
     # WARN: pkgs not from AUR can break pacaur
     pkg_make(){ local p d

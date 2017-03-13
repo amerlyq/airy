@@ -64,12 +64,21 @@ pkglst
     [_] WARN: must be added after reading cached list, not before !!
       BUT: all mods must be gathered from all locations
   [_] BET: poll 'defaults' script after each *mod* to populate symlink immediately
-    Compare *mod* with user defaults config
+    [_] Compare *mod* with user defaults config
     $ cat private/defaults
       # <mod> <sym1> [<sym2>..]
       vim editor
       st r.t
-    THINK: use general 'defaults' in *airy* and augment/override by user
+    [_] THINK: use general 'defaults' in *airy* and augment/override by user
+    [_] Implement fallback in xmonad for defaults if not found
+      r.t -> st (from user defaults, if found) -> any found term
+        => must be evaluated on the sight -> as each sys change may tweak resulting app to launch
+      BUT: how to use such defaults in general for any other app point ?
+        Call all apps from general wrapper which evaluates fallbacks ?
+    [_] ALT: after clean-up immediately populate all 'r.*' links from defaults
+      BAD? affects only 'defaults' and ignores all other 'r.*' even if them exist
+      ALT: more stability: do pacman -Syy, then install vim/ranger/etc, and only then pacman
+      BET: user PKGBUILDs to pinpoint removed/added files per mod
 
 
 filter-mods
