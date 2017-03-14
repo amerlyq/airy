@@ -1,0 +1,68 @@
+FIND
+  [_] TODO:FIND: vfat format to decode/map changes on metadata
+    ++ REF: https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#VFAT
+    + REF https://www.kernel.org/doc/Documentation/filesystems/vfat.txt
+    http://stackoverflow.com/questions/11928982/what-is-the-difference-between-vfat-and-fat32-file-systems
+    https://wiki.archlinux.org/index.php/file_systems
+  [_] TODO: hard-reset keyboard and cmp 'reset.bin' vs 'formatted.bin'
+    => FIND: other linux mkfs.* (or flags to vfat) for more similar fs format
+
+
+TEST 100%
+  Prepare
+    * boot OS
+    * plug kbd (any state: working/broken) - [progm-shift-esc] - [progm-F1]
+    * $ sudo blkid | grep '/dev/sd\a\b'
+    * $ sudo mkfs.vfat /dev/sda
+    * unplug - plug - [progm-shift-esc] - [progm-F1]
+    * $ sudo dd if=/dev/sda of=click_formatted.bin
+  Optional -- disable click sound (to catch moment of breaking)
+    * unplug - plug - [progm-F8] - [progm-F1]
+    * $ sudo dd if=/dev/sda of=noclick_formatted.bin
+  Break
+    * unplug - poweroff - plug (hear 1st "pic-pic")
+    * wait 5s for 2nd "pic-pic" sound + another 5s
+    * poweron (hear 3rd "pic-pic") - uefi dual-boot os-selection menu
+      => kinesis up/down/enter don't work (BUG?)
+      => no click sound (if previously disabled)
+        NOTE: sometimes v-drive breaks here immediately (clicks become no longer mute)
+        If not -- continue next steps
+    * press on 'Reboot Into Firmware Interface' - wait to load bios-like menu (hear 4th/5th "pic-pic")
+      => kinesis starts working, becoming broken (click sound returns)
+    * press 'Discard Changes and Exit' - 'Yes' - wait to load uefi os-selection menu again (no more "pic-pic")
+      => kinesis up/down can move cursor for fraction of second
+      => then all keys again cease to work
+      => and v-disk remains broken (click sound present)
+  Compare
+    * boot OS
+    * (already plugged-in) - [progm-shift-esc] - [progm-F1]
+    * $ sudo dd if=/dev/sda of=broken.bin
+    * $ /usr/bin/diff -ytW140 --suppress-common-lines <(xxd formatted.bin) <(xxd broken.bin)
+    * $ /usr/bin/diff -udt <(xxd -p -c1 formatted.bin) <(xxd -p -c1 broken.bin)
+    * $ sudo mount /dev/sda /mnt
+    * $ ls -al /mnt
+  Repeat
+
+
+ALSO:
+  $ xinput G Kinesis
+  $ sudo lsblk | grep '^sd\a\b'
+  $ mount | grep '/dev/sd\a\b'
+  $ sudo umount /mnt
+
+
+CHECK
+  [_] testcase on general non-charge port
+  [_] bios options influence
+    [_] legacy
+    [_] mass storage
+  [_] time-deps on sound
+    [_] poweron before any 'pi-pic'
+    [_] poweron after one 'pi-pic'
+    [_] poweron after two 'pi-pic'
+  [_] time-deps between insertion and boot-up
+    [_] off - insert - wait 15s - poweron - check if broken in uefi
+    [_] reboot - insert - wait 15s - poweron - check if broken in any
+    [_] off - wait 15s - insert - poweron - check if broken in uefi
+    [_] off - poweron - insert - up/dn to delay uefi - check if broken in uefi
+    [_] off - poweron - uefi - cryptfs - insert - wait 15s - check if broken in cryptfs
