@@ -1,0 +1,23 @@
+NOTE: c/c++ shebang/cache-compiling/interpreting
+  https://root.cern.ch/cint
+  https://root.cern.ch/cling
+  http://bellard.org/tcc/
+
+TECH:
+  https://ef.gy/executable-scripts-in-c++
+
+[_] BET: in each binary -- embed code for self-compiling on timestamp
+  => fork+exec compiler, then exec to newly built binary
+  => compile self-comp code into libairy.a or airy.o and link it to each prg
+
+% exec argv with timeout
+  ALT:(fork): https://linux.die.net/man/3/posix_spawnp
+  ALT:(timeout): http://stackoverflow.com/questions/282176/waitpid-equivalent-with-timeout
+   ATT: https://ldpreload.com/blog/signalfd-is-useless?reposted-on-request
+       https://news.ycombinator.com/item?id=9564975
+   https://eklitzke.org/unix-system-call-timeouts
+  http://stackoverflow.com/questions/5237482/how-do-i-execute-external-program-within-c-code-in-linux-with-arguments
+  + http://stackoverflow.com/questions/282176/waitpid-equivalent-with-timeout
+      http://man7.org/linux/man-pages/man2/signalfd.2.html
+  ++ https://www.linuxprogrammingblog.com/code-examples/signal-waiting-sigtimedwait
+      https://www.mkssoftware.com/docs/man3/sigwaitinfo.3.asp

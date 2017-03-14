@@ -22,6 +22,7 @@ exec sed -u -r "
   /(I|N):\s.*/s//$C6&$CR/
   /(\+!|\*) A:\s.*/s//$C3&$CR/
   /.*\s(-> L\s|(::\/|\*\s).*->).*/s//$C4&$CR/
+  /\(%\)  .*/s//$C2&$CR/
   /~\/\.config\/systemd\/user\//s///g
   /^(\s*)Created symlink (from )?(.*) (to|→) (.*)\.$/s//\1@@-\3 -> \5/
   /^\s*(-> @\s|@@-.*\s->\s).*/s//$C9&$CR/
