@@ -35,31 +35,6 @@ http://stackoverflow.com/questions/19396718/compare-files-in-two-directory-on-re
 http://unix.stackexchange.com/questions/57305/rsync-compare-directories
 
 
-% Binaries comparison
-  $ cmp -l file1.bin file2.bin | gawk '{printf"%08X %02X %02X\n",$1-1,strtonum(0$2),strtonum(0$3)}'
-  $ diff -y <(xxd foo1.bin) <(xxd foo2.bin) | colordiff
-  Method that works for byte addition / deletion
-    $ diff <(od -An -tx1 -w1 -v file1) <(od -An -tx1 -w1 -v file2)
-  HACK:
-    Combine hex grep + diff
-      http://xyne.archlinux.ca/projects/hexgrep/
-  ALT:
-  # http://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
-    vbindiff
-      https://www.cjmweb.net/vbindiff/
-    jdiff
-      http://jojodiff.sourceforge.net/
-    ++ bindiff  # Graph-like comparison
-      https://security.googleblog.com/2016/03/bindiff-now-available-for-free.html
-      https://www.zynamics.com/software.html
-    bsdiff
-      bsdiff and bspatch are tools for building and applying patches to binary files.
-    ALSO:TRY:
-      wdiff, dwdiff -- for minimal diffs (see current prezto func as altr)
-      sdiff -- side by side diff
-      diffc -- python altr to colordiff
-      vim-diffchar -- characterwise line diff instead of chunkwise
-
 % Elfs comparison
   THINK: how to ignore only adress minor shifts?
     # http://stackoverflow.com/questions/3231641/comparing-generated-executables-for-equivilance

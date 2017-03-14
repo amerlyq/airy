@@ -1,0 +1,43 @@
+%%%% Binaries comparison
+  $ cmp -l file1.bin file2.bin | gawk '{printf"%08X %02X %02X\n",$1-1,strtonum(0$2),strtonum(0$3)}'
+  $ diff -y <(xxd foo1.bin) <(xxd foo2.bin) | colordiff
+  Method that works for byte addition / deletion
+    $ diff <(od -An -tx1 -w1 -v file1) <(od -An -tx1 -w1 -v file2)
+  HACK:
+    Combine hex grep + diff
+      http://xyne.archlinux.ca/projects/hexgrep/
+
+
+%%% ALT: Tools
+  # http://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
+  vbindiff
+    https://www.cjmweb.net/vbindiff/
+  jdiff
+    http://jojodiff.sourceforge.net/
+  ++ bindiff  # Graph-like comparison
+    https://security.googleblog.com/2016/03/bindiff-now-available-for-free.html
+    https://www.zynamics.com/software.html
+  bsdiff
+    bsdiff and bspatch are tools for building and applying patches to binary files.
+  ALSO:TRY:
+    wdiff, dwdiff -- for minimal diffs (see current prezto func as altr)
+    sdiff -- side by side diff
+    diffc -- python altr to colordiff
+    vim-diffchar -- characterwise line diff instead of chunkwise
+
+  SEE:
+    https://ubuntuforums.org/archive/index.php/t-346238.html
+    http://tuxdiary.com/tag/ubuntu-hex-file-compare-tool/
+  [$] aur/lfhex ::: BAD: miserably poor gui
+    +? claims: can cmp giant binary files
+    http://www.linux.com/feature/135690
+  [$] aur/hexdiff ::: BAD: less usable << BET:ALT:(dhex)
+    http://manpages.ubuntu.com/manpages/xenial/man1/hexdiff.1.html
+  2017-03-14 [X] community/xdelta3 ::: USE: gen more compact patch
+    Diff utility which works with binary files
+    $ xdelta3 -cs f1 f2 | xxd
+  2017-03-14 [X] aur/xdelta ::: USE: gen compact delta or apply as patch
+    Binary file delta generator
+    $ xdelta delta f1 f2 fdf && xxd fdf
+  ? wxHexEditor
+  ??? https://hexinator.com/
