@@ -11,8 +11,14 @@ TECH:
   => compile self-comp code into libairy.a or airy.o and link it to each prg
 [_] BET: script wrapper to compile with timeout
   << otherwise each lang will require its own impl for auto-recompile
+  * all symlinks in ~/.bin point to this single wrapper script
+  * it can be written in C, not necessary bash -- so my prototype is still relevant
+  * compiled binaries and their sources are stored into ~/.config/airy/bin-{build\,src}
+  * multi-sources are stored in dir /name.ext/* with .ext to determine compiler
+
 
 % exec argv with timeout
+  SEE:DEV: http://code.metager.de/source/xref/gnu/coreutils/src/timeout.c
   ALT:(fork): https://linux.die.net/man/3/posix_spawnp
   ALT:(timeout): http://stackoverflow.com/questions/282176/waitpid-equivalent-with-timeout
    ATT: https://ldpreload.com/blog/signalfd-is-useless?reposted-on-request
@@ -23,3 +29,5 @@ TECH:
       http://man7.org/linux/man-pages/man2/signalfd.2.html
   ++ https://www.linuxprogrammingblog.com/code-examples/signal-waiting-sigtimedwait
       https://www.mkssoftware.com/docs/man3/sigwaitinfo.3.asp
+  time
+    http://stackoverflow.com/questions/14682824/measuring-elapsed-time-in-linux-for-a-c-program

@@ -5,29 +5,46 @@ dst=${TMPDIR:-/tmp}
 while getopts 't:p:' o; do case $o in :|'?') exit 1
 ;; t) dst=$(readlink -m "$OPTARG")
 ;; p) prf=$OPTARG
+# ;; o) out=$OPTARG  # compile all src in one exe
 esac; done; shift $((OPTIND - 1))
 
-build() { local p d f bin cflags
-  p=$(readlink -m "$1")
-  d=${p%/*}
-  f=${p##*/}
-  bin=$dst/${prf-}${f%.*}
+build() { local p d nm bin cflags
+  p=$(readlink -e "$1")
+  nm=${p##*/}
+  bin=$dst/${prf-}${nm%.*}
 
-  if [[ $p -nt $bin ]]; then
-    if [[ -f $bin && -s $bin && -x $bin ]]; then
-      # NOTE: exit if original file differs
-      [[ $("$bin" -src-path) -ef $p ]] || exit 5
-    fi
-    # https://wiki.gentoo.org/wiki/GCC_optimization/ru
-    cflags=( -march=native -O3 -pipe -I "$d" -DSRC_PATH="$p" -o "$bin" "$p" )
-    case "$f"
-    in *.c  ) gcc -std=c11 "${cflags[@]}"
-    ;; *.cpp) g++ -std=c++11 "${cflags[@]}"
-    ;; *.hs ) ghc -O -o "$bin" "$p"
-    esac
+  if [[ -d $p ]]; then
+    d=$p
+    set -- "$d"/*
+  else
+    d=${p%/*}
+    set -- "$p"
   fi
 
-  echo "(%)  ${bin##*/}"
+  if [[ -f $bin && -s $bin && -x $bin ]]; then
+    # NOTE: err if original file is different now
+    if [[ ! $("$bin" -src-path) -ef $p ]]; then
+      echo "original file is different or absent"
+      exit 5
+    fi
+  fi
+
+  # DEV: cmp recursively all files with bin
+  if [[ $p -nt $bin ]]; then
+    echo "(=)  ${bin##*/}"
+    return 0
+  fi
+
+  # https://wiki.gentoo.org/wiki/GCC_optimization/ru
+  cflags=( -march=native -O3 -pipe -I "$d" -DSRC_PATH="$p" )
+
+  case "$nm"
+  in *.c  ) gcc -std=c11 "${cflags[@]}" -o "$bin" "$@"
+  ;; *.cpp) g++ -std=c++11 "${cflags[@]}" -o "$bin" "$@"
+  ;; *.hs ) ghc -O -o "$bin" "$@"
+  esac
+
+  echo "(+)  ${bin##*/}"
 }
 
 for f in "$@"; do build "$f"; done
