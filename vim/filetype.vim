@@ -22,8 +22,9 @@ augroup filetypedetect
   au BufRead,BufNewFile {*.log*,log-*}       setf messages
   au BufRead,BufNewFile {PKGBUILD,.AURINFO}  setf sh
   au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap,*.target,*.service} setf systemd
-  au BufRead ~/.purple/logs/*       setf pidgin
+  au BufRead ~/.purple/logs/*           setf pidgin
   au BufRead ~/.cache/mutt/messages/*   setf mail
+  au BufRead /tmp/gdb/{log.cfg,*/*.cfg} setl ft=fasm ts=8 nowrap
 augroup END
 
 " Use Zeal on Linux for context help

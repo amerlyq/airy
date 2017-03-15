@@ -26,12 +26,13 @@ fi
 search -f GDB ls -d "$BDR"/toolchain_build_*/gdbhost-*/gdb/gdb || GDB=$xct_gdb
 search -d GDB_DATA echo "${GDB%/*}"
 search -d LIBS ls -d "$BDR"/build_*/staging_dir/lib
+search -d DEBUG echo "${LIBS}"
 
 # THINK: move exporting into 'session' MAYBE rename 'session' -> 'env'
 #   => this file must only print key-value results
 # SEE: exporting from conf
 #   http://stackoverflow.com/questions/19331497/set-environment-variables-from-file
 cd "$(r.gdb-tmp -d)"
-links=( GDB GDB_DATA ROOT CORE EXE SRC BDR LIBS )
+links=( GDB GDB_DATA DEBUG ROOT CORE EXE SRC BDR LIBS )
 echo "links=( ${links[*]} )" > ./env
 for nm in "${links[@]}"; do echo "${nm}=${!nm-}" >> ./env; done

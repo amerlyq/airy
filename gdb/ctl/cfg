@@ -22,6 +22,7 @@ set solib-absolute-prefix root
 set solib-search-path libs
 ${OLD_BDR+set substitute-path $OLD_BDR bdr}
 set directories src:\$cdir:\$cwd${SRC_DIRS+:$SRC_DIRS}
+set debug-file-directory debug:libs/debug:root/lib/.debug
 
 ## Place into local ./.gdbinit
 ## FIXED:(pwndbg): unsupported operand types

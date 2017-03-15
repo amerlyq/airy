@@ -7,7 +7,34 @@
       $ r.chroot make menuconfig
     OR $ vim .config  # = uClibc-ng-1.0.15-arm.config
      UCLIBC_EXTRA_CFLAGS="-marm -g3 -ggdb"
-     DODEBUG=y
+     DODEBUG=y  # BAD: incompatible with non-debug libs
+    rebuild inside buildroot
+      make -f buildroot.mk gcc-clean gcc_target-clean uclibc-clean
+      make -f buildroot.mk uclibc-menuconfig  # add -g3
+      make -f buildroot.mk gcc gcc_target uclibc
+  Add symbols to libs (WARN: incomplete)
+    ++ REF: https://sourceware.org/gdb/wiki/How%20gdb%20loads%20symbol%20files
+    ++ Add all sections (custom script)
+      http://stackoverflow.com/questions/33049201/gdb-add-symbol-file-all-sections-and-load-address
+    Load //*.debug from dir
+      set debug-file-directory debug:root/lib/.debug
+      NOTE: must set link to work $ objcopy --add-gnu-debuglink=foo.debug foo
+      https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html
+      https://www-zeuthen.desy.de/unix/unixguide/infohtml/gdb/Separate-Debug-Files.html
+      ++ https://www.technovelty.org/code/separate-debug-info.html
+    Convert debug libs to symbol files
+      $ ls X /opt/mips-unknown-linux-uclibc/bin/mips-linux-objcopy --only-keep-debug
+      http://stackoverflow.com/questions/866721/how-to-generate-gcc-debug-symbol-outside-the-build-target
+      ++ https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/4/html/Debugging_with_gdb/separate-debug-files.html
+      https://www.chemie.fu-berlin.de/chemnet/use/info/gdb/gdb_13.html
+    Fix links to symbols
+      $ find . -xtype l -exec bash -c 'v=$(readlink $1); ln -svnf "${v%.so}.debug" "$1"' '' {} \;
+  Embed custom user symbols into ELF
+    https://github.com/wapiflapi/wsym
+  ELF Structure
+    https://blogs.oracle.com/ali/entry/inside_elf_symbol_tables
+    https://www.embeddedrelated.com/showarticle/900.php
+    REF:(PIE): https://eklitzke.org/position-independent-executables
 
 % Noise
   Disable copyright
