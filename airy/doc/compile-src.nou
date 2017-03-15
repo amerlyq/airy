@@ -9,6 +9,8 @@ TECH:
 [_] BET: in each binary -- embed code for self-compiling on timestamp
   => fork+exec compiler, then exec to newly built binary
   => compile self-comp code into libairy.a or airy.o and link it to each prg
+[_] BET: script wrapper to compile with timeout
+  << otherwise each lang will require its own impl for auto-recompile
 
 % exec argv with timeout
   ALT:(fork): https://linux.die.net/man/3/posix_spawnp

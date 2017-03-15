@@ -14,6 +14,10 @@ build() { local p d f bin cflags
   bin=$dst/${prf-}${f%.*}
 
   if [[ $p -nt $bin ]]; then
+    if [[ -f $bin && -s $bin && -x $bin ]]; then
+      # NOTE: exit if original file differs
+      [[ $("$bin" -src-path) -ef $p ]] || exit 5
+    fi
     # https://wiki.gentoo.org/wiki/GCC_optimization/ru
     cflags=( -march=native -O3 -pipe -I "$d" -DSRC_PATH="$p" -o "$bin" "$p" )
     case "$f"
