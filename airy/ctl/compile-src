@@ -1,8 +1,12 @@
 #!/bin/bash -eu
 
 dst=${TMPDIR:-/tmp}
+autocompile=1  # embed self-compiling code
+check=0
 
-while getopts 't:p:' o; do case $o in :|'?') exit 1
+while getopts 'cNt:p:' o; do case $o in :|'?') exit 1
+;; c) check=1
+;; N) autocompile=0
 ;; t) dst=$(readlink -m "$OPTARG")
 ;; p) prf=$OPTARG
 # ;; o) out=$OPTARG  # compile all src in one exe
@@ -10,8 +14,8 @@ esac; done; shift $((OPTIND - 1))
 
 build() { local p d nm bin cflags
   p=$(readlink -e "$1")
-  nm=${p##*/}
-  bin=$dst/${prf-}${nm%.*}
+  nm=${p##*/}; nm=${nm%.*}
+  bin=$dst/${prf-}$nm
 
   if [[ -d $p ]]; then
     d=$p
@@ -21,7 +25,7 @@ build() { local p d nm bin cflags
     set -- "$p"
   fi
 
-  if [[ -f $bin && -s $bin && -x $bin ]]; then
+  if ((check)) && [[ -f $bin && -s $bin && -x $bin ]]; then
     # NOTE: err if original file is different now
     if [[ ! $("$bin" -src-path) -ef $p ]]; then
       echo "original file is different or absent"
@@ -35,12 +39,30 @@ build() { local p d nm bin cflags
     return 0
   fi
 
-  # https://wiki.gentoo.org/wiki/GCC_optimization/ru
-  cflags=( -march=native -O3 -pipe -I "$d" -DSRC_PATH="$p" -D'main(...)=_main(__VA_ARGS__)' )
+  # TODO: move into r.gcc
+  # SEE:(flags): https://wiki.gentoo.org/wiki/GCC_optimization/ru
+  cflags=( -march=native -O3 -pipe -pedantic -Wall -Wextra -Werror )
+  cflags=( -I "$d" -DSRC_PATH="$p" -o "$bin" )
 
-  case "$nm"
-  in *.c  ) gcc -std=c11 "${cflags[@]}" -o "$bin" "$@"
-  ;; *.cpp) g++ -std=c++11 "${cflags[@]}" -o "$bin" "$@"
+  # BET: makefile to track and re-generate all static libraries  BUT:BAD: too long
+  #   http://stackoverflow.com/questions/2734719/how-to-compile-a-static-library-in-linux
+  if ((autocompile)); then
+    tmp=/tmp/src.path
+    # BAD: parallel 'compile-src' clobber /tmp/src.path file
+    printf '%s\x00' "$p" > "$tmp"
+    trap "rm '$tmp'" INT HUP QUIT TERM ERR EXIT
+    # USAGE: extern uint8_t data[]     asm("_binary_src_path_start");
+    cflags+=( -Wl,--format=binary -Wl,/tmp/src.path -Wl,--format=default )
+    cflags+=( -L -Wl,-Bstatic -lselfcompile )
+    cflags+=( -D'main(...)=_main(__VA_ARGS__)' )
+    # cflags+=( -Wl,-Bdynamic -lbar -Wl,--as-needed )
+    # gcc -c -o "/tmp/${nm}.o" "$p"
+    # ar rcs "/tmp/lib${nm}.a" "/tmp/${nm}.o"
+  fi
+
+  case "${p##*/}"
+  in *.c  ) gcc -std=gnu11 "${cflags[@]}" "$@"
+  ;; *.cpp) g++ -std=gnu++14 "${cflags[@]}" "$@"
   ;; *.hs ) ghc -O -o "$bin" "$@"
   esac
 
