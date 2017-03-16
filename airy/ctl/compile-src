@@ -36,7 +36,7 @@ build() { local p d nm bin cflags
   fi
 
   # https://wiki.gentoo.org/wiki/GCC_optimization/ru
-  cflags=( -march=native -O3 -pipe -I "$d" -DSRC_PATH="$p" )
+  cflags=( -march=native -O3 -pipe -I "$d" -DSRC_PATH="$p" -D'main(...)=_main(__VA_ARGS__)' )
 
   case "$nm"
   in *.c  ) gcc -std=c11 "${cflags[@]}" -o "$bin" "$@"

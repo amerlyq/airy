@@ -38,6 +38,9 @@ trap_errors(){
     #  - with ERR trap defined, syntax errors exit with status 0, not 2
 }
 
+# NEED: bash>v4.3
+_timeout()(set +b; sleep "$1" & shift; "$@" & wait -n; r=$?; kill -9 $(jobs -p); exit $r)
+
 # ======================== Dirs ======================================
 ### Go to current script's directory
 # BAD:DFL: both realpath and readlink => same path on symlinked script

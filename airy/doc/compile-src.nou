@@ -6,15 +6,19 @@ NOTE: c/c++ shebang/cache-compiling/interpreting
 TECH:
   https://ef.gy/executable-scripts-in-c++
 
-[_] BET: in each binary -- embed code for self-compiling on timestamp
-  => fork+exec compiler, then exec to newly built binary
-  => compile self-comp code into libairy.a or airy.o and link it to each prg
-[_] BET: script wrapper to compile with timeout
-  << otherwise each lang will require its own impl for auto-recompile
-  * all symlinks in ~/.bin point to this single wrapper script
-  * it can be written in C, not necessary bash -- so my prototype is still relevant
-  * compiled binaries and their sources are stored into ~/.config/airy/bin-{build\,src}
-  * multi-sources are stored in dir /name.ext/* with .ext to determine compiler
+TODO
+  [_] BET: in each binary -- embed code for self-compiling on timestamp
+    => fork+exec compiler, then exec to newly built binary
+    => compile self-comp code into libairy.a or airy.o and link it to each prg
+  [_] BET: script wrapper to compile with timeout
+    << otherwise each lang will require its own impl for auto-recompile
+    * all symlinks in ~/.bin point to this single wrapper script
+    * it can be written in C, not necessary bash -- so my prototype is still relevant
+    * compiled binaries and their sources are stored into ~/.config/airy/bin-{build\,src}
+    * multi-sources are stored in dir /name.ext/* with .ext to determine compiler
+  [_] DEV: switch embedded and standaloneDEV: switch embedded and standalone
+    [_] by -D define when compiling
+  [_] DEV: sep lib.a with my own 'timeout', 'timestamp', and 'self-compile'
 
 
 % exec argv with timeout
