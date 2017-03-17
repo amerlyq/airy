@@ -1,17 +1,15 @@
-// #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-// #include <time.h>
 #include <unistd.h>
 #include <sys/stat.h>
-// #include <sys/types.h>
 #include <sys/wait.h>
 
-extern int _main(int argc, char **argv);
 // NOTE: must be linked into resulting .bin
 extern char src_path[] asm ("_binary_src_path_start");
-static char * const recompile_cmdv[] = { 
-    "timeout", "5", "r.airy-compile-src", "-c", src_path, NULL };
+// FIXME: for this to work, 'compile-src' must extract DFL path from profile
+static char * const recompile_cmdv[] = {
+    "timeout", "5", "r.airy-compile-src", "-qc", src_path, NULL };
+extern int _main(int argc, char **argv);
 
 static int
 timestamp_cmp(char const * const s, char const * const d)
@@ -32,7 +30,7 @@ timestamp_cmp(char const * const s, char const * const d)
         : ss.st_mtim.tv_nsec > ds.st_mtim.tv_nsec ? 1 : 0;
 }
 
-static int 
+static int
 run_cmd(char * const * const argv)
 {
     pid_t p = fork();
@@ -40,7 +38,7 @@ run_cmd(char * const * const argv)
         execvp(argv[0], argv);
     } else if (p > 0) {  // main
         int status = -1;
-        if (0 <= waitpid(p, &status, 0) && 1 == WIFEXITED(status)) 
+        if (0 <= waitpid(p, &status, 0) && 1 == WIFEXITED(status))
             return WEXITSTATUS(status);
     }
     perror("run_cmd");
@@ -62,13 +60,15 @@ main(int argc, char **argv)  // , char **envp
         --argc, argv[1] = *argv++;
     }
 
-    // WARN: changes saved during compilation won't trigger rebuild
-    //  ALT: use -cmp-hash (slow) ?
-    if (!timestamp_cmp(src_path, argv[0])) {
-        if (0 != run_cmd(recompile_cmdv)) {
-
-        }
+    // WARN: rebuild won't be triggered
+    //  * changes saved directly during compilation
+    //      ALT:(slow): -cmp-hash and func_ptr
+    //  * updated static libs  ALT:(slow): use make
+    if (0 < timestamp_cmp(src_path, argv[0])) {
+        if (0 != run_cmd(recompile_cmdv))
+            return 99;
         execvp(argv[0], argv);
+        _exit(9);
     }
     return _main(argc, argv);
 }

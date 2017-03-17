@@ -1,21 +1,29 @@
 #!/bin/bash -eu
 
-dst=${TMPDIR:-/tmp}
+dbin=${TMPDIR:-/tmp}
+dlib=${TMPDIR:-/tmp}
 autocompile=1  # embed self-compiling code
-check=0
+chk_tstamp=1
+staticlib=0
+chk_src=0
+quiet=0
 
-while getopts 'cNt:p:' o; do case $o in :|'?') exit 1
-;; c) check=1
+while getopts 'cflL:Nt:p:q' o; do case $o in :|'?') exit 1
+;; c) chk_src=1
+;; f) chk_tstamp=0  # force
+;; l) staticlib=1; autocompile=0
 ;; N) autocompile=0
-;; t) dst=$(readlink -m "$OPTARG")
+;; t) dbin=$(readlink -e "$OPTARG")
+;; L) dlib=$(readlink -e "$OPTARG")
 ;; p) prf=$OPTARG
+;; q) quiet=1
 # ;; o) out=$OPTARG  # compile all src in one exe
 esac; done; shift $((OPTIND - 1))
 
-build() { local p d nm bin cflags
+build() { local p d nm out cflags
   p=$(readlink -e "$1")
   nm=${p##*/}; nm=${nm%.*}
-  bin=$dst/${prf-}$nm
+  ((!staticlib)) && out=$dbin/${prf-}${nm} || out=$dlib/lib${prf-}${nm}.a
 
   if [[ -d $p ]]; then
     d=$p
@@ -25,48 +33,61 @@ build() { local p d nm bin cflags
     set -- "$p"
   fi
 
-  if ((check)) && [[ -f $bin && -s $bin && -x $bin ]]; then
+  if ((chk_src)) && ((!staticlib)) && [[ -f $out && -s $out && -x $out ]]; then
     # NOTE: err if original file is different now
-    if [[ ! $("$bin" -src-path) -ef $p ]]; then
-      echo "original file is different or absent"
+    if [[ ! $("$out" -src-path) -ef $p ]]; then
+      echo "original file is different or absent" >&2
       exit 5
     fi
   fi
 
   # DEV: cmp recursively all files with bin
-  if [[ $p -nt $bin ]]; then
-    echo "(=)  ${bin##*/}"
+  if ((chk_tstamp)) && [[ $p -ot $out ]]; then
+    ((quiet)) || echo "(=)  ${out##*/}"
     return 0
   fi
 
-  # TODO: move into r.gcc
+  # TODO: move into r.gcc-make augmented with c/cpp-specific general makefile
   # SEE:(flags): https://wiki.gentoo.org/wiki/GCC_optimization/ru
   cflags=( -march=native -O3 -pipe -pedantic -Wall -Wextra -Werror )
-  cflags=( -I "$d" -DSRC_PATH="$p" -o "$bin" )
+  cflags=( -I "$d" -L "$dlib" -DSRC_PATH="$p" )
+
+  ((staticlib)) && cflags+=( -DBUILD_LIB -c -o "${out%.*}.o" "$@" ) \
+  || cflags+=( -D'main(...)=_main(__VA_ARGS__)' -o "$out" "$@" )
 
   # BET: makefile to track and re-generate all static libraries  BUT:BAD: too long
+  #   ALT: use make only for logic of compiling different extensions per single file
   #   http://stackoverflow.com/questions/2734719/how-to-compile-a-static-library-in-linux
+  # SEE: linker libs order
+  #   http://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
   if ((autocompile)); then
-    tmp=/tmp/src.path
+    cd /tmp
+    tmp=src.path
     # BAD: parallel 'compile-src' clobber /tmp/src.path file
     printf '%s\x00' "$p" > "$tmp"
     trap "rm '$tmp'" INT HUP QUIT TERM ERR EXIT
+    # EXPL: trailing 'dynamic' to not force static libc.a
+    cflags+=( -Wl,-Bstatic -lselfcompile -Wl,-Bdynamic -Wl,--as-needed )
     # USAGE: extern uint8_t data[]     asm("_binary_src_path_start");
-    cflags+=( -Wl,--format=binary -Wl,/tmp/src.path -Wl,--format=default )
-    cflags+=( -L -Wl,-Bstatic -lselfcompile )
-    cflags+=( -D'main(...)=_main(__VA_ARGS__)' )
-    # cflags+=( -Wl,-Bdynamic -lbar -Wl,--as-needed )
-    # gcc -c -o "/tmp/${nm}.o" "$p"
-    # ar rcs "/tmp/lib${nm}.a" "/tmp/${nm}.o"
+    # BAD: $tmp must be name in current dir to get short symbol name
+    # ALT: compile from stdin
+    # http://stackoverflow.com/questions/1003644/is-it-possible-to-get-gcc-to-read-from-a-pipe
+    # https://gcc.gnu.org/ml/gcc-help/2007-01/msg00119.html
+    cflags+=( -Wl,--format=binary -Wl,"$tmp" -Wl,--format=default )
   fi
 
+  # BUG: if not removed *.o -> resulting binary is wrong
+  #   BET: tyr using makefile
   case "${p##*/}"
-  in *.c  ) gcc -std=gnu11 "${cflags[@]}" "$@"
-  ;; *.cpp) g++ -std=gnu++14 "${cflags[@]}" "$@"
-  ;; *.hs ) ghc -O -o "$bin" "$@"
+  in *.c  ) gcc -std=gnu11 -g "${cflags[@]}"
+  ;; *.cpp) g++ -std=gnu++14 "${cflags[@]}"
+  # ;; *.hs ) ghc -O -o "$out" "$@"
   esac
 
-  echo "(+)  ${bin##*/}"
+  # FIXME: use only for gcc/g++
+  ((staticlib)) && ar rcs "$out" "${out%.*}.o"
+
+  ((quiet)) || echo "(+)  ${out##*/}"
 }
 
 for f in "$@"; do build "$f"; done
