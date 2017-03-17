@@ -79,7 +79,7 @@ build() { local p d nm out cflags
   # BUG: if not removed *.o -> resulting binary is wrong
   #   BET: tyr using makefile
   case "${p##*/}"
-  in *.c  ) gcc -std=gnu11 -g "${cflags[@]}"
+  in *.c  ) gcc -std=gnu11 "${cflags[@]}"
   ;; *.cpp) g++ -std=gnu++14 "${cflags[@]}"
   # ;; *.hs ) ghc -O -o "$out" "$@"
   esac

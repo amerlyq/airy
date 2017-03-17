@@ -1,8 +1,11 @@
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
+#include <error.h>      // error()
+#include <errno.h>      // errno
+#include <stdio.h>      // printf()
+#include <string.h>     // strcmp
+#include <unistd.h>     // fork, execvp, readlink
+#include <sys/stat.h>   // stat()
+#include <sys/wait.h>   // waitpid(), W*
+#include <sys/param.h>  // PATH_MAX
 
 // NOTE: must be linked into resulting .bin
 extern char src_path[] asm ("_binary_src_path_start");
@@ -14,14 +17,13 @@ extern int _main(int argc, char **argv);
 static int
 timestamp_cmp(char const * const s, char const * const d)
 {
+    // THINK: if src/dst don't exist anymore -- err? or continue?
     struct stat ss, ds;
     if (stat(s, &ss) == -1) {
-        perror(s);
-        _exit(127);
+        error(2, errno, "stat(\"%s\")", s);
     }
     if (stat(d, &ds) == -1) {
-        perror(d);
-        _exit(126);
+        error(2, errno, "stat(\"%s\")", d);
     }
     // ALT:(no st_mtim): .st_mtime and .st_mtimensec
     return ss.st_mtim.tv_sec < ds.st_mtim.tv_sec ? -1
@@ -41,8 +43,7 @@ run_cmd(char * const * const argv)
         if (0 <= waitpid(p, &status, 0) && 1 == WIFEXITED(status))
             return WEXITSTATUS(status);
     }
-    perror("run_cmd");
-    _exit(9);
+    error(9, errno, "run_cmd");
 }
 
 int
@@ -60,15 +61,20 @@ main(int argc, char **argv)  // , char **envp
         --argc, argv[1] = *argv++;
     }
 
+    char bin_path[PATH_MAX] = {0};
+    if (0 >= readlink("/proc/self/exe", bin_path, PATH_MAX)) {
+        error(2, errno, "readlink(\"%s\")", argv[0]);
+    }
+
     // WARN: rebuild won't be triggered
     //  * changes saved directly during compilation
     //      ALT:(slow): -cmp-hash and func_ptr
     //  * updated static libs  ALT:(slow): use make
-    if (0 < timestamp_cmp(src_path, argv[0])) {
+    if (0 < timestamp_cmp(src_path, bin_path)) {
         if (0 != run_cmd(recompile_cmdv))
             return 99;
-        execvp(argv[0], argv);
-        _exit(9);
+        execvp(bin_path, argv);
+        error(9, errno, "execvp");
     }
     return _main(argc, argv);
 }

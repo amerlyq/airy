@@ -15,7 +15,7 @@ call dein#add('t9md/vim-choosewin', {
 \\n   let g:choosewin_overlay_clear_multibyte = 1
 \\n   let g:choosewin_blink_on_land = 0
 \", 'hook_add': "
-\\n   nmap <silent><unique>  <C-j>  <Plug>(choosewin)
+\\n   nmap <silent><unique>  z<Space>  <Plug>(choosewin)
 \"})
 
 
