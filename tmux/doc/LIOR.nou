@@ -6,6 +6,10 @@ Clear scrollback
   bind -n C-k clear-history
   bind-key C send-keys "clear && tmux clear-history" \; send-keys "Enter"
 
+Disable line wrap (like vim :set nowrap)
+  send DECAWM: $ printf '\033[?7h' inside the pane.
+    https://groups.google.com/forum/#!topic/tmux-users/G27_Zr41Qaw
+
 | % | Split a window vertically
 | " | Split the window horizontally
 | ; | Go to previous
