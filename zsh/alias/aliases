@@ -34,7 +34,7 @@ fi
 alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-running cmds.
 
 ## Filters
-alias -g H='|head'
+alias -g H='|head'  # ALSO:(rest): tail -n +11
 alias -g C='|wc -l'
 alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
