@@ -52,6 +52,13 @@ FIND
   ALT:(dd)
     [_] https://www.cons.org/cracauer/cstream.html
 
+    Skip/seek/count in bytes on GNU dd
+      $ dd if=file of=out bs=4096 skip=fe000 count=4096 iflag=skip_bytes,count_bytes,seek_bytes
+      REF:(dd)
+        http://wiki.linuxquestions.org/wiki/Some_dd_examples
+    Skip 1024 bytes from STDIN
+      ./cmd | tail -c +1025 ...
+
   [_] Integrate script command for terminal
     $ script -afeq /tmp/log11
     ! Be aware: vim or ncurses is not logged appropriately! How to exclude?

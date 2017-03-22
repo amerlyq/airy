@@ -62,7 +62,7 @@ let g:everywhere_activated = 1
 " VIZ. videlicet (~ precisely: implies (near) completeness)
 let s:patterns = {
       \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|CRIT%(ICAL)?'],
-      \ 'Add': [ 76, "#5faf00", 'ADD|SEE|READ|REF|NEED|FIND|ALSO|BET%(TER)?|E\.G'],
+      \ 'Add': [ 76, "#5faf00", 'ADD|SEE|READ|REF|TUT|BLOG|NEED|FIND|ALSO|BET%(TER)?|E\.G'],
       \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|I\.E'],
       \ 'Dev': [ 33, "#0087ff", 'DEV|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECIDE'],
       \ 'Tbd': [169, "#ff5faf", 'TODO|CHECK|TRY|MOVE|NOT|REQ%(UIRE)?|MAYBE'],
