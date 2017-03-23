@@ -69,12 +69,20 @@ define bta
 end
 
 define dis
-  if $argc == 1
-    disassemble $arg0-0x40, $arg0+0x20
+  set $sz = 0x60
+  if $argc == 0
+    set $addr = $pc
+  else
+    if $argc == 1
+      set $addr = $arg0
+    else
+      if $argc == 2
+        set $sz = $arg1
+        set $addr = $arg0
+      end
+    end
   end
-  if $argc == 2
-    disassemble $arg0-$arg1, $arg0+$arg1
-  end
+  disassemble $addr - $sz*2/3, +$sz
 end
 
 # Print disassembled frames

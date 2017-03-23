@@ -8,8 +8,13 @@
 "   - mappings: [[n, <LocalLeader>f, <LocalLeader>r]]
 " EXPL:(hook_add) Launch with default DB
 " EXPL:(hook_post_source) Load DB by using lazy mappings
+" BAD: too slow startup (>10m) on large db >100Mb
+" ALT:BET?(faster?) spacemacs + cscope
+"   https://sourceforge.net/projects/kscope/
+"   OLD https://sourceforge.net/projects/cbrowser/
+" USE: $ cscope -bcqR && ctags -R && ccglue
 call dein#add('hari-rangarajan/CCTree', {
-  \ 'on_cmd': 'CCTreeLoadDB',
+  \ 'on_cmd': ['CCTreeLoadDB', 'CCTreeLoadXRefDBFromDisk'],
   \ 'hook_add': 'com! -bar CCTree'.
   \   ' if !filereadable("cscope.out")| CCgen |en| CCTreeLoadDB cscope.out',
   \ 'hook_source': _hcat('cscope.src'),

@@ -8,7 +8,7 @@ env='#!/usr/bin/env'
 if [[ $bReplace || ! -f $NM ]]; then
     # Python recognizes encoding: "coding[:=]\s*([-\w.]+)"
     case "$shl"
-    in  pl) sb="$env perl\n\nuse strict;\nuse warnings;"
+    in  pl) sb="#!/usr/bin/perl\nuse warnings FATAL => 'all';\nuse autodie;\nuse strict;"
     ;; py2) sb="$env python2\n# vim: fileencoding=utf-8"
     ;; py3) sb="$env python3"
     ;;  sh) sb="#!/bin/bash -eu"

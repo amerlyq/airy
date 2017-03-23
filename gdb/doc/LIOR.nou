@@ -35,7 +35,9 @@ Controls
   : See http://www.chemie.fu-berlin.de/chemnet/use/info/gdb/gdb_8.html
 | q      | quit |
 | where  | show where execution halted
-| bt      | show backtrace for when application crashed
+| bt     | show backtrace for when application crashed
+  (gdb) set backtrace past-main
+  (gdb) set backtrace past-entry
 
 Moving
 | n <count>     | next 1 - exec next line of code completely

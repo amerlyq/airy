@@ -1,3 +1,8 @@
+% Search
+  REF: http://sourceware.org/gdb/onlinedocs/gdb/Memory-Region-Attributes.html#Memory-Region-Attributes
+  (gdb) set mem inaccessible-by-default [on|off]
+  (gdb) find /w 0x08049000 0x0804a000 0x8048034
+
 REF
 Memory contents can be examined using the "x" command. The "x" command is
 optionally followed by a "/", a count field, a format field, a size field and
@@ -12,7 +17,7 @@ following manner: the next 12 bytes as ASCII characters, the next 12 bytes as
 decimal numbers, the next 12 16-bit words in hex, and the next 12 32-bit words
 in hex.
 
-% Search
+% Examine
 (gdb) x/d or x 'address' show decimal
 (gdb) x/100s 'address' show next 100 decimals
 (gdb) x 0x0804846c show decimal at 0x0804846c
