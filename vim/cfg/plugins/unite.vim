@@ -11,11 +11,13 @@ call dein#add('Shougo/neoyank.vim', {'lazy': 0})
 " ATTENTION: when unite.vim loads, 'on_source' will load all its plugins
 "   -- TRY: add on_source: [...] to unite.vim
 "   -- BUT? will it support sources loaded afterwards its loading?
-call dein#add('Shougo/unite-outline', {'on_source': 'unite.vim'})
-call dein#add('thinca/vim-unite-history', {'on_source': 'unite.vim'})
-call dein#add('osyo-manga/unite-quickfix', {'on_source': 'unite.vim'})
-call dein#add('tsukkee/unite-tag', {'on_source': 'unite.vim'})
-call dein#add('Shougo/unite-build', {'on_source': 'unite.vim'})
+" BAD: 'on_source' won't work when 'unite.vim' loaded on start and not lazy
+"   => it _must_ be loaded for neoyank/neomru
+call dein#add('Shougo/unite-outline', {'lazy': 0})
+call dein#add('thinca/vim-unite-history', {'lazy': 0})
+call dein#add('osyo-manga/unite-quickfix', {'lazy': 0})
+call dein#add('tsukkee/unite-tag', {'lazy': 0})
+call dein#add('Shougo/unite-build', {'lazy': 0})
 
 
 

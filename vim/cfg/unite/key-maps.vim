@@ -36,7 +36,7 @@ imap <buffer>   <BS>   <Plug>(unite_delete_backward_path)
 imap <buffer>  <C-w>   <Plug>(unite_delete_backward_path)
 imap <buffer>    jj    <Plug>(unite_insert_leave)
 imap <buffer>    ,s    <Plug>(unite_insert_leave)
-imap <buffer>  <Tab>   <Plug>(unite_complete)
+" imap <buffer>  <Tab>   <Plug>(unite_complete)
 
 imap <silent><buffer>  <C-j>  <Plug>(unite_select_next_line)
 imap <silent><buffer>  <C-k>  <Plug>(unite_select_previous_line)

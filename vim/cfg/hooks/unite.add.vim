@@ -8,6 +8,7 @@ let s:maps = {
 \ 'b': 'buffers -quick-match buffer bookmark',
 \ 'e': 'MyCmd mycmd',
 \ 'f': 'files file_rec/async:!',
+\ 'j': 'jumplist jump',
 \ 'm': 'Favourites menu',
 \ 'M': 'mrus file_mru',
 \ 'o': 'Outline outline',
@@ -17,7 +18,9 @@ let s:maps = {
 \ ':': 'commands history/command',
 \ ';': 'commands command',
 \ 'F': 'files file',
+\ 'T': 'tags tag',
 \ '/': 'lines -start-insert line',
+\ '?': 'help',
 \}
 
 for [c, r] in items(s:maps) | for m in ['n','x']

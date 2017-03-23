@@ -19,9 +19,11 @@ call dein#add('hari-rangarajan/CCTree', {
 
 "" CHECK GNU GLOBAL 6.0 is a source code tagging system {{{1
 " SEE https://www.gnu.org/software/global/
+" NOTE: bundled in >v6.3.2 https://github.com/yoshizow/global-pygments-plugin
 call dein#add('hewes/unite-gtags', {
   \ 'if': executable('global'),
-  \ 'on_source': 'unite.vim'})
+  \ 'lazy': 0})
+  " \ 'on_source': 'unite.vim'})
 
 
 

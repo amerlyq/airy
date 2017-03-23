@@ -49,6 +49,8 @@ noremap <unique> g]   g<C-]>
 noremap <unique> z]   <C-w>g}
 noremap <unique> gz]  <C-w>vg<C-]>
 noremap <unique> g<C-]>   g]
+" NOTE: undo '<C-t>' by moving one tag forward. Use '0' to jump to newest tag.
+noremap <unique> g<C-t>   :<C-u><C-r>=v:count1<CR>tag<CR>
 noremap <unique> g[   :<C-u><C-r>=v:count1<CR>tnext<CR>
 " noremap <C-]> g<C-]>
 " ALSO:  Use [I or ]I -- to show matches of current work in this file

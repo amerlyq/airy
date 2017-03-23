@@ -54,7 +54,7 @@ call dein#add('majutsushi/tagbar', {
 \\n   let g:tagbar_compact = 1
 \\n   let g:tagbar_indent = 2
 \\n   \" let g:tagbar_foldlevel = 2
-\\n   let g:tagbar_autopreview = 1
+\\n   let g:tagbar_autopreview = 0
 \"})
 
 
