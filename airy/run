@@ -41,9 +41,11 @@ has d && mods+=( defaults )
 # WARN: for {pacman, jobs, etc} USE >/dev/tty
 # ALT:(tee -a): individual files "$build/log/$(date +'%Y%m%d_%H%M%S').log"
 exec > >(tee -a "$build/setup.log" | r.airy-pretty)  # colorize
-printf '=%.0s' {1..30}
+cols=$(tput cols); ((cols)) || cols=80
+cols=$(( (cols - 20) / 2 ))
+eval printf '=%.0s' {1..$cols}
 printf ' %s ' "$(date +'%Y%m%d_%H%M%S')"
-printf '=%.0s' {1..30}
+eval printf '=%.0s' {1..$cols}
 printf '\n$ %s %s\n'  "$0" "$*"
 
 

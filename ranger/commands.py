@@ -35,7 +35,9 @@ class ag(Command):
         d = self.fm.thisdir
         if d.marked_items:
             return [f.relative_path for f in d.marked_items]
-        if d.files_all and (len(d.files_all) != len(d.files)):
+        # WARN: permanently hidden files like .* are searched anyways
+        #   << BUG: files skipped in .agignore are grep'ed being added on cmdline
+        if d.temporary_filter and d.files_all and (len(d.files_all) != len(d.files)):
             return [f.relative_path for f in d.files]
         return []
 
