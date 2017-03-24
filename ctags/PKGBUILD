@@ -1,0 +1,33 @@
+pkgname=ccglue-airy-git
+pkgver=0.6
+pkgrel=1
+pkgdesc='cscope cross-reference symbol database'
+arch=('i686' 'x86_64')
+url=https://github.com/giraldeau/ccglue
+# OR https://github.com/hari-rangarajan/ccglue
+license=('GPL3')
+optdepends=('cscope: Generate cscope database files for ccglue')
+source=('git+https://github.com/giraldeau/ccglue')
+md5sums=('SKIP')
+conflicts=('ccglue')
+_gitname=ccglue
+
+prepare() {
+  cd "$_gitname"
+  # sed -i 's/0.4.0/0.6.0/g' doc/*
+  # sed -i 's/0.4.0/0.6.0/g' src/*
+}
+
+build() {
+  cd "$_gitname"
+  autoreconf -vif
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$_gitname"
+  make DESTDIR="${pkgdir}" install
+}
+
+# vim:set ts=2 sw=2 et:

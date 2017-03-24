@@ -1,7 +1,8 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst gdb
+# libdwarf -- for dwarfdump
+pkg_inst gdb libdwarf
 
 if distro arch; then
   pkg_inst python2-six  # WTF?
