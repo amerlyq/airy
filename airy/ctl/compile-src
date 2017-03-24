@@ -20,7 +20,30 @@ while getopts 'cflL:Nt:p:q' o; do case $o in :|'?') exit 1
 # ;; o) out=$OPTARG  # compile all src in one exe
 esac; done; shift $((OPTIND - 1))
 
-build() { local p d nm out cflags
+# NOTE: parse interpreter: // airy:gcc ...
+# DFL: prepend USE:(append): // airy:gcc {} ...
+parse_shebang() { local sub=0 shebang
+  shebang=$(sed -rn '/^\W*\sairy(:\S*)\s(.*)/{s//\1 \2/p;q};5q' "$p")
+  while IFS=$' ' read -ra a; do
+    [[ ${#a[@]} > 0 && -n ${a[0]} ]] || continue
+    interp=${a[0]}
+    a=( "${a[@]:1}" )  # RFC w/o reassign
+
+    # HACK: s/placeholder/src/g
+    #   WTF if $p=dir ? use sep comp file ? OR use shebang from main.*
+    for i in "${!a[@]}"; do case ${a[i]}
+    in '{p}' | '{}') sub=1; a[i]=$p
+    ;; '{b}') sub=1; a[i]=$nm
+    ;; '{d}') sub=1; a[i]=${out%/*}
+    esac; done
+
+    # FIXME: 'airy::' must discard all other args beside general -I, -L
+    cflags+=( "${a[@]}" )
+  done <<< "$shebang"
+  ((sub)) || cflags+=( "$@" )  # RFC move outside
+}
+
+build() { local p d nm out cflags interp
   p=$(readlink -e "$1")
   nm=${p##*/}; nm=${nm%.*}
   ((!staticlib)) && out=$dbin/${prf-}${nm} || out=$dlib/lib${prf-}${nm}.a
@@ -54,8 +77,10 @@ build() { local p d nm out cflags
   cflags+=( -ggdb -fvar-tracking-assignments )  # -gz -gcolumn-info
   cflags+=( -I "$d" -L "$dlib" -DSRC_PATH="$p" )
 
-  ((staticlib)) && cflags+=( -DBUILD_LIB -c -o "${out%.*}.o" "$@" ) \
-  || cflags+=( -D'main(...)=_main(__VA_ARGS__)' -o "$out" "$@" )
+  ((staticlib)) && cflags+=( -DBUILD_LIB -c -o "${out%.*}.o" ) \
+  || cflags+=( -D'main(...)=_main(__VA_ARGS__)' -o "$out" )
+
+  parse_shebang "$@"
 
   # BET: makefile to track and re-generate all static libraries  BUT:BAD: too long
   #   ALT: use make only for logic of compiling different extensions per single file
@@ -80,12 +105,23 @@ build() { local p d nm out cflags
   fi
 
   # BUG: if not removed *.o -> resulting binary is wrong
-  #   BET: tyr using makefile
-  case "${p##*/}"
-  in *.c  ) gcc -std=gnu11 "${cflags[@]}"
-  ;; *.cpp) g++ -std=gnu++14 "${cflags[@]}"
-  # ;; *.hs ) ghc -O -o "$out" "$@"
+  #   BET: try using makefile
+  if [[ ! -v interp || $interp == : ]]; then
+    case "${p##*/}"
+    in *.c  ) interp=( gcc )
+    ;; *.cpp) interp=( g++ )
+    # ;; *.hs ) ghc -O -o "$out" "$@"
+    esac
+  elif [[ $interp == :?* ]]; then
+    interp=( "${interp:1}" )
+  else exit 7; fi
+
+  case $interp
+  in gcc) interp+=( -std=gnu11 )
+  ;; g++) interp+=( -std=gnu++14 )
   esac
+
+  echo "${interp[@]}" "${cflags[@]}"
 
   # FIXME: use only for gcc/g++
   ((staticlib)) && ar rcs "$out" "${out%.*}.o"
