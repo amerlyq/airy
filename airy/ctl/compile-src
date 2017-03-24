@@ -37,7 +37,7 @@ parse_shebang() { local sub=0 shebang
     ;; '{d}') sub=1; a[i]=${out%/*}
     esac; done
 
-    # FIXME: 'airy::' must discard all other args beside general -I, -L
+    # FIXME: 'airy:=' must discard all other args beside general -I, -L
     cflags+=( "${a[@]}" )
   done <<< "$shebang"
   ((sub)) || cflags+=( "$@" )  # RFC move outside
@@ -73,12 +73,17 @@ build() { local p d nm out cflags interp
   # TODO: move into r.gcc-make augmented with c/cpp-specific general makefile
   # SEE:(flags): https://wiki.gentoo.org/wiki/GCC_optimization/ru
   # https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html
-  cflags=( -march=native -O3 -pipe -pedantic -Wall -Wextra -Werror )
-  cflags+=( -ggdb -fvar-tracking-assignments )  # -gz -gcolumn-info
+  cflags=( -march=native -O3 -pipe -pedantic -Wall -Wextra -Werror -Wl,--as-needed )
+  cflags+=( -ggdb -fvar-tracking-assignments -Wl,--trace )  # -gz -gcolumn-info
   cflags+=( -I "$d" -L "$dlib" -DSRC_PATH="$p" )
 
+  # REF: https://gcc.gnu.org/onlinedocs/cpp/Invocation.html
+  #   <= for preprocessing hacks
   ((staticlib)) && cflags+=( -DBUILD_LIB -c -o "${out%.*}.o" ) \
-  || cflags+=( -D'main(...)=_main(__VA_ARGS__)' -o "$out" )
+  || cflags+=( -D'main(...)=main(__VA_ARGS__) asm ("_main"); int main(__VA_ARGS__)' -o "$out" )
+
+  # EXPL: trailing 'dynamic' to not force static libc.a
+  ((autocompile)) && cflags+=( -Wl,-Bstatic -lselfcompile -Wl,-Bdynamic )
 
   parse_shebang "$@"
 
@@ -89,19 +94,17 @@ build() { local p d nm out cflags interp
   # SEE: linker libs order
   #   http://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
   if ((autocompile)); then
-    cd /tmp
-    tmp=src.path
+    tmp=/tmp/src.path
     # BAD: parallel 'compile-src' clobber /tmp/src.path file
     printf '%s\x00' "$p" > "$tmp"
     trap "rm -f '$tmp'" INT HUP QUIT TERM ERR EXIT
-    # EXPL: trailing 'dynamic' to not force static libc.a
-    cflags+=( -Wl,-Bstatic -lselfcompile -Wl,-Bdynamic -Wl,--as-needed )
+
     # USAGE: extern uint8_t data[]     asm("_binary_src_path_start");
     # BAD: $tmp must be name in current dir to get short symbol name
     # ALT: compile from stdin
     # http://stackoverflow.com/questions/1003644/is-it-possible-to-get-gcc-to-read-from-a-pipe
     # https://gcc.gnu.org/ml/gcc-help/2007-01/msg00119.html
-    cflags+=( -Wl,--format=binary -Wl,"$tmp" -Wl,--format=default )
+    cflags+=( -Wl,--format=binary -Wl,"${tmp##*/}" -Wl,--format=default )
   fi
 
   # BUG: if not removed *.o -> resulting binary is wrong
@@ -121,7 +124,7 @@ build() { local p d nm out cflags interp
   ;; g++) interp+=( -std=gnu++14 )
   esac
 
-  echo "${interp[@]}" "${cflags[@]}"
+  (cd "${tmp%/*}" && "${interp[@]}" "${cflags[@]}") || false
 
   # FIXME: use only for gcc/g++
   ((staticlib)) && ar rcs "$out" "${out%.*}.o"
@@ -129,4 +132,5 @@ build() { local p d nm out cflags interp
   ((quiet)) || echo "(+)  ${out##*/}"
 }
 
+# FIXME: don't build unconditionally on each ./setup -m (use make for deps)
 for f in "$@"; do build "$f"; done
