@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+# TODO: move to airy/bin
+
+f=$1
+off=$2
+len=$3
+dst=${4:-${f}.dump}
+args=()
+
+[[ -t 1 ]] || dst=/dev/stdout
+[[ -t 2 ]] && args+=( status=progress )
+
+args+=( "if=$f" "of=$dst" "skip=$((off))" "count=$((len))" )
+args+=( bs=4096 iflag=skip_bytes,count_bytes oflag=seek_bytes )
+
+exec dd "${args[@]}"

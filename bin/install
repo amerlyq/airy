@@ -1,0 +1,8 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  pkg_inst bbe      # bin sed
+  # http://xyne.archlinux.ca/projects/hexgrep/
+  aur_inst hexgrep  # bin grep & diff
+fi
