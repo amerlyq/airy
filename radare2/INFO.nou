@@ -46,6 +46,7 @@ SEE:
   Hack collaboration tools
     http://lockboxx.blogspot.com/2015/11/cooperative-infrastructure-for-security.html
   Reverse
+    + https://www.youtube.com/watch?v=zk3JdMOQPc8
     https://insinuator.net/2016/08/reverse-engineering-with-radare2-intro/
     https://insinuator.net/2016/08/reverse-engineering-with-radare2-part-1/
     https://insinuator.net/2016/08/reverse-engineering-with-radare2-part-2/
@@ -129,6 +130,16 @@ Radare2 in docker
   Regex/filtering ops
     : ?@?
     https://github.com/radare/radare2/issues/5695
+
+  Search binary offset in binary
+    http://radare.today/posts/carving-bins/
+    Find offset
+      /m
+    EMU sed -- search and replace
+      <r2> w blabla @@/x 9090
+      <r2> x @@/x 9090  # TEMP set cmd.hit to run a cmd on each search result
+      $ r2 -qc "w good @@/ bad" $ == s/good/bad/g
+        = can skip the current command 'w bad @@ hit1_*'
 
 CFG
   Analysis speed
