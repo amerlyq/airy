@@ -30,6 +30,6 @@ bins -p "${prf%-}" -s 'run/' -- ./run*  # run* -> bin/r.%d*
 
 srcs(){ local a=()
   for f in "$@"; do [[ -f $f && -s $f && ! -x $f ]] && a+=("$f"); done
-  r.airy-compile-src -t "$bin" -p "${prf}" -- "${a[@]}"
+  r.airy-compile-src -ft "$bin" -p "${prf}" -- "${a[@]}"
 }
 srcs ./src/*  # src/* -> bin/r.%d-*

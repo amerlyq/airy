@@ -44,6 +44,7 @@ run_cmd(char * const * const argv)
             return WEXITSTATUS(status);
     }
     error(9, errno, "run_cmd");
+    return 9;
 }
 
 int
@@ -58,7 +59,7 @@ main(int argc, char **argv)  // , char **envp
             return _main(argc, argv);
         } else
             break;
-        --argc, argv[1] = *argv++;
+        --argc, argv[1] = argv[0], argv++;
     }
 
     char bin_path[PATH_MAX] = {0};

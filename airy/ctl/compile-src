@@ -49,14 +49,17 @@ build() { local p d nm out cflags
 
   # TODO: move into r.gcc-make augmented with c/cpp-specific general makefile
   # SEE:(flags): https://wiki.gentoo.org/wiki/GCC_optimization/ru
+  # https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html
   cflags=( -march=native -O3 -pipe -pedantic -Wall -Wextra -Werror )
-  cflags=( -I "$d" -L "$dlib" -DSRC_PATH="$p" )
+  cflags+=( -ggdb -fvar-tracking-assignments )  # -gz -gcolumn-info
+  cflags+=( -I "$d" -L "$dlib" -DSRC_PATH="$p" )
 
   ((staticlib)) && cflags+=( -DBUILD_LIB -c -o "${out%.*}.o" "$@" ) \
   || cflags+=( -D'main(...)=_main(__VA_ARGS__)' -o "$out" "$@" )
 
   # BET: makefile to track and re-generate all static libraries  BUT:BAD: too long
   #   ALT: use make only for logic of compiling different extensions per single file
+  #   BET:IDEA: ~/.cache/airy/build/{bin,lib,Makefile} and gen Makefile recipes as 'alias' file -- so all deps will be in single file
   #   http://stackoverflow.com/questions/2734719/how-to-compile-a-static-library-in-linux
   # SEE: linker libs order
   #   http://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
@@ -65,7 +68,7 @@ build() { local p d nm out cflags
     tmp=src.path
     # BAD: parallel 'compile-src' clobber /tmp/src.path file
     printf '%s\x00' "$p" > "$tmp"
-    trap "rm '$tmp'" INT HUP QUIT TERM ERR EXIT
+    trap "rm -f '$tmp'" INT HUP QUIT TERM ERR EXIT
     # EXPL: trailing 'dynamic' to not force static libc.a
     cflags+=( -Wl,-Bstatic -lselfcompile -Wl,-Bdynamic -Wl,--as-needed )
     # USAGE: extern uint8_t data[]     asm("_binary_src_path_start");
