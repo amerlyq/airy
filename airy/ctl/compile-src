@@ -2,6 +2,7 @@
 
 dbin=${TMPDIR:-/tmp}
 dlib=${TMPDIR:-/tmp}
+dtmp=${TMPDIR:-/tmp}
 autocompile=1  # embed self-compiling code
 chk_tstamp=1
 staticlib=0
@@ -94,17 +95,18 @@ build() { local p d nm out cflags interp
   # SEE: linker libs order
   #   http://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
   if ((autocompile)); then
-    tmp=/tmp/src.path
+    spth=src.path
     # BAD: parallel 'compile-src' clobber /tmp/src.path file
-    printf '%s\x00' "$p" > "$tmp"
-    trap "rm -f '$tmp'" INT HUP QUIT TERM ERR EXIT
+    printf '%s\x00' "$p" > "$dtmp/$spth"
+    trap "rm -f '$dtmp/$spth'" INT HUP QUIT TERM ERR EXIT
 
     # USAGE: extern uint8_t data[]     asm("_binary_src_path_start");
-    # BAD: $tmp must be name in current dir to get short symbol name
+    # BAD: $spath must be name in current dir to get short symbol name
     # ALT: compile from stdin
     # http://stackoverflow.com/questions/1003644/is-it-possible-to-get-gcc-to-read-from-a-pipe
     # https://gcc.gnu.org/ml/gcc-help/2007-01/msg00119.html
-    cflags+=( -Wl,--format=binary -Wl,"${tmp##*/}" -Wl,--format=default )
+    # BET: use asm cmds to include section with custom symbol
+    cflags+=( -Wl,--format=binary -Wl,"$spth" -Wl,--format=default )
   fi
 
   # BUG: if not removed *.o -> resulting binary is wrong
@@ -124,7 +126,7 @@ build() { local p d nm out cflags interp
   ;; g++) interp+=( -std=gnu++14 )
   esac
 
-  (cd "${tmp%/*}" && "${interp[@]}" "${cflags[@]}") || false
+  (cd "$dtmp" && "${interp[@]}" "${cflags[@]}") || false
 
   # FIXME: use only for gcc/g++
   ((staticlib)) && ar rcs "$out" "${out%.*}.o"
