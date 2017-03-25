@@ -311,13 +311,23 @@ Filtering (IMAP)
 
 Text reflow
   DEV:G:(vim mail reflow)
-    [_] vim mustn't delete single space on soft-break
-    [_] must reflow text/qout joining lines ending in '\s'
-    [_] on wrap must insert soft-break
-      set formatoptions+=w
+    2017-03-25 [X] vim mustn't delete single space on soft-break
+    2017-03-25 [X] must reflow text/qout joining lines ending in '\s'
+    2017-03-25 [X] must do space-stuffing between last quote and text
+      ::: accomplished through pre-processing of buffer with ft=mail
+      http://mutt-users.mutt.narkive.com/8qQWPti3/format-flowed-equals-no-space-in-depth-1
+      http://marc.info/?l=mutt-dev&m=119254717006189
+        ? patches for neomutt
+    2017-03-25 [X] on wrap must insert soft-break
+      ? set formatoptions+=w
       ++ http://vi.stackexchange.com/questions/6773/how-can-i-make-vims-flowing-aware-of-email-replies
+  REF: http://www.rfc-editor.org/rfc/rfc3676.txt
+    SEE:6.4.2. https://www.neomutt.org/guide/gettingstarted
+    READ http://mailformat.dan.info/body/linelength.html
   SEE:CHECK:
     http://brianbuccola.com/line-breaks-in-mutt-and-vim/
+    https://mathiasbynens.be/notes/gmail-plain-text
+      https://github.com/djcb/mu/issues/569
   http://www.256bit.org/~chrisbra/cms/vim_as_e-mail_editor.html#format
   http://vim.wikia.com/wiki/Fix_email_quotations_with_long_lines
   ALSO
