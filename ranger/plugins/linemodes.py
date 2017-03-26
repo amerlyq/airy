@@ -23,6 +23,20 @@ class BytesizeLinemode(LinemodeBase):
 
 
 @ranger.api.register_linemode
+class HexsizeLinemode(LinemodeBase):
+    name = "hexsize"
+
+    def filetitle(self, f, metadata):
+        return f.relative_path
+
+    def infostring(self, f, metadata):
+        if not f.is_directory:
+            return '%06x' % f.stat.st_size
+        else:
+            raise NotImplementedError
+
+
+@ranger.api.register_linemode
 class LinksLinemode(LinemodeBase):
     name = "links"
 
