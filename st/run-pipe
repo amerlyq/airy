@@ -9,5 +9,5 @@ in --url) xurls | awk -vi=1 '{printf "%02d %s\n",i++,$0}' |
 #   TRY: opening stdin directly in tmux
 #   SEE: http://serverfault.com/questions/178457/can-i-send-some-text-to-the-stdin-of-an-active-process-running-in-a-screen-sessi
 ;; --vim) exec r.tf -M -e $EDITOR -u ~/.vim/rc/basic \
-    -c 'EmptyLinesStripEnd|set nowrap nonu nornu nofen bt=nofile|norm!G0' -c 'syntax on' <(cat)
+    -c 'StripLines|set nowrap nonu nornu nofen bt=nofile|norm!G0' -c 'syntax on' <(cat)
 esac

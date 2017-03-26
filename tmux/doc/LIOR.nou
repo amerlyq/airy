@@ -7,8 +7,11 @@ Clear scrollback
   bind-key C send-keys "clear && tmux clear-history" \; send-keys "Enter"
 
 Disable line wrap (like vim :set nowrap)
-  send DECAWM: $ printf '\033[?7h' inside the pane.
-    https://groups.google.com/forum/#!topic/tmux-users/G27_Zr41Qaw
+  Switch line wrap / crop : send DECAWM inside the pane.
+    $ printf '\033[?7h'
+    $ printf '\033[?7l'
+    REF https://github.com/tmux/tmux/blob/master/tools/ansicode.txt
+      https://groups.google.com/forum/#!topic/tmux-users/G27_Zr41Qaw
 
 | % | Split a window vertically
 | " | Split the window horizontally
