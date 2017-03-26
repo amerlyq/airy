@@ -54,6 +54,11 @@ alias -g C\$="|awk '{print\$NF}'"
 function slit { awk "{ print ${(j:,:):-\$${^@}} }"; }
 alias -g CN='|slit'
 
+if (($+commands[r.filter-block])); then
+  for i in {1..4} {-1..-4}
+  do alias -g B$i="|r.filter-block -b $i "; done
+fi
+
 # Pipes
 if (($+commands[grep])); then
   # foreach c ($(<<<'q i F x C2')) alias -g G${c: -1}="G -$c"; end

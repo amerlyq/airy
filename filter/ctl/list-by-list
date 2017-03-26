@@ -1,12 +1,8 @@
-#!/usr/bin/env perl
-
+#!/usr/bin/perl
+# USAGE ./$0 <src> <list>
+use warnings FATAL => 'all';
+use autodie;
 use strict;
-use warnings;
-
-if ($#ARGV < 1) {
-    print "\nUsage: filter-list <src> <list> | column -s\| -t\n";
-    exit;
-}
 
 my $keySrc;
 my $fsrc=$ARGV[0];
@@ -33,4 +29,3 @@ while (<FILE2>) {
     }
 }
 close FILE2;
-

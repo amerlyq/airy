@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use Getopt::Std;
+
+my %opts=(); getopts("b:s", \%opts);
+my $N = $opts{b} // 1;
+my $skip = defined $opts{s} ? 0 : 1;
+
+if ($N == 0)
+{
+    while(<>) { print $_; };
+    exit $!;
+}
+elsif ($N > 0)
+{
+    my $i = 0;
+    while(<>) {
+        if (/^$/) { $skip = 1; next }
+        if ($skip) { $skip = 0; last if ++$i > $N }
+        next if $i < $N;
+        print $_;
+    }
+}
+else
+{
+    my (@b, @bs);
+    while(<>) {
+        if (/^$/) { $skip = 1; next }
+        if ($skip) { push @bs, [@b]; undef @b; $skip = 0; }
+        push @b, $_;
+    }
+    push @bs, [@b] if @b;
+    $N += scalar @bs;
+    print @{$bs[$N]} if $N > 0 and $N < scalar @bs;
+}
