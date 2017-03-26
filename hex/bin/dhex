@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+# no way to silent license through switches
+test "$1" = "-h" || exec 2>/dev/null
+exec /usr/bin/dhex "$@"
