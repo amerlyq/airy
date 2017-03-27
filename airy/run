@@ -8,7 +8,7 @@ shopt -s nullglob
 ### Cmdline
 # a=all, x=reset_queue, g=generate
 dop=maiIsSuUrR
-opts=; while getopts "x${dop}dg" o; do case $o in :|'?') exit 1
+opts=; while getopts "x${dop}dgN" o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
 has(){ [[ $opts =~ [$*] ]]; }
 
@@ -74,8 +74,8 @@ fi
 
 # TODO: rename 'recache'/'rR' to smth another to free up '-r' for general reset/remove
 dopts=$(tr -cd "$dop" <<< "${opts-}")
-has "$dop" && r.airy-each -i $(has x && echo -r) -- \
-  r.airy-do ${dopts:+"-$dopts"} <<< "$lmods"
+has "$dop" && r.airy-each -i $(has x && echo -r) $(has N && echo -s) \
+  -- r.airy-do ${dopts:+"-$dopts"} <<< "$lmods"
 
 # DEV: add one of _[un]used tags by checking in AIRY_MODS
 ! has g || r.airy-link-tags -t "$build/tags" -f "$build/mods"

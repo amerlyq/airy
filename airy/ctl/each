@@ -3,7 +3,7 @@
 queue=${TMPDIR:-/tmp}/airy-cache-mods
 
 # c=cache, f=from, i=incremental, r=reset
-opts=; while getopts 'c:f:ir' o; do case $o in :|'?') exit 1
+opts=; while getopts 'c:f:irs' o; do case $o in :|'?') exit 1
 ;; c) queue=$(readlink -f "$OPTARG")
 ;; f) from=$OPTARG
 esac; opts+=$o; done; shift $((OPTIND - 1))
@@ -15,7 +15,10 @@ mappend(){ readarray -tO "${#mods[@]}" mods; }
 
 if has i; then
   has r && rm -f "$queue"
-  [[ -s $queue ]] && mappend < "$queue"
+  if [[ -s $queue ]]; then
+    has s && sed -i '1d' "$queue"
+    mappend < "$queue"
+  fi
   [[ -s $queue ]] && head="{{{ continue... }}}" || head="{{{ Incremental }}}"
 else head="{{{ Non-incremental }}}"; fi
 
@@ -23,6 +26,7 @@ if ! has i || [[ ! -s $queue ]]; then
   # CHECK: can be bad in nested scripts -- by catching unused stdin
   [[ -t 0 ]] || mappend
   [[ -s ${from-} ]] && mappend < "${from-}"
+  has s && mods=( "${mods[@]:1}" )
   has i && printf "%s\n" "${mods[@]}" > "$queue"
 fi
 

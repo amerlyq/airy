@@ -1,17 +1,16 @@
 .NOTPARALLEL:
-.DEFAULT_GOAL = default
+.DEFAULT_GOAL = continue
 # HACK: keep prompt unaffected  # BAD? no effect ? CHECK
 #  ::: CHECK: seems like pacman isn't connected to tty despite  exec <>/dev/tty
 #  <= if connected to tty -- then there must not be any pacman lines in setup.log
 MAKEFLAGS += --output-sync=none
 
-.PHONY: default
-default: install
-
 .PHONY: all
-all: clean install update-new tags
+all: install update-new tags
 .PHONY: continue
 continue: update tags
+.PHONY: skip
+skip: next continue
 
 # Install 'airy' config system
 # BAD: no colorizing => recursive deps with r.airy-pretty
@@ -26,10 +25,17 @@ install:
 update: ; r.airy -ad
 .PHONY: update-new
 update-new: ; r.airy -xad
+.PHONY: next
+next:
+	r.airy -N
 
 .PHONY: clean
 clean:
 	r.airy-clean
+
+.PHONY: refresh
+refresh: clean install
+	r.airy -sd
 
 .PHONY: log
 log:
