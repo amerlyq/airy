@@ -18,7 +18,8 @@ import XMonad.StackSet              (shift)
 import XMonad.Config.Amer.Common    (inGroup)
 
 myPromptTheme = def
-  { font = "-bitstream-bitstream vera sans-medium-r-*-*-14-*-*-*-*-*-*-*"
+  -- { font = "-bitstream-bitstream vera sans-medium-r-*-*-14-*-*-*-*-*-*-*"
+  { font = "xft:monospace-9.6,Symbola-9"
   , bgColor = "#ffffff"
   , fgColor = "#000000"
   , fgHLight = "#ff0000"

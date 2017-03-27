@@ -43,7 +43,7 @@ import qualified XMonad.StackSet as W
 -- basis
 import XMonad.Layout.Fullscreen     (fullscreenFocus, fullscreenManageHook)
 import XMonad.Layout.TrackFloating  (trackFloating)
-import XMonad.Layout.Tabbed         (simpleTabbed)
+import qualified XMonad.Layout.Tabbed as T
 import XMonad.Layout.TwoPane        (TwoPane(..))
 import XMonad.Layout.Grid           (Grid(..))
 import XMonad.Layout.Circle         (Circle(..))
@@ -168,6 +168,14 @@ myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
   }
 
 
+myTabConfig = def
+  { T.inactiveBorderColor = "#ffaa00"
+  , T.activeTextColor = "#aa00ff"
+  , T.fontName = "xft:monospace:pixelsize=15"
+  -- , T.decoHeight =
+  }
+
+
 -- layoutHintsToCenter
 myLayout = smartBorders
     . ModifiedLayout myOverlay
@@ -185,11 +193,12 @@ myLayout = smartBorders
     . onWorkspace "PI" piLayer
     . onWorkspace "SK" (reflectHoriz skLayer)
     . trackFloating
-    $ tiled ||| TwoPane (1/100) (1/2) ||| simpleTabbed ||| simplestFloat ||| Grid ||| Circle
+    $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| simplestFloat ||| Grid ||| Circle
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
     skLayer = gridIM (1%6) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
     tiled   = ResizableTall nmaster delta ratio [ratio]
+    tabi    = T.tabbedAlways T.shrinkText myTabConfig
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
     delta   = 1/100 -- step of increasing
