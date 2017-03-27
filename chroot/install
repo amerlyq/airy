@@ -7,7 +7,7 @@ source ~/.shell/func.d/packages
 pkg_inst schroot
 
 if distro arch; then
-    aur_inst debootstrap
+    pkg_inst debootstrap
     # Install for ubuntu
     aur_inst -- --asdeps gnupg1
     aur_inst -- --asdeps ubuntu-keyring

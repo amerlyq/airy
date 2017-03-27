@@ -12,7 +12,7 @@ if [[ ! -d $PREZTO ]]; then
 fi
 
 if distro arch; then
-  aur_inst fasd
+  pkg_inst fasd
 elif distro ubuntu; then
   do_if -c git_inst -p fasd 'clvv/fasd' ||:
 fi

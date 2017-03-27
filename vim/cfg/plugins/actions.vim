@@ -5,14 +5,6 @@ call dein#add('tpope/vim-repeat')
 
 
 
-"" Selects a column of identical characters {{{1
-" Can also be used as a text object for an operator
-" On one-line vsel selects a block of identical columns.
-call dein#add('ngn/vim-column', {
-  \ 'on_map': '<Bar>'})
-
-
-
 "" Use CTRL-A/X to increment dates, times, and more {{{1
 " FIXED:BAD: d<C-..> overlaps with 'ag_grp' shortcut 'd'
 " FIXME:BAD: <C-x> overlaps with unicode.vim '<C-x><C-..>'
