@@ -32,6 +32,21 @@ noremap <Leader><C-S> :saveas<Space>
 "" Change current path
 nnoremap <silent><unique> [Frame]cw :lcd %:p:h \| pwd<CR>
 nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
+nnoremap <silent><unique> [Frame]ct :exe 'lcd '.fnameescape(<SID>tagdir()) \| pwd<CR>
+
+fun! s:tagdir()
+  let d = get(tagfiles(), 0)
+  if l:d
+    let d = fnamemodify(d, ':p:h')
+  else
+    let d = fnamemodify(getcwd(), ':p')
+    wh !filereadable(d.'/tags')
+      if d=='/'| throw "tag not found" |en
+      let d = fnamemodify(d, ':h')
+    endw
+  endif
+  return l:d
+endf
 
 
 

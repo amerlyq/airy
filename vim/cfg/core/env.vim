@@ -34,7 +34,7 @@ if v:version >= 703
   set undofile
 endif
 " Tags
-set tags=./tags,tags,*/tags,~/.cache/vim/tags
+set tags=./tags,tags,../tags,../../tags,*/tags,$VCACHE/tags
 set tagbsearch      " Use a binary search (need sorted tags file!)
 if v:version < 703 || (v:version == 703 && !has('patch336'))  " Vim's bug.
   set notagbsearch
