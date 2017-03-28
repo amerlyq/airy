@@ -1,6 +1,12 @@
 # vim:ft=sh
 _airy=${XDG_CONFIG_HOME:-$HOME/.config}/airy
 
+if [[ $TERM == linux ]]; then
+  setterm --blank 0    # Disable blanking for virtual consoles
+  setterm --blength    # Disable bell
+  # setterm --msg on --msglevel 0  # Show debug printk() in console
+fi
+
 ### Aura mods profiles (links only) ###
 # FIXME: what if user want to overwrite some of my aliases?
 [[ ! -d $_airy/env ]] || for f in "$_airy/env"/*

@@ -1,0 +1,5 @@
+#!/bin/sh -eu
+dpi=$(xrdb -query | sed -rn '/.*\bdpi:\s+([0-9]+)$/s//\1/p')
+(( dpi >= 200 )) && export GDK_SCALE=2 GDK_DPI_SCALE=0.5
+exec 2>/dev/null
+exec /usr/bin/xdot "$@"

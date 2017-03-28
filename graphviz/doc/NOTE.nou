@@ -1,6 +1,15 @@
 Graphviz
   $ otl2tags.py -c gv.conf ted.otl > ted.gv
   $ dot -T png ted.gv  -o ted.png
+  $ xdot ted.gv
+
+GUI
+  |aur/dot-editor|
+    Able to display the output of any text-based program that produces graphic files as output.
+    https://vincenthee.github.io/DotEditor/
+  |aur/zgrviewer|
+    A 2.5D graph visualizer that displays graphs specified in the AT&T GraphViz DOT language
+
 
 gvpr
   Ordered binary tree
@@ -10,3 +19,13 @@ EXAMPLES
   Edge between clusters
     http://stackoverflow.com/questions/2012036/graphviz-how-to-connect-subgraphs
     # [ltail=cluster_0 lhead=cluster_2];
+
+Apps
+  |aur/lddgraph-git|
+    Small C++ code which creates dependencies graphs using ldd and Graphviz
+  |aur/lddot-hg|=ALT
+    A wrapper over ldd, which produces output in Graphviz format.
+  |aur/dothost-hg|
+    dothost is a DNS lookup utility, which produces output in Graphviz format.
+  |aur/python-objgraph|
+    Draws Python object reference graphs with graphviz
