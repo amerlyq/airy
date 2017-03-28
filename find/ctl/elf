@@ -1,0 +1,25 @@
+#!/bin/bash -e
+set -o pipefail
+
+bfmt=elf
+pltf=mips
+
+# [a]=all, d=deps, b=bin, p=pltf, s=so
+opts=; while getopts 'abdps' o; do case $o in :|'?') exit 1
+;; p) pltf=$OPTARG
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
+
+src=${1:-$PWD}
+args=( -type f )  # WARN: ignores symlinks
+
+  if has a; then args+=( )
+elif has b; then args+=( -executable \! -regex '.*\.so\(\.[0-9]+\)*$' )
+elif has s; then args+=( -regex '.*\.so\(\.[0-9]+\)*$' )
+fi
+
+exec find -H "$src" "${args[@]}" \
+| file -f- \
+| grep -Fw "${bfmt^^}" \
+| grep -Fw "${pltf^^}" \
+| awk -F': ' '{print $1}'

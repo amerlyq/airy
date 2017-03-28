@@ -7,8 +7,11 @@
 #   http://superuser.com/questions/919025/what-was-the-squashfs-compression-method
 # ALT: >v4.3 unsquashfs -s ..
 
+# NOTE: reverse
+#   mksquashfs ./dir dst -comp lzma [-e exlude]
+
 img=${1:?}
-dst=${2:?}
+dst=${2:-default}
 
 [[ -f $img ]]
 [[ $dst == /* ]] || dst=/tmp/squashfs/$dst

@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+# USAGE: r.find-elf | ./$0
+set -o pipefail
+
+fs=$' '
+nl=$'\n'
+
+dynsize(){ readelf -WS "$1" \
+| { grep -o "\s\.dynsym\s.*" || echo; } \
+| awk '{print($5?$5:0)}'
+}
+export -f dynsize
+
+symcount(){ nm -D "$1" 2>/dev/null | wc -l; }
+export -f symcount
+
+SHELL=/bin/dash parallel "printf '%8d${fs}%6d${fs}%s${nl}' "'\
+  "0x$(dynsize {})" "$(symcount {})" {}'
