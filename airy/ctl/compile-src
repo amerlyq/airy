@@ -85,6 +85,7 @@ build() { local p d nm out cflags interp
 
   # EXPL: trailing 'dynamic' to not force static libc.a
   ((autocompile)) && cflags+=( -Wl,-Bstatic -lselfcompile -Wl,-Bdynamic )
+  # WARN: -Wl,-Bdynamic requires GNU ld, so this solution doesn't work on systems where gcc uses the system ld (e.g. Mac OS X).
 
   parse_shebang "$@"
 
