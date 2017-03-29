@@ -31,7 +31,8 @@
 " TODO:CHG: replace by concrete 'r.*' scripts
 if executable('ctags') || executable('ctags-exuberant')
   let s:ctags = 'ctags --recurse'
-  if executable('ctags-exuberant') | let s:ctags .= '--exuberant' | endif
+  if executable('ctags-exuberant')| let s:ctags .=' --exuberant'  |en
+  if filereadable('.ignore')| let s:ctags .=' --exclude=@.ignore' |en
   command -bar -range -nargs=0 TagsGen call system(s:ctags)
   nnoremap <silent> <F1> :<C-u>TagsGen<CR>
 endif

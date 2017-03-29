@@ -12,7 +12,7 @@ extern char src_path[] asm ("_binary_src_path_start");
 // FIXME: for this to work, 'compile-src' must extract DFL path from profile
 static char * const recompile_cmdv[] = {
     "timeout", "5", "r.airy-compile-src", "-qc", src_path, NULL };
-extern int _main(int argc, char **argv);
+extern int __real_main(int argc, char **argv);
 
 static int
 timestamp_cmp(char const * const s, char const * const d)
@@ -48,7 +48,7 @@ run_cmd(char * const * const argv)
 }
 
 int
-main(int argc, char **argv)  // , char **envp
+__wrap_main(int argc, char **argv)  // , char **envp
 {
     // NOTE: parse all ctrl args at beg (or end -- easy to discard)
     while (argc > 1) {
@@ -56,7 +56,7 @@ main(int argc, char **argv)  // , char **envp
             printf("%s\n", src_path);
             return 0;
         } else if (!strcmp(argv[1], "-no-rebuild")) {
-            return _main(argc, argv);
+            return __real_main(argc, argv);
         } else
             break;
         --argc, argv[1] = argv[0], argv++;
@@ -77,5 +77,5 @@ main(int argc, char **argv)  // , char **envp
         execvp(bin_path, argv);
         error(9, errno, "execvp");
     }
-    return _main(argc, argv);
+    return __real_main(argc, argv);
 }

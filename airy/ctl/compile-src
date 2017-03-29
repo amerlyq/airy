@@ -81,7 +81,7 @@ build() { local p d nm out cflags interp
   # REF: https://gcc.gnu.org/onlinedocs/cpp/Invocation.html
   #   <= for preprocessing hacks
   ((staticlib)) && cflags+=( -DBUILD_LIB -c -o "${out%.*}.o" ) \
-  || cflags+=( -D'main(...)=main(__VA_ARGS__) asm ("_main"); int main(__VA_ARGS__)' -o "$out" )
+  || cflags+=( -Wl,--wrap=main -o "$out" )
 
   # EXPL: trailing 'dynamic' to not force static libc.a
   ((autocompile)) && cflags+=( -Wl,-Bstatic -lselfcompile -Wl,-Bdynamic )
@@ -128,6 +128,9 @@ build() { local p d nm out cflags interp
 
   (cd "$dtmp" && "${interp[@]}" "${cflags[@]}") || false
 
+  # IDEA! build always both library and binary from each single file
+  #   = rename: main() -> main_<prg_name>()
+  #   ++! you can link all libs together and call any directly without fork
   # FIXME: use only for gcc/g++
   ((staticlib)) && ar rcs "$out" "${out%.*}.o"
 
