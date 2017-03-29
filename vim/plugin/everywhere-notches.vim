@@ -91,7 +91,7 @@ endfunction
 
 function! s:everywhere_matches(patts)
   for [k,v] in items(a:patts)
-    call matchadd('Notch'. k, '\v<('. v[2] .')>[:?!*.]=', -1)
+    call matchadd('Notch'. k, '\v<('. v[2] .')>[:?!*.=]=', -1)
   endfor
 endfunction
 

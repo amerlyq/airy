@@ -36,7 +36,8 @@ command! -bang -nargs=0 -range  CopyToBuffer call CopyToBuffer()
 """"""""""""""""""""""""""""""""""""""""""""""""""
 
 function! ShortestIndent(s1, s2)
-  let m=strlen(a:s1) | let n=strlen(a:s2)
+  " BUG:(strlen/oldvim): when lines are mixed tabs with spaces
+  let m=strdisplaywidth(a:s1) | let n=strdisplaywidth(a:s2)
   return m == n ? 0 : m > n ? 1 : -1
 endfunc
 
@@ -45,22 +46,20 @@ function! TrimLines(str)
 endfunction
 
 function! TrimIndents(str,...)
-  let tlst=map(split(a:str, '\n'), 'matchstr(v:val, "^\\s*")')
-  " BUG: when lines are mixed tabs with spaces
-  let tir=sort(l:tlst, "ShortestIndent")[0]
-  let rgx='\v\_^' . l:tir . '(.{-})\s*\_$'
-  let feach='substitute(v:val,"^'.l:tir.'","","")'
-  return join(map(split(a:str, '\n'),l:feach), (a:0>0?a:1 :'')."\n")
-  " return substitute(a:str, l:rgx, (a:0>0?a:1:'').'\1', 'g')
-  " return l:tir
+  " BUG: \_^  \_$  don't work
+  let t = substitute(a:str, '\v\s+(\ze\n|$)', '', 'g')
+  let sil = map(split(t, '\n'), 'matchstr(v:val, "^\\s*")')
+  let tir = get(sort(sil, "ShortestIndent"), 0, '')
+  " BUG: mixed tab/space -- can't determine common prefix
+  return substitute(t, '\v(^|\n$@!\zs)'.tir, get(a:,1,''), 'g')
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
 
-function! CopyStringInReg(r, str)
+function! CopyStringInReg(r, str, ...)
  " Preserve previous buffer in register. Breaks next 'setreg'.
-  call setreg('p', getreg(a:r, 1),  getregtype(a:r))
-  call setreg(a:r, a:str, getregtype(a:r))
+  call setreg('p', getreg(a:r, 1), getregtype(a:r))
+  call setreg(a:r, a:str, get(a:, 1, getregtype(a:r)))
   call CountLinesInRegister(a:r, '@'. a:r .':')
 endfunction
 
@@ -148,22 +147,51 @@ endfunction
 
 "{{{1 Get src snippet with ref from current line
 " ALT: use keymap [Frame]b because of 'bookmark'
-nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count,'')<CR>
-nnoremap <unique>  [Frame]y  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
-vnoremap <unique>  [Frame]y  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
+" nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count,'')<CR>
+nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
+vnoremap <unique>  [Frame]Y  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
 
-function! GetLineBookmark(tid, text, ...)
-  let path= a:0>=1 ? expand('%:p') : @%
-  let tab="\t"
+function! GetLineBookmark(idt, text, ...)
+  let path = a:0>=1 ? expand('%:p') : @%
+  let tab = "\t"
   "" Can't use, as values must be extracted from dst, not from src
-  "repeat(&et ? repeat(" ", &ts) : "\t", a:tid)
-  let prf= repeat(l:tab, a:tid)
-  let str=l:prf . path . ":" . line(".")
-  let str=l:str . (empty(a:text) ? "" : "\n" . l:prf . l:tab . a:text)
-  call CopyStringInReg('+', l:str)
+  "repeat(&et ? repeat(" ", &ts) : "\t", a:idt)
+  let prf = repeat(l:tab, a:idt)
+
+  let str = l:prf . path . ":" . line(".")
+  let str.= empty(a:text) ? "" : ("\n" . l:prf . l:tab . a:text)
+
+  call CopyStringInReg('+', l:str, 'V')
   " TODO: Add re-indenting of several lines (like 'for' or 'function' part)
   " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
 endfunction
+
+nnoremap <unique>  [Frame]y  :call GetLineSpoiler(v:count1, TrimIndents(getline('.')))<CR>
+vnoremap <unique>  [Frame]y  :<C-U>call GetLineSpoiler(v:count1, TrimIndents(GetVisualSelection("\n")))<CR>
+
+""" New legend annotation
+"  * path on the right, aligned on 50-60'th column
+"  * rest of wide string over 50-60 is annotated by \{+ ... +\}
+"  * if lesser -- pad left by spaces
+"  * annotation is concealed completely with replace char is …
+" E.G. static void dl_main (const Elf{+W(Phdr) *phdr,+}   ./elf/rtld.c:719
+fun! GetLineSpoiler(idt, text, ...)
+  let p = a:0>=1 ? expand('%:p') : @%
+  if p !~# '^[./]'| let p = '//'.p |en
+
+  let n = 50
+  let i = repeat("\t", a:idt)
+  let t = map( split( substitute(a:text, '\s\+'
+    \, '\=repeat(" ", strdisplaywidth(submatch(0)))'
+    \, 'g'), "\n"), 'l:i . v:val')
+  " BUG: "\t" matches as single char in ".{50}" instead of &ts
+  let t[0] = substitute(get(t, 0, '')
+    \, '\v^.{'.n.'}\zs.*', '{+&+}', '')
+  let t[0].= repeat(' ', n - strdisplaywidth(t[0]))
+  let t[0].= ' | ' . l:p . ':' . line(".")
+
+  call CopyStringInReg('+', join(t, "\n"), 'V')
+endf
 
 
 "{{{1 UNUSED:
