@@ -273,3 +273,15 @@ Diff (restricted)
   Cases
     * diff AgGroup -- ignore numbers at beg /\v^\d+:\d+:/
     * diff .conf -- ignore all comments (filter out)
+
+
+HACK
+  Folding/concealing
+    NOTE: wrapping isn't affected by conceal
+    http://vim.1045645.n5.nabble.com/conceal-and-wrapping-td5723656.html
+    > https://code.google.com/p/vim/issues/detail?id=260
+  Conceal/subs by folding
+    :setl fdm=expr fde='>1' fml=0
+    :let &l:fdt='matchstr(getline(v:foldstart).repeat(" ",70),''^.\{70}'').repeat(" ",10)'
+    + 3rd param to matchstr() for common path to conceal
+    - drawback of disabling syntax hi!

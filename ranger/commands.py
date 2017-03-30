@@ -206,6 +206,8 @@ class cda(Command):
 
         if path[0:1] == '~':
             path = fs.expanduser(path)
+        if path[0:1] != '/':
+            path = fs.join(self.fm.thisdir.path, path)
         if not fs.exists(path):
             return self.fm.notify("No such: " + path, bad=True)
 

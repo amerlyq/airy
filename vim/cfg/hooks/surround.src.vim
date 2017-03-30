@@ -5,14 +5,20 @@
 let g:operator#surround#no_default_blocks = 1
 let g:operator#surround#blocks = {'-': [
   \ {'block': ['${', '}'], 'motionwise': ['char', 'line'], 'keys': ['$', '4']}
-  \] +
-  \ map(split('();{};[]', ';'), "{
+  \]
+  \+map(split('();{};[]', ';'), "{
   \  'keys' : [v:val[1]],
   \  'block': [v:val[0].' ', ' '.v:val[1]],
   \  'motionwise' : ['char', 'line', 'block'],
-  \ }") +
-  \ map(split(g:block_aliases, ';'), "{
+  \ }")
+  \+map(split(g:block_aliases, ';'), "{
   \  'keys' : [v:val[0], v:val[-1]],
   \  'block': split(v:val[-3:-2], '\\zs'),
   \  'motionwise' : ['char', 'line', 'block'],
-  \ }") }
+  \ }")
+  \+map(split('**;__;~~', ';'), "{
+  \  'keys' : [v:val[1]],
+  \  'block': [v:val[0], v:val[1]],
+  \  'motionwise' : ['char', 'line', 'block'],
+  \ }")
+  \}

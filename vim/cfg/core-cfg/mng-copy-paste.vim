@@ -148,8 +148,8 @@ endfunction
 "{{{1 Get src snippet with ref from current line
 " ALT: use keymap [Frame]b because of 'bookmark'
 " nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count,'')<CR>
-nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
-vnoremap <unique>  [Frame]Y  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
+nnoremap <unique>  [Frame]gy  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
+vnoremap <unique>  [Frame]gy  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
 
 function! GetLineBookmark(idt, text, ...)
   let path = a:0>=1 ? expand('%:p') : @%
@@ -166,8 +166,15 @@ function! GetLineBookmark(idt, text, ...)
   " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
 endfunction
 
-nnoremap <unique>  [Frame]y  :call GetLineSpoiler(v:count1, TrimIndents(getline('.')))<CR>
-vnoremap <unique>  [Frame]y  :<C-U>call GetLineSpoiler(v:count1, TrimIndents(GetVisualSelection("\n")))<CR>
+nnoremap <unique>  [Frame]y
+  \ :<C-u>call GetLineSpoiler(v:count1, TrimIndents(getline('.')), 1)<CR>
+vnoremap <unique>  [Frame]y
+  \ :<C-U>call GetLineSpoiler(v:count1, TrimIndents(GetVisualSelection("\n")), 1)<CR>
+
+nnoremap <unique>  [Frame]Y
+  \ :<C-u>call GetLineSpoiler(v:count1, TrimIndents(getline('.')), 0)<CR>
+vnoremap <unique>  [Frame]Y
+  \ :<C-u>call GetLineSpoiler(v:count1, TrimIndents(GetVisualSelection("\n")), 0)<CR>
 
 """ New legend annotation
 "  * path on the right, aligned on 50-60'th column
@@ -176,21 +183,37 @@ vnoremap <unique>  [Frame]y  :<C-U>call GetLineSpoiler(v:count1, TrimIndents(Get
 "  * annotation is concealed completely with replace char is …
 " E.G. static void dl_main (const Elf{+W(Phdr) *phdr,+}   ./elf/rtld.c:719
 fun! GetLineSpoiler(idt, text, ...)
-  let p = a:0>=1 ? expand('%:p') : @%
-  if p !~# '^[./]'| let p = '//'.p |en
-
   let n = 50
-  let i = repeat("\t", a:idt)
-  let t = map( split( substitute(a:text, '\s\+'
-    \, '\=repeat(" ", strdisplaywidth(submatch(0)))'
-    \, 'g'), "\n"), 'l:i . v:val')
-  " BUG: "\t" matches as single char in ".{50}" instead of &ts
-  let t[0] = substitute(get(t, 0, '')
-    \, '\v^.{'.n.'}\zs.*', '{+&+}', '')
-  let t[0].= repeat(' ', n - strdisplaywidth(t[0]))
-  let t[0].= ' | ' . l:p . ':' . line(".")
+  let p = expand(get(a:,2) ? '%:p' : '%')
+  if p !~# '^[./]'| let p = './'.p |en
 
-  call CopyStringInReg('+', join(t, "\n"), 'V')
+  " Expand all blanks in selection
+  let t = substitute(a:text, '\s\+',
+    \ '\=repeat(" ", strdisplaywidth(submatch(0)))', 'g')
+
+  " WARN: supports fixed indent only == can't use "\t"
+  "   * space-padding for *.nou won't work if &ts diffs from *.c
+  "   * expand "\t" in above is wrong when &ts diffs in *.c / *.nou
+  let i = repeat('  ', a:idt)
+  if get(a:,1)  " Option: Join all lines into single one
+    let t = l:i . substitute(t, '\s*\\n\?\\\?\n\s*', ' ', 'g')
+  else
+    let t = substitute(t, '\v(^|\n$@!\zs)', l:i, 'g')
+  endif
+
+  if !get(a:,1)
+    let m = split(t, "\n")
+    let t = get(m, 0, '')
+  endif
+
+  " BUG: "\t" matches as single char in ".{50}" instead of &ts
+  let t = substitute(t, '\v^.{'.(n-2).'}\zs.*', '{+&+}', '')
+  let t.= repeat(' ', n - strdisplaywidth(t))
+  let t.= ' | ' . l:p . ':' . line(".")
+
+  if !get(a:,1) && len(m)>0| let t = join([t] + m[1:], "\n") |en
+
+  call CopyStringInReg('+', t, 'V')
 endf
 
 
