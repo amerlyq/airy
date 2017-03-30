@@ -190,15 +190,18 @@ fun! GetLineSpoiler(idt, text, ...)
   " Expand all blanks in selection
   let t = substitute(a:text, '\s\+',
     \ '\=repeat(" ", strdisplaywidth(submatch(0)))', 'g')
+  " Strip C-style line ends
+  let t = substitute(t, '\v;?\s*%(\\n)?\\?(\ze\n|$)', '', 'g')
 
   " WARN: supports fixed indent only == can't use "\t"
   "   * space-padding for *.nou won't work if &ts diffs from *.c
   "   * expand "\t" in above is wrong when &ts diffs in *.c / *.nou
   let i = repeat('  ', a:idt)
-  if get(a:,1)  " Option: Join all lines into single one
-    let t = l:i . substitute(t, '\s*\\n\?\\\?\n\s*', ' ', 'g')
-  else
-    let t = substitute(t, '\v(^|\n$@!\zs)', l:i, 'g')
+
+  if get(a:,1)  " Join all lines into single one
+    let t = l:i . substitute(t, '\n\s*', ' ', 'g')
+  else  " Add indent to each line
+    let t = substitute(t, '\v(^|\n\zs$@!)', l:i, 'g')
   endif
 
   if !get(a:,1)
@@ -206,8 +209,11 @@ fun! GetLineSpoiler(idt, text, ...)
     let t = get(m, 0, '')
   endif
 
-  " BUG: "\t" matches as single char in ".{50}" instead of &ts
-  let t = substitute(t, '\v^.{'.(n-2).'}\zs.*', '{+&+}', '')
+  if l:n < strdisplaywidth(t)
+    " BUG: "\t" matches as single char in ".{50}" instead of &ts
+    let t = substitute(t, '\v^.{'.(n-2).'}\zs.*', '{+&+}', '')
+  endif
+
   let t.= repeat(' ', n - strdisplaywidth(t))
   let t.= ' | ' . l:p . ':' . line(".")
 
