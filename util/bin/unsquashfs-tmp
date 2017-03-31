@@ -1,4 +1,7 @@
 #!/bin/bash -e
+# NEED: squashfs-tools
+# NOTE: reverse
+#   mksquashfs ./dir dst -comp lzma [-e exlude]
 
 # Ubuntu:
 # http://unix.stackexchange.com/questions/90323/how-to-use-unsquashfs-with-lzma
@@ -6,9 +9,6 @@
 # Extract compression method from superblock
 #   http://superuser.com/questions/919025/what-was-the-squashfs-compression-method
 # ALT: >v4.3 unsquashfs -s ..
-
-# NOTE: reverse
-#   mksquashfs ./dir dst -comp lzma [-e exlude]
 
 img=${1:?}
 dst=${2:-default}

@@ -1,0 +1,61 @@
+#!/bin/bash -eu
+# path-elf: list of unnecessary syms
+# .def .und .hit .jnk .non
+
+src=$(readlink -e "$1")
+dst=$(readlink -m "${2:-/tmp/deps}")
+
+mkdir -p "$dst"
+
+bin=$dst/bin
+so=$dst/so
+
+cd "$src"
+
+[[ -d $bin ]] || r.find-elf -b . | r.elf-dynsyms-dump "$bin"
+[[ -d $so ]]  || r.find-elf -s . | r.elf-dynsyms-dump "$so"
+
+# TODO: skip STD libs like libstdc++, etc
+# THINK: is there any sense to strip /bin/bash, etc from defined .dynsym ?
+# TODO: skip STD syms like _fini, _start, etc anywhere
+
+# bin def * copy to .jnk
+find "$bin" -type f -name '*.def' \
+| SHELL=/bin/dash parallel cp -fT {} {.}.jnk
+
+# Cache db
+jcat(){ find "$1" -type f -name "*.$2" -print0 \
+  | LC_ALL=C sort --files0-from=- -o "$1.$2"; }
+jcat "$bin" def
+jcat "$bin" und
+jcat "$so" def
+jcat "$so" und
+
+# Check unresolved and excessive
+#   => seems like some .so expect .bin to have certain syms
+grep -vFx -f "$so.def" "$bin.und" | tee "$bin.non" | LC_ALL=C sort -u -o "$bin.unon"
+grep -vFx -f "$so.def"  "$so.und" | tee  "$so.non" | LC_ALL=C sort -u -o  "$so.unon"
+grep -vFx -f "$so.und" "$bin.def" | tee "$bin.jnk" | LC_ALL=C sort -u -o "$bin.ujnk"
+grep  -Fx -f "$so.und" "$bin.def" | tee "$bin.wtf" | LC_ALL=C sort -u -o "$bin.uwtf"
+grep -vFx -f "$so.und" -f "$bin.und" "$so.def" | tee  "$so.jnk" | LC_ALL=C sort -u -o  "$so.ujnk"
+
+sz(){ command stat -c%s "$1"; }
+echo "sym_num reduction: $(( 100 * ( $(sz "$bin.jnk") + $(sz "$so.jnk") ) / ( $(sz "$bin.def") + $(sz "$so.def") ) ))%"
+
+# TRY: two-column .hit $nm for reverse-deps
+# grep -RFx -f "$nm.und" --include '*.def' "$bin" > "$nm.hit"
+# grep -vFx -f "$nm.hit" "$nm.def" > "$nm.jnk"
+
+# bin und
+#   * merge with .so und
+# .so def
+#   * main db for searching
+# .so und
+#   * search them
+
+# NEED
+#   * list unfound .und per elf
+#     => mark each found symbol -- like filter .und back into .non and use in-place edit by sponge, etc
+#       SEE http://unix.stackexchange.com/questions/11067/is-there-a-way-to-modify-a-file-in-place
+#       http://backreference.org/2011/01/29/in-place-editing-of-files/
+#   * list unfound .und per elf

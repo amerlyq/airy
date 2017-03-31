@@ -1,0 +1,15 @@
+#!/bin/bash -eu
+dst=${1:-/tmp/red}
+mkdir -p "$dst"
+
+# ALT: preliminary copy
+# (cd "$src" && r.find-elf) | xargs cp -t "$dst" --parents
+gensymtbl() {
+  echo "$1"
+  mkdir -p "${2%/*}"
+  nm --format=p -D --defined-only "$1"   | cut -d' ' -f1 > "$2.def"
+  nm --format=p -D --undefined-only "$1" | cut -d' ' -f1 > "$2.und"
+}
+export -f gensymtbl
+
+SHELL=/bin/dash parallel "gensymtbl {} '$dst'/{}"
