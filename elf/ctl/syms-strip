@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+
+tbl=$1
+f=$2
+d=${3:-${f}_s}
+
+symlens(){ awk -F' *[\\[\\]]? *' \
+  '{printf"%6d %3d  %s\n",strtonum("0x"$2),length($NF),$NF}'; }
+
+# BUG? tbl has one more sym than result of filtering
+readelf -p.dynstr "$f" | { grep -F -f "$tbl" || echo; } \
+| symlens | LC_ALL=C sort -rn -k1,1 \
+| perl -Mstrict -Mautodie -Mwarnings=FATAL,all -e '
+while(<>) {
+  my ($off,$sz,undef) = split("\\s+");
+  print $off," ",$sz,"\n";
+}
+'

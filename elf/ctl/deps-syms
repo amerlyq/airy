@@ -1,61 +1,77 @@
 #!/bin/bash -eu
+set -o pipefail
 # path-elf: list of unnecessary syms
-# .def .und .hit .jnk .non
-
-src=$(readlink -e "$1")
-dst=$(readlink -m "${2:-/tmp/deps}")
-
-mkdir -p "$dst"
-
-bin=$dst/bin
-so=$dst/so
-
-cd "$src"
-
-[[ -d $bin ]] || r.find-elf -b . | r.elf-dynsyms-dump "$bin"
-[[ -d $so ]]  || r.find-elf -s . | r.elf-dynsyms-dump "$so"
+# .def .und .jnk .wtf | .hit .non
 
 # TODO: skip STD libs like libstdc++, etc
 # THINK: is there any sense to strip /bin/bash, etc from defined .dynsym ?
 # TODO: skip STD syms like _fini, _start, etc anywhere
+# TRY: add two-column .hit $nm for reverse-deps per sym
 
-# bin def * copy to .jnk
-find "$bin" -type f -name '*.def' \
-| SHELL=/bin/dash parallel cp -fT {} {.}.jnk
+opts=; while getopts 'r' o; do case $o in :|'?') exit 1
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
 
-# Cache db
-jcat(){ find "$1" -type f -name "*.$2" -print0 \
-  | LC_ALL=C sort --files0-from=- -o "$1.$2"; }
-jcat "$bin" def
-jcat "$bin" und
-jcat "$so" def
-jcat "$so" und
+src=$(readlink -e "$1")
+dst=$(readlink -m "${2:-/tmp/deps}")
 
-# Check unresolved and excessive
+# Header
+# pushd(){ command pushd "$@" > /dev/null; }
+# popd(){ command popd "$@" > /dev/null; }
+
+# NOTE: Db per elf
+gensyms(){ [[ -d $dst/$1 ]] && ! has r && return
+  r.find-elf "${@:2}" | r.elf-dynsyms-dump "$dst/$1"; }
+
+cd "$src"
+gensyms std/bin -b . \( -name opt -o -name root \) -prune -o
+gensyms std/so  -s . \( -name opt -o -name root \) -prune -o
+gensyms opt/bin -b opt root
+gensyms opt/so  -s opt root
+
+# NOTE: Cache db
+fmask(){ find "$@" -type f -print0 | ifne env LC_ALL=C sort --files0-from=-; }
+dump(){ tee "$1" | LC_ALL=C sort -u -o "${1}u"; }
+jall(){ local d=all/$1.$2; mkdir -p "${d%/*}"
+  fmask "$1" -name all -prune -o -name "*.$2" | dump "$d"
+}
+
+cd "$dst"
+while read -r pnm ext; do jall "$pnm" "$ext"
+done <<< "$(printf '%s\n' {std,opt}/{bin,so}" "{def,und})"
+
+cd "$dst/all"
+for ext in def und; do
+  fmask opt std -name "*.$ext" | dump "all.$ext"
+done
+
+
+# NOTE: Check unresolved and excessive
 #   => seems like some .so expect .bin to have certain syms
-grep -vFx -f "$so.def" "$bin.und" | tee "$bin.non" | LC_ALL=C sort -u -o "$bin.unon"
-grep -vFx -f "$so.def"  "$so.und" | tee  "$so.non" | LC_ALL=C sort -u -o  "$so.unon"
-grep -vFx -f "$so.und" "$bin.def" | tee "$bin.jnk" | LC_ALL=C sort -u -o "$bin.ujnk"
-grep  -Fx -f "$so.und" "$bin.def" | tee "$bin.wtf" | LC_ALL=C sort -u -o "$bin.uwtf"
-grep -vFx -f "$so.und" -f "$bin.und" "$so.def" | tee  "$so.jnk" | LC_ALL=C sort -u -o  "$so.ujnk"
+fstdif(){ grep -vFx -f "all.ign" -f "$2" "$1" || true; };  # OR intrsec
+ucsort(){ LC_ALL=C sort | uniq -c | sort -srn -k1,1; }
 
-sz(){ command stat -c%s "$1"; }
-echo "sym_num reduction: $(( 100 * ( $(sz "$bin.jnk") + $(sz "$so.jnk") ) / ( $(sz "$bin.def") + $(sz "$so.def") ) ))%"
+# TODO:FIND: from where to extract those _mandatory_ syms list ?
+_ignore=( __bss_start _edata _end _fbss _fdata _ftext _fini _init __RLD_MAP main )
+printf '%s\n' "${_ignore[@]}" > "all.ign"
 
-# TRY: two-column .hit $nm for reverse-deps
-# grep -RFx -f "$nm.und" --include '*.def' "$bin" > "$nm.hit"
-# grep -vFx -f "$nm.hit" "$nm.def" > "$nm.jnk"
+fstdif all.def all.und | tee all.jnk | ucsort > all.jnkuc
+fstdif all.und all.def | ucsort > all.wtfuc
 
-# bin und
-#   * merge with .so und
-# .so def
-#   * main db for searching
-# .so und
-#   * search them
+# NOTE: Gather junk per elf
+export -f fstdif
+find -H "$dst" -name all -prune -o -type f -name '*.def' -print \
+| SHELL=/bin/dash parallel 'fstdif {} all.undu > {.}.jnk'
 
-# NEED
-#   * list unfound .und per elf
-#     => mark each found symbol -- like filter .und back into .non and use in-place edit by sponge, etc
-#       SEE http://unix.stackexchange.com/questions/11067/is-there-a-way-to-modify-a-file-in-place
-#       http://backreference.org/2011/01/29/in-place-editing-of-files/
-#   * list unfound .und per elf
+# THINK: more granular deps between bin/.so
+# bin def * filter by .so und
+# bin und * merge with .so und
+# .so def * main db for searching
+# .so und * search them
+
+# NEED => mark each found symbol -- like filter .und back into .non and use in-place edit by sponge, etc
+#   http://unix.stackexchange.com/questions/11067/is-there-a-way-to-modify-a-file-in-place
+#   http://backreference.org/2011/01/29/in-place-editing-of-files/
+
+# sz(){ command stat -c%s "$1"; }
+# echo "sym_num reduction: $(( 100 * ( $(sz "$bin.jnk") + $(sz "$so.jnk") ) / ( $(sz "$bin.def") + $(sz "$so.def") ) ))%"

@@ -1,0 +1,19 @@
+#!/bin/bash -eu
+# USAGE: r.elf-deps-syms . && ./$0 .
+# Total: { r.elf-deps-stat bin; r.elf-deps-stat so; } \
+#   | awk '{e+=$1;u+=$2;j+=$3;s+=$4;++n}END{print e,u,j,s,n}'
+set -o pipefail
+
+src=$1  # /tmp/deps/opt/so
+
+dynstat(){
+  find "$1" -type f -name '*.def' | while IFS= read -r nm; do
+    nm=${nm%.*}
+    printf '%5d %4d %5d %7d %s\n' "$(wc -l <"$nm.def")" \
+      "$(wc -l <"$nm.und")" "$(wc -l <"$nm.jnk")" \
+      "$(stat -c%s "$nm.jnk")" \
+      "/$(realpath --relative-to "$src" "$nm")"
+  done
+}
+
+dynstat "$src" | LC_ALL=C sort -n -k4,4

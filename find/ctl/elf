@@ -14,7 +14,7 @@ opts=; while getopts 'abcf:kmop:s' o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
 has(){ [[ $opts =~ [$*] ]]; }
 
-src=${1:-$PWD}
+src=( "${@:-$PWD}" )
 flt=( )  # DEV: preliminary filter-out trash files
 
 [[ -z ${opts//[^bckos]} ]] && opts=bs  # =DFL
@@ -38,7 +38,7 @@ has s && typ+='|shared object'
 typ="(${typ:1})"
 
 # WARN: ignores symlinks
-exec find -H "$src" -type f "${flt[@]}" \
+exec find -H "${src[@]}" -type f "${flt[@]}" -print \
 | file -f- -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar \
 | grep -iFw "${bfmt-elf}" \
 | grep -Ew  "${typ}" \
