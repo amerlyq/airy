@@ -1,25 +1,46 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 set -o pipefail
 
-bfmt=elf
-pltf=mips
+# USAGE:
+# a=all, b=bin, c=core, k=kernel, o=object, s=shared
+# f=bfmt : elf
+# m=masked : find masked by extension
+# p=pltf : mips, x86-64
 
-# [a]=all, d=deps, b=bin, p=pltf, s=so
-opts=; while getopts 'abdps' o; do case $o in :|'?') exit 1
+opts=; while getopts 'abcf:kmop:s' o; do case $o in :|'?') exit 1
+;; a) opts+=bckos
+;; f) bfmt=$OPTARG
 ;; p) pltf=$OPTARG
 esac; opts+=$o; done; shift $((OPTIND - 1))
 has(){ [[ $opts =~ [$*] ]]; }
 
 src=${1:-$PWD}
-args=( -type f )  # WARN: ignores symlinks
+flt=( )  # DEV: preliminary filter-out trash files
 
-  if has a; then args+=( )
-elif has b; then args+=( -executable \! -regex '.*\.so\(\.[0-9]+\)*$' )
-elif has s; then args+=( -regex '.*\.so\(\.[0-9]+\)*$' )
+[[ -z ${opts//[^bckos]} ]] && opts=bs  # =DFL
+
+if has m; then
+  has bckos && flt+=( \( -false )
+  has b && flt+=( -o \( -executable \! -regex '.*\.[ks]?o\(\.[0-9]+\)*$' \) )
+  has c && flt+=( -o -name 'core.*' )
+  has k && flt+=( -o -name '*.ko' )
+  has o && flt+=( -o -name '*.o' )
+  has s && flt+=( -o -regex '.*\.so\(\.[0-9]+\)*$' )
+  has bckos && flt+=( \) )
 fi
 
-exec find -H "$src" "${args[@]}" \
-| file -f- \
-| grep -Fw "${bfmt^^}" \
-| grep -Fw "${pltf^^}" \
+# TODO: distinguish '.o' from '.ko' by file extension
+typ=''
+has b && typ+='|executable'
+has c && typ+='|core file'
+has ko && typ+='|relocatable'
+has s && typ+='|shared object'
+typ="(${typ:1})"
+
+# WARN: ignores symlinks
+exec find -H "$src" -type f "${flt[@]}" \
+| file -f- -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar \
+| grep -iFw "${bfmt-elf}" \
+| grep -Ew  "${typ}" \
+| grep -iFw "${pltf-}" \
 | awk -F': ' '{print $1}'
