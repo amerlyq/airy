@@ -2,6 +2,19 @@
 
 Resources for blind
   http://mielke.cc/blind.html
+  https://f123.org/
+    https://public.f123.org/experimental/About-F123e.html
+    https://github.com/F123
+
+spacemacs+emacspeak:
+  https://public.f123.org/experimental/About-F123e.html
+
+  DEV: shorter message '-- INSERT --' to pronounce
+    CHG: ~/.emacs.d/elpa/evil-20170209.1259/evil-states.el
+      (evil-define-state insert ...  :message "INS"
+
+!!! [_] READ Chapter from "Beautiful Code" on implementing Emacspeak
+  http://emacspeak.sourceforge.net/raman/publications/bc-emacspeak/publish-emacspeak-bc.html
 
 TODO
   [_] try to use them for coding on mobile when walking streets?
@@ -145,6 +158,9 @@ TTS
   https://www.maketecheasier.com/make-computer-talk-with-festival/
   https://www.quora.com/What-is-the-best-text-to-speech-TTS-program-for-Linux-Are-the-voices-any-good
   https://www.reddit.com/r/linux/comments/5c0ljt/tts_software_for_linux/
+  https://launchpad.net/ubuntu/precise/+source/svox/
+    $ pico2wave -l en-US -w /tmp/t.wav "hello world." && aplay /tmp/t.wav
+  +++ HACK-out https://sweethack.wordpress.com/2014/04/14/excellent-quality-text-to-speech-with-linux-french-francais/
 
   softsynth ?
     I just upgraded to arch 4.0.4, and I downloaded and built edbrowse

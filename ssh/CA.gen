@@ -3,6 +3,9 @@
 # TODO:
 #   Don't forget to disable your passwd connection. Strengen my passwd on CA. Protection from DDOS & brutforce.
 #   Reinstall new firmware with only very necessary progs. Is it has OpenCA? I smth such remember...
+# SEE
+#   https://habrahabr.ru/post/325230/
+#     https://www.yubico.com/2015/02/big-debate-2048-4096-yubicos-stand/
 
 dir=/tmp/ca
 mkdir -p "$dir"
@@ -34,4 +37,3 @@ ssh-keygen -s "$ca_sign" -I "HostSrv_Sir" -h -n "sir.com" -V +52w1d "$sir_idn"
 # scp ssh_host_rsa_key-cert.pub root@sshserver.example.com:/etc/ssh/
 # cp "${sir_idn%.pub}-cert.pub" ~/.ssh/
 rm "$sir_idn" "${sir_idn%.pub}-cert.pub"
-
