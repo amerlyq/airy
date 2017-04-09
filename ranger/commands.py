@@ -5,8 +5,6 @@ import re
 import os
 from os import path as fs
 
-ag_patterns = []
-
 
 # BAD: ranger crash on exit if '--choosedir' path was deleted by 3rd party
 def tmpfile(nm):
@@ -29,6 +27,7 @@ class ag(Command):
     editor = os.getenv('EDITOR') or 'vim'
     acmd = 'ag --smart-case --group --color --hidden'  # --search-zip
     qarg = re.compile(r"""^(".*"|'.*')$""")
+    patterns = []
     # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
 
     def _sel(self):
@@ -43,8 +42,8 @@ class ag(Command):
 
     def _arg(self, i=1):
         if self.rest(i):
-            ag_patterns.append(self.rest(i))
-        return ag_patterns[-1] if ag_patterns else ''
+            ag.patterns.append(self.rest(i))
+        return ag.patterns[-1] if ag.patterns else ''
 
     def _quot(self, patt):
         return patt if ag.qarg.match(patt) else shell_quote(patt)
@@ -64,14 +63,20 @@ class ag(Command):
         return (cmdl, '')
 
     def _aug_sh(self, iarg, flags=[]):
+        cmdl = ag.acmd.split() + flags
         if iarg == 1:
-            cmdl = ag.acmd.split() + self.rest(iarg).split()
+            import shlex
+            cmdl += shlex.split(self.rest(iarg))
         else:
-            if self.arg(iarg) == '-Q':
+            # NOTE: only allowed switches
+            opt = self.arg(iarg)
+            while opt in ['-Q', '-w']:
                 self.shift()
-                flags = ['--literal'] + flags
-            patt = self._bare(self._arg(iarg))
-            cmdl = ag.acmd.split() + flags + [patt]
+                cmdl.append(opt)
+                opt = self.arg(iarg)
+            # TODO: save -Q/-w into ag.patterns =NEED rewrite plugin to join _aug*()
+            patt = self._bare(self._arg(iarg))  # THINK? use shlex.split() also/instead
+            cmdl.append(patt)
         if '-g' not in flags:
             cmdl += self._sel()
         return (cmdl, '-p')
@@ -86,11 +91,11 @@ class ag(Command):
         elif self.arg(1) == '-p':  # paths
             return self._aug_sh(2, ['-g'])
         elif self.arg(1) == '-f':
-            return self._aug_sh(2, [])
+            return self._aug_sh(2)
         elif self.arg(1) == '-r':
             return self._aug_sh(2, ['--files-with-matches'])
         else:
-            return self._aug_sh(1, [])
+            return self._aug_sh(1)
 
     def _catch(self, cmd):
         from subprocess import check_output, CalledProcessError
@@ -127,8 +132,12 @@ class ag(Command):
 
     def tab(self):
         # BAD:(:ag <prev_patt>) when input alias ':agv' and then <Tab>
-        return ['{} {}'.format(self.arg(0), p)
-                for p in reversed(ag_patterns)]
+        #   <= EXPL: aliases expanded before parsing cmdline
+        cmd = self.arg(0)
+        flg = self.arg(1)
+        if flg[0] == '-' and flg[1] in 'flvgprw':
+            cmd += ' ' + flg
+        return ['{} {}'.format(cmd, p) for p in reversed(ag.patterns)]
 
 
 class doc(Command):
