@@ -16,3 +16,13 @@ noremap <unique> gh  :<C-U>bprev<CR>
 noremap <unique> gl  :<C-U>bnext<CR>
 noremap <unique> gH  :<C-U>bfirst<CR>
 noremap <unique> gL  :<C-U>blast<CR>
+
+" Close all but this one ::: ALT: :%bd|e#
+com! -bar -nargs=0 BufOnly :<C-u>call <SID>bufonly()<CR>
+
+fun! s:bufonly()
+  let c = bufnr("%")
+  let e = bufnr("$")
+  if c>1| sil! exe '1,'. (c-1) .'bd'  |en
+  if c<e| sil! exe (c+1) .','. e.'bd' |en
+endf

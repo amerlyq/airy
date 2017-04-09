@@ -1,6 +1,8 @@
 " ATTENTION:OFF: Because of neocomplete/deoplete:
 "   Disable mappings, but allow omnifunc:
-let g:jedi#completions_command = 0
+let g:jedi#completions_command = ''
+" let g:jedi#auto_initialization = 0
+" let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#show_call_signatures = 0
 let g:jedi#popup_select_first = 0
@@ -12,6 +14,7 @@ let g:jedi#use_tabs_not_buffers = 0  " Prefer buffers over tabs
 " let g:jedi#use_splits_not_buffers = "left"
 let g:jedi#smart_auto_mappings = 0
 let g:jedi#popup_on_dot = 1
+let g:jedi#popup_select_first = 0
 let g:jedi#show_call_signatures = 2
 
 "" Mappings
