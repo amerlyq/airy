@@ -28,8 +28,15 @@ bins -p "${prf}" -- ./ctl/*  # ctl/* -> bin/r.%d-*
 bins -p "${prf%-}" -s 'run/' -- ./run*  # run* -> bin/r.%d*
 
 
-srcs(){ local a=()
-  for f in "$@"; do [[ -f $f && -s $f && ! -x $f ]] && a+=("$f"); done
-  r.airy-compile-src -ft "$bin" -p "${prf}" -- "${a[@]}"
+# BAD:(frail dep): used explicit dst dir
+# BAD:(frail dep): explicit name for dst bin
+# BAD: builds only binaries, can't distinguish libs
+srcs(){ local nm d=~/.cache/airy/build/bin
+  for p in "$@"; do
+    [[ -f $p && -s $p && ! -x $p ]] || continue
+    r.airy-compile-src -ft "$d" -- "$p"
+    nm=${p##*/}; nm=${nm%.*}
+    bins -p "${prf}" -- "$d/$nm"
+  done
 }
-srcs ./src/*  # src/* -> bin/r.%d-*
+srcs ./src/*  # src/* -> $cache/build/* -> bin/r.%d-*

@@ -1,53 +1,90 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
+# USAGE: compile single ELF from single src file / dir
+source ~/.shell/profile
 
-dbin=${TMPDIR:-/tmp}
-dlib=${TMPDIR:-/tmp}
+# THINK: does selfcompiling for *.a *.so possible at all ?
+#   ? where to embed init code ?
+#   => always need to recompile main binary
+#   ? maybe for *.so is enough to rebuild only lib itself and relaunch ?
+
+# IDEA! build always both library and binary from each single file
+#   = rename: main() -> main_<prg_name>()
+#   ++! you can link all libs together and call any directly without fork
+#   + accompany *.a by ./build/inc/ dir to place all *.h
+#   BUT: can't cleanly selfcompile those libs on changes...
+
+# ALSO: use dirs 'src.bin' and 'src.lib' to distinguish how-to build ?
+#   => prev idea of having lib per bin is nice to reuse code...
+
+# BAD: deps/libs order -- same problem as with my 'airy' mods deps
+
+dbin=$cache/build/bin
+dlib=$cache/build/lib
 dtmp=${TMPDIR:-/tmp}
 autocompile=1  # embed self-compiling code
 chk_tstamp=1
 staticlib=0
 chk_src=0
 quiet=0
+verbose=0
 
-while getopts 'cflL:Nt:p:q' o; do case $o in :|'?') exit 1
+while getopts 'cflL:Nt:o:qv' o; do case $o in :|'?') exit 1
 ;; c) chk_src=1
 ;; f) chk_tstamp=0  # force
 ;; l) staticlib=1; autocompile=0
 ;; N) autocompile=0
-;; t) dbin=$(readlink -e "$OPTARG")
-;; L) dlib=$(readlink -e "$OPTARG")
-;; p) prf=$OPTARG
+;; t) dbin=$(readlink -m "$OPTARG")
+;; L) dlib=$(readlink -m "$OPTARG")
+;; o) output=$OPTARG
 ;; q) quiet=1
+;; v) verbose=1
 # ;; o) out=$OPTARG  # compile all src in one exe
 esac; done; shift $((OPTIND - 1))
 
-# NOTE: parse interpreter: // airy:gcc ...
-# DFL: prepend USE:(append): // airy:gcc {} ...
-parse_shebang() { local sub=0 shebang
-  shebang=$(sed -rn '/^\W*\sairy(:\S*)\s(.*)/{s//\1 \2/p;q};5q' "$p")
-  while IFS=$' ' read -ra a; do
-    [[ ${#a[@]} > 0 && -n ${a[0]} ]] || continue
-    interp=${a[0]}
-    a=( "${a[@]:1}" )  # RFC w/o reassign
+# NOTE: parse interpreter and prepend args before paths:
+#   // airy: ...
+#   // airy:gcc ...
+#   // airy: {} ...
+#   // airy:=g++ {} ...
+# FIXME: ':=' must discard all other args beside general -I, -L
+# NEED: use args from shebang as deps for timestamps checking in selfcompile
+# RFC: sep on three pure funcs: extract shebang, parse interp, parse args
+parse_shebang() { local sub=0 a shebang
+  shebang=$(sed -rn '/^\W*\sairy(:=?\S*)\s(.*)/{s//\1 \2/p;q};5q' "$p")
+  { read -rd$' ' interp; read -ra a; } <<< "$shebang" || true
+  # RFC:BAD: code duplication
+  [[ -n $interp && ${#a[@]} > 0 ]] || { cflags+=( "$@" ); return 0; }
 
-    # HACK: s/placeholder/src/g
-    #   WTF if $p=dir ? use sep comp file ? OR use shebang from main.*
-    for i in "${!a[@]}"; do case ${a[i]}
-    in '{p}' | '{}') sub=1; a[i]=$p
-    ;; '{b}') sub=1; a[i]=$nm
-    ;; '{d}') sub=1; a[i]=${out%/*}
-    esac; done
+  # HACK: s/placeholder/src/g
+  #   WTF if $p=dir ? use sep comp file ? OR use shebang from main.*
+  #   TODO:BET: use same placeholders from 'parallel'
+  #   RFC: move these subs outside? But then where to get vals for subs?
+  for i in "${!a[@]}"; do case ${a[i]}
+  in '{p}' | '{}') sub=1; a[i]=$p
+  ;; '{b}') sub=1; a[i]=$nm
+  ;; '{d}') sub=1; a[i]=${out%/*}
+  esac; done
 
-    # FIXME: 'airy:=' must discard all other args beside general -I, -L
-    cflags+=( "${a[@]}" )
-  done <<< "$shebang"
+  case $interp
+  in :=?*) interp=${interp:2}; cflags=( "${a[@]}" )
+  ;; :?*)  interp=${interp:1}; cflags+=( "${a[@]}" )
+  ;; *) echo "Err: interp=$interp"; exit 7
+  esac
+
+  # BAD: if 'sub' must specify all files in shebang instead, beside changed
   ((sub)) || cflags+=( "$@" )  # RFC move outside
 }
 
 build() { local p d nm out cflags interp
   p=$(readlink -e "$1")
-  nm=${p##*/}; nm=${nm%.*}
-  ((!staticlib)) && out=$dbin/${prf-}${nm} || out=$dlib/lib${prf-}${nm}.a
+
+  if [[ -z ${output-} ]]; then
+    nm=${p##*/}; nm=${nm%.*}
+    ((!staticlib)) && out=$dbin/${nm} || out=$dlib/lib${nm}.a
+  else
+    out=$output
+    nm=${out##*/}; nm=${nm%.*}
+  fi
 
   if [[ -d $p ]]; then
     d=$p
@@ -57,15 +94,14 @@ build() { local p d nm out cflags interp
     set -- "$p"
   fi
 
-  if ((chk_src)) && ((!staticlib)) && [[ -f $out && -s $out && -x $out ]]; then
-    # NOTE: err if original file is different now
-    if [[ ! $("$out" -src-path) -ef $p ]]; then
-      echo "original file is different or absent" >&2
-      exit 5
-    fi
+  if ((chk_src)) && ((!staticlib)) \
+  && [[ -f $out && -s $out && -x $out ]] \
+  && [[ ! $("$out" -src-path) -ef $p ]]; then
+    echo "Err: original file is different or absent now" >&2
+    exit 5
   fi
 
-  # DEV: cmp recursively all files with bin
+  # DEV: cmp recursively all srcs/deps with bin
   if ((chk_tstamp)) && [[ $p -ot $out ]]; then
     ((quiet)) || echo "(=)  ${out##*/}"
     return 0
@@ -75,24 +111,33 @@ build() { local p d nm out cflags interp
   # SEE:(flags): https://wiki.gentoo.org/wiki/GCC_optimization/ru
   # https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html
   cflags=( -march=native -O3 -pipe -pedantic -Wall -Wextra -Werror -Wl,--as-needed )
-  cflags+=( -ggdb -fvar-tracking-assignments -Wl,--trace )  # -gz -gcolumn-info
+  # -gz -gcolumn-info
+  ((verbose)) && cflags+=( -O1 -ggdb -fvar-tracking-assignments -Wl,--trace )
   cflags+=( -I "$d" -L "$dlib" -DSRC_PATH="$p" )
 
   # REF: https://gcc.gnu.org/onlinedocs/cpp/Invocation.html
   #   <= for preprocessing hacks
   ((staticlib)) && cflags+=( -DBUILD_LIB -c -o "${out%.*}.o" ) \
   || cflags+=( -Wl,--wrap=main -o "$out" )
+  # ALT:BET? instead of wrapping 'main' sym, insert code directly before 'main()' ?
+  #   http://stackoverflow.com/questions/8713470/executing-code-before-main
+  #   http://stackoverflow.com/questions/10897552/call-a-function-before-main
+  #   http://stackoverflow.com/questions/2518415/is-there-any-way-a-c-c-program-can-crash-before-main
+  #   http://ptspts.blogspot.com/2014/01/how-to-run-custom-code-before-and-after.html
 
   # EXPL: trailing 'dynamic' to not force static libc.a
   ((autocompile)) && cflags+=( -Wl,-Bstatic -lselfcompile -Wl,-Bdynamic )
   # WARN: -Wl,-Bdynamic requires GNU ld, so this solution doesn't work on systems where gcc uses the system ld (e.g. Mac OS X).
 
+  # NOTE: modifies "interp" and "cflags+=()"
   parse_shebang "$@"
 
   # BET: makefile to track and re-generate all static libraries  BUT:BAD: too long
   #   ALT: use make only for logic of compiling different extensions per single file
   #   BET:IDEA: ~/.cache/airy/build/{bin,lib,Makefile} and gen Makefile recipes as 'alias' file -- so all deps will be in single file
   #   http://stackoverflow.com/questions/2734719/how-to-compile-a-static-library-in-linux
+  #   BAD: on each launch need make to check all deps recursively (very slow)
+  #     => Compromise: don't use make for independent single-file programs
   # SEE: linker libs order
   #   http://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
   if ((autocompile)); then
@@ -112,26 +157,17 @@ build() { local p d nm out cflags interp
 
   # BUG: if not removed *.o -> resulting binary is wrong
   #   BET: try using makefile
-  if [[ ! -v interp || $interp == : ]]; then
+  if [[ -z $interp ]]; then
     case "${p##*/}"
-    in *.c  ) interp=( gcc )
-    ;; *.cpp) interp=( g++ )
+    in *.c  ) interp=gcc; cflags=( -std=gnu11 "${cflags[@]}" )
+    ;; *.cpp) interp=g++; cflags=( -std=gnu++14 "${cflags[@]}" )
     # ;; *.hs ) ghc -O -o "$out" "$@"
     esac
-  elif [[ $interp == :?* ]]; then
-    interp=( "${interp:1}" )
-  else exit 7; fi
+  fi
 
-  case $interp
-  in gcc) interp+=( -std=gnu11 )
-  ;; g++) interp+=( -std=gnu++14 )
-  esac
+  (cd "$dtmp" && mkdir -p "${out%/*}" \
+    && "$interp" "${cflags[@]}") || false
 
-  (cd "$dtmp" && "${interp[@]}" "${cflags[@]}") || false
-
-  # IDEA! build always both library and binary from each single file
-  #   = rename: main() -> main_<prg_name>()
-  #   ++! you can link all libs together and call any directly without fork
   # FIXME: use only for gcc/g++
   ((staticlib)) && ar rcs "$out" "${out%.*}.o"
 
@@ -139,4 +175,5 @@ build() { local p d nm out cflags interp
 }
 
 # FIXME: don't build unconditionally on each ./setup -m (use make for deps)
-for f in "$@"; do build "$f"; done
+# BAD: ignores all args>1 => can't choose subset of files
+build "$@"
