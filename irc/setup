@@ -9,13 +9,17 @@ source ~/.shell/func.d/cfgsetup
 
 
 ### GENS ###
-export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
+# TEMP:REM: can't suppress passphrase prompt to update settings through script
+#   => REQ make issue with desired behavior
+if cfgOpt r; then
+  export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
 
-## ALT: { sleep 0.5; ./run-pipe "$cfg"; ./run-pipe <<< "/quit"; } & weechat -a; wait
-if [[ -p ~/.weechat/weechat_fifo ]]
-then env-subs ./cfg/weechat.conf | ./run-pipe
-else WEECHAT_PASSPHRASE=' ' weechat -a \
-  -r '/set sec.crypt.passphrase_file /dev/stdin' \
-  -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
-  -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
+  ## ALT: { sleep 0.5; ./run-pipe "$cfg"; ./run-pipe <<< "/quit"; } & weechat -a; wait
+  if [[ -p ~/.weechat/weechat_fifo ]]
+  then env-subs ./cfg/weechat.conf | ./run-pipe
+  else WEECHAT_PASSPHRASE=' ' weechat -a \
+    -r '/set sec.crypt.passphrase_file /dev/stdin' \
+    -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
+    -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
+  fi
 fi
