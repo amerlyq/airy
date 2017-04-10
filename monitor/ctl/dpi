@@ -1,8 +1,11 @@
 #!/bin/bash -eu
-# USAGE: $ MAIN_DPI=192 r.monitor-dpi
+# USAGE: $ AIRY_DPI=192 r.monitor-dpi 384
+# WARN: "r.xorg -d" wrong until preferred 'xrandr --primary' applied
+dpi=${1:-$(r.airy-registry -oen dpi)}
 
-# WARN: must be executed after 'xrandr --primary' applied
-# NOTE: prefer dpi from --primary display
-[[ ${MAIN_DPI-} ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||:)
-xrdb ${MAIN_DPI:+-DMAIN_DPI=$MAIN_DPI} -load ~/.Xresources
-[[ -z ${MAIN_DPI-} ]] || xrandr --dpi "$MAIN_DPI"
+if [[ -n $dpi ]]; then
+  xrdb -DDPI="$dpi" -load ~/.Xresources
+  xrandr --dpi "$dpi"
+else
+  xrdb -load ~/.Xresources
+fi

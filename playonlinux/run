@@ -28,8 +28,10 @@ if (($#)); then case $1
 esac; else
   nm=playonlinux
   cmd=( primusrun "$(which "$nm")" )
-  on_exit+=('xrdb -load ~/.Xresources')
-  xrdb -DMAIN_DPI=141 -load ~/.Xresources
+  if (( "$(r.xorg -d)" > 141 )); then
+    on_exit+=('xrdb -load ~/.Xresources')
+    xrdb -DDPI=141 -load ~/.Xresources
+  fi
   r.video-single 2
 fi
 

@@ -8,12 +8,12 @@ cwd_script
 dst=~/.Xresources
 wstr(){ cat >> "$dst" <<<"$*"; }
 
-# BUG: boot linux with hdmi2 on => wrong xrandr order => wrong DPI
-[[ ${MAIN_DPI-} ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
+# BUG:(r.xorg -d): boot linux with hdmi2 on => wrong xrandr order => wrong DPI
+dpi=$(r.airy-registry dpi "$(r.xorg -d 2>/dev/null)" 96)
 
 > "$dst"
-wstr "#ifndef MAIN_DPI"
-wstr "# define MAIN_DPI  ${MAIN_DPI:?}"
+wstr "#ifndef DPI"
+wstr "# define DPI ${dpi:?}"
 wstr "#endif"
 for f in "${CURR_DIR_CACHE:?}"/Xres-*; do
   wstr "#include \"$f\""

@@ -21,9 +21,9 @@ linkcp -c dunstrc "$dst"
 svc_activate -cue dunst.service
 
 # BUG: external monitor -- different dpi
-[[ ${MAIN_DPI-} ]] || MAIN_DPI=$(r.xorg -d 2>/dev/null||echo 96)
-fs=$(( (${MAIN_DPI:?} + 5) / 10 ))
-iw=$(( ((${MAIN_DPI:?} +8)/16 +3)/6 * 16 ))
+dpi=$(r.airy-registry dpi "$(r.xorg -d 2>/dev/null)" 96)
+fs=$(( (dpi + 5) / 10 ))
+iw=$(( ( (dpi + 8)/16 + 3)/6 * 16 ))
 gw=$(( $(r.xorg -w 2>/dev/null||echo 1280) * 2/5 ))
 sed -ri '
   /^(\s+font = \w+).*/s//\1 '$fs'/

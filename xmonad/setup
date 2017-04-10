@@ -17,7 +17,7 @@ svc_activate -cue xmonad.service \
 if cfgOpt u; then
   # dst=~/.xmonad/xmobarrc
   # linkcp -c xmobarrc "$dst"
-  # trayw=$(( 3 * (${MAIN_DPI:?} * 9/72 + 4) + 6 ))
+  # trayw=$(( 3 * (dpi * 9/72 + 4) + 6 ))
   # sed -ri '/^(, position\s*= BottomP 0).*/s//\1 '$trayw'/' "$dst"
 
   # THINK ServerMode.hs is too old in pacman/core, but wget is slow.

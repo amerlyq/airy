@@ -3,6 +3,10 @@ HiDPI laptop and FullHD monitor have different linear size of graphic elements
   * assumably, font also have different sizes
   ! terminal font size seems wrong comparing to size in inches
 
+REF
+  https://www.labelvalue.com/blog/2015/04/font-size-guide-convert-points-to-inches.html
+    !!! seems like font height is always less then expected by point size
+
 Linear font size in 'st' even after all settings is wrong
   $ st -f monospace:pixelsize=101
     => cursor must become 1 inch in height
@@ -41,7 +45,7 @@ Seems like 'fontconfig' fixes 'pixelsize' and not 'size'
         => TRY: edit font params in fontconfig OR symlink to 10-scale-bitmap-fonts.conf (already have?)
   [_] TRY: compare visual font size in 'pango-view' and 'st'
     NOTE: in r.playonlinux despite xrandr resize, 'st' font kept at reasonable size
-      xrdb -DMAIN_DPI=141 -load ~/.Xresources
+      xrdb -DDPI=141 -load ~/.Xresources
       r.video-single 2
 
 SEE:

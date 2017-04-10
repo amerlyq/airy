@@ -7,9 +7,11 @@ source ~/.shell/profile
 echo "NOTE: disable composition to reduce performance impact!"
 # BAD: export GDK_SCALE=0.3
 
-trap 'xrdb -load ~/.Xresources' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
-xrdb -DMAIN_DPI=141 -load ~/.Xresources
-# ALT: echo Xft.dpi: 144 | xrdb -merge
+if (( "$(r.xorg -d)" > 141 )); then
+  trap 'xrdb -load ~/.Xresources' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+  xrdb -DDPI=141 -load ~/.Xresources
+  # ALT: echo Xft.dpi: 144 | xrdb -merge
+fi
 
 primusrun playonlinux
 # PRIMUS_VERBOSE=2 primusrun glxgears 2>&1 \
