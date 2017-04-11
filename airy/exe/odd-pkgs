@@ -1,0 +1,19 @@
+#!/bin/bash -eu
+# REF:(groups list): https://www.archlinux.org/groups/
+
+# NEED: filter-out pre-installed deps and pacstrap:
+#   base base-devel yaourt
+#   ?: sudo grub os-prober ntp lvm2 polkit
+
+tmp=/tmp/pkgs.txt
+also=( base base-devel yaourt "$@" )
+
+# USAGE: r.airy -xI  # generate active db
+#   TODO:DEV: generate w/o actual cmds execution
+cp -fT ~/.cache/airy/install.txt "$tmp"
+printf '%s\n' "${also[@]}" >> "$tmp"
+
+pacman -Qei | awk '
+  /^Name\s/{n=$3}
+  /^Groups\s/{print($3=="None"?n:n" "$3)}
+' | grep -vwFf "$tmp"

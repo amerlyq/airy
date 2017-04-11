@@ -3,6 +3,7 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   # pkg_inst "base-devel"  # In conflict with multilibs!
+  #   => Install multilib-devel over base-devel
   pkg_inst gcc-multilib
   pkg_inst lib32-gcc-libs
 

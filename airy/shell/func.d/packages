@@ -23,6 +23,21 @@ do_if() {
   ;; q) bQuiet=1
   esac; done; shift $((OPTIND-1))
 
+  # TEMP:REM: to use with =airy/exe/odd-pkgs
+  printf '%s\n' "$@" >> "$cache/install.txt"
+
+  # Skip ignored pkgs
+  if [[ $cmd =~ pacman ]]; then
+    declare -n ign=PKG_IGNORE
+  elif [[ $cmd =~ pacaur || $cmd =~ yaourt ]]; then
+    declare -n ign=AUR_IGNORE
+  fi
+  local ignt=" ${ign[*]} "
+
+  for((i=1;i<=$#;++i)); do
+    [[ $ignt =~ " ${!i} " ]] && set -- "${@:1:i-1}" "${@:i+1}"
+  done
+
   # NOTE: with 'grp' check whole group as whole
   #   without 'grp' check each arg individually
   if ! cfgOpt u && [[ ${grp-} ]]; then
@@ -40,6 +55,9 @@ do_if() {
 
 pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
 cab_inst(){ do_if -c 'cabal install' "$@"; }
+iskip(){ declare -n a="$1"; (( ${#a[@]} ))||return 0
+  printf -- '--ignore '; (IFS=,;printf '%s\n' "${a[*]// /\\ }")
+}
 
 
 if distro ubuntu; then

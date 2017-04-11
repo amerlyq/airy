@@ -9,6 +9,8 @@ source ~/.shell/func.d/packages
 pkg_inst xsel xbindkeys xdotool
 
 if distro arch; then
+  # xorg-xdm xorg-docs
+  pkg_inst xorg-server xorg-server-utils xorg-xinit
   pkg_inst xorg-xprop
 
 elif distro ubuntu; then
