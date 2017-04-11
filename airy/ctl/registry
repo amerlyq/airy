@@ -1,9 +1,5 @@
 #!/bin/bash -eu
-# USAGE: ./$0 dpi [fallback vals...]
-# BAD:WARN: dirty sourcing -- need clean env w/o shellrc inside fakechroot
-#   ALT: safe grep only independent vars with oneline vals
-# DEV: move core into standalone 'fallback' app and wrap here with profile fetch
-#   => OR add files as -f args to parse from
+# USAGE: ./$0 dpi [fallbacks...]
 
 reg=~/.shell/profile
 dflord='erd'

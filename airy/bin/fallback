@@ -1,0 +1,32 @@
+#!/bin/bash -eu
+# USAGE: ./$0 [-n] -v $val -e env {-i ini -o opt} -f[-|file] [-v] "$@"
+#   -c=cmdcatch, -f=nonempty, -F=exists, -k=grep-as-is, (? -K=grep-eval ?)
+# WARN:(-s): uses 'source' and 'eval'  (!declare doesn't reduce quotes!)
+#   => dirty -- need clean env w/o shellrc inside fakechroot
+# BAD:(-f): strips trailing empty lines
+# RFC: time ~4mS
+
+chki(){ local t=${ini:?need -i ..}; }
+fxio(){ [[ -t 0 || $a != - ]] || a=/dev/stdin; [[ -f $a || -p $a ]]; }
+kval(){ grep -Pom1 '^'"$a"'=\K.*' "$ini"; }
+shre(){ local t; t=$(
+    source "$ini" &>/dev/null
+    declare -p "$a" 2>/dev/null
+  ) && eval "declare -g ${t#* }" || return
+}
+
+while getopts 'i:v:e:k:s:c:f:F:n' o; do a=${OPTARG-}
+case $o in :|'?') exit 1
+;; n) noerr=1
+;; v) [[ -n $a ]] && v=$a && break
+;; e) [[ -v $a ]] && v=${!a} && break
+;; c) v=$(eval "$a" 2>/dev/null) && [[ -n $v ]] && break || unset v
+;; i) fxio && ini=$a || { echo "Err: not file $a" >&2; exit 1; }
+;; k) chki && v=$(kval) && break || unset v
+;; s) chki && shre && declare -n "v=$a" && break
+;; f) fxio && v=$(<"$a") && [[ -n $v ]] && break || unset v
+;; F) fxio && v=$(<"$a") && break || unset v
+esac; done; shift $((OPTIND - 1))
+
+[[ -v v ]] || for a; do [[ -n $a ]] && v=$a && break; done
+[[ -v v ]] && printf '%s\n' "$v" || [[ -n ${noerr-} ]]
