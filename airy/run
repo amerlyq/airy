@@ -73,7 +73,8 @@ fi
 # ALSO:(statistics): ${#mods[@]} | ${#skip[@]} | $(wc -l < "$queue")
 
 # TODO: rename 'recache'/'rR' to smth another to free up '-r' for general reset/remove
-dopts=$(tr -cd "$dop" <<< "${opts-}")
+# FIXME:TRY: dopts=${opts//[^$dop]}
+dopts=$(tr -cd "$dop" <<< "$opts")
 has "$dop" && r.airy-each -i $(has x && echo -r) $(has N && echo -s) \
   -- r.airy-do ${dopts:+"-$dopts"} <<< "$lmods"
 

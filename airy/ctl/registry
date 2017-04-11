@@ -1,27 +1,27 @@
 #!/bin/bash -eu
 # USAGE: ./$0 dpi [fallbacks...]
+# RFC: time ~15mS
+args=( -i ~/.shell/profile )
+all=vek
+dfl=ekv
 
-reg=~/.shell/profile
-dflord='erd'
-
-# order: env > reg > dfl > err, n=noerr, o=only
-opts=; while getopts 'derno' o; do case $o in :|'?') exit 1
+# order: env > key > val > err, n=noerr, o=only
+opts=; while getopts 'novek' o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
 
-ord=${opts//[^der]}
-[[ $opts =~ o ]] || ord+=${dflord//[$ord]}
-
 # Transform $nm to match EnvVar convention
-nm=$1; shift
-nm=${nm^^}
-nm=AIRY_${nm//[.\/]/_}
-[[ $nm =~ ^[A-Z0-9_]+$ ]] || exit
+nm=$1; nm=${nm^^}; nm=AIRY_${nm//[.\/]/_}
+[[ $nm =~ ^[A-Z0-9_]+$ ]] || exit && shift
+
+ord=${opts//[^$all]}
+[[ $opts =~ o ]] || ord+=${dfl//[$ord]}
+[[ $opts =~ n ]] && args+=( -n )
 
 for ((i=0; i<${#ord}; ++i)); do case ${ord:i:1}
-in e) [[ -v $nm ]] && break
-;; r) tmp=$(source "$reg" >/dev/null; declare -p "$nm" 2>/dev/null) && eval "$tmp" && break
-;; d) for v; do [[ -n $v ]] && declare -g "$nm=$v" && break; done
-;; *) exit 7
+in v) for v; do args+=( -v "$v" ); done
+;; e) args+=( -e "$nm" )
+;; k) args+=( -s "$nm" )
+;; *) exit 3
 esac; done
 
-[[ -v $nm || $opts =~ n ]] && printf '%s\n' "${!nm-}" || exit 3
+exec fallback "${args[@]}"

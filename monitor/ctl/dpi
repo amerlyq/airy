@@ -1,7 +1,7 @@
 #!/bin/bash -eu
 # USAGE: $ AIRY_DPI=192 r.monitor-dpi 384
 # WARN: "r.xorg -d" wrong until preferred 'xrandr --primary' applied
-dpi=${1:-$(r.airy-registry -oen dpi)}
+dpi=${1:-$(r.airy-registry -noe dpi)}
 
 if [[ -n $dpi ]]; then
   xrdb -DDPI="$dpi" -load ~/.Xresources
