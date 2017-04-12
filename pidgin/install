@@ -3,14 +3,14 @@ source ~/.shell/func.d/packages
 has_pr X || die
 # finch   | TUI interface to pidgin
 
-pkg_inst pidgin
+pkg_inst pidgin finch
 
 if distro arch; then
   # Plugin for Skype
   # CHECK:(old version)?
   pkg_inst purple-skypeweb
   # aur_inst purple-skypeweb-git
-  # aur_inst telegram-purple
+  aur_inst telegram-purple
   # Plugin for MSN -- Office Communicator
   # pkg_inst pidgin-sipe
 

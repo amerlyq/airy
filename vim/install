@@ -3,17 +3,20 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     pkg_inst neovim gvim  # necessary for 'xxd'
+    # ALT:(gvim):
+    # aur/xxd-standalone
+    # aur/go-xxd
+    # aur/xxd-vim
+
     pkg_inst python-neovim python2-neovim
     # pkg_inst python-yaml
     pkg_inst python-jedi
     pkg_inst ghc-mod
 
     ## External deps
-    pkg_inst hlint
-    ## For vim-clang-format and vim-autoformatter
-#    pkg_inst clang-tools-extra
-#    pkg_inst astyle tidy / tidy-html5-git
-#    aur_inst js-beautify  # BAD python-autopep8 beautify-css
+    # pkg_inst tidy / tidy-html5
+    # aur_inst js-beautify
+    # BAD python-autopep8 beautify-css
 
 elif distro ubuntu; then
     # for vimoutliner export in mindmap
@@ -24,8 +27,6 @@ elif distro ubuntu; then
     # REM:NOTE: duplicated for $ ssh -X
     pkg_inst xsel
 
-    # libclang-dev for autocompleter in vim
-    # pkg_inst libclang-dev clang-format-3.5
     pip_inst jedi  # neovim
     echo "Err: not all"
 fi

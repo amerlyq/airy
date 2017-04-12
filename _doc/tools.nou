@@ -26,6 +26,7 @@ FIND
       = suckless-like
   !! [_] ALT:(ranger):
     https://github.com/gokcehan/lf
+  [_] Collage viewing for imgs (sxiv replacement)
 
 
 %%% Core
@@ -40,7 +41,7 @@ FIND
 
   [_] Use fim (fbi with vi-keys) intead of w3mimagedisplay
     http://www.nongnu.org/fbi-improved/
-  [_] SEE: pqiv (found in ranger/riffle.conf)
+  2017-04-12 [X] SEE: pqiv (found in ranger/riffle.conf)
   [_] https://github.com/LemonBoy/bar (like i3bar, very lightweight)
   codeblocks
 
@@ -122,7 +123,23 @@ FIND
     [_] FIND: similar existing prs
   [_] Readline-editing for any cmd (E.G. 'nc')
     https://github.com/hanslub42/rlwrap
+  [_] USE: rkhunter -- for rootkits scan
 
+%% Widgets
+  OSD
+    [_] community/xosd 2.2.14-8
+      Displays text on your screen. On-Screen-Display-libs for some tools
+      $ osd_cat --lines=1 --color=yellow --font="-*-fixed-*-*-*-*-18-*-*-*-*-*-*-*"
+  Sliders
+    [_] aur/wjt 0.2-1 (0, 0.00) [installed]
+      wjt is a slider widget for X
+  Dialogs
+    [_] extra/zenity 3.22.0+1+gcd1647c-1 [installed]
+      Display graphical dialog boxes from shell scripts
+    [_] aur/yad 0.38.2-1 (108, 3.18)
+      A fork of zenity - display graphical dialogs from shell scripts or command line
+    [_] aur/qarma-git 20-7 (10, 0.69)
+      A drop-in replacement clone for zenity, written in Qt4/5, Qt5 build
 
 %% Media
   ALT:(mpd): cmus vs moc
@@ -157,6 +174,12 @@ FIND
   User Scripts
     https://github.com/OpenUserJs/OpenUserJS.org/wiki/Userscript-Beginners-HOWTO
 
+%% Net
+  Proxy
+    $ paci dante
+  TRY
+    $ paci bridge-utils
+
 
 %%% Service
   audio notes to text script
@@ -190,6 +213,24 @@ FIND
 
 
 %%% Maintenance
+
+%% Packages
+  pacman extensions
+    community/snap-pac 1.1-1
+      Pacman hooks that use snapper to create pre/post btrfs snapshots like openSUSE's YaST
+    extra/expac 8-1 [installed]
+      pacman database extraction utility
+    extra/namcap 3.2.7-2
+      A Pacman package analyzer
+    extra/pkgfile 15-1 [installed]
+      a pacman .files metadata explorer
+    extra/srcpac 0.10.10-1
+      The pacman from-source wrapper
+    community/pacmanlogviewer 1.3.1-5
+      Inspect pacman log files
+    community/pacmatic 20150126-1
+      A pacman wrapper to avoid bricking your system and such other surprises.
+
 
 %% Deploy
   [_] Dockers

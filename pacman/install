@@ -2,6 +2,9 @@
 source ~/.shell/func.d/packages
 distro arch || exit
 
+pkg_inst pacman abs
+# To investigate packages content w/o downloading
+pkg_inst pkgfile
+
 # TRY:ALT: packer (lightweight but less automatable and w/o shell completion)
 ayr_inst pacaur
-pkg_inst pkgfile  # To investigate packages content w/o downloading

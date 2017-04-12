@@ -1,0 +1,30 @@
+#!/bin/bash -e
+source ~/.shell/func.d/packages
+
+# winetricks | only for x86
+# mono-complete | for .NET   ::  mono ./file.exe
+
+# lib32-openal | necessary for XAudio2.7
+#   => install xact ("POL_install_xact") so XAudio2 will be available to play the music.
+
+if distro arch; then
+  pkg_inst playonlinux winetricks
+  pkg_inst lib32-alsa-lib lib32-alsa-plugins lib32-openal
+  pkg_inst lib32-ncurses lib32-mpg123  # REM?
+
+elif distro ubuntu; then
+  # REF: http://mintgeek.ru/2011/06/12/kak-ustanovit-witcher-2-v-linux-mint/
+  pkg_inst playonlinux winetricks
+  pkg_inst mono-complete winbind  # ktouch
+
+fi
+
+if distro ubuntu; then
+  # Show available components winetricks --help
+  winetricks dinput directx9 d3dx9_36 d3dx9_43 d3dx10 d3dx11_43 xact_jun2010 d3dcompiler_43 #3dmark06
+  # winetricks dotnet20 dotnet35 dotnet40 dotnet45 dotnet_verifier
+  winetricks xna31 xna40 vcrun2010 vcrun2008 steam
+  mkdir -p ~/".wine/drive_c/Program Files"
+  mkdir -p ~/".wine/drive_c/Program Files (x86)"
+  echo "!! Place your Window's programms inside ~/.wine/drive_c/Program Files/ !!"
+fi

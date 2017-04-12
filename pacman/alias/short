@@ -1,6 +1,7 @@
 # vim:ft=sh
 
 # USE: -r/-a to use repo/aur only
+
 alias pacg='pacman -Sg'    # show list of package [g]roup
 alias paci='pacman -S'     # install
 alias pacI='pacman -U'     # install from files on disk
@@ -13,6 +14,7 @@ alias pacq='pacman -Si'    # info
 alias pacQ='pacman -Qi'    # info local -- grep by "Required By"
 alias pacr='pactree -c  '  # deps direct
 alias pacR='pactree -cr '  # deps reverse
+alias pacD='pacman -D --asdeps'  # change install reason
 alias pacs='pacman -Ss'    # search
 alias pacS='pacman -Qs'    # search local
 alias pacu='pacman -Su'    # install with [u]pdate

@@ -209,6 +209,19 @@ structure
     * all profile pieces can be combined into single ./profile with non-exported environment for *airy*
     * even regular *mod* can contain pieces of profile inside of it
     * differs from ./env -- because ./env is always sourced into interactive sessions
+  [_] THINK: instead of mod-per-pkg (impossible, actually) use mod-per-idea
+    < I already use multiple pkgs per mod anyway
+    < in other cases I choose single 'main' from alternatives list
+    < sometimes I install additional non-preffered alternatives
+    +? no need for 'defaults' script -- all is specified through pkgs list
+    syntax:
+      mod -- use defaults
+      mod:-b -- defaults w/o 'b'
+      mod:a -- only 'a' from alts
+      mod:a,b -- prefer 'a', inst 'b' as secondary
+      mod:+a,-b -- defaults and 'a', w/o 'b'
+      mod:@ -- all
+      mod:@,-b -- all w/o 'b'
 
 
 setup

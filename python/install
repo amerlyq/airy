@@ -5,17 +5,11 @@ pkg_inst python
 pkg_inst python-pip
 
 if distro arch; then
-  pkg_inst ipython
+  pkg_inst ipython  # ALSO: jupyter for notebooks in vim
   pkg_inst python-ipdb  # pretty debugger for IPython
   pkg_inst python-pudb
   pkg_inst python2
   pkg_inst python2-pip
-
-  # NOTE: place at bottom, after installing 'pip3'
-  # readline # for adequate navigation in IPython cmdline
-  # ERR: Build problems on Ubuntu 14.04
-  pip_inst -a readline  # BUG: no adequate condition
-  pip_inst -y pyreadline{,}
 
 elif distro ubuntu; then
   pkg_inst python3 python3-pip

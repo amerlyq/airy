@@ -9,8 +9,7 @@ pkg_inst schroot
 if distro arch; then
     pkg_inst debootstrap
     # Install for ubuntu
-    aur_inst -- --asdeps gnupg1
-    aur_inst -- --asdeps ubuntu-keyring
+    aur_inst --asdeps gnupg1 ubuntu-keyring
     # One or more PGP signatures could not be verified!
     # gpg --recv-keys 2071B08A33BD3F06
 
@@ -19,6 +18,7 @@ elif distro ubuntu; then
 fi
 
 
+# RFC: sep to 'update -u'
 debstrap(){ local chr=${1:?No chr} arch=${2:?No arch} nm=${3:?No nm}
   # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
   # SEE: https://launchpad.net/ubuntu/+archivemirrors

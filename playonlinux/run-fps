@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+set -o pipefail
+
+PRIMUS_VERBOSE=2 primusrun glxgears 2>&1 \
+  | sed -rn 's/.*display.*, (\S+) fps,.*/\1/p'
+# | osd_cat --lines=1 --color=yellow --font="-*-fixed-*-*-*-*-18-*-*-*-*-*-*-*"

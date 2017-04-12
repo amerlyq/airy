@@ -6,10 +6,18 @@ if distro arch; then
   #   => Install multilib-devel over base-devel
   pkg_inst gcc-multilib
   pkg_inst lib32-gcc-libs
+  pkg_inst astyle
+
+  ## For vim-clang-format and vim-autoformatter
+  ## REF: https://clang.llvm.org/extra/clang-rename.html
+  # pkg_inst clang-tools-extra
 
 elif distro ubuntu; then
   pkgs=()  # Those libs also necessary to build x32 under x64 system
   pkgs+=( build-essential gcc-multilib g++-multilib lib32stdc++6 )
   pkgs+=( make checkinstall pkg-config autoconf automake cmake )
   pkg_inst "${pkgs[@]}"
+
+  # libclang-dev for autocompleter in vim
+  # pkg_inst libclang-dev clang-format-3.5
 fi

@@ -23,13 +23,15 @@ do_if() {
   ;; q) bQuiet=1
   esac; done; shift $((OPTIND-1))
 
+  # Statistics NEED: ./odd-pkgs
+  if [[ $cmd == true || $cmd =~ (pacman|pacaur|yaourt) ]]
+  then printf '%s\n' "$@" >> "$cache/install.txt"; fi
+
   # Skip ignored pkgs
   if [[ $cmd =~ pacman ]]; then
     declare -n ign=PKG_IGNORE
-    printf '%s\n' "$@" >> "$cache/install.txt"  # NEED: ./odd-pkgs
-  elif [[ $cmd =~ pacaur || $cmd =~ yaourt ]]; then
+  elif [[ $cmd =~ (pacaur|yaourt) ]]; then
     declare -n ign=AUR_IGNORE
-    printf '%s\n' "$@" >> "$cache/install.txt"  # NEED: ./odd-pkgs
   fi
   local ignt=" ${ign[*]} "
 
@@ -52,6 +54,7 @@ do_if() {
   ((!${#pkgs[@]})) || ${cmd:?} "${pkgs[@]}"
 }
 
+mod_have(){ do_if -c 'true' "$@"; }
 pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
 cab_inst(){ do_if -c 'cabal install' "$@"; }
 iskip(){ declare -n a="$1"; (( ${#a[@]} ))||return 0
@@ -77,18 +80,21 @@ if distro ubuntu; then
 
 elif distro arch; then
   has_pkg(){ pacman -Qq "$@" &>/dev/null; }
-  pkg_inst(){ do_if -c 'sudo pacman -S --needed --noconfirm' "$@"; }
+  _ipacman(){ local c=("$1"); shift
+    c+=( -S --needed --noconfirm )
+    [[ $1 == --asdeps ]] && { c+=("$1"); shift; }
+    do_if -c "${c[*]}" "$@"
+  }
+  pkg_inst(){ _ipacman 'sudo pacman' "$@"; }
   pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
-  if has_pr yaourt; then
-    ayr_inst(){ do_if -c 'yaourt -S --needed --noconfirm' "$@"; }
-  fi
+  has_pr yaourt && ayr_inst(){ _ipacman 'yaourt' "$@"; }
   if has_pr pacaur; then
-    aur_inst(){ do_if -c 'pacaur --aur -S --needed --noconfirm' "$@"; }
+    aur_inst(){ _ipacman 'pacaur --aur' "$@"; }
     loc_inst(){ do_if -c 'pkg_make' "$@"; }
     # WARN: pkgs not from AUR can break pacaur
     pkg_make(){ local p d
       p=$(readlink -e "${1:?}")
-      ( set -e
+      ( set -eu
         source "$p"
         d=$CURR_DIR_PKG/$pkgname
         mkdir -p "$d" && cd "$d"
@@ -97,6 +103,7 @@ elif distro arch; then
         # WARN:(-f): removed 'force' to mitigate idle rebuild
         #   => enforce rebuild by incrementing 'pkgrel=1' in PKGBUILD
         # THINK: using '-C' for clean builds (re-dld all src)
+        # BAD: $?=0 when coflict on install
         makepkg -si --needed --noconfirm
         # updpkgsums &&  # REM: 'makepkg' has flag for this
         # source PKGBUILD  # EXPL: updated on build values for pkgver, etc
@@ -119,7 +126,7 @@ elif distro arch; then
   gem_inst(){ do_if -c 'gem install' "$@"; }
 fi
 
-
+# DEV: sep 'abyss -i' for these functions
 pkg_build() {
     # It can be, that 'autoreconf' can replace my own vehicle.
     local prdir=$1; shift; cd "$prdir"

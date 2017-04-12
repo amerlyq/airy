@@ -1,12 +1,18 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+# For CA, sign, verify
+pkg_inst openssl
+
 #| openssh | server for ssh connections (Win: freesshd)
 #| autossh | autoconnecting client for permanent tunnels
 
 if distro arch; then
-    pkg_inst openssh
+  pkg_inst openssh  # ALT: dropbear
+  # BAD:(freezes fs): sshfs
+  # ALT: autossh autosshfs-git
 
 elif distro ubuntu; then
-    pkg_inst openssl openssh-server openssh-client autossh
+  pkg_inst openssh-server openssh-client
+
 fi

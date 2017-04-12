@@ -6,10 +6,12 @@ source ~/.shell/func.d/packages
 # DFL: fallback
 pkg_inst xf86-video-vesa
 
+# USE: mesa-demos for glxinfo
 nvidia() { pkg_inst nvidia nvidia-utils lib32-nvidia-utils; }
 intel() { pkg_inst xf86-video-intel libva libva-intel-driver
-          pkg_inst mesa mesa-demos mesa-libgl lib32-mesa-libgl; }
+          pkg_inst mesa mesa-libgl lib32-mesa-libgl; }
 
+# TODO: split in three submods: optimus,intel,nvidia
 if distro arch; then
     case "${CURR_PROF:?}"
     in laptop|work) intel

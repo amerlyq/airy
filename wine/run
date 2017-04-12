@@ -1,24 +1,19 @@
 #!/bin/bash -e
-source ~/.shell/profile
 
-# WINEDEBUG=fps
-# xosd-bin
+# EXPL: necessary for 'file -b' checkings
+APP=${1%.exe}.exe; [[ -f $APP ]] || exit
 
-echo "NOTE: disable composition to reduce performance impact!"
-# BAD: export GDK_SCALE=0.3
+# Only for windows *.exe
+file -b "$APP" | grep -iq '^PE32' || exit
 
-if (( "$(r.xorg -d)" > 141 )); then
-  trap 'xrdb -load ~/.Xresources' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
-  xrdb -DDPI=141 -load ~/.Xresources
-  # ALT: echo Xft.dpi: 144 | xrdb -merge
+if ! file -b "$APP" | grep -iqF 'x86-64'; then
+  # WINEPREFIX to not mess with default ~/.wine (and 32 bit)
+  export WINEPREFIX=~/.wine32
+  export WINEARCH=win32
 fi
 
-primusrun playonlinux
-# PRIMUS_VERBOSE=2 primusrun glxgears 2>&1 \
-    # | sed -rn 's/.*display.*, (\S+) fps,.*/\1/p' > /tmp/wine
-    # | osd_cat --lines=1 --color=yellow --font="-*-fixed-*-*-*-*-18-*-*-*-*-*-*-*"
+# WINEPATH to find dlls (or they should lie near *.exe)
+# export WINEPATH=/usr/${TARGET}/bin
+# WINEDEBUG=fps
 
-
-# Start PlayOnLinux, click "Install", and then "Install a non-listed program"
-# 3. When you see "Install some libraries", check it.
-# 4. When presented with the next list, install xact ("POL_install_xact") so XAudio2 will be available to play the music.
+exec wine "$@"

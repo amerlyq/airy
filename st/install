@@ -14,8 +14,9 @@ if distro arch; then
   # BAD: requires password on key -- because it's symlinked on my dev repo
   if cfgOpt u; then (cd "$src" && git-up && "${0%/*}/run-rebuild"); fi
 
-  pkg_inst dvtm
-  pkg_inst abduco
+  # CHECK? if some needed
+  ## reptyr -- attach running pr to a new terminal
+  # pkg_inst dtach dvtm abduco reptyr
 
 elif distro ubuntu; then
   pkg_inst st dtach

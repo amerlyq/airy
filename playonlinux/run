@@ -31,6 +31,7 @@ esac; else
   if (( "$(r.xorg -d)" > 141 )); then
     on_exit+=('xrdb -load ~/.Xresources')
     xrdb -DDPI=141 -load ~/.Xresources
+    # ALT: echo Xft.dpi: 144 | xrdb -merge
   fi
   r.video-single 2
 fi

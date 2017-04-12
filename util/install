@@ -1,9 +1,10 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/packages
 # ALSO:(base) coreutils util-linux inetutils iputils procps-ng
-# ALSO: xorg-utils, squashfs-tools
+# ALSO: xorg-utils
 
 pkg_inst tree
+pkg_inst squashfs-tools
 
 # SEE https://joeyh.name/code/moreutils/
 # TODO: read man on each util

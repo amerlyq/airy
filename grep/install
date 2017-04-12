@@ -8,14 +8,14 @@ source ~/.shell/func.d/packages
 #| sift-bin| ALT:(grep) standalone parallel binary written in '.go'. Fastest?
 #   + single independent binary SEE https://sift-tool.org/performance
 #   BUT: no support for look-ahead/behind:  (?=..), (?<=..)
+# aur_inst sift-bin
 
 # VIZ: grep egrep fgrep
 pkg_inst grep
 
-
 if distro arch; then
   pkg_inst the_silver_searcher
-  # aur_inst sift-bin
+  pkg_inst pdfgrep
 
 elif distro ubuntu; then
   # pkg_inst silversearcher-ag

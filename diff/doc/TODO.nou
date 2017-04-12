@@ -48,3 +48,7 @@ NOTE: using 'colordiff' instead of 'diff --color=always'
 EXAMPLES
   Create patch for 'patch'
     $ diff -Naur file{,_} > patch.diff
+  Statistics on diff
+    = Similar to 'git diff --stat'
+    $ diff ... | diffstat
+    $ diffstat < *.patch
