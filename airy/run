@@ -73,10 +73,16 @@ fi
 # ALSO:(statistics): ${#mods[@]} | ${#skip[@]} | $(wc -l < "$queue")
 
 # TODO: rename 'recache'/'rR' to smth another to free up '-r' for general reset/remove
-# FIXME:TRY: dopts=${opts//[^$dop]}
-dopts=$(tr -cd "$dop" <<< "$opts")
-has "$dop" && r.airy-each -i $(has x && echo -r) $(has N && echo -s) \
-  -- r.airy-do ${dopts:+"-$dopts"} <<< "$lmods"
+# ENH: push/pop $queue in numbered file cache.[0-9] for each interrupted run
+#   => you can manually drench/pop current stack by 'r.airy' w/o args
+cmd=( r.airy-each )
+((defaults)) && cmd+=(-i)
+has x && cmd+=(-r)
+has N && cmd+=(-s)
+cmd+=( -- r.airy-do )
+# OR: dopts=$(tr -cd "$dop" <<< "$opts")
+has "$dop" && cmd+=( -"${opts//[^$dop]}" )
+"${cmd[@]}" <<< "$lmods"
 
 # DEV: add one of _[un]used tags by checking in AIRY_MODS
 ! has g || r.airy-link-tags -t "$build/tags" -f "$build/mods"

@@ -23,14 +23,13 @@ do_if() {
   ;; q) bQuiet=1
   esac; done; shift $((OPTIND-1))
 
-  # TEMP:REM: to use with =airy/exe/odd-pkgs
-  printf '%s\n' "$@" >> "$cache/install.txt"
-
   # Skip ignored pkgs
   if [[ $cmd =~ pacman ]]; then
     declare -n ign=PKG_IGNORE
+    printf '%s\n' "$@" >> "$cache/install.txt"  # NEED: ./odd-pkgs
   elif [[ $cmd =~ pacaur || $cmd =~ yaourt ]]; then
     declare -n ign=AUR_IGNORE
+    printf '%s\n' "$@" >> "$cache/install.txt"  # NEED: ./odd-pkgs
   fi
   local ignt=" ${ign[*]} "
 

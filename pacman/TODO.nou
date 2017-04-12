@@ -5,3 +5,10 @@ TODO
 
   [_] force verify all packages installed
     https://pierre-schmitz.com/verify-all-the-packages/
+
+FAQ
+  Errors on upgrade
+    ca-certificates-utils 20170307-1
+      $ pacman -Syuw                           # download packages
+      $ rm /etc/ssl/certs/ca-certificates.crt  # remove conflicting file
+      $ pacman -Su                             # perform upgrade
