@@ -1,0 +1,30 @@
+%%%% Bitperfect
+Check if bitperfect
+  Play *.flac with 96kHz and check if resempled:
+    $ cat /proc/asound/card*/pcm*p/sub*/hw_params
+    E.G: http://guidainstallazionevoyagempdlinux.blogspot.com/2012/06/812-bit-perfect.html
+    ALSO http://www.cubieforums.com/index.php?topic=1081.0
+
+Bit-perfect config
+  ++ INFO https://lacocina.nl/how-to-setup-a-bit-perfect-digital-audio-streaming-client-with-free-software-with-ltsp-and-mpd
+  ! https://www.musicpd.org/doc/user/advanced_usage.html
+  https://lacocina.nl/audiophile-mpd
+    https://github.com/ronalde/mpd-configure
+  SEE: http://drona.csa.iisc.ernet.in/~uday/alsamch.shtml
+
+
+Non-blocking bitperfect
+  G: mpd alsa non blocking
+    !! REF http://www.sabi.co.uk/Notes/linuxSoundALSA.html
+    http://alsa.opensrc.org/Asynchronous_Playback_(Howto)
+  G: mpd upmixer / dmixer
+    https://bbs.archlinux.org/viewtopic.php?pid=714715
+    https://bbs.archlinux.org/viewtopic.php?id=118988
+    https://bbs.archlinux.org/viewtopic.php?id=42403
+    https://bbs.archlinux.org/viewtopic.php?id=91908
+  G: mpd bitperfect pulse
+    !! REF https://www.musicpd.org/doc/user/advanced_usage.html
+    http://acquisitionsyndrome.com/2014/07/bit-perfect-liva/
+  G: mpd alsa mixing bitperfect
+    + http://www.head-fi.org/t/561961/bit-perfect-audio-from-linux
+    http://mpd.wikia.com/wiki/Alsa

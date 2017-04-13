@@ -45,7 +45,20 @@ Reorder audio cards
   $ cat /proc/asound/card*/id
   $ v /etc/modprobe.d/alsa-base.conf
     options snd-hda-intel id=PCH,HDMI index=1,0
+  BUT seems like it does something unexpected, only renaming w/o reordering actual devices
   $ aplay -l
+    card 0: HDMI [HDA Intel PCH], device 0: ALC887-VD Analog [ALC887-VD Analog]
+    card 0: HDMI [HDA Intel PCH], device 1: ALC887-VD Digital [ALC887-VD Digital]
+    card 1: PCH [HDA Intel HDMI], device 3: HDMI 0 [HDMI 0]
+  ALT: in mpd use name instead of id "hw:1,0" => no need to reorder
+    device "hw:PCH,0"
+    + SEE http://www.head-fi.org/t/561961/bit-perfect-audio-from-linux
+
+Check if bitperfect
+  Play *.flac with 96kHz and check if resempled:
+    $ cat /proc/asound/card*/pcm*p/sub*/hw_params
+    E.G: http://guidainstallazionevoyagempdlinux.blogspot.com/2012/06/812-bit-perfect.html
+    ALSO http://www.cubieforums.com/index.php?topic=1081.0
 
 
 High pitch sound snd_intel_hda
@@ -135,6 +148,8 @@ INFO
   aplay -l
   aplay -L
   amixer
+  Check who is blocking sound device
+    $ fuser -v /dev/snd/*
 
 Change volume balance L-R
   amixer sget Master
