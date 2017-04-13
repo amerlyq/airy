@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/system
 running_X || [[ ${1-} == -t ]] || exec r.bt
 
@@ -28,11 +28,16 @@ chtheme(){ local dir=~/.config/qutebrowser
   linkcp "$dir/theme/${t:?}" "$dir/style.css"
 }
 
-case ${1-}
-in -p) shift; run "$(xsel -ob)"
-;; -h) shift; run "$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)"
+[[ ${1-} == -[phst] ]] && { op=${1-}; shift; }
+
+# WARN: can crash on Nouveau
+set -- --backend webengine --qt-flag disable-reading-from-canvas "$@"
+
+case ${op-}
+in -p) run "$(xsel -ob)"
+;; -h) run "$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)"
 # ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"
-;; -s) shift; exec qutebrowser ':allow-javascript=true' "$@"
-;; -t) shift; chtheme "$@"
+;; -s) exec qutebrowser ':set content allow-javascript true' "$@"
+;; -t) chtheme "$@"; exit
 ;;  *) exec qutebrowser "$@"
 ;; esac
