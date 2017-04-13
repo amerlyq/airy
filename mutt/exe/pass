@@ -2,6 +2,8 @@
 # WARN: unsecure -- someone with occasional access to system
 #   may change this script to dump actual passwords -- use systemwide one
 # BET? https://wiki.archlinux.org/index.php/Pass
+#   https://github.com/roddhjav/pass-tomb
+#   https://wiki.archlinux.org/index.php/Tomb
 
 while getopts 'm' o; do
 [[ $o =~ :|\? ]] && exit 1 || OPTS=${OPTS/[$*]}$*

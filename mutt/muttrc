@@ -23,6 +23,7 @@ set sort = reverse-threads  # reverse-threads -- sort by newest conversation fir
 set sort_aux = last-date-received
 set send_charset="us-ascii:utf-8"
 # set assumed_charset="cp-1251"  # if no charset in msg -- it's probably windows
+set rfc2047_parameters = yes  # decode attach like =?koi8-r?B?...
 set simple_search="~f %s | ~C %s | ~s %s"  # by default search in To/Cc/Subject
 set thorough_search         # strip headers and eval mimes before searching
 

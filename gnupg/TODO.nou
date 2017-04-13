@@ -202,6 +202,8 @@ NEED master key pair when:
   * revoke or generate a revocation certificate for the complete key.
 
 Encrypt data
+  $ gpg --recipient email@ --output doc.gpg --encrypt *.doc
+  $ gpg --output doc --decrypt doc.gpg
   gpg --recipient <id(part)> --encrypt file
   echo "password" | gpg --encrypt -o ~/.acc_pass.gpg
 
