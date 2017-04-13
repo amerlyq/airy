@@ -148,7 +148,7 @@ call dein#add('KabbAmine/zeavim.vim', {
 " filename_patterns: ['\.gpg$', '\.asc$', '\.pgp$']
 " explorer: '.*\.\(gpg\|asc\|pgp\)$'
 " explorer: 1
-call dein#add('jamessan/vim-gnupg', {
+call dein#add('jamessan/vim-gnupg', {'lazy': 0,
   \ 'on_ft': 'gpg',
   \ 'on_cmd': ['GnuPG'],
   \ 'hook_post_source': "silent! exe 'do GnuPG BufReadCmd '",

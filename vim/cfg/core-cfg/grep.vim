@@ -29,11 +29,14 @@
 " Generate 'tags' file: MAYBE:(deprecated by) easytags
 "" TODO -- generate tags into .git/ OR .hg/ if exists
 " TODO:CHG: replace by concrete 'r.*' scripts
+" DEV: use async exec instead of system()
 if executable('ctags') || executable('ctags-exuberant')
   let s:ctags = 'ctags --recurse'
   if executable('ctags-exuberant')| let s:ctags .=' --exuberant'  |en
   if filereadable('.ignore')| let s:ctags .=' --exclude=@.ignore' |en
-  command -bar -range -nargs=0 TagsGen call system(s:ctags)
+  command -bar -range -nargs=0 TagsGen
+    \ if $HOME !~# '^'.getcwd()|call system(s:ctags)
+    \ |else|echom "Prevented gen tags in $HOME or below"|en
   nnoremap <silent> <F1> :<C-u>TagsGen<CR>
 endif
 
