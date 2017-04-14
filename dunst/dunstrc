@@ -1,17 +1,29 @@
 [global]
-    font = monospace 10
+    font = monospace 9
 
-    # Allow a small subset of html markup:
-    #   <b>bold</b>
-    #   <i>italic</i>
-    #   <s>strikethrough</s>
-    #   <u>underline</u>
+    # Possible values are:
+    # full: Allow a small subset of html markup in notifications:
+    #        <b>bold</b>
+    #        <i>italic</i>
+    #        <s>strikethrough</s>
+    #        <u>underline</u>
     #
-    # For a complete reference see
-    # <http://developer.gnome.org/pango/stable/PangoMarkupFormat.html>.
-    # If markup is not allowed, those tags will be stripped out of the
-    # message.
-    allow_markup = yes
+    #        For a complete reference see
+    #        <http://developer.gnome.org/pango/stable/PangoMarkupFormat.html>.
+    #
+    # strip: This setting is provided for compatibility with some broken
+    #        clients that send markup even though it's not enabled on the
+    #        server. Dunst will try to strip the markup but the parsing is
+    #        simplistic so using this option outside of matching rules for
+    #        specific applications *IS GREATLY DISCOURAGED*.
+    #
+    # no:    Disable markup parsing, incoming notifications will be treated as
+    #        plain text. Dunst will not advertise that it has the body-markup
+    #        capability if this is set as a global setting.
+    #
+    # It's important to note that markup inside the format option will be parsed
+    # regardless of what this is set to.
+    markup = full
 
     # The format of the message.  Possible variables are:
     #   %a  appname
@@ -34,7 +46,7 @@
     # Possible values are "left", "center" and "right".
     alignment = right
 
-    # The frequency with wich text that is longer than the notification
+    # The frequency with which text that is longer than the notification
     # window allows bounces back and forth.
     # This option conflicts with "word_wrap".
     # Set to 0 to disable.
@@ -62,17 +74,23 @@
     # (dmenu-like).  If width is 0, the window expands to the longest
     # message displayed.  A positive x is measured from the left, a
     # negative from the right side of the screen.  Y is measured from
-    # the top and down respectevly.
+    # the top and down respectively.
     # The width can be negative.  In this case the actual width is the
     # screen width minus the width defined in within the geometry option.
-    geometry = 800x6-30+20
+    geometry = "300x5-30+20"
+
+    # Define the title of the windows spawned by dunst
+    title = Dunst
+
+    # Define the class of the windows spawned by dunst
+    class = Dunst
 
     # Shrink window if it's smaller than the width.  Will be ignored if
     # width is 0.
     shrink = yes
 
     # The transparency of the window.  Range: [0; 100].
-    # This option will only work if a compositing windowmanager is
+    # This option will only work if a compositing window manager is
     # present (e.g. xcompmgr, compiz, etc.).
     transparency = 20
 
@@ -89,30 +107,41 @@
     #   keyboard: follow window with keyboard focus
     #   none: don't follow anything
     #
-    # "keyboard" needs a windowmanager that exports the
+    # "keyboard" needs a window manager that exports the
     # _NET_ACTIVE_WINDOW property.
-    # This should be the case for almost all modern windowmanagers.
+    # This should be the case for almost all modern window managers.
     #
     # If this option is set to mouse or keyboard, the monitor option
     # will be ignored.
     follow = keyboard
+
+    # Merge multiple notifications with the same content
+    stack_duplicates = true
+
+    # Hide the count of merged notifications with the same content
+    hide_duplicate_count = false
 
     # Should a notification popped up from history be sticky or timeout
     # as if it would normally do.
     sticky_history = yes
 
     # Maximum amount of notifications kept in history
-    history_length = 30
+    history_length = 32
 
     # Display indicators for URLs (U) and actions (A).
     show_indicators = yes
 
-    # The height of a single line.  If the height is smaller than the
+    # The spacing between lines.  If the height is smaller than the
     # font height, it will get raised to the font height.
     # This adds empty space above and under the text.
     line_height = 0
 
-    # Draw a line of "separatpr_height" pixel height between two
+    # The height of the entire notification.  If the height is smaller
+    # than the font height and padding combined, it will be raised
+    # to the font height and padding.
+    notification_height = 0
+
+    # Draw a line of "separator_height" pixel height between two
     # notifications.
     # Set to 0 to disable.
     separator_height = 2
@@ -145,8 +174,21 @@
     # Align icons left/right/off
     icon_position = off
 
+    # Scale larger icons down to this size, set to 0 to disable, DFL=32
+    max_icon_size = 0
+
     # Paths to default icons.
     icon_folders = /usr/share/icons/Faenza/status/16/:/usr/share/icons/Faenza/devices/16/:/usr/share/icons/Faenza/categories/16/
+
+    # Always run rule-defined scripts, even if the notification is suppressed
+    always_run_script = true
+
+# Experimental features that may or may not work correctly. Do not expect them
+# to have a consistent behaviour across releases.
+[experimental]
+    # Calculate the dpi to use on a per-monitor basis.
+    # Please note that this setting will not work if Xft.dpi X resource is set.
+    per_monitor_dpi = false
 
 [frame]
     width = 2
@@ -166,7 +208,8 @@
 
     # Redisplay last message(s).
     # On the US keyboard layout "grave" is normally above TAB and left
-    # of "1".
+    # of "1". Make sure this key actually exists on your keyboard layout,
+    # e.g. check output of 'xmodmap -pke'
     history = ctrl+grave
 
     # Context menu.
@@ -188,6 +231,7 @@
 [urgency_critical]
     background = "#d04000"
     foreground = "#ffffff"
+    frame_color = "#ff0000"
     timeout = 0
 
 
@@ -234,6 +278,11 @@
 #    # This notification will not be displayed
 #    summary = "foobar"
 #    format = ""
+
+#[history-ignore]
+#    # This notification will not be saved in history
+#    summary = "foobar"
+#    history_ignore = yes
 
 #[signed_on]
 #    appname = Pidgin
