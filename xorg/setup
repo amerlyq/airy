@@ -5,8 +5,14 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 linkcp -ct /etc/X11 Xwrapper.config
 
+# NOTE: set dpi for Xorg startup
+#   => then even no need to set screen size by xorg.conf ?
+dpi=$(r.airy-registry -n dpi)
+[[ $dpi =~ ^[0-9]+$ ]] && export DPI="-dpi $dpi" || unset DPI
+svc_activate -cueE xorg.service
+
 svc_activate -cue \
-  xorg.{socket,service,target} \
+  xorg.{socket,target} \
   wm.target xprofile.service
 
 if lspci | grep -q 'VGA.*:\sIntel\s'; then

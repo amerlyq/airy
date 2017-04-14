@@ -17,7 +17,7 @@ Type=forking
 #   => http://stackoverflow.com/questions/20725925/get-pid-of-current-subshell
 ExecStart=/bin/sh -c "trap 'echo waited SIGUSR1 received; exit 0' USR1; (trap '' USR1;\
 exec /usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -keeptty -verbose 2 \
-    -dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25 \
+    -dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25 %{DPI} \
 ) & wait; exit 1"
 # ExecStop=/bin/sh -c 'kill $(cat /tmp/.X0-lock)'
 
