@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+
+t=${1:+${1}.css}
+dir=~/.config/qutebrowser
+
+if [[ -z $t ]]; then t=$(readlink -m "$dir/style.css")
+  mapfile -t L < <(find -L "$dir/theme" \
+    -type f -name '*.css' -printf '%f\n' | sort -n)
+  for((i=0; i<${#L[@]:?}; i++)); do
+    [[ ! $t =~ ${L[$i]}$ ]] || n=$((i+1))
+  done
+  n=$((n < ${#L[@]} ? n : 0))
+  t=${L[$n]}
+fi
+
+linkcp "$dir/theme/${t:?}" "$dir/style.css"
