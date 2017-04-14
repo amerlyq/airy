@@ -9,7 +9,7 @@ text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
 application/msword; antiword '%s'; copiousoutput; description=Word Document; nametemplate=%s.doc
 # application/pdf; pdftotext '%s' -; copiousoutput; description=PDF Document; nametemplate=%s.pdf
 application/*; ~/.config/ranger/scope.dash %s; copiousoutput
-image/*; sxiv %s; test=test -n "$DISPLAY"
+image/*; pqiv %s; test=test -n "$DISPLAY"
 # BUG: text/calendar; r.gcalcli import -d; copiousoutput
 text/*; ~/.mutt/exe/editor %s
 */*; ~/.mutt/exe/editor %s

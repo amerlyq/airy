@@ -1,4 +1,4 @@
-setl commentstring=>\ %s
+setl commentstring=>%s
 setl formatoptions+=w
 setl textwidth=68
 setl spell
