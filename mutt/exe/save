@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 # USAGE Save mail from stdin to file
-# NEED set pipe_decode=yes
-#   => controls what happens to headers and mime parts when you save
+# DEBUG <mail.eml ./exe/save >! proc.eml && command diff -U0 manual.eml proc.eml | tail -n +3 | shasum
+# SEE commit ^60f97fe4 for loop-based impl instead of pipe-based
+
 use warnings FATAL => 'all';
 use autodie;
 use strict;
@@ -10,98 +11,105 @@ use Getopt::Std;
 # d=delimiter, p=plain-copy
 my %opts=(); getopts('d:p', \%opts);
 
-my $plain = $opts{p} // 0;
+# NEED set pipe_decode=yes
+#   => controls what happens to headers and mime parts when you save
 my $delim = $opts{d} // '---==EOF==---';
-my $fh = *STDOUT;
+my $plain = $opts{p} // 0;
+my $fout = *STDOUT;
 
 if (defined $ARGV[0]) {
     my $nm = ($ARGV[1] // 'mail') . '.eml';
-    open $fh, '>', ($ARGV[0].'/'.$nm);
-    END { close $fh; }
+    open $fout, '>', ($ARGV[0].'/'.$nm);
+    END { close $fout; }
 }
 
 
-# Split msgs
-my $end_of_msg = 0;
-my $sig_till_end = 0;
-my $recite_till_end = 0;
-my (@msgs, @lines, @tmp);
+# if ($plain) {
+sub stream_one_msg { my @lines; push @lines, $_ for @_; \@lines; }
 
-# TRY DEV split on multiple pipe-filters MxN with func-global state
-while (<STDIN>) {
 
-    # Plain copy whole pipe
-    if ($plain) {
+sub stream_split_msgs {
+    my $after_delim = 0;
+    my (@msgs, @lines);
+    foreach (@_) {
+        # Split msgs on $delim
+        if ($after_delim) {
+            next if /^\s*$/;  # filter-out empty lines between msgs
+            $after_delim = 0;
+        } elsif (/^$delim$/) {
+            $after_delim = 1;
+            push @msgs, [@lines] if @lines;
+            undef @lines;
+            next
+        }
         push @lines, $_;
-        next
     }
-
-    # Split msgs on $delim
-    if ($end_of_msg) {
-        next if /^\s*$/;  # filter-out empty lines between msgs
-        $end_of_msg = 0;
-    } elsif (/^$delim$/) {
-        $end_of_msg = 1;
-        push @msgs, [@lines] if @lines;
-        undef @lines;
-        $sig_till_end = 0;
-        $recite_till_end = 0;
-        undef @tmp;
-        next
-    }
-
-    # Strip unquoted signatures
-    next if $sig_till_end;
-    if (/^-- $/) { $sig_till_end = 1; next }
-
-    # TODO~NEED? strip signatures in quoted text
-    #   +++ as standalone script to preprocess mails on response
-    #   + when recite is mixed with quoting => to less work
-    # => from /^(>+)/ till diff nesting lvl of '>'
+    push @msgs, [@lines] if @lines;
+    @msgs;
+}
 
 
-    # ALSO DECIDE strip first-level citation after
-    #   /^-----Original Message-----$/
-    #   /14.04.2017 16:39, %user пишет:/
+# TODO?ALSO strip signatures in quoted text
+#   +++ as standalone script to preprocess mails on response
+#   + when recite is mixed with quoting => to less work
+# => from /^(>+)/ till diff nesting lvl of '>'
+sub strip_signature { my $keep = 1;
+    grep { if($keep){ $keep = 0 if /^-- $/ }; $keep } @_;
+}
 
-    # Strip full-recite (useful for threads)
-    #   -> delete only if all lines /^>|^\s*$/ till EOM
-    #   <= HACK if user dirty-quoted directly inside reciting
-    if ($recite_till_end) {
-        if (/^>|^\s*$/) {
+
+# ALSO DECIDE strip first-level citation after
+#   /^-----Original Message-----$/
+#   /14.04.2017 16:39, %user пишет:/
+#   -> delete only if all lines /^>|^\s*$/ till EOM
+#   <= HACK submit if user dirty-quoted directly inside reciting
+sub strip_recite { my $quoted = 0; my @tmp; my @lines;
+    foreach (@_) {
+        if ($quoted) {
+            if (/^>|^\s*$/) {
+                push @tmp, $_;
+                next
+            }
+            push @lines, @tmp;
+            undef @tmp;
+            $quoted = 0;
+
+        } elsif (/^(?:>\s?)?(?:On .*, .* wrote:|-----Original Message-----)$/) {
+            $quoted = 1;
             push @tmp, $_;
             next
         }
-        push @lines, @tmp;
-        undef @tmp;
-        $recite_till_end = 0;
-
-    } elsif (/^(?:>\s?)?(?:On .*, .* wrote:|-----Original Message-----)$/) {
-        $recite_till_end = 1;
-        push @tmp, $_;
-        next
+        push @lines, $_;
     }
+    return @lines;
+}
 
-    # strip fields
-    next if /^Subject:\s/;  # useful for threads
+
+# NOTE strip all empty trailing lines /^>*\s*$/
+sub strip_trail { my $keep = 0;
+    reverse grep { if($keep){ 1 }else{ $keep = !/^>*\s*$/ } } reverse @_;
+}
+
+
+# NOTE useful for threads
+sub strip_fields {
+    # TODO multiline agent line wrapped on 72
+    grep { !/^(?:Subject|User-Agent):\s/ } @_;
     # subject=$(<<<"$message" grep -oPm 1 '^Subject: ?\K.*' | sed 's,/,∕,g')
-
-    # TODO multiline wrapped on 72 agent line
-    next if /^User-Agent:\s/;
-
-    # reformat date in single timezone
+    # Reformat date in single timezone
     #   mail_date=$(<<<"$message" grep -oPm 1 '^Date: ?\K.*')
     #   formatted_date=$(date -d"$mail_date" +%y%m%d)
-
-    push @lines, $_;
 }
-push @msgs, [@lines] if @lines;
-# NOTE access peculiar msg lines: @{$msgs[$i]}
 
 
-foreach (@msgs) {
-    # TODO strip all empty trailing lines /^>*\s*$/
-    foreach (@$_) {
-        print $fh $_;
-    }
-}
+sub format_block { @_, "\n" }
+
+
+print $fout map {
+    format_block
+    strip_fields
+    strip_trail
+    strip_recite
+    strip_signature
+        @$_;
+} stream_split_msgs <STDIN>;
