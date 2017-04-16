@@ -1,3 +1,7 @@
+# Remove all hooks anew on 're-source'
+#   http://www.guckes.net/Mutt/setup.html
+unhook *
+
 # show mail list before it's content
 set my_cfg=~/.mutt/cfg
 set my_cache=~/.cache/mutt
@@ -121,6 +125,7 @@ set header_cache     = $my_cache/headers
 set message_cachedir = $my_cache/messages      # fetch imap msgs on disk instead of memory
 set certificate_file = $my_cache/certificates
 # set signature = ~/.mutt/signature  # Set in account
+set use_domain = no  # name don't -> name@host
 
 
 ## ALIASES (fast access to contacts)

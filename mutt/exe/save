@@ -1,15 +1,107 @@
-#!/bin/bash -eu
-# Save mail from stdin to file
-# NEED: set pipe_decode=yes
+#!/usr/bin/perl
+# USAGE Save mail from stdin to file
+# NEED set pipe_decode=yes
 #   => controls what happens to headers and mime parts when you save
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use Getopt::Std;
 
-d=$1
-f=${2:-mail}
-msg=$(cat)
+# d=delimiter, p=plain-copy
+my %opts=(); getopts('d:p', \%opts);
 
-mkdir -p "$d"
-<<<"$msg" cat > "$d/$f".eml
+my $plain = $opts{p} // 0;
+my $delim = $opts{d} // '---==EOF==---';
+my $fh = *STDOUT;
 
-# mail_date=$(<<<"$message" grep -oPm 1 '^Date: ?\K.*')
-# formatted_date=$(date -d"$mail_date" +%y%m%d)
-# subject=$(<<<"$message" grep -oPm 1 '^Subject: ?\K.*' | sed 's,/,∕,g')
+if (defined $ARGV[0]) {
+    my $nm = ($ARGV[1] // 'mail') . '.eml';
+    open $fh, '>', ($ARGV[0].'/'.$nm);
+    END { close $fh; }
+}
+
+
+# Split msgs
+my $end_of_msg = 0;
+my $sig_till_end = 0;
+my $recite_till_end = 0;
+my (@msgs, @lines, @tmp);
+
+# TRY DEV split on multiple pipe-filters MxN with func-global state
+while (<STDIN>) {
+
+    # Plain copy whole pipe
+    if ($plain) {
+        push @lines, $_;
+        next
+    }
+
+    # Split msgs on $delim
+    if ($end_of_msg) {
+        next if /^\s*$/;  # filter-out empty lines between msgs
+        $end_of_msg = 0;
+    } elsif (/^$delim$/) {
+        $end_of_msg = 1;
+        push @msgs, [@lines] if @lines;
+        undef @lines;
+        $sig_till_end = 0;
+        $recite_till_end = 0;
+        undef @tmp;
+        next
+    }
+
+    # Strip unquoted signatures
+    next if $sig_till_end;
+    if (/^-- $/) { $sig_till_end = 1; next }
+
+    # TODO~NEED? strip signatures in quoted text
+    #   +++ as standalone script to preprocess mails on response
+    #   + when recite is mixed with quoting => to less work
+    # => from /^(>+)/ till diff nesting lvl of '>'
+
+
+    # ALSO DECIDE strip first-level citation after
+    #   /^-----Original Message-----$/
+    #   /14.04.2017 16:39, %user пишет:/
+
+    # Strip full-recite (useful for threads)
+    #   -> delete only if all lines /^>|^\s*$/ till EOM
+    #   <= HACK if user dirty-quoted directly inside reciting
+    if ($recite_till_end) {
+        if (/^>|^\s*$/) {
+            push @tmp, $_;
+            next
+        }
+        push @lines, @tmp;
+        undef @tmp;
+        $recite_till_end = 0;
+
+    } elsif (/^(?:>\s?)?(?:On .*, .* wrote:|-----Original Message-----)$/) {
+        $recite_till_end = 1;
+        push @tmp, $_;
+        next
+    }
+
+    # strip fields
+    next if /^Subject:\s/;  # useful for threads
+    # subject=$(<<<"$message" grep -oPm 1 '^Subject: ?\K.*' | sed 's,/,∕,g')
+
+    # TODO multiline wrapped on 72 agent line
+    next if /^User-Agent:\s/;
+
+    # reformat date in single timezone
+    #   mail_date=$(<<<"$message" grep -oPm 1 '^Date: ?\K.*')
+    #   formatted_date=$(date -d"$mail_date" +%y%m%d)
+
+    push @lines, $_;
+}
+push @msgs, [@lines] if @lines;
+# NOTE access peculiar msg lines: @{$msgs[$i]}
+
+
+foreach (@msgs) {
+    # TODO strip all empty trailing lines /^>*\s*$/
+    foreach (@$_) {
+        print $fh $_;
+    }
+}
