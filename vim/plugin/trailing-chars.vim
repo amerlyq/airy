@@ -59,6 +59,7 @@ command! -bar -nargs=0 -range ToggleTrailingHighlight
 fun! UnobtrusiveSubF(...)
   let l:pos = (exists('*getcurpos') ? getcurpos() : getpos('.'))
   silent! exe call(function("printf"), a:000)
+  " CHECK:BUG: deletes replacements after search /... replace %s;;; and save
   call histdel("search", -1)
   let @/ = histget("search", -1)
   call setpos('.', l:pos)
