@@ -431,7 +431,7 @@ class edit(Command):
     def execute(self):
         if not self.arg(1):
             self.fm.edit_file(self.fm.thisfile.path)
-        elif '.' == self.rest(1):
+        elif self.rest(1) in ['.', ' ']:
             self.fm.edit_file('')
         else:
             self.fm.edit_file(self.rest(1))
