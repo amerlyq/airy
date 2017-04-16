@@ -1,7 +1,8 @@
 # vim: ft=sh
 
 # For 'reu' binary investigation tool
-! hash reu &>/dev/null || while IFS= read -r i; do alias re$i="reu $i"
+! _has_pr reu || while IFS= read -r i; do alias re$i="reu $i"
 done < <(sed -rn '/case/,/esac/{/\s*(\w+)\)\s.*/s//\1/p}' "$(which reu)")
 
 alias readelf='readelf -W'    # don't wrap lines
+alias objdump='objdump -w'    # don't truncate lines

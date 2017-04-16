@@ -2,3 +2,8 @@
 
 # Strict warnings
 alias perl='perl -Mstrict -Mautodie -M5.024 -Mwarnings=FATAL,all'
+
+# Interactive REPL BAD 'my' vars and hashes
+#   ALT: aur/perlconsole
+_has_pr rlwrap \
+&& alias perli='rlwrap perl -de 1'

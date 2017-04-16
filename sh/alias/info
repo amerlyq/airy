@@ -7,10 +7,9 @@ alias \?\?='whatis'  # search in man-db
 alias \?\?\?='whereis'  # desktop search
 # SEE: https://wiki.archlinux.org/index.php/File_system_search
 
-if hash pydf &>/dev/null
-then alias df='pydf'
-else alias df='df -H'
-fi
+_has_pr pydf \
+&& alias df='pydf' \
+|| alias df='df -H'
 
 alias da='\du -sch'
 alias du='\du -ch'

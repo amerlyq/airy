@@ -1,5 +1,5 @@
 # vim: ft=sh
 
 # For 'vienv' fast shebang template
-! hash vienv &>/dev/null || while IFS= read -r s; do alias vi$s="vienv $s"
+! _has_pr vienv || while IFS= read -r s; do alias vi$s="vienv $s"
 done < <(sed -rn '/case/,/esac/{/\s*(in|;;)\s+(\w+)\).*/s//\2/p}' "$(which vienv)")

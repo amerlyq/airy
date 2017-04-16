@@ -1,9 +1,10 @@
 # vim:ft=sh
 
+alias r='source r.ranger'
+
 # Prevent running 'ranger' if not exists in chroot
-hash ranger &>/dev/null \
-&& alias r='source r.ranger' \
-|| alias r='exit'
+[[ -n $debian_chroot ]] && ! _has_pr ranger \
+&& alias r='echo "Err: no ranger" >&2 && exit'
 
 ## Trap to sync on exit bash/zsh and ranger working directories.
 [[ -n ${ZSH_NAME-} ]] \
