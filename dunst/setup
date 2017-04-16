@@ -3,8 +3,24 @@
 # deps: xorg
 source ~/.shell/func.d/cfgsetup
 
-### LINKS ###
-linkcp . ~/.config/dunst
+### GENS ###
+dst=~/.config/dunst/dunstrc
+linkcp -c dunstrc "$dst"
+
+dpi=$(r.airy-registry dpi "$(r.xorg -d 2>/dev/null)" 96)
+fw=$(( dpi / 60 ))
+gw=$(( $(r.xorg -w 2>/dev/null||echo 1280) * 2/5 ))
+iw=$(( ( (dpi + 8)/16 + 3)/6 * 16 ))
+sed -ri '
+  /^(\s+geometry = ")[0-9]+(x.*)/s//\1'$gw'\2/
+  /^(\s+width = )[0-9]+/s//\1'$fw'/
+  /^(\s+icon_folders = ).*/s/16/'$iw'/g
+' "$dst"
+## OBSOLETE: font size fixed in latest release
+## BUG: external monitor -- different dpi
+# fs=$(( (dpi + 5) / 10 ))
+# /^(\s+font = \w+).*/s//\1 '$fs'/
+
 
 ## To disable default notification daemon
 if ! distro arch; then
@@ -18,19 +34,4 @@ if ! distro arch; then
 fi
 
 svc_activate -cue dunst.service
-
-### GENS ###
-## NOTE: fixed in latest release
-# BUG: external monitor -- different dpi
-# linkcp -c dunstrc "$dst"
-# dpi=$(r.airy-registry dpi "$(r.xorg -d 2>/dev/null)" 96)
-# fs=$(( (dpi + 5) / 10 ))
-# iw=$(( ( (dpi + 8)/16 + 3)/6 * 16 ))
-# gw=$(( $(r.xorg -w 2>/dev/null||echo 1280) * 2/5 ))
-# sed -ri '
-#   /^(\s+font = \w+).*/s//\1 '$fs'/
-#   /^(\s+geometry = ")[0-9]+(x.*)/s//\1'$gw'\2/
-#   /^(\s+icon_folders = ).*/s/16/'$iw'/g
-# ' "$dst"
-
-# ! grep_prs dunst || ./run  # BUG: hangs up airy/setup
+# ALT: ! grep_prs dunst || ./run  # BUG: hangs up airy/setup
