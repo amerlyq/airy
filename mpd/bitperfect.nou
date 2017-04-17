@@ -1,9 +1,17 @@
 %%%% Bitperfect
+READ Theory
+  http://www.tested.com/tech/1905-the-real-differences-between-16-bit-and-24-bit-audio/
+  https://hydrogenaud.io/index.php/topic,96578.msg805830.html#msg805830
+
 Check if bitperfect
-  Play *.flac with 96kHz and check if resempled:
+  Download *.flac with 96kHz
+    http://www.findhdmusic.com/high-res-audio/free-music/
+  Play *.flac and check if resempled:
     $ cat /proc/asound/card*/pcm*p/sub*/hw_params
     E.G: http://guidainstallazionevoyagempdlinux.blogspot.com/2012/06/812-bit-perfect.html
     ALSO http://www.cubieforums.com/index.php?topic=1081.0
+  Check who is blocking sound device -- pulse or mpd
+    $ fuser -v /dev/snd/*
 
 Bit-perfect config
   ++ INFO https://lacocina.nl/how-to-setup-a-bit-perfect-digital-audio-streaming-client-with-free-software-with-ltsp-and-mpd

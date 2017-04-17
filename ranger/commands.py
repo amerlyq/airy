@@ -441,6 +441,22 @@ class edit(Command):
         return self._tab_directory_content()
 
 
+class mkdircd(Command):
+    """:md <dirname> OR :mkdircd <dirname>
+    """
+
+    def execute(self):
+        nm = self.rest(1)
+        self.fm.mkdir(nm)
+        # BAD: cursor isn't moved to new dir
+        self.fm.cd(nm)
+        # self.fm.select_file(fs.join(self.fm.thisdir.path, nm))
+        # self.fm.move(right=1)
+
+    def tab(self, tabnum):
+        return self._tab_directory_content()
+
+
 class unfilter(Command):
     def unfilter(self, d):
         # BAD: d.files_all == None ???
