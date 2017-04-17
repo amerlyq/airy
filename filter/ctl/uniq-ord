@@ -1,0 +1,32 @@
+#!/bin/bash -eu
+set -o pipefail
+# TODO: keep first/last
+
+exec cat -n "$@" \
+| sort -k2 -k1n  \
+| uniq -f1 \
+| sort -nk1,1 \
+| cut -f2-
+
+exit
+# EOF ==================================================
+
+# OR: more fast ? TODO: sort from column onwards
+exec nl -w9 -nrz -s$'\t' "$@" \
+| sort -k2 -k1n  \
+| uniq -f1 \
+| sort -nk1,1 \
+| cut -c10-
+
+# ALT:BUT: keeps dup lines -- out of memory
+awk '!a[$0]++'
+perl -ne 'print unless $k{$_}++'
+perl -MDigest::MD5=md5_base64 -ne 'print unless $seen{md5_base64($_)}++'
+
+# ALT: community/john
+unique
+
+# REF
+# ++ http://stackoverflow.com/questions/30906191/uniq-without-sorting-an-immense-text-file
+#   => on bloom filters usage and marisa-trie structs
+# https://unix.stackexchange.com/questions/11939/how-to-get-only-the-unique-results-without-having-to-sort-data

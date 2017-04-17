@@ -54,6 +54,10 @@ alias -g C\$="|awk '{print\$NF}'"
 function slit { awk "{ print ${(j:,:):-\$${^@}} }"; }
 alias -g CN='|slit'
 
+alias -g U='|uniq'
+alias -g Uc='|uniq -c'
+alias -g Uo="|awk '!a[\$0]++'"
+
 if (($+commands[r.filter-block])); then
   for i in {1..4} {-1..-4}
   do alias -g B$i="|r.filter-block -b $i "; done
