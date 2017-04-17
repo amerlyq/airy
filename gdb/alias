@@ -1,3 +1,6 @@
 # vim:ft=sh
 
 alias gdb='gdb -q'  # no way to silent through .gdbinit
+alias gdb.='gdb -iex "set auto-load safe-path $PWD"'  # no way to silent through .gdbinit
+alias gdb@='gdbserver localhost:1234'
+alias gdb:='gdb. -ex "target remote localhost:1234"'

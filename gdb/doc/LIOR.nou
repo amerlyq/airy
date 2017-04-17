@@ -75,7 +75,8 @@ http://www.unknownroad.com/rtfm/gdbtut/gdbbreak.html
 | b  file.c:39  | file:line
 | break *addrss | before executing instruction at address (like 0x400882)
 | b *_start+5   | ... на адресе символа плюс смещение (полезно когда нет сорцов)
-| tb  | tbreak  | temporary breakpoint -- stop once on, then auto removed
+| rb | rbreak . | set breakpoint on all functions in pr
+| tb | tbreak   | temporary breakpoint -- stop once on, then auto removed
   info breakpoints       | list of all
   disable 2 -- disable 2nd breakpoint from list (or enable 2)
   ignore 2 5 -- skip 2nd breakpoint 5 times

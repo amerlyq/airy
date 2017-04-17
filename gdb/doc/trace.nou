@@ -1,0 +1,45 @@
+%% Break on all (ftrace)
+  REF
+    http://bashdb.sourceforge.net/pydb/pydb/lib/subsubsection-brkpts.html
+    https://sourceware.org/gdb/onlinedocs/gdb/Break-Commands.html
+  BAD: rbreak .  # all funcs
+    * WARN: slow >10min for 33k funcs in {gdb + glibc}
+    * BAD: blocks in libc on any keypress
+    * BAD: rbreak can't set regex on directory, only individual files
+      Good: rbreak gdb.c:.* OR rbreak ~/sdk/gdb/symtab.c:.*
+      Ignored: rbreak /gdb/.*:.*
+  ALT: use python
+    http://stackoverflow.com/questions/29437138/can-gdb-set-break-at-every-function-inside-a-directory
+    http://stackoverflow.com/questions/30013252/get-all-global-variables-local-variables-in-gdbs-python-interface
+    ++ https://blog.0x972.info/?d=2017/02/10/08/25/23-gdb-please-set-a-breakpoint-on-all-my-functions
+  OR gen by 'find'
+    $ find ~/sdk/gdb/gdb -type f -regextype egrep -regex '.*/(bfd/|gdb/((arch|cli|gnulib)/|[^/]))[^/]*\.c$' -printf 'rbreak %P:.*\n' >! rbreak.cmds
+    (gdb) source rbreak.cmds
+  NEED `non-stop`
+    (gdb) set non-stop on
+    + https://www.youtube.com/watch?v=SnouzHI9bis
+    https://www-zeuthen.desy.de/unix/unixguide/infohtml/gdb/Non_002dStop-Mode.html
+  DEV
+    # Add cmds to all last set breakpoints
+    (gdb) commands 1-11499
+        silent
+        frame
+        continue
+      end
+    # Save
+    (gdb) set pagination off
+    (gdb) set logging on gdb.log
+    (gdb) c
+
+
+%% Break on return
+  http://stackoverflow.com/questions/10501121/how-to-execute-finish-and-then-another-command-from-inside-commands/42607055#42607055
+  http://stackoverflow.com/questions/10501268/gdb-break-after-function-has-returned
+  http://stackoverflow.com/questions/3649468/setting-breakpoint-in-gdb-where-the-function-returns
+  http://stackoverflow.com/questions/267674/inspect-the-return-value-of-a-function-in-gdb
+  ALSO
+    https://sourceware.org/gdb/onlinedocs/gdb/Returning.html
+  REF
+    https://web.stanford.edu/class/cs107/gdb_coredump1.pdf
+  HACK
+    +++ https://blog.0x972.info/?d=2016/01/08/09/14/47-simple-gdb-extensions-with-python
