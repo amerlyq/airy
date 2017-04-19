@@ -3,7 +3,14 @@
 [Unit]
 Description=Udev - Monitor Hotplug - %P
 ConditionFileIsExecutable=%{HOME}/.bin/r.monitor-refresh
-# BindsTo=...
+## BAD: can't bind to user's xorg.service
+# Requisite=xorg.service
+# After=xorg.service
+# BindsTo=xorg.service ...
+
+## TRY: copy *.rules with -E and run as --user
+#   https://unix.stackexchange.com/questions/245768/managing-another-users-systemd-units
+#   => DEV launching script into /usr/bin/local for root cmds to call user units
 
 [Service]
 Type=oneshot

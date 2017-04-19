@@ -14,7 +14,7 @@ sudo=sudo
 envsubs=0
 A=''  # system-wide
 
-# copy/enable/re-*/run/user
+# copy/enable/ENV/re-*/run/user
 opts=; while getopts 'ceEf:rRu' o; do case $o in :|'?') exit 1
 ;; u) A=--user; sudo=''; dst=~/.config/systemd/user
       # ALT:CHECK:(faster startup) /etc/systemd/user

@@ -1,9 +1,15 @@
 #!/bin/sh -eu
 # WARN: disable executing as root from udev (!!! security hole)
 (( $(id -u) )) || { echo "Err: not allowed running as root" >&2; exit 2; }
+
+# BAD: by itself running 'xset' launches socket-activated Xserver
+#   if it's not started yet => occupying tty even before login
+pgrep Xorg &>/dev/null || exit 0
+
 # WARN: prevent calling additional time on card0 init (even w/o monitor)
 #   -- before user login and even before X starts
 xset q &>/dev/null || exit 0
+
 # ----------------
 
 r.monitor-hotplug
