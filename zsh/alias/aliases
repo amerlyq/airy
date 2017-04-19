@@ -16,6 +16,8 @@ alias -g NN='|tee /dev/tty'
 if (($+commands[$PAGER])); then
   alias -g L='| "$PAGER" '
   alias -g LL='|& "$PAGER" -r '
+  # Line trim W/H to term size (w/o prompt)
+  alias -g LT='| head -$(($(tput lines)-3)) | expand | cut -c-"$(tput cols)"'
 fi
 
 if (($+commands[$EDITOR])); then

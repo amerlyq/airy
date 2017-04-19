@@ -59,8 +59,9 @@ sub strip_signature { my $keep = 1;
 
 
 # ALSO DECIDE strip first-level citation after
-#   /^-----Original Message-----$/
-#   /14.04.2017 16:39, %user пишет:/
+#       /^-----Original Message-----$/
+#       /14.04.2017 16:39, %user пишет:/
+#       /> 19 апр. 2017 г., в 10:22, %user <%mail> написал(а):/
 #   -> delete only if all lines /^>|^\s*$/ till EOM
 #   <= HACK submit if user dirty-quoted directly inside reciting
 sub strip_recite { my $quoted = 0; my @tmp; my @lines;
