@@ -62,10 +62,10 @@ dir_build() {
 
 # USE: key 'recipe'
 file_build() { case "$1"
-in *.c  ) gcc -O1 -g3 -o "$BIN" -I "$PWD" "$@"; return
-;; *.cpp) g++ -O1 -g3 -o "$BIN" -I "$PWD" -std=c++11 "$@"; return
-esac; return 11
-}
+in *.c  ) gcc -O1 -g3 -o "$BIN" -I "$PWD" "$@"
+;; *.cpp) g++ -O1 -g3 -o "$BIN" -I "$PWD" -std=c++11 "$@"
+;; *) return 11
+esac; }
 
 run() {
   (($#)) || { abyssrc 'run' && return || ignore 12; }

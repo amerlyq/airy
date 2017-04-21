@@ -21,7 +21,8 @@ if (($+commands[$PAGER])); then
 fi
 
 if (($+commands[$EDITOR])); then
-  alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
+  # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
+  alias -g V='| $EDITOR - -c "setl noro ma bt=nofile"'
   alias -g VQ='V -c "cgetb|copen"'
   alias -g VG='V -c "set cole=0 fdl=1|setf ag_grp"'
   alias -g V@='|vipe| '

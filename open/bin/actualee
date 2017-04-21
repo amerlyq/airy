@@ -42,6 +42,7 @@ in dot|gv)
   dot -Tx11 "$1"
 ;; tpp) tpp "$1"
 ;;  md) pandoc -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
+;; ijs) /usr/lib/j8/bin/jconsole "$1"
 ;; jar) java -jar "$1"
 # Launched w/o fork, because of poor cmd support: it opens new instance of
 # XMind instead of adding file to opened

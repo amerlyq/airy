@@ -68,6 +68,7 @@ call dein#add('chrisbra/vim-diff-enhanced', {
 "" CHECK open URI or search. Combinable with vim-quickrun ? {{{1
 " NOTE:(opinion) curr overkill for me -- as most of feas impl'ed in qute
 " BUG: sometimes works in same thread, loading CPU. TEMP:FIX: ./setup -U vim
+" FIXME: don't treat '/path/to/file.pdf' as url
 " ALT:CHG: r.b --target tab "$@" BUT how to choose target window (named)?
 call dein#add('tyru/open-browser.vim', {
   \ 'on_map': [['nx', '<Plug>(openbrowser-']],
