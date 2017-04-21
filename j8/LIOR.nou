@@ -1,0 +1,11 @@
+jconsole
+  http://www.jsoftware.com/help/user/cmdline.htm
+  J               - load profile
+  J F A           - load profile; profile loads F
+  J -jprofile     - no profile
+  J -jprofile F A - load F (special profile)
+  J -js A         - load profile
+                    profile sets ARGVVERB_z_ from A and runs it
+  E.G with -js:
+    $ jconsole -js a=.23 b=.3 "echo a*b"
+    $ jconsole -js a=.23 b=.3 "echo a*b" "exit''"

@@ -1,4 +1,9 @@
 REF
+  /usr/share/doc/j8/jvocabulary.pdf
+  /usr/share/doc/j8/jrefcard.pdf
+  Foreigns
+    http://www.jsoftware.com/help/dictionary/xmain.htm
+
   http://code.jsoftware.com/wiki/Main_Page
   https://en.wikipedia.org/wiki/J_(programming_language)
     SEE external links for real world usage examples
@@ -12,7 +17,15 @@ ALT
     https://github.com/wyc/snippets/blob/master/j/jtalk/examples.txt
 
 TODO
-  [_] ADD /dev/stdin support to jcalc / r.j8
+  DEV: awk-like processing
+  !1 [_] exit on err with errmsg
+    $ /usr/lib/j8/bin/jconsole -js "9\!:27'exit 1'" "9\!:29]1" a=.23 b=.3 "echo 2 3*4 5 6" "exit 0"
+    SEE https://github.com/tangentstorm/tangentlabs/blob/master/j/repl.ijs
+  [_] shebang
+    http://juggle.gaertner.de/bnp/cgi.html
+    http://jsoftware.2058.n7.nabble.com/Running-script-from-jconsole-td65867.html
+    http://jsoftware.2058.n7.nabble.com/Example-bash-shell-scripts-using-J-7-01-td1874.html
+  !1 [_] ADD /dev/stdin support to jcalc / r.j8
     http://code.jsoftware.com/wiki/Scripts/Pretty_Print
     G: http://code.jsoftware.com/mediawiki/index.php?title=Special%3AJwikiSearch&for=stdin
   [_] MOVE: ~/j8 -> ~/.config/j8
@@ -20,6 +33,10 @@ TODO
   2017-01-30 [X] remove all 'qtide', etc -- to eliminate qt deps
   [_] TRY run through dockers
     https://hub.docker.com/r/nesachirou/jlang/
+
+vector processing languages
+  https://kx.com/2015/02/13/vector-processing-languages-big-data-analytics-real-time-business-intelligence/
+    http://conceptualorigami.blogspot.com/2010/12/vector-processing-languages-future-of.html
 
 text manipulation through using one-time db in q/kdb+
   + http://quant.stackexchange.com/questions/3156/is-there-any-thing-out-there-as-a-substitute-for-kdb
