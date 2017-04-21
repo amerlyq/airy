@@ -16,9 +16,14 @@ myScratchpads =
     , ("ipython", customFloating $ RationalRect (1/4) (2/3) 1 (1/3))
     ]
   ] ++
+  [ term s c m | (s, c, m) <-
+    [ ("agenda", "r.gcalcli-agenda", nonFloating)
+    , ("todo", "r.airy-todo", nonFloating)
+    , ("j8", "j8 -c", bottom_l14b3)
+    ]
+  ] ++
   [ vim "lyrics" "~/aura/lyfa/lists/music.nou" nonFloating
   , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
-  , term "j8" "j8 -c" bottom_l14b3
   ]
   where
     bottom_l14b3 = customFloating $ RationalRect 0 (2/3) (1/4) (1/3)

@@ -58,7 +58,7 @@ scratchpad = (concat . (`map` [
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
-    | nm <- ["ncmpcpp", "ipython", "j8", "htop", "lyrics"]
+    | nm <- ["agenda", "htop", "ipython", "j8", "lyrics", "ncmpcpp", "todo"]
     ],
     -- Open new window always
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)
@@ -84,7 +84,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("M-S-e"     , "r.dmenu -n")
     , ("M-C-e"     , "j4-dmenu-desktop")
     , ("M-<Print>" , "r.capture-screen")
-    , ("M-o t"     , "r.touchpad-tgl")
+    , ("M-t t"     , "r.touchpad-tgl")
     ],
     -- ADD: prompt to set volume
     feedCmd "r.audio"

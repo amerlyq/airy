@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+# NOTE: reserve word 'agenda' for todo mapped on calendar
+set -o pipefail
+cd ~/aura
+exec ag --vimgrep \
+  -G '.*/.[^/]+\.nou$' \
+  --ignore='_build' \
+  "$@" \
+  '^\s*!+[0-9]+\s\[_\]\s' \
+  -- airy devq lyfa \
+| $EDITOR - -c 'setl ft=nou bt=nofile|cgetb|copen|only'
+# exec grep -r --exclude-dir='_build' "$@" \

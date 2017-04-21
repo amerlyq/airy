@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+r.gcalcli calm
+r.gcalcli calw
+r.gcalcli agenda
+# BET:ALT:TRY:FIX another way to prevent window exit
+# https://github.com/tmux/tmux/issues/787
+# r.t -e bash -c 'tmux set-hook window-linked "set remain-on-exit on"; ls'
+# https://superuser.com/questions/200382/how-do-i-get-tmux-to-open-up-a-set-of-panes-without-manually-entering-them
+exec "$SHELL"
