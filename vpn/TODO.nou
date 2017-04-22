@@ -21,6 +21,36 @@ TODO
     https://wiki.archlinux.org/index.php/OpenConnect#Integration_in_netctl
 
   [_] fine-tupe ip route rules
+    !1 [_] choose net masks for VPN access, rest through your default gateway
+      :: NEED: aka true split-include dns tunneling
+        https://askubuntu.com/questions/84516/how-to-set-routes-for-my-vpn-connection
+      NEED
+        [_] full list of entities involved into traffic routing
+        [_] cmds to change settings for routing
+        [_] which area / info requires special attention
+        [_] debug algorithms / cmds to check those areas
+      Split-tunneling
+        READ USE
+          +++ TUT https://gist.github.com/jagtesh/5531300
+          ++ TUT https://unix.stackexchange.com/questions/220380/openconnect-setting-default-routes
+        Reroute traffic beside some IPs
+          +++ https://superuser.com/questions/692027/how-do-i-route-all-traffic-through-my-openconnect-vpn
+          HACK https://superuser.com/questions/284709/how-to-allow-local-lan-access-while-connected-to-cisco-vpn
+        REF https://en.wikipedia.org/wiki/Split_tunneling
+          ++ INFO http://www.cisco.com/c/en/us/support/docs/security/anyconnect-secure-mobility-client/116016-technote-AnyConnect-00.html
+        !! WARN:BAD: split tunneling is unsafe; any split traffic may result in DNS leaks, etc
+          https://serverfault.com/search?q=split%20tunneling
+          https://serverfault.com/questions/416805/practical-alternatives-to-split-tunneling
+        INFO https://serverfault.com/questions/181733/dns-errors-with-split-tunneling-vpn
+        ALT:(pfSense) https://serverfault.com/questions/372267/vpn-split-tunneling-pros-and-cons-and-how-to-achieve
+      DEBUG DNS leaks
+        https://www.reddit.com/r/VPN/comments/5ic6ve/openvpn_split_tunnel_dns_leak_protection/
+        https://security.stackexchange.com/questions/46997/open-vpn-has-dns-leak
+        http://lifehacker.com/5902397/how-to-make-vpns-even-more-secure
+      Alternative DNS w/o censorship
+        https://www.wikileaks.org/wiki/Alternative_DNS
+
+
     SEE: http://baturin.org/docs/iproute2/
     [_] only choosen traffic must be goint through VPN
       G: linux vpn redirect only ip
