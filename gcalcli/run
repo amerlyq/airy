@@ -1,8 +1,11 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/system
+acc='work'
+cfg=~/.cache/airy/oauth/gcalcli/$acc
+mkdir -p "$cfg" && chmod 700 "$cfg"
 opts=(
   --noincluderc
-  # --configFolder=work
+  --configFolder="$cfg"
   --defaultCalendar='work'
   # BAD: need to copy-paste link on oauth expired
   --noauth_local_webserver

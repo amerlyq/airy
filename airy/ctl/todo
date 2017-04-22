@@ -2,11 +2,9 @@
 # NOTE: reserve word 'agenda' for todo mapped on calendar
 set -o pipefail
 cd ~/aura
+# ATT:NEED: ./.ignore
 exec ag --vimgrep \
-  -G '.*/.[^/]+\.nou$' \
-  --ignore='_build' \
-  "$@" \
+  -G '.*/.[^/]+\.nou$' "$@" \
   '^\s*!+[0-9]+\s\[_\]\s' \
-  -- airy devq lyfa \
-| $EDITOR - -c 'setl ft=nou bt=nofile|cgetb|copen|only'
+| $EDITOR - -c 'setl ft=nou bt=nofile|cgetb|%s/^\S\{-}:\s\+//|copen|only'
 # exec grep -r --exclude-dir='_build' "$@" \
