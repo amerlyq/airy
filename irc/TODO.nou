@@ -13,10 +13,15 @@ LIOR
 SEE
   https://www.reddit.com/r/archlinux/comments/3gv77g/why_do_we_use_irc_still/
   http://askubuntu.com/questions/743/coolest-looking-terminal-irc-client
+  Statistics for IRC logs
+    http://pisg.sourceforge.net/
 
 SEIZE
   https://gist.github.com/pascalpoitras/8406501
   https://wiki.archlinux.org/index.php/WeeChat
+  Solarized
+    http://benoliver999.com/2014/02/18/weechatconf/
+
 
 Setup
   https://gist.github.com/ffledgling/5768485
@@ -24,11 +29,20 @@ Setup
   http://askubuntu.com/questions/61549/how-do-i-configure-irssi
   + http://pbraun.nethence.com/unix/chat/irssi.html
   http://misc.nybergh.net/pub/irssi/config.example
+  https://guides.fixato.org/setting_up_weechat.html
 
 TODO
+  [_] CHECK: don't autoconnect -- won't require password on setup -r ?
+    MAYBE pass prompt requested only if sec data used ?
+    ALT: use certificate with passwd -- add to keyring ?
   [_] certificate instead of password
     https://freenode.net/kb/answer/certfp
-  [_] ? history ?
+    http://wiki.znc.in/Cert
+    FIND: password-protected cert in WeeChat
+    CHECK
+      /whois YourOwnNick
+        # YourOwnNick has client certificate fingerprint f3a1aad46ca88e180c25c9c7021a4b3a
+  [_] ? history / log ?
   [_] ? another irc client with non-intrusive configuration ?
     weechat
   [_] G: WTF chatnet
@@ -74,6 +88,9 @@ USAGE
    /SET hilight_nick_matches_everywhere ON
 
   Auth with SASL
+    https://mikaela.info/english/2015/03/26/weechat-sasl-simply.html
+    https://freenode.net/kb/answer/sasl
+    http://wiki.znc.in/Sasl
      /NETWORK ADD -sasl_mechanism plain -sasl_username myuser -sasl_password mypass freenode
      /SERVER ADD -auto -ssl -ssl_verify -ssl_capath /etc/ssl/certs -network freenode chat.freenode.net 6697
      /SAVE
@@ -106,8 +123,8 @@ WeeChat
        /set irc.look.smart_filter "on"
        /alias sfilter filter add irc_smart_$server_$channel irc.$server.$channel irc_smart_filter *
        /alias rmsfilter filter del irc_smart_$server_$channel
-  Encryption / cert
-    https://blog.catpipegrep.com/tag/weechat.html
+  SEE: Web/Android gui frontend for weechat
+    https://www.glowing-bear.org/
 
 History
   !1 [_] Bouncers to be logged 24/7
@@ -116,6 +133,7 @@ History
     https://robots.thoughtbot.com/running-weechat-on-a-server-for-irc-backlogs
     http://nerderati.com/2010/11/29/perpetual-irc-the-proxy-edition/
   Bot to log
+    ::? CHG by znc-mod-log ?
 
 Passwords
   https://github.com/irssi/irssi/issues/6
@@ -126,27 +144,44 @@ Security
 
 Bouncer
   ZNC
-    http://ericholscher.com/blog/2010/nov/5/using-znc-irc-bouncer/
-    https://fedoramagazine.org/never-leave-irc-znc/
-    http://wiki.znc.in/Providers
-      BET: https://firrre.com/ (freenode only, login per 2 weeks, ask for suspend max 3 month)
-        BAD: signup suspended FIND altr
-      ALT: https://znc.bg/ (any srv, BUT login per 3 days and join channel per 2 weeks)
-      ++ https://tbl.im/ (UA)
-    ALT:
-      https://www.panicbnc.net/Request/
-      +? https://matrix.org/blog/2015/06/22/the-matrix-org-irc-bridge-now-bridges-all-of-freenode/
-    VPS -- install
-      https://www.digitalocean.com/community/tutorials/how-to-install-znc-an-irc-bouncer-on-an-ubuntu-vps
-      https://gist.github.com/freebroccolo/11381154
-  Router
-    http://webcache.googleusercontent.com/search?q=cache:uizP7zllBWUJ:http://www.snbforums.com/threads/n66u-and-an-irc-bouncer.14391/%2Basus+router+irc+bounce&hl=ru&ct=clnk
-    http://www.snbforums.com/threads/n66u-and-an-irc-bouncer.14391/
-    https://asciinema.org/a/7999
-      ALSO:(mpd): https://asciinema.org/a/9018
+    REF http://wiki.znc.in/Configuration
+    USAGE http://wiki.znc.in/Using_commands
+    VIZ
+      http://wiki.znc.in/Modules#.28Un.29Loading_Modules
+      http://wiki.znc.in/Category:Modules
+        http://wiki.znc.in/Category:Core_Modules
+        http://wiki.znc.in/Category:External_Modules
+    TUT http://ericholscher.com/blog/2010/nov/5/using-znc-irc-bouncer/
+      = how to configure znc.conf
+    TUT https://fedoramagazine.org/never-leave-irc-znc/
 
-  Solarized
-    http://benoliver999.com/2014/02/18/weechatconf/
+    Multiple clients
+      TUT https://blog.jay2k1.com/2016/02/04/how-to-configure-znc-backlog-for-multiple-clients/
+        = clientbuffer OR sep-user-per-device
+      DEV https://github.com/znc/znc/issues/343
+      REF http://wiki.znc.in/Multiple_clients
+        http://wiki.znc.in/Clientbuffer
+          http://wiki.znc.in/Compiling_modules
+          https://github.com/jpnurmi/znc-clientbuffer
+
+    Server
+      http://wiki.znc.in/Providers
+        BET: https://firrre.com/ (freenode only, login per 2 weeks, ask for suspend max 3 month)
+          BAD: signup suspended till 2017q2
+        ALT: https://znc.bg/ (any srv, BUT login per 3 days and join channel per 2 weeks)
+        BAD:(down): ++ https://tbl.im/ (UA)
+      ALT:
+        https://www.panicbnc.net/Request/
+        +? https://matrix.org/blog/2015/06/22/the-matrix-org-irc-bridge-now-bridges-all-of-freenode/
+      VPS (Virtual Private Server, VServer) -- install
+        BAD:SECURE: hoster always has full access to your system via the hostsystem
+        https://www.digitalocean.com/community/tutorials/how-to-install-znc-an-irc-bouncer-on-an-ubuntu-vps
+        https://gist.github.com/freebroccolo/11381154
+      Router
+        http://www.snbforums.com/threads/n66u-and-an-irc-bouncer.14391/
+        https://asciinema.org/a/7999
+          ALSO:(mpd): https://asciinema.org/a/9018
+
 
 ALT
   United
@@ -159,10 +194,11 @@ ALT
     ? skype
       https://sameroom.io/blog/connecting-skype-to-irc/
 
-  znc + bitlbee = skype + gtalk + ...
+  !3 [_] znc + bitlbee = skype + gtalk + ...
     ! http://william.weiskopf.me/irc/
     !!! https://www.dont-panic.cc/capi/2011/12/10/a-geeks-unified-instant-messaging-setup/comment-page-1/
     + http://zanshin.net/2015/01/10/a-guide-for-setting-up-weechat-and-bitlbee/
+    + TUT ZNC Push http://ircd.zemra.org/psybnc/znc.php
     SEE: ./skype.nou
 
 
@@ -182,6 +218,8 @@ ALT
     znc: http://wiki.znc.in/WeeChat
   epic + splitfire (ircll)
     http://www.epicsol.org/
+  ircv3
+    http://ircv3.net/
 
   suckless
     http://swtch.com/irc/
