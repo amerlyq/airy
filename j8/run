@@ -1,16 +1,27 @@
-#!/bin/bash
+#!/bin/sh
 #0 :0
 exec /usr/lib/j8/bin/jconsole "$0" "$@"
 )
+NB. -jprofile
 onfail=:3 :0
   1!:2&2 ARGV
-  1!:2&2]13!:12''
+  1!:2&5]13!:12''
   2!:55>:13!:11''
 )
 9!:27 'onfail 1'
 9!:29]1
-echo".;:inv 2}.ARGV
+
+NB. echo".;:(^:_1)2}.ARGV
+NB. transform=. |.@}: , {:
+NB. transform=:".;:(^:_1)2}.ARGV
+transform=:3 :0
+  ".;:(^:_1)2}.ARGV
+)
+NB. NOTE: for filters -- always print
+transform&.stdin ''
+NB. TODO: sed-like key '-n' to print only explicit
+NB. TODO: postfix syntax to use 'x' as data substitution
+
 exit 0
+NB. SEE: http://www.jsoftware.com/help/user/hashbang.htm
 NB. vim: ft=j
-NB. based on http://jsoftware.com/pipermail/programming/2015-April/041472.html
-NB. http://code.jsoftware.com/wiki/Vocabulary/Foreigns

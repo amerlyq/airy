@@ -1,4 +1,5 @@
 # vim:ft=sh
-if [[ -n ${ZSH_NAME-} ]]; then
-  alias jc='noglob jcalc'
-fi
+alias jc='jcalc'  # OR r.j8-calc
+alias jf='r.j8'
+
+[[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' jc jf
