@@ -6,5 +6,6 @@ cd ~/aura
 exec ag --vimgrep \
   -G '.*/.[^/]+\.nou$' "$@" \
   '^\s*!+[0-9]+\s\[_\]\s' \
-| $EDITOR - -c 'setl ft=nou bt=nofile|cgetb|%s/^\S\{-}:\s\+//|copen|only'
+| $EDITOR - -c 'setl bt=nofile bh=wipe|cgetb|copen|only|%s/\v^%([^|]+\|){2}\s+//|set ft=nou'
+# ALT: Tabularize /\|/ instead of '%s/^\S\{-}:\s\+//'
 # exec grep -r --exclude-dir='_build' "$@" \

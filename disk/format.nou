@@ -1,0 +1,21 @@
+%%% Formatting
+
+Flash drive
+  Info
+    $ sudo blkid | grep '/dev/sd\a[0-9]\?\b'
+    $ mount /dev/sda1 /mnt
+    $ lsblk
+  Partitioning (interactive)
+    $ sudo parted /dev/sda
+    (parted) print
+    (parted) mklabel msdos
+    (parted) mkpart
+      # type,fs,beg,end: p, ext4, 1, -1
+    (parted) quit
+  Scripting (non-interactive)
+    parted -s -a opt /dev/sda mklabel msdos
+    parted -s -a opt /dev/sda mkpart primary ext4 1MB 100%
+    # parted -s -a opt /dev/sda set 1 boot on
+  Formatting
+    $ sudo mkfs.ext4 /dev/sda1
+    OR $ sudo mkfs.vfat /dev/sda

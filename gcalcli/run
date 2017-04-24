@@ -5,6 +5,7 @@ cfg=~/.cache/airy/oauth/gcalcli/$acc
 mkdir -p "$cfg" && chmod 700 "$cfg"
 opts=(
   --noincluderc
+  # NOTE:($cfg) otherwise will be saved directly at ~/.gcalcli_{cache,oauth}
   --configFolder="$cfg"
   --defaultCalendar='work'
   # BAD: need to copy-paste link on oauth expired

@@ -1,0 +1,9 @@
+(package-initialize)
+
+(load-file "/usr/share/emacs/site-lisp/emacspeak/lisp/emacspeak-setup.el")
+
+; ALT use 'C-e C-M-k' to exit
+; FIXME exit only if espeak in process list, but not other
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+    "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+    (flet ((process-list ())) ad-do-it))

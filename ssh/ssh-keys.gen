@@ -4,15 +4,18 @@ source ~/.shell/profile
 genssh(){ # $1 -- @mail, $2 -- path/to/key
     local mail=$1 idn=~/.ssh/"$2"
     if [[ ! -f $idn ]]; then
+        # BAD:USAGE:SECURE: mail as comment isn't useful and compromises creds
+        #   https://serverfault.com/questions/309171/possible-to-change-email-address-in-keypair
+        # FIXME: encrypt in PKCS#8 after that and query passwd on first time
         ssh-keygen -t rsa -C "$mail" -N "" -f "$idn"
         echo "!!! Copy generated *.pub key to your servers"
     fi
 }
 
 # =================== Multi--SSH ============================
-genssh "${WORK_NAME:=${MAIN_NAME:?}}" id_rsa
-genssh "${WORK_MAIL:=${MAIN_MAIL:?}}" git_rsa
-genssh "${WORK_MAIL:=${MAIN_MAIL:?}}" rt_rsa
+genssh "id"  id_rsa
+genssh "git" git_rsa
+genssh "rou" rou_rsa
 
 case "$CURR_PROF" in
   # work) genssh "$WORK_MAIL" srk_rsa ;;

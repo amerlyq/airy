@@ -7,6 +7,21 @@ Reconnect w/o password until at least one session is alive
     ControlPersist 600
 
 
+Remove replaced/expired key fingerprint for host
+  $ ssh-keygen -R hostname
+
+
+Encrypt keys in PKCS#8 instead of MD5 passphrase
+  !5 [_] READ REF https://wiki.archlinux.org/index.php/SSH_keys
+    => to decide on ssh-agent vs gnupg
+  HACK TUT https://martin.kleppmann.com/2013/05/24/improving-security-of-ssh-private-keys.html
+    BAD: md5 $ ssh-keygen -p -f rou_rsa
+    BET: $ cd ~/.ssh && openssl pkcs8 -topk8 -v2 des3 -in id_rsa -out id_rsa.new && chmod 600 id_rsa.new
+    = everything must work as before
+
+Safely storing passwd hash -- use slow cryptographic hashes
+  https://codahale.com/how-to-safely-store-a-password/
+
 Control Sockets
   To be able send many request w/o retype password to SSH
   You can do this cleanly with an ssh 'control socket'. To talk to an
