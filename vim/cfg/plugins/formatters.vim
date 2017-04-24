@@ -4,7 +4,7 @@
 " ALT:TODO:TRY: another one: lion, etc
 call dein#add('godlygeek/tabular', {
   \ 'on_cmd': ['Tabi', 'Tabularize'],
-  \ 'hook_source': _hcat('tabular.src'),
+  \ 'hook_post_source': _hcat('tabular.src'),
   \ 'hook_add': _hcat('tabular.add')})
 
 

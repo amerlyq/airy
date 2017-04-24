@@ -14,6 +14,7 @@ for d in split('bundle bckp swap undo view')  " easytags.d
     call mkdir(expand('$CACHE/'.d), 'p', 0700)
   endif
 endfor
+let $VPLUGS = $VCACHE.'/plugins'
 
 
 " NOTE The '//' at directory end: use full path for filename with '%' separators

@@ -2,8 +2,16 @@
 " SEE: http://bling.github.io/blog/2013/06/02/unite-dot-vim-the-plugin-you-didnt-know-you-need/
 
 "" CHECK Unite main sources {{{1
-call dein#add('Shougo/neomru.vim', {'lazy': 0})
-call dein#add('Shougo/neoyank.vim', {'lazy': 0})
+call dein#add('Shougo/neomru.vim', {'lazy': 0,
+  \ 'hook_add': "
+\\n   let g:neomru#file_mru_path = $VPLUGS.'/mru_file'
+\\n   let g:neomru#directory_mru_path = $VPLUGS.'/mru_dir'
+\"})
+
+call dein#add('Shougo/neoyank.vim', {'lazy': 0,
+  \ 'hook_add': "
+\\n   let g:neoyank#file = $VPLUGS.'/neoyank_hist'
+\"})
 
 
 
