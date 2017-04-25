@@ -16,4 +16,6 @@ fi
 # BUG:(clean install) unknown variable: TMUX_PLUGIN_MANAGER_PATH
 tmux source-file ~/.tmux.conf #>/dev/null 2>&1
 "$tpm/scripts/install_plugins.sh" #&>/dev/null
+# WARN: sometime don't pull changes from github
+#   -> use "prefix + U" to update manually
 "$tpm/scripts/update_plugin.sh" all
