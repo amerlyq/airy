@@ -7,6 +7,8 @@ pkg_inst nmap
 
 if distro arch; then
   pkg_inst openbsd-netcat
+  # pkg_inst bind-tools  # dns utils
+  #   SEE:(bindhosts) http://wiki.znc.in/FAQ
   # nethogs - monitor per process network bandwidth
   pkg_inst nethogs
 fi

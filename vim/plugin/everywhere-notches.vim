@@ -61,7 +61,7 @@ let g:everywhere_activated = 1
 " I.A. inter alia (~ among other things)
 " VIZ. videlicet (~ precisely: implies (near) completeness)
 let s:patterns = {
-      \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|CRIT%(ICAL)?'],
+      \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|FAIL%(ED)|CRIT%(ICAL)?'],
       \ 'Add': [ 76, "#5faf00", 'ADD|SEE|READ|REF|TUT|BLOG|NEED|FIND|ALSO|BET%(TER)?|E\.G'],
       \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|CMP|I\.E'],
       \ 'Dev': [ 33, "#0087ff", 'DEV|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECIDE'],
