@@ -16,11 +16,17 @@ NB. transform=. |.@}: , {:
 NB. transform=:".;:(^:_1)2}.ARGV
 transform=:3 :0
   ".;:(^:_1)2}.ARGV
+  y
 )
 NB. NOTE: for filters -- always print
 transform&.stdin ''
 NB. TODO: sed-like key '-n' to print only explicit
 NB. TODO: postfix syntax to use 'x' as data substitution
+NB. TODO: check if stdin = tty => then submit empty list or list from single '' string
+NB. TODO: convert str to num
+NB.   http://www.jsoftware.com/help/jforc/input_and_output.htm
+NB.   http://www.jsoftware.com/help/learning/27.htm
+NB. FIND: how manipulate strings ?
 
 exit 0
 NB. SEE: http://www.jsoftware.com/help/user/hashbang.htm
