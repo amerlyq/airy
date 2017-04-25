@@ -9,7 +9,7 @@ search(){ local t=$1 k=$2; shift 2
 }
 
 search -d ROOT find "$PWD" -maxdepth 1 -xtype d -exec test -d "{}/lib" -a -d "{}/usr/lib" -a -f "{}/VERSION.TXT" \; -print -quit
-search -f CORE find "$PWD" -maxdepth 2 ! -readable -prune -o -xtype f -regex '^.*/core\.[^/]+\.[0-9]+$' -print -quit
+search -f CORE find "$PWD" -maxdepth 2 ! -readable -prune -o -xtype f -regex '^.*/core\.[^/]+\.[0-9]+(\.abort(\.dcf))?$' -print -quit
 # ALT: search archive with cores, then:
 #   tar --wildcards -C "$PWD" -zxvf "$CORE" 'core.*'
 pr=${CORE##*/core.}; pr=${pr%%.*}

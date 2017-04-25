@@ -25,7 +25,7 @@ next:
 clean:
 	r.airy-clean
 
-refresh: clean install
+defaults: clean install
 	r.airy -sd
 
 log:
