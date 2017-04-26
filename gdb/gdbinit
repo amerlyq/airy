@@ -15,6 +15,7 @@ set print demangle on
 set demangle-style gnu-v3
 
 ## Features for C++
+# SEE: http://ftp.gnu.org/old-gnu/Manuals/gdb/html_chapter/gdb_9.html#SEC58
 # pretty = print inner object struct as tree instead of single line
 set print pretty on
 set print object on
@@ -83,7 +84,7 @@ define dis
       end
     end
   end
-  disassemble $addr - $sz*2/3, +$sz
+  disassemble /r $addr - $sz*2/3, +$sz
 end
 
 # Print disassembled frames
@@ -123,6 +124,21 @@ define xc
   end
 end
 
+# https://sourceware.org/gdb/onlinedocs/gdb/Output.html
+# https://sourceware.org/gdb/onlinedocs/gdb/Output-Formats.html#Output-Formats
+define px
+  set $addr = $arg0
+  set $i = 5
+  while ($i > 0)
+    output/xa $addr
+    printf " -> "
+    set $addr = *$addr
+    set $i = $i - 1
+  end
+  printf "\n"
+end
+
+
 # SEE: http://stackoverflow.com/questions/12286311/gdb-backtrace-find-total-number-of-frame
 define btl
   set print frame-arguments all
@@ -142,6 +158,7 @@ define btl
     end
     select-frame 0
   end
+end
 
 # define pipe
 #   set logging off
