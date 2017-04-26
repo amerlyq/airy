@@ -6,6 +6,10 @@ cd ~/aura
 exec ag --vimgrep \
   -G '.*/.[^/]+\.nou$' "$@" \
   '^\s*!+[0-9]+\s\[_\]\s' \
-| $EDITOR - -c 'setl bt=nofile bh=wipe|cgetb|copen|only|%s/\v^%([^|]+\|){2}\s+//|set ft=nou'
+| $EDITOR - -c 'setl ft=nou bt=nofile bh=wipe|cgetb|copen|only|%s/\v^%([^|]+\|){2}\s+//|setl nomod noma ft=nou'
 # ALT: Tabularize /\|/ instead of '%s/^\S\{-}:\s\+//'
 # exec grep -r --exclude-dir='_build' "$@" \
+
+# RFC: construct more long -c '...'
+# eopt=( ... )
+# ecmd=$(IFS=$'|';printf '%s\n' "${eopt[*]// /\\ }")
