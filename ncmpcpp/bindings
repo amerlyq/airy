@@ -83,7 +83,6 @@ def_key "delete"
   delete_playlist_items
 def_key "delete"
   delete_browser_items
-
 def_key "delete"
   delete_stored_playlist
 
@@ -183,16 +182,18 @@ def_key "0"
   show_clock
 def_key "0"
   show_playlist
-def_key "@"
+def_key "%"
   show_server_info
 
 
 ####### Play #######
 
-def_key "s"
+def_key "S"
   stop
-def_key "p"
+def_key "s"
   pause
+def_key "ctrl-s"
+  save_playlist
 
 def_key ">"
   next
@@ -208,10 +209,15 @@ def_key "backspace"
   jump_to_parent_directory
 def_key "backspace"
   replay_song
+
 def_key "f"
   seek_forward
 def_key "b"
   seek_backward
+# Add instantly or select only
+def_key "F"
+  jump_to_position_in_song
+
 
 def_key "H"
   seek_backward
@@ -225,8 +231,15 @@ def_key "."
 
 def_key "r"
   toggle_repeat
+def_key "R"
+  toggle_consume
+
 def_key "z"
   toggle_random
+def_key "Z"
+  shuffle
+def_key "ctrl-z"
+  add_random_items
 
 def_key "y"
   save_tag_changes
@@ -235,23 +248,14 @@ def_key "y"
 def_key "y"
   toggle_single
 
-def_key "R"
-  toggle_consume
 
 def_key "Y"
   toggle_replay_gain_mode
 
-# Add instantly or select only
-def_key "t"
-  jump_to_position_in_song
-
-def_key "|"
+def_key "@"
   toggle_mouse
 def_key "#"
   toggle_bitrate_visibility
-
-def_key "Z"
-  shuffle
 
 def_key "x"
   toggle_crossfade
@@ -261,26 +265,22 @@ def_key "X"
 def_key "u"
   update_database
 
-def_key "ctrl-s"
+def_key "`"
   sort_playlist
-def_key "ctrl-s"
+def_key "`"
   toggle_browser_sort_mode
-def_key "ctrl-s"
+def_key "`"
   toggle_media_library_sort_mode
 
-####### Searching #######
-
-def_key "ctrl-r"
+def_key "~"
   reverse_playlist
 
-def_key "ctrl-_"
-  select_found_items
+####### Searching #######
 
 def_key "/"
   find
 def_key "/"
   find_item_forward
-
 def_key "?"
   find
 def_key "?"
@@ -291,8 +291,10 @@ def_key "n"
 def_key "N"
   previous_found_item
 
-def_key "w"
+def_key "ctrl-^"
   toggle_find_mode
+def_key "ctrl-_"
+  select_found_items
 
 
 ####### Edit #######
@@ -315,18 +317,29 @@ def_key "i"
 def_key "I"
   show_artist_info
 
-def_key "T"
-  toggle_add_mode
-
 def_key "'"
   show_lyrics
+def_key "\""
+  show_lyrics
+def_key "\""
+  toggle_lyrics_fetcher
+def_key "&"
+  toggle_fetching_lyrics_in_background
 
-def_key "ctrl-v"
-  select_range
-def_key "v"
+def_key "t"
   select_item
-def_key "V"
+def_key "T"
+  select_range
+def_key "ctrl-t"
+  toggle_add_mode
+
+def_key "v"
   reverse_selection
+def_key "V"
+  remove_selection
+def_key "ctrl-v"
+  select_found_items
+
 def_key "escape"
   remove_selection
 
@@ -343,9 +356,9 @@ def_key "D"
 def_key "D"
   clear_main_playlist
 
-def_key "C"
+def_key "ctrl-d"
   crop_playlist
-def_key "C"
+def_key "ctrl-d"
   crop_main_playlist
 
 def_key "K"
@@ -365,65 +378,55 @@ def_key "J"
 def_key "M"
   move_selected_items_to
 
-def_key "ctrl-t"
-  save_playlist
-
-def_key "o"
-  show_playlist
-def_key "o"
-  jump_to_playing_song
-
 def_key "c"
   show_playlist
 def_key "c"
   jump_to_playing_song
+def_key "C"
+  toggle_playing_song_centering
 
-def_key "S"
+def_key "o"
+  show_playlist
+def_key "o"
   jump_to_browser
-def_key "S"
-  jump_to_playlist_editor
 
-def_key "~"
+def_key "O"
+  show_playlist
+def_key "O"
   jump_to_media_library
+
+def_key "ctrl-a"
+  show_playlist
+def_key "ctrl-a"
+  jump_to_playlist_editor
 
 def_key "E"
   jump_to_tag_editor
 
-def_key "U"
-  toggle_playing_song_centering
-
-def_key "P"
-  toggle_display_mode
-
 def_key "\\"
+  toggle_display_mode
+def_key "|"
   toggle_interface
 
 def_key "!"
   toggle_separators_between_albums
 
-def_key "L"
-  toggle_lyrics_fetcher
-def_key "\""
-  toggle_lyrics_fetcher
-
-def_key "F"
-  toggle_fetching_lyrics_in_background
 
 # toggle_screen_lock
 def_key "ctrl-l"
   dummy
+def_key "ctrl-o"
+  dummy
 
-def_key "`"
+def_key "ctrl-r"
   toggle_library_tag_type
-
-def_key "`"
+def_key "ctrl-r"
   refetch_lyrics
-
-def_key "`"
-  add_random_items
 
 def_key "ctrl-p"
   set_selected_items_priority
 
+def_key "q"
+  show_playlist
 def_key "q"
   quit
