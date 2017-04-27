@@ -1,26 +1,32 @@
 USAGE: compatible with my general xkb
 
-% Modifiers % (xkb/amer applied over) - [progm-F12] ... [progm]
+% Modifiers % (xkb/amer applied over) - [progm-F12] ... [progm]  =>  check with xev
 | actual key / inner|    function    |    key caps (action -> location)
 | ----------------- | -------------- | -----------------
 | [delete]>[lalt]   | Super (XMonad) | LCommand -> Delete
+| [kp-delete]>[lalt]|  kp+XMonad+... | LCommand -> kp+Delete-kp
+| [kp-bspace]>[delete]|  Delete      | Delete -> kp+Backspace-kp
 | [lalt]>[lctrl]    | Overlay (Xkb)  | LAlt -> LCommand
 | [lctrl]>[kp-lwin] | Alt/Meta       | kp+F1-kp -> LAlt
 
 | [rctrl]>[kp-ralt] | Lang en/ru     | kp+F2-kp -> RAlt
-| [pup]>[rctrl]     | vim: easy C-b  | RAlt -> PgUp
-| [pdown]>[escape]  | vim: easy C-[  | Esc -> PgDn
+| [pdown]>[rctrl]   | vim: easy C-b  | RAlt -> PgDn
+| [pup]>[escape]    | vim: easy C-[  | Esc -> PgUp
 
 | [end]>[kp-lwin]   | st: easy M-v   | kp+F1-kp -> End
 
 | [intl-\]>[kpshft] |  for pup/pdown | kp+F8-kp -> intl-\
 | [kp-insert]>[kpshft] |       ---   | kp+F8-kp -> kp+intl-\-kp
 
-Duplicate shadowed keys on keypad level
-BUT:DFL: kp-<key> work as <key> even w/o remapping
-  [kp-delete]>[delete]
-  [kp-pup]>[pup]
-  [kp-pdown]>[pdown]
+
+ATT:DFL: kp-<key> work as <key> even w/o remapping
+  => BUT you need reset those keys to itself (if remapped)
+    kp+<key> -> kp+<key>
+ALT:Duplicate shadowed keys on keypad level
+  | [kp-delete]>[delete] |
+  | [kp-pup]>[pup]       | PgDn -> kp+PgDn-kp
+  | [kp-pdown]>[pdown]   | PgUp -> kp+PgUp-kp
+
 
 NOTE:(keep):
   intl-\ | Multi_key
