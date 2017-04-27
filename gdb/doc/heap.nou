@@ -1,0 +1,45 @@
+%% REF gdb-heap
+*gdb-heap* teaches gdb about how glibc manages the heap. From this could you
+find allocations and examine vtable pointers to find instances of objects -- at
+least objects that have vtables. I don't think there is any generic way to find
+instances of other kinds of objects.
+https://fedoraproject.org/wiki/Features/MemoryDebuggingTools
+  Forks
+    https://github.com/rogerhu/gdb-heap
+    https://github.com/m0t/gdb-heap
+    https://github.com/gkoszegi/gdb-heap
+  INFO
+    Mem Map
+      https://unix.stackexchange.com/questions/193862/how-to-set-up-gdb-to-scan-through-heap-memory
+      ? http://www.dirac.org/linux/gdb/02a-Memory_Layout_And_The_Stack.php
+    Dude - Where's My RAM? A deep dive in how Python uses memory - David Malcom's PyCon 2011 video talk
+      http://blip.tv/pycon-us-videos-2009-2010-2011/pycon-2011-dude-where-s-my-ram-a-deep-dive-into-how-python-uses-memory-4896725
+    David Malcom's PyCon 2011 slides
+      http://dmalcolm.fedorapeople.org/presentations/PyCon-US-2011/GdbPythonPresentation/GdbPython.html
+    malloc.c.html implementation
+      http://code.woboq.org/userspace/glibc/malloc/malloc.c.html
+    Malloc per-thread arenas in glibc
+      http://siddhesh.in/journal/2012/10/24/malloc-per-thread-arenas-in-glibc/
+    Understanding the heap by breaking it
+      http://www.blackhat.com/presentations/bh-usa-07/Ferguson/Whitepaper/bh-usa-07-ferguson-WP.pdf
+    JVM
+      https://www.atlassian.com/blog/archives/so-you-want-your-jvms-heap
+
+
+%% Runtime heap map
+  http://stackoverflow.com/questions/2564752/examining-c-c-heap-memory-statistics-in-gdb
+  http://stackoverflow.com/questions/30920254/how-to-check-heap-size-and-created-objects-in-core-dump
+    NOTE: glibc+debuginfo = 135168 B total / max memory (with free), 200704 B = mapped
+    (gdb) p main_arena.system_mem
+      $3 = 135168
+    (gdb) p main_arena.max_system_mem
+      $4 = 135168
+    (gdb) p mp_
+      $5 = {trim_threshold = 131072, top_pad = 131072, mmap_threshold = 131072, arena_test = 8, arena_max = 0, n_mmaps = 1, \
+        n_mmaps_max = 65536, max_n_mmaps = 1, no_dyn_threshold = 0, mmapped_mem = 200704, max_mmapped_mem = 200704, \
+        max_total_mem = 0, sbrk_base = 0x1ace000 ""}
+  http://eztrace.gforge.inria.fr/
+    = generating automatically execution trace from HPC (High Performance Computing) programs.
+    = can be interpreted by visualization tools such as ViTE.
+  https://github.com/vmarkovtsev/DeathHandler
+    = SIGSEGV handler which prints the debug stack trace for C/C++ projects on Linux. It is configurable and rather robust.

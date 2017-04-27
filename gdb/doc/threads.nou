@@ -74,3 +74,7 @@ Correlate allocated section 'load3' with thread number
   Search ptr belonging
     $ awk -vv="0x66845618" 'BEGIN{v=strtonum(v)} (strtonum($2)<v && strtonum($3)-v>=0x4)' reg.lwp.sec
     $ grep '^0x' addrs X{} awk -vv="{}" 'BEGIN{v=strtonum(v)} (strtonum($2)<v && strtonum($3)-v>=0x4) {printf"0x%08x: %s\n",v,$0}' reg.lwp.sec
+
+
+%%% Filter-out
+  /\v%(__%(pthread_cond_%(timed)?wait|new_sem_wait|GI_\S+)|close|query_module)\s\(/
