@@ -36,10 +36,22 @@ BUG
   : sudo mount --bind /cryptfs/workspace /cryptfs/chroots/lucid_i386/home/user
   [_] FIXME Exit chroot after using 'xsel'
   : E: 10mount: umount: /run/schroot/mount/xenial_amd64-e0515f5b-3eee-41a9-9135-58086206a3d1/home/user: target is busy
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=829125
+    ALT: use systemd-nspawn
+      https://wiki.archlinux.org/index.php/Systemd-nspawn
+        https://bbs.archlinux.org/viewtopic.php?id=201490
+    !! WARN: seems like it isn't possible to use single chroot on one-per-cmd basis
+      https://bugs.archlinux.org/task/32834
+    BAD:HACK: $ umount -l /run/schroot/mount/*
+      => BAD unmounts even what MUST NOT
   := MAYBE Launching 'xsel' links some resources from $chroot/$HOME into host's Xorg, therefore can't umount them
 
 
 FIXED
+  Timezone
+    https://wiki.debian.org/TimeZoneChanges
+    $ echo "Europe/Kiev" | sudo tee /etc/timezone
+    $ sudo cp -vfT "/usr/share/zoneinfo/$(cat /etc/timezone)" /etc/localtime
   Share system settings (will be used from /home dir)
     mkdir -vp ~/.terminfo/r/
     cp -v /usr/share/terminfo/r/rxvt-unicode-256color ~/.terminfo/r/

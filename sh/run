@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # BAD? zsh launched raw or after ranger -- has SHELL=/usr/bin/zsh
 #   instead of =.../r.sh. OR it's intended behaviour?
@@ -8,20 +8,20 @@
 #   ALT: => [[ -n $ZSH_NAME ]]
 
 # EXPL: simplify when r.sh -c $SHELL
-if [ "$#" -eq 2 ] && [ "$1" = -c ]
-then if [ "$2" = "$SHELL" ] || [ "$2" = '$SHELL' ]
+if [ "$#" -eq 2 ] && [ "${1-}" = -c ]
+then if [ "${2-}" = "$SHELL" ] || [ "${2-}" = '$SHELL' ]
 then shift 2; fi; fi
 
 # EXPL: overwrite when SHELL=r.sh
-[ -x /usr/bin/zsh ] \
-&& export SHELL=/usr/bin/zsh \
-|| export SHELL=/usr/bin/bash
+SHELL=$(which zsh 2>/dev/null)  ||\
+SHELL=$(which bash 2>/dev/null) ||\
+SHELL=$(which sh) || exit  # HACK: pass errmsg
 
 # USE: Interactive shell
-[ "$1" != -c ] && exec ${SHELL:?} "$@"
+[ "${1-}" != -c ] && exec ${SHELL:?} "$@"
 
 # USE: Cmdline populated with aliases
-[ "$1" != -c ] || shift
+[ "${1-}" != -c ] || shift
 exec ${SHELL:?} -c '
 (( $(id -u) )) || HOME=/home/${SUDO_USER:-${USER:-${USERNAME:?}}}
 source ~/.config/airy/aliases

@@ -39,8 +39,9 @@ done
 # THINK: using tmux? how to be with nested sessions?
 
 # EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
+# WARN: DISPLAY="$DISPLAY" -- can't umount schroot
 exec schroot -c "$prf" -d "$dir" -- env \
-  DISPLAY="$DISPLAY" SHELLRC_EVAL="${CURR_CHROOT_EVAL}" \
+  SHELLRC_EVAL="${CURR_CHROOT_EVAL}" \
   "${_env[@]}" "$@"
 
 

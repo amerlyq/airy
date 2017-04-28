@@ -94,8 +94,11 @@ sub strip_trail { my $keep = 0;
 
 # NOTE useful for threads
 sub strip_fields {
-    # TODO multiline agent line wrapped on 72
-    grep { !/^(?:Subject|User-Agent):\s/ } @_;
+    # TODO multiline agent/subject line wrapped on 72
+    #   FIND rfc-standard for this wrapping
+    grep { !/^(?:User-Agent):\s/ } @_;
+    # grep { !/^(?:Subject):\s/ } @_;
+
     # subject=$(<<<"$message" grep -oPm 1 '^Subject: ?\K.*' | sed 's,/,∕,g')
     # Reformat date in single timezone
     #   mail_date=$(<<<"$message" grep -oPm 1 '^Date: ?\K.*')
