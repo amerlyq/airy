@@ -9,6 +9,7 @@ case ${1+$1} in -R) refresh=1; shift; esac  # TEMP
 cmd+=( ./gdb -q )
 
 # Local ./.gdbinit is too late for this option
+# CHECK:CHG: $(readlink -e "$PWD")
 cmd+=( -iex "set auto-load safe-path $PWD" )
 # BAD: this opt can't tolerate symlinks
 # cmd+=( -iex "set auto-load local-gdbinit" )
@@ -39,7 +40,5 @@ cmd+=( -x init.cfg )
 # else cat > cmd
 # fi
 
-# NEED: when running without chroot
-# export SHELL=$(which r.sh)
 exec "${cmd[@]}" "$@"
 # exec r2 -a mips "$file" "$core"

@@ -66,7 +66,8 @@ end
 define bta
   # Make things like C++ or STL classes (as function parameters)
   # not truncated (and shown as "...") in bt.
-  set print frame-arguments all
+  # BAD: don't set implicitly here
+  #   set print frame-arguments all
   thread apply all bt full
 end
 
@@ -141,7 +142,8 @@ end
 
 # SEE: http://stackoverflow.com/questions/12286311/gdb-backtrace-find-total-number-of-frame
 define btl
-  set print frame-arguments all
+  # BAD: don't set implicitly here
+  #   set print frame-arguments all
   # relative absolute basename
   # BAD:(comment-out): No symbol "filename" in current context.
   # set filename-display relative
@@ -158,6 +160,20 @@ define btl
     end
     select-frame 0
   end
+end
+
+# ATT:NEED: pwd == /tmp/gdb/<bug>
+define lognew
+  set logging off
+  shell mkdir -p log
+  # ALT: init-if-undefined $variable = expression
+  if $argc == 0
+    eval "shell ln -sfT \"log/$(date +%%Y%%m%%d_%%H%%M%%S).cfg\" log.cfg"
+  end
+  if $argc == 1
+    eval "shell ln -sfT \"log/%s.cfg\" log.cfg", $arg0
+  end
+  set logging on log.cfg
 end
 
 # define pipe

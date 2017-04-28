@@ -4,6 +4,7 @@
 SEE
   http://yusufonlinux.blogspot.com/2010/11/debugging-core-using-gdb.html
   https://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques/Deadlocks
+  ! https://peeterjoot.wordpress.com/2009/08/28/gdb-on-linux-finding-your-damn-thread/
 
 % Search for thread, which blocked the current one
     # Program terminated with signal 6, Aborted.
@@ -16,14 +17,12 @@ SEE
   ...
   (gdb) f 1
     #1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
-  (gdb) thread apply all p* (pthread_mutex_t*)$a0
-  (gdb) thread apply 1 4 5 90 p* (pthread_mutex_t*)$a0
   (gdb) p* (pthread_mutex_t*)$a0
     $1 = {
       __data = {
         __lock = 2,
         __count = 0,
-        __owner = 4391,
+        __owner = 4391,  # <= search thread with this LWP
         __kind = 0,
         __nusers = 1,
         __spins = 0
@@ -38,3 +37,9 @@ SEE
     #0  0x2ab2b90c in nanosleep () from /lib/libpthread.so.0
     #1  0x2ac820d0 in usleep () from /lib/libc.so.0
     ...
+
+Analyze all
+  NOTE: $a0 in f0 == $a0 in f1
+  (gdb) thread apply 1 4 5 90 p* (pthread_mutex_t*)$a0
+  (gdb) thread apply all p ((pthread_mutex_t*)$a0)->__data.__owner
+  (gdb) t a 69 136 printf "%d %d\n", $_thread, ((pthread_mutex_t*)$a0)->__data.__owner

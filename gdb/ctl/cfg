@@ -15,12 +15,22 @@ cat> ./init.cfg <<EOT
 # vim:ft=gdb
 set pagination off
 set logging overwrite on
+
 set print thread-events off
+# VIZ. none all scalars
+set print frame-arguments scalars
+
+# set print pretty off
+# set print object off
+# set print static-members off
+# set print vtbl off
+
 set data-directory gdb_data
 # OR: sysroot
 set solib-absolute-prefix root
 set solib-search-path debug:libs
 ${OLD_BDR+set substitute-path $OLD_BDR bdr}
+${OLD_SRC+set substitute-path $OLD_SRC src}
 set directories src:\$cdir:\$cwd${SRC_DIRS+:$SRC_DIRS}
 set debug-file-directory debug:libs/debug:root/lib/.debug
 
