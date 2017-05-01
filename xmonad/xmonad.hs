@@ -164,7 +164,7 @@ myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
   -- Style
   , borderWidth        = 2
   , normalBorderColor  = "#000000"
-  , focusedBorderColor = "#c050f0"
+  , focusedBorderColor = "#00af00"
   }
 
 

@@ -201,8 +201,13 @@ Configs
 zsh
   [_] USE ,f to launch fzf? -- with its pop-up list
   [_] Add mapping to save/execute some command (like in ranger/vim)
-    : USE it instead of '<C-p><CR>'
+    : USE it instead of <C-p><CR>
     := Instead ',k' can be merged with ',m' -- if empty -- abyss, if full -- command
+    * ,j -- for repeat last command
+    * ,k -- to repeat last command which was at least once repeated
+      << So, to save cmd for exec you use ,j instead of <C-x><C-m>
+    THINK: how to keep saved cmd even after ranger in same tty ?
+      ? save to disk as key=tty,val=mapping ?
   [_] ADD mapping on C-S-r -- as reverse search instead of C-s
   [_] ENH: Text insertion w/o triggering ',d' or ',s' ::> FIXED(in zsh>=v5.1)
     >> http://zmwangx.github.io/blog/2015-09-21-zsh-51-and-bracketed-paste.html
