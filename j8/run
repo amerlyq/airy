@@ -22,10 +22,140 @@ NB. NOTE: for filters -- always print
 NB. transform&.stdin ''
 NB. 1!:1@3: :. stdout
 NB. stdout=: 1!:2&4
-NB. echo=: 0 0&$ @ (1!:2&2)
 
-body=: ". ;: (^:_1) 2}. ARGV
-echo body
+NB. ech=: 0 0&$ @ (1!:2&4)
+
+NB. http://www.jsoftware.com/help/learning/17.htm
+NB. http://jsoftware.2058.n7.nabble.com/Split-and-Join-did-it-again-td12987.html
+
+NB. 'A O I'=:getargs''
+NB. A=:2}.A   NB.RFC: embed into assignment above
+NB. NB. echo (A;O;I)
+
+NB. DEV: train of nested splitters:
+NB.   -s section, -l line, -f field, -c char
+NB. NOTE: opt vals specify delimiters for splitters
+NB. ALT: vals determine codeblock to apply on that level
+NB.   OR: use upper case -S/-L/-F for per-codeblock syntax
+NB.   * -B/-E for before/end block
+NB.   * w/o specifier -- in innermost block
+NB. ALSO: -=f'expr' to override splitter func completely
+NB. IDEA: two cases: streamline and structural editor
+NB.   * streamline works as awk -- body applied to innermost split
+NB.   * structured is reversed -- pre-processed splitting and body applied to whole structure on outermost level
+NB.     => may be emulated by skipping body (DFL: store) and doing evaluations in the END block
+NB. IDEA: by prefix '-/+' regulate DFL printing after this block processing
+
+NB. f0=: 3 : 0
+NB.  s=.0$0
+NB.  select. y
+NB.   case. 1;2 do. s=.s,'one two'
+NB.   case. 'l' do. s=.s,'three'
+NB.   case. 4;5 do. s=.s,'four five'
+NB.   case. 6   do. s=.s,666
+NB.  end.
+NB.  s
+NB. )
+NB. NB. echo f0 6
+
+NB. RFC:(case by agenda): http://www.jsoftware.com/help/dictionary/d621.htm
+NB. optparse=: 3 : 0
+NB.  echo >{.y
+NB.  select. >{.y
+NB.   case. 'b' do. 'block'
+NB.    NB. s=.s,splitnostring&(LF,LF)
+NB.   case. 'l' do. 'line'
+NB.    NB. s=.s,splitnostring&LF
+NB.   case. do. '*'
+NB.  end.
+NB. )
+
+NB. NB. RFC:CHG: loop by optparse &.> 1 2 3 4 5 6
+NB. NB. for_o. y do. ... end. RFC: remove '_o' BUT which var is DFL?
+NB. NB. echo optparse&.> (<'l'),(<'b'),(<' ')
+NB. 3 : 0''
+NB.   for_o. O do.
+NB.     echo o
+NB.     echo optparse o
+NB.   end.
+NB. )
+
+NB. 3 :0''
+NB.  i=.#O
+NB.  while. i>0 do.
+NB.   echo i
+NB.   i=.i-1
+NB.  end.
+NB. )
+
+NB. 3 :0 ''
+ NB. argb=. (]`(([: < 1: {. }.) , [: < 2: }. ])@.('-'"_ = {.))&.> ARGV
+ NB. echo 2}.ARGV
+ NB. echo ('-' = {.)&.> ARGV
+ NB. echo ([: < 1: {. }.) '-l1'
+ NB. echo ([: < 2: }. ]) '-l1'
+ NB. parm=. 32 = ;(3!:0)&.> argb
+ NB. echo ((-. parm)#argb)
+ NB. echo (>parm#argb)
+ NB. echo (". (0 = isatty 0)#'stdin ''''')
+NB. )
+
+3 : 0''
+  a=.>2}.ARGV
+  while. #a do.
+    o=.{.a
+    if. '-'={.o do.
+      echo 'O:',o
+    else.
+      echo 'A:',o
+    end.
+    a=.}.a
+  end.
+
+  NB.NOTE: stdin is tty
+  if. (0 = isatty 0) do.
+    echo <stdin ''
+  end.
+)
+
+NB. NB. printf '1 5\n4\n\n3 8\n' | r.j8 'echo y'
+NB. data=:1!:1(3)
+NB. data=: LF splitnostring data
+NB. loop=: 3 : (;: (^:_1) 2}. ARGV)
+NB. loop data
+
+NB.NOTE: Line-wise (on line ending)
+NB.   http://www.jsoftware.com/pipermail/programming/2007-May/006694.html
+NB.   http://www.jsoftware.com/pipermail/programming/2007-November/008864.html
+NB. echo LF splitnostring data
+NB. echo < ;. _2 data,LF
+NB.NOTE: Block-wise (on empty line)
+NB. echo (LF,LF) splitnostring data
+NB.NOTE: Word-wise (inner J rules)
+NB. echo ;; data
+NB.BAD: Field-wise
+NB. http://jsoftware.2058.n7.nabble.com/regex-splitting-a-string-on-td70968.html
+NB. echo '^|\s' rxE data
+NB. echo < ;. _2 data,' '
+NB.FIND: Char-wise
+NB.   http://www.jsoftware.com/pipermail/programming/2010-February/018319.html
+NB. echo &.>data
+
+NB. 3 :0''
+NB.  sum=. 0
+NB.  while.#line=:1!:1(3) do.
+NB.  NB.  sum=.sum++/0".' ' (I.line e.CR)} line
+NB.   'line' 1!:2(4)
+NB.   echo line
+NB.  end.
+NB.  echo sum
+NB. )
+
+NB. body=: ;: (^:_1) 2}. ARGV
+NB. inn=: 1!:1&3
+NB. NB. ech ". body
+NB. (1!:2&4) 1!:1&3
+NB. NB. (1!:2&4) (".body)]in 1
 
 NB. TODO: postfix syntax to use 'x' as data substitution
 NB. TODO: sed-like key '-n' to print only explicit
@@ -35,6 +165,14 @@ NB. TODO: convert str to num
 NB.   http://www.jsoftware.com/help/jforc/input_and_output.htm
 NB.   http://www.jsoftware.com/help/learning/27.htm
 NB. FIND: how manipulate strings ?
+
+NB. http://www.jsoftware.com/pipermail/programming/2007-May/006647.html
+NB. http://www.jsoftware.com/pipermail/programming/2007-May/006628.html
+NB. ++ http://www.jsoftware.com/pipermail/programming/2007-May/006644.html
+NB. echo +/ 0&". ;._2 stdin''
+NB. http://www.jsoftware.com/pipermail/general/1999-October/002462.html
+NB. http://www.jsoftware.com/pipermail/general/2000-July/003612.html
+NB. http://www.jsoftware.com/pipermail/general/1999-January/000554.html
 
 exit 0
 NB. SEE: http://www.jsoftware.com/help/user/hashbang.htm
