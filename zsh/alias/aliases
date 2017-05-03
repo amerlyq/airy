@@ -11,6 +11,8 @@ alias -g N1=' >/dev/null'
 alias -g N2='2>/dev/null'
 alias -g N+='2>&1'
 alias -g NN='|tee /dev/tty'
+alias -g NZ='|tr \\n \\0'
+alias -g ZN='|tr \\0 \\n'
 
 ## Viewers
 if (($+commands[$PAGER])); then

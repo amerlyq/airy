@@ -5,6 +5,7 @@ cd "${1:-$PWD}"
 export WCOL=$(r.git-find | awk -vd="$PWD" \
   'BEGIN{RS="\0";d=length(d)} {print length-d}' \
   | LC_ALL=C sort -rn | head -1)
-exec r.git-find | parallel -0 -kX r.git-status {}
+exec r.git-find | r.git-freeze  ${2+"$2"} \
+  | parallel -0 -kX r.git-status {}
 # BAD: counts all escape codes for colors
 # | column -ts $'\t'

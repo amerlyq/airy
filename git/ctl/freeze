@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+f=${1-$PWD/.freeze}
+
+# SEE:HACK: temp files for redirections
+#   https://unix.stackexchange.com/questions/181937/how-create-a-temporary-file-in-shell-script
+exec 3<<< ""
+
+[[ -f $f && -s $f ]] && awk -vp="$PWD" \
+  '$0~/^[^/]/ {print p"/"$0}' "$f" > /dev/fd/3
+
+# WARN: no exec
+grep -zvsxF -f /dev/fd/3
