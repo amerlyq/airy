@@ -1,0 +1,10 @@
+#!/bin/sh -eu
+# USAGE:
+#   ./$0 -- any shebang, all script names
+#   ./$0 . 'perl' -- shebangs with concrete interpreter
+#   ./$0 . '' 'patt' -- grep patt in any shebang
+#   ./$0 . 'perl' 'patt' -- grep patt in specific shebang
+(($#)) && dir=$1 && shift
+(($#)) && intpr=${1:+\\b$1\\b} && shift
+(($#)) && set -- -exec ag --vimgrep "$@" {} \; || set -- -print
+exec find "${dir-.}" -type f -executable -exec grep -qm1 "^#!.*${intpr-}" {} \; "$@"
