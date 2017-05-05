@@ -19,16 +19,16 @@ has p && mkdir -p "${t%/*}"
 
 # WARN: unrestricted recursive substitution
 # FIXME: -- endless loop for USER='%USER%' -- set depth limit ?
+# ALT:BAD:(both empty and undef): if (length(v)==0)
 gawk -vl="$lp" -vm="$mp" -vr="$rp" '{
   while(match($0, l m r)) {
     k = substr($0, RSTART, RLENGTH)
     k = gensub(l"("m")"r, "\\1", "1", k)
-    v = ENVIRON[k]
-    if (length(v)==0) {
-      print "No env: "k > /dev/stderr
+    if (! k in ENVIRON) {
+      print "No env: "k > "/dev/stderr"
       exit 4
     }
-    gsub(l k r, v)
+    gsub(l k r, ENVIRON[k])
   }; print
 }' "$f" > "$t"
 
