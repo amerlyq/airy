@@ -1,7 +1,7 @@
 if !has("gui_running") | finish | endif
 
 
-set guicursor+=a:blinkwait0 " disable cursor blink in gvim
+" set guicursor+=a:blinkwait0 " disable cursor blink in gvim
 "set guiheadroom=0
 
 

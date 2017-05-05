@@ -3,36 +3,38 @@
 # NOTE: $NVIM_TUI_ENABLE_TRUE_COLOR
 #   = replaced by ':set termguicolors' for >160511
 #   = no longer sets 'has("gui_running")' for >160204
+# NOTE: $NVIM_TUI_ENABLE_CURSOR_SHAPE
+#   = unnecessary for nvim>=0.2.0 170502
 
 _has_pr(){ hash "$1" &>/dev/null; }
 
 if _has_pr nvim; then
   # unset NVIM_TUI_ENABLE_TRUE_COLOR
-  unset NVIM_TUI_ENABLE_CURSOR_SHAPE
+  # unset NVIM_TUI_ENABLE_CURSOR_SHAPE
 
   case "$TERM"
   in rxvt-*)
     # BUG: open vim inside vim -- thinks it's xterm
     # BUG: on android xterm is fake = trash symbs on cursor
-    export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    # export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     export TERMCMD='urxvt'
   ;; st-*)
     # export NVIM_TUI_ENABLE_TRUE_COLOR=1
-    export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    # export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     export TERMCMD='st'
   ;; tmux-256color|screen-256color*)
     # Works only with tmux-24bit-color which after merge > v2.1.1
-    if _has_pr tmux && tmux -V | grep -q 'tmux [2-9]\.[2-9]'; then
-        # export NVIM_TUI_ENABLE_TRUE_COLOR=1
-        export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
-    fi
+    # if _has_pr tmux && tmux -V | grep -q 'tmux [2-9]\.[2-9]'; then
+    #     # export NVIM_TUI_ENABLE_TRUE_COLOR=1
+    #     export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    # fi
     # export TERMCMD='tmux split-window "$cmd"'
   esac
 fi
 
 # EXPL: run vim if there are no 'nvim'
 for pr in nvim vis vim vi; do
-  if _has_pr "$pr"; then exec "$pr" "$@"; fi
+  _has_pr "$pr" && exec "$pr" "$@"
 done
 exit 1  # ERR: if not found
 

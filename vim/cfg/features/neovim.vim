@@ -3,6 +3,19 @@ let g:python2_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/bin/python3'
 let g:python_host_prog = g:python2_host_prog
 
+" SEE :h guicursor for -Cursor/lCursor-
+"   https://github.com/neovim/neovim/wiki/FAQ#how-can-i-change-the-cursor-shape-in-the-terminal
+try|set guicursor=
+  \n-v-c:block-Cursor/lCursor-blinkon0
+  \,i-ci-ve:ver25-Cursor/lCursor
+  \,r-cr:hor20-Cursor/lCursor
+  \,o:hor45
+  \,sm:block-blinkwait175-blinkoff150-blinkon175
+  \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+  "" FIXED: restore cursor shape on exit
+  " au MyAutoCmd VimLeave * set guicursor=a:block-blinkon0
+catch/E518/|endt
+
 try|set inccommand=split|catch/E518/|endt   " :substitute preview
 
 " BAD: <ESC><ESC> -- consume single <ESC>, sent to client
