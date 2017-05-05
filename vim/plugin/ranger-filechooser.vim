@@ -1,9 +1,11 @@
 if &cp||exists('g:loaded_ranger')|finish|else|let g:loaded_ranger=1|endif
 " Add ranger as a file chooser in vim
 " FIND:(github) all 'ranger vim' alternatives
+"   BET? https://github.com/francoiscabrol/ranger.vim
+"     BAD: can't select current file under cursor
 "
 " If you add this code to the .vimrc, ranger can be started using the command
-" ":RagerChooser" or the keybinding "<leader>r". Once you select one or more
+" ":RangerChooser" or the keybinding "<leader>r". Once you select one or more
 " files, press enter (or move right) and ranger will quit again and vim will
 " open the selected files.
 
