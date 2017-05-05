@@ -26,6 +26,7 @@ do_if() {
   # Statistics NEED: ./odd-pkgs
   if [[ $cmd == true || $cmd =~ (pacman|pacaur|yaourt) ]]
   then printf '%s\n' "$@" >> "$cache/install.txt"; fi
+  [[ ${AIRY_DRY_RUN-} ]] && return
 
   # Skip ignored pkgs
   if [[ $cmd =~ pacman ]]; then

@@ -39,6 +39,10 @@ tags: _build/tags
 _build/tags: _build/mods
 	r.airy-link-tags -t _build/tags -f _build/mods
 
+problems:
+	@echo "Manually verify necessity of packages outside of airy."
+	@echo "INFO:USE:(commands): pacq, pacr, pacR, paclr"
+	./airy/exe/odd-pkgs
 
 TARGS := $(shell sed -rn 's/^([-a-z]+):.*/\1/p' Makefile|sort -u|xargs)
 .PHONY: $(TARGS)

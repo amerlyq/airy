@@ -7,8 +7,34 @@ TODO
     https://pierre-schmitz.com/verify-all-the-packages/
 
 FAQ
-  Errors on upgrade
+  cert (new upgrade)
     ca-certificates-utils 20170307-1
       $ pacman -Syuw                           # download packages
       $ rm /etc/ssl/certs/ca-certificates.crt  # remove conflicting file
       $ pacman -Su                             # perform upgrade
+  gpg (partial upgrade)
+    ERR
+      https://bbs.archlinux.org/viewtopic.php?id=223797
+      gpg: error while loading shared libraries: libreadline.so.6: cannot open shared object file: No such file or directory
+      ==> ERROR: Trust database could not be updated.
+      error: harfbuzz: missing required signature
+      :: File /var/cache/pacman/pkg/harfbuzz-1.4.5-2-x86_64.pkg.tar.xz is corrupted (invalid or corrupted package (PGP signature)).
+      Do you want to delete it? [Y/n]
+      warning: Public keyring not found; have you run 'pacman-key --init'?
+      error: GPGME error: Invalid crypto engine
+    ::: Temporary change /etc/pacman.conf  :: SigLevel = Never
+      $ sudo /usr/bin/pacman -Syu
+      https://bbs.archlinux.org/viewtopic.php?id=137420
+    OR: mount livecd
+      $ pacman --root
+      https://bbs.archlinux.org/viewtopic.php?id=214998
+  signature (after partial upgrade)
+    ERR
+      https://bbs.archlinux.org/viewtopic.php?id=142798
+      error: archlinux-keyring: signature from "Bartlomiej Piotrowski <b@bpiotrowski.pl>" is unknown trust
+      :: File /var/cache/pacman/pkg/archlinux-keyring-20170320-1-any.pkg.tar.xz is corrupted (invalid or corrupted package (PGP signature)).
+      Do you want to delete it? [Y/n]
+      error: failed to commit transaction (invalid or corrupted package (PGP signature))
+    :::
+      $ pacman-key --init
+      $ pacman-key --populate archlinux

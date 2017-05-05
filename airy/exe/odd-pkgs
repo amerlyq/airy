@@ -8,9 +8,11 @@
 tmp=/tmp/pkgs.txt
 also=( base base-devel yaourt "$@" )
 
-# USAGE: r.airy -xI  # generate active db
-#   TODO:DEV: generate w/o actual cmds execution
-cp -fT ~/.cache/airy/install.txt "$tmp"
+# NOTE: generate active db w/o actual cmds execution
+db=~/.cache/airy/install.txt
+[[ -f $db && -s $db ]] || AIRY_DRY_RUN=1 r.airy -xI
+
+cp -fT "$db" "$tmp"
 printf '%s\n' "${also[@]}" >> "$tmp"
 
 pacman -Qei | awk '
