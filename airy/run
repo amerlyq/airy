@@ -30,8 +30,9 @@ build=$repo/_build
 
 ### Profile
 source ~/.shell/profile
+
 (( ${#mods[@]} )) || mods=( "${AIRY_MODS[@]}" )
-(( ${#skip[@]} )) || skip=( "${AIRY_SKIP[@]}" )
+(( ${#skip[@]} )) || skip=( ${AIRY_SKIP[@]+"${AIRY_SKIP[@]}"} )
 
 # BUG:FIX: when _build/mods generated -- '-d' has no effect !
 has d && mods+=( defaults )
@@ -51,7 +52,7 @@ printf '\n$ %s %s\n'  "$0" "$*"
 
 ### Searching mods
 search_mods(){ for d in "$@"; do (cd "$d" &&
-  r.airy-filter-mods "${mods[@]}" -- "${skip[@]}") done; }
+  r.airy-filter-mods "${mods[@]}" -- ${skip[@]+"${skip[@]}"}) done; }
 
 has x && rm -f "$build/mods"
 if ((!defaults)) || [[ ! -s $build/mods ]]; then
