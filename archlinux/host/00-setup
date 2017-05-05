@@ -35,6 +35,7 @@ echo ':: time setted up'
 # WARNING: dual boot with Windows: https://wiki.archlinux.org/index.php/Time#UTC_in_Windows
 # manually synchronize your clock with the network, ignoring large deviations
 # between local UTC and network UTC, and write that to hardware clock.
+# FIXED: system time deviation
 #   sudo pacman -S ntp
 #   sudo ntpd -qg && sudo hwclock --systohc
 

@@ -42,12 +42,15 @@ call dein#add('kshenoy/vim-signature', {
 " let g:quickhl_manual_colors = [ "ctermbg=..", ... ]
 call dein#add('t9md/vim-quickhl', {
   \ 'on_map': [['nv', '<Plug>(operator-quickhl-', '<Plug>(quickhl-']],
-  \ 'on_cmd': ['QuickhlManualList', 'QuickhlCwordToggle', 'QuickhlTagToggle',
+  \ 'on_cmd': ['QuickhlManualAdd', 'QuickhlManualList',
+  \            'QuickhlCwordToggle', 'QuickhlTagToggle',
   \            'QuickhlManualLockToggle', 'QuickhlManualLockWindowToggle'],
   \ 'depends': 'vim-operator-user',
   \ 'hook_add': "
 \\n    map <unique> [Quote]h    <Plug>(operator-quickhl-manual-this-motion)
-\\n   nmap <unique> [Quote]H    <Plug>(quickhl-manual-reset)
+\\n   nmap <unique> [Quote]H    :QuickhlManualAdd! \\V\\<<C-r><C-w>\\><CR>
+\\n   nmap <unique> [Quote]xh   :QuickhlManualDelete! \\V\\<<C-r><C-w>\\><CR>
+\\n   nmap <unique> [Quote]xH   <Plug>(quickhl-manual-reset
 \\n   nmap <unique> [Toggle]h   <Plug>(quickhl-cword-toggle)
 \\n   nmap <unique> <Leader>Th  <Plug>(quickhl-manual-toggle)
 \\n   nmap <unique> <Leader>TH  <Plug>(quickhl-tag-toggle)

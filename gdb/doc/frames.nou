@@ -126,7 +126,7 @@ REF: http://man7.org/linux/man-pages/man5/elf.5.html -- SEE: Nhdr
     $ readelf -n core | awk '/offset/{s=strtonum($7)} /CORE/{s+=12+8;l=strtonum($2)} /NT_PRS/{printf"0x%x 0x%x\n",s,l} /CORE/{s+=l}' >! reg.sec
       # NOTE: s += 12 + 8 = sizeof(Nhdr) + aligned(int(*s))
     $ <reg.sec xargs -rn2 sh -euc 'echo $((0x$(xxd -p -s$(($1+24)) -l4 core))) "$1"' '' | awk -vt=4780 '$1==t{print$2}'
-      0x90b8   # NOTE: 24 = position for thread id
+      0x90b8   # NOTE: 24 = offset for thread id
   Investigate thread section
     (gdb) i r
               zero       at       v0       v1       a0       a1       a2       a3
