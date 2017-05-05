@@ -18,7 +18,7 @@ frgx(){ local p="\\b$*\\b"
 # DEV: sort user mods to be directly before mods from ./pkg
 #   -- to limit influence scope and to group mods with identical name
 filter_find() { local accept reject=''
-  for s in "${skip[@]}"; do reject+="\\|$(frgx "$s")"; done
+  for s in ${skip[@]+"${skip[@]}"}; do reject+="\\|$(frgx "$s")"; done
   reject=${reject:2}
 
   for m in "${mods[@]:?}"; do accept=$(frgx "$m")
