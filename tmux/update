@@ -1,6 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/system
-cd $(dirname $(readlink -m ${0}))
+cwd_origin
 
 # NOTE: install/update/clean plugins by [prefix + I/U/A-u]
 tpm=~/.tmux/plugins/tpm
@@ -14,6 +14,7 @@ fi
 
 # Update plugins
 # BUG:(clean install) unknown variable: TMUX_PLUGIN_MANAGER_PATH
+# TRY: set env var to apply update on -L tmp-tmux session in case of update to 2.4 with 2.3 loaded as server
 tmux source-file ~/.tmux.conf #>/dev/null 2>&1
 "$tpm/scripts/install_plugins.sh" #&>/dev/null
 # WARN: sometime don't pull changes from github
