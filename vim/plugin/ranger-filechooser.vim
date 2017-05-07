@@ -69,7 +69,7 @@ endfunction
 
 function! s:callback(temps)
   let prms = {'buf': bufnr('%'), 'temps': a:temps, 'name': 'Ranger'}
-  fun! prms.on_exit(id, code)
+  fun! prms.on_exit(...)
     let pos = s:getpos()
     let inplace = pos == s:ppos " {'window': 'enew'}
     if !inplace
