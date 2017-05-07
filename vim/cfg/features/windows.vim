@@ -3,6 +3,7 @@ if $PATH !~? '\(^\|;\)' . escape($VIM, '\\') . '\(;\|$\)'
   let $PATH = $VIM . ';' . $PATH
 endif
 
+" let $SHELL='cmd.exe'  " Is any sense using git-msys under git instead?
 " Use bash.
 "set shell=bash.exe
 "set shellcmdflag=-c

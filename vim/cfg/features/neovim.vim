@@ -5,13 +5,15 @@ let g:python_host_prog = g:python2_host_prog
 
 " SEE :h guicursor for -Cursor/lCursor-
 "   https://github.com/neovim/neovim/wiki/FAQ#how-can-i-change-the-cursor-shape-in-the-terminal
-try|set guicursor=
-  \n-v-c:block-Cursor/lCursor-blinkon0
-  \,i-ci-ve:ver25-Cursor/lCursor
-  \,r-cr:hor20-Cursor/lCursor
-  \,o:hor45
-  \,sm:block-blinkwait175-blinkoff150-blinkon175
-  \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+try|set guicursor=a:block-Cursor/lCursor-blinkon0
+  \,i-ci-ve:ver25,r-cr:hor10,o:hor50
+  " \n-v-c:block-Cursor/lCursor-blinkon0
+  " \,sm:block-blinkwait175-blinkoff150-blinkon175
+  " \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+  " BAD:('tmux/st' have no support for percentage or blink or color?):
+  "   o:hor50
+  "   o:block-ErrorMsg
+  "   o:block-blinkwait200-blinkoff200-blinkon200
   "" FIXED: restore cursor shape on exit
   " au MyAutoCmd VimLeave * set guicursor=a:block-blinkon0
 catch/E518/|endt
