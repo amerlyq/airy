@@ -32,11 +32,15 @@ ControlPersist 600
 
 Host *
     SendEnv !LANG !LC_*
-    TCPKeepAlive=yes
-    #   SEE: http://unix.stackexchange.com/questions/200239/how-can-i-keep-my-ssh-sessions-from-freezing
-    # ServerAliveInterval=15
-    # ServerAliveCountMax=6
     # Compression=yes
+    #   SEE: http://unix.stackexchange.com/questions/200239/how-can-i-keep-my-ssh-sessions-from-freezing
+    TCPKeepAlive=yes
+    ServerAliveInterval=120
+    # ServerAliveCountMax=6
+    # NOTE:NEED:(server): /etc/ssh/sshd_config:
+    #   ClientAliveInterval 60
+    #   TCPKeepAlive yes
+    #   ClientAliveCountMax 10000
 
 ### Accounts ###
 EOT
