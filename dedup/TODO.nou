@@ -17,6 +17,10 @@ NEED names similarity filter (dictionary range)
 
 
 USAGE
-  $ rmlint -o fdupes:stdout . VV YT
+  $ rmlint -o fdupes:stdout . V@ YT
   $ v YT.
   $ YT: X rm
+
+ALT
+  $ rmlint -o pretty:stdout -o summary:stdout -o fdupes:ddup /path/dir/1 /path/dir/2
+  $ rmlint -o sh:stdout,cmd=echo .

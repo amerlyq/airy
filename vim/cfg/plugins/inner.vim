@@ -43,6 +43,12 @@ call dein#add('Shougo/vimfiler.vim', {
 " hook_source = 'source ~/.vim/rc/plugins/vimfiler.rc.vim'
 
 
+" if exists('*IsWindows') && IsWindows()
+" TODO: override as with vim-over mappings (DFL vs plugin)
+" noremap <unique>  <Leader>f :<C-U>VimFiler<CR>
+call dein#add('amerlyq/ranger.vim', {'lazy': 0, 'if': executable('ranger')})
+
+
 " autocmd! BufWritePost * Neomake
 " let g:neomake_cpp_enable_makers = ['clang', 'clangtidy']
 " let g:neomake_cpp_clang_args = ['-std=c++14']

@@ -1,3 +1,4 @@
+finish
 if &cp||exists('g:loaded_ranger')|finish|else|let g:loaded_ranger=1|endif
 " Add ranger as a file chooser in vim
 " FIND:(github) all 'ranger vim' alternatives
