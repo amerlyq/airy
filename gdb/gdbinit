@@ -171,6 +171,7 @@ define lognew
     eval "shell ln -sfT \"log/$(date +%%Y%%m%%d_%%H%%M%%S).cfg\" log.cfg"
   end
   if $argc == 1
+    # BAD: don't work
     eval "shell ln -sfT \"log/%s.cfg\" log.cfg", $arg0
   end
   set logging on log.cfg

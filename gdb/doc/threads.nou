@@ -81,4 +81,12 @@ Correlate allocated section 'load3' with thread number
 
 
 %%% Filter-out
-  /\v%(__%(pthread_cond_%(timed)?wait|new_sem_wait|GI_\S+)|close|query_module)\s\(/
+  Remove uninteresting threads by names
+    /\v%(__%(pthread_cond_%(timed)?wait|new_sem_wait|GI_\S+)|close|query_module)\s\(/
+  BET: Remove threads waiting on jumps/syscalls
+      >> leaving only running or segfaulting threads
+      ? BUT: leave alone jumps -- is it possible to wait on them at all ?
+    (gdb) log threads.cfg
+    (gdb) t a all disas $pc-0x8,$pc+0x8
+    (gdb) log
+    $ v +'g/\v(syscall|jalr\s+t9\n.+)\n\=\>/norm!"_dap' threads.cfg

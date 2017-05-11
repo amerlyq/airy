@@ -137,6 +137,11 @@ https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
     (gdb) p (char*)inet_ntop(10,&my_ip6_addr,$1,64)
 
 
+% Compare values
+  http://stackoverflow.com/questions/7423577/how-to-compare-a-stored-string-variable-in-gdb
+  (gdb) p $_streq($x, "hello")
+
+
 % Env vars (python only)
   http://stackoverflow.com/questions/9814185/how-to-access-environment-variables-inside-gdbinit-and-inside-gdb-itself
   Set ENV from expr inside gdb
