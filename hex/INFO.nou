@@ -1,5 +1,9 @@
 ALT
   xxd
+    $ cat | xxd -g4 -c16 -s 0x6028 -o-0x6028 -l0x100
+  od
+    $ cat | od --traditional -Ax -tx4z -w16 -N0x100 - +0 +0x6028
+
   + bvi+bmore
     more usable then dhex
   ht

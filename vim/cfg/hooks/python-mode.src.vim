@@ -44,7 +44,7 @@ let g:pymode_lint = 1
 " From: pylint, pep8, mccabe, pep257, pyflakes.
 " let g:pymode_lint_checker = "pylint,pep8"
 let g:pymode_lint_checkers = ['pyflakes', 'pep8']
-let g:pymode_lint_ignore="E266,E501,W0401"
+let g:pymode_lint_ignore="E266,E501,W0401,E221"
 "E266,E501 -- multiple '#' in comments and line width > 80
 "W391 -- empty line at EOF, better keep it enabled for fluent git auto-merge
 "W601,C0110
