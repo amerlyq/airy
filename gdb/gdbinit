@@ -193,3 +193,22 @@ end
 # source /usr/share/peda/peda.py
 # source ~/.cache/airy/pkg/pwndbg/gdbinit.py
 # source /usr/share/pwndbg/gdbinit.py
+
+## Pretty Printers
+# python
+# try:
+#     import sys,glob,os
+#     from libstdcxx.v6.printers import register_libstdcxx_printers
+#     register_libstdcxx_printers (None)
+# except ImportError:
+#     print 'cant import c++ support - old gcc or not using target-gdb?'
+# end
+
+## Source command 'heap' for gdb
+python
+import os, sys
+_xdir = os.path.expanduser('~/.config/airy/gdb')
+if os.path.isdir(_xdir):
+    sys.path.insert(0, _xdir)
+    import gdbheap
+end
