@@ -105,6 +105,11 @@ filter-mods
           BET: multiple hook points 20/50/80 for hooks between op levels
             = (symlinks, gens, etc) -- *mod*-specific, if general isn't possible
           BET: sfx instead of prf :: *-40 for sorting
+          ALSO: sfx w/o number == "51" default order
+          * setup! = override == setup!51, USE setup!4 -- to prefer only if non-existent
+          * setup+ = after
+          * setup- = before
+          * setup  = error
         [_] TRY:ALSO: sep numbering/ordering for install/setup/update/recache
         [_] rename private ./mods -> ./hooks ?
     - but diff mods with same name -- aren't allowed
