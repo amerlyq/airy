@@ -25,7 +25,9 @@ set print vtbl on
 
 # Keep command history between sessions
 set history filename ~/.cache/gdb_history
-set history save
+set history save on
+# BAD: unavailable in old gdb <=v7.5
+# set history remove-duplicates 2
 
 # Use findsym $sp $sp+1000 to get a dump of all symbols on the stack
 define findsym
@@ -209,6 +211,35 @@ python
 import os, sys
 _xdir = os.path.expanduser('~/.config/airy/gdb')
 if os.path.isdir(_xdir):
-    sys.path.insert(0, _xdir)
+    # sys.path.insert(0, _xdir)
+    sys.path.append(_xdir)
     import gdbheap
+end
+
+
+## Dev command to reload sources
+# USAGE:DEV: (gdb) python reload(gdbheap.heap)
+#   BUT: correctly reloads only global vars
+#   http://stackoverflow.com/questions/437589/how-do-i-unload-reload-a-python-module
+#   http://stackoverflow.com/questions/684171/how-to-re-import-an-updated-package-while-in-python-interpreter
+python
+class DevReload(gdb.Command):
+    def __init__(self):
+        super(DevReload, self).__init__("reload", gdb.COMMAND_USER)
+    def invoke(self, arg, from_tty):
+        try:
+            from importlib import reload
+        except:
+            try:
+                from imp import reload
+            except:
+                reload
+        try:
+            reload(gdbheap.heap.argparser)
+            reload(gdbheap.heap.main)
+            reload(gdbheap.heap)
+            reload(gdbheap)
+        except:
+            pass
+DevReload()
 end

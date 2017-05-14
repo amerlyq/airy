@@ -10,7 +10,8 @@ if distro arch; then
   # aur_inst peda-git
   # ALT dual compatible: https://github.com/zachriggle/peda
 
-elif distro ubuntu; then :
+elif distro ubuntu; then
+  pkg_inst gdb-multiarch
   # sudo apt-get install python-psutil
   # git clone https://github.com/pwndbg/pwndbg
   # cd pwndbg && ./setup.sh

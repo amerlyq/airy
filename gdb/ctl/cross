@@ -7,6 +7,7 @@ case ${1+$1} in -R) refresh=1; shift; esac  # TEMP
 # BET:ALT: generate ./gdb script containing 'r.chroot' based on full gdb path
 [[ -s /etc/debian_chroot ]] && cmd=() || cmd=( r.chroot )
 # ALT:TRY: systemwide gdb-multiarch
+#   => BUT how to specify sysroot ?
 cmd+=( ./gdb -q )
 
 # Local ./.gdbinit is too late for this option
