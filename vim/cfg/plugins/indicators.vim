@@ -47,10 +47,10 @@ call dein#add('t9md/vim-quickhl', {
   \            'QuickhlManualLockToggle', 'QuickhlManualLockWindowToggle'],
   \ 'depends': 'vim-operator-user',
   \ 'hook_add': "
-\\n    map <unique> [Quote]h    <Plug>(operator-quickhl-manual-this-motion)
-\\n   nmap <unique> [Quote]H    :QuickhlManualAdd! \\V\\<<C-r><C-w>\\><CR>
+\\n    map <unique> [Quote]H    <Plug>(operator-quickhl-manual-this-motion)
+\\n   nmap <unique> [Quote]h    :QuickhlManualAdd! \\V\\<<C-r><C-w>\\><CR>
 \\n   nmap <unique> [Quote]xh   :QuickhlManualDelete! \\V\\<<C-r><C-w>\\><CR>
-\\n   nmap <unique> [Quote]xH   <Plug>(quickhl-manual-reset
+\\n   nmap <unique> [Quote]xH   <Plug>(quickhl-manual-reset)
 \\n   nmap <unique> [Toggle]h   <Plug>(quickhl-cword-toggle)
 \\n   nmap <unique> <Leader>Th  <Plug>(quickhl-manual-toggle)
 \\n   nmap <unique> <Leader>TH  <Plug>(quickhl-tag-toggle)

@@ -6,11 +6,41 @@ SEE
   https://en.wikibooks.org/wiki/Linux_Applications_Debugging_Techniques/Deadlocks
   ! https://peeterjoot.wordpress.com/2009/08/28/gdb-on-linux-finding-your-damn-thread/
 
+
+INFO: ./uClibc-0.9.32.1/libpthread
+  __lll_lock_wait (int *futex, int private)        | ./nptl/sysdeps/unix/sysv/linux/arm/lowlevellock.c:42
+  __pthread_mutex_unlock_usercnt ( pthread_mutex{+_t *mutex, int decr)+} | ./nptl/pthread_mutex_unlock.c:33
+    [Switching to thread 181 (LWP 6337)]
+    #0  0x7726bcf4 in __pthread_mutex_unlock_usercnt () from root/lib/libpthread.so.0
+      (gdb) p ((pthread_mutex_t*)$a0)->__data.__owner
+      $2 = 11935
+  int pthread_cond_wait(pthread_cond_t *cond, pt{+hread_mutex_t *mutex)+} | ./linuxthreads.old/condvar.c:70
+    (gdb) p ((pthread_mutex_t*)$s3)->__data.__owner
+  __pthread_cond_timedwait ( pthread_cond_t *con{+d, pthread_mutex_t *mutex, const struct timespec *abstime)+} | ./nptl/sysdeps/pthread/pthread_cond_timedwait.c:43
+       0x7726987c <+108>:     move    s2,a1
+       ...
+       0x77269968 <+344>:     sw      s2,32(s0)   # ? cond->__data.__mutex = mutex
+       0x77269978 <+360>:     sw      s0,28(sp)   # =cond
+       0x7726997c <+364>:     sw      s2,32(sp)   # =mutex
+       ...
+       0x77269aac <+668>:     li      v0,4238     # lll_futex_timed_wait /*4238*/ | ./nptl/sysdeps/pthread/pthread_cond_timedwait.c:158
+       0x77269ab0 <+672>:     syscall
+    => 0x77269ab4 <+676>:     lw      t9,-32684(gp)
+    (gdb) p ((pthread_mutex_t*)$s2)->__data.__owner
+    (gdb) p ((pthread_mutex_t*)((pthread_cond_t*)$s0)->__data.__mutex)->__data.__owner
+      $8 = 0
+    Timespec (delta) &rt
+      (gdb) x/2wx $s5
+      (gdb) x/2wx $sp+56
+        0x65962718:     0x0000001d      0x3b9ab19b
+
+
 % Search for thread, which blocked the current one
     # Program terminated with signal 6, Aborted.
     #0  0x2ab27b6c in pthread_cond_wait () from /lib/libpthread.so.0
   (gdb) thread 110
-    [Switching to thread 110 (process 4359)]#0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
+    [Switching to thread 110 (process 4359)]
+    #0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
   (gdb) bt
     #0  0x2ab2b1b8 in __lll_lock_wait () from /lib/libpthread.so.0
     #1  0x2ab24678 in pthread_mutex_lock () from /lib/libpthread.so.0
