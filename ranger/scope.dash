@@ -32,6 +32,7 @@ in a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
 ;; doc|xls|ppt) try catdoc "$path" | trim | fmt && exit 3
 ;; odt|ods|odp|sxw) try odt2txt "$path" | trim | fmt && exit 3
 ;; htm|html|xhtml) try elinks -dump "$path" | fmt && exit 3
+;; mp4) exiftool "$path" && exit 5
 ;; *) mimetype=$(file --mime-type -Lb "$path")
 esac
 
