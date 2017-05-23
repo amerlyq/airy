@@ -1,9 +1,14 @@
 #!/bin/sh -eu
 
+# FIND: preprocessors for files to replace my env-subs
+#   => E.G. ~/.Xresources, autoconf, etc
+
 lp='%[{]'
 mp='[A-Z_][A-Z_0-9]*'
 rp='[}]'
 
+# [Marker patterns]: l=left m=middle r=right
+# d=dryrun i=inplace p=mkdir-p
 opts=; while getopts 'dipl:m:r:' o; do case $o in :|'?') exit 1
 ;; [lmr]) declare ${o}p=$OPTARG
 esac; opts+=$o; done; shift $((OPTIND-1))
@@ -24,12 +29,13 @@ gawk -vl="$lp" -vm="$mp" -vr="$rp" '{
   while(match($0, l m r)) {
     k = substr($0, RSTART, RLENGTH)
     k = gensub(l"("m")"r, "\\1", "1", k)
-    if (! k in ENVIRON) {
+    if (!(k in ENVIRON)) {
       print "No env: "k > "/dev/stderr"
       exit 4
     }
     gsub(l k r, ENVIRON[k])
   }; print
 }' "$f" > "$t"
+# FIXME: if [[ -L $t ]] -> error / preremove / write-into
 
 has d || ! has i || mv -f "$t" "$f"
