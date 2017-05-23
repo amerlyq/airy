@@ -1,0 +1,10 @@
+#!/bin/bash -e
+# tags: chat demon
+source ~/.shell/func.d/cfgsetup
+
+### LINKS ###
+export MAIL_EXCHANGE=${MAIL_EXCHANGE//:/\\:}
+# DFL: ~/.davmail.properties
+env-subs -p {,~/.config/davmail/}davmail.properties
+
+svc_activate -cue davmail.service
