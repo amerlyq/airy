@@ -6,140 +6,12 @@ unhook *
 set my_cfg=~/.mutt/cfg
 set my_cache=~/.cache/mutt
 
-# Show
-set pager_index_lines=6     # keep N lines of index on top of pager
-set pager_context=3         # context lines when going to next page
-set pager_stop=yes          # stop instead of displaying next mail
-set menu_scroll=yes         # just scroll one line instead of full page
-
-# Text
-set smart_wrap = yes   # wrap by words in inn pager
-set text_flowed = yes  # use flowed format in outgoing msgs (USAGE: smartphones have narrow screen)
-set reflow_text = yes  # interpret incoming 'format=flowed' msgs in inn pager
-set reflow_wrap = 0    # text width in pager for msgs preview
-set reflow_space_quotes = yes  # >>> ... OR > > > ...'
-# set markers = no  # hide wrap markers
-
-set editor = ~/.mutt/exe/editor
-# set edit_headers          # see the headers when editing
-set sort = reverse-threads  # reverse-threads -- sort by newest conversation first
-# set strict_threads = yes  # don't group any mail with same subject (group only by recepient)
-set sort_aux = last-date-received
-set send_charset="us-ascii:utf-8"
-# set assumed_charset="cp-1251"  # if no charset in msg -- it's probably windows
-set rfc2047_parameters = yes  # decode attach like =?koi8-r?B?...
-set simple_search="~f %s | ~C %s | ~s %s"  # by default search in To/Cc/Subject
-set thorough_search         # strip headers and eval mimes before searching
-
-
-# TODO: setup pager view
-# # show spam score (from SpamAssassin only) when reading a message
-# spam "X-Spam-Score: ([0-9\\.]+).*" "SA: %1"
-# set pager_format = " %C - %[%H:%M] %.20v, %s%* %?H? [%H] ?"
-
-# # do not show all headers, just a few
-# ignore          *
-# unignore        From To Cc Bcc Date Subject
-# # and in this order
-# unhdr_order     *
-# hdr_order       From: To: Cc: Bcc: Date: Subject:
-
-# Preproc <pipe-message>
-set pipe_decode = yes  # weed hdr and decode msg
-set pipe_sep = "\n---==EOF==---\n\n"  # sep mult tagged msgs
-# set pipe_split = yes   # send EOF after each msg (read in cycle)
-set wait_key = no  # don't show prompt after shell/pipe cmds (show when ret!=0)
-
-## Show only important fields in the header
-# ignore *
-# unignore from resent-from reply-to x-mailer user-agent date to cc subject
-## Order for display of the header fields
-# hdr_order From: Resent-From: Reply-To: X-Mailer: User-Agent: Date: To: Cc: Subject:
-set indent_str="> "    # Set quotemark to 1 byte (WARN: ignored if $text_flowed=yes)
-set collapse_unread    # allow collapse unread messages
-# set uncollapse_jump    # jumps to first unread msg of thread on uncollapse
-set index_format="%M|%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
-# %M
-# set index_format = "{%M} $index_format"
-# SEE uncollapse_jump
-#   http://www.rdrop.com/docs/mutt/manual118.html
-
-# NOTE: only in index; open in pager to apply func to current msg only.
-set auto_tag = yes          # auto-apply func to all tagged (w/o ';' prf)
-
-# confirmation skipping
-# set fast_reply=yes        # when replying, don't prompt for address
-set include=ask-yes         # include original text on reply?
-# set forward_quote=yes     # include original text on forward?
-# set delete=yes            # don't ask for delete confirmation
-set print=ask-yes           # Ask before printing
-set confirmappend = no      # silent save on 's'
-
-# Forwarding
-set mime_forward = yes
-set mime_forward_rest = ask-yes
-# set mime_forward_decode = no
-
-set use_from = yes          # to ensure mutt doesn't put user@localhost.localhost
-set abort_nosubject = yes   # Cancel a message when subject is blank
-set copy = yes              # keep copies of outgoing mail.
-set move = no
-
-set ssl_starttls = yes  # activate TLS if available on the server
-set ssl_force_tls= yes  # always use SSL when connecting to a server
-# Display download progress every 5K
-set net_inc=5
-
-# IMAP | enough only set local dirs
-# Don't wait to enter mailbox manually
-unset imap_passive
-## Check incoming: Reduce polling frequency to a sane level
-set mail_check=60
-# Urgent bell in terminal on new mail
-set beep
-set beep_new
-# And poll the current mailbox more often (not needed with IDLE in post 1.5.11)
-set timeout=20
-set imap_keepalive = 900
-# Auto-poll all imap folders for new mail by adding to mailboxes (new in 1.5.11)
-# BAD:CHECK conflicts with multi-acc mailboxes
-set imap_check_subscribed
-
-
-# POP3 | needs to create local dirs manually
-#   touch ~/work/mail/inbox
-### If I will use getmail
-set mbox_type=Maildir
-
-set pop_reconnect = yes
-set pop_checkinterval = 60
-unset pop_delete
-# Similar to IMAP, a pop_authenticators option also exists
-# MAYBE: cures problem of not prompting for password on cmdline send
-# set smtp_authenticators = 'gssapi:login'
-
-## DIRS
-# set folder = ~/work/mail
-# keep a cache of headers for faster loading (1.5.9+?)
-set header_cache     = $my_cache/headers
-set message_cachedir = $my_cache/messages      # fetch imap msgs on disk instead of memory
-set certificate_file = $my_cache/certificates
-# set signature = ~/.mutt/signature  # Set in account
-set use_domain = no  # name don't -> name@host
-
-
-## ALIASES (fast access to contacts)
-set alias_file = $my_cache/aliases
-set sort_alias = alias
-set reverse_alias = yes
+source $my_cfg/config
 source $alias_file
-
-## BINDING
-# Speed up folders switch
-set sleep_time = 0
-source $my_cfg/keyrc
+source $my_cfg/keyrc            # Bindings
 # source $my_cfg/gpgrc          # Keyring
 source $my_cache/theme          # Theme
+
 
 # BUT:TRY:FIX using unmailboxes -- impossible to watch multiple accounts simultaneously
 # NOTE: useful for sidebar to show only mailboxes from current account
@@ -164,10 +36,3 @@ set nm_default_uri = notmuch://$HOME/.mail/$my_acc
 folder-hook . 'set record=^'  # Save mail in cwd instead of '=Sent'
 folder-hook . 'push <collapse-all>'
 # folder-hook . 'push ":set collapse\_unread=no<enter>"'
-
-
-## HTML enriched mails
-set mailcap_path = $my_cfg/mailcap
-alternative_order text/plain text/enriched text/html     # save html for last
-set implicit_autoview=yes  # Load in pager if setting in .mailcap says 'copiousoutput'
-auto_view text/html                                      # view html automatically

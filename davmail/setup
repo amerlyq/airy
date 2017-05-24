@@ -7,4 +7,4 @@ export MAIL_EXCHANGE=${MAIL_EXCHANGE//:/\\:}
 # DFL: ~/.davmail.properties
 env-subs -p {,~/.config/davmail/}davmail.properties
 
-svc_activate -cue davmail.service
+svc_activate -cueR davmail.service

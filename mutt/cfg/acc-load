@@ -5,5 +5,6 @@
 source "$my_cfg/acc-purge"
 set signature = "$my_cache/sign/$my_acc"
 source "$my_cache/acc/$my_acc"
+# BAD: $ mutt -d4 will log each source line with pass in plaintext into ~/.muttdebug*
 source "~/.mutt/exe/pass -m $my_acc $my_pass |"
 source "$my_cfg/keyrc_acc"   # ATT: place before hooks with 'set'
