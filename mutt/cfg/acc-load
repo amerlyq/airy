@@ -3,8 +3,13 @@
 # @args: set my_acc=... my_pass=...
 
 source "$my_cfg/acc-purge"
+
+## DFL
 set signature = "$my_cache/sign/$my_acc"
+set nm_default_uri = notmuch://$HOME/.mail/$my_acc
+mailboxes =INBOX
+
 source "$my_cache/acc/$my_acc"
 # BAD: $ mutt -d4 will log each source line with pass in plaintext into ~/.muttdebug*
 source "~/.mutt/exe/pass -m $my_acc $my_pass |"
-source "$my_cfg/keyrc_acc"   # ATT: place before hooks with 'set'
+source "$my_cfg/acc-keyrc"   # ATT: place before hooks with 'set'

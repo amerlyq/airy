@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+
+dst=~/.cache/mutt
+
+# Gen accounts list to switch
+k=0; printf '# %s:ft=muttrc' vim > "$dst/index"
+for p in "$dst/acc"/*; do [[ -s $p ]] || continue
+  ((k+=1))
+  cat>> "$dst/index" <<EOT
+set my_acc=${p##*/} my_key=<F$k>
+source \$my_cfg/accrc
+EOT
+done

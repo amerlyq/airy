@@ -16,6 +16,10 @@
 
 # TODO: move 'help' from <F1> to somewhere else. Like 'g?'
 
+# Switch folders
+macro index,browser  ,i  "<change-folder>!<enter>"       "Go to inbox"
+macro index,browser  ,l  "<change-folder>^<enter>"       "Go to last"
+
 # Plugins
 bind index,pager  \\ vfolder-from-query
 macro index,pager  S  "| ~/.mutt/exe/save /tmp/msg/"

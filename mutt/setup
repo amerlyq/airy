@@ -4,31 +4,16 @@ THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-linkcp "$PWD" ~/.mutt
-linkcp ./cfg/theme-$THEME ~/.cache/mutt/theme
-
-dst=~/.cache/mutt
-(cd "$dst" && ln -svf "acc/${MUTT_DEFAULT:?}" default)
+linkcp -t ~/.config/mutt cfg exe
+linkcp ~/.config/mutt/acc/"${MUTT_DEFAULT:?}" ~/.muttrc
+linkcp ~/.config/mutt/cfg/theme-"$THEME" ~/.config/mutt/theme
+# THEME=$THEME ./gen/theme-solarized.gen
 
 # Relocate ~/.mail if necessary
-# FIND:WTF: $MAIL = /var/spool/mail/dkolomoiets
+# FIND:WTF: $MAIL = /var/spool/mail/user
 #   CHECK: use $MAIL instead of $CURR_DIR_MAIL ?
 mkdir -p "${CURR_DIR_MAIL:?}"
 [[ $CURR_DIR_MAIL -ef ~/.mail ]] || linkcp "$CURR_DIR_MAIL" ~/.mail
-
-
-### GENS ###
-# THEME=$THEME ./gen/theme-solarized.gen
-
-# Gen accounts list to switch
-k=0; echo '# vim:ft=muttrc' > "$dst/index"
-for p in "$dst/acc"/*; do [[ -s $p ]] || continue
-  ((k+=1))
-  cat>> "$dst/index" <<EOT
-set my_acc=${p##*/} my_key=<F$k>
-source \$my_cfg/accrc
-EOT
-done
 
 
 # THINK:MAYBE: write config by hands instead of generation?

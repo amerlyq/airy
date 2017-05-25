@@ -134,3 +134,11 @@ set mailcap_path = $my_cfg/mailcap
 alternative_order text/plain text/enriched text/html     # save html for last
 set implicit_autoview=yes  # Load in pager if setting in .mailcap says 'copiousoutput'
 auto_view text/html                                      # view html automatically
+
+
+## HOOKS
+# NOTE: setup inside accounts. BUT? how to reset on account switch?
+# save-hook . '=Spam'           # DFL folder to save/move
+folder-hook . 'set record=^'  # Save mail in cwd instead of '=Sent'
+folder-hook . 'push <collapse-all>'
+# folder-hook . 'push ":set collapse\_unread=no<enter>"'

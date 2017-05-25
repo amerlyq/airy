@@ -1,0 +1,22 @@
+# vim:ft=muttrc
+# @brief: default config skeleton
+# @args: set my_acc=...
+set my_cache = ~/.config/mutt
+set my_cfg = "$my_cache/cfg"
+
+# Remove all hooks anew on 're-source'
+#   http://www.guckes.net/Mutt/setup.html
+unhook *
+
+source $my_cfg/config
+source $alias_file
+source $my_cfg/keyrc            # Bindings
+# source $my_cfg/gpgrc          # Keyring
+source $my_cache/theme          # Theme
+
+unmailboxes *
+mailboxes =INBOX
+set signature = "$my_cache/sign/$my_acc"
+set nm_default_uri = notmuch://$HOME/.mail/$my_acc
+
+source "~/.mutt/exe/pass -m $my_acc $my_pass |"

@@ -1,0 +1,14 @@
+# vim:ft=muttrc
+# BUT:TRY:FIX using unmailboxes -- impossible to watch multiple accounts simultaneously
+# NOTE: useful for sidebar to show only mailboxes from current account
+# SEE: https://gist.github.com/miguelmota/9456162
+folder-hook  . 'unmailboxes *'  # Necessary to reset connections to switch acc
+# DISABLED: to allow multi-acc mailboxes
+
+source $my_cache/index          # List of accounts (generated)
+# Query DFL acc from env ACC=... or from symlink ./default
+source "~/.mutt/exe/acc $my_acc_dfl |"
+# BUG:(mutt -f ...) loads dfl password anyways
+#   => NEED check if '-f' was used; OR: always use $ ACC=... mutt
+set my_acc = $my_acc_dfl my_pass = ""
+source $my_cfg/acc-load

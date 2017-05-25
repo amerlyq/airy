@@ -112,7 +112,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     ],
     -- NEED: spawnHere
     -- misc
-    [ ("<XF86Tools>"     , "r.tf ncmpcpp")
+    [ ("<XF86Tools>"     , "r.tf -e ncmpcpp")
     , ("<XF86Mail>"      , "r.tf -e mutt")
     , ("<XF86Search>"    , "r.b -p")
     , ("<XF86Calculator>", "r.tf -e ipython")
@@ -124,7 +124,7 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     , ("g", "r.playonlinux -p")
     , ("e", "r.dict --en --dmenu")
     , ("r", "r.dict --ru --dmenu")
-    , ("m", "r.mpd-move")
+    , ("m", "r.t -e r.mutt-acc")
     ],
     inGroup "M-y"
     [ ("u", "r.b -p")
