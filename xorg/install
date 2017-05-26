@@ -10,8 +10,9 @@ pkg_inst xsel xbindkeys xdotool
 
 if distro arch; then
   # xorg-xdm xorg-docs
-  pkg_inst xorg-server xorg-server-utils xorg-xinit
-  pkg_inst xorg-xprop
+  # DEPRECATED:(xorg-server-utils): use explicit prs from xorg-apps group
+  pkg_inst xorg-server xorg-xinit
+  pkg_inst xorg-xprop xorg-xinput xorg-xrandr xorg-xsetroot
 
 elif distro ubuntu; then
   echo "Err: No xprop"
