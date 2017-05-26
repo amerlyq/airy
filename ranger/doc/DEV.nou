@@ -213,6 +213,20 @@ rifle
   On 'l' don't open big/binary files in $EDITOR unless you explicitly demands so
     No sense for .squashfs -- moreover if you open through slow network fs
 
+built-in terminal to make preview
+  mail rfc822 -> libvte with mutt
+
+preview compromise
+  * launch different pr on each file once
+  * ALT: keep pre-launched prs for set of mime in sep subprocess and pipe files through them
+    + no delays in preview
+    - more processes at once
+    => launch subprocess set on demand
+      :user command
+      folder-local hook
+        launching on enter
+        OR apply to any file under folder
+
 paste
   [_] paste and rename original
   [_] paste with another name
