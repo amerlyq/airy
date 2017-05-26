@@ -4,7 +4,9 @@ source ~/.shell/func.d/packages
 #| tmux | multi-window customizable terminal with vi navigation, useful for SSH connections
 
 if distro arch; then
-  pkg_inst tmux  # TrueColor support in version >=2.2
+  # ATT: TrueColor support in version >=2.2
+  # ATT: official ==2.4.1 broken in st+tmux+neovim+ru+scrolloff
+  aur_inst tmux-git
 
 elif distro ubuntu; then
   # https://gist.github.com/P7h/91e14096374075f5316e
