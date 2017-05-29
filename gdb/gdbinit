@@ -222,6 +222,17 @@ end
 #   BUT: correctly reloads only global vars
 #   http://stackoverflow.com/questions/437589/how-do-i-unload-reload-a-python-module
 #   http://stackoverflow.com/questions/684171/how-to-re-import-an-updated-package-while-in-python-interpreter
+# DEV recursive reload => gather all deps by traversing module, tsort them, then reload in loop
+#   * new deps => no problem => will be loaded after that
+#   * rm deps => problem only if file deleted completely, otherwise WARN excessive reload of old (possibly broken) code
+#   * mv => don't reload old dep (file removed), new dep will be loaded as usual
+#   * rfc => dep moved from one file into another => tsort must be for new version
+#     TRY: https://github.com/jparise/python-reloader
+#   ==> somehow, to support
+#     ?? completely purge module ?? ==> unsupported at all ??
+#       http://blog.bfitz.us/?p=2052
+#   SEE:BAD: https://stackoverflow.com/questions/15506971/recursive-version-of-reload
+#     https://atlee.ca/blog/posts/blog20081121python-reload-danger-here-be-dragons.html
 python
 class DevReload(gdb.Command):
     def __init__(self):
@@ -236,6 +247,7 @@ class DevReload(gdb.Command):
                 reload
         try:
             reload(gdbheap.heap.argparser)
+            reload(gdbheap.heap.stats)
             reload(gdbheap.heap.main)
             reload(gdbheap.heap)
             reload(gdbheap)
