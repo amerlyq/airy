@@ -8,6 +8,14 @@ source ~/.config/gdb/dbinit_stl_views
 # turn off pagination
 set pagination off
 set height 0
+# DISABLED:(too verbose): show complaints per each type of unusual symbol
+# set complaints 10
+set output-radix 0x10
+
+set prompt \033[0;31m──────\033[0m\n(gdb)\040
+# py from gdb import prompt; prompt.substitute_prompt("\[\e[0;34m\](gdb)\[\e[0m\] ")
+
+
 
 # Print C++ names in their source form rather than their mangled form
 set print asm-demangle
@@ -179,6 +187,8 @@ define lognew
   set logging on log.cfg
 end
 
+# SEE: redirect into fifo
+#   https://stackoverflow.com/questions/209534/how-to-highlight-and-color-gdb-output-during-interactive-debugging
 # define pipe
 #   set logging off
 #   set logging on /tmp/gdb.pipe
@@ -248,6 +258,9 @@ class DevReload(gdb.Command):
         try:
             reload(gdbheap.heap.argparser)
             reload(gdbheap.heap.stats)
+            reload(gdbheap.heap.chain)
+            reload(gdbheap.heap.malloc_state)
+            reload(gdbheap.heap.heap)
             reload(gdbheap.heap.main)
             reload(gdbheap.heap)
             reload(gdbheap)
