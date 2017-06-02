@@ -1,12 +1,21 @@
 """ Formatters
 
 "" Align paragraphs by patt {{{1
-" ALT:TODO:TRY: another one: lion, etc
-call dein#add('godlygeek/tabular', {
-  \ 'on_cmd': ['Tabi', 'Tabularize'],
-  \ 'hook_post_source': _hcat('tabular.src'),
-  \ 'hook_add': _hcat('tabular.add')})
-
+" ALT:
+" https://github.com/junegunn/vim-easy-align
+" https://github.com/tommcdo/vim-lion
+call dein#add('junegunn/vim-easy-align', {
+  \ 'on_map': [['nx', '<Plug>(EasyAlign)', '<Plug>(LiveEasyAlign)']],
+  \ 'on_cmd': ['EasyAlign', 'LiveEasyAlign'],
+  \ 'depends': 'vim-repeat',
+  \ 'hook_add': "
+\\n   call Map_nxo('gy', '<Plug>(EasyAlign)', 'nx')
+\\n   call Map_nxo('gY', '<Plug>(LiveEasyAlign)', 'nx')
+\"})
+" call dein#add('godlygeek/tabular', {
+"   \ 'on_cmd': ['Tabi', 'Tabularize'],
+"   \ 'hook_post_source': _hcat('tabular.src'),
+"   \ 'hook_add': _hcat('tabular.add')})
 
 
 "" HACK: lyrics multicolumn /multiverse editor to show in ncmpcpp

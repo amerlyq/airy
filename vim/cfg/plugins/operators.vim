@@ -67,6 +67,7 @@ call dein#add('tyru/operator-camelize.vim', {
 
 
 "" Exchange text: cx{motion} on first, then cx{motion} on other. {{{1
+" ALT: https://github.com/osyo-manga/vim-operator-swap
 " USAGE: line 'cxc' and clear 'cxx', as 'cxc' is more comfortable
 " CHG : [[x, X], [n, cx, cxc, cxx]]
 call dein#add('tommcdo/vim-exchange', {
@@ -119,6 +120,7 @@ call dein#add('haya14busa/vim-operator-flashy', {
 \"})
 
 
+
 "" Shift/jump func-args/list-item/table-cell, ADD textobj-args {{{1
 " ALT:TODO:SEE:
 "   - sgur/vim-textobj-parameter
@@ -141,4 +143,19 @@ call dein#add('AndrewRadev/sideways.vim', {
 \\n
 \\n   noremap <silent><unique> [a :<C-u>SidewaysJumpLeft<CR>
 \\n   noremap <silent><unique> ]a :<C-u>SidewaysJumpRight<CR>
+\"})
+
+
+
+""" Overlaps with AndrewRadev/sideways.vim
+call dein#add('machakann/vim-swap', {
+  \ 'on_map': [['nx', '<Plug>(swap-']],
+  \ 'on_cmd': 'Sideways*',
+  \ 'depends': 'vim-repeat',
+  \ 'hook_add': "
+\\n   let g:swap_no_default_key_mappings = 1
+\\n   nmap <silent><unique> <Leader>< <Plug>(swap-prev)
+\\n   nmap <silent><unique> <Leader>> <Plug>(swap-next)
+\\n   nmap <silent><unique> <Leader>G <Plug>(swap-interactive)
+\\n   xmap <silent><unique> <Leader>G <Plug>(swap-interactive)
 \"})

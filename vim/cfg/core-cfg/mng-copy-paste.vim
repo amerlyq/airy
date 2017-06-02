@@ -81,7 +81,7 @@ nnoremap g<leader>P  :put!+<CR>
 
 " Append to copy buffer
 " nnoremap <leader><leader>y :<C-U>call CopyStringInReg('+', @+ . @")<CR>
-vnoremap gy :<C-U>call CopyStringInReg('"', @" . GetVisualSelection("\n"))<CR>
+vnoremap <leader>Y :<C-U>call CopyStringInReg('+', @" . GetVisualSelection("\n"))<CR>
 
 " Duplicate unnamed and copy registers
 nnoremap <C-y> :<C-U>call CopyStringInReg('+', @")<CR>
@@ -94,8 +94,8 @@ vnoremap <leader><C-y> :<C-U>call CopyStringInReg('+', TrimLines(GetVisualSelect
 nnoremap <leader><C-p> :<C-U>call CopyStringInReg('"', TrimLines(@+))<CR>
 vnoremap <leader><C-p> :<C-U>call CopyStringInReg('"', TrimLines(@+))<CR>gv"+P
 
-" Yank full line w/o newline and surrounded spaces
-nnoremap <leader>Y mz^vg_:<C-U>call CopyStringInReg('+', GetVisualSelection("\n"))<CR>`z
+" DEPRECATED:('yil'): Yank full line w/o newline and surrounded spaces
+" nnoremap <leader>Y mz^vg_:<C-U>call CopyStringInReg('+', GetVisualSelection("\n"))<CR>`z
 " Copy from prompt ':' or '/'. Paste in them by <C-R>+ or <C-R>".
 cnoremap <C-y> <C-R>=CopyStringInReg('+', getcmdline())<CR><C-H>
 " To be able copy/paste regex snippets into vim/snippets/vim_regex.otl
