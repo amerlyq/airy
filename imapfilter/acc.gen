@@ -22,7 +22,7 @@ EOT
 wopt "accs = {}"
 
 # BUG: despite right order inside config.lua :: table is sorted by keys
-ad=~/.cache/mutt/acc
+ad=~/.config/mutt/acc
 for a in "$ad/${MUTT_DEFAULT:?}"; do  # "$ad"/*
   [[ -s $a ]] || continue
   grep -qxF "${a##*/} = IMAP {" "$dst" && continue
