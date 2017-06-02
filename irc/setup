@@ -4,8 +4,8 @@ source ~/.shell/func.d/cfgsetup
 
 ### MANUAL ###
 # /secure passphrase ********
-# /secure set freenode_user xxxxxxxx
-# /secure set freenode_pass ********
+# /secure set znc_user xxxxxxxx
+# /secure set znc_pass ********
 
 
 ### GENS ###
@@ -13,11 +13,12 @@ source ~/.shell/func.d/cfgsetup
 #   => REQ make issue with desired behavior
 if cfgOpt r; then
   export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
-  export IRC_ZNC="$IRC_ZNC" IRC_ZNC_FP="$IRC_ZNC_FP"
+  export IRC_ZNC="${IRC_ZNC:?}" IRC_ZNC_FP="${IRC_ZNC_FP:?}"
 
   ## ALT: { sleep 0.5; ./run-pipe "$cfg"; ./run-pipe <<< "/quit"; } & weechat -a; wait
   if [[ -p ~/.weechat/weechat_fifo ]]
   then env-subs ./cfg/weechat.conf | ./run-pipe
+  # WARN: seems don't affect anything at all => apply config only after removing ~/.weechat/*
   else WEECHAT_PASSPHRASE=' ' weechat --no-connect \
     -r '/set sec.crypt.passphrase_file /dev/stdin' \
     -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
