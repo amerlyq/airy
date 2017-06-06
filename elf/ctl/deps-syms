@@ -24,8 +24,8 @@ gensyms(){ [[ -d $dst/$1 ]] && ! has r && return
   r.find-elf "${@:2}" | r.elf-dynsyms-dump "$dst/$1"; }
 
 cd "$src"
-gensyms std/bin -b . \( -name opt -o -name root \) -prune -o
-gensyms std/so  -s . \( -name opt -o -name root \) -prune -o
+gensyms std/bin -b . '(' -name opt -o -name root ')' -prune -o
+gensyms std/so  -s . '(' -name opt -o -name root ')' -prune -o
 gensyms opt/bin -b opt root
 gensyms opt/so  -s opt root
 
