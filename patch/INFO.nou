@@ -1,0 +1,85 @@
+REF
+  SEE help on utils BET: read online man
+    $ paclr patchutils C2 X{} sh -c '{} --help; echo =========='
+  http://elinux.org/Diff_And_Patch_Tricks
+    SEE: $ python2 diffinfo
+      http://elinux.org/images/a/a9/Diffinfo
+
+REF: man
+  http://manpages.ubuntu.com/manpages/zesty/man1/splitpatch.1.html
+  https://manned.org/pkg/arch/community/patchutils
+
+
+TODO:
+  CHECK: filterdiff usage and issues
+    https://unix.stackexchange.com/questions/188725/using-filterdiff-to-exclude-a-diff
+    http://lists.openembedded.org/pipermail/openembedded-core/2015-December/114263.html
+  CHECK: alt way to split diff in hunks
+    https://unix.stackexchange.com/questions/65698/how-to-make-patch-ignore-already-applied-hunks
+    https://rohieb.name/blag/post/splitting-overly-large-hunks-in-patches/
+  TUT: https://linuxacademy.com/blog/linux/introduction-using-diff-and-patch/
+
+
+%% Statistics %%
+  Text
+    REF https://stackoverflow.com/questions/4174113/how-to-gather-characters-usage-statistics-in-text-file-using-unix-commands
+  Filenames
+    Spaces in names (subjects to rename / process manually)
+      $ find \( -type d -name .hg \) -prune -o -print | grep \\s
+      $ lsdiff a.patch | grep \\s
+    All chars used in names
+      $ find \( -type d -name .hg \) -prune -o -print | sed -r 's/./&\n/g' | sort -u | tr -d '\n';echo
+      #  !&()+-./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~
+    Find usable replacement for "/" and "\s" delimiters
+      $ awk 'BEGIN{for(i=32;i<128;i++)printf "%c\n",i}' | grep -vxFf <(find \( -type d -name .hg \) -prune -o -print | sed -r 's/./&\n/g' | sort -u) | tr -d '\n';echo
+      # "#$%'*,:;<=>?@[\]^`{|}
+
+
+%%% ALG %%% categorize changes from single diff
+  * generate component diff for each subdir
+    $ hgdf -r "<tag>" -- . > ../a.patch
+  * split each component diff by involved files
+    $ splitdiff -a -D tree a.patch
+  * filter-out all removed files
+    = 3rd line ~ /^[+]{3}\s\/dev\/null/
+    - before that list statistics which files will be removed
+  * split each involve file by hunks
+    ALT: $ splitpatch.rb --hunks a.patch
+      NEED: check basenames for all files are unique
+      $ lsdiff a.patch |awk -F/ '{print$NF}'|sort|uniq -dc|sort -k1,1
+        => all non-unique names will have .patch.NNN suffix attached
+  * split each hunk by group of changes delimited by context lines
+    - ALSO: G: remove context
+      CHECK:(features): https://stackoverflow.com/questions/21609603/remove-unneeded-context-lines-from-diff-output-using-sed
+  * sep dir with clean hunks w/o context or header
+    ATT: hunk header must remain in-place for 'dwdiff' to work
+  * process hunks
+    !! SEE: forestanza.sh for related splitting code
+    ~ sep clean hunks into +/-
+    ~ generate additional one with worddiff by git out of repo
+      $ dwdiff -u -A best -C0 hunk.patch  # w/o context -- only lines with changes
+      $ dwdiff -u -A best -3 hunk.patch   # add/del changes itself
+      SUM: dwdiff works even on raw hunks (if header lines |diff -r/---/+++| stripped)
+        BUT: hunk info itself must be present
+        ALSO: -d/-P/-W -c -S -R -L
+  ...
+  * sort hunks/lines into categories
+    ! get statistics on hunk sizes
+      => to guess how many changes were overlapping
+      ALT:BAD:(can't count changes per hunk):
+        $ diffstat -m -p1 a.patch
+        https://stackoverflow.com/questions/28219040/how-to-have-git-stats-on-a-diff-file
+    - if single '+' line matches some construct => its single category
+      E.G. replacing destructors +Class::~Class() = default;
+    - hunk matching multiple categories => copied into each one
+    ? how to filter all spare lines not matched into any categories ?
+      = E.G. split into filter-only and filter-out
+      MAYBE: make db and mark each line when processed at least once
+  * statistics -- number of changes per category
+  ...
+  * combine category diff into single diff
+  * force-apply single diff as patch to repo
+  * view in meld
+    TRY: $ dwfilter -- to reformat resulting diff
+    https://linux.die.net/man/1/dwfilter
+    http://os.ghalkes.nl/dwdiff.html
