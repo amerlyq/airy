@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use Getopt::Std;
+
+my %opts=(); getopts("b:s", \%opts);
+# my $N = $opts{b} // 1;
+# my $skip = defined $opts{s} ? 0 : 1;
+
+my ($a, $b);
+my (@ls, @bs, @hs, @fs);
+while(<>) {
+    chop;
+    if (/^--$/) { next; }  # skip special paragraph marker
+    if (/^$/ and not @ls) { next; }  # skip some first empty line in block before change [-...-]
+    if (/^={70}$/) { if (@ls){ push @bs, join("\n", @ls); undef @ls; }; next; }
+    if (/^@@\s-/) { if (@bs){ push @hs, [@bs]; undef @bs; }; next; }
+    if (/^[+]{3}\s/) { $b = /^[+]{3}\s([^\t]+)(?=\t|$)/i; next; }
+    if (/^[-]{3}\s/) { $a = /^[-]{3}\s([^\t]+)(?=\t|$)/i; next; }
+    if (/^diff -r\s/) { if (@hs){ push @fs, [@hs]; undef @hs; }; next; }
+    push @ls, $_;
+}
+push @bs, join("\n", @ls) if @ls;
+push @hs, [@bs] if @bs;
+push @fs, [@hs] if @hs;
+
+# ... process here
+
+foreach my $hs (@fs) {
+    foreach my $bs (@{$hs}) {
+        foreach (@{$bs}) {
+            print $_, "\x00";
+        }
+    }
+}

@@ -1,5 +1,8 @@
 #!/bin/bash -eu
 set -o pipefail
+trap 'printf "%s:%s: %s\n" "$LINENO" "${FUNCNAME-}" "${BASH_COMMAND-}"
+' HUP INT QUIT TERM ERR
+
 
 swd=$(dirname "$(readlink -e "$0")")
 patch=$1
@@ -15,9 +18,11 @@ lfile=$dfile.lst
 [[ -d $dfile ]] || splitdiff -aD "$dfile" "$patch"
 [[ -s $lfile ]] || find "$dfile" -type f -printf '%p\n' > "$lfile"
 
+isdevnull(){ awk '/^['"$1"']{3}\s\/dev\/null/{z=1} NR>3{exit} END{exit!z}' "$2"; }
+
 # NOTE: use +++ line if not /dev/null else use ---
 # NOTE: allowed \s in filename (till <Tab> before timestamp)
-patchpath(){ head -3 "$1" | awk '
+patchpath(){ awk '
   /^-{3}\sa?\//{a=substr($0,5,index($0,"\t")-5)}
   /^\+{3}\sb?\//{b=substr($0,5,index($0,"\t")-5)}
   NR>3{exit}
@@ -26,17 +31,38 @@ END{
   if(b~/^[ab]\//)b=substr(b,3)
   print b
   exit length(b)<3}
-'; }
+' "$1"; }
+
+hunksdir(){ local d=$(patchpath "$1"); printf '%s\n' "${2+$2/}${d//\//%}"; }
 
 splithunks(){ local d f=$1
-  d=$(patchpath "$f")
-  d=$dhunk/${d//\//%}
+  d=$(hunksdir "$f" "$hunks")
   [[ -d $d ]] && return || mkdir -p "$d"
   (cd "$d" && "$esplitpatch" --hunks "$f")
 }
 
 # ALT: | SHELL=/bin/bash parallel 'splithunks {}'
 # RFC: on 4k files :: 11s for dry-run and 2m40s when splitting
-while IFS= read -r line; do
+[[ -d $dhunk ]] || while IFS= read -r line; do
   splithunks "$line"
 done < "$lfile"
+
+## DECIDE: what to do with add/del files OR ignore them
+# rm -f "$dfile.add.lst" "$dfile.del.lst"
+# while IFS= read -r line; do
+#   isdevnull - "$line" && printf "%s\n" "$line" >> "$dfile.add.lst"
+#   isdevnull + "$line" && printf "%s\n" "$line" >> "$dfile.del.lst"
+# done < "$lfile"
+
+## ALT: if add,del are ignored => directly move into $dst/add,del dir
+# mkdir -p "$dst/add" "$dst/del"
+# while IFS= read -r line; do
+#   isdevnull - "$line" && mv -vt "$dst/add" "$line"
+#   isdevnull + "$line" && mv -vt "$dst/del" "$line"
+# done < "$lfile"
+
+## NOTE: rm all excessive hunks
+# while IFS= read -r p; do
+#   isdevnull - "$p" && rm -vrf "$(hunksdir "$p" "$dhunk")"
+#   isdevnull + "$p" && rm -vrf "$(hunksdir "$p" "$dhunk")"
+# done < <(find "$dst/del" -type f -printf '%p\n')

@@ -8,6 +8,8 @@ REF
 REF: man
   http://manpages.ubuntu.com/manpages/zesty/man1/splitpatch.1.html
   https://manned.org/pkg/arch/community/patchutils
+  + http://linuxcommand.org/man_pages/interdiff1.html
+  https://linux.die.net/man/1/lsdiff
 
 
 TODO:
@@ -36,8 +38,9 @@ TODO:
 
 
 %%% ALG %%% categorize changes from single diff
+Split patch into hunks db
   * generate component diff for each subdir
-    $ hgdf -r "<tag>" -- . > ../a.patch
+    $ hg diff -pU8 -r "<tag>" -- . > ../a.patch
   * split each component diff by involved files
     $ splitdiff -a -D tree a.patch
   * filter-out all removed files
@@ -50,11 +53,15 @@ TODO:
         => all non-unique names will have .patch.NNN suffix attached
   * split each hunk by group of changes delimited by context lines
     - ALSO: G: remove context
+        $ interdiff -q -U1 /dev/null a.patch
+          MAYBE:NEED:USE: beforehand (after manual edits) $ recountdiff
       CHECK:(features): https://stackoverflow.com/questions/21609603/remove-unneeded-context-lines-from-diff-output-using-sed
   * sep dir with clean hunks w/o context or header
     ATT: hunk header must remain in-place for 'dwdiff' to work
   * process hunks
     !! SEE: forestanza.sh for related splitting code
+      * convert diff to 'ex' format
+      * split line-by-line by my code OR modify to split change-by-change
     ~ sep clean hunks into +/-
     ~ generate additional one with worddiff by git out of repo
       $ dwdiff -u -A best -C0 hunk.patch  # w/o context -- only lines with changes
@@ -62,7 +69,27 @@ TODO:
       SUM: dwdiff works even on raw hunks (if header lines |diff -r/---/+++| stripped)
         BUT: hunk info itself must be present
         ALSO: -d/-P/-W -c -S -R -L
+      BAD: dwdiff works badly after 'combinediff' (which ?wrongly? removes first 'diff -r' header)
   ...
+
+Process single diff
+  * preprocess diff to extract word-based changes
+    $ dwdiff -u -C0 -Abest -3 a.patch | grep -vE '^(diff -r|[+-]{3}|@@|={70}$|--$)' >! wdiff.patch
+      BET: perl script to strip blocks and replace /={70}/ with "\0"
+  * incremental filtering
+    $ ./dwdiff2records diff.dww | tr \\0 \\n L
+    $ ./dwdiff2records diff.dww >! diff.patch
+    $ grep -zvFf diff.patt diff.patch | tr \\0 \\n C
+    $ echo "newpatt" >> diff.patt
+    WARN: need to fix $ dwdiff -P $ punctuation to reduce change width
+      E.G.  [-iDefs[i].minOpcode-] { +iDef.minOpcode+}
+    TRY:ALT: only additions
+    $ hg diff -pU8 -r "<tag>" -- . > ../a.patch
+    $ dwdiff -u -C0 -Abest -13 a.patch | ./dwdiff2records > add.patch
+    $ grep -zvFf add.patt add.patch | tr \\0 \\n C
+    $ grep -zvFf add.patt add.patch | sort -z | uniq -zc | sort -znk1,1 | tr \\0 \\n
+    $ grep -zvFf add.patt add.patch | sort -z | uniq -zc | sort -znk1,1 | tr -d '\r\n' | tr \\0 \\n | grep -v 'override;$' L
+
   * sort hunks/lines into categories
     ! get statistics on hunk sizes
       => to guess how many changes were overlapping
@@ -77,7 +104,10 @@ TODO:
       MAYBE: make db and mark each line when processed at least once
   * statistics -- number of changes per category
   ...
+
+Review statistics
   * combine category diff into single diff
+    $ find ./files -type f -execdir cat {} \+ | interdiff -q --combine /dev/null /dev/stdin >! diff.chg
   * force-apply single diff as patch to repo
   * view in meld
     TRY: $ dwfilter -- to reformat resulting diff
