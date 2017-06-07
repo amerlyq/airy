@@ -103,6 +103,10 @@ Process single diff
       = E.G. split into filter-only and filter-out
       MAYBE: make db and mark each line when processed at least once
   * statistics -- number of changes per category
+    Count hunks per top dir (module)
+    $ declare -A arr
+    $ find "diff.d/hunks" -mindepth 1 -maxdepth 1 -type d -printf '%P\n' | while IFS= read -r d; do m=${d%%%*}; n=$(find "$d" -type f|wc -l); ((arr[$m]+=$n)); done
+    $ for k in "${(@k)arr}"; do echo "$arr[$k] $k"; done | sort -rnk1,1
   ...
 
 Review statistics

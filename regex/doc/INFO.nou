@@ -1,0 +1,8 @@
+
+Reduce
+  (^word|word$)
+    $ printf 'a word\nword b\na word b\nword\n'| grep -P '\b(?=(word))(?=^\1|\1$)\1\b'
+    ? /(?:(^)|\b)word(?IF(1)\b|$)/
+    BAD:
+      /\b(?:(?=(word)$)|^)\1\b/
+      /(?<=(^|\b))word(?=$|\b)/

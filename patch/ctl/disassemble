@@ -10,6 +10,7 @@ dst=${2:-${patch%.*}}
 
 esplitpatch=$(readlink -e "${swd%/*}/exe/splitpatch.rb")
 [[ $dst == $patch ]] && dst+='.d'
+mkdir -p "$dst"
 dst=$(readlink -e "$dst")
 dfile=$dst/files
 dhunk=$dst/hunks
@@ -36,7 +37,7 @@ END{
 hunksdir(){ local d=$(patchpath "$1"); printf '%s\n' "${2+$2/}${d//\//%}"; }
 
 splithunks(){ local d f=$1
-  d=$(hunksdir "$f" "$hunks")
+  d=$(hunksdir "$f" "$dhunk")
   [[ -d $d ]] && return || mkdir -p "$d"
   (cd "$d" && "$esplitpatch" --hunks "$f")
 }
