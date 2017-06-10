@@ -17,7 +17,7 @@ elsif ($N > 0)
 {
     my $i = 0;
     while(<>) {
-        if (/^$/) { $skip = 1; next }
+        if (/^$/) { $skip = 1; next; }
         if ($skip) { $skip = 0; last if ++$i > $N }
         next if $i < $N;
         print $_;
@@ -27,7 +27,7 @@ else
 {
     my (@b, @bs);
     while(<>) {
-        if (/^$/) { $skip = 1; next }
+        if (/^$/) { $skip = 1; next; }
         if ($skip) { push @bs, [@b]; undef @b; $skip = 0; }
         push @b, $_;
     }
