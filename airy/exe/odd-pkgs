@@ -5,12 +5,15 @@
 #   base base-devel yaourt
 #   ?: sudo grub os-prober ntp lvm2 polkit
 
+[[ ${1-} == -r ]] && { reset=1; shift; } || reset=0
 tmp=/tmp/pkgs.txt
 also=( base base-devel yaourt "$@" )
 
 # NOTE: generate active db w/o actual cmds execution
 db=~/.cache/airy/install.txt
-[[ -f $db && -s $db ]] || AIRY_DRY_RUN=1 r.airy -xI
+if ((reset)) || ! [[ -f $db && -s $db ]]; then
+  AIRY_DRY_RUN=1 r.airy -xI
+fi
 
 cp -fT "$db" "$tmp"
 printf '%s\n' "${also[@]}" >> "$tmp"

@@ -22,7 +22,7 @@ myScratchpads =
     , ("j8", "j8 -c", bottom_l14b3)
     ]
   ] ++
-  [ vim "lyrics" "~/aura/lyfa/lists/music.nou" nonFloating
+  [ vim "lyrics" "~/aura/lyfa/lists/music/anime.nou" nonFloating
   , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
   ]
   where
