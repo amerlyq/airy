@@ -216,14 +216,18 @@ end
 #     print 'cant import c++ support - old gcc or not using target-gdb?'
 # end
 
-## Source command 'heap' for gdb
+## TEMP:REM: Source command 'heap' for gdb
 python
 import os, sys
-_xdir = os.path.expanduser('~/.config/airy/gdb')
+_xdir = os.path.expanduser('~/.config/airy/python')
 if os.path.isdir(_xdir):
-    # sys.path.insert(0, _xdir)
-    sys.path.append(_xdir)
-    import gdbheap
+    sys.path.append(_xdir)  # ALT: sys.path.insert(0, _xdir)
+    try:
+        from reelf_heap.command import HeapUclibc
+        HeapUclibc()
+    except:
+        import traceback
+        traceback.print_exc()
 end
 
 
