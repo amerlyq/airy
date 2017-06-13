@@ -5,6 +5,10 @@ trap_errors
 cwd_script
 [[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
 
+group=${AIRY_NAMESPACE-}  # ALT:USE header '# namespace=reelf' similar to '# tags: ...'
+# THINK:DFL: [[ -z $group && $repo != airy ]] && group=${repo##*/}
+[[ -z ${group-} || ${group:?} =~ ^[A-Za-z][A-Za-z0-9_]*$ ]] || exit 1
+
 ### Argparse ###
 CFG_ARGS=( "$@" )  # Backup default arguments
 
@@ -29,7 +33,8 @@ fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
 if cfgOpt m; then
   repo=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
   # BAD: lame way to introduce new prefix q.* w/o even its necessity ?
-  r.airy-cache-links -t ~/.bin -p "$([[ $repo =~ q$ ]]&&echo q||echo r).%d-"
-  r.airy-cache-alias
+  #   -> FIXME:CHG: use automatic '$group' prefix instead of r./q.
+  r.airy-cache-links -g "$group" -t ~/.bin -p "$([[ $repo =~ q$ ]]&&echo q||echo r).%d-"
+  r.airy-cache-alias -g "$group"
   airy_cache_pwd_mod
 fi

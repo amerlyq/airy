@@ -116,6 +116,8 @@ filter-mods
 
 
 maint
+  [_] ADD: -M to specify directory from which (only) to load *mods*
+    ALT: sep cmd 'r.airy-mods' for this functional
   2017-02-09 [X] encapsulate deploy system into independent 'airy' mod
   2017-02-04 [X] rename 'setup' to 'maint' OR 'ctl' ALT: use root Makefile
   2017-02-09 [X] ./maint must be simple wrapper and actually call ./airy/run
@@ -327,9 +329,11 @@ cache-alias
 
 
 PKGMOD
-  [_] BAD: package can't touch any /home or /tmp path
+  [_] BAD: PKGBUILD can't touch any /home or /tmp path
     https://wiki.archlinux.org/index.php/Arch_packaging_standards#Directories
     ? is it enough for me to use system-wide dirs and cache ?
+      == TRY:USE: /var/local/{bin,mod} for *mods* OR /opt for whole *airy*
+        << mods from /var/local may symlink back into /opt/airy
   [_] TRY: generate PKGBUILD for each *mod* through my scripts set
     + this allows clean uninstall previous versions based on $pkgver
       >> remove cleaning for ./systemd/user and ./bin symlinks

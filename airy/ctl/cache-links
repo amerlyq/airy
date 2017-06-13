@@ -1,7 +1,10 @@
 #!/bin/bash -eu
 shopt -s nullglob
 
-while getopts 'qt:p:' o; do case $o in :|'?') exit 1
+mod=${PWD##*/}
+
+while getopts 'qg:t:p:' o; do case $o in :|'?') exit 1
+;; g) group=$OPTARG
 ;; t) bin=$(readlink -m "$OPTARG")
 ;; p) prf=$OPTARG
 ;; q) quiet=1
@@ -9,7 +12,7 @@ esac; done; shift $((OPTIND - 1))
 
 [[ ${bin-} ]] || bin=$(r.airy-get-cache)/bin
 [[ ${prf-} ]] || prf='r.%d-'
-prf=${prf//%d/${PWD##*/}}
+prf=${prf//%d/${group:+${group}.}$mod}
 
 
 bins(){ local i a=()
@@ -40,3 +43,9 @@ srcs(){ local nm d=~/.cache/airy/build/bin
   done
 }
 srcs ./src/*  # src/* -> $cache/build/* -> bin/r.%d-*
+
+
+pymod(){ local d=~/.config/airy/python nm=${group:+${group}_}$mod
+  linkcp ${quiet:+-q} -- "$1" "$d/$nm"
+}
+[[ ! -f ./python/__init__.py ]] || pymod ./python

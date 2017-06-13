@@ -10,25 +10,26 @@ begfmt='_alias_cat(){ : # %s'
 endfmt='}; _alias_cat'
 
 # q=quiet, r=reset (always replace)
-opts=; while getopts 'f:m:o:qr' o; do case $o in :|'?') exit 1
+opts=; while getopts 'f:g:m:o:qr' o; do case $o in :|'?') exit 1
 ;; m) mod=$OPTARG
+;; g) group=$OPTARG
 ;; f) from=$(readlink -e "$OPTARG")
 ;; o) output=$(readlink -f "$OPTARG")
 esac; opts+=$o; done; shift $((OPTIND - 1))
 log(){ [[ $opts =~ q ]] || printf '%s\n' "$@"; }
 
 # BAD: can't update, append only. After removing appended -- deletes rest of file
-section_recache(){ local f s a b e t tt timestamp=1
+section_recache(){ local f s id b e t tt timestamp=1
   [[ $1 == -r ]] && { timestamp=0; shift; }
   f=$1
   s=$(readlink -e "$2")
-  a=$mod/${s##*/}
-  b=$(printf "$begfmt" "$a")
-  e=$(printf "$endfmt" "$a")
+  id=${group:+${group}_}$mod/${s##*/}
+  b=$(printf "$begfmt" "$id")
+  e=$(printf "$endfmt" "$id")
   t=$(command stat -c%Y "$s")
   if ((timestamp)); then
     tt=$(sed -n "\|^$b\s*\([0-9]\{10\}\)\$|{s//\1/p;q}" "$f")
-    (( t == tt )) && log "* A: $a" && return
+    (( t == tt )) && log "* A: $id" && return
   fi
   if grep -q "$b\b" "$f"; then sed -i "
     \|^$b|,\|^$e$| {
@@ -40,7 +41,7 @@ section_recache(){ local f s a b e t tt timestamp=1
   else
     printf '\n\n%s\n# %s\n%s\n%s\n' "$b $t" "$s" "$(<"$s")" "$e" >> "$f"
   fi
-  log "+! A: $a"
+  log "+! A: $id"
 }
 
 [[ -n $output ]] || output=$(r.airy-get-cache)/cfg/aliases

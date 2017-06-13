@@ -6,7 +6,7 @@ shopt -s nullglob
 #   ./$0 -- -- ...  # skip-only
 
 ### Cmdline
-# a=all, x=reset_queue, g=generate
+# a=all, x=reset_queue, g=generate, d=defaults
 dop=maiIsSuUrR
 opts=; while getopts "x${dop}dgN" o; do case $o in :|'?') exit 1
 esac; opts+=$o; done; shift $((OPTIND - 1))
