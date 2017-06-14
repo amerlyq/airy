@@ -2,13 +2,27 @@ Analyzing 'traceroute' output
   https://habrahabr.ru/post/129627/
   https://habrahabr.ru/post/281272/
 
+REF How 'traceroute' works
+  ++ https://samsymons.com/blog/how-traceroute-works/
+  + http://www.linuxjournal.com/content/linux-advanced-routing-tutorial
+  TTL
+    http://users.cs.cf.ac.uk/Dave.Marshall/Internet/node77.html
+    http://www.inetdaemon.com/tutorials/troubleshooting/tools/traceroute/definition.shtml
+    https://2buntu.com/articles/1203/traceroute-how-does-it-work/
+    http://www.slashroot.in/how-does-traceroute-work-and-examples-using-traceroute-command
+
 ALSO
   $ traceroute example.com
+  $ sudo traceroute -I example.com
   $ tracepath example.com
 
 READ
   https://www.digitalocean.com/community/tutorials/how-to-use-traceroute-and-mtr-to-diagnose-network-issues
   http://serverfault.com/questions/585862/why-mtr-is-much-faster-than-traceroute
+  TUT: troubleshooting of traceroute
+    !!! http://www.exit109.com/~jeremy/news/providers/traceroute.html#reading
+    http://www.cisco.com/c/en/us/support/docs/ios-nx-os-software/ios-software-releases-121-mainline/12778-ping-traceroute.html
+    https://ccieblog.co.uk/basic-troubleshooting-commands/how-does-traceroute-work
 
 Resolve unknown ip
   $ curl ipinfo.io/23.66.166.151
@@ -20,3 +34,19 @@ Resolve unknown ip
 Resolve whole path
   $ mtr example.com
   $ mtr -n -c1 --report example.com | tee >/dev/tty | awk '$2~/^[0-9.]+$/{print$2}' | xargs -rL1 -I{} curl ipinfo.io/{}
+
+
+Geolocation by IP
+  https://www.iplocation.net/
+    * gather different geo coords from diff services to demark the region
+    * find your actual coords from google map
+    * estimate distance between you and each node based on average traceroute time
+      = take into account delays in each node on re-transmission, scheduling of processes and only then -- on cabel length
+      = also, each router/switch in chain has its own delays
+      = some links are optics = completely different propagation time
+    * estimate estimation error and its intersection with geoip region
+  TRY: traceroute back to double-check estimations
+    http://www.exit109.com/~jeremy/news/providers/trace-pages.html
+    http://www.traceroute.org/
+  Visual traceroute
+    http://www.visualroute.com/
