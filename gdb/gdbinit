@@ -1,5 +1,6 @@
 # vim: ft=gdb:ts=2:sw=2:sts=2
 source ~/.config/gdb/dbinit_stl_views
+source ~/.config/airy/python/reelf_gdb/gdbinit.py
 
 # *.gdbinit* # origin from buildroot
 ## Resolve relocations immediately on startup
@@ -215,60 +216,3 @@ end
 # except ImportError:
 #     print 'cant import c++ support - old gcc or not using target-gdb?'
 # end
-
-## TEMP:REM: Source command 'heap' for gdb
-python
-import os, sys
-_xdir = os.path.expanduser('~/.config/airy/python')
-if os.path.isdir(_xdir):
-    sys.path.append(_xdir)  # ALT: sys.path.insert(0, _xdir)
-    try:
-        from reelf_heap.command import HeapUclibc
-        HeapUclibc()
-    except:
-        import traceback
-        traceback.print_exc()
-end
-
-
-## Dev command to reload sources
-# USAGE:DEV: (gdb) python reload(gdbheap.heap)
-#   BUT: correctly reloads only global vars
-#   http://stackoverflow.com/questions/437589/how-do-i-unload-reload-a-python-module
-#   http://stackoverflow.com/questions/684171/how-to-re-import-an-updated-package-while-in-python-interpreter
-# DEV recursive reload => gather all deps by traversing module, tsort them, then reload in loop
-#   * new deps => no problem => will be loaded after that
-#   * rm deps => problem only if file deleted completely, otherwise WARN excessive reload of old (possibly broken) code
-#   * mv => don't reload old dep (file removed), new dep will be loaded as usual
-#   * rfc => dep moved from one file into another => tsort must be for new version
-#     TRY: https://github.com/jparise/python-reloader
-#   ==> somehow, to support
-#     ?? completely purge module ?? ==> unsupported at all ??
-#       http://blog.bfitz.us/?p=2052
-#   SEE:BAD: https://stackoverflow.com/questions/15506971/recursive-version-of-reload
-#     https://atlee.ca/blog/posts/blog20081121python-reload-danger-here-be-dragons.html
-python
-class DevReload(gdb.Command):
-    def __init__(self):
-        super(DevReload, self).__init__("reload", gdb.COMMAND_USER)
-    def invoke(self, arg, from_tty):
-        try:
-            from importlib import reload
-        except:
-            try:
-                from imp import reload
-            except:
-                reload
-        try:
-            reload(gdbheap.heap.argparser)
-            reload(gdbheap.heap.stats)
-            reload(gdbheap.heap.chain)
-            reload(gdbheap.heap.malloc_state)
-            reload(gdbheap.heap.heap)
-            reload(gdbheap.heap.main)
-            reload(gdbheap.heap)
-            reload(gdbheap)
-        except:
-            pass
-DevReload()
-end
