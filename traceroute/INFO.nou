@@ -4,6 +4,7 @@ Analyzing 'traceroute' output
 
 REF How 'traceroute' works
   ++ https://samsymons.com/blog/how-traceroute-works/
+  ++ http://www.packetu.com/2009/10/09/traceroute-through-the-asa/
   + http://www.linuxjournal.com/content/linux-advanced-routing-tutorial
   TTL
     http://users.cs.cf.ac.uk/Dave.Marshall/Internet/node77.html
@@ -15,6 +16,10 @@ ALSO
   $ traceroute example.com
   $ sudo traceroute -I example.com
   $ tracepath example.com
+  ALT:OLD: https://linux.die.net/man/8/lft
+
+
+
 
 READ
   https://www.digitalocean.com/community/tutorials/how-to-use-traceroute-and-mtr-to-diagnose-network-issues
@@ -50,3 +55,33 @@ Geolocation by IP
     http://www.traceroute.org/
   Visual traceroute
     http://www.visualroute.com/
+
+
+Tracing in Layer 2
+  REF: http://kb.pert.geant.net/PERTKB/Layer2traceroute
+    ++ http://www.apricot.net/apricot2007/presentation/tutorial/ethernet-oam-tutorial_srinath-beldona.pdf
+  Manual
+    https://www.experts-exchange.com/questions/28516743/Tool-similar-to-Tracert-to-trace-via-MAC-address-in-the-LAN.html#
+      => how to do tracing manually by loggin-in switches and grabbing port-MAC connection pair
+    https://networkproxy.wordpress.com/2014/08/15/traceroute-layer-3layer-2-must-know-three-steps/
+    http://forums.whirlpool.net.au/archive/569530
+      = using spanning tree and cam addresses
+    https://networkengineering.stackexchange.com/questions/38813/how-to-traceroute-layer-2-vlans-on-non-cisco-devices
+    https://networkengineering.stackexchange.com/questions/5823/how-to-trace-a-mac-address-on-a-switched-lan
+    FIND: Dynamic routing protocol -- by which routers talk to each other
+  Cisco
+    REF: https://en.wikipedia.org/wiki/Cisco_Discovery_Protocol
+      http://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst6500/ios/12-2SX/configuration/guide/book/l2trace.html
+    https://serverfault.com/questions/457796/is-it-possible-to-include-switches-in-traceroute-hops
+
+
+Routing and Rerouting
+  !! TUT:ATT: http://www.think-like-a-computer.com/2011/08/24/ip-routing/
+  http://www.tomshardware.co.uk/answers/id-1952068/change-route-packets.html
+    = impossible? USE VPN to get better starting point for packages route
+  ```
+    otherwise you're just talking about any-old encapsulation/VPN/tunneling protocol
+    well, yeah, because (barring something like L2TP) you don't encapsulate L2 into L3 ...
+    VPLSes.. but probably beyond the scope of the OP's Q
+    and I guess that's technically tagging it, not l3 encap. even though it's moved along via an L3 network
+  ```
