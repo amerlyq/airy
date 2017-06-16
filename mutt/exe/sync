@@ -6,6 +6,7 @@ mkdir -p ~/.mail/"${MUTT_DEFAULT:?}"
 # --all
 # -l
 # USE:(err_1: -V) to find out file to remove/resync: <dir>/.uidvalidty
+# FIXME: sometimes you need to sync non-default account
 mbsync "${MUTT_DEFAULT:?}"
 # Indexate db
 notmuch new
