@@ -173,6 +173,25 @@ define btl
   end
 end
 
+
+define btreg
+  if $argc == 0
+    echo USE: btreg <count> TODO: auto-parse this string OR python\n
+    bt -1
+  end
+  if $argc == 1
+    set $i = 0
+    while( $i <= $arg0 )
+      select-frame $i
+      eval "echo #%02d: %08x %08x %08x\n", $i, $sp, $pc, $ra
+      # info registers sp pc ra
+      set $i = $i + 1
+    end
+    select-frame 0
+  end
+end
+
+
 # ATT:NEED: pwd == /tmp/gdb/<bug>
 define lognew
   set logging off
