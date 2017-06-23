@@ -63,6 +63,13 @@ function! CopyStringInReg(r, str, ...)
   call CountLinesInRegister(a:r, '@'. a:r .':')
 endfunction
 
+fun! CopyToClipboard(str, ...)
+  if &clipboard =~# 'plus'| let r='+'
+  elseif &clipboard !=# ''| let r='*'
+  else| let r='"' |en
+  call call('CopyStringInReg', [r, a:str] + a:000)
+endf
+
 
 " Operator mappings
 nnoremap <leader>y "+y
@@ -80,29 +87,29 @@ nnoremap g<leader>P  :put!+<CR>
 " nnoremap [unite]y :let @+=expand("%:p")<CR>:echo 'Copied to clipboard.'<CR>
 
 " Append to copy buffer
-" nnoremap <leader><leader>y :<C-U>call CopyStringInReg('+', @+ . @")<CR>
-vnoremap <leader>Y :<C-U>call CopyStringInReg('+', @" . GetVisualSelection("\n"))<CR>
+" nnoremap <leader><leader>y :<C-U>call CopyToClipboard(@+ . @")<CR>
+vnoremap <leader>Y :<C-U>call CopyToClipboard(@" . GetVisualSelection("\n"))<CR>
 
 " Duplicate unnamed and copy registers
-nnoremap <C-y> :<C-U>call CopyStringInReg('+', @")<CR>
-vnoremap <C-y> :<C-U>call CopyStringInReg('+', GetVisualSelection("\n"))<CR>
+nnoremap <C-y> :<C-U>call CopyToClipboard(@")<CR>
+vnoremap <C-y> :<C-U>call CopyToClipboard(GetVisualSelection("\n"))<CR>
 nnoremap <C-p> :<C-U>call CopyStringInReg('"', @+)<CR>
 vnoremap <C-p> :<C-U>call CopyStringInReg('"', @+)<CR>gv"+P
 
-nnoremap <leader><C-y> :<C-U>call CopyStringInReg('+', TrimLines(@"))<CR>
-vnoremap <leader><C-y> :<C-U>call CopyStringInReg('+', TrimLines(GetVisualSelection("\n")))<CR>
+nnoremap <leader><C-y> :<C-U>call CopyToClipboard(TrimLines(@"))<CR>
+vnoremap <leader><C-y> :<C-U>call CopyToClipboard(TrimLines(GetVisualSelection("\n")))<CR>
 nnoremap <leader><C-p> :<C-U>call CopyStringInReg('"', TrimLines(@+))<CR>
 vnoremap <leader><C-p> :<C-U>call CopyStringInReg('"', TrimLines(@+))<CR>gv"+P
 
 " DEPRECATED:('yil'): Yank full line w/o newline and surrounded spaces
-" nnoremap <leader>Y mz^vg_:<C-U>call CopyStringInReg('+', GetVisualSelection("\n"))<CR>`z
+" nnoremap <leader>Y mz^vg_:<C-U>call CopyToClipboard(GetVisualSelection("\n"))<CR>`z
 " Copy from prompt ':' or '/'. Paste in them by <C-R>+ or <C-R>".
-cnoremap <C-y> <C-R>=CopyStringInReg('+', getcmdline())<CR><C-H>
+cnoremap <C-y> <C-R>=CopyToClipboard(getcmdline())<CR><C-H>
 " To be able copy/paste regex snippets into vim/snippets/vim_regex.otl
 " DISABLED: conflicts with Limio -- '<Leader><Space>' paused
-" nnoremap <leader><Space>/ :<C-U>call CopyStringInReg('+', @/)<CR>
+" nnoremap <leader><Space>/ :<C-U>call CopyToClipboard(@/)<CR>
 " vnoremap <leader><Space>/ :<C-U><C-R>=TrimLines(GetVisualSelection('\n')))<CR>
-noremap  <leader>% :<C-U>call CopyStringInReg('+', @%)<CR>
+noremap  <leader>% :<C-U>call CopyToClipboard(@%)<CR>
 " Open commandline with copied text
 nnoremap <leader>; :<C-R>"
 vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
@@ -161,7 +168,7 @@ function! GetLineBookmark(idt, text, ...)
   let str = l:prf . path . ":" . line(".")
   let str.= empty(a:text) ? "" : ("\n" . l:prf . l:tab . a:text)
 
-  call CopyStringInReg('+', l:str, 'V')
+  call CopyToClipboard(l:str, 'V')
   " TODO: Add re-indenting of several lines (like 'for' or 'function' part)
   " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
 endfunction
@@ -219,7 +226,7 @@ fun! GetLineSpoiler(idt, text, ...)
 
   if !get(a:,1) && len(m)>0| let t = join([t] + m[1:], "\n") |en
 
-  call CopyStringInReg('+', t, 'V')
+  call CopyToClipboard(t, 'V')
 endf
 
 
