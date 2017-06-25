@@ -69,7 +69,7 @@ let s:patterns = {
       \ 'Inf': [ 38, "#00afdf", 'INFO?|VAR|VIZ'],
       \ 'Fix': [202, "#ff5f00", 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
       \ 'Did': [243, "#767676", 'DONE|FIXED|EXPL%(AIN)?|TEMP'],
-      \ 'Msg': [ 62, "#5f5fdf", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A'],
+      \ 'Msg': [ 62, "#5f5fdf", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|DEP%(ENDS)?'],
       \ }
 
 function! s:everywhere_print(patts)
