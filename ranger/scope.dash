@@ -40,6 +40,7 @@ esac
 if [ "$preview_images" = True ]; then
   case "$mimetype"
   in image/svg+xml) convert "$path" "$cached" && exit 6
+  # ;; video/* | image/*) exit 7
   ;; video/*) ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6
   ;; image/*) exit 7
   esac
@@ -55,6 +56,15 @@ in text/*|*/xml) exit 2
   # ALT: ldd
   # ALT: readelf -dW
 ;; video/*|audio/*|image/*) exiftool "$path" && exit 5
+# ;; audio/*) exiftool "$path" && exit 5
+# ;; image/*) img2txt --gamma=0.6 --width="$width" "$path" && exit 0
+# ;; video/*)
+#   tmp=${RANGER_TMPDIR:-${TMPDIR:-/tmp}}/preview.jpg
+#   # test -p "$tmp" || mkfifo "$tmp"
+#   ffmpegthumbnailer -s240 -i "$path" -o "$tmp" #& vpid=$!
+#   img2txt --gamma=0.6 --width="$width" "$path" && exit 0
+#   # timg -g${width}x${height} "$tmp"
+#   # wait "$vpid"
 esac
 
 
