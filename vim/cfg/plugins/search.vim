@@ -19,10 +19,11 @@ call dein#add('amerlyq/agn.vim', {'lazy': 0,
 
 "" Focus on matching lines, errors, etc by folding away other lines {{{1
 call dein#add('embear/vim-foldsearch', {
-  \ 'on_cmd': ['Fw', 'Fs', 'Fp', 'Fl', 'FS', 'Fc', 'Fi', 'Fd', 'Fe'],
+  \ 'on_cmd': ['Fw', 'Fs', 'Fp', 'Fl', 'FS', 'Fc', 'Fi', 'Fd', 'Fe', 'Fv'],
   \ 'hook_source': "
 \\n   \" let g:foldsearch_highlight = 1
 \\n   let g:foldsearch_disable_mappings = 1
+\\n   com! Fv let w:foldsearch_pattern = '\\V\\^\\%(\\%('.@/.'\\)\\@!\\.\\)\\*\\$'|call foldsearch#foldsearch#FoldSearchDo()
 \"})
 
 
