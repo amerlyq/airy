@@ -2,6 +2,17 @@
 
 # FIND: preprocessors for files to replace my env-subs
 #   => E.G. ~/.Xresources, autoconf, etc
+# DEV: multipass replacement
+#   => switch to replace only list of vars and don't touch others
+#   => then in second pass replace all one more time
+# ENH: split to 'env-subs' which extracts env and calls 'list-subs' with args for actual replacement
+#   * 'list-subs' must work on /dev/stdin or 'VAR=5 ... -- file'
+#   => this will allow to do 'env-subs' on subset
+# DEV: optionally allow removing headings
+#   IDEA: impl for ${VAR+\n$VAR}, etc
+#   * for /^%{MULTILINE_BLOCK}/ remove heading newline
+#   * for key = %{VALUE} remove heading space or even whole option
+#   NEED: specify what is treated as heading in each case
 
 lp='%[{]'
 mp='[A-Z_][A-Z_0-9]*'
