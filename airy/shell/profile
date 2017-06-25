@@ -22,6 +22,14 @@ CURR_DIR_MUSIC=/home/media/music
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/airy
 config=${XDG_CONFIG_HOME:-$HOME/.config}/airy
 
+### Samba ###
+declare -A AIRY_SAMBA_RO=(
+  [home]="/home/$CURR_USER"
+  [media]="/home/media/"
+  [mounts]="/media/$CURR_USER"
+)
+declare -A AIRY_SAMBA_RW=()
+
 ### Chroots ###
 CURR_DIR_CHROOT=/home/chroot
 CURR_CHROOTS=( )        # USE: xenial_amd64, wily_amd64, trusty_i386, lucid_i386
