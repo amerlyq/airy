@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: net
 source ~/.shell/func.d/cfgsetup
 
@@ -16,6 +16,7 @@ fi
 if cfgOpt u; then
   ### GENS ###
   ./samba.gen
+  # ALT: env-subs -p smb.conf | sudo tee /etc/samba/smb.conf >/dev/null
   svc_activate -eR smbd  # MAYBE:ALSO nmbd
   # Once Samba has restarted, use this command
   # to check your smb.conf for any syntax errors
