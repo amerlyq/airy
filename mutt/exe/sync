@@ -1,12 +1,13 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/profile
+acc=${1:-${MUTT_DEFAULT:?}}
 
-mkdir -p ~/.mail/"${MUTT_DEFAULT:?}"
+mkdir -p ~/.mail/"$acc"
 # -c ~/.mbsyncrc
 # --all
 # -l
 # USE:(err_1: -V) to find out file to remove/resync: <dir>/.uidvalidty
 # FIXME: sometimes you need to sync non-default account
-mbsync "${MUTT_DEFAULT:?}"
+mbsync "$acc"
 # Indexate db
 notmuch new
