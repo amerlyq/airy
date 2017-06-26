@@ -133,8 +133,9 @@ call dein#add('haya14busa/vim-asterisk', {
 "   %s/../.../g  OR  /...  OR  %g/.../d
 " vim_version: '7.3'
 " ALT: AndrewRadev/multichange.vim
+" OBSOLETE:(neovim): if you wish -- call explicitly :OverCommandLine
 call dein#add('osyo-manga/vim-over', {
   \ 'on_cmd': 'OverCommandLine',
   \ 'hook_source': _hcat('over.src'),
-  \ 'hook_add': "let g:subs_wrap = 'OverCommandLine %s<CR>'"
+  \ 'hook_add': (has('nvim') ?"": "let g:subs_wrap = 'OverCommandLine %s<CR>'")
   \."\n" . _hcat('over.add')})
