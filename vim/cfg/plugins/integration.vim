@@ -152,11 +152,12 @@ call dein#add('KabbAmine/zeavim.vim', {
 call dein#add('jamessan/vim-gnupg', {'lazy': 0,
   \ 'on_ft': 'gpg',
   \ 'on_cmd': ['GnuPG'],
-  \ 'hook_post_source': "silent! exe 'do GnuPG BufReadCmd '",
-  \ 'hook_source': "
-\\n   let g:GPGDebugLevel = 1000
-\\n   let g:GPGDebugLog = 'gpglog'
-\"})
+  \})
+  " \ 'hook_post_source': "silent! exe 'do GnuPG BufReadCmd '",
+  " \ 'hook_source': "
+" \\n   let g:GPGDebugLevel = 1000
+" \\n   let g:GPGDebugLog = 'gpglog'
+" \"})
 " fun! hooks.on_post_source(bundle)
 "   " edit  " Re-read buffer to initiate GnuPG autocommands
 "   " silent! exe 'doautocmd BufReadCmd' expand('%')

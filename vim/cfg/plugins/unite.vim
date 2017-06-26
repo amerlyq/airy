@@ -33,5 +33,5 @@ call dein#add('Shougo/unite-build', {'lazy': 0})
 " NOTE: [Unite]h help, -u outline, -n file/new
 call dein#add('Shougo/unite.vim', {
   \ 'depends': 'neomru.vim',
-  \ 'hook_source': 'call _cfg("unite/*.vim")',
+  \ 'hook_post_source': 'call _cfg("unite/*.vim")',
   \ 'hook_add': _hcat('unite.add')})

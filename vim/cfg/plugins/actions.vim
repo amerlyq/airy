@@ -16,8 +16,11 @@ call dein#add('tpope/vim-speeddating', {
   \ 'on_map': [['nx', '<Plug>SpeedDating']],
   \ 'on_func': 'speeddating#',
   \ 'depends': 'vim-repeat',
-  \ 'hook_source': "let g:speeddating_no_mappings = 1",
-  \ 'hook_add': "
+  \ 'hook_source': "
+\\n   let g:speeddating_no_mappings = 1
+\\n   nnoremap <Plug>SpeedDatingFallbackUp <C-a>
+\\n   nnoremap <Plug>SpeedDatingFallbackDown <C-x>
+\", 'hook_add': "
 \\n   call Map_nxo('<C-a>', '<Plug>SpeedDatingUp',  'nx', 1)
 \\n   call Map_nxo('<C-x>', '<Plug>SpeedDatingDown','nx', 1)
 \"})

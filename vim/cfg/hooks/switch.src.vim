@@ -4,7 +4,7 @@ let g:switch_mapping = ''
 let g:switch_reverse_mapping = ''
 
 autocmd FileType conf let b:switch_custom_definitions = [
-  \ ['yes', 'no'],
-  \ ['on', 'off'],
-  \ [1, 0],
+  \ {'\<yes\>': 'no', '\<no\>': 'yes'},
+  \ {'\<on\>': 'off', '\<off\>': 'on'},
   \]
+" \ {'\<1\>': '0', '\<0\>': '1'},
