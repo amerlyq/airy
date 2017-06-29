@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+url=${1:-google.com}
+dns=${2:-ipinfo.io}
+exec mtr -n -c1 --report "$url" | tee >/dev/tty | awk '$2~/^[0-9.]+$/{print$2}' | xargs -rL1 -I{} curl "$dns"/{}
