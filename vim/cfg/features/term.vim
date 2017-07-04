@@ -28,8 +28,8 @@ augroup END
 
 "{{{1 Mouse in Term ============================
 if has('mouse')
+  set mouse=a           " support for mouse wheel and clicks
   if !has('nvim')
-    set mouse=a           " support for mouse wheel and clicks
     if has('mouse_sgr') || v:version > 703 || v:version == 703 && has('patch632')
       set ttymouse=sgr
     else
