@@ -17,6 +17,7 @@ zstyle ':prezto:load' zfunction 'zargs' 'zmv'
 ## Set the Prezto modules to load (browse modules).
 # The order matters: ...completion/>fasd/>...syntax/>history/>prompt/>$
 zstyle ':prezto:load' pmodule \
+  'terminal'                  \
   'editor'                    \
   'history'                   \
   'directory'                 \
@@ -91,11 +92,11 @@ zstyle ':prezto:module:utility:grep' color 'no'
 
 ### Terminal ###
 ## Auto set the tab and window titles.
-# zstyle ':prezto:module:terminal' auto-title 'yes'
+zstyle ':prezto:module:terminal' auto-title 'always'
 ## Set the window title format.
-# zstyle ':prezto:module:terminal:window-title' format '%n@%m: %s'
+zstyle ':prezto:module:terminal:window-title' format 'zsh:%s'
 ## Set the tab title format.
-# zstyle ':prezto:module:terminal:tab-title' format '%m: %s'
+zstyle ':prezto:module:terminal:tab-title' format '%n@%m: %s'
 
 
 ### Tmux ###

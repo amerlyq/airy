@@ -30,6 +30,11 @@ let &statusline="%{winnr('$')>1?'['.winnr().'/'.winnr('$')"
     \ . ".(&fenc!=''?&fenc:&enc).','.&ff.']' : ''}"
     \ . "%m%{printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))}"
 
+" Set title in terminal. WARN:BUG: nvim won't restore title back
+" TODO: replace simple expand by arline letter-wise compression
+set title titlelen=80
+let &titlestring = (has('nvim') ? 'neovim' : 'vim') . ':%{expand("%:~")}%m'
+
 
 set novisualbell    " don't flash the screen
 set shortmess=atTIO " No intro msg, etc
