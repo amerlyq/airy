@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+host=127.0.0.1
+port=2224  # single port for all
+test -z "$DISPLAY" \
+&& test -n "$SSH_TTY" \
+&& nc -dz4 "$host" "$port" \
+|| exec xsel "$@"

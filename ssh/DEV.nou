@@ -1,0 +1,33 @@
+IDEA:REF: http://endot.org/2011/12/04/remotecopy-copy-from-remote-terminals-into-your-local-clipboard/
+  https://gist.github.com/burke/5960455
+
+[_] DEV: nc inside remote xsel, socat on host ssh wrapper
+  if -i : nc "$host" "$port"  # Send
+  if --nodetach : cat file - | nc "$host" "$port"  # Keep connection
+  if -o : onetime read from port
+
+REF:(nc): https://www.computerhope.com/unix/nc.htm
+ALT:(nc): socat https://superuser.com/questions/261900/how-can-i-pipe-commands-to-a-netcat-that-will-stay-alive
+  TRY: maybe socat can run commands on connection established
+    https://unix.stackexchange.com/questions/314550/how-to-set-a-script-to-execute-when-a-port-receives-a-message
+    http://www.dest-unreach.org/socat/doc/socat-exec.html
+    https://www.cyberciti.biz/faq/linux-unix-tcp-port-forwarding/
+TRY:(bash coproc): https://unix.stackexchange.com/questions/53641/how-to-make-bidirectional-pipe-between-two-programs
+SEE: https://github.com/flonatel/pipexec
+
+[_] DEV:TEST: in host system by $ DISPLAY= r.ssh localhost
+  * open single port for both read / write in two instances
+  * test if 'nodetach' needed on host side: nc -l .. | xsel --nodetach -i -b
+[_] CHECK: maybe 'neovim' won't call 'xsel' at all if no $DISPLAY
+
+[_] DEV:ALSO: aug r.ssh wrapper on host end
+  RemoteForward 2224 127.0.0.1:2224
+  ALT: -R 12345:localhost:12345
+[_] MAYBE: ports for push/pull clipboard as ssh_port+1 and +2 if ssh_port > 1024
+[_] NOTE: pushing clipboard must be only for focused terminal / window (tmux on focus event)
+  [_] TEMP: push only on keypress
+  [_] BET:ALT: don't push at all -- wait until 'xsel -i' request on remote side
+
+[_] DEV: chroot connection in same way
+  FIND: how to forward ports into schroot
+  CHECK: if problem with xsel-in-chroot => can't unmount persists even then
