@@ -24,9 +24,14 @@ SEE: https://github.com/flonatel/pipexec
   RemoteForward 2224 127.0.0.1:2224
   ALT: -R 12345:localhost:12345
 [_] MAYBE: ports for push/pull clipboard as ssh_port+1 and +2 if ssh_port > 1024
+  << port can be easily extracted from $SSH_CONNECTION
 [_] NOTE: pushing clipboard must be only for focused terminal / window (tmux on focus event)
   [_] TEMP: push only on keypress
   [_] BET:ALT: don't push at all -- wait until 'xsel -i' request on remote side
+[_] IDEA: send cmdline args for xsel as first msg when establishing connection
+  BAD:SECURITY: on wrong flags even 'xsel -h' may overflow system memory
+    [_] CHECK: open existing socket in reverse way (as persistent ssh connection after auth)
+    ? attacker opened ssh to my machine -- can I reuse his connection to feed some data into his socket as response ?
 
 [_] DEV: chroot connection in same way
   FIND: how to forward ports into schroot

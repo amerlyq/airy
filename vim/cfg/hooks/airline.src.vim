@@ -13,7 +13,7 @@ let g:airline_extensions = ['tabline', 'quickfix', 'xkb'] " 'submode', 'unite'
 
 "" TABS and BUFFERS
 let g:airline#extensions#tabline#buffer_idx_mode = 1
-let g:airline#extensions#tabline#show_tabs = 1
+let g:airline#extensions#tabline#show_tabs = 0  " always show buffers and nr tabs
 let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#show_close_button = 1
 let g:airline#extensions#tabline#tab_nr_type = 2

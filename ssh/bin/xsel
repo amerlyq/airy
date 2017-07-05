@@ -1,0 +1,19 @@
+#!/bin/bash -eu
+host=127.0.0.1
+port=2224  # single bidirectional port
+
+test -z "${DISPLAY-}" \
+&& test -n "${SSH_TTY-}" \
+&& nc -4 -dz "$host" "$port" \
+|| exec /usr/bin/xsel "$@"
+# DEV: SSH_TTY or SCHROOT_CHROOT_NAME
+
+# NOTE: supports only -i/-o, enforces -b, ignores -p/-s
+opts=iobps
+while getopts "$opts" o; do
+case $o in :|'?') echo "xsel wrapper limited to -$opts"; exit 1
+;; i) exec socat -4t0 - TCP:$host:$port
+;; o) exec socat -4t0 - TCP:$host:$port <<<''
+;; -) #-nodetach)
+esac; done; shift $((OPTIND - 1))
+# ALT: nc -4 [-c|-w0] "$host" "$port"

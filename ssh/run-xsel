@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+host=127.0.0.1
+port=2224
+
+# BAD: can't kill forked process
+# ALT: nc -l "$host" "$port" | xsel -i -b
+# DEBUG: -d -d -d
+socat -4u TCP-L:$port,reuseaddr,fork EXEC:xsel-auto &
+
+echo beg
+# BUG: after ssh no commands executed
+# /usr/bin/ssh -R "$port:$host:$port" "$@"
+echo end
+
+kill $(jobs -p) >/dev/null
+# Connect once more to process sigquit and close last instance
+# printf '' | socat -4t0 - TCP:$host:$port
+wait
