@@ -2,6 +2,16 @@
 host=127.0.0.1
 port=2224  # single bidirectional port
 
+# BUG:FIXME: still don't work in neovim
+
+# NOTE: empty packet into socat => fetch clipboard
+#   ~ printf '' | cmd
+#   ~ exec 0<&-
+#   ~ </dev/null
+#   BAD:(cmd <<<'') -- bash always adds \n
+
+# CHECK: maybe 'nc -4dz' has slow timeout when starting on cold system
+#   => first launch neovim after freemem is too slow
 test -z "${DISPLAY-}" \
 && test -n "${SSH_TTY-}" \
 && nc -4 -dz "$host" "$port" \
@@ -9,11 +19,24 @@ test -z "${DISPLAY-}" \
 # DEV: SSH_TTY or SCHROOT_CHROOT_NAME
 
 # NOTE: supports only -i/-o, enforces -b, ignores -p/-s
-opts=iobps
-while getopts "$opts" o; do
-case $o in :|'?') echo "xsel wrapper limited to -$opts"; exit 1
-;; i) exec socat -4t0 - TCP:$host:$port
-;; o) exec socat -4t0 - TCP:$host:$port <<<''
+allopts=iobps
+opts=; while getopts "$allopts" o; do case $o
+in :|'?') echo "xsel wrapper limited to \$ xsel -$allopts"; exit 1
 ;; -) #-nodetach)
-esac; done; shift $((OPTIND - 1))
+esac; opts+=$o; done; shift $((OPTIND - 1))
+
 # ALT: nc -4 [-c|-w0] "$host" "$port"
+cmd=( socat -4t0 - "TCP:$host:$port" )
+
+if [[ $opts =~ i && $opts =~ o ]]; then
+# NOTE: if both -i/-o => return curr value before assign
+  "${cmd[@]}" </dev/null
+  exec "${cmd[@]}"
+# NOTE: '... | xsel -o' -- outputs w/o assign
+elif [[ $opts =~ o ]]; then exec "${cmd[@]}" </dev/null
+elif [[ $opts =~ i ]]; then exec "${cmd[@]}"
+# NOTE: if opts have no -i/-o =>
+elif [[ -t 0 ]]
+then exec "${cmd[@]}" </dev/null
+else exec "${cmd[@]}"
+fi

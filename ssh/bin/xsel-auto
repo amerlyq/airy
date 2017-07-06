@@ -4,7 +4,7 @@ h=${h%.}
 { printf '%s' "$h"; cat
 } | if expr "${#h}" >/dev/null
 then # echo yes >&2
-  exec xsel  --input --clipboard "$@" >/dev/null
+  exec /usr/bin/xsel  --input --clipboard "$@" >/dev/null
 else # echo no >&2
-  exec xsel --output --clipboard "$@" </dev/null
+  exec /usr/bin/xsel --output --clipboard "$@" </dev/null
 fi
