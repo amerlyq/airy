@@ -49,8 +49,14 @@ alias -g T='|column -t'
 alias -g W='|while read line; do'
 alias -g NE="|grep -v '^\s*\$'"
 alias -g S='|noglob sed -u -rn'
-alias -g SN='|noglob sort -n'
-alias -g SU='|noglob sort -u'
+
+alias -g SN='|sort -n'
+alias -g SU='|sort -u'
+for i in {1..5}; do
+  alias -g S$i="|sort -sk$i,$i"
+  alias -g S$i-="S$i -r"
+done
+alias -g SC='|LC_ALL=C sort|uniq -c|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'
 alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
 # alias -g TL='| tail -20 '
@@ -94,6 +100,10 @@ if (($+commands[xargs])); then
   # NOTE: xargs fork faster then parallel shell
   # | xargs -0 -rn1 -P$(nproc) -I{} "$@"
   # WARN:(broken pipe):  xargs | head -1  USE: parallel --dry-run
+
+  # EXPL: add word from first column (until last ':' delim) into filenames from other columns
+  #   => USAGE: distributing reverse-deps from $ r.find-elf | r.elf-deps
+  # alias -g WX='|xargs -rL1 -d\\n bash -c '"'"'d=${1+$0}; l=${1-$0}; mkdir -p "${d:=/tmp/dep}" && cd "$d" && tee -a ${l##*:} <<< "${l%:*}"'"'"
 fi
 
 if (($+commands[xsel])); then

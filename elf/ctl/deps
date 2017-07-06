@@ -8,17 +8,15 @@ nl=$'\n'
 
 # [a]=all, d=deps, b=bin, p=pltf, s=sort
 opts=; while getopts 'dsz' o; do case $o in :|'?') exit 1
-;; d) pltf=$OPTARG
-;; p) pltf=$OPTARG
-;; z) fs=$'\0'
+;; z) fs=$'\0'  # BAD: 'paste' replaces \0 by space, CHECK:(paste -z): if output with \0
 esac; opts+=$o; done; shift $((OPTIND - 1))
 has(){ [[ $opts =~ [$*] ]]; }
 
 deps(){ readelf -Wd "$1" \
 | sed -rn '/^.*NEEDED.*\[(\S+\.so\S+)\]$/s//\1/p' \
-| paste -sd "$fs" -
+| paste -sd "${2:- }" -
 }
 
 export -f deps
-SHELL=/bin/dash parallel "printf '%s${hd}%s${nl}' {} "'"$(deps {})"'
+SHELL=/bin/dash parallel "printf '%s${hd}%s${nl}' {} "'"$(deps {} "'"$fs"'")"'
 # ALT: xargs -rn1 -d\\n

@@ -1,14 +1,22 @@
 #!/bin/bash -eu
 set -o pipefail
 
+# DEV:FIXME:(*.a) insert additional filter between find |..| file
+#   => extract single *.o from *.a to determine its $pltf
+#   ! then there will be no need to write conditional branches for grep
+# ALT: readelf -hW "$p" | grep -qE '^\s*Machine:\s+MIPS' || continue
+# ALT: try |elffile|
+#   https://blogs.oracle.com/ali/elffile:-elf-specific-file-identification-utility
+
 # USAGE:
-# a=all, b=bin, c=core, k=kernel, o=object, s=shared
+# A=all, a=archive, b=bin, c=core, k=kernel, o=object, s=shared
 # f=bfmt : elf
 # m=masked : find masked by extension
 # p=pltf : mips, x86-64
 
-opts=; while getopts 'abcf:kmop:s' o; do case $o in :|'?') exit 1
-;; a) opts+=bckos
+targopt=abckos
+opts=; while getopts 'Aabcf:kmop:s' o; do case $o in :|'?') exit 1
+;; A) opts+=$targopt
 ;; f) bfmt=$OPTARG
 ;; p) pltf=$OPTARG
 esac; opts+=$o; done; shift $((OPTIND - 1))
@@ -17,28 +25,31 @@ has(){ [[ $opts =~ [$*] ]]; }
 src=( "${@:-$PWD}" )
 flt=( )  # DEV: preliminary filter-out trash files
 
-[[ -z ${opts//[^bckos]} ]] && opts=bs  # =DFL
+[[ -z ${opts//[^$targopt]} ]] && opts=bs  # =DFL
 
 if has m; then
-  has bckos && flt+=( \( -false )
+  has $targopt && flt+=( \( -false )
+  has a && flt+=( -o -name '*.a' )
   has b && flt+=( -o \( -executable \! -regex '.*\.[ks]?o\(\.[0-9]+\)*$' \) )
   has c && flt+=( -o -name 'core.*' )
   has k && flt+=( -o -name '*.ko' )
   has o && flt+=( -o -name '*.o' )
   has s && flt+=( -o -regex '.*\.so\(\.[0-9]+\)*$' )
-  has bckos && flt+=( \) )
+  has $targopt && flt+=( \) )
 fi
 
 # TODO: distinguish '.o' from '.ko' by file extension
 typ=''
+has a && typ+='|current ar archive'
 has b && typ+='|executable'
 has c && typ+='|core file'
 has ko && typ+='|relocatable'
 has s && typ+='|shared object'
 typ="(${typ:1})"
 
-# WARN: ignores symlinks
-exec find -H "${src[@]}" -type f "${flt[@]}" -print \
+# ATT: intentionally ignores symlinks to skip duplicates (E.G. busybox)
+# WARN: some *.so are root-only and will be skipped under user
+exec find -H "${src[@]}" ! -readable -prune -o -type f "${flt[@]}" -print \
 | file -f- -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar \
 | grep -iFw "${bfmt-elf}" \
 | grep -Ew  "${typ}" \
