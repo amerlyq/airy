@@ -23,11 +23,12 @@ test -z "${DISPLAY-}" \
 || exec /usr/bin/xsel "$@"
 # DEV: SSH_TTY or SCHROOT_CHROOT_NAME
 
-# NOTE: supports only -i/-o, enforces -b, ignores -p/-s
-allopts=iobps
-opts=; while getopts "$allopts" o; do case $o
-in :|'?') echo "xsel wrapper limited to \$ xsel -$allopts"; exit 1
-;; -) #-nodetach)
+# NOTE: supports: -i/-o, enforces: -b, ignores: -p/-s/--nodetach
+choices=iobps
+opts=; while getopts "${choices}-" o; do case $o
+in :|'?') echo "xsel wrapper limited to \$ xsel -$choices"; exit 1
+;; -) case ${!OPTIND#--} in nodetach) :
+;; *) exit 1 ;; esac; shift; OPTIND=1; continue
 esac; opts+=$o; done; shift $((OPTIND - 1))
 
 # ALT: nc -4 [-c|-w0] "$host" "$port"
