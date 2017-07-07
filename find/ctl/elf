@@ -1,13 +1,6 @@
 #!/bin/bash -eu
 set -o pipefail
 
-# DEV:FIXME:(*.a) insert additional filter between find |..| file
-#   => extract single *.o from *.a to determine its $pltf
-#   ! then there will be no need to write conditional branches for grep
-# ALT: readelf -hW "$p" | grep -qE '^\s*Machine:\s+MIPS' || continue
-# ALT: try |elffile|
-#   https://blogs.oracle.com/ali/elffile:-elf-specific-file-identification-utility
-
 # USAGE:
 # A=all, a=archive, b=bin, c=core, k=kernel, o=object, s=shared
 # f=bfmt : elf
@@ -49,8 +42,18 @@ typ="(${typ:1})"
 
 # ATT: intentionally ignores symlinks to skip duplicates (E.G. busybox)
 # WARN: some *.so are root-only and will be skipped under user
+
+# TEMP:DONE:(while-read): aug *.a metainfo for consequent filters
+# ALT: extract single *.o from *.a to determine its $pltf
+#   => no need to write conditional branches !!
+# ALT:TRY |elffile|
+#   https://blogs.oracle.com/ali/elffile:-elf-specific-file-identification-utility
+
 exec find -H "${src[@]}" ! -readable -prune -o -type f "${flt[@]}" -print \
 | file -f- -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar \
+| while IFS= read -r L; do if [[ $L =~ 'current ar archive'$ ]]
+then printf '%s, ELF, %s\n' "$L" "$(readelf -hW "${L%:*}" | grep -oP '^\s*Machine:\s+\K.*')"
+else printf '%s\n' "$L"; fi; done \
 | grep -iFw "${bfmt-elf}" \
 | grep -Ew  "${typ}" \
 | grep -iFw "${pltf-}" \
