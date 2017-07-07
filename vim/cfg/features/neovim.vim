@@ -3,6 +3,11 @@ let g:python2_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/bin/python3'
 let g:python_host_prog = g:python2_host_prog
 
+" Share the histories
+augroup MyAutoCmd
+  au CursorHold * if exists(':rshada') | rshada | wshada | endif
+augroup END
+
 " SEE :h guicursor for -Cursor/lCursor-
 "   https://github.com/neovim/neovim/wiki/FAQ#how-can-i-change-the-cursor-shape-in-the-terminal
 try|set guicursor=a:block-Cursor/lCursor-blinkon0
@@ -22,11 +27,6 @@ try|set inccommand=split|catch/E518/|endt   " :substitute preview
 
 " BAD: <ESC><ESC> -- consume single <ESC>, sent to client
 tnoremap   <C-\><ESC>   <C-\><C-n>
-
-" Share the histories
-augroup MyAutoCmd
-  au CursorHold * if exists(':rshada') | rshada | wshada | endif
-augroup END
 
 " SEE: https://github.com/neovim/neovim/issues/2897#issuecomment-115464516
 " Terminal base colors used by UIs with RGB capabilities (other use predefined)
