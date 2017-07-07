@@ -2,7 +2,12 @@
 host=127.0.0.1
 port=2224  # single bidirectional port
 
-# BUG:FIXME: still don't work in neovim
+# BUG:FIXME: still don't work in neovim, vim don't work at all
+# NEED: my own provider -- to disable checking of $DISPLAY
+#   https://github.com/cazador481/fakeclip.neovim/blob/master/autoload/provider/clipboard.vim
+# ALT:
+# - lemonade (for SSH) https://github.com/pocke/lemonade
+# - doitclient (for SSH) http://www.chiark.greenend.org.uk/~sgtatham/doit/
 
 # NOTE: empty packet into socat => fetch clipboard
 #   ~ printf '' | cmd
