@@ -1,0 +1,18 @@
+BUG
+  2017-07-07 [X] FIXED: Ubuntu 16.04 error: undefined reference to `create_module'
+    Building module-init-tools-3.2 in Ubuntu16.04 failed:
+     lsmod.o: In function `try_old_version':
+     ./module-init-tools-3.2/backwards_compat.c:56: undefined reference to `create_module'
+    = This is because 16.04 uses GLIBC 2.23 which doesn't export the obsoleted API create_module.
+    create_module(2) - Linux manual page
+      http://man7.org/linux/man-pages/man2/create_module.2.html
+     This obsolete system call is not supported by glibc. No declaration is
+     provided in glibc headers, but, through a quirk of history, glibc versions
+     before 2.23 did export an ABI for this system call. Therefore, in order to
+     employ this system call, it was sufficient to manually declare the
+     interface in your code; alternatively, you could invoke the system call
+     using syscall(2).
+    Xenial (16.04) : glibc package : Ubuntu
+      https://launchpad.net/ubuntu/xenial/+source/glibc
+      glibc (......) version: 2.23-0ubuntu3
+    ::: FIX Enable CONFIG_NO_BACKWARDS_COMPAT for module-init-tools-3.2.

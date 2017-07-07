@@ -1,0 +1,36 @@
+#!/bin/bash -eu
+set -o pipefail
+
+src=${1:-.}
+
+ign_d='.*(config|tests|doc).*'
+ign_f='.*/(autogen\.sh|depcomp|compile|libtool|missing|install-sh|configure|config\.[^/]*)$'
+
+if [[ -t 1 ]]; then
+  # NOTE: emphasize file _name_ as more significant then its path.
+  patt(){ printf '/\/([^\/ ]+)(\s.*%s)/{s@@/%s\\1%s\\2@;p;d}' \
+    "${2?}" "$(tput bold)$(tput setaf "${1:?}")" "$(tput sgr0)"; }
+
+  colorize(){ sed -r "
+    $(patt 1 'ELF.*executable.*x86')
+    $(patt 5 'ELF.*shared object.*x86')
+    $(patt 2 'ELF.*executable.*MIPS')
+    $(patt 6 'ELF.*shared object.*MIPS')
+    $(patt 3 'ar archive')
+    $(patt 4 'shell script')
+    $(patt 15 '')
+  ";}
+
+  exec > >(colorize)
+fi
+
+# DEV: group output by 2nd column like 'ag --group'
+find "$src" -regextype egrep \
+  \( -type d -regex "$ign_d" \) -prune -o \
+  \( -type f -o -type l \) ! -regex "$ign_f" \
+  \( -executable -o -regex '.*\.(a|so)$' \) -print \
+| file -f- -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar \
+| sed 's/:\s\+/\t/' \
+| sort -t\t -k2,2 \
+| column -ts $',\t' -o$'\t' \
+| cut -f-3  # cut -c-120

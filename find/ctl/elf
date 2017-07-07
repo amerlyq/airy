@@ -7,9 +7,9 @@ set -o pipefail
 # m=masked : find masked by extension
 # p=pltf : mips, x86-64
 
-targopt=abckos
-opts=; while getopts 'Aabcf:kmop:s' o; do case $o in :|'?') exit 1
-;; A) opts+=$targopt
+choices=abckos
+opts=; while getopts "Af:mp:$choices" o; do case $o in :|'?') exit 1
+;; A) opts+=$choices
 ;; f) bfmt=$OPTARG
 ;; p) pltf=$OPTARG
 esac; opts+=$o; done; shift $((OPTIND - 1))
@@ -18,17 +18,17 @@ has(){ [[ $opts =~ [$*] ]]; }
 src=( "${@:-$PWD}" )
 flt=( )  # DEV: preliminary filter-out trash files
 
-[[ -z ${opts//[^$targopt]} ]] && opts=bs  # =DFL
+[[ -z ${opts//[^$choices]} ]] && opts=bs  # =DFL
 
 if has m; then
-  has $targopt && flt+=( \( -false )
+  has $choices && flt+=( \( -false )
   has a && flt+=( -o -name '*.a' )
   has b && flt+=( -o \( -executable \! -regex '.*\.[ks]?o\(\.[0-9]+\)*$' \) )
   has c && flt+=( -o -name 'core.*' )
   has k && flt+=( -o -name '*.ko' )
   has o && flt+=( -o -name '*.o' )
   has s && flt+=( -o -regex '.*\.so\(\.[0-9]+\)*$' )
-  has $targopt && flt+=( \) )
+  has $choices && flt+=( \) )
 fi
 
 # TODO: distinguish '.o' from '.ko' by file extension

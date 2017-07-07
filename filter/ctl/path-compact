@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+# TODO: borrow ideas from zsh/prompt.d/path
+#   ~ replace all path-like objects in input
+#   ~ replace paths in some column
+#   OR: split input to multiple pipes and recombine them directly in shell
+#     E.G.  $ { { tee /dev/fd/3 | cmd1 >&9; } 3>&1 | cmd2 >&9; } 9>&1
+#   ~ strip/ignore color codes when shortening
+
+echo '/this/is/a/realy/long/path/id/like/shortened' |
+ perl -F/ -ane 'print join( "/", map { $i++ < @F - 2 ?
+ substr $_,0,3 : $_ } @F)'
+# /thi/is/a/rea/lon/pat/id/like/shortened
+
+
+echo '/this/is/a/realy/long/path/id/like/shortened' |
+ perl -F/ -ane 'print join( "/", map { m/(.)(.*)/;
+ $_ = $1 . "." x (length $2 > 2 ? 2 : length $2 ) if $i++ < @F - 2; $_ } @F)'
+# /t../i./a/r../l../p../i./like/shortened
