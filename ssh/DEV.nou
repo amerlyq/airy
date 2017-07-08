@@ -1,6 +1,21 @@
 IDEA:REF: http://endot.org/2011/12/04/remotecopy-copy-from-remote-terminals-into-your-local-clipboard/
   https://gist.github.com/burke/5960455
 
+DEBUG: -d -d -d
+  $ socat -d -d -d -4u TCP-L:2224,reuseaddr,fork EXEC:xsel-auto
+  $ ssh -R 2224:localhost:2224 ...
+  $ nc -dz4 localhost 2224
+  $ echo $RANDOM | socat -d -d -d -4t0 - TCP:localhost:2224
+    # BUG:(zsh): ... <<<$RANDOM isn't random -- shows fixed last value
+  $ socat -d -d -d -4t0 - TCP:localhost:2224 </dev/null
+
+BAD: if multiple external hosts connected
+  ! can't map on same port
+    ? how to connect on same host as SSH_CONNECTION but to different port
+      E.G. initiate new socket connection through already existing socket connection
+  ! can't decide with which host to sync xsel
+    => use SSH_CONNECTION to distinguish hosts
+
 [_] DEV: nc inside remote xsel, socat on host ssh wrapper
   if -i : nc "$host" "$port"  # Send
   if --nodetach : cat file - | nc "$host" "$port"  # Keep connection

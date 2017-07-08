@@ -3,15 +3,19 @@ host=127.0.0.1
 port=2224
 
 # BUG: socat not always killed on exit
-onexit(){ kill $(jobs -p) &>/dev/null; wait; }
-trap 'onexit' HUP QUIT TERM ERR INT
-
 # BAD: can't kill forked process
 # ALT: nc -l "$host" "$port" | xsel -i -b
-# DEBUG: -d -d -d
-socat -4u TCP-L:$port,reuseaddr,fork EXEC:xsel-auto &
+# BAD: closed if window started this process was closed
+# FIXME: must be run once for all r.ssh-xsel instances
+#   => TRY: and closed with last instance (? systemd.service ?)
+#     => TRY: $ man flock OR lckdo  <== if closing script and no one helds lock -- kill socat
+
+# DEV:CHECK:
+# lock=${TMPDIR:-/tmp}/xsel-remote.lock.pid
+# trap "flock -xnE13 '$lock' pkill -F '$lock' || ((\$?==13))" HUP QUIT TERM ERR INT
+# flock -xnE13 "$lock" nohup xsel-host "$lock" "$port" 0<&- &>/dev/null & disown || (($?==13))
 
 # ATT: ssh returns code of last executed
 # TODO: make universal wrapper and leave here only #!bash\nexec xsel-host ssh "$@"
-ssh "$@"  # TEMP:(removed -R): can't forward port to the same one when testing localhost
-# ssh -R "$port:$host:$port" "$@"
+# ssh "$@"  # TEMP:(removed -R): can't forward port to the same one when testing localhost
+ssh -R "$port:$host:$port" "$@"
