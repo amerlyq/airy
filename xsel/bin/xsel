@@ -1,26 +1,30 @@
 #!/bin/bash -eu
-# USAGE: supports: -i/-o, enforces: -b, ignores: -p/-s/--nodetach
+# USAGE: supports: -i/-o, enforces: -b, ignores: -p/-s/--nodetach ALSO: [L]=socket
 #   == r.xsel = remote wrapper over xsel
-host=127.0.0.1
-port=2224  # single bidirectional port
+socket=/tmp/xsel-shared.remote  # single bidirectional unix-domain socket
 
 # CHECK: maybe 'nc -4dz' has slow timeout when starting on cold system
 #   => first launch neovim after freemem is too slow
 test -z "${DISPLAY-}" \
 && test -n "${SSH_TTY-}" \
-&& nc -4 -dz "$host" "$port" \
+&& nc -4 -dzU "$socket" \
 || exec /usr/bin/xsel "$@"
 # DEV: SSH_TTY or SCHROOT_CHROOT_NAME
 
 choices=iobps
-opts=; while getopts "${choices}-" o; do case $o
+opts=; while getopts "hL:${choices}-" o; do case $o
 in :|'?') echo "xsel wrapper limited to \$ xsel -$choices"; exit 1
+;; h) exec grep '^# USAGE:' "$0"
+;; L) socket=$OPTARG
 ;; -) case ${!OPTIND#--} in nodetach) :
 ;; *) exit 1 ;; esac; shift; OPTIND=1; continue
 esac; opts+=$o; done; shift $((OPTIND - 1))
 
-# ALT: nc -4 [-c|-w0] "$host" "$port"
-cmd=( socat -4t0 - "TCP:$host:$port" )
+# NOTE: no need to 'flock' transmission
+#   => remote socat will create two different xsel
+#   => whoever last ends transmission -> will be first in clipboard history
+# ALT: nc -4 [-c|-w0] -U "$socket"
+cmd=( socat -4t0 - "UNIX-CLIENT:$socket" )
 
 if [[ $opts =~ i && $opts =~ o ]]; then
 # NOTE: if both -i/-o => return curr value before assign

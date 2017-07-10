@@ -1,8 +1,0 @@
-#!/bin/sh -eu
-lock=$1; shift
-# NOTE: daemonize detached server process
-cd /      # HACK: unblock pwd mounting
-# setsid  # SEE: https://stackoverflow.com/questions/3430330/best-way-to-make-a-shell-script-daemon#
-nohup "$@" 0<&- &>/dev/null &
-echo $! >> "$lock"
-disown -r

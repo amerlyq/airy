@@ -1,4 +1,11 @@
 #!/bin/sh -eu
+# NOTE: empty packet into socat => fetch clipboard
+#   ~ printf '' | cmd
+#   ~ </dev/null
+#   ~ BAD:(cmd <<<'') -- bash always adds \n
+#   ~ BAD:(exec 0<&-) -- /usr/bin/xsel: fstat error on stdin: Bad file descriptor
+# ALSO:BAD:(1>&-) -- write error: Bad file descriptor
+
 h=$(head -c 1; echo .)
 h=${h%.}
 if expr "${#h}" >/dev/null; then # echo yes >&2
@@ -7,6 +14,3 @@ if expr "${#h}" >/dev/null; then # echo yes >&2
 else # echo no >&2
   exec /usr/bin/xsel -o -b "$@" </dev/null
 fi
-# ALT:BAD:
-#   0<&-  # /usr/bin/xsel: fstat error on stdin: Bad file descriptor
-#   1>&-  # write error: Bad file descriptor

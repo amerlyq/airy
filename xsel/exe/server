@@ -1,12 +1,12 @@
 #!/bin/sh -eu
-# NOTE: empty packet into socat => fetch clipboard
-#   ~ printf '' | cmd
-#   ~ exec 0<&-
-#   ~ </dev/null
-#   BAD:(cmd <<<'') -- bash always adds \n
-lock=$1
-port=$2
-process=$3
-echo $$ > "$lock"
-exec socat -4u TCP-L:"$port",reuseaddr,fork EXEC:"$process"
+socket=$1
+process=$2
+# TRY: 'UNIX-L:..,unlink-early' if not removed after server shutdown
+# TRY: 'EXEC:..,end-close' with 'xsel --nodetach'
+exec socat -4 UNIX-LISTEN:"$socket",fork EXEC:"$process"
+# exec socat -4u TCP-L:"$port",reuseaddr,fork EXEC:"$process"
 # ALT:(socat) nc -l "$host" "$port" | xsel -i -b
+
+# NOTE: looks like 'socat' can't daemonize itself
+# THINK:(sandboxing): chroot=/home/sandbox,su-d=sandbox
+#   BUT: can't connect xsel inside sandbox

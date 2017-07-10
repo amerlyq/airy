@@ -1,6 +1,0 @@
-#!/bin/sh -eu
-exit 1  # OBSOLETE
-lock=$1
-cleanup=$2
-exec flock -xnE13 "$lock" \
-  "$cleanup" "$lock"
