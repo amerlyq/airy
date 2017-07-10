@@ -1,5 +1,0 @@
-#!/bin/sh -eu
-lock=${1:-${TMPDIR:-/tmp}/xsel-remote.lock.pid}
-port=$2
-echo $$ > "$lock"
-exec socat -4u TCP-L:$port,reuseaddr,fork EXEC:xsel-auto

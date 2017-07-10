@@ -1,0 +1,80 @@
+#!/bin/bash -eu
+exit 22
+# USAGE: under ssh and chroot
+#   $0 <cmd> -- run cmd with daemon lock
+#   $0 -s -- run server in no-fork mode
+#   $0 -k -- explicitly kill forked server
+
+exe=$(readlink -e "$0")
+exe=${exe%/*/*}/exe
+
+tmp=${TMPDIR:-/tmp}/xsel-shared
+lpid=$tmp.lpid  # exclusive lock for daemon
+lock=$tmp.lock  # shared locks for <cmd>
+# ALT: use unix-socket as lock
+host=127.0.0.1
+port=2224
+
+# [a]=auto-xsel [k]=kill_unused [K]=kill_always [p]=port [s]=server
+opts=; while getopts 'akKp:s' o; do case $o
+in :|'?') exit 1
+;; p) port=$OPTARG
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
+
+has a && exec "$exe/auto"
+has k && exec flock -snE13 "$lock" "$exe/kill" "$lock"
+has s && exec flock -xnE13 "$lock" "$exe/server" "$lock" "$port" "$exe/auto"
+# DEV: -d to launch daemon -- if manually killed by -k when session opened
+#   BUT? trap 'onexit' mustn't affect it in this case
+
+# WARN:(racing): if another r.xsel-shared run between <cmd-ends> and <trap-onexit>
+#   => daemon will be run again and will overwrite $$ inside lock file
+
+# NOTE: exclusive lock to kill daemon only after last shared lock
+onexit(){ flock -xnE13 "$lock" "$exe/kill" "$lpid" || (($?==13)); }
+trap 'onexit' HUP QUIT TERM INT ERR EXIT
+
+# NOTE: exclusive lock to run daemon only if no other locks exists
+# NOTE: run server daemon if not running
+# "$exe/onstart" "$lock" "$port" "$exe" || (($?==13))
+
+# NOTE:
+#   onstart lpid/lock: 0/0 => xn/xw => block both
+#   second: xn/.. => skip daemon
+#   BAD: onexit no daemon: ../xw => wait killing ends
+# FIXME: skip if daemon start{ing/ed} BUT:DEV: block until "onexit" ends
+flock -xnE13 "$lock" flock -xw5 "$lpid" \
+  "$exe/daemonize" "$lpid" \
+  socat -4u TCP-L:"$port",reuseaddr,fork EXEC:"$exe/auto" \
+  || (($?==13))
+# <= running daemon must be guaranteed here => xn/0
+
+# FIXME:NEED:(racing): wait until daemon fully started before running $exe/with <cmd>
+#   TRY:THINK: signal back to parent to continue
+
+# WARN: between 'daemon' and 'with' daemon can become killed
+# WTF: if daemon killed by external means => does lock auto removed ?
+
+# NOTE: shared lock waiting exlusive "onstart" or previous "onexit" ends
+
+# TODO:
+## ALG: [lpid/lock] FSM of process %1 when injecting the process %2
+# -- BEFORE DAEMON  0/0
+#   * whoever first to lock daemon becomes leader (process %1)
+# => INSIDE DAEMON  N/W  ----- !!! exl $lock first to block %2 from running <CMD> under $lock
+#   * daemon: N/W => skip
+#   *  <cmd>: N/W => wait daemon starts
+#   * onexit: N/W => DEV: skip killing
+# -- BEFORE  <CMD>  N/0
+#   *  <cmd>: N/0 => unblocked %1 => run %2 <cmd>
+# => INSIDE  <CMD>  N/1  ----- inc shared lock
+# -- BEFORE ONEXIT  N/0
+# => INSIDE ONEXIT  N/0
+#   * daemon: N/0 => DEV: wait killing ends
+# -- AFTER  ONEXIT  0/0
+#   * ignored, no effects
+
+flock -sw5 "$lock" \
+  "$exe/with" "$lock" "$port" "$exe" \
+  "$@"

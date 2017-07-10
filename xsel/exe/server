@@ -1,0 +1,12 @@
+#!/bin/sh -eu
+# NOTE: empty packet into socat => fetch clipboard
+#   ~ printf '' | cmd
+#   ~ exec 0<&-
+#   ~ </dev/null
+#   BAD:(cmd <<<'') -- bash always adds \n
+lock=$1
+port=$2
+process=$3
+echo $$ > "$lock"
+exec socat -4u TCP-L:"$port",reuseaddr,fork EXEC:"$process"
+# ALT:(socat) nc -l "$host" "$port" | xsel -i -b

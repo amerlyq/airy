@@ -1,19 +1,8 @@
 #!/bin/bash -eu
+# USAGE: supports: -i/-o, enforces: -b, ignores: -p/-s/--nodetach
+#   == r.xsel = remote wrapper over xsel
 host=127.0.0.1
 port=2224  # single bidirectional port
-
-# BUG:FIXME: still don't work in neovim, vim don't work at all
-# NEED: my own provider -- to disable checking of $DISPLAY
-#   https://github.com/cazador481/fakeclip.neovim/blob/master/autoload/provider/clipboard.vim
-# ALT:
-# - lemonade (for SSH) https://github.com/pocke/lemonade
-# - doitclient (for SSH) http://www.chiark.greenend.org.uk/~sgtatham/doit/
-
-# NOTE: empty packet into socat => fetch clipboard
-#   ~ printf '' | cmd
-#   ~ exec 0<&-
-#   ~ </dev/null
-#   BAD:(cmd <<<'') -- bash always adds \n
 
 # CHECK: maybe 'nc -4dz' has slow timeout when starting on cold system
 #   => first launch neovim after freemem is too slow
@@ -23,7 +12,6 @@ test -z "${DISPLAY-}" \
 || exec /usr/bin/xsel "$@"
 # DEV: SSH_TTY or SCHROOT_CHROOT_NAME
 
-# NOTE: supports: -i/-o, enforces: -b, ignores: -p/-s/--nodetach
 choices=iobps
 opts=; while getopts "${choices}-" o; do case $o
 in :|'?') echo "xsel wrapper limited to \$ xsel -$choices"; exit 1

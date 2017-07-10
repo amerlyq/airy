@@ -1,0 +1,12 @@
+#!/bin/sh -eu
+lock=$1
+test -f "$lock" || exit 0  # ALSO: -s "$lock"
+pid=$(cat "$lock" 2>/dev/null)
+echo "$pid"
+test -f "/proc/$pid/exe" || exit 0
+prg=$(readlink "/proc/$pid/exe")
+test "$prg" == "/usr/bin/socat" || exit 1
+kill "$pid"  # ALT: exec pkill -F "$lock"
+
+# rm "$lock"   # WARN? racing inside flock ?
+#   BAD: user can ocaccisonally delete wrong file

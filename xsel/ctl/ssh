@@ -1,0 +1,6 @@
+#!/bin/sh -eu
+host=127.0.0.1
+port=2224
+# ATT: ssh returns code of last executed cmd at remote host
+# WARN: can't forward port to the same one when testing localhost
+exec r.xsel-shared -p "$port" -- ssh -R "$port:$host:$port" "$@"

@@ -1,0 +1,23 @@
+NOTE: do not depend on $DISPLAY => always check if 'xsel -ob' works itself
+
+vim
+  [_] CHECK:FIXME: vim don't work at all
+
+neovim
+  ATT:NEED:(g:clipboard): vim > (6016ac27 of 20170627)
+    https://github.com/neovim/neovim/issues/6029
+  ALT:DEV: https://neovim.io/doc/user/provider.html
+  # NEED: my own provider -- to disable checking of $DISPLAY
+  #   https://github.com/cazador481/fakeclip.neovim/blob/master/autoload/provider/clipboard.vim
+  let g:clipboard = {
+    \ 'name': 'ssh-xsel',
+    \ 'copy': {
+    \   '+': 'xsel --nodetach -b -i',
+    \   '*': 'xsel --nodetach -p -i',
+    \  },
+    \ 'paste': {
+    \   '+': 'xsel -b -o',
+    \   '*': 'xsel -p -o',
+    \ },
+    \ 'cache_enabled': 1,
+    \}

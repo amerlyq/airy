@@ -1,0 +1,16 @@
+#!/bin/sh -eu
+# NOTE: kill 'server' when last locked 'cmd' exits
+lock=$1
+port=$2
+exe=$3
+shift 3
+
+# NOTE: run server daemon if not running
+"$exe/onstart" "$lock" "$port" "$exe" || (($?==13))
+
+# NOTE: shared lock per each instance of 'cmd'
+exec "$@"
+
+# ALT: boilerplate at beg of script to run only once
+#   [ "${FLOCKER}" != "$0" ] && exec env FLOCKER="$0" flock -en "$0" "$0" "$@" || :
+#   BAD? can't have two diff servers on diff ports

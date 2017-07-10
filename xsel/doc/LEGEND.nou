@@ -1,0 +1,37 @@
+Idea: seamlessly pull clipboard content from remote machine when using nvim/ranger
+
+When: copy text pieces between vim instances opened in multiple ssh servers
+
+Impl: xsel wrapper on each server => sync to host machine when piping into xsel
+  * fallback to xsel if $DISPLAY is available (xset -q && exec xsel "$@")
+  * check content length to be "small enough" (don't block slow channel)
+  * base64 it if binary content (smth like RFC2047)
+  * choose transmission escape sequences from switch by $TERM
+  * find pty of current process group and write into it
+  ...
+  * st on host extracts data between beg/end transmission escape codes
+  * st decodes and copies data to host machine clipboard
+  * user inserts clipboard into another st window by standart <C-S-v>
+
+Why:
+  * ssh -X/-Y is insecure and requires to be enabled explicitly in /etc/ssh/sshd_config
+  * Xserver may be completely unavailable (headless server w/o xorg packages, chroot system, etc)
+  * cat content/tempfile into reverse tunnel may be impossible behind NAT
+
+
+I remember seeing some dedicated escape sequences and prototype of
+this idea for urxvt 3-4 years ago, before I switched to st.
+But I can't find that prototype now.
+And I'm starting doubt if what I saw is urxvt at all.
+  SEE: OSC 52:  http://sunaku.github.io/tmux-yank-osc52.html
+  SEE: |aur/urxvt-clipboard|
+  Also SEE fix ::: cfg/shell/alias.d/funcs:53 // tmux-display-fix()
+
+What I appreciate:
+  * if you can point already implemented similar (or alternative) solution
+  * if someone can give me ref to that mentioned trick with urxvt (or what that was?)
+  * point out problems which arise in proposed implementation
+
+E.g. Currently I don't know how to resolve content intermixing problem or how
+to determine "reasonably small" data size, and what to do if it's much larger.
+But there must be more problems I failed to notice.

@@ -1,0 +1,12 @@
+#!/bin/sh -eu
+h=$(head -c 1; echo .)
+h=${h%.}
+if expr "${#h}" >/dev/null; then # echo yes >&2
+  { printf '%s' "$h"; cat; } |
+    exec /usr/bin/xsel -i -b "$@" >/dev/null
+else # echo no >&2
+  exec /usr/bin/xsel -o -b "$@" </dev/null
+fi
+# ALT:BAD:
+#   0<&-  # /usr/bin/xsel: fstat error on stdin: Bad file descriptor
+#   1>&-  # write error: Bad file descriptor
