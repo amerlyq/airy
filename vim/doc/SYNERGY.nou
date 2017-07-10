@@ -76,11 +76,8 @@ DEV env: to be able work from alien computers
     fonts -- see on powerline problems, detect and replace symbols if not available
 
   2015-06-08 [X] Autoresizing : http://www.scarpa.name/Terminal_Vim_Resizing
-  [_] BUG: <C-y> in zsh by ssh: xsel: Can't open display: (null) Inappropriate ioctl for device
-    : xsel don't work by ssh and on my machine after ssh? (ioctl...)
-    :  Maybe because I changed connect to default instead of -X
-    := may use OSC 52:  http://sunaku.github.io/tmux-yank-osc52.html
-    Also SEE fix ::: cfg/shell/alias.d/funcs:53 // tmux-display-fix()
+  2017-07-08 [X] BUG: <C-y> in zsh by ssh: xsel: Can't open display: (null) Inappropriate ioctl for device
+    ::: xsel works only in 'ssh -X' after ssh? (ioctl...)
   [_] BUG: italic/highlighted is swapped when searching in vim inside tmux
     :=SEE: Fix reverse-video/italic mode in urxvt
     : https://wiki.archlinux.org/index.php/Tmux#Correct_the_TERM_variable_according_to_terminal_type

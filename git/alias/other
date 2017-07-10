@@ -62,7 +62,7 @@ _gref(){ local cmd=$1 patt=${*:2}
   case ${#rev} in 0) return 1 ;; 1) eval "$cmd" ;;
   *) git lthis -i --grep="$patt" && echo ;; esac
 }
-alias gre="noglob _gref 'printf %s \$rev|tee >(xsel -ib) && echo'"
+alias gre="noglob _gref 'printf %s \$rev | tee /dev/tty | xsel -ib && echo'"
 alias gcog="noglob _gref 'git checkout \$rev'"
 
 # BUG: recursion?

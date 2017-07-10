@@ -35,7 +35,8 @@ BUG
   Not working with schroot:
   : sudo mount --bind /cryptfs/workspace /cryptfs/chroots/lucid_i386/home/user
   [_] FIXME Exit chroot after using 'xsel'
-  : E: 10mount: umount: /run/schroot/mount/xenial_amd64-e0515f5b-3eee-41a9-9135-58086206a3d1/home/user: target is busy
+    CHECK: maybe problem is gone with 'xsel-remote'
+    # E: 10mount: umount: /run/schroot/mount/xenial_amd64-e0515f5b-3eee-41a9-9135-58086206a3d1/home/user: target is busy
     https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=829125
     ALT: use systemd-nspawn
       https://wiki.archlinux.org/index.php/Systemd-nspawn

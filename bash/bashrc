@@ -58,12 +58,11 @@ fi
 shopt -s cdspell
 
 # Enable xsel to copy current cmdline/output (like in zsh)
-if [[ -n $DISPLAY ]]; then
-  _xsel_copy_cmdline(){ xsel -ib <<< "${READLINE_LINE:-$(fc -ln -1)}"; }
-  _xsel_copy_output(){ xsel -ib <<< $(eval $(fc -ln -1) 2>/dev/null); }
-  bind -x '"\C-y": _xsel_copy_cmdline'
-  bind -x '"\C-o": _xsel_copy_output'
-fi
+# NOTE: xsel-remote works even w/o $DISPLAY set
+_xsel_copy_cmdline(){ xsel -ib <<< "${READLINE_LINE:-$(fc -ln -1)}"; }
+_xsel_copy_output(){ xsel -ib <<< $(eval $(fc -ln -1) 2>/dev/null); }
+bind -x '"\C-y": _xsel_copy_cmdline'
+bind -x '"\C-o": _xsel_copy_output'
 
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
