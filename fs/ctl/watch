@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+(($#)) || set -- .
+# -t 300 -r
+exec inotifywait --quiet --monitor --timefmt '%H:%M:%S' --format '%T %e %w%f' "$@"
