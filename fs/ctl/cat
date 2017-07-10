@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+(($#)) || set -- .
+cmd=( cat )
+exec r.fs-watch -e close_write "$@" | while read -r t e f; do
+  printf -- '\n[%s] $ %s "%s"\n' "$t" "${cmd[*]}" "$f"
+  "${cmd[@]}" "$f"
+done

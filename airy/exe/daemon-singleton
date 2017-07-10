@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+# USAGE: exclusive lock to run daemon only if no other locks exists
+# NOTE: wait critical section until daemon starts
+# HACK:(minor trade-off): always wait on global lock ($0)
+#   => OR:(too complex): lock per session instance ($socket)
+[[ ${FLOCKER-} == $0 ]] || FLOCKER="$0" exec flock -xow5 -E14 "$0" "$0" "$@"
+
+pidfile=$1; shift
+
+# HACK: inherited eternal lock for singleton daemon (until daemon explicitly killed)
+flock -xFnE13 "$pidfile" \
+  daemonize -f "$pidfile" -- "$@" \
+|| exit $(($?==13 ? 0 : $?))
+
+# FIXME:NEED:(racing): wait until daemon cmd _fully_ started before releasing lock
+#   TRY:THINK: signal back to parent to continue

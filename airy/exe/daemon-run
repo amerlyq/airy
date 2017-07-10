@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+# USAGE: daemonize detached server process ALT: systemd.service
+pidfile=$1; shift
+(($#)) || exit 2
+cd /      # HACK: unblock pwd mounting
+# setsid  # SEE: https://stackoverflow.com/questions/3430330/best-way-to-make-a-shell-script-daemon#
+nohup "$@" 0<&- &>/dev/null & disown -r
+echo "$!" > "$pidfile"

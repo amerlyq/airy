@@ -1,0 +1,24 @@
+#!/bin/bash -eu
+# MOVE: $ daemonize -k -F "$pidfile" -P "$cmdpath"
+pidfile=$1
+cmdpath=${2-}
+
+is_running(){ local pid exe prg
+  [[ -e $1 ]] || return 10
+  [[ -f $1 && -s $1 ]] || return 11
+
+  pid=$(cat "$1")
+  [[ $pid =~ ^[0-9]+$ ]] || return 12
+
+  exe=/proc/$pid/exe
+  [[ -e $exe ]] || return 10
+  [[ -L $exe && -f $exe ]] || return 13
+
+  prg=$(readlink -e "$exe")
+  [[ -z ${2-} || $prg == $2 ]] || return 14
+}
+
+# NOTE:(-LF): kill only locked pidfile  ALT: kill "$pid"
+is_running "$pidfile" "${cmdpath-}" \
+&& exec pkill -LF "$pidfile" \
+|| exit $(($?==10 ? 0 : $?))

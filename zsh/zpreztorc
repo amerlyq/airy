@@ -9,7 +9,10 @@ zstyle ':prezto:*:*' case-sensitive 'yes'
 zstyle ':prezto:*:*' color 'yes'
 
 ## Set the Zsh modules to load (man zshmodules).
-zstyle ':prezto:load' zmodule 'attr' 'stat'
+zstyle ':prezto:load' zmodule 'attr'
+
+# HACK: keep 'stat' as external command, use 'zstat' for builtin
+zmodload -F zsh/stat b:zstat
 
 ## Set the Zsh functions to load (man zshcontrib).
 zstyle ':prezto:load' zfunction 'zargs' 'zmv'

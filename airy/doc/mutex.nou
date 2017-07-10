@@ -1,0 +1,48 @@
+REF
+  Manual locking alternatives
+    https://stackoverflow.com/questions/17708885/flock-removing-locked-file-without-race-condition/17714808#17714808
+
+
+%% flock
+
+ALT:(obsolete): lckdo
+
+REF: lock removed by OS
+  https://stackoverflow.com/questions/13522273/will-flocked-file-be-unlocked-when-the-process-die-unexpectedly
+  https://stackoverflow.com/questions/12651068/release-of-flock-in-case-of-errors
+
+
+DEBUG: locks
+  $ awk -vi="$(stat -c%i "/tmp/file")" '$7==i{print$4}' /proc/locks
+  $ fuser /tmp/file
+  $ lsof /tmp/file
+    # COMMAND PID    USER   FD   TYPE DEVICE SIZE/OFF    NODE NAME
+    # perl    613 turkish    3uR  REG    8,2        0 1306357 /tmp/file
+    EXPL:(3uR): 3 read/shared locks
+
+
+FAQ
+  2017-07-10 [X] WTF: if kill <cmd>
+    ::: immediately released (<flock> closes $lock descriptor)
+  2017-07-10 [X] WTF: if kill <flock>
+    ::: released after <cmd> exits (<cmd> keeps opened $lock descriptor)
+
+  2017-07-10 [X] WTF if rm "$lock"
+    ::: (racing) don't delete locks at all
+      * %1 unlinks locked file from fs, keeping its fd opened
+      * %2 trying aquire lock on same file in _fs_ creates new file with another fd
+      => locks don't know about each other
+    SEE: https://www.ruby-forum.com/topic/77244
+      https://stackoverflow.com/questions/17708885/flock-removing-locked-file-without-race-condition
+      https://stackoverflow.com/questions/33166460/how-to-delete-a-locked-flock-file-without-race-condition-before-or-after-rele
+
+  [_] BUG: server keeps lock (must not) even with '-o'
+    ?? how -o works exactly, where it's useful ??
+    Assumption: (-o): close fd only inside fork before exec
+      SEE sources of 'flock'
+
+
+HACK
+  boilerplate at beg of script to run script only once
+    $ test "$FLOCKER" == "$0" || FLOCKER="$0" exec flock -en "$0" "$0" "$@"
+    BAD= can't have two diff parametrized instances (I.E. binded to single "$0")
