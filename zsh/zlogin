@@ -11,10 +11,11 @@
 # fi
 
 # Login guards
-# NOTE:(return 1) as wrong usage of login shell
-[[ -z $TMUX && -z $VIM && -z $EMACS ]] || return
-[[ $UID > 0 && $XDG_VTNR == 1 ]] || return 1
-[[ ! -f /tmp/.X11-unix/X0 && $(tty) == /dev/tty1 ]] || return 1
+# NOTE:(return 8) as wrong usage of login shell
+[[ -z $SSH_TTY ]] || return 0
+[[ -z $TMUX && -z $VIM && -z $EMACS ]] || return 8
+[[ $UID > 0 && $XDG_VTNR == 1 ]] || return 8
+[[ ! -f /tmp/.X11-unix/X0 && $(tty) == /dev/tty1 ]] || return 8
 
 # WARNING: can't be placed into ~/.zshenv because PATH then not constructed yet.
 # NOTE: Only main Xorg session controlled by systemd.
