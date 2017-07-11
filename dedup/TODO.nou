@@ -24,3 +24,36 @@ USAGE
 ALT
   $ rmlint -o pretty:stdout -o summary:stdout -o fdupes:ddup /path/dir/1 /path/dir/2
   $ rmlint -o sh:stdout,cmd=echo .
+
+
+Search one set of directories inside another
+  $ rmlint --hidden --types=df --output=fdupes --rank-by=pma --keep-all-tagged --must-match-tagged ... // ...
+  $ rmlint -rkm -T df -o fdupes -S pma ... // -- ...
+  BET: use stdin for one of lists
+    $ ... | rmlint -rKM -T df -o fdupes:stdout -S pma -- ... // -
+  Concrete file list
+    $ find /usr/lib -iname '*.so' -type f |LC_ALL=C sort| rmlint -S pdlma -
+    # WARN! sort file list -- or '-S dl' won't work -- order from /dev/stdin is preffered
+    !!! $ ... |LC_ALL=C sort| rmlint -rT df -o fdupes -S pdlma -KM - // -- "$@"
+  ALSO:
+    -[beiBEI] -- match/not filename/extension/basename
+    --rank-by='pmr</src/>r</tsrc/>r<.*\.bak$>a'
+  Show only target dups
+    BAD: $ ... -o fdupes -c fdupes:omitfirst,oneline
+    ALT: print first entry, ignore dups in tagged, warn dups>3 in targets
+      $ ... | awk '/^$/{n=0;next} !n++{print} n>2{printf"%d: %s\n",n,$0>"/dev/stderr"}'
+      $ ... | awk '/^$/{p=n;n=0;next} !n++{if(p!=1)print} n>2{printf"%d: %s\n",n,$0>"/dev/stderr"}'
+    BET: $ ... -o json | jq ...
+      # list of dictionaries [header, 1.{file+metainfo}, 2.{...}, ..., footer]
+      NEED: parse json OR process json line-by-line by awk
+
+Caching checksums into xattr for large db consecutive search
+  $ rmlint large_file_cluster/ -U --xattr-write   # first run
+  $ rmlint large_file_cluster/ --xattr-read       # second run
+  $ rmlint large_file_cluster/ --xattr-clear      # cleanup
+
+Using generated db.json
+  $ rmlint large_dir/ # First run; writes rmlint.json
+  $ rmlint --replay rmlint.json large_dir -S MaD
+  Merge with preferences
+  $ rmlint --replay a.json // b.json -k
