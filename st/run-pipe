@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash -eu
+set -o pipefail
 
 case "$1"
 in --url) xurls | awk -vi=1 '{printf "%02d %s\n",i++,$0}' |

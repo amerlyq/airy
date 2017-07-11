@@ -1,0 +1,11 @@
+DEV
+  [_] filter: path-compact
+
+  !4 [_] filter: path-cleanup
+    * DFL: strip any single matching path prefix
+    * (-r) strip all prf recursively per each path
+    * (empty) strip $PWD
+    ? (-l) strip prf as-is and any form of readlink path
+    ? (-/) strip only './' prefix
+    USAGE: $ ... | $0 [<path_prf>..]
+      ./current_dir/path/file => path/file
