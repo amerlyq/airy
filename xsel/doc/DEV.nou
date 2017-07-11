@@ -18,10 +18,44 @@ BAD: if multiple external hosts connected
   ! can't decide with which host to sync xsel
     => use SSH_CONNECTION to distinguish hosts
 
+  BUG: ssh multiple times to same host
+    from same host
+      NEED: ignore repeated port forwardings
+        BAD: dropped if main session closes
+      BET: different per-ssh session paths
+    from different host
+      NEED: different per-ssh session specific paths
+      contained inside some exported env var E.G. $SSH_XSEL_SOCK
+  MAYBE
+    $ r.xsel-ssh -M -R 127.0.0.1:0:... user@remote -N
+    $ rport=$(r.xsel-ssh -O forward user@remote)
+
+
+INFO
+  2017-07-11 [X] BAD: remote unix-domain socket -- don't use it
+    NOTE:(StreamLocalBindUnlink): remove remote socket on reconnect
+      https://bugzilla.mindrot.org/show_bug.cgi?id=2308
+    BUG: don't work through client configuration
+      rem=/tmp/xsel-shared.remote
+        # BAD: can't determine value of remote TMPDIR
+      $ ssh -o StreamLocalBindUnlink=yes -R "$rem:$loc" ...
+      https://harald.hoyer.xyz/2016/07/21/gpg-smartcard-and-ssh/
+
+
 [_] DEV: nc inside remote xsel, socat on host ssh wrapper
   if -i : nc "$host" "$port"  # Send
   if --nodetach : cat file - | nc "$host" "$port"  # Keep connection
   if -o : onetime read from port
+
+
+2017-07-11 [X] TRY: connect by 'nc' to client's end pair
+  $ echo $RANDOM | socat -d -d -d -4u - TCP:127.0.0.1:40362
+  ::: Connection refused
+  Write into borrowed socket
+    https://unix.stackexchange.com/questions/33924/write-inside-a-socket-open-by-another-process-in-linux
+      http://lxr.linux.no/linux+v3.2.11/net/socket.c#L146
+      http://lxr.linux.no/linux+v3.2.11/net/socket.c#L487
+
 
 REF:(nc): https://www.computerhope.com/unix/nc.htm
 ALT:(nc): socat https://superuser.com/questions/261900/how-can-i-pipe-commands-to-a-netcat-that-will-stay-alive

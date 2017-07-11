@@ -26,3 +26,30 @@ dns
     $ cat /etc/resolv.conf
       nameserver 192.168.1.1
       search intropro.com.ua
+
+
+Find peer of other end of socket
+  https://serverfault.com/questions/252723/how-to-find-other-end-of-unix-socket-connection
+    $ sudo ss -a --unix -p
+  ++ TUT https://unix.stackexchange.com/questions/16300/whos-got-the-other-end-of-this-unix-socketpair/190606#190606
+    $ lsof +E -aUc python
+    $ ss -xp
+  https://stackoverflow.com/questions/11897662/identify-other-end-of-a-unix-domain-socket-connection/11900231#11900231
+    https://github.com/lemonsqueeze/unix_sockets_peers
+    HACK: find kernel struct address and extract value
+    $ lsof -U
+    $ sudo gdb /usr/src/linux/vmlinux /proc/kcore
+      (gdb) p ((struct unix_sock*)0xffff8803e256d9c0)->peer
+      (gdb) p ((void**)0xffff8803e256d9c0)[0x52]
+
+
+Write into borrowed socket
+  https://unix.stackexchange.com/questions/33924/write-inside-a-socket-open-by-another-process-in-linux
+    http://lxr.linux.no/linux+v3.2.11/net/socket.c#L146
+    http://lxr.linux.no/linux+v3.2.11/net/socket.c#L487
+
+Pass fd between processes through socket
+  https://stackoverflow.com/questions/12425067/socket-handle-transfer-between-independent-processes
+  https://gist.github.com/majek/2500291
+  Forward on demand (socat + ssh)
+    https://serverfault.com/questions/127794/forward-local-port-or-socket-file-to-remote-socket-file
