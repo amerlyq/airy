@@ -2,9 +2,9 @@
 # TEMP: always singleton : pidfile is mandatory and always locked
 
 # USAGE: [f]=pidfile [p]=cmdpath [k]=kill_locked [n]=new-instance [w]=with-singleton
-# USAGE:DFL: = singleton daemon
-# [o]=only_instance [s]=singleton
-opts=; while getopts 'hf:knpw' o; do case $o
+# DFL: singleton daemon
+# THINK: [o]=only_instance [s]=singleton
+opts=; while getopts 'hf:p:knw' o; do case $o
 in :|'?') exit 1
 ;; h) exec grep '^# USAGE:' "$0"
 ;; f) pidfile=$OPTARG
@@ -20,9 +20,9 @@ has n && exec "$exe/daemon-run" "$pidfile" "$@"
 
 if has w; then
   for((i=1;i<=$#;++i)); do [[ ${!i} == -- ]] && break; done
-  "$exe/daemon-singleton" "$pidfile" "${@:1:i-1}"
+  "$exe/daemon-singleton" "$pidfile" "$exe/daemon-run" "$pidfile" "${@:1:i-1}"
   # <= running daemon must be guaranteed here
   exec "${@:i+1}"
 fi
 
-exec "$exe/daemon-singleton" "$pidfile" "$@"
+exec "$exe/daemon-singleton" "$pidfile" "$exe/daemon-run" "$pidfile" "$@"

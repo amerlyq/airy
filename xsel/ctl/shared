@@ -30,21 +30,22 @@ kill_cmd=( daemonize -kf "$pidfile" -p '/usr/bin/socat' )
 
 has a && exec "$exe/auto"
 # NOTE:(-x): run no-fork server if no daemon server is running yet
-has s && exec flock -xnE13 "$pidfile" "${srvcmd[@]}"
+has s && exec flock -xonE13 "$pidfile" "${srv_cmd[@]}" "$@"
 # NOTE:(-s): allow to kill daemon even when session is active, but skip if started onexit()
-has k && exec flock -snE13 "$lock" "${killcmd[@]}"
+has k && exec flock -sonE13 "$lock" "${kill_cmd[@]}"
 # NOTE:(-x): kill only wild daemon w/o any session attached
-has K && exec flock -xnE13 "$lock" "${killcmd[@]}"
+has K && exec flock -xonE13 "$lock" "${kill_cmd[@]}"
 
 # NOTE: exclusive lock to kill daemon only after last session shared lock released
-onexit(){ flock -xnE13 "$lock" "${killcmd[@]}" || (($?==13)); }
+onexit(){ flock -xonE13 "$lock" "${kill_cmd[@]}" || (($?==13)); }
 trap 'onexit' HUP QUIT TERM INT ERR
 
 # NOTE: shared lock per each instance of <cmd> with daemon server resurrection inside
 # CHECK: daemon called each time -- because lock removed after server creation
-flock -sw5 "$lock" \
+flock -osw5 "$lock" \
   daemonize -wf "$pidfile" -- \
-    "${srvcmd[@]}" -- "$@"
+    "${srv_cmd[@]}" -- \
+    ${@+flock -sFnE15 "$lock" "$@"}
 
 onexit
 

@@ -1,7 +1,9 @@
 #!/bin/sh -eu
 # NOTE: dif soc for loc and rem to ssh localhost or transit hosts
 loc=${TMPDIR:-/tmp}/xsel-shared.local
-rem=/tmp/xsel-shared.remote  # BAD: can't determine value of remote TMPDIR
+rem='127.0.0.1:2224'
 
 # ATT: ssh returns code of last executed cmd at remote host
-exec r.xsel-shared -L "$loc" -- ssh -R "$rem:$loc" "$@"
+exec r.xsel-shared -L "$loc" -- \
+  ssh -R "$rem:$loc" \
+  "$@"

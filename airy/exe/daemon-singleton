@@ -9,7 +9,7 @@ pidfile=$1; shift
 
 # HACK: inherited eternal lock for singleton daemon (until daemon explicitly killed)
 flock -xFnE13 "$pidfile" \
-  daemonize -f "$pidfile" -- "$@" \
+  "$@" \
 || exit $(($?==13 ? 0 : $?))
 
 # FIXME:NEED:(racing): wait until daemon cmd _fully_ started before releasing lock

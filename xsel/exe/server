@@ -1,9 +1,10 @@
 #!/bin/sh -eu
 socket=$1
 process=$2
+shift 2
 # TRY: 'UNIX-L:..,unlink-early' if not removed after server shutdown
 # TRY: 'EXEC:..,end-close' with 'xsel --nodetach'
-exec socat -4 UNIX-LISTEN:"$socket",fork EXEC:"$process"
+exec socat -4 "$@" UNIX-LISTEN:"$socket",fork EXEC:"$process"
 # exec socat -4u TCP-L:"$port",reuseaddr,fork EXEC:"$process"
 # ALT:(socat) nc -l "$host" "$port" | xsel -i -b
 

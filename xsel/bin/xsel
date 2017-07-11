@@ -1,15 +1,22 @@
 #!/bin/bash -eu
 # USAGE: supports: -i/-o, enforces: -b, ignores: -p/-s/--nodetach ALSO: [L]=socket
 #   == r.xsel = remote wrapper over xsel
-socket=/tmp/xsel-shared.remote  # single bidirectional unix-domain socket
+[[ -z ${DISPLAY-} && -n ${SSH_CONNECTION-} ]] || exec /usr/bin/xsel "$@"
+# DEV: SCHROOT_CHROOT_NAME
+
+## BAD: using dynamic port, can't get value of random port choosen
+#   http://blog.wrouesnel.com/articles/SSH%20port%20forwarding%20when%20AllowTCPForwarding%20is%20disabled/
+#   $ socat TCP-LISTEN:<local port>,reuseaddr,fork "EXEC:ssh <server> nc localhost <remote port>"
+# read -r _ rport _ _ <<< "$SSH_CONNECTION"
 
 # CHECK: maybe 'nc -4dz' has slow timeout when starting on cold system
 #   => first launch neovim after freemem is too slow
-test -z "${DISPLAY-}" \
-&& test -n "${SSH_TTY-}" \
-&& nc -4 -dzU "$socket" \
-|| exec /usr/bin/xsel "$@"
-# DEV: SSH_TTY or SCHROOT_CHROOT_NAME
+socket='127.0.0.1:2224'
+
+# BUG:(StreamLocalBindUnlink): can't auto-remove remote unix-domain socket
+# single bidirectional unix-domain socket
+# socket=/tmp/xsel-shared.remote.$rport
+
 
 choices=iobps
 opts=; while getopts "hL:${choices}-" o; do case $o
@@ -20,11 +27,16 @@ in :|'?') echo "xsel wrapper limited to \$ xsel -$choices"; exit 1
 ;; *) exit 1 ;; esac; shift; OPTIND=1; continue
 esac; opts+=$o; done; shift $((OPTIND - 1))
 
+nc -4 -dz "${socket%:*}" "${socket##*:}" || exec /usr/bin/xsel "$@"
+# [[ -S $socket ]] || exec /usr/bin/xsel "$@"
+
+
 # NOTE: no need to 'flock' transmission
 #   => remote socat will create two different xsel
 #   => whoever last ends transmission -> will be first in clipboard history
 # ALT: nc -4 [-c|-w0] -U "$socket"
-cmd=( socat -4t0 - "UNIX-CLIENT:$socket" )
+# cmd=( socat -4t0 - "UNIX-CLIENT:$socket" )
+cmd=( socat -4t0 - "TCP:$socket" )
 
 if [[ $opts =~ i && $opts =~ o ]]; then
 # NOTE: if both -i/-o => return curr value before assign
