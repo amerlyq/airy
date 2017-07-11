@@ -4,5 +4,8 @@ pidfile=$1; shift
 (($#)) || exit 2
 cd /      # HACK: unblock pwd mounting
 # setsid  # SEE: https://stackoverflow.com/questions/3430330/best-way-to-make-a-shell-script-daemon#
-nohup "$@" 0<&- &>/dev/null & disown -r
+# ATT:BUG:(0<&-): socat won't accept input with closed stdin, BET: redirect to /dev/null
+exec </dev/null
+exec &>/dev/null
+nohup "$@" & disown -r
 echo "$!" > "$pidfile"
