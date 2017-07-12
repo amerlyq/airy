@@ -1,12 +1,10 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: net
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-dir=~/.imapfilter
-linkcp -t "$dir" config.lua
-chmod 700 "$dir"
+dir=~/.config/imapfilter
+linkcp -t "$dir" cfg && chmod 700 "$dir"
 
-### GENS ###
-./acc.gen
-# USE:CHECK: lua config.lua
+dfl=$dir/acc/${MUTT_DEFAULT-}.lua
+! [[ -f $dfl && -s $dfl ]] || linkcp "$dfl" "$dir/config.lua"

@@ -1,0 +1,41 @@
+SEE
+  http://iranzo.github.io/blog/2015/08/28/filtering-email-with-imapfilter/
+  http://pcre.org/original/doc/html/
+
+DEBUG
+  $ lua config.lua
+
+DEV
+  USE:DEBUG: get and print available mailboxes and folders
+    accs[1].INBOX:check_status()
+    mboxes, folders = acc:list_all()
+    table.foreach(mboxes, print)
+    table.foreach(folders, print)
+  BUG: despite right order inside config.lua :: table is sorted by keys
+     accs = {}
+     table.insert(accs, '$id')
+     $id = IMAP { .. }
+
+  Select all messages marked as spam and throw them away
+    msgs = account1.INBOX:match_header('^.+MailScanner.*Check: [Ss]pam.*$')
+    account1.INBOX:delete_messages(msgs)
+
+  [_] FIND: how to recursively select in Inbox/**
+    ALT: list all subdirs and compose total in cycle
+
+  Move sent messages to INBOX to later sorting
+    FIND: how to keep messages both in 'Sent' and some other topical subdir of Inbox?
+      sent = acc['Sent']:select_all()
+      sent:move_messages(acc['INBOX'])
+
+  Spam
+    spam = todos:contain_field('X-Spam-Score','*****')
+    spam:move_messages(acc['Spam'])
+
+
+NEED:(pending) create online rules on server
+  All emails from case updates, bugzilla, etc to _pending
+  All emails containing ‘list’ or ‘bounces’ in from to _pending
+  All emails not containing me directly on CC or To, to _pending
+  pending = acc['INBOX/_pending']:select_all()
+  todos = pending + inbox -- USE todos everywhere next

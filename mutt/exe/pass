@@ -23,7 +23,7 @@ pass=$2
 path=~/.cache/airy/gpg/mutt.gpg
 if [[ -z $pass && -s $path ]]; then
   pass=$(gpg --use-agent --quiet --batch --decrypt "$path" \
-    | awk -vk="\\\y$key\\\y" '$1~k{print$NF;exit}')
+    | grep -Fm1 "$key" | awk '{print$NF}')
 fi
 
 if [[ -z $pass ]]; then
