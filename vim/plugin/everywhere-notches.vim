@@ -61,14 +61,14 @@ let g:everywhere_activated = 1
 " I.A. inter alia (~ among other things)
 " VIZ. videlicet (~ precisely: implies (near) completeness)
 let s:patterns = {
-      \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|FAIL%(ED)|CRIT%(ICAL)?'],
+      \ 'Err': [196, "#ff2525", 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|FAIL%(ED)?|CRIT%(ICAL)?'],
       \ 'Add': [ 76, "#5faf00", 'ADD|SEE|READ|REF|TUT|BLOG|NEED|FIND|ALSO|BET%(TER)?|E\.G'],
-      \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|CMP|I\.E|EXAM%(INE)'],
+      \ 'Alt': [178, "#dfaf00", 'ALT|OR|CASE|THINK|IDEA|CHG|CMP|I\.E|EXAM%(INE)?'],
       \ 'Dev': [ 33, "#0087ff", 'DEV|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECIDE'],
       \ 'Tbd': [169, "#ff5faf", 'TODO|CHECK|TRY|MOVE|NOT|REQ%(UIRE)?|MAYBE'],
-      \ 'Inf': [ 38, "#00afdf", 'INFO?|VAR|VIZ'],
+      \ 'Inf': [ 38, "#00afdf", 'INFO?|VAR|VIZ|ALG'],
       \ 'Fix': [202, "#ff5f00", 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
-      \ 'Did': [243, "#767676", 'DONE|FIXED|EXPL%(AIN)?|TEMP'],
+      \ 'Did': [243, "#767676", 'DONE|FIXED|EXPL%(AIN)?|TEMP|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?'],
       \ 'Msg': [ 62, "#5f5fdf", 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|DEP%(ENDS)?'],
       \ }
 
