@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# BET:USE: for kernel -- current single arch only
+# https://stackoverflow.com/questions/934233/cscope-or-ctags-why-choose-one-over-the-other
+# http://cscope.sourceforge.net/large_projects.html
+#   $ make tags
+#   $ make cscope
+
 EFL=.ctags_exclude
 > "$EFL"
 printf "drivers/*\nsound/*\ntags\n" >> "$EFL"

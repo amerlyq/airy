@@ -32,6 +32,11 @@ if _has_pr nvim; then
   esac
 fi
 
+# NOTE: server mode from inside :terminal
+if _has_pr nvim && _has_pr nvr && [[ -n ${NVIM_LISTEN_ADDRESS-} ]]; then
+  exec nvr "$@"
+fi
+
 # EXPL: run vim if there are no 'nvim'
 for pr in nvim vis vim vi; do
   _has_pr "$pr" && exec "$pr" "$@"
