@@ -40,6 +40,16 @@ Ubuntu
 Disk monitor
   https://dev.yorhel.nl/ncdu
     https://github.com/guns/ncdu
+  sar, atsar, sysstat (sar)
+  dstat
+    http://dag.wieers.com/home-made/dstat/
+  $ sudo cat /proc/diskstats  # OR watch
+  iostat
+
+Configuring sysstat
+If you want to run sysstat periodicaly, then you should add the content of the
+/opt/share/doc/sysstat-*/sysstat.crond to your crontab, and then restart crond
+(run /etc/rc.d/rc.crond on unslung)
 
 
 UEFI Boot Windows by shortcut

@@ -4,6 +4,7 @@
 # NEED: filter-out pre-installed deps and pacstrap:
 #   base base-devel yaourt
 #   ?: sudo grub os-prober ntp lvm2 polkit
+# ALSO: search pkg bloats $ pacgraph
 
 [[ ${1-} == -r ]] && { reset=1; shift; } || reset=0
 tmp=/tmp/pkgs.txt
