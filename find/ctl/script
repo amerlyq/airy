@@ -1,13 +1,18 @@
 #!/bin/sh -eu
 # WARN: some scripts may not have shebang => sourced in scripts or used as configs
 # USAGE:
-#   ./$0 -- any shebang, all script names
-#   ./$0 . 'perl' -- shebangs with concrete interpreter
-#   ./$0 . '' 'patt' -- grep patt in any shebang
-#   ./$0 . 'perl' 'patt' -- grep patt in specific shebang
+# any shebang, all script names
+#  $ ./$0
+# shebangs with concrete interpreter
+#  $ ./$0 . 'perl'
+# grep patt in file with any shebang
+#  $ ./$0 . '' 'patt'
+# grep patt in file with specific shebang
+#  $ ./$0 . 'perl' 'patt' VQ
+# ----------
 (($#)) && dir=$1 && shift
 (($#)) && interp=${1:+\\b$1\\b} && shift
-(($#)) && set -- -exec ag --vimgrep "$@" {} \; || set -- -print
+(($#)) && set -- -exec ag --vimgrep "$@" -- {} \; || set -- -print
 # BUG: grep #! in all lines instead of only first line
 #   BET: | parallel '[[ $(head -c2 {}) == "#!" ]] && echo "{}"'
 exec find "${dir-.}" -type f -executable -exec grep -qm1 "^#!.*${interp-}" {} \; "$@"

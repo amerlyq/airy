@@ -4,8 +4,9 @@ set -o pipefail
 # Так же вести себя и с пулом -- прошёл успешно если чистый или нужен коммит,
 # стэш, merge итп -- парсить и заменять на значки
 cd "${1:-$PWD}"
+# ATT:(-j1): -- gpg-agent can't decrypt keys in-time
 exec r.git-find | r.git-freeze ${2+"$2"} \
-  | parallel -0 -j1 -k '
+  | parallel -0 -k '
   echo && r.git-status {} &&
   git-up {} 2>&1 &&
   r.git-status {} && echo'
