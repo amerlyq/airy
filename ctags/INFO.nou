@@ -1,0 +1,80 @@
+REF
+  http://charlesmartinreid.com/wiki/Ctags
+  http://design.liberta.co.za/articles/code-completion-intellisense-for-cpp-in-vim-with-omnicppcomplete/
+  http://stackoverflow.com/questions/2825464/generating-a-reasonable-ctags-database-for-boost
+
+Tools to create tag files for diff langs
+  http://vim.wikia.com/wiki/Browsing_programs_with_tags
+  http://www.thegeekstuff.com/2009/04/ctags-taglist-vi-vim-editor-as-sourece-code-browser/
+
+
+%%% ctags
+
+% Large codebase % (kernel, boost)
+  * prefer default "-f" over "-x" human-readable format
+    => use "--filter=yes" for pipes processing
+  * remove excessive extended fields to reduce db size
+    ~ depends on usecase
+  * use relative symlinked path to codebase
+  * prefer "-n|--excmd=number" for readonly (rarely changed) codebase
+
+  $ ctags -R --excmd=number --c++-kinds=+p --fields=+iaS --extra=+q -f ~/tmp/vim/uitags /usr/include
+  $ apt-file list boost | grep -E -o '/usr/include/.*\.(h|hpp)' | grep -v '/usr/include/boost/typeof/' > ~/.vim/tags/boost-filelist
+  $ ctags --sort=foldcase --c++-kinds=+p --fields=+iaS --extra=+q -f ~/.vim/tags/boost -L ~/.vim/tags/boost-filelist
+  # ctags-exuberant --verbose --recurse --excmd=number --sort=foldcase --tag-relative --fields=+nS --exclude=@"$EFL"
+
+% LIOR
+| -I macro[+|=chg]   | skipping/replacing identifiers
+| -n|--excmd=number  | best for readonly codebase (kernel, glibc, boost)
+|    --sort=foldcase | ignore case when sorting
+|    --tag-relative  | src path relative to 'tags' file
+| --language-force=c | find files -- force type to process wrong extensions
+| ________________  /
+| --extra=f | tag+ | each src basename //example.c pointing to line :1
+|        =q | tag+ | 'class::member' beside simply 'member' BUT twice the size of tags db
+| ________________ |
+| --fields=afkmsSt | reasonable maxi-set of extension fields
+|         =+Kz     | too verbose and only increase db size in vain
+|         =+iln    | needless info, especially +n
+
+Format
+  STD: total db
+    $ ... | ctags -L- -f- | ...
+    | tag_name <Tab> file_name <Tab> ex_cmd;" <Tab> extension_fields
+  STD: per file
+    $ ... | ctags --filter=yes --filter-terminator=$'===EOT===\n' | ...
+      + markers between file-related syms
+      + syms sorted per file
+      + no need for '-L-'
+      + ignores '-f/-o'
+  BAD: space separated
+    $ ... | ctags -xL- | ...
+    | tag  kind  lnum  file  srcline
+      * ignores -f/--filter
+
+
+TODO
+  [_] CHECK:(inotify):BAD: always creates tempfile :: -f / -x / --files
+    => replace by direct -f "c.tags"
+  [_] CHECK: --c++-kinds=p => will list or not functions w/o prototypes (test on *.c)
+  [_] ALSO: check if ctags supports double-quoted file names inside *.files (to use the same file with cscope)
+
+
+%%% cscope
+REF
+  2017-07-13 [X] TUT http://cscope.sourceforge.net/large_projects.html
+  http://odellconnie.blogspot.com/2012/07/free-c-software-call-graph-generators.html
+  https://en.wikipedia.org/wiki/Call_graph
+  http://www.toolchainguru.com/2011/03/c-calltrees-in-bash-revisited.html
+  https://sites.google.com/site/vimcctree/ccglue
+  http://stackoverflow.com/questions/3828157/how-to-use-cscope
+
+INFO
+  OBSOLETE: $ export CSCOPE_DB=/my/db/cscope.out
+    ::: USE:(-qf /my/db/cscope.out) +++ has refs to cscope.{in,po}.out
+
+
+%%% gtags
+  $ gtags
+  [_] THINK:SEE: GNU Global -- instead of ctags?
+    https://www.gnu.org/software/global/

@@ -2,9 +2,8 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  # THINK:SEE gtags (GNU Global) -- instead of ctags?
   pkg_inst ctags cscope
-  aur_inst global  # https://www.gnu.org/software/global/
+  aur_inst global
   loc_inst -P 'ccglue-airy-git' ./PKGBUILD
 
 elif distro ubuntu; then
