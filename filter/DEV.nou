@@ -1,11 +1,23 @@
 DEV
   [_] filter: path-compact
 
+  [_] filter: path-relocate
+  https://stackoverflow.com/questions/2564634/convert-absolute-path-into-relative-path-given-a-current-directory-using-bash
+    DFL: use $PWD as base dir
+    ~ (-a) make all paths relative to base dir unconditionally
+      BUT:BAD: makes unrelated paths longer
+    ~ relocate only if possible (makes shorter == path starts with base)
+      support multiple bases as args => for each respective matching path
+    * reverse operation == make full paths
+      add $PWD or list of respective base dirs $ ... [ -b /match/base_dir .. ]
+    * derive minimally possible common base path before stripping
+      BAD: wait until full list available
+
   !4 [_] filter: path-cleanup
     * DFL: strip any single matching path prefix
     * (-r) strip all prf recursively per each path
     * (empty) strip $PWD
-    ? (-l) strip prf as-is and any form of readlink path
+    ? (-l) strip prf as-is and any form of readlink path for symlinks
     ? (-/) strip only './' prefix
     USAGE: $ ... | $0 [<path_prf>..]
       ./current_dir/path/file => path/file
