@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+exec r.fs-watch --recursive /tmp \
+| grep --line-buffered -vE "${TMPDIR:-/tmp}/(copyq|nvim|ranger|zsh)"
