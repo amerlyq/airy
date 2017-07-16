@@ -1,6 +1,11 @@
 DEV
   [_] filter: path-compact
 
+  [_] filter: path-quoting
+    * space-escaping
+    * single/double qoutes
+    * full shell-escaping
+
   [_] filter: path-relocate
   https://stackoverflow.com/questions/2564634/convert-absolute-path-into-relative-path-given-a-current-directory-using-bash
     DFL: use $PWD as base dir
@@ -12,6 +17,9 @@ DEV
       add $PWD or list of respective base dirs $ ... [ -b /match/base_dir .. ]
     * derive minimally possible common base path before stripping
       BAD: wait until full list available
+    * relocate to concrete symlink
+      - readlink it and replace whole beginning if match
+      - ALSO: strip current base dir -- if requested
 
   !4 [_] filter: path-cleanup
     * DFL: strip any single matching path prefix

@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+# DEV: use perl-only
+
+ln=$1
+
+exec perl -wslpe '
+  $_=join("",$r,substr($_,length$d)) if (index($_,$d)==0)
+  ' -- -d="$(readlink -e "$ln")" -r="$ln"
+# WARN: mixed symlink resolving and base dir stripping
