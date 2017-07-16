@@ -7,6 +7,16 @@ Tools to create tag files for diff langs
   http://vim.wikia.com/wiki/Browsing_programs_with_tags
   http://www.thegeekstuff.com/2009/04/ctags-taglist-vi-vim-editor-as-sourece-code-browser/
 
+%%% universal-ctags
+|aur/universal-ctags-git|
+
+BET: maintained, rewritten parser, more langs
+  https://github.com/universal-ctags/ctags
+  https://github.com/universal-ctags/ctags-xparsers
+
+REF
+  http://docs.ctags.io/en/latest/news.html
+
 
 %%% ctags
 
@@ -38,26 +48,57 @@ Tools to create tag files for diff langs
 |         =+iln    | needless info, especially +n
 
 Format
-  STD: total db
-    $ ... | ctags -L- -f- | ...
-    | tag_name <Tab> file_name <Tab> ex_cmd;" <Tab> extension_fields
-  STD: per file
+  STD(-f) total db
+   || tag_name <Tab> file_name <Tab> ex_cmd;" <Tab> extension_fields ||
+    $ ... | ctags -L- -f /my/tags $ BET: no tempfiles
+    $ ... | ctags -L- -f- | ...   $ BAD: tempfile (single)
+  STD(--filter) db per file
     $ ... | ctags --filter=yes --filter-terminator=$'===EOT===\n' | ...
-      + markers between file-related syms
+      !! BAD: multiple tempfiles (per each input file) $ r.watch-tmp
+        NOTE:(-u|--sort=no): no effect on number of tempfiles
       + syms sorted per file
-      + no need for '-L-'
-      + ignores '-f/-o'
-  BAD: space separated
-    $ ... | ctags -xL- | ...
-    | tag  kind  lnum  file  srcline
-      * ignores -f/--filter
+      + marker after each file syms
+      * ignores '-f/-o/-L-'
+  BAD(-x) space separated fields => indistinguishable from path with spaces
+   || tag  kind  lnum  file  srcline ||
+    $ ... | ctags -xL- | ... $ BAD: tempfile (single)
+      * ignores '-f/--filter'
+
+Kinds
+$ ctags --c++-kinds=cdefglmnpstuvx
+  !!! WARN !!!
+    ! global-scope for anything in *.h (even with static)
+    ! any global (v/x) inside namespaces treated as _members_
+  Functions
+    (p) only prototypes w/o body -- file-scope for all in *.c, *.cpp
+      + member-functions declarations, defined outside the class
+      !! ignores templated funcs defined in headers in-place
+    (f) any function / method
+      = file-scope for static funcs in *.c, *.cpp, methods defined inside class/struct
+      = global for methods defined outside of class E.G. (int A::f(){})
+  Data
+    (v) global var (or extern var with value) -- BUT not in namespace
+    (m) data members only -- vars defined inside class/struct/union
+    (e) values inside enum { 'VAL1', ... }
+    (x) external data w/o value -- global scope (extern int v;)
+      ? WTF forward variable declarations
+    (l) local vars (unreliable)
+  Types
+    (d) #define MD / MF() -- file-scope
+    (c/g/n) class/enum/namespace itself  ... 'Name' { ... }
+    (s/u) both 'struct/union ... {}' and 'typedef struct/union {}'
+    (t) only typedef -- duplicated entry for composite 'typedef struct/union ...'
 
 
-TODO
-  [_] CHECK:(inotify):BAD: always creates tempfile :: -f / -x / --files
-    => replace by direct -f "c.tags"
-  [_] CHECK: --c++-kinds=p => will list or not functions w/o prototypes (test on *.c)
-  [_] ALSO: check if ctags supports double-quoted file names inside *.files (to use the same file with cscope)
+INFO
+  BAD: output to /dev/stdout always creates tempfiles $ r.watch-tmp
+  WARN: templated/static functions treated as regular ones
+    (<template T> static int f() {}) => (int f() {})
+  ATT: verbatim path format for '-L'
+    * !unsupported! escaped spaces by backslash
+    * !unsupported! single/double quoted paths
+      => can't use the same *.files with 'cscope'
+  NOTE: for C++11/14/17 use 'universal-ctags', as 'ctags' is no more maintained
 
 
 %%% cscope
@@ -72,6 +113,10 @@ REF
 INFO
   OBSOLETE: $ export CSCOPE_DB=/my/db/cscope.out
     ::: USE:(-qf /my/db/cscope.out) +++ has refs to cscope.{in,po}.out
+  [_] TRY: use only 'cscope' => to retrieve syms per api file instead of 'ctags'
+  [_] FIND: how looks like paths with spaces in results of $ cscope -qdL3 'function'
+    = does them have quotes around path ?
+    ! necessary to choose column by awk
 
 
 %%% gtags
