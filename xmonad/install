@@ -10,17 +10,18 @@ if distro arch; then
   pkg_inst xmonad xmonad-contrib
   pkg_inst wmctrl
 
-  # OR: pkg_inst xmobar
-  # pkg_inst 'haskell-unordered-containers'
-  [[ -d ~/.cabal/bin ]] || echo "Err: Re-login session to add ~/.cabal/bin/xmobar into PATH"
-  pkg_inst --asdeps libxpm
+  pkg_inst xmobar
 
+  # OR:WARN:TEMP: broken cabal after transition static->dynamic
+  # pkg_inst 'haskell-unordered-containers'
+  # [[ -d ~/.cabal/bin ]] || echo "Err: Re-login session to add ~/.cabal/bin/xmobar into PATH"
+  # pkg_inst --asdeps libxpm
   # OR:(install by yaourt): ayr_inst haskell-libmpd
   #   remove bytestring, containers, filepath, time
-  cab_inst -d {~/.cabal/packages/hackage.haskell.org/,}libmpd
-  cab_inst -p 'xmobar' xmobar \
-    --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
-  mod_have xmobar
+  # cab_inst -d {~/.cabal/packages/hackage.haskell.org/,}libmpd
+  # cab_inst -p 'xmobar' xmobar \
+  #   --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
+  # mod_have xmobar
 
 elif distro ubuntu; then
   pkg_inst xmonad xmonad-contrib

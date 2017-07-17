@@ -2,7 +2,10 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst neovim gvim  # necessary for 'xxd'
+    pkg_inst neovim
+    # aur_inst neovim-git
+
+    pkg_inst gvim  # necessary for 'xxd'
     # ALT:(gvim):
     # aur/xxd-standalone
     # aur/go-xxd

@@ -27,4 +27,5 @@ zcd=$zdir/.zcompdump
 if [[ -s $zcd && (! -s ${zcd}.zwc || $zcd -nt ${zcd}.zwc) ]]
 then zcompile $zcd; fi
 
-[[ -s ~/.config/airy/aliases ]] && zcompile ~/.config/airy/aliases
+# BAD: it must be compiled only after all mods were setup
+# [[ -s ~/.config/airy/aliases ]] && zcompile ~/.config/airy/aliases
