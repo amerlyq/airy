@@ -1,0 +1,83 @@
+pkgname=st-airy-git
+_pkgname=st
+pkgver=0.7.9
+pkgrel=1
+pkgdesc='Simple virtual terminal emulator for X'
+url='http://st.suckless.org/'
+arch=('i686' 'x86_64')
+license=('MIT')
+options=('zipman')
+depends=('libxft')
+makedepends=('ncurses' 'libxext' 'git')
+epoch=2
+
+# include config.h and any patches you want to have applied here
+#   E.G. http://st.suckless.org/patches/st-$pkgver-argbbg.diff
+#   E.G. cfg/config.patch
+source=('git://git.suckless.org/st'
+  # 'http://st.suckless.org/patches/st-alpha-20170509-5a10aca.diff'
+  # 'http://st.suckless.org/patches/st-solarized-both-20170626-b331da5.diff'
+  'http://st.suckless.org/patches/st-hidecursor-20170404-745c40f.diff'
+  # 'http://st.suckless.org/patches/st-no_bold_colors-20160727-308bfbf.diff'
+  # 'http://st.suckless.org/patches/st-solarized-dark-20160727-308bfbf.diff'
+)
+sha256sums=('SKIP'
+  'SKIP'
+  # 'SKIP'
+  # 'SKIP'
+  # '5c6269ec840e3103bab018006859c1ac1220d13fda59b8f96b75aa898e5eee52'
+)
+# source=(http://dl.suckless.org/st/$appname-$pkgver.tar.gz
+# sha256sums=('f7870d906ccc988926eef2cc98950a99cc78725b685e934c422c03c1234e6000'
+#         '2e8cdbeaaa79ed067ffcfdcf4c5f09fb5c8c984906cde97226d4dd219dda39dc'
+#         '4782f52c4147a352579586c1b066f9fd1da934e580cbd3b78943f058394d9883')
+
+provides=("${_pkgname}")
+conflicts=("${_pkgname}")
+
+pkgver() {
+  cd "${_pkgname}"
+  git describe --tags | sed 's/-/./g'
+}
+
+prepare() { local f
+  cd "${_pkgname}"
+  # patch -p1 -i $srcdir/../st-$pkgver-argbbg.diff
+
+  # sed -i '
+  #   /char font/s/= .*/= "Fixed:pixelsize=13:style=SemiCondensed";/
+  #   /char worddelimiters/s/= .*/= " '"'"'`\\\"()[]{}<>|";/
+  #   /int defaultcs/s/= .*/= 1;/
+  #   ' config.def.h
+  # sed -i '
+  #   s/CPPFLAGS =/CPPFLAGS +=/g
+  #   s/CFLAGS =/CFLAGS +=/g
+  #   s/LDFLAGS =/LDFLAGS +=/g
+  #   s/_BSD_SOURCE/_DEFAULT_SOURCE/
+  #   ' config.mk
+
+  for f in "${source[@]}"; do
+    if [[ $f == *.diff || $f == *.patch ]]; then
+      # NOTE: apply all patches
+      patch -Np1 -i "$srcdir/$(basename "$f")"
+    elif [[ $f == config.h ]]; then
+      # NOTE: user's config.h as-is
+      cp "$srcdir/$f" .
+    fi
+  done
+
+  ## SKIP terminfo: /usr/share/terminfo/s/st is owned by ncurses 6.0-4
+  sed -i '/\@tic\s/d' Makefile
+}
+
+build() {
+  cd "${_pkgname}"
+  make X11INC=/usr/include/X11 X11LIB=/usr/lib/X11
+}
+
+package() {
+  cd "${_pkgname}"
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 README "${pkgdir}/usr/share/doc/${pkgname}/README"
+}

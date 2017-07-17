@@ -6,6 +6,8 @@ source ~/.shell/func.d/packages
 #| dvtm   | tmux-like dwm-adhere split/tiling management
 
 if distro arch; then
+  # loc_inst -P 'st-airy-git' ./PKGBUILD
+
   src=${CURR_DIR_PKG:?}/st
   [[ -d $src ]] || git clone "https://github.com/amerlyq/st" "$src"
   # THINK:BUG: can't catch errors
