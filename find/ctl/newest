@@ -1,6 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 set -o pipefail
 exec find "${2:-.}" \
-  -regextype egrep -regex ".*/${1:?}" \
-  -printf '%T@ %f\n' \
+  ${3+-mindepth 1 -maxdepth "$3"} \
+  -regextype egrep -regex ".*/$1" \
+  -printf '%T@ %p\n' \
 | LC_ALL=C sort -rnk1 | sed 's/^\S\+\s\+//;q'
