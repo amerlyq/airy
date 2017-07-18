@@ -1,0 +1,104 @@
+diff --git i/config.def.h w/config.def.h
+index 877afab..12f42b4 100644
+--- i/config.def.h
++++ w/config.def.h
+@@ -20,6 +20,15 @@ static char shell[] = "/bin/sh";
+ static char *utmp = NULL;
+ static char stty_args[] = "stty raw pass8 nl -echo -iexten -cstopb 38400";
+ 
++/* Multiplexer wrapper */
++int use_mux = 1;
++char mux_nm[64];
++char *mux_new[] = {"/usr/bin/tmux", "new-session", "-s", NULL, "--"};
++char mux_post[] =
++	"tmux list-clients -t \"$MUX_NM\" 2>/dev/null"
++	"| { read -r _ && ! read -r _; }"
++	"&& tmux kill-session -t \"$MUX_NM\"";
++
+ /* identification sequence returned in DA and DECID */
+ static char vtiden[] = "\033[?6c";
+ 
+diff --git i/st.c w/st.c
+index ae93ade..11a37d8 100644
+--- i/st.c
++++ w/st.c
+@@ -708,6 +708,16 @@ execsh(void)
+ 	signal(SIGTERM, SIG_DFL);
+ 	signal(SIGALRM, SIG_DFL);
+ 
++	if (use_mux) {
++		int i = sizeof(mux_new)/sizeof(mux_new[0]), j = 0;
++		while(args[j++]);
++		char *margs[i + j];
++		while(j--) { margs[i + j] = args[j]; }
++		while(i--) { margs[i] = mux_new[i] ? mux_new[i] : mux_nm; }
++		execvp(mux_new[0], margs);
++		_exit(1);
++	}
++
+ 	execvp(prog, args);
+ 	_exit(1);
+ }
+@@ -2691,7 +2701,7 @@ usage(void)
+ 	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
+ 	    " [-n name] [-o file]\n"
+ 	    "          [-T title] [-t title] [-w windowid]"
+-	    " [[-e] command [args ...]]\n"
++	    " [-m|-M] [[-e] command [args ...]]\n"
+ 	    "       %s [-aiv] [-c class] [-f font] [-g geometry]"
+ 	    " [-n name] [-o file]\n"
+ 	    "          [-T title] [-t title] [-w windowid] -l line"
+diff --git i/st.h w/st.h
+index 44d4938..c47ea35 100644
+--- i/st.h
++++ w/st.h
+@@ -239,6 +239,10 @@ extern double defaultfontsize;
+ /* config.h globals */
+ extern char font[];
+ extern int borderpx;
++extern int use_mux;
++extern char mux_nm[64];  /* BAD: ugly duplication */
++extern char *mux_new[];
++extern char mux_post[];
+ extern float cwscale;
+ extern float chscale;
+ extern unsigned int doubleclicktimeout;
+diff --git i/x.c w/x.c
+index fbfd350..e56f35e 100644
+--- i/x.c
++++ w/x.c
+@@ -1573,6 +1573,11 @@ cmessage(XEvent *e)
+ 			win.state &= ~WIN_FOCUSED;
+ 		}
+ 	} else if (e->xclient.data.l[0] == xw.wmdeletewin) {
++		if (use_mux) {
++			setenv("MUX_NM", mux_nm, 1);
++			if (system(mux_post) != 0)
++				fprintf(stderr, "mux_post execution error\n");
++		}
+ 		/* Send SIGHUP to shell */
+ 		kill(pid, SIGHUP);
+ 		exit(0);
+@@ -1732,6 +1737,12 @@ main(int argc, char *argv[])
+ 	case 'l':
+ 		opt_line = EARGF(usage());
+ 		break;
++	case 'm':
++		use_mux = 1;
++		break;
++	case 'M':
++		use_mux = 0;
++		break;
+ 	case 'n':
+ 		opt_name = EARGF(usage());
+ 		break;
+@@ -1756,6 +1767,9 @@ run:
+ 		if (!opt_title && !opt_line)
+ 			opt_title = basename(xstrdup(argv[0]));
+ 	}
++	if (use_mux) {
++		snprintf(mux_nm, sizeof(mux_nm), "%.43s-%d", (opt_name ? opt_name : "st"), getpid());
++	}
+ 	setlocale(LC_CTYPE, "");
+ 	XSetLocaleModifiers("");
+ 	tnew(MAX(cols, 1), MAX(rows, 1));

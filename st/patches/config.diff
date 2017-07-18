@@ -1,0 +1,68 @@
+diff --git i/config.def.h w/config.def.h
+index 877afab..33c2695 100644
+--- i/config.def.h
++++ w/config.def.h
+@@ -5,7 +5,7 @@
+  *
+  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
+  */
+-char font[] = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
++char font[] = "monospace-9.6";
+ int borderpx = 2;
+ 
+ /*
+@@ -107,7 +107,9 @@ const char *colorname[] = {
+ 	[255] = 0,
+ 
+ 	/* more colors can be added after 255 to use with DefaultXX */
+-	"#cccccc",
++	"#839496",  /* FIXED: solarized base0/12 */
++	"#000000",
++	"#eeeeee",
+ 	"#555555",
+ };
+ 
+@@ -116,10 +118,10 @@ const char *colorname[] = {
+  * Default colors (colorname index)
+  * foreground, background, cursor, reverse cursor
+  */
+-unsigned int defaultfg = 7;
+-unsigned int defaultbg = 0;
+-unsigned int defaultcs = 256;
+-unsigned int defaultrcs = 257;
++unsigned int defaultfg = 256;
++unsigned int defaultbg = 257;
++unsigned int defaultcs = 258;
++unsigned int defaultrcs = 259;
+ 
+ /*
+  * Default shape of cursor
+@@ -134,8 +136,9 @@ unsigned int cursorshape = 2;
+  * Default columns and rows numbers
+  */
+ 
+-unsigned int cols = 80;
+-unsigned int rows = 24;
++// Set geometry to keep it when doFloat
++unsigned int cols = 100;
++unsigned int rows = 30;
+ 
+ /*
+  * Default colour and shape of the mouse cursor
+@@ -170,6 +173,7 @@ Shortcut shortcuts[] = {
+ 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
+ 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
+ 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
++	{ TERMMOD,              XK_End,         zoom,           {.f =+10} },
+ 	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
+ 	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
+ 	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
+@@ -178,6 +182,8 @@ Shortcut shortcuts[] = {
+ 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+ 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+ 	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },
++	{ TERMMOD,              XK_U,           externalpipe,   {.v = "r.st-pipe --url"} },
++	{ TERMMOD,              XK_space,       externalpipe,   {.v = "r.st-pipe --vim"} },
+ };
+ 
+ /*

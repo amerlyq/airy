@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/packages
 
 #| st     | suckless terminal -- lacks of all, but very small
@@ -6,15 +6,8 @@ source ~/.shell/func.d/packages
 #| dvtm   | tmux-like dwm-adhere split/tiling management
 
 if distro arch; then
-  # loc_inst -P 'st-airy-git' ./PKGBUILD
-
-  src=${CURR_DIR_PKG:?}/st
-  [[ -d $src ]] || git clone "https://github.com/amerlyq/st" "$src"
-  # THINK:BUG: can't catch errors
-  # TRY: http://unix.stackexchange.com/questions/48533/exit-shell-script-from-a-subshell
-  pkg_inst libxft
-  # BAD: requires password on key -- because it's symlinked on my dev repo
-  if cfgOpt u; then (cd "$src" && git-up && "${0%/*}/run-rebuild"); fi
+  # [[ $FONT_ST ]] || FONT_ST=$(( dpi * 9/72 + 1))
+  loc_inst -P 'st-airy-git' ./PKGBUILD FONT_ST="${FONT_ST-}"
 
   # CHECK? if some needed
   ## reptyr -- attach running pr to a new terminal

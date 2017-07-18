@@ -9,28 +9,19 @@ license=('MIT')
 options=('zipman')
 depends=('libxft')
 makedepends=('ncurses' 'libxext' 'git')
-epoch=2
+epoch=1
 
-# include config.h and any patches you want to have applied here
-#   E.G. http://st.suckless.org/patches/st-$pkgver-argbbg.diff
-#   E.G. cfg/config.patch
 source=('git://git.suckless.org/st'
-  # 'http://st.suckless.org/patches/st-alpha-20170509-5a10aca.diff'
-  # 'http://st.suckless.org/patches/st-solarized-both-20170626-b331da5.diff'
-  'http://st.suckless.org/patches/st-hidecursor-20170404-745c40f.diff'
-  # 'http://st.suckless.org/patches/st-no_bold_colors-20160727-308bfbf.diff'
-  # 'http://st.suckless.org/patches/st-solarized-dark-20160727-308bfbf.diff'
+  no-bold.diff
+  # solarized-both.diff
+  alpha.diff
+  tmux.diff
+  hidecursor.diff
+  externalpipe.diff
+  kbd-input.diff
+  config.diff
 )
-sha256sums=('SKIP'
-  'SKIP'
-  # 'SKIP'
-  # 'SKIP'
-  # '5c6269ec840e3103bab018006859c1ac1220d13fda59b8f96b75aa898e5eee52'
-)
-# source=(http://dl.suckless.org/st/$appname-$pkgver.tar.gz
-# sha256sums=('f7870d906ccc988926eef2cc98950a99cc78725b685e934c422c03c1234e6000'
-#         '2e8cdbeaaa79ed067ffcfdcf4c5f09fb5c8c984906cde97226d4dd219dda39dc'
-#         '4782f52c4147a352579586c1b066f9fd1da934e580cbd3b78943f058394d9883')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 provides=("${_pkgname}")
 conflicts=("${_pkgname}")
@@ -42,6 +33,7 @@ pkgver() {
 
 prepare() { local f
   cd "${_pkgname}"
+  rm -f config.h
   # patch -p1 -i $srcdir/../st-$pkgver-argbbg.diff
 
   # sed -i '
@@ -65,6 +57,8 @@ prepare() { local f
       cp "$srcdir/$f" .
     fi
   done
+
+  [[ -z ${FONT_ST-} ]] || sed -ri '/^static char font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
 
   ## SKIP terminfo: /usr/share/terminfo/s/st is owned by ncurses 6.0-4
   sed -i '/\@tic\s/d' Makefile

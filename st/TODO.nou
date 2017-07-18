@@ -1,3 +1,33 @@
+%% Patches
+http://st.suckless.org/patches
++ no-bold      | don't use bright colors for bolds
++ alpha        | transparent background in compositors
++ tmux         | integration with tmux sessions
++ hidecursor   | hide mouse pointer when typing
++ externalpipe | pipe scroll content to shell cmds
+~ kbd-input    | TEST http://www.leonerd.org.uk/hacks/fixterms/
+ ============= |
+- clipboard    | DEPR: copyq
+- copyurl      | DEPR: externalpipe + xurls
+? delkey       | THINK
+- disable-b-it | UNUSED
+- openbsd      | UNUSED
+~ scrollback   | TRY
+- solarized    | DEPR: nvim/tmux + true_color
+- spoiler      | UNUSED
+- wordbreak    | OBSOLETE: st>v0.5
+? vertcenter   | THINK
+? visualbell   | THINK
+~ multi-font   | TRY:DEV: need porting
+
+
+NOTE
+  Alternative workflow (github + branches) have crumbled
+  on backward-incompatible changes -- E.G. splitting file.
+    => Currently trying more raw workflow with patch files
+  [_] TODO reuse ./install and ./PKGBUILD before deleting repo
+
+
 REF
   st
     http://git.suckless.org/st/tree/st.c
@@ -47,9 +77,9 @@ DEV
 
 
 TODO
-  [_] try replace argbbg by alpha off patch
+  2017-07-18 [X] try replace argbbg by alpha off patch
+  2017-07-18 [X] check/compare/update other patches
   [_] add 'vertcenter' patch
-  [_] check/compare/update other patches
 
 
 BUG

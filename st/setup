@@ -1,10 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: term
 THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
-
-if cfgOpt t || ! pacman -Qi st-amerlyq-git &>/dev/null; then
-  r.st-rebuild
-fi
 
 svc_activate -cu st.service
