@@ -37,14 +37,14 @@ if executable('ctags') || executable('ctags-exuberant')
   command -bar -range -nargs=0 TagsGen
     \ if $HOME !~# '^'.getcwd()|call system(s:ctags)
     \ |else|echom "Prevented gen tags in $HOME or below"|en
-  nnoremap <silent> <F1> :<C-u>TagsGen<CR>
+  nnoremap <unique><silent> <S-F1> :<C-u>TagsGen<CR>
 endif
 
 " ATTENTION: w/o compression, because CCTree use outdated format
 if executable('cscope')
   let s:cscope = 'cscope -bcqR'
   command -bar -range -nargs=0 CCgen call system(s:cscope)
-  nnoremap <silent> <S-F1> :<C-u>CCgen<CR>
+  " nnoremap <unique><silent> <S-F1> :<C-u>CCgen<CR>
 endif
 
 " Show list of tags when there more then one entry.
