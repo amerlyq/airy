@@ -1,5 +1,5 @@
 diff --git i/config.def.h w/config.def.h
-index 877afab..33c2695 100644
+index 877afab..16f7260 100644
 --- i/config.def.h
 +++ w/config.def.h
 @@ -5,7 +5,7 @@
@@ -11,33 +11,7 @@ index 877afab..33c2695 100644
  int borderpx = 2;
  
  /*
-@@ -107,7 +107,9 @@ const char *colorname[] = {
- 	[255] = 0,
- 
- 	/* more colors can be added after 255 to use with DefaultXX */
--	"#cccccc",
-+	"#839496",  /* FIXED: solarized base0/12 */
-+	"#000000",
-+	"#eeeeee",
- 	"#555555",
- };
- 
-@@ -116,10 +118,10 @@ const char *colorname[] = {
-  * Default colors (colorname index)
-  * foreground, background, cursor, reverse cursor
-  */
--unsigned int defaultfg = 7;
--unsigned int defaultbg = 0;
--unsigned int defaultcs = 256;
--unsigned int defaultrcs = 257;
-+unsigned int defaultfg = 256;
-+unsigned int defaultbg = 257;
-+unsigned int defaultcs = 258;
-+unsigned int defaultrcs = 259;
- 
- /*
-  * Default shape of cursor
-@@ -134,8 +136,9 @@ unsigned int cursorshape = 2;
+@@ -134,8 +134,9 @@ unsigned int cursorshape = 2;
   * Default columns and rows numbers
   */
  
@@ -49,7 +23,17 @@ index 877afab..33c2695 100644
  
  /*
   * Default colour and shape of the mouse cursor
-@@ -170,6 +173,7 @@ Shortcut shortcuts[] = {
+@@ -164,12 +165,17 @@ MouseShortcut mshortcuts[] = {
+ #define MODKEY Mod1Mask
+ #define TERMMOD (ControlMask|ShiftMask)
+ 
++/* THINK: pass more inner vars from st instance */
++static char *pipe_url[] = { "r.st-pipe", "--url", winid, NULL };
++static char *pipe_vim[] = { "r.st-pipe", "--vim", winid, NULL };
++
+ Shortcut shortcuts[] = {
+ 	/* mask                 keysym          function        argument */
+ 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
  	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
  	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
  	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
@@ -57,12 +41,13 @@ index 877afab..33c2695 100644
  	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
  	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
  	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
-@@ -178,6 +182,8 @@ Shortcut shortcuts[] = {
+@@ -178,6 +184,9 @@ Shortcut shortcuts[] = {
  	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
  	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
  	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },
-+	{ TERMMOD,              XK_U,           externalpipe,   {.v = "r.st-pipe --url"} },
-+	{ TERMMOD,              XK_space,       externalpipe,   {.v = "r.st-pipe --vim"} },
++	{ TERMMOD,              XK_F6,          swapcolors,     {.i =  0} },
++	{ TERMMOD,              XK_U,           externalpipe,   {.v = pipe_url} },
++	{ TERMMOD,              XK_space,       externalpipe,   {.v = pipe_vim} },
  };
  
  /*
