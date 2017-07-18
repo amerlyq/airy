@@ -58,7 +58,7 @@ prepare() { local f
     fi
   done
 
-  [[ -z ${FONT_ST-} ]] || sed -ri '/^static char font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
+  [[ -z ${FONT_ST-} ]] || sed -ri '/^char font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
 
   ## SKIP terminfo: /usr/share/terminfo/s/st is owned by ncurses 6.0-4
   sed -i '/\@tic\s/d' Makefile
