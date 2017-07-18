@@ -13,19 +13,19 @@ function _prompt_amer_setup_prompts {
   zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ${parts[6]}
 
   ## Top env
-  _prompt_elapsed='%B%F{10}>>> elapsed time: ${elapsed}%f%b'
+  _prompt_elapsed='%B%F{240}>>> elapsed time: ${elapsed}%f%b'
   _prompt_status="%F{$color}╸%f"
   _prompt_status+='${err:+$err }${elapsed:+$elapsed }'
   _prompt_status+='${fill}${jobnum}'
   _prompt_env="%F{$color}${parts[1]}%f"
   # THINK: instead of pos-based placeholders -- simply concat all letters
   # THINK: letter for chroot
-  _prompt_env+='${${RANGER_LEVEL+"%B%F{10}R%f%b"}:-"'$line'"}'
-  _prompt_env+='${${VIM+"%B%F{10}V%f%b"}:-"'$line'"}'
-  _prompt_env+='%B%F{8}[%F{220}${ppwd}%F{8}]%f%b'
+  _prompt_env+='${${RANGER_LEVEL+"%B%F{28}R%f%b"}:-"'$line'"}'
+  _prompt_env+='${${VIM+"%B%F{28}V%f%b"}:-"'$line'"}'
+  _prompt_env+='%B%F{235}[%F{220}${ppwd}%F{235}]%f%b'
   _prompt_env+='${git_info:+"'$line'"${(e)git_info[details]}}'
   _prompt_env+='${vcs_info_msg_1_:+"'$line'"$vcs_info_msg_1_}'
-  _prompt_env+='${fill}'$line'%B%F{8}(%F{3}${date}%F{8})%f%b'
+  _prompt_env+='${fill}'$line'%B%F{235}(%F{3}${date}%F{235})%f%b'
 
   ## Left
   PROMPT="%F{$color}${parts[3]}%f"
@@ -38,7 +38,7 @@ function _prompt_amer_setup_prompts {
   #   https://github.com/tmux/tmux/issues/516
   #   BUT: resizing tmux panel works almost as expected
   unset RPROMPT  # TEMP:FIXED
-  [[ -n $SSH_TTY ]] && RPROMPT+=$line'%B%F{8}(%F{6}%n%f%F{8}@%f%F{2}%m%F{8})%f%b'
+  [[ -n $SSH_TTY ]] && RPROMPT+=$line'%B%F{235}(%F{6}%n%f%F{235}@%f%F{2}%m%F{235})%f%b'
 
   ## Bottom status
   ## BET: don't use it -- it can interfere with ZSH completion menus and can make crap in tmux
