@@ -36,6 +36,9 @@ DEBUG
 
 
 Setup server
+  Arch: (nfs-utils>=v2.1.1): /etc/nfs.conf
+    [nfsd]
+    vers2=y
   Arch: /etc/sysconfig/nfs
     RPCMOUNTDOPTS=""    # USE:(--manage-gids) if $(groups|wc -w)>16  (NFS limitation)
     RPCSVCGSSDARGS=""   # USE:(-p 20048) for static ports from /etc/services

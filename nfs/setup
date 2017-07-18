@@ -4,7 +4,10 @@ source ~/.shell/func.d/cfgsetup
 
 if cfgOpt u; then
   if distro arch; then
-    linkcp -c nfs.conf /etc/sysconfig/nfs
+    # OBSOLETE:(/etc/sysconfig/nfs): for nfs-utils>=v2.1.1 use /etc/nfs.conf
+    linkcp -ct /etc nfs.conf
+    # BAD: need uncomment section too
+    # grep '^vers2=y' /etc/nfs.conf || sudo sed -r '/^[# ]*(vers2=).*/s//\1y/' -i /etc/nfs.conf
     # BAD: nfs-config  -- not found in last versions of nfs-utils
     svc_activate -eR rpcbind rpc-statd nfs-mountd nfs-server
 
