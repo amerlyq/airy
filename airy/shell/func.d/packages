@@ -5,7 +5,8 @@ trap_errors
 cwd_script
 
 # Re-install even if git pull is up-to-date (for broken builds)
-while getopts 'mrsu' o; do case $o in :|'?') die 1
+# u=update U=update_always
+while getopts 'mrsuU' o; do case $o in :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 mkdir -vp "${CURR_DIR_PKG:?}"
@@ -42,12 +43,12 @@ do_if() {
 
   # NOTE: with 'grp' check whole group as whole
   #   without 'grp' check each arg individually
-  if ! cfgOpt u && [[ ${grp-} ]]; then
+  if ! cfgOpt uU && [[ ${grp-} ]]; then
     if has_such "${obj:?}" "${grp:?}"
     then ((bQuiet)) || echo "I: $* ($obj=$grp)"; return 0
     else pkgs+=("$@"); fi
   else while (($#>0)); do
-    if ! cfgOpt u && has_such "${obj:?}" "$1"
+    if ! cfgOpt uU && has_such "${obj:?}" "$1"
     then ((bQuiet)) || echo "I: $1"
     else pkgs+=("$1"); fi; shift
   done; fi
@@ -87,25 +88,32 @@ elif distro arch; then
     do_if -c "${c[*]}" "$@"
   }
   pkg_inst(){ _ipacman 'sudo pacman' "$@"; }
-  pkg_make(){ sudo make install $@ || exit; }  # FIXME: replace by arch-specific
+  pkg_make(){ sudo make install "$@" || exit; }  # FIXME: replace by arch-specific
   has_pr yaourt && ayr_inst(){ _ipacman 'yaourt' "$@"; }
   if has_pr pacaur; then
     aur_inst(){ _ipacman 'pacaur --aur' "$@"; }
     loc_inst(){ do_if -c 'pkg_make' "$@"; }
     # WARN: pkgs not from AUR can break pacaur
-    pkg_make(){ local p d
-      p=$(readlink -e "${1:?}")
-      ( set -eu
-        source "$p"
+    pkg_make(){ local p d m=$PWD
+      p=$(readlink -e "${1:?}"); shift
+      ( set -Eu; source "$p"; set -Eu
         d=$CURR_DIR_PKG/$pkgname
         mkdir -p "$d" && cd "$d"
         # cd "$(dcache "pacaur/$pkgname")"
+
+        # NOTE:(copy): pkgver and updpkgsums changes PKGBUILD
+        #   OR:(symlink): always commit updated PKGBUILD after changes
         linkcp -ct "$PWD" "$p"
+        linkcp -t "$PWD" "$m/patches"/*.{diff,patch}
+
         # WARN:(-f): removed 'force' to mitigate idle rebuild
-        #   => enforce rebuild by incrementing 'pkgrel=1' in PKGBUILD
+        #   => enforce rebuild by incrementing 'pkgrel=1' or 'epoch' in PKGBUILD
         # THINK: using '-C' for clean builds (re-dld all src)
         # BAD: $?=0 when coflict on install
-        makepkg -si --needed --noconfirm
+        if cfgOpt U
+        then makepkg -si --force --noconfirm "$@"  # REF: $ makepkg [ENVVAR=...]
+        else makepkg -si --needed --noconfirm "$@"
+        fi
         # updpkgsums &&  # REM: 'makepkg' has flag for this
         # source PKGBUILD  # EXPL: updated on build values for pkgver, etc
         # paccache -df "$pkgname"  # REM: prefer to keep old versions
@@ -117,10 +125,13 @@ elif distro arch; then
         # BUT: you need 'expect' installed on clean system...
         # $ expect -c 'spawn pacman -Syu
         #     expect { -re "^in conflict.*" { send "yes\r"; interact } }'
+        # ALSO:BAD: replace on conflict not always good
+        #   => if user temporarily replaced pkg (neovim -> neovim-git)
         # ALT: wait fail, manually remove package, then 'make continue'
         # sudo pacman -U --needed --noconfirm \
         #   "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
-      ) || return
+      ) # WARN:(|| return): suppresses errors in subshell -- don't use it
+      # SEE:(set -E subshell): http://unix.stackexchange.com/questions/48533/exit-shell-script-from-a-subshell
     }
   elif has_pr yaourt; then aur_inst(){ ayr_inst "$@"; }
   fi
@@ -193,7 +204,7 @@ git_inst() { # $0 -d pr_name
   if [[ -d $prdir ]]; then git_pull "$prdir"
   else git clone --depth 1 "$link" "$prdir" && cd "$prdir"; fi
 
-  if ! cfgOpt u && ((${git_is_the_same-})); then
+  if ! cfgOpt uU && ((${git_is_the_same-})); then
     echo "C: Up to date, no re-build"
     return 0
   fi
