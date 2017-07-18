@@ -20,8 +20,8 @@ function _prompt_amer_setup_prompts {
   _prompt_env="%F{$color}${parts[1]}%f"
   # THINK: instead of pos-based placeholders -- simply concat all letters
   # THINK: letter for chroot
-  _prompt_env+='${${RANGER_LEVEL+"%B%F{28}R%f%b"}:-"'$line'"}'
-  _prompt_env+='${${VIM+"%B%F{28}V%f%b"}:-"'$line'"}'
+  _prompt_env+='${${RANGER_LEVEL+"%B%F{60}R%f%b"}:-"'$line'"}'
+  _prompt_env+='${${VIM+"%B%F{60}V%f%b"}:-"'$line'"}'
   _prompt_env+='%B%F{235}[%F{220}${ppwd}%F{235}]%f%b'
   _prompt_env+='${git_info:+"'$line'"${(e)git_info[details]}}'
   _prompt_env+='${vcs_info_msg_1_:+"'$line'"$vcs_info_msg_1_}'
