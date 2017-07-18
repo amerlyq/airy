@@ -14,8 +14,12 @@ TODO
   !1 [_] FIXME qutebrowser dpi by default is non-conformant with AIRY_DPI
     = too small = default 101 ?
     TRY: embed into `r.b` setting on launch ':zoom 150' or similar depending on
-      $ zoom=$(( $(r.airy-registry dpi) / $(r.xorg -d) ))'
+      $ zoom=$(( $(r.airy-registry dpi) / $(r.xorg -d) ))
     ALT: QT_SCALE_FACTOR=2 and/or QT_AUTO_SCREEN_SCALE_FACTOR=1
+  BAD: some sites block with such user agent (E.G. http://www.commandlinefu.com)
+    user-agent = "Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"
+  NOTE: disabled by reason of google search page
+    allow-javascript = false
 
 
 FIND
