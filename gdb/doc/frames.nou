@@ -177,6 +177,7 @@ REF: http://man7.org/linux/man-pages/man5/elf.5.html -- SEE: Nhdr
     $1 = 0x3239a118
   (gdb) x/x $sp     # After sp=sp+40
     0x3239a0f0:     0x2ac93510  # =ra
+  (gdb) info symbol *($sp+40-8)
 
 
 %   (gdb) f 1
@@ -187,7 +188,7 @@ REF: http://man7.org/linux/man-pages/man5/elf.5.html -- SEE: Nhdr
      0x2ac4f714: <semop+4>:       addiu   gp,gp,15872     |
      0x2ac4f718: <semop+8>:       addu    gp,gp,t9        |
      0x2ac4f71c: <semop+12>:      addiu   sp,sp,-40       |
-     0x2ac4f720: <semop+16>:      sw      ra,32(sp)       |
+     0x2ac4f720: <semop+16>:      sw      ra,32(sp)       | NOTE: $ra addr aligned on 8 => not last on stack frame
      0x2ac4f724: <semop+20>:      sw      gp,24(sp)       |
      0x2ac4f728: <semop+24>:      lw      t9,-32644(gp)   |
      0x2ac4f72c: <semop+28>:      sw      a1,16(sp)       |

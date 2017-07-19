@@ -91,7 +91,7 @@ Xvfb over SSH
     Xvfb :99 -screen 0 640x480x24 -fbdir /var/tmp
   Client
     DISPLAY=:99 xwud -in /var/tmp/Xvfb_screen0
-  Xwd
+  Xwd (xorg serial / ssh)
     scrot -z "$DIR/size-${sz}.png"
     > Using any of this you will not receive Qt window transparency!
     import -window $wid "$DIR/size-${sz}.png"
