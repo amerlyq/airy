@@ -2,18 +2,25 @@
 
 REF
   https://wiki.openwrt.org/doc/techref/bootloader/cfe
+  # ALSO: console=ttyS0,115200
 
 USAGE
   $ help
   $ printenv
-  $ setenv -p IP 'ifconfig eth0 -auto'
-  $ setenv -p NFS 'boot ...'
-  $ setenv -p STARTUP '$IP; printenv; $NFS'
-    # Load by default
-  $ setenv -p F3 '$STARTUP'
-    # Load on keypress F3
 
-Flash
-  $ flash -noheader 192.168.1.2:/vmlinuz flash1.kernel
-  $ flash -noheader 192.168.1.2:/squashfs flash1.rootfs
-  $ boot ... "root=/dev/mtdblock2 rootfstype=squashfs ro console=ttyS0,115200 .."
+CONF
+  $ setenv -p IP 'ifconfig eth0 -auto'
+  $ setenv -p NFS 'boot -z -elf 192.168.1.2:/vmlinuz "root=/dev/nfs nfsroot=192.168.1.2:/nfs ip=dhcp rw ..."'
+  $ setenv -p SQFS 'boot -z -elf flash0.kernel: "root=/dev/mtdblock2 rootfstype=squashfs ro ..."'
+  $ setenv -p LVM 'flash -noheader 192.168.1.2:/vmlinuz flash0.kernel'
+  $ setenv -p LSQ 'flash -noheader 192.168.1.2:/squashfs flash0.rootfs'
+  $ setenv -p F1 '$IP'
+  $ setenv -p F2 '$STARTUP'
+  $ setenv -p F3 '$IP; printenv; $NFS'
+  $ setenv -p F4 'printenv; $SQFS'    $ NOTE: no need for network for sqfs
+  $ setenv -p F7 '$LVM'
+  $ setenv -p F8 '$LSQ'
+  $ setenv -p F9 '$IP; printenv; $LVM; $LSQ; $SQFS'   $ HACK: flash and run on boot
+    # Load on keypress F3
+  $ setenv -p STARTUP "$F4"
+    # Load by default, WARN:(double-quotes): only single substitution supported
