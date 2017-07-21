@@ -7,3 +7,11 @@ TODO
     https://unix.stackexchange.com/questions/111906/allowing-users-to-access-certain-ports-on-server
     https://superuser.com/questions/933272/restrict-port-access-per-application
     https://askubuntu.com/questions/48129/how-to-create-a-restricted-ssh-user-for-port-forwarding
+
+HACK
+  Redirect hardcoded IP to another (buildroot configs)
+    $ ipt=(OUTPUT -t nat -d 10.23.161.93 -j DNAT --to-destination 172.24.6.137) \
+      if ! sudo iptables -C "${ipt[@]}" >/dev/null; then
+        if cfgOpt r; then sudo iptables -D "${ipt[@]}"; fi
+        sudo iptables -A "${ipt[@]}"
+      fi

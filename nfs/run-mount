@@ -3,7 +3,7 @@
 [[ ! $1 =~ -u ]] || { unmount=1; shift; }
 
 # ATT: only first entry used
-dir=${1:-$(showmount -d | sed -n '2{p;q}')}
+dir=${1:-$(showmount -d | sed -n "2{p;q\}")}
 mnt=${2:-/mnt}
 
 if ((unmount)); then

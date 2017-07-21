@@ -1,0 +1,9 @@
+#!/usr/bin/expect
+# USAGE: /path/to/expect-login
+
+# verbose on
+# print "\r\n"
+# send "^C^C^C"
+expect "<prompt>" { send "<user>\r" }
+expect "Password:" { send "<pass>\r" }
+# timeout { puts "\nErr\n"; exit 1 }

@@ -38,6 +38,7 @@ dorun(){ $sudo systemctl $A start "$@"; }
 rerun(){ $sudo systemctl $A restart "$@"; }
 
 else # WARN:BAD: 'if distro ubuntu' -- messed 14.10, systemd 16.04
+# ALT: if ! /etc/init.d/"$1" status | grep -qsw 'running'; then
 
 doreload(){ return 0; }
 isenable(){ return 1; }

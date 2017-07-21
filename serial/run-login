@@ -22,7 +22,6 @@ spawn picocom --baud 115200 --flow n --databits 8 --parity n $dev
 sleep 1
 
 # Check if already logged-in
-
 set timeout 1
 send "\r\003\003\003"
 expect {
@@ -32,13 +31,4 @@ expect {
         if {[file exists $src]} { source $src }
     }
 }
-
-# ALT expect-login
-# verbose on
-# print "\r\n"
-# send "^C^C^C"
-# expect "login:" { send "user\r" }
-# expect "passw:" { send "pass\r" }
-# timeout { puts "\nErr\n"; exit 1 }
-
 interact

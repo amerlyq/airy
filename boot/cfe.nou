@@ -14,10 +14,11 @@ CONF
   $ setenv -p SQFS 'boot -z -elf flash0.kernel: "root=/dev/mtdblock2 rootfstype=squashfs ro ..."'
   $ setenv -p LVM 'flash -noheader 192.168.1.2:/vmlinuz flash0.kernel'
   $ setenv -p LSQ 'flash -noheader 192.168.1.2:/squashfs flash0.rootfs'
-  $ setenv -p F1 '$IP'
-  $ setenv -p F2 '$STARTUP'
+  $ setenv -p F1 'printenv'
+  $ setenv -p F2 '$IP'
   $ setenv -p F3 '$IP; printenv; $NFS'
   $ setenv -p F4 'printenv; $SQFS'    $ NOTE: no need for network for sqfs
+  $ setenv -p F5 '$STARTUP'
   $ setenv -p F7 '$LVM'
   $ setenv -p F8 '$LSQ'
   $ setenv -p F9 '$IP; printenv; $LVM; $LSQ; $SQFS'   $ HACK: flash and run on boot
