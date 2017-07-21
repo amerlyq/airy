@@ -1,0 +1,26 @@
+#!/bin/bash -eu
+set -o pipefail
+(($#)) || { exec r.fs-bind-list | column -ts$'\t'; exit; }
+
+# n=no-force-unmount  u=unmount
+O=; while getopts 'nu' o; do case $o in :|'?') exit 1
+esac; O+=$o; done; shift $((OPTIND-1))
+has(){ [[ $O =~ [$*] ]]; }
+
+# DEV: remount in readonly BUT not nfs
+# mount -o remount,bind,ro olddir newdir
+mntdir() { mkdir -p "$2" && sudo mount --bind "$1" "$2"; }
+umntdir() { sudo umount "$@" || lsof -- "$@"; }
+
+# unmount all after '-u'
+has u && { umntdir "$@"; exit; }
+
+s=$1
+t=$2
+
+# do nothing if already binded
+r.fs-bind-list -q "$s" "$t" && exit
+# unmount another by default, if has n => err
+r.fs-bind-list -qt "$t" && { has n && exit 11 || umntdir "$t"; }
+
+mntdir "$s" "$t"

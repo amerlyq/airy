@@ -1,0 +1,50 @@
+#!/bin/bash -eu
+
+# s=srcdir t=dstdir q=querymatch($1,$2)
+O=; while getopts 'qst' o; do case $o in :|'?') exit 1
+esac; O+=$o; done; shift $((OPTIND-1))
+[[ $O =~ [st] ]] || O+='st'
+s=${1+$(readlink -m "$1")}
+t=${2+$(readlink -m "$2")}
+
+# WARN:(>2.25) mount no more shows source of binding
+#   INFO: https://superuser.com/questions/916434/to-show-bind-mount-source-path-for-mount-after-v2-25-2
+# BAD: works only with mounted /dev/*
+#   otherwise => match /shared:\d+/ for tmpfs, etc
+# BAD: schroot binds have different format
+# ALT: $ findmnt
+# ALT:(-s/-t): cut -f1 -d$'\t'
+# NOTE: mountinfo spaces in paths -> \040
+#   BUT: xargs -rL1 -d\\n printf '%b\n' | grep -q => signal 13
+
+exec gawk -vO="$O" -vqs="$s" -vqt="$t" '
+  { p=$4; t=$5; d=gensub(/^.* - \w+ (\S+).*/,"\\1",1) }
+  d~/\// { if(p=="/") { M[d]=t }else{ P[t]=p; D[t]=d }}
+
+function esc(l, v)
+{
+  split(l, A, /\\[0-8]{3}/, C)
+  for(k in A){
+    v = v sprintf("%s", A[k])
+    if(C[k]) v = v sprintf("%c", strtonum(substr(C[k], 2)))
+  }
+  return v
+}
+
+END { for(t in P) {
+    s = esc(M[D[t]]P[t])
+    t = esc(t, "")
+    if (O~"q") {
+      if (O~"s" && O~"t") { if (s==qs && t==qt) exit 0 }
+      else if (O~"s") { if (s==qs) exit 0 }
+      else if (O~"t") { if (qt=="" ? t==qs : t==qt) exit 0 }
+    } else {
+      if (O~"s") printf "%s", s
+      if (O~"s" && O~"t") printf "\t"
+      if (O~"t") printf "%s", t
+      if (O~"s" || O~"t") printf "\n"
+    }
+  }
+  if(O~"q") {exit 1}
+}
+' /proc/self/mountinfo
