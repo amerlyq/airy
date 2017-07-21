@@ -1,0 +1,25 @@
+#!/bin/bash -eu
+# USAGE: /path/to/nfs -- root path where all dirs are binded
+nfs_root=$1
+
+# BAD: Mounted subdirs impossible to export even with -crossmnt- (? Only for NFSv1/2 ?)
+# DEBUG: check nfs is mountable by $ sudo mount 192.168.1.2:/path/to/nfs /mnt
+
+# remove non-binded empty dirs
+find "$nfs_root" -mindepth 1 -maxdepth 1 -type d -empty ! -exec r.fs-bind-list -qt {} \; -delete
+
+# export all binded dirs
+tmp=$(mktemp -t 'exports.XXXX')
+params='192.168.1.0/24(rw,sync,nohide,no_root_squash,no_subtree_check)'
+find "$nfs_root" -mindepth 1 -maxdepth 1 -type d -exec r.fs-bind-list -qt {} \; \
+  -printf "%p $params\n" > "$tmp"
+
+if ! cmp -s "$tmp" /etc/exports; then
+  sudo cp -vfT "$tmp" /etc/exports
+  sudo exportfs -ra
+  sudo exportfs -sv
+fi
+
+svc_activate -r rpcbind
+svc_activate -r nfs-mountd
+svc_activate -r nfs-server

@@ -1,0 +1,31 @@
+#!/bin/bash -eu
+set -o pipefail
+
+id=${1:-default}
+boot=${2:-_boot}
+
+tftp_root=/cryptfs/tftpboot
+nfs_root=/cryptfs/nfs
+dtftp=$boot/flash
+dnfs=$boot/nfs
+
+if [[ -d $dtftp ]]; then
+  # TODO: r.tftp-deploy
+  # ./flash_copy
+  r.fs-bind-mnt "$dtftp" "$tftp_root/$id"
+  r.tftp-root-refresh "$tftp_root"
+fi
+
+if [[ -d $dnfs ]]; then
+  # TODO: r.nfs-deploy
+  sudo systemctl stop nfs-server
+  # OR: sudo service nfs-kernel-server stop
+  # ./img_unpack
+  r.fs-bind-mnt "$dnfs" "$nfs_root/$id"
+  r.nfs-root-refresh "$nfs_root"
+fi
+
+# ALSO:(manually): refresh hosts
+#   echo "192.168.1.${ip} $id" | sudo tee -a /etc/hosts
+
+r.fs-bind-list -st
