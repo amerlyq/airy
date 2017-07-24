@@ -62,6 +62,34 @@ class ag(Command):
         cmdl = [ag.editor, '-c', cmd, '-c', 'only']
         return (cmdl, '')
 
+    def _aug_nvr(self, iarg, group=None):
+        cmdl = 'ag --smart-case --hidden'.split()
+        if group:
+            cmdl += ['--column', '--group']
+        else:
+            cmdl += ['--vimgrep']
+
+        if iarg == 1:
+            import shlex
+            cmdl += shlex.split(self.rest(iarg))
+        else:
+            # NOTE: only allowed switches
+            opt = self.arg(iarg)
+            while opt in ['-Q', '-w']:
+                self.shift()
+                cmdl.append(opt)
+                opt = self.arg(iarg)
+            # TODO: save -Q/-w into ag.patterns =NEED rewrite plugin to join _aug*()
+            patt = self._quot(self._bare(self._arg(iarg)))
+            cmdl.append(patt)
+
+        if group:
+            cmdl += ['|', ag.editor, '-', '+"setl noro ma bt=nofile"', '+"set cole=0 fdl=1|setf ag_grp"']
+        else:
+            cmdl += ['|sort|', ag.editor, '-q/dev/stdin', '+copen']
+            # ALT: cmdl += ['|', ag.editor, '-', '+"setl noro ma bt=nofile"', '+"cgetb|copen"']
+        return (' '.join(cmdl), '')
+
     def _aug_sh(self, iarg, flags=[]):
         cmdl = ag.acmd.split() + flags
         if iarg == 1:
@@ -83,9 +111,9 @@ class ag(Command):
 
     def _choose(self):
         if self.arg(1) == '-v':
-            return self._aug_vim(2, 'Ag')
+            return self._aug_nvr(2, False)
         elif self.arg(1) == '-g':
-            return self._aug_vim(2, 'sil AgView grp|Ag')
+            return self._aug_nvr(2, True)
         elif self.arg(1) == '-l':
             return self._aug_sh(2, ['--files-with-matches', '--count'])
         elif self.arg(1) == '-p':  # paths

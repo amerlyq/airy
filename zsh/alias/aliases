@@ -28,6 +28,7 @@ if (($+commands[$EDITOR])); then
   alias -g V='| $EDITOR - -c "setl noro ma bt=nofile"'
   alias -g VN='V -c "setf nou"'
   alias -g VQ='V -c "cgetb|copen"'
+    # ALT: ag --vimgrep ... |sort| nvim -q/dev/stdin
   alias -g VG='V -c "set cole=0 fdl=1|setf ag_grp"'
   alias -g V@='|vipe| '
   # ALT:(vipe): V :w!tee

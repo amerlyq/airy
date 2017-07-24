@@ -34,7 +34,7 @@ fi
 
 # NOTE: server mode from inside :terminal
 if _has_pr nvim && _has_pr nvr && [[ -n ${NVIM_LISTEN_ADDRESS-} ]]; then
-  exec nvr "$@"
+  exec nvr -cc 'tabprevious' "$@"
 fi
 
 # EXPL: run vim if there are no 'nvim'
