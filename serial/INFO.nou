@@ -1,0 +1,9 @@
+HACK: comment/tag serial output
+  Open new terminal with
+    $ r.t -M -e tmux new-session -s serial -- r.serial
+    $ tail -f /var/log/messages.log
+  From another terminal => mark new operation
+    $ _(){ tmux send-keys -t serial $'\n'"# $*"$'\n'; }
+    $ _ $tag $comment
+  Save whole scrollback of original terminal
+    <C-l><A-S-p>
