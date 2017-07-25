@@ -3,7 +3,16 @@ HACK: comment/tag serial output
     $ r.t -M -e tmux new-session -s serial -- r.serial
     $ tail -f /var/log/messages.log
   From another terminal => mark new operation
-    $ _(){ tmux send-keys -t serial $'\n'"# $*"$'\n'; }
-    $ _ $tag $comment
+    $ tmux set-option -t serial history-limit 40000
+    $ _s(){ tmux send-keys -t serial $'\n'"# $*"$'\n'; }
+    $ _c(){ _s "$@"; sleep 2; _s --; }
+    $ _c $comment
   Save whole scrollback of original terminal
     <C-l><A-S-p>
+
+
+|community/lrzsz|
+rz/sz to receive/send files by Z-modem protocol
+  $ picocom --send-cmd 'sz -vv' --receive-cmd 'rz -vv' ...
+| <C-a><C-s> /host/file   | send into serial
+| <C-a><C-r> /target/file | receive from serial
