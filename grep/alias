@@ -3,7 +3,7 @@
 # grep -Ri 'name' . # find in all files
 
 # DFL: fixed case and group view for piping results
-alias ag='ag -s --group'
+alias ag='ag --all-text -s --group'
 
 if _has_pr ag
 then agi() { command ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' "$@"; }

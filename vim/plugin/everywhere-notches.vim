@@ -16,6 +16,8 @@ let s:patterns = [
   \ ['Did', 243, '#767676', 'DONE|FIXED|EXPL%(AIN)?|TEMP|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?'],
   \ ['Msg',  62, '#5f5fdf', 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|DEP%(ENDS)?'],
   \]
+" check = prove = assert = verify
+" check:maybe = lemma = assumption = guess = conjecture = hypothesis
 " Latin abbrev: SEE https://en.wikipedia.org/wiki/List_of_Latin_abbreviations
 " E.G. exampli gratia (~ example given)
 " I.E. id est (~ in especial, effectively)

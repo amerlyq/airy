@@ -25,7 +25,7 @@ class ag(Command):
     Looks for a string in all marked paths or current dir
     """
     editor = os.getenv('EDITOR') or 'vim'
-    acmd = 'ag --smart-case --group --color --hidden'  # --search-zip
+    acmd = 'ag --all-text --smart-case --group --color --hidden'  # --search-zip
     qarg = re.compile(r"""^(".*"|'.*')$""")
     patterns = []
     # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
