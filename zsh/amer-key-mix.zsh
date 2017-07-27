@@ -1,3 +1,12 @@
+# DEBUG
+#   $ bindkey -lL      $ list all groups
+#   $ bindkey -M emacs $ list all keybindings in group
+#   $ zle -al OR -lL   $ list all commands
+#   $ bindkey '<C-v><my_key>' $ show what is binded to key
+#   Test zle widgets == (execute-named-cmd) widget
+#     https://superuser.com/questions/691925/zsh-how-to-zle-widgets-directly
+#     $ <Esc>:kill-line<CR>
+
 # Man
 #   http://zsh.sourceforge.net/Guide/zshguide04.html
 #   http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Zle-Builtins
@@ -37,6 +46,15 @@ bindkey '^W' backward-kill-word
 bindkey '^K' kill-line
 bindkey '^U' backward-kill-line
 
+# BUG: fixterm keys :: http://www.leonerd.org.uk/hacks/fixterms/
+#   <S-BS>  ->  ^[[127;2u  ->  <Esc>..u  ->  undo all typed text in vicmd mode
+# FIXED: redefine key sequences
+bindkey '\e[127;2u' backward-delete-char  # <S-BS>
+bindkey '\e[45;5u'  redo                  # <C-_>
+bindkey '\e[109;5u' .accept-line          # <C-m>
+bindkey -s '\e[32;2u' ' '                 # <S-Space>
+# HACK: use 'redo' after pressing fixterm key and accidentally clearing cmdline
+bindkey -a '^_' redo
 
 ## Emacs duplicates
 bindkey '\eOH'  beginning-of-line # Home
@@ -80,6 +98,7 @@ bindkey '\C-x\C-j' jh-prev-comp       # Run with last output autocomplete
 bindkey -a  '\C-u' jh-prev-comp       # Run with last output autocomplete
 bindkey '\C-x\C-e' edit-command-line
 bindkey -a  '\C-t' edit-command-line
+bindkey '\C-x:'    execute-named-cmd  # run widget
 
 bindkey '\C-x\C-s' synchro-dir-push
 bindkey '\C-x\C-l' synchro-dir-pop
