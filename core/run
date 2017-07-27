@@ -38,4 +38,6 @@ case $1
 in   logout|-o) chk_wnd && chk_tmux && ask "Logout?" && sys_logout
 ;;   reboot|-r) chk_wnd && chk_tmux && ask "Reboot?" && systemctl reboot
 ;; shutdown|-t) chk_wnd && chk_tmux && chk_repo && ask "Shutdown?" && systemctl poweroff
+# ALT: run 'r.core lock' on <M-S-z> if no windows found BAD: check skippped if hidden window
+;;     lock|-l) chk_wnd && chk_tmux && chk_repo && r.lock
 esac

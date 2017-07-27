@@ -139,6 +139,7 @@ system =
   [ [ ("o", spawn "r.core logout")
     , ("r", spawn "r.core reboot")
     , ("t", spawn "r.core shutdown")
+    , ("l", spawn "r.core lock")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.xmonad-rebuild")
