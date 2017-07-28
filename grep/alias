@@ -2,8 +2,8 @@
 
 # grep -Ri 'name' . # find in all files
 
-# DFL: fixed case and group view for piping results
-alias ag='ag --all-text -s --group'
+# DFL: smart case and group view for piping results
+alias ag='ag --all-text -S --group'
 
 if _has_pr ag
 then agi() { command ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' "$@"; }

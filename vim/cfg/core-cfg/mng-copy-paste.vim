@@ -189,6 +189,12 @@ vnoremap <unique>  [Frame]Y
 "  * if lesser -- pad left by spaces
 "  * annotation is concealed completely with replace char is …
 " E.G. static void dl_main (const Elf{+W(Phdr) *phdr,+}   ./elf/rtld.c:719
+" ENH: options
+"  * trim text instead of spoilering
+"  * use old format for long paths/funds -- path:lnum:\n:\t:func()
+"  * use word/funcname under cursor
+"  * enforce pivot dir to make paths related to it instead of diff lwd
+"   HACK: use tags in pwd but trim paths common prf USE: java nested paths
 fun! GetLineSpoiler(idt, text, ...)
   let n = 50
   let p = expand(get(a:,2) ? '%:p' : '%')
