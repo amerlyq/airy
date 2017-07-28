@@ -190,6 +190,8 @@ class doc(Command):
 
     def execute(self):
         nm = self.arg(1) if self.arg(1) else doc.lst['t']
+        if self.quantifier is not None:
+            nm = '{}_{:02d}'.format(nm, self.quantifier)
         pwd = self.fm.thisdir.path
         path = self._nearest(pwd, nm, fs.isfile)
         # WARNING: opens nested editor if file don't exists!
