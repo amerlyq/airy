@@ -9,7 +9,7 @@ let s:patterns = [
   \ ['Err', 196, '#ff2525', 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|FAIL%(ED)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'ADD|SEE|READ|REF|TUT|BLOG|NEED|FIND|ALSO|BET%(TER)?|E\.G'],
   \ ['Alt', 178, '#dfaf00', 'ALT|OR|CASE|THINK|IDEA|CHG|CMP|I\.E|EXAM%(INE)?'],
-  \ ['Dev',  33, '#0087ff', 'DEV|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECIDE'],
+  \ ['Dev',  33, '#0087ff', 'DEV|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECIDE|IMPL'],
   \ ['Tbd', 169, '#ff5faf', 'TODO|CHECK|TRY|MOVE|NOT|REQ%(UIRE)?|MAYBE'],
   \ ['Inf',  38, '#00afdf', 'INFO?|VAR|VIZ|ALG'],
   \ ['Fix', 202, '#ff5f00', 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
