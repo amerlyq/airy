@@ -16,9 +16,10 @@ noremap <unique> gh  :<C-U>bprev<CR>
 noremap <unique> gl  :<C-U>bnext<CR>
 noremap <unique> gH  :<C-U>bfirst<CR>
 noremap <unique> gL  :<C-U>blast<CR>
+noremap <unique> [Frame]` :<C-U>b#<CR>
 
 " Close all but this one ::: ALT: :%bd|e#
-com! -bar -nargs=0 BufOnly :<C-u>call <SID>bufonly()<CR>
+com! -bar -nargs=0 BufOnly call s:bufonly()
 
 fun! s:bufonly()
   let c = bufnr("%")
