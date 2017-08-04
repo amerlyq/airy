@@ -11,5 +11,5 @@ mailboxes =INBOX
 
 source "$my_cache/acc/$my_acc"
 # BAD: $ mutt -d4 will log each source line with pass in plaintext into ~/.muttdebug*
-source "~/.mutt/exe/pass -m $my_acc $my_pass |"
+source "$my_cache/exe/pass -m $my_acc $my_pass |"
 source "$my_cfg/acc-keyrc"   # ATT: place before hooks with 'set'

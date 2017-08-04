@@ -22,7 +22,7 @@ macro index,browser  ,l  "<change-folder>^<enter>"       "Go to last"
 
 # Plugins
 bind index,pager  \\ vfolder-from-query
-macro index,pager  S  "| ~/.mutt/exe/save /tmp/msg/"
+macro index,pager  S  "| $my_cache/exe/save /tmp/msg/"
 # <enter>
 
 # HACK: show mailboxes list for current acc (BUT from root only)
@@ -32,9 +32,9 @@ macro index \Ca <tag-pattern>~A<enter>   "select all"
 # macro index \Ca <untag-pattern>~A<enter>   "deselect all"
 macro index  +  <limit>all<enter>        "limit reset"
 macro index '"' <limit>all<enter>        "limit reset"
-macro generic,pager <f09> "<shell-escape>~/.mutt/exe/sync $my_acc<enter>"   "Index notmuch db"
+macro generic,pager <f09> "<shell-escape>$my_cache/exe/sync $my_acc<enter>"   "Index notmuch db"
 # BUG: after reloading gmail requires to accept cert
-macro generic,pager <f12> ":source ~/.mutt/muttrc<enter>"
+macro generic,pager <f12> ":source $my_cache/muttrc<enter>"
 
 # EXPL: collapsing
 # macro index \R '<read-thread><collapse-thread><next-unread>' 'Mark the current thread as read'
