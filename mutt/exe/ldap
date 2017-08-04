@@ -1,0 +1,57 @@
+#!/bin/bash -eu
+set -o pipefail
+# USAGE: ./$0 -u user -p pass 'filter' [attrs..]
+#   NOTE:(attrs): {*|+|1.1|<attr_name>}..
+# E.G.(bash): ./$0 -u 'city\NSurname' -p 'pass' 'pref*' mail
+# E.G.(mutt): set query_command = "$my_cache/exe/ldap -u $imap_user -p $imap_pass -m %s"
+#   LIOR:(editor): To: pref<C-x>  OR:(index): 'Q'
+
+# BAD:SECU:(pass): visible in 'ps' cmdline ALSO:(ldapsearch -w <pass>): isn't better
+# m=inmutt, x=exact, d=department, u=user, p=passwd
+opts=; while getopts 'mxd:u:p:' o; do case $o in :|'?') exit 1
+;; u) user=$OPTARG  # 'city\NSurname'
+;; p) pass=$OPTARG
+;; d) dep=$OPTARG
+esac; opts+=$o; done; shift $((OPTIND - 1))
+has(){ [[ $opts =~ [$*] ]]; }
+
+q=$1; shift
+has x || q="*$q*"  # query fuzzy / exact
+has m && set -- cn mail
+
+cmd=( ldapsearch  # -v
+  -LLL    # output as ldif(1) w/o comments and version
+  -o ldif-wrap=no  # disable wrapping on 80 for parsing
+  -s one  # scope of search {base|one|sub|children}
+  -z 100  # max search results
+  -l 30   # timeout for search query
+  -E pr=500/noprompt  # paged results (reduce server overload)
+  -x -H 'ldap://localhost:1389'  # simple local davmail
+  -D "$user"
+  -b 'ou=people'  # base (davmail specific) ALT: ou=Contacts
+  -S mail
+)
+
+# ALT: ${0%/*}/pass "$user"
+has p && cmd+=( -w "$pass" ) || cmd+=( -W )
+
+# SEE:(rfc4515) https://tools.ietf.org/search/rfc4515#section-4
+filt='(objectClass=person)'
+has d && filt+="(department=$dep)"
+((${#q})) && filt+="(|(uid=$q)(mail=$q)(sn=$q)(cn=$q)(givenName=$q))"
+cmd+=( "(&$filt)" )
+
+# ALT: perl -MMIME::Base64 -ne 'printf "%s\n",decode_base64($_)'
+decode64(){ gawk -F ':\\s+' '$1 ~ ":$" {
+  _="base64 -diw0 -"; print$2|&_;
+  close(_,"to"); _|&getline$2; close(_)
+}1'; }
+
+muttalias(){ gawk -F ':\\s+' '
+  $1=="mail"{m=$2}
+  $1=="cn"  {n=$2}
+  /^$/ {printf("\"%s\" <%s>\n",n,m); n=m=""}
+'; }
+
+has m && exec > >(muttalias)
+"${cmd[@]}" "$@" | decode64

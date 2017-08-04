@@ -1,19 +1,19 @@
-#!/bin/bash -e
+#!/bin/bash -eu
+set -o pipefail
 # WARN: unsecure -- someone with occasional access to system
 #   may change this script to dump actual passwords -- use systemwide one
 # BET? https://wiki.archlinux.org/index.php/Pass
 #   https://github.com/roddhjav/pass-tomb
 #   https://wiki.archlinux.org/index.php/Tomb
 
-while getopts 'm' o; do
-[[ $o =~ :|\? ]] && exit 1 || OPTS=${OPTS/[$*]}$*
-done; shift $((OPTIND - 1))
+opts=; while getopts 'm' o; do case $o in :|'?') exit 1
+esac; opts+=$o; done; shift $((OPTIND - 1))
 
 prf(){ printf '%s' "$@"; }
 
 key=${1:-$([[ -t 0 ]]||ifne cat)}
 key=${key:?}
-pass=$2
+pass=${2-}
 
 ## Debug
 # > /tmp/mut
@@ -31,7 +31,7 @@ if [[ -z $pass ]]; then
   echo >/dev/tty
 fi
 
-if [[ $OPTS =~ m ]]; then
+if [[ $opts =~ m ]]; then
   prf "set my_pass=$pass"
   if [[ $key =~ ^[a-zA-Z]+$ ]]
   then prf "; set my_pass_$key=$pass"

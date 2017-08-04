@@ -1,0 +1,32 @@
+% LIOR: ldap
+  requesting: All userApplication attributes
+  dn: uid=NSurname, ou=people
+  apple-generateduid: NSurname__AT__company.com
+  mail: NSurname@company.com
+  manager: MManager
+  givenName: <Name>
+  roomnumber: <address>
+  mobile: <number>
+  objectClass: top
+  objectClass: person
+  objectClass: organizationalPerson
+  objectClass: inetOrgPerson
+  objectClass: apple-user
+  cn: <Surname>, <Name>  # OR: common name/displayName: ...
+  l: <city>
+  title: <position>
+  o: <company>  # OR: organization name: ...
+  uid: NSurname
+  apple-serviceslocator: <uuid>:<uuid>:calendar
+  sn: <Surname>  # OR: surname: ...
+  department: <building>
+
+
+REF
+  +++ [_] USE:(lbdb) http://mutt.postle.net/addresses/
+
+  adressbook database instead of aliases
+    + https://dev.mutt.org/trac/wiki/QueryCommand
+      https://dev.mutt.org/trac/wiki/QueryCommand/MuttLdapSearch
+      https://encrypted.google.com/search?q=mutt+ldap+address+book
+      http://mamchenkov.net/wordpress/2004/03/23/how-can-i-configure-mutt-to-use-addresses-from-ldap-addressbook/
