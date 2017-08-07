@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+# NOTE: chmod with separate access rights for dirs and files
+exec find "$@" \( -type d -exec chmod --preserve-root --changes 700 {} \+ \) \
+  -or \( -type f -exec chmod --preserve-root --changes 600 {} \+ \)

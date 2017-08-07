@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+# tags: core
+source ~/.shell/func.d/cfgsetup
+
+mkdir -p ~/VMs
+VBoxManage setproperty machinefolder ~/VMs  # OR /home/media/VMs
+
+## NOTE: disable annoying miniToolBar
+# SEE: http://helpdeskgeek.com/virtualization/hide-the-menu-bar-and-status-bar-in-virtualbox/
+VBoxManage setextradata global GUI/Customizations noMenuBar,noStatusBar
+# ALT: $ sed -i '/ShowMiniToolBar/ s/\(value="\)\w\+"/\1no"/' ~/VMs/arch64/arch64.vbox

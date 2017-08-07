@@ -7,7 +7,7 @@ user="${SYS_USER:?No}"
 
 ### ADD users:  https://wiki.archlinux.org/index.php/Users_and_groups#User_groups
 # adbusers, mpd, vboxsf, vboxusers, wireshark
-id -g $user || groupadd $user
+id -g $user || groupadd $user  # ALT:BET:USE: unified command $ useradd -U ...
 id -u $user || useradd -m -g $user -G users,wheel,uucp,games -s /bin/bash $user
 gpasswd -a $user uucp  # FIND: useradd is not enough to add to group?
 printf "%s" $user:$user | chpasswd

@@ -21,6 +21,14 @@ cryptsetup -s 512 luksFormat /dev/nvme0n1p6
 cryptsetup open --type luks /dev/nvme0n1p6 crypto-lvm
 # OR luksOpen?
 
+## NOTE: change password
+# https://unix.stackexchange.com/questions/252672/how-do-i-change-a-luks-password
+# INFO: look at occupied key slots
+# sudo cryptsetup luksDump /dev/sdb5 | grep ABLED
+# WARN: don't overwrite passphrase directly (failure-prone)
+# -- BET: repeat safe change two times with same password
+# sudo cryptsetup luksChangeKey /dev/sdb5
+
 # Create LVM parts for SSD
 lvmdiskscan
 
@@ -32,17 +40,20 @@ vgcreate lvm /dev/mapper/crypto-lvm
 vgdisplay
 vgs
 
+# lvcreate lvm -Wy --yes -L 4G -C y -n swap
 lvcreate lvm -Wy --yes -L 40G -n root
 lvcreate lvm -Wy --yes -L 40G -n home
 lvcreate lvm -Wy --yes -l +100%FREE -n media
 lvs
 
 # Format
+# mkswap -f /dev/mapper/lvm-swap
 mkfs.btrfs -f /dev/mapper/lvm-root
 mkfs.btrfs -f /dev/mapper/lvm-home
 mkfs.ext4 /dev/mapper/lvm-media
 
 # Mount
+# swapon /dev/mapper/lvm-swap
 mount -o compress=lzo,autodefrag /dev/mapper/lvm-root /mnt
 mkdir /mnt/boot
 mount /dev/nvme0n1p1 /mnt/boot
@@ -80,4 +91,12 @@ pacstrap base base-devel lvm2 btrfs-progs ntp sudo polkit wpa_supplicant wget xo
 # https://wiki.archlinux.org/index.php/ASUS_Zenbook_Pro_UX501
 
 # END
-cryptsetup close crypto-lvm
+# ALSO: umount -l /mnt
+# swapoff /dev/mapper/lvs-swap
+vgs
+lvchange --activate n vg0   # stop LVM group
+cryptsetup -v close crypto-lvm
+# BUG: device-mapper: remove ioctl on crypto-lvm  failed: Device or resource busy
+# SEE: https://askubuntu.com/questions/429612/device-mapper-remove-ioctl-on-luks-xxxx-failed-device-or-resource-busy
+# $ sudo dmsetup ls | grep 'crypto-lvm\|^vg0-'  => (254:6) :7 :8
+# $ sudo lsof | grep '254,[678]'

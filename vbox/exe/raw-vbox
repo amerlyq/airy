@@ -1,0 +1,53 @@
+#!/bin/bash -eu
+set -o pipefail
+exit
+
+VBoxManage list vms
+VBoxManage list runningvms
+
+# VIZ. VBoxManage list ostypes Gi arch
+# REM: VBoxManage unregistervm arch64hdd  # --delete
+VBoxManage createvm --name arch64hdd --ostype ArchLinux_64 --basefolder ~/VMs --register
+
+
+VBoxManage modifyvm arch64hdd \
+  --memory 3072 --ioapic on --firmware efi --rtcuseutc on \
+  --boot1 dvd --boot2 disk --boot3 none --boot4 none \
+  --cpus 4 --pae on --hwvirtex on --nestedpaging on --largepages on --vtxvpid on \
+  --vram 128 --accelerate3d on --accelerate2dvideo off --audio pulse --audiocontroller hda
+  # --clipboard bidirectional --monitorcount 1 --vrde off
+  # --usb on --usbehci off --nic1 nat --nic2 none --nic3 none --nic4 none
+
+
+# HACK:SECU: create restricted vboxhdd user with access to rw- disk
+# BET:(udev+uaccess): https://wiki.archlinux.org/index.php/users_and_groups#Pre-systemd_groups
+# NOTE:(-m): intentionally create home directory
+# BAD:(don't work due to home perms): -- running by another user from home
+#   $ sudo -u vbox env VBOX_USER_HOME=/home/$USER/.config/VirtualBox VBoxManage ...
+# sudo useradd -m --system --shell /sbin/nologin --gid "$(id -g)" --groups vboxusers,disk vbox
+# BAD:(can't change umask 022): all inner files created by vbox user aren't visible for normal one due to perms
+#   https://unix.stackexchange.com/questions/36220/how-to-set-umask-for-a-system-user
+#   ALT:BAD:(hard to setup): use ACL
+#     setfacl -R -m group:groupname:rw-,d:group:groupname:rw- directory/
+# sudo chmod 770 /home/vbox
+# sudo find ~/VMs/arch64hdd \( -type d -exec chmod 770 {} \+ \) -or \( -type f -exec chmod 660 {} \+ \)
+# ALT:NOT:SECU: add yourself into 'disk' group and relogin by $ loginctl terminate-user "$USER"
+sudo usermod -a -G vboxusers,disk "$USER"
+
+
+# NOTE: complete encrypted disk with boot on /dev/sdb1 and lvm-on-luks at /dev/sdb5
+# REF: http://www.virtualbox.org/manual/ch09.html#rawdisk
+#   ATT: need read/write access to disk on initial creation and on following usage
+#   DONE: first 10MB of /dev/sdb is unchanged
+VBoxManage internalcommands createrawvmdk -filename ~/VMs/arch64hdd/arch64hdd.vmdk -rawdisk /dev/sdb
+# sudo chown vboxhdd:$USER ~/VMs/arch64hdd/arch64hdd.vmdk
+# BUG: VBoxManage: error: Failed to initialize COM! (hrc=NS_ERROR_FAILURE)
+#   https://www.cosmologyathome.org/forum_thread.php?id=7478
+
+
+# NOTE: Installation phase
+VBoxManage storagectl arch64hdd --name 'IDE'  --add ide --controller PIIX4 --hostiocache on --bootable on
+VBoxManage storagectl arch64hdd --name 'SATA' --add sata --controller IntelAHCI --hostiocache off --portcount 1
+
+VBoxManage storageattach arch64hdd --storagectl 'IDE' --port 0 --device 0 --type dvddrive --medium ~/VMs/archlinux-2017.08.01-x86_64.iso
+VBoxManage storageattach arch64hdd --storagectl 'SATA' --port 0 --device 0 --type hdd --medium ~/VMs/arch64hdd/arch64hdd.vmdk
