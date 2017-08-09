@@ -20,5 +20,6 @@ alias s.v='s.u show-environment'
 alias s.vi='s.u import-environment'
 alias s.vs='s.u set-environment'
 
-alias s.l='journalctl --user -u'
-alias s.L='journalctl --user -f -o cat -u'
+alias s.l='journalctl --user -u'            # full status log for unit
+alias s.b='journalctl --user -b -u'         # log starting current boot
+alias s.L='journalctl --user -f -o cat -u'  # tail current status

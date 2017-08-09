@@ -1,13 +1,13 @@
 #!/bin/bash -e
 exit
 
-## For UHD displays:
-setfont latarcyrheb-sun32 -m 8859-1
-# OR setfont  # To reset
+## For UHD 4k displays:
+setfont latarcyrheb-sun32 -m 8859-1  # OR:(reset):$ setfont
 
 # SEE
 # https://gist.github.com/jasonwryan/4618490
 # https://gist.github.com/binaerbaum/535884a7f5b8a8697557
+# (grub+UEFI): https://gist.github.com/mattiaslundberg/8620837
 
 # Add partition for encrypted lvm (dual-windows)
 # Firstly, create unallocated space under Windows.
@@ -45,6 +45,7 @@ lvcreate lvm -Wy --yes -L 40G -n root
 lvcreate lvm -Wy --yes -L 40G -n home
 lvcreate lvm -Wy --yes -l +100%FREE -n media
 lvs
+# ALSO:(if needed):$ lvremove /dev/lvm/media
 
 # Format
 # mkswap -f /dev/mapper/lvm-swap
@@ -60,17 +61,19 @@ mount /dev/nvme0n1p1 /mnt/boot
 mkdir /mnt/home
 mount -o compress=lzo,autodefrag /dev/mapper/lvm-home /mnt/home
 mkdir /mnt/home/media
-mount /dev/mapper/lvm-home /mnt/home/media
+mount /dev/mapper/lvm-media /mnt/home/media
+mkdir -vp /mnt/hostrun && mount --bind /run /mnt/hostrun
 
 # Create loader.conf
-cat > /boot/loader/loader.conf <<EOT
+mkdir -p /mnt/boot/loader/entries
+cat > /mnt/boot/loader/loader.conf <<EOT
 default arch
 timeout 3
 editor 0
 EOT
 
 # <UUID> is raw encrypted device /dev/nvme0n1p6 -- find by ':r!blkid' in vi
-cat > /boot/loader/entries/arch.conf <<EOT
+cat > /mnt/boot/loader/entries/arch.conf <<EOT
 title Arch Linux Enc
 linux /vmlinuz-linux
 initrd /initramfs-linux.img
@@ -82,17 +85,22 @@ EOT
 cp /etc/nectl/{examples/,}wireless-wpa
 # THEN: edit /etc/netctl/wireless-wpa
 netctl start wireless-wpa
+# ALT:BET:$ wifi-menu
 timedatectl set-ntp true
 
 # Install
-pacstrap base base-devel lvm2 btrfs-progs ntp sudo polkit wpa_supplicant wget xorg-server xorg-server-utils xorg-xinit xf86-video-intel xf86-video-vesa mesa-libgl
+pacstrap /mnt base base-devel lvm2 btrfs-progs grub ntp sudo polkit wget git zsh vis
+# wpa_supplicant xorg-server xorg-server-utils xorg-xinit xf86-video-intel xf86-video-vesa mesa-libgl
 
 # ATTENTION:SEE:
 # https://wiki.archlinux.org/index.php/ASUS_Zenbook_Pro_UX501
 
+arch-chroot /mnt /bin/bash
+
 # END
-# ALSO: umount -l /mnt
-# swapoff /dev/mapper/lvs-swap
+umount /mnt/hostrun && rmdir -v /mnt/hostrun
+swapoff -a      # OR: /dev/mapper/lvs-swap
+umount -R /mnt  # OR: umount -l /mnt
 vgs
 lvchange --activate n vg0   # stop LVM group
 cryptsetup -v close crypto-lvm

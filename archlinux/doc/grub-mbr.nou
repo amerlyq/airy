@@ -1,0 +1,88 @@
+# vim: ft=sh
+# NOTE: non-SSD + MBR/BIOS + grub + luks/lvm
+
+cryptsetup luksOpen /dev/sda5 luks
+
+mount -o autodefrag /dev/mapper/ws-root /mnt
+swapon /dev/mapper/ws-swap
+mkdir -vp /mnt/{boot,home,work,hostrun}
+mount /dev/sda1 /mnt/boot
+mount -o autodefrag /dev/mapper/ws-home /mnt/home
+mount /dev/mapper/ws-work /mnt/work
+mount --bind /run /mnt/hostrun  # REQ for grub-mkconfig
+
+lsblk /dev/sda
+# NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+# sda             8:16   0 931.5G  0 disk
+# ├─sda1          8:17   0     2G  0 part  /mnt/boot
+# ├─sda2          8:18   0     1K  0 part
+# └─sda5          8:21   0 929.5G  0 part
+#   └─luks      254:6    0 929.5G  0 crypt
+#     ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]
+#     ├─ws-root 254:8    0    40G  0 lvm  /mnt
+#     ├─ws-home 254:9    0    40G  0 lvm  /mnt/home
+#     └─ws-work 254:10   0 845.5G  0 lvm  /mnt/work
+
+timedatectl set-timezone Europe/Kiev
+timedatectl set-ntp true
+pacstrap /mnt base base-devel lvm2 btrfs-progs grub ntp sudo polkit wget git zsh vis
+
+genfstab -pU /mnt >> /mnt/etc/fstab
+
+arch-chroot /mnt /bin/bash
+{
+  vis /etc/locale.gen  # uncomment 'en_US.UTF-8'
+  locale-gen
+  echo LANG=en_US.UTF-8 > /etc/locale.conf
+  export LANG=en_US.UTF-8
+  ln -svf /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+  hwclock --systohc --utc
+
+  echo myhost > /etc/hostname
+  vis /etc/hosts  # add 'myhost' on right of 'localhost'
+  cp /etc/netctl/{examples/ethernet-dhcp,eth_dhcp}
+  vis /etc/netctl/eth_dhcp  #change ifc by results of ':r!ip link'
+  netctl enable eth_dhcp
+
+  # CHG: HOOKS="base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck"
+  vis /etc/mkinitcpio.conf
+  mkinitcpio -p linux
+
+  grub-install --target=i386-pc --recheck /dev/sda
+  {
+    vis /etc/default/grub
+    # GRUB_TIMEOUT=0
+    # GRUB_TIMEOUT_STYLE=hidden
+    ## INFO: :<blkid /dev/sda5 OR :<lsblk -dno UUID /dev/sda5
+    # GRUB_CMDLINE_LINUX="cryptdevice=UUID=<UUID>:luks"
+    # GRUB_PRELOAD_MODULES="part_msdos lvm"
+    # GRUB_DISABLE_RECOVERY=true
+    # GRUB_DISABLE_SUBMENU=true
+    # GRUB_DISABLE_OS_PROBER=true
+    ## WARN: 'console' is not resizable
+    # GRUB_GFXPAYLOAD_LINUX=keep  # ALT: =text
+    # GRUB_GFXMODE=1024x768x32    # choose from GRUB -> 'e' -> :vbeinfo
+
+    mkdir -vp /run/lvm && mount --bind /hostrun/lvm /run/lvm
+    grub-mkconfig -o /boot/grub/grub.cfg
+    umount /run/lvm && rmdir -v /run/lvm
+  }
+
+  # VIZ. list all users: sudo passwd -Sa
+  passwd
+  useradd -mUG users,wheel,uucp -s /bin/bash myuser
+  passwd myuser       # OR: $ printf myuser:mypass | chpasswd
+  EDITOR=vis visudo   # CHG: uncomment first '%wheel'
+
+  su myuser
+  {
+  }
+}
+
+## Clean-up
+rmdir -v /mnt/hostrun
+umount -R /mnt
+swapoff -a
+lvchange -a n ws   # stop LVM group
+cryptsetup -v close luks
+reboot

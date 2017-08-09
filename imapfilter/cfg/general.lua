@@ -16,7 +16,7 @@ function os.capture(cmd) --, raw
 end
 
 function get_acc_passwd(muser)
-  return os.capture(os.getenv('HOME')..'/.mutt/exe/pass '..muser)
+  return os.capture(os.getenv('HOME')..'/.config/mutt/exe/pass '..muser)
 end
 
 -- return io.open(dir..'/'..file):read()

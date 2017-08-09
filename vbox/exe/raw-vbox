@@ -11,9 +11,9 @@ VBoxManage createvm --name arch64hdd --ostype ArchLinux_64 --basefolder ~/VMs --
 
 
 VBoxManage modifyvm arch64hdd \
-  --memory 3072 --ioapic on --firmware efi --rtcuseutc on \
+  --memory 3072 --ioapic on --firmware bios --rtcuseutc on \
   --boot1 dvd --boot2 disk --boot3 none --boot4 none \
-  --cpus 4 --pae on --hwvirtex on --nestedpaging on --largepages on --vtxvpid on \
+  --cpus 4 --pae on --hwvirtex on --paravirtprovider none --nestedpaging on --largepages on --vtxvpid on \
   --vram 128 --accelerate3d on --accelerate2dvideo off --audio pulse --audiocontroller hda
   # --clipboard bidirectional --monitorcount 1 --vrde off
   # --usb on --usbehci off --nic1 nat --nic2 none --nic3 none --nic4 none
@@ -45,9 +45,19 @@ VBoxManage internalcommands createrawvmdk -filename ~/VMs/arch64hdd/arch64hdd.vm
 #   https://www.cosmologyathome.org/forum_thread.php?id=7478
 
 
-# NOTE: Installation phase
+# NOTE: installation phase
 VBoxManage storagectl arch64hdd --name 'IDE'  --add ide --controller PIIX4 --hostiocache on --bootable on
-VBoxManage storagectl arch64hdd --name 'SATA' --add sata --controller IntelAHCI --hostiocache off --portcount 1
+VBoxManage storagectl arch64hdd --name 'SATA' --add sata --controller IntelAHCI --hostiocache on --portcount 1
 
 VBoxManage storageattach arch64hdd --storagectl 'IDE' --port 0 --device 0 --type dvddrive --medium ~/VMs/archlinux-2017.08.01-x86_64.iso
 VBoxManage storageattach arch64hdd --storagectl 'SATA' --port 0 --device 0 --type hdd --medium ~/VMs/arch64hdd/arch64hdd.vmdk
+
+# ... (install ArchLinux)
+
+# NOTE: usage after installation
+VBoxManage storageattach arch64hdd --storagectl 'IDE' --port 0 --device 0 --medium emptydrive
+VBoxManage storagectl arch64hdd --name 'SATA' --hostiocache off --bootable on
+
+
+# BUG: pan on resize
+# https://www.virtualbox.org/ticket/15863?cversion=0&cnum_hist=2

@@ -3,3 +3,23 @@ Enable TRIM : partition -> btrfs -> lvm -> crypto-lvm -> ssd partition
   http://blog.neutrino.es/2013/howto-properly-activate-trim-for-your-ssd-on-linux-fstrim-lvm-and-dmcrypt/
   https://wiki.archlinux.org/index.php/Btrfs#Mount_options
   http://comments.gmane.org/gmane.comp.file-systems.btrfs/15646
+
+Enable discard (TRIM) on SSDs while running LVM on LUKS and Btrfs (Arch) -- to keep it fresh
+  https://fogelholk.io/enable-discard-trim-on-ssds-while-running-lvm-on-luks-and-btrfs-arch/
+  Add 'discard' as a mount-option to your /etc/fstab
+    /dev/mapper/lvmvg-rootvol / btrfs rw,relatime,ssd,discard,compress=lzo,space_cache,subvol=root 0 0
+    /dev/mapper/lvmvg-rootvol /home btrfs rw,relatime,ssd,discard,compress=lzo,space_cache,subvol=home 0 0
+  Allow discard-command to go through LVM in /etc/lvm/lvm.conf
+    issue_discards = 1
+  Enable 'fstrim.timer' for periodical trim
+    $ systemctl enable fstrim.timer
+  Boot cryptdevice, allowing trim in /etc/default/grub
+    GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda3:lvm:allow-discards root=/dev/mapper/lvmvg-rootvol rootflags=subvol=root resume=/dev/mapper/lvmvg-swapvol"
+  Regenerate grub and reboot
+    $ grub-mkconfig -o /boot/grub/grub.cfg
+  Trigger a TRIM to run manually first time
+    $ sudo fstrim -v /
+  ALSO:THINK:
+    Make /tmp a ramdisk (add the following line to /mnt/etc/fstab)
+      tmpfs	/tmp	tmpfs	defaults,noatime,mode=1777	0	0
+    Change relatime on all non-boot partitions to noatime (reduces wear if using an SSD)
