@@ -1,0 +1,31 @@
+USE https://wiki.archlinux.org/index.php/Snapper
+  BAD: Having many (>10) subvolumes can be very slow
+    https://btrfs.wiki.kernel.org/index.php/Gotchas#Having_many_subvolumes_can_be_very_slow
+    ::: set low limits on snapshots count
+
+USAGE
+  Mount real root-subvolume for overview and operations on subvolumes
+    https://unix.stackexchange.com/questions/326348/btrfs-revert-snapshot-of-root-fs
+    $ mount -o subvolid=0 /dev/mapper/ws-root /mnt
+    $ mount -o subvol=/ /dev/mapper/ws-root /mnt
+  Free space BAD: $ df -h /
+    $ btrfs filesystem df /
+  Contiguous (unfragmented) VM disk images -- disable CoW
+    https://btrfs.wiki.kernel.org/index.php/FAQ#Can_copy-on-write_be_turned_off_for_data_blocks.3F
+    $ touch vm-image.raw
+    $ chattr +C vm-image.raw
+    $ fallocate -l10g vm-image.raw
+  Copy large sources
+    $ cp --archive --one-file-system --reflink=always "$@"
+    OR $ r.btrfs-cow
+  Snapshot of single directory (NEED: cross-subvolume reflinks allowed)
+    $ btrfs subvolume create dest
+    $ cp -ax --reflink=always /path/to/src/. dest
+  Defragment (?per subvolume?)
+    BAD: defragmenting CoW (snapshot/reflinks) will produce two unrelated files
+      => defragment subvolume with snapshot => doubles disk usage
+    Only file data recursively
+      $ sudo btrfs filesystem defragment -r -v /
+    ALSO directories metadata
+      $ find / -xdev -type d -print -exec btrfs filesystem defragment -- {} \+
+    ALT: for new files $ mount -o autodefrag ...

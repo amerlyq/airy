@@ -1,0 +1,45 @@
+%%%% Btrfs
+
+REF
+  TUT https://btrfs.wiki.kernel.org/index.php/SysadminGuide
+  FAQ https://btrfs.wiki.kernel.org/index.php/UseCases
+  BAD https://btrfs.wiki.kernel.org/index.php/Gotchas
+  [_] READ:(problems): http://www.jupiterbroadcasting.com/61572/preventing-a-btrfs-nightmare-las-320/
+  2017-08-10 [X] READ:(atime + btrfs): https://lwn.net/Articles/499293/
+    << xref from https://btrfs.wiki.kernel.org/index.php/Mount_options#Performance
+    ::: TEMP:USE: always noatime -- because of SSD
+      ALT: noatime for subvolume with firmware builds and SSD, reltime otherwise
+        << BUT! we will use "noatime" eventually when migrating to SSD anyway -- so why bother ?
+
+INFO
+  WARN:TEMP: mount options apply to whole filesystem
+    => only options from first mounted subvolume will take effect
+      E.G.(for newly created files): nodatacow, nodatasum, compress
+    * "autodefrag" -- detect random writes and start background defragging
+    * "compress=lzo" -- compresses only if file's first block $ ((sz_lzo < sz_orig))
+    * "nodatacow" -- behave as ext[234] -- USE only for randow writes to large database
+    * "space_cache" -- store free space data on disk, enabled automatically
+    * "noatime" -- performance when compiling
+      NOTE: makefile uses "mtime" -- so disabling "atime" is safe
+      ATT:(reltime): writes atime once a 24h -- BAD! triggers CoW on snapshots
+        E.G. recursive grep => all inodes become duplicated
+        WARN: explicit :touch or utime() will update "atime" anyway -- triggering CoW
+      ?? CHECK: breaks makefiles ??
+      ALT:BET: mark build dir as noatime -- disable writing atime on disk for each file read
+        http://en.tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap6sec73.html
+        $ chattr -R +A  /path/to/build/src
+  Supported
+    * CoW = copy-on-write $ cp --reflink=auto
+      - copy uses no disk space
+      - when copy edited -- only changed blocks will be written
+      ! eventually any copy/snapshot becomes completely independent
+        -- loosing "cheap" characteristic after multiple rewrites
+    * online shrink/extend => manage quota for "btrfs per partition"
+    * quotas -- limit total/unshared/compressed data per subvolume
+      REF https://btrfs.wiki.kernel.org/index.php/Quota_support
+  Subvolumes vs Folders
+    * subvolumes under the default root-subvolume appear as folders
+    * subvolumes do not need to be mounted if you've mounted the root-subvolume
+    * subvolumes can be mounted individually without mounting root/parent-subvolume
+    * subvolumes can be snapshotted, whereas folders can't
+    * BUT: unmounted subvolumes are read-only

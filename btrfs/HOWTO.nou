@@ -1,11 +1,5 @@
 >>> Btrfs
 
-SEE
-  http://www.jupiterbroadcasting.com/61572/preventing-a-btrfs-nightmare-las-320/
-
-Free space (df -h /)
-  btrfs filesystem df /
-
 Resize
   https://www.libcrack.so/2012/05/15/reduce-btrfs-on-lvm-quick-recipe/
   Unmount the filesystem and check its' LV
@@ -38,6 +32,23 @@ Resize
     mount /mnt/bar
 
 Snapshots
+  #1
+    Snapshot root
+      https://superuser.com/questions/795903/how-to-snapshot-a-btrfs-root-file-system-snapshot-of
+      $ btrfs subvolume snapshot / /.snapshots/root
+    Revert root
+      https://unix.stackexchange.com/questions/326348/btrfs-revert-snapshot-of-root-fs
+    Restore from ro- snapshot
+      /media/btrfs
+        ├─@home
+        └─snapshots
+          └─@home-20170105
+      $ cd /media/btrfs
+      $ mv @home @home.old
+      $ btrfs sub snap snapshots/@home-20170105 @home
+      # OR:(rw-): mv snapshots/@home-20170105 @home
+      $ sudo umount /home && sudo mount /home  # OR:(root/): reboot
+
   Снимки. Монтируем корень ФС и создаём снимок корня системы:
     mount /dev/sda /mnt
     btrfs subvolume snapshot /mnt/root /mnt/backup
@@ -58,12 +69,6 @@ Snapshots
     ln -s ROOT@`cat /run/btrfs-root/__current/ROOT/SNAPSHOT` fresh-install
     rm /run/btrfs-root/__current/ROOT/SNAPSHOT
 
-
-CoW daily
-  Копирование при записи (CoW). Если использовать команду cp с ключом
-  --reflink=auto, то копия файла не будет занимать место на диске. И
-  впоследствии, допустим, при изменении скопированного файла, записываться
-  на диск будут только изменённые блоки.
 
 Commit interval settings
 > It is recommended to disable CoW for big binary files with random writes,
@@ -103,10 +108,3 @@ Checking
     : ...
     : found 88435663767 bytes used err is 0
     : ...
-
-Defragment
-  btrfs filesystem defragment -r -v /
-  : Note: The command above will defragment only file data.
-  : To defragment directory metadata for every directory in the file system,
-  : run this command:
-  find / -xdev -type d -print -exec btrfs filesystem defragment '{}' \;

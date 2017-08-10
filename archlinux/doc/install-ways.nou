@@ -1,0 +1,15 @@
+% From Running Arch Linux
+  $ paci arch-install-scripts
+
+
+% From VirtualBox RAW
+  https://wiki.archlinux.org/index.php/Installing_Arch_Linux_from_VirtualBox_(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9)
+
+  2017-08-10 [X] FIXED:BUG: not loading at all OR keyboard don't work in hardware or vbox
+  NEED: remove 'autodetect' to prevent deleting modules (unused on vbox or system)
+    $ sudo cryptsetup open --type luks /dev/sdb5 luks
+    $ sudo mount /dev/ws/root /mnt
+    $ sudo mount /dev/sdb1 /mnt/boot
+    $ sudo arch-chroot /mnt
+      $ vis /etc/mkinitcpio.conf
+      $ sudo mkinitcpio -p linux

@@ -1,10 +1,16 @@
+[_] READ https://ubuntuforums.org/showthread.php?t=2315354
+  http://techreport.com/review/27909/the-ssd-endurance-experiment-theyre-all-dead
+
+
 Enable TRIM : partition -> btrfs -> lvm -> crypto-lvm -> ssd partition
   https://wiki.archlinux.org/index.php/Solid_State_Drives
   http://blog.neutrino.es/2013/howto-properly-activate-trim-for-your-ssd-on-linux-fstrim-lvm-and-dmcrypt/
   https://wiki.archlinux.org/index.php/Btrfs#Mount_options
   http://comments.gmane.org/gmane.comp.file-systems.btrfs/15646
 
+
 Enable discard (TRIM) on SSDs while running LVM on LUKS and Btrfs (Arch) -- to keep it fresh
+  !1 [_] TODO: on my system
   https://fogelholk.io/enable-discard-trim-on-ssds-while-running-lvm-on-luks-and-btrfs-arch/
   Add 'discard' as a mount-option to your /etc/fstab
     /dev/mapper/lvmvg-rootvol / btrfs rw,relatime,ssd,discard,compress=lzo,space_cache,subvol=root 0 0

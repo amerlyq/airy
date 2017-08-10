@@ -1,0 +1,15 @@
+%%%% Btrfs
+
+TODO
+  !8 [_] setup regular btrfs snapshots and on pacman/airy update
+    NEED: move root-subvolume into //root
+
+TROUBLESHOOT
+  BAD: btrfs blk_update_request i/o error :: dev sda sector XXXXXXXXX
+    http://www.spinics.net/lists/linux-btrfs/msg51445.html
+    http://askubuntu.com/questions/424580/i-o-error-dev-sda-sector-xxxxxxxxxx
+    https://btrfs.wiki.kernel.org/index.php/Btrfsck
+    Identify the corrupted files
+      $ badblocks -n /dev/sdX
+    List files part of a BTRFS block
+      http://unix.stackexchange.com/questions/196824/how-to-list-files-part-of-a-btrfs-block

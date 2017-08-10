@@ -1,2 +1,3 @@
 #!/bin/sh -eu
-exec cp --reflink=always "$@"
+exec cp --archive --one-file-system --reflink=always "$@"
+# OR: cp -ax --reflink=auto

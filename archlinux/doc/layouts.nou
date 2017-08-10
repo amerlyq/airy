@@ -1,0 +1,40 @@
+INFO
+  * keep mbr/gpt under lvm for /boot and /boot/efi
+  * keep lvm under btrfs to create/change new 'ext4' partition
+  * use subvolume per /home/user for separate timemachines
+
+
+ALT: layouts
+  ~ per each partition use single btrfs root subvol=/
+    BAD: If your "/" is also the top level of your filesystem, then you can't atomically roll back to an earlier snapshot
+      SEE:(end of paragraph): https://btrfs.wiki.kernel.org/index.php/UseCases#I_want_to_be_able_to_do_rollbacks_with_Btrfs
+  ~ single partition with subvolumes :: root ++ home ++ work subvolumes
+  ~ two partitions (system|data) :: root ++ home :: media ++ work
+
+
+MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
+  sda             8:16   0 931.5G  0 disk
+  ├─sda1          8:17   0     2G  0 part  /mnt/boot
+  ├─sda2          8:18   0     1K  0 part
+  └─sda5          8:21   0 929.5G  0 part
+    └─luks      254:6    0 929.5G  0 crypt
+      ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]
+      ├─ws-root 254:8    0    40G  0 lvm
+        ├─root                            /mnt
+        └─user                            /mnt/home/user
+      └─ws-data 254:9    0    40G  0 lvm
+        ├─media                           /mnt/home/media
+        └─work                            /mnt/work
+
+
+Install
+  $ mkfs.btrfs -L LABEL /dev/sdx
+  # OR:(label after install): $ btrfs filesystem label /dev/sdx
+  $ mount -o autodefrag,compress=no /dev/mapper/ws-home /mnt/home
+
+
+SEE
+  2017-08-10 [X] https://bbs.archlinux.org/viewtopic.php?id=194491
+    ::: stick with 'Snapper' default way, as widely-known way
+    https://wiki.archlinux.org/index.php/Snapper
+      DEV https://btrfs.wiki.kernel.org/index.php/Autosnap
