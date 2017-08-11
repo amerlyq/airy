@@ -19,22 +19,63 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
   └─sda5          8:21   0 929.5G  0 part
     └─luks      254:6    0 929.5G  0 crypt
       ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]
-      ├─ws-root 254:8    0    40G  0 lvm
+      ├─ws-system 254:8  0    40G  0 lvm
         ├─root                            /mnt
-        └─user                            /mnt/home/user
+        └─home_user                       /mnt/home/user
       └─ws-data 254:9    0    40G  0 lvm
         ├─media                           /mnt/home/media
+        ├─vm                              /mnt/vm       # nodatacow, exclude from snapshots
         └─work                            /mnt/work
 
 
+SubLayout for each subvolume
+  * toplevel -- only contains main dirs (tracked by 'snapper') :: /root, /home, /work, /media
+  * main dirs -- contain mandatory subvolumes /@ and /@snapshots
+    └─root
+      ├─@           | mount /root/@ /mnt
+      ├─@snapshots  | mount /root/@snapshots /mnt/.snapshots
+      ├─@var_pkg    | mount /root/@pkg_cache /mnt/var/cache/pacman/pkg
+      └─@...        | other excluded+mounted subvolumes (specific for this mountpoint)
+  * /@ -- completely flat w/o any subvolumes inside
+    => otherwise on restore you must clone+delete each of nested subvolumes one by one
+      http://www.spinics.net/lists/linux-btrfs/msg54931.html
+    OR: stick to default way of "Snapper" -- never replace /root and directly boot into snapshot
+      BAD:(incongruent): /root itself can't be deleted -- as it has nested subvolume /root/.snapshots
+      # => /root subvolume becomes abandoned after first restoration of system
+  * snapshots -- moved outside of /@, otherwise you can't:
+    => ... replace /@ by "ro-" snapshot from inside it
+    => ... delete /@ at all -- having nested /.snapshots subvolume
+
+
+Exclude from snapshotting by creating subvolumes
+  + /vm -- nodatacow -- use VBox built-in snapshotting instead of btrfs one
+  + /var/log -- big ~4GB, binary *.journal -- always keep logs as-is for troubleshooting
+  + /var/cache/pacman/pkg -- no sense to snapshot
+  - /var/abs -- restorable db, no need to snapshot (don't exist anymore together with |abs| package)
+  ~? /chroot
+  ~? /opt
+
+
+[_] READ: https://gist.github.com/broedli/4f401e0097f185ba34eb#1-setup-ssh
+  << it's bad overall, but has some ideas (E.G. grup-btrfs)
+
+
 Install
-  $ mkfs.btrfs -L LABEL /dev/sdx
-  # OR:(label after install): $ btrfs filesystem label /dev/sdx
-  $ mount -o autodefrag,compress=no /dev/mapper/ws-home /mnt/home
+  $# mkfs.btrfs -L LABEL /dev/sdx  # OR: $ btrfs fi label /dev/sdx
+  $# btrfs subvolume list /
+  $# mount -o autodefrag,compress=no /dev/mapper/ws-home /mnt/home
 
 
-SEE
-  2017-08-10 [X] https://bbs.archlinux.org/viewtopic.php?id=194491
-    ::: stick with 'Snapper' default way, as widely-known way
-    https://wiki.archlinux.org/index.php/Snapper
-      DEV https://btrfs.wiki.kernel.org/index.php/Autosnap
+Snapper
+  Exclude snapshots from indexing
+    $ v /etc/updatedb.conf
+    # CHG: PRUNENAMES = ".snapshots"
+
+  home_$user main dir:
+    $ btrfs filesystem df / &> /dev/null  # sanity check if btrfs
+    $ btrfs subvol create /home/$user
+    $ snapper -c home_$user create-config /home/$user
+    $ sed -i -e "s/ALLOW_USERS=\"\"/ALLOW_USERS=\"$user\"/g" ${SNAPPERCFGDIR}/home_$user
+    # NEED:?
+    $ chown $user.$group /home/$user
+    $ chmod 755 /home/$user/.snapshots

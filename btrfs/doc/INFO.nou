@@ -17,7 +17,12 @@ INFO
       E.G.(for newly created files): nodatacow, nodatasum, compress
     * "autodefrag" -- detect random writes and start background defragging
     * "compress=lzo" -- compresses only if file's first block $ ((sz_lzo < sz_orig))
-    * "nodatacow" -- behave as ext[234] -- USE only for randow writes to large database
+      => enable -- for faster 3x reading bandwidth (even from SSD)
+      ~ uncompresses files by complete blocks up to 128 KB -- even for several bytes read
+      ~ increases fragmentation on middle-writes -- by rewriting whole compressed block
+    * "nodatacow" -- behave as ext[234] -- USE only for random writes to large database
+      ! implies "nodatasum" and disables "compress"
+      => sep subvolume for vms, dbs and other file-backed block devices
     * "space_cache" -- store free space data on disk, enabled automatically
     * "noatime" -- performance when compiling
       NOTE: makefile uses "mtime" -- so disabling "atime" is safe
@@ -42,4 +47,5 @@ INFO
     * subvolumes do not need to be mounted if you've mounted the root-subvolume
     * subvolumes can be mounted individually without mounting root/parent-subvolume
     * subvolumes can be snapshotted, whereas folders can't
-    * BUT: unmounted subvolumes are read-only
+    * BUT:CHECK: unmounted subvolumes are read-only
+    * WARN: ro- subvolumes can't be moved directly -- only with parent (due to xref to parent)

@@ -1,7 +1,17 @@
-USE https://wiki.archlinux.org/index.php/Snapper
+Snapper
+  USE https://wiki.archlinux.org/index.php/Snapper
+  FAQ https://doc.opensuse.org/documentation/leap/reference/html/book.opensuse.reference/cha.snapper.html
+  ALT:DEV:(built-in): https://btrfs.wiki.kernel.org/index.php/Autosnap
   BAD: Having many (>10) subvolumes can be very slow
     https://btrfs.wiki.kernel.org/index.php/Gotchas#Having_many_subvolumes_can_be_very_slow
     ::: set low limits on snapshots count
+  ALSO
+    https://pypi.python.org/pypi/snapperS
+    https://bbs.archlinux.org/viewtopic.php?id=194491
+  2017-08-10 [X] layout for subvolumes
+    https://bbs.archlinux.org/viewtopic.php?id=194491
+    ::: stick with 'Snapper' default way, as widely-known way
+
 
 USAGE
   Mount real root-subvolume for overview and operations on subvolumes
@@ -29,3 +39,5 @@ USAGE
     ALSO directories metadata
       $ find / -xdev -type d -print -exec btrfs filesystem defragment -- {} \+
     ALT: for new files $ mount -o autodefrag ...
+      NEED: separately compress already existing files
+      $ btrfs filesystem defragment -c -r -v /
