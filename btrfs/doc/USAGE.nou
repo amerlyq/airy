@@ -13,7 +13,19 @@ Snapper
     ::: stick with 'Snapper' default way, as widely-known way
 
 
+DEBUG
+  Check if checksum is hardware accelerated
+    $ dmesg | grep crc
+    # Btrfs loaded, crc32c=crc32c-intel
+  SEE btrfs messages
+    $ dmesg Gi btrfs
+  WARN: btrfs may become very unresponsive (almost freeze) on balancing ops $ dmesg
+     # [306.726728] BTRFS info (device sda3): relocating block group 73740058624 flags 1
+
+
 USAGE
+  Show all devices
+    $ sudo btrfs f show
   Mount real root-subvolume for overview and operations on subvolumes
     https://unix.stackexchange.com/questions/326348/btrfs-revert-snapshot-of-root-fs
     $ mount -o subvolid=0 /dev/mapper/ws-root /mnt
@@ -40,4 +52,11 @@ USAGE
       $ find / -xdev -type d -print -exec btrfs filesystem defragment -- {} \+
     ALT: for new files $ mount -o autodefrag ...
       NEED: separately compress already existing files
-      $ btrfs filesystem defragment -c -r -v /
+      $ btrfs filesystem defragment -v -clzo -r /
+  Pure metadata-data rebalance (kernel<v3.18)
+    free == Metadata(total) - Metadata(used) - GlobalReserve(total)
+    $ btrfs balance start -v -dusage=0 /path/to/filesystem
+    BET: https://btrfs.wiki.kernel.org/index.php/Balance_Filters
+    https://serverfault.com/questions/784871/no-space-left-on-device-but-enough-space-and-enough-inodes
+    http://www.codeblueprint.co.uk/2017/05/11/dear-btrfs.html
+    http://marc.merlins.org/perso/btrfs/post_2014-05-04_Fixing-Btrfs-Filesystem-Full-Problems.html

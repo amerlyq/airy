@@ -1,7 +1,8 @@
 INFO
   * keep mbr/gpt under lvm for /boot and /boot/efi
-  * keep lvm under btrfs to create/change new 'ext4' partition
-  * use subvolume per /home/user for separate timemachines
+  * keep lvm under btrfs for swap partition and to create/change new 'ext4' partition
+    https://btrfs.wiki.kernel.org/index.php/FAQ#Btrfs_has_subvolumes.2C_does_this_mean_I_don.27t_need_a_logical_volume_manager_and_I_can_create_a_big_Btrfs_filesystem_on_a_raw_partition.3F
+  * use subvolume per /home/user for separate independent timemachines
 
 
 ALT: layouts
@@ -14,18 +15,17 @@ ALT: layouts
 
 MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
   sda             8:16   0 931.5G  0 disk
-  ├─sda1          8:17   0     2G  0 part  /mnt/boot
+  ├─sda1          8:17   0     2G  0 part  /mnt/boot    # EXPL: outside of luks to be able to boot in UEFI
   ├─sda2          8:18   0     1K  0 part
   └─sda5          8:21   0 929.5G  0 part
     └─luks      254:6    0 929.5G  0 crypt
-      ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]
-      ├─ws-system 254:8  0    40G  0 lvm
-        ├─root                            /mnt
-        └─home_user                       /mnt/home/user
-      └─ws-data 254:9    0    40G  0 lvm
-        ├─media                           /mnt/home/media
-        ├─vm                              /mnt/vm       # nodatacow, exclude from snapshots
+      ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]        # SECU: must be encrypted
+      ├─ws-root 254:8    0    40G  0 lvm  /mnt          # EXPL: sep root to reinstall system if snapshots+quota will break/lock-down btrfs some day
+      ├─ws-user 254:9    0    40G  0 lvm  /mnt/home/user  # EXPL: sep snapshots per each user
+      ├─ws-data 254:10   0 845.5G  0 lvm
+        ├─data                            /mnt/data     # shared data :: group=users
         └─work                            /mnt/work
+      └─vm                                /mnt/vm       # TEMP:(nodatacow): can't set for individual subvolumes
 
 
 SubLayout for each subvolume
@@ -41,7 +41,17 @@ SubLayout for each subvolume
       http://www.spinics.net/lists/linux-btrfs/msg54931.html
     OR: stick to default way of "Snapper" -- never replace /root and directly boot into snapshot
       BAD:(incongruent): /root itself can't be deleted -- as it has nested subvolume /root/.snapshots
-      # => /root subvolume becomes abandoned after first restoration of system
+        => /root subvolume becomes abandoned after first restoration of system
+        => on other hand you will clearly see that system was restored
+        TUT: https://bbs.archlinux.org/viewtopic.php?id=194491
+        OFF: https://github.com/openSUSE/snapper/issues/159
+      NOTE: automatic clean-up of rollback snapshots BUT beside very first one /root
+        2017-08-13 [X] http://snapper.io/2017/05/10/automatic-cleanup-after-rollback.html
+      2017-08-12 [X] /.snapshots may actually be movable as whole -- only its subvolumes are "ro-" but not itself
+        => may actually be true, but requires excessive manual actions (which can be done by /etc/fstab)
+      2017-08-12 [X] /.snapshots is dir or subvolume itself ? ::: subvolume (because it's mountable)
+      2017-08-12 [X] /.snapshots on rollback moved or not ? ::: not moved -- "rw-" created directly besides "ro-"
+        => so set-default boots into "rw-", mounting snapshots from old location into /.snapshots/7/snapshot/.snapshots
   * snapshots -- moved outside of /@, otherwise you can't:
     => ... replace /@ by "ro-" snapshot from inside it
     => ... delete /@ at all -- having nested /.snapshots subvolume
@@ -50,14 +60,29 @@ SubLayout for each subvolume
 Exclude from snapshotting by creating subvolumes
   + /vm -- nodatacow -- use VBox built-in snapshotting instead of btrfs one
   + /var/log -- big ~4GB, binary *.journal -- always keep logs as-is for troubleshooting
-  + /var/cache/pacman/pkg -- no sense to snapshot
+    [_] CHECK: problems with systemd journaling when unmounting on shutdown
+    USE: ext4/nodatacow -- as random writes will slow-down the whole system
+  + /var/cache/pacman/pkg -- no sense to snapshot -- big and stale file list
+  + /tmp -- exlude in case of large files written to /tmp may become snapshotted
+    [_] CHECK: use RAM-exclusive /tmp if possible ?
+      BAD: low RAM when building firmware -- need disk-backed /tmp
+  - /chroot -- snapshot /chroot together with /root for tight versioning
+  - /var -- sep dir only to be able to remount /usr in "ro-"
+    => inseparable as whole == contains multiple files tightly synced with /usr
+    ! can't be unmounted on shutdown due to systemd journaling to /var/log
   - /var/abs -- restorable db, no need to snapshot (don't exist anymore together with |abs| package)
-  ~? /chroot
-  ~? /opt
+  ~ /opt -- only if you want to keep corporate software unaffected on rollback
+  [_] ALSO https://doc.opensuse.org/documentation/leap/reference/html/book.opensuse.reference/cha.snapper.html#snapper.dir-excludes
 
 
-[_] READ: https://gist.github.com/broedli/4f401e0097f185ba34eb#1-setup-ssh
-  << it's bad overall, but has some ideas (E.G. grup-btrfs)
+TODO
+  [_] READ: https://gist.github.com/broedli/4f401e0097f185ba34eb#1-setup-ssh
+    << it's bad overall, but has some ideas (E.G. grup-btrfs)
+  [_] setup config for quota
+    http://snapper.io/2016/05/18/space-aware-cleanup.html
+  [_] USE: for install http://www.funtoo.org/BTRFS_Fun
+  [_] USE:(config from end-of-article): http://www.nrtm.org/index.php/2012/03/13/the-joys-of-btrfs-and-opensuse-or-no-space-left-on-device/comment-page-1/
+  2017-08-12 [X] https://ramsdenj.com/2016/04/05/using-btrfs-for-easy-backup-and-rollback.html
 
 
 Install
@@ -70,6 +95,29 @@ Snapper
   Exclude snapshots from indexing
     $ v /etc/updatedb.conf
     # CHG: PRUNENAMES = ".snapshots"
+  Delete big files through all snapshots
+    https://blog.pdark.de/2014/02/16/deleting-files-from-snapper/
+    $ btrfs subvolume snapshot snap snap.rw
+    $ rm -rf snap.rw/path/to/file
+    $ btrfs subvolume delete snap
+    $ btrfs subvolume snapshot -r snap.rw snap
+    $ btrfs subvolume delete snap.rw
+  Find all CoW extents -- verify if file is reflink to another
+    https://unix.stackexchange.com/questions/263309/how-to-verify-a-file-copy-is-reflink-cow
+    https://unix.stackexchange.com/questions/128055/how-to-find-data-copies-of-a-given-file-in-btrfs-filesystem
+    rmlint: https://github.com/sahib/rmlint/issues/132
+  NOTE: if disk full -> can't create ./info.xml -> snapper won't track that snapshot
+    https://github.com/openSUSE/snapper/issues/24
+    -> delete manually $ sudo btrfs subvolume delete /.snapshots/1772/snapshot
+  Delete old snapshots (when disk is full)
+    $ snapper -c root list
+    $ snapper -c root delete 1
+    $ snapper ls
+    $ snapper delete --sync [id]
+    $ snapper -c root set-config "NUMBER_LIMIT=2"
+    $ snapper -c root set-config "NUMBER_LIMIT_IMPORTANT=2"
+  Revert single file from post(5) to pre(2)
+    $ snapper -v undochange 2..5 /etc/sysconfig/apache2
 
   home_$user main dir:
     $ btrfs filesystem df / &> /dev/null  # sanity check if btrfs

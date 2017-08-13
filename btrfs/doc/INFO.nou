@@ -3,6 +3,7 @@
 REF
   TUT https://btrfs.wiki.kernel.org/index.php/SysadminGuide
   FAQ https://btrfs.wiki.kernel.org/index.php/UseCases
+    https://btrfs.wiki.kernel.org/index.php/FAQ
   BAD https://btrfs.wiki.kernel.org/index.php/Gotchas
   [_] READ:(problems): http://www.jupiterbroadcasting.com/61572/preventing-a-btrfs-nightmare-las-320/
   2017-08-10 [X] READ:(atime + btrfs): https://lwn.net/Articles/499293/
@@ -11,18 +12,62 @@ REF
       ALT: noatime for subvolume with firmware builds and SSD, reltime otherwise
         << BUT! we will use "noatime" eventually when migrating to SSD anyway -- so why bother ?
 
+
+CMP: performance
+  REF
+    2017-08-12 [X] http://www.phoronix.com/scan.php?page=article&item=btrfs-mount-linux49
+    2017-08-12 [X] http://www.phoronix.com/scan.php?page=article&item=btrfs_lzo_2638&num=1
+    https://www.mayrhofer.eu.org/ssd-linux-benchmark
+    2017-08-12 [X] http://events.linuxfoundation.org/sites/events/files/slides/linux_file_system_analysis_for_IVI_systems.pdf
+    2017-08-12 [X] https://www.spinics.net/lists/linux-btrfs/msg49755.html
+    2017-08-12 [X] https://bbs.archlinux.org/viewtopic.php?id=180368
+    2017-08-12 [X] https://btrfs.wiki.kernel.org/index.php/Compression
+    2017-08-12 [X] http://blog.erdemagaoglu.com/post/4605524309/lzo-vs-snappy-vs-lzf-vs-zlib-a-comparison-of
+  SUM
+    = compile => almost the same for ext4/btrfs in any configuration
+      + some compiling tests benefit from lzo
+    + read on high load => btrfs twice as fast: 2x ext4
+    = repos => lzo 10..25% space saving, no performance impact
+    = direct io (DIO) don't use compression at all
+    ~ small files => each 4KB block is sep compressed, but whole range up to 128KB -- uncompressed at once
+      ! each config/source file when compiling is uncompressed as whole -- even for several bytes read
+      = OK: each file is RAM-backed after initial read and HDD read is much slower anyway
+      ? [_] FIND lzo compressed files <4KB also embedded into metainfo ?
+    - builds => lzo ~5% slower with no space savings
+    - write/delete/unpack => btrfs twice as slower than ext4 x0.7/0.5/0.8
+    - random/sequential writes => btrfs 3x/4x slower when CoW enabled
+    - lzo degrades performance on multi-thread writes to large files x0.65
+
+
+CMP: quotas
+  BAD: "qgroup" is still unstable and potentially harmful
+  BUT 'snapper' can't cleanup snapshots after itself w/o quotas
+    TEMP:WAR: single subvolume per partition (quotas enabled)
+      BUT: looses ability to share space for snapshots between //root/ and /home
+        => resize partitions as whole by underlying LVM when necessary
+  REF https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-quota
+  https://lists.opensuse.org/opensuse-factory/2016-09/msg00085.html
+  ++ http://www.spinics.net/lists/linux-btrfs/msg58385.html
+    - "No space left" when quota exceeded -- potentially completely locking system
+    - similarly problems may arise on //root/ filled up even w/o quotas enabled
+
+
 INFO
-  WARN:TEMP: mount options apply to whole filesystem
+  WARN:TEMP: mount options apply to whole filesystem (affects all subvolumes)
     => only options from first mounted subvolume will take effect
+      https://btrfs.wiki.kernel.org/index.php/Mount_options
       E.G.(for newly created files): nodatacow, nodatasum, compress
+      ! TEMP: all subvolumes will be mounted with same options as root
     * "autodefrag" -- detect random writes and start background defragging
     * "compress=lzo" -- compresses only if file's first block $ ((sz_lzo < sz_orig))
       => enable -- for faster 3x reading bandwidth (even from SSD)
-      ~ uncompresses files by complete blocks up to 128 KB -- even for several bytes read
+      ~ uncompresses files by complete ranges up to 128 KB of 4KB blocks -- even for several bytes read
       ~ increases fragmentation on middle-writes -- by rewriting whole compressed block
     * "nodatacow" -- behave as ext[234] -- USE only for random writes to large database
       ! implies "nodatasum" and disables "compress"
       => sep subvolume for vms, dbs and other file-backed block devices
+      BET: create separate LVM partition for VMs and resize if needed
+        ALT: create sep LVM part for _each_ vm and use rawhdd for vbox instead of file-backed
     * "space_cache" -- store free space data on disk, enabled automatically
     * "noatime" -- performance when compiling
       NOTE: makefile uses "mtime" -- so disabling "atime" is safe
