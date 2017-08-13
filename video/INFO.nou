@@ -1,3 +1,20 @@
+BUG:
+  2017-08-06 [X] primus: fatal: failed to load any of the libraries: /usr/lib/nvidia/libGL.so.1:/usr/lib32/nvidia/libGL.so.1
+    $ primusrun glxgears -info
+    ::: packaging and bumblebee config changed on update
+      https://bbs.archlinux.org/viewtopic.php?id=223989
+    FIXED $ sudo mv /etc/bumblebee/bumblebee.conf{.pacnew,} && S.rr bumblebeed
+  2017-08-06 [X] system hangs on startup
+    ::: energy saving method 'auto' don't work as expected
+    https://github.com/Bumblebee-Project/Bumblebee/issues/764
+    https://wiki.archlinux.org/index.php/NVIDIA_Optimus#Lockup_issue_.28lspci_hangs.29
+    TEMP: disable energy saving
+      $ v /etc/bumblebee/bumblebee.conf
+       PMMethod=none
+    ALT: workaround
+      acpi_osi=! acpi_osi="Windows 2009"
+
+
 Freeze : xorg freeze skylake
   ~ bumblebee + nvidia
     > https://bbs.archlinux.org/viewtopic.php?id=207646

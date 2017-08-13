@@ -1,3 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
-exec primusrun steam
+r.video-single 2
+
+onexit(){ r.video-single 1; }
+trap 'onexit' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+
+r.wm -w g  # Jump to game workspace
+primusrun steam

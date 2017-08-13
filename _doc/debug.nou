@@ -1,0 +1,21 @@
+Debug performance of application (mutt)
+  +++ http://www.codeblueprint.co.uk/2016/12/19/a-kernel-devs-approach-to-improving.html
+      http://www.codeblueprint.co.uk/2017/01/15/a-kernel-devs-approach-to-improving2.html
+  It's a good idea to look at the state of the entire system before delving into application-specific issues
+  Get system stats when running application
+    $ vmstat 1
+    # procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+    # r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+    # 1  0      0 4761080  2316 1994984    0    0 55392  3268 7571 30468  9 7 72 13  0
+  Get per-process results
+    $ pidstat -C mutt 1
+    # 21:53:07      UID       PID    %usr %system  %guest    %CPU   CPU  Command
+    # 21:53:08     1000      4475   31.00   22.00    0.00   53.00     0  mutt
+  Sum delays of sched_stat_iowait tracepoint
+    # kworker/u8:5-7166  [001] d..4  78.852761: sched_stat_iowait: comm=mutt pid=7200 delay=804910 [ns]
+    $ grep -E "iowait.*mutt" trace  | sed -e 's/.*delay=//' | \
+      awk 'BEGIN{s=0}{s+=$1} END{printf "%.2fs\n", s/1000000000}'
+  Acquire per-CPU distribution of time
+    $ perf report -g fractal --no-children
+    # +    5.07%  mutt     libc-2.24.so        [.] __strchr_sse2
+    # ...
