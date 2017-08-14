@@ -11,9 +11,9 @@ _has_pr pydf \
 && alias df='pydf' \
 || alias df='df -H'
 
-alias da='\du -sch'
-alias du='\du -ch'
-alias duh='du --max-depth=1' #Or: du -hd1
+alias duf='command du -ch'
+alias du='command du -sh'
+alias dU='sh -c "command du -xhd1 \"\$@\" | sort -rh" ""'
 alias stat.='command stat -c%s'
 
 alias now='date +"%T"'

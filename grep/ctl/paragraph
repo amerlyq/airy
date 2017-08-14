@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+exec awk -vRS='' -vORS='\n\n' -vr="$1" '$0~r' "${@:2}"
+# USE: multiline grep
+# pcregrep -M 'Pseudo.*\n.*42B.*\nstate.*' sample.txt
