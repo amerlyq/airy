@@ -56,8 +56,14 @@ INFO
   WARN:TEMP: mount options apply to whole filesystem (affects all subvolumes)
     => only options from first mounted subvolume will take effect
       https://btrfs.wiki.kernel.org/index.php/Mount_options
+      ++ https://www.spinics.net/lists/linux-btrfs/msg14673.html
+        https://www.spinics.net/lists/linux-btrfs/msg14683.html
       E.G.(for newly created files): nodatacow, nodatasum, compress
       ! TEMP: all subvolumes will be mounted with same options as root
+      ! if mounted with "nodatacow" -> then enabling CoW back wit "chattr -C" is ignored
+      ALT: set "chattr +C" for "nodatacow" subvolume before creating/copying any files or directories there
+        https://bbs.archlinux.org/viewtopic.php?id=213609
+  VIZ.
     * "autodefrag" -- detect random writes and start background defragging
     * "compress=lzo" -- compresses only if file's first block $ ((sz_lzo < sz_orig))
       => enable -- for faster 3x reading bandwidth (even from SSD)

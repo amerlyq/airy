@@ -13,6 +13,7 @@ setfont latarcyrheb-sun32 -m 8859-1  # OR:(reset):$ setfont
 # Firstly, create unallocated space under Windows.
 # SEE (gdisk example) http://www.rodsbooks.com/gdisk/walkthrough.html
 gdisk /dev/nvme0n1
+# o - create clean GUID, p - show results
 # n - new, number - 6, start/end -- default, type: 8e00 (lvm)
 # v - check, w - write+exit
 

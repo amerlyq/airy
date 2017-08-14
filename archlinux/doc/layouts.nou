@@ -1,5 +1,10 @@
 INFO
   * keep mbr/gpt under lvm for /boot and /boot/efi
+    GPT: for disks/partitions > 2TB, with unlimited primary partitions
+    ALSO: dups table and adds checksums for corruptions
+      https://askubuntu.com/questions/629470/gpt-vs-mbr-why-not-mbr
+    GPT -> MBR bridge
+      https://www.anchor.com.au/blog/2012/10/the-difference-between-booting-mbr-and-gpt-with-grub/
   * keep lvm under btrfs for swap partition and to create/change new 'ext4' partition
     https://btrfs.wiki.kernel.org/index.php/FAQ#Btrfs_has_subvolumes.2C_does_this_mean_I_don.27t_need_a_logical_volume_manager_and_I_can_create_a_big_Btrfs_filesystem_on_a_raw_partition.3F
   * use subvolume per /home/user for separate independent timemachines
@@ -19,13 +24,23 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
   ├─sda2          8:18   0     1K  0 part
   └─sda5          8:21   0 929.5G  0 part
     └─luks      254:6    0 929.5G  0 crypt
-      ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]        # SECU: must be encrypted
-      ├─ws-root 254:8    0    40G  0 lvm  /mnt          # EXPL: sep root to reinstall system if snapshots+quota will break/lock-down btrfs some day
-      ├─ws-user 254:9    0    40G  0 lvm  /mnt/home/user  # EXPL: sep snapshots per each user
-      ├─ws-data 254:10   0 845.5G  0 lvm
-        ├─data                            /mnt/data     # shared data :: group=users
-        └─work                            /mnt/work
-      └─vm                                /mnt/vm       # TEMP:(nodatacow): can't set for individual subvolumes
+      ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]        # SECU: must be encrypted, NOTE: position beg/end doesn't matter: each manufacturer may do things differently
+      ├─ws-root 254:8    0    40G  0 lvm                # EXPL: sep root to reinstall system if snapshots+quota will break/lock-down btrfs some day
+        ├─@                               /mnt
+        ├─@snapshots                      /mnt/.snapshots
+        ├─@var_cache                      /mnt/var/cache  # sep to exclude
+        └─@var_log                        /mnt/var/log    # sep, mark with "+C/nodatacow"
+      ├─ws-pkgs 254:8    0    20G  0 lvm  /mnt/var/cache/pacman/pkg
+      ├─ws-user 254:9    0    40G  0 lvm                  # EXPL: sep snapshots per each user
+        ├─@                               /mnt/home/user
+        ├─@snapshots                      /mnt/home/user/.snapshots
+        ├─@cabal                          /mnt/home/user/.cabal/lib     # ~2.1GB, recoverable builds of haskell libs
+        ├─@pacaur                         /mnt/home/user/.cache/pacaur  # ~5.6GB, recoverable builds of AUR pkgs
+        ├─@sdk                            /mnt/home/user/sdk            # ~3.3GB, cloned master repos from others
+      ├─ws-data 254:10   0   200G  0 lvm  /mnt/data       # shared data :: group=users
+        /data/dld  # use directly in all prgs instead of /home/user/Downloads
+        /data/vm   # if btrfs -- chattr +C /data/vm ALT: individual subvol when fixed "nodatacow" per subvol
+      ├─ws-work 254:11   0   625G  0 lvm  /mnt/work
 
 
 SubLayout for each subvolume
@@ -127,3 +142,14 @@ Snapper
     # NEED:?
     $ chown $user.$group /home/$user
     $ chmod 755 /home/$user/.snapshots
+
+
+Boot into snapshot
+  grub-btrfs
+    https://github.com/Antynea/grub-btrfs
+  uefi
+    ??? limited support from community
+  mkinitcpio -- after any bootloader
+    https://github.com/anthonyrisinger/mkinitcpio-btrfs
+  NOT: systemd-boot -- won't fix, supports only FAT
+    https://github.com/systemd/systemd/issues/2055

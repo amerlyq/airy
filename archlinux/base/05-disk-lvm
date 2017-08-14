@@ -8,7 +8,7 @@ sd="${SYS_DISK:?}"
 ## If disk had lvm previously created, remove devices from memory
 #:> FIXED: pvcreate cant open exclusively mounted filesystem
 dmsetup remove_all
-dmsetup ls
+dmsetup ls --tree
 # dmsetup remove lvm-...
 
 
