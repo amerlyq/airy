@@ -5,6 +5,7 @@ INFO
       https://askubuntu.com/questions/629470/gpt-vs-mbr-why-not-mbr
     GPT -> MBR bridge
       https://www.anchor.com.au/blog/2012/10/the-difference-between-booting-mbr-and-gpt-with-grub/
+  * keep /boot inside root / partition :: snapshot must have synced kernel and lkm modules
   * keep lvm under btrfs for swap partition and to create/change new 'ext4' partition
     https://btrfs.wiki.kernel.org/index.php/FAQ#Btrfs_has_subvolumes.2C_does_this_mean_I_don.27t_need_a_logical_volume_manager_and_I_can_create_a_big_Btrfs_filesystem_on_a_raw_partition.3F
   * use subvolume per /home/user for separate independent timemachines
@@ -28,7 +29,8 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
       ├─ws-root 254:8    0    40G  0 lvm                # EXPL: sep root to reinstall system if snapshots+quota will break/lock-down btrfs some day
         ├─@                               /mnt
         ├─@snapshots                      /mnt/.snapshots
-        ├─@var_cache                      /mnt/var/cache  # sep to exclude
+        ├─@boot_grub                      /mnt/boot/grub  # sep, keep GRUB config unchanged when boot into snapshots
+        ├─@var_cache                      /mnt/var/cache  # sep, ./pacman/pkg: ext4 shared between chroots
         └─@var_log                        /mnt/var/log    # sep, mark with "+C/nodatacow"
       ├─ws-pkgs 254:8    0    20G  0 lvm  /mnt/var/cache/pacman/pkg
       ├─ws-user 254:9    0    40G  0 lvm                  # EXPL: sep snapshots per each user
@@ -40,7 +42,7 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
       ├─ws-data 254:10   0   200G  0 lvm  /mnt/data       # shared data :: group=users
         /data/dld  # use directly in all prgs instead of /home/user/Downloads
         /data/vm   # if btrfs -- chattr +C /data/vm ALT: individual subvol when fixed "nodatacow" per subvol
-      ├─ws-work 254:11   0   625G  0 lvm  /mnt/work
+      └─ws-work 254:11   0   625G  0 lvm  /mnt/work
 
 
 SubLayout for each subvolume
