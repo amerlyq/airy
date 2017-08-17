@@ -15,6 +15,9 @@ linkcp -t "$dir" ./cfg/mpd.conf
 ./cfg/state.gen "$dir"/mpd.state
 svc_activate -cue mpd.{socket,service} mpd-log.service
 
+mkdir -p ~/chat  # BET? ~/db
+ln -svfT ~/.config/mpd/history ~/chat/mpd
+
 ## Broadcast server
 # linkcp -t "$dir" ./cfg/mpd-cast.conf
 # ./cfg/state.gen "$dir"/mpd-cast.state

@@ -59,5 +59,25 @@ VBoxManage storageattach arch64hdd --storagectl 'IDE' --port 0 --device 0 --medi
 VBoxManage storagectl arch64hdd --name 'SATA' --hostiocache off --bootable on
 
 
-# BUG: pan on resize
+# BUG:(broken auto-resize in tiling): pan on resize
 # https://www.virtualbox.org/ticket/15863?cversion=0&cnum_hist=2
+
+# NOTE: serial -- needed on system install / kernel debug
+# SEE: https://wiki.archlinux.org/index.php/working_with_the_serial_console
+VBoxManage modifyvm arch64hdd --uart1 0x3F8 4 --uartmode1 server /tmp/vbox-arch64hdd
+# GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash console=tty0 console=ttyS0,115200n8"
+# GRUB_TERMINAL="console serial"
+# GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"
+# GRUB_GFXPAYLOAD_LINUX=text
+# grub-mkconfig -o /boot/grub/grub.cfg
+# USAGE:
+socat -d -d /tmp/vbox-arch64hdd PTY,link=/tmp/vbox &
+picocom --baud 115200 --flow n --databits 8 --parity n /tmp/vbox
+# GUEST: r.serial-resize
+
+
+# NOTE: ssh port forwarding -- more comfortable then serial on system setup
+VBoxManage showvminfo arch64hdd | grep 'Rule.*ssh'
+VBoxManage modifyvm arch64hdd --natpf1 'ssh,tcp,,2822,,22'
+# VBoxManage modifyvm arch64hdd --natpf1 delete ssh
+ssh -p 2822 user@localhost

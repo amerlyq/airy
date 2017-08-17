@@ -15,6 +15,8 @@ linkcp ~/.config/mutt/cfg/theme-"$THEME" ~/.config/mutt/theme
 mkdir -p "${CURR_DIR_MAIL:?}"
 [[ $CURR_DIR_MAIL -ef ~/.mail ]] || linkcp "$CURR_DIR_MAIL" ~/.mail
 
+mkdir -p ~/chat
+ln -svfT ~/.mail ~/chat/mail
 
 # THINK:MAYBE: write config by hands instead of generation?
 # USAGE: mbsync '$mid' OR mbsync -a

@@ -18,4 +18,7 @@ if cfgOpt r || [[ ! -f $acc || ! -f $cfg ]]; then
   # gnome-keyring-daemon --replace
 fi
 
+mkdir -p ~/chat
+ln -svfT ~/.purple/logs ~/chat/pidgin
+
 echo "C: pidgin"

@@ -7,7 +7,8 @@ source ~/.shell/func.d/packages
 if distro arch; then
     # pacman -Si linux
     # will install DKMS properly
-    pkg_inst linux-headers virtualbox virtualbox-guest-iso
+    pkg_inst linux-headers virtualbox
+    pkg_inst virtualbox-guest-iso  # USE: to install adds to guests other than Arch
     # ALT:(conflict) aur_inst 'virtualbox-bin' 'virtualbox-host-modules'  # NOT FOUND
     # SEE: https://forum.antergos.com/topic/818/can-t-run-my-vitualbox/4
     # dkms autoinstall  # For custom, also: pkg_inst virtualbox-host-dkms
