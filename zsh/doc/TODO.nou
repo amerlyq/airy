@@ -56,6 +56,11 @@ Profiling startup time
 
 
 TASKS
+  [_] FIX: on login -- '%' prompt -- don't use Prezto framework => prefer antigen lib
+    https://github.com/sorin-ionescu/prezto/blob/master/modules/prompt/init.zsh#L13
+      # disabled on purpose
+    https://github.com/sorin-ionescu/prezto/issues/1005
+    https://github.com/sorin-ionescu/prezto/pull/713
   [_] BUG: auto-cd to root / on each interactively defined func() execution
     * BUG:(alias "..."="cd ../../") at ~/.config/airy/aliases
     * related to ~/.zprezto/init.zsh ALSO eval "$(fasd --init auto)"
