@@ -2,6 +2,7 @@
 # NOTE: non-SSD + MBR/BIOS + grub + luks/lvm
 
 cryptsetup luksOpen /dev/sda5 luks
+lvchange -a y ws
 
 mount -o autodefrag /dev/mapper/ws-root /mnt
 swapon /dev/mapper/ws-swap
@@ -26,12 +27,14 @@ lsblk /dev/sda
 timedatectl set-timezone Europe/Kiev
 timedatectl set-ntp true
 pacstrap /mnt base base-devel lvm2 btrfs-progs grub ntp sudo polkit wget git zsh vis
+# pacstrap /mnt ntp sudo polkit wget git zsh vis
 
 genfstab -pU /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt /bin/bash
 {
-  vis /etc/locale.gen  # uncomment 'en_US.UTF-8'
+  # uncomment 'en_US.UTF-8'
+  vis /etc/locale.gen
   locale-gen
   echo LANG=en_US.UTF-8 > /etc/locale.conf
   export LANG=en_US.UTF-8
@@ -41,21 +44,23 @@ arch-chroot /mnt /bin/bash
   echo myhost > /etc/hostname
   vis /etc/hosts  # add 'myhost' on right of 'localhost'
   cp /etc/netctl/{examples/ethernet-dhcp,eth_dhcp}
-  vis /etc/netctl/eth_dhcp  #change ifc by results of ':r!ip link'
+  # cp /etc/netctl/{examples/ethernet-static,eth_static}
+  vis /etc/netctl/eth_dhcp  # CHG ifc by results of ':r!ip link'
   netctl enable eth_dhcp
 
   # CHG: HOOKS="base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck"
   vis /etc/mkinitcpio.conf
   mkinitcpio -p linux
 
-  grub-install --target=i386-pc --recheck /dev/sda
   {
     vis /etc/default/grub
     # GRUB_TIMEOUT=0
     # GRUB_TIMEOUT_STYLE=hidden
     ## INFO: :<blkid /dev/sda5 OR :<lsblk -dno UUID /dev/sda5
     # GRUB_CMDLINE_LINUX="cryptdevice=UUID=<UUID>:luks"
-    # GRUB_PRELOAD_MODULES="part_msdos lvm"
+    ## HACK: for /boot inside LUKS
+    # GRUB_ENABLE_CRYPTODISK=y
+    # GRUB_PRELOAD_MODULES="part_gpt part_msdos lvm"
     # GRUB_DISABLE_RECOVERY=true
     # GRUB_DISABLE_SUBMENU=true
     # GRUB_DISABLE_OS_PROBER=true
@@ -63,23 +68,28 @@ arch-chroot /mnt /bin/bash
     # GRUB_GFXPAYLOAD_LINUX=keep  # ALT: =text
     # GRUB_GFXMODE=1024x768x32    # choose from GRUB -> 'e' -> :vbeinfo
 
+    # HOST: mkdir -vp /mnt/hostrun && mount --bind /run /mnt/hostrun
     mkdir -vp /run/lvm && mount --bind /hostrun/lvm /run/lvm
     grub-mkconfig -o /boot/grub/grub.cfg
+    grub-install --target=i386-pc --recheck /dev/sda
     umount /run/lvm && rmdir -v /run/lvm
   }
 
   # VIZ. list all users: sudo passwd -Sa
+  myuser=...
   passwd
-  useradd -mUG users,wheel,uucp -s /bin/bash myuser
-  passwd myuser       # OR: $ printf myuser:mypass | chpasswd
+  useradd -mUG users,wheel,uucp -s /bin/bash ${myuser:?}
+  passwd ${myuser:?}  # OR: $ printf myuser:mypass | chpasswd
   EDITOR=vis visudo   # CHG: uncomment first '%wheel'
 
   su myuser
   {
+    # sudo usermod -s "$(which zsh)" "$(whoami)"
   }
 }
 
 ## Clean-up
+umount /mnt/hostrun
 rmdir -v /mnt/hostrun
 umount -R /mnt
 swapoff -a

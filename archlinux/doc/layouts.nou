@@ -28,10 +28,13 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
       ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]        # SECU: must be encrypted, NOTE: position beg/end doesn't matter: each manufacturer may do things differently
       ├─ws-root 254:8    0    40G  0 lvm                # EXPL: sep root to reinstall system if snapshots+quota will break/lock-down btrfs some day
         ├─@                               /mnt
-        ├─@snapshots                      /mnt/.snapshots
-        ├─@boot_grub                      /mnt/boot/grub  # sep, keep GRUB config unchanged when boot into snapshots
-        ├─@var_cache                      /mnt/var/cache  # sep, ./pacman/pkg: ext4 shared between chroots
-        └─@var_log                        /mnt/var/log    # sep, mark with "+C/nodatacow"
+          ├─/boot/grub                    /mnt/boot/grub  # sep, keep GRUB config unchanged when boot into snapshots
+          ├─/var/log                      /mnt/var/log    # HACK:(systemd journal): mark with "+C/nodatacow"
+          └─/var/cache                    /mnt/var/cache  # sep, ./pacman/pkg: ext4 shared between chroots
+           # @boot_grub -- impossible to mount by GRUB bootloader
+           # @var_log -- unmountable because of systemd -- NEED shutdown hook in mkinitcpio ALT: direct subvolume, manually move on restoring from snapshot
+           # @var_cache -- no sense to make separate and mount afterwards -- you still need manually move other subvolumes
+        └─@snapshots                      /mnt/.snapshots
       ├─ws-pkgs 254:8    0    20G  0 lvm  /mnt/var/cache/pacman/pkg
       ├─ws-user 254:9    0    40G  0 lvm                  # EXPL: sep snapshots per each user
         ├─@                               /mnt/home/user

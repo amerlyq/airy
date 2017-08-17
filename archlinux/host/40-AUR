@@ -14,10 +14,11 @@ cat >> $cfg <<EOT
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 
+## NOTE: already in |community|
 ## MinGW-w64: https://sourceforge.net/projects/mingw-w64-archlinux/
-[mingw-w64]
-SigLevel = Optional TrustAll
-Server = http://downloads.sourceforge.net/project/mingw-w64-archlinux/$arch
+# [mingw-w64]
+# SigLevel = Optional TrustAll
+# Server = http://downloads.sourceforge.net/project/mingw-w64-archlinux/\$arch
 
 ## AUR: https://archlinux.fr/yaourt-en
 [archlinuxfr]

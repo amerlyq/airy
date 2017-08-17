@@ -83,6 +83,17 @@ lvcreate ws -Wy --yes -n data -L 200G
 lvcreate ws -Wy --yes -n work -l +100%FREE
 lvs
 
+# sdb               8:16   0 931.5G  0 disk
+# ├─sdb1            8:17   0 931.5G  0 part
+# │ └─luks        254:6    0 931.5G  0 crypt
+# │   ├─ws-swap   254:7    0     4G  0 lvm
+# │   ├─ws-root   254:8    0    40G  0 lvm
+# │   ├─ws-pkgs   254:9    0    20G  0 lvm
+# │   ├─ws-user   254:10   0    40G  0 lvm
+# │   ├─ws-data   254:11   0   200G  0 lvm
+# │   └─ws-work   254:12   0 627.5G  0 lvm
+# └─sdb2            8:18   0   992K  0 part
+
 
 ## NOTE: format LV partitions
 mkswap -L swap -f /dev/mapper/ws-swap
@@ -94,31 +105,42 @@ mkfs.btrfs -L work -f /dev/mapper/ws-work
 
 
 ## NOTE: create root btrfs layout
-# BAD:CHECK: @var_log -- unmountable because of systemd -- NEED shutdown hook in mkinitcpio
 mount -o noatime,compress=lzo,autodefrag /dev/mapper/ws-root /mnt
-btrfs subvolume create /mnt/@{,snapshots,boot_grub,var_cache,var_log}
-chattr +C /mnt/@var_log  # nodatacow per subvolume
-mkdir -vp /mnt/@/{.snapshots,boot/grub,var/{cache,log},data,work}
-mkdir -vp /mnt/@var_cache/pacman/pkg
-mkdir -vp /mnt/@/home/${myuser:?}
+btrfs quota enable /mnt
+btrfs subvolume create /mnt/@
+mkdir -vp /mnt/@/{.snapshots,boot,var,data,work,home/${myuser:?}}
+btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/@/boot/grub
+btrfs subvolume create /mnt/@/var/cache
+btrfs subvolume create /mnt/@/var/log
+# nodatacow per subvolume
+chattr +C /mnt/@/var/log
+mkdir -vp /mnt/@/var/cache/pacman/pkg
+btrfs subvolume list /mnt
 umount /mnt
 # ├─@            /mnt
-# ├─@snapshots   /mnt/.snapshots
-# ├─@boot_grub   /mnt/boot/grub
-# ├─@var_cache   /mnt/var/cache
-# └─@var_log     /mnt/var/log
+#   ├─/boot/grub
+#   ├─/var/cache
+#   └─/var/log
+# └─@snapshots   /mnt/.snapshots
 
 
 ## NOTE: create user btrfs layout
 mount -o noatime,compress=lzo,autodefrag /dev/mapper/ws-user /mnt
-btrfs subvolume create /mnt/@{,snapshots,cabal,pacaur,sdk}
-mkdir -vp /mnt/@/{.snapshots,.cabal/lib,.cache/pacaur,sdk}
+btrfs quota enable /mnt
+btrfs subvolume create /mnt/@
+mkdir -vp /mnt/@/{.snapshots,.cabal,.cache}
+btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/@/.cabal/lib
+btrfs subvolume create /mnt/@/.cache/pacaur
+btrfs subvolume create /mnt/@/sdk
+btrfs subvolume list /mnt
 umount /mnt
 # ├─@            /mnt/home/user
-# ├─@snapshots   /mnt/home/user/.snapshots
-# ├─@cabal       /mnt/home/user/.cabal/lib
-# ├─@pacaur      /mnt/home/user/.cache/pacaur
-# └─@sdk         /mnt/home/user/sdk
+#   ├─ ~/.cabal/lib
+#   ├─ ~/.cache/pacaur
+#   └─ ~/sdk
+# └─@snapshots   /mnt/home/user/.snapshots
 
 
 ## NOTE: create work btrfs layout
@@ -129,26 +151,62 @@ umount /mnt
 
 ## NOTE: assemble mounted filesystem
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-root /mnt
-mount -o noatime,nodatacow,autodefrag,subvol=@var_log /dev/mapper/ws-root /mnt/var/log
 mount -o noatime,compress=lzo,autodefrag,subvol=@snapshots /dev/mapper/ws-root /mnt/.snapshots
-mount -o noatime,compress=lzo,autodefrag,subvol=@boot_grub /dev/mapper/ws-root /mnt/boot/grub
-mount -o noatime,compress=lzo,autodefrag,subvol=@var_cache /dev/mapper/ws-root /mnt/var/cache
 mount /dev/mapper/ws-pkgs /mnt/var/cache/pacman/pkg
-
 myuser=...
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-user /mnt/home/${myuser:?}
 mount -o noatime,compress=lzo,autodefrag,subvol=@snapshots /dev/mapper/ws-user /mnt/home/${myuser:?}/.snapshots
-mount -o noatime,compress=lzo,autodefrag,subvol=@cabal /dev/mapper/ws-user /mnt/home/${myuser:?}/.cabal
-mount -o noatime,compress=lzo,autodefrag,subvol=@pacaur /dev/mapper/ws-user /mnt/home/${myuser:?}/.cache/pacaur
-mount -o noatime,compress=lzo,autodefrag,subvol=@sdk /dev/mapper/ws-user /mnt/home/${myuser:?}/sdk
-
 swapon /dev/mapper/ws-swap
 mount /dev/mapper/ws-data /mnt/data
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-work /mnt/work
 
 
+chown -R root:users /data /work
+chmod -R 770 /data /work
+# NEED:(music): for mpd install
+mkdir -vp /data/{_dld,music,vm}
+
+## FIXME: possible only after creating user
+chown -R ${myuser:?}:${myuser:?} /home/${myuser:?}{,sdk,.cabal,.config}
+chmod -R 700 /home/${myuser:?}{,sdk,.cabal,.config}
+
+
 ## NOTE: bake fstab
 timedatectl set-timezone Europe/Kiev
 timedatectl set-ntp true
-pacstrap /mnt  base base-devel lvm2 btrfs-progs grub
+pacstrap /mnt  base base-devel lvm2 btrfs-progs grub snapper
+## FIX: manually remove swap of host system
 genfstab -pU /mnt >> /mnt/etc/fstab
+
+# pacstrap /mnt ntp sudo polkit wget git zsh vis
+
+
+## NOTE: snapper
+# https://wiki.archlinux.org/index.php/Snapper
+umount /.snapshots
+rmdir /.snapshots
+snapper -c root create-config /
+btrfs subvolume delete /.snapshots
+mkdir /.snapshots
+mount -a
+
+vis /etc/snapper/configs/root
+# TIMELINE_MIN_AGE="1800"
+# TIMELINE_LIMIT_HOURLY="8"
+# TIMELINE_LIMIT_DAILY="7"
+# TIMELINE_LIMIT_WEEKLY="5"
+
+# http://snapper.io/2016/05/18/space-aware-cleanup.html
+snapper setup-quota
+snapper get-config
+snapper set-config NUMBER_LIMIT=4-10 NUMBER_LIMIT_IMPORTANT=4-10
+
+chown -R root:users /home/${myuser:?}/.snapshots
+chmod -R 750 /home/${myuser:?}/.snapshots
+snapper -c user setup-quota
+
+snapper cleanup number
+btrfs qgroup show -reF /
+
+# start and enable
+systemctl enable --now snapper-timeline.timer snapper-cleanup.timer snapper-boot.timer
