@@ -110,6 +110,8 @@ defaultrev=only(.)
 pre-push = printf 'Are you sure you want to push to remote? (y/n): '; read R; [ x"$R" == "xy" ]
 
 [ui]
+## BUG: https://bz.mercurial-scm.org/show_bug.cgi?id=5325
+# http://solutionmania.com/blog/2016/3/30/mercurial-skipping-unreadable-ignore-file/
 # For <v1.5 -- relative to PWD, after -- relative to repo root
 # So in chroot -- commit only from repo root
-ignore = .hg/hgignore
+# ignore = .hg/hgignore
