@@ -2,8 +2,9 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  pkg_inst qutebrowser python-opengl
-  pkg_inst gst-libav gst-plugins-bad gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-ugly
+  pkg_inst qutebrowser
+  pkg_inst --asdeps qt5-webengine python-opengl
+  pkg_inst --asdeps gst-libav gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
 
 elif distro ubuntu; then
     echo "Err: no"
