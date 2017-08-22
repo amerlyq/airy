@@ -4,8 +4,8 @@ source ~/.shell/profile
 [[ ! $1 =~ -u ]] || { unmount=1; shift; }
 
 # WARN:ALSO: you need creds in ~/.netrc 600
-d=${1:-${CURR_DIR_FTP:?}}
-f=${2:-${WORK_FTP:?}}
+d=${1:-/srv/ftp}
+f=${2:-${AIRY_FTP_HOST:?}}
 
 
 ismnt(){ grep -qsFw "$1" /proc/mounts; }

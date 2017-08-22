@@ -12,10 +12,8 @@
 
 # Login guards
 # NOTE:(return 8) as wrong usage of login shell
-[[ -z $SSH_TTY ]] || return 0
+[[ -z $SSH_TTY || $UID == 0 ]] || return 0
 [[ -z $TMUX && -z $VIM && -z $EMACS ]] || return 8
-[[ $UID > 0 && $XDG_VTNR == 1 ]] || return 8
-[[ ! -f /tmp/.X11-unix/X0 && $(tty) == /dev/tty1 ]] || return 8
 
 # WARNING: can't be placed into ~/.zshenv because PATH then not constructed yet.
 # NOTE: Only main Xorg session controlled by systemd.
@@ -29,9 +27,13 @@
 systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
 systemctl --user import-environment XDG_VTNR PATH TMPDIR EDITOR PAGER
 
+# NOTE: set env even for other tty, but lauch only on first
+[[ ! -f /tmp/.X11-unix/X0 && $XDG_VTNR == 1 && $(tty) == /dev/tty1 ]] || return 8
+
 # TODO:FIND: how to 'exec' into main target
 # SEE https://alan-mushi.github.io/2014/10/26/execute-an-interactive-script-at-boot-with-systemd.html
-setopt norcs  # Skip loading of all subsequent rc files
+## DISABLED: zlogin is the last file -- nothing to skip
+# setopt norcs  # Skip loading of all subsequent rc files
 systemctl --user start main.target
 
 # BUG: seems like it causes long delay before Xorg on cold system
