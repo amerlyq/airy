@@ -13,11 +13,13 @@ cmd=f_link
 keep=0
 quiet=0
 backup=''
+rpargs=-e
 
-while getopts 'bckqrf:t:p:s:' o; do case $o in :|'?') die 1
+while getopts 'bckmqrf:t:p:s:' o; do case $o in :|'?') die 1
 ;; c) cmd='f_copy'
 ;; b) backup='_'
 ;; k) keep=1       # Keep src relative subpath
+;; m) rpargs=-m    # Realpath -- ignore non-existant src
 ;; q) quiet=1      # No verbose messages
 ;; r) relative=1   # Symlink dst relative to src
 ;; f) dfrom=$OPTARG  # From directory
@@ -37,7 +39,7 @@ same_tree() { ! find "$1" -type f -printf '%P\0' \
 }
 # BAD: $(readlink -m "$1") resolves dangling symlinks :: NEED path of link itself
 has_perm(){ local d=$1; [[ ${d:0:1} == / ]] || d=$PWD/$d
-  until [[ -e $d || $d == / ]]; do d=${d%/*}
+  until [[ -e $d || $d == / ]]; do d=${d%/*}; d=${d:-/}
   done; [[ -w $d ]]
 }
 f_copy() { local src=$1 dst=$2 sudo=''
@@ -48,7 +50,7 @@ f_copy() { local src=$1 dst=$2 sudo=''
   if ([[ -f $src ]] && same_file "$src" "$dst")\
   || ([[ -d $src ]] && same_tree "$src" "$dst")
   then show C "$src" "$dst"; return; fi
-  $sudo mkdir -p "${dst%/*}"
+  [[ -n ${dst%/*} ]] && $sudo mkdir -p "${dst%/*}"
   $sudo cp -rvfT -- "$src" "$dst"  # -b
   # THINK: maintaine file hash db in ~/.cache/airy/ to check if configs
   # was changed in external means and refuse to copy over, or forcefully
@@ -60,7 +62,7 @@ f_link() { local src=$1 dst=$2 sudo=''
   [[ -e $dst || ! -L $dst ]] || $sudo rm "$dst"  # EXPL: rm dangling links
   if [[ ! -e $dst || -L $dst ]]; then
     if [[ ! $src -ef $dst ]]; then
-      $sudo mkdir -p "${dst%/*}"
+      [[ -n ${dst%/*} ]] && $sudo mkdir -p "${dst%/*}"
       $sudo ln -svfT${relative:+r} -- "$src" "$dst"
     else show L "$src" "$dst"; fi
   elif [[ -n $backup && ! -e ${dst}$backup ]]; then
@@ -68,8 +70,8 @@ f_link() { local src=$1 dst=$2 sudo=''
       $sudo ln -svfT${relative:+r} -- "$src" "$dst"
   else die "refuse symlink over existing file/dir '$dst'"; fi
 }
-dispatch() { local src=$(readlink -e "${1:?}") dst=${2:?}
-  [[ -e $src ]] || die "no such file '${src:-$1}'"
+dispatch() { local src=${1:?} dst=${2:?}
+  src=$(realpath --no-symlinks $rpargs "$src")
   ${cmd:?} "$src" "$dst"
 }
 
