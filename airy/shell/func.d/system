@@ -57,7 +57,7 @@ cwd_origin(){ cd "$(dirname "$(readlink -e "$0")")"; }  # only around original f
 airy_cache_pwd_mod() {
   [[ -z ${MODS_CACHE_DISABLE-} && ${0##*/} =~ ^(install|setup)$ ]] || return 0
   local mods=$(r.airy-get-cache)/mods
-  [[ ! -t 0 ]] || [[ ! $0 =~ ^${CURR_DIR_CFG:?} ]] ||
+  [[ ! -t 0 ]] || [[ ! $0 =~ ^${AIRY_DIR_MODS:?} ]] ||
     grep -qxF "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
 }
 is_empty_dir(){ [[ $(find "${1:-.}" -maxdepth 0 -type d -empty) ]]; }

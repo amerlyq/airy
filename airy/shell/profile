@@ -1,4 +1,9 @@
 # vim: ft=sh
+# Manually symlink or mount --bind
+#   linkcp  /data/chroots /chroot
+#   linkcp  /home/work    /work
+#   linkcp  ~/Downloads   /_dld
+#   linkcp  /data/music   ~/.config/mpd/music
 
 ### Profile Mgmt ###
 CURR_PROF='default'
@@ -9,15 +14,10 @@ CURR_HOST=${HOSTNAME:-$(uname -n)}
 
 
 ### Dirs ###
-CURR_DIR_CFG=~/aura/airy/cfg
+AIRY_DIR_MODS=~/aura/airy
 CURR_DIR_CACHE=~/.cache/airy
 CURR_DIR_PKG=${CURR_DIR_PKG:-$CURR_DIR_CACHE/pkg}
-CURR_DIR_HUB=~/hub
-CURR_DIR_SYNC=~/synchro
 CURR_DIR_PRF=~/.config/airy/prf
-CURR_DIR_MAIL=~/.mail
-CURR_DIR_WORK=/home/work
-CURR_DIR_MUSIC=/home/media/music
 
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/airy
 config=${XDG_CONFIG_HOME:-$HOME/.config}/airy
@@ -31,9 +31,8 @@ declare -A AIRY_SAMBA_RO=(
 declare -A AIRY_SAMBA_RW=()
 
 ### Chroots ###
-CURR_DIR_CHROOT=/home/chroot
 CURR_CHROOTS=( )        # USE: xenial_amd64, wily_amd64, trusty_i386, lucid_i386
-CURR_CHROOT_MOUNTS=( )  # USE: /cryptfs /home/work OR ${CURR_DIR_WORK:?}
+CURR_CHROOT_MOUNTS=( )  # USE: /opt /work
 CURR_CHROOT_EVAL=''
 
 
@@ -48,4 +47,3 @@ PKG_IGNORE=()
 AUR_IGNORE=()
 
 [[ ! -s $config/profile ]] || source "$config/profile"
-# source ~/aura/env

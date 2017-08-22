@@ -20,7 +20,7 @@ users=$USER
 # groups=wheel
 profile=default
 type=directory
-directory=${CURR_DIR_CHROOT:?}/$prf
+directory=/chroot/$prf
 shell=/bin/bash
 EOT
   linkcp -bc "$cprof" "/etc/schroot/chroot.d/${prf}.conf"

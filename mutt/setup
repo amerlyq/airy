@@ -12,11 +12,9 @@ linkcp ~/.config/mutt/cfg/theme-"$THEME" ~/.config/mutt/theme
 # Relocate ~/.mail if necessary
 # FIND:WTF: $MAIL = /var/spool/mail/user
 #   CHECK: use $MAIL instead of $CURR_DIR_MAIL ?
-mkdir -p "${CURR_DIR_MAIL:?}"
-[[ $CURR_DIR_MAIL -ef ~/.mail ]] || linkcp "$CURR_DIR_MAIL" ~/.mail
-
-mkdir -p ~/chat
-ln -svfT ~/.mail ~/chat/mail
+mkdir -p -m 700 ~/.mail
+# [[ $CURR_DIR_MAIL -ef ~/.mail ]] || linkcp "$CURR_DIR_MAIL" ~/.mail
+linkcp -m ~/.mail ~/chat/mail
 
 # THINK:MAYBE: write config by hands instead of generation?
 # USAGE: mbsync '$mid' OR mbsync -a

@@ -1,4 +1,9 @@
 # vim: ft=sh
+# TODO:BET:CHG:
+#   https://wiki.archlinux.org/index.php/environment_variables
+#   https://unix.stackexchange.com/questions/354291/how-to-set-environment-variables-at-startup-in-archlinux
+#   https://wiki.archlinux.org/index.php/XDG_Base_Directory_support#User_directories
+
 # BAD: always overwrites vars when sourced in some script
 #   !!! cant change env vars on cmdline or by 'env'
 # TEMP:REM?
@@ -27,7 +32,7 @@ export PATH
 
 ### Vim ###
 EDITOR=r.vim && _has_pr $EDITOR || EDITOR=vim
-VISUAL="$EDITOR -R"  # BAD:(space in args):  +set\ nolist
+VISUAL="$EDITOR"  # BAD:(space in args):  +set\ nolist
 export EDITOR VISUAL
 
 ### Less ###

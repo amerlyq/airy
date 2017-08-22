@@ -7,16 +7,13 @@ dir=~/.config/mpd
 ### LINKS ###
 # NOTE: playlists can't be grouped in subfolders:(
 linkcp -t "$dir"/playlists ./radio/*
-linkcp "${CURR_DIR_MUSIC:?}" "$dir"/music
-
 
 ## Local server
 linkcp -t "$dir" ./cfg/mpd.conf
 ./cfg/state.gen "$dir"/mpd.state
 svc_activate -cue mpd.{socket,service} mpd-log.service
 
-mkdir -p ~/chat  # BET? ~/db
-ln -svfT ~/.config/mpd/history ~/chat/mpd
+linkcp -m ~/.config/mpd/history ~/chat/mpd  # BET? ~/db
 
 ## Broadcast server
 # linkcp -t "$dir" ./cfg/mpd-cast.conf

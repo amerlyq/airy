@@ -8,7 +8,7 @@ source ~/.shell/profile
 # USE: 'r.chroot 1' -- to load second chroot from list
 case "$1" in [0-9]) index=$1; shift ;; esac
 prf=${CURR_CHROOTS[${index:-0}]:?}
-chroot=${CURR_DIR_CHROOT:?}/$prf
+chroot=/chroot/$prf
 
 # EXPL: Derive mounted/overrided PWD for chroot
 dir=$PWD
@@ -17,7 +17,7 @@ unset ismounted && while read line; do
     [[ ${dir#$line} == $dir ]] || ismounted=1
 done < <(awk '/^\//{print$1}' /etc/schroot/default/fstab)
 if ((!ismounted)) && [[ ! -d ${chroot}${dir} ]]; then
-  [[ -d $CURR_DIR_WORK ]] && dir=${CURR_DIR_WORK:?} || dir=$HOME
+  [[ -d /work ]] && dir=/work || dir=$HOME
 fi
 
 # EXPL: filter-out env vars before command

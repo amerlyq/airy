@@ -1,12 +1,4 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-# SEE:(btrfs): http://askubuntu.com/questions/468466/why-this-occurs-error-diskfilter-writes-are-not-supported
-
-if distro arch; then
-  pkg_inst ntfs-3g
-  pkg_inst btrfs-progs
-
-elif distro ubuntu; then
-  pkg_inst btrfs-tools
-fi
+pkg_inst ntfs-3g

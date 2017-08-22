@@ -30,7 +30,7 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
     sed -i '/^$user ALL.*/d; \$a\\$user ALL=(ALL) ALL' /etc/sudoers
 "; }
 
-dir=${CURR_DIR_CHROOT:?} && [[ -d $dir ]]
+dir=/chroot && [[ -d $dir ]]
 for prf in "${CURR_CHROOTS[@]:?}"; do
   linkcp -c {,"$dir/$prf"}/usr/share/terminfo/s/st-256color
   linkcp -c {,"$dir/$prf"}/usr/share/terminfo/t/tmux-256color

@@ -7,8 +7,8 @@ pkgs="sudo,locales,software-properties-common,vim,tmux"
 # mirror='http://archive.ubuntu.com/ubuntu'  # ALT ftp.ua.debian.org/debian/
 mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu/'
 
-dir=${CURR_DIR_CHROOT:?}
-[[ -d $dir ]] || sudo mkdir -p "$dir"
+dir=/chroot
+[[ -d $dir ]] || sudo mkdir -p -m 750 "$dir"
 
 if cfgOpt u; then
   for prf in "${CURR_CHROOTS[@]:?}"; do

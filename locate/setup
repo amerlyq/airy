@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: dev
 source ~/.shell/func.d/cfgsetup
 
@@ -8,8 +8,8 @@ if ! grep -q '^PRUNENAMES\b.*\s.snapshots\b' /etc/updatedb.conf; then
 fi
 
 # Prune work dir -- because it can contain too many src files
-if ! grep -q "^PRUNEPATHS\b.*\s${CURR_DIR_WORK:?}\b" /etc/updatedb.conf; then
-  sudo sed -ri '/^(PRUNEPATHS = "[^"]+)"/s||\1 '"${CURR_DIR_WORK:?}"'"|' /etc/updatedb.conf
+if ! grep -q '^PRUNEPATHS\b.*\s/work\b' /etc/updatedb.conf; then
+  sudo sed -ri '/^(PRUNEPATHS = "[^"]+)"/s||\1 /work"|' /etc/updatedb.conf
 fi
 
 cfgNo u || fork_m sudo updatedb
