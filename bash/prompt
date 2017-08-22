@@ -45,6 +45,8 @@ if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
   [[ -z "$debian_chroot" ]] || prompt_color="$F04"
 
   #PROMPT_DIRTRIM=4   # change too deep dir names to .../airy/cfg/bash/
+  # FIXED:NEED:(broken prompt parts): export LANG=en_US.UTF-8
+  #   ::: USE:(/bin/bash -il): to load necessary defaults
   prompt_parts="╔═╚╣╼"
   PS1="${prompt_color}${prompt_parts:0:1}${prompt_suffix:-${prompt_parts:1:1}}"
   PS1+="${prompt_parts:1:1}$F00$Fbold[$F03\w$F00]$Fsgr0"

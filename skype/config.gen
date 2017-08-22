@@ -1,10 +1,10 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/profile
 
 opt=~/.Skype/shared.xml
 cfg=~/.Skype/${MAIN_SKYPE:?}/config.xml
 [[ -f $opt && -f $cfg ]] ||
-    die 0 "Wrn: launch Skype once before gen cfg"
+  { echo "Wrn: launch Skype once before gen cfg"; exit 0; }
 
 sxml(){ local f=$1 a=$2 k=$3 v=$4
   grep -qF "$k" "$f" \
@@ -19,4 +19,4 @@ sopt \\/Pos Style GTK+
 sopt \\/Pos StartMinimized 0
 
 # scfg Account IdleTimeForAway 1200
-scfg FileTransfer SavePath "$HOME/Downloads"
+scfg FileTransfer SavePath "${CURR_DIR_DLD:?}"

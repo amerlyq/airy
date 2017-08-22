@@ -5,8 +5,8 @@ import ranger.container.directory
 old_accept_file = ranger.container.directory.accept_file
 
 HIDE_FILES = [os.path.abspath(path) for path in (
-    "/boot", "/cdrom", "/mnt", "/root", "/srv",
-    "~/SIM-GBS-ROOT", "~/tizen_secos"
+    "/boot", "/cdrom", "/root",
+    # "/srv", "/mnt", "~/SIM-GBS-ROOT", "~/tizen_secos"
 )]
 
 
@@ -16,6 +16,7 @@ def custom_accept_file(file, filters):
         return False
     else:
         return old_accept_file(file, filters)
+
 
 # Overwrite the old function
 import ranger.container.directory
