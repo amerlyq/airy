@@ -1,9 +1,10 @@
 #!/bin/bash -eu
 # USAGE: /path/to/tftpboot -- root path where all dirs are binded
-tftp_root=$1
+tftp_root=${1:-/srv/tftp}
 
 # remove non-binded empty dirs
-find "$tftp_root" -mindepth 1 -maxdepth 1 -type d -empty ! -exec r.fs-bind-list -qt {} \; -delete
+find "$tftp_root" -mindepth 1 -maxdepth 1 -type d -empty \
+  ! -exec r.fs-bind-list -qt {} \; -delete
 
 # CHECK: if necessary to restart when updating content
 # svc_activate -r tftpd

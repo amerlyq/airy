@@ -1,23 +1,22 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: net
 source ~/.shell/func.d/cfgsetup
 
 # http://linux.die.net/man/8/tftpd
-dir=${CURR_DIR_TFTP:-${CURR_DIR_WORK:?}/tftpboot}
+dir=/srv/tftp
 
-if cfgOpt u && [[ -d $dir ]]; then
-    add_sysuser tftp
+mkdir -p "$dir"
+add_sysuser tftp
+[[ $(stat -c '%U:%G' "$dir") == tftp:users ]] || sudo chown tftp:users "$dir"
+[[ $(stat -c '%a' /srv/tftp) == 775 ]] || sudo chmod 775 "$dir"
 
-    mkdir -p "$dir"
-    if [[ $(stat -c '%u %g' "$dir") != "$(id -u tftp) $(id -g tftp)" ]]
-    then sudo chown -R tftp:tftp "$dir"; fi
+cfgOpt u && opts=-eR || opts=-er
 
-    if distro arch; then
-        linkcp -c ./config /etc/conf.d/tftpd
-        svc_activate -eR tftpd
+if distro arch; then
+  linkcp -c ./config /etc/conf.d/tftpd
+  svc_activate $opts tftpd
 
-    elif distro ubuntu; then
-        linkcp -c ./config /etc/default/tftpd-hpa
-        svc_activate -eR tftpd-hpa
-    fi
+elif distro ubuntu; then
+  linkcp -c ./config /etc/default/tftpd-hpa
+  svc_activate $opts tftpd-hpa
 fi

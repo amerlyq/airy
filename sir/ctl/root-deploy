@@ -4,8 +4,8 @@ set -o pipefail
 id=${1:-default}
 boot=${2:-_boot}
 
-tftp_root=/cryptfs/tftpboot
-nfs_root=/cryptfs/nfs
+tftp_root=/srv/tftp
+nfs_root=/srv/nfs
 dtftp=$boot/flash
 dnfs=$boot/nfs
 
