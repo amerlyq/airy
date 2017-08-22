@@ -17,6 +17,8 @@ Change
         export GIT_AUTHOR_DATE="Fri Jan 2 21:38:53 2009 -0800"
         export GIT_COMMITTER_DATE="Sat May 19 01:01:01 2007 -0700"
       fi'
+  Change Author+Commiter in unpushed commits
+    $ git rebase -i origin/master -x "git commit --amend --author 'Amerlyq <amerlyq@gmail.com>' --no-edit"
 
 git difftool -t meld <commit> <commit> [<path_to_file_to_compare>]
 
