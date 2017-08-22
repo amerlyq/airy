@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 MODS_CACHE_DISABLE=1
 source ~/.shell/func.d/packages
 distro ubuntu || die "Not Ubuntu"
@@ -26,7 +26,9 @@ pkgs+=(gcc-multilib g++-multilib lib32stdc++6)
 # BUG:(not found)  libc6-dbg:i386 unifdef
 pkgs+=(make pkg-config autoconf automake cmake bison flex texinfo fakeroot)
 pkgs+=(xutils-dev cvs tcl gettext intltool libncurses5-dev libxml2-dev zlib1g-dev sqlite3)
-pkgs+=(xsel zsh vim gdb git mercurial unzip)  # rsync openssh-client command-not-found
+pkgs+=(ant openjdk-7-jdk)  # NOTE: ant to run tests and javac to compile them
+pkgs+=(vim git mercurial unzip)  # rsync openssh-client command-not-found
+# xsel zsh gdb
 pkgs+=(python-dev python3)
 # BUG:(corrupted install) sgml-base xml-core
 

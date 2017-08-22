@@ -8,6 +8,9 @@ SEE
     https://sites.google.com/site/uxhakx/debootstrap-on-archlinux-howto
     https://bbs.archlinux.org/viewtopic.php?id=100039
 
+  with X
+    https://debian-administration.org/article/566/schroot_-_chroot_for_any_users
+
 USAGE
   Self-chroot scripts
     $ [[ -s /etc/debian_chroot ]] || ! hash r.chroot &>/dev/null || exec r.chroot "$0" "$@"
@@ -32,8 +35,21 @@ Install
     ./chroot_buildenv.sh --install --installdir /cryptfs/chroots/lucid_i386 --name lucid_i386 --tarball chrootenv_lucid_i386.tar.bz2
 
 BUG
-  Not working with schroot:
-  : sudo mount --bind /cryptfs/workspace /cryptfs/chroots/lucid_i386/home/user
+  [_] BUG: problems with groups transition
+    # schroot groups: cannot find name for group ID 14
+    REF: it does not modify anything about the user environment unless you
+      specifically tell it to. the list of effective groups is a 'process parameter',
+      so those are inherited and not modified
+    * $ man sg $ -- but it changes only active group
+    * on Arch create new user 'ubuntu' for chroots only with ubuntu-like groups preset
+      BUT: it will need 'wheel' group which will cause problems again
+    * copy only missing group lines into /chroot/wily_amd64/etc/group OR add by $ usermod $ command
+      BUT: may cause unknown problems when groups swapped 10 <-> 14
+    FIND: export/login with only choosen groups on schroot
+      -- SEE http://unix.stackexchange.com/questions/160487/how-to-prevent-schroot-from-overridding-passwd-file-and-others-files-already-pre
+    ::: manually add groups in
+  [_] Not working with schroot:
+    $ sudo mount --bind /cryptfs/workspace /cryptfs/chroots/lucid_i386/home/user
   [_] FIXME Exit chroot after using 'xsel'
     CHECK: maybe problem is gone with 'xsel-remote'
     # E: 10mount: umount: /run/schroot/mount/xenial_amd64-e0515f5b-3eee-41a9-9135-58086206a3d1/home/user: target is busy
@@ -45,6 +61,8 @@ BUG
       https://bugs.archlinux.org/task/32834
     BAD:HACK: $ umount -l /run/schroot/mount/*
       => BAD unmounts even what MUST NOT
+    !4 [_] TRY:USE: running chroot cloning per session
+      https://manpages.debian.org/testing/schroot/schroot-faq.7.en.html
   := MAYBE Launching 'xsel' links some resources from $chroot/$HOME into host's Xorg, therefore can't umount them
 
 

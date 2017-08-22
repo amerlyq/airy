@@ -31,18 +31,19 @@ for arg in "$@"; do
 done
 
 # NOTE: source ~/.bash_profile by forcing interactive shell
+# THINK: using tmux? how to be with nested sessions?
 # ATT: -l is not enough to activate SHELLRC_EVAL -- use '-i'
 # ATT: -l must be used anyway -- to compose PATH VAR
 # MAYBE:(exec) will be excessive limitation for cmdline?
-((!$#)) && set -- "$SHELL" || set -- bash -lic 'exec "$@"' "$0" "$@"
-# TODO: use ZSH in chroot if available [[ -x ${chroot}$SHELL ]]
-# THINK: using tmux? how to be with nested sessions?
+[[ -x ${chroot}$SHELL ]] || SHELL=/bin/bash
+((!$#)) || set -- -c 'exec "$@"' "$0" "$@"
 
 # EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
 # WARN: DISPLAY="$DISPLAY" -- can't umount schroot
 exec schroot -c "$prf" -d "$dir" -- env \
   SHELLRC_EVAL="${CURR_CHROOT_EVAL}" \
-  "${_env[@]}" "$@"
+  "${_env[@]}" \
+  "$SHELL" -li "$@"
 
 
 # ALT:DEPRECATED:
