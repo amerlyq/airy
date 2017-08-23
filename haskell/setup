@@ -1,3 +1,10 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: lang
 source ~/.shell/func.d/cfgsetup
+
+## NOTE: use dynamic linking by default
+#   (static libs require |ghc-static|)
+cfg=~/.cabal/config
+opt='executable-dynamic: True'
+grep -qxF "$opt" "$cfg" || gawk -i inplace -vo="$opt" \
+  '/^(--\s*)?executable-dynamic:/{$0=o}1' "$cfg"

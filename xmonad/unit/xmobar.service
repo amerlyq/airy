@@ -2,11 +2,12 @@
 Description=DE - Status Bar - %P
 Conflicts=logoff.target
 Requires=xmobar.socket xorg.target
-After=xorg.target
+After=xorg.target xmonad.service
 # After=xmobar.socket
 
 [Service]
 SyslogIdentifier=xmobar
+# ExecStart=/usr/bin/xmobar %h/.xmonad/xmobarrc
 ExecStart=/bin/sh -c 'exec %h/.cabal/bin/xmobar %h/.xmonad/xmobarrc'
 StandardInput=socket
 

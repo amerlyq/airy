@@ -30,5 +30,6 @@ if cfgOpt u; then
   # FIXED: static->dynamic linking transition 0.13.1 -> 0.13-2
   # cd ~/.xmonad && ghc --make xmonad.hs -i -ilib -dynamic -fforce-recomp -main-is main -v0 -o xmonad-x86_64-linux
 
+  # BUG: need manually 'xmonad --recompile' to create ~/.xmonad/xmonad-x86_64-linux
   fork_m r.xmonad-rebuild
 fi

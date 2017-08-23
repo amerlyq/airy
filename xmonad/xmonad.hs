@@ -263,6 +263,8 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
     composeFloat = mconcat . map (--> doFloat)
 
 
+-- ALT: acquire dpi directly from xmonad
+-- SEE: https://git.joko.gr/joko/dotfiles/commit/9a918ac37297ecfee511d541b9d5caa8f795f7c4?style=split
 -- BUG:FIXME: unsafe io operation, catch error/exception instead of Xorg fail.
 catchStdout c f = fmap read (runProcessWithInput c [f] "")
 
@@ -285,10 +287,15 @@ main = do
 
   -- TODO:CHG: query value from Xft.dpi by xmonad means instead!
   -- BUT:TEMP: impossible as xprofile can be run only after xmonad
+  -- BUG: not found r.xorg
+  -- dpi <- print (fromMaybe 96 (catchStdout "r.xorg" "-d"))
   dpi <- catchStdout "r.xorg" "-d"
+  -- (err, stdout, _) <- readProcessWithExitCode "r.xorg" ["-d"] ""
+  -- dpi <- fmap read stdout
 
   xmonad $ ewmh myCfg { logHook = myLogHook h
   , borderWidth = fromIntegral $ round (dpi / 60)
+  -- , borderWidth = fromIntegral $ round (fromMaybe 96 (catchStdout "r.xorg" "-d") / 60)
   }
 
   -- CHECK: is really necessary?
