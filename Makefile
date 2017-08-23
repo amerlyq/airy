@@ -4,6 +4,8 @@
 #  ::: CHECK: seems like pacman isn't connected to tty despite  exec <>/dev/tty
 #  <= if connected to tty -- then there must not be any pacman lines in setup.log
 MAKEFLAGS += --output-sync=none
+PATH := $(PATH):$(HOME)/.bin
+EDITOR ?= nvim
 
 all: install update-new tags
 continue: update tags
