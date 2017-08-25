@@ -30,3 +30,9 @@ Tear-free video
   20-intel.conf
     Option "TearFree" "true"
   Enable 'compton' with 'unredir-if-possible = true'
+
+Print tv xorg screen through serial/ssh and show as image on your monitor
+  while true; do echo "Down"; sdb shell 'xwd -root | gzip --stdout |
+  base64 -w0' | base64 -d | gunzip >screen.xwd ; echo "Down done";
+  killall xwud; echo "New XWUD"; xwud -in screen.xwd  &; sleep 0.1; done
+  https://cgit.freedesktop.org/xorg/app/xwd/tree/
