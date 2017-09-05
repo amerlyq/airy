@@ -25,3 +25,15 @@ function os.source(file)
   -- return f()
   return dofile(os.getenv('HOME')..'/.imapfilter/'..file)
 end
+
+-- DEBUG: print_results(inbox:contain_subject('...'))
+function print_results(tbl)
+  local count = 0
+  for k, v in pairs(tbl) do
+    if (type(v) == 'table') then
+      print(k, v)
+      count = count + 1
+    end
+  end
+  print(count)
+end

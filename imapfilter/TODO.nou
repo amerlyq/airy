@@ -32,6 +32,18 @@ DEV
     spam = todos:contain_field('X-Spam-Score','*****')
     spam:move_messages(acc['Spam'])
 
+BUG
+  [~] MAYBE:BUG: contain_cc() / contain_subject() not supported by davmail
+    https://github.com/lefcha/imapfilter/issues/11
+    BUG? https://github.com/lefcha/imapfilter/issues/93
+      => USE: send_query from RFC
+        http://tools.ietf.org/rfcmarkup?doc=3501#section-6.4.4
+    REF: https://github.com/lefcha/imapfilter/blob/master/samples/config.lua
+    ::: TEMP:FIXED:
+      * create server rules for new messages
+      * use match_*() for already received msgs
+      * setup offline isync sorting
+
 
 NEED:(pending) create online rules on server
   All emails from case updates, bugzilla, etc to _pending
