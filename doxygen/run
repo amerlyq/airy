@@ -1,43 +1,37 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-SCRIPT_PATH=$(readlink -m ${BASH_SOURCE[0]})
-SCRIPT_DIR=${SCRIPT_PATH%/*}
-PJ_DIR=$SCRIPT_DIR/../..
-DOCS_DIR=$PJ_DIR/doxy
-DOXY_CONF=$DOCS_DIR/Doxyfile
-
-chg_line() { sed "s@\(^$1[ ]*=[ ]*\).*@\1 $2@g" -i $DOXY_CONF; }
-chg_quoted() { chg_line $1 "\"$2\""; }
-
-mkdir -p $DOCS_DIR
-rm -f $DOXY_CONF
+pj=${1:-${PWD##*/}}
+d=${2:-_build-doxygen}
+cfg=$d/Doxyfile
 
 # Generate default config, [-s]-key removes comments from it
-doxygen -g $DOXY_CONF
+mkdir -p _doxygen
+rm -f "$cfg" && doxygen -g "$cfg"
 
-if [ -z "$1" ]; then PR_NM="EmptyName"; else PR_NM="$1"; fi
+## ALT: chg() { sed "s@\(^$1[ ]*=[ ]*\).*@\1 $2@g" -i "$cfg"; }
+# BAD: fields must be split on first FS only
+#   gawk -i inplace -vFS='\s*=\s*' -vOFS=' = ' -vk="$1" -vv="$2" '$1==k{$2=v}1' "$cfg"
+
+chg() { command perl -i -wslpe 's/^($k\s*=\s*).*/$1$v/' -- -k="$1" -v="$2" "$cfg"; }
+chgq() { chg "$1" "\"$2\""; }
 
 # Project sets
-chg_quoted PROJECT_NAME     "${PR_NM}"
-chg_quoted PROJECT_NUMBER   `git log --pretty=format:'%ad' --date=short -1`
-
-#chg_quoted INPUT            "inc src"
-chg_line OUTPUT_DIRECTORY   $DOCS_DIR
-chg_line TAB_SIZE           4
+chgq PROJECT_NAME     "${PWD%/*}"
+chgq PROJECT_NUMBER   "$(git --no-pager log --pretty=format:'%ad' --date=short -1)"
+#chgq INPUT            "inc src"
+chg OUTPUT_DIRECTORY  "$PWD/_doxygen"
+chg TAB_SIZE          4
 
 # Additional sets
-chg_line RECURSIVE          YES
-chg_line SOURCE_BROWSER     YES
-chg_line SEARCHENGINE       NO
-chg_line GENERATE_LATEX     NO
-chg_line GENERATE_TREEVIEW        YES
-chg_line OPTIMIZE_OUTPUT_FOR_C    YES
-chg_line REFERENCED_BY_RELATION   YES
-chg_line REFERENCES_RELATION      YES
+chg RECURSIVE               YES
+chg SOURCE_BROWSER          YES
+chg SEARCHENGINE            NO
+chg GENERATE_LATEX          NO
+chg GENERATE_TREEVIEW       YES
+chg OPTIMIZE_OUTPUT_FOR_C   YES
+chg REFERENCED_BY_RELATION  YES
+chg REFERENCES_RELATION     YES
 
-chg_line EXCLUDE_PATTERNS   "$PJ_DIR/build/* $PJ_DIR/libs/*"
+# chg EXCLUDE_PATTERNS   "$PWD/build/* $PWD/libs/*"
 
-cd $PJ_DIR
-doxygen $DOXY_CONF
-echo "->> Docs generation is done."
-
+exec doxygen "$cfg"
