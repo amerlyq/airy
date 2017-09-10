@@ -16,6 +16,8 @@ parted /dev/sda print | grep ^Partition
 
 
 ## NOTE: use GPT+GRUB for raw disk
+## WARN: some systems can only use gpt+uefi
+##    => USE single-partition crypto-mbr+bios
 # ALT:IA: fdisk/gdisk (MBR/GPT)
 # OR:(non-interactive): parted -s -a opt /dev/sda ...
 parted /dev/sda
@@ -167,8 +169,8 @@ chmod -R 770 /data /work
 mkdir -vp /data/{_dld,music,vm}
 
 ## FIXME: possible only after creating user
-chown -R ${myuser:?}:${myuser:?} /home/${myuser:?}{,sdk,.cabal,.config}
-chmod -R 700 /home/${myuser:?}{,sdk,.cabal,.config}
+chown -R ${myuser:?}:${myuser:?} /home/${myuser:?}{,sdk,.cabal,.cache}
+chmod -R 700 /home/${myuser:?}{,sdk,.cabal,.cache}
 
 
 ## NOTE: bake fstab

@@ -75,6 +75,9 @@ arch-chroot /mnt /bin/bash
     umount /run/lvm && rmdir -v /run/lvm
   }
 
+  # CHG: uncomment 'Color' and '[multilib]'
+  vis /etc/pacman.conf
+
   # VIZ. list all users: sudo passwd -Sa
   myuser=...
   passwd
