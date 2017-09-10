@@ -1,0 +1,39 @@
+%%%% Install Certs
+
+REF: https://www.archlinux.org/news/ca-certificates-update/
+  /usr/local/share/ca-certificates/*.crt -> $dir
+  /etc/ssl/certs/*.pem -> $dir/*.crt
+  OBSOL: update-ca-certificates
+
+DEBUG:
+  Check available certs for p11-kit:
+    $ trust list | grep Company
+    WARN: LuxTrust is contained in ca-certificates-cacert
+  Look at opened paths
+    $ strace -o /tmp/strace -e trace=open -f trust list
+
+
+Arch
+  Manually (low-level)
+    $ sudo cp -t /etc/ca-certificates/trust-source/anchors/  *.crt
+    # OR: ../blacklist ALT:(low-priority): /usr/share/ca-certificates/trust-source/anchors
+    $ sudo update-ca-trust extract
+
+  Reinstall certificates
+    $ pacX ca-certificates
+    $ paci ca-certificates
+
+  [_] CHECK: Automatic
+    <= supposedly must call dist-specific cmd
+    $ sudo trust --verbose anchor --store  /path/to/mitm.crt
+    $ sudo trust --verbose anchor --remove /path/to/mitm.crt
+      BUG: p11-kit: couldn't remove read-only certificate
+    $ sudo trust --verbose extract-compat
+
+
+Ubuntu
+  Manually (direct)
+    $ sudo mkdir /usr/share/ca-certificates/Company
+    $ linkcp -ct /usr/share/ca-certificates/Company mitm.crt
+    CLI: $ sudo update-ca-certificates
+    GUI: $ sudo dpkg-reconfigure ca-certificates
