@@ -4,8 +4,16 @@
 #  ::: CHECK: seems like pacman isn't connected to tty despite  exec <>/dev/tty
 #  <= if connected to tty -- then there must not be any pacman lines in setup.log
 MAKEFLAGS += --output-sync=none
-PATH := $(PATH):$(HOME)/.bin
-EDITOR ?= nvim
+
+export AIRY_ROOT   ?= $(HOME)/.local/airy
+export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
+export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
+export AIRY_DATA   ?= $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/airy
+export AIRY_BIN    ?= $(AIRY_CACHE)/bin
+
+# FIXED:(r.airy): on clean install in same login
+PATH := $(AIRY_BIN):$(PATH):$(HOME)/.bin
+EDITOR ?= vi
 
 all: install update-new tags
 continue: update tags
@@ -14,7 +22,8 @@ skip: next continue
 # Install 'airy' config system
 # BAD: no colorizing => recursive deps with r.airy-pretty
 # 	=> add 'quiet' regime to linkcp
-install:
+$(AIRY_ROOT): ; ln -s "$(shell pwd)" "$@"
+install: | $(AIRY_ROOT)
 	./airy/setup -m
 
 # All choosen pkgs setup/update
@@ -39,7 +48,7 @@ tags: _build/tags
 # => like renaming links as 'modname' -> '[+]modname' for enabled ones
 # ALT: Enabled: +mod | @mod | [+]mod, Disabled: simple name w/o marker
 _build/tags: _build/mods
-	r.airy-link-tags -t _build/tags -f _build/mods
+	r.airy-link-tags -t "$@" -f "$<"
 
 problems:
 	@echo "Manually verify necessity of packages outside of airy."
