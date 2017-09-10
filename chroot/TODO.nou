@@ -78,7 +78,10 @@ FIXED
     vim /var/lib/dpkg/statoverride
     : remove all error lines
   i386 in amd64 chroot
-    sudo sh -c "echo 'foreign-architecture i386' > /etc/dpkg/dpkg.cfg.d/multiarch"
-    sudo dpkg --add-architecture i386
-    sudo apt-get update
-    sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
+    NOTE: not obligatory
+      # sudo sh -c "echo 'foreign-architecture i386' > /etc/dpkg/dpkg.cfg.d/multiarch"
+    $ sudo dpkg --add-architecture i386
+    $ dpkg --print-architecture
+    $ dpkg --print-foreign-architectures
+    $ sudo apt-get update
+    $ sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386

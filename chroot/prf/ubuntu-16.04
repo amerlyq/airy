@@ -1,0 +1,20 @@
+#!/bin/bash -eu
+MODS_CACHE_DISABLE=1
+source ~/.shell/func.d/packages
+distro ubuntu || die "Not Ubuntu"
+
+pkgs=(build-essential pkg-config doxygen)
+pkgs+=(lib32stdc++6 libc6-i386 libbz2-dev)
+pkgs+=(libexpat1-dev libgio2.0-cil-dev libusb-1.0-0-dev lib32z1 libasound2-dev libicu-dev zlib1g-dev libdbus-glib-1-dev)
+pkgs+=(subversion git cmake default-jre)
+pkgs+=(vim git unzip dialog wget less gawk bc)
+pkgs+=(python-pip python-dev python-smbus)
+pkgs+=(libglew-dev:i386 libjpeg-dev:i386 libpng-dev:i386)
+
+# xclip cmake-curses-gui mc
+
+
+if cfgOpt u; then
+  pkg_inst "${pkgs[@]}"
+  sudo ln -s /usr/lib/i386-linux-gnu/libGLEW.so.1.13.0 /usr/lib/i386-linux-gnu/libGLEW.so.1.6
+fi

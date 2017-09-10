@@ -5,6 +5,7 @@ ARG=$1  # -u
 
 debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
   [[ $ARG =~ u ]] || ! grep -qF 'multiverse' "$chr/etc/apt/sources.list" &>/dev/null || return 0
+  # NEW: deb http://ua.archive.ubuntu.com/ubuntu/ xenial main restricted
   local mirror='ftp://ubuntu.ip-connect.vn.ua/mirror/ubuntu'
   local user=${USER:?}
 
@@ -13,6 +14,8 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
   sudo schroot -c "${chr##*/}" -d "/" -- bash -c "
     (cd /bin && ln -sfv bash sh)
 
+    # NOTE: allow installing :i386 packages
+    dpkg --add-architecture i386
     tee /etc/apt/sources.list <<<'deb $mirror $nm main universe multiverse'
     apt-get update
     apt-get upgrade
@@ -21,7 +24,7 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
     # sudo dpkg-reconfigure tzdata
 
     useradd -mUG users,uucp,sudo -s /bin/bash $user
-    ## BET: manually use passwd: $ sudo schroot -c "${chr##*/}"
+    ## BET: manually use 'passwd': $ sudo schroot -c "${chr##*/}"
     # printf '%s' root:root   | chpasswd
     # printf '%s' $user:$user | chpasswd
 
