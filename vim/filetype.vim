@@ -26,6 +26,7 @@ augroup filetypedetect
   au BufRead ~/.purple/logs/*           setf pidgin
   au BufRead ~/.{mail,config/mutt/messages}/*   setf mail
   au BufRead /tmp/gdb/{log.cfg,*/*.cfg} setl ft=fasm ts=8 nowrap
+  au BufRead,BufNewFile *.ftrace        setl ft=ftrace
 augroup END
 
 " Use Zeal on Linux for context help
