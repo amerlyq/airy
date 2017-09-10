@@ -4,6 +4,14 @@
 " ATTENTION: neovim has broken t_ti
 call dein#add('amerlyq/vim-focus-autocmd', {'if': '!has("nvim")'})
 
+call dein#add('embear/vim-localvimrc', {'lazy': 0,
+  \ 'on_cmd': 'LocalVimRC',
+  \ 'hook_add': "
+\\n   let g:localvimrc_name = [ '.lvimrc' ]
+\\n   let g:localvimrc_sandbox = 1
+\\n   let g:localvimrc_persistent = 1
+\\n   let g:localvimrc_persistence_file = $VPLUGS.'/localvimrc_persistent'
+\"})
 
 
 """ Path {{{1

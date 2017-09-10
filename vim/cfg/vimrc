@@ -48,4 +48,5 @@ catch /^Vim\%((\a\+)\)\=:E185/
 endtry
 
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
-set exrc secure modeline    " also parse 'vim:...' cmds from comments
+" DEPRECATED:(exrc):USE:(vim-localvimrc)
+set noexrc secure modeline    " also parse 'vim:...' cmds from comments
