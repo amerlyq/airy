@@ -169,8 +169,8 @@ myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
 
 
 myTabConfig = def
-  { T.inactiveBorderColor = "#ffaa00"
-  , T.activeTextColor = "#aa00ff"
+  { T.inactiveBorderColor = "#222222"
+  , T.activeTextColor = "#22ff44"
   , T.fontName = "xft:monospace:pixelsize=15"
   -- , T.decoHeight =
   }

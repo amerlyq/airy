@@ -12,6 +12,7 @@ linkcp ~/.config/mutt/cfg/theme-"$THEME" ~/.config/mutt/theme
 # Relocate ~/.mail if necessary
 # FIND:WTF: $MAIL = /var/spool/mail/user
 #   CHECK: use $MAIL instead of $CURR_DIR_MAIL ?
+# BET:USE: ~/.local/mail
 mkdir -p -m 700 ~/.mail
 # [[ $CURR_DIR_MAIL -ef ~/.mail ]] || linkcp "$CURR_DIR_MAIL" ~/.mail
 linkcp -m ~/.mail ~/chat/mail

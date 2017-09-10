@@ -1,10 +1,12 @@
 #!/bin/bash -e
 # tags: media
+# deps: xdg
 source ~/.shell/func.d/cfgsetup
 
 dir=~/.config/mpd
 
 ### LINKS ###
+linkcp "$(xdg-user-dir MUSIC)" "$dir/music"
 # NOTE: playlists can't be grouped in subfolders:(
 linkcp -t "$dir"/playlists ./radio/*
 

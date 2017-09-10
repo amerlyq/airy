@@ -32,9 +32,10 @@ fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
 
 if cfgOpt m; then
   repo=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
+  case $repo in */devq) pref=q ;; */work) pref=w ;; *) pref=r ;; esac
   # BAD: lame way to introduce new prefix q.* w/o even its necessity ?
   #   -> FIXME:CHG: use automatic '$group' prefix instead of r./q.
-  r.airy-cache-links -g "$group" -t ~/.bin -p "$([[ $repo =~ q$ ]]&&echo q||echo r).%d-"
+  r.airy-cache-links -g "$group" -t ~/.bin -p "${pref:-?}.%d-"
   r.airy-cache-alias -g "$group"
   airy_cache_pwd_mod
 fi

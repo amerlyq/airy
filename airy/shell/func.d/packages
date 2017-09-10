@@ -67,6 +67,8 @@ iskip(){ declare -n a="$1"; (( ${#a[@]} ))||return 0
 if distro ubuntu; then
   has_pkg(){ dpkg -l "$@" &>/dev/null; }  # CHECK: if working
   pkg_inst(){ do_if -c 'sudo /usr/bin/apt-get --yes install' "$@"; }
+  # +++ REF:(checkinstall): https://www.dwheeler.com/essays/automating-destdir.html
+  #   sudo checkinstall -D --pkgname=dlt-daemon --default  # ... make install PREFIX=/usr DESTDIR=/local
   pkg_make(){ sudo checkinstall --default "$@"; }
   deb_wget(){ wget_inst -d "$1" && sudo dpkg -i "$CURR_DIR_PKG/${2:-${1##*/}}"; }
   deb_inst(){ do_if -c 'deb_wget' "$@"; }
