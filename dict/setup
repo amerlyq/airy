@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: media
 # deps: xkb
 source ~/.shell/func.d/cfgsetup
@@ -10,12 +10,12 @@ elif distro ubuntu; then
 fi
 # Copy files instead of symlink, as dictd drops to 'nobody' user
 #   with no access to my config files inside home directory.
-linkcp -c ./cfg "$dir"
+linkcp -ct "$dir" ./cfg/*
 
-if cfgOpt u ; then
+if cfgOpt u; then
   svc_activate -ceR dictd.service
 
-  dicts=/home/media/res/dicts
+  dicts=/data/res/dicts
   if [[ ! -d $dicts ]]
   then echo "Wrn: install '*dict.dz' into '$dicts'"
   else

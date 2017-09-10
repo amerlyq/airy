@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-src=${1:-/home/media/res/dicts}
-[[ -d $src ]] || die "Err: No dir with *.dict.dz specified"
+src=${1:-/data/res/dicts}
+[[ -d $src ]] || { echo "Err: No dir with *.dict.dz specified"; exit 1; }
 
 ## Link directory to access it by 'nobody'
 dst=/usr/share/dictd
