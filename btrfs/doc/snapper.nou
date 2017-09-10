@@ -1,0 +1,88 @@
+%%%% snapper
+
+REF: https://wiki.archlinux.org/index.php/Snapper
+
+DEBUG
+  Show current quotes
+    $ btrfs qgroup show -reF /
+  $ snapper cleanup <number>
+  Sanity check if btrfs
+    $ btrfs filesystem df / &> /dev/null
+  If no permissions:
+    $ sudo chown -R root:users /etc/snapper/configs
+
+POST
+  Start and enable
+    $ sudo systemctl enable --now snapper-timeline.timer snapper-cleanup.timer snapper-boot.timer
+  Create initial snapshots
+    $ sudo snapper -c root create -d initial
+    $ snapper -c user create -d initial
+
+****************
+
+Register root
+  $ umount /.snapshots
+  $ rmdir /.snapshots
+  $ snapper -c root create-config /
+  $ btrfs subvolume delete /.snapshots
+  $ mkdir /.snapshots
+  $ mount -a
+
+Setup
+  $ sudo chown root:users /.snapshots
+  $ sudo chmod 750 /.snapshots
+  # http://snapper.io/2016/05/18/space-aware-cleanup.html
+  # OR: vis /etc/snapper/configs/root
+  $ sudo snapper -c root set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY="8",DAILY="7",WEEKLY="5"}
+  $ sudo snapper -c root setup-quota
+  $ sudo snapper -c root get-config
+
+***************
+
+Register user
+ALT:USE: "home_$user" instead of "user"
+  $ umount ~/.snapshots
+  $ rmdir ~/.snapshots
+  $ sudo snapper -c user create-config ~
+  $ sudo btrfs subvolume delete ~/.snapshots
+  $ mkdir ~/.snapshots
+  $ mount -a
+
+Setup
+  $ sudo sed -ri 's/(ALLOW_USERS=).*/\1"'"$USER"'"/g' /etc/snapper/configs/user
+  $ sudo chown root:users ~/.snapshots
+  $ sudo chmod 750 ~/.snapshots
+  $ sudo snapper -c user set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY="8",DAILY="7",WEEKLY="5"}
+  $ sudo snapper -c user setup-quota
+  $ sudo snapper -c user get-config
+  $ sudo v /etc/snapper/configs/user
+
+
+USAGE
+  2017-08-30 [X] Exclude snapshots from indexing
+    $ v /etc/updatedb.conf
+    # CHG: PRUNENAMES = ".snapshots"
+    ::: already included in |airy/locate|
+  Delete big files through all snapshots
+    https://blog.pdark.de/2014/02/16/deleting-files-from-snapper/
+    $ btrfs subvolume snapshot snap snap.rw
+    $ rm -rf snap.rw/path/to/file
+    $ btrfs subvolume delete snap
+    $ btrfs subvolume snapshot -r snap.rw snap
+    $ btrfs subvolume delete snap.rw
+  Find all CoW extents -- verify if file is reflink to another
+    https://unix.stackexchange.com/questions/263309/how-to-verify-a-file-copy-is-reflink-cow
+    https://unix.stackexchange.com/questions/128055/how-to-find-data-copies-of-a-given-file-in-btrfs-filesystem
+    rmlint: https://github.com/sahib/rmlint/issues/132
+  NOTE: if disk full -> can't create ./info.xml -> snapper won't track that snapshot
+    https://github.com/openSUSE/snapper/issues/24
+    -> delete manually $ sudo btrfs subvolume delete /.snapshots/1772/snapshot
+  Delete old snapshots (when disk is full)
+    $ snapper -c root list
+    $ snapper -c root delete 1
+    $ snapper ls
+    $ snapper delete --sync [id]
+    $ snapper -c root set-config "NUMBER_LIMIT=2"
+    $ snapper -c root set-config "NUMBER_LIMIT_IMPORTANT=2"
+  Revert single file from post(5) to pre(2)
+    $ snapper -v undochange 2..5 /etc/sysconfig/apache2

@@ -111,44 +111,6 @@ Install
   $# mount -o autodefrag,compress=no /dev/mapper/ws-home /mnt/home
 
 
-Snapper
-  Exclude snapshots from indexing
-    $ v /etc/updatedb.conf
-    # CHG: PRUNENAMES = ".snapshots"
-  Delete big files through all snapshots
-    https://blog.pdark.de/2014/02/16/deleting-files-from-snapper/
-    $ btrfs subvolume snapshot snap snap.rw
-    $ rm -rf snap.rw/path/to/file
-    $ btrfs subvolume delete snap
-    $ btrfs subvolume snapshot -r snap.rw snap
-    $ btrfs subvolume delete snap.rw
-  Find all CoW extents -- verify if file is reflink to another
-    https://unix.stackexchange.com/questions/263309/how-to-verify-a-file-copy-is-reflink-cow
-    https://unix.stackexchange.com/questions/128055/how-to-find-data-copies-of-a-given-file-in-btrfs-filesystem
-    rmlint: https://github.com/sahib/rmlint/issues/132
-  NOTE: if disk full -> can't create ./info.xml -> snapper won't track that snapshot
-    https://github.com/openSUSE/snapper/issues/24
-    -> delete manually $ sudo btrfs subvolume delete /.snapshots/1772/snapshot
-  Delete old snapshots (when disk is full)
-    $ snapper -c root list
-    $ snapper -c root delete 1
-    $ snapper ls
-    $ snapper delete --sync [id]
-    $ snapper -c root set-config "NUMBER_LIMIT=2"
-    $ snapper -c root set-config "NUMBER_LIMIT_IMPORTANT=2"
-  Revert single file from post(5) to pre(2)
-    $ snapper -v undochange 2..5 /etc/sysconfig/apache2
-
-  home_$user main dir:
-    $ btrfs filesystem df / &> /dev/null  # sanity check if btrfs
-    $ btrfs subvol create /home/$user
-    $ snapper -c home_$user create-config /home/$user
-    $ sed -i -e "s/ALLOW_USERS=\"\"/ALLOW_USERS=\"$user\"/g" ${SNAPPERCFGDIR}/home_$user
-    # NEED:?
-    $ chown $user.$group /home/$user
-    $ chmod 755 /home/$user/.snapshots
-
-
 Boot into snapshot
   grub-btrfs
     https://github.com/Antynea/grub-btrfs

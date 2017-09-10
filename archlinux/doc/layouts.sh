@@ -179,34 +179,3 @@ pacstrap /mnt  base base-devel lvm2 btrfs-progs grub snapper
 genfstab -pU /mnt >> /mnt/etc/fstab
 
 # pacstrap /mnt ntp sudo polkit wget git zsh vis
-
-
-## NOTE: snapper
-# https://wiki.archlinux.org/index.php/Snapper
-umount /.snapshots
-rmdir /.snapshots
-snapper -c root create-config /
-btrfs subvolume delete /.snapshots
-mkdir /.snapshots
-mount -a
-
-vis /etc/snapper/configs/root
-# TIMELINE_MIN_AGE="1800"
-# TIMELINE_LIMIT_HOURLY="8"
-# TIMELINE_LIMIT_DAILY="7"
-# TIMELINE_LIMIT_WEEKLY="5"
-
-# http://snapper.io/2016/05/18/space-aware-cleanup.html
-snapper setup-quota
-snapper get-config
-snapper set-config NUMBER_LIMIT=4-10 NUMBER_LIMIT_IMPORTANT=4-10
-
-chown -R root:users /home/${myuser:?}/.snapshots
-chmod -R 750 /home/${myuser:?}/.snapshots
-snapper -c user setup-quota
-
-snapper cleanup number
-btrfs qgroup show -reF /
-
-# start and enable
-systemctl enable --now snapper-timeline.timer snapper-cleanup.timer snapper-boot.timer
