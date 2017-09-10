@@ -1,5 +1,7 @@
-" For when you forget to sudo.. Really Write the file.
-command! -bar -bang -nargs=0 Sw silent write !sudo tee % >/dev/null
+"" NOTE: Save file with sudo ":w!sudo tee %"
+command! -bar -bang -nargs=? Sw exe "silent write !sudo tee "
+  \.shellescape(empty(<q-args>) ? expand('%') : <q-args>)." >/dev/null"
+
 " Execute command and place output in new buffer. (:new, :vnew, :tabnew)
 command! -bar -nargs=+ E new | r ! <args>
 

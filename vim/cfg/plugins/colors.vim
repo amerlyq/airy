@@ -26,7 +26,7 @@ call dein#add('bling/vim-airline', {
 "" Sticked to this colorscheme 2+ years already... {{{1
 " ALT:(both) https://github.com/Samuel-Phillips/nvim-colors-solarized
 
-call dein#add('lifepillar/vim-solarized8', {
+call dein#add('lifepillar/vim-solarized8', {'lazy': 0,
   \ 'hook_add': _hcat('solarized.add')})
 
 " DEV: simplified solarized -- with menu/etc removed
