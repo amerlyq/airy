@@ -2,8 +2,9 @@
 
 # grep -Ri 'name' . # find in all files
 
-# DFL: smart case and group view for piping results
-alias ag='ag --all-text -S --group'
+# DFL: used 'group' to pipe into 'less'
+# BAD: --all-text => skips '--ignore'
+alias ag='command ag --smart-case --group'
 
 if _has_pr ag
 then agi() { command ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' "$@"; }
@@ -11,7 +12,8 @@ else agi() { grep -ri "$@" .; }  # --include=*.{cc,h}
 fi
 
 # DEV: highlight: call ag#syntax#himatch_pcre("${@: -1}")
-agg() { ag --group -s "$@" 2>/dev/null | $EDITOR -R - -c "set cole=0 fdl=1|setf ag_grp"; }
+agg(){ command ag --group --heading -s "$@" | r.vim-stdin -c "set cole=0 fdl=1|setf ag_grp"; }
+agv(){ command ag --vimgrep -s "$@" | r.vim-stdin -c "cgetb|copen"; }
 
 agd() { find . -maxdepth 1 -type f | xargs ag "$@"; }    # in curr dir only
 agw() { agi -w "$@"; }
