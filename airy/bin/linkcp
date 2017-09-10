@@ -8,6 +8,7 @@ die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 #   << guard for scripts in ./{bin,ctl,exe,src} with same name.
 # ALT:(pr): http://skarnet.org/software/s6-portable-utils/s6-update-symlinks.html
 # !4 [_] BUG:(cd dir && linkcp -r src dst): => creates directory 'dir/dst', must symlink in-place
+# DEV: split linkcp to airy-ln and airy-cp
 
 cmd=f_link
 keep=0
@@ -33,9 +34,11 @@ show() { local t=$1 src=$2 dst=$3 sfx
   ((quiet)) || echo "-> $t  ${dst}${sfx-}";
 }
 same_file() { diff -q "${1:?}" "${2:?}" &>/dev/null; }
-same_tree() { ! find "$1" -type f -printf '%P\0' \
-    |& xargs -r0I{} diff -q "${1:?}"/{} "${2:?}"/{} \
-    |& grep -qm1 '.*'  # ALT: read -t0 -N1
+# BAD: same_tree triggers whole copy_tree instead of copy only different files
+#   => CHG: cmp and copy files one-by-one => call f_copy recursively on src dir tree
+same_tree() { local s=${1:?} d=${2:?}
+  while IFS= read -r f; do cmp -s "$s/$f" "$d/$f" || return
+  done < <(find "$1" -type f -printf '%P\n')
 }
 # BAD: $(readlink -m "$1") resolves dangling symlinks :: NEED path of link itself
 has_perm(){ local d=$1; [[ ${d:0:1} == / ]] || d=$PWD/$d
@@ -51,6 +54,7 @@ f_copy() { local src=$1 dst=$2 sudo=''
   || ([[ -d $src ]] && same_tree "$src" "$dst")
   then show C "$src" "$dst"; return; fi
   [[ -n ${dst%/*} ]] && $sudo mkdir -p "${dst%/*}"
+  # BAD: if some files in dst are symlinks => CHECK: copying will overwrite original files
   $sudo cp -rvfT -- "$src" "$dst"  # -b
   # THINK: maintaine file hash db in ~/.cache/airy/ to check if configs
   # was changed in external means and refuse to copy over, or forcefully
@@ -60,6 +64,8 @@ f_copy() { local src=$1 dst=$2 sudo=''
 f_link() { local src=$1 dst=$2 sudo=''
   has_perm "$dst" || sudo=sudo
   [[ -e $dst || ! -L $dst ]] || $sudo rm "$dst"  # EXPL: rm dangling links
+  # ADD:(<=here) if $dst == empty dir => rmdir and create symlink => NEED: for ~/.lyrics
+  # MAYBE:ALSO: rm $dst if empty file ?
   if [[ ! -e $dst || -L $dst ]]; then
     if [[ ! $src -ef $dst ]]; then
       [[ -n ${dst%/*} ]] && $sudo mkdir -p "${dst%/*}"
