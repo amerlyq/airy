@@ -2,17 +2,11 @@
 source ~/.shell/func.d/packages
 has_pr X || die
 
-# FIXED You are already signed in on this computer
-#   rm ~/.Skype/shared_dynco/dc.lock
-
-# FIXED Chat groups don't work
-#   https://community.skype.com/t5/Linux/Skype-group-chat-not-working-anymore/td-p/3987288
-
 if distro arch; then
-    aur_inst skype  # multilib only  # DEPS: lib32-qt4
-    # NEED: paci lib32-openssl100
     # USE:CHECK:(audio call): skypeforlinux-bin
-    # aur_inst skypeforlinux-bin
+    aur_inst skypeforlinux-bin
+    # OBSOLETE: multilib only DEPS: lib32-qt4 NEED: paci lib32-openssl100
+    #   aur_inst skype
     # DEPRECATED: sni-qt  # tray icon for skype
     # OBSOLETE:(cfg/media/pidgin already installed skypeweb plugin)
     #   aur_inst skype4pidgin-git'
@@ -30,10 +24,3 @@ elif distro ubuntu; then
         sudo apt-get install skype
     fi
 fi
-
-# FIX silent crash with pidgin
-# SEE http://community.skype.com/t5/Linux/Skype-4-3-crash-on-ubuntu-14-04/td-p/3219892
-
-# $ sqlite3 ~/.Skype/[username]/main.db
-# > UPDATE Messages SET body_xml=substr(body_xml,instr(body_xml,'<files')) WHERE type=68 AND body_xml LIKE 'posted%';
-# > .quit

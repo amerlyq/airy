@@ -191,7 +191,7 @@ myLayout = smartBorders
     . boringWindows
     . minimize
     . onWorkspace "PI" piLayer
-    . onWorkspace "SK" (reflectHoriz skLayer)
+    -- . onWorkspace "SK" (reflectHoriz skLayer)
     . trackFloating
     $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| simplestFloat ||| Grid ||| Circle
   where
@@ -213,6 +213,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   --   (ask >>= \w -> doF $ W.sink w) >> doShift "IM"
   -- FIXME: bring copyq into between windows stack -- check on first window of fullscreen wksp
   , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (3/10) (3/10))
+  , className =? "LuxoftPopulus" --> doFloat
   ] <+>
   composeFloat
   [ ("Float" `isPrefixOf`) <$> appName
@@ -244,7 +245,8 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   mconcat
   -- EXPL: for IM 'shift' is more comfortable
   [ className =? "Pidgin" --> doF (W.shift "PI")
-  , className =? "Skype" --> doF (W.shift "SK")
+  -- , className =? "Skype" --> doF (W.shift "SK")
+  , className =? "Skype Preview" --> doF (W.shift "SK")
   , className =? "Firefox" --> doF (bring "FF")
   -- , ("5", "Krita")
   -- , ("8", "t-engine64")

@@ -50,7 +50,8 @@ scratchpad = (concat . (`map` [
     , ("M-S-o", windows $ shift "NSP")
     , ("f" , runOrRaise "firefox" $ className =? "Firefox")
     , ("p" , runOrRaise "r.pidgin" $ className =? "Pidgin" <&&> stringProperty "WM_WINDOW_ROLE" =? "buddy_list")
-    , ("s" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
+    , ("s" , runOrRaise "skypeforlinux" $ className =? "Skype Preview")
+    -- , ("S" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
     -- FIXME: broken opening on new wksp?
     , ("m" , raiseMaybe (spawn "r.t -n mutt -e mutt") (appName =? "mutt"))
     , ("M" , raiseMaybe (spawn "r.t -n muttR -e mutt -R") (appName =? "muttR"))
