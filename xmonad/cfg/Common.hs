@@ -1,7 +1,7 @@
 -- vim: ts=2:sw=2:sts=2
 module XMonad.Config.Amer.Common (
     bring, backNforth, actions, actionMons,
-    inGroup, feedCmd
+    inGroup, feedCmd, lazyView
 ) where
 
 import XMonad                         (gets, windowset)

@@ -15,7 +15,7 @@ import XMonad.Prompt.XMonad         (xmonadPrompt)
 import XMonad.Actions.SpawnOn       (spawnHere)
 import XMonad.StackSet              (shift)
 
-import XMonad.Config.Amer.Common    (inGroup)
+import XMonad.Config.Amer.Common    (inGroup, actions)
 
 myPromptTheme = def
   -- { font = "-bitstream-bitstream vera sans-medium-r-*-*-14-*-*-*-*-*-*-*"
@@ -30,14 +30,16 @@ myPromptTheme = def
   , autoComplete = Just 1
   }
 
+pWksps = inGroup "M-i" [ (drop 2 m ++ "w", workspacePrompt def (windows . f)) | (m, f) <- actions]
+
 keys = inGroup "M-i"
   [ ("t", inputPrompt def "Fire" ?+ \p -> spawnHere ("r.tf -e " ++ p))
   , ("s", shellPrompt myPromptTheme)
   , ("o", xmonadPrompt def)
+  -- TODO: combine as set of "actions" with regular prefixes
   , ("f", windowPromptGoto def)
   , ("d", windowPromptBring def)
   , ("c", windowPromptBringCopy def)
-  , ("w", workspacePrompt def (windows . shift))
-  ] ++
+  ] ++ pWksps ++
   [ ("M-C-z" , inputPrompt def "LockMsg" ?+ \p -> spawn ("r.lock " ++ p))
   ]

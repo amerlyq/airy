@@ -14,7 +14,7 @@ import XMonad.Layout.TwoPane        (TwoPane(..))
 import XMonad.Layout.LayoutScreens  (layoutScreens)
 import XMonad.Actions.TagWindows    (setTags, addTag, shiftHere, tagPrompt, tagDelPrompt, focusUpTaggedGlobal, withTaggedGlobal, withTaggedGlobalP, withTaggedP)
 
-import XMonad.Config.Amer.Common    (inGroup, actions, actionMons, backNforth)
+import XMonad.Config.Amer.Common    (inGroup, actions, actionMons, backNforth, lazyView)
 import XMonad.Config.Amer.Workspace (skipped, immediate)
 
 
@@ -22,7 +22,9 @@ import XMonad.Config.Amer.Workspace (skipped, immediate)
 -- BUG: them counts unused wksp from current one, NEED any from the start! -- USE another sorting function
 -- ALT: choose empty only from secondary wksp? -- Like on M-g <Space> instead <Backspace>
 nextEmpty    f = findWorkspace getSortByIndex Next EmptyWS 1    >>= windows . f
+prevEmpty    f = findWorkspace getSortByIndex Prev EmptyWS 1    >>= windows . f
 nextNonEmpty f = findWorkspace getSortByIndex Next NonEmptyWS 1 >>= windows . f
+prevNonEmpty f = findWorkspace getSortByIndex Prev NonEmptyWS 1 >>= windows . f
 focusNonEmpty = withWindowSet $ \ws -> unless (null . allWindows $ ws) (nextNonEmpty view)
 
 -- Cycle through screens
@@ -37,14 +39,15 @@ doScreen d f = do
     Just ws -> windows (f ws)
 
 
-keys = screens ++ nwksps ++ panels ++ markNgo
+keys = screens ++ altWksps ++ usedWksps ++ emptyWksps ++ panels ++ markNgo
 
-nwksps = [ (m ++ k, b f) | (k, b) <- groups, (m, f) <- actions]
-groups =
-  [ ("a", backNforth skipped)
-  -- , ("<Backspace>", nextEmpty)
-  , ("<Tab>", nextNonEmpty)
-  ]
+altWksps = [ (m ++ "a", backNforth skipped f) | (m, f) <- actions]
+usedWksps =
+  [ ("M-<Tab>", nextNonEmpty lazyView),
+  ("M-S-<Tab>", prevNonEmpty lazyView) ]
+emptyWksps =
+  [ ("M-<Backspace>", nextEmpty lazyView),
+  ("M-S-<Backspace>", prevEmpty lazyView) ]
 
 -- NOTE: M-M1-[ must swap whole wksp between screens, keeping their numbers
 -- HACK: any more conviniet needs to re-implement greedyView
