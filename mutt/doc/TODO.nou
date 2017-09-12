@@ -1,4 +1,33 @@
+mbsync
+  [_] BUG: mbsync UID BODY.PEEK[HEADER.FIELDS
+    https://www.hmailserver.com/forum/viewtopic.php?t=13623
+    https://sourceforge.net/p/isync/mailman/message/34600615/
+    https://sourceforge.net/p/isync/mailman/message/33170964/
+  [_] BUG:FIND: mbsync folder rename
+  [_] BUG: isync UID 0x7fffffff
+    https://bugzilla.mozilla.org/show_bug.cgi?id=1391128
+  [_] mutt offline by imap/pop sync => how to check for new mails _fast_ ?
+    imap_idle
+      https://github.com/justinribeiro/idlemailcheck
+      Check support
+        G: imap idle check
+        https://stackoverflow.com/questions/18103278/how-to-check-whether-imap-idle-works
+        https://github.com/clehner/sylpheed-imap-notify/issues/2
+    [_] BET:FIND: mutt connect by imap but use local maildir
+      https://unix.stackexchange.com/questions/146634/accessing-maildir-locally-with-mutt-and-remotely-over-imap-simultaneously
+        => seems like you can't open local Maildir in mutt and sync it by IMAP simultaneously
+          << mailes on read must be moved new=>cur and .sfx added
+      http://donnlee.com/2010/01/22/do-you-love-mutt-use-offlineimap-fdm-and-rejoice/
+      https://unix.stackexchange.com/questions/72369/local-email-storage-syncing-to-imap-mutt-friendly
+
 TODO
+  [_] import calendar events from mutt
+  [_] mutt show whole mailbox tree -- to show unread/important per folder on the right
+  [_] BUG mutt -- opens html attachments only on second time => otherwise "file not found"
+  [_] mutt / davmail / exchange = login frequency timeout -- somewhere I seen config from someone with parameters
+    => SEE ldap => maybe it was there
+  2017-09-12 [X] BAD:(POP3) access only to Inbox, can't access other dirs ::: DFL protocol specs
+
   [_] isync -- poll for new mail
     https://sourceforge.net/p/isync/mailman/message/31795745/
     + READ https://unix.stackexchange.com/questions/99481/mbsync-not-fetching-pushing-with-gmail-folders
@@ -15,6 +44,11 @@ TODO
       https://www.reddit.com/r/commandline/comments/4l14gn/looking_for_a_new_mail_setup_in_the_terminal/
     + READ https://lukespear.co.uk/mutt-multiple-accounts-mbsync-notmuch-gpg-and-sub-minute-updates
   [_] don't ask password from 'pass' => keep empty if not queried from gpg
+    => [_] CHECK if isync queries pass in tty when PassCmd returns empty or error
+      SEE /usr/share/doc/isync/examples/mbsyncrc.sample
+    NEED remove pass when opening local mail => query pass not earlier then when sent mail by smtp
+      ! allow composing mail w/o sending
+
   [_] BAD: slow notmuch 'vfolder-from-query'
     https://raw.githubusercontent.com/karelzak/mutt-kz/master/README.notmuch
     REQ: ask on irc:#neomutt

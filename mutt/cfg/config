@@ -94,10 +94,14 @@ set mail_check=60
 set beep
 set beep_new
 # And poll the current mailbox more often (not needed with IDLE in post 1.5.11)
-set timeout=20
+set timeout = 20
+set imap_idle = yes
 set imap_keepalive = 900
 # Auto-poll all imap folders for new mail by adding to mailboxes (new in 1.5.11)
 # BAD:CHECK conflicts with multi-acc mailboxes
+# BAD: davmail freezes after each action => SEE davmail logs
+#   https://unix.stackexchange.com/questions/293460/reading-exchange-email-with-mutt-and-davmail
+#   + https://github.com/neomutt/neomutt/issues/186#issuecomment-252442647
 set imap_check_subscribed
 
 

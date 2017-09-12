@@ -25,8 +25,6 @@ bind index,pager  \\ vfolder-from-query
 macro index,pager  S  "| $my_cache/exe/save /tmp/msg/"
 # <enter>
 
-# HACK: show mailboxes list for current acc (BUT from root only)
-macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'
 macro index \Ca <tag-pattern>~A<enter>   "select all"
 # TRY: combine with \Ca by ternary op checking if there are tagged entries
 # macro index \Ca <untag-pattern>~A<enter>   "deselect all"
@@ -53,7 +51,13 @@ bind editor \Cp  history-up
 bind editor \Cn  history-down
 bind editor \Cx  complete-query
 
-bind browser  h  first-entry   # EXPL:(back) don't exists
+## Generic
+# BAD: in nested hierarchy of dirs can't return -- "back one level" don't exists, only
+bind generic  h  exit
+bind generic  g  first-entry
+bind generic  G  last-entry
+
+
 bind browser  l  select-entry
 # bind browser  j  next-entry       # generic
 # bind browser  k  previous-entry   # generic
@@ -73,9 +77,13 @@ bind index,pager  p  recall-message  # postponed
 bind index,pager  F  sync-mailbox
 bind index,pager  x  imap-fetch-mail # fetch-mail OR "!getmail" (external)
 
+# HACK: show mailboxes list for current acc (BUT from root only)
+macro index 'h' '<change-folder>?<change-dir><home>^K=<enter>'
+
 ## Navigate
 bind index  l  display-message
-bind index  h  collapse-thread
+bind index \Ch collapse-thread
+bind index  c  collapse-thread
 bind index  z  collapse-all
 bind index  =  limit
 bind index "'" limit
@@ -84,8 +92,8 @@ bind index  j  next-entry
 bind index  k  previous-entry
 bind index  J  next-undeleted
 bind index  K  previous-undeleted
-bind index  g  first-entry
-bind index  G  last-entry
+bind index  g  first-entry  # DFL:(override)
+bind index  G  last-entry   # DFL:(override)
 bind index  H  top-page
 bind index  L  bottom-page
 # bind index  <Down>  next-entry
@@ -101,7 +109,7 @@ bind index <Space> tag-entry
 
 ### Pager
 # bind pager  ;  tag-prefix
-bind pager  h  exit
+bind pager  h  exit  # DFL:(override)
 bind pager  l  view-attachments
 bind pager  H  display-toggle-weed
 bind pager  J  next-line
