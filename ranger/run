@@ -32,7 +32,8 @@ RANGER_LOAD_DEFAULT_RC=FALSE \
 # Automatically change the directory in bash to the last visited one
 # after ranger quits. To undo the effect of this function,
 # you can type "cd -" to return to the original directory.
-if [[ -s $RANGER_TMPDIR/cwd ]]; then
-  dir=$(<"$RANGER_TMPDIR/cwd")
-  [[ $dir == $PWD || ! -d $dir ]] || cd -- "$dir"
-fi
+
+_ranger_cd(){ local d f=$RANGER_TMPDIR/cwd
+  [[ -s $f ]] && d=$(<"$f")
+  [[ ! -d ${d-} || $d == $PWD ]] || cd -- "$d"
+}; _ranger_cd

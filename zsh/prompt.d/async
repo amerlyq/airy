@@ -3,7 +3,7 @@
 # @brief Compute slow commands in the background.
 #   NOTE Must be the last commands of function for prompt refresh to work.
 
-function prompt_update {
+function prompt_update { local c
   typeset -g _prompt_async_pid=''  # Reset PID
   for c in $_prompt_async_calls; do
     # THINK: directly use typeset -g instead of source env=$(< $tmp/f1 < $tmp/f2)
@@ -18,7 +18,7 @@ function prompt_update {
   zle && zle .reset-prompt
 }
 
-function prompt_async_exec {
+function prompt_async_exec { local c
   local update=${1:?} timer pids=()
   # NOTE: 'timeout' is expensive, 'sleep+kill' need fork,
   # ALSO: '{{ cmd; }|{ sleep 5; kill 0; }}' don't work

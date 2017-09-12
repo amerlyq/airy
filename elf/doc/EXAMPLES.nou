@@ -8,3 +8,6 @@ INFO
       $ strings -a file | grep -i gcc
   ALSO info
     $ readelf -n file
+
+  Check if required deps libs present on host system
+    $ objdump -p "$elf" | sed -n '/\s*NEEDED\s*/s///p' | grep -vxFf <(ldconfig -p | awk '{print$1}')

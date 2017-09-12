@@ -38,9 +38,20 @@ PKGBUILD
   NOTE: 'abs' installs useful templates into /usr/share/pacman
 
 
-Use pkgs in .deb or .rpm
-  $ dpkg
-  $ rpmextract
+Use alien pkgs
+  BET: repack manually into PKGBUILD
+  .rpm
+    https://unix.stackexchange.com/questions/115245/install-rpm-file-on-arch-linux
+    https://unix.stackexchange.com/questions/131010/why-am-i-getting-an-error-failed-to-open-dev-st0-when-extracting-an-archiv
+    BET $ bsdtar -xf *.rpm
+    OR $ rpmextract / alien
+  .deb
+    https://www.maketecheasier.com/install-deb-package-in-arch-linux/
+    $ dpkg
+    $ sudo deptap -u
+    $ debtap *.deb
+    $ pacman -U *.pkg.tar.xz
+    OR:(generate PKGBUILD only): $ debtap -P *.deb
 
 
 IDEA
