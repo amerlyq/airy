@@ -85,24 +85,26 @@ set ssl_force_tls= yes  # always use SSL when connecting to a server
 # Display download progress every 5K
 set net_inc=5
 
+# Urgent bell in terminal on new mail
+set beep
+set beep_new
 # IMAP | enough only set local dirs
 # Don't wait to enter mailbox manually
 unset imap_passive
 ## Check incoming: Reduce polling frequency to a sane level
-set mail_check=60
-# Urgent bell in terminal on new mail
-set beep
-set beep_new
+set mail_check = 60
 # And poll the current mailbox more often (not needed with IDLE in post 1.5.11)
 set timeout = 20
 set imap_idle = yes
-set imap_keepalive = 900
+set imap_keepalive = 300
 # Auto-poll all imap folders for new mail by adding to mailboxes (new in 1.5.11)
 # BAD:CHECK conflicts with multi-acc mailboxes
 # BAD: davmail freezes after each action => SEE davmail logs
 #   https://unix.stackexchange.com/questions/293460/reading-exchange-email-with-mutt-and-davmail
 #   + https://github.com/neomutt/neomutt/issues/186#issuecomment-252442647
-set imap_check_subscribed
+set imap_check_subscribed = no
+# set mail_check_stats=no
+# set mail_check_stats_interval=0
 
 
 # POP3 | needs to create local dirs manually

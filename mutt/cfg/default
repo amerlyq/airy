@@ -15,7 +15,8 @@ source $my_cfg/keyrc            # Bindings
 source $my_cache/theme          # Theme
 
 unmailboxes *
-mailboxes =INBOX
+## BAD: '=' available only after $folder set inside <account>
+# mailboxes =INBOX
 set signature = "$my_cache/sign/$my_acc"
 set nm_default_uri = notmuch://$HOME/.mail/$my_acc
 
