@@ -1,0 +1,54 @@
+Multihost master key
+
+  Master key = keep on flash stick in safe
+    master: $ gpg --full-gen-key --expert $  # gpg> RSA(8)/Certify(C)+Sign(S)+Q/4096/3y/Name/email/nick/OK
+    $ gpgkey=amerlyq@gmail.com
+    * interactively create key on secured machine / BET:SECU: use LiveCD in offline
+    * you can extend date even for expired key
+    * if you lost key => users will know when it expired
+
+  Subkeys = local per each host machine
+    WARN: first generate signing-only key, then encryption!
+      EXPL: if ctime(sign_key) > ctime(enc_key) => cannot be used for encryption in PGP 8
+    signing: $ gpg --edit-key $gpgkey $  # gpg> addkey/RSA_sign(4)/2048/6m/save
+    encrypt: $ gpg --edit-key $gpgkey $  # gpg> addkey/RSA_encr(6)/2048/6m/save
+    # OR: $ gpg --import amerlyq.gpg-mail.asc
+    * timeframe key, could be recreated and distributed regularly each month
+      adduid :: for additional name/email (searchable on key server)
+        => NEED re-gen all subkeys to include this info
+      addphoto :: Can embed photo into key ~120x144px, ~4KB JPEG
+
+  Export master key and master revocation cert
+    * do it after subkeys creation, so master key know about subkeys and can revoke them
+    ! ATTENTION: store revocation cert !separately! from master key (print on paper in safe:)
+      => to revoke even if you lost flash stick with master key itself
+    $ gpg --export-secret-keys --armor $gpgkey > amerlyq.gpg-private.asc
+    $ gpg --export --armor $gpgkey > amerlyq.gpg-public.asc
+    $ gpg --output amerlyq.gpg-revoke.asc --gen-revoke $gpgkey
+      gpg> 0/Use only in case of master key loss, else gen new with specified reason.
+
+  Keep only subkeys (with changed password)
+    !_ You can use RAM disk for tmp operations, instead of using shred on HDD
+    NOT diff passwords
+      NOTE: you can't have different passphrase for master key and subkeys
+      HACK: export all keys and re-import only subkeys, then change subkeys password
+        https://superuser.com/questions/879977/how-to-have-a-different-pass-phrase-for-a-gpg-subkey
+    ATT: back-up to roll-back in case of unexpected troubles
+      $ cp -rv ~/.gnupg to your encrypted USB drives (better multiple)
+      OR $ (umask 077 && tar -cf gnupg-backup.tar -C "$HOME" .gnupg)
+
+    Export all subkeys
+      $ gpg --export-secret-subkeys $gpgkey > subkeys.asc
+      ALT: export sep keys per each host individually in different files
+        $ gpg --export-secret-subkeys -a '<SID>!' '<EID>!' >  subkeys_$host.asc
+    Delete master key -- public key will remain
+      !_ WARN: master key must be already exported
+      $ gpg --delete-secret-key $gpgkey
+    Insert subkeys back
+      $ gpg --import subkeys.asc
+      $ shred --remove subkeys.asc
+        WARN: use cp + shred instead of mv for key transportation
+    ! Verify that gpg -K shows a "sec#" instead of just "sec" for your private key.
+      << That means the signing subkey is not in the keypair located in keyring.
+      $ gpg --edit-key $gpgkey passwd
+      $ gpg --list-options show-keyring -K

@@ -47,63 +47,7 @@ Test
     systemctl --user start gpg-agent
 
 
-> Initial setup
-: for multiple machines
-< export GPGKEY=amerlyq@gmail.com
-
-  Create Interactively one root key on main secured machine
-  : ATTENTION: better to use LiveCD in offline to eliminate possible threats.
-    gpg --full-gen-key --expert
-    |gpg> RSA/Certify+Sign/4096/3y/Name/email/nick
-    : ALT --gen-key for gpg < v2.1
-    : NOTE It’s easy to extend the expiration date, even after it elapsed.
-    : But, if you lost it, then key will expire and users will know it.
-
-  Create separate subkeys for each machine (main included)
-  : do twice for local sign/decrypt and import once created shared decrypt for mail
-    gpg --edit-key $GPGKEY
-    |gpg> addkey/RSA/2048/6m/save
-    gpg --import amerlyq.gpg-mail.asc
-      : timeframe key, could be recreated and distributed regularly
-      adduid
-      : for additional name/email (for searching your key on key server)
-      : but then you need re-generate all subkeys to include this information
-      addphoto
-      : Can embed photo into key ~120x144px, ~4KB JPEG
-    WARNING first generate signing only key, then encryption!
-    : EXPL A key with a signing subkey that is newer than the encryption subkey
-    : cannot be used for encryption in PGP 8. A key where the encryption
-    : subkey is newer than the signing subkey can be used for encryption.
-
-  Export master key with subkeys and master revocation cert:
-  : do it after subkeys creation, so master key know about and can revoke them
-    gpg --export-secret-keys --armor $GPGKEY > amerlyq.gpg-private.asc
-    gpg --export --armor $GPGKEY > amerlyq.gpg-public.asc
-    gpg --output amerlyq.gpg-revoke.asc --gen-revoke $GPGKEY
-    |gpg> 0/Use only in case of master key loss, else gen new with specified reason.
-    ATTENTION:
-      Store revocation !separately! from master exactly for case of master key loss!
-      You can even print it on paper and keep with other docs in safe.
-
-  Back-up to roll-back in case of unexpected troubles
-    cp -rv ~/.gnupg to your encrypted USB drives (better multiple)
-    : OR (umask 077 && tar -cf "$HOME"/gnupg-backup.tar -C "$HOME" .gnupg)
-
-  Remove master key and keep subkeys only, then change their passwords:
-  : ATTENTION: export master key to secure place before this!
-  <You can use RAM disk for tmp operations, instead of using shred on HDD>
-    : ALT eport all: gpg --export-secret-subkeys $GPGKEY > subkeys.asc
-    gpg --list-options show-keyring -K
-    gpg --export-secret-subkeys -a '<SID>!' '<EID>!' >  <subkeys_...>.asc
-    | Repeat this for each machine -- using different files
-    gpg --delete-secret-key $GPGKEY  # public key will remain
-    gpg --import subkeys_home.asc
-    shred --remove subkeys_home.asc
-    : WARNING: use cp + shred instead of mv for key transportation
-    | Verify that gpg -K shows a sec# instead of just sec for your private key.
-      : That means the signing subkey is not in the keypair located in keyring.
-    gpg --edit-key $GPGKEY passwd
-
+>> Other scenarios
   Deploy keys
     gpg --import secretkey1.asc && shred --remove secretkey1.asc
     gpg --export-secret-key -a '<ID1>!'| ssh :dst: gpg --import -
@@ -136,7 +80,6 @@ Test
       : A secret keyring as used by GnuPG versions before 2.1.
       : It is not used by GnuPG 2.1 and later.
 
->> Other scenarios
 Revocation
 : One of subkeys
   Boot LiveCD + Encrypted USB drive + master.asc OR ~/.gnupg
@@ -146,6 +89,7 @@ Revocation
     USE gpg> list, key 2, revkey, save
 
 Extending:
+    $ gpg --edit-key $GPGKEY
     gpg> key 1, expire, save
   Send the updated key to the keyservers
     gpg --send-key --keyserver <server> $GPGKEY
