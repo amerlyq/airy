@@ -1,0 +1,16 @@
+NEED: setup gnupg with encryption key
+
+SEE pass+git
+  https://www.passwordstore.org/
+  https://wiki.archlinux.org/index.php/Pass
+
+Setup
+  $ pass init $mail
+  $ pass insert work/user
+
+USE
+  Copy passwd from dmenu to xclip
+    $ passmenu
+
+BUG
+  [_] BAD: remove xclip from deps of pass
