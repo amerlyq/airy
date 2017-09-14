@@ -1,3 +1,13 @@
 #!/bin/bash -eu
 # tags: chat irc server
 source ~/.shell/func.d/cfgsetup
+
+cfg=/etc/bitlbee/bitlbee.conf
+uncomment(){ ! grep -q '^#\s*'"$1"'\s*=' "$cfg" \
+  || sudo sed -ri '/^#\s*('"$1"'\s*=)/s//\1/' "$cfg"; }
+
+uncomment User
+uncomment DaemonInterface
+uncomment DaemonPort
+
+svc_activate -er bitlbee

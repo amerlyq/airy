@@ -1,7 +1,49 @@
 setup
   https://wiki.archlinux.org/index.php/bitlbee
-  https://wiki.bitlbee.org/ConvertPurple
   https://wiki.bitlbee.org/HowtoSkypeWeb
+
+
+ALG
+  Reg bitlbee account for all my IM
+    register <passwd>
+    identify <passwd>
+  List available protocols
+    plugins
+  Add accounts per IM
+    BET: use /OPER for entering <passwd> securely w/o echo
+    gtalk
+      account add jabber <user@gmail.com> <passwd>
+      account jabber set
+      account jabber set connect_server talk.google.com
+      account jabber set port 5222
+      account jabber set auth_plain_in_clear false
+      account jabber set connection_security require_tls
+      account jabber on
+    skype
+      account add skypeweb <user> <passwd>
+      account skypeweb set
+      account skypeweb on
+  Show offline users
+    chan &bitlbee set show_users online+,away+,offline
+    /names
+  Groupchats
+    List all your chats from server
+      chat list skypeweb
+    Add choosen ones
+      chat add skypeweb !4 #work
+      channel #work set auto_join true
+      /join #work
+
+Weechat
+  notify-send
+    https://github.com/s3rvac/weechat-notify-send
+    /script search|install notify_send.pl
+
+
+OBSOL: Convert from Pidgin
+  https://wiki.bitlbee.org/ConvertPurple
+  https://github.com/bitlbee/bitlbee/blob/master/utils/convert_purple.py
+  $ ./convert_purple.py -f ~/.purple
 
 plugins
   https://wiki.bitlbee.org/FrontPage
