@@ -1,4 +1,12 @@
 mbsync
+  2017-09-13 [X] poll in foreground NEED: auto password
+    $ watch -bdxn120 mbsync -qV -c account --pull-new channel:INBOX
+  2017-09-13 [X] sync single mailbox / inbox
+    ::: $ mbsync -c account --pull-new channel:INBOX
+    * fetch only new mails (cron polling OR imap_idle event)
+    * never use Office365 web or IMAP to modify mails
+    * only modify mailboxes locally
+    * push accumulated changes at once => on demand or by hourly timer
   [_] BUG: mbsync UID BODY.PEEK[HEADER.FIELDS
     https://www.hmailserver.com/forum/viewtopic.php?t=13623
     https://sourceforge.net/p/isync/mailman/message/34600615/
