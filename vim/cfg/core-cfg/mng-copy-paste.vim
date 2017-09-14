@@ -196,6 +196,8 @@ vnoremap <unique>  [Frame]Y
 "  * enforce pivot dir to make paths related to it instead of diff lwd
 "   HACK: use tags in pwd but trim paths common prf USE: java nested paths
 fun! GetLineSpoiler(idt, text, ...)
+  " TODO: g:line_spoiler_width = 50
+  "   => so I can change DFL params of snippet at any time
   let n = 50
   let p = expand(get(a:,2) ? '%:p' : '%')
   if p !~# '^[./]'| let p = './'.p |en
@@ -222,10 +224,21 @@ fun! GetLineSpoiler(idt, text, ...)
     let t = get(m, 0, '')
   endif
 
-  if l:n < strdisplaywidth(t)
-    " BUG: "\t" matches as single char in ".{50}" instead of &ts
-    let t = substitute(t, '\v^.{'.(n-2).'}\zs.*', '{+&+}', '')
-  endif
+  " BUG: "\t" matches as single char in ".{50}" instead of &ts
+  "" NOTE: Hide into spoiler {+ ... +}
+  " if l:n < strdisplaywidth(t)
+  "   let t = substitute(t, '\v^.{'.(n-2).'}\zs.*', '{+&+}', '')
+  " endif
+
+  "" TRY:BET: pipe through ctags => extract tag name
+  if l:n<strdisplaywidth(t)|let t = substitute(t, '\v\)\zs[^)]*$', '', '')|en
+  if l:n<strdisplaywidth(t)|let t = substitute(t, '\v^.{'.(n-4).'}.{-}\zs[^()]*\)', '...)', '')|en
+  " BUG: corrupts 'if/while' statements => FIXME: apply cutting only to function signatures
+  "   ALT: apply prefix cutting only on demand
+  if l:n<strdisplaywidth(t)|let t = substitute(t, '\v^\s*\zs[^()]{-}\ze\S*\S{,'.(n-4).'}$', '... ', '')|en
+  " if l:n<strdisplaywidth(t)|let t = substitute(t, '\v^\s*\zs.{-}\ze\S{,'.(n-4).'}$', '... ', '')|en
+  if l:n<strdisplaywidth(t)|let t = substitute(t, '... ', '', '')|en
+  if l:n<strdisplaywidth(t)|let t = substitute(t, '(...)', '()', '')|en
 
   let t.= repeat(' ', n - strdisplaywidth(t))
   let t.= ' | ' . l:p . ':' . line(".")

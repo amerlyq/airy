@@ -1,6 +1,13 @@
 Neovim
 SEE:(neovim>vim): https://geoff.greer.fm/2015/01/15/why-neovim-is-better-than-vim/
 
+  [_] BAD: when opening tag by symlink => it follows to actual file
+    => TextSpoiler has actual full path instead of relative to pwd
+    ::: DFL intended behaviour (swap file resolution to prevent simultaneous editing by many links)
+      https://stackoverflow.com/questions/708700/getting-the-logical-path-in-vim-when-theres-a-symlink
+      https://superuser.com/questions/960773/vim-opens-symlink-even-when-given-target-path-directly
+    [_] NEED: get somehow original path by which file was opened
+
   2017-05-26 [X] BUG: st+tmux+neovim+solarized => ru text disappears in area of 'set scrolloff=3'
     IDEA: always :redraw! after cursor move ?
     ::: official pkg tmux==2.4.1 broken, TEMP:USE: tmux-git
