@@ -1,6 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: xorg
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 linkcp -t ~/.config mimeapps.list
+
+# TODO: override from private -- if existing
+# BAD:(xdg-user-dirs-update): replaces symlink by file
+#   CHG: must be generated :: embed by cmd AIRY_BIN => user-dirs
+linkcp -ct ~/.config user-dirs.dirs
+echo en_US > ~/.config/user-dirs.locale
