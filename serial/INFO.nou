@@ -1,3 +1,16 @@
+BET: use terminal directly w/o minicom/picocom
+  Reset and set params for serial device
+    $ stty -F /dev/ttyUSB0 raw
+    $ stty -F /dev/ttyUSB0 115200 -evenb -cstopb -echo -onclr
+  Save and restore all current params
+    $ stty -F /dev/ttyUSB0 -g | xsel -ib
+    $ stty -F /dev/ttyUSB0 "$(xsel -ob)"
+  Bidirectional communication
+    $ cat /dev/ttyUSB0 & cat - > /dev/ttyUSB0
+    OR $ tee /dev/ttyUSB0
+    USE:(to close background cat): $ jobs && fg
+
+
 HACK: comment/tag serial output
   Open new terminal with
     $ r.t -M -e tmux new-session -s serial -- r.serial
