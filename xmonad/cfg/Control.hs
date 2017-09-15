@@ -44,6 +44,7 @@ isFloat  = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ member w $ W.f
 --     then fX else nextNonEmpty W.view >> spawn "r.n 'Shutdown warning:' 'Close all windows'" :: X()
 
 -- FIXME: jump to urgent and back ALT: save last urgent and always jump to it even after urgentstate cleared
+--  ALSO: save current non-urgent window to return there when all urgent were viewed
 -- urgentNback w = withUrgents $ maybe (backNforth [] $ W.view w) (windows . W.focusWindow) . listToMaybe $ w
 urgentNback = withUrgents $ maybe (return ()) (windows . W.focusWindow) . listToMaybe
 -- ENH: urgent_pullNback

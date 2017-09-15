@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+set -o pipefail
+
+make --dry-run -d | sed -n "/Must remake target '/{s///;s/'\.\$//;p}" | command grep -vE '/(all|build|depend)$'

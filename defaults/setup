@@ -35,12 +35,15 @@ mkdef r.n         r.notify
 mkdef r.b         r.qute
 mkdef r.bt        r.elinks
 mkdef r.wm        r.xmonad
+mkdef r.e         r.vim
+mkdef r.e-        r.vim-stdin
+# HACK: I can use "EDITOR=r.e" to change it in aliases on the fly
 
 mkdef xmessage    r.vim-xmessage
 mkdef notify-send /usr/bin/dunstify
-[[ -z $EDITOR ]] || mkdef editor $EDITOR
 
 if distro ubuntu; then
+  [[ -z ${EDITOR-} ]] || mkdef editor $EDITOR
   mkdef www-browser         elinks
   mkdef x-www-browser       qutebrowser
   mkdef x-window-manager    xmonad
