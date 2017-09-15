@@ -5,11 +5,27 @@ ConditionFileNotEmpty=/etc/dict/dictd.conf
 ConditionDirectoryNotEmpty=/usr/share/dictd
 
 [Service]
+# EnvironmentFile=-/etc/conf.d/dictd
+# Run ExecStartPre with root-permissions
+#   SEE: https://blog.hqcodeshop.fi/archives/93-Handling-varrun-with-systemd.html
+PermissionsStartOnly=true
+ExecStartPre=-/usr/bin/mkdir -m 755 "%t/dictd"
+ExecStartPre=/usr/bin/chown -R nobody:users "%t/dictd/"
+PIDFile=%t/dictd/dictd.pid
+
 Type=forking
+User=nobody
+## BAD:SECU:BET: move/mount dicts directly to /usr/share/dictd instead of keeping on shared media partition
+Group=users
+ExecStart=/usr/bin/dictd --pid-file %t/dictd/dictd.pid --config /etc/dict/dictd.conf -- -s
 # EXPL: 143 = 128 + 15(SIGTERM)
 SuccessExitStatus=0 143
-# EnvironmentFile=-/etc/conf.d/dictd
-ExecStart=/usr/bin/dictd -c /etc/dict/dictd.conf -- -s
+
+InaccessibleDirectories=/sys
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=full
 
 [Install]
 WantedBy=multi-user.target
