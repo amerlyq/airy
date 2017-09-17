@@ -23,6 +23,7 @@
 # ALSO:BAD: all spawned terminals will have incomplete env w/o ~/.shell/exports
 # MAYBE:BETTER: generate env into file by ./setup and then source it into xmonad.service?
 
+## TRY:FIXME: use single env file (shared with ~/.pam_environment)
 # systemctl --user set-environment XDG_CONFIG_HOME=~/.config
 systemctl --user set-environment DISPLAY=:0  # XAUTHORITY
 systemctl --user import-environment XDG_VTNR PATH TMPDIR EDITOR PAGER

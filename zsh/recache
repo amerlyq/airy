@@ -12,14 +12,13 @@ ZDOTDIR=$zdir
 rehash
 
 zcompile ~/.zshenv
-zcompile $zdir/.zprofile $zdir/.zprofile ~/.shell/exports
+zcompile $zdir/.zprofile $zdir/.zprofile
 zcompile $zdir/.zlogin $zdir/.zlogin
 
 # Combine zshrc components into one file
 lst=()
 lst+=( $zdir/.{zshrc,zprezto{rc,/init.zsh}} )
 lst+=( ./{amer-{widgets,key-mix},filetypes,completion}.zsh )
-lst+=( ~/.shell/common )
 zcompile $zdir/.zshrc ${lst[@]}
 
 # Compile the completion dump

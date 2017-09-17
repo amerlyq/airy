@@ -1,59 +1,15 @@
 #!/bin/bash -eu
 # tags: airy
 # deps: st notify qute elinks xmonad vim dunst
-source ~/.shell/func.d/system
+source ~/.shell/func.d/cfgsetup
 
-# WARN: those short-links don't exist on ./setup -friu
-#   => can't be used inside scripts at all
-#   !! even long-links will exist only after *mod* was resolved
-#   BET: don't use interdependent links between *mod* at all
-#   ALT: use 'make' etc for deps graph resolving -- BUT: sins like systemd
-#   ALT: run once before system install and once after
+### LINKS ###
+linkcp -ct /etc/profile.d ./cfg/airy-profile.sh
 
-if distro arch; then
-  # TODO:DEV: add fallback -- for each arg until pr found OR err
-  mkdef() { linkcp "$(which "${2:?}")" ~/.bin/"${1:?}"; }
-elif distro ubuntu; then
-  mkdef() { local nm=${1:?} pr=${2:?}; pr=$(which "$pr")
-    update-alternatives --get-selections | grep -q "^$nm.*$pr\$" ||
-    sudo update-alternatives --set "$nm" "$pr"
-  }
-  # ALT: Interactive choose defaults
-  #   sudo update-alternatives --config gnome-www-browser
-  #   update-alternatives --display x-session-manager
-fi
+### ENVS ###
+for f in ./env/{editor,pager}
+do source "$f"; done
+env-subs {./cfg/,~/.}pam_environment
 
-### AUTO ###
-if has_pr st; then term=st
-elif has_pr urxvt; then term=urxvt
-else term=xterm; fi
-
-echo 'N: Defaults'
-mkdef r.t         ${term:?}
-mkdef r.tf        r.${term}-float
-mkdef r.n         r.notify
-mkdef r.b         r.qute
-mkdef r.bt        r.elinks
-mkdef r.wm        r.xmonad
-mkdef r.e         r.vim
-mkdef r.e-        r.vim-stdin
-# HACK: I can use "EDITOR=r.e" to change it in aliases on the fly
-
-mkdef xmessage    r.vim-xmessage
-mkdef notify-send /usr/bin/dunstify
-
-if distro ubuntu; then
-  [[ -z ${EDITOR-} ]] || mkdef editor $EDITOR
-  mkdef www-browser         elinks
-  mkdef x-www-browser       qutebrowser
-  mkdef x-window-manager    xmonad
-  mkdef x-terminal-emulator "$term"
-  # mkdef x-session-manager cinnamon-session-cinnamon
-  # Mint:
-  #   sudo mdmsetup     | login screen
-  #   cinnamon-settings | other sets
-  for nm in vim view rview; do mkdef "$nm" vim.gtk; done
-fi
-
-# DFL: Qt4 SEE: https://wiki.archlinux.org/index.php/Qt#Installation
-# linkcp /etc/xdg/qtchooser/4.conf ~/.config/qtchooser/default.conf ||:
+### GENS ###
+./gen/symlinks

@@ -22,7 +22,9 @@ defaults=$(( !${#mods[@]} && !${#skip[@]} ))
 ### Environment
 airy=$(dirname "$(readlink -e "$0")")
 "$airy/setup" -m  # BAD!RFC: dirty code duplication
-source ~/.shell/exports
+[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
+[[ -d ${TMPDIR:=/tmp/${LOGNAME-}} ]] || mkdir -p "$TMPDIR"
+export TMPDIR
 
 repo=$(git -C "$airy" rev-parse --show-toplevel)
 build=$repo/_build

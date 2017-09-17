@@ -5,6 +5,11 @@ source ~/.shell/func.d/packages
 #| mediainfo or perl-image-exiftool # viewing information about media files
 pkg_inst highlight mediainfo
 
+if cfgOpt u; then
+  # INIT: $ ranger --copy-config=all
+  echo 'N: USE:(on_upgrade): $ diff -u {/usr/share/doc/ranger/config,~/.config/ranger}/rifle.conf'
+fi
+
 if distro arch; then
   pkg_inst ranger
   pkg_inst fbida  # framebuffer image viewer for terminal

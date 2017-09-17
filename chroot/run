@@ -40,7 +40,10 @@ done
 
 # EXPL Export SHELLRC_EVAL to source env in each spawned shell from ranger
 # WARN: DISPLAY="$DISPLAY" -- can't umount schroot
+# FIXED:($LANG): for schroot into old ubuntu
 exec schroot -c "$prf" -d "$dir" -- env \
+  LANG="${LANG:-en_US.UTF-8}" \
+  LC_NUMERIC="${LC_NUMERIC:-${LANG-}}" \
   SHELLRC_EVAL="${CURR_CHROOT_EVAL}" \
   "${_env[@]}" \
   "$SHELL" -li "$@"

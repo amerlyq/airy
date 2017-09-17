@@ -1,0 +1,10 @@
+# vim:ft=sh
+### Editor ###
+
+EDITOR=${EDITOR:-r.vim}
+hash "$EDITOR" &>/dev/null || EDITOR=vim
+hash "$EDITOR" &>/dev/null || EDITOR=vi
+
+# BAD:(space in args):  +set\ nolist
+VISUAL="${VISUAL:-$EDITOR}"
+export EDITOR VISUAL

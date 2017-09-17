@@ -8,8 +8,3 @@ cfgNo c || git clean -Xdi -- "$PWD"
 ### LINKS ###
 linkcp "$PWD" ~/.config/ranger
 linkcp {,~/.}mime.types
-
-if cfgOpt u; then
-  echo "N: USE: ranger --copy-config=all (Be Careful!), and see diff"
-  echo "W: for 'auto-cwd' on exit use '_ranger_cwd()' from ~/.shell/common"
-fi

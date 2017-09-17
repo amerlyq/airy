@@ -1,12 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: shell
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 linkcp {,~/.}bashrc
-
-if distro arch; then
-  linkcp {,~/.bash_}profile
-elif distro ubuntu; then
-  linkcp {,~/.}profile
-fi
+linkcp ~/.bashrc ~/.bash_profile

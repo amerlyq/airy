@@ -1,5 +1,4 @@
 #!/bin/bash -eu
-source ~/.shell/exports  # for $EDITOR only
 set -euo pipefail
 
 ### PLUGINS ###
@@ -10,7 +9,7 @@ set -euo pipefail
 
 # NOTE: EDITOR=vim ./update
 # -nesR -u "$PWD/vimrc" ... -- ./vimrc
-shvim() { $EDITOR -nR \
+shvim() { ${EDITOR:-nvim} -nR \
   -c "set nomore|redir!>/dev/tty" \
   -c "$1" \
   -c "echo''|redir END|qall!" \

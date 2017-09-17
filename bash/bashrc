@@ -8,7 +8,7 @@ export SHELL=$BASH  # NEED: when bash run from zsh
 # BUG: cd has errors -- when '$ cd' in bash
 # BUG: bash can't '.a' to jump between dirs
 
-[[ -d ${TMPDIR:=/tmp} ]] || mkdir -p $TMPDIR
+[[ -d ${TMPDIR:=/tmp} ]] || mkdir -p "$TMPDIR"
 TMPPREFIX=${TMPDIR%/}/${SHELL##*/}
 
 # don't put duplicate lines or lines starting with space in the history.
@@ -41,7 +41,7 @@ stty -ixon
 stty -echoctl
 
 # make less more friendly for non-text input files, see lesspipe(1)
-[[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
+# [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile

@@ -1,0 +1,40 @@
+TODO:BET:CHG:
+  https://wiki.archlinux.org/index.php/environment_variables
+  https://unix.stackexchange.com/questions/354291/how-to-set-environment-variables-at-startup-in-archlinux
+  https://wiki.archlinux.org/index.php/XDG_Base_Directory_support#User_directories
+
+2017-09-17 [X] BAD: ~/.shell/exports always overwrites vars when sourced in dependent scripts
+  !!! cant change env vars E.G. $EDITOR
+  ::: USE ~/.pam_environment
+
+
+DFL environment variables
+  https://wiki.archlinux.org/index.php/environment_variables
+  http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03
+    /etc/security/pam_env.conf
+    /etc/environment
+    ~/.pam_environment
+  +++ http://unix.stackexchange.com/questions/88201/whats-the-best-distro-shell-agnostic-way-to-set-environment-variables
+  +++ http://xpt.sourceforge.net/techdocs/nix/distro/debian/deb20-SystemConfiguration/ar01s08.html
+    ~/.profile => not sourced by ZSH => bash reads it only if ~/.bash_{profile,login} doesn't exist
+      SEE: /usr/share/doc/bash/examples/startup-files
+  https://wiki.archlinux.org/index.php/Systemd/User#Environment_variables
+    ~/.config/systemd/user.conf
+    /etc/systemd/user.conf
+    /etc/systemd/system/user@.service.d/ <= drop-in config file
+    man 5 environment.d
+      ~/.config/environment.d/*.conf
+      /etc/environment.d/*.conf
+      /run/environment.d/*.conf
+      /usr/lib/environment.d/*.conf
+      /etc/environment
+    man 7 systemd.environment-generator
+      /run/systemd/system-environment-generators/*
+      /etc/systemd/system-environment-generators/*
+      /usr/local/lib/systemd/system-environment-generators/*
+      /usr/lib/systemd/system-environment-generators/*
+
+      /run/systemd/user-environment-generators/*
+      /etc/systemd/user-environment-generators/*
+      /usr/local/lib/systemd/user-environment-generators/*
+      /usr/lib/systemd/user-environment-generators/*

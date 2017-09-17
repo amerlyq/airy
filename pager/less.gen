@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -eu
+# CHG: use ~/.config/lesskey => ~/.config/less and add "-k ~/.config/less" to r.pager
 dst=~/.lesskey
 trap "rm -f '$dst'" INT TERM EXIT
 > "$dst"

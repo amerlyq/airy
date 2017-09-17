@@ -1,16 +1,13 @@
 # vim:ft=sh
 _airy=${XDG_CONFIG_HOME:-$HOME/.config}/airy
 
-if [[ $TERM == linux ]]; then
-  setterm --blank 0    # Disable blanking for virtual consoles
-  setterm --blength    # Disable bell
-  # setterm --msg on --msglevel 0  # Show debug printk() in console
-fi
-
 ### Aura mods profiles (links only) ###
 # FIXME: what if user want to overwrite some of my aliases?
 [[ ! -d $_airy/env ]] || for f in "$_airy/env"/*
 do [[ -L $f ]] && source "$f"; done
+
+### Alien profile (SSH server, anonymous) ###
+if [[ -f ~/aura/env ]]; then source ~/aura/env; fi
 
 # Source combined alias cache from all *mod*s
 [[ ! -s $_airy/aliases ]] || source "$_airy/aliases"

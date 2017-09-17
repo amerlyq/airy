@@ -1,0 +1,7 @@
+# vim:ft=sh
+### Pager ###
+
+PAGER=${PAGER:-r.pager}
+hash "$PAGER" &>/dev/null || PAGER=less
+[[ -r ~/.less ]] || LESS=${LESS:--a -i -j6 -M -N -R -S -w -z-4 -x4}
+export PAGER LESS
