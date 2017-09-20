@@ -15,7 +15,7 @@ dpi=$(r.airy-registry dpi "$(r.xorg -d 2>/dev/null)" 96)
 wstr "#ifndef DPI"
 wstr "# define DPI ${dpi:?}"
 wstr "#endif"
-for f in "${CURR_DIR_CACHE:?}"/Xres-*; do
+for f in "${XDG_CACHE_HOME:-$HOME/.cache}/airy"/Xres-*; do
   wstr "#include \"$f\""
 done
 cat ./xfontrc >> "$dst"

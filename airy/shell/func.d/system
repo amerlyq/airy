@@ -53,13 +53,6 @@ _timeout()(set +b; sleep "$1" & shift; "$@" & wait -n; r=$?; kill -9 $(jobs -p);
 #   first apply all 'readlink $0' -- and only then do 'cd'
 cwd_script(){ cd "${0%/*}"; }  # even around symlinked
 cwd_origin(){ cd "$(dirname "$(readlink -e "$0")")"; }  # only around original file
-### Add current package to active mods list if absent
-airy_cache_pwd_mod() {
-  [[ -z ${MODS_CACHE_DISABLE-} && ${0##*/} =~ ^(install|setup)$ ]] || return 0
-  local mods=$(r.airy-get-cache)/mods
-  [[ ! -t 0 ]] || [[ ! $0 =~ ^${AIRY_DIR_MODS:?} ]] ||
-    grep -qxF "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
-}
 is_empty_dir(){ [[ $(find "${1:-.}" -maxdepth 0 -type d -empty) ]]; }
 
 dmkdir(){

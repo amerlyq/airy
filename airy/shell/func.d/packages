@@ -10,7 +10,6 @@ while getopts 'mrsuU' o; do case $o in :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 mkdir -vp "${CURR_DIR_PKG:?}"
-airy_cache_pwd_mod
 
 do_if() {
   local cmd grp obj=P pkgs=() bQuiet=0 OPTIND=1
@@ -37,7 +36,7 @@ do_if() {
   fi
   local ignt=" ${ign[@]+${ign[*]}} "
 
-  for((i=1;i<=$#;++i)); do
+  for ((i=1;i<=$#;++i)); do
     [[ $ignt =~ " ${!i} " ]] && set -- "${@:1:i-1}" "${@:i+1}"
   done
 

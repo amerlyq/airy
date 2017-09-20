@@ -10,7 +10,7 @@ r.xkb-has-overlay $over
 [[ $CURR_XKB_LANG ]] ||
     CURR_XKB_LANG="amer(us):1+amer(ru):2+amer(ua):3"
 
-dst="${CURR_DIR_CACHE:?}/keylayout.xkb"
+dst=${XDG_CACHE_HOME:-$HOME/.cache}/airy/keylayout.xkb
 cat > "$dst" <<EOT
 xkb_keymap {
     xkb_keycodes  { include "evdev+aliases(qwerty)" };

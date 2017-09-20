@@ -19,7 +19,6 @@ OPTIND=1; while getopts 'cdfimrs:t:uU' o; do case $o in :|'?') die 1
 esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 
 ### Choose theme
-# DEV: must be placed after 'airy_cache_pwd_mod' for individual themes
 [[ ${THEME_ALLOWED-} ]] || THEME_ALLOWED='dark|light|lucid|opaque'
 # DEV:USE: $(<.../theme/{PWD##*/} || <.../theme/default)
 # TODO: use THEME_DEFAULT if set, else -- .../theme/default
@@ -37,5 +36,4 @@ if cfgOpt m; then
   #   -> FIXME:CHG: use automatic '$group' prefix instead of r./q.
   r.airy-cache-links -g "$group" -t ~/.bin -p "${pref:-?}.%d-"
   r.airy-cache-alias -g "$group"
-  airy_cache_pwd_mod
 fi

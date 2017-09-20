@@ -19,6 +19,22 @@
       filter all unnecessary info from output
       in the end show report with success and errors
 
+  2017-09-21 [X] airy_cache_pwd_mod
+    == Add current package to active mods list if absent
+    DISABLED: no sense in automatic implicit update of $mods
+      * modified $mods will be reset on next 'make update'
+        BET: setup mods explicitly in prf
+      * tracking all mods applied to system in sep file has little sense
+        -- user can manually interfere -- and cancel/modify system changes
+        BET: use system's package management for $HOME configuration
+    airy_cache_pwd_mod() {
+      [[ -z ${MODS_CACHE_DISABLE-} && ${0##*/} =~ ^(install|setup)$ ]] || return 0
+      local mods=$(r.airy-get-cache)/mods
+      [[ ! -t 0 ]] || [[ ! $0 =~ ^${AIRY_DIR_MODS:?} ]] ||
+        grep -qxF "${0%/*}" "$mods" || echo "${0%/*}" >> "$mods"
+    }
+
+
 TODO
   2014-11-30 [X] ALT: source erian profiles
    Пусковой скрипт для установки должен находиться в erian: оттуда он будет

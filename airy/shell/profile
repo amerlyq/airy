@@ -1,23 +1,15 @@
 # vim: ft=sh
-# Manually symlink or mount --bind
-#   linkcp  /data/chroots /chroot
-#   linkcp  /home/work    /work
-#   linkcp  ~/Downloads   /_dld
-#   linkcp  /data/music   ~/.config/mpd/music
 
 ### Profile Mgmt ###
 CURR_PROF='default'
 # ALT:TRY: $OSTYPE, maybe replace CURR_PLTF in all scripts?
 CURR_PLTF=$(expr substr $(uname -s) 1 5)
 CURR_USER=${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}
-CURR_HOST=${HOSTNAME:-$(uname -n)}
 
 
 ### Dirs ###
-AIRY_DIR_MODS=~/aura/airy
-CURR_DIR_CACHE=~/.cache/airy
-CURR_DIR_PKG=${CURR_DIR_PKG:-$CURR_DIR_CACHE/pkg}
-CURR_DIR_PRF=~/.config/airy/prf
+# TODO: replace by ~/.cache/pacaur
+CURR_DIR_PKG=${CURR_DIR_PKG:-${XDG_CACHE_HOME:-$HOME/.cache}/airy/pkg}
 
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/airy
 config=${XDG_CONFIG_HOME:-$HOME/.config}/airy

@@ -3,6 +3,10 @@
 path=${CURR_DIR_CACHE-}
 
 # THINK:DEV: by '$1' request different dirs (bin, cfg, pkg, ...)
+#   => DEV "r.airy-dir" similar to xdg-user-dir parsing user-dirs.dirs
+#   :: 'airy' is called first and 'defaults' is last => so we can't use xdg-user-dir until the very end of 'make install'
+#   ALSO: we can't store xdg dirs in defaults, because we need to access them much earlier
+# ALT: replace r.airy-get-cache everywhere by $(r.airy-dir "folder")
 
 if [[ -z $path ]]; then
   airy=$(dirname "$(readlink -e "$0")")

@@ -6,7 +6,7 @@ exit 1
 user="tester"
 zone="Europe/Kiev"
 sd=/dev/sda
-CURR_HOST="archvbox"
+host="archvbox"
 VBOX_HOST_IP="192.168.56.1"
 LOCAL_SRV="http://${VBOX_HOST_IP}:23208"
 
@@ -65,7 +65,7 @@ if hopt h; then
 # ALT: systemd-nspawn
 do_each arch-chroot /mnt /bin/bash -c ~/host/ <<EOTHOST
 00-setup $zone
-10-network $CURR_HOST
+10-network $host
 $(hopt v && echo "15-network-vbox $VBOX_HOST_IP")
 20-grub $sd
 $(hopt v && echo "22-grub-vbox $sd")

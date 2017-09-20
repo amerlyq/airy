@@ -26,7 +26,7 @@ linkcp "$PWD/themes/amer-${THEME}" "$config/theme-urxvt"
 # Color schemes with scrshots:
 # http://linsovet.org.ua/terminal-color-schemes-2
 
-dst="${CURR_DIR_CACHE:?No}/Xres-urxvt"
+dst=${XDG_CACHE_HOME:-$HOME/.cache}/airy/Xres-urxvt
 # size=11
 cat > "$dst" << EOT
 #define LETTER_SPACE $(distro arch && ${LETTER_SPACE:-0} || LETTER_SPACE=-1)

@@ -7,11 +7,23 @@ Modular system configuration and package installation.
   * Automatic setup on clean system, with following update/maintenance.
 
 
-## Install ##
-
 Currently supported host systems:
   * Arch Linux (preferable)
   * Ubuntu-based distro (clean if possible)
+
+
+## Initial ##
+
+TEMP: Manually symlink or mount --bind
+
+```bash
+ln -s  /data/chroots /chroot
+ln -s  /home/work    /work
+ln -s  ~/Downloads   /_dld
+ln -s  /data/music   ~/.config/mpd/music
+```
+
+## Install ##
 
 If you wish to feel what it's like, default setup contains only necessary
 symlinks and terminal tools, preserving your system as much as possible.
@@ -99,7 +111,8 @@ MAIN_SKYPE="<username>"
 Profiles can be nested/inherited.
 This allows to distribute settings and nicely reuse parts of configs for similar hosts.
 ```bash
-source "${CURR_DIR_PRF:?}/home" || return
+dprf=$(dirname "$(readlink -e "$BASH_SOURCE")")
+source "$dprf/home" || return
 CURR_PROF=home_vbox
 AIRY_SKIP+=( browser )
 MAIN_MAIL="vboxuser@email.com"
@@ -110,6 +123,5 @@ Example how to use profile vars in your own modules/scripts:
 #!/bin/bash -e
 source ~/.shell/profile
 ...
-./muttprf.gen ${MAIN_MAIL:?}
-./gtk-theme.gen "${CURR_DIR_CACHE:?}/theme"
+r.mutt-acc ${MAIN_MAIL:?}
 ```
