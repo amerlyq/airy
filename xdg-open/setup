@@ -6,7 +6,8 @@ source ~/.shell/func.d/cfgsetup
 linkcp -t ~/.config mimeapps.list
 
 # TODO: override from private -- if existing
+# WARN: don't use 'xdg-user-dirs-update' -- it's irritating
 # BAD:(xdg-user-dirs-update): replaces symlink by file
 #   CHG: must be generated :: embed by cmd AIRY_BIN => user-dirs
-linkcp -ct ~/.config user-dirs.dirs
+linkcp -t ~/.config user-dirs.dirs
 echo en_US > ~/.config/user-dirs.locale
