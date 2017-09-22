@@ -12,6 +12,7 @@ esac
 
 
 ### Temp ###
+# CHG:USE:(pam-tmpdir) https://sources.debian.net/src/pam-tmpdir/
 if ! test -d "${TMPDIR-}"; then
   TMPDIR=/tmp/"${LOGNAME-}"
   mkdir -p -m 700 "$TMPDIR"

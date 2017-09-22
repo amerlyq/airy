@@ -48,7 +48,7 @@ call dein#add('kana/vim-altr', {
   \ 'on_map': [['nvoic', '<Plug>']],
   \ 'hook_source': "
 \\n   call altr#define('%/src/%.c', '%/inc/%.h')
-\\n   call altr#define('%/source/%.cpp', '%/include/%.hpp')
+\\n   call altr#define('%/source/%.cpp', '%/include/%.hpp', '%/include/%.h')
 \\n   call altr#define('%/src/%.cpp', '%/inc/%.h', '%/t/%_test.cpp')
 \", 'hook_add': "
 \\n   nmap <unique> ]f  <Plug>(altr-forward)

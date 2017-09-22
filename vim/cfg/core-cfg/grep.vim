@@ -40,6 +40,10 @@ if executable('ctags') || executable('ctags-exuberant')
   nnoremap <unique><silent> <S-F1> :<C-u>TagsGen<CR>
 endif
 
+""" NOTE: smart tags generation (for C/C++ only)
+command -bar -range -nargs=0 Ctags
+  \ call system("q.callgraph-find-src -CL . | q.callgraph-tags-cpp > tags")
+
 " ATTENTION: w/o compression, because CCTree use outdated format
 if executable('cscope')
   let s:cscope = 'cscope -bcqR'

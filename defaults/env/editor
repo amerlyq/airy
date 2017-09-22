@@ -1,9 +1,12 @@
 # vim:ft=sh
 ### Editor ###
 
-EDITOR=${EDITOR:-r.vim}
-hash "$EDITOR" &>/dev/null || EDITOR=vim
-hash "$EDITOR" &>/dev/null || EDITOR=vi
+# NOTE: keep external EDITOR when sourcing if it's nonexistent
+if test -z "${EDITOR+x}"; then
+  EDITOR=r.vim
+  hash "$EDITOR" &>/dev/null || EDITOR=vim
+  hash "$EDITOR" &>/dev/null || EDITOR=vi
+fi
 
 # BAD:(space in args):  +set\ nolist
 VISUAL="${VISUAL:-$EDITOR}"
