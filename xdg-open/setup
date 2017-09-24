@@ -9,5 +9,11 @@ linkcp -t ~/.config mimeapps.list
 # WARN: don't use 'xdg-user-dirs-update' -- it's irritating
 # BAD:(xdg-user-dirs-update): replaces symlink by file
 #   CHG: must be generated :: embed by cmd AIRY_BIN => user-dirs
-linkcp -t ~/.config user-dirs.dirs
-echo en_US > ~/.config/user-dirs.locale
+#   /usr/lib/systemd/user/xdg-user-dirs-update.service
+# BET: enable=False in config
+linkcp -t ~/.config cfg/user-dirs.{dirs,conf,locale}
+
+# BAD:DEV: r.airy-xdg
+#   * I need to show error or fallback to /var/error on nonexistent dir instead of fallback to home
+#   * use AIRY_ vars w/o XDG_ prefix
+#   * NEED: user-dirs.dirs for Firefox, etc
