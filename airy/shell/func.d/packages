@@ -24,8 +24,9 @@ do_if() {
   esac; done; shift $((OPTIND-1))
 
   # Statistics NEED: ./odd-pkgs
+  local pkgl=$cache/install-pkgs.txt
   if [[ $cmd == true || $cmd =~ (pacman|pacaur|yaourt) ]]
-  then printf '%s\n' "$@" >> "$cache/install.txt"; fi
+  then printf '%s\n' "$@" | grep -vsxFf "$pkgl" >> "$pkgl" ||: ; fi
   [[ ${AIRY_DRY_RUN-} ]] && return
 
   # Skip ignored pkgs

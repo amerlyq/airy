@@ -11,7 +11,7 @@ tmp=/tmp/pkgs.txt
 also=( base base-devel yaourt "$@" )
 
 # NOTE: generate active db w/o actual cmds execution
-db=~/.cache/airy/install.txt
+db=~/.cache/airy/install-pkgs.txt
 if ((reset)) || ! [[ -f $db && -s $db ]]; then
   AIRY_DRY_RUN=1 r.airy -xI
 fi
