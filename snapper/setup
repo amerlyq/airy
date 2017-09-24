@@ -1,3 +1,5 @@
 #!/bin/bash -eu
 # tags: core
 source ~/.shell/func.d/cfgsetup
+
+svc_activate -er snapper-{boot,cleanup,timeline}.timer
