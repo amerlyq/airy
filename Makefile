@@ -54,6 +54,10 @@ problems:
 	@echo "Manually verify necessity of packages outside of airy."
 	@echo "INFO:USE:(commands): pacq, pacr, pacR, paclr"
 	./airy/exe/odd-pkgs
+	@echo "Merge/delete all *.pacnew files from pkg updates"
+	@echo "ALT: find / -name '*.pacnew'"
+	@echo "Then, for each found *.panew, do 'v -d /etc/locale.gen{,.pacnew}'"
+	locate .pacnew
 
 TARGS := $(shell sed -rn 's/^([-a-z]+):.*/\1/p' Makefile|sort -u|xargs)
 .PHONY: $(TARGS)

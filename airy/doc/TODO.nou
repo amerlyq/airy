@@ -112,6 +112,10 @@ filter-mods
           * setup  = error
         [_] TRY:ALSO: sep numbering/ordering for install/setup/update/recache
         [_] rename private ./mods -> ./hooks ?
+        [_] ALT: override configs with the same name
+          * NEED fixed order of all repos for overriding -- E.G. ${XDG_DATA_DIRS}
+            BAD: some mods may have reverse order of overriding 1-2-3 => 1-3-2
+              MAYBE: there is no need for such complex rules
     - but diff mods with same name -- aren't allowed
 
 
@@ -349,6 +353,14 @@ PKGMOD
   [_] convert pkgbuild to deb
     http://www.overclock.net/t/1339466/converting-an-aur-slackbuild-script-for-use-in-debian
     http://archlinux.org.ru/forum/topic/15919/
+
+
+TRY:
+  [_] Save "airy" configs directly to /etc -- as "airy" is actually distribution rolled over ArchLinux
+    * I simply change system defaults -- package list and settings
+    => then user's private profile becomes STD settings => which user applies by himself
+    ?? MAYBE: I can override system-wide cfgs in /etc by my custom PKBBUILD -- if it allows "override"
+    [_] THINK: provide two variants -- /etc and $HOME -- because $HOME can be cleanly removed (by log-in as another user)
 
 
 other

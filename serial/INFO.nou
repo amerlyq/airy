@@ -8,6 +8,8 @@ BET: use terminal directly w/o minicom/picocom
   Reset and set params for serial device
     $ stty -F /dev/ttyUSB0 raw
     $ stty -F /dev/ttyUSB0 115200 -evenp -cstopb -echo -onlcr
+  Use as raw (instead of terminal)
+    $ stty -F /dev/ttyUSB0 raw -echo -echoe -echok
   Save and restore all current params
     $ stty -F /dev/ttyUSB0 -g | xsel -ib
     $ stty -F /dev/ttyUSB0 "$(xsel -ob)"
