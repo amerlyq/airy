@@ -24,7 +24,8 @@ fdmenu() {
     # run again on EXIT or some independent error/etc in inappropriate place
     ${langprev:+r.xkb-lang $langprev}
 
-    [[ $word ]] && echo "$word" >> "$fl" || return
+    [[ $word ]] || return
+    grep -qxF "$word" "$fl" || echo "$word" >> "$fl"
     fvim "$word"
 }
 

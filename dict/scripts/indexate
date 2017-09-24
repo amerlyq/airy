@@ -1,16 +1,16 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
 src=${1:-/data/res/dicts}
 [[ -d $src ]] || { echo "Err: No dir with *.dict.dz specified"; exit 1; }
 
 ## Link directory to access it by 'nobody'
 dst=/usr/share/dictd
-[[ ! -e $dst || -L $dst ]] || sudo mv -vf -- $dst ${dst}_
-[[ $src -ef $dst ]] || sudo ln -sfvT "$src" $dst
+[[ ! -e $dst || -L $dst ]] || sudo mv -vfT -- "$dst"{,_}
+[[ $src -ef $dst ]] || sudo ln -sfvT "$src" "$dst"
 
 
 ## Generate database of all dictionaries in 'dir'
-dblst="$src/custom.list"  # /var/lib/dictd/custom.list
+dblst=$src/custom.list  # /var/lib/dictd/custom.list
 > "$dblst"
 
 find "$dst/" -regex '.*\.dict\(\.dz\)?' | while read fl; do

@@ -24,7 +24,8 @@ SuccessExitStatus=0 143
 InaccessibleDirectories=/sys
 PrivateTmp=true
 PrivateDevices=true
-ProtectHome=true
+## BUG: no access to symlink /usr/share/dictd if it points to /home
+# ProtectHome=true
 ProtectSystem=full
 
 [Install]
