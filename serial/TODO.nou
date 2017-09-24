@@ -1,0 +1,67 @@
+SEE
+  [_] Serial Laplink how-to
+  [_] 11. of Serial how-to
+
+
+TRY
+  [_] setserial
+  [_] ser2net
+    http://asia-systems.com/site/?p=436
+    https://bbs.archlinux.org/viewtopic.php?id=163405
+  [_] slattach
+  [_] PPP over serial
+    https://wiki.archlinux.org/index.php/Direct_modem_connection
+  [_] |isapnptools|
+
+
+USB remote
+  [_] usbip
+    http://asia-systems.com/site/?p=447
+    https://wiki.openwrt.org/doc/howto/usb.iptunnel
+
+
+Virtual serial port
+  https://stackoverflow.com/questions/52187/virtual-serial-port-for-linux
+  Virtual pseudo terminal
+    $ man pts
+    $ socat -d -d PTY,raw,echo=0,link=/tmp/ttySV{0,1}
+  [_] FIND: G: linux usb to serial more ports
+    [_] SEE: specs for some serial-to-usb adapters --> maybe there is limitation to 4 serials at once
+    [_] TRY: change which /dev/ttyS* to which /dev/ttyUSB* is mapped <== reuse /dev/ttyS3 which isn't used
+      G: usb-serial adapter mapping
+      ~~~ it seems usb-serial adapters are mostly 1:1
+      => FIND how exactly S* are mapped inside board -- kernel / adapter chip
+
+
+TRY: ethernet over usb
+  REF https://en.wikipedia.org/wiki/Ethernet_over_USB
+  HACK https://wiki.wireshark.org/CaptureSetup/USB
+  https://archlinuxarm.org/forum/viewtopic.php?f=48&t=7500
+  https://serverfault.com/questions/821245/how-to-hook-an-ethernet-over-usb-connection-up-to-the-host-network
+  https://elementztechblog.wordpress.com/2014/12/22/sharing-internet-using-network-over-usb-in-beaglebone-black/
+  https://bbs.archlinux.org/viewtopic.php?id=195358
+  http://www.pataphysical.info/installing-arch-linux-on-the-beaglebone-black.html
+  https://www.obitalk.com/forum/index.php?topic=10532.0
+
+
+  [_] usb to serial
+    REF https://www.kernel.org/doc/Documentation/usb/usb-serial.txt
+    INFO https://eee701planetoid.wordpress.com/2010/06/08/using-a-usb-serial-cable-in-linux-first-steps/
+
+Serial over SSH
+  https://unix.stackexchange.com/questions/290969/how-can-i-create-a-virtual-serial-port-that-relays-data-over-ssh
+
+Sniff serial traffic w/o disconnection
+  https://unix.stackexchange.com/questions/313995/monitoring-serial-port-data-between-virtual-ports
+  $ socat /dev/ttyACM0,raw,echo=0 SYSTEM:'tee input.txt | socat - "PTY,link=/dev/ttyACM1,raw,echo=0,waitslave" | tee output.txt'
+
+Identify/map USB <-> Serial
+  https://stackoverflow.com/questions/4800099/how-to-identify-multiple-usb-serial-adapters-under-ubuntu-10-1
+  https://unix.stackexchange.com/questions/144029/command-to-determine-ports-of-a-device-like-dev-ttyusb0
+  https://askubuntu.com/questions/49910/how-to-distinguish-between-identical-usb-to-serial-adapters
+
+
+Bluetooth / serial network
+  https://gist.github.com/0/c73e2557d875446b9603
+  https://gist.github.com/yeokm1/d6c3ca927919c61257cd
+  http://www.osnews.com/story/9836/Make_your_Arch_Linux_a_Bluetooth_Access_Point/page2/
