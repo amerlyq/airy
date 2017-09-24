@@ -32,7 +32,8 @@ VBoxManage modifyvm arch64hdd \
 # sudo chmod 770 /home/vbox
 # sudo find ~/VMs/arch64hdd \( -type d -exec chmod 770 {} \+ \) -or \( -type f -exec chmod 660 {} \+ \)
 # ALT:NOT:SECU: add yourself into 'disk' group and relogin by $ loginctl terminate-user "$USER"
-sudo usermod -a -G vboxusers,disk "$USER"
+# NEED: reboot OR su - $USER
+sudo usermod -aG vboxusers,disk "${LOGNAME:?}"
 
 
 # NOTE: complete encrypted disk with boot on /dev/sdb1 and lvm-on-luks at /dev/sdb5

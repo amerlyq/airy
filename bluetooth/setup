@@ -1,7 +1,5 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-if ! id | grep -q '(lp)'; then
-  sudo usermod -aG lp "${CURR_USER:?No}"
-  printf "\n!!! Re-login in this shell/session or reboot to update changes in Groups\n"
-fi
+# NEED: relogin
+id | grep -qwF lp || sudo gpasswd -a "${LOGNAME:?}" lp

@@ -60,9 +60,9 @@ then
     if ! id | grep '(disk)'; then
         # Look at current disk rights 'root group'
         group=$(ls -g "$disk" | awk '{print $3}')
-        printf "Adding user '${CURR_USER?Need CURR_USER}' to disk (or appropriate)
-            group '${group?Need group}' (to be able to use key '-relative')\n"
-        sudo usermod -a -G "$group" "$CURR_USER"
+        printf "Adding user '${LOGNAME:?}' to disk (or appropriate)
+            group '${group:?}' (to be able to use key '-relative')\n"
+        sudo usermod -aG "$group" "${LOGNAME:?}"
 
         printf "\n!!! Re-login in this shell/session or reboot to update changes in Groups\n"
         exit 0

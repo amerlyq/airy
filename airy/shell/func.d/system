@@ -137,4 +137,11 @@ usvc_run(){ local svc=${1:?No svc}; shift
 add_sysuser() { id -u "${1:?}" >/dev/null 2>&1 ||
     sudo useradd -rUd /dev/null -s /usr/bin/nologin "$1"; }
 
+## NOTE: usermod adds to multiple groups BUT: unsafe if skip "-a"; gpasswd safe but one group only
+## https://serverfault.com/questions/688685/usermod-ag-vs-gpasswd-a-as-a-best-practice
+# USE: $ id | grep -qwF uinput || sudo gpasswd -a "${LOGNAME:?}" uinput
+# ALT:(id|grep): $ grep -q "uinput.*${LOGNAME:?}" /etc/group
+# ALT:(gpasswd): $ sudo usermod -aG uinput "${LOGNAME:?}"
+# NEED: relogin/reboot OR: apply w/o reboot only for this terminal: su - $USER
+
 # ====================================================================

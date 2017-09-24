@@ -17,11 +17,8 @@ elif distro ubuntu; then
     if [[ "${va:(-2):1}" != 'w' ]]; then
         sudo chmod -R o+w /etc/minicom
     fi
-    if ! grep -q "dialout.*${USER:-No}" /etc/group; then
-        sudo usermod -a -G dialout $USER
-        echo "Relogin now to apply group info"
-        # OR: apply w/o reboot only for this terminal: su - $USER
-    fi
+    # NEED: relogin
+    id | grep -qwF dialout || sudo gpasswd -a "${LOGNAME:?}" dialout
 fi
 
 ### LINKS ###
