@@ -1,3 +1,16 @@
+REF
+  https://wiki.archlinux.org/index.php/android
+
 Emulator setup
   https://developer.android.com/studio/run/emulator.html
   https://docs.nativescript.org/tooling/android-virtual-devices
+
+
+ADB
+  Authorize
+    https://stackoverflow.com/questions/18011685/cant-connect-nexus-4-to-adb-unauthorized
+    Change MTP to smth else (Camera, Storage)
+    Developer options => USB debugging [_] => Revoke USB debug auth
+    => USB debugging [X]
+    HOST: $ adb kill-server && adb shell
+    => click "Allow for this XX:XX:XX:XX:XX:XX"

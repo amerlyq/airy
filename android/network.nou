@@ -1,0 +1,45 @@
+Network (add Android to PC network)
+  ??? Bluetooth (reverse tethering)
+    https://wiki.archlinux.org/index.php/android_tethering
+  USB (reverse tethering)
+    https://github.com/dpavlin/android-adb-usb-tether/blob/master/android-tether.sh
+    https://github.com/medvid/android-tether/blob/master/tether
+    https://android.stackexchange.com/questions/66043/how-do-i-turn-off-usb-tethering-or-restart-usb-connection-via-computer-pcs-term
+    * Plug USB cabel (WARN: bad cabel will disconnect frequently)
+    * Settings => Tethering and Mobile hotspots => USB tethering [X]
+      ALT: (adb) su -c "setprop sys.usb.config rndis,adb"
+        BUG: adb looses connection
+    HOST: check new ether ifc
+      $ ip link  ## enp0s20f0u1
+      $ ueth=enp0s20f0u1
+      $ sudo ip link set up dev "${ueth:?}"
+      $ sudo ip addr add 192.168.2.1/24 dev "${ueth:?}"
+      $ sudo sysctl net.ipv4.ip_forward=1
+      # SEE: $ sudo sysctl -a 2>/dev/null| grep 'forward\b'
+      # ? iptables -t nat -F
+      # ? iptables -t nat -A POSTROUTING -j MASQUERADE
+    ANDR: Terminal Emulator
+      $ su
+      $# ip addr add 192.168.2.2/24 dev rndis0
+      $# ip link set up dev rndis0
+      $# ip route add default via 192.168.2.1 dev rndis0
+      OR: $# netcfg rndis0 dhcp
+
+
+F*cking message
+  Attention "The connected device is unable to access data on this device"
+  Fix when MTP can't see device
+    https://forums.gentoo.org/viewtopic-p-8098846.html?sid=38d79e27310a845c388561405038cf15
+    https://askubuntu.com/questions/943559/not-able-to-see-galaxy-a5-device-as-mounted-mtp-fail
+
+
+Android reverse tethering (web PC -> AN)
+  ALT: bluetooth
+  https://medium.com/genymobile/gnirehtet-reverse-tethering-android-2afacdbdaec7
+  [_] https://forum.xda-developers.com/showthread.php?t=2287494
+  https://android.stackexchange.com/questions/2298/how-to-set-up-reverse-tethering-over-usb
+  https://forum.xda-developers.com/showthread.php?t=1371345
+  https://play.google.com/store/apps/details?id=com.floriandraschbacher.reversetethering.free
+  https://forum.fairphone.com/t/reverse-usb-tethering-on-linux/5671/2
+  2017-09-24 [X] - https://unix.stackexchange.com/questions/90020/how-do-i-create-a-usb-networking-interface-for-passing-internet-to-my-android-ph
+  2017-09-24 [X] -- https://community.linuxmint.com/tutorial/view/1524
