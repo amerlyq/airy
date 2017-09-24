@@ -1,0 +1,15 @@
+#!/bin/bash -eu
+set -o pipefail
+
+trap 'exit' INT TERM ERR
+trap 'kill 0' EXIT
+
+r.b -- https://sketchboard.me &
+lsmod | grep -wF uinput >/dev/null || sudo modprobe uinput
+networktablet &
+sleep 0.5
+
+mon=$(xrandr -q --current | awk '$2" "$3=="connected primary"{print$1}')
+xid=$(xinput list --id-only 'Network Tablet')
+xinput map-to-output "$xid" "$mon"
+wait

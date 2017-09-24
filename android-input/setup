@@ -1,0 +1,12 @@
+#!/bin/bash -eu
+# tags: misc
+source ~/.shell/func.d/cfgsetup
+
+# NEED: relogin
+id | grep -qwF uinput || sudo gpasswd -a "${LOGNAME:?}" uinput
+
+# BAD: configs in /etc are system-wide and must be copied
+#   OR: them must be symlinked in system-wide system-specific repo
+#   => independent user settings are in "airy"
+#   => system-specific (airy-independent) settings are in "erian-$hostname"
+linkcp -ct /etc/X11/xorg.conf.d -- ./53-tablet.conf
