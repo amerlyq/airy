@@ -10,21 +10,33 @@ Enable TRIM : partition -> btrfs -> lvm -> crypto-lvm -> ssd partition
 
 
 Enable discard (TRIM) on SSDs while running LVM on LUKS and Btrfs (Arch) -- to keep it fresh
-  !1 [_] TODO: on my system
+  2017-09-29 [X] TODO: on my system
   https://fogelholk.io/enable-discard-trim-on-ssds-while-running-lvm-on-luks-and-btrfs-arch/
-  Add 'discard' as a mount-option to your /etc/fstab
-    /dev/mapper/lvmvg-rootvol / btrfs rw,relatime,ssd,discard,compress=lzo,space_cache,subvol=root 0 0
-    /dev/mapper/lvmvg-rootvol /home btrfs rw,relatime,ssd,discard,compress=lzo,space_cache,subvol=home 0 0
-  Allow discard-command to go through LVM in /etc/lvm/lvm.conf
-    issue_discards = 1
-  Enable 'fstrim.timer' for periodical trim
-    $ systemctl enable fstrim.timer
-  Boot cryptdevice, allowing trim in /etc/default/grub
-    GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda3:lvm:allow-discards root=/dev/mapper/lvmvg-rootvol rootflags=subvol=root resume=/dev/mapper/lvmvg-swapvol"
-  Regenerate grub and reboot
+  Verify TRIM support WARN: enabling TRIM when unsupported can result in data loss !!!
+    $ sudo lsblk -D
+      Non-zero values in DISC-GRAN and DISC-MAX columns indicate TRIM support.
+  BET: periodic
+    $ sudo systemctl enable fstrim.timer
+  NOT:ALT: continuous
+    !dangerous! -- not needed with fstrim timer once per week
+      https://wiki.archlinux.org/index.php/Solid_State_Drives#Continuous_TRIM
+      https://forums.freebsd.org/threads/56951/#post-328912
+    ADD 'discard' as a mount-option to your /etc/fstab
+    ...  /      btrfs   rw,relatime,ssd,discard,compress=lzo,space_cache,subvol=root 0 0
+    ...  /data  ext4    rw,relatime,discard,data=ordered	0 2
+  LVM -- TRIM deallocated volumes (rarely needed)
+    $ v /etc/lvm/lvm.conf
+      issue_discards = 1
+  Boot dm-crypt
+    https://wiki.archlinux.org/index.php/Dm-crypt/Specialties#Discard.2FTRIM_support_for_solid_state_drives_.28SSD.29
+    $ v /etc/default/grub
+      GRUB_CMDLINE_LINUX="cryptdevice=/dev/sda3:lvm:allow-discards resume=/dev/mapper/lvm-swap"
     $ grub-mkconfig -o /boot/grub/grub.cfg
+    OR: /boot/loader/entries/arch.conf
+      ... cryptdevice=UUID=...:lvm:allow-discards
   Trigger a TRIM to run manually first time
     $ sudo fstrim -v /
+
   ALSO:THINK:
     Make /tmp a ramdisk (add the following line to /mnt/etc/fstab)
       tmpfs	/tmp	tmpfs	defaults,noatime,mode=1777	0	0
