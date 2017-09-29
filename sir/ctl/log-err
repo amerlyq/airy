@@ -1,0 +1,49 @@
+#!/bin/bash -eu
+set -o pipefail
+# USAGE: ./$0 -fout="./log-filter" -- make ...
+
+## DFL
+logrotate=1
+d_log=./log
+declare -A filtercmd=(
+  [err]=cat
+  [out]=cat
+  [tty]=cat
+)
+declare -A logfile=(
+  [err]=error.log
+  [out]=build.log
+  [tty]=output.log
+)
+
+
+## Funcs
+keyval(){ declare -n a=$1 local k=$2 v=$3
+  [[ ${a["$k"]+x} ]] || { echo "no such key '$k', use: ${!a[*]}"; exit 2; }
+  declare "$a["$k"]=$v"
+}
+dump(){ local f=${logfile["$1"]} flt=${filtercmd["$1"]}
+  [[ -d ${f%/*} ]] || mkdir -p "${f%/*}"
+  ((logrotate)) && [[ -f $f ]] && cp -vafT --backup=t "$f"{,}
+  "$flt" | stdbuf -oL -eL tee "$f"
+}
+
+
+# f="filtercmd", l=/path/to/logfile, L=logdir(for_relative)
+while getopts 'of:l:L:R' o; do case $o in :|'?') die 1
+;; c) cmd='f_copy'
+;; f) keyval filtercmd "${OPTARG%%=*}" "${OPTARG#*=}"
+;; l) keyval logfile   "${OPTARG%%=*}" "${OPTARG#*=}"
+;; L) d_log=$OPTARG
+;; R) logrotate=0
+esac; done; shift $((OPTIND-1))
+
+## Prepend d_log dir to each non-absolute path
+for k in "${!logfile[@]}"; do f=${logfile[$k]}
+  [[ $f == /* ]] || logfile[$k]=$d_log/$f
+done
+
+## Redirect stdout, stderr and combined output
+( ("$@" 2>&1 1>&3 | dump err
+  ) 3>&1 | dump out
+) 2>&1 | dump tty
