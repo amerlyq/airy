@@ -1,12 +1,14 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/packages
 
 #| tmux | multi-window customizable terminal with vi navigation, useful for SSH connections
 
 if distro arch; then
-  # ATT: TrueColor support in version >=2.2
+  # ATT:(>=2.2): TrueColor
+  # ATT:(>=2.4): copy-pipe w/o cancel
   # ATT: official ==2.4.1 broken in st+tmux+neovim+ru+scrolloff
-  aur_inst tmux-git
+  # aur_inst tmux-git
+  pkg_inst tmux
 
 elif distro ubuntu; then
   # https://gist.github.com/P7h/91e14096374075f5316e

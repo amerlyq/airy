@@ -18,6 +18,12 @@ POST
     $ sudo snapper -c root create -d initial
     $ snapper -c user create -d initial
 
+USAGE
+  Restore old version of directory (E.G. some chroot)
+    $ sudo mount -o noatime,compress=lzo,autodefrag /dev/mapper/ws-root /mnt
+    $ sudo r.btrfs-cow -T /mnt/@snapshots/246/snapshot/chroot/xenial_amd64 /mnt/@/chroot/xenial_amd64-nowine
+    $ sudo umount /mnt
+
 ****************
 
 Register root

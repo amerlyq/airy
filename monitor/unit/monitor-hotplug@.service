@@ -18,6 +18,7 @@ TimeoutStartSec=15
 RemainAfterExit=false
 User=%{USER}
 Environment=DEVPATH=%I
+# NOTE: it must be loaded into env on login into X
 Environment=DISPLAY=%{DISPLAY}
 Environment=XAUTHORITY=%{HOME}/.Xauthority
 Environment=PATH=%{HOME}/.bin:/usr/local/bin:/usr/bin

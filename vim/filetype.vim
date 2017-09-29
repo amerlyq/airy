@@ -19,7 +19,7 @@ augroup filetypedetect
   au BufRead,BufNewFile *.otl   setl noet  " TEMP:REM*
   " System
   au BufRead,BufNewFile {*.gpg,*.asc}   setf gpg
-  au BufRead,BufNewFile {*.log*,log-*}       setf messages
+  au BufRead,BufNewFile *.log*          setf messages
   au BufRead,BufNewFile {PKGBUILD,.AURINFO}  setf sh
   au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap,*.target,*.service} setf systemd
   au BufRead ~/sdk/*                    setl ts=8
