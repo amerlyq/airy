@@ -1,0 +1,58 @@
+FAQ по Microsoft Windows Vista
+Q: Как отключить или переназначить клавишу Caps Lock
+
+Основная масса пользователей не используют клавишу Caps Lock по назначению, по крайней мере это относится к адекватным интернет пользователям :) Вместе с тем, расположение этой клавиши иногда доставляет неудобства, поскольку ее легко случайно нажать. Предлагаю вам способ отключения этой клавиши гораздо более гуманный, чем удаление ее с клавиатуры при помощи отвертки.
+Средства графического интерфейса не предоставляют возможности отключить или переназначить клавишу, но это можно сделать путем редактирования параметра реестра.
+Для этого необходимо изменить значение параметра Scancode Map, который расположен в разделе реестра
+
+    HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout
+
+Ниже представлены твики реестра для переназначения и отключения клавиши Caps Lock.
+
+Клавиша Caps Lock будет выполнять действие клавиши Ctrl
+
+
+    Windows Registry Editor Version 5.00
+
+    [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
+    "Scancode Map"=hex:00,00,00,00,00,00,00,00,02,00,00,00,1d,00,3a,00,00,00,00,00
+
+
+Клавиша Caps Lock будет выполнять действие клавиши Shift
+
+    Windows Registry Editor Version 5.00
+
+    [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
+    "Scancode Map"=hex:00,00,00,00,00,00,00,00,02,00,00,00,2a,00,3a,00,00,00,00,00
+
+
+Отключает Caps Lock и переназначает действие клавиши Scroll Lock на выполнение Caps Lock
+
+    Windows Registry Editor Version 5.00
+
+    [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
+    "Scancode Map"=hex:00,00,00,00,00,00,00,00,02,00,00,00,00,00,3a,00,3A,00,46,00,00,00,00,00
+
+
+Отключает клавишу Caps Lock
+
+    Windows Registry Editor Version 5.00
+
+    [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
+    "Scancode Map"=hex:00,00,00,00,00,00,00,00,02,00,00,00,00,00,3a,00,00,00,00,00
+
+
+Отменяет все предыдущие переназначения клавиш
+
+    Windows Registry Editor Version 5.00
+
+    [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
+    "Scancode Map"=-
+
+Вы можете загрузить архив по этой ссылке, который содержит следующие файлы реестра:
+
+ChangeCapsToControl.reg 	Клавиша Caps Lock будет выполнять действие клавиши Ctrl
+ChangeCapsToShift.reg 	Клавиша Caps Lock будет выполнять действие клавиши Shift
+SwitchCapsToScrollLock.reg 	Отключает Caps Lock и переназначает действие клавиши Scroll Lock на выполнение Caps Lock
+KillCapsLock.reg 	Отключает клавишу Caps Lock
+DisableKeyboardRemap.reg 	Отменяет все предыдущие переназначения клавиш
