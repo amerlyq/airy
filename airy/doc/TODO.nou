@@ -10,6 +10,17 @@ BUT: we can't define it to :0 -- as that var is essential for setup
 WARN: how to be on clean system from console -- for initial setup ?
 
 pkglst
+  [_] two-column list of pkgs
+    * aggregated from all repos
+    * generate into ~/.config/airy/mods.default
+      so anyone could see which modules available and choose from them
+    * load user's mods from ~/.config/airy/mods
+    * switch state by changing +/-/# in first column
+      + install if absent, update if installed
+      - uninstall if installed,
+      # don't install and ignore if installed
+      BAD: hard to navigate if too many unused mods
+      BET: generate mods.unused BUT:BET: symlinking to unused
   2017-03-12 [X] rename private file ./pkgs -> ./mods
   !!! [_] remove sourcing ./pkgs file from 'profile' with reading by 'readarray'
     = (long operation -- sourced in each cfgsetup)

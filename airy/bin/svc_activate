@@ -7,6 +7,7 @@ set -euo pipefail
 #   * access init scripts by proxy of r.svc -- linked by mkdef
 #   SEE: http://unix.stackexchange.com/questions/196166/how-to-find-out-if-a-system-uses-sysv-upstart-or-systemd-initsystem
 # THINK: embed 'envsubs' directly into 'linkcp'
+# BAD: remove implicit loading from './unit' -- it's unobvious
 
 dst=/etc/systemd/system
 from=./unit
