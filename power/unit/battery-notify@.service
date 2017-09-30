@@ -1,0 +1,23 @@
+# NOTE: '%{...}' are replaced '$ env-subs'
+
+# NOTE: pass udev vars into systemd:
+#   https://superuser.com/questions/924683/passing-udev-environment-variables-to-systemd-service-execution
+#   USE $env{DEVPATH} as %I and run $(udevadm info --query=env --export %I)
+
+# ALT:(env-subs): in udev.rules USE: IMPORT{program}="/usr/bin/xpub"
+#   https://github.com/Ventto/xpub/blob/master/src/xpub.sh
+#   * automatically find Xorg session and its user
+
+[Unit]
+Description=Udev - Battery Notify - %P
+ConditionFileIsExecutable=/usr/bin/notify-send
+
+[Service]
+Type=oneshot
+TimeoutStartSec=5
+RemainAfterExit=false
+User=%{USER}
+Environment=DISPLAY=%{DISPLAY}
+Environment=XAUTHORITY=%{HOME}/.Xauthority
+Environment=DBUS_SESSION_BUS_ADDRESS=%{DBUS_SESSION_BUS_ADDRESS}
+ExecStart=/bin/sh -c '/usr/bin/notify-send -u "${0%%:*}" -a battery-notify Battery "${0#*:}"' '%I'

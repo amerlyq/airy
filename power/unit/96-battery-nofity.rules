@@ -1,0 +1,19 @@
+# battery-notify
+# ALT: run directly NEED user env vars + DBUS_SESSION_BUS_ADDRESS
+# WARN! don't set ENV{DISPLAY} directly in udev -- it will set this var for whole device !!!
+# RUN+="/bin/su %{USER} -c '/usr/bin/env DISPLAY=%{DISPLAY} /usr/bin/notify-send -u critical -a battery Battery $attr{capacity}%'"
+# BAD:NEED: XDG_RUNTIME_DIR and DBUS_SESSION_BUS_ADDRESS to run as "systemd --user" -- not better then env-subs for system unit
+
+SUBSYSTEM=="power_supply", ACTION=="change", KERNEL=="BAT0", \
+ATTR{status}=="Discharging", ATTR{capacity}=="1[0-9]|[0-9]", TAG+="systemd", \
+RUN+="/bin/systemctl start --no-block battery-notify@critical:$attr{capacity}%.service"
+
+SUBSYSTEM=="power_supply", ACTION=="change", KERNEL=="AC0", ENV{POWER_SUPPLY_ONLINE}=="0", \
+ENV{URGENCY}="normal", ENV{NOTIFY}="no-AC", TAG+="systemd", GOTO="end", \
+RUN+="/bin/systemctl start --no-block battery-notify@normal:no-AC.service"
+
+SUBSYSTEM=="power_supply", ACTION=="change", KERNEL=="AC0", ENV{POWER_SUPPLY_ONLINE}=="1", \
+ENV{URGENCY}="normal", ENV{NOTIFY}="AC-charge", TAG+="systemd", GOTO="end", \
+RUN+="/bin/systemctl start --no-block battery-notify@normal:AC-charge.service"
+
+LABEL="end"

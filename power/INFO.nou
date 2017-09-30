@@ -9,10 +9,31 @@ SEE
 
   upower
 
+
+Low-battery notify
+  REF
+    https://wiki.archlinux.org/index.php/Laptop#Battery_state
+  Test if event plug/unplug and discharge capacity by 1% are notified
+    $ udevadm monitor --property
+  If 1% is not notified -- event must be produced once when "alarm" < "energy_full"
+    $ cat /sys/class/power_supply/BAT0/alarm
+  ALT
+    |common|
+      acpi -- polling
+      ~ ibam -- predict precise battery life time
+      - osdbattery -- uses xosd, which don't work for me
+    |aur|
+      i3-battery-popup-git -- polling
+      + batify -- udev rules NEED rework
+      batwarn -- change gamma
+      pwrnotify -- written in C
+
+
 TODO
   [_] надо сконфигурировать батарею заряжаться до <95% итп,
     чтобы она не умерла так же быстро как на Impression.
     G: arch battery capacity tips
+    |aur/batterylife|
 
 CPU
   https://wiki.archlinux.org/index.php/CPU_frequency_scaling
