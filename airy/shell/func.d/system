@@ -142,6 +142,6 @@ add_sysuser() { id -u "${1:?}" >/dev/null 2>&1 ||
 # USE: $ id | grep -qwF uinput || sudo gpasswd -a "${LOGNAME:?}" uinput
 # ALT:(id|grep): $ grep -q "uinput.*${LOGNAME:?}" /etc/group
 # ALT:(gpasswd): $ sudo usermod -aG uinput "${LOGNAME:?}"
-# NEED: relogin/reboot OR: apply w/o reboot only for this terminal: su - $USER
+# NEED: relogin/reboot OR $ newgrp uinput OR: apply w/o reboot only for this terminal: su - $USER
 
 # ====================================================================
