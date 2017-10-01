@@ -19,8 +19,10 @@ chgq() { chg "$1" "\"$2\""; }
 chgq PROJECT_NAME     "${PWD%/*}"
 chgq PROJECT_NUMBER   "$(git --no-pager log --pretty=format:'%ad' --date=short -1)"
 #chgq INPUT            "inc src"
-chg OUTPUT_DIRECTORY  "$PWD/_doxygen"
+chgq OUTPUT_DIRECTORY "$PWD/_doxygen"
+chgq WARN_LOGFILE     "warnings.log"
 chg TAB_SIZE          4
+# chg INPUT             ../
 
 # Additional sets
 chg RECURSIVE               YES
@@ -31,6 +33,17 @@ chg GENERATE_TREEVIEW       YES
 chg OPTIMIZE_OUTPUT_FOR_C   YES
 chg REFERENCED_BY_RELATION  YES
 chg REFERENCES_RELATION     YES
+
+chg EXTRACT_STATIC          YES
+# HTML_EXTRA_STYLESHEET  = stylesheet.css
+# HTML_TIMESTAMP         = YES
+# GENERATE_HTMLHELP      = YES
+# CHM_FILE               = ../documentation.chm
+# HHC_LOCATION           = "c:\Program Files (x86)\HTML Help Workshop\hhc.exe"
+# GENERATE_LATEX         = NO
+## BAD: can't replace multiline value
+# FILE_PATTERNS        *.c *.cpp *.h *.hpp
+# EXCLUDE_PATTERNS       = */.svn/* */include/* */tests/* */sources/*
 
 # chg EXCLUDE_PATTERNS   "$PWD/build/* $PWD/libs/*"
 
