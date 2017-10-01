@@ -2,7 +2,7 @@
 # tags: misc
 source ~/.shell/func.d/cfgsetup
 
-# NEED: relogin
+# NEED: relogin or $ newgrp plugdev adbusers
 # EXPL: https://developer.android.com/studio/run/device.html
 id | grep -qwF plugdev || sudo gpasswd -a "${LOGNAME:?}" plugdev
 id | grep -qwF adbusers || sudo gpasswd -a "${LOGNAME:?}" adbusers
