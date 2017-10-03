@@ -1,31 +1,32 @@
 #!/bin/bash -eu
 set -o pipefail
-# USAGE: ./$0 -fout="./log-filter" -- make ...
+# USAGE: ./$0 -fscr="./log-filter" -- make ...
+# DEBUG: ./$0 -- sh -c 'echo out >&1; echo err >&2'
 
 ## DFL
 logrotate=1
 d_log=./log
 declare -A filtercmd=(
-  [err]=cat
-  [out]=cat
-  [tty]=cat
+  [out]=cat  # stdout
+  [err]=cat  # stderr
+  [scr]=cat  # tty
 )
 declare -A logfile=(
+  [out]=output.log
   [err]=error.log
-  [out]=build.log
-  [tty]=output.log
+  [scr]=screen.log
 )
 
 
 ## Funcs
-keyval(){ declare -n a=$1 local k=$2 v=$3
-  [[ ${a["$k"]+x} ]] || { echo "no such key '$k', use: ${!a[*]}"; exit 2; }
-  declare "$a["$k"]=$v"
+keyval(){ declare -n a=$1; local k=$2 v=$3
+  if [[ ${a["$k"]+x} ]]; then a["$k"]=$v
+  else IFS=$'|'; echo "Err: no such key '$k'. Use: [${!a[*]}]"; exit 2; fi
 }
 dump(){ local f=${logfile["$1"]} flt=${filtercmd["$1"]}
   [[ -d ${f%/*} ]] || mkdir -p "${f%/*}"
-  ((logrotate)) && [[ -f $f ]] && cp -vafT --backup=t "$f"{,}
-  "$flt" | stdbuf -oL -eL tee "$f"
+  ((logrotate)) && [[ -f $f ]] && command cp -afT --backup=t "$f"{,}
+  eval "$flt" | stdbuf -oL -eL tee "$f"
 }
 
 
@@ -46,4 +47,4 @@ done
 ## Redirect stdout, stderr and combined output
 ( ("$@" 2>&1 1>&3 | dump err
   ) 3>&1 | dump out
-) 2>&1 | dump tty
+) 2>&1 | dump scr
