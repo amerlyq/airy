@@ -1,0 +1,30 @@
+pkgname=simple-rt-airy-git
+pkgver=20170510
+pkgrel=1
+url="https://github.com/vvviperrr/SimpleRT"
+pkgdesc="SimpleRT - Reverse Tethering utility for Android"
+arch=('x86' 'x86_64')
+depends=('libusb')
+makedepends=('git' 'make')
+source=('simple-rt::git://github.com/vvviperrr/SimpleRT')
+md5sums=('SKIP')
+license=('GPLv3')
+
+pkgver() {
+  cd "$srcdir/simple-rt"
+  local date=$(git log -1 --format="%cd" --date=short | sed s/-//g)
+  local commit=$(git rev-parse --short HEAD)
+  echo "$date.$commit"
+}
+
+build() {
+	cd "$srcdir/simple-rt/simple-rt-cli"
+	make
+}
+
+package() {
+	mkdir -p "$pkgdir/usr/bin"
+	mkdir -p "$pkgdir/usr/lib/simple-rt"
+	install -m755 "$srcdir/$pgkname/simple-rt/simple-rt-cli/simple-rt" "$pkgdir/usr/lib/simple-rt/simple-rt"
+	install -m755 "$srcdir/$pgkname/simple-rt/simple-rt-cli/iface_up.sh" "$pkgdir/usr/lib/simple-rt/iface_up.sh"
+}

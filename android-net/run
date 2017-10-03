@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+set -o pipefail
+cd /usr/lib/simple-rt
+
+prf=w
+ifc=$(command ip link | sed -rn '/^[0-9]+:\s+('"$prf"'\w+):.*$/{s//\1/p;q}')
+
+exec sudo /usr/lib/simple-rt/simple-rt -i "$ifc"
