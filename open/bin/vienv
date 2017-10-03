@@ -16,7 +16,7 @@ if [[ $bReplace || ! -f $NM ]]; then
     ;;   *) sb="$env $shl"
     esac
     printf "%b\n\n\n" "$sb" > "$NM"  # Compatible with 'echo -e'
-    chmod 764 "$NM"
+    chmod 755 "$NM"
 fi
 
 if [[ -t 0 ]]; then  # input from terminal

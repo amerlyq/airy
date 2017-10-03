@@ -10,7 +10,7 @@ alias -g N0='&>/dev/null'
 alias -g N1=' >/dev/null'
 alias -g N2='2>/dev/null'
 alias -g N+='2>&1'
-alias -g NN='|tee /dev/tty'
+alias -g NN='|stdbuf -oL -eL tee /dev/tty'
 alias -g NZ='|tr \\n \\0'
 alias -g ZN='|tr \\0 \\n'
 
@@ -124,8 +124,8 @@ fi
 
 ## Buffers
 _xsel_tmp_buf=${TMPPREFIX:-${TMPDIR:-/tmp}}/zsh-output
-alias -g YT='|tee "$_xsel_tmp_buf"'
-alias -g YT+='|tee -a "$_xsel_tmp_buf"'
+alias -g YT='|stdbuf -oL -eL tee "$_xsel_tmp_buf"'
+alias -g YT+='|stdbuf -oL -eL tee -a "$_xsel_tmp_buf"'
 alias -g YT:='cat "$_xsel_tmp_buf"'
 alias -g YT.='"$_xsel_tmp_buf"'
 
