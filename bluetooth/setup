@@ -1,5 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/cfgsetup
 
-# NEED: relogin
+# NEED: relogin or $ newgrp lp
 id | grep -qwF lp || sudo gpasswd -a "${LOGNAME:?}" lp
+
+grep -qw '^btusb' /proc/modules || sudo modprobe btusb
+
+svc_activate -ceR bluetooth.service

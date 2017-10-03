@@ -1,2 +1,61 @@
-TRY: connect to bluetooth terminal in slave mod and send commands directly to debug target
-  * use laptop bluetooth instead of smartphone, emulating responses to BlueGO requests
+TODO
+  TRY: connect to bluetooth terminal in slave mod and send commands directly to debug target
+    * use laptop bluetooth instead of smartphone, emulating responses to BlueGO requests
+
+
+Interactive pairing
+  $ bluetoothctl
+  help
+  power on
+  devices
+  scan on
+  agent on
+  pair 00:12:34:56:78:90
+  OR: pair 00:<Tab>
+  MAYBE: trust 00:12:34:56:78:90
+  connect 00:12:34:56:78:90
+
+
+Network PAN
+  https://bbs.archlinux.org/viewtopic.php?id=177672
+  https://wiki.archlinux.org/index.php/android_tethering#Tethering_via_Bluetooth
+    $ dbus-send --system --type=method_call --dest=org.bluez /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF org.bluez.Network1.Connect string:'nap'
+    ifc=bnep
+  http://blog.fraggod.net/2015/03/28/bluetooth-pan-network-setup-with-bluez-5x.html
+  https://wiki.gentoo.org/wiki/Bluetooth_Network_Aggregation_Point
+
+
+DEBUG
+  USB dongle
+    REF https://wiki.archlinux.org/index.php/bluetooth#Bluetooth_USB_Dongle
+  Operation not possible due to RF-kill
+    $ sudo rfkill unblock bluetooth
+  rfkill unblock: Do not unblock
+    $ connmanctl enable bluetooth
+
+
+Remote filesystem
+  $ obexfs -b 00:12:34:56:78:90 /tmp/mnt
+    CHECK: rw- permissions for mount
+  $ fusermount -u /tmp/mnt
+
+
+Push/get files
+  $ obexftp -b 00:12:34:56:78:90 -p ./local/file
+  $ obexftp -b 00:12:34:56:78:90 -g /remote/path/to/file
+  OR: $ obexftp -b 00:12:34:56:78:90 -g file_in_exchange_folder
+  ALT: sdptool|ussp-push SEE: https://wiki.archlinux.org/index.php/bluetooth#Obex_Object_Push
+
+
+Settings
+  Auto power-on after boot
+    /etc/bluetooth/main.conf
+    [Policy]
+      AutoEnable=true
+
+  Laptop speakers as headset
+    https://wiki.archlinux.org/index.php/bluetooth#Audio
+    NEED? |pulseaudio-bluetooth|
+    /etc/bluetooth/audio.conf
+      [General]
+      Enable=Source,Sink,Media,Socket
