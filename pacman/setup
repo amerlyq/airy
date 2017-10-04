@@ -5,7 +5,13 @@ distro arch || exit
 
 cfg=/etc/pacman.conf
 grep -q '^#Color\s*$' "$cfg" && sudo sed -ri '/^#(Color)\s*$/s//\1/' "$cfg"
-linkcp pacaur.conf ~/.config/pacaur/config
+
+# DISABLED:TEMP: try default values from /etc/xdg/pacaur/configt set
+#   => ALT: change displaybuildfiles=none directly in system co
+#   => USE: EDITOR from ~/.pam_environment instead of setting in config
+#   => !9 [_] TEST: clean install on system => BUG editor is non
+[[ -f ~/.config/pacaur/config ]] && exit 5
+# linkcp pacaur.conf ~/.config/pacaur/config
 
 # TODO setup pacaur to use -j4..-j8 in /etc/makepkg.conf
 # OR: $XDG_CONFIG_HOME/pacman/makepkg.conf OR ~/.makepkg.conf
