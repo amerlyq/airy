@@ -9,7 +9,20 @@ skypeweb
   [_] BUG history from server does not contain your own messages
   [_] BUG private messages received when you was offline aren't delievered on connection
   [_] NEED send/receive multiline msg
-    https://wiki.bitlbee.org/SendNewlines
+    bitlbee
+      https://wiki.bitlbee.org/SendNewlines
+      # help set paste_buffer
+      set paste_buffer true
+      set paste_buffer_delay 400
+      set typing_notice true
+    weechat
+      https://github.com/weechat/weechat/issues/889
+      /set irc.server.bitlbee.anti_flood_prio_high 0
+      /set weechat.bar.input.size 0
+      /set weechat.bar.input.size_max 3
+      ALT:BET:REQ: https://github.com/weechat/weechat/pull/1063
+      NEED: remap keys
+        https://github.com/weechat/scripts/issues/164
 
 ALG
   Reg bitlbee account for all my IM
@@ -31,6 +44,8 @@ ALG
       account add skypeweb <user> <passwd>
       account skypeweb set
       account skypeweb on
+    CHECK
+      acc list
   Show offline users
     chan &bitlbee set show_users online+,away+,offline
     /names
@@ -52,6 +67,8 @@ Weechat
     ~~ https://github.com/s3rvac/weechat-notify-send
     + https://weechat.org/scripts/source/notify_send.pl.html/
     /script search|install notify_send.pl
+  BET:(built-in):
+    /set trigger.trigger.beep.command "/print -beep;/exec -bg notify-send -i '/usr/share/icons/hicolor/32x32/apps/weechat.png' 'IRC Notification' "${tg_tag_nick}: ${tg_message_nocolor}""
 
 
 OBSOL: Convert from Pidgin
