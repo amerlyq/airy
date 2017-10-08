@@ -13,8 +13,8 @@ gw=$(( $(r.xorg -w 2>/dev/null||echo 1280) * 2/5 ))
 iw=$(( ( (dpi + 8)/16 + 3)/6 * 16 ))
 sed -ri '
   /^(\s+geometry = ")[0-9]+(x.*)/s//\1'$gw'\2/
-  /^(\s+width = )[0-9]+/s//\1'$fw'/
-  /^(\s+icon_folders = ).*/s/16/'$iw'/g
+  /^(\s+frame_width = )[0-9]+/s//\1'$fw'/
+  /^(\s+icon_path = ).*/s/16/'$iw'/g
 ' "$dst"
 ## OBSOLETE: font size fixed in latest release
 ## BUG: external monitor -- different dpi
