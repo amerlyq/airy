@@ -1,0 +1,86 @@
+REF
+  https://community.atlassian.com/t5/Confluence-questions/View-wiki-markup-in-5-xx/qaq-p/406270
+
+  Wiki markup (one-way only)
+    https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html
+    https://confluence.atlassian.com/doc/macros-139387.html
+
+OFF
+  http://www.schemacentral.com/
+  http://www.wikimatrix.org/
+
+  BLOG http://idratherbewriting.com/
+    = good articles about tech docs writing
+
+    Problems of confluence
+      http://idratherbewriting.com/2014/09/24/two-major-confluence-problems-poor-content-re-use-and-no-wiki-markup/
+      HACK:(reuse content): http://idratherbewriting.com/2014/06/24/strategies-for-content-re-use-in-confluence/
+    Wiki is also BAD
+      http://idratherbewriting.com/2012/06/11/essay-my-journey-to-and-from-wikis-why-i-adopted-wikis-why-i-veered-away-from-them-and-a-new-model-for-collaboration/
+
+
+TODO
+  nou -> confluence -> nou (where possible)
+
+
+XML :: xmlns .dtd
+  ~ https://confluence.atlassian.com/doc/confluence-data-model-127369837.html
+  REF http://www.amnet.net.au/~ghannington/confluence/docs/index.html
+    +++ http://www.amnet.net.au/~ghannington/confluence/readme.html
+    https://confluence.atlassian.com/doc/confluence-storage-format-790796544.html
+    http://www.amnet.net.au/~ghannington/confluence/docs/confluence/e-ac_confluence.html
+    DEMO http://www.amnet.net.au/~ghannington/confluence/wikifier/rt/
+    FORUM https://community.atlassian.com/t5/Confluence-questions/occupy-confluence-markup-provide-a-WYSIWYG-XHTML-Markup-editor/qaq-p/281803
+  USE https://marketplace.atlassian.com/plugins/com.atlassian.confluence.plugins.editor.confluence-source-editor/server/overview
+    (?extract processings?)
+    G: confluence source markup
+  ??
+    https://community.atlassian.com/t5/Questions/Confluence-DTD-Document-Type-Definition/qaq-p/380516
+    https://community.atlassian.com/t5/Confluence-questions/Need-information-about-the-used-DTD-Schema-used-by-Confluence/qaq-p/138601
+    TUT https://community.atlassian.com/t5/Answers-Developer-Questions/Confluence-XML-manipulation/qaq-p/479407
+    https://community.atlassian.com/t5/Questions/Copy-HTML-Source-to-Confluence-WIki-Mark-up/qaq-p/12477
+
+
+
+FIND: api to edit remote page
+  = fetch what is shown in "Source Editor" -> xml2nou -> edit -> nou2xml -> push back to Atlassian
+  REF api REST
+    https://developer.atlassian.com/confdev/confluence-server-rest-api/confluence-rest-api-examples
+    https://developer.atlassian.com/cloud/confluence/rest-api-examples/
+    http://muddytm.github.io/blag/2016/03/24/Confluence-API-Getting-children-of-a-page.html
+    https://stackoverflow.com/questions/36411290/get-list-of-new-wiki-pages-using-confluence-api
+    https://jspace.atlassian.net/wiki/spaces/DSPACEAPI/pages/1277957/API+Documentation
+  E.G. pkg
+    ~ https://pypi.python.org/pypi/pyconfluence/1.0
+    https://github.com/amishyn/confluence-api-client
+    https://www.codeproject.com/Articles/1191742/Update-Confluence-Wiki-Page-Using-Python
+    OBSOLETE https://github.com/orlandov/vimfluence
+        https://github.com/bigloser/vimfluence.rb
+      https://stackoverflow.com/questions/3634639/confluence-vim-bridge
+      http://vim.wikia.com/wiki/Script:1994
+      ? https://vim.sourceforge.io/scripts/script.php?script_id=1994
+
+
+gerrit review in vim
+  https://sio2project.mimuw.edu.pl/display/DOC/Integrating+Gerrit+with+Your+Favourite+Editor
+
+
+DEV
+  https://gist.github.com/dodok1/4352500
+  ??
+    https://marketplace.atlassian.com/plugins/com.atlassian.confluence.pandocconnect/cloud/overview
+      https://bitbucket.org/atlassianlabs/confluence-pandoc-connect
+    https://community.atlassian.com/t5/Confluence-questions/Import-markdown-into-Confluence/qaq-p/211797
+    http://www.jedi.be/blog/2011/12/15/markdown-to-confluence-conversion/
+  pandoc
+    mk-confl writer
+      DEV https://gist.github.com/zhzhxtrrk/11106681
+      +++ TRY https://github.com/jpbarrette/pandoc-confluence-writer
+    https://www.npmjs.com/package/confluence-to-markdown
+    https://www.npmjs.com/package/confluence-to-github-markdown
+  with dld
+    https://blog.lanyonm.org/articles/2014/08/16/markdown-to-confluence-uploader.html
+
+
+Setup local jira/confluence with nginx
+  https://wiki.teamlead.ru/pages/viewpage.action?pageId=101680023

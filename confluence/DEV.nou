@@ -1,0 +1,13 @@
+pandoc dev
+  REF https://wiki.archlinux.org/index.php/haskell#Building_statically_linked_packages_with_Cabal_.28without_using_shared_libraries.29
+  $ aur_inst stack-static
+  $ stack setup --system-ghc
+  $ stack install --system-ghc cabal-install
+  $ git clone --single-branch --depth=1 https://github.com/jgm/pandoc
+
+  REF https://docs.haskellstack.org/en/stable/README/
+  REF https://pandoc.org/installing.html#quick-stack-method
+  $ cd ./pandoc
+  $ stack setup
+  $ stack install --test
+  $ stack build
