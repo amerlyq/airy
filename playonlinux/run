@@ -17,7 +17,8 @@ overlay(){ local nm=$1
 }
 
 game(){ [[ -n $1 ]] || exit; nm=$1
-  overlay "$nm"; cmd=$lib/$nm
+  # overlay "$nm";
+  cmd=$lib/$nm
   [[ -f $cmd ]] || { r.n 'No such game' "$cmd"; exit 1; }
 }
 

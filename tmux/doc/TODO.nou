@@ -49,6 +49,11 @@ ENH:
 TODO
   [_] BUG: copies only 380 bytes of selection
     CHECK: if copy-pipe outputs only 380 bytes
+      => TODO: look at sources
+  [_] DEV: controllable instance by vim
+    >> compile/run code directly from vim w/o switching windows
+    * on <C-l><C-e> store current tmux session/window/pane into file
+    * in vim on <,l> send ",m<CR>" into controlled tmux to compile
   [_] BUG: uses "xsel" even if I placed "cat"
   [_] REM env VAR FINGERS_* from @tmux-fingers plugin
   2017-07-13 [X] BUG: xsel don't work after ssh into tmux ::: DONE:DEV: r.xsel-ssh
