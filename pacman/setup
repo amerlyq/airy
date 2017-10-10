@@ -10,7 +10,10 @@ grep -q '^#Color\s*$' "$cfg" && sudo sed -ri '/^#(Color)\s*$/s//\1/' "$cfg"
 #   => ALT: change displaybuildfiles=none directly in system co
 #   => USE: EDITOR from ~/.pam_environment instead of setting in config
 #   => !9 [_] TEST: clean install on system => BUG editor is non
-[[ -f ~/.config/pacaur/config ]] && exit 5
+if [[ -f ~/.config/pacaur/config ]]; then
+  echo "Remove ~/.config/pacaur/config"
+  exit 5
+fi
 # linkcp pacaur.conf ~/.config/pacaur/config
 
 # TODO setup pacaur to use -j4..-j8 in /etc/makepkg.conf

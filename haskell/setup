@@ -5,6 +5,12 @@ source ~/.shell/func.d/cfgsetup
 ## NOTE: use dynamic linking by default
 #   (static libs require |ghc-static|)
 cfg=~/.cabal/config
+opt='library-vanilla: False'
+grep -qxF "$opt" "$cfg" || gawk -i inplace -vo="$opt" \
+  '/^(--\s*)?library-vanilla:/{$0=o}1' "$cfg"
+opt='shared: True'
+grep -qxF "$opt" "$cfg" || gawk -i inplace -vo="$opt" \
+  '/^(--\s*)?shared:/{$0=o}1' "$cfg"
 opt='executable-dynamic: True'
 grep -qxF "$opt" "$cfg" || gawk -i inplace -vo="$opt" \
   '/^(--\s*)?executable-dynamic:/{$0=o}1' "$cfg"

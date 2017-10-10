@@ -22,7 +22,7 @@ skip: next continue
 # Install 'airy' config system
 # BAD: no colorizing => recursive deps with r.airy-pretty
 # 	=> add 'quiet' regime to linkcp
-$(AIRY_ROOT): ; mkdir "$(@D)" && ln -s "$(shell pwd)" "$@"
+$(AIRY_ROOT): ; mkdir -p "$(@D)" && ln -s "$(shell pwd)" "$@"
 install: | $(AIRY_ROOT)
 	./airy/setup -m
 
