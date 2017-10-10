@@ -1,0 +1,13 @@
+[Unit]
+Description=Synergy Server Daemon
+Requires=xorg.target
+After=wm.target
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/synergys --no-daemon --config %h/.synergy.conf
+Restart=on-failure
+
+# [Install]
+# WantedBy=main.target
+# Also=synergys.socket

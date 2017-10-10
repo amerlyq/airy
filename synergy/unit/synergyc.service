@@ -1,0 +1,13 @@
+[Unit]
+Description=Synergy Client Daemon
+Requires=xorg.target
+After=wm.target
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/synergyc --no-daemon 192.168.1.2
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=main.target
