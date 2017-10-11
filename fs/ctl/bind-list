@@ -16,6 +16,7 @@ t=${2+$(readlink -m "$2")}
 # ALT:(-s/-t): cut -f1 -d$'\t'
 # NOTE: mountinfo spaces in paths -> \040
 #   BUT: xargs -rL1 -d\\n printf '%b\n' | grep -q => signal 13
+# BUG: works only for binded btrfs and not ext4 E.G. /data -> /srv/nfs/default
 
 exec gawk -vO="$O" -vqs="$s" -vqt="$t" '
   { p=$4; t=$5; d=gensub(/^.* - \w+ (\S+).*/,"\\1",1) }
