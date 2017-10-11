@@ -1,3 +1,17 @@
+SEE
+  https://wiki.archlinux.org/index.php/synergy
+ALT: x2x, xrdp
+  http://raspberrypi.stackexchange.com/questions/4253/forward-mouse-and-keyboard-input-to-x-session
+
 TODO
   [_] Fix synergy errors in debug mode with 'not found display'
       Simply launch it
+
+  SSH:
+    $ synergys -a localhost:24800
+    $ ssh -f -N -L 24800:server-hostname:24800
+  Set display to be able launch this by SSH
+    $ DISPLAY=:0 ...
+
+  --name screen-name | This option lets the client use a name
+                     | other  than  its  hostname for its screen.

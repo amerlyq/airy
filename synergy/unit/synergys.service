@@ -5,9 +5,9 @@ After=wm.target
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/synergys --no-daemon --config %h/.synergy.conf
+ExecStart=/usr/bin/synergys --no-daemon --debug NOTE --config %h/.synergy.conf
 Restart=on-failure
 
-# [Install]
-# WantedBy=main.target
+[Install]
+WantedBy=main.target
 # Also=synergys.socket
