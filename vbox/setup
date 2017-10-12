@@ -2,8 +2,10 @@
 # tags: core
 source ~/.shell/func.d/cfgsetup
 
-mkdir -p ~/VMs
-VBoxManage setproperty machinefolder ~/VMs  # OR /home/media/VMs
+# TODO: symlink /vm to xdg_airy_vm_dir with fallback to ~/vm
+dir=/data/vm  # OR ~/VMs OR /home/media/VMs
+mkdir -p "$dir"
+VBoxManage setproperty machinefolder "$dir"
 
 ## NOTE: disable annoying miniToolBar
 # SEE: http://helpdeskgeek.com/virtualization/hide-the-menu-bar-and-status-bar-in-virtualbox/

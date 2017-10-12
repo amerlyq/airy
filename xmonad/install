@@ -1,14 +1,13 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+pkg_inst xmonad xmonad-contrib
+pkg_inst wmctrl
 
 if distro arch; then
   # DEPRECATED: xorg-xmessage -- use r.vim-xmessage
   # FIXED:(>v0.12): 'getWindowAttributes' crash on Wine or Pidgin close
   # aur_inst xmonad-git
-
-  pkg_inst xmonad xmonad-contrib
-  pkg_inst wmctrl
 
   ## BAD:WARN: sections 'Volume' and 'MPD' break DFL config
   # pkg_inst xmobar
@@ -23,8 +22,4 @@ if distro arch; then
   cab_inst -p 'xmobar' xmobar \
     --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
   mod_have xmobar
-
-elif distro ubuntu; then
-  pkg_inst xmonad xmonad-contrib
-  echo "Err: not enough"
 fi

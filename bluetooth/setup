@@ -6,4 +6,4 @@ id | grep -qwF lp || sudo gpasswd -a "${LOGNAME:?}" lp
 
 grep -qw '^btusb' /proc/modules || sudo modprobe btusb
 
-svc_activate -ceR bluetooth.service
+svc_activate -eR bluetooth.service
