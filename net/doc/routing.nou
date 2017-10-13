@@ -1,0 +1,82 @@
+[_] TODO: automatic routing setup by netctl
+[_] MOVE: |airy/net| but replace ips/dev names in notes
+[_] FIXME: routing for svn
+
+REF
+  https://bbs.archlinux.org/viewtopic.php?id=184434
+  + https://stackoverflow.com/questions/29942760/linux-route-specific-traffic-through-ethernet
+  https://superuser.com/questions/980509/route-only-specific-ip-series-traffic-from-eth0-and-rest-all-to-wlan0
+  ++ READ https://unix.stackexchange.com/questions/101505/route-traffic-out-different-gateway-by-destination-network
+
+  BET:REF: http://linux-ip.net/html/tools-ip-route.html
+    !!! [_] READ http://baturin.org/docs/iproute2/
+    NOTE:ALT: "change/replace" -- to modify / add if not exists
+      BUG: can't select which rule to replace, can't reuse route fields in changed rule
+        MAYBE: you can't "ip r change" only "dst" field E.G. "default" -> "172.16.*/16" (as "dst" may be route key in hashmap)
+
+  ALT: iptables (untested)
+  https://askubuntu.com/questions/104400/how-to-put-all-traffic-and-on-one-interface-and-some-traffic-on-another-interfac
+    $ iptables -t mangle -A OUTPUT -p tcp --dport ssh -o eth0 -j MARK --set-mark 1
+    $ ip rule add fwmark 1 table 1
+    $ ip route add 0.0.0.0/0 table 1 dev wlan0
+
+
+ALG
+  Routing all to WiFi but use company subnet for repo/jira/builds (172.16.* in /etc/hosts)
+    $ ip route show
+      # default via 172.30.133.1 dev enp0s25 src 172.30.133.127 metric 202
+      # default via 172.27.186.1 dev wlo1 src 172.27.186.103 metric 304
+      # 172.27.186.0/24 dev wlo1 proto kernel scope link src 172.27.186.103 metric 304
+      # 172.30.133.0/24 dev enp0s25 proto kernel scope link src 172.30.133.127 metric 202
+
+    $ eth=$(command ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p;q}')
+    $ gw=$(command ip r s exact 0.0.0.0/0 dev "${eth:?}" | sed -rn 's/.*via ([0-9.]+).*/\1/p')
+    $ sudo ip route del default dev "${eth:?}"
+    $ sudo ip route add 172.16.0.0/16 via "${gw:?}"
+      <= for ethernet-only resources
+    $ sudo ip route add 172.30.0.0/16 via "${gw:?}"
+      <= for wifi-only resources
+    $ sudo ip route flush cache
+    $ ip route show
+      # default via 172.27.186.1 dev wlo1
+      # 172.16.0.0/16 via 172.30.133.1 dev enp0s25
+      # 172.27.186.0/24 dev wlo1 proto kernel scope link src 172.27.186.103 metric 304
+      # 172.30.133.0/24 dev enp0s25 proto kernel scope link src 172.30.133.127 metric 202
+  Auto
+    https://wiki.archlinux.org/index.php/dhcpcd#DHCP_static_route.28s.29
+    $ man 8 dhcpcd-run-hooks
+    https://www.daemon-systems.org/man/dhcpcd-run-hooks.8.html
+    /usr/lib/dhcpcd/dhcpcd-hooks/40-vpnroute
+      ip route del default dev enp0s25
+      ip route add 172.16.0.0/16 via 172.30.78.1
+      ip route add 172.30.0.0/16 via 172.30.78.1
+
+
+DEBUG
+  Route lookup trie
+    https://vincent.bernat.im/en/blog/2017-ipv4-route-lookup-linux
+    $ cat /proc/net/fib_trie
+    $ cat /proc/net/fib_triestat
+    $ ip rule
+    $ ip route show table local
+  Reset network / routing
+    $ sudo netctl restart eth_dhcp
+    $ sudo netctl restart wifi_dhcp
+  Reset default gateways (keep wifi/inet only)
+    $ sudo ip route del default
+    $ sudo ip route add default dev wlo1 via 172.27.186.1
+  Dynamic gateway (via)
+    https://ask.fedoraproject.org/en/question/47502/how-to-set-default-route-when-gateway-has-dynamic-ip/
+
+
+HACK
+  [_] READ:HACK: spoof DNS on LAN => redirect traffic
+    https://null-byte.wonderhowto.com/how-to/hack-like-pro-spoof-dns-lan-redirect-traffic-your-fake-website-0151620/
+  [_] MTU path discovery
+    https://blog.cloudflare.com/path-mtu-discovery-in-practice/
+  [_] Max mobile/vm net performance
+    https://blog.cloudflare.com/optimizing-the-linux-stack-for-mobile-web-per/
+    http://www.nateware.com/linux-network-tuning-for-2013.html
+    http://solutionhacker.com/system-tuning-cheat-sheet/
+  ++ [_] REF: route lookup in tree
+    https://vincent.bernat.im/en/blog/2017-ipv4-route-lookup-linux
