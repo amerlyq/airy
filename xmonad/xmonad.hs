@@ -245,8 +245,8 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   mconcat
   -- EXPL: for IM 'shift' is more comfortable
   [ className =? "Pidgin" --> doF (W.shift "PI")
-  -- , className =? "Skype" --> doF (W.shift "SK")
-  , className =? "Skype Preview" --> doF (W.shift "SK")
+  , className =? "Skype" --> doF (W.shift "SK")
+  -- , className =? "Skype Preview" --> doF (W.shift "SK")
   , className =? "Firefox" --> doF (bring "FF")
   -- , ("5", "Krita")
   -- , ("8", "t-engine64")
