@@ -1,3 +1,19 @@
 TODO
   [_] vbox laptop access web camera
   2014-11-30 [X] VBox & CapsLock toggle:> Solution: remap Caps to Ctrl on Windows
+
+
+BUG: tiling wm wrong scale
+  https://www.virtualbox.org/ticket/15863?cversion=0&cnum_hist=2
+  https://bugreports.qt.io/browse/QTBUG-57608?focusedCommentId=354600&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-354600
+  https://www.linuxquestions.org/questions/linux-software-2/antix-16-rc1-can-not-autoresize-screen-in-virtualbox-5-0-22-with-guest-additions-installed-4175582627/
+  https://github.com/i3/i3/issues/2497
+
+  https://www.reddit.com/r/i3wm/comments/4u1wj6/virtualbox_i3_on_arch_issues_for_anyone_else/
+  Workarounds
+    * Seemless Mode on -> off -> on -> off
+      -> correct scaling, but with slightly off mouse cursor
+    * Fullscreen +vbox +host -vbox -host <H+f> <H><M+f>
+      -> until the next VM reboot for me.
+    * ALT: <H+c> OR select "Scaled Mode" under the View menu in <H+Home>
+      It's better then nothing.

@@ -45,6 +45,8 @@ TODO
     $ xdg-user-dirs-update --set CONFIG=~/.config
     NOTE: ~/.local/bin may be used by "pip" => can't be used exclusive for airy
     dbin=${XDG_AIRY_BIN_DIR:-${XDG_CACHE_HOME:-~/.cache}/airy/bin}
+    * publicshare -- use for VBox, etc
+      $ sudo sh -c 'mkdir $0 && chmod 770 $0 && chown :users $0' /srv/users
 
   [_] airy dirs distribution
     ~/.local/airy => link |airy| itself   => access through path shortcuts instead of "aura"
