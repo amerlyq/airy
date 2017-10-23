@@ -47,9 +47,33 @@ ENH:
     https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
 
 TODO
-  [_] BUG: copies only 380 bytes of selection
-    CHECK: if copy-pipe outputs only 380 bytes
-      => TODO: look at sources
+  [_] BAD: copy-mode timeout in 10s and 180s
+      if (wp->modelast < time(NULL) - WINDOW_MODE_...) | ./window.c:1213
+      struct timeval         tv = { .tv_sec = 10 }     | ./window.c:1224
+      evtimer_add(&wp->modetimer, &tv)                 | ./window.c:1232
+    It's updated only on each mode change
+      wp->modelast = time(NULL)                        | ./window.c:1230
+
+  [_] BET: split two tmux configs :: for tmux>=2.4 and older one and choose version on ./setup
+    NEED: source common part and then source individual parts
+    IDEA: use latest tmux as default one and move old options to nearest versioned config ./tmux-2.4.conf
+  [_] TRY: on remote tmux "set-clipboard" to pass clipboard through escape sequences of xterm(1)
+    NEED: enabled support in terminal (READ man)
+  [_] BUG: don't reload key bindings $ tmux source ~/.tmux.conf
+  [_] BAD? tmux.service has different environment on start
+  2017-10-23 [X] BUG: copies only 380 bytes of selection to clipboard
+    ::: problem due to "set-clipboard=external" SEE sources https://github.com/tmux/tmux
+      * it implicitly copies selection by escape codes and/or screen_write_start()
+      * "xsel" never called despite being job_run() earlier then window_copy_copy_buffer()
+        MAYBE CopyQ makes hidden copy from primary to clipboard when screen_write_start() called in tmux
+          => writing to clipboard is blocked and job_run() never called
+    DEBUG: replace by pipe by "tee /tmp/fff"
+    FIXED:TRY:(server-option):
+      $ tmux set -sg set-clipboard off
+      $ tmux show-options -s G clipboard
+      $ tmux bind -T copy-mode-vi 'y' send-keys -X copy-pipe 'xsel -ib' \\\; send-keys -X clear-selection \\\; delete-buffer
+      $ tmux list-keys -Tcopy-mode-vi G '\by\b'
+
   [_] DEV: controllable instance by vim
     >> compile/run code directly from vim w/o switching windows
     * on <C-l><C-e> store current tmux session/window/pane into file
