@@ -17,6 +17,7 @@ t=${2+$(readlink -m "$2")}
 # NOTE: mountinfo spaces in paths -> \040
 #   BUT: xargs -rL1 -d\\n printf '%b\n' | grep -q => signal 13
 # BUG: works only for binded btrfs and not ext4 E.G. /data -> /srv/nfs/default
+# TRY: stat -c%m "$file" to show mount point
 
 exec gawk -vO="$O" -vqs="$s" -vqt="$t" '
   { p=$4; t=$5; d=gensub(/^.* - \w+ (\S+).*/,"\\1",1) }
