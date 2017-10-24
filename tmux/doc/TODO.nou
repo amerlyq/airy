@@ -47,6 +47,10 @@ ENH:
     https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
 
 TODO
+  [_] BAD: sticking "n/N" binding after copycat/etc
+    # bind-key -T root  n  run-shell "tmux send-keys 'n'; ~/.tmux/plugins/tmux-copycat/scripts/copycat_jump.sh 'next'; true"
+    TODO: replace it by smth simple
+    ::: TEMP:(workaround): <C-l>:unbind -Troot n<CR>
   [_] BAD: copy-mode timeout in 10s and 180s
       if (wp->modelast < time(NULL) - WINDOW_MODE_...) | ./window.c:1213
       struct timeval         tv = { .tv_sec = 10 }     | ./window.c:1224
