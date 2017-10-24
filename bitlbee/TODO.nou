@@ -1,8 +1,39 @@
-setup
+REF
+  2017-10-25 [X] https://www.bitlbee.org/user-guide.html
   https://wiki.archlinux.org/index.php/bitlbee
   https://wiki.bitlbee.org/HowtoSkypeWeb
 
+
+TODO
+  [_] TODO setup OTR for secure messaging https://otr.cypherpunks.ca/
+    https://www.reddit.com/r/irc/comments/3f2x4w/any_weechat_users_use_off_the_record/
+    OTR for weechat/bitlbee/pidgin/purple
+      https://wiki.bitlbee.org/bitlbee-otr
+      https://wiki.archlinux.org/index.php/WeeChat#OTR
+      https://github.com/mmb/weechat-otr
+  [_] BUG: bitlbee_completion.py don't work
+  2017-10-25 [X] BAD: telegram shows non-english names as increasing series of underscore "____"
+    https://github.com/ircv3/ircv3-specifications/issues/259
+    ::: set utf8_nicks true
+    TRY: set nick_source full_name / first_name
+  [_] CHG: more secure password input
+    TRY: "set oauth true" for gtalk/twitter/facebook ALT: simply add account w/o password
+    TRY: use "oper" for entering securely w/o echo -- instead "identify" ?
+      /oper <user> <passwd>
+  [_] history is incomplete and ugly
+    set display_timestamps off
+
+  [_] TRY: send msgs in control channel to last person you addressed
+    set default_target last
+  +++ 2017-10-25 [X] TRY: bitlbee XMPP -> IRC
+    https://www.bitlbee.org/main.php/news.r.html
+    2017-10-25 [X] |bitlbee|
+    2017-10-25 [X] |bitlbee-libpurple|
+    2017-10-25 [X] |purple-discord-git| OR |bitlbee-discord-git|
+
+
 skypeweb
+  [_] https://sameroom.io/blog/connecting-skype-to-irc/
   !1 [_] BUG: -- lost incoming/outgoing msgs in groupchat
     * not delievered
     * no warning/error message
@@ -17,6 +48,8 @@ skypeweb
       set paste_buffer true
       set paste_buffer_delay 400
       set typing_notice true
+      set private true
+      set utf8_nicks true
     weechat
       https://github.com/weechat/weechat/issues/889
       /set irc.server.bitlbee.anti_flood_prio_high 0
@@ -33,7 +66,6 @@ ALG
   List available protocols
     plugins
   Add accounts per IM
-    BET: use /OPER for entering <passwd> securely w/o echo
     gtalk
       account add jabber <user@gmail.com> <passwd>
       account jabber set
@@ -46,11 +78,53 @@ ALG
       account add skypeweb <user> <passwd>
       account skypeweb set
       account skypeweb on
+    telegram
+      account add telegram +3... <anything>
+      account telegram on
+        => wait SMS and enter code
+      account telegram set
+        accept-secret-chats = `ask'
+        auto-join-group-chats = `true'
+        auto_connect = `true'
+        auto_reconnect = `true'
+        away is empty
+        compat-verification = `false'
+        display-read-notifications = `false'
+        display_name is empty
+        handle_unknown is empty
+        history-retrieve-days = `14'
+        inactive-days-offline = `7'
+        media-size-threshold = `32768'
+        nick_format is empty
+        nick_source = `handle'
+        password-two-factor is empty
+        send-read-notifications = `true'
+    discord
+      account add eionrobb-discord <user@gmail.com> <passwd>
+      account eionrobb-discord set
+      account eionrobb-discord on
+      account eionrobb-discord set display_name <user>
+
+      chat list eionrobb-discord
+      chat add eionrobb-discord !1 #mydiscordchannel
+      chan #mydiscordchannel set auto_join true
+      /join #mydiscordchannel
     CHECK
       acc list
+  Split contact list by protocols
+    https://wiki.bitlbee.org/ManagingContactList
+    acc list
+    /join &gtalk
+    channel &gtalk set
+    channel &gtalk set auto_join true
+    channel &gtalk set account gtalk
+    channel &gtalk set fill_by account
+    channel &gtalk set show_users online%,away+,offline
   Show offline users
+    help set show_users
     chan &bitlbee set show_users online+,away+,offline
     /names
+    blist
   NEED: rename/alias jabber account to normal name
   Groupchats
     List all your chats from server
@@ -59,18 +133,35 @@ ALG
       chat add skypeweb !4 #work
       OR: chat add skypeweb 19:a1d04a804e32daa5832810b2f4e5aaad@thread.skype
       channel #work set auto_join true
+      OR: channel list => channel 3 set auto_join true
       /join #work
   Rename users
     jabber
       rename _f223764e8a836b85c93455 <somenick>
+  Manage users
+    info/remove/block/allow <nick>
+  Set status ("away" has higher priority then "status")
+    set status ...
+    set skype status ...
+    /away ...
+    set skype away ...
 
 Weechat
+  auto-completion
+    bitlbee_completion.py
+    bitlbee_typing_notice.py
   notify-send
     ~~ https://github.com/s3rvac/weechat-notify-send
     + https://weechat.org/scripts/source/notify_send.pl.html/
     /script search|install notify_send.pl
   BET:(built-in):
     /set trigger.trigger.beep.command "/print -beep;/exec -bg notify-send -i '/usr/share/icons/hicolor/32x32/apps/weechat.png' 'IRC Notification' "${tg_tag_nick}: ${tg_message_nocolor}""
+  Trigger "urgent" only by choosen msgs
+    http://noone.org/blog/English/Computer/IRC/Sedating%20irssi's%20nick%20highlight%20for%20microblogging%20messages.html
+
+
+discord
+  https://github.com/sm00th/bitlbee-discord/graphs/code-frequency
 
 
 OBSOL: Convert from Pidgin
