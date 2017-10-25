@@ -17,8 +17,8 @@ TODO
     ::: set utf8_nicks true
     TRY: set nick_source full_name / first_name
   [_] CHG: more secure password input
-    TRY: "set oauth true" for gtalk/twitter/facebook ALT: simply add account w/o password
-    TRY: use "oper" for entering securely w/o echo -- instead "identify" ?
+    [_] TRY: "set oauth true" for gtalk/twitter/facebook ALT: simply add account w/o password
+    2017-10-25 [X] TRY: use "oper" for entering securely w/o echo -- instead of "identify <passwd>" ?
       /oper <user> <passwd>
   [_] history is incomplete and ugly
     set display_timestamps off
@@ -62,7 +62,8 @@ skypeweb
 ALG
   Reg bitlbee account for all my IM
     register <passwd>
-    identify <passwd>
+    identify
+    /oper <user> <passwd>
   List available protocols
     plugins
   Add accounts per IM
