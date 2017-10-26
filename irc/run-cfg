@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+set -o pipefail
+
+for cfg; do
+  printf '/print === START %s ===\n' "$cfg"
+  env-subs "$cfg"
+  printf '/print === DONE %s ===\n' "$cfg"
+  # echo '/save'
+done | r.irc-pipe

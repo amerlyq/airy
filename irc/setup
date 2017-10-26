@@ -16,10 +16,17 @@ if cfgOpt r; then
   export IRC_ZNC="${IRC_ZNC:?}" IRC_ZNC_FP="${IRC_ZNC_FP:?}"
 
   ## ALT: { sleep 0.5; ./run-pipe "$cfg"; ./run-pipe <<< "/quit"; } & weechat -a; wait
-  if [[ -p ~/.weechat/weechat_fifo ]]
-  then env-subs ./cfg/weechat.conf | ./run-pipe
+  if [[ -p ~/.weechat/weechat_fifo ]]; then
+    # r.irc-pipe <<< '/unset -mask irc.*'
+    # BUG:(don't work): /server del *
+    r.irc-cfg ./cfg/{anonymity,server_default,bitlbee,znc,freenode}.conf
+    # BAD:(removes too much): /unset -mask weechat.*
+    r.irc-cfg ./cfg/{behavior,buflist,nicks,messages,multiline}.conf
+    # r.irc-pipe <<< '/save'  # OR: '/save irc'
+
   # WARN: seems don't affect anything at all => apply config only after removing ~/.weechat/*
-  else WEECHAT_PASSPHRASE=' ' weechat --no-connect \
+  else exit 6
+    WEECHAT_PASSPHRASE=' ' weechat --no-connect \
     -r '/set sec.crypt.passphrase_file /dev/stdin' \
     -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
     -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
