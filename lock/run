@@ -18,6 +18,8 @@ if [[ ! -f $pic ]]; then
 fi
 
 # Notifications demon pause/resume
+# BUG: sometimes after unlock dpms not restored and affects all subsequent locks
+#   => query hardcoded value from some default settings file
 trap "
 xset dpms $(xset q|awk '/Standby:/{print$2}')
 notify-send DUNST_COMMAND_RESUME

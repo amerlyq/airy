@@ -12,7 +12,7 @@ alias gir1='gir HEAD~'
 alias g\?='git help'
 ## Status
 # Re-defined
-alias gs='git status -sbu && git --no-pager stash list'
+alias gs='{ git status -sbu && git --no-pager stash list; }'
 alias gca='gaa && gcm'
 # SEE: http://gitolite.com/git-pull--rebase
 # http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
