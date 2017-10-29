@@ -17,7 +17,7 @@ if [[ -f $1 ]]; then path=$1; else
 fi
 
 [[ -f $path ]] \
-  && r.dmenu-move -n 'MPD:' "$dir" "$path" \
+  && r.dmenu-move "$dir" "$path" \
   || exit
 #Del current, interrupts cast by ssh: mpc del 0
 ${curr+mpc next >/dev/null && mpc del $curr}

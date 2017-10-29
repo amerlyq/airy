@@ -86,6 +86,7 @@ end
 
 function h_move()
   show_status("info", "moving to...")
+  -- FIXME if press <Esc> -- show "Cancelled"
   local res = utils.subprocess({
     cancellable = false, args = { "r.mpv-category",
       tostring(mp.get_property_native("path"))
@@ -94,6 +95,7 @@ function h_move()
     show_status("error", "Failed("..res["error"]..") moving: "..res["stdout"])
   else
     show_status("info", "Moved OK:"..res["stdout"])
+    mp.commandv("playlist-next", "force")
   end
 end
 

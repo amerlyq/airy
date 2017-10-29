@@ -1,10 +1,17 @@
-#!/bin/bash -e
-${1:+cd "$1"}
+#!/bin/bash -eu
+set -o pipefail
 
-# ALT: better choice for such -- frezency like fzf
-# -- to sort possible dirs in order
-find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
-| sort -n \
-| exec dmenu -i -b -p "${2:-Dirs:}" \
+dir=$1
+
+find "$dir" -mindepth 1 -type d -printf '%T@ %P\n' \
+| sort -nr | cut -d' ' -f2- \
+| dmenu -i -b -p "$dir" \
   -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31658C' \
   -fn '-misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+
+# DEV: options
+# * sort by length and alphabet (hold more results on screen)
+#   $ awk '{print length,$0}' | sort -k2nr,2 -k1n,1
+# * sort dirs on lvl1 by timestamp, and all nested dirs -- by alphabet
+# * better choice for such usage -- frezency like fzf
+#   to sort possible dirs in order
