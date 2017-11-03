@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: browser
 THEME=light
 THEME_ALLOWED='dark|light'
@@ -6,9 +6,10 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 linkcp -t ~/.config/qutebrowser \
-  qutebrowser.conf keys.conf theme
+  config.py theme
 
-linkcp -m ~/.local/share/qutebrowser/history ~/chat/qute  # BET? ~/db
+# BET? link to ~/db
+linkcp -m ~/.local/share/qutebrowser/history.sqlite ~/chat/qute
 
 ### THEME ###
 ./run-theme ${THEME:?}
