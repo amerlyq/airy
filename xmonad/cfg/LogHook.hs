@@ -5,11 +5,10 @@ module XMonad.Config.Amer.LogHook (myLogHook) where
 --  https://bbs.archlinux.org/viewtopic.php?id=194863
 
 import qualified Data.Map.Strict as M
-import System.IO (hPutStrLn)
-import Data.Default  (def)
+import System.IO     (hPutStrLn)
 import Text.Regex    (mkRegex, subRegex)
 
-import XMonad                         (io)
+import XMonad                         (io, def)
 import XMonad.Actions.CopyWindow      (wsContainingCopies)
 import XMonad.Actions.GroupNavigation (historyHook)
 import XMonad.Hooks.DynamicLog        (dynamicLogString, xmobarColor, PP(..))  -- pad, wrap, shorten,

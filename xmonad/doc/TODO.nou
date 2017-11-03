@@ -1,4 +1,5 @@
 CHG
+  [_] BAD: too often window becames hidden on <M-b> :: change keybinding
   [_] FIX: fullscreen for floats
   [_] FIX: floats scaling with dpi instead of fixed percent of screen
   [_] FIX: xmobar per monitor/screen -- how to share/fork stdin with desktop numbers ?
@@ -315,6 +316,11 @@ FIXME
 
 
 BUG
+  [_] Breaks on reinstall
+    ::: partial fix
+      https://bbs.archlinux.org/viewtopic.php?id=229495
+      $ sudo ghc-pkg recache
+      $ paci xmonad xmonad-contrib
   [_] After floating window open/close, focus drops to Master window instead last slave
   [_] 'f' in mpv don't make fullscreen -- SEE FullscreenMessage
     [_] SEE https://www.reddit.com/r/xmonad/comments/3ak0ri/how_to_manage_fullscreen_programms/

@@ -3,7 +3,6 @@ module XMonad.Config.Amer.Prompt (
     keys, myPromptTheme
 ) where
 
-import Data.Default                 (def)
 import XMonad                       (spawn, windows)
 import XMonad.Prompt
 import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))

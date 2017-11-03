@@ -53,7 +53,7 @@ scratchpad = (concat . (`map` [
     , ("s" , runOrRaise "skypeforlinux" $ className =? "Skype Preview")
     -- , ("S" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
     -- FIXME: broken opening on new wksp?
-    , ("m" , raiseMaybe (spawn "r.t -n mutt -e mutt") (appName =? "mutt"))
+    , ("m" , raiseMaybe (spawn "r.t -n mutt -e neomutt") (appName =? "mutt"))
     , ("M" , raiseMaybe (spawn "r.t -n muttR -e mutt -R") (appName =? "muttR"))
     , ("<F1>", namedScratchpadAction myScratchpads "help")
     ],

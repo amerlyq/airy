@@ -2,8 +2,7 @@
 module XMonad.Config.Amer.EventHook (myHandleEventHook) where
 
 import Control.Arrow  (first)
-import Data.Default   (def)
-import XMonad                       (handleEventHook)
+import XMonad                       (def, handleEventHook)
 import XMonad.StackSet              (allWindows)
 import XMonad.Layout.LayoutHints    (hintsEventHook)
 -- BAD: don't react to mpv 'f'

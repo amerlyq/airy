@@ -3,8 +3,8 @@ module XMonad.Config.Amer.Navigation (
     keys, doScreen, nextEmpty, nextNonEmpty, focusNonEmpty
 ) where
 
-import Control.Monad  (unless)
-import Data.Default                 (def)
+import Control.Monad                (unless)
+import XMonad.Prompt                (def)
 import XMonad                       (gets, spawn, windows, windowset, screenWorkspace, broadcastMessage, float, withFocused, rescreen, withWindowSet)
 import XMonad.StackSet              (view, shift, currentTag, shiftWin, allWindows)
 import XMonad.Actions.CycleWS       (findWorkspace, screenBy, Direction1D(Prev, Next), WSType(EmptyWS, NonEmptyWS))

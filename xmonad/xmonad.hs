@@ -6,7 +6,6 @@ module Main (main) where
 import Control.Monad (when, unless)
 import Data.List     (isPrefixOf)
 import Data.Ratio    ((%))
-import Data.Default  (def)
 import Data.Maybe    (maybe, fromMaybe, fromJust, isJust)
 import Text.Read     (readMaybe)
 import System.Directory     (doesFileExist)
