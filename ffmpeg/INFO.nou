@@ -3,6 +3,13 @@ CLI video editor / cutting tool
 
 [_] TRY:USE: catch camera video directly
 
+
+INFO
+  TUT https://www.labnol.org/internet/useful-ffmpeg-commands/28490/
+  REF http://trac.ffmpeg.org/wiki/Encode/H.264
+    $ ffmpeg -an -c:v libx264 -b:v 1200k -preset medium -s 960x540 -i input.mp4 output.mp4
+
+
 Cut flv
 SEE http://superuser.com/questions/138331/using-ffmpeg-to-cut-up-video
   -ss/-to HH:MM:SS.xxx OR -t for duration OR -vframes 1800

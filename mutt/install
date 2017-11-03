@@ -5,8 +5,7 @@ source ~/.shell/func.d/packages
 #| neomutt | mutt with many patches
 
 if distro arch; then
-  pkg_inst isync notmuch openldap
-  aur_inst neomutt
+  pkg_inst neomutt isync notmuch openldap
   aur_inst imapfilter
 
 elif distro ubuntu; then
