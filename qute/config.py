@@ -185,7 +185,6 @@ config.load_autoconfig()
 ## Foreground color of an error message.
 ## Type: QssColor
 # c.colors.messages.error.fg = 'white'
-c.colors.messages.error.fg = 'lime'
 
 ## Background color of an info message.
 ## Type: QssColor
@@ -1372,7 +1371,7 @@ config.bind(',R', 'set content.proxy system')
 config.bind(',s', 'set content.javascript.enabled true')
 config.bind(',S', 'set content.javascript.enabled false')
 config.bind(',t', 'set content.user_stylesheets theme/dark.css')
-config.bind(',T', 'set content.user_stylesheets theme/ligth.css')
+config.bind(',T', 'set content.user_stylesheets theme/light.css')
 config.bind(',y', 'spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -yc mpv "{url}"')
 # config.bind("'", 'enter-mode jump_mark')
 # config.bind('+', 'zoom-in')

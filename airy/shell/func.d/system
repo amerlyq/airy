@@ -99,6 +99,11 @@ amAskConfirm() {
     esac
 }
 
+Deprecated() { local a ok=1
+  for a in "$@"; do if [[ -f $a ]]; then ok=0; echo "FIX:(remove): $a" >&2; fi; done
+  ((ok)) || exit 5
+}
+
 help_from_ifhas() { sed -rn '/^(\s*)(el)?if\s+has (\w+)[^;]*;[^#]+#\s*(.*)$/s//\1 -\3  \4/p' "$0"; }
 # ====================== Process =====================================
 
