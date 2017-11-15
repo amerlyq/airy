@@ -13,6 +13,8 @@ esac
 
 ### Temp ###
 # CHG:USE:(pam-tmpdir) https://sources.debian.net/src/pam-tmpdir/
+#   BUG: sourced only into 'tmux -s $USER' session
+#     => $TMPDIR not present in other vte->tmux->xmonad
 if ! test -d "${TMPDIR-}"; then
   TMPDIR=/tmp/"${LOGNAME-}"
   mkdir -p -m 700 "$TMPDIR"
