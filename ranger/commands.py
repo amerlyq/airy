@@ -122,6 +122,8 @@ class ag(Command):
             return self._aug_sh(2)
         elif self.arg(1) == '-r':
             return self._aug_sh(2, ['--files-with-matches'])
+        elif self.arg(1) == '-u':
+            return self._aug_sh(2, ['--unrestricted', '--follow'])
         else:
             return self._aug_sh(1)
 
