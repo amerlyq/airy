@@ -10,7 +10,9 @@ Type=forking
 ExecStartPre=/bin/sh -c 'pkill -x xcape; true'
 # BAD: splitting quoted expression into multiline
 # BUG: w/o '-d' when stopping 'xcape' ABRT coredump
-ExecStart=/usr/bin/xcape -t 250 -e "ISO_Level3_Shift=Super_R;Overlay1_Enable=Multi_key"
+ExecStart=/usr/bin/xcape -t 250 -e "Overlay1_Enable=Multi_key"
+## DISABLED:(ISO_Level3_Shift=Super_R): latching mods interfere with vbox usage
+# ExecStart=/usr/bin/xcape -t 250 -e "ISO_Level3_Shift=Super_R;Overlay1_Enable=Multi_key"
 # ExecStop=/usr/bin/kill -TERM $MAINPID
 # StandardOutput=null
 Restart=always

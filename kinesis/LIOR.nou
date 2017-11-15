@@ -10,6 +10,7 @@ USAGE: compatible with my general xkb
 | [lctrl]>[kp-lwin] | Alt/Meta       | kp+F1-kp -> LAlt
 
 | [rctrl]>[kp-ralt] | Lang en/ru     | kp+F2-kp -> RAlt
+| [kp-rctrl]>[kp-ralt] | Lang en/ru  | kp+F2-kp -> kp-RAlt-kp
 | [pdown]>[rctrl]   | vim: easy C-b  | RAlt -> PgDn
 | [pup]>[escape]    | vim: easy C-[  | Esc -> PgUp
 
@@ -17,6 +18,7 @@ USAGE: compatible with my general xkb
 
 | [intl-\]>[kpshft] |  for pup/pdown | kp+F8-kp -> intl-\
 | [kp-insert]>[kpshft] |       ---   | kp+F8-kp -> kp+intl-\-kp
+| [kp-hyphen]>[kp-insert]| Shift+Insert | kp+intl-\-kp -> kp+[-]-kp
 
 
 ATT:DFL: kp-<key> work as <key> even w/o remapping
@@ -38,5 +40,32 @@ BAD: vbox
   * "xcape" on vbox key -- may produce excessive keypress
   * don't put latching modifiers as VBox -- they latch and affect next command
   * need key, which present both on laptop and external keyboard
-  * TRY: use "Hyper" otherwise Windows repeats actual function of key -- SuperR
+    BET: ISO_First_Group_Lock on hard <RAlt>
+      ++ no bad consequences on Linux if no vbox
+      ++ very comfortable to press
+      + hard <AltGr> is not too useful in Win
+    BAD: <LAlt> == <XMonad> always passed to vbox as hard key
+      E.G. refocusing by <Host><M-j> results in sending <LAlt> when focus moves
+      NEED: hard button completely unused by Win
+        ??? disable button in Win by registry keys
+        ??? kinesis => remap hard keys by something completely unused
   * NEED!!! remap "Insert" for <S-Insert> as it's shadowed by [kpshft]
+  * TRY: use "Hyper" otherwise Windows repeats actual function of key -- SuperR
+    BUT: Win executes "hard" function of key, when vbox is binded to "xkb" meaning
+      <Win> (hard)
+        --- opens start menu in Win
+      caps (hard)
+        + manually mapped to <ctrl> under Win
+        + no mods latching under Win
+        + can be repositioned on kinesis
+        --- on laptop is hardcoded under <ctrl>
+      menu (hard)
+        - may be useful under Win
+      prtscr
+        -- BAD produces files if not vbox
+      calc
+        -- CHECK launches calc if not vbox
+      scroll lock
+        MAYBE
+      pause
+        MAYBE
