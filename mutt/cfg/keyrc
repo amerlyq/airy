@@ -32,14 +32,17 @@ macro index  +  <limit>all<enter>        "limit reset"
 macro index '"' <limit>all<enter>        "limit reset"
 macro generic,pager <f09> "<shell-escape>$my_cache/exe/sync $my_acc<enter>"   "Index notmuch db"
 # BUG: after reloading gmail requires to accept cert
-macro generic,pager <f12> ":source $my_cache/muttrc<enter>"
+macro generic,pager <f12> ":source $my_cache/acc/$my_acc<enter>"
 
-# EXPL: collapsing
-# macro index \R '<read-thread><collapse-thread><next-unread>' 'Mark the current thread as read'
-macro index '{' ':set my_oldcollapse_unread=$collapse_unread<enter>:set collapse_unread=yes<enter><collapse-thread>:set collapse_unread=$my_oldcollapse_unread<enter>' 'Collapse thread.'
-macro index '}' '{' '(Un)collapse thread.'
 # EXPL: Trick to open second copy of mutt to view mail beside editing answer
 # bind pager \Ce $TERMINAL -e mutt -R
+
+# bind index,pager  B  sidebar-toggle-visible
+bind index,pager  <Tab>     sidebar-toggle-visible
+bind index,pager  <BackTab> sidebar-toggle-visible
+bind index,pager  (  sidebar-prev
+bind index,pager  )  sidebar-next
+bind index,pager  _  sidebar-open
 
 
 # STD: \e[ulc] -- make word upper/lower/capital
@@ -77,14 +80,14 @@ bind index,pager  p  recall-message  # postponed
 bind index,pager  F  sync-mailbox
 bind index,pager  x  imap-fetch-mail # fetch-mail OR "!getmail" (external)
 
+bind index,pager  {  previous-new-then-unread
+bind index,pager  }  next-new-then-unread
+
 # HACK: show mailboxes list for current acc (BUT from root only)
 macro index 'h' '<change-folder>?<change-dir><home>^K=<enter>'
 
 ## Navigate
 bind index  l  display-message
-bind index \Ch collapse-thread
-bind index  c  collapse-thread
-bind index  z  collapse-all
 bind index  =  limit
 bind index "'" limit
 # EXPL: swap jk/JK for entry/undeleted
@@ -98,6 +101,14 @@ bind index  H  top-page
 bind index  L  bottom-page
 # bind index  <Down>  next-entry
 # bind index  <Up>    previous-entry
+
+## Collapsing
+# macro index \R '<read-thread><collapse-thread><next-unread>' 'Mark the current thread as read'
+macro index  c  ':set my_tmp=$collapse_unread<enter>:set collapse_unread<enter><collapse-thread>:set collapse_unread=$my_tmp<enter>' 'Collapse thread.'
+macro index \Ch 'c' '(Un)collapse thread'
+macro index \C? 'c' '(Un)collapse thread'
+macro index <BackSpace> 'c' '(Un)collapse thread'
+bind index  z  collapse-all
 
 ## Mark
 bind index  i  flag-message

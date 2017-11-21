@@ -49,15 +49,27 @@ set wait_key = no  # don't show prompt after shell/pipe cmds (show when ret!=0)
 ## Order for display of the header fields
 # hdr_order From: Resent-From: Reply-To: X-Mailer: User-Agent: Date: To: Cc: Subject:
 set indent_str="> "    # Set quotemark to 1 byte (WARN: ignored if $text_flowed=yes)
-set collapse_unread    # allow collapse unread messages
+unset collapse_unread   # keep unread threads uncollapsed -- mitigate BUG freeze on startup
+## SEE:(uncollapse_jump):  http://www.rdrop.com/docs/mutt/manual118.html
 # set uncollapse_jump    # jumps to first unread msg of thread on uncollapse
 set index_format="%M|%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
 set attach_format = "%u%D%I %t%4n %T%.100d%> [%.7m/%.10M, %.6e%?C?, %C?, %s] "
 set query_format = "%4c %t %-50.50a %-50.50n %?e?(%e)?"
-# %M
 # set index_format = "{%M} $index_format"
-# SEE uncollapse_jump
-#   http://www.rdrop.com/docs/mutt/manual118.html
+
+## Sidebar
+set sidebar_visible = no
+set sidebar_on_right = yes
+set sidebar_sort_method = 'unsorted'    # Sort: unsorted, count, flagged, new, path
+set sidebar_format = "%B%?F? [%F]?%* %?N?%N/?%S"
+set sidebar_width = 20                  # Plenty of space
+# set sidebar_divider_char = '│'          # Pretty line-drawing character
+set sidebar_short_path                  # Shorten mailbox names
+set sidebar_delim_chars = "/"           # Delete everything up to the last / character
+set sidebar_folder_indent               # Indent folders whose names we've shortened
+set sidebar_indent_string = "  "        # Indent with two spaces
+# set sidebar_new_mail_only               # Only mailboxes with new/flagged email
+# sidebar_whitelist INBOX adc/org my      # Always display these two mailboxes
 
 # NOTE: only in index; open in pager to apply func to current msg only.
 set auto_tag = yes          # auto-apply func to all tagged (w/o ';' prf)
