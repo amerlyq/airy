@@ -15,6 +15,10 @@ esac
 # CHG:USE:(pam-tmpdir) https://sources.debian.net/src/pam-tmpdir/
 #   BUG: sourced only into 'tmux -s $USER' session
 #     => $TMPDIR not present in other vte->tmux->xmonad
+#     => BUG: even PATH is not sourced when splitting tmux pane
+# zsh vs sh compatibility
+#   * usual zsh startup/shutdown scripts are not executed
+#   * Login shells source /etc/profile followed by $HOME/.profile
 if ! test -d "${TMPDIR-}"; then
   TMPDIR=/tmp/"${LOGNAME-}"
   mkdir -p -m 700 "$TMPDIR"
