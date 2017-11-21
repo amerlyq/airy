@@ -1,0 +1,20 @@
+#!/bin/bash -eu
+
+nm=$1
+path=~/.cache/airy/gpg/"${nm}".gpg
+
+if [[ ! $nm =~ ^[[:alnum:]/]+$ ]] ||
+   [[ $nm = /* ]] || [[ $nm = */ ]]; then
+  echo "Bad file name '$1', use only \w+ and /"
+  exit 1
+fi
+
+read -s -p "Password to save inside '$nm': " pp
+echo
+if [[ $pp =~ [[:blank:]] ]]; then
+  echo "Bad password, use only \S+"
+  exit 1
+fi
+
+mkdir -p "${path%/*}"
+gpg --use-agent --encrypt -o "$path" <<< "$pp"

@@ -1,0 +1,10 @@
+#!/bin/bash -eu
+set -o pipefail
+
+nm=$1
+path=~/.cache/airy/gpg/"${nm}".gpg
+
+if [[ -f $path && -s $path ]]; then
+  gpg --use-agent --quiet --batch --decrypt "$path"
+  # | grep -Fm1 "$key" | awk '{print$NF}'
+fi
