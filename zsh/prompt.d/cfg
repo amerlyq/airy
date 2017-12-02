@@ -5,7 +5,7 @@ function _prompt_color {
   local color=${1:-1}
   ## Change main color according to environment variables
   #if (( $(echotc Co) < 256 )) ? 1,2,4 : 124,112,27; fi
-  if [[ -n $SSH_TTY ]]; then color=${2:-2}
+  if [[ -n ${SSH_CONNECTION+x} ]]; then color=${2:-2}
     if [[ $HOST =~ vbox ]]; then color=${3:-4}; fi
   fi
 

@@ -8,7 +8,7 @@ if &cp||exists('g:loaded_trailing')|finish|else|let g:loaded_trailing=1|endif
 "{{{1 MAPS ====================
 noremap <unique> [Toggle]l :<C-u>set list! list?<CR>
 noremap <unique> [Toggle]L :<C-u>ToggleTrailingHighlight<CR>
-noremap <unique> [Toggle]t :<C-u>ToggleStripLines<CR>
+noremap <unique> [Toggle]t :<C-u>ToggleStripLines<Bar>ToggleStripSpaces<CR>
 
 noremap <unique> [Replace]E :<C-u>EmptyLinesCompress<CR>
 

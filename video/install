@@ -11,10 +11,11 @@ nvidia() { pkg_inst nvidia nvidia-utils lib32-nvidia-utils; }
 intel() { pkg_inst xf86-video-intel libva libva-intel-driver
           pkg_inst mesa mesa-libgl lib32-mesa-libgl; }
 
-# TODO: split in three submods: optimus,intel,nvidia
+# TODO: split into submods: {optimus,intel,nvidia,amd} -- and choose combo in profile
 if distro arch; then
     case "${CURR_PROF:?}"
-    in laptop|work) intel
+    in laptop|work|wlux) intel
+    ;; wlux) intel  # and AMD
     ;; home|neo) intel && nvidia  ## Optimus:
         pkg_inst bumblebee primus lib32-primus lib32-virtualgl
         pkg_inst bbswitch  # Only for laptops

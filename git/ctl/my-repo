@@ -8,7 +8,8 @@ cd "${1:-$PWD}"
 # git remote show origin | grep "Push *URL" | sed "s@.*:.*:\(.*\$\)@\1@"
 info="git:"
 
-if [[ ${CURR_PROF:?} == work ]]; then
+# BAD: explicit names => swap meaning MAIN_NAME for work and AIRY_PERSONAL_NAME for your own repos
+if [[ ${CURR_PROF:?} =~ ^(work|wlux)$ ]]; then
   git config --local user.name "${MAIN_NAME:?}"
   git config --local user.email "${MAIN_MAIL:?}"
   info+="($MAIN_NAME <$MAIN_MAIL>),"
