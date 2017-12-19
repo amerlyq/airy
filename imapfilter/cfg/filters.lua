@@ -10,6 +10,11 @@ function mv_from(acc, m, dst, tbl)
     m:contain_from(v):move_messages(acc[dst])
   end
 end
+function mv_to(acc, m, dst, tbl)
+  for i, v in pairs(tbl) do
+    m:contain_to(v):move_messages(acc[dst])
+  end
+end
 function mv_subj(acc, m, dst, tbl)
   for i, v in pairs(tbl) do
     m:contain_subject(v):move_messages(acc[dst])

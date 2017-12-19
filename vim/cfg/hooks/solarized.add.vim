@@ -18,3 +18,11 @@ let g:solarized_hitrail=0
 let g:solarized_bold=1
 let g:solarized_underline=1
 let g:solarized_italic=1
+
+" for vim-solarized8
+let g:solarized_use16 = 1
+let g:solarized_enable_extra_hi_groups = 1
+let g:solarized_old_cursor_style = 0
+let g:solarized_term_italics = 1
+let g:solarized_termtrans = 0
+" let g:solarized_visibility = "normal"

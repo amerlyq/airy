@@ -3,8 +3,9 @@
 # So, in mutt it is just a matter of hitting v to view the attached HTML and
 # then m to send it to mailcap. For convenience, I bind Enter to that function in muttrc.
 #text/html; vimprobtab.sh %s &; test=test -n "$DISPLAY"; needsterminal;
-text/html; r.b %s; test=test -n "$DISPLAY"; nametemplate=%s.html
-text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
+text/html; t="${TMPDIR:-/tmp}/mutt" \; mkdir -p "$t" \; cp -ft "$t" %s \; r.b "$t/$(basename %s)" &; test=test -n "$DISPLAY"; nametemplate=%s.html
+text/html; r.bt -d; copiousoutput; nametemplate=%s.html
+# text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
 # text/html; elinks -dump %s ; copiousoutput
 application/msword; antiword '%s'; copiousoutput; description=Word Document; nametemplate=%s.doc
 # application/pdf; pdftotext '%s' -; copiousoutput; description=PDF Document; nametemplate=%s.pdf

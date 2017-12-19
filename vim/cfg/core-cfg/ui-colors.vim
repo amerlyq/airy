@@ -59,6 +59,10 @@ fun! s:PatchColorScheme()
   " hi! GitGutterAdd ctermfg=green guifg=darkgreen
   " hi! GitGutterDelete ctermfg=red guifg=darkred
   " hi! GitGutterChangeDelete ctermfg=yellow guifg=darkyellow
+
+  " FIXED new "nvim/syntax/diff.vim"
+  hi! link diffLine Identifier
+  hi! link diffAdded Statement
 endf
 
 augroup PatchColorScheme

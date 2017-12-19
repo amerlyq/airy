@@ -4,8 +4,9 @@ source ~/.shell/func.d/packages
 #| compton  | 3d effects on workspace
 
 if distro arch; then
-    aur_inst compton-git
+  pkg_inst compton
+  # aur_inst compton-git
 
 elif distro ubuntu; then
-    pkg_inst compton
+  pkg_inst compton
 fi
