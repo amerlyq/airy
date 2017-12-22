@@ -228,6 +228,8 @@ class cd_shelldir(Command):
             return self.fm.notify(cd_shelldir.lastdir, bad=True)
 
         # FIXED: expanded pwd symlink teleporting
+        # BUG: cd to symlink dir, open ranger, do "cD" to reduce current dir, enter subshell
+        #   -> BAD: again inside symlink dir instead of readlinked one
         if path != fs.realpath(self.fm.thisdir.path) and fs.exists(path):
             self.fm.cd(path)
 
