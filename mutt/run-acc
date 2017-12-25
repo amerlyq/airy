@@ -11,4 +11,4 @@ choose(){ dmenu -p 'Mail:' -fn monospace:size=10 \
 (($#)) && { rc=$lib/$1; shift; } || rc=$lib/$(files "$lib" | choose)
 [[ -f $rc ]] || { r.n -U 'No muttrc:' "$rc"; exit 1; }
 # r.wm -w g  # Jump to game workspace
-exec mutt -F "$rc" "$@"
+exec neomutt -F "$rc" "$@"

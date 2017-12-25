@@ -52,7 +52,14 @@ bindkey '^U' backward-kill-line
 bindkey '\e[127;2u' backward-delete-char  # <S-BS>
 bindkey '\e[45;5u'  redo                  # <C-_>
 bindkey '\e[109;5u' .accept-line          # <C-m>
-bindkey -s '\e[32;2u' ' '                 # <S-Space>
+bindkey -s '\e[32;2u' ' '     # <S-Space>
+bindkey -s '\e[13;2u' '\n'    # <S-CR>
+bindkey -s '\e[13;3u' '\n'    # <A-CR>
+bindkey -s '\e[13;4u' '\n'    # <A-S-CR>
+bindkey -s '\e[13;5u' '\n'    # <C-CR>
+bindkey -s '\e[13;6u' '\n'    # <C-S-CR>
+bindkey -s '\e[13;7u' '\n'    # <C-A-CR>
+bindkey -s '\e[13;8u' '\n'    # <C-A-S-CR>
 # HACK: use 'redo' after pressing fixterm key and accidentally clearing cmdline
 bindkey -a '^_' redo
 

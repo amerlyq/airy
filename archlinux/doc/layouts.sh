@@ -171,6 +171,8 @@ mkdir -vp /data/{_dld,music,vm}
 ## FIXME: possible only after creating user
 chown -R ${myuser:?}:${myuser:?} /home/${myuser:?}{,sdk,.cabal,.cache}
 chmod -R 700 /home/${myuser:?}{,sdk,.cabal,.cache}
+# ALSO:
+# chownm /media/$myuser
 
 
 ## NOTE: bake fstab

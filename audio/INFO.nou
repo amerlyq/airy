@@ -22,6 +22,7 @@ Status
 Mixers
   $ amixer
   $ alsamixer  # TUI
+  $ amixer scontrols  # list mixers to be used by mpd
 
 Test microphone level -- tap and see output
   $ arecord -vvv -f dat /dev/null
@@ -30,6 +31,18 @@ Test pulseaudio
   $ pactl stat
   $ pactl list short sinks
   $ pacmd list-sinks
+
+Switch pulse output: Analog <-> HDMI
+  Auto-switch by udev rules
+    https://wiki.archlinux.org/index.php/PulseAudio/Examples#Automatically_switch_audio_to_HDMI
+    $ user=$(w -hs | awk -v vt=tty$(fgconsole) '$0 ~ vt {print $1}')
+    $ [[ $(</sys/class/drm/card0/*HDMI*/status) != connected ]] || sudo -u "$user" pactl --server "unix:/run/user/$(id -u "$user")/pulse/native" set-card-profile 0 output:hdmi-stereo+input:analog-stereo
+  https://bbs.archlinux.org/viewtopic.php?id=164868
+  $ pacmd list-cards | grep -B1 name:
+  $ pacmd list-cards | grep -A5 profiles: | cut -d' ' -f1
+  $ pacmd set-card-profile 0 output:analog-stereo+input:analog-stereo
+  $ pacmd set-card-profile 0 output:hdmi-stereo+input:analog-stereo
+    => NOTE: verify global volume and mute-off when switch to hdmi output
 
 Reorder audio cards
   http://superuser.com/questions/626606/how-to-make-alsa-pick-a-preferred-sound-device-automatically

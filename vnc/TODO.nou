@@ -1,0 +1,10 @@
+%%%% Remote desktop
+
+REMOTE:
+  $ paci x11vnc
+  NEED: running Xorg
+
+LOCAL:
+  $ paci tigervnc
+  $ ssh -t -L 5900:localhost:5900 user@host 'x11vnc -localhost -display :0'
+  $ vncviewer -PreferredEncoding=ZRLE localhost:0

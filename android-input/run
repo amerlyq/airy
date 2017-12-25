@@ -4,7 +4,7 @@ set -o pipefail
 trap 'exit' INT TERM ERR
 trap 'kill 0' EXIT
 
-r.b -- https://sketchboard.me &
+# r.b -- https://sketchboard.me &
 lsmod | grep -wF uinput >/dev/null || sudo modprobe uinput
 networktablet &
 sleep 0.5

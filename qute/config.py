@@ -1338,11 +1338,12 @@ c.url.start_pages = ['https://encrypted.google.com/search']
 ## The default zoom level.
 ## Type: Perc
 # c.zoom.default = '100%'
-c.zoom.default = '150%'
+c.zoom.default = '125%'
 
 ## The available zoom levels.
 ## Type: List of Perc
 # c.zoom.levels = ['25%', '33%', '50%', '67%', '75%', '90%', '100%', '110%', '125%', '150%', '175%', '200%', '250%', '300%', '400%', '500%']
+c.zoom.levels = ['50%', '75%', '85%', '90%', '95%', '100%', '105%', '110%', '115%', '120%', '125%', '130%', '140%', '150%', '175%', '200%', '300%', '400%', '500%']
 
 ## How much to divide the mouse wheel movements to translate them into
 ## zoom increments.

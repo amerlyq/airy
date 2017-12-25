@@ -14,6 +14,7 @@ augroup filetypedetect
   au BufRead,BufNewFile *.hla  setl ft=hla syntax=hla
   " Configuration
   au BufRead,BufNewFile {Gemfile,Gemfile.lock,Rakefile,Thorfile,Vagrantfile}  setl ft=ruby fdm=syntax fdn=1
+  au BufRead,BufNewFile *.reg   edit ++enc=utf16le
   " -- override default runtime mistake 'ft=hog'
   au BufRead,BufNewFile *.rules setl ft=udevrules
   au BufRead,BufNewFile *.otl   setl noet  " TEMP:REM*

@@ -148,6 +148,17 @@ RFC
   : ]
 
 TODO
+  [_] adjust size of fixed-size windows
+    * use size always less then single (current|smallest) monitor -- minus statusbars height
+      << because xmonad uses whole Xorg screen to eval window size
+    * use lower and upper bounds -- for low dpi on small screen and high dpi on big screen
+      => I use fixed font in "st" BUT it's indirectly related to system-wide dpi anyway
+    * similar total visible area of window (in terms of INFO quantity)
+    ? WTF when moving once spawned window between monitors E.G. scratchpads
+      =>? always use smaller screen as etalon ? -- everchanging window sizes may be annoying
+    E.G.
+      - htop/ncmpcpp/ipython
+      - copyq
   [_] M-b -- when has hidden -- use greenish color for wksp
     ? THINK how to combine 'CopyWindow' (blue) with 'Hidden' (green) ?
       ?? use markers instead of non-stacking colors

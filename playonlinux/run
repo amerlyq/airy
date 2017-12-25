@@ -1,6 +1,14 @@
 #!/bin/bash -eu
 set -euo pipefail
 
+# TODO: don't resize display
+#   * resize if eDP1 (laptop only)
+#   * don't resize if multi-monitor
+#   * OR: resize only targeted monitor
+#   * resize choosen monitor on demand
+#     => MAYBE: resize current monitor where mouse/keyboard focus lays (when you run M-i-g)
+#   * auto-choose correct mode 1280x768 or 1280x800 depending on monitor when r.video-resize 1/2/3
+
 lib=~/.config/airy/game
 on_exit=('r.video-single 1')
 
@@ -17,7 +25,7 @@ overlay(){ local nm=$1
 }
 
 game(){ [[ -n $1 ]] || exit; nm=$1
-  # overlay "$nm";
+  overlay "$nm";
   cmd=$lib/$nm
   [[ -f $cmd ]] || { r.n 'No such game' "$cmd"; exit 1; }
 }

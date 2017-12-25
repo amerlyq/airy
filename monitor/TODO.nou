@@ -40,6 +40,25 @@ DEV r.monitor-dpi
 
 
 TODO
+  2017-12-17 [X] reduced uw size 1920x800
+    $ cvt 1920 800 60 | sed -n '2s/^\w\+\s//p'
+    $ xrandr --newmode 1920x800 125.00 1920 2024 2216 2512 800 803 813 831 -hsync +vsync
+    $ xrandr --addmode DP1 1920x800
+    $ xrandr --output DP1 --mode 1920x800
+    $ xrandr --output DP1 --auto
+  [_] TRY: disable blinking led on LG monitor OR control backlight
+    UDEV  [3476.637736] change   /devices/pci0000:00/0000:00:02.0/drm/card0/card0-eDP-1/intel_backlight (backlight)
+      BUG: why backlight changes when I plug-in/out external monitor ?
+        MAYBE: due to short blink of laptop screen's LED when xrandr runs
+  [_] TODO: ignore udev events when going to sleep -- don't disable external monitor
+    BAD: usb devices also re-init (remove+add) when going to standby
+      ? MAYBE this behavior only when picture through USB3.1 ?
+        CHECK: standby with picture through HDMI
+    * multiple "change" events
+  [_] BUG: multiple identical "change" events from udev on monitor plug-in/out
+    * ignore by rules all the initial events, where choosen properties are empty
+    * in script check monitor state (?what and where?) and ignore subsequent events
+    * enable or disable monitor depending on current state -- don't "refresh" unconditionally
   [_] THINK:CHECK:BAD? if two identical monitors have the same edid/hash ?
     => how to construct their `id` ?
   2017-03-12 [X] DEV: allow matching on first 8..40 symbols instead of whole edid-hash

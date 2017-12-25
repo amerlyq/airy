@@ -6,3 +6,13 @@ Copy directory
   :shell -w rsync -rain --size-only %f/ %F
   $ rsync -rvz --no-perms --no-owner --no-group ...
   https://www.electrictoolbox.com/rsync-ignore-existing-update-newer/
+
+Move directory
+  https://unix.stackexchange.com/questions/43957/using-rsync-to-move-not-copy-files-between-directories
+  dry-run: -n
+  move into current dir
+    $ rsync -avh --stats --progress --remove-source-files /path/old .
+  move and rename
+    $ rsync -avh --stats --progress --remove-source-files /path/old/ /path/new
+  delete empty source dirs skeleton afterward
+    $ find /path/old -depth -type d -empty -delete
