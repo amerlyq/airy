@@ -42,6 +42,7 @@ DEV r.monitor-dpi
 TODO
   2017-12-17 [X] reduced uw size 1920x800
     $ cvt 1920 800 60 | sed -n '2s/^\w\+\s//p'
+    OR:(?old?): $ gtf 1280 720 60
     $ xrandr --newmode 1920x800 125.00 1920 2024 2216 2512 800 803 813 831 -hsync +vsync
     $ xrandr --addmode DP1 1920x800
     $ xrandr --output DP1 --mode 1920x800

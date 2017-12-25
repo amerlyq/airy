@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+# tags: core driver ctrl
+# deps: video-intel video-nvidia
+source ~/.shell/func.d/cfgsetup
+
+# die "!!! Re-login X session or reboot to update changes in Groups"
+id | grep -qwF bumblebee || sudo gpasswd -a "${LOGNAME:?}" bumblebee
+svc_activate -e bumblebeed

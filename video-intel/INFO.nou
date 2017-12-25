@@ -1,0 +1,18 @@
+Manual installation of Intel driver
+  SEE https://01.org/linuxgraphics/downloads
+  You must install 'intel-linux-graphics-installer'
+  On mint 17 you also must change vendor in file '/etc/lsb-release'
+  So intel could update
+      DISTRIB_ID=Ubuntu
+      DISTRIB_RELEASE=14.04
+      DISTRIB_CODENAME=trusty
+      DISTRIB_DESCRIPTION="Ubuntu 14.04 LTS"
+  Then 'sudo intel-linux-graphics-installer'
+  After update, 'glxinfo| grep -i opengl'
+  NOTE: MUST NOT have llvmpipe -- it's software renderer
+
+Workarounds:
+  ::: Mesa warning: couldn't open libtxc_dxtn.so, software DXTn compression / decompression unavailable
+  This may be needed to run games using textures in the S3TC format.
+  $ pkg_inst libtxc-dxtn-s2tc0 libtxc-dxtn-s2tc0:i386
+  $ pkg_inst xserver-xorg-video-intel mesa-utils

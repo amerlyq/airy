@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+# USE: mesa-demos for glxinfo
+pkg_inst xf86-video-intel libva libva-intel-driver mesa mesa-libgl lib32-mesa-libgl
+pkg_inst vulkan-intel  # Only neo
