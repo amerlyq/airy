@@ -1,6 +1,23 @@
-#!/bin/bash -e
-source ~/.shell/func.d/packages
+#!/bin/bash -eu
+source ~/.shell/func.d/system
 distro arch || exit
+
+## Install pacaur from AUR without yaourt
+# SEE: https://gist.github.com/Tadly/0e65d30f279a34c33e9b
+# NEED: binutils make gcc fakeroot pkg-config git
+has_pkg(){ command pacman -Qq "$1" &>/dev/null; }
+mk_pkg(){ local aur='https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD'
+  mkdir -p /tmp/paci && cd /tmp/paci && trap 'rm -rf /tmp/paci' EXIT
+  curl -o PKGBUILD "$aur?h=$1"
+  makepkg PKGBUILD --skippgpcheck --install --needed
+}
+has_pkg expac || sudo pacman -S --asdeps expac
+has_pkg yajl  || sudo pacman -S --asdeps yajl
+has_pkg cower || mk_pkg cower
+has_pkg pacaur|| mk_pkg pacaur
+
+
+source ~/.shell/func.d/packages
 
 # ATT: abs deprecated from 20170515, use asp
 pkg_inst pacman
