@@ -1357,7 +1357,7 @@ c.zoom.levels = ['50%', '75%', '85%', '90%', '95%', '100%', '105%', '110%', '115
 
 ## Bindings for normal mode
 config.bind(',d', 'tab-close')
-config.bind(',a', 'hint links spawn -- r.wgett -o /home/media/amv -c mpv "{hint-url}"')
+config.bind(',a', 'hint links spawn -- r.wgett -o /data/amv -c mpv "{hint-url}"')
 config.bind(',b', 'set content.host_blocking.enabled true')
 config.bind(',B', 'set content.host_blocking.enabled false')
 config.bind(',m', 'hint links spawn -- mpv "{hint-url}"')

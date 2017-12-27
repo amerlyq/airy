@@ -17,7 +17,7 @@ ost="$(VBoxManage list ostypes | awk '/^ID:/{a=$NF} /^Desc.*'"$patt_nm"'/{print 
 case "${CURR_PLTF?}"
 in Linux)
     sudo="sudo"
-    VMs="/home/media/VMs"
+    VMs="/data/VMs"
     SERIAL="/tmp/vbox-${VNM:?}"
 
 ;; MINGW)

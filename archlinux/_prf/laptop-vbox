@@ -26,9 +26,9 @@ SYS_PREF="/dev/mapper/lvm-"      # OR: pr="/dev/$gr/"
 #| media | Large binary files
 
 ## Order determines disk layout
-SYS_PART=( boot swap  root   home   media )
+SYS_PART=( boot swap  root   home   data )
 SYS_SIZE=( 200M   1G    8G     4G  '+100%FREE' )
-SYS_MNT=( /boot    %     /  /home  /home/media)
+SYS_MNT=( /boot    %     /  /home  /data)
 SYS_FS=(   ext4 swap btrfs  btrfs  ext4 )
 
 # Separate partition in lvm for source files -- ReiserFS

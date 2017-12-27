@@ -4,7 +4,7 @@ source ~/.shell/profile
 
 case "${CURR_PROF:?No}"
 in home) dir=/media/${CURR_USER:?No}/Umi/Music/++
-;; *) dir=/home/media/music/++
+;; *) dir=/data/music/++
 esac
 case "$1" in -l) ls "$dir/${2?}"; exit ;; esac
 

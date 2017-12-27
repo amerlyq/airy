@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Run from /home/media/_play/wineprefix/$game/drive_c/users/amer
+# Run from /games/_play/wineprefix/$game/drive_c/users/amer
 
 lst=(
   'Desktop'
@@ -12,5 +12,5 @@ lst=(
 for L in "${lst[@]}"; do
   [[ -L $L || ! -e $L ]]
   rm "$L"
-  ln -svf /home/media/_play/_saves "$L"
+  ln -svf /games/_play/_saves "$L"
 done

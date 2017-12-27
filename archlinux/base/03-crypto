@@ -44,15 +44,15 @@ vgs
 # lvcreate lvm -Wy --yes -L 4G -C y -n swap
 lvcreate lvm -Wy --yes -L 40G -n root
 lvcreate lvm -Wy --yes -L 40G -n home
-lvcreate lvm -Wy --yes -l +100%FREE -n media
+lvcreate lvm -Wy --yes -l +100%FREE -n data
 lvs
-# ALSO:(if needed):$ lvremove /dev/lvm/media
+# ALSO:(if needed):$ lvremove /dev/lvm/data
 
 # Format
 # mkswap -f /dev/mapper/lvm-swap
 mkfs.btrfs -f /dev/mapper/lvm-root
 mkfs.btrfs -f /dev/mapper/lvm-home
-mkfs.ext4 /dev/mapper/lvm-media
+mkfs.ext4 /dev/mapper/lvm-data
 
 # Mount
 # swapon /dev/mapper/lvm-swap
@@ -61,8 +61,8 @@ mkdir /mnt/boot
 mount /dev/nvme0n1p1 /mnt/boot
 mkdir /mnt/home
 mount -o compress=lzo,autodefrag /dev/mapper/lvm-home /mnt/home
-mkdir /mnt/home/media
-mount /dev/mapper/lvm-media /mnt/home/media
+mkdir /mnt/data
+mount /dev/mapper/lvm-data /mnt/data
 mkdir -vp /mnt/hostrun && mount --bind /run /mnt/hostrun
 
 # Create loader.conf
