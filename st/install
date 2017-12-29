@@ -7,6 +7,21 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   # [[ $FONT_ST ]] || FONT_ST=$(( dpi * 9/72 + 1))
+
+  # BUG: can't override font size from environment BUT: is it robust to allow this ?
+  #   $ FONT_ST=20 r.airy -a st
+  echo AAAA:$FONT_ST
+
+  # BUG: no errfail when
+  #   st-airy-git and st-amerlyq-git are in conflict (st). Remove st-amerlyq-git? [y/N]
+  #   ???
+  # BUG: can't update pkg with new font size
+  #   ==> Installing package st-airy-git with pacman -U...
+  #   warning: st-airy-git-1:0.7.41.g1f24bde-1 is up to date -- skipping
+  #   ::: pacx st-airy-git
+  # BUG: can't rebuild pkg because of already built one
+  #   WARNING: A package has already been built, installing existing package...
+  #   ::: rm ~/.cache/airy/pkg/st-airy-git/*.tar.xz
   loc_inst -P 'st-airy-git' ./PKGBUILD FONT_ST="${FONT_ST-}"
 
   # CHECK? if some needed
