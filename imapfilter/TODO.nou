@@ -5,7 +5,24 @@ SEE
 DEBUG
   $ lua config.lua
 
+DEBUG manual imap commands (when filters don't work)
+  http://www.offlineimap.org/server/imap/error/2016/01/27/error-no-such-number.html
+  http://www.faqs.org/rfcs/rfc3501.html
+  https://busylog.net/telnet-imap-commands-note/https://busylog.net/telnet-imap-commands-note/
+  $ telnet localhost 1143
+    NOTE: on telnet connect look for correct 301 in $ s.L davmail
+    #   2018-01-03 18:48:23,248 DEBUG [ImapConnection-43130] davmail.exchange.ExchangeSession  - Test configuration status: 301
+    . login user passwd
+    . list "" "*"
+    . select INBOX
+    . uid search all FROM "user"
+    . uid search all TO "@example.com"
+
 DEV
+  [_] DEV: conditional execution
+    * ignore some parts of config on demand
+      E.G filtering spam requires too much time for single run when debugging
+
   USE:DEBUG: get and print available mailboxes and folders
     accs[1].INBOX:check_status()
     mboxes, folders = acc:list_all()
@@ -33,6 +50,17 @@ DEV
     spam:move_messages(acc['Spam'])
 
 BUG
+  [_] BUG:(.lua): slow -- :inbox:move_messages() doesn't remove messages from VAR
+    * every msg -- even already moved ones -- are compared to patterns
+    FIND: advanced configuration examples, where some msgs "removed" from inbox VAR
+    SEE man imapfilter_config
+    MAYBE: always use acc['INBOX'] instead of VAR -- query current state each time
+  [_] ERR?
+    C (5): 1000 NOOP
+    S (5): 1000 BAD command authentication required
+    imapfilter: IMAP (5): 1000 BAD command authentication required
+  [$] BUG:(davmail): no search results by -- contain_to() / contain_from()
+    https://sourceforge.net/p/davmail/bugs/626/
   [~] MAYBE:BUG: contain_cc() / contain_subject() not supported by davmail
     https://github.com/lefcha/imapfilter/issues/11
     BUG? https://github.com/lefcha/imapfilter/issues/93
