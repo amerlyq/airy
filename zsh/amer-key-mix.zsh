@@ -50,6 +50,7 @@ bindkey '^U' backward-kill-line
 #   <S-BS>  ->  ^[[127;2u  ->  <Esc>..u  ->  undo all typed text in vicmd mode
 # FIXED: redefine key sequences
 bindkey '\e[127;2u' backward-delete-char  # <S-BS>
+bindkey '\e[127;5u' backward-delete-char  # <C-BS>
 bindkey '\e[45;5u'  redo                  # <C-_>
 bindkey '\e[109;5u' .accept-line          # <C-m>
 bindkey -s '\e[32;2u' ' '     # <S-Space>

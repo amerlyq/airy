@@ -1,4 +1,4 @@
 # WARN: no way to distinguish plug/unplug events for HDMI
-SUBSYSTEM=="drm", ACTION=="change", DEVLINKS=="?*", TAG+="systemd", RUN+="/bin/systemctl start --no-block monitor-hotplug@%p.service"
+SUBSYSTEM=="drm", ACTION=="change", TAG+="systemd", RUN+="/bin/systemctl start --no-block monitor-hotplug@%p.service"
 # BAD: works only for ACTION="add"
 # ENV{SYSTEMD_WANTS}="monitor-hotplug.service"

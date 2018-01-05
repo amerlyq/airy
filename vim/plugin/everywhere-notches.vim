@@ -4,6 +4,10 @@
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has('autocmd') || v:version <= 701 | finish | endif
 
+" IDEA: mark text by color specified in notch
+"   "RED: ..." -- rest of line
+"   "RED! ..." -- whole line from beginning
+
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 let s:patterns = [
   \ ['Err', 196, '#ff2525', 'ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|FAIL%(ED)?|CRIT%(ICAL)?'],
@@ -11,7 +15,7 @@ let s:patterns = [
   \ ['Alt', 178, '#dfaf00', 'ALT|OR|CASE|THINK|IDEA|CHG|CMP|I\.E|EXAM%(INE)?'],
   \ ['Dev',  33, '#0087ff', 'DEV|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECIDE'],
   \ ['Tbd', 169, '#ff5faf', 'TODO|CHECK|TRY|MOVE|NOT|REQ%(UIRE)?|MAYBE'],
-  \ ['Inf',  38, '#00afdf', 'INFO?|VAR|VIZ|ALG|IMPL'],
+  \ ['Inf',  38, '#00afdf', 'INFO?|VAR|VIZ|ALG|IMPL|ARCH|TALK|SECU%(RITY)?'],
   \ ['Fix', 202, '#ff5f00', 'BUT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
   \ ['Did', 243, '#767676', 'DONE|FIXED|EXPL%(AIN)?|TEMP|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?'],
   \ ['Msg',  62, '#5f5fdf', 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|DEP%(ENDS)?'],

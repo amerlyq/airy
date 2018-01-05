@@ -16,9 +16,10 @@ ACTION=="remove", ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/usr/
 ACTION!="add|change", GOTO="wacom_end"
 
 ## Provide path
+# BET:TRY: to use system path -- maybe it's mapped correctly on new kernels
 ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c 'p=$sys%p; ln -s ${p%/*/*/*}/wacom_led /tmp/wacom_led'"
 ## Give the users group permissions to set Wacom device LEDs.
-ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c 'chown :users /tmp/wacom_led/*"
+ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c '/bin/chgrp leds /tmp/wacom_led/*'"
 
 # WARN:XXX: may conflict simultaneous usb and wireless connect
 

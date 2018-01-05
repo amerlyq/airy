@@ -17,6 +17,7 @@ fi
 # DFL path defined in /etc/profile, package extensions are at /etc/profile.d/*
 # TODO: distribute to ./env inside |airy/{ruby,cabal}| similar to /etc/profile.d/*
 #   => symlink into ~/.config/airy/env/<group.mod> -- to source by all
+# NEW: $(ruby -rubygems -e "puts Gem.user_dir")/bin
 hash ruby 2>/dev/null && PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
 hash cabal 2>/dev/null && PATH=~/.cabal/bin:$PATH
 PATH=~/.bin:$PATH
