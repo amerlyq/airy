@@ -1,7 +1,4 @@
 #!/bin/bash
-# SEE: upower -i /org/freedesktop/UPower/devices/battery_BAT0
-
-# ALT: acpi | awk '$9=substr($4,1,match($4,"%")-1) {print $9}'
 
 DIR=$(echo /sys/class/power_supply/BAT* | awk '{print $1}')
 if [ ! -d "$DIR" ]; then exit 33; fi
@@ -42,4 +39,3 @@ if [ $( cat "$DIR/present" ) -eq 1 ]; then
 else bat="☯"; color="#FF00AA"; fi
 
 printf "$bat\n$bat\n${color:+$color\n}"
-
