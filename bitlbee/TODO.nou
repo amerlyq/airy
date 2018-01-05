@@ -5,6 +5,12 @@ REF
 
 
 TODO
+  [_] move to two-factor auth to store passwords on system and auto-login on boot
+    SECU:
+      https://security.googleblog.com/2013/02/an-update-on-our-war-against-account.html
+      https://duo.com/blog/bypassing-googles-two-factor-authentication
+      https://www.microsoft.com/en-us/research/publication/so-long-and-no-thanks-for-the-externalities-the-rational-rejection-of-security-advice-by-users/?from=https%3A%2F%2Fresearch.microsoft.com%2Fpubs%2F80436%2FSoLongAndNoThanks.pdf
+    ? how to make root-only readable config-embedded passwords for programs which run as user ?
   [_] DEV cfg scripts to setup all channels through $ r.irc-cfg
     CMP with native cfg of bitlbee server
   [_] TODO setup OTR for secure messaging https://otr.cypherpunks.ca/
@@ -43,6 +49,9 @@ skypeweb
   [_] BUG private messages received when you was offline aren't delievered on connection
   [_] BUG long lines are splitted in multiple messages
   [_] BUG multiline messages <C-S-v> -- loose some messages -- changing status to "Edited"
+  [_] BUG: typing notice isn't shown
+  [_] BUG: immediate multiline send after multiline paste on <C-Y> -- NEED add more text
+  [_] BUG: for skype "private" doesn't route messages in sep window
   [_] NEED send/receive multiline msg
     bitlbee
       https://wiki.bitlbee.org/SendNewlines
