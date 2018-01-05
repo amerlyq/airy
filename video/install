@@ -1,5 +1,6 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/packages
 
-# DFL: fallback
-pkg_inst xf86-video-vesa
+# NOTE: use it as fallback BUT only for old hardware
+#   => otherwise kernel fallbacks to modesetting
+# pkg_inst xf86-video-vesa

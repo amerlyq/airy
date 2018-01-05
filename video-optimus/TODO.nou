@@ -1,0 +1,68 @@
+TUT
+  bumblebee setup
+    https://gist.github.com/cpburnz/21694595b6dfffebf964
+
+
+BUG:
+  2017-08-06 [X] primus: fatal: failed to load any of the libraries: /usr/lib/nvidia/libGL.so.1:/usr/lib32/nvidia/libGL.so.1
+    $ primusrun glxgears -info
+    ::: packaging and bumblebee config changed on update
+      https://bbs.archlinux.org/viewtopic.php?id=223989
+    FIXED $ sudo mv /etc/bumblebee/bumblebee.conf{.pacnew,} && S.rr bumblebeed
+
+
+%%%% DEBUG
+
+Active VGA
+  If "nvidia" dGPU is running
+    $ cat /proc/acpi/bbswitch
+      0000:01:00.0 OFF
+  Which renderer is in use
+    $ glxinfo | grep -E "OpenGL (vendor|renderer)"
+    # OpenGL renderer string: Mesa DRI Intel(R) HD Graphics 630 (Kaby Lake GT2)
+    $ optirun glxinfo | grep -E "OpenGL (vendor|renderer)"
+    # OpenGL renderer string: GeForce GTX 1050/PCIe/SSE2
+  Which GPU is active VGA controller
+    $ lspci -vnnn | perl -lne 'print if /^\d+\:.+(\[\S+\:\S+\])/ and /VGA/'
+    # 00:02.0 VGA compatible controller [0300]: Intel Corporation Device [8086:591b] (rev 04) (prog-if 00 [VGA controller])
+      = Any controller with [VGA controller] at the end is your currently active GPU
+  Try enlist nvidia cards (HACK: fails when nvidia is unloaded)
+    $ nvidia-smi -L
+    $ optirun nvidia-smi -L
+  Look dmesg messages after using "optirun"
+    $ dmesg | tail
+    * [ 5894.978265] bbswitch: enabling discrete graphics
+      [ 5895.247937] nvidia-nvlink: Nvlink Core is being initialized, major device number 240
+      [ 5895.248171] NVRM: loading NVIDIA UNIX x86_64 Kernel Module  387.34  Tue Nov 21 03:09:00 PST 2017 (using threaded interrupts)
+      [ 5895.845067] nvidia-modeset: Loading NVIDIA Kernel Mode Setting Driver for UNIX platforms  387.34  Tue Nov 21 02:09:45 PST 2017
+      [ 5895.845740] nvidia-modeset: Allocated GPU:0 (GPU-3180af44-63c4-de95-03ce-ae79ac84a2f6) @ PCI:0000:01:00.0
+      [ 5895.845837] nvidia-modeset: Freed GPU:0 (GPU-3180af44-63c4-de95-03ce-ae79ac84a2f6) @ PCI:0000:01:00.0
+      [ 5896.618081] nvidia-modeset: Unloading
+      [ 5896.654205] nvidia-nvlink: Unregistered the Nvlink Core, major device number 240
+    * [ 5896.696117] bbswitch: disabling discrete graphics
+
+
+Power saving
+  2017-12-31 [X] does power saving activates when dGPU is disabled ?
+    << dmesg
+      [ 5896.696117] bbswitch: disabling discrete graphics
+      [ 5896.713878] pci 0000:01:00.0: Refused to change power state, currently in D0
+    ::: ignore it, dGPU is disabled too fast -- only check if state is OFF in $ cat /proc/acpi/bbswitch
+      https://github.com/Bumblebee-Project/Bumblebee/issues/664
+
+  Force shutdown of dGPU == idle temperature drops ~50C -> ~42C
+    bbswitch == find current active card and manually ON/OFF nvidia card
+      $ cat /proc/acpi/bbswitch
+      # 0000:01:00.0 OFF
+      $ sudo echo ON >> /proc/acpi/bbswitch
+
+    ALT: acpi signals
+      $ paci acpi_call && reboot
+      $ sudo modprobe acpi_call
+      $ sudo /usr/share/acpi_call/examples/turn_off_gpu.sh
+        # Trying \_SB.PCI0.PEG0.PEGP._OFF: works!
+      [make persistent]
+      $ echo acpi_call | sudo tee /etc/modules-load.d/acpi_call.conf
+      $ cat /etc/tmpfiles.d/acpi_call.conf
+        # w /proc/acpi/call - - - - \\_SB.PCI0.PEG0.PEGP._OFF
+      => it writes specific OFF signal into /proc/acpi/call

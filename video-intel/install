@@ -1,6 +1,12 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/packages
 
+## BAD: "intel" is not recommended anymore
+#   https://bugs.freedesktop.org/show_bug.cgi?id=96572
+# DFL: now built-in "modeset" driver is preffered over
+# BUT: xbacklight don't work with "modeset" driver
+# pkg_inst xf86-video-intel
+
 # USE: mesa-demos for glxinfo
-pkg_inst xf86-video-intel libva libva-intel-driver mesa mesa-libgl lib32-mesa-libgl
-pkg_inst vulkan-intel  # Only neo
+pkg_inst libva libva-intel-driver mesa mesa-libgl lib32-mesa-libgl
+pkg_inst vulkan-intel  # ATT: remove if not supported by hardware
