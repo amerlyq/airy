@@ -1,0 +1,19 @@
+#!/bin/bash -eu
+# tags: core net
+source ~/.shell/func.d/cfgsetup
+
+ifcs(){ command ip link | sed -rn '/^[0-9]+:\s+('"$1"'\w+):.*$/{s//\1/p}'; }
+# WARN: prefer first found card
+efc=$(ifcs e | head -1)
+wfc=$(ifcs w | head -1)
+
+# NOTE: to prefer static IP :: ExcludeAuto=no AND Priority=2
+[[ $efc ]] && svc_activate -e "netctl-ifplugd@$efc.service"
+# NEED: Security=wpa-configsection | Security=wpa AND priority=... | ExcludeAuto=yes
+[[ $wfc ]] && svc_activate -e "netctl-auto@$wfc.service"
+# USAGE: switch between wifi networks: $ netctl-auto
+
+# EXPL: disable boot-time connect to network
+while IFS= read -r nm; do st=$(netctl is-enabled "$nm")
+  [[ $st != enabled ]] || sudo netctl disable "$nm"
+done < <(find /etc/netctl -maxdepth 1 -type f -printf '%f\n')
