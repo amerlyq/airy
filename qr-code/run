@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+set -o pipefail
+
+data=$1
+
+qrencode -s6 -o- "$data" | display -
