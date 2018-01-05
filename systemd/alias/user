@@ -10,7 +10,6 @@ alias s.s='s.u status'
 alias s.f='s.u --failed'
 alias s.t='s.u stop'
 
-alias s.a='s.u --all'
 alias s.f='s.u --failed'
 alias s.g='s.u list-dependencies'
 alias s.i='s.u list-unit-files'
@@ -21,6 +20,8 @@ alias s.v='s.u show-environment'
 alias s.vi='s.u import-environment'
 alias s.vs='s.u set-environment'
 
+alias s.ls='s.u --all --type=service'       # list services
+alias s.lsa='s.u --all'                     # show all units (w/ inactive and following)
 alias s.l='journalctl --user -u'            # full status log for unit
 alias s.b='journalctl --user -b -u'         # log starting current boot
 alias s.L='journalctl --user -f -o cat -u'  # tail current status

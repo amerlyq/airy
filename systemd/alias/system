@@ -11,6 +11,8 @@ alias S.s='systemctl status'
 alias S.f='S.u --failed'
 alias S.t='S.u stop'
 
+alias S.ls='systemctl --all --type=service' # list services
+alias S.lsa='systemctl --all'               # show all units (w/ inactive and following)
 alias S.l='journalctl -u'
 alias S.b='journalctl -b -u'
 alias S.L='journalctl -f -o cat -u'
