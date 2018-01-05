@@ -3,9 +3,12 @@
 # deps: xorg feh wm
 source ~/.shell/func.d/cfgsetup
 
-# NOTE: disabled hotplug -- irritating at work, need DISPLAY on init install
 
 ### GENS ###
+# DISABLED: -- irritating at work, need DISPLAY on init install, don't work for VGA on startup anyway
+#   MAYBE: don't work for any port on startup at all
+#     TODO: create .service, which runs hotplug before XMonad OR run "monitor-hotplug" itself
+# BAD: will be refreshed on each event (can be multiple) from each port of multiple monitors
 svc_activate -cE monitor-hotplug@.service
 
 ### LINKS ###

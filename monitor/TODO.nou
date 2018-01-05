@@ -40,6 +40,10 @@ DEV r.monitor-dpi
 
 
 TODO
+  [_] DEV: generate xorg.conf of current xrandr settings for multi-monitor setup
+    https://wiki.archlinux.org/index.php/Multihead#Example:_dualhead_configuration_using_relative_coordinates
+    ALT: start custome xrandr/monitor.service to trigger
+    [_] CHECK: if Xorg fails to startup when some of monitors are missing
   2017-12-17 [X] reduced uw size 1920x800
     $ cvt 1920 800 60 | sed -n '2s/^\w\+\s//p'
     OR:(?old?): $ gtf 1280 720 60
@@ -47,6 +51,8 @@ TODO
     $ xrandr --addmode DP1 1920x800
     $ xrandr --output DP1 --mode 1920x800
     $ xrandr --output DP1 --auto
+    ADD: to initial xorg.conf
+      https://wiki.archlinux.org/index.php/xrandr#Permanently_adding_undetected_resolutions
   [_] TRY: disable blinking led on LG monitor OR control backlight
     UDEV  [3476.637736] change   /devices/pci0000:00/0000:00:02.0/drm/card0/card0-eDP-1/intel_backlight (backlight)
       BUG: why backlight changes when I plug-in/out external monitor ?
