@@ -1,0 +1,22 @@
+#!/bin/bash -eu
+#%USAGE: -- supports 'grep' arguments
+#%  ./$0 'abc' -- search words/phrase containing 'abc'
+#%  ./$0 -x 'abc\w+' -- search whole words starting with 'abc'
+set -o pipefail
+
+db=~/.cache/airy/dict.index
+
+[[ -t 1 ]] && exec > >(sed -ru "
+  s|${@: -1}|$(tput setaf 3)$(tput bold)\0$(tput sgr0)|g
+")
+
+ldicts(){ find -H /usr/share/dictd -type f -name '*.index' "${@:--print0}"; }
+while IFS= read -r -d $'\0' f; do
+  [[ $db -ot $f ]] || continue
+  ldicts -exec cut -d$'\t' -f1 {} \+ | LC_ALL=C sort -u > "$db"
+  break
+done < <(ldicts)
+
+# NOTE: zgrep = 0.4 sec, BUT: db 60MB -> 13MB
+#   MAYBE: zgrep is better on HDD
+exec grep -E "$@" "$db"
