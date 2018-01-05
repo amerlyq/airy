@@ -1,4 +1,6 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst xorg-xbacklight
+# WARN: xbacklight don't work with new DFL "modeset" driver
+#   => USE: $ r.backlight-sys-mon
+# pkg_inst xorg-xbacklight

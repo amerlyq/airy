@@ -1,0 +1,5 @@
+ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp %{LED_GRP} /sys/class/backlight/%k/brightness"
+ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chmod g+w /sys/class/backlight/%k/brightness"
+# NOTE: maybe no need -- being regulated through dbus by UPower
+ACTION=="add", SUBSYSTEM=="leds", RUN+="/bin/chgrp %{LED_GRP} /sys/class/leds/%k/brightness"
+ACTION=="add", SUBSYSTEM=="leds", RUN+="/bin/chmod g+w /sys/class/leds/%k/brightness"

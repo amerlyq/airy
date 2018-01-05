@@ -129,6 +129,12 @@ system =
   , ("M-C-S-\\" , kill)
   , ("M-S-z"    , spawn "r.lock")
   -- , ("M-C-S-\\" , spawn "~/.i3/ctl/wnd_active_kill") -- FIXME
+  , ("<XF86KbdBrightnessDown>", spawn "r.backlight-kbd-sys -n -")
+  , ("<XF86KbdBrightnessUp>", spawn "r.backlight-kbd-sys -n +")
+  , ("<XF86MonBrightnessDown>", spawn "r.backlight-mon-sys -n -")
+  , ("<XF86MonBrightnessUp>", spawn "r.backlight-mon-sys -n +")
+  , ("<XF86TouchpadToggle>", spawn "r.touchpad-tgl")
+  , ("<XF86PowerOff>", spawn "r.core shutdown")
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
 
@@ -145,9 +151,10 @@ system =
     , ("x", restart "xmonad" True)
     , ("j", spawn "r.xmonad-rebuild")
     , ("-", spawn "r.monitor-off")
+    , ("0", spawn "r.backlight-mon-sys -n 100%")
     ],
-    map (second spawn) $ feedCmd "xbacklight -set" $ mconcat
-    [ [ (i, i ++ "0")   | i <- map show [1..9] ]
-    , [ (" 0 " ++ i, i) | i <- map show [1..9] ]
+    map (second spawn) $ feedCmd "r.backlight-mon-sys -n" $ mconcat
+    [ [ (i, i ++ "0%")         | i <- map show [1..9] ]
+    , [ (" ` " ++ i, i ++ "%") | i <- map show [1..9] ]
     ]
   ]

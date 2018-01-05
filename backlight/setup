@@ -1,0 +1,17 @@
+#!/bin/bash -eu
+# deps: power
+#   NOTE: "upower" required for dbus-activated kbd backlight
+# tags: driver
+source ~/.shell/func.d/cfgsetup
+
+export LED_GRP=leds
+grep -q "^$LED_GRP:" /etc/group || sudo groupadd -r "$LED_GRP"
+groups | grep -qwF leds || sudo gpasswd -a "${LOGNAME:?}" "$LED_GRP"
+
+d=${TMPDIR:-/tmp}
+env-subs {unit,"$d"}/90-backlight.rules
+linkcp -ct '/etc/udev/rules.d' "$d/90-backlight.rules"
+
+if cfgOpt u; then
+  sudo udevadm control --reload-rules
+fi

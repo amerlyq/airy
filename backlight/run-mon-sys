@@ -1,0 +1,35 @@
+#!/bin/bash -eu
+#%USAGE: add user to group 'leds', otherwise 'sudo' is required
+#%  (-n) notify pop-up
+#%  (-u) unrestricted low backlight -- allow less then 5%
+set -o pipefail
+O=; while getopts 'nr' o; do O+=$o; done; shift $((OPTIND-1))
+
+val=${1-}
+dev=intel_backlight
+dir=/sys/class/backlight/$dev
+
+set_led(){ local val=$1
+  val=$((val > max ? max : val < 0 ? 0 : val))
+  [[ $O =~ u ]] || ((val < max / 20)) && val=$((max / 20))
+  [[ -w $dir/brightness ]] || sudo=sudo
+  ((val == cur)) || ${sudo-} tee "$dir/brightness" <<< "$val"
+  [[ ! $O =~ n ]] || r.n $'\U0001F4A1' "$((val*100/max))%"
+}
+
+max=$(<"$dir/max_brightness")
+cur=$(<"$dir/actual_brightness")
+
+if [[ -z $val ]]; then
+  echo "$cur $((cur * 100 / max))%"
+elif [[ $val =~ ^[0-9]+$ ]] && ((val <= max)); then
+  set_led "$val"
+elif [[ $val =~ ^[0-9]+%$ ]] && (("${val:0:-1}" <= 100)); then
+  set_led $(( max * "${val:0:-1}" / 100 ))
+elif [[ $val =~ ^[+-]{2}$ ]]; then
+  set_led $(( cur "$val" (max / 100) ))
+elif [[ $val = [+-] ]]; then
+  set_led $(( cur "${val:0:1}" (max / 10) ))
+else
+  echo "Error: wrong value: '$val'. Use: [0-$max]|[0-100]%|+|-|++|--"; exit 1
+fi

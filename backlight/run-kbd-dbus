@@ -1,0 +1,30 @@
+#!/bin/bash -eu
+set -o pipefail
+O=; while getopts 'n' o; do O+=$o; done; shift $((OPTIND-1))
+
+val=${1-}
+opts=(
+  --dest=org.freedesktop.UPower
+  /org/freedesktop/UPower/KbdBacklight
+  org.freedesktop.UPower.KbdBacklight
+)
+
+get_led(){ dbus-send --system --print-reply=literal \
+  --reply-timeout=1000 "${opts[@]}.$@" | awk '{print$2}'
+}
+set_led(){ local val=$1
+  val=$((val > max ? max : val < 0 ? 0 : val))
+  ((val == cur)) || dbus-send --system --type=method_call \
+  "${opts[@]}.SetBrightness" int32:"$val"
+  [[ ! $O =~ n ]] || r.n $'\U0001F4A1\U0001F5AE' "$((val*100/max))%"
+}
+
+max=$(get_led GetMaxBrightness)
+cur=$(get_led GetBrightness)
+
+case $val
+in [0-$max]) set_led "$val"
+;; [+-]) set_led $((cur "$val" 1))
+;; '') echo "$cur $((cur * 100 / max))%"
+;;  *) echo "Error: wrong value: '$val'. Use: [0-$max]|+|-"; exit 1
+esac

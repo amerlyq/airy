@@ -1,56 +1,88 @@
-Dell E7440, same problem on 14.04: very quick to change brightness using
-intel_backlight command, but hardward keys (Fn-Up/Down) pause the computer
-briefly.
-  sudo intel_backlight
-  sudo intel_backlight 40
+TODO
+  2015-09-21 [$] Set backlight on mint. Again, afger Nvidia drivers
+    http://habrahabr.ru/post/236353/
+    ::: Moved to Archlinux, no problem. But maybe again useful for nvidia?
+  2014-11-30 [X] не гаснущий capslock
 
-Thanks to instruction from user Toz
- (http://ubuntuforums.org/showthread.php?t=2208278),
-  Current kernel boot line:
-    cat /proc/cmdline
-  Video card(s):
-    lspci -k | grep -iA2 VGA
-  Known backlight interfaces:
-    for interface in /sys/class/backlight/*; do echo -e "\n $interface"; cat $interface/{brightness,max_brightness,actual_brightness}; done
-  A listing of your loaded kernel modules:
-    lsmod
-  Your /var/log/Xorg.0.log file:
-    pastebinit /var/log/Xorg.0.log
 
-the fix requires both
-  kernel param "acpi_backlight=vendor"
-   My Dell Latitude E5430 only needed the kernel param adding to work correctly.
-  and creating the /usr/share/X11/xorg.conf.d/20-intel.conf file:
-   Adding the xorg.conf file as well may just caused it to oscillate rapidly +/-
-   10% with a permanent on screen KDE brightness bar.
-    Section "Device"
+USAGE
+  Manual control
+    $ cat /sys/class/backlight/intel_backlight/max_brightness
+    $ echo 1000 | sudo tee /sys/class/backlight/intel_backlight/brightness
+    ALT: $ echo 5 | sudo tee /sys/class/backlight/acpi_video0/brightness
+    ALT: $ xrandr --output LVDS1 --brightness 0.8
+
+
+BUG
+  2018-01-01 [X] BUG: xbacklight don't work
+    == related to new DFL "modesetting" driver -- which dropped support for Intel hacks of backlight controls
+    ::: USE: control /sys directly by $ r.backlight-mon-sys
+      OR: $ echo 3 | sudo tee /sys/devices/platform/asus-nb-wmi/leds/asus::kbd_backlight/brightness
+    2017-12-31 [X] TRY: other acpi_brightness=video/vendor/native/none with "xf86-video-intel" installed
+      ::: don't work with new DFL modesetting driver -- need enforce "intel" in xorg.conf
+      https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=833508
+      https://bugs.freedesktop.org/show_bug.cgi?id=96572
+    ALSO:
+      https://bbs.archlinux.org/viewtopic.php?id=174991
+      https://bbs.archlinux.org/viewtopic.php?id=134972
+      https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=651741
+    journalctl -b
+      Dec 30 20:06:38 rose xserver[1141]: (II) Applying OutputClass "intel" to /dev/dri/card0
+      Dec 30 20:06:38 rose xserver[1141]:         loading driver: modesetting
+      Dec 30 20:06:38 rose xserver[1141]: (II) Unloading intel
+    ALT:
+      - https://github.com/Hummer12007/brightnessctl |aur/brightnessctl| ::: I absorbed it even before opening
+      - https://github.com/jmesmon/illum |aur/illum-git| ::: needless -- listens brightness events on multiple /dev/input/event*
+      - https://github.com/Ventto/lux ::: badly written script with no additional ideas
+
+  2018-01-01 [X] BAD: backlight buttons <Fn-F5> - <Fn-F7> don't work
+    ::: impossible, seems like they aren't compatible with "acpi_osi=" workaround
+    2018-01-05 [X] TRY: map additional xkb https://wiki.archlinux.org/index.php/extra_keyboard_keys
+    2018-01-05 [X] TRY: acpid events https://wiki.archlinux.org/index.php/Acpid
+      SEE post #11 -- acpid maybe required for brightness buttons to work
+      $ pacman -Qs acpi
+      $ sudo systemctl enable acpid
+      E.G. $ acpi_listen
+        video/brightnessup BRTUP 00000086 00000000 K
+        video/brightnessdown BRTDN 00000087 00000000 K
+      ::: BAD: no acpi events for me -- as empty as xev/showkey --scancodes
+        ALSO: https://wiki.archlinux.org/index.php/Power_management#Suspend_from_corresponding_laptop_Fn_key_not_working
+      journalctl -b
+        Dec 30 18:41:02 rose kernel: asus_wmi: Unknown key cf pressed
+        Dec 30 18:41:02 rose kernel: acpi INT3400:00: Unsupported event [0x86]
+    [_] INFO: look at "$ xinput" -- Asus WMI hotkeys
+      ~ maybe backlight buttons are available there somewhere
+      NEED:(for kbd::led):$ modprobe asus-nb-wmi
+    [_] monitor backlight problems
+      http://skilldrick.co.uk/2010/07/samsung-fn-hotkeys-and-arch-linux/
+      https://forums.linuxmint.com/viewtopic.php?t=187720
+      https://bbs.archlinux.org/viewtopic.php?id=178014
+      https://bbs.archlinux.org/viewtopic.php?id=210121
+        * looks like problem with wrong acpi_osi= trick
+      [_] TRY: other possible options -- SEE: list of cmdline args
+        https://unix.stackexchange.com/questions/315178/how-to-enable-monitor-brightness-keyboard-shortcuts-on-samsung-90x3a
+      https://unix.stackexchange.com/questions/105141/recognise-extra-keyboard-keys-steelseries-apex
+
+  2018-01-05 [X] BAD: boot error with external monitor only E.G. can't restore backlight level
+    $ sudo systemctl disable systemd-backlight@backlight:acpi_video0.service
+    OR: $ sudo systemctl mask systemd-backlight
+
+  2016-07-16 [X] BUG: can't regulate backlight level on intel
+    * Dell E7440, same problem on 14.04: very quick to change brightness using
+    intel_backlight command, but hardward keys (Fn-Up/Down) pause the computer briefly.
+      $ sudo intel_backlight 40
+    http://ubuntuforums.org/showthread.php?t=2208278, the fix requires both:
+      * kernel param "acpi_backlight=vendor"
+      * creating the /usr/share/X11/xorg.conf.d/20-intel.conf file:
+    NOTE: Adding the xorg.conf file as well may just caused it to oscillate rapidly
+      +/- 10% with a permanent on screen KDE brightness bar.
+      Section "Device"
         Identifier "card0"
         Driver "intel"
         Option "Backlight" "intel_backlight"
         BusID "PCI:0:2:0"
-    EndSection
-
-Change
-  $ cat /sys/class/backlight/intel_backlight/max_brightness
-  $ echo 1000 | sudo tee /sys/class/backlight/intel_backlight/brightness
-  ALT: $ echo 5 | sudo tee /sys/class/backlight/acpi_video0/brightness
-  ALT: $ xrandr --output LVDS1 --brightness 0.8
-
-Add to bootloader:
-  sudo vim /etc/default/grub
-  : GRUB_CMDLINE_LINUX_DEFAULT="... video.use_native_backlight=1"
-  sudo grub-mkconfig -o /boot/grub/grub.cfg
-
-
-On work -- where no backlight -- disable to eliminate boot error
-  sudo systemctl disable systemd-backlight@backlight:acpi_video0.service
-  OR sudo systemctl mask systemd-backlight
-
-Keyboard backlight
-  $ echo 3 | sudo tee /sys/devices/platform/asus-nb-wmi/leds/asus::kbd_backlight/brightness
-
-TODO
-  2015-09-21 [$] Set backlight on mint. Again, afger Nvidia drivers
-    http://habrahabr.ru/post/236353/
-    ::> Moved to Archlinux, no problem. But maybe again useful for nvidia?
-  2014-11-30 [X] не гаснущий capslock
+      EndSection
+    Add to bootloader
+      $ sudo vim /etc/default/grub
+      # GRUB_CMDLINE_LINUX_DEFAULT="... video.use_native_backlight=1"
+      $ sudo grub-mkconfig -o /boot/grub/grub.cfg

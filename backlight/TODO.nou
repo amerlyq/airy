@@ -1,0 +1,32 @@
+REF
+  READ https://wiki.archlinux.org/index.php/backlight
+    => to control backlight through dbus
+
+
+HACK
+  Catch (empty) events in /sys when brightness changes
+    $ inotifywait -me modify --format '' /sys/class/backlight/intel_backlight/actual_brightness
+
+
+TODO
+  [_] TRY: control backlight of external LG monitor
+    [_] BUG: Display not found
+      MAYBE: need some driver/package for /dev/i2c- to be created
+      READ: $ man ddcutil
+    USAGE:
+      $ sudo ddcutil capabilities | grep Brightness
+        Feature: 10 (Brightness)
+      $ sudo ddcutil getvcp 10
+        VCP code 0x10 (Brightness): current value = 60, max value = 100
+      $ sudo ddcutil setvcp 10 70
+  2018-01-05 [X] brightness must show "r.n"
+    IDEA: use '-n' key to notify
+    ~ maybe -- only inside XMonad: $ r.n $(r.backlight)
+    ~ detect xorg and display always
+    ! must be still usable in vt console
+  2017-12-26 [X] toggle kbd backlight
+    https://wiki.archlinux.org/index.php/Keyboard_backlight
+    ::: USE: $ r.backlight-kbd-sys +
+  2017-12-30 [X] FIND disable logo backlight
+    ::: impossible -- no related device in /sys
+      $ sudo \find -name brightness

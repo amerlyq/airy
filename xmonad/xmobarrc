@@ -51,9 +51,9 @@ Config {
         \<action=`r.audio` button=1>\
           \ %default:Master%\
         \</action></action></action>\
-    \<action=`xbacklight -inc 1` button=4>\
-      \<action=`xbacklight -dec 1` button=5>\
-        \<action=`xbacklight -set 30` button=3>\
+    \<action=`r.backlight-mon-sys -n +` button=4>\
+      \<action=`r.backlight-mon-sys -n -` button=5>\
+        \<action=`r.backlight-mon-sys -n 30$'\x25'` button=3>\
           \ %bright%\
         \</action></action></action>\
   \<fc=#cc00cc>  </fc>\
