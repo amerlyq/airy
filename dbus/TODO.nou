@@ -1,0 +1,40 @@
+ARCH:REF:
+  https://free-electrons.com/pub/conferences/2016/meetup/dbus/josserand-dbus-meetup.pdf
+  https://www.freepascal.org/~michael/articles/dbus1/dbus1.pdf
+
+DEV:REF:
+  https://dbus.freedesktop.org/doc/dbus-tutorial.html
+  https://www.gnu.org/software/emacs/manual/html_node/dbus/Receiving-Method-Calls.html
+  https://www.gnu.org/software/emacs/manual/html_node/dbus/Methods-and-Signal.html
+
+TUT
+  https://stackoverflow.com/questions/18243912/can-you-retrieve-a-d-bus-property-without-calling-org-freedesktop-dbus-propertie
+  https://blog.fpmurphy.com/2009/02/dbus-scripting.html
+
+E.G.
+  https://mail.gnome.org/archives/networkmanager-list/2010-January/msg00212.html
+  http://www.jajuk.info/manual/d-bus.html
+  https://docs.pagure.org/SSSD.sssd/design_pages/dbus_users_and_groups.html
+
+DEBUG
+  https://wiki.ubuntu.com/DebuggingDBus
+
+Introspection
+  https://www.gnu.org/software/emacs/manual/html_node/dbus/Introspection.html
+  https://blog.fpmurphy.com/2014/10/revisiting-the-systemd-d-bus-interface.html
+  http://cheesehead-techblog.blogspot.com/2012/08/dbus-tutorial-introspection-figuring.html
+  https://unix.stackexchange.com/questions/46301/a-list-of-available-dbus-services
+  https://blog.mafr.de/2006/12/19/using-dbus-introspection/
+  http://www.kaizou.org/2014/06/dbus-command-line/
+  https://askubuntu.com/questions/147568/how-do-i-get-a-list-of-all-of-the-available-dbus-properties
+  https://liquidat.wordpress.com/2014/03/18/howto-using-dbus-to-query-status-information-from-networkmanager-or-others/
+  TUT http://rrbluetoothx.blogspot.com/2016/06/rr-bluetooth-list-dbus-services-buses.html
+
+Objects implementing this interface are usually discovered through the
+org.freedesktop.UPower interface on the /org/freedesktop/UPower object on the
+D-Bus system bus service with the well-known name org.freedesktop.UPower using
+the EnumerateDevices method.
+  $ dbus-send --print-reply --system --dest=org.freedesktop.UPower \
+              /org/freedesktop/UPower/devices/battery_BAT0 \
+              org.freedesktop.DBus.Properties.GetAll \
+              string:org.freedesktop.UPower.Device
