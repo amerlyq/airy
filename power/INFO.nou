@@ -1,24 +1,46 @@
+USAGE
+  Current battery level
+    $ cat /sys/class/power_supply/BAT0/energy_now
+    $ upower -i /org/freedesktop/UPower/devices/battery_BAT0
+    $ acpi | awk '$9=substr($4,1,match($4,"%")-1) {print $9}'
+
+
 SEE
   https://wiki.archlinux.org/index.php/Powertop
+    http://xmodulo.com/how-to-monitor-power-usage-in-linux.html
   https://wiki.archlinux.org/index.php/CPU_frequency_scaling
   https://wiki.archlinux.org/index.php/Power_management
+    TUT:DEBUG: https://fizz.buzz/posts/adventures-in-battery-life-on-arch-linux.html
   https://wiki.archlinux.org/index.php/Laptop
 
   https://wiki.ubuntu.com/Kernel/PowerManagement
   https://www.reddit.com/r/linux/comments/1xac1r/linux_and_the_laptop_power_management_is_terrible/
 
   upower
+    https://unix.stackexchange.com/questions/10418/how-to-find-power-draw-in-watts
+    = maybe it can draw graphics with annotation to state of pcie devices, etc ?
+  |i7z|
+  |cpupower|
+  tlp
+    http://linrunner.de/en/tlp/docs/tlp-linux-advanced-power-management.html
+    TLP will use ASPM if enabled with "pcie_aspm=force"
+      https://github.com/linrunner/TLP/issues/211
 
 
 Low-battery notify
   REF
     https://wiki.archlinux.org/index.php/Laptop#Battery_state
+    http://permalink.gmane.org/gmane.linux.acpi.devel/39226
+    https://bbs.archlinux.org/viewtopic.php?id=133047
   Test if event plug/unplug and discharge capacity by 1% are notified
     $ udevadm monitor --property
   If 1% is not notified -- event must be produced once when "alarm" < "energy_full"
     $ cat /sys/class/power_supply/BAT0/alarm
   ALT
     |common|
+      acpid -- daemon which dispatches events
+        => maybe "acpid" is useful to receive more granular events from battery
+          https://wiki.archlinux.org/index.php/Power_management#ACPI_events
       acpi -- polling
       ~ ibam -- predict precise battery life time
       - osdbattery -- uses xosd, which don't work for me
@@ -27,32 +49,3 @@ Low-battery notify
       + batify -- udev rules NEED rework
       batwarn -- change gamma
       pwrnotify -- written in C
-
-
-TODO
-  [_] надо сконфигурировать батарею заряжаться до <95% итп,
-    чтобы она не умерла так же быстро как на Impression.
-    G: arch battery capacity tips
-    |aur/batterylife|
-
-CPU
-  https://wiki.archlinux.org/index.php/CPU_frequency_scaling
-  i7z
-  cpupower
-
-Video
-  nvidia-smi -a
-  nvidia-smi -q -d TEMPERATURE
-
-  Power down discrete GPU (neo)
-  # Idle temperature drops ~50C -> ~42C
-    $ paci acpi_call
-    Until next reboot
-    $ sudo modprobe acpi_call
-    $ sudo /usr/share/acpi_call/examples/turn_off_gpu.sh
-    # Trying \_SB.PCI0.PEG0.PEGP._OFF: works!
-    Persistent:
-    $ echo acpi_call | sudo tee /etc/modules-load.d/acpi_call.conf
-    $ cat /etc/tmpfiles.d/acpi_call.conf
-    # w /proc/acpi/call - - - - \\_SB.PCI0.PEG0.PEGP._OFF
-        : it writes specific OFF signal into /proc/acpi/call

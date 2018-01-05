@@ -58,13 +58,16 @@ TODO
     * multiple "change" events
   [_] BUG: multiple identical "change" events from udev on monitor plug-in/out
     * ignore by rules all the initial events, where choosen properties are empty
+      BAD: can't depend on some vars E.G. SUBSYSTEM=="drm", DEVLINKS=="?*", ACTION=="change"
+        => Dec 30 17:13:01 rose systemd-udevd[261]: Invalid rule /etc/udev/rules.d/95-monitor-hotplug.rules:2: unknown key 'DEVLINKS'
     * in script check monitor state (?what and where?) and ignore subsequent events
     * enable or disable monitor depending on current state -- don't "refresh" unconditionally
+    [_] TRY: use ACPI events DP-1 on/off from |acpid| instead of udev events
   [_] THINK:CHECK:BAD? if two identical monitors have the same edid/hash ?
     => how to construct their `id` ?
   2017-03-12 [X] DEV: allow matching on first 8..40 symbols instead of whole edid-hash
   [_] BUG: writes bad `DisplaySize` if '--primary' external monitor
-  [_] BUG: if plugged on boot -- enabled as mirror and r.monitor-hotplug don't work
+  [_] BUG: if plugged on boot -- enabled as mirror and r.monitor-hotplug isn't triggered
   [_] CHECK: how to be with udev rule, when monitor plug-in/out w/o Xorg started ?
   2017-01-08 [X] can't wake up after dpms
     ::: switch 'Input' to 'HDMI' only (no 'auto')
