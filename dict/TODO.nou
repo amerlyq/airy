@@ -1,8 +1,11 @@
-> DICT : in terminal
+%%%% dict
 
 DEBUG
-  $ /usr/bin/dictd -d{nofork,verbose,init} -c /etc/dict/dictd.conf -- -s
-  $ sudo -u nobody ls /usr/share/dictd
+  NOTE: /etc/hosts must contain "localhost" to allow connections
+  Full path to dicts must have r-x permissions for "others" -- to be accessed by "nobody"
+    $ sudo -u nobody ls /usr/share/dictd
+  Look at detailed debug messages
+    $ /usr/bin/dictd -d{nofork,verbose,init} -c /etc/dict/dictd.conf -- -s
 
 TODO
     ADD: script to copyq -- to translate from copied text

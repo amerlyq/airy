@@ -15,18 +15,19 @@ PIDFile=%t/dictd/dictd.pid
 
 Type=forking
 User=nobody
-## BAD:SECU:BET: move/mount dicts directly to /usr/share/dictd instead of keeping on shared media partition
-Group=users
+## BET: move/mount dicts directly to /usr/share/dictd instead of keeping on shared media partition
+# Group=users
 ExecStart=/usr/bin/dictd --pid-file %t/dictd/dictd.pid --config /etc/dict/dictd.conf -- -s
 # EXPL: 143 = 128 + 15(SIGTERM)
 SuccessExitStatus=0 143
 
-InaccessibleDirectories=/sys
 PrivateTmp=true
 PrivateDevices=true
-## BUG: no access to symlink /usr/share/dictd if it points to /home
-# ProtectHome=true
-ProtectSystem=full
+## WARN: no access to symlink /usr/share/dictd if it points to /home
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+# InaccessibleDirectories=/sys
 
 [Install]
 WantedBy=multi-user.target

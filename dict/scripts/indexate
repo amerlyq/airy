@@ -1,25 +1,37 @@
 #!/bin/bash -eu
 
-src=${1:-/data/res/dicts}
-[[ -d $src ]] || { echo "Err: No dir with *.dict.dz specified"; exit 1; }
+[[ ${1-} =~ -r ]] && { rescan=1; shift; } || rescan=0
 
-## Link directory to access it by 'nobody'
-dst=/usr/share/dictd
-[[ ! -e $dst || -L $dst ]] || sudo mv -vfT -- "$dst"{,_}
-[[ $src -ef $dst ]] || sudo ln -sfvT "$src" "$dst"
+# NOTE: directory is accessed by 'nobody'
+dicts=${1:-/usr/share/dictd}
+idx=${2:-$dicts/custom.list}  # ALT: /var/lib/dictd/custom.list
 
+### FUNC ###
+find_dz(){ find "$1" -type f -regex '.*\.dict\(\.dz\)?'; }
+has_dz(){ find_dz "$1" 2>/dev/null | grep . >/dev/null; }
+gen_index(){ local d=$1 f nm
+  while IFS= read -r f; do nm=${f%.dz}; nm=${nm%.dict}
+  [[ -f $nm.index ]] || continue
+  cat << EOT
+database "${nm##*/}" {
+  data  "$f"
+  index "$nm.index"
+}
+EOT
+  done < <(find_dz "$d")
+}
 
-## Generate database of all dictionaries in 'dir'
-dblst=$src/custom.list  # /var/lib/dictd/custom.list
-> "$dblst"
-
-find "$dst/" -regex '.*\.dict\(\.dz\)?' | while read fl; do
-    nm="${fl%.dz}"; nm="${nm%.dict}";
-    if [[ -e "${nm}.index" ]]; then
-        echo "database \"${nm##*/}\" {
-  data  \"$fl\"
-  index \"${nm}.index\"
-}" >> "$dblst"
-fi; done
-
-echo "W: $dblst"
+### GEN ###
+if ! has_dz "$dicts"; then echo "N: (optional)
+  For local translation copy your dictionaries into location
+    {./En-En/*/*.dict.gz} -> '$dicts'
+  => otherwise only online dicts will be used
+"
+elif ((rescan)) || ! [[ -f $idx && -s $idx ]]; then
+  [[ -f $idx && -w $idx ]] || [[ -d ${idx%/*} && -w ${idx%/*} ]] && sudo= || sudo=sudo
+  echo "N: generate index for dictd"
+  gen_index "$dicts" | $sudo tee "$idx" | sed -rn 's/^database "([^"]+)".*/ * \1/p'
+  # NOTE: send signal to re-read cfg files (and index)
+  kill -SIGHUP $(pgrep dictd) || true
+  echo "W: $idx"
+fi

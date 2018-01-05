@@ -1,6 +1,8 @@
 #!/bin/bash -eu
 # tags: media
 # deps: xkb
+#   => CHG: only optional runtime deps
+#   => NEED: pandoc BUT! remove it from runtime
 source ~/.shell/func.d/cfgsetup
 
 if distro arch; then
@@ -12,30 +14,17 @@ fi
 #   with no access to my config files inside home directory.
 linkcp -ct "$dir" ./cfg/*
 
-if cfgOpt u; then
-  svc_activate -ceR dictd.service
+./scripts/indexate $(cfgOpt r && echo -r)
 
-  dicts=/data/res/dicts
-  if [[ ! -d $dicts ]]
-  then echo "Wrn: install '*dict.dz' into '$dicts'"
-  else
-    ## Add dictionaries to dictd
-    ./scripts/indexate
-    # echo "~/installer/Dics" >> /etc/dictd/dictd.order
+# BAD:(-R): always sudo for system services
+svc_activate -ce$(cfgOpt uU&&echo R) dictd.service
 
-    # sudo touch /var/lib/dictd/db.list
-    if distro ubuntu; then
-        sudo dictdconfig --write
-        ## Re-read configuration file
-        # /etc/init.d/dictd restart
-        # pid=$(pgrep dictd) && sudo kill -SIGHUP $pid
-    fi
-  fi
+# if distro ubuntu; then
+#   # sudo touch /var/lib/dictd/db.list
+#   sudo dictdconfig --write
+# fi
 
-    ### GEN ###
-    # echo 'cd "$HOME/.wine/drive_c/Program Files (x86)/Yarxi" && wine yarxi.exe'\
-    #     | vienv -r sh ~/.bin/r.yarxi
-
-fi
+# echo 'cd "$HOME/.wine/drive_c/Program Files (x86)/Yarxi" && wine yarxi.exe'\
+#     | vienv -r sh ~/.bin/r.yarxi
 
 echo "C: 'dict' done"
