@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+# tags: core
+source ~/.shell/func.d/cfgsetup
+
+## Enable TRIM on SSD only if all curently mounted disks support it
+#   == both DISC-GRAN and DISC-MAX fields are non-zero
+## CRITICAL! even unsupported disks with (0) in those fields may be trimmed,
+#   being mounted at the moment the timer triggers service "/bin/fstrim -av"
+if lsblk -SD | awk '("0"==$(NF-2)||"0"==$(NF-1)){exit 1}'; then
+  svc_activate -e fstrim.timer
+fi

@@ -7,3 +7,17 @@ Disk failures
 
   |community/ncdu| -- CASE search biggest files to delete
     Disk usage analyzer with an ncurses interface
+
+
+TODO
+  2018-01-01 [X] CHECK: is internal SSD working correctly
+    ::: no problem
+      http://linux-ide.vger.kernel.narkive.com/xwztlYxD/sata-is-dpo-and-fua-ever-supported
+      https://serverfault.com/questions/229443/what-is-read-cache-in-sda-write-cache-enabled-read-cache-enabled-doesnt
+      + https://lwn.net/Articles/400834/
+      https://lists.altlinux.org/pipermail/hardware/2012-December/016476.html
+    journalctl -b
+      Dec 30 17:13:01 rose kernel: sd 0:0:0:0: [sda] 1000215216 512-byte logical blocks: (512 GB/477 GiB)
+      Dec 30 17:13:01 rose kernel: sd 0:0:0:0: [sda] Write Protect is off
+      Dec 30 17:13:01 rose kernel: sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
+      Dec 30 17:13:01 rose kernel: sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
