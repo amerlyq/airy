@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+set -o pipefail
+
+exec jiracli --issue-search "
+  status NOT in (Closed, Completed, Bypassed, 'Ready for System Test')
+  AND resolution = Unresolved
+  AND assignee in (currentUser())
+  ORDER BY priority, CID
+" --issue-oneline "$@"

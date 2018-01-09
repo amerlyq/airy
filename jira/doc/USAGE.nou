@@ -1,0 +1,94 @@
+%%%% USAGE
+
+Init ~/.jiracli.ini
+  $ jiracli
+    user: myuser
+    passwd: mypasswd
+    url: https://project.example.com/jira
+  $ jiracli -h
+
+Search
+  favorites
+    $ jiracli --filter-list-fav
+  by filter-id
+    $ jiracli --issue-search-by-filter 1552
+  jql {New|Open|In Progress|Suspended|Resolved|Closed|Reopened}
+    $ jiracli --issue-search "assignee=CurrentUser() and status='In Progress'" --issue-comments
+
+Search JQL
+  issue body
+    "project = MYPROJ AND text ~ {} ORDER BY key DESC"
+    "comment ~ 'corrupted coredump'"
+  related tickets
+    "... AND NOT (status=Open OR status='In Progress' OR status=Closed OR status=Resolved) ORDER BY CID, priority"
+  my progress
+    "... AND status = Closed AND status was 'Resolved' by currentUser()"
+  my comments
+    SEE: https://jamieechlin.atlassian.net/wiki/display/GRV/Scripted+JQL+Functions#ScriptedJQLFunctions-commented(commentquery)
+    "issueFunction in commented('by currentUser()')"
+    "after -1d by Tom"
+
+Show
+  projects
+    $ jiracli --project-list
+  single issue
+    $ jiracli -i MYPROJ-1234
+    $ jiracli --issue-desc -i MYPROJ-1234
+      --issue-comments
+      --issue-oneline
+  sprint (ongoing)
+    $ jiracli --sprint MYPROJ
+
+Add
+  links-relations {includes|depends on|child of|...}
+    $ jiracli --issue-link-types-list
+  issue-types {Epic|Pre-Condition|Problem|Feature|Task|Test|Defect} || Sub-task
+    $ jiracli --issue-type-list
+  add single (5-args)
+    $ jiracli --issue-create project-key issue-type summary labels components
+    $ jiracli -c MYPROJ "Dev Bug" "my test summary" "abc,def" "xxx,yyyy"
+      => EDITOR will be opened to input "Description"
+      https://github.com/toabctl/jiracli/issues/51
+  add multiple with subtasks (4-args batch from file)
+    $ jiracli --issues-create MYPROJ parent-type child-type /work/file-with-tree
+    $ jiracli --issues-create MYPROJ Feature Sub-task /work/task-tree
+    /work/task-tree
+      Main task summary     # => each gets parent-type
+      * sub-task-1 summary  # => each gets child-type
+      * sub-task-2 summary
+      * ...
+  append multiple to existing parent (and then continue as above)
+    $ jiracli --issue-parent MYPROJ-1111 --issues-create MYPROJ Task Sub-task /work/task-tree
+    /work/task-tree
+      * sub-task-1 summary
+      * sub-task-2 summary
+      Next new parent task  # => this and each next gets parent-type
+      * sub-task-3 summary  # => each gets child-type
+      * sub-task-4 summary
+  pipe tasks tree directly from vim
+    $ vipe </dev/null | jiracli --issue-parent MYPROJ-1111 --issues-create MYPROJ Task Sub-task /dev/stdin
+      * sub-task-1
+      * sub-task-2
+
+Modify
+  components (domain)
+    ? $ jiracli --project-list-components MYPROJ
+    + $ jiracli --issue-component-add MYPROJ-1234 "COMP1"
+    - $ jiracli --issue-component-remove MYPROJ-1234 "COMP1"
+  assign
+    = $ jiracli --issue-assign MYPROJ-1234 v.pupkin
+  transition (workflow)
+    ? $ jiracli --issue-trans MYPROJ-1234
+    = $ jiracli --issue-trans-{open,start,resolve,close,custom} MYPROJ-1234
+  labels {bluetooth|BT|fix|improvement|Obsolete|Organizer|refactoring|regected|security|stability|test|trainings|unclear}
+    + $ jiracli --issue-label-add MYPROJ-3724 "testlabel"
+    - $ jiracli --issue-label-remove MYPROJ-3724 "testlabel"
+  watchers
+    + $ jiracli --issue-watch-add MYPROJ-1234
+    - $ jiracli --issue-watch-remove MYPROJ-1234
+  add comments
+    + $ jiracli --issue-comment-add MYPROJ-3724
+    + $ jiracli --issue-comment-add MYPROJ-3724 -m "another comment"
+  fix versions
+    + $ jiracli --issue-fix-version-add MYPROJ-3750 "My Fix version"
+    - $ jiracli --issue-fix-version-remove MYPROJ-3750 "My Fix version"

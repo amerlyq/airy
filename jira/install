@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+if cfgOpt uU && has_pr pip2pkgbuild; then
+  pip2pkgbuild -n jiracli-airy-git \
+    -d python-termcolor python-jira python-tabulate \
+    -- jiracli
+fi
+
+# TEMP:FIX install manually, because "makepkg" can't resolve AUR deps
+aur_inst --asdeps python-jira python-tabulate
+
+loc_inst -P 'jiracli-airy-git' ./PKGBUILD

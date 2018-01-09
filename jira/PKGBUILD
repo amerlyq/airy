@@ -1,0 +1,24 @@
+pkgbase=('jiracli-airy-git')
+pkgname=('jiracli-airy-git')
+_module='jiracli'
+pkgver='0.4.10'
+pkgrel=1
+pkgdesc="command line interface for jira"
+url="https://github.com/toabctl/jiracli"
+depends=('python' 'python-termcolor' 'python-jira' 'python-tabulate')
+makedepends=('python-setuptools')
+license=('BSD')
+arch=('any')
+source=("https://files.pythonhosted.org/packages/source/j/jiracli/jiracli-${pkgver}.tar.gz")
+md5sums=('6db8b44067113e34be534e4e479c087b')
+
+build() {
+    cd "${srcdir}/${_module}-${pkgver}"
+    python setup.py build
+}
+
+package() {
+    depends+=()
+    cd "${srcdir}/${_module}-${pkgver}"
+    python setup.py install --root="${pkgdir}" --optimize=1 --skip-build
+}
