@@ -9,6 +9,9 @@ die() { printf "Err: '${0##*/}' %s${1+\n}" "$1"; exit 1; }
 # ALT:(pr): http://skarnet.org/software/s6-portable-utils/s6-update-symlinks.html
 # !4 [_] BUG:(cd dir && linkcp -r src dst): => creates directory 'dir/dst', must symlink in-place
 # DEV: split linkcp to airy-ln and airy-cp, and make airy-envsub similarly equal
+# DEV: to each file copied by "linkcp -c" add header similar to "# airy: copied from '/path/to/original'
+#   => it will allow to find all the trash after previous airy versions automatically
+#   NOTE: symlinks by "linkcp" can be found in similar way when they point to ~/aura/airy
 
 cmd=f_link
 keep=0

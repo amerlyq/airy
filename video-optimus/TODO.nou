@@ -50,6 +50,10 @@ Power saving
     ::: ignore it, dGPU is disabled too fast -- only check if state is OFF in $ cat /proc/acpi/bbswitch
       https://github.com/Bumblebee-Project/Bumblebee/issues/664
 
+  2018-01-07 [X] XXX [891.539542] bbswitch: enabling discrete graphics
+    ? enabled before sleep -- is power saved ?
+    ::: yes, dGPU is enabled before sleep (to mitigate not-wake-up problems) and is disabled afterwards
+
   Force shutdown of dGPU == idle temperature drops ~50C -> ~42C
     bbswitch == find current active card and manually ON/OFF nvidia card
       $ cat /proc/acpi/bbswitch

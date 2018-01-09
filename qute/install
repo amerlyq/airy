@@ -1,9 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst qutebrowser
-  pkg_inst --asdeps qt5-webengine python-opengl
+  pkg_inst --asdeps qt5-webkit python-opengl
   pkg_inst --asdeps gst-libav gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
 
 elif distro ubuntu; then

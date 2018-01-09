@@ -2,15 +2,25 @@
 # tags: core
 source ~/.shell/func.d/cfgsetup
 
+# NOTE: inhibit "PowerOff" button
+linkcp -ct '/etc/systemd/logind.conf.d' unit/20-acpi-buttons.conf
+
 svc_activate -cE battery-notify@.service
 linkcp -ct '/etc/udev/rules.d' unit/96-battery-nofity.rules
 
 # env-subs 96-battery-nofity.rules | sudo tee /etc/udev/rules.d/96-battery-nofity.rules >/dev/null
 if cfgOpt u; then
+  # TODO: make "udev_activate" which will refresh by itself -- but only if list changed
   sudo udevadm control --reload-rules
 fi
 
-# Disable bluetooth
-# THINK: replace by blacklisting?
-# svc_activate -e rfkill-block@bluetooth
-# linkcp -t '/etc/modprobe.d' blacklist-powersave.conf
+## Disable bluetooth -- only if present and autostarted
+if lsmod | grep -q '^btusb\s'; then
+  linkcp -ct '/etc/modprobe.d' unit/blacklist-bluetooth.conf
+
+  ## ALSO: rebuild initramfs -- if it includes blacklisted modules
+  # if mkinitcpio -v | grep -qw 'bluetooth\|btusb'; then
+  #   grep '^FILES=(.*'"$black" /etc/mkinitcpio.conf || { echo "add '$black' to FILES()"; exit 1; }
+  #   sudo mkinitcpio -p linux
+  # fi
+fi

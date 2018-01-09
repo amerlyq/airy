@@ -13,8 +13,9 @@ dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
 run(){
   export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
   # WARN: can crash on Nouveau
-  exec qutebrowser --backend webengine --enable-webengine-inspector \
-    --qt-flag disable-reading-from-canvas "$@"
+  # BAD: "webengine" is newer, but no Caret and white css on reload
+  # BAD:SECU: --enable-webengine-inspector
+  exec qutebrowser --backend webkit --qt-flag disable-reading-from-canvas "$@"
 }
 chk(){ [[ -n $url ]] && return; r.n Browser "No url arg"; exit 1; }
 

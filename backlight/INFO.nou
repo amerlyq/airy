@@ -14,6 +14,10 @@ USAGE
 
 
 BUG
+  2018-01-01 [X] BUG: backlight isn't restored on boot
+    ::: FIXED: acpi_brightness=none
+      MAYBE: brightness saved for "acpi_video0" interferes with "intel_backlight"
+
   2018-01-01 [X] BUG: xbacklight don't work
     == related to new DFL "modesetting" driver -- which dropped support for Intel hacks of backlight controls
     ::: USE: control /sys directly by $ r.backlight-mon-sys

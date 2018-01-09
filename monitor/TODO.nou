@@ -57,6 +57,8 @@ TODO
     UDEV  [3476.637736] change   /devices/pci0000:00/0000:00:02.0/drm/card0/card0-eDP-1/intel_backlight (backlight)
       BUG: why backlight changes when I plug-in/out external monitor ?
         MAYBE: due to short blink of laptop screen's LED when xrandr runs
+  [_] FIXME:DONT: 'r.monitor-refresh' when returning from dpms
+    * I may manually disable built-in eDP1 monitor and don't want to enable it when simply move mouse after 20 min
   [_] TODO: ignore udev events when going to sleep -- don't disable external monitor
     BAD: usb devices also re-init (remove+add) when going to standby
       ? MAYBE this behavior only when picture through USB3.1 ?

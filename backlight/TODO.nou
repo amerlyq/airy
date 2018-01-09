@@ -6,6 +6,7 @@ REF
 HACK
   Catch (empty) events in /sys when brightness changes
     $ inotifywait -me modify --format '' /sys/class/backlight/intel_backlight/actual_brightness
+    BUT:WTF: -- how does it works ? SEE /proc and /sys aren't supported $ man inotify
 
 
 TODO

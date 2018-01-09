@@ -171,7 +171,7 @@ class ag(Command):
 
 
 class doc(Command):
-    lst = {'d': 'DEV', 'e': 'EXAMPLES', 'i': 'INFO', 'h': 'HACK',
+    lst = {'b': 'DEBUG', 'd': 'DEV', 'e': 'EXAMPLES', 'i': 'INFO', 'h': 'HACK',
            'g': 'LEGEND', 'l': 'LIOR', 'm': 'MAINT', 'n': 'NOTE',
            's': 'SYNERGY', 't': 'TODO', 'u': 'USAGE'}
     ext = ['.nou', '.otl', '.txt', '']

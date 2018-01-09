@@ -1,14 +1,18 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: io
 # deps: xorg feh wm
 source ~/.shell/func.d/cfgsetup
 
 
 ### GENS ###
-# DISABLED: -- irritating at work, need DISPLAY on init install, don't work for VGA on startup anyway
-#   MAYBE: don't work for any port on startup at all
+## DISABLED: -- irritating when always disabled HDMI is plugged-in
+#   MAYBE: doesn't triggered for any port on startup at all (at least VGA)
 #     TODO: create .service, which runs hotplug before XMonad OR run "monitor-hotplug" itself
-# BAD: will be refreshed on each event (can be multiple) from each port of multiple monitors
+#   BAD: will be refreshed on each event (can be multiple) from each port of multiple monitors
+## BAD: need DISPLAY on init install
+#   TRY: => assume it's always :0
+#   BET: export :0 to ~/.pam_environment and use it in both zprofile and here
+#     BUT:CHECK: it will be exported from pam even on ssh login ?
 svc_activate -cE monitor-hotplug@.service
 
 ### LINKS ###
@@ -20,11 +24,14 @@ if cfgOpt u; then
   sudo udevadm control --reload-rules
 fi
 
-wh=$(r.xorg -WH | xargs ||:)
-if [[ $wh =~ [0-9]+\ [0-9]+ ]]; then
-  tmp=$(mktemp); trap "rm '$tmp'" EXIT
-  sed -r '/^(\s+DisplaySize)\s.*$/s//\1 '"$wh/" \
-    ./unit/90-monitor.conf > "$tmp"
-  dst=/etc/X11/xorg.conf.d/90-monitor.conf
-  linkcp -c "$tmp" "$dst"
-fi
+## NOTE: required only when EDID for monitor is wrong
+## ATT: "$ Xorg -dpi ..." will override dpi derived from monitor's physical size
+## BUT: you are still required to set physical size for firefox/webkit auto-resize on window moving between monitors
+# wh=$(r.xorg -WH | xargs ||:)
+# if [[ $wh =~ [0-9]+\ [0-9]+ ]]; then
+#   tmp=$(mktemp); trap "rm '$tmp'" EXIT
+#   sed -r '/^(\s+DisplaySize)\s.*$/s//\1 '"$wh/" \
+#     ./unit/90-monitor.conf > "$tmp"
+#   dst=/etc/X11/xorg.conf.d/90-monitor.conf
+#   linkcp -c "$tmp" "$dst"
+# fi
