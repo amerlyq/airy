@@ -13,6 +13,7 @@ export AIRY_BIN    ?= $(AIRY_CACHE)/bin
 
 # FIXED:(r.airy): on clean install in same login
 PATH := $(AIRY_BIN):$(PATH):$(HOME)/.bin
+# BUG: on clean install maps "defaults" to "vi"
 EDITOR ?= vi
 
 all: install update-new tags

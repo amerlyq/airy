@@ -2,32 +2,44 @@
 source ~/.shell/func.d/system
 running_X || exec r.bt
 
+## TODO: basedir spec for independent sessions
+# https://github.com/ayekat/dotfiles/blob/master/bin/qutebrowser
+
 # log=${TMPDIR:-/tmp}/qute/$(date +%Y%m%d_%H%M%S).log
 # mkdir -p "${log%/*}"
 # exec > $log 2>&1
+
+## NOTE: both of them may significantly load CPU > 40..90% on soundcloud depending on song
+# web=webengine
+## CRIT: "webkit" often freezes/hangs on media, "webengine" is much more stable
+web=webkit
+[[ ${THEME-} == dark ]] && web=webkit
 
 dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
     -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31AC65' \
     -fn '-misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
 }
-run(){
-  export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
-  # WARN: can crash on Nouveau
-  # BAD: "webengine" is newer, but no Caret and white css on reload
-  # BAD:SECU: --enable-webengine-inspector
-  exec qutebrowser --backend webkit --qt-flag disable-reading-from-canvas "$@"
-}
 chk(){ [[ -n $url ]] && return; r.n Browser "No url arg"; exit 1; }
 
-[[ ${1-} == -[tphs] ]] && { op=${1-}; shift; }
 
-case ${op-}
-in -p) url=$(xsel -ob)
-  chk "$url" || set -- "$url"
-;; -h) url=$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)
-  chk "$url" || set -- "$url"
+getopts ':hkpstw' o && [[ $o != '?' ]] && shift 1  #% NOTE: parse only first option
+case $o in '?') true  # pass rest and unsupported options to qutebrowser
+;; p) url=$(xsel -ob); chk "$url" || set -- "$url"
+#% WARN: all next windows will use same backend as first one
+;; k) web=webkit
+;; w) web=webengine
+;; s) set -- ':set content allow-javascript true' "$@"
+## FIXME: history now is sqlite db
+# ;; -h) url=$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)
+#   chk "$url" || set -- "$url"
 # ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"
-;; -s) set -- ':set content allow-javascript true' "$@"
 esac
 
-run "$@"
+export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
+
+# WARN: can crash on Nouveau
+# BAD: "webengine" is newer, but no Caret and white css on reload
+# BAD:SECU: --enable-webengine-inspector
+exec qutebrowser --backend "$web" \
+  --qt-flag disable-reading-from-canvas \
+  "$@"

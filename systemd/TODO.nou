@@ -66,6 +66,15 @@ User
   :     dbus-update-activation-environment DISPLAY XAUTHORITY
   : fi
 
+
+E.G.
+  Run ExecStartPre with root-permissions
+    SEE: https://blog.hqcodeshop.fi/archives/93-Handling-varrun-with-systemd.html
+    PermissionsStartOnly=true
+    ExecStartPre=-/usr/bin/mkdir -m 755 "%t/dictd"
+    ExecStartPre=/usr/bin/chown -R nobody:users "%t/dictd/"
+
+
 Dbus
   https://fedoraproject.org/wiki/Packaging:Systemd?rd=Packaging:Guidelines:Systemd#DBus_activation
 
