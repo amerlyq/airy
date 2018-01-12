@@ -1,6 +1,13 @@
 #!/bin/bash -eu
 set -euo pipefail
 
+## Check filemarker to auto-update only once a day
+marker=~/.cache/vim/dein/updated
+t_upd=$(command stat -c%Y "$marker" 2>/dev/null||:)
+doupdate=0
+[[ " $* " =~ " -U " ]] && doupdate=1
+[[ " $* " =~ " -u " ]] && (( $(date -d yesterday +'%s') > t_upd )) && doupdate=1
+
 ### PLUGINS ###
 # BUG: returns non-zero errcode!
 # BUG: no parallel dld on nvim -- only vimproc works
@@ -16,8 +23,11 @@ shvim() { ${EDITOR:-nvim} -nR \
   >/dev/null </dev/tty ||:; }  # return $(($?-1)); }
 
 cmd='call dein#clear_state()'
-[[ ! " $* " =~ " -u " ]] || cmd+='|call dein#update()'
+((doupdate)) && cmd+='|call dein#update()'
 cmd+='|if dein#check_install()| call dein#install() |else| call dein#recache_runtimepath() |en'
 cmd+='|call dein#remote_plugins()'
 
 shvim "$cmd"
+
+## Update filemarker modification date
+((!doupdate))||touch "$marker"
