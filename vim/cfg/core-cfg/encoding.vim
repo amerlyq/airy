@@ -12,7 +12,7 @@ elseif &termencoding == ""
 endif
 
 setg fileencoding=utf-8
-set fileencodings=utf-8,cp1251,cp866
+set fileencodings=utf-8,utf-16le,cp1251,cp866
 
 setg fileformat=unix
 set fileformats=unix,dos,mac  " Line endings

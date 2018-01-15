@@ -28,6 +28,7 @@ let s:patterns = [
 " I.E. id est (~ in especial, effectively)
 " I.A. inter alia (~ among other things)
 " VIZ. videlicet (~ precisely: implies (near) completeness)
+" N.B. nota bene (~ pay attention, take notice) == NOTE, ATT
 
 function! s:everywhere_print(patts)
   tabnew

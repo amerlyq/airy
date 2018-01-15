@@ -1,10 +1,13 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/packages
+
+# BAD: gv (ugly), xpdf (need mouse BUT supports encrypted)
 
 pkg_inst zathura
 
 if distro arch; then
-  pkg_inst zathura-djvu zathura-pdf-mupdf
+  # ERR:(zathura-pdf-mupdf): when opening high-definition-audio-specification.pdf :: error: cycle in forms, uncaught error: cycle in forms
+  pkg_inst zathura-djvu zathura-pdf-poppler
 fi
 #deb_wget "http://http.us.debian.org/debian/pool/main/z/zathura/zathura_0.2.9-2_amd64.deb"
 
