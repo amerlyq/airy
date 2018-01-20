@@ -3,7 +3,9 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-./gtk.gen "$THEME"
+# TEMP: override user settings by standard theme
+./gtk.gen "Adwaita"
+# ./gtk.gen "$THEME"
 
 ## Use gtk themes for Qt4
 cfg=~/.config/Trolltech.conf

@@ -7,15 +7,16 @@ if distro arch; then
     pkg_inst gtk2 gtk3
     pkg_inst gnome-themes-standard
 
-    aur_inst gtk-theme-flatstudio
+    # BAD: integrity check, many deps
+    # aur_inst gtk-theme-flatstudio
     # mate-themes numix-themes
     # aur_inst vertex-themes
     # aur_inst zuki-themes
     # aur_inst ceti-2-themes
 
     # Icons
-    pkg_inst hicolor-icon-theme
-    pkg_inst faenza-icon-theme
+    pkg_inst hicolor-icon-theme   # only dirs structure
+    # pkg_inst faenza-icon-theme  # UNUSED
 
 elif distro ubuntu; then
     echo "ERR: install manually"
