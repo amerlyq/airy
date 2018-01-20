@@ -1,0 +1,96 @@
+TODO
+  [_] Dolby setup
+    SEE http://www.johannes-bauer.com/linux/dolby/
+    https://ubuntuforums.org/showthread.php?t=2261215
+  !9 [_] TRY:ALT: https://wiki.archlinux.org/index.php/PulseAudio/Examples#Binaural_Headphones
+    http://bs2b.sourceforge.net/
+  !2 [_] BAD:NEED? choppy sound with analog surround sound setup
+    == The low-frequency effects (LFE) channel is not remixed per default
+    ::: manually edit WARN: may become overwritten on package update (edit again)
+    $ man pulse-daemon.conf
+    /etc/pulse/daemon.conf
+      enable-lfe-remixing = yes
+      default-sample-rate = 48000
+      alternate-sample-rate = 44100
+
+
+DEBUG
+  Check surround speakers by custom 4-channel file
+    $ sox -M /usr/share/sounds/alsa/{Front,Rear}_{Left,Right}.wav 4channel.wav
+    $ aplay -D surround40 -vv 4channel.wav
+    $ speaker-test -D 'surround40' -t wav -c4
+    https://www.linux.org.ru/forum/general/7210688
+    READ:
+      [_] http://www.alsa-project.org/main/index.php/Asoundrc
+      [_] TRY: stereo -> surround40
+        TUT: https://alsa.opensrc.org/Playing_stereo_on_surround_sound_setup_(Howto)
+        TUT: https://www.halfgaar.net/surround-sound-in-linux
+        e.g. https://www.linux.org.ru/forum/general/7210688
+      [_] https://alsa.opensrc.org/SurroundSound
+
+
+
+[_] TRY: setup speakers surround sound / subwoofer
+  INFO: actual configuration on Windows
+    * two hi-freq Front Speakers plus two low-freq Rear Speakers (combined with Bass)
+  FAIL: configuration on Linux (with appropriate surround profile)
+    * no sound from front speakers at all (or too low?)
+    * Rear Speakers work as Front ones
+    * no sound from LFE channels
+
+  DEBUG (reduce PCM volume first)
+    $ amixer -c0 set PCM 50%
+    $ pacmd set-card-profile 'alsa_card.pci-0000_00_1f.3' 'output:analog-surround-40+input:analog-stereo'
+    $ speaker-test -D 'surround40:CARD=PCH,DEV=0' -c4 -t wav
+    $ pacmd set-card-profile 'alsa_card.pci-0000_00_1f.3' 'output:analog-surround-21+input:analog-stereo'
+    $ speaker-test -D 'surround21:CARD=PCH,DEV=0' -c3 -t wav
+    MAYBE? there is no LFE sound, because such file is absent in /usr/share/sounds/alsa ?
+      [_] TRY: noise into all channels one-by-one
+  2018-01-07 [X] TRY /etc/pulse/daemon.conf :: default-sample-channels = 4
+    ::: white noise in LFE channels
+      NOTE: even "enable-lfe-remixing = yes" didn't help
+
+  BUT: using simple 'analog-stereo' -- generates sound into Front Speakers
+    $ pacmd set-card-profile 'alsa_card.pci-0000_00_1f.3' 'output:analog-stereo+input:analog-stereo'
+    $ speaker-test -D 'surround21:CARD=PCH,DEV=0' -c4 -t wav
+      => both speakers together play "Rear Center"
+
+  Amusingly, each bottom speaker plays "Rear Center" -- but only if "Master" and "Bass Speakers" are > 0
+    ? MAYBE there is different configuration paths for different card profiles -mFL,FR,LFE,LFE
+    2018-01-18 [X] TRY: mute "Speaker" to disable Front-* and play some music -- to check if sound goes to LFE speakers
+      * Bass Speakers == Subwoofer => unmute Master and Speaker, BUT "Bass Speaker" slider -- no effect
+      * Front Speakers == Front => unmute Master and "Bass Speaker" -- use "Master" slider
+      * both can be regulated by PCM at the same time
+    $ amixer -c0 set PCM 10%
+    $ speaker-test -D 'surround40:CARD=PCH,DEV=0' -c4 -t wav
+    $ speaker-test -D 'surround40:CARD=PCH,DEV=0' -twav -c4 -s3
+    $ speaker-test -D 'front:CARD=PCH' -twav -c4 -s3
+
+  !2 [_] BUG: alsamixer isn't linear relative to PCM volume
+    https://www.linux.org.ru/forum/multimedia/13700730
+    $ amixer -c0 set PCM 10%
+      Front Left: Playback 26 [10%] [-45.80dB]
+      Front Right: Playback 26 [10%] [-45.80dB]
+    $ alsamixer -c0 -Vplay
+      WTF: PCM=4 of 100
+
+  2018-01-07 [X] CHECK: sound from Speakers and their configuration in ControlPanel on Windows
+    https://support.hp.com/us-en/document/c02634956
+  ? CHECK: is there subwoofer present at all ?
+    https://github.com/dragosprju/y50-subwoofer-linux-enabler
+    https://bugs.launchpad.net/ubuntu/+source/linux/+bug/728161
+    https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1553685
+    http://forum.notebookreview.com/threads/how-to-test-if-my-subwoofer-is-working.675850/
+  INFO surround2.1, subwoofer
+    http://voices.canonical.com/david.henningsson/2015/12/15/2-1-surround-sound-support/
+      https://cgit.freedesktop.org/pulseaudio/pulseaudio/commit/?id=3f140f9022ef0b59b3684edd25e2202a65989669
+      http://www.alsa-project.org/alsa-doc/alsa-lib/group___p_c_m.html
+
+  TUT: https://unix.stackexchange.com/questions/111428/how-do-i-configure-pulseaudio-for-7-1-surround-sound-over-hdmi
+
+  !2 [_] pulseaudio -vvvv
+    => seems like fallback is in action -- instead of default stereo
+      [Mapping stereo-fallback]
+      device-strings = hw:%f
+      channel-map = front-left,front-right
+    ~~> results in wrong configuration of Speakers

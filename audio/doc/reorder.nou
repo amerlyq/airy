@@ -1,0 +1,58 @@
+Reorder audio cards
+  http://superuser.com/questions/626606/how-to-make-alsa-pick-a-preferred-sound-device-automatically
+  http://superuser.com/questions/53957/what-do-alsa-devices-like-hw0-0-mean-how-do-i-figure-out-which-to-use
+  https://forums.opensuse.org/showthread.php/465666-How-to-order-multiple-sound-cards-with-ALSA-when-some-are-using-the-same-module
+    + https://gist.github.com/UedaTakeyuki/926f6e89ec48fcde0b6f
+  https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture#Set_the_default_sound_card
+  +++ http://alsa.opensrc.org/MultipleCards#How_to_choose_a_particular_order_for_multiple_installed_cards
+    = SEE Ordering multiple cards of the same type
+  +++ https://wiki.archlinux.org/index.php/Talk:Advanced_Linux_Sound_Architecture
+    http://alsa.opensrc.org/MultipleCards#Ordering_multiple_cards_of_the_same_type
+  http://alsa-project.org/main/index.php/Matrix:Module-emu10k1
+  $ cat /proc/asound/card*/id
+  $ v /etc/modprobe.d/alsa-base.conf
+    options snd-hda-intel id=PCH,HDMI index=1,0
+  BUT seems like it does something unexpected, only renaming w/o reordering actual devices
+  $ aplay -l
+    card 0: HDMI [HDA Intel PCH], device 0: ALC887-VD Analog [ALC887-VD Analog]
+    card 0: HDMI [HDA Intel PCH], device 1: ALC887-VD Digital [ALC887-VD Digital]
+    card 1: PCH [HDA Intel HDMI], device 3: HDMI 0 [HDMI 0]
+  ALT: in mpd use name instead of id "hw:1,0" => no need to reorder
+    device "hw:PCH,0"
+    + SEE http://www.head-fi.org/t/561961/bit-perfect-audio-from-linux
+
+  ALSO: See docs:
+    : If both devices use the same module then we can use the
+    : *enable* parameter from snd-hda-intel module, it's an array
+    : of booleans that can enable/disable the desired sound card.
+    options snd-hda-intel enable=0,1
+    : my HDMI card has now disappeared and the USB is second.
+
+    https://coderwall.com/p/wajiaq
+      /usr/share/alsa/alsa.conf
+        defaults.ctl.card      0  to  defaults.ctl.card      1
+        defaults.pcm.card      0  to  defaults.pcm.card      1
+        defaults.rawmidi.card  0  to  defaults.rawmidi.card  1
+        defaults.hwdep.card    0  to  defaults.hwdep.card    1
+        defaults.timer.card    0  to  defaults.timer.card    1
+
+      /etc/modprobe.d/alsa-base.conf
+        alias char-major-116 snd
+        alias snd-card-0 snd-hda-intel
+        alias snd-card-1 snd-hda-intel
+
+        options snd-hda-intel id=PCH index 0
+        options snd-hda-intel id=HDMI index 1
+        options snd_hda_codec_hdmi index=-2
+
+      Replace:
+        install sound-slot-0 /sbin/modprobe snd-card-1
+        install sound-slot-1 /sbin/modprobe snd-card-0
+        : After I replaced this lines (and it's the only
+        : changes in file), then login in mint, test sound
+        : and login back in i3  -- seems to work for me.
+
+    TRY only disable hdmi -- seems to work
+        options snd-hda-intel model=auto enable=0,1
+      If broke again, see:
+        https://bbs.archlinux.org/viewtopic.php?id=180102

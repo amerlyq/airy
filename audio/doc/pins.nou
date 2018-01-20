@@ -1,0 +1,135 @@
+%%%% Pins remapping
+
+REF
+  https://github.com/torvalds/linux/blob/master/Documentation/sound/hd-audio/notes.rst
+  https://alsa.opensrc.org/SurroundSound
+  http://www.alsa-project.org/main/index.php/Asoundrc
+  REF: http://wiki.osdev.org/Intel_High_Definition_Audio
+
+  2018-01-17 [X] TRY: override 0x17 pin to "Internal speaker (LFE)"
+  2018-01-17 [X] currently it somehow works with ~/research/user_pin_configs
+    $ speaker-test -D 'surround40' -t wav -c4
+    2018-01-17 [X] TRY: listen if bottom speaker will play together $ aplay -D surround40 -vv 2channel.wav
+    !2 [_] TRY: enable external amplifier
+
+  2018-01-14 [X] READ Enable surround on Envy X15 -- debugging by hda-verb
+    TUT: http://www.asyndetic.com/2013/04/11/on-debugging-intel-high-definition-audio-in-linux-part-i/
+      http://www.idt.com/products/audio-products/high-definition-hd-audio-codecs/92hd91b-single-chip-pc-audio-system-codec-speaker-amplifier-capless-hp-ldo
+      https://temposemi.com/products/pclaptop-hd/92hd91/
+
+ARCH: chip+OEM  http://temposemi.com/wp-content/uploads/docs/92HD91Rev1-6.pdf
+  * HDA defines a variety of widget types identified by a NID (node identifier)
+  * for debugging purposes, the most important widgets are Pin Widgets (audio sinks/sources)
+  * not all Pins are suitable for output -- suitable ones can be arbitrary connected by the OEM inside laptop
+    E.G. Port D has a Connection List, hard-coded by IDT (SEE datasheet) -- DAC0, DAC1, MixerOutVol
+      Since there are multiple sources, it is possible to select a connection with the Connection Select Control verb
+      Both DAC0 and DAC1 are suitable sources for digital audio data from the OS
+        - two sources -- means that we can stream multiple audio sources simultaneously
+          BUT only one may be connected to this output at a time
+        - if you connect Port D to MixerOutVol, you would hear both mixed DAC0 and DAC1 streams simultaneously from the front speakers
+    << chip has DFL configuration programmed, BUT it certainly will not match the OEM configuration
+    E.G. Port D (NID 0xD) with two outputs on my chip happens to be connected to the front Speakers on my laptop
+      << The only certain way to determine this is physically -- from the OEM or experimentation
+  * for surround sound, multiple Pin Widgets are required
+
+REF: spec for hda-verb -- verbs and their payload
+  https://www.intel.com/content/dam/www/public/us/en/documents/product-specifications/high-definition-audio-specification.pdf
+  * HDA provides a standard bus protocol that implement commands called verbs
+  * One or more verb types may be transmitted to each node, represented by NID
+    SEE: /Node 0x../ in `alsa-info.sh` output
+  * Set verbs take a parameter (payload) OR use 0x0 instead (required)
+  = The operating system uses this configuration to properly configure your audio devices
+
+  E.G. program the pin with NID=0x13 to be a Front speaker
+    $# hda-verb 0x13 0x71F 0x92
+      NID = 0x13 (guess -- Front Speaker)
+      Verb = 0x71F (Set Configuration Default bits [31:24])
+      Payload = 0x92 (Port connectivity = Fixed function; Location = Front)
+  ALT: reconfigure pins by using /proc
+    $# echo 0x14 0x9993013f > /sys/class/sound/hwC0D0/user_pin_configs
+    $# echo 1 > /sys/class/sound/hwC0D0/reconfig
+  ALT: use early patching for initial boot-up with dosini file
+    https://github.com/torvalds/linux/blob/master/Documentation/sound/hd-audio/notes.rst#early-patching
+    options snd-hda-intel patch=on-board-patch,hdmi-patch
+    /lib/firmware/on-board-patch.fw
+
+
+  E.G. enable other speakers
+    CFG: extra speakers -- NID=0x0F, NID=0x10
+    TRY: copy the pin config from Front Speakers NID=0x0D (which was already working properly)
+    Reviewing the datasheet, you can see what this data means. 0x92XXX decodes to:
+      Port Connectivity = Fixed function (0x1)
+      Location = Internal (0x1), Front (0x2)
+      Device = Speaker (0x1)
+      Connection Type = Other analog (0x7)
+      Color = Unknown (0x0)
+      Misc = No Jack detect override (0x0)
+      Association = 0x1
+      Sequence = 0x0
+    NOTE: you can change the location information -- so that, hopefully, Linux will determine correctly speakers layout.
+    To set NID 0xF, you use the Set Configuration Default commands.
+    It is actually four commands – one for each byte of data.
+      $# hda-verb 0x0f 0x71c 0x10
+      $# hda-verb 0x0f 0x71d 0x0
+      $# hda-verb 0x0f 0x71e 0x17
+      $# hda-verb 0x0f 0x71f 0x91
+    Reload drivers and restart audio system
+      $ systemctl --user stop pulseaudio.socket && pulseaudio -k
+      $ sudo alsa force-reload && systemctl --user stop pulseaudio.socket
+        ATT: It will list drivers not unloaded in parentheses on the first line, and then list the drivers that were reloaded
+
+
+Determining what NID has what purpose
+  Initial pin configuration -- from BIOS
+    $ cat /sys/class/sound/hwC0D0/{init,driver,user}_pin_configs
+  ??? how to determine pin maps ???
+    [_] MAYBE: send some sound directly ? SEE: urandom in /_dld/sprac10.pdf
+    !2 [_] decode values in "init_pin_configs" and verb coeffs from ./my/alsa-windows-no
+
+
+Tools
+  hdajackretask
+    |alsa-tools| OR |aur/hda-jack-retask-bzr|
+    http://voices.canonical.com/david.henningsson/2011/11/29/turn-your-mic-jack-into-a-headphone-jack/
+    $ hdajackretask
+  hda-analyzer
+    http://www.alsa-project.org/main/index.php/HDA_Analyzer
+      http://git.alsa-project.org/?p=alsa.git;a=tree;f=hda-analyzer
+      $ gc1 git://git.alsa-project.org/alsa.git
+    = provides a GUI interface with a tree of all the widgets in your codecs
+    + fantastic
+    - impossible to do things like change the location of a Pin Widget
+    Get list length of possible connections in Pin Complex 0x17 ::: SEE:(7.3.4.11) page 208
+      $ sudo /usr/bin/hda-verb /dev/snd/hwC0D0 0x17 PARAMETERS CONNLIST_LEN
+    Switch connected input to Pin Complex
+      $ sudo /usr/bin/hda-verb /dev/snd/hwC0D0 0x17 SET_CONNECT_SEL 0x1
+  codecgraph
+    $ gc1 http://git.raisama.net/hda-tools.git    # (Eduardo's tree)
+    $ gc1 http://helllabs.org/git/codecgraph.git  # (Claudio's tree)
+  hda-emu / hda-decode-verb
+    Install
+      $ wget https://github.com/torvalds/linux/archive/master.zip
+      $ unzip master.zip
+      $ gc1 git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/hda-emu.git
+        OR: https://github.com/cmatsuoka/hda-emu
+      $ cd hda-emu && autoreconf --install && ./configure --with-kerneldir="${PWD%/*}/linux-master"
+    Usage
+      $ ./hda-decode-verb 0x500 0x67
+      $ while read -r nid cfg; do echo $nid; ./hda-decode-pincfg $cfg; echo; done < /sys/class/sound/card0/hwC0D0/init_pin_configs
+      Read /proc from alsa-info.sh:
+      $ ./hda-emu ~/research/audio/alsa-info/alsa-probe0-win-disable
+  Windows
+    HD Audio Tool -- show default Pins
+      http://msdn.microsoft.com/en-us/library/windows/hardware/gg462977.aspx
+      SEE:TUT: [_] HP x360 https://bugzilla.kernel.org/show_bug.cgi?id=189331
+
+
+Datasheets
+  contain pins specification
+    http://www.realtek.cz/realtek-datasheet.php?datasheet=ALC892
+    * WTF: same card may have different mixers/pin-out-set in different laptops
+    * chip defaults to what vendor programs in it, which will not correspond to the actual connections
+    * ACPI BIOSes can provide HDA pin configuration
+      * This corresponds to the "4-byte Configuration Default Register" data for each Pin Widget in the system
+    * buggy BIOS is lying >> Linux and generic Windows driver --> both play only Front Speakers
+        >> NEED: running IDT driver from HP OEM --> reconfigures codec Pins

@@ -1,0 +1,34 @@
+%%%% ALSA
+
+INFO
+  Find triplet <ALSA Interface:ALSA Card id,ALSA Device Id>
+    * "hw" provides direct communication to the hardware device.
+    * "plughw" plugin provides resampling layer to one supported by the device.
+      << when using "hw:" results in errmsg "Channels count non available" == audio file has unsupported sample rate
+
+
+USAGE
+  List available volume controls / mixers of card 0
+    $ amixer -c0
+    $ amixer -c0 scontrols  # OR:(numid): controls
+    $ amixer -c0 scontents  # OR:(numid): contents
+  Mixers (CLI and TUI)
+    $ amixer
+    $ amixer -c0 info
+    $ amixer -c0 -M -D pulse get Master
+    $ alsamixer
+    $ alsamixer -D hw:0
+  Change volume balance L-R
+    $ amixer sget Master
+    $ amixer sset Master 20%,20%
+    $ amixer sset Master 30%,32%
+  List all soundcards and digital audio devices:
+    $ aplay -l
+    $ aplay -L
+    $ lsmod | grep snd
+    # must play for defaults
+    $ aplay -D sysdefault:CARD=PCH /usr/share/sounds/alsa/*.wav
+    $ speaker-test -D hdmi -c 2 -t wav
+    $ pasuspender -- speaker-test -D hdmi -c 8 -m FL,FC,FR,RR,RRC,RLC,RL,LFE
+  Chained copy of raw output between plugins
+    $ aplay -D"tee:'plughw:0,0',/tmp/alsatee.out,raw" xy.wav

@@ -1,0 +1,126 @@
+General
+  https://wiki.archlinux.org/index.php/sound_system
+  https://wiki.linuxaudio.org/wiki/start
+  [_] TALK: https://lwn.net/Articles/385125/
+  https://www.pks.mpg.de/~mueller/docs/suse10.1/suselinux-manual_en/manual/cha.sound.html
+  INFO https://wiki.linuxfoundation.org/desktop/making_sound_that_just_works
+  HW: http://www.flaterco.com/kb/audio/ISA/index.html
+  MMAP: https://wiki.thingsandstuff.org/Audio
+  REF:CMP: https://www.learndigitalaudio.com/how-linux-audio-works-vs-windows-audio-2017
+  (Anti-patterns) http://voices.canonical.com/david.henningsson/2012/07/13/top-five-wrong-ways-to-fix-your-audio/
+    DONT: $ gpasswd -a audio $USER
+  ALT: sound-servers instead of PulseAudio
+    http://www.gamersonlinux.com/forum/threads/pipewire-can-we-finally-get-away-from-pulseaudio.2178/
+    https://forums.freebsd.org/threads/60829/
+  Open Sound Firmware
+    https://www.alsa-project.org/main/index.php/Firmware
+
+  !2 [_] TUT:CFG:READ https://www.ab9il.net/software-defined-radio/software-audio-processing.html
+    Configure intermediate device between pulse+alsa
+      MAYBE: use Jack between pulse and alsa ?
+      OR: use "apulse" dummy instead of PulseAudio
+
+
+Datasheet
+  http://www.realtek.cz/realtek-datasheet.php?datasheet=ALC892
+    -- contain pins specification
+      WTF: same card may have different Mixers/pin-out-set in different laptops
+  https://www.rom.by/forum/razlichija_audiokodekov_ALC_v_chem?page=1
+
+
+Hardware porting / repair threads
+  Using audio card as oscilloscope
+    http://www.zelscope.com/faq.html
+  i2c
+    https://community.nxp.com/thread/358362
+    https://groups.google.com/forum/#!topic/acmesystems/4veQoNRzzRY
+
+
+Intel HDA
+  REF https://en.wikipedia.org/wiki/Intel_High_Definition_Audio
+  https://www.kernel.org/doc/html/v4.12/sound/hd-audio/notes.html
+  https://help.ubuntu.com/community/HdaIntelSoundHowto
+    ftp://ftp.ulakbim.gov.tr/linux/kernel/people/tiwai/docs/HD-Audio.txt
+  http://www.alsa-project.org/main/index.php/Matrix:Module-hda-intel
+  https://01.org/linuxgraphics/gfx-docs/drm/sound/alsa-configuration.html
+  DEBUG: https://wiki.sabayon.org/index.php?title=HOWTO:_Resolve_Problems_with_HDA-Intel_Sound_Cards
+
+
+ALSA
+  /usr/src/linux/Documentation/sound/alsa/ALSA-Configuration.txt
+  |core/linux-docs| $ v /usr/lib/modules/$(uname -r)/build/Documentation/sound/alsa/HD-Audio-Models.txt
+  ++ REF http://www.volkerschatz.com/noise/alsa.html
+  http://www.alsa-project.org/
+  https://alsa.opensrc.org/
+  VIZ. plugins http://www.alsa-project.org/alsa-doc/alsa-lib/pcm_plugins.html
+  https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture
+  https://wiki.parabola.nu/Advanced_Linux_Sound_Architecture
+  TALK: https://www.linux.org.ru/tag/alsa?section=2
+  INFO /proc
+    https://alsa.opensrc.org/Proc_asound_documentation
+    VIZ. http://www.alsa-project.org/main/index.php/Matrix:Main
+    http://www.sabi.co.uk/Notes/linuxSoundALSA.html
+    http://linux-audio.com/Sound-HOWTO-6.html
+  TUT http://shellscreen.blogspot.com/2015/01/tips-to-fix-sound-server-issues-on.html
+
+  Remove PulseAudio
+    https://www.hecticgeek.com/2012/01/how-to-remove-pulseaudio-use-alsa-ubuntu-linux/
+    https://www.linux.org.ru/forum/linux-hardware/13799945
+
+
+PulseAudio
+  BLOG: http://voices.canonical.com/david.henningsson/category/pulseaudio/
+  !!! [_] READ:ARCH: https://gavv.github.io/blog/pulseaudio-under-the-hood/
+  https://wiki.archlinux.org/index.php/PulseAudio
+  https://wiki.archlinux.org/index.php/PulseAudio/Configuration
+  https://wiki.archlinux.org/index.php/PulseAudio/Examples
+  https://wiki.debian.org/PulseAudio
+  https://wiki.gentoo.org/wiki/PulseAudio
+  https://www.freedesktop.org/wiki/Software/PulseAudio/Notes/11.0/
+  https://www.freedesktop.org/wiki/Software/PulseAudio/FAQ/
+  http://kodi.wiki/view/PulseAudio
+  https://wiki.parabola.nu/PulseAudio/Troubleshooting
+
+  Volume controls
+    https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/PulseAudioStoleMyVolumes/
+    https://unix.stackexchange.com/questions/364939/why-does-setting-master-work-differently-than-setting-pcm
+    REF: https://freedesktop.org/software/pulseaudio/doxygen/volume.html
+    Master vs PCM
+      https://unix.stackexchange.com/questions/243661/whats-the-difference-between-master-and-pcm-channels-in-alsa
+  pactl/pacmd CLI language
+    $ man pulse-cli-syntax
+    https://habrahabr.ru/post/106806/
+    $ pactl help
+    $ pactl stat
+
+
+Jack
+  CMP: Pulse vs Jack
+    https://unix.stackexchange.com/questions/68772/jack-vs-pulseaudio-how-is-it-faster
+  TUT:CFG: https://forum.manjaro.org/t/how-to-replace-pulseaudio-with-jack-jack-and-pulseaudio-together-as-friend/2086
+  https://wiki.archlinux.org/index.php/JACK_Audio_Connection_Kit
+  https://github.com/jackaudio/jackaudio.github.com/wiki/PulseAudio
+
+
+Troubleshooting
+  FUN: https://freedompenguin.com/articles/how-to/pulseaudio-toilet-full-roses/
+  + [_] READ:ARCH: http://www.troubleshooters.com/linux/sound/sound_troubleshooting.htm
+  ~ https://help.ubuntu.com/community/SoundTroubleshootingProcedure
+  https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture/Troubleshooting
+  https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting
+  https://help.ubuntu.com/community/SoundTroubleshooting
+  https://www.freedesktop.org/wiki/Software/PulseAudio/FAQ/
+  https://fedoraproject.org/wiki/How_to_debug_PulseAudio_problems
+  https://wiki.debian.org/SoundFAQ
+  https://en.opensuse.org/SDB:Audio_troubleshooting
+  http://linux-sunxi.org/Audio_Codec
+  https://ubuntuforums.org/showthread.php?t=205449
+
+
+Glossary
+  |  PCH  | Platform Controller Hub
+  |  PCM  | Pulse-code modulation -- amplitude quantized with sample rate
+  |  LFE  | Low-Frequence Effects 20-200Hz
+  |  hda  | Intel High Definition Audio Specification 2004 (successor of Intel AC'97 standard)
+  | codec | hardware device OR software tool (encoder/decoder) -- chip may contain >1 codecs
+  |  NID  | node identifier ~~ PinWidget != PIN

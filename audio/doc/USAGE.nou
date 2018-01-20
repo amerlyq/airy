@@ -1,0 +1,35 @@
+Card
+  Find card chipset
+    $ cat /proc/asound/cards
+      0 [PCH            ]: HDA-Intel - HDA Intel PCH
+                           HDA Intel PCH at 0xed328000 irq 130
+    $ amixer -c0 info G Mixer
+      Mixer name	: 'Realtek ALC295'
+  Find datasheet
+    G: Realtek ALC295
+      WTF: same card may have different Mixers/pin-out-set in different laptops
+      * Harman Kardon OR Bang & Olufsen
+      * ASUS SonicMaster
+      * With an array of four separate high-quality speakers powered by two smart amplifiers, ZenBook Pro offers true surround-sound
+      * Two stereo channels, pair of high-quality speakers per each
+      * Top: LF woofer, Bottom: HF tweeter
+  Check kernel version with changes to your audio driver
+    $ lspci -nn
+    G: 8086 a171 lkddb
+      https://cateee.net/lkddb/web-lkddb/SND_HDA_INTEL.html
+    G: pci 8086:a171
+      https://pci-ids.ucw.cz/read/PC/8086/a171
+
+
+Microphone
+  Disable capture
+    $ amixer -D pulse set Capture nocap
+  Finger-tap and see output
+    $ arecord -vvv -f dat /dev/null
+  Check is 50% loud enough and w/o distortion
+    $ amixer -D pulse set Capture 50% cap
+    $ arecord -vvv -t wav /tmp/fff.wav
+  [_] CHECK: headphones line-in mic may not work
+    https://wiki.archlinux.org/index.php/ASUS_Zenbook_UX430/UX530#Headset_Microphone
+  Play speach from mic
+    $ arecord -f S16_LE -r 44100 -c 4 -D multi | aplay -f S16_LE -r 44100 -c 4 -D multi

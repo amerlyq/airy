@@ -1,0 +1,82 @@
+DEBUG
+  REF
+    + [_] READ http://voices.canonical.com/david.henningsson/2011/12/08/audio-debugging-techniques/
+    https://antergos.com/wiki/hardware/getting-informations-on-soundproblems/
+    ++ REF: /proc and amixer http://www.tldp.org/HOWTO/Alsa-sound-6.html
+    2018-01-14 [X] READ seize http://www.ti.com/lit/an/sprac10/sprac10.pdf
+      ::: no useful info
+    ALSO: search "debug" in different spaces of:
+      http://www.ti.com/sitesearch/docs/universalsearch.tsp?searchTerm=debug
+      http://downloads.ti.com/mctools/esd/docs/opencl/debug/?keyMatch=debug&tisearch=Search-EN-Everything
+      https://training.ti.com/debugging-embedded-linux-dynamic-debug?keyMatch=debug&tisearch=Search-EN-Everything
+      https://training.ti.com/zh-tw/debugging-embedded-linux-printk-variations?keyMatch=debug&tisearch=Search-EN-Everything
+  Check audio goes through HDMI
+    https://unix.stackexchange.com/questions/29185/how-to-check-why-sound-over-hdmi-doesnt-work
+      = MAYBE: auto-redirect audio on ACPI events of HDMI connection received from acpid
+  Compare alsa codec coefficients after reboot from Windows and on direct cold boot in Linux
+    https://bugzilla.kernel.org/show_bug.cgi?id=195457#c5
+    $ echo 1 | sudo tee /sys/module/snd_hda_codec/parameters/dump_coefs
+    $ alsa-info.sh --no-upload --output alsa-windows.info
+    $ alsa-info.sh --no-upload --output alsa-linux.info
+    $ diff alsa-{windows,linux}.info | grep Coeff
+    ALT:TRY: read coeffs directly from /proc and use $ dmesg | grep snd_hda_codec_realtek
+  Check who is blocking sound device
+    $ fuser -v /dev/snd/* /dev/dsp
+  Test headphone jack plug-in/out events
+    $ alsactl monitor
+    https://forums.gentoo.org/viewtopic-t-1069608.html?sid=ae315b638e3698c947900eaf2fb65484
+
+
+ALSA
+  Codec coeffs
+    $ cat /proc/asound/card*/codec\#*
+  All alsa dB controls (not only "Simple")
+    $ alsactl -f- store
+
+
+PulseAudio "-vvvv" logs
+  Log user actions
+    ~/.config/pulse/client.conf
+      autospawn = no
+    $ s.t pulseaudio.service pulseaudio.socket
+    $ killall pulseaudio
+    $ LANG=C pulseaudio -vvvv --log-time=1 |& tee /tmp/pulseverbose.log
+      Do what you need to reproduce the bug. Then <C-c> to stop PulseAudio
+  Startup logging
+    /etc/pulse/client.conf
+      extra-arguments = -vvvv --log-target=newfile:/tmp/pulseverbose.log --log-time=1
+    $ reboot
+  Alsa driver timings test (glitch-free PA)
+    https://www.freedesktop.org/wiki/Software/PulseAudio/Backends/ALSA/BrokenDrivers/
+    $ wget -O alsa-time-test.c http://cgit.freedesktop.org/pulseaudio/pulseaudio/plain/src/tests/alsa-time-test.c
+    NEED: Fedora(alsa-lib-devel), Ubuntu(libasound2-dev)
+    $ gcc -Wall -Wextra -O0 -g alsa-time-test.c -o alsa-time-test $(pkg-config --cflags --libs alsa) -lcheck
+    $ ./alsa-time-test hw:0 > log
+
+
+TUT: PulseAudio dB volume controls grouping
+  Card
+    0 [I82801DBICH4   ]: ICH4 - Intel 82801DB-ICH4
+      Intel 82801DB-ICH4 with STAC9752,53 at irq 11
+  Datasheet
+    G: 0-0/0: SigmaTel STAC9752,53 datasheet
+      + http://www.datasheetlib.com/datasheet/48246/stac9752_idt-integrated-device-technology.html
+      http://www.idt.com/?genId=STAC9752
+    Take a look at the Figure 21. "STAC9753 2-Channel Mixer Functional Diagram" (page 44) of STAC9752/53 datasheet
+      The master volume control did not has any effect on the headphone volume
+      * Line out = PCM volume + Master Volume
+      * HP_Out = PCM volume + Headphone Volume
+    Please post the output of "pulseaudio -vvvv" to find out how PA calculate the dB value of volume
+  pulseaudio -vvvv
+    D: alsa-mixer.c: Path analog-output (Analog Output) ... min_dB=-81, max_dB=12
+    D: alsa-mixer.c: Path analog-output-headphones (Analog Headphones) ... min_dB=-127.5, max_dB=12
+      <= Headphones path wrongly added "Element Master ... volume=1" which doesn't affect anything
+      It is PA miscalculate the total dB range of headphone since Master Volume of AC97 codec is the Front Out volume
+      and not the virtual master volume of HDA codec. SEE:(above): datasheet specs mixer diagram
+  $ alsactl -f- store
+    control.2  { comment.dbmin -4650 comment.dbmax 0 name 'Master Playback Volume'
+    control.4  { comment.dbmin -4650 comment.dbmax 0 name 'Headphone Playback Volume'
+    control.23 { comment.dbmin -3450 comment.dbmax 1200 name 'PCM Playback Volume'
+      PCM + Master = ((-3450 - -4650)) = -8100 dB
+
+  !2 [_] DEBUG: my dB pulseaudio

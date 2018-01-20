@@ -1,0 +1,43 @@
+Switch pulse output: Analog <-> HDMI
+  Auto-switch by udev rules
+    https://wiki.archlinux.org/index.php/PulseAudio/Examples#Automatically_switch_audio_to_HDMI
+    $ user=$(w -hs | awk -v vt=tty$(fgconsole) '$0 ~ vt {print $1}')
+    $ [[ $(</sys/class/drm/card0/*HDMI*/status) != connected ]] || sudo -u "$user" pactl --server "unix:/run/user/$(id -u "$user")/pulse/native" set-card-profile 0 output:hdmi-stereo+input:analog-stereo
+  https://bbs.archlinux.org/viewtopic.php?id=164868
+  $ pacmd list-cards | grep -B1 name:
+  $ pacmd list-cards | grep -A5 profiles: | cut -d' ' -f1
+  $ pacmd set-card-profile 0 output:analog-stereo+input:analog-stereo
+  $ pacmd set-card-profile 0 output:hdmi-stereo+input:analog-stereo
+    => NOTE: verify global volume and mute-off when switch to hdmi output
+  OR: set default and move all inputs to new sink
+    $ pacmd set-default-sink 1
+    $ pacmd move-sink-input $input 1
+
+
+CONF
+  Reorder the channels
+    https://ubuntuforums.org/showthread.php?t=795525
+    https://askubuntu.com/questions/48406/inverted-surround-channels
+    https://ubuntuforums.org/showthread.php?t=1905333
+    $ speaker-test -D 'surround40:CARD=PCH,DEV=0' -twav -mFL,FR,LFE,LFE -c4 -s3
+      BAD:(-m) can't be remapped in driver snd_pcm_set_chmap()
+  Get channel maps, allowed by driver
+    REF:
+      https://www.alsa-project.org/alsa-doc/alsa-lib/group___p_c_m.html
+      https://www.kernel.org/doc/html/v4.10/sound/designs/channel-mapping-api.html
+      SRC: http://git.alsa-project.org/?p=alsa-utils.git;a=blob;f=speaker-test/speaker-test.c
+    ATT: daemon.conf "default-sample-channels" is overriden by other channel maps present
+      https://askubuntu.com/questions/48406/inverted-surround-channels
+    Query chmap from C library
+      $ nm -D /usr/lib/libasound.so G chmap
+      $ python
+        from ctypes import *
+        la = CDLL("libasound.so")
+        la.snd_pcm_chmap_parse_string("front-left,front-right")
+        BAD: don't work ?
+  ERR: "Channels count non available"
+    !2 [_] Use it to decode meaning of alsactl.state file dump
+    FIXED define your controls in /etc/asound.conf
+      defaults.ctl.card 0
+      defaults.pcm.card 0
+      defaults.pcm.device 0

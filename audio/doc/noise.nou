@@ -1,0 +1,74 @@
+High pitch sound snd_intel_hda
+  $ journalctl -b
+    snd_hda_intel 0000:00:1f.3: bound 0000:00:02.0 (ops i915_audio_component_bind_ops [i915])
+    ...
+    snd_hda_intel 0000:00:1f.3: IRQ timing workaround is activated for card #0. Suggest a bigger bdl_pos_adj.
+    ...
+  ::::: Immediately after xserver :::::
+    pulseaudio[659]: E: [alsa-source-ALC668 Analog] alsa-source.c: ALSA woke us up to read new data from the device, but there was actually nothing to read.
+    pulseaudio[659]: E: [alsa-source-ALC668 Analog] alsa-source.c: Most likely this is a bug in the ALSA driver 'snd_hda_intel'. Please report this issue to the ALSA developers.s.s.s.
+    pulseaudio[659]: E: [alsa-source-ALC668 Analog] alsa-source.c: We were woken up with POLLIN set -- however a subsequent snd_pcm_avail() returned 0 or another value < min_avail.
+  $ cat /proc/bus/input/devices | grep -i name
+    N: Name="HDA Intel PCH Headphone" (event9 in Xorg.log)
+  $ lspci -k G audio
+    Intel Corporation Sunrise Point-H HD Audio
+  $ aplay -l
+    Realtec ALC668 Analog
+  < alsa, that it doesn't suspend the device properly
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=756150
+  $ cat /sys/module/snd_hda_intel/parameters/power_save
+  Looks like CONFIG_SND_HDA_CODEC_ANALOG=y is missing.
+  >> http://docs.slackware.com/howtos:hardware:audio_and_snd-hda-intel
+  http://www.troubleshooters.com/linux/sound/sound_troubleshooting.htm
+  https://thelinuxexperiment.com/fix-annoying-high-pitched-sound/
+  TRY: reconfiguring with alsaconf
+    https://forums-web2.gentoo.org/viewtopic-t-553075-start-0.html
+  $ alsactl init
+  THINK:>>> Hardware is initialized using a generic method
+    -- but what about booting after Windows?
+  TRY: save default state after Windows with alsactl
+  http://www.alsa-project.org/main/index.php/Asoundrc
+  https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture
+    http://www.volkerschatz.com/noise/alsa.html
+    http://www.sabi.co.uk/Notes/linuxSoundALSA.html
+  ~ https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1252733
+
+  [_] TODO:FIND: compare snd-hda-intel device state after clean boot and reboot from Windows
+  > http://avidemux.org/smif/index.php?topic=16271.0
+  http://soundprogramming.net/programming/alsa-tutorial-1-initialization/
+  ~ https://bbs.archlinux.org/viewtopic.php?id=191041
+  FIND
+    snd-hda-intel initializing "whine" -coil
+    i915_audio_component_bind_ops
+    snd_hda_codec_realtek hdaudioC0D0
+
+  TRY
+    > https://pappp.net/?p=1499
+    sudo XAUTHORITY=/home/amer/.Xauthority hdajackretask
+
+  Static noise
+    : http://askubuntu.com/questions/292786/static-background-noise-while-using-new-headset
+    /etc/pulse/default.pa
+    : load-module module-udev-detect tsched=0  # ADD: tshed=0
+    : # load-module module-suspend-on-idle     # comment it
+
+  CHECK:
+    Audio by ICEpower | Bang & Olufsen Technology
+    : Seems like it's tech mark for speakers.
+    : ASUS N73jq : options snd-hda-intel model=eeepc-p901
+
+    /usr/lib/systemd/system/alsa-restore.service
+    : Note that two different ALSA card state management schemes exist and they
+    : can be switched using a file exist check - /etc/alsa/state-daemon.conf .
+
+  MAYBE:
+    ? Problem from alsa-lib package
+      : why it called "alternative implementation"
+    ? Need alsa-oss
+
+  SEE
+    http://xps13-9333.appspot.com/#background_noise
+    > https://wiki.debian.org/SoundFAQ
+    > http://forums.debian.net/viewtopic.php?f=7&t=117835
+    > http://www.debianhelp.co.uk/sound.htm
+    http://soundprogramming.net/programming/alsa-tutorial-1-initialization/

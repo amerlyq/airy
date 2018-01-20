@@ -1,0 +1,17 @@
+[Unit]
+Description=Once - fix headphones audio cracking after boot and resume
+After=multi-user.target suspend.target hibernate.target
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+# ExecStart=/usr/bin/hda-verb /dev/snd/hwC0D0 0x20 SET_COEF_INDEX 0x67
+# ExecStart=/usr/bin/hda-verb /dev/snd/hwC0D0 0x20 SET_PROC_COEF 0x3000
+ExecStart=/usr/bin/hda-verb /dev/snd/hwC0D0 0x17 SET_CONNECT_SEL 0x1
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+
+[Install]
+WantedBy=multi-user.target suspend.target hibernate.target

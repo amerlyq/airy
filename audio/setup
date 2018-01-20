@@ -1,3 +1,27 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: io
 source ~/.shell/func.d/cfgsetup
+
+
+### USER: symlink or copy tmpl/ to private unit/
+
+## FIXED: pops when starting and stopping playback
+# NOTE: enable if "pops" are irritating (compromise with laptop heat)
+# linkcp -ct '/etc/modprobe.d' unit/audio-no-powersave.conf
+
+## FIXED: audio has cracking in left channel
+# svc_activate -ce temp_fix_alc295_cracking.service
+
+## FIXED:(alsa): regulate speakers volume by "Headphone" slider in alsamixer
+# BAD: speakers input isn't switched through verb in patch
+# linkcp -ct '/lib/firmware' unit/alc295-fix.fw
+# linkcp -ct '/etc/modprobe.d' unit/audio-alc295-fix.conf
+
+## FIXED:(pulseaudio): regulate speakers volume by default "Master"
+## NEED: don't mute headphones -- because Speakers will work through them
+##  ALSO: disable auto-mute by "UpArrow" in $ alsamixer -c0
+# WARN: may become overwritten on package update (edit again)
+#   /usr/share/pulseaudio/alsa-mixer/paths/analog-output-speaker.conf
+#     [Element Headphone]
+#     switch = ignore
+#     volume = zero

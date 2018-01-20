@@ -1,0 +1,241 @@
+Specs
+  G: Realtek ALC295 datasheet
+  https://github.com/insanelydeepak/cloverHDA-for-Mac-OS-Sierra-10.12/issues/27
+  https://github.com/vit9696/AppleALC/tree/master/Resources/ALC295
+    ?? ALC295 similar to ALC3254 ??
+  INFO: actual configuration on Windows
+    * two hi-freq Front Speakers plus two low-freq Rear Speakers (combined with Bass)
+  ::: FAIL: configuration on Linux (with appropriate surround profile)
+    * no sound from front speakers at all (or too low?)
+    * Rear Speakers work as Front ones
+    * no sound from LFE channels
+  DEBUG (reduce PCM volume first)
+    $ amixer -c0 set PCM 50%
+    $ pacmd set-card-profile 'alsa_card.pci-0000_00_1f.3' 'output:analog-surround-40+input:analog-stereo'
+    $ speaker-test -D 'surround40:CARD=PCH,DEV=0' -c4 -t wav
+
+
+2018-01-07 [X] REQ audio has cracking in left channel leaking from right channel, even if left channel is muted
+  ::: -> wait until changes are merged into 4.15+, then clean-up /lib/firmware/alc295-fix.fw
+    TEMP:FIXED: https://bugzilla.kernel.org/show_bug.cgi?id=195457#c5
+      == CMP: alsa codec coefficients on direct boot in Linux and after reboot from Windows
+    $ sudo hda-verb /dev/snd/hwC0D0 0x20 SET_COEF_INDEX 0x67
+    $ sudo hda-verb /dev/snd/hwC0D0 0x20 SET_PROC_COEF 0x3000
+  REF
+    https://xevin.ru/blog/2017/11/24/chinim-hrip-zvukovuhi-realtek-alc295-v-gnulinux
+    ++ https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/1648183/comments/17
+      << FROM: https://h30434.www3.hp.com/t5/Notebook-Audio/HP-Models-with-Realtek-ALC295-codec-Linux-Audio-Problem/td-p/6100591
+    ++ 2018-01-07 [X] https://wiki.archlinux.org/index.php/ASUS_Zenbook_UX430/UX530#Headphones_audio_is_too_low
+    https://patchwork.kernel.org/patch/9142225/
+  OR: apply patch to snd-hda-intel driver
+    /lib/firmware/alc295-fix.fw
+      [verb]
+      0x20 0x500 0x67
+      0x20 0x400 0x3000
+    /etc/modprobe.d/audio-alc295-fix.conf
+      options snd_hda_intel patch=alc295-fix.fw
+
+
+2018-01-07 [X] NOT:BUG: zero volume is still audible in headphones
+  ::: FIXED: hda driver + PulseAudio must be correctly configured -- to reduce volume in chain Master -> Headphones -> PCM
+  INFO: human misconception 0% == mute, is actually attenuation level ~ -50dB, which is still audible
+    https://bbs.archlinux.org/viewtopic.php?id=160156
+    https://unix.stackexchange.com/questions/402080/audio-volume-goes-from-0-to-100-on-aux-basically-only-on-off
+    https://bugzilla.redhat.com/show_bug.cgi?id=894016
+    https://bugs.launchpad.net/ubuntu/+source/alsa-driver/+bug/39477
+
+
+[$] BAD? headphones volume control is nonlinear
+
+[$] BAD? headphones max volume is lower then expected (but still enough) BUT not enough for silent music or noised room
+  E.G. https://www.youtube.com/watch?v=LadUft_ly50
+  https://superuser.com/questions/744845/after-updating-archlinux-the-maximum-volume-is-far-too-low
+
+2018-01-05 [X] (powersave) sound slightly pops when starting and stopping playback
+  ::: (optional) apply only if too loud and irritates as no tomorrow, otherwise keep as-is
+    options snd_hda_intel power_save=0 power_save_controller=N
+
+
+%%% Speakers
+
+INFO:BUG:
+  https://bugzilla.kernel.org/show_bug.cgi?id=195457
+  https://bbs.archlinux.org/viewtopic.php?id=223512
+  + https://wiki.archlinux.org/index.php/ASUS_Zenbook_UX390
+  + https://forums.linuxmint.com/viewtopic.php?t=91453
+  + https://askubuntu.com/questions/32383/adjust-pcm-volume
+  ++ https://maxammann.github.io/2015/02/15/z10-sync-master-pcm/
+  https://forums.linuxmint.com/viewtopic.php?t=91453
+  https://bbs.archlinux.org/viewtopic.php?id=164868
+  https://unix.stackexchange.com/questions/34526/how-to-change-mixing-of-channels-by-pulse-audio-alsa
+  REL: https://bugs.freedesktop.org/show_bug.cgi?id=93946
+  +++ https://chrisjean.com/fix-for-usb-audio-is-too-loud-and-mutes-at-low-volume-in-ubuntu/
+
+
+2018-01-15 [X] BAD: speakers volume isn't regulated at all
+  ::: NEED:(real solution) enable External Amplifier for 0x6 sound channel, connected to LFE speakers
+    if fixed someday -- remove /lib/firmware/alc295-fix.fw and "temp_fix_alc295_cracking.service"
+  ALT:TEMP:(workaround): pavucontrol -- change volume of individual program
+  ::: TEMP:FIXED: redirected audio output from Headphones to serve for LFE Speakers
+    [_] SEE:REQ https://bugzilla.kernel.org/show_bug.cgi?id=198495
+      Default graph is on default-codec#0.svg -- you see 0x02 with EAPD connected
+      to 0x14 (Front) -- it allows "Master" and "Bass Speakers" sliders to
+      regulate their output. By the way, "Bass Speakers" slider is wrong -- as it
+      must be "Speakers". Next 0x03 with EAPD regulates 0x21 by "Headphones"
+      slider and the last one 0x06 is directly connected to 0x17 LFE -- without
+      any slider at all. Relevant default-alsa-info.txt is inside attach.
+
+      I have a rather inelegant workaround for this problem -- by associating
+      both 0x02 and 0x03 as group and redirecting output from 0x03 to LFE
+      instead of headphones. It automagically replaced my incorrect "Bass
+      Speaker" slider with "Speaker" in alsamixer. After fixing pulseaudio
+      config, now I can regulate LFE by "Headphones".
+    Actual fix:
+      [pincfg]
+      0x14 0x90170110
+      0x17 0x90170111
+      [verb]
+      # Re-associate Inner Speakers and redirect input from Headphones to LFE
+      # 0x14 0x71c 0x50
+      # 0x17 0x71c 0x51
+      # 0x17 0x701 0x1
+      # FIXED: audio has cracking in left channel
+      0x20 0x500 0x67
+      0x20 0x400 0x3000
+
+    [_] Why using verb in 0x701 inside /lib/firmware/alc295.fw actually had no
+      effect -- despite being shown inside "/sys/.../init_verbs". I applied it by
+      hda-verb with systemd service, which worked. I only empirically understood
+      with hdajackretask, that [pincfg] verbs must always be applied first,
+      otherwise switching input on 0x17 has no desired effect -- is this
+      observation relevant to actual alsa code?
+
+    [_] I still suspect that between 0x06 and 0x17 lfe there must be EAPD somewhere
+      to produce actual "Bass Speaker" slider slaved to "Master". But diagrams show
+      no modules in-between. Moreover, as you can see from fixed-alsa-info.txt,
+      enabling all 3 gpio haven't forced it to be enabled nor it magically appeared.
+      Is there possibility that EAPD between 0x06 and 0x17 actually exists or I
+      misinterpreted output from tools?
+
+    [_] If enabling of EAPD is related to verb sequences into vendor widgets or
+      coefficients to them -- is there a way on Windows to sniff hda bus? Is there a
+      way to find in that verb stream that concreate sequence? (actually I already
+      compared coefficients from /proc/asound and only 0x67 fixed my headphones,
+      others only created noise in speakers).
+
+2018-01-20 [X] ALT:TEMP:(workaround): regulate global volume only by PCM
+  OR: $ alsamixer $ -- regulate volume of "PCM" directly
+  !!! BAD: changes to paths may become overwritten on pkg update (they aren't in backup array)
+  MAYBE: audio quality will become lower then expected (merging channels with softvol mixer)
+  /usr/share/pulseaudio/alsa-mixer/paths/analog-output-speaker.conf
+    [Element Master]
+      volume = off
+    [Element Bass Speaker]
+      volume = ignore
+
+++ !!! 2018-01-07 [X] Asus UX550VE https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1721345
+  == ALC295 codec seems to have Master and PCM channels swapped
+  #9 :: The problem is that node 0x06 does not have <amp-out> (amplified-output) capability.
+    Also there's no mixer that can connect 0x06 to another node with amp-out capability.
+  !2 [_] REQ write there link to my topic after getting amp-out map on Windows
+
+[$] MAYBE: use flat-volumes to regulate PCM together with Master ?
+  https://forum.kodi.tv/showthread.php?tid=93839
+  ::: BAD: any launched application will change Master volume
+
+2018-01-19 [X] TRY: enable GPIO pins (some speaker pins aren't enabled by BIOS)
+  USE:(trial-and-error): $ hdajackretask | hda-analyzer
+    * GPIO pins
+    * changing VREF of some unused pins
+    * vendor-specific COEF parameters to enable some amps
+    SEE: InitVerbs http://www.asyndetic.com/2013/04/11/on-debugging-intel-high-definition-audio-in-linux-part-i/#comment-13675
+  2018-01-16 [X] FIND: vendor-shipped *.ini file on Windows, which overrides default driver params
+    ALT: dld and compile Realtek drivers -- and look inside
+      SEE: https://wiki.debian.org/ALSA
+
+2018-01-19 [X] TRY: hda-patching
+  !1 [_] HP x360 https://bugzilla.kernel.org/show_bug.cgi?id=189331
+  This will give a new mixer element "Bass Speaker" switch, and unmute it.
+    /lib/firmware/alsa/hp-spectre-x360
+      [codec]
+      0x10ec0295 0x103c827e 0
+      [pincfg]
+      0x17 0x90170111
+    /etc/modprobe.d/90-hp-spectre-audio.conf
+      options snd-hda-intel patch=alsa/hp-spectre-x360
+
+2018-01-19 [X] TRY: redirect audio output for pin
+  select the connection for pin 0x17 to 'Audio Ouput [0x2]' using hdaanalyzer
+    => you then be able to control the volume using the master volume control
+
+2018-01-19 [X] TRY: init audio card by Windows in VM
+  * I've got all speakers working in a libvirt VM (thanks Robert)
+  * Ben's find to just disable/enable the drivers in Device manager works there too with a clean shutdown.
+  * I've started looking into kernel tracing using mmiotrace or iommu tracing as described here
+    https://blogs.s-osg.org/how-can-iommu-event-tracing-help-you/
+    ? suggestions for getting more info via the VM
+
+[$] TRY: vfio tracing with the pci card passed through to qemu
+  * run some hda-verb commands via a Fedora VM qemu: https://pastebin.com/QDQS9nwP
+    BUT the tracing didn't seem very useful -- log has no known values seen from hda-verb
+  irc:#vfio-user -- beyond current expertise
+    <awilliam> seems like you're assuming a programmed I/O model of the device
+    rather than a DMA model, those accesses could just be poking the device to
+    go read the next command in memory
+    <awilliam> I'd go look in the linux code to see what those registers are
+    <awilliam> I'd guess 48/4a are some sort of head/tail pointers in a queue,
+    we write a new head or tail, then 5d seems like a "go" register and we're
+    OR'ing it with 4 to kick it
+    <awilliam> between the qemu monitor and a gdb session, if you knew where
+    this queue thing was you could break on vcpu access to it and see what is
+    getting written there.  It's substantially harder and you need to know
+    something about the programming model of the device to do it
+
+2018-01-14 [X] TRY:CMP: alsa codec coeffs -- NEED: default setup w/o hda-verb fix
+  ! eject Headphones, don't touch Speaker volume at all
+  $ S.d temp_fix_alc295_cracking.service
+  $ systemctl --user mask pulseaudio.socket
+  ALSO: reduce driver init by probe_mask
+    $ vim /etc/modprobe.d/alsa.conf
+      options snd-hda-intel probe_mask=1
+    =1 -- won't configure mixer/PCM => get raw codec info before modified by driver
+    =3 -- configure, but don't reset HDA codecs -- maybe more precise than =1 but more info after Windows
+  * cold boot in Linux
+  * cold boot in Windows, enable Realtek driver
+    => again cold boot in Windows, disable Realtek driver in Device Manager
+    => reboot into Linux
+  ::: comparison data has no distinct difference
+
+2018-01-05 [X] TRY: remove ~/.config/pulse -- maybe affected ::: no effect
+
+[_] TRY: dmesg: MAYBE: problem here -> with 0x0 in speaker_outs ?
+  snd_hda_codec_realtek hdaudioC0D0:    speaker_outs=0 (0x0/0x0/0x0/0x0/0x0)
+  https://bbs.archlinux.org/viewtopic.php?id=191780
+    SEE: $ cat /var/lib/alsa/asound.state
+
+[_] TRY: different laptop models with workarounds
+  https://forums.gentoo.org/viewtopic-t-1032280-start-0.html
+  VIZ. http://elixir.free-electrons.com/linux/v3.3/source/Documentation/sound/alsa/HD-Audio-Models.txt
+  https://bugs.freedesktop.org/show_bug.cgi?id=84905
+  [_] TRY: Audio, ALSA for laptop: http://help.ubuntu.ru/wiki/alsa
+    /etc/modprobe.d/alsa-base.conf
+      options blacklist snd_usb_audio
+      options snd-hda-intel model=auto
+      options snd-hda-intel probe_mask=1 model=auto
+      options snd-hda-intel model=asus-mode1
+
+[_] TRY: unmute / increase volume for some widgets
+  http://www.instructables.com/id/Test-Sound-Card-and-Speakers-in-Raspberry-Pi/
+  $ cat /proc/asound/cards
+  $ ls -dl /proc/asound/card*
+  $ find /proc/asound/card* -maxdepth 2 -name info -printf '\n%P\n' -exec cat {} \;
+  MAYBE: $ amixer -c 2 cset numid=34 40% $ will set the 34th soundcard element to 40%
+    E.G. $ sudo amixer -c 0 cset numid=3 1 $ may unmute soundcard
+
+[_] TRY: create software volume mixer for unsupported hw mixer card
+  http://www.instructables.com/id/Create-a-Volume-Control-for-USB-Sound-Card-in-Rasp/
+  +++ https://superuser.com/questions/887012/how-to-force-software-master-volume-control-in-pulseaudio
+  ~ problem due to HW_VOLUME_CTRL in $ pacmd list-sinks | grep flags:
+    BUT: my laptop also has this option
+  ~ due to acpi_osi= some volume control is broken
+    ! can be verified by reboot w/o acpi_osi= and with disabled power mgmt for nvidia
