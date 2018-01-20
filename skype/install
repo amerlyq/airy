@@ -3,8 +3,8 @@ source ~/.shell/func.d/packages
 has_pr X || die
 
 if distro arch; then
-    # USE:CHECK:(audio call): skypeforlinux-bin
-    aur_inst skypeforlinux-bin
+    # aur_inst skypeforlinux-preview-bin
+    aur_inst skypeforlinux-stable-bin
     # OBSOLETE: multilib only DEPS: lib32-qt4 NEED: paci lib32-openssl100
     #   aur_inst skype
     # DEPRECATED: sni-qt  # tray icon for skype
