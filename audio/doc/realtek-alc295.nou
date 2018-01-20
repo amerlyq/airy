@@ -201,6 +201,7 @@ INFO:BUG:
     =1 -- won't configure mixer/PCM => get raw codec info before modified by driver
     =3 -- configure, but don't reset HDA codecs -- maybe more precise than =1 but more info after Windows
   * cold boot in Linux
+    $ echo 1 | sudo tee /sys/module/snd_hda_codec/parameters/dump_coefs
   * cold boot in Windows, enable Realtek driver
     => again cold boot in Windows, disable Realtek driver in Device Manager
     => reboot into Linux

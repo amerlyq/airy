@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: xorg
 source ~/.shell/func.d/cfgsetup
 
@@ -6,6 +6,8 @@ source ~/.shell/func.d/cfgsetup
 linkcp -kt '/usr/share/X11' xkb/{compat,rules,symbols,types}/*
 
 # CHECK: maybe broken, as airy/setup sets DISPLAY=:0
+# NOTE: broken after exporting DISPLAY for *monitor*
+# FAIL:(xset q &>/dev/null): will launch socket-activated Xorg when not needed
 running_X && ./run
 
 ### GENS ###
@@ -14,11 +16,7 @@ running_X && ./run
 # ./xkb-xorg.gen
 
 ### SYSD ###
-if distro arch; then
-  # dbus=/usr/share/dbus-1/system-services
-  # linkcp -c ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
-  # BUG: https://bbs.archlinux.org/viewtopic.php?id=172798
-  svc_activate -cue {kbdd,xcape}.service
-else
-  echo "If no systemd -- run kbdd manually"
-fi
+# dbus=/usr/share/dbus-1/system-services
+# linkcp -c ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
+# BUG: https://bbs.archlinux.org/viewtopic.php?id=172798
+svc_activate -cue {kbdd,xcape}.service

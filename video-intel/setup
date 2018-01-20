@@ -1,3 +1,8 @@
 #!/bin/bash -eu
 # tags: core driver
 source ~/.shell/func.d/cfgsetup
+
+## OBSOL: now "modeprobe" is used instead of "intel"
+# if lspci | grep -q 'VGA.*:\sIntel\s'; then
+#   linkcp -t /etc/X11/xorg.conf.d 20-intel.conf
+# fi

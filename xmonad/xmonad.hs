@@ -211,7 +211,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   , isDialog --> doCenterFloat
   --   (ask >>= \w -> doF $ W.sink w) >> doShift "IM"
   -- FIXME: bring copyq into between windows stack -- check on first window of fullscreen wksp
-  , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (3/10) (3/10))
+  , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
   , className =? "LuxoftPopulus" --> doFloat
   ] <+>
   composeFloat
