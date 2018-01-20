@@ -2,6 +2,14 @@ SEE
   https://wiki.archlinux.org/index.php/Touchpad_Synaptics
   https://faq.i3wm.org/question/3862/system-settings-not-working-scrolling-and-touch-click/
 
+USAGE
+  Change cursor speed
+    $ xinput --set-prop 13 'Device Accel Constant Deceleration' 3
+    $ xset m 6/1 4
+  Auto-disable touchpad when typing
+    $ syndaemon -i 0.2 -K -t -d
+
+
 FTE1001
   https://www.mail-archive.com/kernel-packages@lists.launchpad.net/msg193557.html
   https://bugzilla.kernel.org/show_bug.cgi?id=120181
@@ -49,11 +57,6 @@ synclient
 
 Fast typing 10 fingers
   http://10fastfingers.com/
-
-Speed
-  $ xinput --set-prop 13 'Device Accel Constant Deceleration' 3
-  $ xset m 6/1 4
-
 
 TEMP:(xorg.conf.d): if broken drivers
   MatchIsPointer  "on"
