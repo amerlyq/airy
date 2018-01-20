@@ -1,0 +1,50 @@
+%%% Boot
+
+[_] BUG: boot screen -- "Unable to add image options measurements: Invalid Parameter"
+  == systemd TPM measurements on startup -- problem of systemd-bootloader
+    SEE:(issue thread): https://github.com/systemd/systemd/issues/7118
+    ALT:FIX: https://wiki.archlinux.org/index.php/EFISTUB
+  2017-12-31 [X] NEED: at leaset systemd>=236.0.2 ::: still don't work for me
+  ::: REQ: wait for newer systemd-boot -- and USE: $ sudo bootctl update
+
+2018-01-02 [X] BIOS: enable "Fast Boot" -- otherwise slower startup (3.3s -> 5.8s for firmware init)
+  ::: FastBoot in bios means PC ignores USB devices except for mouse/kb at startup
+    http://www.tomshardware.co.uk/answers/id-3366685/fast-boot-fast-startup.html
+    https://forums.anandtech.com/threads/win10-fast-startup-vs-fast-boot.2481353/
+    WARN: it may sometimes play havoc in Linux with firmware after reboot from Windows.
+
+%%% Shutdown
+
++1 [_] pam shutdown
+  Dec 30 20:06:20 rose login[736]: pam_systemd(login:session): Failed to release session: Connection reset by peer
+  Dec 30 20:06:20 rose systemd-logind[404]: Failed to abandon session scope, ignoring: Transport endpoint is not connected
+
++1 [_] console shutdown
+  ~ MAYBE: related to shutdown order of my other systemd units
+    https://bugs.freedesktop.org/show_bug.cgi?id=93592
+  journalctl -b
+    Dec 30 20:06:20 rose mkinitcpio[14261]: ==> Build complete.
+    Dec 30 20:06:20 rose systemd[1]: Started Generate shutdown-ramfs.
+    Dec 30 20:06:20 rose systemd[1]: Stopped Bumblebee C Daemon.
+    Dec 30 20:06:20 rose xserver[1132]: (WW) xf86CloseConsole: KDSETMODE failed: Input/output error
+    Dec 30 20:06:20 rose xserver[1132]: (WW) xf86CloseConsole: VT_GETMODE failed: Input/output error
+    Dec 30 20:06:20 rose xserver[1132]: (WW) xf86CloseConsole: VT_ACTIVATE failed: Input/output error
+    Dec 30 20:06:20 rose xserver[1132]: (II) Server terminated successfully (0). Closing log file.
+    Dec 30 20:06:21 rose systemd[737]: Stopped Xorg - Server.
+
++1 [_] BUG: on shutdown -- wlp3s0 can't remove key
+  https://askubuntu.com/questions/967441/17-1-wlp6s0-failed-to-remove-key-1-ffffffffffff-from-hardware-22
+  https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1720930
+  NEED: kernel>=4.13.6 (prevents freeze)
+  MAYBE: install latest wifi drivers
+  ? harmless
+  ? related to shutdown order of systemd units --> NEED: shutdown wifi before stopping Network ?
+  journalctl -b
+    Dec 30 20:06:21 rose systemd[1]: Stopped target Network.
+    Dec 30 20:06:21 rose systemd[1]: Stopping Networking for netctl profile wireless-wpa-static...
+    Dec 30 20:06:21 rose network[14353]: Stopping network profile 'wireless-wpa-static'...
+    Dec 30 20:06:21 rose kernel: wlp3s0: deauthenticating from 10:c3:7b:55:63:94 by local choice (Reason: 3=DEAUTH_LEAVING)
+    Dec 30 20:06:21 rose kernel: wlp3s0: failed to remove key (1, ff:ff:ff:ff:ff:ff) from hardware (-22)
+    Dec 30 20:06:21 rose kernel: wlp3s0: failed to remove key (2, ff:ff:ff:ff:ff:ff) from hardware (-22)
+    Dec 30 20:06:22 rose systemd[1]: Stopped Login Service.
+    Dec 30 20:06:22 rose network[14353]: Stopped network profile 'wireless-wpa-static'

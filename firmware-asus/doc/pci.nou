@@ -1,0 +1,55 @@
+[_] pcieport AER: Corrected error received: id=00e0
+  $ dmesg --level=err
+
+Workarounds:
+  *** BET: upgrade BIOS
+  ** INFO: Setting "FastBoot" to "Auto/Through" in the BIOS (v2.4.2) of my XPS 13 9360 fixed this error.
+    2018-01-02 [X] https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1521173
+  ** BET:HACK:(setpci): mask only "AER: correctable errors" for single PCIe device
+    ++ TUT: https://lkml.org/lkml/2015/9/3/475
+    E.G. https://lists.gt.net/linux/kernel/2250177
+  * disable WiFi powersave /etc/modprobe.d/iwlwifi.conf => options iwlmvm power_scheme=1
+    BUT:SEE:(bottom): it must be already disabled -- https://wireless.wiki.kernel.org/en/users/Drivers/iwlwifi
+    2018-01-02 [X] https://www.linux.org.ru/forum/linux-hardware/12585679
+    https://forum.manjaro.org/t/wifi-fails-time-to-time-rtl8821ae/28914/13
+  ? disable whole device completely on boot -- E.G. cardreader w/o drivers
+  * "pcie_aspm=off" -- works only when errors flood is resulted from powermgmt states
+  * "pci=noaer" -- advanced error reporting, unrelated
+    -- only if flood from error messages spams you 5-10 messages per second
+    2018-01-02 [X] https://askubuntu.com/questions/771899/pcie-bus-error-severity-corrected
+  * "pci=nomsi" -- more slower interrupts handling in PCIe (in the manner of old PCI physical interrupt wires)
+    -- FIX:BAD: disables advanced MSI interrupts for all devices altogether
+    EXPL:(bottom): "nomsi" -- wtf
+      2018-01-02 [X] http://xillybus.com/tutorials/pci-express-tlp-pcie-primer-tutorial-guide-1
+      http://www.nvnews.net/vbulletin/showthread.php?t=120710
+    ALT? pci=pcie_bus_safe, pcie_pme=nomsi, pcie_hp=nomsi
+    BET:(>pci=nomsi): pci=nommconf -- no unified memory mapping to single memory space
+      https://unix.stackexchange.com/questions/327730/what-causes-this-pcieport-00000003-0-pcie-bus-error-aer-bad-tlp
+      https://forums.geforce.com/default/topic/957456/gtx-1080-throwing-bad-tlp-pcie-bus-errors/
+
+
+INFO
+  NOTE: repeats only several times on each power state change -- on boot and after sleep
+    [0.682134] pcieport 0000:00:1c.0: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e0(Transmitter ID)
+    [4.561657] pcieport 0000:00:1c.0: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e0(Transmitter ID)
+    [893.1544] ACPI: Waking up from system sleep state S3
+    [893.1964] pcieport 0000:00:1c.0: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e0(Transmitter ID)
+    [12723.54] pcieport 0000:00:1c.0: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e0(Receiver ID)
+      => error id=00e0 => 0/11100:000b => $ hex 0b11100 $ => BDF=00:1c.0 => $ sudo lspci -s 0000:00:1c.0 -vnn
+
+  dmesg (full example)
+    [3.357330] [drm] RC6 on
+    [3.436322] IPv6: ADDRCONF(NETDEV_UP): wlp3s0: link is not ready
+    [4.561640] pcieport 0000:00:1c.0: AER: Multiple Corrected error received: id=00e0
+    [4.561657] pcieport 0000:00:1c.0: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e0(Transmitter ID)
+    [4.561666] pcieport 0000:00:1c.0:   device [8086:a110] error status/mask=00001001/00002000
+    [4.561673] pcieport 0000:00:1c.0:    [ 0] Receiver Error         (First)
+    [4.561679] pcieport 0000:00:1c.0:    [12] Replay Timer Timeout
+    [4.561699] pcieport 0000:00:1c.0: AER: Multiple Corrected error received: id=00e0
+    [4.561708] pcieport 0000:00:1c.0: can't find device of ID00e0
+    [4.561711] pcieport 0000:00:1c.0: AER: Multiple Corrected error received: id=00e0
+    [4.561720] pcieport 0000:00:1c.0: can't find device of ID00e0
+    [4.561723] pcieport 0000:00:1c.0: AER: Multiple Corrected error received: id=00e0
+    [4.561732] pcieport 0000:00:1c.0: can't find device of ID00e0
+    13.140347] wlp3s0: authenticate with 10:c3:7b:55:63:94
+    13.275427] wlp3s0: Limiting TX power to 23 (23 - 0) dBm as advertised by 10:c3:7b:55:63:94

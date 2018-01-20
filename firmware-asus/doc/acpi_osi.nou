@@ -1,0 +1,44 @@
+%%% System freeze/hang on startup
+
+::: incompatible motherboard firmware with current linux drivers
+When:
+  * run Xorg
+  * power off dGPU by Bumblebee
+  * $ lspci
+
+REF:
+  https://bugzilla.kernel.org/show_bug.cgi?id=156341
+  https://github.com/Bumblebee-Project/Bumblebee/issues/764
+  https://wiki.archlinux.org/index.php/NVIDIA_Optimus#Lockup_issue_.28lspci_hangs.29
+
+
+ASUS UX550VD
+  + OK: acpi_osi=! acpi_osi="Windows 2009"
+    -- FAIL: wlan <Fn+F2>, monitor brightness <Fn+F5>-<Fn+F8>
+    == you are telling the firmware that the OS is Windows 7 which may not support firmware features for newer Windows versions.
+  - acpi_osi=
+  - acpi_osi=Linux
+  - acpi_osi="!Windows 2009"
+  - acpi_osi="!Windows 2012"
+  - acpi_osi="!Windows 2015"
+  - acpi_osi=! acpi_osi="Windows 2013"
+  - acpi_osi=! acpi_osi="Windows 2015"
+  - acpi_rev_override=5
+    https://bugzilla.kernel.org/show_bug.cgi?id=156341#c34
+    * on ASUS N552VW-FI056T it works better than the acpi_osi="!Windows 2015"
+    * backlight function keys are working.
+  ? TEMP: disable energy saving PMMethod=auto -> none
+    << disabling dGPU on Xorg startup triggers FAIL
+    $ v /etc/bumblebee/bumblebee.conf
+      PMMethod=none
+  ? ALT: manually fix issue with DDSDT
+    REF:
+      TUT: https://wiki.archlinux.org/index.php/DSDT
+      REF: https://01.org/linux-acpi
+      REF: https://en.wikipedia.org/wiki/Advanced_Configuration_and_Power_Interface
+      VIZ. https://wiki.archlinux.org/index.php/ACPI_modules
+      DEV: https://github.com/acpica/acpica
+        https://bugs.acpica.org/show_bug.cgi?id=1333
+    TUT:
+      https://askubuntu.com/questions/921580/ubuntu-freezes-on-login-after-nvidia-prime-intel/923216#923216
+      = tried on MSI GP72 6QE -- modified table is the SSDT6 -- the system is stable despite some boot error.

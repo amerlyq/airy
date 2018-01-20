@@ -1,0 +1,16 @@
+2018-01-02 [$] NOT: cardreader +-1c.0-[02]----00.0  Alcor Micro Device 6621
+  MAYBE: related problems with WiFi interfering -- from shared pci-bridge device
+  ::: au6621 linux driver is barely working shit -- and not in kernel (install yourself)
+    https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1270676
+    ALT:(au6601): https://ysegorov.github.io/2016/au6601/
+
+
+2018-01-01 [X] CHECK: camera = 0.3 Mpx
+  https://wiki.archlinux.org/index.php/Webcam_setup
+  $ lsusb -vt
+  $ lsusb -s 001:003 -v | grep 'Width\|Height'
+  $ mpv av://v4l2:/dev/video0
+
+
+[_] BAD? screen has more "violet" color for blue CMP: "deep blue" on my lapton, "average" on LG
+  NEED: calibrate ICC profiles, MAYBE: it's eye-saving feature enabled with more "warm" colors of 6500K

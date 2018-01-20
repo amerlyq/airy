@@ -1,0 +1,89 @@
+[_] termal sensors -- cpu temp and fan speed is too aloud even when viewing text in broser ?
+  ? increase starting temp
+
+
+[_] reboot/shutdown results in visual artifacts overlay over systemd text (video adjustment table)
+  ~ test card, also known as a test pattern or start-up/closedown test
+  ~ common PAL test pattern
+  ~ color bars: common NTSC test pattern
+
+
++1 [_] XXX: dmesg
+  [0.329999] ACPI: [Firmware Bug]: BIOS _OSI(Linux) query ignored
+    MAYBE: related to acpi_osi=!Windows workaround
+  [0.793941] i8042: PNP: PS/2 appears to have AUX port disabled, if this is incorrect please boot with i8042.nopnp
+
+
+2018-01-01 [X] BUG: ACPI region does not cover the entire command/response buffer
+  ::: ignore :: not involved into any workflow with crypto-processor
+    ~ can be used to store _single_ SSH key in PKCS#11
+    ~ NEED: "modprobe tpm*" and user-space daemon "tcsd"
+    https://wiki.archlinux.org/index.php/Trusted_Platform_Module
+  E.G. probably cannot send large TPM commands since the buffer will be truncated
+    DEV:FIX:(patch) https://patchwork.kernel.org/patch/9585671/
+      https://bugzilla.redhat.com/show_bug.cgi?id=1494574
+    https://trustedcomputinggroup.org/tpm-main-specification/
+  dmesg
+    Dec 30 17:13:01 rose kernel: ACPI: [Firmware Bug]: BIOS _OSI(Linux) query ignored
+    [1.705980] tpm_crb MSFT0101:00: [Firmware Bug]: ACPI region does not cover the entire command/response buffer. [mem 0xfed40000-0xfed4087f flags 0x201] vs fed40080 f80
+    [1.706654] tpm_crb MSFT0101:00: [Firmware Bug]: ACPI region does not cover the entire command/response buffer. [mem 0xfed40000-0xfed4087f flags 0x201] vs fed40080 f80
+
+
+2018-01-01 [X] BUG: thermal_zone9 failed
+  ::: harmless, thermal data must appear a few seconds later
+    https://patchwork.kernel.org/patch/5978221/
+    $ xargs < /sys/class/thermal/thermal_zone9/{temp,type}
+      44000 iwlwifi
+  dmesg
+    [2.234865] thermal thermal_zone9: failed to read out thermal zone (-61)
+      -61 = ENODATA  /* No data available */ in /usr/include/asm-generic/errno.h
+
+
+2018-01-01 [X] ACPI FADT declares the system doesn't support PCIe ASPM, so disable it
+  ::: harmless, but you won't get powersaving on PCIe devices (~20% of laptop battery)
+    https://wiki.archlinux.org/index.php/Power_management#Active_State_Power_Management
+  ALSO: look at your BIOS for ASPM -- if there is any settings
+  ALT:USE:(kernel): pcie_aspm=force
+    WARN:
+      * "force" => can cause a freeze/panic => don't disable "edit" in UEFI to undo the kernel option
+      * systems w/o support for ASPM may even increase power consumption
+        INFO: verify power consumption before and after "force" added
+          $ for i in {1..100}; do sleep 0.1; cat /sys/class/power_supply/BAT0/power_now; done | awk '{a+=strtonum($0)/1000000;n++} END{print a/n}'
+        INFO: verify CPU frequency
+          $ find -L /sys/devices/system/cpu/cpufreq -maxdepth 2 -name scaling_cur_freq -exec sh -c 'd=${0%/*}; echo ${d##*/} $(cat $0)' {} \; SN T
+          https://wiki.archlinux.org/index.php/CPU_frequency_scaling
+      * check $ dmesg | grep ASPM $ after enabling to see if ASPM in hardware is still disabled after "force"
+        ATT: results may be incorrect when booting with acpi_osi=! acpi_osi="Windows 2009"
+      * NEED: test wifi speed after sleep -- iwlwifi may become sluggish after powersave
+        https://bugzilla.kernel.org/show_bug.cgi?id=84031
+  ALT: $ setpci
+    TUT: https://wireless.wiki.kernel.org/en/users/Documentation/ASPM
+      https://wireless.wiki.kernel.org/en/users/drivers/ath9k/power-consumption
+    TUT: http://forum.notebookreview.com/threads/enable-aspm-in-t61-running-windows-for-saving-2w-of-power-consumption.606100/
+  INFO
+    https://forums.tweaktown.com/asrock/54297-pci-express-active-power-management-aspm-disabled.html
+    https://forum.thinkpads.com//viewtopic.php?t=110446
+    + (historical) https://lwn.net/Articles/449448/
+      https://web.archive.org/web/20120718035639/http://www.fewt.com/2011/09/about-kernel-30-power-regression-myth.html
+      https://www.phoronix.com/forums/forum/software/mobile-linux/25676-the-leading-cause-of-the-recent-linux-kernel-power-problems/page3
+      https://bugs.launchpad.net/ubuntu/+source/linux/+bug/760131
+      https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1170836
+  DEBUG: check current state
+    $ cat /sys/module/pcie_aspm/parameters/policy
+      [default] performance powersave powersupersave
+    $ sudo lspci -vv | grep '^\S\|ASPM.*abled;' | grep -B1 ASPM
+      ...
+      03:00.0 Network controller: Intel Corporation Wireless 8265 / 8275 (rev 78)
+         LnkCtl: ASPM L1 Enabled; RCB 64 bytes Disabled- CommClk+
+
+
+[~] TRY: use finger-scaner when prompted for password for sudo or gnupg
+  ::: Fingerprint reader is not supported. The drivers are closed source.
+    DEV:(fork, people are trying to add support): https://github.com/sbechet/libfprint
+  ~~ using finger-scaner is annoying -- requires to significantly move your hands from keyboard
+  REF
+    https://wiki.archlinux.org/index.php/Fingerprint-gui
+    https://wiki.archlinux.org/index.php/fprint
+    https://wiki.archlinux.org/index.php/ThinkFinger
+    https://bbs.archlinux.org/viewtopic.php?id=150726
+    TUT: http://www.archlinuxuser.com/2013/05/using-fingerprint-for-loginsusudo-with.html

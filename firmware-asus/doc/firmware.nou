@@ -1,0 +1,42 @@
+2017-12-31 [X] hwmon_device_register
+  ::: ignore it, -- relevant only for driver developers
+  SEE:
+    nouveau: https://patchwork.freedesktop.org/series/23107/
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=875924
+    https://trello.com/b/ZudRDiTL/nouveau
+    https://forums.linuxmint.com/viewtopic.php?t=251683
+  dmesg
+    [1.711360] (NULL device *): hwmon_device_register() is deprecated. Please convert the driver to use hwmon_device_register_with_info().
+    [1.711441] thermal LNXTHERM:00: registered as thermal_zone0
+    [1.711442] ACPI: Thermal Zone [THRM] (49 C)
+    [1.780525] (NULL device *): hwmon_device_register() is deprecated. Please convert the driver to use hwmon_device_register_with_info().
+    [1.780628] shpchp: Standard Hot Plug PCI Controller Driver version: 0.4
+    [2.085868] (NULL device *): hwmon_device_register() is deprecated. Please convert the driver to use hwmon_device_register_with_info().
+    [2.085877] thermal thermal_zone9: failed to read out thermal zone (-61)
+
+
+2018-01-01 [X] WARN: Argument #4 type mismatch
+  ::: harmless, nvidia passes wrong details (wontfix) -- some systems will break if fixed
+    https://askubuntu.com/questions/842134/acpi-warning-argument-4-type-mismatch
+      https://github.com/Bumblebee-Project/bbswitch/issues/106
+      https://github.com/Bumblebee-Project/bbswitch/commit/ee0591b9b8d0a42f60eae6f9c644e6a1be4323d6#commitcomment-4685919
+  dmesg
+    [3.155398] bbswitch: loading out-of-tree module taints kernel.
+    [3.155688] bbswitch: version 0.8
+    [3.155691] bbswitch: Found integrated VGA device 0000:00:02.0: \_SB_.PCI0.GFX0
+    [3.155694] bbswitch: Found discrete VGA device 0000:01:00.0: \_SB_.PCI0.PEG0.PEGP
+    [3.155700] ACPI Warning: \_SB.PCI0.PEG0.PEGP._DSM: Argument #4 type mismatch - Found [Buffer], ACPI requires [Package] (20170728/nsarguments-100)
+    [3.155761] bbswitch: detected an Optimus _DSM function
+    [3.155767] pci 0000:01:00.0: enabling device (0006 -> 0007)
+    [3.155838] bbswitch: Succesfully loaded. Discrete card 0000:01:00.0 is on
+    [3.156910] bbswitch: disabling discrete graphics
+
+
+2018-01-07 [X] XXX [893.203437] ACPI: button: The lid device is not compliant to SW_LID.
+  == occurs when <Fn+F1> hibernates laptop, BUT absent when simply closing Laptop LID
+  ::: ignore, here kernel applies workaround to frequent LID bug in firmware
+    E.G. https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1666637
+    https://elixir.free-electrons.com/linux/latest/source/drivers/acpi/button.c#L166
+      OR:line:166: https://github.com/torvalds/linux/blob/master/drivers/acpi/button.c
+    EXPL: https://patchwork.kernel.org/patch/9285379/
+      https://lists.freedesktop.org/archives/systemd-devel/2017-June/038977.html

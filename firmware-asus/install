@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+# FIXED:SEE: /var/log/pacman.log -- install drivers
+#  ==> WARNING: Possibly missing firmware for module: wd719x
+#  ==> WARNING: Possibly missing firmware for module: aic94xx
+aur_inst wd719x-firmware aic94xx-firmware
+
+
+## FIXED: sytem freeze on startup
+workaround='acpi_osi=! acpi_osi="Windows 2009"'
+if ! grep -qwF "$workaround" /boot/loader/entries/*.conf; then
+cat << EOT
+ADD:($workaround) to kernel boot cmdline:
+E.G: $ cat /boot/loader/entries/arch.conf
+  options root=/dev/mapper/ws-root rw $workaround
+EOT
+fi
