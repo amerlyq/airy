@@ -1,0 +1,36 @@
+TODO
+  [_] FIND G: ga prolong battery life
+    * limit charging to 58-60% when constantly on AC
+    * disable charging of battery completely
+    * disable offline charging usb port
+
+  [_] надо сконфигурировать батарею заряжаться до <95% итп,
+    чтобы она не умерла так же быстро как на Impression.
+    G: arch battery capacity tips
+    |aur/batterylife|
+
+  2018-01-01 [X] NEED: disable/remap "PowerOff" key permanently -- too close to <Del>/<BS>/<Home>
+    https://wiki.archlinux.org/index.php/Power_management#ACPI_events
+    /etc/systemd/logind.conf.d/20-acpi-buttons.conf
+      [Login]
+      HandlePowerKey=ignore
+    2018-01-01 [X] TRY: remap disabled "PowerOff" to "r.core shutdown"
+    [_] THINK: remap vt console action 0xe05ee0de -> ???
+
+  2018-01-01 [X] CHECK: sleep/suspend/closing_laptop_lid generates event w/o |acpid|
+    2018-01-01 [X] OK: <Fn+F2>, OK: <LidClose>
+    2018-01-01 [X] READ: if acpid itself is of any use for me
+      ::: systemd normally supports basic events
+    xorg -- no problem
+      Dec 30 20:06:40 rose xserver[1141]: (II) config/udev: Adding input device Lid Switch (/dev/input/event1)
+      Dec 30 20:06:40 rose xserver[1141]: (II) No input driver specified, ignoring this device.
+
+  2018-01-01 [X] FIND: what difference between these two power buttons ?
+    https://lists.gt.net/linux/kernel/2084674
+    https://forums.gentoo.org/viewtopic-t-897006-start-0.html
+    ::: ignore it, until problems with double-events resulting in repeated hibernation
+    dmesg
+      [1.706189] input: Power Button as /devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0C:00/input/input3
+      [1.706196] ACPI: Power Button [PWRB]
+      [1.706228] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input4
+      [1.706243] ACPI: Power Button [PWRF]

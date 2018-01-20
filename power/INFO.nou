@@ -9,6 +9,21 @@ USAGE
     $ acpi | awk '$9=substr($4,1,match($4,"%")-1) {print $9}'
 
 
+Tools
+  upower ?unnecessary?
+    NOTE: upower is dbus-activated, but explicit "enable" improves system startup time
+      svc_activate -e upower
+    + plot graphics with data returned by dbus
+      https://unix.stackexchange.com/questions/10418/how-to-find-power-draw-in-watts
+      SEE: GetHistory() at https://upower.freedesktop.org/docs/Device.html
+        = maybe it can draw graphics with annotation to state of pcie devices, etc ?
+      $ dbus-send --print-reply --system --dest=org.freedesktop.UPower /org/freedesktop/UPower/devices/battery_BAT0 org.freedesktop.UPower.Device.GetStatistics string:charging
+    + exposes kbd backlight through dbus w/o sudo
+    + MAYBE better alert on low battery
+    - 1.6s of startup
+    - additional packages
+
+
 SEE
   https://wiki.archlinux.org/index.php/Powertop
     http://xmodulo.com/how-to-monitor-power-usage-in-linux.html
@@ -21,9 +36,6 @@ SEE
   https://wiki.ubuntu.com/Kernel/PowerManagement
   https://www.reddit.com/r/linux/comments/1xac1r/linux_and_the_laptop_power_management_is_terrible/
 
-  upower
-    https://unix.stackexchange.com/questions/10418/how-to-find-power-draw-in-watts
-    = maybe it can draw graphics with annotation to state of pcie devices, etc ?
   |i7z|
   |cpupower|
   tlp
