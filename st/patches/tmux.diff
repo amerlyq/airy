@@ -39,7 +39,22 @@ index ae93ade..11a37d8 100644
  	execvp(prog, args);
  	_exit(1);
  }
-@@ -2691,7 +2701,7 @@ usage(void)
+@@ -1572,11 +1582,12 @@ tsetmode(int priv, int set, int *args, int narg)
+ 				MODBIT(term.mode, set, MODE_BRCKTPASTE);
+ 				break;
+ 			/* Not implemented mouse modes. See comments there. */
+-			case 1001: /* mouse highlight mode; can hang the
+-				      terminal by design when implemented. */
+ 			case 1005: /* UTF-8 mouse mode; will confuse
+ 				      applications not supporting UTF-8
+ 				      and luit. */
++				break; /* silently ignore tmux probing inside tty_start_tty(), etc */
++			case 1001: /* mouse highlight mode; can hang the
++				      terminal by design when implemented. */
+ 			case 1015: /* urxvt mangled mouse mode; incompatible
+ 				      and can be mistaken for other control
+ 				      codes. */
+@@ -2691,7 +2702,7 @@ usage(void)
  	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
  	    " [-n name] [-o file]\n"
  	    "          [-T title] [-t title] [-w windowid]"

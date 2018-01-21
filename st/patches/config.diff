@@ -23,7 +23,7 @@ index 877afab..16f7260 100644
  
  /*
   * Default colour and shape of the mouse cursor
-@@ -164,12 +165,17 @@ MouseShortcut mshortcuts[] = {
+@@ -164,6 +165,10 @@ MouseShortcut mshortcuts[] = {
  #define MODKEY Mod1Mask
  #define TERMMOD (ControlMask|ShiftMask)
  
@@ -34,14 +34,7 @@ index 877afab..16f7260 100644
  Shortcut shortcuts[] = {
  	/* mask                 keysym          function        argument */
  	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
- 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
- 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
- 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-+	{ TERMMOD,              XK_End,         zoom,           {.f =+10} },
- 	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
- 	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
- 	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
-@@ -178,6 +184,9 @@ Shortcut shortcuts[] = {
+@@ -178,6 +183,9 @@ Shortcut shortcuts[] = {
  	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
  	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
  	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },

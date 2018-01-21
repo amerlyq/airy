@@ -37,6 +37,10 @@ function prompt_elapsed_urgent { local dt=${1:?}
   (( dt > 60 )) || return
   printf '\a'  # Urgent bell
   # BAD: false-positive after: ranger, bash, schroot, etc
+  # => even <CR> on empty prompt after 10s will trigger this
+  #   * don't notify when exited through user actions -- exit command, <C-c>, kill signal, etc
+  #   * current term/tmux window must be unfocused
+  #   ~ don't notify after ncurses apps
   # if (($+commands[r.n])) && [[ -n $DISPLAY ]]; then
   #   r.n -U 'ZSH' "$(fc -l -n -1)"
   # fi

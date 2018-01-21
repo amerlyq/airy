@@ -116,8 +116,19 @@ BUG
      erresc: unknown csi ESC[8;30;100t
      erresc: unknown csi ESC[8;20;119t
       [_] FIND: terminfo csi redefine/change to suppress those codes for 'st'
-    [_] tmux
-     erresc: unknown private set/reset mode 1005
+  2018-01-21 [X] erresc: unknown private set/reset mode 1005
+    ::: safe to ignore -- DEV patch "st.c" to hide message for 1005 only
+    << repeats twice at tty_start_tty() / tty_stop_tty()
+      if (tty_term_has(tty->term, TTYC_KMOUS))         | ./tty.c:307
+        tty_puts(tty, "\033[?1000l\033[?1002l\033[?1006l\033[?1005l")
+    INFO: can be emulated manually inside $ st -M $ and outputting that sequence
+      $ printf "\033[?1000l\033[?1002l\033[?1006l\033[?1005l"
+      REF: https://www.systutorials.com/docs/linux/man/4-console_codes/
+    FIND: terminfo csi redefine/change to suppress those codes for 'st'
+      => st.info: "kmous=\E[M" BUT! if removed I will lose mouse in terminal completely
+    ALT: use only 1006 -- but how is it possible, moreover it won't suppress tty_start_tty()
+      https://superuser.com/questions/696212/tmux-mouse-mode-does-not-works-with-large-gnome-terminal/904927
+      (m->sgr_type != ' ' && (s->mode & MODE_MO...))    | ./input-keys.c:288
   Other
     [_] neovim -> ranger -> 'a' (ag) <M-v> to paste --> eats two letters at beginning
       :? related to escape-seq of paste? Try using paste-as-text?

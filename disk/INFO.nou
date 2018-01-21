@@ -7,6 +7,14 @@ Disk failures
 
   |community/ncdu| -- CASE search biggest files to delete
     Disk usage analyzer with an ncurses interface
+  ERR: "critical medium error"
+    https://unix.stackexchange.com/questions/372390/my-usb-hard-drive-seems-inaccessible
+    Check
+      $ sudo badblocks /dev/sda
+    Copy to another partition
+      $ dd_rescue/ddrescue
+    Create new partition table instead of damaged sector
+      $ fdisk
 
 
 TODO
