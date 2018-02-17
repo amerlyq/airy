@@ -20,7 +20,7 @@ call dein#add('mhinz/vim-signify', {'lazy': 0,
 " ALSO:USE: m, m. m- m/ m? dm  CHG: m<Del> m<BS>
 " STD: :marks(list), m'`(prev), m<>(visual), m[](change/yank), :k[a-zA-Z'](mark)
 " CHECK: IncludeMarkers >= 10 --> USE? \"
-call dein#add('kshenoy/vim-signature', {
+call dein#add('kshenoy/vim-signature', {'lazy': 0,
   \ 'on_map': [['n', "m", "']", "'[", "`]", "`[", "]'", "['",
   \             "]`", "[`", "]-", "[-", "]=", "[="]],
   \ 'on_cmd': ['SignatureToggleSigns', 'SignatureRefresh',

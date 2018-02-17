@@ -21,6 +21,10 @@ command! -nargs=0 -range  SortInLine
 command! -bar -bang -range  SortByBlock
       \ <line1>,<line2>sort<bang> i /\ze\%V/
 
+command! -bar -bang -nargs=0 -range=% SortLineLen
+  \ sil exe <line1>.','.<line2>."!awk '{print length\"\\t\"$0}'"
+  \. "|sort -ns" .(<bang>0 ?'': 'r'). "|cut -f2-"
+
 " Search opened buffers
 " http://vim.wikia.com/wiki/Search_using_quickfix_to_list_occurrences
 " :bufdo vimgrepadd threading % | copen
