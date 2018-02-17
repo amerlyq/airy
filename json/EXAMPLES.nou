@@ -1,0 +1,17 @@
+Extract choosen values
+  $ jq -r '.[]|select(.==-1)'
+  $ jq -r '.[]|select(.field|contains("-1"))'
+
+Replace choosen values
+   .cells |= map(if has("outputs") then .outputs = [] else . end
+                 | if has("execution_count") then .execution_count = null else . end)
+
+  $ jq '((.cells[].outputs | select(.) ) |= []) | (((.cells[].execution_count | select(.))) |= null)'
+  $ jq 'with_entries(if(.value==-1) then .value=-5 else . end)'
+
+
+Convert values to numbers
+  $ jq 'with_entries(.value |= tonumber)'
+
+Filter by values
+  $ jq '[.something | to_entries[] | {"key": .key, "value": .value.foo}] | from_entries'
