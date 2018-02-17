@@ -26,7 +26,8 @@ function prompt_async_exec { local c
   # EXPL: terminate itself w/o waiting for next prompt to kill
   #   * if terminal left alone or user launched long session with ranger/etc
   #   * send signal to update prompt before killing to reset $pid variable
-  { sleep 10; kill -USR1 $update; kill 0; } & timer=$!
+  # HACK: "cd /" beforehand to prevent sleep from obstructing unmount
+  ( cd /; sleep 10; kill -USR1 $update; kill 0; ) & timer=$!
 
   for c in $_prompt_async_calls; do
     _prompt_async_call_$c >! $_prompt_tmp/$c & pids+=($!)
