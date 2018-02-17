@@ -60,6 +60,7 @@ TODO
   [_] FIXME:DONT: 'r.monitor-refresh' when returning from dpms
     * I may manually disable built-in eDP1 monitor and don't want to enable it when simply move mouse after 20 min
   [_] TODO: ignore udev events when going to sleep -- don't disable external monitor
+    => seems like xrandr keeps state => only ignore first udev events after wake up to not disable monitor
     BAD: usb devices also re-init (remove+add) when going to standby
       ? MAYBE this behavior only when picture through USB3.1 ?
         CHECK: standby with picture through HDMI
@@ -80,6 +81,10 @@ TODO
   2017-01-08 [X] can't wake up after dpms
     ::: switch 'Input' to 'HDMI' only (no 'auto')
   [_] BUG: again can't wake up -- if HDMI primary and only eDP1 off
+    ::: FIXED: workaround to wake up
+      $ sleep 1 && xset dpms force standby && sleep 8 && xset dpms force on && xrandr --output DP-1 --auto
+    https://askubuntu.com/questions/854754/monitor-stays-in-sleep-when-daisy-chained-via-displayport
+      TEMP:FIXED: $ xset dpms force off $ and move mouse to wake it up back
     CHECK: after drivers upgrade
     https://wiki.archlinux.org/index.php/intel_graphics#DRI3_issues
       + https://bbs.archlinux.org/viewtopic.php?id=215930

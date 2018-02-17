@@ -29,3 +29,14 @@ TODO
       Dec 30 17:13:01 rose kernel: sd 0:0:0:0: [sda] Write Protect is off
       Dec 30 17:13:01 rose kernel: sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
       Dec 30 17:13:01 rose kernel: sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+
+
+UAS disable
+  https://unix.stackexchange.com/questions/239782/connection-problem-with-usb3-external-storage-on-linux-uas-driver-problem
+    https://ubuntuforums.org/showthread.php?t=2307662
+    REF https://ru.wikipedia.org/wiki/USB_Attached_SCSI
+    https://bugzilla.redhat.com/show_bug.cgi?id=1124119
+  $ echo options usb-storage quirks=8564:7000:u | sudo tee /etc/modprobe.d/blacklist_uas.conf
+  $ sudo mkinitcpio -p linux
+  $ reboot
+    => [   93.985002] usb 4-1: UAS is blacklisted for this device, using usb-storage instead

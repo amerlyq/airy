@@ -16,3 +16,11 @@ Move directory
     $ rsync -avh --stats --progress --remove-source-files /path/old/ /path/new
   delete empty source dirs skeleton afterward
     $ find /path/old -depth -type d -empty -delete
+
+Resume / interrupt
+  https://unix.stackexchange.com/questions/48298/can-rsync-resume-after-being-interrupted/147286
+  * --partial --partial-dir
+  * --append --append-verify
+  * --checksum
+
+TRY: store checksum in xatter on copy like rmlint
