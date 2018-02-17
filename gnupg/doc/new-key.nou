@@ -28,7 +28,7 @@ Multihost master key
       gpg> 0/Use only in case of master key loss, else gen new with specified reason.
 
   Keep only subkeys (with changed password)
-    !_ You can use RAM disk for tmp operations, instead of using shred on HDD
+    !. You can use RAM disk for tmp operations, instead of using shred on HDD
     NOT diff passwords
       NOTE: you can't have different passphrase for master key and subkeys
       HACK: export all keys and re-import only subkeys, then change subkeys password
@@ -42,7 +42,7 @@ Multihost master key
       ALT: export sep keys per each host individually in different files
         $ gpg --export-secret-subkeys -a '<SID>!' '<EID>!' >  subkeys_$host.asc
     Delete master key -- public key will remain
-      !_ WARN: master key must be already exported
+      !. WARN: master key must be already exported
       $ gpg --delete-secret-key $gpgkey
     Insert subkeys back
       $ gpg --import subkeys.asc
@@ -50,5 +50,6 @@ Multihost master key
         WARN: use cp + shred instead of mv for key transportation
     ! Verify that gpg -K shows a "sec#" instead of just "sec" for your private key.
       << That means the signing subkey is not in the keypair located in keyring.
+      $ gpg -K
       $ gpg --edit-key $gpgkey passwd
       $ gpg --list-options show-keyring -K
