@@ -1,0 +1,41 @@
+view -> storage
+  $ curl -u "$USER" -X POST -H 'Content-Type: application/json' -d'{"value":"{cheese}","representation":"wiki"}' "$host/rest/api/contentbody/convert/storage" | jq
+
+browse and save cookie
+  $ host='https://example.com/confluence'
+  $ curl -c mycookie --user "$USER" --referer "$host" --header 'Accept: application/json' --url "$host/rest/api/content/" | jq
+  $ curl -b mycookie "$host/rest/api/content/" YT
+  $ YT: | jq
+  NOTE: if some page not found -- maybe cookie has expired
+
+find content id by space and page title
+  $ page="my wikipage"
+  $ space=MYPROJ
+  $ curl -b mycookie -X GET "$host/rest/api/content?title=$page&spaceKey=$space&expand=history" | jq -r '.results[0]._links.self'
+    # https://example.com/confluence/rest/api/content/338678240
+
+read content with expanded body
+  "_expandable": {
+    "editor": "",       # ???
+    "view": "",         # relative refs
+    "export_view": "",  # expanded absolute refs
+    "styled_view": "",  # complete page
+    "storage": "",      # inner xml
+    "anonymous_export_view": ""  # data w/o page context
+  }
+  $ curl -b mycookie -X GET "$host/rest/api/content/338678240?expand=body.view" | jq
+  $ YT: | jq -r '.body.view.value' | w3mh
+    # (see <a href="/confluence/display/MYPROJ/my+wikipage">my wikipage</a>)
+  $ curl -b mycookie -X GET "$host/rest/api/content/338678240?expand=body.editor" | jq
+  $ YT: | jq -r '.body.editor.value' | w3mh
+    # (see <a class=\"confluence-link\"
+    #   href=\"/confluence/display/MYPROJ/my+wikipage\"
+    #   data-linked-resource-id=\"323519034\" data-linked-resource-version=\"71\"
+    #   data-linked-resource-type=\"page\"
+    #   data-linked-resource-default-alias=\"my wikipage\"
+    #   data-base-url=\"https://example.com/confluence\">my wikipage</a>)
+  $ curl -b mycookie -X GET "$host/rest/api/content/338678240?expand=body.storage" | jq
+  $ YT: | jq -r '.body.storage.value' | w3mh
+    # (see&nbsp;<ac:link><ri:page ri:content-title=\"my wikipage\" /></ac:link>)
+  USE
+    $ YT: | jq -r '.body.storage.value' | tidy -xml -i - 2>/dev/null V -c 'setf xml'

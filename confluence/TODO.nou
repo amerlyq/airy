@@ -1,0 +1,39 @@
+TODO
+  [_] USE: cookie or login-token
+    E.G.
+      $ confluence --action login --user mylogin --password - > tokenfile
+      $ confluence --action getserverInfo --user mylogin --loginFromStandardInput < tokenfile
+
+Tools
+  pretty json
+    jq <-> $ python -mjson.tool
+  pretty html/xml
+    https://stackoverflow.com/questions/16090869/how-to-pretty-print-xml-from-the-command-line
+    $ tidy -xml -i - $ <-> $ xmllint --format -
+      paci libxml2-utils
+    TRY: $ tidy - --indent yes --indent-spaces 4 --indent-attributes yes --wrap-attributes yes --input-xml yes --output-xml yes
+
+
+API
+  https://developer.atlassian.com/docs/
+  [_] confluence wiki API
+    https://docs.atlassian.com/atlassian-confluence/REST/6.6.0/
+    E.G. https://developer.atlassian.com/confdev/confluence-server-rest-api/confluence-rest-api-examples
+  [_] bitbucket review API
+    https://docs.atlassian.com/bitbucket-server/rest/5.6.2/bitbucket-rest.html
+
+
+Bitbucket Code Review
+  http://layer0.authentise.com/bitbucket-jira-integration-or-why-we-moved-away-from-github.html
+  https://habrahabr.ru/post/261783/
+    https://habrahabr.ru/post/261783/#comment_8488971
+  http://thoughts.codegram.com/reviewing-pull-requests-from-vim-with-vim-codereview/
+  https://github.com/mrbabbs/bitbucket-vim-reviewer
+  ++ https://github.com/seletskiy/ash
+    |aur/ash|
+    https://github.com/seletskiy/ashium
+  https://lambdalisue.github.io/vimconf2015/#1
+
+READ how-to review (bad practice)
+  https://bitquabit.com/post/code-reviews-and-bad-habits/
+  http://codeinthehole.com/tips/pull-requests-and-other-good-practices-for-teams-using-github/
