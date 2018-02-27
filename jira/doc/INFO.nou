@@ -1,2 +1,24 @@
 Convert issue <=> sub-task
   https://confluence.atlassian.com/jiracoreserver073/creating-issues-and-sub-tasks-861257329.html
+
+jira issues API
+  https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-createIssue
+  https://developer.atlassian.com/server/jira/platform/
+  E.G.
+    https://gist.github.com/Integralist/24da7316dee1ba00bd66
+    https://community.atlassian.com/t5/Jira-questions/How-to-create-an-issue-automatically-in-JIRA-without-Jelly/qaq-p/314688
+    https://community.atlassian.com/t5/Jira-questions/Create-issue-and-or-data-with-JSON-REST-API/qaq-p/154403
+    https://stackoverflow.com/questions/5884960/how-to-create-an-issue-in-jira-via-rest-api
+  jql for 5.0+
+    https://developer.atlassian.com/server/jira/platform/jira-rest-api-example-query-issues-6291606/
+    NOTE: hardcoded limitation <=100 results
+      https://community.atlassian.com/t5/Answers-Developer-Questions/How-to-get-more-than-50-issues-with-search-API/qaq-p/463122
+
+cookie session expiration time DFL=5h -> 30min
+  => NEED: "remember me" -- copy from browser and use
+    OR:BET: post form simulating that jira login page to receive remember me cookie
+    https://community.atlassian.com/t5/Answers-Developer-Questions/Can-REST-API-Authentication-take-advantage-of-the-long-lived/qaq-p/563576
+    https://community.atlassian.com/t5/Answers-Developer-Questions/Where-in-the-JIRA-database-schema-is-the-remember-me-cookie/qaq-p/491738
+  https://confluence.atlassian.com/jira063/changing-the-default-session-timeout-683542392.html
+  https://community.atlassian.com/t5/Jira-questions/Configure-maximum-lifetime-of-session-in-JIRA/qaq-p/229614
+  https://community.atlassian.com/t5/Jira-questions/how-to-set-timeout-for-jira-user-session/qaq-p/28832

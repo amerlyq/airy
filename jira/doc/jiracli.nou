@@ -16,8 +16,11 @@ Search
     $ jiracli --issue-search "assignee=CurrentUser() and status='In Progress'" --issue-comments
 
 Search JQL
+  https://confluence.atlassian.com/jiracore/blog/2015/07/search-jira-like-a-boss-with-jql
+  current project
+    "project = MYPROJ AND sprint IN openSprints()"
   issue body
-    "project = MYPROJ AND text ~ {} ORDER BY key DESC"
+    "text ~ {} ORDER BY key DESC"
     "comment ~ 'corrupted coredump'"
   related tickets
     "... AND NOT (status=Open OR status='In Progress' OR status=Closed OR status=Resolved) ORDER BY CID, priority"
