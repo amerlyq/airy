@@ -32,6 +32,20 @@ USAGE
     $ mount -o subvol=/ /dev/mapper/ws-root /mnt
   Free space BAD: $ df -h /
     $ btrfs filesystem df /
+  Deduplicate extents
+    https://wiki.archlinux.org/index.php/Btrfs#Deduplication
+    https://lwn.net/Articles/679031/
+    https://askubuntu.com/questions/631917/how-can-i-deduplicate-my-data-with-btrfs
+    REF: https://btrfs.wiki.kernel.org/index.php/Deduplication
+    $ sudo bedup dedup --defrag --flush /work
+    NOTE: $ sync $ before synthetic tests
+      $ duperemove
+        https://github.com/markfasheh/duperemove
+        BUT: skips files smaller than block size
+          https://github.com/markfasheh/duperemove/issues/164
+        CRIT:BUG https://github.com/markfasheh/duperemove/issues/50
+    Compare reused extents between files
+      $ filefrag -v file1 file2
   Contiguous (unfragmented) VM disk images -- disable CoW
     https://btrfs.wiki.kernel.org/index.php/FAQ#Can_copy-on-write_be_turned_off_for_data_blocks.3F
     $ touch vm-image.raw
