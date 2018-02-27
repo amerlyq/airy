@@ -1,0 +1,32 @@
+#!/bin/bash -eu
+set -o pipefail
+
+(($#)) || set -- origin/master
+b=$1
+
+fmt=(
+  '%cr'
+  '%ae'
+  '%h'
+  '%D'
+)
+fmt=$(IFS=,; sed s/,/%x09/g <<< "${fmt[*]}")
+
+exec git branch -r \
+  --format='%(objectname)' \
+  --sort=-committerdate \
+  --no-merged "$@" \
+| xargs -rn1 -I{} -P$(nproc) \
+  git --no-pager show --no-patch \
+  --pretty=format:"$fmt%n" \
+  --shortstat {}
+
+## BAD: commits from stdin are treated differently then in origial git diff
+# | git diff-tree --stdin -M -m \
+#   --pretty=format:"$fmt" \
+#   --shortstat "$b"
+
+# echo c10d79cc892b67504333184780f6feba5a2c35df | git --no-pager diff --stdin -l0 -M -C -m --shortstat origin/release --
+
+# OR: filter by files
+#   --stat "$b" -- relpath/to/dir

@@ -1,0 +1,17 @@
+#!/bin/bash -eu
+set -o pipefail
+
+(($#)) || set -- origin/master
+
+fmt=(
+  'committerdate:relative'
+  'authoremail'
+  'objectname:short'
+  'refname:lstrip=3'
+)
+fmt=$(printf '%%(%s)\n' "${fmt[@]}"|paste -sd,|sed s/,/%09/g)
+
+exec git branch -r \
+  --format="$fmt" \
+  --sort=-committerdate \
+  --no-merged "$@"
