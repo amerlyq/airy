@@ -1,0 +1,14 @@
+#!/bin/bash -eu
+# tags: util
+source ~/.shell/func.d/cfgsetup
+
+## /etc/asd.conf
+# WHATTOSYNC=(
+#   '/work/_build'
+#   '/work/_mirror/_ccache'
+# )
+# USE_OVERLAYFS="yes"
+
+# NEED: $ sudo modprobe overlay
+# sudo modprobe -c | grep overlay
+svc_activate -er asd.service

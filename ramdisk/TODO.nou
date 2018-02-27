@@ -1,0 +1,16 @@
+REF
+  https://rgrunber.wordpress.com/2014/10/24/tmpfs-all-of-the-things-with-anything-sync-daemon/
+
+USAGE
+  Parse and print status
+    $ asd p
+  Clean crash backups
+    $ asd c
+  Restore the snapshot from backup
+    Stop asd.
+    Confirm that there is no symlink to the sync target.
+      If there is, asd did not stop correctly for other reasons.
+    Move the "bad" copy of the sync target to a backup (do not blindly delete anything).
+      $ mv /foo/bar /foo/bar-bad
+    Copy the snapshot directory to the expected sync target.
+      $ cp -a /foo/.bar-backup_asd-crashrecovery-20141221_070112 /foo/bar
