@@ -91,6 +91,7 @@ nnoremap <unique> K   a<CR><Right><Esc>
 xnoremap <unique> K   c<CR><Esc>
 nnoremap <unique> gK  i<CR><Right><Esc>
 nnoremap <unique> <C-k> i<CR><Right><Esc>:m .-2<CR>
+nnoremap <unique> <C-j> :<C-u>+m.-<CR>J
 nnoremap <unique> gX  lxh
 
 

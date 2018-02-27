@@ -18,7 +18,7 @@ let s:patterns = [
   \ ['Tbd', 169, '#ff5faf', 'TODO|CHECK|TRY|MOVE|NOT|REQ%(UIRE)?|MAYBE'],
   \ ['Inf',  38, '#00afdf', 'INFO?|SRC|VAR|VIZ|ALG|IMPL|ARCH|TALK|SECU%(RE|RITY)?|MMAP'],
   \ ['Fix', 202, '#ff5f00', 'BUT|DONT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
-  \ ['Did', 243, '#767676', 'DONE|FIXED|EXPL%(AIN)?|TEMP|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?'],
+  \ ['Did', 243, '#767676', 'DONE|FIXED|EXPL%(AIN)?|TEMP|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR'],
   \ ['Msg',  62, '#5f5fdf', 'NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP%(ENDS)?'],
   \]
 " check = prove = assert = verify

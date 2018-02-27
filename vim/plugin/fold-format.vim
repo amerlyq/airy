@@ -149,5 +149,5 @@ fun! s:ToggleRenderClosedFolds(line1, line2)
   endtry
 endf
 
-command! -bar -range=% PrintFolds
+command! -bar -range=% FoldRender
     \ call s:ToggleRenderClosedFolds(<line1>, <line2>)

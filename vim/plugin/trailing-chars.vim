@@ -5,6 +5,11 @@ if &cp||exists('g:loaded_trailing')|finish|else|let g:loaded_trailing=1|endif
 "   https://github.com/search?q=vim+strip
 "   https://github.com/search?q=vim+trail
 
+"" CHECK: keep EOL on last life if already present, add if not
+" https://vi.stackexchange.com/questions/3298/how-to-make-vim-automatically-add-a-newline-to-the-end-of-a-file
+" set nobinary nofixendofline endofline
+" set fileformats+=dos
+
 "{{{1 MAPS ====================
 noremap <unique> [Toggle]l :<C-u>set list! list?<CR>
 noremap <unique> [Toggle]L :<C-u>ToggleTrailingHighlight<CR>
@@ -38,7 +43,7 @@ command! -bar -nargs=0 -range=% StripLines
     \ <line2>)
 
 command! -bar -nargs=0 -range ToggleStripLines
-    \ call ToggleVariable('g:strip_lines')
+    \ call ToggleVariable('g:strip_lines') | let &fixeol=g:strip_lines
 
 " DEV: if &ft==mail  =>  don't touch line '^--\s$'
 command! -bar -nargs=0 -range=% StripSpaces
