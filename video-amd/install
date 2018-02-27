@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+pkg_inst xf86-video-amdgpu mesa lib32-mesa
+pkg_inst vulkan-radeon
+
+## Accelerated video decoding
+# libva-mesa-driver lib32-libva-mesa-driver
+# OR:VA-API: mesa-vdpau libva-vdpau-driver lib32-mesa-vdpau
