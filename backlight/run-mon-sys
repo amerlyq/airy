@@ -6,7 +6,9 @@ set -o pipefail
 O=; while getopts 'nr' o; do O+=$o; done; shift $((OPTIND-1))
 
 val=${1-}
-dev=intel_backlight
+# HACK:BAD: reverse sort to use acpi_* only if no other e.g. intel_backlight radeon_bl0
+# ALT: manually symlink system path $ ln -sT /sys/class/backlight/radeon_bl0 /usr/local/share/backlight-mon
+dev=$(find /sys/class/backlight -mindepth 1 -maxdepth 1 -xtype d -printf '%f\n' | sort -r | head -1)
 dir=/sys/class/backlight/$dev
 
 set_led(){ local val=$1
