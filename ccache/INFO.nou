@@ -1,0 +1,36 @@
+INFO
+  2018-01-11 [X] CRIT:FIND:XXX: ccache build same object file simultaneously
+    e.g. if multiple builds are run by multiple users in shared cache
+    ::: no problem, atomic move() from tmpfile is used
+      https://www.mail-archive.com/ccache@lists.samba.org/msg00646.html
+
+  2018-01-11 [X] CRIT:READ: ccache myths
+    ccache slows down ~20% compilation on fresh systems and rolling releases,
+    when almost everything must be recompiled
+      https://blog.flameeyes.eu/2010/07/debunking-ccache-myths-redux/
+    BUT: ccache is useful for
+      * "broken" build systems with incorrect dependencies
+      * maintaining similar builds in multiple dirs
+      * jumps in vcs history/branches of single build
+      * temporary changes in project-wide headers
+      https://stackoverflow.com/questions/11905485/why-isnt-ccache-used-with-gcc-more-often
+
+  [_] CRIT: kernel has zero hits
+    ? how to disable ccache for kernel only ?
+    !3 [_] CHECK: _log/ -- is ccache was used to compile kernel ?
+    https://lists.samba.org/archive/ccache/2014q1/001171.html
+    SEE: https://github.com/ccache/ccache/issues?utf8=%E2%9C%93&q=kernel
+      ?FIXED? something related in v3.3.4+
+        https://github.com/ccache/ccache/issues/134
+    ALSO
+      http://anton-baranov.blogspot.com/2014/09/speed-up-linux-kernel-compilation-with.html
+      CMP: arm linaro on different disk systems nfs/emmc/ssd/ram
+        http://odroid.us/mediawiki/index.php?title=Speed_Builds_Using_Compiler_Cache
+
+  [_] CMP: ccache on ext4 vs btrfs
+    https://lists.samba.org/archive/ccache/2014q3/001243.html
+    2012: https://plus.google.com/+SteveKondik/posts/dMG1GrTCXDc
+    https://lwn.net/Articles/400629/
+    CoW performance
+      https://www.mail-archive.com/ccache@lists.samba.org/msg01125.html
+      https://www.mail-archive.com/ccache@lists.samba.org/msg01126.html

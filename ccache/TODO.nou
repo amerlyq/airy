@@ -1,0 +1,58 @@
+REF
+  https://github.com/ccache/ccache
+  http://ccache.samba.org/manual.html
+
+  CMake
+    https://stackoverflow.com/questions/1815688/how-to-use-ccache-with-cmake
+    https://crascit.com/2016/04/09/using-ccache-with-cmake/
+    https://github.com/zephyrproject-rtos/zephyr/blob/master/cmake/ccache.cmake
+    [_] http://software.icecube.wisc.edu/documentation/projects/cmake/cmake_advanced.html
+    https://github.com/beagleboard/buildroot/blob/master/support/misc/toolchainfile.cmake.in
+    SRC: https://patchwork.ozlabs.org/patch/225556/
+
+
+DEBUG:
+  Statistics -- CMP before and after build
+    $ ccache -s
+  Refresh whole cache
+    $ export CCACHE_RECACHE=1 $ OR $ ccache -C
+  Disable CCache (only in the current shell)
+    $ export CCACHE_DISABLE=1
+
+
+TODO
+  [_] USE: different "cache_dir" for projects and makepkg
+    => switch on per-project basis (user env vars) with fallback to global system cache used for makepkg
+      => so, it must be zero-config for general user
+
+  [_] TRY: "makechrootpkg" in addition / instead of "schroot"
+    https://wiki.archlinux.org/index.php/ccache#makechrootpkg
+
+  [_] FIND:WTF: "USE_CCACHE" in ./buildroot/support/misc/toolchainfile.cmake.in
+    $(HOST_DIR)/usr/share/buildroot/toolchainfile.cmake:   | ./sdk/buildroot-2014.11/package/pkg-cmake.mk:187
+      => force everyone to use it => ccache will be used automatically if found => explicit disable it by -DUSE_CCACHE=OFF
+      !! won't work: export USE_CCACHE=1
+    BUT: https://patchwork.ozlabs.org/patch/382041/
+      => USE_CCACHE is removed from ./pkg-cmake.mk to prevent its using for host packages
+      [_] !BUT! problem with nested ccache for host packages still remains
+
+  [_] WTF: ccache isn't used with cmake (which uses compilers by direct path)
+    => grep log file by 'sdk/buildroot/output/host/opt/ext-toolchain/bin/arm-linux-gnueabihf-' to find all fall-through entries
+    $ <ccache.log grep -E '(^|&& )/\S+buildroot\S+/ccache /usr/lib/ccache' C
+      2199 => host pkgs with nested (double) ccache
+    $ <ccache.log grep -E '(^|&& )/\S+buildroot\S+/ccache' Gv ' /usr/lib/ccache' C
+      2798 => buildroot pkgs compiled with ccache
+      => no-one custom src pkg, only buildroot pkgs => look into surrounding context of make entering-leaving
+      BUT: some pkgs there compiled with CC -- aren't them are compiled w/o ccache ?
+    $ <ccache.log grep -E 'arm-linux-gnueabihf-[gc]' Gv '^checking ' | grep -vE '(^\s*|&& |\blibtool\b.*|CXX=")/\S+/buildroot\S+/ccache' C
+      1840 => any pkgs compiled w/o ccache
+
+  [_] MAYBE: use ./buildroot/support/toolchain.mk instead of toolchain file placed in the root of each project
+    ATT: we can't change it with "cmake -DCMAKE_CXX_COMPILER" because them are read _before_ toolchain and already available/overridden inside toolchain
+    BAD: we can't use PATH= with ccache symlinks nambed after arm compiler
+      => toolchain files contain full paths
+        => we can't move original compiler (and inject there symlink to ccache) due to its hardcoded full-paths
+    ALT: use CC/CXX env vars -- but it's ignored with toolchain...
+      https://cmake.org/cmake/help/v3.0/manual/cmake-toolchains.7.html
+      https://intellij-support.jetbrains.com/hc/en-us/community/posts/205822219-How-to-properly-change-the-compilers-in-Toolchains-Preferences-
+        or maybe CXX overrides compiler after all? But it must be different for host tools and buildroot tools...

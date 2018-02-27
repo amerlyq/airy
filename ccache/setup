@@ -1,0 +1,32 @@
+#!/bin/bash -eu
+# tags: lang
+source ~/.shell/func.d/cfgsetup
+
+## CHECK: if "pacman" behaves normally with foreign dirs in its cache
+# dcache=/var/cache/pacman/pkg/_ccache
+## BET: use same partition as your project _build* dirs
+#   => MAYBE:CHECK: btrfs CoW will be used for copying of *.o
+# [_] TODO: query cache from $AIRY_{USER,SYSTEM}_CCACHE
+dcache=/work/_mirror/_ccache
+
+# BAD: re-configured on each setup
+#   BUT: different machines require different setup
+ccache --set-config=max_size=2G
+ccache --set-config=cache_dir="$dcache"
+ccache --set-config=compression=true
+
+if cfgOpt r; then
+  sudo mkdir "$dcache"
+  sudo chown "${LOGUSER:?}" "$dcache"
+  sudo chgrp users "$dcache"
+  sudo chmod 755 "$dcache"
+fi
+
+## NOTE: enable ccache for makepkg builds
+# cfg=/etc/makepkg.conf
+# grep -qF "\sccache\s" "$cfg" || sudo sed -ir "/(#?\s*BUILDENV=.*\s)!ccache(.*)/s//\1ccache\2/" "$cfg"
+
+
+## Setup older gcc5
+# paci gcc5
+# printf '%s\n' {gcc,g++,cpp,c++}-5 | sudo xargs -rn1 ln -sT /usr/bin/ccache

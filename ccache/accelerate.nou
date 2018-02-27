@@ -1,0 +1,38 @@
+2018-02-27 [X] TRY: RAM disk as RAID1/unionfs/overlay/aufs
+  ::: USE "asd" ramdisk sync
+  BUT: using RAM disk we must copy object files to SSD anyway
+    => MAYBE point cmake _build-debug also into RAM to eliminate copying between partitions ?
+      NEED: CCACHE_TEMPDIR pointing there -- to be on the same partition
+    ? is there need for "anything-sync-daemon" to also overlay those build dirs ?
+  https://stackoverflow.com/questions/2282276/write-through-ram-disk-or-massive-caching-of-file-system
+  tmpfs
+    REF: https://wiki.archlinux.org/index.php/Tmpfs
+    $ sudo mount -t tmpfs -o noatime,size=2G none /tmp/ramdisk
+      CHECK: noatime,nodiratime,nodev,nosuid,uid=1000,gid=100,mode=0700
+  BAD: RAID-1 -- data loss because shutdown doesn't wait until sync completes
+  CoW
+    https://bbs.archlinux.org/viewtopic.php?id=112314
+    * writes / CoW in RAM is much faster, reads are also slightly faster
+    * rarely you may sync/dump your RAM content into underlying HDD overlay
+    https://storageswiss.com/2016/04/01/snapshot-101-copy-on-write-vs-redirect-on-write/
+  TRY: zram -> растяжение 2GB реальной оперативы до 1:3 виртуальной без записи на диск
+    https://habrahabr.ru/post/205158/
+    + https://forums.gentoo.org/viewtopic-t-838198-start-0.html
+    => MAYBE activate on build server, as it's better than swap
+  rsync  SSD <-> RAM
+    -> $ rsync -av /var/ramdisk-backup/ /mnt/ramdisk/
+    <- $ rsync -av --delete --recursive --force /mnt/ramdisk/ /var/ramdisk-backup/
+    -> $ rsync -av -H -x /usr/portage/local/ccache/x64/ /var/tmp/ccache/ > /dev/null 2>/var/log/ccache-restore.log
+    <- $ rsync -av -H -x /var/tmp/ccache/ /usr/portage/local/ccache/x64/ > /dev/null 2>/var/log/ccache-store.log
+  tar
+    -> $ cd /tmp && tar --lzop -xvf ramdisk-backup.tar.lzop
+    <- $ cd /tmp && tar --lzop -cvf ramdisk-backup.tar.lzop ramdisk
+  => make rsync .service required-by sleep/reboot/shutdown and .timer which triggers .service periodically
+    ALSO script to trigger directly after build is done or manually
+    [_] SEE: https://wiki.debian.org/SSDOptimization#Reduction_of_SSD_write_frequency_via_RAMDISK
+    https://habrahabr.ru/post/205158/
+  BET:
+    https://wiki.archlinux.org/index.php/anything-sync-daemon
+      https://github.com/graysky2/anything-sync-daemon
+      ALT: https://github.com/eikevons/tmpfs-syncer
+        http://shnatsel.blogspot.com/2012/05/tmpfs-for-real-life-write-buffering.html

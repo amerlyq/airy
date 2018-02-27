@@ -1,0 +1,127 @@
+READ: $ man ccache
+
+2018-01-10 [X] CMP: warm build time w/ and w/o compression => both on SSD and HDD
+  * compression = true
+  * compression_level = 6
+
+  Official performance comparison
+    https://ccache.samba.org/performance.html
+
+    host
+    |  <state> | cold  | warm / cpu | idle |  size |
+    | i5   SSD |12m30s |1m30s   55% | ???  | 650MB |
+    | zlib-SSD |14m30s |  54s  224% | 2.7s | 150MB |
+    | i7   HDD | 7m02s |4m08s  506% | 4.2s | 700MB |
+    | zlib-HDD | 6m44s |1m33s  250% | 3.1s | 145MB |
+    target
+    | zlib-HDD | 2h15m |1h45m  250% | !=0  |!200MB!|
+
+
+WARN: before enabling "colorgcc" wrapper
+  USING CCACHE WITH OTHER COMPILER WRAPPERS
+  ALSO
+    $ sudo cpan ANSIColor
+    $ paci colorgcc
+    export PATH="/usr/lib/colorgcc/bin/:$PATH"    # As per usual colorgcc installation, leave unchanged (don't add ccache)
+    export CCACHE_PATH="/usr/bin"                 # Tell ccache to only use compilers here
+    /etc/colorgcc/colorgccrc
+      /usr/bin -> /usr/lib/ccache/bin (for all the compilers in /usr/lib/ccache/bin)
+    ALT: colors directly in gcc
+      https://xaizek.github.io/2015-10-25/enable-colorization-of-gcc-output/
+    BET: colorize output by separate filter _after_ logging
+      http://zaufi.github.io/pluggable-output-processor.html
+      |aur/python-outproc|
+        $ sudo ln -s /usr/bin/outproc /usr/lib/outproc/bin/make
+      BET: https://github.com/garabik/grc
+        https://github.com/jingweno/ccat
+        G: linux generic output colorizers
+
+
+WARN: before using precompiled headers
+  https://www.mail-archive.com/ccache@lists.samba.org/msg00506.html
+  PRECOMPILED HEADERS
+    * sloppiness = pch_defines,time_macros
+      - ccache can’t tell whether __TIME__ or __DATE__ is used when using a precompiled header
+      - can’t detect changes in #defines in the source code because of how preprocessing works in combination with precompiled headers
+  ALSO:USE: either
+    ~ "gcc -include pch.h" instead of #include
+    ~ "clang -include-pch pch.pch" for generated file
+    ~ "gcc -fpch-preprocess"
+    >>> otherwise
+      - non-precompiled version of the header file will be used (if available)
+      - ccache will fall back to running the real compiler and increase the statistics counter “preprocessor error”
+        (if the non-precompiled header file is not available)
+
+
+WARN: before sharing ccache on server
+  SHARING A CACHE
+    * hard_link = false  # DFL
+    * umask = 002
+      ALT: force the r and w permission for the group "groupname" on a directory
+        $ setfacl -R -m group:groupname:rw-,d:group:groupname:rw- directory/
+        $ setfacl -R -m u:colleague:rwX .
+    * max_size = 20G
+    * cache_dir = /work/_mirror/_ccache
+    THINK: * unify
+
+    $ CCACHE_DIR=/home/_work/ccache
+      <= ONLY /etc/ccache.conf OR env var
+    $ sudo mkdir -p -m775 "$CCACHE_DIR"
+    $ sudo chown -R nobody "$CCACHE_DIR"
+    $ sudo /usr/sbin/groupadd ccacheshared
+    $ sudo chgrp -R ccacheshared "$CCACHE_DIR"
+    $ sudo find "$CCACHE_DIR" -type d -exec chgrp ccacheshared {} \; -exec chmod g+s {} \;
+    $ vim README
+    $ CCACHE_DIR=/home/_work/ccache ccache --max-size 20G
+      !! can't pass to buildroot directly (inner usage) -- patched to BR2_CCACHE_DIR
+  Run:
+    $ source setenvB
+    ? $ export CCACHE_DIR=/home/_work/ccache
+    $ export BR_CCACHE_DIR=/home/_work/ccache
+    $ export CCACHE_COMPRESS=true CCACHE_UMASK="000"
+    $ export CCACHE_BASEDIR="$PWD"
+    $ make release
+      BAD!! => ccache isn't used when building host-tools/cmake/etc
+        BUT: maybe we must not use it when gcc builds itself ?
+      TRY: additionally use system-global ccache ?
+        $ export CCACHE_DIR=/home/_work/ccache
+          BUT: if PATH is tweaked -- won't be any effect
+  COMPILING IN DIFFERENT DIRECTORIES
+    * CCACHE_BASEDIR=$PJ_DIR == rewrite abspaths to relpaths
+    * for GDB if src is passed as abspath and rewritten as relpath NEED (gdb) cd $PJ_DIR
+      ALT: $ gcc -fdebug-prefix-map=old=new $ relocates debug info to a common prefix
+        << REQ! to distinguish and keep both debug/release builds instead of rebuilding *.o
+          ALT:USE hash_dir
+
+
+[_] ccache for buildroot
+  * only "kconfig/conf" and "host-ccache" are compiled by host compiler directly
+  * many tools ccache inside ccache are double-wrapped
+    ext-toolchain host-libtool host-m4 host-gettext host-pkgconf host-ncurses
+    host-expat host-zlib host-python host-openssl host-swig libgpg-error
+    libgcrypt host-flex host-gperf host-genext2fs host-icu host-protobuf
+    host-lz4 host-xz host-squashfs host-fakeroot host-lzop
+  ? what about kernel
+  [_] (once) dld ccache into /dl to prevent network access
+  ./buildroot/.config OR: .defconfig
+    BR2_CCACHE=y
+    BR2_CCACHE_DIR=/abspath/to/cache
+      OR: beforehand $ export CCACHE_DIR=/abspath/to/cache
+    # BR2_CCACHE_INITIAL_SETUP="--max-files=200"
+    (new only) BR2_CCACHE_USE_BASEDIR=y
+      NEED: for GDB cd to the output directory first
+  ! WARN! purge ccache when changing compiler/libc version !
+    https://stackoverflow.com/questions/27906820/reasons-to-clear-ccache-or-use-multiple-ccache-directories
+  Show stats
+    $ make ccache-stats
+  Set cache limit size
+    $ make ccache-options CCACHE_OPTIONS="--max-size=5G"
+  Zero statistics counters
+    $ make ccache-options CCACHE_OPTIONS="--zero-stats"
+
+  CRIT: host-tools are also have disabled compiler timestamp checking
+    => you must clear cache when any of buildroot compiler OR host compiler version changes
+
+  CMP: inner/outer ccache files BAD: all are different
+    $ cat <(find ~/ccache-test -type f -printf '%f\n'|sort) <(find /home/_work/ccache -type f -printf '%f\n'|sort) | uniq -c | sort -rnk1,1 | head
+    ALT: grep log by /\/usr\/bin\/[cg]++/ -- if somewhere used directly -- it must be enough
