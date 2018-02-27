@@ -11,7 +11,7 @@ if [[ $bReplace || ! -f $NM ]]; then
     in  pl) sb="#!/usr/bin/perl\nuse warnings FATAL => 'all';\nuse autodie qw(:all);\nuse strict;\nuse v5.14;  # for s///r"
     ;; py2) sb="$env python2\n# vim: fileencoding=utf-8"
     ;; py3) sb="$env python3"
-    ;;  sh) sb="#!/bin/bash -eu\nset -o pipefail"
+    ;;  sh) sb="#!/bin/bash\nset -euo pipefail"
     ;;  zh) sb="#!/usr/bin/zsh -eu\nsetopt pipe_fail"
     ;;  mk) sb="#!/usr/bin/make -sf\n.ONESHELL:\n.DEFAULT_GOAL = all\nSHELL := \$(shell which bash)\n.SHELLFLAGS := -euo pipefail -c"
     ;;   *) sb="$env $shl"

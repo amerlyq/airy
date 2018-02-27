@@ -43,10 +43,11 @@ alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-run
 
 ## Filters
 alias -g H='|head'  # ALSO:(rest): tail -n +11
+alias -g T='|tail'
 alias -g C='|wc -l'
 alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
-alias -g T='|column -t'
+alias -g TC='|column -t'
 alias -g W='|while read line; do'
 alias -g NE="|grep -v '^\s*\$'"
 alias -g S='|noglob sed -u -rn'
@@ -60,7 +61,6 @@ done
 alias -g SC='|LC_ALL=C sort|uniq -c|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'
 alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
-# alias -g TL='| tail -20 '
 
 for i in {1..5}; do alias -g C$i="|awk '{print\$$i}'"; done
 alias -g C\$="|awk '{print\$NF}'"

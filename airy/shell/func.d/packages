@@ -105,7 +105,8 @@ elif distro arch; then
 
         # NOTE:(copy): pkgver and updpkgsums changes PKGBUILD
         #   OR:(symlink): always commit updated PKGBUILD after changes
-        linkcp -ct "$PWD" "$p"
+        # TODO: use files with name=<pkgname> instead of single PKGBUILD per dir
+        linkcp -c "$p" "$PWD/PKGBUILD"
         linkcp -t "$PWD" "$m/patches"/*.{diff,patch}
 
         # WARN:(-f): removed 'force' to mitigate idle rebuild

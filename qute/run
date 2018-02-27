@@ -10,10 +10,8 @@ running_X || exec r.bt
 # exec > $log 2>&1
 
 ## NOTE: both of them may significantly load CPU > 40..90% on soundcloud depending on song
-# web=webengine
-## CRIT: "webkit" often freezes/hangs on media, "webengine" is much more stable
-web=webengine
-[[ ${THEME-} == dark ]] && web=webkit
+## CRIT: "webkit" often freezes/hangs on media, using "webengine" by default is much more stable
+[[ ${THEME-} == dark ]] && web=webkit || web=webengine
 
 dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
     -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31AC65' \
