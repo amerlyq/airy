@@ -4,6 +4,19 @@ set -o pipefail
 # DEBUG: ./$0 -- sh -c 'echo out >&1; echo err >&2'
 # ALT: { { make | stdbuf -oL -eL tee out.log; } 3>&1 1>&2 2>&3 | stdbuf -oL -eL tee err.log; } 2>&1 | stdbuf -oL -eL tee scr.log
 
+# TODO: split script
+#   * redirect stdout/stderr/both into three different files (utils) MAYBE use shell redirections instead
+#     file: $ ... | ./redirect  err out both
+#     util: $ ... | ./redirect  >(./flt-err > err.log) >(flt-out > out.log) >(flt-both > both.log)
+#   * 'store stdout to files with log-rotate' FIND maybe "logrotate" util may do this already
+# TODO: move log-related functions into |airy/log|
+# NEED: combined total output before "scr" filter applied
+#   e.g. if scr colorized
+# NEED: raw stdout/stderr/tty output and filtered one
+#   MAYBE: there is no need for filtering stdout/stderr separately?
+#   => only use combined filter on output in separate perl script
+#     SEE: my other filters for errors only -- can it be combined in single filter or not?
+
 ## DFL
 logrotate=1
 d_log=./_log

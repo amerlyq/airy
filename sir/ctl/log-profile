@@ -1,0 +1,45 @@
+#!/bin/bash -eu
+set -o pipefail
+
+[[ -t 1 ]] && exec > >(column -ts$'\t')
+
+# USAGE: build (?buildroot?) project with "make" and pipe to "ts"
+#   $ make release | ts -s %.s | stdbuf -oL -eL tee build.log
+# Analyze log timings per each "make" section
+#   $ r.sir-log-profile build.log
+
+# ALG
+#   * choose Makefile lines only -- "s_time <direction> num_make path"
+#   * group paths by num_make and evaluate dt per each thread
+#   * substitute full paths by their component dirs
+#   * sum all threads times per the same component dir
+#   * format output in sorted table of accumulated times
+
+## WTF: make[7] may enter the same directory multiple times !!!
+#   TEMP:FIXED: use refcount to measure first-last timeframe window and detect only dangling links afterwards
+
+sed -rn '\@^([0-9.]+).*\[([0-9]+)\]: (Entering|Leaving) directory.*\/mib3_integ[^/]*/(.*).$@{s//\1\t\3\t\2\t\4/;s/Entering/>/;s/Leaving/</;p}' "$@" \
+| awk -F$'\t' -vOFS=$'\t' '
+  $2==">"{
+    k=$3":"$4
+    # if(k in t){ print "Err: overwrite",$2,k,t[k],"->",$1 > "/dev/stderr" }
+    if(!(k in t)){ t[k]=strtonum($1) }
+    ++c[k]
+  }
+  $2=="<"{
+    k=$3":"$4
+    --c[k]
+    if(!(k in t)){ print "Err: dangling",$2,k,$1 > "/dev/stderr"; next }
+    if(c[k]<=0){
+      dt[k] = strtonum($1) - t[k]
+      delete t[k]
+    }
+  }
+  END{
+    for(k in t){ print "Err: remains",k,t[k] > "/dev/stderr" }
+    for(k in dt){ printf "%4.3f\t%s\n",dt[k],substr(k,index(k,":")+1) }
+  }' \
+| sed -r '\@(([^\t]*/output/build|usr_pkgs/luxoft|sdk/nongpl_pkgs)/[^/]+).*@s//\1\/*/' \
+| sed -r '\@(usr_pkgs/[^l][^/]+).*@s//\1\/*/' \
+| awk -F$'\t' -vOFS=$'\t' '{at[$2]+=strtonum($1)} END{for(k in at){printf "%4.3f\t%s\n",at[k],k}}' \
+| sort -nk1,1
