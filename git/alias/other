@@ -12,15 +12,16 @@ alias gir1='gir HEAD~'
 alias g\?='git help'
 ## Status
 # Re-defined
-alias gs='{ git status -sbu && git --no-pager stash list; }'
+alias gs='{ git status -sb && git --no-pager stash list; }'
+alias gsu='{ git status -sbu && git --no-pager stash list; }'
 alias gca='gaa && gcm'
 # SEE: http://gitolite.com/git-pull--rebase
 # http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
 # It's like: git rebase --onto @{u} $(git merge-base HEAD @{u}@{1}) OK, that syntax ("@{u}@{1}")
 alias gl='git pull --rebase --verbose'
 alias glu='gss && gl && gsp'
-alias gbl='git branch -va'
-alias gbL='git branch -v'
+alias gbl='git branch -vv'
+alias gbL='git branch -va'
 
 # Additional
 alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'

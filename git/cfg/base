@@ -29,8 +29,9 @@
 [commit]
     verbose = true
 
-[format]
-    pretty = oneline
+# BAD: some build systems breaks on "git log -1 | head -n 1"
+# [format]
+#     pretty = oneline
 #[credential]
 #    helper = cache --timeout=3600
 # [help]

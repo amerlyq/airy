@@ -21,7 +21,7 @@
     lstd     = log --abbrev-commit --date=short --format=format:'%C(bold green)%ad%C(reset) %C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset) %C(yellow)%h%C(reset)'
     linverse = log --abbrev-commit --date=short --all --format=format:'%C(bold reverse green)%ad%C(reset)%C(reverse white) %s %C(reset)%C(bold reverse red)%d%C(reset)%C(bold reverse blue) [%aN]%C(reset):%C(reverse yellow)%h%C(reset)'
 
-    lgraph  = !git lstd --all --graph
+    lgraph  = !git lstd --graph
     lthis   = !git --no-pager lstd --graph
     ldump   = !git --no-pager lgraph
     lfiles  = !git lstd --all --decorate --diff-filter="ACDMRT" --name-status  # OR --numstat
