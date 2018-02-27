@@ -12,7 +12,15 @@
 # ----------
 (($#)) && dir=$1 && shift
 (($#)) && interp=${1:+\\b$1\\b} && shift
-(($#)) && set -- -exec ag --vimgrep "$@" -- {} \; || set -- -print
+(($#)) && set -- -exec ag --vimgrep "$@" -- {} \; || {
+  # TODO: find all bash scripts and sort them by rev date
+  #   => useful to find my last ideas implemented to copy-paste
+  # ALT: annotate pathes by date in normal format %Y-%m-%d
+  set -- -printf '%T@\t%TY-%Tm-%Td\t%p\n'
+  #%USAGE: r.find-script . perl |sort -rnk1|cut -f2- V
+  # exec > >(sort -rnk1|cut -f2-)
+}
+
 # BUG: grep #! in all lines instead of only first line
 #   BET: | parallel '[[ $(head -c2 {}) == "#!" ]] && echo "{}"'
 exec find "${dir-.}" -type f -executable -exec grep -qm1 "^#!.*${interp-}" {} \; "$@"
