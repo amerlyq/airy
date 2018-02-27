@@ -1,11 +1,3 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: net
 source ~/.shell/func.d/cfgsetup
-
-### LINKS ###
-if cfgOpt r; then
-  # Initiate OAuth2 to generate ~/.gcalcli_oauth
-  gcalcli list
-  # Secondary acc
-  # gcalcli --configFolder ~/work list
-fi

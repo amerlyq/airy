@@ -9,8 +9,8 @@ if distro arch; then
 
   loc_inst -P 'gcalcli-airy-git' ./PKGBUILD  # v4.0a2
 
-  aur_inst python2-vobject
-  pkg_inst python2-parsedatetime
+  aur_inst --asdeps python2-vobject
+  pkg_inst --asdeps python2-parsedatetime
 
 elif distro ubuntu; then
   echo "Err: fix use pip2"
