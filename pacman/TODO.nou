@@ -1,4 +1,22 @@
 TODO
+  [_] pip to PKGBUILD
+    DEPR: |aur/pip2arch-git|
+    USE: |aur/pip2pkgbuild|
+      https://github.com/toabctl/jiracli
+    TRY:ALT:(virtualenv) https://flexion.org/posts/2012-12-python-and-virtualenv-on-archlinux-and-ubuntu/
+      https://bbs.archlinux.org/viewtopic.php?id=178564
+      https://wiki.archlinux.org/index.php/Python/Virtual_environment
+      https://github.com/tensorflow/tensorflow/issues/263
+
+  [_] pacman -- mgmt of custom pkgs
+    https://unix.stackexchange.com/questions/32130/how-do-i-get-pacman-to-use-my-custom-pkgbuilds-when-updating
+    * mark my own PKGBUILD with groups=('airy')
+    * prevent updating /etc/pacman.conf :: IgnoreGroup = airy
+    https://github.com/rmarquis/pacaur/issues/12
+    https://bbs.archlinux.org/viewtopic.php?id=219656
+    TUT: https://www.reddit.com/r/archlinux/comments/55p7mw/force_pacman_to_upgrade_some_packages_through/
+    https://github.com/eli-schwartz/pkgbuilds/blob/master/README.md
+
   [_] BUG: pacaur -Syu doesn't update "copyq-git"
     CHECK: if all aur pkgs are updated by pacaur or some are ignored/skipped/lost
     MAYBE: pacaur ignores all *-git packages ?
