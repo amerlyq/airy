@@ -13,7 +13,9 @@ source ~/.shell/func.d/cfgsetup
 #   TRY: => assume it's always :0
 #   BET: export :0 to ~/.pam_environment and use it in both zprofile and here
 #     BUT:CHECK: it will be exported from pam even on ssh login ?
-svc_activate -cE monitor-hotplug@.service
+## BET: use xrandr script per each system and Xorg config
+#   => otherwise too many XRandR events on plug in-out and sleep
+# svc_activate -cE monitor-hotplug@.service
 
 ### LINKS ###
 # THINK: embed *.rules support into svc_activate
