@@ -13,6 +13,7 @@ import time
 def get_macros_with_date(self):
     macros = old_get_macros(self)
     macros['date'] = time.strftime('%Y-%m-%d')
+    macros['dt'] = time.strftime('%Y%m%d')
     return macros
 
 # Overwrite the old one
