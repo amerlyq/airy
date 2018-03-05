@@ -237,6 +237,21 @@ class cd_shelldir(Command):
         return self._tab_directory_content()  # Generic function
 
 
+class cd_gitroot(Command):
+    def execute(self):
+        from subprocess import check_output, CalledProcessError
+        try:
+            # cd fm.thisdir.path
+            out = check_output(['git', 'rev-parse', '--show-toplevel'])
+        except CalledProcessError:
+            return self.fm.notify("cd_gitroot: " + out, bad=True)
+        else:
+            path = out[:-1].decode('utf-8')
+
+        if path != fs.realpath(self.fm.thisdir.path) and fs.exists(path):
+            self.fm.cd(path)
+
+
 # Auto cd
 class cda(Command):
     def execute(self):
