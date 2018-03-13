@@ -5,7 +5,7 @@ src=${1:-}
 dst=${2:-_deps}
 libs=$dst/libs-inner
 ext=$dst/libs-external
-syms=$dst/sym.all
+allsyms=$dst/sym.all
 
 ignore=( _Unwind_Resume )
 ignore=$(IFS=$'|'; printf '%s\n' <<< "${ignore[*]}")
@@ -21,64 +21,92 @@ mkdir -p "$dst"
   || printf 'Err: seems like ldd error\n' >&2
 
 ## THINK: ignore $5=="WEAK" bind ???
-if [[ ! -f $dst/_gen_syms ]]; then
-  mkdir -p "$dst/sym" "$dst/und"
+extract_symbols(){ local flib=$1 sym=$2 und=$3
+  mkdir -p "${sym%/*}" "${und%/*}"
+  readelf -Ws -- "$flib" | gawk -vignore="$ignore" '
+    !$8 || $8 ~ ignore"" {
+      next
+    }
+    $5=="GLOBAL" && $6=="DEFAULT" && $7=="UND" {
+      print $8 > "/dev/stderr"; next
+    }
+    $4=="FUNC" || $4=="OBJECT" || $4=="TLS" {
+      print $8
+    }
+  ' > >(LC_ALL=C sort -u > "$sym") \
+  2> >(LC_ALL=C sort -u > "$und")
+}
+
+batch_extract(){ local dst=$1; shift
+  while IFS= read -r flib; do
+    printf '* (lib) %s\n' "$flib" >&2
+    extract_symbols "$flib" "$dst/sym/${flib##*/}" "$dst/und/${flib##*/}"
+  done < <(cat "$@")
+}
+
+resolve_symbols(){ local dsym=$1 fUnd=$2 dneed=$3
+  mkdir -p "$dneed"
+  grep -rHxFf "$fUnd" \
+    --include '*.a' --include '*.a.*' \
+    --include '*.so' --include '*.so.*' \
+    --include '*.o' "$dsym" \
+  | awk -F'[:/]' -vd=""$dneed"" '{print$NF > d"/"$(NF-1)}' \
+  || printf '!!! (empty) %s\n' "$fUnd" >&2
+}
+
+resolve_stats(){ local dneed=$1 fstats=$2
+  mkdir -p "${fstats%/*}"
+  find -H "$dneed" -type f -print0 \
+  | wc -l --files0-from=- \
+  | awk -F'/|\\s' '{print$1"\t"$NF}' \
+  | sort -k1rn,1 \
+  | tail -n +2 \
+  > "$fstats"
+}
+
+# TODO: try to @ -> @@ and repeat again
+# e.g. (boost) _ZNSt6localeC1ERKS_@GLIBCXX_3.4
+#   -> (stdc++) _ZNSt6localeC1ERKS_@@GLIBCXX_3.4
+print_notfound(){ local fUnd=$1 dnot=$2
+  printf '!!! (notfound) %s\n' "$fUnd" >&2
+  mkdir -p "$dnot"
+  { echo "$fUnd"
+    grep -vxFf "$allsyms" -- "$fUnd" \
+    | tee "$dnot/${fUnd##*/}" \
+    | sed 's/^/\t/'
+  } >&2
+}
+
+resolve_undefined(){ local fund=$1 dst=$2
+  [[ -s $fund ]] || continue
+  printf '* (resolve) %s\n' "$fund" >&2
+  dneed=$dst/need/${fund##*/}
+  fstats=$dst/stat/${fund##*/}
+  resolve_symbols "$dst/sym" "$fund" "$dneed"
+  resolve_stats "$dneed" "$fstats"
+  [[ -s $fstats ]] || print_notfound "$fund" "$dst/notfound"
+}
+
+# export -f gensymtbl
+# SHELL=/bin/bash parallel "resolve_undefined {} '$dst'/{}"
+batch_resolve(){ local dst=$1
   while IFS= read -r p; do
-    printf '* (syms) %s\n' "$p" >&2
-    readelf -Ws -- "$p" | gawk -vignore="$ignore" '
-      !$8 || $8 ~ ignore"" {
-        next
-      }
-      $5=="GLOBAL" && $6=="DEFAULT" && $7=="UND" {
-        print $8 > "/dev/stderr"; next
-      }
-      $4=="FUNC" || $4=="OBJECT" || $4=="TLS" {
-        print $8
-      }
-    ' > >(LC_ALL=C sort -u > "$dst/sym/${p##*/}") \
-    2> >(LC_ALL=C sort -u > "$dst/und/${p##*/}")
-  done < <(cat "$libs" "$ext")
-  touch "$dst/_gen_syms"
-fi
-
-[[ -s $syms ]] || find -H "$dst/sym" -type f -exec cat {} \+ \
-  | LC_ALL=C sort -u > "$syms"
-
-if [[ ! -f $dst/_gen_need ]]; then
-  mkdir -p "$dst/stat"
-  while IFS= read -r p; do
-    [[ -s $p ]] || continue
-    printf '* (need) %s\n' "$p" >&2
-
-    d=$dst/need/${p##*/}
-    mkdir -p "$d"
-    grep -rHxFf "$p" \
-      --include '*.a' --include '*.a.*' \
-      --include '*.so' --include '*.so.*' \
-      --include '*.o' "$dst/sym" \
-    | awk -F'[:/]' -vd="$d" '{print$NF > d"/"$(NF-1)}' \
-    || printf '!!! (empty) %s\n' "$p" >&2
-
-    st=$dst/stat/${p##*/}
-    find -H "$d" -type f -print0 \
-    | wc -l --files0-from=- \
-    | awk -F'/|\\s' '{print$1"\t"$NF}' \
-    | sort -k1rn,1 \
-    | tail -n +2 \
-    > "$st"
-
-    if [[ ! -s $st ]]; then
-      printf '!!! (notfound) %s\n' "$p" >&2
-      mkdir -p "$dst/notfound"
-      { echo "$p"
-        grep -vxFf "$syms" -- "$p" \
-        | tee "$dst/notfound/${p##*/}" \
-        | sed 's/^/\t/'
-      } >&2
-    fi
+    resolve_undefined "$p" "$dst"
   done < <(find -H "$dst/und" -type f -print)
-  touch "$dst/_gen_need"
-fi
+}
+
+[[ ! -f $dst/_gen_syms ]] \
+  && batch_extract "$dst" "$libs" "$ext" \
+  && touch "$dst/_gen_syms"
+
+[[ -s $allsyms ]] \
+  || find -H "$dst/sym" -type f -exec cat {} \+ \
+  | LC_ALL=C sort -u > "$allsyms"
+
+[[ ! -f $dst/_gen_need ]] \
+  && batch_resolve "$dst" \
+  && touch "$dst/_gen_need"
+
 
 ## DEBUG
 # grep -rxFf "$dst"/und/libWavePlayerConfig.a \
