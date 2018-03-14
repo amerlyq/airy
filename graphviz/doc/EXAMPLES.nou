@@ -1,0 +1,32 @@
+Generate some graphs
+  Interactive edit
+    $ gvedit new.gv
+      = GUI notepad with auto-render / preview
+    $ vimdot new.gv
+      = TUI notepad with separate auto-render / preview on save
+  Random generation
+    $ gvgen -d -r10,10
+  Manual composition
+    $ printf '%s\n' 'A B' 'B C' 'C A' 'B D' 'D E' 'E F' 'F E' | { echo 'digraph G {'; sed 's/\s/->/'; echo '}'; } | nop
+
+Transform
+  $ gvpr
+    = e.g. like AWK
+  TRY prune
+
+Stats
+  Count nodes / edges / clusters
+    $ ... | gc -ne
+    $ ... | cluster | gc -C
+
+Split cycles into subgraphs / clusters
+  $ ... | bcomps | xdot -
+  $ ... | cluster | xdot -
+    = NOTE: accepts Weights
+  TRY: osage, patchwork, sccmap
+  $ ... | dot | cluster | gvmap | xdot -
+    = fills whole regions of nodes (i.e. Geographical Map)
+
+Colorize nodes/edges automatically
+  $ ... | dot | gvcolor | dot -Tx11
+    = NEED: set color for some nodes e.g. blue_green, green, and light_yellow for root and some leaves
