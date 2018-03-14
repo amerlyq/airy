@@ -80,7 +80,7 @@ resolve_symbols(){ local fUnd=$1 dneed=$2
 
 resolve_stats(){ local dneed=$1 fstats=$2
   mkdir -p "${fstats%/*}"
-  find "$dneed" -type f -print0 \
+  find "$dneed" -type f -not -empty -print0 \
   | wc -l --files0-from=- \
   | awk -F'/|\\s' '{print$1"\t"$NF}' \
   | sort -k1rn,1 \
@@ -90,7 +90,7 @@ resolve_stats(){ local dneed=$1 fstats=$2
 
 
 merge_allsyms(){
-  find "${@:?}" -type f -exec cat {} \+ | LC_ALL=C sort -u
+  find "${@:?}" -type f -not -empty -exec cat {} \+ | LC_ALL=C sort -u
 }; export -f merge_allsyms
 
 # BUG: fixup_versioned_symbols() has no effect on notfound list
@@ -135,36 +135,83 @@ find_all(){ local src=$1 dst=$2
 
 # BAD: parallel ignores errors
 extract_group(){ local grp=$1
-  dump_once "$grp/_gen_syms" parallel --halt-on-error now,fail=1 -- extract_symbols {} "$grp/sym/{/}" "$grp/und/{/}" :::: "$grp/files"
+  dump_once "$grp/._gen_syms" parallel --halt-on-error now,fail=1 -- extract_symbols {} "$grp/sym/{/}" "$grp/und/{/}" :::: "$grp/files"
 }
 
-extract_all(){ local dst=$1
-  extract_group "$dst/a"
-  extract_group "$dst/o"
-  extract_group "$dst/so"
-  extract_group "$dst/bin"
-  extract_group "$dst/ext"
+foreach_group(){ local dst=$1 fn=$2; shift 2
+  for g in a o so bin ext; do "$fn" "$dst/$g" "$@"; done
 }
 
 
 resolve_group(){ local grp=$1; shift
-  dump_once "$grp/und.sym" find "$grp/und" -type f -print
-  dump_once "$grp/_gen_need" parallel --halt-on-error now,fail=1 -- \
+  dump_once "$grp/und.sym" find "$grp/und" -type f -not -empty -print
+  dump_once "$grp/._gen_need" parallel --halt-on-error now,fail=1 -- \
     resolve_undefined {} "$grp" -- "${@:?}" \
     :::: "$grp/und.sym"
 }
 
 resolve_all(){ local dst=$1
   resolve_group "$dst/a" "$dst/a/sym" "$dst/so/sym" "$dst/ext/sym"
-  resolve_group "$dst/o" "$dst/o/sym"
+  resolve_group "$dst/o" "$dst/o/sym" "$dst/so/sym" "$dst/ext/sym"
   resolve_group "$dst/so" "$dst/so/sym" "$dst/ext/sym"
   resolve_group "$dst/bin" "$dst/so/sym" "$dst/ext/sym"
   resolve_group "$dst/ext" "$dst/ext/sym"
 }
 
+toposort(){ local grp=$1; shift
+  printf '* (toposort) %s\n' "$grp" >&2
+  { { find "${@:?}" -type f -not -empty -exec \
+      awk -F\\t '{sub(".*/", "", FILENAME); print FILENAME"\t"$2}' {} \+ \
+      | tsort > "$grp/topo.ordered"
+    } 3>&1 1>&2 2>&3 | sed 's/^tsort: //; s/^-:.*//' > "$grp/topo.cycles"
+  } || printf '!!! cycles detected\n' >&2
+}
+
+toposort_group(){ local grp=$1; shift
+  dump_once "$grp/._gen_topo" toposort "$grp" "$@"
+}
+
+toposort_all(){ local dst=$1
+  toposort_group "$dst/a" "$dst/a/stat" "$dst/so/stat" "$dst/ext/stat"
+  toposort_group "$dst/o" "$dst/o/stat" "$dst/so/stat" "$dst/ext/stat"
+  toposort_group "$dst/so" "$dst/so/stat" "$dst/ext/stat"
+  toposort_group "$dst/bin" "$dst/so/stat" "$dst/ext/stat"
+  toposort_group "$dst/ext" "$dst/ext/stat"
+}
+
+orderdeps(){ local grp=$1 ord=$2
+  printf '* (orderdeps) %s\n' "$grp" >&2
+  mkdir -p "$grp/deps"
+  find "$grp/stat" -type f -not -empty -print \
+  | parallel -- grep -xFf '<(cut -f2 {})' "$ord" '>' "$grp/deps/{/}"
+}
+
+orderdeps_group(){ local grp=$1
+  dump_once "$grp/._gen_deps" orderdeps "$grp" "$grp/topo.ordered"
+}
+
+cycle_relpath(){ local sym=$1; shift
+  [[ -z $sym ]] && echo && return
+  printf '* (cycle-relpath) %s\n' "$sym" >&2
+  grep -whF "$sym" "$@" | sed "s|^${PWD:?}/||" \
+    || echo "Err: not found symbol: $sym" >&2
+}; export -f cycle_relpath
+
+# ALT: remove longest common prefix
+# http://www.alecjacobson.com/weblog/?p=141
+topo_cycle_relpath(){ local grp=$1; shift
+  dump_once "$grp/topo.cycles.relpath" \
+    parallel -- cycle_relpath {} "$grp/files" "$@" \
+    :::: "$grp/topo.cycles"
+}
+
 find_all "$src" "$deps"
-extract_all "$deps"
+foreach_group "$deps" extract_group
 resolve_all "$deps"
+toposort_all "$deps"
+foreach_group "$deps" orderdeps_group
+foreach_group "$deps" topo_cycle_relpath "$deps/ext/files"
+
 
 
 ## DEBUG
