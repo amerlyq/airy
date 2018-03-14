@@ -301,7 +301,7 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-    (load-file "/usr/share/emacs/site-lisp/emacspeak/lisp/emacspeak-setup.el")
+    ; (load-file "/usr/share/emacs/site-lisp/emacspeak/lisp/emacspeak-setup.el")
     (global-linum-mode) ; Show line numbers by default
     ; FIXME exit only if espeak in process list, but not other
     (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)

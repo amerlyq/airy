@@ -124,6 +124,9 @@ Completely detach ranger interface from filemanager
   : p.communicate(input='Hello, World')
 
 DEV
+  [_] go into shell with pre-inputted command with expanded paths
+    :$dfV %d %D => $ diff -uU0 /path/dir1 /path/dir2 | vim +'setf diff'
+    :$rsync %d %D => $ rsync ...many-options... /path/dir1 /path/dir2
   [_] show hash (shasum) of files in dir == visually easy to find duplicates in dir
   [_] paste with rename : 'yypr' to duplicate file under another name
   [_] Save/restore session of opened tabs and positions

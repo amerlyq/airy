@@ -50,6 +50,7 @@ in dot|gv)
 # Launched w/o fork, because of poor cmd support: it opens new instance of
 # XMind instead of adding file to opened
 ;; xmind) XMind -noSplash -- "$1"
+# TODO: fix PATH to include this binary
 ;; nb) Mathematica -- "$1" &
 ;; *) return 11
 esac; }
