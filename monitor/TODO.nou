@@ -40,19 +40,28 @@ DEV r.monitor-dpi
 
 
 TODO
+  [_] TRY Enable monitor on boot w/o re-plug
+    :::~ seems like display will wake up if you won't disable monitor before disconnecting it from AC
+    G: linux display port over usb 3
+    https://superuser.com/questions/636617/disabling-laptop-monitor-on-boot
+    https://wiki.archlinux.org/index.php/Dell_XPS_13_(9350)#External_screen
+    https://wiki.archlinux.org/index.php/DisplayLink
+    https://communities.intel.com/thread/112202
   [_] DEV: generate xorg.conf of current xrandr settings for multi-monitor setup
     https://wiki.archlinux.org/index.php/Multihead#Example:_dualhead_configuration_using_relative_coordinates
     ALT: start custome xrandr/monitor.service to trigger
     [_] CHECK: if Xorg fails to startup when some of monitors are missing
-  2017-12-17 [X] reduced uw size 1920x800
-    $ cvt 1920 800 60 | sed -n '2s/^\w\+\s//p'
-    OR:(?old?): $ gtf 1280 720 60
-    $ xrandr --newmode 1920x800 125.00 1920 2024 2216 2512 800 803 813 831 -hsync +vsync
-    $ xrandr --addmode DP1 1920x800
-    $ xrandr --output DP1 --mode 1920x800
-    $ xrandr --output DP1 --auto
-    ADD: to initial xorg.conf
-      https://wiki.archlinux.org/index.php/xrandr#Permanently_adding_undetected_resolutions
+  [_] HDMI no 4k
+    $ cvt 3840 1600 60 | sed -n '2s/^\w\+\s//p'
+    $ xrandr --newmode 3840x1600  521.75  3840 4128 4544 5248  1600 1603 1613 1658 -hsync +vsync
+    $ xrandr --addmode HDMI-1 3840x1600
+    $ xrandr --output HDMI-1 --mode 3840x1600
+    $ xrandr --output HDMI-1 --auto
+      https://askubuntu.com/questions/815075/how-can-i-get-4k-60hz-at-420-working-in-ubuntu-16-04
+      https://lars.ingebrigtsen.no/2017/07/01/isnt-4k60hz-hdmi-possible-in-linux/
+      https://forums.geforce.com/default/topic/880214/geforce-900-series/for-all-people-with-black-screens-no-signal-issues/
+      https://forum.level1techs.com/t/why-cant-intel-530-graphics-run-4k-60hz/113809/10
+      https://www.linux.com/news/event/open-source-summit-na/2017/3/fixing-linux-graphics-kernel-true-displayport-compliance-or-how-upstream-patch
   [_] TRY: disable blinking led on LG monitor OR control backlight
     UDEV  [3476.637736] change   /devices/pci0000:00/0000:00:02.0/drm/card0/card0-eDP-1/intel_backlight (backlight)
       BUG: why backlight changes when I plug-in/out external monitor ?
