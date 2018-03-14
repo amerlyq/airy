@@ -26,7 +26,7 @@ call dein#add('kshenoy/vim-signature', {'lazy': 0,
   \ 'on_cmd': ['SignatureToggleSigns', 'SignatureRefresh',
   \            'SignatureListMarks', 'SignatureListMarkers'],
   \ 'hook_post_source': 'sil! exe "doautocmd sig_autocmds BufEnter"',
-  \ 'hook_source': "
+  \ 'hook_add': "
 \\n   let g:SignatureIncludeMarkers = '!@#$%^&*()'
 \\n   let g:SignaturePurgeConfirmation = 1
 \\n   let g:SignaturePrioritizeMarks = 0

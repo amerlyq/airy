@@ -81,6 +81,16 @@ call dein#add('vim-perl/vim-perl', {
   \ 'on_ft': 'perl'})
 
 
+" USAGE: sbcl --load /etc/default/quicklisp --load ~/.cache/vim/dein/repos/github.com/l04m33/vlime/lisp/start-vlime.lisp
+call dein#add('l04m33/vlime', {
+  \ 'rtp': 'vim/',
+  \ 'on_ft': 'lisp',
+  \ 'hook_source': "
+\\n   let g:vlime_force_default_keys = 1
+\\n   let g:vlime_compiler_policy = {'DEBUG': 3}
+\"})
+
+
 
 " mappings: [C-xC-o, [[, ]], ([, ((, )), F5, F7]
 call dein#add('LaTeX-Box-Team/LaTeX-Box', {

@@ -14,9 +14,9 @@ call dein#add('vim-scripts/DrawIt', {
 
 
 " Map: <LocalLeader>l[lvi]
+" \ 'on_map': '<LocalLeader>l',
 call dein#add('wannesm/wmgraphviz.vim', {
   \ 'on_cmd': ['GraphvizCompile', 'GraphvizShow', 'GraphvizInteractiv'],
-  \ 'on_map': '<LocalLeader>l',
   \ 'on_ft': 'dot'
   \})
 
