@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+((EUID)) && sudo=sudo || sudo=
+
+# BUG: devices aren't restored
+# http://billauer.co.il/blog/2013/02/usb-reset-ehci-uhci-linux/
+# https://bugzilla.redhat.com/show_bug.cgi?id=1179924
+
+# $sudo udevadm trigger
+exec find /sys/bus/pci/drivers -type l \
+  -path '*/?hci_hcd/????:??:??.?' \
+  -execdir $sudo sh -c '
+    printf "%s" "${0##*/}"|tee unbind|tee bind
+  ' {} \;

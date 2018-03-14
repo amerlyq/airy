@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+
+dfl=eDP-1
+ext=DP-1
+kw=1/4
+w=3840
+h=1600
+# NOTE: reduce physical size to increase virtual dpi
+mw=874
+mh=366
+
+s1=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((w*$kw))+0
+s2=$((w*$kw))/$((mw*$kw))x$h/$mh+0+0
+
+xrandr --delmonitor "$ext~1" --delmonitor "$ext~2"
+
+[[ ${1-} == -[s] ]] && xrandr \
+  --setmonitor "$ext~1" 2880/654x1600/366+960+0 "$ext" \
+  --setmonitor "$ext~2"  960/218x1600/366+0+0 none
+  # --setmonitor "$ext~1" 960/218x1600/366+0+0 "$ext" \
+  # --setmonitor "$ext~2"  2880/654x1600/366+960+0 none
+  # --setmonitor "$ext~1" "$s1" "$ext" \
+  # --setmonitor "$ext~2" "$s2" none
+
+xrandr --output "$dfl" --primary --auto --below "$ext" --output "$ext" --auto
+# xrandr --output "$dfl" --auto --primary --below "$ext"
+
+r.feh

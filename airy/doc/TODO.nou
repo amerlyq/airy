@@ -254,6 +254,11 @@ structure
         └── prf
 
 
+overlay
+  [_] TODO: replace "tmpl/" dirs with overlays from private repo AIRY_OVERLAY_PATH=overlay1:overlay2
+    e.g. $ linkcp -ct "/etc/X11/xorg.conf.d" ./tmpl/90-monitor-xrandr.conf
+
+
 setup
   2015-07-01 [X] FIX: /tmp/aura must be changed -> /tmp/$USER
     -- check if $USER available from bare script := see .xprofile
