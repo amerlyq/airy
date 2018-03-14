@@ -23,4 +23,8 @@ Resume / interrupt
   * --append --append-verify
   * --checksum
 
-TRY: store checksum in xatter on copy like rmlint
+[_] TRY: store checksum in xatter on copy like rmlint
+
+Incremental backups with hardlinks
+  https://superuser.com/questions/1245978/using-rsync-on-wsl-bash-for-windows-10-for-incremental-backups
+  $ rsync -aP --link-dest=PATHTO/$PREVIOUSBACKUP $SOURCE $CURRENTBACKUP
