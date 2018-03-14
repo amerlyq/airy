@@ -1,36 +1,39 @@
 #!/bin/bash
 set -euo pipefail
+export SHELL=$(type -p bash)
 
 src=${1:-$PWD}
 deps=${2:-/tmp/_deps}
-allsyms=$deps/sym.all
 
 # VIZ. ignorable symbols
 #   https://stackoverflow.com/questions/12697081/what-is-gmon-start-symbol
 ignore=( _Unwind_Resume __gmon_start__ )
 ignore=$(IFS=$'|'; printf '%s\n' "${ignore[*]}")
-ignore="^($ignore)$"
+export SYM_IGNORE="^($ignore)$"
 
-gather_libs(){ local src=$1 libs=$2
-  mkdir -p "${libs%/*}"
-  # -o | to search obj files
-  if [[ ! -s $libs ]]; then
-    printf '* (find) [*.a|*.o] %s\n' "$src" >&2
-    r.find-elf -abs -- "$src" > "$libs" \
-    || printf 'Err: *.a/*.so binaries not found\n' >&2
-  fi
+dump_once(){ local mark=$1; shift
+  mkdir -p "${mark%/*}"
+  [[ -f $mark ]] || "${@:?}" > "$mark" || exit 3
+}; export -f dump_once
+
+# -o | to search obj files
+find_artifacts(){ printf '* (find) %s\n' "$*" >&2
+  r.find-elf "$@" \
+  || { printf 'Err: *.a/*.so binaries not found\n' >&2; exit 1; }
 }
 
-# ATT: some libs are linked inside inner project
-#   => search your own *.so deps inside "ext" dir
-gather_ext(){ local src=$1 ext=$2
-  mkdir -p "${ext%/*}"
-  if [[ ! -s $ext  ]]; then
-    printf '* (find) [-*.so|exe] %s\n' "$src" >&2
-    r.find-elf -bs -- "$src" | xargs -rn1 -P$(nproc) \
-    ldd | awk '$3{print$3}' | LC_ALL=C sort -u > "$ext" \
-    || printf 'Err: seems like ldd error\n' >&2
-  fi
+# TODO: also extract dlopen() list
+# TODO: recursive ldd
+# NOTE: from ldd output all links to local libs are removed
+#  => search them in their own _deps/so dir
+#  => dir _deps/ext contains only external dirs
+ldd_ext(){ printf '* (ldd) %s\n' "$*" >&2
+  cat "$@" \
+  | xargs -rn1 -P$(nproc) ldd \
+  | awk '$3{print$3}' \
+  | LC_ALL=C sort -u \
+  | grep -vxFf <(cat "$@") \
+  || { printf 'Err: seems like ldd error\n' >&2; exit 2; }
 }
 
 ## THINK: completely ignore $5=="WEAK" bind ???
@@ -38,8 +41,9 @@ gather_ext(){ local src=$1 ext=$2
 # BAD? $6!="DEFAULT" -- actual for *.so|exe BUT in *.o it may be HIDDEN
 # https://reverseengineering.stackexchange.com/questions/14895/why-are-symbols-with-local-binding-present-in-the-symbol-table-of-my-elf-files
 extract_symbols(){ local fLib=$1 sym=$2 und=$3
+  printf '* (symbols) %s\n' "$fLib" >&2
   mkdir -p "${sym%/*}" "${und%/*}"
-  { { readelf -Ws -- "$fLib" | gawk -vignore="$ignore" '
+  { { readelf -Ws -- "$fLib" | gawk -vignore="${SYM_IGNORE:?}" '
       !$8 || $5 == "LOCAL" || $8 ~ ignore {
         next
       }
@@ -52,7 +56,7 @@ extract_symbols(){ local fLib=$1 sym=$2 und=$3
     ' | LC_ALL=C sort -u > "$sym"
     } 3>&1 1>&2 2>&3 | LC_ALL=C sort -u > "$und"
   }
-}
+}; export -f extract_symbols
 
 # INFO: some symbols are requested with "@"
 #   * static linker considers only current default "@@" symbols
@@ -60,8 +64,8 @@ extract_symbols(){ local fLib=$1 sym=$2 und=$3
 # e.g. (boost) _ZNSt6localeC1ERKS_@GLIBCXX_3.4 -> (stdc++) _ZNSt6localeC1ERKS_@@GLIBCXX_3.4
 # HACK: replace @ -> @@ for symbols with same version when resolving
 fixup_versioned_symbols(){
-  sed '/@@/!{/@/s//@@/}' "$1" | LC_ALL=C sort -u
-}
+  sed '/@@/!{/@/s//@@/}' "$@" | LC_ALL=C sort -u
+}; export -f fixup_versioned_symbols
 
 resolve_symbols(){ local fUnd=$1 dneed=$2
   while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
@@ -72,87 +76,95 @@ resolve_symbols(){ local fUnd=$1 dneed=$2
     --include '*.o' "${@:?}" \
   | awk -F'[:/]' -vd=""$dneed"" '{print$NF > d"/"$(NF-1)}' \
   || printf '!!! (empty) %s\n' "$fUnd" >&2
-}
+}; export -f resolve_symbols
 
 resolve_stats(){ local dneed=$1 fstats=$2
   mkdir -p "${fstats%/*}"
-  find -H "$dneed" -type f -print0 \
+  find "$dneed" -type f -print0 \
   | wc -l --files0-from=- \
   | awk -F'/|\\s' '{print$1"\t"$NF}' \
   | sort -k1rn,1 \
   | sed '1{/\stotal$/d}' \
   > "$fstats"
-}
+}; export -f resolve_stats
+
+
+merge_allsyms(){
+  find "${@:?}" -type f -exec cat {} \+ | LC_ALL=C sort -u
+}; export -f merge_allsyms
 
 # BUG: fixup_versioned_symbols() has no effect on notfound list
-print_notfound(){ local fUnd=$1 dnot=$2
+print_notfound(){ local fUnd=$1 grp=$2
+  while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
   printf '!!! (notfound) %s\n' "$fUnd" >&2
-  mkdir -p "$dnot"
+  dump_once "$grp/available.sym" merge_allsyms "${@:?}"
+  mkdir -p "$grp/notfound"
   { echo "$fUnd"
-    grep -vxFf "$allsyms" -- "$fUnd" \
-    | tee "$dnot/${fUnd##*/}" \
+    grep -vxFf "$grp/available.sym" -- "$fUnd" \
+    | tee "$grp/notfound/${fUnd##*/}" \
     | sed 's/^/\t/'
   } >&2
-}
+}; export -f print_notfound
 
-resolve_undefined(){ local fUnd=$1 dst=$2
+resolve_undefined(){ local fUnd=$1 grp=$2
+  [[ -s $fUnd ]] || return 0
   while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
   printf '* (resolve) %s\n' "$fUnd" >&2
-  dneed=$dst/need/${fUnd##*/}
-  fstats=$dst/stat/${fUnd##*/}
+  dneed=$grp/need/${fUnd##*/}
+  fstats=$grp/stat/${fUnd##*/}
   resolve_symbols "$fUnd" "$dneed" -- "${@:?}"
   resolve_stats "$dneed" "$fstats"
-  [[ -s $fstats ]] || print_notfound "$fUnd" "$dst/notfound"
+  [[ -s $fstats ]] || print_notfound "$fUnd" "$grp" -- "${@:?}"
+}; export -f resolve_undefined
+
+
+find_group(){ local t=$1 src=$2 grp=$3
+  mkdir -p "$grp"
+  dump_once "$grp/files" find_artifacts "$t" "$src"
 }
 
-batch_extract(){ local dst=$1
-  while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
-  while IFS= read -r fLib; do
-    printf '* (symbols) %s\n' "$fLib" >&2
-    extract_symbols "$fLib" "$dst/sym/${fLib##*/}" "$dst/und/${fLib##*/}"
-  done < <(cat "${@:?}")
-}
-
-# export -f gensymtbl
-# SHELL=/bin/bash parallel "resolve_undefined {} '$dst'/{}"
-
-gen_syms(){ local dst=$1
-  while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
-  if [[ ! -f $dst/_gen_syms ]]; then
-    batch_extract "$dst" -- "${@:?}"
-    touch "$dst/_gen_syms"
-  fi
+find_all(){ local src=$1 dst=$2
+  find_group -a "$src" "$dst/a"
+  find_group -o "$src" "$dst/o"
+  find_group -s "$src" "$dst/so"
+  find_group -b "$src" "$dst/bin"
+  mkdir -p "$dst/ext"
+  dump_once "$dst/ext/files" ldd_ext "$dst/so/files" "$dst/bin/files"
 }
 
 
-gen_allsyms(){ local allsyms=$1
-  while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
-  if [[ ! -s $allsyms ]]; then
-    find -H "${@:?}" -type f -exec cat {} \+ \
-    | LC_ALL=C sort -u > "$allsyms"
-  fi
+# BAD: parallel ignores errors
+extract_group(){ local grp=$1
+  dump_once "$grp/_gen_syms" parallel --halt-on-error now,fail=1 -- extract_symbols {} "$grp/sym/{/}" "$grp/und/{/}" :::: "$grp/files"
 }
 
-gen_need(){ local dUnd=$1 dst=$2
-  while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
-  if [[ ! -f $dst/_gen_need ]]; then
-    while IFS= read -r fUnd; do
-      [[ -s $fUnd ]] || continue
-      resolve_undefined "$fUnd" "$dst" -- "${@:?}"
-    done < <(find -H "$dUnd" -type f -print)
-    touch "$dst/_gen_need"
-  fi
+extract_all(){ local dst=$1
+  extract_group "$dst/a"
+  extract_group "$dst/o"
+  extract_group "$dst/so"
+  extract_group "$dst/bin"
+  extract_group "$dst/ext"
 }
 
-gather_libs "$src" "$deps/pj/libs"
-gather_ext "$src" "$deps/ext/libs"
 
-gen_syms "$deps/pj" -- "$deps/pj/libs"
-gen_syms "$deps/ext" -- "$deps/ext/libs"
-gen_allsyms "$allsyms" -- "$deps/pj/sym" "$deps/ext/sym"
+resolve_group(){ local grp=$1; shift
+  dump_once "$grp/und.sym" find "$grp/und" -type f -print
+  dump_once "$grp/_gen_need" parallel --halt-on-error now,fail=1 -- \
+    resolve_undefined {} "$grp" -- "${@:?}" \
+    :::: "$grp/und.sym"
+}
 
-gen_need "$deps/pj/und" "$deps/pj" -- "$deps/pj/sym" "$deps/ext/sym"
-gen_need "$deps/ext/und" "$deps/ext" -- "$deps/pj/sym" "$deps/ext/sym"
+resolve_all(){ local dst=$1
+  resolve_group "$dst/a" "$dst/a/sym" "$dst/so/sym" "$dst/ext/sym"
+  resolve_group "$dst/o" "$dst/o/sym"
+  resolve_group "$dst/so" "$dst/so/sym" "$dst/ext/sym"
+  resolve_group "$dst/bin" "$dst/so/sym" "$dst/ext/sym"
+  resolve_group "$dst/ext" "$dst/ext/sym"
+}
+
+find_all "$src" "$deps"
+extract_all "$deps"
+resolve_all "$deps"
 
 
 ## DEBUG
