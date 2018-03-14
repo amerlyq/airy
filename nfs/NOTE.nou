@@ -1,3 +1,25 @@
+Client
+  https://help.ubuntu.com/community/NFSv4Howto
+  On the client we can mount the complete export tree with one command:
+    $ sudo mount -t nfs4 -o proto=tcp,port=2049 nfs-server:/ /mnt
+    $ sudo mount -t nfs -o vers=4 192.168.1.2:/nfs/share /mnt
+  We can also mount an exported subtree with:
+    $ sudo mount -t nfs4 -o proto=tcp,port=2049 nfs-server:/users /home/users
+    $ sudo mount -t nfs 192.168.1.2:/nfs/share /mnt
+  To save us from retyping this after every reboot we add the following line to /etc/fstab:
+    [grep[
+    nfs-server:/   /mnt   nfs4    _netdev,auto  0  0
+    ]grep]
+  CMP: Auth NFS vs SMB
+    https://serverfault.com/questions/597254/smb-vs-nfs-authentication
+  UID mapping
+    https://unix.stackexchange.com/questions/286924/uid-mapping-in-nfs
+      => NFSv4 sends names instead of uid/gid and translates them on server
+    http://www.troubleshooters.com/linux/nfs.htm
+      * uid/gid -> as-is
+      * root 0/0 -> anon
+      * all -> anon
+
 Setup exports
   NOTE: for each 'mount --bind' point you need one entry in /etc/exports
 		BAD? Export root as is and each mounted fs with fsid=0
@@ -30,9 +52,13 @@ DEBUG
   Verifying whether NFS shared directories are configured correctly:
     $ sudo exportfs -sv  # show
   Check status of all RPC utility prs
-    $ rpcinfo -p  # show RPC vers/proto for 'nfs'
+    $ rpcinfo -p  # show RPC vers/proto for 'nfs' (see 2049 port)
     $ rpcinfo -p G '\b2\b.*tcp.*nfs'
   /etc/init.d/nfs-kernel-server
+  Check response / version
+    https://docs.oracle.com/cd/E19120-01/open.solaris/819-1634/rfsadmin-224/index.html
+    $ rpcinfo -s localhost
+    $ nfsstat -m
 
 
 Setup server
