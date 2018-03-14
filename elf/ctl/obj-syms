@@ -205,11 +205,30 @@ topo_cycle_relpath(){ local grp=$1; shift
     :::: "$grp/topo.cycles"
 }
 
+# TODO: delete self-links BET: gvpr postprocessing
+#   <deps-.gv awk '$1";"!=$3' > deps--.gv
+# TODO: filter-out common libs -- stdc++, logger, etc
+#   TRY: prune can help
+# TODO: spring-out layout
+graph_deps(){ local grp=$1; shift
+  printf '* (graph) %s\n' "$grp" >&2
+  find "$grp/stat" -type f -not -empty -exec awk -F\\t '
+    BEGIN {print "digraph G {"}
+    {sub(".*/", "", FILENAME); print "\""FILENAME"\" -> \""$2"\""}
+    END {print "}"}
+  ' {} \+ | nop
+}
+
+graph_group(){ local grp=$1
+  dump_once "$grp/deps.gv" graph_deps "$grp"
+}
+
 find_all "$src" "$deps"
 foreach_group "$deps" extract_group
 resolve_all "$deps"
 toposort_all "$deps"
 foreach_group "$deps" orderdeps_group
+foreach_group "$deps" graph_group
 foreach_group "$deps" topo_cycle_relpath "$deps/ext/files"
 
 
