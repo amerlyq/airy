@@ -20,7 +20,8 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 # THINK: embed *.rules support into svc_activate
 #   ALT: create 'udev_activate' or r.udev-cfg
-linkcp -ct '/etc/udev/rules.d' unit/95-monitor-hotplug.rules
+# BAD: idea of auto-plug is counterintuitive for tiling WMs
+# linkcp -ct '/etc/udev/rules.d' unit/95-monitor-hotplug.rules
 
 if cfgOpt u; then
   sudo udevadm control --reload-rules
@@ -29,11 +30,12 @@ fi
 ## NOTE: required only when EDID for monitor is wrong
 ## ATT: "$ Xorg -dpi ..." will override dpi derived from monitor's physical size
 ## BUT: you are still required to set physical size for firefox/webkit auto-resize on window moving between monitors
-wh=$(r.xorg -WH | xargs ||:)
-if [[ $wh =~ [0-9]+\ [0-9]+ ]]; then
-  tmp=$(mktemp); trap "rm '$tmp'" EXIT
-  sed -r '/^(\s+DisplaySize)\s.*$/s//\1 '"$wh/" \
-    ./unit/90-monitor.conf > "$tmp"
-  dst=/etc/X11/xorg.conf.d/90-monitor.conf
-  linkcp -c "$tmp" "$dst"
-fi
+# BAD: specifying monitor size will round-up numbers 346mm -> 350 due to Xorg structs in "cm"
+# wh=$(r.xorg -WH | xargs ||:)
+# if [[ $wh =~ [0-9]+\ [0-9]+ ]]; then
+#   tmp=$(mktemp); trap "rm '$tmp'" EXIT
+#   sed -r '/^(\s+DisplaySize)\s.*$/s//\1 '"$wh/" \
+#     ./unit/90-monitor.conf > "$tmp"
+#   dst=/etc/X11/xorg.conf.d/90-monitor.conf
+#   linkcp -c "$tmp" "$dst"
+# fi
