@@ -8,11 +8,26 @@ Generate some graphs
     $ gvgen -d -r10,10
   Manual composition
     $ printf '%s\n' 'A B' 'B C' 'C A' 'B D' 'D E' 'E F' 'F E' | { echo 'digraph G {'; sed 's/\s/->/'; echo '}'; } | nop
+  Preprocessor "cpp" and graphviz
+    http://www.malloc47.com/preprocessors-and-graphviz/
 
 Transform
   $ gvpr
     = e.g. like AWK
-  TRY prune
+    TUT http://mhenderson.net/stream-editing/2014/06/06/graphviz-01.html
+    https://wirelesstechnol.wordpress.com/2010/02/22/presenting-gvpr/
+  Prune -- subtree/subgraph
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=546726
+    $ prune -n B -N color=red test.gv
+  Delete unconnected nodes
+    https://stackoverflow.com/questions/43965713/remove-nodes-with-0-edges-before-drawing-the-graph-dot-graphviz
+    $ gvpr -c "N[$.degree==0]{delete(NULL, $)}" mygraph.gv
+  Delete nodes
+    http://graphviz.996277.n3.nabble.com/gvpr-s-delete-on-nodes-td3506.html
+    $ gvpr -ni 'N[!($.name=="D|F")]'
+    $ gvpr -ni 'N[name!="D|F"]'
+  Reverse direction of nodes
+    https://stackoverflow.com/questions/10147619/how-can-i-reverse-the-direction-of-every-edge-in-a-graphviz-dot-language-graph
 
 Stats
   Count nodes / edges / clusters
@@ -20,7 +35,7 @@ Stats
     $ ... | cluster | gc -C
 
 Split cycles into subgraphs / clusters
-  $ ... | bcomps | xdot -
+  $ ... | bcomps -x | xdot -
   $ ... | cluster | xdot -
     = NOTE: accepts Weights
   TRY: osage, patchwork, sccmap
