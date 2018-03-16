@@ -62,7 +62,7 @@ alias -g SC='|LC_ALL=C sort|uniq -c|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'
 alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
 
-for i in {1..5}; do alias -g C$i="|awk '{print\$$i}'"; done
+for i in {1..9}; do alias -g C$i="|awk '{print\$$i}'"; done
 alias -g C\$="|awk '{print\$NF}'"
 # Prints columns 1 2 3 ... n.
 function slit { awk "{ print ${(j:,:):-\$${^@}} }"; }

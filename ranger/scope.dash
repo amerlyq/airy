@@ -1,4 +1,7 @@
-#!/bin/dash
+#!/bin/bash
+# BUG:(dash): doesn't support "pipefail" -> can't fallback on variants
+set -o pipefail
+
 # vim:ft=sh
 # 0 | success    | show stdout
 # 1 | failure    | no preview
@@ -33,9 +36,9 @@ in a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
 ;; odt|ods|odp|sxw) try odt2txt "$path" | trim | fmt && exit 3
 ;; htm|html|xhtml) try elinks -dump "$path" | fmt && exit 3
 ;; mp4) exiftool "$path" && exit 5
-;; *) mimetype=$(file --mime-type -Lb "$path")
 esac
 
+mimetype=$(file --mime-type -Lb "$path")
 
 if [ "$preview_images" = True ]; then
   case "$mimetype"

@@ -5,7 +5,7 @@ d=${2:-_build-doxygen}
 cfg=$d/Doxyfile
 
 # Generate default config, [-s]-key removes comments from it
-mkdir -p _doxygen
+mkdir -p "$d"
 rm -f "$cfg" && doxygen -g "$cfg"
 
 ## ALT: chg() { sed "s@\(^$1[ ]*=[ ]*\).*@\1 $2@g" -i "$cfg"; }
@@ -17,9 +17,9 @@ chgq() { chg "$1" "\"$2\""; }
 
 # Project sets
 chgq PROJECT_NAME     "${PWD%/*}"
-chgq PROJECT_NUMBER   "$(git --no-pager log --pretty=format:'%ad' --date=short -1)"
+chgq PROJECT_NUMBER   "$(git --no-pager log --pretty=format:'%ad' --date=short -1 || echo 0)"
 #chgq INPUT            "inc src"
-chgq OUTPUT_DIRECTORY "$PWD/_doxygen"
+chgq OUTPUT_DIRECTORY ""$d""
 chgq WARN_LOGFILE     "warnings.log"
 chg TAB_SIZE          4
 # chg INPUT             ../

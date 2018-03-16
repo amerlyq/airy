@@ -23,7 +23,7 @@ let s:colors = [
 
 fun! s:_indent(i)
   let ind = '%(\t| {'.&ts.'})'
-  let p = '^'
+  let p = ''
   let p .= '%('.ind.'{1})'
   let p .= '%('.ind.'{'.len(s:colors).'}){-}'
   let p .= '%('.ind .'{'. a:i .'})' . '\ze\S'
