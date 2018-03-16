@@ -4,11 +4,12 @@ set -o pipefail
 # USAGE:
 # A=all, a=archive, b=bin, c=core, k=kernel, o=object, s=shared
 # f=bfmt : elf
-# m=masked : find masked by extension
+# m=masked : find masked by extension (default)
+# M=more : search all files without masking
 # p=pltf : mips, x86-64
 
 choices=abckos
-opts=; while getopts "Af:mp:$choices" o; do case $o in :|'?') exit 1
+opts=; while getopts "Af:mMp:$choices" o; do case $o in :|'?') exit 1
 ;; A) opts+=$choices
 ;; f) bfmt=$OPTARG
 ;; p) pltf=$OPTARG
@@ -20,7 +21,7 @@ flt=( )  # DEV: preliminary filter-out trash files
 
 [[ -z ${opts//[^$choices]} ]] && opts=bs  # =DFL
 
-if has m; then
+if ! has M || has m; then
   has $choices && flt+=( \( -false )
   has a && flt+=( -o -name '*.a' )
   has b && flt+=( -o \( -executable \! -regex '.*\.[ks]?o\(\.[0-9]+\)*$' \) )
@@ -49,12 +50,15 @@ typ="(${typ:1})"
 # ALT:TRY |elffile|
 #   https://blogs.oracle.com/ali/elffile:-elf-specific-file-identification-utility
 
-exec find -H "${src[@]}" ! -readable -prune -o -type f "${flt[@]}" -print \
+aug_filetype(){ if [[ $1 =~ 'current ar archive'$ ]]
+  then printf '%s, ELF, %s\n' "$1" "$(readelf -hW "${1%:*}" | grep -oP '^\s*Machine:\s+\K.*')"
+  else printf '%s\n' "$1"; fi
+}; export -f aug_filetype
+
+find -H "${src[@]}" ! -readable -prune -o -type f "${flt[@]}" -print \
 | file -f- -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar \
-| while IFS= read -r L; do if [[ $L =~ 'current ar archive'$ ]]
-then printf '%s, ELF, %s\n' "$L" "$(readelf -hW "${L%:*}" | grep -oP '^\s*Machine:\s+\K.*')"
-else printf '%s\n' "$L"; fi; done \
-| grep -iFw "${bfmt-elf}" \
+| grep -iFw -e "${bfmt-elf}" -e 'current ar archive' \
 | grep -Ew  "${typ}" \
+| parallel -- aug_filetype {} \
 | grep -iFw "${pltf-}" \
-| awk -F': ' '{print $1}'
+| cut -d: -f1
