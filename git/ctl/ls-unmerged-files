@@ -1,0 +1,50 @@
+#!/bin/bash -eu
+#%USAGE: $ ./$0 [-s] origin/master [relpath-regex] [start-date]
+#%Group by author
+#%  r.git-ls-unmerged-files origin/master . '-6 month' | sort -t$'\t' -sk2f,2 | awk -F\\t -vOFS=\\t '$2!=m{m=$2;printf"\n"}{print$1,$2,"~"$5" +"$6" -"$7,$3,$4}' | column -ts$'\t'
+set -o pipefail
+
+# TODO:(-f): filter by filelist from stdin
+# TODO:(-b/-r): filter by files from branch/revision
+[[ ${1-} == -s ]] && { stats=1; shift; } || stats=0
+
+(($#)) || set -- origin/master
+b=$1
+rgx=${2:-.}
+startdate=${3:--1 month}
+
+((!stats)) && [[ -t 1 ]] && exec > >(column -ts$'\t')
+
+# '%cd %h %ce %s %n'
+fmt=(
+  '%cr'
+  '%ae'
+  '%h'
+  '%D'
+)
+fmt=$(IFS=,; sed s/,/%x09/g <<< "${fmt[*]}")
+
+# m=$(git merge-base --fork-point "$b" "$h")
+# xargs -rn1 -I{} -P$(nproc)
+
+git branch -r \
+  --format='%(committerdate:unix)%09%(objectname)' \
+  --sort=-committerdate \
+  --no-merged "$b" -- \
+| awk -vd="$(date +%s -d "$startdate")" '$1>d{print$2}' \
+| while IFS=$'\t' read -r h; do
+
+  git --no-pager diff --name-only "$b"..."$h" -- | grep -qE "$rgx" || continue
+  ## ALT: filter by another branch
+  #   BAD: won't show you conflicts "deleted folder vs added file"
+  # git --no-pager diff --name-only "$b"..."$h" -- | grep -q -xFf <(git --no-pager diff --name-only "$b"..."$h" --) || continue
+
+  if ((stats)); then
+    git --no-pager show --no-patch --pretty=format:"$fmt%n" "$h" --
+    ((stats)) && git --no-pager diff --stat "$b"..."$h" && echo
+  else
+    { git --no-pager show --no-patch --pretty=format:"$fmt%n" "$h" --
+      git --no-pager diff --shortstat "$b"..."$h" -- | awk '{print$1"\t"$4"\t"$6}'
+    } | sed -u 'N;s/\n/\t/'
+  fi
+done
