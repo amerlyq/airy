@@ -31,11 +31,12 @@ call dein#add('davidhalter/jedi-vim', {
 
 
 
+"" DISABLED: too much CPU load when editing
 " mappings: [ [[, ]], [M, ]M, [ai]C, [ai]M ]
-call dein#add('klen/python-mode', {
-  \ 'rev': 'develop',
-  \ 'on_ft': 'python',
-  \ 'hook_source': _hcat('python-mode.src')})
+" call dein#add('klen/python-mode', {
+"   \ 'rev': 'develop',
+"   \ 'on_ft': 'python',
+"   \ 'hook_source': _hcat('python-mode.src')})
 
 
 

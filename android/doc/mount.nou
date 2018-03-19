@@ -1,0 +1,6 @@
+https://superuser.com/questions/1027722/how-to-transfer-files-between-linux-and-android-in-a-fast-and-reliable-way
+SSHelper // com.arachnoid.sshelper
+  (TARG) sshd => enable
+  (HOST) sshfs
+  $ mkdir /tmp/andr
+  $ sshfs -o "idmap=user,transform_symlinks,default_permissions,uid=$(id -u),gid=$(id -g)" sshd@192.168.1.65:/storage/emulated/0 /tmp/andr -C -p 2222 -f
