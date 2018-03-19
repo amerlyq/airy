@@ -1253,7 +1253,7 @@ c.tabs.last_close = 'close'
 ## `about:blank` for a blank page.
 ## Type: FuzzyUrl
 # c.url.default_page = 'https://start.duckduckgo.com/'
-c.url.default_page = 'https://encrypted.google.com/search'
+c.url.default_page = 'https://google.com/search'
 
 ## The URL segments where `:navigate increment/decrement` will search for
 ## a number.
@@ -1276,26 +1276,26 @@ c.url.default_page = 'https://encrypted.google.com/search'
 ## Type: Dict
 # c.url.searchengines = {'DEFAULT': 'https://duckduckgo.com/?q={}'}
 c.url.searchengines = {
-    'DEFAULT': 'https://encrypted.google.com/search?q={}',
+    'DEFAULT': 'https://google.com/search?q={}',
     'ab': 'https://bbs.archlinux.org/search.php?action=search&author=&forums=&search_in=0&sort_by=0&sort_dir=DESC&show_as=topics&keywords={}',
     'au': 'https://aur.archlinux.org/packages/?O=0&C=0&SeB=nd&outdated=&SB=n&SO=a&PP=50&do_Search=Go&K={}',
     'aw': 'https://wiki.archlinux.org/index.php?title=Special:Search&search={}',
     'D': 'https://duckduckgo.com/?q=!g%20{}',
     'd': 'https://duckduckgo.com/?q={}',
     'di': 'https://duckduckgo.com/?ia=images&q={}',
-    'g': 'https://encrypted.google.com/search?q={}',
-    'ga': 'https://encrypted.google.com/search?q=arch%20linux%20{}',
-    'gb': 'https://encrypted.google.com/search?q=bash%20{}',
+    'g': 'https://google.com/search?q={}',
+    'ga': 'https://google.com/search?q=arch%20linux%20{}',
+    'gb': 'https://google.com/search?q=bash%20{}',
     'gh': 'https://github.com/search?q={}',
-    'gj': 'https://encrypted.google.com/search?q=%22jsoftware%22%20{}',
+    'gj': 'https://google.com/search?q=%22jsoftware%22%20{}',
     'gm': 'https://www.google.com/maps/place/{}',
-    'gv': 'https://encrypted.google.com/search?q=graphviz%20{}',
+    'gv': 'https://google.com/search?q=graphviz%20{}',
     'ha': 'http://www.haskell.org/hoogle/?hoogle={}',
     'so': 'http://stackoverflow.com/search?q={}',
-    'en': 'https://encrypted.google.com/search?q=english%20{}',
-    'py': 'https://encrypted.google.com/search?q=python%20{}',
-    'p2': 'https://encrypted.google.com/search?q=python2%20{}',
-    'p3': 'https://encrypted.google.com/search?q=python3%20{}',
+    'en': 'https://google.com/search?q=english%20{}',
+    'py': 'https://google.com/search?q=python%20{}',
+    'p2': 'https://google.com/search?q=python2%20{}',
+    'p3': 'https://google.com/search?q=python3%20{}',
     'dt': 'http://dictionary.reference.com/browse/{}',
     'ea': 'http://www.ex.ua/search?original_id=23786&s={}',
     'ex': 'http://www.ex.ua/search?s={}',
@@ -1314,7 +1314,7 @@ c.url.searchengines = {
 ## The page(s) to open at the start.
 ## Type: List of FuzzyUrl, or FuzzyUrl
 # c.url.start_pages = ['https://start.duckduckgo.com']
-c.url.start_pages = ['https://encrypted.google.com/search']
+c.url.start_pages = ['https://google.com/search']
 
 ## The URL parameters to strip with `:yank url`.
 ## Type: List of String
