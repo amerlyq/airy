@@ -171,9 +171,9 @@ class ag(Command):
 
 
 class doc(Command):
-    lst = {'b': 'DEBUG', 'd': 'DEV', 'e': 'EXAMPLES', 'i': 'INFO', 'h': 'HACK',
-           'g': 'LEGEND', 'l': 'LIOR', 'm': 'MAINT', 'n': 'NOTE',
-           's': 'SYNERGY', 't': 'TODO', 'u': 'USAGE'}
+    lst = {'b': 'DEBUG', 'd': 'DEV', 'e': 'EXAMPLES', 'f': 'FUTURE',
+           'i': 'INFO', 'h': 'HACK', 'g': 'LEGEND', 'l': 'LIOR', 'm': 'MAINT',
+           'n': 'NOTE', 's': 'SYNERGY', 't': 'TODO', 'u': 'USAGE'}
     ext = ['.nou', '.otl', '.txt', '']
     loci = ['doc', 'docs', '_doc', '']
     """:doc [<name>]

@@ -51,6 +51,8 @@ fi
 
 case "$mimetype"
 in text/*|*/xml) exit 2
+;; application/x-sqlite3)
+  sqlite3 "$path" .fullschema .dbinfo && exit 5
 ;; application/x-executable)
   file -Lb "$path"
   echo
