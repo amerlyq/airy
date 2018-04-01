@@ -79,9 +79,15 @@ DEV
 TODO
   [_] CHG: modify font size / dpi when moving window between monitors
     => SEE: dunst can detect event of switching monitors
+    2018-04-01 [X] DEV: auto-switch font size between monitors with different dpi
   2017-07-18 [X] try replace argbbg by alpha off patch
   2017-07-18 [X] check/compare/update other patches
   [_] add 'vertcenter' patch
+  [_] TODO: dld ready-to-use mappings for ZSH, VIM, ranger (OK: nvim)
+    [_] <S-CR> and <C-CR> generates rubbish in vim =>  :.,.+22u
+    [_] every letter <C-S-..> generage rubbish in vim/zsh
+    !! FIX: max-remap everything to "do_nothing <C-S-a>" or "same_as <C-Space>"
+      => then map only required ones individually
 
 
 BUG
@@ -115,6 +121,7 @@ BUG
      erresc: unknown csi ESC[8;18;212t
      erresc: unknown csi ESC[8;30;100t
      erresc: unknown csi ESC[8;20;119t
+     erresc: unknown str ESC]12
       [_] FIND: terminfo csi redefine/change to suppress those codes for 'st'
   2018-01-21 [X] erresc: unknown private set/reset mode 1005
     ::: safe to ignore -- DEV patch "st.c" to hide message for 1005 only

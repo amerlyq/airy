@@ -9,6 +9,21 @@ NOTE:
   Switch tty / virtual terminal
     $ chvt 1
     <C-A-Fn> == LCtrl-LWin-Fn
+    <A-Left> / <A-Right>
+  [_] TODO: map F1-F12 in vconsole to directly switch "chvt"
+    https://wiki.archlinux.org/index.php/extra_keyboard_keys
+    BAD: ranger will lose fast switch between tabs
+
+SysRq / PrintScreen
+  OnBoot: use "sysrq_always_enabled=1" in kernel cmdline
+  OnInit: use "kernel.sysrq=1" in /etc/sysctl.d/99-sysctl.conf
+  OnDemand: use $ echo 1 | sudo tee /proc/sys/kernel/sysrq
+  | <Alt + SysRq + r> | Unraw     | Take control of keyboard back from X.
+  | <Alt + SysRq + e> | Terminate | Send SIGTERM to all processes, allowing them to terminate gracefully.
+  | <Alt + SysRq + i> | Kill      | Send SIGKILL to all processes, forcing them to terminate immediately.
+  | <Alt + SysRq + s> | Sync      | Flush data to disk.
+  | <Alt + SysRq + u> | Unmount   | Unmount and remount all filesystems read-only.
+  | <Alt + SysRq + b> | Reboot    | Reboot
 
 DEBUG
   Show current

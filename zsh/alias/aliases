@@ -49,7 +49,7 @@ alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
 alias -g TC='|column -t'
 alias -g W='|while read line; do'
-alias -g NE="|grep -v '^\s*\$'"
+alias -g NE='|grep -v "^\s*\$"'
 alias -g S='|noglob sed -u -rn'
 
 alias -g SN='|sort -n'

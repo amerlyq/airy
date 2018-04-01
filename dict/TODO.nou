@@ -8,8 +8,12 @@ DEBUG
     $ /usr/bin/dictd -d{nofork,verbose,init} -c /etc/dict/dictd.conf -- -s
 
 TODO
-    ADD: script to copyq -- to translate from copied text
-        ALSO: to send/receive TL through google/etc
+  [_] dict -- doesn't translate by vim, only in terminal on "r.dict"
+    ":Dict some" doesn't work -- need pandoc
+    [_] remove pandoc from deps MAYBE: use my own color scheme instead of .md
+    [_] DEV: on "g=" open new editable "nofile" buffer instead of ":enew"
+  [_] ADD: script to copyq -- to translate from copied text
+    ALSO: to send/receive TL through google/etc
   BUG: err(143/n/a): sudo systemctl stop dictd
   > [_] ADD vim client
     https://github.com/szw/vim-dict

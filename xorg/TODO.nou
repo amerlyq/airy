@@ -1,0 +1,17 @@
+TODO
+  [_] TODO: read anew xorg systemd -- maybe there is no need for my hack with fork-waiting in .service
+    [_] FIND: if socket activation on 1.19 was fixed -- and I may remove my hack
+    [_] G: arhc linux unprivilidged xorg / user mode
+    [2017-12-26 02:35] [ALPM-SCRIPTLET] >>> xorg-server has now the ability to run without root rights with
+    [2017-12-26 02:35] [ALPM-SCRIPTLET]     the help of systemd-logind. xserver will fail to run if not launched
+    [2017-12-26 02:35] [ALPM-SCRIPTLET]     from the same virtual terminal as was used to log in.
+    [2017-12-26 02:35] [ALPM-SCRIPTLET]     Without root rights, log files will be in ~/.local/share/xorg/ directory.
+    [2017-12-26 02:35] [ALPM-SCRIPTLET]
+    [2017-12-26 02:35] [ALPM-SCRIPTLET]     Old behavior can be restored through Xorg.wrap config file.
+    [2017-12-26 02:35] [ALPM-SCRIPTLET]     See Xorg.wrap man page (man xorg.wrap).
+
+  2017-12-31 [X] FIND: what is that PID out of session -- MAYBE: related to new xorg in user mode
+    2017-12-31 [X] READ: https://wiki.archlinux.org/index.php/Systemd/User#Xorg_as_a_systemd_user_service
+      => it seems xorg tries to query it's own session from logind by its own PID
+    Dec 30 20:06:38 rose xserver[1141]: (++) using VT number 1
+    Dec 30 20:06:38 rose xserver[1141]: (EE) systemd-logind: failed to get session: PID 1142 does not belong to any known session
