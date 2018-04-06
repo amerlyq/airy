@@ -42,8 +42,9 @@ Multihost master key
       ALT: export sep keys per each host individually in different files
         $ gpg --export-secret-subkeys -a '<SID>!' '<EID>!' >  subkeys_$host.asc
     Delete master key -- public key will remain
-      !. WARN: master key must be already exported
+      !. WARN: master key must be already exported (SEE: above)
       $ gpg --delete-secret-key $gpgkey
+        = yes, yes, yes
     Insert subkeys back
       $ gpg --import subkeys.asc
       $ shred --remove subkeys.asc

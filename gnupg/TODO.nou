@@ -88,12 +88,6 @@ Revocation
     gpg --edit-key $GPGKEY   # ALT --homedir=/mnt/.gnupg
     USE gpg> list, key 2, revkey, save
 
-Extending:
-    $ gpg --edit-key $GPGKEY
-    gpg> key 1, expire, save
-  Send the updated key to the keyservers
-    gpg --send-key --keyserver <server> $GPGKEY
-
 Sign others keys
   Mounted USB drive
     export GNUPGHOME=/mnt/keys/gnupg
