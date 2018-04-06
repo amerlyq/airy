@@ -1,0 +1,41 @@
+REF
+  http://www.kossboss.com/?p=2017
+  http://www.kossboss.com/?p=2277
+  https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-restore
+  https://btrfs.wiki.kernel.org/index.php/Restore
+  https://superuser.com/questions/415132/how-to-undelete-files-on-btrfs-partition
+  https://www.google.com/search?q=btrfs%20restore%20deleted
+  https://wiki.archlinux.org/index.php/file_recovery
+  https://askubuntu.com/questions/150671/accidentally-deleted-a-folder
+  https://www.reddit.com/r/archlinux/comments/61ej37/who_knew_restoring_deleted_files_from_btrfs_is/
+
+Restore files
+  Unmount (required)
+    $ umount /work
+
+  Enlist CoW trees
+    $ sudo btrfs-find-root /dev/mapper/ws-work
+     ```
+     Found tree root at 129510785024 gen 27071 level 1
+     Well block 129508376576(gen: 27070 level: 1) seems good, but generation/level doesn't match, want gen: 27071 level: 1
+     Well block 129476935680(gen: 27069 level: 1) seems good, but generation/level doesn't match, want gen: 27071 level: 1
+     ```
+
+  Gather statistics
+    NOTE: use -r @work to reduce results list to single subvolume
+    # ionice -c2 -n7 nice -n +15 ...
+    $ ... | awk -F'\\s|\\(' '/Well block/{print$3}' | sudo xargs -rn1 -d\\n -I{} -P4 --verbose \
+      sh -c 'printf "%d: %d\n" "{}" $(btrfs restore --dry-run -v -i -t {} --path-regex "^/(|@(|/relpath(|/from(|/mountpoint(|/to(|/my(|/project(|/.*))))))))\$" /dev/mapper/ws-work /tmp/btrfs | wc -l)' | sort -rn >! /tmp/log
+     >
+      129508376576: 1038
+      129474035712: 2873
+      129422376960: 5231
+     <
+
+  List contained files in non-zero ones (try them sequentially in descending order of ids)
+    $ sudo btrfs restore --dry-run -v -i -t 129423720448 /dev/mapper/ws-work /tmp/btrfs |grep relpath/from/mountpoint/to/my/project/.git
+    $ sudo btrfs restore --dry-run -v -i -t 129423720448 --path-regex '^/(|@(|/relpath(|/from(|/mountpoint(|/to(|/my(|/project(|/.*))))))))\$' /dev/mapper/ws-work /tmp/btrfs |grep -v 'project/_'
+
+  Restore choosen
+    $ mkdir /tmp/btrfs
+    $ sudo btrfs restore -v -i -t 129423720448 --path-regex '^/(|@(|/relpath(|/from(|/mountpoint(|/to(|/my(|/project(|/.*))))))))\$' /dev/mapper/ws-work /tmp/btrfs
