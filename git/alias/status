@@ -1,0 +1,17 @@
+# vim:ft=sh
+
+## Status
+alias gs='{ git status -sb && git --no-pager stash list; }'
+alias gsu='{ git status -sbu && git --no-pager stash list; }'
+
+# OR:(more precise): grep -P '^.?[!](?=\\s)' || grep -iP '^.?\\K${i}(?=\\s)'
+alias gwsi="git -c color.status=always status -s --ignored=traditional    | grep --color=never -E '.?[!]\\B'"
+alias gwsI="git -c color.status=always status -s --ignored=no"
+alias gwst="git -c color.status=always status -s --untracked-files=normal | grep --color=never -E '.?[?]\\B'"
+alias gwsT="git -c color.status=always status -s --untracked-files=no"
+
+# NOTE: one-letter variants are replaced global aliases in ZHS
+for i in {A,C,D,M,R,U}; do
+  alias gws${ZSH_NAME:+$i:l}${BASH:+${i,,}}="git -c color.status=always status -s | grep --color=never -E '\\a?[$i]\\b'"
+  alias gws$i="git -c color.status=always status -s | grep --color=never -vE '\\a?[$i]\\b'"
+done
