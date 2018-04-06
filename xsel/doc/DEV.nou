@@ -7,6 +7,8 @@ DEBUG: -d -d -d
   $ socat -d -d -d -4u TCP-L:2224,reuseaddr,fork EXEC:xsel-auto
   $ ssh -R 2224:localhost:2224 ...
   $ nc -dz4 localhost 2224
+    BUG: doesn't terminate after transmission
+    https://stackoverflow.com/questions/47482245/nc-l-disconnect-after-transmission
   $ echo $RANDOM | socat -d -d -d -4t0 - TCP:localhost:2224
     # BUG:(zsh): ... <<<$RANDOM isn't random -- shows fixed last value
   $ socat -d -d -d -4t0 - TCP:localhost:2224 </dev/null

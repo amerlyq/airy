@@ -25,7 +25,8 @@ fi
 
 if (($+commands[$EDITOR])); then
   # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
-  alias -g V='| $EDITOR - -c "setl noro ma bt=nofile"'
+  # ALSO: -c "fencs= fenc=utf8 nobinary nobomb"
+  alias -g V='| $EDITOR - -c "setl noro ma bt=nofile nowrap"'
   alias -g VN='V -c "setf nou"'
   alias -g VQ='V -c "cgetb|copen"'
     # ALT: ag --vimgrep ... |sort| nvim -q/dev/stdin
@@ -52,11 +53,12 @@ alias -g W='|while read line; do'
 alias -g NE='|grep -v "^\s*\$"'
 alias -g S='|noglob sed -u -rn'
 
+alias -g SS='|LC_ALL=C sort'
 alias -g SN='|sort -n'
 alias -g SU='|sort -u'
 for i in {1..5}; do
   alias -g S$i="|sort -sk$i,$i"
-  alias -g S$i-="S$i -r"
+  alias -g S$i-="|sort -sk${i}r,$i"
 done
 alias -g SC='|LC_ALL=C sort|uniq -c|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'

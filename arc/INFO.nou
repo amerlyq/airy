@@ -16,3 +16,8 @@ Archives
   Compress with passwd
     $ 7z a -mhe=on -p arch.7z dir1
     $ 7z a -mhe=on '-xr!work/dbg/' '-x!cvs/cvs.log' '-x!~~/*.tgz' '-x!*.squashfs' -p arch.7z  dir1 dir2...
+  Uncompress multipart zip
+    https://unix.stackexchange.com/questions/40480/how-to-unzip-a-multipart-spanned-zip-on-linux
+    $ zip -s 0 partial.zip --out full.zip
+      = other files will be added automatically ./partial.z01 ...
+    $ unzip full.zip
