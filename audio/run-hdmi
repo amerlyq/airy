@@ -22,6 +22,6 @@ setprf(){ [[ $1 == $active ]] || pacmd set-card-profile "$card" "$1"; }
 case $state
 in 0) setprf "$prf0"
 ;; 1) setprf "$prf1"
-;; '') if [[ $active == $prf0 ]]; then setprf "$prf1"; else setprf "$prf0"; fi
+;; '') p=$prf1; [[ $active == $p ]] && p=$prf0; echo "$p"; setprf "$p"
 ;; *) exit 2
 esac

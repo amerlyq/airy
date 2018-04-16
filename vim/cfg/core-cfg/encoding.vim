@@ -11,8 +11,9 @@ elseif &termencoding == ""
   language message C " Use English interface.
 endif
 
+" BAD:(utf-16le): hierogliphs in confusing/broken files most of the time
 setg fileencoding=utf-8
-set fileencodings=utf-8,utf-16le,cp1251,cp866
+set fileencodings=utf-8,cp1251,cp866
 
 setg fileformat=unix
 set fileformats=unix,dos,mac  " Line endings

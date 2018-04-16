@@ -7,13 +7,13 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 
 " EXPL: used <DECI> because DEC==decrement/decrease
 " IDEA: mark text by color specified in notch
-"   "RED: ..." -- marker only
-"   "GREN! ..." -- rest of line
-"   "!CYAN! ..." -- whole line from beginning
+"   'RED: ...' -- marker only
+"   'GREN! ...' -- rest of line
+"   '!CYAN! ...' -- whole line from beginning
 
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 let s:patterns = [
-  \ ['Err', 196, '#ff2525', 'RED|ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|FAIL%(ED)?|CRIT%(ICAL)?'],
+  \ ['Err', 196, '#ff2525', 'RED|RQ|ERR%(OR)?|BUG|REGR|XXX|WTF|BAD|FAIL%(ED)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'GREN|ADD|NEED|FIND|ALSO|BET%(TER)?|E\.G|e\.g'],
   \ ['Ref',  28, '#00af00', 'SEE|READ|REF|TUT|BLOG|BOOK|LIOR'],
   \ ['Alt', 178, '#dfaf00', 'YELW|ALT|OR|CASE|THINK|IDEA|CHG|CMP|I\.E|i\.e|EXAM%(INE)?'],

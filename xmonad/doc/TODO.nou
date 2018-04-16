@@ -331,10 +331,18 @@ FIXME
 
 BUG
   [_] Breaks on reinstall
+    https://bbs.archlinux.org/viewtopic.php?id=229495
     ::: partial fix
-      https://bbs.archlinux.org/viewtopic.php?id=229495
       $ sudo ghc-pkg recache
       $ paci xmonad xmonad-contrib
+      OR: $ paci $(pacman -Qs haskell |grep 'local/' |tr '/' ' ' |awk '{ print $2 }' |grep '^haskell')
+    I.E. related errors
+      (1/1) Unregistering Haskell modules...
+        error: command failed to execute correctly
+      lib/XMonad/Config/Amer/Common.hs:7:1: error:
+        Could not find module ‘XMonad’
+      package xmonad-0.13-K842KXy8eLK2djQHd55ZyZ is unusable due to missing dependencies:
+        X11-1.8-JnAOOA5ca1mBqz6w5LwuYT
   [_] After floating window open/close, focus drops to Master window instead last slave
   [_] 'f' in mpv don't make fullscreen -- SEE FullscreenMessage
     [_] SEE https://www.reddit.com/r/xmonad/comments/3ak0ri/how_to_manage_fullscreen_programms/
