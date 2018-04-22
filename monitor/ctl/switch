@@ -30,6 +30,7 @@ case $*
 in *d*) xrandr --output "$dfl" --primary --auto --output "$ext" --off
 ;; *e*) xrandr --output "$dfl" --off --output "$ext" --primary --auto
 ;; *a*|'') xrandr --output "$dfl" --primary --auto --below "$ext" --output "$ext" --auto
+;; *) echo "Err: wrong option '$*'"; exit 1
 esac
 
 r.feh
