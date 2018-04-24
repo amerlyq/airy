@@ -21,7 +21,7 @@ pass=${2-}
 # prf(){ printf '%s' "$@" | tee -a /tmp/mut; }
 
 if [[ -z $pass ]]; then
-  pass=$(r.query-passwd "mutt/$acc")
+  pass=$(r.query-passwd "mail/$acc")
 fi
 
 if [[ -z $pass ]]; then

@@ -1,0 +1,41 @@
+ALT
+  |extra/getmail| 5.5-1
+    A POP3 mail retriever with reliable Maildir and command delivery.
+    =. Inbox => local => filter/distribute => push by imap on server
+      BAD: unsynced changes done to imap folder from browser client
+  |aur/getmail-passwordeval| 4.53.0-1 (0, 0.00)
+    A POP3 mail retriever with reliable Maildir and command delivery
+    (with passwordeval patch).
+
+
+SEE
+  |aur/mailcheck| 1.91.2-3 (5, 0.00)
+    Check multiple mailboxes/maildirs for mail from the command line.
+
+
+IDEA: commit mail to git on receive
+  https://mikeburnscoder.wordpress.com/2011/06/12/one-big-mutt-inbox-filtered-after-the-fact-using-procmail/
+    + ALSO can be nicely formatted for grepping, stripped images and html
+
+
+TODO
+  [_] CHECK delete propagation (gmail, davmail)
+    https://notmuchmail.org/pipermail/notmuch/2016/023112.html
+
+
+BETTER: http://isync.sourceforge.net/
+  : 2016-05-11 [X] https://wiki.archlinux.org/index.php/Isync
+  2016-05-11 [X] https://bloerg.net/2013/10/09/syncing-mails-with-mbsync-instead-of-offlineimap.html
+    [_] https://github.com/rlue/little_red_flag
+  [_] https://lukespear.co.uk/mutt-multiple-accounts-mbsync-notmuch-gpg-and-sub-minute-updates
+  [_] https://gist.github.com/russell/6588466
+  polling with mbsync
+    + http://www.holgerschurig.de/en/notmuch-polling-with-mbsync/
+    + CFG READ https://lukespear.co.uk/mutt-multiple-accounts-mbsync-notmuch-gpg-and-sub-minute-updates
+  SEE peculiar BUG dir naming
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=782054
+
+
+BAD: http://www.offlineimap.org/
+  : https://wiki.archlinux.org/index.php/OfflineIMAP
+  2016-05-11 [X] >> http://blog.ezyang.com/2012/08/offlineimap-sucks/

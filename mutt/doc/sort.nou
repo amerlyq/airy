@@ -1,0 +1,47 @@
+REF
+  INFO ftp://support.myown.be/housing/sqwebmail-5.1.6/maildir/README.maildirfilter.html
+
+
+IDEA: manually sort current message on <y> after reading in mutt
+  TUT https://mikeburnscoder.wordpress.com/2011/06/12/one-big-mutt-inbox-filtered-after-the-fact-using-procmail/
+
+
+IDEA: tag by notmuch, sort by simple scripts
+  !8 [_] https://anarc.at/blog/2016-05-12-email-setup/
+    IDEA: Sieve=pre-filtering, notmuch=tagging (fine-granular filtering)
+    http://blog.tshirtman.fr/2013/3/17/mutt-offlineimap-notmuch-nottoomuch
+  [_] DEMO: http://homepages.inf.ed.ac.uk/ptotzke/blobs/talks/2013-10-22-LabLunch.pdf
+  [_] READ: https://www.gnu.org/ghm/2013/paris/slides/notmuch--bremner--ghm-2013.pdf
+
+
+TODO
+  [_] mark uninteresting / junk mails as read
+    ++ http://www.holgerschurig.de/en/notmuch-mark-uninteresting/
+  [_] TRY: formail (from procmail) to reformat messages
+  [_] TRY: spamfilter
+    https://www.opennet.ru/docs/RUS/mutt_openbsd/
+
+
+SEE:
+  maildirproc ALT:(procmail):
+    http://joel.rosdahl.net/maildirproc/
+    $ pip install mailprocessing
+
+  maildird
+    http://www.lysator.liu.se/~jc/maildird.html
+
+  sieve
+    = dovecot + postfix + sieve
+    https://serverfault.com/questions/418681/run-sieve-on-maildir
+    TUT https://wiki.dovecot.org/HowTo/RefilterMail
+
+  procmail
+    https://wiki.archlinux.org/index.php/Procmail
+    https://unix.stackexchange.com/questions/41971/how-can-i-apply-my-procmail-filters-to-my-maildir-inbox
+      = refiltering already saved messages
+    http://blog.tekerson.com/2007/12/16/using-procmail-to-apply-filter-mail-into-maildir-folders/
+
+  maildrop
+    https://www.titan-project.org/howto/using-maildirs.html
+
+  ? https://packages.debian.org/stretch/mail/maildir-filter

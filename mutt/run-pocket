@@ -1,11 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # BUG: how to input password from inside [qute]?
 # TRY: adding passwords to keyring after entering once?
 
 url=${1:?}
 
-export ACC=amerlyq
+# BAD: hardcoded acc -- use $MAIN_MAIL
+acc=amerlyq
 
-neomutt -s " " add@getpocket.com <<< "$url" \
+r.mutt-acc "$acc" -s " " add@getpocket.com <<< "$url" \
 && r.n 'Sent to Pocket' "$url" \
 || r.n -U 'Error: Pocket' "$url"

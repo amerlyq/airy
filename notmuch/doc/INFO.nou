@@ -1,0 +1,49 @@
+REF
+  [_] READ:(review) https://lwn.net/Articles/705856/
+  https://notmuchmail.org/notmuch-mutt/
+    https://notmuchmail.org/howto/
+  !9 [_] READ:(notmuch ideology): https://lwn.net/Articles/705856/
+
+
+CFG:(init setup)
+  $ notmuch setup
+  $ notmuch new
+
+
+USAGE:
+  !!! https://notmuchmail.org/mutttips/
+    :set nm_default_uri="notmuch:///home/user/.mail/<acc>"
+    :push <vfolder-from-query>
+  BAD: need specify full path in config (strictly binded to system)
+    => TRY generate config
+
+  THINK: integrate in neovim frontend (like notmuch-vim frontend)
+
+  FIND: directly using imap / notmuch gmail imap
+    CHECK: set nm_record
+    # https://encrypted.google.com/search?q=notmuch%20imap
+    Seems like impossible -- after all, use 'mbsync' (in term/mutt)?
+      https://notmuchmail.org/howto/
+
+  ALSO: by using mbsync -- check if it can monitor multiple mailboxes from multiple accounts
+    https://wiki.archlinux.org/index.php/Isync
+    BUT: how to gather this local info inside mutt?
+    SEE: mswatch to initiate sync
+      OR:(cron): https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
+    [_] FIXME: can't sync deleted folder
+      BAD: if removed from server -- won't be removed on local
+      # master Junk cannot be opened and slave Junk not empty
+
+  !!! 2016-09-07 [X] SEE 'notmuch' usage at neomutt site
+  + http://tobias.kleemann.net/2011/05/mutt-notmuch-searching-multiple-mailboxes-in-mutt/
+  https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
+    : https://wiki.archlinux.org/index.php/Notmuch
+
+  Deferred notmuch (read later)
+    https://github.com/larsks/mutt-utils/blob/master/notmuch/muttrc.deferred
+      https://github.com/larsks/mutt-utils
+
+  Inst
+    ! http://www.neomutt.org/feature/notmuch/
+    https://github.com/tsto/notmuchfs
+    http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/

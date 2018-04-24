@@ -1,13 +1,17 @@
-#!/bin/bash -e
-# tags: term
+#!/bin/bash -eu
+# tags: mail term
 THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-linkcp -t ~/.config/mutt cfg exe
-linkcp ~/.config/mutt/acc/"${MUTT_DEFAULT:?}" ~/.muttrc
-linkcp ~/.config/mutt/cfg/theme-"$THEME" ~/.config/mutt/theme
+d_cfg=${XDG_CONFIG_HOME:-$HOME/.config}/mutt
+linkcp -t "$d_cfg" cfg exe
+linkcp "$d_cfg"/acc/"${MUTT_DEFAULT:?}" ~/.muttrc
+linkcp "$d_cfg"/cfg/theme-"$THEME" "$d_cfg"/theme
 # THEME=$THEME ./gen/theme-solarized.gen
+
+# HACK: store distinct message headers cache for different folders (accounts)
+mkdir -p "$d_cfg"/headers
 
 # Relocate ~/.mail if necessary
 # FIND:WTF: $MAIL = /var/spool/mail/user
@@ -16,12 +20,3 @@ linkcp ~/.config/mutt/cfg/theme-"$THEME" ~/.config/mutt/theme
 mkdir -p -m 700 ~/.mail
 # [[ $CURR_DIR_MAIL -ef ~/.mail ]] || linkcp "$CURR_DIR_MAIL" ~/.mail
 linkcp -m ~/.mail ~/chat/mail
-
-# THINK:MAYBE: write config by hands instead of generation?
-# USAGE: mbsync '$mid' OR mbsync -a
-# ATT: place at bottom
-# dst=~/.mbsyncrc
-# > "$dst"
-# for creds in "${MAIL_CREDS[@]}"
-# do ./gen/mbsyncrc.gen "$dst" ${creds:?}; done
-# THEN: notmuch setup; notmuch new

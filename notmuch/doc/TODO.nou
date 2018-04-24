@@ -1,0 +1,40 @@
+% Notmuch (search all folders)
+
+BUG
+  [_] MOVE dir /.notmuch to another location (error for mbsync)
+    REQ:DEV: http://notmuch.198994.n3.nabble.com/PATCH-WIP-support-XDG-database-directory-td4039047.html
+    https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1576871.html
+    ::: TEMP:FIXED: set "SubFolders Verbatim" in mbsyncrc
+
+  [_] BAD: slow notmuch 'vfolder-from-query'
+    https://raw.githubusercontent.com/karelzak/mutt-kz/master/README.notmuch
+    REQ: ask on irc:#neomutt
+    TRY: filter msgs in curr dir by #id instead of temp Mailbox of symlinks
+      http://log.or.cz/?p=228
+      :macro index L "<enter-command>unset wait_key<enter><shell-escape>read -p 'notmuch query: ' x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;chomp@a;s/\^id:// for@a;$,=\"|\";print@a'\`\"<enter>" "show only messages matching a notmuch pattern"
+      :macro index a "<limit>all\n" "show all messages (undo limit)"
+
+  [_] BUG: fix 'save =Sent to current dir' for case of virtual dir of 'notmuch'
+    new: save to =INBOX / last dir before virtual
+    reply: save to same dir as mail itself (extract its dir)
+
+
+TODO
+  [_] TRY: mutt-viewer mode (ranger integration)
+    [_] queries as folders
+      https://github.com/tsto/notmuchfs
+    [_] open mail in mutt from ranger
+  [_] CFG: sync notmuch tags with GMail labels
+    http://deferred.io/2016/01/18/notmuch-tags-gmail-labels-bidirectional-sync.html
+      https://github.com/deadc0de6/scripts/blob/master/maildir-notmuch-sync
+    ALSO:SEE: |muchsync|
+
+
+TRY
+  |aur/notmuchfs-git| 0.3.r22.eb06359-1 (1, 0.00)
+    A virtual maildir file system for notmuch queries.
+  |aur/alot| 0.7-1 (31, 1.02)
+    terminal-based MUA for the notmuch mail system
+  |aur/muchsync| 5-1 (3, 0.00)
+    synchronize notmuch mail (tags) across machines
+    http://www.muchsync.org/muchsync.html

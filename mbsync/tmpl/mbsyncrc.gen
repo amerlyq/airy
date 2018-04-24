@@ -32,13 +32,16 @@ wopt CertificateFile /etc/ssl/certs/ca-certificates.crt
 #CertificateFile ~/.cert/Equifax_Secure_CA.pem
 wprf '\n'
 
+# DISABLED:(gmail, davmail): sync =Trash as any other maildir and rely on your server to expunge them
+# wopt Trash ...
+
 wopt IMAPStore ${mid:?}-remote
 wopt Account $mid
 wprf '\n'
 
 wopt MaildirStore ${mid:?}-local
 wopt Path  "$mpath/"  # The trailing "/" is important
-wopt Inbox "$mpath/Inbox"
+wopt Inbox "$mpath/INBOX"
 wprf '\n'
 
 wopt Channel $mid
@@ -52,6 +55,8 @@ wopt Patterns '*'
 
 # Automatically create missing mailboxes, both locally and on the server
 wopt Create Both
+# DFL: bidirectional sync of everything
+wopt Sync All
 # Save the synchronization state files in the relevant directory
 wopt SyncState '*'
 wprf '\n# ----------\n\n'

@@ -1,0 +1,30 @@
+# vim:ft=dosini
+# TRY: pass db path by env or flag instead of this hardcoded config
+
+# Create <maildir>/.notmuch/ db here
+[database]
+path=/home/user/.mail/work
+
+# Formatting for notmuch-reply
+[user]
+name=
+primary_email=
+# other_email= ..;..;
+
+# Mark by notmuch-new all new found mails with tags, ignoring files/dirs
+[new]
+tags=unread;inbox;
+ignore=.mbsyncstate;.uidvalidity;
+
+# Filter notmuch-search
+[search]
+exclude_tags=deleted;spam;
+
+# Map flags in filenames to db tags for notmuch-{tag,restore}
+#  VIZ.  D draft, F flagged, P passed, R replied, S unread
+[maildir]
+synchronize_flags=true
+
+# Deprecated
+[crypto]
+gpg_path=gpg

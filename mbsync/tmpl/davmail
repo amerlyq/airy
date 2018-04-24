@@ -1,0 +1,39 @@
+# vim:ft=sshconfig
+### Bidirect
+Expunge None
+Sync All
+Create Both
+Remove Both
+CopyArrivalDate yes
+# ----------
+
+IMAPAccount mywork
+Host 127.0.0.1
+Port 1143
+User workuser
+PassCmd "r.query-passwd mail/mywork"
+SSLType None
+AuthMechs LOGIN
+# SSLVersions TLSv1
+# CertificateFile /etc/ssl/certs/ca-certificates.crt
+# TEMP:MAYBE? works better for davmail ? (E.G. creating folders, etc)
+PipelineDepth 1
+
+IMAPStore mywork-remote
+Account mywork
+
+MaildirStore mywork-local
+Path  ~/.mail/mywork/
+Inbox ~/.mail/mywork/INBOX
+# NOTE: ignored when "Flatten" BUT prevents "error: found subfolder '.notmuch/xapian'"
+SubFolders Verbatim
+Flatten .
+
+# NEED:FIX: sync in both directions
+#   => but when polling for new messages => use only --fast / ...
+#   << so only new mails will be fetched and flags won't be pushed
+Channel mywork
+Master :mywork-remote:
+Slave  :mywork-local:
+Patterns *
+SyncState *

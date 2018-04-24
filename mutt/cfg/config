@@ -7,7 +7,6 @@ set menu_scroll=yes         # just scroll one line instead of full page
 
 # Text
 set smart_wrap = yes   # wrap by words in inn pager
-set text_flowed = yes  # use flowed format in outgoing msgs (USAGE: smartphones have narrow screen)
 set reflow_text = yes  # interpret incoming 'format=flowed' msgs in inn pager
 set reflow_wrap = 0    # text width in pager for msgs preview
 set reflow_space_quotes = yes  # >>> ... OR > > > ...'
@@ -48,7 +47,13 @@ set wait_key = no  # don't show prompt after shell/pipe cmds (show when ret!=0)
 # unignore from resent-from reply-to x-mailer user-agent date to cc subject
 ## Order for display of the header fields
 # hdr_order From: Resent-From: Reply-To: X-Mailer: User-Agent: Date: To: Cc: Subject:
-set indent_str="> "    # Set quotemark to 1 byte (WARN: ignored if $text_flowed=yes)
+set indent_string = ""   # Set quotemark to 1 byte (WARN: ignored if $text_flowed=yes)
+set text_flowed = no   # use flowed format in outgoing msgs (USAGE: smartphones have narrow screen)
+set sig_on_top = yes
+# NOTE: top-posting quoting similar to Outlook
+set attribution = "\n\n-----Original Message-----\nFrom: %n <%a>\nSent: %d\nTo: %r\nCc: %R\nSubject: %s\n"
+# set date_format = "!%a, %b %d, %Y at %I:%M:%S%p %Z"
+
 unset collapse_unread   # keep unread threads uncollapsed -- mitigate BUG freeze on startup
 ## SEE:(uncollapse_jump):  http://www.rdrop.com/docs/mutt/manual118.html
 # set uncollapse_jump    # jumps to first unread msg of thread on uncollapse
@@ -122,7 +127,8 @@ set imap_check_subscribed = no
 # POP3 | needs to create local dirs manually
 #   touch ~/work/mail/inbox
 ### If I will use getmail
-set mbox_type=Maildir
+set mbox_type = Maildir
+set maildir_trash = yes
 ## NOTE: may twice as improve performance of opening maildir
 # set maildir_header_cache_verify=no
 

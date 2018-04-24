@@ -1,0 +1,15 @@
+#!/bin/bash -eu
+#%USAGE: $ ./$0 [<account>] [-- [<notmuch_args>]]
+source ~/.shell/profile
+
+# ALT: use $(readlink $acc/default) to get name of default acc
+(($#)) && [[ $1 != -- ]] && acc=$1 && shift || acc=${MUTT_DEFAULT:?}
+[[ ${1-} == -- ]] && shift
+
+# NOTE: set default action
+(($#)) || set -- new
+
+cfg=${XDG_CONFIG_HOME:-$HOME/.config}/notmuch/acc/"$acc"
+
+## MAYBE: instead of config directly specify path to db ?
+exec notmuch --config "$cfg" "$@"

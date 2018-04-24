@@ -1,73 +1,17 @@
-mbsync
-  2017-09-13 [X] poll in foreground NEED: auto password
-    $ watch -bdxn120 mbsync -qV -c account --pull-new channel:INBOX
-  2017-09-13 [X] sync single mailbox / inbox
-    ::: $ mbsync -c account --pull-new channel:INBOX
-    * fetch only new mails (cron polling OR imap_idle event)
-    * never use Office365 web or IMAP to modify mails
-    * only modify mailboxes locally
-    * push accumulated changes at once => on demand or by hourly timer
-  [_] BUG: mbsync UID BODY.PEEK[HEADER.FIELDS
-    https://www.hmailserver.com/forum/viewtopic.php?t=13623
-    https://sourceforge.net/p/isync/mailman/message/34600615/
-    https://sourceforge.net/p/isync/mailman/message/33170964/
-  [_] BUG:FIND: mbsync folder rename
-  [_] BUG: isync UID 0x7fffffff
-    https://bugzilla.mozilla.org/show_bug.cgi?id=1391128
-  [_] mutt offline by imap/pop sync => how to check for new mails _fast_ ?
-    imap_idle
-      https://github.com/justinribeiro/idlemailcheck
-      Check support
-        G: imap idle check
-        https://stackoverflow.com/questions/18103278/how-to-check-whether-imap-idle-works
-        https://github.com/clehner/sylpheed-imap-notify/issues/2
-    [_] BET:FIND: mutt connect by imap but use local maildir
-      https://unix.stackexchange.com/questions/146634/accessing-maildir-locally-with-mutt-and-remotely-over-imap-simultaneously
-        => seems like you can't open local Maildir in mutt and sync it by IMAP simultaneously
-          << mailes on read must be moved new=>cur and .sfx added
-      http://donnlee.com/2010/01/22/do-you-love-mutt-use-offlineimap-fdm-and-rejoice/
-      https://unix.stackexchange.com/questions/72369/local-email-storage-syncing-to-imap-mutt-friendly
-
-notmuch
-  [_] mark uninteresting / junk mails
-    http://www.holgerschurig.de/en/notmuch-mark-uninteresting/
-
 TODO
+  [_] TRY: outlook high-priority message
+    https://calomel.org/mutt_config.html
+     # When OutLook receives email it will put it at the
+     # top of their mailbox list and flag it with an "urgent"
+     # red box. Just another way to play with Outlook/LookOut users.
+     my_hdr X-Message-Flag: OUTLOOK WARNING!! Use Open Source
+     my_hdr Reply-By: `date --date="-3 days"`
+     my_hdr X-MSMail-Priority: High
   [_] import calendar events from mutt
   [_] mutt show whole mailbox tree -- to show unread/important per folder on the right
   [_] BUG mutt -- opens html attachments only on second time => otherwise "file not found"
-  [_] mutt / davmail / exchange = login frequency timeout -- somewhere I seen config from someone with parameters
-    => SEE ldap => maybe it was there
   2017-09-12 [X] BAD:(POP3) access only to Inbox, can't access other dirs ::: DFL protocol specs
 
-  [_] isync -- poll for new mail
-    https://sourceforge.net/p/isync/mailman/message/31795745/
-    + READ https://unix.stackexchange.com/questions/99481/mbsync-not-fetching-pushing-with-gmail-folders
-    dovecot https://henrikpingel.wordpress.com/2014/07/30/how-to-use-isync-and-the-dovecot-mail-server-to-read-your-gmail-in-emacs-efficiently/
-    isync mail check interval
-      https://encrypted.google.com/search?q=isync+mail+check+interval
-      + READ https://sourceforge.net/p/isync/feature-requests/11/
-      https://www.reddit.com/r/emacs/comments/4dntkl/mu4e_with_push_notifications/
-    REF https://wiki.archlinux.org/index.php/Isync
-    https://www.reddit.com/r/emacs/comments/4gyujl/mu4e_with_isyncmbsync_and_davmail_to_connect_of/
-    https://encrypted.google.com/search?q=linux+isync+wait+new+mail
-    http://stevelosh.com/blog/2012/10/the-homely-mutt/#getting-email
-    IDEA https://unix.stackexchange.com/questions/72369/local-email-storage-syncing-to-imap-mutt-friendly
-      https://www.reddit.com/r/commandline/comments/4l14gn/looking_for_a_new_mail_setup_in_the_terminal/
-    + READ https://lukespear.co.uk/mutt-multiple-accounts-mbsync-notmuch-gpg-and-sub-minute-updates
-  [_] don't ask password from 'pass' => keep empty if not queried from gpg
-    => [_] CHECK if isync queries pass in tty when PassCmd returns empty or error
-      SEE /usr/share/doc/isync/examples/mbsyncrc.sample
-    NEED remove pass when opening local mail => query pass not earlier then when sent mail by smtp
-      ! allow composing mail w/o sending
-
-  [_] BAD: slow notmuch 'vfolder-from-query'
-    https://raw.githubusercontent.com/karelzak/mutt-kz/master/README.notmuch
-    REQ: ask on irc:#neomutt
-    TRY: filter msgs in curr dir by #id instead of temp Mailbox of symlinks
-      http://log.or.cz/?p=228
-      :macro index L "<enter-command>unset wait_key<enter><shell-escape>read -p 'notmuch query: ' x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;chomp@a;s/\^id:// for@a;$,=\"|\";print@a'\`\"<enter>" "show only messages matching a notmuch pattern"
-      :macro index a "<limit>all\n" "show all messages (undo limit)"
   [_] setup aspell -- to check composed mails before send on 'i'
     set ispell = ...
   [_] FIX on wrong passwd -- load other mailbox on <F1>..
@@ -84,9 +28,6 @@ TODO
     ALT:FIX: unset collapse_unread in config
   [_] allow to manually collapse unread threads on 'h'
     => ALSO check their colorscheme
-  [_] BUG: fix 'save =Sent to current dir' for case of virtual dir of 'notmuch'
-    new: save to =INBOX / last dir before virtual
-    reply: save to same dir as mail itself (extract its dir)
   [_] BAD: I load all available prf in seq _after_ options was set
     FIXME: Any excessive var from 'prf' will overwrite options defined earlier
       => it will influence all other prf which depends on default
@@ -98,8 +39,6 @@ TODO
       => CHECK: performance
   [_] DEV: Batch export mail
     http://unix.stackexchange.com/questions/60838/saving-a-email-as-file-in-mutt
-    [_] read from offline isync db
-      > http://stevelosh.com/blog/2012/10/the-homely-mutt/#getting-email
     [_] smart remove of quoted text -- based on $ diff $ in same chain
 
   TRY:ALT: http://www.neomutt.org/features.html
@@ -208,49 +147,6 @@ mutt
     Write in markdown
       http://unix.stackexchange.com/questions/108485/send-email-written-in-markdown-using-mutt
 
-% Notmuch (search all folders)
-    USAGE:
-      !!! https://notmuchmail.org/mutttips/
-        :set nm_default_uri="notmuch:///home/user/.mail/<acc>"
-        :push <vfolder-from-query>
-    BAD: need specify full path in config (strictly binded to system)
-      => TRY generate config
-    SEE
-      https://notmuchmail.org/notmuch-mutt/
-        https://notmuchmail.org/howto/
-    TRY: mutt-viewer mode (ranger integration)
-      [_] queries as folders
-        https://github.com/tsto/notmuchfs
-      [_] open mail in mutt from ranger
-    THINK: integrate in neovim frontend (like notmuch-vim frontend)
-    !8 [_] https://anarc.at/blog/2016-05-12-email-setup/
-      IDEA: Sieve=pre-filtering, notmuch=tagging (fine-granular filtering)
-      http://blog.tshirtman.fr/2013/3/17/mutt-offlineimap-notmuch-nottoomuch
-    !9 [_] READ:(notmuch ideology): https://lwn.net/Articles/705856/
-    FIND: directly using imap / notmuch gmail imap
-      CHECK: set nm_record
-      # https://encrypted.google.com/search?q=notmuch%20imap
-      Seems like impossible -- after all, use 'mbsync' (in term/mutt)?
-        https://notmuchmail.org/howto/
-    ALSO: by using mbsync -- check if it can monitor multiple mailboxes from multiple accounts
-      https://wiki.archlinux.org/index.php/Isync
-      BUT: how to gather this local info inside mutt?
-      SEE: mswatch to initiate sync
-        OR:(cron): https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
-      [_] FIXME: can't sync deleted folder
-        BAD: if removed from server -- won't be removed on local
-        # master Junk cannot be opened and slave Junk not empty
-    !!! 2016-09-07 [X] SEE 'notmuch' usage at neomutt site
-    + http://tobias.kleemann.net/2011/05/mutt-notmuch-searching-multiple-mailboxes-in-mutt/
-    https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
-      : https://wiki.archlinux.org/index.php/Notmuch
-    Deferred notmuch (read later)
-      https://github.com/larsks/mutt-utils/blob/master/notmuch/muttrc.deferred
-        https://github.com/larsks/mutt-utils
-    Inst
-      ! http://www.neomutt.org/feature/notmuch/
-      https://github.com/tsto/notmuchfs
-      http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/
   Setup
     Tips & tricks
       >>> http://dev.mutt.org/trac/wiki/ConfigTricks
@@ -267,8 +163,6 @@ mutt
   Address book and thorough setup
     >! https://wiki.debian.org/Mutt
     > http://www.guckes.net/Mutt/setup.html
-    SEE nottoomuch
-      http://blog.tshirtman.fr/2013/3/17/mutt-offlineimap-notmuch-nottoomuch
     ADD Notify
     >[_] http://www.codeovertones.com/2010/04/mutt-gmail-gdata-notify-send-perfect.html
       http://code.google.com/p/altcanvas/source/browse/trunk/scripts/chkgmail
@@ -307,9 +201,6 @@ mutt
     [_] keyring for ssh keys
   [_] separate mail fetcher
     https://wiki.archlinux.org/index.php/Getmail
-  [_] separate mail sorter
-    https://wiki.archlinux.org/index.php/Procmail
-    https://www.opennet.ru/docs/RUS/mutt_openbsd/
   [_] attachments
     http://dev.mutt.org/trac/wiki/MuttFaq/Attachment
   [_] html-rich
@@ -356,15 +247,6 @@ VIM+gpg:
 
 Filtering (IMAP)
   Programs
-    BETTER: http://isync.sourceforge.net/
-      : 2016-05-11 [X] https://wiki.archlinux.org/index.php/Isync
-      2016-05-11 [X] https://bloerg.net/2013/10/09/syncing-mails-with-mbsync-instead-of-offlineimap.html
-        [_] https://github.com/rlue/little_red_flag
-      [_] https://lukespear.co.uk/mutt-multiple-accounts-mbsync-notmuch-gpg-and-sub-minute-updates
-      [_] https://gist.github.com/russell/6588466
-    BAD: http://www.offlineimap.org/
-      : https://wiki.archlinux.org/index.php/OfflineIMAP
-      2016-05-11 [X] >> http://blog.ezyang.com/2012/08/offlineimap-sucks/
     http://www.dovecot.org/
       : https://wiki.archlinux.org/index.php/dovecot
       : https://en.wikipedia.org/wiki/Sieve_%28mail_filtering_language%29
@@ -389,28 +271,3 @@ Filtering (IMAP)
       : BAD: site is down
     http://baptiste-wicht.com/posts/2014/07/a-mutt-journey-filter-mails-with-imapfilter.html
     http://blog.endpoint.com/2011/10/imapfilter-lua-email-mutt-filtering.html
-
-
-Text reflow
-  DEV:G:(vim mail reflow)
-    2017-03-25 [X] vim mustn't delete single space on soft-break
-    2017-03-25 [X] must reflow text/qout joining lines ending in '\s'
-    2017-03-25 [X] must do space-stuffing between last quote and text
-      ::: accomplished through pre-processing of buffer with ft=mail
-      http://mutt-users.mutt.narkive.com/8qQWPti3/format-flowed-equals-no-space-in-depth-1
-      http://marc.info/?l=mutt-dev&m=119254717006189
-        ? patches for neomutt
-    2017-03-25 [X] on wrap must insert soft-break
-      ? set formatoptions+=w
-      ++ http://vi.stackexchange.com/questions/6773/how-can-i-make-vims-flowing-aware-of-email-replies
-  REF: http://www.rfc-editor.org/rfc/rfc3676.txt
-    SEE:6.4.2. https://www.neomutt.org/guide/gettingstarted
-    READ http://mailformat.dan.info/body/linelength.html
-  SEE:CHECK:
-    http://brianbuccola.com/line-breaks-in-mutt-and-vim/
-    https://mathiasbynens.be/notes/gmail-plain-text
-      https://github.com/djcb/mu/issues/569
-  http://www.256bit.org/~chrisbra/cms/vim_as_e-mail_editor.html#format
-  http://vim.wikia.com/wiki/Fix_email_quotations_with_long_lines
-  ALSO
-    https://github.com/vdanen/mutt-scripts/blob/master/mutt/muttrc

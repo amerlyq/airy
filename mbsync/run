@@ -1,0 +1,30 @@
+#!/bin/bash -eu
+#%USAGE: $ ./$0 [<account>] [-- [<mbsync_args>]]
+#% * <inbox>  $ r.mbsync -- inbox
+#% * polling  $ r.mbsync -- poll
+source ~/.shell/profile
+
+(($#)) && [[ $1 != -- ]] && acc=$1 && shift || acc=${MUTT_DEFAULT:?}
+[[ ${1-} == -- ]] && shift
+
+# NOTE: set default channel
+(($#)) || set -- "$acc"
+
+cfg=${XDG_CONFIG_HOME:-$HOME/.config}/mbsync/acc/"$acc"
+mdir=${MAIL:-${MAILDIR:-${MAILROOT:-$HOME/.mail}/$acc}}
+mkdir -p "$mdir"
+
+# TODO: special config for polling only new and indexing
+#   * pull new mails only from INBOX
+#     (otherwise ~50 dirs require 1 min for idle check; no effect from PipelineDepth)
+#   * don't push anything
+#   * run notmuch-new to reindex
+# => push everything by cron once a hour (full sync)
+
+## USAGE
+# -a|--all  # all channels
+# -l|--list # only list mailboxes
+# -V        # verbose (show files to remove/resync: <dir>/.uidvalidty)
+
+# INFO: "davmail" sync speed is ~100 / min
+mbsync --config "$cfg" "$@"

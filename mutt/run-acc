@@ -1,14 +1,25 @@
 #!/bin/bash -eu
-# USAGE: ./$0  # dmenu chooser
-# USAGE: ./$0 <accname> [<mutt_args>..]  # silent acc choose
-lib=~/.config/mutt/acc
+#%USAGE: $ ./$0 [<account>] [-- [<mutt_args>]]
+#% * dmenu chooser   $ ./$0
+#% * default account $ ./$0 --
+lib=${XDG_CONFIG_HOME:-$HOME/.config}/mutt/acc
+
 
 files(){ find -H "$1" -mindepth 1 -maxdepth 1 -xtype f \
   -printf '%f\n' | sort -n; }
 choose(){ dmenu -p 'Mail:' -fn monospace:size=10 \
   -nb '#000000' -nf '#b0e0e6' -sb '#227410' -sf '#ccaa00'; }
 
-(($#)) && { rc=$lib/$1; shift; } || rc=$lib/$(files "$lib" | choose)
-[[ -f $rc ]] || { r.n -U 'No muttrc:' "$rc"; exit 1; }
-# r.wm -w g  # Jump to game workspace
-exec neomutt -F "$rc" "$@"
+
+(($#)) && acc=$1 && shift || acc=$(files "$lib" | choose)
+[[ ${1-} == -- ]] && shift
+
+[[ $acc == -- ]] && {
+  source ~/.shell/profile
+  acc=${MUTT_DEFAULT:?}
+}
+
+[[ -f $lib/$acc ]] || { r.n -U 'No muttrc:' "$acc"; exit 1; }
+
+# r.wm -w MM Jump to mail workspace
+exec neomutt -F "$lib/$acc" "$@"

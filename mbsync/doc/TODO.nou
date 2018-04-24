@@ -1,0 +1,36 @@
+TODO
+  2017-09-13 [X] poll in foreground NEED: auto password
+    $ watch -bdxn120 mbsync -qV -c account --pull-new channel:INBOX
+  2017-09-13 [X] sync single mailbox / inbox
+    ::: $ mbsync -c account --pull-new channel:INBOX
+    * fetch only new mails (cron polling OR imap_idle event)
+    * never use Office365 web or IMAP to modify mails
+    * only modify mailboxes locally
+    * push accumulated changes at once => on demand or by hourly timer
+  [_] BUG: mbsync UID BODY.PEEK[HEADER.FIELDS
+    https://www.hmailserver.com/forum/viewtopic.php?t=13623
+    https://sourceforge.net/p/isync/mailman/message/34600615/
+    https://sourceforge.net/p/isync/mailman/message/33170964/
+  [_] BUG:FIND: mbsync folder rename
+  [_] BUG: isync UID 0x7fffffff
+    https://bugzilla.mozilla.org/show_bug.cgi?id=1391128
+  [_] mutt offline by imap/pop sync => how to check for new mails _fast_ ?
+    imap_idle
+      https://github.com/justinribeiro/idlemailcheck
+      Check support
+        G: imap idle check
+        https://stackoverflow.com/questions/18103278/how-to-check-whether-imap-idle-works
+        https://github.com/clehner/sylpheed-imap-notify/issues/2
+    [_] BET:FIND: mutt connect by imap but use local maildir
+      https://unix.stackexchange.com/questions/146634/accessing-maildir-locally-with-mutt-and-remotely-over-imap-simultaneously
+        => seems like you can't open local Maildir in mutt and sync it by IMAP simultaneously
+          << mailes on read must be moved new=>cur and .sfx added
+      http://donnlee.com/2010/01/22/do-you-love-mutt-use-offlineimap-fdm-and-rejoice/
+      https://unix.stackexchange.com/questions/72369/local-email-storage-syncing-to-imap-mutt-friendly
+  [_] don't ask password from 'pass' => keep empty if not queried from gpg
+    => [_] CHECK if isync queries pass in tty when PassCmd returns empty or error
+      SEE /usr/share/doc/isync/examples/mbsyncrc.sample
+    NEED remove pass when opening local mail => query pass not earlier then when sent mail by smtp
+      ! allow composing mail w/o sending
+  [_] read from offline isync db
+    > http://stevelosh.com/blog/2012/10/the-homely-mutt/#getting-email

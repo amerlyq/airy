@@ -1,0 +1,32 @@
+# vim:ft=sshconfig
+# E.G. https://gist.github.com/reyjrar/80963224c8affe0a3ffe
+### Slave-only
+Expunge Slave
+Sync Pull
+Create Slave
+Remove Slave
+CopyArrivalDate yes
+# ----------
+
+IMAPAccount myhome
+Host imap.gmail.com
+User myhome@gmail.com
+PassCmd "r.query-passwd mail/myhome"
+SSLType IMAPS
+SSLVersions TLSv1.2
+# CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore myhome-remote
+Account myhome
+# PathDelimiter /
+
+MaildirStore myhome-local
+Path ~/.mail/myhome/
+Inbox ~/.mail/myhome/Inbox
+# Flatten .
+
+Channel myhome
+Master :myhome-remote:
+Slave  :myhome-local:
+Patterns *
+SyncState *
