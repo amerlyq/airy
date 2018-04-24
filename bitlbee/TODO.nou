@@ -4,30 +4,41 @@ REF
   https://wiki.bitlbee.org/HowtoSkypeWeb
 
 
-TODO
-  [_] move to two-factor auth to store passwords on system and auto-login on boot
+SECU
+  2018-04-25 [X] move to two-factor auth to store per-application passwords on system and auto-login on boot
+    => 2018-04-25 [X] close non-secure access to gmail account
+    => 2018-04-25 [X] REQ enable two-factor authentication on gmail
+    => 2018-04-25 [X] use per-application password for mutt and bitlbee
+      TUT:(how-to): https://unix.stackexchange.com/questions/172666/gmail-blocking-mutt
+      REF:(generate): https://myaccount.google.com/apppasswords
+        ALT https://security.google.com/settings/security/apppasswords
     SECU:
       https://security.googleblog.com/2013/02/an-update-on-our-war-against-account.html
       https://duo.com/blog/bypassing-googles-two-factor-authentication
-      https://www.microsoft.com/en-us/research/publication/so-long-and-no-thanks-for-the-externalities-the-rational-rejection-of-security-advice-by-users/?from=https%3A%2F%2Fresearch.microsoft.com%2Fpubs%2F80436%2FSoLongAndNoThanks.pdf
-    ? how to make root-only readable config-embedded passwords for programs which run as user ?
-  [_] DEV cfg scripts to setup all channels through $ r.irc-cfg
-    CMP with native cfg of bitlbee server
+      https://www.microsoft.com/en-us/research/publication/so-long-and-no-thanks-for-the-externalities-the-rational-rejection-of-security-advice-by-users/
+    ? [_] how to make root-only readable config-embedded passwords for programs which run as user ?
+  [_] CHG: more secure password input
+    [_] TRY: "set oauth true" for gtalk/twitter/facebook ALT: simply add account w/o password
+    2017-10-25 [X] TRY: use "oper" for entering securely w/o echo -- instead of "identify <passwd>" ?
+      /oper <user> <passwd>
+  [_] READ: google two-step OTP auth on Arch (PAM integration)
+    https://wiki.archlinux.org/index.php/Google_Authenticator
   [_] TODO setup OTR for secure messaging https://otr.cypherpunks.ca/
     https://www.reddit.com/r/irc/comments/3f2x4w/any_weechat_users_use_off_the_record/
     OTR for weechat/bitlbee/pidgin/purple
       https://wiki.bitlbee.org/bitlbee-otr
       https://wiki.archlinux.org/index.php/WeeChat#OTR
       https://github.com/mmb/weechat-otr
+
+
+TODO
   [_] BUG: bitlbee_completion.py don't work
   2017-10-25 [X] BAD: telegram shows non-english names as increasing series of underscore "____"
     https://github.com/ircv3/ircv3-specifications/issues/259
     ::: set utf8_nicks true
     TRY: set nick_source full_name / first_name
-  [_] CHG: more secure password input
-    [_] TRY: "set oauth true" for gtalk/twitter/facebook ALT: simply add account w/o password
-    2017-10-25 [X] TRY: use "oper" for entering securely w/o echo -- instead of "identify <passwd>" ?
-      /oper <user> <passwd>
+  [_] DEV cfg scripts to setup all channels through $ r.irc-cfg
+    CMP with native cfg of bitlbee server
   [_] history is incomplete and ugly
     set display_timestamps off
 

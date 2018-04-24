@@ -1,10 +1,14 @@
-.NOTPARALLEL:
 .DEFAULT_GOAL = continue
 # HACK: keep prompt unaffected  # BAD? no effect ? CHECK
 #  ::: CHECK: seems like pacman isn't connected to tty despite  exec <>/dev/tty
 #  <= if connected to tty -- then there must not be any pacman lines in setup.log
 MAKEFLAGS += --output-sync=none
+.NOTPARALLEL:
+.SUFFIXES:
+Makefile:;
+this := $(lastword $(MAKEFILE_LIST))
 
+### Parameters
 export AIRY_ROOT   ?= $(HOME)/.local/airy
 export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
 export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
@@ -60,7 +64,13 @@ problems:
 	@echo "Then, for each found *.panew, do 'v -d /etc/locale.gen{,.pacnew}'"
 	locate .pacnew
 
-TARGS := $(shell sed -rn 's/^([-a-z]+):.*/\1/p' Makefile|sort -u|xargs)
-.PHONY: $(TARGS)
+#% USAGE: $ make some
+.FORCE:
+%  :: .FORCE ; @r.airy -a $@
+%- :: .FORCE ; @r.airy -misur $(@:-=)
+
+PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
+.PHONY: $(PHONY)
 help:
-	@echo "Use: $(TARGS)"
+	@echo "Use: $(PHONY)"
+	@sed -rn '/^(.*\s)?#%/s///p' '$(this)'

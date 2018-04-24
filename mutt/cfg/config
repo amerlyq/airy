@@ -142,9 +142,9 @@ unset pop_delete
 ## DIRS
 # set folder = ~/work/mail
 # keep a cache of headers for faster loading (1.5.9+?)
-set header_cache     = $my_cache/headers
+set header_cache     = $my_cache/headers       # mkdir for per-account cache
 set message_cachedir = $my_cache/messages      # fetch imap msgs on disk instead of memory
-set certificate_file = $my_cache/certificates
+set certificate_file = $my_cache/certificates  # touch to be usable
 # set signature = ~/.mutt/signature  # Set in account
 set use_domain = no  # name don't -> name@host
 
