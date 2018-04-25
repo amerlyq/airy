@@ -1,0 +1,18 @@
+TODO
+  [_] DEV: query password from gpg through hook to on_connect per each channel
+    ! don't try to ask passwd when --no-connect
+      TODO:FIND: disable asking passphrase even when sec.conf exist
+        => use "/secure decrypt" on demand afterwards
+    ! don't save password to ~/.weechat/* after query
+    ? keep ${sec.data.freenode_pass} in config file in case you someday activate sec.conf for whatever
+    REQ
+      https://github.com/weechat/weechat/issues/749
+      https://github.com/weechat/weechat/pull/906
+    DEV: exec and eval result back
+      /eval /exec -nosh -nobg -nostdin -norc -noln -oc sh -c 'echo "/print /oper ${irc.server.freenode.sasl_username} $(pass show irc/${irc.server.freenode.sasl_username})"'
+      /eval /exec -nosh -nobg -nostdin -norc -noln -pipe "/print /identify; /oper ${irc.server.freenode.sasl_username}" pass show irc/${irc.server.freenode.sasl_username}
+      [_] CHECK: multiple commands on single line
+
+MAINT
+  Show all changed options -- to update my ./cfg/*.conf list after experiments
+    /set diff
