@@ -1139,8 +1139,9 @@ c.new_instance_open_target = 'tab'
 ##   - startpage: Load the start page.
 ##   - default-page: Load the default page.
 ##   - close: Close the window.
-# c.tabs.last_close = 'ignore'
-c.tabs.last_close = 'close'
+# NOTE: use 'Q' to close whole window (last tab)
+c.tabs.last_close = 'ignore'
+# c.tabs.last_close = 'close'
 
 ## Switch between tabs using the mouse wheel.
 ## Type: Bool
