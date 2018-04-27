@@ -4,7 +4,19 @@ REF
   https://wiki.bitlbee.org/HowtoSkypeWeb
 
 
+CFG
+  /etc/bitlbee/bitlbee.conf
+  /var/lib/bitlbee/amerlyq.xml
+  /var/lib/bitlbee/purple/amerlyq/prefs.xml
+
+
 SECU
+  READ:(joke): Why You Might Want to Store Your Passwords in Plain Text
+    https://stormpath.com/blog/why-you-might-want-to-store-your-passwords-in-plain-text
+  [_] don't store password in CFG
+    ~~ seems like if you don't use "register" -- and will send passwd from gpg to account every time -- it will work nicely
+      https://bbs.archlinux.org/viewtopic.php?id=138451
+      https://pthree.org/2007/12/13/jabber-muc-through-bitlbee/
   2018-04-25 [X] move to two-factor auth to store per-application passwords on system and auto-login on boot
     => 2018-04-25 [X] close non-secure access to gmail account
     => 2018-04-25 [X] REQ enable two-factor authentication on gmail
@@ -72,6 +84,7 @@ skypeweb
       set typing_notice true
       set private true
       set utf8_nicks true
+      save
     weechat
       https://github.com/weechat/weechat/issues/889
       /set irc.server.bitlbee.anti_flood_prio_high 0
@@ -97,6 +110,19 @@ ALG
       account jabber set auth_plain_in_clear false
       account jabber set connection_security require_tls
       account jabber on
+      save
+    hangouts
+      https://bitbucket.org/EionRobb/purple-hangouts/wiki/Bitlbee_FAQ
+        https://demu.red/blog/2016/12/setting-up-sms-in-irc-via-bitlbee-with-purple-hangouts/
+        +++ TALK https://bitbucket.org/EionRobb/purple-hangouts/issues/71/cannot-authenticate-error-invalid_scope
+      account add hangouts <user@gmail.com>
+        SEE video and extract your OAuth https://www.youtube.com/watch?v=hlDhp-eNLMU
+          firefox: <C-S-v> -> Network -> File -> programmatic_auth -> set-cookie -> oauth_code="4/AABq...-6C..." ;
+      account hangouts set nick_format %full_name
+        # NOTE: needs to off/on account to take effect if you already connected
+      account hangouts on
+        = send your OAuth "4/AABq...-6C..." into auto-opened "purple_request_0" window and /part it
+      save
     skype
       account add skypeweb <user> <passwd>
       account skypeweb set
@@ -132,8 +158,12 @@ ALG
       chat add eionrobb-discord !1 #mydiscordchannel
       chan #mydiscordchannel set auto_join true
       /join #mydiscordchannel
+    matrix
+      BUG:REQ https://github.com/matrix-org/purple-matrix/issues/41
     CHECK
       acc list
+  Reset password
+    account hangouts set password ""
   Split contact list by protocols
     https://wiki.bitlbee.org/ManagingContactList
     acc list
