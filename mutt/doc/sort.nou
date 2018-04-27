@@ -15,6 +15,17 @@ IDEA: tag by notmuch, sort by simple scripts
 
 
 TODO
+  [_] IDEA treat all read messages as +delete => move immediately to $mbox / =Trash
+    <. beside choosen ones, archived manually on shortcuts into dedicated dirs
+     set read = on                 # move "read" msgs from spool -> $mbox
+     mbox-hook . ~E =INBOX/.Trash  # onMailboxExit/Change -> all "expired" moved to =Trash
+     set mbox = "=[Gmail]/All<quote-char><space>Mail"
+    IDEA
+      * to be moved: read messages ~R
+      * to keep: old messages ~O
+    SEE: somewhat related strategies
+      http://promberger.info/linux/2008/03/10/mutt-and-gmail-via-imap-how-to-delete-messages/
+      http://mutt-users.mutt.narkive.com/Hbv0ynxU/maildir-trash-what-does-it-do
   [_] mark uninteresting / junk mails as read
     ++ http://www.holgerschurig.de/en/notmuch-mark-uninteresting/
   [_] TRY: formail (from procmail) to reformat messages

@@ -1,7 +1,12 @@
 #!/bin/bash -eu
 #%USAGE: $ ./$0 [<account>] [-- [<mbsync_args>]]
-#% * <inbox>  $ r.mbsync -- inbox
-#% * polling  $ r.mbsync -- poll
+#% * sync inbox $ r.mbsync -- inbox
+#% * pull new   $ r.mbsync -- -q new
+#%
+#%DEBUG pull    $ r.mbsync -- -qV --pull-new new
+#% -a|--all     # all channels
+#% -l|--list    # only list mailboxes
+#% -V|--verbose # verbose (show files to remove/resync: <dir>/.uidvalidty)
 source ~/.shell/profile
 
 (($#)) && [[ $1 != -- ]] && acc=$1 && shift || acc=${MUTT_DEFAULT:?}
@@ -17,14 +22,14 @@ mkdir -p "$mdir"
 # TODO: special config for polling only new and indexing
 #   * pull new mails only from INBOX
 #     (otherwise ~50 dirs require 1 min for idle check; no effect from PipelineDepth)
+#     !! even then new mails with large attach may require much more time to be downloaded
+#       => touch some file after sync
+#       => skip next sync by timer if (now - date_touch < 0.5 * sync_interval)
 #   * don't push anything
 #   * run notmuch-new to reindex
 # => push everything by cron once a hour (full sync)
-
-## USAGE
-# -a|--all  # all channels
-# -l|--list # only list mailboxes
-# -V        # verbose (show files to remove/resync: <dir>/.uidvalidty)
+# FIND: "Examine" instead of "Select" for polling
+#   https://github.com/k9mail/k-9/issues/2772
 
 # INFO: "davmail" sync speed is ~100 / min
 mbsync --config "$cfg" "$@"

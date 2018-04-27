@@ -3,11 +3,70 @@ REF
   https://notmuchmail.org/notmuch-mutt/
     https://notmuchmail.org/howto/
   !9 [_] READ:(notmuch ideology): https://lwn.net/Articles/705856/
+  REF https://notmuchmail.org/special-tags/
+  REF maildir format flags in filenames
+    https://cr.yp.to/proto/maildir.html
 
 
 CFG:(init setup)
   $ notmuch setup
   $ notmuch new
+
+
+Propagate deletion (expunge) and =Trash
+  TUT: https://github.com/djcb/mu/issues/1136
+  mutt: copy to =Trash, mark +delete, sync and send "Expunge" (purge) to IMAP
+    => IMAP: (additionally) auto-move +delete to its own =TrashServer => return reduced list
+    => davmail: sync =Trash, (utterly) purge +delete files on Exchange directly => return reduced list immediately
+    => mbsync: sync (push) new in =Trash and all +delete to IMAP server => it does as usuas => pull back
+      !! locally deleted messages (as files) will be re-downloaded from server
+      !! messages deleted directly on server (through web browser) will remain untouched locally (and may become uploaded again)
+      BUT at least they are marked +delete
+    Expunge
+      None:
+        mark +delete on any side, don't copy, don't expunge, sync to the other side (local/remote), kept on both sides
+          => duplicated deleted msg on local
+        remote +delete, sync-mailbox, copy to remote =Trash, remote "Expunge"
+      Slave:
+        remote +delete, sync local, delete locally (or copy to local =Trash), sync back to server (delete on server?)
+
+  maildir_trash "T"
+    SEE http://mutt-users.mutt.narkive.com/Hbv0ynxU/maildir-trash-what-does-it-do
+      (mutt) set maildir_trash = yes
+      [_] CHECK:CMP: hidden "T" vs moved to =Trash
+        = compare which way user/script are best for processing (CMP diff usecases/scenario)
+    REF http://cr.yp.to/proto/maildir.html
+
+  CMP =Trash vs "T"
+    * "T" used by davmail/Exchange natively
+      ~ deletion from web-interface
+      ~ recalling of messages e.g. 1524771066.31197_3.NB-109,U=642:2,ST
+    * +deleted msgs are still shown as normal ones in Exchange
+      ! disable "davmail.imapAutoExpunge=false" otherwise all marked messages will disappear immediately on sync
+        <= i.a. sometimes you need to be able to copy +deleted messages to server w/o actual "Expunge"
+    * you can't mark "T" inside =Trash (where you have moved messages)
+      !! they won't be present in "Deleted Items" of Exchange web-interface
+    * "T" effectively hides msgs from MUA
+      ! BUT they are still present in "Maildir" in their original folder
+      => Exchange has virtual folder "Deleted Items" which aggregates all hidden msgs
+      ++ easy to restore or attribute message
+      -- need periodic scan of all folders to delete all msgs older 30 days
+      https://github.com/djcb/mu/issues/1136
+        https://together.jolla.com/question/12079/deleted-emails-stick-around-until-expunged-imap/
+
+  GMail :: to delete mail it must be explcitly moved into [GMail]/Trash
+    EXPL http://promberger.info/linux/2008/03/10/mutt-and-gmail-via-imap-how-to-delete-messages/
+    USE:(mutt) set trash = "=[Gmail]/Trash"
+     macro index d "<save-message>=[Gmail]/Trash<enter>" "Trash"
+
+  [_] FIND: how to sync moved/renamed folders ?
+
+  [_] BUG: local folder "Drafts" was deleted on sync
+    $ r.mbsync -- -qV all:Drafts
+
+  [_] FIXME: can't sync deleted folder
+    BAD: if removed from server -- won't be removed on local
+    # master Junk cannot be opened and slave Junk not empty
 
 
 USAGE:
@@ -30,9 +89,6 @@ USAGE:
     BUT: how to gather this local info inside mutt?
     SEE: mswatch to initiate sync
       OR:(cron): https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
-    [_] FIXME: can't sync deleted folder
-      BAD: if removed from server -- won't be removed on local
-      # master Junk cannot be opened and slave Junk not empty
 
   !!! 2016-09-07 [X] SEE 'notmuch' usage at neomutt site
   + http://tobias.kleemann.net/2011/05/mutt-notmuch-searching-multiple-mailboxes-in-mutt/
