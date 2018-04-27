@@ -1,18 +1,38 @@
-TODO
-  [_] DEV: query password from gpg through hook to on_connect per each channel
-    ! don't try to ask passwd when --no-connect
-      TODO:FIND: disable asking passphrase even when sec.conf exist
-        => use "/secure decrypt" on demand afterwards
-    ! don't save password to ~/.weechat/* after query
-    ? keep ${sec.data.freenode_pass} in config file in case you someday activate sec.conf for whatever
-    REQ
-      https://github.com/weechat/weechat/issues/749
-      https://github.com/weechat/weechat/pull/906
-    DEV: exec and eval result back
-      /eval /exec -nosh -nobg -nostdin -norc -noln -oc sh -c 'echo "/print /oper ${irc.server.freenode.sasl_username} $(pass show irc/${irc.server.freenode.sasl_username})"'
-      /eval /exec -nosh -nobg -nostdin -norc -noln -pipe "/print /identify; /oper ${irc.server.freenode.sasl_username}" pass show irc/${irc.server.freenode.sasl_username}
-      [_] CHECK: multiple commands on single line
+[_] DEV: query password from gpg through hook to on_connect per each channel
+  ! don't try to ask passwd when --no-connect
+    TODO:FIND: disable asking passphrase even when sec.conf exist
+      => use "/secure decrypt" on demand afterwards
+  ! don't save password to ~/.weechat/* after query
+    https://www.google.com/search?q=weechat%20don%27t%20save%20option
+    https://www.google.com/search?q=weechat%20don%27t%20save%20password
+    https://www.google.com/search?q=%22weechat%22+hook+connect&prmd=ivns&ei=MW3iWseVKKXI6ASxwa64Cg&start=50&sa=N
+  ? keep ${sec.data.freenode_pass} in config file in case you someday activate sec.conf for whatever
+  REQ
+    https://github.com/weechat/weechat/issues/141
+    https://github.com/weechat/weechat/issues/749
+    https://github.com/weechat/weechat/pull/906
+  DEV: exec and eval result back
+    /eval /exec -nosh -nobg -nostdin -norc -noln -oc sh -c 'echo "/print /oper ${irc.server.freenode.sasl_username} $(pass show irc/${irc.server.freenode.sasl_username})"'
+    /eval /exec -nosh -nobg -nostdin -norc -noln -pipe "/print /identify; /oper ${irc.server.freenode.sasl_username}" pass show irc/${irc.server.freenode.sasl_username}
+    [_] CHECK: multiple commands on single line
+  hook on connect
+    REF https://weechat.org/blog/tag/regex
+    [_] READ: E.G. https://github.com/weechat/weechat/wiki/Triggers
+      https://www.tomechangosubanana.com/2017/weechat-trigger-sounds-based-on-specific-keywords/
+       /trigger addreplace warningword signal *,irc_in2_PRIVMSG "${message_without_tags} =~ (danger will robinson|stop the line|help me)" "" "/exec -bg /usr/bin/paplay /usr/share/sounds/ubuntu/notifications/Positive.ogg
+    CFG https://buck.ludd.ltu.se/tmplt/dotfiles/blob/fb58568dae694c147ca7b6cd72c23ba4c38a0033/weechat/.weechat/trigger.conf
+      (?server?) https://raw.githubusercontent.com/redbrick/eduScripts/master/wcconf/trigger.conf
+    INFO http://nullege.com/codes/search/weechat.hook_command
+
+
+[_] DEV:CFG: Optimize log usage
+  +++ https://blog.jeaye.com/2016/10/31/weechat-logs/
+
 
 MAINT
   Show all changed options -- to update my ./cfg/*.conf list after experiments
     /set diff
+
+
+True colors
+  https://github.com/weechat/weechat/issues/312
