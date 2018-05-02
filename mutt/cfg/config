@@ -129,7 +129,8 @@ set imap_check_subscribed = no
 ### If I will use getmail
 set mbox_type = Maildir
 ## SEE http://mutt-users.mutt.narkive.com/Hbv0ynxU/maildir-trash-what-does-it-do
-set maildir_trash = yes
+# BAD: "yes" won't move to =Trash BUT mark with "T" in same dir and "mbsync" will Expunge them immediately
+set maildir_trash = no
 ## NOTE: may twice as improve performance of opening maildir
 # set maildir_header_cache_verify=no
 

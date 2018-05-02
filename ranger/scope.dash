@@ -36,6 +36,7 @@ in a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
 ;; odt|ods|odp|sxw) try odt2txt "$path" | trim | fmt && exit 3
 ;; htm|html|xhtml) try elinks -dump "$path" | fmt && exit 3
 ;; mp4) exiftool "$path" && exit 5
+;; *,U=[0-9]*:*,*) try mshow -nBFN "$path" | fmt && exit 3
 esac
 
 mimetype=$(file --mime-type -Lb "$path")

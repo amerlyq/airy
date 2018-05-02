@@ -1,4 +1,10 @@
 TODO
+  [_] BUG: "index" view replaces column (10K) of msg.size -> by (222) of msg.char_length when you open it (when it's cached in ~/.config/)
+    => TODO: show msg size always (to detect and delete big messages) and char length only when necessary (to assume how much you need to read)
+  [_] BUG: can't open Maildir if no =INBOX i.e. when mbsync copied only some other single directore
+    ! BUT I want to see _only_ that other dir !
+    ~~? "you have to create them all yourself, except 'inbox', which should be provided by the system"
+      https://gitlab.com/muttmua/mutt/wikis/MuttGuide/Folders
   [_] FIND: "IMAP MOVE" extension instead of copy+delete
     http://davmail.sourceforge.net/faq.html
   [_] TRY: outlook high-priority message
