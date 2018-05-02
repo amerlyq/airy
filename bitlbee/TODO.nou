@@ -2,16 +2,21 @@ REF
   2017-10-25 [X] https://www.bitlbee.org/user-guide.html
   https://wiki.archlinux.org/index.php/bitlbee
   https://wiki.bitlbee.org/HowtoSkypeWeb
+  https://mantlepro.github.io/posts/chat.html
+    = znc + bitlbee
 
 
 CFG
   /etc/bitlbee/bitlbee.conf
-  /var/lib/bitlbee/amerlyq.xml
-  /var/lib/bitlbee/purple/amerlyq/prefs.xml
+  /var/lib/bitlbee/myuser.xml
+    = users, accounts, settings, renames
+  /var/lib/bitlbee/purple/myuser/prefs.xml
+  /var/lib/bitlbee/purple/myuser/blist.xml
+    = cache of names
 
 
 SECU
-  READ:(joke): Why You Might Want to Store Your Passwords in Plain Text
+  [_] READ:(joke): Why You Might Want to Store Your Passwords in Plain Text
     https://stormpath.com/blog/why-you-might-want-to-store-your-passwords-in-plain-text
   [_] don't store password in CFG
     ~~ seems like if you don't use "register" -- and will send passwd from gpg to account every time -- it will work nicely
@@ -29,13 +34,13 @@ SECU
       https://duo.com/blog/bypassing-googles-two-factor-authentication
       https://www.microsoft.com/en-us/research/publication/so-long-and-no-thanks-for-the-externalities-the-rational-rejection-of-security-advice-by-users/
     ? [_] how to make root-only readable config-embedded passwords for programs which run as user ?
-  [_] CHG: more secure password input
-    [_] TRY: "set oauth true" for gtalk/twitter/facebook ALT: simply add account w/o password
-    2017-10-25 [X] TRY: use "oper" for entering securely w/o echo -- instead of "identify <passwd>" ?
-      /oper <user> <passwd>
+  [_] TRY: "set oauth true" for gtalk/twitter/facebook ALT: simply add account w/o password
+  2017-10-25 [X] TRY: use "oper" for entering securely w/o echo -- instead of "identify <passwd>" ?
+
   [_] READ: google two-step OTP auth on Arch (PAM integration)
     https://wiki.archlinux.org/index.php/Google_Authenticator
   [_] TODO setup OTR for secure messaging https://otr.cypherpunks.ca/
+    REF https://ru.wikipedia.org/wiki/Off-the-Record_Messaging
     https://www.reddit.com/r/irc/comments/3f2x4w/any_weechat_users_use_off_the_record/
     OTR for weechat/bitlbee/pidgin/purple
       https://wiki.bitlbee.org/bitlbee-otr
@@ -44,27 +49,49 @@ SECU
 
 
 TODO
-  [_] BUG: bitlbee_completion.py don't work
+  2018-05-01 [X] BUG: "nick_source = `handle'" resets to "handle" each time on reconnect
+    ::: OBSOLETE for years, more limited, internally just changes "nick_format"
+      https://github.com/bitlbee/bitlbee/blob/7801298f6a855cda0c62433d45ec717d2773ef73/protocols/account.c#L208-L221
   2017-10-25 [X] BAD: telegram shows non-english names as increasing series of underscore "____"
     https://github.com/ircv3/ircv3-specifications/issues/259
     ::: set utf8_nicks true
     TRY: set nick_source full_name / first_name
   [_] DEV cfg scripts to setup all channels through $ r.irc-cfg
-    CMP with native cfg of bitlbee server
+    CMP with native cfg of bitlbee server ::: native contains hashed passwd
   [_] history is incomplete and ugly
     set display_timestamps off
-
-  [_] TRY: send msgs in control channel to last person you addressed
+  2018-04-30 [X] TRY: send msgs in control channel to last person you addressed
     set default_target last
   +++ 2017-10-25 [X] TRY: bitlbee XMPP -> IRC
     https://www.bitlbee.org/main.php/news.r.html
     2017-10-25 [X] |bitlbee|
     2017-10-25 [X] |bitlbee-libpurple|
     2017-10-25 [X] |purple-discord-git| OR |bitlbee-discord-git|
+  [_] NEED send/receive multiline msg
+    bitlbee: https://wiki.bitlbee.org/SendNewlines
+      | help set paste_buffer
+    weechat: https://github.com/weechat/weechat/issues/889
+      /set irc.server.bitlbee.anti_flood_prio_high 0
+      /set weechat.bar.input.size 0
+      /set weechat.bar.input.size_max 3
+      ALT:BET:REQ: https://github.com/weechat/weechat/pull/1063
+      NEED: remap keys
+        https://github.com/weechat/scripts/issues/164
 
 
 skypeweb
   [_] https://sameroom.io/blog/connecting-skype-to-irc/
+  [_] BUG: names aren't fetched from <alias> when <handle>, <first_name> and <full_name> are garbage
+    https://bitbucket.org/EionRobb/purple-hangouts/issues/35/many-names-missing-in-group-chats
+    %nick / %group / %account / %handle == the same handle (under which user is registered)
+    %first_name
+      somenick is now known as HisAliasName
+      HisAliasName is now known as HisName
+      # info HisName ::: skypeweb - User somenick info:, First Name: HisName, Last Name: HisLast
+    %full_name
+      somenick is now known as HisAliasNameAliasLast
+      HisAliasNameAliasLast is now known as HisNameHisLast
+      # info HisNameHisLast ::: skypeweb - User somenick info:, First Name: HisName, Last Name: HisLast
   !1 [_] BUG: -- lost incoming/outgoing msgs in groupchat
     * not delievered
     * no warning/error message
@@ -75,146 +102,54 @@ skypeweb
   [_] BUG: typing notice isn't shown
   [_] BUG: immediate multiline send after multiline paste on <C-Y> -- NEED add more text
   [_] BUG: for skype "private" doesn't route messages in sep window
-  [_] NEED send/receive multiline msg
-    bitlbee
-      https://wiki.bitlbee.org/SendNewlines
-      # help set paste_buffer
-      set paste_buffer true
-      set paste_buffer_delay 400
-      set typing_notice true
-      set private true
-      set utf8_nicks true
-      save
-    weechat
-      https://github.com/weechat/weechat/issues/889
-      /set irc.server.bitlbee.anti_flood_prio_high 0
-      /set weechat.bar.input.size 0
-      /set weechat.bar.input.size_max 3
-      ALT:BET:REQ: https://github.com/weechat/weechat/pull/1063
-      NEED: remap keys
-        https://github.com/weechat/scripts/issues/164
+  [_] BUG: multiline splitted / wrapped after certain text length
+  [_] BUG: multiline is left-adjusted instead of right-adjusted text with excessive spaces till "textwidth"
+
 
 ALG
-  Reg bitlbee account for all my IM
-    register <passwd>
-    identify
-    /oper <user> <passwd>
-  List available protocols
-    plugins
   Add accounts per IM
     gtalk
-      account add jabber <user@gmail.com> <passwd>
-      account jabber set
-      account jabber set connect_server talk.google.com
-      account jabber set port 5222
-      account jabber set auth_plain_in_clear false
-      account jabber set connection_security require_tls
-      account jabber on
-      save
     hangouts
       https://bitbucket.org/EionRobb/purple-hangouts/wiki/Bitlbee_FAQ
-        https://demu.red/blog/2016/12/setting-up-sms-in-irc-via-bitlbee-with-purple-hangouts/
-        +++ TALK https://bitbucket.org/EionRobb/purple-hangouts/issues/71/cannot-authenticate-error-invalid_scope
-      account add hangouts <user@gmail.com>
-        SEE video and extract your OAuth https://www.youtube.com/watch?v=hlDhp-eNLMU
-          firefox: <C-S-v> -> Network -> File -> programmatic_auth -> set-cookie -> oauth_code="4/AABq...-6C..." ;
-      account hangouts set nick_format %full_name
-        # NOTE: needs to off/on account to take effect if you already connected
-      account hangouts on
-        = send your OAuth "4/AABq...-6C..." into auto-opened "purple_request_0" window and /part it
-      save
+        SMS: https://demu.red/blog/2016/12/setting-up-sms-in-irc-via-bitlbee-with-purple-hangouts/
     skype
-      account add skypeweb <user> <passwd>
-      account skypeweb set
-      account skypeweb on
+      USE: template for contacts naming "NameFamily [Role/Company-Location]"
     telegram
-      account add telegram +3... <anything>
-      account telegram on
-        => wait SMS and enter code
-      account telegram set
-        accept-secret-chats = `ask'
-        auto-join-group-chats = `true'
-        auto_connect = `true'
-        auto_reconnect = `true'
-        away is empty
-        compat-verification = `false'
-        display-read-notifications = `false'
-        display_name is empty
-        handle_unknown is empty
-        history-retrieve-days = `14'
-        inactive-days-offline = `7'
-        media-size-threshold = `32768'
-        nick_format is empty
-        nick_source = `handle'
-        password-two-factor is empty
-        send-read-notifications = `true'
     discord
-      account add eionrobb-discord <user@gmail.com> <passwd>
-      account eionrobb-discord set
-      account eionrobb-discord on
-      account eionrobb-discord set display_name <user>
-
-      chat list eionrobb-discord
-      chat add eionrobb-discord !1 #mydiscordchannel
-      chan #mydiscordchannel set auto_join true
-      /join #mydiscordchannel
+      https://github.com/sm00th/bitlbee-discord/graphs/code-frequency
     matrix
       BUG:REQ https://github.com/matrix-org/purple-matrix/issues/41
-    CHECK
-      acc list
-  Reset password
-    account hangouts set password ""
-  Split contact list by protocols
-    https://wiki.bitlbee.org/ManagingContactList
-    acc list
-    /join &gtalk
-    channel &gtalk set
-    channel &gtalk set auto_join true
-    channel &gtalk set account gtalk
-    channel &gtalk set fill_by account
-    channel &gtalk set show_users online%,away+,offline
-  Show offline users
-    help set show_users
-    chan &bitlbee set show_users online+,away+,offline
-    /names
-    blist
-  NEED: rename/alias jabber account to normal name
-  Groupchats
-    List all your chats from server
-      chat list skypeweb
-    Add choosen ones
-      chat add skypeweb !4 #work
-      OR: chat add skypeweb 19:a1d04a804e32daa5832810b2f4e5aaad@thread.skype
-      channel #work set auto_join true
-      OR: channel list => channel 3 set auto_join true
-      /join #work
-  Rename users
-    jabber
-      rename _f223764e8a836b85c93455 <somenick>
-  Manage users
-    info/remove/block/allow <nick>
-  Set status ("away" has higher priority then "status")
-    set status ...
-    set skype status ...
-    /away ...
-    set skype away ...
+      [_] READ:CMP: https://matrix.org/blog/2017/03/11/how-do-i-bridge-thee-let-me-count-the-ways/
+      ++ [_] READ:VIZ. https://anders.unix.se/2017/06/23/how-to-irc-like-its-2017/
+
 
 Weechat
   auto-completion
     bitlbee_completion.py
+      [_] BUG: bitlbee_completion.py don't work
+        BUT: raw query after login does work:
+        $ nc localhost 6667
+        | NICK myuser
+        | USER myuser 0 * :
+        | completions
+         :root!root@localhost.localdomain NOTICE myuser :COMPLETIONS OK
+         ...
     bitlbee_typing_notice.py
+      [_] TRY: add "bitlbee_typing_notice" badge to status line
   notify-send
     ~~ https://github.com/s3rvac/weechat-notify-send
     + https://weechat.org/scripts/source/notify_send.pl.html/
     /script search|install notify_send.pl
+
   BET:(built-in):
     /set trigger.trigger.beep.command "/print -beep;/exec -bg notify-send -i '/usr/share/icons/hicolor/32x32/apps/weechat.png' 'IRC Notification' "${tg_tag_nick}: ${tg_message_nocolor}""
   Trigger "urgent" only by choosen msgs
     http://noone.org/blog/English/Computer/IRC/Sedating%20irssi's%20nick%20highlight%20for%20microblogging%20messages.html
 
 
-discord
-  https://github.com/sm00th/bitlbee-discord/graphs/code-frequency
+emacs
+  http://emacs-fu.blogspot.com/2012/03/social-networking-with-bitlbee-and-erc.html
+  http://doc.rix.si/cce/cce-irc.html
 
 
 OBSOL: Convert from Pidgin

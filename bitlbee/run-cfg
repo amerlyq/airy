@@ -1,0 +1,80 @@
+#!/bin/bash
+set -euo pipefail
+source ~/.shell/profile
+
+# DEV: connect to server directly by protocol
+#   https://www.linuxjournal.com/content/more-using-bashs-built-devtcp-file-tcpip
+#   https://serverfault.com/questions/183157/send-message-to-irc-channel-from-bash
+#   TRY: open TCP directly in expect SEE: http://wiki.tcl.tk/14702
+#   [_] FIND: don't auto-connect accounts on bitlbee :identify
+# ALT:BAD:
+#   * hardcoded assumption of "weechat" frontend
+#   * must use tty -- bad for scripts
+
+# tmp=$(mktemp -dt "${0##*/}~XXXX")
+# onexit(){ rm -rf "$tmp"; }
+# trap 'onexit' INT HUP QUIT TERM
+# pipe=$tmp/weechat_fifo
+## BAD: launched in same tty !! can't redirect output
+# weechat --dir "$tmp" --no-connect --no-script "irc://${BITLBEE_USER:?}@localhost:6667" </dev/tty >/dev/tty
+# [[ -p $pipe ]] && exec > "$pipe" || exit
+# sed '/^#.*$/s///; /^\s*$/d; s/^/*/'
+# echo save
+# echo /quit
+
+bitlbee_user=${IRC_USER:?}
+bitlbee_pass=$(r.query-passwd 'irc/bitlbee') || {
+  echo "Err: must store desired password in keyring beforehand"
+  echo "i.e. execute $ pass insert irc/bitlbee"
+  exit 1
+}
+
+# NOTE: you must log off bitlbee to $ rm -rf /var/lib/bitlbee
+#   TRY: log-in, take over session and quit before rm-rf
+
+## Register
+# ATT: must take over other session -- otherwise settings won't be saved
+# exec 3<> /dev/tcp/localhost/6667
+# cat >&3 <<EOT
+# NICK ${bitlbee_user:?}
+# USER ${bitlbee_user:?} 0 * :
+# PRIVMSG &bitlbee :register ${bitlbee_pass:?}
+# PRIVMSG &bitlbee :identify ${bitlbee_pass:?}
+# PRIVMSG &bitlbee :yes
+# EOT
+
+# OPER ${bitlbee_user:?} ${bitlbee_pass:?}
+# JOIN &bitlbee
+# PONG :PinglBee
+# PRIVMSG &bitlbee :account skypeweb set auto_connect false
+# PRIVMSG &bitlbee :save
+# QUIT
+# cat <&3
+# exec 3>&-
+
+
+expect -nNf- <<EOT
+spawn nc localhost 6667
+
+expect ":BitlBee-IRCd initialized"
+send "NICK ${bitlbee_user:?}\r"
+send "USER ${bitlbee_user:?} 0 * :\r"
+
+expect -re "PRIVMSG &bitlbee .* identify yourself"
+send "PRIVMSG &bitlbee :register ${bitlbee_pass:?}\r"
+send "PRIVMSG &bitlbee :identify ${bitlbee_pass:?}\r"
+
+expect {
+  "take over this session?" {
+    send "PRIVMSG &bitlbee :yes\r"
+    expect "successfully taken over"
+  }
+}
+expect "PRIVMSG &bitlbee :Password accepted" { puts "YEDD\r" }
+
+expect eof
+# close
+# interact
+EOT
+
+# TODO: foreach *.conf

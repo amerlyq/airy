@@ -1,0 +1,106 @@
+%%% USAGE
+
+Reg bitlbee user for all IM accounts
+  | register <passwd>
+  | /msg nickserv identify <passwd>
+  OR:
+    | identify
+    | /oper <user> <passwd>
+
+
+%% Accounts
+
+REM
+  | account skypeweb off
+  | account skypeweb del
+  | save
+
+INFO
+  | plugins
+  | acc list
+
+
+Reset password (oauth)
+  | account hangouts set password ""
+
+
+%% Channels
+
+ADD
+  | /join &gtalk
+  | channel &gtalk set account gtalk
+  | channel &gtalk set auto_join true
+  | channel &gtalk set fill_by account
+  | channel &gtalk set show_users online%,away+,offline
+
+REM
+  | /part &gtalk
+  | channel &gtalk del
+  | save
+
+INFO
+  | chan &gtalk set
+
+
+Per-protocol contacts list (split)
+  https://wiki.bitlbee.org/ManagingContactList
+  | /join &gtalk
+  | channel &gtalk set account gtalk
+  | channel &gtalk set auto_join true
+  | channel &gtalk set fill_by account
+  | channel &gtalk set show_users online%,away+,offline
+
+
+Groupchats
+  skypeweb
+    | chat list skypeweb
+      = List all your chats from server
+    | chat add skypeweb !4 #work
+      # OR: chat add skypeweb 19:a1d04a804e32daa5832810b2f4e5aaad@thread.skype
+    | channel #work set auto_join true
+      # OR: channel list => channel 3 set auto_join true
+    # account = `skypeweb'
+    # chat_type = `room'
+    # nick is empty
+    # purple_chatname = `19:a1d04a804e32daa5832810b2f4e5aaad@thread.skype'
+    # room = `19:a1d04a804e32daa5832810b2f4e5aaad@thread.skype'
+    # translate_to_nicks = `true'
+    # type = `chat'
+    | /join #work
+  discord
+    | chat list eionrobb-discord
+    | chat add eionrobb-discord !1 #mydiscordchannel
+    | chan #mydiscordchannel set auto_join true
+    | /join #mydiscordchannel
+
+
+Offline contacts (show)
+  | help set show_users
+  | chan &bitlbee set show_users online+,away+,offline
+  | /names
+  | blist
+
+
+%% Contacts
+Rename contact
+  | rename _f223764e8a836b85c93455 <somenick>
+  TODO:FIND: delete all local renames -- to propagate renaming from Skype server
+    otherwise it's renamed each time {nick -> server name -> local name}
+    G: reset buddy-list / purple blist / renames
+      https://developer.pidgin.im/ticket/5895
+      https://bugs.bitlbee.org/ticket/1270
+    [_] CHECK:MAYBE: simply delete buddy list cache ?
+      $ sudo rm /var/lib/bitlbee/purple/myuser/blist.xml
+
+
+Info / manage
+  | info/remove/block/allow <nick>
+
+
+%%% User
+
+Set status ("away" has higher priority then "status")
+  | set status ...
+  | set skypeweb status ...
+  | /away ...
+  | set skypeweb away ...
