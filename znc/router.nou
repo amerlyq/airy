@@ -1,0 +1,28 @@
+Install Entware
+  format USB drive and insert in router
+    $ sudo mkfs.ext2 /dev/sda1
+  connect by SSH
+    $ ssh lrou
+  setup entware
+    https://github.com/Entware/Entware-ng/wiki/Install-on-asuswrt-merlin-firmware
+      (already included into Merlin firmware since 2015-11-23)
+    $ entware-setup.sh  # choose partition '1' or other
+  install package
+    $ opkg install znc
+    !! relogin into rou to reorder $PATH
+
+
+CFG znc
+  Create new config
+    $ rm -rf /opt/share/znc
+    $ /opt/bin/znc -d /opt/share/znc --makeconf
+      port: <port>
+      ssl: y
+      IPv4v6: y
+      nick:
+      altnick:
+      ident:
+      realname: ""
+      run: no
+  Check existing config on errors
+    $ /opt/bin/znc -d /opt/share/znc -D
