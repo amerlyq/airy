@@ -64,6 +64,9 @@ pkglst
   [_] split 'deps:'
     * required (r.xorg in ./setup -- BUT! not always, really) and optional (r.n in ./run )
     * necessary at 'setup' and at 'runtime'
+      airy: keep sep setup-deps and run-deps
+        << like it's done in PKGBUILD
+      BUT! each "run" script may require diff deps =>? keep only total
   [_] TODO!!! reorder pkg: firstly -- the most necessary tools (zsh,vim,ranger)
     = so even if system breaks, it must become somewhat more usable then default to fix all troubles
     => ENH: append to AIRY_MODS instead of overwrite

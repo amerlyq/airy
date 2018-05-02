@@ -23,6 +23,10 @@ REF
 
 ALG
   Routing all to WiFi but use company subnet for repo/jira/builds (172.16.* in /etc/hosts)
+    G: arch linux traffic through another lan device
+    https://bbs.archlinux.org/viewtopic.php?id=184434
+    https://bbs.archlinux.org/viewtopic.php?id=231128
+    https://bbs.archlinux.org/viewtopic.php?id=155020
     $ ip route show
       # default via 172.30.133.1 dev enp0s25 src 172.30.133.127 metric 202
       # default via 172.27.186.1 dev wlo1 src 172.27.186.103 metric 304
@@ -53,6 +57,8 @@ ALG
 
 
 DEBUG
+  SEE
+    https://wiki.archlinux.org/index.php/Network_Debugging
   Route lookup trie
     https://vincent.bernat.im/en/blog/2017-ipv4-route-lookup-linux
     $ cat /proc/net/fib_trie

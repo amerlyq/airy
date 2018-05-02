@@ -1,13 +1,22 @@
 %%%% Install Certs
 
 TODO
-  [_] TRY: install CA only inside chroot -- to be affected by corporate MITM only inside chroot
+  [$] TRY: install CA only inside chroot -- to be affected by corporate MITM only inside chroot
     << for build systems and separate instance of firefox
+    => currently no need for jira/git
+  2017-09-05 [X] FIND: delete root certificate
+    https://askubuntu.com/questions/440580/how-does-one-remove-a-certificate-authoritys-certificate-from-a-system
+    https://unix.stackexchange.com/questions/119966/installed-root-certificate-authority-doesnt-appear-to-be-working
+    https://bugs.archlinux.org/task/43450
+    https://access.redhat.com/solutions/1549003
+    https://www.happyassassin.net/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
+
 
 REF: https://www.archlinux.org/news/ca-certificates-update/
   /usr/local/share/ca-certificates/*.crt -> $dir
   /etc/ssl/certs/*.pem -> $dir/*.crt
   OBSOL: update-ca-certificates
+
 
 DEBUG:
   Check available certs for p11-kit:
