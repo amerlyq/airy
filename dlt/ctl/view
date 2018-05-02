@@ -1,0 +1,166 @@
+#!/usr/bin/perl
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use v5.14;  # for s///r
+use Getopt::Std;
+
+# READ: perl unicode
+#   http://ahinea.com/en/tech/perl-unicode-struggle.html
+binmode (STDIN, ':utf8');
+binmode (STDOUT, ':utf8');
+
+# getopts
+# https://stackoverflow.com/questions/13800130/adding-a-help-command-to-a-script
+# https://www.computerhope.com/unix/uperl.htm
+# https://perldoc.perl.org/Pod/Usage.html
+
+my %opts=(); getopts("0d:c:o:", \%opts);
+my $OFS = $opts{d} // "\t";
+my $ORS = $opts{0} ? "\0" : "\n";
+
+################################################################################
+
+sub check_allowed {
+    my ($ref, @vars) = @_;
+    foreach my $var (@vars) {
+        die "Err: wrong variant '$var'. Use one of: {". join("|", @$ref) ."}"
+            if not grep { $var eq $_ } @$ref;
+    }
+    return @vars;
+}
+
+# NOTE: output only specified fields in their order  -o :acn,date,:t,body
+#  * delimit fields by comma (no space allowed)
+#  * prefix field by colon to treat next letters as one-letter keys
+sub multichoice {
+    my ($optval, $choices, $aliases, $default) = @_;
+    return @$default if not $optval;
+
+    # NOTE: traverse in reverse order for splice to keep iterator intact
+    my @pick = split/,/, $optval;
+    for (my $i = $#pick; $i >= 0; --$i) {
+        my $f = $pick[$i];
+        if ('@' eq $f) {
+            # NOTE: replace '@' in any place of list by default list of columns (to add instead of replace)
+            splice @pick, $i, 1, @$default;
+        } elsif (':' eq substr $f,0,1) {
+            my @oneletters = split(//, substr($f,1));
+            my @mapped = @$aliases{ @oneletters };
+            die "Wrong one-letter key" if grep { not defined } @mapped;
+            splice @pick, $i, 1, @mapped;
+        }
+    }
+    return check_allowed($choices, @pick);
+}
+
+################################################################################
+
+# TODO: specify "-i" input regex to post-process earlier outputted files
+my $field_regex = qr{
+    ^(?<index>\d+)
+    \s(?<date>\d{4}/\d\d/\d\d)
+    \s(?<time>\d\d?:\d\d:\d\d.\d{6})
+    \s+(?<stamp>\d+)
+    \s(?<msgnum>\d+)
+    \s(?<ecuid>\S+)
+    \s(?<appid>\S+)
+    \s(?<ctxid>\S+)
+    \s(?<Type>\S+)
+    \s(?<level>\S+)
+    \s(?<vnvst>\S+)
+    \s(?<nargs>\d+)
+    \s\[(?<body>.+)$
+}x;
+my @field_names = ($field_regex =~ /\(\?<(\w+)>/g);
+my %field_alias;
+foreach my $name (@field_names) {
+    my $alias = substr($name,0,1);
+    die "Err: '$name' results in duplicate alias (already exists '$alias' -> '$field_alias{$alias}'):
+    first letter of all fields (used as one-letter alias) must be different
+    " if $field_alias{$alias};
+    $field_alias{$alias} = $name;
+}
+# my @field_default = qw(index stamp msgnum appid ctxid level body);
+my @field_default = check_allowed(\@field_names, qw(appid ctxid index stamp msgnum level body));
+my @field_shown = multichoice($opts{o}, \@field_names, \%field_alias, \@field_default);
+
+################################################################################
+# my @ctxid_shown = map { uc } split/,/, $opts{c} if $opts{c};
+# my $ctxid_shown = /^(${join("|", @ctxid_shown)})$/;
+# = multichoice($opts{c}, \@ctxid_names, \%ctxid_alias, \@ctxid_default);
+
+my $pref = '/work/_mirror/_prefix-host';
+$ENV{PATH}="$pref/bin:$ENV{PATH}";
+$ENV{LD_LIBRARY_PATH}="$pref/lib:".($ENV{LD_LIBRARY_PATH} // "");
+
+# my $file = $ARGV[0] || '/path/to/log.dlt';
+my @files = @ARGV;
+
+
+################################################################################
+
+sub proc_record {
+    # my %fields = @_;
+    # print join("\t", map {$fields{$_}} sort keys %fields), "\n";
+    my $f = shift;
+    # print join("\t", map {$f->{$_}} sort keys %{$f}), "\n";
+    print join($OFS, map { $_ // '' } @{$f}{ @field_shown }), $ORS;
+    # printf "%08x${OFS}%08x${OFS}%s${OFS}%s${OFS}%s\n", @$_;
+}
+
+sub push_record {
+    my $fields = shift;
+    # chop $fields{body};
+    $fields->{body} =~ s/\s*\]$//;  # remove body closing bracket ']'
+    $fields->{body} =~ s/\n/\r/g;   # compress multiline body
+    proc_record($fields);
+};
+
+# TODO: chain messages to next function
+# FIND perl coroutines
+sub dlt_convert {
+    open(my $fh, '-|', qw( dlt-convert -a ), @_);
+    my %fields;
+    # my $fnext = sub {
+    #     # chop $fields{body};
+    #     $fields{body} =~ s/\s*\]$//m;
+    #     $fields{body} =~ s/\n/\r/m;
+    #     proc_record(\%fields);
+    #     # proc_record(%fields);
+    # };
+
+    while (<$fh>) {
+        chop;
+        if (/$field_regex/) {
+            # continue if not /$regex/;
+            if (%fields) {
+                push_record(\%fields);
+                undef %fields;
+            }
+            # PROF:(30MB): 2.8s -> 9.0s
+            %fields = %+;
+        } else {
+            # EXPL: skip trash at the beginning of file
+            if (%fields) {
+                # print "*",$_,"\n";
+                $fields{body} .= "\n" . $_;
+                # print STDERR $fields{body},"\n";
+            }
+        }
+
+        # next unless /\d\]/;  # Skip irrelevant lines
+        # $_ = substr($_, index($_, ']') + 2);
+        # my ($nm, $tp, $addr, $off, $sz, undef) = split('\s+');
+        # # HACK custom addr/size/section/class/Type/name for end-symbols
+        # push @syms, [ hex($addr) + hex($sz), 0, $nm, '=', '=', '~'.$nm ];
+    }
+    close($fh);
+    push_record(\%fields) if (%fields);
+}
+
+################################################################################
+
+print STDERR join($OFS, @field_shown), "\n";
+dlt_convert @files;
+# print join("\n", @files);

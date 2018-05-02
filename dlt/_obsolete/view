@@ -1,0 +1,170 @@
+#!/bin/bash
+#%USAGE: save and print logs from network
+#%  $ ./$0 [-S
+#%USAGE: print log files
+#%  $ ./$0 -[...] *.dlt
+#%USAGE: grep keeping original colors
+#%  $ ./$0 -C -[...] *.dlt | grep regex | less -R
+#%REF: log fields description
+#%  INDEX TIME TMSTP MSGCNT   ECUID APID CTID MSGTYPE MSGSUBTYPE VNVSTATUS NOARG [PAYLOAD]
+#%  4 2018/01/29 14:37:43.086761 3572658 223   PROJ ID-- ID-- log info V 1 [...]
+#%
+#%EXAMPLES: grep in multiline records
+#%  $ ./$0 *.dlt | grep regex | tr \\r \\n
+#%  $ ./$0 -0mn *.dlt | grep -z regex | tr \\000 \\n
+#%
+set -euo pipefail
+
+# TODO:TEST:
+#   -u :: with logs from target
+#   -D/-L5 :: for logs controlling
+
+# MAYBE: generate html5 with collapse/expand parts
+#   => similar to as I do in vim :Fs
+
+# TODO: use default to build dir of ExternalProject by default
+pref=${CMAKE_PREFIX_DIR:-/work/_mirror/_prefix-host}
+trsfm=('s/\r\[/[/g' 's/\r\]/]/g')  # FIXED: wrong newlines
+filter=()
+fields=()
+ofsep='\t'
+annotate=0
+unbuffered=0
+rawoutput=0
+verbose=0
+colorize=0
+tailwritten=0
+nlheader=0
+nlpayload=0
+headcolor=
+datacolor=
+
+_flags=$(sed -rn '/.*#%\s(\S\S?)\s?=.*/{s//\1/;s/(.)[+]/\1:/;p}' "$0")
+<<< "$_flags" cut -c-1 | sort | uniq -d | { ! grep -q '\S'; } || exit 8
+
+#%OPTIONS:
+# TODO: +f ... => to add filters to default ones instead of replacing
+# TODO: regulate spacing between records 0,1,2... empty lines or custom delimiter e.g. '---' for yaml
+# TODO: -l -- to load last file explicitly (error if no args)
+# TODO: - filter-out some logs
+O=; while getopts "$(paste -sd '' <<< "$_flags")" o; do case $o in :|'?') exit 1
+;; f) filter+=("$OPTARG")   #% f+= filter expression (E.G: -f '---- IDv2' -f 'ID ----')
+;; A) filter=()             #% A = all messages -- removes all filters before and default ones
+;; %) annotate=1            #% % = annotate all fields name in first line of stderr
+;; m) trsfm+=('s/\r/\n/g')  #% m = multiline raw data (don't compress with \r)
+;; 0) trsfm+=('s/$/\x0/g')  #% 0 = null output record separator (for "grep -z")
+;; n) nlheader=1            #% n = nl_header between header and payload
+;; N) nlpayload=1           #% N = nl_header as payload arguments separator
+;; s) ofsep=$OPTARG         #% s:= fields separator (DFL=\t)
+;; w) tailwritten=1         #% w = tail continuously written file by dlt-receive
+;; C) colorize=1            #% C = colorize always (even with grep/head/less/etc)
+#%FIELDS:
+# TODO: remove fields with some values (all-filters) instead of choosing only (filters)
+#   => e.g. remove some cluttering from SVT-, keeping every other log
+;; i) fields+=('$1')  #% i = index of msg (global/all)
+;; d) fields+=('$2')  #% d = date
+;; t) fields+=('$3')  #% t = time
+;; T) fields+=('$4')  #% T = timestamp (XXX: wrong value?)
+;; I) fields+=('$5')  #% I = index of msg (local/context)
+;; e) fields+=('$6')  #% e = ecuID
+;; a) fields+=('$7')  #% a = appID
+;; c) fields+=('$8')  #% c = contextID
+;; l) fields+=('$9')  #% l = log level
+;; P) fields+=('$11')  #% P = number of payload args
+#%OTHER:
+;; p) trsfm+=('s/^[^[]+\[/[/')  #% p = payload only
+;; L) loglevel=$OPTARG  #% L:= set log level (0=None, 1=Error, ..., 5=Verbose)
+;; u) unbuffered=1      #% u = unbuffered output (line-wise, but lower performance)
+;; r) rawoutput=1       #% r = raw output (as-is, no postprocess)
+;; v) verbose=1         #% v = verbose output from dlt-* programms
+;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; H) MANPATH="$pref/share/man" exec man "${1:-dlt-convert}"  #% H = man page from prefix
+esac; O+=$o; done; shift $((OPTIND-1))
+
+dltfiles=("$@")
+# HACK: use latest created *.dlt file in current dir when no arguments
+latest_created(){ find -maxdepth 1 -xtype f -name "$1" -printf '%C@\t%f\n'|sort -rnk1|head -1|cut -f2-; }
+((${#dltfiles[@]})) || dltfiles=("$(latest_created '*.dlt')")
+
+# ((${#filter[@]})) || [[ $O =~ A ]] || filter=('---- IDv2' 'ID ----')
+((${#filter[@]})) && exec < <(printf '%s\n' "${filter[@]}")
+
+((nlheader)) && trsfm+=('s/\t\[/\n[/')
+# BAD: splits even multiline payload if it contains some symbols
+((nlpayload)) && trsfm+=('s/([,;])\s/\1\n/g')
+((nlheader)) && trsfm+=('s/$/\n/')
+
+((${#fields[@]})) && fields+=('$NF') || fields=('$0')
+
+## FAIL: don't work with "-w" -- requires to have complete file for "sed" to process
+## MAYBE:(performance): replace "postprocess" or <everything> with single perl script
+#   e.g: perl -pe 'BEGIN{$n=3} 1 while s/old/new/ && ++$i < $n' your_file
+((rawoutput)) && function postprocess { cat; } || function postprocess
+{ local u=
+  ((unbuffered)) && u=-u
+  sed $u -r '
+  /^\s[A-Z0-9-]+\s[A-Z0-9-]+\r/d
+  s/(\x0|\r)$//g
+  s/\x0|\r/\x1f/g
+  s/\t/ /g
+' | sed $u -zr '
+  s/\]\n([0-9]+\s)/]\x0\1/g
+  s/\n/\r/g
+  s/\t\x0/\t/g
+  # s/\x0/&\n/g
+' | sed $u -zr 's/\[/\x0[/' \
+| sed $u -zr "
+  /^\[/!s/ +/\t/g
+  /^\[/!{$headcolor}
+  /^\[/{$datacolor}
+" | sed $u -r 's/\x0\[/[/g; s/\x0/\n/g' \
+| sed $u -r "$(printf '%s\n' "${trsfm[@]}")" \
+| { IFS=,; awk -F\\t -vOFS=\\t "{print${fields[*]}}"; } \
+| sed "s/\\t/$ofsep/g"
+}
+
+((annotate)) && printf '%s\n' \
+  INDEX 'DATE    ' TIME.MICRO TMSTP MSGCNT \
+  ECUID APID CTID TYPE LEVEL \
+  VNVST NOARG '[PAYLOAD]' \
+  | paste -sd \\t > /dev/stderr
+
+# MAYBE: append colorizing filter to postprocessing "sed $u -zr /^\[/!"
+#   * colorize fields and payload separately
+#   * NEED: force-colorize -- otherwise can't head/less/grep with colors
+#     MAYBE: colorize '\e[33\tword' to have clear separator after/before escape code to grep by '\b'
+[[ -t 1 ]] && colorize=1
+
+# ALT: colorize whole line (with payload)
+#   * same black/white text color for whole line
+#   * keep fg colors for individual parts of message
+#   ? override some parts of line bg by more priority color (e.g ERROR field in loglevel)
+# TODO: fix colors on default xterm
+# BUG: ^O in "less" in place of $CR -- because 0xf == ^O, and "tput sgr0" = 1b5b 6d0f
+#   => problem due to "tmux" -- raw "st" do not print x0f in the end
+#   * NEED: "less -R" to process color sequences
+if ((colorize)); then
+  for n in {0..15}; do readonly C$n=$(tput setaf "$n"); done
+  CR=$(tput sgr0); CB=$(tput bold); CS=$(tput smso)
+  headcolor="
+    s/^/$CB/
+    s/\t/$CR&$CB/g
+    s/$/$CR/
+    s/error/$C1&/
+    s/warn/$C3&/
+    s/info/$C2&/
+    s/debug/$C13&/
+    s/verbose/$C11&/
+  "
+  datacolor="
+    s/line:/$CB$C3&$CR/
+  "
+fi
+
+export LD_LIBRARY_PATH=$pref/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export PATH=$pref/bin:$PATH
+
+cmd=(dlt-convert -a)
+((tailwritten)) && cmd+=( -w )
+((${#filter[@]})) && cmd+=( -f/dev/stdin )
+"${cmd[@]}" "${dltfiles[@]}" | postprocess

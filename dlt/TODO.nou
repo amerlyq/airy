@@ -1,0 +1,83 @@
+FORMAT
+  INDEX TIME TMSTP MSGCNT   ECUID APID CTID MSGTYPE MSGSUBTYPE VNVSTATUS NOARG [PAYLOAD]
+  e.g. 4 2018/01/29 14:37:43.086761 3572658 223   PROJ ID-- ID-- log info V 1 [...]
+
+  INFO
+    * level VIZ. log / control
+    * ecuid ONLY "PROJ" => DFL=hide
+    * $11 vnvst VIZ. V (log), N (control) => DFL=hide
+    * $12 nargs -- different, but usefulness is questionable
+
+
+TODO
+  ? 2018-05-02 [X] which resolution for timestamps, seems like 100us i.e. 10000 ticks per second ?
+  [_] BUG: grep message in stdout due to '\r' in output
+     ~ Binary file (standard input) matches
+  [_] TODO:OPT=: cut body length after joining (i.e. vcard dump is enormous)
+
+
+DEV
+  [_] NEED: convert lines to full format to publish at jira issue comments
+    => store into log file and replace in-place from full log by regex or its unique global index
+    !! when replacing by regex detect duplicates and print warnings
+
+  [_] TODO:DFL=: prepend index,stamp columns by spaces for on-screen alignment
+    ~~~ maybe date,time,msgnum as well (never seen it's exceeding)
+    ~~ log level probably
+    ALT: use ' ' instead '\t' for more terse format -- e.g. specify format string with per-column width
+
+  [_] FIND: correct global order of messages with absolute event timestamps
+    = when _exactly_ dlt assigns timestamp/msgcount/date/globalindex
+      -- where: client/daemon, when: send/create/receive; sleeping threads ordering
+
+  [_] THINK:IDEA: split body into additional subcolumns -- e.g. function tracing or multipart data
+    => allocate full-fledged column names for them
+
+
+IDEA
+  [_] TODO: intermediate cache into file
+    Storable: http://www.perlmonks.org/?node_id=510202
+    https://stackoverflow.com/questions/10684656/store-and-read-hash-and-array-in-files-in-perl
+    ALT: json + jq
+
+  [_] ALT: keep process with parsed structures running and run queries to it
+    NEED: perl shared memory with access to same data struct from different thread/fork
+    (if you need on-fly conversion from dlt-receive and multiple queries at once)
+
+  [_] sort body by length per group
+    <= similar lines must have similar length but some details may be different in body
+  [_] grep-out lines of no interest based on their fingerprint
+    ?? how to grep 'similar' lines -- what is 'similarity' ?
+
+
+E.G.
+  [_] TODO: group by appid+ctxid OR by stamp < ts_prev
+    [_] HACK: use this for grouping
+      $ time r.dlt-view *.dlt Gv 'with error code: OK' | sort -s -k1,1 -k2,2 -k4n,4 -k5n,5 |awk '$1!=a||$2!=b{print""}{a=$1;b=$2}1' V
+
+  [_] IMPL: sort msgs by groups and separate groups by empty lines
+    i.e. $ time r.dlt-view -o :acn,body *.dlt Gv 'with error code: OK' G error SS |awk '$1!=a||$2!=b{print""}{a=$1;b=$2}1' V +'set nowrap'
+         $ time r.dlt-view *.dlt Gv 'with error code: OK' | sort -s -k7,7 -k8,8 -k1,1  |awk '$7!=a||$8!=b{print""}{a=$7;b=$8}1' V
+      == overview of errors from perspective of each application
+
+  [_] BAD: sorting by $5 = msgnum seems foolish -- it's timestamp can actually be lower even if msgnum higher
+    ~~? different threads ?
+
+
+
+BAD: performance
+  $ time r.dlt-convert *.dlt
+    0.04s user 0.02s system 97% cpu 0.066 total
+  $ time r.dlt-view
+    0.31s user 0.06s system 109% cpu 0.338 total
+
+
+Receive logs from UART
+  INFO:CMP
+    ~33.0kB | $ nc -4 127.0.0.1 3490
+    =11.3kB | $ dlt-receive -a
+    ~ 2.5kB | $ dlt-receive -a | gzip
+    ~ 1.0kB | $ ... | dlt-receive -a -f/dev/stdin
+  ATT! 115200 bps for logs (30kiB/s) is not enough !
+  INFO: current UART supports speeds up to 921600 bps
+    https://superuser.com/questions/488449/is-there-any-way-to-check-which-baud-rates-are-supported-on-a-serial-device

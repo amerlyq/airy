@@ -1,0 +1,75 @@
+#!/bin/bash
+set -euo pipefail
+
+trap 'exit' INT TERM
+trap 'echo; kill 0' EXIT
+
+apid=${1:-ID}
+ctid=${1:-IDv2}
+
+pref=${CMAKE_PREFIX_DIR:-/work/_mirror/_prefix-host}
+socket='192.168.1.100'  # :3490
+savefile=$(date +'log-%Y%m%d_%H%M%S.dlt')
+# savefile=/tmp/dlt.log
+
+# ;; S) socket=$OPTARG    #% S:= socket to connect (DFL=192.168.1.100[:3490])
+# ;; F) savefile=$OPTARG  #% F:= /path/to/file to save logs from socket (DFL=./log-$DATE.dlt)
+
+[[ $socket =~ : ]] && export DLT_CLIENT_ENV_DAEMON_TCP_PORT=${socket##*:}
+
+# DEV:(-D/-L3):
+#   * send dlt-control to switch log level
+#   * always save .dlt intermediate file to use in dlt-viewer by others
+#   * immediately print it with $ dlt-convert -w
+#   MAYBE: extract appID from filters to send log level change event
+# dlt-control -a 'ID--' -c 'ID--' -d 5 -l 5 -i 0
+# dlt-control -g -o
+# dlt-control -j
+# ((verbose)) && dlt-control -v
+
+# TODO: -a | append/overwrite file specified by -f
+# TODO: -s | single/multiple files when reconnect
+#   => -asf...| append to single on reconnect
+#   => -sf... | overwrite single on reconnect
+#   => -af... | append to previous
+#   => -f...  | append but override on reopen
+
+export LD_LIBRARY_PATH=$pref/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export PATH=$pref/bin:$PATH
+
+## This sets ?global? default log level
+# dlt-control -a ID -d 5 -l 5 -i 0 "${socket%:*}"
+dlt-control -a "$apid" -c ---- -d 5 -l 5 -i 0 "${socket%:*}"
+dlt-control -a "----" -c "$ctid" -d 5 -l 5 -i 0 "${socket%:*}"
+
+# BAD: dlt-receive file/stdout output is buffered
+#   !! can't be fixed by "stdbuf"
+> "$savefile"  # HACK: truncate when restart
+# trap echo INT EXIT
+echo "$savefile"
+
+# BUG: on target reboot dlt-receive doesn't reconnect
+#   => socket is broken and must be reopened
+{
+  # filter=('ID ----')
+  # filter=('---- IDv2')
+  # filter=('---- IDv2' 'ID ----')
+  # exec < <(printf '%s\n' "${filter[@]}")
+  # stdbuf -oL -eL dlt-receive -f/dev/stdin -o "$savefile" "$@"
+  stdbuf -oL -eL dlt-receive -o "$savefile" "${socket%:*}"
+} & pid=$!
+
+tail -f "$savefile" --pid=$pid | LC_ALL=C awk '{
+  l+=length/1024/1024; printf"\rN=%-6d %.2fMiB",NR,l}'
+wait
+
+# DEV: restart if > 5s w/o output
+#   * wrap dlt-receive startup in while true
+#   * ping regularly -- while { sleep 5; kill -USR1 $$; }
+#   * exit pipe if ?awk/bash? line counter have not changed
+#     => BET: if pipe file cursor position not changed
+# (perl) https://unix.stackexchange.com/questions/260906/trap-ctrl-c-in-awk-script
+# http://www.perlmonks.org/bare/?node_id=563063
+# https://blog.booking.com/socket-timeout-made-easy.html
+#   OR [No connection (35s) to ...] maybe with periodically growing dots tail (e.g. each second)
+# 16.04: perl v5.22.1
