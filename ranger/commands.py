@@ -383,7 +383,7 @@ class nrenum(Command):
 class actualee(Command):
     FLST = tmpfile('buffer')
     """:actualee
-    Use '~/.bin/actually' to apply secondary action to file/list
+    Use '~/.local/bin/actually' to apply secondary action to file/list
     """
     def execute(self):
         cmd = ['actualee']

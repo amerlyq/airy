@@ -22,6 +22,10 @@ ln -s  /home/work    /work
 ln -s  ~/Downloads   /_dld
 ln -s  /data/music   ~/.config/mpd/music
 ```
+ALSO
+ * ecrypt your SSH keys
+ * add SSH keys to github/gitlab
+
 
 ## Install ##
 
@@ -70,10 +74,10 @@ airy=~/aura/airy
   git clone 'https://github.com/amerlyq/airy' "$airy")
 
 config=${XDG_CONFIG_HOME:-~/.config}/airy
-[[ -d ~/.bin && -L $config ]] || (cd "$airy" && make install)
+[[ -d ~/.local/bin && -L $config ]] || (cd "$airy" && make install)
 [[ -L $config ]] || (echo 'Err: $config must be symlink'; exit)
 
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
+[[ :$PATH: == *:$HOME/.local/bin:* ]] || export PATH=~/.local/bin:$PATH
 
 repo=$(git rev-parse --show-toplevel)
 linkcp "$repo/prf" "$config/prf"

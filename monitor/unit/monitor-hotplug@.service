@@ -2,7 +2,7 @@
 
 [Unit]
 Description=Udev - Monitor Hotplug - %P
-ConditionFileIsExecutable=%{HOME}/.bin/r.monitor-refresh
+ConditionFileIsExecutable=%{HOME}/.local/bin/r.monitor-refresh
 ## BAD: can't bind to user's xorg.service
 # Requisite=xorg.service
 # After=xorg.service
@@ -21,5 +21,5 @@ Environment=DEVPATH=%I
 # NOTE: it must be loaded into env on login into X
 Environment=DISPLAY=%{DISPLAY}
 Environment=XAUTHORITY=%{HOME}/.Xauthority
-Environment=PATH=%{HOME}/.bin:/usr/local/bin:/usr/bin
+Environment=PATH=%{HOME}/.local/bin:/usr/local/bin:/usr/bin
 ExecStart=/bin/sh -c 'exec r.monitor-refresh'

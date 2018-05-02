@@ -3,7 +3,7 @@ source ~/.shell/profile
 source ~/.shell/func.d/system
 trap_errors
 cwd_script
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
+[[ :$PATH: == *:$HOME/.local/bin:* ]] || export PATH=~/.local/bin:$PATH
 
 group=${AIRY_NAMESPACE-}  # ALT:USE header '# namespace=reelf' similar to '# tags: ...'
 # THINK:DFL: [[ -z $group && $repo != airy ]] && group=${repo##*/}
@@ -34,6 +34,6 @@ if cfgOpt m; then
   case $repo in */devq) pref=q ;; */work) pref=w ;; *) pref=r ;; esac
   # BAD: lame way to introduce new prefix q.* w/o even its necessity ?
   #   -> FIXME:CHG: use automatic '$group' prefix instead of r./q.
-  r.airy-cache-links -g "$group" -t ~/.bin -p "${pref:-?}.%d-"
+  r.airy-cache-links -g "$group" -t ~/.local/bin -p "${pref:-?}.%d-"
   r.airy-cache-alias -g "$group"
 fi

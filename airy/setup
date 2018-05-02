@@ -12,12 +12,12 @@ build=$repo/_build
 ### LINKS ###
 [[ :$PATH: == *:$PWD/bin:* ]] || export PATH=$PWD/bin:$PATH  # :linkcp
 ./ctl/cache-links -t "$build/bin" -q
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH  # :r.airy-*
+[[ :$PATH: == *:$HOME/.local/bin:* ]] || export PATH=~/.local/bin:$PATH  # :r.airy-*
 
 linkcp -q {,~/.}shell
 linkcp -q ./pathes "$build/cfg/pathes"
 
-linkcp -q "$build/bin" ~/.bin
+linkcp -q "$build/bin" ~/.local/bin
 linkcp -q "$build/cfg" ~/.config/airy
 
 r.airy-cache-alias

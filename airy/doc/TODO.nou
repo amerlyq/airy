@@ -135,6 +135,9 @@ filter-mods
 
 
 maint
+  [_] BAD: too much places with fallback of ~/.bin / ~/.local/.bin if not in PATH
+    $ ag /\.bin\b
+    NEED:CHG: single place to set or ERR if not found
   [_] ADD: -M to specify directory from which (only) to load *mods*
     ALT: sep cmd 'r.airy-mods' for this functional
   2017-02-09 [X] encapsulate deploy system into independent 'airy' mod

@@ -32,7 +32,7 @@ fi
 #   => symlink into ~/.config/airy/env/<group.mod> -- to source by all
 hash ruby 2>/dev/null && PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
 hash cabal 2>/dev/null && PATH=~/.cabal/bin:$PATH
-PATH=~/.bin:$PATH
+PATH=~/.local/bin:$PATH
 export PATH
 # Deduplicate
 # if hash awk 2>/dev/null; then

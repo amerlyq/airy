@@ -31,7 +31,7 @@ function _jh-prev-result() {
 
 zle -C amer-coplete-bin menu-complete _amer-coplete-bin
 function _amer-coplete-bin() {
-    cmd_output_buf=$(cd ~/.bin && ls **/*(.x))
+    cmd_output_buf=$(cd ~/.local/bin && ls **/*(.x))
     set -A hlist ${(@s/
 /)cmd_output_buf}
     compadd - ${hlist}

@@ -85,7 +85,7 @@ dispatch() { local src=${1:?} dst=${2:?}
 }
 
 
-bin=$(readlink -m ~/.bin)
+bin=$(readlink -m ~/.local/bin)
 ((quiet)) || exec > >(sed -r "
   s@$bin/@* @g
   s@(^|\W)$HOME@\1~@g

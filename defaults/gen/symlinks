@@ -10,7 +10,7 @@ trap_errors
 #   ALT: run once before system install and once after
 
 if distro arch; then
-  mklink() { linkcp "$1" ~/.bin/"$2"; }
+  mklink() { linkcp "$1" ~/.local/bin/"$2"; }
 elif distro ubuntu; then
   mklink() { update-alternatives --get-selections | grep -q "^$2.*$1\$" \
     || sudo update-alternatives --set "$2" "$1"; }

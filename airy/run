@@ -22,7 +22,7 @@ defaults=$(( !${#mods[@]} && !${#skip[@]} ))
 ### Environment
 airy=$(dirname "$(readlink -e "$0")")
 "$airy/setup" -m  # BAD!RFC: dirty code duplication
-[[ :$PATH: == *:$HOME/.bin:* ]] || export PATH=~/.bin:$PATH
+[[ :$PATH: == *:$HOME/.local/bin:* ]] || export PATH=~/.local/bin:$PATH
 [[ -d ${TMPDIR:=/tmp/${LOGNAME-}} ]] || mkdir -p "$TMPDIR"
 export TMPDIR
 
