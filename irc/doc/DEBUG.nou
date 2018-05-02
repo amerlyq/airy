@@ -1,0 +1,20 @@
+Telnet IRC
+  REF
+    http://archive.oreilly.com/pub/h/1963
+    https://blog.initprogram.com/2010/10/14/a-quick-basic-primer-on-the-irc-protocol/
+
+  | NICK mynick
+    ! repeat with another nick if ERR:e.g. :kornbluth.freenode.net 433 * Paul :Nickname is already in use.
+  | USER myuser 0 * :
+  | USER myuser 0 * :<Real Name>
+    where 0 = bit mask
+  Ack(staying alive) = bounce same msg back
+    -> | PING :PinglBee
+    <- | PONG :PinglBee
+  | JOIN &bitlbee
+  | PRIVMSG #channel :hello
+  | PRIVMSG someuser :hi
+  | PRIVMSG &bitlbee :help
+  | QUIT
+  | QUIT :I'm leaving...
+    ERROR :Closing Link: myuser (Client Quit)

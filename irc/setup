@@ -6,12 +6,14 @@ source ~/.shell/func.d/cfgsetup
 # /secure passphrase ********
 # /secure set znc_user xxxxxxxx
 # /secure set znc_pass ********
+# /secure set bitlbee_pass ********
 
 
 ### GENS ###
 # TEMP:REM: can't suppress passphrase prompt to update settings through script
 #   => REQ make issue with desired behavior
 if cfgOpt r; then
+  # NOTE: "export IRC_NICK" won't generate error if var doesn't exist
   export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
   export IRC_ZNC="${IRC_ZNC:?}" IRC_ZNC_FP="${IRC_ZNC_FP:?}"
 

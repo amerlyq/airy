@@ -1,5 +1,4 @@
 REF
-  https://en.wikipedia.org/wiki/Internet_Relay_Chat
   http://www.chiark.greenend.org.uk/doc/weechat-doc/html/weechat_faq.en.html
 
 LIOR
@@ -12,30 +11,20 @@ LIOR
     $ infocmp -L1
 
 SEE
-  https://www.reddit.com/r/archlinux/comments/3gv77g/why_do_we_use_irc_still/
   http://askubuntu.com/questions/743/coolest-looking-terminal-irc-client
   Statistics for IRC logs
     http://pisg.sourceforge.net/
 
-SEIZE
-  https://wiki.archlinux.org/index.php/WeeChat
-  Solarized
-    http://benoliver999.com/2014/02/18/weechatconf/
-
-
-Setup
-  https://gist.github.com/ffledgling/5768485
-  http://paquier.xyz/manuals/archlinux/misc-configuration/irssi/
-  http://askubuntu.com/questions/61549/how-do-i-configure-irssi
-  + http://pbraun.nethence.com/unix/chat/irssi.html
-  http://misc.nybergh.net/pub/irssi/config.example
-  https://guides.fixato.org/setting_up_weechat.html
-  2017-10-06 [X] https://zanshin.net/2015/01/10/a-guide-for-setting-up-weechat-and-bitlbee/
 
 TODO
+  [_] TRY:ADD: reddit channels in IRC == https://snoonet.org/ircservers
+  [_] FIND: escaping "double-quotes" inside options
+    e.g. /set irc.server.bitlbee.command "/exec -nosh -nobg -nostdin -norc -noln -pipe \"/msg nickserv identify\" r.query-passwd irc/$server"
   [_] BUG: it tries to highlight "--" on the left when nick is found on the right
     │13:42:51 freenode  -- | NickServ (NickServ@services.): You are now identified for amerlyq.
     │[amer3yq(Zi)] Invalid commandline: Unknown option --3HL)
+    MAYBE: problem from "nick highlight" plugin -- it tries to highlight "--" treated as <nick> which mentioned my name
+      ~~ ?solution? -- disable highlight on the control channel #1
   [_] open weechat + ZNC BUT w/o connectiong to all #50 channels
     => so I could ask fast only single channel a time
   [_] BUG: some meta-<key> don't work in 'st'
@@ -92,9 +81,11 @@ TODO
     http://superuser.com/questions/528816/how-to-hide-public-ip-adress-on-irc-channel
     http://superuser.com/questions/564983/how-do-i-hide-my-username-in-irc
 
+
 Code of conduct
   Don't use PM directly -- ask for them in common chat and wait on them
     READ: https://www.drupal.org/irc/usage
+
 
 USAGE
   REF
