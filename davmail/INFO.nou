@@ -2,6 +2,9 @@
 
 INFO: "davmail" sync speed is ~100 mail / min
 
+ALT: enable IMAP on Exchange
+  https://technet.microsoft.com/en-us/library/bb691018(v=exchg.160).aspx
+  https://kb.intermedia.net/article/824
 
 REF
   https://wiki.archlinux.fr/Davmail
@@ -37,7 +40,14 @@ BAD
   Slow
     https://unix.stackexchange.com/questions/293460/reading-exchange-email-with-mutt-and-davmail
   Security
-    need to get a server certificate in PKCS12 or JKS format and add it in the key store section in DavMail settings, see SSL Setup.
+    [_] need to get a server certificate in PKCS12 or JKS format and add it in the key store section in DavMail settings, see SSL Setup.
+      REF http://davmail.sourceforge.net/sslsetup.html
+        http://davmail.sourceforge.net/faq.html#Security
+      TODO: generate /etc/ssl/davmail.pem in setup once
+      gpgsm: TUT https://lists.gnupg.org/pipermail/gnupg-devel/2011-March/025989.html
+        https://www.gnupg.org/documentation/manuals/gnupg/Howto-Create-a-Server-Cert.html
+      openssl: https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-apache-on-arch-linux
+        +++ TUT https://www.8host.com/blog/nastrojka-shlyuza-obmena-davmail-na-servere-debian-7/
 
 E.G.
   url: https://outlook.office365.com/EWS/Exchange.asmx
