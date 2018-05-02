@@ -1,0 +1,74 @@
+%%% DEBUG
+
+Scan
+  $ sudo iw --debug dev wlo1 scan L
+
+2017-09-05 [X] WiFi debug / manual
+  Create config
+  $ wpa_passphrase 'WorkNet' 'work-mobile' | sudo tee /etc/wpa_supplicant/mobile.conf
+  $ sv /etc/wpa_supplicant/mobile.conf
+    ctrl_interface=/run/wpa_supplicant
+    update_config=1
+    network={
+      # mac => *:21:32
+      ssid="WorkNet"
+      # psk="work-mobile"
+      psk=32ac6a5b86777cacb7433da644a55997716ca96b98be49ff42415c5c213a6fff
+      identity="work-mobile"
+      password="passwd"
+      # key_mgmt=IEEE8021X
+      # eap=PEAP
+      # phase2="autheap=MSCHAPV2"
+      # disabled=1
+    }
+  DEBUG: read msgs -- to determine what is necessary to add into config for it to work
+    $ sudo wpa_supplicant -dd -i wlo1 -c /etc/wpa_supplicant/mobile.conf
+  When all OK -- get IPv4 to check if inet itself works
+    $ sudo dhcpcd wlo1
+    $ curl https://example.com
+
+
+%%% Ethernet
+  => NEED: login once in browser for 12_h
+  => Install Certs
+  Get MAC
+    $ ip link show dev enp0s25
+    OR $ cat /sys/class/net/enp0s25/address
+
+
+%%% Guest WiFi
+2017-09-08 [X] work-guest
+  $ sudo ip link set wlo1 up
+  $ sudo iw --debug dev wlo1 connect WorkGuest
+  $ sudo dhcpcd wlo1
+  Login-at (enable scripts): work-guest :: ggXGPC
+    https://1.1.1.1/login.html?redirect=example.com/
+    Please be aware that in case of access to the internet resources from this machine you need to do authentication in Check Point every 12 hours.
+    It can be done manually by command:
+      $ ldapsearch -D "user@$company.com" -x -w "passwd" -b "ou=users,ou=unq,ou=$company,dc=$country,dc=$company,dc=com" -h $ip > /dev/null
+  netctl
+   Description='A simple open wireless connection'
+   Interface=wlo1
+   Connection=wireless
+   Security=none
+   ESSID='WorkGuest'
+   IP=dhcp
+
+
+%%% netctl
+2017-09-05 [X] WiFi netctl / automatic
+  $ sudo cp /etc/netctl/examples/wireless-wpa-configsection /etc/netctl/wifi_dhcp
+  $ sudo vim /etc/netctl/wifi_dhcp
+    Description='A wireless connection using a custom network block configuration'
+    Interface=wlo1
+    Connection=wireless
+    Security=wpa-configsection
+    IP=dhcp
+    WPAConfigSection=(
+        'ssid="WorkNet"'
+        '#psk="work-mobile"'
+        'psk=32ac6a5b86777cacb7433da644a55997716ca96b98be49ff42415c5c213a6fff'
+        'identity="work-mobile"'
+        'password="passwd"'
+    )
+  $ netctl enable wifi_dhcp
