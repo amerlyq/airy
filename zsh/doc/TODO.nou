@@ -5,10 +5,12 @@ REF
   >>> [_] https://grml.org/zsh/zsh-lovers.html
 
 DEBUG
-  Debug work of prompt
+  prompt internals and init details
     https://unix.stackexchange.com/questions/813/how-to-determine-where-an-environment-variable-came-from
-    $ zsh -xl
+    $ zsh -xl 2>&1
     $ PS4='+$BASH_SOURCE> ' BASH_XTRACEFD=7 bash -xl 7>&2
+  init files order
+    $ zsh -o sourcetrace
 
 Plugins
   [_] TRY: zplug
