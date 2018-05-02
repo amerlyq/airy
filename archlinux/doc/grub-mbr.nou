@@ -59,8 +59,8 @@ arch-chroot /mnt /bin/bash
     ## INFO: :<blkid /dev/sda5 OR :<lsblk -dno UUID /dev/sda5
     # GRUB_CMDLINE_LINUX="cryptdevice=UUID=<UUID>:luks"
     ## HACK: for /boot inside LUKS
-    # GRUB_ENABLE_CRYPTODISK=y
     # GRUB_PRELOAD_MODULES="part_gpt part_msdos lvm"
+    # GRUB_ENABLE_CRYPTODISK=y
     # GRUB_DISABLE_RECOVERY=true
     # GRUB_DISABLE_SUBMENU=true
     # GRUB_DISABLE_OS_PROBER=true

@@ -13,6 +13,7 @@ Type=forking
 User=nobody
 ## BET: move/mount dicts directly to /usr/share/dictd instead of keeping on shared media partition
 # Group=users
+# CMP: with /etc/conf.d/dictd
 ExecStart=/usr/bin/dictd --pid-file %t/%P/%P.pid --config /etc/dict/dictd.conf -- -s
 # EXPL: 143 = 128 + 15(SIGTERM)
 SuccessExitStatus=0 143

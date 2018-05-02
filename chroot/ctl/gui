@@ -1,0 +1,9 @@
+#!/bin/sh -eu
+exec r.chroot-auto \
+  DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+  DISPLAY="$DISPLAY" \
+  "$@"
+
+# exec r.t -e r.chroot-gui "$@"
+# ALT:BAD: hard to close many panes -- <C-l>&y
+# exec r.t -e sh -c 'tmux set -w remain-on-exit on; "$@"' "$0" r.chroot-with-dbus "$@"

@@ -49,6 +49,7 @@ Add
     $ jiracli --issue-type-list
   add single (5-args)
     $ jiracli --issue-create project-key issue-type summary labels components
+      e.g. $ jiracli --issue-create MYPROJ Feature MyDescription improvement MyDomain
     $ jiracli -c MYPROJ "Dev Bug" "my test summary" "abc,def" "xxx,yyyy"
       => EDITOR will be opened to input "Description"
       https://github.com/toabctl/jiracli/issues/51
@@ -69,6 +70,7 @@ Add
       * sub-task-3 summary  # => each gets child-type
       * sub-task-4 summary
   pipe tasks tree directly from vim
+    $ vipe </dev/null | jiracli --issues-create "$pj" "$ptype" "$ctype" /dev/stdin
     $ vipe </dev/null | jiracli --issue-parent MYPROJ-1111 --issues-create MYPROJ Task Sub-task /dev/stdin
       * sub-task-1
       * sub-task-2

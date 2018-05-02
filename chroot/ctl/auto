@@ -1,0 +1,5 @@
+#!/bin/sh -eu
+if test -s /etc/debian_chroot
+then exec env "$@"
+else exec r.chroot "$@"
+fi

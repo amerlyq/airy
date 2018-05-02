@@ -20,6 +20,15 @@
     + https://forums.gentoo.org/viewtopic-t-838198-start-0.html
     ++ http://www.bog.pp.ru/work/linux.html#zram
     => MAYBE activate on build server, as it's better than swap
+    REF https://www.kernel.org/doc/Documentation/blockdev/zram.txt
+    READ:EXPL https://lwn.net/Articles/454795/
+    https://stackoverflow.com/questions/45798618/how-does-the-memory-allocation-size-works-for-zram
+      EXPL http://rdiez.shoutwiki.com/wiki/Linux_zram#How_zram_Swapping_Works
+    ALT: zsmalloc -- another memory allocator
+      https://lwn.net/Articles/474880/
+    ALT: zcache -- store "cached pages of opened files" in RAM
+      https://unix.stackexchange.com/questions/17879/cleancache-vs-zram/19383
+        BUT: .data/.bss/malloc() still must be sent to swap
   rsync  SSD <-> RAM
     -> $ rsync -av /var/ramdisk-backup/ /mnt/ramdisk/
     <- $ rsync -av --delete --recursive --force /mnt/ramdisk/ /var/ramdisk-backup/

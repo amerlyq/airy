@@ -2,6 +2,7 @@ REF :: serial == COM-port > RS-232 > UART
   http://www.armadeus.org/wiki/index.php?title=Serial_ports_usage_on_Linux
   READ http://tldp.org/HOWTO/Serial-HOWTO.html
 
+
 BET: use terminal directly w/o minicom/picocom
   INFO: The "stty" command should work, unless another program is interfering.
     A common culprit is gpsd which looks for GPS devices being plugged in.
@@ -36,6 +37,17 @@ HACK: comment/tag serial output
     $ _c $comment
   Save whole scrollback of original terminal
     <C-l><A-S-p>
+
+
+DEBUG
+  Compare chars
+    $ cat /dev/ttyUSB3 | stdbuf -oL -eL tr -cd '[:graph:][:space:]' | stdbuf -oL -eL tee >/dev/tty | xxd
+    ERR: \n] => somebody uses newline where he must not
+  Measure stream speed
+    $ pv -ar /dev/ttyUSB3 >/dev/null
+  Limit speed
+    https://superuser.com/questions/239893/how-to-rate-limit-a-pipe-under-linux
+    $ pv -L 3k # OR $ throttle -k 3
 
 
 |community/lrzsz|
