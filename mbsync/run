@@ -1,7 +1,8 @@
 #!/bin/bash -eu
 #%USAGE: $ ./$0 [<account>] [-- [<mbsync_args>]]
-#% * sync inbox $ r.mbsync -- inbox
-#% * pull new   $ r.mbsync -- -q new
+#% * sync all   $ r.mbsync -- all
+#% * sync inbox $ r.mbsync -- -qqV inbox
+#% * pull new   $ r.mbsync -- -qq new
 #%
 #%DEBUG pull    $ r.mbsync -- -qV --pull-new new
 #% -a|--all     # all channels
@@ -16,7 +17,8 @@ source ~/.shell/profile
 (($#)) || set -- "$acc"
 
 cfg=${XDG_CONFIG_HOME:-$HOME/.config}/mbsync/acc/"$acc"
-mdir=${MAIL:-${MAILDIR:-${MAILROOT:-$HOME/.mail}/$acc}}
+# mdir=${MAIL:-${MAILDIR:-${MAILROOT:-$HOME/.mail}/$acc}}
+mdir=${MAILROOT:-$HOME/.mail}/$acc
 mkdir -p "$mdir"
 
 # TODO: special config for polling only new and indexing
