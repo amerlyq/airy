@@ -1,0 +1,23 @@
+NOTE: you must log off bitlbee to $ rm -rf /var/lib/bitlbee
+  TRY: log-in, take over session and quit before rm-rf
+  BAD: you have no permissions over /var/lib/bitlbee
+
+ALT:BAD:
+  $ weechat --dir "$tmp" --no-connect --no-script "irc://${BITLBEE_USER:?}@localhost:6667" </dev/tty >/dev/tty
+  * hardcoded assumption of "weechat" frontend
+  * must use tty, can't redirect -- interferes with scripting
+
+ALT: connect to server directly by protocol
+  https://www.linuxjournal.com/content/more-using-bashs-built-devtcp-file-tcpip
+  https://serverfault.com/questions/183157/send-message-to-irc-channel-from-bash
+  BAD: can't sleep/wait on output in managable way
+   exec 3<> /dev/tcp/localhost/6667
+   cat >&3 <<EOT
+   NICK ${bitlbee_user:?}
+   USER ${bitlbee_user:?} 0 * :
+   PRIVMSG &bitlbee :register ${bitlbee_pass:?}
+   PRIVMSG &bitlbee :identify ${bitlbee_pass:?}
+   PRIVMSG &bitlbee :yes
+   EOT
+   cat <&3
+   exec 3>&-

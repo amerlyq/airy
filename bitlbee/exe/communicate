@@ -1,0 +1,67 @@
+#!/usr/bin/expect -nNf
+
+# CHECK: maybe no need for funcs -- use DFL backtrace on exception
+proc post {text} { send "PRIVMSG &bitlbee :$text\r" }
+proc die {reason} { puts "Err: $reason"; exit 1 }
+proc assert {args} { foreach var $args {
+    if {![info exists ::$var]} { die "'$var' must exist" }
+    set v [uplevel set $var]
+    if {$v eq ""} { die "$var='$v'" }
+}}
+
+if { $argc > 0 } { set cfgdir [lindex $argv 0] }
+assert cfgdir
+
+## SECU! don't supply user/passwd through cmdline
+# NEED:USE: at least "bitlbee <user> <passwd>"
+while {[gets stdin line] >= 0} {
+  scan $line "bitlbee %s %s" bitlbee_user bitlbee_pass
+  break
+}
+assert bitlbee_user bitlbee_pass
+
+# Raw communication with IRC bitlbee
+set irc [socket localhost 6667]
+fconfigure $irc -buffering line
+spawn -open $irc
+
+expect ":BitlBee-IRCd initialized"
+send "NICK $bitlbee_user\r"
+send "USER $bitlbee_user 0 * :\r"
+
+expect -re "PRIVMSG &bitlbee .* identify yourself"
+post "set auto_connect false"
+
+## HACK: delete your account for clean re-configure
+# post "drop $bitlbee_pass"
+post "register $bitlbee_pass"
+post "identify $bitlbee_pass"
+
+# ATT: must take over other session -- otherwise settings won't be saved
+expect {
+  "PING :PinglBee" { send "PONG :PinglBee\r"; exp_continue }
+  "take over this session?" {
+    puts "!!! Trying to take over the session !!!\r"
+    post "yes"
+    exp_continue
+  }
+  "successfully taken over" { exp_continue }
+  "PRIVMSG &bitlbee :Password accepted" { puts "!!!!!!!!!! YES\r" }
+}
+
+while {[gets stdin line] >= 0} {
+  scan $line "%s %s %s" proto user pass
+  assert proto
+  puts -nonewline "\[$proto\] "
+  ## TODO: skip lines del/add account <= if both user/pass not exist
+  assert user pass
+  ## DEV: http://wiki.tcl.tk/367
+  # submit "$cfgdir/$proto.conf"
+  puts "$user : $pass"
+  ## BAD: what to do with "account on" which requires "/oper" or other blocking ops?
+}
+
+post "set auto_connect true"
+post "save"
+send "QUIT\r"
+expect eof
