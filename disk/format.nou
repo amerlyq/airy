@@ -21,3 +21,9 @@ Flash drive
     $ sudo mkfs.ext4 /dev/sda1
     OR $ sudo mkfs.vfat /dev/sdb1
       NEED: |core/dosfstools|
+  Labels (per each fs-type)
+    https://wiki.archlinux.org/index.php/Persistent_block_device_naming#by-label
+    btrfs: $ btrfs filesystem label /dev/XXX <label> using btrfs-progs
+    ext4:  $ e2label /dev/XXX <label> using e2fsprogs
+    vfat:  $ fatlabel /dev/XXX <label> using dosfstools
+    ...

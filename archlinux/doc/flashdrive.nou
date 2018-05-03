@@ -1,0 +1,34 @@
+%%%% ArchIso on FlashDrive
+
+Simple (install ArchLinux and restore drive afterwards)
+  $# lsblk -ao NAME,HOTPLUG,SIZE,ROTA,FSTYPE,STATE,RM,LABEL,TYPE,MOUNTPOINT
+  $# dd bs=4M if=archlinux-2018.05.01-x86_64.iso of=/dev/sdb status=progress oflag=sync
+  ...
+  $# wipefs --all /dev/sdb
+  $# parted -s -a opt /dev/sdb mklabel msdos
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 1MiB 100%
+  $# mkfs.vfat /dev/sdb1
+
+
+Separate partition on drive for ArchLinux
+  $# parted -s -a opt /dev/sdb mklabel msdos
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 1MiB 6.5GiB
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 6.5GiB 100%
+  $# parted -s -a opt /dev/sdb set 2 boot on
+
+  $# mkfs.vfat /dev/sdb1
+  $# mkfs.fat -F 32 /dev/sdb2
+  $# fatlabel /dev/sdb2 ARCH_201805
+  $# sudo blkid | grep '/dev/sdb2'
+
+  $# mkdir -p /mnt/{iso,usb}
+  $# mount -o loop archlinux-2018.05.01-x86_64.iso /mnt/iso
+  $# mount /dev/sdb2 /mnt/usb
+  $# cp -a /mnt/iso/* /mnt/usb
+  $# sync
+  $# umount /mnt/iso
+
+  $# paci syslinux
+  $# cp -f /usr/lib/syslinux/bios/*.c32 /mnt/usb/arch/boot/syslinux
+  $# extlinux --install /mnt/usb/arch/boot/syslinux
+  $# umount /mnt/usb

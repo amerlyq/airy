@@ -33,25 +33,34 @@ genfstab -pU /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt /bin/bash
 {
+  ln -svf /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+  hwclock --systohc --utc
   # uncomment 'en_US.UTF-8'
   vis /etc/locale.gen
   locale-gen
   echo LANG=en_US.UTF-8 > /etc/locale.conf
   export LANG=en_US.UTF-8
-  ln -svf /usr/share/zoneinfo/Europe/Kiev /etc/localtime
-  hwclock --systohc --utc
 
   echo myhost > /etc/hostname
   vis /etc/hosts  # add 'myhost' on right of 'localhost'
-  cp /etc/netctl/{examples/ethernet-dhcp,eth_dhcp}
+  cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/eth_dhcp
   # cp /etc/netctl/{examples/ethernet-static,eth_static}
-  vis /etc/netctl/eth_dhcp  # CHG ifc by results of ':r!ip link'
+  vis /etc/netctl/eth_dhcp  # CHG ifc by results of ':r!ip link' OR ':<ip link'
   netctl enable eth_dhcp
 
-  # CHG: HOOKS="base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck"
+  # CHG: uncomment 'Color' and '[multilib]'
+  vis /etc/pacman.conf
+  pacman -Syy
+
+  # only if Intel SEE /proc/cpuinfo
+  # pacman -S intel-ucode
+  # NEED: again $ grub-mkconfig -o /boot/grub/grub.cfg
+
+  # CHG: HOOKS=(base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck)
   vis /etc/mkinitcpio.conf
   mkinitcpio -p linux
 
+  # NEED:(out of chroot): mount --bind /run /mnt/hostrun  # REQ for grub-mkconfig
   {
     vis /etc/default/grub
     # GRUB_TIMEOUT=0
@@ -75,9 +84,6 @@ arch-chroot /mnt /bin/bash
     umount /run/lvm && rmdir -v /run/lvm
   }
 
-  # CHG: uncomment 'Color' and '[multilib]'
-  vis /etc/pacman.conf
-
   # VIZ. list all users: sudo passwd -Sa
   myuser=...
   passwd
@@ -89,6 +95,7 @@ arch-chroot /mnt /bin/bash
   {
     # sudo usermod -s "$(which zsh)" "$(whoami)"
   }
+
 }
 
 ## Clean-up

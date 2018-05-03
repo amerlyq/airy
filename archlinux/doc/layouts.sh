@@ -1,6 +1,9 @@
 # vim: ft=sh
 # NOTE: mixed btrfs + snapshots layout
 
+# Disable PC beep
+setterm -blength 0
+
 # ALSO:
 # http://www.davideolianas.com/install-arch-linux-on-btrfs-subvolume-inside-luks-in-uefi.html
 # https://gist.github.com/broedli/4f401e0097f185ba34eb#1-setup-ssh
@@ -102,7 +105,7 @@ mkswap -L swap -f /dev/mapper/ws-swap
 mkfs.btrfs -L root -f /dev/mapper/ws-root
 mkfs.ext4 -L pkgs /dev/mapper/ws-pkgs
 mkfs.btrfs -L user -f /dev/mapper/ws-user
-mkfs.ext4 -L data /dev/mapper/ws-data
+mkfs.btrfs -L data -f /dev/mapper/ws-data
 mkfs.btrfs -L work -f /dev/mapper/ws-work
 
 
@@ -145,6 +148,14 @@ umount /mnt
 # └─@snapshots   /mnt/home/user/.snapshots
 
 
+## NOTE: create data btrfs layout (if used btrfs instead of ext4)
+mount -o noatime,autodefrag /dev/mapper/ws-data /mnt
+btrfs subvolume create /mnt/@
+mkdir -vp /mnt/@/vm
+chattr +C /mnt/@/vm
+umount /mnt
+
+
 ## NOTE: create work btrfs layout
 mount -o noatime,compress=lzo,autodefrag /dev/mapper/ws-work /mnt
 btrfs subvolume create /mnt/@
@@ -159,14 +170,14 @@ myuser=...
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-user /mnt/home/${myuser:?}
 mount -o noatime,compress=lzo,autodefrag,subvol=@snapshots /dev/mapper/ws-user /mnt/home/${myuser:?}/.snapshots
 swapon /dev/mapper/ws-swap
-mount /dev/mapper/ws-data /mnt/data
+mount -o noatime,autodefrag,subvol=@ /dev/mapper/ws-data /mnt/data
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-work /mnt/work
 
 
-chown -R root:users /data /work
-chmod -R 770 /data /work
-# NEED:(music): for mpd install
-mkdir -vp /data/{_dld,music,vm}
+chown -R root:users /mnt/data /mnt/work
+chmod -R 770 /mnt/data /mnt/work
+# NEED:(music): for mpd install (after user creation)
+mkdir -vp /data/{_dld,music}
 
 ## FIXME: possible only after creating user
 chown -R ${myuser:?}:${myuser:?} /home/${myuser:?}{,sdk,.cabal,.cache}
@@ -179,7 +190,8 @@ chmod -R 700 /home/${myuser:?}{,sdk,.cabal,.cache}
 timedatectl set-timezone Europe/Kiev
 timedatectl set-ntp true
 pacstrap /mnt  base base-devel lvm2 btrfs-progs grub snapper
-## FIX: manually remove swap of host system
+## FIX: manually remove swap of host system (if necessary)
 genfstab -pU /mnt >> /mnt/etc/fstab
 
-# pacstrap /mnt ntp sudo polkit wget git zsh vis
+# pacstrap /mnt ntp sudo polkit wget git zsh vis neovim openssh
+# arch-chroot /mnt
