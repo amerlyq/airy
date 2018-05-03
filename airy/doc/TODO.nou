@@ -265,6 +265,12 @@ overlay
     e.g. $ linkcp -ct "/etc/X11/xorg.conf.d" ./tmpl/90-monitor-xrandr.conf
   [_] USE: path-like fallback instead of unordered symlinks in ~/.config/airy/mod
     i.e. AIRY_MODS_PATH=/work/mod:/path/to/dev:/path/to/private:/path/to/airy
+    * arbitrary order
+      MAYBE: keep auto-symlinks as before
+      OR: use aliased hashmap mods_path=([w]=/work/mod [r]=~/.local/airy)
+    !! if *mod* is found in multiple paths -- emit fatal error
+      <= when processing AIRY_MODS but before actual execution
+      => force user to specify "repo/mod" instead of short "mod" to resolve ambiguity
 
 
 setup

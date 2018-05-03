@@ -1,0 +1,35 @@
+NOTE repo layout
+  core (?repo?)
+    cfgs
+    docs
+    tasks
+    scripts
+  sync (private copying)
+    secure (highly sensitive info)
+    large unique (irreplaceable) binary artifacts
+    vast customized environments for tasks to reproduce
+  cache (non-repo, non-sync)
+    renewable builds
+    renewable environments
+    unimportant artifacts
+
+
+DEV working task / layout deployment
+  Create
+    $ r.work bug
+    $ r.work new
+    $ r.work task
+
+  ALT: $ make bug
+    BUT it requires Makefile per each repo (=non-generic=)
+
+  Make and link dir for artifacts
+    VIZ.
+      _build
+      _sync
+    NOTE: .gitignore will skip them -- to prevent user from commiting them into git
+      BUT: they are added as symlinks and $ git add $ to be commited
+        <= to track $date and $realpath of symlink
+
+  Flags
+    -Q|--query -- get path derived from prf/env vars
