@@ -1,0 +1,12 @@
+%%%% Sync by SSH
+
+TUT https://kyup.com/tutorials/copy-files-rsync-ssh/
+
+-> remote
+  $ rsync -e "ssh -p2222" -avh --no-group --stats --progress /work/doc user@host:/work
+  $ rsync -e ssh -avh --no-group --stats --progress /work/doc ws:/work
+  $ rsync -e ssh -azvh --delete /work/doc/ ws:/work/doc
+
+<- remote
+  $ rsync -e ssh -avh ws:/work/doc /work
+  $ rsync -e ssh -azvh --delete ws:/work/doc/ /work/doc
