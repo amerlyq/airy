@@ -8,6 +8,10 @@ After=wm.target
 # ConditionHost=!neo
 
 [Service]
+# BUG: red background, flickering
+#   TEMP:FIXED: https://github.com/chjj/compton/issues/477
+Environment=allow_rgb10_configs=false
+
 ExecStart=/usr/bin/compton -d ${DISPLAY}
 TimeoutStopSec=5
 
