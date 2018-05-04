@@ -29,15 +29,22 @@ Config {
 -- FIND: <action> with pressed modifiers (ctrl/shift)
 
 
+--   \<fc=#cc8000>  </fc>\
+--     \<fn=1><action=`r.wm M-o_n` button=3>\
+--       \<action=`mpc next` button=4>\
+--         \<action=`mpc prev` button=5>\
+--           \<action=`mpc toggle` button=1>\
+--             \%mpd%\
+--           \</action></action></action></action></fn>\
+
+--     \<action=`r.audio 1$'\x25'+` button=4>\
+--       \<action=`r.audio 1$'\x25'-` button=5>\
+--         \<action=`r.audio` button=1>\
+--           \ %default:Master%\
+--         \</action></action></action>\
+
 , template = "%UnsafeStdinReader%}{\
   \%wacom%\
-  \<fc=#cc8000>  </fc>\
-    \<fn=1><action=`r.wm M-o_n` button=3>\
-      \<action=`mpc next` button=4>\
-        \<action=`mpc prev` button=5>\
-          \<action=`mpc toggle` button=1>\
-            \%mpd%\
-          \</action></action></action></action></fn>\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%\
   \<fc=#00cc80>  </fc>\
@@ -46,11 +53,6 @@ Config {
     \</action>\
   \<fc=#0080cc>  </fc>\
     \%battery%\
-    \<action=`r.audio 1$'\x25'+` button=4>\
-      \<action=`r.audio 1$'\x25'-` button=5>\
-        \<action=`r.audio` button=1>\
-          \ %default:Master%\
-        \</action></action></action>\
     \<action=`r.backlight-mon-sys -n +` button=4>\
       \<action=`r.backlight-mon-sys -n -` button=5>\
         \<action=`r.backlight-mon-sys -n 30$'\x25'` button=3>\
@@ -83,17 +85,17 @@ Config {
   , "-L", "10", "-l", "#ff0000"
   , "-H", "66", "-h", "#899ca1"
   , "-n", "#b6e354" ] 100 -- #888800
-, Run Volume "default" "Master"
-  [ "-t", "<status> <volume>%"
-  , "-L", "20", "-l", "#b6e354"
-  , "-H", "60", "-h", "#dd6600"
-  , "-n", "#ddffff", "-w2", "--"
-  , "-O", "♪", "-C", "#00dd00"
-  , "-o", "⎋", "-c", "#dd0000" ] 5
-, Run MPD  -- TRY: '[[%artist% - ]%title%]|[%name%]|[%file%]'
-  [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
-  , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
-  ] 50
+-- , Run Volume "default" "Master"
+--   [ "-t", "<status> <volume>%"
+--   , "-L", "20", "-l", "#b6e354"
+--   , "-H", "60", "-h", "#dd6600"
+--   , "-n", "#ddffff", "-w2", "--"
+--   , "-O", "♪", "-C", "#00dd00"
+--   , "-o", "⎋", "-c", "#dd0000" ] 5
+-- , Run MPD  -- TRY: '[[%artist% - ]%title%]|[%name%]|[%file%]'
+--   [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
+--   , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
+--   ] 50
 -- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
 , Run Com "awk" [ "{print$1}", "/proc/loadavg" ] "loadavg" 10
 , Run Com "r.xkb-lang" [ "-N" ] "lang" 10

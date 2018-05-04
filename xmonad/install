@@ -10,7 +10,7 @@ if distro arch; then
   # aur_inst xmonad-git
 
   ## BAD:WARN: sections 'Volume' and 'MPD' break DFL config
-  # pkg_inst xmobar
+  pkg_inst xmobar
 
   # OR:WARN:TEMP: broken cabal after transition static->dynamic
   # pkg_inst 'haskell-unordered-containers'
@@ -19,7 +19,10 @@ if distro arch; then
   # OR:(install by yaourt): ayr_inst haskell-libmpd
   #   remove bytestring, containers, filepath, time
   # cab_inst -d {~/.cabal/packages/hackage.haskell.org/,}libmpd
-  cab_inst -p 'xmobar' xmobar \
-    --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
-  mod_have xmobar
+
+  ## BUG: broken again, now from dbus API update
+  #   https://github.com/jaor/xmobar/issues/346
+  # cab_inst -p 'xmobar' xmobar \
+  #   --flags="with_dbus with_utf8 with_xft with_alsa with_mpd"
+  # mod_have xmobar
 fi

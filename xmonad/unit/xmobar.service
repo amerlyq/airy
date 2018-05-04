@@ -7,8 +7,8 @@ After=xorg.target xmonad.service
 
 [Service]
 SyslogIdentifier=xmobar
-# ExecStart=/usr/bin/xmobar %h/.xmonad/xmobarrc
-ExecStart=/bin/sh -c 'exec %h/.cabal/bin/xmobar %h/.xmonad/xmobarrc'
+ExecStart=/usr/bin/xmobar %h/.xmonad/xmobarrc
+# ExecStart=/bin/sh -c 'exec %h/.cabal/bin/xmobar %h/.xmonad/xmobarrc'
 StandardInput=socket
 
 [Install]
