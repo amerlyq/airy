@@ -22,10 +22,9 @@ source ~/.shell/func.d/cfgsetup
 #   ALT: create 'udev_activate' or r.udev-cfg
 # BAD: idea of auto-plug is counterintuitive for tiling WMs
 # linkcp -ct '/etc/udev/rules.d' unit/95-monitor-hotplug.rules
-
-if cfgOpt u; then
-  sudo udevadm control --reload-rules
-fi
+# if cfgOpt u; then
+#   sudo udevadm control --reload-rules
+# fi
 
 ## NOTE: required only when EDID for monitor is wrong
 ## ATT: "$ Xorg -dpi ..." will override dpi derived from monitor's physical size
