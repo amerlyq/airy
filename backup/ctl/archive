@@ -1,0 +1,65 @@
+#!/bin/bash
+#%USAGE: $ ./$0 [<history|secrets|chat>...]
+set -euo pipefail
+
+## CHG: place into synced dir from profile
+dst=/tmp
+args=( "$@" )
+
+
+## Store all permissions and extended attributes.
+#   (otherwise many programs will stop working!)
+make_backup(){ local f nm=$1
+  ((${#args[@]})) && [[ ! " $nm " =~ " ${args[*]} " ]] && return
+  f=$dst/$nm-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.gz
+  sed -r "
+    s/^\s+//              # indenting spaces
+    /(^#|  # ).*$/s///    # comments (separate and inline)
+    s/\s+$//              # trailing spaces (ALSO: left before comments)
+    /^\s*$/d              # empty lines
+    s|~|$HOME|            # expand home dir
+  " | tar --xattrs -pT- -czvf "$f"
+  # --exclude-from="$fexc"
+}
+
+#%INFO: backup history and other local db (both binary and textual)
+# ALT: use bash array with globs in sep files -- instead of parsing them myself
+ffprf=$(find ~/.mozilla/firefox -maxdepth 1 -type d -name '*.default' -print -quit)
+make_backup history <<EOT
+  ~/.cache/airy/dict-words-en.txt
+  ~/.cache/airy/dict-words-ru.txt
+  ~/.cache/vim/plugins/mru_file
+  ~/.config/mpd/history
+  ~/.config/selfspy/selfspy.sqlite
+
+## cli
+  ~/.cache/gdb_history
+  ~/.cache/zsh/.zhistory
+  ~/.config/radare2/history
+  ~/.bash_history
+
+  ~/.config/VirtualBox
+  # THINK: ~/.cache/vim/cache/bckp
+  # THINK: ~/.cache/vim/cache/undo
+
+## browsers
+  ~/.local/share/qutebrowser/history.sqlite
+  $ffprf/places.sqlite    # bookmarks
+  $ffprf/sessionstore.js  # opened tabs
+  $(find "$ffprf/sessionstore-backups" -maxdepth 1 -type f \( -name '*.js' -o -name '*.js-*' \) -print)
+EOT
+
+
+# BET:DEV:SECU create versioned *tomb* for secrets backup
+make_backup secrets <<EOT
+  ~/.gnupg            # export keys
+  ~/.password-store   # NEED: ~/.gnupg
+  ~/.ssh              # copy keys
+EOT
+
+
+make_backup chat <<EOT
+  # SEP: ~/.mail
+  ~/.purple/logs
+  ~/.weechat/logs
+EOT

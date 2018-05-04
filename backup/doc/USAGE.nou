@@ -1,0 +1,6 @@
+Restore into same paths
+  $ tar --xattrs -xpf $backupfile
+
+Parallel compression and restoration
+  $ pbzip2 /path/to/chosen/directory/etc-backup.tar.bz2
+  $ tar -xvjf etc-backup.tar.bz2 -C /

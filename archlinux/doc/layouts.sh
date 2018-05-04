@@ -174,8 +174,11 @@ mount -o noatime,autodefrag,subvol=@ /dev/mapper/ws-data /mnt/data
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-work /mnt/work
 
 
-chown -R root:users /mnt/data /mnt/work
-chmod -R 770 /mnt/data /mnt/work
+## NOTE: fix shared "users" access for /data
+# sudo find /data -type d -exec chgrp users {} \; -exec chmod g+s {} \;
+chown root:users /mnt/data /mnt/work
+chmod 770 /mnt/data /mnt/work
+chmod g+s /mnt/data
 # NEED:(music): for mpd install (after user creation)
 mkdir -vp /data/{_dld,music}
 

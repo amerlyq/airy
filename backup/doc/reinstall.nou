@@ -1,32 +1,28 @@
 Backup before clean re-install
 
-configs
+secrets
   ~/.gnupg
     = export keys
-  ~/.local/share/qutebrowser/sessions
-  ~/.local/share/qutebrowser/cmd-history
-  ~/.local/share/qutebrowser/history.sqlite
-  ~/.mail
   ~/.password-store
-    = ALSO:NEED: ~/.gnupg
-  ~/.purple/logs
+    = NEED: ~/.gnupg
   ~/.ssh
-    = copy keys / custom config
+    = copy keys
+
+
+chats
+  ~/.mail
+  ~/.purple/logs
   ~/.weechat/logs
-  ~/.bash_history
 
-  ~/.cache/airy/dict-words-en.txt
-  ~/.cache/airy/dict-words-ru.txt
-  ~/.cache/vim/plugins/mru_file
-  ~/.cache/vim/cache/bckp
-  ~/.cache/vim/cache/undo
-  ~/.cache/gdb_history
 
-  ~/.config/mpd/history
-  ~/.config/qutebrowser/quickmarks
-  ~/.config/radare2/history
-  ~/.config/selfspy/selfspy.sqlite
-  ~/.config/VirtualBox
+history
+  SEE:(backup script): $ ./exe/archive history
+    e.g. cmdline history, browser sqlite, other db, vim mru
+
+
+configs
+  /var/lib/bitlbee/*
+    = SEE contacts renames, missed passwords
 
 
 home
@@ -35,7 +31,7 @@ home
   ~/books
     = sync
   ~/chat
-    = see forgotten
+    = see missed from earlier enlisting
   ~/research
     = RFC / copy
   ~/sdk
@@ -45,6 +41,7 @@ home
 
 
 SEE: additional flags, configs, settings per-host
+  /boot/loader/entries/*
   /etc/default/grub
   /etc/netctl/*
   /etc/binfmt.d
@@ -57,12 +54,13 @@ SEE: additional flags, configs, settings per-host
 Pick necessary, sync in other ways
   ~/work
   /chroot
+    = look if anything necessary was inside
   /srv/share
+    = TODO: use only as aggregator for mount points and symlinks
   /_dld
-  /data
+  /data/*
   /work/*
-  /work/_done
+  /work/task.*
   /work/_mirror
-  /work/_seized
   /vm OR /srv/vm
     = /work/_data/vm
