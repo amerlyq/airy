@@ -1,16 +1,78 @@
 #!/usr/bin/expect -nNf
+#%USAGE: $ "$0" /path/to/cfg.d [0|1] <<< ["<protocol> <user> <passwd>\n"]...
 
 # CHECK: maybe no need for funcs -- use DFL backtrace on exception
 proc post {text} { send "PRIVMSG &bitlbee :$text\r" }
-proc die {reason} { puts "Err: $reason"; exit 1 }
 proc assert {args} { foreach var $args {
-    if {![info exists ::$var]} { die "'$var' must exist" }
+    if {![info exists ::$var]} { error "Err: var '$var' must exist" }
     set v [uplevel set $var]
-    if {$v eq ""} { die "$var='$v'" }
+    if {$v eq ""} { error "Err: $var='$v'" }
 }}
 
+proc subvar {text args} {
+  variable g_user
+  variable g_pass
+foreach var $args {
+  if {![regexp "%{$var}" $text match]} continue
+  # if {::$skip_missed_vars} continue
+  # assert $var
+  set text [regsub -all -line "%{$var}" $text [set g_$var]]
+}; return $text }
+
+proc submit {line} { variable g_user; variable g_pass
+  set line [regsub -line "(^\s*#|  # ).*$" $line ""]
+  ## BAD: what to do with "account on" which requires "/oper" or other blocking ops?
+  switch -regexp -matchvar m -- $line {
+    {^$} {}
+    {^/join (.*)} { puts "JOIN [lindex $m 1]" }
+    {^/\S*} { error "Err: IRC command '$m' is not allowed" }
+    default { puts [subvar $line user pass] }
+  }
+}
+
+proc process_file {path} {
+  set cfg [open "$path" r]
+  fconfigure $cfg -buffering line
+  while {[gets $cfg line] >= 0} { submit $line }
+  close $cfg
+}
+
+proc login_bitlbee {user pass} {
+  expect ":BitlBee-IRCd initialized"
+  send "NICK $user\r"
+  send "USER $user 0 * :\r"
+  expect -re "PRIVMSG &bitlbee .* identify yourself"
+  post "set auto_connect false"
+
+  ## HACK: delete your account for clean re-configure TODO: optional
+  # post "drop $bitlbee_pass"
+  post "register $pass"
+  post "identify $pass"
+
+  # ATT: must take over other session -- otherwise settings won't be saved
+  expect {
+    "PING :PinglBee" { send "PONG :PinglBee\r"; exp_continue }
+    "take over this session?" {
+      puts "!!! Trying to take over the session !!!\r"
+      post "yes"
+      exp_continue
+    }
+    "successfully taken over" { exp_continue }
+    "PRIVMSG &bitlbee :Password accepted" { send_user "\n" }
+  }
+}
+
+proc logout_bitlbee {} {
+  post "set auto_connect true"
+  post "save"
+  send "QUIT\r"
+  expect eof
+}
+
+# ==================
+set skip_missed_vars 0
 if { $argc > 0 } { set cfgdir [lindex $argv 0] }
-assert cfgdir
+if { $argc > 1 } { set skip_missed_vars [lindex $argv 1] }
 
 ## SECU! don't supply user/passwd through cmdline
 # NEED:USE: at least "bitlbee <user> <passwd>"
@@ -18,50 +80,20 @@ while {[gets stdin line] >= 0} {
   scan $line "bitlbee %s %s" bitlbee_user bitlbee_pass
   break
 }
-assert bitlbee_user bitlbee_pass
+assert cfgdir bitlbee_user bitlbee_pass
 
 # Raw communication with IRC bitlbee
 set irc [socket localhost 6667]
 fconfigure $irc -buffering line
 spawn -open $irc
+login_bitlbee $bitlbee_user $bitlbee_pass
 
-expect ":BitlBee-IRCd initialized"
-send "NICK $bitlbee_user\r"
-send "USER $bitlbee_user 0 * :\r"
-
-expect -re "PRIVMSG &bitlbee .* identify yourself"
-post "set auto_connect false"
-
-## HACK: delete your account for clean re-configure
-# post "drop $bitlbee_pass"
-post "register $bitlbee_pass"
-post "identify $bitlbee_pass"
-
-# ATT: must take over other session -- otherwise settings won't be saved
-expect {
-  "PING :PinglBee" { send "PONG :PinglBee\r"; exp_continue }
-  "take over this session?" {
-    puts "!!! Trying to take over the session !!!\r"
-    post "yes"
-    exp_continue
-  }
-  "successfully taken over" { exp_continue }
-  "PRIVMSG &bitlbee :Password accepted" { puts "!!!!!!!!!! YES\r" }
-}
-
+## Process rest of protocol credentials from stdin
 while {[gets stdin line] >= 0} {
-  scan $line "%s %s %s" proto user pass
-  assert proto
-  puts -nonewline "\[$proto\] "
-  ## TODO: skip lines del/add account <= if both user/pass not exist
-  assert user pass
-  ## DEV: http://wiki.tcl.tk/367
-  # submit "$cfgdir/$proto.conf"
-  puts "$user : $pass"
-  ## BAD: what to do with "account on" which requires "/oper" or other blocking ops?
+  if {$line eq ""} continue
+  scan $line "%s %s %s" file g_user g_pass
+  send_user "\[$file\]\n"
+  process_file "$cfgdir/$file.conf"
+  send_user "\n"
 }
-
-post "set auto_connect true"
-post "save"
-send "QUIT\r"
-expect eof
+logout_bitlbee

@@ -11,8 +11,11 @@ get_pass(){ local id=irc/${1:?}
 }
 
 cfg="bitlbee ${IRC_USER:?} $(get_pass 'bitlbee')"
-# cfg+=$'\n'common
-# cfg+=$'\n'"skypeweb"
+cfg+=$'\n'
+# cfg+=$'\n'some
+cfg+=$'\n'"common"
+cfg+=$'\n'"hangouts usr"
+cfg+=$'\n'"skypeweb usr psw"
 
 ## TODO: query list of configs from available vars
 # (IFS=; declare -p) | grep -v '\s[A-Z0-9_]\+\b' | sed 's/declare -\S\+//'
@@ -20,4 +23,4 @@ cfg="bitlbee ${IRC_USER:?} $(get_pass 'bitlbee')"
 #   cfg+="$nm ${BITLBEE_$nm_USER:?} $(get_pass "$nm")"
 # done
 
-# "$d/exe/communicate" "$d/cfg" <<< "$cfg"
+"$d/exe/communicate" "$d/cfg" <<< "$cfg"
