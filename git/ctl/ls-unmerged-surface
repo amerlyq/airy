@@ -1,0 +1,23 @@
+#!/bin/bash -eu
+#%USAGE: $ find -type d -printf '%P\n' | egrep --color=always -f <(r.git-ls-unmerged-surface origin/release|sed 's/^/^/;s/$/$|/') L
+set -o pipefail
+
+b=${1:-origin/master}
+rgx=${2:-.}
+startdate=${3:--1 month}
+
+
+git branch -r \
+  --format='%(committerdate:unix)%09%(objectname)%09%(authoremail)' \
+  --sort=-committerdate \
+  --no-merged "$b" -- \
+| awk -vd="$(date +%s -d "$startdate")" \
+  -va="<$(git config user.email)>" \
+  '$1>d && $3!=a {print$2}' \
+| while IFS=$'\t' read -r h; do
+
+  # git --no-pager diff --diff-filter=R --name-only "$b"..."$h" --
+  git --no-pager diff --name-only "$b"..."$h" --
+
+done | sed 's|/[^/]\+$||' | sort -ru
+# | awk 'p!~$0{print} {p=$0}'

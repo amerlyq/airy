@@ -4,10 +4,13 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-linkcp -t ~/.config/git ignore attributes
+linkcp -t ~/.config/git cfg ignore attributes
 
 # Customization
 # http://git-scm.com/docs/git-config
+
+echo "USE: replace name/email for private repo before push:
+  $ r.git-my-repo /path/to/repo"
 
 ### GENS ###
 dst=~/.config/git/config
@@ -18,6 +21,9 @@ if [[ -n "${WORK_NAME:=${MAIN_NAME-}}" &&
     git config --global user.email "$WORK_MAIL"
     # git config --global user.signingkey = C8A2DA6E
 fi
-cat "$PWD/cfg"/* >> "$dst"
+
+for f in cfg/*; do
+  git config --global --add include.path "$f"
+done
 
 echo "W: $dst"
