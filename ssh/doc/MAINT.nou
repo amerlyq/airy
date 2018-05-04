@@ -1,0 +1,17 @@
+%%%% Troubleshooting
+
+LC_ALL
+  = when SSH, you can see msg: "LC_ALL not setted", etc, locale problems
+  REMOTE:
+    $ sudo locale-gen uk_UA.UTF-8 (and all other missing in `locale -a`)
+      OR: sudo dpkg-reconfigure locales
+      OR: sudo apt-get --reinstall install language-pack-de
+      OR: sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+    $ sed 's/^.*AcceptEnv*$/#\0' /etc/ssh/ssh_config
+    $ echo "LC_ALL=en_US.UTF-8" >> ~/.bashrc
+  LOCAL:
+    $ sed 's/^.*SendEnv.*$/#\0' /etc/ssh/ssh_config
+    $ LC_ALL=en_US.UTF-8 ssh...
+    Use only english locales on local machine
+    ALT: insert in ~/.ssh/config
+      Host *\n    SendEnv !LANG !LC_*

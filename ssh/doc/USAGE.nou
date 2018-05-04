@@ -1,0 +1,13 @@
+%%% Keys
+  Add keys
+    $ ssh-add id_rsa
+    $ ssh-add /path/to/my_rsa
+  List cached keys (opened by password)
+    $ ssh-add -l
+  Delete all cached keys
+    $ ssh-add -D
+
+
+%%% Hosts
+  Remove replaced/expired key fingerprint for host
+    $ ssh-keygen -R hostname

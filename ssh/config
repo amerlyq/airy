@@ -1,0 +1,25 @@
+# vim:ft=sshconfig
+
+# NOTE: instead of this config, you can add param for each 'git push'
+#   i.e. $ git ... -key ~/.ssh/git_rsa  # OR only for remote add ?
+##
+# https://unix.stackexchange.com/questions/61655/multiple-similar-entries-in-ssh-config
+
+### Common options
+ControlPath /tmp/%u/%r@%h:%p
+ControlPersist 600
+
+Host *
+    SendEnv !LANG !LC_*
+    # Compression=yes
+    #   SEE: http://unix.stackexchange.com/questions/200239/how-can-i-keep-my-ssh-sessions-from-freezing
+    TCPKeepAlive=yes
+    ServerAliveInterval=120
+    # ServerAliveCountMax=6
+    # NOTE:NEED:(server): /etc/ssh/sshd_config:
+    #   ClientAliveInterval 60
+    #   TCPKeepAlive yes
+    #   ClientAliveCountMax 10000
+
+### Accounts
+Include cfg/*

@@ -7,13 +7,9 @@ Reconnect w/o password until at least one session is alive
     ControlPersist 600
 
 
-Remove replaced/expired key fingerprint for host
-  $ ssh-keygen -R hostname
-
-
 Encrypt keys in PKCS#8 instead of MD5 passphrase
   !5 [_] READ REF https://wiki.archlinux.org/index.php/SSH_keys
-    => to decide on ssh-agent vs gnupg
+    => to decide on CMP ssh-agent vs gnupg
   HACK TUT https://martin.kleppmann.com/2013/05/24/improving-security-of-ssh-private-keys.html
     BAD: md5 $ ssh-keygen -p -f rou_rsa
     BET: $ cd ~/.ssh && openssl pkcs8 -topk8 -v2 des3 -in id_rsa -out id_rsa.new && chmod 600 id_rsa.new
@@ -58,18 +54,3 @@ Connect headless SSH
   = $ sudo ln -svf /bin/bash /bin/sh
   = $ v /etc/host
   = $ ./cfg/dev/chroot/prf/ubuntu-15.10
-
-
-Supported escape sequences:
-  USAGE: *↵~.* to terminate frozen ssh session
-  NOTE: escapes are only recognized immediately after newline.
-    Enter ↵, ~, ?:
-  | ~? | this message (help)
-  | ~. | terminate connection (and any multiplexed sessions)
-  | ~& | background ssh (when waiting for connections to terminate)
-  | ~# | list forwarded connections
-  | ~~ | send the escape character by typing it twice
-  | ~B | send a BREAK to the remote system
-  | ~R | Request rekey (SSH protocol 2 only)
-  | ~C | open a command line
-  | ~^Z| suspend ssh

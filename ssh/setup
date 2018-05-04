@@ -1,6 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: net
 source ~/.shell/func.d/cfgsetup
 
+linkcp -t ~/.ssh config
+
 ./ssh-keys.gen
-./ssh-config.gen

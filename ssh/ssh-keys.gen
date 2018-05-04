@@ -18,20 +18,9 @@ genssh "git" git_rsa
 # genssh "rou" rou_rsa
 
 case "$CURR_PROF" in
-  # work) genssh "$WORK_MAIL" srk_rsa ;;
 laptop) genssh "$MAIN_MAIL" lsir_rsa
         genssh "$MAIN_MAIL" lked_rsa ;;
   home) genssh "$MAIN_MAIL" lked_rsa ;;
 esac
 
 echo "W: ~/.ssh/*_rsa"
-# ===========================================================
-
-# ssh-add "$stdkey"
-# ssh-add "$mykey"
-# ssh-add -l # check your saved keys
-# ssh-add -D # delete all cached keys
-
-## Copy .pub keys to site
-# cat "$stdkey.pub"
-# clip < "$stdkey.pub"

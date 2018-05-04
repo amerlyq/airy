@@ -1,0 +1,13 @@
+Supported escape sequences:
+  USAGE: *↵~.* to terminate frozen ssh session
+  NOTE: escapes are only recognized immediately after newline.
+    Enter ↵, ~, ?:
+  | ~? | this message (help)
+  | ~. | terminate connection (and any multiplexed sessions)
+  | ~& | background ssh (when waiting for connections to terminate)
+  | ~# | list forwarded connections
+  | ~~ | send the escape character by typing it twice
+  | ~B | send a BREAK to the remote system
+  | ~R | Request rekey (SSH protocol 2 only)
+  | ~C | open a command line
+  | ~^Z| suspend ssh
