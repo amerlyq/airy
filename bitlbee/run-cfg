@@ -8,8 +8,10 @@ get_pass(){ r.query-passwd "irc/${1:?}" 2>/dev/null || return 0; }
 
 cfg="bitlbee ${IRC_USER:?} $(get_pass 'bitlbee')
 common
-skypeweb ${MAIN_SKYPE:?} $(get_pass 'skypeweb')
-hangouts ${MAIN_MAIL:?} $(get_pass 'hangouts')
+skype    ${MAIN_SKYPE:?} $(get_pass 'skypeweb')
+hangouts ${MAIN_MAIL:?}  $(get_pass 'hangouts')
+telegram ${MAIN_TELGR:?} $(get_pass 'telegram')
+discord  ${MAIN_MAIL:?}  $(get_pass 'discord')
 "
 
 ## TODO: query list of configs from available vars
@@ -22,5 +24,5 @@ hangouts ${MAIN_MAIL:?} $(get_pass 'hangouts')
 #   -- you must set to DFL value explicitly or delete-and-recreate account beforehand
 #   OR: delete whole /var/lib/bitlbee/*
 
-"$d/exe/communicate" -- -c "$d/cfg" <<< "$cfg"
+"$d/exe/communicate" -- -v -c "$d/cfg" <<< "$cfg"
 # "$d/exe/communicate" -- -r -c "$d/cfg" <<< "$cfg"

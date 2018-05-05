@@ -1,39 +1,71 @@
 #!/usr/bin/expect -nNf
 #%USAGE: $ "$0" [-d|--dryrun] [-v|--verbose] [-r|--renew] \
 #%... [{-c|--cfgdir} /path/to/cfg] [host:port] <<< "<protocol> <user> <passwd>\n..."
-#% NOTE: to connect to server you need at least "bitlbee <user> <passwd>" on stdin
+#% ATT: first stdin line must always be "bitlbee <user> <passwd>"
+#% WARN: don't use "account on" in *.conf, as it may require blocking "/oper" and will timeout
 
+# TALK: This script is masterpiece and writing it was really fun!
+#   But in the retrospective all those efforts and time would better be dedicated
+#   to the original bitlbee codebase -- concentrating on splitting of the /var/lib/bitlbee/<user>.xml
+#   into "secret" (localhost only), "sensitive" (private gitlab) and "general" (public github) parts.
+
+proc echo {args} { send_user -- "[join $args]\n" }
 proc msgraw  {s} { if {$::opts(verbose)} { puts $s }; send "$s\r" }
 proc msgsend {s} { msgraw "PRIVMSG &bitlbee :$s" }
-proc msgauto {s} { if {$::opts(dryrun)} { puts $s } else { msgsend $s } }
+proc msgroot {s} { msgsend "root: $s" }
+proc msgauto {s} { if {$::opts(dryrun)} { puts $s } else { msgroot $s } }
+proc iosync {user} {
+  msgsend "$user: iosync"
+  expect "PRIVMSG $user :iosync\r" { echo --- } timeout { error "iosync timeout" }
+  unset expect_out(buffer)
+}
 
-proc subvar {text} { variable g_user; variable g_pass
+# DEV:TODO: get global auto_connect to restore afterwards
+# proc query_option {option} { }
+
+#% ATT:RQ: depends on "tag == <filename>" i.e. set "tag = %{tag}" inside *.conf
+proc has_account {tag user} {
+  msgroot "account list"
+  set accrgx " \\($tag\\): .*, $user\[ \r\n\]"
+  expect {
+    -re $accrgx { return 1 }
+    ":End of account list" { return 0 }
+    timeout { error "check account existence timeout" } }
+}
+
+proc gsubvars {text} {
   set rgx "%{(\\w+)}"
   while {[regexp -line $rgx $text m]} {
-    regsub -line $rgx $m "g_\\1" var
-    ## ARCH:BAD: frail concept of "skipping" -- NEED "Least Surprise"
-    # if {$skip_missed_vars && ![info exists $var]} { return "" }
+    regsub -line $rgx $m "::g_\\1" var
     regsub -line $m $text [set $var] text
   }
   return $text
 }
 
+# HACK: delete "%{tag}" account if user was renamed
+# WARN! all unexported "rename" will be lost
+#   => BET:(when possible): rename them on server and use nick_format=%first_name
+#   => ALT: use private "%{tag}_rename.conf"
 proc parse_line {line} {
-  ## BAD: what to do with "account on" which requires "/oper" or other blocking ops?
   switch -regexp -matchvar m -- $line {
     {^$} {}
     {^/join (.*)} { msgraw "JOIN [lindex $m 1]" }
-    {^/\S*} { error "Err: IRC command '$m' is not allowed" }
-    {^account (add|del)} { if {$::opts(renew)} { msgauto [subvar $line] } }
+    {^/\S*} { error "IRC command '$m' is not allowed" }
+    {^account add} {
+      if {![has_account $::g_tag $::g_user]} {
+        msgauto [gsubvars "account %{tag} del"]
+        msgauto $line
+      }}
     default { msgauto $line }
   }
 }
 
+proc strip_comments {line} { regsub -line "(^\\s*#|  # ).*$" $line "" }
 proc process_file {path} {
   set cfg [open $path r]
   fconfigure $cfg -buffering line
   while {[gets $cfg line] >= 0} {
-    parse_line [regsub -line "(^\\s*#|  # ).*$" $line ""]
+    parse_line [gsubvars [strip_comments $line]]
   }
   close $cfg
 }
@@ -43,9 +75,8 @@ proc login_as {user pass} {
 
   msgraw "NICK $user"
   msgraw "USER $user 0 * :"
-
   expect {
-    timeout { error "Err: identifying process not initiated" }
+    timeout { error "identify timeout" }
     "command to identify yourself" }
 
   ## HACK: delete your identity for clean re-configuration
@@ -55,39 +86,45 @@ proc login_as {user pass} {
     msgauto "register $pass"
   }
 
-  msgsend "set auto_connect false"
-  msgsend "identify $pass"
+  msgroot "set auto_connect false"
+  msgroot "identify $pass"
   expect {
-    timeout { error "Err: identify failed" }
-    ":You're already logged in" { send_user "\n" }
-    ":Password accepted" { send_user "\n" } }
+    timeout { error "identify failed" }
+    ":You're already logged in" echo
+    ":Password accepted" echo }
 
   # ATT: must take over other session -- otherwise settings won't be saved
   expect -timeout 1 "take over this session?" {
-    msgsend "yes"
+    msgroot "yes"
     expect -timeout 1 "successfully taken over"
   }
 }
 
-proc logout {} {
-  msgsend "set auto_connect true"
+proc logout {user} {
+  ## FIXME: restore to queried value
+  #   WARN: "moment of query" is significant -- use may contain this setting in his *.conf
+  # msgroot "set auto_connect true"
   msgauto "save"
+  iosync $user
   msgraw "QUIT"
   expect eof
 }
 
 ## Process rest of protocol credentials from stdin
-proc configure_user {user pass} { variable g_user; variable g_pass
+# TODO:NEED: use "bitlbee" instead of "common"
+proc configure_user {user pass} {
+  variable g_tag; variable g_user; variable g_pass
   login_as $user $pass
   while {[gets stdin line] >= 0} {
-    if {$line eq ""} continue
-    unset -nocomplain file g_user g_pass
-    scan $line "%s %s %s" file g_user g_pass
-    send_user "\[$file\]\n"
-    process_file "$::opts(cfgdir)/$file.conf"
-    send_user "\n"
+    if {$line eq "" || [string match "#*" $line]} continue
+    unset -nocomplain g_tag g_user g_pass
+    scan $line "%s %s %s" g_tag g_user g_pass
+    iosync $user
+    echo "\n\[$g_tag\]"
+    msgroot "account $g_tag off"
+    process_file "$::opts(cfgdir)/$g_tag.conf"
   }
-  logout
+  logout $user
 }
 
 ## Raw communication with IRC bitlbee
@@ -96,7 +133,7 @@ proc connect_to {server port} { global spawn_id
   fconfigure $irc -buffering line
   spawn -open $irc
   expect {
-    timeout { error "Err: bitlbee server signature not found" }
+    timeout { error "bitlbee server signature not found" }
     ":BitlBee-IRCd initialized" }
 }
 
@@ -113,6 +150,7 @@ proc define_options {} { global opts
     -v - --verbose { set opts(verbose) 1 }
     -r - --renew   { set opts(renew) 1 }
     -c - --cfgdir  { set opts(cfgdir) [shift] }
+    -t - --timeout { set ::timeout [shift] }
     default { lassign [split $v :] opts(server) opts(port) }
   }}
 }
