@@ -1,14 +1,37 @@
 #!/usr/bin/expect -nNf
-#%USAGE: $ "$0" [-d|--dryrun] [-v|--verbose] [-r|--renew] \
-#%... [{-c|--cfgdir} /path/to/cfg] [host:port] <<< "<protocol> <user> <passwd>\n..."
-#% ATT: first stdin line must always be "bitlbee <user> <passwd>"
-#% WARN: don't use "account on" in *.conf, as it may require blocking "/oper" and will timeout
-#% VIZ. available substitutions: %{user} %{pass} %{tag}
-
-# TALK: This script is masterpiece and writing it was really fun!
-#   But in the retrospective all those efforts and time would better be dedicated
-#   to the original bitlbee codebase -- concentrating on splitting of the /var/lib/bitlbee/<user>.xml
-#   into "secret" (localhost only), "sensitive" (private gitlab) and "general" (public github) parts.
+#%USAGE: $ ./communicate -- [<options>] -c /path/to/cfg/ <<< "[<protocol>[ <user>[ <passwd>[ <nick>]]]]\n..."
+#%
+#%Disclaimer: this script IMHO is masterpiece and writing it was really fun!
+#%  But in the retrospection all those efforts and time would be better
+#%  to be dedicated to the original bitlbee codebase...
+#%  For example, splitting single /var/lib/bitlbee/<user>.xml into distinct
+#%  "secret" (localhost only), "sensitive" (private gitlab) and "general" (public github) parts.
+#%
+proc printhelp {} { catch {exec sed -rn "1d;/^(.*\[ ;\])?#%/s///p" [info script]} help; echo $help; }
+proc shift {} { set ::argv [lassign $::argv v]; incr ::argc -1; return $v }
+proc define_options {} { global opts
+  set ::timeout 5
+  array set opts {
+    dryrun 0 verbose 0 renew 0
+    input stdin
+    server localhost
+    port 6667
+  }
+  #%HELP: <options>
+  while {$::argc > 0} { switch -- [set v [shift]] {
+    -c - --cfgdir  { set opts(cfgdir) [shift]   ;#%!c:= path to dir where all "*.conf" are contained (REQ) [--cfgdir] }
+    -r - --renew   { set opts(renew) 1          ;#% r = drop your "identity" and re-create all accounts anew [--renew] }
+    -h - --help    { printhelp; exit            ;#% h = print help [--help] }
+    -d - --dryrun  { set opts(dryrun) 1         ;#% d = debug commands parsing (keeping most settings intact) [--dryrun] }
+    -v - --verbose { set opts(verbose) 1        ;#% v = print commands (!with your passwords!) before execution [--verbose] }
+    -i - --input   { set opts(input) [shift]    ;#% i:= input file containing list of protocols and passwords (DFL=stdin) [--input] }
+    -t - --timeout { set ::timeout [shift]      ;#% t:= fine-tune global timeout for "expect" commands on slow server [--timeout] }
+    default { lassign [split $v :] s p           #% $1= host and port of bitlbee server (DFL=localhost:6667) [<[host][:port]>]
+      if {$s ne ""} set opts(server) $s          #%   e.g. you can specify only host: 192.168.1.3, or only port: :9376
+      if {$p ne ""} set opts(port) $p            #%
+    }
+  }}
+}
 
 proc echo {args} { send_user -- "[join $args]\n" }
 proc msgraw  {s} { if {$::opts(verbose)} { puts $s }; send "$s\r" }
@@ -24,7 +47,9 @@ proc iosync {user} {
 # DEV:TODO: get global auto_connect to restore afterwards
 # proc query_option {option} { }
 
-#% ATT:RQ: depends on "tag == <filename>" i.e. set "tag = %{tag}" inside *.conf
+#%HELP: <configs>
+#% * suppressing duplicate accounts depends on "tag == <filename>"
+#%   RQ:USE: set "tag = %{tag}" inside *.conf
 proc has_account {tag user} {
   msgroot "account list"
   set accrgx " \\($tag\\): .*, $user\[ \r\n\]"
@@ -44,13 +69,14 @@ proc gsubvars {text} {
   return $text
 }
 
-# HACK: delete "%{tag}" account if user was renamed
-# WARN! all unexported "rename" will be lost
-#   => BET:(when possible): rename them on server and use nick_format=%first_name
-#   => ALT: use private "%{tag}_rename.conf"
-proc parse_line {line} {
+#% * WARN: "account ... on" in *.conf may result in "timeout error" due to "/oper" blocking successive input
+#% * HACK: if account user was renamed => current "%{tag}" account will be deleted and recreated
+#%   => WARN! all unexported "rename" will be lost
+#%    * BET:(when possible): rename them on server and use nick_format=%first_name
+#%    * ALT: use private "%{tag}_rename.conf"
+#%
+proc parse_command {line} {
   switch -regexp -matchvar m -- $line {
-    {^$} {}
     {^/join (.*)} { msgraw "JOIN [lindex $m 1]" }
     {^/\S*} { error "IRC command '$m' is not allowed" }
     {^account add} {
@@ -63,11 +89,14 @@ proc parse_line {line} {
 }
 
 proc strip_comments {line} { regsub -line "(^\\s*#|  # ).*$" $line "" }
-proc process_file {path} {
+proc apply_conf_commands {path} {
+  msgroot "account $::current(tag) off"
   set cfg [open $path r]
   fconfigure $cfg -buffering line
   while {[gets $cfg line] >= 0} {
-    parse_line [gsubvars [strip_comments $line]]
+    set line [strip_comments $line]
+    if {$line eq ""} continue
+    parse_command [gsubvars $line]
   }
   close $cfg
 }
@@ -81,8 +110,7 @@ proc login_as {user pass} {
     timeout { error "identify timeout" }
     "command to identify yourself" }
 
-  ## HACK: delete your identity for clean re-configuration
-  #   => WARN: otherwise your accounts will be added twice!
+  #%HACK: drop your "identity" for clean reconfiguration
   if {$::opts(renew)} {
     msgauto "drop $pass"
     msgauto "register $pass"
@@ -95,41 +123,50 @@ proc login_as {user pass} {
     ":You're already logged in" echo
     ":Password accepted" echo }
 
-  # ATT: must take over other session -- otherwise settings won't be saved
+  #%ATT: this script must take over your other sessions -- otherwise settings won't be saved
   expect -timeout 1 "take over this session?" {
     msgroot "yes"
     expect -timeout 1 "successfully taken over"
   }
 }
 
-proc logout {user} {
+proc logout {} {
   ## FIXME: restore to queried value
   #   WARN: "moment of query" is significant -- use may contain this setting in his *.conf
   # msgroot "set auto_connect true"
   msgauto "save"
-  iosync $user
-  msgraw "QUIT"
-  expect eof
 }
 
-## Process rest of protocol credentials from stdin
-# TODO:NEED: use "bitlbee" instead of "common"
-proc configure_user {user pass} {
+#%
+#%HELP: <stdin>
+#% * supply "bitlbee <user> <passwd>" before any other protocols to authorize
+#% * multiple "bitlbee ..." input lines are allowed (configure multiple users sequentially)
+proc configure_users {inputfile} {
   variable current
-  login_as $user $pass
-  while {[gets stdin line] >= 0} {
+  while {[gets $inputfile line] >= 0} {
+    #% * each input line is propagated into substitutions: %{tag} %{user} %{pass} %{nick}
     if {$line eq "" || [string match "#*" $line]} continue
-    unset -nocomplain current(tag) current(user) current(pass)
-    scan $line "%s %s %s" current(tag) current(user) current(pass)
-    iosync $user
+    unset -nocomplain current
+    scan $line "%s %s %s %s" current(tag) current(user) current(pass) current(nick)
+    set confpath "$::opts(cfgdir)/$current(tag).conf"
+
+    if {$current(tag) eq "bitlbee"} {
+      if {[info exists bitlbee_user]} logout
+      set bitlbee_user $current(user)
+      set bitlbee_pass $current(pass)
+      login_as $bitlbee_user $bitlbee_pass
+      #% * "bitlbee.conf" for global user settings is optional, BUT other *.conf must exist
+      if {![file exists $confpath]} continue
+    }
+
+    iosync $bitlbee_user
     echo "\n\[$current(tag)\]"
-    msgroot "account $current(tag) off"
-    process_file "$::opts(cfgdir)/$current(tag).conf"
+    apply_conf_commands $confpath
   }
-  logout $user
+  logout
+  iosync $bitlbee_user
 }
 
-## Raw communication with IRC bitlbee
 proc connect_to {server port} { global spawn_id
   set irc [socket $server $port]
   fconfigure $irc -buffering line
@@ -139,24 +176,21 @@ proc connect_to {server port} { global spawn_id
     ":BitlBee-IRCd initialized" }
 }
 
-proc shift {} { set ::argv [lassign $::argv v]; incr ::argc -1; return $v }
-proc define_options {} { global opts
-  set ::timeout 5
-  array set opts {
-    dryrun 0 verbose 0 renew 0
-    server localhost
-    port 6667
-  }
-  while {$::argc > 0} { switch -- [set v [shift]] {
-    -d - --dryrun  { set opts(dryrun) 1 }
-    -v - --verbose { set opts(verbose) 1 }
-    -r - --renew   { set opts(renew) 1 }
-    -c - --cfgdir  { set opts(cfgdir) [shift] }
-    -t - --timeout { set ::timeout [shift] }
-    default { lassign [split $v :] opts(server) opts(port) }
-  }}
-}
-
+## Raw communication with IRC bitlbee
 define_options
 connect_to $::opts(server) $::opts(port)
-configure_user {*}[scan [gets stdin] "bitlbee %s %s"]
+configure_users $::opts(input)
+msgraw "QUIT"
+expect eof
+
+#%
+#%HELP: <example> (self-sufficient)
+#%#!/usr/bin/env bash
+#%set -euo pipefail
+#%./communicate -- -c ./cfg <<EOT
+#%bitlbee  ${IRC_BITLBEE:?}  $(pass irc/bitlbee)
+#%skype    ${IRC_SKYPE:?}    $(pass irc/skype)
+#%hangouts ${IRC_HANGOUTS:?} $(pass irc/hangouts)
+#%telegram ${IRC_TELEGRAM:?} $(pass irc/telegram)
+#%discord  ${IRC_DISCORD:?}  $(pass irc/discord) ${IRC_DISCORD%@*}
+#%EOT
