@@ -1,23 +1,18 @@
 #!/usr/bin/expect -nNf
-#%USAGE: $ "$0" /path/to/cfg.d [0|1] <<< ["<protocol> <user> <passwd>\n"]...
-#  * at least [bitlbee <user> <passwd>] is required to identify account
-# SECU! don't supply user/passwd through cmdline
+#%USAGE: $ "$0" [-d|--dryrun] [-v|--verbose] [-r|--renew] \
+#%... [{-c|--cfgdir} /path/to/cfg] [host:port] <<< "<protocol> <user> <passwd>\n..."
+#% NOTE: to connect to server you need at least "bitlbee <user> <passwd>" on stdin
 
-# CHECK: maybe no need for assert -- use DFL backtrace on exception
-#   BUT: must detect early any incomplete input !
-proc post {text} { if {$text ne ""} { send "PRIVMSG &bitlbee :$text\r" } }
-proc assert {args} { foreach var $args {
-    if {![info exists ::$var]} { error "Err: var '$var' must exist" }
-    set v [uplevel set $var]
-    if {$v eq ""} { error "Err: $var='$v'" }
-}}
+proc msgraw  {s} { if {$::opts(verbose)} { puts $s }; send "$s\r" }
+proc msgsend {s} { msgraw "PRIVMSG &bitlbee :$s" }
+proc msgauto {s} { if {$::opts(dryrun)} { puts $s } else { msgsend $s } }
 
 proc subvar {text} { variable g_user; variable g_pass
-  global skip_missed_vars
   set rgx "%{(\\w+)}"
   while {[regexp -line $rgx $text m]} {
     regsub -line $rgx $m "g_\\1" var
-    if {$skip_missed_vars && ![info exists $var]} { return "" }
+    ## ARCH:BAD: frail concept of "skipping" -- NEED "Least Surprise"
+    # if {$skip_missed_vars && ![info exists $var]} { return "" }
     regsub -line $m $text [set $var] text
   }
   return $text
@@ -27,14 +22,15 @@ proc parse_line {line} {
   ## BAD: what to do with "account on" which requires "/oper" or other blocking ops?
   switch -regexp -matchvar m -- $line {
     {^$} {}
-    {^/join (.*)} { puts "JOIN [lindex $m 1]" }
+    {^/join (.*)} { msgraw "JOIN [lindex $m 1]" }
     {^/\S*} { error "Err: IRC command '$m' is not allowed" }
-    default { puts [subvar $line] }
+    {^account (add|del)} { if {$::opts(renew)} { msgauto [subvar $line] } }
+    default { msgauto $line }
   }
 }
 
 proc process_file {path} {
-  set cfg [open "$path" r]
+  set cfg [open $path r]
   fconfigure $cfg -buffering line
   while {[gets $cfg line] >= 0} {
     parse_line [regsub -line "(^\\s*#|  # ).*$" $line ""]
@@ -42,68 +38,85 @@ proc process_file {path} {
   close $cfg
 }
 
-proc login_bitlbee {user pass} {
-  expect ":BitlBee-IRCd initialized"
-  send "NICK $user\r"
-  send "USER $user 0 * :\r"
-  expect -re "PRIVMSG &bitlbee .* identify yourself"
-  post "set auto_connect false"
+proc login_as {user pass} {
+  expect_before "PING :PinglBee" { msgraw "PONG :PinglBee"; exp_continue }
 
-  ## HACK: delete your account for clean re-configure TODO: optional
-  # post "drop $bitlbee_pass"
-  post "register $pass"
-  post "identify $pass"
+  msgraw "NICK $user"
+  msgraw "USER $user 0 * :"
+
+  expect {
+    timeout { error "Err: identifying process not initiated" }
+    "command to identify yourself" }
+
+  ## HACK: delete your identity for clean re-configuration
+  #   => WARN: otherwise your accounts will be added twice!
+  if {$::opts(renew)} {
+    msgauto "drop $pass"
+    msgauto "register $pass"
+  }
+
+  msgsend "set auto_connect false"
+  msgsend "identify $pass"
+  expect {
+    timeout { error "Err: identify failed" }
+    ":You're already logged in" { send_user "\n" }
+    ":Password accepted" { send_user "\n" } }
 
   # ATT: must take over other session -- otherwise settings won't be saved
-  expect {
-    "PING :PinglBee" { send "PONG :PinglBee\r"; exp_continue }
-    "take over this session?" {
-      puts "!!! Trying to take over the session !!!\r"
-      post "yes"
-      exp_continue
-    }
-    "successfully taken over" { exp_continue }
-    "PRIVMSG &bitlbee :Password accepted" { send_user "\n" }
+  expect -timeout 1 "take over this session?" {
+    msgsend "yes"
+    expect -timeout 1 "successfully taken over"
   }
 }
 
-proc logout_bitlbee {} {
-  post "set auto_connect true"
-  post "save"
-  send "QUIT\r"
+proc logout {} {
+  msgsend "set auto_connect true"
+  msgauto "save"
+  msgraw "QUIT"
   expect eof
 }
 
-proc configure_user {user pass} {
-  global spawn_id cfgdir
-  variable g_user; variable g_pass
-
-  # Raw communication with IRC bitlbee
-  set irc [socket localhost 6667]
-  fconfigure $irc -buffering line
-  spawn -open $irc
-  login_bitlbee $user $pass
-
-  ## Process rest of protocol credentials from stdin
+## Process rest of protocol credentials from stdin
+proc configure_user {user pass} { variable g_user; variable g_pass
+  login_as $user $pass
   while {[gets stdin line] >= 0} {
     if {$line eq ""} continue
     unset -nocomplain file g_user g_pass
     scan $line "%s %s %s" file g_user g_pass
     send_user "\[$file\]\n"
-    process_file "$cfgdir/$file.conf"
+    process_file "$::opts(cfgdir)/$file.conf"
     send_user "\n"
   }
-  logout_bitlbee
+  logout
 }
 
-# ==================
-set skip_missed_vars 0
-if { $argc > 0 } { set cfgdir [lindex $argv 0] }
-if { $argc > 1 } { set skip_missed_vars [lindex $argv 1] }
-
-while {[gets stdin line] >= 0} {
-  scan $line "bitlbee %s %s" bitlbee_user bitlbee_pass
-  break
+## Raw communication with IRC bitlbee
+proc connect_to {server port} { global spawn_id
+  set irc [socket $server $port]
+  fconfigure $irc -buffering line
+  spawn -open $irc
+  expect {
+    timeout { error "Err: bitlbee server signature not found" }
+    ":BitlBee-IRCd initialized" }
 }
-assert cfgdir bitlbee_user bitlbee_pass
-configure_user $bitlbee_user $bitlbee_pass
+
+proc shift {} { set ::argv [lassign $::argv v]; incr ::argc -1; return $v }
+proc define_options {} { global opts
+  set ::timeout 5
+  array set opts {
+    dryrun 0 verbose 0 renew 0
+    server localhost
+    port 6667
+  }
+  while {$::argc > 0} { switch -- [set v [shift]] {
+    -d - --dryrun  { set opts(dryrun) 1 }
+    -v - --verbose { set opts(verbose) 1 }
+    -r - --renew   { set opts(renew) 1 }
+    -c - --cfgdir  { set opts(cfgdir) [shift] }
+    default { lassign [split $v :] opts(server) opts(port) }
+  }}
+}
+
+define_options
+connect_to $::opts(server) $::opts(port)
+configure_user {*}[scan [gets stdin] "bitlbee %s %s"]

@@ -4,18 +4,13 @@ source ~/.shell/profile
 
 d=$(dirname "$(readlink -e "$0")")
 
-get_pass(){ local id=irc/${1:?}
-  r.query-passwd "$id" && return
-  echo "Err: must store desired password beforehand: $ pass insert $id" >&2
-  exit 2
-}
+get_pass(){ r.query-passwd "irc/${1:?}" 2>/dev/null || return 0; }
 
-cfg="bitlbee ${IRC_USER:?} $(get_pass 'bitlbee')"
-cfg+=$'\n'
-# cfg+=$'\n'some
-cfg+=$'\n'"common"
-cfg+=$'\n'"hangouts usr"
-cfg+=$'\n'"skypeweb usr psw"
+cfg="bitlbee ${IRC_USER:?} $(get_pass 'bitlbee')
+common
+skypeweb ${MAIN_SKYPE:?} $(get_pass 'skypeweb')
+hangouts ${MAIN_MAIL:?} $(get_pass 'hangouts')
+"
 
 ## TODO: query list of configs from available vars
 # (IFS=; declare -p) | grep -v '\s[A-Z0-9_]\+\b' | sed 's/declare -\S\+//'
@@ -23,4 +18,9 @@ cfg+=$'\n'"skypeweb usr psw"
 #   cfg+="$nm ${BITLBEE_$nm_USER:?} $(get_pass "$nm")"
 # done
 
-"$d/exe/communicate" "$d/cfg" <<< "$cfg"
+# WARN: to use DFL values don't simply comment options in *.conf
+#   -- you must set to DFL value explicitly or delete-and-recreate account beforehand
+#   OR: delete whole /var/lib/bitlbee/*
+
+"$d/exe/communicate" -- -c "$d/cfg" <<< "$cfg"
+# "$d/exe/communicate" -- -r -c "$d/cfg" <<< "$cfg"
