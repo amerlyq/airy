@@ -3,6 +3,7 @@
 #%... [{-c|--cfgdir} /path/to/cfg] [host:port] <<< "<protocol> <user> <passwd>\n..."
 #% ATT: first stdin line must always be "bitlbee <user> <passwd>"
 #% WARN: don't use "account on" in *.conf, as it may require blocking "/oper" and will timeout
+#% VIZ. available substitutions: %{user} %{pass} %{tag}
 
 # TALK: This script is masterpiece and writing it was really fun!
 #   But in the retrospective all those efforts and time would better be dedicated
@@ -36,7 +37,8 @@ proc has_account {tag user} {
 proc gsubvars {text} {
   set rgx "%{(\\w+)}"
   while {[regexp -line $rgx $text m]} {
-    regsub -line $rgx $m "::g_\\1" var
+    regsub -line $rgx $m "::current(\\1)" var
+    if {![info exists $var]} { error "unknown substitution '$m'" }
     regsub -line $m $text [set $var] text
   }
   return $text
@@ -52,7 +54,7 @@ proc parse_line {line} {
     {^/join (.*)} { msgraw "JOIN [lindex $m 1]" }
     {^/\S*} { error "IRC command '$m' is not allowed" }
     {^account add} {
-      if {![has_account $::g_tag $::g_user]} {
+      if {![has_account $::current(tag) $::current(user)]} {
         msgauto [gsubvars "account %{tag} del"]
         msgauto $line
       }}
@@ -113,16 +115,16 @@ proc logout {user} {
 ## Process rest of protocol credentials from stdin
 # TODO:NEED: use "bitlbee" instead of "common"
 proc configure_user {user pass} {
-  variable g_tag; variable g_user; variable g_pass
+  variable current
   login_as $user $pass
   while {[gets stdin line] >= 0} {
     if {$line eq "" || [string match "#*" $line]} continue
-    unset -nocomplain g_tag g_user g_pass
-    scan $line "%s %s %s" g_tag g_user g_pass
+    unset -nocomplain current(tag) current(user) current(pass)
+    scan $line "%s %s %s" current(tag) current(user) current(pass)
     iosync $user
-    echo "\n\[$g_tag\]"
-    msgroot "account $g_tag off"
-    process_file "$::opts(cfgdir)/$g_tag.conf"
+    echo "\n\[$current(tag)\]"
+    msgroot "account $current(tag) off"
+    process_file "$::opts(cfgdir)/$current(tag).conf"
   }
   logout $user
 }
