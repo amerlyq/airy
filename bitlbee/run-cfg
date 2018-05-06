@@ -10,7 +10,7 @@ cfg="bitlbee ${IRC_USER:?} $(get_pass 'bitlbee')
 skype    ${MAIN_SKYPE:?} $(get_pass 'skypeweb')
 hangouts ${MAIN_MAIL:?}  $(get_pass 'hangouts')
 telegram ${MAIN_TELGR:?} $(get_pass 'telegram')
-discord  ${MAIN_MAIL:?}  $(get_pass 'discord') ${MAIN_MAIL%@*}
+discord  ${MAIN_MAIL:?}  $(get_pass 'discord') ${MAIN_MAIL:0:4}
 "
 
 ## TODO: query list of configs from available vars

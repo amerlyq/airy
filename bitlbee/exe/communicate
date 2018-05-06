@@ -4,8 +4,8 @@
 #%Disclaimer: this script IMHO is masterpiece and writing it was really fun!
 #%  But in the retrospection all those efforts and time would be better
 #%  to be dedicated to the original bitlbee codebase...
-#%  For example, splitting single /var/lib/bitlbee/<user>.xml into distinct
-#%  "secret" (localhost only), "sensitive" (private gitlab) and "general" (public github) parts.
+#%  For example, splitting single /var/lib/bitlbee/<user>.xml into distinct parts:
+#%  [ "secret" (localhost only) | "sensitive" (private gitlab) | "general" (public github) ]
 #%
 proc printhelp {} { catch {exec sed -rn "1d;/^(.*\[ ;\])?#%/s///p" [info script]} help; echo $help; }
 proc shift {} { set ::argv [lassign $::argv v]; incr ::argc -1; return $v }
@@ -33,6 +33,7 @@ proc define_options {} { global opts
   }}
 }
 
+
 proc echo {args} { send_user -- "[join $args]\n" }
 proc msgraw  {s} { if {$::opts(verbose)} { puts $s }; send "$s\r" }
 proc msgsend {s} { msgraw "PRIVMSG &bitlbee :$s" }
@@ -44,8 +45,25 @@ proc iosync {user} {
   unset expect_out(buffer)
 }
 
-# DEV:TODO: get global auto_connect to restore afterwards
-# proc query_option {option} { }
+
+# WARN: query moment is significant -- options may change when parsing *.conf
+proc option_query {opt} {
+  msgroot "set $opt"
+  expect -re "PRIVMSG &bitlbee :$opt = `(\\w+)'\r" {
+    return $expect_out(1,string)
+  } timeout { error "option_query timeout" }
+}
+proc option_backup {opt args} {
+  set ::opts_backup($opt) [option_query $opt]
+  if {$args ne {}} { set ::opts_server($opt) [lindex $args 0] }
+}
+# NOTE: don't restore option if user's *.conf have changed it after backup was done
+proc option_restore {opt} { set v [option_query $opt]
+  if {$v eq $::opts_backup($opt) || $v eq "false"} return
+  msgroot "set $opt $::opts_backup($opt)"
+}
+proc option_set {opt val} { option_backup $opt $val; msgroot "set $opt $val" }
+
 
 #%HELP: <configs>
 #% * suppressing duplicate accounts depends on "tag == <filename>"
@@ -88,6 +106,7 @@ proc parse_command {line} {
   }
 }
 
+
 proc strip_comments {line} { regsub -line "(^\\s*#|  # ).*$" $line "" }
 proc apply_conf_commands {path} {
   msgroot "account $::current(tag) off"
@@ -100,6 +119,7 @@ proc apply_conf_commands {path} {
   }
   close $cfg
 }
+
 
 proc login_as {user pass} {
   expect_before "PING :PinglBee" { msgraw "PONG :PinglBee"; exp_continue }
@@ -116,7 +136,7 @@ proc login_as {user pass} {
     msgauto "register $pass"
   }
 
-  msgroot "set auto_connect false"
+  option_set auto_connect false
   msgroot "identify $pass"
   expect {
     timeout { error "identify failed" }
@@ -131,9 +151,8 @@ proc login_as {user pass} {
 }
 
 proc logout {} {
-  ## FIXME: restore to queried value
-  #   WARN: "moment of query" is significant -- use may contain this setting in his *.conf
-  # msgroot "set auto_connect true"
+  echo "\[LOGOUT\] restore temporarily switched user settings"
+  option_restore auto_connect
   msgauto "save"
 }
 
@@ -163,8 +182,8 @@ proc configure_users {inputfile} {
     echo "\n\[$current(tag)\]"
     apply_conf_commands $confpath
   }
-  logout
   iosync $bitlbee_user
+  logout
 }
 
 proc connect_to {server port} { global spawn_id
@@ -175,6 +194,7 @@ proc connect_to {server port} { global spawn_id
     timeout { error "bitlbee server signature not found" }
     ":BitlBee-IRCd initialized" }
 }
+
 
 ## Raw communication with IRC bitlbee
 define_options
