@@ -380,7 +380,7 @@ c.colors.statusbar.url.fg = 'lime'
 ## How many commands to save in the command history. 0: no history / -1:
 ## unlimited
 ## Type: Int
-# c.completion.cmd_history_max_items = 200
+c.completion.cmd_history_max_items = 1000
 
 ## The height of the completion, in px or as percentage of the window.
 ## Type: PercOrInt
