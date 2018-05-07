@@ -4,3 +4,16 @@ TODO
   [_] DEV:SECU create versioned tomb for backup sync
     passwords, keys
     ::: TEMP: $ ./exe/archive secrets
+  [_] THINK: share history.sqlite and other binary artifacts by dropbox/etc
+    BUT: how to merge different .sqlite on sync ?
+    MAYBE: sync local .git repo with custom merge filters for .sqlite ?
+      ? how to prevent history growing in this case ?
+
+IDEA:DEV:
+  ~/.local/backup
+    * contains custom subtree with symlinks to other files
+    * symlinks added by public/private scripts from *backup*
+      ALSO: user can add local-only symlinks (temporary, as you may suspect)
+    * gather resolved full path (and logical path to itself)
+      $ find ~/.local/backup -type l -execdir realpath -ze --relative-to / {} \;
+    * compress original ~/.local/backup (symlinks only) and data it points to
