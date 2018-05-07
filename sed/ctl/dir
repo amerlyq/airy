@@ -1,24 +1,27 @@
 #!/usr/bin/env bash
+#%USAGE: $ sed -ri "\|$rgx|s||$sub|g"
+#% * dry-run $ sed -rn "\|$rgx|s||$sub|gp"
+set -euo pipefail
 
-case "$1" in -*) KEY="$1"; shift ;; esac
+case $1 in -?) opts=$1; shift ;; esac
+rgx=${1:?Choose regex}
+sub=${2-}
+hl=$rgx
 
-OLD="${1?Need old regex}"
-NEW="$2"
-HL="$OLD"
+S=$'|'
+[[ $rgx == *$S* ]] && exit 3
+[[ $sub == *$S* ]] && exit 4
 
-[[ -z "$KEY" && -n "$NEW" ]] && KEY='-s'
-[[ "$KEY" == '-s' && "$3" == '--r' ]] && KEY='-r'
+[[ -z $opts && -n $sub ]] && opts='-s'
+[[ $opts == -s && "$3" == -r ]] && opts='-r'
 
-case "$KEY" in
--r) ag -l "$OLD" | xargs sed -ri -e '/'"$OLD"'/s||'"$NEW"'|g'
-    # TODO: save 'ag -l' output filenames to var/file, then use 'ag... $HL' on that list
-    # if [[ -n "$NEW" ]]; then HL="$NEW"; ag -l "$HL"; fi
-    ;;
--s) # If NEW=="" then returns empty list: as all OLD was deleted!
-    if [[ -n "$NEW" ]]; then HL="$OLD|$NEW"; fi
-    ag -l "$OLD" | xargs sed -rn -e '/'"$OLD"'/s||'"$NEW"'|gp'  | ag "$HL"
-    ;;
--f) ag -l "$OLD" ;;
- *) ag "$HL" ;;
+case $opts
+in -r) ag -l "$rgx" | xargs sed -ri -e "\\${S}$rgx${S}s${S}${S}$sub${S}g"
+    # TODO: save 'ag -l' output filenames to var/file, then use 'ag... $hl' on that list
+    # if [[ -n "$sub" ]]; then hl="$sub"; ag -l "$hl"; fi
+;; -s) # If sub=="" then returns empty list: as all rgx was deleted!
+    if [[ -n "$sub" ]]; then hl="$rgx|$sub"; fi
+    ag -l "$rgx" | xargs sed -rn -e "\\${S}$rgx${S}s${S}${S}$sub${S}gp" | ag "$hl"
+;; -f) ag -l "$rgx"
+;;  *) ag "$hl"
 esac
-
