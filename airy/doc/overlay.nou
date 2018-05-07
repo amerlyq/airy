@@ -1,0 +1,15 @@
+ARCH: everything must mimic (fractal) underlying structure for maximum transparency
+  i.e. overlays must mimic UNIX principles (after all its concepts were born from trial and error)
+
+
+DEV
+  [_] create *airy* mod to manage private overlay settings of user
+    i.e. to automate creation and maintenance of erian
+
+
+IDEA: use sfx symbols to explicitly choose overlay for each cfg file individually
+  => otherwise default per *mod* overlay strategy is used
+  VIZ. /[!+-]/  = "override", "append", "prepend"
+  e.g. *bitlbee*
+    "skype!", "skype+", "skype-" in BITLBEE_LIST
+    DFL="append" for BITLBEE_OVERLAY_PATH
