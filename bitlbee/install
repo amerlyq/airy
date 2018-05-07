@@ -4,6 +4,10 @@ source ~/.shell/func.d/packages
 # pkg_inst bitlbee
 aur_inst bitlbee-libpurple
 
-# TODO: install plugins only if user declared related account
-pkg_inst purple-skypeweb
-aur_inst telegram-purple purple-discord-git purple-hangouts-hg
+# NOTE: install plugins only when user account exists
+source ~/.shell/profile
+[[ ${CHAT_SKYPE+x} ]]    && pkg_inst purple-skypeweb
+[[ ${CHAT_HANGOUTS+x} ]] && aur_inst purple-hangouts-hg
+[[ ${CHAT_TELEGRAM+x} ]] && aur_inst telegram-purple
+[[ ${CHAT_DISCORD+x} ]]  && aur_inst purple-discord-git
+exit 0
