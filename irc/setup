@@ -14,7 +14,7 @@ source ~/.shell/func.d/cfgsetup
 #   => REQ make issue with desired behavior
 if cfgOpt r; then
   # NOTE: "export IRC_NICK" won't generate error if var doesn't exist
-  export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_USER:?} IRC_CHAN=${IRC_CHAN:?}
+  export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_FREENODE :-${IRC_USER:?}} IRC_CHAN=${IRC_FREENODE_CHAN:?}
   export IRC_ZNC="${IRC_ZNC:?}" IRC_ZNC_FP="${IRC_ZNC_FP:?}"
 
   ## ALT: { sleep 0.5; ./run-pipe "$cfg"; ./run-pipe <<< "/quit"; } & weechat -a; wait
