@@ -10,9 +10,6 @@ source ~/.shell/profile
 
 [[ " $* " =~ " -r " ]] && renew=1 || unset renew
 
-# ARCH: everything must mimic UNIX in fractal way
-# IDEA: use sfx symbols (e.g. "cfg!", "cfg+") in OVERLAY_PATH to explicitly
-#   choose "override" or "append" when files with same name were found
 # WARN: you can't simply source all *.conf in public and private ./cfg/
 #   * user must choose accounts and channels himself -- you won't be able to guess
 #   * experimental configs and template files must be left untouched
