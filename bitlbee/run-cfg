@@ -1,14 +1,24 @@
 #!/bin/bash
+#%USAGE: ./$0 [-r|--renew] [<cfgbasename>...]
 set -euo pipefail
 d_mod=$(dirname "$(readlink -e "$0")")
-BITLBEE_OVERLAY_PATH=$d_mod/cfg
+
 # NOTE: default policy is "append", realized as "var+=:/private/dir"
 #   => "append" is user-friendly -- allows to extend defaults
-#   => default configs can be disabled by strict assign (override) in profile
+#   => all default configs at once can be disabled by strict assign (override) in profile
 #   BAD:THINK: sometimes you need to choose policy per-file (some override, some append, some prepend)
+BITLBEE_OVERLAY_PATH=$d_mod/cfg
 source ~/.shell/profile
 
-[[ " $* " =~ " -r " ]] && renew=1 || unset renew
+[[ " $* " =~ " -r " || " $* " =~ " --renew " ]] && renew=1 && shift || unset renew
+
+# ALT:(BITLBEE_LIST): use implicit order of CHAT_* vars declaration (instead of explicit list)
+#   $ (IFS=; declare -p) | sed -rn 's/declare -\S\sCHAT_([A-Z0-9]+)[_=].*/\1/p' | sort -u
+#   BAD: always uses all vars -- can't use vars only for other programs
+#   BAD: some CHAT_* vars may be used by other programs BUT:NOT bitlbee
+(($#)) && names=( "$@" ) || names=( "${BITLBEE_LIST[@]:?}" )
+overlay_path=${BITLBEE_OVERLAY_PATH:?}
+
 
 # WARN: you can't simply source all *.conf in public and private ./cfg/
 #   * user must choose accounts and channels himself -- you won't be able to guess
@@ -18,7 +28,7 @@ source ~/.shell/profile
 #     => user may write clean bash script instead of using CHAT_* vars ()
 #     SEE:<example> in ./exe/communicate with $(pass ...) commands used only where necessary
 
-IFS=: read -r -d '' -a cfgdirs < <(printf '%s:\0' "${BITLBEE_OVERLAY_PATH:?}")
+IFS=: read -r -d '' -a cfgdirs < <(printf '%s:\0' "$overlay_path")
 confpath(){ for d in "${cfgdirs[@]}"; do
   [[ $d && -f $d/$1.conf ]] || continue
   echo "@$d/$1.conf"
@@ -35,11 +45,7 @@ tags=( tag=$nm
 ) && echo "[${tags[*]}]"
 confpath $nm
 
-# ALT:(BITLBEE_LIST): use implicit order of CHAT_* vars declaration (instead of explicit list)
-#   $ (IFS=; declare -p) | sed -rn 's/declare -\S\sCHAT_([A-Z0-9]+)[_=].*/\1/p' | sort -u
-#   BAD: always uses all vars -- can't use vars only for other programs
-#   BAD: some CHAT_* vars may be used by other programs BUT:NOT bitlbee
-for nm in "${BITLBEE_LIST[@]:?}"; do
+for nm in "${names[@]}"; do
   user=CHAT_${nm^^}
   [[ ${!user+x} ]] || { echo "Err: variable '$user' is unset" >&2; exit 1; }
   pass=$(r.query-passwd "chat/$nm" 2>/dev/null||:)
