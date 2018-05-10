@@ -10,30 +10,29 @@ source ~/.shell/func.d/cfgsetup
 
 
 ### GENS ###
-# TEMP:REM: can't suppress passphrase prompt to update settings through script
-#   => REQ make issue with desired behavior
 if cfgOpt r; then
   # NOTE: "export IRC_NICK" won't generate error if var doesn't exist
-  export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_FREENODE :-${IRC_USER:?}} IRC_CHAN=${IRC_FREENODE_CHAN:?}
-  export IRC_ZNC="${IRC_ZNC:?}" IRC_ZNC_FP="${IRC_ZNC_FP:?}"
+  export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_FREENODE:-${IRC_USER:?}} IRC_CHAN=${IRC_FREENODE_CHAN:?}
+  # export IRC_ZNC="${IRC_ZNC:?}" IRC_ZNC_FP="${IRC_ZNC_FP:?}"
 
-  ## ALT: { sleep 0.5; ./run-pipe "$cfg"; ./run-pipe <<< "/quit"; } & weechat -a; wait
-  if [[ -p ~/.weechat/weechat_fifo ]]; then
-    # r.irc-pipe <<< '/unset -mask irc.*'
-    # BUG:(don't work): /server del *
-    r.irc-cfg ./cfg/{anonymity,server_default,bitlbee,znc,freenode}.conf
-    # BAD:(removes too much): /unset -mask weechat.*
-    r.irc-cfg ./cfg/{behavior,buflist,nicks,messages,multiline}.conf
-    # r.irc-pipe <<< '/save'  # OR: '/save irc'
+  [[ -p ~/.weechat/weechat_fifo ]] || { weechat-headless --no-connect & wee_pid=$!; }
+  while ! [[ -p ~/.weechat/weechat_fifo ]]; do printf .; sleep 0.1; done
 
-  # WARN: seems don't affect anything at all => apply config only after removing ~/.weechat/*
-  else exit 6
-    WEECHAT_PASSPHRASE=' ' weechat --no-connect \
-    -r '/set sec.crypt.passphrase_file /dev/stdin' \
-    -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
-    -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
-    # ALT: try sec.crypt.passphrase_file temporary point to temp file with single space
-  fi
+  # r.irc-pipe <<< '/unset -mask irc.*'
+  # BUG:(don't work): /server del *
+  r.irc-cfg ./cfg/{anonymity,server_default,bitlbee,freenode,oftc}.conf  # znc
+  # BAD:(removes too much): /unset -mask weechat.*
+  r.irc-cfg ./cfg/{behavior,buflist,nicks,messages,multiline}.conf
+  r.irc-pipe <<< '/save'  # OR: '/save irc'
+
+  [[ ${wee_pid+x} ]] && { r.irc-pipe <<< '/quit'; wait "$wee_pid"; }
 fi
+
+# USE: $ WEECHAT_PASSPHRASE="$(pass irc/weechat)" weechat --no-connect
+# Can't suppress passphrase prompt to update settings through script
+# BAD:(space don't work for env var): $ WEECHAT_PASSPHRASE=' ' weechat --no-connect
+# FAIL: $ weechat --no-connect -r '/set sec.crypt.passphrase_file /dev/stdin' \
+#   -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
+#   -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
 
 linkcp -m ~/.weechat/logs ~/chat/weechat
