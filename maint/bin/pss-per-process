@@ -1,0 +1,9 @@
+#!/bin/bash
+# USAGE:(oneliner): $ for f in /proc/[0-9]*/smaps; do echo "$(awk '/Pss:/{s+=$2}END{printf"%d ",s}' "$f")" "$(tr '\000\040' '\t\t' <"${f%/*}/cmdline"|cut -f1)"; done | sort -k1n,1
+set -euo pipefail
+
+for f in /proc/[0-9]*/smaps; do
+  pss_total=$(awk '/Pss:/{s+=$2}END{printf"%d ",s}' "$f")
+  cmd_path=$(tr '\000\040' '\t\t' <"${f%/*}/cmdline"|cut -f1)
+  echo "$pss_total" "$cmd_path"
+done | sort -k1n,1
