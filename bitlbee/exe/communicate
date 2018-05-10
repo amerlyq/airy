@@ -100,7 +100,10 @@ proc login_as {user pass} {
 
   #% * HACK: drop your "identity" for clean reconfiguration
   if {$::opts(renew)} {
+    # BUG: despite "drop" if weechat was connected -- old version will be restored
+    #   => must close weechat (or at least all connections to bitlbee) before update
     msgauto "drop $pass"
+    # msgauto "save"  ;# TRY:NEED: otherwise old acc is restored
     msgauto "register $pass"
   }
 
