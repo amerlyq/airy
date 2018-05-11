@@ -23,4 +23,4 @@
 
 # BUG: grep #! in all lines instead of only first line
 #   BET: | parallel '[[ $(head -c2 {}) == "#!" ]] && echo "{}"'
-exec find "${dir-.}" -type f -executable -exec grep -qm1 "^#!.*${interp-}" {} \; "$@"
+exec find "${dir-.}" -type d -name .git -prune -o -type f -executable -exec grep -qm1 "^#!.*${interp-}" {} \; "$@"
