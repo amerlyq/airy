@@ -19,7 +19,7 @@ dump_once(){ local mark=$1; shift
 # -o | to search obj files
 find_artifacts(){ printf '* (find) %s\n' "$*" >&2
   r.find-elf "$@" \
-  || { printf 'Err: *.a/*.so binaries not found\n' >&2; exit 1; }
+  || { printf '!!! (warning) %s binaries not found\n' "$1" >&2; }
 }
 
 # TODO: also extract dlopen() list
@@ -42,7 +42,6 @@ ldd_ext(){ printf '* (ldd) %s\n' "$*" >&2
 # https://reverseengineering.stackexchange.com/questions/14895/why-are-symbols-with-local-binding-present-in-the-symbol-table-of-my-elf-files
 extract_symbols(){ local fLib=$1 sym=$2 und=$3
   printf '* (symbols) %s\n' "$fLib" >&2
-  mkdir -p "${sym%/*}" "${und%/*}"
   { { readelf -Ws -- "$fLib" | gawk -vignore="${SYM_IGNORE:?}" '
       !$8 || $5 == "LOCAL" || $8 ~ ignore {
         next
@@ -79,7 +78,6 @@ resolve_symbols(){ local fUnd=$1 dneed=$2
 }; export -f resolve_symbols
 
 resolve_stats(){ local dneed=$1 fstats=$2
-  mkdir -p "${fstats%/*}"
   find "$dneed" -type f -not -empty -print0 \
   | wc -l --files0-from=- \
   | awk -F'/|\\s' '{print$1"\t"$NF}' \
@@ -110,8 +108,8 @@ resolve_undefined(){ local fUnd=$1 grp=$2
   [[ -s $fUnd ]] || return 0
   while (($#)); do [[ $1 == -- ]] && shift && break || shift; done
   printf '* (resolve) %s\n' "$fUnd" >&2
-  dneed=$grp/need/${fUnd##*/}
-  fstats=$grp/stat/${fUnd##*/}
+  local dneed=$grp/need/${fUnd##*/}
+  local fstats=$grp/stat/${fUnd##*/}
   resolve_symbols "$fUnd" "$dneed" -- "${@:?}"
   resolve_stats "$dneed" "$fstats"
   [[ -s $fstats ]] || print_notfound "$fUnd" "$grp" -- "${@:?}"
@@ -135,7 +133,9 @@ find_all(){ local src=$1 dst=$2
 
 # BAD: parallel ignores errors
 extract_group(){ local grp=$1
-  dump_once "$grp/._gen_syms" parallel --halt-on-error now,fail=1 -- extract_symbols {} "$grp/sym/{/}" "$grp/und/{/}" :::: "$grp/files"
+  local sym=$grp/sym und=$grp/und
+  mkdir -p "$sym" "$und"  # TEMP:FIXED: empty directory for "find"
+  dump_once "$grp/._gen_syms" parallel --halt-on-error now,fail=1 -- extract_symbols {} "$sym/{/}" "$und/{/}" :::: "$grp/files"
 }
 
 foreach_group(){ local dst=$1 fn=$2; shift 2
@@ -144,6 +144,7 @@ foreach_group(){ local dst=$1 fn=$2; shift 2
 
 
 resolve_group(){ local grp=$1; shift
+  mkdir -p "$grp/stat"  # TEMP:FIXED: empty directory for "find"
   dump_once "$grp/und.sym" find "$grp/und" -type f -not -empty -print
   dump_once "$grp/._gen_need" parallel --halt-on-error now,fail=1 -- \
     resolve_undefined {} "$grp" -- "${@:?}" \
@@ -183,7 +184,7 @@ orderdeps(){ local grp=$1 ord=$2
   printf '* (orderdeps) %s\n' "$grp" >&2
   mkdir -p "$grp/deps"
   find "$grp/stat" -type f -not -empty -print \
-  | parallel -- grep -xFf '<(cut -f2 {})' "$ord" '>' "$grp/deps/{/}"
+  | parallel --halt-on-error now,fail=1 -- grep -xFf '<(cut -f2 {})' "$ord" '>' "$grp/deps/{/}"
 }
 
 orderdeps_group(){ local grp=$1
@@ -201,8 +202,8 @@ cycle_relpath(){ local sym=$1; shift
 # http://www.alecjacobson.com/weblog/?p=141
 topo_cycle_relpath(){ local grp=$1; shift
   dump_once "$grp/topo.cycles.relpath" \
-    parallel -- cycle_relpath {} "$grp/files" "$@" \
-    :::: "$grp/topo.cycles"
+    <"$grp/topo.cycles" xargs -rn1 -d\\n -I{} -- \
+    bash -c 'cycle_relpath "$0" "$@"' '{}' "$grp/files" "$@"
 }
 
 # TODO: delete self-links BET: gvpr postprocessing
