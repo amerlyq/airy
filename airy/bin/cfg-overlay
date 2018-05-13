@@ -1,6 +1,6 @@
 #!/bin/bash
 #%USAGE: ./$0 [<flags>...] [--] <tags>...
-#%ALSO: append flags from env vars: $CFG_OVERLAY_{BASE,PATH,SUBS,MODE}
+#%ALSO: append flags from env vars: $CFG_OVERLAY_{BASE,PATH,MODE,SUBST,PRINT}
 #%
 #%VIZ. <tags> syntax (overlay modifiers)
 #% * <tag>    (default mode) = not required for file to exist in both places
@@ -16,89 +16,116 @@
 #  * <tag>!1--1  (asc  interval 1,2,3)
 #  * <tag>!1,3   (selection sequence)
 #
-## INFO: performance
+## INFO: performance: ~4ms total, THINK:DEV: self-compiling C util
 #  * 2.3ms -- bash startup
-#  * 0.3ms -- args parsing
-#  * 0.5ms -- file searching
+#  * 0.4ms -- {args + func} parsing
+#  * 0.3ms -- file searching
+#  * 1.0ms -- print to tty
 #
 set -euo pipefail -o noglob
 
+die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
+
 # ALT:BAD: performance: +2.2ms
 #   IFS=: read -r -d '' -a dpaths < <(IFS=:; printf '%s:\0' "$*")
-papp(){ declare -rn a=$1; shift; local p IFS=:
+papp(){ local -rn a=$1; shift; local p IFS=:
   for p in $*; do [[ -z ${p:+x} ]] || a+=("$p"); done
 }
 
-ov_mode=${CFG_OVERLAY_MODE-+}
 tag_fmt='^([[:punct:]])?([-/_[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
-ss_print='%s\n'
+ov_mode=${CFG_OVERLAY_MODE-+}
+fmt_print=${CFG_OVERLAY_PRINT-'%s\n'}
+query_parsed=0
+verbose=0
 
 #%INFO: <flags>
-while getopts 'b:hM:o:s:S:' o; do case $o in :|'?') exit 1
+while getopts 'b:F:hM:o:qs:v' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; v) verbose=1                 #% v = verbose (only for debug)
+;; q) query_parsed=1            #% q = query tag names with stripped control pref/sfx
 ;; b) papp ov_base "$OPTARG"    #% b+= overlay basis, DFL=(<empty>), e.g. [/airy/cfg]
 ;; o) papp ov_path "$OPTARG"    #% o+= overlay paths, DFL=(<empty>), e.g. [/private/cfg:/public/cfg]
-;; s) ss_masks+=( "$OPTARG" )   #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
-;; S) ss_print=$OPTARG          #% S+= print result substitution, DFL=%s\n, e.g. [@%s\0]
+;; s) ss_mask+=( "$OPTARG" )    #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
+;; F) fmt_print=$OPTARG         #% F = format print result, DFL=%s\n, e.g. [@%s\0]
 ;; M) ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+
+                                #%   ('+' by default is user-friendly -- allows to extend base configs)
 esac; done; unset o; shift $((OPTIND-1))
-(($#)) || { echo "Err: empty requested tags list (\$@)" >&2; exit 1; }
+(($#)) || die "empty requested tags list (\$@)"
 
 # NOTE: append from env vars
 papp ov_base "${CFG_OVERLAY_BASE-}"
 papp ov_path "${CFG_OVERLAY_PATH-}"
-papp ss_mask "${CFG_OVERLAY_SUBS-}"
+papp ss_mask "${CFG_OVERLAY_SUBST-}"
 
+debugprint(){ :; } && ((verbose)) &&
+debugprint(){ local -rn a=$1
+  echo "[$1]" >&2
+  for v in "${a[@]}"; do printf ' * %s\n' "$v"; done
+}
 
-select_dirs(){ declare -rn a=$1; local mod=$2 sfx=$3
+debugprint ov_base
+debugprint ov_path
+
+select_dirs(){ local -r var=$1 mod=$2 sfx=$3; local -rn a=$var
   case $mod
   in !) a=( "${ov_path[@]}" )
   ;; +) a=( "${ov_base[@]}" "${ov_path[@]}" )
   ;; -) a=( "${ov_path[@]}" "${ov_base[@]}" )
-  ;; *) echo "Err: unknown modifier '$mod'" >&2; exit 1
+  ;; *) die "unknown modifier '$mod'"
   esac
+  # DEV: sequence; desc interval
   while [[ -n ${sfx:+x} ]]; do
     [[ $sfx =~ ^[0-9]+$ ]] && a=( "${a[sfx]}" ) && break
     [[ $sfx =~ ^[0-9]+-[0-9]+$ ]] && a=( "${a[@]:(${sfx%%-*}):(${sfx#*-}-${sfx%%-*})}" ) && break
-    echo "Err: unknown suffix format '$sfx'" >&2; exit 1
+    die "unknown suffix format '$sfx'"
   done
-  [[ ${a[@]:+x} ]] || { echo "Err: empty search dirs list (-b/-o)" >&2; exit 1; }
+  [[ ${a[@]:+x} ]] || die "empty '$var' = search dirs list (-b/-o)"
+  debugprint "$var"
 }
 
-gen_names(){ declare -rn a=$1; local tag=$2
-  if [[ ${ss_masks[@]:+x} ]]
-  then a=( "${ss_masks[@]//\{\}/$tag}" )
+gen_names(){ local -r var=$1 tag=$2; local -rn a=$var
+  if [[ ${ss_mask[@]:+x} ]]
+  then a=( "${ss_mask[@]//\{\}/$tag}" )
   else a=("$tag"); fi
+  debugprint "$var"
 }
 
 # ALT:BAD: bad performance: +4.0ms and "find" isn't flexible enough for subdir names
 #   find -H "${dpaths[@]}" -maxdepth 1 -xtype f \( -false "${fnames[@]}" \) -print -quit
-find_existing(){ declare -rn a=$1 da=$2 fa=$3
+find_existing(){ local -r var=$1; local -rn a=$var da=$2 fa=$3
   for d in "${da[@]:?}"; do
     for f in "${fa[@]:?}"; do
       [[ -f $d/$f ]] || continue
       a+=( "$d/$f" )
     done
   done
+  debugprint "$var"
 }
 
 # ALT:BAD: brittle globbing
 #   case $tag in *?[-!+]?*) sfx=${tag#*!}; tag=${tag%$sfx}; mod=${tag:(-1)}; tag=${tag%?}
 search(){ local tag=$1 mod opt sfx dpaths fnames found
-  [[ $tag =~ $tag_fmt ]] || { echo "Err: tag '$tag' has wrong format" >&2; exit 1; }
+  [[ $tag =~ $tag_fmt ]] || die "tag '$tag' has wrong format"
   opt=${BASH_REMATCH[1]}
   tag=${BASH_REMATCH[2]}
   mod=${BASH_REMATCH[4]:-$ov_mode}
   sfx=${BASH_REMATCH[5]}
+  ((verbose)) && printf '%s=[%s|%s|%s]\n' "$tag" "$opt" "$mod" "$sfx" >&2
+
+  if ((query_parsed)); then
+    # DEV: substitute tag/mod/opt/sfx in fmt_print
+    printf "$fmt_print" "$tag"
+    return
+  fi
 
   select_dirs dpaths "$mod" "$sfx"
   gen_names fnames "$tag"
   find_existing found dpaths fnames
 
   if [[ ${found[@]:+x} ]]; then
-    printf "$ss_print" "${found[@]}"
+    printf "$fmt_print" "${found[@]}"
   elif [[ $opt != '?' ]]; then
-    echo "Err: tag '$tag' not found" >&2; exit 2
+    die "tag '$tag' not found"
   fi
 }
 
