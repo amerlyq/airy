@@ -1,91 +1,107 @@
 #!/bin/bash
-#%USAGE: ./$0 [-M{!+-}] [-b /airy/cfg] [-o /private/cfg:/public/cfg] [-s {}.conf] <tag|tag[!+-]>...
-#%INFO: correct tags match ~ /^[?]?(.+)(\W([-,0-9])?)?/
-#% * last char is optional control non-word
-#%   <= MAYBE:DEV: escaping of user input e.g.  tag\? -> as "tag?"|mode=+
-#% * after that is optional selection suffix
-#%VIZ. overlay fallback syntax
-#% * <tag>    (default mode)
-#% * <tag>!   (override) = search only inside overlay path
-#% * <tag>!1  (override) = use only Nth of all paths (as temporary fix)
-#% * <tag>+   (append  = search default -> overlay)
-#% * <tag>-   (prepend = search overlay -> default)
-## Experimental BAD: brittle when -b/-o changes
-#% * ?<tag>.. (DEV: default, no error even if not found)
+#%USAGE: ./$0 [<flags>...] [--] <tags>...
+#%ALSO: append flags from env vars: $CFG_OVERLAY_{BASE,PATH,SUBS,MODE}
+#%
+#%VIZ. <tags> syntax (overlay modifiers)
+#% * <tag>    (default mode) = not required for file to exist in both places
+#% *?<tag>..  (optional) = silent ignore if file not found
+#% * <tag>!   (override) = search inside only overlay path
+# DEV: preprocess escaping of user input e.g.  tag\! -> as "tag!"|mode=+
+#% * <tag>!0  (override) = use only Nth of all paths (?as temporary fix?)
+#% * <tag>+   (append)  = search order: {default -> overlay}, DEV: file must exist in both places
+#% * <tag>-   (prepend) = search order: {overlay -> default}, DEV: file must exist in both places
+#%
+## Experimental BAD:(brittle): when base/path frequently changes
 #  * <tag>!-1-1  (desc interval 3,2,1)
 #  * <tag>!1--1  (asc  interval 1,2,3)
-#  * <tag>!1,3   (sequence)
-# MAYBE: generate errors if +/- found only in base OR in path ? (assuming +/- always requires existing of both)
-#   BAD: default "<tag>" will generate error if found only in single place
-#   ?? tweak behavior of default <tag> => append but w/o error if found in single place ??
-#     BAD: unsymmetrical: can't apply prepend w/o error
-#%
+#  * <tag>!1,3   (selection sequence)
+#
+## INFO: performance
+#  * 2.3ms -- bash startup
+#  * 0.3ms -- args parsing
+#  * 0.5ms -- file searching
+#
 set -euo pipefail -o noglob
 
-papp(){ declare -rn a=$1; local dpaths p; shift
-  IFS=: read -r -d '' -a dpaths < <(IFS=:; printf '%s:\0' "$*")
-  for p in "${dpaths[@]}"; do [[ -z ${p:+x} ]] || a+=("$p"); done
+# ALT:BAD: performance: +2.2ms
+#   IFS=: read -r -d '' -a dpaths < <(IFS=:; printf '%s:\0' "$*")
+papp(){ declare -rn a=$1; shift; local p IFS=:
+  for p in $*; do [[ -z ${p:+x} ]] || a+=("$p"); done
 }
 
-# TEMP:
-CFG_OVERLAY_BASE=~/.local/airy/bitlbee/cfg
-CFG_OVERLAY_PATH=~/aura/erian/mods/bitlbee/cfg
-
-papp ov_base "${CFG_OVERLAY_BASE-}"
-papp ov_path "${CFG_OVERLAY_PATH-}"
-papp ss_mask "${CFG_OVERLAY_SUBS-}"
 ov_mode=${CFG_OVERLAY_MODE-+}
+tag_fmt='^([[:punct:]])?([-/_[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
+ss_print='%s\n'
 
-while getopts 'b:hM:o:s:' o; do case $o in :|'?') exit 2
+#%INFO: <flags>
+while getopts 'b:hM:o:s:S:' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
 ;; b) papp ov_base "$OPTARG"    #% b+= overlay basis, DFL=(<empty>), e.g. [/airy/cfg]
 ;; o) papp ov_path "$OPTARG"    #% o+= overlay paths, DFL=(<empty>), e.g. [/private/cfg:/public/cfg]
 ;; s) ss_masks+=( "$OPTARG" )   #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
-;; M) ov_mode=$OPTARG           #% M = default overlay mode, DFL=+
+;; S) ss_print=$OPTARG          #% S+= print result substitution, DFL=%s\n, e.g. [@%s\0]
+;; M) ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+
 esac; done; unset o; shift $((OPTIND-1))
-(($#)) || { echo "Err: need args"; exit 1; }
+(($#)) || { echo "Err: empty requested tags list (\$@)" >&2; exit 1; }
+
+# NOTE: append from env vars
+papp ov_base "${CFG_OVERLAY_BASE-}"
+papp ov_path "${CFG_OVERLAY_PATH-}"
+papp ss_mask "${CFG_OVERLAY_SUBS-}"
 
 
-search(){ local nm=$1 mode=$ov_mode sfx dpaths fnames found
-
-  case $nm
-  in *?[-!+]?*) sfx=${nm#*!}; nm=${nm%$sfx}; mode=${nm:(-1)}; nm=${nm%?}
-  ;; *?[-!+]) mode=${nm:(-1)}; nm=${nm%?}
+select_dirs(){ declare -rn a=$1; local mod=$2 sfx=$3
+  case $mod
+  in !) a=( "${ov_path[@]}" )
+  ;; +) a=( "${ov_base[@]}" "${ov_path[@]}" )
+  ;; -) a=( "${ov_path[@]}" "${ov_base[@]}" )
+  ;; *) echo "Err: unknown modifier '$mod'" >&2; exit 1
   esac
-
-  case $mode
-  in !) dpaths=( "${ov_path[@]}" )
-  ;; +) dpaths=( "${ov_base[@]}" "${ov_path[@]}" )
-  ;; -) dpaths=( "${ov_path[@]}" "${ov_base[@]}" )
-  ;; *) echo "Err: wrong mode '$mode'"; exit 1
-  esac
-
   while [[ -n ${sfx:+x} ]]; do
-    [[ $sfx =~ ^[0-9]+$ ]] && dpaths=( "${dpaths[sfx]}" ) && break
-    [[ $sfx =~ ^[0-9]+-[0-9]+$ ]] && dpaths=( "${dpaths[@]:(${sfx%%-*}):(${sfx#*-}-${sfx%%-*})}" ) && break
-    echo "Err: unknown suffix format '$sfx'"; exit 1
+    [[ $sfx =~ ^[0-9]+$ ]] && a=( "${a[sfx]}" ) && break
+    [[ $sfx =~ ^[0-9]+-[0-9]+$ ]] && a=( "${a[@]:(${sfx%%-*}):(${sfx#*-}-${sfx%%-*})}" ) && break
+    echo "Err: unknown suffix format '$sfx'" >&2; exit 1
   done
-  # echo DP: "${dpaths[@]}"
-
-  if ((${#ss_masks[@]})); then
-    for m in "${ss_masks[@]}"; do
-      fnames+=( "${m//\{\}/$nm}" )
-    done
-  else fnames=( "$nm" ); fi
-  # echo FN: "${fnames[@]}"
-
-  [[ ${dpaths[@]:+x} && ${fnames[@]:+x} ]] || exit 5
-
-  # NOTE: "find" isn't flexible enough for names in subdirs and has bad performance: 0.6s -> 1.0s / 100 runs
-  for d in "${dpaths[@]}"; do
-    for f in "${fnames[@]}"; do
-      [[ -f $d/$f ]] || continue
-      found+=( "$d/$f" )
-    done
-  done
-  [[ ${found[@]:+x} ]] || exit 6
-
-  printf '%s\n' "${found[@]}"
+  [[ ${a[@]:+x} ]] || { echo "Err: empty search dirs list (-b/-o)" >&2; exit 1; }
 }
 
-search "$@"
+gen_names(){ declare -rn a=$1; local tag=$2
+  if [[ ${ss_masks[@]:+x} ]]
+  then a=( "${ss_masks[@]//\{\}/$tag}" )
+  else a=("$tag"); fi
+}
+
+# ALT:BAD: bad performance: +4.0ms and "find" isn't flexible enough for subdir names
+#   find -H "${dpaths[@]}" -maxdepth 1 -xtype f \( -false "${fnames[@]}" \) -print -quit
+find_existing(){ declare -rn a=$1 da=$2 fa=$3
+  for d in "${da[@]:?}"; do
+    for f in "${fa[@]:?}"; do
+      [[ -f $d/$f ]] || continue
+      a+=( "$d/$f" )
+    done
+  done
+}
+
+# ALT:BAD: brittle globbing
+#   case $tag in *?[-!+]?*) sfx=${tag#*!}; tag=${tag%$sfx}; mod=${tag:(-1)}; tag=${tag%?}
+search(){ local tag=$1 mod opt sfx dpaths fnames found
+  [[ $tag =~ $tag_fmt ]] || { echo "Err: tag '$tag' has wrong format" >&2; exit 1; }
+  opt=${BASH_REMATCH[1]}
+  tag=${BASH_REMATCH[2]}
+  mod=${BASH_REMATCH[4]:-$ov_mode}
+  sfx=${BASH_REMATCH[5]}
+
+  select_dirs dpaths "$mod" "$sfx"
+  gen_names fnames "$tag"
+  find_existing found dpaths fnames
+
+  if [[ ${found[@]:+x} ]]; then
+    printf "$ss_print" "${found[@]}"
+  elif [[ $opt != '?' ]]; then
+    echo "Err: tag '$tag' not found" >&2; exit 2
+  fi
+}
+
+for tag; do
+  search "$tag"
+done
