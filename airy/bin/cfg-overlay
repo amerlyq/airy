@@ -16,13 +16,13 @@
 #  * <tag>!1,3   (selection sequence)
 #
 #%INFO: <env vars> $CFG_OVERLAY_{BASE,PATH,MODE,SUBST,PRINT}
-# DEV: env composition
-#% -E!F = env, ignore flags
-#% -E~F = env, fallback flags
-#% -E+F = env, append flags
-#% -F!E = flags, ignore env
-#% -F~E = flags, fallback env (TODO:DFL)
-#% -F+E = flags, append env (TEMP:DFL)
+#% -E! = ignore env vars
+#% -E~ = fallback to env vars (DFL)
+#% -E+ = append env vars (after all flags)
+#%THINK:DEV: reverse env composition
+#% -F!E = ignore flags, use env
+#% -F~E = fallback to flags
+#% -F+E = append flags after env
 #%
 ## INFO: performance: ~4ms total, THINK:DEV: self-compiling C util
 #  * 2.3ms -- bash startup
@@ -31,18 +31,22 @@
 #  * 1.0ms -- print to tty
 #
 set -euo pipefail -o noglob
-shopt -s extglob
+# MAYBE: check $BASH_VERSION >= 4.4
 
 die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
 
 # ALT:BAD: subshell performance: +2.2ms
 #   IFS=: read -r -d '' -a dpaths < <(IFS=:; printf '%s:\0' "$*")
-#   for p in $*; do [[ -z ${p:+x} ]] || a+=("$p"); done
-papp(){ local -rn a=$1; shift; local p IFS=:; a+=( ${*//+(:)/:} ); }
+# ALT:BAD: ":some" => two elements
+#   shopt -s extglob; a+=( ${*//+(:)/:} )
+papp(){ local -rn a=$1; shift; local p IFS=:
+  for p in $*; do [[ -z ${p:+x} ]] || a+=("$p"); done
+}
 
-tag_rgx='^([[:punct:]])?([-/_[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
+tag_rgx='^([[:punct:]])?([-_./[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
 fmt_print='%s\n'
-ov_mode=+
+env_mode='~'
+ov_mode='+'
 ov_base=()
 ov_path=()
 ss_mask=()
@@ -51,25 +55,30 @@ query_uniqpath=0
 verbose=0
 
 #%INFO: <flags>
-while getopts 'b:hM:o:p:qQs:v' o; do case $o in :|'?') exit 1
+while getopts 'b:E:hM:o:p:qQs:v' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
 ;; v) verbose=1                 #% v = verbose (only for debug)
 ;; q) query_tagnames=1          #% q = query tag names with stripped control pref/sfx
 ;; Q) query_uniqpath=1          #% Q = query base+path with dups and empty removed
-;; M) ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+
+;; M) ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+, VIZ. {-=prepend +=append !=override}
 #                               #%   ('+' by default is user-friendly -- allows to extend base configs)
 ;; b) papp ov_base "$OPTARG"    #% b+= overlay basis, DFL=(<empty>), e.g. [/airy/cfg]
 ;; o) papp ov_path "$OPTARG"    #% o+= overlay paths, DFL=(<empty>), e.g. [/private/cfg:/public/cfg]
 ;; s) ss_mask+=( "$OPTARG" )    #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
 ;; p) fmt_print=$OPTARG         #% p = printf format for generic results, DFL=%s\n, e.g. [@%s\0]
+;; E) env_mode=$OPTARG          #% E = env merge modifier, DFL=~, VIZ. {~=fallback +=append !=ignore}
 esac; done; opts+=$o; shift $((OPTIND-1))
 
-# TEMP:DFL: append from env vars
-papp ov_base "${CFG_OVERLAY_BASE-}"
-papp ov_path "${CFG_OVERLAY_PATH-}"
-papp ss_mask "${CFG_OVERLAY_SUBST-}"
-[[ ! $opts =~ F && ${CFG_OVERLAY_PRINT+x} ]] && fmt_print=$CFG_OVERLAY_PRINT
-[[ ! $opts =~ M && ${CFG_OVERLAY_MODE+x}  ]] && ov_mode=$CFG_OVERLAY_MODE
+[[ $env_mode == [~+!] ]] || die "unknown env vars modifier '$env_mode'"
+
+if [[ $env_mode != [!] ]]; then
+  # WARN: don't use ((${#ov_base})) -- user can pass [-b ':'], which is technically empty
+  [[ ! $opts =~ b || $env_mode == [+] ]] && papp ov_base "${CFG_OVERLAY_BASE-}"
+  [[ ! $opts =~ o || $env_mode == [+] ]] && papp ov_path "${CFG_OVERLAY_PATH-}"
+  [[ ! $opts =~ s || $env_mode == [+] ]] && papp ss_mask "${CFG_OVERLAY_SUBST-}"
+  [[ ! $opts =~ F && ${CFG_OVERLAY_PRINT+x} ]] && fmt_print=$CFG_OVERLAY_PRINT
+  [[ ! $opts =~ M && ${CFG_OVERLAY_MODE+x}  ]] && ov_mode=$CFG_OVERLAY_MODE
+fi
 
 #%-----
 
@@ -84,7 +93,7 @@ compose_by_modifier(){ local -rn a=$1; local -r mod=$2
   in !) a=( "${ov_path[@]}" )
   ;; +) a=( "${ov_base[@]}" "${ov_path[@]}" )
   ;; -) a=( "${ov_path[@]}" "${ov_base[@]}" )
-  ;; *) die "unknown modifier '$mod'"
+  ;; *) die "unknown overlay modifier '$mod'"
   esac
 }
 
@@ -132,23 +141,23 @@ find_existing(){ local -r var=$1; local -rn a=$var da=$2 fa=$3
   debugprint "$var"
 }
 
-# ALT:BAD: brittle globbing
+# ALT:BAD: brittle globbing, may require 'shopt -s extglob'
 #   case $tag in *?[-!+]?*) sfx=${tag#*!}; tag=${tag%$sfx}; mod=${tag:(-1)}; tag=${tag%?}
-parse_tag(){ local expr=$1; local -rn _opt=$2 _tag=$3 _mod=$4 _sfx=$5
+parse_tag(){ local expr=$1; local -rn _opt=$2 _nm=$3 _mod=$4 _sfx=$5
   [[ $expr =~ $tag_rgx ]] || die "tag '$expr' has wrong format"
   _opt=${BASH_REMATCH[1]}
-  _tag=${BASH_REMATCH[2]}
+  _nm=${BASH_REMATCH[2]}
   _mod=${BASH_REMATCH[4]:-$ov_mode}
   _sfx=${BASH_REMATCH[5]}
-  ((!verbose)) || printf '%s=[%s|%s|%s]\n' "$_tag" "$_opt" "$_mod" "$_sfx" >&2
+  ((!verbose)) || printf '%s=[%s|%s|%s]\n' "$_nm" "$_opt" "$_mod" "$_sfx" >&2
 }
 
-search(){ local tag=$1 opt mod sfx dpaths fnames found
-  parse_tag "$tag" opt tag mod sfx
+search(){ local tag=$1 opt nm mod sfx dpaths fnames found
+  parse_tag "$tag" opt nm mod sfx
   select_dirs dpaths "$mod" "$sfx"
-  [[ ${dpaths[@]:+x} ]] || die "empty 'dpaths' search list (-b/-o)"
+  [[ ${dpaths[@]:+x} ]] || die "empty search list for '$tag' tag (-b/-o)"
 
-  gen_names fnames "$tag"
+  gen_names fnames "$nm"
   find_existing found dpaths fnames
 
   if [[ ${found[@]:+x} ]]; then
@@ -165,7 +174,7 @@ debugprint ov_path
 if ((query_uniqpath)); then
   # THINK:DEV: allow [-M !1,3 ] to specify "$sfx" for queries
   select_dirs dpaths "$ov_mode" ''
-  printf "$fmt_print" "${dpaths[@]}"
+  [[ -z ${dpaths[@]:+x} ]] || printf "$fmt_print" "${dpaths[@]}"
   exit
 fi
 
