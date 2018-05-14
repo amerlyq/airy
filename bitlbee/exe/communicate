@@ -1,4 +1,5 @@
 #!/usr/bin/expect -nNf
+#%SUMMARY: communicate with bitlbee server according to input spec file
 #%USAGE: $ ./communicate -- [<options>] [<host:port>] <<< "$configs"
 #%
 #%Disclaimer: this script IMHO is masterpiece and writing it was really fun!
@@ -14,7 +15,7 @@ proc printhelp {} { catch {exec sed -rn "1d;/^(.*\[ ;\])?#%/s///p" [info script]
 proc define_options {} { global opts
   set ::timeout 5
   array set opts {
-    dryrun 0 verbose 0 reset 0 renew 0 input ""
+    dryrun 0 verbose 0 reset 0 renew 0 input "-"
     server localhost
     port 6667
   }
@@ -35,10 +36,11 @@ proc define_options {} { global opts
 
 
 # ==============================================================
-proc msgraw  {s} { if {$::opts(verbose)} { puts $s }; send "$s\r" }
+proc safeecho {s} { if {$::opts(verbose)} { puts [regsub -line -all "\\m$::account(pass)\\M" $s "********"] } }
+proc msgraw  {s} { safeecho $s; send "$s\r" }
 proc msgsend {s} { msgraw "PRIVMSG &bitlbee :$s" }
 proc msgroot {s} { msgsend "root: $s" }
-proc msgauto {s} { if {$::opts(dryrun)} { puts $s } else { msgroot $s } }
+proc msgauto {s} { if {$::opts(dryrun)} { safeecho $s } else { msgroot $s } }
 proc iosync {} {
   if {![info exists ::bitlbee_user]} return
   msgsend "$::bitlbee_user: iosync"
@@ -90,6 +92,7 @@ proc connect_to {server port} { global spawn_id
 }
 
 proc login_as {user pass} {
+  if {$pass eq ""} { error "login account '\[tag=bitlbee ...\]' must contain password" }
   expect_before "PING :PinglBee" { msgraw "PONG :PinglBee"; exp_continue }
 
   msgraw "NICK $user"
@@ -105,9 +108,12 @@ proc login_as {user pass} {
     msgauto "drop $pass"
     # msgauto "save"  ;# TRY:NEED: otherwise old acc is restored
     msgauto "register $pass"
+    # INFO:DFL: on reset enable auto_connect (least surprise)
+    #   <= if not explicitly disabled by subsequent user configs
+    msgauto "set auto_connect true"
   }
 
-  option_set auto_connect false
+  option_set auto_connect "false"
   msgroot "identify $pass"
   expect {
     timeout { error "identify failed" }
@@ -139,6 +145,7 @@ proc use_account {} {
     set ::bitlbee_pass $account(pass)
     login_as $::bitlbee_user $::bitlbee_pass
   }
+  if {![info exists ::bitlbee_user]} { error "first account must be '\[tag=bitlbee ...\]'" }
   msgroot "account $account(tag) off"
   if {[info exists account(reset)]} { msgroot "account $account(tag) del" }
 }
@@ -170,8 +177,10 @@ proc parse_tags {line} {
 
 proc parse_config {path} {
   iosync
+  ## DEPR: open() substitutes "~" by itself
+  #   if {[string range $path 0 1] eq "~/"} { string replace $path 0 0 $::env(HOME) }
   if {$path eq "" || $path eq "-"} { set fd stdin; set path $fd } else { set fd [open $path r] }
-  echo "\n\[[expr {[info exists ::account(tag)] ? $::account(tag) : {-}}]\]  @$path"
+  echo "\n\[[expr {[info exists ::account(tag)] ? $::account(tag) : {=}}]\]  @$path"
   fconfigure $fd -buffering line
   parse_fstream $fd
   close $fd
