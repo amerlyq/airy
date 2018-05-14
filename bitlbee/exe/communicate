@@ -53,6 +53,7 @@ proc iosync {} {
 #%   => RQ:USE: set "tag = %{tag}" inside *.conf
 proc has_account {tag user} {
   msgroot "account list"
+  regsub {[+.*]} $user {\\\0} user
   set accrgx " \\($tag\\): .*, $user\[ \r\n\]"
   expect {
     -re $accrgx { return 1 }
@@ -165,14 +166,14 @@ proc gsubvars {text} {
 }
 
 proc parse_tags {line} {
-  if {$::opts(verbose)} { puts "\[$line\]" }
   unset -nocomplain ::account
   foreach kv [regexp -inline -all -- {\S+} $line] {
     lassign [split $kv =] k v
     if {$k eq ""} { error "key is required" }
     set ::account($k) $v
   }
-  if {$::opts(verbose)} { parray ::account }
+  safeecho "\[$line\]"
+  # if {$::opts(verbose)} { parray ::account }
 }
 
 proc parse_config {path} {
@@ -188,7 +189,7 @@ proc parse_config {path} {
 
 proc parse_command {line} {
   set line [gsubvars $line]
-  if {$::opts(verbose)} { puts " <- $line" }
+  safeecho " <- $line"
   switch -regexp -matchvar m -- $line {
     {^/join (.*)} { msgraw "JOIN [lindex $m 1]" }
     {^/\S*} { error "IRC command '$m' is not allowed" }

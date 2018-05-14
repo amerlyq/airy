@@ -16,7 +16,7 @@ dryrun=
 renew=
 verbose=
 
-while getopts 'dhr-:' o; do case $o in :|'?') exit 1
+while getopts 'dhrv-:' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
 ;; d) dryrun=1     #% d = dryrun print (!with your plain-text passwords!) instead of communication
 ;; r) renew=1      #% r = renew, completely reset current identity and re-create accounts
@@ -74,7 +74,7 @@ for i in "${!names[@]}"; do
       ${pass+pass=$pass}
       ${!nick+nick=${!nick}}
     )
-    [[ $nm == skype ]] && creds+=( reset )  # TEMP
+    # [[ $nm == skype ]] && creds+=( reset )  # TEMP
     spec+=$'\n'
     spec+="[${creds[*]}]"
     spec+=$'\n'
