@@ -33,6 +33,10 @@ CURR_CHROOT_EVAL=''
 # Def: prs for headless ssh, cli/tui only
 AIRY_MODS=(wget shell bash zsh util grep python ruby git term ranger tmux vim elinks)
 AIRY_SKIP=()
+## NOTE: by unset 'AIRY_OVERLAY_BASE' all default configs can be disabled at once
+AIRY_OVERLAY_BASE=~/.local/airy
+## user customizable
+# AIRY_OVERLAY_PATH=/private/overlay:/public/overlay
 
 # Ignore pkgs updates
 PKG_IGNORE=()

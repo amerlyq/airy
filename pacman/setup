@@ -12,6 +12,8 @@ grep -q '^#Color\s*$' "$cfg" && sudo sed -ri '/^#(Color)\s*$/s//\1/' "$cfg"
 #   => !9 [_] TEST: clean install on system => BUG editor is non
 Deprecated ~/.config/pacaur/config
 # linkcp pacaur.conf ~/.config/pacaur/config
+cfg=/etc/xdg/pacaur/config
+grep -q '^#displaybuildfiles=' "$cfg" && sudo sed -ri '/^#(displaybuildfiles)=\S+(\s+.*)$/s//\1=none \2/' "$cfg"
 
 # TODO setup pacaur to use -j4..-j8 in /etc/makepkg.conf
 # OR: $XDG_CONFIG_HOME/pacman/makepkg.conf OR ~/.makepkg.conf

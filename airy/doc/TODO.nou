@@ -365,6 +365,10 @@ cache-alias
 
 PKGMOD
   [_] TRY:OPT: install "airy" as secure system-wide (with sudo on exclusive single-user PC) or portable user-local *pkg* (on shared PC)
+    * run inside chroot to create single package
+    * (option) copy files under symlinks or keep as symlinks
+      => so, changing scripts in *airy* will have immediate effect w/o rebuild
+      BUT: adding new scripts will require complete rebuild
   [_] TRY: install whole "airy" as single native pkg
   [_] BAD: PKGBUILD can't touch any /home or /tmp path
     https://wiki.archlinux.org/index.php/Arch_packaging_standards#Directories
@@ -387,11 +391,9 @@ PKGMOD
     http://www.overclock.net/t/1339466/converting-an-aur-slackbuild-script-for-use-in-debian
     http://archlinux.org.ru/forum/topic/15919/
 
-
-TRY:
-  [_] Save "airy" configs directly to /etc -- as "airy" is actually distribution rolled over ArchLinux
+  [_] TRY: Save "airy" configs directly to /etc -- as "airy" is actually distribution rolled over ArchLinux
     * I simply change system defaults -- package list and settings
-    => then user's private profile becomes STD settings => which user applies by himself
+    => then user's private profile becomes STD settings => which admin applies by himself to whole system
     ?? MAYBE: I can override system-wide cfgs in /etc by my custom PKBBUILD -- if it allows "override"
     [_] THINK: provide two variants -- /etc and $HOME -- because $HOME can be cleanly removed (by log-in as another user)
 

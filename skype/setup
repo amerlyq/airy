@@ -3,7 +3,7 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-dst=~/.Skype/${MAIN_SKYPE:?}/config.xml
+dst=~/.Skype/${CHAT_SKYPE:?}/config.xml
 if cfgOpt r || [[ ! -f $dst ]]; then
   rm -f "$dst"
   linkcp -c "${dst##*/}" "$dst"

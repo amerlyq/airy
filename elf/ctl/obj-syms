@@ -200,6 +200,7 @@ cycle_relpath(){ local sym=$1; shift
 
 # ALT: remove longest common prefix
 # http://www.alecjacobson.com/weblog/?p=141
+# TODO: replace by "parallel --keep-order"
 topo_cycle_relpath(){ local grp=$1; shift
   dump_once "$grp/topo.cycles.relpath" \
     <"$grp/topo.cycles" xargs -rn1 -d\\n -I{} -- \

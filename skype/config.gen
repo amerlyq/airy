@@ -2,7 +2,7 @@
 source ~/.shell/profile
 
 opt=~/.Skype/shared.xml
-cfg=~/.Skype/${MAIN_SKYPE:?}/config.xml
+cfg=~/.Skype/${CHAT_SKYPE:?}/config.xml
 [[ -f $opt && -f $cfg ]] ||
   { echo "Wrn: launch Skype once before gen cfg"; exit 0; }
 

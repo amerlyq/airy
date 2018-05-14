@@ -15,3 +15,6 @@ for i in {A,C,D,M,R,U}; do
   alias gws${ZSH_NAME:+$i:l}${BASH:+${i,,}}="git -c color.status=always status -s | grep --color=never -E '\\a?[$i]\\b'"
   alias gws$i="git -c color.status=always status -s | grep --color=never -vE '\\a?[$i]\\b'"
 done
+
+## Lists
+alias gwli='git ls-files --others --ignored --exclude-standard'
