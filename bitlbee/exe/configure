@@ -1,0 +1,92 @@
+#!/bin/bash
+#%SUMMARY: convert list of tags to bitlbee communication spec file
+#%USAGE: ./$0 [-r|--renew] [-d|--dryrun] <tags>...
+#%
+## INFO:
+# ALT:(BITLBEE_LIST):BAD: use implicit order of CHAT_* vars declaration (instead of explicit list)
+# i.e. $ (IFS=; declare -p) | sed -rn 's/declare -\S\sCHAT_([A-Z0-9]+)[_=].*/\1/p' | sort -u
+#   - always uses all vars -- can't use vars only for other programs
+#   - some CHAT_* vars may be used by other programs BUT:NOT bitlbee
+#   - can't apply per-tag overlay/existence modifiers
+#
+set -euo pipefail -o noglob
+source ~/.shell/profile
+
+dryrun=
+renew=
+verbose=
+
+while getopts 'dhr-:' o; do case $o in :|'?') exit 1
+;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; d) dryrun=1     #% d = dryrun print (!with your plain-text passwords!) instead of communication
+;; r) renew=1      #% r = renew, completely reset current identity and re-create accounts
+;; v) verbose=1    #% v = verbose communication
+;; -) case $OPTARG
+in renew|dryrun) declare $OPTARG=1
+;; *) echo "Err: unknow flag '--$OPTARG'"; exit 1
+esac; esac; done; unset o; shift $((OPTIND-1))
+(($#)) || { echo "Err: empty requested tags list (\$@)"; exit 1; }
+tags=( "$@" )
+
+## THINK: do I really need per-*mod* overlay var ?
+##   BUT: where to derive per-mod dir from airy overlay ?
+# if [[ ${BITLBEE_OVERLAY_BASE+x} ]]; then base=$BITLBEE_OVERLAY_BASE
+# else
+# ALT: use [-s 'bitlbee/cfg/{}.conf'] to add pref to each path
+# ALT: base=$(cfg-overlay -QE! -p '%s:' -b "${AIRY_OVERLAY_BASE:?}"); base=${base//://bitlbee/cfg:}; base=${base%:}
+# fi
+
+mcfg=bitlbee/cfg
+export CFG_OVERLAY_BASE=$(cfg-overlay -QE! -p "%s/$mcfg:" -b "${AIRY_OVERLAY_BASE-}" --)
+export CFG_OVERLAY_PATH=$(cfg-overlay -QE! -p "%s/$mcfg:" -o "${AIRY_OVERLAY_PATH-}" --)
+export CFG_OVERLAY_MODE=+
+export CFG_OVERLAY_SUBST='{}.conf'
+export CFG_OVERLAY_PRINT=' @%s\n'
+
+# WARN: you can't simply source all *.conf in /public/cfg/ and /private/cfg/
+#   * only user knows which accounts and channels him want to choose
+#   * experimental configs and template files must be left untouched
+# NOTE: "./exe/cfg-by-chat-vars" contains policy and "./exe/communicate" implements mechanisms
+#   * places where to look for passwords are subject of this script's policy
+#     => user may write clean bash script instead of using CHAT_* vars ()
+#     SEE:<example> in ./exe/communicate with $(pass ...) commands used only where necessary
+
+readarray -t names < <(cfg-overlay -qE! -p '%s\n' -- "${tags[@]}")
+
+# RQ: always required, always first
+[[ ${names[0]} == bitlbee ]] || {
+  echo "Err: first account must be 'bitlbee'" >&2
+  exit 1
+}
+
+spec=
+for i in "${!names[@]}"; do
+  tag=${tags[i]}
+  nm=${names[i]}
+  user=CHAT_${nm^^}
+  pass=$(r.query-passwd "chat/$nm" 2>/dev/null||:)
+  nick=${user}_NICK
+
+  ## THINK:WARN: { echo "Err: variable '$user' is unset" >&2; exit 1; }
+  if [[ ${!user+x} ]]; then
+    creds=( tag=${names[i]}
+      ${!user+user=${!user}}
+      ${pass+pass=$pass}
+      ${!nick+nick=${!nick}}
+    )
+    [[ $nm == skype ]] && creds+=( reset )  # TEMP
+    spec+=$'\n'
+    spec+="[${creds[*]}]"
+    spec+=$'\n'
+  fi
+  spec+=$(cfg-overlay -- "$tag")
+  spec+=$'\n'
+done
+
+#%WARN: system-wide bitlbee.service must be runnning
+if ((dryrun)); then
+  cat <<< "$spec"
+else
+  d_exe=$(dirname "$(readlink -e "$0")")
+  "$d_exe/communicate" -- ${verbose:+-v} ${renew:+--renew} <<< "$spec"
+fi

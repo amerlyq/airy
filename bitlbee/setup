@@ -13,5 +13,6 @@ uncomment DaemonPort
 
 svc_activate -er bitlbee
 
-# r.bitlbee-cfg
-# cfgOpt r && ./exe/configure <<< "set auto_connect true"
+if cfgOpt u; then
+  ./exe/configure $(cfgOpt r && echo --renew) -- "${BITLBEE_LIST[@]:?}"
+fi
