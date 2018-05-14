@@ -12,10 +12,14 @@ source ~/.shell/func.d/cfgsetup
 ### GENS ###
 if cfgOpt r; then
   # NOTE: "export IRC_NICK" won't generate error if var doesn't exist
-  export IRC_NICK=${IRC_NICK:?} IRC_USER=${IRC_FREENODE:-${IRC_USER:?}} IRC_CHAN=${IRC_FREENODE_CHAN:?}
   # export IRC_ZNC="${IRC_ZNC:?}" IRC_ZNC_FP="${IRC_ZNC_FP:?}"
+  export CHAT_IRC_NICK  CHAT_BITLBEE  CHAT_FREENODE  CHAT_FREENODE_CHAN  CHAT_OFTC  CHAT_OFTC_CHAN
 
-  [[ -p ~/.weechat/weechat_fifo ]] || { weechat-headless --no-connect & wee_pid=$!; }
+  onexit(){ [[ ${wee_pid+x} ]] || return 0; r.irc-pipe <<< '/quit'; wait "$wee_pid"; }
+  [[ -p ~/.weechat/weechat_fifo ]] || {
+    weechat-headless --no-connect & wee_pid=$!
+    trap 'onexit' HUP INT QUIT TERM ERR
+  }
   while ! [[ -p ~/.weechat/weechat_fifo ]]; do printf .; sleep 0.1; done
 
   # r.irc-pipe <<< '/unset -mask irc.*'
@@ -25,7 +29,7 @@ if cfgOpt r; then
   r.irc-cfg ./cfg/{behavior,buflist,nicks,messages,multiline}.conf
   r.irc-pipe <<< '/save'  # OR: '/save irc'
 
-  [[ ${wee_pid+x} ]] && { r.irc-pipe <<< '/quit'; wait "$wee_pid"; }
+  onexit
 fi
 
 # USE: $ WEECHAT_PASSPHRASE="$(pass irc/weechat)" weechat --no-connect
