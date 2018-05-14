@@ -7,8 +7,8 @@
 #% * <tag>!   (override) = search inside only overlay path
 # DEV: preprocess escaping of user input e.g.  tag\! -> as "tag!"|mode=+
 #% * <tag>!0  (override) = use only Nth of all paths (?as temporary fix?)
-#% * <tag>+   (append)  = search order: {default -> overlay}, DEV: file must exist in both places
-#% * <tag>-   (prepend) = search order: {overlay -> default}, DEV: file must exist in both places
+#% * <tag>+   (append)  = search order: {base -> path}, DEV: file must exist in both places
+#% * <tag>-   (prepend) = search order: {path -> base}, DEV: file must exist in both places
 #%
 ## Experimental BAD:(brittle): when base/path frequently changes
 #  * <tag>!-1-1  (desc interval 3,2,1)
@@ -55,32 +55,36 @@ query_uniqpath=0
 verbose=0
 
 #%INFO: <flags>
+opts=; declare -A opta
 while getopts 'b:E:hM:o:p:qQs:v' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
 ;; v) verbose=1                 #% v = verbose (only for debug)
 ;; q) query_tagnames=1          #% q = query tag names with stripped control pref/sfx
 ;; Q) query_uniqpath=1          #% Q = query base+path with dups and empty removed
-;; M) ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+, VIZ. {-=prepend +=append !=override}
-#                               #%   ('+' by default is user-friendly -- allows to extend base configs)
-;; b) papp ov_base "$OPTARG"    #% b+= overlay basis, DFL=(<empty>), e.g. [/airy/cfg]
-;; o) papp ov_path "$OPTARG"    #% o+= overlay paths, DFL=(<empty>), e.g. [/private/cfg:/public/cfg]
-;; s) ss_mask+=( "$OPTARG" )    #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
-;; p) fmt_print=$OPTARG         #% p = printf format for generic results, DFL=%s\n, e.g. [@%s\0]
 ;; E) env_mode=$OPTARG          #% E = env merge modifier, DFL=~, VIZ. {~=fallback +=append !=ignore}
-esac; done; opts+=$o; shift $((OPTIND-1))
+;; p) opta[fmt_print]=1; fmt_print=$OPTARG       #% p = printf format for generic results, DFL=%s\n, e.g. [@%s\0]
+;; s) opta[ss_mask]=1; ss_mask+=( "$OPTARG" )    #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
+;; b) opta[ov_base]=1; papp ov_base "$OPTARG"    #% b+= overlay basis , DFL=(<empty>), e.g. [/airy/cfg]
+;; o) opta[ov_path]=1; papp ov_path "$OPTARG"    #% o+= overlay paths (user's personal), DFL=(<empty>), e.g. [/private/cfg:/public/cfg]
+;; M) opta[ov_mode]=1; ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+, VIZ. {-=prepend +=append !=override}
+esac; done; opts+=$o; shift $((OPTIND-1))        #%   ('+' by default is user-friendly -- allows to extend base configs)
+#%-----
+#% base = unchangable part of underlying *airy* system, outside of user's control, can change with every update
+#% path = part of user's own public/private repos, provides full access, can be frozen whenever needed
+#%
 
 [[ $env_mode == [~+!] ]] || die "unknown env vars modifier '$env_mode'"
 
-if [[ $env_mode != [!] ]]; then
-  # WARN: don't use ((${#ov_base})) -- user can pass [-b ':'], which is technically empty
-  [[ ! $opts =~ b || $env_mode == [+] ]] && papp ov_base "${CFG_OVERLAY_BASE-}"
-  [[ ! $opts =~ o || $env_mode == [+] ]] && papp ov_path "${CFG_OVERLAY_PATH-}"
-  [[ ! $opts =~ s || $env_mode == [+] ]] && papp ss_mask "${CFG_OVERLAY_SUBST-}"
-  [[ ! $opts =~ F && ${CFG_OVERLAY_PRINT+x} ]] && fmt_print=$CFG_OVERLAY_PRINT
-  [[ ! $opts =~ M && ${CFG_OVERLAY_MODE+x}  ]] && ov_mode=$CFG_OVERLAY_MODE
+if [[ $env_mode != '!' ]]; then
+  # ALT:(${#ov_base}):BAD: user can pass [-b ':'], which is technically empty
+  # ALT:($opts =~ b):BAD:NEED sync flag letters above and below
+  [[ -z ${opta[ov_base]+x} || $env_mode == [+] ]] && papp ov_base "${CFG_OVERLAY_BASE-}"
+  [[ -z ${opta[ov_path]+x} || $env_mode == [+] ]] && papp ov_path "${CFG_OVERLAY_PATH-}"
+  [[ -z ${opta[ss_mask]+x} || $env_mode == [+] ]] && papp ss_mask "${CFG_OVERLAY_SUBST-}"
+  [[ -z ${opta[ov_mode]+x}   && ${CFG_OVERLAY_MODE+x}  ]] && ov_mode=$CFG_OVERLAY_MODE
+  [[ -z ${opta[fmt_print]+x} && ${CFG_OVERLAY_PRINT+x} ]] && fmt_print=$CFG_OVERLAY_PRINT
 fi
 
-#%-----
 
 debugprint(){ :; } && ((verbose)) &&
 debugprint(){ local -rn a=$1
