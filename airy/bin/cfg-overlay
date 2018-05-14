@@ -1,6 +1,5 @@
 #!/bin/bash
 #%USAGE: ./$0 [<flags>...] [--] <tags>...
-#%ALSO: append flags from env vars: $CFG_OVERLAY_{BASE,PATH,MODE,SUBST,PRINT}
 #%
 #%VIZ. <tags> syntax (overlay modifiers)
 #% * <tag>    (default mode) = not required for file to exist in both places
@@ -16,6 +15,15 @@
 #  * <tag>!1--1  (asc  interval 1,2,3)
 #  * <tag>!1,3   (selection sequence)
 #
+#%INFO: <env vars> $CFG_OVERLAY_{BASE,PATH,MODE,SUBST,PRINT}
+# DEV: env composition
+#% -E!F = env, ignore flags
+#% -E~F = env, fallback flags
+#% -E+F = env, append flags
+#% -F!E = flags, ignore env
+#% -F~E = flags, fallback env (TODO:DFL)
+#% -F+E = flags, append env (TEMP:DFL)
+#%
 ## INFO: performance: ~4ms total, THINK:DEV: self-compiling C util
 #  * 2.3ms -- bash startup
 #  * 0.4ms -- {args + func} parsing
@@ -23,39 +31,47 @@
 #  * 1.0ms -- print to tty
 #
 set -euo pipefail -o noglob
+shopt -s extglob
 
 die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
 
-# ALT:BAD: performance: +2.2ms
+# ALT:BAD: subshell performance: +2.2ms
 #   IFS=: read -r -d '' -a dpaths < <(IFS=:; printf '%s:\0' "$*")
-papp(){ local -rn a=$1; shift; local p IFS=:
-  for p in $*; do [[ -z ${p:+x} ]] || a+=("$p"); done
-}
+#   for p in $*; do [[ -z ${p:+x} ]] || a+=("$p"); done
+papp(){ local -rn a=$1; shift; local p IFS=:; a+=( ${*//+(:)/:} ); }
 
-tag_fmt='^([[:punct:]])?([-/_[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
-ov_mode=${CFG_OVERLAY_MODE-+}
-fmt_print=${CFG_OVERLAY_PRINT-'%s\n'}
-query_parsed=0
+tag_rgx='^([[:punct:]])?([-/_[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
+fmt_print='%s\n'
+ov_mode=+
+ov_base=()
+ov_path=()
+ss_mask=()
+query_tagnames=0
+query_uniqpath=0
 verbose=0
 
 #%INFO: <flags>
-while getopts 'b:F:hM:o:qs:v' o; do case $o in :|'?') exit 1
+while getopts 'b:hM:o:p:qQs:v' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
 ;; v) verbose=1                 #% v = verbose (only for debug)
-;; q) query_parsed=1            #% q = query tag names with stripped control pref/sfx
+;; q) query_tagnames=1          #% q = query tag names with stripped control pref/sfx
+;; Q) query_uniqpath=1          #% Q = query base+path with dups and empty removed
+;; M) ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+
+#                               #%   ('+' by default is user-friendly -- allows to extend base configs)
 ;; b) papp ov_base "$OPTARG"    #% b+= overlay basis, DFL=(<empty>), e.g. [/airy/cfg]
 ;; o) papp ov_path "$OPTARG"    #% o+= overlay paths, DFL=(<empty>), e.g. [/private/cfg:/public/cfg]
 ;; s) ss_mask+=( "$OPTARG" )    #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
-;; F) fmt_print=$OPTARG         #% F = format print result, DFL=%s\n, e.g. [@%s\0]
-;; M) ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+
-                                #%   ('+' by default is user-friendly -- allows to extend base configs)
-esac; done; unset o; shift $((OPTIND-1))
-(($#)) || die "empty requested tags list (\$@)"
+;; p) fmt_print=$OPTARG         #% p = printf format for generic results, DFL=%s\n, e.g. [@%s\0]
+esac; done; opts+=$o; shift $((OPTIND-1))
 
-# NOTE: append from env vars
+# TEMP:DFL: append from env vars
 papp ov_base "${CFG_OVERLAY_BASE-}"
 papp ov_path "${CFG_OVERLAY_PATH-}"
 papp ss_mask "${CFG_OVERLAY_SUBST-}"
+[[ ! $opts =~ F && ${CFG_OVERLAY_PRINT+x} ]] && fmt_print=$CFG_OVERLAY_PRINT
+[[ ! $opts =~ M && ${CFG_OVERLAY_MODE+x}  ]] && ov_mode=$CFG_OVERLAY_MODE
+
+#%-----
 
 debugprint(){ :; } && ((verbose)) &&
 debugprint(){ local -rn a=$1
@@ -63,23 +79,37 @@ debugprint(){ local -rn a=$1
   for v in "${a[@]}"; do printf ' * %s\n' "$v"; done
 }
 
-debugprint ov_base
-debugprint ov_path
-
-select_dirs(){ local -r var=$1 mod=$2 sfx=$3; local -rn a=$var
+compose_by_modifier(){ local -rn a=$1; local -r mod=$2
   case $mod
   in !) a=( "${ov_path[@]}" )
   ;; +) a=( "${ov_base[@]}" "${ov_path[@]}" )
   ;; -) a=( "${ov_path[@]}" "${ov_base[@]}" )
   ;; *) die "unknown modifier '$mod'"
   esac
-  # DEV: sequence; desc interval
+}
+
+# DEV: sequence; desc interval
+select_by_designator(){ local -rn a=$1; local -r sfx=$2
   while [[ -n ${sfx:+x} ]]; do
     [[ $sfx =~ ^[0-9]+$ ]] && a=( "${a[sfx]}" ) && break
     [[ $sfx =~ ^[0-9]+-[0-9]+$ ]] && a=( "${a[@]:(${sfx%%-*}):(${sfx#*-}-${sfx%%-*})}" ) && break
     die "unknown suffix format '$sfx'"
   done
-  [[ ${a[@]:+x} ]] || die "empty '$var' = search dirs list (-b/-o)"
+}
+
+remove_duplicates(){ local -rn a=$1; local -A dups; local i v
+  for i in "${!a[@]}"; do v=${a[$i]}
+    if [[ ${dups["$v"]+x} ]]; then
+      unset a[$i]
+      continue
+    else dups["$v"]=1; fi
+  done
+}
+
+select_dirs(){ local -r var=$1 mod=$2 sfx=$3
+  compose_by_modifier "$var" "$mod"
+  select_by_designator "$var" "$sfx"
+  remove_duplicates "$var"
   debugprint "$var"
 }
 
@@ -104,21 +134,20 @@ find_existing(){ local -r var=$1; local -rn a=$var da=$2 fa=$3
 
 # ALT:BAD: brittle globbing
 #   case $tag in *?[-!+]?*) sfx=${tag#*!}; tag=${tag%$sfx}; mod=${tag:(-1)}; tag=${tag%?}
-search(){ local tag=$1 mod opt sfx dpaths fnames found
-  [[ $tag =~ $tag_fmt ]] || die "tag '$tag' has wrong format"
-  opt=${BASH_REMATCH[1]}
-  tag=${BASH_REMATCH[2]}
-  mod=${BASH_REMATCH[4]:-$ov_mode}
-  sfx=${BASH_REMATCH[5]}
-  ((verbose)) && printf '%s=[%s|%s|%s]\n' "$tag" "$opt" "$mod" "$sfx" >&2
+parse_tag(){ local expr=$1; local -rn _opt=$2 _tag=$3 _mod=$4 _sfx=$5
+  [[ $expr =~ $tag_rgx ]] || die "tag '$expr' has wrong format"
+  _opt=${BASH_REMATCH[1]}
+  _tag=${BASH_REMATCH[2]}
+  _mod=${BASH_REMATCH[4]:-$ov_mode}
+  _sfx=${BASH_REMATCH[5]}
+  ((!verbose)) || printf '%s=[%s|%s|%s]\n' "$_tag" "$_opt" "$_mod" "$_sfx" >&2
+}
 
-  if ((query_parsed)); then
-    # DEV: substitute tag/mod/opt/sfx in fmt_print
-    printf "$fmt_print" "$tag"
-    return
-  fi
-
+search(){ local tag=$1 opt mod sfx dpaths fnames found
+  parse_tag "$tag" opt tag mod sfx
   select_dirs dpaths "$mod" "$sfx"
+  [[ ${dpaths[@]:+x} ]] || die "empty 'dpaths' search list (-b/-o)"
+
   gen_names fnames "$tag"
   find_existing found dpaths fnames
 
@@ -128,6 +157,28 @@ search(){ local tag=$1 mod opt sfx dpaths fnames found
     die "tag '$tag' not found"
   fi
 }
+
+
+debugprint ov_base
+debugprint ov_path
+
+if ((query_uniqpath)); then
+  # THINK:DEV: allow [-M !1,3 ] to specify "$sfx" for queries
+  select_dirs dpaths "$ov_mode" ''
+  printf "$fmt_print" "${dpaths[@]}"
+  exit
+fi
+
+(($#)) || die "empty requested tags list (\$@)"
+
+if ((query_tagnames)); then
+  # DEV: substitute tag/mod/opt/sfx in fmt_print
+  for tag; do
+    parse_tag "$tag" _ tag _ _
+    printf "$fmt_print" "$tag"
+  done
+  exit
+fi
 
 for tag; do
   search "$tag"
