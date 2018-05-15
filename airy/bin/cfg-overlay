@@ -16,8 +16,8 @@
 #  * <tag>!1,3   (selection sequence)
 #
 #%INFO: <env vars> $CFG_OVERLAY_{BASE,PATH,MODE,SUBST,PRINT}
-#% -E! = ignore env vars
-#% -E~ = fallback to env vars (DFL)
+#% -E! = ignore env vars (DFL, otherwise any "export" will cause system-wide disaster)
+#% -E~ = fallback to env vars (USE: only enable on demand, when you really expect it)
 #% -E+ = append env vars (after all flags)
 #%THINK:DEV: reverse env composition
 #% -F!E = ignore flags, use env
@@ -45,7 +45,7 @@ papp(){ local -rn a=$1; shift; local p IFS=:
 
 tag_rgx='^([[:punct:]])?([-_./[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
 fmt_print='%s\n'
-env_mode='~'
+env_mode='!'
 ov_mode='+'
 ov_base=()
 ov_path=()
@@ -61,7 +61,7 @@ while getopts 'b:E:hM:o:p:qQs:v' o; do case $o in :|'?') exit 1
 ;; v) verbose=1                 #% v = verbose (only for debug)
 ;; q) query_tagnames=1          #% q = query tag names with stripped control pref/sfx
 ;; Q) query_uniqpath=1          #% Q = query base+path with dups and empty removed
-;; E) env_mode=$OPTARG          #% E = env merge modifier, DFL=~, VIZ. {~=fallback +=append !=ignore}
+;; E) env_mode=$OPTARG          #% E = env merge modifier, DFL=!, VIZ. {~=fallback +=append !=ignore}
 ;; p) opta[fmt_print]=1; fmt_print=$OPTARG       #% p = printf format for generic results, DFL=%s\n, e.g. [@%s\0]
 ;; s) opta[ss_mask]=1; ss_mask+=( "$OPTARG" )    #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
 ;; b) opta[ov_base]=1; papp ov_base "$OPTARG"    #% b+= overlay basis , DFL=(<empty>), e.g. [/airy/cfg]

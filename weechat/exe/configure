@@ -1,0 +1,39 @@
+#!/bin/bash
+#%SUMMARY: stuff list of tags to weechat pipe as files
+#%USAGE: ./$0 [-r] [-d] <tags>...
+#%
+set -euo pipefail -o noglob
+source ~/.shell/profile
+
+# USE: $ WEECHAT_PASSPHRASE="$(pass chat/weechat)" weechat --no-connect
+#   <= BAD: can't suppress passphrase prompt by '<Space>' to update settings through script
+#     i.e. $ WEECHAT_PASSPHRASE=' ' weechat --no-connect
+# FAIL: $ weechat --no-connect -r '/set sec.crypt.passphrase_file /dev/stdin' \
+#   -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
+#   -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
+
+dryrun=
+verbose=
+
+while getopts 'dhv' o; do case $o in :|'?') exit 1
+;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; d) dryrun=1     #% d = dryrun
+;; v) verbose=1    #% v = verbose
+esac; done; unset o; shift $((OPTIND-1))
+(($#)) || { echo "Err: empty requested tags list (\$@)"; exit 1; }
+tags=( "$@" )
+
+mcfg=weechat/cfg
+export CFG_OVERLAY_BASE=$(cfg-overlay -Q -p "%s/$mcfg:" -b "${AIRY_OVERLAY_BASE-}" --)
+export CFG_OVERLAY_PATH=$(cfg-overlay -Q -p "%s/$mcfg:" -o "${AIRY_OVERLAY_PATH-}" --)
+
+readarray -t names < <(cfg-overlay -q -p '%s\n' -- "${tags[@]}")
+readarray -t files < <(cfg-overlay -M+ -E~ -s '{}.conf' -- "${tags[@]}")
+
+for nm in "${names[@]}"; do var=CHAT_${nm^^}
+  # NOTE: "export VAR" won't generate error even if VAR doesn't exist
+  export "$var" "${var}_NICK" "${var}_CHAN"
+done
+
+d_exe=$(dirname "$(readlink -e "$0")")
+"$d_exe/communicate" ${dryrun:+-d} ${verbose:+-v} -- "${files[@]}"

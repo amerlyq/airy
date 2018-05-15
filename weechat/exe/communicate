@@ -1,0 +1,45 @@
+#!/bin/bash
+#%USAGE: ./$0 [<flags>...] [--] [/dev/stdin] [<cfgspec>...]
+#%INFO: ~/.weechat/weechat_fifo
+#%  $ echo 'irc.server.freenode */nick newnick' > "$pipe"
+#%  $ echo 'irc.freenode.#weechat *hello!' > "$pipe"
+#%  $ echo '*hello!' > "$pipe"
+set -euo pipefail
+die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
+
+pipe=${WEECHAT_HOME:-$HOME/.weechat}/weechat_fifo
+dryrun=
+verbose=
+
+while getopts 'dhv' o; do case $o in :|'?') exit 1
+;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; d) dryrun=1     #% d = dryrun
+;; v) verbose=1    #% v = verbose
+esac; done; unset o; shift $((OPTIND-1))
+
+strip_comments(){ sed -r '/^\s+/s///; /(^#|  # ).*$/s///; /^$/d'; }
+parse_config(){ env-subs "$@"  | strip_comments | sed 's/^/*/'; }
+onexit(){ [[ ${wee_pid+x} ]] || return 0; echo '*/quit'; wait "$wee_pid"; }
+
+if ((!dryrun)); then
+  [[ -p $pipe ]] || {
+    weechat-headless --no-connect & wee_pid=$!
+    trap 'onexit' HUP INT QUIT TERM ERR
+  }
+  # OR: [[ -p $pipe ]] || die "pipe '$pipe' must exist"
+  while ! [[ -p $pipe ]]; do printf .; sleep 0.1; done && echo
+  exec > "$pipe"
+fi
+
+## DEV: --renew
+# MAYBE: '/unset -mask irc.*'
+# BUG:(don't work): /server del *
+# BAD:(removes too much): /unset -mask weechat.*
+
+for cfg; do
+  ((verbose)) && printf '\n[%s]  @%s\n' "${cfg##*/}" "$cfg" >&2
+  parse_config "$cfg"
+done
+
+echo '*/save'  # OR: '/save irc'
+onexit

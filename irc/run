@@ -2,7 +2,7 @@
 
 # NOTE: propagate passwd from keyring (when available) if you use /secure for weechat
 if grep -xF '__passphrase__ = on' ~/.weechat/sec.conf; then
-  pass=$(r.query-passwd irc/weechat 2>/dev/null) && export WEECHAT_PASSPHRASE=$pass
+  pass=$(r.query-passwd 'chat/weechat' 2>/dev/null) && export WEECHAT_PASSPHRASE=$pass
 fi
 
 exec weechat "$@"

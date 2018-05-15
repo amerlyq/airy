@@ -22,12 +22,9 @@ if cfgOpt r; then
   }
   while ! [[ -p ~/.weechat/weechat_fifo ]]; do printf .; sleep 0.1; done
 
-  # r.irc-pipe <<< '/unset -mask irc.*'
-  # BUG:(don't work): /server del *
   r.irc-cfg ./cfg/{anonymity,server_default,bitlbee,freenode,oftc}.conf  # znc
-  # BAD:(removes too much): /unset -mask weechat.*
   r.irc-cfg ./cfg/{behavior,buflist,nicks,messages,multiline}.conf
-  r.irc-pipe <<< '/save'  # OR: '/save irc'
+  r.irc-pipe <<< '/save'
 
   onexit
 fi

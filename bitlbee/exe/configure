@@ -33,15 +33,12 @@ tags=( "$@" )
 # if [[ ${BITLBEE_OVERLAY_BASE+x} ]]; then base=$BITLBEE_OVERLAY_BASE
 # else
 # ALT: use [-s 'bitlbee/cfg/{}.conf'] to add pref to each path
-# ALT: base=$(cfg-overlay -QE! -p '%s:' -b "${AIRY_OVERLAY_BASE:?}"); base=${base//://bitlbee/cfg:}; base=${base%:}
+# ALT: base=$(cfg-overlay -Q -p '%s:' -b "${AIRY_OVERLAY_BASE:?}"); base=${base//://bitlbee/cfg:}; base=${base%:}
 # fi
 
 mcfg=bitlbee/cfg
-export CFG_OVERLAY_BASE=$(cfg-overlay -QE! -p "%s/$mcfg:" -b "${AIRY_OVERLAY_BASE-}" --)
-export CFG_OVERLAY_PATH=$(cfg-overlay -QE! -p "%s/$mcfg:" -o "${AIRY_OVERLAY_PATH-}" --)
-export CFG_OVERLAY_MODE=+
-export CFG_OVERLAY_SUBST='{}.conf'
-export CFG_OVERLAY_PRINT=' @%s\n'
+export CFG_OVERLAY_BASE=$(cfg-overlay -Q -p "%s/$mcfg:" -b "${AIRY_OVERLAY_BASE-}" --)
+export CFG_OVERLAY_PATH=$(cfg-overlay -Q -p "%s/$mcfg:" -o "${AIRY_OVERLAY_PATH-}" --)
 
 # WARN: you can't simply source all *.conf in /public/cfg/ and /private/cfg/
 #   * only user knows which accounts and channels him want to choose
@@ -51,7 +48,7 @@ export CFG_OVERLAY_PRINT=' @%s\n'
 #     => user may write clean bash script instead of using CHAT_* vars ()
 #     SEE:<example> in ./exe/communicate with $(pass ...) commands used only where necessary
 
-readarray -t names < <(cfg-overlay -qE! -p '%s\n' -- "${tags[@]}")
+readarray -t names < <(cfg-overlay -q -p '%s\n' -- "${tags[@]}")
 
 # RQ: always required, always first
 [[ ${names[0]} == bitlbee ]] || {
@@ -79,7 +76,7 @@ for i in "${!names[@]}"; do
     spec+="[${creds[*]}]"
     spec+=$'\n'
   fi
-  spec+=$(cfg-overlay -- "$tag")
+  spec+=$(cfg-overlay -M+ -E~ -s '{}.conf' -p ' @%s\n' -- "$tag")
   spec+=$'\n'
 done
 
