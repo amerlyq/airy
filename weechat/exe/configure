@@ -5,13 +5,6 @@
 set -euo pipefail -o noglob
 source ~/.shell/profile
 
-# USE: $ WEECHAT_PASSPHRASE="$(pass chat/weechat)" weechat --no-connect
-#   <= BAD: can't suppress passphrase prompt by '<Space>' to update settings through script
-#     i.e. $ WEECHAT_PASSPHRASE=' ' weechat --no-connect
-# FAIL: $ weechat --no-connect -r '/set sec.crypt.passphrase_file /dev/stdin' \
-#   -r '/exec -sh env-subs ./cfg/weechat.conf | ./run-pipe' \
-#   -r /quit </dev/tty >/dev/tty  # TEMP:REM:(tty):BAD:only interactive setup
-
 dryrun=
 verbose=
 

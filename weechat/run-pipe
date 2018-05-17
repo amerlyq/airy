@@ -1,0 +1,9 @@
+#!/bin/bash -eu
+#%USAGE: ./$0 [<cmds>...] <<< "[<cmds>...]"
+pipe=${WEECHAT_HOME:-$HOME/.weechat}/weechat_fifo
+[[ -p $pipe ]] || { echo "Err: pipe '$pipe' must exist" >&2; exit 1; }
+exec > "$pipe"
+
+[[ -t 0 ]] || cat
+IFS=$'\n'
+cat <<< "$*"

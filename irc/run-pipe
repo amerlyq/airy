@@ -1,6 +1,0 @@
-#!/bin/bash -eu
-cd "$(dirname "$(readlink -e "$0")")"
-p=~/.weechat/weechat_fifo
-[[ -p $p ]] && exec > "$p" || exit
-[[ -n ${1-} || -t 0 ]] && exec < "$1"
-exec sed -r '/(^#|  # ).*$/s///; /^\s*$/d; s/^/*/'

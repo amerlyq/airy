@@ -20,19 +20,14 @@
       (?server?) https://raw.githubusercontent.com/redbrick/eduScripts/master/wcconf/trigger.conf
     INFO http://nullege.com/codes/search/weechat.hook_command
   USE
-    IDEA: eval for exec results
-      /exec -nosh -nobg -nostdin -norc -noln -pipe "/msg nickserv identify" pass show irc/bitlbee
-      ALT:
-        /eval /exec -nosh -nobg -nostdin -norc -noln -oc sh -c 'echo "/print /oper ${irc.server.freenode.sasl_username} $(pass show irc/${irc.server.freenode.sasl_username})"'
-        /eval /exec -nosh -nobg -nostdin -norc -noln -pipe "/print /identify; /oper ${irc.server.freenode.sasl_username}" pass show irc/${irc.server.freenode.sasl_username}
-        [_] CHECK: multiple commands on single line
-    IDEA: post-command hook
-      /set irc.server.bitlbee.command "/msg nickserv identify xxxxxxx"
-        = BAD: stored in plaintext
+    [_] CHECK: multiple commands on single line
     IDEA: /trigger
     nickserv
-      /set irc.server.bitlbee.command /exec -nosh -nobg -nostdin -norc -noln -pipe "/msg nickserv identify" r.query-passwd irc/$server
+      IDEA: post-command hook = BAD: stored in plaintext
+      /set irc.server.bitlbee.command /exec -nosh -nobg -nostdin -norc -noln -pipe "/msg nickserv identify" pass show irc/$server
+      ALT: /eval /exec -nosh -nobg -nostdin -norc -noln -oc sh -c 'echo "/print identify; /print /oper $user $(pass show irc/$server)"'
     sasl
+      https://mikaela.info/english/2015/03/26/weechat-sasl-simply.html
       irc.server.freenode.sasl_username
       irc.server.freenode.sasl_password
     ssl
