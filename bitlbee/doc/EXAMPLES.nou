@@ -1,11 +1,19 @@
 %%% USAGE
 
 Reg bitlbee user for all IM accounts
+  | /nick <user>
   | register <passwd>
-  | /msg nickserv identify <passwd>
-  OR:
+
+Login
+  Weechat SASL (preffered)
+    | /set irc.server.bitlbee.sasl_username <user>
+    | /secure set bitlbee.pass <passwd>
+    | /set irc.server.bitlbee.sasl_password "${sec.data.bitlbee.pass}"
+  Secure identify
     | identify
     | /oper <user> <passwd>
+  Unrecommended
+    | /msg nickserv identify <passwd>
 
 
 %% Accounts
