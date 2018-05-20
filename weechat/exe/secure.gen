@@ -1,0 +1,32 @@
+#!/bin/bash
+source ~/.shell/profile
+set -euo pipefail -o noglob
+
+# readarray -t names < <(cfg-overlay -q -p '%s\n' -- "${tags[@]}")
+names=( "$@" )
+dryrun=1
+
+### ALT: generate "/secure" part of config
+spec=
+for nm in "${names[@]}"; do
+  var=CHAT_${nm^^}
+  [[ ${!var+x} ]] || continue
+  declare "${var}_USER=${!var}"
+  declare "${var}_PASS=$(r.query-passwd "chat/$nm" 2>/dev/null||:)"
+  for sfx in user pass nick chan addr fgpr; do value=${var}_${sfx^^}
+    [[ ${!value:+x} ]] && spec+="/secure set ${nm}.${sfx} ${!value}"$'\n'
+  done
+done
+
+weechat_pass=$(r.query-passwd "chat/weechat" 2>/dev/null||:)
+
+### HACK: recreate "sec.conf" on each reconfigure
+#  * all user changes to "sec.conf" are always lost
+#  * if no passphrase => it will be queried from "chat/weechat"
+#  * if passwd has been changed => you can't decrypt prev "sec.conf" and login into weechat UI anyway
+if [[ ${weechat_pass:+x} || ${spec:+x} ]]; then
+  ((dryrun)) || rm -f "${WEECHAT_HOME:-$HOME/.weechat}/sec.conf"
+  spec="/secure passphrase $weechat_pass"$'\n'"$spec"
+fi
+
+# cat <<< "$spec"

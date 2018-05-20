@@ -1,10 +1,13 @@
 #!/bin/bash
-#%SUMMARY: stuff list of tags to weechat pipe as files
-#%USAGE: ./$0 [-r] [-d] <tags>...
+#%SUMMARY: extract irc commands from files and send it to weechat pipe
+#%USAGE: ./$0 [-v] [-d] <tags>...
 #%
 set -euo pipefail -o noglob
 source ~/.shell/profile
 
+die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
+
+sec_conf=${WEECHAT_HOME:-$HOME/.weechat}/sec.conf
 dryrun=
 verbose=
 
@@ -13,20 +16,49 @@ while getopts 'dhv' o; do case $o in :|'?') exit 1
 ;; d) dryrun=1     #% d = dryrun
 ;; v) verbose=1    #% v = verbose
 esac; done; unset o; shift $((OPTIND-1))
-(($#)) || { echo "Err: empty requested tags list (\$@)"; exit 1; }
+(($#)) || { echo "Err: empty requested tags list (\$@)" >&2; exit 1; }
 tags=( "$@" )
 
 mcfg=weechat/cfg
 export CFG_OVERLAY_BASE=$(cfg-overlay -Q -p "%s/$mcfg:" -b "${AIRY_OVERLAY_BASE-}" --)
 export CFG_OVERLAY_PATH=$(cfg-overlay -Q -p "%s/$mcfg:" -o "${AIRY_OVERLAY_PATH-}" --)
 
-readarray -t names < <(cfg-overlay -q -p '%s\n' -- "${tags[@]}")
+# readarray -t names < <(cfg-overlay -q -p '%s\n' -- "${tags[@]}")
 readarray -t files < <(cfg-overlay -M+ -E~ -s '{}.conf' -- "${tags[@]}")
 
-for nm in "${names[@]}"; do var=CHAT_${nm^^}
-  # NOTE: "export VAR" won't generate error even if VAR doesn't exist
-  export "$var" "${var}_NICK" "${var}_CHAN"
-done
+_pass_required=0
+grep -qsxF '__passphrase__ = on' "$sec_conf" && _pass_required=1
+
+# NOTE: export only passwords required inside list of config files
+servers=$(grep -hPos '^[^#].*%\{WEECHAT_PASS_\K\w+(?=\})' "${files[@]}")
+while IFS= read -r srv; do
+  export WEECHAT_PASS_${srv}=$(r.query-passwd "chat/${srv,,}")
+done <<< "$servers"
+
+# NOTE: propagate passwd from keyring (when available) if you use /secure for weechat
+# BUG: can't suppress passphrase prompt by {WEECHAT_PASSPHRASE=' '}, genuine password is required
+# FAIL: $ weechat -r '/set sec.crypt.passphrase_file /dev/stdin' ...
+if ((_pass_required)); then
+  weechat_pass=$(r.query-passwd "chat/weechat")
+  export WEECHAT_PASSPHRASE=${weechat_pass:?}
+  # HACK: recreate "sec.conf" on each reconfigure -- otherwise you can't decrypt old password after change
+  rm -f "$sec_conf"
+elif [[ ${servers:+x} ]]; then
+  weechat_pass=$(r.query-passwd "chat/weechat")
+else
+  weechat_pass=$(r.query-passwd "chat/weechat" 2>/dev/null||:)
+fi
+
+# WARN:SECU! unencrypted "passwd" is contained in user's env (-r--------)
+#   $ cat /proc/$(pidof weechat)/environ
+# NOTE: adding passphrase won't have any effect until some encrypted data added
+#   => if no WEECHAT_PASS_* vars => no need for password on weechat launch
+#   => can be always added safely
+exec <<< ""
+[[ ${weechat_pass:+x} ]] && exec <<< "/secure passphrase $weechat_pass"
+
+# cat
+# env | grep WEECHAT
 
 d_exe=$(dirname "$(readlink -e "$0")")
-"$d_exe/communicate" ${dryrun:+-d} ${verbose:+-v} -- "${files[@]}"
+"$d_exe/communicate" ${dryrun:+-d} ${verbose:+-v} -- /dev/stdin "${files[@]}"

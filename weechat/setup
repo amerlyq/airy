@@ -2,17 +2,10 @@
 # tags: net chat
 source ~/.shell/func.d/cfgsetup
 
-### MANUAL ###
-# /secure passphrase ********
-# /secure set znc_user xxxxxxxx
-# /secure set znc_pass ********
-# /secure set bitlbee_pass ********
-
-
 ### GENS ###
+# WARN: will break on clean install (must store bunch of "chat/*" passwords beforehand)
 if cfgOpt u; then
   ./exe/configure -- "${WEECHAT_LIST[@]:?}"
 fi
 
-# WARN: will break on clean install
 linkcp -m ~/.weechat/logs ~/chat/weechat

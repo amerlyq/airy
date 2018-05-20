@@ -1,7 +1,9 @@
 #!/bin/sh -eu
 
+sec_conf=${WEECHAT_HOME:-$HOME/.weechat}/sec.conf
+
 # NOTE: propagate passwd from keyring (when available) if you use /secure for weechat
-if grep -xF '__passphrase__ = on' "${WEECHAT_HOME:-$HOME/.weechat}/sec.conf"; then
+if grep -qsxF '__passphrase__ = on' "$sec_conf"; then
   pass=$(r.query-passwd 'chat/weechat' 2>/dev/null) && export WEECHAT_PASSPHRASE=$pass
 fi
 

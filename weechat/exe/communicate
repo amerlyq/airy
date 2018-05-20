@@ -1,41 +1,38 @@
 #!/bin/bash
 #%USAGE: ./$0 [<flags>...] [--] [/dev/stdin] [<cfgspec>...]
-#%INFO: ~/.weechat/weechat_fifo
+#%INFO: pipe=~/.weechat/weechat_fifo
 #%  $ echo 'irc.server.freenode */nick newnick' > "$pipe"
 #%  $ echo 'irc.freenode.#weechat *hello!' > "$pipe"
 #%  $ echo '*hello!' > "$pipe"
-set -euo pipefail
+set -euo pipefail -o errtrace
+onexit(){ [[ ${wee_pid+x} ]] || return 0; echo '*/quit'; wait "$wee_pid"; }
 die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
 
 pipe=${WEECHAT_HOME:-$HOME/.weechat}/weechat_fifo
 dryrun=
 verbose=
 
-while getopts 'dhv' o; do case $o in :|'?') exit 1
+while getopts 'dhp:v' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
-;; d) dryrun=1     #% d = dryrun
-;; v) verbose=1    #% v = verbose
+;; d) dryrun=1      #% d = dryrun
+;; v) verbose=1     #% v = verbose
+;; p) pipe=$OPTARG  #% p = pipe /path/to/weechat_fifo
 esac; done; unset o; shift $((OPTIND-1))
 
 strip_comments(){ sed -r '/^\s+/s///; /(^#|  # ).*$/s///; /^$/d'; }
-parse_config(){ env-subs "$@"  | strip_comments | sed 's/^/*/'; }
-onexit(){ [[ ${wee_pid+x} ]] || return 0; echo '*/quit'; wait "$wee_pid"; }
+parse_config(){ env-subs "$@" | strip_comments | sed 's/^/*/'; }
 
-if ((!dryrun)); then
-  if [[ ! -p $pipe ]]; then
-    # NOTE: propagate passwd from keyring (when available) if you use /secure for weechat
-    # BUG: can't suppress passphrase prompt by {pass=$' '}, genuine password is required
-    # FAIL: $ weechat -r '/set sec.crypt.passphrase_file /dev/stdin' ...
-    if grep -xF '__passphrase__ = on' "${WEECHAT_HOME:-$HOME/.weechat}/sec.conf"; then
-      pass=$(r.query-passwd 'chat/weechat' 2>/dev/null)
-    fi
-    WEECHAT_PASSPHRASE="$pass" weechat-headless --no-connect & wee_pid=$!
+stdout_to_pipe(){ local p=$1
+  if [[ ! -p $p ]]; then
+    weechat-headless --no-connect & declare -g wee_pid=$!
     trap 'onexit' HUP INT QUIT TERM ERR
   fi
-  # OR: [[ -p $pipe ]] || die "pipe '$pipe' must exist"
-  while ! [[ -p $pipe ]]; do printf .; sleep 0.1; done && echo
-  exec > "$pipe"
-fi
+  timeout 1 sh -c "while ! test -p '$p'; do printf .; sleep 0.1; done && echo" \
+    || die "pipe '$p' must exist"
+  exec > "$p"
+}
+
+((dryrun)) || stdout_to_pipe "$pipe"
 
 ## DEV: --renew
 # MAYBE: '/unset -mask irc.*'
