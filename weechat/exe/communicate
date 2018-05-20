@@ -1,14 +1,16 @@
 #!/bin/bash
+#%SUMMARY: strips comments from command files and sends them to weechat pipe
 #%USAGE: ./$0 [<flags>...] [--] [/dev/stdin] [<cfgspec>...]
 #%INFO: pipe=~/.weechat/weechat_fifo
 #%  $ echo 'irc.server.freenode */nick newnick' > "$pipe"
 #%  $ echo 'irc.freenode.#weechat *hello!' > "$pipe"
 #%  $ echo '*hello!' > "$pipe"
 set -euo pipefail -o errtrace
-onexit(){ [[ ${wee_pid+x} ]] || return 0; echo '*/quit'; wait "$wee_pid"; }
+onexit(){ [[ ${wee_pid+x} ]] || return 0; echo '*/quit' && wait "$wee_pid"; }
 die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
 
 pipe=${WEECHAT_HOME:-$HOME/.weechat}/weechat_fifo
+flog=${WEECHAT_HOME:-$HOME/.weechat}/logs/core.weechat.weechatlog
 dryrun=
 verbose=
 
@@ -30,6 +32,9 @@ stdout_to_pipe(){ local p=$1
   timeout 1 sh -c "while ! test -p '$p'; do printf .; sleep 0.1; done && echo" \
     || die "pipe '$p' must exist"
   exec > "$p"
+
+  # WARN: wait on "$wee_pid" only, not itself; ALT:(kill last job): kill %% 2>/dev/null
+  tail -n0 -f "$flog" --pid="${wee_pid:-$$}" | grep --line-buffered -P '\t(?:⚠|=!=)\t|\t\K(?:Error:?|irc:)(?=\s)' >&2 &
 }
 
 ((dryrun)) || stdout_to_pipe "$pipe"

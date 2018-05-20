@@ -1,6 +1,6 @@
 #!/bin/bash
-#%SUMMARY: extract irc commands from files and send it to weechat pipe
-#%USAGE: ./$0 [-v] [-d] <tags>...
+#%SUMMARY: supplements weechat communication files by overlays and passwords
+#%USAGE: ./$0 [-v] [-d] [-r] <tags>...
 #%
 set -euo pipefail -o noglob
 source ~/.shell/profile
@@ -8,12 +8,14 @@ source ~/.shell/profile
 die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
 
 sec_conf=${WEECHAT_HOME:-$HOME/.weechat}/sec.conf
+renew=
 dryrun=
 verbose=
 
-while getopts 'dhv' o; do case $o in :|'?') exit 1
+while getopts 'dhrv' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
 ;; d) dryrun=1     #% d = dryrun
+;; r) renew=1      #% r = renew, recreates "sec.conf" when password have changed (user changes will be lost)
 ;; v) verbose=1    #% v = verbose
 esac; done; unset o; shift $((OPTIND-1))
 (($#)) || { echo "Err: empty requested tags list (\$@)" >&2; exit 1; }
@@ -40,20 +42,21 @@ done <<< "$servers"
 # FAIL: $ weechat -r '/set sec.crypt.passphrase_file /dev/stdin' ...
 if ((_pass_required)); then
   weechat_pass=$(r.query-passwd "chat/weechat")
-  export WEECHAT_PASSPHRASE=${weechat_pass:?}
-  # HACK: recreate "sec.conf" on each reconfigure -- otherwise you can't decrypt old password after change
-  rm -f "$sec_conf"
+  # BAD: impossible to detect when password has changed (and data can't be decrypted)
+  #   => HACK: recreate "sec.conf" on each reconfigure (user additional changes will be lost)
+  if ((renew)); then rm -f "$sec_conf"
+  else export WEECHAT_PASSPHRASE=${weechat_pass:?}; fi
 elif [[ ${servers:+x} ]]; then
+  #%NOTE: all user changes to "sec.conf" before first encryption will be kept
   weechat_pass=$(r.query-passwd "chat/weechat")
 else
   weechat_pass=$(r.query-passwd "chat/weechat" 2>/dev/null||:)
 fi
 
-# WARN:SECU! unencrypted "passwd" is contained in user's env (-r--------)
+## WARN:SECU! unencrypted "passwd" is contained in user's env (-r--------)
 #   $ cat /proc/$(pidof weechat)/environ
-# NOTE: adding passphrase won't have any effect until some encrypted data added
-#   => if no WEECHAT_PASS_* vars => no need for password on weechat launch
-#   => can be always added safely
+## NOTE: passphrase can be added always <= no passphrase is requested on startup
+#   until some encrypted data will be added (i.e. WEECHAT_PASS_* vars)
 exec <<< ""
 [[ ${weechat_pass:+x} ]] && exec <<< "/secure passphrase $weechat_pass"
 
