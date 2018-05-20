@@ -1,9 +1,10 @@
-#!/bin/bash -eu
+#!/bin/bash
 # USAGE: under ssh and chroot
 #   $0 <cmd> -- run cmd with daemon lock
 #   $0 -- re-run killed daemon for existing sessions
 #   $0 -s -- run server in no-fork mode
 #   $0 -k -- explicitly kill forked server
+set -euo pipefail -o errtrace
 
 exe=$(readlink -e "$0")
 exe=${exe%/*/*}/exe

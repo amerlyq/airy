@@ -1,7 +1,7 @@
-#!/bin/bash -e
-SWD=$(readlink -e "$0"); SWD=${SWD%/*}
-PATH=${SWD%/*}/mod:$PATH
-set -o pipefail
+#!/bin/bash
+exe=$(readlink -e "$0"); exe=${exe%/*/*}
+PATH=$exe/mod:$PATH
+set -euo pipefail -o errtrace
 
 trap 'onexit $((_ret)) $((num))' INT HUP QUIT TERM EXIT
 # BUG: no err on script exit
