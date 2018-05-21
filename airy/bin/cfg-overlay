@@ -54,6 +54,8 @@ query_tagnames=0
 query_uniqpath=0
 verbose=0
 
+# [_] MAYBE: instead of -q/-Q use -L/-P OR -qL/-qP
+
 #%INFO: <flags>
 opts=; declare -A opta
 while getopts 'b:E:hM:o:p:qQs:v' o; do case $o in :|'?') exit 1
@@ -66,8 +68,9 @@ while getopts 'b:E:hM:o:p:qQs:v' o; do case $o in :|'?') exit 1
 ;; s) opta[ss_mask]=1; ss_mask+=( "$OPTARG" )    #% s+= search substitute masks, DFL=({}), e.g. [some/{}.conf]
 ;; b) opta[ov_base]=1; papp ov_base "$OPTARG"    #% b+= overlay basis , DFL=(<empty>), e.g. [/airy/cfg]
 ;; o) opta[ov_path]=1; papp ov_path "$OPTARG"    #% o+= overlay paths (user's personal), DFL=(<empty>), e.g. [/private/cfg:/public/cfg]
-;; M) opta[ov_mode]=1; ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+, VIZ. {-=prepend +=append !=override}
-esac; done; opts+=$o; shift $((OPTIND-1))        #%   ('+' by default is user-friendly -- allows to extend base configs)
+;; M) opta[ov_mode]=1; ov_mode=$OPTARG           #% M = default modifier for overlay composition, DFL=+
+esac; done; opts+=$o; shift $((OPTIND-1))        #%   VIZ. {-=prepend +=append !=override(strict), ~=fallback(loose)}
+                                                 #%   ('+=append' by default is user-friendly -- allows to extend base configs)
 #%-----
 #% base = unchangable part of underlying *airy* system, outside of user's control, can change with every update
 #% path = part of user's own public/private repos, provides full access, can be frozen whenever needed
@@ -96,7 +99,7 @@ compose_by_modifier(){ local -rn a=$1; local -r mod=$2
   case $mod
   in !) a=( "${ov_path[@]}" )
   ;; +) a=( "${ov_base[@]}" "${ov_path[@]}" )
-  ;; -) a=( "${ov_path[@]}" "${ov_base[@]}" )
+  ;;[-~]) a=( "${ov_path[@]}" "${ov_base[@]}" )
   ;; *) die "unknown overlay modifier '$mod'"
   esac
 }
@@ -165,6 +168,7 @@ search(){ local tag=$1 opt nm mod sfx dpaths fnames found
   find_existing found dpaths fnames
 
   if [[ ${found[@]:+x} ]]; then
+    [[ $mod == "~" ]] && found=("${found[0]}")
     printf "$fmt_print" "${found[@]}"
   elif [[ $opt != '?' ]]; then
     die "tag '$tag' not found"
