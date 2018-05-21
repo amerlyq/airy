@@ -1,0 +1,41 @@
+REF
+  general
+    https://freenode.net/kb/all
+  intro
+    https://opensource.com/article/16/6/irc-quickstart-guide?src=irc_resource_menu3&intcmp=701f2000000h2ZFAAY
+  ref-cards
+    http://www.bencode.net/linux/2018/01/31/irc/
+    https://gist.github.com/xero/2d6e4b061b4ecbeb9f99
+  TALK
+    https://aaronparecki.com/2015/08/29/8/why-i-live-in-irc
+      https://news.ycombinator.com/item?id=12267254
+
+
+INFO
+  hostmask: nick!user@host
+
+  #channels
+  | # | channel that is available across the entire IRC net
+  | ##| or more hashes, indicates its off topic
+  | & | channel local to a server
+  | + | modeless
+  | ! | timestamped channel
+
+
+FIND
+  alis: more effective way to search on freenode
+    USAGE: https://freenode.net/kb/answer/findingchannels
+    | /msg alis LIST #foo* -min 50
+     * min <n>: show only channels with at least users
+     * max <n>: show only channels with at most users
+     * skip <n>: skip first matches
+     * show [m][t]: show modes/topicsetter
+     * mode <+|-|=><modes>: modes set/unset/equal
+     * topic <pattern>: topic matches pattern
+     * showsecret: show secret channels (requires chan:auspex)
+  web: ALT to "/msg alis"
+    http://irc.netsplit.de/channels/?net=freenode
+  memoserv: deferred msg to offline user/channel
+    | /msg MemoServ ...
+    http://wiki.ircnet.su/MemoServ
+    http://www.geekshed.net/commands/memoserv/

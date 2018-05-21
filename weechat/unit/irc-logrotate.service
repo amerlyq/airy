@@ -1,0 +1,12 @@
+#%USAGE: $ journalctl --user -f -u weechat-rotate
+
+[Unit]
+Description=Logrotate weechat logs
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/logrotate -s %t/logrotate.state  %h/.local/share/logrotate.d/irc -v
+
+[Install]
+WantedBy=default.target
+# ALT: use .timer

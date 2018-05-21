@@ -1,7 +1,19 @@
 Use weechat as relay (instead of znc)
   https://pthree.org/2016/05/20/weechat-relay-with-lets-encrypt-certificates/
+  + https://robots.thoughtbot.com/running-weechat-on-a-server-for-irc-backlogs
   Relay client on Android (need WeeChat running on public server)
     https://play.google.com/store/apps/details?id=com.ubergeek42.WeechatAndroid
 
 ZNC vs Relay(weechat)
   https://news.ycombinator.com/item?id=8678514
+  https://gist.github.com/pascalpoitras/8406501
+    /relay sslcertkey
+    /relay add ssl.weechat <port>
+    /set relay.network.password ${sec.data.relaypass}
+    https://pthree.org/2016/05/20/weechat-relay-with-lets-encrypt-certificates/
+      = use let's encrypt for a trusted certificate
+  NOTE: Even if I use a bouncer (ZNC), this is quite useful to enable relay.
+    Like this you have access to all IRC client (ZNC) and all weechat remote interface (WeeChat Relay).
+    Of course, WeeChat can do both but ZNC is multi-user.
+
+THINK: run weechat in docker at some VPS

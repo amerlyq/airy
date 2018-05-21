@@ -1,4 +1,3 @@
-
 Channel
   /join #channel
   /part
@@ -13,15 +12,50 @@ Copy from irc == hide nicklist, etc
     https://github.com/weechat/weechat/pull/411
   OR: /bar toggle nicklist
 
+
 Navigation
+| <C-n>/<C-p> | cycle buffers
 |  <F5>/<F6>  | switch to previous/next buffer OR <A-Left>/<A-Right>
 |  <F7>/<F8>  | switch to previous/next window (when screen is split)
 |    <A-a>    | jump to buffer with activity (in hotlist)
+|    <A-/>    | Switch to last buffer   | /input jump_last_buffer_displayed
+
+
+Window manipulation
+| /win #  /buf #  <A-#>  /b name | partial match and jump
+| <A-w>,<A-↑> | Switch to window above (below, left or right) | /window up
+| <A-w>,<A-b> | Balance sizes of all windows  | /window balance
+| <A-w>,<A-w> | Swap buffers of two windows   | /window swap
+|    <A-=>    | Toggle filters                | /filter toggle
+|    <A-->    | Toggle filters in current buffer | /filter toggle @
+
+
+Scroll buffer
+|<PgUp>/<PgDn>| screen up/down
+|<Home>/<End> | top/bottom
+| <A-n>/<A-p> | next/prev highlight    | /window scroll_next_highlight
+|    <A-u>    | till first unread line | /window scroll_unread
+TRY: history
+/bl #chan <num lines to go back>
+
 
 View
-|  <F9>/<F10> | scroll title bar
 | <F11>/<F12> | scroll nicklist
-|<PgUp>/<PgDn>| scroll text in current buffer
+| <A-F11> / <A-F12> | scroll nicklist top/bottom
+|  <F9>/<F10> | scroll title bar
+
+
+Layout
+| /win splith |
+| /win splitv |
+| /win zoom   |
+| /win merge  |
+| /win move # | ALSO: /buffer move #
+
 
 Input
-|    <Tab>    | complete text in input bar, like in your shell
+| <Tab> | complete text in input bar, like in your shell
+| <A-s> | toggle spell checker | /mute aspell toggle
+| <C-x> | cycle between target servers in buffer #1 -- see status line just above input field (unnecessary for commands addressed to weechat itself)
+| <C-r> | search buffer history, use <CR> to stop | /input search_text
+| <A-m> | toggle mouse

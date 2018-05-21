@@ -1,5 +1,5 @@
 SEIZE
-  ++ https://gist.github.com/pascalpoitras/8406501
+  ++ [05%] https://gist.github.com/pascalpoitras/8406501
     https://gist.github.com/spicycode/371ca343201391a7eb5409f3288e2864
   https://wiki.archlinux.org/index.php/WeeChat
   http://benoliver999.com/2014/02/18/weechatconf/
@@ -20,6 +20,22 @@ SEIZE
   2017-10-06 [X] https://zanshin.net/2015/01/10/a-guide-for-setting-up-weechat-and-bitlbee/
   https://alexjj.com/blog/2016/9/setting-up-weechat/
     = look and feel
+  2018-05-20 [X] https://thepracticalsysadmin.com/introduction-to-weechat/
+
+
+MAINT: Optimize log usage
+  +++ 2018-05-21 [X] https://blog.jeaye.com/2016/10/31/weechat-logs/
+    $ wc -c "irc.freenode.##programming.weechatlog"
+     350526327 irc.freenode.##programming.weechatlog
+  Total number of joins/parts/quits in that file (1.3 million)
+    $ grep -Ec "-->|<--|»»»|«««" "irc.freenode.##programming.weechatlog"
+     1363355
+  Total size of the log without those joins/parts/quits (208MB)
+    $ sed '/»»»\|«««/d' "irc.freenode.##programming.weechatlog" | wc -c
+    208668563 /dev/fd/63
+  Rotate/compress old logs
+    http://vdwaa.nl/archlinux/systemd/weechat/logs/logrotate-weechat-logs/
+    REQ https://github.com/weechat/weechat/issues/314
 
 
 HACK
