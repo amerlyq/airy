@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#%USAGE: $ env SRC=$d_pj BLD=$d_build PRF=$d_pref ./$0 < "$log" > "${log}~"
+set -euo pipefail
+
+compiler='/(usr|opt)/\S+/((arm-none-eabi-)?(g\+\+|gcc)|clang)(-[0-9])?'
+
+sed -r "
+  # Pretty paths (depth-first order)
+  ${PRF:+\@$PRF|$(realpath -m "$PRF")@s||<prefix>|g}
+  ${BLD:+\@$BLD|$(realpath -m "$BLD")@s||<build>|g}
+  ${SRC:+\@$SRC|$(realpath -m "$SRC")@s||<pj>|g}
+  ${SRC:+\@${SRC%/*}@s||<pj>/..|g}
+  ${SRC:+\@${SRC%/*/*}@s||<pj>/../..|g}
+
+  \@${compiler}@{
+    # Split compiler and its args
+    h; s@^((cd .* && )?${compiler}).*@\n\1@p; g;
+    s@^(cd .* && )?${compiler}\s+@@
+
+    # Pretty compiler args
+    s/\s+/\n/g
+    s/(-[cog]|-isystem|-Wl,--whole-archive)\n/\1  /g
+    s/\n(-Wl,--no-whole-archive)/\t\1/g
+    s/^/\t/g
+    s/\n/&\t/g
+    s/$/\n/g
+  }
+" "$@" | awk '
+  $0==""{i=""}
+  $1=="-Wl,--end-group"{i=substr(i,2)}
+  {print i""$0}
+  $1=="-Wl,--start-group"{i="\t"i}
+'
