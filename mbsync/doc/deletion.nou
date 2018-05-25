@@ -6,16 +6,16 @@ REF
 
 Propagate deletion (expunge) and =Trash
   mutt: copy to =Trash, mark +delete, sync and send "Expunge" (purge) to IMAP
-    => IMAP: (additionally) auto-move +delete to its own =TrashServer => return reduced list
-    => davmail: sync =Trash, (utterly) purge +delete files on Exchange directly => return reduced list immediately
+    => IMAP: (additionally) auto-move +delete to its own =TrashOnServer => return reduced list
+    => davmail: sync =Trash, (utterly) purge +delete files on Exchange directly => return reduced list immediately w/o round trip to server
     => mbsync: sync (push) new in =Trash and all +delete to IMAP server => it does as usuas => pull back
       !! locally deleted messages (as files) will be re-downloaded from server
       !! messages deleted directly on server (through web browser) will remain untouched locally (and may become uploaded again)
       BUT at least they are marked +delete
     Expunge
       None:
-        mark +delete on any side, don't copy, don't expunge, sync to the other side (local/remote), kept on both sides
-          => duplicated deleted msg on local
+        mark +delete on any side, don't copy anywhere, don't expunge, sync to the other side (local/remote), kept on both sides
+          => duplicates all deleted msg on local
         remote +delete, sync-mailbox, copy to remote =Trash, remote "Expunge"
       Slave:
         remote +delete, sync local, delete locally (or copy to local =Trash), sync back to server (delete on server?)
@@ -37,10 +37,11 @@ Propagate deletion (expunge) and =Trash
 
 
 CMP =Trash vs "T"
-  * =Trash is more intuitive for users (you are explicitly moving +deleted to =Trash)
-  * =Trash no unexpected overhead when pulling =INBOX
-  * =Trash is easy to clean-up regularly (remove too big or too old mails)
-  * servers are doing different things with "T"/+deleted messages when you push them to server
+  + =Trash is more intuitive for users (you are explicitly moving +deleted to =Trash) (and GMail virtually works same way)
+  + =Trash doesn't introduce any unexpected overhead when pulling =INBOX
+  + =Trash is easy to clean-up regularly (remove too big or too old mails)
+  + =Trash demonstrates the less unexpected behavior of the two
+    WARN! servers are doing notoriously different things with "T"/+deleted messages when you push them to server
     GMail: ~archives~ them to [GMail]/All Mails (instead of ignoring completely or moving to "=[GMail]/Trash" by itself)
     Exchange: (davmail) == (!broken!) deleted or marked with "T" are completely recreated as different UID mail
       [_] CHECK:MAYBE: it's davmail exclusive bug -- or is it correct behavior by specs ?

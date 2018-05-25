@@ -1,0 +1,24 @@
+BUG new/recent local status isn't synced
+
+  MAYBE? it's due to how "mutt" marked them as "old" = "cur/*unseen" when moving between folders
+    CHECK: won't it work fine, if only "new/" and "cur/*seen" messages are present
+    CHECK: if it interferes with deletion of messages, which are currently new
+  old
+    slave: 71 messages, 1 recent
+    master: 80 messages, 31 recent  # here, 31=N -- strictly "new" messages (NOT "old/unseend")
+  sync
+    slave: 80 messages, 10 recent
+    master: 80 messages, 31 recent
+  ALT:
+    anew
+      slave: 0 messages, 0 recent
+      master: 80 messages, 31 recent
+    resync
+      slave: 80 messages, 59 recent
+      master: 80 messages, 31 recent
+  seen on server
+    slave: 80 messages, 10 recent
+    master: 80 messages, 0 recent  # => all "old/unseen" are treated normally (NOT recent)
+  resync
+    slave: 80 messages, 31 recent  # =>? seems like all mails which are "unseen" on server become "new" locally
+    master: 80 messages, 0 recent

@@ -1,4 +1,15 @@
 TODO
+  [_] BUG: undecided messages are kept locally as-is
+    BUT! you don't know which of them must be removed manually
+    old
+      slave: 650 messages, 0 recent
+      master: 896 messages, 0 recent
+    sync
+      slave: 933 messages, 0 recent
+      master: 898 messages, 0 recent
+  [_] BUG can't sync choosen dir in channel
+    <= IMAP error: mailbox name spam contains server's hierarchy delimiter
+    $ r.mbsync -- -qV all:spam
   [_] FIXME: can't sync deleted folder
     BAD: if removed from server -- won't be removed on local
     # master Junk cannot be opened and slave Junk not empty
@@ -15,6 +26,7 @@ TODO
     TUT:(ru) https://bogachev.biz/2016/06/15/%D0%97%D0%B0%D0%BF%D1%83%D1%81%D0%BA-%D0%B7%D0%B0%D0%B4%D0%B0%D1%87-%D0%BF%D0%BE-%D1%80%D0%B0%D1%81%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D1%8E-%D1%87%D0%B5%D1%80%D0%B5%D0%B7-Systemd-Timer/
     REF https://wiki.archlinux.org/index.php/Systemd/Timers
     E.G. https://gist.github.com/drmalex07/350238961f451d6946dd
+    http://www.holgerschurig.de/en/notmuch-polling-with-mbsync/
     ? for snapper -- how .timer knows which .service to run ?
   2017-09-13 [X] poll in foreground NEED: auto password
     $ watch -bdxn120 mbsync -qV -c account --pull-new channel:INBOX
