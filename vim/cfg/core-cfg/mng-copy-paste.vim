@@ -159,6 +159,8 @@ endfunction
 nnoremap <unique>  [Frame]gy  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
 vnoremap <unique>  [Frame]gy  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
 
+" TODO:DEV: set print format on the fly ":GetLineBookmarkFormat  // {h}\n\t{b:1:1}\n\t\t{b:2}"
+"   => different documents and languages require different format of indented/aligned bookmarks
 function! GetLineBookmark(idt, text, ...)
   let path = a:0>=1 ? expand('%:p') : @%
   let tab = "\t"

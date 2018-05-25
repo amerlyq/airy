@@ -1,4 +1,14 @@
 % Debug symbols
+  Search appropriate libs in buildroot
+    $ cd buildroot
+    $ ./arm-linux-gnueabihf-gdb -q -batch -ex 'set solib-search-path ./buildroot/output/host/usr/arm-buildroot-linux-gnueabihf/sysroot/lib:./buildroot/output/build/boost-1.61.0/bin.v2/libs/system/build/gcc-4.8.3/debug/threading-multi:./buildroot/output/host/usr/arm-buildroot-linux-gnueabihf/sysroot/usr/lib:./buildroot/output/host/usr/arm-buildroot-linux-gnueabihf/sysroot/usr/lib/gstreamer-0.10:rootfs/lib:rootfs/usr/lib:rootfs/usr/lib/gstreamer-0.10' -ex 'set print thread-events off' -ex 'info sharedlib' exe core > out.log
+    $ <out.log sed -n '/^From/,$p' | awk -F/ '/^0x/{print$NF}' | xargs -L1 sh -c 'echo "[$0]"; find -name "$0" -exec wc -c {} \; | sort -rn | sed "s/^/  /"; echo' > solibs
+      => ADD vim:ft=dosini, mark best locations (max size) with "*" on the left
+      => then choose locations with max size and add them to "solib-search-path"
+    compose search path
+      $ sed -rn '/^\*\s*\S+\s+/{s///; s|/[^/]+$||; p}' solibs | sort -u
+    find libs still with symbols, but w/o debug
+      $ awk '$4=="(*)"{print$NF}' out.log
   uClibc
     http://stackoverflow.com/questions/21049575/unable-to-get-unstripped-runtime-libs-from-buildroot
     http://stackoverflow.com/questions/10475040/gcc-g-vs-g3-gdb-flag-what-is-the-difference

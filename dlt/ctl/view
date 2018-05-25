@@ -15,9 +15,10 @@ binmode (STDOUT, ':utf8');
 # https://www.computerhope.com/unix/uperl.htm
 # https://perldoc.perl.org/Pod/Usage.html
 
-my %opts=(); getopts("0d:c:o:", \%opts);
+my %opts=(); getopts("0ac:d:Ho:", \%opts);
 my $OFS = $opts{d} // "\t";
 my $ORS = $opts{0} ? "\0" : "\n";
+my $printheaders = not $opts{H};
 
 ################################################################################
 
@@ -83,7 +84,7 @@ foreach my $name (@field_names) {
 }
 # my @field_default = qw(index stamp msgnum appid ctxid level body);
 my @field_default = check_allowed(\@field_names, qw(appid ctxid index stamp msgnum level body));
-my @field_shown = multichoice($opts{o}, \@field_names, \%field_alias, \@field_default);
+my @field_shown = $opts{a} ? @field_names : multichoice($opts{o}, \@field_names, \%field_alias, \@field_default);
 
 ################################################################################
 # my @ctxid_shown = map { uc } split/,/, $opts{c} if $opts{c};
@@ -161,6 +162,8 @@ sub dlt_convert {
 
 ################################################################################
 
-print STDERR join($OFS, @field_shown), "\n";
+## BAD: ingenious, but unintuitive -- redirect by '>' is more instinctual then explicit '&>'
+# print STDERR join($OFS, @field_shown), "\n";
+print join($OFS, @field_shown), "\n" if $printheaders;
 dlt_convert @files;
 # print join("\n", @files);
