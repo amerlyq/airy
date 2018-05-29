@@ -18,7 +18,7 @@ if cfgOpt u; then
   ./samba.gen
   # ALT: env-subs -p smb.conf | sudo tee /etc/samba/smb.conf >/dev/null
   # SEE: samba.service -- "Wants network-online"
-  svc_activate -eR smb  # MAYBE:ALSO nmbd
+  svc_activate -erR smb  # MAYBE:ALSO nmbd
   # Once Samba has restarted, use this command
   # to check your smb.conf for any syntax errors
   testparm -s >/dev/null

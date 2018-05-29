@@ -8,6 +8,9 @@ ConditionDirectoryNotEmpty=/usr/share/dictd
 # EnvironmentFile=-/etc/conf.d/dictd
 RuntimeDirectory=%P
 PIDFile=%t/%P/%P.pid
+# ALT: systemd-tmpfiles --create bitlbee.conf
+# $ cat /usr/lib/tmpfiles.d/bitlbee.conf
+# d /run/bitlbee 0755 bitlbee bitlbee - -
 
 Type=forking
 User=nobody

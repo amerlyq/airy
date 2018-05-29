@@ -12,6 +12,7 @@ uncomment DaemonInterface
 uncomment DaemonPort
 
 Deprecated /etc/systemd/system/multi-user.target.wants/bitlbee.service
+# MAYBE:(changes to config): $ sudo systemctl stop bitlbee.service
 svc_activate -er bitlbee.socket
 
 if cfgOpt u; then

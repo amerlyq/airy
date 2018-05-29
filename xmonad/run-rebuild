@@ -3,6 +3,6 @@ source ~/.shell/func.d/system
 
 r.n xmonad recompile
 xmonad --recompile
-! running_X || xmonad --restart
-svc_activate -uR xmobar
+running_X && xmonad --restart
+svc_activate -urR xmobar
 r.n OK

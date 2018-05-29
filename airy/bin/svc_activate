@@ -36,7 +36,7 @@ doenable(){ $sudo systemctl $A enable "$@"; }
 reenable(){ $sudo systemctl $A reenable "$@"; }
 isrun(){ systemctl $A is-active "$@" &>/dev/null; }
 dorun(){ $sudo systemctl $A start "$@"; }
-rerun(){ $sudo systemctl $A restart "$@"; }
+rerun(){ $sudo systemctl $A try-restart "$@"; }
 
 else # WARN:BAD: 'if distro ubuntu' -- messed 14.10, systemd 16.04
 # ALT: if ! /etc/init.d/"$1" status | grep -qsw 'running'; then
@@ -89,7 +89,7 @@ enableall(){ for f in "$@"; do
 done;}
 
 runall(){ for f in "$@"; do
-  if ! isrun "$f"; then dorun "$f"
+  if ! isrun "$f" && has r; then dorun "$f"
   elif has R; then rerun "$f"
   fi 2>&1
 done;}
@@ -98,4 +98,5 @@ done;}
 # EXPL: split in stages -- to take dependency into account
 has c && copyall "$@"
 has e && enableall "$@"  # OR:ALSO: && $sudo systemctl $A disable "$f"
-! has rR || runall "$@"
+has rR && runall "$@"
+exit 0

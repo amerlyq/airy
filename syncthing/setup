@@ -6,4 +6,4 @@ source ~/.shell/func.d/cfgsetup
 ./config.gen
 
 # http://docs.syncthing.net/users/autostart.html#systemd
-svc_activate -e$(cfgOpt uU&&echo R) syncthing{,-inotify}@"${USER:?}"
+svc_activate -e$(cfgOpt uU&&echo rR) syncthing{,-inotify}@"${USER:?}"

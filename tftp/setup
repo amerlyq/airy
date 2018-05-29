@@ -10,13 +10,11 @@ add_sysuser tftp
 [[ $(stat -c '%U:%G' "$dir") == tftp:users ]] || sudo chown tftp:users "$dir"
 [[ $(stat -c '%a' /srv/tftp) == 775 ]] || sudo chmod 775 "$dir"
 
-cfgOpt u && opts=-eR || opts=-er
-
 if distro arch; then
   linkcp -c ./config /etc/conf.d/tftpd
-  svc_activate $opts tftpd
+  svc_activate -er$(cfgOpt uU&&echo R) tftpd
 
 elif distro ubuntu; then
   linkcp -c ./config /etc/default/tftpd-hpa
-  svc_activate $opts tftpd-hpa
+  svc_activate -er$(cfgOpt uU&&echo R) tftpd-hpa
 fi

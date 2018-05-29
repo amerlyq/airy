@@ -6,12 +6,12 @@ source ~/.shell/func.d/cfgsetup
 # ./synergy.gen
 
 ## NOTE:
-svc_activate -cueR synergys.service
+svc_activate -cuerR synergys.service
 
 ## BUG: socket-activated synergys -- starts and loads Xorg even before user logins
 #   << when some client tries to connect when server boots
 # svc_activate -cu synergys.service
-# svc_activate -cueR synergys.socket
+# svc_activate -cuerR synergys.socket
 
 ## NOTE: if client
-# svc_activate -cueR synergyc.service
+# svc_activate -cuerR synergyc.service

@@ -17,7 +17,7 @@ linkcp -ct "$dir" ./cfg/*
 ./scripts/indexate $(cfgOpt r && echo -r)
 
 # BAD:(-R): always sudo for system services
-svc_activate -ce$(cfgOpt uU&&echo R) dictd.service
+svc_activate -cer$(cfgOpt uU&&echo R) dictd.service
 
 # if distro ubuntu; then
 #   # sudo touch /var/lib/dictd/db.list
