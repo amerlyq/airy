@@ -28,6 +28,8 @@ Propagate deletion (expunge) and =Trash
 
   BAD: pushing +deleted to server marks them "T", which are treated as different UID mail
     !! locally duplicated on !each! pull, each f*cking pull !!
+      SEE: $ man mbsync $ /Maildir Stores/ :: native / alternative UID schemes problems
+      SEE: /CopyArrivalDate/ :: maybe +deleted timestamp (part of UID?) is changed when pushed and pulled back
     * new UID with "T" is pulled from server
     * old mail renamed to "T" (as not found on server)
       => "Expunge Slave" will delete both of them, not only the old UID which disappeared on server !!!

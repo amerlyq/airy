@@ -1,10 +1,18 @@
 [Unit]
 Description=Mail sync timer - %P
 
+# REF
+# https://wiki.archlinux.org/index.php/Systemd/Timers
+
 [Timer]
+Unit=mbsync.service
 OnBootSec=2m
 OnUnitActiveSec=5m
-Unit=mbsync.service
+# Persistent=true
+# RandomizedDelaySec=...
+# OnCalendar=weekly
+# OnCalendar=Mon,Tue *-*-01..04 12:00:00
+# OnCalendar=Sat *-*-1..7 18:00:00
 
 [Install]
 WantedBy=timers.target

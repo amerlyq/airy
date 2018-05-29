@@ -13,9 +13,9 @@ TODO
 
 
 REF: https://www.archlinux.org/news/ca-certificates-update/
-  /usr/local/share/ca-certificates/*.crt -> $dir
-  /etc/ssl/certs/*.pem -> $dir/*.crt
-  OBSOL: update-ca-certificates
+  /usr/local/share/ca-certificates/*.crt -> /etc/ca-certificates/trust-source/anchors/
+  /etc/ssl/certs/*.pem -> /etc/ca-certificates/trust-source/anchors/*.crt
+  OBSOL: $ update-ca-certificates $ -> $ trust extract-compat
 
 
 DEBUG:

@@ -1,10 +1,12 @@
 [Unit]
 Description=Mail sync service - %P
 After=network.target network-online.target dbus.socket
-# TODO: sep unit with dependency on davmail.service
+# TODO: sep unit with req dependency on davmail.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c 'exec r.mbsync %I -- -qq --pull-new new'
+ExecStart=/usr/bin/env  r.mbsync %I -- -q --pull-new new
 # TODO: error or ignore post-hook if notmuch config file doesn't exists
-ExecStartPost=/bin/sh -c 'exec r.notmuch %I -- new'
+ExecStartPost=/usr/bin/env  r.notmuch %I -- new
+# OnFailure=status-email-user@%n.service
+# OnFailure=r.notify-failure@%n.service

@@ -1,0 +1,60 @@
+%%% SSL
+
+REF
+  http://davmail.sourceforge.net/sslsetup.html
+  http://davmail.sourceforge.net/faq.html#Security
+
+
+WARN!!! don't use cert for davmail localhost
+  * self-signed SSL must be accepted by each program individually (cumbersome)
+  * SECU:WARN! never add such self-signed cert to trust store in /etc/ca-certificates/trust-source/anchors/
+    !!! this cert isn't expected to provide secure communication at all
+    * only used to prevent "mbsync" complains "*** IMAP Warning *** Password is being sent in the clear"
+    !! cert has world-known "dummypasswd" password, so anyone who steals manually trusted root cert can MITM attack *any* of your other communications
+
+
+HOWTO
+  generate: PKCS12 or JKS format
+    NOTE: use "cn=" same address where you connect to, for mutt to allow you "accept (a)lways" for self-signed cert
+  setup
+    export DAVMAIL_CERT_PATH=$(dconfig)/davmail.p12
+    export DAVMAIL_CERT_PASS=$(r.query-passwd 'mail/davmail' 2>/dev/null || echo dummypasswd)
+    cfgOpt r && rm -f "$DAVMAIL_CERT_PATH"
+    [[ -f $DAVMAIL_CERT_PATH ]] || keytool -genkey \
+      -keyalg rsa -keysize 2048 -storetype pkcs12 -validity 3650 \
+      -dname cn=localhost,ou=davmail,o=sf,o=net \
+      -storepass "$DAVMAIL_CERT_PASS" -keystore "$DAVMAIL_CERT_PATH"
+  davmail.properties
+    davmail.ssl.keystoreType=PKCS12
+    davmail.ssl.keystoreFile=%{DAVMAIL_CERT_PATH}
+    davmail.ssl.keystorePass=%{DAVMAIL_CERT_PASS}
+    davmail.ssl.keyPass=%{DAVMAIL_CERT_PASS}
+  mutt
+    set imap_authenticators = login
+    set ssl_force_tls = yes
+
+
+ALT:(generate):
+  gpgsm: TUT https://lists.gnupg.org/pipermail/gnupg-devel/2011-March/025989.html
+    https://www.gnupg.org/documentation/manuals/gnupg/Howto-Create-a-Server-Cert.html
+  openssl: https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-apache-on-arch-linux
+    +++ TUT https://www.8host.com/blog/nastrojka-shlyuza-obmena-davmail-na-servere-debian-7/
+
+
+Trust
+  BET! accepted self-signed cert by each program individually
+
+  SSL
+    generate /etc/ca-certificates/trust-source/anchors/davmail.crt
+      $ sudo update-ca-trust extract
+    convert to PKCS#12 to be used by davmail
+      $ openssl pkcs12 -export -in /etc/ca-certificates/trust-source/anchors/davmail.crt -inkey privatekey-davmail.key -certfile chain-davmail.pem -out ~/.config/davmail/davmail.p12
+    [_] TRY:USE: directly PKCS#11 in "keystoreType"
+      BUT: it seems unsupported
+        2018-05-26 20:29:44,260 DEBUG [ImapConnection-34818] org.apache.commons.httpclient.HttpClient  - SunJSSE 1.8: Sun JSSE provider(PKCS12, SunX509/PKIX key/trust factories, SSLv3/TLSv1/TLSv1.1/TLSv1.2)
+  NSS
+    ?? DONT:USE: seems like "libnssckbi.so" has become alias to new SSL "p11-kit-trust.so"
+    REF https://wiki.archlinux.org/index.php/Network_Security_Services
+      $ certutil -d sql:$HOME/.pki/nssdb -L
+      $ pk12util -d sql:$HOME/.pki/nssdb -i ~/.config/davmail/davmail.p12
+      $ certutil -d sql:$HOME/.pki/nssdb -D -n mykey

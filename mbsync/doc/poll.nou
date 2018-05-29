@@ -1,0 +1,35 @@
+%%%% Check for new mails _fast_
+
+Lock
+  WARN:FIND: what if two different timers run "mbsync" at the same time
+    MAYBE:USE: "flock" some file to prevent mailbox corruption and cancel "sync new" at that time
+  XXX? what if "mutt" makes some changes inside dir in the process of ongoing sync ?
+
+
+Poll
+  2017-09-13 [X] poll in foreground NEED: auto password
+    $ watch -bdxn120 mbsync -qV -c account --pull-new channel:INBOX
+
+
+IMAP_IDLE
+  https://github.com/justinribeiro/idlemailcheck
+  DEV https://blog.mister-muffin.de/2013/06/05/reliable-imap-synchronization-with-idle-support/
+  Check support
+    G: imap idle check
+    https://stackoverflow.com/questions/18103278/how-to-check-whether-imap-idle-works
+    https://github.com/clehner/sylpheed-imap-notify/issues/2
+
+  [_] BET:FIND: mutt connect by imap but use local maildir
+    https://unix.stackexchange.com/questions/146634/accessing-maildir-locally-with-mutt-and-remotely-over-imap-simultaneously
+      => seems like you can't open local Maildir in mutt and sync it by IMAP simultaneously
+        << mailes on read must be moved new=>cur and .sfx added
+    http://donnlee.com/2010/01/22/do-you-love-mutt-use-offlineimap-fdm-and-rejoice/
+    https://unix.stackexchange.com/questions/72369/local-email-storage-syncing-to-imap-mutt-friendly
+
+
+Systemd timers
+  TUT:(ru) https://bogachev.biz/2016/06/15/%D0%97%D0%B0%D0%BF%D1%83%D1%81%D0%BA-%D0%B7%D0%B0%D0%B4%D0%B0%D1%87-%D0%BF%D0%BE-%D1%80%D0%B0%D1%81%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D1%8E-%D1%87%D0%B5%D1%80%D0%B5%D0%B7-Systemd-Timer/
+  REF https://wiki.archlinux.org/index.php/Systemd/Timers
+  E.G. https://gist.github.com/drmalex07/350238961f451d6946dd
+  http://www.holgerschurig.de/en/notmuch-polling-with-mbsync/
+  ? for snapper -- how .timer knows which .service to run ?

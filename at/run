@@ -1,6 +1,10 @@
 #!/bin/bash -e
 # USAGE: at 18:30, at now + 5 minutes
 
+# ALT: use transient systemd timers directly
+#   $ systemd-run --on-active=30 /bin/touch /tmp/foo
+#   $ systemd-run --on-active="12h 30m" --unit someunit.service
+
 # Run 'atd' jobs daemon
 svc_activate -r atd.service
 

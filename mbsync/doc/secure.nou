@@ -1,0 +1,47 @@
+%%% SECURITY
+
+  FAIL:SECU: re-ask passphrase each sync after TTS timeout
+    WARN! by habit user may enter his passphrase to attacker's prompt (decrypting attempt)
+    => ask passphrase only once on sync demon startup BAD: impossible with .timer
+
+  FAIL:SECU: using env VAR (-r--------) == using clear text config (NOT more secure)
+    ALSO:BAD: service can't fail-restart when user is absent
+    ALT: using temp env file
+      BAD: pre-cmd is executed on each restart after failure
+      //.service
+        ExecStartPre=sh -c 'echo MBSYNC_PASS=$(pass) > /run/yourservice/arg'
+        EnvironmentFile=/run/yourservice/arg
+      //mbsync.conf
+        PassCmd "sh -cue 'printf -- $MBSYNC_PASS'"
+
+  FAIL:SECU: clear password (or whole config) under another isolated user
+    BAD! mbsync writes mails as =600, inaccessible for group
+      - even sep dir for mail only won't help $ chown mbsync:users /mail
+      - too much hassle to create isolated shared group "$USER-mbsync" for only "mbsync" and $USER
+    E.G.
+      $ chown mbsync:mbsync /var/lib/mbsync
+      //.service
+        User=mbsync   # access to /var/lib/mbsync/
+        Group=$USER   # access to ~/.mail
+      //mbsync.conf
+        PassCmd="cat /var/lib/mbsync/passwd/<account>"
+
+
+  FAIL:SECU: open whole keyring on login
+    DEV: https://github.com/cruegge/pam-gnupg
+    BAD: keyring is permanently opened -- even when PC may stay overnight w/o user
+    BAD: all keys are opened at once (too broad security surface)
+
+
+Password / keyring
+  BAD: can't be used as service == you are forced to use passwd in clear text
+    !! it's hard for "pass" to access GUI to enter master passwd from inside .service
+    !! each hour user must re-enter master passwd, keeping keyring literally constantly open
+    !! if user is absent from PC -- not entering passwd will generate error and everything will break
+    ALT:
+      https://lists.gnupg.org/pipermail/gnupg-users/2015-December/054788.html
+      +++ [_] READ https://eklitzke.org/using-gpg-agent-effectively
+
+
+  ??? isn't it too much hassle, if passwd will be anyway stored in keyring to populate /var/lib/mbsync
+    <= in case of system breach all the passwords will be dumped from keyring anyway -- no sense to secure config itself

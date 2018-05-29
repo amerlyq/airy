@@ -1,13 +1,15 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 # tags: mail demon
 source ~/.shell/func.d/cfgsetup
 
-### LINKS ###
-export MAIL_EXCHANGE=${MAIL_EXCHANGE//:/\\:}
+### GENS ###
+export DAVMAIL_EXCHANGE=${DAVMAIL_EXCHANGE//:/\\:}
 # DFL: ~/.davmail.properties
-env-subs -p {,~/.config/davmail/}davmail.properties
+env-subs -p ./davmail.properties "$(dconfig)/davmail.properties"
 
 # FIX: on home it must run only on demand, never enabled unconditionally
 #   => NEED: split "install" phase and "auto-hook-on-system-defaults"
 svc_activate -cu davmail.service
-# svc_activate -cueR davmail.service
+
+# TODO: fix -R to do exactly this for all ./setup in svc_activate -- replace R by rR everywhere
+systemctl --user try-restart davmail.service

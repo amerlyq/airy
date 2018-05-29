@@ -11,7 +11,8 @@ uncomment User
 uncomment DaemonInterface
 uncomment DaemonPort
 
-svc_activate -er bitlbee
+Deprecated /etc/systemd/system/multi-user.target.wants/bitlbee.service
+svc_activate -er bitlbee.socket
 
 if cfgOpt u; then
   ./exe/configure $(cfgOpt r && echo --renew) -- "${BITLBEE_LIST[@]:?}"

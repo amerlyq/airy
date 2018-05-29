@@ -1,0 +1,37 @@
+%%%% Sync Strategy
+
+new emails
+  * ASAP -- when you are working on PC (and therefore can resolve sync problems interactively)
+    - poll each 2 min by .timer
+    - IMAP IDLE reverse socket with reconnection
+  * ignored -- when screen is blocked (lunchtime), user is absent (night), PC is sleeping or off
+    - suspend .timer or .service activity when unit of lockscreen is active
+  * beneficial -- if standby PC downloads new mails before new working day begins (doubtful time economy)
+  * for permanent "online" status, when indefinite delay isn't allowed  -- use STD push notifications to smartphone
+
+
+sync remote server changes (done by other devices, e.g. browser or smartphone)
+  = you are the single user of email account = you always know which changes you did from which device
+  * sync when necessary by hands if propagating remote changes "now" is important
+  * wait regular periodic sync for unimportant changes
+  * sync immediately before related batch of local changes (for consistency)
+
+
+sync local changes (primarily done by mutt/notmuch)
+  * accumulate batch of inotify changes (mark "dirty") and push batch of changes (not all) after interval
+    NEED: determine "dirty" state -- when user has done any local changes from last sync
+      ATT: don't use it as condition to skip regular sync, otherwise remote changes won't be fetched
+  * trigger manual sync
+    - before PowerOff
+      ~ NEED: notify user on PowerOff about unsynced changes (similar to my current unsynced .git notification)
+      ~ ALT: add to PowerOff systemd chain BAD: blocks PowerOff until everything is synced
+    - to be immediately available on other devices
+    - on massive changes NOT to be lost through disk failure
+
+
+SUMMARY
+  INFO user can enter and re-enter passphrase when necessary (in working hours)
+  ALG OnFailure
+    - sync must be halted
+    - user reliably notified
+    - fixup/restart is waited indefinitely until user reaction

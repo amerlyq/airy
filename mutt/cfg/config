@@ -95,10 +95,15 @@ set mime_forward_rest = ask-yes
 set use_from = yes          # to ensure mutt doesn't put user@localhost.localhost
 set abort_nosubject = yes   # Cancel a message when subject is blank
 set copy = yes              # keep copies of outgoing mail.
-set move = no
+
+# NOTE: useful only when PC is both workstation and mail server
+#   i.e. you login directly into server and move new/read mails /var/spool/mail/$USER -> ~/.mail/
+set move = no               # don't move read mail :: $spool -> $mbox
 
 set ssl_starttls = yes  # activate TLS if available on the server
 set ssl_force_tls= yes  # always use SSL when connecting to a server
+set ssl_verify_host = yes
+set ssl_verify_dates = yes
 # Display download progress every 5K
 set net_inc=5
 
