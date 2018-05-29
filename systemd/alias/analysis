@@ -5,9 +5,11 @@ alias S.ag='xdot -Tx11 <(systemd-analyze dot)'  # Search cycles  USE: (--order|-
 alias S.as='systemd-analyze time'    # summary
 alias S.at='systemd-analyze blame'   # sort by time
 alias S.av='systemd-analyze verify'  # check svc list recursively
+alias S.aT='systemd-analyze calendar'  # e.g. S.aT "Mon,Tue *-*-01..04 12:00:00"
 
 alias s.ac='systemd-analyze --user critical-chain'
 alias s.ag='xdot -Tx11 <(systemd-analyze --user dot)'  # Search cycles  USE: (--order|--require)
 alias s.as='systemd-analyze --user time'    # summary
 alias s.at='systemd-analyze --user blame'   # sort by time
 alias s.av='systemd-analyze --user verify'  # check svc list recursively
+alias S.aT='systemd-analyze --user calendar'  # e.g. s.aT weekly
