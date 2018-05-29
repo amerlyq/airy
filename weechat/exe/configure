@@ -27,6 +27,11 @@ export CFG_OVERLAY_PATH=$(cfg-overlay -Q -p "%s/$mcfg:" -o "${AIRY_OVERLAY_PATH-
 
 # readarray -t names < <(cfg-overlay -q -p '%s\n' -- "${tags[@]}")
 readarray -t files < <(cfg-overlay -M+ -E~ -s '{}.conf' -- "${tags[@]}")
+# TODO:DEV: reverse operation: from base+overlay dirs extract list of tags matching -s suffix
+#   => to warn (always or in verbose) when some configs are left undecided (i.e. newly added)
+#   => so, you must reject such configs explicitly (!tag) to suppress this warn message
+#   echo "WARN: Config '$tag.conf' is undecided (probably new)."
+#   echo "Add '$tag' to profile or explicitly ignore with '!$tag' to suppress this warning"
 
 _pass_required=0
 grep -qsxF '__passphrase__ = on' "$sec_conf" && _pass_required=1

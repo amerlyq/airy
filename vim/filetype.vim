@@ -29,6 +29,7 @@ augroup filetypedetect
   au BufRead ~/.{mail,config/mutt/messages}/*   setf mail
   au BufRead /tmp/gdb/{log.cfg,*/*.cfg} setl ft=fasm ts=8 nowrap
   au BufRead,BufNewFile *.ftrace        setl ft=ftrace
+  au BufRead,BufNewFile *.weechatlog    setl ft=weechatlog
 augroup END
 
 " Use Zeal on Linux for context help
