@@ -7,6 +7,17 @@ SEIZE
   http://ruleoftech.com/2016/starting-with-weechat
     urlbuf.py
     buffer_autoclose.py
+      * CHECK: may conflict with "buflist"
+      = focus only on buffers which had any activity in awhile
+      ALT:DEV: auto hide / show
+        VIZ. message, all, highlight
+        /trigger addreplace reattach print "" "${buffer.hidden} == 1 && ${tg_tag_notify} == message" "" "/command -buffer irc.$server.$channel core /buffer unhide"
+        /trigger addreplace detach timer 10000;0;0 "" "" "/allchan /eval /perlexec weechat::command('', '/command -buffer irc.\${server}.\${channel} core /buffer hide') if ((${date:%s} - \${buffer[\${info:irc_buffer,\${server},\${channel}}].lines.last_line.data.date}) > 100)"
+        /trigger addreplace detach timer 10000;0;0 "" "" "/allchan /eval /perlexec weechat::command('', '/command -buffer irc.\${server}.\${channel} core /buffer hide') if ((${date:%s} - \${buffer[\${info:irc_buffer,\${server},\${channel}}].lines.last_line.data.date}) > 100 && '\${window.buffer.full_name}' !~ 'irc.\${server}.\${channel}')
+        /trigger addreplace detach timer 10000;0;0 "" "" "/allchan /eval /perlexec weechat::command('', '/command -buffer irc.\${server}.\${channel} core /buffer hide') if ((${date:%s} - \${buffer[\${info:irc_buffer,\${server},\${channel}}].lines.last_line.data.date}) > 100 && '\${window.buffer.full_name}' !~ 'irc.\${server}.\${channel}' && '\${buffer[\${info:irc_buffer,\${server},\${channel}}].hotlist}' eq '0x0')"
+        ADD= https://github.com/weechat/weechat/wiki/Triggers#hide-buffers-after-100-seconds-of-inactivity-if-they-arent-on-the-hotlist-requires-perlexecpl
+
+replace message by all or highlight if you want
   https://arpinux.org/livarp/livarp39/help_center/us/tips/tchat.html
   https://iamkelv.in/blog/2017/08/weechat.html
     * pushbullet

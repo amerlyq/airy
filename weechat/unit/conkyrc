@@ -1,0 +1,19 @@
+# vim:yaml
+background no
+cpu_avg_samples 2
+net_avg_samples 2
+no_buffers yes
+out_to_stderr no
+update_interval 1.0
+uppercase no
+use_spacer none
+
+TEXT
+Load Average: ${loadavg 1 2}
+Uptime: $uptime
+CPU: $cpu%
+RAM: $memperc%
+Swap: $swapperc%
+Up: ${upspeed venet0}
+Down: ${downspeed venet0}
+Note: you need conky-cli package on Debian, same for Arch Linux
