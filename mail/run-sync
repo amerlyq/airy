@@ -1,0 +1,31 @@
+#!/bin/bash -eu
+#%USAGE: $ ./$0 <account> [<mbsync_args>]
+
+acc=$1
+shift
+
+# new:
+#   * pull new mails only from INBOX
+#   * don't push anything
+#   * run notmuch-new to reindex
+
+# cat "/var/lib/mbsync/$acc"
+echo =====
+echo
+id
+env
+
+# r.mbsync "$acc" -- "$@"
+
+# ALG: fail or ignore if notmuch config file doesn't exists
+#   * run on "dirty" state (local changes) == approx by dates of all files in dir are < lastsync
+#   * run on "new" state (lastsync file touched more then OnUnitActiveSec ago
+#   * don't touch lastsync if no new mail and not dirty
+#
+# !! one sync may require time >> OnUnitActiveSec (large attach)
+#   => touch some file after sync
+#   => skip next sync by timer if (now - date_touch < 0.5 * sync_interval)
+
+# BAD: mail path must be in sync between all programs configs
+# r.notmuch "$acc" -- new
+# touch ~/.mail/$acc

@@ -45,6 +45,7 @@ habrahabr.ru/post/126849/#comment_4183443, а именно:
       # use it
       export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
     done
+    ALT: $ export DBUS_SESSION_BUS_ADDRESS=$(pgrep -a dbus-daemon -U [username] | grep -o 'unix:abstract.*$')
   }
   if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
     init_notify

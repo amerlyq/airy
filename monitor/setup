@@ -16,6 +16,7 @@ source ~/.shell/func.d/cfgsetup
 ## BET: use xrandr script per each system and Xorg config
 #   => otherwise too many XRandR events on plug in-out and sleep
 # svc_activate -cE monitor-hotplug@.service
+Deprecated /etc/systemd/system/monitor-hotplug@.service
 
 ### LINKS ###
 # THINK: embed *.rules support into svc_activate
@@ -25,6 +26,7 @@ source ~/.shell/func.d/cfgsetup
 # if cfgOpt u; then
 #   sudo udevadm control --reload-rules
 # fi
+Deprecated /etc/udev/rules.d/95-monitor-hotplug.rules
 
 ## NOTE: required only when EDID for monitor is wrong
 ## ATT: "$ Xorg -dpi ..." will override dpi derived from monitor's physical size
@@ -38,6 +40,7 @@ source ~/.shell/func.d/cfgsetup
 #   dst=/etc/X11/xorg.conf.d/90-monitor.conf
 #   linkcp -c "$tmp" "$dst"
 # fi
+Deprecated /etc/X11/xorg.conf.d/90-monitor.conf
 
 # TODO: replace "tmpl/" dirs with overlays from private repo AIRY_OVERLAY_PATH=overlay1:overlay2
 # linkcp -ct "/etc/X11/xorg.conf.d" ./tmpl/90-monitor-xrandr.conf

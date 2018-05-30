@@ -17,24 +17,10 @@ source ~/.shell/profile
 (($#)) || set -- "$acc"
 
 cfg=${XDG_CONFIG_HOME:-$HOME/.config}/mbsync/acc/"$acc"
-# mdir=${MAIL:-${MAILDIR:-${MAILROOT:-$HOME/.mail}/$acc}}
-mdir=${MAILROOT:-$HOME/.mail}/$acc
+# ALT: mdir=${MAIL:-${MAILDIR:-${MAILROOT:-$HOME/.mail}/$acc}}
+mdir=$(sed -rn '/^\s*Path\s+(.*)\s*($|#.*)/s//\1/p' "$acc")
 mkdir -p "$mdir"
 
-# TODO: special config for polling only new and indexing
-#   * pull new mails only from INBOX
-#     (otherwise ~50 dirs require 1 min for idle check; no effect from PipelineDepth)
-#     !! even then new mails with large attach may require much more time to be downloaded
-#       => touch some file after sync
-#       => skip next sync by timer if (now - date_touch < 0.5 * sync_interval)
-#   * don't push anything
-#   * run notmuch-new to reindex
-# => push everything by cron once a hour (full sync)
-# FIND: "Examine" instead of "Select" for polling
-#   https://github.com/k9mail/k-9/issues/2772
-
-# cat "/var/lib/mbsync/$acc"
-# id
-
 # INFO: "davmail" sync speed is ~100 / min
+#   ~50 dirs is 1 min for idle check; no effect from PipelineDepth
 mbsync --config "$cfg" "$@"

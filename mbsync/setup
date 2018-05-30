@@ -2,15 +2,4 @@
 # tags: term mail
 source ~/.shell/func.d/cfgsetup
 
-linkcp -ct /etc/tmpfiles.d  unit/mbsync.conf
-add_sysuser mbsync /var/lib/mbsync
-cfgOpt uU || [[ ! -d /var/lib/mbsync ]] && sudo systemd-tmpfiles --create mbsync.conf
-
-acc=${MUTT_DEFAULT:?}
-if cfgOpt r; then
-  pass=$(r.query-passwd "mail/${acc}")
-  printf '%s\n' "$pass" | sudo -u mbsync -g mbsync tee "/var/lib/mbsync/$acc" >/dev/null
-fi
-
-svc_activate -cE mbsync@.{service,timer}
-# svc_activate -er mbsync@${acc}.timer
+Deprecated /var/lib/mbsync

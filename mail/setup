@@ -1,0 +1,19 @@
+#!/bin/bash -eu
+# tags: demon mail
+source ~/.shell/func.d/cfgsetup
+
+linkcp -ct /etc/tmpfiles.d  unit/mailsync.conf
+add_sysuser mailsync /var/lib/mailsync
+cfgOpt uU || [[ ! -d /var/lib/mailsync ]] && sudo systemd-tmpfiles --create mailsync.conf
+
+acc=${MUTT_DEFAULT:?}
+if cfgOpt uU && ! sudo test -f "/var/lib/mailsync/$acc"; then
+  r.query-passwd "mail/${acc}" | sudo -u mailsync -g mailsync -- \
+    tee "/var/lib/mailsync/$acc" >/dev/null
+fi
+
+svc_activate -cE \
+  mailsync-new@.{service,timer} \
+  mailsync-failure@.service
+
+# svc_activate -er mailsync-new@${acc}.timer
