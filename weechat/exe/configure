@@ -39,8 +39,10 @@ grep -qsxF '__passphrase__ = on' "$sec_conf" && _pass_required=1
 # NOTE: export only passwords required inside list of config files
 servers=$(grep -hPos '^[^#].*%\{WEECHAT_PASS_\K\w+(?=\})' "${files[@]}")
 while IFS= read -r srv; do
-  export WEECHAT_PASS_${srv}=$(r.query-passwd "chat/${srv,,}")
+  pass=$(r.query-passwd "chat/${srv,,}") || err=1
+  export WEECHAT_PASS_${srv}=$pass
 done <<< "$servers"
+[[ ${err+x} ]] && die "Add required passwords by: $ pass insert chat/<nm>"
 
 # NOTE: propagate passwd from keyring (when available) if you use /secure for weechat
 # BUG: can't suppress passphrase prompt by {WEECHAT_PASSPHRASE=' '}, genuine password is required

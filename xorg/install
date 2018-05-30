@@ -8,6 +8,11 @@ source ~/.shell/func.d/packages
 # TRY: |community/xautomation|
 pkg_inst xbindkeys xdotool
 
+# BUG: xorg-server 1.20-0-2 is broken for systemd/user
+# ::: downgrade and wait on 1.20-0-4
+#   https://bugs.archlinux.org/task/58644
+#   https://bbs.archlinux.org/viewtopic.php?pid=1787318#p1787318
+
 if distro arch; then
   # xorg-xdm xorg-docs xorg-xdpyinfo
   # DEPRECATED:(xorg-server-utils): use explicit prs from xorg-apps group

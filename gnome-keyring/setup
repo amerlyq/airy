@@ -20,7 +20,7 @@ fi
 fps=/etc/pam.d/passwd
 if ! grep -qF "$s" "$fps"; then
   sudo sed -i "/$s/d" "$fps"
-  echo "password        optional        $s" | sudo tee -a "$fps" >/dev/null
+  printf "password\toptional\t%s\n" "$s" | sudo tee -a "$fps" >/dev/null
 fi
 
 echo "W: {$flg,$fps}"
