@@ -1,0 +1,23 @@
+# TODO: sep unit with req dependency on davmail.service
+
+[Unit]
+Description=Mail sync service - %P
+# Requires=network.target network-online.target dbus.socket
+# After=network.target network-online.target dbus.socket
+# ConditionDirectoryNotEmpty=/var/lib/mbsync
+# ConditionFileNotEmpty=/var/lib/mbsync/%I
+
+[Service]
+Type=oneshot
+User=%{USER}
+Group=mbsync
+# ExecStartPre=-/usr/bin/env
+ExecStart=/home/%{USER}/.local/bin/r.mbsync %I -- -q --pull-new new
+# ExecStart=/usr/bin/env  r.mbsync %I -- -q --pull-new new
+# TODO: error or ignore post-hook if notmuch config file doesn't exists
+# ExecStartPost=/usr/bin/env  r.notmuch %I -- new
+# OnFailure=status-email-user@%n.service
+# OnFailure=r.notify-failure@%n.service
+# PrivateDevices=true
+# ProtectSystem=strict
+# ProtectKernelTunables=true
