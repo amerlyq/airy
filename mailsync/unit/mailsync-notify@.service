@@ -1,0 +1,25 @@
+#%USAGE: $ S.r mailsync-notify@critical:title:body.service
+# INFO:(allowed chars): /[-:_]/
+#   $ systemd-escape $(printf '%s\n' {$((0x20))..$((0x7e))} | awk '{printf"%c\n",$0}')
+
+[Unit]
+Description=Notify=%I
+Requires=dbus.socket
+ConditionFileIsExecutable=/usr/bin/notify-send
+
+[Service]
+Type=oneshot
+TimeoutStartSec=5
+RemainAfterExit=false
+User=%{USER}
+Environment=DISPLAY=%{DISPLAY}
+Environment=XAUTHORITY=%{HOME}/.Xauthority
+Environment=DBUS_SESSION_BUS_ADDRESS=%{DBUS_SESSION_BUS_ADDRESS}
+ExecStart=/bin/sh -c 'm=${1#*:}; exec /usr/bin/notify-send --app-name="$0" --urgency="${1%%%%:*}" -- "${m%%%%:*}" "${m#*:}"' %p %I
+# ExecStart=/usr/bin/notify-send --urgency=critical OnFailure %I
+
+PrivateTmp=true
+PrivateDevices=true
+# ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true

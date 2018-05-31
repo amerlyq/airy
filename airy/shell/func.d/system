@@ -99,8 +99,8 @@ amAskConfirm() {
     esac
 }
 
-Deprecated() { local a ok=1
-  for a in "$@"; do if [[ -f $a ]]; then ok=0; echo "FIX:(remove): $a" >&2; fi; done
+Deprecated() { local ok=1
+  for a; do if [[ -e $a ]]; then ok=0; echo "FIX:(remove): $a" >&2; fi; done
   ((ok)) || exit 5
 }
 
@@ -151,4 +151,5 @@ add_sysuser() { id -u "${1:?}" &>/dev/null || sudo useradd --system --user-group
 # ALT:(gpasswd): $ sudo usermod -aG uinput "${LOGNAME:?}"
 # NEED: relogin/reboot OR $ newgrp uinput OR: apply w/o reboot only for this terminal: su - $USER
 #   ALT:(newgrp):$ sg uiput -c 'some /bin/sh cmd'
+# REM: $ sudo userdel mbsync && sudo groupdel mbsync
 # ====================================================================
