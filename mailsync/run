@@ -1,8 +1,10 @@
-#!/bin/bash -eu
+#!/bin/bash
 #%USAGE: $ ./$0 <account> [<mbsync_args>]
+set -euo pipefail
 
 acc=$1
 shift
+mbsync_args=( "$@" )
 
 # new:
 #   * pull new mails only from INBOX
@@ -11,16 +13,19 @@ shift
 
 # cat "/var/lib/mbsync/$acc"
 echo =====
+date
 echo
 id
 env
 
-# r.mbsync "$acc" -- "$@"
+# TODO: if davmail in clear -- sed "/*** IMAP Warning *** Password is being sent in the clear/d"
+# r.mbsync "$acc" -- "${mbsync_args[@]}"
 
 # ALG: fail or ignore if notmuch config file doesn't exists
 #   * run on "dirty" state (local changes) == approx by dates of all files in dir are < lastsync
 #   * run on "new" state (lastsync file touched more then OnUnitActiveSec ago
 #   * don't touch lastsync if no new mail and not dirty
+# TRY: use .uidvalidity content as lastsync timestamp
 #
 # !! one sync may require time >> OnUnitActiveSec (large attach)
 #   => touch some file after sync

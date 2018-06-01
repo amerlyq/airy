@@ -8,14 +8,16 @@ After=network.target network-online.target dbus.socket
 # ConditionFileNotEmpty=/var/lib/mailsync/%I
 StartLimitBurst=3
 StartLimitIntervalSec=10m
-OnFailure=mailsync-notify@critical:OnFailure/%P:%I.service
+OnFailure=mailsync-notify@critical:OnFailure-%p:%i.service
 
 [Service]
 Type=oneshot
 User=%{USER}
 Group=mailsync
 # ExecStartPre=-/usr/bin/env  r.mail-sync %I
-ExecStart=/home/%{USER}/.local/bin/r.mail-sync %I new
+ExecStart=/home/%{USER}/.local/bin/r.mailsync %I -q new
+# NOTE: fetch-new are allowed to fail on long sync-all BUT not otherwise
+SuccessExitStatus=0 13
 # PrivateDevices=true
 # ProtectSystem=strict
 # ProtectKernelTunables=true

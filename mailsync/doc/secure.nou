@@ -14,18 +14,20 @@
       //mbsync.conf
         PassCmd "sh -cue 'printf -- $MBSYNC_PASS'"
 
-  FAIL:SECU: clear password (or whole config) under another isolated user
+  FAIL:SECU: clear password under another isolated user
     BAD! mbsync writes mails as =600, inaccessible for group
-      - even sep dir for mail only won't help $ chown mbsync:users /mail
-      - too much hassle to create isolated shared group "$USER-mbsync" for only "mbsync" and $USER
+      - even sep dir for mail only won't help $ chown mailsync:users /mail
+      - too much hassle to create isolated shared group "$USER-mailsync" for only "mailsync" and $USER
     E.G.
-      $ chown mbsync:mbsync /var/lib/mbsync
+      $ chown mailsync:mailsync /var/lib/mailsync
       //.service
-        User=mbsync   # access to /var/lib/mbsync/
-        Group=$USER   # access to ~/.mail
+        User=%{USER}     # access to ~/.mail
+        Group=mailsync   # access to /var/lib/mailsync/
       //mbsync.conf
-        PassCmd="cat /var/lib/mbsync/passwd/<account>"
+        PassCmd="cat /var/lib/mailsync/<account>"
 
+  FAIL:USAGE: whole config with clear password (under $USER or mailsync)
+    BAD: can't symlink configs -- only copy through env-sub
 
   FAIL:SECU: open whole keyring on login
     DEV: https://github.com/cruegge/pam-gnupg
@@ -43,5 +45,5 @@ Password / keyring
       +++ [_] READ https://eklitzke.org/using-gpg-agent-effectively
 
 
-  ??? isn't it too much hassle, if passwd will be anyway stored in keyring to populate /var/lib/mbsync
+  ??? isn't it too much hassle, if passwd will be anyway stored in keyring to populate /var/lib/mailsync
     <= in case of system breach all the passwords will be dumped from keyring anyway -- no sense to secure config itself

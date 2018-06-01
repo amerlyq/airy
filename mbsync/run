@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash
 #%USAGE: $ ./$0 [<account>] [-- [<mbsync_args>]]
 #% * sync all   $ r.mbsync -- all
 #% * sync inbox $ r.mbsync -- -qV inbox
@@ -7,20 +7,24 @@
 #%DEBUG pull    $ r.mbsync -- -qV --pull-new new
 #% -a|--all     # all channels
 #% -l|--list    # only list mailboxes
-#% -V|--verbose # verbose (show files to remove/resync: <dir>/.uidvalidty)
+#% -V|--verbose # verbose (show files to remove/resync: <dir>/.uidvalidity)
+set -euo pipefail
 source ~/.shell/profile
 
-(($#)) && [[ $1 != -- ]] && acc=$1 && shift || acc=${MUTT_DEFAULT:?}
+(($#)) && [[ $1 != -- ]] || set -- "${MUTT_DEFAULT:?}" "$@"
+
+acc=$1
+shift
 [[ ${1-} == -- ]] && shift
 
-# NOTE: set default channel
-(($#)) || set -- "$acc"
-
 cfg=${XDG_CONFIG_HOME:-$HOME/.config}/mbsync/acc/"$acc"
+
 # ALT: mdir=${MAIL:-${MAILDIR:-${MAILROOT:-$HOME/.mail}/$acc}}
-mdir=$(sed -rn '/^\s*Path\s+(.*)\s*($|#.*)/s//\1/p' "$acc")
+mdir=$(sed -rn "/^\s*Path\s+(.*)\s*($|#.*)/{s//\1/;s|^~|$HOME|p}" "$cfg")
+mdir=$(realpath -sm "$mdir")
 mkdir -p "$mdir"
 
 # INFO: "davmail" sync speed is ~100 / min
 #   ~50 dirs is 1 min for idle check; no effect from PipelineDepth
-mbsync --config "$cfg" "$@"
+flock -FxE13 -w15 "$mdir" \
+  mbsync --config "$cfg" "$@"
