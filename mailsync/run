@@ -4,6 +4,7 @@ set -euo pipefail
 
 acc=$1
 shift
+[[ ${1-} == -- ]] && shift
 mbsync_args=( "$@" )
 
 # new:
@@ -11,15 +12,14 @@ mbsync_args=( "$@" )
 #   * don't push anything
 #   * run notmuch-new to reindex
 
-# cat "/var/lib/mbsync/$acc"
-echo =====
-date
-echo
-id
-env
+# echo =====
+# date
+# id
+# env
+# BAD:SECU: all output is logged and journalctl can't delete logs from single unit
+# cat "/var/lib/mailsync/$acc"
 
-# TODO: if davmail in clear -- sed "/*** IMAP Warning *** Password is being sent in the clear/d"
-# r.mbsync "$acc" -- "${mbsync_args[@]}"
+r.mbsync "$acc" -- "${mbsync_args[@]}"
 
 # ALG: fail or ignore if notmuch config file doesn't exists
 #   * run on "dirty" state (local changes) == approx by dates of all files in dir are < lastsync

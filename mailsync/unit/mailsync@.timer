@@ -1,5 +1,6 @@
 [Unit]
 Description=Mailsync timer - %P
+ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
 
 # REF
 # https://wiki.archlinux.org/index.php/Systemd/Timers

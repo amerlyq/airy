@@ -1,0 +1,36 @@
+#%USAGE: $ S.r mailsync@account:new.service $ VIZ.(new,inbox,all)
+
+# TODO: sep unit with Required=davmail.service
+#   OR: no need -- it will simply fail on connect
+
+[Unit]
+Description=Mailsync service - %P
+Requisite=network.target network-online.target dbus.socket
+After=network.target network-online.target dbus.socket
+ConditionDirectoryNotEmpty=/var/lib/mailsync
+# ConditionFileNotEmpty=/var/lib/mailsync/%I
+ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
+# TODO: include error text from journal or FIND env var with err text
+OnFailure=notify-user@critical:OnFailure:%i.service
+StartLimitBurst=3
+StartLimitIntervalSec=10m
+
+[Service]
+Type=oneshot
+User=%{USER}
+Group=mailsync
+# BAD:SECU: substituted notorious exe in ~/.local/bin will gain access to /var/lib/mailsync
+# ALT: ExecStart=/bin/sh -c 'PATH=/var/lib/mailsync/bin:$PATH exec ...'
+Environment=PATH=/var/lib/mailsync/bin:/home/%{USER}/.local/bin:/usr/bin
+# ALT: ExecStart=/usr/bin/env  r.mailsync %I
+ExecStart=/bin/sh -c 'acc=${0%%%%:*}; chan=${0#*:}; \
+test "x$chan" == "xnew" && opts=-q || opts=-V; \
+exec r.mailsync "$acc" -- "$opts" "$chan"' %I
+
+# NOTE: fetch-new are allowed to fail on long sync-all BUT not otherwise
+SuccessExitStatus=0 13
+
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectKernelTunables=true

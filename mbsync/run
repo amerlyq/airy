@@ -24,6 +24,11 @@ mdir=$(sed -rn "/^\s*Path\s+(.*)\s*($|#.*)/{s//\1/;s|^~|$HOME|p}" "$cfg")
 mdir=$(realpath -sm "$mdir")
 mkdir -p "$mdir"
 
+# NOTE: only if using local davmail w/o encryption
+grep -qwF 'Host 127.0.0.1' "$cfg" \
+  && grep -qwF 'SSLType None' "$cfg" \
+  && exec 2> >(grep -vxF '*** IMAP Warning *** Password is being sent in the clear')
+
 # INFO: "davmail" sync speed is ~100 / min
 #   ~50 dirs is 1 min for idle check; no effect from PipelineDepth
 flock -FxE13 -w15 "$mdir" \

@@ -1,4 +1,4 @@
-#%USAGE: $ S.r mailsync-notify@critical:title:body.service
+#%USAGE: $ S.r notify-user@critical:title:$(systemd-escape body).service
 # INFO:(allowed chars): /[-:_]/
 #   $ systemd-escape $(printf '%s\n' {$((0x20))..$((0x7e))} | awk '{printf"%c\n",$0}')
 
