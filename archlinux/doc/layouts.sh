@@ -82,6 +82,7 @@ vgs
 ## NOTE: create LV partitions
 lvcreate ws -Wy --yes -n swap -L 4G -C y
 lvcreate ws -Wy --yes -n root -L 40G
+# TODO:BET: join with root partition, but exclude from snapshots
 lvcreate ws -Wy --yes -n pkgs -L 20G
 lvcreate ws -Wy --yes -n user -L 40G
 lvcreate ws -Wy --yes -n data -L 200G

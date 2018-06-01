@@ -35,7 +35,7 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
            # @var_log -- unmountable because of systemd -- NEED shutdown hook in mkinitcpio ALT: direct subvolume, manually move on restoring from snapshot
            # @var_cache -- no sense to make separate and mount afterwards -- you still need manually move other subvolumes
         └─@snapshots                      /mnt/.snapshots
-      ├─ws-pkgs 254:8    0    20G  0 lvm  /mnt/var/cache/pacman/pkg
+      ├─ws-pkgs 254:8    0    20G  0 lvm  /mnt/var/cache/pacman/pkg   # TODO: join with root partition, but exclude from snapshots
       ├─ws-user 254:9    0    40G  0 lvm                  # EXPL: sep snapshots per each user
         ├─@                               /mnt/home/user
         ├─@snapshots                      /mnt/home/user/.snapshots
