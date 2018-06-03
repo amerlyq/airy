@@ -1,4 +1,7 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/packages
 
-pkg_inst isync
+# pkg_inst isync
+
+# FIXED:(davmail):TEMP:(isync=1.3.1): https://sourceforge.net/p/isync/bugs/38/?limit=25
+loc_inst -P 'isync-git' ./PKGBUILD

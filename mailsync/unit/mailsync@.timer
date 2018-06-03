@@ -6,7 +6,8 @@ ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
 # https://wiki.archlinux.org/index.php/Systemd/Timers
 
 [Timer]
-# Unit=mbsync.service
+# BAD: need both mailsync-{new,all}.timer with different timespan per each account
+# Unit=mailsync@%i:new.service
 OnBootSec=2m
 OnUnitActiveSec=3m
 # Persistent=true

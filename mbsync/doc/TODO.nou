@@ -2,11 +2,15 @@ REQ
   https://sourceforge.net/p/isync/isync/ci/master/tree/TODO
 
 TODO
+  2018-06-03 [X] TODO: create PKGBUILD for 1.3.1
   [_] BUG: Warning: lost track of 2 pushed message(s)
     https://sourceforge.net/p/isync/mailman/message/33170964/
     https://sourceforge.net/p/isync/bugs/38/?limit=25
       ::: CHECK:FIXED: isync>=1.3.1 (not released yet, no AUR)
-      [_] TODO: create PKGBUILD
+      BAD: now lost track occurs only in Trash, when MUA copies message
+      ALSO: msgs are different by name and by single byte
+        1528043566.23184_11.myhost,U=271:2,S: ... 40"><head> ...
+        1528042917.R321398000954429629.myhost,U=257:2,S: ... 40">\n<head> ...
   [_] BUG: undecided messages are kept locally as-is
     BUT! you don't know which of them must be removed manually
     BAD!? they aren't sent back to server

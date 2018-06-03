@@ -1,0 +1,13 @@
+[Unit]
+Description=Mailsync timer - %P
+Requisite=network.target
+ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
+ConditionFileNotEmpty=/var/lib/mailsync/sec/%i
+ConditionFileNotEmpty=/home/%{USER}/.config/mbsync/acc/%i
+
+[Timer]
+OnBootSec=5m
+OnCalendar=hourly
+
+[Install]
+WantedBy=timers.target

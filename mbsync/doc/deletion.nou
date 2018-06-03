@@ -1,10 +1,32 @@
 REF
   (imap): https://tools.ietf.org/html/rfc2193
+    http://www.faqs.org/rfcs/rfc3501.html
+    flag: \Deleted
+    http://deflexion.com/2006/05/server-side-message-labels
+    https://www.melnikov.ca/mel/Drafts/draft-melnikov-imap-keywords-00.txt
   (maildir): http://cr.yp.to/proto/maildir.html
+    flag: T = trashed
   TUT: https://github.com/djcb/mu/issues/1136
 
 
 Propagate deletion (expunge) and =Trash
+  ARCH: delete propagation
+    * mutt=D
+      - on <d>-key add message to selection to be deleted (mutt memory-only flag "D")
+    * mutt=sync-mailbox   # apply action to selection:
+      ~ do nothing        # * selection is ignored and lost on mailbox/dir reopen
+      ~ imap=\Deleted     # * mark and sync flag to IMAP server
+        => then send ~EXPUNGE~ to server and delete local memory/disk cache of these messages
+      ~ append Maildir=T  # * to names of all selected messages flag
+    * mbsync=sync
+      - mark not found locally as \Deleted  # not found = {msgid < max-UID}, presumably deleted
+      - mark Maildir=T as imap=\Deleted
+      - sync in both directions
+      - mark not found remote as Maildir=T locally
+    * mbsync=expunge
+      - send ~EXPUNGE~ to IMAP server
+      - delete all marked with "T" locally
+
   mutt: copy to =Trash, mark +delete, sync and send "Expunge" (purge) to IMAP
     => IMAP: (additionally) auto-move +delete to its own =TrashOnServer => return reduced list
     => davmail: sync =Trash, (utterly) purge +delete files on Exchange directly => return reduced list immediately w/o round trip to server
@@ -28,6 +50,7 @@ Propagate deletion (expunge) and =Trash
 
   BAD: pushing +deleted to server marks them "T", which are treated as different UID mail
     !! locally duplicated on !each! pull, each f*cking pull !!
+      SEE:(similar): https://sourceforge.net/p/isync/mailman/message/34564157/
       SEE: $ man mbsync $ /Maildir Stores/ :: native / alternative UID schemes problems
       SEE: /CopyArrivalDate/ :: maybe +deleted timestamp (part of UID?) is changed when pushed and pulled back
     * new UID with "T" is pulled from server

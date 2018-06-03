@@ -1,19 +1,24 @@
-#%USAGE: $ S.r mailsync@account:new.service $ VIZ.(new,inbox,all)
+#%USAGE: $ S.r mailsync@account:channel.service
+#%VIZ.(channel): new inbox all ...
 
 # TODO: sep unit with Required=davmail.service
-#   OR: no need -- it will simply fail on connect
+#   OR: no need -- it will simply fail on connect and notify user
 
 [Unit]
 Description=Mailsync service - %P
-Requisite=network.target network-online.target dbus.socket
-After=network.target network-online.target dbus.socket
-ConditionDirectoryNotEmpty=/var/lib/mailsync
-# ConditionFileNotEmpty=/var/lib/mailsync/%I
+Requisite=network.target
+Requires=network-online.target
+After=network.target network-online.target
+
+# BAD:THINK: how-to sync on headless server w/o xorg notifications
+# FAIL: if condition false -- job triggers OnFailure, but can't notify
 ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
-# TODO: include error text from journal or FIND env var with err text
-OnFailure=notify-user@critical:OnFailure:%i.service
+ConditionDirectoryNotEmpty=/var/lib/mailsync
+
 StartLimitBurst=3
 StartLimitIntervalSec=10m
+# TODO: include error text from journal or FIND env var with err text
+OnFailure=notify-user@critical:OnFailure:%i.service
 
 [Service]
 Type=oneshot
@@ -26,8 +31,10 @@ Environment=PATH=/var/lib/mailsync/bin:/home/%{USER}/.local/bin:/usr/bin
 ExecStart=/bin/sh -c 'acc=${0%%%%:*}; chan=${0#*:}; \
 test "x$chan" == "xnew" && opts=-q || opts=-V; \
 exec r.mailsync "$acc" -- "$opts" "$chan"' %I
+# BAD: trying to kill process even after successful ending
+# ExecStop=/usr/bin/kill -TERM $MAINPID
 
-# NOTE: fetch-new are allowed to fail on long sync-all BUT not otherwise
+# FIXME: fetch-new are allowed to fail on long sync-all BUT not otherwise
 SuccessExitStatus=0 13
 
 PrivateTmp=true

@@ -23,11 +23,8 @@ cfgOpt uU && for acc in "${MAILSYNC_LIST[@]:?}"; do
     tee "$fpass" >/dev/null
 done
 
-svc_activate -cE \
-  "$nm"@.{service,timer}
+svc_activate -cE "$nm"-{new,all}@.{service,timer}
 
-# BAD: need both "new" and "all" timers with different timespan per each account
-#   e.g. mailsync-new@account.timer => Unit=mailsync@%i:new.service
 # for acc in "${MAILSYNC_LIST[@]:?}"; do
 #   svc_activate -er "${nm}:new@${acc}:new.timer"
 # done
