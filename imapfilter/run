@@ -1,7 +1,11 @@
 #!/bin/bash -eu
 export IMAPFILTER_HOME=~/.config/imapfilter
 
-acc=${1:+$IMAPFILTER_HOME/acc/$1.lua}
+acc=$1
+shift
+[[ ${1-} == -- ]] && shift
+
+cfg=$IMAPFILTER_HOME/acc/$acc.lua
 log=$IMAPFILTER_HOME/imapfilter.log
 
 if [[ -t 1 ]]; then  ## Colorize
@@ -15,4 +19,4 @@ if [[ -t 1 ]]; then  ## Colorize
   ") && printf '\n-----\n%s\n' "$(date +'%Y%m%d_%H%M%S')"
 fi
 
-exec imapfilter -v ${acc:+-c "$acc"}
+exec imapfilter -v -c "$cfg" "$@"

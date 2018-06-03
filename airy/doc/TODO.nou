@@ -376,7 +376,7 @@ PKGMOD
     ? is it enough for me to use system-wide dirs and cache ?
       == TRY:USE: /var/local/{bin,mod} for *mods* OR /opt for whole *airy*
         << mods from /var/local may symlink back into /opt/airy
-  [_] TRY: generate PKGBUILD for each *mod* through my scripts set
+  [_] TRY: generate PKGBUILD for each *mod* through my scripts set to create //airy-$USER-<mod>.pkg.tar.xz
     + this allows clean uninstall previous versions based on $pkgver
       >> remove cleaning for ./systemd/user and ./bin symlinks
     +++ can resolve deps graph between my own moduls
@@ -387,7 +387,11 @@ PKGMOD
     ALT: generate single package //airy-$USER.pkg.tar.xz from whole 'airy'
       + no need for my own AUR local mirror
         => install by simple $ makepkg && pacman -U
-      + package is individual for an
+      + package is individual for user -- you will immediately see conflicts between users
+      + clean upgrade / clean remove
+      + controllable environment inside chroot
+      + update all deps in one go
+    BAD! any minuscule changes to configs require reinstalling of whole package
   [_] convert pkgbuild to deb
     http://www.overclock.net/t/1339466/converting-an-aur-slackbuild-script-for-use-in-debian
     http://archlinux.org.ru/forum/topic/15919/
