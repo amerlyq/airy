@@ -17,7 +17,9 @@ source $my_cache/theme          # Theme
 unmailboxes *
 ## BAD: '=' available only after $folder set inside <account>
 # mailboxes =INBOX
-set signature = "$my_cache/sign/$my_acc"
-set nm_default_uri = notmuch://$HOME/.mail/$my_acc
 
-source "$my_cache/exe/pass -m $my_acc $my_pass |"
+set signature = "$my_cache/sign/$my_acc"
+
+unset imap_user imap_pass
+unset smtp_url  smtp_pass
+unset pop_user  pop_pass

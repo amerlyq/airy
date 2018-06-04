@@ -27,10 +27,11 @@ r.mbsync "$acc" -- "${mbsync_args[@]}"
 #   * don't touch lastsync if no new mail and not dirty
 # TRY: use .uidvalidity content as lastsync timestamp
 #
+# ALG: skip next sync
 # !! one sync may require time >> OnUnitActiveSec (large attach)
 #   => touch some file after sync
 #   => skip next sync by timer if (now - date_touch < 0.5 * sync_interval)
 
 # BAD: mail path must be in sync between all programs configs
-# r.notmuch "$acc" -- new
+r.notmuch "$acc" -- new
 # touch ~/.mail/$acc

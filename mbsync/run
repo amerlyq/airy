@@ -1,17 +1,19 @@
 #!/bin/bash
-#%USAGE: $ ./$0 [<account>] [-- [<mbsync_args>]]
-#% * sync all   $ r.mbsync -- all
-#% * sync inbox $ r.mbsync -- -qV inbox
-#% * pull new   $ r.mbsync -- -qq new
+#%USAGE: $ ./$0 <account> [-- [<mbsync_args>]]
+#% * sync all   $ -- all
+#% * sync inbox $ -- -qV inbox
+#% * pull new   $ -- -qq new
 #%
-#%DEBUG pull    $ r.mbsync -- -qV --pull-new new
+#%DEBUG pull    $ -- -qV --pull-new new
 #% -a|--all     # all channels
 #% -l|--list    # only list mailboxes
 #% -V|--verbose # verbose (show files to remove/resync: <dir>/.uidvalidity)
 set -euo pipefail
-source ~/.shell/profile
 
-(($#)) && [[ $1 != -- ]] || set -- "${MUTT_DEFAULT:?}" "$@"
+# ALT:DFL:BAD: reduced orthogonality
+# source ~/.shell/profile
+# (($#)) && [[ $1 != -- ]] || set -- "${MUTT_DEFAULT:?}" "$@"
+# ALT: use $(readlink $acc/default) to get name of default acc
 
 acc=$1
 shift

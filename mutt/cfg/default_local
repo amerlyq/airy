@@ -1,0 +1,23 @@
+# vim:ft=muttrc
+source ~/.config/mutt/cfg/default_common
+
+unset header_cache
+unset message_cachedir
+
+# NOTE: extremely useful and rather safe options for offline mutt
+set mail_check_stats = yes
+
+# BAD: backticks are evaluated only on mutt startup
+# set smtp_pass = "`r.query-passwd mail/$my_acc`"
+source "$my_cache/exe/pass -m $my_acc $my_pass |"
+set smtp_pass = $my_pass
+
+set folder = $HOME/.mail/$my_acc
+set nm_default_uri = notmuch://$HOME/.mail/$my_acc
+
+mailboxes =INBOX
+set spoolfile = "=INBOX"
+set postponed = "=Drafts"
+set copy      = yes
+set record    = "=Sent"    # Need fcc to work for cmdline-send
+set trash     = "=Trash"   # Need patch

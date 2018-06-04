@@ -3,8 +3,8 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-dir=~/.config/imapfilter
-linkcp -t "$dir" cfg && chmod 700 "$dir"
+linkcp -t "$(dconfig)" cfg
 
-dfl=$dir/acc/${MUTT_DEFAULT-}.lua
-! [[ -f $dfl && -s $dfl ]] || linkcp "$dfl" "$dir/config.lua"
+# ALT:DFL:
+# dfl=$(dconfig)/acc/${MUTT_DEFAULT:?}.lua
+# ! [[ -f $dfl && -s $dfl ]] || linkcp "$dfl" "$(dconfig)/config.lua"

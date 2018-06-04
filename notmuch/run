@@ -1,9 +1,9 @@
 #!/bin/bash -eu
-#%USAGE: $ ./$0 [<account>] [-- [<notmuch_args>]]
+#%USAGE: $ ./$0 <account> [-- [<notmuch_args>]]
 source ~/.shell/profile
 
-# ALT: use $(readlink $acc/default) to get name of default acc
-(($#)) && [[ $1 != -- ]] && acc=$1 && shift || acc=${MUTT_DEFAULT:?}
+acc=$1
+shift
 [[ ${1-} == -- ]] && shift
 
 # NOTE: set default action

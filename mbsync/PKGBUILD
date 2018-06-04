@@ -9,12 +9,17 @@ url="http://isync.sourceforge.net"
 license=('GPL2')
 depends=('libsasl' 'zlib')
 conflicts=('isync')
-source=('git+https://git.code.sf.net/p/isync/isync')
-md5sums=(SKIP)
+source=('git+https://git.code.sf.net/p/isync/isync' davmail.diff)
+md5sums=(SKIP SKIP)
 
 pkgver() {
   cd isync
   echo "$(git describe --abbrev=0 --tags|cut -d- -f2|sed s/v//).r$(git rev-list --count HEAD).$(git log -1 --format=g%h)"
+}
+
+prepare() {
+  cd isync
+  patch -Np1 -i "$srcdir"/davmail.diff
 }
 
 build() {

@@ -1,0 +1,8 @@
+# vim:ft=muttrc
+source ~/.config/mutt/cfg/default_common
+
+source "$my_cache/exe/pass -m $my_acc $my_pass |"
+set imap_pass = $my_pass
+set smtp_pass = $my_pass
+
+set query_command = "$my_cache/exe/ldap -u $imap_user -p $imap_pass -m %s"

@@ -16,7 +16,7 @@ add_sysuser "$nm" "/var/lib/$nm"
 cfgOpt uU || [[ ! -d /var/lib/$nm ]] && sudo systemd-tmpfiles --create "$nm.conf"
 
 ### GENS ###
-cfgOpt uU && for acc in "${MAILSYNC_LIST[@]:?}"; do
+cfgOpt uU && for acc in "${MAILSYNC_ACCOUNTS[@]:?}"; do
   fpass=/var/lib/$nm/sec/$acc
   cfgOpt r || sudo test -f "$fpass" -a -s "$fpass" && continue
   r.query-passwd "mail/${acc}" | sudo -u "$nm" -g "$nm" -- \
@@ -25,6 +25,6 @@ done
 
 svc_activate -cE "$nm"-{new,all}@.{service,timer}
 
-# for acc in "${MAILSYNC_LIST[@]:?}"; do
-#   svc_activate -er "${nm}:new@${acc}:new.timer"
+# for acc in "${MAILSYNC_ACCOUNTS[@]:?}"; do
+#   svc_activate -er "${nm}"-{new,all}@${acc}.timer
 # done
