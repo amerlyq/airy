@@ -5,6 +5,7 @@
 #% * <tag>    (default mode) = not required for file to exist in both places
 #% *?<tag>..  (optional) = silent ignore if file not found
 #% * <tag>!   (override) = search inside only overlay path
+#% *!<tag>..  (disable)  = THINK:DEV: skip this tag and suppress previous tags with same name
 # DEV: preprocess escaping of user input e.g.  tag\! -> as "tag!"|mode=+
 #% * <tag>!0  (override) = use only Nth of all paths (?as temporary fix?)
 #% * <tag>+   (append)  = search order: {base -> path}, DEV: file must exist in both places
@@ -30,6 +31,7 @@
 #  * 0.3ms -- file searching
 #  * 1.0ms -- print to tty
 ### ALT: create special overlay filesystem which possesses all necessary qualities of customized merge/override per file
+# [_] TODO:FAIL on duplicate tags found (interchanging {<tag>, !<tag>} sequences are allowed)
 #
 set -euo pipefail -o noglob
 # MAYBE: check $BASH_VERSION >= 4.4
@@ -44,7 +46,9 @@ papp(){ local -rn a=$1; shift; local p IFS=:
   for p in $*; do [[ -z ${p:+x} ]] || a+=("$p"); done
 }
 
-tag_rgx='^([[:punct:]])?([-_./[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
+# NOTE: allowed regex must be very tight -- otherwise some wrong tags will be parsed as similar ones
+tag_rgx='^([?])?([-_./[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
+# tag_rgx='^([[:punct:]])?([-_./[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
 fmt_print='%s\n'
 env_mode='!'
 ov_mode='+'
