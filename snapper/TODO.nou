@@ -1,0 +1,15 @@
+BUG:
+  [_] size quota doesn't work
+    <= even with 0.5, system was filled up until zero space left
+    however, I have almost half space ~18/40GB with files...
+  [_] timeline cleaning is more rare than expected
+    TIMELINE_MIN_AGE="1800"
+    TIMELINE_LIMIT_HOURLY="8"
+    TIMELINE_LIMIT_DAILY="7"
+    TIMELINE_LIMIT_WEEKLY="5"
+    TIMELINE_LIMIT_MONTHLY="10"
+    TIMELINE_LIMIT_YEARLY="10"
+    Today: +18+
+    Yesterday: +1 at 0:0AM, +11 until night
+    Week: 7 :: 2018-06-05 ... 2018-05-30
+    => FIND:MAYBE limits overlap and actual amount per day must be summed up from all of them ?

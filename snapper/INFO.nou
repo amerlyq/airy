@@ -70,6 +70,23 @@ USAGE
     # CHG: PRUNENAMES = ".snapshots"
     ::: already included in |airy/locate|
   Delete big files through all snapshots
+    Temporarily grant rw access to snapshot
+      $ sudo btrfs property set ~/.snapshots/<snapshot_num>/snapshot ro false
+      $ sudo btrfs property get ~/.snapshots/<snapshot_num>/snapshot
+        ro=false
+    Batch remove
+      $ ls X{} sudo btrfs property set ~/.snapshots/{}/snapshot ro false
+      $ ls X{} sudo btrfs property get ~/.snapshots/{}/snapshot
+      $ cd ~/.snapshots
+      $ rm -rf */snapshot/common_api
+      $ rm -rf */snapshot/.cabal/packages
+      $ rm -rf */snapshot/.wine{,32}
+      $ rm -rf */snapshot/.cache/qutebrowser/webengine/Cache
+      $ rm -rf */snapshot/.config/skypeforlinux
+      $ rm -rf */snapshot/.cache/mozilla/firefox/*.default/cache2
+      $ ls X{} sudo btrfs property set ~/.snapshots/{}/snapshot ro true
+      $ ls X{} sudo btrfs property get ~/.snapshots/{}/snapshot
+    ALT: manipulate rw copy of ro snapshot
     https://blog.pdark.de/2014/02/16/deleting-files-from-snapper/
     $ btrfs subvolume snapshot snap snap.rw
     $ rm -rf snap.rw/path/to/file
