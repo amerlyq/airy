@@ -15,8 +15,11 @@ After=network.target network-online.target
 ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
 ConditionDirectoryNotEmpty=/var/lib/mailsync
 
-StartLimitBurst=3
-StartLimitIntervalSec=10m
+# BAD: useful only for daemons with Restart= on failure (however interferes with manual restarts)
+#   => useless for "oneshot" (unless you want to limit frequency of its triggering by timer, etc)
+# StartLimitBurst=3
+# StartLimitIntervalSec=10m
+
 # TODO: include error text from journal or FIND env var with err text
 OnFailure=notify-user@critical:OnFailure:%i.service
 

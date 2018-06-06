@@ -10,8 +10,6 @@ ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
 ConditionFileNotEmpty=/var/lib/mailsync/sec/%i
 ConditionFileNotEmpty=/home/%{USER}/.config/mbsync/acc/%i
 
-StartLimitBurst=3
-StartLimitIntervalSec=10m
 OnFailure=notify-user@critical:OnFailure:%i-new.service
 
 [Service]
