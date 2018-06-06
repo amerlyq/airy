@@ -3,24 +3,25 @@
 #% * dry-run $ sed -rn "\|$rgx|s||$sub|gp"
 set -euo pipefail
 
-case $1 in -?) opts=$1; shift ;; esac
+case ${1-} in -?) opts=$1; shift ;; esac
 rgx=${1:?Choose regex}
 sub=${2-}
 hl=$rgx
+opts=
 
-S=$'|'
+[[ ${S-} ]] || S=$'|'
 [[ $rgx == *$S* ]] && exit 3
 [[ $sub == *$S* ]] && exit 4
 
 [[ -z $opts && -n $sub ]] && opts='-s'
-[[ $opts == -s && "$3" == -r ]] && opts='-r'
+[[ $opts == -s && $3 == -r ]] && opts='-r'
 
 case $opts
 in -r) ag -l "$rgx" | xargs sed -ri -e "\\${S}$rgx${S}s${S}${S}$sub${S}g"
     # TODO: save 'ag -l' output filenames to var/file, then use 'ag... $hl' on that list
     # if [[ -n "$sub" ]]; then hl="$sub"; ag -l "$hl"; fi
 ;; -s) # If sub=="" then returns empty list: as all rgx was deleted!
-    if [[ -n "$sub" ]]; then hl="$rgx|$sub"; fi
+    if [[ -n $sub ]]; then hl="$rgx|$sub"; fi
     ag -l "$rgx" | xargs sed -rn -e "\\${S}$rgx${S}s${S}${S}$sub${S}gp" | ag "$hl"
 ;; -f) ag -l "$rgx"
 ;;  *) ag "$hl"
