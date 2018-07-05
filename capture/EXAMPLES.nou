@@ -1,0 +1,63 @@
+ALG: demo screen capture
+  zsh preparing
+    $ typeset -A ZSH_HIGHLIGHT_STYLES=( [comment]='fg=white,bold' )
+    $ setopt interactivecomments
+    $ setopt clobber
+    $ reset
+
+
+Capture screen
+  https://trac.ffmpeg.org/wiki/Capture/Desktop
+    $ ffmpeg -video_size 1920x1080 -framerate 30 -f x11grab -i "$DISPLAY"+1080,0 -c:v libx264 -crf 0 -preset ultrafast -y output.mkv
+    $ mpv output.mkv
+  convert video: less size, speed x2 (BAD? must be separate runnings)
+    $ ffmpeg -i output.mkv -filter:v "setpts=0.25*PTS" speed4x.mp4
+    $ ffmpeg -i speed4x.mp4 -vf unsharp sharp.mp4
+    $ ffmpeg -i sharp.mp4 -crf 21 converted.mp4
+  my
+    $ ffmpeg -f x11grab -s 1920x1080 -i "$DISPLAY"+1080,0 -vcodec libx264 -r 30 -crf 0 -preset veryfast -y output.mp4
+    $ ffmpeg -f x11grab -s 1920x1080 -i "$DISPLAY"+1080,0 -vcodec libx264 -r 60 -crf 18 -q:v 0 -vf scale=1280:720 -y output.mp4
+  SEE: quality
+    https://superuser.com/questions/490683/cheat-sheets-and-presets-settings-that-actually-work-with-ffmpeg-1-0
+      = veryfast is the best by size/speed/quality, but use ultrafast when low CPU
+    http://randombio.com/linuxsetup141.html
+    https://github.com/ShareX/ShareX/issues/160
+      = don't use "fps", otherwise video will speed up due to frame drops
+  ALT:
+    $ ffmpeg -rtbufsize 10000k -f dshow -i video="screen-capture-recorder":audio="virtual-audio-capturer" -c:v libx264 -r 30 -crf 0 -preset fast -tune zerolatency -pix_fmt yuv420p -c:a libvo_aacenc -ac 2 -b:a 128k -y "output.mp4"
+    $ ffmpeg -f x11grab -s 1920x1080 -i "$DISPLAY"+1080,0 -vcodec libx264 -r 30 -crf 18 -preset veryfast -vf scale=1280:720 -vf unsharp -y output.mp4
+    $ ffmpeg -f alsa -ac 2 -i pulse -f x11grab -r 30 -s 1680x1050 -i :0.0 -acodec pcm_s16le -vcodec rawvideo -threads 0 -vf "scale=1280:720" /home/greenbag/Captures/output.avi
+
+
+Terminal capture session pipeline
+  CMP: https://intoli.com/blog/terminal-recorders/
+  ALT:(with sound): asciinema + recterm
+    https://linoxide.com/linux-how-to/recterm-record-videos-audio-linux-terminal/
+  asciinema -- capture commands session with output
+    $ paci asciinema
+    $ asciinema rec demo.json
+    $ tmux
+      = use multiplexer to capture the internal highlighting it uses (by keyboard or mouse)
+    $ setopt interactivecomments
+      = zsh -- allow comments in current cmdline
+    $ # This demo is dedicated to the problem ...
+    ... (your other regular commands)
+    <C-d>
+  asciicast2gif -- convert session to GIF
+    https://github.com/asciinema/asciicast2gif/issues/28
+      BAD: font seems not changable
+        https://github.com/asciinema/asciicast2gif/blob/master/page/asciinema-player.css#L144
+        https://gist.github.com/glamp/74188691c91d52770807
+      $ paci npm
+      $ paci phantomjs-bin
+      $ sudo npm install --global asciicast2gif
+      $ asciinema/asciicast2gif -s 2 -t solarized-dark demo.json demo.gif
+    ALT:BAD:(--user $USER -v $HOME:$HOME:ro): ZSH loaded without all necessary options
+    https://container-solutions.com/understanding-volumes-docker/
+      $ paci docker
+      $ S.r docker
+      $ sudo docker pull asciinema/asciicast2gif
+      $ sudo docker run --rm -v $PWD:/data asciinema/asciicast2gif -s 2 -t solarized-dark demo.json demo.gif
+        = with Solarized Dark theme, double speed (-s 2), single pixel density (-S 1):
+  ffmpeg -- convert GIF to mp4
+    $ ffmpeg -i demo.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" demo.mp4
