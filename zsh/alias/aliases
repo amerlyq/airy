@@ -18,10 +18,11 @@ alias -g ZN='|tr \\0 \\n'
 if (($+commands[$PAGER])); then
   alias -g L='| "$PAGER" '
   alias -g LL='|& "$PAGER" -r '
-  # Line trim W/H to term size (w/o prompt)
-  alias -g LW='| expand | cut -c-"$(tput cols)"'
-  alias -g LT='| head -$(($(tput lines)-3)) | expand | cut -c-"$(tput cols)"'
 fi
+
+# Line trim W/H to term size (w/o two prompts and errcode)
+alias -g LW='| expand | cut -c-"$(tput cols)"'
+alias -g LT='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'
 
 if (($+commands[$EDITOR])); then
   # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
@@ -49,25 +50,31 @@ alias -g C='|wc -l'
 alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
 alias -g TC='|column -t'
+alias -g TT='|column -ts'"$'\t'"
 alias -g W='|while read line; do'
 alias -g NE='|grep -v "^\s*\$"'
 alias -g S='|noglob sed -u -rn'
 
 alias -g SS='|LC_ALL=C sort'
-alias -g SN='|sort -n'
-alias -g SU='|sort -u'
-for i in {1..5}; do
-  alias -g S$i="|sort -sk$i,$i"
-  alias -g S$i-="|sort -sk${i}r,$i"
+alias -g SN='SS -n'
+alias -g SU='SS -u'
+for i in {1..9}; do
+  alias -g S$i="SS -sk$i,$i"
+  alias -g S$i-="SS -sk${i}r,$i"
 done
-alias -g SC='|LC_ALL=C sort|uniq -c|sort -srn -k1,1'
+alias -g SC='SS|uniq -c|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'
 alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
 
-for i in {1..9}; do alias -g C$i="|awk '{print\$$i}'"; done
+for i in {1..9}; do
+  alias -g C$i="|awk '{print\$$i}'"
+  alias -g C/$i="|awk -F/ '{print\$$i}'"
+done
 alias -g C\$="|awk '{print\$NF}'"
+alias -g C/\$="|awk -F/ '{print\$NF}'"
+
 # Prints columns 1 2 3 ... n.
-function slit { awk "{ print ${(j:,:):-\$${^@}} }"; }
+function slit { awk "{ print ${(j:,:):-\$(${^@})} }"; }
 alias -g CN='|slit'
 
 alias -g U='|uniq'
