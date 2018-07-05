@@ -15,8 +15,9 @@ After=network.target network-online.target
 ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
 ConditionDirectoryNotEmpty=/var/lib/mailsync
 
-# BAD: useful only for daemons with Restart= on failure (however interferes with manual restarts)
-#   => useless for "oneshot" (unless you want to limit frequency of its triggering by timer, etc)
+# BAD: useful only with Restart= and OnFailure=restart when IntervalSec much smaller than .timer interval
+#   => unit becomes failed even if 3 times are normal start and not fail
+#   => useless for "oneshot" to limit their overall failure count
 # StartLimitBurst=3
 # StartLimitIntervalSec=10m
 
