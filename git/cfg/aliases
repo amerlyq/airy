@@ -25,7 +25,7 @@
     lthis   = !git --no-pager lstd --graph
     ldump   = !git --no-pager lgraph
     lfiles  = !git lstd --all --decorate --diff-filter="ACDMRT" --name-status  # OR --numstat
-    lmine   = !git lstd --all --author=\"$(git config user.name) \"
+    lmine   = !git lstd --author=\"$(git config user.name) \"
     lcommit = !git linverse -u # Show modified files in last commit
 
     logx = log --graph --decorate=short --color --format=format:'%C(bold blue)%h%C(reset)+%C(dim black)(%cr)%C(reset)+%C(auto)%d%C(reset)++\n+++       %C(bold black)%an%C(reset)%C(black): %s%C(reset)'

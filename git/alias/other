@@ -25,6 +25,7 @@ alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstr
 alias gaa='git add --all'
 alias ga.='gaa .'
 gcfd(){ local d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
+alias gcss='gcs --stat'
 alias gcsd='git --no-pager log --pretty=tformat:%ad%n%cd HEAD~..HEAD'
 alias gcom='gco master'
 
