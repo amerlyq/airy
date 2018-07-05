@@ -28,6 +28,7 @@ alias pacY='pacman -Syu'   # '[u]pgrade all'
 # alias pacexpl='pacman -D --asexp'  # 'mark as [expl]icit'
 # alias pacimpl='pacman -D --asdep'  # 'mark as [impl]icit'
 alias pac-last='tac /var/log/pacman.log | sed -rn "/\[PACMAN\]/q;/installed|updated/p" | tac'
+pac-old(){ pacman -U 'https://archive.archlinux.org/packages/.all/'"${^@}"; }
 
 # Synchronizes the local package database against the repositories then
 # upgrades outdated packages.

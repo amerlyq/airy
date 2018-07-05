@@ -1,2 +1,2 @@
-#!/bin/zsh
+#!/bin/zsh -eu
 for f in *.dlt*(.); do r.dlt-view $@ -- $f &>! ${f:s/\.dlt/\.txt}; done

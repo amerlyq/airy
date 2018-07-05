@@ -36,7 +36,7 @@
 set -euo pipefail -o noglob
 # MAYBE: check $BASH_VERSION >= 4.4
 
-die(){ echo "Err:(${0##*/}): $*" >&2; exit 1; }
+die(){ echo "Err:(${0##*/}):${LINENO}: $*" >&2; exit 1; }
 
 # ALT:BAD: subshell performance: +2.2ms
 #   IFS=: read -r -d '' -a dpaths < <(IFS=:; printf '%s:\0' "$*")
