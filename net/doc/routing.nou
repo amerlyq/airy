@@ -59,6 +59,17 @@ ALG
       # OR: by partial ranges (if some intranet resources accessible only by wifi)
       # ip route add 172.16.0.0/16 via 172.30.78.1
       # ip route add 172.30.0.0/16 via 172.30.78.1
+  MacOS
+    TUT https://gist.github.com/jessereynolds/1260554/6bf6c8bdd2b3afcd4486c041d604680764d4880b
+    Add / remove intranet routing
+      $ sudo networksetup -setadditionalroutes "Display Ethernet" 172.16.0.0 255.255.0.0 172.31.158.1
+      $ sudo networksetup -setadditionalroutes "Display Ethernet"
+    Reorder WiFi to be first before ethernet
+      NOTE: analogous to removing second "default" gateway
+      $ networksetup -listnetworkserviceorder
+      $ sudo networksetup -ordernetworkservices "Wi-Fi" "Ethernet"
+    Check default interface in use
+      $ route get 8.8.8.8
 
 
 Route WiFi to PC on same Router subnet
