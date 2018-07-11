@@ -55,7 +55,7 @@ aug_filetype(){ if [[ $1 =~ 'current ar archive'$ ]]
   else printf '%s\n' "$1"; fi
 }; export -f aug_filetype
 
-find -H "${src[@]}" ! -readable -prune -o -type f "${flt[@]}" -print \
+find -H ${src[@]+"${src[@]}"} ! -readable -prune -o -type f ${flt[@]+"${flt[@]}"} -print \
 | file -f- -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar \
 | grep -iFw -e "${bfmt-elf}" -e 'current ar archive' \
 | grep -Ew  "${typ}" \

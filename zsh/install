@@ -11,8 +11,8 @@ if [[ ! -d $PREZTO ]]; then
   git clone --recursive "$url" "$PREZTO"
 fi
 
-if distro arch; then
-  pkg_inst fasd
-elif distro ubuntu; then
-  do_if -c git_inst -p fasd 'clvv/fasd' ||:
-fi
+# if distro arch; then
+#   pkg_inst fasd
+# elif distro ubuntu; then
+#   do_if -c git_inst -p fasd 'clvv/fasd' ||:
+# fi

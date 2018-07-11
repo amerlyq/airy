@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/packages
 
 if distro arch; then
@@ -25,13 +25,11 @@ if distro arch; then
     # aur_inst js-beautify
     # BAD python-autopep8 beautify-css
 
-elif distro ubuntu; then
-    # for vimoutliner export in mindmap
-    pkg_inst vim-gtk #python3-yaml
-
-    ppa_add 'ppa:neovim-ppa/unstable'
-    pkg_inst neovim
-
-    pip_inst jedi  # neovim
-    echo "Err: not all"
+elif distro ubuntu || distro debian; then
+  # for vimoutliner export in mindmap
+  # pkg_inst vim-gtk  # python3-yaml
+  # ppa_add 'ppa:neovim-ppa/unstable'
+  # pkg_inst neovim
+  # pip_inst jedi  # neovim
+  git_inst 'neovim/neovim'
 fi
