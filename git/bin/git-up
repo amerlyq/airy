@@ -1,11 +1,11 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 
 # USE $ gem install git-up  # SEE http://aanandprasad.com/git-up/
 # if ((!$+commands[git-up])); then
 
 cwd=${1:-$PWD}
 clean=1
-cgit(){ git -c color.status=always -c color.ui=always "$@"; }
+cgit(){ git --no-pager -c color.status=always -c color.ui=always "$@"; }
 
 cd "$cwd"
 
@@ -19,7 +19,7 @@ git diff-files --quiet --ignore-submodules -- || clean=0
 cgit fetch --all
 cgit pull --rebase --verbose  # --rebase=preserve
 
-((clean)) || cgit stash pop
+((!clean)) && cgit stash show && cgit stash pop
 
 # ALT: with autostash and colored rebase
 # git ${GCFG[@]} fetch --all --progress --prune --verbose
@@ -32,3 +32,5 @@ cgit pull --rebase --verbose  # --rebase=preserve
 #   remote=$(git ls-remote -h ${remote%/*} refs/heads/${remote##*/} | awk '{print $1}')
 #   [[ $(git rev-parse HEAD) != "${remote%% *}" ]] || return 1
 # }
+
+exit 0
