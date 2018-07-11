@@ -1,8 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/system
 
-r.n xmonad recompile
+running_X && r.n xmonad recompile
 xmonad --recompile
 running_X && xmonad --restart
 svc_activate -urR xmobar
-r.n OK
+running_X && r.n OK
+exit 0

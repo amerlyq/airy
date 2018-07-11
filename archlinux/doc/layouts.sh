@@ -183,6 +183,7 @@ chmod 770 /mnt/data /mnt/work
 chmod g+s /mnt/data
 # NEED:(music): for mpd install (after user creation)
 mkdir -vp /data/{_dld,music}
+ln -sv /data/_dld /_dld
 
 ## FIXME: possible only after creating user
 chown -R ${myuser:?}:${myuser:?} /home/${myuser:?}{,sdk,.cabal,.cache}
