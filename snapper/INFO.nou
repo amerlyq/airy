@@ -26,44 +26,6 @@ USAGE
 
 ****************
 
-Register root
-  $ umount /.snapshots
-  $ rmdir /.snapshots
-  $ snapper -c root create-config /
-  $ btrfs subvolume delete /.snapshots
-  $ mkdir /.snapshots
-  $ mount -a
-
-Setup
-  $ sudo chown root:users /.snapshots
-  $ sudo chmod 750 /.snapshots
-  # http://snapper.io/2016/05/18/space-aware-cleanup.html
-  # OR: vis /etc/snapper/configs/root
-  $ sudo snapper -c root set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY="8",DAILY="7",WEEKLY="5"}
-  $ sudo snapper -c root setup-quota
-  $ sudo snapper -c root get-config
-
-***************
-
-Register user
-ALT:USE: "home_$user" instead of "user"
-  $ umount ~/.snapshots
-  $ rmdir ~/.snapshots
-  $ sudo snapper -c user create-config ~
-  $ sudo btrfs subvolume delete ~/.snapshots
-  $ mkdir ~/.snapshots
-  $ mount -a
-
-Setup
-  $ sudo sed -ri 's/(ALLOW_USERS=).*/\1"'"$USER"'"/g' /etc/snapper/configs/user
-  $ sudo chown root:users ~/.snapshots
-  $ sudo chmod 750 ~/.snapshots
-  $ sudo snapper -c user set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY="8",DAILY="7",WEEKLY="5"}
-  $ sudo snapper -c user setup-quota
-  $ sudo snapper -c user get-config
-  $ sudo v /etc/snapper/configs/user
-
-
 USAGE
   2017-08-30 [X] Exclude snapshots from indexing
     $ v /etc/updatedb.conf
