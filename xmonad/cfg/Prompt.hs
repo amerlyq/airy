@@ -7,7 +7,7 @@ import XMonad                       (spawn, windows)
 import XMonad.Prompt
 import XMonad.Prompt.Input          (inputPrompt, inputPromptWithCompl, (?+))
 import XMonad.Prompt.Shell          (shellPrompt)
-import XMonad.Prompt.Window         (windowPromptGoto, windowPromptBringCopy, windowPromptBring)
+import XMonad.Prompt.Window         (windowPrompt, WindowPrompt(..), allWindows)
 import XMonad.Prompt.Workspace      (workspacePrompt)
 import XMonad.Prompt.XMonad         (xmonadPrompt)
 
@@ -36,9 +36,9 @@ keys = inGroup "M-i"
   , ("s", shellPrompt myPromptTheme)
   , ("o", xmonadPrompt def)
   -- TODO: combine as set of "actions" with regular prefixes
-  , ("f", windowPromptGoto def)
-  , ("d", windowPromptBring def)
-  , ("c", windowPromptBringCopy def)
+  , ("f", windowPrompt def Goto allWindows)
+  , ("d", windowPrompt def Bring allWindows)
+  , ("c", windowPrompt def BringCopy allWindows)
   ] ++ pWksps ++
   [ ("M-C-z" , inputPrompt def "LockMsg" ?+ \p -> spawn ("r.lock " ++ p))
   ]
