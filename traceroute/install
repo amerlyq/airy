@@ -3,6 +3,7 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst mtr traceroute iputils
+  pkg_inst bind-tools  # -> $ ip route get "$(dig google.com +short)" for hostname resolution
 
 elif distro ubuntu; then
   echo "Err: fixme"

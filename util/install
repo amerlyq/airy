@@ -8,6 +8,10 @@ source ~/.shell/func.d/packages
 pkg_inst tree
 pkg_inst squashfs-tools
 
+# E.G. $ datediff 2011-11-15 2012-04-11 $ => 148
+# ALT: $ echo $(( ($(date +%s -d 2012-02-03) - $(date +%s -d 2012-01-15)) / 86400 ))
+pkg_inst dateutils
+
 # SEE https://joeyh.name/code/moreutils/
 # TODO: read man on each util
 pkg_inst moreutils
