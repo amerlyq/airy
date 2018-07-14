@@ -1,4 +1,5 @@
 #!/bin/bash
+#%USAGE: $ ./$0 /path/to/_build /path/out/_deps
 set -euo pipefail
 export SHELL=$(type -p bash)
 
@@ -207,6 +208,12 @@ topo_cycle_relpath(){ local grp=$1; shift
     bash -c 'cycle_relpath "$0" "$@"' '{}' "$grp/files" "$@"
 }
 
+annotate_cycle(){ local fcycle=$1; shift; r.elf-obj-syms-annotate-cycles "$@" < "$fcycle" | c++filt; }
+annotate_cycle_group(){ local grp=$1; shift 1
+  dump_once "$grp/topo.cycles.annotated" \
+    annotate_cycle "$grp/topo.cycles.relpath" "$grp/need"
+}
+
 # TODO: delete self-links BET: gvpr postprocessing
 #   <deps-.gv awk '$1";"!=$3' > deps--.gv
 # TODO: filter-out common libs -- stdc++, logger, etc
@@ -232,6 +239,7 @@ toposort_all "$deps"
 foreach_group "$deps" orderdeps_group
 foreach_group "$deps" graph_group
 foreach_group "$deps" topo_cycle_relpath "$deps/ext/files"
+foreach_group "$deps" annotate_cycle_group
 
 
 

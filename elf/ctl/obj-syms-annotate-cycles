@@ -1,0 +1,33 @@
+#!/bin/bash
+#%USAGE: $ <topo.cycles.relpath ./$0 ./need ... | c++filt V
+set -euo pipefail -o noglob
+
+dneed=$1
+
+annotate_group(){ local dneed=$1 obj dep; shift
+  (($#)) && printf '\n\n'
+  for pobj; do obj=${pobj##*/}
+    printf '%s\n' "$pobj"
+    for pdep; do dep=${pdep##*/}
+      [[ $pobj == $pdep ]] && continue
+      if [[ -f $dneed/$obj/$dep ]]; then
+        printf '\t%s\n' "$dep"
+        sed 's/^/\t\t/' "$dneed/$obj/$dep"
+      fi
+    done
+  done
+}
+
+annotate_cycles(){ local dneed=$1 grp=() line
+  while IFS= read -r line; do
+    if [[ $line ]]; then
+      grp+=( "$line" )
+    else
+      annotate_group "$dneed" "${grp[@]}"
+      grp=()
+    fi
+  done
+  annotate_group "$dneed" "${grp[@]}"
+}
+
+annotate_cycles "$dneed"
