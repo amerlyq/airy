@@ -1,11 +1,12 @@
-#!/bin/bash -eu
+#!/bin/bash
 # USAGE:DFL: non-interactive config = ./tmpl/vpn.conf
 # USAGE:ALT: env vars VPN_* from some profile
-#%USAGE:(get fingerprint): $ openconnect --authenticate "$server"
-set -o pipefail
+#%USAGE:(get fingerprint): $ r.vpn -i
+#%  OR: $ openconnect --authenticate "$server"
+set -euo pipefail
 
 # THINK: simplify by using only 'config' variant
-pr=openconnect
+exe=/usr/bin/openconnect
 cfg=~/.config/airy/vpn.conf
 pidf=${TMPDIR:-/tmp}/vpn.pid
 background=0
@@ -13,7 +14,7 @@ interactive=0
 verbose=0
 
 trap 'pgrep -f "$pidf" >/dev/null || rm -f "$pidf"' EXIT
-pids(){ pgrep -f "$pidf" || pgrep "$pr"; }
+pids(){ pgrep -f "$pidf" || pgrep "${exe##*/}"; }
 sigsend(){ local p; readarray -t p <<< "$(pids)"
   (( ! ${#p[@]} )) || sudo kill "$@" -- "${p[@]}"; }
 
@@ -28,8 +29,6 @@ in b) background=1
 ;; :|'?') exit 2
 esac; done; shift $((OPTIND - 1))
 
-gpgdb=${VPN_GPG:-~/.cache/airy/gpg/vpn.gpg}
-
 if [[ -s $cfg ]]; then
   # HACK: extract server from config's comments (no native support)
   [[ -n ${server:=${1-}} ]] \
@@ -41,7 +40,7 @@ else
 fi
 
 
-opts=( /usr/bin/"$pr" "$server" )
+opts=( "$server" )
 ((verbose)) && opts+=( --timestamp --verbose )
 ((background)) && opts+=( --background --pid-file="$pidf" )
 
@@ -49,19 +48,14 @@ opts=( /usr/bin/"$pr" "$server" )
 && opts+=( --config="$cfg" ) \
 || opts+=( --user="$user" --authgroup="$group" --pfs --disable-ipv6 )
 
+pass=$(r.query-passwd "vpn/$server" ||:)
 
-# BET? https://wiki.archlinux.org/index.php/Pass $ pass(){ pass 'vpn/user'; }
-pass(){ /usr/bin/gpg --use-agent --quiet --batch --decrypt "$1" \
-  | /usr/bin/awk -vk="$2" '$1~("\\y"k"\\y"){print$NF;exit}'; }
-vpnauth(){ "${opts[@]}" --authenticate "$@"; }
-
-# EXPL: first time -- only auth w/o sudo
-if ((interactive)) || [[ ! -s $gpgdb ]]; then
+# USAGE: first time -- only auth w/o sudo
+if ((interactive)) || [[ -z $pass ]]; then
   # THINK:DEV: if [[ -t 0 ]] always read pass from stdin ?
-  session=$( vpnauth )
+  session=$("$exe" "${opts[@]}" --authenticate)
 else
-  # THINK:RFC: replace pipe by $ exec < <(pass ...) $ BUT: need to restore &1
-  session=$( pass "$user@$server" "$gpgdb" | vpnauth --non-inter --passwd-on-stdin )
+  session=$("$exe" "${opts[@]}" --authenticate --non-inter --passwd-on-stdin <<< "$pass")
 fi
 
 
@@ -69,5 +63,5 @@ unset COOKIE FINGERPRINT
 eval "$session"
 [[ -n $COOKIE && -n $FINGERPRINT ]] || exit 1
 
-execcon(){ exec sudo "${opts[0]}" --reconnect-timeout=60 "${opts[@]:1}" "$@"; }
+execcon(){ exec sudo "$exe" --reconnect-timeout=60 "${opts[@]}" "$@"; }
 execcon --non-inter --servercert "$FINGERPRINT" --cookie-on-stdin <<< "$COOKIE"
