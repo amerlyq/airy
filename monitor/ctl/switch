@@ -1,4 +1,5 @@
 #!/bin/bash
+#%USAGE: $ r.monitor-switch -as
 set -euo pipefail
 
 dfl=eDP-1
@@ -17,14 +18,15 @@ del_mon_split(){
 del_mon_split "$ext~1"
 del_mon_split "$ext~2"
 
+# NOTE: artificially reduce physical size (mw x mh) to increase virtual dpi
 ext_dims=$(get_mon_dims "$ext")
 read -r w h x y mw mh <<< "$ext_dims"
 s1=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((w*$kw))+0
 s2=$((w*$kw))/$((mw*$kw))x$h/$mh+0+0
 
 [[ $* =~ s ]] && xrandr \
-  --setmonitor "$ext~1" "$s1" "$ext" \
-  --setmonitor "$ext~2" "$s2" none
+  --setmonitor "$ext~1" "$s2" "$ext" \
+  --setmonitor "$ext~2" "$s1" none
 
 case $*
 in *d*) xrandr --output "$dfl" --primary --auto --output "$ext" --off

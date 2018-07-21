@@ -1,0 +1,18 @@
+#!/bin/bash
+#%SUMMARY: reduced size for ultrawide screen (when no HiDPI support or for higher FPS rate)
+set -euo pipefail -o noglob
+
+output=${1:-DP-1}
+mode=${2:-1920x800}
+
+# OR:(?old?): $ gtf 1920 800 60
+# e.g. 125.00 1920 2024 2216 2512 800 803 813 831 -hsync +vsync
+params=$(cvt ${mode%x*} ${mode##*x} 60 | sed -n '2s/^\w\+\s//p' | cut -d' ' -f2-)
+params=( $params )
+
+xrandr --newmode 1920x800 "${params[@]}"
+xrandr --addmode "$output" 1920x800
+xrandr --output "$output" --mode 1920x800
+
+# Restore back:
+# xrandr --output DP-1 --auto
