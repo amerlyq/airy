@@ -161,6 +161,9 @@ myCfg = withUrgencyHook BorderUrgencyHook { urgencyBorderColor="#ff0000" } $ def
   , focusFollowsMouse = False
   , clickJustFocuses = True
   -- Style
+  -- TRY: borderWidth based on window
+  -- REF: http://haskell.1045720.n5.nabble.com/More-possibilities-for-border-width-customization-td5825298.html
+  -- e.g. setBorder bw = ask >>= \w -> liftX (withDisplay $ \d -> io $ setWindowBorderWidth d w bw) >> idHook
   , borderWidth        = 2
   , normalBorderColor  = "#000000"
   , focusedBorderColor = "#00af00"
@@ -192,7 +195,7 @@ myLayout = smartBorders
     . onWorkspace "PI" piLayer
     -- . onWorkspace "SK" (reflectHoriz skLayer)
     . trackFloating
-    $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| simplestFloat ||| Grid ||| Circle
+    $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| Grid
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
     skLayer = gridIM (1%6) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
@@ -219,6 +222,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   --EXPL: pidgin is tiled by XMonad.Layout.IM
   -- , let lst = "buddy_list Preferences"
   --   in wmhas (stringProperty "WM_WINDOW_ROLE") lst
+  -- BAD: floating "Steam" will run away in diagonal bot-right if {borderWidth > 2}
   , let lst = "feh Steam Gimp piony.py Transmission-gtk"
     in wmhas className lst
   , let lst = "PlayOnLinux Dialog"
@@ -289,14 +293,14 @@ main = do
   -- TODO:CHG: query value from Xft.dpi by xmonad means instead!
   -- BUT:TEMP: impossible as xprofile can be run only after xmonad
   -- BUG: not found r.xorg
-  -- dpi <- print (fromMaybe 96 (catchStdout "r.xorg" "-d"))
-  dpi <- catchStdout "r.xorg" "-d"
-  -- (err, stdout, _) <- readProcessWithExitCode "r.xorg" ["-d"] ""
-  -- dpi <- fmap read stdout
+  -- -- dpi <- print (fromMaybe 96 (catchStdout "r.xorg" "-d"))
+  -- -- (err, stdout, _) <- readProcessWithExitCode "r.xorg" ["-d"] ""
+  -- -- dpi <- fmap read stdout
+  -- dpi <- catchStdout "r.xorg" "-d"
 
   xmonad $ ewmh myCfg { logHook = myLogHook h
-  , borderWidth = fromIntegral $ round (dpi / 60)
-  -- , borderWidth = fromIntegral $ round (fromMaybe 96 (catchStdout "r.xorg" "-d") / 60)
+  -- , borderWidth = fromIntegral $ round (dpi / 60)
+  -- -- , borderWidth = fromIntegral $ round (fromMaybe 96 (catchStdout "r.xorg" "-d") / 60)
   }
 
   -- CHECK: is really necessary?
