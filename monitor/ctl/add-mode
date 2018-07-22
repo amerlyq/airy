@@ -10,9 +10,14 @@ mode=${2:-1920x800}
 params=$(cvt ${mode%x*} ${mode##*x} 60 | sed -n '2s/^\w\+\s//p' | cut -d' ' -f2-)
 params=( $params )
 
-xrandr --newmode 1920x800 "${params[@]}"
-xrandr --addmode "$output" 1920x800
-xrandr --output "$output" --mode 1920x800
+# NEED: check if mode exist in general (otherwise --newmode fails)
+# BAD: check only if output has mode added
+if ! xrandr -q | awk -vo=DP-1 -vm=1920x800 '$1==o{x=1;next} x&&/^\S/{exit 1} x&&$1==m{exit 0}'; then
+  xrandr --newmode "$mode" "${params[@]}"
+  xrandr --addmode "$output" "$mode"
+fi
+
+xrandr --output "$output" --mode "$mode"
 
 # Restore back:
 # xrandr --output DP-1 --auto
