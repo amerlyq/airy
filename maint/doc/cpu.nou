@@ -1,0 +1,12 @@
+Monitor CPU usage
+
+Use /proc/stat on embedded
+  https://www.mail-archive.com/linuxkernelnewbies@googlegroups.com/msg01690.html
+
+ALT: dump ps
+  $ while usleep 300000; do ps -Ao time,%cpu,comm | awk -vt="$(awk '3==NR{print$3;exit}' /proc/timer_list)" '/myprogram$/{$1=substr($1,1,2)*3600+substr($1,4,2)*60+substr($1,7,2);print t,$0;exit}'; done > /data/cpuusage
+  $ <cpuusage gnuplot -p -e "plot '-' using 1:2 with lines lw 2 title 'CPU_total' noenhanced"
+  $ <cpuusage gnuplot -p -e "plot '-' using 1:3 with lines lw 2 title '%CPU' noenhanced"
+  ALSO: calculate derivative for CPU_total
+    e.g. $ printf -- '%d %f\n' $(seq 1 40|awk '{print $1,10*log($1)}')
+    $ <cpuusage awk 'NR>1{$2=sprintf("%.3f",($2-y)/($1-x));print} {x=$1;y=$2}' | gnuplot -p -e "plot '-' using 1:2 with lines lw 2 title 'CPU_total' noenhanced"

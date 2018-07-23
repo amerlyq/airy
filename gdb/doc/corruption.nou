@@ -1,0 +1,8 @@
+Debugging strategy for stack protection is possible and sometimes useful:
+  ALT:TRY: mudflap REF: https://gcc.gnu.org/wiki/Mudflap_Pointer_Debugging
+  REF: https://stackoverflow.com/questions/1629685/when-and-how-to-use-gccs-stack-protection-feature
+    (1) execute the binary compiled with stack protection (-fstack-protector) and disable ASLR (address space layout randomization) in a debugger.
+    (2) wait for a core.
+    (3) the core will indicate the address of the stack canary that got clobbered.
+    (4) re-run your binary in the debugger and set a hardware watch point on the address of the clobbered stack canary.
+    (5) the debugger will stop when the memory located at culprit address is modified.

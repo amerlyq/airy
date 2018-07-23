@@ -36,7 +36,7 @@ ALG
     $ eth=$(command ip link | sed -rn '/^[0-9]+:\s+(e\w+):.*$/{s//\1/p;q}')
     $ gw=$(command ip r s exact 0.0.0.0/0 dev "${eth:?}" | sed -rn 's/.*via ([0-9.]+).*/\1/p')
     $ sudo ip route del default dev "${eth:?}"
-    $ sudo ip route add 172.16.0.0/16 via "${gw:?}"
+    $ sudo ip route add 172.16.0.0/12 via "${gw:?}"
       <= for ethernet-only resources
     $ sudo ip route add 172.30.0.0/16 via "${gw:?}"
       <= for wifi-only resources
