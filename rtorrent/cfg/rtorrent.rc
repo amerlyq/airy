@@ -1,0 +1,13 @@
+# vim: ft=conf
+# REF: http://rtorrent-docs.readthedocs.io/en/latest/use-cases.html#drop-in-config
+# TUT: https://github.com/rakshasa/rtorrent/wiki/Common-Tasks-in-rTorrent
+# ALSO: http://rtorrent-docs.readthedocs.io/en/latest/scripting.html
+
+## Layout
+method.insert = cfg.config,  private|const|string, (cat,"~/.config/rtorrent/")
+method.insert = cfg.cfgdir,  private|const|string, (cat,(cfg.config),"cfg/")
+method.insert = cfg.cfglist, private|const|string, (cat,(cfg.config),"/cfg.rc")
+
+## Load other rc snippets (~/.config/rtorrent/cfg/*.rc)
+execute.throw = sh, -euc, (cat,"find \"$0\" -type f -name '*.conf' -printf 'import=%p\\n' | sort > \"$1\""), (cfg.cfgdir), (cfg.cfglist)
+try_import = (cat, (cfg.cfglist))

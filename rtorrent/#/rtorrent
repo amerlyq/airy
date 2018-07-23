@@ -1,0 +1,16 @@
+#!/bin/bash
+set -euo pipefail
+
+pr=/usr/bin/rtorrent
+
+# ALT: $ rtorrent -n -o import=~/.config/rtorrent/rtorrent.rc
+cfg=~/.rtorrent.rc
+[[ -f $cfg && -s $cfg ]] || exec "$pr" "$@"
+
+dcache=$(grep -Po '^session\.path\.set\s*=\s*\K.*(?=\s*)$' "$cfg")
+mkdir -p "$dcache"
+
+if ! flock -xonE13 "$dcache" "$pr" "$@"; then err=$?
+  ((err==13)) && echo "Err: rtorrent session dir '$dcache' is already used by another rtorrent instance"
+  exit $err
+fi
