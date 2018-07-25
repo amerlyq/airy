@@ -226,3 +226,10 @@ hg_inst() {
   else hg clone "$link" "$prdir" && cd "$prdir"; fi
   ((!dobuild))|| pkg_build "$prdir"
 }
+
+url_wget_to(){ local d=$1; shift
+  [[ $d =~ " " ]] && { echo "Err: spaces in path are not supported"; return 1; }
+  for u; do [[ $u == -- ]] && continue
+    do_if -c "wget -q --show-progress -cNP $d" -f "$d/${u##*/}" -- "$u"
+  done
+}

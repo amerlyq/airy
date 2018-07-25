@@ -26,7 +26,7 @@ Testing repo
   ALSO: nvidia-smi -a
 
 Get VGA card and display GPU vendor
-  $ lspci | grep 'VGA|3D'
+  $ lspci | grep -E 'VGA|3D'
   lspci -vnn | grep VGA -A 12
   lshw -numeric -C display
   sudo lshw -numeric -C display

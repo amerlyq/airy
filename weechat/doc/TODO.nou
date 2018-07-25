@@ -1,3 +1,22 @@
+BUG
+  [_] multiline not seen what typed after two lines (not scrolled anymore)
+  [_] errors treated as commands
+    <=
+      15:55 ⚠ irc: command "**" not found:
+      15:55 ⚠ ** (process:26219): WARNING **: 15:55:56.690: (telegram-purple.c:505):update_on_ready: runtime check failed: (P)
+      15:56 ⚠ irc: command "**" not found:
+      15:56 ⚠ ** (process:26219): CRITICAL **: 15:56:01.794: purple_conversation_get_chat_data: assertion 'conv != NULL' failed
+      15:56 ⚠ irc: command "**" not found:
+      19:28 ⚠ irc: command "(process:26219):" not found:
+      19:28 ⚠ (process:26219): Json-CRITICAL **: 19:28:06.199: json_node_get_object: assertion 'JSON_NODE_IS_VALID (node)' failed
+      19:28 ⚠ irc: command "**" not found:
+      19:28 ⚠ ** (process:26219): CRITICAL **: 19:28:31.285: purple_url_encode: assertion 'str != NULL' failed
+      19:28 ⚠ irc: command "**" not found:
+    SEE:
+      https://bitbucket.org/EionRobb/purple-rocketchat/issues/39/bitlbee-cant-set-proper-room-name
+      https://github.com/majn/telegram-purple/issues/336
+
+
 IDEA
   trigger to replace (lenny) -> ( ͡° ͜ʖ ͡°) when I send a message
     * similar for table-flipping and other kaoji
