@@ -15,7 +15,7 @@ RemainAfterExit=yes
 # ExecStart=/bin/sh -ec 'source ~/.xprofile'
 ExecStartPre=/usr/bin/dbus-update-activation-environment DISPLAY XAUTHORITY
 ExecStartPre=/usr/bin/xrdb -load %h/.Xresources
-ExecStart=/usr/bin/xset b off s off dpms 1200 0 0 r rate 250 40
+ExecStart=/usr/bin/xset b off s off dpms 1200 1500 1800 r rate 250 40
 ExecStart=/usr/bin/xsetroot -cursor_name left_ptr
 # EXPL:CHECK: because we can't replace setxkbmap by xorg.conf
 ExecStart=/bin/sh -c '%h/.local/bin/r.xkb'

@@ -3,7 +3,7 @@ set -euo pipefail
 
 apid=${1:-ID}
 ctid=${1:-IDv2}
-pref=${CMAKE_PREFIX_DIR:-/work/_mirror/_prefix-host}
+pref=${CMAKE_PREFIX_DIR:-/work/cache/_prefix-host}
 
 export LD_LIBRARY_PATH=$pref/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export PATH=$pref/bin:$PATH

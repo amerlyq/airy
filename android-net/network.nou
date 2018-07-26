@@ -46,3 +46,15 @@ Android reverse tethering (web PC -> AN)
   https://forum.fairphone.com/t/reverse-usb-tethering-on-linux/5671/2
   2017-09-24 [X] - https://unix.stackexchange.com/questions/90020/how-do-i-create-a-usb-networking-interface-for-passing-internet-to-my-android-ph
   2017-09-24 [X] -- https://community.linuxmint.com/tutorial/view/1524
+
+
+Tethering
+  Ubuntu
+    http://darwinpedia.blogspot.com/2017/09/ubuntu-server-1604-connection-via-usb.html
+      $ sudo ifconfig -a
+      $ sudo ifconfig enp0s29f7u5 up
+      $ sudo nano /etc/network/interfaces
+        # Append:
+        auto enp0s29f7u5
+        iface enp0s29f7u5 inet dhcp
+      $ sudo ifup enp0s29f7u5
