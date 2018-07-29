@@ -1,4 +1,6 @@
 DOC:REF: https://wiki.archlinux.org/index.php/Steam/Game-specific_troubleshooting
+  https://wiki.archlinux.org/index.php/Steam#Installation
+  https://wiki.archlinux.org/index.php/Steam/Troubleshooting#Steam_runtime
 
 NOTE: move installation dir
   $ mkdir /games/_steam
@@ -6,6 +8,24 @@ NOTE: move installation dir
     * choose /games/_steam
     * right-click /games/_steam -> make default
     # NOT * right-click ~/.local/share/Steam -> remove
+
+Run single game
+  $ primusrun steam steam://rungameid/23687
+
+Crash on startup
+  + https://github.com/ValveSoftware/steam-for-linux/issues/4529
+    MAYBE crash due to libglvnd inside nvidia-drivers present in render path -- rebuild driver w/o it
+  https://github.com/ValveSoftware/steam-for-linux/issues/4340
+
+Show Free-to-Play games which you installed before
+  https://gaming.stackexchange.com/questions/107550/free-to-play-games-go-missing-in-the-steam-library
+
+TODO
+  [_] TODO export "Own", "Wishlist", "Not interested" from Steam (in case of service trash up)
+
+Gamepad
+  https://www.gottabemobile.com/how-to-use-the-xbox-elite-controller-on-pcs/
+
 
 # Games
 # aur/steamband

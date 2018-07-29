@@ -1,10 +1,12 @@
 #!/bin/bash
 set -euo pipefail -o errtrace
 
-r.video-single 2
-
-onexit(){ r.video-single 1; }
-trap 'onexit' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+r.monitor-scale 2
+onexit(){ r.monitor-scale 1; }
+trap 'onexit' HUP INT QUIT TERM ERR
 
 r.wm -w g  # Jump to game workspace
-primusrun steam
+optirun steam
+
+# BAD: crash on "libvgui2_s.so"
+# primusrun steam
