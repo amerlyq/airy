@@ -1819,3 +1819,9 @@ config.bind('l', 'forward')
 # config.bind('<Return>', 'prompt-accept', mode='yesno')
 # config.bind('n', 'prompt-accept no', mode='yesno')
 # config.bind('y', 'prompt-accept yes', mode='yesno')
+
+
+### Load private part of config
+privatecfg = config.configdir / 'config-private.py'
+if privatecfg.is_file():
+    config.source(privatecfg)

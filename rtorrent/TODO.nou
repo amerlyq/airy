@@ -10,6 +10,8 @@ TODO:
     https://github.com/pyroscope/pyrocore
   2018-07-23 [X] FIND: specify download directory per .torrent file from CLI
     $ rtorrent -d /media/$USER/Umi/_dld [-s ./session] [-o key=opt,...] /path/to/some.torrent
+    e.g. $ rtorrent -d. some.torrent
+    [_] BUG: not saving into current dir !!!
     ALT: https://groups.google.com/forum/#!topic/pyroscope-users/N8hHe-58K14
       $ rtxmlrpc -v load.verbose '' "$metafile" "d.directory_base.set=\"$datadir\"" "d.priority.set=$priority"
   2018-07-23 [X] FIND: use config from another location

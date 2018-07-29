@@ -10,7 +10,9 @@ pkg_inst strace
 #   -- is more prone to crash traced processes than strace.
 pkg_inst ltrace
 
-if distro arch; then
-  aur_inst xtrace-git
+if distro arch; then :
+  # BUG: git.debian.org[0: 194.177.211.202]: errno=Connection refused
+  # aur_inst xtrace-git
   # ALSO: xscope -- to monitor Xorg traffic
+  # ALSO: extrace-git for exec()
 fi
