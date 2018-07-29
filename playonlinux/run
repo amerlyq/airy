@@ -10,7 +10,7 @@ set -euo pipefail -o errtrace
 #   * auto-choose correct mode 1280x768 or 1280x800 depending on monitor when r.video-resize 1/2/3
 
 lib=~/.config/airy/game
-on_exit=('r.video-single 1')
+on_exit=('r.monitor-scale 1')
 
 choose(){ dmenu -p 'Play me:' -fn monospace:size=10
      -nb '#000000' -nf '#b0e0e6' -sb '#227410' -sf '#ccaa00'; }
@@ -42,7 +42,7 @@ esac; else
     xrdb -DDPI=141 -load ~/.Xresources
     # ALT: echo Xft.dpi: 144 | xrdb -merge
   fi
-  r.video-single 2
+  r.monitor-scale 2
 fi
 
 # CHECK: called only one trap or sometimes multiple of them?

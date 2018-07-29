@@ -2,9 +2,13 @@
 #%USAGE: $ r.monitor-switch -as
 set -euo pipefail
 
+# TODO: split into orthogonal scripts "split" and "layout"
+# BUG: wrong "st" font size when $ xrandr --output DP-1 --mode 1920x1080
+
 dfl=eDP-1
 ext=DP-1
 kw=1/4
+[[ $* =~ S ]] && kw=5/21
 
 get_mon_dims(){ xrandr -q | awk -vm="$1" '$1==m && $2=="connected"' | sed -rn '
   /.*\s([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+).*\s([0-9]+)mm x ([0-9]+)mm/{
@@ -15,24 +19,35 @@ del_mon_split(){
   xrandr --delmonitor "$1"
 }
 
-del_mon_split "$ext~1"
-del_mon_split "$ext~2"
 
-# NOTE: artificially reduce physical size (mw x mh) to increase virtual dpi
+# NOTE: reuse current active resolutions for monitor OR: --auto
+dfl_dims=$(get_mon_dims "$dfl")
+read -r dflw dflh _ <<< "$dfl_dims"
+dfl_mode=( --mode "${dflw}x${dflh}" )
+
 ext_dims=$(get_mon_dims "$ext")
 read -r w h x y mw mh <<< "$ext_dims"
+ext_mode=( --mode "${w}x${h}" )
+
+
+# NOTE: artificially reduce physical size (mw x mh) to increase virtual dpi
 s1=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((w*$kw))+0
 s2=$((w*$kw))/$((mw*$kw))x$h/$mh+0+0
 
-[[ $* =~ s ]] && xrandr \
+del_mon_split "$ext~1"
+del_mon_split "$ext~2"
+
+[[ $* =~ [sS] ]] && xrandr \
   --setmonitor "$ext~1" "$s2" "$ext" \
   --setmonitor "$ext~2" "$s1" none
 
+
 case $*
-in *d*) xrandr --output "$dfl" --primary --auto --output "$ext" --off
-;; *e*) xrandr --output "$dfl" --off --output "$ext" --primary --auto
-;; *a*|'') xrandr --output "$dfl" --primary --auto --below "$ext" --output "$ext" --auto
+in *d*) xrandr --output "$dfl" --primary "${dfl_mode[@]:?}" --output "$ext" --off
+;; *e*) xrandr --output "$dfl" --off --output "$ext" --primary "${ext_mode[@]:?}"
+;; *a*|'') xrandr --output "$dfl" --primary "${dfl_mode[@]:?}" --below "$ext" --output "$ext" "${ext_mode[@]:?}"
 ;; *) echo "Err: wrong option '$*'"; exit 1
 esac
 
 r.feh
+# r.wm restart-wm

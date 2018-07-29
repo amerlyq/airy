@@ -12,7 +12,7 @@ params=( $params )
 
 # NEED: check if mode exist in general (otherwise --newmode fails)
 # BAD: check only if output has mode added
-if ! xrandr -q | awk -vo=DP-1 -vm=1920x800 '$1==o{x=1;next} x&&/^\S/{exit 1} x&&$1==m{exit 0}'; then
+if ! xrandr -q | awk -vo="$output" -vm="$mode" '$1==o{x=1;next} x&&/^\S/{exit 1} x&&$1==m{exit 0}'; then
   xrandr --newmode "$mode" "${params[@]}"
   xrandr --addmode "$output" "$mode"
 fi
