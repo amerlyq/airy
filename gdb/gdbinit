@@ -22,6 +22,7 @@ set prompt \033[0;31m──────\033[0m\n(gdb)\040
 set print asm-demangle
 set print demangle on
 set demangle-style gnu-v3
+# set filename-display absolute
 
 ## Features for C++
 # SEE: http://ftp.gnu.org/old-gnu/Manuals/gdb/html_chapter/gdb_9.html#SEC58
@@ -174,6 +175,28 @@ define btl
 end
 
 
+define btll
+  # set filename-display absolute (to resolve substituted paths to actual ones on host system)
+  if $argc == 0
+    echo USE: btll <count>
+    bt -1
+  end
+  if $argc == 1
+    set $i = 0
+    while( $i <= $arg0 )
+      select-frame $i
+      frame
+      echo \n//
+      info line
+      info locals
+      echo \n
+      set $i = $i + 1
+    end
+    select-frame 0
+  end
+end
+
+
 define btreg
   if $argc == 0
     echo USE: btreg <count> TODO: auto-parse this string OR python\n
@@ -183,8 +206,11 @@ define btreg
     set $i = 0
     while( $i <= $arg0 )
       select-frame $i
-      eval "echo #%02d: %08x %08x %08x\n", $i, $sp, $pc, $ra
-      # info registers sp pc ra
+      ## ARM
+      eval "echo #%02d: %08x %08x %08x\n", $i, $sp, $pc, $lr
+      ## MIPS
+      # eval "echo #%02d: %08x %08x %08x\n", $i, $sp, $pc, $ra
+      # ALT: info registers sp pc ra
       set $i = $i + 1
     end
     select-frame 0
