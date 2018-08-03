@@ -74,31 +74,71 @@ define findval
   end
 end
 
-# Use bta to print backtraces for all threads
+
 define bta
+  thread apply all bt
+end
+document bta
+Backtrace for all threads
+end
+
+define btal
   # Make things like C++ or STL classes (as function parameters)
   # not truncated (and shown as "...") in bt.
   # BAD: don't set implicitly here
   #   set print frame-arguments all
   thread apply all bt full
 end
+document btal
+Full backtrace (with locals) for all threads
+end
+
+
+#
+define disa
+  set $beg = 0
+  set $end = 2
+  if $argc == 1
+    set $beg = $arg0
+    set $end = $arg0
+  else
+    if $argc == 2
+      set $beg = $arg0
+      set $end = $arg1
+    end
+  end
+  thread apply all disassemble $pc-$beg,$pc+$end
+end
+document disa
+Syntax: disa [beg] [end]
+| Disassemble around $pc of each thread (to verify waiting on syscall instruction, e.g. "svc 0" on ARM Thumb)
+end
+
 
 define dis
+  disassemble
+end
+document dis
+Disassemble current function
+end
+
+define diss
+  set $addr = $pc
   set $sz = 0x60
-  if $argc == 0
-    set $addr = $pc
+  if $argc == 1
+    set $sz = $arg0
   else
-    if $argc == 1
-      set $addr = $arg0
-    else
-      if $argc == 2
-        set $sz = $arg1
-        set $addr = $arg0
-      end
+    if $argc == 2
+      set $sz = $arg0
+      set $addr = $arg1
     end
   end
   disassemble /r $addr - $sz*2/3, +$sz
 end
+document diss
+Disassemble section around $pc of specified size in ratio 2:1
+end
+
 
 # Print disassembled frames
 define frdis
@@ -168,6 +208,7 @@ define btl
     while( $i <= $arg0 )
       select-frame $i
       frame
+      echo \n
       set $i = $i + 1
     end
     select-frame 0
@@ -176,7 +217,8 @@ end
 
 
 define btll
-  # set filename-display absolute (to resolve substituted paths to actual ones on host system)
+  # HACK: resolve substituted paths to actual ones on host system
+  # set filename-display absolute
   if $argc == 0
     echo USE: btll <count>
     bt -1
