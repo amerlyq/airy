@@ -1,16 +1,23 @@
 Binary grep string offset
   http://tuxdiary.com/2014/11/29/grep-offset-string-binary-file/
-  $ grep -baron
+    $ grep -baron 'mystr' *.so
+    $ grep -bao 'mystr' exe
   ALT: https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstGrep
 
 Binary files grep
+  [_] TRY search core_dump by radare2
   https://oldpapyrus.wordpress.com/2016/03/28/search-binary-files-linux/
   VIZ
-    https://github.com/tmbinc/bgrep
+    https://github.com/tmbinc/bgrep  # BAD: no useful capabilities, no help
       http://debugmo.de/2009/04/bgrep-a-binary-grep/
+      WARN: reverse bytes order for little-endian address 0x027f8058
+      $ bgrep 58807f02 core_dump
+        core_dump: 03368bbc
     https://github.com/udoprog/bgrep2
     https://github.com/Sepero/SearchBin  # BAD: too naive impl
     http://xyne.archlinux.ca/projects/hexgrep/src/
+      $ hexgrep -cf core_dump -- 0x027f8058
+        3368bbc 58 80 7f 02
 
 
 ALG: string matching
