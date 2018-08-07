@@ -9,6 +9,7 @@ dfl=eDP-1
 ext=DP-1
 kw=1/4
 [[ $* =~ S ]] && kw=5/21
+[[ $* =~ [0-9]+/[0-9]+ ]] && kw=${BASH_REMATCH[0]:?}
 
 get_mon_dims(){ xrandr -q | awk -vm="$1" '$1==m && $2=="connected"' | sed -rn '
   /.*\s([0-9]+)x([0-9]+)\+([0-9]+)\+([0-9]+).*\s([0-9]+)mm x ([0-9]+)mm/{
@@ -31,21 +32,22 @@ ext_mode=( --mode "${w}x${h}" )
 
 
 # NOTE: artificially reduce physical size (mw x mh) to increase virtual dpi
-s1=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((w*$kw))+0
-s2=$((w*$kw))/$((mw*$kw))x$h/$mh+0+0
+s1=$((w*$kw))/$((mw*$kw))x$h/$mh+0+0
+s2=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((w*$kw))+0
 
 del_mon_split "$ext~1"
 del_mon_split "$ext~2"
 
 [[ $* =~ [sS] ]] && xrandr \
-  --setmonitor "$ext~1" "$s2" "$ext" \
-  --setmonitor "$ext~2" "$s1" none
+  --setmonitor "$ext~2" "$s1" "$ext" \
+  --setmonitor "$ext~1" "$s2" none
 
 
 case $*
 in *d*) xrandr --output "$dfl" --primary "${dfl_mode[@]:?}" --output "$ext" --off
 ;; *e*) xrandr --output "$dfl" --off --output "$ext" --primary "${ext_mode[@]:?}"
 ;; *a*|'') xrandr --output "$dfl" --primary "${dfl_mode[@]:?}" --below "$ext" --output "$ext" "${ext_mode[@]:?}"
+;; *[sS]*) true
 ;; *) echo "Err: wrong option '$*'"; exit 1
 esac
 
