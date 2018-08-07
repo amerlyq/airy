@@ -1,4 +1,6 @@
 TODO:
+  [_] BUG: Connecting to http://retracker.local/announce [Timed out]
+    ::: https://habr.com/post/103009/
   [_] FIX cfg
     [_] dir struct / names (to eliminate necessity to crete dirs manually)
     [_] Move/delete finished dld
@@ -27,6 +29,8 @@ LIOR
 
 REF
   https://habrahabr.ru/post/238413/
+  [_] READ https://wiki.gentoo.org/wiki/RTorrent
+  [_] READ https://wiki.archlinux.org/index.php/RTorrent
 
 Choose files
   rtorrent does allow you to control which file from a torrent to download
@@ -65,3 +69,17 @@ Automation (choose file)
 
   > ``` You can visually verify that it selected the files you wanted
     and click Apply, et voilà. ```
+
+
+REF:INFO
+  Not really but I can give you some useful links and info:
+    raksasha's (the author) trac http://libtorrent.rakshasa.no/
+    wiki by the pyroscope guy http://community.rutorrent.org/
+    rtorrent man page http://libtorrent.rakshasa.no/rtorrent/rtorrent.1.html
+    rutorrent forums http://forums.rutorrent.org/
+    Arch wiki about rTorrent https://wiki.archlinux.org/index.php/RTorrent
+    mail archives to raksasha (contain some useful threads but also a lot of not interesting discussions)
+      http://rakshasa.no/pipermail/libtorrent-devel/
+    You can also sen "system.listMethods" with an XML-RPC client to rTorrent and it will return a list of all supported methods.
+    If you don't know how to do that/what RPC is, I've just submitted a dump of the output here
+      http://pastebin.com/RwB4nK9N

@@ -1,0 +1,38 @@
+DEBUG
+  https://superuser.com/questions/410507/move-already-i-e-not-new-completed-files-in-rtorrent
+  <C-x>
+    | print=$directory.default=
+    | print=$d.directory_base=
+    | print=$d.directory=
+    | print=$d.base_path=
+    | execute=command
+
+
+Start/stop all torrents
+  REF: https://github.com/rakshasa/rtorrent/wiki/Common-Tasks-in-rTorrent#start-or-stop-all-torrents
+  <C-x>
+    | d.multicall2=,d.start=
+    | d.multicall2=,d.stop=
+  ALT: $ sed -i 's/5:statei1e/5:statei0e/' ./.session/*.torrent.rtorrent
+
+
+Move completed torrent (but keep seeding)
+  WARN: "d.directory.set" must be first to make torrent [CLOSED], otherwise ERR:
+    <Fault -503: 'Cannot change the directory of an open download atter the files have been moved.'>
+  https://superuser.com/questions/410506/move-already-i-e-not-new-completed-files-in-rtorrent
+    <C-x>
+    | print=$d.directory=
+      e.g. /path/to/old/Torrent\ Name
+    | d.directory.set="/path/to/new"
+      * NOTE: torrent automatically becomes [CLOSED]
+      * WARN: destination root dir /path/to/new must exist
+    Manually move downloaded files to new path
+      $ mv -vt /path/to/new "/path/to/old/Torrent Name"
+    <C-r><C-s>  # rehash torrent and start download again
+  https://github.com/rakshasa/rtorrent/wiki/Common-Tasks-in-rTorrent#move-completed-torrents-to-a-fixed-location
+    | d.directory.set=$argument.1=
+    | execute=mkdir,-p,$argument.1=
+    | execute=mv,-u,$argument.0=,$argument.1=
+    | d.save_full_session=
+  https://github.com/rakshasa/rtorrent/wiki/User-Guide
+    # WARN: <C-d><C-o> works only for "still not activated torrents"  # to stop torrent and change destination directory
