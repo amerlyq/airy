@@ -25,7 +25,8 @@ overlay(){ local nm=$1
 }
 
 game(){ [[ -n $1 ]] || exit; nm=$1
-  overlay "$nm";
+  # NOTE: not needed for games with gamepad THINK: detect and switch automatically?
+  # overlay "$nm";
   cmd=$lib/$nm
   [[ -f $cmd ]] || { r.n 'No such game' "$cmd"; exit 1; }
 }
