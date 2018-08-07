@@ -14,8 +14,8 @@ source ~/.shell/profile
 over=${1:-${CURR_XKB[overlay]:-vim}}
 r.xkb-has-overlay ${over:?}
 
-# setxkbmap -query -verbose 10 -print
-exec setxkbmap -display ${DISPLAY:?} -option "" \
+# BUG: -I/etc/X11/xkb loads with errors
+exec setxkbmap -I/etc/X11/xkb -display ${DISPLAY:?} -option "" \
   -model pc104 -rules amer \
   -layout "${CURR_XKB[layout]:-us,ru,ua}" \
   -variant "${CURR_XKB[variant]:-amer,amer,amer}" \

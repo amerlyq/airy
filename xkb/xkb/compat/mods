@@ -15,10 +15,16 @@ xkb_compatibility "latch"  {
     //     //useModMapMods= level1;
     //     action = LockMods(modifiers=modMapMods);
     // };
+    // ALT: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=256706
+    // interpret ISO_Lock+AnyOf(all) {
+    //     action= ISOLock(modifiers=modMapMods,affect=all);
+    // };
 
     // ----------------------------------------------
-    latchMods.latchToLock= True;
-    // latchMods.twoKeys = True;
+    // BAD:DISABLED: more confusing then useful
+    //  => reasonable to enable only with dedicated modifier button for latching
+    // latchMods.latchToLock= True;
+    //// latchMods.twoKeys = True;
 
     // Long press -- latch, Short press -- Esc
     interpret Control_L {

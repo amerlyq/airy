@@ -1,3 +1,12 @@
+DEBUG
+  Print current
+    $ setxkbmap -query -verbose 10 -print
+    $ xkbcomp $DISPLAY -
+  Set default
+    $ setxkbmap -v 10 -option "" -model pc104 -rules evdev -layout us
+  Compare before/after changes
+    $ v -d <(xkbcomp $DISPLAY -) prev
+
 xinput
   TRY: sep kbd/mouse/monitor
     * you can work on external kbd/mouse on main monitor
@@ -67,7 +76,11 @@ Xkbmap
     [_] BUG: Lang change -- Mod+RAlt -> need to reset Mod/Ctrl/(all involved) modifiers
 
   Latching
-    [_] TODO: on latched control <C><C> -- prevent "Mod" key of xmonad from working
+    ISO_Lock
+      SRC:(setxkbmap): https://www.x.org/releases/individual/app/
+      https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=256706
+      +++ [_] REF:TUT: https://medium.com/@damko/a-simple-humble-but-comprehensive-guide-to-xkb-for-linux-6f1ad5e13450
+    [_] TODO: on latched control <C-><C-> -- prevent "Mod" key of xmonad from working
       << allows to not mess up everything everywhere if you forgot to disable latched modifiers in less/vim for <C-f> in view mode
     2015-09-06 [X] NEED: Tray indicators for latching ModN
     >[_] FIND latchin shift -- do latch only if pressed < 300ms
@@ -82,6 +95,8 @@ Xkbmap
     [_] TRY: accessx instead of my modifiers latching
       : http://www.x.org/releases/X11R7.7/doc/libX11/XKB/xkblib.html#Controls_for_Better_Keyboard_Access_by_Physically_ImpairedPersons
       : https://wiki.archlinux.org/index.php/Accessibility
+      NOTE! to enable sticky keys from accessx -- press shift 5 times
+        "+accessx 0 0x1e 0 0xcef" == w/o timeout, w/o audio/video feedback
     There is a utility called xbkeys for setting accessibiltiy options for xorg.
       From xbkey manual:
       : To switch sticky keys on or off, and optionally set or reset:
