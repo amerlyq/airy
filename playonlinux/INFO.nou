@@ -50,3 +50,16 @@ M&B Warband
 
     mogrify -format dds -define dds:compression=none '*.dds'
     ls | grep -n $(lsof -p 27965 | sed -rn 's|.*/([^/]+\.dds)$|\1|p')
+
+
+DEBUG
+  FPS counter
+    |aur/glxosd|
+    |aur/glxosd-git|
+    dxvk_hud (for Vulkan)
+
+
+SECURITY
+  install games through lightweigh arch chroot
+    * read-only root partition
+    * empty destination dir available (only)

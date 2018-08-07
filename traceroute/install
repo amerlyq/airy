@@ -4,6 +4,9 @@ source ~/.shell/func.d/packages
 if distro arch; then
   pkg_inst mtr traceroute iputils
   pkg_inst bind-tools  # -> $ ip route get "$(dig google.com +short)" for hostname resolution
+  # REF: https://wiki.archlinux.org/index.php/Domain_name_resolution
+  #   ALT: use $ getent hosts google.com
+  #   ALT: use $ drill @nameserver TXT google.com
 
 elif distro ubuntu; then
   echo "Err: fixme"

@@ -16,7 +16,8 @@ in o) cd "${OPTARG/#\~/$HOME}"  # THINK: replace with dir= for youtube-dl, etc?
 ;; *) exit 3; esac; done; shift $((OPTIND-1))
 
 
-
+# WARN: file can change extension after dld: {mp4 + webm -> mkv}
+#   DEV: search file with same name and any possible extension for video
 if [[ $dldcmd =~ youtube ]]; then
   fnm=$(youtube-dl --get-filename "${1:?}")
   fnm=${fnm##*/}
