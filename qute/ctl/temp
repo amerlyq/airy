@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+
+# ALT: --temp-basedir
+basedir=$(mktemp -dt "qute@${0##*/}~XXXX")
+onexit(){ rm -rf "$basedir"; }
+trap 'onexit' INT HUP QUIT TERM ERR
+
+r.qute-new "$basedir" "$@"

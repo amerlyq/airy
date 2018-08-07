@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+
+exec r.qute-new ~/.local/qute-proxy --set content.proxy 'socks://localhost:8080' "$@"

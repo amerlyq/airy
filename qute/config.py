@@ -7,10 +7,6 @@
 c = c  # noqa: F821
 config = config  # noqa: F821
 
-## This is here so configs done via the GUI are still loaded.
-## Remove it to not load settings done via the GUI.
-config.load_autoconfig()
-
 ## Aliases for commands. The keys of the given dictionary are the
 ## aliases, while the values are the commands they map to.
 ## Type: Dict
@@ -1456,7 +1452,7 @@ c.url.searchengines = {
     'gr': 'http://srk:1248/source/search?q=&defs={}&refs=&path=&hist=&type=&project=linux-3.10.28',
     'w': 'http://en.wikipedia.org/w/index.php?search={}&title=Special:Search',
     'wa': 'http://www.wolframalpha.com/input/?i={}',
-    'yo': 'http://www.youtube.com/results?search_query={}',
+    'y': 'http://www.youtube.com/results?search_query={}',
     'al': 'http://www.allmusic.com/search/all/{}',
     'im': 'http://www.imdb.com/find?s=all&q={}',
     'ja': 'http://www.jango.com/music/{}',
@@ -1515,16 +1511,22 @@ config.bind(',o', 'download-open')
 config.bind(',p', 'hint links spawn -- r.mutt-pocket "{hint-url}"')
 config.bind(',P', 'spawn -- r.mutt-pocket "{url}"')
 config.bind(',Q', "spawn -- r.qr-code '{url}'")
-config.bind(',R', 'set content.proxy socks://localhost:8080/')
-# config.bind(',R', 'set content.proxy http://localhost:8080/')
-config.bind(',r', 'set content.proxy system')
-config.bind(',s', 'set content.javascript.enabled true ;; reload')
-config.bind(',S', 'set content.javascript.enabled false ;; reload')
+config.bind(',r', 'set content.proxy system ;; reload')
+config.bind(',R', 'set content.proxy socks://localhost:8080/ ;; reload')  # OR: http://
+
+# SEE: https://www.reddit.com/r/qutebrowser/comments/83avuf/qutebrowser_v120_released_with_perdomain_settings/
+#   => how to add permanent "blacklist" and "whitelist"
+# ALT: config-cycle content.javascript.enabled ;; set content.javascript.enabled?
+config.bind(',s', 'config-cycle -p content.javascript.enabled')
+# config.bind(',s', 'set content.javascript.enabled true ;; reload')
+# config.bind(',S', 'set content.javascript.enabled false ;; reload')
+
 # NOTE: WebKit switches CSS immediately, BUT: WebEngine requires ";; reload"
 config.bind(',t', 'set content.user_stylesheets theme/dark.css')
 config.bind(',T', 'set content.user_stylesheets theme/light.css')
 config.bind(',z', 'set content.user_stylesheets theme/solarized.css')
-config.bind(',y', 'spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -yc mpv "{url}"')
+config.bind(',y', 'hint links spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -y "{hint-url}"')
+config.bind(',Y', 'spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -yc mpv "{url}"')
 # config.bind("'", 'enter-mode jump_mark')
 # config.bind('+', 'zoom-in')
 # config.bind('-', 'zoom-out')
@@ -1825,3 +1827,9 @@ config.bind('l', 'forward')
 privatecfg = config.configdir / 'config-private.py'
 if privatecfg.is_file():
     config.source(privatecfg)
+
+### Override config by session settings
+# BUG: url.default_page from session not used
+## This is here so configs done via the GUI are still loaded.
+## Remove it to not load settings done via the GUI.
+config.load_autoconfig()
