@@ -1,7 +1,9 @@
 % Search
   REF: http://sourceware.org/gdb/onlinedocs/gdb/Memory-Region-Attributes.html#Memory-Region-Attributes
   (gdb) set mem inaccessible-by-default [on|off]
-  (gdb) find /w 0x08049000 0x0804a000 0x8048034
+  (gdb) find /w 0x08049000, 0x0804a000, 0x8048034
+  (gdb) python import struct; print('0x{:08x}'.format(gdb.selected_inferior().search_memory(0x02428000, 0x0287d603-0x02428000, struct.pack('<1I', 0xdeadbeaf))))
+    => BUG: if even single byte of region is inaccessible -- whole search halts
 
 REF
 Memory contents can be examined using the "x" command. The "x" command is

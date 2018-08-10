@@ -1,0 +1,13 @@
+https://stackoverflow.com/questions/1466566/can-you-change-what-a-symlink-points-to-after-it-is-created
+
+* The owner and group of an existing symbolic link can be changed
+using lchown(2). The only time that the ownership of a symbolic link
+matters is when the link is being removed or renamed in a directory
+that has the sticky bit set (see stat(2)).
+
+* The last access and last modification timestamps of a symbolic link
+can be changed using utimensat(2) or lutimes(3).
+
+* On Linux, the permissions of a symbolic link are not used in any
+operations; the permissions are always 0777 (read, write, and execute
+for all user categories), and can't be changed.

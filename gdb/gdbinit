@@ -37,7 +37,8 @@ set print vtbl on
 set history filename ~/.cache/gdb_history
 set history save on
 # BAD: unavailable in old gdb <=v7.5
-# set history remove-duplicates 2
+set history size 1000
+set history remove-duplicates unlimited
 
 # Use findsym $sp $sp+1000 to get a dump of all symbols on the stack
 define findsym
