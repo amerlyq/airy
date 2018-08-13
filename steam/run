@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euo pipefail -o errtrace
 
-r.monitor-scale 2
-onexit(){ r.monitor-scale 1; }
-trap 'onexit' HUP INT QUIT TERM ERR
+# r.monitor-scale 2
+# onexit(){ r.monitor-scale 1; }
+# trap 'onexit' HUP INT QUIT TERM ERR
 
 r.wm -w g  # Jump to game workspace
 optirun steam

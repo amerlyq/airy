@@ -7,10 +7,8 @@ set -euo pipefail
 basedir=$1
 shift
 
-linkcp -t "$basedir"/config \
-  ~/.config/qutebrowser/config.py \
-  ~/.config/qutebrowser/style.css \
-  ~/.config/qutebrowser/config-private.py
+linkcp -t "$basedir"/config -f ~/.config/qutebrowser \
+  bookmarks config.py config-private.py quickmarks style.css
 
 export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
 

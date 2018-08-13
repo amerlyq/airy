@@ -795,7 +795,7 @@ c.downloads.location.prompt = False
 ## Type: ShellCommand
 # c.editor.command = ['gvim', '-f', '{file}', '-c', 'normal {line}G{column0}l']
 # c.editor.command = ['r.vim-new', '{file}', '-c', 'call cursor({line}, {column0})']
-# c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
+c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
 
 ## Encoding to use for the editor.
 ## Type: Encoding
