@@ -19,16 +19,21 @@ del_mon_split(){
   xrandr --listmonitors | cut -d$' ' -f3 | grep -F "$1" || return 0
   xrandr --delmonitor "$1"
 }
+set_mon_layout(){ for((i=1;i<=$#;++i)); do [[ ${!i} == -- ]] && break; done
+  local dfl_args=( "${@:1:i-1}" ); [[ " ${dfl_args[*]} " =~ " --off " ]] || dfl_args+=( "${dfl_mode[@]:?}" )
+  local ext_args=( "${@:i+1}" );   [[ " ${ext_args[*]} " =~ " --off " ]] || ext_args+=( "${ext_mode[@]:?}" )
+  xrandr --output "$dfl" "${@:1:i-1}" "${dfl_args[@]}" --output "$ext" "${ext_args[@]}"
+}
 
 
 # NOTE: reuse current active resolutions for monitor OR: --auto
 dfl_dims=$(get_mon_dims "$dfl")
 read -r dflw dflh _ <<< "$dfl_dims"
-dfl_mode=( --mode "${dflw}x${dflh}" )
+((dflw && dflh)) && dfl_mode=( --mode "${dflw}x${dflh}" ) || dfl_mode=( --auto )
 
 ext_dims=$(get_mon_dims "$ext")
 read -r w h x y mw mh <<< "$ext_dims"
-ext_mode=( --mode "${w}x${h}" )
+((w && h)) && ext_mode=( --mode "${w}x${h}" ) || ext_mode=( --auto )
 
 
 # NOTE: artificially reduce physical size (mw x mh) to increase virtual dpi
@@ -43,12 +48,17 @@ del_mon_split "$ext~2"
   --setmonitor "$ext~1" "$s2" none
 
 
+# BUG: switching "a" -> "d" -> "e" leaves visual artifacts on screen
+#   MAYBE: as with rotation -- must supply commands in special order or split into multiple commands ?
+
+(($#)) || set -- -a
 case $*
-in *d*) xrandr --output "$dfl" --primary "${dfl_mode[@]:?}" --output "$ext" --off
-;; *e*) xrandr --output "$dfl" --off --output "$ext" --primary "${ext_mode[@]:?}"
-;; *a*|'') xrandr --output "$dfl" --primary "${dfl_mode[@]:?}" --below "$ext" --output "$ext" "${ext_mode[@]:?}"
+in *d*) set_mon_layout --primary -- --off
+;; *e*) set_mon_layout --off -- --primary
+;; *m*) set_mon_layout --below "$ext" -- --primary
+;; *a*) set_mon_layout --primary --below "$ext" --
 ;; *[sS]*) true
-;; *) echo "Err: wrong option '$*'"; exit 1
+;; *) echo "Err: wrong option '$*'" >&2; exit 2
 esac
 
 r.feh
