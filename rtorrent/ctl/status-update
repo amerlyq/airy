@@ -1,0 +1,23 @@
+#!/bin/bash
+set -euo pipefail
+
+# status=0
+# while getopts 's:' o; do case $o in :|'?') exit 2
+# ;; s) status=$OPTARG  # s:= VIZ. {0,1} = {incomplete,completed}
+# esac; done; unset o; shift $((OPTIND-1))
+
+status=$1  # VIZ. {0,1} = {incomplete=create,completed=remove}
+torrent=$2
+sfx=.incomplete
+link=${torrent}${sfx}
+
+[[ ! -e $link ]] || [[ -L $link && $link -ef $torrent ]] || {
+  echo "Err: refuse to modify unrelated file '$link'" >&2; exit 3; }
+
+if ((status)); then
+  [[ -L $link ]] && rm -v "$link"
+else
+  [[ -L $link ]] || ln -srvT "$torrent" "$link"
+fi
+
+exit 0

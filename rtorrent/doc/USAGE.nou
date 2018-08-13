@@ -15,6 +15,11 @@ Start/stop all torrents
     | d.multicall2=,d.stop=
   ALT: $ sed -i 's/5:statei1e/5:statei0e/' ./.session/*.torrent.rtorrent
 
+  Fix completion status/symlinks on all/choosen entries
+  <C-x>
+    | d.multicall2=,"d.custom.set=completed,1"
+    | d.custom.set=completed,0
+
 
 Move completed torrent (but keep seeding)
   WARN: "d.directory.set" must be first to make torrent [CLOSED], otherwise ERR:
