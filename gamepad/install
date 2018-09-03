@@ -1,9 +1,14 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/packages
 
-pkg_inst linuxconsole
+pkg_inst evtest linuxconsole
 # BAD: conflicts
 # pkg_inst joyutils
 # lsmod | grep -qw '^joydev' || sudo modprobe -a joydev
 
-aur_inst xboxdrv-stable-git xpadneo-dkms-git
+aur_inst xpadneo-dkms-git
+
+# USE: https://github.com/zerojay/xboxdrv/tree/stable
+loc_inst -P 'xboxdrv-airy-git' ./PKGBUILD
+# aur_inst xboxdrv-stable-git
+# aur_inst xboxdrv-develop-git

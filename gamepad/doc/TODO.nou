@@ -1,0 +1,37 @@
+REF
+  https://wiki.archlinux.org/index.php/Gamepad
+
+
+TUT
+  https://www.gottabemobile.com/how-to-use-the-xbox-elite-controller-on-pcs/
+
+
+USAGE
+  Overlay chain of configs
+    $ xboxdrv ... --write-config mygame.ini
+    $ xboxdrv --config xbox-one-elite.ini --config mouse.ini --config mygame.ini
+  BAD: Exclusive xboxdrv mode (don't work anymore)
+    $ sudo rmmod xpad  # ALT: echo "blacklist xpad" >> /etc/modprobe.d/blacklist.conf
+    $ sudo modprobe uinput joydev
+    $ sudo xboxdrv --demon --detach-kernel-driver --type xbox --mimic-xpad
+
+
+TODO
+  2018-08-28 [X] SEE: ./examples/* in source dir
+  [_] ordering use "xboxdrv --match usbpath=BUS:DEV" to assign concreate controllers to concreate slots js0 / js1
+    https://github.com/xboxdrv/xboxdrv/issues/89
+  [_] toggle on <guide> alt config "--mouse" BUT disable game's built-in action on guide
+    i.e. disable dup of "menu" on <start>
+  [_] Find input device by short identifier, i.e. associate joysticks with "id=0", etc. permanently
+    $ udevadm info --query=path --name=/dev/input/js0
+      /devices/pci0000:00/0000:00:1c.4/0000:04:00.0/0000:05:02.0/0000:3c:00.0/usb3/3-1/3-1.2/3-1.2:1.0/input/input59/js0
+    $ udevadm info --query=all --path=$(udevadm info --query=path --name=/dev/input/js0)
+    $ cat /proc/bus/input/devices
+      S: Sysfs=/devices/pci0000:00/0000:00:1c.4/0000:04:00.0/0000:05:02.0/0000:3c:00.0/usb3/3-1/3-1.2/3-1.2:1.0/input/input59
+      H: Handlers=event9 js0
+    $ realpath /dev/input/by-id/usb-Microsoft_Controller_*-event-joystick
+      /dev/input/event9
+    [_] ALT:TRY: add udev rule to create specific numbered "id" alias e.g. /dev/input/by-id/XBoxElite_0/
+
+  DEBUG: check if xboxdrv "js0" and "eventXX" are correctly opened
+  $ strace -o /tmp/strace -e trace=%file -f /games/GOG-game/start.sh

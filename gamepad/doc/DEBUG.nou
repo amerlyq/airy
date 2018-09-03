@@ -1,0 +1,13 @@
+DEBUG
+  Press and look
+    $ evtest  # select corresponding input (e.g. #19)
+    $ xboxdrv --evdev-debug
+  Rumble
+    $ fftest /dev/input/by-id/usb-*event-joystick  # = {0,4,5,-1}
+  List of axis
+    NEW $ evdev-joystick --showcal /dev/input/by-id/usb-*-event-joystick
+    OLD $ jstest /dev/input/js0
+  Who created joystick devices
+    $ sudo udevadm info --attribute-walk --name /dev/input/js0
+    $ sudo udevadm info -an /dev/input/js0
+    $ sudo udevadm control --reload

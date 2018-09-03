@@ -1,0 +1,14 @@
+#!/bin/bash
+#%SUMMARY: run game with multiple joysticks configured
+set -euo pipefail
+
+game=$1
+game=${game%.exe}
+
+trap 'exit' INT TERM ERR
+trap 'kill -INT 0; wait' EXIT
+
+r.gamepad "joy1_serial" "$game" &
+r.gamepad "joy1_serial" "$game" &
+
+"$@"

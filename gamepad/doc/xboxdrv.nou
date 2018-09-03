@@ -1,0 +1,61 @@
+%%%% xboxdrv issues
+
+
+[_] Invert wrong Y axis on both sticks, but ignore for mouse
+  ::: $ xboxdrv --axismap -Y1=Y1,-Y2=Y2 --next-config --mouse --axismap -Y1=Y1,-Y2=Y2
+  ALT:BAD: remap half-axes $ xboxdrv --evdev-absmap ABS_Y-=Y1,ABS_Y+=Y1
+    !! after any touch such axis sticks to -32768
+    <= EXPL: https://github.com/xboxdrv/xboxdrv/issues/170
+  [_] TODO:TRY: remap axis directly in evdev
+
+
+[_] Hide duplicate js0/js1 to access js3/js4 created by xboxdrv
+  https://askubuntu.com/questions/825729/auto-mount-gamepad-at-js1-instead-js0
+  ~~~ Specify concrete gamepad on game startup (if it uses SDL underneath)
+    NEW: $ SDL_JOYSTICK_DEVICE=/dev/input/event20 ...
+    OLD: $ SDL_JOYSTICK_DEVICE=/dev/input/js1 ...
+  Rename "xpad" js0
+    ! BAD: not auto-removed on eject
+    $ sudo find /dev/input -maxdepth 1 -name 'js[0-9]' -execdir mv {} _{} \;
+  Chmod "xpad" js0 (remove read rights)
+    <= so game will look next js# until working one, created by "xboxdrv"
+    !! BAD: some games are waiting on js0 anyway
+    $ sudo chmod 000 /dev/input/js0
+    $ sudo find /dev/input -maxdepth 1 -name 'js[0-9]' -execdir chmod 000 {} +
+  Delete "xpad" js0
+    REF https://github.com/RetroPie/RetroPie-Setup/wiki/Xbox-360-Controller
+    ALSO: $ man xboxdrv +/--evdev
+    ! BAD:(must re-plug gamepad to play other games w/o xboxdrv):
+    $ sudo find /dev/input -maxdepth 1 -name 'js[0-9]' -delete
+    BAD: js0 is still opened by searching first joystick in "/run/udev/data/+input:input*"
+  Udev rules
+    [_] TODO:TRY:FIND: udev rules to create "xpad_js0" instead of "js0" directly on plug
+    https://askubuntu.com/questions/722550/use-udev-to-rename-devices-with-same-properties
+    + https://ubuntuforums.org/showthread.php?t=1595666
+    https://forums.gentoo.org/viewtopic-t-953776-start-0.html
+    /usr/lib/udev/rules.d/70-joystick.rules
+      SUBSYSTEMS=="input", ATTRS{name}=="USB Gamepad ", KERNELS=="input[0-9]*", SYMLINK+="gamepad_Z"
+      SUBSYSTEM=="input", ATTRS{idVendor}=="0079", ATTRS{idProduct}=="XXXX", ATTRS{serial}=="YYYYYY", SYMLINK+="gamepad_Z"
+      => use USB path via ID_PATH if all attributes are identical
+
+    [_] TRY: renaming post-factum BAD: will affect also xboxdrv devices
+      KERNEL=="js?", ENV{ID_VENDOR}=="©Microsoft_Corporation", ENV{ID_MODEL}=="Controller", NAME="input/xpad_js0"
+      BAD: not recommended due to racing, moreover completely prohibited in newer systemd
+  [_] TRY:ALT: remap natively by "evdev" / xinput, forget about "xboxdrv"
+
+
+[_] BUG: [DEBUG] XboxdrvDaemon::process_match(): ignoring 045e:02e3 not a valid Xboxdrv device
+  dmesg: [12349.597085] usb 3-1.2: New USB device found, idVendor=045e, idProduct=02e3, bcdDevice= 2.03
+  BET: Use default evdev + remap to mimic Xbox 360 controller by Xbox One Elite
+    BAD: must remove "xpad" js0 -- so game find "xboxdrv" js0 first
+    REF:HACK: https://github.com/atar-axis/xpadneo/issues/11
+      https://github.com/RetroPie/RetroPie-Setup/issues/1277
+    $ xboxdrv --evdev /dev/input/by-id/usb-Microsoft_Controller_${serial}-event-joystick --mimic-xpad \
+      --evdev-absmap ABS_X=X1,ABS_Y-=Y1,ABS_RX=X2,ABS_RY-=Y2,ABS_Z=LT,ABS_RZ=RT,ABS_HAT0X=DPAD_X,ABS_HAT0Y=DPAD_Y \
+      --evdev-keymap BTN_SOUTH=A,BTN_EAST=B,BTN_NORTH=X,BTN_WEST=Y,BTN_TL=LB,BTN_TR=RB,BTN_MODE=Guide,BTN_SELECT=Back,BTN_START=Start
+  Manually specify compatible device by --device-by-*
+    [_] BUG: USBController::usb_find_ep(): couldn't find matching endpoint
+    $ sudo xboxdrv --detach-kernel-driver --device-by-path 003:018 --type xbox --id 0
+    $ sudo xboxdrv --detach-kernel-driver --device-by-id 045e:02e3 --type xbox --id 0
+  Patch list of allowed devices based on 'zerojay/xboxdrv.git#branch=stable'
+    => add your gamepad <vendor:product> pair into ./src/xpad_device.cpp array "xpad_devices[]"

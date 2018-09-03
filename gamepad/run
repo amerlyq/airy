@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+trap 'printf "%s:%s(): %s\n" "$LINENO" "${FUNCNAME-}" "${BASH_COMMAND-}"' ERR
+
+# WARN: configures only alphabetically first gamepad
+input=$(find /dev/input/by-id -type l -xtype c -name 'usb-*-event-joystick' -print -quit)
+
+while getopts 'i:' o; do case $o in :|'?') exit 2
+;; i) input=$OPTARG
+esac; done; shift $((OPTIND-1))
+
+get_overlay(){ cfg-overlay -M~ -s "gamepad/$1/{}.ini" -b "${AIRY_OVERLAY_BASE:=$HOME/.local/airy}" -o "${AIRY_OVERLAY_PATH-}" -- "${@:2}"; }
+evdev_cfg=$(get_overlay cfg 'xbox-one-elite')
+mouse_cfg=$(get_overlay cfg 'default-mouse')
+
+configs=()
+for t; do configs+=( --config="$(get_overlay 'lib' "$1")" ); done
+
+if [[ -c /dev/input/js0 ]]; then
+  printf -- "Err: must remove '/dev/input/js*' devices created by xpad [Y/n]: " >&2
+  read answer
+  case $answer
+  in [yY] | [yY][Ee][Ss] | '') sudo find /dev/input -maxdepth 1 -name 'js[0-9]' -delete
+  ;; [nN] | [n|N][O|o] | *) exit 1
+  esac
+fi
+
+# --silent
+set -x
+
+# NOTE: working! MAYBE: due to rmmod+replug
+exec xboxdrv --evdev "$input" --config "$evdev_cfg" "${configs[@]}" --mimic-xpad
+
+# NOTE: not working!
+# exec xboxdrv --evdev "$input" --config "$evdev_cfg" "${configs[@]}" \
+  # --next-config --config "$evdev_cfg" --config "$mouse_cfg"

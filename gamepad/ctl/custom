@@ -1,0 +1,44 @@
+#!/bin/bash
+#%SUMMARY: cmdline-only configuration for evdev gamepad
+set -euo pipefail
+
+# WARN: configures only alphabetically first gamepad
+input=$(find /dev/input/by-id -type l -xtype c -name 'usb-*-event-joystick' -print -quit)
+
+axis=(
+  ABS_X=X1
+  ABS_Y=Y1
+  ABS_RX=X2
+  ABS_RY=Y2
+  ABS_Z=LT
+  ABS_RZ=RT
+  ABS_HAT0X=DPAD_X
+  ABS_HAT0Y=DPAD_Y
+)
+
+keys=(
+  BTN_SOUTH=A
+  BTN_EAST=B
+  BTN_NORTH=X
+  BTN_WEST=Y
+  BTN_TL=LB
+  BTN_TR=RB
+  BTN_MODE=Guide
+  BTN_SELECT=Back
+  BTN_START=Start
+)
+
+axis=$(IFS=,; echo "${axis[*]}")
+keys=$(IFS=,; echo "${keys[*]}")
+
+if [[ -c /dev/input/js0 ]]; then
+  echo "Err: must remove '/dev/input/js*' devices created by xpad [Y/n]:" >&2
+  read answer
+  case $answer
+  in [yY] | [yY][Ee][Ss] | '') sudo find /dev/input -maxdepth 1 -name 'js[0-9]' -delete
+  ;; [nN] | [n|N][O|o] | *) exit 1
+  esac
+fi
+
+exec xboxdrv --silent --evdev "$input" --evdev-absmap "$axis" --evdev-keymap "$keys" \
+  --trigger-as-button --axismap -Y1=Y1,-Y2=Y2 --next-config --mouse --axismap -Y1=Y1,-Y2=Y2 "$@"

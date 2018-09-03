@@ -1,0 +1,19 @@
+[Unit]
+Description=Xbox controller driver daemon
+Documentation=man:xboxdrv(1)
+
+[Service]
+Type=forking
+User=root
+PIDFile=%t/%P.pid
+ExecStart=/usr/bin/xboxdrv --daemon --detach --pid-file %t/%P.pid -c /etc/conf.d/xboxdrv
+
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+# InaccessibleDirectories=/sys
+
+[Install]
+WantedBy=multi-user.target

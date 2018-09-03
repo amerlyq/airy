@@ -1,0 +1,25 @@
+From 3f0bf5bafbbc691295a007bd38b53e937a66e3ea Mon Sep 17 00:00:00 2001
+From: Amerlyq <amerlyq@gmail.com>
+Date: Mon, 27 Aug 2018 20:03:19 +0300
+Subject: [PATCH] add support for Xbox One S Elite controller
+
+---
+ src/xpad_device.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/xpad_device.cpp b/src/xpad_device.cpp
+index f9312a4..8c82f66 100644
+--- a/src/xpad_device.cpp
++++ b/src/xpad_device.cpp
+@@ -147,6 +147,8 @@ XPadDevice xpad_devices[] = {
+   { GAMEPAD_XBOXONE,          0x045e, 0x02e6, "XboxOne Controller (Lunar White)" },
+   { GAMEPAD_XBOXONE,          0x0e6f, 0x0139, "Afterglow Wired Controller for Xbox One" },
+ 
++  { GAMEPAD_XBOXONE,          0x045e, 0x02e3, "XboxOne S Elite Controller" },
++
+   { GAMEPAD_PLAYSTATION3_USB, 0x054c, 0x0268, "PLAYSTATION(R)3 Controller" }
+ };
+ 
+-- 
+2.18.0
+
