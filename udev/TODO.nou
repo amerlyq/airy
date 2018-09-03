@@ -24,6 +24,13 @@ Reload
   $ sudo udevadm trigger /dev/input/event4
 
 DEBUG
+  TUT https://unix.stackexchange.com/questions/200194/how-to-debug-an-udev-rule-in-etc-udev-rules-d/207712
+  Get info
+    $ udevadm info -a --name /dev/input/js0
+    $ udevadm info --query=all --path=$(udevadm info --query=path --name=/dev/input/js0)
+  Switch level to debug and back
+    $ udevadm control --log-priority=debug
+    $ udevadm control --log-priority=err
   Monitor/catch special variables (attributes) on plug/unplug events
   # env ID_VENDOR_ID, ID_MODEL_ID <--> attr idVendor, idProduct
     $ udevadm monitor --environment --udev  # --kernel

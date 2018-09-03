@@ -15,6 +15,8 @@ Deprecated /etc/systemd/system/multi-user.target.wants/bitlbee.service
 # MAYBE:(changes to config): $ sudo systemctl stop bitlbee.service
 svc_activate -er bitlbee.socket
 
+# BUG: after system update gpg/pass won't work until reboot -- fail for setup
+#   ::: TEMP: remove lines with "bitlbee" and "weechat" from /tmp/airy-*.list
 if cfgOpt u; then
   ./exe/configure $(cfgOpt r && echo --renew) -- "${BITLBEE_LIST[@]:?}"
 fi

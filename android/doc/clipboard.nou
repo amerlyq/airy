@@ -8,6 +8,10 @@ HOST: |community/kdeconnect|
   Pair device to share clipboard
     $ kdeconnect-cli -l
     $ kdeconnect-cli -d 8711b58d64210eb6 --pair
+    $ kdeconnect-cli --pair --device $(kdeconnect-cli --list-devices --id-only|head -1)
+  Accept connection request in notification
+    <C-S-.> <Enter>
+
 
 ALT:
   KDE-connect

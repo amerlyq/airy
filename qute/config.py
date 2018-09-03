@@ -717,6 +717,7 @@ c.content.notifications = False
 ##   - false
 ##   - ask
 # c.content.ssl_strict = 'ask'
+c.content.ssl_strict = True
 
 ## List of user stylesheet filenames to use.
 ## Type: List of File, or File
@@ -1484,6 +1485,8 @@ c.url.start_pages = ['https://google.com/search']
 ## Type: Perc
 # c.zoom.default = '100%'
 # c.zoom.default = '125%'
+# BAD: not supported yet
+# config.set('zoom.default', '150%', '*://store.steampowered.com/*')
 
 ## Available zoom levels.
 ## Type: List of Perc
@@ -1502,6 +1505,7 @@ c.zoom.levels = ['50%', '75%', '85%', '90%', '95%', '100%', '105%', '110%', '115
 config.bind(',d', 'tab-close')
 config.bind(',a', 'hint links spawn -- r.wgett -o /_dld/amv -c mpv "{hint-url}"')
 config.bind(',b', 'set content.host_blocking.enabled true ;; reload')
+config.bind(',c', 'config-cycle -p content.ssl_strict')
 config.bind(',B', 'set content.host_blocking.enabled false ;; reload')
 config.bind(',m', 'hint links spawn -- mpv "{hint-url}"')
 config.bind(',M', 'spawn -- mpv "{url}"')

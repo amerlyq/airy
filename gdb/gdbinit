@@ -117,7 +117,15 @@ end
 
 
 define dis
-  disassemble
+  if $argc == 0
+    disassemble
+  end
+  if $argc == 1
+    disassemble $arg0
+  end
+  if $argc == 2
+    disassemble $arg0, $arg1
+  end
 end
 document dis
 Disassemble current function
@@ -304,3 +312,12 @@ end
 # except ImportError:
 #     print 'cant import c++ support - old gcc or not using target-gdb?'
 # end
+
+### Epilog:
+set logging off
+set logging redirect off
+set logging overwrite on
+## BAD: tracing clutters screen (desired -- only log to file)
+# set trace-commands on
+## BUG: disassemble inside "define" routines goes only to screen, ignoring log file
+set logging on /tmp/gdb-log.cfg

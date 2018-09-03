@@ -6,6 +6,17 @@ Reconnect w/o password until at least one session is alive
     # ALT: yes
     ControlPersist 600
 
+  ADD/REM/EXIT port forwarding to multiplexed session on the fly
+    REF: https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Multiplexing
+    $ ssh -O forward -L 8080:localhost:80 -S ~/.ssh/sock/user@example.org:22  user@example.org
+    $ ssh -O cancel -L 8080:localhost:80 -S ~/.ssh/sock/user@example.org:22  user@example.org
+    $ ssh -O exit -L 8080:localhost:80 -S ~/.ssh/sock/user@example.org:22  user@example.org
+    ! ATT: escape sequence "~C" is not available for multiplexed sessions
+    ! ATT: forwardings in "~#" are not included
+    Check remote side socket is listening
+      $ ss --all --unix -p G /tmp/xsel
+
+
 
 Encrypt keys in PKCS#8 instead of MD5 passphrase
   !5 [_] READ REF https://wiki.archlinux.org/index.php/SSH_keys

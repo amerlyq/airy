@@ -2,3 +2,9 @@
   http://support.code-red-tech.com/CodeRedWiki/DebugHardFault
   http://support.code-red-tech.com/CodeRedWiki/UsingGDB
   https://www.lpcware.com/content/forum/gdb-command-line-and-vector-catch
+
+
+% Calling conventions
+  REF https://en.wikipedia.org/wiki/X86_calling_conventions#x86-64_calling_conventions
+  x86-64 | RDI, RSI, RDX, RCX, R8, R9, XMM0–7 | Stack aligned on 16 bytes boundary. 128 bytes red zone below stack.
+    = The kernel interface uses RDI, RSI, RDX, R10, R8 and R9.

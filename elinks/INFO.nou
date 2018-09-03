@@ -1,0 +1,20 @@
+Enable javascript
+  https://askubuntu.com/questions/34687/is-there-a-text-mode-browser-which-supports-javascript
+  https://www.cnx-software.com/2014/02/09/building-elinks-text-based-web-browser-with-some-sort-of-javascript-support/
+  https://forum.manjaro.org/t/how-to-enable-javascript-support-on-elinks/32513
+    => in PKGBUILD replace "s/--without-spidermonkey/--enable-spidermonkey/" then enable in menu:
+      * $ elinks
+      * <Esc> (menu) -> [Settings] -> <Space> (expand tree) -> [Ecmascript] -> [Edit] -> <Enter>
+      * [Save] -> [OK] -> [Close]
+
+SEE https://gist.github.com/xet7/5abe0fb1941382efae97
+  Watching youtube with elinks:
+    https://urukrama.wordpress.com/2010/01/02/watching-youtube-videos-in-elinks/
+  Elinks usage tips:
+    https://kmandla.wordpress.com/2007/05/06/howto-use-elinks-like-a-pro/
+  Setup to 16 colors:
+    * Start elinks with command elinks
+    * Press Esc to get to menu, navigate with arrow keys, or use mouse to click
+    * Go to Settings / Terminal settings
+    * Select colors: 16 colors.
+    * Save and OK.

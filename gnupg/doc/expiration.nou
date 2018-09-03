@@ -7,7 +7,7 @@ Extend expiration date of subkey
   Extend expiration date of choosen subkeys (sign + encrypt)
     $ gpgkey=amerlyq@gmail.com
     $ gpg --edit-key $gpgkey
-    gpg> key 1, key 2, expire, 6m, y, save
+    gpg> key 1, key 2, expire, y, 6m, y, save
 
   (optional) Send the updated key to the keyservers
     $ gpg --send-key --keyserver <server> $gpgkey

@@ -1,3 +1,4 @@
 # vim:ft=sh
 
 vstrace(){ ( "$@" 3>&1 1>&2- 2>&3- ) | $EDITOR - -c 'setf strace'; }
+alias fstrace='strace -o /tmp/strace.log -e trace=%file -f'
