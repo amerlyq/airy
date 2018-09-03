@@ -1,0 +1,63 @@
+#!/bin/bash
+#%USAGE:
+#%  $ mkdir wingame && cp ./$0 wingame/ && ./wingame/$0
+#%  $ ./$0 -i vcrun2010
+#%  $ ./$0 'd:\\setup.exe'
+set -euo pipefail
+swd=$(dirname "$(realpath "$0")")
+pfx=$swd
+wcache=~/.cache/winetricks
+
+((EUID)) || { echo "Err: root user not allowed" >&2; exit 1; }
+
+## Wine
+export WINE=${WINE:-wine}
+export WINETRICKS=${WINETRICKS:-winetricks}
+# export WINE=$pfx/data/wine/bin/wine
+# export WINETRICKS=$pfx/wine/winetricks
+# export REGEDIT=$pfx/wine/bin/regedit
+export HOME=$pfx/home
+export WINEPREFIX=$pfx/prefix
+export WINEARCH=win32
+export WINEDEBUG='-all'
+export WINEDLLOVERRIDES='mshtml=,winemenubuilder.exe='
+# export WINEDLLOVERRIDES='mscoree,mshtml=,winemenubuilder.exe='
+
+mkdir -p "$HOME/.cache"
+[[ -L $HOME/.cache/${wcache##*/} ]] || ln -svnft "$HOME/.cache" "$wcache"
+
+# Initial update the prefix
+if [[ ! -f $WINEPREFIX/_done ]] || [[ ${1-} == -u ]]; then
+  opts=(
+    # d3d8=disabled d3d9=disabled d3d10=disabled d3d10_1=disabled
+    # d3d10core=disabled d3d11=disabled
+    # nvapi64=disabled
+    winegstreamer=disabled
+    csmt=on  # "command stream" to increase graphic performance
+  )
+  "$WINE" --version
+  wineboot -u
+  "$WINETRICKS" "${opts[@]}"
+  touch "$WINEPREFIX/_done"
+fi
+
+## Sandbox the prefix (each time)
+# REF: Disable https://github.com/lutris/lutris/issues/404
+rm -f "$WINEPREFIX/dosdevices/z:"
+find "$WINEPREFIX/drive_c/users/$(id -u -n)" -type l -xtype d -execdir sh -c 'rm "$0"; mkdir "$0"' {} \;
+"$WINE" regedit /d 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\Windows\CurrentVersion\Explorer\Desktop\Namespace\{9D20AAE8-0625-44B0-9CA7-71889C2254D9}'
+
+## Performance Threaded Dispatch
+# export __GL_THREADED_OPTIMIZATIONS=1  # NVIDIA
+# export mesa_glthread=true             # AMD/Intel
+
+## Windowed
+# ln -svnf "$d_user/saves" "$pfx/saves"
+if (($#==0)); then
+  # "$WINE" explorer /desktop=Game,1920x1080 ssss # Windowed
+  exec env -C "$WINEPREFIX/drive_c/Program Files/Some Game" -- "$WINE" some.exe
+elif (($#==1)); then
+  exec "$WINE" "$@"
+elif (($#>=2)) && [[ $1 == -i ]]; then
+  exec "$WINETRICKS" "${@:2}"
+fi
