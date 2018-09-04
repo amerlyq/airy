@@ -74,3 +74,23 @@ USAGE
     https://serverfault.com/questions/784871/no-space-left-on-device-but-enough-space-and-enough-inodes
     http://www.codeblueprint.co.uk/2017/05/11/dear-btrfs.html
     http://marc.merlins.org/perso/btrfs/post_2014-05-04_Fixing-Btrfs-Filesystem-Full-Problems.html
+
+
+Re-balance btrfs inodes i.e. "No space left on device" in mounted chroot
+  Null-rebalance -- try first
+    $ sudo btrfs balance start -musage=0 /work
+    $ sudo btrfs balance start -dusage=0 /work
+  FS is full despite only 60% in use
+    $ sudo btrfs fi show /work
+      Label: 'work'  uuid: 9ed87631-ec37-4057-859a-e14709089b3f
+      Total devices 1 FS bytes used 70.91GiB
+      devid    1 size 119.57GiB used 119.57GiB path /dev/mapper/ws-work
+  Put all blocks <40% into fuller blocks and free less used (bigger number = longer time)
+    $ sudo btrfs balance start -dusage=40 /work
+  Rebalance if metadata is too full
+    $ sudo btrfs fi df /work
+      Metadata, DUP: total=10.00GiB, used=9.50GiB
+      ...
+    $ sudo btrfs balance start -v -dusage=0 /mnt/btrfs_pool2
+  FS is so full it can't rebalance -- see last tip with additional flash drive
+    REF: http://marc.merlins.org/perso/btrfs/post_2014-05-04_Fixing-Btrfs-Filesystem-Full-Problems.html
