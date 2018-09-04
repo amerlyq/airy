@@ -88,3 +88,17 @@ Routing and Rerouting
     VPLSes.. but probably beyond the scope of the OP's Q
     and I guess that's technically tagging it, not l3 encap. even though it's moved along via an L3 network
   ```
+
+
+DNS route
+  Test DNS leaks
+    USE: https://www.dnsleaktest.com/
+    REF: https://unix.stackexchange.com/questions/434916/how-to-fix-openvpn-dns-leak
+  Check who resolves address (which router, if many; your ISP or VPN)
+    https://ns1.com/blog/using-dig-trace
+      $ dig +trace www.example.com
+    https://www.unix.com/ip-networking/145589-how-do-traceroute-dns-lookups.html
+      $ nslookup -debug www.example.com
+      => look for "Server" on first line, who resolves DNS
+  Routing tables
+    $ route -n
