@@ -1,0 +1,22 @@
+# vim:ft=cfg
+Description='VPN'
+Interface=vpn
+Connection=tuntap
+Mode=tun
+#User=root
+#Group=root
+
+BindsToInterfaces=(enp0s25 wlp2s0)
+IP=no
+
+PIDFILE=/run/openconnect_${Interface}.pid
+SERVER=vpn.example.net
+AUTHGROUP='<AUTHGROUP>'
+LOCAL_USERNAME=<USERNAME>
+REMOTE_USERNAME=<VPN_USERNAME>
+# Assuming the use of pass(1):
+#   !! you need beforehand $ systemctl --user set-environment DISPLAY=:0
+PASSWORD="`su ${LOCAL_USERNAME} -c "DISPLAY=${DISPLAY} pass ${REMOTE_USERNAME}" | head -n 1`"
+
+ExecUpPost="echo '${PASSWORD}' | /usr/bin/openconnect --background --pid-file=${PIDFILE} --interface='${Interface}' --authgroup='${AUTHGROUP}' --user='${REMOTE_USERNAME}' --passwd-on-stdin ${SERVER}"
+ExecDownPre="kill -INT $(cat ${PIDFILE}) ; resolvconf -d ${Interface} ; ip link delete ${Interface}"

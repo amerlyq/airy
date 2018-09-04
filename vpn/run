@@ -3,6 +3,8 @@
 # USAGE:ALT: env vars VPN_* from some profile
 #%USAGE:(get fingerprint): $ r.vpn -i
 #%  OR: $ openconnect --authenticate "$server"
+#%E.G: VPN_SCRIPT='192.168.1.0/24 hostname1 alias2=alias2.bigcorp.com=192.168.1.43'
+#%  => {ip routing mask, hosts to resolve by VPN's DNS, manually added hosts and their aliases}'
 set -euo pipefail
 
 # THINK: simplify by using only 'config' variant
@@ -11,6 +13,7 @@ cfg=~/.config/airy/vpn.conf
 pidf=${TMPDIR:-/tmp}/vpn.pid
 background=0
 interactive=0
+splitroute=1
 verbose=0
 
 trap 'pgrep -f "$pidf" >/dev/null || rm -f "$pidf"' EXIT
@@ -18,25 +21,27 @@ pids(){ pgrep -f "$pidf" || pgrep "${exe##*/}"; }
 sigsend(){ local p; readarray -t p <<< "$(pids)"
   (( ! ${#p[@]} )) || sudo kill "$@" -- "${p[@]}"; }
 
-while getopts 'bc:ikprv' o; do case $o
+while getopts 'bc:ikprSv' o; do case $o
 in b) background=1
 ;; c) cfg=$OPTARG  # Use: '' to force disabling
 ;; i) interactive=1
 ;; k) sigsend -INT; exit  # clean shutdown
 ;; r) sigsend -USR2; exit  # reconnect on IP change
 ;; p) pids; exit
+;; S) splitroute=0
 ;; v) verbose=1
 ;; :|'?') exit 2
 esac; done; shift $((OPTIND - 1))
 
 if [[ -s $cfg ]]; then
-  # HACK: extract server from config's comments (no native support)
-  [[ -n ${server:=${1-}} ]] \
-  || server=$(sed -rn '/^#\s*server\s*=\s*(.*)\s*$/s//\1/p' "$cfg")
+  # HACK: extract additional fields from config's comments (no native support)
+  [[ -n ${server:=${1-}} ]] || server=$(sed -rn '/^#\s*server\s*=\s*(.*)\s*$/s//\1/p' "$cfg")
+  [[ -n ${script:=${4-}} ]] || script=$(sed -rn '/^#\s*script\s*=\s*(.*)\s*$/s//\1/p' "$cfg")
 else
   server=${1-${VPN_SERVER-}}
   user=${2-${VPN_USER:?}}
   group=${3-${VPN_GROUP:?}}
+  script=${4-${VPN_SCRIPT-}}
 fi
 
 
@@ -58,10 +63,12 @@ else
   session=$("$exe" "${opts[@]}" --authenticate --non-inter --passwd-on-stdin <<< "$pass")
 fi
 
+((splitroute)) && opts+=( --script="vpn-slice ${script:?}" )
 
 unset COOKIE FINGERPRINT
 eval "$session"
 [[ -n $COOKIE && -n $FINGERPRINT ]] || exit 1
 
+echo ---
 execcon(){ exec sudo "$exe" --reconnect-timeout=60 "${opts[@]}" "$@"; }
 execcon --non-inter --servercert "$FINGERPRINT" --cookie-on-stdin <<< "$COOKIE"

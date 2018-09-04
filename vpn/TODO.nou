@@ -14,20 +14,22 @@ USAGE
 
 
 TODO
-  [_] FIND: route single IP (ssh) into VPN (so other traffic will be routed as always e.g. torrents)
+  [_] DEV: daemon vpn by netctl
+    TUT: https://wiki.archlinux.org/index.php/OpenConnect#netctl
+  2018-09-04 [X] FIND: route single IP (ssh) into VPN (so other traffic will be routed as always e.g. torrents)
+    ::: use split routing e.g. https://github.com/dlenski/vpn-slice
+      $ ... --script='vpn-slice 172.31.22.13/32 --no-host-names'
   [_] CHECK: update DNS by insisted on by VPN
     https://unix.stackexchange.com/questions/115108/arch-linux-openvpn-dns-problem
       https://github.com/masterkorp/openvpn-update-resolv-conf
   [_] TRY: alias wakeupnas01='/usr/bin/wakeonlan 00:11:32:11:15:FC'
     suspend office machine until wakeonlan
 
-  ++ [_] netctl
-    https://wiki.archlinux.org/index.php/OpenConnect#Integration_in_netctl
-
   [_] fine-tupe ip route rules
-    !1 [_] choose net masks for VPN access, rest through your default gateway
+    !1 2018-09-04 [X] choose net masks for VPN access, rest through your default gateway
       :: NEED: aka true split-include dns tunneling
         https://askubuntu.com/questions/84516/how-to-set-routes-for-my-vpn-connection
+        |aur/vpn-slice|
       NEED
         [_] full list of entities involved into traffic routing
         [_] cmds to change settings for routing
