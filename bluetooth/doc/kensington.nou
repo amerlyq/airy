@@ -1,0 +1,17 @@
+Kensington [Expert Wireless TB] Mouse
+  OFF: https://www.kensington.com/us/us/s/k72359ww/expert-mousespan-classregsymspan-wireless-trackball
+  https://wiki.archlinux.org/index.php/Bluetooth
+  https://wiki.archlinux.org/index.php/bluetooth_mouse
+    $ bluetoothctl $ -> help -> power on -> devices
+      OR: scan on -> {pair,trust,connect} 00:12:34:56:78:90
+  Automatic pairing
+    https://ru-linux.livejournal.com/2911405.html
+    https://www.reddit.com/r/archlinux/comments/4ldhxh/automatic_pairing_of_bluetooth_mouse/
+  Cursor is stuck
+    https://www.reddit.com/r/archlinux/comments/9994fa/kensington_trackball_stuck_cursor/
+      https://bugzilla.kernel.org/show_bug.cgi?id=200849
+        https://patchwork.kernel.org/patch/10583471/
+    TEMP:FIXED: wain on |linux-4.19|
+      BET: $ sudo sed -i '4aATTRS{name}=="Expert Wireless TB Mouse", ENV{ID_INPUT_MOUSE}="1"' /usr/lib/udev/rules.d/70-mouse.rules
+        => off mouse -> $ S.rr bluetooth $ -> on mouse -> (bluetoothctl) power on
+      ALT: $ pacman -U linux-4.17.10-1-x86_64.pkg.tar.xz linux-headers-4.17.10-1-x86_64.pkg.tar.xz acpi_call-1.1.0-145-x86_64.pkg.tar.xz bbswitch-0.8-151-x86_64.pkg.tar.xz nvidia-396.24-20-x86_64.pkg.tar.xz nvidia-utils-396.24-2-x86_64.pkg.tar.xz

@@ -6,4 +6,8 @@ id | grep -qwF lp || sudo gpasswd -a "${LOGNAME:?}" lp
 
 grep -qw '^btusb' /proc/modules || sudo modprobe btusb
 
+# Enable "power on" at boot to pair devices automatically
+cfg=/etc/bluetooth/main.conf
+grep -qxF 'AutoEnable=true' "$cfg" || sudo sed -ri '/#?\s*(AutoEnable\s*=\s*).*/s//\1true/' "$cfg"
+
 svc_activate -e$(cfgOpt uU&&echo rR) bluetooth.service

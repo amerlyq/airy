@@ -3,19 +3,6 @@ TODO
     * use laptop bluetooth instead of smartphone, emulating responses to BlueGO requests
 
 
-Interactive pairing
-  $ bluetoothctl
-  help
-  power on
-  devices
-  scan on
-  agent on
-  pair 00:12:34:56:78:90
-  OR: pair 00:<Tab>
-  MAYBE: trust 00:12:34:56:78:90
-  connect 00:12:34:56:78:90
-
-
 Network PAN
   https://bbs.archlinux.org/viewtopic.php?id=177672
   https://wiki.archlinux.org/index.php/android_tethering#Tethering_via_Bluetooth
@@ -32,19 +19,6 @@ DEBUG
     $ sudo rfkill unblock bluetooth
   rfkill unblock: Do not unblock
     $ connmanctl enable bluetooth
-
-
-Remote filesystem
-  $ obexfs -b 00:12:34:56:78:90 /tmp/mnt
-    CHECK: rw- permissions for mount
-  $ fusermount -u /tmp/mnt
-
-
-Push/get files
-  $ obexftp -b 00:12:34:56:78:90 -p ./local/file
-  $ obexftp -b 00:12:34:56:78:90 -g /remote/path/to/file
-  OR: $ obexftp -b 00:12:34:56:78:90 -g file_in_exchange_folder
-  ALT: sdptool|ussp-push SEE: https://wiki.archlinux.org/index.php/bluetooth#Obex_Object_Push
 
 
 Settings

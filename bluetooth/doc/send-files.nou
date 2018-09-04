@@ -1,0 +1,11 @@
+Remote filesystem
+  $ obexfs -b 00:12:34:56:78:90 /tmp/mnt
+    CHECK: rw- permissions for mount
+  $ fusermount -u /tmp/mnt
+
+
+Push/get files
+  $ obexftp -b 00:12:34:56:78:90 -p ./local/file
+  $ obexftp -b 00:12:34:56:78:90 -g /remote/path/to/file
+  OR: $ obexftp -b 00:12:34:56:78:90 -g file_in_exchange_folder
+  ALT: sdptool|ussp-push SEE: https://wiki.archlinux.org/index.php/bluetooth#Obex_Object_Push
