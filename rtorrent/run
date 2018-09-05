@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+# REF: https://serverfault.com/questions/50585/whats-the-best-way-to-check-if-a-volume-is-mounted-in-a-bash-script
+# ALT:(depends on /proc): ismnt(){ mountpoint -q "/media/$USER/$1"; }
+ismnt(){ findmnt -rno TARGET "/media/$USER/$1" >/dev/null; }
+
+if ismnt sda1 && ismnt sda2; then
+  exec rtorrent "$@"
+else
+  echo "Err: mount external HDD first" >&2
+  exit 1
+fi

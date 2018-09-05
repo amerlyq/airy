@@ -5,6 +5,9 @@ IDEA:REF: http://endot.org/2011/12/04/remotecopy-copy-from-remote-terminals-into
 BUG: if local host xsel restarts, then remote end of ssh must be restarted as well
   ? is it possible without reconnection to ssh (~C is blocked for multiplexed connections) ?
 
+HACK: repair remote xsel copy-paste
+  $ host=ruser@rhost:22 && ssh -O forward -R /tmp/xsel-shared.remote:/tmp/${host%%@*}/xsel-shared.local -S "/tmp/$USER/$host" "$host"
+
 DEBUG: -d -d -d
   $ socat -d -d -d -4u TCP-L:2224,reuseaddr,fork EXEC:xsel-auto
   $ ssh -R 2224:localhost:2224 ...
