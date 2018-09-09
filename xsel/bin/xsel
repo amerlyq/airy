@@ -11,12 +11,12 @@
 
 # CHECK: maybe 'nc -4dz' has slow timeout when starting on cold system
 #   => first launch neovim after freemem is too slow
-socket='127.0.0.1:2224'
+# socket='127.0.0.1:2224'
 
 # BUG:(StreamLocalBindUnlink): can't auto-remove remote unix-domain socket
 # single bidirectional unix-domain socket
 # socket=/tmp/xsel-shared.remote.$rport
-
+socket=/tmp/xsel-shared.remote
 
 choices=iobps
 opts=; while getopts "hL:${choices}-" o; do case $o
@@ -27,7 +27,13 @@ in :|'?') echo "xsel wrapper limited to \$ xsel -$choices"; exit 1
 ;; *) exit 1 ;; esac; shift; OPTIND=1; continue
 esac; opts+=$o; done; shift $((OPTIND - 1))
 
-nc -4 -dz "${socket%:*}" "${socket##*:}" || exec /usr/bin/xsel "$@"
+if [[ -S $socket ]] && nc -4 -dzU "$socket"
+then true
+else
+  # rm "$socket"
+  exec /usr/bin/xsel "$@"
+fi
+# nc -4 -dz "${socket%:*}" "${socket##*:}" || exec /usr/bin/xsel "$@"
 # [[ -S $socket ]] || exec /usr/bin/xsel "$@"
 
 
@@ -35,8 +41,8 @@ nc -4 -dz "${socket%:*}" "${socket##*:}" || exec /usr/bin/xsel "$@"
 #   => remote socat will create two different xsel
 #   => whoever last ends transmission -> will be first in clipboard history
 # ALT: nc -4 [-c|-w0] -U "$socket"
-# cmd=( socat -4t0 - "UNIX-CLIENT:$socket" )
-cmd=( socat -4t0 - "TCP:$socket" )
+cmd=( socat -4t0 - "UNIX-CLIENT:$socket" )
+# cmd=( socat -4t0 - "TCP:$socket" )
 
 if [[ $opts =~ i && $opts =~ o ]]; then
 # NOTE: if both -i/-o => return curr value before assign
