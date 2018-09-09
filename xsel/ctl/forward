@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+conn=${1:?Need: user@host[:port]}
+[[ $conn =~ @ ]] || conn=$conn@$USER
+[[ $conn =~ : ]] || conn+=:22
+
+ruser=${conn%%@*}
+rsock=/tmp/xsel-shared.remote
+# lsock=${TMPDIR:-/tmp}/xsel-shared.local   # WTF: why it doesn't work despite looking right
+lsock=/tmp/$ruser/xsel-shared.local         # WTF: how it works at all ?
+
+exec ssh -O forward -R "$rsock:$lsock" -S "${TMPDIR:-/tmp}/$conn" "$conn"
