@@ -1,0 +1,19 @@
+Create remote dir
+  $ svn --username user mkdir 'svn://example.com/svn/doc/newdir'
+
+Checkout
+  $ svn --username user co 'https://example.com/svn/doc/technical/'
+
+Add directory (and transfer revision to server)
+  ALT:(explicit dst): https://stackoverflow.com/questions/15510119/how-to-add-an-existing-folder-with-files-to-svn
+  $ svn --username user co 'svn://example.com/svn/doc/newdir'
+  $ cd newdir
+  $ cp -r /path/to/pdf ./pdf
+  $ svn st
+    ? pdf
+  $ svn add pdf
+  $ svn commit -m 'Add pdf directory with files'
+
+Push changes
+  $ svn update
+  $ svn commit
