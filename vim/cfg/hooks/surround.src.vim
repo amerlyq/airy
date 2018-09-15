@@ -4,7 +4,10 @@
 " BAD: disabled 'spaced' brackets '{( ', ' )}'
 let g:operator#surround#no_default_blocks = 1
 let g:operator#surround#blocks = {'-': [
-  \ {'block': ['${', '}'], 'motionwise': ['char', 'line'], 'keys': ['$', '4']}
+  \ {'block': ['"${', '}"'],    'motionwise': ['char', 'line'], 'keys': ['4']},
+  \ {'block': ['"${', '[@]}"'], 'motionwise': ['char', 'line'], 'keys': ['2']},
+  \ {'block': ['${', '}'],      'motionwise': ['char', 'line'], 'keys': ['$']},
+  \ {'block': ['${', '[@]}'],   'motionwise': ['char', 'line'], 'keys': ['@']},
   \]
   \+map(split('();{};[]', ';'), "{
   \  'keys' : [v:val[1]],
