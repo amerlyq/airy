@@ -11,6 +11,15 @@
 
 [_] Hide duplicate js0/js1 to access js3/js4 created by xboxdrv
   https://askubuntu.com/questions/825729/auto-mount-gamepad-at-js1-instead-js0
+  Mknod = reserve places before connecting gamepads
+    https://unix.stackexchange.com/questions/241173/how-are-dev-linux-files-created
+    # alias to /dev/null
+    $ sudo mknod /dev/input/js0 c 1 3
+    $ sudo mknod /dev/input/js1 c 1 3
+    <plug-gamepads>
+    $ sudo rm /dev/input/js{0,1}
+    $ r.gamepad
+    !!! BAD: even then it creates "js1"
   ~~~ Specify concrete gamepad on game startup (if it uses SDL underneath)
     NEW: $ SDL_JOYSTICK_DEVICE=/dev/input/event20 ...
     OLD: $ SDL_JOYSTICK_DEVICE=/dev/input/js1 ...

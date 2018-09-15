@@ -9,6 +9,6 @@ trap 'exit' INT TERM ERR
 trap 'kill -INT 0; wait' EXIT
 
 r.gamepad "joy1_serial" "$game" &
-r.gamepad "joy1_serial" "$game" &
+r.gamepad "joy2_serial" "$game" &
 
 "$@"
