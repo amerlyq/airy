@@ -16,6 +16,7 @@ Search
     $ jiracli --issue-search "assignee=CurrentUser() and status='In Progress'" --issue-comments
 
 Search JQL
+  REF: https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-functions-reference-764478342.html
   https://confluence.atlassian.com/jiracore/blog/2015/07/search-jira-like-a-boss-with-jql
   current project
     "project = MYPROJ AND sprint IN openSprints()"
@@ -30,6 +31,25 @@ Search JQL
     SEE: https://jamieechlin.atlassian.net/wiki/display/GRV/Scripted+JQL+Functions#ScriptedJQLFunctions-commented(commentquery)
     "issueFunction in commented('by currentUser()')"
     "after -1d by Tom"
+  my related issues (all)
+    (assignee = currentUser() OR assignee was currentUser() OR reporter = currentUser()  OR reporter was currentUser() OR watcher = currentUser() OR status was Resolved by currentUser() or status was Closed by currentUser()) ORDER BY createdDate ASC
+    (assignee was currentUser() OR worklogAuthor = currentUser() OR reporter was currentUser() OR watcher = currentUser() OR voter = currentUser() OR assignee changed by currentUser() OR fixVersion changed by currentUser() OR priority changed by currentUser() OR reporter changed by currentUser() OR resolution changed by currentUser() OR status changed by currentUser() OR issueFunction in commented("by currentUser()")) ORDER BY project, createdDate ASC
+      WARN: "watcher" adds false-positives
+    ALT: see activity stream
+      https://community.atlassian.com/t5/Jira-questions/How-can-I-search-issues-to-which-a-user-has-commented/qaq-p/91873
+        1 open Dashboard
+        2 Add Gadget Activitiy Stream
+        3 Add a global filter: Project is XY
+        4 Add a global filter: User is (username)
+        5 Below the Global Filter, klick JIRA - Add Filter:  Activity is Comment
+        6 Set "limit to 99 items"
+  Epic-linked issues
+    my epics
+      ... AND (issueFunction not in hasLinkType("Epic-Story Link") OR (issueFunction in hasLinkType("Epic-Story Link") and issuetype = Epic))
+      ... and status = "R&D Backlog"
+    my related issues (excluding subtasks of Epics and unrelated activity)
+      (assignee was currentUser() OR worklogAuthor = currentUser() OR reporter was currentUser() OR assignee changed by currentUser() OR resolution changed by currentUser() OR status changed by currentUser() OR issueFunction in commented("by currentUser()"))  AND (issueFunction not in hasLinkType("Epic-Story Link") OR (issueFunction in hasLinkType("Epic-Story Link") and issuetype = Epic)) ORDER BY project, createdDate ASC
+
 
 Show
   projects
