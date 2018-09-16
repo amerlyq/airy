@@ -37,11 +37,12 @@ in  [Mm]akefile*) make ${_quiet:+-s} -f "$1"
 esac; }
 
 
-by_ext(){ local ext=${1##*.}
+by_ext(){ local basename=${1%.*} ext=${1##*.}
+case ${basename##*.}.$ext
+in dot.gz|gv.gz) r.graphviz-view "$1"
+;; *)
 case ${ext:?}
-in dot|gv)
-  hash xdot &>/dev/null && { xdot "$1"; return; }
-  dot -Tx11 "$1"
+in dot|gv) r.graphviz-view "$1"
 ;; tpp) tpp "$1"
 ;;  md) pandoc -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
 ;; ijs) /usr/lib/j8/bin/jconsole "$1"
@@ -52,7 +53,7 @@ in dot|gv)
 # TODO: fix PATH to include this binary
 ;; nb) Mathematica -- "$1" &
 ;; *) return 11
-esac; }
+esac; esac; }
 
 
 by_mime(){ local mime=$(file --brief --mime-type "$1")

@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+
+args=()
+[[ -t 0 ]] || args+=( /dev/stdin )
+args+=( "$@" )
+
+# OR: ${DISPLAY-}
+if xset q &>/dev/null; then
+  if hash xdot &>/dev/null; then
+    view(){ xdot "$@"; }
+  else
+    view(){ dot -Tx11 "$@"; }
+  fi
+else
+  hash graph-easy &>/dev/null || exit 1
+  view(){ sed 's/\bbox3d\b/box/g' "$@" | graph-easy; }
+fi
+
+# ALT: $ file --mime-type --brief --dereference -- graph.gv.gz
+zcat --force -- "$@" | view /dev/stdin
