@@ -2,19 +2,19 @@
 # THINK: reboot system with controller plugged-in -- maybe it works afterwards ?
 source ~/.shell/profile
 
-set -euo pipefail -o noglob -o errtrace
+set -euo pipefail -o noglob
 trap 'printf "%s:%s(): %s\n" "$LINENO" "${FUNCNAME-}" "${BASH_COMMAND-}"' ERR
 
 xpad=/sys/bus/usb/drivers/xpad
 inputs=()
-delete=
+rename=
 sortargs=-r
 unbind=
 
-while getopts 'i:ru1:2:' o; do case $o in :|'?') exit 2
+while getopts 'i:rsu1:2:3:4:' o; do case $o in :|'?') exit 2
 ;; i) inputs=( "$OPTARG" )
-;; d) delete=$((!delete))
-;; r) sortargs=
+;; r) rename=$((!rename))
+;; s) sortargs=
 ;; u) unbind=$((!unbind))
 # HACK: use individual configs to make 1st gamepad as keyboard
 ;; [1-4]) declare -n a=cfg_$o; a+=( "$OPTARG" )
@@ -25,7 +25,7 @@ cfgshared=( "$@" )
 ((${#inputs[@]})) || inputs=(
   $(find /dev/input/by-id -type l -xtype c -name 'usb-*-event-joystick' -print | sort $sortargs)
 )
-echo "${inputs[@]}"
+# echo "${inputs[@]}"
 
 get_overlay(){ cfg-overlay -M~ -s "gamepad/$1/{}.ini" -b "${AIRY_OVERLAY_BASE:=$HOME/.local/airy}" -o "${AIRY_OVERLAY_PATH-}" -- "${@:2}"; }
 evdev_cfg=$(get_overlay cfg 'xbox-one-elite')
@@ -42,50 +42,62 @@ opt_config(){ declare -rn a=$1; local tmp i=$2; shift 2; tmp=( "${a[@]}" ); a=()
   done
 }
 
-remove_js(){ local answer js input=$1
-  # TODO: delete only devices created by xpad, keep other intact
-  js=/dev/$(udevadm info --query=name --name="${input/-event-/-}") || return 0
-  [[ -c $js ]] || { echo 'Err: impossible' >&2; exit 3; }
-  printf -- "Err: must delete '$js' device created by xpad [Y/n]: " >&2
-  read answer
-  case $answer
-  in [yY] | [yY][Ee][Ss] | '') sudo rm "$js"
-  ;; [nN] | [n|N][O|o] | *) exit 1
-  esac
+
+rename_list=()
+rename_devs(){ local dev
+  for input; do
+    # NOTE: rename only devices created by xpad, keep other intact
+    dev=/dev/$(udevadm info --query=name --name="${input/-event-/-}") || continue
+    sudo mv -vT "$dev" "${dev%/*}/~${dev##*/}"
+    rename_list+=( "$dev" )
+  done
 }
+restore_devs(){ for dev in "${rename_list[@]}"; do sudo mv -vT "${dev%/*}/~${dev##*/}" "$dev"; done; }
+
 
 bind_list=()
-unbind_driver(){ local bus
+unbind_drivers(){ local bus
   bind_list=( $(find "$xpad" -type l -xtype d -name '*:*' -printf '%P\n') )
   for bus in "${bind_list[@]}"; do
     printf -- "$bus" | sudo tee "$xpad/unbind"
   done
 }
-restore_driver(){ local bus
+restore_drivers(){ local bus
   for bus in "${bind_list[@]}"; do
     printf -- "$bus" | sudo tee "$xpad/bind"
   done
 }
 
-onexit(){ echo onexit; trap 'exit 0' INT; kill -INT 0; wait; echo end; }
-trap 'onexit' INT TERM ERR
 
+onexit(){
+  echo onexit
+  trap 'exit 0' EXIT
+  kill -INT "${fork_list[@]}"
+  wait
+  restore_drivers
+  restore_devs
+  echo end
+}
+trap 'onexit' INT TERM
+
+
+((unbind)) && unbind_drivers
+((rename)) && rename_devs "${inputs[@]}"
+
+fork_list=()
 for i in "${!inputs[@]}"; do
   declare -n cfg_N=cfg_$((i+1))
   opt_config "cfg_N" "$((i+1))" "${cfgshared[@]}"
-  input=${inputs[i]}
-  echo "=$input"
-
-  ((delete)) && remove_js "$input"
-  ((unbind)) && unbind_driver
   set -x
   # NOTE: working! MAYBE: due to rmmod+replug
   # BUG: non-deterministic order of created virtual js0/js1
-  xboxdrv --silent --evdev "$input" --config="$evdev_cfg" --mimic-xpad "${cfg_N[@]}" &
+  # --mimic-xpad -- interferes with some games
+  xboxdrv --silent --evdev "${inputs[i]}" --config="$evdev_cfg" "${cfg_N[@]}" & fork_list+=( $! )
   set +x
   sleep 0.5
 done
 echo ---
+# BUG: this 'wait' is interrupted -> therefore triggers ERR trap
 wait
 
 # https://stackoverflow.com/questions/690266/why-cant-i-use-job-control-in-a-bash-script
