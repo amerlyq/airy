@@ -55,8 +55,9 @@ del_mon_split "$ext~2"
 case $*
 in *d*) set_mon_layout --primary -- --off
 ;; *e*) set_mon_layout --off -- --primary
-;; *m*) set_mon_layout --below "$ext" -- --primary
+;; *m*) set_mon_layout --below "$ext" -- --primary  # FIXME: don't enable other screens if they are off
 ;; *a*) set_mon_layout --primary --below "$ext" --
+# DEV:(-o): switch to only one screen whichever is currently main, or do nothing if already single
 ;; *[sS]*) true
 ;; *) echo "Err: wrong option '$*'" >&2; exit 2
 esac

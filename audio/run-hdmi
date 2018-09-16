@@ -2,6 +2,9 @@
 #%USAGE: 0=off  1=on  ''=toggle
 set -euo pipefail -o noglob
 
+# BUG: after boot must run something to launch pulse server
+#   => otherwise ERR pulse not started
+
 state=${1-}
 prf0='output:analog-stereo+input:analog-stereo'
 prf1='output:hdmi-stereo+input:analog-stereo'

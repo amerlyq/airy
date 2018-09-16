@@ -1516,7 +1516,7 @@ config.bind(',p', 'hint links spawn -- r.mutt-pocket "{hint-url}"')
 config.bind(',P', 'spawn -- r.mutt-pocket "{url}"')
 config.bind(',Q', "spawn -- r.qr-code '{url}'")
 config.bind(',r', 'set content.proxy system ;; reload')
-config.bind(',R', 'set content.proxy socks://localhost:8080/ ;; reload')  # OR: http://
+config.bind(',R', 'set content.proxy socks://localhost:1080/ ;; reload')  # OR: http://
 
 # SEE: https://www.reddit.com/r/qutebrowser/comments/83avuf/qutebrowser_v120_released_with_perdomain_settings/
 #   => how to add permanent "blacklist" and "whitelist"

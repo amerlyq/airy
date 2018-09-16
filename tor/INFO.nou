@@ -1,0 +1,7 @@
+Doing https requests through a SOCKS5 proxy (tor) with curl
+  https://stackoverflow.com/questions/24568788/doing-https-requests-through-a-socks5-proxy-tor-with-curl
+  https     $ curl https://www.reg.ru/whois/?dname=google.com
+  tor+http  $ curl --socks5 127.0.0.1:9050 http://stackoverflow.com/
+  tor+https $ curl --socks5-hostname 127.0.0.1:9050 https://www.torproject.org/download/download.html.en
+       ALT: $ curl --proxy socks5h://127.0.0.1:9050 https://www.torproject.org/download/download.html.en
+       ALT: $ ALL_PROXY=socks5h://127.0.0.1:9050 curl https://www.torproject.org/download/download.html.en
