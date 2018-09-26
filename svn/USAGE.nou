@@ -12,8 +12,10 @@ Add directory (and transfer revision to server)
   $ svn st
     ? pdf
   $ svn add pdf
-  $ svn commit -m 'Add pdf directory with files'
 
 Push changes
   $ svn update
-  $ svn commit
+  $ svn commit -m 'Add pdf directory with files'
+
+Undo "svn add"
+  https://stackoverflow.com/questions/5083242/undo-svn-add-without-reverting-local-edits#

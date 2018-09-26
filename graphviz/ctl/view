@@ -14,7 +14,7 @@ if xset q &>/dev/null; then
   fi
 else
   hash graph-easy &>/dev/null || exit 1
-  view(){ sed 's/\bbox3d\b/box/g' "$@" | graph-easy; }
+  view(){ sed -r 's/(shape=)(box3d|tab|component|Msquire|plain|underline)\b/\1box/g' "$@" | graph-easy | r.pager; }
 fi
 
 # ALT: $ file --mime-type --brief --dereference -- graph.gv.gz
