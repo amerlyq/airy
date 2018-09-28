@@ -1,0 +1,5 @@
+#!/bin/sh -eu
+# ALT: exec ag "$@" -- $(find -xtype f \( -name 'CMakeLists.txt' -o -name '*.cmake' \) -print)
+exec find -type d -name '_*' -prune -o \
+  -xtype f \( -name 'CMakeLists.txt' -o -name '*.cmake' \) -exec \
+    ag --heading "$@" -- {} +

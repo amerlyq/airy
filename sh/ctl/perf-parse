@@ -1,13 +1,12 @@
-#!/bin/bash -eu
-# USAGE: r.sh-perf-parse /tmp/profiling.16850 | cut -c -80 | sort -k1,1
+#!/bin/bash
+#%USAGE: r.sh-perf-parse /tmp/profiling.16850 | cut -c -80 | sort -k1,1
+set -euo pipefail
 
 flog=$1
-ftime=$flog.time
-# exec paste "$ftime" "$flog"
+ftime=${2:-$flog.time}
 
 # TODO: sep accumulate times per function call on the right
-
-exec paste <(while read t; do
+parse_times(){ while read t; do
   [[ -z ${end-} ]] && end=${t//.} && beg=${t//.}
   crt="000000000$((${t//.}-10#0$end))"
   ctot="000000000$((${t//.}-10#0$beg))"
@@ -15,4 +14,8 @@ exec paste <(while read t; do
     "${crt:0:${#crt}-9}.${crt:${#crt}-9}" \
     "${ctot:0:${#ctot}-9}.${ctot:${#ctot}-9}"
   end=${t//.}
-done < "$ftime" ) "$flog"
+done < "$ftime"
+}
+
+exec < <(parse_times)
+exec paste - "$flog"

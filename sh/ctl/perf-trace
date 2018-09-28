@@ -2,6 +2,8 @@
 # USAGE: toggle by 'source r.sh-prof-trace'
 # ALT: strace -c ls
 
+# [_] BET:CHG: use "ts -s %.s" for /dev/stderr (OR: /^+/ lines of 2>&1) and analyze with r.sir-log-profile
+
 ## PROFILING BEG
 if [[ -z ${_prof_enabled-} ]] || ((!_prof_enabled)); then
   _prof_name=/tmp/profiling.$$
