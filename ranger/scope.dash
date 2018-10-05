@@ -18,6 +18,7 @@ height="${3:-$(tput lines)}"  # OR '-0' for all
 cached="$4"
 preview_images="$5" # True|False
 
+# BET: do timeout/trim/fmt/safepipe directly in ranger in identical consistent way
 try(){ timeout --kill-after 5 3 "$@"; }
 trim(){ head -n "$height"; }
 fmt(){ command fmt -s -w "$width"; }
