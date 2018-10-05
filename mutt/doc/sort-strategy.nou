@@ -1,0 +1,101 @@
+ALG sync server rules (setup online through web-ifc)
+  <Sync Push> for all directories beside "archivecopy/" and "Sent/"
+    !! only local client can change any other folder
+      => Sync Push (use server only as backup, override all changes there)
+    !! only remote server can change these two folders "archivecopy/" and "Sent/"
+      => Sync Pull when necessary (exclude them by Patterns)
+  "archivecopy/"
+    * copy all incoming messages to "archivecopy/"
+    ! never delete anything
+    * never sync to offline PC until strictly required
+    * use it as reserve backup to prevent accidentally deleted mails
+      = online copy from "archivecopy/" to your other folders
+  "Sent/"
+    * ask server to store all outgoing messages to "Sent/"
+    * setup "davmail" to copy everything outgoing to "Sent/"
+    * setup "mutt" to always leave copy of outgoing message in current folder
+      ? how to be with messages sent from cmdline or by separate "msmtp" program ?
+      ? MAYBE: they can be set up to store sent messages on their own ?
+    ! never delete anything
+    * never sync to offline PC until strictly required
+    * use it as reserve backup to prevent accidentally deleted mails
+      = online copy from "Sent/" to your other folders
+  ? MAYBE: make INBOX also read-only folder
+    - move all urgent action-items in "todo"
+    - BAD: anyway must propagate back deletions
+  MOVE all messages before sorting in all prev subdirs into "archivecopy/"
+
+
+ALG
+  Action-items (filtering based on my required reaction/attention)
+    - "INBOX" -- everything which requires my personal attention to decide (fail of auto-scripts)
+      + "flagged" todo-list (i.e. <unmovable>)
+    - "todo" ? merge with Inbox
+    - "ong" : "ongoing" / "discuss" / "t" : "talk" / "pend" : "pending"
+    - "task" / "log" / "archive" / "history"
+    - "fin"
+    - "spam"
+    - "log" = activity ntf log
+    - "ntf" = non-project notifications
+    - "rfc" = proposals
+    - "lst" / "forum" = mail lists / groups
+    - "done"
+  Role-items
+    - "my" / "employee" (org/company)
+    - "my" / "personal" (well-being, personal mailing)
+    - "dev" / "developer" (project)
+    - "dev" / "inventor" (global proposals)
+
+  Strategy
+    * sub-categorize "Archived"
+    * sub-categorize spam to reduce traffic when I go into "possible-spam" to "unspam" something
+      BAD: explicitly dedicated "undecided" directory for possible spam, and "spam" containing only proven spam
+        !! FAIL this "undecided" dir will immediately become bottomless garbage collector in which no one looks inside
+
+
+CHG:TODO: I sort mails, which I don't give a shit for
+  * keep all addressed to me in Inbox
+  * mark important (require response in one-two day) as "flagged" to keep them in Inbox
+    =fin, =ntf for password change
+  * keep all flagged
+  * sort all that have filter
+  * move all other mails to "spam"
+    == flag with "spam-probability" to look at spam sometimes
+    MAYBE: move spam into week's folder "spam/2018-09=1" for "unspamming" at the end of each week
+  * archiving old projects
+    => collect folders "log"/"ntf"/"done" and move into "archived-old-pj"/<pjname>/*
+
+
+BET: combine permanent principal dirs (action-items) and transient tags (auto-categorize for faster overview)
+  * "t" talking threads -- discuss of smth
+  * "todo" tasks/events requiring some actions -> move into "done" after completion
+  * "my" my personal important stuff as employee, unrelated to project itself -- vacation,hardware,sdesk
+  * "tech","todo" reusable info -- to process and move to "processed" folder
+  * "rule", org info (with expiration time)-- new people,workflow,rules(codeofconduct) -- use as reference material on demand
+   => rules doesn't touch me directly or immediately (general rules) -- due to not involved to situations
+    ?? similar to "inf" or "ref"
+  * "inf", very-low-priority info -- vacancy,training -- 0.1% probability to be used some day
+  * "ntf", notifications -- 0.01% may require attention when tracking problems (jira, confluence)
+    => ALT: "log" dir for history of worklog events
+  * "spam", everything else -- orgspam,unrelated,market,etc -- 0% used (sure-spam move into subfolders)
+
+
+TODO
+  [_] create graphviz flow for mails in my dir structure
+  [_] sort all messages by my newly proposed criteria
+  [_] determine similarity in resulting groups and create subgroups
+    => use "notmuch show" query on all messages and sort-uniq-count groups to find majors
+  [_] sort spam on local machine only
+    - maybe setup local mail server for auto-sort incoming messages
+    - fetch mail by cron ? or by that local mail server ?
+  [_] auto-tag messages
+  [_] full mailbox search
+  !! re-enable sync service
+
+
+ALT:NEED:(pending) create online pre-sorting rules on server
+  All emails from case updates, bugzilla, etc to _pending
+  All emails containing ‘list’ or ‘bounces’ in from to _pending
+  All emails not containing me directly on CC or To, to _pending
+  pending = acc['INBOX/_pending']:select_all()
+  todos = pending + inbox -- USE todos everywhere next

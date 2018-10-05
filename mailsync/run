@@ -35,3 +35,7 @@ r.mbsync "$acc" -- "${mbsync_args[@]}"
 # BAD: mail path must be in sync between all programs configs
 r.notmuch "$acc" -- new
 # touch ~/.mail/$acc
+
+# ALT:BET? use post-hook in ~/.mail/$acc/.notmuch/hooks/post-new
+# export NOTMUCH_CONFIG=$PWD/=${XDG_CONFIG_HOME:-$HOME/.config}/notmuch/acc/"$acc"
+# afew --tag --new

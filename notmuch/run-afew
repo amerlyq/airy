@@ -1,0 +1,17 @@
+#!/bin/bash -eu
+#%USAGE: $ ./$0 <account> [-- [<afew_args>]]
+source ~/.shell/profile
+
+acc=$1
+shift
+[[ ${1-} == -- ]] && shift
+
+# NOTE: set default action
+(($#)) || set -- new
+
+cfg=${XDG_CONFIG_HOME:-$HOME/.config}/notmuch/acc/"$acc"
+
+## MAYBE: instead of config directly specify path to db ?
+
+export NOTMUCH_CONFIG=$cfg
+exec afew "$@"

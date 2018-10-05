@@ -1,3 +1,11 @@
 #!/bin/bash -eu
 # tags: term mail
 source ~/.shell/func.d/cfgsetup
+
+### afew
+# DEBUG:(afew):
+#   tags $ afew --dry-run -vvv --notmuch-config "$cfg" --tag --new
+#   move $ afew --dry-run -vvv --notmuch-config "$cfg" --move-mails --all
+mkdir -p ~/.local/share/afew/categories
+d_cfg=${XDG_CONFIG_HOME:-$HOME/.config}/afew
+linkcp -t "$d_cfg" cfg-afew/config

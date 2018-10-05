@@ -47,3 +47,11 @@ USAGE:
     ! http://www.neomutt.org/feature/notmuch/
     https://github.com/tsto/notmuchfs
     http://upsilon.cc/~zack/blog/posts/2011/01/how_to_use_Notmuch_with_Mutt/
+
+
+Hooks
+  Create a post-new hook for notmuch
+    $ mkdir -p /path/to/maildir/.notmuch/hooks
+    $ v /path/to/maildir/.notmuch/hooks/post-new
+     #!/bin/sh
+     $HOME/.local/bin/afew --tag --new

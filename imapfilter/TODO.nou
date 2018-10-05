@@ -2,6 +2,13 @@ SEE
   http://iranzo.github.io/blog/2015/08/28/filtering-email-with-imapfilter/
   http://pcre.org/original/doc/html/
 
+  Advanced examples and ideas for imapfilter
+    https://iranzo.github.io/blog/2015/08/28/filtering-email-with-imapfilter/
+    https://blogs.igalia.com/vjaquez/2009/08/09/the-true-imap-usage-imapfilter/
+    https://www.endpoint.com/blog/2011/10/17/imapfilter-lua-email-mutt-filtering
+    https://github.com/lefcha/imapfilter/blob/master/samples/config.lua
+
+
 DEBUG
   $ lua config.lua
 
@@ -61,6 +68,8 @@ BUG
     imapfilter: IMAP (5): 1000 BAD command authentication required
   [$] BUG:(davmail): no search results by -- contain_to() / contain_from()
     https://sourceforge.net/p/davmail/bugs/626/
+    FAIL: davmain contain_* doesn't work reliably (being based on parsing of XML)
+    ::: ALT: use match_* BET: use offline sync+sort
   [~] MAYBE:BUG: contain_cc() / contain_subject() not supported by davmail
     https://github.com/lefcha/imapfilter/issues/11
     BUG? https://github.com/lefcha/imapfilter/issues/93
@@ -71,11 +80,3 @@ BUG
       * create server rules for new messages
       * use match_*() for already received msgs
       * setup offline isync sorting
-
-
-NEED:(pending) create online rules on server
-  All emails from case updates, bugzilla, etc to _pending
-  All emails containing ‘list’ or ‘bounces’ in from to _pending
-  All emails not containing me directly on CC or To, to _pending
-  pending = acc['INBOX/_pending']:select_all()
-  todos = pending + inbox -- USE todos everywhere next

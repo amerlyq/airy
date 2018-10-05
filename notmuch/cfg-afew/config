@@ -1,0 +1,16 @@
+# vim:ft=dosini:ts=2:sw=2:sts=2
+
+## This is the default filter chain
+# [SpamFilter]
+# [KillThreadsFilter]
+# [ListMailsFilter]
+# [ArchiveSentMailsFilter]
+# [InboxFilter]
+
+; [Filter.2]
+; query = from:'noreply@company.com'
+; tags = -new;+notification;+company
+; message = Garbage notification
+
+# ===================================
+# REF:E.G. https://github.com/notmuch/notmuch/blob/master/test/T650-regexp-query.sh
