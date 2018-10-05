@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+#%USAGE:
+#%  $ ./$0 -H ./exe.smaps | column -t | sort -rnk3,3 | head -15
+#%  (majorants) $ ./$0 -H ./exe.smaps | column -t | sort -rnk3,3 | awk '{print$3,$16,$20?$20:$15}' | head -15 | column -t
+
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use Getopt::Std;
+
+my $US = $ENV{US} // "\t";
+my $RS = $ENV{RS} // "\n";
+
+my %opts=(); getopts('H', \%opts);
+my $print_headers = int($opts{H} // 0);
+
+my @headers = ("vmsz", "rss", "pss", "shcl", "shdr", "prcl", "prdr", "refd",
+    "anon", "anhp", "swap", "kpsz", "mpsz", "lock",
+    "vm_area_range", "perm", "offset", "dev", "inode", "pathname");
+
+
+sub parse_smaps {
+    my ($area, @mem, @frames);
+    while (<>) {
+        chomp;
+        if (/^[[:xdigit:]]+-[[:xdigit:]]+/) {
+            if (@mem) {
+                push @frames, [@mem, $area];
+                undef @mem;
+                undef $area;
+            }
+            $area = $_;
+        } elsif (/^(\S+):\s+(\d+)\s+kB$/) {
+            # HACK: accumulate headers table
+            # push(@headers, $1) if not @frames;
+            push @mem, int($2);
+        }
+    }
+    push @frames, [@mem, $area] if @mem;
+    return @frames;
+}
+
+
+print (join($US, @headers), $RS) if $print_headers;
+for my $fr (parse_smaps) {
+    print join($US, @$fr), $RS;
+    # print join(" ", map(sprintf('%5d',$_), @$fr[0..7]), @$fr[8..scalar(@$fr)-1]), "\n";
+}

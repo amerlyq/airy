@@ -1,0 +1,53 @@
+#!/usr/bin/gnuplot -p
+# USAGE: $ gnuplot -c ./plot-img dat-hidden > dat-hidden.png
+#
+# REF: http://www.gnuplot.info/docs_4.2/gnuplot.html#x1-13200034.1.7
+## Labels
+#   https://stackoverflow.com/questions/16208737/plot-line-with-labels
+#   https://stackoverflow.com/questions/40875810/drawing-multiple-lines-using-a-script-in-gnuplot
+## Files in dir
+#   https://stackoverflow.com/questions/45300058/how-to-change-directory-of-gnuplot-in-linux
+#   https://stackoverflow.com/questions/29969393/plot-all-files-in-a-directory-simultanously-with-gnuplot
+## stdin
+#   https://stackoverflow.com/questions/4585770/gnuplot-stdin-how-to-plot-two-lines
+# NOTE: args in gnuplot
+#   https://stackoverflow.com/questions/12328603/how-to-pass-command-line-argument-to-gnuplot
+#   +++ TUT http://zenonharley.com/gnuplot/cli/2015/06/29/graphing-data-from-the-command-line.html
+#
+# TODO:
+#   * draw line "total memory" by all processes
+#   * draw horizontal line or limit viewport by MemTotal
+
+
+set term png size 1024, 600
+set size ratio 0.5
+set size 1,1
+set xlabel "t, sec"
+set ylabel ARG2 # "RAM, kB"
+# set logscale y
+
+# cd "./dat"
+cd ARG1
+FILES = system("find -mindepth 1 -maxdepth 1 -printf '%P\\n' | sort -n")
+plot for [i=1:words(FILES)] word(FILES,i) using 1:2 with lines lw 2 title word(FILES,i) noenhanced
+
+
+# plot for [i=1:words(FILES)] word(FILES,i) using ($1+0.05):($2+0.05) title word(FILES,i) noenhanced
+# title word(FILES,i) noenhanced
+# plot "Datafile.txt" u ($2+0.05):($3+0.05):1 with labels notitle,\
+#      "" u 2:3 ev ::0::0 ls 3 "Trace 1",\
+#      "" u 2:3 ev ::1::1 ls 4 "Trace 2",\
+#      "" u 2:3 ev ::2 ls 6 notitle
+
+# plot for [data in FILES] data u 1:2 w p notitle
+# plot for [data in FILES] data u 1:2 w p pt 1 lt rgb 'black' notitle
+# plot for [i=1:words(FILES)] word(FILES,i) using 1:2 title word(FILES,i) noenhanced
+# plot for [i=1:words(FILES)] word(FILES,i) using 1:2 with linespoints pointsize 0.6 title word(FILES,i) noenhanced
+
+# LABEL = FILES
+# LABEL = system("ls -1 data_*.dat | sed -e 's/data_//' -e 's/.dat//'")
+# plot for [i=1:words(FILES)] word(FILES,i) u 3:2 title word(LABEL,i) noenhanced
+
+#%SEE: gnuplot
+# set datafile separator ","; plot '-' using 1:2 with lines, '' using 1:3 with lines
+# plot '-' using 1:2 with lines, '' using 1:3 with lines

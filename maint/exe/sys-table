@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+#%USAGE: $ ./$0 sys.perf
+#%FORMAT(out): [timestamp rss cputotal command]
+
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use Getopt::Std;
+
+my $US = $ENV{US} // "\t";
+my $RS = $ENV{RS} // "\n";
+
+my %opts=(); getopts('f', \%opts);
+my $framed = $opts{f};
+
+sub print_record { my @rec = @$_;
+    $rec[0] = sprintf("%.3f", $rec[0]);
+    print join($US, @rec), $RS ;
+}
+
+my ($tbeg, $mem, $tend, @frame);
+while (<>) {
+    chomp;
+    $_ =~ s/^\s+|\s+$//g;
+    if (/^TBEG:\s+(\d+)/) {
+        $tbeg = $1 / 1e9;
+    } elsif (/^TEND:\s+(\d+)/) {
+        $tend = $1 / 1e9;
+    } elsif (/^(MemAvailable):\s+(\d+)/) {
+        push @frame, [$2, 0, $1];
+    } elsif (/^---$/) {
+        my $dt = ($tend - $tbeg) / scalar(@frame);
+
+        my ($i, $totalrss) = (0, 0);
+        foreach my $f (@frame) {
+            unshift @$f, ($tbeg + $dt * $i);
+            $totalrss += $f->[1];
+            ++$i;
+        }
+        # BUG: total mem counts shared RSS pages multiple times
+        #   => use MemActive instead ?
+        push @frame, [$tend, $totalrss, 0, "RssTotal"];
+        print_record foreach(@frame);
+        undef @frame;
+        # HACK: use it to detect noncontiguous "$comm-$pid" splines
+        print "---\n" if $framed;
+    } else {
+        my ($pid, $rss, $cputime, $comm) = split /\s+/, $_, 4;
+        print STDERR "Err:(parse): '$_'\n" if not $comm;
+        my @ts = split /:/, $cputime, 3;
+        $cputime = (($ts[0] * 60) + $ts[1]) * 60 + $ts[2];
+        push @frame, [$rss, $cputime, $comm.'-'.$pid];
+    }
+}

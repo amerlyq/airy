@@ -1,0 +1,227 @@
+#!/usr/bin/perl
+#%NEED: $ ./sys-table sys.perf > sys.table
+#%USAGE:
+#%  $ <sys.table ./$0 -f rss -s max -n 8 -b 30000 -t ./dat/rss
+#%  $ gnuplot -c ./sys-plot-img ./dat/rss 'RSS, kB' >! ./dat/rss.png
+#%
+#%  $ <sys.table ./$0 -f d_cpu -s max -n 5 -D -t ./dat/d_cpu
+#%  $ gnuplot -c ./sys-plot-img ./dat/d_cpu 'CPU, %' >! ./dat/d_cpu.png
+#%
+#%  $ <sys.table ./$0 -f cpu -s max -a 5 -t ./dat/cpu
+#%FORMAT(in-out): [timestamp rss cputotal command]
+
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use Getopt::Long qw(GetOptions :config bundling permute
+    no_auto_abbrev no_getopt_compat no_ignore_case no_pass_through);
+use File::Path qw(make_path);
+use List::Util qw( min max sum );
+#   reduce any all none notall first
+#   max maxstr min minstr product sum sum0
+#   pairs unpairs pairkeys pairvalues pairfirst pairgrep pairmap
+#   shuffle uniq uniqnum uniqstr
+
+my $US = $ENV{US} // "\t";
+my $RS = $ENV{RS} // "\n";
+
+my %opts = (ignoreticks => 4);
+GetOptions(\%opts, 'help|h' => \&help,
+    'field|f=s', 'stat|s=s', 'derivative|D!',
+    'number|n=i', 'above|a=i', 'below|b=i',
+    'ignoreticks|i=i', 'targetdir|t=s',
+    'delimiter|d=s' => \$US
+) or die &help;
+
+sub help { open(my $fh, '<:encoding(UTF-8)', $0);
+    while (<$fh>) { print $2,"\n" if /^(.*\s)?#%(.*)/ }
+    close($fh); exit
+}
+
+sub parse_table {
+    my %samples;
+    my @fields = ("rss", "cpu");
+    while (<>) {
+        chomp;
+        $_ =~ s/^\s+|\s+$//g;
+        my @F = split /\s+/, $_, 4;
+        my $ts = shift @F;
+        my $cmd = pop @F;
+
+        for my $i (0 .. $#F) {
+            my $type = $fields[$i];
+            $samples{$type} = {} if not exists $samples{$type};
+            $samples{$type}->{$cmd} = [] if not exists $samples{$type}->{$cmd};
+            push @{$samples{$type}->{$cmd}}, [$ts, $F[$i]];
+        }
+    }
+    return %samples;
+}
+
+# NOTE: piece-wise smooth average
+#   i.e. first different Y is true, other are approximated
+sub intsmoothing { my @pts = @_;
+    my (@grp, @out);
+    my $rescale = sub { my ($t, $x) = @_;
+        my ($pt, $px) = @{$grp[0]};
+        my $dt = $t - $pt;
+        my $dxdt = $dt > 0 ? ($x - $px) / $dt : 0;
+        my $evalX = sub { my ($ct, $cx) = @{$_[0]}; [$ct, $px + $dxdt * ($ct - $pt)]; };
+        my @tmp = @grp;
+        undef @grp;
+        return map { $evalX->($_) } @tmp;
+    };
+    for my $p (@pts) {
+        if (@grp and $grp[0]->[1] != $p->[1]) {
+            push @out, $rescale->(@$p);
+        }
+        push @grp, $p;
+    }
+    push @out, $rescale->(@{$grp[$#grp]}) if @grp;
+    return @out;
+}
+
+sub derivative1 { my @pts = @_;
+    my $t0 = $pts[0]->[0];
+    my $x0 = $pts[0]->[1];
+    my $t1 = $pts[1]->[0];
+    my $x1 = $pts[1]->[1];
+    my $dx0 = ($x1 - $x0) / ($t1 - $t0);
+
+    my $fdxdt = sub { my $i = $_[0]; ($pts[$i+1]->[1] - $pts[$i-1]->[1]) / ($pts[$i+1]->[0] - $pts[$i-1]->[0]) };
+
+    my $tN = $pts[$#pts]->[0];
+    my $xN = $pts[$#pts]->[1];
+    my $tN1 = $pts[$#pts - 1]->[0];
+    my $xN1 = $pts[$#pts - 1]->[1];
+    my $dxN = ($xN - $xN1) / ($tN - $tN1);
+
+    return [$t0, $dx0], (map { [$pts[$_]->[0], $fdxdt->($_) * 100] } 1 .. ($#pts-1)), [$tN, $dxN];
+}
+
+sub eval_derivative { my ($xs, undef) = @_;
+    for my $type (keys %$xs) {
+        my $der = "d_" . $type;
+        my $x = $xs->{$type};
+        for my $cmd (keys %$x) {
+            $xs->{$der} = {} if not exists $xs->{$der};
+            $xs->{$der}->{$cmd} = [derivative1(intsmoothing(@{$x->{$cmd}}))];
+            # print scalar(@{$x->{$cmd}}),$RS;
+            # TODO: for derivative -- scale Y by dt, so it's scaled up to 100% CPU utilization
+        }
+    }
+}
+
+# REF: https://stackoverflow.com/questions/5119034/using-perl-to-find-median-mode-standard-deviation
+sub compute_stats {
+    my @pts = @_;
+    my $n = scalar (@pts);
+
+    my @times = map { $_->[0] } @pts;
+    my $t_span = max(@times) - min(@times);
+
+    my @vals  = map { $_->[1] } @pts;
+    my ($max, $min) = (max(@vals), min(@vals));
+    my $mean = sum(@vals) / $n;
+    my $sqdev = sqrt(abs(sum(map { $_ ** 2 } @vals) / $n - $mean));
+
+    my $n_mid = int $n/2;
+    my @vals_sorted = sort @vals;
+    my $median = (@vals_sorted % 2)
+        ? $vals_sorted[ $n_mid ]
+        : ($vals_sorted[$n_mid-1] + $vals_sorted[$n_mid]) / 2;
+
+    return {
+        max => $max, min => $min, mean => $mean,
+        sqdev => $sqdev, med => $median,
+        t_span => $t_span,
+    };
+}
+
+sub compute_stats_all {
+    my %samples = @_;
+    my %stats;
+    for my $type (keys %samples) {
+        $stats{$type} = {} if not exists $stats{$type};
+        for my $cmd (keys %{$samples{$type}}) {
+            $stats{$type}->{$cmd} = compute_stats(@{$samples{$type}->{$cmd}});
+        }
+    }
+    return %stats;
+}
+
+sub delete_nonmatch { my ($samples, $stats) = @_;
+    return if not exists $opts{field};
+    my $f = $opts{field};
+    my $x = $samples->{$f};
+    my $w = $stats->{$f};
+
+    return if not exists $opts{stat};
+    my $s = $opts{stat};
+
+    if (exists $opts{below}) {
+        delete $x->{$_} for grep { $w->{$_}->{$s} > $opts{below} } keys %$x;
+    }
+    if (exists $opts{above}) {
+        delete $x->{$_} for grep { $w->{$_}->{$s} < $opts{above} } keys %$x;
+    }
+    if (exists $opts{number}) {
+        my @cmds = sort { $w->{$b}->{$s} <=> $w->{$a}->{$s} } keys %$x;
+        delete $x->{$_} for @cmds[$opts{number} .. $#cmds];
+    }
+}
+
+sub save_sample { my ($sample, $outdir) = @_;
+    return if not %$sample;
+    make_path($outdir, { chmod => 0755 }) unless -d $outdir;
+    for my $cmd (keys %$sample) {
+        open my $fh, ">", $outdir . '/' . $cmd;
+        print $fh join($RS, map { sprintf "%.3f${US}%.3f", @$_ } @{$sample->{$cmd}});
+        close $fh;
+    }
+}
+
+sub print_stats { my ($stats, $f) = @_;
+    my $w = $stats->{$f};
+    my @cmds;
+    if (exists $opts{stat}) {
+        my $s = $opts{stat};
+        @cmds = sort { $w->{$b}->{$s} <=> $w->{$a}->{$s} } keys %$w;
+    } else {
+        @cmds = sort keys %$w;
+    }
+    my @keys = sort keys %{$w->{$cmds[0]}};
+    print join($US, @keys, "comm-pid"), $RS;
+
+    for my $cmd (@cmds) {
+        print join($US, map { sprintf "%.2f", $w->{$cmd}->{$_} } @keys), $US, $cmd, $RS;
+    }
+}
+
+my %samples = parse_table();
+
+## Filter-out short living process <=100mS (E.G. measurement script itself)
+if (-1 < $opts{ignoreticks}) {
+    for my $f (keys %samples) {
+        my $x = $samples{$f};
+        delete $x->{$_} for grep { scalar(@{$x->{$_}}) <= $opts{ignoreticks} } keys %$x;
+    }
+}
+
+eval_derivative \%samples if $opts{derivative};
+
+my %stats = compute_stats_all %samples;
+delete_nonmatch(\%samples, \%stats);
+%stats = compute_stats_all %samples;
+
+if (exists $opts{field}) {
+    print_stats(\%stats, $opts{field});
+    save_sample($samples{$opts{field}}, $opts{targetdir}) if $opts{targetdir};
+} else {
+    for (sort keys %stats) {
+        print $_, $RS;
+        print_stats(\%stats, $_);
+        print $RS;
+        save_sample($samples{$_}, $opts{targetdir}.'/'.$_) if $opts{targetdir};
+    }
+}

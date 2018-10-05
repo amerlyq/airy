@@ -1,0 +1,218 @@
+#!/usr/bin/perl
+#%USAGE:
+#%  $ ./$0 -p -s -l 7000 memusage | sort -rnk1,1 H -n20 T
+#%  $ <memusage ./$0 -psSn3 -l1 | sort -rnk1,1 H -n20 T
+#%  $ <memusage ./$0 -psn8 -l1 | sort -rnk1,1 H -n20 T
+
+use warnings FATAL => 'all';
+# BET:FAIL: use autodie qw(:all);
+use autodie;
+use strict;
+use v5.14;  # for s///r
+use Getopt::Std;
+use File::Path qw(make_path);
+use List::Util qw( min max sum );
+#   reduce any all none notall first
+#   max maxstr min minstr product sum sum0
+#   pairs unpairs pairkeys pairvalues pairfirst pairgrep pairmap
+#   shuffle uniq uniqnum uniqstr
+
+# WARN:(0.01%): merging of unrelated graphs
+#   << if process with same pid+comm respawns between 0.1s of monitoring
+# [_] TODO: filter processes with pgid=monitoring-script
+#   => pass -p/-g 11,128,587 for pid/pgid list == filter only those pids/pgids
+#   => pass -P/-G for filter-out
+#   ALT: filter-out process with uptime<1s and 1-2 graph points
+# [_] ENH:(-b): number of ignored gaps when splitting, 0=always, -1=continuous
+# [_] DEV: filter-out all process with monotonous memory with low deviation
+#   keep only: large memory value and large speed of inc/dec
+# [_] TODO: disable MemAvailable
+
+## TODO:DEV: long options
+# b = break continuous (comm+pid) lines on gaps in top
+# i = ignore short-living (< i * 100mS) processes
+# M = total RAM on system
+# o = output dir for plot data
+# S = include MemAvailable and MemTopTotal
+my %opts=(); getopts('M:i:l:n:psSt:', \%opts);
+my $breaktop = $opts{b};
+my $lowmem = int($opts{l} // 0);
+my $memtotal = int($opts{M} // 155268);
+my $limitnum = int($opts{n} // 0);
+my $ignoreticks = int($opts{i} // 1);
+my $outputdir = $opts{t} // './dat';
+my $dosave = int($opts{s} // 0);
+my $memstats = int($opts{S} // 0);
+my $printstat = int($opts{p} // 0);
+
+
+sub parse_memusage {
+    my ($tbeg, $mem, $tend, %top, @frames);
+    while (<>) {
+        if (/^TBEG:\s+(\d+)/) {
+            $tbeg = $1 / 1e9;
+        } elsif (/^MemAvailable:\s+(\d+)/) {
+            $mem = $1;
+        } elsif (/^\s*(?<pid>\d+)\s+(?<rss>\d+)\s+(?<cputime>\S.*)\s+(?<comm>\S.*)\s*$/) {
+            # $name = used as uid for process and label for graph
+            my $name = $+{comm} .'-'. $+{pid};
+            $top{$name} = [$+{rss}];
+        } elsif (/^TEND:\s+(\d+)/) {
+            $tend = $1 / 1e9;
+        } elsif (/^---$/) {
+            my $dt = ($tend - $tbeg) / scalar(keys %top);
+            my ($i, $sum) = (0, 0);
+            foreach my $k (keys %top) {
+                unshift @{$top{$k}}, ($tbeg + $dt * $i++);
+                $sum += $top{$k}->[1];
+            }
+            $top{MemAvailable} = [$tbeg, $mem] if $memstats;
+            # BUG: total mem counts shared RSS pages multiple times
+            #   => use MemActive instead ?
+            $top{MemTopTotal} = [$tbeg, $sum] if $memstats;
+            push @frames, {%top};
+            undef %top;
+        } else {
+            print STDERR "Err:(parse): '$_'\n";
+        }
+    }
+    return @frames;
+}
+
+
+sub extract_graphs {
+    my @frames = @_;
+    my (%graphs, %active);  # [{ "nm1" => [[line1],[line2], ..} ..]
+    my $move_finalized_graph = sub {
+        for my $name (@_) {
+            $graphs{$name} = [] if not exists $graphs{$name};
+            # DEBUG: print ($name, "\n") if @{$graphs{$name}} > 0;
+            push @{$graphs{$name}}, delete $active{$name};
+        }
+    };
+    for my $top (@frames) {
+        if ($breaktop) {
+            # NOTE: find all active[uid] absent in current $top
+            my @ends = grep { not exists $top->{$_} } keys %active;
+            # DEBUG: print join(" ", @ends), "\n";
+            $move_finalized_graph->(@ends);
+        }
+        for my $name (keys %$top) {
+            # unconditionally append plot data to hash{uid}
+            $active{$name} = [] if not exists $active{$name};
+            push @{$active{$name}}, $top->{$name};
+            # DEBUG: print $name, " ", $top->{$name}->[0], "\n";
+        }
+    }
+    # NOTE: store all remaining active into graph
+    $move_finalized_graph->(keys %active);
+    # DEBUG: print scalar(keys %graphs), "\n";
+    return %graphs;
+}
+
+
+# NOTE: if array > 2 elements => add to uid sfx _0 _1 ...
+sub flatten_graph_sfx {
+    my %graphs = @_;
+    for my $name (keys %graphs) {
+        my $n = @{$graphs{$name}};
+        if ($n > 1) {
+            # print $n, " ", $name, "\n";
+            my $i = 1;
+            for (@{$graphs{$name}}) {
+                my $k = $name .'_'. $i++;
+                $graphs{$k} = $_;
+                # print $k, " ", $name, "\n";
+            }
+            delete $graphs{$name};
+        } else {
+            $graphs{$name} = $graphs{$name}->[0];
+        }
+    }
+    # print scalar(keys %graphs), "\n";
+    return %graphs;
+}
+
+
+# https://stackoverflow.com/questions/5119034/using-perl-to-find-median-mode-standard-deviation
+sub compute_stats { my %graphs = @_;
+    my %stats;
+    for my $name (keys %graphs) {
+        my @points = @{$graphs{$name}};
+        my $n = scalar (@points);
+
+        my @times = map { $_->[0] } @points;
+        my $t_span = max(@times) - min(@times);
+
+        my @vals  = map { $_->[1] } @points;
+        my ($max, $min) = (max(@vals), min(@vals));
+        my $mean = sum(@vals) / $n;
+        my $sqdev = sqrt(sum(map { $_ ** 2 } @vals) / $n - $mean);
+
+        my $n_mid = int $n/2;
+        my @vals_sorted = sort @vals;
+        my $median = (@vals_sorted % 2)
+            ? $vals_sorted[ $n_mid ]
+            : ($vals_sorted[$n_mid-1] + $vals_sorted[$n_mid]) / 2;
+
+        $stats{$name} = {
+            max => $max, min => $min, mean => $mean,
+            sqdev => $sqdev, med => $median,
+            t_span => $t_span,
+        };
+
+    }
+    return %stats;
+}
+
+sub print_stats { my %stats = @_;
+    # Headings
+    my @keys = sort keys %{$stats{(sort keys %stats)[0]}};
+    # my @keys = keys %stats;
+    # @keys = keys %{$stats{$keys[0]}};
+    print join("\t", @keys, "comm-pid"), "\n";
+
+    for my $name (sort keys %stats) {
+        my %st = %{ $stats{$name} };
+        print join("\t", map { int $st{$_} } @keys), "\t", $name, "\n";
+        # printf "%d\t%s\n", $st{max}, $name;
+        # print $graphs{$name}, "\n";
+    }
+    return %stats;
+}
+
+sub save_graphs { my %graphs = @_;
+    return if not %graphs;
+    make_path($outputdir, { chmod => 0755 }) unless -d $outputdir;
+    for my $name (keys %graphs) {
+        my $buf = join("\n", map { sprintf "%.3f %d", $_->[0], $_->[1] } @{$graphs{$name}});
+        open my $fh, ">", $outputdir . '/' . $name;
+        print $fh $buf;
+        close $fh;
+    }
+    return %graphs;
+}
+
+my %graphs = flatten_graph_sfx extract_graphs parse_memusage;
+my %stats = compute_stats %graphs;
+
+## Filter-out short living process <=100mS (E.G. measurement script itself)
+sub delete_shortliving {
+    delete $graphs{$_} for grep { scalar(@{$graphs{$_}}) <= $ignoreticks } keys %graphs;
+}
+
+sub delete_lowmem { my %graphs = @_;
+    my @keep = grep { $stats{$_}->{max} >= $lowmem } keys %graphs;
+    if ($limitnum) {
+        @keep = sort { $stats{$b}->{max} <=> $stats{$a}->{max} } @keep;
+        @keep = @keep[0 .. $limitnum - 1];
+    }
+    return map { $_ => $graphs{$_} } @keep;
+}
+
+delete_shortliving if -1 < $ignoreticks;
+%graphs = delete_lowmem %graphs if $lowmem;
+%stats = compute_stats %graphs;
+
+print_stats %stats if $printstat;
+save_graphs %graphs if $dosave;

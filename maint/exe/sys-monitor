@@ -1,0 +1,20 @@
+#!/bin/sh
+#%USAGE: from flashdrive $ sh sys-monitor &
+#%  => then $ fg $ and stop by <C-c>
+set -eu
+
+f=/data/sys-$(date +%Y%m%d_%H%M%S).perf
+dt=100000  # microseconds
+
+# BAD: "pss" is most correct but it's not available, use "rss"
+# BAD: "cputimes" not supported on some embedded
+# WARN: "/proc/timer_list" requires "root" for linux>2010
+#   MAYBE: using "date" for timestamp is more performant ?
+#   <= (one syscall instead of many for printing whole table)
+while usleep "$dt"; do
+  awk '3==NR{print"TBEG:",$3;exit}' /proc/timer_list
+  awk '$1=="MemAvailable:"{print;exit}' /proc/meminfo
+  ps -Ao pid,rss,cputime,comm | awk '$2==0||NR==1{next} $2~/m$/{$2=$2*1024}1'
+  awk '3==NR{print"TEND:",$3;exit}' /proc/timer_list
+  echo ---
+done > "$f"
