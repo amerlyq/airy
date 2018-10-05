@@ -37,8 +37,8 @@ USAGE
       $ sudo btrfs property get ~/.snapshots/<snapshot_num>/snapshot
         ro=false
     Batch remove
-      $ ls X{} sudo btrfs property set ~/.snapshots/{}/snapshot ro false
-      $ ls X{} sudo btrfs property get ~/.snapshots/{}/snapshot
+      $ find ~/.snapshots -mindepth 1 -maxdepth 1 -type d -execdir sudo btrfs property set {}/snapshot ro false \;
+      $ find ~/.snapshots -mindepth 1 -maxdepth 1 -type d -execdir sudo btrfs property get {}/snapshot \;
       $ cd ~/.snapshots
       $ rm -rf */snapshot/common_api
       $ rm -rf */snapshot/.cabal/packages

@@ -1,0 +1,10 @@
+#!/bin/bash
+#%SUMMARY: find files with duplicate basenames (all project src must have distinct names)
+#%USAGE: $ ./$0 /path/to/pj
+set -euo pipefail
+paths=( "$@" )
+skip=( CMakeLists.txt Makefile .gitignore )
+find_allowed(){ find "${paths[@]}" -type d \( -name '_*' -o -name '*Test' -o -name '*Tests' \) -prune -o -type f "$@"; }
+find_nonmake(){ find_allowed -printf '%f\n' |sort|uniq -d|grep -vE "^($(IFS=$'|'; echo "${skip[*]}"))$"|sed 's|.*|/&$|'; }
+group_basename(){ awk -F/ '{print$NF"\t"$0}' | sort | cut -f2- | awk -F/ 'a&&$NF!=a{print""} {print;a=$NF}'; }
+find_allowed -printf '%P\n' | grep -f <(find_nonmake) | group_basename

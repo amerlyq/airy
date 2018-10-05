@@ -1,0 +1,11 @@
+#!/bin/bash
+#%SUMMARY: make headers inside cwd local "" and outside cwd external <>
+#%USAGE: $ cd /path/to/pj/cmpt/src && ./$0
+set -euo pipefail
+
+#   $ S=@ r.sed-dir "$(set -- *.hpp; IFS=$'|'; echo "^(#include)\s+<($*)>")" '\1 "\2"' -r
+#   $ S=@ r.sed-dir "$(cd ./src; set -- *.hpp; IFS=$'|'; echo "^(#include)\s+[<\"](.+/)?($*)[\">]")" '\1 "\3"' -r
+
+# ALSO: batch rename moved headers
+#   $ r.sed-dir '<Some/Interface/Prefix/[^/[:blank:]]+/' '<' -r
+#   $ S=@ r.sed-dir "$(cd ./src; set -- *.hpp; IFS=$'|'; echo "^(#include)\s+[<\"]Some/($*)[\">]")" '\1 <\2>' -r

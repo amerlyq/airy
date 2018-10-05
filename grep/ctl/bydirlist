@@ -1,0 +1,2 @@
+#!/bin/bash -eu
+exec grep -rwFf <(find "$@" -type f -name '*.hpp' -printf '%f\n') --exclude-dir '_*' --exclude 'tags'

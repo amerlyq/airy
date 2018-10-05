@@ -1,0 +1,19 @@
+Statistics
+  $ ... | sort -rn H
+  $ ... | jq -s min
+  $ ... | jq -s max
+  $ ... | jq -s add/length
+  ALT: $ | perl -M'List::Util qw(sum max min)' -MPOSIX -0777 -a -ne 'printf "%-7s : %d\n"x4, "Min", min(@F), "Max", max(@F), "Average", sum(@F)/@F,  "Median", sum( (sort {$a<=>$b} @F)[ int( $#F/2 ), ceil( $#F/2 ) ] )/2;'
+  ALT: |aur/num| http://www.numcommand.com/  https://github.com/numcommand/num
+
+How-to
+  Extract timestamps
+    $ gunzip -c time.log.gz | awk '{print$2}' | date +%s.%N -f-
+  Annotate timestamps with delta time in mS
+    $ ... | awk -F\. 'NR>1{d=($1-s)*1000 + ($2-n)/1000000; print$0,d} {s=0+$1; n=0+$2}'
+  Look at graph plot
+    $ ... | gnuplot -p -e 'plot "/dev/stdin"'
+  Filter all annotated entries by ((dt > 50mS)) and find delta time of peaks occurance
+    $ ... | awk '$2>50{print$1}' | awk -F\. 'NR>1{d=($1-s)*1000 + ($2-n)/1000000; print$0,d} {s=0+$1; n=0+$2}'
+  Find median period
+    $ ... |sort -n|awk '{a[NR]=$0}END{if(NR%2==1)print a[int(NR/2)+1];else print(a[NR/2-1]+a[NR/2])/2}'
