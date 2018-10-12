@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+f=$1
+
+readelf -S "$f" \
+| sed -n 's/\[ /\[0/; /\[00\]/d; /\[[0-9]/p' | tac \
+| gawk -vo=$(stat -Lc%s "$f") '
+  {s=o-strtonum("0x"$5);o-=s;printf"%8s %s %s\n",s,$1,$2}
+' | sort -rn | grep -v \.debug

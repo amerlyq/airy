@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+for f; do
+  for tp in LLVM Google Chromium Mozilla WebKit; do
+    clang-format -style="$tp" "$f" > "${f%.*}_${tp}.${f##*.}"
+  done
+done

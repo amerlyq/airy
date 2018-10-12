@@ -1,0 +1,68 @@
+# vim:ft=yaml
+#%USAGE: $ clang-format -style=file -i some.cpp
+#%REF: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+#%HACK: skip formatting
+#%  int formatted_code;
+#%  // clang-format off
+#%      void    unformatted_code  ;
+#%  // clang-format on
+#%  void formatted_code_again;
+#%
+Language: Cpp
+Standard: Cpp11
+
+# NOTE: after modifications it's nearer to WebKit
+BasedOnStyle: LLVM
+
+AlignAfterOpenBracket: DontAlign
+AlignEscapedNewlines: DontAlign
+
+# NOTE: one-liners are error-prone to attention sneak off
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+
+AlwaysBreakAfterReturnType: AllDefinitions
+AlwaysBreakTemplateDeclarations: true
+# (clang8): AlwaysBreakTemplateDeclarations: Yes
+
+BinPackArguments: false
+BinPackParameters: false
+
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Linux
+
+# BreakBeforeBraces: Custom
+# BraceWrapping:
+#   AfterClass:      true
+#   AfterFunction:   true
+#   AfterStruct:     true
+#   AfterUnion:      true
+#   SplitEmptyFunction: false
+#   SplitEmptyRecord: false
+
+# old / new
+BreakBeforeInheritanceComma: true
+BreakConstructorInitializersBeforeComma: true
+BreakConstructorInitializers: BeforeComma
+# (clang8): BreakInheritanceList: BeforeComma
+
+# Many developers complain about 80 chars
+ColumnLimit: 120
+CompactNamespaces: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+IndentWidth: 4
+IndentPPDirectives: AfterHash
+MaxEmptyLinesToKeep: 2
+
+PointerAlignment: Middle
+ReflowComments: false
+SpaceAfterTemplateKeyword: false
+SpacesBeforeTrailingComments: 2
+SpacesInContainerLiterals: false
+
+TabWidth: 4
+UseTab: Never
