@@ -10,6 +10,15 @@
 #%  // clang-format on
 #%  void formatted_code_again;
 #%
+#%DEBUG: get comparison table for options which differ
+#%  $ for t in LLVM Google Chromium Mozilla WebKit file; do clang-format -style=$t -dump-config > $t; done
+#%  $ fv(){ grep -viE '\b(regex|priority):|^objc' | cut -d: -f2- | sed 's/^\s*//'; }
+#%  $ nocorrect paste -d$'\t' <(<file grep -viE '\b(regex|priority):|^objc'|sed 's/:\s\+/:\t/') <(fv<WebKit) <(fv<Mozilla) <(fv<LLVM) <(fv<Google) <(fv<Chromium) | grep -vP '(?:^|\s)([^\t]+)\t\1\t\1\t\1\t\1\t\1' | sed 's/\btrue\b/+/g; s/\bfalse\b/-/g' | column -ts$'\t'
+#%DEBUG: compare number of differences with each style
+#%  $ for t in LLVM Google Chromium Mozilla WebKit; do echo $t $(/usr/bin/diff -u file $t|grep '^[+-]'|grep -viE '\b(regex|priority):|^objc' | wc -l); done
+#%DEBUG: statistics on project line length with quantile 40
+#%  $ find -name '_*' -prune -o \( -name '*.cpp' -o -name '*.hpp' \) -exec awk -vq=40 '$0!~/^\s*$/ && $1!~/^\/\// {print int(length($0)/q+1)*q}' {} + |sort -n|uniq -c
+#%
 Language: Cpp
 Standard: Cpp11
 
@@ -76,7 +85,10 @@ BreakConstructorInitializers: BeforeComma
 
 # Many developers complain about 80 chars, especially with long C++ identifiers
 ColumnLimit: 120
-CompactNamespaces: true
+
+# When using "Linux" braces wrapping, it has no effect anyway
+CompactNamespaces: false
+
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 
 # All indents must be multiple of "4" so pressing <Tab> allows developers align it easily
@@ -88,7 +100,6 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 IndentWidth: 4
-TabWidth: 4
 UseTab: Never
 
 # Nested define directives must be indented by 1 space each -- to emphasize and attract attention
@@ -96,7 +107,8 @@ UseTab: Never
 IndentPPDirectives: AfterHash
 
 # Useful after headers list, between classes and unrelated functions
-MaxEmptyLinesToKeep: 2
+# BUT: for nicely distributed classes/functions by files default "1" must be enough
+# MaxEmptyLinesToKeep: 2
 
 # I equally hate all three variant of alignment, but "Middle" can be barely tolerated by everybody.
 #   => now after long years "Middle" starts looking for me not simply tolerated, by even nicer then other two...
@@ -104,15 +116,14 @@ MaxEmptyLinesToKeep: 2
 #   - i.e. both "Thread & thr" and "Thread&& thr" are exclusively ugly, you can't have both of them nice at same time
 #   + I better stick to uniformaly " & " and " && " -- everywhere separated by spaces
 #   + separate "&" has an advantage of emphasized ref -- you won't miss type looking with sliding glance
-PointerAlignment: Middle
+# PointerAlignment: Middle
+# BUT: instead use more familiar to devs with less ugly refs "Left" variant
+PointerAlignment: Left
 
 # Only developers aesthetic sense must influence comments layout, not lifeless dumb algorithms
-ReflowComments: false
+# BUT:BET:(stick to defaults): -- let it reflow and simply remove ugly comments afterwards
+# ReflowComments: false
 
 # All trailing comments must be emphasized with spaces before and after, to distinct from scraps of old refactoring
 #  e.g. "func();  // comment"
 SpacesBeforeTrailingComments: 2
-
-# No other spaces messing with mental perception of statements, please
-SpaceAfterTemplateKeyword: false
-SpacesInContainerLiterals: false
