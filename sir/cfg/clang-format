@@ -2,6 +2,11 @@
 #%USAGE: $ clang-format -style=file -i some.cpp
 #%REF: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 #%REF: https://www.kernel.org/doc/html/v4.10/process/coding-style.html
+#%CMP:
+#%  * https://arne-mertz.de/2016/11/trailing-return-types-everywhere/
+#%  * http://slashslash.info/2018/02/a-foolish-consistency/
+#%  * https://levelofindirection.com/blog/east-end-functions.html
+#%  * https://bugs.llvm.org/show_bug.cgi?id=34220
 #%
 #%HACK: skip formatting
 #%  int formatted_code;
@@ -31,8 +36,10 @@ AlignAfterOpenBracket: DontAlign
 # Despite human's desire to align everything, re-aligns are harder to maintain and review diffs
 AlignEscapedNewlines: DontAlign
 
+# Prefer to split multiline args instead of moving all of them on next single line
+AllowAllParametersOfDeclarationOnNextLine: false
+
 # One-liners are error-prone to attention sneak off, and mechanic errors being skipped by sliding glances
-AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Empty
 
@@ -66,16 +73,24 @@ BreakBeforeBinaryOperators: NonAssignment
 # cons:
 #   - one-liner definitions of class methods in .cpp file are looking better with "{" on same line, bear with it
 #   - compressed namespaces are better then multiline, but as I prefer to remove namespaces completely -- it's no problem
-BreakBeforeBraces: Linux
-## ALT: custom more fine-tuned variant:
-# BreakBeforeBraces: Custom
-# BraceWrapping:
-#   AfterClass:      true
-#   AfterFunction:   true
-#   AfterStruct:     true
-#   AfterUnion:      true
-#   SplitEmptyFunction: false
-#   SplitEmptyRecord: false
+# BreakBeforeBraces: Linux
+## ALT: custom more fine-tuned variant (for the sake of CompactNamespaces):
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass:            true
+  AfterControlStatement: false
+  AfterEnum:             false
+  AfterExternBlock:      false
+  AfterFunction:         true
+  AfterNamespace:        false
+  AfterStruct:           false
+  AfterUnion:            true
+  BeforeCatch:           false
+  BeforeElse:            false
+  IndentBraces:          false
+  SplitEmptyFunction:    false
+  SplitEmptyNamespace:   false
+  SplitEmptyRecord:      false
 
 # Special lists delimited by ":" and "," are more emphasized at the start of string
 BreakBeforeInheritanceComma: true
@@ -84,10 +99,11 @@ BreakConstructorInitializers: BeforeComma
 # (clang8): BreakInheritanceList: BeforeComma
 
 # Many developers complain about 80 chars, especially with long C++ identifiers
+# ColumnLimit: 80
 ColumnLimit: 120
 
 # When using "Linux" braces wrapping, it has no effect anyway
-CompactNamespaces: false
+CompactNamespaces: true
 
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 
@@ -98,7 +114,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 #   !! for C++ indent "2" makes code looking messy blob instead of organized structure
 #   !! if you code is too far on right as you need too much indent levels -- fix you code, not indent width
 ConstructorInitializerIndentWidth: 4
-ContinuationIndentWidth: 4
+ContinuationIndentWidth: 8
 IndentWidth: 4
 UseTab: Never
 
