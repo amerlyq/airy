@@ -171,10 +171,11 @@ class ag(Command):
 
 
 class doc(Command):
-    lst = {'b': 'DEBUG', 'c': 'comment', 'd': 'DEV', 'e': 'EXAMPLES', 'f': 'FUTURE',
-           'i': 'INFO', 'h': 'HACK', 'g': 'LEGEND', 'l': 'LIOR', 'm': 'MAINT',
-           'n': 'NOTE', 's': 'SYNERGY', 't': 'TODO', 'u': 'USAGE'}
-    ext = ['.nou', '.otl', '.txt', '']
+    lst = {'a': 'ARCH', 'b': 'DEBUG', 'c': 'comment', 'd': 'DEV', 'e': 'EXAMPLES',
+           'f': 'FUTURE', 'i': 'INFO', 'h': 'HACK', 'g': 'LEGEND', 'l': 'LIOR',
+           'm': 'MAINT', 'n': 'NOTE', 'r': 'README', 's': 'SYNERGY',
+           't': 'TODO', 'u': 'USAGE'}
+    ext = ['.nou', '.otl', '.md', '.txt', '']
     loci = ['doc', 'docs', '_doc', '']
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories
