@@ -92,7 +92,10 @@ for i in "${!inputs[@]}"; do
   # NOTE: working! MAYBE: due to rmmod+replug
   # BUG: non-deterministic order of created virtual js0/js1
   # --mimic-xpad -- interferes with some games
-  xboxdrv --silent --evdev "${inputs[i]}" --config="$evdev_cfg" "${cfg_N[@]}" & fork_list+=( $! )
+  # --mimic-xpad-wireless
+  xboxdrv --silent --evdev "${inputs[i]}" --config="$evdev_cfg" "${cfg_N[@]}" \
+    --next-config --config="$evdev_cfg" --config="$mouse_cfg" \
+    & fork_list+=( $! )
   set +x
   sleep 0.5
 done

@@ -1,6 +1,10 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/cfgsetup
 
+# NOTE? required for gamepad to work in Wine
+# DEBUG: $ wine control joy.cpl
+# id | grep -qwF input || sudo gpasswd -a "${LOGNAME:?}" input
+
 # linkcp -ct /etc/conf.d xboxdrv
 # svc_activate -erR xboxdrv.service
 

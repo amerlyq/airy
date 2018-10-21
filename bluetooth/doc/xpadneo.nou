@@ -1,0 +1,9 @@
+Connect
+  $ sudo modprobe hid-xpadneo
+  $ echo 1 | sudo tee /sys/module/bluetooth/parameters/disable_ertm
+  OR: /etc/modprobe.d/xbox_bt.conf
+    options bluetooth disable_ertm=1
+  $ bluetoothctl $ -> help -> power on -> devices
+    OR: scan on -> {pair,trust,connect} C8:3F:26:XX:XX:XX
+    <= push the connect button on upper side of the gamepad, and hold it down, until the light starts flashing fast
+    => gamepad rumble

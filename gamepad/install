@@ -12,3 +12,9 @@ aur_inst xpadneo-dkms-git
 loc_inst -P 'xboxdrv-airy-git' ./PKGBUILD
 # aur_inst xboxdrv-stable-git
 # aur_inst xboxdrv-develop-git
+
+# NOTE: add xinput support into Wine
+# USAGE: LD_PRELOAD='/usr/lib32/koku-xinput-wine.so /usr/lib32/koku-xinput-wine64.so' wine "$@"
+# aur_inst koku-xinput-wine
+# REF: https://bbs.archlinux.org/viewtopic.php?id=188904
+# ALT: https://github.com/kozec/dumbxinputemu
