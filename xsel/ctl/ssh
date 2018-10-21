@@ -4,7 +4,11 @@ loc=${TMPDIR:-/tmp}/xsel-shared.local
 rem='/tmp/xsel-shared.remote'
 # rem='127.0.0.1:2224'
 
+# WARN:(StreamLocalBindUnlink):
+#   * NEED: openssh>=6.7 :: https://bugzilla.redhat.com/show_bug.cgi?id=1366400
+#   * NEED: enable on server :: https://lists.mindrot.org/pipermail/openssh-unix-dev/2016-July/035184.html
+#     $ echo StreamLocalBindUnlink yes >> /etc/ssh/sshd_config && sudo pkill -SIGHUP sshd
 # ATT: ssh returns code of last executed cmd at remote host
 exec r.xsel-shared -L "$loc" -- \
-  ssh -R "$rem:$loc" \
+  ssh -o 'StreamLocalBindUnlink=yes' -R "$rem:$loc" \
   "$@"

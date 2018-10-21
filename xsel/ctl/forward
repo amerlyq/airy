@@ -1,5 +1,7 @@
 #!/bin/bash
 set -euo pipefail
+# MODEL: remote = [xsel -> socat -> remote.sock -> sshd]
+#   ===> [ssh -> local.sock -> socat -> xsel] = local
 
 conn=${1:?Need: user@host[:port]}
 [[ $conn =~ @ ]] || conn=$conn@$USER
@@ -7,7 +9,9 @@ conn=${1:?Need: user@host[:port]}
 
 ruser=${conn%%@*}
 rsock=/tmp/xsel-shared.remote
-# lsock=${TMPDIR:-/tmp}/xsel-shared.local   # WTF: why it doesn't work despite looking right
-lsock=/tmp/$ruser/xsel-shared.local         # WTF: how it works at all ?
+## WTF: why it doesn't work despite looking right MAYBE: conflict with local socat ?
+# lsock=${TMPDIR:-/tmp}/xsel-shared.local
+## WTF: how it works at all with wrong path ?
+lsock=/tmp/$ruser/xsel-shared.local
 
 exec ssh -O forward -R "$rsock:$lsock" -S "${TMPDIR:-/tmp}/$conn" "$conn"
