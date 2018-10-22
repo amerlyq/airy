@@ -8,8 +8,20 @@ ALG: demo screen capture
 
 Capture screen
   https://trac.ffmpeg.org/wiki/Capture/Desktop
+  USAGE:
     $ ffmpeg -video_size 1920x1080 -framerate 30 -f x11grab -i "$DISPLAY"+1080,0 -c:v libx264 -crf 0 -preset ultrafast -y output.mkv
+    $ ffmpeg -f alsa -ac 1 -i pulse -video_size 1920x1080 -framerate 30 -f x11grab -i "$DISPLAY"+1080,0 -c:v libx264 -crf 0 -preset ultrafast -y output.mkv
     $ mpv output.mkv
+  cut video segments and concat them
+    $ ffmpeg -ss 00:01:51 -i output.mp4 -t 00:00:14 -avoid_negative_ts make_zero -fflags +genpts -y A.mp4
+      => reencode small clips to get precise start-end frames
+    $ ffmpeg -ss 00:03:42 -i output.mp4 -to 01:02:45 -c copy -avoid_negative_ts make_zero -fflags +genpts -y B.mp4
+      ... (repeat for each approximate segment required)
+    Fix audio sync by padding
+      https://stackoverflow.com/questions/35416110/ffmpeg-concat-video-and-audio-out-of-sync
+      $ ffmpeg -i A.mp4 -af apad -c:v copy -shortest -avoid_negative_ts make_zero -fflags +genpts Ap.mp4
+      BAD: still a/v is out-of-sync
+    $ ffmpeg -f concat -safe 0 -i <(find . -name '?p.mp4' -printf "file '$PWD/%p'\n" | sort) -c copy -y sum.mp4
   convert video: less size, speed x2 (BAD? must be separate runnings)
     $ ffmpeg -i output.mkv -filter:v "setpts=0.25*PTS" speed4x.mp4
     $ ffmpeg -i speed4x.mp4 -vf unsharp sharp.mp4
