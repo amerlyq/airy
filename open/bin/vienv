@@ -2,7 +2,7 @@
 
 case $1 in -r) bReplace=1; shift ;; esac
 shl=$1
-NM=${2:-$(tempfile)}
+NM=${2:-$(mktemp)}
 env='#!/usr/bin/env'
 
 if [[ $bReplace || ! -f $NM ]]; then

@@ -1,10 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-args=()
-[[ -t 0 ]] || args+=( /dev/stdin )
-args+=( "$@" )
-
 # OR: ${DISPLAY-}
 if xset q &>/dev/null; then
   if hash xdot &>/dev/null; then
