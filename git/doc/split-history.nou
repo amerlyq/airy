@@ -73,6 +73,43 @@ HACK change wrong date (NOTE: order of _pull branch_ is independent)
   # better also make copy | or clone with '--no-hardlinks'
     $ git filter-branch --force --prune-empty --index-filter 'git rm -rf --cached --ignore-unmatch path/rel/folder' -- HEAD
 
+
+
+%%%% ALT (multi-dir)
+  REF
+    ++ https://dalibornasevic.com/posts/2-permanently-remove-files-and-folders-from-git-repo
+    https://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history
+  Clone local repo
+    $ mkdir new_repo && cd new_repo
+    $ git clone --local --dissociate --no-hardlinks ../origin .
+    ALT:BAD:(remote refs and pull-requests will prevent history from being cleaned up):
+      $ git clone --mirror --local --dissociate --no-hardlinks ../origin .git
+      $ git config --bool core.bare false
+      ALSO:BAD: pull-requests may interfere with bitbucket's pull requests system
+    $ git checkout master
+    NOTE:(remote branches refs will disappear):
+      $ git remote rm origin
+      OR: $ git remote rename origin upstream
+  Remove all unnecessary folders and make it build/test/run/deploy
+    $ rm -rf ...
+  Compose list of required files
+    $ find . -name .git -prune -o -type f -exec bash -euc 'echo; git --no-pager log --follow --format="" --name-only -- "$0" | sort -u' {} \; >! ../project_renames.txt
+  Manually remove all unnecessary/wrong entries from file list
+    WARN: test grep-filter on current commit -- and add files manually if some where skipped (i.e. git log --follow -- empty history)
+    $ git ls-files | grep -vxFf ../project_renames.txt
+  Filter-out history from unrequired files
+    $ git filter-branch --prune-empty --index-filter 'git ls-files -z | grep -vzxFf ../project_renames.txt | xargs -0 -r git rm --cached --' --tag-name-filter cat -- --all
+    $ git filter-branch --prune-empty --index-filter 'git rm --cached --ignore-unmatch -- some/file.c'
+  Try-push to bare repo your filtered one and re-clone it
+    $ git init --bare ../bare_repo
+    $ git remote add origin ../bare_repo
+    $ git push --mirror
+    # $ git push origin --all
+    # $ git push --tags
+    $ git clone --no-hardlinks --local ../bare_repo
+
+
+
 %%%% OLD (full)
 
 
