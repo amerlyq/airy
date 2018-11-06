@@ -1,7 +1,13 @@
 #!/usr/bin/gnuplot -p
 # USAGE: $ gnuplot -c ./plot-img dat-hidden > dat-hidden.png
+# USAGE: $ ... | gnuplot -p -e "plot '-' using 1:2 with lines lw 2 title 'CPU_total' noenhanced"
+# USAGE: $ echo t,a,b | sed '$a\e' | tee -ia /dev/stdout{,,} | gnuplot -p -e "plot for [i=2:3] '-' using 1:i with lines"
 #
 # REF: http://www.gnuplot.info/docs_4.2/gnuplot.html#x1-13200034.1.7
+# TUT: piecewise "linespoints" with intervals till points
+#   http://www.gnuplotting.org/tag/linespoints/
+# E.G: https://alvinalexander.com/technology/gnuplot-charts-graphs-examples
+#   http://www2.yukawa.kyoto-u.ac.jp/~akira.ohnishi/Lib/gnuplot.html
 ## Labels
 #   https://stackoverflow.com/questions/16208737/plot-line-with-labels
 #   https://stackoverflow.com/questions/40875810/drawing-multiple-lines-using-a-script-in-gnuplot
