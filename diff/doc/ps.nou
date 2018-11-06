@@ -1,0 +1,13 @@
+Compare "ps" snapshots -- sequental list
+  => find where processes have disappeared (to get their last cumulative TIME)
+  $ for f in *.log; do <"$f" tr -s " " \\t | cut -f2,11- | tr \\t " " | sort -n > "${f}_"; done
+  $ find -type f -name 'ps_*.log_' | sort | r.diff-by-pairs | grep -vE '^[-+][0-9]+ (sh|ps)\s' | sed 's/^---\s/\x00\n&/' | grep -vzP '@@\n$'| colordiff
+
+Sort "ps" by column
+  $ for f in *.log; do <"$f" sort -k2n,2 >"${f}_"; done
+
+Sum total TIME of all processes
+  $ tr -s " " \\t | cut -f10 | tr \\t " " | awk -F: '$2{a+=$2}END{print a}'
+
+Get majorant TIME processes from "ps" snapshots
+  $ ls ps_* | sort X bash -c '< "$0" tr -s " " \\t | cut -f10- | tr \\t " " | sort -r | head -5'

@@ -1,0 +1,2 @@
+Compare each two files in dir
+  $ paste <(find -type f|sort|head -n -1) <(find -type f|sort|tail -n +2) | xargs -rn2 /usr/bin/diff -U0

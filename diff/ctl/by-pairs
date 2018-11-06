@@ -1,0 +1,8 @@
+#!/bin/bash
+#%USAGE: $ find -type f|sort| r.diff-by-pairs
+set -euo pipefail
+
+(($#)) && lpaths=$(printf '%s\n' "$@") || lpaths=$(cat)
+
+paste <(head -n -1 <<< "$lpaths") <(tail -n +2 <<< "$lpaths") \
+| xargs -rn2 ${DIFF:-/usr/bin/diff -U0}
