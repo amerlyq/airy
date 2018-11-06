@@ -19,6 +19,10 @@ if (($+commands[$PAGER])); then
   alias -g L='| "$PAGER" '
   alias -g LL='|& "$PAGER" -r '
 fi
+if (($+commands[gnuplot])); then
+  alias -g PL1="| gnuplot -p -e \"plot '-' using 1:2 with linespoints lw 2 pt 7 noenhanced\""
+  pl1(){ gnuplot -p -e "set xlabel '$1'; set ylabel '$2'; plot '-' using 1:2 with lines lw 2 title '$3' noenhanced"; }
+fi
 
 # Line trim W/H to term size (w/o two prompts and errcode)
 alias -g LW='| expand | cut -c-"$(tput cols)"'
