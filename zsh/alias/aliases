@@ -20,6 +20,7 @@ if (($+commands[$PAGER])); then
   alias -g LL='|& "$PAGER" -r '
 fi
 if (($+commands[gnuplot])); then
+  alias -g PL0="| gnuplot -p -e \"set xlabel 'index, n'; set ylabel 'value, -'; plot '-' using 1 with linespoints lw 2 pt 7 notitle\""
   alias -g PL1="| gnuplot -p -e \"plot '-' using 1:2 with linespoints lw 2 pt 7 noenhanced\""
   pl1(){ gnuplot -p -e "set xlabel '$1'; set ylabel '$2'; plot '-' using 1:2 with lines lw 2 title '$3' noenhanced"; }
 fi

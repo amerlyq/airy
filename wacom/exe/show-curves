@@ -11,7 +11,7 @@ PATH=$SWD/mod:$PATH
 
 cd "${SWD%/*}/profile.d"
 for pf in *; do
-  cat "$pf" | pressure-extract "$pf" | bash
+  pressure-extract "$pf" < "$pf" | bash
 done
 
-sxiv /tmp/wacom_*.gif
+pqiv /tmp/wacom_*.gif

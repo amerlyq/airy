@@ -10,7 +10,47 @@ READ
   https://corte.si/posts/code/farewell-to-orms.html
     > BAD: map sql tbls on objs
     > BET: use simple lang to generate tbls
+  NOTE: flag SQLITE_OPEN_EXCLUSIVE is impossible, unless you use VFS
+    https://mijailovic.net/2017/08/27/sqlite-adventures/
+
 
 LIOR
   sqlite console processing commands
     https://sqlite.org/cli.html
+  TUT: https://www.thegeekstuff.com/2012/09/sqlite-command-examples/
+    | .database
+  DEBUG:(explain|query plan):
+    | explain query plan select * from empdept;
+    | explain select empid,strftime('%d-%m-%Y %w %W',updatedon) from employee;
+  get schema
+    $ sqlite3 test.db .schema > schema.sql
+  List of columns
+    | PRAGMA table_info(mytable);
+    | .schema mytable
+
+
+Copy table into another db
+  oneliner
+    $ sqlite3 old.db ".dump mytable" | sqlite3 new.db
+  interactive
+    $ sqlite3 old.db
+    | .output table_dump.sql
+    | .dump table_name
+    | .quit
+    $ sqlite3 new.db
+    | .read table_dump.sql
+  fine-tuned import "new <- old"
+    $ sqlite3 new.db
+    | ATTACH old.db as src
+    | .databases
+    # main: /path/to/new.db
+    # src: /path/to/old.db
+    | .tables
+    Create table from table
+      # BAD: can't rename/remap column names
+      | CREATE TABLE mytable AS SELECT id, category FROM src.mytable;
+    Import table into created table
+      # WARN: order of columns may become messed up -- USE prescribed order instead
+      | CREATE TABLE mytable ( ... , ... );
+      | INSERT INTO mytable SELECT * FROM src.mytable;
+      | INSERT INTO main.mytable(col1, col2) SELECT col1, col2 FROM src.mytable;

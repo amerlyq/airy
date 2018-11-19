@@ -108,6 +108,26 @@ HACK change wrong date (NOTE: order of _pull branch_ is independent)
     # $ git push --tags
     $ git clone --no-hardlinks --local ../bare_repo
 
+% Update with PRs (when integration is too slow)
+  Initial
+    - create two branches "aaa" and "bbb" in original repo
+    - remove unnecessary files in "aaa" and "bbb" respectively
+    - fixup each branch to buildable state with success unit tests
+    - copy repo and filter-out history in new repo -- so only "bbb" history remains
+  Update
+    - create new branch "grp1" from "master" in original repo
+    - merge all related PRs (ongoing integration) into branch "grp1" and resolve conflicts
+    - merge "grp1" into "aaa" -- !you will have conflicts!
+    - delete files which must be present only in "bbb", not in "aaa"
+      = e.g. conflicts delete/update $ git -c color.status=false status -s | grep -oP '^\s?DU\s\K.*' | xargs git rm
+      = remove empty dirs $ find -type d -not -path '*/_build-*' -empty -delete
+      = also manually remove some of newly added files into already deleted dirs $ git status -s | grep '^\s\?A\s'
+    - commit resolved merge
+    - repeat :: merge "grp1" into "bbb", remove moved files, commit
+    - go to new repo with "bbb" only, remove everything beside ".git" (and "_build-*")
+    - copy everything beside ".git" from original repo "bbb" branch into new repo "bbb" branch
+    - commit new repo "bbb" branch with message "backporting from grp1 of original repo"
+    - repeat this process when you need add more intermediate PRs
 
 
 %%%% OLD (full)

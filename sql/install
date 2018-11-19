@@ -1,6 +1,12 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+# GUI viewers for DB
+#   community/sqlitebrowser
+# + aur/valentina-studio
+#   aur/sqliteman
+#   aur/sqlitemanager
+
 if distro arch; then
   pkg_inst mariadb
   aur_inst mariadb-connector-c

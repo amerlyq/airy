@@ -33,6 +33,7 @@ alias gCd='git diff $(gCl)'
 alias gro='git rebase --onto'  # gro master HEAD~1  #: <dst> <point>
 alias grm='git rebase --preserve-merges'
 alias grim='gri --preserve-merges'  # BUG: with -i can be weird!
+gmo(){ git merge origin/"$1" "${@:2}"; }
 
 alias gfa='git fetch --all --progress --prune --verbose'
 alias gwRc='gwR origin/"$(git-branch-current 2> /dev/null)"'

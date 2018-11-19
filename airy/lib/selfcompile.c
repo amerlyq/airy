@@ -11,6 +11,7 @@
 #include <sys/wait.h>   // waitpid(), W*
 #include <sys/param.h>  // PATH_MAX
 
+// ALT:REF: https://beesbuzz.biz/code/4399-Embedding-binary-resources-with-CMake-and-C-11
 // NOTE: must be linked into resulting .bin
 extern char src_path[] asm ("_binary_src_path_start");
 // FIXME: for this to work, 'compile-src' must extract DFL path from profile
