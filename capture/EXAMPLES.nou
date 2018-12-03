@@ -13,6 +13,7 @@ Capture screen
     $ ffmpeg -f alsa -ac 1 -i pulse -video_size 1920x1080 -framerate 30 -f x11grab -i "$DISPLAY"+1080,0 -c:v libx264 -crf 0 -preset ultrafast -y output.mkv
     $ mpv output.mkv
   cut video segments and concat them
+    WARN:(ffmpeg>=2.1): for any transcoding (NOT -c:v copy), -ss will always be frame-accurate
     $ ffmpeg -ss 00:01:51 -i output.mp4 -t 00:00:14 -avoid_negative_ts make_zero -fflags +genpts -y A.mp4
       => reencode small clips to get precise start-end frames
     $ ffmpeg -ss 00:03:42 -i output.mp4 -to 01:02:45 -c copy -avoid_negative_ts make_zero -fflags +genpts -y B.mp4

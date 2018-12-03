@@ -16,10 +16,15 @@ if [[ -e "$path" ]]; then
     mv -vfT --backup=t "$path" "${path%.*}_${RANDOM}.${path##*.}"
 fi
 
+# https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg
 ffmpeg -y -nostdin -i "$fname" \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
-    -codec:v copy -codec:a copy -codec:d copy \
+    -c:v libx264 -c:a aac -codec:d copy \
     "$path"
+
+# BAD: inexact position
+# -codec:v copy -codec:a copy -codec:d copy \
+
         # OR -c copy \
 # ALT ffmpeg -y -nostdin -ss $BEGIN -i "$SRC" -t $DURATION "$DST"
 # OR ffmpeg -ss $BEGIN -i $SRC -to $END -strict -2 ${DST}.mp4

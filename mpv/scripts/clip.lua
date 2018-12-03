@@ -4,7 +4,7 @@
 -- Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
 
 local utils = require 'mp.utils'
-local g = { A = 0.0, B = mp.get_property_native("length") or 0.0 }
+local g = { A = 0.0, B = mp.get_property_number("length") or 0.0 }
 
 -- Options
 mp.set_property("hr-seek-framedrop", "no")
@@ -43,12 +43,14 @@ function mark_update(m)
     m, g.B - g.A, os.date("%M:%S", g.A), os.date("%M:%S", g.B)))
 end
 function h_mark_beg()
-  g.A = mp.get_property_native("playback-time")
+  g.A = mp.get_property_number("playback-time")
+  -- print(g.A)
   g.B = math.max(g.A, g.B)
   mark_update('A')
 end
 function h_mark_end()
-  g.B = mp.get_property_native("playback-time")
+  g.B = mp.get_property_number("playback-time")
+  -- print(g.B)
   g.A = math.min(g.A, g.B)
   mark_update('B')
 end
@@ -99,12 +101,12 @@ function h_move()
   end
 end
 
-mp.add_forced_key_binding("y", nm("write"), h_write)
-mp.add_forced_key_binding("M", nm("moving"), h_move)
-mp.add_forced_key_binding("[", nm("mark_beg"), h_mark_beg)
-mp.add_forced_key_binding("]", nm("mark_end"), h_mark_end)
-mp.add_forced_key_binding("{", nm("seek_beg"), h_seek_beg)
-mp.add_forced_key_binding("}", nm("seek_end"), h_seek_end)
+mp.add_key_binding("y", nm("write"),    h_write)
+mp.add_key_binding("M", nm("moving"),   h_move)
+mp.add_key_binding("[", nm("mark_beg"), h_mark_beg)
+mp.add_key_binding("]", nm("mark_end"), h_mark_end)
+mp.add_key_binding("{", nm("seek_beg"), h_seek_beg)
+mp.add_key_binding("}", nm("seek_end"), h_seek_end)
 
 
 -- mp.osd_message("loaded", 3)
