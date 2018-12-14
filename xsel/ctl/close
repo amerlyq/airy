@@ -1,8 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
-conn=${1:?Need: user@host[:port]}
-[[ $conn =~ @ ]] || conn=$conn@$USER
+# MOVE: into "r.ssh-close"
+
+conn=${1:?Need: [/path/to/]user@host[:port]}
+conn=${conn##*/}
+
+[[ $conn =~ @ ]] || conn=$USER@$conn
 [[ $conn =~ : ]] || conn+=:22
 
 exec ssh -O exit -S "${TMPDIR:-/tmp}/$conn" "$conn"
