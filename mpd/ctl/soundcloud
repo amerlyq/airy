@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec < <(printf '%s\n' "$@" | sed -r 's|^\w+://|soundcloud://url/|')
+exec xargs -rn1 -d\\n mpc load
