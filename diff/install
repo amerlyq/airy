@@ -6,3 +6,8 @@ pkg_inst diffutils
 
 # VIZ: diffstat | cdiff colordiff | dwdiff
 pkg_inst diffstat colordiff dwdiff
+
+# ==== X only ====
+has_pr X || die
+# cool text/directory comparator
+pkg_inst meld

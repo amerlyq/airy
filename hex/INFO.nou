@@ -1,9 +1,22 @@
+CMP
+  https://en.wikibooks.org/wiki/X86_Disassembly/Analysis_Tools
+  https://blackarch.org/binary.html
+  VIZ. https://texteditors.org/cgi-bin/wiki.pl?action=browse&id=HexEditorFamily&oldid=HexEditors
+  https://www.apriorit.com/dev-blog/366-software-reverse-engineering-tools
+
+FIND:
+  G: linux advanced hex viewer
+  G: linux hex dump
+  Github: hex
+
 ALT
   xxd
     $ cat | xxd -g4 -c16 -s 0x6028 -o-0x6028 -l0x100
   od
     $ cat | od --traditional -Ax -tx4z -w16 -N0x100 - +0 +0x6028
 
+  ++ bviplus
+    http://bviplus.sourceforge.net/
   + bvi+bmore
     more usable then dhex
   ht
@@ -17,21 +30,81 @@ ALT
     too simple, pico interface
   ? hexed
     WTF: web editor
-  bless (highlight similar)
-  wxhexedit (tagging -- manual highlight)
-
-  TRY: hx
+  - bless (highlight similar)
+    too primitive, but has "highlight identical" for mouse selection
+  = wxHexEditor
+    tagging -- manual highlight
+  ? okteta
+    https://www.kde.org/applications/utilities/okteta/
+  + hexer
+    https://www.brighthub.com/computing/linux/articles/89715.aspx
+    ++ nice vim-like editor with shift
+  ++ veles
+    => nice gradient colorizing and entropy visualizing
+  emacs + hexl-mode
+  ? |aur/tweak-hexeditor|
+    https://www.chiark.greenend.org.uk/~sgtatham/tweak/
+    ++ cmdline
+    ++ lazy loading of files
+    ARCH: https://www.chiark.greenend.org.uk/~sgtatham/tweak/btree.html
+  + hx
     https://github.com/wapiflapi/hx
-    + nice visualizing
+    $ hx file | less
+    + nice colorizing
+    - SIGPIPE wrong
+  radare2
+    $ rabin2 -I file
+  ++ pixd
+    = entropy hystogram
+      https://github.com/FireyFly/pixd
+  |aur/hyx|
+    https://yx7.cc/code/
+  bed
+    https://www.dse.nl/~bed/
+  ci
+    http://www.cihexviewer.com/
+
+
+ALG: formats
+  BOOK: https://www.amazon.fr/Practical-Binary-Analysis-Instrumentation-Disassembly-ebook/dp/B07BPKWJVT
+  ext2
+    http://homepage.smc.edu/morgan_david/cs40/analyze-ext2.htm
+  tcpdump
+    https://www.pacificsimplicity.ca/blog/reading-packet-hex-dumps-manually-no-wireshark
 
 
 DEV: hexdump examples SEE: J, Haskell, Lisp
   http://wiki.c2.com/?HexDumpInManyProgrammingLanguages
 
+IDEA
+  https://www.sweetscape.com/010editor/
+  https://hexinator.com/
+  https://binary.ninja/2017/12/15/change-is-in-the-air.html
+  http://www.disk-editor.org/
+  https://www.hopperapp.com/
+  https://www.synalysis.net/
+  http://www.hexworkshop.com/screen_shots.html
+
 
 TODO:
+  spectral/numerical analysis
+    CMP:USE: https://en.wikipedia.org/wiki/Comparison_of_numerical_analysis_software
+    https://wiki.archlinux.org/index.php/List_of_applications/Science
+    https://sigrok.org/
   * show with offset = shift all text on <C-e>/<C-y>
   * column number by N -- to align binary data by structure size one below other
   * regions with their own offset and column number
     - foldable
   * synchronized cursors (togglable)
+  * entropy split -- multiple continuous block with different alignment, offset, etc
+    => first derivative of cumulative entropy i.e. speed of compressed size changing
+  * find statistics on one-two-four-eight bytes groups and colorize everywhere only most frequent ones
+    = hystogram
+    = allow to remove some entries i.e. when 0x0 ~ 98% of file and you are interested in hystogram of all other bytes
+  * apply statistics separately per each entropy block
+  * special font per block (extended ascii) == nice feature from bless/wxHexEditor to show pseudo-graphics instead of control sequences
+    => much more rememberable than plain '.' dot everywhere
+  * patterned statistics
+    => split 0-255 into multiple interval or even custom noncontiguous sets and highlight them differently
+    => observe regularity inside resulting patterns -- evaluate statistics on resulting patterns
+      -- nice to do with 010editor highlights feature

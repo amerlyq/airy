@@ -1,0 +1,8 @@
+Dump needles
+  Store all found entries as separate files
+    $ r2 -n file
+    | / \x7fELF
+    | b 1M
+    | wtf @@ hit0*
+  Get RBin.filesize and resize file
+    $ find -maxdepth 1 -name 'dump.*' -execdir r2 -wnqc"r $(rabin2 -Z {})" {} \;
