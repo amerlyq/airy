@@ -1,6 +1,7 @@
 " Name: Notches
 " Fast highlighting: match Error /ENOMEM/
 " SEE: https://github.com/inkarkat/vim-mark
+"%USAGE: show all notches :: execute ":/#.*\u\{3,}:", then ":Fs"
 
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has('autocmd') || v:version <= 701 | finish | endif
@@ -19,7 +20,7 @@ let s:patterns = [
   \ ['Alt', 178, '#dfaf00', 'YELW|ALT|OR|CASE|THINK|IDEA|CHG|CMP|I\.E|i\.e|EXAM%(INE)?'],
   \ ['Dev',  33, '#0087ff', 'BLUE|DEV|CFG|ENH%(ANCE)?|HACK|RFC|SEP%(ARATE)?|SPL%(IT)?|DECI%(DE)?'],
   \ ['Tbd', 169, '#ff5faf', 'PINK|TODO|CHECK|TRY|MOVE|NOT|REQ%(UIRE)?|MAYBE'],
-  \ ['Inf',  38, '#00afdf', 'CYAN|INFO?|SRC|VAR|VIZ|ALG|IMPL|ARCH|TALK|SECU%(RE|RITY)?|MMAP'],
+  \ ['Inf',  38, '#00afdf', 'CYAN|INFO?|SRC|VAR|VIZ|ALG|HYPO?|IMPL|ARCH|TALK|SECU%(RE|RITY)?|MMAP'],
   \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|FIX%(ME)?|WARN%(ING)?|ATT%(ENTION)?|REM%(OVE)?'],
   \ ['Did', 243, '#767676', 'GREY|DONE|FIXED|EXPL%(AIN)?|TEMP|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR'],
   \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP%(ENDS)?'],
