@@ -86,8 +86,8 @@ class ag(Command):
         if group:
             cmdl += ['|', ag.editor, '-', '+"setl noro ma bt=nofile"', '+"set cole=0 fdl=1|setf ag_grp"']
         else:
-            cmdl += ['|sort|', ag.editor, '-q/dev/stdin', '+copen']
-            # ALT: cmdl += ['|', ag.editor, '-', '+"setl noro ma bt=nofile"', '+"cgetb|copen"']
+            # BUG:(bdelete 1): we close wrong buffer for ranger-filechooser.vim (because it reads into last buffer)
+            cmdl += ['|sort|', ag.editor, '+"setl noro ma bt=nofile|cbuffer|copen"', '-']
         return (' '.join(cmdl), '')
 
     def _aug_sh(self, iarg, flags=[]):

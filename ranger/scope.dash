@@ -58,7 +58,8 @@ fi
 case "$mimetype"
 in text/*|*/xml) exit 2
 ;; application/x-sqlite3)
-  sqlite3 "$path" .fullschema .dbinfo && exit 5
+  # BUG: even in readonly mode it creates -wal files
+  sqlite3 "$path" .fullschema .dbinfo .quit && exit 5
 ;; application/x-executable)
   file -Lb "$path"
   echo
