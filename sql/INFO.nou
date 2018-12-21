@@ -12,6 +12,15 @@ READ
     > BET: use simple lang to generate tbls
   NOTE: flag SQLITE_OPEN_EXCLUSIVE is impossible, unless you use VFS
     https://mijailovic.net/2017/08/27/sqlite-adventures/
+  WARN: "create [table]" i.e. .schema can't contain bound values at all !!
+    RQ: http://sqlite.1065341.n5.nabble.com/Crash-when-binding-default-column-value-td78200.html
+      ~~ parser could render it into text and insert that value literally, but at the moment it does not
+      <= schema is stored as the text of the create statements
+        --> value of bound VAR must be available each time the ~constraint~ is parsed
+    ::: if your really-really need substitution, use text extrapolation sqlite3_mprintf():
+       char *zSql = sqlite3_mprintf("CREATE TABLE t1(a, b DEFAULT(%Q))", zStringFromUser);
+       sqlite3_exec(db, zSql, 0, 0, 0);
+       sqlite3_free(zSql);
 
 
 LIOR
@@ -27,6 +36,7 @@ LIOR
   List of columns
     | PRAGMA table_info(mytable);
     | .schema mytable
+    | SELECT name, sql FROM sqlite_master WHERE type='table' AND name='mytable';  # BAD: you must parse SQL by regex
 
 
 Copy table into another db
@@ -54,3 +64,11 @@ Copy table into another db
       | CREATE TABLE mytable ( ... , ... );
       | INSERT INTO mytable SELECT * FROM src.mytable;
       | INSERT INTO main.mytable(col1, col2) SELECT col1, col2 FROM src.mytable;
+
+
+USAGE:
+  augment table till :NNN entries
+    WITH RECURSIVE
+        remaining(x) AS (SELECT 0 UNION ALL SELECT (:NNN - count(*)) from mytable),
+        placeholders(x) AS (SELECT 0 UNION ALL SELECT x FROM placeholders LIMIT (SELECT max(x) FROM remaining))
+      INSERT INTO mytable(mycolumn) SELECT x FROM placeholders;

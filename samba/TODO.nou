@@ -63,6 +63,9 @@ USAGE
     $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -c "mkdir $USER"
     $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'put "some file.jpg"'
     $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c ls
+  Download all files or folder
+    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'mget *'
+    $ smbclient '//example.com/Public' -N -c 'mask "";prompt OFF;recurse ON;mget *'
   Permissions (ACL-based)
     $ smbcacls //192.168.1.2/share myfile -U user%password
   Mount

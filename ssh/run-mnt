@@ -1,6 +1,9 @@
 #!/bin/bash -eu
 source ~/.shell/profile
 # ALT:TRY: aur/sshmnt, aur/sftpman, aur/autosshfs-git
+# ALT:
+#   $ sshfs wkftp:/ /srv/ftp
+#   $ fusermount -u /srv/ftp
 
 unmount=
 [[ ! ${1:-} =~ -u ]] || { unmount=1; shift; }
