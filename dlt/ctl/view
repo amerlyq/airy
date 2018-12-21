@@ -10,6 +10,8 @@ use Getopt::Std;
 binmode (STDIN, ':utf8');
 binmode (STDOUT, ':utf8');
 
+my $prefix = $ENV{CMAKE_PREFIX_PATH} // '/work/cache/_prefix';
+
 # getopts
 # https://stackoverflow.com/questions/13800130/adding-a-help-command-to-a-script
 # https://www.computerhope.com/unix/uperl.htm
@@ -91,9 +93,8 @@ my @field_shown = $opts{a} ? @field_names : multichoice($opts{o}, \@field_names,
 # my $ctxid_shown = /^(${join("|", @ctxid_shown)})$/;
 # = multichoice($opts{c}, \@ctxid_names, \%ctxid_alias, \@ctxid_default);
 
-my $pref = '/work/cache/_prefix-host';
-$ENV{PATH}="$pref/bin:$ENV{PATH}";
-$ENV{LD_LIBRARY_PATH}="$pref/lib:".($ENV{LD_LIBRARY_PATH} // "");
+$ENV{PATH}="$prefix/bin:$ENV{PATH}";
+$ENV{LD_LIBRARY_PATH}="$prefix/lib:".($ENV{LD_LIBRARY_PATH} // "");
 
 # my $file = $ARGV[0] || '/path/to/log.dlt';
 my @files = @ARGV;

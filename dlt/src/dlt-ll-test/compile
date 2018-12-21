@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#%DEBUG: $ coredumpctl gdb -r
+#%
+set -euo pipefail -o errtrace
+swd=$(dirname "$(readlink -e "$0")")
+
+pref=/work/cache/_prefix
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+g++ -I"$pref/include/dlt" -L"$pref/lib" -ldlt -o main.bin main.cpp
+# ALT: time make -sC "$bdir/$pr"
+
+[[ ${1-} =~ -b ]] && shift && exit
+
+### Running with DLT
+onexit(){ local jobs=$(jobs -p); [[ $jobs ]] || return 0; kill -INT $jobs; wait; }
+trap 'onexit' INT ERR
+
+export LD_LIBRARY_PATH=$pref/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export PATH=$pref/bin:$PATH
+
+killall -INT dlt-daemon &>/dev/null || true
+
+{ exec < <(printf '%s\n' 'LoggingLevel = 6' 'ContextLogLevel = 6')
+  exec dlt-daemon -c/dev/stdin || kill -INT 0
+} &
+
+## BAD: must be launched after $pr was started and registered in DLT
+##  ~DLT~ 5532~ERROR    ~Could not set log level: 5. Context [TST:----] not found
+# dlt-control -a 'TST' -c '----' -d 5 -l 5 -i 0 "${socket%:*}"
+# dlt-control -a '----' -c 'TST' -d 5 -l 5 -i 0 "${socket%:*}"
+
+sleep 0.2
+{ exec < <(printf '%s\n' "TST ----" "---- TST")
+  exec stdbuf -oL -eL dlt-receive -f/dev/stdin -a 127.0.0.1 \
+  | sed 's/\s\s\+/ /' | cut -d' ' -f6,7,9,12- | sed 's/\[/| /;s/\]$//'
+} &
+
+# WARN:BUG:(upstream): 2-letter apid/ctid is ignored by
+#   => SEE:ALG: dlt-daemon/src/lib/dlt_env_ll.c :: dlt_env_ids_match()
+# export DLT_LOG_LEVEL=6
+export DLT_INITIAL_LOG_LEVEL="TST:TST:6"
+# export DLT_INITIAL_LOG_LEVEL="TST-:TST-:verbose"
+# mkdir -p /tmp/dlt-tmp/loglevels && echo "TST:TST:6" > /tmp/dlt-tmp/loglevels/TST
+
+# ALT: env --chdir "$bdir/$pr" ./"$pr" "$@"
+./main.bin "$@"
+
+## ALT:
+# ./main.bin "$@" & pid=$!
+# sleep 1
+# dlt-control -d 6 -l 6 -j 127.0.0.1
+# sleep 3
+# wait "$pid"
+onexit

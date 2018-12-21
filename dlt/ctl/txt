@@ -1,0 +1,4 @@
+#!/bin/zsh -eu
+f=$1
+shift
+r.dlt-view $@ -- $f &>! ${f:s/\.dlt/\.txt}

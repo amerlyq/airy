@@ -1,2 +1,3 @@
 #!/bin/zsh -eu
+gzip -d *.dlt.gz || true
 for f in *.dlt*(.); do r.dlt-view $@ -- $f &>! ${f:s/\.dlt/\.txt}; done

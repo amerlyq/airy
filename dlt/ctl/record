@@ -1,19 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#%USAGE: $ ./$0 {apid|ctid}..
 set -euo pipefail
 
 trap 'exit' INT TERM
 trap 'echo; kill 0' EXIT
 
-apid=${1:-ID}
-ctid=${1:-IDv2}
-
-pref=${CMAKE_PREFIX_DIR:-/work/_mirror/_prefix-host}
-socket='192.168.1.100'  # :3490
+prefix=${CMAKE_PREFIX_PATH:-/work/cache/_prefix}
 savefile=$(date +'log-%Y%m%d_%H%M%S.dlt')
-# savefile=/tmp/dlt.log
+socket='192.168.1.100'  # :3490
+withdaemon=0
 
-# ;; S) socket=$OPTARG    #% S:= socket to connect (DFL=192.168.1.100[:3490])
-# ;; F) savefile=$OPTARG  #% F:= /path/to/file to save logs from socket (DFL=./log-$DATE.dlt)
+while getopts 'dlo:Op:rs:' o; do case $o in :|'?') exit 1
+;; d) ((withdaemon=!withdaemon))
+;; l) socket='127.0.0.1'  # :3490
+;; r) socket='192.168.1.100'  # :3490
+;; s) socket=$OPTARG         #% S:= socket to connect (DFL=192.168.1.100[:3490])
+;; o) savefile=$OPTARG       #% F:= /path/to/file to save logs from socket (DFL=./log-$DATE.dlt)
+;; O) savefile=/tmp/dlt.log
+;; p) prefix=$OPTARG
+esac; done; shift $((OPTIND-1))
+
+ids=( "$@" )
 
 [[ $socket =~ : ]] && export DLT_CLIENT_ENV_DAEMON_TCP_PORT=${socket##*:}
 
@@ -34,13 +41,31 @@ savefile=$(date +'log-%Y%m%d_%H%M%S.dlt')
 #   => -af... | append to previous
 #   => -f...  | append but override on reopen
 
-export LD_LIBRARY_PATH=$pref/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-export PATH=$pref/bin:$PATH
+onexit(){ local jobs=$(jobs -p); [[ $jobs ]] || return 0; kill -INT $jobs; wait; }
+trap 'onexit' INT ERR
+
+if [[ ${prefix+x} ]]; then
+  export LD_LIBRARY_PATH=$prefix/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+  export PATH=$prefix/bin:$PATH
+fi
+
+
+((withdaemon)) && {
+  killall dlt-daemon &>/dev/null ||:
+  exec < <(printf '%s\n' 'LoggingLevel = 3' 'ContextLogLevel = 6')
+  exec dlt-daemon -c/dev/stdin || kill -INT 0
+} &
+
+sleep 0.2
 
 ## This sets ?global? default log level
 # dlt-control -a ID -d 5 -l 5 -i 0 "${socket%:*}"
-dlt-control -a "$apid" -c ---- -d 5 -l 5 -i 0 "${socket%:*}"
-dlt-control -a "----" -c "$ctid" -d 5 -l 5 -i 0 "${socket%:*}"
+dlt-control -d 6 -l 5 -j "${socket%:*}"
+# WARN: won't work if apid/ctid aren't registered yet
+for id in "${ids[@]}"; do
+  dlt-control -a "$id" -c ---- -d 6 -l 6 -i 0 "${socket%:*}"
+  dlt-control -a "----" -c "$id" -d 6 -l 6 -i 0 "${socket%:*}"
+done
 
 # BAD: dlt-receive file/stdout output is buffered
 #   !! can't be fixed by "stdbuf"
@@ -56,12 +81,15 @@ echo "$savefile"
   # filter=('---- IDv2' 'ID ----')
   # exec < <(printf '%s\n' "${filter[@]}")
   # stdbuf -oL -eL dlt-receive -f/dev/stdin -o "$savefile" "$@"
+  sleep 0.2
   stdbuf -oL -eL dlt-receive -o "$savefile" "${socket%:*}"
 } & pid=$!
 
+# FIXME: use correct input RS instead of newline
 tail -f "$savefile" --pid=$pid | LC_ALL=C awk '{
   l+=length/1024/1024; printf"\rN=%-6d %.2fMiB",NR,l}'
-wait
+
+onexit
 
 # DEV: restart if > 5s w/o output
 #   * wrap dlt-receive startup in while true
