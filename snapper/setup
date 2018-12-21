@@ -4,4 +4,6 @@ source ~/.shell/func.d/cfgsetup
 
 # cfgOpt r && ./init.gen
 
+linkcp -ct '/etc/systemd/system/snapper-cleanup.timer.d' unit/override-cleanup.conf
+
 svc_activate -er snapper-{boot,cleanup,timeline}.timer

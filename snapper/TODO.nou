@@ -1,8 +1,10 @@
 BUG:
   [_] size quota doesn't work
+    BUG: quota not working (preparing quota failed)
     <= even with 0.5, system was filled up until zero space left
     however, I have almost half space ~18/40GB with files...
   [_] timeline cleaning is more rare than expected
+    [_] TRY: more frequent cleanup 1d -> 2h :: ./override-cleanup.conf
     TIMELINE_MIN_AGE="1800"
     TIMELINE_LIMIT_HOURLY="8"
     TIMELINE_LIMIT_DAILY="7"
