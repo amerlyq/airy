@@ -22,3 +22,5 @@ ALT: dump ps
   ALT: total cpu
     bash: $ while usleep 300000; do read -ra cpu < /proc/stat; idle=${cpu[4]}; total=0; for i in "${cpu[@]:1}"; do total=$((total+i)); done; echo $(((idle-pi)*100/(total-pt))); pi=$idle; pt=$total; done
     sh:   $ while usleep 300000; do sudo awk '3==NR{print$3;exit}' /proc/timer_list; done | awk '{t=$0;f="/proc/stat"; getline<f; close(f); idle=$5; total=0; for(i=1;i<=NF;++i)total+=$(i); print t,(idle-pi)*100/(total-pt); pi=idle; pt=total}'
+
+http://www.brendangregg.com/blog/2014-07-28/execsnoop-for-linux.html

@@ -1,0 +1,25 @@
+#!/bin/sh
+# ALT: $ ... --append --output profiling.log
+# MAYBE: embed timestamp $(date +%s.%N) as first element
+# MAYBE: embed cmdline 'argv="%C"' as last element
+# SEE: :/aeternum/make/profiling/shell-wrapper
+#
+exec time --format "\
+errcode=%x \
+elapsed=%e \
+user=%U \
+system=%S \
+maxrss=%M \
+fsin=%I \
+fsout=%O \
+majflt=%F \
+mnrflt=%R \
+ctxforce=%c \
+ctxwait=%w\
+" -- "$@"
+
+# CHECK:WARN! some params always =0 (not all Unix implemented)
+# avgrss=%t \
+# avgmem=%K \
+# avgdata=%D \
+# swaps=%W \
