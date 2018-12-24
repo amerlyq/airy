@@ -17,8 +17,10 @@ ALT
 
   ++ bviplus
     http://bviplus.sourceforge.net/
+    - width set on lauch, no resize
   + bvi+bmore
-    more usable then dhex
+    ? more usable then dhex
+    - width set on lauch, no resize
   ht
     $ hte ./file
     - old dos-like
@@ -34,11 +36,14 @@ ALT
     too primitive, but has "highlight identical" for mouse selection
   = wxHexEditor
     tagging -- manual highlight
-  ? okteta
+  = okteta
     https://www.kde.org/applications/utilities/okteta/
+    - no fast width change
   + hexer
     https://www.brighthub.com/computing/linux/articles/89715.aspx
-    ++ nice vim-like editor with shift
+    + shift offs on < >
+    -- amatorish vi-like editor
+    --- can't change width
   ++ veles
     => nice gradient colorizing and entropy visualizing
   emacs + hexl-mode
@@ -108,3 +113,8 @@ TODO:
     => split 0-255 into multiple interval or even custom noncontiguous sets and highlight them differently
     => observe regularity inside resulting patterns -- evaluate statistics on resulting patterns
       -- nice to do with 010editor highlights feature
+  * when interactively splitting blocks and changing their width -- remember offset and width
+    => dump "schema" of data afterwards
+  * build xref graph which may mean offsets inside file
+    ! must be able to toggle xref src/dst ignore on whole blocks or their parts
+      i.e. allow only first src xref per array entry in block
