@@ -1,9 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/packages
 
-if distro arch; then
-  pkg_inst radare2  # radare2-cutter
-
-elif distro ubuntu; then
-  git_inst ""
-fi
+pkg_inst radare2
+# pkg_inst radare2-cutter
+# aur_inst radare2-git
