@@ -35,7 +35,7 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
            # @var_log -- unmountable because of systemd -- NEED shutdown hook in mkinitcpio ALT: direct subvolume, manually move on restoring from snapshot
            # @var_cache -- no sense to make separate and mount afterwards -- you still need manually move other subvolumes
         └─@snapshots                      /mnt/.snapshots
-      ├─ws-pkgs 254:8    0    20G  0 lvm  /mnt/var/cache/pacman/pkg   # TODO: join with root partition, but exclude from snapshots
+      ├─ws-pkgs 254:8    0    20G  0 lvm  /mnt/var/cache/pacman  # TODO: join with root partition, but exclude from snapshots whole /var/cache (already done)
       ├─ws-user 254:9    0    40G  0 lvm                  # EXPL: sep snapshots per each user
         ├─@                               /mnt/home/user
         ├─@snapshots                      /mnt/home/user/.snapshots
@@ -55,7 +55,7 @@ SubLayout for each subvolume
     └─root
       ├─@           | mount /root/@ /mnt
       ├─@snapshots  | mount /root/@snapshots /mnt/.snapshots
-      ├─@var_pkg    | mount /root/@pkg_cache /mnt/var/cache/pacman/pkg
+      ├─@var_pkg    | mount /root/@pkg_cache /mnt/var/cache/pacman
       └─@...        | other excluded+mounted subvolumes (specific for this mountpoint)
   * /@ -- completely flat w/o any subvolumes inside
     => otherwise on restore you must clone+delete each of nested subvolumes one by one
@@ -83,7 +83,7 @@ Exclude from snapshotting by creating subvolumes
   + /var/log -- big ~4GB, binary *.journal -- always keep logs as-is for troubleshooting
     [_] CHECK: problems with systemd journaling when unmounting on shutdown
     USE: ext4/nodatacow -- as random writes will slow-down the whole system
-  + /var/cache/pacman/pkg -- no sense to snapshot -- big and stale file list
+  + /var/cache/pacman/{pkg,aur,my} -- no sense to snapshot -- big and stale file list
   + /tmp -- exlude in case of large files written to /tmp may become snapshotted
     [_] CHECK: use RAM-exclusive /tmp if possible ?
       BAD: low RAM when building firmware -- need disk-backed /tmp

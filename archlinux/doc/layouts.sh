@@ -94,7 +94,7 @@ lvs
 # │ └─luks        254:6    0 931.5G  0 crypt
 # │   ├─ws-swap   254:7    0     4G  0 lvm
 # │   ├─ws-root   254:8    0    40G  0 lvm
-# │   ├─ws-pkgs   254:9    0    20G  0 lvm
+# │   ├─ws-pkgs   254:9    0    20G  0 lvm  # ATT: merge with root partition
 # │   ├─ws-user   254:10   0    40G  0 lvm
 # │   ├─ws-data   254:11   0   200G  0 lvm
 # │   └─ws-work   254:12   0 627.5G  0 lvm
@@ -104,7 +104,7 @@ lvs
 ## NOTE: format LV partitions
 mkswap -L swap -f /dev/mapper/ws-swap
 mkfs.btrfs -L root -f /dev/mapper/ws-root
-mkfs.ext4 -L pkgs /dev/mapper/ws-pkgs
+# mkfs.ext4 -L pkgs /dev/mapper/ws-pkgs
 mkfs.btrfs -L user -f /dev/mapper/ws-user
 mkfs.btrfs -L data -f /dev/mapper/ws-data
 mkfs.btrfs -L work -f /dev/mapper/ws-work
@@ -121,7 +121,7 @@ btrfs subvolume create /mnt/@/var/cache
 btrfs subvolume create /mnt/@/var/log
 # nodatacow per subvolume
 chattr +C /mnt/@/var/log
-mkdir -vp /mnt/@/var/cache/pacman/pkg
+mkdir -vp /mnt/@/var/cache/pacman
 btrfs subvolume list /mnt
 umount /mnt
 # ├─@            /mnt
@@ -167,7 +167,7 @@ umount /mnt
 ## NOTE: assemble mounted filesystem
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-root /mnt
 mount -o noatime,compress=lzo,autodefrag,subvol=@snapshots /dev/mapper/ws-root /mnt/.snapshots
-mount /dev/mapper/ws-pkgs /mnt/var/cache/pacman/pkg
+# mount /dev/mapper/ws-pkgs /mnt/var/cache/pacman
 myuser=...
 mount -o noatime,compress=lzo,autodefrag,subvol=@ /dev/mapper/ws-user /mnt/home/${myuser:?}
 mount -o noatime,compress=lzo,autodefrag,subvol=@snapshots /dev/mapper/ws-user /mnt/home/${myuser:?}/.snapshots
