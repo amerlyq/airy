@@ -91,7 +91,6 @@ elif distro arch; then
   }
   pkg_inst(){ _ipacman 'sudo pacman' "$@"; }
   pkg_make(){ sudo make install "$@" || exit; }  # FIXME: replace by arch-specific
-  has_pr yaourt && ayr_inst(){ _ipacman 'yaourt' "$@"; }
   if has_pr pacaur; then
     aur_inst(){ _ipacman 'pacaur --aur' "$@"; }
     loc_inst(){ do_if -c 'pkg_make' "$@"; }
@@ -138,7 +137,6 @@ elif distro arch; then
       ) # WARN:(|| return): suppresses errors in subshell -- don't use it
       # SEE:(set -E subshell): http://unix.stackexchange.com/questions/48533/exit-shell-script-from-a-subshell
     }
-  elif has_pr yaourt; then aur_inst(){ ayr_inst "$@"; }
   fi
   gem_inst(){ do_if -c 'gem install' "$@"; }
 fi

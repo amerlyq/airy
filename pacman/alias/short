@@ -9,7 +9,7 @@ alias pacl='\pacman -Ql'   # list files (installed by a given package)
 alias paclr='_a()(command pacman -Ql "$@" | grep -P "/bin/(?!\$)"); _a '
 alias pacL='\pacman -Qo'   # show pkgs which contain arg path
 alias pacLr='_a(){ command pacman -Qo "$(which "$1")"; }; _a '
-alias paco='\pacman -Qdt'  # list [o]rphans
+alias pacn='\pacman -Qdt'  # list [o]rphans
 alias pacq='pacman -Si'    # info
 alias pacQ='pacman -Qi'    # info local -- grep by "Required By"
 alias pacr='pactree -c  '  # deps direct
@@ -28,8 +28,12 @@ alias pacY='pacman -Syu'   # '[u]pgrade all'
 # alias pacexpl='pacman -D --asexp'  # 'mark as [expl]icit'
 # alias pacimpl='pacman -D --asdep'  # 'mark as [impl]icit'
 alias pac-last='tac /var/log/pacman.log | sed -rn "/\[PACMAN\]/q;/installed|updated/p" | tac'
-pac-old(){ pacman -U 'https://archive.archlinux.org/packages/.all/'"${^@}"; }
-pac-old-deps(){ pacman --asdeps -U 'https://archive.archlinux.org/packages/.all/'"${^@}"; }
+
+# [_] TRY: replace funcs by redirecting to global repo or repo of your last update
+#   OR: insert as first entry into your mirrorlist (and change "date" to when you last run pacman -Syu)
+#     Server=https://archive.archlinux.org/repos/2014/03/30/$repo/os/$arch
+paco(){ pacman -U 'https://archive.archlinux.org/packages/.all/'"${^@}"; }
+pacO(){ pacman --asdeps -U 'https://archive.archlinux.org/packages/.all/'"${^@}"; }
 
 # Synchronizes the local package database against the repositories then
 # upgrades outdated packages.

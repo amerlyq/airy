@@ -1,12 +1,6 @@
 # vim:ft=sh
 
-if _has_pr pacaur; then
-  alias pacman='pacaur'
-elif _has_pr yaourt; then
-  alias pacman='yaourt'
-else
-  alias pacman='sudo \pacman'
-fi
+alias pacman='sudo pacman'
 
 if [[ -n ${ZSH_NAME-} ]]; then
   _alias_ -b 'noglob ' pacman
