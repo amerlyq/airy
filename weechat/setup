@@ -5,6 +5,14 @@ source ~/.shell/func.d/cfgsetup
 weechat_prf=$(cfg-overlay -M~ -s 'weechat/{}' -b "${AIRY_OVERLAY_BASE-}" -o "${AIRY_OVERLAY_PATH-}" -- profile)
 source "$weechat_prf"  # -> WEECHAT_LIST
 
+cert=~/.weechat/certs/nick.pem
+if [[ ! -f $cert ]] || cfgOpt r; then
+  mkdir -p "${cert%/*}"
+  # ALT: -subj "/C=US/ST=Oregon/L=Portland/O=Company/OU=Org/CN=www.example.com"
+  openssl req -nodes -newkey rsa:2048 -keyout "$cert" -x509 -days 999 -out "$cert" -subj '/CN=localhost'
+  chmod 400 "$cert"
+fi
+
 ### GENS ###
 # WARN: will break on clean install (must store bunch of "chat/*" passwords beforehand)
 if cfgOpt ur; then
