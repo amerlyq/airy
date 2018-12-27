@@ -64,6 +64,18 @@ TODO
   [_] force verify all packages installed
     https://pierre-schmitz.com/verify-all-the-packages/
 
+
+aurutils
+  2018-12-25 [X] ERR: Repository file '/var/cache/pacman/aurto//aurto.files.tar' is not a proper pacman database.
+    <= BAD(repose): seems incompatible :: https://bbs.archlinux.org/viewtopic.php?pid=1707649#p1707649
+    ::: revert databases
+      $ cd /var/cache/pacman/aurto/ && rm aurto.db* aurto.files* && repo-add -n aurto.db.tar *.pkg.tar.xz
+
+  2018-12-25 [X] ERR: Cannot find the git package needed to handle git sources.
+    e.g. "vpn-slice-git" => means pkg "git" was forgotten in makedeps of PKGBUILD
+      $ aursync --no-view --no-confirm --repo=aurto vpn-slice-git
+
+
 FAQ
   cert (new upgrade)
     ca-certificates-utils 20170307-1

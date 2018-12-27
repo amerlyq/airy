@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+source ~/.shell/profile
+set -euo pipefail
+
+d_pfx=${TMPDIR:-/tmp}/airy
+fall=$d_pfx/mods.all
+freq=$d_pfx/mods.req
+
+r.airy-mods-all-sorted > "$fall"
+printf '%s\n' "${AIRY_MODS[@]}" > "$freq"
+
+notfound=$(grep -vxFf "$fall" -- "$freq" | paste -sd ',') && {
+  echo "Err: mods not found: '$notfound'" >&2
+  exit 1
+}
+
+exec grep -xFf "$freq" -- "$fall"

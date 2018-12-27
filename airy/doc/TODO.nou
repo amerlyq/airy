@@ -13,6 +13,7 @@ BUT: we can't define it to :0 -- as that var is essential for setup
 WARN: how to be on clean system from console -- for initial setup ?
 USE: arch chroot to test clean setup of *airy*
 
+
 pkglst
   [_] two-column list of pkgs
     * aggregated from all repos
@@ -61,6 +62,7 @@ pkglst
     [_] reuse these parts of funcs orthogonally everywhere in airy
     [_] after tsort by deps graph, use numeric stable sort by 'priority coeff'
       = so, pacman/vim/ranger will be at the top
+    [_] allow using file-deps instead of mod-deps :: "# deps: some/setup"
   [_] DEV: individual 'deps:' in setup/install/update/recache
     [_] 'wide' mode : gather all 'deps:' in single list before processing
     [_] 'depth' mode : use 'deps:' separately

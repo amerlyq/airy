@@ -139,13 +139,14 @@ mkdir -vp /mnt/@/{.snapshots,.cabal,.cache}
 btrfs subvolume create /mnt/@snapshots
 btrfs subvolume create /mnt/@/.cabal/lib
 btrfs subvolume create /mnt/@/.cabal/packages
-btrfs subvolume create /mnt/@/.cache/pacaur
+# MAYBE? exclude whole ~/.cache from snapshots ?
+btrfs subvolume create /mnt/@/.cache/aurutils
 btrfs subvolume create /mnt/@/sdk
 btrfs subvolume list /mnt
 umount /mnt
 # ├─@            /mnt/home/user
 #   ├─ ~/.cabal/lib
-#   ├─ ~/.cache/pacaur
+#   ├─ ~/.cache/aurutils
 #   └─ ~/sdk
 # └─@snapshots   /mnt/home/user/.snapshots
 

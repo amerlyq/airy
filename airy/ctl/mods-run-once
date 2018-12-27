@@ -1,0 +1,77 @@
+#!/usr/bin/make -sf
+#%SUMMARY: run once all specified scripts in mod dirs
+#%WARN: mod recipes conflict (merge) with target aliases of the same name
+#%
+#%USAGE: $ ./$0 [options] [--] [help | reset | all | <mod> | {<mod>,all}/{all,cleanup,install,setup,update,recache}]
+#% * flags=-u      # pass these flags to all chosen scripts at subpaths (separate set of timestamps)
+#%   -- ALSO: for individual scripts use "<subpath>_flags=-u"
+#% * subpaths=...  # list of space-separated relpaths to scripts inside mod dirs
+#% * tsdir=/path   # abspath to timestamps directory (DFL=/tmp/$USER/airy/ts)
+#%   -- HACK: in pj root override by static location to prevent rebuild from zero after reboot
+#%
+#%USAGE: actions
+#% * [custom]: $ ./$0 firefox       # = run once only firefox
+#% * [always]: $ ./$0 -W firefox    # = rerun firefox
+#% * [w/deps]: $ ./$0 -B firefox    # = rerun firefox (with all deps)
+#% * [ignore]: $ ./$0 -o firefox    # = all beside firefox
+#% *  [reset]: $ ./$0 -t firefox    # = skip firefox (when error)
+#% * [dryrun]: $ ./$0 -n firefox    # = only print commands (BAD: must disable "silent")
+#%
+.DEFAULT_GOAL = all
+MAKEFLAGS += -rR
+.SUFFIXES:
+this := $(lastword $(MAKEFILE_LIST))
+$(this): ;
+.PHONY: help
+help: ; sed -rn '/^(.*\s)?#%/s///p' '$(this)'
+
+# TODO: dev script "mods-all-deps" and add inter-deps to recipes for multithread execution
+#  => NEED: allow subpaths i.a. dot self-refs "#deps: ./setup"
+#  !!! aur_inst may corrupt file -- use flock ???
+#    => ALT: pass $(mktemp) per-thread file through env var and then merge outputs
+.NOTPARALLEL:
+
+flags :=
+subpaths := cleanup install setup update recache
+tsdir := $(or $(TMPDIR),/tmp)/airy/ts
+
+# ====================
+$(subst ,, ) := $(subst ,, )
+&stampfile = $(subst $( ),\$( ),$(tsdir)/@$(subst /,_,$(1)))
+&abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
+&scripts = $(shell r.airy-mods-req-files $(1))
+
+# ARGS: <mod> <subpath> <stamp-path>
+define makealiases =
+.PHONY: $(1) $(1)/all $(1)/$(2)
+$(1): $(1)/all
+$(1)/all: $(1)/$(2)
+all/$(2): $(1)/$(2)
+$(1)/$(2): $(3)
+endef
+
+# ARGS: <script-path> <subpath>
+define runreceipt =
+$(call makealiases,$(notdir $(1:/$(2)=)),$(2),$(&stampfile))
+$(&stampfile) : $(&abspath)
+	@echo '>>> $$< <<<'
+	@$$< $(flags) $($(subst /,_,$2)_flags)
+	@touch $$@
+endef
+
+# ARGS: <subpath>
+define defsubpath =
+.PHONY: all all/$1
+all: all/$1
+$(foreach s,$(&scripts),$(eval $(call runreceipt,$s,$1)))
+endef
+
+# DEBUG: $(info $(call runreceipt,te st,setup))
+# DEBUG: $(info $(call defsubpath,setup))
+$(shell mkdir -p $(tsdir))
+$(foreach s,$(subpaths),$(eval $(call defsubpath,$s)))
+
+.PHONY: reset
+reset:
+	find -H '$(tsdir)' -mindepth 1 -maxdepth 1 -type f -name '@?*' -empty -delete
+	rmdir '$(tsdir)'

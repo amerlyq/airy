@@ -1,31 +1,22 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/system
 distro arch || exit
+cwd_origin
 
-## Install pacaur from AUR without yaourt
-# SEE: https://gist.github.com/Tadly/0e65d30f279a34c33e9b
-# NEED: binutils make gcc fakeroot pkg-config git
-has_pkg(){ command pacman -Qq "$1" &>/dev/null; }
-mk_pkg(){ local aur='https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD'
-  mkdir -p /tmp/paci && cd /tmp/paci && trap 'rm -rf /tmp/paci' EXIT
-  curl -o PKGBUILD "$aur?h=$1"
-  makepkg PKGBUILD --skippgpcheck --install --needed
-}
-has_pkg expac || sudo pacman -S --asdeps expac
-has_pkg yajl  || sudo pacman -S --asdeps yajl
-has_pkg cower || mk_pkg cower
-has_pkg pacaur|| mk_pkg pacaur
+# NOTE: create local AUR repo beforehand (ALSO: actualize "bin,ctl" symlinks)
+./setup
+
+## Install AUR helper
+has_pkgs(){ command pacman -Qq "$@" &>/dev/null; }
+has_pkgs devtools || sudo pacman -S --asdeps devtools
+
+KEY=DBE7D3DD8C81D58D0A13D0E76BC26A17B9B7018A \
+  r.pacman-aur-helper 'aurutils-git' \
+    'https://raw.githubusercontent.com/AladW/aurutils/master/makepkg/PKGBUILD'
 
 
-source ~/.shell/func.d/packages
-
-# ATT: abs deprecated from 20170515, use asp
-#   $ asp checkout isync
 pkg_inst pacman pacman-contrib
-aur_inst pacaur
-# To investigate packages content w/o downloading
-pkg_inst pkgfile
+pkg_inst pkgfile   # grep packages content w/o downloading
 
-# TRY:ALT: packer (lightweight but less automatable and w/o shell completion)
-# NOTE: install manually w/o yaourt
-# ayr_inst pacaur
+# ATT: abs deprecated from 20170515, use asp :: $ asp checkout isync
+aur_inst aurutils-git

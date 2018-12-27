@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#%VIEW: $ <"${TMPDIR:-/tmp}/airy.log" r.airy-pretty | less -r
+#%
+set -euo pipefail
+
+log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/airy.log
+# log=${TMPDIR:-/tmp}/airy.log
+
+[[ -t 1 ]] && exec > >(stdbuf -oL -eL tee -a "$log" | r.airy-pretty)
+
+exec make "$@"

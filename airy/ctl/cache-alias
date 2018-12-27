@@ -1,6 +1,9 @@
 #!/bin/bash -eu
 # WARN: for timestamping you need non-regex name w/o spaces: $a = \S+
 
+# BUG: section isn't deleted when deleting whole file
+#   => DEV: add check that all files exist and remove if not
+
 mod=${PWD##*/}
 from='alias'  # NOTE: either file or dir
 output=''  # ${TMPDIR:-/tmp}/airy-cache-alias

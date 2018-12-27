@@ -83,16 +83,16 @@ if distro ubuntu || distro debian; then
   gem_inst(){ do_if -c 'sudo gem install' "$@"; }
 
 elif distro arch; then
-  has_pkg(){ pacman -Qq "$@" &>/dev/null; }
+  has_pkgs(){ pacman -Qq "$@" &>/dev/null; }
   _ipacman(){ local c=("$1"); shift
     c+=( -S --needed --noconfirm )
     [[ $1 == --asdeps ]] && { c+=("$1"); shift; }
     do_if -c "${c[*]}" "$@"
   }
-  pkg_inst(){ _ipacman 'sudo pacman' "$@"; }
+  # pkg_inst(){ _ipacman 'sudo pacman' "$@"; }
   pkg_make(){ sudo make install "$@" || exit; }  # FIXME: replace by arch-specific
   if has_pr pacaur; then
-    aur_inst(){ _ipacman 'pacaur --aur' "$@"; }
+    # aur_inst(){ _ipacman 'pacaur --aur' "$@"; }
     loc_inst(){ do_if -c 'pkg_make' "$@"; }
     # WARN: pkgs not from AUR can break pacaur
     pkg_make(){ local p d m=$PWD
@@ -150,9 +150,9 @@ pkg_build() {
     if [[ $cabal ]]; then
       cabal install "$cabal"
     elif [[ -f ./CMakeLists.txt ]]; then
-      mkdir -p ./build && bdir="$_"
-      cmake -E chdir ./build cmake "" "$prdir" || return
-      cd ./build && pkg_make
+      mkdir -p ./_build && bdir="$_"
+      cmake -B"$bdir" "$prdir" || return
+      cd "$bdir" && pkg_make
 
     elif [[ -f ./Makefile ]]; then make && pkg_make
     elif [[ -f ./setup.py ]]; then sudo python setup.py install

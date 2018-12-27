@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# SEE: https://gist.github.com/Tadly/0e65d30f279a34c33e9b
+# NEED: binutils make gcc fakeroot pkg-config git
+
+gpgkey=${KEY-}
+
+nm=$1      # -> some-pkg
+url=${2-}  # -> http://.*/PKGBUILD
+
+pacman -Qq "$nm" &>/dev/null && exit
+
+# FAIL:(sometimes down): gpg: keyserver receive failed: No keyserver available
+[[ -n $gpgkey ]] && gpg --recv-keys "$gpgkey"
+
+mkdir -p /tmp/paci && cd /tmp/paci && trap 'rm -rf /tmp/paci' EXIT
+
+if [[ -n $url ]]; then
+  curl -o PKGBUILD -- "$url/$nm"
+else
+  # ALT:(w/o_patches):
+  #   local aur="https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$nm"
+  #   curl -o PKGBUILD "$aur"
+  local aur="https://aur.archlinux.org/cgit/aur.git/snapshot/$nm.tar.gz"
+  curl -L "$aur" | tar xz --strip-components=1
+fi
+
+makepkg PKGBUILD --syncdeps --clean --install  # --rmdeps

@@ -4,24 +4,11 @@
 source ~/.shell/func.d/cfgsetup
 distro arch || exit
 
-cfg=/etc/pacman.conf
-grep -q '^#Color\s*$' "$cfg" && sudo sed -ri '/^#(Color)\s*$/s//\1/' "$cfg"
-
-# DISABLED:TEMP: try default values from /etc/xdg/pacaur/configt set
-#   => ALT: change displaybuildfiles=none directly in system co
-#   => USE: EDITOR from ~/.pam_environment instead of setting in config
-#   => !9 [_] TEST: clean install on system => BUG editor is non
-Deprecated ~/.config/pacaur/config
-# linkcp pacaur.conf ~/.config/pacaur/config
-cfg=/etc/xdg/pacaur/config
-grep -q '^#displaybuildfiles=' "$cfg" && sudo sed -ri '/^#(displaybuildfiles)=\S+(\s+.*)$/s//\1=none \2/' "$cfg"
-
-# TODO setup pacaur to use -j4..-j8 in /etc/makepkg.conf
 # OR: $XDG_CONFIG_HOME/pacman/makepkg.conf OR ~/.makepkg.conf
 # OR: system-wide export MAKEFLAGS="-j$(expr $(nproc) \+ 1)"
 #   http://unix.stackexchange.com/questions/268221/use-multi-threaded-make-by-default
 cfg=/etc/makepkg.conf
-mf='MAKEFLAGS="-j$(nproc)"'
+mf="MAKEFLAGS='-j$(nproc)'"
 grep -qxF "$mf" "$cfg" || sudo gawk -i inplace -vmf="$mf" \
   '/^(#\s*)?MAKEFLAGS=/{$0=mf}1' "$cfg"
 
@@ -29,3 +16,18 @@ grep -qxF "$mf" "$cfg" || sudo gawk -i inplace -vmf="$mf" \
 #   Make sure there is a line in the PKGBUILD which says options=('!makeflags').
 #   If it is not there, you will need to add this line, otherwise multi-core
 #   compilation will not proceed.
+
+append_repo(){ local nm=$1 at=$2
+  local inc="Include = /etc/pacman.d/$nm.conf"
+  local cfg=/etc/pacman.conf
+  local dcache=/var/cache/pacman
+  linkcp -ct /etc/pacman.d -- ./cfg/"$nm".conf
+  grep -qxF "$inc" "$cfg" || sudo sed -ri "$at$inc" "$cfg"
+  [[ -f $dcache/$nm/$nm.db.tar ]] && return
+  sudo install -d "$dcache/$nm" -o "$USER"
+  repo-add "$dcache/$nm/$nm.db.tar"
+}
+
+# BET?USE:(aurto):
+append_repo dev '/^#\[testing\]$/i'
+append_repo aur '$a'

@@ -11,10 +11,12 @@ skip(){ set -- ${!1:+"${!1}"}; (($#))||return 0
 # HACK: first update GPG keys
 # sudo pacman -Syu archlinux-keyring ca-certificates
 
-# NOTE: two-stage for reliability
+# NOTE: three-stage process to upgrade AUR together with dependencies
 # HACK: skip 'exit 1' if update 'n' in pacman
-sudo pacman -Syu $(skip 'PKG_IGNORE[@]') || ((1==$?))
-pacaur --aur  -Syu $(skip 'AUR_IGNORE[@]')
+pkgupd(){ sudo pacman -Syu $(skip 'PKG_IGNORE[@]') || ((1==$?)); }
+pkgupd
+aur sync --database=aur --chroot --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')
+pkgupd
 
 if [[ " $* " =~ " -u " || ! -f /var/cache/pkgfile/core.files ]]
 then sudo pkgfile --update; fi

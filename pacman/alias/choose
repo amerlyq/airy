@@ -1,8 +1,0 @@
-# vim:ft=sh
-
-alias pacman='sudo pacman'
-
-if [[ -n ${ZSH_NAME-} ]]; then
-  _alias_ -b 'noglob ' pacman
-  # alias pacman="noglob ${${$(alias pacman)#*=}:-pacman}"
-fi
