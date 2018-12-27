@@ -8,4 +8,5 @@ source ~/.shell/func.d/cfgsetup
 #   move $ afew --dry-run -vvv --notmuch-config "$cfg" --move-mails --all
 mkdir -p ~/.local/share/afew/categories
 d_cfg=${XDG_CONFIG_HOME:-$HOME/.config}/afew
-linkcp -t "$d_cfg" cfg-afew/config
+afew=$(r.airy-overlay 'cfg-afew/config')
+linkcp -t "$d_cfg" "$afew"
