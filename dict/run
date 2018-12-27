@@ -8,7 +8,8 @@ filter() {
 fdmenu() {
     local prompt=${lang:-any}
     local DMENU="dmenu -i -p ${prompt^^}: -b -nb #000000 -nf #999999 -sb #000000 -sf #31AC65 -fn -misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2"
-    local fl=~/.cache/airy/dict-words-${lang:-any}.txt
+    local fl=~/.local/share/airy/dict-words-${lang:-any}.txt
+    mkdir -p "${fl%/*}"
     touch "$fl"
 
     if [[ $lang ]]; then

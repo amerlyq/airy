@@ -10,18 +10,18 @@
 MAKEFLAGS += --silent
 .NOTPARALLEL:
 .SUFFIXES:
-Makefile:;
 this := $(lastword $(MAKEFILE_LIST))
+$(this): ;
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
 help: ; @echo 'Use: $(PHONY)'; @sed -rn '/^(.*\s)?#%/s///p' '$(this)'
 .PHONY: $(PHONY)
 
 ### Parameters
 export AIRY_ROOT   ?= $(HOME)/.local/airy
+export AIRY_BIN    ?= $(HOME)/.local/bin
 export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
 export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
 export AIRY_DATA   ?= $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/airy
-export AIRY_BIN    ?= $(AIRY_CACHE)/bin
 
 flags := -mu
 &mods = +r.airy-mods-run-once "tsdir=$(AIRY_CACHE)/ts" "flags=$(flags)"
@@ -42,13 +42,15 @@ clean: ; r.airy-clean
 # ALSO: use env vars to force $ pacman --color always $ when using TTY w/o redirect
 # 	=> add 'quiet' regime to linkcp
 configure:
-	mkdir -p $(dir $(AIRY_ROOT))
-	ln -svfT $(realpath $(dir $(this))) $(AIRY_ROOT)
+	mkdir -p $(dir $(AIRY_ROOT)) $(AIRY_BIN)
+	ln -svfT $(dir $(realpath $(this))) $(AIRY_ROOT)
+	ln -svfT $(realpath $(this)) $(AIRY_BIN)/r.airy
 	./airy/setup -m
 	./pacman/setup -m
 
 # THINK: maybe move into separate mod "update" and place it always last
 #   => PERF: allows to run "&mods" script once with argument "all" instead of staged run
+# FIXME:BAD: when placed here in such inconsistent way, you can't "skip=pacman" this phase
 install:
 	r.pacman-lists-install -x
 	$(&mods) all/install

@@ -3,9 +3,11 @@
 #%WARN: mod recipes conflict (merge) with target aliases of the same name
 #%
 #%USAGE: $ ./$0 [options] [--] [help | reset | all | <mod> | {<mod>,all}/{all,cleanup,install,setup,update,recache}]
+#%VAR:
 #% * flags=-u      # pass these flags to all chosen scripts at subpaths (separate set of timestamps)
 #%   -- ALSO: for individual scripts use "<subpath>_flags=-u"
-#% * subpaths=...  # list of space-separated relpaths to scripts inside mod dirs
+#% * skip=...      # space-separated list of modnames to skip their operations (BAD: no per-subdir granularity)
+#% * subpaths=...  # space-separated list of relpaths to scripts inside mod dirs
 #% * tsdir=/path   # abspath to timestamps directory (DFL=/tmp/$USER/airy/ts)
 #%   -- HACK: in pj root override by static location to prevent rebuild from zero after reboot
 #%
@@ -14,7 +16,7 @@
 #% * [always]: $ ./$0 -W firefox    # = rerun firefox
 #% * [w/deps]: $ ./$0 -B firefox    # = rerun firefox (with all deps)
 #% * [ignore]: $ ./$0 -o firefox    # = all beside firefox
-#% *  [reset]: $ ./$0 -t firefox    # = skip firefox (when error)
+#% *  [reset]: $ ./$0 -t firefox    # = skip firefox (when error) (FAIL: aliased tgt do not propagate to actual ones)
 #% * [dryrun]: $ ./$0 -n firefox    # = only print commands (BAD: must disable "silent")
 #%
 .DEFAULT_GOAL = all
@@ -32,6 +34,7 @@ help: ; sed -rn '/^(.*\s)?#%/s///p' '$(this)'
 .NOTPARALLEL:
 
 flags :=
+skip :=
 subpaths := cleanup install setup update recache
 tsdir := $(or $(TMPDIR),/tmp)/airy/ts
 
@@ -40,6 +43,7 @@ $(subst ,, ) := $(subst ,, )
 &stampfile = $(subst $( ),\$( ),$(tsdir)/@$(subst /,_,$(1)))
 &abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
 &scripts = $(shell r.airy-mods-req-files $(1))
+&modname = $(subst $( ),\$( ),$(notdir $(1:/$(2)=)))
 
 # ARGS: <mod> <subpath> <stamp-path>
 define makealiases =
@@ -51,8 +55,9 @@ $(1)/$(2): $(3)
 endef
 
 # ARGS: <script-path> <subpath>
+runorskip = $(if $(filter $(&modname),$(skip)),,$(eval $(call runreceipt,$(1),$(2))))
 define runreceipt =
-$(call makealiases,$(notdir $(1:/$(2)=)),$(2),$(&stampfile))
+$(call makealiases,$(&modname),$(2),$(&stampfile))
 $(&stampfile) : $(&abspath)
 	@echo '>>> $$< <<<'
 	@$$< $(flags) $($(subst /,_,$2)_flags)
@@ -63,11 +68,11 @@ endef
 define defsubpath =
 .PHONY: all all/$1
 all: all/$1
-$(foreach s,$(&scripts),$(eval $(call runreceipt,$s,$1)))
+$(foreach s,$(&scripts),$(call runorskip,$s,$(1)))
 endef
 
-# DEBUG: $(info $(call runreceipt,te st,setup))
-# DEBUG: $(info $(call defsubpath,setup))
+# DEBUG: $(eval $(call runreceipt,te st,setup))
+# DEBUG: $(error $(call defsubpath,setup))
 $(shell mkdir -p $(tsdir))
 $(foreach s,$(subpaths),$(eval $(call defsubpath,$s)))
 

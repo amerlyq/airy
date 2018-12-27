@@ -6,19 +6,17 @@
 
 cd "$(dirname "$(readlink -e "$0")")"
 repo=$(git -C "$PWD" rev-parse --show-toplevel)
-build=$repo/_build
 
 
 ### LINKS ###
 [[ :$PATH: == *:$PWD/bin:* ]] || export PATH=$PWD/bin:$PATH  # :linkcp
-./ctl/cache-links -t "$build/bin" -q
 [[ :$PATH: == *:$HOME/.local/bin:* ]] || export PATH=~/.local/bin:$PATH  # :r.airy-*
+./ctl/cache-links -t ~/.local/bin -q
+find -H ~/.local/bin -xtype l -delete
 
+mkdir -p ~/.config/airy
 linkcp -q {,~/.}shell
-linkcp -q ./pathes "$build/cfg/pathes"
-
-linkcp -q "$build/bin" ~/.local/bin
-linkcp -q "$build/cfg" ~/.config/airy
+linkcp -q ./pathes ~/.config/airy/pathes
 
 r.airy-cache-alias
 

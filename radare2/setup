@@ -4,3 +4,9 @@ source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 linkcp -t ~/.config/radare2 radare2rc
+
+# NOTE: keep history in non-temporary location (~/.cache is not backuped)
+h=~/.local/share/radare2/history
+mkdir -p "${h%/*}"
+touch "$h"
+linkcp "$h" ~/.cache/radare2/"${h##*/}"

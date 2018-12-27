@@ -47,7 +47,7 @@ section_recache(){ local f s id b e t tt timestamp=1
   log "+! A: $id"
 }
 
-[[ -n $output ]] || output=$(r.airy-get-cache)/cfg/aliases
+[[ -n $output ]] || output=~/.cache/airy/aliases.sh
 [[ -s $output ]] || (set +C; printf '%s\n' "$header" > "$output")
 [[ -d $from ]] && from=$(find "$from" -type f ! -name tags -print)
 

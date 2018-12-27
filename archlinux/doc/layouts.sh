@@ -121,7 +121,7 @@ btrfs subvolume create /mnt/@/var/cache
 btrfs subvolume create /mnt/@/var/log
 # nodatacow per subvolume
 chattr +C /mnt/@/var/log
-mkdir -vp /mnt/@/var/cache/pacman
+# mkdir -vp /mnt/@/var/cache/pacman
 btrfs subvolume list /mnt
 umount /mnt
 # ├─@            /mnt
@@ -135,18 +135,17 @@ umount /mnt
 mount -o noatime,compress=lzo,autodefrag /dev/mapper/ws-user /mnt
 btrfs quota enable /mnt
 btrfs subvolume create /mnt/@
-mkdir -vp /mnt/@/{.snapshots,.cabal,.cache}
+mkdir -vp /mnt/@/{.snapshots,.cabal}
 btrfs subvolume create /mnt/@snapshots
 btrfs subvolume create /mnt/@/.cabal/lib
 btrfs subvolume create /mnt/@/.cabal/packages
-# MAYBE? exclude whole ~/.cache from snapshots ?
-btrfs subvolume create /mnt/@/.cache/aurutils
+btrfs subvolume create /mnt/@/.cache
 btrfs subvolume create /mnt/@/sdk
 btrfs subvolume list /mnt
 umount /mnt
 # ├─@            /mnt/home/user
 #   ├─ ~/.cabal/lib
-#   ├─ ~/.cache/aurutils
+#   ├─ ~/.cache
 #   └─ ~/sdk
 # └─@snapshots   /mnt/home/user/.snapshots
 

@@ -29,6 +29,9 @@ inst(){ local nm=$1 tp=$2; shift 2
   xargs -a "$d_pfx/$nm.$tp" -- "$@"
 }
 
+# HACK: workaround when calling from inside Makefile
+exec > /dev/tty
+
 # NOTE: both OFF and AUR an have deps only from OFF
 inst pkg deps
 inst aur deps

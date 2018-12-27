@@ -6,6 +6,7 @@ d_pfx=${TMPDIR:-/tmp}/airy
 fall=$d_pfx/mods.all
 freq=$d_pfx/mods.req
 
+mkdir -p "$d_pfx"
 r.airy-mods-all-sorted > "$fall"
 printf '%s\n' "${AIRY_MODS[@]}" > "$freq"
 
