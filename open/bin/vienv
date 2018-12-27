@@ -14,7 +14,6 @@ if [[ ${bReplace-} || ! -f $nm ]]; then
     ;; py3) sb="$env python3"
     ;;  sh) sb="$env bash\nset -euo pipefail"
     ;;  zh) sb="#!/usr/bin/zsh -eu\nsetopt pipe_fail"
-    ;;  mk) sb="#!/usr/bin/make -sf\n.ONESHELL:\n.DEFAULT_GOAL = all\nSHELL := \$(shell which bash)\n.SHELLFLAGS := -euo pipefail -c"
     ;;   *) sb="$env $shl"
     esac
     printf "%b\n\n\n" "$sb" > "$nm"  # Compatible with 'echo -e'
