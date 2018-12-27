@@ -146,7 +146,7 @@ gen_names(){ local -r var=$1 tag=$2; local -rn a=$var
 find_existing(){ local -r var=$1; local -rn a=$var da=$2 fa=$3
   for d in "${da[@]:?}"; do
     for f in "${fa[@]:?}"; do
-      [[ -f $d/$f ]] || continue
+      [[ -e $d/$f ]] || continue
       a+=( "$d/$f" )
     done
   done
@@ -191,17 +191,25 @@ if ((query_uniqpath)); then
   exit
 fi
 
-(($#)) || die "empty requested tags list (\$@)"
+if (($#)); then
+  tags=( "$@" )
+elif [[ ! -t 0 ]]; then
+  tags=$(grep -oh '\S\+')
+  readarray -t tags <<< "$tags"
+  set -- "${tags[@]}"
+else
+  die "empty requested tags list (\$@)"
+fi
 
 if ((query_tagnames)); then
   # DEV: substitute tag/mod/opt/sfx in fmt_print
-  for tag; do
+  for tag in "${tags[@]}"; do
     parse_tag "$tag" _ tag _ _
     printf "$fmt_print" "$tag"
   done
   exit
 fi
 
-for tag; do
+for tag in "${tags[@]}"; do
   search "$tag"
 done
