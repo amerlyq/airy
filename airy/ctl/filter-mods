@@ -1,7 +1,7 @@
 #!/bin/bash -eu
-# USAGE cd ./cfg && ./$0 "${mods[@]}" -- "${skip[@]}"
-# WARN: don't use any Emacs regex symbol for *mod* name
-# NOTE:(obsolete): search is based on install/setup scripts
+#%OBSOLETE: old search based on install/setup scripts and glob masks
+#%USAGE: $ env -C ./cfg -- ./$0 "${mods[@]}" -- "${skip[@]}"
+#%WARN: don't use any Emacs regex symbol for *mod* name
 cwd=$(readlink -e "$PWD")
 prf=${cwd##*/}
 

@@ -64,6 +64,7 @@ dpwdsfx(){ dmkdir "$1/${2:-${PWD##*/}}"; }
 dcache(){ dpwdsfx "${XDG_CACHE_HOME:-$HOME/.cache}" "$@"; }
 dconfig(){ dpwdsfx "${XDG_CONFIG_HOME:-$HOME/.config}" "$@"; }
 dtemp(){ dpwdsfx "${TMPDIR:-/tmp}" "$@"; }
+drepo(){ git -C "$PWD" rev-parse --show-toplevel; }
 
 # ====================== Configs =====================================
 ajoin() { local IFS="$1"; shift; echo "$*"; }
@@ -71,6 +72,9 @@ ajoin() { local IFS="$1"; shift; echo "$*"; }
 cjoin(){ set -- ${!1:+"${!1}"}; (($#))||return 0
   printf -- '--ignore '; (IFS=,;printf '%s\n' "${*// /\\ }")
 }
+reverse_words(){ for((i=${#*};i>0;i--)){ echo ${!i};};}
+hruler(){ eval printf '=%.0s' {1..$(tput cols)}; }
+path_prepend(){ for p; do [[ :$PATH: == *:${p/#\~/$HOME}:* ]] || export PATH=$p:$PATH; done; }
 
 cfgOpt(){ local IFS=; [[ ${CFG_OPTS-} =~ [$*] ]]; }  # ALT: [[ ${CFG_OPTS/[$*]} != $CFG_OPTS ]]
 cfgOptAdd() { local a=$* o=${CFG_OPTS-}; a=${a// }; CFG_OPTS=${o//[$a]}$a; }

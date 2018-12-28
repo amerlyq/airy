@@ -23,56 +23,62 @@
 MAKEFLAGS += -rR
 .SUFFIXES:
 this := $(lastword $(MAKEFILE_LIST))
-$(this): ;
-.PHONY: help
-help: ; sed -rn '/^(.*\s)?#%/s///p' '$(this)'
+_phony := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
+$(this): ; @:
 
 # TODO: dev script "mods-all-deps" and add inter-deps to recipes for multithread execution
-#  => NEED: allow subpaths i.a. dot self-refs "#deps: ./setup"
 #  !!! aur_inst may corrupt file -- use flock ???
 #    => ALT: pass $(mktemp) per-thread file through env var and then merge outputs
+# BUG: necessary "#deps:" aren't installed unconditionally or with error !!! NEED:ERR: add them
+#   !!! can't automize :: "defaults" may depend on all optional pkgs to choose from, but must not install them
+#   i.e. difference between "requires" and "after" -- requires at least one of any, but after all of them
+#    - using intermediate alias :: <airy> :deps: r.t | <r.t> :deps: anyof(st,urxvt,etc)
+# BET? check all deps to be present inside @modlist and fail with normal error
+#  => but then we can't simply call "some/setup" even if its deps are already installed
+#    !! especially if we want to avoid re-setup for its deps mods !!
+# FAIL: dependency on whole "mod" results in out-of-order install/setup
+#   MAYBE:(option): deps={install,ignore,error} to choose behavior
+# airy/setup: vime ; @:
 .NOTPARALLEL:
+# ====================
 
 flags :=
 skip :=
 subpaths := cleanup install setup update recache
 tsdir := $(or $(TMPDIR),/tmp)/airy/ts
 
+# NOTE: generate recipes -- for cmdline targets or default required list
+#  !! each recipe is generated for all subpaths at once !!
+#  ENH: filter directly by subpath matching e.g. "airy/setup" or "airy/.*"
+#  BUT: we can't use "airy/[^/]+" because subpath may be nested
+@allmods := $(shell r.airy-mods-all)
+@modlist := $(filter-out $(_phony),$(MAKECMDGOALS))
+@modlist := $(foreach t,$(@modlist),$(firstword $(subst /, ,$t)))
+_unknown := $(filter-out $(@allmods),$(@modlist))
+$(if $(_unknown),$(error no such mod(s) {$(_unknown)}, look into help =$$ make -f '$(this)' help $$=))
+@modlist := $(or $(@modlist),$(shell r.airy-mods-required))
+@modlist := $(filter-out $(skip),$(@modlist))
+
 # ====================
 $(subst ,, ) := $(subst ,, )
 &stampfile = $(subst $( ),\$( ),$(tsdir)/@$(subst /,_,$(1)))
 &abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
 &modname = $(subst $( ),\$( ),$(notdir $(1:/$(2)=)))
-
-&@scripts = $(shell r.airy-mods-all | r.airy-mods-subpaths $(1))
-@modlist := $(shell r.airy-mods-required)
-
-&alltgtadd = $(if $(filter $(&modname),$(skip)),,\
-  $(if $(filter $(&modname),$(@modlist)),\
-    $(eval all/$(2): $(1)/$(2))))
+&scripts = $(shell r.airy-mods-subpaths $(1) -- $(@modlist))
 
 # ARGS: <mod> <subpath> <stamp-path>
 define makealiases =
 .PHONY: $(1) $(1)/ $(1)/all $(1)/$(2)
 $(1) $(1)/: $(1)/all
 $(1)/all: $(1)/$(2)
+all/$(2): $(1)/$(2)
 $(1)/$(2): $(3)
-$(&alltgtadd)
 endef
-
-# BUG: necessary "#deps:" aren't installed unconditionally or with error !!! NEED:ERR: add them
-#   !!! can't automize :: "defaults" may depend on all optional pkgs to choose from, but must not install them
-#   i.e. difference between "requires" and "after" -- requires at least one of any, but after all of them
-#    - using intermediate alias :: <airy> :deps: r.t | <r.t> :deps: anyof(st,urxvt,etc)
-
-# PERF:BET! instead of "mods-all" -- generate only receipts for passed targets (if match mods-all)
-#  => if passed no special targets -- generate only for list of required ones
-defonlytgts = $(eval $(call defreceipt,$(1),$(2)))
 
 # ARGS: <script-path> <subpath>
 define defreceipt =
 $(call makealiases,$(&modname),$(2),$(&stampfile))
-$(&abspath): ;
+$(&abspath): ; @:
 $(&stampfile) : $(&abspath)
 	@echo '>>> $$< <<<'
 	@$$< $(flags) $($(subst /,_,$2)_flags)
@@ -83,24 +89,31 @@ endef
 define defsubpath =
 .PHONY: all all/$1
 all: all/$1
-$(foreach s,$(&@scripts),$(call defonlytgts,$s,$(1)))
+$(foreach s,$(&scripts),$(eval $(call defreceipt,$s,$(1))))
 endef
 
 # DEBUG:
-#  $(info $(call &@scripts,setup))
+#  $(info $(call &scripts,setup))
 #  $(eval $(call defreceipt,te st,setup))
 #  $(error $(call defsubpath,setup))
 
 $(shell mkdir -p $(tsdir))
 $(foreach p,$(subpaths),$(eval $(call defsubpath,$p)))
 
+# ====================
 .PHONY: reset
 reset:
 	find -H '$(tsdir)' -mindepth 1 -maxdepth 1 -type f -name '@?*' -empty -delete
 	rmdir '$(tsdir)'
 
-# ATT: make treats existing files in cwd as implicit targets => no error even if no target
+.PHONY: help
+help:
+	@echo "VIZ:(targets): {$(_phony)}"
+	sed -rn '/^(.*\s)?#%/s///p' '$(this)'
+	@echo "VIZ:(known mods): {$(@allmods)}"
+
+# ATT: "make" treats existing files in cwd as implicit targets => no error even if no target
 #   => generate explicit error when target not found
-.FORCE:
+.PHONY: .FORCE
 % :: .FORCE
 	echo "Err: no such target '$@'" >&2 && exit 1

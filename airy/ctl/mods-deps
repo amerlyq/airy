@@ -2,6 +2,10 @@
 #%SUMMARY: print topologically ordered deps or their graph
 set -euo pipefail
 
+# [_] DEV: allow local subpaths i.a. dot self-refs "#deps: ./setup"
+# [_] DEV: allow very first/last specifiers e.g. "#deps: 0 $"
+#   => still they will be after global "first" and before "last" of "./mods-ordered"
+
 graph=
 
 while getopts 'g' o; do case $o in :|'?') exit 1

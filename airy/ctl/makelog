@@ -3,9 +3,12 @@
 #%
 set -euo pipefail
 
-log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/airy.log
+log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/log/$(date +'%Y%m%d_%H%M%S').log
+# log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/airy.log
 # log=${TMPDIR:-/tmp}/airy.log
 
-[[ -t 1 ]] && exec > >(stdbuf -oL -eL tee -a "$log" | r.airy-pretty)
+mkdir -p "${log%/*}"
 
-exec make "$@"
+[[ -t 1 ]] && exec > >(r.airy-pretty)
+
+make "$@" | stdbuf -oL -eL tee -a "$log"

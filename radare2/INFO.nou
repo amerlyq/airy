@@ -26,6 +26,7 @@ SEE:
     ? https://github.com/radare/radare2/tree/master/shlr/sdb
     http://radare.today/posts/solving-crackmes-with-ldpreload/
   TUT
+    !!! https://github.com/dukebarman/awesome-radare2
     ++ https://retro.moe/2015/11/18/disassembling-6502-code-with-radare-part-i/
     ++ https://blog.techorganic.com/2016/03/08/radare-2-in-0x1e-minutes/
     +++ http://radare.tv/a/1
@@ -193,3 +194,11 @@ Shell
     $ rafind2 -x 40045c00 lib.so  # => 0x1debc
     DEV: split any ./core-nm file into ./core-nm/{reg\,load\,inf}/* to repair/analyze corrupted core file
     TODO: activate [multilib] in pacman.conf and FIND binutils-multilib
+
+Decompiler
+  > r2dec
+    = nice to figure out control flow
+
+Wine
+  $ r2 -d winedbg:///binary.exe
+  $ r2 -D winedbg -d ./binary

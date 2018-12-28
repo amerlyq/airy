@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# [_] TODO: if VAR was exported -- write names to specified files
+#   => otherwise -- directly call simplified "r.pacman-list-install" to install immediately
+# pfx=${PKG_INSTALL_PREFIX}
+
 pfx=${0##*/}; pfx=${pfx%%_*}
 pfx=${TMPDIR:-/tmp}/airy/$pfx
 mkdir -p "${pfx%/*}"
