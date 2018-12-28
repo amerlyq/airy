@@ -37,7 +37,11 @@ export PATH := $(AIRY_BIN):$(PATH)
 all: configure install setup update recache
 
 # MAYBE: replace by "cleanup" script in each mod
+#  => however, when everything is placed in ~/.cache -- there is no need to clean up ?
 # TODO: rename 'recache'/'rR' to smth another to free up '-r' for general reset/remove
+# IDEA: create "backup" scripts per each mod to gather all necessary data in one go
+#   => so even external locations like ~/work or /data/music can be represented by private user mod ;)
+#   => same as "install" -- gather list of paths by env var, but run immediately if launch
 clean: ; r.airy-clean
 
 # NOTE: prepare config system (once)

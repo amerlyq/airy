@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 #%SUMMARY: apply airy-wide config for overlays
 set -euo pipefail
+
+#%NOTE: env vars can be paramethrized from outside to install mods from unlinked repo
+overlay=${AIRY_OVERLAY_PATH-}
+
 source ~/.shell/profile
 
-export CFG_OVERLAY_ENVM='~'
+# export CFG_OVERLAY_ENVM='~'
 export CFG_OVERLAY_MODE='~'
 export CFG_OVERLAY_BASE="${AIRY_OVERLAY_BASE:?}"
-export CFG_OVERLAY_PATH="${AIRY_OVERLAY_PATH-}"
+export CFG_OVERLAY_PATH="${overlay:-${AIRY_OVERLAY_PATH-}}"
 
-exec cfg-overlay "$@"
+exec cfg-overlay -E~ "$@"

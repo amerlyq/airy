@@ -21,7 +21,7 @@ dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
 chk(){ [[ -n $url ]] && return; r.n Browser "No url arg"; exit 1; }
 
 
-getopts ':hkpstwz' o && [[ $o != '?' ]] && shift 1  #% NOTE: parse only first option
+getopts ':hkpstwz' o && [[ $o != [:?] ]] && shift 1  #% NOTE: parse only first option
 case $o in '?') true  # pass rest and unsupported options to qutebrowser
 ;; p) url=$(xsel -ob); chk "$url" || set -- "$url"
 #% WARN: all next windows will use same backend as first one

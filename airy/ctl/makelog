@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 #%VIEW: $ <"${TMPDIR:-/tmp}/airy.log" r.airy-pretty | less -r
 #%
-set -euo pipefail
+set -euo pipefail -o noglob
+
+# FAIL: impossible to distinguish if tgts were passed on cmdline or only flags/vars
+#   => (compromise): always append to end args from stdin OR use special single flag
+# while (($#)); do [[ $1 =~ "^-|=" ]] && shift || break; done
+# (($#)) || [[ -t 0 ]] || args+=( $(cat) )
+
+#%USAGE:(fallback): special syntax to accept makefile args from stdin
+#%  $ r.airy - [options]
+(($#>2)) && [[ $1 == -f && -f $2 && $3 == - ]] &&
+  set -- "${@:1:2}" "${@:4}" $([[ -t 0 ]] || cat)
 
 log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/log/$(date +'%Y%m%d_%H%M%S').log
 # log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/airy.log
