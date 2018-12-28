@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+source ~/.shell/profile
+set -euo pipefail
+
+# THINK:(option): grouping order -- all subpaths for each dir or single subpath for all dirs ?
+# MAYBE: searching for all subpaths first and filtering+sorting afterwards is more efficient ?
+
+subpaths=( "$@" )
+
+existing_subpaths(){ while IFS= read -r d; do
+    for f in "${subpaths[@]}"; do
+      [[ -e $d/$f ]] && printf '%s\n' "$d/$f"
+    done
+  done
+  return 0
+}
+
+(( ${#subpaths[@]} )) && exec > >(existing_subpaths)
+
+exec r.airy-overlay -M+

@@ -23,7 +23,8 @@ if has rRaA; then tags+=(recache) ; has RA && flags[recache]="-u$flg" ; fi
 [[ -t 1 ]] && exec > >(r.airy-pretty)  # colorize
 
 # MAYBE: use parallel
-r.airy-mods-req-files "${tags[@]}" \
+r.airy-mods-required \
+| r.airy-mods-subpaths "${tags[@]}" \
 | while IFS= read -r f; do
   echo ">>> $f <<<"
   "$f" "${flags[${f##*/}]-}"

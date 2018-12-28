@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# NOTE: hardcoded order (systemwide dependencies)
+beg=( airy pacman )
+end=( )  # defaults
+
+first=$(printf '%s\n' "${beg[@]}")
+last=$(printf '%s\n' "${end[@]}")
+deps=$(r.airy-mods-deps)
+
+exec 3<<<"$first"
+exec 4<<<"$deps"
+exec 5<<<"$last"
+
+# WARN! "<&3" can be drained only once, but "/dev/fd/3" -- multiple times
+cat <&3
+grep -vxF -f/dev/fd/{3,5} <&4
+r.airy-mods-all | grep -vxF -f/dev/fd/{3,4,5}
+cat <&5

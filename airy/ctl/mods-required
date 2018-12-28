@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+source ~/.shell/profile
+set -euo pipefail
+
+required=$(printf '%s\n' "${AIRY_MODS[@]}")
+ordered=$(r.airy-mods-ordered)
+
+exec 0<<<"$ordered"
+exec 3<<<"$required"
+
+notfound=$(grep -vxFf /dev/fd/0 -- /dev/fd/3 | paste -sd ',') && {
+  echo "Err: mods not found: '$notfound'" >&2
+  exit 1
+}
+
+exec grep -xFf /dev/fd/3 -- /dev/fd/0

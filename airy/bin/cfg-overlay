@@ -16,6 +16,16 @@
 #  * <tag>!1--1  (asc  interval 1,2,3)
 #  * <tag>!1,3   (selection sequence)
 #
+#%INFO: <mode> (overlay composition)
+#% -M+ = search base, append overlay (DFL)
+#% -M~ = prepend overlay, fallback to base
+#% -M- = prepend overlay before base search
+#% -M! = ignore base, search overlay only (ERR: if not found)
+#%
+#  TODO:DEV:(-m1): limit number of matching entries from all overlays
+#    => select_by_designator() already does this ?
+#  TODO: value aliases [append,prepend,override]
+#
 #%INFO: <env vars> $CFG_OVERLAY_{BASE,PATH,MODE,SUBST,PRINT}
 #% -E! = ignore env vars (DFL, otherwise any "export" will cause system-wide disaster)
 #% -E~ = fallback to env vars (USE: only enable on demand, when you really expect it)
@@ -50,7 +60,7 @@ papp(){ local -rn a=$1; shift; local p IFS=:
 tag_rgx='^([?])?([-_./[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
 # tag_rgx='^([[:punct:]])?([-_./[:alnum:]]+)(([[:punct:]])([-,[:digit:]]+)?)?$'
 fmt_print='%s\n'
-env_mode='!'
+env_mode=${CFG_OVERLAY_ENVM:-!}  # NOTE: unsafe, but needed for top-level overrides
 ov_mode='+'
 ov_base=()
 ov_path=()

@@ -1,13 +1,13 @@
 #!/usr/bin/make -sf
-#%SUMMARY: run once all specified scripts in mod dirs
+#%SUMMARY: run once all specified subpaths in mod dirs
 #%WARN: mod recipes conflict (merge) with target aliases of the same name
 #%
 #%USAGE: $ ./$0 [options] [--] [help | reset | all | <mod> | {<mod>,all}/{all,cleanup,install,setup,update,recache}]
 #%VAR:
-#% * flags=-u      # pass these flags to all chosen scripts at subpaths (separate set of timestamps)
-#%   -- ALSO: for individual scripts use "<subpath>_flags=-u"
+#% * flags=-u      # pass these flags to all chosen subpaths at subpaths (separate set of timestamps)
+#%   -- ALSO: for individual subpaths use "<subpath>_flags=-u"
 #% * skip=...      # space-separated list of modnames to skip their operations (BAD: no per-subdir granularity)
-#% * subpaths=...  # space-separated list of relpaths to scripts inside mod dirs
+#% * subpaths=...  # space-separated list of relpaths to subpaths inside mod dirs
 #% * tsdir=/path   # abspath to timestamps directory (DFL=/tmp/$USER/airy/ts)
 #%   -- HACK: in pj root override by static location to prevent rebuild from zero after reboot
 #%
@@ -42,22 +42,37 @@ tsdir := $(or $(TMPDIR),/tmp)/airy/ts
 $(subst ,, ) := $(subst ,, )
 &stampfile = $(subst $( ),\$( ),$(tsdir)/@$(subst /,_,$(1)))
 &abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
-&scripts = $(shell r.airy-mods-req-files $(1))
 &modname = $(subst $( ),\$( ),$(notdir $(1:/$(2)=)))
+
+&@scripts = $(shell r.airy-mods-all | r.airy-mods-subpaths $(1))
+@modlist := $(shell r.airy-mods-required)
+
+&alltgtadd = $(if $(filter $(&modname),$(skip)),,\
+  $(if $(filter $(&modname),$(@modlist)),\
+    $(eval all/$(2): $(1)/$(2))))
 
 # ARGS: <mod> <subpath> <stamp-path>
 define makealiases =
-.PHONY: $(1) $(1)/all $(1)/$(2)
-$(1): $(1)/all
+.PHONY: $(1) $(1)/ $(1)/all $(1)/$(2)
+$(1) $(1)/: $(1)/all
 $(1)/all: $(1)/$(2)
-all/$(2): $(1)/$(2)
 $(1)/$(2): $(3)
+$(&alltgtadd)
 endef
 
+# BUG: necessary "#deps:" aren't installed unconditionally or with error !!! NEED:ERR: add them
+#   !!! can't automize :: "defaults" may depend on all optional pkgs to choose from, but must not install them
+#   i.e. difference between "requires" and "after" -- requires at least one of any, but after all of them
+#    - using intermediate alias :: <airy> :deps: r.t | <r.t> :deps: anyof(st,urxvt,etc)
+
+# PERF:BET! instead of "mods-all" -- generate only receipts for passed targets (if match mods-all)
+#  => if passed no special targets -- generate only for list of required ones
+defonlytgts = $(eval $(call defreceipt,$(1),$(2)))
+
 # ARGS: <script-path> <subpath>
-runorskip = $(if $(filter $(&modname),$(skip)),,$(eval $(call runreceipt,$(1),$(2))))
-define runreceipt =
+define defreceipt =
 $(call makealiases,$(&modname),$(2),$(&stampfile))
+$(&abspath): ;
 $(&stampfile) : $(&abspath)
 	@echo '>>> $$< <<<'
 	@$$< $(flags) $($(subst /,_,$2)_flags)
@@ -68,15 +83,24 @@ endef
 define defsubpath =
 .PHONY: all all/$1
 all: all/$1
-$(foreach s,$(&scripts),$(call runorskip,$s,$(1)))
+$(foreach s,$(&@scripts),$(call defonlytgts,$s,$(1)))
 endef
 
-# DEBUG: $(eval $(call runreceipt,te st,setup))
-# DEBUG: $(error $(call defsubpath,setup))
+# DEBUG:
+#  $(info $(call &@scripts,setup))
+#  $(eval $(call defreceipt,te st,setup))
+#  $(error $(call defsubpath,setup))
+
 $(shell mkdir -p $(tsdir))
-$(foreach s,$(subpaths),$(eval $(call defsubpath,$s)))
+$(foreach p,$(subpaths),$(eval $(call defsubpath,$p)))
 
 .PHONY: reset
 reset:
 	find -H '$(tsdir)' -mindepth 1 -maxdepth 1 -type f -name '@?*' -empty -delete
 	rmdir '$(tsdir)'
+
+# ATT: make treats existing files in cwd as implicit targets => no error even if no target
+#   => generate explicit error when target not found
+.FORCE:
+% :: .FORCE
+	echo "Err: no such target '$@'" >&2 && exit 1

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#%SUMMARY: print topologically ordered deps or their graph
+set -euo pipefail
+
+graph=
+
+while getopts 'g' o; do case $o in :|'?') exit 1
+;; g) graph=1
+esac; done; shift $((OPTIND - 1))
+
+if (($#)); then
+  paths=("$@")
+elif [[ ! -t 0 ]]; then
+  readarray -t paths
+else
+  tmp=$(r.airy-overlay -Q)
+  readarray -t paths <<< "$tmp"
+fi
+
+find -H "${paths[@]}" \
+  -mindepth 2 -maxdepth 2 -type f -name 'setup' -print0 \
+| xargs -0 grep -PHo '^#+\s*deps:\s*\K[^#]+' \
+| awk -F/ '{split(substr($NF,index($NF,":")+1),a," "); for(i in a)print a[i],$(NF-1)}' \
+| if ((graph)); then cat; else tsort; fi

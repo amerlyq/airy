@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#%SUMMARY: in modules fetch first override of user configs
+set -euo pipefail
+
+[[ -x ./setup || -x ./install ]] || exit 3
+mod=${PWD##*/}
+
+exec r.airy-overlay -M~ -s "$mod/{}" -- "$@"

@@ -51,6 +51,7 @@ configure:
 # THINK: maybe move into separate mod "update" and place it always last
 #   => PERF: allows to run "&mods" script once with argument "all" instead of staged run
 # FIXME:BAD: when placed here in such inconsistent way, you can't "skip=pacman" this phase
+#   => FAIL: it runs each and every time I do "make"
 install:
 	r.pacman-lists-install -x
 	$(&mods) all/install
