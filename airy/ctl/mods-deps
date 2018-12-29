@@ -5,6 +5,7 @@ set -euo pipefail
 # [_] DEV: allow local subpaths i.a. dot self-refs "#deps: ./setup"
 # [_] DEV: allow very first/last specifiers e.g. "#deps: 0 $"
 #   => still they will be after global "first" and before "last" of "./mods-ordered"
+#   => NEED: separate script to sort in groups {beg,body,end}
 
 graph=
 
@@ -21,8 +22,6 @@ else
   readarray -t paths <<< "$tmp"
 fi
 
-find -H "${paths[@]}" \
-  -mindepth 2 -maxdepth 2 -type f -name 'setup' -print0 \
-| xargs -0 grep -PHo '^#+\s*deps:\s*\K[^#]+' \
-| awk -F/ '{split(substr($NF,index($NF,":")+1),a," "); for(i in a)print a[i],$(NF-1)}' \
+r.airy-mods-modelines -k deps -d: \
+| awk -F: '{split($NF,a," "); for(k in a)print a[k],$1}' \
 | if ((graph)); then cat; else tsort; fi

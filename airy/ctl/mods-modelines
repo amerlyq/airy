@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+#%SUMMARY: extract modelines by specified keys i.e. /# key: .../
+set -euo pipefail
+
+files=(setup)
+mkeys=(deps)
+dirsep=': '
+tagsep=  # use "|"
+
+while getopts 'f:k:d:t:' o; do case $o in :|'?') exit 1
+;; f) IFS=', ' read -ra files <<<"$OPTARG"
+;; k) IFS=', ' read -ra mkeys <<<"$OPTARG"
+;; d) dirsep=$OPTARG
+;; t) tagsep=$OPTARG
+esac; done; shift $((OPTIND - 1))
+
+if (($#)); then
+  paths=("$@")
+elif [[ ! -t 0 ]]; then
+  readarray -t paths
+else
+  tmp=$(r.airy-overlay -Q)
+  readarray -t paths <<< "$tmp"
+fi
+
+search=( '(' -false )
+for f in "${files[@]}"; do search+=( -o -name "$f" ); done
+search+=( ')' )
+
+keyrgx=$(printf '\\Q%s\\E\n' "${mkeys[@]}" | paste -sd '|')
+modrgx="^#+\s*\K($keyrgx):\s*[^#]+"
+
+find -H "${paths[@]}" -mindepth 2 -maxdepth 2 -type f "${search[@]}" -print0 \
+| xargs -0 grep -PHo "$modrgx" \
+| awk -F/ -vOFS=: -vt="$tagsep" -vh="$dirsep" '
+  $(NF-1)!=d {if(d){for(k in m){print (t?k""t:"") d h m[k]}}; d=$(NF-1); delete m}
+  {
+    split($NF, a, /:\s*/)
+    k = a[2]
+    sub(/\s+$/, "", a[3])
+    m[k]=m[k] (m[k]?" ":"") a[3]
+  }
+  END {if(d){for(k in m){print (t?k""t:"") d h m[k]}}}
+'
