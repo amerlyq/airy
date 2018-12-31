@@ -10,6 +10,9 @@ cwd_origin
 has_pkgs(){ command pacman -Qq "$@" &>/dev/null; }
 has_pkgs devtools || sudo pacman -S --asdeps devtools
 
+# TRY: https://github.com/cassava/repoctl -- use for removing pkgs
+#   recommended by AladW :: https://github.com/AladW/aurutils/issues/208
+
 KEY=DBE7D3DD8C81D58D0A13D0E76BC26A17B9B7018A \
   r.pacman-aur-helper 'aurutils-git' \
     'https://raw.githubusercontent.com/AladW/aurutils/master/makepkg/PKGBUILD'

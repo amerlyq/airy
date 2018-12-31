@@ -1,5 +1,9 @@
 # vim:ft=sh
 
+alias paclr='_a()(command pacman -Ql "$@" | grep -P "/bin/(?!\$)"); _a '
+alias pacLr='_a(){ command pacman -Qo "$(which "$1")"; }; _a '
+alias pacll='tac /var/log/pacman.log | sed -rn "/\[PACMAN\]/q;/installed|updated/p" | tac'
+
 alias pacman-list-orphans='command pacman --query --deps --unrequired'
 alias pacman-remove-orphans='sudo pacman --remove --recursive $(pacman-list-orphans)'
 

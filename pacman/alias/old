@@ -1,0 +1,7 @@
+# vim:ft=sh
+
+# [_] TRY: replace funcs by redirecting to global repo or repo of your last update
+#   OR: insert as first entry into your mirrorlist (and change "date" to when you last run pacman -Syu)
+#     Server=https://archive.archlinux.org/repos/2014/03/30/$repo/os/$arch
+paco(){ sudo pacman -U 'https://archive.archlinux.org/packages/.all/'"${^@}"; }
+pacO(){ sudo pacman --asdeps -U 'https://archive.archlinux.org/packages/.all/'"${^@}"; }

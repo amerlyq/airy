@@ -1,0 +1,27 @@
+# vim:ft=sh
+
+alias pacr='pactree -c'       # deps direct
+alias pacR='pactree -cr'      # deps reverse
+
+alias pacg='pacman -Sg'       # show list of package [g]roup
+alias pacl='pacman -Ql'       # list files (installed by a given package)
+alias pacL='pacman -Qo'   # show pkgs which contain arg path
+alias pacn='pacman -Qdt'      # list [o]rphans
+alias pacq='pacman -Si'       # info
+alias pacQ='pacman -Qi'       # info local -- grep by "Required By"
+alias pacs='pacman -Ss'       # search
+alias pacS='pacman -Qs'       # search local
+
+alias paci='sudo pacman -S'   # install
+alias pacI='sudo pacman -U'   # install from files on disk
+alias pacD='sudo pacman -D --asdeps'      # change install reason
+alias pacE='sudo pacman -D --asexplicit'  # change install reason
+alias pacu='sudo pacman -Su'  # install with [u]pdate
+alias pacU='sudo pacman --sync --refresh'  # --sysupgrade
+# alias pacU='pacman -U /var/cache/pacman/pkg'    # refresh only
+
+# alias pacC='pacman -Scc'     # '[c]lean cache' (all not currently installed)
+alias pacx='sudo pacman -Rsu'  # '[r]emove'
+alias pacX='sudo pacman -Rsc'  # 'Rm pkg, its deps and all depending pkgs
+alias pacy='sudo pacman -Sy'   # refresh only
+alias pacY='sudo pacman -Syu'  # '[u]pgrade all'

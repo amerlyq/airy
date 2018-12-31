@@ -1,0 +1,12 @@
+# vim:ft=sh
+
+# NOTE: first always update 'archlinux-keyring' package
+
+# If unknown public key $ gpg --recv-keys <KEYID>
+# AND then you can sign it $ gpg --lsign-key <KEYID>
+
+alias packk='gpg --recv-keys'     # 249B39D24F25E3B6
+alias packs='gpg --search-keys'
+
+alias packK='sudo pacman-key --recv-keys'   # add into system-wide trustdb
+alias packL='pacman-key --list-keys'        # packer_name

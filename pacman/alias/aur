@@ -1,0 +1,24 @@
+# vim:ft=sh
+
+# USAGE:
+# * (rebuild) $ cd ~/.cache/aurutils/sync/emacspeak && aurb && auru && paci emacspeak
+# *  (remove) $ pacx emacspeak && aurC && aurx emacspeak && aury
+
+alias aurb='aur build --database=aur --chroot --force'         # rebuild inside current dir
+alias auri='aur sync --database=aur --chroot --no-view'        # install
+alias aurl='pacman -Sl aur'   # list installed aur pkgs
+alias aurs='aur search'
+
+# apply action to "aur" database only
+alias paca='sudo pacman --config /etc/pacman.d/aur.conf'
+alias aury='paca -Sy'
+alias auru='paca -Syu'
+
+alias aurc='paccache --cachedir /var/cache/pacman/aur --keep 0 --dryrun --'
+alias aurC='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
+
+# WARN: it doesn't remove pkg from cache dir BAD: paccache won't find it anymore
+# https://github.com/AladW/aurutils/issues/305 + $ sudo pacman -Syu
+# https://github.com/AladW/aurutils/issues/208
+#   = Note that when you set your repo as a pacman CacheDir (which is recommended anyway), you can use KeepInstalled and simply run pacman -Sc. repoctl update then proceeds to remove stale entries from the db.
+aurx(){ find /var/cache/pacman/aur -name "*.db.tar" -execdir repo-remove {} "$@" \;; }
