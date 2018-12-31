@@ -13,7 +13,7 @@ MAKEFLAGS += --silent
 this := $(lastword $(MAKEFILE_LIST))
 $(this): ;
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
-help: ; @echo 'Use: $(PHONY)'; @sed -rn '/^(.*\s)?#%/s///p' '$(this)'
+help: ; @echo 'Use: $(PHONY)'; sed -rn '/^(.*\s)?#%/s///p' '$(this)'
 .PHONY: $(PHONY)
 
 ### Parameters

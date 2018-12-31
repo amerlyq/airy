@@ -51,11 +51,14 @@ tsdir := $(or $(TMPDIR),/tmp)/airy/ts
 #  !! each recipe is generated for all subpaths at once !!
 #  ENH: filter directly by subpath matching e.g. "airy/setup" or "airy/.*"
 #  BUT: we can't use "airy/[^/]+" because subpath may be nested
-@allmods := $(shell r.airy-mods-all)
-@modlist := $(filter-out $(_phony),$(MAKECMDGOALS))
+@modlist := $(MAKECMDGOALS)
 @modlist := $(foreach t,$(@modlist),$(firstword $(subst /, ,$t)))
+@modlist := $(filter-out $(_phony),$(@modlist))
+
+@allmods := $(shell r.airy-mods-all)
 _unknown := $(filter-out $(@allmods),$(@modlist))
 $(if $(_unknown),$(error no such mod(s) {$(_unknown)}, look into help =$$ make -f '$(this)' help $$=))
+
 @modlist := $(or $(@modlist),$(shell r.airy-mods-required))
 @modlist := $(filter-out $(skip),$(@modlist))
 

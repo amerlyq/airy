@@ -1,5 +1,8 @@
 NEED: setup gnupg with encryption key
 
+TODO: add to qutebrowser
+  https://github.com/browserpass/browserpass
+
 SEE pass+git
   https://www.passwordstore.org/
   https://wiki.archlinux.org/index.php/Pass
@@ -7,6 +10,9 @@ SEE pass+git
 Setup
   $ pass init $mail
   $ pass insert work/user
+
+Copy url field from data produced by pass-import
+  $ pass urldroplet.com | grep -oP '^url: \K.*' Y
 
 USE
   Copy passwd from dmenu to xclip

@@ -17,7 +17,7 @@ if [[ -e "$path" ]]; then
 fi
 
 # https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg
-ffmpeg -y -nostdin -i "$fname" \
+exec ffmpeg -y -nostdin -i "$fname" \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
     -c:v libx264 -c:a aac -codec:d copy \
     "$path"

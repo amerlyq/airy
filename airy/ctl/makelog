@@ -21,4 +21,6 @@ mkdir -p "${log%/*}"
 
 [[ -t 1 ]] && exec > >(r.airy-pretty)
 
-make "$@" | stdbuf -oL -eL tee -a "$log"
+{ { make "$@"
+  } 3>&1 1>&2 2>&3 | sed -u 's/^/ERR: /'
+} |& stdbuf -oL -eL tee -a "$log"

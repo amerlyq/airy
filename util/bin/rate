@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+date=${1:-$(date +%Y%m%d)}
+code=${2:-usd}
+
+exec > >(grep -oP '<rate>\K[0-9.]+')
+
+exec curl -s "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=${code^^}&date=$date"
