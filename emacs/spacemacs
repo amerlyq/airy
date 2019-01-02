@@ -102,7 +102,7 @@ values."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style 'vim
+   dotspacemacs-editing-style '(vim :variables vim-style-visual-feedback t)
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
@@ -260,7 +260,7 @@ values."
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
    ;; (default nil)
-   dotspacemacs-line-numbers nil
+   dotspacemacs-line-numbers 'relative
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
    dotspacemacs-folding-method 'evil
@@ -303,6 +303,11 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   )
 
+; (defun keyboard-escape-quit-and-save-buffer ()
+;   "Run in sequence."
+;   (save-buffer)
+;   (keyboard-escape-quit))
+
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
 This function is called at the very end of Spacemacs initialization after
@@ -310,12 +315,27 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-    ; (load-file "/usr/share/emacs/site-lisp/emacspeak/lisp/emacspeak-setup.el")
-    (global-linum-mode) ; Show line numbers by default
-    ;; FIXME exit only if espeak in process list, but not other
-    ; (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-    ;     "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-    ;     (flet ((process-list ())) ad-do-it))
+  ; (load-file "/usr/share/emacs/site-lisp/emacspeak/lisp/emacspeak-setup.el")
+  ; (global-linum-mode) ; Show line numbers by default
+  ;; FIXME exit only if espeak in process list, but not other
+  ; (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  ;     "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+  ;     (flet ((process-list ())) ad-do-it))
+
+  ;; TRY: install evil-goggles
+  ;; https://gitter.im/syl20bnr/spacemacs/archives/2017/08/29
+  ;;   https://gist.github.com/fiveNinePlusR/73216d90d2562963ad0a311bd0578807
+  ;; SEE: https://github.com/syl20bnr/spacemacs/blob/develop/doc/DOCUMENTATION.org#vim
+  ;;  https://github.com/syl20bnr/spacemacs/issues/10834
+
+  ;; clipboard
+  ; https://github.com/syl20bnr/spacemacs/issues/2222
+
+  ;; BAD: can't input ',' at all
+  ;; SEE: http://blog.jenkster.com/2013/02/mapping-jk-in-emacs-evil-mode.html
+  ;; BET: https://github.com/syl20bnr/evil-escape
+  ; (define-key evil-insert-state-map (kbd ",s") 'save-buffer)
+  ; (define-key evil-insert-state-map (kbd ",s") 'keyboard-escape-quit-and-save-buffer)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
