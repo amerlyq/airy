@@ -1,23 +1,27 @@
 #!/usr/bin/env bash
+#%SUMMARY: list of available mods/paths sorted in overlay order
 set -euo pipefail
+
+reversed=
+sortkeys='%f/%f'
 
 # TODO: sort by guesstimate install time
 #   => HACK: store this time inside stampfiles and sum them by mods
-sorted=1
+# i.e. if (guess && 0<(getline duration < $0)) { printf strtonum(duration); close($0) }
+sortbyguesstimate=
 
-while getopts '' o; do case $o in :|'?') exit 1
-;; S) sorted=
+while getopts 'd:pr' o; do case $o in :|'?') exit 1
+;; d) sortkeys="%f/%f$OPTARG%p"   #% d:= print both name and path separated by delimiter
+;; p) sortkeys='%f/%p'            #% p = print mod path instead of name
+;; r) reversed=1                  #% r = search overlays in reversed order
+;; S) sortbyguesstimate=1
 esac; done; shift $((OPTIND - 1))
+repos=$(r.airy-mods-repos ${reversed:+-r} "$@")
+readarray -t repos <<< "$repos"
 
-if (($#)); then
-  paths=("$@")
-elif [[ ! -t 0 ]]; then
-  readarray -t paths
-else
-  tmp=$(r.airy-overlay -Q)
-  readarray -t paths <<< "$tmp"
-fi
-
-find -H "${paths[@]}" -mindepth 1 -maxdepth 1 \
-  -type d -not -name '[_.]*' -printf '%f\n' \
-| LC_ALL=C sort -u
+# NOTE: sort in overlay order by mod name
+find -H "${repos[@]}" -mindepth 1 -maxdepth 1 \
+  -type d -not -name '[_.]*' -printf "$sortkeys\n" \
+| LC_ALL=C sort -st/ -k1,1 \
+| cut -d/ -f2- \
+| uniq

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# NOTE: hardcoded order (systemwide dependencies)
-beg=( airy pacman )
+# NOTE: hardcoded order (systemwide dependencies) = most necessary tools first
+#   -- to have somewhat usable system even if *airy* breaks in the middle
+beg=( airy pacman bash zsh ranger vim tmux )
 end=( )  # defaults
 
 first=$(printf '%s\n' "${beg[@]}")

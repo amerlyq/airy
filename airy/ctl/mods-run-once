@@ -113,7 +113,9 @@ reset:
 help:
 	@echo "VIZ:(targets): {$(_phony)}"
 	sed -rn '/^(.*\s)?#%/s///p' '$(this)'
-	@echo "VIZ:(known mods): {$(@allmods)}"
+	@echo "VIZ:(total=$(words $(@modlist)) requested mods): {$(@modlist)}"
+	@echo
+	@echo "VIZ:(rest of mods from total=$(words $(@allmods))): {$(filter-out $(@modlist),$(@allmods))}"
 
 # ATT: "make" treats existing files in cwd as implicit targets => no error even if no target
 #   => generate explicit error when target not found

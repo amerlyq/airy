@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#%BAD:PERF: 150mS -- must be only 50mS
 source ~/.shell/profile
 set -euo pipefail
 
@@ -9,8 +10,18 @@ exec 0<<<"$ordered"
 exec 3<<<"$required"
 
 notfound=$(grep -vxFf /dev/fd/0 -- /dev/fd/3 | paste -sd ',') && {
-  echo "Err: mods not found: '$notfound'" >&2
+  echo "Err: mods not found: {$notfound}" >&2
   exit 1
 }
+
+chk_dups(){ local dups
+  dups=$(sort | uniq -d)
+  [[ ${dups:+x} ]] || return 0
+  echo "Err: "$*" duplicates: {$dups}" >&2
+  exit 1
+}
+
+chk_dups 'all mods' <<< "$ordered"
+chk_dups 'req mods' <<< "$required"
 
 exec grep -xFf /dev/fd/3 -- /dev/fd/0

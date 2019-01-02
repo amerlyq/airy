@@ -13,7 +13,6 @@ MAKEFLAGS += --silent
 this := $(lastword $(MAKEFILE_LIST))
 $(this): ;
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
-help: ; @echo 'Use: $(PHONY)'; sed -rn '/^(.*\s)?#%/s///p' '$(this)'
 .PHONY: $(PHONY)
 
 ### Parameters
@@ -73,13 +72,11 @@ setup update recache: ; $(&mods) all/$@
 defaults: clean configure
 	r.airy -sd
 
-tags: _build/tags
-# TODO: use whole ./pkg/* instead of depending on -f ...
-# ALSO: tag full ./pkg/* by content of _build/mods
-# => like renaming links as 'modname' -> '[+]modname' for enabled ones
-# ALT: Enabled: +mod | @mod | [+]mod, Disabled: simple name w/o marker
-_build/tags: _build/mods
-	r.airy-link-tags -t "$@" -f "$<"
+tags:
+	r.airy-mods-tags -L ~/.cache/airy/tags
+
+tags-tree:
+	tree --noreport -- ~/.cache/airy/tags | sed 's/\s*->\s*.*//'
 
 problems:
 	@echo "Manually verify necessity of packages outside of airy."
@@ -89,6 +86,11 @@ problems:
 	@echo "ALT: find / -name '*.pacnew'"
 	@echo "Then, for each found *.panew, do 'v -d /etc/locale.gen{,.pacnew}'"
 	locate .pacnew
+
+help:
+	@echo 'Use: $(PHONY)'
+	@sed -rn '/^(.*\s)?#%/s///p' '$(this)'
+	$(&mods) help
 
 #% NOTE: pass-through unknown targets as mod names
 .FORCE:

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#%SUMMARY: convert modpaths list to modname with repo suffix
+#%  !! only single mod can be defined -- everything else will be overlays
+#%  !! different mods with same name is conflict
+#%WARN: overlay repos basenames must be different OR? enumerate as {mod@repo=1, mod@repo=2...}
+#%FIXME: place
+set -euo pipefail
+
+always=0
+pathsep=
+reposep=@
+
+while getopts 'ap:s:' o; do case $o in :|'?') exit 1
+;; a) always=1
+;; p) pathsep=$OPTARG
+;; s) reposep=$OPTARG
+esac; done; shift $((OPTIND - 1))
+
+# MAYBE: some mods in "airy" can work as overlays over foreign mods (reversed order)
+awk -F/ -vsfx="$always" -vrs="$reposep" -vps="$pathsep" '{
+  s=""
+  if (sfx || $NF==pmod) { s=s rs $(NF-1) }
+  if (ps) { s=s ps $0 }
+  print $NF s
+  pmod=$NF
+}'

@@ -1,0 +1,85 @@
+#!/usr/bin/env zsh
+#%SUMMARY: print known tags for all mods (or create symlinks tag tree)
+#%USAGE: $ r.airy-mods-tags [-L /tags/destdir] [--] [/path/to/repo...]
+#%  e.g: $ r.airy-mods-tags -L ~/.cache/airy/tags -- ~/.local/airy
+#NOTE: use one of [F3G] to disable/error/null glob
+set -FCuremo pipefail
+
+# [_] DEV: append manually launched mods to ~/.config/airy/custom.mods (beside common.mods and <hostname>.mods)
+#   => add "_custom" tags -- if run ./setup|./install and not in _requested (also -- remove "_unused" tag for this mod)
+#   ALT: instead of {'' + custom | unused} use {[in]active | [dis/en]abled}
+# MAYBE: add tag "_incomplete" to mods w/o "setup" file or w/o "tags" modeline -- to fixup it thoroughly
+
+# MAYBE:(opt -m: or stdin): update tags for only chosen mods w/o removing everything
+# MAYBE: allow "key=val" tags (e.g. repo="airy/erian/devq")
+#   <= because can't distinguish "repo" from other tags if not key=val fmt
+
+tagdir=
+modsep=': '
+
+# ALT? zparseopts -D -K -M -A opts -- L=-create-links --create-links
+while getopts 'L:m:' o; do case $o in :|'?') exit 1
+;; L) tagdir=$OPTARG
+;; m) modsep=$OPTARG
+esac; done; shift $((OPTIND - 1))
+repos=( ${(f)"$(r.airy-mods-repos $@)"} )
+
+# -----
+# INFO: "all" mods = to compose flat directory of all overlays
+modlist=$(r.airy-mods-all -rp -- $repos | r.airy-mods-suffix -p:)
+typeset -A mods tags
+for e in ${(f)modlist}; do
+  k=${e%%:*}
+  m=${k%@*}
+  mods[$k]=${e#*:}
+  tags[$m]=''
+  [[ $k == $m ]] || tags[$m]+=' _overlay'
+done
+
+# INFO: "required" mods = explicitly requested in user config
+reqlist=$(r.airy-mods-required -- $repos)
+reqs=( ${(f)reqlist} )
+for e in $reqs; do
+  (( $+tags[${e%%:*}] ))
+  tags[${e%%:*}]+=' _required'
+done
+
+# INFO: "unused" mods = {all - required}
+for k in ${(k)tags:|reqs}; do
+  tags[$k]+=' _unused'
+done
+
+# INFO: manual tags = extracted from modeline in 'setup' file
+taglist=$(r.airy-mods-modelines -K tags -m: -- $repos)
+for e in ${(f)taglist}; do
+  (( $+tags[${e%%:*}] ))
+  tags[${e%%:*}]+=" ${e#*:}"
+done
+
+# -----
+function make_links { local mdir=$1 mod=$2; shift 2
+  local -A sfx
+  ((${@[(ie)_required]} <= $#)) && sfx[_all]+=' [+]'
+  ((${@[(ie)obsolete]} <= $#)) && sfx[_all]+=' ##'
+  for tag; do
+    local link=$tagdir/$tag/${mod}${sfx[$tag]-}
+    [[ $link -ef $mdir ]] && continue
+    mkdir -p ${link%/*}
+    command ln -snT $mdir $link
+  done
+}
+
+# DEBUG: print -l -- "${(@qkv)tags}"
+
+if [[ -n $tagdir ]]; then
+  [[ -d $tagdir ]] && find -H $tagdir -depth \( \( -type l -xtype d \) -or \( -type d -empty \) \) -delete
+  [[ -d $tagdir ]] && { echo "Err: tags dir not empty: $tagdir"; find -H "$tagdir"; exit 1; } >&2
+  # ALT: print -l ${(kv)mods[(I)qute|qute@*]}
+  for m in ${(ok)mods}; do
+    make_links $mods[$m] $m _all ${(z)tags[${m%@*}]}
+  done
+else  # NOTE: w/o option "-L:" -- simply print whole graph
+  for k in ${(ok)tags}; do
+    print -- "${k}${modsep}${(z)tags[${k%@*}]}"
+  done
+fi

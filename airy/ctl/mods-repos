@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#%SUMMARY: print overlays path list in its search order
+set -euo pipefail
+
+[[ ${1-} == -r ]] && shift && exec > >(tac)
+
+if (($#)); then
+  printf '%s\n' "$@"
+elif [[ ! -t 0 ]]; then
+  exec cat
+else
+  exec r.airy-overlay -Q
+fi

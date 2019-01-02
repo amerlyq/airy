@@ -1,44 +1,51 @@
 #!/usr/bin/env bash
 #%SUMMARY: extract modelines by specified keys i.e. /# key: .../
+#%CHECK: merges modelines of all overlays per each mod MAYBE?BET: override tags by overlays
 set -euo pipefail
 
 files=(setup)
-mkeys=(deps)
-dirsep=': '
-tagsep=  # use "|"
+mkeys=()
+pathsep=
+modsep=$': '
+keysep=
+tagsep=$' '
 
-while getopts 'f:k:d:t:' o; do case $o in :|'?') exit 1
-;; f) IFS=', ' read -ra files <<<"$OPTARG"
-;; k) IFS=', ' read -ra mkeys <<<"$OPTARG"
-;; d) dirsep=$OPTARG
+while getopts 'F:k:K:m:p:t:' o; do case $o in :|'?') exit 1
+;; F) IFS=', ' read -ra files <<<"$OPTARG"
+;; K) IFS=', ' read -ra mkeys <<<"$OPTARG"
+;; m) modsep=$OPTARG
+;; k) keysep=$OPTARG
 ;; t) tagsep=$OPTARG
+;; p) pathsep=$OPTARG
 esac; done; shift $((OPTIND - 1))
+repos=$(r.airy-mods-repos "$@"); readarray -t repos <<< "$repos"
 
-if (($#)); then
-  paths=("$@")
-elif [[ ! -t 0 ]]; then
-  readarray -t paths
-else
-  tmp=$(r.airy-overlay -Q)
-  readarray -t paths <<< "$tmp"
-fi
+((${#mkeys[@]})) || { echo "Err: need at least one comma-separated key '-k ...'" >&2; exit 1; }
 
 search=( '(' -false )
 for f in "${files[@]}"; do search+=( -o -name "$f" ); done
 search+=( ')' )
 
+# ALT:(grep): exit after first not-commented line
+#   $ sed -rn '/^[^#]/q;/^#@deps:\s*(.+)\s*$/{s//\1\t/;s/\s+/\n'"${f##*/}"'\t/g;p}' -- "$f"
 keyrgx=$(printf '\\Q%s\\E\n' "${mkeys[@]}" | paste -sd '|')
-modrgx="^#+\s*\K($keyrgx):\s*[^#]+"
+modrgx="^#+\s*\K($keyrgx):\s*[^#:]+"
 
-find -H "${paths[@]}" -mindepth 2 -maxdepth 2 -type f "${search[@]}" -print0 \
+# WARN: file path can't contain ':' when using (-p:)
+find -H "${repos[@]}" -mindepth 2 -maxdepth 2 -type f "${search[@]}" -print0 \
 | xargs -0 grep -PHo "$modrgx" \
-| awk -F/ -vOFS=: -vt="$tagsep" -vh="$dirsep" '
-  $(NF-1)!=d {if(d){for(k in m){print (t?k""t:"") d h m[k]}}; d=$(NF-1); delete m}
+| awk -F/ -vOFS=: -vps="$pathsep" -vms="$modsep" -vks="$keysep" -vts="$tagsep" '
+  function fmt(){ if(m){ for(k in t){
+    gsub(/\s+/, ts, t[k])
+    print (ps ? p""ps : "") (ms ? m""ms : "") (ks ? k""ks : "") t[k]
+    delete t
+  }}}
+  m != $(NF-1) { fmt(); m=$(NF-1); p=substr($0, 1, index($0,":") - 1) }
   {
     split($NF, a, /:\s*/)
     k = a[2]
     sub(/\s+$/, "", a[3])
-    m[k]=m[k] (m[k]?" ":"") a[3]
+    t[k]=t[k] (t[k] ? " " : "") a[3]
   }
-  END {if(d){for(k in m){print (t?k""t:"") d h m[k]}}}
+  END {fmt()}
 '

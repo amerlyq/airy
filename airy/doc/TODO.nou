@@ -29,23 +29,26 @@ pkglst
   2017-03-12 [X] rename private file ./pkgs -> ./mods
   !!! [_] remove sourcing ./pkgs file from 'profile' with reading by 'readarray'
     = (long operation -- sourced in each cfgsetup)
-  [_] TODO: mark as obsolete (or another word instead of 'obsolete' -- SEE how AUR marks such old cases)
+    = use two plain files with comments "default mods" and "per-host mods" as overlay over stored in "airy"
+      => specify used list by AIRY_MODS_CFGNAMES in setup/profile
+  2018-12-31 [X] TODO: mark as obsolete (or another word instead of 'obsolete' -- SEE how AUR marks such old cases)
     VIZ: surf uzbl vimb eclipse java latex sql tizen webex synergy urxvt i3 tray
-  [_] TODO: check AIRY_MODS on errors (err on inexistant pkgs and warn on duplicates)
+  2018-12-31 [X] TODO: check AIRY_MODS on errors (err on inexistant pkgs and warn on duplicates)
     => keep 'r.airy-find-pkgs' script, but replace it by direct access to paths in ./pkg/* by ./run
-  [_] apply unique to non-sorted lists -- to reorder some items in top of list
+  2018-12-31 [X] apply unique to non-sorted lists -- to reorder some items in top of list
     E.G. AIRY_MODS=( xorg ... sorted list | unique )
     BET: use 'tsort' and raise err on repetition
   [_] airy dirs structure
     2017-03-12 [X] ls ./airy/* -- flat list
     2017-03-12 [X] _build
-    [_] _obsolete  # ALT: use tags: obsolete instead and filter-out from auto-tag 'active'
+    2019-01-02 [X] _obsolete  # ALT: use tags: obsolete instead and filter-out from auto-tag 'active'
+    2019-01-02 [X] add one of _[un]used tags by checking in AIRY_MODS
     [_] _site  # aux gen from mods
     2017-03-12 [X] _doc  # notes + tasks
     2017-03-12 [X] airy   # mng 'airy' by itself -- add to ./pkgs
   2017-02-09 [X] TODO: install, notes => redistribute
-  [_] TODO: vim diff between list ./pkg/* and file ./pkgs to easily see and add new pkgs
-    => embed into makefile
+  2018-12-31 [X] TODO: vim diff between list ./pkg/* and file ./pkgs to easily see and add new pkgs
+    => embed into makefile ::: BET: simply look into _unused tags dir
   [_] TODO: compare all pacman pakages from AIRY_MODS with installed on system
     and suggest to user to remove excessive ones
     (after reducing AIRY_MODS to maintain cleaner system)
@@ -54,14 +57,14 @@ pkglst
       https://en.wikipedia.org/wiki/Tsort
     ALT: https://sourceforge.net/projects/dep-trace/
   [_] DEV extract 'deps:' and apply 'tsort' on them :: split ./airy/ctl scripts
-    [_] gather '-a' all mods from all locations
+    2018-12-31 [X] gather '-a' all mods from all locations
     [_] sort mods intervening
       (? HOW to make mutual deps after/before for identically named pkgs ?)
     [_] create table: name, repo/name, fullpath
     [_] sort table topologically
-    [_] reuse these parts of funcs orthogonally everywhere in airy
+    2018-12-31 [X] reuse these parts of funcs orthogonally everywhere in airy
     [_] after tsort by deps graph, use numeric stable sort by 'priority coeff'
-      = so, pacman/vim/ranger will be at the top
+      = so, pacman/vim/ranger will be at the top and become available even if next steps will break install
     [_] allow using file-deps instead of mod-deps :: "# deps: some/setup"
   [_] DEV: individual 'deps:' in setup/install/update/recache
     [_] 'wide' mode : gather all 'deps:' in single list before processing
@@ -73,7 +76,7 @@ pkglst
       airy: keep sep setup-deps and run-deps
         << like it's done in PKGBUILD
       BUT! each "run" script may require diff deps =>? keep only total
-  [_] TODO!!! reorder pkg: firstly -- the most necessary tools (zsh,vim,ranger)
+  2019-01-01 [X] TODO!!! reorder pkg: firstly -- the most necessary tools (zsh,vim,ranger)
     = so even if system breaks, it must become somewhat more usable then default to fix all troubles
     => ENH: append to AIRY_MODS instead of overwrite
       * HACK:(non-robust): make reasonable default group with necessary deps in default system ~/.shell/profile
@@ -190,11 +193,11 @@ structure
   2017-02-09 [X] MOVE ./bin -> ./ctl and populate prgs from ./bin with unchanged names
   [_] Add VAR 'tags' to generate symlinked categories into ./_build
     2017-01-30 [X] ALT:TEMP: for each 'setup' add '# tags: .. .. ..' after /^source ~\/.*cfgsetup/
-    [_] cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
-      [_] ALT: link all ./pkg/* w/o mod file in root --> ./_build/{wrong|trash|empty|bad}
-    [_] ALSO: search all non-'pretty' for that regex
+    2019-01-02 [X] cfgsetup = apply additional tag :: [in]active | [dis/en]abled | [un]used
+      2019-01-02 [X] ALT: link all ./pkg/* w/o mod file in root --> ./_build/{wrong|trash|empty|bad}
+    2019-01-02 [X] ALSO: search all non-'pretty' for that regex
       -- must source / traverse all mods and not only choosen ones from AIRY_MODS
-    [_] WTF: when mods in diff dirs has same name and same tags? it's impossible to add them into same path name
+    2019-01-02 [X] WTF: when mods in diff dirs has same name and same tags? it's impossible to add them into same path name
   Abstraction: defaults -> ./mod -> ./pkg
     2017-02-09 [X] rename ./cfg -> ./pkg (for named main/aur pkgs only)
     2017-01-27 [X] rename ./my -> ./mod
