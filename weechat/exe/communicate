@@ -21,6 +21,7 @@ while getopts 'dhp:v' o; do case $o in :|'?') exit 1
 ;; p) pipe=$OPTARG  #% p = pipe /path/to/weechat_fifo
 esac; done; unset o; shift $((OPTIND-1))
 
+# [_] TODO:DEV: merge lines ending with single unescaped '\'
 strip_comments(){ sed -r '/^\s+/s///; /(^#|  # ).*$/s///; /^$/d'; }
 parse_config(){ env-subs "$@" | strip_comments | sed 's/^/*/'; }
 
