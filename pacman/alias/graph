@@ -1,0 +1,7 @@
+# vim:ft=sh
+
+alias pacr='pactree -c'       # deps direct
+alias pacR='pactree -cr'      # deps reverse
+
+pacrg(){ pactree -d3 --graph "$@" | xdot /dev/stdin; }
+pacRg(){ pactree -r -d3 --graph "$@" | xdot /dev/stdin; }

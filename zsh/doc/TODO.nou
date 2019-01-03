@@ -42,10 +42,12 @@ Profiling startup time
   [_] BUG why zprofile loaded on st?
   [_] BUG double-loading zprofile in tmux
   SEE
-    > http://blog.xebia.com/profiling-zsh-shell-scripts/
+    +++ https://xebia.com/blog/profiling-zsh-shell-scripts/
     https://kev.inburke.com/kevin/profiling-zsh-startup-time/
     http://stackoverflow.com/questions/4351244/can-i-profile-my-zshrc-zshenv
     http://stackoverflow.com/questions/8899890/zsh-script-and-prompt-profiling
+  HACK: add timestamps to commands (even interactive ones)
+    https://gist.github.com/nriley/34d92c9eb2eaf1073c04
   [_] FIX reduce startup time -- it's too much for zsh+ranger
     := do all preparations async like for git?
     :/ or make async ipc from ranger to zsh -- which is even better

@@ -1,21 +1,34 @@
 # vim:ft=sh
 
+# [_] CHECK: it seems "auru" is not needed anymore after "aurb"
 # USAGE:
 # * (rebuild) $ cd ~/.cache/aurutils/sync/emacspeak && aurb && auru && paci emacspeak
 # *  (remove) $ pacx emacspeak && aurC && aurx emacspeak && aury
 
-alias aurb='aur build --database=aur --chroot --force'         # rebuild inside current dir
-alias auri='aur sync --database=aur --chroot --no-view'        # install
+alias aur='AUR_REPO=aur aur'
+alias aurb='aur build --chroot --force'          # rebuild inside current dir
+alias aurc='pacman -Qm | aur vercmp'                            # check updates for foreign pkgs
+alias auri='aur sync --chroot --no-view'         # install
 alias aurl='pacman -Sl aur'   # list installed aur pkgs
 alias aurs='aur search'
+function aurS { aur pkglist -P "$@" | xargs aur search -i; }    # search pkgname by regex
 
-# apply action to "aur" database only
+alias aur\?='pacman -Slq aur | grep -vxFf <(aur pkglist)'       # unknown pkgs (not from AUR)
+
+# HACK: apply action to "aur" database only (to keep old core/extra/community)
+#   ALT:(for whole aurutils): make wrapper-script from it and export PACMAN=/path/to/script
+#   ALT: make symlink to eliminate necessity to sync custom repo at all
+#     $ ln -s /var/lib/pacman/sync/aur.db /var/cache/pacman/aur/aur.db
 alias paca='sudo pacman --config /etc/pacman.d/aur.conf'
 alias aury='paca -Sy'
 alias auru='paca -Syu'
 
-alias aurc='paccache --cachedir /var/cache/pacman/aur --keep 0 --dryrun --'
-alias aurC='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
+# ALT: update only installed
+# pacman -Slq aur | grep -ZFxf <(pacman -Qq) | xargs -0 echo
+alias aurU='aur sync -u'                                        # update-rebuild all
+
+alias aurz='paccache --cachedir /var/cache/pacman/aur --keep 0 --dryrun --'
+alias aurZ='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
 
 # WARN: it doesn't remove pkg from cache dir BAD: paccache won't find it anymore
 # https://github.com/AladW/aurutils/issues/305 + $ sudo pacman -Syu

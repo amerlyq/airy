@@ -19,6 +19,10 @@ mkdir -p ~/.config/airy
 linkcp -q {,~/.}shell
 linkcp -q ./pathes ~/.config/airy/pathes
 
+# FIXME: as with tags -- run only once on all mods in batch
+#   => and allow to pass mods list through stdin or args
+#   RFC:(-f): pass "repos" as colon-separated list to seek at
+#     <= instead of "cfg-overlay -Q" (simplity it)
 r.airy-cache-alias
 
 # TEMP:REM: until normal way to build libs awailable

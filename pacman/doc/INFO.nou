@@ -1,3 +1,20 @@
+WARN: full system upgrade needed each time when using chroot
+  ::: don't use chroot
+    host: pacman databases A -- /var/lib/pacman/sync
+    container: pacman databases B -- /var/cache/aurbuild/x86_64/root/var/lib/pacman/sync
+    custom: bind mounted to the chroot R -- /var/cache/pacman/custom/custom.db
+    1) You build the package bloatpkg in the container.
+    2) "B" and "R" are updated (synced) in the process such that necessary makedepends for bloatpkg can be installed to the container.
+      => to prevent sync just use devtools directly. (/usr/bin/extra-x86_64-build)
+    3) "A" remains unaffected. To install bloatpkg on the host, you thus need to sync "A" to match "R".
+    4) However, "R" assumed "B". Thus the package may not work if you don't do a full system upgrade.
+      => ALT: use same archive mirror for host and chroot OR don't use chroots
+  ALT: make "B" a copy of "A" ::
+    - bind mount /var/lib/pacman/sync
+    - remove -u from the makechrootpkg options
+    - adapt the --config/-Syu mechanism for local builds to chroot builds
+
+
 PGP signature
   !! when problem with package update, first update 'archlinux-keyring' pkg
    E.G: signature from "Ambrevar <ambrevar@gmail.com>" is unknown trust
@@ -47,6 +64,11 @@ PKGBUILD
   Add user/group by PKGBUILD .install hooks
     https://wiki.archlinux.org/index.php/PKGBUILD#install
     https://wiki.archlinux.org/index.php/Pacman#Hooks
+
+  WARN: never delete anything directly in PKGBUILD (or its hooks)
+    https://bbs.archlinux.org/viewtopic.php?id=202532
+      https://github.com/valvesoftware/steam-for-linux/issues/3671
+      https://bugzilla.redhat.com/show_bug.cgi?id=1202858
 
 
 Use alien pkgs

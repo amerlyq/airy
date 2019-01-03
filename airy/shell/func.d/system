@@ -20,7 +20,8 @@ error() { local err=$?
 trap_errors(){
     # FIXME: even with those options, pkgbuild errors are not catched?
     # [[ $- =~ i ]] && return || exit
-    # Let shell functions inherit ERR trap.  Same as `set -E'.
+    # Let shell functions inherit ERR trap.  Same as `set -E' for subshell.
+    # SEE: http://unix.stackexchange.com/questions/48533/exit-shell-script-from-a-subshell
     set -o errtrace
 
     #  Trap non-normal exit signals: 1/HUP, 2/INT, 3/QUIT, 15/TERM, ERR
