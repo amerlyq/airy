@@ -22,7 +22,7 @@ augroup filetypedetect
   " System
   au BufRead,BufNewFile {*.gpg,*.asc}   setf gpg
   au BufRead,BufNewFile *.log*          setf messages
-  au BufRead,BufNewFile {PKGBUILD,.AURINFO}  setf sh
+  au BufRead,BufNewFile {PKGBUILD,.AURINFO,*.pkgbuild}  setf sh
   au BufRead,BufNewFile {*.automount,*.mount,*.path,*.socket,*.swap,*.target,*.service} setf systemd
   au BufRead ~/sdk/*                    setl ts=8
   au BufRead ~/.purple/logs/*           setf pidgin

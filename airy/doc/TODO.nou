@@ -320,7 +320,8 @@ install
   [_] DEV: extend '-P' key in 'do_if' to auto-choose appropriate 'has_pkg' for pacman/gem/pip/etc
   [_] BAD: 'git_inst' don't respect 'do_if' keys
     FIND: /\v_inst \zs-\w '?[^ '}]+['} ]*/
-  [_] FIX: 'loc_inst' can't auto-derive pkg name '-P' from the same arg ./PKGBUILD
+  2019-01-03 [X] FIX: 'loc_inst' can't auto-derive pkg name '-P' from the same arg ./PKGBUILD
+    ::: use "$pkgname.pkgbuild" as filename and maintain matching manually
   [_] do_if -> system
   [_] do_if must accept commands from stdin
     = Aim -- in all ./setup files to simplify upgrade sections

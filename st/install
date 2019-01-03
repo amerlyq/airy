@@ -22,7 +22,7 @@ if distro arch; then
   # BUG: can't rebuild pkg because of already built one
   #   WARNING: A package has already been built, installing existing package...
   #   ::: rm ~/.cache/airy/pkg/st-airy-git/*.tar.xz
-  loc_inst -P 'st-airy-git' ./PKGBUILD FONT_ST="${FONT_ST-}"
+  FONT_ST="${FONT_ST-}" loc_inst ./st-airy-git.pkgbuild
 
   # CHECK? if some needed
   ## reptyr -- attach running pr to a new terminal
