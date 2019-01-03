@@ -287,6 +287,9 @@ setup
     -- check if $USER available from bare script := see .xprofile
   [_] In each script replace ~/.config to $XDG_CONFIG_HOME with fallback
     ALSO: set this shell var in cfgsetup like TMPDIR
+  [_] THINK:DEV: $(r.airy-dir "folder") for VIZ. bin, cfg, pkg, ...
+    => similar to xdg-user-dir parsing user-dirs.dirs but available even on clean system
+    ALSO: we can't store xdg dirs in defaults, because we need to access them much earlier
   [_] create ./wmkeys to populate current *wm* hotkeys
     => convert general format to wm-specific one
     * use general function names, with wm-specific impl
@@ -372,7 +375,12 @@ cache-alias
     ~ dir with symlinks to aliases
 
 
-PKGMOD
+PKGMOD / AIRYPKG
+  [_] BET: install systemwide pkg + add dev prefix to system
+    * all overlays public/private combined form package in /etc | /usr/bin ...
+    * config vars fallback as usual /home -> /etc -> /usr/lib
+    * add dev prefix to user's PATH and LD_LIBRARY_PATH to use bleeding edge
+      => and still you could remove any part in any moment to fallback to system's stable pkgs
   [_] TRY:OPT: install "airy" as secure system-wide (with sudo on exclusive single-user PC) or portable user-local *pkg* (on shared PC)
     * run inside chroot to create single package
     * (option) copy files under symlinks or keep as symlinks

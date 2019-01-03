@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 test "${_EXEC-}" = 1 || _EXEC=1 exec "$SHELL" "$0" "$@"
 set -euo pipefail
-(($#)) || set -- $(r.airy-get-cache)/cfg/aliases
+(($#)) || set -- "${AIRY_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/airy}/aliases.sh"
 
 # SEE:VAR https://www.gnu.org/software/bash/manual/bashref.html#Bash-Variables
 # if [[ -n ${BASH-} ]]; then

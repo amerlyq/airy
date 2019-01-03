@@ -26,6 +26,8 @@ this := $(lastword $(MAKEFILE_LIST))
 _phony := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
 $(this): ; @:
 
+# TRY:DEV: add deps of 'setup' -> ./cfg/* etc used in "setup" but then it must be declarative file!
+#   => i.e. we need smth similar to PKGBUILD file with lists and "install/setup/recache" will be generally the same
 # TODO: dev script "mods-all-deps" and add inter-deps to recipes for multithread execution
 #  !!! aur_inst may corrupt file -- use flock ???
 #    => ALT: pass $(mktemp) per-thread file through env var and then merge outputs
@@ -36,6 +38,7 @@ $(this): ; @:
 # BET? check all deps to be present inside @modlist and fail with normal error
 #  => but then we can't simply call "some/setup" even if its deps are already installed
 #    !! especially if we want to avoid re-setup for its deps mods !!
+# MAYBE: use parallel
 # FAIL: dependency on whole "mod" results in out-of-order install/setup
 #   MAYBE:(option): deps={install,ignore,error} to choose behavior
 # airy/setup: vime ; @:
@@ -64,7 +67,9 @@ $(if $(_unknown),$(error no such mod(s) {$(_unknown)}, look into help =$$ make -
 
 # ====================
 $(subst ,, ) := $(subst ,, )
-&stampfile = $(subst $( ),\$( ),$(tsdir)/@$(subst /,_,$(1)))
+_tspfx := @
+_tsdlm := =+
+&stampfile = $(subst $( ),\$( ),$(tsdir)/$(_tspfx)$(subst /,$(_tsdlm),$(1)))
 &abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
 &modname = $(subst $( ),\$( ),$(notdir $(1:/$(2)=)))
 &scripts = $(shell r.airy-mods-subpaths $(1) -- $(@modlist))
@@ -106,7 +111,7 @@ $(foreach p,$(subpaths),$(eval $(call defsubpath,$p)))
 # ====================
 .PHONY: reset
 reset:
-	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f -name '@?*' -empty -delete
+	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f -name '$(_tspfx)$(_tsdlm)?*' -empty -delete
 	rmdir '$(tsdir)'
 
 .PHONY: help

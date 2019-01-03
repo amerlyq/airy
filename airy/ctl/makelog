@@ -3,6 +3,8 @@
 #%
 set -euo pipefail -o noglob
 
+read -ra fpretty <<< "${AIRY_PRETTY_STDOUT:-r.airy-pretty}"
+
 # FAIL: impossible to distinguish if tgts were passed on cmdline or only flags/vars
 #   => (compromise): always append to end args from stdin OR use special single flag
 # while (($#)); do [[ $1 =~ "^-|=" ]] && shift || break; done
@@ -10,16 +12,17 @@ set -euo pipefail -o noglob
 
 #%USAGE:(fallback): special syntax to accept makefile args from stdin
 #%  $ r.airy - [options]
-(($#>2)) && [[ $1 == -f && -f $2 && $3 == - ]] &&
-  set -- "${@:1:2}" "${@:4}" $([[ -t 0 ]] || cat)
+(($#>2)) && [[ $1 == -f && -f $2 && $3 == - ]] && readarray -t targets \
+  && set -- "${@:1:2}" "${@:4}" "${targets[@]}"
 
+# THINK: instead of fallback in each script -- demand env vars to be always set and FAIL
 log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/log/$(date +'%Y%m%d_%H%M%S').log
 # log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/airy.log
 # log=${TMPDIR:-/tmp}/airy.log
 
 mkdir -p "${log%/*}"
 
-[[ -t 1 ]] && exec > >(r.airy-pretty)
+[[ -t 1 ]] && ((${#fpretty[@]})) && exec > >("${fpretty[@]}")
 
 { { make "$@"
   } 3>&1 1>&2 2>&3 | sed -u 's/^/ERR: /'

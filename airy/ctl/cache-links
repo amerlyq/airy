@@ -2,6 +2,7 @@
 shopt -s nullglob
 
 mod=${PWD##*/}
+bin=${AIRY_BIN:-$HOME/.local/bin}
 
 while getopts 'qg:t:p:' o; do case $o in :|'?') exit 1
 ;; g) group=$OPTARG
@@ -10,7 +11,6 @@ while getopts 'qg:t:p:' o; do case $o in :|'?') exit 1
 ;; q) quiet=1
 esac; done; shift $((OPTIND - 1))
 
-[[ ${bin-} ]] || bin=$(r.airy-get-cache)/bin
 [[ ${prf-} ]] || prf='r.%d-'
 prf=${prf//%d/${group:+${group}.}$mod}
 
@@ -31,6 +31,7 @@ bins -p "${prf}" -- ./ctl/*  # ctl/* -> bin/r.%d-*
 bins -p "${prf%-}" -s 'run/' -- ./run*  # run* -> bin/r.%d*
 
 
+# FIXME: use ~/.cache/airy/prefix and add it to user session as-is
 # BAD:(frail dep): used explicit dst dir
 # BAD:(frail dep): explicit name for dst bin
 # BAD: builds only binaries, can't distinguish libs

@@ -57,6 +57,10 @@ for e in ${(f)taglist}; do
 done
 
 # -----
+function purge_tags { local d=$1
+  [[ -d $d ]] && find -H $d -depth \( \( -type l -xtype d \) -or \( -type d -empty \) \) -delete
+  [[ -e $d ]] && { echo "Err: tags dir not empty: $d"; find -H $d; exit 1; } >&2
+}
 function make_links { local mdir=$1 mod=$2; shift 2
   local -A sfx
   ((${@[(ie)_required]} <= $#)) && sfx[_all]+=' [+]'
@@ -72,8 +76,7 @@ function make_links { local mdir=$1 mod=$2; shift 2
 # DEBUG: print -l -- "${(@qkv)tags}"
 
 if [[ -n $tagdir ]]; then
-  [[ -d $tagdir ]] && find -H $tagdir -depth \( \( -type l -xtype d \) -or \( -type d -empty \) \) -delete
-  [[ -d $tagdir ]] && { echo "Err: tags dir not empty: $tagdir"; find -H "$tagdir"; exit 1; } >&2
+  purge_tags $tagdir
   # ALT: print -l ${(kv)mods[(I)qute|qute@*]}
   for m in ${(ok)mods}; do
     make_links $mods[$m] $m _all ${(z)tags[${m%@*}]}

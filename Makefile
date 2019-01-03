@@ -24,15 +24,18 @@ export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
 export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
 export AIRY_DATA   ?= $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/airy
 
+# BUG: some packages (like gcc-multilib) aren't replaced even with -u) due to pacman defaults to [y/N] in --noconfirm
+#   => TRY: disable "--noconfirm"
+# TODO: remove "-m" => always setup
 flags := -mu
-&mods = +r.airy-mods-run-once "tsdir=$(AIRY_CACHE)/ts" "flags=$(flags)"
+&mods = +r.airy-mods-make "tsdir=$(AIRY_CACHE)/ts" "flags=$(flags)"
 
 # FIXED:(r.airy): on clean install in same login
 # BUG: on clean install maps "defaults" to "vi"
 EDITOR ?= vi
 export PATH := $(AIRY_BIN):$(PATH)
 
-# BET:PERF: use directly $ r.airy-mods-run-once -- flags=-mu all
+# BET:PERF: use directly $ r.airy-mods-make -- flags=-mu all
 all: configure install setup update recache
 
 # MAYBE: replace by "cleanup" script in each mod
@@ -41,7 +44,14 @@ all: configure install setup update recache
 # IDEA: create "backup" scripts per each mod to gather all necessary data in one go
 #   => so even external locations like ~/work or /data/music can be represented by private user mod ;)
 #   => same as "install" -- gather list of paths by env var, but run immediately if launch
-clean: ; r.airy-clean
+## WARN! finally remove symlinks, as all next r.* calls become invalid
+# BAD: if symlinks will be always deleted, r.xorg will be never used in core/xorg
+# BAD: when deleting all together -- must run whole setup for other cleared areas
+#   NEED: clean only systemd ==> link only systemd
+# ALSO: ~/.local/share/fonts
+clean:
+	find -H ~/.config/systemd/user -xdev -depth -mindepth 1 -delete
+	find -H '$(AIRY_BIN)' -xdev -depth -mindepth 1 -delete
 
 # NOTE: prepare config system (once)
 # BAD: no colorizing here => recursive deps with r.airy-pretty
@@ -49,10 +59,11 @@ clean: ; r.airy-clean
 # ALSO: use env vars to force $ pacman --color always $ when using TTY w/o redirect
 # BAD!RFC: dirty code duplication for init (place wholesome into airy/setup)
 #  => BUT: then "airy/setup" must be called even before "all/install" USE? script "init_once" ?
+# ALT:(rename): "r.airyctl"
 configure:
-	mkdir -p $(dir $(AIRY_ROOT)) $(AIRY_BIN) $(AIRY_TMPDIR)
-	ln -svfT $(dir $(realpath $(this))) $(AIRY_ROOT)
-	ln -svfT $(realpath $(this)) $(AIRY_BIN)/r.airy
+	mkdir -p '$(dir $(AIRY_ROOT))' '$(AIRY_BIN)' '$(AIRY_TMPDIR)'
+	ln -svfT '$(dir $(realpath $(this)))' '$(AIRY_ROOT)'
+	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/r.airy'
 	./airy/setup -m
 	./pacman/setup -m
 
