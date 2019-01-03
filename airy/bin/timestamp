@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+#%USAGE: $ timestamp -o /path/to/stampfile -- cmd [args..]
+#%NOTE: can't directly use "/usr/bin/time --output=stampfile" -- it creates file even on error
+#%PERF:(script itself): overhead of 0.010s
+set -FCuemo pipefail
+
+while getopts 'o:' o; do case $o in :|'?') exit 1
+;; o) f_output=$OPTARG
+esac; done; shift $((OPTIND - 1))
+
+[[ -z ${f_output-} ]] && exec 3>&2 || exec 3>! $f_output
+
+function getts { date +'%s.%6N'; }
+prev=$(getts)
+
+command env -- ${@:?}
+
+elapsed=$(( $(getts) - prev ))
+>&3 printf '%.6f\n' $elapsed

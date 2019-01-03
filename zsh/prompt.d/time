@@ -21,6 +21,8 @@ function prompt_elapsed_reset {
   # print -rn -- $terminfo[el]  # Erase notification under prompt
 }
 
+# BET: use "elapsed time" of last interactive cmd in this zsh instance
+#   => $(fc -IDlt%s -1) :: {idx tstart duration cmd}
 function prompt_elapsed { local dt elapsed
   # Calculate and print the elapsed time.
   # ALT:(SECONDS) https://gist.github.com/jpouellet/5278239

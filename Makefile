@@ -77,7 +77,7 @@ install:
 	r.pacman-lists-install
 
 # MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
-reset: ; $(&mods) $@
+reset: ; $(&mods) reset
 setup update recache: ; $(&mods) all/$@
 
 defaults: clean configure

@@ -184,6 +184,8 @@ psg() { ps uwwp ${$(pgrep -d, "${(j:|:)@}"):?no matches}; }
 # time stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # HIST_STAMPS="mm/dd/yyyy"
+# TODO: more history aliases (!even elapsed time per cmd (in zsh instance boundaries)!)
+#   SEE: https://unix.stackexchange.com/questions/103398/datetime-stamp-when-running-history-command-in-zsh-shell
 case ${HIST_STAMPS-}
 in "mm/dd/yyyy") alias history='fc -fl 1'
 ;; "dd.mm.yyyy") alias history='fc -El 1'

@@ -1,25 +1,36 @@
 #!/bin/sh
 # ALT: $ ... --append --output profiling.log
-# MAYBE: embed timestamp $(date +%s.%N) as first element
-# MAYBE: embed cmdline 'argv="%C"' as last element
 # SEE: :/aeternum/make/profiling/shell-wrapper
+# BAD: can't be used to generate stampfile -- file is always created
+# FAIL: on error prints into file "Command exited with non-zero status 1"
 #
-exec time --format "\
-errcode=%x \
-elapsed=%e \
-user=%U \
-system=%S \
-maxrss=%M \
-fsin=%I \
-fsout=%O \
-majflt=%F \
-mnrflt=%R \
-ctxforce=%c \
-ctxwait=%w\
+US=${US:- }  # BET=$'\x1f' OR=$'\t'
+
+# THINK: always use time if available, otherwise built-in :: (( ${+commands[time]} ))
+while getopts 'o:p:' o; do case $o in :|'?') exit 1
+;; p) prefix=$OPTARG      #% p+: prepend prefix
+;; o) f_output=$OPTARG
+esac; done; shift $((OPTIND - 1))
+
+exec time ${f_output:+--output="$f_output"} --format="\
+${prefix:+$prefix${US}}\
+errcode=%x\
+${US}ts=$(date +%s.%2N)\
+${US}elapsed=%e\
+${US}user=%U\
+${US}system=%S\
+${US}maxrss=%M\
+${US}fsin=%I\
+${US}fsout=%O\
+${US}majflt=%F\
+${US}mnrflt=%R\
+${US}ctxforce=%c\
+${US}ctxwait=%w\
+${US}cmdline=%C\
 " -- "$@"
 
 # CHECK:WARN! some params always =0 (not all Unix implemented)
-# avgrss=%t \
-# avgmem=%K \
-# avgdata=%D \
-# swaps=%W \
+# avgrss=%t
+# avgmem=%K
+# avgdata=%D
+# swaps=%W

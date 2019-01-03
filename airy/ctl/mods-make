@@ -60,15 +60,15 @@ tsdir := $(or $(TMPDIR),/tmp)/airy/ts
 
 @allmods := $(shell r.airy-mods-all)
 _unknown := $(filter-out $(@allmods),$(@modlist))
-$(if $(_unknown),$(error no such mod(s) {$(_unknown)}, look into help =$$ make -f '$(this)' help $$=))
+$(if $(_unknown),$(error no such mod(s) {$(_unknown)}; SEE:VIZ: $$ r.airy-mods-make help))
 
 @modlist := $(or $(@modlist),$(shell r.airy-mods-required))
 @modlist := $(filter-out $(skip),$(@modlist))
 
 # ====================
-$(subst ,, ) := $(subst ,, )
 _tspfx := @
-_tsdlm := =+
+_tsdlm := !
+$(subst ,, ) := $(subst ,, )
 &stampfile = $(subst $( ),\$( ),$(tsdir)/$(_tspfx)$(subst /,$(_tsdlm),$(1)))
 &abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
 &modname = $(subst $( ),\$( ),$(notdir $(1:/$(2)=)))
@@ -83,14 +83,16 @@ all/$(2): $(1)/$(2)
 $(1)/$(2): $(3)
 endef
 
+# HACK: store "guesstimate" time into timestamps to presort unordered part of deps on next install
+#  BET: create wrapper to store average time between current and previously stored
+
 # ARGS: <script-path> <subpath>
 define defreceipt =
 $(call makealiases,$(&modname),$(2),$(&stampfile))
 $(&abspath): ; @:
-$(&stampfile) : $(&abspath)
+$(&stampfile) : $(&abspath) | $(tsdir)
 	@echo '>>> $$< <<<'
-	@$$< $(flags) $($(subst /,_,$2)_flags)
-	@touch $$@
+	@timestamp -o '$$@' -- '$$<' $(flags) $($(subst /,_,$2)_flags)
 endef
 
 # ARGS: <subpath>
@@ -104,14 +106,14 @@ endef
 #  $(info $(call &scripts,setup))
 #  $(eval $(call defreceipt,te st,setup))
 #  $(error $(call defsubpath,setup))
-
-$(shell mkdir -p $(tsdir))
 $(foreach p,$(subpaths),$(eval $(call defsubpath,$p)))
 
 # ====================
+$(tsdir): ; mkdir -p '$@'
+
 .PHONY: reset
 reset:
-	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f -name '$(_tspfx)$(_tsdlm)?*' -empty -delete
+	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f -name '$(_tspfx)$(_tsdlm)?*' -delete
 	rmdir '$(tsdir)'
 
 .PHONY: help
