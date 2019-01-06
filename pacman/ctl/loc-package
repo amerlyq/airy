@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#%SUMMARY: from list of pkgnames build and create packages in "dev" repo
+#%USAGE: $ ./$0 < "${TMPDIR:-/tmp}/airy/loc.list"
+#%NOTE: abs/rel paths aren't allowed, only pkgnames
+#%  $ xargs -- realpath --relative-to="$d_root" -e -- | ...
+#%NOTE: defaults disabled, only explicit pkgname <= [[ -t 0 ]] && exec <<< "$PWD"
+set -fCureEo pipefail
+
+export AUR_REPO=dev
+d_root=~/.cache/aurutils/airy
+# ALT: enforce rebuild by incrementing 'pkgrel=1' or 'epoch' in PKGBUILD
+update=
+
+while getopts 'hu' o; do case $o in :|'?') exit 1
+;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; u) update=1
+esac; done; unset o; shift $((OPTIND-1))
+(($#)) && exec < <(printf '%s\n' "$@") || [[ ! -t 0 ]] || exit 1
+
+# INFO: "sudo" isn't affected by "/dev/stdin" argument ALT: cache "sudo -k" beforehand
+env --chdir "$d_root" -- \
+  aur build ${update:+--force} --arg-file='/dev/stdin' --
+
+
+########
+# E.G.:(oneliner): $ echo *mypkgdirs* | xargs -- realpath -ze -- | env -C ~/.cache/mypkgs -- xargs -0 -- sh -c '
+#   install -Dt "${0##*/}" -- "$0/PKGBUILD" && aur build -a /dev/stdin <<< "${0##*/}" && sudo pacman -S ???' "$0"
+#
+# ALT:USE: $ makepkg [ENVVAR=...]
+# THINK: using '-C' for clean builds (re-dld all src)
+# BUG: $?=0 when coflict on install
+# ((update)) && arg=--force || arg=--needed
+# makepkg "$arg" --syncdeps --install ${interactive:+--noconfirm} "$@"

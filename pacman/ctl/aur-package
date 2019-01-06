@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# HACK: workaround when calling from inside Makefile
+exec > /dev/tty
+set -fCureEo pipefail
+
+export AUR_REPO=aur
+noninteractive=--noconfirm
+ondemand=
+
+while getopts 'hiu' o; do case $o in :|'?') exit 1
+;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; i) noninteractive=   #% i = interactive install (allow answering yes/no)
+# WARN: --force is not enough -- you need "--no-ver" also
+;; u) ondemand=--force  #% u = update installed package of same version
+esac; done; shift $((OPTIND-1))
+(($#)) && exec < <(printf '%s\n' "$@") || [[ ! -t 0 ]] || exit 1
+
+xargs -r -- aur sync --no-view $noninteractive $ondemand --

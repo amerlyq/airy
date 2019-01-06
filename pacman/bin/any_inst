@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#%SUMMARY: store as named lists or immediately install packages
+#%USAGE:(-d): install in two separate steps
+#% * (--asexplicit): $ ./$0 -- pkgs...
+#% * (--asdeps):     $ ./$0 -d -- deps...
+set -euo pipefail
+exec 0<&-
+
+# ALT: directly call simplified "r.pacman-list-install" to install immediately
+
+pfx=${0##*/}
+pfx=${pfx%%_*}
+flist=${LISTS_STORE_DIR:?}/$pfx.list
+fn=( "r.pacman-$pfx-prepare" )
+
+[[ ${1-} == -d ]] && flist=${flist%.*}.deps && shift
+[[ ${1:?Err: empty pkg list} == -- ]] && shift
+
+hash "${fn[0]}" &>/dev/null || fn=( printf '%s\n' )
+
+mkdir -p "${flist%/*}"
+exec >> "$flist"
+
+exec "${fn[@]}" "$@"

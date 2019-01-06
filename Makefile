@@ -3,11 +3,10 @@
 #% * (no-update): $ ./$0 flags=
 #%
 .DEFAULT_GOAL = all
-# HACK: keep prompt unaffected  # BAD? no effect ? CHECK
+# HACK: keep prompt unaffected -- when scripts inside ask for "sudo" password
 #  ::: CHECK: seems like pacman isn't connected to tty despite  exec <>/dev/tty
 #  <= if connected to tty -- then there must not be any pacman lines in setup.log
-# MAKEFLAGS += --output-sync=none
-MAKEFLAGS += --silent
+MAKEFLAGS += --silent --output-sync=none
 .NOTPARALLEL:
 .SUFFIXES:
 this := $(lastword $(MAKEFILE_LIST))
@@ -23,6 +22,7 @@ export AIRY_BIN    ?= $(HOME)/.local/bin
 export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
 export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
 export AIRY_DATA   ?= $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/airy
+export LISTS_STORE_DIR ?= $(AIRY_TMPDIR)
 
 # BUG: some packages (like gcc-multilib) aren't replaced even with -u) due to pacman defaults to [y/N] in --noconfirm
 #   => TRY: disable "--noconfirm"
@@ -71,10 +71,14 @@ configure:
 #   => PERF: allows to run "&mods" script once with argument "all" instead of staged run
 # FIXME:BAD: when placed here in such inconsistent way, you can't "skip=pacman" this phase
 #   => FAIL: it runs each and every time I do "make"
+#
+# WARN:HACK: if error in middle of gathering "install" list -- run once "make -B install" to restart
+#   BUG: stored lists are deleted completely before "continue"
+#   BUG: old lists are not deleted on repeated $ make -B arc/install
 install:
-	r.pacman-lists-install -x
+	r.pacman-any-install -x
 	$(&mods) all/install
-	r.pacman-lists-install
+	r.pacman-any-install
 
 # MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
 reset: ; $(&mods) reset

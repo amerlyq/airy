@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+#%SUMMARY: copy list of dirs with PKGBUILD into dev-pkgs root location and print pkgnames
+#%HACK:TEMP: use "$pkgname.pkgbuild" instead of fixed file name
+#%INFO:STD: dirlist must be "$pkgname/PKGBUILD" <= WARN: other names are not allowed
+#%  -- otherwise you can't derive "pkgname" from PKGBUILD (at least fast enough)
+#%
+## BAD: we may use any dir in "prepare" and "package" steps, but "install" step requires correct *pkgname*
+# NEED: pkgbase for split pkgs OR first pkgname in array
+# * [filename]: BET?BUT:(nonstandart): $ basename -s.pkgbuild "$f_pkg"
+# * [dirname]: BET?BUT:(rigid): $ local pkgname=${d_src##*/}
+# * [regex]: $ find -name PKGBUILD X \grep -m1 -oP '^pkgbase|^pkgname=(?:\(\s*['"'"'"]?)?\K[[:alnum:]@._+-]+'
+# * [source]: (mildly-safe): $ PATH= source "$f_pkg"
+# * [makepkg]: BAD:PERF:(0.36s): makepkg --printsrcinfo | grep -oP 'pkgname = \K.*'
+#
+#%WARN: flags aren't inherited by 'parallel' shell
+set +f -CueEo pipefail
+shopt -s nullglob
+exec 3>&1 1>&-
+
+d_root=~/.cache/aurutils/airy
+
+(($#)) && exec < <(printf '%s\n' "$@")
+[[ -t 0 ]] && exec <<< "$PWD"
+
+copy_pkgbuild(){ local d_src f_pkg pkgname
+  if [[ -d $1 ]]; then
+    d_src=$1
+    f_pkg=$(realpath -e -- "$d_src/PKGBUILD")
+    pkgname=${d_src##*/}
+  else
+    f_pkg=$(realpath -e -- "$1")
+    d_src=${f_pkg%/*}
+    pkgname=${f_pkg##*/}
+    pkgname=${pkgname%.pkgbuild}
+  fi
+  local d_build=$d_root/$pkgname
+  local xref=$d_build/_airy
+
+  # HACK: skip if already installed BET? use "|aur vercmp"
+  #   BET? move outside to pre-filter list
+  # pacman -Qq "$pkgname" &>/dev/null && return
+
+  mkdir -p "$d_build"
+  [[ -d $xref ]] || ln -sT "$d_src" "$xref"
+  [[ $xref -ef $d_src ]] || { echo "Err: divergent locations of pkg=$pkgname" \
+    "and xref=$(readlink "$xref")" >&2; exit 1; }
+
+  # NOTE:(copy): pkgver and "updpkgsums" changes PKGBUILD ("makepkg" has flag for this)
+  #   OR:(symlink): always commit updated PKGBUILD after changes
+  # FIXME: allow putting any files, not only patches, i.a. rename "patches" directory
+  # THINK: disable (don't copy) some files by changing attributes or adding pfx/sfx
+  install -Cm644 -- "$f_pkg" "$d_build/PKGBUILD"
+  patches=( "$d_src/patches"/* )
+  (( ${#patches[@]} )) && install -Cm644 -t "$d_build" -- "${patches[@]}"
+
+  printf '%s\n' "$pkgname" >&3
+}
+
+while IFS= read -r; do copy_pkgbuild "$REPLY"; done

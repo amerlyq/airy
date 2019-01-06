@@ -84,60 +84,7 @@ if distro ubuntu || distro debian; then
 
 elif distro arch; then
   has_pkgs(){ pacman -Qq "$@" &>/dev/null; }
-  _ipacman(){ local c=("$1"); shift
-    c+=( -S --needed --noconfirm )
-    [[ $1 == --asdeps ]] && { c+=("$1"); shift; }
-    do_if -c "${c[*]}" "$@"
-  }
-  # pkg_inst(){ _ipacman 'sudo pacman' "$@"; }
   pkg_make(){ sudo make install "$@" || exit; }  # FIXME: replace by arch-specific
-  if has_pr pacaur; then
-    # aur_inst(){ _ipacman 'pacaur --aur' "$@"; }
-    loc_inst(){ do_if -c 'pkg_make' "$@"; }
-    # WARN: pkgs not from AUR can break pacaur
-    pkg_make(){ local p d m=$PWD
-      p=$(readlink -e "${1:?}"); shift
-      ( set -Eu; source "$p"; set -Eu
-        d=$CURR_DIR_PKG/$pkgname
-        mkdir -p "$d" && cd "$d"
-        # cd "$(dcache "pacaur/$pkgname")"
-
-        # NOTE:(copy): pkgver and updpkgsums changes PKGBUILD
-        #   OR:(symlink): always commit updated PKGBUILD after changes
-        # TODO: use files with name=<pkgname> instead of single PKGBUILD per dir
-        linkcp -c "$p" "$PWD/PKGBUILD"
-        # NOTE: allow putting any files, not only patches
-        linkcp -t "$PWD" "$m/patches"/*
-        # linkcp -t "$PWD" "$m/patches"/*.{diff,patch}
-
-        # WARN:(-f): removed 'force' to mitigate idle rebuild
-        #   => enforce rebuild by incrementing 'pkgrel=1' or 'epoch' in PKGBUILD
-        # THINK: using '-C' for clean builds (re-dld all src)
-        # BAD: $?=0 when coflict on install
-        if cfgOpt U
-        then makepkg -si --force --noconfirm "$@"  # REF: $ makepkg [ENVVAR=...]
-        else makepkg -si --needed --noconfirm "$@"
-        fi
-        # updpkgsums &&  # REM: 'makepkg' has flag for this
-        # source PKGBUILD  # EXPL: updated on build values for pkgver, etc
-        # paccache -df "$pkgname"  # REM: prefer to keep old versions
-        # BAD:(yes): -- can answer some wrong question
-        # sudo sh -c 'yes | pacman -U --needed "$@"' '' \
-        #  "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
-        # NOTE: remove '--noconfirm' -- to read answer from stdin
-        # BET: wrap in 'expect' to answer only question about conflict
-        # BUT: you need 'expect' installed on clean system...
-        # $ expect -c 'spawn pacman -Syu
-        #     expect { -re "^in conflict.*" { send "yes\r"; interact } }'
-        # ALSO:BAD: replace on conflict not always good
-        #   => if user temporarily replaced pkg (neovim -> neovim-git)
-        # ALT: wait fail, manually remove package, then 'make continue'
-        # sudo pacman -U --needed --noconfirm \
-        #   "${pkgname}-${pkgver}-${pkgrel}-"*.pkg.tar.xz
-      ) # WARN:(|| return): suppresses errors in subshell -- don't use it
-      # SEE:(set -E subshell): http://unix.stackexchange.com/questions/48533/exit-shell-script-from-a-subshell
-    }
-  fi
   gem_inst(){ do_if -c 'gem install' "$@"; }
 fi
 

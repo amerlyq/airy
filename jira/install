@@ -8,6 +8,6 @@ if cfgOpt uU && has_pr pip2pkgbuild; then
 fi
 
 # TEMP:FIX install manually, because "makepkg" can't resolve AUR deps
-aur_inst --asdeps python-jira python-tabulate
+aur_inst -d python-jira python-tabulate
 
 loc_inst ./jiracli-airy-git.pkgbuild

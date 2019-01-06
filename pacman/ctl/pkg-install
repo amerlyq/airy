@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#%NOTE:(-i): specify choice for [y/N] prompts -- e.g. replace "gcc" by "gcc-multilib"
+#
+#%INFO: always replace on conflict isn't good => when pkg temp CHG:(neovim -> neovim-git)
+# BAD: pipe $ yes | pacman ... $ -- can answer some wrong question
+# BET: wrap in 'expect' to answer only question about conflict
+#   $ expect -c 'spawn pacman -Syu
+#     expect { -re "^in conflict.*" { send "yes\r"; interact } }'
+#   BUT: you need 'expect' installed on clean system...
+
+# HACK: workaround when calling from inside Makefile
+exec > /dev/tty
+set -fCureEo pipefail
+
+asdeps=
+noninteractive=--noconfirm
+ondemand=--needed
+
+# ALT: wait fail, manually remove package, then 'make continue'
+
+while getopts 'hdiu' o; do case $o in :|'?') exit 1
+;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; d) asdeps=--asdeps   #% d = install whole list as dependencies
+;; i) noninteractive=   #% i = interactive install (allow answering yes/no)
+;; u) ondemand=--force  #% u = update installed package of same version
+esac; done; shift $((OPTIND-1))
+(($#)) && exec < <(printf '%s\n' "$@") || [[ ! -t 0 ]] || exit 1
+
+## BAD? ignored pkgs when specified on cmdline are prompted [Y/n] and reinstalled
+#   $ sudo pacman -S zip --ignore zip --noconfirm
+# source ~/.shell/profile
+# declare -n ign="${pfx^^}_IGNORE[@]"  # ALT: ${ign[*]/%/,}
+# ALT: skip(){ set -- ${!1:+"${!1}"}; (IFS=,; printf '%s\n' "${*// /\\ }"); }
+# ign=$(printf '"%s"\n' ${ign[@]:+"${ign[@]}"} | paste -sd ',')
+# [[ $ign ]] && set -- "$@" --ignore "$ign"
+
+sudo pacman --sync "$ondemand" $noninteractive $asdeps -- -

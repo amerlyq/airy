@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# FIND: maybe part of this script is already done inside "aurutils" ?
+cd "${LISTS_STORE_DIR:?}"
+set -fCueEo pipefail
+
+removelists=
+aur=
+loc=
+pkg=
+
+while getopts 'diux' o; do case $o in :|'?') exit 1
+;; d) pkg+=$o
+;; i) pkg+=$o; aur+=$o
+;; u) pkg+=$o; aur+=$o; loc+=$o
+;; x) removelists=1     #% r = remove prepared lists of packages
+esac; done; shift $((OPTIND-1))
+(($#)) && exit 3
+
+# THINK: ?? remove individually each type or in batch ??
+if ((removelists)); then
+  rm -vf ./{pkg,aur,loc}.{list,deps}
+  exit
+fi
+
+nonempty(){ local fs=()
+  while (($#)); do
+    [[ $1 == -- ]] && shift && break
+    [[ -f $1 && -s $1 ]] && fs+=( "$1" )
+    shift
+  done
+  (( ${#fs[@]} )) || return 0
+  "${@:?}" < <(cat -- "${fs[@]:?}")
+}
+
+# NOTE: do full-system-upgrade if you want to link AUR with correct libs (and not rebuild them immediately again)
+# WARN:(build AUR/LOC): to enable some feature -- may need some pkg to be already installed
+nonempty ./aur.{list,deps}    -- r.pacman-aur-package ${aur:+"-$aur"} --
+nonempty ./loc.{list,deps}    -- r.pacman-loc-package ${loc:+"-$loc"} --
+nonempty ./{aur,loc,pkg}.deps -- r.pacman-pkg-install ${pkg:+"-$pkg"} -d --
+nonempty ./{aur,loc,pkg}.list -- r.pacman-pkg-install ${pkg:+"-$pkg"} --
