@@ -1,0 +1,137 @@
+#!/usr/bin/make -sf
+#%SUMMARY: run once all specified subpaths in mod dirs
+#%WARN: mod recipes conflict (merge) with target aliases of the same name
+#%
+#%USAGE: $ ./$0 [options] [--] [help | reset | all | <mod> | {<mod>,all}/{all,cleanup,install,setup,update,recache}]
+#%VAR:
+#% * flags=-u      # pass these flags to all chosen subpaths at subpaths (separate set of timestamps)
+#%   -- ALSO: for individual subpaths use "<subpath>_flags=-u"
+#% * skip=...      # space-separated list of modnames to skip their operations (BAD: no per-subdir granularity)
+#% * subpaths=...  # space-separated list of relpaths to subpaths inside mod dirs
+#% * tsdir=/path   # abspath to timestamps directory (DFL=/tmp/$USER/airy/ts)
+#%   -- HACK: in pj root override by static location to prevent rebuild from zero after reboot
+#%
+#%USAGE: actions
+#% * [custom]: $ ./$0 firefox       # = run once only firefox
+#% * [always]: $ ./$0 -W firefox    # = rerun firefox
+#% * [w/deps]: $ ./$0 -B firefox    # = rerun firefox (with all deps)
+#% * [ignore]: $ ./$0 -o firefox    # = all beside firefox
+#% *  [reset]: $ ./$0 -t firefox    # = skip firefox (when error) (FAIL: aliased tgt do not propagate to actual ones)
+#% * [dryrun]: $ ./$0 -n firefox    # = only print commands (BAD: must disable "silent")
+#%
+.DEFAULT_GOAL = all
+MAKEFLAGS += -rR
+.SUFFIXES:
+this := $(lastword $(MAKEFILE_LIST))
+_phony := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
+$(this): ; @:
+
+# [_] DEV:NEED enforce correct order between subtargets of even different targets
+#   i.e. all "install", then all "setup", etc.
+#   ALSO:MOVE: from main Makefile $ r.pacman-any-install $ to run directly after all "install" targets
+
+# BUG: "<pkg>/all" won't install pkgs immediately after running ./install => can't apply actions to installed files
+# TRY:DEV: add deps of 'setup' -> ./cfg/* etc used in "setup" but then it must be declarative file!
+#   => i.e. we need smth similar to PKGBUILD file with lists and "install/setup/recache" will be generally the same
+# TODO: dev script "mods-all-deps" and add inter-deps to recipes for multithread execution
+#  ::: actually isn't strictly required -- when processing install/setup steps in batch
+#  !!! aur_inst may corrupt file -- use flock ???
+#    => ALT: pass $(mktemp) per-thread file through env var and then merge outputs
+# BUG: necessary "#deps:" aren't installed unconditionally or with error !!! NEED:ERR: add them
+#   !!! can't automize :: "defaults" may depend on all optional pkgs to choose from, but must not install them
+#   i.e. difference between "requires" and "after" -- requires at least one of any, but after all of them
+#    - using intermediate alias :: <airy> :deps: r.t | <r.t> :deps: anyof(st,urxvt,etc)
+# BET? check all deps to be present inside @modlist and fail with normal error
+#  => but then we can't simply call "some/setup" even if its deps are already installed
+#    !! especially if we want to avoid re-setup for its deps mods !!
+# MAYBE: use parallel
+# FAIL: dependency on whole "mod" results in out-of-order install/setup
+#   MAYBE:(option): deps={install,ignore,error} to choose behavior
+# airy/setup: vime ; @:
+.NOTPARALLEL:
+# ====================
+
+flags :=
+skip :=
+subpaths := cleanup install setup update recache
+tsdir := $(or $(TMPDIR),/tmp)/airy/ts
+
+# NOTE: generate recipes -- for cmdline targets or default required list
+#  !! each recipe is generated for all subpaths at once !!
+#  ENH: filter directly by subpath matching e.g. "airy/setup" or "airy/.*"
+#  BUT: we can't use "airy/[^/]+" because subpath may be nested
+@modlist := $(MAKECMDGOALS)
+@modlist := $(foreach t,$(@modlist),$(firstword $(subst /, ,$t)))
+@modlist := $(filter-out $(_phony),$(@modlist))
+
+@allmods := $(shell r.airy-mods-all)
+_unknown := $(filter-out $(@allmods),$(@modlist))
+$(if $(_unknown),$(error no such mod(s) {$(_unknown)}; SEE:VIZ: $$ r.airy-mods-make help))
+
+@modlist := $(or $(@modlist),$(shell r.airy-mods-required))
+@modlist := $(filter-out $(skip),$(@modlist))
+
+# ====================
+_tspfx := @
+_tsdlm := !
+$(subst ,, ) := $(subst ,, )
+&stampfile = $(subst $( ),\$( ),$(tsdir)/$(_tspfx)$(subst /,$(_tsdlm),$(1)))
+&abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
+&modname = $(subst $( ),\$( ),$(notdir $(1:/$(2)=)))
+&scripts = $(shell r.airy-mods-subpaths $(1) -- $(@modlist))
+
+# ARGS: <mod> <subpath> <stamp-path>
+define makealiases =
+.PHONY: $(1) $(1)/ $(1)/all $(1)/$(2)
+$(1) $(1)/: $(1)/all
+$(1)/all: $(1)/$(2)
+all/$(2): $(1)/$(2)
+$(1)/$(2): $(3)
+endef
+
+# HACK: store "guesstimate" time into timestamps to presort unordered part of deps on next install
+#  BET: create wrapper to store average time between current and previously stored
+
+# ARGS: <script-path> <subpath>
+define defreceipt =
+$(call makealiases,$(&modname),$(2),$(&stampfile))
+$(&abspath): ; @:
+$(&stampfile) : $(&abspath) | $(tsdir)
+	@echo '>>> $$< <<<'
+	@timestamp -o '$$@' -- '$$<' $(flags) $($(subst /,_,$2)_flags)
+endef
+
+# ARGS: <subpath>
+define defsubpath =
+.PHONY: all all/$1
+all: all/$1
+$(foreach s,$(&scripts),$(eval $(call defreceipt,$s,$(1))))
+endef
+
+# DEBUG:
+#  $(info $(call &scripts,setup))
+#  $(eval $(call defreceipt,te st,setup))
+#  $(error $(call defsubpath,setup))
+$(foreach p,$(subpaths),$(eval $(call defsubpath,$p)))
+
+# ====================
+$(tsdir): ; mkdir -p '$@'
+
+.PHONY: reset
+reset:
+	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f -name '$(_tspfx)$(_tsdlm)?*' -delete
+	rmdir '$(tsdir)'
+
+.PHONY: help
+help:
+	@echo "VIZ:(targets): {$(_phony)}"
+	sed -rn '/^(.*\s)?#%/s///p' '$(this)'
+	@echo "VIZ:(total=$(words $(@modlist)) requested mods): {$(@modlist)}"
+	@echo
+	@echo "VIZ:(rest of mods from total=$(words $(@allmods))): {$(filter-out $(@modlist),$(@allmods))}"
+
+# ATT: "make" treats existing files in cwd as implicit targets => no error even if no target
+#   => generate explicit error when target not found
+.PHONY: .FORCE
+% :: .FORCE
+	echo "Err: no such target '$@'" >&2 && exit 1

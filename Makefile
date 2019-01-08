@@ -6,7 +6,7 @@
 # HACK: keep prompt unaffected -- when scripts inside ask for "sudo" password
 #  ::: CHECK: seems like pacman isn't connected to tty despite  exec <>/dev/tty
 #  <= if connected to tty -- then there must not be any pacman lines in setup.log
-MAKEFLAGS += --silent --output-sync=none
+MAKEFLAGS += -rR --silent --output-sync=none
 .NOTPARALLEL:
 .SUFFIXES:
 this := $(lastword $(MAKEFILE_LIST))
@@ -22,7 +22,10 @@ export AIRY_BIN    ?= $(HOME)/.local/bin
 export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
 export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
 export AIRY_DATA   ?= $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/airy
-export LISTS_STORE_DIR ?= $(AIRY_TMPDIR)
+export PATH        := $(AIRY_BIN):$(PATH)
+# FIXED:(r.airy): on clean install in same login
+# BUG: on clean install maps "defaults" to "vi"
+EDITOR ?= vi
 
 # BUG: some packages (like gcc-multilib) aren't replaced even with -u) due to pacman defaults to [y/N] in --noconfirm
 #   => TRY: disable "--noconfirm"
@@ -30,13 +33,17 @@ export LISTS_STORE_DIR ?= $(AIRY_TMPDIR)
 flags := -mu
 &mods = +r.airy-mods-make "tsdir=$(AIRY_CACHE)/ts" "flags=$(flags)"
 
-# FIXED:(r.airy): on clean install in same login
-# BUG: on clean install maps "defaults" to "vi"
-EDITOR ?= vi
-export PATH := $(AIRY_BIN):$(PATH)
+# [_] CHECK: if works "skip=pacman"
+# WARN:HACK: if error in middle of gathering "install" list -- run once "make -B install" to restart
+#   BUG: stored lists are deleted completely before "continue"
+#     => THINK: delete only on "reset" -- timestamps will do for partial upgrade
+#     => TODO: wrap all/install into stampfile "all" to signify successful generation of all lists
 
 # BET:PERF: use directly $ r.airy-mods-make -- flags=-mu all
-all: configure install setup update recache
+# MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
+all: configure all/all
+install setup update recache: ; $(&mods) all/$@
+reset: ; $(&mods) reset
 
 # MAYBE: replace by "cleanup" script in each mod
 #  => however, when everything is placed in ~/.cache -- there is no need to clean up ?
@@ -66,23 +73,6 @@ configure:
 	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/r.airy'
 	./airy/setup -m
 	./pacman/setup -m
-
-# THINK: maybe move into separate mod "update" and place it always last
-#   => PERF: allows to run "&mods" script once with argument "all" instead of staged run
-# FIXME:BAD: when placed here in such inconsistent way, you can't "skip=pacman" this phase
-#   => FAIL: it runs each and every time I do "make"
-#
-# WARN:HACK: if error in middle of gathering "install" list -- run once "make -B install" to restart
-#   BUG: stored lists are deleted completely before "continue"
-#   BUG: old lists are not deleted on repeated $ make -B arc/install
-install:
-	r.pacman-any-install -x
-	$(&mods) all/install
-	r.pacman-any-install
-
-# MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
-reset: ; $(&mods) reset
-setup update recache: ; $(&mods) all/$@
 
 defaults: clean configure
 	r.airy -sd

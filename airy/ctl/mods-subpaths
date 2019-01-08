@@ -6,14 +6,19 @@ set -euo pipefail
 # THINK:(option): grouping order -- all subpaths for each dir or single subpath for all dirs ?
 # MAYBE: searching for all subpaths first and filtering+sorting afterwards is more efficient ?
 
+# NOTE: for "r.airy-mods-make" targets filtering
+function fmt { printf '%s/%s\n' "$@"; }
+[[ ${1-} == @(-r|--relative) ]] && shift && function fmt { printf '%s/%s\n' "${1##*/}" "$2"; }
+[[ ${1-} == @(-p|--pipesep) ]] && shift && function fmt { printf '%s|%s/%s\n' "${1%/*}" "${1##*/}" "$2"; }
+
 for((i=1;i<=$#;++i)); do [[ ${!i} == -- ]] && break; done
 subpaths=( "${@:1:i-1}" )
 modlist=( "${@:i+1}" )
 
 existing_subpaths(){
   while IFS= read -r d; do
-    for f in "${subpaths[@]}"; do
-      [[ -e $d/$f ]] && printf '%s\n' "$d/$f"
+    for s in "${subpaths[@]}"; do
+      [[ -e $d/$s ]] && fmt "$d" "$s"
     done
   done
   return 0

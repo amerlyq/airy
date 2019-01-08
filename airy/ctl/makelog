@@ -12,7 +12,7 @@ read -ra fpretty <<< "${AIRY_PRETTY_STDOUT:-r.airy-pretty}"
 
 #%USAGE:(fallback): special syntax to accept makefile args from stdin
 #%  $ r.airy - [options]
-(($#>2)) && [[ $1 == -f && -f $2 && $3 == - ]] && readarray -t targets \
+(($#>2)) && [[ $1 == -*f* && -f $2 && $3 == - ]] && readarray -t targets \
   && set -- "${@:1:2}" "${@:4}" "${targets[@]}"
 
 # THINK: instead of fallback in each script -- demand env vars to be always set and FAIL

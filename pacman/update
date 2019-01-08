@@ -15,7 +15,7 @@ skip(){ set -- ${!1:+"${!1}"}; (($#))||return 0
 # HACK: skip 'exit 1' if update 'n' in pacman
 pkgupd(){ sudo pacman -Syu $(skip 'PKG_IGNORE[@]') || ((1==$?)); }
 pkgupd
-aur sync --database=aur --chroot --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')
+aur sync --database=aur --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')
 pkgupd
 
 if [[ " $* " =~ " -u " || ! -f /var/cache/pkgfile/core.files ]]

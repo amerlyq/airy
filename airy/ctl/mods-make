@@ -19,18 +19,24 @@
 #% *  [reset]: $ ./$0 -t firefox    # = skip firefox (when error) (FAIL: aliased tgt do not propagate to actual ones)
 #% * [dryrun]: $ ./$0 -n firefox    # = only print commands (BAD: must disable "silent")
 #%
+#%ALG: !FIXME!
+#% - generate recipes only from cmdline targets (=performance=)
+#% - divide by barrier each batch of VAR=subpaths recipes (e.g. all "install")
+#% - impose order upon the barriers lining up to VAR=subpaths (e.g. all "install" before all "setup")
+#% - provide partial inter-deps ordering for each batch inside barrier (e.g. a/setup -> b/install)
+#% - run configuration script of the same name in each recipe
+#% - error if unknown or don't exists
+#%
 .DEFAULT_GOAL = all
 MAKEFLAGS += -rR
 .SUFFIXES:
 this := $(lastword $(MAKEFILE_LIST))
-_phony := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
 $(this): ; @:
+_phony := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
+.PHONY: .FORCE $(_phony)
+@/% :: .FORCE ; @echo '$*'
+$(subst ,, ) := $(subst ,, )
 
-# [_] DEV:NEED enforce correct order between subtargets of even different targets
-#   i.e. all "install", then all "setup", etc.
-#   ALSO:MOVE: from main Makefile $ r.pacman-any-install $ to run directly after all "install" targets
-
-# BUG: "<pkg>/all" won't install pkgs immediately after running ./install => can't apply actions to installed files
 # TRY:DEV: add deps of 'setup' -> ./cfg/* etc used in "setup" but then it must be declarative file!
 #   => i.e. we need smth similar to PKGBUILD file with lists and "install/setup/recache" will be generally the same
 # TODO: dev script "mods-all-deps" and add inter-deps to recipes for multithread execution
@@ -47,82 +53,158 @@ $(this): ; @:
 # MAYBE: use parallel
 # FAIL: dependency on whole "mod" results in out-of-order install/setup
 #   MAYBE:(option): deps={install,ignore,error} to choose behavior
-# airy/setup: vime ; @:
 .NOTPARALLEL:
-# ====================
+
+####################
+### Options
+#
+export AIRY_TMPDIR ?= $(or $(TMPDIR),/tmp/$(LOGNAME))/airy
+export LISTS_STORE_DIR ?= $(AIRY_TMPDIR)
 
 flags :=
 skip :=
+# NOTE: each subpath is barrier when installing targets in batch
 subpaths := cleanup install setup update recache
-tsdir := $(or $(TMPDIR),/tmp)/airy/ts
+
+tsdir := $(AIRY_TMPDIR)/ts
+lsdir := $(LISTS_STORE_DIR)
+
+####################
+### Barriers
+#
+&barrier = --$(subst $( ),\$( ),$(1))--
+&barrier.pre = $(call &barrier,$(1).pre)
+&barrier.post = $(call &barrier,$(1).post)
+&@barriers = $(&barrier.pre) $(&barrier) $(&barrier.post)
+@barriers := $(call &barrier.pre,all) $(foreach 1,$(subpaths),$(&@barriers)) $(call &barrier.post,all)
+.PHONY: $(@barriers)
+
+# ARGS: <subpath>
+define defbarrier =
+$(&barrier.pre): $(_prevbar)
+$(&barrier): $(&barrier.pre)
+$(&barrier.post): $(&barrier)
+$(eval _prevbar := $(&barrier.post))
+endef
+
+_prevbar := $(call &barrier.pre,all)
+$(foreach p,$(subpaths),$(eval $(call defbarrier,$p)))
+$(call &barrier.post,all): $(_prevbar)
+$(@barriers) : % : | @/%
+
+####################
+### Cmdline args
+#
+@targets := $(filter-out $(_phony) $(@barriers),$(MAKECMDGOALS))
 
 # NOTE: generate recipes -- for cmdline targets or default required list
 #  !! each recipe is generated for all subpaths at once !!
 #  ENH: filter directly by subpath matching e.g. "airy/setup" or "airy/.*"
 #  BUT: we can't use "airy/[^/]+" because subpath may be nested
-@modlist := $(MAKECMDGOALS)
+@modlist := $(filter-out all/%,$(@targets))
 @modlist := $(foreach t,$(@modlist),$(firstword $(subst /, ,$t)))
-@modlist := $(filter-out $(_phony),$(@modlist))
-
 @allmods := $(shell r.airy-mods-all)
-_unknown := $(filter-out $(@allmods),$(@modlist))
+_unknown := $(filter-out all $(@allmods),$(@modlist))
 $(if $(_unknown),$(error no such mod(s) {$(_unknown)}; SEE:VIZ: $$ r.airy-mods-make help))
-
 @modlist := $(or $(@modlist),$(shell r.airy-mods-required))
 @modlist := $(filter-out $(skip),$(@modlist))
 
-# ====================
-_tspfx := @
-_tsdlm := !
-$(subst ,, ) := $(subst ,, )
-&stampfile = $(subst $( ),\$( ),$(tsdir)/$(_tspfx)$(subst /,$(_tsdlm),$(1)))
-&abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(1))))
-&modname = $(subst $( ),\$( ),$(notdir $(1:/$(2)=)))
-&scripts = $(shell r.airy-mods-subpaths $(1) -- $(@modlist))
+# ATT: verify allowed subpaths _before_ expanding "*/all"
+#   i.e. ignore errors for nonexistent subpaths resulting from "all" expansion
+#   == /all => must expand into only allowed entries -- or errors must be ignored only for /all
+@allsubs := $(shell r.airy-mods-subpaths --relative $(subpaths) -- $(@modlist))
+_unknown := $(filter-out $(@allsubs),$(filter %/,$(@targets:%/=%)))
+$(if $(_unknown),$(error no such subpath(s) {$(_unknown)}; look into respective mods dirs))
+
+@recipes := $(or $(@targets),all)
+@recipes := $(foreach r,$(@recipes),$(if $(findstring /,$(r:%/=%)),$r,$(r:%/=%)/all))
+@recipes := $(foreach r,$(@recipes),$(if $(filter all/%,$r),$(@modlist:%=%/$(r:all/%=%)),$r))
+@recipes := $(foreach r,$(@recipes),$(if $(filter %/all,$r),$(subpaths:%=$(r:%/all=%)/%),$r))
+@recipes := $(filter $(@recipes),$(@allsubs))
+
+@scripts := $(shell r.airy-mods-subpaths --pipesep $(subpaths) -- $(@modlist))
+@scripts := $(filter $(@recipes:%=\%|%),$(@scripts))
+
+# DEBUG:
+# $(foreach s,$(@allsubs),$(info $s))
+# $(foreach m,$(@modlist),$(info $m))
+# $(foreach r,$(@recipes),$(info $r))
+# $(foreach s,$(@scripts),$(info $s))
+# $(error ?)
+
+####################
+### Functions
+#
+# [_] FIXME: clarify inter-deps between all all/* */all and barriers
+# - BAD: all/setup will call all/install due to barriers -- can't only all/setup
+# - !! possible only after restructuring
+# - $(call &barrier.post,all) -- all cmdline phony tgts must depend on it
+#     FAIL: if cmdline tgts are actual stampfiles -- can't insert intermediate deps
 
 # ARGS: <mod> <subpath> <stamp-path>
-define makealiases =
+define defaliases =
 .PHONY: $(1) $(1)/ $(1)/all $(1)/$(2)
 $(1) $(1)/: $(1)/all
 $(1)/all: $(1)/$(2)
 all/$(2): $(1)/$(2)
-$(1)/$(2): $(3)
+$(1)/$(2): $(call &barrier.post,all)
+$(call &barrier,$(2)): $(3)
 endef
 
-# HACK: store "guesstimate" time into timestamps to presort unordered part of deps on next install
+# HACK:($ timestamp): store "guesstimate" time into timestamps to presort unordered part of deps on next install
 #  BET: create wrapper to store average time between current and previously stored
+_tspfx := @
+_tsdlm := !
+&stampfile = $(subst $( ),\$( ),$(tsdir)/$(_tspfx)$(subst /,$(_tsdlm),$(1)))
 
-# ARGS: <script-path> <subpath>
-define defreceipt =
-$(call makealiases,$(&modname),$(2),$(&stampfile))
-$(&abspath): ; @:
-$(&stampfile) : $(&abspath) | $(tsdir)
+# ARGS: <script-abspath> <modname> <subpath>
+define defrecipe =
+$(call defaliases,$(2),$(3),$(&stampfile))
+$(1): ; @: #prevent-sink-all-rule
+$(&stampfile) : $(1) | $(tsdir)
 	@echo '>>> $$< <<<'
-	@timestamp -o '$$@' -- '$$<' $(flags) $($(subst /,_,$2)_flags)
-endef
-
-# ARGS: <subpath>
-define defsubpath =
-.PHONY: all all/$1
-all: all/$1
-$(foreach s,$(&scripts),$(eval $(call defreceipt,$s,$(1))))
+	@timestamp -o '$$@' -- '$$<' $(flags) $($(subst /,_,$(3))_flags)
 endef
 
 # DEBUG:
-#  $(info $(call &scripts,setup))
-#  $(eval $(call defreceipt,te st,setup))
-#  $(error $(call defsubpath,setup))
-$(foreach p,$(subpaths),$(eval $(call defsubpath,$p)))
+#  $(eval $(call defrecipe,te st,setup))
 
-# ====================
+&abspath = $(subst |,\$( ),$(abspath $(subst $( ),|,$(subst |,/,$(1)))))
+# &mod_dir = $(lastword $(subst /, ,$(firstword $(subst |, ,$(1)))))
+# ALT:BAD:(dare consequences): dangling "setup" -> "." instead of ""
+# &modname = $(lastword $(subst /, ,$(dir $(1))))
+# &modname = $(word $(words $(subst /, ,$(1))),'' $(subst /, ,$(1)))
+&modname = $(firstword $(subst /, ,$(lastword $(subst |, ,$(1)))))
+&subpath = $(patsubst $(&modname)/%,%,$(lastword $(subst |, ,$(1))))
+
+$(foreach 1,$(@scripts),$(eval $(call defrecipe,$(&abspath),$(&modname),$(&subpath))))
+
+
+####################
+### Hooks
+#
+ifneq (0,$(words $(filter %/install,$(@recipes))))
+$(call &barrier.pre,install):
+	r.pacman-any-install -x
+$(call &barrier.post,install):
+	r.pacman-any-install
+endif
+
+
+####################
+### Auxiliary
+#
 $(tsdir): ; mkdir -p '$@'
 
-.PHONY: reset
+.PHONY: all all/all $(subpaths:%=all/%)
+all: all/all
+all/all: $(subpaths:%=all/%)
+$(subpaths:%=all/%) : all/% : $(call &barrier.post,%)
+
 reset:
 	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f -name '$(_tspfx)$(_tsdlm)?*' -delete
 	rmdir '$(tsdir)'
 
-.PHONY: help
 help:
 	@echo "VIZ:(targets): {$(_phony)}"
 	sed -rn '/^(.*\s)?#%/s///p' '$(this)'
@@ -132,6 +214,5 @@ help:
 
 # ATT: "make" treats existing files in cwd as implicit targets => no error even if no target
 #   => generate explicit error when target not found
-.PHONY: .FORCE
 % :: .FORCE
 	echo "Err: no such target '$@'" >&2 && exit 1
