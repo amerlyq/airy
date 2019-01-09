@@ -6,7 +6,7 @@
 #%VAR:
 #% * flags=-u      # pass these flags to all chosen subpaths at subpaths (separate set of timestamps)
 #%   -- ALSO: for individual subpaths use "<subpath>_flags=-u"
-#% * skip=...      # space-separated list of modnames to skip their operations (BAD: no per-subdir granularity)
+#% * skip=...      # {space|comma}-separated list of modnames to skip their operations (BAD: no per-subdir granularity)
 #% * subpaths=...  # space-separated list of relpaths to subpaths inside mod dirs
 #% * tsdir=/path   # abspath to timestamps directory (DFL=/tmp/$USER/airy/ts)
 #%   -- HACK: in pj root override by static location to prevent rebuild from zero after reboot
@@ -34,9 +34,12 @@ this := $(lastword $(MAKEFILE_LIST))
 $(this): ; @:
 _phony := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
 .PHONY: .FORCE $(_phony)
-@/% :: .FORCE ; @echo '$*'
 $(subst ,, ) := $(subst ,, )
+, := ,
 
+# [_] BUG: can't "skip=ctags,snow" after "install" stampfile in "install.post" step only
+#
+# WARN: if "cleanup" script updated -- it will be run triggering whole chain
 # TRY:DEV: add deps of 'setup' -> ./cfg/* etc used in "setup" but then it must be declarative file!
 #   => i.e. we need smth similar to PKGBUILD file with lists and "install/setup/recache" will be generally the same
 # TODO: dev script "mods-all-deps" and add inter-deps to recipes for multithread execution
@@ -58,6 +61,7 @@ $(subst ,, ) := $(subst ,, )
 ####################
 ### Options
 #
+# NOTE: env vars as primary configuration
 export AIRY_TMPDIR ?= $(or $(TMPDIR),/tmp/$(LOGNAME))/airy
 export LISTS_STORE_DIR ?= $(AIRY_TMPDIR)
 
@@ -65,19 +69,19 @@ flags :=
 skip :=
 # NOTE: each subpath is barrier when installing targets in batch
 subpaths := cleanup install setup update recache
-
 tsdir := $(AIRY_TMPDIR)/ts
-lsdir := $(LISTS_STORE_DIR)
 
 ####################
 ### Barriers
 #
-&barrier = --$(subst $( ),\$( ),$(1))--
+
+# ALT: use instead of dir previx $ vpath --%-- $(tsdir) && touch '$(tsdir)/$@'
+&barrier = $(tsdir)/--$(subst $( ),\$( ),$(subst /,!,$(1)))--
+&barrier.hook = $(patsubst --%--,hook.%,$(notdir $(1)))
 &barrier.pre = $(call &barrier,$(1).pre)
 &barrier.post = $(call &barrier,$(1).post)
 &@barriers = $(&barrier.pre) $(&barrier) $(&barrier.post)
 @barriers := $(call &barrier.pre,all) $(foreach 1,$(subpaths),$(&@barriers)) $(call &barrier.post,all)
-.PHONY: $(@barriers)
 
 # ARGS: <subpath>
 define defbarrier =
@@ -87,10 +91,16 @@ $(&barrier.post): $(&barrier)
 $(eval _prevbar := $(&barrier.post))
 endef
 
+# NOTE: use barriers as real stampfiles to prevent stored lists deletion by "install.pre"
+#  -- to continue after errors interrupt chain in the middle of "install"
+# USE: $ make -B all/install $ to restart fully
 _prevbar := $(call &barrier.pre,all)
 $(foreach p,$(subpaths),$(eval $(call defbarrier,$p)))
 $(call &barrier.post,all): $(_prevbar)
-$(@barriers) : % : | @/%
+$(@barriers):
+	@echo '$(@F)'
+	@$(value $(call &barrier.hook,$@))
+	@touch '$@'
 
 ####################
 ### Cmdline args
@@ -107,7 +117,7 @@ $(@barriers) : % : | @/%
 _unknown := $(filter-out all $(@allmods),$(@modlist))
 $(if $(_unknown),$(error no such mod(s) {$(_unknown)}; SEE:VIZ: $$ r.airy-mods-make help))
 @modlist := $(or $(@modlist),$(shell r.airy-mods-required))
-@modlist := $(filter-out $(skip),$(@modlist))
+@modlist := $(filter-out $(subst $(,), ,$(skip)),$(@modlist))
 
 # ATT: verify allowed subpaths _before_ expanding "*/all"
 #   i.e. ignore errors for nonexistent subpaths resulting from "all" expansion
@@ -183,11 +193,10 @@ $(foreach 1,$(@scripts),$(eval $(call defrecipe,$(&abspath),$(&modname),$(&subpa
 ####################
 ### Hooks
 #
+
 ifneq (0,$(words $(filter %/install,$(@recipes))))
-$(call &barrier.pre,install):
-	r.pacman-any-install -x
-$(call &barrier.post,install):
-	r.pacman-any-install
+hook.install.pre  := r.pacman-any-install -x
+hook.install.post := r.pacman-any-install
 endif
 
 
@@ -201,8 +210,8 @@ all: all/all
 all/all: $(subpaths:%=all/%)
 $(subpaths:%=all/%) : all/% : $(call &barrier.post,%)
 
-reset:
-	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f -name '$(_tspfx)$(_tsdlm)?*' -delete
+reset: | $(tsdir)
+	find -H '$(tsdir)' -xdev -mindepth 1 -maxdepth 1 -type f \( -name '$(_tspfx)$(_tsdlm)?*' -or -name '--?*--' \) -delete
 	rmdir '$(tsdir)'
 
 help:

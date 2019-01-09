@@ -31,21 +31,19 @@ EDITOR ?= vi
 #   => TRY: disable "--noconfirm"
 # TODO: remove "-m" => always setup
 flags := -mu
-&mods = +r.airy-mods-make "tsdir=$(AIRY_CACHE)/ts" "flags=$(flags)"
-
-# [_] CHECK: if works "skip=pacman"
-# WARN:HACK: if error in middle of gathering "install" list -- run once "make -B install" to restart
-#   BUG: stored lists are deleted completely before "continue"
-#     => THINK: delete only on "reset" -- timestamps will do for partial upgrade
-#     => TODO: wrap all/install into stampfile "all" to signify successful generation of all lists
+skip  :=
+tsdir := $(AIRY_CACHE)/ts
+&mods = +r.airy-mods-make "tsdir=$(tsdir)" "flags=$(flags)" "skip=$(skip)"
 
 # BET:PERF: use directly $ r.airy-mods-make -- flags=-mu all
 # MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
 all: configure all/all
+configure: $(tsdir)/--configure--
+upgrade: ; ./pacman/update -u
 install setup update recache: ; $(&mods) all/$@
 reset: ; $(&mods) reset
 
-# MAYBE: replace by "cleanup" script in each mod
+# MAYBE: replace by "cleanup" script in each mod (when you need clean state for accumulating dirs/files)
 #  => however, when everything is placed in ~/.cache -- there is no need to clean up ?
 # TODO: rename 'recache'/'rR' to smth another to free up '-r' for general reset/remove
 # IDEA: create "backup" scripts per each mod to gather all necessary data in one go
@@ -66,13 +64,18 @@ clean:
 # ALSO: use env vars to force $ pacman --color always $ when using TTY w/o redirect
 # BAD!RFC: dirty code duplication for init (place wholesome into airy/setup)
 #  => BUT: then "airy/setup" must be called even before "all/install" USE? script "init_once" ?
-# ALT:(rename): "r.airyctl"
-configure:
+# [_] TODO: consistency
+#   OR: make "configure" as separate first step of r.airy-mods-make (inconsistent)
+#   OR: call "configure" from --all.pre-- step hook (impossible on clean system)
+#   OR: make "airy" mod the very first setup everywhere (hard)
+$(tsdir)/--configure--:
+	echo '$(@F)'
 	mkdir -p '$(dir $(AIRY_ROOT))' '$(AIRY_BIN)' '$(AIRY_TMPDIR)'
 	ln -svfT '$(dir $(realpath $(this)))' '$(AIRY_ROOT)'
-	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/r.airy'
+	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/airyctl'
 	./airy/setup -m
 	./pacman/setup -m
+	touch '$@'
 
 defaults: clean configure
 	r.airy -sd

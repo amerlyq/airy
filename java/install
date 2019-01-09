@@ -13,7 +13,6 @@ source ~/.shell/func.d/packages
 if distro arch; then
   # aur_inst jdk  # BAD:(changed names)
   pkg_inst jdk8-openjdk
-  cfgNo u || sudo archlinux-java set 'java-8-openjdk'
 
 
 elif distro ubuntu; then
@@ -22,10 +21,6 @@ elif distro ubuntu; then
     sudo apt-get install 'oracle-java8-installer'
     # sudo update-java-alternatives -s java-8-oracle
 fi
-
-java -version
-javac -version
-
 
 
 # IF ppa CAN'T DOWNLOAD java (ex: oracle changed cookies)

@@ -6,6 +6,7 @@
 #%NOTE: defaults disabled, only explicit pkgname <= [[ -t 0 ]] && exec <<< "$PWD"
 set -fCureEo pipefail
 
+# BUG: "emacspeak-git" can't be built w/o 'tclx' which is absent in 'dev' due to --config dev.conf
 export AUR_REPO=dev
 d_root=~/.cache/aurutils/airy
 # ALT: enforce rebuild by incrementing 'pkgrel=1' or 'epoch' in PKGBUILD

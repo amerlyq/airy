@@ -2,7 +2,7 @@
 #%USAGE: $ timestamp -o /path/to/stampfile -- cmd [args..]
 #%NOTE: can't directly use "/usr/bin/time --output=stampfile" -- it creates file even on error
 #%PERF:(script itself): overhead of 0.010s
-set -FCuemo pipefail
+set -FCueo pipefail
 
 while getopts 'o:' o; do case $o in :|'?') exit 1
 ;; o) f_output=$OPTARG
