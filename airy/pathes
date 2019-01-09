@@ -146,16 +146,18 @@
 
 .w.  /work
 .wa  /work/work/adc
-.wb  /work/_build  # symlink -> /tmp/_build/
+.wb  /work/bug
 .wc  /work/cache
 .wd  /work/doc
 .wf  /work/cache/fw
-.wg  /work/_bug  # symlink -> /work/src/bug-<current_task>/
+.wg  /work/bug/!now   # symlink -> /work/src/bug-<current_task>/
 .wm  /work/_mirror
+.wp  /work/cache/_prefix
 .wr  /work/repo
-.ws  /work/_src  # symlink -> /work/src/<current_task>/path-to-submodule/
-.wt  /work/task  # pj
-.ww  /work/_now  # symlink -> /work/task/<current_task>/
+.ws  /work/repo/!now  # symlink -> /work/src/<current_task>/path-to-submodule/
+.wt  /work/task       # pj
+.wu  /work/_build     # symlink -> /tmp/_build/
+.ww  /work/task/!now  # symlink -> /work/task/<current_task>/
 
 .W.  ~/work
 

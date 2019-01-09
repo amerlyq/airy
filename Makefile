@@ -13,6 +13,8 @@ $(this): ;
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
 .PHONY: $(PHONY)
 
+# [_] BET:FIXME: instead of shebang to r.airy-makelog -- use pass-through recipe into it
+
 ### Parameters
 export TMPDIR      ?= /tmp/$(LOGNAME)
 # MAYBE: use $XDG_RUNTIME_DIR
@@ -45,6 +47,8 @@ reset: ; $(&mods) reset
 
 # MAYBE: replace by "cleanup" script in each mod (when you need clean state for accumulating dirs/files)
 #  => however, when everything is placed in ~/.cache -- there is no need to clean up ?
+#   ALSO: merge "cleanup" with "cfgOpt -r" reset to simulate full reset of some mods
+#   OR append actions to "reset" target of "r.airy-mods-make" to be completely user-demanded
 # TODO: rename 'recache'/'rR' to smth another to free up '-r' for general reset/remove
 # IDEA: create "backup" scripts per each mod to gather all necessary data in one go
 #   => so even external locations like ~/work or /data/music can be represented by private user mod ;)

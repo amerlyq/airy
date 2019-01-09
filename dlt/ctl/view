@@ -113,6 +113,7 @@ sub proc_record {
 
 sub push_record {
     my $fields = shift;
+    $fields->{stamp} = sprintf '%.4f', $fields->{stamp} / 10000;   # convert to seconds
     # chop $fields{body};
     $fields->{body} =~ s/\s*\]$//;  # remove body closing bracket ']'
     $fields->{body} =~ s/\n/\r/g;   # compress multiline body
