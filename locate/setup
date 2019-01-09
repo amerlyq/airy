@@ -11,5 +11,3 @@ fi
 if ! grep -q '^PRUNEPATHS\b.*\s/work\b' /etc/updatedb.conf; then
   sudo sed -ri '/^(PRUNEPATHS = "[^"]+)"/s||\1 /work"|' /etc/updatedb.conf
 fi
-
-cfgNo u || fork_m sudo updatedb

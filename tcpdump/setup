@@ -6,7 +6,4 @@ source ~/.shell/func.d/cfgsetup
 # linkcp -t ~/.wireshark preferences
 # ALSO: disabled_protos hosts subnets ethers manuf services ipxnets
 
-if ! id | grep -q '(wireshark)'; then
-  sudo gpasswd -a "${CURR_USER:?}" wireshark
-  die "!!! Re-login user session or reboot to update changes in Groups"
-fi
+id | grep -qwF wireshark || sudo gpasswd -a "${LOGNAME:?}" wireshark

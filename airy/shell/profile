@@ -1,11 +1,6 @@
 # vim: ft=sh
 
-### Profile Mgmt ###
 CURR_PROF='default'
-# ALT:TRY: $OSTYPE, maybe replace CURR_PLTF in all scripts?
-CURR_PLTF=$(expr substr $(uname -s) 1 5)
-CURR_USER=${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}
-
 
 ### Dirs ###
 # TODO: replace by ~/.cache/pacaur OR:BET: /var/cache/pacman/dev
@@ -16,9 +11,9 @@ config=${XDG_CONFIG_HOME:-$HOME/.config}/airy
 
 ### Samba ###
 declare -A AIRY_SAMBA_RO=(
-  [home]="/home/$CURR_USER"
+  [home]="/home/${USER:?}"
   [data]="/data"
-  [mounts]="/media/$CURR_USER"
+  [mounts]="/media/${USER:?}"
 )
 declare -A AIRY_SAMBA_RW=()
 
@@ -34,6 +29,7 @@ CURR_CHROOT_EVAL=''
 AIRY_MODS=(wget shell bash zsh util grep python ruby git term ranger tmux vim elinks)
 AIRY_SKIP=()
 ## NOTE: by unset 'AIRY_OVERLAY_BASE' all default configs can be disabled at once
+# MAYBE: use XDG-similar naming AIRY_CONFIG_DIRS
 AIRY_OVERLAY_BASE=~/.local/airy
 ## user customizable
 # AIRY_OVERLAY_PATH=/private/overlay:/public/overlay

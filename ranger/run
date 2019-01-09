@@ -15,6 +15,7 @@ then echo "Err: install 'ranger' to use it"; return 1; fi
 
 # No need because it sourced?
 # trap "rm -f -- '$_ranger_tmp' > /dev/null" EXIT
+# MAYBE: use $XDG_RUNTIME_DIR
 export RANGER_TMPDIR=${TMPDIR:-/tmp}/ranger
 [[ -d $RANGER_TMPDIR ]] || command mkdir -p "$RANGER_TMPDIR"
 

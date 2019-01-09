@@ -15,7 +15,8 @@ source ~/.shell/profile
 # Mount fs by SSH
 # https://ru.wikipedia.org/wiki/Mount
 
-mnt=/media/${CURR_USER:-`whoami`}
+user=${SUDO_USER:-${USER:-${USERNAME:-$(whoami)}}}
+mnt=/media/$user
 action=m
 
 # Disk mounting util
@@ -39,7 +40,7 @@ clean() { check "$1"
   || sudo rmdir -v "$1" \
   || die "Can't remove directory '$1'!"
 }
-chuser(){ sudo chown "$CURR_USER:$CURR_USER" "$1"; }
+chuser(){ sudo chown "$user:$user" "$1"; }
 dirmk() { clean "$1"
   mkdir -p "$1" 2>/dev/null \
   || sudo mkdir -p "$1" && chuser "$1" \
@@ -70,7 +71,7 @@ domnt() { local TYPE DEVPATH=/dev/disk/by-label/${1##*/}
     case "$TYPE"
     in vfat|exfat) MOPTS="rw,nosuid,nodev,noexec,relatime,uid=$(id -u),gid=$(id -g),fmask=0133,dmask=0022,\
 codepage=437,iocharset=iso8859-1,shortname=mixed,showexec,utf8,flush,errors=remount-ro"
-    ;; ntfs) MOPTS="uid=$CURR_USER,gid=users,dmask=022,fmask=133"  #
+    ;; ntfs) MOPTS="uid=$user,gid=users,dmask=022,fmask=133"  #
     ;; ext?) MOPTS=""
     ;;    *) die "Unknown type '$TYPE'" ;; esac
     # -t "$TYPE"

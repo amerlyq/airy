@@ -26,9 +26,6 @@ esac; cfgOptAdd "$o"; done; shift $((OPTIND - 1))
 [[ ${THEME-} =~ ^($THEME_ALLOWED)$ ]] || THEME=${THEME_ALLOWED%%|*}
 
 ### LINKS ###
-# BUG: on error we can't exit from forked shell and fail main one!
-fork_m(){ cfgOpt m && eval '"$@" &' || "$@"; }
-
 if cfgOpt m; then
   repo=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
   case $repo in */devq) pref=q ;; */work) pref=w ;; *) pref=r ;; esac

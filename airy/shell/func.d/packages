@@ -23,12 +23,6 @@ do_if() {
   ;; q) bQuiet=1
   esac; done; shift $((OPTIND-1))
 
-  # Statistics NEED: ./odd-pkgs
-  local pkgl=$cache/install-pkgs.txt
-  if [[ $cmd == true || $cmd =~ (pacman|pacaur|yaourt) ]]
-  then printf '%s\n' "$@" | grep -vsxFf "$pkgl" >> "$pkgl" ||: ; fi
-  [[ ${AIRY_DRY_RUN-} ]] && return
-
   # Skip ignored pkgs
   if [[ $cmd =~ pacman ]]; then
     declare -n ign=PKG_IGNORE
@@ -56,7 +50,6 @@ do_if() {
   ((!${#pkgs[@]})) || ${cmd:?} "${pkgs[@]}"
 }
 
-mod_have(){ do_if -c 'true' "$@"; }
 pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
 cab_inst(){ do_if -c 'cabal install' "$@"; }
 iskip(){ declare -n a="$1"; (( ${#a[@]} ))||return 0

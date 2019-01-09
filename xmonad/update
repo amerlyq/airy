@@ -1,5 +1,7 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 source ~/.shell/func.d/system
+set -euo pipefail
+# BUG: need manually 'xmonad --recompile' to create ~/.xmonad/xmonad-x86_64-linux
 
 running_X && r.n xmonad recompile
 xmonad --recompile

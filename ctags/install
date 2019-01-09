@@ -4,7 +4,8 @@ source ~/.shell/func.d/packages
 if distro arch; then
   pkg_inst ctags cscope
   aur_inst global
-  loc_inst ./ccglue-airy-git.pkgbuild
+  # ERR: error: no match for ‘operator--’
+  # loc_inst ./ccglue-airy-git.pkgbuild
 
 elif distro ubuntu; then
   pkg_inst exuberant-ctags cscope

@@ -14,7 +14,7 @@ cat>> "$tmp" << EOT
     comment = Shared Data
     path = ${AIRY_SAMBA_RO[$k]}
     available = yes
-    valid users = $CURR_USER
+    valid users = ${USER:?}
     read only = yes
     browseable = yes
     public = no
@@ -28,7 +28,7 @@ cat>> "$tmp" << EOT
 [$k]
     path = ${AIRY_SAMBA_RW[$k]:?}
     available = yes
-    valid users = $CURR_USER
+    valid users = ${USER:?}
     read only = no
     browseable = yes
     public = no

@@ -8,6 +8,7 @@ set -euo pipefail -o errtrace
 
 exe=$(readlink -e "$0")
 exe=${exe%/*/*}/exe
+# MAYBE: use $XDG_RUNTIME_DIR
 session=${TMPDIR:-/tmp}/xsel-shared
 
 # USAGE: [L]=socket [S]=session [a]=auto-xsel [k]=kill_unused [K]=kill_always [s]=server

@@ -1,10 +1,14 @@
 # vim:ft=sh
-_airy=${XDG_CONFIG_HOME:-$HOME/.config}/airy
-_cache=${XDG_CONFIG_HOME:-$HOME/.cache}/airy
+_airy=$HOME/.local/airy
+_cache=${XDG_CACHE_HOME:-$HOME/.cache}/airy
+_config=${XDG_CONFIG_HOME:-$HOME/.config}/airy
+_data=${XDG_DATA_HOME:-$HOME/.local/share}/airy
+_tempdir=${TMPDIR:-/tmp${USER:+/$USER}}/airy
+_runtime=${XDG_RUNTIME_DIR:-$_tempdir}/airy
 
 ### Aura mods profiles (links only) ###
 # FIXME: what if user want to overwrite some of my aliases?
-[[ ! -d $_airy/env ]] || for f in "$_airy/env"/*
+[[ ! -d $_config/env ]] || for f in "$_config/env"/*
 do [[ -L $f ]] && source "$f"; done
 
 ### Alien profile (SSH server, anonymous) ###

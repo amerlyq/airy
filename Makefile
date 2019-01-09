@@ -3,10 +3,9 @@
 #% * (no-update): $ ./$0 flags=
 #%
 .DEFAULT_GOAL = all
-# HACK: keep prompt unaffected -- when scripts inside ask for "sudo" password
-#  ::: CHECK: seems like pacman isn't connected to tty despite  exec <>/dev/tty
-#  <= if connected to tty -- then there must not be any pacman lines in setup.log
-MAKEFLAGS += -rR --silent --output-sync=none
+# HACK:( --output-sync=none): keep prompt unaffected -- when scripts inside ask for "sudo" password
+# CHECK: seems like pacman isn't connected to tty despite :: exec > /dev/tty && exec < /dev/tty
+MAKEFLAGS += -rR --silent
 .NOTPARALLEL:
 .SUFFIXES:
 this := $(lastword $(MAKEFILE_LIST))
@@ -16,6 +15,7 @@ PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|x
 
 ### Parameters
 export TMPDIR      ?= /tmp/$(LOGNAME)
+# MAYBE: use $XDG_RUNTIME_DIR
 export AIRY_TMPDIR ?= $(TMPDIR)/airy
 export AIRY_ROOT   ?= $(HOME)/.local/airy
 export AIRY_BIN    ?= $(HOME)/.local/bin
@@ -37,9 +37,9 @@ tsdir := $(AIRY_CACHE)/ts
 
 # BET:PERF: use directly $ r.airy-mods-make -- flags=-mu all
 # MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
-all: configure all/all
+all: configure upgrade all/all
 configure: $(tsdir)/--configure--
-upgrade: ; ./pacman/update -u
+upgrade: $(tsdir)/--upgrade--
 install setup update recache: ; $(&mods) all/$@
 reset: ; $(&mods) reset
 
@@ -76,6 +76,9 @@ $(tsdir)/--configure--:
 	./airy/setup -m
 	./pacman/setup -m
 	touch '$@'
+
+$(tsdir)/--upgrade--:
+	./pacman/update -u
 
 defaults: clean configure
 	r.airy -sd

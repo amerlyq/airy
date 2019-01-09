@@ -1,0 +1,3 @@
+#!/bin/sh
+#%SUMMARY: remove comments and empty lines from generic config-like files
+exec sed 's/\s*#.*$//; /^\s*$/d' "$@"
