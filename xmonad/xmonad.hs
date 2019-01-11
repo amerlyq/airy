@@ -195,7 +195,7 @@ myLayout = smartBorders
     . onWorkspace "PI" piLayer
     -- . onWorkspace "SK" (reflectHoriz skLayer)
     . trackFloating
-    $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| Grid
+    $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| Grid ||| simplestFloat
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
     skLayer = gridIM (1%6) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))

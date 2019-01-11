@@ -1,0 +1,25 @@
+/* Load the original theme */
+@import url("/usr/share/themes/Arc-Dark/gtk-3.0/gtk.css");
+/* @import url("/usr/share/themes/Adwaita/gtk-3.0/gtk.css"); */
+
+/* Override scrollbar setting */
+/* SEE: http://twicetwo.com/blog/linux/gtk/theme/customization/2016/05/04/per-user-gtk-customization.html */
+/* https://askubuntu.com/questions/775201/how-to-get-a-bigger-static-scrollbar-aka-normal-scrollbar */
+/* .scrollbar { */
+/*   /1* -GtkScrollbar-has-backward-stepper: 1 !important; *1/ */
+/*   /1* -GtkScrollbar-has-forward-stepper: 1 !important; *1/ */
+/*   /1* -GtkScrollbar-has-backward-stepper: true; *1/ */
+/*   /1* -GtkScrollbar-has-forward-stepper: true; *1/ */
+/*   -GtkRange-slider-width: 40 !important; */
+/*   -GtkRange-stepper-size: 40 !important; */
+/* } */
+
+/* SEE: https://bugs.launchpad.net/ubuntu/+source/firefox/+bug/1683997 */
+/* .scrollbar.vertical slider, */
+/* .scrollbar slider, */
+scrollbar {
+    scrollbar slider {
+        min-height: 100px !important;
+        min-width: 100px !important;
+    }
+}

@@ -7,9 +7,9 @@ linkcp -ct /etc/X11 Xwrapper.config
 
 # NOTE: set dpi for Xorg startup
 #   => then even no need to set screen size by xorg.conf ?
-# dpi=$(r.airy-registry -n dpi)
-# [[ $dpi =~ ^[0-9]+$ ]] && export DPI="-dpi $dpi" || export DPI=''
-export DPI=''
+dpi=$(r.airy-registry -n dpi)
+[[ $dpi =~ ^[0-9]+$ ]] && export DPI="-dpi $dpi" || export DPI=''
+# export DPI=''
 svc_activate -cueE xorg.{service,socket,target}
 
 svc_activate -cue \
