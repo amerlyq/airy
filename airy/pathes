@@ -101,6 +101,7 @@
 
 # .p   ~/pkg
 .p.  ~/aura/pj
+.pd  ~/aura/pj/ds
 .pf  ~/aura/forestanza/forestanza
 .pj  ~/aura/pj/jira-cli
 .pp  ~/aura/pj/piony
@@ -146,18 +147,19 @@
 
 .w.  /work
 .wa  /work/work/adc
-.wb  /work/bug
+.wb  /work/bug/!now   # symlink -> ./bug/$date-$jira-$desc>/
+.wB  /work/bug
 .wc  /work/cache
 .wd  /work/doc
 .wf  /work/cache/fw
-.wg  /work/bug/!now   # symlink -> /work/src/bug-<current_task>/
 .wm  /work/_mirror
 .wp  /work/cache/_prefix
-.wr  /work/repo
+.wr  /work/repo/_root
+.wR  /work/repo
 .ws  /work/repo/!now  # symlink -> /work/src/<current_task>/path-to-submodule/
-.wt  /work/task       # pj
+.wt  /work/task/!now  # symlink -> /work/task/<current_task>/
+.wT  /work/task       # pj
 .wu  /work/_build     # symlink -> /tmp/_build/
-.ww  /work/task/!now  # symlink -> /work/task/<current_task>/
 
 .W.  ~/work
 

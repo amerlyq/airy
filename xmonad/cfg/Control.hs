@@ -149,7 +149,7 @@ system =
     , ("l", spawn "r.core lock")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
     , ("x", restart "xmonad" True)
-    , ("j", spawn "r.xmonad-rebuild")
+    , ("j", spawn "airyctl -B -- xmonad/update")
     , ("-", spawn "r.monitor-off")
     , ("0", spawn "r.backlight-mon-sys -n 100%")
     ],

@@ -8,12 +8,16 @@
 MAKEFLAGS += -rR --silent
 .NOTPARALLEL:
 .SUFFIXES:
-this := $(lastword $(MAKEFILE_LIST))
+this := $(realpath $(lastword $(MAKEFILE_LIST)))
+here := $(patsubst %/,%,$(dir $(this)))
 $(this): ;
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
 .PHONY: $(PHONY)
 
 # [_] BET:FIXME: instead of shebang to r.airy-makelog -- use pass-through recipe into it
+
+# BAD: mods may be inside .tar.gz or in subdir -- better to align on Makefile itself "$this"
+# repo := $(shell git rev-parse --show-toplevel)
 
 ### Parameters
 export TMPDIR      ?= /tmp/$(LOGNAME)
@@ -75,7 +79,7 @@ clean:
 $(tsdir)/--configure--:
 	echo '$(@F)'
 	mkdir -p '$(dir $(AIRY_ROOT))' '$(AIRY_BIN)' '$(AIRY_TMPDIR)'
-	ln -svfT '$(dir $(realpath $(this)))' '$(AIRY_ROOT)'
+	ln -svfT '$(here)' '$(AIRY_ROOT)'
 	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/airyctl'
 	./airy/setup -m
 	./pacman/setup -m
