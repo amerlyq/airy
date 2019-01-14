@@ -10,7 +10,7 @@ MAKEFLAGS += -rR --silent
 .SUFFIXES:
 this := $(realpath $(lastword $(MAKEFILE_LIST)))
 here := $(patsubst %/,%,$(dir $(this)))
-$(this): ;
+$(notdir $(this)): ;
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
 .PHONY: $(PHONY)
 
@@ -92,7 +92,7 @@ defaults: clean configure
 	r.airy -sd
 
 tags:
-	r.airy-mods-tags -L ~/.cache/airy/tags
+	r.airy-cache-tags -L ~/.cache/airy/tags
 
 tags-tree:
 	tree --noreport -- ~/.cache/airy/tags | sed 's/\s*->\s*.*//'

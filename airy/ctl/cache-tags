@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 #%SUMMARY: print known tags for all mods (or create symlinks tag tree)
-#%USAGE: $ r.airy-mods-tags [-L /tags/destdir] [--] [/path/to/repo...]
-#%  e.g: $ r.airy-mods-tags -L ~/.cache/airy/tags -- ~/.local/airy
+#%USAGE: $ r.airy-cache-tags [-L /tags/destdir] [--] [/path/to/repo...]
+#%  e.g: $ r.airy-cache-tags -L ~/.cache/airy/tags -- ~/.local/airy
 #NOTE: use one of [F3G] to disable/error/null glob
 set -FCureo pipefail
 
@@ -75,6 +75,12 @@ function make_links { local mdir=$1 mod=$2; shift 2
 
 # DEBUG: print -l -- "${(@qkv)tags}"
 
+# BAD:(unintuitive): options must be 'optional'
+#   => use dst as required positional arg
+#   => '-' to specify output to stdout
+#   => pass modnames on stdin
+#   => allow fullpaths on stdin -- ignore repos in this case
+#   => pass repos by single overlay path arg instead of positional
 if [[ -n $tagdir ]]; then
   purge_tags $tagdir
   # ALT: print -l ${(kv)mods[(I)qute|qute@*]}
