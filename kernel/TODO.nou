@@ -3,6 +3,18 @@ DEBUG
     $ </proc/config.gz zgrep -i patch_loader
 
 
+CFG
+  Modify config options through trigger menus
+    $ make menuconfig
+    General -> Control groups -> ... [Y]
+  Read available options and dependencies
+    $ less ./init/Kconfig
+    /CGROUP_SCHED/
+  Firmware fragment of config
+    ./arch/arm/configs/*
+    e.g. ./arch/arm/configs/some_defconfig
+
+
 BUG
   2017-07-07 [X] FIXED: Ubuntu 16.04 error: undefined reference to `create_module'
     Building module-init-tools-3.2 in Ubuntu16.04 failed:

@@ -56,7 +56,9 @@ if [ "$preview_images" = True ]; then
 fi
 
 case "$mimetype"
-in text/*|*/xml) exit 2
+in text/*|*/xml)
+  try bat --theme=TwoDark --paging=never --color=always --plain "$path" && { dump | trim; exit 5; }
+  exit 2
 ;; application/x-sqlite3)
   # BUG: even in readonly mode it creates -wal files
   sqlite3 "$path" .fullschema .dbinfo .quit && exit 5

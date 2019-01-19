@@ -32,7 +32,7 @@ fsys=(
   # = 50-user.conf
   # = 51-local.conf
   70-no-bitmaps.conf
-  75-emojione.conf  # NEED: ttf-emojione
+  # 75-emojione.conf  # NEED: ttf-emojione  # BUG: breaks jp-fonts fallback
 )
 linkcp -rt /etc/fonts/conf.d -f /etc/fonts/conf.avail "${fsys[@]}"
 

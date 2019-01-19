@@ -6,9 +6,9 @@
 # *  (remove) $ pacx emacspeak && aurC && aurx emacspeak && aury
 
 alias aur='AUR_REPO=aur aur'
-alias aurb='aur build --chroot --force'          # rebuild inside current dir
+alias aurb='aur build --force'          # rebuild inside current dir
 alias aurc='pacman -Qm | aur vercmp'                            # check updates for foreign pkgs
-alias auri='aur sync --chroot --no-view'         # install
+alias auri='aur sync --no-view'         # install
 alias aurl='pacman -Sl aur'   # list installed aur pkgs
 alias aurs='aur search'
 function aurS { aur pkglist -P "$@" | xargs aur search -i; }    # search pkgname by regex
