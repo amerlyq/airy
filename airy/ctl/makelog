@@ -16,6 +16,7 @@ read -ra fpretty <<< "${AIRY_PRETTY_STDOUT:-r.airy-pretty}"
   && set -- "${@:1:2}" "${@:4}" "${targets[@]}"
 
 # THINK: instead of fallback in each script -- demand env vars to be always set and FAIL
+#   => then populate env vars from central app "airyctl" and access everything through it
 log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/log/$(date +'%Y%m%d_%H%M%S').log
 # log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/airy.log
 # log=${TMPDIR:-/tmp}/airy.log
@@ -25,5 +26,7 @@ mkdir -p "${log%/*}"
 [[ -t 1 ]] && ((${#fpretty[@]})) && exec > >("${fpretty[@]}")
 
 { { make "$@"
-  } 3>&1 1>&2 2>&3 | sed -u 's/^/ERR: /'
+  } 3>&1 1>&2 2>&3 | sed -u 's/^/E: /'
 } |& stdbuf -oL -eL tee -a "$log"
+
+# [[ -s $log ]] || rm "$log"

@@ -1,6 +1,7 @@
-#!/usr/bin/env -S r.airy-makelog -f
+#!/usr/bin/env -S make -f
 #%USAGE:
-#% * (no-update): $ ./$0 flags=
+#% * (no-update): $ make flags=
+#% * (only mods): $ make -B all/all
 #%
 .DEFAULT_GOAL = all
 # HACK:( --output-sync=none): keep prompt unaffected -- when scripts inside ask for "sudo" password
@@ -8,13 +9,18 @@
 MAKEFLAGS += -rR --silent
 .NOTPARALLEL:
 .SUFFIXES:
-this := $(realpath $(lastword $(MAKEFILE_LIST)))
-here := $(patsubst %/,%,$(dir $(this)))
-$(notdir $(this)): ;
-PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u|xargs)
-.PHONY: $(PHONY)
+this := $(lastword $(MAKEFILE_LIST))
+here := $(patsubst %/,%,$(dir $(realpath $(this))))
+$(this): ; @:
+.PHONY: .FORCE
 
-# [_] BET:FIXME: instead of shebang to r.airy-makelog -- use pass-through recipe into it
+# HACK: pass-through recipes into log wrapper
+ifeq ($(MAKELEVEL),0)
+fmk := r.airy-makelog
+fmk := $(if $(shell which $(fmk) 2>/dev/null),$(fmk),$(here)/airy/ctl/makelog)
+% :: .FORCE
+	+'$(fmk)' -f '$(this)' -C '$(here)' $(MAKECMDGOALS)
+else
 
 # BAD: mods may be inside .tar.gz or in subdir -- better to align on Makefile itself "$this"
 # repo := $(shell git rev-parse --show-toplevel)
@@ -112,6 +118,9 @@ help:
 	$(&mods) help
 
 #% NOTE: pass-through unknown targets as mod names
-.FORCE:
 %  :: .FORCE ; $(&mods) $@
 %- :: .FORCE ; $(&mods) flags= $(@:-=)
+
+PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
+.PHONY: $(PHONY)
+endif
