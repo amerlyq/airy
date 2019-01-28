@@ -29,11 +29,11 @@ search+=( ')' )
 # ALT:(grep): exit after first not-commented line
 #   $ sed -rn '/^[^#]/q;/^#@deps:\s*(.+)\s*$/{s//\1\t/;s/\s+/\n'"${f##*/}"'\t/g;p}' -- "$f"
 keyrgx=$(printf '\\Q%s\\E\n' "${mkeys[@]}" | paste -sd '|')
-modrgx="^#+\s*\K($keyrgx):\s*[^#:]+"
+modelinergx="^#+\s*\K($keyrgx):\s*[^#:]+"
 
 # WARN: file path can't contain ':' when using (-p:)
 find -H "${repos[@]}" -mindepth 2 -maxdepth 2 -type f "${search[@]}" -print0 \
-| xargs -0 grep -PHo "$modrgx" \
+| xargs -0 grep -PHo "$modelinergx" \
 | awk -F/ -vOFS=: -vps="$pathsep" -vms="$modsep" -vks="$keysep" -vts="$tagsep" '
   function fmt(){ if(m){ for(k in t){
     gsub(/\s+/, ts, t[k])

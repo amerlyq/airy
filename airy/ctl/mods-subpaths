@@ -26,4 +26,7 @@ existing_subpaths(){
 
 (( ${#subpaths[@]} )) && exec > >(existing_subpaths)
 
+# MAYBE:BET? simplify overlay to always replace files with same name => never extend
+# -- create <file>-pre.conf/<file>.conf/<file>_post.conf
+# -- explicitly register it inside "<mod>/config"
 exec r.airy-overlay -M+ -- "${modlist[@]}"

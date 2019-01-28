@@ -25,6 +25,8 @@ bins(){ local i a=()
 #   lst=$(find . -maxdepth 1 -type f -name 'run*' -not -empty -executable -print0)
 #   a=(); while IFS= read -rd $'\0'; do a+=("$REPLY"); done <<< "$lst"; }
 
+# ALG? Find all files -- run bin/ ctl/, sort by overlay order and send to uniq to keep only first from overlay
+# BET: for each mod find in reverse overlay order -- then accumulate list
 
 bins -- ./bin/*  # bin/* -> bin/*
 bins -p "${prf}" -- ./ctl/*  # ctl/* -> bin/r.%d-*

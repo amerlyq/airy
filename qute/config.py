@@ -1431,6 +1431,7 @@ c.url.searchengines = {
     'ab': 'https://bbs.archlinux.org/search.php?action=search&author=&forums=&search_in=0&sort_by=0&sort_dir=DESC&show_as=topics&keywords={}',
     'au': 'https://aur.archlinux.org/packages/?O=0&C=0&SeB=nd&outdated=&SB=n&SO=a&PP=50&do_Search=Go&K={}',
     'aw': 'https://wiki.archlinux.org/index.php?title=Special:Search&search={}',
+    'cpp': 'https://en.cppreference.com/mwiki/index.php?search={}',
     'D': 'https://duckduckgo.com/?q=!g%20{}',
     'd': 'https://duckduckgo.com/?q={}',
     'di': 'https://duckduckgo.com/?ia=images&q={}',

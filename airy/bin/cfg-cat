@@ -1,3 +1,16 @@
-#!/bin/sh
-#%SUMMARY: remove comments and empty lines from generic config-like files
-exec sed 's/\s*#.*$//; /^\s*$/d' "$@"
+#!/usr/bin/sed -rf
+#%SUMMARY: convert human-readable generic config files into machine-parsable
+
+#% * remove comments (allowed even after line ending by "\")
+s/\s*#.*$//
+
+#% * join lines ending by single "\" (don't work on comments)
+: x
+/(^|[^\\])\\$/ {
+  N
+  s/\\\n\s*//
+  t x
+}
+
+#% * remove empty lines
+/^\s*$/d
