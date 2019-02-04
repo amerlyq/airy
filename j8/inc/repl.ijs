@@ -1,6 +1,7 @@
 #!/usr/lib/j8/bin/jconsole
 NB. USAGE: { echo 1 2 3; echo 1 + 4; } | ./repl.ijs
 NB. demo showing how to make a simple repl in j.
+NB. SEE: https://rosettacode.org/wiki/Multiline_shebang#J
 
 readln =: [: (1!:1) 1:
 donext =: [: (9!:29) 1: [ 9!:27

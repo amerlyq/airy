@@ -1,10 +1,5 @@
-Statistics
+Quantiles?
   $ ... | sort -rn H
-  $ ... | jq -s min
-  $ ... | jq -s max
-  $ ... | jq -s add/length
-  ALT: $ | perl -M'List::Util qw(sum max min)' -MPOSIX -0777 -a -ne 'printf "%-7s : %d\n"x4, "Min", min(@F), "Max", max(@F), "Average", sum(@F)/@F,  "Median", sum( (sort {$a<=>$b} @F)[ int( $#F/2 ), ceil( $#F/2 ) ] )/2;'
-  ALT: |aur/num| http://www.numcommand.com/  https://github.com/numcommand/num
 
 How-to
   Extract timestamps

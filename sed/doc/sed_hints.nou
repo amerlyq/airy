@@ -1,40 +1,9 @@
-Cool snippets!
-  http://sed.sourceforge.net/grabbag/scripts/#sdeb
-
-FAQ
-  http://sed.sourceforge.net/sedfaq3.html
-
--------------------------------------------------------------------------------
-Also see  regex.hints  for hints and tips of matching regular expressions
-And sed 1 liners
-  http://sed.sourceforge.net/sed1line.txt
-Also examples from the gnu "info sed"
-
 ------------------------------------------------------------------------------
-Print specific lines
-
-print first line of file (emulates "head -1")
-  sed q
-
-print first 10 lines of file (emulates behavior of "head")
-  sed 10q
-
-
-print the last line of a file (emulates "tail -1")
-  sed '$!d'                    # method 1
-  sed -n '$p'                  # method 2
 
 print the next-to-the-last line of a file
   sed -e '$!{h;d;}' -e x              # for 1-line files, print blank line
   sed -e '1{$q;}' -e '$!{h;d;}' -e x  # for 1-line files, print the line
   sed -e '1{$d;}' -e '$!{h;d;}' -e x  # for 1-line files, print nothing
-
-print the last 2 lines of a file (emulates "tail -2")
-  sed '$!N;$!D'
-
-print the last 10 lines of a file (emulates "tail")
-  sed -e :a -e '$q;N;11,$D;ba'
-
 
 ------------------------------------------------------------------------------
 Delete between Markers AAAA and BBBB
@@ -84,14 +53,7 @@ left aligned
 right aligned
   sed = filename | sed 'N; s/^/     /; s/ *\(.\{6,\}\)\n/\1  /'
 
-counting lines ("sed" only no "wc")
-
-  sed -n '$=' file
-
 ------------------------------------------------------------------------------
-Delete ALL blank lines
-  sed '/^$/d' file
-
 Delete multiple blank lines (paragraph separators)
   sed '/^$/{ N; /^\n$/D; }' file
 or
@@ -291,22 +253,3 @@ Count 'a's on a line
     y/bcdefgh/abcdefg/
     /[a-h]/ b loop
     '
-
-------------------------------------------------------------------------------
-Reverse characters in a line
-
-  sed -e '
-     # skip lines with lest than two characters
-     /../! b
-
-     # Embed newlines at both ends
-     # then slowly meove markers toward middle
-     :x
-     s/\(\n.\)\(.*\)\(.\n\)/\3\2\1/
-     tx
-
-     # remove newline markers
-     s/\n//g
-     '
-
--------------------------------------------------------------------------------

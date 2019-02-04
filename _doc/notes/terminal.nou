@@ -4,8 +4,6 @@ TODO: create outline graph to generate web-site for those text-proc utils
   $ calcurse # curses calendar and scheduller
   $ watch    # run cmd periodically and show single screen of output (ncurses-based)
   $ slabtop  # watch detailed kernel memory usage (dentry/caching/mapping/etc)
-  $ expand   # convert tabs to spaces (non-trivial for mixed tab/space files)
-  $ col      # filters \r -> \n  and \s -> \t
   $ csplit   # split file into sections by context lines
   $ rename 'regex' files # apply perl regex to filenames
   $ renameutils  # deurlname to decode url file paths
@@ -13,9 +11,6 @@ TODO: create outline graph to generate web-site for those text-proc utils
 
 Cron
   https://www.cyberciti.biz/faq/linux-execute-cron-job-after-system-reboot/
-
-Remove 1st line in file
-  $ ex -sc '1d|x' file.txt
 
 Filenames '.' and '..'
   http://unix.stackexchange.com/questions/148563/how-to-rename-file-to-dot-dot
@@ -103,16 +98,9 @@ Mount
     sudo umount /dev/sdb1
     sudo mkfs.vfat /dev/sdb1
 
-HACK
-  Scan local network for ip's
-    nmap -sn 192.168.0.0/24
-    nmap -sP 192.168.1.0/24
 
 Flags from nemo:
   mkdir -p ~/usb && sudo mount -t vfat /dev/sdb1 ~/usb -o rw,nosuid,nodev,uid=1000,gid=1000,shortname=mixed,dmask=077,utf8=1,showexec,flush,uhelper=udisks2
-
-Ascii
-  $ figlet  # output text by it's big ascii version (each pixel by character)
 
 
 Convert binary to c-hex
@@ -122,27 +110,12 @@ Convert binary to c-hex
 Instead of <CR> after using C-R: (when launching <C-R>make<CR> , <C-R>make install<CR>)
   Use C-O: this will exec current line and inserts next command from history
 
-Count unique lines by groups
-  cat file | sort | uniq -c
-
 Compare files as options
  Simple idea to save comments: we will keep only one file in its
  primary state, second we sort and clean. Then extract options which
  differs, or reorder second list as first and show difference.
   http://stackoverflow.com/questions/12869354/how-to-compare-two-text-files-for-the-same-exact-text-using-bash
   http://mywiki.wooledge.org/BashFAQ/036
-
-Reverse lines
-  :g/^/m0   | in vim
-  tac
-  tail -r
-  sed '1!G;h;$!d'               # method 1
-  sed -n '1!G;h;$p'             # method 2
-  perl -e 'print reverse <>'
-
-Remove last lines
-  tac file.txt | sed "1,$n{d}" | tac > newfile
-  head -n -2 myfile.txt > newfile
 
 Ubuntu gnome terminal, disable cursor blinking
   gconftool-2 --set /apps/gnome-terminal/profiles/Default/cursor_blink_mode --type string off

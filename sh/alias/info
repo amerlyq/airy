@@ -13,10 +13,13 @@ _has_pr pydf \
 
 alias duf='command du -ch'
 alias du='command du -sh'
-alias dU='sh -c "command du -xhd1 \"\$@\" | sort -rh" ""'
+# alias dU='sh -c "command du -xhd1 \"\$@\" | sort -rh" ""'
 alias stat.='command stat -c%s'
 
 alias now='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias date.='date +%Y%m%d_%H%M%S'
 # alias notes='date +"%Y-%m-%d, %T" >> ./notes.otl && editor ./notes.otl'
+
+# FIXED: different order required by {comm -12 ...}, can be used after LC_COLLATE=C sort
+alias comm='LC_COLLATE=C comm'
