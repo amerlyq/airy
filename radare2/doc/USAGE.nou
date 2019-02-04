@@ -26,3 +26,6 @@ Xref
     | axt @ str.HelloWorld
   Print flags describing offset of func in between the range
     | (,?btw 0x1000028c4 $$ 0x100003c81,?? fd)() @@@F
+  Strings
+    | aac; pdi 1 @@= `ax*~^axs[2]`  # But aac sometimes misses some.
+    | axt @@ str.*

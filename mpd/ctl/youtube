@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# REF: https://bbs.archlinux.org/viewtopic.php?id=180478
+# HACK:(when https not supported): --prefer-insecure
+# VIZ. $ youtube-dl -F sTPtBvcYkO8
+# ALT: use -f140 -- lower bitrate
+youtube-dl -g -f140 "$@" \
+| xargs -rn1 -d\\n mpc add

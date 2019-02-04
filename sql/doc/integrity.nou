@@ -1,0 +1,27 @@
+READ! corruption and ACID
+  REF
+    https://www.sqlite.org/howtocorrupt.html
+    https://www.sqlite.org/atomiccommit.html
+    https://www.sqlite.org/lockingv3.html#how_to_corrupt
+    https://www.sqlite.org/fileformat2.html
+  TALK
+    http://sqlite.1065341.n5.nabble.com/Bug-Successfully-committed-transaction-rolled-back-after-power-failure-td86756.html
+
+
+
+Integrity
+  Confirm that file is truly sqlite3 database (empty file is OK)
+    FAIL! returns "BUSY" when already opened on write from another thread
+      => can't use in ctor
+    HACK: you can compare "schema_version != 0" to distinguish empty file from valid db
+    NOTE: sqlite3 opens DB lazily -- you must do smth (preferably harmless) that requires a database
+    ALT: run sqlite3_table_column_metadata() and discard output OR prepare and discard some query against this db
+     char* errmsg = nullptr;
+     int rc = sqlite3_exec(m_DB, "PRAGMA schema_version", nullptr, nullptr, &errmsg);
+     if (rc != SQLITE_OK) {
+         std::string const msg = "busy, invalid or corrupted DB file=" + dbpath
+           + " [" + errmsg "] (rc=" + std::to_string(rc) + " '" + sqlite3_errstr(rc) + "')");
+         std::cerr << msg << std::endl;
+         sqlite3_free(errmsg);
+         throw std::runtime_error(msg);
+     }

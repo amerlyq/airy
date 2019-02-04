@@ -3,10 +3,7 @@ f=${1-$PWD/.freeze}
 
 # SEE:HACK: temp files for redirections
 #   https://unix.stackexchange.com/questions/181937/how-create-a-temporary-file-in-shell-script
-# exec 3<<< ""
-
-[[ -f $f && -s $f ]] && awk -vp="$PWD" \
-  '$0~/^[^/]/ {print p"/"$0}' "$f" > "$TMPDIR/freeze"
-
-# WARN: no exec
-grep -zvsxF -f "$TMPDIR/freeze"
+ignore=
+[[ -f $f ]] && ignore=$(awk -vp="$PWD" '$0~/^[^/]/ {print p"/"$0}' "$f")
+exec 3<<< "$ignore"
+exec grep -zvsxF -f /dev/fd/3
