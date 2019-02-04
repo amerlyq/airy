@@ -1,0 +1,35 @@
+### PREPARE
+# You need gdb-multiarch, otherwise use "arm-linux-gnueabihf-gdb" from buildroot
+paci arm-linux-gnueabihf-gdb arm-linux-gnueabihf-binutils
+sudo apt-get install gdb-multiarch
+
+
+
+### TARGET
+## Attach to running process
+gdbserver --attach :1234 $(pidof myexe)
+
+# OR: restart your app
+killall /usr/bin/myexe
+gdbserver --once :1234 /usr/bin/myexe
+
+# OR: simply gather coredump with all threads as-is (and copy afterwards)
+#   search inside $ cat /proc/sys/kernel/core_pattern
+pkill -QUIT /usr/bin/myexe
+
+### HOST
+# NOTE: you need correct ARM myexe with debug symbols
+gdb-multiarch -q ./myexe
+# Use correct IP of your device
+(gdb) target remote 192.168.1.100:1234
+(gdb) continue
+--- try to break or deadlock HU now by clicking different menu ---
+<Ctrl-C>
+(gdb) gcore
+
+## Exit from attached gdbserver by command on HOST
+(gdb) monitor exit
+(gdb) quit
+
+# ALT: one-liner (instantly get coredump)
+gdb-multiarch -q -batch -ex 'target remote 192.168.1.10:1234' -ex 'gcore' -ex 'monitor exit' ./myexe
