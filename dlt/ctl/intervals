@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ -t 1 ]] && exec > >(column -tR 1,2)
+
+echo ts_beg ts_end filename
+for f in *.txt; do
+  b=$(<"$f" head -2|tail -1|cut -f4)
+  e=$(<"$f" tail -1|cut -f4)
+  printf '%s %s %s\n' "$b" "$e" "$f"
+done | sort -n
