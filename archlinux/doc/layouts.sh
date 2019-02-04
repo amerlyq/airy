@@ -137,9 +137,9 @@ btrfs quota enable /mnt
 btrfs subvolume create /mnt/@
 mkdir -vp /mnt/@/{.snapshots,.cabal}
 btrfs subvolume create /mnt/@snapshots
-btrfs subvolume create /mnt/@/.cabal/lib
-btrfs subvolume create /mnt/@/.cabal/packages
+btrfs subvolume create /mnt/@/.cabal
 btrfs subvolume create /mnt/@/.cache
+btrfs subvolume create /mnt/@/.gem
 btrfs subvolume create /mnt/@/sdk
 btrfs subvolume list /mnt
 umount /mnt

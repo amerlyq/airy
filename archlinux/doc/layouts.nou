@@ -39,8 +39,9 @@ MBR -- LUKS -- LVM -- BTRFS -- SUBVOL -- Snapper
       ├─ws-user 254:9    0    40G  0 lvm                  # EXPL: sep snapshots per each user
         ├─@                               /mnt/home/user
         ├─@snapshots                      /mnt/home/user/.snapshots
-        ├─@cabal                          /mnt/home/user/.cabal/lib     # ~2.1GB, recoverable builds of haskell libs
-        ├─@cache                          /mnt/home/user/.cache         # ~5.6GB, recoverable intermediate cache and builds of AUR pkgs
+          .cabal                          /mnt/home/user/.cabal         # ~2.1GB, recoverable builds of haskell libs
+          .cache                          /mnt/home/user/.cache         # ~5.6GB, recoverable intermediate cache and builds of AUR pkgs
+          .gem                            /mnt/home/user/.gem           # ~1.0GB, cache of ruby gems, installed by bundle
         ├─@sdk                            /mnt/home/user/sdk            # ~3.3GB, cloned master repos from others
       ├─ws-data 254:10   0   200G  0 lvm  /mnt/data       # shared data :: group=users
         # !USE! btrfs to be able to restore deleted files from btrfs ghosts
