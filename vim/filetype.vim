@@ -7,6 +7,7 @@ augroup filetypedetect
   au BufRead,BufNewfile *.p5      setf perl
   au BufRead,BufNewfile *.p6      setf perl6
   au BufRead,BufNewFile *.tex.erb setf tex.eruby
+  au BufRead,BufNewFile *         if getline(1) =~# '^#!.*/bin/jconsole\>'| setf j |en
   " Asm
   au BufRead,BufNewFile *.asm  setl ft=masm syntax=masm
   au BufRead,BufNewFile *.inc  setl ft=masm syntax=masm

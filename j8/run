@@ -1,12 +1,11 @@
-#!/bin/sh
-#0 :0
-exec /usr/lib/j8/bin/jconsole "$0" "$@"
-)
-NB. -jprofile
+#!/usr/lib/j8/bin/jconsole
+NB. [_] ALT: http://www.jsoftware.com/pipermail/programming/2014-October/039914.html
+NB.   => convert stdin into J syntax and parse it directly by "jconsole"
+
 onfail=:3 :0
-  1!:2&2 ARGV
-  1!:2&5]13!:12''
-  2!:55>:13!:11''
+  smoutput ARGV   NB. print boxes of actual cmdline
+  stderr]dberm''  NB. print text of error
+  exit>:dberr''   NB. exit with last cmd error code
 )
 9!:27 'onfail 1'
 9!:29]1
@@ -21,9 +20,6 @@ NB. )
 NB. NOTE: for filters -- always print
 NB. transform&.stdin ''
 NB. 1!:1@3: :. stdout
-NB. stdout=: 1!:2&4
-
-NB. ech=: 0 0&$ @ (1!:2&4)
 
 NB. http://www.jsoftware.com/help/learning/17.htm
 NB. http://jsoftware.2058.n7.nabble.com/Split-and-Join-did-it-again-td12987.html
@@ -175,5 +171,3 @@ NB. http://www.jsoftware.com/pipermail/general/2000-July/003612.html
 NB. http://www.jsoftware.com/pipermail/general/1999-January/000554.html
 
 exit 0
-NB. SEE: http://www.jsoftware.com/help/user/hashbang.htm
-NB. vim: ft=j
