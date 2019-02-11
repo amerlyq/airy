@@ -1,0 +1,6 @@
+Tracking dangling file descriptors of deleted files (e.g. sqlite holding tmpfiles in /var)
+  ::: match myexe(1) acitivity logs to strace(1) backtraces by timestamps
+  With timestamps and all forks
+    $ strace -ftt -e trace=open,openat,close,unlink,unlinkat -o /tmp/strace.log -- myexe
+  With backtrace and summary (profiling)
+    $ strace -fttTyikC -s64 -e trace=open,openat,close,unlink,unlinkat -o /tmp/strace.log -- myexe
