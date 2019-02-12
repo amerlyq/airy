@@ -1,0 +1,17 @@
+#!/bin/sh
+#%FORMAT:(out): [ts memfree cputotal ctxvo ctxnv mempss minflt majflt utime stime]
+set -eu
+
+#%PROF: each process launch is ~25us => expect >0.25ms of runtime per each measure
+# BET: send sync signals $ while usleep 100000; do echo; done | awk '{read all files and print data}' > /data/prof
+
+# ALT:(ts): use average time between tsbeg and tsend
+pid=$(pidof "$1")
+while usleep 100000; do
+  awk '3==NR{print$3;exit}' /proc/timer_list
+  awk '$1=="MemAvailable:"{print$2;exit}' /proc/meminfo
+  awk '{for(i=2;i<NF;++i)t+=$(i);print t;exit}' /proc/stat
+  awk '$1~/ctxt_switches/{print$2}' "/proc/$pid/status"
+  awk '$1=="Pss:"{m+=$2}END{print m}' "/proc/$pid/smaps"
+  awk '{print$10,$12,$14,$15}' "/proc/$pid/stat"
+done > "/data/sys-$(date +%Y%m%d_%H%M%S).perf"

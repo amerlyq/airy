@@ -24,3 +24,16 @@ ALT: dump ps
     sh:   $ while usleep 300000; do sudo awk '3==NR{print$3;exit}' /proc/timer_list; done | awk '{t=$0;f="/proc/stat"; getline<f; close(f); idle=$5; total=0; for(i=1;i<=NF;++i)total+=$(i); print t,(idle-pi)*100/(total-pt); pi=idle; pt=total}'
 
 http://www.brendangregg.com/blog/2014-07-28/execsnoop-for-linux.html
+
+SEE:(/proc/[pid]/stat): $ man 5 proc
+
+/proc/$$/status
+  voluntary_ctxt_switches:        150
+  nonvoluntary_ctxt_switches:     545
+
+/proc/<pid>/schedstat
+  1) runticks -- time spent on the cpu
+  2) waitticks -- time spent waiting on a runqueue
+  3) nrrun -- # of timeslices run on this cpu
+  latency = (waitticks - waitticks_prev) / (nrrun - nrrun_prev)
+    = time between event and process being scheduled

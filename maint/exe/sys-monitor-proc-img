@@ -1,0 +1,21 @@
+#!/usr/bin/env -S gnuplot -p -c
+#%USAGE: $ ./$0 sys.perf
+
+#%USAGE: uncomment to save img $ ./$0 sys.perf > perf.png
+# set term png size 1024, 600
+
+set size ratio 0.5
+set size 1,1
+set xlabel "t, s"
+# set xrange [5560:5620]
+
+set ytics 10 nomirror autofreq tc lt 1
+set ylabel "cpu, %"
+set yrange [0:*]
+
+set y2tics 10 nomirror autofreq tc lt 2
+set y2label "mem(pss), MB" tc lt 2
+set y2range [8:12]
+
+plot ARG1 using 1:2 with lines lw 2 lt 1 title "cpu", \
+     ARG1 using 1:3 with lines lw 2 lt 2 title "mem" axes x1y2

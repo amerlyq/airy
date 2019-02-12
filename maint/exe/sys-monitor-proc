@@ -1,0 +1,23 @@
+#!/bin/sh
+#%FORMAT:(out): [ts %cpu %mem]
+#%USAGE: $ ./$0 myexe
+#% * [graph]: $ <sys.perf gnuplot -p -e 'N="ts,sec %cpu(total) %mem(pss)"' -e 'set xlabel word(N,1); set ylabel "ratio,%"' -e "plot for [i=2:3] '/dev/stdin' using 1:i with lines lw 2 title word(N,i) noenhanced"
+#%
+set -eu
+
+pid=$(pidof "$1")
+
+awk '$1=="MemTotal:"{print;exit}' /proc/meminfo
+
+pticks=$(awk '{for(i=2;i<NF;++i)t+=$(i);print t;exit}' /proc/stat)
+pcpu=$(awk '{print$14+$15}' "/proc/$pid/stat")
+
+while usleep 100000; do
+  ts=$(awk '3==NR{print$3;exit}' /proc/timer_list)
+  ticks=$(awk '{for(i=2;i<NF;++i)t+=$(i);print t;exit}' /proc/stat)
+  cpu=$(awk '{print$14+$15}' "/proc/$pid/stat")
+  pss=$(awk '$1=="Pss:"{m+=$2}END{print m}' "/proc/$pid/smaps")
+  awk "BEGIN{printf\"%.3f %.2f %.2f\\n\", $ts/1000000000, 100*($cpu-$pcpu)/($ticks-$pticks), $pss/1024}"
+  pticks="$ticks"
+  pcpu="$cpu"
+done > /data/sys.perf
