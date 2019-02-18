@@ -1,0 +1,25 @@
+#compdef q.sched
+# REF: https://mads-hartmann.com/2017/08/06/writing-zsh-completion-scripts.html
+# https://github.com/zsh-users/zsh-completions/tree/master/src
+
+function _q.sched {
+  local lib=~/aura/devq/re/sched/lib
+  local line
+  local fns
+  fns=${(f)"$(q.sched -L)":gs/:/\\:}
+  # fns=( ${(f)"$(q.sched -l)"} ) => USAGE: "1: :($fns)"
+
+  _arguments -C \
+    '-l[List functions]' \
+    '-L[List functions with descriptions]' \
+    "1: :(($fns))" \
+    '*::arg:->args'
+
+  # case $line[1]
+  # in loudly) _hello_loudly
+  # ;; quietly) _hello_quietly
+  # esac
+}
+
+# function _hello_quietly { _arguments "--silent[Dont output anything]"; }
+# function _hello_loudly { _arguments "--repeat=[Repat the <message> any number of times]"; }

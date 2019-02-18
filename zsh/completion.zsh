@@ -1,6 +1,7 @@
 # COMPLETION SETTINGS
 # add custom completion scripts
-fpath=(~/.shell/zsh/completion.d $fpath)
+# NOTE: already extended before prezto
+# fpath=(${ZDOTDIR}/cfg/completion.d $fpath)
 
 # EXPL: speed up completion
 zstyle ':completion::complete:*' accept-exact '*(N)'

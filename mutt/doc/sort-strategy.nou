@@ -27,6 +27,18 @@ ALG sync server rules (setup online through web-ifc)
 
 
 ALG
+  Pipeline
+    "INBOX"
+      to:me -> +important
+      thread{has from:me} +important -> keep
+        OR: move to "ong" ?
+      +important -> keep
+    ...
+      (sorting known)
+    "unknown"
+      not to:me
+      not sorted = everything else
+
   Action-items (filtering based on my required reaction/attention)
     - "INBOX" -- everything which requires my personal attention to decide (fail of auto-scripts)
       + "flagged" todo-list (i.e. <unmovable>)

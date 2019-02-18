@@ -3,6 +3,9 @@ setl formatoptions+=w
 setl textwidth=68
 setl spell
 setl foldmethod=syntax
+setl tabstop=2
+setl shiftwidth=2
+setl softtabstop=2
 
 let b:strip_spaces = 0
 " NOTE: don't touch spaces in signature line '^--\s$'

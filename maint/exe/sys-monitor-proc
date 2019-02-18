@@ -1,6 +1,6 @@
 #!/bin/sh
 #%FORMAT:(out): [ts %cpu %mem]
-#%USAGE: $ ./$0 myexe
+#%USAGE: $ ./$0 processname
 #% * [graph]: $ <sys.perf gnuplot -p -e 'N="ts,sec %cpu(total) %mem(pss)"' -e 'set xlabel word(N,1); set ylabel "ratio,%"' -e "plot for [i=2:3] '/dev/stdin' using 1:i with lines lw 2 title word(N,i) noenhanced"
 #%
 set -eu

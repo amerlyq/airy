@@ -12,7 +12,8 @@ if [[ ${bReplace-} || ! -f $nm ]]; then
     in  pl) sb="#!/usr/bin/perl\nuse warnings FATAL => 'all';\nuse autodie qw(:all);\nuse strict;\nuse v5.14;  # for s///r"
     ;; py2) sb="$env python2\n# vim: fileencoding=utf-8"
     ;; py3) sb="$env python3"
-    ;;  sh) sb="$env bash\nset -euo pipefail"
+    ;;  sh) sb="$env bash\n#%SUMMARY:\nset -euo pipefail"
+    ;; she) sb="#!/bin/sh\n#%SUMMARY:\nexec \"\$@\""
     ;;  zh) sb="#!/usr/bin/zsh -eu\nsetopt pipe_fail"
     ;;   *) sb="$env $shl"
     esac

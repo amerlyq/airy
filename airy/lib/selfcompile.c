@@ -1,8 +1,3 @@
-// ALT:HACK: use shebang-like string (with cache based on timestamps) BAD:SECU: possible cache file name collisions
-//usr/bin/test "$0" -ot "${out:=${TMPDIR:-/tmp}/$(readlink -e "$0"|tr / _)}" || gcc "$0" -o "$out" && exec "$out"
-//usr/bin/test "$0" -ot /tmp/a.out || gcc "$0" -o /tmp/a.out && exec /tmp/a.out  # BAD: same dst names
-//usr/bin/make -f/dev/null "${0%.cpp}" || exit && exec "${0%.cpp}"
-
 #include <error.h>      // error()
 #include <errno.h>      // errno
 #include <stdio.h>      // printf()

@@ -7,6 +7,9 @@ TMPPREFIX="${${TMPDIR:-/tmp}%/}/${SHELL##*/}"
 
 source ${ZDOTDIR}/cfg/options
 
+# NOTE: must be set before prezto
+fpath=(${ZDOTDIR}/cfg/completion.d $fpath)
+
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ||:  # Block dirty code in prezto

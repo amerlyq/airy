@@ -4,3 +4,13 @@ Tracking dangling file descriptors of deleted files (e.g. sqlite holding tmpfile
     $ strace -ftt -e trace=open,openat,close,unlink,unlinkat -o /tmp/strace.log -- myexe
   With backtrace and summary (profiling)
     $ strace -fttTyikC -s64 -e trace=open,openat,close,unlink,unlinkat -o /tmp/strace.log -- myexe
+  Max number w/o backtrace ~10MB even for simple
+    $ strace -fttT -s64 -e 'trace=!gettid,nanosleep,select,gettimeofday,clock_gettime,fcntl64,_llseek,stat64,fstat64,futex,ioctl' -o /tmp/strace.log -- myexe
+    $ watch -n1 ls -l /tmp/strace.log
+    $ grep -aoP '\w+(?=\()' strace.log SC H -20
+    $ strace-graph strace.log
+    $ strace-log-merge strace.log
+
+
+Watch consumed cpu
+  $ watch -n1 sh -c "ps -e -o %cpu,pid,tid,times,comm -L | awk '\$2==$(pidof organizer)' | sort -n"
