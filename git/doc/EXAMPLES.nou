@@ -156,6 +156,11 @@ Selection
   branch@{yesterday} local date based reference
   branch@{5} the 5th last value of branch (locally)
 
+Diff
+  Exclude files from diff
+    $ git diff -- . ':(exclude)db/irrelevant.php' ':(exclude)db/irrelevant2.php'
+    $ git diff | filterdiff -p 1 -x db/irrelevant.php
+    $ git diff 987200fbfb 878cee40ba --stat -- ':!*.cs'
 
 Patching
  For example, I once used git diff to generate a patch for a folder that was

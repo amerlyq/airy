@@ -236,6 +236,7 @@ call dein#add('tpope/vim-fugitive', {
 \\n   nnoremap <silent><unique> [Git]d :Gdiff<CR>
 \\n   nnoremap <silent><unique> [Git]w :Gwrite<CR>
 \\n   nnoremap <silent><unique> [Git]b :Gblame<CR>
+\\n   nnoremap <silent><unique> [Git]# :call fugitive#detect(expand('%:p'))<CR>
 \"})
 
 
