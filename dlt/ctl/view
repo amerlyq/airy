@@ -84,8 +84,7 @@ foreach my $name (@field_names) {
     " if $field_alias{$alias};
     $field_alias{$alias} = $name;
 }
-# my @field_default = qw(index stamp msgnum appid ctxid level body);
-my @field_default = check_allowed(\@field_names, qw(appid ctxid index stamp msgnum level body));
+my @field_default = check_allowed(\@field_names, qw(appid ctxid stamp level body));
 my @field_shown = $opts{a} ? @field_names : multichoice($opts{o}, \@field_names, \%field_alias, \@field_default);
 
 ################################################################################
@@ -138,7 +137,7 @@ sub dlt_convert {
         if (/$field_regex/) {
             # continue if not /$regex/;
             if (%fields) {
-                push_record(\%fields);
+                push_record(\%fields) if not ($fields{appid} eq "DA1-" and $fields{ctxid} eq "DC1-");
                 undef %fields;
             }
             # PROF:(30MB): 2.8s -> 9.0s

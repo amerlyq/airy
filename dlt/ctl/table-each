@@ -1,3 +1,15 @@
 #!/bin/zsh -eu
-gzip -d *.dlt.gz || true
-for f in *.dlt*(.); do r.dlt-view $@ -- $f &>! ${f:s/\.dlt/\.txt}; done
+
+fs=()
+args=()
+while (($#)); do
+  [[ ${1:0:1} == - ]] && args+=( "$1" ) || fs+=( "$1" )
+  shift
+done
+(($#fs)) || fs=( *.dlt*(.) )
+
+find $fs -type f -name '*.dlt.gz' -execdir gzip -d {} + ||:
+
+for f in $fs; do
+  r.dlt-view $@ -- $f &>! ${f:s/\.dlt/\.txt}
+done
