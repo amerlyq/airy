@@ -2,6 +2,8 @@
 #%FORMAT:(out): [ts %cpu mem]
 #%USAGE: $ ./$0 processname
 #%LICENSE: MIT, (c) amerlyq, 2019
+#%USAGE:(annotate timestamp to each line):
+#%  $ ls | awk -vf=/proc/timer_list '{s=$0;for(i=0;i<3;++i)getline<f; close(f); printf"%.3f %s\n",$3/1000000000,s}'
 set -eu
 
 pid=$(pidof "$1")
@@ -16,7 +18,7 @@ while usleep 100000; do
   ticks=$(awk '{for(i=2;i<NF;++i)t+=$(i);print t;exit}' /proc/stat)
   cpu=$(awk '{print$14+$15}' "/proc/$pid/stat")
   pss=$(awk '$1=="Pss:"{m+=$2}END{print m}' "/proc/$pid/smaps")
-  awk "BEGIN{printf\"%.3f %.2f %.2f\\n\", $ts/1000000000, 100*($cpu-$pcpu)/($ticks-$pticks), $pss/1024}"
+  awk "BEGIN{printf\"%.3f %5.2f %.2f\\n\", $ts/1000000000, 100*($cpu-$pcpu)/($ticks-$pticks), $pss/1024}"
   pticks="$ticks"
   pcpu="$cpu"
 done > /data/sys.perf

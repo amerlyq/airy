@@ -12,7 +12,7 @@ set size ratio 0.5
 set size 1,1
 set xlabel "t, s"
 # NOTE: remove large empty area on left and right
-set xrange [8307:8329]
+# set xrange [8307:8329]
 
 set ytics 10 nomirror autofreq tc lt 1
 set ylabel "cpu, %"
@@ -21,7 +21,7 @@ set yrange [0:*]
 set y2tics 10 nomirror autofreq tc lt 2
 set y2label "mem(pss), MB" tc lt 2
 # NOTE: adjust memory range for better resolution
-set y2range [9:10]
+# set y2range [9:10]
 
 plot ARG1 using 1:2 with lines lw 2 lt 1 title "cpu", \
      ARG1 using 1:3 with lines lw 2 lt 2 title "mem" axes x1y2

@@ -19,9 +19,11 @@ pkill -QUIT /usr/bin/myexe
 
 ### HOST
 # NOTE: you need correct ARM myexe with debug symbols
-gdb-multiarch -q ./myexe
+gdb-multiarch -q -iex "set gnutarget elf32-littlearm" -iex "set sysroot ./rootfs" -- ./myexe
+# gdb-multiarch -q ./myexe
 # Use correct IP of your device
 (gdb) target remote 192.168.1.100:1234
+(gdb) catch throw
 (gdb) continue
 --- try to break or deadlock HU now by clicking different menu ---
 <Ctrl-C>
