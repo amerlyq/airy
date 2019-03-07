@@ -6,6 +6,13 @@
 # EXPL: speed up completion
 zstyle ':completion::complete:*' accept-exact '*(N)'
 
+# Disable inserting literal TAB on empty prompt
+# zstyle ':completion:*' insert-tab false
+
+# Fallback to file completion
+# https://www.zsh.org/mla/users/2011/msg00974.html
+zstyle ':completion:*' completer _expand _complete _files _correct _approximate
+
 # compsys initialization
 # autoload -U compinit
 # compinit

@@ -144,7 +144,10 @@ bindkey -a '\C-x\C-m' set-fast-exec-cmd
 
 
 ### Miscellaneous
-bindkey '^I' expand-or-complete-prefix
+# bindkey '^I' complete-word
+bindkey '^I' expand-or-complete
+# BAD: completion in the middle of word will tear off and duplicate the tail
+# bindkey '^I' expand-or-complete-prefix
 bindkey ' ' magic-space  # [Space] - do history expansion
 ## On <F12> in vim mode loads config debug aliases
 # printf "~=> rc-reload-*  actualizes last config version"
