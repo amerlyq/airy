@@ -1,0 +1,22 @@
+#!/bin/bash -eu
+# REF:(savant elite1): https://github.com/rubberydub/savantconf/blob/master/savantconf.sh
+# https://askubuntu.com/questions/685235/how-should-i-configure-kinesis-savant-elite-usb-pedals-in-14-04
+
+idVendor=29ea
+idProduct=0100
+cfg=${TMPDIR:-/tmp}/kinesis-savant.hwdb
+
+cat> "$cfg" <<EOF
+evdev:input:b0003v${idVendor}p${idProduct}*
+ KEYBOARD_KEY_${CODE_COMMON_1}=unknown
+ KEYBOARD_KEY_${CODE_COMMON_2}=unknown
+ KEYBOARD_KEY_${CODE_LEFT}=${LEFT}
+ KEYBOARD_KEY_${CODE_MIDDLE}=${MIDDLE}
+ KEYBOARD_KEY_${CODE_RIGHT}=${RIGHT}
+EOF
+linkcp -ct '/etc/udev/hwdb.d/"' "$cfg"
+
+if cfgOpt u; then
+  sudo udevadm hwdb --update
+  sudo udevadm trigger
+fi
