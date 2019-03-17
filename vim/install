@@ -11,7 +11,9 @@ if distro arch; then
     # aur/go-xxd
     # aur/xxd-vim
 
-    pkg_inst python-neovim python2-neovim
+    pkg_inst python-neovim
+    # AUR: python2-neovim
+
     ## BUG: on clean system can't build python-psutils
     aur_inst neovim-remote  # VIZ. $ nvr to talk to vim from inside ranger
 
