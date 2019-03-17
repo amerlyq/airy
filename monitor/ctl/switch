@@ -7,8 +7,10 @@ set -euo pipefail
 
 dfl=eDP-1
 ext=DP-1
+add=HDMI-1
+# kw=7/27  # =0.741
 kw=1/4
-[[ $* =~ S ]] && kw=5/21
+[[ $* =~ S ]] && kw=5/21  # more narrow
 [[ $* =~ [0-9]+/[0-9]+ ]] && kw=${BASH_REMATCH[0]:?}
 
 get_mon_dims(){ xrandr -q | awk -vm="$1" '$1==m && $2=="connected"' | sed -rn '
@@ -43,20 +45,20 @@ s2=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((w*$kw))+0
 del_mon_split "$ext~1"
 del_mon_split "$ext~2"
 
-[[ $* =~ [sS] ]] && xrandr \
-  --setmonitor "$ext~2" "$s1" "$ext" \
-  --setmonitor "$ext~1" "$s2" none
+[[ $* =~ [sS] ]] && echo xrandr \
+  --setmonitor "$ext~1" "$s1" none \
+  --setmonitor "$ext~2" "$s2" "$ext"
 
 
 # BUG: switching "a" -> "d" -> "e" leaves visual artifacts on screen
 #   MAYBE: as with rotation -- must supply commands in special order or split into multiple commands ?
 
-(($#)) || set -- -a
+(($#)) || set -- -m
 case $*
 in *d*) set_mon_layout --primary -- --off
 ;; *e*) set_mon_layout --off -- --primary
-;; *m*) set_mon_layout --below "$ext" -- --primary  # FIXME: don't enable other screens if they are off
-;; *a*) set_mon_layout --primary --below "$ext" --
+;; *m*) set_mon_layout --right-of "$ext" -- --primary  # FIXME: don't enable other screens if they are off
+;; *a*) set_mon_layout --primary --right-of "$ext" --
 # DEV:(-o): switch to only one screen whichever is currently main, or do nothing if already single
 ;; *[sS]*) true
 ;; *) echo "Err: wrong option '$*'" >&2; exit 2

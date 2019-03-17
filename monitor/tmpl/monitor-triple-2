@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+# BAD! due to rotate :: keypress events in terminal (e.g. j/k) became observably SLOW
+# [_] CHECK: maybe too big viewport -- check performance after disabling or resizing some monitors
+# [_] CHECK: problem with HDMI / monitor itself OR problem with drivers
+#   => glxgears on full screen yield only 50fps
+
+xrandr \
+  --output eDP-1 --auto --primary --rotate normal \
+  --output DP-2 --above eDP-1 --rotate normal \
+  --output HDMI-1 --right-of DP-2 --rotate normal  # right
+
+r.feh

@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+xrandr --delmonitor DP-1~1 --delmonitor DP-1~2
+xrandr --output eDP-1 --auto --primary --output DP-1 --auto --left-of eDP-1
+# NOTE: init side-split first to place xmobar there, but mark as ~2 to apply smaller font in "st"
+xrandr --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1 --setmonitor DP-1~1 2926/666x1600/366+914+0 none
+xrandr --output DP-1 --primary
+
+r.feh

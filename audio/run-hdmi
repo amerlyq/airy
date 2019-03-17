@@ -8,6 +8,7 @@ set -euo pipefail -o noglob
 state=${1-}
 prf0='output:analog-stereo+input:analog-stereo'
 prf1='output:hdmi-stereo+input:analog-stereo'
+prf2='output:hdmi-stereo-extra1+input:analog-stereo'
 
 cards=( $(pacmd list-cards | sed -rn '/^\s*name:\s*<(\S+)>.*/s//\1/p') )
 ((${#cards[@]} == 1)) || { echo "Err: unsupported number of audio cards (DFL=1)"; exit; }
@@ -25,6 +26,7 @@ setprf(){ [[ $1 == $active ]] || pacmd set-card-profile "$card" "$1"; }
 case $state
 in 0) setprf "$prf0"
 ;; 1) setprf "$prf1"
+;; 2) setprf "$prf2"
 ;; '') p=$prf1; [[ $active == $p ]] && p=$prf0; echo "$p"; setprf "$p"
 ;; *) exit 2
 esac
