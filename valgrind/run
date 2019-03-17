@@ -2,7 +2,7 @@
 exe=${1:?}; shift
 opts=(
   --fullpath-after="${exe%/*}/"
-  --log-file="${exe}.log"
+  --log-file="${exe}.txt"
   --tool=memcheck
   --leak-check=full
   --num-callers=12

@@ -22,5 +22,4 @@ REPLACER="$SED_MEMCHECK;$SED_LOST;$SED_ID;$SED_LINE;$SED_DIR;$SED_LIB"
 
 GR_TEST=".*testing::.*)"
 
-sed -e "$REPLACER" | grep -v "$GR_TEST"
-
+sed -ue "$REPLACER" "$@" #| grep -v "$GR_TEST"

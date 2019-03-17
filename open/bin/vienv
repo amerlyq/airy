@@ -15,6 +15,7 @@ if [[ ${bReplace-} || ! -f $nm ]]; then
     ;;  sh) sb="$env bash\n#%SUMMARY:\nset -euo pipefail"
     ;; she) sb="#!/bin/sh\n#%SUMMARY:\nexec \"\$@\""
     ;;  zh) sb="#!/usr/bin/zsh -eu\nsetopt pipe_fail"
+    ;; cpp) sb='//usr/bin/make -sf/dev/null "$@" -- "${0%.*}" || exit && exec "${0%.*}"'"\n#include <iostream>\n\nint main()\n{\n    std::cout << 1 << std::endl;\n    return 0;\n}"; nm=${nm%.cpp}.cpp
     ;;   *) sb="$env $shl"
     esac
     printf "%b\n\n\n" "$sb" > "$nm"  # Compatible with 'echo -e'

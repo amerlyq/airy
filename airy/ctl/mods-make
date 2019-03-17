@@ -46,6 +46,7 @@ $(subst ,, ) := $(subst ,, )
 #  ::: actually isn't strictly required -- when processing install/setup steps in batch
 #  !!! aur_inst may corrupt file -- use flock ???
 #    => ALT: pass $(mktemp) per-thread file through env var and then merge outputs
+# MAYBE: use "flock" for whole this "make"
 # BUG: necessary "#deps:" aren't installed unconditionally or with error !!! NEED:ERR: add them
 #   !!! can't automize :: "defaults" may depend on all optional pkgs to choose from, but must not install them
 #   i.e. difference between "requires" and "after" -- requires at least one of any, but after all of them
