@@ -10,6 +10,6 @@ done
 
 find $fs -type f -name '*.dlt.gz' -execdir gzip -d {} + ||:
 
-for f in $fs; do
+for f in ${fs[@]%.gz}; do
   r.dlt-view $@ -- $f &>! ${f:s/\.dlt/\.txt}
 done
