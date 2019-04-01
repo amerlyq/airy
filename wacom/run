@@ -1,5 +1,5 @@
 #!/bin/dash
 cmd=$(readlink -e "$0")
-cmd=${cmd%/*}/ctl/$1
+cmd=${cmd%/*}/exe/$1
 shift
 exec "$cmd" "$@"

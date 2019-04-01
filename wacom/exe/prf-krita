@@ -2,6 +2,7 @@
 cd "$(readlink -e "${0%/*}")"
 source "${PWD%/*}/funcs-lib"
 
+# NEED: "escape" to close windows and deselect
 wacom "$WPAD" <<EOT
   Button   2  "key shift"
   Button   3  "key ctrl"
