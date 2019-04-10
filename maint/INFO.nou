@@ -8,6 +8,12 @@ INFO
     $ loginctl session-status <Tab>
 
 
+VIZ: tools
+  CMP: https://www.ubuntupit.com/most-comprehensive-list-of-linux-monitoring-tools-for-sysadmin/
+  2019-04-06 [X] CMP: https://blog.serverdensity.com/80-linux-monitoring-tools-know/
+  ALSO:SOME: https://news.ycombinator.com/item?id=10654681
+
+
 | top  | Linux Process Monitoring
 | htop | Linux Process Monitoring
 | iotop | Monitor Linux Disk I/O
@@ -47,7 +53,6 @@ REF http://stackoverflow.com/questions/5658568/how-to-list-processes-attached-to
 NetHogs - Monitor Per Process Network Bandwidth
   OR: vnstat -- BUT need constantly running
 iftop  - Network Bandwidth Monitoring
-Collectl - All-in-One Performance Monitoring Tool
 
 Monitor / log short-living processes
   + https://www.slideshare.net/brendangregg/linux-performance-analysis-and-tools
@@ -60,16 +65,19 @@ Monitor / log short-living processes
     https://unix.stackexchange.com/questions/231294/how-to-find-out-the-processes-that-forks-a-lot
     $ ./dtrace
     paci systemtap
-  https://unix.stackexchange.com/questions/272752/tracking-monitoring-short-lived-cpu-intensive-process-on-one-cpu
-    aur/collectl
+  collectl - All-in-One Performance Monitoring Tool |aur/collectl|
     http://collectl.sourceforge.net/Process.html
     $ collectl --showsubopt
     $ collectl -sZ -i.1:.1 --procfilt f[your process name]
+  Whole system overview
+    pkg_inst glances
 
 Page cache -- mem cached files
   https://serverfault.com/questions/278454/is-it-possible-to-list-the-files-that-are-cached
   https://unix.stackexchange.com/questions/167718/list-all-files-that-are-present-in-the-cache
   https://github.com/tobert/pcstat
+  $ vmtouch
+    = check and manipulate page cache
 
 %% Kernel
 https://habrahabr.ru/company/virtuozzo/blog/332740/

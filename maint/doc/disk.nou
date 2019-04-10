@@ -1,0 +1,4 @@
+https://unix.stackexchange.com/questions/145954/how-can-i-see-i-o-stats-for-a-briefly-running-process
+  $ mount debugfs -t debugfs /sys/kernel/debug
+  $ blktrace -d /dev/sda -a read -a write -o - | blkparse -i
+  # 8,0   15        3 1266874889.709440165 32679  Q   W 20511277 + 8 [rpc.mountd]

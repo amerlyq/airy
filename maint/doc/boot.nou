@@ -1,0 +1,50 @@
+%%%% Boot
+
+Improve performance
+  REF
+    https://wiki.archlinux.org/index.php/Improving_performance/Boot_process
+    https://wiki.archlinux.org/index.php/improve_boot_performance
+    https://wiki.archlinux.org/index.php/Bootchart
+    + https://wiki.archlinux.org/index.php/Arch_boot_process
+
+
+Optimize Boot Time
+  REF kernel + bootloader
+    +++ https://elinux.org/Boot_Time
+    https://wiki.archlinux.org/index.php/Improving_performance/Boot_process
+    http://processors.wiki.ti.com/index.php/Optimize_Linux_Boot_Time
+    http://events.linuxfoundation.org/sites/events/files/slides/12%20Lessons%20Learnt%20in%20Boot%20Time%20Reduction.pdf
+    https://wiki.archlinux.org/index.php/Improve_boot_performance
+  ARCH
+    ARM booting
+      http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html
+    Super fast boot of embedded linux
+      http://www.makelinux.net/emb/fastboot/
+    Dracut -- gen minimal initramfs -- faster boot time
+      http://www.techradar.com/news/software/operating-systems/what-on-earth-is-dracut-1078647
+    Initramfs history and ideas
+      https://web.archive.org/web/20150430223035/http://archlinux.me/brain0/2010/02/13/early-userspace-in-arch-linux/
+  ALG
+    check time
+      $ systemd-analyze
+    measure data read (See at 7th column):
+      $ cat /proc/diskstats
+    - Use compression?
+    - Maybe XFS would be best as for init+mount+r/w time?
+    - Utilize 100% I/O and CPU on boot
+    - Focus on delays -- enable logs and watch
+    - 'quiet' to disable printing
+    USE perf, oprofile, strace, bootchart
+      https://wiki.archlinux.org/index.php/Bootchart
+    E4rat
+      https://wiki.archlinux.org/index.php/Ext4#Tips_and_tricks
+       E4rat is a preload application designed for the ext4 filesystem. It
+       monitors files opened during boot, optimizes their placement on the
+       partition to improve access time, and preloads them at the very
+       beginning of the boot process. E4rat does not offer improvements
+       with SSDs, whose access time is negligible compared to hard disks.
+
+
+HACK:
+  UEFI Boot Windows by shortcut
+    https://bbs.archlinux.org/viewtopic.php?id=140049
