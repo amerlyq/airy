@@ -6,7 +6,9 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
   pkg_inst neomutt openldap
+
   # TODO:SEP: into their own modules (with docs)
+  # ALSO:SEE: |community/mailutils|
   aur_inst mblaze-git
   # NOTE: required for cmdline to work $ mshow -nBFN *
   mkdir -p ~/.mblaze

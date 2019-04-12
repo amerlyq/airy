@@ -5,7 +5,7 @@ set -euo pipefail
 acc=$1
 shift
 [[ ${1-} == -- ]] && shift
-mbsync_args=( "$@" )
+# mbsync_args=( "$@" )
 
 # new:
 #   * pull new mails only from INBOX
@@ -19,7 +19,8 @@ mbsync_args=( "$@" )
 # BAD:SECU: all output is logged and journalctl can't delete logs from single unit
 # cat "/var/lib/mailsync/$acc"
 
-r.mbsync "$acc" -- "${mbsync_args[@]}"
+# r.mbsync "$acc" -- "${mbsync_args[@]}"
+r.getmail "$acc" --
 
 # ALG: fail or ignore if notmuch config file doesn't exists
 #   * run on "dirty" state (local changes) == approx by dates of all files in dir are < lastsync

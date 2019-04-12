@@ -7,9 +7,13 @@ ALG sync server rules (setup online through web-ifc)
   "archivecopy/"
     * copy all incoming messages to "archivecopy/"
     ! never delete anything
-    * never sync to offline PC until strictly required
+    ! never sync to offline PC until strictly required
     * use it as reserve backup to prevent accidentally deleted mails
       = online copy from "archivecopy/" to your other folders
+    +++ allows you to pull all messages from INBOX by POP3, preventing problems:
+      - isync X-TUID reindexing (FIXED:BUG: all your msgs will be duplicated and redownloaded from server)
+      - davmail / html reformatting
+    ++ using POP3 will also allow detect when sync was frozen -- messages will accumulate in Web client
   "Sent/"
     * ask server to store all outgoing messages to "Sent/"
     * setup "davmail" to copy everything outgoing to "Sent/"

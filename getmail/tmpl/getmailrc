@@ -1,0 +1,59 @@
+# vim: ft=dosini
+# REF: http://pyropus.ca/software/getmail/configuration.html
+# https://wiki.archlinux.org/index.php/Getmail
+
+##ALT: gmail
+# [retriever]
+# type = SimplePOP3SSLRetriever
+# port = 995
+# server = pop.gmail.com
+# username = username@gmail.com
+
+# NOTE: local davmail has no use for SSL
+# ALT: SimpleIMAPRetriever + delete + --idle=INBOX
+# -- BUT: still actual IDLE period depends on davmail config...
+[retriever]
+type = SimplePOP3Retriever
+port = 1110
+server = 127.0.0.1
+username = domain\username
+
+# password = password
+password_command = ("r.query-passwd", "mail/account")
+
+[destination]
+type = Maildir
+path = ~/.mail/account/INBOX/
+
+# ATT:USE: delete XOR read_all
+[options]
+# ALT: delete_after = 1
+# read_all = False
+delete = True
+# XXX? how also strip Return-Path ?
+strip_delivered_to = True
+verbose = 0
+message_log = ~/.cache/getmail/log
+message_log_verbose = true
+
+# BUG: file(1) detects files as SMTPmail instead of rfc822
+#   due to getmail(1) mailfile naming scheme
+#   ./getmailcore/utilities.py:299: filename = '%(secs)s.%(unique)s.%(hostname)s' % info
+
+# ALT: send to sorting conveyer
+# [destination]
+# type = MDA_external
+# path = /usr/bin/procmail
+# arguments = ('~bob/.procmailrc', '-f', '%(sender)')
+# user = bob
+
+# ALT:TRY: copy to sorting conveyer
+# [destination]
+# type = MultiDestination
+# destinations = ("[procmail-as-bob]", )
+
+# [procmail-as-bob]
+# type = MDA_external
+# path = /usr/bin/procmail
+# arguments = ('~bob/.procmailrc', '-f', '%(sender)')
+# user = bob
