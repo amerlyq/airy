@@ -18,7 +18,7 @@ my $prefix = $ENV{CMAKE_PREFIX_PATH} // '/work/cache/_prefix';
 # https://perldoc.perl.org/Pod/Usage.html
 
 my %opts=(); getopts("0ac:d:Ho:", \%opts);
-my $OFS = $opts{d} // "\t";
+my $OFS = $opts{d} // " ";
 my $ORS = $opts{0} ? "\0" : "\n";
 my $printheaders = not $opts{H};
 
@@ -84,7 +84,7 @@ foreach my $name (@field_names) {
     " if $field_alias{$alias};
     $field_alias{$alias} = $name;
 }
-my @field_default = check_allowed(\@field_names, qw(appid ctxid stamp level body));
+my @field_default = check_allowed(\@field_names, qw(appid ctxid stamp level));
 my @field_shown = $opts{a} ? @field_names : multichoice($opts{o}, \@field_names, \%field_alias, \@field_default);
 
 ################################################################################
@@ -106,7 +106,7 @@ sub proc_record {
     # print join("\t", map {$fields{$_}} sort keys %fields), "\n";
     my $f = shift;
     # print join("\t", map {$f->{$_}} sort keys %{$f}), "\n";
-    print join($OFS, map { $_ // '' } @{$f}{ @field_shown }), $ORS;
+    print join($OFS, map { $_ // '' } @{$f}{ @field_shown }), ' | ', $f->{body}, $ORS;
     # printf "%08x${OFS}%08x${OFS}%s${OFS}%s${OFS}%s\n", @$_;
 }
 
