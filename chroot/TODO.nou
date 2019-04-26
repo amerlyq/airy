@@ -85,3 +85,11 @@ FIXED
     $ dpkg --print-foreign-architectures
     $ sudo apt-get update
     $ sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
+  BUG: E: PAM error: Authentication failure
+    REF:
+      https://bbs.archlinux.org/viewtopic.php?id=244101
+      https://lists.archlinux.org/pipermail/arch-general/2019-February/046039.html
+    ADD: /etc/pam.d/schroot
+      auth		required	pam_unix.so
+      account		required	pam_unix.so
+      session		required	pam_unix.so

@@ -114,3 +114,11 @@ FAQ
     :::
       $ pacman-key --init
       $ pacman-key --populate archlinux
+  BUG: error: GPGME error: No data
+    REF: https://forum.antergos.com/topic/9645/gpgme-error-no-data
+    ::: most likely DBs were overwriten by HTML page with form to enter credentials (you forgot to log-in work network)
+      $ sudo rm -R /etc/pacman.d/gnupg
+      $ sudo pacman-key --init
+      $ sudo pacman-key --populate archlinux
+      $ sudo pacman-key --refresh-keys
+      $ sudo pacman -Syy
