@@ -9,6 +9,7 @@
 alias -g N0='&>/dev/null'
 alias -g N1=' >/dev/null'
 alias -g N2='2>/dev/null'
+alias -g N2C='2> >(sed -u "s/^/\o033[31m/; s/\$/\o033[0m/")'
 alias -g N+='2>&1'
 alias -g NN='|stdbuf -oL -eL tee /dev/tty'
 alias -g NZ='|tr \\n \\0'

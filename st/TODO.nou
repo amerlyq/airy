@@ -93,6 +93,13 @@ TODO
 
 
 BUG
+  2019-05-10 [X] Vertical offset after update 2019-04-XX
+    BUG: too narrow by vertical -- truncated upper part of "[(" braces and "i" dot
+      ::: must also update fonts when fontconfig is updated
+    DEBUG:
+      $ st -f monospace-64
+      $ xterm -fa monospace-64
+      $ xterm -fa monospace -fs 64
   Cell rendering issues
     ::: seems fixed by updating font.conf and font itself
     2017-01-09 [X] artifacts (scratches) on bg fill SEE :XtermColorTable

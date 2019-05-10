@@ -4,8 +4,7 @@
 #% * (only mods): $ make -B all/all
 #%
 .DEFAULT_GOAL = all
-# HACK:( --output-sync=none): keep prompt unaffected -- when scripts inside ask for "sudo" password
-# CHECK: seems like pacman isn't connected to tty despite :: exec > /dev/tty && exec < /dev/tty
+# FAIL:( --output-sync=none): keep prompt unaffected -- when scripts inside ask for "sudo" password
 MAKEFLAGS += -rR --silent
 .NOTPARALLEL:
 .SUFFIXES:
@@ -91,8 +90,10 @@ $(tsdir)/--configure--:
 	./pacman/setup -m
 	touch '$@'
 
+# NOTE: connect pacman to tty instead of logs
 $(tsdir)/--upgrade--:
-	./pacman/update -u
+	echo '$(@F)'
+	./pacman/update -u > /dev/tty
 
 defaults: clean configure
 	r.airy -sd

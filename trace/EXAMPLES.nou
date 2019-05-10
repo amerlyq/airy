@@ -14,3 +14,7 @@ Tracking dangling file descriptors of deleted files (e.g. sqlite holding tmpfile
 
 Watch consumed cpu
   $ watch -n1 sh -c "ps -e -o %cpu,pid,tid,times,comm -L | awk '\$2==$(pidof organizer)' | sort -n"
+
+
+Tracing network packets (~low-level curl~)
+  https://github.com/secdev/scapy

@@ -19,6 +19,6 @@ fi
 # BUG:(clean install) unknown variable: TMUX_PLUGIN_MANAGER_PATH
 # TRY: set env var to apply update on -L tmp-tmux session in case of update to 2.4 with 2.3 loaded as server
 # WARN: sometime don't pull changes from github -> use "prefix + U" to update manually
-tmux info &>/dev/null && tmux source-file ~/.tmux.conf
+tmux info &>/dev/null && tmux source-file ~/.tmux.conf  # || echo "E: FIXME: obsolete options"
 "$tpm/scripts/install_plugins.sh"
 "$tpm/scripts/update_plugin.sh" all

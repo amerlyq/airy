@@ -7,6 +7,8 @@ svc_activate -cue {demons,logoff,main}.target
 
 # Start user instance right after boot and keep beside sessions
 # USE:(to logoff) loginctl terminate-user "${USER:?}"
+# BUG: Could not enable linger: Read-only file system
+#   REQ:REF: https://github.com/systemd/systemd/issues/12401
 if cfgOpt u; then
   sudo loginctl enable-linger "${USER:?}"
 fi

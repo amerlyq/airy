@@ -1,6 +1,15 @@
 USAGE
+  interactive connect
+    (wpa_supplicant): $ wpa_cli
   restart when WiFi connection disappears
     $ S.rr netctl-auto@wlp3s0.service
+
+DEBUG
+  If error on connection -- see reasons:
+    $ ip link set wlan0 down
+    $ netctl start wlan_static
+    $ journalctl -xn
+    $ netctl status wlan_static
 
 TODO
   [_] split configuration and install pkgs to lan/wifi

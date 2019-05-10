@@ -25,8 +25,10 @@ mkdir -p "${log%/*}"
 
 [[ -t 1 ]] && ((${#fpretty[@]})) && exec > >("${fpretty[@]}")
 
+# WARN:BUG:(sed -u/awk): isn't really unbuffered -- it will prevent [Y/n] prompt w/o NL
+# awk '{print "E:",$0}'
 { { make "$@"
   } 3>&1 1>&2 2>&3 | sed -u 's/^/E: /'
-} |& stdbuf -oL -eL tee -a "$log"
+} |& stdbuf -oL tee -a "$log"
 
 # [[ -s $log ]] || rm "$log"
