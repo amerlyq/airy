@@ -1,0 +1,179 @@
+# vim: ft=sh
+# NOTE: mixed btrfs + snapshots layout -- multidisk
+
+# Disable PC beep
+setterm -blength 0
+parted -l
+#  * /dev/nvme0n1
+#  * /dev/sda
+
+## NOTE: lvm-on-luks whole-disk GPT partition
+## HACK: keep main as sda1 -- create grub as last one
+parted /dev/nvme0n1
+#  - mklabel gpt
+#  - mkpart primary 2048s 100%
+#  - align-check opt 1
+#  - set 1 boot on
+#  - mkpart primary 64s 2047s  # pick "Ignore"
+#  - align-check min 2
+#  - help set
+#  - set 2 bios_grub on
+#  - unit mib
+#  - print
+#  - quit
+
+parted /dev/sda
+#  - mklabel gpt
+#  - mkpart primary 2048s 100%
+#  - quit
+
+## INFO: check main lvm partition alignment
+#   0 == "Start of 1" % 2048 (1MB stripe / 512 sector size)
+parted /dev/nvme0n1 unit s print
+
+
+## NOTE: Default AES cipher in XTS mode (effective key 256-bit)
+# REF: https://wiki.archlinux.org/index.php/GRUB#Encrypted_/boot
+# BUG: https://savannah.gnu.org/bugs/?55093
+cryptsetup -s 512 --type luks1 luksFormat /dev/nvme0n1p1
+cryptsetup luksDump /dev/nvme0n1p1
+cryptsetup luksOpen /dev/nvme0n1p1 luks
+
+
+## INFO: scanning / clean
+lvmdiskscan
+dmsetup ls --tree
+# dmsetup remove /dev/mapper/luks  # NOTE: del old LVM completely
+# vgremove -f ws  # NOTE: del only group, keeping LVM
+
+## NOTE: init partition as Physical Volume
+pvcreate --dataalignment 1m /dev/mapper/luks
+pvcreate -f /dev/mapper/luks
+pvdisplay
+pvs
+
+## NOTE: add PV to new Volume Group
+vgcreate ws /dev/mapper/luks
+vgdisplay
+vgs
+
+
+## NOTE: create LV partitions
+lvcreate ws -Wy --yes -n swap -L 4G -C y
+lvcreate ws -Wy --yes -n root -L 100G
+lvcreate ws -Wy --yes -n work -l +100%FREE
+lvs
+
+# nvme0n1         259:0  0 238.5G  0 disk
+# ├─nvme0n1p1     259:1  0 238.5G  0 part
+# │ └─luks        254:0  0 238.5G  0 crypt
+# │   ├─ws-swap   254:1  0     4G  0 lvm
+# │   ├─ws-root   254:2  0   100G  0 lvm
+# │   └─ws-work   254:3  0 134.5G  0 lvm
+# └─nvme0n1p2     259:2  0   992K  0 part
+# sda               8:0  0 931.5G  0 disk
+# └─sda1            8:1  0 931.5G  0 part
+
+
+## NOTE: format LV partitions
+mkswap -L swap -f /dev/ws/swap
+mkfs.btrfs -L root -f /dev/ws/root
+mkfs.btrfs -L work -f /dev/ws/work
+mkfs.ext4 -L data /dev/sda1
+
+
+## NOTE: create work btrfs layout
+mount -o compress=lzo,autodefrag /dev/ws/work /mnt
+btrfs subvolume create /mnt/@
+umount /mnt
+
+
+## NOTE: create root btrfs layout
+mount -o compress=lzo,autodefrag /dev/ws/root /mnt
+btrfs quota enable /mnt
+btrfs subvolume create /mnt/@
+myuser=...
+mkdir -vp /mnt/@/{.snapshots,boot,var,data,work,home/${myuser:?}}
+btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/@/boot/grub
+btrfs subvolume create /mnt/@/var/cache
+btrfs subvolume create /mnt/@/var/log
+# MAYBE: merge "work" with "root" and add under snapshoting excluding build dir
+# btrfs subvolume create /mnt/@/work/repo
+btrfs subvolume create /mnt/@/home/${myuser:?}/.cabal
+btrfs subvolume create /mnt/@/home/${myuser:?}/.cache
+btrfs subvolume create /mnt/@/home/${myuser:?}/.gem
+btrfs subvolume create /mnt/@/home/${myuser:?}/sdk
+# nodatacow per subvolume
+chattr +C /mnt/@/var/log
+btrfs subvolume list /mnt
+umount /mnt
+# ├─@            /mnt
+#   ├─/boot/grub
+#   ├─ ~/.cabal/lib
+#   ├─ ~/.cache
+#   ├─ ~/sdk
+#   ├─/var/cache
+#   └─/var/log
+# └─@snapshots   /mnt/.snapshots
+
+
+## NOTE: assemble mounted filesystem
+mount -o noatime,compress=lzo,autodefrag,ssd,subvol=/@ /dev/ws/root /mnt
+mount -o noatime,compress=lzo,autodefrag,ssd,subvol=/@ /dev/ws/work /mnt/work
+mount -o noatime,compress=lzo,autodefrag,ssd,subvol=/@snapshots /dev/ws/root /mnt/.snapshots
+mount /dev/sda1 /mnt/data
+swapon /dev/ws/swap
+
+
+## NOTE: fix shared "users" access for /data
+mkdir /mnt/_dld
+chown root:users /mnt/{_dld,data,work}
+chmod 770 /mnt/{_dld,data,work}
+chmod g+s /mnt/{_dld,data,work}
+mkdir /mnt/data/music
+
+
+## NOTE: bake fstab
+timedatectl set-timezone Europe/Kiev
+timedatectl set-ntp true
+pacstrap /mnt  base base-devel lvm2 btrfs-progs grub snapper ntp sudo polkit wget git openssh
+
+## FIX: manually remove swap of host system (if necessary)
+genfstab -pU /mnt >> /mnt/etc/fstab
+
+# REQ for grub-mkconfig BUT: not needed anymore
+# mkdir -vp /mnt/hostrun
+# mount --bind /run /mnt/hostrun
+arch-chroot /mnt
+{
+  # Defaults SEE: ./grub-mbr.nou
+  ...
+
+  mkdir -vp /media/${myuser:?}
+  chown -R ${myuser:?}:${myuser:?} /{home,media}/${myuser:?}
+  chmod -R 700  /{home,media}/${myuser:?}
+  chmod g+s /home/${myuser:?}
+
+  systemctl enable sshd.service ntpd.service
+
+  # Snapper SEE: ../snapper/init.gen
+  # btrfs quota enable /mnt
+  ...
+}
+
+# umount /mnt/hostrun
+# rmdir -v /mnt/hostrun
+umount -R /mnt
+swapoff -a
+lvchange -a n ws   # stop LVM group
+cryptsetup -v close luks
+reboot
+
+
+## INFO: on boot problems
+setterm -blength 0
+cryptsetup luksOpen /dev/nvme0n1p1 luks
+mount -o subvol=@ /dev/ws/root /mnt
+arch-chroot /mnt
+...

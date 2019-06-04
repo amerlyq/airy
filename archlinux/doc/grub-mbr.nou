@@ -1,108 +1,58 @@
 # vim: ft=sh
 # NOTE: non-SSD + MBR/BIOS + grub + luks/lvm
 
-cryptsetup luksOpen /dev/sda5 luks
-lvchange -a y ws
+# NEED:(after): $ arch-chroot /mnt /bin/bash
 
-mount -o autodefrag /dev/mapper/ws-root /mnt
-swapon /dev/mapper/ws-swap
-mkdir -vp /mnt/{boot,home,work,hostrun}
-mount /dev/sda1 /mnt/boot
-mount -o autodefrag /dev/mapper/ws-home /mnt/home
-mount /dev/mapper/ws-work /mnt/work
-mount --bind /run /mnt/hostrun  # REQ for grub-mkconfig
+ln -svf /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+hwclock --systohc --utc
+vi /etc/locale.gen  # uncomment 'en_US.UTF-8'
+locale-gen
+export LANG=en_US.UTF-8
+echo LANG=$LANG > /etc/locale.conf
 
-lsblk /dev/sda
-# NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
-# sda             8:16   0 931.5G  0 disk
-# ├─sda1          8:17   0     2G  0 part  /mnt/boot
-# ├─sda2          8:18   0     1K  0 part
-# └─sda5          8:21   0 929.5G  0 part
-#   └─luks      254:6    0 929.5G  0 crypt
-#     ├─ws-swap 254:7    0     4G  0 lvm  [SWAP]
-#     ├─ws-root 254:8    0    40G  0 lvm  /mnt
-#     ├─ws-home 254:9    0    40G  0 lvm  /mnt/home
-#     └─ws-work 254:10   0 845.5G  0 lvm  /mnt/work
+echo myhost > /etc/hostname
+vi /etc/hosts  # add: 127.0.0.1  localhost  myhost
+cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/eth_dhcp
+vi /etc/netctl/eth_dhcp  # CHG ifc by results of ':r!ip link' OR ':<ip link'
+netctl enable eth_dhcp
 
-timedatectl set-timezone Europe/Kiev
-timedatectl set-ntp true
-pacstrap /mnt base base-devel lvm2 btrfs-progs grub ntp sudo polkit wget git zsh vis
-# pacstrap /mnt ntp sudo polkit wget git zsh vis
+vi /etc/pacman.conf  # uncomment 'Color' and '[multilib]'
+pacman -Syy
 
-genfstab -pU /mnt >> /mnt/etc/fstab
+# NOTE: only if Intel SEE /proc/cpuinfo NEED: $ grub-mkconfig -o /boot/grub/grub.cfg
+# pacman -S intel-ucode
 
-arch-chroot /mnt /bin/bash
-{
-  ln -svf /usr/share/zoneinfo/Europe/Kiev /etc/localtime
-  hwclock --systohc --utc
-  # uncomment 'en_US.UTF-8'
-  vis /etc/locale.gen
-  locale-gen
-  echo LANG=en_US.UTF-8 > /etc/locale.conf
-  export LANG=en_US.UTF-8
+# CHG: HOOKS=(base udev keyboard autodetect consolefont modconf block encrypt lvm2 filesystems fsck)
+vi /etc/mkinitcpio.conf
+mkinitcpio -p linux
 
-  echo myhost > /etc/hostname
-  vis /etc/hosts  # add 'myhost' on right of 'localhost'
-  cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/eth_dhcp
-  # cp /etc/netctl/{examples/ethernet-static,eth_static}
-  vis /etc/netctl/eth_dhcp  # CHG ifc by results of ':r!ip link' OR ':<ip link'
-  netctl enable eth_dhcp
+# {{{
+vi /etc/default/grub
+# GRUB_TIMEOUT=0
+# GRUB_TIMEOUT_STYLE=hidden
+## INFO: :r!blkid /dev/nvme0n1p1 OR :r!lsblk -dno UUID /dev/nvme0n1p1
+# GRUB_CMDLINE_LINUX="cryptdevice=UUID=<UUID>:luks root=/dev/ws/root"
+## HACK: for /boot inside LUKS
+# GRUB_PRELOAD_MODULES="part_gpt lvm"
+# GRUB_ENABLE_CRYPTODISK=y
+# GRUB_DISABLE_RECOVERY=true
+# GRUB_DISABLE_SUBMENU=true
+# GRUB_DISABLE_OS_PROBER=true
+## WARN: 'console' is not resizable
+# GRUB_GFXPAYLOAD_LINUX=keep  # ALT: =text
+# GRUB_GFXMODE=1024x768x32    # choose from GRUB -> 'e' -> :vbeinfo
 
-  # CHG: uncomment 'Color' and '[multilib]'
-  vis /etc/pacman.conf
-  pacman -Syy
+# NEED:(out of chroot): mkdir -vp /mnt/hostrun && mount --bind /run /mnt/hostrun
+# mkdir -vp /run/lvm && mount --bind /hostrun/lvm /run/lvm
+grub-mkconfig -o /boot/grub/grub.cfg
 
-  # only if Intel SEE /proc/cpuinfo
-  # pacman -S intel-ucode
-  # NEED: again $ grub-mkconfig -o /boot/grub/grub.cfg
+grub-install --target=i386-pc --recheck /dev/nvme0n1
+# umount /run/lvm && rmdir -v /run/lvm
+# }}}
 
-  # CHG: HOOKS=(base udev keyboard autodetect modconf block encrypt lvm2 filesystems fsck)
-  vis /etc/mkinitcpio.conf
-  mkinitcpio -p linux
-
-  # NEED:(out of chroot): mount --bind /run /mnt/hostrun  # REQ for grub-mkconfig
-  {
-    vis /etc/default/grub
-    # GRUB_TIMEOUT=0
-    # GRUB_TIMEOUT_STYLE=hidden
-    ## INFO: :<blkid /dev/sda5 OR :<lsblk -dno UUID /dev/sda5
-    # GRUB_CMDLINE_LINUX="cryptdevice=UUID=<UUID>:luks"
-    ## HACK: for /boot inside LUKS
-    # GRUB_PRELOAD_MODULES="part_gpt part_msdos lvm"
-    # GRUB_ENABLE_CRYPTODISK=y
-    # GRUB_DISABLE_RECOVERY=true
-    # GRUB_DISABLE_SUBMENU=true
-    # GRUB_DISABLE_OS_PROBER=true
-    ## WARN: 'console' is not resizable
-    # GRUB_GFXPAYLOAD_LINUX=keep  # ALT: =text
-    # GRUB_GFXMODE=1024x768x32    # choose from GRUB -> 'e' -> :vbeinfo
-
-    # HOST: mkdir -vp /mnt/hostrun && mount --bind /run /mnt/hostrun
-    mkdir -vp /run/lvm && mount --bind /hostrun/lvm /run/lvm
-    grub-mkconfig -o /boot/grub/grub.cfg
-    grub-install --target=i386-pc --recheck /dev/sda
-    umount /run/lvm && rmdir -v /run/lvm
-  }
-
-  # VIZ. list all users: sudo passwd -Sa
-  myuser=...
-  passwd
-  useradd -mUG users,wheel,uucp -s /bin/bash ${myuser:?}
-  passwd ${myuser:?}  # OR: $ printf myuser:mypass | chpasswd
-  EDITOR=vis visudo   # CHG: uncomment first '%wheel'
-
-  su myuser
-  {
-    # sudo usermod -s "$(which zsh)" "$(whoami)"
-  }
-
-}
-
-## Clean-up
-umount /mnt/hostrun
-rmdir -v /mnt/hostrun
-umount -R /mnt
-swapoff -a
-lvchange -a n ws   # stop LVM group
-cryptsetup -v close luks
-reboot
+# VIZ. list all users: sudo passwd -Sa
+myuser=...
+passwd
+useradd -mUG users,wheel,uucp -s /bin/bash ${myuser:?}
+passwd ${myuser:?}  # OR: $ printf myuser:mypass | chpasswd
+EDITOR=vi visudo   # CHG: uncomment first '%wheel'
