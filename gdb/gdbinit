@@ -76,9 +76,12 @@ define findval
   end
 end
 
-
 define bta
+  set filename-display basename
+  set print frame-arguments none
   thread apply all bt
+  set print frame-arguments all
+  set filename-display absolute
 end
 document bta
 Backtrace for all threads

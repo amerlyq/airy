@@ -44,15 +44,16 @@ call dein#add('stefandtw/quickfix-reflector.vim', {
 "" CHECK: Multiple realtime hl for searching {{{1
 " NOTE: vim_version: '7.3'
 " FIXED:('if': 0): for 'nvim segfault encode_tv2string()' or ':mess incsearch recursive'
+" INFO: neovim has incremental highlighting, but we also need key bindings on "*"
+" map <unique> /  <Plug>(incsearch-forward)
+" map <unique> ?  <Plug>(incsearch-backward)
+" map <unique> g/ <Plug>(incsearch-stay)
 call dein#add('haya14busa/incsearch.vim', {
   \ 'on_source': ['incsearch-fuzzy.vim', 'vim-anzu', 'vim-asterisk'],
   \ 'on_map': [['nxo', '<Plug>']],
   \ 'depends': 'vim-repeat',
   \ 'hook_source': _hcat('incsearch.src'),
   \ 'hook_add': "
-\\n   map <unique> /  <Plug>(incsearch-forward)
-\\n   map <unique> ?  <Plug>(incsearch-backward)
-\\n   map <unique> g/ <Plug>(incsearch-stay)
 \\n   for c in ['n', 'N']
 \\n     call Map_nxo(c, '<Plug>(incsearch-nohl-'.c.')')
 \\n   endfor

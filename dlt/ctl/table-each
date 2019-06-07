@@ -8,7 +8,7 @@ while (($#)); do
 done
 (($#fs)) || fs=( *.dlt*(.) )
 
-find $fs -type f -name '*.dlt.gz' -execdir \
+find -L $fs -type f -name '*.dlt.gz' -execdir \
   sh -c 'test -f "${0%.gz}" || gzip --decompress "$0" || true' {} \;
 
 for f in ${fs[@]%.gz}; do

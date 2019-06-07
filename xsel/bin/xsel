@@ -41,7 +41,8 @@ fi
 #   => remote socat will create two different xsel
 #   => whoever last ends transmission -> will be first in clipboard history
 # ALT: nc -4 [-c|-w0] -U "$socket"
-cmd=( socat -4t0 - "UNIX-CLIENT:$socket" )
+# BUG: -t0 don't work anymore
+cmd=( socat -4 -t 0.5 - "UNIX-CLIENT:$socket" )
 # cmd=( socat -4t0 - "TCP:$socket" )
 
 if [[ $opts =~ i && $opts =~ o ]]; then

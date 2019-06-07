@@ -23,6 +23,7 @@ gdb-multiarch -q -iex "set gnutarget elf32-littlearm" -iex "set sysroot ./rootfs
 # gdb-multiarch -q ./myexe
 # Use correct IP of your device
 (gdb) target remote 192.168.1.100:1234
+# NOTE: break on exception
 (gdb) catch throw
 (gdb) continue
 --- try to break or deadlock HU now by clicking different menu ---
