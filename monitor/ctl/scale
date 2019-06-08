@@ -31,7 +31,7 @@ esac
 [[ ${ext_mod-} ]] && case $ext_mod
 in 1) xrandr --output "$ext" --auto
 ;; 2) r.monitor-add-mode "$ext" "$wide2"
-;; 3) xrandr --output "$ext" --mode 1280x720
+;; 3) xrandr --output "$ext" --mode 1280x800
 ;; *) echo "Err: not supported '$ext_mod' delimiter"; exit 1
 esac
 

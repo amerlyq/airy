@@ -61,7 +61,9 @@ endf
 "   set shellcmdflag=
 " elseif exists('$SHELL')
   " WARNING Don't use '-i':  'stty: standard input: Inappropriate ioctl for device'
-  set shell=$SHELL
+  " DISABLED: inherits "r.sh" from ranger which accesses too much files
+  " set shell=$SHELL
+  set shell=/bin/sh
 " endif
 
 " if has('nvim')

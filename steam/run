@@ -6,7 +6,14 @@ set -euo pipefail -o errtrace
 # trap 'onexit' HUP INT QUIT TERM ERR
 
 r.wm -w g  # Jump to game workspace
-optirun steam
+
+# FIXED: VirtualGL in Steam
+# [VGL] ERROR: VirtualGL attempted to load the real
+# [VGL]   glXCreatePbuffer function and got the fake one instead.
+# [VGL]   Something is terribly wrong.  Aborting before chaos ensues.
+export LD_PRELOAD="/usr/lib/libGL.so /usr/lib32/libGL.so"
+
+exec optirun steam
 
 # BAD: crash on "libvgui2_s.so"
 # primusrun steam

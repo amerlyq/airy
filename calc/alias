@@ -1,7 +1,14 @@
 # vim:ft=sh
 
 # printf '%x\n' "$((2#101010101))"
-hex() { printf "%08lx\n" $(($*)); }
+hex() { local REPLY
+  if [[ -t 0 ]]; then
+    printf "%08lx\n" $(($*))
+  else while IFS= read -r; do
+    printf "%08lx\n" $((REPLY))
+  done; fi
+}
+
 dec() { printf "%s\n" $(($*)); }
 
 # perl -e "print unpack('s',pack 's', hex('ffaa'))"

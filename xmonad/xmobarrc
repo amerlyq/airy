@@ -43,13 +43,20 @@ Config {
 --           \ %default:Master%\
 --         \</action></action></action>\
 
+--  \<fc=#cc00cc>  </fc>\
+--    \<action=`r.xkb-lang 0` button=3>\
+--      \<action=`r.xkb-lang +` button=1>\
+--        \%lang% %leds% \
+--      \</action></action>\
+-- %loadavg%
+
 , template = "%UnsafeStdinReader%}{\
   \%wacom%\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%\
   \<fc=#00cc80>  </fc>\
     \<action=`r.wm M-o_h` button=1>\
-      \%cpu%  %loadavg%  %memory% %swap%\
+      \%cpu%  %memory% %swap%\
     \</action>\
   \<fc=#0080cc>  </fc>\
     \%battery%\
@@ -58,11 +65,6 @@ Config {
         \<action=`r.backlight-mon-sys -n 30$'\x25'` button=3>\
           \ %bright%\
         \</action></action></action>\
-  \<fc=#cc00cc>  </fc>\
-    \<action=`r.xkb-lang 0` button=3>\
-      \<action=`r.xkb-lang +` button=1>\
-        \%lang% %leds% \
-      \</action></action>\
     \%date% "
 , commands =
 [ Run Date "<fc=#fd971f>%d.%m.%y</fc> ⌚ <fc=#ffffff>%H:%M</fc>" "date" 50
@@ -97,15 +99,15 @@ Config {
 --   , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"
 --   ] 50
 -- , Run Com "/home/dvmacias/.xmonad/bin/volume.sh" [] "vol" 1
-, Run Com "awk" [ "{print$1}", "/proc/loadavg" ] "loadavg" 10
-, Run Com "r.xkb-lang" [ "-N" ] "lang" 10
+-- , Run Com "awk" [ "{print$1}", "/proc/loadavg" ] "loadavg" 10
+-- , Run Com "r.xkb-lang" [ "-N" ] "lang" 10
 -- BUG: biased naming starts from amer(pc). CHECK:(src) Kbd plugin
 -- , Run Kbd
 --   [ ("amer(us)", "<fc=#00cc00>EN</fc>")
 --   , ("amer(ru)", "<fc=#0000cc>RU</fc>")
 --   , ("amer(ua)", "<fc=#ffcc00>UA</fc>")
 --   ]
-, Run Com "r.xkb-leds" [] "leds" 10
+-- , Run Com "r.xkb-leds" [] "leds" 10
 , Run Swap
   [ "-t", "<usedratio>%" ] 100
 , Run Brightness
