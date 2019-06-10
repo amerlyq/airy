@@ -13,6 +13,9 @@ r.wm -w g  # Jump to game workspace
 # [VGL]   Something is terribly wrong.  Aborting before chaos ensues.
 export LD_PRELOAD="/usr/lib/libGL.so /usr/lib32/libGL.so"
 
+# FIXED: small fonts and video on main screen
+export GDK_SCALE=2
+
 exec optirun steam
 
 # BAD: crash on "libvgui2_s.so"

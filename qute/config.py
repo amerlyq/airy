@@ -1105,6 +1105,8 @@ c.input.partial_timeout = 0
 ## QT_AUTO_SCREEN_SCALE_FACTOR=1 in the environment. It's off by default
 ## as it can cause issues with some bitmap fonts. As an alternative to
 ## this, it's possible to set font sizes and the `zoom.default` setting.
+# REF: https://github.com/qutebrowser/qutebrowser/issues/4786
+# ALT: run $  ...  -s qt.highdpi true
 ## Type: Bool
 # c.qt.highdpi = False
 

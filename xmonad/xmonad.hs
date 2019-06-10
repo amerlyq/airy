@@ -223,7 +223,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- , let lst = "buddy_list Preferences"
   --   in wmhas (stringProperty "WM_WINDOW_ROLE") lst
   -- BAD: floating "Steam" will run away in diagonal bot-right if {borderWidth > 2}
-  , let lst = "feh Steam Gimp piony.py Transmission-gtk"
+  , let lst = "feh Gimp piony.py Transmission-gtk"
     in wmhas className lst
   , let lst = "PlayOnLinux Dialog"
     in wmhas appName lst
