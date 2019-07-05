@@ -1,11 +1,19 @@
 # vim:ft=sh
 ## Log
-alias glh='git fcommits'  # history for one file
-alias glB='git flines'    # blame formatted
+alias gfH='git fcommits'  # history for one file
+alias gfB='git flines'    # blame formatted
+
 alias glg='git lgraph'
 alias glg.='glg -- .'
 alias gla='glg --all'
 alias gla.='gla -- .'
+
+# REF: https://stackoverflow.com/questions/46750027/is-there-a-git-log-summary-that-includes-merge-only-and-non-merge-commits
+glB(){ git log -m --first-parent "$(git merge-base "$1" HEAD)~..HEAD" "${@:2}"; }
+glR(){ glB "$(git branch --list --remote --sort '-refname' --format '%(refname:short)' -- 'origin/release/R??' | head -1)" "$@"; }
+alias gdR='glR --patch'
+alias gdR.='gdR -- .'
+
 alias glF='git log -p HEAD..origin'  # with fetched
 alias gll='git lmsg'
 gln(){ git ldump -n ${1:-10}; } #or -1 for inf

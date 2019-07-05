@@ -4,11 +4,13 @@ set -euo pipefail
 
 # WTF:FIXED: prevents trashing of both LVDS-1 and DP-1 monitors
 #  when VGA-1 becomes rotated
-xrandr --output LVDS-1 --off
+xrandr \
+  --output LVDS-1 --off \
+  --output VGA-1 --off
 
 xrandr \
   --output LVDS-1 --auto --right-of DP-1 --rotate normal \
   --output DP-1 --primary --pos 1080x0 --rotate normal \
-  --output VGA-1 --left-of DP-1 --rotate left
+  --output VGA-1 --auto --left-of DP-1 --rotate left
 
 r.feh

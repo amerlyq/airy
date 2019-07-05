@@ -16,6 +16,7 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 "   '!CYAN! ...' -- whole line from beginning
 
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
+" TODO: separate doc page with all available notches
 let s:patterns = [
   \ ['Err', 196, '#ff2525', 'RED|RQ|REQUIRE|ERR%(OR)?|BUG|REGR%(ESSION)?|XXX|WTF|BAD|FAIL%(ED|URE)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'GREN|ADD|NEED|FIND|ALSO|BET%(TER)?|E\.G|e\.g'],

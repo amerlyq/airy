@@ -54,6 +54,8 @@ emptyWksps =
 screens =
   [ (m ++ k, b f)
   | (k, b) <- [ ("[", doScreen (-1)), ("]", doScreen 1) ]
+  -- BUG: must mirror-navigation if laptop display "--output LVDS --primary" is the right-most one
+  -- | (k, b) <- [ ("[", doScreen (1)), ("]", doScreen (-1)) ]
   , (m, f) <- actionMons
   ]
 

@@ -1,8 +1,14 @@
 %%%% Shared clipboard
 
-F-Droid: kdeconnect
+F-Droid: install "kdeconnect"
   * disable excessive abilities beside clipboard sync
+Android:
+  * connect by WiFi OR: USB and reverse-tethering
+    NOTE:(if no connection): disable DNS66 and re-plug USB to get pop-up "Simple-RT connected"
+  * run "KDE Connect" app (if background service had stopped)
 HOST: |community/kdeconnect|
+  Create reverse-tethering USB network
+    $ ./airy/android-net/run
   Run foreground demon directly or through systemd unit
     $ /usr/lib/kdeconnectd
   Pair device to share clipboard
