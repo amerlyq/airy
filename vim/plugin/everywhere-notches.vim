@@ -5,6 +5,7 @@
 "%HACK: automate C++ notifications with TODO_BEFORE(date, text)
 "   https://www.fluentcpp.com/2019/01/01/todo_before-clean-codebase-2019/
 " IDEA: use similar concept of dates distinguishing -- VIZ:(date)={created,planned,completed}
+" STAT: search both /\bAAA:/ and /^\s*AAA$/
 
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has('autocmd') || v:version <= 701 | finish | endif
@@ -38,6 +39,7 @@ let s:patterns = [
 " I.A. inter alia (~ among other things)
 " VIZ. videlicet (~ precisely: implies (near) completeness)
 " N.B. nota bene (~ pay attention, take notice) == NOTE, ATT
+" w.r.t. with regard to (USAGE: https://github.com/gperftools/gperftools/wiki/gperftools'-stacktrace-capturing-methods-and-their-issues)
 
 function! s:everywhere_print(patts)
   tabnew
