@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#%SUMMARY: search statistic on all ever used notches
+set -euo pipefail
+ag --nobreak --nofilename -o '\b[A-Z]{3,}(?=:)|^\s*\K[A-Z]{2,}$'|sort|uniq -c|sort -srn -k1,1

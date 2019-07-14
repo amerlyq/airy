@@ -40,6 +40,12 @@ DEV r.monitor-dpi
 
 
 TODO
+  [_] restore USB ports on external monitor after suspend / resume
+    ERR: xhci_hcd 0000:3c:00.0: Refused to change power state
+    https://askubuntu.com/questions/1044988/usb-ports-not-working-after-resume-from-sleep-on-ubuntu-18-04
+      ::: $ modprobe -r [uex]hci_hcd && modprobe [uex]hci_hcd
+      ALSO: restart "xhci_pci" if it blocks "xhci_hcd"
+    TRY: https://logfile.ch/linux/2017/06/15/disable-usb-autosuspend-linux/
   [_] BUG: HDMI don't work
     https://www.google.com/search?q=arch%20linux%20hdmi%20i2c%20i2c-4%3A%20sendbytes%3A%20NAK%20bailout
     https://wiki.archlinux.org/index.php/Bumblebee#Multiple_monitors

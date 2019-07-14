@@ -7,8 +7,14 @@ set -euo pipefail
 # https://bugzilla.redhat.com/show_bug.cgi?id=1179924
 
 # $sudo udevadm trigger
-exec find /sys/bus/pci/drivers -type l \
-  -path '*/?hci_hcd/????:??:??.?' \
-  -execdir $sudo sh -c '
-    printf "%s" "${0##*/}"|tee unbind|tee bind
-  ' {} \;
+# exec find /sys/bus/pci/drivers -type l \
+#   -path '*/?hci_hcd/????:??:??.?' \
+#   -execdir $sudo sh -c '
+#     printf "%s" "${0##*/}"|tee unbind|tee bind
+#   ' {} \;
+
+$sudo modprobe -r xhci_pci
+$sudo modprobe -r xhci_hcd
+$sudo modprobe xhci_hcd
+$sudo modprobe xhci_pci
+r.xkb
