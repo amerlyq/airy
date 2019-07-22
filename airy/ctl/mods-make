@@ -197,7 +197,8 @@ $(foreach 1,$(@scripts),$(eval $(call defrecipe,$(&abspath),$(&modname),$(&subpa
 
 ifneq (0,$(words $(filter %/install,$(@recipes))))
 hook.install.pre  := r.pacman-any-install -x
-hook.install.post := r.pacman-any-install
+# BAD: not the best solution to reuse -U from "flags" BET: separate var to control AUR reinstall
+hook.install.post := r.pacman-any-install $(if $(findstring U,$(flags)),-u)
 endif
 
 
