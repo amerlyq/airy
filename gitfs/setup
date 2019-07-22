@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+# tags: net
+source ~/.shell/func.d/cfgsetup
+
+cfg=/etc/fuse.conf
+grep -qxF 'user_allow_other' "$cfg" || sudo sed -ri '/.*#?\s*(user_allow_other)/s//\1/' "$cfg"
+
+svc_activate -cuer"$(cfgOpt uU&&echo R)" gitfs.service

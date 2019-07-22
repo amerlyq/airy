@@ -1,0 +1,23 @@
+[Unit]
+Description=GitFS - auto synced FUSE mounted git repo
+Documentation='https://www.presslabs.com/code/gitfs/how-to-use-gitfs/'
+RequiresMountsFor=%h
+
+# MAYBE: move dir-specific pieces into @/erian/mods/gitfs
+#
+# ALG: prevent too much git push to server
+#   $ git clone --bare glab:planning.git ~/aura/planning
+#   $ r.gitfs-todo
+#   $ git push --all
+#   OR: $ git push origin master
+#   WARN: usual alias $ Gp $ won't work
+#     TODO:DEV: must modify it to allow pushing bare repos
+
+[Service]
+Type=forking
+ExecStartPre=/usr/bin/mkdir -p '%h/todo'
+ExecStart=/bin/sh -c 'exec %h/.local/bin/r.gitfs-mount "$@"' '' '%h/aura/planning' '%h/todo'
+Restart=always
+
+[Install]
+WantedBy=demons.target

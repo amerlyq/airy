@@ -1,0 +1,22 @@
+# Maintainer: Jaroslav Lichtblau <dragonlord@aur.archlinux.org>
+
+pkgname=gitfs
+pkgver=0.4.5.1
+pkgrel=1
+pkgdesc="Version controlled file system"
+arch=('any')
+url="http://www.presslabs.com/gitfs/"
+license=('Apache')
+depends=('python-atomiclong' 'python-fusepy' 'python-pygit2>=0.24.0' 'python-setuptools' 'python-raven')
+source=($pkgname-$pkgver.tar.gz::https://github.com/PressLabs/$pkgname/archive/$pkgver.tar.gz)
+sha256sums=('6049fd81182d9172e861d922f3e2660f76366f85f47f4c2357f769d24642381c')
+install="gitfs.install"
+
+package() {
+  cd $pkgname-$pkgver
+  sed -i 's/fusepy==/fusepy>=/g' requirements.txt
+  sed -i 's/pygit2==/pygit2>=/g' requirements.txt
+  sed -i 's/raven==/raven>=/g' requirements.txt
+  sed -i 's/six==/six>=/g' requirements.txt
+  python setup.py install --root="${pkgdir}" --optimize=1
+}

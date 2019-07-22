@@ -1,0 +1,10 @@
+post_install() {
+  post_upgrade
+  echo ">>> Uncomment 'user_allow_other' in /etc/fuse.conf to mount as a regular user"
+}
+
+post_upgrade() {
+  mkdir -p /var/lib/gitfs
+  chown -R root:users /var/lib/gitfs
+  chmod -R 775 /var/lib/gitfs
+}

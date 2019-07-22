@@ -2,9 +2,19 @@
 ## WARNING:
 # Will find even submodules as separate repo!
 # It's useful for status, but could be very bad for pull/push/<cmd>
+
+# FIXME: ignore guard if set env var or pass some flag
 if [[ ! ${1:-$PWD} =~ ^$HOME/ ]]; then
   echo 'Guard: run only from $HOME' >&2
   exit 1
 fi
+
 exec find "${1:-$PWD}" \( -type d -o -type l -xtype d \) \
   -name .git -prune "${@:2}" -printf '%h\0'
+
+# FIXME: find dir which contains exact list of file and dir names
+# NEED: fix status/pull/push for bare repo
+# exec find "${1:-$PWD}" \( \
+#   \( -type d -o -type l -xtype d \) -name .git \
+#   -o \( -type f -name HEAD \) \
+# \) -prune "${@:2}" -printf '%h\0'

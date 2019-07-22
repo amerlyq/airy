@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#%SUMMARY: mount remote gitfs branch over directory to auto-commit any changes
+#%REF: https://wiki.archlinux.org/index.php/Gitfs
+set -euo pipefail
+
+repo=$1
+mount=$2
+
+# shellcheck disable=SC2191
+opts=(
+  # remote_url="$repo"
+  branch='master'
+  # repo_path="$mount"
+  # max_size=10MB
+  user="$USER"
+  group="$USER"
+  committer_name="$USER"
+  committer_email="${USER}@$(hostname)"
+  # merge_timeout='5 sec'
+  # fetch_timeout='30 sec'
+  # min_idle_times=10
+  # idle_fetch_timeout='30 min'
+  # log=syslog
+  # log_level=warning
+  # debug=false
+  # foreground=true
+  allow_other=false
+  allow_root=false
+  # username=
+  # password=
+  key="$HOME/.ssh/git_rsa"
+)
+
+exec gitfs -o "$(IFS=,; echo "${opts[*]}")" "$repo" "$mount"
