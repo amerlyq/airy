@@ -21,6 +21,9 @@ fmk := $(if $(shell which $(fmk) 2>/dev/null),$(fmk),$(here)/airy/ctl/makelog)
 	+'$(fmk)' -f '$(this)' -C '$(here)' $(MAKECMDGOALS)
 else
 
+# [_] FIXME: must "continue" <make all -B> from where it was stopped
+#   => currently simple "continue" from same place won't include "-B"
+
 # BAD: mods may be inside .tar.gz or in subdir -- better to align on Makefile itself "$this"
 # repo := $(shell git rev-parse --show-toplevel)
 

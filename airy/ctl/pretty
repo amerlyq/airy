@@ -32,4 +32,5 @@ exec sed -u -r "
   /^\s*(-> @\s|@@-.*\s->\s).*/s//$C9&$CR/
   /.*\s-> C\s.*/s//$C3&$CR/
   /\b(E|Err|Wrn|ERR):\s.*/s//$CB$C1&$CR/
+  /^\s*[|]:\s.*/s//$C5&$CR/
 " "$@"

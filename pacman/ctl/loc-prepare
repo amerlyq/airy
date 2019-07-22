@@ -50,8 +50,10 @@ copy_pkgbuild(){ local d_src f_pkg pkgname
   # FIXME: allow putting any files, not only patches, i.a. rename "patches" directory
   # THINK: disable (don't copy) some files by changing attributes or adding pfx/sfx
   install -Cm644 -- "$f_pkg" "$d_build/PKGBUILD"
-  patches=$(find "$d_src/patches" -maxdepth 1 -type f)
-  readarray -t patches <<< "$patches"
+
+  local patches
+  [[ -d $d_src/patches ]] && patches=$(find "$d_src/patches" -maxdepth 1 -type f)
+  readarray -t patches < <(printf '%s' "${patches-}")
   (( ${#patches[@]} )) && install -Cm644 -t "$d_build" -- "${patches[@]}"
 
   printf '%s\n' "$pkgname" >&3
