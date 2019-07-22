@@ -6,6 +6,11 @@ import os
 from os import path as fs
 
 
+# NOTE: jump to next day only at 7:00AM
+def today_date(delta=7):
+    import datetime
+    return (datetime.datetime.now() - datetime.timedelta(hours=delta)).strftime('%Y-%m-%d')
+
 # BAD: ranger crash on exit if '--choosedir' path was deleted by 3rd party
 def tmpfile(nm):
     tmp = os.getenv('RANGER_TMPDIR')
@@ -174,7 +179,7 @@ class doc(Command):
     lst = {'a': 'ARCH', 'b': 'DEBUG', 'c': 'comment', 'd': 'DEV', 'e': 'EXAMPLES',
            'f': 'FUTURE', 'h': 'HACK', 'g': 'LEGEND', 'i': 'INFO', 'k': 'WORKLOG',
            'l': 'LIOR', 'm': 'MAINT', 'n': 'NOTE', 'r': 'README', 's': 'SYNERGY',
-           't': 'TODO', 'u': 'USAGE', 'w': 'HOWTO'}
+           't': 'TODO', 'u': 'USAGE', 'w': 'HOWTO', '.': '.'}
     ext = ['.nou', '.otl', '.md', '.txt', '']
     loci = ['doc', 'docs', '_doc', '']
     """:doc [<name>]
@@ -193,6 +198,12 @@ class doc(Command):
 
     def execute(self):
         nm = self.arg(1) if self.arg(1) else doc.lst['t']
+        if nm == '.':
+            # NEED: copy "_tmpl/worklog" instead of using empty file
+            # FIX:BET: check/create/open symlinks "today.nou" "tomorrow.nou" "nextweek.nou"
+            #   => so you could open them directly from filesystem even without ranger shortcut
+            #   => relative symlink will be commited in GIT containing date of commit -- nice historical bisect
+            nm = today_date()
         if self.quantifier is not None:
             nm = '{}_{:02d}'.format(nm, self.quantifier)
         pwd = self.fm.thisdir.path
