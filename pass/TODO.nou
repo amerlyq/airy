@@ -14,9 +14,14 @@ Setup
 Copy url field from data produced by pass-import
   $ pass urldroplet.com | grep -oP '^url: \K.*' Y
 
+Migrate to another key
+  https://lists.zx2c4.com/pipermail/password-store/2015-May/001548.html
+    $ pass init "$NEWKEY"
+
 USE
   Copy passwd from dmenu to xclip
     $ passmenu
 
-BUG
-  [_] BAD: remove xclip from deps of pass
+TODO
+  [_] FIND: move pass db from another PC
+  [_] BUG: remove xclip from deps of pass

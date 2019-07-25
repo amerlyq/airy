@@ -28,3 +28,12 @@ Resume / interrupt
 Incremental backups with hardlinks
   https://superuser.com/questions/1245978/using-rsync-on-wsl-bash-for-windows-10-for-incremental-backups
   $ rsync -aP --link-dest=PATHTO/$PREVIOUSBACKUP $SOURCE $CURRENTBACKUP
+
+Batch update
+  = compute once, update to many identical mirrors
+  https://superuser.com/questions/282942/make-rsync-wait-for-a-confirmation-before-actually-changing-files
+  SRC $ rsync --only-write-batch="$(git rev-parse --verify HEAD)" --verbose "$@"
+  DST $ <"./$hash" rsync --read-batch=- -avh .
+  BUG:G: rsync "read-batch" hangs up
+    BUT:FIXED? 3.0.5rc2   MAYBE:USE: --no-i-r
+      https://rsync.samba.narkive.com/urLWrVou/batch-mode-hangs-if-dest-is-uptodate

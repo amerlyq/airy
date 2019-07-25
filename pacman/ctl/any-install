@@ -8,7 +8,8 @@ aur=
 loc=
 pkg=
 
-while getopts 'diux' o; do case $o in :|'?') exit 1
+while getopts 'Cdiux' o; do case $o in :|'?') exit 1
+;; C) loc+=$o
 ;; d) pkg+=$o
 ;; i) pkg+=$o; aur+=$o
 ;; u) pkg+=$o; aur+=$o; loc+=$o

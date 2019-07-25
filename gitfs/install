@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/packages
 
-# aur_inst gitfs
+# BAD:(broken): aur_inst gitfs ALT ::
+aur_inst -d python-atomiclong python-fusepy
+pkg_inst -d python-raven
 loc_inst ./gitfs.pkgbuild

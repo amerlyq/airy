@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#%SUMMARY: convert all traces recursively
+set -euo pipefail
+
+exec find "$@" -type f -name '*.dlt' -execdir r.dlt-table-each {} +

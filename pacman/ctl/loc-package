@@ -10,16 +10,24 @@ set -fCureEo pipefail
 export AUR_REPO=dev
 d_root=~/.cache/aurutils/airy
 # ALT: enforce rebuild by incrementing 'pkgrel=1' or 'epoch' in PKGBUILD
+chroot=1
 update=
 
-while getopts 'hu' o; do case $o in :|'?') exit 1
+while getopts 'hCu' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
+;; C) chroot=
 ;; u) update=1
 esac; done; unset o; shift $((OPTIND-1))
 (($#)) && exec < <(printf '%s\n' "$@") || [[ ! -t 0 ]] || exit 1
 
+# ERROR: aur-sync: pacman failed to install missing dependencies
+# BUG: can't install without confirm
+# HACK: https://github.com/AladW/aurutils/issues/447
+#   $ makechrootpkg -- 'PACMAN_OPTS=--confirm'
+# OR$ arch-nspawn /var/lib/aurbuild/x86_64/root pacman -S sqlite-replication
+
 # INFO: "sudo" isn't affected by "/dev/stdin" argument ALT: cache "sudo -k" beforehand
-env --chdir "$d_root" -- \
+${chroot:+env --chdir "$d_root" --} \
   aur build ${update:+--force} --arg-file='/dev/stdin' --
 
 

@@ -74,7 +74,15 @@ Nested repos
     http://blog.mixu.net/2012/04/06/git-tips-and-tricks/
   2014-11-30 [X] Сделать отдельный скрипт по манипуляции кучей репозиториев.
 
+
 % DEV
+  [_] DEV: ./ctl/auto-pick-hunks
+    = add several hunks to index by some heuristic procuring minimal useful commits
+  [_] DEV: ./ctl/auto-message
+    = create description automatically based on hunks currently added into index
+    SEE: how it is done in gitfs(1) -- how many situations it disctinguish
+  [_] DEV: ./ctl/auto-commit
+    = repeat auto-pick-hunks and auto-message until there are no more changes
   [_] FIND:(maybe faster): if possible to check latest commit hash directly from github
     TODO: check all in parallel, compose list on update, do git-up sequentially to prevent problems with gnupg
   * go through all and do 'git fetch'

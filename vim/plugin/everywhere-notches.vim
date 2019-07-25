@@ -27,7 +27,7 @@ let s:patterns = [
   \ ['Inf',  38, '#00afdf', 'CYAN|INFO?|SRC|VARs?|VIZ|ALG|SEQ%(UENCE)?|HYPO?|CONTR?|CONTRACT|IMPL|ARCH|PERF%(ORMANCE)?|TALK|SECU%(RE|RITY)?|MMAP'],
   \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|FIX%(ME)?|WARN%(ING)?|ATTN?|ATTENTION|REM%(OVE)?'],
   \ ['Did', 243, '#767676', 'GREY|DONE|FIXED|EXPL%(AIN)?|TEMP%(ORARY)?|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR'],
-  \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP%(ENDS)?'],
+  \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|USAGE|DFL|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP|DEPS|DEPENDS'],
   \]
 
 " check = prove = assert = verify

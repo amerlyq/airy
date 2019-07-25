@@ -96,6 +96,9 @@ Route WiFi to PC on same Router subnet
       net.ipv4.ip_forward=1
       net.ipv6.conf.default.forwarding=1
       net.ipv6.conf.all.forwarding=1
+    WARN:SECU: keeping "iptables" permanently enabled is BAD
+      !! anyone can impersonate Laptop simply by physically connecting
+        into the same router/network when owner is absent
     $# iptables -t nat -A POSTROUTING -o wlo1 -j MASQUERADE
     $# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     $# iptables -A FORWARD -i enp0s25 -o wlo1 -j ACCEPT

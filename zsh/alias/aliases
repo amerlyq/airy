@@ -67,10 +67,11 @@ alias -g SU='SS -u'
 alias -g SN-='SS -rn'
 alias -g SU-='SS -ru'
 for i in {1..9}; do
-  alias -g S$i="SS -sk$i,$i"
-  alias -g S$i-="SS -sk${i}r,$i"
-  alias -g SN$i="SS -sk${i}n,$i"
-  alias -g SN$i-="SS -sk${i}rn,$i"
+  alias -g S$i-="SS -sk$i,$i"
+  alias -g S$i="SS -sk${i}r,$i"
+  alias -g SN$i-="SS -sk${i}n,$i"
+  alias -g SN$i="SS -sk${i}rn,$i"
+  alias -g SU$i="SU -k$i,$i"
 done
 alias -g SC='SS|uniq -c|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'
