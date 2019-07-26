@@ -66,20 +66,12 @@ repo
 Main `repo/setup` must be launched on clean system before everything else.
 It will symlink your choosen profile/modules and launches system setup.
 ```bash
-#!/bin/bash -eu
-cd "$(dirname "$(readlink -e "$0")")"
-
-airy=~/aura/airy
-[[ -d $airy ]] || (mkdir -p "${airy%/*}" &&
-  git clone 'https://github.com/amerlyq/airy' "$airy")
-
+#!/usr/bin/env bash
+set -euo pipefail
+make -C ~/aura/airy -- configure
+export PATH=~/.local/bin:$PATH
 config=${XDG_CONFIG_HOME:-~/.config}/airy
-[[ -d ~/.local/bin && -L $config ]] || (cd "$airy" && make install)
-[[ -L $config ]] || (echo 'Err: $config must be symlink'; exit)
-
-[[ :$PATH: == *:$HOME/.local/bin:* ]] || export PATH=~/.local/bin:$PATH
-
-repo=$(git rev-parse --show-toplevel)
+repo=$(git -C "${0%/*}" rev-parse --show-toplevel)
 linkcp "$repo/prf" "$config/prf"
 linkcp "$repo/prf/$(hostname)" "$config/profile"
 linkcp "$repo/mods" "$config/mod/${repo##*/}"
@@ -88,8 +80,12 @@ linkcp "$repo/mods" "$config/mod/${repo##*/}"
 In such way your own clean system setup will be as simple as:
 ```bash
 mkdir -p ~/aura && cd ~/aura
+git clone https://github.com/amerlyq/airy
 git clone https://github.com/$yourname/$reponame
-cd $reponame && ./setup
+cd $reponame
+./setup
+cd ../airy
+make -B
 ```
 Note, that in case of using Xorg mods, to fully setup system you must run
 setup command inside Xorg session -- because some vars (like dpi)
