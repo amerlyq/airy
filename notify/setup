@@ -3,4 +3,6 @@
 # deps: fs
 source ~/.shell/func.d/cfgsetup
 
+# TODO: make it required global var in user "prf" instead of fallback
+export DISPLAY="${DISPLAY:-:0}"
 svc_activate -cE notify-user@.service

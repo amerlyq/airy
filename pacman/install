@@ -4,7 +4,8 @@ distro arch || exit
 cwd_origin
 
 # NOTE: create local AUR repo beforehand (ALSO: actualize "bin,ctl" symlinks)
-./setup
+# DISABLED: call setup explicitly in main Makefile target "configure"
+# ./setup -m
 
 ## Install AUR helper
 has_pkgs(){ command pacman -Qq "$@" &>/dev/null; }

@@ -154,6 +154,7 @@ end
 
 
 # Print disassembled frames
+# ALT:BET: (gdb) frame apply all -q -c disassemble $pc-0x8,$pc+0x8
 define frdis
   if $argc == 0
     info frame

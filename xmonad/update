@@ -6,6 +6,6 @@ set -euo pipefail
 running_X && r.n xmonad recompile
 xmonad --recompile
 running_X && xmonad --restart
-svc_activate -urR xmobar
+svc_activate -u$(running_X && echo rR) xmobar
 running_X && r.n OK
 exit 0

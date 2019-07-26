@@ -4,6 +4,8 @@
 source ~/.shell/func.d/cfgsetup
 
 # Choose default shell
+# FIXME: pick default shell directly on clean setup
+#   => BET: pick current shell by "defaults"
 if cfgOpt r; then
   # BAD: when ./setup is called from ranger with SHELL=r.sh
   #   $(which zsh) != ${SHELL:?}

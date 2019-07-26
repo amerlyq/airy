@@ -9,7 +9,7 @@ if distro arch; then
   # [[ $FONT_ST ]] || FONT_ST=$(( dpi * 9/72 + 1))
 
   # BUG: can't override font size from environment BUT: is it robust to allow this ?
-  #   $ FONT_ST=20 r.airy -a st
+  #   $ airyctl FONT_ST=20 -B st
   # echo AAAA:$FONT_ST
 
   # BUG: no errfail when

@@ -8,6 +8,7 @@ pkg_inst diffutils
 pkg_inst diffstat colordiff dwdiff
 
 # ==== X only ====
-has_pr X || die
+# BET:(clean install): separate package for meld -- to exclude it on headless servers
+# has_pr X || die
 # cool text/directory comparator
 pkg_inst meld
