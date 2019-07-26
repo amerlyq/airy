@@ -3,7 +3,8 @@
 #%
 set -euo pipefail -o noglob
 
-read -ra fpretty <<< "${AIRY_PRETTY_STDOUT:-r.airy-pretty}"
+flt=r.airy-pretty && hash "$flt" &>/dev/null || flt=
+read -ra fpretty <<< "${AIRY_PRETTY_STDOUT:-$flt}"
 
 # FAIL: impossible to distinguish if tgts were passed on cmdline or only flags/vars
 #   => (compromise): always append to end args from stdin OR use special single flag

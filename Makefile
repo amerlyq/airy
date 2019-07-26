@@ -15,19 +15,8 @@ $(this): ; @:
 
 # HACK: pass-through recipes into log wrapper
 ifeq ($(MAKELEVEL),0)
-fmk := r.airy-makelog
-fmk := $(if $(shell which $(fmk) 2>/dev/null),$(fmk),$(here)/airy/ctl/makelog)
-% :: .FORCE
-	+'$(fmk)' -f '$(this)' -C '$(here)' $(MAKECMDGOALS)
-else
 
-# [_] FIXME: must "continue" <make all -B> from where it was stopped
-#   => currently simple "continue" from same place won't include "-B"
-
-# BAD: mods may be inside .tar.gz or in subdir -- better to align on Makefile itself "$this"
-# repo := $(shell git rev-parse --show-toplevel)
-
-### Parameters
+### Environment
 export TMPDIR      ?= /tmp/$(LOGNAME)
 # MAYBE: use $XDG_RUNTIME_DIR
 export AIRY_TMPDIR ?= $(TMPDIR)/airy
@@ -41,6 +30,20 @@ export PATH        := $(AIRY_BIN):$(PATH)
 # BUG: on clean install maps "defaults" to "vi"
 EDITOR ?= vi
 
+### Log and colorize
+fmk := r.airy-makelog
+fmk := $(if $(shell which $(fmk) 2>/dev/null),$(fmk),$(here)/airy/ctl/makelog)
+% :: .FORCE
+	+'$(fmk)' -f '$(this)' -C '$(here)' $(MAKECMDGOALS)
+else
+
+# [_] FIXME: must "continue" <make all -B> from where it was stopped
+#   => currently simple "continue" from same place won't include "-B"
+
+### Parameters
+# BAD: mods may be inside .tar.gz or in subdir -- better to align on Makefile itself "$this"
+# repo := $(shell git rev-parse --show-toplevel)
+
 # BUG: some packages (like gcc-multilib) aren't replaced even with -u) due to pacman defaults to [y/N] in --noconfirm
 #   => TRY: disable "--noconfirm"
 # TODO: remove "-m" => always setup
@@ -52,7 +55,7 @@ tsdir := $(AIRY_CACHE)/ts
 # BET:PERF: use directly $ r.airy-mods-make -- flags=-mu all
 # MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
 all: configure upgrade all/all
-configure: $(tsdir)/--configure--
+configure: $(tsdir)/--configure-- pacman/setup pacman/install
 upgrade: $(tsdir)/--upgrade--
 install setup update recache: ; $(&mods) all/$@
 reset: ; $(&mods) reset
@@ -90,16 +93,13 @@ $(tsdir)/--configure--:
 	ln -svfT '$(here)' '$(AIRY_ROOT)'
 	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/airyctl'
 	./airy/setup -m
-	./pacman/setup -m
+	mkdir -p '$(@D)'
 	touch '$@'
 
 # NOTE: connect pacman to tty instead of logs
 $(tsdir)/--upgrade--:
 	echo '$(@F)'
 	./pacman/update -u > /dev/tty
-
-defaults: clean configure
-	r.airy -sd
 
 tags:
 	r.airy-cache-tags -L ~/.cache/airy/tags

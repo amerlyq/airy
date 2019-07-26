@@ -69,6 +69,7 @@ export LISTS_STORE_DIR ?= $(AIRY_TMPDIR)
 flags :=
 skip :=
 # NOTE: each subpath is barrier when installing targets in batch
+# MAYBE: add last barrier --defaults-- to update all defaults after new package installed
 subpaths := cleanup install setup update recache
 tsdir := $(AIRY_TMPDIR)/ts
 
