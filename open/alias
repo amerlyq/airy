@@ -1,5 +1,10 @@
 # vim: ft=sh
 
-# For 'vienv' fast shebang template
-! _has_pr vienv || while IFS= read -r s; do alias vi$s="vienv $s"
-done < <(sed -rn '/case/,/esac/{/\s*(in|;;)\s+(\w+)\).*/s//\2/p}' "$(which vienv)")
+alias vias='re-elf kirie/new/asm'
+alias vish='re-elf kirie/new/bash'
+alias vicc='re-elf kirie/new/c'
+alias vicp='re-elf kirie/new/cpp'
+alias vimk='re-elf kirie/new/make'
+alias vipl='re-elf kirie/new/perl'
+alias vipy='re-elf kirie/new/python'
+alias vizh='re-elf kirie/new/zsh'

@@ -11,7 +11,8 @@ augroup filetypedetect
   " Asm
   au BufRead,BufNewFile *.asm  setl ft=masm syntax=masm
   au BufRead,BufNewFile *.inc  setl ft=masm syntax=masm
-  au BufRead,BufNewFile *.[sS] setl ft=gas syntax=gas
+  au BufRead,BufNewFile *.s    setl ft=nasm syntax=nasm
+  au BufRead,BufNewFile *.S    setl ft=gas syntax=gas
   au BufRead,BufNewFile *.hla  setl ft=hla syntax=hla
   " Configuration
   au BufRead,BufNewFile {Gemfile,Gemfile.lock,Rakefile,Thorfile,Vagrantfile}  setl ft=ruby fdm=syntax fdn=1

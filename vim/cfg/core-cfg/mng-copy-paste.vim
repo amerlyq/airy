@@ -176,6 +176,8 @@ function! GetLineBookmark(idt, text, ...)
   " NOTE: we can add mechanics to insert strings directly to file! or xmind.otl!
 endfunction
 
+" TODO:DEV: use "3[Frame].y" to <fixate> current copy-indent to "3"
+"   => useful when copying sources outline function by function
 nnoremap <unique>  [Frame]y
   \ :<C-u>call GetLineSpoiler(v:count1, TrimIndents(getline('.')), 1)<CR>
 vnoremap <unique>  [Frame]y
