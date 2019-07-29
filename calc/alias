@@ -1,13 +1,19 @@
 # vim:ft=sh
 
 # printf '%x\n' "$((2#101010101))"
-hex() { local REPLY
+hex_calc() { local fmt=$1; shift
+  local REPLY
   if [[ -t 0 ]]; then
-    printf "%08lx\n" $(($*))
+    printf "$fmt\n" $(($*))
   else while IFS= read -r; do
-    printf "%08lx\n" $((REPLY))
+    printf "$fmt\n" $((REPLY))
   done; fi
 }
+
+alias hex='hex_calc "0x%lx"'
+alias hxx='hex_calc "%lx"'
+alias hx0='hex_calc "%08lx"'
+alias hx0x='hex_calc "0x%08lx"'
 
 dec() { printf "%s\n" $(($*)); }
 

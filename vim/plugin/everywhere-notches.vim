@@ -18,7 +18,7 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 " TODO: separate doc page with all available notches
 let s:patterns = [
-  \ ['Err', 196, '#ff2525', 'RED|RQ|REQUIRE|ERR%(OR)?|BUG|REGR%(ESSION)?|XXX|WTF|BAD|FAIL%(ED|URE)?|CRIT%(ICAL)?'],
+  \ ['Err', 196, '#ff2525', 'RED|Qs|RQ|REQUIRE|ERR%(OR)?|BUG|REGR%(ESSION)?|XXX|WTF|BAD|FAIL%(ED|URE)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'GREN|ADD|NEED|FIND|ALSO|BET%(TER)?|E\.G|e\.g'],
   \ ['Ref',  28, '#00af00', 'SEE|READ|REF%(ERENCE)?|TUT%(ORIAL)?|BLOG|BOOK|LIOR|LORE'],
   \ ['Alt', 178, '#dfaf00', 'YELW|ALT|OR|CASE|THINK|IDEA|CHG|RENAME|CMP|I\.E|i\.e|EXAM%(INE)?'],

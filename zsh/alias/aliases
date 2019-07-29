@@ -28,7 +28,7 @@ fi
 
 # Line trim W/H to term size (w/o two prompts and errcode)
 alias -g LW='| expand | cut -c-"$(tput cols)"'
-alias -g LT='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'
+alias -g HH='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'
 
 if (($+commands[$EDITOR])); then
   # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
@@ -50,8 +50,19 @@ fi
 alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-running cmds.
 
 ## Filters
-alias -g H='|head'  # ALSO:(rest): tail -n +11
+alias -g H='|head'
+alias -g H1='|head -1'
+alias -g H2='|head -2'
+
 alias -g T='|tail'
+alias -g T1='|tail -1'
+alias -g T2='|tail -2'
+
+# ALSO:(rest):
+alias -g R='|tail -n +11'
+alias -g R1='|tail -n +2'
+alias -g R2='|tail -n +3'
+
 alias -g C='|wc -l'
 alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
