@@ -13,7 +13,7 @@ alias auri='aur sync --no-view'         # install
 alias aurI='_a(){ auri "$1" && paci "$1"; }; _a'         # install
 alias aurl='pacman -Sl aur'   # list installed aur pkgs
 alias aurs='aur search'
-function aurS { aur pkglist -P "$@" | xargs aur search -i; }    # search pkgname by regex
+function aurq { aur pkglist -P "$@" | xargs aur search -i; }    # search pkgname by regex
 
 alias aur\?='pacman -Slq aur | grep -vxFf <(aur pkglist)'       # unknown pkgs (not from AUR)
 
