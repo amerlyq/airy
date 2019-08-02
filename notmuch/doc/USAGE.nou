@@ -1,0 +1,23 @@
+Update and pre-tag
+  $ notmuch new
+  $ r.notmuch-afew $acc -- -vvv --new --tag
+  $ r.notmuch-afew $acc -- -vvv --new --move
+
+Mark old mails again for repeated sorting
+  $ r.notmuch $acc -- tag +new folder:INBOX and from:github.com
+
+Rename tag globally
+  $ r.notmuch $acc -- tag tag:aaa -aaa -bbb
+
+Manually add tags
+  $ notmuch tag +github-issues folder:neomutt and tag:tofilter and from:github.com
+  $ notmuch tag -tofilter tag:tofilter and from:gui-gui@netcourrier.com
+
+Notify new -- only if attention required
+  $ test $(notmuch count tag:tofilter and tag:unread) == 0 || notify-send -h 'string:bgcolor:#3579a8' -h 'string:fgcolor:#d0d0d0' mutt "$_ new messages"
+
+Show all and every tag currently in use
+  $ r.notmuch $acc -- search --output=tags '*'
+
+Count mails before deciding to query headers preview
+  $ r.notmuch $acc -- count 'to:example.com'

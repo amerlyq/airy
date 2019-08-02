@@ -1,12 +1,18 @@
 % Notmuch (search all folders)
 
-BUG
+TODO
+  [_] FIXME:BET: use short tag names to fit more tags into neomutt index_format for notmuch
+  [_] TODO: keep flagged messages in inbox !despite having other tags!
+    => MAYBE! even move back all flagged messages from other places
   [_] MOVE dir /.notmuch to another location (error for mbsync)
     REQ:DEV: http://notmuch.198994.n3.nabble.com/PATCH-WIP-support-XDG-database-directory-td4039047.html
     https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1576871.html
     ::: TEMP:FIXED: set "SubFolders Verbatim" in mbsyncrc
 
   [_] BAD: slow notmuch 'vfolder-from-query'
+    2019-08-01 [X] CHECK:MAYBE: everything is slow due to "header_cache|message_cachedir" when processing virtual mailbox
+      ::: even with disabled cache we still need 3 sec for 9000 messages
+    [_] ALT:USE: set nm_db_limit = 200  # DFL=0 for unlimited listing
     https://raw.githubusercontent.com/karelzak/mutt-kz/master/README.notmuch
     REQ: ask on irc:#neomutt
     TRY: filter msgs in curr dir by #id instead of temp Mailbox of symlinks
@@ -17,17 +23,22 @@ BUG
   [_] BUG: fix 'save =Sent to current dir' for case of virtual dir of 'notmuch'
     new: save to =INBOX / last dir before virtual
     reply: save to same dir as mail itself (extract its dir)
+    SEE: :/mutt/ :: BUG:(set record=^)
 
 
 TODO
   !0 [_] USE: notmuch integration
-    https://wiki.archlinux.org/index.php/Notmuch
-    https://neomutt.org/feature/notmuch
-    https://neomutt.org/feature/custom-tags
-    https://blitiri.com.ar/p/other/mutt-labels/
-    https://github.com/tsto/notmuchfs
-    https://notmuchmail.org/special-tags/
-    https://notmuchmail.org/notmuch-mutt/
+    [_] https://github.com/tsto/notmuchfs
+    [_] https://notmuchmail.org/notmuch-mutt/
+    2019-08-01 [X] https://notmuchmail.org/special-tags/
+    2019-08-01 [X] https://wiki.archlinux.org/index.php/Neomutt
+    2019-08-01 [X] https://wiki.archlinux.org/index.php/Notmuch
+    2019-08-01 [X] https://notmuchmail.org/mutttips/
+    2019-08-01 [X] https://blitiri.com.ar/p/other/mutt-labels/
+    2019-08-01 [X] https://neomutt.org/feature/notmuch
+    2019-08-01 [X] https://neomutt.org/feature/custom-tags
+    2019-08-01 [X] https://gist.github.com/guiniol/5109c5bd953af950e0530b720507d704
+    2019-08-01 [X] https://kdecherf.com/blog/2018/02/25/reconstruct-thread-with-neomutt-and-notmuch/
   [_] TRY: mairix
     https://gitlab.com/muttmua/mutt/wikis/MuttFaq/Maildir
   [_] TRY: mutt-viewer mode (ranger integration)
@@ -56,3 +67,4 @@ TRY
       - run afew against all your old mail by running afew --tag --all
       - start :doc:`extending` afew
     https://github.com/pazz/alot
+    SEE:(alt strategies): https://notmuchmail.org/initial_tagging/
