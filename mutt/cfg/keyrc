@@ -1,4 +1,4 @@
-# vim:ft=muttrc
+# vim:ft=neomuttrc
 ### Key Bindings
 # REF
 #   http://www.mutt.org/doc/manual/#bind
@@ -16,14 +16,29 @@
 
 # TODO: move 'help' from <F1> to somewhere else. Like 'g?'
 
-# Switch folders
-macro index,browser  ,i  "<change-folder>!<enter>"       "Go to inbox"
-macro index,browser  ,l  "<change-folder>^<enter>"       "Go to last"
+## Plugins
+macro index,pager  \Cs  "| $my_cache/exe/save /tmp/msg/"
 
-# Plugins
-bind index,pager  \\ vfolder-from-query
-macro index,pager  S  "| $my_cache/exe/save /tmp/msg/"
-# <enter>
+## Notmuch virtfolders
+# OR: macro index \\\\ "<vfolder-from-query>" "Search mailbox"
+macro index  x  "<change-vfolder>?" "Change to vfolder overview"
+bind  index  [  vfolder-window-forward
+bind  index  ]  vfolder-window-backward
+## REF: https://kdecherf.com/blog/2018/02/25/reconstruct-thread-with-neomutt-and-notmuch/
+bind  index,pager  E  entire-thread
+# bind  index,pager  +  entire-thread
+bind  index,pager  y  modify-labels
+bind  index,pager \\  vfolder-from-query
+bind  index,pager \e\\  vfolder-from-query-readonly
+
+macro index,pager  S  '<modify-labels>+archive -unread -inbox<enter>'           "Archive message"
+macro index,pager  D  '<modify-labels-then-hide>-inbox -unread +junk<enter>'    "Tag as Junk mail"
+# macro index,pager  D  '<modify-labels-then-hide>-inbox -unread +junk<enter><sync-mailbox><next-undeleted>'    "Tag as Junk mail"
+# macro index,pager tt "<modify-labels>!todo\n" "Toggle the 'todo' tag"
+# macro index + "<modify-labels>+*\\n<sync-mailbox>"    # tag as starred
+# macro index - "<modify-labels>-*\\n<sync-mailbox>"    # tag as unstarred
+
+
 
 macro index  v  <tag-pattern>~A<enter>      "select all"
 macro index  V  <untag-pattern>all<enter>   "clear selection"
@@ -35,7 +50,7 @@ macro index  +  <limit>all<enter>        "limit reset"
 macro index '"' <limit>all<enter>        "limit reset"
 macro generic,pager <f09> "<shell-escape>$my_cache/exe/sync $my_acc<enter>"   "Index notmuch db"
 # BUG: after reloading gmail requires to accept cert
-macro generic,pager <f12> ":source $my_cache/acc/$my_acc<enter>"
+macro generic,pager <f12> "<enter-command>source $my_cache/acc/$my_acc<enter>"
 
 # EXPL: Trick to open second copy of mutt to view mail beside editing answer
 # bind pager \Ce $TERMINAL -e mutt -R
@@ -43,13 +58,29 @@ macro generic,pager <f12> ":source $my_cache/acc/$my_acc<enter>"
 # bind index,pager  B  sidebar-toggle-visible
 bind index,pager  <Tab>     sidebar-toggle-visible
 bind index,pager  <BackTab> sidebar-toggle-visible
-bind index,pager  (  sidebar-prev
-bind index,pager  )  sidebar-next
 bind index,pager  _  sidebar-open
+bind index,pager \`  sidebar-toggle-virtual
+macro index,pager  (  "<sidebar-prev><sidebar-open><sync-mailbox>"
+macro index,pager  )  "<sidebar-next><sidebar-open><sync-mailbox>"
+
+## BET:USE:FUTURE:
+# bind index,pager \CJ sidebar-next
+# bind index,pager \CK sidebar-prev
+# bind index,pager \CL sidebar-open
 
 # Swap sorting direction
 bind index  o  sort-reverse
 bind index  O  sort-mailbox
+
+# Swap quit and query
+bind index  A  query
+# bind index  q  query
+# bind index  Q  quit
+
+# Swap log and compose
+bind index '^' show-log-messages
+bind index,pager  M  compose-to-sender
+
 
 # STD: \e[ulc] -- make word upper/lower/capital
 # STD: \ed -- kill-eow
@@ -84,7 +115,7 @@ bind index,pager  r  group-reply
 bind index,pager  R  reply
 bind index,pager  p  recall-message  # postponed
 bind index,pager  F  sync-mailbox
-bind index,pager  x  imap-fetch-mail # fetch-mail OR "!getmail" (external)
+bind index,pager  X  imap-fetch-mail # fetch-mail OR "!getmail" (external)
 
 bind index,pager  {  previous-new-then-unread
 bind index,pager  }  next-new-then-unread
@@ -110,7 +141,8 @@ bind index  L  bottom-page
 
 ## Collapsing
 # macro index \R '<read-thread><collapse-thread><next-unread>' 'Mark the current thread as read'
-macro index  c  ':set my_tmp=$collapse_unread<enter>:set collapse_unread<enter><collapse-thread>:set collapse_unread=$my_tmp<enter>' 'Collapse thread.'
+# BUG: adds commands to ":" cmd history -- obstructs view of my own commands
+macro index  c  '<enter-command>set my_tmp=$collapse_unread<enter>:set collapse_unread<enter><collapse-thread>:set collapse_unread=$my_tmp<enter>' 'Collapse thread.'
 macro index \Ch 'c' '(Un)collapse thread'
 macro index \C? 'c' '(Un)collapse thread'
 macro index <BackSpace> 'c' '(Un)collapse thread'
@@ -173,3 +205,10 @@ bind compose  L  edit-file
 bind compose  p  postpone-message
 bind compose  P  pgp-menu
 bind compose \Cp print-entry
+
+## Edit in new window
+# macro compose E 'qy<shell-escape>termite -e "zsh -c \"/usr/bin/mutt -F <(cat ~/.config/mutt/muttrc ~/.config/mutt/external-editor.muttrc) -p\"" >/dev/null 2>&1 &<enter>' "Edit in new window"
+
+# Swap
+bind compose  R  rename-attachment
+bind compose \CO rename-file

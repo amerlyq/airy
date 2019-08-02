@@ -1,4 +1,4 @@
-# vim:ft=muttrc:ts=2:sw=2:sts=2
+# vim:ft=neomuttrc:ts=2:sw=2:sts=2
 
 # THINK: define VAR my_c_* for each color type and source that file before colorscheme
 #   => use $my_c_* instead of directly specifying colors below
@@ -124,6 +124,10 @@ color tree          yellow          default         # arrow in threads
 color hdrdefault    brightgreen     default
 color header        brightyellow    default         "^(From)"
 color header        blue            default         "^(Subject)"
+color header        color214        default         "^(Tags)"
+color index_tag     color214        default         "inbox"
+color index_tags    color214        default         # no pattern
+
 
 ### body -----------------------------------------------------------------
 
@@ -145,6 +149,9 @@ color body          brightcyan      default         "[*]?((N)?ACK|CU|LOL|SCNR|BR
                                                      |IRL|RTFM|ROTFL|ROFL|YMMV)[*]?"
 color body          brightcyan      default         "[ ][*][^*]*[*][ ]?" # more emoticon?
 color body          brightcyan      default         "[ ]?[*][^*]*[*][ ]" # more emoticon?
+
+## IDEA: highlight my everywhere-notches
+color body          brightmagenta   default         "WARNING: .*"
 
 ## pgp
 
@@ -178,6 +185,11 @@ color body          red             default         "([a-z][a-z0-9+-]*://(((([a-
 # Border lines.
 color body          brightmagenta     default         "( *[-+=#*~_]){6,}"
 
+color compose header            color81        default
+color compose security_both     brightgreen    default
+color compose security_sign     brightmagenta  default
+color compose security_encrypt  brightyellow   default
+color compose security_none     brightred      default
 
 # THINK: move into acc?
 #folder-hook .                  "color status        J_black         J_status        "

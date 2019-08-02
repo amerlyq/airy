@@ -1,4 +1,15 @@
 TODO
+  2019-08-01 [X] BUG: unread counter not updated
+    ::: use upstream git REF: https://www.linux.org.ru/forum/general/14776333
+  [_] BUG: neomutt don't display notmuch tags in "regular" index -- only in virtual mailboxes
+    2019-08-01 [X] CHECK if we have tags in notmuch DB by cmdline query ::: OK
+    2019-08-01 [X] neomutt can't display them in %Y/%g -- only manually added <edit-label> which modify mail body are shown
+    BAD: seems like "Tags:" header is only shown for Notmuch virtual boxes
+      => in default index only "X-Labels:" header available, which modifies mail-file itself
+    [_] G: show notmuch tags for regular index / mailbox
+  2019-08-01 [X] FIND:BUG:(set record=^): can't reply after switching to vmbox due to "Fcc:notmuch://"
+    ::: use virtual mailboxes from notmuch to combine mails from "Sent" and "Inbox" into threads
+      REF: https://www.reddit.com/r/commandline/comments/53dh17/mutt_getting_thread_replies_in_inbox/
   [_] BUG: "index" view replaces column (10K) of msg.size -> by (222) of msg.char_length when you open it (when it's cached in ~/.config/)
     => TODO: show msg size always (to detect and delete big messages) and char length only when necessary (to assume how much you need to read)
   [_] BUG: can't open Maildir if no =INBOX i.e. when mbsync copied only some other single directore
@@ -12,9 +23,16 @@ TODO
      # When OutLook receives email it will put it at the
      # top of their mailbox list and flag it with an "urgent"
      # red box. Just another way to play with Outlook/LookOut users.
-     my_hdr X-Message-Flag: OUTLOOK WARNING!! Use Open Source
+     unmy_hdr *
+     my_hdr X-Message-Flag: WARNING!! Outlook sucks
      my_hdr Reply-By: `date --date="-3 days"`
      my_hdr X-MSMail-Priority: High
+     Remind about Follow-Up
+      mailMessage.Headers["X-Message-Flag"] = "Follow up";
+      mailMessage.Headers["Reply-By"] = DateTime.Now.AddDays(1).ToString("ddd, dd MMM yyyy HH:mm:ss %K");
+    VIZ: http://jkorpela.fi/headers.html
+    READ: Reply-To: https://derickrethans.nl/the-entertainment-value-of-replyto-headers.html
+    NEED: set edit_headers=yes
   [_] import calendar events from mutt
   [_] mutt show whole mailbox tree -- to show unread/important per folder on the right
   [_] BUG mutt -- opens html attachments only on second time => otherwise "file not found"
@@ -181,10 +199,11 @@ mutt
     https://hynek.me/articles/fleeing-from-gmail/
     https://blog.bartbania.com/raspberry_pi/consolify-your-gmail-with-mutt/
 
-  Security
+  SECU: sign your mails
     http://dev.mutt.org/trac/wiki/MuttGuide/UseGPG
     http://codesorcery.net/old/mutt/mutt-gnupg-howto
     http://jasonwryan.com/blog/2013/07/20/gnupg/
+    ++ https://hispagatos.org/blog/2019-02-02-neomutt-gnupg-and-pass-howto/
 
   Useful additional additions
     http://cedricduval.free.fr/mutt/patches/#trash

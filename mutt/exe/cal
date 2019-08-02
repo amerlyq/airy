@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#%SUMMARY: convert calendar events to text format
+set -euo pipefail
+
+exec khal printics --format "
++----------------+
+| Calendar Event |
++----------------+
+Event........{repeat-symbol}{title}
+Location.....{location}
+Start........{start-date-long} {start-time-full}
+End..........{end-date-long} {end-time-full}
+Status.......{status}
+Description:
+{description}
+" "$@" | tail -n +3

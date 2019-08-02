@@ -1,4 +1,17 @@
-SEE
+TODO
+  [_] create graphviz flow for mails in my dir structure
+  [_] sort all messages by my newly proposed criteria
+  [_] determine similarity in resulting groups and create subgroups
+    => use "notmuch show" query on all messages and sort-uniq-count groups to find majors
+  [_] sort spam on local machine only
+    - maybe setup local mail server for auto-sort incoming messages
+    - fetch mail by cron ? or by that local mail server ?
+  [_] auto-tag messages
+  [_] full mailbox search
+  !! re-enable sync service
+
+
+INFO
   The nine stages of a message
     NICE: https://flylib.com/books/en/1.391.1.74/1/
 
@@ -61,6 +74,7 @@ ALG
     - "rfc" = proposals
     - "lst" / "forum" = mail lists / groups
     - "done"
+    - "org" / "mgmt"
   Role-items
     - "my" / "employee" (org/company)
     - "my" / "personal" (well-being, personal mailing)
@@ -91,17 +105,23 @@ CHG:TODO: I sort mails, which I don't give a shit for
   * sort all that have filter
   * move all other mails to "spam"
     == flag with "spam-probability" to look at spam sometimes
+      TRY: use spamassassin to divide mails by score
     MAYBE: move spam into week's folder "spam/2018-09=1" for "unspamming" at the end of each week
+    MAYBE: categorize some spam (jira/bitbucket) to reduce sheer number of mails in box
+    MAYBE: must differentiate between "spam", "junk" and
+  * "idontcare" -- folder for everything not spam but not important either
   * archiving old projects
     => collect folders "log"/"ntf"/"done" and move into "archived-old-pj"/<pjname>/*
 
 
 BET: combine permanent principal dirs (action-items) and transient tags (auto-categorize for faster overview)
-  * "t" talking threads -- discuss of smth
+  * "t" / "history" talking threads -- discuss of smth
   * "todo" tasks/events requiring some actions -> move into "done" after completion
   * "my" my personal important stuff as employee, unrelated to project itself -- vacation,hardware,sdesk
-  * "tech","todo" reusable info -- to process and move to "processed" folder
-  * "rule", org info (with expiration time)-- new people,workflow,rules(codeofconduct) -- use as reference material on demand
+  * "tech","todo" reusable info -- to process and move to "processed"/"seized" folder
+    RENAME: "tech" -> "use" and apply "todo"/"job"/"work" only for work issues
+      NOTE:BET: if "work" has subfolders for projects -- USE: shorter pfx :: ./wk.<pj>
+  * "rule", "org" info (with expiration time)-- new people,workflow,rules(codeofconduct) -- use as reference material on demand
    => rules doesn't touch me directly or immediately (general rules) -- due to not involved to situations
     ?? similar to "inf" or "ref"
   * "inf", very-low-priority info -- vacancy,training -- 0.1% probability to be used some day
@@ -110,22 +130,22 @@ BET: combine permanent principal dirs (action-items) and transient tags (auto-ca
   * "spam", everything else -- orgspam,unrelated,market,etc -- 0% used (sure-spam move into subfolders)
 
 
-TODO
-  [_] create graphviz flow for mails in my dir structure
-  [_] sort all messages by my newly proposed criteria
-  [_] determine similarity in resulting groups and create subgroups
-    => use "notmuch show" query on all messages and sort-uniq-count groups to find majors
-  [_] sort spam on local machine only
-    - maybe setup local mail server for auto-sort incoming messages
-    - fetch mail by cron ? or by that local mail server ?
-  [_] auto-tag messages
-  [_] full mailbox search
-  !! re-enable sync service
-
-
 ALT:NEED:(pending) create online pre-sorting rules on server
   All emails from case updates, bugzilla, etc to _pending
   All emails containing ‘list’ or ‘bounces’ in from to _pending
   All emails not containing me directly on CC or To, to _pending
   pending = acc['INBOX/_pending']:select_all()
   todos = pending + inbox -- USE todos everywhere next
+
+
+%%% Dataflow
+  INBOX --> "new"
+  "flagged" (any in thread) = keep whole thread in =INBOX
+  "replied" = move whole thread (together with answer) into =history when "flagged" is removed
+    FAIL: must again add +new to apply filtering once more
+      <= https://notmuchmail.org/pipermail/notmuch/2015/020293.html
+    ALT: don't remove "new" until actually becomes subject to moving e.g. removed "keep"/"hold" flag
+  "spam,ntf,log" --> immediately into =spam,=... and distribute there further what is possible
+    -- BAD: results in two moves one by one -- MAYBE:BET: two-stage moving ?
+  "unread" = keep rest which don't match other filters
+    -- BUT:MOVE:(when I read them): "to:me" -> =dontcare | others -> =junk

@@ -2,16 +2,41 @@
 # vimprobable. The default, however, is determined by the copiousoutput tag.
 # So, in mutt it is just a matter of hitting v to view the attached HTML and
 # then m to send it to mailcap. For convenience, I bind Enter to that function in muttrc.
+
+## HTML
 #text/html; vimprobtab.sh %s &; test=test -n "$DISPLAY"; needsterminal;
 text/html; t="${TMPDIR:-/tmp}/mutt" \; mkdir -p "$t" \; cp -ft "$t" %s \; r.b "$t/$(basename %s)" &; test=test -n "$DISPLAY"; nametemplate=%s.html
 text/html; r.bt -d; copiousoutput; nametemplate=%s.html
+# text/html; lynx -assume_charset=%{charset} -display_charset=utf-8 -dump %s; nametemplate=%s.html; copiousoutput
 # text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
 # text/html; elinks -dump %s ; copiousoutput
+
+
+## Documents
 application/msword; antiword '%s'; copiousoutput; description=Word Document; nametemplate=%s.doc
 # application/pdf; pdftotext '%s' -; copiousoutput; description=PDF Document; nametemplate=%s.pdf
-application/*; ~/.config/ranger/scope.dash %s; copiousoutput
+# application/pgp-keys; pgp -f < %s ; copiousoutput
 message/rfc822; mshow -nBFN '%s'
+
+
+## Media
 image/*; pqiv %s; test=test -n "$DISPLAY"
+# image/*; imv %s
+
+
+## Calendar
+# NOTE: show calendar summary and add entry to agenda
+# ALT: ; print=khal import --batch -a email@somewhere.com %s
+# DEBUG: apply <save-attach> to "text/calendar" and check cmdline manually
+#  <= copiousoutput won't show anything in mail body if errorcode != 0
+# BAD:NEED:(set show_multipart_alternative = inline): to show it in mail preview
+text/calendar; ~/.config/mutt/exe/cal %s; copiousoutput; nametemplate=%s.ics; print=khal import --batch -a private %s
+application/ics; ~/.config/mutt/exe/cal %s; copiousoutput; nametemplate=%s.ics; print=khal import --batch -a private %s
 # BUG: text/calendar; r.gcalcli import -d; copiousoutput
+
+
+## Fallback
 text/*; ~/.config/mutt/exe/editor -c "e ++enc="%{charset} %s
+application/*; ~/.config/ranger/scope.dash %s; copiousoutput
+# application/*; background-xdg-open.sh %s
 */*; xdg-open %s
