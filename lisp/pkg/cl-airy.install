@@ -1,0 +1,20 @@
+# arg 1: the new package version
+post_install() {
+  echo ">>> Compiling Lisp files to *.fasl"
+  # NOTE: use sbcl built-in "asdf" to compile sources
+  # TRY: use newly installed "/usr/share/common-lisp/source/asdf" to allow storing compiled cache directly in rootfs near *.lisp files or in /var/{cache,tmp}/
+  #   => otherwise all *.fasl are placed in ~/.cache/common-lisp/*
+  sbcl --no-userinit --disable-debugger --eval '(require :asdf)' \
+    --eval "(asdf:operate 'asdf:compile-op 'sdl2)"
+}
+
+post_upgrade() {
+  post_install "$1"
+}
+
+pre_remove() {
+  # FIXME: use different dir for each package
+  find /usr/share/common-lisp/source/sdl2 -type f \( -name '*.fas' -o -name '*.lib' \) -delete
+}
+
+"$@"

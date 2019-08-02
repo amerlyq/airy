@@ -1,0 +1,126 @@
+# HACK: use temporary quicklisp to install split-packages with all deps
+#   e.g. sdl2 -> cl-autowrap-git -> c2ffi-git -> alexandria ...
+# BET: create separate packages BAD: quicklisp will be downloaded and rebuilt each time
+pkgbase=cl-airy
+pkgname=(
+  'cl-sdl2-airy'
+  'cl-alexandria-airy'
+  'cl-autowrap-airy'
+  'cl-babel-airy'
+  'cl-bordeaux-threads-airy'
+  'cl-cffi-airy'
+  'cl-defpackage-plus-airy'
+  'cl-json-airy'
+  'cl-ppcre-airy'
+  'cl-trivial-channels-airy'
+  'cl-trivial-features-airy'
+  'cl-trivial-timeout-airy'
+)
+pkgver='20181007'
+pkgrel=1
+pkgdesc='Common Lisp wrapper bundle for the SDL 2.0 C Library'
+url="https://github.com/lispgames/cl-sdl2"
+arch=('any')
+license=('MIT')
+groups=("$pkgbase")
+depends=('sdl2')
+optdepends=('sbcl')
+makedepends=('sbcl')
+source=('https://beta.quicklisp.org/quicklisp.lisp')
+sha256sums=('4a7a5c2aebe0716417047854267397e24a44d0cce096127411e9ce9ccfeb2c17')
+
+# TRY:USE: instead of (quit) $ sbcl --script - << EOT
+prepare() {
+sbcl --no-userinit --disable-debugger --load ./quicklisp.lisp <<EOT
+  (ignore-errors (quicklisp-quickstart:install :path "$PWD/quicklisp"))
+  (load "$PWD/quicklisp/setup")
+  (ql:quickload :sdl2)
+  (quit)
+EOT
+}
+
+pkgver() {
+  # NOTE: extract timestamp version from filepath
+  local _fpath="dists/quicklisp/installed/releases/cl-sdl2.txt"
+  grep -oP '[0-9.]+(?=-git/$)' "$PWD/quicklisp/$_fpath"
+}
+
+# CHECK:BAD? can't asdf-build code -- because it hardcodes all paths => ALT: build in post_install()
+# build(){ ... }
+
+_package(){
+  local _pkg=$1       # "${1:-${pkgname%-airy}}"
+  local _nm=${2-$1}   # "${2:-${_pkg#${3:-cl-}}}"
+  conflicts=("cl-${_pkg#cl-}")
+
+  cd "$PWD/quicklisp/$(cat "$PWD/quicklisp/dists/quicklisp/installed/releases/$_pkg.txt")"
+  local cl="${pkgdir}/usr/share/common-lisp"
+  install -d "$cl/source" "$cl/systems"
+  cp -a ./. "$cl/source/$_nm"
+  ln -sr "$cl/source/$_nm/$_nm.asd" "$cl/systems/$_nm"
+}
+
+package_cl-sdl2-airy() {
+  depends=( 'sdl2'
+    'cl-alexandria-airy'
+    'cl-autowrap-airy'  # + 'cl-plus-c-airy'
+    'cl-ppcre-airy'
+    'cl-trivial-channels-airy'
+    'cl-trivial-features-airy'
+  )
+  install=_airy/$pkgbase.install
+  _package cl-sdl2 sdl2
+}
+
+package_cl-alexandria-airy() {
+  depends=()
+  _package alexandria
+}
+package_cl-autowrap-airy() {
+  depends=('cl-cffi-airy'
+    'cl-alexandria-airy'
+    'cl-json-airy'
+    'cl-ppcre-airy'
+    'cl-defpackage-plus-airy'
+    'cl-trivial-features-airy'
+  )
+  # TODO: personal file per each split-package to compile sources on install
+  # install=_airy/$pkgname.install
+  _package cl-autowrap
+}
+package_cl-babel-airy() {
+  depends=('cl-alexandria-airy' 'cl-trivial-features-airy')
+  _package babel
+}
+package_cl-bordeaux-threads-airy() {
+  depends=('cl-alexandria-airy')
+  _package bordeaux-threads
+}
+package_cl-cffi-airy() {
+  depends=('cl-alexandria-airy' 'cl-trivial-features-airy' 'cl-babel-airy')
+  _package cffi
+}
+package_cl-defpackage-plus-airy() {
+  depends=('cl-alexandria-airy')
+  _package defpackage-plus
+}
+package_cl-json-airy() {
+  depends=()
+  _package cl-json
+}
+package_cl-ppcre-airy() {
+  depends=()
+  _package cl-ppcre
+}
+package_cl-trivial-channels-airy() {
+  depends=('cl-bordeaux-threads-airy' 'cl-trivial-timeout-airy')
+  _package trivial-channels
+}
+package_cl-trivial-features-airy() {
+  depends=()
+  _package trivial-features
+}
+package_cl-trivial-timeout-airy() {
+  depends=()
+  _package trivial-timeout
+}

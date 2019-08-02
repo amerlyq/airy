@@ -1,6 +1,13 @@
 #!/bin/bash -eu
 source ~/.shell/func.d/packages
 
-# pkg_mngr: https://www.quicklisp.org/beta/
-pkg_inst sbcl
-# pkg_inst clisp
+pkg_inst sbcl  # clisp
+
+# USAGE: $ rlwrap sbcl
+pkg_inst rlwrap
+
+# BAD: aur_inst quicklisp
+# USAGE:(rebuild): $ airyctl lisp -B flags=mU
+loc_inst ./pkg/quicklisp-airy.pkgbuild
+
+loc_inst ./pkg/cl-airy.pkgbuild

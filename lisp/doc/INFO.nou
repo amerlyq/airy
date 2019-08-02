@@ -1,0 +1,39 @@
+Quicklisp
+  REF: https://www.quicklisp.org/beta/
+
+  Install new package
+    $ sudo sbcl --no-userinit --disable-debugger --load /etc/default/quicklisp --eval '(progn (ql:quickload "sdl2") (quit))'
+  Remove old packages
+    BAD: don't actually works
+    (map nil 'ql-dist:clean (ql-dist:all-dists))
+      To load a system, use: (ql:quickload "system-name")
+      To find systems, use: (ql:system-apropos "term")
+      To load Quicklisp every time you start Lisp, copy the lines from /etc/default/quicklisp to your ~/sbclrc or ~/.ccl-init.lisp
+  Installed dependencies
+    https://lisp.com.br/quicksys/
+    AVAILABLE: * (ql:system-apropos "")
+    LOCAL: * (ql-dist:installed-releases (ql-dist:dist "quicklisp"))
+
+  Install into $HOME to support user projects
+    $ wget https://beta.quicklisp.org/quicklisp.lisp
+    $ sbcl --no-userinit --disable-debugger --load ./quicklisp.lisp \
+      --eval "(quicklisp-quickstart:install :path \"$HOME/.local/quicklisp\")" \
+      --eval "(load \"$HOME/.local/quicklisp\")" \
+      --eval '(ql:quickload :sdl2)'
+    $ cat ~/.sbclrc
+     (load "~/.local/quicklisp")
+
+
+Dependencies documentation
+  BET? quickdocs
+  https://stackoverflow.com/questions/38684906/how-to-get-package-documentation-in-quicklisp
+
+
+Roswell
+  https://www.juev.org/2017/02/23/roswell/
+  [_] MAYBE: for roswell use ~/.roswell -> ~/.cache/roswell
+
+
+Slimv
+  [_] https://github.com/kovisoft/slimv
+    TUT: https://kovisoft.bitbucket.io/tutorial.html

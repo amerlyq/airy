@@ -1,0 +1,10 @@
+post_install()
+{
+  echo -e "\e[32m"
+  echo "==== quicklisp installed ===="
+  echo "SEE: http://www.quicklisp.org/beta/"
+  echo "LOAD: (ql:quickload \"system-name\")"
+  echo "SEARCH: (ql:system-apropos \"term\")"
+  echo "STARTUP: /etc/default/quicklisp --> ~/.sbclrc"
+  echo -e "\e[0m"
+}

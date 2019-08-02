@@ -1,0 +1,29 @@
+pkgname=quicklisp-airy
+pkgver="20150128"
+pkgrel=1
+pkgdesc="A library manager for Common Lisp"
+arch=('any')
+url="https://www.quicklisp.org"
+license=('custom:bsd')
+optdepends=('sbcl' 'ccl')
+makedepends=('sbcl')
+conflicts=('quicklisp')
+source=('https://beta.quicklisp.org/quicklisp.lisp')
+sha256sums=('4a7a5c2aebe0716417047854267397e24a44d0cce096127411e9ce9ccfeb2c17')
+install=_airy/$pkgname.install
+nm=quicklisp
+
+pkgver() {
+  awk '/defvar qlqs-info/{gsub(/[^0-9]/,"");print$NF}' "$nm.lisp"
+}
+
+package() {
+  local p=$pkgdir/usr/lib/$nm
+  # mkdir -p "$p"
+  # chown root:users "$p"
+  # chmod 2777 "$p"  # FAIL:SECU: sticky bit is always removed by makepkg
+  sbcl --no-userinit --disable-debugger --load "$nm.lisp" \
+    --eval "(progn (quicklisp-quickstart:install :path \"$p\") (quit))"
+  install -d "$pkgdir"/etc/default
+  printf '(load "%s")\n' "/usr/lib/$nm/setup" > "$pkgdir/etc/default/$nm"
+}
