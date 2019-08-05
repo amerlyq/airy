@@ -53,6 +53,8 @@ _package(){
   local _nm=${2-$1}   # "${2:-${_pkg#${3:-cl-}}}"
   conflicts=("cl-${_pkg#cl-}")
 
+  # ALT: * (asdf:system-source-directory :linedit)
+  #  #P"/Users/aerique/quicklisp/dists/quicklisp/software/linedit-20111203-git/"
   cd "$PWD/quicklisp/$(cat "$PWD/quicklisp/dists/quicklisp/installed/releases/$_pkg.txt")"
   local cl="${pkgdir}/usr/share/common-lisp"
   install -d "$cl/source" "$cl/systems"

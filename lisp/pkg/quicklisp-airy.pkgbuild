@@ -17,6 +17,8 @@ pkgver() {
   awk '/defvar qlqs-info/{gsub(/[^0-9]/,"");print$NF}' "$nm.lisp"
 }
 
+# TODO: also build ASDF: https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=asdf
+
 package() {
   local p=$pkgdir/usr/lib/$nm
   # mkdir -p "$p"

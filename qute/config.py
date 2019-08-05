@@ -1720,6 +1720,10 @@ config.bind('l', 'forward')
 # config.bind('{{', 'navigate prev -t')
 # config.bind('}}', 'navigate next -t')
 
+## FIXED:BUG: rogue <Tab> keypresses in QtWebEngine
+# REF: https://github.com/qutebrowser/qutebrowser/issues/4579
+config.bind('<Tab>', 'nop')
+
 ## Bindings for caret mode
 # config.bind('$', 'move-to-end-of-line', mode='caret')
 # config.bind('0', 'move-to-start-of-line', mode='caret')

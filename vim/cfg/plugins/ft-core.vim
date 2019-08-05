@@ -84,6 +84,7 @@ call dein#add('vim-perl/vim-perl', {
 
 " USAGE: sbcl --load /etc/default/quicklisp --load ~/.cache/vim/dein/repos/github.com/l04m33/vlime/lisp/start-vlime.lisp
 call dein#add('l04m33/vlime', {
+  \ 'if': 0,
   \ 'rtp': 'vim/',
   \ 'on_ft': 'lisp',
   \ 'hook_source': "
@@ -91,6 +92,16 @@ call dein#add('l04m33/vlime', {
 \\n   let g:vlime_compiler_policy = {'DEBUG': 3}
 \"})
 
+
+" REF: https://kovisoft.bitbucket.io/tutorial.html
+call dein#add('kovisoft/slimv', {
+  \ 'rtp': 'vim/',
+  \ 'on_ft': 'lisp',
+  \ 'hook_source': "
+\\n let g:slimv_swank_cmd = \"!ros -e '(ql:quickload :swank) (swank:create-server)' wait &\"
+\\n let g:slimv_lisp = 'ros run'
+\\n let g:slimv_impl = 'sbcl'
+\"})
 
 
 " mappings: [C-xC-o, [[, ]], ([, ((, )), F5, F7]
