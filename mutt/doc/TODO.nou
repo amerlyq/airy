@@ -1,4 +1,14 @@
 TODO
+  [_] BUG! neomutt =INBOX is not refreshed when afew moves mails into new dirs
+  [_] DEV: don't ask for password if opened in read-only mode $ neomutt -R
+  [_] Add auto-generation of text/HMTL from Markdown
+    MAYBE: place markdown directly inside text/plain
+    OR: replace/attach it by MIME text/markdown; charset=UTF-8
+      https://stackoverflow.com/questions/10701983/what-is-the-mime-type-for-markdown
+    ALT: explicit keybinding or implicit hook when writing email
+      => generate "text/html" from text/plain OR text/markdown
+      NEED: do something with tail of recited mails -- to keep their html contrpart intact
+        CHECK: how Outlook joins such mails -- what it inserts in-between ?
   2019-08-01 [X] BUG: unread counter not updated
     ::: use upstream git REF: https://www.linux.org.ru/forum/general/14776333
   [_] BUG: neomutt don't display notmuch tags in "regular" index -- only in virtual mailboxes

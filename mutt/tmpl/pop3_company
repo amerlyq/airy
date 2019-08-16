@@ -1,0 +1,20 @@
+# vim:ft=neomuttrc
+set my_acc = company
+source ~/.config/mutt/cfg/default_local
+color status brightgreen black
+
+# NEED: to colorize inbox by "sent to me"
+set realname = "Name Surname"
+set from = user@company.com
+set smtp_url = 'smtp://group\User@localhost:1025'
+
+# ADD: more mailboxes from sieve rules
+# mailboxes =todo =ntf =org =my =inf
+# virtual-mailboxes \
+#     "org"     "notmuch://?query=folder:org" \
+#     "my"      "notmuch://?query=folder:my"  \
+#     "inf"     "notmuch://?query=folder:inf" \
+#     "ntf"     "notmuch://?query=folder:ntf" \
+
+# SECU:(intended): no ssl for localhost
+set ssl_force_tls = no

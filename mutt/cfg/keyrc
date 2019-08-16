@@ -31,15 +31,6 @@ bind  index,pager  y  modify-labels
 bind  index,pager \\  vfolder-from-query
 bind  index,pager \e\\  vfolder-from-query-readonly
 
-macro index,pager  S  '<modify-labels>+archive -unread -inbox<enter>'           "Archive message"
-macro index,pager  D  '<modify-labels-then-hide>-inbox -unread +junk<enter>'    "Tag as Junk mail"
-# macro index,pager  D  '<modify-labels-then-hide>-inbox -unread +junk<enter><sync-mailbox><next-undeleted>'    "Tag as Junk mail"
-# macro index,pager tt "<modify-labels>!todo\n" "Toggle the 'todo' tag"
-# macro index + "<modify-labels>+*\\n<sync-mailbox>"    # tag as starred
-# macro index - "<modify-labels>-*\\n<sync-mailbox>"    # tag as unstarred
-
-
-
 macro index  v  <tag-pattern>~A<enter>      "select all"
 macro index  V  <untag-pattern>all<enter>   "clear selection"
 # macro index \Ca <tag-pattern>~A<enter>   "select all"
@@ -58,15 +49,18 @@ macro generic,pager <f12> "<enter-command>source $my_cache/acc/$my_acc<enter>"
 # bind index,pager  B  sidebar-toggle-visible
 bind index,pager  <Tab>     sidebar-toggle-visible
 bind index,pager  <BackTab> sidebar-toggle-visible
-bind index,pager  _  sidebar-open
-bind index,pager \`  sidebar-toggle-virtual
+bind index,pager   _  sidebar-open
 macro index,pager  (  "<sidebar-prev><sidebar-open><sync-mailbox>"
 macro index,pager  )  "<sidebar-next><sidebar-open><sync-mailbox>"
+## ERROR: key is not bound ???
+# bind index,pager '`'  sidebar-toggle-virtual
+# bind index,pager  -  sidebar-toggle-virtual
 
 ## BET:USE:FUTURE:
-# bind index,pager \CJ sidebar-next
-# bind index,pager \CK sidebar-prev
-# bind index,pager \CL sidebar-open
+bind index,pager  \Cj  sidebar-next
+bind index,pager  \Ck  sidebar-prev
+bind index,pager  \Co  sidebar-open
+# bind index,pager  \CL  sidebar-open
 
 # Swap sorting direction
 bind index  o  sort-reverse
@@ -121,7 +115,8 @@ bind index,pager  {  previous-new-then-unread
 bind index,pager  }  next-new-then-unread
 
 # HACK: show mailboxes list for current acc (BUT from root only)
-macro index 'h' '<change-folder>?<change-dir><home>^K=<enter>'
+# [_] BUG: disappeared =INBOX from list
+macro index  h  '<change-folder>?<change-dir><home>^K=<enter>'
 
 ## Navigate
 bind index  l  display-message

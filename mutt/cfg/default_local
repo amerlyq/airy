@@ -32,19 +32,29 @@ mailboxes =INBOX
 # set query_command = "r.notmuch $my_acc -- address %s"
 
 set nm_default_uri = notmuch://$HOME/.mail/$my_acc
-set nm_db_limit = 200  # DFL=0 for unlimited listing
-set nm_query_window_duration=2
-set nm_query_window_timebase="week" # or "hour", "day", "week", "month", "year"
+set nm_db_limit = 400                   # DFL=0 for unlimited listing
+set nm_query_window_duration = 0        # DFL=0 for unlimited listing
+set nm_query_window_timebase = "week"   # VIZ: "hour", "day", "week", "month", "year"
 
 # set virtual_spoolfile = yes    # use first vmbox as initial selection
 unvirtual-mailboxes *
 virtual-mailboxes \
-    "inbox"     "notmuch://?query=tag:inbox AND NOT tag:archive" \
-    "unread"    "notmuch://?query=tag:unread" \
-    "starred"   "notmuch://?query=tag:*" \
-    "sent"      "notmuch://?query=tag:sent" \
-    "archive"   "notmuch://?query=tag:archive" \
-    "news"      "notmuch://?query=tag:newsletters"
+    "inbox"   "notmuch://?query=tag:inbox AND NOT tag:archive" \
+    "unread"  "notmuch://?query=tag:unread"  \
+    "sent"    "notmuch://?query=tag:sent"    \
+  "abandoned" "notmuch://?query=query:abandoned" \
+  "dontcare"  "notmuch://?query=folder:dontcare" \
+    "org"     "notmuch://?query=folder:org"  \
+    "work"    "notmuch://?query=folder:work" \
+    "junk"    "notmuch://?query=folder:junk" \
+    "my"      "notmuch://?query=folder:my"   \
+    "info"    "notmuch://?query=folder:info" \
+    "log"     "notmuch://?query=folder:log"  \
+    "spam"    "notmuch://?query=folder:spam"
+
+# "starred" "notmuch://?query=tag:*" \
+# "archive" "notmuch://?query=tag:archive" \
+# "news"    "notmuch://?query=tag:newsletters"
 
 
 ## NOTE: replace "imap-fetch-mail" by local variant

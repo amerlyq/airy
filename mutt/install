@@ -5,7 +5,10 @@ source ~/.shell/func.d/packages
 #| neomutt | mutt with many patches
 
 if distro arch; then
-  pkg_inst neomutt openldap
+  # pkg_inst neomutt
+  aur_inst neomutt-git
+
+  pkg_inst openldap
 
   # TODO:SEP: into their own modules (with docs)
   # ALSO:SEE: |community/mailutils|

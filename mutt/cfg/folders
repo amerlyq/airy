@@ -1,17 +1,39 @@
 # vim:ft=neomuttrc
 
+# ALT: use virtual folders :: e.g. ",d" for #deleted and ",k" for #killed
+
+# BUG: ",," not returns to "last"
+
+bind index,browser , noop
+
 ## Switch folders
-macro index,browser  ,f  "<change-folder>=inf<enter>"           "Go to =inf (information)"
-macro index,browser  ,g  "<change-folder>=log<enter>"           "Go to =log (lots-of-garbage)"
-macro index,browser  ,h  "<change-folder>=history<enter>"       "Go to =history (conversations)"
-macro index,browser  ,i  "<change-folder>!<enter>"              "Go to =INBOX (welcome screen)"
-macro index,browser  ,j  "<change-folder>=log.jira<enter>"      "Go to JIRA issues notifications"
-macro index,browser  ,l  "<change-folder>^<enter>"              "Go to <last>"
-macro index,browser  ,m  "<change-folder>=my<enter>"            "Go to =my (my very personal)"
-macro index,browser  ,n  "<change-folder>=ntf<enter>"           "Go to =ntf (notifications)"
+macro index,browser  ,.  "<change-folder>!<enter>"              "Go to =INBOX (welcome screen)"
+macro index,browser  ,,  "<change-folder>^<enter>"              "Go to <last>"
+# macro index,browser  ,!  "<change-folder>=Trash<enter>"         "Go to =Trash (items waiting for irreversible deletion)"
+# macro index,browser  ,d  "<change-folder>=Drafts<enter>"        "Go to =Drafts (stored before sent)"
+macro index,browser  ,d  "<change-folder>=dontcare<enter>"      "Go to =dontcare (personal but not answered)"
+# macro index,browser  ,h  "<change-folder>=history<enter>"       "Go to =history (conversations)"
+macro index,browser  ,i  "<change-folder>=info<enter>"          "Go to =info (information useful for future)"
+macro index,browser  ,j  "<change-folder>=junk<enter>"          "Go to =junk (project-related but not personally important)"
+macro index,browser  ,J  "<change-folder>=log.jira<enter>"      "Go to JIRA issues notifications"
+macro index,browser  ,l  "<change-folder>=log<enter>"           "Go to =log (lots-of-garbage)"
+macro index,browser  ,m  "<change-folder>=my<enter>"            "Go to =my  (my very personal, largely project-unrelated)"
+# macro index,browser  ,n  "<change-folder>=ntf<enter>"           "Go to =ntf (notifications)"
 macro index,browser  ,o  "<change-folder>=org<enter>"           "Go to =org (organizational)"
-macro index,browser  ,r  "<change-folder>=log.review<enter>"    "Go to PR review notifications"
+macro index,browser  ,r  "<change-folder>=log.stash<enter>"     "Go to PR review notifications"
 macro index,browser  ,s  "<change-folder>$record<enter>"        "Go to =Sent (SEE: set record = ...)"
-macro index,browser  ,t  "<change-folder>=todo<enter>"          "Go to =todo (pending actions)"
-macro index,browser  ,u  "<change-folder>=use<enter>"           "Go to =use (anything personally useful)"
-macro index,browser  ,w  "<change-folder>=work<enter>"          "Go to =work (pending actions)"
+# macro index,browser  ,s  "<change-folder>=spam<enter>"        "Go to =spam (look sometimes if anything useful there)"
+macro index,browser  ,t  "<change-folder>=team<enter>"          "Go to =team (tech-talks, forwarding, personal support, etc)"
+# macro index,browser  ,t  "<change-folder>=todo<enter>"          "Go to =todo (pending actions)"
+# macro index,browser  ,u  "<change-folder>=use<enter>"           "Go to =use (anything personally useful)"
+macro index,browser  ,w  "<change-folder>=work<enter>"          "Go to =work (project-related threads I answered)"
+
+
+# MAYBE: also unbind/bind ,I for pager -- BUT how to be with scrolling ?
+macro index,browser  ,I  "<modify-labels>!info\n"               "Toggle #info tag"
+# macro index,pager  S  '<modify-labels>+archive -unread -inbox<enter>'           "Archive message"
+# macro index,pager  D  '<modify-labels-then-hide>-inbox -unread +junk<enter>'    "Tag as Junk mail"
+# macro index,pager  D  '<modify-labels-then-hide>-inbox -unread +junk<enter><sync-mailbox><next-undeleted>'    "Tag as Junk mail"
+# macro index,pager tt "<modify-labels>!todo\n" "Toggle the 'todo' tag"
+# macro index + "<modify-labels>+*\\n<sync-mailbox>"    # tag as starred
+# macro index - "<modify-labels>-*\\n<sync-mailbox>"    # tag as unstarred

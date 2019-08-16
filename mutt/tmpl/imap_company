@@ -1,0 +1,27 @@
+# vim: ft=muttrc
+set my_acc = company
+source ~/.config/mutt/cfg/default_imap
+color status white yellow
+
+set realname = "Name Surname"
+set from = user@company.com
+
+set imap_user = 'group\User'
+set smtp_url = 'smtp://group\User@localhost:1025'
+set folder = 'imap://group\User@localhost:1143'
+
+mailboxes =INBOX
+set spoolfile = "=INBOX"
+set postponed = "=Drafts"
+set record    = "=Sent"    # Need fcc to work for cmdline-send
+set trash     = "=Trash"   # Need patch
+set copy      = yes
+
+# Account mappings
+macro index,browser  ,w  "<change-folder>=work<enter>"       "Go to work"
+
+# VIZ: [CAPABILITY IMAP4REV1 AUTH=LOGIN IDLE MOVE]
+set imap_authenticators = login
+set smtp_authenticators = login
+# SECU:(intended): no ssl for localhost
+set ssl_force_tls = no

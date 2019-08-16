@@ -1,0 +1,21 @@
+# vim: ft=muttrc
+set my_acc = user
+source ~/.config/mutt/cfg/default_imap
+color status white cyan
+
+set realname = "Nick"
+set from = user@gmail.com
+
+set imap_user = user@gmail.com
+set smtp_url = smtps://user@gmail.com@smtp.gmail.com
+set folder = imaps://user@gmail.com@imap.gmail.com
+
+# NOTE: you must use English interface in GMail for correct folder names
+mailboxes =INBOX
+set spoolfile = "=INBOX"
+set postponed = "=[Gmail]/Drafts"
+## SEE: http://promberger.info/linux/2008/03/10/mutt-and-gmail-via-imap-how-to-delete-messages/
+# set mbox = "=[Gmail]/All<quote-char><space>Mail"
+set record = "=[Gmail]/Sent<quote-char><space>Mail"
+set copy = no  # Gmail stores sent mail automatically
+set trash = "=[Gmail]/Trash"   # Need patch; create dir manually if not exist
