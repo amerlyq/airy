@@ -58,7 +58,7 @@ fi
 
 case "$mimetype"
 in text/*|*/xml)
-  try bat --theme=TwoDark --paging=never --color=always --plain "$path" && { dump | trim; exit 5; }
+  try bat --theme=TwoDark --paging=never --color=always --plain "$path" | trim && exit 5
   exit 2
 ;; application/x-sqlite3)
   # BUG: even in readonly mode it creates -wal files
