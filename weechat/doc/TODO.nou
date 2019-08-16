@@ -15,6 +15,14 @@ BUG
     SEE:
       https://bitbucket.org/EionRobb/purple-rocketchat/issues/39/bitlbee-cant-set-proper-room-name
       https://github.com/majn/telegram-purple/issues/336
+  [_] ERROR: sometimes broken messages from Skype
+    https://bugs.bitlbee.org/ticket/399
+    ::: copy, determine current encoding -- then convert them individually
+      $ echo "2019-08-08 12:12:55  ÐÑÐ»Ð¸ Ð¼Ð½Ðµ Ð¿Ð¾ÑÑÐ¸ ÐµÐ¶ÐµÐ´Ð½ÐµÐ²Ð½Ð¾ Ð´ÐµÐ»ÐµÐ³Ð¸ÑÑÐµÑÑÑ Ð"
+      $ ... | uchardet  $ from |extra/uchardet|
+      #  UTF-8
+      $ ... | iconv -f UTF-8 -t ISO-8859-1
+      #  2019-08-08 12:12:55  Если мне почти ежедневно делегируется по несколько новых задач
 
 
 IDEA
