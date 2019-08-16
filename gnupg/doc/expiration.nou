@@ -2,7 +2,8 @@ Extend expiration date of subkey
 
   Import multihost master key from encrypted USB flash-drive
     $ sudo mount /dev/sdb /mnt
-    $ gpg --import /mnt/amerlyq.gpg-{public,private}.asc
+    $ cd /mnt
+    $ gpg --import ./amerlyq.gpg-{public,private}.asc
 
   Extend expiration date of choosen subkeys (sign + encrypt)
     $ gpgkey=amerlyq@gmail.com
@@ -20,6 +21,6 @@ Extend expiration date of subkey
       = yes, yes, yes
     $ gpg --import subkeys.asc
     $ shred --remove subkeys.asc
-    $ mv -vft /mnt amerlyq.gpg-{public,private}.asc
+    $ mv -vft /mnt -- amerlyq.gpg-{public,private}.asc
     !! Verify that gpg -K shows a "sec#" instead of just "sec" for your private key.
     $ gpg -K

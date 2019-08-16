@@ -12,5 +12,7 @@ svc_activate -cue -f "$d" gpg-agent-ssh.socket gpg-agent.socket
 svc_activate -cu -f "$d" gpg-agent.service
 # dirmngr.service dirmngr.socket
 
-
-echo RELOADAGENT | tee >(gpg-connect-agent)
+if cfgOpt u; then
+  # echo RELOADAGENT | tee >(gpg-connect-agent)
+  gpg-connect-agent reloadagent /bye
+fi
