@@ -81,10 +81,12 @@ zle -N history-beginning-search-backward-end history-search-end
 zle -N history-beginning-search-forward-end  history-search-end
 
 ## History
-bindkey    '^R' history-incremental-search-backward
-bindkey -a '^R' history-incremental-pattern-search-backward
-bindkey    '^S' history-incremental-search-forward
-bindkey -a '^S' history-incremental-pattern-search-forward
+# ALT: search by regex with custom widget
+#   https://superuser.com/questions/275262/reverse-history-search-with-regular-expressions
+bindkey    '^R' history-incremental-pattern-search-backward
+bindkey -a '^R' history-incremental-search-backward
+bindkey    '^S' history-incremental-pattern-search-forward
+bindkey -a '^S' history-incremental-search-forward
 # Prev-hist-cmd, depending on text from beginning till cursor #'\e[A','\e[B'
 bindkey    '^P' up-line-or-history                 #up-line-or-search
 bindkey    '^N' down-line-or-history               #down-line-or-search
