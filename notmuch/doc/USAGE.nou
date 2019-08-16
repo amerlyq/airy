@@ -13,6 +13,9 @@ Manually add tags
   $ notmuch tag +github-issues folder:neomutt and tag:tofilter and from:github.com
   $ notmuch tag -tofilter tag:tofilter and from:gui-gui@netcourrier.com
 
+Add tag to each message in thread
+  $ notmuch tag +$tag $(notmuch search --output=threads tag:$tag)
+
 Notify new -- only if attention required
   $ test $(notmuch count tag:tofilter and tag:unread) == 0 || notify-send -h 'string:bgcolor:#3579a8' -h 'string:fgcolor:#d0d0d0' mutt "$_ new messages"
 
@@ -21,3 +24,45 @@ Show all and every tag currently in use
 
 Count mails before deciding to query headers preview
   $ r.notmuch $acc -- count 'to:example.com'
+
+Search for messages that have no tags
+  $ notmuch search $(notmuch search --output=tags '*' | sed 's/^/NOT tag:/;2~1s/^/AND /')
+
+Search for only To:/CC: or custom header (must grep pre-matched mails yourself)
+  $ notmuch search to:bob@example.com 'date:1w..today' --output=files | xargs grep -lE '^(Accept-Language:en-US|X-Spam-Flag:NO)'
+  ALT: use some tool to pre-tag the messages you care about e.g. through procmail()
+  BET: ask notmuch to hash additional headers
+    DEV:(2019-06): http://notmuch.198994.n3.nabble.com/Index-user-defined-headers-td4040549.html
+    $ r.notmuch $acc -- config set index.header.List 'List-Id'
+    $ r.notmuch $acc -- config set index.header.To 'To'
+    $ r.notmuch $acc -- config set query.concluded 'NOT thread:"{tag:flagged OR tag:unread}"'
+    $ r.notmuch $acc -- config list
+    $ r.notmuch $acc -- notmuch reindex '*'
+    USAGE: $ r.notmuch $acc -- count 'To:me@example.com'
+
+
+Deduplication
+  https://notmuchmail.org/pipermail/notmuch/2014/018493.html
+    https://notmuchmail.org/pipermail/notmuch/2014/018505.html
+  http://notmuch.198994.n3.nabble.com/Automatic-suppression-of-non-duplicate-messages-td4025722.html
+  IDEA: mark all of duplicates by #dup -- then search for that tag, and manually mass-delete one of two copies
+  TRY: https://github.com/kdeldycke/maildir-deduplicate
+    ALT: fdupes and fuzzy-diff
+
+
+TODO: count statistical patterns to find best filters i.e. categorize bulk mails
+  * same Subject:
+  * same From:
+  * same To: / CC:
+  * combination of (From: + Subject:)
+  * combination of (From: + To:)
+  ? something else ? maybe body keywords/phrases ?
+    TRY: dump all other non-bulk mail bodies and find statistics on
+      - whole lines
+      - pairs of words
+      - separate words
+  HACK: if body contains kind/reminder -- auto-mark "flagged" to be kept in INBOX
+  WARN: such pre-sorting will wrongly place some mails into @idontcare
+    => if you must never miss such mails -- you must periodically look through idontcare and move them
+    MAYBE? create "staging" dir where all mails are moved from inbox -- and you must manually move them from there into @idontcare
+    BET! directly use =INBOX as such staging -- keep "unread" in there and auto-move them when read mail and haven't moved it yourself
