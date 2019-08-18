@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# ALT:BET: https://github.com/xyproto/cxx
+#
 #   $ sir [args:br] [target:all64] [=][filter:Simple*] [vg]{ --vgdb-arg --as-no } ..
 #
 # Small: w/o logs. Capital: with logs.
@@ -198,4 +200,3 @@ if (has_opti l && (! has_opti b || (has_opti b && has_opti r))) && [ -f "${PR_NM
     if has_opt L ; then FLT=less; fi   #FLT="-v -e '\\.' -e '^\\s*$'"
     cat "${PR_NM}.log" | "$SIR/filter-valgrind" "$PREFIX_DIR" | ${FLT:-'cat'}
 fi
-

@@ -2,17 +2,17 @@
 #%USAGE: $ timestamp -o /path/to/stampfile -- cmd [args..]
 #%NOTE: can't directly use "/usr/bin/time --output=stampfile" -- it creates file even on error
 #%PERF:(script itself): overhead of 0.005s
-set -Ceufo pipefail
+set -eufo pipefail
+
+output=/dev/stderr
 
 while getopts 'o:' o; do case $o in :|'?') exit 1
-;; o) f_output=$OPTARG
+;; o) output=$OPTARG
 esac; done; shift $((OPTIND - 1))
-
-[[ -z ${f_output-} ]] && exec 3>&2 || exec 3>| "$f_output"
 
 getts() { date +'%s.%06N'; }
 begts=$(getts)
 
 command env -- "${@:?}"
 
->&3 awk -vb="$begts" -ve="$(getts)" 'BEGIN{printf "%.6f\n",e-b}'
+awk -vb="$begts" -ve="$(getts)" 'BEGIN{printf "%.6f\n",e-b}' > "$output"

@@ -170,10 +170,11 @@ _tsdlm := !
 &stampfile = $(subst $( ),\$( ),$(tsdir)/$(_tspfx)$(subst /,$(_tsdlm),$(1)))
 
 # ARGS: <script-abspath> <modname> <subpath>
+# ATT: all individual timestamps MUST also depend on --XXX.pre--  otherwise they aren't updated on "continue"
 define defrecipe =
 $(call defaliases,$(2),$(3),$(&stampfile))
 $(1): ; @: #prevent-sink-all-rule
-$(&stampfile) : $(1) | $(tsdir)
+$(&stampfile) : $(1) $(call &barrier.pre,$(3)) | $(tsdir)
 	@echo '>>> $$< <<<'
 	@timestamp -o '$$@' -- '$$<' $(flags) $($(subst /,_,$(3))_flags)
 endef

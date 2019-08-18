@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # FIND: maybe part of this script is already done inside "aurutils" ?
-cd "${LISTS_STORE_DIR:?}"
+cd "${LISTS_STORE_DIR:-${TMPDIR:-/tmp/$LOGNAME}/airy}"
 set -fCueEo pipefail
 
 removelists=

@@ -37,9 +37,6 @@ fmk := $(if $(shell which $(fmk) 2>/dev/null),$(fmk),$(here)/airy/ctl/makelog)
 	+'$(fmk)' -f '$(this)' -C '$(here)' $(MAKECMDGOALS)
 else
 
-# [_] FIXME: must "continue" <make all -B> from where it was stopped
-#   => currently simple "continue" from same place won't include "-B"
-
 ### Parameters
 # BAD: mods may be inside .tar.gz or in subdir -- better to align on Makefile itself "$this"
 # repo := $(shell git rev-parse --show-toplevel)
@@ -59,6 +56,14 @@ configure: $(tsdir)/--configure-- pacman/setup pacman/install
 upgrade: $(tsdir)/--upgrade--
 install setup update recache: ; $(&mods) all/$@
 reset: ; $(&mods) reset
+
+# [_] FIXME: must "continue" <make all -B> from where it was stopped
+#   => currently simple "continue" from same place won't include "-B"
+#     BUT:CHECK: if all ts depend on previous already updated ones -- whole chain will be updated
+#   ERROR:(r.pacman-loc-package): aur build ${update:+--force}
+#      == w/o --force -- will exit successfully even if package itself has errors and can't be built
+#     [_] TODO: localize error and create github issue with cmdline snippet to reproduce
+continue: install setup update recache
 
 # MAYBE: replace by "cleanup" script in each mod (when you need clean state for accumulating dirs/files)
 #  => however, when everything is placed in ~/.cache -- there is no need to clean up ?
@@ -122,8 +127,9 @@ help:
 	$(&mods) help
 
 #% NOTE: pass-through unknown targets as mod names
+%- :: flags := -muU
+%- :: .FORCE ; $(&mods) $(@:-=)
 %  :: .FORCE ; $(&mods) $@
-%- :: .FORCE ; $(&mods) flags= $(@:-=)
 
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
 .PHONY: $(PHONY)

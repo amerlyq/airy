@@ -1,4 +1,4 @@
 #!/bin/bash
 #%USAGE:(total): $ <beg.smaps ./$0 SN C1 | jq -s add
 set -euo pipefail
-awk '/^[0-9a-f]{8}-/{f=$0} /^Size:/{s=$2} /^Rss:/{r=$2} /^Pss:/{print$2,r,s,f}' "$@"
+awk '/^[0-9a-f]{8,}-/{f=$0} /^Size:/{s=$2} /^Rss:/{r=$2} /^Pss:/{print$2,r,s,f}' "$@"
