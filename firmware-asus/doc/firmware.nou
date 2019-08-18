@@ -1,3 +1,28 @@
+2019-08-17 [_] ACPI BIOS Error (bug): Could not resolve symbol
+  SEE
+    https://www.linux.org.ru/forum/linux-hardware/14860628
+    !! https://bugzilla.redhat.com/show_bug.cgi?id=1610727
+  REF
+    https://uefi.org/specifications
+  dmesg
+    [   36.941004] ACPI BIOS Error (bug): Could not resolve symbol [\_GPE._L69.D1F0], AE_NOT_FOUND (20190509/psargs-330)
+    [   36.945182] ACPI Error: Aborting method \_GPE._L69 due to previous error (AE_NOT_FOUND) (20190509/psparse-529)
+    [   36.949362] ACPI Error: AE_NOT_FOUND, while evaluating GPE method [_L69] (20190509/evgpe-511)
+  NOTE
+    https://askubuntu.com/questions/1129577/acpi-bios-error-bug-could-not-resolve-rp09-pegp-ae-not-found-20180531
+      I have also tons of ACPI errors on my system (ASUSTeK P8Z68-V LX) and I
+      can cold boot, but can't do a warm boot after wakeup. Weeks ago it was
+      working, but with last updates it is no longer warm booting. – Uwe Disch Apr 13 at 15:33
+    https://unix.stackexchange.com/questions/443398/acpi-bios-error-ae-not-found
+      NOTE: The package intel-microcode used to be called intel-ucode once. You
+      should be running at least kernel version 4.18.0 (cat /proc/version*) because
+      that included a fix that allows kernel to try to proceed even with errors
+      while loading ACPI tables. Older kernel versions will stop loading the whole
+      table in case of any error. And note that if older kernel version does not
+      emit errors, it does not mean that it did work correctly - it probably just
+      didn't even try to load those tables.
+
+
 2017-12-31 [X] hwmon_device_register
   ::: ignore it, -- relevant only for driver developers
   SEE:
