@@ -18,6 +18,10 @@ set prompt \033[0;31m──────\033[0m\n(gdb)\040
 # py from gdb import prompt; prompt.substitute_prompt("\[\e[0;34m\](gdb)\[\e[0m\] ")
 
 
+# NOTE: if you wish library path instead of source path, you can do:
+# INFO: 2019-08-20_20:32 <tromey> amerlyq: there's no flag for that at the moment (to change backtrace format)
+#   (gdb) frame apply all -q info symbol *$pc
+
 
 # Print C++ names in their source form rather than their mangled form
 set print asm-demangle

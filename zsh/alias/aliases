@@ -7,10 +7,13 @@
 
 ## Consumers
 alias -g N0='&>/dev/null'
-alias -g N1=' >/dev/null'
+alias -g N1='1>/dev/null'
 alias -g N2='2>/dev/null'
 alias -g N2C='2> >(sed -u "s/^/\o033[31m/; s/\$/\o033[0m/")'
 alias -g N+='2>&1'
+# REF: https://unix.stackexchange.com/questions/265061/how-can-i-pipe-only-stderr-in-zsh
+alias -g N-='2>&1 >&- >/dev/null'  # suppress stdout and pipe stderr (NICE: +mult_ios)
+alias -g N%='3>&2 2>&1 1>&3 3>&-'  # swap stdout and stderr (BAD: +mult_ios)
 alias -g NN='|stdbuf -oL -eL tee /dev/tty'
 alias -g NZ='|tr \\n \\0'
 alias -g ZN='|tr \\0 \\n'

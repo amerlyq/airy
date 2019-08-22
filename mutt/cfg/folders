@@ -6,6 +6,10 @@
 
 bind index,browser , noop
 
+macro index  ,0  "<enter-command>set nm_db_limit=0<enter>"      "NotMuch unlimited query"
+macro index  ,-  "<enter-command>set nm_db_limit=400<enter>"    "NotMuch query reduced for performance"
+
+
 ## Switch folders
 macro index,browser  ,.  "<change-folder>!<enter>"              "Go to =INBOX (welcome screen)"
 macro index,browser  ,,  "<change-folder>^<enter>"              "Go to <last>"

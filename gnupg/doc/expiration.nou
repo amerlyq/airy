@@ -18,7 +18,7 @@ Extend expiration date of subkey
     $ gpg --export --armor $gpgkey > amerlyq.gpg-public.asc
     $ gpg --export-secret-subkeys $gpgkey > subkeys.asc
     $ gpg --delete-secret-key $gpgkey
-      = yes, yes, yes
+      = yes, yes, delete, delete
     $ gpg --import subkeys.asc
     $ shred --remove subkeys.asc
     $ mv -vft /mnt -- amerlyq.gpg-{public,private}.asc

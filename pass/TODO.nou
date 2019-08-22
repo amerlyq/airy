@@ -8,20 +8,54 @@ SEE pass+git
   https://wiki.archlinux.org/index.php/Pass
 
 Setup
-  $ pass init $mail
-  $ pass insert work/user
+  Basic
+    $ pass init ${gpgid:-$mail}
+    $ pass insert work/user
+  Git
+    $ pass git init
+    # $ pass git remote add origin kexec.com:pass-store
+    # $ pass git push -u --all
+  Tomb
+    $ mv ~/.password-store{,_}
+    $ pass tomb ${gpgid:-$mail}
+    $ pass open
+    $ cp -a ~/.password-store{_/.,}
+    $ rm -rf ~/.password-store_/
+    ...
+    $ pass close
 
 Copy url field from data produced by pass-import
   $ pass urldroplet.com | grep -oP '^url: \K.*' Y
 
 Migrate to another key
   https://lists.zx2c4.com/pipermail/password-store/2015-May/001548.html
-    $ pass init "$NEWKEY"
+    $ pass init gpgid-new
+
+
+Copy DB to another PC
+  Import new keys
+    OLD: $ gpg --import new-subkeys.asc
+  Reencrypt passwords by both keys
+    OLD: $ pass init gpgid-old gpgid-new
+  Check both identities present
+    $ gpg -d ~/.password-store/somepassword.gpg
+  Copy whole ~/.password-store to another PC
+    $ pass close
+    $ scp ~/.password.tomb user@host:~/
+  ALT: generate new subkeys, export them and copy to new PC
+    $ gpg --export-secret-subkeys gpgid-new > subkeys.asc
+  Reencrypt again to drop support of different keys
+    NEW: $ pass init gpgid-new
+    OLD: $ pass init gpgid-old
+  Delete new keys from old PC
+    OLD: $ gpg --delete-secret-key gpgid-new
+
 
 USE
   Copy passwd from dmenu to xclip
     $ passmenu
 
 TODO
-  [_] FIND: move pass db from another PC
+  2019-08-22 [X] FIND: move pass db from another PC
   [_] BUG: remove xclip from deps of pass
+    <= needed for "copy-to-clipboard-and-remove" feature
