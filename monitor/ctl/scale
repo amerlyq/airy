@@ -3,14 +3,12 @@ set -euo pipefail
 
 dfl=eDP-1
 ext=DP-1
-wide1=2560x1600
-wide2=1920x800
 
 optparse(){ case $1 in :|'?') exit 1
 ;; [1-4]) xrandr -q | grep -qw "^${ext}\sconnected" && ext_mod=$1 || dfl_mod=$1
 ;; d) dfl_mod=${2:-2}
 ;; e) ext_mod=${2:-2}
-;; n) wide2=1920x1080  #% n = normalize resolution
+;; n) ext_mod=${ext_mod//n/}n   #% n = normalize resolution
 ;; *) exit 1
 esac; }
 
@@ -31,7 +29,9 @@ esac
 
 [[ ${ext_mod-} ]] && case $ext_mod
 in 1) xrandr --output "$ext" --auto
-;; 2) r.monitor-add-mode "$ext" "$wide2"
+;; 1n) r.monitor-add-mode "$ext" 2560x1600
+;; 2) r.monitor-add-mode "$ext" 1920x800
+;; 2n) xrandr --output "$ext" --mode 1920x1080
 ;; 3) xrandr --output "$ext" --mode 1280x800
 ;; 4) xrandr --output "$ext" --mode 1024x768
 ;; *) echo "Err: not supported '$ext_mod' delimiter"; exit 1
