@@ -134,7 +134,8 @@ system =
   , ("<XF86MonBrightnessDown>", spawn "r.backlight-mon-sys -n -")
   , ("<XF86MonBrightnessUp>", spawn "r.backlight-mon-sys -n +")
   , ("<XF86TouchpadToggle>", spawn "r.touchpad-tgl")
-  , ("<XF86PowerOff>", spawn "r.core shutdown")
+  -- BAD: I can't reboot safely when high-cpu process freezes system
+  -- , ("<XF86PowerOff>", spawn "r.core shutdown")
   ] ++
   --ATTENTION: "M-<Esc>" must be unused -- I use <Esc> to drop xkb latching
 

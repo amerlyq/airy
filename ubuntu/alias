@@ -3,8 +3,12 @@
 # dpkg dpkg-reconfigure
 ((!EUID)) || alias apt-get='sudo apt-get'
 
+# TUT: http://newbiedoc.sourceforge.net/tutorials/apt-get-intro/info.html
 alias apti='apt-get install'
+alias aptq='apt-cache show'
+alias aptR='apt-cache rdepends'
 alias apts='apt-cache search'
+
 alias update='apt-get update && apt-get upgrade'
 
 # alias debup='aptitude update && aptitude safe-upgrade'
