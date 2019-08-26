@@ -2,8 +2,8 @@
 # tags: core
 source ~/.shell/func.d/cfgsetup
 
-# NOTE: inhibit "PowerOff" button
-linkcp -ct '/etc/systemd/logind.conf.d' unit/20-acpi-buttons.conf
+# NOTE: inhibit "PowerOff" button BAD: I can't reboot safely when high-cpu process freezes system
+# linkcp -ct '/etc/systemd/logind.conf.d' unit/20-acpi-buttons.conf
 
 svc_activate -cE battery-notify@.service
 linkcp -ct '/etc/udev/rules.d' unit/96-battery-nofity.rules
@@ -24,3 +24,6 @@ if lsmod | grep -q '^btusb\s'; then
   #   sudo mkinitcpio -p linux
   # fi
 fi
+
+# INFO:(temperature): $ sensors
+svc_activate -er thermald.service

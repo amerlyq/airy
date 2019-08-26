@@ -1,0 +1,20 @@
+ERR: 3D games start intensively lagging after ~1h hour
+  [21626.476631] mce: CPU1: Core temperature above threshold, cpu clock throttled (total events = 72401)
+  [21910.179590] mce: CPU1: Package temperature above threshold, cpu clock throttled (total events = 198667)
+    ::: partially solved by hairdryer into laptop
+
+
+TODO
+  SEE: $ r.b -r fanspeed
+  TRY: set "high" to ~85
+    <= Package id 0:  +72.0°C  (high = +100.0°C, crit = +100.0°C)
+    https://askubuntu.com/questions/463640/ubuntu-sensors-how-to-decrease-temperatures-threshold
+    https://unix.stackexchange.com/questions/129214/lower-temperature-thresholds-for-sensors
+    INFO: $ sudo sensors -u coretemp-isa-0000
+    $ man sensors.conf
+    ::: FAIL: my laptop won't allow to set "high = 85" using ../sensors.conf
+
+
+Watch temperature
+  $ watch sensors
+  $ watch grep '"cpu MHz"' /proc/cpuinfo
