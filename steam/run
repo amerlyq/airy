@@ -16,7 +16,15 @@ export LD_PRELOAD="/usr/lib/libGL.so /usr/lib32/libGL.so"
 # FIXED: small fonts and video on main screen
 export GDK_SCALE=2
 
-exec optirun steam
+# MAYBE:ALT:REF: https://wiki.archlinux.org/index.php/Vulkan#Nvidia_-_vulkan_is_not_working_and_can_not_initialize
+# export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nv_vulkan_wrapper.json
+# export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json
+# exec optirun -b primus steam
+
+# USE:|community/primus_vk|: vulkan offload for Bumblebee
+export ENABLE_PRIMUS_LAYER=1
+
+exec optirun steam "$@"
 
 # BAD: crash on "libvgui2_s.so"
 # primusrun steam

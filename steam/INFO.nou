@@ -5,6 +5,10 @@ DOC:REF: https://wiki.archlinux.org/index.php/Steam/Game-specific_troubleshootin
 Steam in Wine + gamepad
   https://www.linuxquestions.org/questions/linux-games-33/howto-getting-steam-wine-game-controllers-working-together-4175618012/
   https://steamcommunity.com/app/221410/discussions/0/828938354860178892/
+  http://fliplinux.com/steam-wine.html
+  2018-08-24 ALT:BET? SteamPlay -- embedded wine into steam itself
+    https://3dnews.ru/974517
+
 
 NOTE: move installation dir
   $ mkdir /games/_steam
@@ -15,6 +19,19 @@ NOTE: move installation dir
 
 Run single game
   $ primusrun steam steam://rungameid/23687
+
+
+Supraland -- 8 FPS
+  ERR: vulkandriverque[24065]: segfault at 10 ip
+  TRY: https://github.com/ValveSoftware/steam-for-linux/issues/6230
+  |community/primus_vk|
+  |community/vkd3d|
+  |multilib/lib32-vulkan-intel|
+  |multilib/lib32-vkd3d|
+  |multilib/lib32-primus_vk|
+  INSTALL $ paci primus_vk lib32-primus_vk lib32-vulkan-intel vkd3d lib32-vkd3d
+  USAGE: $ ENABLE_PRIMUS_LAYER=1 optirun path/to/application
+
 
 Crash on startup
   + https://github.com/ValveSoftware/steam-for-linux/issues/4529
