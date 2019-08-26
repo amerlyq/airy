@@ -3,7 +3,14 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-linkcp -t ~/.config mimeapps.list
+
+# BUG:REQ: using any xdg-set command overwrites symlink in ~/.config/ by real file
+#
+# MAYBE:(old): must be symlinked into two locations
+#   https://bugs.freedesktop.org/show_bug.cgi?id=98562
+linkcp -t ~/.config -- mimeapps.list
+# linkcp -t ~/.local/share/applications -- mimeapps.list
+
 
 # TODO: override from private -- if existing
 # WARN: don't use 'xdg-user-dirs-update' -- it's irritating

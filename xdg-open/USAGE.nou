@@ -1,0 +1,34 @@
+
+  $ xdg-mime query filetype my.txt
+    text/plain
+
+  $ xdg-mime query default text/plain
+    wine-extension-txt.desktop
+
+
+Browser
+  $ xdg-settings --list
+  Known properties:
+    default-url-scheme-handler    Default handler for URL scheme
+    default-web-browser           Default web browser
+  $ xdg-settings get default-web-browser
+    chromium.desktop
+
+  CMP: $ update-alternatives --display x-www-browser
+    x-www-browser - auto mode
+      link best version is /usr/bin/firefox
+      link currently points to /usr/bin/firefox
+      link x-www-browser is /usr/bin/x-www-browser
+    /usr/bin/chromium-browser - priority 40
+    /usr/bin/firefox - priority 40
+
+  FIXED: from /usr/share/applications/
+  $ xdg-settings set default-web-browser 'org.qutebrowser.qutebrowser.desktop'
+  ALSO:BUT:BET:
+    $ xdg-settings set default-url-scheme-handler http 'org.qutebrowser.qutebrowser.desktop'
+  $ xdg-settings get default-web-browser
+  $ xdg-open http://example.com/
+
+  ALT: config file
+    https://unix.stackexchange.com/questions/497146/create-a-custom-url-protocol-handler
+    MimeType=text/html;application/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
