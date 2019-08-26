@@ -4,8 +4,8 @@ source ~/.shell/func.d/packages
 # BAD:REM: installs 'xclip' as dep
 pkg_inst pass
 
-# WARN: to install you must
-#   https://aur.archlinux.org/packages/tomb/
-#  * edit refs in ~/.cache/aurutils/sync/tomb/PKGBUILD
-#  * gpg --recv-key ... for both "tomb" and "pass-tomb"
+# WARN: to install you must REF: https://aur.archlinux.org/packages/tomb/
+#  $ aur sync pass-tomb
+#  $ edit PKGBUILD :: https://files.dyne.org/${pkgname}/releases/*
+#  $ gpg --recv-key ... for both "tomb" and "pass-tomb"
 aur_inst pass-tomb

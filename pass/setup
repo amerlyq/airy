@@ -2,3 +2,16 @@
 # tags: util security
 # deps: gnupg
 source ~/.shell/func.d/cfgsetup
+
+if cfgOpt r; then
+  gpgid=${MAIN_MAIL:?}
+  pass init "$gpgid"
+  pass git init
+  # pass git remote add origin kexec.com:pass-store
+  # pass git push -u --all
+  tmp=~/.password-store_tmp
+  mv -vT ~/.password-store "$tmp"
+  pass tomb "$gpgid"
+  pass open
+  cp -aT "$tmp"/. ~/.password-store && rm -rf "$tmp"
+fi
