@@ -12,6 +12,12 @@ Tracking dangling file descriptors of deleted files (e.g. sqlite holding tmpfile
     $ strace-log-merge strace.log
 
 
+Trace by audit logs (syscalls, opened files, etc.)
+  IDEA: https://habr.com/ru/post/464951/
+  $ sudo auditctl -a exit,always -F arch=b64 -S clock_settime -S settimeofday && date
+  $ sudo ausearch -sc settimeofday --comm "chkcache_proces"
+
+
 Watch consumed cpu
   $ watch -n1 sh -c "ps -e -o %cpu,pid,tid,times,comm -L | awk '\$2==$(pidof organizer)' | sort -n"
 
