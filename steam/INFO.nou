@@ -33,6 +33,12 @@ Supraland -- 8 FPS
   USAGE: $ ENABLE_PRIMUS_LAYER=1 optirun path/to/application
 
 
+BUG: performance drop after ~1h playing
+  TRY:
+    $ sudo cpupower frequency-set -g performance
+    $ sudo cpupower frequency-set -g powersave
+
+
 Crash on startup
   + https://github.com/ValveSoftware/steam-for-linux/issues/4529
     MAYBE crash due to libglvnd inside nvidia-drivers present in render path -- rebuild driver w/o it

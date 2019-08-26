@@ -1,5 +1,17 @@
 USAGE: compatible with my general xkb
 
+DEFAULT: thumb modifiers
+  ────┬───────────────┬────────────
+  win │ lctrl  lalt   │ rwin  rctrl
+  mac │ lcomm  altopt │ ctrl  rcomm
+  pc  │ lctrl  lalt   │ ralt  rctrl
+  ────┼───────────────┼────────────
+  my  │ lwin   lctrl  │ rwin  ralt  (based on "win")
+  xkb │ meta  overlay │ lvl3  lang1
+  game│ lalt   xmonad │ lvl3  lang1
+  ────┴───────────────┴────────────
+
+
 % Modifiers % (xkb/amer applied over) - [progm-F12] ... [progm]  =>  check with xev
 |   actual key / inner  |    function    |    key caps (action -> location)
 | --------------------- | -------------- | -----------------
@@ -87,3 +99,13 @@ BAD: vbox
         MAYBE
       pause
         MAYBE
+
+
+Gaming layout (progm + g)
+| [lalt]>[lalt]         | Super (XMonad) | !! must be w/o <kp-> otherwise <M-j> won't work due to NumPad on <kp->
+| [bspace]>[space]      | Jump           | when can't remap <Space> in-game
+| [kp-bspace]>[rctrl]   | Crouch         | when xkb remap to CapsLock don't work
+    FIXME: "rctrl" may be not enough in some games
+      USE: "lctrl" and move "Overlay1" to "rctrl" by swapping lctrl and rctrl
+  WASD -> ESDF
+  Tab -> A

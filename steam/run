@@ -11,7 +11,8 @@ r.wm -w g  # Jump to game workspace
 # [VGL] ERROR: VirtualGL attempted to load the real
 # [VGL]   glXCreatePbuffer function and got the fake one instead.
 # [VGL]   Something is terribly wrong.  Aborting before chaos ensues.
-export LD_PRELOAD="/usr/lib/libGL.so /usr/lib32/libGL.so"
+export LD_PRELOAD="libpthread.so.0 /usr/lib/libGL.so /usr/lib32/libGL.so"
+export __GL_THREADED_OPTIMIZATIONS=1
 
 # FIXED: small fonts and video on main screen
 export GDK_SCALE=2
