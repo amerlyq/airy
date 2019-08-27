@@ -25,7 +25,9 @@ export GDK_SCALE=2
 # USE:|community/primus_vk|: vulkan offload for Bumblebee
 export ENABLE_PRIMUS_LAYER=1
 
-exec optirun steam "$@"
+# NEED: $ sudo chrt --fifo --all-tasks --pid 15 $(pidof game)
+exec time nice -n -4 taskset --cpu-list 0-8:2 optirun steam "$@"
+# exec optirun steam "$@"
 
 # BAD: crash on "libvgui2_s.so"
 # primusrun steam

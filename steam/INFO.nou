@@ -34,9 +34,15 @@ Supraland -- 8 FPS
 
 
 BUG: performance drop after ~1h playing
-  TRY:
+  TRY
     $ sudo cpupower frequency-set -g performance
+    $ watch grep '"cpu MHz"' /proc/cpuinfo
     $ sudo cpupower frequency-set -g powersave
+  READ
+    https://wiki.archlinux.org/index.php/CPU_frequency_scaling
+    https://wiki.archlinux.org/index.php/Steam/Game-specific_troubleshooting
+    https://wiki.archlinux.org/index.php/Improving_performance
+    https://wiki.archlinux.org/index.php/Gaming
 
 
 Crash on startup
