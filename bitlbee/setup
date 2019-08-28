@@ -16,6 +16,10 @@ Deprecated /etc/systemd/system/multi-user.target.wants/bitlbee.service
 # MAYBE:(changes to config): $ sudo systemctl stop bitlbee.service
 svc_activate -er bitlbee.socket
 
+# [_] FIXME disable history/buddies/logging/debug/verbose, etc. inside default Purple config
+#   /var/lib/bitlbee/purple/$USER/prefs.xml
+#   ?? maybe use ~/.config/purple/ to override settings BAD: system-wide svc ??
+
 # BUG: after system update gpg/pass won't work until reboot -- fail for setup
 #   ::: TEMP: remove lines with "bitlbee" and "weechat" from /tmp/airy-*.list
 if cfgOpt u; then

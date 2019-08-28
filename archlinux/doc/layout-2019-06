@@ -102,7 +102,10 @@ btrfs subvolume create /mnt/@/var/log
 # btrfs subvolume create /mnt/@/work/repo
 btrfs subvolume create /mnt/@/home/${myuser:?}/.cabal
 btrfs subvolume create /mnt/@/home/${myuser:?}/.cache
+btrfs subvolume create /mnt/@/home/${myuser:?}/.ccache
 btrfs subvolume create /mnt/@/home/${myuser:?}/.gem
+btrfs subvolume create /mnt/@/home/${myuser:?}/.local/share/Steam
+btrfs subvolume create /mnt/@/home/${myuser:?}/.stack
 btrfs subvolume create /mnt/@/home/${myuser:?}/sdk
 # nodatacow per subvolume
 chattr +C /mnt/@/var/log

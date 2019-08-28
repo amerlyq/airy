@@ -26,8 +26,8 @@ make_backup(){ local f nm=$1
 # ALT: use bash array with globs in sep files -- instead of parsing them myself
 ffprf=$(find ~/.mozilla/firefox -maxdepth 1 -type d -name '*.default' -print -quit)
 make_backup history <<EOT
-  ~/.cache/airy/dict-words-en.txt
-  ~/.cache/airy/dict-words-ru.txt
+  ~/.local/share/airy/dict-words-en.txt
+  ~/.local/share/airy/dict-words-ru.txt
   ~/.cache/vim/plugins/mru_file
   ~/.config/mpd/history
   ~/.config/selfspy/selfspy.sqlite
