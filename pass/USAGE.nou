@@ -1,0 +1,53 @@
+USAGE
+  Copy passwd from dmenu to xclip
+    $ passmenu
+  Copy url field from data produced by pass-import
+    $ pass urldroplet.com | grep -oP '^url: \K.*' Y
+
+
+Setup
+  Basic
+    $ gpgid=$(gpg -K | grep -oE '\S{40}' | head -1)
+    $ pass init ${gpgid:-$mail}
+    $ pass insert work/user
+  Git
+    $ pass git init
+    # $ pass git remote add origin kexec.com:pass-store
+    # $ pass git push -u --all
+  Tomb
+    $ mv ~/.password-store{,_}
+    $ pass tomb --timer=2h ${gpgid:-$mail}  # NOTE: doing "pass init" by itself
+    $ pass git init
+    $ cp -a ~/.password-store{_/.,}
+    $ rm -rf ~/.password-store_/
+    ...
+    $ pass close
+  Import from LastPass
+    TUT https://github.com/roddhjav/pass-import
+    | More Options -> Advanced -> Export -> <Ctrl-s> => "Export.html" => file.csv
+    $ pass import lastpass file.csv
+
+
+Migrate to another key
+  https://lists.zx2c4.com/pipermail/password-store/2015-May/001548.html
+    $ pass init gpgid-new
+
+
+Copy DB to another PC
+  Import new keys
+    OLD: $ gpg --import new-subkeys.asc
+    $ gpg -K
+  Reencrypt passwords by both keys
+    OLD: $ pass init gpgid-old gpgid-new
+  Check both identities present
+    $ gpg -d ~/.password-store/somepassword.gpg
+  Copy whole ~/.password-store to another PC
+    $ pass close
+    $ scp ~/.password.tomb user@host:~/
+  ALT: generate new subkeys, export them and copy to new PC
+    $ gpg --export-secret-subkeys gpgid-new > subkeys.asc
+  Reencrypt again to drop support of different keys
+    NEW: $ pass init gpgid-new
+    OLD: $ pass init gpgid-old
+  Delete new keys from old PC
+    OLD: $ gpg --delete-secret-key gpgid-new

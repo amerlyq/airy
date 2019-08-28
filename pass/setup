@@ -3,15 +3,20 @@
 # deps: gnupg
 source ~/.shell/func.d/cfgsetup
 
-if cfgOpt r; then
+# TODO:CHG:(cfgOpt r): when fixed and actively used everywhere
+#   SECU:REQ: https://github.com/roddhjav/pass-tomb/issues/27
+if false; then
+  set -eu  # ensure
   gpgid=${MAIN_MAIL:?}
-  pass init "$gpgid"
+  tmp=~/.password-store_tmp
+  [[ -d ~/.password-store ]] && mv -vT ~/.password-store "$tmp"
+  pass tomb --timer=2h "$gpgid"  # NOTE: it also does "pass init"
   pass git init
   # pass git remote add origin kexec.com:pass-store
   # pass git push -u --all
-  tmp=~/.password-store_tmp
-  mv -vT ~/.password-store "$tmp"
-  pass tomb "$gpgid"
+  [[ -d $tmp ]] && cp -aT "$tmp"/. ~/.password-store
+  pass close
   pass open
-  cp -aT "$tmp"/. ~/.password-store && rm -rf "$tmp"
+  echo
+  >&2 echo "WARN!!! check all passwords present and then manually remove '$tmp'"
 fi
