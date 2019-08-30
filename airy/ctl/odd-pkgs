@@ -1,0 +1,20 @@
+#!/bin/bash -eu
+# REF:(groups list): https://www.archlinux.org/groups/
+
+db=~/.cache/airy/install-pkgs.txt
+dsrc=${TMPDIR:?}/airy
+
+# NOTE: generate active db w/o actual cmds execution
+[[ -d $dsrc ]] || airyctl -- all/install flags=-m
+
+# NOTE: filter-out pre-installed deps and pacstrap:
+#   ?: sudo grub os-prober ntp lvm2 polkit
+sort - "$dsrc"/*.list > "$db" <<'EOT'
+base
+base-devel
+EOT
+
+pacman -Qei | awk '
+  /^Name\s/{n=$3}
+  /^Groups\s/{print($3=="None"?n:n" "$3)}
+' | grep -vwFf "$db"
