@@ -609,6 +609,9 @@ c.content.headers.accept_language = 'en-US,en;q=0.5'
 ## Type: Bool
 # c.content.javascript.enabled = True
 c.content.javascript.enabled = False
+config.set('content.javascript.enabled', True, '*://github.com/*')
+config.set('content.javascript.enabled', True, '*://google.com/*')
+config.set('content.javascript.enabled', True, '*://stackoverflow.com/*')
 config.set('content.javascript.enabled', True, '*://www.google.com/*')
 
 ## Log levels to use for JavaScript console logging messages. When a

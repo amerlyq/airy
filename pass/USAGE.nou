@@ -17,6 +17,7 @@ Setup
   Tomb
     $ mv ~/.password-store{,_}
     $ pass tomb --timer=2h ${gpgid:-$mail}  # NOTE: doing "pass init" by itself
+    # OR: $ pass open --timer=10min
     $ pass git init
     $ cp -a ~/.password-store{_/.,}
     $ rm -rf ~/.password-store_/
@@ -43,7 +44,7 @@ Copy DB to another PC
     $ gpg -d ~/.password-store/somepassword.gpg
   Copy whole ~/.password-store to another PC
     $ pass close
-    $ scp ~/.password.tomb user@host:~/
+    $ scp ~/.password.tomb{,.key} user@host:~/
   ALT: generate new subkeys, export them and copy to new PC
     $ gpg --export-secret-subkeys gpgid-new > subkeys.asc
   Reencrypt again to drop support of different keys

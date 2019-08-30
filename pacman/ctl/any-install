@@ -33,6 +33,11 @@ nonempty(){ local fs=()
   "${@:?}" < <(cat -- "${fs[@]:?}")
 }
 
+sudo -v
+(while sleep 30; do sudo -v; done || true) & pidsudo=$!
+onexit(){ kill -TERM "$pidsudo"; wait "$pidsudo"; }
+trap onexit INT ERR
+
 # NOTE: do full-system-upgrade if you want to link AUR with correct libs (and not rebuild them immediately again)
 # WARN:(build AUR/LOC): to enable some feature -- may need some pkg to be already installed
 nonempty ./aur.{list,deps}    -- r.pacman-aur-package ${aur:+"-$aur"} --

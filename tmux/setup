@@ -3,6 +3,9 @@
 source ~/.shell/func.d/cfgsetup
 [[ $THEME =~ ^(dark|light)$ ]] || THEME=dark
 
+# BUG: clean system:
+# error connecting to /tmp//tmux-1000/default (No such file or directory)
+
 ### LINKS ###
 linkcp "$PWD/tmux.conf" ~/.tmux.conf
 linkcp "$PWD/theme-${THEME}.conf" ~/.config/airy/theme-tmux.conf

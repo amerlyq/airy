@@ -22,6 +22,7 @@ if distro arch; then
   # BUG: can't rebuild pkg because of already built one
   #   WARNING: A package has already been built, installing existing package...
   #   ::: rm ~/.cache/airy/pkg/st-airy-git/*.tar.xz
+  # BUG: must disable split-screen 12 font for small monitors... when primary external monitor is HDMI-2 itself
   FONT_ST="${FONT_ST-}" loc_inst ./st-airy-git.pkgbuild
 
   # CHECK? if some needed

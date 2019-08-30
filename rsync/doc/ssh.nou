@@ -8,5 +8,12 @@ TUT https://kyup.com/tutorials/copy-files-rsync-ssh/
   $ rsync -e ssh -azvh --delete /work/doc/ ws:/work/doc
 
 <- remote
-  $ rsync -e ssh -avh ws:/work/doc /work
-  $ rsync -e ssh -azvh --delete ws:/work/doc/ /work/doc
+  move files/dirs from home
+    $ rsync -e ssh -Pavh --stats ws:'file1 dir2' .
+  move into current dir
+    $ rsync -e ssh -Pavh --stats ws:/work/doc /work
+    $ rsync -Pavh -e 'ssh -p 1122 -i sshkey' user@remotemachine:'/work/{file1.zip,file2.zip,file3.zip}' .
+  move and rename
+    $ rsync -e ssh -avh --stats --progress ws:/work/doc/ /work/doc
+  ALT
+    $ rsync -e ssh -azvh --delete ws:/work/doc/ /work/doc

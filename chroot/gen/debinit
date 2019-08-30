@@ -23,14 +23,16 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
     locale-gen 'en_US.UTF-8'  # NEED: locales
     # sudo dpkg-reconfigure tzdata
 
-    useradd -mUG users,uucp,sudo -s /bin/bash $user
-    ## BET: manually use 'passwd': $ sudo schroot -c "${chr##*/}"
-    # printf '%s' root:root   | chpasswd
-    # printf '%s' $user:$user | chpasswd
-
     # NOTE: only after install/update 'sudo'
     # CHECK:ALT: add user to group 'sudo' is enough?
     sed -i '/^$user ALL.*/d; \$a\\$user ALL=(ALL) ALL' /etc/sudoers
+
+    # BUG: user '$user' already exists
+    useradd -mUG users,uucp,sudo -s /bin/bash $user
+    # usermod -aG users,uucp,sudo,wheel $user
+    ## BET: manually use 'passwd': $ sudo schroot -c "${chr##*/}"
+    # printf '%s' root:root   | chpasswd
+    # printf '%s' $user:$user | chpasswd
 "; }
 
 dir=/chroot && [[ -d $dir ]]

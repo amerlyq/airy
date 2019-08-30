@@ -1,0 +1,12 @@
+[Unit]
+Description=Xorg - Virtual Server - %P
+
+[Service]
+# OR: -screen 0 640x480x24
+ExecStart=/usr/bin/Xvfb :%i -fbdir /var/tmp
+Restart=always
+RestartSec=3
+TimeoutStopSec=3
+
+[Install]
+WantedBy=main.target

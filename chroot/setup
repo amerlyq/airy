@@ -11,3 +11,11 @@ if cfgOpt u; then
   ./gen/nss.gen
   ./gen/net.gen
 fi
+
+# NEED: reset passwords in chroot and setup dev packages
+if cfgOpt R; then
+  for chr in "${CURR_CHROOTS[@]:?}"; do
+    sudo schroot -c "${chr##*/}" -d '/' -- bash -c "passwd; passwd ${USER:?}"
+    sudo schroot -c "${chr##*/}" -d '/' -- bash -c "cd ~/aura/airy/chroot/prf && ./ubuntu-16.04 -u"
+  done
+fi

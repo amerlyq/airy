@@ -17,5 +17,5 @@ if cfgOpt u; then
     sudo debootstrap --verbose --include="$pkgs" --variant buildd \
       --arch "${prf##*_}" "${prf%_*}" "$dir/$prf" "$mirror"
   done
-  ./gen/debinit
+  ./gen/debinit $(cfgOpt R && echo -u)
 fi

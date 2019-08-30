@@ -13,7 +13,8 @@ source "$my_cache/exe/pass -m $my_acc $my_pass |"
 set smtp_pass = $my_pass
 
 set folder = $HOME/.mail/$my_acc
-set spoolfile = "=INBOX"
+# set spoolfile = "=INBOX"
+set spoolfile = "inbox"  # USE: "description" from "virtual-mailboxes" / "named-mailboxes"
 set postponed = "=Drafts"
 set copy      = yes
 set record    = "=Sent"    # Need fcc to work for cmdline-send
@@ -36,10 +37,12 @@ set nm_db_limit = 400                   # DFL=0 for unlimited listing
 set nm_query_window_duration = 0        # DFL=0 for unlimited listing
 set nm_query_window_timebase = "week"   # VIZ: "hour", "day", "week", "month", "year"
 
-# set virtual_spoolfile = yes    # use first vmbox as initial selection
+# [_] TRY:CFG: show both "inbox" + "Sent|important OR related-to-inbox-threads" to reconstruct chains
+# set virtual_spoolfile = yes    # DEPRECATED: use first vmbox as initial selection
+
 unvirtual-mailboxes *
 virtual-mailboxes \
-    "inbox"   "notmuch://?query=tag:inbox AND NOT tag:archive" \
+    "inbox"   "notmuch://?query=folder:INBOX&limit=0" \
     "unread"  "notmuch://?query=tag:unread"  \
     "sent"    "notmuch://?query=tag:sent"    \
   "abandoned" "notmuch://?query=query:abandoned" \
@@ -52,6 +55,7 @@ virtual-mailboxes \
     "log"     "notmuch://?query=folder:log"  \
     "spam"    "notmuch://?query=folder:spam"
 
+# "inbox"   "notmuch://?query=tag:inbox AND NOT tag:archive&limit=100" \
 # "starred" "notmuch://?query=tag:*" \
 # "archive" "notmuch://?query=tag:archive" \
 # "news"    "notmuch://?query=tag:newsletters"

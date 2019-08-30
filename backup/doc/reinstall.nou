@@ -3,10 +3,11 @@ Backup before clean re-install
 secrets
   ~/.gnupg
     = export keys
-  ~/.password-store | ~/.password.tomb
+  ~/.password-store | ~/.password.tomb | ~/.password.tomb.key
     = NEED: ~/.gnupg
   ~/.ssh
     = copy keys
+  ~/.weechat/certs/nick.pem
 
 
 chats
@@ -62,5 +63,4 @@ Pick necessary, sync in other ways
   /work/*
   /work/task.*
   /work/_mirror
-  /vm OR /srv/vm
-    = /work/_data/vm
+  /vm OR /data/vm OR /srv/vm OR /work/_data/vm

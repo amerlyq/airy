@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 exec r.chroot-auto \
   DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
-  DISPLAY="$DISPLAY" \
+  DISPLAY="${DISPLAY:-:0}" \
   "$@"
 
 # exec r.t -e r.chroot-gui "$@"

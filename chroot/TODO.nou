@@ -1,8 +1,26 @@
+ALT
+  TUT Поднятие chroot-«виртуалки» с ubuntu для сборки пакетов / Хабр
+    https://habr.com/ru/post/244373/
+  docker
+    $ docker pull ubuntu:16.04
+    $ docker run -ti ubuntu /bin/bash
+  lxc
+    http://vasilisc.com/lxc-1-0-unprivileged-containers
+    ?? не все пакеты можно собрать в chroot-е
+      Я на днях собирал pulseaudio из trunk-а, и в chroot он не собрался (не стал копать, почему),
+      а в lxc — с первого раза все собралось
+  vagrant + lxc plugin
+  pbuilder
+  ???
+    https://openbuildservice.org/
+  build farm
+    https://github.com/jordansissel/fpm
+
+
 SEE
   Full
     https://wiki.ubuntu.com/DebootstrapChroot
     https://help.ubuntu.com/community/DebootstrapChroot
-    https://habrahabr.ru/post/244373/
 
   Small
     https://sites.google.com/site/uxhakx/debootstrap-on-archlinux-howto
@@ -15,24 +33,12 @@ USAGE
   Self-chroot scripts
     $ [[ -s /etc/debian_chroot ]] || ! hash r.chroot &>/dev/null || exec r.chroot "$0" "$@"
 
-ALT:CHECK:
-  docker
-    docker pull ubuntu:14.04
-    docker run -ti ubuntu /bin/bash
-  lxc
-    http://vasilisc.com/lxc-1-0-unprivileged-containers
-    : не все пакеты можно собрать в chroot-е. Я на днях собирал pulseaudio
-    : из trunk-а, и в chroot он не собрался (не стал копать, почему), а в
-    : lxc — с первого раза все собралось.
-    vagrant + lxc plugin
-  https://github.com/jordansissel/fpm
-  pbuilder
-  http://openbuildservice.org
 
 Install
   Ubuntu10
     sudo apt-get install debootstrap schroot
     ./chroot_buildenv.sh --install --installdir /cryptfs/chroots/lucid_i386 --name lucid_i386 --tarball chrootenv_lucid_i386.tar.bz2
+
 
 BUG
   [_] BUG: problems with groups transition

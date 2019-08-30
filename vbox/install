@@ -13,6 +13,11 @@ if distro arch; then
     # SEE: https://forum.antergos.com/topic/818/can-t-run-my-vitualbox/4
     # dkms autoinstall  # For custom, also: pkg_inst virtualbox-host-dkms
 
+    # -> VNC, USB2.0
+    pkg_inst virtualbox-ext-vnc
+    # BAD: non-free for corporate usage
+    # aur_inst virtualbox-ext-oracle
+
     pkg_inst net-tools  # NEED for bridge network and host-only to assign host ip
 
     # now this command should work :)

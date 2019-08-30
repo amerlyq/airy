@@ -35,6 +35,7 @@ sudo umount ~/.snapshots
 sudo rmdir ~/.snapshots
 sudo snapper -c user create-config ~
 sudo btrfs subvolume delete ~/.snapshots
+# BAD! global search in home will be slow BET! use common /home/.snapshots OR! merge root and home partitions and use only /.snapshots
 mkdir ~/.snapshots
 sudo mount -a
 

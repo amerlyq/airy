@@ -264,7 +264,7 @@ auto_view text/html text/calendar
 #   REF: https://www.reddit.com/r/commandline/comments/53dh17/mutt_getting_thread_replies_in_inbox/
 #   FIXED:BUG:(set record=^): can't reply after switching to vmbox due to "Fcc:notmuch://"
 # [_] FIXME: must be fixed on "=Sent" for notmuch virtual box OR: pick folder based on Folder: of replied message
-folder-hook . 'set record=^'  # Save mail in cwd instead of '=Sent'
+# folder-hook . 'set record=^'  # Save mail in cwd instead of '=Sent'
 # ALT: folder-hook . 'exec collapse-all'
 folder-hook . 'push <collapse-all>'
 # folder-hook . 'push ":set collapse\_unread=no<enter>"'

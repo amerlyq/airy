@@ -2,6 +2,8 @@
 # /etc/security/pam_env.conf
 
 # BAD:(PATH): /etc/profile overrides after ~/.pam_environment
+# BUG: clean setup -- sets "vim" and you must override it
+#   $ PAGER=r.pager EDITOR=r.vim ./setup -m
 # PATH    OVERRIDE="%{PATH}"
 EDITOR  DEFAULT="%{EDITOR}"
 VISUAL  DEFAULT="%{EDITOR}"

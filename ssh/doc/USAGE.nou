@@ -11,3 +11,5 @@
 %%% Hosts
   Remove replaced/expired key fingerprint for known_hosts
     $ ssh-keygen -R hostname
+  Compare github fingerprint between old and new PC
+    $ ssh-keygen -l -f ~/.ssh/known_hosts -F 140.82.118.4

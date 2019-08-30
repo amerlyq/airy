@@ -7,6 +7,7 @@ Copy directory
   $ rsync -rvz --no-perms --no-owner --no-group ...
   https://www.electrictoolbox.com/rsync-ignore-existing-update-newer/
 
+
 Move directory
   https://unix.stackexchange.com/questions/43957/using-rsync-to-move-not-copy-files-between-directories
   dry-run: -n
@@ -17,17 +18,21 @@ Move directory
   delete empty source dirs skeleton afterward
     $ find /path/old -depth -type d -empty -delete
 
+
 Resume / interrupt
   https://unix.stackexchange.com/questions/48298/can-rsync-resume-after-being-interrupted/147286
   * --partial --partial-dir
   * --append --append-verify
   * --checksum
 
+
 [_] TRY: store checksum in xatter on copy like rmlint
+
 
 Incremental backups with hardlinks
   https://superuser.com/questions/1245978/using-rsync-on-wsl-bash-for-windows-10-for-incremental-backups
   $ rsync -aP --link-dest=PATHTO/$PREVIOUSBACKUP $SOURCE $CURRENTBACKUP
+
 
 Batch update
   = compute once, update to many identical mirrors

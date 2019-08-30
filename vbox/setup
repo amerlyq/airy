@@ -2,11 +2,18 @@
 # tags: core
 source ~/.shell/func.d/cfgsetup
 
+lsmod | grep -q '^vboxdrv\>' || sudo modprobe vboxdrv
+
+linkcp -ct /etc/tmpfiles.d  "unit/vbox.conf"
+cfgOpt uU || [[ ! -d /srv/share ]] && sudo systemd-tmpfiles --create "vbox.conf"
+
 # TODO: symlink /vm to xdg_airy_vm_dir with fallback to ~/vm
 dir=/data/vm  # OR ~/VMs OR /data/VMs
 mkdir -p "$dir"
 VBoxManage setproperty machinefolder "$dir"
 
+# TODO! change Host key to "ISO_first_group_lock"
+# TODO! exchange Host-Del and Host-Backspace
 ## NOTE: disable annoying miniToolBar
 # SEE: http://helpdeskgeek.com/virtualization/hide-the-menu-bar-and-status-bar-in-virtualbox/
 VBoxManage setextradata global GUI/Customizations noMenuBar,noStatusBar

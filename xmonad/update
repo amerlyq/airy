@@ -3,6 +3,9 @@ source ~/.shell/func.d/system
 set -euo pipefail
 # BUG: need manually 'xmonad --recompile' to create ~/.xmonad/xmonad-x86_64-linux
 
+# BUG: clean install don't have "r.n"
+has_pr r.n || r.n(){ printf '%s\n' "$@"; }
+
 running_X && r.n xmonad recompile
 xmonad --recompile
 running_X && xmonad --restart

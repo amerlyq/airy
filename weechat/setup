@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-# deps: defaults
+# deps: defaults query pass
 # tags: net chat
 #%USAGE: update single config
 #%  $ ./exe/communicate -- cfg/info/rss.conf
@@ -19,6 +19,7 @@ fi
 
 ### GENS ###
 # WARN: will break on clean install (must store bunch of "chat/*" passwords beforehand)
+# BUG: clean-install -- still don't have r.query-password
 if cfgOpt ur; then
   ./exe/configure $(cfgOpt r && printf -- -r) -- "${WEECHAT_LIST[@]:?}"
 fi
