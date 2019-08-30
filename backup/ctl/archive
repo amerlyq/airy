@@ -1,16 +1,20 @@
 #!/bin/bash
 #%USAGE: $ ./$0 [<history|secrets|chat>...]
+#%PERF: 6 min = 13 topics = 4.7GB total
 set -euo pipefail
 
+# [_] TRY: /net/backup BAD? store backup directly to NAS -- may corrupt transmitted archives
+
 ## CHG: place into synced dir from profile
-dst=/tmp
+dst=${BACKUP_DIR_ROOT:-/tmp}
 args=( "$@" )
 
 
 ## Store all permissions and extended attributes.
 #   (otherwise many programs will stop working!)
 make_backup(){ local f nm=$1
-  ((${#args[@]})) && [[ ! " $nm " =~ " ${args[*]} " ]] && return
+  # shellcheck disable=SC2076
+  ((${#args[@]})) && [[ ! " ${args[*]} " =~ " $nm " ]] && return
   f=$dst/$nm-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.gz
   sed -r "
     s/^\s+//              # indenting spaces
@@ -24,41 +28,54 @@ make_backup(){ local f nm=$1
 
 #%INFO: backup history and other local db (both binary and textual)
 # ALT: use bash array with globs in sep files -- instead of parsing them myself
-ffprf=$(find ~/.mozilla/firefox -maxdepth 1 -type d -name '*.default' -print -quit)
 make_backup history <<EOT
   ~/.local/share/airy/dict-words-en.txt
   ~/.local/share/airy/dict-words-ru.txt
   ~/.cache/vim/plugins/mru_file
   ~/.config/mpd/history
-  ~/.config/selfspy/selfspy.sqlite
+  # ~/.config/selfspy/selfspy.sqlite
+  ~/.config/VirtualBox
 
 ## cli
   ~/.cache/gdb_history
   ~/.cache/zsh/.zhistory
   ~/.config/radare2/history
+  ~/.fbless_save
   ~/.ipython/profile_default/history.sqlite
   ~/.bash_history
   ~/.jhistory
+  ~/.local/share/zathura
+  ~/.sbcl_history
   ~/.sqlite_history
-
-  ~/.config/VirtualBox
-  # THINK: ~/.cache/vim/cache/bckp
-  # THINK: ~/.cache/vim/cache/undo
+  ~/.w3m/history
+  ~/.wget-hsts
+EOT
 
 ## browsers (frequently updating cache)
+ffprf=$(find ~/.mozilla/firefox -maxdepth 1 -type d -name '*.default' -print -quit)
+make_backup browsers <<EOT
+  ~/.config/qutebrowser/autoconfig.yml          # transient settings
+  ~/.local/qute-proxy                           # additional session
   ~/.local/share/qutebrowser/cmd-history
   ~/.local/share/qutebrowser/history.sqlite
-  $ffprf/places.sqlite    # bookmarks
-  $ffprf/sessionstore.js  # opened tabs
+  $ffprf/places.sqlite                          # bookmarks
+  $ffprf/sessionstore.js                        # opened tabs
   $(find "$ffprf/sessionstore-backups" -maxdepth 1 -type f \( -name '*.js' -o -name '*.js-*' \) -print)
 EOT
 
 
+
 # BET:DEV:SECU create versioned *tomb* for secrets backup
 make_backup secrets <<EOT
-  ~/.gnupg            # export keys
-  ~/.password-store   # NEED: ~/.gnupg
-  ~/.ssh              # copy keys
+  ~/.android                  # authorized adb shell
+  ~/.config/kdeconnect        # authorized clipboard sharing
+  ~/.config/syncthing         # certificates and ids
+  ~/.gnupg                    # export keys
+  ~/.password-store           # NEED: ~/.gnupg
+  # ~/.password-store.tomb
+  # ~/.password-store.key
+  ~/.ssh                      # copy keys
+  ~/.weechat/certs/nick.pem   # privatkey-login
 EOT
 
 
@@ -67,3 +84,37 @@ make_backup chat <<EOT
   ~/.purple/logs
   ~/.weechat/logs
 EOT
+
+
+# = custom digital presets
+make_backup krita <<EOT
+  ~/.local/share/krita
+  ~/.cache/krita
+EOT
+
+# = syncthing folders
+make_backup sync <<EOT
+  # ~/books
+  # ~/mems
+  ~/sync
+EOT
+
+make_backup aura <<< ~/aura             # = all personal repos
+make_backup gamesaves <<< ~/gamesaves   # = aggregated game saves
+make_backup hub <<< ~/hub               # = code examples and teaching materials
+make_backup research <<< ~/research     # = ongoing research topics
+make_backup vim <<< ~/.cache/vim/cache  # = vim files backups
+make_backup work <<< ~/work             # = archived work topics
+
+# make_backup dld <<< /_dld               # = unsorted downloads (always move media files to /data)
+
+make_backup etc <<< /etc ||:      # = system-wide user configs (skipping passwords w/o sudo)
+# make_backup srv <<< /srv          # = ftp/http/tftp/vbox-share/etc
+# make_backup usrsrc <<< /usr/src   # = some downloaded sources
+
+
+# ALSO:
+# /games and /opt must backup filelist instead of content
+#   -- to be able to restore same hierarchy on demand e.g. to remember active games
+# ~~ same for ./odd-packages installed from pacman
+# ~~ and history of everything which we installed into ~/.cache/aurutils/

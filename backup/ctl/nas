@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#%SUMMARY: remount NAS share
+#%ALT:BET: keep NAS always "ro" and sync backups directly by "rsync"
+#%  $ command rsync -e ssh -Pavh --no-group --stats -- *.tar.gz NAS:/path/to/backup/@linux
+set -fCueEo pipefail
+
+mode=ro
+dir=/net/share
+
+(($#)) && mode=rw
+
+# WARN!!! mount NAS share by default in "ro" and remount to "rw" only on demand
+#   -- to prevent accidental "rm -rf /" from buggy programs like steam
+# REF: https://github.com/valvesoftware/steam-for-linux/issues/3671
+
+findmnt --type cifs -O "$mode" -- "$dir" >/dev/null \
+|| sudo mount --options "remount,${mode:?}" -- "$dir"
+
+findmnt --type cifs -- "$dir"
