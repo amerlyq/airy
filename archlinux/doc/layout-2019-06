@@ -122,6 +122,11 @@ umount /mnt
 #   └─/var/log
 # └─@snapshots   /mnt/.snapshots
 
+# ALT: migrate existing /home to snapper subvolumes
+#   fmv(){ mv "$1" "${1}_" && btrfs sub create "$1" && chown "$myuser:$myuser" "$1" && cp -a --reflink=always "${1}_"/. "$1" && diff --no-dereference -r "${1}_" "$1" && rm -rf "${1}_"; }
+# USAGE: $ fmv .cache
+# CHECK: $ btrfs sub list /home
+
 
 ## NOTE: assemble mounted filesystem
 mount -o noatime,compress=lzo,autodefrag,ssd,subvol=/@ /dev/ws/root /mnt
