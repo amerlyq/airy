@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#%SUMMARY: remap pedals to something else
+#%DFL: [LMouse|Overlay|RMouse]
+#%TUT:(xinput): https://askubuntu.com/questions/492744/how-do-i-automatically-remap-buttons-on-my-mouse-at-startup
+set -fCureEo pipefail
+
+# SEE: https://superuser.com/questions/883782/how-do-i-properly-map-a-keyboard-key-to-a-mouse-button
+# https://askubuntu.com/questions/685235/how-should-i-configure-kinesis-savant-elite-usb-pedals-in-14-04
+# https://www.linux.org/threads/cool-tricks-with-xinput-device.10345/
+
+nm='Kinesis Savant Elite2 Foot Pedal'
+dev=$(xinput list --name-only | grep -im1 "$nm")
+mid=$(xinput list --id-only "pointer:$dev")
+
+#%DEBUG: press keys to know their reported index
+# xinput --get-button-map "$mid"
+# xinput test "$mid"
+
+# Map button 9 (top side button) to button 2 (middle button)
+xinput set-button-map "$mid" 1 2 10 4 5 6 7
+
+r.n Savant/Pedals Remapped
+
+# FAIL:ATT: remapping "RMouse" to "space" by xdotool -- you will lose ability to press both pedals simultaneously
+#   <= xdotool simply won't emulate RMouse action when LMouse is pressed
+# BET:USE: "space" -- it can be easily remapped by xinput to any other key required in games
+#
+# OR: "xte 'key 0x61'"
+# OR: "xvkbd -xsendevent -text '\[Delete]'"
+#   <= https://askubuntu.com/questions/85850/how-to-remap-a-key-combination-to-a-single-key
+xbindkeys --nodaemon --file /dev/stdin <<EOT
+"xdotool key w"
+  m:0x0 + b:10
+EOT
+
+## ALT:BET? remap mouse to keyboard through xkbset | xmodmap
+# https://superuser.com/questions/313926/use-keys-for-mouse-buttons-on-linux-alternative-to-ahk
+# BAD: mapped in reverse direction -- keypress generates mouse
+# xmodmap -e "keysym Menu = Pointer_Button2"
+# xmodmap -n - <<< "keysym Menu = Pointer_Button2"

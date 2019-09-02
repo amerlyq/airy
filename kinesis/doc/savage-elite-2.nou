@@ -1,5 +1,8 @@
 Reprogram
-  * switch to progmode by sliding switch under pedals bottom
+  * switch to "Program Mode"
+    - hold ANY pedal when pedals plugged into USB
+      => you must re-insert USB to switch back to "Play Mode"
+    - OR: by sliding switch under pedals bottom
   * open virtual drive $ mnt sda
   * change file ./active/pedals.txt
 
@@ -14,3 +17,13 @@ Mouse + Overlay
   [lpedal]>[lmouse]
   [mpedal]>[lctrl]
   [rpedal]>[rmouse]
+
+
+Gaming / Hybrid Overlay
+  [lpedal]>[lmouse]
+  [mpedal]>[lctrl]
+  [rpedal]>[space]
+    NOTE: "space" is good-enough for most games, especially considering KinesisAdvantage <Space> is on the right
+    ALSO: it can be easily remapped by xinput to any other key required in games
+    ALT:ATT: remapping "RMouse" to "space" by xdotool -- you will lose ability to press both pedals simultaneously
+      <= xdotool simply won't emulate RMouse action when LMouse is pressed
