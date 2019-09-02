@@ -6,4 +6,7 @@ source ~/.shell/func.d/cfgsetup
 
 linkcp -ct '/etc/systemd/system/snapper-cleanup.timer.d' unit/override-cleanup.conf
 
-svc_activate -er snapper-{boot,cleanup,timeline}.timer
+## NOTE: snaper-boot snapshots only ROOT -- but I have only HOME on laptop
+[[ $CURR_PROF =~ ^neo ]] || svc_activate -er snapper-boot.timer
+
+svc_activate -er snapper-{cleanup,timeline}.timer

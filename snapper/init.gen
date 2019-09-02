@@ -21,6 +21,7 @@ sudo chmod 750 /.snapshots
   # http://snapper.io/2016/05/18/space-aware-cleanup.html
   # OR: vis /etc/snapper/configs/root
 sudo snapper -c root set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY="8",DAILY="7",WEEKLY="5"}
+sudo btrfs quota enable /
 sudo snapper -c root setup-quota
 sudo snapper -c root get-config
 
@@ -44,6 +45,7 @@ sudo sed -ri 's/(ALLOW_USERS=).*/\1"'"$user"'"/g' /etc/snapper/configs/user
 sudo chown "root:$user" ~/.snapshots
 sudo chmod 750 ~/.snapshots
 sudo snapper -c user set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY="8",DAILY="7",WEEKLY="5"}
+sudo btrfs quota enable /home
 sudo snapper -c user setup-quota
 sudo snapper -c user get-config
 # v /etc/snapper/configs/user
