@@ -1,0 +1,89 @@
+# /etc/iptables/iptables.rules
+# SUMMARY: extended stateful firewall
+
+### SRC: :/airy/iptables/70-hardening
+# *filter
+# :INPUT DROP [0:0]
+# :FORWARD DROP [0:0]
+# :OUTPUT ACCEPT [0:0]
+# -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+# -A INPUT -i lo -j ACCEPT
+# -A INPUT -p udp --sport 53 -j ACCEPT
+# -A INPUT -p icmp -j REJECT
+# -A INPUT -p tcp -j REJECT --reject-with tcp-reset
+# -A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable
+# -A INPUT -j REJECT --reject-with icmp-proto-unreachable
+# COMMIT
+
+
+### SRC: /etc/iptables/simple_firewall.rules
+# SUMMARY: simple stateful firewall
+# *filter
+# :INPUT DROP [0:0]
+# :FORWARD DROP [0:0]
+# :OUTPUT ACCEPT [0:0]
+# -A INPUT -p icmp -j ACCEPT
+# -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+# -A INPUT -i lo -j ACCEPT
+# -A INPUT -p tcp -j REJECT --reject-with tcp-reset
+# -A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable
+# -A INPUT -j REJECT --reject-with icmp-proto-unreachable
+# COMMIT
+
+
+### REF: https://bbs.archlinux.org/viewtopic.php?id=189551
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:LOG-NORM - [0:0]
+:LOG-FRAG - [0:0]
+:LOG-INVL - [0:0]
+:LOG-PRIV - [0:0]
+:SSH_ACCEPT - [0:0]
+###
+# Log chains (dead-end)
+###
+#--- Normal packets
+-A LOG-NORM -m limit --limit 5/min --limit-burst 10 -j LOG --log-prefix "firewall-norm: " --log-level 6 --log-ip-options --log-tcp-options --log-uid
+-A LOG-NORM -j REJECT --reject-with icmp-host-prohibited
+#--- Fragmeted packets
+-A LOG-FRAG -j LOG --log-prefix "firewall-frag: " --log-level 6 --log-ip-options --log-uid
+-A LOG-FRAG -j DROP
+#--- Invalid packets
+-A LOG-INVL -j LOG --log-prefix "firewall-invl: " --log-level 6 --log-ip-options --log-tcp-options --log-uid
+-A LOG-INVL -j REJECT --reject-with icmp-host-prohibited
+#--- Packets from private IPs
+-A LOG-PRIV -j LOG --log-prefix "firewall-priv: " --log-level 6 --log-ip-options --log-tcp-options --log-uid
+-A LOG-PRIV -j REJECT --reject-with icmp-host-prohibited
+###
+# Rate-limit connections to SSHD
+###
+-A SSH_ACCEPT -m recent --set --name NEW_SSH --rsource
+-A SSH_ACCEPT -m recent --update --seconds 60 --hitcount 4 --name NEW_SSH --rsource -j LOG-NORM
+-A SSH_ACCEPT -j ACCEPT
+###
+# Traffic destined for the firewall host
+###
+#--- Check for fragmented and invalid packets, and allow all ICMP types
+-A INPUT -i lo -j ACCEPT
+-A INPUT --fragment -j LOG-FRAG
+-A INPUT -m conntrack --ctstate INVALID -j LOG-INVL
+-A INPUT -p icmp -j ACCEPT
+#--- Check for malformed TCP headers [see "man 8 iptables-extensions"]
+-A INPUT -p tcp -m tcp --tcp-flags ALL ALL -j LOG-NORM
+-A INPUT -p tcp -m tcp --tcp-flags ALL NONE -j LOG-NORM
+-A INPUT -p tcp -m tcp --tcp-flags FIN,SYN FIN,SYN -j LOG-NORM
+-A INPUT -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -j LOG-NORM
+-A INPUT -p tcp -m tcp --tcp-flags FIN,RST FIN,RST -j LOG-NORM
+-A INPUT -p tcp -m tcp --tcp-flags SYN,ACK SYN,ACK -m conntrack --ctstate NEW -j LOG-NORM
+-A INPUT -p tcp -m tcp ! --syn -m conntrack --ctstate NEW -j LOG-NORM
+#--- We already took care of ICMP and don't run an FTP server, so no need for RELATED
+-A INPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
+#--- Protect SSHD
+-A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -j SSH_ACCEPT
+#--- Log and reject everything else
+-A INPUT -p tcp -j LOG-NORM
+-A INPUT -p udp -j REJECT
+-A INPUT -j LOG --log-prefix "firewall-prot: " --log-level 6 --log-ip-options --log-uid
+-A INPUT -j REJECT --reject-with icmp-proto-unreachable
