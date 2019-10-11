@@ -613,6 +613,7 @@ config.set('content.javascript.enabled', True, '*://github.com/*')
 config.set('content.javascript.enabled', True, '*://google.com/*')
 config.set('content.javascript.enabled', True, '*://stackoverflow.com/*')
 config.set('content.javascript.enabled', True, '*://www.google.com/*')
+config.set('content.javascript.enabled', True, '*://www.reddit.com/*')
 
 ## Log levels to use for JavaScript console logging messages. When a
 ## JavaScript message with the level given in the dictionary key is
@@ -720,6 +721,7 @@ c.content.notifications = False
 ##   - false
 ##   - ask
 # c.content.ssl_strict = 'ask'
+# BUT: where to find TLSv1.3 only ?
 c.content.ssl_strict = True
 
 ## List of user stylesheet filenames to use.

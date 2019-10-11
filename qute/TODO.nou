@@ -10,6 +10,15 @@ DEBUG
 
 
 TODO
+  2019-10-01 [X] add/show/validate CA root cert by NSS "certutil"
+    SRC https://github.com/qutebrowser/qutebrowser/issues/843
+    USAGE: :/net/doc/nss.nou
+    MITM proxy for all traffic
+      $ export XDG_DATA_HOME=$HOME/.local/qute-proxy
+      :set content.proxy http://127.0.0.1:8080/
+      :set aliases '{ "burp": "set content.proxy http://127.0.0.1:8080/", "noburp": "set content.proxy system" }'
+      :burp
+      :noburp
   [_] integrate pass
     https://github.com/browserpass/browserpass
     https://wiki.archlinux.org/index.php/Qutebrowser#Automatically_enter_login_information

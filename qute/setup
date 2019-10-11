@@ -16,6 +16,12 @@ linkcp -m ~/.local/share/qutebrowser/history.sqlite ~/chat/qute
 ### THEME ###
 ./ctl/theme ${THEME:?}
 
+# ALT:(create symlink): @/erian/mod/qute/bin/qutebrowser -> r.qute-hidpi
+if (( "$(r.xorg -d)" > 141 )); then
+  # run=$(r.airy-overlay-mod run)
+  linkcp -m ~/.local/bin/r.qute-hidpi ~/.local/bin/qutebrowser
+fi
+
 ### UPDATE ###
 dst=~/.local/share/qutebrowser/blocked-hosts
 if running_X && (cfgOpt r || [[ ! -f $dst ]])

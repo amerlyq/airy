@@ -2,9 +2,6 @@
 source ~/.shell/func.d/system
 running_X || exec r.bt
 
-## TODO: basedir spec for independent sessions
-# https://github.com/ayekat/dotfiles/blob/master/bin/qutebrowser
-
 # log=${TMPDIR:-/tmp}/qute/$(date +%Y%m%d_%H%M%S).log
 # mkdir -p "${log%/*}"
 # exec > $log 2>&1
@@ -12,7 +9,6 @@ running_X || exec r.bt
 ## NOTE: both of them may significantly load CPU > 40..90% on soundcloud depending on song
 ## CRIT: "webkit" often freezes/hangs on media, using "webengine" by default is much more stable
 [[ ${THEME-} == dark ]] && web=webkit || web=webengine
-zoom=1
 
 dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
     -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31AC65' \
@@ -21,7 +17,7 @@ dml(){ dmenu ${1+-l $1} -b -p 'Qute:' \
 chk(){ [[ -n $url ]] && return; r.n Browser "No url arg"; exit 1; }
 
 
-getopts ':hkpstwz' o && [[ $o != [:?] ]] && shift 1  #% NOTE: parse only first option
+getopts ':hkpstw' o && [[ $o != [:?] ]] && shift 1  #% NOTE: parse only first option
 case $o in '?') true  # pass rest and unsupported options to qutebrowser
 ;; p) url=$(xsel -ob); chk "$url" || set -- "$url"
 #% WARN: all next windows will use same backend as first one
@@ -32,18 +28,10 @@ case $o in '?') true  # pass rest and unsupported options to qutebrowser
 # ;; -h) url=$(sed 's/^[0-9]\+ //' ~/.local/share/qutebrowser/history | dml 16)
 #   chk "$url" || set -- "$url"
 # ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"
-;; z) zoom=0
 esac
 
-# BAD: if main monitor resized -- on secondary one everything becomes too large
-if ((zoom)); then
-  export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
-  export QT_SCREEN_SCALE_FACTORS="2;1"
-  # export QT_SCALE_FACTOR=2
-fi
-
 # WARN: can crash on Nouveau
-# BAD: "webengine" is newer, but no Caret and white css on reload
+# OBSOLETE:(BAD): "webengine" is newer, but no Caret and white CSS on reload
 # BAD:SECU: --enable-webengine-inspector
 exec qutebrowser --backend "$web" \
   --qt-flag disable-reading-from-canvas \

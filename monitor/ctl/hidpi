@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# SPDX-FileCopyrightText: 2019 Amerlyq <amerlyq@gmail.com> and contributors
+#
+# SPDX-License-Identifier: MIT
+#
+#%SUMMARY: make QT / GTK application aware of HiDPI
+#%USAGE: $ ./$0 cmd [args]
+set -fCeu
+
+# BAD: if main monitor resized -- on secondary one everything becomes too large
+
+export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
+
+# TODO: under profile check
+# BET: export something dpi-like into profile
+# ALT: provide run-hd and run-hidpi and then symlink one or another inside erian profile overrides
+# ALT: compare here dpi with threshold
+export QT_SCREEN_SCALE_FACTORS="2;1"
+# export QT_SCALE_FACTOR=2
+
+### GTK
+# export GDK_SCALE=$(r.xorg -s)
+# export GDK_DPI_SCALE=$(awk "BEGIN{print(1/$GDK_SCALE)}")
+
+exec "$@"

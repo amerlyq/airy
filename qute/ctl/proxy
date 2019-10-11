@@ -1,4 +1,23 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+#
+# SPDX-FileCopyrightText: 2019 Amerlyq <amerlyq@gmail.com> and contributors
+#
+# SPDX-License-Identifier: MIT
+#
+#%SUMMARY: access all traffic (DNS included) through proxy
+#%USAGE: $ ./$0 [port] [qute_args]
+set -fCue
 
-exec r.qute-new ~/.local/qute-proxy --set content.proxy 'socks://localhost:1080' "$@"
+case ${1-}
+in '' | *[!0-9]*) port=1080
+;; *) port=$1; shift
+esac
+
+# NOTE: IPv4 can also connect to it (through dev aliasing)
+# FIXME: must pass whole local path if we use UNIX proxy
+pxy="socks://[::1]:$port"
+
+exec r.qute-new ~/.local/qute-proxy \
+  --set content.proxy "$pxy" \
+  --set content.proxy_dns_requests true \
+  "$@"
