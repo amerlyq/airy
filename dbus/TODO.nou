@@ -43,3 +43,29 @@ the EnumerateDevices method.
               /org/freedesktop/UPower/devices/battery_BAT0 \
               org.freedesktop.DBus.Properties.GetAll \
               string:org.freedesktop.UPower.Device
+
+NICE:TUT overview
+  https://pythonhosted.org/txdbus/dbus_overview.html
+    https://www.reddit.com/r/linux/comments/1kxk7x/good_readable_intro_to_dbus/
+
+
+DEBUG
+  ALT: dbus-monitor
+    https://stackoverflow.com/questions/1477174/d-bus-is-there-such-a-thing-as-a-d-bus-sniffer
+  bustle
+    https://gitlab.freedesktop.org/bustle/bustle
+      http://hackage.haskell.org/package/bustle
+      https://aur.archlinux.org/packages/bustle-pcap-git/
+    [_] READ: https://blogs.gnome.org/wjjt/category/bustle/
+    USAGE
+      [TARG]
+        $ bustle-pcap logfile.bustle
+      [HOST]
+        $ bustle --count logfile.bustle
+        $ bustle --time logfile.bustle
+    OLD
+      https://manpages.ubuntu.com/manpages/precise/man1/bustle-dbus-monitor.1.html
+      http://www.huge-man-linux.net/man1/bustle.html
+      https://github.com/mvidner/dbus-dump
+      https://bugs.freedesktop.org/show_bug.cgi?id=34070
+      http://manpages.org/bustle-time
