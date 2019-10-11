@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 # tags: chat irc server
-# deps: pass
+# deps: pass expect
 source ~/.shell/func.d/cfgsetup
 
 cfg=/etc/bitlbee/bitlbee.conf
@@ -22,6 +22,7 @@ svc_activate -er bitlbee.socket
 
 # BUG: after system update gpg/pass won't work until reboot -- fail for setup
 #   ::: TEMP: remove lines with "bitlbee" and "weechat" from /tmp/airy-*.list
-if cfgOpt u; then
+# BUG: clean install must create bitlbee identity OR??? force user to prepare existing one ?
+if cfgOpt uUrR; then
   ./exe/configure $(cfgOpt r && echo --renew) -- "${BITLBEE_LIST[@]:?}"
 fi
