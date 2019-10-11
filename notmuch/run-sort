@@ -1,0 +1,15 @@
+#!/bin/bash -eu
+#%SUMMARY: sort account mails to dirs by afew
+#%WARN! close neomutt (or at least save you statuses) -- otherwise it will freeze
+#%USAGE: $ ./$0 <account>
+
+acc=$1
+shift
+[[ ${1-} == -- ]] && shift
+
+r.notmuch "$acc" -- new
+r.notmuch-afew "$acc" -- -vvv --new --tag
+r.notmuch-afew "$acc" -- -vvv --new --move
+
+## HACK: propagate notmuch tag "#flagged" to maildir filenames ",F"
+# r.notmuch "$acc" -- tag -flagged +flagged -- tag:flagged

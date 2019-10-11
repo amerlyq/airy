@@ -1,6 +1,12 @@
 % Notmuch (search all folders)
 
 TODO
+  [_] BUG: "flagged" does not become RED in mutt
+    DEBUG: :unset hidden_tags  => reload <,.>
+    ::: it seems you need two commands
+      * "notmuch new" syncs :: filename -> tags
+      * afew-sort
+      * "notmuch tag/restore" syncs :: tags -> filenames
   [_] TRY: automatically add my default queries form ./setup to "notmuch config" on hook-create for new db
   [_] add tag "calendar" for any calendar events and invites -- check attach for specific formats
   2019-08-16 [X] FIXME:BET: use short tag names to fit more tags into neomutt index_format for notmuch

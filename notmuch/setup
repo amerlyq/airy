@@ -2,19 +2,23 @@
 # tags: term mail
 source ~/.shell/func.d/cfgsetup
 
+## THINK:MAYBE: always apply this config to default config ?
 # TODO: always auto-setup this for each new db
 #   r.notmuch $acc -- config set index.header.List 'List-Id'
 #   r.notmuch $acc -- config set index.header.To 'To'
 #   r.notmuch $acc -- config set query.toMe 'to:user@example.com'
+# TODO: rename to xtoMe|exMe
 #   r.notmuch $acc -- config set query.ToMe 'To:user@example.com'
 # BET:TODO: create "afew" moving filters which substitute current dir and push separate PR for all of them
 #   r.notmuch $acc -- config set query.concluded 'folder:INBOX AND thread:"{folder:INBOX AND tag:replied}" AND NOT thread:"{folder:INBOX AND (tag:unread OR tag:flagged)}"'
 #   r.notmuch $acc -- config set query.idontcare 'folder:INBOX AND NOT thread:"{folder:INBOX AND tag:replied}" AND NOT thread:"{folder:INBOX AND (tag:unread OR tag:flagged)}"'
+#   r.notmuch $acc -- config set query.reconstructed 'thread:"{folder:INBOX OR (folder:Sent AND tag:flagged)}"'
 # DEBUG
 #   r.notmuch $acc -- config list
 
 ### afew
 # DEBUG:(afew):
+#    new $ notmuch --config "$cfg" new
 #   tags $ afew --dry-run -vvv --notmuch-config "$cfg" --tag --new
 #   move $ afew --dry-run -vvv --notmuch-config "$cfg" --move-mails --all
 mkdir -p ~/.local/share/afew/categories
