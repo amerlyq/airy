@@ -58,9 +58,10 @@ set sig_on_top = yes
 set attribution = "\n\n-----Original Message-----\nFrom: %n <%a>\nSent: %d\nTo: %r\nCc: %R\nSubject: %s\n"
 # set date_format = "!%a, %b %d, %Y at %I:%M:%S%p %Z"
 
-unset collapse_unread   # keep unread threads uncollapsed -- mitigate BUG freeze on startup
+# unset collapse_unread   # keep unread threads uncollapsed -- mitigate BUG freeze on startup
+set collapse_unread
 ## SEE:(uncollapse_jump):  http://www.rdrop.com/docs/mutt/manual118.html
-# set uncollapse_jump    # jumps to first unread msg of thread on uncollapse
+set uncollapse_jump    # jumps to first unread msg of thread on uncollapse
 # TRY: %g | %J | %Gx
 # set index_format="%2M|%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s%* %?y?@%Y?|%?GU?%GU& ? %?GR?%GR& ? %?GI?%GI& ? "
 set index_format="%2M|%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s%* %?y? @%.20Y?%?g? #%.20g?"

@@ -137,10 +137,10 @@ bind index  L  bottom-page
 ## Collapsing
 # macro index \R '<read-thread><collapse-thread><next-unread>' 'Mark the current thread as read'
 # BUG: adds commands to ":" cmd history -- obstructs view of my own commands
-macro index  c  '<enter-command>set my_tmp=$collapse_unread<enter>:set collapse_unread<enter><collapse-thread>:set collapse_unread=$my_tmp<enter>' 'Collapse thread.'
-macro index \Ch 'c' '(Un)collapse thread'
-macro index \C? 'c' '(Un)collapse thread'
-macro index <BackSpace> 'c' '(Un)collapse thread'
+macro index  <BackSpace>  '<enter-command>set my_tmp=$collapse_unread<enter>:set collapse_unread<enter><collapse-thread>:set collapse_unread=$my_tmp<enter>' '(Un)collapse thread'
+macro index \Ch '<BackSpace>' '(Un)collapse thread'
+macro index \C? '<BackSpace>' '(Un)collapse thread'
+bind index  c  collapse-thread
 bind index  z  collapse-all
 
 ## Mark
@@ -152,6 +152,7 @@ bind index <Space> tag-entry
 
 
 ### Pager
+bind pager  e  edit
 # bind pager  ;  tag-prefix
 bind pager  h  exit  # DFL:(override)
 bind pager  l  view-attachments

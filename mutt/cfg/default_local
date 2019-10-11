@@ -40,9 +40,11 @@ set nm_query_window_timebase = "week"   # VIZ: "hour", "day", "week", "month", "
 # [_] TRY:CFG: show both "inbox" + "Sent|important OR related-to-inbox-threads" to reconstruct chains
 # set virtual_spoolfile = yes    # DEPRECATED: use first vmbox as initial selection
 
+# TODO: INBOX or Sent
+
 unvirtual-mailboxes *
 virtual-mailboxes \
-    "inbox"   "notmuch://?query=folder:INBOX&limit=0" \
+    "inbox"   "notmuch://?query=query:reconstructed&limit=0" \
     "unread"  "notmuch://?query=tag:unread"  \
     "sent"    "notmuch://?query=tag:sent"    \
   "abandoned" "notmuch://?query=query:abandoned" \
