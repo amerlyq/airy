@@ -1,0 +1,179 @@
+%%%% VPS
+
+greenhost
+  SRC: https://gitlab.com/drizzt/vps2arch/
+    OLD: https://github.com/drizzt/vps2arch/
+  VIZ: https://gitlab.com/drizzt/vps2arch/wikis/Tested-VPS-Providers
+  INFO: based on REF https://github.com/drizzt/vps2arch/wiki/How-to-use-on-Scaleway
+
+  [_] TRY:USE: бесплатные Let’s Encrypt сертификаты
+    => в качестве основных для доступа к bitlbee / znc
+
+  [_] TODO: setup bitlbee and ZNC
+
+
+
+%% INSTALL
+  NEED: Debian 8/9
+  $ wget http://tinyurl.com/vps2arch
+    # OR: $ wget http://git.io/vps2arch
+  $ chmod +x vps2arch
+  $ systemctl stop systemd-udev
+  $ umount /lib/modules
+  $ ./vps2arch -b none
+    # MAYBE: $ ... -m http://archlinux.mirrors.ovh.net/archlinux
+  !Don't reboot now!
+
+  Fix key access
+    $ cd /root
+    $ mkdir /root/.ssh
+    $ touch /root/.ssh/authorized_keys
+    $ chmod 0600 /root/.ssh/authorized_keys
+  Make systemd-networkd to use DHCP
+    $ mv /etc/systemd/network/default.network{,_}
+  Don't permit root login without ssh key
+    $ sed -i '/^PermitRootLogin/s//#\1/' /etc/ssh/sshd_config
+  Fix permissions (if needed)
+    $ chmod 0755 /etc /usr /usr/local /usr/local/bin /usr/local/sbin
+    $ chmod 0750 /root
+  (Optional) Cleanup useless linux package:
+    $ pacman -Rcsu linux
+  Hard-Reboot:
+    $ sync ; reboot -f
+
+
+%% CHECK
+
+  2019-10-02 [X] $ cat /proc/cmdline
+    ::: root=/dev/xvda1 rw console=tty0  instance_id=3287
+  2019-10-02 [X] $ cat /proc/cpuinfo
+    ::: Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+  2019-10-02 [X] $ cat /sys/block/xvda1/queue/rotational
+    ::: 0 == SSD
+  2019-10-02 [X] $ cat /etc/hostname
+    ::: my custom
+  2019-10-02 [X] $ dmesg
+    [_] XXX? [    0.010000] AppArmor: AppArmor disabled by boot time parameter
+    2019-10-02 [X] FIXED:(dmesg spam): [ 1746.314810] evbug: Event. Dev: input0, Type: 0, Code: 0, Value: 0
+      ::: enabled due to kernel configured in DEBUG mode
+      $ echo "blacklist evbug" >> /etc/modprobe.d/blacklist.conf
+  2019-10-02 [X] $ journalctl -b
+    [_] BUG: ipv6 support for ntpd
+      ntpd[1309]: bind(24) AF_INET6 fe80::...%2#123 flags 0x11 failed: Cannot assign requested address
+      ntpd[1309]: unable to create socket on eth0 (6) for fe80::...%2#123
+      ntpd[1309]: failed to init interface for address fe80::...%2
+  2019-10-02 [X] $ ps --forest aux
+  2019-10-02 [X] $ systemctl status && systemctl --user status
+  2019-10-02 [X] $ ls -la /var/log/*
+    INFO: https://www.linuxnix.com/read-view-utmp-wtmp-btmp-file-linuxunix/
+    failed log-in tries $ last -f /var/run/btmp
+    currently logged-in $ last -f /var/run/utmp
+    past log-in/log-out $ last -f /var/log/wtmp
+
+
+  [_] TRY: disable NFS -- and unload nfsv* modules from kernel
+
+  [_] TRY: IPv6:
+    https://greenhost.net/nl/blog/2011/02/16/ipv6-de-angst-voor-grote-getallen/
+    https://forum.f-droid.org/t/ipv6-broken-on-forum/5080/3
+    [_] DEBUG:ONLINE: http://ipv6now.com.au/tools.php
+
+  [_] TRY: $ ssh -6 fe80::216:4dff:fe7c:8b00%wlp3s0 -p 31823 -i ~/.ssh/chat_rsa
+  INFO
+    Как IPv6 помогает роутеры ломать / Хабр
+      https://habr.com/ru/post/225539/
+    Практика IPv6 — домашняя сеть / Хабр
+      https://habr.com/ru/post/192164/
+    Практика IPv6 / Блог компании Selectel / Хабр
+      https://habr.com/ru/company/selectel/blog/183176/
+
+
+%% SETUP
+
+TUT
+  2019-10-02 [X] RU: https://glashkoff.com/vps-archlinux/
+    [_] READ: nginx + chroot + systemd
+
+  Locale
+    $ vi /etc/locale.gen
+    # uncomment ::
+       en_US.UTF-8
+    $ locale-gen
+    $ export LANG=en_US.UTF-8
+    $ echo LANG=$LANG > /etc/locale.conf
+  Timezone
+    $ timedatectl set-timezone Europe/Kiev
+      # OR: $ ln -svf /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+    $ timedatectl set-ntp true
+    $ pacman -S ntp
+    $ systemctl enable ntpd.service
+  Hostname
+    $ echo myhost > /etc/hostname
+    $ vi /etc/hosts
+       127.0.0.1  localhost  myhost
+       ::1        localhost  myhost
+  Packages
+    $ vi /etc/pacman.conf
+      # uncomment :: Color
+    $ pacman -Syy
+  Tools
+    $ sudo pacman -S zsh
+
+  MAYBE: swap
+    $ sudo fallocate -l 512M /swapfile
+    $ sudo chmod 600 /swapfile
+    $ sudo mkswap /swapfile
+    $ sudo swapon /swapfile
+    $ vi /etc/fstab
+       /swapfile none swap defaults 0 0
+
+
+%% HARDENING
+
+Users
+  VIZ. list all users
+    $ sudo passwd -Sa
+  Passwords
+    $ passwd
+    $ useradd -mUG users,wheel,uucp -s /bin/bash admin
+      # MAYBE:ALSO $ useradd -m -g admin -s /usr/bin/zsh user
+    $ passwd admin
+      # OR: $ printf admin:mypass | chpasswd
+    $ EDITOR=vi visudo
+      CHG: uncomment first '%wheel'
+      # OR: $ echo "%admin ALL=(ALL) ALL" >> /etc/sudoers
+
+  MAYBE: Enforce a delay after a failed login attempt
+    $ vi /etc/pam.d/system-login
+       auth       optional   pam_faildelay.so     delay=4000000
+       auth       required   pam_tally2.so        deny=3 unlock_time=600 onerr=succeed file=/var/log/tallylog
+
+  MAYBE: Allow root login only from web console
+    $ vi /etc/securetty
+      = Comment everything beside tty1 OR console
+
+
+Kernel Restrictions
+  :/airy/iptables/cfg/51-restrict.conf
+  :/airy/iptables/cfg/90-firewall.conf
+
+
+Firewall
+  :/airy/iptables/cfg/nftables.conf
+
+
+SSH
+  Access
+    $ sed -ri '/^#+(PermitRootLogin)\b.*/s//\1 no/' /etc/ssh/sshd_config
+      # OR: $ sed -i '/^PermitRootLogin/s//#\1/' /etc/ssh/sshd_config
+    $ sed -ri '/^#+(Port)\b.*/s//\1 22222/' /etc/ssh/sshd_config
+    $ sed -ri '$a\AllowUsers admin' /etc/ssh/sshd_config
+    $ systemctl restart sshd
+      HOST: $ ssh -O exit -p 22 user@remote-host
+  Don't listen IPv6 on SSH
+    $ ss -lp | grep ssh | column -t
+    $ sed -ri '/^#+(AddressFamily)\b.*/s//\1 inet/' /etc/ssh/sshd_config
+
+
+%% VPN / Shadowsocks
+  [_] RU: https://glashkoff.com/shadowsocks/
