@@ -3,11 +3,24 @@ MODS_CACHE_DISABLE=1
 source ~/.shell/func.d/packages
 distro ubuntu || die "Not Ubuntu"
 
+# NOTE: use "git-lfs" on HOST, and chroot only to build
+
+## NEED: Oracle JDK 1.8.0_201 (before new License Agreement)
+#   ++ https://www.oracle.com/technetwork/java/javase/downloads/java-archive-javase8-2177648.html
+#   https://repo.huaweicloud.com/java/jdk/8u202-b08/
+#   https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+#
+# sudo mkdir /opt/jdk
+# sudo tar -zxf jdk-8u***-linux.tar.gz -C /opt/jdk
+# sudo update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.***/bin/java 100
+# sudo update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.***/bin/javac 100
+# sudo update-alternatives --config java
+
 pkgs=(build-essential pkg-config doxygen)
 pkgs+=(lib32stdc++6 libc6-i386 libbz2-dev)
 pkgs+=(libexpat1-dev libgio2.0-cil-dev libusb-1.0-0-dev lib32z1 libasound2-dev libicu-dev zlib1g-dev libdbus-glib-1-dev)
 pkgs+=(subversion git cmake default-jre)
-pkgs+=(vim git unzip dialog wget less gawk bc)
+pkgs+=(vim unzip dialog wget less gawk bc)
 pkgs+=(python-pip python-dev python-smbus)
 pkgs+=(libglew-dev:i386 libjpeg-dev:i386 libpng-dev:i386)
 pkgs+=(lcov time moreutils cpio)
