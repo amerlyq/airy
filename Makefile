@@ -13,6 +13,8 @@ here := $(patsubst %/,%,$(dir $(realpath $(this))))
 $(this): ; @:
 .PHONY: .FORCE
 
+# BUG: freeze without clean exit
+
 # HACK: pass-through recipes into log wrapper
 ifeq ($(MAKELEVEL),0)
 
@@ -92,13 +94,13 @@ clean:
 #   OR: make "configure" as separate first step of r.airy-mods-make (inconsistent)
 #   OR: call "configure" from --all.pre-- step hook (impossible on clean system)
 #   OR: make "airy" mod the very first setup everywhere (hard)
+# BUG: clean install -- need install aur before setup
 $(tsdir)/--configure--:
 	echo '$(@F)'
-	mkdir -p '$(dir $(AIRY_ROOT))' '$(AIRY_BIN)' '$(AIRY_TMPDIR)'
+	mkdir -p '$(@D)' '$(dir $(AIRY_ROOT))' '$(AIRY_BIN)' '$(AIRY_TMPDIR)'
 	ln -svfT '$(here)' '$(AIRY_ROOT)'
 	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/airyctl'
 	./airy/setup -m
-	mkdir -p '$(@D)'
 	touch '$@'
 
 # NOTE: connect pacman to tty instead of logs
