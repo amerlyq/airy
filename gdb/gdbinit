@@ -29,6 +29,9 @@ set print demangle on
 set demangle-style gnu-v3
 # set filename-display absolute
 
+## BAD: removes colorizing
+set disassembly-flavor att
+
 ## Features for C++
 # SEE: http://ftp.gnu.org/old-gnu/Manuals/gdb/html_chapter/gdb_9.html#SEC58
 # pretty = print inner object struct as tree instead of single line
@@ -345,6 +348,11 @@ end
 # end
 
 ### Epilog:
+
+## NEED: disable colors/style to get plain text without escape codes inside log file
+#   https://sourceware.org/gdb/current/onlinedocs/gdb/Output-Styling.html#Output-Styling
+# set style enabled off
+
 set logging off
 set logging redirect off
 set logging overwrite on

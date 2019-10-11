@@ -13,3 +13,8 @@
     $ ssh-keygen -R hostname
   Compare github fingerprint between old and new PC
     $ ssh-keygen -l -f ~/.ssh/known_hosts -F 140.82.118.4
+  Compare server fingerprint with known_hosts
+    REMOTE: $ ssh-keygen -lf /etc/ssh/ssh_host_ecdsa_key.pub
+    LOCAL: $ ssh-keygen -lF "$ip_or_domain"
+    ALT:(semi-automatic):
+      REF: https://www.phcomp.co.uk/Tutorials/Unix-And-Linux/ssh-check-server-fingerprint.html

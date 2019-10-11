@@ -18,6 +18,8 @@ esac
 # FIXME: must pass whole local path if we use UNIX proxy
 pxy="socks://[::1]:$port"
 
+# ALT:TRY: Universal wrapper for app to use proxy instead of reading "http_proxy" yourself
+#   https://libproxy.github.io/libproxy/
 export http_proxy="$pxy"
 export https_proxy="$pxy"
 

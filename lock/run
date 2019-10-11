@@ -6,7 +6,7 @@ txt=${TMPDIR:?}/screenlock.txt
 
 if [[ ! -f $pic ]]; then
   pic=${TMPDIR:?}/screenlock.png
-  scrot "$pic"  # Lock with cool bkgd
+  scrot --overwrite "$pic"  # Lock with cool bkgd
   mogrify -scale 10% -scale 1000% "$pic"
 
   # TODO: apply text to user-choosen bkgr, not only to screenshot
