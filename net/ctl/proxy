@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# SPDX-FileCopyrightText: 2019 Amerlyq <amerlyq@gmail.com> and contributors
+#
+# SPDX-License-Identifier: MIT
+#
+#%SUMMARY: make command aware of proxy on specific port
+#%USAGE: $ ./$0 [port] cmd [args]
+#%  E.G: $ sudo ./$0 pacman -Syu
+set -fCue
+
+case ${1-}
+in '' | *[!0-9]*) port=1080
+;; *) port=$1; shift
+esac
+
+# NOTE: IPv4 can also connect to it (through dev aliasing)
+# FIXME: must pass whole local path if we use UNIX proxy
+pxy="socks://[::1]:$port"
+
+export http_proxy="$pxy"
+export https_proxy="$pxy"
+
+exec "$@"

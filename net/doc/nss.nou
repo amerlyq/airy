@@ -1,0 +1,31 @@
+add/show/validate CA root cert by NSS "certutil"
+  SRC https://github.com/qutebrowser/qutebrowser/issues/843
+  TUT https://fy.blackhats.net.au/blog/html/pages/nss_and_openssl_command_reference.html
+  TUT http://homepage.rub.de/jan.holthuis/posts/using-burpsuite-with-qutebrowser
+  REF(trust flags): https://blogs.oracle.com/meena/about-trust-flags-of-certificates-in-nss-database-that-can-be-modified-by-certutil
+    REF(nss): https://wiki.mozilla.org/NSS_Shared_DB_And_LINUX
+
+  Root cert for one user
+    !! import ./certnew.cer into Firefox -- and then export TWO resulting certs separately into files to reimport into another DB !!
+    # ALT: -i /etc/pki/CA/nss/ca.crt
+    $ certutil -d "sql:$HOME/.pki/nssdb" -L
+    $ certutil -d "sql:$HOME/.pki/nssdb" -A -t ,, -n 'Work Root CA' -i /work/cache/cert/WorkRootCA.crt
+    $ certutil -d "sql:$HOME/.pki/nssdb" -A -t CT,c, -n "Work Issuing CA..." -i /work/cache/cert/WorkIssuingCA.crt
+    $ certutil -d "sql:$HOME/.pki/nssdb" -L -n 'Work Root CA'
+    $ certutil -d "sql:$HOME/.pki/nssdb" -V -u V -n 'Work Root CA'
+    $ certutil -d "sql:$HOME/.pki/nssdb" -V -u C -n 'Work Root CA'
+    $ openssl s_client -connect www.google.com:443 -showcerts
+
+  remove:
+    $ certutil -d "sql:$HOME/.pki/nssdb" -D -n 'Work Root CA'
+
+  @/nss-3.46-with-nspr-4.22.tar.gz/nss/lib/sysinit/nsssysinit.c:65
+    Return the path to user's NSS database.
+    We search in the following dirs in order:
+    * (1) $HOME/.pki/nssdb;
+    * (2) $XDG_DATA_HOME/pki/nssdb if XDG_DATA_HOME is set;
+    * (3) $HOME/.local/share/pki/nssdb (default XDG_DATA_HOME value).
+
+  MITM proxy for all traffic
+    $ export XDG_DATA_HOME=$HOME/.local/qute-proxy
+    :set content.proxy http://127.0.0.1:8080/
