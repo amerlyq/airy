@@ -10,6 +10,7 @@ efc=$(ifc e) && [[ -n $efc ]] && svc_activate -e "netctl-ifplugd@$efc.service"
 
 # NOTE: disable some profiles (e.g. static) by ExcludeAuto=yes
 # NEED: Security=wpa-configsection | Security=wpa AND priority=...
+# DISABLE:(if WiFi also has CA): prefer only eth with root cert in work environment
 wfc=$(ifc w) && [[ -n $wfc ]] && svc_activate -e "netctl-auto@$wfc.service"
 # USAGE: switch between wifi networks: $ netctl-auto
 

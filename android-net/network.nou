@@ -1,3 +1,15 @@
+Tethering (add PC to Android 4G)
+  $ S.t mailsync-new@$account.timer
+  $ S.t netctl-ifplugd@enp0s25.service
+  $ cat /etc/netctl/eth_teth
+    Description='A basic dhcp ethernet connection'
+    Interface=enp0s20u2u4u4
+    Connection=ethernet
+    IP=dhcp
+    Priority=10
+  $ S.r netctl-ifplugd@enp0s20u2u4u4
+
+
 Network (add Android to PC network)
   ??? Bluetooth (reverse tethering)
     https://wiki.archlinux.org/index.php/android_tethering
