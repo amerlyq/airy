@@ -11,6 +11,7 @@
 export SHELL=/usr/bin/zsh  # NEED: when zsh run from bash
 
 # If you want move it to ZDOTDIR also, then next line must reside in /etc/zshenv
+# FIXME: zsh must keep history inside ~/.local/share -- otherwise it won't be saved in btrfs snapshots
 [[ ! -d ~/.cache/zsh ]] || ZDOTDIR=~/.cache/zsh
 
 # in $ man zshall --> there is recommended to use '[[ -o rcs ]]' ?
