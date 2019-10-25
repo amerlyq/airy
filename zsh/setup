@@ -11,11 +11,12 @@ if cfgOpt r; then
   #   $(which zsh) != ${SHELL:?}
   if has_pr zsh && [[ -z ${SSH_TTY-} ]]; then
     sudo chsh -s /bin/bash  # Root login shell
-    sudo usermod -s "$(which zsh)" "$(whoami)"  # User shell
+    sudo usermod -s "$(command -v zsh)" "$(whoami)"  # User shell
   fi
 fi
 
 # Main destination for Zsh
+mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/zsh"
 PREZTO=~/.cache/zsh/.zprezto
 linkcp "$PWD" "${PREZTO%/*}/cfg"
 linkcp -t "${PREZTO%/*}" -p. zlogin zprofile zshrc zpreztorc

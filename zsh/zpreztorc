@@ -19,10 +19,11 @@ zstyle ':prezto:load' zfunction 'zargs' 'zmv'
 
 ## Set the Prezto modules to load (browse modules).
 # The order matters: ...completion/>fasd/>...syntax/>history/>prompt/>$
+# DISABLED: move history from ~/.cache to keep it in btrfs snapshots
+#   editor -> "history" -> directory
 zstyle ':prezto:load' pmodule \
   'terminal'                  \
   'editor'                    \
-  'history'                   \
   'directory'                 \
   'spectrum'                  \
   'utility'                   \
