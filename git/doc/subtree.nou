@@ -1,0 +1,72 @@
+REF
+  https://habr.com/ru/post/429014/
+  https://tsh.io/blog/git-subtree-or-how-i-stopped-worrying-and-learned-to-love-external-dependencies/
+
+NOTE: directory, local branch, and remote -- all have same name "mylib" but mean different things
+
+
+SETUP
+  Clone separate repo from single directory (without file renames)
+    $ cd myrepo
+    $ git subtree split --prefix=mylib/ --branch=mylib
+      OR: $ git checkout -b mylib
+          $ git filter-branch --subdirectory-filter ./mylib/
+    $ git log --oneline mylib --
+    $ git remote add mylib ghub:user/mylib
+    $ git push -u mylib mylib
+      OR: $ git push ghub:user/mylib mylib:master
+      OR: $ mkdir mylib && cd mylib && git init && git pull ../myrepo mylib:master
+      OR: $ git clone mylib && cd mylib && git fetch ../myrepo mylib:tmp
+          $ git checkout tmp && git rebase master && git checkout master && git merge --ff tmp && git branch --delete tmp
+    $ git rm -r ./mylib/
+    $ git commit -m 'move ./mylib/ into subtree'
+
+  Add remote repo as subtree to new projects
+    $ git remote add mylib ghub:user/mylib
+    $ git subtree add --prefix=mylib/ --branch=mylib mylib master
+      => ref "mylib/master"
+    $ git log --oneline --graph --decorate
+
+  Revert subtree (but keep in history)
+    $ git remote rm mylib
+    $ git rm -r ./mylib/ --cached
+    $ git commit -m 'revert ./mylib/ from subtree'
+    $ git add ./mylib/
+    $ git commit -m 'add ./mylib/ exclusively'
+
+
+USAGE
+  Status of changes
+    $ git log -- . ':(exclude)mylib'
+    $ git log mylib --
+
+  Pull remote repo
+    # $ git subtree --debug --list
+    $ git fetch mylib
+    $ git subtree pull --prefix=mylib/ mylib master
+    $ git subtree pull --prefix=mylib/ --squash mylib master
+      OR: $ git merge -X subtree=./mylib/ --squash mylib
+      OR: $ git merge -s subtree --squash mylib
+      OR: $ git pull -s subtree mylib master
+
+  Push latest changes without creating duplicate commits on pull
+    <= because same commits will have different hashes in different repos
+    == imitates changes fetched only from remote
+    $ git commit -m '...'
+    $ git subtree push --prefix=mylib/ mylib master
+    $ git reset --hard HEAD^
+    $ git log -3 --graph
+    $ git subtree pull --prefix=mylib/ mylib master
+
+  Push all contributed changes from subtree
+    $ git remote add mylib ghub:user/mylib
+    $ git subtree push --prefix=mylib/ mylib master
+
+  Push only picked changes from subtree
+    $ git checkout -b mylib-backport mylib
+    $ git cherry-pick -x master~3
+    $ git cherry-pick -x --strategy=subtree master^
+    $ git log --oneline --decorate --stat -2
+    $ git push
+      dc995bf..34f50a4  backport-plugin -> master
+    $ git branch --delte mylib-backport

@@ -12,6 +12,19 @@ Tracking dangling file descriptors of deleted files (e.g. sqlite holding tmpfile
     $ strace-log-merge strace.log
 
 
+Trace child process tree
+  https://stackoverflow.com/questions/4053142/how-to-track-child-process-using-strace
+  $ strace -qqzf -e trace=execve -e signal=none -o trace -- wiw
+  $ ./strace -f -q -s 100 -o trace -p 449
+  $ strace-graph ./trace
+    <= |crosstool-ng|
+
+
+Trace strace itself by systemtap
+  https://stackoverflow.com/questions/5317261/using-ptrace-to-track-all-execve-calls-across-children
+  $ stap -e 'probe syscall.ptrace {if (execname()=="strace") log(argstr)}' -c 'strace COMMAND'
+
+
 Trace by audit logs (syscalls, opened files, etc.)
   IDEA: https://habr.com/ru/post/464951/
   $ sudo auditctl -a exit,always -F arch=b64 -S clock_settime -S settimeofday && date
@@ -24,3 +37,9 @@ Watch consumed cpu
 
 Tracing network packets (~low-level curl~)
   https://github.com/secdev/scapy
+
+Reverse-engineering with strace :: function61.com
+  https://function61.com/blog/2017/reverse-engineering-with-strace/
+
+[_] READ strace / Re: Experience from writing trace_inputs.py
+  https://sourceforge.net/p/strace/mailman/message/32129307/

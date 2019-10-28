@@ -20,5 +20,6 @@ pkgupd
 aur sync --database=aur --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')
 pkgupd
 
+# BUG: returns error "sudo pkgfile --update"
 if [[ " $* " =~ " -u " || ! -f /var/cache/pkgfile/core.files ]]
 then sudo pkgfile --update; fi

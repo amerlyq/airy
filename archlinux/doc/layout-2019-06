@@ -147,6 +147,7 @@ mkdir /mnt/data/music
 ## NOTE: bake fstab
 timedatectl set-timezone Europe/Kiev
 timedatectl set-ntp true
+# NEW: "base" is almost empty now -- install everything manually
 pacstrap /mnt  base base-devel lvm2 btrfs-progs grub snapper ntp sudo polkit wget git openssh
 
 ## FIX: manually remove swap of host system (if necessary)

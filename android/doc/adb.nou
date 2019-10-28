@@ -7,3 +7,11 @@ Authorize
   => USB debugging [X]
   HOST: $ adb kill-server && adb shell
   => click "Allow for this XX:XX:XX:XX:XX:XX"
+
+
+Delete system app (without root)
+  1) Зайти в меню разработчика
+  2) Включить отладку по USB
+  3) Скачать adb
+  4) Посмотреть в информации о приложение его пакет(например com.google.android.music)
+  5) Ввести команду pm uninstall -k --user 0 com.google.android.music
