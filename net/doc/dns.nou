@@ -1,17 +1,14 @@
 %%%% DNS
 
-REF
-  +++ [_] READ https://web.archive.org/web/20080906191922/http://www.isoc.org/isoc/conferences/inet/99/proceedings/4s/4s_3.htm
-  http://superuser.com/questions/442096/change-default-dns-server-in-arch-linux
-  https://wiki.archlinux.org/index.php/Resolv.conf
-  How DNS works (slides OARC 30)
-    https://habr.com/en/company/qrator/blog/452848/
-    https://indico.dns-oarc.net/event/31/contributions/683/attachments/667/1096/multi-signer.pdf
-  [_] READ:VIZ https://wiki.archlinux.org/index.php/DNS_server
-    https://wiki.archlinux.org/index.php/Domain_name_resolution#DNS_servers
-  [_] SECU https://wiki.archlinux.org/index.php/DNSSEC
-  [_] DEBUG https://wiki.archlinux.org/index.php/Domain_name_resolution#Lookup_utilities
-  [_] INFO: TLS https://wiki.archlinux.org/index.php/Transport_Layer_Security
+VIZ: setup local DNS
+  https://www.nlnetlabs.nl/projects/unbound/about/
+  https://wiki.archlinux.org/index.php/Category:Domain_Name_System
+  https://wiki.archlinux.org/index.php/Dynamic_DNS
+  https://wiki.archlinux.org/index.php/Domain_name_resolution
+  https://en.wikipedia.org/wiki/Public_recursive_name_server#List_of_public_DNS_service_operators
+  https://en.wikipedia.org/wiki/Man-in-the-middle_attack
+  https://en.wikipedia.org/wiki/DNS_hijacking
+  https://en.wikipedia.org/wiki/Name_server#Authoritative_name_server
 
 
 TUT
@@ -44,7 +41,7 @@ DEBUG
 
 Routing based on host name (through local DNS server)
   [_] NEED: re-route DNS and IPv6 traffic $ ip -6 route
-  +++ [_] READ https://superuser.com/questions/1185861/linux-routing-based-on-domain-names
+  +++ [_] READ:TODO: https://superuser.com/questions/1185861/linux-routing-based-on-domain-names
     => tech how to setup
   https://wiki.archlinux.org/index.php/Domain_name_resolution#Conditional_forwarding
     https://wiki.archlinux.org/index.php/Dnscrypt-proxy

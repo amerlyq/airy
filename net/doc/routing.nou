@@ -92,6 +92,7 @@ Route WiFi to PC on same Router subnet
   https://wiki.archlinux.org/index.php/Internet_sharing
   SERVER
     $# sysctl net.ipv4.ip_forward=1
+    OR: $# echo 1 > /proc/sys/net/ipv4/conf/enp0s25/forwarding
     /etc/sysctl.d/30-ipforward.conf
       net.ipv4.ip_forward=1
       net.ipv6.conf.default.forwarding=1
@@ -102,11 +103,22 @@ Route WiFi to PC on same Router subnet
     $# iptables -t nat -A POSTROUTING -o wlo1 -j MASQUERADE
     $# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     $# iptables -A FORWARD -i enp0s25 -o wlo1 -j ACCEPT
+    OR: nftables
+    $# nft add table ip nat
+    $# nft add chain ip nat prerouting '{ type nat hook prerouting priority 0 ; }'
+    $# nft add chain ip nat postrouting '{ type nat hook postrouting priority 100 ; }'
+    $# nft add rule nat postrouting oifname wlo1 masquerade
+    $# nft list ruleset
+      ---
+    WARN: $# nft flush chain inet filter forward
+    $# nft add chain inet filter forward '{ type filter hook forward priority 0 ; policy drop ; }'
+    $# nft add rule inet filter forward ct state related,established accept
+    $# nft add rule inet filter forward iifname enp0s25 oifname wlo1 accept
   CLIENT
     /usr/lib/dhcpcd/dhcpcd-hooks/40-vpnroute
-      ip route del default dev enp3s0
-      ip route add default via 192.168.1.3 dev enp3s0
-      ip route add 172.16.0.0/12 via 192.168.1.1
+      $# ip route del default dev eno1
+      $# ip route add default via 192.168.1.3 dev eno1
+      $# ip route add 172.16.0.0/12 via 192.168.1.1
 
 
 DEBUG
@@ -128,6 +140,46 @@ DEBUG
     https://ask.fedoraproject.org/en/question/47502/how-to-set-default-route-when-gateway-has-dynamic-ip/
   Visualization
     https://cumulusnetworks.com/blog/complex-topology-and-wiring-validation-in-data-centers/
+  Package drop reason
+    https://jvns.ca/blog/2017/09/05/finding-out-where-packets-are-being-dropped/
+    $ sudo netstat -i
+    $ ethtool -S enp0s25
+    $ cat /sys/class/net/enp0s25/statistics/rx_dropped
+    https://github.com/pavel-odintsov/drop_watch
+    $ sudo ./dropwatch -l kas
+    $ sudo perf record -g -a -e skb:kfree_skb
+    $ sudo perf script
+  Routing Problem with IP Forwarding
+    https://serverfault.com/questions/596641/linux-ip-forwarding-trouble
+      INFO: https://lartc.org/howto/lartc.kernel.html
+      https://unix.stackexchange.com/questions/268928/routing-problem-with-ip-forwarding-on-ubuntu-14-04-and-virtualbox
+    $# echo 0 > /proc/sys/net/ipv4/conf/eth0/rp_filter
+    $# echo 0 > /proc/sys/net/ipv4/conf/eth1/rp_filter
+  Troubleshoot Routing
+    VIZ:HOWTO: http://www.microhowto.info/howto/index.html
+    +++ 2019-10-16 [X] TUT:ALG: microHOWTO: Enable forwarding of IPv4 network packets
+      http://www.microhowto.info/howto/enable_forwarding_of_ipv4_packets.html
+    microHOWTO: Troubleshooting iptables
+      http://www.microhowto.info/troubleshooting/troubleshooting_iptables.html
+    microHOWTO: Troubleshooting the routing table
+      http://www.microhowto.info/troubleshooting/troubleshooting_the_routing_table.html
+      https://ubuntuforums.org/showthread.php?t=2175163
+      Direct
+        $ ip route get to 198.51.100.1 from 192.168.0.2 iif eth0
+           198.51.100.1 from 192.168.0.2 via 203.0.113.1 dev ppp0  src 192.168.0.1
+           cache <src-direct>  mtu 1500 advmss 1460 hoplimit 64 iif eth0
+        NOTE: The main points to check are that the IP address of the next hop is
+        correct (203.0.113.1 in this case) and that the packet is being sent
+        onwards through the appropriate interface (ppp0).
+      Reverse
+        $ ip route get to 192.168.0.2 from 198.51.100.1 iif ppp0
+           192.168.0.2 from 198.51.100.1 dev eth0  src 203.0.113.144
+           cache  mtu 1500 advmss 1460 hoplimit 64 iif ppp0
+        NOTE: You should also check the reverse path, because you will get no
+        response to a ping unless it can be routed in both directions:
+    microHOWTO: Troubleshooting SSH port forwarding
+      http://www.microhowto.info/troubleshooting/troubleshooting_ssh_port_forwarding.html
+
 
 
 HACK
