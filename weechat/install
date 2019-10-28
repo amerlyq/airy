@@ -8,5 +8,14 @@ pkg_inst python2-feedparser  # for rss
 pkg_inst aspell aspell-en aspell-ru aspell-uk
 
 # [_] FIXME: remove or override on "-U" to imitate upgrade
-url_wget_to ~/.weechat/python/autoload -- \
+url_wget_to ~/.weechat/python -- \
   'https://raw.githubusercontent.com/keith/edit-weechat/master/edit.py'
+
+### ALT: https://github.com/torhve/weechat-matrix-protocol-script
+# aur_inst weechat-matrix-git
+# linkcp -t ~/.weechat/lua -- /opt/matrix.lua
+
+### BET: https://github.com/poljar/weechat-matrix
+aur_inst weechat-poljar-matrix-git
+linkcp -t ~/.weechat/python -- /usr/lib/weechat/python/matrix.py
+linkcp /usr/lib/weechat/python/matrix/ ~/.weechat/python/matrix
