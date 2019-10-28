@@ -8,7 +8,7 @@ if distro arch; then
   #   => Install multilib-devel over base-devel
   pkg_inst gcc-multilib
   pkg_inst lib32-gcc-libs
-  pkg_inst cmake
+  pkg_inst cmake boost
   pkg_inst astyle
 
   # pkg_inst colorgcc
@@ -17,6 +17,8 @@ if distro arch; then
   ## For vim-clang-format and vim-autoformatter
   ## REF: https://clang.llvm.org/extra/clang-rename.html
   # pkg_inst clang-tools-extra
+
+  loc_inst ./cmake-format-airy-git.pkgbuild
 
 elif distro ubuntu; then
   pkgs=()  # Those libs also necessary to build x32 under x64 system
