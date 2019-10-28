@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #%VIEW: $ <"${TMPDIR:-/tmp}/airy.log" r.airy-pretty | less -r
 #%
-set -euo pipefail -o noglob
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
 flt=r.airy-pretty && hash "$flt" &>/dev/null || flt=
 # OR: flt=$(dirname "$(readlink -e "$0")")/pretty
@@ -25,12 +25,12 @@ log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/log/$(date +'%Y%m%d_%H%M%S').log
 
 mkdir -p "${log%/*}"
 
-[[ -t 1 ]] && ((${#fpretty[@]})) && exec > >("${fpretty[@]}")
-
 # WARN:BUG:(sed -u/awk): isn't really unbuffered -- it will prevent [Y/n] prompt w/o NL
 # awk '{print "E:",$0}'
 { { make "$@"
   } 3>&1 1>&2 2>&3 | sed -u 's/^/|: /'
-} |& stdbuf -oL tee -a "$log"
+} |& stdbuf -o0 tee -a "$log" \
+| if [[ -t 1 ]] && ((${#fpretty[@]}))
+then "${fpretty[@]}"; else cat; fi
 
 # [[ -s $log ]] || rm "$log"

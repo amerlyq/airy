@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
+set -fCueo pipefail
 # FIND: maybe part of this script is already done inside "aurutils" ?
 cd "${LISTS_STORE_DIR:-${TMPDIR:-/tmp/$LOGNAME}/airy}"
-set -fCueEo pipefail
 
 removelists=
 aur=
@@ -33,11 +33,11 @@ nonempty(){ local fs=()
   "${@:?}" < <(cat -- "${fs[@]:?}")
 }
 
-# BUG? maybe everything dangles due to it
-# sudo -v
-# (while sleep 30; do sudo -v; done || true) & pidsudo=$!
-# onexit(){ kill -TERM "$pidsudo"; wait "$pidsudo"; }
-# trap onexit INT ERR
+# FIXED:BUG: can't "sleep 30" -- TERM signal won't be delivered until loop unpaused
+{ i=0; while sleep 1; do ((++i%30))||{ echo .;sudo -v; }; done; } & pidsudo=$!
+onexit(){ kill -TERM "$pidsudo"; wait; }
+trap onexit INT ERR
+sudo -v
 
 # NOTE: do full-system-upgrade if you want to link AUR with correct libs (and not rebuild them immediately again)
 # WARN:(build AUR/LOC): to enable some feature -- may need some pkg to be already installed
@@ -46,4 +46,4 @@ nonempty ./loc.{list,deps}    -- r.pacman-loc-package ${loc:+"-$loc"} --
 nonempty ./{aur,loc,pkg}.deps -- r.pacman-pkg-install ${pkg:+"-$pkg"} -d --
 nonempty ./{aur,loc,pkg}.list -- r.pacman-pkg-install ${pkg:+"-$pkg"} --
 
-# onexit
+onexit

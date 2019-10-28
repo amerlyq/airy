@@ -14,7 +14,15 @@ base
 base-devel
 EOT
 
-pacman -Qei | awk '
-  /^Name\s/{n=$3}
-  /^Groups\s/{print($3=="None"?n:n" "$3)}
-' | grep -vwFf "$db"
+# FIXME: $ comm -23 <(pacman -Qqett | sort) <(pacman -Qqg base -g base-devel | sort | uniq)
+#   USE:(-Qqe): to include explicit packages which are also deps to others
+{ cat -- "$dsrc"/*.list
+  pacman -Qqg base -g base-devel
+} | sort -u > "$db"
+
+# pacman -Qei | awk '
+#   /^Name\s/{n=$3}
+#   /^Groups\s/{print($3=="None"?n:n" "$3)}
+# ' | grep -vwFf "$db"
+
+pacman -Qqe | grep -vwFf "$db"

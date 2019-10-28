@@ -1,4 +1,13 @@
-#!/usr/bin/env -S make -f
+#!/bin/sh -fCeu
+# vim:ft=make
+#
+# SPDX-FileCopyrightText: 2019 Amelyq <amerlyq@gmail.com> and contributors.
+#
+# SPDX-License-Identifier: MIT
+#
+:; m=$(readlink -e "$0") && exec "${d:=${m%/*}}"/airy/ctl/makelog -C "$d" -f "$m" MAKEGUARD="$0" "$@" || exit
+#
+#%SUMMARY: project control center
 #%USAGE:
 #% * (no-update): $ make flags=
 #% * (only mods): $ make -B all/all
@@ -10,13 +19,18 @@ MAKEFLAGS += -rR --silent
 .SUFFIXES:
 this := $(lastword $(MAKEFILE_LIST))
 here := $(patsubst %/,%,$(dir $(realpath $(this))))
-$(this): ; @:
+$(MAKEFILE_LIST): ; @:
 .PHONY: .FORCE
 
-# BUG: freeze without clean exit
-
-# HACK: pass-through recipes into log wrapper
-ifeq ($(MAKELEVEL),0)
+# HACK: exec into log wrapper + tty colorizer
+ifndef MAKEGUARD
+$(subst ,, ) := $(subst ,, )
+make := $(here)/airy/ctl/makelog
+envp := (let () (unsetenv "MAKE_COMMAND") (setenv "MAKEGUARD" "$(this)") (setenv "MAKEFLAGS" "$(MAKEFLAGS)") (environ))
+args := $(subst \|,$( ),$(patsubst %,"%",$(subst \$( ),\|,$(MAKECMDGOALS) $(MAKEOVERRIDES))))
+$(guile (execle "$(make)" $(envp) "$(make)" "--file=$(this)" $(args)))
+else
+unexport MAKEGUARD
 
 ### Environment
 export TMPDIR      ?= /tmp/$(LOGNAME)
@@ -28,16 +42,11 @@ export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
 export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
 export AIRY_DATA   ?= $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/airy
 export PATH        := $(AIRY_BIN):$(PATH)
+
 # FIXED:(r.airy): on clean install in same login
 # BUG: on clean install maps "defaults" to "vi"
 EDITOR ?= vi
 
-### Log and colorize
-fmk := r.airy-makelog
-fmk := $(if $(shell which $(fmk) 2>/dev/null),$(fmk),$(here)/airy/ctl/makelog)
-% :: .FORCE
-	+'$(fmk)' -f '$(this)' -C '$(here)' $(MAKECMDGOALS)
-else
 
 ### Parameters
 # BAD: mods may be inside .tar.gz or in subdir -- better to align on Makefile itself "$this"
@@ -53,7 +62,7 @@ tsdir := $(AIRY_CACHE)/ts
 
 # BET:PERF: use directly $ r.airy-mods-make -- flags=-mu all
 # MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
-all: configure upgrade all/all
+all: configure upgrade all/all problems
 configure: $(tsdir)/--configure-- pacman/setup pacman/install
 upgrade: $(tsdir)/--upgrade--
 install setup update recache: ; $(&mods) all/$@
@@ -115,13 +124,12 @@ tags-tree:
 	tree --noreport -- ~/.cache/airy/tags | sed 's/\s*->\s*.*//'
 
 problems:
+	@echo "Merge/delete all *.pacnew files from pkg updates :: $$ find / -name '*.pacnew'"
+	@echo "Then, for each found *.panew, do 'v -d /etc/locale.gen{,.pacnew}'"
+	locate .pacnew
 	@echo "Manually verify necessity of packages outside of airy."
 	@echo "INFO:USE:(commands): pacq, pacr, pacR, paclr"
 	r.airy-odd-pkgs
-	@echo "Merge/delete all *.pacnew files from pkg updates"
-	@echo "ALT: find / -name '*.pacnew'"
-	@echo "Then, for each found *.panew, do 'v -d /etc/locale.gen{,.pacnew}'"
-	locate .pacnew
 
 help:
 	@echo 'Use: $(PHONY)'
