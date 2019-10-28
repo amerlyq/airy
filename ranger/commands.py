@@ -180,7 +180,7 @@ class doc(Command):
            'f': 'FUTURE', 'h': 'HACK', 'g': 'LEGEND', 'i': 'INFO', 'k': 'WORKLOG',
            'l': 'LIOR', 'm': 'MAINT', 'n': 'NOTE', 'r': 'README', 's': 'SYNERGY',
            't': 'TODO', 'u': 'USAGE', 'w': 'HOWTO', '.': '.'}
-    ext = ['.nou', '.otl', '.md', '.txt', '']
+    ext = ['.nou', '.rst', '.otl', '.md', '.txt', '']
     loci = ['doc', 'docs', '_doc', '']
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories

@@ -53,3 +53,12 @@ call dein#add('Matt-Deacalion/vim-systemd-syntax', {
 " 'on_path': 'tmux.*conf'
 call dein#add('zaiste/tmux.vim', {
   \ 'on_ft': 'tmux'})
+
+
+" REF: https://github.com/gu-fan/riv.vim
+" HELP: :RivInstruction | :RivQuickStart | :RivPrimer | :RivSpecification
+" DEBUG: :RivReload
+" let proj1 = { 'path': '~/Dropbox/rst', }
+" let g:riv_projects = [proj1]
+call dein#add('gu-fan/riv.vim', {
+  \ 'on_ft': 'rst'})

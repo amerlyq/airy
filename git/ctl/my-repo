@@ -2,6 +2,8 @@
 source ~/.shell/profile
 cd "${1:-$PWD}"
 
+gurl=${2-}
+
 # After this script you must specify 'ghub' entry in ~/.ssh/config
 # In other case you will not be able to pull this gurl
 
@@ -15,7 +17,7 @@ if [[ ${CURR_PROF:?} =~ ^(work|wlux)$ ]]; then
   info+="($MAIN_NAME <$MAIN_MAIL>),"
 fi
 
-gurl=$(git config --get remote.origin.url \
+[[ $gurl ]] || gurl=$(git config --get remote.origin.url \
   | sed '{s@.*git\(.*\)\.com/@g\1:@}')
 
 git remote set-url origin "${gurl:?Not a git repo?}"

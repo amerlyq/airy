@@ -1,5 +1,15 @@
 # vim: ft=sh
 
+alias m='make'
+
+##ALT:HACK: use /dev/null to force printing filenames beside content
+# alias catv='grep "" /dev/null '
+# alias catv="awk '{print FILENAME \$0}' "
+# alias catv='more * | cat'
+# alias catv='tail -n +1 '
+# alias catv='find . -type f -print -exec cat {} \;'
+alias catv='head -n -0 '
+
 alias viasm='re-elf kirie/new/asm'
 alias viawk='re-elf kirie/new/awk'
 alias vish='re-elf kirie/new/bash'

@@ -1,5 +1,11 @@
 # vim:ft=sh
 
-alias tgz='tar -cvfz' # arch.tar.gz ./
-alias utgz='tar xvfz'
-alias utbz2='tar xvfj'
+# USAGE: $ txz arch.tar.gz -- ./
+
+alias txz='tar -cvJf'
+alias uxz='tar -xvJf'
+
+alias tgz='tar -cvzf'
+alias ugz='tar -xvzf'
+
+alias ubz2='tar -xvjf'
