@@ -36,7 +36,7 @@ USAGE
       $ sudo btrfs property set ~/.snapshots/<snapshot_num>/snapshot ro false
       $ sudo btrfs property get ~/.snapshots/<snapshot_num>/snapshot
         ro=false
-    Batch remove
+    Batch remove e.g. large files
       $ find ~/.snapshots -mindepth 1 -maxdepth 1 -type d -execdir sudo btrfs property set {}/snapshot ro false \;
       $ find ~/.snapshots -mindepth 1 -maxdepth 1 -type d -execdir sudo btrfs property get {}/snapshot \;
       $ cd ~/.snapshots

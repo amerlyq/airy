@@ -54,3 +54,9 @@ nft add rule inet filter TCP tcp dport 22 accept
 # To accept incoming DNS requests:
 nft add rule inet filter TCP tcp dport 53 accept
 nft add rule inet filter UDP udp dport 53 accept
+
+
+# Show result
+nft list tables
+nft list ruleset
+# nft list chain inet filter output

@@ -4,4 +4,6 @@ source ~/.shell/func.d/cfgsetup
 
 # systemctl enable iptables.service
 
+linkcp -ct /etc -- nftables.conf
+
 svc_activate -er nftables.service

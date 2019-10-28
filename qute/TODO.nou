@@ -10,6 +10,10 @@ DEBUG
 
 
 TODO
+  [_] BUG: Certificate error with google.com and QtWebEngine #2319
+    https://github.com/qutebrowser/qutebrowser/issues/2319
+      https://bugreports.qt.io/browse/QTBUG-52068
+    https://github.com/GoogleChrome/puppeteer/issues/3687
   2019-10-01 [X] add/show/validate CA root cert by NSS "certutil"
     SRC https://github.com/qutebrowser/qutebrowser/issues/843
     USAGE: :/net/doc/nss.nou
@@ -80,3 +84,14 @@ ADD
   [_] js global script to keep scroll position on resize, ankering to headers
   [_] DEV plugin to strip encrypted...gooogle from links
     2016-11-01 [X] ALT: use copyq plugin 'purify-url'
+
+
+USAGE
+  Clear cookies
+    Go to www.facebook.com.
+    Run the :inspector command.
+    Under the Application tab, click
+      » Application
+      » Clear storage
+      !. uncheck anything that you don't want to clear
+      » Clear site data
