@@ -97,6 +97,7 @@ mkdir -vp /mnt/@/{.snapshots,boot,var,data,work,home/${myuser:?}}
 btrfs subvolume create /mnt/@snapshots
 btrfs subvolume create /mnt/@/boot/grub
 btrfs subvolume create /mnt/@/var/cache
+btrfs subvolume create /mnt/@/var/lib/docker
 btrfs subvolume create /mnt/@/var/log
 # MAYBE: merge "work" with "root" and add under snapshoting excluding build dir
 # btrfs subvolume create /mnt/@/work/repo

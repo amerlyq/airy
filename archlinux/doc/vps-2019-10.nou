@@ -177,3 +177,8 @@ SSH
 
 %% VPN / Shadowsocks
   [_] RU: https://glashkoff.com/shadowsocks/
+
+
+Upgrade
+  $# reflector -l 35 -p https --sort rate --save /etc/pacman.d/mirrorlist
+  $# pacman -Syu
