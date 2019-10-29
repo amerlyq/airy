@@ -11,5 +11,18 @@ alias apts='apt-cache search'
 
 alias update='apt-get update && apt-get upgrade'
 
+## List files in package
+alias aptlr='_a()(command dpkg -L "$@" | grep -P "/bin/(?!\$)"); _a'
+
+## List all installed packages
+#   apt list --installed
+#   dpkg --get-selections
+#   dpkg -l
+#   dpkg -l debianutils
+
+## List dependent packages (before removal)
+#   apt-cache rdepends --installed systemd | sort -u
+#   apt-cache rdepends --installed libblkid1 | grep -vxF <(dpkg --get-selections | cut -d' ' -f1)
+
 # alias debup='aptitude update && aptitude safe-upgrade'
 # alias debup_old='aptitude update && aptitude upgrade'

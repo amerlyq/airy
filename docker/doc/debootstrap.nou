@@ -1,0 +1,33 @@
+%%%% Debootstrap
+
+TRY: Ubuntu -- download and install all packages fully offline
+  https://stackoverflow.com/questions/26050899/how-to-mount-host-volumes-into-docker-containers-in-dockerfile-during-build
+  https://docs.docker.com/engine/examples/apt-cacher-ng/
+  https://www.google.com/search?q=apt-get%20download%20packages%20with%20dependencies
+  https://stackoverflow.com/questions/13756800/how-to-download-all-dependencies-and-packages-to-directory
+  https://www.ostechnix.com/download-packages-dependencies-locally-ubuntu/
+
+
+Bootstrap with offline packages
+  https://wiki.debian.org/DebianMultilibMultiarchBootstrap
+  https://unix.stackexchange.com/questions/533849/how-to-debootstrap-specific-version-in-ubuntu-or-debian
+  https://www.reddit.com/r/debian/comments/d1u9l0/buster_cabin_fever_packing_checklist_for_offline/
+  https://www.google.com/search?q=%22debootstrap%22%20offline%20packages
+  https://unix.stackexchange.com/questions/397862/how-can-i-run-debootstrap-offline
+  TUT:
+    https://fredrik.wendt.se/2018/01/06/debootstrap-ing-ubuntu-lts/
+    https://www.theo-andreou.org/?tag=debootstrap
+    http://www.aguslr.com/blog/2019/03/24/lightweight-debian.html#using-debootstrap
+
+
+Fakeroot bootstrap -- to keep root permissions without sudo
+  https://unix.stackexchange.com/questions/214828/is-it-possible-to-run-debootstrap-within-a-fakeroot-environment
+    $ fakechroot fakeroot debootstrap sid /tmp/sid
+    = too much of headache -- especially when creating loop-devices / mounts / etc.
+
+
+VIZ: $ debootstrap ... --print-debs
+  BAD:(unnecessary packages): but I can't remove them -- Ubuntu is too broken to allow this
+    --exclude="e2fslibs,e2fsprogs,gcc-5-base,gcc-6-base,init,init-system-helpers,insserv,libapparmor1,libcap2,libcap2-binlibcryptsetup4,libdevmapper1.02.1,libgcrypt20,libgpg-error0,libkmod2,libseccomp2,libsystemd0,libusb-0.1-4,mawk,sensible-utils,systemd,systemd-sysv,sysv-rc"
+  ERR: W: Failure trying to run: $ chroot "/data/rootfs" /bin/true
+    ::: seems like you can't '--exclude=dash' after all

@@ -5,6 +5,11 @@
     + Replaces file by text reference to the external server on clone
     - After commits .git will increase -- no command to replace files immediately
 
+  Auto-track binary files
+    $ git lfs install   # initialize the Git LFS project
+    $ git lfs track '*.tar.xz'
+    $ git add .gitattributes
+
   git-annex
     https://git-annex.branchable.com/
     https://git-annex.branchable.com/walkthrough/
