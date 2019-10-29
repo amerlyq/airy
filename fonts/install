@@ -2,6 +2,15 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
+  # ATT: https://www.archlinux.org/news/ttf-dejavu-237-will-require-forced-upgrade/
+  pkg_inst ttf-dejavu
+
+  aur_inst ttf-symbola
+
+  # DEBUG: https://unicode.org/Public/emoji/12.1/
+  # BUG: config 75-joypixels.conf breaks jp-fonts
+  # pkg_inst ttf-joypixels
+
   # if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
   #   grep -q '^\[infinality-bundle\]' /etc/pacman.conf; then
   #     # infinality supports only 96dpi
@@ -12,30 +21,23 @@ if distro arch; then
   #   https://typeof.net/Iosevka/
   # aur_inst ttf-iosevka
 
-  fd=/usr/share/fonts
   # SEE: luxi-mono, mikachan, stix, croscore
   # ttf-freefont ttf-droid
-  # ATT: https://www.archlinux.org/news/ttf-dejavu-237-will-require-forced-upgrade/
-  pkg_inst ttf-dejavu
-  aur_inst ttf-symbola
-  # SEE: https://github.com/adobe-fonts
-  # NOTE: http://adobe-fonts.github.io/source-code-pro/
-  # https://github.com/adobe-fonts/source-code-pro
-  pkg_inst adobe-source-code-pro-fonts
-  pkg_inst adobe-source-sans-pro-fonts
-  pkg_inst adobe-source-serif-pro-fonts
-  # ALT: ttf-arphic-{ukai,uming}, 0-lohit-*
-  # https://github.com/adobe-fonts/source-han-sans
-  pkg_inst adobe-source-han-sans-jp-fonts
-  # NOTE: http://comicneue.com/
-  aur_inst ttf-comic-neue
-  # NOTE: http://ipafont.ipa.go.jp/
-  pkg_inst otf-ipafont
 
-  # CHG:BET: ttf-joypixels
-  # https://aur.archlinux.org/packages/ttf-emojione
-  # aur_inst ttf-emojione
-  pkg_inst ttf-joypixels
+  ## NOTE: http://adobe-fonts.github.io/source-code-pro/
+  ## SRC: https://github.com/adobe-fonts/source-code-pro
+  # pkg_inst adobe-source-code-pro-fonts
+  # pkg_inst adobe-source-sans-pro-fonts
+  # pkg_inst adobe-source-serif-pro-fonts
+
+  ## REF: https://github.com/adobe-fonts/source-han-sans
+  pkg_inst adobe-source-han-sans-jp-fonts
+  # ALT:(jp): ttf-arphic-{ukai,uming}, 0-lohit-*
+  # ALT:REF: http://ipafont.ipa.go.jp/
+  # pkg_inst otf-ipafont
+
+  # NOTE: http://comicneue.com/
+  # aur_inst ttf-comic-neue
 
   # Install manually:
   # aur_inst freetype2-ubuntu fontconfig-ubuntu cairo-ubuntu
