@@ -1,0 +1,96 @@
+%%% Image
+
+USAGE(external)
+  $ systemctl start docker
+  $# docker pull ubuntu:16.04
+  $# docker image ls --all
+  $# docker run -ti ubuntu:16.04 /bin/bash
+  $# docker container ls --all
+  $# docker stop ubuntu:16.04
+
+
+Offline transfer image
+  INFO: "Export container" vs "Save image"
+    https://tuhrig.de/difference-between-save-and-export-in-docker/
+  HOST: $ sudo docker pull ubuntu
+  HOST: $ sudo docker save -o ubuntu_image.docker ubuntu
+  TARG: $ sudo docker load -i ubuntu_image.docker
+
+
+BUILD(custom)
+  Setup (once)
+    $# systemctl start docker
+    $# docker pull ubuntu:16.04
+  Create
+    | ARG var = /path/to/archive.tar.xz
+    | FROM ubuntu:16.04
+    | ENV LANG="en_US.UTF-8" LC_ALL="C"
+  Build
+    $# docker build -t mydocker:latest -- .
+  Backup
+    $# docker save -o mydocker-latest.docker mydocker:latest
+    $# chown "$USER:$USER" mydocker-latest.docker
+    $ xz mydocker-latest.docker
+  Restore
+    $# docker load -i mydocker-latest.docker.xz
+    $# docker image ls --all
+  Usage
+    $ bdir=$PWD/build && mkdir -p -- "$bdir" && chown "$USER:$USER" -- "$bdir" && chmod g+s -- "$bdir"
+    $# docker run --name dev --rm --tty=true --interactive=true \
+      --volume="$PWD/build:/build:rw" --volume="$PWD/src:/src:ro" \
+      --hostname docker -- mydocker:latest  # --privileged
+    $# docker container ls --all
+    $# docker stop mydocker:latest
+  Separate in-source build by overlay
+    DOCKER: $# mount -t overlayfs overlay -o "lowerdir=/src,upperdir=/build" /repo
+
+
+BUILD(FROM scratch)
+  https://docs.docker.com/develop/develop-images/baseimages/
+  ALT:TRY: https://linuxhint.com/create_docker_image_from_scratch/
+     BET: https://docs.docker.com/develop/develop-images/baseimages/
+  INFO:REF:(create ./rootfs.tar.gz): ./debootstrap.nou
+    | FROM scratch
+    | ADD rootfs.tar.gz /
+
+
+
+%%% Mounts
+
+CMP: Manage data in Docker | Docker Documentation
+  https://docs.docker.com/storage/
+
+
+Bind Mounts
+  https://stackoverflow.com/questions/23439126/how-to-mount-a-host-directory-in-a-docker-container
+  * run with read-only mount-bind to whole source tree (due to ext-deps)
+    docker>=17 $ docker run -it --mount src="$(pwd)",target=/test_container,type=bind k3_s3
+    docker>=18 $ docker run -v /src/path:/container/path
+    REF: ++ http://wiki.t-firefly.com/en/ROC-RK3308-CC/buildroot-builder.html
+  * use /build for output -- keep cache inside container (not /tmp)
+  * keep container on specified partion instead of /var/lib -- due to snapshots and partition diskspace
+
+
+
+Mount bind for "docker build" ::: impossible
+  https://codefresh.io/docker-tutorial/not-ignore-dockerignore-2/
+  https://medium.com/@LihauTan/took-me-hours-to-realise-why-docker-build-ignores-my-dockerignore-and-this-is-what-ive-learned-2f87c770ea9c
+  READ: https://matthiasnoback.nl/2017/04/docker-build-patterns/
+  https://github.com/moby/moby/issues/17745
+    https://github.com/moby/moby/issues/14080
+  ++ https://stackoverflow.com/questions/26050899/how-to-mount-host-volumes-into-docker-containers-in-dockerfile-during-build
+  ALT:TRY: https://docs.docker.com/engine/examples/apt-cacher-ng/
+
+
+
+Volumes :: /var/lib/docker/volumes
+  TUT: https://docs.docker.com/storage/volumes/
+  + useful if you want for docker to manage and orchestrate volume-to-container mapping
+  - stores everything in root-only /var partition
+  ALT: store persistent volume in a different path
+    https://unix.stackexchange.com/questions/439106/docker-create-a-persistent-volume-in-a-specific-directory
+
+  ALT: tmpfs mounts
+    https://docs.docker.com/storage/tmpfs/
+    $ docker run -d -it --name tmptest --tmpfs /app nginx:latest
+    $ docker container inspect 'tmptest'

@@ -1,0 +1,17 @@
+%%%% Maintenance
+
+Cleanup
+  TUT: https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes
+  Purging All Unused or Dangling Images, Containers, Volumes, and Networks
+    $ docker system prune
+    OR: individually
+    $# docker container prune
+    $# docker image prune
+    $# docker network prune
+    $# docker volume prune
+  List all images and remove by pattern
+    $ docker images -a
+    $ docker images -a | grep "pattern" | awk '{print $3}' | xargs docker rmi
+  List all containers and remove by ID
+    $ docker ps -a
+    $ docker rm $ID_or_Name

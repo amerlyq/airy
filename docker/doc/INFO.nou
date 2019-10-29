@@ -1,0 +1,23 @@
+TUT
+  +++ https://www.slideshare.net/Docker/dcsf19-dockerfile-best-practices
+
+
+ATT: Licensing
+  https://opensource.stackexchange.com/questions/7013/license-for-docker-images
+
+
+ADD: default user
+  TUT: https://stackoverflow.com/questions/27701930/add-user-to-docker-container
+  NOTE: create default user with same UID (i.e. 1000 :: "user=$(id -u)") -- to prevent file-copy errors
+  TRY: make it directly in docker instead of debootstrap
+
+
+IDEA: multistage builds
+  https://vsupalov.com/cache-docker-build-dependencies-without-volume-mounting/
+    ubuntu -> devmachine -> toolchain
+  WARN: reasonable to apply it only to reduce build time, but not complexity
+    https://vsupalov.com/build-docker-image-clone-private-repo-ssh-key/
+
+
+Change default dir for images
+  https://forums.docker.com/t/how-do-i-change-the-docker-image-installation-directory/1169

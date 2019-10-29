@@ -1,0 +1,13 @@
+
+%%% Doxyfile
+
+  Order layers from less to most frequently changing
+    REF
+      https://medium.com/@aidobreen/using-docker-dont-forget-to-use-build-caching-6e2b4f43771e
+      https://pythonspeed.com/articles/docker-caching-model/
+      https://thenewstack.io/understanding-the-docker-cache-for-faster-builds/
+    | FROM python:3.6-alpine
+    | COPY requirements.txt /
+    | RUN pip install -r /requirements.txt
+    | COPY . /app
+    | CMD [ "python", "/app/yourscript.py" ]

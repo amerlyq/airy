@@ -1,0 +1,20 @@
+
+BUG:(FROM i386/ubuntu:16.04): configure: error: Oops, mp_limb_t is 32 bits, but the assembler code in this configuration expects 64 bits.
+  REF: https://github.com/crosstool-ng/crosstool-ng/issues/304
+  | FROM i386/ubuntu:16.04
+  MAYBE: can pass "-m32" flags for everything to work out ?
+
+
+2019-10-19 [X] Accumulated images in "docker image ls --all"
+  ::: NOTE:(docker run --rm): removes all runtime changes to container
+
+
+2019-10-19 [X] FIXED:ERROR: /bin/sh: /bin/sh: cannot execute binary file
+  ::: HACK:(--entrypoint=""): mitigate ENTRYPOINT [...] to run custom commands
+    REF: https://github.com/docker/for-linux/issues/225
+
+
+FAIL: too old, crashes "bash" and "apt-get" when running on x86_64 with newer kernel/glibc
+  | FROM ubuntu:10.04
+  | RUN sed -i -e "s/archive.ubuntu.com/old-releases.ubuntu.com/g" /etc/apt/sources.list
+  | CMD ["/bin/bash"]
