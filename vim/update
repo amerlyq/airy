@@ -22,6 +22,9 @@ shvim() { ${EDITOR:-nvim} -nR \
   -c "echo''|redir END|qall!" \
   >/dev/null </dev/tty ||:; }  # return $(($?-1)); }
 
+# BAD: don't work as expected due to lazy-loaded plugins
+# cmd='UpdateRemotePlugins'
+
 cmd='call dein#clear_state()'
 ((doupdate)) && cmd+='|call dein#update()'
 cmd+='|if dein#check_install()| call dein#install() |else| call dein#recache_runtimepath() |en'

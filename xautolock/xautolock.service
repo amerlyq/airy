@@ -5,6 +5,8 @@ After=xorg.target
 
 [Service]
 Type=simple
+# BUG: still called each 10 minutes after manually issuing r.lock
+# TRY: use <M-S-z> "xautolock -locknow" instead -- maybe it won't try to lock each 10 min then
 ExecStart=/usr/bin/xautolock -time 10 -locker r.lock -detectsleep
 Restart=always
 RestartSec=1

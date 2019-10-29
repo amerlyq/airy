@@ -3,6 +3,8 @@
 [Unit]
 Description=Mailsync service - %P
 Requisite=network.target
+Requisite=network-online.target
+# Requisite=netctl-ifplugd@enp0s25
 Requires=network-online.target
 After=network.target network-online.target
 
