@@ -1,0 +1,33 @@
+#%SUMMARY: docker container with all necessary dev tools
+#%BUILD: $ sudo docker build -f /path/to/archlinux-dev -t dev:latest -- .
+#%USAGE: $ sudo docker run --name dev --rm --tty=true --interactive=true --hostname=docker -- dev:latest
+#%ERR!(NEED): different dockers for development and production
+#   because we need fully controllable environment to reproduce
+#   binary-identical build from the revision hash embedded into ELF
+FROM archlinux/base
+
+## TODO: replace by proper setup of locale
+# ENV LANG="en_US.UTF-8" LC_ALL="C"
+
+# useradd --comment 'Default developer account' --create-home --user-group --groups users,sudo --shell /bin/bash --uid 1000 --gid 1000 --password user -- user
+
+# COPY /usr/share/terminfo/s/st-256color
+# COPY /usr/share/terminfo/t/tmux-256color
+
+# TODO: use VOLUME [ "/var/cache/pacman" ] to cache packages permanently
+# OR: RUN --mount=type=cache,target=/var/composer composer install -n -o --no-dev
+
+# ATT: docker archlinux immediately deletes packages from pacman cache
+#   REF: https://github.com/archlinux/archlinux-docker/blob/master/rootfs/usr/share/libalpm/hooks/package-cleanup.hook
+# IDEA: transparent pacman packages cache inside separate container REF: https://github.com/nroi/cpcache
+#   https://www.reddit.com/r/archlinux/comments/cchq69/i_made_a_docker_based_caching_pacman_proxy/
+#     https://github.com/okamidash/paccache
+#     https://hub.docker.com/r/okamidash/paccache
+#     $ docker run -d --name --paccache -p 8080:8080 -v /path/to/data/dir:/cache:rw -e okamidash/paccache
+RUN pacman -Syu --noconfirm && pacman -S --noconfirm \
+    git clang
+
+# COPY . /root/
+
+WORKDIR /build
+CMD ["/bin/bash"]
