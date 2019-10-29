@@ -36,9 +36,14 @@ parted /dev/nvme0n1 unit s print
 # REF: https://wiki.archlinux.org/index.php/GRUB#Encrypted_/boot
 # BUG: https://savannah.gnu.org/bugs/?55093
 cryptsetup -s 512 --type luks1 luksFormat /dev/nvme0n1p1
+
+## ADD: second passphrase -- to disclose in emergencies and then remove it
+#  :: enter existing passphrase to open dev, then new one for next key slot
+cryptsetup luksAddKey /dev/nvme0n1p1
+
+## Check both keys are present and open encrypted device
 cryptsetup luksDump /dev/nvme0n1p1
 cryptsetup luksOpen /dev/nvme0n1p1 luks
-
 
 ## INFO: scanning / clean
 lvmdiskscan
