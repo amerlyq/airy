@@ -8,10 +8,11 @@ skip(){ set -- ${!1:+"${!1}"}; (($#))||return 0
 # HACK: first update GPG keys
 # sudo pacman -Syu archlinux-keyring ca-certificates
 
-sudo -v
-(while sleep 30; do sudo -v; done || true) & pidsudo=$!
-onexit(){ kill -TERM "$pidsudo"; wait "$pidsudo"; }
+# FIXED:BUG: can't "sleep 30" -- TERM signal won't be delivered until loop unpaused
+{ i=0; while sleep 1; do ((++i%30))||sudo -v; done; } & pidsudo=$!
+onexit(){ kill -TERM "$pidsudo"; wait; }
 trap onexit INT ERR
+sudo -v
 
 # NOTE: three-stage process to upgrade AUR together with dependencies
 # HACK: skip 'exit 1' if update 'n' in pacman

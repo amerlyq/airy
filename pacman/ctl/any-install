@@ -34,7 +34,7 @@ nonempty(){ local fs=()
 }
 
 # FIXED:BUG: can't "sleep 30" -- TERM signal won't be delivered until loop unpaused
-{ i=0; while sleep 1; do ((++i%30))||{ echo .;sudo -v; }; done; } & pidsudo=$!
+{ i=0; while sleep 1; do ((++i%30))||sudo -v; done; } & pidsudo=$!
 onexit(){ kill -TERM "$pidsudo"; wait; }
 trap onexit INT ERR
 sudo -v
