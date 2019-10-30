@@ -16,6 +16,7 @@ sudo -v
 
 # NOTE: three-stage process to upgrade AUR together with dependencies
 # HACK: skip 'exit 1' if update 'n' in pacman
+# BUG: skips upgrade if file exists -- because errcode=1
 pkgupd(){ sudo pacman -Syu $(skip 'PKG_IGNORE[@]') || ((1==$?)); }
 pkgupd
 aur sync --database=aur --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')

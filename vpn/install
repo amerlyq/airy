@@ -3,4 +3,5 @@ source ~/.shell/func.d/packages
 
 pkg_inst openconnect
 pkg_inst -d vpnc
-aur_inst vpn-slice-git  # FIXME:(upstream): makedeps+=git
+aur_inst vpn-slice-git  # FIXME:(upstream): makedeps+=git depends+=(python-setproctitle)
+pkg_inst -d python-setproctitle

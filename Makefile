@@ -113,6 +113,7 @@ $(tsdir)/--configure--:
 	touch '$@'
 
 # NOTE: connect pacman to tty instead of logs
+# BUG:FIXME: only run on "airyctl -B" -- must ignore on simple "airyctl"
 $(tsdir)/--upgrade--:
 	echo '$(@F)'
 	./pacman/update -u > /dev/tty
@@ -127,6 +128,7 @@ problems:
 	@echo "Merge/delete all *.pacnew files from pkg updates :: $$ find / -name '*.pacnew'"
 	@echo "Then, for each found *.panew, do 'v -d /etc/locale.gen{,.pacnew}'"
 	locate .pacnew
+	@echo
 	@echo "Manually verify necessity of packages outside of airy."
 	@echo "INFO:USE:(commands): pacq, pacr, pacR, paclr"
 	r.airy-odd-pkgs
