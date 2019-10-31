@@ -1,9 +1,12 @@
-<!-- NEED: replace "myuser", "myhost" and "device id" by actual values -->
+<!-- ~/.config/syncthing/config.xml -->
+<!-- NEED: replace "myuser", "myhost", "mytarg" and both "device id" by actual values -->
 <configuration version="29">
     <folder id="sync" label="sync" path="/home/myuser/sync" type="sendreceive" rescanIntervalS="14400" fsWatcherEnabled="true" fsWatcherDelayS="10" ignorePerms="false" autoNormalize="true">
         <filesystemType>basic</filesystemType>
         <device id="75F2JYC-6VBY6AH-6K5KAXD-RJEK4CS-VVSJJQL-CFFYTX6-QAJB7OC-EPQPSA4" introducedBy=""></device>
+        <device id="CCK7IOF-I43UJE3-G6ZJWG6-W6UHLE5-YSTB3W4-BKYT4ZI-57ALEWN-LTMS5AC" introducedBy=""></device>
         <minDiskFree unit="%">1</minDiskFree>
+        <!-- BAD: mostly useless if you have "snapper/btrfs" snapshots each hour -->
         <versioning type="staggered">
             <param key="cleanInterval" val="3600"></param>
             <param key="maxAge" val="7776000"></param>
@@ -23,7 +26,16 @@
         <weakHashThresholdPct>25</weakHashThresholdPct>
         <markerName>.stfolder</markerName>
         <copyOwnershipFromParent>false</copyOwnershipFromParent>
+        <modTimeWindowS>0</modTimeWindowS>
     </folder>
+    <device id="CCK7IOF-I43UJE3-G6ZJWG6-W6UHLE5-YSTB3W4-BKYT4ZI-57ALEWN-LTMS5AC" name="mytarg" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
+        <address>dynamic</address>
+        <paused>false</paused>
+        <autoAcceptFolders>false</autoAcceptFolders>
+        <maxSendKbps>0</maxSendKbps>
+        <maxRecvKbps>0</maxRecvKbps>
+        <maxRequestKiB>0</maxRequestKiB>
+    </device>
     <device id="75F2JYC-6VBY6AH-6K5KAXD-RJEK4CS-VVSJJQL-CFFYTX6-QAJB7OC-EPQPSA4" name="myhost" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
         <address>dynamic</address>
         <paused>false</paused>
@@ -81,5 +93,6 @@
         <stunKeepaliveStartS>180</stunKeepaliveStartS>
         <stunKeepaliveMinS>20</stunKeepaliveMinS>
         <stunServer>default</stunServer>
+        <databaseTuning>auto</databaseTuning>
     </options>
 </configuration>

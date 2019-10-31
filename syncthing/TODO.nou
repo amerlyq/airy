@@ -2,11 +2,15 @@ ALT:
   BTSync
     https://www.resilio.com/individuals/
 
+
 INFO
   !! following symlinks will not be implemented
     https://github.com/syncthing/syncthing/issues/1776
   ALG: pre-copy large data before enabling sync
     https://forum.syncthing.net/t/is-it-okay-to-seed-a-sync/13188/7
+  WARN:(>=1.3): new option <databaseTuning>auto</databaseTuning>
+    https://forum.syncthing.net/t/many-small-ldb-files-with-database-tuning/13842
+
 
 USAGE
   android
@@ -15,5 +19,14 @@ USAGE
       https://www.reddit.com/r/Syncthing/comments/a1gdwm/your_android_version_only_grants_syncthing_read/
       https://forum.syncthing.net/t/writing-to-sd-card-issue/12333
 
+
 TODO
-  G: syncthing android through usb
+  2019-10-31 [X] G: syncthing android through usb
+    ::: bring PC and Android under single network
+      <= use USB-tethering or USB-reverse-tethering by SimpleRT
+  [_] BAD!WARN: local discovery -- may send packages into WAN (all your other networks)
+    https://forum.syncthing.net/t/behavior-of-local-discovery-surprices-me/11543
+    2019-10-31 [X] FAIL: shows devices as disconnected
+      # DISABLED: to prevent broadcast into WAN: add devices manually by ID
+      <localAnnounceEnabled>false</localAnnounceEnabled>
+    [_] TODO:DEV: must block syncthing discovery on everything beside USB "tun0" by firewall

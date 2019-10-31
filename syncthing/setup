@@ -4,7 +4,14 @@ source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
 # cfgOpt r && ./config.gen
-cfgOpt u && echo "W: replace necessary details from ./tmpl/ manually by vimdiff"
+# TODO: only allow connections from "dev tun0" when connecting phone by USB
+cfgOpt u && cat <<EOT
+W: shutdown server and manually replace necessary details
+  s.t syncthing
+  v -d  ~/.config/syncthing/config.xml ./tmpl/config.xml
+  wdiff ~/.config/syncthing/config.xml ./tmpl/config.xml
+  s.r syncthing
+EOT
 
 # http://docs.syncthing.net/users/autostart.html#systemd
 # ALT:(system-wide): $ svc_activate -e$(cfgOpt uU&&echo rR) syncthing{,-inotify}@"${USER:?}"
