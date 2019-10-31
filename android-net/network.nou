@@ -38,7 +38,10 @@ Network (add Android to PC network)
       OR: $# netcfg rndis0 dhcp
 
   ALT https://github.com/vvviperrr/SimpleRT
-    $ cd /usr/lib/simple-rt && sudo /usr/lib/simple-rt/simple-rt -i enp0s25
+    $ cd /usr/lib/simple-rt && sudo /usr/lib/simple-rt/simple-rt -i wlo1
+    $ sudo nft add rule inet filter forward iifname tun0 oifname wlo1 accept
+      OR:(reset): $ sudo nft flush chain inet filter forward
+    $ sudo nft list ruleset
 
 
 F*cking message

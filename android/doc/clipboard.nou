@@ -7,7 +7,10 @@ Android:
   * run "KDE Connect" app (if background service had stopped)
 HOST: |community/kdeconnect|
   Create reverse-tethering USB network
-    $ ./airy/android-net/run
+    $ r.android-net
+  CHECK: firewall rules allow forwarding between network devices
+    $ sysctl net.ipv4.ip_forward
+    $ sudo nft list ruleset
   TARG: open "USB menu" and switch to "USB tethering" -- you will get pop-up "Simple-RT connected"
     NOTE:(if no connection): disable DNS66 and re-plug USB
   Run single foreground demon directly or through systemd unit
@@ -17,10 +20,30 @@ HOST: |community/kdeconnect|
     $ kdeconnect-cli -l
     $ kdeconnect-cli -d 8711b58d64210eb6 --pair
     $ kdeconnect-cli --pair --device $(kdeconnect-cli --list-devices --id-only|head -1)
+  OR: reverse pairing
+    TARG: click into found device to request pairing on the phone
+    HOST: press <ctrl+shift+period> when "dunst" notification visible and pick "Accept"
+    FIXED? if device is not visible -- try unpairing first (!undocumented!)
+      $ kdeconnect-cli --unpair --device $(kdeconnect-cli --list-devices --id-only|head -1)
   Accept connection request in notification
     <C-S-.> <Enter>
   FINISH
     TARG: re-enable "DNS66" which was disabled by "SimpleRT"
+
+
+DEBUG
+  https://forum.kde.org/viewtopic.php?f=22&t=154107
+  Is the process listening?
+    $ sudo netstat -tunelp | grep -i kdeconnect
+      tcp6 0 0 :::1716 :::* LISTEN 1000 36999 3399/kdeconnectd
+      udp6 39936 0 :::1716 :::* 1000 36998 3399/kdeconnectd
+  Are the ports open/blocked?
+    # Try phone and laptop, use port which netstat shows
+    $ netcat -z -v <your-phones-ip> 1714-1764
+      Connection to <your -phones-ip> 1716 port [tcp/*] succeeded!
+      + lots of Connection refused, but you need 1 "succeeded"
+  Check the kdeconnect home dir
+    $ ls -al /home/<user>/.config/kdeconnect/
 
 
 ALT:
@@ -29,6 +52,7 @@ ALT:
     https://blog.alteroot.org/articles/2013-11-16/kdeconnect-with-android-and-xfce-archlinux.html
     https://albertvaka.wordpress.com/
     http://www.webupd8.org/2017/01/integrate-your-android-device-with.html
+    USB: https://mail.kde.org/pipermail/kdeconnect/2016-April/001481.html
   Netclip
     https://github.com/alegen/netclip
     https://f-droid.org/wiki/page/net.alegen.android.netclip
