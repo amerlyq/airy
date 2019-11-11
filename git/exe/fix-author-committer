@@ -1,0 +1,38 @@
+#!/bin/bash
+# SUMMARY: rewrite history author/committer
+# REF:TUT: https://github.community/t5/Support-Protips/Why-is-my-commit-associated-with-the-wrong-person/ba-p/6728
+# [_] FIND: how to prohibit global committer/author on workstations
+# NOTE: delete refs after git diff :: $ git update-ref -d refs/original/refs/heads/master
+# WARN: keep in mind that this is going to create new references in the git
+# history so do this only in private repository or the one which is still not
+# shared with others as it could cause broken references!
+set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+# ALSO: rewrite dates for specific commits
+# if [ $GIT_COMMIT = 119f9ecf58069b265ab22f1f97d2b648faf932e0 ]; then
+#   export GIT_AUTHOR_DATE="Fri Jan 2 21:38:53 2009 -0800"
+#   export GIT_COMMITTER_DATE="$(date -Rd "-1 days")"
+
+fixme=${1:-wrong@example.com}
+name=${2:-Amerlyq}
+email=${3:-amerlyq@gmail.com}
+
+git filter-branch --env-filter "
+
+# export GIT_COMMITTER_NAME='$name'
+# export GIT_COMMITTER_EMAIL='$email'
+# export GIT_AUTHOR_NAME='$name'
+# export GIT_AUTHOR_EMAIL='$email'
+
+if test \"x\$GIT_COMMITTER_EMAIL\" == 'x$fixme'
+then
+    export GIT_COMMITTER_NAME='$name'
+    export GIT_COMMITTER_EMAIL='$email'
+fi
+if test \"x\$GIT_AUTHOR_EMAIL\" == 'x$fixme'
+then
+    export GIT_AUTHOR_NAME='$name'
+    export GIT_AUTHOR_EMAIL='$email'
+fi
+
+" --tag-name-filter cat -- --branches --tags

@@ -1,6 +1,12 @@
+# vim: ft=gitconfig
+
+[user]
+    # NOTE: enforce local user.name/email per each repo
+    useConfigOnly = true
+
 [core]
     editor = $EDITOR
-	# editor = notepad++.exe
+    # editor = notepad++.exe
     # Use <pj>/.git/info/excludes for per-project local ignore
     # ALSO: consider ignoring local changes to files, already commited to repo
     #   git update-index --assume-unchanged <file>
@@ -85,5 +91,3 @@
 #[rerere]
 #enabled = 1
 #autoupdate = 1
-
-# vim: ft=gitconfig

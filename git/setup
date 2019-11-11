@@ -14,16 +14,21 @@ echo "USE: replace name/email for private repo before push:
 
 ### GENS ###
 dst=~/.config/git/config
-> "$dst"
-if [[ -n "${WORK_NAME:=${MAIN_NAME-}}" &&
-      -n "${WORK_MAIL:=${MAIN_MAIL-}}" ]]; then
-    git config --global user.name  "$WORK_NAME"
-    git config --global user.email "$WORK_MAIL"
-    # git config --global user.signingkey = C8A2DA6E
-fi
 
-for f in cfg/*; do
-  git config --global --add include.path "$f"
-done
+## DISABLED: copying template file is a cleaner approach
+# > "$dst"
+# for f in cfg/*; do
+#   git config --global --add include.path "$f"
+# done
+linkcp -ct ~/.config/git -- ./cfg/config
+
+## DISABLED: never set global user/email -- only per each repo
+## BET:DONE:CFG: $ git config --global user.useConfigOnly true
+# if [[ -n "${WORK_NAME:=${MAIN_NAME-}}" &&
+#       -n "${WORK_MAIL:=${MAIN_MAIL-}}" ]]; then
+#     git config --global user.name  "$WORK_NAME"
+#     git config --global user.email "$WORK_MAIL"
+#     # git config --global user.signingkey = C8A2DA6E
+# fi
 
 echo "W: $dst"

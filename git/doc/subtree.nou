@@ -6,14 +6,14 @@ NOTE: directory, local branch, and remote -- all have same name "mylib" but mean
 
 
 SETUP
-  Clone separate repo from single directory (without file renames)
+  Extract single directory into separate repo (without file renames)
     $ cd myrepo
     $ git subtree split --prefix=mylib/ --branch=mylib
       OR: $ git checkout -b mylib
           $ git filter-branch --subdirectory-filter ./mylib/
     $ git log --oneline mylib --
     $ git remote add mylib ghub:user/mylib
-    $ git push -u mylib mylib
+    $ git push -u mylib mylib:master
       OR: $ git push ghub:user/mylib mylib:master
       OR: $ mkdir mylib && cd mylib && git init && git pull ../myrepo mylib:master
       OR: $ git clone mylib && cd mylib && git fetch ../myrepo mylib:tmp
@@ -21,7 +21,7 @@ SETUP
     $ git rm -r ./mylib/
     $ git commit -m 'move ./mylib/ into subtree'
 
-  Add remote repo as subtree to new projects
+  Add remote repo as subtree back to new projects
     $ git remote add mylib ghub:user/mylib
     $ git subtree add --prefix=mylib/ --branch=mylib mylib master
       => ref "mylib/master"

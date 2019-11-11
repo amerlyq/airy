@@ -8,6 +8,11 @@ alias glg.='glg -- .'
 alias gla='glg --all'
 alias gla.='gla -- .'
 
+## Statistics on all authors / committers in the repo
+# NOTE: add '... -- dir/file' for blaming
+alias glan='git --no-pager shortlog --summary --numbered --email --all'
+alias glcn='glan --committer'
+
 # REF: https://stackoverflow.com/questions/46750027/is-there-a-git-log-summary-that-includes-merge-only-and-non-merge-commits
 glB(){ git log -m --first-parent "$(git merge-base "$1" HEAD)~..HEAD" "${@:2}"; }
 glR(){ glB "$(git branch --list --remote --sort '-refname' --format '%(refname:short)' -- 'origin/release/R??' | head -1)" "$@"; }
