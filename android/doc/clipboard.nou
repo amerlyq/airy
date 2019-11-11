@@ -1,21 +1,25 @@
 %%%% Shared clipboard
 
-F-Droid: install "kdeconnect"
-  * disable excessive abilities beside clipboard sync
 Android:
   * connect by WiFi OR USB
-  * run "KDE Connect" app (if background service had stopped)
+  * install "kdeconnect" from F-Droid
+  * run "KDE Connect" app (e.g. background service could have stopped)
+  * disable excessive abilities beside clipboard sync
+
 HOST: |community/kdeconnect|
   Create reverse-tethering USB network
     $ r.android-net
   CHECK: firewall rules allow forwarding between network devices
     $ sysctl net.ipv4.ip_forward
     $ sudo nft list ruleset
-  TARG: open "USB menu" and switch to "USB tethering" -- you will get pop-up "Simple-RT connected"
-    NOTE:(if no connection): disable DNS66 and re-plug USB
+  TARG: open "USB menu" and switch to "USB tethering"
+    * you will get pop-up "Simple-RT connected"
+    !!. check Simple-RT is enabled as VPN service in notification area !!
+      <= disable "DNS66" if no connection and switch "USB tethering" again
   Run single foreground demon directly or through systemd unit
-    $ pkill kdeconnectd  # FIXED: kill old server if "kdeconnectd" immediately exits
     $ /usr/lib/kdeconnectd
+    FIXED: kill old server if "kdeconnectd" immediately exits
+      $ pkill kdeconnectd
   Pair device to share clipboard
     $ kdeconnect-cli -l
     $ kdeconnect-cli -d 8711b58d64210eb6 --pair
@@ -35,13 +39,13 @@ DEBUG
   https://forum.kde.org/viewtopic.php?f=22&t=154107
   Is the process listening?
     $ sudo netstat -tunelp | grep -i kdeconnect
-      tcp6 0 0 :::1716 :::* LISTEN 1000 36999 3399/kdeconnectd
-      udp6 39936 0 :::1716 :::* 1000 36998 3399/kdeconnectd
+      tcp6 0     0 :::1716 :::* LISTEN 1000 36999 3399/kdeconnectd
+      udp6 39936 0 :::1716 :::*        1000 36998 3399/kdeconnectd
   Are the ports open/blocked?
-    # Try phone and laptop, use port which netstat shows
-    $ netcat -z -v <your-phones-ip> 1714-1764
-      Connection to <your -phones-ip> 1716 port [tcp/*] succeeded!
-      + lots of Connection refused, but you need 1 "succeeded"
+    Try phone and laptop, use port which netstat shows
+    $ netcat -z -v 10.1.1.1 1714-1764
+      # Lots of Connection refused, but you need 1 "succeeded"
+      e.g. connect to <your-phones-ip> port 1716 [tcp/*] succeeded!
   Check the kdeconnect home dir
     $ ls -al /home/<user>/.config/kdeconnect/
 
