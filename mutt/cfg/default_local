@@ -25,9 +25,9 @@ mailboxes =INBOX
 # MAYBE:MOVE: mailbox setting to ./folders file -- so keys a
 # VIZ: mailboxes =todo =ntf =org =my =inf
 # REF: https://github.com/neomutt/neomutt/issues/46
-# IDEA: mailboxes `find -H ~/.mail/luxoft -maxdepth 1 -type d -exec test -d {}/cur \; -printf '=%f '`
+# IDEA: mailboxes `find -H ~/.mail/myacc -maxdepth 1 -type d -exec test -d {}/cur \; -printf '=%f '`
 #   => sort only directly in sidebar :: set sidebar_sort_method
-# OR: mailboxes `find -H ~/.mail/luxoft -maxdepth 1 -type d -exec test -d {}/cur \; -printf '=%f\n' | grep -vEw 'Sent|Trash' | sort | paste -sd ' '`
+# OR: mailboxes `find -H ~/.mail/myacc -maxdepth 1 -type d -exec test -d {}/cur \; -printf '=%f\n' | grep -vEw 'Sent|Trash' | sort | paste -sd ' '`
 
 # WARN: it seems vars aren't expanded in string
 # set query_command = "r.notmuch $my_acc -- address %s"
