@@ -1,26 +1,40 @@
-#!/bin/bash -e
-source ~/.shell/profile
-cd "${1:-$PWD}"
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2019 Amerlyq <amerlyq@gmail.com> and contributors
+#
+# SPDX-License-Identifier: MIT
+#
+#%SUMMARY: set local user/email/url identity for current repository
+#%ARCH: use multiple identities (per repository) and DISABLE global identity
+#%NEED: add 'ghub' entry to ~/.ssh/config -- otherwise pull/push won't work
+#%USAGE: $ cd /path/to/repo && ./$0 [name] [email] [remote-url]
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
-gurl=${2-}
+repo=$(realpath --no-symlinks -e "${REPO:-$PWD}")
+git(){ command git -C "$repo" --no-pager "$@" || exit $(($?==1 ? 0 : $?)); }
 
-# After this script you must specify 'ghub' entry in ~/.ssh/config
-# In other case you will not be able to pull this gurl
 
+name=${1:-$(git config --local user.name)}
+mail=${2:-$(git config --local user.email)}
+url=${3:-$(git config --get remote.origin.url | sed '{s@.*git\(.*\)\.com/@g\1:@}')}
 # git remote show origin | grep "Push *URL" | sed "s@.*:.*:\(.*\$\)@\1@"
-info="git:"
 
-# BAD: explicit names => swap meaning MAIN_NAME for work and AIRY_PERSONAL_NAME for your own repos
-if [[ ${CURR_PROF:?} =~ ^(work|wlux)$ ]]; then
-  git config --local user.name "${MAIN_NAME:?}"
-  git config --local user.email "${MAIN_MAIL:?}"
-  info+="($MAIN_NAME <$MAIN_MAIL>),"
+
+if [[ -z $name || -z $mail ]]; then
+  # THINK: replace "source" with global registry to use "set -r"
+  source ~/.shell/profile
+  case $repo
+  in /home/*) name=${MAIN_NAME:?}; mail=${MAIN_MAIL:?}
+  ;; /work/*) name=${WORK_NAME:?}; mail=${WORK_MAIL:?}
+  esac
 fi
 
-[[ $gurl ]] || gurl=$(git config --get remote.origin.url \
-  | sed '{s@.*git\(.*\)\.com/@g\1:@}')
 
-git remote set-url origin "${gurl:?Not a git repo?}"
-info+=" $gurl <- '${PWD#$HOME/}'"
+# MAYBE: don't change if the same -- to keep file timestamp
+git config --local user.name "${name:?}"
+git config --local user.email "${mail:?}"
+[[ $url ]] && git remote set-url origin "$url"
 
-printf 'C: %s\n' "$info"
+
+printf 'C: (%s <%s>), %s <- %s\n' \
+  "$name" "$mail" "${url:-/local/}" "${repo#$HOME/}"

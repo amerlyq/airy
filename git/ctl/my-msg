@@ -1,0 +1,235 @@
+#!/usr/bin/env perl
+#
+# SPDX-FileCopyrightText: 2019 Amerlyq <amerlyq@gmail.com> and contributors
+#
+# SPDX-License-Identifier: MIT
+#
+#%SUMMARY: generate git index description to use as auto-commit message
+#%FORMAT(>): e.g. [mods,.] 6 files (A3 M3)  +1679/-1  20191123_230146
+#%IDEA: rapid development first, clean-up PR history later
+#%USAGE: $ cd /path/to/repo && ./$0 [--split] [--index] [--commit]
+#%   OR: $ ./$0 | git commit -F-
+#
+# REF
+#   IDEA: https://github.com/presslabs/gitfs
+#   ALT: https://en.wikipedia.org/wiki/Versioning_file_system
+#   USE:(hook): https://gist.github.com/bartoszmajsak/1396344
+#     https://medium.com/@nicklee1/prepending-your-git-commit-messages-with-user-story-ids-3bfea00eab5a
+#
+# MAYBE: git config commit.template
+#
+# IDEA: commit message must help with easier decisions about rewriting history
+# VIZ:
+#   * generate full msg from current dirty repo
+#   * ... from current index
+#   * ... from arbitrary diff / commit range
+# TODO
+#   * split into multiple commits current dirty repo (for easier history rewrite)
+#     <= per each flat dir | per each action ($mod) inside each dir
+#   * ... current index
+#
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use v5.14;  # for s///r
+use List::Util qw(uniq sum0);  # REF: https://perldoc.perl.org/List/Util.html
+use POSIX qw(:sys_wait_h strftime);
+use Cwd qw(cwd);
+use File::Spec::Functions qw( rel2abs canonpath );
+use Getopt::Long qw(GetOptions :config bundling permute
+no_auto_abbrev no_getopt_compat no_ignore_case no_pass_through);
+
+
+my %opts = ( index => 1 );
+GetOptions(\%opts   #%OPTIONS:
+, 'all|a!'          #% a = all      | all files in workdir
+, 'index|i!'        #% i = index    | describe only current git index
+, 'commit|c!'       #% c = commit   | immediately commit description (implies: -i)
+, 'relative|r!'     #% r = relative | describe only current folder (TBD)
+, 'workdir|w!'      #% w = workdir  | describe only current git index (disables: -i)
+, 'help|h|?' => sub { print &help; exit }
+) or die $/,&help;  #%
+$opts{index} = 1 if $opts{commit};
+$opts{index} = 0 if $opts{workdir};
+
+my $repo = canonpath(rel2abs($ENV{REPO} // cwd));
+my @git = ('git', '-C', $repo, '--no-pager');
+
+
+sub help { open STDIN,'<',$0; grep { $_ } map { $1.$/ if /^(?:.*\s)?#%(.*)/ } <STDIN> }
+sub git {
+    my $rc = system(@git, @_);
+    exit WEXITSTATUS($?) if $rc and WIFEXITED($?) and WEXITSTATUS($?);
+}
+
+
+my @cmd;
+if ($opts{index}) {
+    push @cmd, 'diff-index', '--cached';
+    push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat';
+    push @cmd, 'HEAD';
+} else {
+    push @cmd, 'diff-files';
+    push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat';
+}
+
+# NOTE: use ARGV as list of files/dirs to add to current commit (if specified)
+# ALT: join and use ARGV as commit message hint for future rebasing
+
+my $usediff = 1 if -t STDIN;
+
+my $pid;
+if ($usediff) {
+    $pid = open(STDIN, "-|");
+    exec(@git, @cmd, '--', @ARGV) or die if $pid == 0;
+    undef @ARGV;
+}
+
+
+
+## BAD:SEE: my own way to get branch name from this folder
+# branch=$(git symbolic-ref --short HEAD)
+# branch=$(git rev-parse --abbrev-ref HEAD)
+# push=$(git for-each-ref --format="%(refname:short) %(push:track)" refs/heads)
+# git --no-pager show --no-patch --pretty=format:"%cr%x09%ae%x09%h%x09%D%n" --shortstat HEAD
+# m=$(git merge-base --fork-point "$b" "$h")
+# git branch -r --format='%(committerdate:unix)%09%(objectname)%09%(authoremail)' --sort=-committerdate
+
+
+# NOTE:(--patch-with-raw): -- can be used to add changed-line-context to commit message
+# NOTE: don't support complex tree designators ALT: use $ gitdiff() --cached --raw --numstat
+# gitdiff(){ git diff-index -z --find-renames --find-copies --minimal --cached --raw --numstat "$@"; }
+# gitdiff(){ git diff --no-color --find-renames --find-copies --irreversible-delete --textconv "$@"; }
+# gitdiff --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]] --name-only "$b"..."$h" --
+# gitdiff --cached --dirstat=cumulative / --name-status / --name-only
+# MAYBE: --cc
+# MAYBE: --submodule=short OR --ignore-submodules=none/untracked/dirty/all
+# MAYBE: --ignore-space-change --ignore-all-space  --ignore-blank-lines
+#   calculate diff size difference w/ and w/o blanks to show "blanks changed" number
+# OR:(-z): local $/ = "\0";
+# 1       2       README NUL
+# 3       1       NUL arch/i386/Makefile NUL arch/x86/Makefile NUL
+
+my %diff;
+while (<STDIN>) {
+    chomp;
+    if (/^:/) {
+        my ($inf,$src,$dst) = split /\t/, substr($_,1), 3;
+        my ($sm,$dm,$sh,$dh,$mod) = split /\s/, $inf, 5;
+        $diff{$src} = { mod => $mod, src => $src, dst => $dst };
+    } else {
+        my ($add,$del,$src,$dst) = split /\t/, $_, 4;
+        @{ $diff{$src} }{qw(add del)} = ($add, $del);
+    }
+}
+
+if ($usediff) {
+    # ATT: die here if app exited with error
+    waitpid $pid, 0;
+    exit WEXITSTATUS($?) if WIFEXITED($?) and WEXITSTATUS($?);
+}
+
+if (not %diff) {
+    print "Err: empty diff, nothing to describe", $/;
+    exit 1;
+}
+
+# MAYBE: use both src/dst -- because you affect both on rename
+my %files;
+$files{$_->{src}}++ for values %diff;
+my @files = sort { $files{$b} <=> $files{$a} } keys %files;
+
+my %stat;
+$stat{add} = sum0 (map { $_->{add} } values %diff);
+$stat{del} = sum0 (map { $_->{del} } values %diff);
+# NEED: git diff --patch | grep /^@@/
+# $stat{hunk} += 1;
+
+
+# per-topdir
+my %tops;
+foreach my $src (keys %diff) {
+    my $i = index($src, "/");
+    my $top = $i == -1 ? "." : substr($src, 0, $i);
+    ++$tops{$top};
+    $diff{$src}{top} = $top;
+}
+my @tops = sort { $tops{$b} <=> $tops{$a} } keys %tops;
+
+
+# per-basedir
+my %dirs;
+foreach my $src (keys %diff) {
+    my $i = rindex($src, "/");
+    my $dir = $i == -1 ? "." : substr($src, 0, $i);
+    ++$dirs{$dir};
+    $diff{$src}{dir} = $dir;
+}
+my @dirs = sort { $dirs{$b} <=> $dirs{$a} } keys %dirs;
+
+
+# per-type
+my @allmods = qw(M R A D C T U X B);
+my %allmods = ( A => "add", C => "copy", D => "del", M => "chg", R => "move", T => "retype" );
+foreach my $src (keys %diff) {
+    my $h = $diff{$src};
+    ++$stat{$h->{mod}};
+}
+my @mods = grep { $stat{$_} } @allmods;
+
+
+# TODO:ALG: heuristics
+#   * top-level dirs in flat hierarchy === app architecture
+#       [mods,.] 6 files (A3 M3)  +1679/-1  20191123_230146
+#   * subdirs -- if low count
+#   * list individual files in single dir == module details
+#       [.] chg {README.md}  +7  20191124_002419
+#   * statistcis on individual files == too much changes at once
+#   * hunks in files === change details
+#   * individual lines in file === edit details
+
+# THINK: prepend by currently working story/ticket e.g. "ARCH-127 [mymod,bbd] ..."
+#   ALT: use short feature-branch name -- because you must store that ticket name somewhere anyway
+
+my $text;
+
+# FORMAT ::= branch? [tops,..] files dirs?  +X/-Y  YYYYMMdd_hhmmss
+#  files ::= {chg|add|del} {<files>,..} | {chg|add|del} <N> "files" | <N> "files" (M2 A3)
+$text .= "[". $tops[0];
+$text .= ",". $tops[1] if @tops > 1;
+$text .= ",(+". (@tops - 2) .")" if @tops > 2;
+$text .= "]";
+
+my $action = $allmods{$mods[0]};
+if (@mods > 1) {
+    $text .= " ". @files ." files";
+    $text .= " (". join(" ", map { $_ . $stat{$_} } @mods) .")";
+} elsif (@files > 2) {
+    $text .= " ". $action ." ". @files ." files";
+} else {
+    # BET? use basename "path/to/[file.txt]" :: [mod] chg file.txt
+    $text .= " ". $action ." ". join(",", @files);
+}
+
+
+# BET? use middle-part "mod/[path/to]/file.txt" :: [mod] chg file.txt in {path/to/}
+# $text .= " in {". join(",", @dirs) ."}" if @dirs < 2;
+
+
+# MAYBE: print only number of changed lines -- remove added/deleted whole files from count
+if ($stat{add} or $stat{del}) {
+    $text .= "  ";
+    $text .= "+". $stat{add} if $stat{add};
+    $text .= "/-". $stat{del} if $stat{del};
+}
+
+$text .= "  ". strftime("%Y%m%d_%H%M%S", localtime);
+
+
+if ($opts{commit}) {
+    # THINK:USE: --fixup=<commit> for "rebase --autosquash"
+    git('commit', '--message='.$text);
+    # git('show', '--stat');
+} else {
+    print $text, $/;
+}

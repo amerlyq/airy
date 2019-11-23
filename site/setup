@@ -11,7 +11,7 @@ clone_orphan() { local d=$1
     u=$(git remote get-url origin) || u=$PWD
     git clone "$u" "$d" --single-branch -b "${d##*/}"
   fi
-  r.git-my-repo "$d"
+  REPO="$d" r.git-my-repo
   if git branch -r | grep -qF origin/"$d"; then
     git branch -dr origin/"$d"
   fi
