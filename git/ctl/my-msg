@@ -20,7 +20,8 @@
 #   IDEA: always populate message by template by "[@tops...] <usermsg>"
 #
 # IDEA: commit message must help with easier decisions about rewriting history
-# TODO
+# TODO: tops=$(git add -- .; git diff-index --name-only --cached HEAD | sed 's|/.*||' | sort -u; git reset)
+#   $ for d in "${(@f)tops}"; do git add "$d"; git stash push --keep-index --include-untracked; r.git-my-msg --index --commit; git stash pop; done
 #   * split into multiple commits current dirty repo (for easier history rewrite)
 #     <= per each flat dir | per each action ($mod) inside each dir
 #   * ... current index
@@ -88,11 +89,11 @@ if ($opts{commit}) {
 my @cmd;
 if ($opts{index}) {
     push @cmd, 'diff-index', '--cached';
-    push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat';
+    push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat', '-z';
     push @cmd, 'HEAD';
 } else {
     push @cmd, 'diff-files';
-    push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat';
+    push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat', '-z';
 }
 
 my $usediff = 1 if -t STDIN;
@@ -124,22 +125,50 @@ if ($usediff) {
 # MAYBE: --submodule=short OR --ignore-submodules=none/untracked/dirty/all
 # MAYBE: --ignore-space-change --ignore-all-space  --ignore-blank-lines
 #   calculate diff size difference w/ and w/o blanks to show "blanks changed" number
-# OR:(-z): local $/ = "\0";
+
+
+# FORMAT(<): --numstat
 # 1       2       README NUL
 # 3       1       NUL arch/i386/Makefile NUL arch/x86/Makefile NUL
+sub parse_raw_numstat {
+    local $/ = "\0";
+    my %diff;
+    while (<STDIN>) {
+        chomp;
+        if (/^:\d{6}\s/) {
+            my ($sm,$dm,$sh,$dh,$mod) = split /\s/, substr($_,1), 5;
+            my $src = <STDIN>;
+            chomp $src;
+            my $dst = <STDIN> if $mod =~ /^[RC]/;
+            chomp $dst if $dst;
+            $diff{$src} = { mod => $mod, src => $src, dst => $dst };
+        } else {
+            my ($add,$del,$src) = split /\t/, $_, 3;
+            if (not $src) {
+                $src = <STDIN>;
+                chomp $src;
+                my $dst = <STDIN>;
+                chomp $dst;
+            }
+            @{ $diff{$src} }{qw(add del)} = ($add, $del);
+        }
 
-my %diff;
-while (<STDIN>) {
-    chomp;
-    if (/^:/) {
-        my ($inf,$src,$dst) = split /\t/, substr($_,1), 3;
-        my ($sm,$dm,$sh,$dh,$mod) = split /\s/, $inf, 5;
-        $diff{$src} = { mod => $mod, src => $src, dst => $dst };
-    } else {
-        my ($add,$del,$src,$dst) = split /\t/, $_, 4;
-        @{ $diff{$src} }{qw(add del)} = ($add, $del);
+        ## NOT(-z):FAIL:(rename): pretty --numstat
+        # if (/^:/) {
+        #     my ($inf,$src,$dst) = split /\t/, substr($_,1), 3;
+        #     my ($sm,$dm,$sh,$dh,$mod) = split /\s/, $inf, 5;
+        #     $diff{$src} = { mod => $mod, src => $src, dst => $dst };
+        # } else {
+        #     my ($add,$del,$obj) = split /\t/, $_, 3;
+        #     my ($src,$dst) = split /\s=>\s/, $obj, 2;
+        #     @{ $diff{$src} }{qw(add del)} = ($add, $del);
+        # }
     }
+    return %diff;
 }
+
+my %diff = parse_raw_numstat();
+
 
 if ($usediff) {
     # ATT: die here if app exited with error
