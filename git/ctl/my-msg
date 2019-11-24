@@ -17,16 +17,14 @@
 #     https://medium.com/@nicklee1/prepending-your-git-commit-messages-with-user-story-ids-3bfea00eab5a
 #
 # MAYBE: git config commit.template
+#   IDEA: always populate message by template by "[@tops...] <usermsg>"
 #
 # IDEA: commit message must help with easier decisions about rewriting history
-# VIZ:
-#   * generate full msg from current dirty repo
-#   * ... from current index
-#   * ... from arbitrary diff / commit range
 # TODO
 #   * split into multiple commits current dirty repo (for easier history rewrite)
 #     <= per each flat dir | per each action ($mod) inside each dir
 #   * ... current index
+#   * generate full msg from arbitrary diff / commit range
 #
 use warnings FATAL => 'all';
 use autodie;
@@ -40,21 +38,35 @@ use Getopt::Long qw(GetOptions :config bundling permute
 no_auto_abbrev no_getopt_compat no_ignore_case no_pass_through);
 
 
-my %opts = ( index => 1 );
+# VIZ:BAD:(non-orthogonal): many other combinations don't have any sense
+#   * generate full msg from active index OR !current! workdir (dirty repo)
+#   * append everything in current workdir to index and autocommit (with optional message)
+#
+my %opts = (
+    index => 1,
+    directory => cwd,
+);
 GetOptions(\%opts   #%OPTIONS:
-, 'all|a!'          #% a = all      | all files in workdir
+# , 'add|a!'          #% a = add      | add all files in current workdir (implies: -i) WARN: appends to index
 , 'index|i!'        #% i = index    | describe only current git index
 , 'commit|c!'       #% c = commit   | immediately commit description (implies: -i)
-, 'relative|r!'     #% r = relative | describe only current folder (TBD)
+# , 'message|m=s'     #% m:= message  | additional hint message to insert into description
+# , 'relative|r!'     #% r = relative | describe only current folder (TBD)
 , 'workdir|w!'      #% w = workdir  | describe only current git index (disables: -i)
-, 'help|h|?' => sub { print &help; exit }
+    => sub { $opts{index} = 0 }
+, 'directory|C=s'   #% C = directory  | git repo directory
+, 'help|h|?'        #% h = help
+    => sub { print &help; exit }
 ) or die $/,&help;  #%
-$opts{index} = 1 if $opts{commit};
-$opts{index} = 0 if $opts{workdir};
 
-my $repo = canonpath(rel2abs($ENV{REPO} // cwd));
-my @git = ('git', '-C', $repo, '--no-pager');
 
+########################################
+# ALT: use ARGV as list of files/dirs to add to current commit (if specified)
+#   NOT:BET: use explicit "git add" + "my-msg --index" -- the same effort anyway
+# BET: join and use ARGV as commit message hint for future rebasing
+$opts{message} = join(" ", @ARGV);
+$opts{directory} = canonpath(rel2abs($opts{directory}));
+my @git = ('git', '-C', $opts{directory}, '--no-pager');
 
 sub help { open STDIN,'<',$0; grep { $_ } map { $1.$/ if /^(?:.*\s)?#%(.*)/ } <STDIN> }
 sub git {
@@ -63,6 +75,16 @@ sub git {
 }
 
 
+########################################
+### Add
+if ($opts{commit}) {
+    git('add', '--all', '--', '.') if not $opts{index};
+    $opts{index} = 1;
+}
+
+
+########################################
+### Diff
 my @cmd;
 if ($opts{index}) {
     push @cmd, 'diff-index', '--cached';
@@ -73,16 +95,12 @@ if ($opts{index}) {
     push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat';
 }
 
-# NOTE: use ARGV as list of files/dirs to add to current commit (if specified)
-# ALT: join and use ARGV as commit message hint for future rebasing
-
 my $usediff = 1 if -t STDIN;
 
 my $pid;
 if ($usediff) {
     $pid = open(STDIN, "-|");
-    exec(@git, @cmd, '--', @ARGV) or die if $pid == 0;
-    undef @ARGV;
+    exec(@git, @cmd, '--', ) or die if $pid == 0;
 }
 
 
@@ -134,14 +152,18 @@ if (not %diff) {
     exit 1;
 }
 
+
+########################################
+### Stats
 # MAYBE: use both src/dst -- because you affect both on rename
 my %files;
 $files{$_->{src}}++ for values %diff;
 my @files = sort { $files{$b} <=> $files{$a} } keys %files;
+my @binaries = grep { $_->{add} =~ /-/ or $_->{del} =~ /-/ } values %diff;
 
 my %stat;
-$stat{add} = sum0 (map { $_->{add} } values %diff);
-$stat{del} = sum0 (map { $_->{del} } values %diff);
+$stat{add} = sum0 (map { $_->{add} =~ /-/ ? 0 : $_->{add} } values %diff);
+$stat{del} = sum0 (map { $_->{del} =~ /-/ ? 0 : $_->{del} } values %diff);
 # NEED: git diff --patch | grep /^@@/
 # $stat{hunk} += 1;
 
@@ -200,12 +222,17 @@ $text .= ",". $tops[1] if @tops > 1;
 $text .= ",(+". (@tops - 2) .")" if @tops > 2;
 $text .= "]";
 
+$text .= " ". $opts{message} if $opts{message};
+
 my $action = $allmods{$mods[0]};
 if (@mods > 1) {
-    $text .= " ". @files ." files";
+    $text .= " ". @files ." files" if @files;
+    $text .= " ". @binaries ." binary" if @binaries;
     $text .= " (". join(" ", map { $_ . $stat{$_} } @mods) .")";
 } elsif (@files > 2) {
-    $text .= " ". $action ." ". @files ." files";
+    $text .= " ". $action;
+    $text .= " ". @files ." files" if @files;
+    $text .= " ". @binaries ." binary" if @binaries;
 } else {
     # BET? use basename "path/to/[file.txt]" :: [mod] chg file.txt
     $text .= " ". $action ." ". join(",", @files);
@@ -228,7 +255,7 @@ $text .= "  ". strftime("%Y%m%d_%H%M%S", localtime);
 
 if ($opts{commit}) {
     # THINK:USE: --fixup=<commit> for "rebase --autosquash"
-    git('commit', '--message='.$text);
+    git('commit', '--verbose', '--message='.$text);
     # git('show', '--stat');
 } else {
     print $text, $/;
