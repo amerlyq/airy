@@ -48,10 +48,33 @@ BUILD(custom)
 BUILD(FROM scratch)
   https://docs.docker.com/develop/develop-images/baseimages/
   ALT:TRY: https://linuxhint.com/create_docker_image_from_scratch/
-     BET: https://docs.docker.com/develop/develop-images/baseimages/
+  TUT: https://hub.docker.com/r/tozd/ubuntu-systemd/dockerfile
   INFO:REF:(create ./rootfs.tar.gz): ./debootstrap.nou
     | FROM scratch
     | ADD rootfs.tar.gz /
+  OR: $ sudo tar -C rootfs -c . | docker import - xenial
+
+  ALG: single-app docker "hello"
+    $ printf '%s\n' '#include <stdio.h>' 'int main(){printf("%s\n","hi");}' \
+      | gcc -g -static -static-libgcc -xc -o hello -
+    | FROM scratch
+    | ADD hello /
+    | CMD ["/hello"]
+    $ docker build --tag hello .
+    $ docker run hello
+
+
+BUILD squash
+  MAYBE:(--squash): merge layers into one
+  REF https://vsupalov.com/build-docker-image-clone-private-repo-ssh-key/
+    $ docker build --squash [...]
+
+
+Background container
+  https://vsupalov.com/exit-docker-container/
+  USE:(-d):
+  Run additional command
+    $ docker exec -ti CONTAINER_ID bash
 
 
 

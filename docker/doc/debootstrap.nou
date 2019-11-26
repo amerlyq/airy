@@ -1,5 +1,7 @@
 %%%% Debootstrap
 
+ALSO: @/airy/chroot/gen/debinit
+
 TRY: Ubuntu -- download and install all packages fully offline
   https://stackoverflow.com/questions/26050899/how-to-mount-host-volumes-into-docker-containers-in-dockerfile-during-build
   https://docs.docker.com/engine/examples/apt-cacher-ng/
@@ -31,3 +33,43 @@ VIZ: $ debootstrap ... --print-debs
     --exclude="e2fslibs,e2fsprogs,gcc-5-base,gcc-6-base,init,init-system-helpers,insserv,libapparmor1,libcap2,libcap2-binlibcryptsetup4,libdevmapper1.02.1,libgcrypt20,libgpg-error0,libkmod2,libseccomp2,libsystemd0,libusb-0.1-4,mawk,sensible-utils,systemd,systemd-sysv,sysv-rc"
   ERR: W: Failure trying to run: $ chroot "/data/rootfs" /bin/true
     ::: seems like you can't '--exclude=dash' after all
+
+
+%%% Prepare offline artifacts
+
+i386
+  $ pkgs="automake,bison,bzip2,curl,flex,g++-4.9,gawk,gcc-4.9,libtool-bin,make,libncurses5-dev,patch,texinfo,xz-utils,sudo,locales,vim-tiny"
+  $ sudo debootstrap --verbose --no-check-gpg --variant=buildd --arch=i386 --include="$pkgs" --foreign xenial xenial_i386 'ftp://ubuntu.colocall.net/ubuntu/'
+
+x86_64
+  NEED: fakeroot + fakechroot to compress rootfs into archive
+    NICE: store as whole by git-lfs
+    BAD: hard to store archive directly under git
+  NOTE: use only "--download-only"
+  $ pkgs="automake,bison,bzip2,curl,flex,g++-4.9-multilib,gawk,gcc-4.9-multilib,libtool-bin,make,ncurses-dev,patch,texinfo,xz-utils,sudo,locales,vim-tiny"
+  $ sudo debootstrap --verbose --no-check-gpg --foreign --keep-debootstrap-dir --arch='amd64' --variant='minbase' --include="$pkgs" --cache-dir="$PWD/packages" xenial "$PWD/rootfs" 'ftp://ubuntu.colocall.net/ubuntu/'
+  $ fakeroot sh -c 'debootstrap --verbose --no-check-gpg --foreign --download-only --keep-debootstrap-dir --arch=amd64 --variant=minbase --include="$1" --cache-dir="$PWD/packages" xenial "$PWD/rootfs" "$0" && tar -cvJf rootfs.tar.xz -- rootfs' 'ftp://ubuntu.colocall.net/ubuntu/' "$pkgs"
+
+  ALT:(--foreign): non-debian HOST
+    ATT:(second-stage-target): option requires a full path
+    WARN! don't work after --download-only
+    $ mkdir work
+    $ cd work
+    $ sudo cp -r ../deboot .
+    $ sudo DEBOOTSTRAP_DIR=$PWD/xeinal/debootstrap debootstrap --second-stage --second-stage-target "$PWD/xenial"
+
+  ALT: download and put packages
+    --make-tarball=[file]
+    --unpack-tarball=[file]
+
+
+apt-proxy
+  ALT: If you want to reuse your cache from some other source or shared folder
+  use apt-proxy or cp -a packages /var/cache/apt/archives/, however, this isn't
+  fully offline as debootstrap will still try to connect to the interent to get
+  the InRelease file from the remote repo.
+
+  ALT: proxy
+    https://gist.github.com/dergachev/8441335
+    e.g. https://askubuntu.com/questions/958795/how-to-use-the-mirror-option-of-apt-cacher-ng-for-debootstrap
+      +++ https://copyninja.info/blog/approx_to_acng.html

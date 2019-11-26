@@ -1,0 +1,4 @@
+# FAIL: too old, crashes "bash" and "apt-get" when running on x86_64 with newer kernel/glibc
+FROM ubuntu:10.04
+RUN sed -i -e "s/archive.ubuntu.com/old-releases.ubuntu.com/g" /etc/apt/sources.list
+CMD ["/bin/bash"]
