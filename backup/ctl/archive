@@ -37,15 +37,15 @@ make_backup history <<EOT
   ~/.config/VirtualBox
 
 ## cli
-  ~/.cache/gdb_history
-  ~/.cache/zsh/.zhistory
+  ~/.local/share/gdb/history
+  ~/.local/share/zsh/history
   ~/.config/radare2/history
-  ~/.fbless_save
+  # ~/.fbless_save
   ~/.ipython/profile_default/history.sqlite
   ~/.bash_history
   ~/.jhistory
   ~/.local/share/zathura
-  ~/.sbcl_history
+  # ~/.sbcl_history
   ~/.sqlite_history
   ~/.w3m/history
   ~/.wget-hsts
@@ -76,11 +76,11 @@ make_backup secrets <<EOT
   # ~/.password.tomb.key
   ~/.ssh                      # copy keys
   ~/.weechat/certs/nick.pem   # privatkey-login
+  # /work/cache/gpg
 EOT
 
 
 make_backup chat <<EOT
-  # SEP: ~/.mail
   ~/.purple/logs
   ~/.weechat/logs
 EOT
@@ -100,11 +100,13 @@ make_backup sync <<EOT
 EOT
 
 make_backup aura <<< ~/aura             # = all personal repos
-make_backup gamesaves <<< ~/gamesaves   # = aggregated game saves
-make_backup hub <<< ~/hub               # = code examples and teaching materials
+# make_backup gamesaves <<< ~/gamesaves   # = aggregated game saves
+# make_backup hub <<< ~/hub               # = code examples and teaching materials
 make_backup research <<< ~/research     # = ongoing research topics
 make_backup vim <<< ~/.cache/vim/cache  # = vim files backups
 make_backup work <<< ~/work             # = archived work topics
+# make_backup mail <<< ~/.mail            # = offline emails
+# make_backup doc <<< /work/doc           # = working notes
 
 # make_backup dld <<< /_dld               # = unsorted downloads (always move media files to /data)
 
@@ -112,6 +114,8 @@ make_backup etc <<< /etc ||:      # = system-wide user configs (skipping passwor
 # make_backup srv <<< /srv          # = ftp/http/tftp/vbox-share/etc
 # make_backup usrsrc <<< /usr/src   # = some downloaded sources
 
+# ALSO: defects analysis reports
+# find /work/{bug,task,task.done,task.seized} -name '*.nou' -print0 | tar -cvzf analysis-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.gz --null -T -
 
 # ALSO:
 # /games and /opt must backup filelist instead of content
