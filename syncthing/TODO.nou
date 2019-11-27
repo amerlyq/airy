@@ -21,9 +21,21 @@ USAGE
 
 
 TODO
+  [_] DEV: sync "notes" repo content (and only content) to android -- to edit notes on the go
+    => when file conflicts simply place both versions near each other and sync them back to later solve conflict on PC
+    BET? directly use git on android and forward port for syncthing
+  [_] MAYBE: use vps as intermediate node to sync only notes in "@"
+    BUT: must enable WAN discovery -- phone can't safely forward ports through SSH without its own access keys
   2019-10-31 [X] G: syncthing android through usb
     ::: bring PC and Android under single network
       <= use USB-tethering or USB-reverse-tethering by SimpleRT
+      WARN:SECU: must add firewall rule or reset it BUT! still doesn't work
+        $ sudo nft flush chain inet filter forward
+    BET: use only default USB-tethering $ S.r netctl-ifplugd@enp0s20u2u4u4
+      CHG: "dynamic" to Address=10.1.1.2:22000
+    ALT: use only default USB-tethering and redirect packages to new interface as proxy
+      https://wiki.archlinux.org/index.php/Syncthing#Running_through_a_proxy
+      https://docs.syncthing.net/users/proxying.html
   [_] BAD!WARN: local discovery -- may send packages into WAN (all your other networks)
     https://forum.syncthing.net/t/behavior-of-local-discovery-surprices-me/11543
     2019-10-31 [X] FAIL: shows devices as disconnected
