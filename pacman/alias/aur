@@ -14,6 +14,8 @@ alias auri='aur sync --no-view'         # install
 alias aurc='auri --continue'            # install without download and edit
 alias aurI='_a(){ auri "$1" && paci "$1"; }; _a'         # install
 alias aurl='pacman -Sl aur'   # list installed aur pkgs
+alias aurr='aur sync --nover-shallow -f'  # fully rebuild chosen packages (e.g. python-* pkgs installed as deps)
+alias aurR='aur sync --rebuildtree '      # fully rebuild pkg with all its dependencies
 alias aurs='aur search'
 function aurq { aur pkglist -P "$@" | xargs aur search -i; }    # search pkgname by regex
 

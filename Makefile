@@ -140,8 +140,8 @@ help:
 
 #% NOTE: pass-through unknown targets as mod names
 %- :: flags := -muU
-%- :: .FORCE ; $(&mods) $(@:-=)
-%  :: .FORCE ; $(&mods) $@
+%- :: .FORCE $(tsdir)/--configure-- ; $(&mods) $(@:-=)
+%  :: .FORCE $(tsdir)/--configure-- ; $(&mods) $@
 
 PHONY := $(shell sed -rn 's/^([A-Za-z0-9-]+):(\s.*|$$)/\1/p' '$(this)'|sort -u)
 .PHONY: $(PHONY)

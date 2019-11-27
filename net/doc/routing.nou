@@ -103,7 +103,7 @@ Route WiFi to PC on same Router subnet
     $# iptables -t nat -A POSTROUTING -o wlo1 -j MASQUERADE
     $# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     $# iptables -A FORWARD -i enp0s25 -o wlo1 -j ACCEPT
-    OR: nftables
+  OR: nftables
     $# nft add table ip nat
     $# nft add chain ip nat prerouting '{ type nat hook prerouting priority 0 ; }'
     $# nft add chain ip nat postrouting '{ type nat hook postrouting priority 100 ; }'

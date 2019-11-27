@@ -118,7 +118,7 @@ $(@barriers):
 @allmods := $(shell r.airy-mods-all)
 _unknown := $(filter-out all $(@allmods),$(@modlist))
 $(if $(_unknown),$(error no such mod(s) {$(_unknown)}; SEE:VIZ: $$ r.airy-mods-make help))
-@modlist := $(or $(@modlist),$(shell r.airy-mods-required))
+@modlist := $(or $(@modlist),$(shell r.airy-mods-required),$(error "check your AIRY_MODS"))
 @modlist := $(filter-out $(subst $(,), ,$(skip)),$(@modlist))
 
 # ATT: verify allowed subpaths _before_ expanding "*/all"
