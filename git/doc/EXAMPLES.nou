@@ -191,6 +191,12 @@ Git hooks
     integration with external systems
     email notifications
   Deploying over git, with a post-update checkout hook
+  ADD local hooks to affect all your local repos
+    https://medium.com/@nicklee1/prepending-your-git-commit-messages-with-user-story-ids-3bfea00eab5a
+    $ git config --global init.templatedir '~/.git-templates'
+    $ mkdir -p ~/.git-templates/hooks
+    $ chmod a+x ~/.git-templates/hooks/prepare-commit-msg
+
 
 Stash
   git stash list
