@@ -1,6 +1,23 @@
 # vim: ft=sh
 
-alias m='make'
+# BET: move to "beatrix/shell" and install as global aliases of beatrix package
+# BAD: if multiple projects depend on beatrix -- conflicting source of beatrix aliases
+if command -v remake >/dev/null 2>&1; then
+  alias m='remake'
+else
+  alias m='make'
+fi
+
+if command -v time >/dev/null 2>&1; then
+  case $LANG  # UNUSED: cmdline=%C
+  in *.UTF-8) alias ttime='command time --format "%ee %Uu %Ss ♏%MkB %F▲%R▼ %O↑%I↓kB/s %c⚙%w ε%x↵" -- '
+  ;; *) alias ttime='command time --format "%ee %Uu %Ss rss=%MkB flt=%F+%R io=%O+%IkB/s ctx=%c+%w err=%x" -- '
+  esac
+  alias mm='ttime m'
+else
+  alias mm='(TIMEFORMAT="  %1Uu  %1Ss  %1Re"; time m)'
+fi
+
 
 ##ALT:HACK: use /dev/null to force printing filenames beside content
 # alias catv='grep "" /dev/null '
