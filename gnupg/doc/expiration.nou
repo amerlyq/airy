@@ -24,3 +24,6 @@ Extend expiration date of subkey
     $ mv -vft /mnt -- amerlyq.gpg-{public,private}.asc
     !! Verify that gpg -K shows a "sec#" instead of just "sec" for your private key.
     $ gpg -K
+
+  Share encryption key to other devices (only the latest encryption key is actually used by identity)
+    $ gpg --export-secret-subkeys --armor --output amerlyq.gpg-encrypt.asc "$(gpg --list-secret-keys --keyid-format short | awk '$4=="[E]"{print substr($2,index($2,"/")+1)}')"!

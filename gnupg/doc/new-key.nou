@@ -10,6 +10,9 @@ Multihost master key
   Subkeys = local per each host machine
     WARN: first generate signing-only key, then encryption!
       EXPL: if ctime(sign_key) > ctime(enc_key) => cannot be used for encryption in PGP 8
+    WARN: encryption key must be single one for all devices -- only signing keys may be different
+      https://superuser.com/questions/466396/how-to-manage-gpg-keys-across-multiple-systems
+      +++ TUT: https://wiki.debian.org/Subkeys?action=show&redirect=subkeys
     signing: $ gpg --edit-key $gpgkey $  # gpg> addkey/RSA_sign(4)/2048/6m/save
     encrypt: $ gpg --edit-key $gpgkey $  # gpg> addkey/RSA_encr(6)/2048/6m/save
     # OR: $ gpg --import amerlyq.gpg-mail.asc

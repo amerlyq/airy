@@ -95,8 +95,7 @@ TUT
 
   Locale
     $ vi /etc/locale.gen
-    # uncomment ::
-       en_US.UTF-8
+      # uncomment :: en_US.UTF-8
     $ locale-gen
     $ export LANG=en_US.UTF-8
     $ echo LANG=$LANG > /etc/locale.conf
@@ -115,8 +114,6 @@ TUT
     $ vi /etc/pacman.conf
       # uncomment :: Color
     $ pacman -Syy
-  Tools
-    $ sudo pacman -S zsh
 
   MAYBE: swap
     $ sudo fallocate -l 512M /swapfile
@@ -129,18 +126,61 @@ TUT
 
 %% HARDENING
 
-Users
-  VIZ. list all users
-    $ sudo passwd -Sa
-  Passwords
-    $ passwd
-    $ useradd -mUG users,wheel,uucp -s /bin/bash admin
+  Users
+    $# pacman -S sudo
+    $# useradd -mUG wheel -s /bin/bash admin
       # MAYBE:ALSO $ useradd -m -g admin -s /usr/bin/zsh user
-    $ passwd admin
-      # OR: $ printf admin:mypass | chpasswd
-    $ EDITOR=vi visudo
-      CHG: uncomment first '%wheel'
-      # OR: $ echo "%admin ALL=(ALL) ALL" >> /etc/sudoers
+    $# passwd -Sa
+    $# passwd
+    $# passwd admin
+    $# EDITOR=vi visudo
+      # CHG: uncomment first '%wheel'
+    $ mkdir -m700 /home/admin/.ssh && cd $_
+    $ mv -t. /root/.ssh/authorized_keys && chmod 0600 *
+  SSH Access
+    $ sed -ri '/^#+(PermitRootLogin)\b.*/s//\1 no/' /etc/ssh/sshd_config
+    $ sed -ri '/^#+(Port)\b.*/s//\1 22222/' /etc/ssh/sshd_config
+    $ sed -ri '$a\AllowUsers admin' /etc/ssh/sshd_config
+    $ systemctl restart sshd
+      HOST: $ ssh -O exit -p 22 user@remote-host
+  Don't listen IPv6 on SSH
+    $ ss -lp | grep ssh | column -t
+    $ sed -ri '/^#+(AddressFamily)\b.*/s//\1 inet/' /etc/ssh/sshd_config
+  AUR
+    $ pacman -S base-devel
+    $ mkdir -p ~/aur && cd ~/aur && curl -L 'https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils.tar.gz' | tar xz --strip-components=1
+    $ gpg --search-keys 6BC26A17B9B7018A  ## press <1>
+    $ makepkg PKGBUILD --syncdeps --clean --install --force
+    $ echo $'[options]\nCacheDir = /var/cache/pacman/aur\n[aur]\nSigLevel = Optional TrustAll\nServer = file:///var/cache/pacman/aur' > /etc/pacman.d/aur.conf
+    $ echo "Include = /etc/pacman.d/aur.conf" >> /etc/pacman.conf
+    $ sudo install -d /var/cache/pacman/aur -o "$USER"
+    $ repo-add /var/cache/pacman/aur/aur.db.tar
+    $ pacman -Syy
+  GnuPG
+    $ sudo pacman -S gnupg
+    # LOCAL:(share): export only encryption key and share it between all your personal devices/hosts
+    #   $ gpg --export-secret-subkeys --armor --output amerlyq.gpg-encrypt.asc "$(gpg --list-secret-keys --keyid-format short | awk '$4=="[E]"{print substr($2,index($2,"/")+1)}')"!
+    #   $ scp amerlyq.gpg-encrypt.asc vps:
+    $ gpg --import amerlyq.gpg-encrypt.asc
+    $ gpg --edit-key amerlyq
+      gpg> trust, 5, save  # TRY:SECU: lower security level instead of [ultimate]
+    $ gpg -K
+  Pass-Tomb
+    $ sudo pacman -S git
+    $ aur sync -d aur -- pass-tomb
+    $ gpg --search-keys 73B35DA54ACB7D10  ## press <1>
+    $ gpg --search-keys C5469996F0DF68EC  ## press <1>
+    $ gpg -k
+    $ sudo pacman -S pass-tomb
+    $ pass tomb --timer=30m amerlyq
+    $ pass git init
+    # LOCAL:(push): circumvent non-bare repo -- use separate non-checkouted branch
+    #   $ pass git remote add -t exchange origin ssh://vps/home/admin/.password-store
+    #   $ pass git push -u origin master:exchange
+    $ pass close
+  Tools
+    $ sudo pacman -S zsh
+
 
   MAYBE: Enforce a delay after a failed login attempt
     $ vi /etc/pam.d/system-login
@@ -161,23 +201,16 @@ Firewall
   :/airy/iptables/cfg/nftables.conf
 
 
-SSH
-  Access
-    $ sed -ri '/^#+(PermitRootLogin)\b.*/s//\1 no/' /etc/ssh/sshd_config
-      # OR: $ sed -i '/^PermitRootLogin/s//#\1/' /etc/ssh/sshd_config
-    $ sed -ri '/^#+(Port)\b.*/s//\1 22222/' /etc/ssh/sshd_config
-    $ sed -ri '$a\AllowUsers admin' /etc/ssh/sshd_config
-    $ systemctl restart sshd
-      HOST: $ ssh -O exit -p 22 user@remote-host
-  Don't listen IPv6 on SSH
-    $ ss -lp | grep ssh | column -t
-    $ sed -ri '/^#+(AddressFamily)\b.*/s//\1 inet/' /etc/ssh/sshd_config
-
 
 %% VPN / Shadowsocks
   [_] RU: https://glashkoff.com/shadowsocks/
 
 
-Upgrade
-  $# reflector -l 35 -p https --sort rate --save /etc/pacman.d/mirrorlist
-  $# pacman -Syu
+%%% UPGRADE
+  $ sudo reflector -l 35 -p https --sort rate --save /etc/pacman.d/mirrorlist
+  $ sudo pacman -Syu
+  $ sudo find / -type f -name '*.pacnew'
+    # edit-replace such files
+  $ aur sync --no-view -nud aur
+    # OR: $ aur sync --database=aur --no-view --no-confirm --upgrades
+  $ sudo reboot

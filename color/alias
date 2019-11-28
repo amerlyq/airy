@@ -17,11 +17,12 @@ alias egrep="grep -E"
 # alias diff='colordiff'
 
 
+# DISABLED:ERR: don't work with "ttime" alias (=> "/usr/bin/time LS_COLOR=... ls")
 ### Colorscheme
-if [[ -x /usr/bin/dircolors ]] && [[ -s ~/.config/dircolors ]]; then
-  LS_COLORS=$(eval "$(dircolors -b ~/.config/dircolors)"; printf '%s\n' "$LS_COLORS")
-fi
-_alias_ -b "${LS_COLORS:+LS_COLORS='$LS_COLORS' }" ls
+# if [[ -x /usr/bin/dircolors ]] && [[ -s ~/.config/dircolors ]]; then
+#   LS_COLORS=$(eval "$(dircolors -b ~/.config/dircolors)"; printf '%s\n' "$LS_COLORS")
+# fi
+# _alias_ -b "${LS_COLORS:+LS_COLORS='$LS_COLORS' }" ls
 
-GREP_COLORS="mt=37;45"
-_alias_ -b "${GREP_COLORS:+GREP_COLORS='$GREP_COLORS' }" grep
+# GREP_COLORS="mt=37;45"
+# _alias_ -b "${GREP_COLORS:+GREP_COLORS='$GREP_COLORS' }" grep
