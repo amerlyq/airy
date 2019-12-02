@@ -1,0 +1,103 @@
+%%%% USAGE
+
+"Democracy requires Privacy as much as Freedom of Expression." (c) Anonymous
+
+!!!. Never keep your keys where your tomb is !!!
+  https://www.dyne.org/software/tomb/
+  = their password protection is bruteforce-able
+
+
+INFO
+  https://pujol.io/blog/tomb-with-gpg-keys/
+  https://n0where.net/the-crypto-undertaker-tomb
+
+
+CFG
+  Authorize users w/o sudo
+    /etc/sudoers
+    | username ALL=NOPASSWD: /usr/local/bin/tomb
+  Avoid syslog for tomb execution
+    /etc/sudoers
+    | Cmnd_Alias TOMB = /usr/local/bin/tomb
+    | Defaults!TOMB !syslog
+  Avoid ZSH history
+    NEED: HISTIGNORESPACE=1
+    $ alias tomb=' tomb'
+
+
+GnuPG-encrypted key
+  create for multiple identities
+    $ tomb forge secret.tomb.key -gr myid,yourid
+    $ tomb lock secret.tomb -k secret.tomb.key -gr myid,yourid
+    OR? $ tomb lock secret.tomb -k secret.tomb.key -g
+  open and immediately mount
+    $ tomb open secret.tomb -k secret.tomb.key -g /mnt
+  close
+    $ tomb close
+    $ tomb close all
+    $ tomb slam all   # kill all programs which block any .tomb
+  re-encode by new key
+    $ tomb passwd -k secret.tomb.key -gr otherid
+
+
+Remote key / SSH
+  VPS mount sshfs
+    $ sshfs -o allow_root user@remote.host:/ /local/mountpoint/
+    $ tomb open /local/mountpoint/yourthings.tomb -k /path/to/key
+  Open a Tomb using the key from a remote SSH shell, without saving any local copy of it:
+    $ ssh user@my.shell.net 'cat .secrets/tomb.key' | tomb open secret.tomb -k -
+  Open a Tomb on a remote server passing the unencrypted local key on stdin via SSH:
+    $ gpg -d .secrets/tomb.key | ssh server tomb open secret.tomb -k cleartext --unsafe
+  Sphinx -- impossible to retrieve the password without the oracle sphinx server running and reachable
+    https://github.com/stef/libsphinx
+  Android -- by bluetooth
+    # prepare to store temporarily the key in volatile ram
+    $ mkdir -p /dev/shm/secrets
+    $ chmod go-rwx /dev/shm/secrets
+    $ cd /dev/shm/secrets
+    $ obexftp -b 11:22:33:44:55:66 -g secrets.tomb.key
+    $ tomb open $HOME/secrets.tomb -k secrets.tomb.key
+    $ wipe -f secrets.tomb.key
+    $ cd -
+    $ rmdir /dev/shm/secrets.key
+
+
+Password-protected key
+  create (size in MB)
+    $ tomb dig -s 100 secret.tomb
+    $ tomb forge secret.tomb.key
+    $ tomb lock secret.tomb -k secret.tomb.key
+  open (luks device)
+    $ tomb open secret.tomb -k secret.tomb.key
+  change password
+    $ tomb passwd -k otherid
+
+
+Manually
+  open less intrusive
+    $ tomb open secret.tomb -k secret.tomb.key -pngo ro,exec /mnt
+  open w/o tomb
+    $ gpg -d secret.tomb.key | cryptsetup --key-file - luksOpen $(sudo losetup --show --find secret.tomb) secret
+    $ mount /dev/mapper/secret /mnt
+
+
+Misc
+  All opened .tomb
+    $ tomb list
+  All processes blocking .tomb
+    $ tomb ps
+  Indexing content (swish-e) and filenames (mlocate)
+    $ tomb index
+    $ tomb search
+  Resize .tomb (can only grow, not shrink)
+    $ tomb resize -k secret.tomb.key -s 200
+  Store key as QR code |QREncode|
+    $ tomb engrave
+  Steganography into JPEG |steghide|
+    = If the password is not known, it is very hard to verify if a key is buried in any image or not.
+    $ tomb bury -k old-secret.tomb.key -gr myid,yourid some.jpg
+    $ tomb exhume -k new-secret.tomb.key -gr myid,yourid some.jpg
+  Steganography into large .txt |cloakify|
+    ! no support for GnuPG
+    $ tomb cloak
+    $ tomb uncloak

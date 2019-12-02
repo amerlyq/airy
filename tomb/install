@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+# REF: https://aur.archlinux.org/packages/tomb/
+aur_inst tomb
+
+# ALSO:
+#  $ aur sync pass-tomb
+#  $ edit PKGBUILD :: https://files.dyne.org/${pkgname}/releases/*
+#  $ gpg --recv-key ... for both "tomb" and "pass-tomb"
+# aur_inst pass-tomb

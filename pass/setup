@@ -1,10 +1,9 @@
 #!/bin/bash -eu
 # tags: util security
-# deps: gnupg
+# deps: gnupg tomb
 source ~/.shell/func.d/cfgsetup
 
-# TODO:CHG:(cfgOpt r): when fixed and actively used everywhere
-#   SECU:REQ: https://github.com/roddhjav/pass-tomb/issues/27
+# TODO:CHG:(cfgOpt r): when fixed "roddhjav/pass-tomb/#27"
 if false; then
   set -eu  # ensure
   gpgid=${MAIN_MAIL:?}
