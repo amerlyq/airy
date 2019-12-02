@@ -139,6 +139,8 @@ TUT
     $ mv -t. /root/.ssh/authorized_keys && chmod 0600 *
   SSH Access
     $ sed -ri '/^#+(PermitRootLogin)\b.*/s//\1 no/' /etc/ssh/sshd_config
+    $ sed -ri '/^#+(PasswordAuthentication)\b.*/s//\1 no/' /etc/ssh/sshd_config
+      SEE:(per-user): https://serverfault.com/questions/285800/how-to-disable-ssh-login-with-password-for-some-users
     $ sed -ri '/^#+(Port)\b.*/s//\1 22222/' /etc/ssh/sshd_config
     $ sed -ri '$a\AllowUsers admin' /etc/ssh/sshd_config
     $ systemctl restart sshd
@@ -158,9 +160,9 @@ TUT
     $ pacman -Syy
   GnuPG
     $ sudo pacman -S gnupg
-    # LOCAL:(share): export only encryption key and share it between all your personal devices/hosts
-    #   $ gpg --export-secret-subkeys --armor --output amerlyq.gpg-encrypt.asc "$(gpg --list-secret-keys --keyid-format short | awk '$4=="[E]"{print substr($2,index($2,"/")+1)}')"!
-    #   $ scp amerlyq.gpg-encrypt.asc vps:
+    | LOCAL:(share): export only encryption key and share it between all your personal devices/hosts
+    |   $ gpg --export-secret-subkeys --armor --output amerlyq.gpg-encrypt.asc "$(gpg --list-secret-keys --keyid-format short | awk '$4=="[E]"{print substr($2,index($2,"/")+1)}')"!
+    |   $ scp amerlyq.gpg-encrypt.asc vps:
     $ gpg --import amerlyq.gpg-encrypt.asc
     $ gpg --edit-key amerlyq
       gpg> trust, 5, save  # TRY:SECU: lower security level instead of [ultimate]
@@ -174,9 +176,9 @@ TUT
     $ sudo pacman -S pass-tomb
     $ pass tomb --timer=30m amerlyq
     $ pass git init
-    # LOCAL:(push): circumvent non-bare repo -- use separate non-checkouted branch
-    #   $ pass git remote add -t exchange origin ssh://vps/home/admin/.password-store
-    #   $ pass git push -u origin master:exchange
+    | LOCAL:(push): circumvent non-bare repo -- use separate non-checkouted branch
+    |   $ pass git remote add -t exchange origin ssh://vps/home/admin/.password-store
+    |   $ pass git push -u origin master:exchange
     $ pass close
   Tools
     $ sudo pacman -S zsh
