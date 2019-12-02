@@ -67,6 +67,7 @@ alias -g R1='|tail -n +2'
 alias -g R2='|tail -n +3'
 
 alias -g C='|wc -l'
+alias -g CC='|cat'
 alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
 alias -g TC='|column -Lt'
@@ -94,6 +95,8 @@ alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
 for i in {1..9}; do
   alias -g C$i="|awk '{print\$$i}'"
   alias -g C/$i="|awk -F/ '{print\$$i}'"
+  alias -g C\$$i="|awk '{print\$(NF-$i)}'"
+  alias -g C//$i="|awk -F/ '{print\$(NF-$i)}'"
 done
 alias -g C\$="|awk '{print\$NF}'"
 alias -g C/\$="|awk -F/ '{print\$NF}'"
