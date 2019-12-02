@@ -17,6 +17,10 @@ ALT:
     ALT: install manually w/o yaourt
 
 TODO
+  2019-12-02 [X] rebuild python packages when python itself is upgraded
+    https://github.com/AladW/aurutils/issues/641#event-2839998079
+    HACK: find all python-dependent packages in local "aur" db
+    $ pactree -sur python | grep -f <(pacman -Slq aur)
   [_] TRY:USE: pacman post-instal hooks
     https://www.reddit.com/r/archlinux/comments/dsnu81/hear_ye_archers_share_your_pacman_hooks/
   [_] MOVE: ~/.cache/aurutils to /var/cache/aurutils
@@ -53,6 +57,7 @@ TODO
   [_] TRY: migrate from pacaur to aura (Haskell, +powerpill+ to fasten downloading)
     https://github.com/aurapm/aura
       https://xyne.archlinux.ca/projects/powerpill/
+        https://xyne.archlinux.ca/projects/bauerbill/
     + more dedicated and explicit, more silent by default
     + downgrading by -C, viewing log by -L
     https://github.com/oppenlander/dotfiles/commit/cdb3e259b786ddce2e5e08e017c2a41f04109df7

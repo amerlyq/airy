@@ -3,5 +3,8 @@
 alias pacr='pactree -c'       # deps direct
 alias pacR='pactree -cr'      # deps reverse
 
+alias pacr1='pactree --color --depth 1'
+alias pacR1='pactree --color --depth 1 --reverse'
+
 pacrg(){ pactree -d3 --graph "$@" | xdot /dev/stdin; }
 pacRg(){ pactree -r -d3 --graph "$@" | xdot /dev/stdin; }

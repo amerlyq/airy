@@ -18,7 +18,7 @@ alias pacU='sudo pacman --sync --refresh'  # --sysupgrade
 # alias pacU='pacman -U /var/cache/pacman/pkg'    # refresh only
 
 # alias pacC='pacman -Scc'     # '[c]lean cache' (all not currently installed)
-alias pacx.='sudo pacman -R'   # remove only these packages
+alias pacx.='sudo pacman -Rdd' # remove only these packages (force breaking deps)
 alias pacx='sudo pacman -Rsu'  # '[r]emove'
 alias pacX='sudo pacman -Rsc'  # 'Rm pkg, its deps and all depending pkgs
 alias pacy='sudo pacman -Sy'   # refresh only
