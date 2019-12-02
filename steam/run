@@ -26,7 +26,8 @@ export GDK_SCALE=2
 export ENABLE_PRIMUS_LAYER=1
 
 # NEED: $ sudo chrt --fifo --all-tasks --pid 15 $(pidof game)
-exec time nice -n -4 taskset --cpu-list 0-8:2 optirun steam "$@"
+# FAIL: can't set "nice" without "sudo" -- which will mess up all permissions of configs and saves
+exec time nice -n -4 taskset --cpu-list 0-8:2 optirun -b primus -- steam "$@"
 # exec optirun steam "$@"
 
 # BAD: crash on "libvgui2_s.so"

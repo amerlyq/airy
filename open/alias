@@ -10,7 +10,8 @@ fi
 
 if command -v time >/dev/null 2>&1; then
   case $LANG  # UNUSED: cmdline=%C
-  in *.UTF-8) alias ttime='command time --format "%ee %Uu %Ss ♏%MkB %F▲%R▼ %O↑%I↓kB/s %c⚙%w ε%x↵" -- '
+  in *.UTF-8) alias ttime='command time --format "%ee %Uu %Ss ♏%MkB %F▲%R▼ %O↑%I↓kB/s %c⚙%w ↳%x" -- '
+  # in *.UTF-8) alias ttime='command time --format "%ee %Uu %Ss ♏%MkB %F▲%R▼ %O↑%I↓kB/s %c⚙%w ε%x↵" -- '
   ;; *) alias ttime='command time --format "%ee %Uu %Ss rss=%MkB flt=%F+%R io=%O+%IkB/s ctx=%c+%w err=%x" -- '
   esac
   alias mm='ttime m'
