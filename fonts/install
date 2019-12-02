@@ -7,8 +7,13 @@ if distro arch; then
 
   aur_inst ttf-symbola
 
+  # MAYBE:ALT: open source programming font
+  # https://sourcefoundry.org/hack/
+  # https://github.com/source-foundry/Hack/
+
   # DEBUG: https://unicode.org/Public/emoji/12.1/
   # BUG: config 75-joypixels.conf breaks jp-fonts
+  # BUG: fallback to it crashes "st" on @/airy/irc/doc/kaomoji.nou
   # pkg_inst ttf-joypixels
 
   # if [[ ! ${CURR_PROF:?} =~ ^neo ]] &&
@@ -26,9 +31,9 @@ if distro arch; then
 
   ## NOTE: http://adobe-fonts.github.io/source-code-pro/
   ## SRC: https://github.com/adobe-fonts/source-code-pro
-  # pkg_inst adobe-source-code-pro-fonts
-  # pkg_inst adobe-source-sans-pro-fonts
-  # pkg_inst adobe-source-serif-pro-fonts
+  pkg_inst adobe-source-code-pro-fonts
+  pkg_inst adobe-source-sans-pro-fonts
+  pkg_inst adobe-source-serif-pro-fonts
 
   ## REF: https://github.com/adobe-fonts/source-han-sans
   pkg_inst adobe-source-han-sans-jp-fonts

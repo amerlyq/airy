@@ -3,10 +3,11 @@
 
 fndir=~/.local/share/fonts
 
-if ((rescan)); then
-  mkfontscale "$fndir"
-  mkfontdir "$fndir"
-fi
+## DISABLED: I don't use outdated XLFD font patterns at all
+# if ((rescan)); then
+#   mkfontscale "$fndir"
+#   mkfontdir "$fndir"
+# fi
 
 fc-cache -v${rescan+f} "$fndir"
 # fc-cache -fs >/dev/null
