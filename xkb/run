@@ -1,6 +1,7 @@
 #!/bin/bash -e
 source ~/.shell/profile
 # CHECK: maybe broken, as airy/setup sets DISPLAY=:0
+# FAIL:(xset q &>/dev/null): will launch socket-activated Xorg when not needed
 [[ $DISPLAY ]] || exit 0
 
 # declare -A CURR_XKB=(
@@ -12,10 +13,9 @@ source ~/.shell/profile
 # MAYBE: is calling setxkbmap again with only '-option "over:$over"' enough?
 
 over=${1:-${CURR_XKB[overlay]:-vim}}
-r.xkb-has-overlay ${over:?}
+r.xkb-has-overlay "${over:?}"
 
-# BUG: -I/etc/X11/xkb loads with errors
-exec setxkbmap -I/etc/X11/xkb -display ${DISPLAY:?} -option "" \
+exec setxkbmap -I/usr/share/X11/xkb -display "${DISPLAY:?}" -option "" \
   -model pc104 -rules amer \
   -layout "${CURR_XKB[layout]:-us,ru,ua}" \
   -variant "${CURR_XKB[variant]:-amer,amer,amer}" \
