@@ -1,0 +1,39 @@
+NOTE! mixed problems from Xft, fontconfig and Monitor-DPI
+
+Reset everything to minimum to debug problems
+
+  remove almost all fonts (TEMP: break some dependencies)
+    $ pacx otf-ipafont ttf-comic-neue ttf-joypixels ttf-symbola ttf-ms-fonts ttf-liberation
+    $ pacx xorg-fonts-misc && paci --asdeps xorg-mkfontscale xorg-mkfontdir
+    $ pacx. gsfonts ttf-dejavu terminus-font cantarell-fonts
+    HACK: seems like it's a group "require ANY OF"
+      $ pacs ttf-font
+
+  remove X mkfontdir cache / reset Xorg
+    NOTE: after removing all fonts
+    $ sudo mkfontscale && sudo mkfontdir
+    $ mkfontscale && mkfontdir
+
+  remove fontconfig configs / reset
+    $ sudo mv /etc/fonts/conf.d{,_}
+    $ mv ~/.config/fontconfig/conf.d{,_}
+
+  remove fontconfig cache
+    BAD: "fc-cache -fr" has no effect at all
+    $ sudo rm -rf /var/cache/fontconfig
+    $ sudo fc-cache --system-only -v
+    $ rm -rf ~/.cache/fontconfig
+    $ fc-cache -v
+
+  remove Xresources / reset xrdb
+    $ mv ~/..Xresources{,_}
+    $ xrdb -load /dev/null
+      BAD: looks like no effect -- must restart Xorg
+
+  remove paths from Xorg
+    WARN: output from $ fc-cache -v $ assumes many other dirs are added
+    $ xset q | awk '/^Font Path:$/{getline;print;quit}'
+    $ xset -fp /usr/share/misc && xset fp rehash
+
+  create the most basic fontconfig for PragmataPro
+    ./cfg/45-pragmata-pro.conf

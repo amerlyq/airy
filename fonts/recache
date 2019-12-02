@@ -4,10 +4,15 @@
 fndir=~/.local/share/fonts
 
 ## DISABLED: I don't use outdated XLFD font patterns at all
+# REF:(XLFD): https://wiki.archlinux.org/index.php/X_Logical_Font_Description
 # if ((rescan)); then
 #   mkfontscale "$fndir"
 #   mkfontdir "$fndir"
+#   xset fp rehash ||:
 # fi
+
+# REF:(Xft): https://keithp.com/~keithp/render/Xft.tutorial
+# Xresources
 
 fc-cache -v${rescan+f} "$fndir"
 # fc-cache -fs >/dev/null

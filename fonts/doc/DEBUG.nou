@@ -1,0 +1,46 @@
+%%%% DEBUG
+
+WARN! Unless it’s told otherwise, fontconfig assumes every font is sans-serif
+
+
+%% Query
+  Show fallbacks list
+    $ fc-match -s <font>
+  Show gnome dpi
+    $ gconftool-2 -g /desktop/gnome/font_rendering/dpi
+  Show choosen font settings
+    $ FC_DEBUG=1 st -f monospace-9.6
+  Find aliased font (and query its current settings)
+    INFO: $ man 5 fonts-conf
+    $ fc-match --verbose pragmatapromono
+  Query font parameters
+    INFO: The formatting is described in FcPatternFormat(3).
+    $ fc-query -f '%{family[0]}\n' /path/to/file
+  Default font
+    $ fc-match
+  List font searching folders
+    $ fc-cache -v
+    $ sudo fc-cache --system-only -v
+
+  List all fonts
+    $ fc-list
+    $ pango-list
+    with language support
+      $ fc-list -f '%{file}\n' :lang=ja
+    with unicode character
+      $ fc-match -s monospace:charset=1F4A9
+  List enabled config symlinks (+/-)
+    $ fc-conflist
+
+  Compare rendered styles for errors in image viewer
+    find -name '*.ttf' -printf '%P\n' | xargs -P8 -I{}  convert -font {} -pointsize 28 -size 800 caption:@test.txt {}.png
+
+  Automatic global configuration
+    /etc/fonts/fonts.conf
+      /etc/fonts/local.conf
+      ~/.config/fontconfig/fonts.conf
+
+  Preview
+    |freetype2-demos|
+    $ ftview -e unic -d 1024x768x24 -r 96 10 /usr/share/fonts/noto/NotoSans-Regular.ttf
+    $ DISPLAY=:0 FC_DEBUG=4 pango-view --font=monospace -t "${1:-☺}" | grep family:
