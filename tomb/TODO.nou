@@ -1,0 +1,7 @@
+TODO
+  [_] TRY: enable FS compression inside .tomb for text data to occupy less space
+    BUT: we already have compression for bare repo due to using "git gc"
+  [_] BAD: sshfs / sftp don't support vps alias from SSH config -- NEED: explicit user@host
+  [_] THINK:MAYBE: convert whole .tomb into a single large .git repo instead of using multiple smaller ones
+    BUT: otherwise I can also hide pass-tomb db into this tomb and other large binaries
+  [_] IDEA: keep local git mirror key inside the remote .tomb AND remote key GnuPG-encrypted on local PC

@@ -25,9 +25,34 @@ CFG
     $ alias tomb=' tomb'
 
 
-GnuPG-encrypted key
+
+%% Setup remote exchange
+
+  SERV:
+    $ mkdir ~/tomb
+    $ tomb dig -s 400 ~/tomb/dev.tomb
+  HOST:
+    $ mkdir ~/tomb
+    $ gpgid=mymail
+    $ tomb forge ~/tomb/dev.tomb.key -gr "$gpgid"
+    $ sudo mkdir -m700 /media/tomb && chown "$USER:$USER" /media/tomb
+    $ sshfs -d -o "umask=077,noexec,no_readahead,allow_root,port=22,IdentityFile=$HOME/.ssh/id_rsa" user@host:tomb /media/tomb
+    $ tomb lock /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -gr "$gpgid"
+  USAGE
+    $ tomb open /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g
+    $ mkdir /media/dev/repo.git && git -C "$_" init --bare
+    $ git clone --dissociate /media/dev/repo.git .
+  HOST:
+    $ tomb close
+    $ umount /media/tomb
+
+
+
+%% GnuPG-encrypted key
+
   create for multiple identities
     $ tomb forge secret.tomb.key -gr myid,yourid
+    $ tomb dig -s 100 secret.tomb
     $ tomb lock secret.tomb -k secret.tomb.key -gr myid,yourid
     OR? $ tomb lock secret.tomb -k secret.tomb.key -g
   open and immediately mount
@@ -47,6 +72,7 @@ Remote key / SSH
   Open a Tomb using the key from a remote SSH shell, without saving any local copy of it:
     $ ssh user@my.shell.net 'cat .secrets/tomb.key' | tomb open secret.tomb -k -
   Open a Tomb on a remote server passing the unencrypted local key on stdin via SSH:
+    FAIL: requires TTY to enter password into "sudo"
     $ gpg -d .secrets/tomb.key | ssh server tomb open secret.tomb -k cleartext --unsafe
   Sphinx -- impossible to retrieve the password without the oracle sphinx server running and reachable
     https://github.com/stef/libsphinx
@@ -81,7 +107,8 @@ Manually
     $ mount /dev/mapper/secret /mnt
 
 
-Misc
+%% Misc
+
   All opened .tomb
     $ tomb list
   All processes blocking .tomb
