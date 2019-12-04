@@ -7,11 +7,16 @@ source ~/.shell/func.d/cfgsetup
 #   r.notmuch $acc -- config set index.header.List 'List-Id'
 #   r.notmuch $acc -- config set index.header.To 'To'
 #   r.notmuch $acc -- config set query.toMe 'to:user@example.com'
-# TODO: rename to xtoMe|exMe
+#     = TODO: parse "$acc" and extract "email" to insert here
 #   r.notmuch $acc -- config set query.ToMe 'To:user@example.com'
+#     = TODO: rename to xtoMe|exMe
 # BET:TODO: create "afew" moving filters which substitute current dir and push separate PR for all of them
-#   r.notmuch $acc -- config set query.concluded 'folder:INBOX AND thread:"{folder:INBOX AND tag:replied}" AND NOT thread:"{folder:INBOX AND (tag:unread OR tag:flagged)}"'
-#   r.notmuch $acc -- config set query.idontcare 'folder:INBOX AND NOT thread:"{folder:INBOX AND tag:replied}" AND NOT thread:"{folder:INBOX AND (tag:unread OR tag:flagged)}"'
+#   r.notmuch $acc -- config set query.important 'thread:{folder:INBOX} AND thread:"{tag:unread OR tag:flagged}"'
+#   r.notmuch $acc -- config set query.abandoned 'folder:INBOX AND NOT query:important'
+#   r.notmuch $acc -- config set query.sentreply 'thread:"{folder:INBOX AND tag:replied}"'
+#
+#   r.notmuch $acc -- config set query.concluded 'query:abandoned AND query:sentreply'
+#   r.notmuch $acc -- config set query.idontcare 'query:abandoned AND NOT query:sentreply'
 #   r.notmuch $acc -- config set query.reconstructed 'thread:"{folder:INBOX OR (folder:Sent AND tag:flagged)}"'
 # DEBUG
 #   r.notmuch $acc -- config list

@@ -1,6 +1,11 @@
 % Notmuch (search all folders)
 
 TODO
+  2019-12-04 [X] BUG: "flagged" threads still moved from INBOX
+    ATT: for thread:{...} query single message must satisfy ALL conditions inside {}
+      $ notmuch search 'thread:"{folder:INBOX AND (tag:unread OR tag:flagged)}"'
+    ::: PERF: you must use much-much slower intersection between two queries
+      $ notmuch config set query.important 'thread:{folder:INBOX} AND thread:"{tag:unread OR tag:flagged}"'
   [_] BUG: "flagged" does not become RED in mutt
     DEBUG: :unset hidden_tags  => reload <,.>
     ::: it seems you need two commands

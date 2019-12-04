@@ -41,6 +41,9 @@ set nm_query_window_timebase = "week"   # VIZ: "hour", "day", "week", "month", "
 # set virtual_spoolfile = yes    # DEPRECATED: use first vmbox as initial selection
 
 # TODO: INBOX or Sent
+# IDEA: "all" with reconstructed threads
+# IDEA: folders by date of last message in thread for previous week
+#   == to overview old messages and resolved tasks on Monday after weekends/holidays
 
 unvirtual-mailboxes *
 virtual-mailboxes \
@@ -65,3 +68,15 @@ virtual-mailboxes \
 
 ## NOTE: replace "imap-fetch-mail" by local variant
 macro index,pager  X  "!r.mailsync $my_acc -- -q new"
+
+## NOTE: must sync before modifying notmuch db and reload vfolder afterwards
+macro index <F8> \
+"<enter-command>push <sync-mailbox><enter>\
+<shell-escape>r.notmuch $my_acc -- new<enter>" \
+"Index +new notmuch db"
+
+macro index <F9> \
+"<enter-command>push <sync-mailbox><enter>\
+<shell-escape>r.notmuch-sort $my_acc --<enter>\
+<change-folder>^<enter>" \
+"Sort =INBOX"

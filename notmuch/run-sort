@@ -7,6 +7,8 @@ acc=$1
 shift
 [[ ${1-} == -- ]] && shift
 
+# NEED: send to neomutt "lock" + "sync-mailbox" then do "sort" and then again -- "reopen" same vfolder
+# DEV: log -vvv to file to check problems when using from "mutt" and show in mutt only short summary
 r.notmuch "$acc" -- new
 r.notmuch-afew "$acc" -- -vvv --new --tag
 r.notmuch-afew "$acc" -- -vvv --new --move

@@ -5,7 +5,12 @@ set pager_context=3         # context lines when going to next page
 set pager_stop=yes          # stop instead of displaying next mail
 set menu_scroll=yes         # just scroll one line instead of full page
 set menu_move_off=no        # never scroll up below last item
-set history_remove_dups=yes # deduplicate command history
+
+## Commands history
+# set history = 100
+set save_history = 100
+set history_remove_dups = yes
+set history_file = $my_cache/history
 
 # Text
 set smart_wrap = yes   # wrap by words in inn pager
