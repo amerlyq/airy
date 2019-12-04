@@ -33,6 +33,10 @@ Disk fill up VIZ. list of similar projects
 | vmstat -s | \ statistics
 | vmstat -d | \ for disk
 
+# USAGE: https://unix.stackexchange.com/questions/15024/umount-device-is-busy-why
+#   lsof -vm /mnt
+#   losetup -a
+
 | lsof             | List Open Files
 | lsof -u `whoami` | \ specific user
 | lsof -u^`whoami` | \ exclude user

@@ -12,8 +12,17 @@ Setup
     $ pass insert work/user
   Git
     $ pass git init
-    # $ pass git remote add origin kexec.com:pass-store
-    # $ pass git push -u --all
+    $ r.ssh-my-repo
+    $ r.ssh-tomb-vps
+    $ tomb open /media/tomb/pass.git.tomb -k ~/tomb/pass.git.tomb.key -g
+    $ pass git remote add origin /media/pass.git
+      # MAYBE: $ pass git remote remove origin
+      # OR: $ pass git remote add origin kexec.com:pass-store
+    $ pass git fetch --prune --all
+    $ pass git branch master -u origin/master
+    $ pass git push -u --all
+    $ tomb close pass.git
+    $ umount /media/tomb
   Tomb
     $ mv ~/.password-store{,_}
     $ pass tomb --timer=2h ${gpgid:-$mail}  # NOTE: doing "pass init" by itself

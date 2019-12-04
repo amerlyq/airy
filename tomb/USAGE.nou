@@ -26,24 +26,60 @@ CFG
 
 
 
-%% Setup remote exchange
+%% Local setup
 
-  SERV:
-    $ mkdir ~/tomb
-    $ tomb dig -s 400 ~/tomb/dev.tomb
-  HOST:
-    $ mkdir ~/tomb
+  CREATE
+    $ mkdir -m700 ~/tomb
+    $ chattr +C ~/tomb
     $ gpgid=mymail
     $ tomb forge ~/tomb/dev.tomb.key -gr "$gpgid"
+    $ tomb dig -s 400 ~/tomb/dev.tomb
+    $ tomb lock ~/tomb/dev.tomb -k ~/tomb/dev.tomb.key -gr "$gpgid"
+  SETUP
+    $ tomb open ~/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g ~/dev
+      BAD! uses "root 711" permissions on this dir => better store it somewhere else than ~/
+    $ mkdir -p ~/dev/repo
+    $ git -C ~/dev/repo init
+    $ git -C ~/dev/repo remote add origin /media/dev/repo.git
+    $ r.git-my-repo
+    $ tomb close dev
+
+
+
+%% Remote sync
+
+  NEED: |Local setup|
+
+  SERVER
+    $ mkdir -m700 ~/tomb
+    $ chattr +C ~/tomb
+    $ tomb dig -s 400 ~/tomb/dev.tomb
+  CREATE
     $ sudo mkdir -m700 /media/tomb && chown "$USER:$USER" /media/tomb
     $ sshfs -d -o "umask=077,noexec,no_readahead,allow_root,port=22,IdentityFile=$HOME/.ssh/id_rsa" user@host:tomb /media/tomb
     $ tomb lock /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -gr "$gpgid"
-  USAGE
+  SETUP
     $ tomb open /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g
-    $ mkdir /media/dev/repo.git && git -C "$_" init --bare
-    $ git clone --dissociate /media/dev/repo.git .
-  HOST:
+    $ mkdir -p /media/dev/repo.git
+    $ git -C /media/dev/repo.git init --bare
     $ tomb close
+    $ umount /media/tomb
+  USAGE
+    $ sshfs -d -o "umask=077,noexec,no_readahead,allow_root,port=22,IdentityFile=$HOME/.ssh/id_rsa" user@host:tomb /media/tomb
+      = OR: $ r.ssh-tomb-vps
+    $ tomb open /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g
+  TOMB
+    $ tomb open ~/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g ~/dev
+    $ cd ~/dev/repo
+    $ git pull
+    $ tomb close dev
+      WARN! will close both local and remote tomb named "dev"
+    $ umount /media/tomb
+  PLAIN
+    $ cd ~/work
+    $ git clone --dissociate /media/dev/repo.git .
+    $ env -C repo r.git-my-repo
+    $ tomb close dev
     $ umount /media/tomb
 
 

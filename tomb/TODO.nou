@@ -1,7 +1,53 @@
 TODO
+  [_] BUG: loop device isn't deleted after each "tomb close" when tomb is mounted over sshfs
+    [_] MAYBE: problem is due to "." in the name CHECK: plain name "pass"
+    $ losetup -a
+    /dev/loop1: []: (/media/tomb/pass.git.tomb)
+    /dev/loop0: []: (/media/tomb/pass.git.tomb)
   [_] TRY: enable FS compression inside .tomb for text data to occupy less space
     BUT: we already have compression for bare repo due to using "git gc"
   [_] BAD: sshfs / sftp don't support vps alias from SSH config -- NEED: explicit user@host
   [_] THINK:MAYBE: convert whole .tomb into a single large .git repo instead of using multiple smaller ones
+    2019-12-04 [X] CHECK: if using name "repo.git.tomb" will result in "/media/repo.git" mountpoint
     BUT: otherwise I can also hide pass-tomb db into this tomb and other large binaries
-  [_] IDEA: keep local git mirror key inside the remote .tomb AND remote key GnuPG-encrypted on local PC
+  2019-12-04 [X] IDEA: keep local git mirror key inside the remote .tomb AND remote key GnuPG-encrypted on local PC
+    BAD: access is possible only when you have internet and access to remote host
+      BUT: in this case you could directly work inside sshfs mount instead of local .tomb sync
+    ::: local .tomb sync needs its key present on the same PC (or your phone) for offline access
+      == to allow offline access to .tomb contents
+  [_] CHECK: what will occur if sshfs-mount remote .tomb with .git to multiple PC at the same time
+
+
+SECU
+  2019-12-04 [X] WARN: never keep gpg-id and tomb.key on remote VPS
+    ~ keep them only locally and copy-paste whole .tomb
+      BAD: 500MB binary .tomb is too expensive to copy-replace as whole on each change
+        <= we must be able to crypt/decrypt on VPS itself
+    ! BET: remote mount by ssh-fs and work directly inside mountpoint (NICE: no key on server)
+    + ALSO: setup local .tomb sync for offline caching
+  2019-12-04 [X] THINK: sync .tomb by VPS -- how many tomb.keys do I need
+    ::: use the same per-tomb key -- shared between hosts
+    VIZ:(hosts): [ laptop <-> vps <-> desktop ] :: (dev,pass)
+    ~ identity-centered -- single key for everything
+      ++ easy to setup
+      -- stolen tomb.key will decrypt everything in all places
+      -- you can't share only single .tomb with somebody -- because key will be the same even if GnuPG differs
+    ~ machine-centered -- key per host (but same for all synced tombs)
+      ++ useful if data may slightly differ and 'not everything is synced'
+      -- each host must have both keys -- for remote and local tombs
+      -- useless -- if you share GnuPG identity all keys will be encrypted by same gpgid (and maybe even same password)
+    ~ tomb-centered -- key per tomb, but the same for all hosts
+      ++ as designed -- tomb and key compose the single entity
+      ~~ theoretically passphrase could be different -- but it will be the same due to GnuPG shared identity
+      -- if one PC is stolen -- you can decrypt *the same* tomb/info on other PC...
+        ~~ it's not useful immediately, but attacker can wait until you accumulate more info in tomb on another PC...
+        ~~ otherwise each PC will have at least two keys to steal anyway -- local and remote
+          -> no sense to keep separate keys
+      -- useless granularity for single PC -- GnuPG encrypts all of them (single point of failure)
+        ~~ BUT:NICE? you can distribute each tomb separately
+    ~ access-centered -- granular matrix of keys :: per tomb per host
+      ++ can only access single tomb on single PC
+        -- BUT: you still need pair of local/remote keys per each tomb
+      -- useless -- GnuPG encrypts everything anyway
+  [_] ALT:MAYBE: use sphinx to generate complex password
+    https://github.com/stef/libsphinx

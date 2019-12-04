@@ -63,6 +63,8 @@ INFO
       ! if mounted with "nodatacow" -> then enabling CoW back wit "chattr -C" is ignored
       ALT: set "chattr +C" for "nodatacow" subvolume before creating/copying any files or directories there
         https://bbs.archlinux.org/viewtopic.php?id=213609
+        !. nodatacow bypasses the very mechanisms that are meant to provide consistency in the filesystem
+          SRC: https://btrfs.wiki.kernel.org/index.php/FAQ#Can_I_have_nodatacow_.28or_chattr_.2BC.29_but_still_have_checksumming.3F
   VIZ.
     * "autodefrag" -- detect random writes and start background defragging
     * "compress=lzo" -- compresses only if file's first block $ ((sz_lzo < sz_orig))

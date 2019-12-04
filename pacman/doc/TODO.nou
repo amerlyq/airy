@@ -50,7 +50,23 @@ TODO
 
   [_] MAYBE: move ~/.cache/pacaur to /var/cache/pacaur chown by user ?
   [_] TRY: add as mirror archive of old packages -- to install pkg on old system without upgrade
-    https://archive.archlinux.org/packages/.all/
+    IDEA: use date of last upgrade and re-generate additional entry to pacman config
+      $ printf 'Server = %s/%s/$repo/os/$arch\n' 'https://archive.archlinux.org/repos' "$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)" | sudo tee -a /etc/pacman.d/mirrorlist
+    [_] DEV:IDEA: use pacman global post-update hook -- to replace archive mirror date by "sed"
+      ALT: integrate into reflector(1) instead of using "sudo sed"
+      ~ MAYBE: generate before each upgrade in my own script -- to pull updated list from there
+      ~ BET: generate only after upgrade -- and pull its list explicitly
+    ALT: generate aux config with mirrors of off repos
+      /etc/pacman.conf
+        Include = /etc/pacman.d/archive.conf
+      /etc/pacman.d/archive.conf
+        [archive-{core,extra,community}]
+        SigLevel = PackageRequired
+        Server = https://archive.archlinux.org/repos/$(date +%Y/%m/%d)/\$repo/os/\$arch
+    ALT: use single repo https://archive.archlinux.org/packages/.all/
+      NICE: because otherwise "$repo" must be substituted by "core/extra/community" each
+      CHECK: will it download too large index of all packages from eternity ?
+      BET: use mirrors instead of configs -- they are shared and I regenerate them through reflector anyway
   [_] BUG: pacaur -Syu doesn't update "copyq-git"
     CHECK: if all aur pkgs are updated by pacaur or some are ignored/skipped/lost
     MAYBE: pacaur ignores all *-git packages ?
