@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2019 Amerlyq <amerlyq@gmail.com> and contributors.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+#%SUMMARY: create routing
+#%USAGE: $ ./$0
+set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+sudo nft add table ip nat
+sudo nft add chain ip nat prerouting '{ type nat hook prerouting priority 0 ; }'
+sudo nft add chain ip nat postrouting '{ type nat hook postrouting priority 100 ; }'
+sudo nft add rule nat postrouting oifname wlo1 masquerade
+# sudo nft list ruleset
+
+# WARN:
+sudo nft flush chain inet filter forward
+sudo nft add chain inet filter forward '{ type filter hook forward priority 0 ; policy drop ; }'
+sudo nft add rule inet filter forward ct state related,established accept
+sudo nft add rule inet filter forward iifname enp0s25 oifname wlo1 accept
+sudo nft list ruleset
