@@ -199,9 +199,19 @@ Git hooks
 
 
 Stash
-  git stash list
-  git stash apply stash@{0}
-  git stash drop stash@{0}
+  Basics
+    $ git stash list
+    $ git stash apply stash@{0}
+    $ git stash drop stash@{0}
+  Restore dropped stash
+    https://stackoverflow.com/questions/89332/how-to-recover-a-dropped-stash-in-git
+    If dropped hash was printed into terminal
+      $ git stash apply b8c052aa10a8379dfa2ed756a11b47b33699c4fb
+    If you don't know hash -- find it
+      $ git log --graph --oneline --decorate $(git fsck --no-reflog | awk '/dangling commit/{print$3}')
+        NOTE:(search): WIP on somebranch: commithash Some old commit message
+
+
 
 Git works over ssh
  If all you need is a place for storage, you just need sshd and disk space.
