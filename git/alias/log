@@ -5,6 +5,11 @@ alias gfB='git flines'    # blame formatted
 
 alias glg='git lgraph'
 alias glg.='glg -- .'
+# WARN:NEED:(git pull --rebase): https://redfin.engineering/visualize-merge-history-with-git-log-graph-first-parent-and-no-merges-c6a9b5ff109c
+#   <= otherwise first-parent of merge on "git pull" is reversed and history is wrong
+alias gll='glg -m -M --first-parent'
+alias glc='glg -m -M --no-merges'
+alias glm='glg -m -M --merges'
 alias gla='glg --all'
 alias gla.='gla -- .'
 
@@ -20,7 +25,7 @@ alias gdR='glR --patch'
 alias gdR.='gdR -- .'
 
 alias glF='git log -p HEAD..origin'  # with fetched
-alias gll='git lmsg'
+# alias gll='git lmsg'
 gln(){ git ldump -n ${1:-10}; } #or -1 for inf
 
 alias ggs='glg --source --all -S'   # search <text> in all commits content

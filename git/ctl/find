@@ -9,7 +9,9 @@ if [[ ! ${1:-$PWD} =~ ^$HOME/ ]]; then
   exit 1
 fi
 
-exec find "${1:-$PWD}" \( -type d -o -type l -xtype d \) \
+exec find "${1:-$PWD}" \
+  -xtype d \( -name '_build*' -o -name '_cache*' \) -prune -o \
+  \( -type d -o -type l -xtype d \) \
   -name .git -prune "${@:2}" -printf '%h\0'
 
 # FIXME: find dir which contains exact list of file and dir names
