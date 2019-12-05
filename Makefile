@@ -125,6 +125,7 @@ tags-tree:
 	tree --noreport -- ~/.cache/airy/tags | sed 's/\s*->\s*.*//'
 
 problems:
+	echo '--$(@F)--'
 	@echo "Merge/delete all *.pacnew files from pkg updates :: $$ find / -name '*.pacnew'"
 	@echo "Then, for each found *.panew, do 'v -d /etc/locale.gen{,.pacnew}'"
 	locate .pacnew

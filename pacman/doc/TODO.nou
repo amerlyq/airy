@@ -49,8 +49,14 @@ TODO
     [_] G: pacaur local PKBBUILD -- to install into ~/.cache/pacaur and be managed by pacaur
 
   [_] MAYBE: move ~/.cache/pacaur to /var/cache/pacaur chown by user ?
+  2019-12-05 [X] HACK: share pacman cache on same LAN
+    SERV: $ r.pacman-cache-server
+    TARG: $ sudo sed -i '1s;^;Server = http://192.168.1.3:8080\n;' /etc/pacman.d/mirrorlist
+      = prepend mirror list by darkhttpd-shared PC
   [_] TRY: add as mirror archive of old packages -- to install pkg on old system without upgrade
     IDEA: use date of last upgrade and re-generate additional entry to pacman config
+      # $ sudo reflector -l 35 -p https --sort rate --save /etc/pacman.d/mirrorlist
+      # $ sudo pacman -Syu
       $ printf 'Server = %s/%s/$repo/os/$arch\n' 'https://archive.archlinux.org/repos' "$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)" | sudo tee -a /etc/pacman.d/mirrorlist
     [_] DEV:IDEA: use pacman global post-update hook -- to replace archive mirror date by "sed"
       ALT: integrate into reflector(1) instead of using "sudo sed"
