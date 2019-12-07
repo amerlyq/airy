@@ -23,7 +23,7 @@ ln -s  ~/Downloads   /_dld
 ln -s  /data/music   ~/.config/mpd/music
 ```
 ALSO
- * ecrypt your SSH keys
+ * encrypt your SSH keys
  * add SSH keys to github/gitlab
 
 
@@ -50,40 +50,40 @@ private repository (gitlab.com, bitbucket.com, dropbox, etc).
 Overall directories structure (in repo's root or some subdirectory) is next:
 ```
 repo
-├── mods
-│   ├── fonts
-│   │   └── setup
-│   └── mutt_gmail
-│       ├── install
-│       └── setup
-├── prf
+├── airy
 │   ├── hostname1  # home
 │   ├── hostname2  # work
 │   └── hostname3  # server (headless)
-└── setup
+├── fonts
+│   └── setup
+├── mutt
+│   └── acc
+│       ├── home
+│       └── work
+└── Makefile
 ```
 
-Main `repo/setup` must be launched on clean system before everything else.
-It will symlink your choosen profile/modules and launches system setup.
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-make -C ~/aura/airy -- configure
-export PATH=~/.local/bin:$PATH
-config=${XDG_CONFIG_HOME:-~/.config}/airy
-repo=$(git -C "${0%/*}" rev-parse --show-toplevel)
-linkcp "$repo/prf" "$config/prf"
-linkcp "$repo/prf/$(hostname)" "$config/profile"
-linkcp "$repo/mods" "$config/mod/${repo##*/}"
+Main `repo/Makefile` must be launched on clean system before everything else.
+It will symlink your chosen profile/modules and launches system setup.
+```make
+#!/usr/bin/make -f
+.DEFAULT_GOAL = install
+MAKEFLAGS += -rR --silent
+d_airy := $(HOME)/aura/airy
+d_cfg := $(or $(AIRY_CONFIG),$(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy)
+prf := $(shell pwd)/airy/$(shell hostname)
+install:
+	$(MAKE) -C '$(d_airy)' -- configure
+	ln -svfT '$(prf)' '$(d_cfg)/profile'
 ```
 
 In such way your own clean system setup will be as simple as:
 ```bash
 mkdir -p ~/aura && cd ~/aura
 git clone https://github.com/amerlyq/airy
-git clone https://github.com/$yourname/$reponame
-cd $reponame
-./setup
+git clone https://gitlab.com/$yourname/$airyprivate
+cd $airyprivate
+make
 cd ../airy
 make -B
 ```
@@ -112,6 +112,7 @@ Profiles can be nested/inherited.
 This allows to distribute settings and nicely reuse parts of configs for similar hosts.
 ```bash
 dprf=$(dirname "$(readlink -e "$BASH_SOURCE")")
+AIRY_OVERLAY_PATH=${dprf%/*}
 source "$dprf/home" || return
 CURR_PROF=home_vbox
 AIRY_SKIP+=( browser )
