@@ -1,5 +1,31 @@
+REF
+  https://en.wikipedia.org/wiki/Package_manager
+  2019-12-07 [X] TUT: http://www.linuxfromscratch.org/lfs/view/9.0/chapter06/pkgmgt.html
+  [_] TODO: G: nix vs linuxbrew -- CHECK: user custom overlays
+
+
+INFO
+  delivery
+    fpm
+      https://github.com/jordansissel/fpm
+
+  distribution
+    http://0install.net/
+    https://github.com/calamares/calamares
+
+  portable local installation w/o root
+    Hai
+      https://github.com/Barthalion/hai
+      = for archlinux packages even on non-arch systems
+    Junest -- only isolate fs (install pkgs w/o root), everything else is shared
+      i.e. can monitor host processes from inside arch container
+      https://github.com/fsquillace/junest
+
+
+
 ALT:(dot-mgmt)
   VIZ: https://wiki.thingsandstuff.org/Packages
+    https://www.slant.co/topics/344/~best-linux-package-managers
   TRY: https://github.com/thoughtbot/rcm
   https://github.com/noctuid/dotfiles
 
@@ -7,11 +33,19 @@ ALT:(dot-mgmt)
     Stow
       [_] READ: http://www.gnu.org/software/stow/manual/stow.html
       = https://www.reddit.com/r/archlinux/comments/8ptgw1/custom_pkgbuild_install_into_local/
+    Linuxbrew
+      https://docs.brew.sh/Homebrew-on-Linux
+    Gentoo Prefix
+      https://wiki.gentoo.org/wiki/Project:Prefix
     conda, easybuild, spack
     guix, guix-hpc
       https://www.gnu.org/software/guix/manual/en/html_node/Package-Management.html
-    nix
+    +++ TRY: nix
+      https://nixos.org/nix/
       https://nixos.org/nixos/nix-pills/why-you-should-give-it-a-try.html
+    pkgsrc
+      http://www.pkgsrc.org/
+      TUT: https://rundong.wordpress.com/2013/10/18/pkgsrc-my-favorite-non-root-package-manager-on-linux/
     gx
       https://github.com/whyrusleeping/gx
   G: user package management

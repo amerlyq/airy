@@ -233,15 +233,20 @@ structure
       - git <v2.10.2 on Windows will replace symlinks by text files
         = so I can commit relative symblinks without problem
 
-  [_] gather all artifacts into '_build' dir instead of ~/.cache/airy/
+  [$] gather all artifacts into '_build' dir instead of ~/.cache/airy/
     [$] link /airy/_build into ~/.cache/airy and /airy/mod into ~/.config/airy
-    [_] add support for XDG_... env vars into 'cfgsetup' to determine symlink targets
+    [$] add support for XDG_... env vars into 'cfgsetup' to determine symlink targets
+    ::: NOT: build artifacts litter .git repo -- better placed in ~/.cache in separate btrfs snapshot
   [_] instead of using ./prf/* files -- use separate pieces of profile in each private *mod*
     * AIRY_MODS is placed inside of *airy* mod
     * all profile pieces can be combined into single ./profile with non-exported environment for *airy*
     * even regular *mod* can contain pieces of profile inside of it
     * differs from ./env -- because ./env is always sourced into interactive sessions
   [_] THINK: instead of mod-per-pkg (impossible, actually) use mod-per-idea
+    ?? how to visualize flat hierarchy of idea→idea→pkg/obsolete
+      -- mod name modification (prefix/suffix/etc) is insufficient
+      NEED: hierarchical text outline with alt choices (or graphviz with colors)
+        <= like "menuconfig"
     < I already use multiple pkgs per mod anyway
     < in other cases I choose single 'main' from alternatives list
     < sometimes I install additional non-preffered alternatives
@@ -264,6 +269,9 @@ structure
 
 
 overlay
+  [_] split *airy* into two -- system-wide and user-specific
+    * install system-wide configs through unified PKGBUILD
+    ?? how to be with user-specific configs which can be updated on-the-fly ?
   [_] TODO: replace "tmpl/" dirs with overlays from private repo AIRY_OVERLAY_PATH=overlay1:overlay2
     e.g. $ linkcp -ct "/etc/X11/xorg.conf.d" ./tmpl/90-monitor-xrandr.conf
   [_] USE: path-like fallback instead of unordered symlinks in ~/.config/airy/mod
