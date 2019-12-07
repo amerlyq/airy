@@ -6,8 +6,8 @@ mkdir -p "$cfg" && chmod 700 "$cfg"
 opts=(
   --noincluderc
   # NOTE:($cfg) otherwise will be saved directly at ~/.gcalcli_{cache,oauth}
-  --configFolder="$cfg"
-  --defaultCalendar='work'
+  --config-folder="$cfg"
+  --default-calendar='work'
   # BAD: need to copy-paste link on oauth expired
   --noauth_local_webserver
 )

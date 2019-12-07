@@ -53,6 +53,7 @@ TODO
     SERV: $ r.pacman-cache-server
     TARG: $ sudo sed -i '1s;^;Server = http://192.168.1.3:8080\n;' /etc/pacman.d/mirrorlist
       = prepend mirror list by darkhttpd-shared PC
+    [_] ALSO:TRY: add same "Server = ..." to /etc/pacman.d/{aur,dev}.conf to avoid rebuilding AUR packages
   [_] TRY: add as mirror archive of old packages -- to install pkg on old system without upgrade
     IDEA: use date of last upgrade and re-generate additional entry to pacman config
       # $ sudo reflector -l 35 -p https --sort rate --save /etc/pacman.d/mirrorlist

@@ -43,6 +43,10 @@ HACK
         if cfgOpt r; then sudo iptables -D "${ipt[@]}"; fi
         sudo iptables -A "${ipt[@]}"
       fi
+  Edit ruleset on the fly
+    https://wiki.nftables.org/wiki-nftables/index.php/Atomic_rule_replacement
+    WARN! you must prepend "flush ruleset" to config -- or rules will be appended !!!
+    $ sudo nft list ruleset | vipe | sudo nft -f-
 
 
 DEBUG

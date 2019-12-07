@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 #%SUMMARY: expose cache to LAN to update other PC
 #%DEPS: |darkhttpd|
+#%NEED: $ sudo nft add rule inet filter input tcp dport 8080 accept
 #%REF: https://wiki.archlinux.org/index.php/Pacman/Tips_and_tricks#Network_shared_pacman_cache
-set -fCureEo pipefail
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
 
-sudo cp --symbolic-link --update --verbose -t /var/cache/pacman/pkg -- /var/lib/pacman/sync/*.db
+# NOTE: must also share *.files for pkgfile(1) :: /var/cache/pkgfile
+sudo cp --symbolic-link --update --verbose -t /var/cache/pacman/pkg -- \
+  /var/lib/pacman/sync/*.db \
+  /var/cache/pkgfile/*.files
 
 exec sudo -u http darkhttpd /var/cache/pacman/pkg --no-server-id
