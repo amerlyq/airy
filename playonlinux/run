@@ -9,11 +9,11 @@ set -euo pipefail -o errtrace
 #     => MAYBE: resize current monitor where mouse/keyboard focus lays (when you run M-i-g)
 #   * auto-choose correct mode 1280x768 or 1280x800 depending on monitor when r.video-resize 1/2/3
 
-lib=~/.config/airy/game
+lib=~/aura/gaming
 on_exit=('r.monitor-scale 1')
 
-choose(){ dmenu -p 'Play me:' -fn monospace:size=10
-     -nb '#000000' -nf '#b0e0e6' -sb '#227410' -sf '#ccaa00'; }
+choose(){ dmenu -p 'Play me:' -fn monospace:size=10 \
+     -nb '#000000' -nf '#b0f0f6' -sb '#227410' -sf '#ccff66'; }
 
 overlay(){ local nm=$1
   # DEV: separate overlays to be provided directly by wrapper in $config/games
@@ -27,17 +27,17 @@ overlay(){ local nm=$1
 game(){ [[ -n $1 ]] || exit; nm=$1
   # NOTE: not needed for games with gamepad THINK: detect and switch automatically?
   # overlay "$nm";
-  cmd=$lib/$nm
+  cmd=$lib/$nm/run
   [[ -f $cmd ]] || { r.n 'No such game' "$cmd"; exit 1; }
 }
 
 if (($#)); then case $1
-  in -p) shift; game "$(cd "$lib" && ls | choose)"
+  in -p) shift; game "$(find "$lib" -mindepth 1 -maxdepth 1 -printf '%P\n' | choose)"
   ;; -n) shift; game "$1"
   ;;  *) exit 1
 esac; else
   nm=playonlinux
-  cmd=( primusrun "$(which "$nm")" )
+  cmd=( primusrun "$(command -v "$nm")" )
   if (( "$(r.xorg -d)" > 141 )); then
     on_exit+=('xrdb -load ~/.Xresources')
     xrdb -DDPI=141 -load ~/.Xresources
@@ -48,7 +48,7 @@ fi
 
 # CHECK: called only one trap or sometimes multiple of them?
 onexit(){ for c in "${on_exit[@]}"; do eval "$c"; done; }
-trap 'onexit' HUP INT QUIT ILL TRAP KILL BUS TERM EXIT ERR
+trap 'onexit' HUP INT QUIT ILL TRAP BUS TERM EXIT ERR
 
 # TODO: query and return to current wksp on exit
 r.wm -w g  # Jump to game workspace
