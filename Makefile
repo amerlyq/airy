@@ -11,6 +11,7 @@
 #%USAGE:
 #% * (no-update): $ make flags=
 #% * (only mods): $ make -B all/all
+#% BUG: w/o -B simple "airyctl" doesn't continue interrupted "setup" process
 #%
 .DEFAULT_GOAL = all
 # FAIL:( --output-sync=none): keep prompt unaffected -- when scripts inside ask for "sudo" password

@@ -60,3 +60,6 @@ let g:syntastic_enable_perl_checker = 1
 
 """ Haskell """
 let g:syntastic_haskell_checkers = ['hlint']  " 'hdevtools', 'ghc-mod'
+
+""" reStructuredText
+let g:syntastic_rst_checkers=['sphinx']

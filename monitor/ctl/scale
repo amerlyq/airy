@@ -27,6 +27,8 @@ in 1) xrandr --output "$dfl" --auto
 ;; *) echo "Err: not supported '$dfl_mod' delimiter"; exit 1
 esac
 
+# TODO:DEV: must also change server DPI to make fonts crisper and more scaled
+#   xrandr --dpi 110 && xrdb -DDPI=110 -load ~/.Xresources
 [[ ${ext_mod-} ]] && case $ext_mod
 in 1) xrandr --output "$ext" --auto
 ;; 1n) r.monitor-add-mode "$ext" 2560x1600
