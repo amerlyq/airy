@@ -44,3 +44,69 @@ https://github.com/jaspervdj/patat
   Read
     $ st -f monospace:size=20 -e patat file.md
   LIOR: 0/G, h/l, j/k, r/q | {sp,cr}/bksp, lf/rh, up/dn
+
+
+Sphinx
+  Themes
+    NICE: https://pythonhosted.org/sphinxjp.themes.revealjs/#/
+      + good list of animations, but Convex/Concave rotating cylinder has too small radius
+        -- I wish something akin "infinite gallery"
+      + good themes == USE: "Beige" or "Serif" or "Solarized"
+    https://pythonhosted.org/sphinxjp.themes.impressjs/#/installation
+      - slow as hell
+      https://openlife.cc/blogs/2018/march/impressjs-10-released
+    https://pythonhosted.org/sphinxjp.themes.htmlslide/
+      - ugly and nauseating
+
+
+%%% IDEA: slides pipelines
+
+  rst + sphinx + plantuml + hieroglyph + ... => ... (html / pdf)
+    aur/plantuml 1.2019.12-1 (+98 2.19%)
+        Component that allows to quickly write uml diagrams
+    aur/python-sphinxcontrib-plantuml 0.17-1 (+2 0.00%)
+        Sphinx 'plantuml' extension
+    aur/python-hieroglyph-git 0.7.1.r11.g6861328-1 (+1 0.00%)
+        hieroglyph is an extension for Sphinx which builds HTML5 slides from ReStructured Text documents.
+        http://docs.hieroglyph.io/en/hieroglyph-0.5.5/getting-started.html
+          TUT: how to use "sphinx-quickstart" and "sphinx-build"
+    ALSO:
+    aur/plantuml-ascii-math 20171116-2 (+2 0.01%)
+        Plantuml language extension to allow use AsciiMath or JLaTeXMath notation
+    aur/plantuml-pdf 1.2018.1-1 (+2 0.00%) (Out-of-date: 05 June 2018)
+        Component that allows to quickly write uml diagrams, with PDF support.
+
+    SEE: can push hieroglyph to slideshare ?
+      https://pypi.org/project/sphinxcontrib-slide/
+
+  txt + pandoc + plantuml + beamer => pdf
+    aur/pandoc-plantuml-filter-git 0.1.0.2-1 (+1 0.00%)
+        Pandoc filter for PlantUML code blocks
+    aur/pandoc-plantuml-filter-py 0.1.2-2 (+0 0.00%)
+        Pandoc filter for PlantUML code blocks, python version
+
+  impressjs
+    https://github.com/impress/impress.js
+    +sphinx: https://github.com/gawel/impress
+
+  CMP 5 of the Best Free HTML5 Presentation Systems — SitePoint
+    https://www.sitepoint.com/5-free-html5-presentation-systems/
+
+  S5
+    https://docutils.readthedocs.io/en/sphinx-docs/user/slide-shows.html
+    https://meyerweb.com/eric/tools/s5/
+      ~~~ so-so, like old beamer
+
+  WTF: mermaid-js -- allows diagrams inside impressjs
+    https://mermaid-js.github.io/mermaid/#/
+
+  landslide
+    https://github.com/adamzap/landslide
+      ~~~ google html5slides
+
+  IPython
+    https://ipython.org/ipython-doc/2/notebook/nbconvert.html
+    https://github.com/jupyter/nbconvert
+
+  spectacle -- reactjs based
+    https://github.com/FormidableLabs/spectacle
