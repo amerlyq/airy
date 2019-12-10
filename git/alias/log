@@ -20,8 +20,8 @@ alias glcn='glan --committer'
 
 # REF: https://stackoverflow.com/questions/46750027/is-there-a-git-log-summary-that-includes-merge-only-and-non-merge-commits
 glB(){ git log -m --first-parent "$(git merge-base "$1" HEAD)~..HEAD" "${@:2}"; }
-glR(){ glB "$(git branch --list --remote --sort '-refname' --format '%(refname:short)' -- 'origin/release/R??' | head -1)" "$@"; }
-alias gdR='glR --patch'
+glBR(){ glB "$(git branch --list --remote --sort '-refname' --format '%(refname:short)' -- 'origin/release/R??' | head -1)" "$@"; }
+alias gdR='glBR --patch'
 alias gdR.='gdR -- .'
 
 alias glF='git log -p HEAD..origin'  # with fetched
@@ -32,6 +32,9 @@ alias ggs='glg --source --all -S'   # search <text> in all commits content
 alias ggx='git rev-list --all | xargs git grep'
 alias ggS='git log -S'
 alias ggG='git log -G'
+# BET:TRY:(zsh>=4.3.7): anonymous functions
+#   https://vincent.bernat.ch/en/blog/2011-zsh-zshrc
+# USAGE: (){ print -l $@; } a b c
 ggg(){ git --no-pager log --pretty=format:'%H' -G "$1" \
 | while IFS= read -r rev; do echo && git --no-pager lstd --graph -n1 "$rev" && echo
   git --no-pager grep --color -I -n -e "$@" "$rev" | cut -d: -f2-

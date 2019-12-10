@@ -8,8 +8,9 @@ alias gdF='gdf --submodule=diff'  # don't show renamed files
 alias gdff='gdf --diff-filter=d'
 alias gdfm='gdf --diff-filter=M'
 alias gdfs='gdf --stat'
-alias gdfo='gdf HEAD...origin'  # with fetched
-alias gdo='gdf origin/$(git-branch-current 2>/dev/null)'
+alias gdfo='gdf origin/$(git-branch-current 2>/dev/null)'
+alias gdo='gdf origin/$(git-branch-current 2>/dev/null)...HEAD'
+alias gdO='gdf HEAD...origin/$(git-branch-current 2>/dev/null)'
 alias gdum='gdf master upstream/master'
 alias gdw='gdf --no-ext-diff --word-diff --unified=0'  # OR -U0
 alias gdc='gdf --cached -w'

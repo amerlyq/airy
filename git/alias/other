@@ -48,34 +48,6 @@ alias gmf='gm --ff-only'
 alias gmc='gm --continue'
 alias gpC='gpc --no-verify'
 
-# WARNING: works only in ZSH because it will not split arguments in words!
-# ALT: git-up
-# glA() { local current="$(git-branch-current 2> /dev/null)"
-# git for-each-ref --format="%(refname:short) %(push:track)" refs/heads |
-#     while read branch state; do if [[ -n "$state" ]]; then
-#         git checkout "$branch" && git pull --rebase --verbose
-#     fi; done
-#     git checkout "$current"
-# }
-
-# gcof(){
-#   # BUG: don't work (empty current), when you are detached (like gco HEAD~5)
-#   local current="$(git-branch-current 2> /dev/null)"
-#   local revs=($(git rev-list --ancestry-path HEAD..$current))
-#   local next=${revs[${1:--1}]}
-#   [[ -z $next ]] || git checkout $next
-# }
-
-### Grep log message and execute command on it OR show log matches instead.
-# ATTENTION: can be bugged (not show all) in detached stated by using 'HEAD..'
-_gref(){ local cmd=$1 patt=${*:2}
-  local rev=($(git --no-pager log --all --pretty=format:'%h%n' -i --grep="$patt"))
-  case ${#rev} in 0) return 1 ;; 1) eval "$cmd" ;;
-  *) git lthis -i --grep="$patt" && echo ;; esac
-}
-alias gre="noglob _gref 'printf %s \$rev | tee /dev/tty | xsel -ib && echo'"
-alias gcog="noglob _gref 'git checkout \$rev'"
-
 # BUG: recursion?
 # gri(){ [[ "$1" =~ [0-9]+ ]] && git rebase -i HEAD~$* || git rebase -i $@; }
 # compdef grI=git-rebase
