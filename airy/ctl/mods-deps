@@ -13,6 +13,9 @@ while getopts 'g' o; do case $o in :|'?') exit 1
 ;; g) graph=1
 esac; done; shift $((OPTIND - 1))
 
+# BUG: must sort AIRY_OVERLAY before *airy*
+#   => otherwise accounts symlinked inside erian aren't available for airy/*/setup
+
 # ALT:(tsort): https://sourceforge.net/projects/dep-trace/
 r.airy-mods-modelines -K deps -p: -- "$@" \
 | awk -F: '{split($NF,a," "); for(k in a)print a[k],$1}' \

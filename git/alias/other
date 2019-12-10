@@ -20,6 +20,9 @@ alias glu='gss && gl && gsp'
 alias gbl='git branch -vv'
 alias gbL='git branch -va'
 
+alias gpD='git push origin --no-verify --delete'
+alias gpCD='gpD $(git-branch-current 2>/dev/null)'
+
 # Additional
 alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
 alias gaa='git add --all'
@@ -27,7 +30,7 @@ alias ga.='gaa .'
 alias giU='giu --patch'
 gcfd(){ local d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
 alias gcss='gcs --stat'
-alias gcsd='gcs --pretty=short --show-signature'
+alias gcsd='gcs --diff-filter=d --pretty=short --show-signature'
 alias gcst='git --no-pager log --pretty=tformat:%ad%n%cd HEAD~..HEAD'
 alias gcom='gco master'
 

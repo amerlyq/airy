@@ -1,4 +1,15 @@
 # vim:ft=sh
+
+## DEV: git log only for current branch, showing merges as gray commits (like in bitbucket PR view)
+# REF: How to find the nearest parent of a Git branch? - Stack Overflow
+#   https://stackoverflow.com/questions/3161204/how-to-find-the-nearest-parent-of-a-git-branch
+# FAIL: cannot handle more than 27 refs
+# git show-branch -a | grep '\*' | grep -v "$(git rev-parse --abbrev-ref HEAD)" | sed '1{s/.*\[\(.*\)\].*/\1/;s/[\^~].*//;q}'
+# CHECK: my prompt -- how can I decifer "remotes/origin/myfeature" even for detached HEAD ?
+# BET: git merge-base --fork-point HEAD
+# glg -m "$(git merge-base --fork-point HEAD)~..HEAD"
+# glg -m --first-parent "$(git merge-base --fork-point HEAD)~...HEAD"
+
 ## Log
 alias gfH='git fcommits'  # history for one file
 alias gfB='git flines'    # blame formatted

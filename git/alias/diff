@@ -5,8 +5,8 @@ alias gdf='git diff -M --color-moved'  # don't show renamed files
 alias gdF='gdf --submodule=diff'  # don't show renamed files
 # SEE: http://stackoverflow.com/questions/5685007/making-git-log-ignore-changes-for-certain-paths/21079437#21079437
 # git diff HEAD -- . ':!some/dir' -- exlude shanges
-alias gdff='gdf --diff-filter=d'
-alias gdfm='gdf --diff-filter=M'
+alias gdfd='gdf --diff-filter=d'
+alias gdfM='gdf --diff-filter=M'
 alias gdfs='gdf --stat'
 alias gdfo='gdf origin/$(git-branch-current 2>/dev/null)'
 alias gdo='gdf origin/$(git-branch-current 2>/dev/null)...HEAD'
