@@ -1,7 +1,10 @@
 TODO
   [_] BUG! neomutt =INBOX is not refreshed when afew moves mails into new dirs
-    BUG:: whichever folder you open through "Directory" view -- disappears from list
-      CHECK: set mail_check_stats = yes
+  [$] BUG:: whichever folder you open through "Directory" view -- disappears from list
+    CHECK: set mail_check_stats = yes
+    ~~ seems only "neomutt-git" has this problem, but not release "neomutt"
+  [_] BUG: =INBOX is not shown in neomutt
+    REQ: https://github.com/neomutt/neomutt/issues/1903
   [_] DEV: don't ask for password if opened in read-only mode $ neomutt -R
   [_] Add auto-generation of text/HMTL from Markdown
     MAYBE: place markdown directly inside text/plain
