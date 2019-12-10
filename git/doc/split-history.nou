@@ -98,8 +98,11 @@ HACK change wrong date (NOTE: order of _pull branch_ is independent)
     WARN: test grep-filter on current commit -- and add files manually if some where skipped (i.e. git log --follow -- empty history)
     $ git ls-files | grep -vxFf ../project_renames.txt
   Filter-out history from unrequired files
-    $ git filter-branch --prune-empty --index-filter 'git ls-files -z | grep -vzxFf ../project_renames.txt | xargs -0 -r git rm --cached --' --tag-name-filter cat -- --all
-    $ git filter-branch --prune-empty --index-filter 'git rm --cached --ignore-unmatch -- some/file.c'
+    USE:|aur/git-filter-repo|:BET? https://github.com/newren/git-filter-repo
+      $ git filter-repo --paths-from-file ../project_renames.txt
+    ALT:WARN
+      $ git filter-branch --prune-empty --index-filter 'git ls-files -z | grep -vzxFf '"${PWD%/*}/project_renames.txt"' | xargs -0 -r git rm --quiet --cached --' --tag-name-filter cat --prune-empty -- --all
+      $ git filter-branch --prune-empty --index-filter 'git rm --cached --ignore-unmatch -- some/file.c'
   Try-push to bare repo your filtered one and re-clone it
     $ git init --bare ../bare_repo
     $ git remote add origin ../bare_repo
@@ -107,6 +110,15 @@ HACK change wrong date (NOTE: order of _pull branch_ is independent)
     # $ git push origin --all
     # $ git push --tags
     $ git clone --no-hardlinks --local ../bare_repo
+  OR: Merge-up history into existing project
+    $ cd ../existin_project
+    $ git remote add sep ../bare_repo
+    $ git fetch sep --tags
+    $ git merge --allow-unrelated-histories sep/master
+    $ git push origin '+refs/remotes/sep/*:refs/heads/*'
+    $ git push origin --all
+    $ git remote remove project-a
+
 
 % Update with PRs (when integration is too slow)
   Initial
