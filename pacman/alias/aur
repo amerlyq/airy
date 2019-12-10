@@ -7,17 +7,17 @@
 
 alias aur='AUR_REPO=aur aur'
 alias aurb='aur build --force'          # rebuild inside current dir
-alias aurB='_a(){ local nm; nm=$(r.pacman-loc-prepare "$1") && r.pacman-loc-package "$nm" && sudo pacman -S "$nm"; }; _a'
+function aurB { local nm; nm=$(r.pacman-loc-prepare "$1") && r.pacman-loc-package "$nm" && sudo pacman -S "$nm"; }
 alias aurC='pacman -Qm | aur vercmp'                            # check updates for foreign pkgs
 alias aure='aur sync'                   # install and prompt to edit files
 alias auri='aur sync --no-view'         # install
 alias aurc='auri --continue'            # install without download and edit
-alias aurI='_a(){ auri "$1" && paci "$1"; }; _a'         # install
+function aurI { auri "$1" && paci "$1"; }  # install
 alias aurl='pacman -Sl aur'   # list installed aur pkgs
 alias aurr='aur sync --nover-shallow -f'  # fully rebuild chosen packages (e.g. python-* pkgs installed as deps)
 alias aurR='aur sync --rebuildtree '      # fully rebuild pkg with all its dependencies
 alias aurs='aur search'
-function aurq { aur pkglist -P "$@" | xargs aur search -i; }    # search pkgname by regex
+function aurq { aur pkglist -P "$@" | command xargs aur search -i; }    # search pkgname by regex
 
 alias aur\?='pacman -Slq aur | grep -vxFf <(aur pkglist)'       # unknown pkgs (not from AUR)
 
