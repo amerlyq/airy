@@ -27,6 +27,8 @@ _alias_(){ local a b e t v overwrite=0 OPTIND=1
   done
 }
 
+## ALT:BET?(ZSH named dirs): use tilda expansion w/o "cd" e.g. $ ls ~d
+#   https://vincent.bernat.ch/en/blog/2015-zsh-directory-bookmarks
 # Source all pathes shortcuts
 [[ ! -s $_airy/pathes ]] || while read -r k p; do alias "$k"="cd $p"
 done < <(sed 's/\s*#.*$//; /^\s*$/d' "$_airy/pathes")

@@ -10,7 +10,8 @@ After=network.target network-online.target
 
 ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
 ConditionFileNotEmpty=/var/lib/mailsync/sec/%i
-ConditionFileNotEmpty=/home/%{USER}/.config/mbsync/acc/%i
+ConditionFileNotEmpty=/home/%{USER}/.config/getmail/acc/%i
+# ConditionFileNotEmpty=/home/%{USER}/.config/mbsync/acc/%i
 
 OnFailure=notify-user@critical:OnFailure:%i-new.service
 

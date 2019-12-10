@@ -115,9 +115,12 @@ $(tsdir)/--configure--:
 
 # NOTE: connect pacman to tty instead of logs
 # BUG:FIXME: only run on "airyctl -B" -- must ignore on simple "airyctl"
+# FIXME: call upgrade only when doing "make -B" -- sometimes I only need to refresh symlinks, keeping packages old
+#   => same with :/pacman/ mod -- don't upgrade it
 $(tsdir)/--upgrade--:
 	echo '$(@F)'
 	./pacman/update -u > /dev/tty
+	touch '$@'
 
 tags:
 	r.airy-cache-tags -L ~/.cache/airy/tags
