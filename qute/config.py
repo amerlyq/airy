@@ -847,7 +847,7 @@ c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
 ## setting, it's replaced with the fonts listed here.
 ## Type: Font
 # c.fonts.monospace = '"xos4 Terminus", Terminus, Monospace, "DejaVu Sans Mono", Monaco, "Bitstream Vera Sans Mono", "Andale Mono", "Courier New", Courier, "Liberation Mono", monospace, Fixed, Consolas, Terminal'
-c.fonts.monospace = 'monospace, "DejaVu Sans Mono"'
+c.fonts.monospace = 'monospace'
 
 ## Font used for prompts.
 ## Type: Font
@@ -872,14 +872,17 @@ c.fonts.monospace = 'monospace, "DejaVu Sans Mono"'
 ## Font family for fixed fonts.
 ## Type: FontFamily
 # c.fonts.web.family.fixed = ''
+# c.fonts.web.family.fixed = 'monospace'
 
 ## Font family for sans-serif fonts.
 ## Type: FontFamily
 # c.fonts.web.family.sans_serif = ''
+# c.fonts.web.family.sans_serif = 'sans-serif'
 
 ## Font family for serif fonts.
 ## Type: FontFamily
 # c.fonts.web.family.serif = ''
+# c.fonts.web.family.serif = 'serif'
 
 ## Font family for standard fonts.
 ## Type: FontFamily
