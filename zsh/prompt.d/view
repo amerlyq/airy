@@ -30,7 +30,7 @@ function _prompt_amer_setup_prompts {
   ## Left
   PROMPT="%F{$color}${parts[3]}%f"
   PROMPT+='${git_info:+${(e)git_info[icons]}}${vcs_info_msg_0_}'
-  PROMPT+="%F{$color}"'${editor_info[overwrite]:-${editor_info[keymap]}}%f'
+  PROMPT+="%F{$color}${parts[5]}"'${editor_info[overwrite]:-${editor_info[keymap]}}%f'
   PROMPT+='%(!. %B%F{196}#%f%b.) '  # EXPL: if root
 
   ## Right
