@@ -32,10 +32,10 @@ au FileType make :imap <buffer><silent><expr>  <TAB>  pumvisible() ? "\<C-n>"
 inoremap <expr><S-Tab>  pumvisible() ? "\<C-p>" : "\<C-h>"
 " <C-h>, <BS>: close popup and delete backword char.
 " TRY: wrap expr in smth to prevent <C-h> from breaking in nvim
-inoremap <expr><C-h> (!exists('g:deoplete#_context') ? ''
-      \: deoplete#mappings#smart_close_popup()) . "\<C-h>"
-inoremap <expr><BS>  (!exists('g:deoplete#_context') ? ''
-      \: deoplete#mappings#smart_close_popup()) . "\<BS>"
+" inoremap <expr><C-h> (!exists('g:deoplete#_context') ? ''
+"       \: deoplete#mappings#smart_close_popup()) . "\<C-h>"
+" inoremap <expr><BS>  (!exists('g:deoplete#_context') ? ''
+"       \: deoplete#mappings#smart_close_popup()) . "\<BS>"
 " inoremap <expr> '  pumvisible() ? deoplete#mappings#close_popup() : "'"
 
 " let g:deoplete#enable_ignore_case = 1
