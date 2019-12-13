@@ -45,6 +45,13 @@ BUG: performance drop after ~1h playing
     https://wiki.archlinux.org/index.php/Gaming
 
 
+FIXED:BUG:(Proton): Failed to initialize graphics. Make sure you have DirectX 11 installed
+  REF: https://steamcommunity.com/app/221410/discussions/8/1629664607001626033/
+    https://steamcommunity.com/app/221410/discussions/0/1741094390461378203/
+  ::: game -> <rightclick> -> properties -> start options -> <insert>
+    PROTON_USE_WINED3D=1 %command%
+
+
 Crash on startup
   + https://github.com/ValveSoftware/steam-for-linux/issues/4529
     MAYBE crash due to libglvnd inside nvidia-drivers present in render path -- rebuild driver w/o it

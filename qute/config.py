@@ -872,17 +872,17 @@ c.fonts.monospace = 'monospace'
 ## Font family for fixed fonts.
 ## Type: FontFamily
 # c.fonts.web.family.fixed = ''
-# c.fonts.web.family.fixed = 'monospace'
+c.fonts.web.family.fixed = 'monospace'
 
 ## Font family for sans-serif fonts.
 ## Type: FontFamily
 # c.fonts.web.family.sans_serif = ''
-# c.fonts.web.family.sans_serif = 'sans-serif'
+c.fonts.web.family.sans_serif = 'sans-serif'
 
 ## Font family for serif fonts.
 ## Type: FontFamily
 # c.fonts.web.family.serif = ''
-# c.fonts.web.family.serif = 'serif'
+c.fonts.web.family.serif = 'serif'
 
 ## Font family for standard fonts.
 ## Type: FontFamily
@@ -1450,6 +1450,8 @@ c.url.searchengines = {
     'gb': 'https://google.com/search?q=bash%20{}',
     'gh': 'https://github.com/search?q={}',
     'gj': 'https://google.com/search?q=%22jsoftware%22%20{}',
+    'gk': 'http://localhost:1248/source/search?q=&defs={}&refs=&path=&hist=&type=&project=linux-3.10.28',
+    'gr': 'https://google.com/search?q=restructuredtext%20{}',
     'gm': 'https://www.google.com/maps/place/{}',
     'gv': 'https://google.com/search?q=graphviz%20{}',
     'ha': 'http://www.haskell.org/hoogle/?hoogle={}',
@@ -1461,7 +1463,6 @@ c.url.searchengines = {
     'dt': 'http://dictionary.reference.com/browse/{}',
     'ea': 'http://www.ex.ua/search?original_id=23786&s={}',
     'ex': 'http://www.ex.ua/search?s={}',
-    'gr': 'http://srk:1248/source/search?q=&defs={}&refs=&path=&hist=&type=&project=linux-3.10.28',
     'w': 'http://en.wikipedia.org/w/index.php?search={}&title=Special:Search',
     'wa': 'http://www.wolframalpha.com/input/?i={}',
     'y': 'http://www.youtube.com/results?search_query={}',
@@ -1527,7 +1528,7 @@ config.bind(',p', 'hint links spawn -- r.mutt-pocket "{hint-url}"')
 config.bind(',P', 'spawn -- r.mutt-pocket "{url}"')
 config.bind(',Q', "spawn -- r.qr-code '{url}'")
 config.bind(',r', 'set content.proxy system ;; reload')
-config.bind(',R', 'set content.proxy socks://localhost:17321/ ;; reload')  # OR: http://
+config.bind(',R', 'set content.proxy socks://localhost:17325/ ;; reload')  # OR: http://
 config.bind(',s', 'hint links spawn -- r.mpd-soundcloud "{hint-url}"')
 config.bind(',S', 'spawn -- r.mpd-soundcloud "{url}"')
 
