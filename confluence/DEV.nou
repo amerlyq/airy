@@ -11,3 +11,7 @@ pandoc dev
   $ stack setup
   $ stack install --test
   $ stack build
+
+
+Convert markup to confl
+  $ <page.rst pandoc -f rst -t ~/aura/airy/pandoc/fmt/confluence.lua | tidy -q -xml --output-xml
