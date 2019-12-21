@@ -60,5 +60,5 @@ call dein#add('zaiste/tmux.vim', {
 " DEBUG: :RivReload
 " let proj1 = { 'path': '~/Dropbox/rst', }
 " let g:riv_projects = [proj1]
-" call dein#add('gu-fan/riv.vim', {
-"   \ 'on_ft': 'rst'})
+call dein#add('gu-fan/riv.vim', {
+  \ 'on_ft': 'rst'})

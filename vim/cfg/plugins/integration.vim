@@ -276,3 +276,8 @@ call dein#add('amerlyq/vim-tshark', {
 \\n   let g:tshark_detail_opts = '-V -x -t r'
 \\n   let g:tshark_summary_opts = '-t r'
 \"})
+
+
+
+" SUM: Use vim for info(1) pages
+" REF: https://gitlab.com/HiPhish/info.vim
