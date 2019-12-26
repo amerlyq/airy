@@ -67,9 +67,11 @@ CFG
   USAGE
     $ sshfs -d -o "umask=077,noexec,no_readahead,allow_root,port=22,IdentityFile=$HOME/.ssh/id_rsa" user@host:tomb /media/tomb
       = OR: $ r.ssh-tomb-vps
-    $ tomb open /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g
+    $  tomb open /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g
+      !! space-prepended !!
+      TODO: usage some picture from catalogue
   TOMB
-    $ tomb open ~/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g ~/dev
+    $  tomb open ~/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g ~/dev
     $ cd ~/dev/repo
     $ git pull
     $ tomb close dev
