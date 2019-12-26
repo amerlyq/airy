@@ -1528,7 +1528,7 @@ config.bind(',p', 'hint links spawn -- r.mutt-pocket "{hint-url}"')
 config.bind(',P', 'spawn -- r.mutt-pocket "{url}"')
 config.bind(',Q', "spawn -- r.qr-code '{url}'")
 config.bind(',r', 'set content.proxy system ;; reload')
-config.bind(',R', 'set content.proxy socks://localhost:17325/ ;; reload')  # OR: http://
+config.bind(',R', 'set content.proxy socks://localhost:17321/ ;; reload')  # OR: http://
 config.bind(',s', 'hint links spawn -- r.mpd-soundcloud "{hint-url}"')
 config.bind(',S', 'spawn -- r.mpd-soundcloud "{url}"')
 
