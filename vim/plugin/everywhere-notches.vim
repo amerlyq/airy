@@ -15,6 +15,9 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 "   'GREN! ...' -- rest of line
 "   '!CYAN! ...' -- whole line from beginning
 
+" DEV: phonetic abbreviations in cyrillic, etc.
+"   iabbr 'туду:' -> 'TODO:'
+
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 " TODO: separate doc page with all available notches
 let s:patterns = [

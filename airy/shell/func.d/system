@@ -27,6 +27,7 @@ trap_errors(){
     #  Trap non-normal exit signals: 1/HUP, 2/INT, 3/QUIT, 15/TERM, ERR
     # BUG: wrong LINENO for correct command
     # MAYBE: used previous LINENO instead of current?
+    # ALT:BET?(caller 0): https://unix.stackexchange.com/questions/453144/functions-calling-context-in-zsh-equivalent-of-bash-caller
     trap 'error -e ${LINENO} \
     "${FUNCNAME+[$FUNCNAME] }${BASH_COMMAND-}"
     ' HUP INT QUIT TERM ERR
