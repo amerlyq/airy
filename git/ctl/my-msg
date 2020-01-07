@@ -27,6 +27,10 @@
 #   * ... current index
 #   * generate full msg from arbitrary diff / commit range
 #
+# DEV:IDEA: auto-expanded ZSH alias => (gcm '[git] add |... +3') with cursor in the middle of the message
+#   ALT: open lightweight vis(1) editor with prepared message and positioned cursor
+#   $ r.git-my-msg --index | git commit --template=/dev/stdin
+#
 use warnings FATAL => 'all';
 use autodie;
 use strict;
@@ -141,7 +145,7 @@ sub parse_raw_numstat {
             chomp $src;
             my $dst = <STDIN> if $mod =~ /^[RC]/;
             chomp $dst if $dst;
-            $diff{$src} = { mod => $mod, src => $src, dst => $dst };
+            $diff{$src} = { mod => substr($mod,0,1), src => $src, dst => $dst };
         } else {
             my ($add,$del,$src) = split /\t/, $_, 3;
             if (not $src) {
@@ -227,6 +231,10 @@ foreach my $src (keys %diff) {
     my $h = $diff{$src};
     ++$stat{$h->{mod}};
 }
+## DEBUG
+# foreach my $k (keys %stat) {
+#     print $k,"=",$stat{$k},"\n";
+# }
 my @mods = grep { $stat{$_} } @allmods;
 
 
@@ -254,9 +262,22 @@ $text .= "]";
 
 $text .= " ". $opts{message} if $opts{message};
 
+# DEV: if folder didn't exist before -- use word :: "new", "create", "+"
 my $action = $allmods{$mods[0]};
+
+# IDEA:(fine-tuning): if you add file to some "cmpt-type" subfolder -- use trailing "+"
+#   e.g. "add file ./cmpt/tmpl/new.c" -> "[cmpt] tmpl+ new.c"
+# IDEA: if this added file contains header with "%SUMMARY:" -- use it as message
+#   <= because ctx-based msgs are much better than simple file name duplicated in git log
+
 if (@mods > 1) {
     $text .= " ". @files ." files" if @files;
+    # BAD: prints "[design] add 10 files 10 binary"
+    #   FIXME: subtract binaries from total files count
+    #   MAYBE: rename to e.g.
+    #     "[design] add 2 text 8 binary files"
+    #     "[design] add 2 files and 8 binary"
+    #     "[design] add 10 files (8 binary)"
     $text .= " ". @binaries ." binary" if @binaries;
     $text .= " (". join(" ", map { $_ . $stat{$_} } @mods) .")";
 } elsif (@files > 2) {
@@ -281,7 +302,8 @@ if ($stat{add} or $stat{del}) {
     $text .= "/-". $stat{del} if $stat{del};
 }
 
-$text .= "  ". strftime("%Y%m%d_%H%M%S", localtime);
+## DISABLED: obstructs view more than helps -- better use proper "glG" alias with time
+# $text .= "  ". strftime("%Y%m%d_%H%M%S", localtime);
 
 
 if ($opts{commit}) {
