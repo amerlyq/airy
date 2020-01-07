@@ -60,10 +60,10 @@ screens =
   ]
 
 
-panels =
-  [ ("M-S-p"    , layoutScreens 2 (TwoPane 0.15 0.85) >> windows (view "MON"))
-  , ("M-p"      , rescreen)  -- TODO: toggle show/hide second screen
-  ]
+panels = []
+  -- [ ("M-S-p"    , layoutScreens 2 (TwoPane 0.15 0.85) >> windows (view "MON"))
+  -- , ("M-p"      , rescreen)  -- TODO: toggle show/hide second screen
+  -- ]
 
 -- NEED:DEV: back_and_forth -- to return window on their previous screen
 -- -- if on currentFocused -- shiftHere was pressed again
