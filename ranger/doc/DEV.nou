@@ -222,9 +222,12 @@ When sorting in 'type' order
     E.G video types
   = ALT: use horizontal line (underline?) between different types to split list
 
+
 dirlist
+  sort by name rest
+    i.e. bugs "20180712-jira-12345" sort entries by "${nm#*-}" rest of "jira-12345"
   sort by name tail
-    i.e. bugs "20180712-jira-12345" sort entries by "${nm#*-}" tail "jira-12345"
+    i.e. bugs "synchro-airy-20190830_030832.tar.gz" sort entries by "${nm##*-}" tail "20190830_030832"
 
 
 rifle
