@@ -7,5 +7,27 @@
 # ff() { find . -type f -regex $@; }
 # fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
 # alias ff='find ./ | grep -i '
-#
-# fd='fd -H'
+
+alias ff='command fd -Htf'
+alias ffg='ff -g'
+alias ff0='ff -0'
+alias ff1='ff -d1'
+alias ff2='ff -d2'
+
+alias fF='command fd -tf'
+alias fFg='fF -g'
+alias fF0='fF -0'
+alias fF1='fF -d1'
+alias fF2='fF -d2'
+
+alias fd='command fd -Htd'
+alias fdg='fd -g'
+alias fd0='fd -0'
+alias fd1='fd -d1'
+alias fd2='fd -d2'
+
+alias fD='command fd -td'
+alias fDg='fD -g'
+alias fD0='fD -0'
+alias fD1='fD -d1'
+alias fD2='fD -d2'
