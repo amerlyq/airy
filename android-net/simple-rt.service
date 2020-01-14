@@ -2,10 +2,18 @@
 Description=SimpleRT Daemon
 
 [Service]
-Type=idle
-ExecStart=/usr/lib/simple-rt/simple-rt -i enp5s0
+# Type=simple
 WorkingDirectory=/usr/lib/simple-rt
+ExecStart=/usr/lib/simple-rt/simple-rt -i wlo1
 Restart=always
+RestartSec=1
+
+PrivateTmp=true
+# PrivateDevices=true
+ProtectHome=true
+ProtectSystem=strict
+# ProtectKernelTunables=true
+InaccessibleDirectories=/sys
 
 [Install]
 WantedBy=multi-user.target
