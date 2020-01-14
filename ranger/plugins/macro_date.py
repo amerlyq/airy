@@ -4,18 +4,24 @@
 # date in commands that allow macros.  You can test it with the command
 # ":shell echo %date; read"
 
-# BUG: Error while loading plugin 'macro_date'
+# from __future__ import (absolute_import, division, print_function)
+
+import time
+
+import ranger.core.actions
+
 # Save the original macro function
-# import ranger.core.actions
-# old_get_macros = ranger.core.actions.Actions._get_macros
+GET_MACROS_OLD = ranger.core.actions.Actions.get_macros
+
 
 # Define a new macro function
-import time
 def get_macros_with_date(self):
-    macros = old_get_macros(self)
-    macros['date'] = time.strftime('%Y-%m-%d')
+    macros = GET_MACROS_OLD(self)
     macros['dt'] = time.strftime('%Y%m%d')
+    macros['dT'] = time.strftime('%Y-%m-%d')
+    macros['date'] = time.strftime('%Y/%m/%d')
     return macros
 
+
 # Overwrite the old one
-# ranger.core.actions.Actions._get_macros = get_macros_with_date
+ranger.core.actions.Actions.get_macros = get_macros_with_date
