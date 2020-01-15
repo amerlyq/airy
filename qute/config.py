@@ -609,7 +609,9 @@ c.content.headers.accept_language = 'en-US,en;q=0.5'
 ## Type: Bool
 # c.content.javascript.enabled = True
 c.content.javascript.enabled = False
+config.set('content.javascript.enabled', True, '*://127.0.0.1/*')
 config.set('content.javascript.enabled', True, '*://github.com/*')
+config.set('content.javascript.enabled', True, '*://gitlab.com/*')
 config.set('content.javascript.enabled', True, '*://google.com/*')
 config.set('content.javascript.enabled', True, '*://stackoverflow.com/*')
 config.set('content.javascript.enabled', True, '*://www.google.com/*')
@@ -937,7 +939,8 @@ c.fonts.web.family.serif = 'serif'
 ##   - javascript: Better but slower
 ##   - python: Slightly worse but faster
 # c.hints.find_implementation = 'python'
-c.hints.find_implementation = 'javascript'
+# DISABLED:ERR: not available with QtWebEngine
+# c.hints.find_implementation = 'javascript'
 
 ## Hide unmatched hints in rapid mode.
 ## Type: Bool
@@ -1669,6 +1672,8 @@ config.bind('gn', 'open -t')
 # config.bind('gr', 'tab-move +')
 # config.bind('gt', 'set-cmd-text -s :buffer')
 # config.bind('gu', 'navigate up')
+config.bind('gy', 'open -t -- {clipboard}')
+config.bind('gY', 'open -- {clipboard}')
 # config.bind('h', 'scroll left')
 config.bind('h', 'back')
 # config.bind('i', 'enter-mode insert')
