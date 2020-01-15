@@ -260,51 +260,51 @@ $text .= ",". $tops[1] if @tops > 1;
 $text .= ",(+". (@tops - 2) .")" if @tops > 2;
 $text .= "]";
 
-$text .= " ". $opts{message} if $opts{message};
-
-# DEV: if folder didn't exist before -- use word :: "new", "create", "+"
-my $action = $allmods{$mods[0]};
-
-# IDEA:(fine-tuning): if you add file to some "cmpt-type" subfolder -- use trailing "+"
-#   e.g. "add file ./cmpt/tmpl/new.c" -> "[cmpt] tmpl+ new.c"
-# IDEA: if this added file contains header with "%SUMMARY:" -- use it as message
-#   <= because ctx-based msgs are much better than simple file name duplicated in git log
-
-if (@mods > 1) {
-    $text .= " ". @files ." files" if @files;
-    # BAD: prints "[design] add 10 files 10 binary"
-    #   FIXME: subtract binaries from total files count
-    #   MAYBE: rename to e.g.
-    #     "[design] add 2 text 8 binary files"
-    #     "[design] add 2 files and 8 binary"
-    #     "[design] add 10 files (8 binary)"
-    $text .= " ". @binaries ." binary" if @binaries;
-    $text .= " (". join(" ", map { $_ . $stat{$_} } @mods) .")";
-} elsif (@files > 2) {
-    $text .= " ". $action;
-    $text .= " ". @files ." files" if @files;
-    $text .= " ". @binaries ." binary" if @binaries;
+if ($opts{message}) {
+    $text .= " ". $opts{message};
 } else {
-    my @subpaths = @files;
-    s|^/?.+/|| for @subpaths;
-    $text .= " ". $action ." ". join(",", @subpaths);
+    # DEV: if folder didn't exist before -- use word :: "new", "create", "+"
+    my $action = $allmods{$mods[0]};
+
+    # IDEA:(fine-tuning): if you add file to some "cmpt-type" subfolder -- use trailing "+"
+    #   e.g. "add file ./cmpt/tmpl/new.c" -> "[cmpt] tmpl+ new.c"
+    # IDEA: if this added file contains header with "%SUMMARY:" -- use it as message
+    #   <= because ctx-based msgs are much better than simple file name duplicated in git log
+
+    if (@mods > 1) {
+        $text .= " ". @files ." files" if @files;
+        # BAD: prints "[design] add 10 files 10 binary"
+        #   FIXME: subtract binaries from total files count
+        #   MAYBE: rename to e.g.
+        #     "[design] add 2 text 8 binary files"
+        #     "[design] add 2 files and 8 binary"
+        #     "[design] add 10 files (8 binary)"
+        $text .= " ". @binaries ." binary" if @binaries;
+        $text .= " (". join(" ", map { $_ . $stat{$_} } @mods) .")";
+    } elsif (@files > 2) {
+        $text .= " ". $action;
+        $text .= " ". @files ." files" if @files;
+        $text .= " ". @binaries ." binary" if @binaries;
+    } else {
+        my @subpaths = @files;
+        s|^/?.+/|| for @subpaths;
+        $text .= " ". $action ." ". join(",", @subpaths);
+    }
+
+    # BET? use middle-part "mod/[path/to]/file.txt" :: [mod] chg file.txt in {path/to/}
+    # $text .= " in {". join(",", @dirs) ."}" if @dirs < 2;
+
+
+    # MAYBE: print only number of changed lines -- remove added/deleted whole files from count
+    if ($stat{add} or $stat{del}) {
+        $text .= "  ";
+        $text .= "+". $stat{add} if $stat{add};
+        $text .= "/-". $stat{del} if $stat{del};
+    }
+
+    ## DISABLED: obstructs view more than helps -- better use proper "glG" alias with time
+    # $text .= "  ". strftime("%Y%m%d_%H%M%S", localtime);
 }
-
-
-# BET? use middle-part "mod/[path/to]/file.txt" :: [mod] chg file.txt in {path/to/}
-# $text .= " in {". join(",", @dirs) ."}" if @dirs < 2;
-
-
-# MAYBE: print only number of changed lines -- remove added/deleted whole files from count
-if ($stat{add} or $stat{del}) {
-    $text .= "  ";
-    $text .= "+". $stat{add} if $stat{add};
-    $text .= "/-". $stat{del} if $stat{del};
-}
-
-## DISABLED: obstructs view more than helps -- better use proper "glG" alias with time
-# $text .= "  ". strftime("%Y%m%d_%H%M%S", localtime);
-
 
 if ($opts{commit}) {
     # THINK:USE: --fixup=<commit> for "rebase --autosquash"

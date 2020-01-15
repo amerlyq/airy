@@ -28,6 +28,7 @@ alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstr
 alias gaa='git add --all'
 alias ga.='gaa .'
 alias giU='giu --patch'
+alias gcff='git commit --fixup'
 gcfd(){ local d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
 alias gcss='gcs --stat'
 alias gcsd='gcs --diff-filter=d --pretty=short --show-signature'
@@ -38,6 +39,7 @@ alias gCd='git diff $(gCl)'
 alias gro='git rebase --onto'  # gro master HEAD~1  #: <dst> <point>
 alias grm='git rebase --preserve-merges'
 alias grim='gri --preserve-merges'  # BUG: with -i can be weird!
+alias gria='gri --autostash --autosquash'
 gmo(){ git merge origin/"$1" "${@:2}"; }
 
 alias gfa='git fetch --all --progress --prune --verbose'
