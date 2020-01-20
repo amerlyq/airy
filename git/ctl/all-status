@@ -9,3 +9,7 @@ exec r.git-find | r.git-freeze  ${2+"$2"} \
   | parallel -0 -kX r.git-status {}
 # BAD: counts all escape codes for colors
 # | column -ts $'\t'
+
+
+# BAD: no separate status for my own submodules, which I develop in-place
+#   btrx/beatrix-templates/beatrix/

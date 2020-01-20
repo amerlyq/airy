@@ -31,6 +31,9 @@
 #   ALT: open lightweight vis(1) editor with prepared message and positioned cursor
 #   $ r.git-my-msg --index | git commit --template=/dev/stdin
 #
+# THINK:NICE:ARCH: use *feature-project-task* hierarchy with transparent mapping on architecture
+#   !! then my auto-msg "[feature] chg project/task" will be directly reflecting what you did like any proper commit msg !!
+#
 use warnings FATAL => 'all';
 use autodie;
 use strict;
@@ -272,6 +275,7 @@ if ($opts{message}) {
     #   <= because ctx-based msgs are much better than simple file name duplicated in git log
 
     if (@mods > 1) {
+        # DEV: use {"files" -> "symlinks"} if only symlinks are added/changed
         $text .= " ". @files ." files" if @files;
         # BAD: prints "[design] add 10 files 10 binary"
         #   FIXME: subtract binaries from total files count
