@@ -1,0 +1,29 @@
+
+Kernel IRQ
+  ALG: irq handling
+    https://opus4.kobv.de/opus4-fau/files/6722/report.pdf
+  FIQ and IRQ latency differences | NXP Community
+    https://community.nxp.com/thread/329106
+    https://lkml.org/lkml/2014/7/15/550
+
+
+Kernel / Ethernet
+  REF: https://netbeez.net/blog/iperf2-vs-iperf3/
+  CMP: http://fasterdata.es.net/performance-testing/network-troubleshooting-tools/nuttcp/
+  TARG: $ iperf3 -s
+  HOST:(tcp): $ iperf3 -c localhost -t0
+  HOST:(udp): $ iperf3 -c localhost -t0 -u -b0
+
+  Benchmark scheduler
+    A survey of scheduler benchmarks [LWN.net]
+      https://lwn.net/Articles/725238/
+
+
+Suites
+  TRY: stress-ng
+    http://manpages.ubuntu.com/manpages/bionic/man1/stress-ng.1.html
+    https://stackoverflow.com/questions/57960754/how-to-get-cpu-counters-from-stress-ng-perf
+    https://wiki.ubuntu.com/Kernel/Reference/stress-ng
+  TRY: hackbench
+    http://manpages.ubuntu.com/manpages/xenial/man8/hackbench.8.html
+    USAGE:(irq/scheduler): https://community.nxp.com/thread/329106
