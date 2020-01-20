@@ -256,6 +256,8 @@ my @mods = grep { $stat{$_} } @allmods;
 
 my $text;
 
+# FIXME: instead of semi-random order, sort @tops by number of changes
+#   => then first two features [a,b,(+...)] will have the largest diff
 # FORMAT ::= branch? [tops,..] files dirs?  +X/-Y  YYYYMMdd_hhmmss
 #  files ::= {chg|add|del} {<files>,..} | {chg|add|del} <N> "files" | <N> "files" (M2 A3)
 $text .= "[". $tops[0];
