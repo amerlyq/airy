@@ -1,0 +1,213 @@
+
+RQ
+  * manage all
+    git-annex
+      https://git-annex.branchable.com/
+      + can use rsync(1) to work with cloud
+      + can backend to bup(1)
+      + can part-sync Android https://git-annex.branchable.com/assistant/
+        USAGE:TUT: https://git-annex.branchable.com/assistant/
+      + encrypted cloud w/o git-annex installed in central repo
+        https://git-annex.branchable.com/forum/Shared_repository_without_git-annex_on_central_server/
+        https://git-annex.branchable.com/tips/fully_encrypted_git_repositories_with_gcrypt/
+      + mix sources and data in same repo
+        https://git-annex.branchable.com/tips/largefiles/
+        * auto-decide filter support
+        HACK: use "git add" for textual, and "git annex add" for binaries
+          SRC: https://stackoverflow.com/questions/29160241/git-annex-with-github
+      + archive / historical
+        * keep "qutebrowser.sqlite" history versioned
+        * keep old frozen projects as ondemand shallow-references
+      + metadata
+        https://git-annex.branchable.com/metadata/
+      + STD:(git): branches and tags
+        https://git-annex.branchable.com/walkthrough/
+      + URI scheme
+        READ:(comment): https://git-annex.branchable.com/backends/
+      2020-01-17 [X] TUT: Large files with Git: LFS and git-annex [LWN.net]
+        https://lwn.net/Articles/774125/
+  * large binary
+    git-lfs
+      BAD:(unreliable): Breaking Up With Git LFS
+        https://dustinfreeman.org/blog/rip-lfs/
+        https://towardsdatascience.com/why-git-and-git-lfs-is-not-enough-to-solve-the-machine-learning-reproducibility-crisis-f733b49e96e8
+      G: standalone local server
+        +++ https://github.com/artemkin/git-lfs-server
+        https://secure.phabricator.com/D15485
+        https://stackoverflow.com/questions/57254411/is-it-possible-to-use-git-lfs-without-api-or-other-servers
+          https://github.com/nathasm/git-lfs-rsync-agent
+          + https://github.com/sinbad/lfs-folderstore
+  * slice/view
+  * sync/remote
+  * backup/offline
+    bup -- git-based sync-backup
+      2020-01-17 [X] https://bup.github.io/
+      + dedup even parts of file
+    borg
+      https://borgbackup.readthedocs.io/en/stable/
+      FIND: .vs. bup
+    restic
+      BET:(than borg):CMP: https://git-annex.branchable.com/todo/borg_special_remote/
+    NEED: disaster recovery ripout -- only passwords/GPG to access AmazonGlacier
+  * backup/online (paid)
+    AmazonGlacierDeepArchive($1/TB)
+    hetzner: https://community.hetzner.com/tutorials/install-and-configure-borgbackup?title=BorgBackup/en
+    rsync.net: https://www.rsync.net/products/attic.html
+
+
+USAGE: git-annex
+  SETUP(distributed repo)
+    $ cd /data/annex
+    $ git init
+    $ r.git-my-repo -g
+    $ git annex init "work-$(hostname) repo"
+      FIXME: use v7 file copy instead of symlink
+    $ git remote add "home-$(hostname)" /data/annex
+    $ touch README.rst
+    $ gaa README.rst
+    $ gcm 'Initial commit'
+  ALT: centralized git repo
+    https://git-annex.branchable.com/tips/centralized_git_repository_tutorial/
+  CONVERT
+    $ tops=$(fd -td -d1 |LC_ALL=C sort -f)
+    $ for d in "${(@f)tops}"; do git annex add "$d"; r.git-my-msg --index --commit; done
+    $ git gc --aggressive && git prune
+    $ fd . .git/annex/objects | wc -l
+  REMOTE(rsync via ssh)
+    $ git clone ssh://mylaptop/home/me/annex ~/annex
+    $ cd ~/annex
+    $ git annex init "my desktop"
+  FETCH(all)
+    $ cd /media/usb/annex
+    $ git annex sync laptop
+    $ git annex get .
+      get my_cool_big_file (from laptop...) ok
+      get iso/debian.iso (from laptop...) ok
+  SYNC
+    # metadata only
+    $ git annex sync
+    $ git annex sync --content
+  SYNC + BACKUP
+    https://git-annex.branchable.com/forum/Modus_operandi_for_local_full_backup/
+      * connect the hard drives in my computer
+      * run the borg (or bup) backup
+      * then run $ git annex sync --content $ on all my git-annex repositories
+    IDEA: backup separately "git-annex" and everything else
+      * keeping large files in many archived backups -- is luxury we can't afford
+  MAYBE
+    $ git annex numcopies 2
+    $ git annex copy . --to usbdrive
+    $ echo "*.ogg annex.numcopies=1" >> .gitattributes
+    $ echo "*.flac annex.numcopies=3" >> .gitattributes
+    $ mkdir important_stuff && echo "* annex.numcopies=3" > important_stuff/.gitattributes
+    $ git annex get --auto --numcopies=2
+    $ git annex drop --auto --numcopies=2
+    HACK: hiding files
+      https://git-annex.branchable.com/tips/hiding_missing_files/
+  EDIT
+    https://git-annex.branchable.com/tips/unlocked_files/
+      !! I don't need this readonly symlink thing -- I have hourly snapshots and daily backups to restore files !!
+        BUT: maybe useful to prevent file loss in under 10min ?
+        TRY: $ git annex adjust --unlock
+    # create file copy instead of symlink
+    $ git annex unlock mybigfile
+    # edit file, "annex add" to auto-replace by symlink, and commit back w/o adding anywhere
+    $ git annex add . && git commit
+      NICE! commit has only changed hash
+      FAIL! commit also has type-change 444 <-> 644 between readonly symlink and rw file
+    # replace by symlink
+    $ git annex lock [...]
+  BET:(edit):USE:(btrfs):
+    https://git-annex.branchable.com/bugs/Uses_rsync_instead_of___96__cp_--reflink__61__auto__96___on_volumes_of_the_same_BTRFS_partition/
+    PERF: http://old.datalad.org/test_fs_analysis.html
+      https://git-annex.branchable.com/forum/Filesystem_recommendation___40__ext4__44___btrfs__44___xfs__44___you_name_it__41____63__/
+    https://git-annex.branchable.com/forum/Use_reflinks_on_BTRFS_instead_of_symlinks___63__/
+    $ git annex unlock .
+      == same as  # cp --reflink=auto
+  MAINT
+    $ git annex upgrade
+    $ git annex find --unlocked
+    $ git annex unused
+      https://git-annex.branchable.com/forum/Understanding___34__deletion__34___and___34__dropping__34_____38___cleanup_of_history/
+      = finds files that are not used by the heads of any branches or tags
+      - BAD:CHECK? can't detect if files are referenced by some old commits or totally wild and detouched
+    $ git annex whereis
+    $ git annex fsck
+    ~ $ git annex dropunused 1-1000
+    ~ $ git annex copy --unused --to backup
+    ~ $ git annex move --unused --to archive
+    ALSO: split repo
+      https://git-annex.branchable.com/tips/splitting_a_repository/
+    RQ: $ git stash pop && git annex smudge --update
+      SRC: https://git-annex.branchable.com/tips/unlocked_files/
+    Recovering from a corrupt git repository
+      https://git-annex.branchable.com/tips/recovering_from_a_corrupt_git_repository/
+  REMOVE (if you have no benefits from git-annex)
+    https://stackoverflow.com/questions/24447047/remove-git-annex-repository-from-file-tree/24464323
+    ALT: https://superuser.com/questions/1391188/how-to-copy-files-by-hard-linking-when-dereferencing-symlinks-to-extract-files/1391272#1391272
+    $ git annex uninit
+    OR: $ git unnannex . --fast
+  HACK: intermediate cache for CI
+    https://git-annex.branchable.com/tips/local_caching_of_annexed_files/
+
+
+WARN
+  ARCH: don't use git inside git
+    ++ https://git-annex.branchable.com/forum/n00b_question._Can_I_use_git-annex_to_manage_a_tree_that_contains_git_repos__63__/
+    https://git-annex.branchable.com/forum/Git_repos_in_git_annex__63__/
+    ??? but what to use ???
+  FAIL: don't use hardlinks for non-readonly files (which you intend to modify in future)
+    https://git-annex.branchable.com/bugs/data_loss_from_dedup_when_v7_unlocked_file_is_duplicated__47__truncated/
+    $ echo hi > 1
+    $ echo hi > 2
+    $ git annex add 1 2
+    $ git annex unlock 1
+    $ echo bye > 1
+    $ cat 2
+    # bye
+
+
+IDEA
+  [_] TRY: make all ref-materials readonly (which I'm not supposed to edit or delete)
+  [_] FIND: overlay for git-annex -- to separate each mod in @/airy/* into two layers -- for annex and for *airy*
+  [_] USE: git-subtree to merge all my work into single git-annex and then export changes back into separate repos
+  [_] TRY: use *myrepos* http://myrepos.branchable.com/ to manage multiple git repos
+
+  BET: git-annex + borg
+    DEV: https://git-annex.branchable.com/todo/borg_special_remote/
+    USE: https://git-annex.branchable.com/bugs/data_loss_from_dedup_when_v7_unlocked_file_is_duplicated__47__truncated/
+    SRC: https://github.com/RonnyPfannschmidt/git-annex-borg
+    + http://www.tom-ridge.com/2018-07-09_backup_tools.html
+    https://blog.jak-linux.org/2016/05/11/backing-up-with-borg-and-git-annex/
+
+  git-annex + bup
+    https://git-annex.branchable.com/tips/Bup_repositories_in_git-annex/
+      https://git-annex.branchable.com/forum/git-annex_and_bup_-_the_other_way_around___63____63____63__/
+    https://git-annex.branchable.com/design/assistant/deltas/
+
+
+READ: deep analysis of backup solution
+  [_] CMP: https://wiki.archlinux.org/index.php/Synchronization_and_backup_programs
+  [_] https://anarc.at/services/backup/
+    ~ migrates bup() -> borg()
+    ALSO: https://git-annex.branchable.com/users/anarcat/#index1h1
+  [_] https://dnns.no/backup-with-borg-and-rclone.html
+  [_] https://opensource.com/article/17/10/backing-your-machines-borg
+
+
+MISC
+  FIND: hiding symlinks in ranger
+    <= because aliases are becoming too much
+    MAYBE: use dot-prefixed hidden symlinks for aliases ?
+
+  development / publish
+    conan -- conan_server (private) + JFrog Bintray (OSS)
+    ALT: CMake ExternalData()
+      SRC: https://discourse.slicer.org/t/should-we-use-git-lfs-to-manage-data/2448/7
+
+  ALSO: git-worktree(1) -- multiple checkouted branches
+    USAGE:(git-annex): https://git-annex.branchable.com/tips/Using_git-worktree_with_annex/
+    TALK: https://www.reddit.com/r/git/comments/epd7ma/i_continuously_switch_between_branches_to_test/
+
+  ALSO: git-commit-graph -- for huge git repo
+    https://github.com/git/git/blob/master/Documentation/technical/commit-graph.txt
