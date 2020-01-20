@@ -1,9 +1,14 @@
 #!/bin/bash
 #%USAGE: $ ./$0 [<history|secrets|chat>...]
+#%ONELINE:(fast): $ tar -I lz4 --xattrs -cpvf "$(hostname)-$(date +%Y%m%d_%H%M%S).tar.lz4" ...
+#%  CMP: https://catchchallenger.first-world.info/wiki/Quick_Benchmark:_Gzip_vs_Bzip2_vs_LZMA_vs_XZ_vs_LZ4_vs_LZO#Compression_time
 #%PERF: 6 min = 13 topics = 4.7GB total
 set -euo pipefail
 
 # [_] TRY: /net/backup BAD? store backup directly to NAS -- may corrupt transmitted archives
+# DEV:USE: "pigz" -- parallel gzip
+# BET:PERF: "zstd" from libarchive instead of "xz"
+# BET:TRY: "borg"
 
 ## CHG: place into synced dir from profile
 dst=${BACKUP_DIR_ROOT:-/tmp}
