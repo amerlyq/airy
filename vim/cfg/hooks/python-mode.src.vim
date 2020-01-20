@@ -19,9 +19,10 @@ let g:pymode_doc = 0
 let g:pymode_doc_key = '<leader>K'
 
 " Disabled because of better omni by 'Jedi'
-let g:pymode_rope = 0
-let g:pymode_rope_completion = 0
-let g:pymode_rope_complete_on_dot = 0
+let g:pymode_rope = 1
+let g:pymode_rope_completion = 1
+let g:pymode_rope_complete_on_dot = 1
+let g:pymode_rope_completion_bind = '<C-Space>'
 
 " Support virtualenv  :PymodeVirtualenv <rel_path> -- activate it
 let g:pymode_virtualenv = 1

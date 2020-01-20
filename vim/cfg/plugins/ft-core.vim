@@ -33,8 +33,8 @@ call dein#add('hynek/vim-python-pep8-indent', {
 
 "" DISABLED: too much CPU load when editing
 " mappings: [ [[, ]], [M, ]M, [ai]C, [ai]M ]
+" \ 'rev': 'update_submodules',
 " call dein#add('klen/python-mode', {
-"   \ 'rev': 'develop',
 "   \ 'on_ft': 'python',
 "   \ 'hook_source': _hcat('python-mode.src')})
 
