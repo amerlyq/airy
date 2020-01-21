@@ -259,6 +259,9 @@ paste
   [_] paste with another name
   [_] paste symlink with another name
   [_] move file to another place and remain symlink at previous location
+  [_] auto-relative symlink if pasted inside same vcs repo
+    + else auto-absolute symlink if copied or pasted under global /aura -- use it as web URI
+    + refuse to paste inside repo if abs symlink contains $HOME (prevent leakage of username)
 
 rename
   [_] rename file and touch empty file with prev name -- to immediately edit old named one
