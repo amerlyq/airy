@@ -149,6 +149,15 @@ USAGE: git-annex
     OR: $ git unnannex . --fast
   HACK: intermediate cache for CI
     https://git-annex.branchable.com/tips/local_caching_of_annexed_files/
+  CONFIGURE
+    Per directory numcopies -- to keep movies/serials in single copy only
+      https://git-annex.branchable.com/forum/Per_directory_numcopies/
+        HACK: you can even duplicate them in different folders instead of symlinks -- they will be deduplicated anyway
+      $ echo "*.ogg annex.numcopies=1" >> .gitattributes
+      $ echo "* annex.numcopies=3" > important_stuff/.gitattributes
+    Keep my own notes under git, and everything else -- in git-annex
+      ATT: can't simply ignore all text/* -- because I don't what .html when downloading repo elsewhere
+      ALSO: even simple .txt (like lyrics) may require megabytes of space -- not feasible to copy them on smartphone
 
 
 WARN
@@ -172,6 +181,7 @@ IDEA
   [_] FIND: overlay for git-annex -- to separate each mod in @/airy/* into two layers -- for annex and for *airy*
   [_] USE: git-subtree to merge all my work into single git-annex and then export changes back into separate repos
   [_] TRY: use *myrepos* http://myrepos.branchable.com/ to manage multiple git repos
+    SEE:ALT: related software below on page
 
   BET: git-annex + borg
     DEV: https://git-annex.branchable.com/todo/borg_special_remote/
@@ -193,6 +203,7 @@ READ: deep analysis of backup solution
     ALSO: https://git-annex.branchable.com/users/anarcat/#index1h1
   [_] https://dnns.no/backup-with-borg-and-rclone.html
   [_] https://opensource.com/article/17/10/backing-your-machines-borg
+  [_] https://git-annex.branchable.com/walkthrough/
 
 
 MISC
