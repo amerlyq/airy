@@ -18,13 +18,16 @@ pkgver() {
 }
 
 build() {
-	cd "$srcdir/simple-rt/simple-rt-cli"
-	make
+  cd "$srcdir/simple-rt/simple-rt-cli"
+  make prefix=/usr sbindir=/usr/bin
+}
+
+prepare() {
+  cd "$srcdir/simple-rt/simple-rt-cli"
+  sed -i 's/.*iptables.*/:/' ./iface_up.sh
 }
 
 package() {
-	mkdir -p "$pkgdir/usr/bin"
-	mkdir -p "$pkgdir/usr/lib/simple-rt"
-	install -m755 "$srcdir/$pgkname/simple-rt/simple-rt-cli/simple-rt" "$pkgdir/usr/lib/simple-rt/simple-rt"
-	install -m755 "$srcdir/$pgkname/simple-rt/simple-rt-cli/iface_up.sh" "$pkgdir/usr/lib/simple-rt/iface_up.sh"
+  cd "$srcdir/simple-rt/simple-rt-cli"
+  make install prefix=/usr sbindir=/usr/bin DESTDIR="$pkgdir"
 }
