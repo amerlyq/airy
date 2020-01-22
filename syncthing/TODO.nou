@@ -31,10 +31,10 @@ TODO
   2019-10-31 [X] G: syncthing android through usb
     ::: bring PC and Android under single network
       <= use USB-tethering or USB-reverse-tethering by SimpleRT
-      WARN:SECU: must add firewall rule or reset it BUT! still doesn't work
+      WARN:SECU: reset firewall or add a rule (SEE: :/firewall/cfg/nftables.conf)
         $ sudo nft flush chain inet filter forward
-    BET: use only default USB-tethering $ S.r netctl-ifplugd@enp0s20u2u4u4
-      CHG: "dynamic" to Address=10.1.1.2:22000
+    TRY:BET: use only default USB-tethering $ S.r netctl-ifplugd@enp0s20u2u4u4
+      CHG:(host): "dynamic" to Address=10.1.1.2:22000 BUT: it works even with "default"
     ALT: use only default USB-tethering and redirect packages to new interface as proxy
       https://wiki.archlinux.org/index.php/Syncthing#Running_through_a_proxy
       https://docs.syncthing.net/users/proxying.html

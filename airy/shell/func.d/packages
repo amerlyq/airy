@@ -12,7 +12,7 @@ if [[ -z ${LISTS_STORE_DIR-} ]]; then
   # BAD:HACK: cleanup prev lists to install only current "install"
   find "$LISTS_STORE_DIR" -maxdepth 1 -type f -regextype egrep -regex '.*/(aur|loc|pkg).(list|deps)$' -delete
   # [[ -t 1 ]] && exec > >(r.airy-pretty)
-  trap "r.airy-mods-make tsdir='$AIRY_TMPDIR/ts' flags=-mu '${PWD##*/}'" EXIT
+  trap "r.airy-mods-make tsdir='$AIRY_TMPDIR/ts' flags=-muU '${PWD##*/}'" EXIT
 fi
 
 # Re-install even if git pull is up-to-date (for broken builds)
