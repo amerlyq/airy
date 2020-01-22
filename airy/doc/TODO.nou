@@ -271,7 +271,13 @@ structure
 overlay
   [_] split *airy* into two -- system-wide and user-specific
     * install system-wide configs through unified PKGBUILD
+      => install both user and system through PKGBUILD, but use +setguid+ bit
+        to set change installed files group/user to my own
     ?? how to be with user-specific configs which can be updated on-the-fly ?
+      NOTE: *airy* with symlinks instead of full install procedure is the same as C++/Lisp edited in runtime
+        + you have fast change-reload-try REPL cycle in development
+        - you security circles and deps are very messy
+      => it seems I use mixed style between the two -- partial "dynamic configuration" and partial "systemwide install"
   [_] TODO: replace "tmpl/" dirs with overlays from private repo AIRY_OVERLAY_PATH=overlay1:overlay2
     e.g. $ linkcp -ct "/etc/X11/xorg.conf.d" ./tmpl/90-monitor-xrandr.conf
   [_] USE: path-like fallback instead of unordered symlinks in ~/.config/airy/mod
