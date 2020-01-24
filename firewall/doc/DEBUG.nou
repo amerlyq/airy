@@ -1,0 +1,31 @@
+SEE
+  2020-01-23 [X] TUT: https://serverfault.com/questions/696182/debugging-iptables-and-common-firewall-pitfalls
+  [_] https://docs.netgate.com/pfsense/en/latest/firewall/firewall-rule-troubleshooting.html
+  [_] https://books.google.com.ua/books?id=qyWhLU1armgC&pg=PA274&lpg=PA274&dq=debug+if+firewall+blocks+packages&source=bl&ots=Ps5SsdBSz2&sig=ACfU3U0WAEBs22PTk7uOEOkdQGDdnh9dRw&hl=en&sa=X&ved=2ahUKEwiFr4WY65fnAhXezMQBHWnpDs0Q6AEwDXoECAgQAQ
+  [_] https://www.thegeekstuff.com/2012/08/iptables-log-packets/
+  ALSO: What are the canonical answers we've discovered over the years? - Meta Server Fault
+    VIZ: https://meta.serverfault.com/questions/1986/what-are-the-canonical-answers-weve-discovered-over-the-years
+    2020-01-23 [X] https://serverfault.com/questions/463366/does-getting-disconnected-from-an-ssh-session-kill-your-programs
+    2020-01-23 [60%] https://serverfault.com/questions/531941/i-am-under-ddos-what-can-i-do
+    2020-01-23 [X] https://serverfault.com/questions/323706/what-should-i-do-about-a-misbehaving-user
+    2020-01-23 [X] https://serverfault.com/questions/184524/switching-to-ipv6-implies-dropping-nat-is-that-a-good-thing
+    [_] https://serverfault.com/questions/426183/how-does-ipv6-subnetting-work-and-how-does-it-differ-from-ipv4-subnetting
+
+
+ALG
+  Dump iptables rules with automatic counters
+    $# iptables -L -v -n -t nat --line-numbers
+    $# iptables-save
+    ALSO: ip6tables
+  Dump nftables rules with manually added counters (no automatic)
+  Service is listening on the correct network interface/ip-address/port
+    $# netstat -plnut
+    $# ss -tnlp
+  Emulate listener
+    $ nc -l -p 1234
+    $ openssl s_server -accept 1234
+      # = secured TLS/SSL SEE: $ man s_server
+  Verify connection from !local! and remote host
+    $ telnet <IP of Server> 1234
+    $ echo "Hello" | nc <IP of Server> 1234
+    $ service openssl s_client -connect <IP of Server>:1234
