@@ -971,6 +971,12 @@ c.fonts.web.family.serif = 'serif'
 ## Type: Bool
 # c.hints.scatter = True
 
+c.hints.selectors["code"] = [
+    # Selects all code tags whose direct parent is not a pre tag
+    ":not(pre) > code",
+    "pre"
+]
+
 ## Make characters in hint strings uppercase.
 ## Type: Bool
 # c.hints.uppercase = False
@@ -1730,6 +1736,7 @@ config.bind('l', 'forward')
 # config.bind('yP', 'yank pretty-url -s')
 # config.bind('yT', 'yank title -s')
 # config.bind('yY', 'yank -s')
+config.bind('yc', 'hint code userscript code_select.py')
 # config.bind('yd', 'yank domain')
 # config.bind('yp', 'yank pretty-url')
 # config.bind('yt', 'yank title')
