@@ -1,5 +1,6 @@
 " vim:ts=2:sw=2:sts=2
 " NOTE: cmap: C-R,C-G inserts current file name
+" ONELINE: :nmap cp :let @+ = "  ".expand("%:p").":".line(".").":\n    ".substitute(getline("."),'^\s\+','','')<CR>
 ":s;|;\\^M|;g  | split pipe on multiline
 "To comment (instead of C-V): select by S-V, then type : s/^/#
 " list all occurrences of word under cursor in current buffer: [I

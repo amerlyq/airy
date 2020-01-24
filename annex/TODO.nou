@@ -177,6 +177,10 @@ WARN
 
 
 IDEA
+  [_] TODO: use absolute symlinks pointing to /x/.git/annex/objects/* instead of relative ones
+    => then moving symlinks won't break them
+    https://github.com/powderhouse/git-annex/blob/master/Annex/Link.hs
+    http://hackage.haskell.org/package/git-annex-3.20110915/src/debian/git-annex/usr/share/doc/git-annex/html/bugs/git_rename_detection_on_file_move.html
   [_] TRY: make all ref-materials readonly (which I'm not supposed to edit or delete)
   [_] FIND: overlay for git-annex -- to separate each mod in @/airy/* into two layers -- for annex and for *airy*
   [_] USE: git-subtree to merge all my work into single git-annex and then export changes back into separate repos
