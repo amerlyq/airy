@@ -5,6 +5,12 @@ ARCH: everything must mimic (fractal) underlying structure for maximum transpare
 DEV
   [_] create *airy* mod to manage private overlay settings of user
     i.e. to automate creation and maintenance of erian
+  [_] IDEA: use read-only OverlayFS to temporarily merge *airy*,
+    its many layers of extensions, and end-user configuration
+    https://wiki.archlinux.org/index.php/Overlay_filesystem
+      https://www.kernel.org/doc/Documentation/filesystems/
+    https://www.datalight.com/blog/2016/01/27/explaining-overlayfs-%E2%80%93-what-it-does-and-how-it-works
+    NICE: it's much simpler than my ./bin/cfg-overlay script
 
 
 IDEA: use sfx symbols to explicitly choose overlay for each cfg file individually
