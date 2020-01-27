@@ -3,6 +3,7 @@
 ## Status
 alias gs='{ git status -sb && git --no-pager stash list; }'
 alias gsu='{ git status -sbu && git --no-pager stash list; }'
+alias gwu='git ls-files --others --exclude-standard'  # ALT:(dry): git add -A -n
 
 # OR:(more precise): grep -P '^.?[!](?=\\s)' || grep -iP '^.?\\K${i}(?=\\s)'
 alias gwsi="git -c color.status=always status -s --ignored=traditional    | grep --color=never -E '.?[!]\\B'"
