@@ -258,6 +258,10 @@ my $text;
 
 # FIXME: instead of semi-random order, sort @tops by number of changes
 #   => then first two features [a,b,(+...)] will have the largest diff
+# ALT:BET: if @tops > 1 feature :: use '[#]' or '[%]' marker -- to detect easily inside git history
+#   BUT: what about '[.]' or '[:]' or '[%]' for pj root files -- first one is relative to pwd, and last one -- like nou.vim
+#   MAYBE: redefine nou.vim defaults to make ./rel/path always counted from file itself, and %/rel/path from $PWD
+#     BAD: it conflicts with expand('%') in vim, and '[.]' will mean current file and not project root anyway
 # FORMAT ::= branch? [tops,..] files dirs?  +X/-Y  YYYYMMdd_hhmmss
 #  files ::= {chg|add|del} {<files>,..} | {chg|add|del} <N> "files" | <N> "files" (M2 A3)
 $text .= "[". $tops[0];
