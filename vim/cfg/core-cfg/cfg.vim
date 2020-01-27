@@ -73,6 +73,7 @@ set nostartofline   " keep column when  <C-[fbud]> or [ggGHML], :25
 set spellfile=$VIMHOME/spell/en.utf-8.add  " One file of mixed content
 set spellcapcheck=  " Don't auto-capitilize suggested words
 nnoremap <unique> [Toggle]s  :setl spell! spelllang=en_us,ru_yo,uk spell?<CR>
+if !filereadable(&spellfile . '.spl')| exe 'mkspell' &spellfile |en
 
 
 " Set keyword help.
