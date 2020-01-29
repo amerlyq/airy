@@ -5,14 +5,17 @@
 # SPDX-License-Identifier: MIT
 #
 #%SUMMARY: copy current title/url or use selected text as title
-#%USAGE: :bind yn spawn --userscript yank_nou
-#%OR(with-args): :bind <somekey> set-cmd-text -s :spawn --userscript yank_nou
+#%USAGE: :bind yv spawn --userscript yank_nou
+#%OR(with-args): :bind yV set-cmd-text -s :spawn --userscript yank_nou
 #%DEBUG: $ QUTE_COUNT=2 QUTE_TITLE=aaa QUTE_URL=bbb ./yank_nou
 set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
-count=${QUTE_COUNT:-0}
+# HACK: use count=10 to use no indent
+count=$(( ${QUTE_COUNT:-1} % 10 ))
+
+pfx=${1-}
 
 exec xsel -ib <<EOT
-$(printf "%$((count * 2))s")${QUTE_SELECTED_TEXT:-$QUTE_TITLE}
+$(printf "%$((count * 2))s")${pfx}${QUTE_SELECTED_TEXT:-$QUTE_TITLE}
 $(printf "%$(((count + 1) * 2))s")$QUTE_URL
 EOT
