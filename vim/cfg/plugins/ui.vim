@@ -33,3 +33,7 @@ call dein#add('zhaocai/GoldenView.Vim', {'lazy': 0,
 " \\n   call GoldenView#ExtendProfile('small-height', {'other_window_winheight': 2})
 " \\n   let g:goldenview__active_profile = 'small-height'
 " \"})
+
+"" SEE:
+" https://www.reddit.com/r/vim/comments/ersy6g/quickui_update_new_widgets_to_preview_tags_and/
+" https://www.reddit.com/r/vim/comments/eudnd8/welllecontextvim_update_use_vim_popupsneovim/

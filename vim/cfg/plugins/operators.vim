@@ -12,6 +12,8 @@ call dein#add('kana/vim-operator-user', {'lazy': 0,
 " BUG: Impossible character to use as surround: qab\
 " FIXME: don't exclude surrounding spaces when adding quotes
 " ALT: (TODO: compare code) https://github.com/machakann/vim-sandwich
+"   TALK: https://www.reddit.com/r/vim/comments/esrfno/why_vimsandwich_and_not_surroundvim/
+"   CMP: https://joereynoldsaudio.com/2020/01/22/vim-sandwich-is-better-than-surround.html
 " CHG mappings: [[nx, q[adr]], [n, q[bBfFQ], q[({[&quot'<`] ]
 " DEPRECATED:
 "   - (bloated) tpope/vim-surround
