@@ -6,6 +6,9 @@
 # BAD: --all-text => skips '--ignore'
 alias ag='command ag --smart-case --group'
 
+# NICE: interactively fuzzy-search text line and open it in vim
+ks(){ sk --ansi -i -c 'ag --follow --color "{}"' | sed -ur 's/(:[0-9]+:).*/\1/' | ifne xargs -L1 -d\\n r.vim; }
+
 if _has_pr ag
 then agi() { command ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' "$@"; }
 else agi() { grep -ri "$@" .; }  # --include=*.{cc,h}
@@ -43,5 +46,5 @@ vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
         # -c "let g:syntastic_mode_map['mode']='passive'" -c "NeoCompleteDisable" \
 }
 
-vimf(){ ag -g $@ | $EDITOR -; }
+vimf(){ ag -g "$@" | $EDITOR -; }
 # vimq(){ $EDITOR -q <(agi --vimgrep $@); }  # Don't work in bash 4.1.5? in ubuntu12?

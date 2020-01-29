@@ -263,6 +263,8 @@ my $text;
 #   BUT: what about '[.]' or '[:]' or '[%]' for pj root files -- first one is relative to pwd, and last one -- like nou.vim
 #   MAYBE: redefine nou.vim defaults to make ./rel/path always counted from file itself, and %/rel/path from $PWD
 #     BAD: it conflicts with expand('%') in vim, and '[.]' will mean current file and not project root anyway
+#   ALSO:NEED: detect primary feature even for @tops > 1
+#     == often I add new feature [client] and fix integration in [ctl] to enable it but it's still part of [client] feature
 # FORMAT ::= branch? [tops,..] files dirs?  +X/-Y  YYYYMMdd_hhmmss
 #  files ::= {chg|add|del} {<files>,..} | {chg|add|del} <N> "files" | <N> "files" (M2 A3)
 $text .= "[". $tops[0];

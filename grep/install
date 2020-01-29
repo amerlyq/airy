@@ -10,9 +10,13 @@ source ~/.shell/func.d/packages
 #   BUT: no support for look-ahead/behind:  (?=..), (?<=..)
 # aur_inst sift-bin
 
+# ALT: fuzzy-grep
+#   skim :: https://github.com/lotabout/skim
+#   aur/goagrep-git
+#   aur/agrep-git
 # ALT: cgrep :: http://awgn.github.io/cgrep/
 # VIZ: grep egrep fgrep
-pkg_inst grep
+pkg_inst grep skim
 
 if distro arch; then
   # TRY:BET: pkg_inst ripgrep  USAGE: rg

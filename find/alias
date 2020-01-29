@@ -8,25 +8,25 @@
 # fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
 # alias ff='find ./ | grep -i '
 
-alias ff='command fd -Htf'
+alias ff='command fd -Htf -E .git'
 alias ff.='ff -g'
 alias ff0='ff -0'
 alias ff1='ff -d1'
 alias ff2='ff -d2'
 
-alias fF='command fd -tf'
+alias fF='command fd -tf -E .git'
 alias fF.='fF -g'
 alias fF0='fF -0'
 alias fF1='fF -d1'
 alias fF2='fF -d2'
 
-alias fd='command fd -Htd'
+alias fd='command fd -Htd -E .git'
 alias fd.='fd -g'
 alias fd0='fd -0'
 alias fd1='fd -d1'
 alias fd2='fd -d2'
 
-alias fD='command fd -td'
+alias fD='command fd -td -E .git'
 alias fD.='fD -g'
 alias fD0='fD -0'
 alias fD1='fD -d1'
