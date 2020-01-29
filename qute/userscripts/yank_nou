@@ -10,8 +10,13 @@
 #%DEBUG: $ QUTE_COUNT=2 QUTE_TITLE=aaa QUTE_URL=bbb ./yank_nou
 set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
+# NOTE: cache last indent count
+cache=$TMPDIR/qute.cfg
+[[ ${QUTE_COUNT-} ]] || [[ ! -f $cache ]] || QUTE_COUNT=$(sed -n '/^[0-9]$/s//\0/p;q' "$cache")
+
 # HACK: use count=10 to use no indent
 count=$(( ${QUTE_COUNT:-1} % 10 ))
+echo "$count" >| "$cache"
 
 pfx=${1-}
 
