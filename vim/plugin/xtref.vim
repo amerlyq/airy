@@ -82,7 +82,7 @@ fun! xtref#ctags(root, ...)
     let cmd .= " --exclude=".shellescape(g)
   endfor
 
-  echom cmd
+  " DEBUG: echom cmd
   let _ = join(xtref#call_at(a:root, 'systemlist', cmd), '\n')
   echom "Done: gen xtref tags for ". a:root
 endf
