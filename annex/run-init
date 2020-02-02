@@ -1,0 +1,80 @@
+#!/usr/bin/env zsh
+#%SUMMARY: initialize cloned git-annex repo to default settings
+#%USAGE: $ ./$0
+set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+
+### GENERIC ######################################
+
+## MAINT: I prefer to run $ git annex upgrade $ only when mentally prepared to fix problems
+git config --local 'annex.autoupgraderepository' false
+
+## SECU: don't store keys in files, better use memory-only GPG encrypted keys
+git config --local 'annex.cachecreds' false
+
+## CHECK: it seems by disabling it git-annex assistant won't auto-restart ?
+git config --local 'annex.autoupgrade' false
+
+
+
+### ADD ##########################################
+
+# NOTE: I don't care about "special/broken" programs at all,
+# therefore I don't need hashing with SHA256E extension
+# NICE: the same files {./aaa.jpg, ./aaa.JPG, ./aaa.56.jpg} will have same hash
+git config --local 'annex.backend' SHA256
+
+## DECI? "git add" will never add files to git-annex
+## FAIL: may accidentally add large files by 'gaa'
+# git config --local 'annex.gitaddtoannex' false
+git config --local 'annex.gitaddtoannex' true
+
+## DECI: skip small files in annex, use solely "git add"
+## BET? keep small files untouched to commit with better msg
+git config --local 'annex.addsmallfiles' false
+
+## NOTE: generate git-annex branch metainformation
+## HACK:(metadata): used to create focused *view* branches
+# * file: modification month, day, year
+# * feed: author, title
+# BAD:PERF:THINK: not sure if it's worth it
+#   => maybe use only :: https://github.com/przemoc/metastore
+# git config --local 'annex.genmetadata' true
+git config --local 'annex.genmetadata' false
+
+## NOTE: use all available CPU
+git config --local 'annex.jobs' cpus
+
+
+# DEBUG: $ git annex matchexpression 'largerthan=100kb or not (mimetype=text/* or mimetype=inode/x-empty)' --file=my.txt --size=100kb --mimetype=text/x-empt --largefiles
+git annex config --set 'annex.largefiles' \
+  'largerthan=100kb or not (mimetype=text/* or mimetype=inode/x-empty)'
+
+
+
+### CHECKOUT #####################################
+
+## NOTE: always unlock my drawing-projects
+## TODO: enable after CHECK
+# git annex config --set 'annex.addunlocked' \
+#   'include=*.kra'
+
+
+
+### SYNC #########################################
+
+## NOTE: checked by "git annex drop" and "git annex {--all|--unused|--key}"
+## WARN:CHECK: maybe will keep copies even for old deleted files still in history (--unused)
+git annex numcopies 2
+
+## NOTE: prevent "git-annex sync" from doing commit
+#  I prefer using my own heuristics from r.git-my-msg for commit msg
+## TODO: enable after CHECK
+git annex config --set 'annex.autocommit' false
+
+## FIND: how exactly "annex.resolvemerge" resolves merge
+## TODO: enable after CHECK
+# git annex config --set 'annex.resolvemerge' false
+
+## NOTE: always sync both metadata and content
+## TODO: enable after CHECK
+# git annex config --set 'annex.synccontent' true

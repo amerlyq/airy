@@ -1,0 +1,52 @@
+%%%% USAGE: git-annex
+
+
+%% Initial setup
+
+  SETUP(distributed repo)
+    $ cd /data/annex
+    $ git init
+    $ r.git-my-repo -m
+    $ git annex init "work-$(hostname)"
+      FIXME: use v7 file copy for BTRFS instead of symlink i.e. unlock everything
+    $ git remote add "home-$(hostname)" /data/annex
+    $ touch README.rst
+    $ gaa README.rst
+    $ gcm 'Initial commit'
+
+  CONVERT
+    $ tops=$(fd -td -d1 |LC_ALL=C sort -f)
+    $ for d in "${(@f)tops}"; do git annex add "$d"; r.git-my-msg --index --commit; done
+    $ git gc --aggressive && git prune
+    $ fd . .git/annex/objects | wc -l
+
+
+%% Setup remote sync
+
+  ALT: centralized git repo
+    https://git-annex.branchable.com/tips/centralized_git_repository_tutorial/
+
+  REMOTE(rsync via ssh)
+    $ git clone ssh://mylaptop/home/me/annex ~/annex
+    $ cd ~/annex
+    $ git annex init "my desktop"
+
+  FETCH(all)
+    $ cd /media/usb/annex
+    $ git annex sync laptop
+    $ git annex get .
+      get my_cool_big_file (from laptop...) ok
+      get iso/debian.iso (from laptop...) ok
+
+  SYNC
+    # metadata only
+    $ git annex sync
+    $ git annex sync --content
+
+  SYNC + BACKUP
+    https://git-annex.branchable.com/forum/Modus_operandi_for_local_full_backup/
+      * connect the hard drives in my computer
+      * run the borg (or bup) backup
+      * then run $ git annex sync --content $ on all my git-annex repositories
+    IDEA: backup separately "git-annex" and everything else
+      * keeping large files in many archived backups -- is luxury we can't afford

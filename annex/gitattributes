@@ -1,0 +1,18 @@
+#%SUMMARY: default settings for newly created git-annex repos
+#%USAGE: $ cp -vt /path/to/annex-repo/ -- ./$0
+#%ATT:(when using git-annex *view*): only top-level .gitattributes file
+#%  is preserved -- other will disappear and will have no effect
+#%WARN! git annex {--all|--unused|--key} will bypass .gitattributes
+#%  -- they operate on SHA instead of paths
+
+# NOTE: I don't care about "special/broken" programs at all,
+# therefore I don't need hashing with SHA256E extension
+# NICE: the same files {./aaa.jpg, ./aaa.JPG, ./aaa.56.jpg} will have same hash
+* annex.backend=SHA256
+
+## THINK: for which large files it can be useful
+# *.kra annex.backend=WORM
+
+## NOTE: overrides all other "numcopies" settings
+## WARN: never set to numcopies=0
+# *.kra annex.numcopies=3

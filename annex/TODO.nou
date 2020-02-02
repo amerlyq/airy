@@ -33,6 +33,8 @@ RQ
       BAD:(unreliable): Breaking Up With Git LFS
         https://dustinfreeman.org/blog/rip-lfs/
         https://towardsdatascience.com/why-git-and-git-lfs-is-not-enough-to-solve-the-machine-learning-reproducibility-crisis-f733b49e96e8
+      Piggyback comparison to alternatives
+        https://cran.r-project.org/web/packages/piggyback/vignettes/alternatives.html
       G: standalone local server
         +++ https://github.com/artemkin/git-lfs-server
         https://secure.phabricator.com/D15485
@@ -52,55 +54,16 @@ RQ
       BET:(than borg):CMP: https://git-annex.branchable.com/todo/borg_special_remote/
     NEED: disaster recovery ripout -- only passwords/GPG to access AmazonGlacier
   * backup/online (paid)
-    AmazonGlacierDeepArchive($1/TB)
+    AmazonGlacierDeepArchive($1/TB) -- slow recovery ⌇>TTnu
     hetzner: https://community.hetzner.com/tutorials/install-and-configure-borgbackup?title=BorgBackup/en
     rsync.net: https://www.rsync.net/products/attic.html
+      ALT:(fast): git-annex($15/TB) https://www.rsync.net/products/git-annex-pricing.html
+    AWS CodeCommit Pricing | Amazon Web Services
+      https://aws.amazon.com/codecommit/pricing/
 
 
-USAGE: git-annex
-  SETUP(distributed repo)
-    $ cd /data/annex
-    $ git init
-    $ r.git-my-repo -g
-    $ git annex init "work-$(hostname) repo"
-      FIXME: use v7 file copy instead of symlink
-    $ git remote add "home-$(hostname)" /data/annex
-    $ touch README.rst
-    $ gaa README.rst
-    $ gcm 'Initial commit'
-  ALT: centralized git repo
-    https://git-annex.branchable.com/tips/centralized_git_repository_tutorial/
-  CONVERT
-    $ tops=$(fd -td -d1 |LC_ALL=C sort -f)
-    $ for d in "${(@f)tops}"; do git annex add "$d"; r.git-my-msg --index --commit; done
-    $ git gc --aggressive && git prune
-    $ fd . .git/annex/objects | wc -l
-  REMOTE(rsync via ssh)
-    $ git clone ssh://mylaptop/home/me/annex ~/annex
-    $ cd ~/annex
-    $ git annex init "my desktop"
-  FETCH(all)
-    $ cd /media/usb/annex
-    $ git annex sync laptop
-    $ git annex get .
-      get my_cool_big_file (from laptop...) ok
-      get iso/debian.iso (from laptop...) ok
-  SYNC
-    # metadata only
-    $ git annex sync
-    $ git annex sync --content
-  SYNC + BACKUP
-    https://git-annex.branchable.com/forum/Modus_operandi_for_local_full_backup/
-      * connect the hard drives in my computer
-      * run the borg (or bup) backup
-      * then run $ git annex sync --content $ on all my git-annex repositories
-    IDEA: backup separately "git-annex" and everything else
-      * keeping large files in many archived backups -- is luxury we can't afford
   MAYBE
-    $ git annex numcopies 2
     $ git annex copy . --to usbdrive
-    $ echo "*.ogg annex.numcopies=1" >> .gitattributes
-    $ echo "*.flac annex.numcopies=3" >> .gitattributes
     $ mkdir important_stuff && echo "* annex.numcopies=3" > important_stuff/.gitattributes
     $ git annex get --auto --numcopies=2
     $ git annex drop --auto --numcopies=2
@@ -234,3 +197,11 @@ MISC
 
   ALSO: git-commit-graph -- for huge git repo
     https://github.com/git/git/blob/master/Documentation/technical/commit-graph.txt
+
+
+READ: NICE! reading about major new features in major projects is mind-blowing and contains many useful arch patterns !!
+  [_] NEED:DEV: consume NEWS streams inside my generic aura workflow
+  2020-02-01 [80%] Highlights from Git 2.24 - The GitHub Blog
+    https://github.blog/2019-11-03-highlights-from-git-2-24/
+  [_] Highlights from Git 2.23 - The GitHub Blog ⌇C:Tnu
+    https://github.blog/2019-08-16-highlights-from-git-2-23/
