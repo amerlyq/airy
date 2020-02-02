@@ -1,0 +1,4 @@
+2020-02-01 [X] TASK: which chars are "free" in z85
+  BET:SEE: https://rfc.zeromq.org/spec:32/Z85/
+  $ printf '%b\n' $(printf '\\x%x\n' {32..126}) | grep -vxFf <(fold -w1 <<<'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#') | paste -sd '' Y
+  #  "',;\_`|~

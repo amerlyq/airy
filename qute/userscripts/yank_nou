@@ -20,7 +20,10 @@ echo "$count" >| "$cache"
 
 pfx=${1-}
 
+# HACK: timestamp working as xref
+ts=$(printf '%08x' "$(date +%s)" | xxd -r -p | basenc --z85 | rev)
+
 exec xsel -ib <<EOT
-$(printf "%$((count * 2))s")${pfx}${QUTE_SELECTED_TEXT:-$QUTE_TITLE}
+$(printf "%$((count * 2))s")${pfx}${QUTE_SELECTED_TEXT:-$QUTE_TITLE} ⌇$ts
 $(printf "%$(((count + 1) * 2))s")$QUTE_URL
 EOT

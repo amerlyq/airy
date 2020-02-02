@@ -1,0 +1,8 @@
+HACK: binary files also have "date of creation" which can be used to identify them
+  -- you can refer them "as whole" if all dates are unique and preserved in metadata
+    <= however, even if you find multiple files created at the same second -- it's not a big deal either
+  ~~ of course, it's reasonable only for manually created files of any significance
+    -- which you can't produce faster than one per second, like with automatic scripts
+    THINK: also use nanoseconds beside seconds to also refer batch-created files
+    BUT: also must encode "node" to refer files created at the same time on different platforms
+  ALT: for textual files you can add mark inside file header around usual #vim:ft=...

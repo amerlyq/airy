@@ -1,0 +1,15 @@
+DEV: annotate each idea/outline by tiny flag to ref back ⌇unReK
+
+NICE! actually simple creation date unsigned timestamp will do the best for oncoming 70 years, even if it wraps afterwards !!
+
+* base64(^XjT1Gw==)              $ printf '%08x' $(date +%s) | xxd -r -p | basenc --base64url
+* z85(unReK)                     $ printf '%08x' $(date +%s) | xxd -r -p | basenc --z85
+* Z85(@Cq4hm7j47)                $ printf '%08x' "$(date +%s%N)" | xxd -r -p | basenc --z85 | rev | tr -d \\n
+* uuid128(0MBEVx+<45Za$}^N{!I#)  $ uuidgen --random | tr -d - | xxd -p -r | basenc --z85
+
+BET: reverse order of string to better distribute time-keys inside hashmap space of cached db
+  e.g(⌇#NRnu) $ printf '%08x' $(date +%s) | xxd -r -p | basenc --z85 | rev | tr -d \\n Y
+
+NICE
+  +++ such keys are much more visually distinct than keys with same prefix
+  -- inside single file it becomes harder to spot lines added at the same time

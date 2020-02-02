@@ -1,4 +1,10 @@
-" Name: Notches
+" ⌇<%:nu
+" SPDX-FileCopyrightText: 2020 Dmytro Kolomoiets <amerlyq@gmail.com>
+" SPDX-License-Identifier: GPL-3.0-only
+" SPDX-PackageName: vim-notches
+" SPDX-PackageSummary: keywords/syntax overlay to annotate comments and notes
+"
+
 " Fast highlighting: match Error /ENOMEM/
 " SEE: https://github.com/inkarkat/vim-mark
 "%USAGE: show all notches :: execute ":/#.*\u\{3,}:", then ":Fs"

@@ -1,0 +1,9 @@
+ALSO:IDEA: to refer another user on same domain, or to cross-domain issuer, you can use prefix:
+  | ⌘user[@host]:unRtV |
+  | ⌘user[@host]`unRtV |
+  = automatically split by ":", access "user@host" db index and find definition of reference "unRtV" there
+    e.g. by directly accessing foreign server or by cloning all its repos into named directory /z/user@host/...
+    BET? store xattr "user.xref.domain = user@host" for downloaded foreign files/folders to refer from your own notes
+  ALT:BET? len(sfx) is always eq 5, therefore we can instead always use head as node-id
+  "/⌘\S{5,}/[:-6]"  <= cool hack, always works, results in empty node-id
+  "/⌘(\S+[:`])?\S{5}/[:-6]"

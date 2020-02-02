@@ -20,7 +20,7 @@
 "{{{1 Ctags/Mappings ============================
 
 "" TODO Make tags placed in .git/tags file available in all levels of a repository
-" --> This idea is compatible with nou.vim concept of cross-links
+" --> This idea is compatible with nou.vim concept of cross-links ※Gg-nu
 " let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
 " if gitroot != ''
 "     let &tags = &tags . ',' . gitroot . '/.git/tags'
