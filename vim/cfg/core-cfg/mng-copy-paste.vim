@@ -111,7 +111,8 @@ cnoremap <C-y> <C-R>=CopyToClipboard(getcmdline())<CR><C-H>
 " nnoremap <leader><Space>/ :<C-U>call CopyToClipboard(@/)<CR>
 " vnoremap <leader><Space>/ :<C-U><C-R>=TrimLines(GetVisualSelection('\n')))<CR>
 "" NOTE: copy current path DFL: let @" = expand('%:p:~') ALT: 1<C-g>
-noremap  <leader>% :<C-U>call CopyToClipboard(expand('%:p:~'))<CR>
+noremap  [Frame]%  :<C-U>call CopyToClipboard(expand('%:p:~'))<CR>
+noremap  <leader>% :<C-U>call CopyToClipboard('./'.expand('%:t'))<CR>
 " Open commandline with copied text
 nnoremap <leader>; :<C-R>"
 vnoremap <leader>; :<C-U><C-R>=GetVisualSelection(" ")<CR>
