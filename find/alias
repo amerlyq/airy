@@ -8,26 +8,53 @@
 # fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
 # alias ff='find ./ | grep -i '
 
-alias ff='command fd -Htf -E .git'
+alias fa='command fd -E .git -E _build\*'
+alias fa.='fa -g'
+alias fa0='fa -0'
+alias fa1='fa -d1'
+alias fa2='fa -d2'
+
+alias fA='fa -I --show-errors'
+alias fA.='fA -g'
+alias fA0='fA -0'
+alias fA1='fA -d1'
+alias fA2='fA -d2'
+
+alias fe='fa -Hte'
+alias fx='fa -Htx'
+
+alias ff='fa -Htf'
 alias ff.='ff -g'
 alias ff0='ff -0'
 alias ff1='ff -d1'
 alias ff2='ff -d2'
 
-alias fF='command fd -tf -E .git'
+alias fF='fa -tf'
 alias fF.='fF -g'
 alias fF0='fF -0'
 alias fF1='fF -d1'
 alias fF2='fF -d2'
 
-alias fd='command fd -Htd -E .git'
+alias fd='fa -Htd'
 alias fd.='fd -g'
 alias fd0='fd -0'
 alias fd1='fd -d1'
 alias fd2='fd -d2'
 
-alias fD='command fd -td -E .git'
+alias fD='fa -td'
 alias fD.='fD -g'
 alias fD0='fD -0'
 alias fD1='fD -d1'
 alias fD2='fD -d2'
+
+alias fl='fa -Htl'
+alias fl.='fl -g'
+alias fl0='fl -0'
+alias fl1='fl -d1'
+alias fl2='fl -d2'
+
+alias fL='fa -tl'
+alias fL.='fL -g'
+alias fL0='fL -0'
+alias fL1='fL -d1'
+alias fL2='fL -d2'
