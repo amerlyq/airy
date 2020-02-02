@@ -20,17 +20,20 @@ url=${3:-$(git config --get remote.origin.url | sed '{s@.*git\(.*\)\.com/@g\1:@}
 # git remote show origin | grep "Push *URL" | sed "s@.*:.*:\(.*\$\)@\1@"
 
 
-if [[ -z ${name/-[mw]} || -z $mail ]]; then
+if [[ -z ${name/-[mMw]} || -z $mail ]]; then
   # THINK: replace "source" with global registry to use "set -r"
   source ~/.shell/profile
-  if [[ $name == -m || $repo == /home/* ]]; then
+  if [[ $name == -M ]]; then
+    name=${WORK_NAME:?}
+    mail=${MAIN_MAIL:?}
+  elif [[ $name == -m || $repo == /home/* ]]; then
     name=${MAIN_NAME:?}
     mail=${MAIN_MAIL:?}
   elif [[ $name == -w || $repo == /work/* ]]; then
     name=${WORK_NAME:?}
     mail=${WORK_MAIL:?}
   else
-    >&2 echo "Err: use main/work preset \$ ./${0##*/} {-m|-w}"
+    >&2 echo "Err: use main/mixed/work preset \$ ./${0##*/} {-m|-M|-w}"
     >&2 echo " OR: explicit credentials \$ ./${0##*/} name email"
     exit 1
   fi
