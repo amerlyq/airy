@@ -40,12 +40,25 @@ fun! xtref#new(...)
 endf
 
 fun! xtref#invert(...)
-  let xref = get(a:, 1, expand('<cWORD>'))
-  let pfx = strcharpart(xref, 0, 1)
-  let xts = strcharpart(xref, 1)
-  if pfx == "⌇" | let pfx=g:xtref.refer_pfx | let pfx=g:xtref.anchor_pfx | en
-  let alt = (pfx==g:xtref.anchor_pfx ? g:xtref.refer_pfx : g:xtref.anchor_pfx)
-  return alt . xts  " fnameescape(xts)
+  let a = g:xtref.anchor_pfx
+  let r = g:xtref.refer_pfx
+  let t = get(a:, 1, )
+
+  " [_] THINK:TODO: jump from anywhere on current line :: auto-traverse it left-right
+  "   BAD: regular tags will be always ignored MAYBE: apply only for nou.vim
+  if a:0 > 0
+    let t = a:1
+  else
+    " FIXED: expand('<cWORD>') don't support glued train of anchors/referals
+    let t = getline('.')
+    let lt = substitute(strcharpart(t, 0, col('.')), '^.*\ze['.a.r.']', '', '')
+    let rt = substitute(strcharpart(t, col('.')), '['.a.r.'].*', '', '')
+    let t = lt . rt
+  end
+  " NOTE: keep regular tags untouched
+  let pfx = strcharpart(t, 0, 1)
+  if pfx!=#a && pfx!=#r| return expand('<cword>') | en
+  return (pfx==a ? r : a) . strcharpart(t, 1, 5)  " fnameescape()
 endf
 
 function! xtref#call_at(cwd, fn, ...)
@@ -87,13 +100,20 @@ fun! xtref#ctags(root, ...)
   echom "Done: gen xtref tags for ". a:root
 endf
 
+fun! xtref#syntax()
+  hi! xtrefAnchor ctermfg=24 guifg=#005f87
+  call matchadd('xtrefAnchor', '\v'. g:xtref.anchor_pfx .'\S{5,}\ze\s?', -1)
+
+  hi! xtrefRefer ctermfg=35 guifg=#00af5f
+  call matchadd('xtrefRefer', '\v'. g:xtref.refer_pfx .'\S{5,}\ze\s?', -1)
+endf
 
 
-hi! xtrefAnchor cterm=bold ctermfg=24 gui=bold guifg=#005f87
-call matchadd('xtrefAnchor', '\v'. g:xtref.anchor_pfx .'\S{5,}\ze\s?', -1)
-
-hi! xtrefRefer cterm=bold ctermfg=35 gui=bold guifg=#00af5f
-call matchadd('xtrefRefer', '\v'. g:xtref.refer_pfx .'\S{5,}\ze\s?', -1)
+call xtref#syntax()
+augroup Xtref
+  autocmd!
+  au WinEnter * call xtref#syntax()
+augroup END
 
 
 " NOTE: use "xts<C-v><Space>" to insert "xts" literally

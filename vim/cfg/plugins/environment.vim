@@ -36,10 +36,12 @@ call dein#add('airblade/vim-rooter', {
 " ALT: https://github.com/lucerion/vim-extract
 " USAGE: :Xtract newfilename<CR>
 " FIXME: move from fork to 'rstacruz' when fixed trailing dot
-call dein#add('specious/vim-xtract', {
-  \ 'on_cmd': 'Xtract'})
 " MAYBE: also insert index link when extracting  ⌇}!:nu
-noremap <unique> <LocalLeader>> :Xtract<Space>
+call dein#add('specious/vim-xtract', {
+  \ 'on_cmd': 'Xtract',
+  \ 'hook_add': "
+\\n   noremap <unique> <LocalLeader>> :Xtract<Space>
+\"})
 
 
 
