@@ -52,6 +52,10 @@ fi
 ## Utils
 # BUG: shows command from ~+2 history
 alias -g A='; alert'  # USAGE: $ <cmd> A OR $ A <cmd> -- notify-send on long-running cmds.
+alias -g D.='$(date +%Y%m%d_%H%M%S)'
+alias -g D@='$(date +@%s)'
+# BAD: can't be used as file name due to contained '/' symbol
+alias -g D!='$(printf "%08x" $(date +%s)|xxd -r -p|basenc --z85|rev)'
 
 ## Filters
 alias -g H='|head'
@@ -67,8 +71,13 @@ alias -g R='|tail -n +11'
 alias -g R1='|tail -n +2'
 alias -g R2='|tail -n +3'
 
-alias -g C='|wc -l'
-alias -g CC='|cat'
+alias -g C='|wc --lines'
+alias -g Cb='|wc --bytes'
+alias -g Cc='|wc --chars'
+alias -g Cm='|wc --max-line-length'
+alias -g Cw='|wc --words'
+alias -g Ca='|cat'
+alias -g Cn='|nl -s"  " -w4'
 alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
 alias -g TC='|column -Lt'

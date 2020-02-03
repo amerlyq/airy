@@ -19,6 +19,10 @@ alias stat.='command stat -c%s'
 alias now='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias date.='date +%Y%m%d_%H%M%S'
+alias date..='date +%Y%m%d'
+alias date@='date +%s'
+alias date@@='date +%s.%N'
+alias date!='printf "%08x" "$(date +%s%N)" | xxd -r -p | basenc --z85 | rev'
 # alias notes='date +"%Y-%m-%d, %T" >> ./notes.otl && editor ./notes.otl'
 
 # FIXED: different order required by {comm -12 ...}, can be used after LC_COLLATE=C sort
