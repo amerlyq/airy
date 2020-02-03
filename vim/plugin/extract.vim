@@ -35,7 +35,7 @@ function! extract#main(bang, nm) range abort
   " ALT: silent exe a:firstline.",".a:lastline . "yank"
   let xa = xtref#new()
   let xr = xtref#invert(xa)
-  let lines = xtract#vlines()
+  let lines = extract#vlines()
 
   " NOTE: strip from all lines common min indent TODO: replace '\t' => ' 'x2
   let mindent = min(map(copy(lines),'len(matchstr(v:val, "^\\s*"))'))

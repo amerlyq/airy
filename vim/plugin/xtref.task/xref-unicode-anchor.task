@@ -1,0 +1,9 @@
+IDEA: 3-letter non-latin Unicode encoding
+
+  * pick 2048 characters from Unicode, which are most likely never used in user texts (together with pseudo-graphics)
+    <= skip popular human languages
+    e.g. U+16A0 U+2200 U+2801 U+EB40 ※unRH(
+  * each letter represents 2^11 part of 2^33 number ~= 200 years
+  * no need for rev(1) due to short size
+  * easy to distinctly parse from any text
+  * easy to add to any filename

@@ -79,6 +79,7 @@ endfunction
 fun! xtref#ctags(root, ...)
   if !executable('ctags')| echoerr "Not found in PATH: ctags(1)" | return |en
   let dst = get(a:, 1, g:xtref.tagfile)
+  " \." --output-format=xref --_xformat='%{name}\t%{input}\t%{line};/%{name}/;\"\t%k'"
   let cmd = "ctags --options=NONE -o ". dst
     \." --recurse --input-encoding=UTF-8 --output-encoding=UTF-8"
     \." --langdef=xtref --map-xtref='(*)'"
@@ -138,9 +139,13 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 
 
 "" NOTE: jump anchor from referal under cursor, and vice versa
-noremap g]  :<C-u>exe v:count1."tag" xtref#invert()<CR>
-noremap z]  :<C-u>exe "tsel" xtref#invert()<CR>
-noremap g[  :<C-u><C-r>=v:count1<CR>tnext<CR>
+" BUG:(TEMP:sil): paused prompt on each :tag
+"   => always prints name of file it opens on tag jump
+nnoremap g]  :sil exe v:count1."tag" xtref#invert()<CR>
+xnoremap g]  :<C-u>sil exe v:count1."tag" xtref#invert(xtref#vsel)<CR>
+nnoremap z]  :sil exe "tsel" xtref#invert()<CR>
+xnoremap z]  :<C-u>sil exe "tsel" xtref#invert(xtref#vsel)<CR>
+ noremap g[  :<C-u><C-r>=v:count1<CR>tnext<CR>
 
 
 "" NOTE: jump to next anchor/referal
