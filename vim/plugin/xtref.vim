@@ -42,7 +42,6 @@ endf
 fun! xtref#invert(...)
   let a = g:xtref.anchor_pfx
   let r = g:xtref.refer_pfx
-  let t = get(a:, 1, )
 
   " [_] THINK:TODO: jump from anywhere on current line :: auto-traverse it left-right
   "   BAD: regular tags will be always ignored MAYBE: apply only for nou.vim

@@ -33,15 +33,16 @@ call dein#add('airblade/vim-rooter', {
 
 
 "" Extract the selection into a new file with same extension
-" ALT: https://github.com/lucerion/vim-extract
+" ALT: https://github.com/lucerion/vim-extract ⌇[!^nu
 " USAGE: :Xtract newfilename<CR>
 " FIXME: move from fork to 'rstacruz' when fixed trailing dot
 " MAYBE: also insert index link when extracting  ⌇}!:nu
-call dein#add('specious/vim-xtract', {
-  \ 'on_cmd': 'Xtract',
-  \ 'hook_add': "
-\\n   noremap <unique> <LocalLeader>> :Xtract<Space>
-\"})
+" DEPRECATED: use my own :/plugin/xtract.vim
+" call dein#add('specious/vim-xtract', {
+"   \ 'on_cmd': 'Xtract',
+"   \ 'hook_add': "
+" \\n   noremap <unique> <LocalLeader>> :Xtract<Space>
+" \"})
 
 
 

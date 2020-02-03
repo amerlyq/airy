@@ -2,7 +2,7 @@ DEV: annotate each idea/outline by tiny flag to ref back ⌇unReK
 
 NICE! actually simple creation date unsigned timestamp will do the best for oncoming 70 years, even if it wraps afterwards !!
 
-* base64(^XjT1Gw==)              $ printf '%08x' $(date +%s) | xxd -r -p | basenc --base64url
+* base64url(^XjT1Gw==)           $ printf '%08x' $(date +%s) | xxd -r -p | basenc --base64url
 * z85(unReK)                     $ printf '%08x' $(date +%s) | xxd -r -p | basenc --z85
 * Z85(@Cq4hm7j47)                $ printf '%08x' "$(date +%s%N)" | xxd -r -p | basenc --z85 | rev | tr -d \\n
 * uuid128(0MBEVx+<45Za$}^N{!I#)  $ uuidgen --random | tr -d - | xxd -p -r | basenc --z85
