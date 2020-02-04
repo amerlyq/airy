@@ -6,8 +6,11 @@
 # Show file content from old revision
 # git show 1b17fd56:./async
 
-## --- Git ---
 alias gc1='noglob git clone --single-branch --depth=1'
+gIC(){ (mkdir "$1" && cd "$1" && git init && touch README.rst &&
+  r.git-my-repo "${2:--m}" && git add --all && git commit -m "Initial commit"); }
+
+## --- Git ---
 alias gir1='gir HEAD~'
 alias g\?='git help'
 # Re-defined
