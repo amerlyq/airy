@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+fmt=${1:-%f:%l:%c:%m}
+exec ifne $EDITOR -c "setl noro ma bt=nofile nowrap efm=$fmt|cb|if len(getqflist())>1|copen|en"

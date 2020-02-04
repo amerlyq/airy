@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY: util for xtref anchors/referals operations
+#%USAGE: $ ./$0 {|-a|-x} [-f <fmt>] [{|-i|-p|-pp|-r|-t}] [--] [{ANCHOR|REFERAL}] [FILE..]
+#%  * generate default xtref anchor/referal based on current timestamp or another xtref passed on cmdline
+#%  * toggle between anchor and referal, convert between different formats :: {braille|date|dt|hex|u2048|unix|utc|z85r|z85}
+#%  * insert anchor as first line into files (-a), or grep files/folders for specific anchor/referal (-r), or run ctags (-t)
+#%  * use {-u|-uu|-uuu|-uuuu} to append one nanoseconds char/register per letter
+#%
+# shellcheck disable=SC2059
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+fmts=( braille date dt hex unix utc z85 z85r )  # TBD: u2048
+pf_anchor='⌇'
+pf_referer='※'
+
+# ALT:(generic): '\S{3,20}\ze\s?'
+r_z85='[-0-9a-zA-Z.:+=^!/*?&<>()\[\]{}@%$#]{5}'
+r_braille='[\u2800-\u28FF]{4}'
+r_addr="($r_z85|$r_braille)"
+
+anchor=
+fmt=braille
+insert=
+inverse=
+nanosec=
+printrgx=
+recursive=
+tags=
+
+# shellcheck disable=SC2076
+while getopts 'af:iprtux' o; do case $o in :|'?') exit 1
+;; a) anchor=1
+;; f) fmt=$OPTARG; [[ " ${fmts[*]} " =~ " $fmt " ]] || { >&2 echo "Err: fmt=$fmt"; exit 1; }
+;; i) insert=1
+;; p) ((++printrgx))
+;; r) recursive=1
+;; t) tags=1
+;; u) ((++nanosec)); echo TBD ADD: 1-4 trailing bytes; exit 3
+;; x) inverse=1;
+esac; done; shift $((OPTIND - 1))
+
+
+## FAIL: ctags based on glibc=2.10 don't support unicode range [\u2800-\u28FF]
+# Changing the ctags regex engine · Issue #1861 · universal-ctags/ctags ⌇⡞⠸⣛⣶
+#   https://github.com/universal-ctags/ctags/issues/1861
+# Unicode parse incorrect! · Issue #1275 · universal-ctags/ctags ⌇⡞⠸⣜⠭
+#   https://github.com/universal-ctags/ctags/issues/1275
+# shellcheck disable=SC2191
+gen_tags(){ local
+  # export LANG=en_US.utf8 LC_COLLATE=C LC_CTYPE=C
+  # r_braille='[\\u2800-\\u28FF]'
+  # r_braille='[⠀-⣿]'
+  # r_braille='\\p{Braille}'
+  # r_braille='[\x{2800}-\x{28FF}]'
+
+# TEMP:FIXED:(unicode): use explicit table instead of range ※⡞⠸⣛⣶
+alt_braille=$(tr ' \n' '||' <<'EOT'
+⠀ ⠁ ⠂ ⠃ ⠄ ⠅ ⠆ ⠇ ⠈ ⠉ ⠊ ⠋ ⠌ ⠍ ⠎ ⠏
+⠐ ⠑ ⠒ ⠓ ⠔ ⠕ ⠖ ⠗ ⠘ ⠙ ⠚ ⠛ ⠜ ⠝ ⠞ ⠟
+⠠ ⠡ ⠢ ⠣ ⠤ ⠥ ⠦ ⠧ ⠨ ⠩ ⠪ ⠫ ⠬ ⠭ ⠮ ⠯
+⠰ ⠱ ⠲ ⠳ ⠴ ⠵ ⠶ ⠷ ⠸ ⠹ ⠺ ⠻ ⠼ ⠽ ⠾ ⠿
+⡀ ⡁ ⡂ ⡃ ⡄ ⡅ ⡆ ⡇ ⡈ ⡉ ⡊ ⡋ ⡌ ⡍ ⡎ ⡏
+⡐ ⡑ ⡒ ⡓ ⡔ ⡕ ⡖ ⡗ ⡘ ⡙ ⡚ ⡛ ⡜ ⡝ ⡞ ⡟
+⡠ ⡡ ⡢ ⡣ ⡤ ⡥ ⡦ ⡧ ⡨ ⡩ ⡪ ⡫ ⡬ ⡭ ⡮ ⡯
+⡰ ⡱ ⡲ ⡳ ⡴ ⡵ ⡶ ⡷ ⡸ ⡹ ⡺ ⡻ ⡼ ⡽ ⡾ ⡿
+⢀ ⢁ ⢂ ⢃ ⢄ ⢅ ⢆ ⢇ ⢈ ⢉ ⢊ ⢋ ⢌ ⢍ ⢎ ⢏
+⢐ ⢑ ⢒ ⢓ ⢔ ⢕ ⢖ ⢗ ⢘ ⢙ ⢚ ⢛ ⢜ ⢝ ⢞ ⢟
+⢠ ⢡ ⢢ ⢣ ⢤ ⢥ ⢦ ⢧ ⢨ ⢩ ⢪ ⢫ ⢬ ⢭ ⢮ ⢯
+⢰ ⢱ ⢲ ⢳ ⢴ ⢵ ⢶ ⢷ ⢸ ⢹ ⢺ ⢻ ⢼ ⢽ ⢾ ⢿
+⣀ ⣁ ⣂ ⣃ ⣄ ⣅ ⣆ ⣇ ⣈ ⣉ ⣊ ⣋ ⣌ ⣍ ⣎ ⣏
+⣐ ⣑ ⣒ ⣓ ⣔ ⣕ ⣖ ⣗ ⣘ ⣙ ⣚ ⣛ ⣜ ⣝ ⣞ ⣟
+⣠ ⣡ ⣢ ⣣ ⣤ ⣥ ⣦ ⣧ ⣨ ⣩ ⣪ ⣫ ⣬ ⣭ ⣮ ⣯
+⣰ ⣱ ⣲ ⣳ ⣴ ⣵ ⣶ ⣷ ⣸ ⣹ ⣺ ⣻ ⣼ ⣽ ⣾ ⣿
+EOT
+)
+
+  # TEMP:FIXED:(posix): old engine has some quirks with '[\]]'
+  local r_z85='([-0-9a-zA-Z.:+=^!\/*?&<>()[{}@%$#]|]){5}'
+
+  local r_braille="(${alt_braille%|}){4}"
+  local r_addr="($r_z85|$r_braille)"
+
+  args=( --options='NONE'
+    ${recursive+--recurse}
+
+    --input-encoding='UTF-8'
+    --output-encoding='UTF-8'
+    --sort='yes'
+    --excmd='combine'
+    --output-format='xref'
+    --_xformat=$'%{name}\t%{input}\t%{line};/%{name}/;\"\t%k'
+
+    --langdef='xtref'
+    --map-xtref='(*)'
+    --kinddef-xtref='a,anchor,place of definition'
+    --kinddef-xtref='r,reference,jump to location'
+    --regex-xtref="/($pf_anchor$r_addr)/\\1/a/"
+    --regex-xtref="/($pf_referer$r_addr)/\\1/r/"
+    --languages='xtref'
+  )
+  for g in .git '_build*' tags '*.tags'; do
+    args+=( --exclude="$g" )
+  done
+  for f in .ignore .gitignore; do
+    [[ -f $f ]] && args+=( --exclude="@$f" )
+  done
+  # DEBUG: echo exec ctags --quiet "${args[@]}" "$@"
+  exec ctags --quiet "${args[@]}" "$@"
+  exit
+}
+
+gen_regex(){
+  if (($#)); then
+    parse_xtref "$1"
+    rgx=$(print_xtref)
+    return
+  fi
+
+  if ((inverse)); then rgx=$pf_referer
+  elif ((anchor)); then rgx=$pf_anchor
+  else rgx="($pf_anchor|$pf_referer)"
+  fi
+  ((printrgx<2)) || rgx+=$r_addr
+}
+
+grep_xtref(){
+  cmd="r.grep-repo --case-sensitive '{}'"
+  exec sk --ansi --multi -ic "$cmd" --cmd-query="$1" | r.vim-qf
+  exit
+}
+
+parse_xtref(){
+  case ${1:0:1}
+  in $pf_anchor | ⍿ | @ | ⌇) pfx=$pf_anchor; xts=${1:1}
+  ;; $pf_referer | ※) pfx=$pf_referer; xts=${1:1}
+  ;; *) pfx=$pf_anchor; xts=$1
+  esac
+
+  # SEE:VIZ: Most common Bash date commands for timestamping « The Intellectual Wilderness ⌇⡞⠸⣪⣽
+  #   https://zxq9.com/archives/795
+  case ${#xts}
+  in 20) xts=$(printf '%08x' "$(date +%s --date="$1")")  #  utc = 2020-02-03T22:19:31Z
+  ;; 19) xts=$(printf '%08x' "$(date +%s --date="$1")")  # date = 2020-02-04_00:19:31
+  ;; 16) xts=$(printf '%08x' "$(date +%s --date="$1")")  #   ut = 20200203T221931Z
+  ;; 15) xts=$(printf '%08x' "$(date +%s --date="$1")")  #   dt = 20200204_001931
+  ;; 10) xts=$(printf '%08x' "$1")                       # unix = 1580768371
+  ;;  8) xts=$xts                                        #  hex = 5e389c73
+  # XXX:(5): how to detect "rev .vs. non-rev" format ?   # z85r = @D1ou
+  ;;  5) xts=$(printf '%s' "$xts" | rev | basenc --z85 -d | od -tx1 | tr -d ' ')
+  ;;  4) xts=$(unicode -t "$xts" | sed 's/^28//' | paste -sd '')  # braille = ⡞⠸⢜⡳
+  ;;  3) xts=...  # u2048 = TBD
+  esac
+}
+
+cvt_braille(){ printf -- "${2-}""\\U28${1:0:2}""\\U28${1:2:2}""\\U28${1:4:2}""\\U28${1:6:2}""\\n"; }
+cvt_hex(){ printf -- "${2-}""\\x${1:0:2}""\\x${1:2:2}""\\x${1:4:2}""\\x${1:6:2}""\\n"; }
+cvt_dt(){ date +"${2-}%Y%m%d_%H%M%S" --date="@$((0x$1))"; }
+cvt_date(){ date +"${2-}%Y-%m-%d_%H:%M:%S" --date="@$((0x$1))"; }
+cvt_utc(){ date +"${2-}%Y%m%dT%H%M%SZ" --utc --date="@$((0x$1))"; }
+cvt_unix(){ printf '%s%d\n' "${2-}" "$((0x$1))"; }
+cvt_z85(){ printf '%s%s\n' "${2-}" "$(cvt_hex "$1" | tr -d \\n | basenc --z85)"; }
+cvt_z85r(){ printf '%s%s\n' "${2-}" "$(cvt_hex "$1" |  tr -d \\n | basenc --z85 | rev)"; }
+
+gen_xtref(){
+  pfx=$pf_anchor
+  ts=$(command date +%s)
+  xts=$(printf '%08x' "$ts")
+}
+
+print_xtref(){
+  ((inverse)) && case $pfx
+    in $pf_anchor) pfx=$pf_referer
+    ;; $pf_referer) pfx=$pf_anchor
+    ;; '') pfx=$pf_referer    # CASE:(-x): for wild address always means "referer"
+    esac
+  "cvt_$fmt" "$xts" "$pfx"
+}
+
+
+if ((tags)); then
+  gen_tags "$@"
+
+elif ((insert)); then
+  echo "TBD write to $* files OR $recursive"
+  exit 3
+
+elif ((recursive)); then
+  gen_regex "$@"
+  (($#)) && shift
+  grep_xtref "${rgx//\\u/\\\\u}" "$@"
+
+elif ((printrgx)); then
+  gen_regex "$@"
+  printf '%s\n' "$rgx"
+
+elif (($#)); then
+  parse_xtref "$1"
+  shift
+  print_xtref
+
+else
+  gen_xtref
+  print_xtref
+fi

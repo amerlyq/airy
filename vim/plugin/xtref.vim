@@ -8,9 +8,18 @@
 let g:xtref = {}
 let g:xtref.aura = $HOME."/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
-let g:xtref.refer_pfx = '※'
+
 let g:xtref.anchor_pfx = '⌇'
-let g:xtref.exclude = ['.git', '_build*', 'tags', '*.tags']
+let g:xtref.refer_pfx = '※'
+
+" TODO: support for nanoseconds tail
+" ALT:(queue): $ r.vim-xtref -pp $ ALT:(generic): '\S{3,20}\ze\s?'
+let s:r_z85 = '[-0-9a-zA-Z.:+=^!/*?&<>()\[\]{}@%$#]{5}'
+let s:r_braille = '[\u2800-\u28FF]{4}'
+let g:xtref.r_addr = '('. s:r_z85 .'|'. s:r_braille .')'
+let g:xtref.r_anchor = g:xtref.anchor_pfx . g:xtref.r_addr
+let g:xtref.r_refer = g:xtref.refer_pfx . g:xtref.r_addr
+
 
 " NOTE: xref artifact ※unReK
 digraph xa 8967  " ⌇
@@ -33,8 +42,11 @@ fun! xtref#vsel()
 endf
 
 fun! xtref#new(...)
-  let xts = printf('%08x', call('strftime', ['%s'] + a:000))
-  let xts = systemlist('xxd -p -r | basenc --z85 | rev', xts)[0]
+  "" DEPRECATED:(z85):
+  " let xts = printf('%08x', call('strftime', ['%s'] + a:000))
+  " let xts = systemlist('xxd -p -r | basenc --z85 | rev', xts)[0]
+  "" ALT:PERF: systemlist('r.vim-xtref '.get(a:,1))[0]
+  let xts = substitute(printf('%x', strftime('%s')), '..', '\=nr2char("0x28".submatch(0))', 'g')
   call setreg('+', g:xtref.refer_pfx . xts, 'c')
   return g:xtref.anchor_pfx . xts
 endf
@@ -54,10 +66,10 @@ fun! xtref#invert(...)
     let rt = substitute(strcharpart(t, col('.')), '['.a.r.'].*', '', '')
     let t = lt . rt
   end
-  " NOTE: keep regular tags untouched
   let pfx = strcharpart(t, 0, 1)
+  " NOTE: keep regular tags untouched ALT:USE: (pfx==a ? r : pfx==r ? a : pfx)
   if pfx!=#a && pfx!=#r| return expand('<cword>') | en
-  return (pfx==a ? r : a) . strcharpart(t, 1, 5)  " fnameescape()
+  return (pfx==a ? r : a) . strcharpart(t, 1)  " fnameescape()
 endf
 
 function! xtref#call_at(cwd, fn, ...)
@@ -72,40 +84,27 @@ function! xtref#call_at(cwd, fn, ...)
     if getcwd() !=# l:old
       try| exe 'lcd '.fnameescape(l:old) |catch|endt
     endif
+    if v:shell_error
+      echoe join(_, '\n')
+      return []
+    en
   endtry
   return _
 endfunction
 
 fun! xtref#ctags(root, ...)
   if !executable('ctags')| echoerr "Not found in PATH: ctags(1)" | return |en
-  let dst = get(a:, 1, g:xtref.tagfile)
-  " \." --output-format=xref --_xformat='%{name}\t%{input}\t%{line};/%{name}/;\"\t%k'"
-  let cmd = "ctags --options=NONE -o ". dst
-    \." --recurse --input-encoding=UTF-8 --output-encoding=UTF-8"
-    \." --langdef=xtref --map-xtref='(*)'"
-    \." --kinddef-xtref=a,anchor,place"
-    \." --kinddef-xtref=r,reference,jump"
-    \." --regex-xtref='/(". g:xtref.anchor_pfx ."\\S{5,})\\s?/\\1/a/'"
-    \." --regex-xtref='/(". g:xtref.refer_pfx ."\\S{5,})\\s?/\\1/r/'"
-    \." --languages=xtref --excmd=combine"
-
-  if filereadable('.ignore')| let cmd .=' --exclude=@.ignore' |en
-  if filereadable('.gitignore')| let cmd .=' --exclude=@.gitignore' |en
-  for g in g:xtref.exclude
-    let cmd .= " --exclude=".shellescape(g)
-  endfor
-
-  " DEBUG: echom cmd
-  let _ = join(xtref#call_at(a:root, 'systemlist', cmd), '\n')
+  let dst = shellescape(get(a:, 1, g:xtref.tagfile))
+  let _ = join(xtref#call_at(a:root, 'systemlist', 'r.vim-xtref -tr -- -o '.dst), '\n')
   echom "Done: gen xtref tags for ". a:root
 endf
 
 fun! xtref#syntax()
   hi! xtrefAnchor ctermfg=24 guifg=#005f87
-  call matchadd('xtrefAnchor', '\v'. g:xtref.anchor_pfx .'\S{5,}\ze\s?', -1)
+  call matchadd('xtrefAnchor', '\v'. g:xtref.r_anchor, -1)
 
   hi! xtrefRefer ctermfg=35 guifg=#00af5f
-  call matchadd('xtrefRefer', '\v'. g:xtref.refer_pfx .'\S{5,}\ze\s?', -1)
+  call matchadd('xtrefRefer', '\v'. g:xtref.r_refer, -1)
 endf
 
 
@@ -149,8 +148,8 @@ xnoremap z]  :<C-u>sil exe "tsel" xtref#invert(xtref#vsel)<CR>
 
 
 "" NOTE: jump to next anchor/referal
-noremap <silent>  [x  :<C-u>let @/=g:xtref.anchor_pfx<CR>n
-noremap <silent>  ]x  :<C-u>let @/=g:xtref.refer_pfx<CR>n
+noremap <silent>  [x  :<C-u>let @/='\v'.g:xtref.r_anchor<CR>n
+noremap <silent>  ]x  :<C-u>let @/='\v'.g:xtref.r_refer<CR>n
 
 
 nnoremap <Plug>(xtref-new) $"=" ".xtref#new()<CR>p<Plug>(xtref-yank)

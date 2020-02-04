@@ -23,6 +23,8 @@ call Map_nxo('[Quote]<Space>', s:ad.' ', 'x')
 "" Add quotes on qq
 call Map_nxo('[Quote]q', s:ad.'iW"', 'n')
 call Map_nxo('[Quote]q', s:ad.'"', 'x')
+call Map_nxo('[Quote]Q', s:ad.'iWQ', 'n')
+call Map_nxo('[Quote]Q', s:ad.'Q', 'x')
 
 "" Sigils for bash
 call Map_nxo('[Quote]@', s:ad.'iw2', 'n')
