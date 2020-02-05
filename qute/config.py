@@ -1864,6 +1864,13 @@ config.bind('<Tab>', 'nop')
 # config.bind('y', 'prompt-accept yes', mode='yesno')
 
 
+## qute-pass
+config.bind('zl',  'spawn --userscript qute-pass')
+config.bind('zul', 'spawn --userscript qute-pass --username-only')
+config.bind('zpl', 'spawn --userscript qute-pass --password-only')
+config.bind('zol', 'spawn --userscript qute-pass --otp-only')
+
+
 ### Load private part of config
 privatecfg = config.configdir / 'config-private.py'
 if privatecfg.is_file():
