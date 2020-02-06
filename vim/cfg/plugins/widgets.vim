@@ -3,10 +3,10 @@
 "" Toggle qf and loci lists {{{1
 " DEV:TODO: merge with qf mappings
 call dein#add('Valloric/ListToggle', {
-  \ 'on_map': ['[Unite]q', '[Unite]l'],
+  \ 'on_map': ['<Leader>q', '[Unite]l'],
   \ 'hook_source': "
 \\n   let g:lt_location_list_toggle_map = '[Unite]l'
-\\n   let g:lt_quickfix_list_toggle_map = '[Unite]q'
+\\n   let g:lt_quickfix_list_toggle_map = '<Leader>q'
 \"})
 
 

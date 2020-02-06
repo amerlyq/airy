@@ -13,6 +13,7 @@ let s:maps = {
 \ 'm': 'Keybinds mapping',
 \ 'M': 'mrus file_mru',
 \ 'o': 'Outline outline',
+\ 'q': 'Quickfix quickfix',
 \ 's': 'MySub mysub',
 \ 'y': 'yanks history/yank',
 \ 'g': 'grep grep:.',

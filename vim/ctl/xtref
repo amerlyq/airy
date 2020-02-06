@@ -143,6 +143,20 @@ parse_xtref(){
 
   # SEE:VIZ: Most common Bash date commands for timestamping « The Intellectual Wilderness ⌇⡞⠸⣪⣽
   #   https://zxq9.com/archives/795
+  # ALSO: [[urn:]uuid:]f81d4fae-7dec-11d0-a765-00a0c91e6bf6 with "urn:uuid:...[#frag]" as ref prefix and "uuid:..." as anchor
+  #   https://en.wikipedia.org/wiki/Uniform_Resource_Name
+  # CMP:(similary to mine): Tag URI scheme - Wikipedia ⌇⡞⠻⢅⠙
+  #   https://en.wikipedia.org/wiki/Tag_URI_scheme
+  #   Linked data - Wikipedia ⌇⡞⠻⢆⡑
+  #     https://en.wikipedia.org/wiki/Linked_data
+  #   NOTE: can also use ISAN / ISBN to refer movies/books/etc.
+  # The Semantic Web & Linked Data ⌇⡞⠻⢊⣞
+  #   https://rubenverborgh.github.io/WebFundamentals/semantic-web/#linked-data-basic
+  # OBSOL(URI): new IRI for Unicode ⌇⡞⠻⢍⠑
+  #   https://www.ietf.org/rfc/rfc3987.txt
+  #   Internationalized Resource Identifier - Wikipedia ⌇⡞⠻⢝⠥
+  #     https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier
+  # ALSO: SHA1/SHA256 for git objects refs
   case ${#xts}
   in 20) xts=$(printf '%08x' "$(date +%s --date="$1")")  #  utc = 2020-02-03T22:19:31Z
   ;; 19) xts=$(printf '%08x' "$(date +%s --date="$1")")  # date = 2020-02-04_00:19:31

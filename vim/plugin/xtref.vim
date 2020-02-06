@@ -211,9 +211,12 @@ nnoremap <Plug>(xtref-yank) :<C-u>call xtref#copy(xtref#invert())<CR>
 xnoremap <Plug>(xtref-yank) :<C-u>call xtref#copy(xtref#invert(xtref#vsel()))<CR>
 
 " ENH: limit #get() area by visual selection for bounded replace
-nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace()<CR>
+nnoremap <Plug>(xtref-delete) :call xtref#replace()<CR>
 " MAYBE:([Xtref]r): upgrade xtref marker format one-by-one instead of all at once
-nnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(xtref#new())<CR>
+nnoremap <Plug>(xtref-refresh) :call xtref#replace(xtref#new())<CR>
+
+nnoremap <Plug>(xtref-toggle) :call xtref#replace(xtref#invert())<CR>
+xnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(xtref#invert(xtref#vsel()))<CR>
 
 
 " OBSOL:  <LocalLeader>...
@@ -221,6 +224,7 @@ map <silent> [Xtref]a <Plug>(xtref-new-append)
 map <silent> [Xtref]d <Plug>(xtref-delete)
 map <silent> [Xtref]i <Plug>(xtref-new-insert)
 map <silent> [Xtref]r <Plug>(xtref-refresh)
+map <silent> [Xtref]t <Plug>(xtref-toggle)
 map <silent> [Xtref]y <Plug>(xtref-yank)
 
 

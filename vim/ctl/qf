@@ -1,4 +1,9 @@
 #!/bin/sh -eu
 fmt=${1:-%f:%l:%c:%m}
-# BUG:(nvr): below qf loading from stdin don't work with nvr instance redirection
-exec ifne $EDITOR - -c "setl noro ma bt=nofile nowrap efm=$fmt|cb|if len(getqflist())>1|copen|en"
+excmd="setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|if len(getqflist())>1|copen|en"
+
+if [ -n "${NVIM_LISTEN_ADDRESS-}" ]; then
+  exec xargs -rn1 -d\\n realpath | ifne $EDITOR - -c "$excmd"
+else
+  exec ifne $EDITOR - -c "$excmd"
+fi
