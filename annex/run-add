@@ -1,0 +1,44 @@
+#!/usr/bin/env zsh
+#%SUMMARY: add new file and keep all its attributes
+#%USAGE: $ ./$0
+set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+
+f=$1
+
+autoload zmathfunc
+zmathfunc
+
+stat --format='%W %X %Y %Z ' $f | read -r -- btime atime mtime ctime
+# echo $btime,$atime,$mtime,$ctime
+
+GIT_AUTHOR_DATE=$(( min(btime,atime,mtime,ctime) ))
+GIT_COMMITTER_DATE=$mtime
+export GIT_AUTHOR_DATE GIT_COMMITTER_DATE
+
+git add -- $f
+obj=$(git rev-parse :$f)
+
+## ALT: store xattr in commit msg body (w/o summary)
+# {
+#   printf '+\n\n'
+#   getfattr --no-dereference --absolute-names --dump -- $f \
+# } | git commit --cleanup=verbatim --file=- --only -- $f
+# # --long | --dry-run
+
+# BET? use custom git-notes for xattr per each file
+# BUT: we have symlinks...
+
+getfattr --no-dereference --absolute-names --dump -- $f \
+| git notes --ref=xattr add --file=- -- $obj
+
+git commit --allow-empty-message --message='' --only -- $f
+
+# DEBUG:
+# git notes --ref=xattr list
+# git cat-file -p -- $obj
+# git notes --ref=xattr list C1 X git cat-file -p --
+
+# ALT:NOTE: use new binary blob as note
+# cc *.c
+# blob=$(git hash-object -w a.out)
+# git notes --ref=built add --allow-empty -C "$blob" HEAD
