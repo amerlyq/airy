@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+#%SUMMARY: add untracked files in batch as separate historical commits
+#%USAGE: $ ./$0
+#%NEED: sort/rebase history afterwards
+set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+
+# d=${1:-.}
+
+git ls-files -z -o --cached --exclude-standard \
+| xargs -0 --no-run-if-empty --max-procs=0 -- r.annex-add

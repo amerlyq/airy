@@ -1,9 +1,10 @@
 #!/usr/bin/env zsh
 #%SUMMARY: add new file and keep all its attributes
 #%USAGE: $ ./$0
-set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
 f=$1
+force=${2-}
 
 autoload zmathfunc
 zmathfunc
@@ -16,7 +17,7 @@ GIT_COMMITTER_DATE=$mtime
 export GIT_AUTHOR_DATE GIT_COMMITTER_DATE
 
 git add -- $f
-obj=$(git rev-parse :$f)
+obj=$(git rev-parse :./$f)
 
 ## ALT: store xattr in commit msg body (w/o summary)
 # {
@@ -28,17 +29,43 @@ obj=$(git rev-parse :$f)
 # BET? use custom git-notes for xattr per each file
 # BUT: we have symlinks...
 
-getfattr --no-dereference --absolute-names --dump -- $f \
-| git notes --ref=xattr add --file=- -- $obj
+## BAD:(... | git notes -F-): will error-out even if existing note is the same
+# getfattr --no-dereference --absolute-names --dump -- $f \
+# | git notes --ref=xattr add --file=- -- $obj
+
+# TRY:ENH: store each option value as separate blob -- to allow preview images/etc as metadata content
+# FAIL! file copies at different locations *may* have different xattrs to mark their public access level, etc.
+#   ALT: forget about location-based metadata (context) and focus only on content-based metadata (substance)
+#     == introduce location-based metadata by location itself e.g. demarcate domain boundaries
+#     BUT: such ctx-based tags are virtual (dynamic) -- you can't easily query them directly from files
+
+## ALT:NOTE: use new binary blob as note
+# NOT:(--path $f): based on filepath adds notes to annex instead of plain git
+sha_blob=$(getfattr --no-dereference --absolute-names --dump -- $f \
+  | tail -n +2 | git hash-object --stdin -w)
+
+old_sha=$(git notes --ref=xattr list -- $obj 2>/dev/null ||:)
+
+if [[ -z $old_sha ]] || [[ -n force ]]; then
+  git notes --ref=xattr add ${force+--force} --reuse-message=$sha_blob -- $obj
+elif [[ $old_sha != $sha_blob ]]; then
+  # TODO:BET:ENH: instead of "force" fallback to "git-notes merge" and open diff-editor for this
+  #   BUT: what if notes are binary ?? You can't open 3-way merge then and must use --force ...
+  echo $old_sha $sha_blob
+  git diff $old_sha $sha_blob --
+  >&2 echo "Err: merge manually or use --force"
+  exit 1
+fi
 
 git commit --allow-empty-message --message='' --only -- $f
 
-# DEBUG:
+## DEBUG:
 # git notes --ref=xattr list
+# git log --patch notes/xattr
+# git log -p -g notes/xattr
 # git cat-file -p -- $obj
 # git notes --ref=xattr list C1 X git cat-file -p --
+# git checkout notes/xattr
 
-# ALT:NOTE: use new binary blob as note
-# cc *.c
-# blob=$(git hash-object -w a.out)
-# git notes --ref=built add --allow-empty -C "$blob" HEAD
+## RESTORE
+# getfattr --no-dereference --absolute-names --dump -- some.pdf | { echo "# file: tmp"; tail -n +2; } | setfattr --restore=-

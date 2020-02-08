@@ -52,6 +52,15 @@ FIXED:BUG:(Proton): Failed to initialize graphics. Make sure you have DirectX 11
     PROTON_USE_WINED3D=1 %command%
 
 
+FIXED:BUG:(Proton): Black Screen on launch e.g. for RPGMaker games (everything else is OK)
+  How to change a game's compatibility to Windows XP : SteamPlay ⌇⡞⠾⠳⡥
+    https://www.reddit.com/r/SteamPlay/comments/bnmajg/how_to_change_a_games_compatibility_to_windows_xp/
+  ::: set compatibility to Windows XP -- find $appid through --gui, then apply fix
+  $ aurI protontricks
+  $ protontricks --gui
+  $ protontricks $appid winxp
+
+
 Crash on startup
   + https://github.com/ValveSoftware/steam-for-linux/issues/4529
     MAYBE crash due to libglvnd inside nvidia-drivers present in render path -- rebuild driver w/o it

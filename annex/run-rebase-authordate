@@ -1,0 +1,52 @@
+#!/usr/bin/env zsh
+#%SUMMARY: reorder whole commits history in author's chronological order
+#%USAGE: $ ./$0 [HEAD|notes/xattr]
+#%BUG: merge conflicts DU/UD when xattrs for files had changed at least once
+#%UNDO: $ git reset --hard ORIG_HEAD
+#%  OR: $ (git reflog || git log -g) && git reset --hard HEAD@{0}
+#%DEBUG: $ git log --pretty=format:'%h %aI %cI %f' --raw
+set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+
+# BUG: reordering breaks git-annex
+#   git-annex: git status will show a/sec4-2.pdf to be modified, since content
+#   availability has changed and git-annex was unable to update the index. This
+#   is only a cosmetic problem affecting git status; git add, git commit, etc
+#   won't be affected. To fix the git status display, you can run:
+#   git update-index -q --refresh a/sec4-2.pdf
+#   BAD:(don't work): git rebase ... --exec 'git update-index -q --refresh'
+#   ALT: run at the end simple $ git add --all
+
+# NOTE:(--root): after reordering files may be placed below first ever commit in repo
+#   => therefore "Initial commit" must actually be renamed to "Repo creation commit"
+
+if [[ ${GIT_SEQUENCE_EDITOR-} == "$0:A" ]]; then
+  <$1 awk '$1=="pick"' | sort -k3n,3 | sponge $1
+else
+  export GIT_SEQUENCE_EDITOR=$0:A
+  git -c rebase.instructionFormat='%at' rebase --interactive \
+    --allow-empty-message --no-stat --root $@
+fi
+
+## ALT:MAYBE:(git filter-repo): check if possible through it
+#  newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement) ⌇⡞⠾⢮⠵
+#    https://github.com/newren/git-filter-repo
+
+## ALT:(inspired-by):
+#  scripting - How do I run git rebase --interactive in non-interactive manner? - Stack Overflow ⌇⡞⠾⢯⢽
+#    https://stackoverflow.com/questions/12394166/how-do-i-run-git-rebase-interactive-in-non-interactive-manner
+# <$1 awk '$1=="pick"{print$2}' \
+# | git rev-list --stdin --no-walk=unsorted --format='pick %h %at' \
+# | awk '$1=="pick"' \
+# | sort -k3n,3 \
+# | sponge $1
+
+## NOTE: annotate hash list from stdin
+# BAD: post-filter lines "commit <hash>" because they are impossible to disable for rev-list
+#  Exclude Preceding Commit> line from git rev-list formatting - Stack Overflow ⌇⡞⠾⢦⠹
+#    https://stackoverflow.com/questions/36927089/exclude-preceding-commit-line-from-git-rev-list-formatting
+# git rev-list --stdin --no-walk=unsorted --format='pick %h %at'
+
+## NOTE: list all hashes and grep by their short prefix
+# FROM: https://stackoverflow.com/questions/18445925/how-to-get-list-of-git-commit-hashes-that-start-with-given-string/18447440
+# git rev-parse --disambiguate=4cdf| git cat-file --batch-check
+# git rev-list --all | grep '^b'
