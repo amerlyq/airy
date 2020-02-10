@@ -10,7 +10,7 @@ pfx=~/.config/airy/wallpaper_
 
 # Set new wallpaper
 for ((i=1 ; i<=$# ; i++)); do
-  f=$(readlink -m "${!i}")
+  f=$(realpath -s "${!i}")
   [[ -e $f ]] || exit
   ln -svf "$f" "${pfx}$i"
 done

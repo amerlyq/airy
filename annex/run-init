@@ -3,6 +3,24 @@
 #%USAGE: $ ./$0
 set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
+### PREPARE ######################################
+here=$0:A:h
+
+[[ -f .gitattributes ]] || cp -vT -- $here/gitattributes .gitattributes
+diff -u -- $here/gitattributes .gitattributes
+
+# git -c annex.tune.objecthash1=true annex init ⌇⡞⡀⠝⠺
+#   https://git-annex.branchable.com/tuning/
+git -c annex.tune.objecthash1=true \
+    -c annex.tune.branchhash1=true \
+    -c annex.tune.objecthashlower=true \
+  annex init
+
+# WARN: maybe also must edit local .git/info/attributes by hooks/post_checkout
+#  making it easier to smudge dotfiles ⌇⡞⡀⠞⢧
+#    https://git-annex.branchable.com/todo/making_it_easier_to_smudge_dotfiles/
+
+
 ### GENERIC ######################################
 
 ## MAINT: I prefer to run $ git annex upgrade $ only when mentally prepared to fix problems
@@ -25,6 +43,7 @@ git config --local 'annex.backend' SHA256
 
 ## DECI? "git add" will never add files to git-annex
 ## FAIL: may accidentally add large files by 'gaa'
+## BUT:BET? filter-out large files post-factum based on .git large files statistics
 # git config --local 'annex.gitaddtoannex' false
 git config --local 'annex.gitaddtoannex' true
 
@@ -47,14 +66,16 @@ git config --local 'annex.jobs' cpus
 
 # DEBUG: $ git annex matchexpression 'largerthan=100kb or not (mimetype=text/* or mimetype=inode/x-empty)' --file=my.txt --size=100kb --mimetype=text/x-empt --largefiles
 git annex config --set 'annex.largefiles' \
-  'largerthan=100kb or not (mimetype=text/* or mimetype=inode/x-empty)'
+  'largerthan=100kb or include=*.mht or mimetype=text/html or not (mimetype=text/* or mimetype=inode/x-empty or mimetype=inode/symlink)'
 
 
 
 ### CHECKOUT #####################################
 
 ## NOTE: always unlock my drawing-projects
-## TODO: enable after CHECK
+## TODO: enable after CHECK -- because "git status" seems to be slow due to smudge filter
+##   git status smudges unncessarily after unlock ⌇⡞⡀⠢⠉
+##     https://git-annex.branchable.com/todo/git_status_smudges_unncessarily_after_unlock/
 # git annex config --set 'annex.addunlocked' \
 #   'include=*.kra'
 

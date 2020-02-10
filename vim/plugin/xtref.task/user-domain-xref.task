@@ -7,3 +7,8 @@ ALSO:IDEA: to refer another user on same domain, or to cross-domain issuer, you 
   ALT:BET? len(sfx) is always eq 5, therefore we can instead always use head as node-id
   "/⌘\S{5,}/[:-6]"  <= cool hack, always works, results in empty node-id
   "/⌘(\S+[:`])?\S{5}/[:-6]"
+
+
+ALT: extract git-email from git-blame and annotate ctags by "... blame=<author>" attribute
+  => in this way you can distinguish jumping by ref to whatever source
+  i.e. <xtref> -- pref jump to your own tags, <domain@xtref> -- jump to explicit user's domain xtref

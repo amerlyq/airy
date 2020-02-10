@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 #%SUMMARY: add new file and keep all its attributes
 #%USAGE: $ ./$0
+#%   OR: $ r.annex-add-batch
 set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
 f=$1
@@ -13,11 +14,32 @@ stat --format='%W %X %Y %Z ' $f | read -r -- btime atime mtime ctime
 # echo $btime,$atime,$mtime,$ctime
 
 GIT_AUTHOR_DATE=$(( min(btime,atime,mtime,ctime) ))
-GIT_COMMITTER_DATE=$mtime
+GIT_COMMITTER_DATE=$(( max(btime,mtime) ))
 export GIT_AUTHOR_DATE GIT_COMMITTER_DATE
 
-git add -- $f
-obj=$(git rev-parse :./$f)
+# TODO:NEED: separate script to extract and create only notes/xattr
+#   e.g. when you forgot to update xattrs before adding file
+#   <= must be able to import author/commit date from file commit itself OR use current
+
+## ALT:NOTE: use new binary blob as note
+# NOT:(--path $f): based on filepath adds notes to annex instead of plain git
+sha_blob=$(getfattr --no-dereference --absolute-names --dump -- $f \
+  | tail -n +2 | git hash-object --stdin -w)
+
+# NOTE: don't try to store sha_blob if it's ignored
+sha_ignore=(
+  e69de29bb2d1d6434b8b29ae775ad8c2e48c5391  # sha_empty
+  8b137891791fe96927ad78e64b0aad7bded08bdc  # sha_NL
+  139597f9cb07c5d48bed18984ec4747f4b4f3438  # sha_NLNL
+)
+(($sha_ignore[(Ie)$sha_blob])) && sha_blob=''
+
+
+## WARN: you must read [dereferenced] xattrs/[bm]time before file moved to .git/annex
+git annex add -- $f
+
+
+obj=$(git rev-parse :./$f) 2>/dev/null || { echo "ignored: $f"; exit 0; }
 
 ## ALT: store xattr in commit msg body (w/o summary)
 # {
@@ -39,16 +61,18 @@ obj=$(git rev-parse :./$f)
 #     == introduce location-based metadata by location itself e.g. demarcate domain boundaries
 #     BUT: such ctx-based tags are virtual (dynamic) -- you can't easily query them directly from files
 
-## ALT:NOTE: use new binary blob as note
-# NOT:(--path $f): based on filepath adds notes to annex instead of plain git
-sha_blob=$(getfattr --no-dereference --absolute-names --dump -- $f \
-  | tail -n +2 | git hash-object --stdin -w)
-
 old_sha=$(git notes --ref=xattr list -- $obj 2>/dev/null ||:)
 
-if [[ -z $old_sha ]] || [[ -n force ]]; then
+
+if [[ $old_sha == $sha_blob ]]; then
+  : "nothing to do -- both are absent OR new xattr had not changed"
+elif [[ -z $old_sha ]] || [[ -n force ]]; then
+  # [_] TODO:TRY: create "tree" instead of "blob" to contain all attributes separately
   git notes --ref=xattr add ${force+--force} --reuse-message=$sha_blob -- $obj
-elif [[ $old_sha != $sha_blob ]]; then
+elif [[ -z $sha_blob ]]; then
+  # --ignore-missing
+  git notes --ref=xattr remove -- $obj
+else
   # TODO:BET:ENH: instead of "force" fallback to "git-notes merge" and open diff-editor for this
   #   BUT: what if notes are binary ?? You can't open 3-way merge then and must use --force ...
   echo $old_sha $sha_blob
