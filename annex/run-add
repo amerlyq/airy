@@ -10,7 +10,7 @@ force=${2-}
 autoload zmathfunc
 zmathfunc
 
-stat --format='%W %X %Y %Z ' $f | read -r -- btime atime mtime ctime
+command stat --format='%W %X %Y %Z ' $f | read -r -- btime atime mtime ctime
 # echo $btime,$atime,$mtime,$ctime
 
 GIT_AUTHOR_DATE=$(( min(btime,atime,mtime,ctime) ))

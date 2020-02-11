@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq+airy@gmail.com> and contributors.
 #
 # SPDX-License-Identifier: MIT
 #
 #%SUMMARY: copy current title/url or use selected text as title
-#%USAGE: :bind yv spawn --userscript yank_nou
-#%OR(with-args): :bind yV set-cmd-text -s :spawn --userscript yank_nou
+#%USAGE: :bind yv spawn --userscript yank_nou [prefix] [block]
+#%OR(with-ia-args): :bind yV set-cmd-text -s :spawn --userscript yank_nou
 #%DEBUG: $ QUTE_COUNT=2 QUTE_TITLE=aaa QUTE_URL=bbb ./yank_nou
 set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
@@ -18,12 +18,13 @@ cache=$TMPDIR/qute.cfg
 count=$(( ${QUTE_COUNT:-1} % 10 ))
 echo "$count" >| "$cache"
 
-pfx=${1-}
+blk=${1-}
+pfx=${2-}
 
 # HACK: timestamp working as xref
 xtref=$(r.vim-xtref)
 
 exec xsel -ib <<EOT
-$(printf "%$((count * 2))s")${pfx}${QUTE_SELECTED_TEXT:-$QUTE_TITLE}${xtref:+ $xtref}
-$(printf "%$(((count + 1) * 2))s")$QUTE_URL
+${blk}$(printf "%$((count * 2))s")${pfx}${QUTE_SELECTED_TEXT:-$QUTE_TITLE}${xtref:+ $xtref}
+${blk}$(printf "%$(((count + 1) * 2))s")$QUTE_URL
 EOT
