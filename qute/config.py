@@ -849,7 +849,9 @@ c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
 ## setting, it's replaced with the fonts listed here.
 ## Type: Font
 # c.fonts.monospace = '"xos4 Terminus", Terminus, Monospace, "DejaVu Sans Mono", Monaco, "Bitstream Vera Sans Mono", "Andale Mono", "Courier New", Courier, "Liberation Mono", monospace, Fixed, Consolas, Terminal'
-c.fonts.monospace = 'monospace'
+# FIXED:(upgrade): https://lists.schokokeks.org/pipermail/qutebrowser-announce/2020-February/000076.html
+c.fonts.default_family = []
+# c.fonts.default_family = 'monospace'
 
 ## Font used for prompts.
 ## Type: Font

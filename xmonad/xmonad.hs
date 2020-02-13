@@ -216,6 +216,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- FIXME: bring copyq into between windows stack -- check on first window of fullscreen wksp
   , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
   , className =? "LuxoftPopulus" --> doFloat
+  , className =? "rdesktop" --> doFullFloat
   ] <+>
   composeFloat
   [ ("Float" `isPrefixOf`) <$> appName

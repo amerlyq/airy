@@ -17,6 +17,9 @@ do [[ -L $f ]] && source "$f"; done
 # Source combined alias cache from all *mod*s
 [[ ! -s $_cache/aliases.sh ]] || source "$_cache/aliases.sh"
 
+# TEMP:
+[[ -s /etc/profile.d/tenjo.sh ]] && source "/etc/profile.d/tenjo.sh"
+
 # Execute exported commands for chroot and ssh
 # BAD: can't be used for non-interactive shell (like r.chroot)
 #   $ bash -ic '"$@"' "$0" "$@"
