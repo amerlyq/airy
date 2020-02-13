@@ -23,6 +23,7 @@ export GIT_AUTHOR_DATE GIT_COMMITTER_DATE
 
 ## ALT:NOTE: use new binary blob as note
 # NOT:(--path $f): based on filepath adds notes to annex instead of plain git
+# [_] TODO:TRY: create "tree" instead of "blob" to contain all attributes separately
 sha_blob=$(getfattr --no-dereference --absolute-names --dump -- $f \
   | tail -n +2 | git hash-object --stdin -w)
 
@@ -67,7 +68,6 @@ old_sha=$(git notes --ref=xattr list -- $obj 2>/dev/null ||:)
 if [[ $old_sha == $sha_blob ]]; then
   : "nothing to do -- both are absent OR new xattr had not changed"
 elif [[ -z $old_sha ]] || [[ -n force ]]; then
-  # [_] TODO:TRY: create "tree" instead of "blob" to contain all attributes separately
   git notes --ref=xattr add ${force+--force} --reuse-message=$sha_blob -- $obj
 elif [[ -z $sha_blob ]]; then
   # --ignore-missing

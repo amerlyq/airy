@@ -78,6 +78,7 @@ alias -g Cm='|wc --max-line-length'
 alias -g Cw='|wc --words'
 alias -g Ca='|cat'
 alias -g Cn='|nl -s"  " -w4'
+alias -g Cz='|tr \\0 \\n'
 alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
 # ALT: |perl -nle '$s+=(split)[1];END{print $s}'
 alias -g TC='|column -Lt'
