@@ -1,0 +1,78 @@
+
+Enable USB extensions
+  File -> Preferences -> Extensions -> select .vbox-extpack -> install
+
+Share folder always(guest-reboot) OR temporary(on-the-fly)
+  $ VBoxManage sharedfolder add "$vnm" --name vboxshare --hostpath /srv/share --automount [--transient]
+
+
+Connect USB device
+  $ VBoxManage list usbhost
+  $ VBoxManage controlvm <VM> usbattach <ID>
+  $ VBoxManage controlvm <VM> usbdetach <ID>
+  $ VBoxManage list usbfilters
+
+  Quickly Attaching USB Devices to VirtualBox Guests using VBoxManage « AJ Online ⌇⡞⡂⢲⡦
+    https://antonyjepson.wordpress.com/2012/01/26/quickly-attaching-usb-devices-to-virtualbox-guests-using-vboxmanage/
+  Chapter 8. VBoxManage ⌇⡞⡂⢲⡳
+    https://www.virtualbox.org/manual/ch08.html#vboxmanage-usbfilter
+
+  BAD:
+  [SOLVED] Virtualbox list usb devices is empty. / Newbie Corner / Arch Linux Forums ⌇⡞⡂⣆⣭
+    https://bbs.archlinux.org/viewtopic.php?id=149110
+  vboxmanage usbhost empty - Google Search ⌇⡞⡂⣆⣳
+    https://www.google.com/search?q=vboxmanage%20usbhost%20empty
+  virtualbox cmdline usb device - Google Search ⌇⡞⡂⣆⣿
+    https://www.google.com/search?q=virtualbox%20cmdline%20usb%20device
+
+
+Run headless on server ⌇⡞⡂⣇⣕
+  WARN? w/o GUI impossible to add into VBoxManager and install USB extension, etc.
+  FAIL: vbox regularly crashes on system w/o Xorg
+    vga - What are differences between VBoxVGA, VMSVGA and VBoxSVGA in VirtualBox? - Super User ⌇⡞⡃⣒⠎
+      https://superuser.com/questions/1403123/what-are-differences-between-vboxvga-vmsvga-and-vboxsvga-in-virtualbox
+    How to set virtualbox the correct way – graphics controller – workflow | Arcolinux.com ⌇⡞⡃⣒⠣
+      https://arcolinux.com/how-to-set-virtualbox-6-the-correct-way-graphical-controller-workflow/
+    #18915 (Critical structure corruption blue screen) – Oracle VM VirtualBox ⌇⡞⡃⣒⡋
+      https://www.virtualbox.org/ticket/18915
+  FAIL: can't pass HostKey over rdesktop
+    BET: use VNC ※⡞⡃⣑⣄
+
+  Chapter 7. Remote Virtual Machines ⌇⡞⡂⢦⡆
+    https://www.virtualbox.org/manual/ch07.html
+
+  SSH
+    $ VBoxManage list runningvms
+    $ VBoxManage list vms
+    $ VBoxHeadless --startvm "$vnm" --vrde on  # 3389
+    OR: $ VBoxManage startvm "$vnm" --type headless
+  HOST
+    $ r.xsel-ssh -t -L 3389:localhost:3389 wt 'VBoxHeadless --startvm "$vnm" --vrde on'
+    # $ RDESKTOP_DEBUG=All rdesktop -a 16 -N localhost:3389
+    $ rdesktop-vrdp -g 1920x1020 -z localhost:3389
+
+    NOTE: use |community/virtualbox|/rdesktop-vrdp
+      [Solved] Virtualbox RDP over LAN / Networking, Server, and Protection / Arch Linux Forums ⌇⡞⡂⢈⣥
+        https://bbs.archlinux.org/viewtopic.php?id=195014
+    # OR: $ krdc rdp://localhost:3389
+  SSH
+    $ VBoxManage controlvm "$vnm" poweroff
+    $ VBoxManage controlvm "$vnm" poweroff --type headless
+
+
+ALT
+  VIZ: Category:Remote desktop - ArchWiki ⌇⡞⡂⢦⢾
+    https://wiki.archlinux.org/index.php/Category:Remote_desktop
+  RemoteBox - ArchWiki ⌇⡞⡂⢦⢁
+    https://wiki.archlinux.org/index.php/RemoteBox
+  PhpVirtualBox - ArchWiki ⌇⡞⡂⢦⢇
+    https://wiki.archlinux.org/index.php/PhpVirtualBox
+  Xrdp - ArchWiki ⌇⡞⡂⢦⢕
+    https://wiki.archlinux.org/index.php/Xrdp
+  Rdesktop - ArchWiki ⌇⡞⡂⢦⢙
+    https://wiki.archlinux.org/index.php/Rdesktop
+  Remmina - ArchWiki ⌇⡞⡂⢦⣉
+    https://wiki.archlinux.org/index.php/Remmina
+    FreeRDP ⌇⡞⡂⢦⢲
+      http://www.freerdp.com/
+      https://www.archlinux.org/packages/community/x86_64/freerdp/
