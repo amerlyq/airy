@@ -76,8 +76,12 @@ endf
 "   INFO:ALT: expand('<cWORD>') don't support glued train of anchors/referals
 " WARN! regular tags will be always ignored
 "   TODO: provide for them separate keybindings
-fun! xtref#get()
-  let [l,c] = [getline('.'), col('.')-1]
+fun! xtref#get(visual)
+  if a:visual
+    let [l,c] = [xtref#vsel(), 0]
+  else
+    let [l,c] = [getline('.'), col('.')-1]
+  endif
 
   let b = xtref#lseek(l, g:xtref.markers, c)
   let e = xtref#rseek(l, g:xtref.markers, c)
@@ -102,22 +106,44 @@ fun! xtref#get()
   return [strpart(l, b, len), b-c]
 endf
 
-fun! xtref#replace(...)
-  let [x, off] = xtref#get()
+fun! xtref#replace(visual, sub)
+" fun! xtref#replace(...)
+"   let [x, off] = xtref#get()
+  let [x, off] = xtref#get(a:visual)
   if empty(x) | return |en
   let b = col('.')-1 + off
   let e = b + len(x)
   let l = getline('.')
-  call setline('.', l[0:b-1] .get(a:,1,''). l[e:])
+  call setline('.', l[0:b-1] . a:sub . l[e:])
 endf
 
-fun! xtref#invert(...)
-  let x = get(a:, 1, xtref#get()[0])
+fun! xtref#strip(xloci)
+  let [x, off] = a:xloci
+  let [a,r] = g:xtref.markers
+  let pfx = strcharpart(x, 0, 1)
+  if pfx ==# a || pfx ==# r | let x = strcharpart(x, 1) | en
+  return x
+endf
+
+fun! xtref#invert(xloci)
+  let [x, off] = a:xloci
   let pfx = strcharpart(x, 0, 1)
   " ALT: keep regular tags untouched = (pfx==a ? r : pfx==r ? a : pfx)
   let [a,r] = g:xtref.markers
   if pfx !=# a && pfx !=# r | return expand('<cword>') | en
   return (pfx ==# a ? r : a) . strcharpart(x, 1)  " fnameescape()
+endf
+
+fun! xtref#to_date(xloci)
+  let [x, off] = a:xloci
+  let [pfx, x] = [strcharpart(x, 0, 1), strcharpart(x, 1)]
+  let [a,r] = g:xtref.markers
+  if pfx !=# a && pfx !=# r
+    echoe "Unsupported xtref format"
+    return x
+  endif
+  let hexts = substitute(x, '.', '\=printf("%x",and(char2nr(submatch(0)),0xff))', 'g')
+  return pfx . strftime('%Y-%m-%d_%H:%M:%S%z', str2nr(hexts, 16))
 endf
 
 function! xtref#call_at(cwd, fn, ...)
@@ -190,10 +216,10 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 "" NOTE: jump anchor from referal under cursor, and vice versa
 " BUG:(TEMP:sil): paused prompt on each :tag
 "   => always prints name of file it opens on tag jump
-nnoremap g]  :sil exe v:count1."tag" xtref#invert()<CR>
-xnoremap g]  :<C-u>sil exe v:count1."tag" xtref#invert(xtref#vsel)<CR>
-nnoremap z]  :exe "tsel" xtref#invert()<CR>
-xnoremap z]  :<C-u>exe "tsel" xtref#invert(xtref#vsel)<CR>
+nnoremap g]  :sil exe v:count1."tag" xtref#invert(xtref#get(0))<CR>
+xnoremap g]  :<C-u>sil exe v:count1."tag" xtref#invert(xtref#get(1))<CR>
+nnoremap z]  :exe "tsel" xtref#invert(xtref#get(0))<CR>
+xnoremap z]  :<C-u>exe "tsel" xtref#invert(xtref#get(1))<CR>
  noremap g[  :<C-u><C-r>=v:count1<CR>tnext<CR>
  noremap <C-]>  :<C-u>tags<CR>
 
@@ -207,25 +233,38 @@ nnoremap <Plug>(xtref-new-insert) i<C-r>=xtref#new()<CR><Esc>
 
 nnoremap <Plug>(xtref-new-append) $"=" ".xtref#new()<CR>p<Plug>(xtref-yank)
 xnoremap <Plug>(xtref-new-append) "=xtref#new()<CR>p
-nnoremap <Plug>(xtref-yank) :<C-u>call xtref#copy(xtref#invert())<CR>
-xnoremap <Plug>(xtref-yank) :<C-u>call xtref#copy(xtref#invert(xtref#vsel()))<CR>
 
-" ENH: limit #get() area by visual selection for bounded replace
-nnoremap <Plug>(xtref-delete) :call xtref#replace()<CR>
+nnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(0)))<CR>
+xnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(1)))<CR>
+nnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref#strip(xtref#get(0)))<CR>
+xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref#strip(xtref#get(1)))<CR>
+
+" [_] CHECK: limit #get() area by visual selection for bounded replace
+nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(0,'')<CR>
+xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
+
+nnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(0,xtref#to_date(xtref#get(0)))<CR>
+xnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(1,xtref#to_date(xtref#get(1)))<CR>
+
 " MAYBE:([Xtref]r): upgrade xtref marker format one-by-one instead of all at once
-nnoremap <Plug>(xtref-refresh) :call xtref#replace(xtref#new())<CR>
+nnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(0,xtref#new())<CR>
+xnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(1,xtref#new())<CR>
 
-nnoremap <Plug>(xtref-toggle) :call xtref#replace(xtref#invert())<CR>
-xnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(xtref#invert(xtref#vsel()))<CR>
+nnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(0,xtref#invert(xtref#get(0)))<CR>
+xnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(1,xtref#invert(xtref#get(1)))<CR>
 
 
 " OBSOL:  <LocalLeader>...
+map <silent> [Xtref]<Backspace> <Plug>(xtref-delete)
+map <silent> [Xtref]<Delete> <Plug>(xtref-delete)
+
 map <silent> [Xtref]a <Plug>(xtref-new-append)
-map <silent> [Xtref]d <Plug>(xtref-delete)
 map <silent> [Xtref]i <Plug>(xtref-new-insert)
+map <silent> [Xtref]d <Plug>(xtref-replace-date)
 map <silent> [Xtref]r <Plug>(xtref-refresh)
 map <silent> [Xtref]t <Plug>(xtref-toggle)
-map <silent> [Xtref]y <Plug>(xtref-yank)
+map <silent> [Xtref]y <Plug>(xtref-yank-refer)
+map <silent> [Xtref]Y <Plug>(xtref-yank-anchor)
 
 
 " HACK: new leader
