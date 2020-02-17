@@ -24,7 +24,11 @@ pfx=${2-}
 # HACK: timestamp working as xref
 xtref=$(r.vim-xtref)
 
+## BAD: no easy keyboard-only way to remove accidental selections on page
+# title=${QUTE_SELECTED_TEXT:-$QUTE_TITLE}
+title=$QUTE_TITLE
+
 exec xsel -ib <<EOT
-${blk}$(printf "%$((count * 2))s")${pfx}${QUTE_SELECTED_TEXT:-$QUTE_TITLE}${xtref:+ $xtref}
+${blk}$(printf "%$((count * 2))s")${pfx}${title}${xtref:+ $xtref}
 ${blk}$(printf "%$(((count + 1) * 2))s")$QUTE_URL
 EOT

@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 #%SUMMARY: add untracked files in batch as separate historical commits
-#%USAGE: $ ./$0
+#%USAGE: $ ./$0 [r.annex-add]
 #%NEED: sort/rebase history afterwards
 # RENAME? add-batch-untracked
 set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
@@ -8,8 +8,10 @@ set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
 # git log --pretty=format:'%h %aI %cI %f' --raw G '^:' Gv '\.(chm|mht|html?|php|js|pdf|PDF|djvu?|zip|ZIP|rar|gz|tar|jpe?g|JPG|JPE|gif|png|tga|tif|bmp|cur|otf|ttf|wmv|flv|ogg(|.sf[kl])|mp3|kra|mmap|doc|epub|fb2|prproj|exe|dll|max|psd)$' G -o '[^./]+$' SC
 
 # d=${1:-.}
+(($#)) || set -- printf '%s\n'
 
 # WARN:BAD:(--max-procs=0): I don't if git-annex breaks with concurrency
-git ls-files -z -o --cached --exclude-standard \
+# --cached
+git ls-files -z -o --exclude-standard \
 | grep -zZ -vxFf <(find -type l -printf '%P\n') \
-| xargs -0 --no-run-if-empty --max-args=1 -- r.annex-add
+| xargs -0 --no-run-if-empty --max-args=1 -- $@

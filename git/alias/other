@@ -7,8 +7,10 @@
 # git show 1b17fd56:./async
 
 alias gc1='noglob git clone --single-branch --depth=1'
-gIC(){ (mkdir "$1" && cd "$1" && git init && touch "${3:=README.rst}" &&
-  r.git-my-repo "${2:--m}" && git add $3 && git commit -m "Initial commit"); }
+gcI(){ [[ -d $1 ]] && return
+  git init "$1" && REPO="$1" r.git-my-repo "${2:--m}" &&
+    git -C "$1" commit --allow-empty -m "Initial empty commit"
+}
 
 ## --- Git ---
 alias gir1='gir HEAD~'
