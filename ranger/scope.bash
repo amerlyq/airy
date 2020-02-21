@@ -68,7 +68,7 @@ trim() { head -n "$maxln"; }
 # CHECK: minimize disk io
 try() {
     # (sleep 3 && echo hi && kill $$ >/dev/null 2>&1) & disown
-    timeout --kill-after 5 --foreground 3 $@ | head -n "$maxln"
+    timeout --kill-after 2 --foreground 3 $@ | head -n "$maxln"
     # kill $! >/dev/null 2>&1
 
     # output=$(eval '"$@"');
