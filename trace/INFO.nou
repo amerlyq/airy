@@ -1,3 +1,21 @@
+
+FAIL
+  BUGS: A traced process runs slowly.
+    strace Wow Much Syscall ⌇⡞⡏⣫⠐
+      http://www.brendangregg.com/blog/2014-05-11/strace-wow-much-syscall.html
+    No mention of overhead. strace can bring down your production environment -- it ... | Hacker News ⌇⡞⡏⣩⠉
+      https://news.ycombinator.com/item?id=16355845
+      ALT:PERF: $ perf trace
+  BUGS Programs that use the setuid bit do not have effective user ID privileges while being traced.
+    | sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid' option set or an NFS file system without root privileges?
+    ::: $ sudo strace -u "$USER"  ... -- sudo ls
+      NOTE: use "sudo -k ls" to clear cached passphrase and force user to re-enter it
+      FAIL: incompatible "--seccomp-bpf"
+    Why strace sudo command bombs when sudo command works? - Super User ⌇⡞⡏⣯⣖
+      https://superuser.com/questions/1059198/why-strace-sudo-command-bombs-when-sudo-command-works
+      ++ https://stackoverflow.com/questions/34279612/cannot-strace-sudo-reports-that-effective-uid-is-nonzero
+
+
 INFO
   How does strace work? - Packagecloud Blog
     https://blog.packagecloud.io/eng/2016/02/29/how-does-strace-work/
@@ -9,3 +27,8 @@ INFO
     https://blog.packagecloud.io/eng/2016/04/05/the-definitive-guide-to-linux-system-calls/
   [_] READ: Micro-optimizations matter: preventing 20 million system calls - Packagecloud Blog
     https://blog.packagecloud.io/eng/2017/03/06/micro-optimizations-matter/
+  Strace – My Favourite Secret Weapon (2011) | Hacker News ⌇⡞⡏⣩⣦
+    TALK: https://news.ycombinator.com/item?id=16353054
+    REF: https://zwischenzugs.com/2011/08/29/my-favourite-secret-weapon-strace/
+  Advanced Debugging in the Linux Environment | | InformIT ⌇⡞⡏⣭⡢
+    http://www.informit.com/articles/article.aspx?p=2161291

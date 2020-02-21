@@ -14,7 +14,7 @@ alias pacI='sudo pacman -U'   # install from files on disk
 alias pacD='sudo pacman -D --asdeps'      # change install reason
 alias pacE='sudo pacman -D --asexplicit'  # change install reason
 alias pacu='sudo pacman -Su'  # install with [u]pdate
-alias pacU='sudo pacman --sync --refresh'  # --sysupgrade
+alias pacU='sudo pacman -Syu' # == --sync --refresh --sysupgrade
 # alias pacU='pacman -U /var/cache/pacman/pkg'    # refresh only
 
 # alias pacC='pacman -Scc'     # '[c]lean cache' (all not currently installed)

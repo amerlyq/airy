@@ -13,7 +13,33 @@ Tracking dangling file descriptors of deleted files (e.g. sqlite holding tmpfile
 
 
 Trace child process tree
-  https://stackoverflow.com/questions/4053142/how-to-track-child-process-using-strace
+  BAD: can't hide arg3=environment in execve()
+    [_] REQ: request on github ::
+      https://github.com/strace/strace/issues/124
+      https://github.com/strace/strace/issues/125
+
+  SEE: ~/sdk/strace/linux/x86_64/syscallent.h:/\bTP\b/
+
+  NEW:(=5.4):
+    $ strace --seccomp-bpf -qftttvzs4096 -X raw -o "_build-$(date +%Y%m%d_%H%M%S).strace" \
+      -e verbose='execve,execveat' -e trace='%process,chdir' -e signal=none -- make
+  OLD:(=4.11):
+    $ strace -qftttvzs4096 -e verbose='execve,execveat' -e trace='process,chdir' -e signal=none -- ls
+  sudo:
+    $ sudo strace -u "$USER" -qftttvzs4096 -X raw \
+      -e verbose='execve,execveat' -e trace='%process,chdir' -e signal=none -- sudo id
+  chroot_sudo:
+    $ sudo strace -u "$USER" -qftttvzs4096 -X raw -o "_build-$(date +%Y%m%d_%H%M%S).strace" \
+      -e verbose='execve,execveat' -e trace='%process,chdir' -e signal=none \
+      -- schroot -c "xenial_amd64" -d "$PWD" -- env \
+        LANG="${LANG:=en_US.UTF-8}" \
+        LC_NUMERIC="${LC_NUMERIC:-${LANG-}}" \
+        DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+        DISPLAY="${DISPLAY:-:0}" \
+        /bin/bash -li "$(readlink -e "$0")" "$@"
+  [_] ALT:(sysdig): https://unix.stackexchange.com/questions/371484/sudo-command-does-not-work-when-strace-is-attached-with-pid-of-bash
+
+  ALSO: https://stackoverflow.com/questions/4053142/how-to-track-child-process-using-strace
   $ strace -qqzf -e trace=execve -e signal=none -o trace -- wiw
   $ ./strace -f -q -s 100 -o trace -p 449
   $ strace-graph ./trace
