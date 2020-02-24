@@ -10,20 +10,64 @@
 # glg -m "$(git merge-base --fork-point HEAD)~..HEAD"
 # glg -m --first-parent "$(git merge-base --fork-point HEAD)~...HEAD"
 
+declare -gA _gitfmt
+_gitfmt[ad]='%C(bold green)%ad%C(reset)'
+_gitfmt[h]='%C(yellow)%h%C(reset)'
+_gitfmt[ph]='%<(60)'
+_gitfmt[s]='%C(white)%s%C(reset)'
+_gitfmt[d]='%C(bold red)%d%C(reset)'
+_gitfmt[aN]='%C(bold blue)[%aN]%C(reset)'
+_gitfmt[std]="${_gitfmt[ad]} ${_gitfmt[h]} ${_gitfmt[ph]}${_gitfmt[s]}${_gitfmt[d]} ${_gitfmt[aN]}"
+
+_gitfmt[Iad]='%C(bold reverse green)%ad%C(reset)'
+_gitfmt[Ih]='%C(reverse yellow)%h%C(reset)'
+_gitfmt[Is]='%C(15 8)%s%C(reset)'
+# _gitfmt[Is]='%C(white black)%s%C(reset)'
+_gitfmt[Id]='%C(bold reverse red)%d%C(reset)'
+# _gitfmt[Iph]='%C(reverse black)%>(60)%C(reset)'
+_gitfmt[IaN]='%C(bold reverse blue)[%aN]%C(reset)'
+_gitfmt[Istd]="${_gitfmt[Iad]} ${_gitfmt[Ih]} ${_gitfmt[ph]}${_gitfmt[Is]} ${_gitfmt[Id]} ${_gitfmt[IaN]}"
+
+_gitfmt[dt]='%Y%m%d %H%M%S'
+_gitfmt[d_]='%Y%m%d_%H%M%S'
+_gitfmt[DT]='%Y-%m-%d %H:%M:%S'
+_gitfmt[D_]='%Y-%m-%d_%H:%M:%S'
+_gitfmt[d.]='%Y%m%d'
+_gitfmt[D.]='%Y-%m-%d'  # BET: --date=short
+# _gitfmt[DB]="%s => $(r.vim-xtref %s)"  ## TRY: ts => Braille
+
+
 ## Log
 alias gfH='git fcommits'  # history for one file
 alias gfB='git flines'    # blame formatted
 
-alias glG='git log --graph --abbrev-commit --date=format:"%Y-%m-%d %H:%M:%S" --format=format:"%C(bold green)%ad%C(reset) %C(yellow)%h%C(reset) %C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset)"'
-alias glg='git lgraph'
-alias glg.='glg -- .'
+alias gLl='git log --date=short --format=format:"${_gitfmt[std]}"'
+alias gLn='git log --date=short --format=format:"${_gitfmt[Istd]}%n"'
+alias gLt='git log --date=short --format=tformat:"${_gitfmt[std]}"'
+alias gLL='git log --date=format:"${_gitfmt[DT]}" --format=format:"${_gitfmt[std]}"'
+alias gLN='git log --date=format:"${_gitfmt[DT]}" --format=format:"${_gitfmt[Istd]}%n"'
+alias gLT='git log --date=format:"${_gitfmt[DT]}" --format=tformat:"${_gitfmt[std]}"'
+alias gLF='git log --date=iso8601 --format=format:"commit %H%nparent %P%ntreesh %T%nreflog %gd %gs %gN <%gE>%nauthor %ad %aN <%aE>%ncomitr %cd %cN <%cE>%nsigner %G? %GS%ndecorat %D%S%nsubject %s%nbody %b%nnotes %N%n" --graph'
+
+alias glg='gLl --graph'
+alias glg.='gLl --graph -- .'
+alias glG='gLL --graph'
+
+alias gla='gLl --graph --all'
+alias gla.='gLl --graph --all -- .'
+alias glA='gLL --graph --all'
+
+alias gls='gLN --topo-order --graph --compact-summary'
+alias glS='gLN --topo-order --graph --name-status'
+alias gld='gLN --topo-order --patch-with-stat'
+
+# --raw, --numstat, --shortstat, --dirstat, --summary, --name-only, --name-status, --check
+
 # WARN:NEED:(git pull --rebase): https://redfin.engineering/visualize-merge-history-with-git-log-graph-first-parent-and-no-merges-c6a9b5ff109c
 #   <= otherwise first-parent of merge on "git pull" is reversed and history is wrong
 alias gll='glg -m -M --first-parent'
 alias glc='glg -m -M --no-merges'
 alias glm='glg -m -M --merges'
-alias gla='glg --all'
-alias gla.='gla -- .'
 
 ## Statistics on all authors / committers in the repo
 # NOTE: add '... -- dir/file' for blaming
