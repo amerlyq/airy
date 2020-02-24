@@ -352,7 +352,7 @@ sub mkmsg {
     # DEV:(opt): orthogonal options to enable each part of auto-message in addition to opts{message}
     return $opts{message} if $opts{message};
     # ALT: "[%]. chg ..." | "[%]* chg ..." | "[%] * chg ..." | "[%] *chg ..."
-    return "*". mkmods() ." ". mkcmpts(2) . mkbody() . mkchgs();
+    return "* ". mkmods() ." ". mkcmpts(2) . mkbody() . mkchgs();
 }
 
 my $text = "[". mkpfx(@tops) ."] ". mkmsg();

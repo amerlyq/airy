@@ -1465,6 +1465,7 @@ c.url.searchengines = {
     'gr': 'https://google.com/search?q=restructuredtext%20{}',
     'gm': 'https://www.google.com/maps/place/{}',
     'gv': 'https://google.com/search?q=graphviz%20{}',
+    'gz': 'https://www.google.com/search?q=%22zsh%22%20{}',
     'ha': 'http://www.haskell.org/hoogle/?hoogle={}',
     'so': 'http://stackoverflow.com/search?q={}',
     'en': 'https://google.com/search?q=english%20{}',
@@ -1485,6 +1486,7 @@ c.url.searchengines = {
     'ro': 'http://www.rottentomatoes.com/search/?search={}',
     'vs': 'https://www.google.com/search?q=%22vimscript%22%20{}',
     'za': 'http://songza.com/search/?q={}',
+    'zsh': 'https://www.google.com/search?q=%22zsh%22%20{}',
 }
 
 ## Page(s) to open at the start.
