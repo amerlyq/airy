@@ -45,7 +45,7 @@ use warnings FATAL => 'all';
 use autodie;
 use strict;
 use v5.14;  # for s///r
-use List::Util qw(uniq sum0);  # REF: https://perldoc.perl.org/List/Util.html
+use List::Util qw(min uniq sum0);  # REF: https://perldoc.perl.org/List/Util.html
 use POSIX qw(:sys_wait_h strftime);
 use Cwd qw(cwd);
 use File::Spec::Functions qw( rel2abs canonpath );
@@ -59,11 +59,15 @@ no_auto_abbrev no_getopt_compat no_ignore_case no_pass_through);
 #
 my %opts = (
     index => 1,
+    level => 0,
     directory => cwd,
 );
 GetOptions(\%opts   #%OPTIONS:
 # , 'add|a!'          #% a = add      | add all files in current workdir (implies: -i) WARN: appends to index
 , 'index|i!'        #% i = index    | describe only current git index
+, 'greatest|g!'     #% g = greatest | use single folder with greatest number of changes DFL='[%]'
+, 'level|l=i'       #% l:= level    | derive names from nesting level DFL=0
+, 'prefix|p=s'      #% p:= prefix   | override component prefix DFL=<auto:{top-dir|.|%}>
 , 'commit|c!'       #% c = commit   | immediately commit description (implies: -i)
 # , 'message|m=s'     #% m:= message  | additional hint message to insert into description
 # , 'relative|r!'     #% r = relative | describe only current folder (TBD)
@@ -212,6 +216,7 @@ $stat{del} = sum0 (map { $_->{del} =~ /-/ ? 0 : $_->{del} } values %diff);
 
 
 # per-topdir
+# FIX: opts{level}
 my %tops;
 foreach my $src (keys %diff) {
     my $i = index($src, "/");
@@ -261,12 +266,11 @@ my @mods = grep { $stat{$_} } @allmods;
 # THINK: prepend by currently working story/ticket e.g. "ARCH-127 [mymod,bbd] ..."
 #   ALT: use short feature-branch name -- because you must store that ticket name somewhere anyway
 
-my $text;
-
 # FIXME: instead of semi-random order, sort @tops by number of changes
 #   => then first two features [a,b,(+...)] will have the largest diff
 # ALT:BET: if @tops > 1 feature :: use '[#]' or '[%]' marker -- to detect easily inside git history
 #     => and place short list of @tops<4 into message :: '[%] chg git,find,android,gdb,(+3) 5 files'
+#     BET: use '%' which means "intended group" (like strace(1)) -- in contrast to '#' meaning "unseized junkyard"
 #   BUT: what about '[.]' or '[:]' or '[%]' for pj root files -- first one is relative to pwd, and last one -- like nou.vim
 #   MAYBE: redefine nou.vim defaults to make ./rel/path always counted from file itself, and %/rel/path from $PWD
 #     BAD: it conflicts with expand('%') in vim, and '[.]' will mean current file and not project root anyway
@@ -274,57 +278,84 @@ my $text;
 #     == often I add new feature [client] and fix integration in [ctl] to enable it but it's still part of [client] feature
 # FORMAT ::= branch? [tops,..] files dirs?  +X/-Y  YYYYMMdd_hhmmss
 #  files ::= {chg|add|del} {<files>,..} | {chg|add|del} <N> "files" | <N> "files" (M2 A3)
-$text .= "[". $tops[0];
-$text .= ",". $tops[1] if @tops > 1;
-$text .= ",(+". (@tops - 2) .")" if @tops > 2;
-$text .= "]";
-
-if ($opts{message}) {
-    $text .= " ". $opts{message};
-} else {
-    # DEV: if folder didn't exist before -- use word :: "new", "create", "+"
-    my $action = $allmods{$mods[0]};
-
-    # IDEA:(fine-tuning): if you add file to some "cmpt-type" subfolder -- use trailing "+"
-    #   e.g. "add file ./cmpt/tmpl/new.c" -> "[cmpt] tmpl+ new.c"
-    # IDEA: if this added file contains header with "%SUMMARY:" -- use it as message
-    #   <= because ctx-based msgs are much better than simple file name duplicated in git log
-
-    if (@mods > 1) {
-        # DEV: use {"files" -> "symlinks"} if only symlinks are added/changed
-        $text .= " ". @files ." files" if @files;
-        # BAD: prints "[design] add 10 files 10 binary"
-        #   FIXME: subtract binaries from total files count
-        #   MAYBE: rename to e.g.
-        #     "[design] add 2 text 8 binary files"
-        #     "[design] add 2 files and 8 binary"
-        #     "[design] add 10 files (8 binary)"
-        $text .= " ". @binaries ." binary" if @binaries;
-        $text .= " (". join(" ", map { $_ . $stat{$_} } @mods) .")";
-    } elsif (@files > 2) {
-        $text .= " ". $action;
-        $text .= " ". @files ." files" if @files;
-        $text .= " ". @binaries ." binary" if @binaries;
-    } else {
-        my @subpaths = @files;
-        s|^/?.+/|| for @subpaths;
-        $text .= " ". $action ." ". join(",", @subpaths);
-    }
-
-    # BET? use middle-part "mod/[path/to]/file.txt" :: [mod] chg file.txt in {path/to/}
-    # $text .= " in {". join(",", @dirs) ."}" if @dirs < 2;
-
-
-    # MAYBE: print only number of changed lines -- remove added/deleted whole files from count
-    if ($stat{add} or $stat{del}) {
-        $text .= "  ";
-        $text .= "+". $stat{add} if $stat{add};
-        $text .= "/-". $stat{del} if $stat{del};
-    }
-
-    ## DISABLED: obstructs view more than helps -- better use proper "glG" alias with time
-    # $text .= "  ". strftime("%Y%m%d_%H%M%S", localtime);
+sub mkpfx {
+    die if @_ < 1;
+    return $opts{prefix} if defined $opts{prefix};
+    return "%" if @_ > 1 and not $opts{greatest};
+    return $_[0];
+    # OPTION:(old): composite
+    # $pfx .= "[". $tops[0];
+    # $pfx .= ",". $tops[1] if @tops > 1;
+    # $pfx .= ",(+". (@tops - 2) .")" if @tops > 2;
+    # $pfx .= "]";
 }
+
+sub mkmods {
+    # DEV: if folder didn't exist before -- use word :: "new", "create", "+"
+    die if @mods < 1;
+    return $allmods{$mods[0]} if @mods == 1;
+    return "(". join(" ", map { $_ . $stat{$_} } @mods) .")";
+}
+
+sub mkcmpts {
+    my ($max, @pfx) = @_;
+    my $end = min($max - 1, $#tops);
+    push @pfx, @tops[0 .. $end] if $max > 0;
+    push @pfx, "(+". (@tops - $max) .")" if @tops > $max;
+    return "" if @pfx < 2 or $opts{greatest};
+    return join(",", @pfx) .": ";
+}
+
+# BAD: prints "[design] add 10 files 10 binary"
+#   FIXME: subtract binaries from total files count
+#   MAYBE: rename to e.g.
+#     "[design] add 2 text 8 binary files"
+#     "[design] add 2 files and 8 binary"
+#     "[design] add 10 files (8 binary)"
+sub mkstats { my @fls;
+    push @fls, @files ." files" if @files;
+    push @fls, @binaries ." binary" if @binaries;
+    return join(" ", @fls);
+}
+
+sub mkpaths { my @subpaths = @files;
+    s|^/?.+/|| for @subpaths;
+    return join(",", @subpaths);
+}
+
+sub mkbody {
+    return mkstats() if @files > 2;
+    return mkpaths();
+}
+
+# MAYBE: print only number of changed lines -- remove added/deleted whole files from count
+#   i.e. $ git log --irreversible-delete
+sub mkchgs { my @chgs;
+    push @chgs, "+". $stat{add} if $stat{add};
+    push @chgs, "-". $stat{del} if $stat{del};
+    return "" if not @chgs;
+    return "  ". join("/", @chgs);
+}
+
+## DISABLED: obstructs view more than helps -- better use proper "glG" alias with time
+# BUT:OPT: can be useful for e.g. "aura commit-index" when I totally change author/committer dates
+# NEED: timezone OR directly use timestamp BUT still need timezone
+# sub mkts { return "  ". strftime("%Y%m%d_%H%M%S", localtime) }
+
+# IDEA:(fine-tuning): if you add file to some "cmpt-type" subfolder -- use trailing "+"
+#   e.g. "add file ./cmpt/tmpl/new.c" -> "[cmpt] tmpl+ new.c"
+# IDEA: if this added file contains header with "%SUMMARY:" -- use it as message
+#   <= because ctx-based msgs are much better than simple file name duplicated in git log
+# BET? use middle-part "mod/[path/to]/file.txt" :: [mod] chg file.txt in {path/to/}
+#   $text .= " in {". join(",", @dirs) ."}" if @dirs < 2;
+sub mkmsg {
+    # DEV:(opt): orthogonal options to enable each part of auto-message in addition to opts{message}
+    return $opts{message} if $opts{message};
+    # ALT: "[%]. chg ..." | "[%]* chg ..." | "[%] * chg ..." | "[%] *chg ..."
+    return "*". mkmods() ." ". mkcmpts(2) . mkbody() . mkchgs();
+}
+
+my $text = "[". mkpfx(@tops) ."] ". mkmsg();
 
 if ($opts{commit}) {
     # THINK:USE: --fixup=<commit> for "rebase --autosquash"
