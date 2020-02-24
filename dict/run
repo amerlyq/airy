@@ -20,13 +20,18 @@ fdmenu() {
       { sleep 0.1; r.xkb-lang $lang; } &
     fi
 
-    word=$(cat "$fl" | $DMENU)  # KEEP
+    # FIXED: use reverse order for words
+    word=$(tac "$fl" | cut -f2- | awk '!a[$0]++' | $DMENU)  # KEEP
     # WARNING: on errror won't be called, but we can't use trap or it will be
     # run again on EXIT or some independent error/etc in inappropriate place
     ${langprev:+r.xkb-lang $langprev}
 
     [[ $word ]] || return
-    grep -qxF "$word" "$fl" || echo "$word" >> "$fl"
+
+    # FIXED: accumulate all repeated words (with timestamps) to allow "frecency" statistics
+    # grep -qxF "$word" "$fl" || echo "$word" >> "$fl"
+    printf '%d\t%s\n' "$(date +%s)" "$word" >> "$fl"
+
     fvim "$word"
 }
 
