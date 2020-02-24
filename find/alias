@@ -8,6 +8,20 @@
 # fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
 # alias ff='find ./ | grep -i '
 
+alias fs='find . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
+alias fS='find -L . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
+
+# ALSO: @/airy/elf/ctl/categorize
+alias fh="find . -name .git -prune -o -print | grep -Po '[.]\\K(?:[^./]{3}[.])?[^./]{1,16}$' |LC_ALL=C sort|uniq -c|sort -k1n,1|tail"
+
+
+alias fUf='git ls-files --others'
+alias fuf='git ls-files --others --exclude-standard'
+alias fU='git ls-files --others --directory'
+alias fu='git ls-files --others --directory --exclude-standard'
+alias fu0='fu -z'
+
+
 alias fa='command fd -E .git -E _build\*'
 alias fa.='fa -g'
 alias fa0='fa -0'
@@ -20,8 +34,11 @@ alias fA0='fA -0'
 alias fA1='fA -d1'
 alias fA2='fA -d2'
 
-alias fe='fa -Hte'
-alias fx='fa -Htx'
+alias fe='fa -H -e'
+alias fe0='fa -H0 -e'
+
+alias fE='fa -Hte'
+alias fX='fa -Htx'
 
 alias ff='fa -Htf'
 alias ff.='ff -g'
