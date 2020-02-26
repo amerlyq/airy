@@ -11,3 +11,9 @@ fi
 if ! grep -q '^PRUNEPATHS\b.*\s/work\b' /etc/updatedb.conf; then
   sudo sed -ri '/^(PRUNEPATHS = "[^"]+)"/s||\1 /work"|' /etc/updatedb.conf
 fi
+
+# MAYBE: use something more granular e.g. /data/_work/{cache,repo}
+# BUT: having search for source files is also nice (BUT slow)
+if ! grep -q '^PRUNEPATHS\b.*\s/data/_work\b' /etc/updatedb.conf; then
+  sudo sed -ri '/^(PRUNEPATHS = "[^"]+)"/s||\1 /data/_work"|' /etc/updatedb.conf
+fi

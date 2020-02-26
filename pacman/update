@@ -33,6 +33,7 @@ aur sync --database=aur --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]'
 pkgupd
 
 # BUG: returns error "sudo pkgfile --update"
+# FAIL: 404 when fetching *.files from LAN pacman cache
 if [[ " $* " =~ " -u " || ! -f /var/cache/pkgfile/core.files ]]
 then sudo pkgfile --update; fi
 

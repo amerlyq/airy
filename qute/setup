@@ -20,7 +20,7 @@ linkcp -t ~/.local/share/qutebrowser/ userscripts
 
 # ALT:(create symlink): @/erian/mod/qute/bin/qutebrowser -> r.qute-hidpi
 # FAIL! dpi is not enough -- you also must consider distance to screen
-if (( "$(r.xorg -d)" > 141 )); then
+if (( "$(r.xorg -d||echo 0)" > 141 )); then
   # run=$(r.airy-overlay-mod run)
   linkcp -m ~/.local/bin/r.qute-hidpi ~/.local/bin/qutebrowser
 fi

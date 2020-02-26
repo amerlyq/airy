@@ -1,0 +1,7 @@
+#!/bin/sh -eu
+# ALT:(oneline): copy on FAT: rsync -hrt ...
+exec rsync -hr \
+  --stats --progress \
+  --info=copy,del,remove,skip \
+  --out-format='%t %i %f' \
+  "$@"
