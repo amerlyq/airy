@@ -1,5 +1,6 @@
-#!/bin/dash
+#!/bin/bash
 cmd=$(readlink -e "$0")
+(($#)) || set -- defaults
 cmd=${cmd%/*}/exe/$1
 shift
 exec "$cmd" "$@"

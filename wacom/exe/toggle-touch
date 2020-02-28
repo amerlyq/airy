@@ -1,16 +1,25 @@
-#!/bin/bash -e
-SWD=$(readlink -e "$0"); SWD=${SWD%/*}
-source "${SWD%/*}/funcs-lib"
+#!/usr/bin/env bash
+set -euo pipefail
 
-s=$1
+state=${1-}
 
-if [[ -z $s ]]; then
-  s=$(xsetwacom get "$WTOUCH" Touch)
-  declare -A _s=([on]=off [off]=on)
-  s=${_s[${s:?}]:?}
+# OBSOLETE? state=$(xsetwacom get "$WTOUCH" Touch)
+getId(){ xinput list --id-only "$(xinput list --name-only | grep -Ei "$1")"; }
+id=$(getId 'Wacom Intuos Pro S Finger')
+
+if [[ -z $state ]]; then
+  state=$(xinput list-props "$id" | awk '/Device Enabled/{print$NF}')
+  # declare -A _s=([on]=off [off]=on)
+  declare -a _s=(on off)
+  state=${_s[$state]}
 fi
-s=${s^^}
 
-xsetwacom set "$WTOUCH" Touch "${s:?}"
-
-r.n 'Wacom: Touch' "${s:?}"
+# OBSOLETE? xsetwacom set "$WTOUCH" Touch "${state^^}"
+# ALT: xinput set-prop "$id" "Device Enabled" 0
+if [[ $state == off ]]; then
+  xinput disable "$id"
+  r.n -Ut20 'Wacom: Touch' "$state"
+else
+  xinput enable "$id"
+  r.n 'Wacom: Touch' "$state"
+fi

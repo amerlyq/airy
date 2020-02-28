@@ -1,0 +1,16 @@
+#!/bin/bash -e
+cd "$(readlink -e "${0%/*}")"
+source "${PWD%/*}/funcs-lib"
+
+# NEED: "escape" to close windows and deselect
+wacom "$WPAD" <<EOT
+  Button   2    "key F12"       # sidebar
+  Button   3    "key ctrl L"    # new layer
+  Button   8    "13"            # [RING MODE]
+  AbsWheelUp    "key ctrl Z"    # undo
+  Button   1    "key ctrl Z"    # undo
+  AbsWheelDown  "key ctrl Y"    # redo
+  Button   9    "key ctrl 6"    # draw line
+  Button  10    "key ctrl 4"    # draw arrow
+  Button  11    "key ctrl 5"    # draw coords
+EOT

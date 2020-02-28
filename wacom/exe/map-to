@@ -5,6 +5,7 @@ set -o pipefail
 
 # BAD: time ./$0 => 40..120 mS
 # THINK:(output): use abs WxH+X+Y relative to $output ?
+# IDEA:DEV: frame=window_under_cursor
 
 [[ $1 == -h ]] && { dry_run=1; shift; }
 zone=$1     # [full|auto|[%]WxH+X+Y]
