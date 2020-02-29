@@ -8,8 +8,8 @@ source ~/.shell/profile
 unmount=
 [[ ! ${1:-} =~ -u ]] || { unmount=1; shift; }
 
-d=${1:-${CURR_DIR_BSRV:?}}  # /home/bsrv
-s=${2:-${BSRV_SRC:?}}       # ${usr}@${host}:${dir}
+d=${1:-/srv/ftp}  # /home/bsrv
+s=${2:-$USER@wkftp:/}       # ${usr}@${host}:${dir}
 
 # NOT: user,allow_other
 opts="idmap=user,transform_symlinks"  # identityfile=$HOME/.ssh/id_rsa,

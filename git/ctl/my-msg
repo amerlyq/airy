@@ -222,10 +222,15 @@ foreach my $src (keys %diff) {
     my $i = index($src, "/");
     my $top = $i == -1 ? "." : substr($src, 0, $i);
     # FIXME: if contains spaces and longer than 20 chars -- crop to "[Aaljsdljljsdf…] ..."
-    ++$tops{$top};
+    ## BAD: counts files, not diff
+    # ++$tops{$top};
+    ## IDEA: sum diff with number of files and treat deletion as much less important
+    $tops{$top} += $diff{$src}{add} + (0.4 * $diff{$src}{del}) + 1;
     $diff{$src}{top} = $top;
 }
-my @tops = sort { $tops{$b} <=> $tops{$a} } keys %tops;
+my @tops = sort { $tops{$b} <=> $tops{$a} or $a cmp $b } keys %tops;
+
+# print $_,"=",$tops{$_},$/ for (@tops);  # DEBUG=
 
 
 # per-basedir
@@ -320,7 +325,8 @@ sub mkstats { my @fls;
 
 sub mkpaths { my @subpaths = @files;
     s|^/?.+/|| for @subpaths;
-    return join(",", @subpaths);
+    # OR: "," | ", " | " and "
+    return join(", ", @subpaths);
 }
 
 sub mkbody {

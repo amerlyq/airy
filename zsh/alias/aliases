@@ -31,8 +31,8 @@ if (($+commands[gnuplot])); then
 fi
 
 # Line trim W/H to term size (w/o two prompts and errcode)
-alias -g LW='| expand | cut -c-"$(tput cols)"'
-alias -g HH='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'
+alias -g CW='| expand | cut -c-"$(tput cols)"'
+alias -g CH='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'
 
 if (($+commands[$EDITOR])); then
   # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
