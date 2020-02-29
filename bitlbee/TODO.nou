@@ -106,6 +106,23 @@ skypeweb
   [_] BUG: multiline is left-adjusted instead of right-adjusted text with excessive spaces till "textwidth"
 
 
+telegram
+  [_] BUG: always stores ALL downloads in background
+    /var/lib/bitlbee/purple/amerlyq/telegram-purple/*/downloads
+  [_] BUG:(don't work): set auto-join-group-chats false
+  [_] BUG: &telegram mixed with discord NEED: re-setup chatrooms for separate room
+    MAYBE: it will fix the random crash on join
+    @/airy/bitlbee/cfg/discord.conf:24
+      /join &%{tag}
+      channel &%{tag} set account %{tag}
+
+
+Twitter / Mastodon -- updates feed
+  !8 [_] READ:TUT: What Really IRCs Me: Mastodon | Linux Journal ⌇⡞⡘⠶⡇
+    https://www.linuxjournal.com/content/what-really-ircs-me-mastodon
+    = setup the same thing
+
+
 ALG
   Add accounts per IM
     gtalk
