@@ -15,21 +15,25 @@ Tracking dangling file descriptors of deleted files (e.g. sqlite holding tmpfile
 Trace child process tree
   BAD: can't hide arg3=environment in execve()
     [_] REQ: request on github ::
-      https://github.com/strace/strace/issues/124
+      2020-02-25 [X] https://github.com/strace/strace/issues/124
+        ::: WARN:(-v -e verbose=execve): will expand ENVP, don't use "-v"
       https://github.com/strace/strace/issues/125
 
   SEE: ~/sdk/strace/linux/x86_64/syscallent.h:/\bTP\b/
 
-  NEW:(=5.4):
-    $ strace --seccomp-bpf -qftttvzs4096 -X raw -o "_build-$(date +%Y%m%d_%H%M%S).strace" \
-      -e verbose='execve,execveat' -e trace='%process,chdir' -e signal=none -- make
+  BET:(>=5.4):
+    $ strace --seccomp-bpf -qftttzs4096 -X raw -e verbose='execve,execveat' \
+      -e trace='%process,chdir' -e signal=none -o/dev/stdout -- sh -c '/bin/true {0001..0100} & wait'
   OLD:(=4.11):
-    $ strace -qftttvzs4096 -e verbose='execve,execveat' -e trace='process,chdir' -e signal=none -- ls
+    $ strace -qftttzs4096 -e verbose='execve,execveat' \
+      -e trace='process,chdir' -e signal=none -o/dev/stdout -- sh -c '/bin/true {0001..0100} & wait'
   sudo:
-    $ sudo strace -u "$USER" -qftttvzs4096 -X raw \
-      -e verbose='execve,execveat' -e trace='%process,chdir' -e signal=none -- sudo id
+    $ sudo strace -u "$USER" -qftttzs4096 -X raw -e verbose='execve,execveat' \
+      -e trace='%process,chdir' -e signal=none -o/dev/stdout -- sudo id
+    BUG:(--seccomp-bpf): sudo: effective uid is not 0, is /usr/bin/sudo on a file system
+      with the 'nosuid' option set or an NFS file system without root privileges?
   chroot_sudo:
-    $ sudo strace -u "$USER" -qftttvzs4096 -X raw -o "_build-$(date +%Y%m%d_%H%M%S).strace" \
+    $ sudo strace -u "$USER" -qftttzs4096 -X raw -o "_build-$(date +%Y%m%d_%H%M%S).strace" \
       -e verbose='execve,execveat' -e trace='%process,chdir' -e signal=none \
       -- schroot -c "xenial_amd64" -d "$PWD" -- env \
         LANG="${LANG:=en_US.UTF-8}" \

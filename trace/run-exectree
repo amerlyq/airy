@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
+#
+# SPDX-License-Identifier: MIT
+#
+#%SUMMARY: trace whole children spawning tree
+#%USAGE: $ ./$0 prog [args]
+exec strace --seccomp-bpf -qftttzs4096 -X raw -e verbose='execve,execveat' \
+  -e trace='%process,chdir' -e signal=none -o/dev/stdout -- "$@"
