@@ -21,6 +21,30 @@ alias fU='git ls-files --others --directory'
 alias fu='git ls-files --others --directory --exclude-standard'
 alias fu0='fu -z'
 
+alias ful0="fuf -z | xargs -r0 zsh -c 'for f; do [[ ! -h \$f ]] || print -rNC1 -- \$f; done' ''"
+alias fuL0="fuf -z | xargs -r0 zsh -c 'for f; do [[ -h \$f ]] || print -rNC1 -- \$f; done' ''"
+alias fuE0="fuL0 | xargs -r0 zsh -c 'for f; do [[ \$(file --brief --mime-type -- \$f) == */x-empty ]] || print -rNC1 -- \$f; done' ''"
+alias fuA0="ful0 | xargs -r0 zsh -c 'for f (\$@) print -rNC1 -- \${\${(M)\${f:A}:#*/.git/annex/objects*}:+\$f}' ''"
+alias ful='ful0 | tr \\0 \\n'
+alias fuL='fuL0 | tr \\0 \\n'
+alias fuA='fuA0 | tr \\0 \\n'
+
+alias fif0='git diff-index -z --cached --name-only --relative HEAD --'
+alias fil="git diff-index --cached --relative HEAD -- | grep -E '^:[0-9]{6}\\s120000\\s' | cut -f2-"
+
+# BET:MOVE: rename to "gf*" aliases
+alias fwR='git ls-tree -r HEAD'
+alias fwR0='fwR -z'
+alias fw='fwR --name-only'
+alias fw0='fwR0 --name-only'
+alias fwl0='fwR0 | grep  -z "^120000" | cut -zf2-'
+alias fwL0='fwR0 | grep -vz "^120000" | cut -zf2-'
+alias fwa0="fwl0 | xargs -r0 zsh -c 'for f (\$@) print -rNC1 -- \${\${(M)\${f:A}:#*/.git/annex/objects*}:+\$f}' ''"
+alias fwA0="fwl0 | xargs -r0 zsh -c 'for f (\$@) print -rNC1 -- \${\${\${f:A}:#*/.git/annex/objects*}:+\$f}' ''"
+alias fwl='fwl0 | tr \\0 \\n'
+alias fwL='fwL0 | tr \\0 \\n'
+alias fwa='fwa0 | tr \\0 \\n'
+alias fwA='fwA0 | tr \\0 \\n'
 
 alias fa='command fd -E .git -E _build\*'
 alias fa.='fa -g'
