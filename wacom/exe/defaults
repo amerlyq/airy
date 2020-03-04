@@ -7,9 +7,13 @@ prf=xournalpp
 
 toggle-touch on
 keys-reset
+
+# WARN: must switch to "en" xkb layout to map keys
+r.xkb-lang en
 prf-$prf
 
 # TODO: xournalpp ring -- change color (isntead of free toolbar)
+# NOTE:BAD:(unintuitive): uses next mode after zoom -- undo
 change-mode -p zoom
 
 change-curve soft
@@ -19,7 +23,7 @@ change-curve soft
 # frame=$2    # [full|auto|cursor|[%]WxH+X+Y]
 # rotate=$3   # [none|half|cw|ccw]
 # output=$4   # [ {<output>|1..9} | {desktop|0} | WxH+X+Y || next ]
-map-to auto auto none 0
+map-to auto wndclick none 0
 # map-to full full none 0
 
 keys-bind $prf

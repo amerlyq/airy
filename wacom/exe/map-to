@@ -9,7 +9,7 @@ set -o pipefail
 
 [[ $1 == -h ]] && { dry_run=1; shift; }
 zone=$1     # [full|auto|[%]WxH+X+Y]
-frame=$2    # [full|auto|cursor|[%]WxH+X+Y]
+frame=$2    # [full|auto|cursor|wndfocus|wndclick|[%]WxH+X+Y]
 rotate=$3   # [none|half|cw|ccw]
 output=$4   # [ {<output>|1..9} | {desktop|0} | WxH+X+Y || next ]
 
@@ -89,6 +89,19 @@ cursor_rect(){
   frame="%0x0+$((100*mx/ox))+$((100*my/oy))"
 }
 
+window_rect(){ local WINDOW X Y WIDTH HEIGHT SCREEN
+  # BET:ZSH: typeset -A wnd=( "${(@s:=:)${(f)"$(xdotool getwindowgeometry --shell "$(xdotool getwindowfocus)")"}}" )
+  eval "$(xdotool getwindowfocus getwindowgeometry --shell)"
+  frame="${WIDTH}x${HEIGHT}+${X}+${Y}"
+}
+
+click_rect(){ local wnd WINDOW X Y WIDTH HEIGHT SCREEN
+  # BAD: focusing by xdotool is ignored in XMonad
+  # xdotool selectwindow getwindowgeometry --shell windowfocus --sync
+  eval "$(xdotool selectwindow getwindowgeometry --shell)"
+  frame="${WIDTH}x${HEIGHT}+${X}+${Y}"
+}
+
 
 # Adjust ======================================================================
 IFS=' ' read -r ax ay aX aY <<< "$maxarea"
@@ -107,6 +120,9 @@ in full) frame='%100x100+0+0'; # =$output
 ;; auto) frame='%0x0+50+50'
 ;; [%0-9]*x*) frame=$frame
 ;; cursor) cursor_rect  # '1/5'
+;; wndfocus) window_rect  # currently focused window
+;; wndclick) click_rect   # window clicked by mouse
+# ;; select) select_rect  # select rect on screen by mouse selection
 ;; *) exit 3
 esac
 

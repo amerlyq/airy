@@ -6,4 +6,5 @@ prf=${1-}
 
 cfg=${PWD%/*}/unit/xbindkeysrc${prf+-$prf}
 
-exec xbindkeys -n -f "$cfg"
+# --verbose
+exec xbindkeys --nodaemon --file "$cfg"
