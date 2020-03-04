@@ -4,20 +4,20 @@
   <property name="pressureSensitivity" value="true"/>
   <property name="zoomGesturesEnabled" value="true"/>
   <property name="selectedToolbar" value="custom Copy"/>
-  <property name="lastSavePath" value=""/>
+  <property name="lastSavePath" value="/data"/>
   <property name="lastOpenPath" value=""/>
   <property name="lastImagePath" value=""/>
   <property name="zoomStep" value="10.00000000"/>
   <property name="zoomStepScroll" value="2.00000000"/>
   <property name="displayDpi" value="110"/>
   <property name="mainWndWidth" value="2922"/>
-  <property name="mainWndHeight" value="935"/>
+  <property name="mainWndHeight" value="1596"/>
   <property name="maximized" value="false"/>
-  <property name="showSidebar" value="false"/>
+  <property name="showSidebar" value="true"/>
   <property name="sidebarWidth" value="166"/>
   <property name="sidebarOnRight" value="false"/>
   <property name="scrollbarOnLeft" value="false"/>
-  <property name="menubarVisible" value="true"/>
+  <property name="menubarVisible" value="false"/>
   <property name="numColumns" value="1"/>
   <property name="numRows" value="1"/>
   <property name="viewFixedRows" value="false"/>
@@ -41,9 +41,9 @@
   <property name="defaultSaveName" value="%F-Note-%H-%M"/>
   <property name="autosaveEnabled" value="true"/>
   <property name="autosaveTimeout" value="3"/>
-  <property name="addHorizontalSpace" value="true"/>
+  <property name="addHorizontalSpace" value="false"/>
   <property name="addHorizontalSpaceAmount" value="150"/>
-  <property name="addVerticalSpace" value="true"/>
+  <property name="addVerticalSpace" value="false"/>
   <property name="addVerticalSpaceAmount" value="150"/>
   <property name="drawDirModsEnabled" value="false"/>
   <property name="drawDirModsRadius" value="50"/>
@@ -58,7 +58,7 @@
   <!--The count of rendered PDF pages which will be cached.-->
   <!--Config for new pages-->
   <property name="pdfPageCacheSize" value="10"/>
-  <property name="pageTemplate" value="xoj/template&#10;copyLastPageSize=false&#10;copyLastPageSettings=true&#10;size=595.275591x841.889764&#10;backgroundType=graph&#10;backgroundColor=#ffffffff&#10;"/>
+  <property name="pageTemplate" value="xoj/template&#10;copyLastPageSize=false&#10;copyLastPageSettings=true&#10;size=907.086614x510.236220&#10;backgroundType=graph&#10;backgroundColor=#ffffffff&#10;"/>
   <property name="sizeUnit" value="cm"/>
   <property name="audioFolder" value=""/>
   <property name="audioInputDevice" value="-1"/>
@@ -70,13 +70,13 @@
   <property name="strokeFilterIgnoreTime" value="150"/>
   <property name="strokeFilterIgnoreLength" value="1.00000000"/>
   <property name="strokeFilterSuccessiveTime" value="500"/>
-  <property name="strokeFilterEnabled" value="true"/>
-  <property name="doActionOnStrokeFiltered" value="false"/>
-  <property name="trySelectOnStrokeFiltered" value="true"/>
+  <property name="strokeFilterEnabled" value="false"/>
+  <property name="doActionOnStrokeFiltered" value="true"/>
+  <property name="trySelectOnStrokeFiltered" value="false"/>
   <property name="experimentalInputSystemEnabled" value="false"/>
   <property name="inputSystemTPCButton" value="false"/>
   <property name="inputSystemDrawOutsideWindow" value="true"/>
-  <property name="font" font="PragmataPro Liga" size="12.00000000"/>
+  <property name="font" font="sans" size="12.00000000"/>
   <data name="buttonConfig">
     <data name="default">
       <attribute name="color" type="hex" value="ff000000"/>
@@ -85,16 +85,16 @@
       <attribute name="tool" type="string" value="pen"/>
     </data>
     <data name="eraser">
-      <attribute name="tool" type="string" value="hand"/>
+      <attribute name="tool" type="string" value="showFloatingToolbox"/>
     </data>
     <data name="middle">
-      <attribute name="color" type="hex" value="ffef2929"/>
+      <attribute name="color" type="hex" value="ff000000"/>
       <attribute name="drawingType" type="string" value="dontChange"/>
       <attribute name="size" type="string" value="none"/>
       <attribute name="tool" type="string" value="hilighter"/>
     </data>
     <data name="right">
-      <attribute name="tool" type="string" value="selectRegion"/>
+      <attribute name="tool" type="string" value="selectRect"/>
     </data>
     <data name="stylus">
       <attribute name="eraserMode" type="string" value="none"/>
@@ -102,12 +102,12 @@
       <attribute name="tool" type="string" value="eraser"/>
     </data>
     <data name="stylus2">
-      <attribute name="tool" type="string" value="showFloatingToolbox"/>
+      <attribute name="tool" type="string" value="selectRegion"/>
     </data>
     <data name="touch">
-      <attribute name="device" type="string" value="Wacom Intuos Pro S Finger"/>
+      <attribute name="device" type="string" value=""/>
       <attribute name="disableDrawing" type="boolean" value="true"/>
-      <attribute name="tool" type="string" value="hand"/>
+      <attribute name="tool" type="string" value="none"/>
     </data>
   </data>
   <data name="deviceClasses">
@@ -132,7 +132,7 @@
       <attribute name="deviceSource" type="int" value="8"/>
     </data>
     <data name="Wacom Intuos Pro S Pen cursor">
-      <attribute name="deviceClass" type="int" value="2"/>
+      <attribute name="deviceClass" type="int" value="1"/>
       <attribute name="deviceSource" type="int" value="3"/>
     </data>
     <data name="Wacom Intuos Pro S Pen eraser">
@@ -168,7 +168,7 @@
       <attribute name="drawingType" type="string" value="default"/>
     </data>
     <data name="hilighter">
-      <attribute name="color" type="hex" value="ffef2929"/>
+      <attribute name="color" type="hex" value="000000"/>
       <attribute name="drawingType" type="string" value="default"/>
       <attribute name="fill" type="int" value="0"/>
       <attribute name="fillAlpha" type="int" value="128"/>
@@ -178,7 +178,7 @@
       <attribute name="drawingType" type="string" value="default"/>
     </data>
     <data name="pen">
-      <attribute name="color" type="hex" value="00c0ff"/>
+      <attribute name="color" type="hex" value="000000"/>
       <attribute name="drawingType" type="string" value="default"/>
       <attribute name="fill" type="int" value="0"/>
       <attribute name="fillAlpha" type="int" value="128"/>
