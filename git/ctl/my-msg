@@ -162,6 +162,15 @@ sub parse_raw_numstat {
             $diff{$src} = { mod => substr($mod,0,1), src => $src, dst => $dst };
         } else {
             my ($add,$del,$src) = split /\t/, $_, 3;
+
+            # WARN: for newly added binary files numstat "add/del" = "-/-"
+            #   TEMP:HACK: treat whole file as single added/deleted line -- for @tops ordering on L229
+            if ($add eq '-' or $del eq '-') {
+                my $mod = $diff{$src}{mod};
+                $add = ($mod =~ /^[AM]/ ? 1 : 0) if $add eq '-';
+                $del = ($mod =~ /^[DM]/ ? 1 : 0) if $del eq '-';
+            }
+
             if (not $src) {
                 $src = <STDIN>;
                 chomp $src;
