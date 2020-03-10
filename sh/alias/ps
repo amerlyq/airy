@@ -4,6 +4,10 @@
 # ALSO: sort in order of starting time
 alias p='ps --group 0 --deselect --forest -o user,pid,pgid,pcpu,pmem,etime,args'
 
+pp(){ ps --group 0 --deselect --forest -o user,pid,pgid,pcpu,pmem,etime,args \
+  | grep -vE '[0-9]\s(dictd|login|/usr/bin/(bumblebeed|dbus-daemon|ntpd)|/usr/lib/(polkit|rtkit|systemd)|\s\\_\s\(sd-pam\)|\s\\_\s/usr/(bin/(compton|copyq|dbus-daemon|dunst|gpg-agent|kbdd|pulseaudio|syncthing|tmux|xcape|xmobar|xsel)|lib/(at-spi-bus-launcher|dconf-service|Xorg)))\b'
+}
+
 # alias psg='ps aux | grep ' # Rewritten by zsh
 alias topstat='dstat -cdnpmgs --top-bio --top-cpu'
 
@@ -28,7 +32,7 @@ term_tree() { local leaf=$$
       printf("%s|%05s\n",command[pid],pid); // parent[pid];
       if(pid!=1) print_ancestry(parent[pid])
   };
-  END{\
+  END{
       print_ancestry(leaf)
   }' | column -t -s '|'
 }
