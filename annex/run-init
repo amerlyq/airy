@@ -68,6 +68,11 @@ git config --local 'annex.jobs' cpus
 git annex config --set 'annex.largefiles' \
   'largerthan=100kb or include=*.mht or mimetype=text/html or not (mimetype=text/* or mimetype=inode/x-empty or mimetype=inode/symlink)'
 
+## NOTE: always add '.*' files directly to git
+git annex config --set 'annex.dotfiles' false
+
+## NICE: only sync "git-annex" branch and content -- don't touch other branches
+git annex config --set 'annex.synconlyannex' true
 
 
 ### CHECKOUT #####################################
