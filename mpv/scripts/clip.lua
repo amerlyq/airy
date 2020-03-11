@@ -1,17 +1,18 @@
 -- vim:ft=lua:ts=2:sw=2:sts=2
--- Clip video from between two marks '[' and ']'
--- Seek to placed marks 'S-[' and 'S-]'
--- Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
+--%USAGE:
+--% * Clip video from between two marks '[' and ']'
+--% * Seek to placed marks 'S-[' and 'S-]'
+--% * Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
+--%
 
 local utils = require 'mp.utils'
 local g = { A = 0.0, B = mp.get_property_number("length") or 0.0 }
 
 -- Options
-mp.set_property("hr-seek-framedrop", "no")
-mp.set_property("options/keep-open", "always")
--- alas, the following setting seems to not take effect - needs
--- to be specified on the command line of mpv, instead:
-mp.set_property("options/script-opts", "osc-layout=bottombar,osc-hidetimeout=-1")
+-- mp.set_property("hr-seek-framedrop", "no")
+-- mp.set_property("options/keep-open", "always")
+-- NOTE: always show OSD
+-- mp.set_property("options/script-opts", "osc-layout=bottombar,osc-hidetimeout=-1")
 
 
 -- Behaviour
