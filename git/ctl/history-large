@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+#%SUMMARY: find largest files in history
+#%USAGE: $ ./$0
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
+
+dogc=${1-}
+max=${2:-20}
+
+[[ -t 1 ]] && exec > >(head -n "$max" | column -t)
+
+[[ ${dogc:+x} ]] && git gc
+
+packs=$(git rev-parse --git-path 'objects/pack')
+
+trap 'exit $(($?==141 ? 0 : $?))' PIPE ERR
+
+git verify-pack -v "$packs"/pack-*.idx \
+| grep -E '^[[:xdigit:]]{40,}' \
+| sort -k4rn,4 \
+| awk 'FNR==NR{f[$1]=substr($0,index($0," ")+1)} FNR!=NR{print $0,f[$1]}' /dev/fd/3 -  3<<EOT
+$(git rev-list --objects --all)
+EOT
