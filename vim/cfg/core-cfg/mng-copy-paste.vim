@@ -158,20 +158,22 @@ endfunction
 "{{{1 Get src snippet with ref from current line
 " ALT: use keymap [Frame]b because of 'bookmark'
 " nnoremap <unique>  [Frame]Y  :call GetLineBookmark(v:count,'')<CR>
-nnoremap <unique>  [Frame]gy  :call GetLineBookmark(v:count1, TrimIndents(getline('.')))<CR>
-vnoremap <unique>  [Frame]gy  :<C-U>call GetLineBookmark(v:count1, TrimIndents(GetVisualSelection("\n"),"\t"))<CR>
+nnoremap <unique>  [Frame]y  :call GetLineBookmark(v:count, getline('.'))<CR>
+vnoremap <unique>  [Frame]y  :<C-U>call GetLineBookmark(v:count, GetVisualSelection("\n"))<CR>
 
 " TODO:DEV: set print format on the fly ":GetLineBookmarkFormat  // {h}\n\t{b:1:1}\n\t\t{b:2}"
 "   => different documents and languages require different format of indented/aligned bookmarks
 function! GetLineBookmark(idt, text, ...)
   let path = a:0>=1 ? expand('%:p') : @%
-  let tab = "\t"
+  let tab = "  "
+  let idfl= 2
   "" Can't use, as values must be extracted from dst, not from src
   "repeat(&et ? repeat(" ", &ts) : "\t", a:idt)
-  let prf = repeat(l:tab, a:idt)
+  let prf = repeat(l:tab, (a:idt ? a:idt : idfl))
+  let bpfx = l:prf . l:tab
 
-  let str = l:prf . path . ":" . line(".")
-  let str.= empty(a:text) ? "" : ("\n" . l:prf . l:tab . a:text)
+  let str = l:prf .'//'. path .':'. line('.')
+  let str.= "\n" . TrimIndents(a:text, bpfx)
 
   call CopyToClipboard(l:str, 'V')
   " TODO: Add re-indenting of several lines (like 'for' or 'function' part)
@@ -180,14 +182,14 @@ endfunction
 
 " TODO:DEV: use "3[Frame].y" to <fixate> current copy-indent to "3"
 "   => useful when copying sources outline function by function
-nnoremap <unique>  [Frame]y
+nnoremap <unique>  [Frame]gy
   \ :<C-u>call GetLineSpoiler(v:count1, TrimIndents(getline('.')), 1)<CR>
-vnoremap <unique>  [Frame]y
+vnoremap <unique>  [Frame]gy
   \ :<C-U>call GetLineSpoiler(v:count1, TrimIndents(GetVisualSelection("\n")), 1)<CR>
 
-nnoremap <unique>  [Frame]Y
+nnoremap <unique>  [Frame]gY
   \ :<C-u>call GetLineSpoiler(v:count1, TrimIndents(getline('.')), 0)<CR>
-vnoremap <unique>  [Frame]Y
+vnoremap <unique>  [Frame]gY
   \ :<C-u>call GetLineSpoiler(v:count1, TrimIndents(GetVisualSelection("\n")), 0)<CR>
 
 """ New legend annotation
