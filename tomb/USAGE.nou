@@ -67,6 +67,7 @@ CFG
   USAGE
     $ sshfs -d -o "umask=077,noexec,no_readahead,allow_root,port=22,IdentityFile=$HOME/.ssh/id_rsa" user@host:tomb /media/tomb
       = OR: $ r.ssh-tomb-vps
+      OR:(ssh-config): $ sshfs -d -o "umask=0077,noexec,no_readahead,allow_root" myvps:tomb /media/tomb
     $  tomb open /media/tomb/dev.tomb -k ~/tomb/dev.tomb.key -g
       !! space-prepended !!
       TODO: usage some picture from catalogue
@@ -77,6 +78,7 @@ CFG
     $ tomb close dev
       WARN! will close both local and remote tomb named "dev"
     $ umount /media/tomb
+      FIXED:※⡞⡬⢒⢚ $ losetup -a && sudo losetup -d /dev/loop0
   PLAIN
     $ cd ~/work
     $ git clone --dissociate /media/dev/repo.git .

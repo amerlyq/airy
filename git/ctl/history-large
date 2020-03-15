@@ -8,6 +8,10 @@
 #%USAGE: $ ./$0
 set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
 
+# TODO:DEV:(opt):
+#   * unused -- only deleted files history (not present in worktree)
+#   * obsolete -- old revisions of worktree files (history without last commit)
+
 dogc=${1-}
 max=${2:-20}
 
