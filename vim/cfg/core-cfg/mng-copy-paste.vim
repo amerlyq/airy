@@ -172,7 +172,10 @@ function! GetLineBookmark(idt, text, ...)
   let prf = repeat(l:tab, (a:idt ? a:idt : idfl))
   let bpfx = l:prf . l:tab
 
-  let str = l:prf .'//'. path .':'. line('.')
+  " NOTE: add context-dependent location prefix '//'
+  if strpart(part,0,1) != '/'| let path = '//' . path |en
+
+  let str = l:prf . path .':'. line('.')
   let str.= "\n" . TrimIndents(a:text, bpfx)
 
   call CopyToClipboard(l:str, 'V')

@@ -1,9 +1,11 @@
 #!/bin/bash -eu
+#%ONELINE: sshfs -o idmap=user,transform_symlinks,follow_symlinks,default_permissions,uid=1000,gid=1000 $USER@wt:/data/repo /srv/repo -C
 source ~/.shell/profile
 # ALT:TRY: aur/sshmnt, aur/sftpman, aur/autosshfs-git
 # ALT:
 #   $ sshfs wkftp:/ /srv/ftp
 #   $ fusermount -u /srv/ftp
+
 
 unmount=
 [[ ! ${1:-} =~ -u ]] || { unmount=1; shift; }

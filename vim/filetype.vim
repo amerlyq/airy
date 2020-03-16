@@ -18,8 +18,8 @@ augroup filetypedetect
   au BufRead,BufNewFile {Gemfile,Gemfile.lock,Rakefile,Thorfile,Vagrantfile}  setl ft=ruby fdm=syntax fdn=1
   au BufRead,BufNewFile *.reg   edit ++enc=utf16le
   au BufRead,BufNewFile *.pc    setf automake
-  au BufRead,BufNewFile Config.in    setf kconfig  " Buildroot,BusyBox
-  au BufRead,BufNewFile *defconfig   setf make     " Buildroot,Linux
+  au BufRead,BufNewFile {Config.in,Kconfig}    setf kconfig  " Buildroot,BusyBox
+  au BufRead,BufNewFile {*.config,*defconfig}  setf make     " Buildroot,Linux
   " -- override default runtime mistake 'ft=hog'
   au BufRead,BufNewFile *.rules setl ft=udevrules
   au BufRead,BufNewFile *.otl   setl noet  " TEMP:REM*
