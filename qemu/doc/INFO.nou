@@ -1,0 +1,47 @@
+⌇⡞⡫⠤⠴
+
+REF
+  QEMU ⌇⡞⡫⠔⠲
+    https://wiki.qemu.org/Main_Page
+    https://wiki.qemu.org/download/qemu-doc.html
+      [_] MAYBE see more about -net* switches
+  QEMU - ArchWiki ⌇⡞⡫⠢⡶
+    https://wiki.archlinux.org/index.php/QEMU
+
+
+INSTALL
+  DECI: $ paci qemu-arch-extra
+    -> qemu ?? qemu-headless qemu-headless-arch-extra
+  [_] READ: some interesting things, especially proot (chroot w/o sudo)
+    $ aurI proot-bin qemu-user-static binfmt-support binfmt-qemu[-all-arch]
+  OR: enable build in buildroot ※⡞⡫⠝⣂
+
+
+SEIZE
+  https://github.com/arapov/wrap-qemukvm
+
+
+%% Qemu with native ARM compiler (slow)
+
+  archlinux - Is it possible to cross compile from Arch Linux host with qemu and chroot and how? - Raspberry Pi Stack Exchange ⌇⡞⡫⠒⢅
+    https://raspberrypi.stackexchange.com/questions/6754/is-it-possible-to-cross-compile-from-arch-linux-host-with-qemu-and-chroot-and-ho
+  Crosscompiling for RaspPi - Explained - Raspberry Pi Forums ⌇⡞⡫⠒⡿
+    https://www.raspberrypi.org/forums/viewtopic.php?p=101026
+  software development - How do I build a GCC 4.7 toolchain for cross-compiling? - Raspberry Pi Stack Exchange ⌇⡞⡫⠒⢱
+    https://raspberrypi.stackexchange.com/questions/1/how-do-i-build-a-gcc-4-7-toolchain-for-cross-compiling/1144#1144
+  boot - Emulation on a Linux PC - Raspberry Pi Stack Exchange ⌇⡞⡫⠒⣅
+    https://raspberrypi.stackexchange.com/questions/165/emulation-on-a-linux-pc/286#286
+
+
+%% Performance for Native
+  REF
+    https://wiki.archlinux.org/index.php/QEMU#Virtual_machine_runs_too_slowly
+
+  INFO: KVM support
+    NOTE: with KVM some supported arch can't be emulated
+      http://www.michurin.net/tools/qemu.html
+    Check sequentially
+      CPU: $ grep -E '(vmx|svm)' /proc/cpuinfo
+      Kernel: $ zgrep KVM /proc/config.gz
+      LKM: $ lsmod | grep -i kvm
+      Qemu: (qemu) info kvm

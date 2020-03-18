@@ -179,7 +179,7 @@ class doc(Command):
     lst = {'a': 'ARCH', 'b': 'DEBUG', 'c': 'comment', 'd': 'DEV', 'e': 'EXAMPLES',
            'f': 'FUTURE', 'h': 'HACK', 'g': 'LEGEND', 'i': 'INFO', 'k': 'WORKLOG',
            'l': 'LIOR', 'm': 'MAINT', 'n': 'NOTE', 'r': 'README', 's': 'SYNERGY',
-           't': 'TODO', 'u': 'USAGE', 'w': 'HOWTO', '.': '.'}
+           't': 'TODO', 'u': 'USAGE', 'w': 'HOWTO', 'z': 'SEIZE', '.': '.'}
     ext = ['.nou', '.rst', '.otl', '.md', '.txt', '']
     loci = ['doc', 'docs', '_doc', '']
     """:doc [<name>]

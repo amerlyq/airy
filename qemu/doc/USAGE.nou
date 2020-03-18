@@ -1,0 +1,29 @@
+
+NEED
+  /buildroot//.
+  //configs/qemu_arm_versatile_defconfig
+  //board/qemu/arm-vexpress/readme.txt
+  //board/qemu/arm-versatile/readme.txt
+  //build/docs/manual/manual.text
+  //build/docs/manual/beyond-buildroot.txt
+
+
+RUN
+  $ exec qemu-system-arm -nographic -nodefaults -no-user-config -name QemuArm \
+    -machine vexpress-a9 -smp cores=2 -m 256 \
+    -audiodev id=none,driver=none \
+    -kernel output/images/zImage \
+    -append "console=ttyAMA0,115200 rootwait root=/dev/mmcblk0" \
+    -drive file=output/images/rootfs.ext2,if=sd,format=raw -snapshot \
+    -serial mon:stdio \
+    -net user \
+    -gdb tcp::1234 -S
+
+
+DEBUG
+  $ d_linux=output/build/linux-custom
+  $ exec gdb-multiarch -q \
+    -iex "set gnutarget elf32-littlearm" \
+    -ex "set directories \$cdir:\$cwd:$d_linux" \
+    -ex 'target remote :1234' \
+    "$@" --args $d_linux/vmlinux

@@ -1,0 +1,64 @@
+%%%% Launch config
+
+WTF
+  [_] TRY: kvm and virsh
+    23:02 <TJ-> makr8100: do you have to use virtualbox? how about using qemu/kvm via virsh (libvirtd)
+    libvirt: virsh ⌇⡞⡫⠡⡻
+      https://libvirt.org/manpages/virsh.html
+
+
+%% Settings
+  $ … -nodefaults            # don't create any default devices
+    [_] CHECK: do we need "-parallel none" when using "-nodefaults" ?
+
+  $ … -name QemuArm
+
+
+%% Ini config
+
+  DFL: at startup loads cfgs from //sysconfdir and //datadir
+
+  $ … -readconfig qemu.ini   # instead of cmdline options
+  $ … -writeconfig {-|f.ini} # save combined options to config
+  $ … -no-user-config        # NEW: ignore //sysconfdir OBSOL:(qemu<4.2): ignore //datadir
+  $ … -nodefconfig           # REM:(qemu<4.2): ignore both //sysconfdir and //datadir
+
+
+%% Snapshots
+
+  Save
+    $ … -snapshot
+    ???
+  Restore
+    $ … -loadvm file
+    $ … -mem-path file
+
+
+%% GDB server %% ⌇⡞⡱⣺⢞
+
+  NOTE:(-S): must stop kernel to debug from beginning -- use (gdb) continue
+
+  QEMU ⌇⡞⡱⣺⢞
+    $ … -Ss
+    $ … -gdb tcp::1234 -S
+  HOST
+    $ gdb-multiarch -q -iex 'set gnutarget elf32-littlearm' ./output/build/linux-custom/vmlinux
+    (gdb) set directories \$cdir:\$cwd:./buidroot/output/build/linux-custom
+    (gdb) target remote :1234
+    (gdb) hbreak start_kernel
+    (gdb) c
+    (gdb) <C-c>
+    (gdb) lx-dmesg
+
+
+%% Service / systemd
+
+  $ … -pidfile "$TMPDIR/qemu.pid" -daemonize -watchdog model -chroot dir -runas user
+
+
+%% IPC / JSON-protocol
+
+  Documentation/QMP - QEMU ⌇⡞⡲⠉⡼
+    https://wiki.qemu.org/Documentation/QMP
+  Scriptable KVM/QEMU guest agent implemented in Python — negotiator 0.12.2 documentation ⌇⡞⡲⠉⢞
+    https://negotiator.readthedocs.io/en/latest/

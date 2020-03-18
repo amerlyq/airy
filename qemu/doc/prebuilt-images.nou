@@ -1,0 +1,33 @@
+%%%% Testing images
+
+  Testing/System Images - QEMU ⌇⡞⡫⠧⠮
+    https://wiki.qemu.org/Testing/System_Images
+  Index of /~aurel32/qemu ⌇⡞⡫⠨⢅
+    https://people.debian.org/~aurel32/qemu/
+  Debian on an emulated ARM machine ⌇⡞⡫⠪⡘
+    https://www.aurel32.net/info/debian_arm_qemu.php
+
+
+INSTALL
+  https://people.debian.org/~aurel32/qemu/armhf/
+
+  $ wget https://people.debian.org/~aurel32/qemu/armhf/vmlinuz-3.2.0-4-vexpress
+  $ wget https://people.debian.org/~aurel32/qemu/armhf/initrd.img-3.2.0-4-vexpress
+  $ wget https://people.debian.org/~aurel32/qemu/armhf/debian_wheezy_armhf_standard.qcow2
+    - Keyboard:       US
+    - Locale:         en_US
+    - Mirror:         ftp.debian.org
+    - Hostname:       debian-armel
+    - Root password:  root
+    - User account:   user
+    - User password:  user
+
+  $ qemu-system-arm -M vexpress-a9 -kernel vmlinuz-3.2.0-4-vexpress -initrd initrd.img-3.2.0-4-vexpress \
+    -drive if=sd,file=debian_wheezy_armhf_standard.qcow2 -append "root=/dev/mmcblk0p2"
+
+    By default QEMU emulates a machine with 128MiB of RAM. The -m option increases
+    or decreases the size of the RAM. It is however limited to 1024MiB. If you don't
+    want to start QEMU in graphic mode, you can use the -nographic option. The image
+    is configured to display a login prompt on the first serial port (ttyAMA0). If
+    you want to switch the boot messages to the serial port, you need to add
+    "console=ttyAMA0" after "root=/dev/mmcblk0p2".

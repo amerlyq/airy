@@ -1,0 +1,98 @@
+%%%% Periphery / IO / Interfaces
+
+
+%% Screen
+
+  $ … -nographic
+  $ … -vga std
+
+
+%% Serial / UART
+
+  VIZ
+    $ qemu-system-x86_64 -device help  # |& grep -i serial
+    $ qemu-system-x86_64 -device isa-serial,help
+
+  ctl: -mon [chardev=]name[,mode=readline|control][,default]
+    VIZ:(type): socket vc file pipe serial pty stdio braille tty …
+    [_] TRY: pty  # Create a new pseudo-terminal on the host and connect to it
+
+  $ … -serial mon:stdio
+    NOTE: switch to command-mode by <C-a>`c
+  $ … -serial stdio
+    BAD: <C-c> exits qemu(1)
+
+
+%% Network
+
+  USAGE: $ … -net nic,model=lan9118 -net user
+
+  ALSO: -redir tcp:2222::22
+
+  NEW:(-nic):
+  OLD:(-net):
+    VIZ: $ qemu -net nic,model=help
+    DFL:(-net user):
+      net: 10.0.2.0/24
+      host: 10.0.2.2  # net+2
+
+  INFO
+    2018-05-31 v2.12 QEMU's new -nic command line option - QEMU ⌇⡞⡱⣦⣬
+      https://www.qemu.org/2018/05/31/nic-parameter/
+    Setting up Qemu with a tap interface ⌇⡞⡱⣩⢥
+      https://gist.github.com/extremecoders-re/e8fd8a67a515fee0c873dcafc81d811c
+    Host-only networking set up for QEMU hypervisor - Andrey Albershtein ⌇⡞⡱⣩⣈
+      https://alberand.github.io/host-only-networking-set-up-for-qemu-hypervisor.html
+
+
+%% Sound
+
+  VIZ
+    $ qemu-system-arm -audiodev-help
+    OLD: $ qemu-system-x86_64 -audio-help | grep Name: # Name: pa
+
+  TEMP: $ … -audiodev id=none,driver=none
+
+  NEED: both -audiodev + -soundhw
+
+  ERR
+    $ export QEMU_AUDIO_DRV=alsa
+      DEPR
+    $ … -audiodev wav,id=1,path=qemu.wav
+      TRY
+    $ … -audiodev id=none,driver=none
+      audio: Device lm4549: audiodev default parameter is deprecated, please specify audiodev=none
+    $ … -audiodev=0
+      BUG not supported
+    $ … -soundhw hda
+      qemu-system-arm: PCI bus not available for hda
+    $ … -audiodev driver=pa,id=pa,server="unix:$(pactl info|awk '/Server String/{print$3}')"
+      BUG: pulseaudio don't work
+        pulseaudio: set_sink_input_volume() failed
+        pulseaudio: Reason: Invalid argument
+        pulseaudio: set_sink_input_mute() failed
+        pulseaudio: Reason: Invalid argument
+      http://qemu.11.n7.nabble.com/How-am-I-supposed-to-use-the-audiodev-option-td694855.html#a695315
+
+  only-input + only-output
+    $ … -audiodev alsa,id=example,in.frequency=44110,out.frequency=8000 \
+        -audiodev alsa,id=example,out.channels=1,out.period-length=4096
+
+  INFO
+    SEE: sound configuration changes in qemu | kraxel’s news ⌇⡞⡫⡰⠇
+      https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
+    [1/3] audio: omitting audiodev= parameter is only deprecated - Patchwork ⌇⡞⡰⢚⡔
+      https://patchwork.kernel.org/patch/11113775/
+    How am I supposed to use the -audiodev option? ⌇⡞⡱⣟⡾
+      https://www.mail-archive.com/qemu-discuss@nongnu.org/msg04966.html
+
+
+%% USB
+
+  TRY: create -usb -device usb-...
+  https://www.raspberrypi.org/forums/viewtopic.php?t=3149&start=25
+
+
+%% Bluetooth
+
+  MAYBE -bt vhci

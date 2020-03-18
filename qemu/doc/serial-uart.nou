@@ -1,0 +1,68 @@
+%%% Serial port
+
+REF
+  +++ http://nairobi-embedded.org/qemu_monitor_console.html
+
+  SEE |UART|
+    https://geektimes.ru/post/253786/
+    https://ru.wikipedia.org/wiki/%D0%A3%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9_%D0%B0%D1%81%D0%B8%D0%BD%D1%85%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%B9_%D0%BF%D1%80%D0%B8%D1%91%D0%BC%D0%BE%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%82%D1%87%D0%B8%D0%BA
+    http://easyelectronics.ru/tag/uart
+    http://s-engineer.ru/rabotaem-s-uart-na-avr/
+    https://github.com/ytai/ioio/wiki/UART
+
+  SEE lsof + unix socket : end-point
+    http://serverfault.com/questions/252723/how-to-find-other-end-of-unix-socket-connection
+
+
+  REF
+    ++ http://www.tldp.org/HOWTO/Serial-HOWTO-10.html
+    http://nairobi-embedded.org/qemu_serial_terminal_redirection.html
+    http://wiki.qemu.org/Features/ChardevFlowControl
+    https://blackdot.be/2013/07/qemu-kvm-monitor-and-serial-console-over-sockets-with-minicom/
+    http://www.makelinux.net/alp/047
+  USAGE:
+    -serial pty
+      copy path /dev/pts/N allocated on qemu launch
+      Connect:
+        $ picocom /dev/pts/N
+          => BETTER: allows connections inside tmux -- to copy on-screen text
+        $ st -l /dev/pts/N
+    -serial unix:path[,server][,nowait][,reconnect=seconds]
+       E.G: -serial unix:/tmp/ttyS0,server,nowait
+       ALT: -chardev socket,id=tmp,path="$tmp/ttyS0",server -device isa-serial,chardev=tmp
+    -serial mon:stdio
+      Switch mux by `<C-a> c` to monitor/ttyS0
+    -mon [chardev=]name[,mode=readline|control][,default]
+       E.G: -chardev socket,server,nowait,path=monitor,id=monitor -mon chardev=monitor,mode=readline
+       ALT: -chardev stdio,mux=on,id=char0 -mon chardev=char0,mode=readline,default
+  THINK: preallocate device
+    ++ http://tldp.org/HOWTO/Text-Terminal-HOWTO-7.html
+    http://stackoverflow.com/questions/52187/virtual-serial-port-for-linux
+    Recovery by stty after socat
+      http://stackoverflow.com/questions/26373006/using-socat-for-raw-serial-connection
+    $ socat PTY,link=/tmp/pts $(tty),rawer
+    ALT:
+      $ sudo mknod -m 666 /tmp/ttyS0 c 4 64
+      $ socat -d -d PTY,raw,echo=0 PTY,raw,echo=0
+      $ socat PTY,link=/dev/ttyS10 PTY,link=/dev/ttyS11
+  Connect
+    $ nc -U /tmp/ttyS0
+    $ socat UNIX-CLIENT:/tmp/ttyS0 -
+      BAD:FIND: no support for escape seq inside term (E.G. Up/Down arrows)
+      SEE:
+        socat UNIX-CLIENT:/tmp/ttyS0 "EXEC:picocom -"
+        socat UNIX-CLIENT:/tmp/ttyS0 PTY
+    NEED: use socat to convert //unix.sock -> //pty
+      # Impossible direct connect to *.sock
+      $ picocom -b 115200 /tmp/pty
+      $ st -l /tmp/pty 115200
+  DFL:HACK:
+    New terminal <M-Space>
+      $ tty
+      # /dev/pts/3
+      $ sleep 10d
+     USE: -chardev tty,id=pts,path=/dev/pts/3 -device isa-serial,chardev=pts
+  E.G:
+  $ qemu -nographic -serial mon:stdio -append 'console=ttyS0' binary.img
+  $ qemu -nographic -kernel ./bzImage -hda ./image.hda -append "root=/dev/sda console=ttyS0"
+  $ qemu -kernel linux-3.9.2/arch/x86/boot/bzImage -serial stdio -append "root=/dev/ram0 console=ttyAMA0 console=ttyS0"

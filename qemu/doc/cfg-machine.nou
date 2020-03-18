@@ -1,0 +1,31 @@
+%%%% Machine / Platform
+g
+
+%% Platform
+
+  VIZ: $ qemu-system-arm -machine help
+
+  $ … -M vexpress-a9
+  $ … -machine vexpress-a9
+
+
+%% CPU
+
+  VIZ: $ qemu-system-arm -machine vexpress-a9 -cpu help
+
+  $ … -smp cores=2
+
+  $ … -cpu l3-cache=on
+    NEED:(qemu>=2.8.0-rc0)
+      $ lscpu G L3
+    EXPL:(patch): git.qemu.org Git - qemu.git/commit ⌇⡞⡱⣽⢆
+      https://git.qemu.org/?p=qemu.git;a=commit;h=14c985cffa6cb177fc01a163d8bcf227c104718c
+    TUT: Enable L3 cache in Qemu ⌇⡞⡱⣽⢫
+      http://www.codeblueprint.co.uk/2016/12/08/why-you-should-tell-qemu-about-your-l3.html
+      See layout of NUMA CPU per domain
+        $ ls /proc/sys/kernel/sched_domain/cpu*
+
+
+%% RAM
+
+  $ … -m 256

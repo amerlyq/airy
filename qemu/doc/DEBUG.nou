@@ -1,0 +1,26 @@
+%%%% DEBUG
+
+  @/devq/kernel/DEBUG.nou
+  @/airy/gdb/doc/kernel.nou
+  ./kernel-debug.nou
+
+
+WTF
+  THINK: -debugcon -- write to guest port 0xe9 to output to host device
+
+  [_] TRY: Show log on both qemu and in your terminal
+    Kernel: console=ttyAMA0,115200 console=tty mem=256M highres=off console=ttyS0
+
+  Protect host memory from guest faults/crash
+    https://wiki.archlinux.org/index.php/QEMU#Enabling_IOMMU_.28Intel_VT-d.2FAMD-Vi.29_support
+
+
+%% Tracing qemu events
+
+  $ qemu-system-arm -trace help
+  $ qemu-system-x86_64 -d help
+
+  $ … -trace [events=file][,file=file]
+
+  $ qemu-system-x86_64 -d mmu -D /tmp/log
+    ? -dfilter

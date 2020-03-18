@@ -1,0 +1,51 @@
+%%%% Online sharing
+
+WTF
+  -semihosting
+    https://qemu.weilnetz.de/doc/qemu-doc.html#ARM-System-emulator
+
+  QEMU - ArchWiki ⌇⡞⡲⠕⣰
+    https://wiki.archlinux.org/index.php/QEMU#Sharing_data_between_host_and_guest
+
+
+%% Remote files
+
+  SSH:
+     -drive file=ssh://user@host/path/to/disk.img
+     -drive file.driver=ssh,file.user=$user,file.host=$host,file.port=22,file.path=/path/to/disk.img
+
+  WEB: direct ro access to files ⌇⡞⡲⠔⠌
+    USAGE: {http|https|ftp|ftps|tftp}://[<username>[:<password>]@]<host>/<path>
+    E.G: boot from a remote Fedora 20 live ISO image
+      $ qemu --drive media=cdrom,file=http://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
+      $ qemu --drive media=cdrom,file.driver=http,file.url=http://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
+    E.G: boot from a remote Fedora 20 cloud image using a local overlay for writes, copy-on-read, and a readahead of 64k
+      $ qemu-img create -f qcow2 -o backing_file='json:{"file.driver":"http",, "file.url":"https://dl.fedoraproject.org/Fedora-x86_64.qcow2",, "file.readahead":"64k"}' /tmp/Fedora.qcow2
+      $ qemu --drive file=/tmp/Fedora.qcow2,copy-on-read=on
+
+
+%% SSH access
+
+  Password-less access from |Clean guest|
+    $ ssh -p 2122 user@localhost
+    $ … -net user,hostfwd=tcp:127.0.0.1:6001-:6000
+    $ … -net user,hostfwd=tcp::5555-:23
+
+  ALT:OBSOLETE:(-redir)
+    $ … -net user -net nic,model=rtl8139 -redir tcp:2122::22
+
+  Reverse-access
+    # open 10.10.1.1:4321 on bootup, connect 10.0.2.100:1234 to it whenever the guest accesses it
+    $ … -net user,guestfwd=tcp:10.0.2.100:1234-tcp:10.10.1.1:4321
+
+
+%% One-way / Two-way
+
+  [_] TODO: SEP /pmd and /data partitions
+  [_] MAYBE: SEP /usr partition to replace apps on the fly
+
+  WARN:(corruption): we can't have "rw" for both guest/host anyway
+
+  $ … -drive file="$img",if=sd,format=raw
+    OR -sd "$img"
+    OR -virtfs ...

@@ -1,0 +1,65 @@
+%%%% Firmware / Deploy
+
+To boot the system you need two images SEE ※⡞⡲⠻⣽
+  1) zImage (or bZimage in case of x86)
+  2) root file system ※⡞⡲⡊⠰
+
+
+%% Boot
+
+  IDEA:(-netdev tftp/bootfile): use to emulate fully network boot from local dir
+    i.e. we already can use -kernel/-mtdblock to local files, but sometimes better test whole NFS usecase
+  ALSO: direct access to files by tftp ※⡞⡲⠔⠌
+
+
+%% Kernel
+
+  $ … -kernel output/images/zImage
+
+
+%% Cmdline
+
+  $ … -append "rootfstype=squashfs console=ttyS0"
+  $ … -append "console=ttyAMA0,115200 rootwait root=/dev/mmcblk0"
+
+
+%% Initrd %% ※⡞⡲⠢⠵
+
+  DEPRECATED: by initramfs
+  NOTE: bootloader loads both kernel and InitRamDisk (NOT initramfs) to RAM and forwards it as root=/dev/ram0
+  [_] TRY: It is also possible to use initrd with an NFS-mounted root, see the pivot_root(8) man page for details.
+
+  $ … -initrd "$ram"
+  $ … -initrd initrd.img-3.2.0-4-vexpress
+
+
+%% Device Tree (DTB / DTS)
+
+  NOTE: dtb is passed to kernel on boot
+
+  $ … -dtb output/images/vexpress-v2p-ca9.dtb
+
+
+%% Rootfs / Drive
+
+  Create qemu img from dir
+    http://serverfault.com/questions/246835/convert-directory-to-qemu-kvm-virtual-disk-image
+
+  $ … -drive if=sd,format=raw,file=/images/rootfs.ext2 -snapshot
+  $ … -drive if=sd,file=debian_wheezy_armhf_standard.qcow2
+
+  NOTE:ERR: ※⡞⡲⡙⡓ -mtdblock rootfs.ext2
+    qemu-system-arm: -mtdblock output/images/rootfs.ext2: machine type does not support if=mtd,bus=0,unit=0
+
+  2020-03-13 [X] BUG:(tune2fs): Can't check if filesystem is mounted due to missing mtab file
+    ::: FIXED: $ r.chroot touch /etc/mtab
+
+  WARN: cannot use -hdc and -cdrom at the same time
+     -hda file.img   | == -drive file=file,index=0,media=disk
+     -cdrom file.iso | == -drive file=file,index=2,media=cdrom
+     -mtdblock file  | on-board Flash memory image (Android-like)
+     -sd file        | [micro]SD-card
+  By default, interface is "ide" and index is automatically incremented
+     -drive file=a -drive file=b" | == -hda a -hdb b
+  E.G:(formats) file ssh qcow2 raw vdi tftp ftp http nfs …
+    HELP $ qemu-img -h
