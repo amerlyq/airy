@@ -41,8 +41,20 @@ Install
 
 
 BUG
+  [_] BUG: inside "st-tmux-ssh-chroot" ERR: tput: unknown terminal "tmux-256color"
+    ALT:FAIL: arrows don't work in menuconfig $ TERM=xterm-256color r.chroot make menuconfig
+    ::: FIXED: dump by infocmp(1) and recompile by tic(1)
+      HOST: $ infocmp tmux-256color > tmux-256color.ti
+      CHRT: $# tic tmux-256color.ti
+        => writes to /etc/terminfo/t/ OR ~/.terminfo/t/
+      SRC: ssh - tmux and screen-256 TERM not supported on remote hosts - Super User ⌇⡞⡴⣖⢽
+        https://superuser.com/questions/431922/tmux-and-screen-256-term-not-supported-on-remote-hosts
+    [_] BUG: interactive .vs. non-interactive mode -- arrows don't work
+      $ r.chroot
+      $ make menuconfig
+      .vs.
+      $ sora exectree/log/chained-cmdline -celL make menuconfig
   [_] BUG: problems with groups transition
-    # schroot groups: cannot find name for group ID 14
     REF: it does not modify anything about the user environment unless you
       specifically tell it to. the list of effective groups is a 'process parameter',
       so those are inherited and not modified
@@ -53,7 +65,23 @@ BUG
       BUT: may cause unknown problems when groups swapped 10 <-> 14
     FIND: export/login with only choosen groups on schroot
       -- SEE http://unix.stackexchange.com/questions/160487/how-to-prevent-schroot-from-overridding-passwd-file-and-others-files-already-pre
-    ::: manually add groups in
+    ERR:
+      groups: cannot find name for group ID 14
+      groups: cannot find name for group ID 150
+      groups: cannot find name for group ID 985
+      groups: cannot find name for group ID 987
+      groups: cannot find name for group ID 998
+    ::: FIXED: manually add groups in
+      HOST: $ id
+      CHRT:
+        sudo /usr/sbin/groupadd -g 150 wireshark
+        sudo /usr/sbin/groupadd -g 985 users2
+        sudo /usr/sbin/groupadd -g 987 uucp2
+        sudo /usr/sbin/groupadd -g 998 wheel
+    [_] BAD: you must remap existing groups instead of creating copies
+      985 -> 100 (users) and 987 -> 10 (uucp)
+      SEE: Use Linux user namespaces to fix permissions in docker volumes ⌇⡞⡴⣛⣐
+        https://www.jujens.eu/posts/en/2017/Jul/02/docker-userns-remap/
   [_] Not working with schroot:
     $ sudo mount --bind /cryptfs/workspace /cryptfs/chroots/lucid_i386/home/user
   [_] FIXME Exit chroot after using 'xsel'
