@@ -2,9 +2,13 @@
 
 ## My auto-cmds
 alias gc='r.git-my-msg --index --commit'
-alias gcg='r.git-my-msg --index --commit --greatest'
 alias gC='r.git-my-msg --index --commit --prefix'
+alias gct='r.git-my-msg --index --commit --prefix="TEMP!"'
+alias gcg='r.git-my-msg --index --commit --greatest'
+alias gcd='r.git-my-msg --index --commit --diff'
 alias gc.='r.git-my-msg --workdir --commit'
+
+[[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' gc gC gcd gcg gct
 
 # CHECK: are them useful in any workflow ?
 # BET? simply commit and verify afterward

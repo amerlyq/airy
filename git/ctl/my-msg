@@ -60,11 +60,14 @@ no_auto_abbrev no_getopt_compat no_ignore_case no_pass_through);
 my %opts = (
     index => 1,
     level => 0,
+    diff => 1,
     directory => cwd,
 );
 GetOptions(\%opts   #%OPTIONS:
 # , 'add|a!'          #% a = add      | add all files in current workdir (implies: -i) WARN: appends to index
 , 'index|i!'        #% i = index    | describe only current git index
+, 'diff|d!'         #% d = diff     | flip flag to append diff tail DFL=append
+    => sub { $opts{diff} = !$opts{diff} }  # BAD: non-intuitive behavior
 , 'greatest|g!'     #% g = greatest | use single folder with greatest number of changes DFL='[%]'
 , 'level|l=i'       #% l:= level    | derive names from nesting level DFL=0
 , 'prefix|p=s'      #% p:= prefix   | override component prefix DFL=<auto:{top-dir|.|%}>
@@ -367,7 +370,9 @@ sub mkmsg {
     # DEV:(opt): orthogonal options to enable each part of auto-message in addition to opts{message}
     return $opts{message} if $opts{message};
     # ALT: "[%]. chg ..." | "[%]* chg ..." | "[%] * chg ..." | "[%] *chg ..."
-    return "* ". mkmods() ." ". mkcmpts(2) . mkbody() . mkchgs();
+    my $msg = "* ". mkmods() ." ". mkcmpts(2) . mkbody();
+    $msg .= mkchgs() if $opts{diff};
+    return $msg;
 }
 
 my $text = "[". mkpfx(@tops) ."] ". mkmsg();

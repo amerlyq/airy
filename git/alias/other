@@ -6,10 +6,14 @@
 # Show file content from old revision
 # git show 1b17fd56:./async
 
-alias gc1='noglob git clone --single-branch --depth=1'
+alias gc1='git clone --depth=1 --single-branch'
+[[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' gc1
+
+alias gc1b='gc1 --branch'  # USE: $ gc1b v3.14 for single tag
 gcI(){ [[ -d $1 ]] && return
   git init "$1" && REPO="$1" r.git-my-repo "${2:--m}" &&
-    git -C "$1" commit --allow-empty -m "Initial empty commit"
+    git -C "$1" commit --allow-empty -m "Initial empty commit" &&
+    git -C "$1" tag -a -m 'Initial repo root tag' ROOT
 }
 
 ## --- Git ---
