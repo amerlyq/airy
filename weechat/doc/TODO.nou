@@ -1,11 +1,4 @@
 BUG
-  [_] sigsegv crash
-    [_] CHECK:MAYBE: it's due to I enabled "xfer" earlier
-    [_] CRIT: crashed on auto-opening #lux-kiev
-      skypeweb - User amerlyq added to conversation 0x55df95e24af0
-      ~/.weechat/weechat_crash_20200225_156594.log
-      156594 (weechat) Tue 2020-02-25 14:13:13 EET
-        /var/lib/systemd/coredump/core.weechat.1000.e71eaeaa5c5f42f18ed5caf001c2715e.156594.1582632793000000000000.lz4
   [_] multiline not seen what typed after two lines (not scrolled anymore)
   [_] errors treated as commands
     <=
@@ -30,6 +23,10 @@ BUG
       #  UTF-8
       $ ... | iconv -f UTF-8 -t ISO-8859-1
       #  2019-08-08 12:12:55  Если мне почти ежедневно делегируется по несколько новых задач
+  2020-04-02 [X] BUG: some unknown plugins write to /dev/stderr on connect
+    DEBUG: $ r.weechat 2>/tmp/log
+    ERR: Invalid commandline: Unknown option --(PM)
+    FIXED: add prefix to name :: irc:$ /set plugins.var.perl.notify_send.command "notify-send -- '#$name($type)' '$message' &>/dev/null"
 
 
 IDEA

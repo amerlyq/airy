@@ -1,0 +1,42 @@
+sigsegv crash
+  2020-04-04 [$] CHECK:MAYBE: it's due to I enabled "xfer" earlier
+  [_] CRIT: crashed on auto-opening channel
+    = due to server sending you again last messages with broken unicode
+  MAYBE: strip-out unicode
+    LC_ALL=C cat irc.freenode.#podman.weechatlog | tr -dc '\0-\177' | grep jidar seems like it would work
+  ::: repro
+    $ gdb -ex 'source /dev/fd/3' weechat 3<<< $'set breakpoint pending on\nb weechat_python_hashtable_map_cb\ncomm 1\nset var value = ":\\xd0\\x9e\\xd1\\x84\\xd0\\x00\\xd0\\xbc"\ncont\nend\nrun'
+  [_] CHECK:MAYBE: root cause: weechat/bitlbee splits long unicode messages on "bytelength" instead of "charlength" --
+    and therefore creates broken unicode, which crash weechat when being sent back by skype history server
+
+
+TALK: irc:#weechat/freenode
+  2020-04-04 15:25:59	amerlyq	FlashCode: added fuller backtrace to https://github.com/weechat/weechat/issues/1463
+  2020-04-04 18:13:52	@FlashCode	amerlyq: you still have the core file and a way to type gdb commands?
+  2020-04-04 18:20:59	@FlashCode	the backtrace helps a bit, but I need a way to reproduce or to understand what's happening
+  2020-04-04 18:27:24	@FlashCode	if you can, please try:   f 6   then:  p value   and give me the whole value please
+  2020-04-04 18:36:51	@FlashCode	amerlyq: ok, I understand what happens and am able to reproduce the issue
+  2020-04-04 18:37:59	@FlashCode	your script is using a modifier on irc_in_PRIVMSG, and this is NOT recommended to use that,
+    because the modifier may receive bytes when there is invalid UTF-8 sequence in the message,
+    as written there: https://weechat.org/files/doc/devel/weechat_scripting.en.html#_strings_received_in_callbacks
+    (this is a new behavior in WeeChat 2.7)
+  2020-04-04 18:38:17	@FlashCode	instead it is recommended to use irc_in2_PRIVMSG, which will always receive valid UTF-8
+  2020-04-04 18:39:30	@FlashCode	and then the problem after with irc_IN_PRIVMSG is that there's a call to weechat.info_get_hashtable('irc_message_parse', {...}) to parse the message
+  2020-04-04 18:39:40	@FlashCode	and here the script will send bytes, with invalid UTF-8, like:
+  2020-04-04 18:39:50	@FlashCode	info = weechat.info_get_hashtable('irc_message_parse', {'message': b':nick!user@host PRIVMSG #weechat :\xe9'})
+  2020-04-04 18:39:56	@FlashCode	this crashes weechat
+  2020-04-04 18:40:20	@FlashCode	so as a conclusion:
+  2020-04-04 18:40:43	@FlashCode	1. your script must be changed to use irc_in2_PRIVMSG, which is much better (the callback receives always UTF-8 data)
+  2020-04-04 18:41:24	@FlashCode	2. I'll fix the crash, but I don't know exactly how for now,
+    maybe I'll put bytes in the hashtable instead of string in case of invalid UTF-8 data (like does the irc_in_PRIVMSG modifier)
+  2020-04-04 18:41:46	@FlashCode	so at least it will not crash, but the script may be surprised to receive bytes in the dict
+  2020-04-04 18:41:54	@FlashCode	still a lot better than a crash :)
+  2020-04-04 18:42:48	@nils_2	i prefer a nice crash :-D
+  2020-04-04 18:44:36	@FlashCode	so I'll try str, if failing bytes, if still failing, I skip the entry in the dict
+  2020-04-04 18:44:51	@FlashCode	better bytes or missing entry than a crash
+  2020-04-04 19:02:08	@FlashCode	fix implemented, tested, commit soon
+  2020-04-04 19:11:01	@FlashCode	amerlyq: fixed, please try, feedback welcome
+  2020-04-04 19:11:30	@FlashCode	now in case of invalid UTF-8 in the weechat hashtable,
+    bytes are returned in the python dict instead of str (just for the key or value with problem)
+  2020-04-04 19:11:42	@FlashCode	so you can have mixed str and bytes in the dict
+  2020-04-04 19:12:12	@FlashCode	but as I said, the script, like many others, must be fixed (the modifier irc_in_xxx should never be used any more, irc_in2_xxx is better)
