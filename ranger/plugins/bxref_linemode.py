@@ -30,6 +30,7 @@ class XAttrLinemode(LinemodeBase):
 class BTimeXrefLinemode(LinemodeBase):
     name = 'bxref'
 
+    # FIXME: replace by "r.vim-xtref"
     def to_z85(self, ts):
         from subprocess import run, CalledProcessError
         try:
@@ -47,5 +48,6 @@ class BTimeXrefLinemode(LinemodeBase):
         # BUG: .st_birthtime is still not available on Linux for Python libs
         #   FROM: https://www.manongdao.com/q-2465.html
         # FAIL: on ext4 birth ~=~ change time, and "modify" is much older
+        #   !! because vim always creates new files on write !!
         # return '⌇' + self.to_z85(f.stat.st_birthtime)
         return '⌇' + self.to_z85(f.stat.st_mtime)
