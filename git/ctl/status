@@ -19,6 +19,8 @@ function gita_omz {
 function gita_prezto {
   (( $+functions[git-info] )) || return
   git-info
+  # TODO: embed into Gs similar info to "r.git-my-msg" -- to estimate changes w/o running Gt
+  #   e.g. (master) ◯♯  aeternum  (F5 M7 A5 +399/-12)
   printf "%-16s" "${(%e)git_info[details]} ${(%e)git_info[icons]}"
 }
 
@@ -39,7 +41,7 @@ function time_dt {
 }
 
 function gita_st { local rep=$1 sfx=${2-}
-  stm=$(git log -1 --pretty=format:'%ci' | awk '{print$2,$1}')
+  stm=$(git log -1 --pretty=format:'%ci' | cut -d' ' -f1,2)
   name=$(printf "%-${WCOL:-17}s\n" "$rep" | sed 's|[^/]\+/|%F{6}\0%f|')
 
   # ALT:(builtin slower then sed):
@@ -56,7 +58,7 @@ function gita_st { local rep=$1 sfx=${2-}
       ) ||:  # Block nonexistent '%(push:track)' in git v1.9.1
 
   [[ -z ${psh#* } ]] || psh="\n$psh\n\u2534"
-  print -P "$(gita_prezto) \t$name \t$stm - $(time_dt)%F{35}$psh%f$sfx"
+  print -P "$(gita_prezto) \t$name $(time_dt)  $stm%F{35}$psh%f$sfx"
 }
 
 unsetopt no_unset
