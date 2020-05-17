@@ -6,6 +6,8 @@ DEBUG
     $ setxkbmap -v 10 -option "" -model pc104 -rules evdev -layout us
   Compare before/after changes
     $ v -d <(xkbcomp $DISPLAY -) prev
+  Monitor kbdd bugs
+    $ dbus-monitor path=/ru/gentoo/KbddService
 
 xinput
   TRY: sep kbd/mouse/monitor
