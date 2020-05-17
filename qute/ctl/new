@@ -9,10 +9,12 @@ basedir=$1
 shift
 
 linkcp -t "$basedir"/config -f ~/.config/qutebrowser \
-  bookmarks config.py config-private.py quickmarks style.css
+  bookmarks config.py config-private.py quickmarks theme style.css
 
 linkcp -t "$basedir"/data -f ~/.local/share/qutebrowser \
   userscripts
+
+linkcp -t "$basedir" -- ~/.password-store ~/.gnupg
 
 # HACK: use different NSS/PKI chain to override root cert from ~/.pki/nssdb/
 #   <= according to ~/sdk/nss-3.46/nss/lib/sysinit/nsssysinit.c: getUserDB()

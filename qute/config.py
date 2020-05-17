@@ -2,6 +2,7 @@
 ## Documentation:
 ##   qute://help/configuring.html
 ##   qute://help/settings.html
+## SEE: :open qute://configdiff
 
 # REF: /usr/lib/python3.6/site-packages/qutebrowser
 c = c  # noqa: F821
@@ -1661,7 +1662,7 @@ config.unbind('ZZ')
 # config.bind('cd', 'download-clear')
 # config.bind('co', 'tab-only')
 config.bind('cy', 'open -t -- {clipboard}')
-config.bind('cY', 'open -- {clipboard}')
+config.bind('c.', 'open -- {clipboard}')
 # config.bind('d', 'tab-close')
 # config.bind('f', 'hint')
 # config.bind('g$', 'tab-focus -1')
@@ -1687,7 +1688,7 @@ config.bind('gn', 'open -t')
 # config.bind('gt', 'set-cmd-text -s :buffer')
 # config.bind('gu', 'navigate up')
 config.bind('gy', 'open -t -- g {clipboard}')
-config.bind('gY', 'open -- g {clipboard}')
+config.bind('g.', 'open -- g {clipboard}')
 # config.bind('h', 'scroll left')
 config.bind('h', 'back')
 # config.bind('i', 'enter-mode insert')
@@ -1871,10 +1872,10 @@ config.bind('<Tab>', 'nop')
 
 
 ## qute-pass
-config.bind('zl',  'spawn --userscript qute-pass')
-config.bind('zul', 'spawn --userscript qute-pass --username-only')
-config.bind('zpl', 'spawn --userscript qute-pass --password-only')
-config.bind('zol', 'spawn --userscript qute-pass --otp-only')
+config.bind('zl',  'spawn --userscript qute-pass --dmenu-invocation dmenu')
+config.bind('zul', 'spawn --userscript qute-pass --dmenu-invocation dmenu --username-only')
+config.bind('zpl', 'spawn --userscript qute-pass --dmenu-invocation dmenu --password-only')
+config.bind('zol', 'spawn --userscript qute-pass --dmenu-invocation dmenu --otp-only')
 
 
 ### Load private part of config

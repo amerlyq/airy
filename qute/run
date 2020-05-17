@@ -33,6 +33,6 @@ esac
 # WARN: can crash on Nouveau
 # OBSOLETE:(BAD): "webengine" is newer, but no Caret and white CSS on reload
 # BAD:SECU: --enable-webengine-inspector
-exec qutebrowser --backend "$web" \
-  --qt-flag disable-reading-from-canvas \
-  "$@"
+# SECU: $ --qt-flag disable-reading-from-canvas
+#   FAIL:(2020-04 onwards): #5345 youtube disappering controls
+exec qutebrowser --backend "$web" "$@"
