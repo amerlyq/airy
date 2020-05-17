@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# ALT: https://www.httrack.com/
+#   USAGE: $ httrack --update https://example.com/docs/ '-*' '+example.com/*'
+#      OR: $ … '+*example.com/*'
+
 LINK="${1?Need link}"
 DOM="${LINK#*//}"
 DOM="${DOM%%/*}" #Comma-separated list
@@ -16,4 +20,3 @@ exec wget --recursive --no-parent --no-clobber \
 
 # OR: (view logs: tail -f nohup.out)
 #   nohup wget ... &
-# ALT: https://www.httrack.com/
