@@ -1,0 +1,392 @@
+# vim: ft=sh
+# SUM: "fractal" multidisk -- compile performance + privacy/encryption + resilience/snapshots + decent gaming
+# NEED:
+#   * disable Windows fast-startup and hibernation
+#   * switch Windows date-time to UTC and fix current time
+#
+# PERF
+#   * https://www.phoronix.com/scan.php?page=article&item=bcachefs-linux-2019&num=2
+#   * https://www.phoronix.com/scan.php?page=article&item=linux-50-filesystems&num=4
+#   * https://www.datalad.org/test_fs_analysis.html
+#
+# ARCH: M.2 1TB, SSD 4TB
+# ? /       zfs    100GiB | best apps startup time (4x btrfs 3x ext4) (BUT: SSD .vs. NVMe), +snapshots
+#   /       btrfs  100GiB | +snapshots -- ArchLinux rolling releases, +recovery /var/cache files, +/home/user/.*
+#   /aura   btrfs  200GiB | +snapshots, git-annex
+#   /cache  xfs    200GiB | +reflink for ccache, +compile, +dbench (concurrent compiling for ct-ng), +src/sdk
+#   ...                   | keep rest unallocated
+# ? /docker <- /var/lib/docker
+#   /data   btrfs  1TiB   | +recovery, +/_dld -> /data/_dld
+#   /games  ext4   3TiB   | + /games/_steam OR ? -> /data/_games -CoW, shrink when /data needs more space
+# * /boot === another M.2 disk with Windows BAD: only 100MB is not enough due to fallback initramfs ALT: flashdrive with /boot
+# ? /boot   fat32  200MiB | (efi) MAYBE: allocate separate partition to allow Windows fast-startup and hibernation
+
+
+# Disable PC beep
+setterm -blength 0
+parted -l
+#  * /dev/nvme0n1
+#  * /dev/sda
+
+
+### 1 #########################################################################
+## NOTE: two whole-disk lvm-on-luks
+parted /dev/nvme0n1
+#  - mklabel gpt
+#  - mkpart primary 2048s 100%
+#  - align-check opt 1
+#  - quit
+
+## NOTE: Default AES cipher in XTS mode (effective key 256-bit)
+# INFO: Взлом и защита шифрования дисков LUKS / Хабр ⌇⡞⢺⠀⡲
+#   https://habr.com/ru/post/457542/
+# FIXED:(grub/luks2): https://savannah.gnu.org/bugs/?55093
+# ALSO: $ … --iter-time 5000 --use-random
+cryptsetup -v --key-size 512 --hash sha512 --type luks2 luksFormat /dev/nvme0n1p1
+
+## ADD: second passphrase -- to disclose in emergencies and then remove it
+#  :: enter existing passphrase to open dev, then new one for next key slot
+## ALSO: check both keys are present and open encrypted device
+cryptsetup --hash sha512 luksAddKey /dev/nvme0n1p1
+cryptsetup luksDump /dev/nvme0n1p1
+cryptsetup --allow-discards --persistent luksOpen /dev/nvme0n1p1 luks
+
+
+## NOTE: init partition as Physical Volume, add PV to new Volume Group
+pvcreate --dataalignment 1m /dev/mapper/luks
+vgcreate ws /dev/mapper/luks
+
+## NOTE: create LV partitions TEMP: keep rest unallocated
+#   /       btrfs  100GiB
+#   /aura   btrfs  200GiB
+#   /cache  xfs    200GiB
+lvcreate ws -Wy --yes -n root -L 100G
+lvcreate ws -Wy --yes -n aura -L 200G
+lvcreate ws -Wy --yes -n cache -L 200G
+
+## NOTE: format LV partitions
+mkfs.btrfs -L root -f /dev/ws/root
+mkfs.btrfs -L aura -f /dev/ws/aura
+mkfs.xfs -L cache -f /dev/ws/cache
+
+
+
+### 2 #########################################################################
+parted /dev/sda
+#  - mklabel gpt
+#  - mkpart primary 2048s 100%
+#  - quit
+cryptsetup -v --key-size 512 --hash sha512 --type luks2 luksFormat /dev/sda1
+cryptsetup --hash sha512 luksAddKey /dev/sda1
+cryptsetup luksDump /dev/sda1
+cryptsetup --allow-discards --persistent luksOpen /dev/sda1 crypt
+
+## INFO
+#   /data   btrfs  1TiB
+#   /games  ext4   3TiB
+pvcreate --dataalignment 1m /dev/mapper/crypt
+vgcreate ds /dev/mapper/crypt
+lvcreate ds -Wy --yes -n data -L 1T
+lvcreate ds -Wy --yes -n games -l +100%FREE
+
+## NOTE: format LV partitions
+mkfs.btrfs -L data -f /dev/ds/data
+mkfs.ext4 -L games /dev/ds/games
+
+
+
+### INFO ######################################################################
+lsblk -ao NAME,HOTPLUG,SIZE,ROTA,FSTYPE,STATE,RM,LABEL,TYPE,MOUNTPOINT
+lsblk -ao +fstype,label,rota,state
+# nvme0n1         931.5G  disk
+# └─nvme0n1p1     931.5G  part   crypto_LUKS
+#   └─luks        931.5G  crypt  LVM2_member
+#     ├─ws-root     100G  lvm    btrfs
+#     ├─ws-aura     200G  lvm    btrfs
+#     ├─ws-cache    200G  lvm    xfs
+#     └─ ... (unallocated)
+# sda               3.7T  disk
+# └─sda1            3.7T  part   crypto_LUKS
+#   └─luks          3.7T  crypt  LVM2_member
+#     ├─ds-data       1T  lvm    btrfs
+#     └─ds-games    2.7T  lvm    ext4
+
+lvmdiskscan
+dmsetup ls --tree
+# dmsetup remove /dev/mapper/luks  # NOTE: del old LVM completely
+# vgremove -f ws  # NOTE: del only group, keeping LVM
+pvdisplay
+pvs
+vgdisplay
+vgs
+lvs
+
+
+### SNAPSHOTS #################################################################
+## NOTE: create btrfs layout for snapshots
+mount -o compress=zstd,autodefrag /dev/ws/aura /mnt
+btrfs quota enable /mnt
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@snapshots
+mkdir -vp /mnt/@/.snapshots
+umount /mnt
+
+mount -o compress=zstd,autodefrag /dev/ds/data /mnt
+btrfs quota enable /mnt
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@snapshots
+mkdir -vp /mnt/@/.snapshots
+umount /mnt
+
+mount -o compress=zstd,autodefrag /dev/ws/root /mnt
+btrfs quota enable /mnt
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@snapshots
+mkdir -vp /mnt/@/{.snapshots,aura,boot,cache,data,games}
+for x in cache lib/docker log
+do v=/mnt/@/var/$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
+chattr +C /mnt/@/var/log
+for x in cabal cache cargo conan config/skypeforlinux ccache gem local/share/Steam npm stack
+do v=/mnt/@/home/user/.$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
+btrfs subvolume list /mnt
+umount /mnt
+
+
+### BOOTSTRAP #################################################################
+## FIXED: bootstrap from another distributive .iso
+cd /tmp
+wget http://mirrors.nix.org.ua/linux/archlinux/iso/2020.05.01/archlinux-bootstrap-2020.05.01-x86_64.tar.gz
+tar xzf archlinux-bootstrap-*-x86_64.tar.gz
+vi /tmp/root.x86_64/etc/pacman.d/mirrorlist
+# FIXED:ERR: error: could not determine cachedir mount point /var/cache/pacman/pkg
+mount --bind /tmp/root.x86_64 /tmp/root.x86_64
+/tmp/root.x86_64/bin/arch-chroot /tmp/root.x86_64/
+{
+
+pacman-key --init
+pacman-key --populate archlinux
+pacman -Syyu vis
+
+
+### LAYOUT ####################################################################
+## NOTE: assemble mounted filesystem
+mount -o noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@ /dev/ws/root /mnt
+mount -o noatime,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ws/aura /mnt/aura
+mount /dev/ws/cache /mnt/cache
+mount -o noauto,nofail,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ds/data /mnt/data
+mount -o noauto,nofail,x-systemd.automount /dev/ds/games /mnt/games
+mount -o noauto,x-systemd.automount /dev/nvme1n1p2 /mnt/boot
+
+# FAIL:(snapper): can't mount snapshots somewhere rarely accessible (e.g. /root/*) to prevent automount
+# [_] TODO: exclude it from system-wide grep and updatedb (MAYBE: by using chmod 000)
+mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@snapshots /dev/ws/root /mnt/.snapshots
+mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=/@snapshots /dev/ws/aura /mnt/aura/.snapshots
+mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=/@snapshots /dev/ds/data /mnt/data/.snapshots
+
+
+### SETUP #####################################################################
+## NOTE: bake fstab
+timedatectl set-timezone EET
+timedatectl set-ntp true
+timedatectl status
+
+# NEW: "base" is almost empty now -- install everything manually
+pacstrap /mnt  base amd-ucode linux linux-firmware base-devel cryptsetup lvm2 btrfs-progs vis wget git
+
+
+## CHG: manually remove swap of host system (if necessary)
+genfstab -pU /mnt >> /mnt/etc/fstab
+
+## NOTE: unlock 2nd encrypted disk automatically by plain text keyfile
+# SEE: Install Windows and Linux on different SSD
+#   * https://unix.stackexchange.com/questions/120232/dual-boot-windows-on-second-harddrive-uefi-gpt-system
+#   * https://www.zdnet.com/article/hands-on-linux-uefi-multi-boot-my-way/
+#   * https://askubuntu.com/questions/726972/dual-boot-windows-10-and-linux-ubuntu-on-separate-hard-drives
+#   * https://superuser.com/questions/699189/efi-boot-two-independently-bootable-physical-hard-drives
+mkdir -p /root/luks
+dd if=/dev/random bs=32 count=1 of=/root/luks/crypt.key
+cryptsetup luksAddKey /dev/sda1 /root/luks/crypt.key
+echo "crypt  /dev/sda1  /root/luks/crypt.key  nofail,discard" >> /mnt/etc/crypttab
+
+
+bootctl --path=/mnt/boot install
+mkdir -p /mnt/boot/loader/entries
+# <UUID> is raw encrypted device -- find by ':r!blkid -dno UUID /dev/nvme0n1p1' in vi (OR: ':< ...' in vis)
+# ALT:(rootflags): use "btrfs {get,set}-default ..."
+cat > /mnt/boot/loader/entries/arch.conf <<EOT
+title Arch Linux Enc
+linux /vmlinuz-linux
+initrd /amd-ucode.img
+initrd /initramfs-linux.img
+options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ quiet
+EOT
+# i915.enable_execlists=0
+# acpi_osi=! acpi_osi="Windows 2009" acpi_backlight=native sysrq_always_enabled=1
+# initcall_debug intel_iommu=igfx_off kvm-intel.nested=1 no_timer_check noreplace-smp page_alloc.shuffle=1 rcu_nocbs=0-64 rcupdate.rcu_expedited=1 rootfstype=ext4,btrfs,xfs,f2fs tsc=reliable rw rootwait
+
+cat > /mnt/boot/loader/loader.conf <<EOT
+default arch
+timeout 3
+editor 0
+EOT
+
+
+### SYSTEM ####################################################################
+arch-chroot /mnt
+{
+  # NOTE: replace CapsLock by Ctrl
+  printf 'keymaps 0-255\nkeycode 58 = Control\n' > /etc/vconsole.map
+  echo KEYMAP=/etc/vconsole.map > /etc/vconsole.conf
+  loadkeys /etc/vconsole.map
+
+  # pacman -S sed gzip
+  export LANG=en_US.UTF-8
+  # CHG: uncomment 'en_US.UTF-8'  OR: $ echo "$LANG UTF-8" > /etc/locale.gen
+  vis /etc/locale.gen
+  echo "LANG=$LANG" > /etc/locale.conf
+  locale-gen
+
+  pacman -S ntp openssh
+  ln -sf /usr/share/zoneinfo/EET /etc/localtime
+  hwclock --systohc --utc
+  systemctl enable ntpd sshd
+
+  echo fractal > /etc/hostname
+  vis /etc/hosts
+  # 127.0.0.1  localhost  fractal
+  # ::1        localhost  fractal
+
+  # pacman -S mkinitcpio
+  # FIXED:BAD: small EFI 100MB is not enough for fallback image
+  # CHG: PRESETS=('default')
+  vis /etc/mkinitcpio.d/linux.preset
+  # CHG: HOOKS=(base udev keyboard autodetect modconf block encrypt lvm2 filesystems fsck)
+  vis /etc/mkinitcpio.conf
+  mkinitcpio -vM
+  mkinitcpio -p linux
+
+  pacman -S netctl dhcpcd ifplugd wpa_supplicant
+  ip link
+
+  systemctl enable netctl-ifplugd@enp67s0
+  cat > /etc/netctl/eth_dhcp <<EOT
+Description='Home LAN'
+Interface=enp67s0
+Connection=ethernet
+IP=dhcp
+EOT
+
+  systemctl enable netctl-auto@wlo2
+  wpa_passphrase mywifi mypasswd > /etc/netctl/wifi_dhcp
+  cat > /etc/netctl/wifi_dhcp <<EOT
+Description='Home WiFi'
+Interface=wlo2
+Connection=wireless
+Security=wpa
+IP=dhcp
+ESSID='mywifi'
+Key='...'
+Hidden=yes
+EOT
+
+  cat > /etc/netctl/wifi_static <<EOT
+Description='Home WiFi static'
+Interface=wlo2
+Connection=wireless
+Security=wpa
+IP=static
+ESSID='mywifi'
+Key='...'
+Hidden=yes
+ExcludeAuto=yes
+Address='192.168.1.4/24'
+Gateway='192.168.1.1'
+DNS=('192.168.1.1')
+EOT
+
+  pacman -S sudo polkit
+  useradd --create-home --home-dir /home/user --user-group --groups users,wheel --shell /bin/bash --comment admin -- amer
+  # OR: uncomment first '%wheel' $ EDITOR=vis visudo
+  echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+  # OR: echo "amer ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user
+  passwd amer
+  passwd
+
+  ## NOTE: fix shared "users" access for /data
+  fmd(){ chown -R "$1" -- "${@:3}" && chmod -R "$2" -- "${@:3}"; }
+  fmd root:users 2770 /{aura,cache,data,games} /data/{_dld,music}
+  fmd root:users  750 {,/aura,/data}/.snapshots
+  fmd amer:amer  2700 /home/user /media/amer /cache/work
+  chmod -R 700 /home
+  ln -svT /data/_dld /_dld
+  ln -svT /cache/work /work
+
+
+  vis /etc/pacman.conf  # uncomment 'Color' and '[multilib]'
+  pacman -S reflector
+  cp -vf --backup=t /etc/pacman.d/mirrorlist{,}
+  reflector --score 5 --protocol https > /etc/pacman.d/mirrorlist
+  pacman -Syyu
+  udt=$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)
+  echo "Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch" >> /etc/pacman.d/mirrorlist
+
+  echo "Include = /etc/pacman.d/aur.conf" >> /etc/pacman.conf
+  cat > /etc/pacman.d/aur.conf <<EOT
+[options]
+CacheDir = /var/cache/pacman/aur
+[aur]
+SigLevel = Optional TrustAll
+Server = file:///var/cache/pacman/aur
+EOT
+  install -dm1775 -o amer -g users -- /var/cache/pacman/aur
+  repo-add /var/cache/pacman/aur/aur.db.tar
+  chown -R amer:users /var/cache/pacman/aur
+  pacman -Sy
+
+  su amer
+  {
+    ### AUR
+    mkdir -p ~/.cache/aurutils/sync/aurutils
+    cd ~/.cache/aurutils/sync/aurutils
+    curl -L "https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils.tar.gz" | tar xz --strip-components=1
+    gpg --recv-keys 6BC26A17B9B7018A
+    makepkg PKGBUILD --syncdeps --clean --install --noconfirm --force
+    aur sync --database=aur --no-view --no-confirm --upgrades -- gotop-bin
+    sudo pacman --noconfirm --sync --needed -- gotop-bin
+  }
+
+  ## FAIL:(snapper): hardcoded dir /.snapshots must be always present and mounted
+  # SEE: @/airy/snapper/init.gen
+  pacman -S snapper
+  # INFO: create /etc/snapper/configs/root
+  snap(){ local nm=$1 d=$2/.snapshots
+    umount $d && rmdir $d && snapper -c $nm create-config ${d%/*}
+    btrfs subvolume delete $d && mkdir $d && mount $d && chmod 750 $d && chown root:users $d
+    snapper -c $nm set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY=8,DAILY=7,WEEKLY=5}
+    btrfs qgroup show -reF $d
+    btrfs quota enable $d
+    snapper -c $nm setup-quota
+    snapper -c $nm get-config
+  }
+  snap root /
+  snap aura /aura
+  snap data /data
+  systemctl enable snapper-{cleanup,timeline,boot}.timer
+}
+
+# umount /mnt/hostrun
+# rmdir -v /mnt/hostrun
+umount -R /mnt
+}
+
+lvchange -a n ws   # stop LVM group
+cryptsetup -v close luks
+reboot
+
+
+## DEBUG: on boot problems
+setterm -blength 0
+cryptsetup luksOpen /dev/nvme0n1p1 luks
+mount -o subvol=@ /dev/ws/root /mnt
+arch-chroot /mnt
+...
