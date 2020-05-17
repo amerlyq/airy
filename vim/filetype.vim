@@ -19,7 +19,7 @@ augroup filetypedetect
   au BufRead,BufNewFile *.reg   edit ++enc=utf16le
   au BufRead,BufNewFile *.pc    setf automake
   au BufRead,BufNewFile {Config.in,Kconfig}    setf kconfig  " Buildroot,BusyBox
-  au BufRead,BufNewFile {*.config,*defconfig}  setf make     " Buildroot,Linux
+  au BufRead,BufNewFile {*.config,*.frag,*_defconfig,defconfig}  setf make     " Buildroot,Linux
   " -- override default runtime mistake 'ft=hog'
   au BufRead,BufNewFile *.rules setl ft=udevrules
   au BufRead,BufNewFile *.otl   setl noet  " TEMP:REM*

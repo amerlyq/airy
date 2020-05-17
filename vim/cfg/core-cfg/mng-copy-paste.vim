@@ -173,7 +173,7 @@ function! GetLineBookmark(idt, text, ...)
   let bpfx = l:prf . l:tab
 
   " NOTE: add context-dependent location prefix '//'
-  if strpart(part,0,1) != '/'| let path = '//' . path |en
+  if strpart(path,0,1) != '/'| let path = '//' . path |en
 
   let str = l:prf . path .':'. line('.')
   let str.= "\n" . TrimIndents(a:text, bpfx)

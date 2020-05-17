@@ -174,7 +174,7 @@ parse_xtref(){
 cvt_braille(){ printf -- "${2-}""\\U28${1:0:2}""\\U28${1:2:2}""\\U28${1:4:2}""\\U28${1:6:2}""\\n"; }
 cvt_hex(){ printf -- "${2-}""\\x${1:0:2}""\\x${1:2:2}""\\x${1:4:2}""\\x${1:6:2}""\\n"; }
 cvt_dt(){ date +"${2-}%Y%m%d_%H%M%S" --date="@$((0x$1))"; }
-cvt_date(){ date +"${2-}%Y-%m-%d_%H:%M:%S" --date="@$((0x$1))"; }
+cvt_date(){ date +"${2-}%Y-%m-%d=%H:%M:%S" --date="@$((0x$1))"; }
 cvt_utc(){ date +"${2-}%Y%m%dT%H%M%SZ" --utc --date="@$((0x$1))"; }
 cvt_unix(){ printf '%s%d\n' "${2-}" "$((0x$1))"; }
 cvt_z85(){ printf '%s%s\n' "${2-}" "$(cvt_hex "$1" | tr -d \\n | basenc --z85)"; }

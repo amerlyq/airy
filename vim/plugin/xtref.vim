@@ -143,7 +143,8 @@ fun! xtref#to_date(xloci)
     return x
   endif
   let hexts = substitute(x, '.', '\=printf("%x",and(char2nr(submatch(0)),0xff))', 'g')
-  return pfx . strftime('%Y-%m-%d_%H:%M:%S%z', str2nr(hexts, 16))
+  " BET? convert directly by "r.vim-xtref" as SPOT
+  return pfx . strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
 endf
 
 function! xtref#call_at(cwd, fn, ...)
@@ -243,6 +244,7 @@ xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref
 nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(0,'')<CR>
 xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 
+" TODO:ENH: switch loop between z85 / braille / iso8601
 nnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(0,xtref#to_date(xtref#get(0)))<CR>
 xnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(1,xtref#to_date(xtref#get(1)))<CR>
 

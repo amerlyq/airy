@@ -9,6 +9,8 @@ call dein#add('octol/vim-cpp-enhanced-highlight', {
 call dein#add('Shirk/vim-gas')
 
 
+call dein#add('ollykel/v-vim')
+
 
 " SEE:
 " vim-scripts/DoxygenToolkit.vim:

@@ -17,8 +17,9 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 
 " EXPL: used <DECI> because DEC==decrement/decrease
 " IDEA: mark text by color specified in notch
-"   'RED: ...' -- marker only
-"   'GREN! ...' -- rest of line
+"   'RED: ...' -- marker only (statement)
+"   'ALT~ ...' -- marker only (compromise / uncertainty)
+"   'GREN! ...' -- rest of line (unshakable confidence)
 "   '!CYAN! ...' -- whole line from beginning
 
 " DEV: phonetic abbreviations in cyrillic, etc.
@@ -70,7 +71,7 @@ function! s:everywhere_matches(patts)
   if exists('w:everywhere_matches')| return |en
   for [k,c,g,p] in a:patts
     " ALT:BAD: '\v<(OR)>[:?!*.=]*'
-    call matchadd('Notch'. k, '\v%(^|.*!|\A@1<=)%('.p.')%(!.*|[:?*.=]+|\A@=|$)', -1)
+    call matchadd('Notch'. k, '\v%(^|.*!|\A@1<=)%('.p.')%(!.*|[:?*.=~]+|\A@=|$)', -1)
   endfor
   let w:everywhere_matches = 1
 endfunction

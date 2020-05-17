@@ -8,6 +8,7 @@ let g:operator#surround#blocks = {'-': [
   \ {'block': ['"${', '[@]}"'], 'motionwise': ['char', 'line'], 'keys': ['2']},
   \ {'block': ['${', '}'],      'motionwise': ['char', 'line'], 'keys': ['$']},
   \ {'block': ['${', '[@]}'],   'motionwise': ['char', 'line'], 'keys': ['@']},
+  \ {'block': ['“', '”'],       'motionwise': ['char', 'line'], 'keys': ['q']},
   \ {'block': ['«', '»'],       'motionwise': ['char', 'line'], 'keys': ['Q']},
   \]
   \+map(split('();{};[]', ';'), "{
