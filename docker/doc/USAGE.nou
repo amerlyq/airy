@@ -117,3 +117,21 @@ Volumes :: /var/lib/docker/volumes
     https://docs.docker.com/storage/tmpfs/
     $ docker run -d -it --name tmptest --tmpfs /app nginx:latest
     $ docker container inspect 'tmptest'
+
+
+%%% Interaction
+
+Pull/push files (docker>=1.8)
+  $ docker container ls
+  $ docker cp foo.txt mycontainer:/foo.txt
+  $ docker cp mycontainer:/foo.txt foo.txt
+  $ docker cp src/. mycontainer:/target
+  $ docker cp mycontainer:/src/. target
+
+Copy files directly
+  $ docker ps
+  | d8e703d7e303   solidleon/ssh:latest  /usr/sbin/sshd -D   cranky_pare
+  $ docker inspect -f   '{{.Id}}'  {d8e703d7e303 | cranky_pare}
+  | d8e703d7e3039a6df6d01bd7fb58d1882e592a85059eb16c4b83cf91847f88e5
+  $ sudo cp path-file-host /var/lib/docker/aufs/mnt/FULL_CONTAINER_ID/PATH-NEW-FILE
+    = $ sudo cp file.txt /var/lib/docker/aufs/mnt/**d8e703d7e3039a6df6d01bd7fb58d1882e592a85059eb16c4b83cf91847f88e5**/rootfs/file.txt

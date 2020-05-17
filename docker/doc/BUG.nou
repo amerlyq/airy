@@ -24,3 +24,11 @@ Can't set hostname from inside container
   | RUN hostnamectl set-hostname "docker"
   ERR: Failed to create bus connection: No such file or directory
   ::: USE: $ docker run ... --hostname='docker'
+
+
+BUG: docker $ apt-get update
+  Err:1 http://archive.ubuntu.com/ubuntu xenial InRelease
+  Temporary failure resolving 'archive.ubuntu.com'
+  DEBUG: $ docker run busybox nslookup google.com
+    ;; connection timed out; no servers could be reached
+  ::: FIXED: $# docker build --network=host ...
