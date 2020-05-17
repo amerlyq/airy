@@ -1,0 +1,60 @@
+
+%%% Install
+
+Create new isolated "nobody" config
+  $ sudo pacman -Syu
+  $ sudo pacman -S znc
+  $ sudo rm -rf /var/lib/znc
+  $ sudo -u znc -- znc --makeconf
+    CFG(gen): /var/lib/znc/.znc/configs/znc.conf
+      port: <port-priv>
+      ssl: y
+      IPv4v6: y
+      username: <user-std>
+      password: <pass-gen>
+      nick:
+      altnick:
+      ident:
+      realname:
+      bindhost:
+      network:
+      ssl: y
+      port: 7000
+      pass:
+      chan: #freenode  # WARN: keep it until you test connection, password and identity
+      launch: no
+  Check existing config on errors
+    $ sudo -u znc -- znc -D
+
+FIX: extend config
+  ENABLE
+    $ systemctl enable --now znc
+    /server <znc_server_ip> +$port <username>:<password>
+
+BUG: you can't connect to "webadmin" due to SSLv3
+  ERR: /build/znc/src/build/src/Csocket.cpp:664 error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
+    $ ssh -L "$port:localhost:$port" login@znc_server_ip
+    $ r.b "https://localhost:$port/"
+
+
+%% Certificates
+  Cert - ZNC ⌇⡞⢎⡁⢂
+    https://wiki.znc.in/Cert
+
+  !3 [_] FIND self-signed cert for IPv6/4 instead of domen
+
+  Create more anonymized .pem cert (default one includes your user/host/email)
+    $ openssl req -x509 -newkey rsa:2048 -keyout znc.pem -out znc.pem -days 3650 -nodes -subj "/CN=user"
+    $ sudo mv -vfT znc.pem /var/lib/znc/.znc/znc.pem
+    $ sudo chown znc:znc /var/lib/znc/.znc/znc.pem
+    $ sudo chmod 600 /var/lib/znc/.znc/znc.pem
+
+  Get server fingerprint
+    $ openssl s_client -connect ZNC_host:ZNC_port </dev/null 2>/dev/null | openssl x509 -in /dev/stdin -noout -fingerprint -sha256  | sed s/://g | cut -c 20-
+
+
+TODO ============================
+  Connecting to ZNC - ZNC ⌇⡞⢎⡜⡄
+    https://wiki.znc.in/Connecting_to_ZNC
+  My always up-to-date WeeChat configuration (weechat-dev) ⌇⡞⢎⡣⣶
+    https://gist.github.com/danguita/5b7540f02856632a8954322a0dd0de2f

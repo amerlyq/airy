@@ -1,0 +1,11 @@
+#!/bin/bash -e
+# tags: net chat
+source ~/.shell/func.d/cfgsetup
+
+### GENS ###
+if cfgOpt R || [[ ! -f ~/.znc/znc.pem ]]; then
+  openssl req -x509 -newkey rsa:2048 -keyout ~/.znc/znc.pem -out ~/.znc/znc.pem -days 3650 -nodes -subj "/CN=user"
+fi
+
+### LINKS ###
+linkcp -t ~/.znc/configs cfg/znc.conf

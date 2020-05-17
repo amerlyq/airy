@@ -12,17 +12,22 @@ Install Entware
     !! relogin into rou to reorder $PATH
 
 
-CFG znc
-  Create new config
-    $ rm -rf /opt/share/znc
-    $ /opt/bin/znc -d /opt/share/znc --makeconf
-      port: <port>
-      ssl: y
-      IPv4v6: y
-      nick:
-      altnick:
-      ident:
-      realname: ""
-      run: no
+%%% CFG znc
+
+Install
+  $ opkg update
+  $ opkg install ca-certificates znc
+
+Create new config
+  $ rm -rf /opt/share/znc
+  $ /opt/bin/znc -d /opt/share/znc --makeconf
+    port: <port>
+    ssl: y
+    IPv4v6: y
+    nick:
+    altnick:
+    ident:
+    realname: ""
+    run: no
   Check existing config on errors
     $ /opt/bin/znc -d /opt/share/znc -D
