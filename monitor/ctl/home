@@ -1,0 +1,27 @@
+#!/bin/bash
+set -euo pipefail
+
+xrandr --delmonitor DP-1~1 --delmonitor DP-1~2
+
+if [[ ${1-} == -e ]]; then
+  xrandr --output DP-1 --auto
+else
+  xrandr --output eDP-1 --auto --primary --output DP-1 --auto --left-of eDP-1
+fi
+
+# NOTE: init side-split first to place xmobar there, but mark as ~2 to apply smaller font in "st"
+xrandr --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1 --setmonitor DP-1~1 2926/666x1600/366+914+0 none
+xrandr --output DP-1 --primary
+
+r.feh
+r.audio-hdmi 0
+${@+exec "$@"}
+
+# BAD! due to rotate :: keypress events in terminal (e.g. j/k) became observably SLOW
+# [_] CHECK: maybe too big viewport -- check performance after disabling or resizing some monitors
+# [_] CHECK: problem with HDMI / monitor itself OR problem with drivers
+#   => glxgears on full screen yield only 50fps
+# xrandr \
+#   --output eDP-1 --auto --primary --rotate normal \
+#   --output DP-2 --above eDP-1 --rotate normal \
+#   --output HDMI-1 --right-of DP-2 --rotate normal  # right

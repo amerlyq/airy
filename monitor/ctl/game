@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+xrandr --delmonitor DP-1~1 --delmonitor DP-1~2 --output eDP-1 --off
+r.monitor-add-mode DP-1 1920x800
+r.feh
+# BAD: need sudo -- can't run from dmenu
+# r.monitor-reset-usb
+r.audio-hdmi 0
+${@+exec "$@"}

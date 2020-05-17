@@ -1,0 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+
+xrandr --delmonitor DP-1~1 --delmonitor DP-1~2 --output eDP-1 --off
+r.feh
+r.audio-hdmi 1
+${@+exec "$@"}

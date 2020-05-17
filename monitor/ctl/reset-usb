@@ -13,6 +13,7 @@ set -euo pipefail
 #     printf "%s" "${0##*/}"|tee unbind|tee bind
 #   ' {} \;
 
+# ALT: use "adb shell" to reinitialize USB
 $sudo modprobe -r xhci_pci
 $sudo modprobe -r xhci_hcd
 $sudo modprobe xhci_hcd
