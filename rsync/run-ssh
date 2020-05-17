@@ -1,0 +1,6 @@
+#!/bin/sh -eu
+# USAGE: $ ./$0 ./dir host:/mnt/HD/HD_a2/share/$USER
+exec rsync -e ssh -avh --no-group \
+  --stats --progress \
+  --out-format='%t %i %f' \
+  -- "$@"
