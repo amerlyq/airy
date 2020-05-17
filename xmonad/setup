@@ -25,6 +25,7 @@ if cfgOpt u; then
   url='http://code.haskell.org/XMonadContrib/XMonad/Hooks/ServerMode.hs'
   [[ -f $dst/ServerMode.hs ]] || (mkdir -p "$dst" && wget "$url" -O "$dst/ServerMode.hs")
   # TRY: replace ctl.hs by bash/python XEvent script?
+  # NEED:(on ERR): $ sudo ghc-pkg recache
   (cd "$lib/Util/Amer" && ghc --make ctl.hs -i -ilib -dynamic -fforce-recomp -main-is main -v0)
 
   # FIXED: static->dynamic linking transition 0.13.1 -> 0.13-2

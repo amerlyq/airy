@@ -4,6 +4,9 @@ source ~/.shell/func.d/packages
 # libdwarf -- for dwarfdump
 pkg_inst gdb libdwarf
 
+## NEED: for syntax highlight inside GDB
+# pkg_inst --asdeps source-highlight
+
 if distro arch; then
   pkg_inst python2-six  # WTF?
   aur_inst pwndbg-git  # DEPS: python-ptrace
