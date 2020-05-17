@@ -4,5 +4,9 @@ Download only audio w/o video
 Specify size to fetch
   $ youtube-dl -f 'bestvideo[height<=240]+bestaudio/best[height<=240]' ...
 
+Re-encode .wav audio
+  CBR: $ youtube-dl -x --audio-format mp3 --audio-quality 196K -- ...
+  VBR: $ youtube-dl -x --audio-format mp3 --audio-quality 7 -- ...
+
 Dld:(soundcloud):
   https://github.com/flyingrub/scdl
