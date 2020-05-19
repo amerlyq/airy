@@ -3,15 +3,15 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-# ./synergy.gen
+linkcp ./cfg/barrier.conf ~/.local/share/barrier/.barrier.conf
 
-## NOTE:
-svc_activate -cuerR synergys.service
+## NOTE: activate only one :: server .vs. client
+case $CURR_PROF
+in fractal) svc_activate -cuerR barriers.service
+;;     neo) svc_activate -cuerR barrierc.service
+esac
 
 ## BUG: socket-activated synergys -- starts and loads Xorg even before user logins
 #   << when some client tries to connect when server boots
 # svc_activate -cu synergys.service
 # svc_activate -cuerR synergys.socket
-
-## NOTE: if client
-# svc_activate -cuerR synergyc.service

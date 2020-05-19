@@ -1,0 +1,13 @@
+[Unit]
+Description=Barrier Server Daemon
+Requires=xorg.target
+After=wm.target
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/barriers --no-daemon --debug NOTE
+Restart=always
+
+[Install]
+WantedBy=main.target
+# Also=synergys.socket
