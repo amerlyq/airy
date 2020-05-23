@@ -1,0 +1,13 @@
+ERR: no audio from rear USB panel (front USB panel works)
+  $ dmesg --level=err
+    [   14.927797] snd_hda_intel 0000:23:00.4: no codecs found!
+    [   17.633423] usb 9-5: cannot get ctl value: req = 0x83, wValue = 0xc00, wIndex = 0x1300, type = 4
+    [   17.634301] usb 9-5: 19:0: cannot get min/max values for control 12 (id 19)
+  206543 – snd_hda_intel no codecs found! on ASUS ROG ZENITH EXTREME II pci-id 1022:1487 subsystem 1043:874f ⌇⡞⣉⢧⠘
+    https://bugzilla.kernel.org/show_bug.cgi?id=206543
+
+    NEED:(linux=5.7): test and open new bug with PCI/USB product/vendor to be added to drivers
+    $ lspci -vn -s 0000:23:00.4
+      1022:1487
+    $# vis /etc/modprobe.d/audio-rear.conf
+      options snd-usb-audio quirk_alias=0414a002:0db00d64
