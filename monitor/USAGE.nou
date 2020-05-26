@@ -3,6 +3,12 @@
     REF:DONE: https://lists.x.org/pipermail/xorg/2017-March/058634.html
       https://lists.x.org/pipermail/xorg/2017-March/058665.html
       https://askubuntu.com/questions/659381/use-one-monitor-as-multiple-monitors
+      RandR 1.5 Brings Monitor Objects & Tile Support For X.Org - Phoronix ⌇⡞⣍⠑⣆
+        https://www.phoronix.com/scan.php?page=news_item&px=X-Server-1.18-RandR-1.5
+      How to only use xrandr 1.5 and --setmonitor · Issue #48 · phillipberndt/fakexrandr · GitHub ⌇⡞⣍⠓⠻
+        https://github.com/phillipberndt/fakexrandr/issues/48
+        => need "fakexrandr" for nvidia, because pure "xrandr1.5" works only with modesetting driver
+          ALT:TRY: "nvidia-drm.modeset=1" BUT: what to do with PerfLevelSrc whining ? SEE: kernel sources for params
     REF: "monitor_name" "width_px"/"width_mm"x"height_px"/"height_mm"+"x_offset_px"+"y_offset_px" "output_name"
       $ xrandr --listmonitors
       3:1
