@@ -5,38 +5,26 @@ source ~/.shell/func.d/packages
 #   http://www.linuxveda.com/2015/03/09/how-to-install-virtualbox-in-arch-linux/
 
 if distro arch; then
-    # pacman -Si linux
-    # will install DKMS properly
-    pkg_inst linux-headers virtualbox
-    pkg_inst virtualbox-guest-iso  # USE: to install adds to guests other than Arch
+    # USE:(guest-iso): to install adds to guests other than Arch
+    pkg_inst -d linux-headers virtualbox-host-modules-arch virtualbox-guest-iso
+    pkg_inst virtualbox
+
     # ALT:(conflict) aur_inst 'virtualbox-bin' 'virtualbox-host-modules'  # NOT FOUND
     # SEE: https://forum.antergos.com/topic/818/can-t-run-my-vitualbox/4
     # dkms autoinstall  # For custom, also: pkg_inst virtualbox-host-dkms
 
-    # -> VNC, USB2.0
-    pkg_inst virtualbox-ext-vnc
-    # BAD: non-free for corporate usage
+    ## -> VNC, USB2.0
+    # pkg_inst virtualbox-ext-vnc
+    ## BAD: non-free for corporate usage
     # aur_inst virtualbox-ext-oracle
 
-    pkg_inst net-tools  # NEED for bridge network and host-only to assign host ip
-
-    # now this command should work :)
-    # sudo modprobe -a vboxdrv vboxnetflt vboxpci vboxnetadp
-    # sudo vboxreload  # reload modules after update
-
-    # you may run this
+    ## NEED for bridge network and host-only to assign host ip
+    # pkg_inst -d net-tools
+    # -> now this command should work :)
+    #  sudo modprobe -a vboxdrv vboxnetflt vboxpci vboxnetadp
+    #  sudo vboxreload  # reload modules after update
+    ## you may run this to rebuild
     # sudo /sbin/rcvboxdrv -h
-    # add current user to vboxusers group
-    # sudo gpasswd -a $USER vboxusers
-
-    # now add entries to /etc/modules-load.d/virtualbox.conf
-    # for startup
-    # vim /etc/modules-load.d/virtualbox.conf
-    # insert this:
-    #vboxdrv
-    #vboxnetadp
-    #vboxnetflt
-    #vboxpci
 
 elif distro ubuntu; then
     echo "Dld manually!"

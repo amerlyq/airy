@@ -1,0 +1,59 @@
+CFG
+  * paravirtualization = default / KVM / none
+    https://superuser.com/questions/945910/how-to-select-paravirtualization-interface-in-virtualbox
+  * audio = disable / pulse
+  * network => port forwarding => 22 -> 33322
+  * shared folders => /srv/share , auto-mount
+    RQ:(guest): $# gpasswd -a vmuser vboxsf
+
+
+Guest Additions
+  How to Install VirtualBox Guest Additions on Debian 10 Linux | Linuxize ⌇⡞⣏⢩⡢
+    https://linuxize.com/post/how-to-install-virtualbox-guest-additions-on-debian-10/
+    RQ:(before): $ sudo apt install build-essential dkms linux-headers-$(uname -r)
+  WARN! must re-install GUEST additions after each HOST virtualbox upgrade
+    [_] TRY: add pacman hook to warn about it
+
+
+autologin / Xfce
+  LightDM - Debian Wiki ⌇⡞⣏⢨⠹
+    https://wiki.debian.org/LightDM#Enable_autologin
+    /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+    [Seat:*]
+    greeter-hide-users=false
+    autologin-user=$user
+    autologin-user-timeout=0
+
+    OR: /etc/lightdm/lightdm.conf.d/02_user.conf
+    [SeatDefaults]
+    # autologin-session=true
+    autologin-user=$user
+    autologin-user-timeout=0
+    greeter-hide-users=false
+
+
+poweroff on ACPI
+  $ VBoxManage controlvm %i acpipowerbutton
+  https://wiki.debian.org/ConfigurePowerButton
+  Settings => Power Manager => "When power button is pressed"
+
+
+disk io cache
+  Settings > Storage > Controller:SATA => enable Use Host I/O Cache.
+  Settings > Storage > Controller:SATA => .vdi => enable SSD
+
+
+spectre / timeout
+  ERR: [    0.108702] Spectre V2 : Spectre mitigation: LFENCE not serializing, switching to generic retpoline
+  /etc/default/grub
+    GRUB_TIMEOUT=0
+    GRUB_TIMEOUT_STYLE=hidden
+    GRUB_CMDLINE_LINUX_DEFAULT="quiet spectre_v2=off"
+  $ /sbin/grub-mkconfig -o /boot/grub/grub.cfg
+  $ /sbin/reboot
+
+
+ERR
+  OFF: https://www.virtualbox.org/manual/ch03.html#settings-screen
+  [    0.874931] [drm:vmw_host_log [vmwgfx]] *ERROR* Failed to send host log message.
+  [    0.875165] [drm:vmw_host_log [vmwgfx]] *ERROR* Failed to send host log message.

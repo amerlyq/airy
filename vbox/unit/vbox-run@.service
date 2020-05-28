@@ -1,0 +1,56 @@
+#%USAGE: $ S.r vbox-run@<VMname>.service
+#%REF
+#  * https://wiki.archlinux.org/index.php/VirtualBox/Tips_and_tricks#Virtual_machine_launch_management
+#  * https://blogging.dragon.org.uk/start-stop-virtualbox-with-systemd/
+#  * http://www.ericerfanian.com/automatically-starting-virtualbox-vms-on-archlinux-using-systemd/
+# ALT:BAD:(archlinux)? http://lifeofageekadmin.com/how-to-set-your-virtualbox-vm-to-automatically-startup/
+
+[Unit]
+Description=VirtualBox autostart - %P
+# Requisite=network.target
+# Requires=systemd-modules-load.service
+# After=network.target systemd-modules-load.service vboxdrv.service
+# Before=runlevel2.target shutdown.target
+
+## OBSOLETE: "vboxdrv.service"
+## FAIL: user units can not reference or depend on system units
+##   ALT: make system-unit@.service BUT: need user/group to drop perms
+# /usr/lib/systemd/system/systemd-modules-load.service
+# /usr/lib/modules-load.d/virtualbox-host-modules-arch.conf
+
+ConditionGroup=vboxusers
+ConditionDirectoryNotEmpty=/vm/%i
+ConditionPathIsDirectory=/srv/share
+# ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
+# OnFailure=notify-user@critical:OnFailure:%i-vm.service
+
+[Service]
+Type=forking
+Restart=no
+TimeoutSec=5min
+IgnoreSIGPIPE=no
+KillMode=process
+# KillSignal=SIGWINCH
+# TimeoutStopSec=40
+
+## TEMP:FIXED: unit can't find correct PID and becomes "inactive"
+GuessMainPID=no
+RemainAfterExit=yes
+
+# OR:(oneshot):NEED: host VNC client to access GUI
+# ExecStart=/usr/bin/VBoxHeadless --startvm %i --vrde off
+# ExecStart=/usr/bin/VBoxManage startvm %i --type headless
+ExecStart=/usr/bin/VBoxManage startvm %i
+# OR:VIZ: poweroff, savestate, acpipowerbutton
+#   WARN: using "savestate" on SSD will write 0.4-2GB each time
+#   WARN: poweroff is "abort" -- OK on CLI, but GUI requires proper shutdown
+ExecStop=/usr/bin/VBoxManage controlvm %i acpipowerbutton
+# VIZ: VBoxManage list runningvms
+
+# PrivateTmp=true
+# PrivateDevices=true
+# ProtectSystem=strict
+# ProtectKernelTunables=true
+
+# [Install]
+# WantedBy=multi-user.target
