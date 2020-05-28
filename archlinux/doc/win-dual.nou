@@ -1,0 +1,62 @@
+MOVE? @/airy/windows/doc with xref and xpath
+
+Disable Pagefile / Virtual Memory (10GB)
+  https://www.geeksinphoenix.com/blog/post/2016/05/10/how-to-manage-windows-10-virtual-memory.aspx
+  https://superuser.com/questions/1017764/how-can-i-shrink-a-windows-10-partition
+   wmic computersystem set AutomaticManagedPagefile=False
+   wmic pagefileset where name="C:\\pagefile.sys" delete
+  https://www.surfacetablethelp.com/2018/01/how-to-disable-virtual-memory-to-increase-windows-10-performance.html
+   BET: fsutil behavior set encryptpagingfile 0
+   NEED:(after reboot remove manually):  > Remove-Item "C:\\pagefile.sys" -Force
+
+Disable hibernation and hibernation.sys file (25GB)
+  https://www.lifewire.com/delete-hiberfil-sys-file-in-windows-4158131
+  (WinShell/Admin) powercfg.exe /hibernate off
+  BET: powercfg /h off
+
+Extend EFI partition by 400MB by shrinking and moving C:\ partition
+  https://superuser.com/questions/1106092/how-to-enlarge-windows-10-efi-partition
+   BET:(Shift+Reboot=>Troubleshoot=>CMDLine): > diskpart
+    > list disk, sel disk 2, list part, sel part 3, delete part override, create part msr size=16 offset=1048576, exit
+    => extend EFI under linux (windows can not)
+  OR: https://superuser.com/questions/972227/i-want-to-expand-a-partition-on-my-boot-ssd-but-there-is-a-recovery-partition-a/972398#972398
+  ALSO: https://www.eightforums.com/threads/recreating-microsoft-reserved-system-reserved-partition.69322/
+  ++ TUT: https://superuser.com/questions/1017764/how-can-i-shrink-a-windows-10-partition
+  https://www.hdd-tool.com/windows-10/how-to-move-partition.html
+  https://superuser.com/questions/1338305/move-msr-partition
+   gparted 0.33.0 (.iso)
+  FAIL: parted + fatresize(1) -- impossible for fat32 disks < 512MiB
+    https://www.linuxquestions.org/questions/linux-newbie-8/resizing-the-esp-boot-efi-partition-4175608872/page2.html
+  BET: backup, delete, and recreate
+    https://superuser.com/questions/1230741/how-to-resize-the-efi-system-partition
+    $ mount /dev/nvme1n1p2 /boot
+    $ sudo rsync -av /boot/ /cache/esp/
+    $ sudo dd if=/dev/nvme1n1p2 of=/cache/esp.img bs=64K conv=noerror,sync status=progress
+    $ umount /boot
+    $ sudo parted /dev/nvme1n1
+      (parted) unit s
+      (parted) print
+      # 2      1085440s    1290239s    204800s     fat32        EFI system partition          boot, esp
+      (parted) rm 2
+      (parted) mkpart primary fat32 1085440s 100%
+      (parted) align-check opt 2
+      (parted) set 2 esp on
+      (parted) name 2 EFI
+      (parted) quit
+    $ sudo partprobe /dev/nvme1n1
+    $ sudo mkfs.fat -F32 /dev/nvme1n1p2
+    $ sudo blkid -dno UUID /dev/nvme1n1p2
+    + Fix /boot UUID
+    $ sudo vis /etc/fstab
+    $ mount /boot
+    $ sudo rsync -av /cache/esp/ /boot
+    + Enable mkinitcpio fallback again (and nvidia modules)
+    $ sudo vis /etc/mkinitcpio.d/linux.preset
+    $ sudo vis /etc/mkinitcpio.conf
+      CHG: MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
+      NEED: hook /etc/pacman.d/hooks/nvidia.hook
+    $ sudo mkinitcpio -p linux
+
+
+Repair
+  https://windowsreport.com/how-to-enter-recovery-mode-in-windows-10/
