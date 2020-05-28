@@ -1,0 +1,11 @@
+#!/bin/bash -e
+#%SUM: 3d effects on workspace
+source ~/.shell/func.d/packages
+
+if distro arch; then
+  # OLD: aur_inst compton-git
+  pkg_inst picom
+
+elif distro ubuntu; then
+  pkg_inst picom
+fi

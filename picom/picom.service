@@ -10,9 +10,9 @@ After=wm.target
 [Service]
 # BUG: red background, flickering
 #   TEMP:FIXED: https://github.com/chjj/compton/issues/477
-Environment=allow_rgb10_configs=false
+# Environment=allow_rgb10_configs=false
 
-ExecStart=/usr/bin/compton
+ExecStart=/usr/bin/picom
 Restart=on-abnormal
 # RestartSec=5
 # TimeoutStopSec=5
