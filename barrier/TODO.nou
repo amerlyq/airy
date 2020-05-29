@@ -4,6 +4,17 @@ ALT: x2x, xrdp
   http://raspberrypi.stackexchange.com/questions/4253/forward-mouse-and-keyboard-input-to-x-session
 
 TODO
+  [_] ERR: lagging language switch
+    Client Input language changes when typing special character on server · Issue #646 · debauchee/barrier ⌇⡞⣑⠈⠡
+      https://github.com/debauchee/barrier/issues/646
+      https://github.com/debauchee/barrier/issues/134
+      $ setxkbmap -device `xinput list | grep "Virtual core XTEST keyboard" | sed -e 's/.\+=\([0-9]\+\).\+/\1/'` de
+    Problem with russian language · Issue #481 · debauchee/barrier ⌇⡞⣑⠈⢝
+      https://github.com/debauchee/barrier/issues/481
+      ::: Seems like when i switch both pc's on russian inputs all is ok.
+  2020-05-29 [X] ERR: doubling input
+    REGR: (client) xset r rate 80 20
+    ::: (client) xset r off
   [_] Fix synergy errors in debug mode with 'not found display'
       Simply launch it
 
