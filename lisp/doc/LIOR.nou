@@ -1,0 +1,38 @@
+USAGE
+  Common Lisp layer ⌇⡞⣒⣍⡟
+    https://develop.spacemacs.org/layers/+lang/common-lisp/README.html
+  Spacemacs documentation ⌇⡞⣒⣍⡨
+    https://develop.spacemacs.org/doc/DOCUMENTATION.html#lisp-key-bindings
+  CLiki: SLIME Features ⌇⡞⣓⠸⢲
+    https://www.cliki.net/SLIME%20Features
+
+
+Debugging ⌇⡞⣒⣁⢷
+  https://lispcookbook.github.io/cl-cookbook/debugging.html#remote-debugging
+  https://github.com/LispCookbook/cl-cookbook/issues/115
+
+  Evaluation (SLIME User Manual, version 2.22) ⌇⡞⣒⣇⠤
+    https://common-lisp.net/project/slime/doc/html/Evaluation.html
+
+
+HACK: Emacs: print key binding for a command or list all key bindings - Stack Overflow ⌇⡞⣒⣉⠝
+  https://stackoverflow.com/questions/2845934/emacs-print-key-binding-for-a-command-or-list-all-key-bindings
+  (spacemacs) <C-h f> slime-eval-defun
+    => bound to C-M-x, M-RET e f, M-m m e f
+
+
+HACK: evaluate arbitrary elisp expression before putting it into config
+  https://www.gnu.org/software/emacs/manual/html_node/efaq/Evaluating-Emacs-Lisp-code.html
+    M-: or M-x eval-expression
+      e.g. (setq unread-command-events (listify-key-sequence "\C-[:bd\n"))
+  https://www.masteringemacs.org/article/evaluating-elisp-emacs
+
+
+| Key Binding | Description                                                    |
+|-------------+----------------------------------------------------------------|
+| <C-c C-c>   | eval function / top-level S-expr                               |
+| <SPC m e f> |   »                                                            |
+| <, e f>     |   »                                                            |
+| <C-c C-c>   | eval function                                                  |
+| <C-c C-r>   | eval visual selection (region) IDEA: use for bisecting/debug   |
+| <C-x C-e>   | eval last expression
