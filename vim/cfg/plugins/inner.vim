@@ -46,7 +46,7 @@ call dein#add('Shougo/vimfiler.vim', {
 " if exists('*IsWindows') && IsWindows()
 " TODO: override as with vim-over mappings (DFL vs plugin)
 " noremap <unique>  <Leader>f :<C-U>VimFiler<CR>
-call dein#add('amerlyq/ranger.vim', {'lazy': 0, 'if': executable('ranger')})
+" call dein#add('amerlyq/ranger.vim', {'lazy': 0, 'if': executable('ranger')})
 
 
 " autocmd! BufWritePost * Neomake
