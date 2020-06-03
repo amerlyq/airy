@@ -83,6 +83,7 @@ zle -N history-beginning-search-forward-end  history-search-end
 ## History
 # ALT: search by regex with custom widget
 #   https://superuser.com/questions/275262/reverse-history-search-with-regular-expressions
+#   https://unix.stackexchange.com/questions/97843/how-can-i-search-history-with-text-already-entered-at-the-prompt-in-zsh
 bindkey    '^R' history-incremental-pattern-search-backward
 bindkey -a '^R' history-incremental-search-backward
 bindkey    '^S' history-incremental-pattern-search-forward
@@ -181,5 +182,6 @@ bindkey -M menuselect '^M' .accept-line
 #bindkey '^[^I' reverse-menu-complete
 #bindkey '^X^N' accept-and-infer-next-history
 #bindkey '^Y' yank-last-arg # No such func
+# FAIL: bindkey  '\C-.' insert-last-word
 # bindkey '^\' character-search               # <C-4>, <C-\>
 # bindkey '^]' character-search-backward      # <C-5>, <C-]>

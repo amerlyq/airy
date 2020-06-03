@@ -26,17 +26,16 @@ def aura_pathes(fm):
     fpathes = os.path.expanduser('~/.config/airy/pathes')
     lst = []
     try:
-        fname = fm.confpath(fpathes)
-        with open(fname, 'r') as f:
+        with open(fm.confpath(fpathes), 'r') as f:
             lst = f.readlines()
     except IOError:
         return fm.notify(fpathes, bad=True)
 
     lst = [l.split('#', 1)[0].strip().split(None, 1) for l in lst]
     lst = filter(lambda e: len(e) > 1, lst)
-    # ERR: ranger sorts by 2nd column by default... Qs: How to alterate?
     for e in sorted(lst, key=lambda l: l[0]):  # reverse=True
-        fm.execute_console("map " + str(e[0]) + " cd " + str(e[1]))
+        # ERR: ranger sorts by 2nd column by default... Qs: How to alterate?
+        fm.execute_console("map " + str(e[0]) + " cda " + str(e[1]))
 
 
 def hook_init(fm):

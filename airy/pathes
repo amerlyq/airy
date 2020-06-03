@@ -43,7 +43,7 @@
 # ..B  ~/.bin
 # .C   ~/aura/airy/_build/cfg
 
-.c.  ~/.cache/airy/tags
+.c.  /cache
 .cb  ~/aura/coastline/beatrix
 # .cb  ~/.cache/airy/tags/browser
 .cc  ~/.cache/airy/tags/core
@@ -60,7 +60,8 @@
 .cx  ~/.cache/airy/tags/xorg
 
 .d.  /data
-.dd  /_dld
+.dd  /data/_dld
+.dl  /_dld
 .dm  /data/music
 .dr  /_dld/rtorrent
 .ds  ~/aura/miur/dast
@@ -151,10 +152,13 @@
 .t.  ~/aura/aeternum
 .tb  ~/aura/aeternum/buildsystems
 .tc  ~/aura/pj/aeternum-cmake-cross
-.td  ~/aura/planning
+.td -l ~/aura/todo/!today
 .tf  ~/aura/aeternum/frameworks
 .tj  ~/aura/tenjo
 .tl  ~/aura/aeternum/languages
+.tn  ~/aura/todo/now
+.to  ~/aura/todo
+.tp  ~/aura/planning
 
 .u   ~/aura
 .U   ~/.cache/aurutils/sync
@@ -165,6 +169,7 @@
 .vd  ~/aura/vim/dictl.vim
 .vf  ~/aura/vim/forestanza.vim
 .vl  ~/aura/vim/lyrics-ed.vim
+.vm  /vm
 .vn  ~/aura/vim/nou.vim
 .vr  ~/aura/vim/recoverer.vim
 .vu  ~/aura/vim/vim-textobj-keyvalue
@@ -176,6 +181,7 @@
 .wc  /work/cache
 .wd  /work/doc
 .wf  /work/cache/fw
+.wh  ~/work
 .wj  /work/tenjo
 .wm  /work/repo/_mirror
 .wo  ~/aura/work
@@ -188,7 +194,11 @@
 .wu  /work/_build     # symlink -> /tmp/_build/
 .ww  ~/aura/miur/wiw
 
-.W   ~/work
+# BET?(usability): ".wG" .vs. ".Wg"
+.W.  /win
+.wD  /win/data
+.wG  /win/games
+.wS  /win/system
 
 .x   /x
 

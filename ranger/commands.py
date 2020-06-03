@@ -13,14 +13,11 @@ def today_date(delta=7):
 
 # BAD: ranger crash on exit if '--choosedir' path was deleted by 3rd party
 def tmpfile(nm):
-    tmp = os.getenv('RANGER_TMPDIR')
-    if tmp is None:
-        tmp = os.getenv('TMPDIR')
-        if tmp is None:
-            tmp = '/tmp'
-        tmp = fs.join('ranger')
-        if not fs.exists(tmp):
-            os.mkdir(tmp)
+    ge = os.getenv
+    tmp = ge('RANGER_TMPDIR', fs.join(
+        ge('TMPDIR', fs.join('/tmp', ge('USER', ''), 'ranger'))))
+    if not fs.isdir(tmp):
+        os.mkdir(tmp)
     return fs.join(tmp, nm)
 
 
@@ -268,10 +265,10 @@ class cd_gitroot(Command):
 class cda(Command):
     def execute(self):
         if self.arg(1) and self.arg(1)[0] == '-':
-            # flags = self.arg(1)[1:]
+            flags = self.arg(1)[1:]
             path = self.rest(2)
         else:
-            # flags = ''
+            flags = ''
             path = self.rest(1)
 
         if path[0:1] == '~':
@@ -281,6 +278,13 @@ class cda(Command):
 
         # Strip :lnum:lpos:
         path = re.sub(r'(?::\d+){1,2}:?$', '', path)
+
+        if fs.islink(path):
+            if 'l' in flags:
+                lpath = os.readlink(path)
+                path = lpath if lpath.startswith('/') else fs.join(fs.dirname(path), lpath)
+            if 'L' in flags:
+                path = fs.realpath(path)
 
         if not fs.exists(path):
             return self.fm.notify("No such: " + path, bad=True)

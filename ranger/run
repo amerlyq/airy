@@ -36,5 +36,5 @@ RANGER_LOAD_DEFAULT_RC=FALSE \
 
 _ranger_cd(){ local d f=$RANGER_TMPDIR/cwd
   [[ -s $f ]] && d=$(<"$f")
-  [[ ! -d ${d-} || $d == $PWD ]] || cd -- "$d"
+  [[ ! -d ${d-} || $d == $PWD ]] || builtin cd -- "$d"
 }; _ranger_cd

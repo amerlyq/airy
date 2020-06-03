@@ -2,6 +2,8 @@
 [[ -n ${ZSH_NAME-} ]] || return 0  ## Global aliases. Zsh only
 # ATTENTION: disallow aliases after commands requiring args
 
+alias hh='fc -l 1 | grep -E '
+
 # Expand in any place of cmdline.
 # Space at the end to allow expanding next command
 
@@ -96,9 +98,9 @@ alias -g SU-='SS -ru'
 for i in {1..9}; do
   alias -g S$i-="SS -sk$i,$i"
   alias -g S$i="SS -sk${i}r,$i"
-  alias -g SN$i-="SS -sk${i}n,$i"
-  alias -g SN$i="SS -sk${i}rn,$i"
-  alias -g SU$i="SU -k$i,$i"
+  alias -g S${i}n-="SS -sk${i}n,$i"
+  alias -g S${i}n="SS -sk${i}rn,$i"
+  alias -g S${i}u="SU -k$i,$i"
 done
 alias -g SC='SS|uniq -c|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'

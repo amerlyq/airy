@@ -1,5 +1,6 @@
 ranger
-  [_] BUG: creates 'ranger' dir in current dir on each ranger-shell transition if env vars aren't set
+  2020-06-03 [X] BUG: creates 'ranger' dir in current dir on each ranger-shell transition if env vars aren't set
+    ::: FIXED: bug in "fs.join" ./commands.py: def tmpfile(nm):
   [_] when in buildroot dirs -- go into r.chroot instead of shell (like setlocal)
   [_] FIND:CHECK: riffle 'has X' by SSH to another Ubuntu
     !!! must return 'no X' terminal-only -- for correct opening of files

@@ -16,8 +16,9 @@ EOT
 
 # FIXME: $ comm -23 <(pacman -Qqett | sort) <(pacman -Qqg base -g base-devel | sort | uniq)
 #   USE:(-Qqe): to include explicit packages which are also deps to others
+## DISABLED: "base" is not a group anymore -- it's an empty package with deps
 { cat -- "$dsrc"/*.list
-  pacman -Qqg base -g base-devel
+  pacman -Qqg base-devel
 } | sort -u > "$db"
 
 # pacman -Qei | awk '
