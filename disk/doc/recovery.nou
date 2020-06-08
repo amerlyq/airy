@@ -1,0 +1,18 @@
+Copy
+  linux - dd_rescue vs dcfldd vs dd - Super User ⌇⡞⣏⣑⡆
+    https://superuser.com/questions/355310/dd-rescue-vs-dcfldd-vs-dd/355322#355322
+
+
+ddrescue
+  https://www.linuxquestions.org/questions/linux-software-2/why-is-ddrescue-running-so-slow-4175591133/
+  ALG: Multi-pass
+    Grab most of the error-free areas in a hurry
+      $ ddrescue -n /dev/old_disk disk.img rescued.log
+    Recover as much of the dicy areas as possible:
+      $ ddrescue -r 1 /dev/old_disk disk.img rescued.log
+    Try stepping by large blocks first
+      $ ddrescue -a 1MiB /dev/old_disk disk.img rescued.log
+    Mount result
+      $ mount -o loop disk.img /mnt
+  SEE: ddrecscueview
+    https://superuser.com/questions/1244575/ddrescue-very-slow-writing-to-ntfs-is-it-worth-it-to-convert-to-ext4-now
