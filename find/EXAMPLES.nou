@@ -26,7 +26,7 @@ linux - Как из терминала заменить слово в файла
   $ find ./ -name "*~" -exec rm {} \;
 
 Search all archives
-  $ find . \( -name 'hmc*.tar.gz' -o -name 'hmc*.tgz' \) -exec tar tf {} \; | grep -i uclibc
+  $ find . ( -name 'hmc*.tar.gz' -o -name 'hmc*.tgz' ) -exec tar tf {} \; | grep -i uclibc
 
 Convert mp3 tags to utf8  # ALT: mutagen
   $ find ./ -iname "*.mp3" -print0 | xargs -0 mid3iconv -eCP1251 --remove-v1 -d
@@ -71,3 +71,22 @@ Batch and encoding (charset) of files
     Find non-ascii to save as plain text
       /[^[:print:]]/
   ALT: convert to utf8 $ enca -L ru *
+
+
+Fix encoding for non-ascii names (e.g. due to default mount options) ⌇⡞⣞⡄⡠
+  INFO
+    https://bbs.archlinux.org/viewtopic.php?id=149043
+    https://bbs.archlinux.org/viewtopic.php?id=63393
+    https://bbs.archlinux.org/viewtopic.php?id=228764
+    https://bbs.archlinux.org/viewtopic.php?id=110266
+    https://bbs.archlinux.org/viewtopic.php?id=116902
+  USAGE
+    CHECK: ((vim)) /[^\x00-\x7F\u2013\u0400-\u04ff]
+    $ for f in Ð*; do convmv --notest -t iso-8859-1 -f UTF-8 $f; done
+  TODO
+    ⋮The Legendary Moonlight Sculptor/달빛조각사1권.txt
+    ⋮Hari Kunihiko Ð¿ÑÐ 12 ÐÐ¾ÑÐ¾Ð»ÐµÐ²ÑÑÐ².mp3
+    ⋮Hari Kunihiko Ð¿ÑÐ Fuushun(PCSmix).mp3
+    ⋮Hari Kunihiko Ð¿ÑÐ Fuushun.mp3
+    ⋮Hari Kunihiko Ð¿ÑÐ Youma.mp3
+    ⋮339 Ã 297 - habrahabr.ru.jpg
