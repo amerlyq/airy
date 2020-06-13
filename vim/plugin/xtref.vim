@@ -51,7 +51,7 @@ fun! xtref#new(...)
   " let xts = printf('%08x', call('strftime', ['%s'] + a:000))
   " let xts = systemlist('xxd -p -r | basenc --z85 | rev', xts)[0]
   "" ALT:PERF: systemlist('r.vim-xtref '.get(a:,1))[0]
-  let xts = substitute(printf('%x', strftime('%s')), '..', '\=nr2char("0x28".submatch(0))', 'g')
+  let xts = substitute(printf('%08x', strftime('%s')), '..', '\=nr2char("0x28".submatch(0))', 'g')
   call xtref#copy(g:xtref.refer_pfx . xts)
   return g:xtref.anchor_pfx . xts
 endf
@@ -114,7 +114,7 @@ fun! xtref#replace(visual, sub)
   let b = col('.')-1 + off
   let e = b + len(x)
   let l = getline('.')
-  call setline('.', l[0:b-1] . a:sub . l[e:])
+  call setline('.', (b>0 ? l[0:b-1] : '') . a:sub . l[e:])
 endf
 
 fun! xtref#strip(xloci)
@@ -134,17 +134,27 @@ fun! xtref#invert(xloci)
   return (pfx ==# a ? r : a) . strcharpart(x, 1)  " fnameescape()
 endf
 
-fun! xtref#to_date(xloci)
-  let [x, off] = a:xloci
-  let [pfx, x] = [strcharpart(x, 0, 1), strcharpart(x, 1)]
+"" NICE: use "r.vim-xtref" as SPOT
+" VIZ:(fmt): braille hex dt date utc unix z85 z85r
+fun! xtref#to_fmt(fmt, xloci)
+  let [xts, off] = a:xloci
+  let [pfx, x] = [strcharpart(xts, 0, 1), strcharpart(xts, 1)]
   let [a,r] = g:xtref.markers
   if pfx !=# a && pfx !=# r
     echoe "Unsupported xtref format"
-    return x
+    return xts
   endif
-  let hexts = substitute(x, '.', '\=printf("%x",and(char2nr(submatch(0)),0xff))', 'g')
-  " BET? convert directly by "r.vim-xtref" as SPOT
-  return pfx . strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
+  "" ALT:PERF:(native)
+  " let hexts = substitute(x, '.', '\=printf("%02x",and(char2nr(submatch(0)),0xff))', 'g')
+  " return pfx . strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
+  return pfx . systemlist('r.vim-xtref -nf '.a:fmt.' -- '.xts)[0]
+endf
+
+"" NOTE: cycle loop :: any => braille | braille => iso8601
+fun! xtref#to_fmt_cycle(fmt, xloci)
+  let fmt = (a:xloci[0] =~# '\v'.s:r_braille) ? a:fmt : 'braille'
+  " echom fmt
+  return xtref#to_fmt(fmt, a:xloci)
 endf
 
 function! xtref#call_at(cwd, fn, ...)
@@ -235,6 +245,15 @@ nnoremap <Plug>(xtref-new-insert) i<C-r>=xtref#new()<CR><Esc>
 nnoremap <Plug>(xtref-new-append) $"=" ".xtref#new()<CR>p<Plug>(xtref-yank)
 xnoremap <Plug>(xtref-new-append) "=xtref#new()<CR>p
 
+" FIXME: skip initial commentstring and insert "[_]" directly before actual text
+" BAD: when converting URL into task -- we will have two trailing xtrefs
+nnoremap <Plug>(xtref-task-convert) 0wi[_]<Space><Esc>$"=" ".xtref#new()<CR>p<Plug>(xtref-yank)
+nnoremap <Plug>(xtref-task-insert) i[_]<Space><Esc>
+" FIXME: smart commentstring parsing -- allow "//" and "/*"
+" FIXME: allow inside multiline block comment /* ... */ -- regex w/o leading commentstring
+nnoremap <Plug>(xtref-task-new) :call setline('.', substitute(getline('.'), '\v(['. &commentstring[0] .']+\s*)(\[[_X]\]\s*)?', '\1[_] ', ''))<CR>
+nnoremap <Plug>(xtref-task-done) :call setline('.', substitute(getline('.'), '\V[_]\s\?', xtref#new().' [X] ', ''))<CR><Plug>(xtref-yank)
+
 nnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(0)))<CR>
 xnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(1)))<CR>
 nnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref#strip(xtref#get(0)))<CR>
@@ -244,14 +263,16 @@ xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref
 nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(0,'')<CR>
 xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 
-" TODO:ENH: switch loop between z85 / braille / iso8601
-nnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(0,xtref#to_date(xtref#get(0)))<CR>
-xnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(1,xtref#to_date(xtref#get(1)))<CR>
+nnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('iso',xtref#get(0)))<CR>
+xnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(1,xtref#to_fmt_cycle('iso',xtref#get(1)))<CR>
 
 " MAYBE:([Xtref]r): upgrade xtref marker format one-by-one instead of all at once
 nnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(0,xtref#new())<CR>
 xnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(1,xtref#new())<CR>
 
+" THINK:FIXME: any "yy" op in vim must modify all {anchor => referer}
+"   <= because using <\ x t> on each copied line is too tedious when creating
+"   cross-refs for tasks and mentionings
 nnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(0,xtref#invert(xtref#get(0)))<CR>
 xnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(1,xtref#invert(xtref#get(1)))<CR>
 
@@ -267,6 +288,13 @@ map <silent> [Xtref]r <Plug>(xtref-refresh)
 map <silent> [Xtref]t <Plug>(xtref-toggle)
 map <silent> [Xtref]y <Plug>(xtref-yank-refer)
 map <silent> [Xtref]Y <Plug>(xtref-yank-anchor)
+
+" BAD: better use unified keybindings for tasks in nou.vim and xtref
+"   i.e. always confusing <,.> and <\x>
+map <silent> [Xtref]<Space> <Plug>(xtref-task-new)
+map <silent> [Xtref]_ <Plug>(xtref-task-insert)
+map <silent> [Xtref]x <Plug>(xtref-task-convert)
+map <silent> [Xtref]X <Plug>(xtref-task-done)
 
 
 " HACK: new leader

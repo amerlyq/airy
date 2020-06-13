@@ -14,7 +14,7 @@
 # shellcheck disable=SC2059
 set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
-fmts=( braille date dt hex unix utc z85 z85r )  # TBD: u2048
+fmts=( braille date dt hex iso unix utc z85 z85r )  # TBD: u2048
 pf_anchor='⌇'
 pf_referer='※'
 
@@ -33,10 +33,11 @@ recursive=
 tags=
 
 # shellcheck disable=SC2076
-while getopts 'af:iprtux' o; do case $o in :|'?') exit 1
+while getopts 'af:inprtux' o; do case $o in :|'?') exit 1
 ;; a) anchor=1
 ;; f) fmt=$OPTARG; [[ " ${fmts[*]} " =~ " $fmt " ]] || { >&2 echo "Err: fmt=$fmt"; exit 1; }
 ;; i) insert=1
+;; n) nopfx=
 ;; p) ((++printrgx))
 ;; r) recursive=1
 ;; t) tags=1
@@ -134,11 +135,11 @@ grep_xtref(){
   exit
 }
 
-parse_xtref(){
+parse_xtref(){ local a
   case ${1:0:1}
-  in $pf_anchor | ⍿ | @ | ⌇) pfx=$pf_anchor; xts=${1:1}
-  ;; $pf_referer | ※) pfx=$pf_referer; xts=${1:1}
-  ;; *) pfx=$pf_anchor; xts=$1
+  in "$pf_anchor" | ⍿ | @ | ⌇) pfx=$pf_anchor; a=${1:1}
+  ;; "$pf_referer" | ※) pfx=$pf_referer; a=${1:1}
+  ;; *) pfx=$pf_anchor; a=$1
   esac
 
   # SEE:VIZ: Most common Bash date commands for timestamping « The Intellectual Wilderness ⌇⡞⠸⣪⣽
@@ -157,17 +158,21 @@ parse_xtref(){
   #   Internationalized Resource Identifier - Wikipedia ⌇⡞⠻⢝⠥
   #     https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier
   # ALSO: SHA1/SHA256 for git objects refs
-  case ${#xts}
-  in 20) xts=$(printf '%08x' "$(date +%s --date="$1")")  #  utc = 2020-02-03T22:19:31Z
-  ;; 19) xts=$(printf '%08x' "$(date +%s --date="$1")")  # date = 2020-02-04_00:19:31
-  ;; 16) xts=$(printf '%08x' "$(date +%s --date="$1")")  #   ut = 20200203T221931Z
-  ;; 15) xts=$(printf '%08x' "$(date +%s --date="$1")")  #   dt = 20200204_001931
-  ;; 10) xts=$(printf '%08x' "$1")                       # unix = 1580768371
-  ;;  8) xts=$xts                                        #  hex = 5e389c73
+  case ${#a}
+  in 24) xts=$(printf '%08x' "$(date +%s --date="$a")")  #  iso = 2020-02-03T22:19:31+0300
+  ;; 20) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  #  utc = 2020-02-03T22:19:31Z
+  ;; 19) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  # date = 2020-02-04_00:19:31
+  ;; 16) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  #   ut = 20200203T221931Z
+  ;; 15) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  #   dT = 20200204_001931
+  ;; 11) xts=$(printf '%08x' "$(date +%s --date="$a")")  #  day = 2020-02-04-
+  ;; 10) xts=$(printf '%08x' "$a")                       # unix = 1580768371  BET: prefix @1580768371 to allow 2020-02-04 w/o sfx BET! not match (*-*)
+  ;;  9) xts=$(printf '%08x' "$(date +%s --date="$a")")  #   dt = 20200204- OR 20200204T
+  ;;  8) xts=$a                                        #  hex = 5e389c73    BET: prefix 0x5e389c73 OR @5e389c73 to allow 20200204 w/o sfx
   # XXX:(5): how to detect "rev .vs. non-rev" format ?   # z85r = @D1ou
-  ;;  5) xts=$(printf '%s' "$xts" | rev | basenc --z85 -d | od -tx1 | tr -d ' ')
-  ;;  4) xts=$(unicode -t "$xts" | sed 's/^28//' | paste -sd '')  # braille = ⡞⠸⢜⡳
+  ;;  5) xts=$(printf '%s' "$a" | rev | basenc --z85 -d | od -An -tx1 | tr -d ' ')
+  ;;  4) xts=$(unicode -t "$a" | sed 's/^28//' | paste -sd '')  # braille = ⡞⠸⢜⡳
   ;;  3) xts=...  # u2048 = TBD
+  ;;  *) >&2 echo "Err: unknown fmt with len=${#a}"; exit 1
   esac
 }
 
@@ -175,6 +180,7 @@ cvt_braille(){ printf -- "${2-}""\\U28${1:0:2}""\\U28${1:2:2}""\\U28${1:4:2}""\\
 cvt_hex(){ printf -- "${2-}""\\x${1:0:2}""\\x${1:2:2}""\\x${1:4:2}""\\x${1:6:2}""\\n"; }
 cvt_dt(){ date +"${2-}%Y%m%d_%H%M%S" --date="@$((0x$1))"; }
 cvt_date(){ date +"${2-}%Y-%m-%d=%H:%M:%S" --date="@$((0x$1))"; }
+cvt_iso(){ date +"${2-}%Y-%m-%dT%H:%M:%S%z" --date="@$((0x$1))"; }
 cvt_utc(){ date +"${2-}%Y%m%dT%H%M%SZ" --utc --date="@$((0x$1))"; }
 cvt_unix(){ printf '%s%d\n' "${2-}" "$((0x$1))"; }
 cvt_z85(){ printf '%s%s\n' "${2-}" "$(cvt_hex "$1" | tr -d \\n | basenc --z85)"; }
@@ -188,11 +194,11 @@ gen_xtref(){
 
 print_xtref(){
   ((inverse)) && case $pfx
-    in $pf_anchor) pfx=$pf_referer
-    ;; $pf_referer) pfx=$pf_anchor
+    in "$pf_anchor") pfx=$pf_referer
+    ;; "$pf_referer") pfx=$pf_anchor
     ;; '') pfx=$pf_referer    # CASE:(-x): for wild address always means "referer"
     esac
-  "cvt_$fmt" "$xts" "$pfx"
+  "cvt_$fmt" "$xts" ${nopfx-"$pfx"}
 }
 
 
