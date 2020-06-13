@@ -23,6 +23,7 @@ augroup filetypedetect
   " -- override default runtime mistake 'ft=hog'
   au BufRead,BufNewFile *.rules setl ft=udevrules
   au BufRead,BufNewFile *.otl   setl noet  " TEMP:REM*
+  " MOVE: ftdetect/xtref.vim -- detection must be part of xtref plugin
   au BufRead,BufNewFile {*.task,TASK}   setf nou  " TEMP:MOVE: ⌇TU:nu
   " System
   au BufRead,BufNewFile {*.gpg,*.asc}   setf gpg
