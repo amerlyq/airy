@@ -1470,6 +1470,7 @@ c.url.searchengines = {
     'ha': 'http://www.haskell.org/hoogle/?hoogle={}',
     'so': 'http://stackoverflow.com/search?q={}',
     'en': 'https://google.com/search?q=english%20{}',
+    'ин': 'https://google.com/search?q=english%20{}',
     'py': 'https://docs.python.org/3/search.html?check_keywords=yes&area=default&q={}',
     'pY': 'https://google.com/search?q=python%20{}',
     'p2': 'https://google.com/search?q=python2%20{}',
