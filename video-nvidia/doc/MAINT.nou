@@ -1,0 +1,14 @@
+CFG
+  PowerSource
+    $ nvidia-settings -a '[gpu:0]/GPUPowerMizerMode=1'
+    $ nvidia-settings -q GPUPowerSource -t
+
+MON
+  Temperature
+    $ nvidia-settings -q gpucoretemp -t
+    $ nvidia-smi
+    $ nvidia-smi -q -d TEMPERATURE
+    $ nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits
+  Graph
+    $ nvtop
+      https://www.linuxuprising.com/2019/06/2-tools-for-monitoring-nvidia-gpus-on.html

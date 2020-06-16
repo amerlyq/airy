@@ -1,3 +1,13 @@
 #!/bin/bash -eu
 # tags: core driver
 source ~/.shell/func.d/cfgsetup
+
+# NEED: config option for
+# nvidia-settings -a '[gpu:0]/GPUPowerMizerMode=1'
+# SEE: https://wiki.archlinux.org/index.php/NVIDIA/Troubleshooting
+# https://wiki.archlinux.org/index.php/NVIDIA/Tips_and_tricks
+
+# TODO: replace "tmpl/" dirs with overlays from private repo AIRY_OVERLAY_PATH=overlay1:overlay2
+linkcp -ct /etc/X11/xorg.conf.d -- ./cfg/20-nvidia.conf
+linkcp -ct /etc/modprobe.d -- ./cfg/nvidia.conf ./cfg/blacklist-nvidia-fb.conf
+linkcp -ct /etc/pacman.d/hooks -- ./cfg/nvidia.hook

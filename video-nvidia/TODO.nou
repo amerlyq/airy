@@ -6,13 +6,13 @@ DEBUG
     $ optirun glxspheres32
   USAGE
     $ vblank_mode=0 primusrun unigine-heaven
+      WARN:(vblank_mode=0): only works for Mesa drivers
+      USE:(nvidia): $ __GL_SYNC_TO_VBLANK=0
     $ optirun wine application.exe
     $ optirun -b primus wine windows program.exe
     $ optirun -b none nvidia-settings -c :8
   INFO on dGPU params
     $ nvidia-smi -a
-  Current temperature
-    $ nvidia-smi -q -d TEMPERATURE
   INFO which display port wired to which GPU
     == extra hyphens (like LVDS-1-2) mostly used for Nvidia
     $ xrandr -q

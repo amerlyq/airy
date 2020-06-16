@@ -1,3 +1,66 @@
+CFG
+  NVIDIA - ArchWiki ⌇⡞⣃⢁⡸
+    https://wiki.archlinux.org/index.php/NVIDIA
+  NVIDIA/Tips and tricks - ArchWiki ⌇⡞⣃⢁⢐
+    https://wiki.archlinux.org/index.php/NVIDIA/Tips_and_tricks
+  NVIDIA/Troubleshooting - ArchWiki ⌇⡞⣃⢁⢃
+    https://wiki.archlinux.org/index.php/NVIDIA/Troubleshooting
+
+
+TODO:
+  https://wiki.archlinux.org/index.php/Hardware_video_acceleration
+  GPGPU - ArchWiki ⌇⡞⣃⢅⠞
+    https://wiki.archlinux.org/index.php/GPGPU#CUDA
+  Gentoo Forums :: View topic - Nvidia driver slow on OGL and fast on Vulkan ⌇⡞⣊⡶⢸
+    https://forums.gentoo.org/viewtopic-t-1096808-start-0.html
+    [   138.167] (II) GLX: Another vendor is already registered for screen 0
+    [   138.167] (II) Initializing extension NV-GLX
+    MAYBE: add myself to "video" group for direct rendering ?
+      BUT: /dev/nvidia on ArchLinux is root:root, not root:video as on Gentoo
+
+PERF
+  Nvidia, poor CPU performance and NVreg_UsePageAttributeTable / Kernel & Hardware / Arch Linux Forums ⌇⡞⣃⡾⣯
+    https://bbs.archlinux.org/viewtopic.php?id=242007
+  sometimes GPU initialization is very slow · Issue #108 · dmlc/cxxnet · GitHub ⌇⡞⣃⢄⡳
+    https://github.com/dmlc/cxxnet/issues/108
+    TRY: persistece-daemon / mode to prevent unloading of nvidia driver
+      BUT:BAD? https://wiki.archlinux.org/index.php/NVIDIA#Driver_persistence
+  GPU (Nvidia) passthrough on Proxmox LXC container - passbe.com ⌇⡞⣉⡸⢇
+    https://www.passbe.com/2020/02/19/gpu-nvidia-passthrough-on-proxmox-lxc-container/
+
+CFG
+  Special Nvidia Driver Settings - ddcutil Documentation ⌇⡞⣎⢹⡁
+    https://www.ddcutil.com/nvidia/
+  drivers - Set max power level of Nvidia PowerMizer to 1 - Ask Ubuntu ⌇⡞⣎⢹⢎
+    https://askubuntu.com/questions/1061919/set-max-power-level-of-nvidia-powermizer-to-1/1162513
+  manually change performance level - Linux - NVIDIA Developer Forums ⌇⡞⣎⢺⠔
+    https://forums.developer.nvidia.com/t/manually-change-performance-level/75623
+  Power Mizer - difference between PowerMizerDefault and PowerMizerLevel - Linux - NVIDIA Developer Forums ⌇⡞⣎⢻⢲
+    https://forums.developer.nvidia.com/t/power-mizer-difference-between-powermizerdefault-and-powermizerlevel/46884
+  Gentoo Forums :: View topic - NVIDIA GTX1080 Idle Power Usage 50W ⌇⡞⣎⢼⡥
+    https://forums.gentoo.org/viewtopic-t-1091030-start-0.html
+
+
+TRY:
+  export KWIN_TRIPLE_BUFFER=1
+  export __GL_YIELD='usleep'
+
+SEE
+  FlightGear forum • View topic - FlightGear 3.6.0 RC Frame Rate and Graphics Experience ⌇⡞⣂⣖⠢
+    https://forum.flightgear.org/viewtopic.php?f=68&t=27715
+  WineHQ - Comments ⌇⡞⣂⣖⠷
+    https://appdb.winehq.org/commentview.php?iAppId=1922&iVersionId=33768&iThreadId=98556
+  Major stuttering with all games. RTX | NVIDIA GeForce Forums ⌇⡞⣂⣙⣟
+    https://www.nvidia.com/en-us/geforce/forums/discover/283079/major-stuttering-with-all-games-rtx-2080/
+  How to Get Rid of Lag | GeForce ⌇⡞⣂⣚⠉
+    https://www.geforce.com/whats-new/guides/how-to-get-rid-of-lag-guide#1
+  How to Enable Ultra-Low Latency Mode for NVIDIA Graphics ⌇⡞⣂⣚⠞
+    https://www.howtogeek.com/437761/how-to-enable-ultra-low-latency-mode-for-nvidia-graphics/
+  Fixing USB Autosuspend ⌇⡞⣂⣟⢎
+    https://hamwaves.com/usb.autosuspend/en/
+  usb audiosystem not recognized after booting - Linux Mint Forums ⌇⡞⣂⣟⢦
+    https://forums.linuxmint.com/viewtopic.php?t=297286
+
 SEE:  http://forum.ubuntu-fr.org/viewtopic.php?pid=16696581#p16696581
 
   if no such file as /etc/X11/xorg.conf
