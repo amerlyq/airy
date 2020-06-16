@@ -1,0 +1,43 @@
+* resize /boot partition
+
+* 2020-05-19 [X] import gnupg subkeys
+
+* 2020-05-19 [X] generate new SSH keys (with password) and add them to github/gitlab
+  $ ssh-keygen -t rsa -C $(hostname) -f ~/.ssh/git_rsa
+  $ ssh-keygen -p -f ~/.ssh/git_rsa
+  $ ssh-keygen -t rsa -C $(hostname) -f ~/.ssh/glab_rsa
+  $ ssh-add ~/.ssh/git_rsa
+  $ ssh lf 'cat ~/.ssh/id_rsa.pub' >> ~/.ssh/authorized_keys
+
+* 2020-05-19 [X] clone all repos in batch
+  $ ./erian/aura
+
+* 2020-05-19 [X] setup synergy/barrier with previous pc
+  $ airyctl -B barrier
+
+* 2020-05-19 [X] copy "pass" database
+  $ pass init amerlyq
+  $ (cd ~/.password-store && r.git-my-repo)
+  $ pass git init
+  $ pass git remote add origin ssh://neo/home/amer/.password-store/.git
+  $ pass git fetch --prune --all
+  $ pass git branch master -u origin/master
+  $ git -C ~/.password-store reset --hard origin/master
+
+* [_] configure misc chat accounts
+
+* [_] fix hardware problems CPU/GPU/audio
+
+[_] TODO: search all "cfgOpt -r" in @/airy
+  == indicators of manual intervention on clean setup
+
+&/dict -- install dictionaries
+firefox
+  * connect profile
+  * setup VD Helper
+  * export-import Greasemonkey/Tampermonkey userscripts and their userdata
+google -- login profiles
+samba -- setup /data sharing
+syncthing -- setup new host node :: all-exchange + amer-sync-private
+
+[_] SEE: @/todo .cal -- other misc staff I did to setup new system
