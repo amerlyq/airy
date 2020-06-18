@@ -1,7 +1,13 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+# FIXED: pkg_inst -d vpnc
 pkg_inst openconnect
-pkg_inst -d vpnc
-aur_inst vpn-slice-git  # FIXME:(upstream): makedeps+=git depends+=(python-setproctitle)
-pkg_inst -d python-setproctitle
+
+# FIXME:(upstream): pkg_inst -d python-setproctitle
+#   makedeps+=git
+#   depends+=(python-setproctitle)
+#   conflicts=('vpn-slice')
+#   provides=('vpn-slice')
+# aur_inst vpn-slice-git
+pkg_inst vpn-slice

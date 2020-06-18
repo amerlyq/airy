@@ -1,0 +1,14 @@
+# cat /etc/systemd/network/15-vpn.netdev
+[NetDev]
+Name=vpn
+Kind=wireguard
+
+[WireGuard]
+PrivateKey = SOME_PRIVATE_KEY
+ListenPort = 51820
+
+[WireGuardPeer]
+PublicKey = SOME_PUBLIC_KEY
+PresharedKey = SOME_PSK_KEY
+AllowedIPs = 172.16.0.0/12
+Endpoint = 1.2.3.4:1234

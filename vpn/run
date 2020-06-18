@@ -36,6 +36,7 @@ esac; done; shift $((OPTIND - 1))
 if [[ -s $cfg ]]; then
   # HACK: extract additional fields from config's comments (no native support)
   [[ -n ${server:=${1-}} ]] || server=$(sed -rn '/^#\s*server\s*=\s*(.*)\s*$/s//\1/p' "$cfg")
+  [[ -n ${user:=${2-}} ]]   || user=$(sed -rn '/^user\s*=\s*(.*)\s*$/s//\1/p' "$cfg")
   [[ -n ${script:=${4-}} ]] || script=$(sed -rn '/^#\s*script\s*=\s*(.*)\s*$/s//\1/p' "$cfg")
 else
   server=${1-${VPN_SERVER-}}
@@ -53,7 +54,7 @@ opts=( "$server" )
 && opts+=( --config="$cfg" ) \
 || opts+=( --user="$user" --authgroup="$group" --pfs --disable-ipv6 )
 
-pass=$(r.query-passwd "vpn/$server" ||:)
+pass=$(r.query-passwd "work/$server/$user" ||:)
 
 # USAGE: first time -- only auth w/o sudo
 if ((interactive)) || [[ -z $pass ]]; then
