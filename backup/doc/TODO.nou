@@ -3,11 +3,20 @@ TODO
     bup
       https://bup.github.io/
       + dedup even parts of file
+      BAD? issues are disabled on github, discussion only in maillist
     borg
       https://borgbackup.readthedocs.io/en/stable/
       BET?CMP: https://anarc.at/services/backup/
       [_] READ:ARCH https://borgbackup.readthedocs.io/en/stable/internals/data-structures.html#archive-limitation
+      [_] READ https://borgbackup.readthedocs.io/en/stable/faq.html#which-file-types-attributes-etc-are-preserved
       [_] TRY: borg separately from git-annex "to get a gist of it"
+    restic
+      [_] REQ Implement Compression · Issue #21 · restic/restic ⌇⡞⣮⡑⡹
+        https://github.com/restic/restic/issues/21
+        SECU! problems with encryption of incremental backups in general
+        TALK: https://forum.restic.net/
+    BURP - BackUp and Restore Program ⌇⡞⣮⡑⡊
+      https://burp.grke.org/why.html
   [_] CFG: reverse-symlinks for chat logs / mail
     => to sync easily OR keep under git
   [_] DEV:SECU create versioned tomb for backup sync
@@ -17,6 +26,73 @@ TODO
     BUT: how to merge different .sqlite on sync ?
     MAYBE: sync local .git repo with custom merge filters for .sqlite ?
       ? how to prevent history growing in this case ?
+  [_] SEE: Redundancy / repairing / PAR2
+    darrenldl/blockyarchive: Blocky archive - multithreaded archiver offering bit rot protection and sector level recoverability ⌇⡞⣮⠿⡔
+      https://github.com/darrenldl/blockyarchive
+      SRC: https://www.reddit.com/r/DataHoarder/comments/har55c/ama_im_a_consultant_with_25_years_experience/
+
+
+CMP
+  BET? bup .vs. borg .vs. restic
+    2020-06-20 [X] [Borgbackup] Test : Borg vs Restic ⌇⡞⣭⣿⢱
+      https://mail.python.org/pipermail/borgbackup/2017q3/000778.html
+    Borg Backup VS rdiff-backup - differences & reviews? | SaaSHub ⌇⡞⣮⡁⣿
+      https://www.saashub.com/compare-borg-backup-vs-rdiff-backup
+    Backup Strategies for 2018 | Lullabot ⌇⡞⣮⡂⡊
+      https://www.lullabot.com/articles/backup-strategies-for-2018
+    compare borg to * · Issue #1364 · borgbackup/borg ⌇⡞⣮⡃⢈
+      https://github.com/borgbackup/borg/issues/1364
+    [_] restic/others: Exhaustive list of backup solutions for Linux ⌇⡞⣮⡃⢐
+      https://github.com/restic/others
+    Roundup of remote encrypted deduplicated backups in Linux | The Changelog ⌇⡞⣮⡗⣮
+      https://changelog.complete.org/archives/9353-roundup-of-remote-encrypted-deduplicated-backups-in-linux
+  VIZ
+    2020-06-20 [X] Backup - Freehackers ⌇⡞⣮⡁⣚
+      https://www.freehackers.org/Backup
+        ::: nothing extra interesting
+          [_] http://librelist.com/browser/attic/2015/3/31/comparison-of-attic-vs-bup-vs-obnam/
+    2020-06-20 [X] Comparison of backup software - Wikipedia ⌇⡞⣮⡃⠶
+      https://en.wikipedia.org/wiki/Comparison_of_backup_software
+    2020-06-20 [X] Synchronization and backup programs - ArchWiki ⌇⡞⣮⡃⠺
+      https://wiki.archlinux.org/index.php/Synchronization_and_backup_programs#Chunk-based_increments
+      https://wiki.archlinux.org/index.php/User:Level323
+        + CMP: remove data from backup repo
+      [_] BUT: error detection/correction
+  SEE: $ r.b -r backup $ ALSO: grep these links over whole repo ⌇⡞⣥⢐⣑
+    [_] Borg Documentation — Borg - Deduplicating Archiver 1.1.13 documentation ⌇⡞⣬⣙⣡
+      https://borgbackup.readthedocs.io/en/stable/
+    [_] bup, it backs things up! ⌇⡞⣬⣙⣤
+      https://bup.github.io/
+    [_] Backup procedures - anarcat ⌇⡞⣬⣙⣦
+      https://anarc.at/services/backup/
+    [_] Data structures and file formats — Borg - Deduplicating Archiver 1.1.13 documentation ⌇⡞⣬⣙⣩
+      https://borgbackup.readthedocs.io/en/stable/internals/data-structures.html#archive-limitation
+    [_] Synchronization and backup programs - ArchWiki ⌇⡞⣬⣙⣭
+      https://wiki.archlinux.org/index.php/Synchronization_and_backup_programs
+    [_] restic · Backups done right! ⌇⡞⣬⣙⣳
+      https://restic.net/
+    [_] borg special remote ⌇⡞⣬⣙⣯
+      https://git-annex.branchable.com/todo/borg_special_remote/
+      CMP: borg .vs. restic
+  Recommended replacement? [LWN.net] ⌇⡞⣮⡀⠸
+    https://lwn.net/Articles/731044/
+    For bup it was that there was no way to remove old data from the
+    repositories; you had to create a whole new repo and throw away the old one
+    (maybe that's changed since then).
+
+    What drove me to borg was deduplication and client-side encryption as well
+    as perfect handling of permissions, extended attributes & ACLs even over
+    NFS, even with servers on things like Synology DiskStations. Of course borg
+    is really a bare-bones solution, and you have to script a lot of things
+    around that, but that's true for other systems, too.
+  rsync
+    I'm bind-mounting my persistent filesystems to /sysimg and then using
+    `rsync -asSHAXz --delete --delete-excluded --numeric-ids -f '.
+    /etc/rsync-backup-filter' /sysimg/
+    ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}` from cron.
+    (/etc/rsync-backup-filter is just "- lost+found" plus system-specific
+    exclusions.)
+
 
 IDEA:DEV:
   ~/.local/backup
@@ -26,3 +102,13 @@ IDEA:DEV:
     * gather resolved full path (and logical path to itself)
       $ find ~/.local/backup -type l -execdir realpath -ze --relative-to / {} \;
     * compress original ~/.local/backup (symlinks only) and data it points to
+
+
+INFO: super-long super-large backups
+  [AMA] I'm a consultant with 25 years experience archiving petabytes of data for enormous organizations. Ask me anything about long term archival storage. : DataHoarder ⌇⡞⣮⠪⠠
+    https://www.reddit.com/r/DataHoarder/comments/har55c/ama_im_a_consultant_with_25_years_experience/
+  https://digipres.org/ ⌇⡞⣮⠫⡪
+  Erasure Coding: Backblaze Open Sources Reed-Solomon Code ⌇⡞⣮⠼⣏
+    https://www.backblaze.com/blog/reed-solomon/
+  Why We Started Putting Unpopular Assets in Memory ⌇⡞⣮⠼⣕
+    https://blog.cloudflare.com/why-we-started-putting-unpopular-assets-in-memory/
