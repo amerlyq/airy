@@ -14,6 +14,12 @@ fi
 #   with no access to my config files inside home directory.
 linkcp -ct "$dir" ./cfg/*
 
+# NEED: copy offline dicts first
+if cfgOpt r; then
+  sudo mkdir -p /usr/share/dictd
+  sudo chown "${USER}:users" /usr/share/dictd
+  rsync -e ssh -avhP lcloud:/me/_pj-data/dict/dicts/ /usr/share/dictd
+fi
 ./scripts/indexate $(cfgOpt r && echo -r)
 
 # BAD:(-R): always sudo for system services
