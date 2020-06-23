@@ -11,6 +11,7 @@
 "%HACK: automate C++ notifications with TODO_BEFORE(date, text)
 "   https://www.fluentcpp.com/2019/01/01/todo_before-clean-codebase-2019/
 " IDEA: use similar concept of dates distinguishing -- VIZ:(date)={created,planned,completed}
+" FIND:(other used ones): $ grep -ohrE '\b[[:upper:]]{3,}:' --include '*.nou' SC
 
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has('autocmd') || v:version <= 701 | finish | endif
@@ -25,18 +26,25 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 " DEV: phonetic abbreviations in cyrillic, etc.
 "   iabbr 'туду:' -> 'TODO:'
 
+" MAYBE:ALSO: treat whole /:([^)]+):/ as special "notch" word with hi! bg
+" IDEA: add dark bg for all notches to standout from surrounding text even more
+
 " UNUSED: 7,15 - whites, 0,8 - blacks, 11,12,14 - grays
 " TODO: separate doc page with all available notches
+" MAYBE: "TBD" and "WiP" | "MIND" .vs. "CARE" | "THEO"
+" ALSO: OPTM|optim(al/um) + OPTZ|optimize
 let s:patterns = [
   \ ['Err', 196, '#ff2525', 'RED|Qs|RQ|REQUIRE|ERR%(OR)?|BUG|REGR%(ESSION)?|XXX|WTF|BAD|FAIL%(ED|URE)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'GREN|ADD|NEED|FIND|ALSO|BET%(TER)?|E\.G|e\.g|ADVICE'],
   \ ['Ref',  28, '#00af00', 'SEE|READ|REF%(ERENCE)?|TUT%(ORIAL)?|BLOG|BOOK|LIOR|LORE'],
-  \ ['Alt', 178, '#dfaf00', 'YELW|ALT|OR|CASE|THINK|IDEA|CHG|RENAME|CALL|CMP|I\.E|i\.e|EXAM%(INE)?'],
+  \ ['Alt', 178, '#dfaf00', 'YELW|ALT|OR|CASE|THINK|IDEA|CHG|RENAME|CALL|CMP|I\.E|i\.e|EXAM%(INE)?|OPTL?|OPTIONAL'],
   \ ['Dev',  33, '#0087ff', 'BLUE|DEV%(ELOP)?|CFG|ENH%(ANCE)?|HACK|NICE|RFC|SEP%(ARATE)?|SPL%(IT)?|DECI%(DE)?'],
   \ ['Tbd', 169, '#ff5faf', 'PINK|TODO|CHECK|TRY|MOVE|NOT|REQ%(UEST)?|MAYBE|WAIT%(ING)?'],
-  \ ['Inf',  38, '#00afdf', 'CYAN|INFO?|SRC|VARs?|VIZ|ALG|SEQ%(UENCE)?|HYPO?|CONTR?|CONTRACT|IMPL|ARCH|PERF%(ORMANCE)?|TALK|SECU%(RE|RITY)?|MMAP'],
-  \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|FIX%(ME)?|WARN%(ING)?|ATTN?|ATTENTION|REM%(OVE)?'],
+  \ ['Inf',  38, '#00afdf', 'CYAN|INFO?|SRC|VARs?|VIZ|ALG|SEQ%(UENCE)?|HYPO?|CONTR?|CONTRACT|IMPL|ARCH|PERF%(ORMANCE)?|TALK|SECU%(RE|RITY)?|RELI%(ABILITY)?|RELY|MMAP'],
+  \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|TBD|WiP|WIP|FIX%(ME)?|WARN%(ING)?|ATTN?|ATTENTION|REM%(OVE)?|OPTS|OPTIONS'],
   \ ['Did', 243, '#767676', 'GREY|DONE|FIXED|EXPL%(AIN)?|TEMP%(ORARY)?|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR|FORMAT|FMT'],
+  \ ['Sem', 163, '#df40af', 'ex:|SEIZE'],
+  \ ['Hdr',  27, '#004fff', 'OFFL?|OFCL|OFFICIAL'],
   \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|DEMO|USAGE|DFL|DEFAULT|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP|DEPS|DEPENDS'],
   \]
 
