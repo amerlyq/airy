@@ -332,7 +332,7 @@ EOT
   fmd root:users 2770 /{aura,cache,data,games} /data/{_dld,music}
   fmd root:users  750 {,/aura,/data}/.snapshots
   fmd amer:users  750 /games/_steam  /win/{data,games,system}  /net/share
-  fmd amer:amer  2700 /home/user /media/amer /cache/{research,vm,work}
+  fmd amer:amer  2700 /home/user /media/amer  /cache/{research,vm,work}  /aura/aura
   chmod -R 700 /home
   ln -svT /data/_dld /_dld
   # [_] FIXME: move research to /aura/research -- to keep it under snapshots
@@ -340,6 +340,11 @@ EOT
   ln -svT /cache/research /home/user/research
   ln -svT /cache/vm /vm
   ln -svT /cache/work /work
+  # BAD: we need additional symlink due to many places still hardcoding "~/aura"
+  #   TRY[_] replace all of them by "~/.local/airy"
+  #   BUT: then jumping in ranger will have unexpectedly deep paths...
+  ln -svT /aura/aura /home/user/aura
+  ln -svT /aura/aurax /x
   ln -svT share/amer /net/user
   ln -svT user/_private /net/_private
   ln -svT _private/@linux /net/backup
@@ -370,9 +375,9 @@ EOT
   su amer
   {
     ### AUR
-    mkdir -p ~/.cache/aurutils/sync/aurutils
-    cd ~/.cache/aurutils/sync/aurutils
-    curl -L "https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils.tar.gz" | tar xz --strip-components=1
+    mkdir -p ~/.cache/aurutils/sync/aurutils-git
+    cd ~/.cache/aurutils/sync/aurutils-git
+    curl -L "https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils-git.tar.gz" | tar xz --strip-components=1
     gpg --recv-keys 6BC26A17B9B7018A
     makepkg PKGBUILD --syncdeps --clean --install --noconfirm --force
     aur sync --database=aur --no-view --no-confirm --upgrades -- gotop-bin wd719x-firmware aic94xx-firmware
@@ -414,3 +419,7 @@ cryptsetup luksOpen /dev/nvme0n1p1 luks
 mount -o subvol=@ /dev/ws/root /mnt
 arch-chroot /mnt
 ...
+
+
+## FIXED: after EFI extend or Windows repair
+bootctl --path=/mnt/boot install
