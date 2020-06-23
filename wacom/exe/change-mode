@@ -26,6 +26,8 @@ curr() { [[ -s $fmod ]] && cat "$fmod"
 # }
 
 next(){ declare -A n
+  ## DISABLED:BET: use two-finger scroll
+  # n=([zoom]=undo [undo]=scroll [scroll]=zoom)
   n=([zoom]=undo [undo]=zoom)
   # n=([zoom]=rotate [rotate]=undo [undo]=zoom)
   mod=${n[${1:-default}]:-zoom}; }
@@ -105,6 +107,10 @@ opacity) fled 0 64; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
     AbsWheelDown "key I"  # opaque
     AbsWheelUp   "key O"  # transparent
+' ;;
+scroll) fled 0 32; wacom "$WPAD" <<< '
+    AbsWheelDown "key down"   # xournalpp
+    AbsWheelUp   "key up"     # xournalpp
 ' ;;
 zoom) fled 1 64; wacom "$WPAD" <<< '
     # Button  1    "key E"  # brush/erase

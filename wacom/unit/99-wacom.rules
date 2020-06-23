@@ -19,7 +19,9 @@ ACTION!="add|change", GOTO="wacom_end"
 # BET:TRY: to use system path -- maybe it's mapped correctly on new kernels
 ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c 'p=$sys%p; ln -s ${p%/*/*/*}/wacom_led /tmp/wacom_led'"
 ## Give the users group permissions to set Wacom device LEDs.
-ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c '/bin/chgrp leds /tmp/wacom_led/*'"
+ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c '/bin/chgrp users /tmp/wacom_led/*'"
+# WTF: why there is no group "leds" on new system? MAYBE:BET: keep "users" to not add your user to "leds" ?
+# ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c '/bin/chgrp leds /tmp/wacom_led/*'"
 
 # WARN:XXX: may conflict simultaneous usb and wireless connect
 
