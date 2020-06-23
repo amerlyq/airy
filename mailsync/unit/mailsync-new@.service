@@ -10,6 +10,8 @@ After=network.target network-online.target
 
 ConditionFileNotEmpty=/etc/systemd/system/notify-user@.service
 ConditionFileNotEmpty=/var/lib/mailsync/sec/%i
+
+# FIXME: home=$(getent passwd $USER | cut -d: -f6)
 ConditionFileNotEmpty=/home/%{USER}/.config/getmail/acc/%i
 # ConditionFileNotEmpty=/home/%{USER}/.config/mbsync/acc/%i
 

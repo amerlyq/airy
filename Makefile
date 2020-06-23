@@ -61,6 +61,8 @@ skip  :=
 tsdir := $(AIRY_CACHE)/ts
 &mods = +r.airy-mods-make "tsdir=$(tsdir)" "flags=$(flags)" "skip=$(skip)"
 
+# FAIL: package "defaults" is never called on clean system
+
 # BET:PERF: use directly $ r.airy-mods-make -- flags=-mu all
 # MAYBE:(opt): append -B to force run of chosen target group (e.g. "setup") w/o eliminating all timestamps at once
 all: configure upgrade all/all problems
