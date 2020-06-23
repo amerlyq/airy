@@ -32,3 +32,10 @@ Separate partition on drive for ArchLinux
   $# cp -f /usr/lib/syslinux/bios/*.c32 /mnt/usb/arch/boot/syslinux
   $# extlinux --install /mnt/usb/arch/boot/syslinux
   $# umount /mnt/usb
+
+Triple: Flash, ClearLinux, ArchLinux
+  $# parted -s -a opt /dev/sdb mklabel msdos
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 1MiB 11GiB
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 11GiB 14084MiB
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 14084MiB 100%
+  FAIL: https://github.com/clearlinux/distribution/issues/1498
