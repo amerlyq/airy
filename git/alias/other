@@ -45,8 +45,9 @@ alias gcst='git --no-pager log --pretty=tformat:%ad%n%cd HEAD~..HEAD'
 alias gcom='gco master'
 
 alias gCd='git diff $(gCl)'
+alias grm='git rebase master'
 alias gro='git rebase --onto'  # gro master HEAD~1  #: <dst> <point>
-alias grm='git rebase --preserve-merges'
+alias grM='git rebase --preserve-merges'
 alias grim='gri --preserve-merges'  # BUG: with -i can be weird!
 alias gria='gri --autostash --autosquash'
 gmo(){ git merge origin/"$1" "${@:2}"; }

@@ -370,6 +370,8 @@ sub mkmsg {
     # DEV:(opt): orthogonal options to enable each part of auto-message in addition to opts{message}
     return $opts{message} if $opts{message};
     # ALT: "[%]. chg ..." | "[%]* chg ..." | "[%] * chg ..." | "[%] *chg ..."
+    # FIXME! always prepend "*" in the same place -- to be able to filter-out
+    #   auto messages from git history and focus only on human-created ones
     my $msg = "* ". mkmods() ." ". mkcmpts(2) . mkbody();
     $msg .= mkchgs() if $opts{diff};
     return $msg;
