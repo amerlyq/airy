@@ -3,9 +3,11 @@
 " SPDX-License-Identifier: GPL-3.0-only
 " SPDX-PackageName: vim-xtref
 " SPDX-PackageSummary: timestamp-based cross-refs manipulation and tagging
+"   = xtref = cross(X)-time(T)-references
 "
 
 let g:xtref = {}
+" MAYBE: if list -- use first existing dir [/x, /aura, /data/aura, /home/user/aura]
 let g:xtref.aura = $HOME."/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 
@@ -18,6 +20,8 @@ let g:xtref.markers = [g:xtref.anchor_pfx, g:xtref.refer_pfx]
 let s:r_z85 = '[-0-9a-zA-Z.:+=^!/*?&<>()\[\]{}@%$#]{5}'
 let s:r_braille = '[\u2800-\u28FF]{4}'
 let g:xtref.r_addr = '('. s:r_z85 .'|'. s:r_braille .')'
+" IDEA: allow xtref free format in brackets ※[so me] instead of time-format
+"  ALT: use completely different braces
 let g:xtref.r_anchor = g:xtref.anchor_pfx . g:xtref.r_addr
 let g:xtref.r_refer = g:xtref.refer_pfx . g:xtref.r_addr
 
@@ -77,7 +81,9 @@ endf
 " WARN! regular tags will be always ignored
 "   TODO: provide for them separate keybindings
 fun! xtref#get(visual)
-  if a:visual
+  if a:visual < 0
+    return [xtref#vsel(), 0]
+  elseif a:visual
     let [l,c] = [xtref#vsel(), 0]
   else
     let [l,c] = [getline('.'), col('.')-1]
@@ -147,11 +153,12 @@ fun! xtref#to_fmt(fmt, xloci)
   "" ALT:PERF:(native)
   " let hexts = substitute(x, '.', '\=printf("%02x",and(char2nr(submatch(0)),0xff))', 'g')
   " return pfx . strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
-  return pfx . systemlist('r.vim-xtref -nf '.a:fmt.' -- '.xts)[0]
+  return pfx . systemlist('r.vim-xtref -nf '.a:fmt.' -- '.shellescape(xts))[0]
 endf
 
 "" NOTE: cycle loop :: any => braille | braille => iso8601
 fun! xtref#to_fmt_cycle(fmt, xloci)
+  echom a:xloci[0]
   let fmt = (a:xloci[0] =~# '\v'.s:r_braille) ? a:fmt : 'braille'
   " echom fmt
   return xtref#to_fmt(fmt, a:xloci)
@@ -227,6 +234,7 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 "" NOTE: jump anchor from referal under cursor, and vice versa
 " BUG:(TEMP:sil): paused prompt on each :tag
 "   => always prints name of file it opens on tag jump
+" [_] TRY: also overload <gf> to open xtref under cursor as if it was "file"
 nnoremap g]  :sil exe v:count1."tag" xtref#invert(xtref#get(0))<CR>
 xnoremap g]  :<C-u>sil exe v:count1."tag" xtref#invert(xtref#get(1))<CR>
 nnoremap z]  :exe "tsel" xtref#invert(xtref#get(0))<CR>
@@ -263,8 +271,10 @@ xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref
 nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(0,'')<CR>
 xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 
-nnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('iso',xtref#get(0)))<CR>
-xnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(1,xtref#to_fmt_cycle('iso',xtref#get(1)))<CR>
+nnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('date',xtref#get(0)))<CR>
+" FIXED:(-1): use exact visual selection (to allow spaces in ISO date, etc.)
+"   instead of auto-locating xtref in selected area
+xnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(-1,xtref#to_fmt_cycle('date',xtref#get(-1)))<CR>
 
 " MAYBE:([Xtref]r): upgrade xtref marker format one-by-one instead of all at once
 nnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(0,xtref#new())<CR>

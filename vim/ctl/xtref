@@ -14,7 +14,7 @@
 # shellcheck disable=SC2059
 set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
-fmts=( braille date dt hex iso unix utc z85 z85r )  # TBD: u2048
+fmts=( braille date dt dpfx hex iso unix utc z85 z85r )  # TBD: u2048
 pf_anchor='⌇'
 pf_referer='※'
 
@@ -25,19 +25,23 @@ r_addr="($r_z85|$r_braille)"
 
 anchor=
 fmt=braille
+fileref=
 insert=
 inverse=
+linesep=$'\n'
 nanosec=
 printrgx=
 recursive=
 tags=
 
 # shellcheck disable=SC2076
-while getopts 'af:inprtux' o; do case $o in :|'?') exit 1
+while getopts 'af:FinNprtux' o; do case $o in :|'?') exit 1
 ;; a) anchor=1
 ;; f) fmt=$OPTARG; [[ " ${fmts[*]} " =~ " $fmt " ]] || { >&2 echo "Err: fmt=$fmt"; exit 1; }
+;; F) fileref=1
 ;; i) insert=1
 ;; n) nopfx=
+;; N) linesep=
 ;; p) ((++printrgx))
 ;; r) recursive=1
 ;; t) tags=1
@@ -141,6 +145,7 @@ parse_xtref(){ local a
   ;; "$pf_referer" | ※) pfx=$pf_referer; a=${1:1}
   ;; *) pfx=$pf_anchor; a=$1
   esac
+  [[ -n $fileref || -f $a ]] && a=$(date +%s --reference="$a")
 
   # SEE:VIZ: Most common Bash date commands for timestamping « The Intellectual Wilderness ⌇⡞⠸⣪⣽
   #   https://zxq9.com/archives/795
@@ -158,14 +163,19 @@ parse_xtref(){ local a
   #   Internationalized Resource Identifier - Wikipedia ⌇⡞⠻⢝⠥
   #     https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier
   # ALSO: SHA1/SHA256 for git objects refs
+  #
+  # MAYBE: always use "nano" as inner xts -- and simply strip trailing spaces ${%%⠀*} to reduce 8char to 4-6-7 char
+  # [_] FIXME: "nano" parsing is "8)" -- must match branches by value itself, not length only
+  # DEV:HACK: jump <g[> using only first 4-char (ignoring nanoseconds)
   case ${#a}
-  in 24) xts=$(printf '%08x' "$(date +%s --date="$a")")  #  iso = 2020-02-03T22:19:31+0300
+  in 28|31|34) xts=$(printf '%08x' $(date +'%s %N' --date="$a"))         # nano = 2019-11-08T01:53:33.407997535+0200
+  ;; 24) xts=$(printf '%08x' "$(date +%s --date="$a")")                 #  iso = 2020-02-03T22:19:31+0300
   ;; 20) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  #  utc = 2020-02-03T22:19:31Z
   ;; 19) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  # date = 2020-02-04_00:19:31
-  ;; 16) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  #   ut = 20200203T221931Z
-  ;; 15) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  #   dT = 20200204_001931
+  ;; 16) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  # ut = 20200203T221931Z
+  ;; 15) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  # dT = 20200204_001931
   ;; 11) xts=$(printf '%08x' "$(date +%s --date="$a")")  #  day = 2020-02-04-
-  ;; 10) xts=$(printf '%08x' "$a")                       # unix = 1580768371  BET: prefix @1580768371 to allow 2020-02-04 w/o sfx BET! not match (*-*)
+  ;; 10) xts=$(printf '%08x' "$((10#$a))")               # unix = 1580768371  BET: prefix @1580768371 to allow 2020-02-04 w/o sfx BET! not match (*-*)
   ;;  9) xts=$(printf '%08x' "$(date +%s --date="$a")")  #   dt = 20200204- OR 20200204T
   ;;  8) xts=$a                                        #  hex = 5e389c73    BET: prefix 0x5e389c73 OR @5e389c73 to allow 20200204 w/o sfx
   # XXX:(5): how to detect "rev .vs. non-rev" format ?   # z85r = @D1ou
@@ -176,12 +186,13 @@ parse_xtref(){ local a
   esac
 }
 
-cvt_braille(){ printf -- "${2-}""\\U28${1:0:2}""\\U28${1:2:2}""\\U28${1:4:2}""\\U28${1:6:2}""\\n"; }
+cvt_braille(){ printf -- "${2-}"; local i; for((i=0;i<${#1};i+=2)); do printf -- "\\U28${1:i:2}"; done; echo; }
 cvt_hex(){ printf -- "${2-}""\\x${1:0:2}""\\x${1:2:2}""\\x${1:4:2}""\\x${1:6:2}""\\n"; }
 cvt_dt(){ date +"${2-}%Y%m%d_%H%M%S" --date="@$((0x$1))"; }
-cvt_date(){ date +"${2-}%Y-%m-%d=%H:%M:%S" --date="@$((0x$1))"; }
+cvt_date(){ date +"${2-}%Y-%m-%d"$'\U00A0'"%H:%M:%S" --date="@$((0x$1))"; }  # ALT:USE: sep="=" MAYBE: add %z
 cvt_iso(){ date +"${2-}%Y-%m-%dT%H:%M:%S%z" --date="@$((0x$1))"; }
 cvt_utc(){ date +"${2-}%Y%m%dT%H%M%SZ" --utc --date="@$((0x$1))"; }
+cvt_dpfx(){ date +"${2-}%Y%m%d-" --date="@$((0x$1))"; }
 cvt_unix(){ printf '%s%d\n' "${2-}" "$((0x$1))"; }
 cvt_z85(){ printf '%s%s\n' "${2-}" "$(cvt_hex "$1" | tr -d \\n | basenc --z85)"; }
 cvt_z85r(){ printf '%s%s\n' "${2-}" "$(cvt_hex "$1" |  tr -d \\n | basenc --z85 | rev)"; }
@@ -192,13 +203,14 @@ gen_xtref(){
   xts=$(printf '%08x' "$ts")
 }
 
-print_xtref(){
+print_xtref(){ local xtref
   ((inverse)) && case $pfx
     in "$pf_anchor") pfx=$pf_referer
     ;; "$pf_referer") pfx=$pf_anchor
     ;; '') pfx=$pf_referer    # CASE:(-x): for wild address always means "referer"
     esac
-  "cvt_$fmt" "$xts" ${nopfx-"$pfx"}
+  xtref=$("cvt_$fmt" "$xts" ${nopfx-"$pfx"})
+  printf '%s%s' "$xtref" "$linesep"
 }
 
 

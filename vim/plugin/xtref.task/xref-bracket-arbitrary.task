@@ -1,0 +1,39 @@
+IDEA: use arbitrary text in special brackets as "xbref"
+  BAD: we will have two different sets of chars to grep and insert
+  BUT: xtref and xbref have completely different content and purpose
+    ?? so using new set of brackets is totally reasonable
+
+
+ALT:DFL:NICE: using the same leading symbol for referer and anchor -- easy global grep
+  ※[free mark]
+    e.g. can be used to contain ISO date with spaces
+      ※[Tue, 26 May 2020 09:10:03 +0000]
+  FAIL: <g[> won't work on mark with spaces -- easy to highlight, hard to jump
+  BAD: we must disallow or escape /]/ inside xref text
+
+
+SEE
+  ⋮@/erian/fonts/PragmataPro0.828/USEFUL FILES/All_chars.txt
+    331: U+2980  ⦀ ⦁ ⦂ ⦃ ⦄ ⦅ ⦆ ⦇ ⦈ ⦉ ⦊ ⦋ ⦌ ⦍ ⦎ ⦏
+  @/forestanza/forestanza.sh/exe/text-split
+    33:my $br_ub = qr( “‘‹«≪（［｛｟⦅〚⦃「〈《【〔⦗『〖〘｢⟦⟨⟪⟮⟬⌈⌊⦇⦉❛❝❨❪❴❬❮❰❲〈⦑⧼﹙﹛﹝ );
+  @/vim/nou.vim/autoload/nou/syntax/block.vim
+    92:"   BET? use square brackets ⦅⦃⦗｢⟦⟨⟪⟮⟬⌈⌊⦇⦉❨❪❴❬❮❰❲⦑⧼  vim ⦆⦄⦘｣⟧⟩⟫⟯⟭⌉⌋⦈⦊❩❫❵❭❯❱❳⦒⧽
+
+
+VIZ
+  ⦑free mark⦒  NICE: similar to referer ※aaaaa
+  ⦓free mark⦔
+  ⧛free mark⧚  NICE: similar to anchor ⌇aaaaa
+
+  ⦒free mark⦑
+  ⧚free mark⧛
+
+  ⧼free mark⧽
+  ⧽free mark⧼
+  ⦇free mark⦈
+
+  ⦍free mark⦎
+  ⦏free mark⦐
+  ⧙free mark⧘
+  ⧏free mark⧐
