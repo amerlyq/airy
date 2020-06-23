@@ -1,6 +1,22 @@
 #!/bin/sh -eu
 # USAGE: $ ./$0 ./dir host:/mnt/HD/HD_a2/share/$USER
+
+# SEE:(--backup): sync - make rsync wait for a confirmation before actually changing files - Super User ⌇⡞⣯⡸⣀
+#   https://superuser.com/questions/282942/make-rsync-wait-for-a-confirmation-before-actually-changing-files
+#   => create files with '~' suffix in same dir
+#     WARN: will be deleted if "--delete" specified
+#     BET? use in this case: --backup-dir=../backup
+
+# WARN: "/me" must be correct symlink on dest, otherwise...
+#   it may copy onto RAM rootfs instead of HDD
+#   BAD:(--one-file-system): still didn't help
+#   WARN: always only use "--delete-after" -- to recover files
+#     <= e.g. if they were deleted wrongly and moving to ~/backup had failed
+dbkp="/me/!rsync/$(date +%Y%m%d_%H%M%S)"
+
 exec rsync -e ssh -avh --no-group \
   --stats --progress \
+  --backup --backup-dir="$dbkp" \
+  --remote-option=--one-file-system \
   --out-format='%t %i %f' \
-  -- "$@"
+  "$@"

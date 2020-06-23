@@ -1,7 +1,12 @@
 #!/bin/sh -eu
 # ALT:(oneline): copy on FAT: rsync -hrt ...
-exec rsync -hr \
+
+dbkp="../!rsync-$(date +%Y%m%d_%H%M%S)"
+
+exec rsync -ah --no-group \
   --stats --progress \
   --info=copy,del,remove,skip \
+  --backup --backup-dir="$dbkp" \
+  --remote-option=--one-file-system \
   --out-format='%t %i %f' \
   "$@"
