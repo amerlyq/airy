@@ -11,7 +11,7 @@ set -euo pipefail
 # BET:TRY: "borg"
 
 ## CHG: place into synced dir from profile
-dst=${BACKUP_DIR_ROOT:-/tmp}
+dst=${BACKUP_DIR_ROOT:-/tmp/backups}
 args=( "$@" )
 
 
@@ -21,6 +21,7 @@ make_backup(){ local f nm=$1
   # shellcheck disable=SC2076
   ((${#args[@]})) && [[ ! " ${args[*]} " =~ " $nm " ]] && return
   f=$dst/$nm-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.gz
+  mkdir -p "${f%/*}"
   sed -r "
     s/^\s+//              # indenting spaces
     /(^#|  # ).*$/s///    # comments (separate and inline)
@@ -38,8 +39,10 @@ make_backup history <<EOT
   ~/.local/share/airy/dict-words-ru.txt
   ~/.cache/vim/plugins/mru_file
   ~/.config/mpd/history
+  ~/.config/mpv/watch_later
   # ~/.config/selfspy/selfspy.sqlite
   ~/.config/VirtualBox
+  ~/.cache/.bluetoothctl_history
 
 ## cli
   ~/.local/share/gdb/history
@@ -49,8 +52,10 @@ make_backup history <<EOT
   ~/.ipython/profile_default/history.sqlite
   ~/.bash_history
   ~/.jhistory
+  ~/.local/share/mcomix
   ~/.local/share/zathura
-  # ~/.sbcl_history
+  ~/.python_history
+  ~/.sbcl_history
   ~/.sqlite_history
   ~/.w3m/history
   ~/.wget-hsts
@@ -62,7 +67,9 @@ make_backup browsers <<EOT
   ~/.config/qutebrowser/autoconfig.yml          # transient settings
   ~/.local/qute-proxy                           # additional session
   ~/.local/share/qutebrowser/cmd-history
+  ~/.local/share/qutebrowser/cookies
   ~/.local/share/qutebrowser/history.sqlite
+  # ~/.local/share/qutebrowser/history.sqlite-wal  # WARN: only on running
   $ffprf/places.sqlite                          # bookmarks
   $ffprf/sessionstore.js                        # opened tabs
   $(find "$ffprf/sessionstore-backups" -maxdepth 1 -type f \( -name '*.js' -o -name '*.js-*' \) -print)
@@ -73,18 +80,22 @@ EOT
 # BET:DEV:SECU create versioned *tomb* for secrets backup
 make_backup secrets <<EOT
   ~/.android                  # authorized adb shell
+  ~/.config/copyq
   ~/.config/kdeconnect        # authorized clipboard sharing
   ~/.config/syncthing         # certificates and ids
   ~/.gnupg                    # export keys
   ~/.password-store           # NEED: ~/.gnupg
+  ~/tomb
   # ~/.password.tomb
   # ~/.password.tomb.key
   ~/.ssh                      # copy keys
   ~/.weechat/certs/nick.pem   # privatkey-login
+  ~/.znc
   # /work/cache/gpg
 EOT
 
 
+# WARN:CHG: archive whole ~/.weechat/ -- I may modify some plugins in-place
 make_backup chat <<EOT
   ~/.purple/logs
   ~/.weechat/logs
@@ -102,18 +113,22 @@ make_backup sync <<EOT
   # ~/books
   # ~/mems
   ~/sync
+  ~/sync_kedi
 EOT
 
+# ALSO: tar -I lz4 --xattrs -cpvf "/tmp/x-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.lz4" /data/aura
 make_backup aura <<< ~/aura             # = all personal repos
-# make_backup gamesaves <<< ~/gamesaves   # = aggregated game saves
-# make_backup hub <<< ~/hub               # = code examples and teaching materials
+make_backup gamesaves <<< ~/gamesaves   # = aggregated game saves
+make_backup hub <<< ~/hub               # = code examples and teaching materials
+make_backup sdk <<< ~/sdk               # = misc cloned FOSS code
 make_backup research <<< ~/research     # = ongoing research topics
 make_backup vim <<< ~/.cache/vim/cache  # = vim files backups
 make_backup work <<< ~/work             # = archived work topics
 # make_backup mail <<< ~/.mail            # = offline emails
 # make_backup doc <<< /work/doc           # = working notes
 
-# make_backup dld <<< /_dld               # = unsorted downloads (always move media files to /data)
+# WARN: symlink "/_dld" don't work directly
+make_backup dld <<< /data/_dld          # = unsorted downloads (always move media files to /data)
 
 make_backup etc <<< /etc ||:      # = system-wide user configs (skipping passwords w/o sudo)
 # make_backup srv <<< /srv          # = ftp/http/tftp/vbox-share/etc
@@ -122,8 +137,25 @@ make_backup etc <<< /etc ||:      # = system-wide user configs (skipping passwor
 # ALSO: defects analysis reports
 # find /work/{bug,task,task.done,task.seized} -name '*.nou' -print0 | tar -cvzf analysis-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.gz --null -T -
 
-# ALSO:
-# /games and /opt must backup filelist instead of content
-#   -- to be able to restore same hierarchy on demand e.g. to remember active games
-# ~~ same for ./odd-packages installed from pacman
-# ~~ and history of everything which we installed into ~/.cache/aurutils/
+
+## NOTE: save lists to be able to restore same hierarchy on demand e.g. to remember active games
+# [_] MAYBE:DEV also save some magnet-donkey-torrent-like hash-sum
+#   => to search "future IPFS web" for exact copy OR verify if identical
+if ((!${#args[@]})) || [[ " ${args[*]} " =~ " flist " ]]; then
+  dtmp=$(mktemp -d)
+  gather_flist(){ local fl d=$1
+    # [[ -d $d ]] || return 0
+    fl=$(realpath -m "$dtmp/$d")
+    mkdir -p "${fl%/*}"
+    find "$d" -not -readable -prune -o -printf '%y\t%s\t%P\n' > "$fl"
+  }
+  gather_flist /games  # /games and /opt must backup filelist instead of content
+  gather_flist /opt
+  gather_flist /usr/local
+  # MAYBE:ALSO: bundle, cabal, cargo, gem, npm, etc. | ALSO: ~/.{cmake,conan}
+  gather_flist ~/.cache/aurutils   # ~~ and history of everything which we installed
+  pacman -Qd > "$dtmp/pacman-implicit"
+  pacman -Qe > "$dtmp/pacman-explicit"  # ~~ same for ./odd-packages installed from pacman
+  make_backup filelists <<< "$dtmp"
+  # rm -rf "$dtmp"
+fi
