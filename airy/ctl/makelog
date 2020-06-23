@@ -24,6 +24,7 @@ log=${XDG_CACHE_HOME:-$HOME/.cache}/airy/log/$(date +'%Y%m%d_%H%M%S').log
 # log=${TMPDIR:-/tmp}/airy.log
 
 mkdir -p "${log%/*}"
+ln -sfT "${log##*/}" "${log%/*}/latest"
 
 # WARN:BUG:(sed -u/awk): isn't really unbuffered -- it will prevent [Y/n] prompt w/o NL
 # awk '{print "E:",$0}'

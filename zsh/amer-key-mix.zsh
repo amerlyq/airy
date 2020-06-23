@@ -46,6 +46,9 @@ bindkey '^W' backward-kill-word
 bindkey '^K' kill-line
 bindkey '^U' backward-kill-line
 
+# TODO: delete-whole-WORD and delete-path-word
+# https://unix.stackexchange.com/questions/258656/how-can-i-have-two-keystrokes-to-delete-to-either-a-slash-or-a-word-in-zsh
+
 # BUG: fixterm keys :: http://www.leonerd.org.uk/hacks/fixterms/
 #   <S-BS>  ->  ^[[127;2u  ->  <Esc>..u  ->  undo all typed text in vicmd mode
 # FIXED: redefine key sequences

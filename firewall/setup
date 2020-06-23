@@ -6,4 +6,5 @@ source ~/.shell/func.d/cfgsetup
 
 linkcp -ct /etc -- cfg/nftables.conf
 
+# WARN:(-erR): needs reboot on clean setup ERR: "Netlink socket: Protocol not supported"
 svc_activate -eR nftables.service

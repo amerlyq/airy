@@ -26,6 +26,7 @@ append_repo(){ local nm=$1 at=$2
   [[ -f $dcache/$nm/$nm.db.tar ]] && return
   sudo install -d "$dcache/$nm" -o "$USER"
   repo-add "$dcache/$nm/$nm.db.tar"
+  sudo pacman -Sy
 }
 
 # BET?USE:(aurto):
