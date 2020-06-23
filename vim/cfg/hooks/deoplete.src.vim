@@ -21,7 +21,7 @@ endfunction "}}}
 imap <silent><expr> <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " HACK: use spaces in Makefile
-au FileType make :imap <buffer><silent><expr>  <TAB>  pumvisible() ? "\<C-n>"
+au FileType {make,kconfig} :imap <buffer><silent><expr>  <TAB>  pumvisible() ? "\<C-n>"
   \: (virtcol(".")==1 ? "\<TAB>" : repeat(' ', &tabstop - ((virtcol('.') - 1) % &tabstop)))
 
 " imap <silent><expr> <TAB>
