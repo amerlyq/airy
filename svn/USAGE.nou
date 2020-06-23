@@ -3,6 +3,9 @@ Create remote dir
 
 Checkout
   $ svn --username user co 'https://example.com/svn/doc/technical/'
+  $ svn --no-auth-cache --username $USER checkout 'https://example.com/svn/doc/technical/'
+    FIXED:ERR:(freeze): name org.freedesktop.secrets was not provided by any .service files
+    && org.kde.kwindowsystem: Could not find any platform plugin
 
 Add directory (and transfer revision to server)
   ALT:(explicit dst): https://stackoverflow.com/questions/15510119/how-to-add-an-existing-folder-with-files-to-svn
