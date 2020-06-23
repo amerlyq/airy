@@ -2,26 +2,32 @@
 [options]
 ; lazy-load=1
 hide-info-box=1
-scale-image-up=1
+scale-images-up=1
 watch-files=changes-only
 
 [keybindings]
 k  { goto_file_relative(-1) }
 j  { goto_file_relative(1) }
-J  { goto_file_relative(10) }
-K  { goto_file_relative(-10) }
+J  { goto_directory_relative(1) }
+K  { goto_directory_relative(-1) }
 
 <Control>p  { goto_directory_relative(-1) }
 <Control>n  { goto_directory_relative(1) }
 
 d  { quit() }
 q  { quit() }
-r  { reload() }
+<Control>r  { reload() }
 f  { toggle_fullscreen() }
 
 l  { set_scale_level_relative(1.1) }
 h  { set_scale_level_relative(0.9) }
+w  { toggle_scale_mode(5) }
+W  { toggle_scale_mode(4) }
 t  { toggle_scale_mode(0) }
+T  { toggle_scale_mode(1) }
+e  { toggle_scale_mode(3) }
+E  { toggle_scale_mode(2) }
+<Return> { montage_mode_enter() }
 
 /  { flip_horizontally() }
 ?  { flip_vertically() }
