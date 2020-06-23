@@ -17,6 +17,7 @@ distro ubuntu || die "Not Ubuntu"
 # sudo update-alternatives --config java
 
 pkgs=(build-essential pkg-config doxygen)
+pkgs+=(bison flex libncurses5-dev)  # work ALSO:MAYBE:(kernel): libssl-dev libelf-dev
 pkgs+=(lib32stdc++6 libc6-i386 libbz2-dev)
 pkgs+=(libexpat1-dev libgio2.0-cil-dev libusb-1.0-0-dev lib32z1 libasound2-dev libicu-dev zlib1g-dev libdbus-glib-1-dev)
 pkgs+=(subversion git cmake default-jre)

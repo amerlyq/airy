@@ -17,6 +17,7 @@ unset ismounted && while read line; do
     [[ ${dir#$line} == $dir ]] || ismounted=1
 done < <(awk '/^\//{print$1}' /etc/schroot/default/fstab)
 if ((!ismounted)) && [[ ! -d ${chroot}${dir} ]]; then
+  # NEED: $ sudo ln -svfT cache/work /chroot/xenial_amd64/work
   [[ -d /work ]] && dir=/work || dir=$HOME
 fi
 

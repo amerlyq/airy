@@ -13,9 +13,11 @@ if cfgOpt u; then
 fi
 
 # NEED: reset passwords in chroot and setup dev packages
-if cfgOpt R; then
+if cfgOpt r; then
+  home=$(getent passwd "$USER" | cut -d: -f6)
   for chr in "${CURR_CHROOTS[@]:?}"; do
     sudo schroot -c "${chr##*/}" -d '/' -- bash -c "passwd; passwd ${USER:?}"
-    sudo schroot -c "${chr##*/}" -d '/' -- bash -c "cd ~/aura/airy/chroot/prf && ./ubuntu-16.04 -u"
+    # FIXME: auto-pick script :: *-16.04 => *-xenial == ${chr%%_*}
+    sudo schroot -c "${chr##*/}" -d '/' -- bash -c "cd '$home/aura/airy/chroot/prf' && ./ubuntu-16.04 -u"
   done
 fi

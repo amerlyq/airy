@@ -74,9 +74,12 @@ BUG
     ::: FIXED: manually add groups in
       HOST: $ id
       CHRT:
+        sudo /usr/sbin/groupadd -g 108 vboxusers
         sudo /usr/sbin/groupadd -g 150 wireshark
+        sudo /usr/sbin/groupadd -g 973 adbusers
         sudo /usr/sbin/groupadd -g 985 users2
         sudo /usr/sbin/groupadd -g 987 uucp2
+        sudo /usr/sbin/groupadd -g 991 lp2
         sudo /usr/sbin/groupadd -g 998 wheel
     [_] BAD: you must remap existing groups instead of creating copies
       985 -> 100 (users) and 987 -> 10 (uucp)

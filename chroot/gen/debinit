@@ -37,7 +37,10 @@ debcfg(){ local chr=${1:?No chr} nm=${2:?No nm}
 
 dir=/chroot && [[ -d $dir ]]
 for prf in "${CURR_CHROOTS[@]:?}"; do
-  linkcp -c {,"$dir/$prf"}/usr/share/terminfo/s/st-256color
-  linkcp -c {,"$dir/$prf"}/usr/share/terminfo/t/tmux-256color
+  # BET:
+  # HOST: $ infocmp tmux-256color > tmux-256color.ti
+  # CHRT: $# tic tmux-256color.ti
+  # linkcp -c {,"$dir/$prf"}/usr/share/terminfo/s/st-256color
+  # linkcp -c {,"$dir/$prf"}/usr/share/terminfo/t/tmux-256color
   debcfg "$dir/$prf" "${prf%_*}"
 done
