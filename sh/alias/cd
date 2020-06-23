@@ -1,4 +1,4 @@
-# vim:ft=bash
+# vim:ft=sh
 
 alias cd..='cd ..'
 alias ..='cd ..'
@@ -16,9 +16,10 @@ cdauto() { ((!$#)) || local p=${*: -1}
   if [[ -z ${1-} || $p == - || -d $p ]]; then
     builtin cd "$@" || return
   elif [[ ${1-} == -l ]]; then
-    p=$(readlink -e "$p")
     builtin cd "${p%/*}" || return
-    $EDITOR -- "$p"
+    p=$(readlink "$p")
+    builtin cd "${p%/*}" || return
+    $EDITOR -- "${p##*/}"
   elif [[ ${1-} == -L ]]; then
     p=$(realpath -e "$p")
     builtin cd "${p%/*}" || return
