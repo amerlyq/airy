@@ -10,10 +10,10 @@ alias aurb='aur build --force'          # rebuild inside current dir
 function aurB { local nm; nm=$(r.pacman-loc-prepare "$1") && r.pacman-loc-package "$nm" && sudo pacman -S "$nm"; }
 alias aurC='pacman -Qm | aur vercmp'                            # check updates for foreign pkgs
 alias aure='aur sync'                   # install and prompt to edit files
-alias auri='aur sync --no-view'         # install
+alias aurI='aur sync --no-view'         # install
 alias aurc='auri --continue'            # install without download and edit
-# BUG: bare function doesn't expand aliases
-alias aurI='function aurI { auri "$1" && paci "$1"; }; aurI'  # install
+# BUG: bare function doesn't expand aliases BUT: function below is not highlighted either
+alias auri='function auri { aurI "$1" && paci "$1"; }; auri'  # install
 alias aurl='pacman -Sl aur'   # list installed aur pkgs
 alias aurr='aur sync --nover-shallow -f'  # fully rebuild chosen packages (e.g. python-* pkgs installed as deps)
 alias aurR='aur sync --rebuildtree '      # fully rebuild pkg with all its dependencies

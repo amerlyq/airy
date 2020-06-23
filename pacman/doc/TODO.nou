@@ -55,6 +55,9 @@ TODO
       = prepend mirror list by darkhttpd-shared PC
     [_] ALSO:TRY: add same "Server = ..." to /etc/pacman.d/{aur,dev}.conf to avoid rebuilding AUR packages
   [_] TRY: add as mirror archive of old packages -- to install pkg on old system without upgrade
+    [_] TODO: similarly to "nvidia.hook" make "mirrorlist.hook" which will add/replace backup mirror only once
+      udt=$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)
+      echo "Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch" >> /etc/pacman.d/mirrorlist
     IDEA: use date of last upgrade and re-generate additional entry to pacman config
       # $ sudo reflector -l 35 -p https --sort rate --save /etc/pacman.d/mirrorlist
         TODO: use only 3 world and 2 local country mirrors plus 1 archive

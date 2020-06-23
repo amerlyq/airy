@@ -22,7 +22,7 @@ while getopts 'hdiu' o; do case $o in :|'?') exit 1
 ;; h) exec sed -rn '1d;/^(.*\s)?#%/s///p' "$0"  #% h = help
 ;; d) asdeps=--asdeps   #% d = install whole list as dependencies
 ;; i) noninteractive=   #% i = interactive install (allow answering yes/no)
-;; u) ondemand=--force  #% u = update installed package of same version
+;; u) ondemand=         #% u = update installed package of same version
 esac; done; shift $((OPTIND-1))
 (($#)) && exec < <(printf '%s\n' "$@") || [[ ! -t 0 ]] || exit 1
 
