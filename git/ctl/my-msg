@@ -72,6 +72,7 @@ GetOptions(\%opts   #%OPTIONS:
 , 'level|l=i'       #% l:= level    | derive names from nesting level DFL=0
 , 'prefix|p=s'      #% p:= prefix   | override component prefix DFL=<auto:{top-dir|.|%}>
 , 'commit|c!'       #% c = commit   | immediately commit description (implies: -i)
+, 'modtime|t!'      #% t = modtime  | use as author's date the most recent changed index file modtime (usewith: -c)
 # , 'message|m=s'     #% m:= message  | additional hint message to insert into description
 # , 'relative|r!'     #% r = relative | describe only current folder (TBD)
 , 'workdir|w!'      #% w = workdir  | describe only current git index (disables: -i)
@@ -379,9 +380,30 @@ sub mkmsg {
 
 my $text = "[". mkpfx(@tops) ."] ". mkmsg();
 
+
 if ($opts{commit}) {
     # THINK:USE: --fixup=<commit> for "rebase --autosquash"
-    git('commit', '--verbose', '--message='.$text);
+    my @commitargs = ('--verbose', '--message='.$text);
+    if ($opts{modtime}) {
+
+        # SRC: https://stackoverflow.com/questions/54487856/use-perls-qx-operator-with-a-list-of-arguments
+        use IPC::Run qw( run );
+        my @cmd = (@git, 'rev-parse', '--show-toplevel');
+        run(\@cmd, \undef, \my $gittopdir);
+        chomp $gittopdir;
+
+        my $authordate = 0;
+        foreach my $x (values %diff) {
+            # BAD:(skipped): can't track modtime of deleted files
+            next if $x->{mod} =~ /^[D]/;
+            my $f = join('/', $gittopdir, (defined $x->{dst} ? $x->{dst} : $x->{src}));
+            # print "= ",$f,$/;  # DEBUG=
+            my $uts = (stat($f))[9];
+            $authordate = $uts if $uts > $authordate;
+        }
+        push(@commitargs, '--date='.$authordate) if $authordate;
+    }
+    git('commit', @commitargs);
     # git('show', '--stat');
 } else {
     print $text, $/;

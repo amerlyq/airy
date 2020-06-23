@@ -1,12 +1,13 @@
 # vim:ft=sh
 
 ## My auto-cmds
-alias gc='r.git-my-msg --index --commit'
-alias gC='r.git-my-msg --index --commit --prefix'
+alias gc='r.git-my-msg --index --modtime --commit'
+alias gC='r.git-my-msg --index --modtime --commit --greatest'
+alias gcn='r.git-my-msg --index --modtime --commit --prefix'
+alias gcN='r.git-my-msg --index --commit --prefix'
 alias gct='r.git-my-msg --index --commit --prefix="TEMP!"'
-alias gcg='r.git-my-msg --index --commit --greatest'
 alias gcd='r.git-my-msg --index --commit --diff'
-alias gc.='r.git-my-msg --workdir --commit'
+alias gc.='r.git-my-msg --workdir --modtime --commit'
 
 [[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' gc gC gcd gcg gct
 
