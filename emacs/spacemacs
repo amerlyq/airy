@@ -33,7 +33,7 @@ values."
    dotspacemacs-configuration-layers
    '(
      python
-   html
+     html
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -42,7 +42,8 @@ values."
      helm
      ;; auto-completion
      ;; better-defaults
-     emacs-lisp
+     ; emacs-lisp
+     common-lisp
      ;; git
      ;; markdown
      ;; org
@@ -113,7 +114,7 @@ values."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'official
+   dotspacemacs-startup-banner nil
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
@@ -136,7 +137,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("monospace"
-                               :size 36
+                               :size 32
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -336,12 +337,29 @@ you should place your code here."
   (setq-default evil-escape-delay 0.2)
   (setq-default evil-escape-key-sequence ",s")
 
+  ;; BET? USE: <SPC f s> OR :w<CR>
   ;; BAD: can't input ',' at all
   ;; SEE: http://blog.jenkster.com/2013/02/mapping-jk-in-emacs-evil-mode.html
+  ;; https://emacs.stackexchange.com/questions/34024/how-to-bind-a-key-in-evil-spacemacs-when-the-leader-key-is-comma
   ;; BET: https://github.com/syl20bnr/evil-escape
   ; (define-key evil-insert-state-map (kbd ",s") 'save-buffer)
   ; (define-key evil-insert-state-map (kbd ",s") 'keyboard-escape-quit-and-save-buffer)
-  (define-key evil-normal-state-map ",s" 'save-buffer)
+  ; BAD: conflicts with <, s *> bindings in major mode
+  ; FAIL: must bind separately for each major mode
+  ; [_] READ
+  ;   emacs - spacemacs: how to define a new key-binding with a leading [SPC]? - Stack Overflow ⌇⡞⣔⠡⣈
+  ;     https://stackoverflow.com/questions/46777840/spacemacs-how-to-define-a-new-key-binding-with-a-leading-spc
+  ;   syl20bnr/spacemacs - Gitter ⌇⡞⣔⠡⣒
+  ;     https://gitter.im/syl20bnr/spacemacs/archives/2016/04/06
+  ;   emacs - spacemacs: how to define a new key-binding with a leading [SPC]? - Stack Overflow ⌇⡞⣔⠢⡍
+  ;     https://stackoverflow.com/questions/46777840/spacemacs-how-to-define-a-new-key-binding-with-a-leading-spc
+  ;   ++ RFC: Improve Spacemacs experience for new users · Issue #772 · syl20bnr/spacemacs ⌇⡞⣔⠢⡯
+  ;     https://github.com/syl20bnr/spacemacs/issues/772
+  ;   HACK: https://www.reddit.com/r/emacs/comments/69qbd6/save_buffer_with_keychord_jk/
+  ;   OFF: https://develop.spacemacs.org/doc/DOCUMENTATION.html
+  ; (define-key evil-normal-state-map ",s" 'save-buffer)
+  ; (define-key evil-normal-state-map (kbd ", s s") 'save-buffer)
+  ; (define-key evil-normal-state-map "\SPC m s s" 'save-buffer)
 
   )
 
@@ -354,7 +372,7 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic haml-mode powerline spinner hydra lv parent-mode projectile pkg-info epl flx highlight smartparens iedit anzu evil goto-chg undo-tree f dash s diminish bind-map bind-key packed helm avy helm-core popup async winum ws-butler window-numbering which-key web-mode volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit spacemacs-theme spaceline slim-mode scss-mode sass-mode restart-emacs request rainbow-delimiters quelpa pug-mode popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint less-css-mode info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-css-scss helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+    (slime-company company slime yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic haml-mode powerline spinner hydra lv parent-mode projectile pkg-info epl flx highlight smartparens iedit anzu evil goto-chg undo-tree f dash s diminish bind-map bind-key packed helm avy helm-core popup async winum ws-butler window-numbering which-key web-mode volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit spacemacs-theme spaceline slim-mode scss-mode sass-mode restart-emacs request rainbow-delimiters quelpa pug-mode popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint less-css-mode info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-css-scss helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
