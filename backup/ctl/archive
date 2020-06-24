@@ -44,6 +44,12 @@ make_backup history <<EOT
   ~/.config/VirtualBox
   ~/.cache/.bluetoothctl_history
 
+  # WARN: remove them from ~/.config, otherwise they override ~/.local
+  #   ~/.config/ranger => ~/aura/airy/ranger
+  ~/.local/share/ranger/bookmarks
+  ~/.local/share/ranger/history
+  ~/.local/share/ranger/tagged
+
 ## cli
   ~/.local/share/gdb/history
   ~/.local/share/zsh/history
