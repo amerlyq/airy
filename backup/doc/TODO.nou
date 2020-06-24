@@ -1,22 +1,5 @@
 TODO
   [_] SEE: git-based sync-backup
-    bup
-      https://bup.github.io/
-      + dedup even parts of file
-      BAD? issues are disabled on github, discussion only in maillist
-    borg
-      https://borgbackup.readthedocs.io/en/stable/
-      BET?CMP: https://anarc.at/services/backup/
-      [_] READ:ARCH https://borgbackup.readthedocs.io/en/stable/internals/data-structures.html#archive-limitation
-      [_] READ https://borgbackup.readthedocs.io/en/stable/faq.html#which-file-types-attributes-etc-are-preserved
-      [_] TRY: borg separately from git-annex "to get a gist of it"
-    restic
-      [_] REQ Implement Compression · Issue #21 · restic/restic ⌇⡞⣮⡑⡹
-        https://github.com/restic/restic/issues/21
-        SECU! problems with encryption of incremental backups in general
-        TALK: https://forum.restic.net/
-    BURP - BackUp and Restore Program ⌇⡞⣮⡑⡊
-      https://burp.grke.org/why.html
   [_] CFG: reverse-symlinks for chat logs / mail
     => to sync easily OR keep under git
   [_] DEV:SECU create versioned tomb for backup sync
@@ -103,6 +86,130 @@ IDEA:DEV:
       $ find ~/.local/backup -type l -execdir realpath -ze --relative-to / {} \;
     * compress original ~/.local/backup (symlinks only) and data it points to
 
+
+%% CMP ==============================
+
+FIND
+  [_] PAR2 support for redundancy / repairing
+    + bup :: SRC https://lwn.net/Articles/380983/
+  [_] running consistency check (authorized)
+  [_] manual restoration of data w/o original tool
+    ! especially if per-block encryption is used
+  [_] speed comparison :: increment, walk mounted snapshots, restore chosen files
+    Резервное копирование, часть 6: Сравнение средств резервного копирования / Блог компании Southbridge / Хабр ⌇⡞⣲⠖⠜
+      https://habr.com/ru/company/southbridge/blog/470802/
+      | <tool>           <create> <restore>
+      | Rsync               4m15s 4m28s
+      | Tar pure            3m12s 2m43s
+      |     gzip            9m37s 3m19s
+      | Burp                11m9s 7m2s
+      | BorgBackup  noenc   4m7s  2m45s
+      |             aes     4m58s 3m23s
+      |             blake2  4m39s 3m19s
+      |             Restic  5m38s 4m28s
+    Бэкап-хранилище для тысяч виртуальных машин свободными инструментами / Хабр ⌇⡞⣲⠀⡱
+      https://habr.com/ru/post/504152/
+  [_] android support ?
+    restic
+      https://github.com/restic/restic/issues/886
+    borg
+      https://github.com/borgbackup/borg/issues/5184
+      https://github.com/borgbackup/borg/issues/1155
+      2019-12-12 The package has been merged to termux master: termux/termux-packages@fc6b158#diff-2fc9e51174a78dd5bfc57e8e368590b3
+        $ apt-get install libacl liblz4 zstd openssl python
+        $ env BORG_OPENSSL_PREFIX="/data/data/com.termux/files/usr" BORG_LIBLZ4_PREFIX="/data/data/com.termux/files/usr" BORG_LIBZSTD_PREFIX="/data/data/com.termux/files/usr" pip install borgbackup
+
+restic
+  SRC:(Go): https://github.com/restic/restic
+  USE: "master" -- because 0.9.6 has bugs for restoration big files
+    https://github.com/restic/restic/releases
+  USAGE: Restic Documentation — restic 0.9.6 documentation ⌇⡞⣱⣿⡊
+    https://restic.readthedocs.io/en/stable/
+  Streaming backup
+    $ tar cf - data_dir | restic backup --stdin --stdin-filename data_dir.tar
+  BAD: still no compression (expected in 2020+)
+    REQ: Implement Compression · Issue #21 · restic/restic · GitHub ⌇⡞⣱⣳⠒
+      https://github.com/restic/restic/issues/21
+      SECU! problems with encryption of incremental backups in general
+      TALK: https://forum.restic.net/
+    BUT:INFO: Is it better to backup pre-compressed data, or uncompressed? · Issue #790 · restic/restic · GitHub ⌇⡞⣱⣳⡉
+      https://github.com/restic/restic/issues/790
+  ARCH: restic · Foundation - Introducing Content Defined Chunking (CDC) ⌇⡞⣱⣵⡵
+    https://restic.net/blog/2015-09-12/restic-foundation1-cdc
+  [_] NAS? compile Go for ARM
+    Cross Compiling Golang Applications For Use On A Raspberry Pi ⌇⡞⣱⣷⣱
+      https://www.thepolyglotdeveloper.com/2017/04/cross-compiling-golang-applications-raspberry-pi/
+    SEE: Backups segfault on ARMv7 · Issue #2618 · restic/restic · GitHub ⌇⡞⣱⣸⠱
+      https://github.com/restic/restic/issues/2618
+
+borg
+  SRC:(Python): https://github.com/borgbackup/borg
+  https://borgbackup.readthedocs.io/en/stable/
+  BET?CMP: https://anarc.at/services/backup/
+  [_] READ:ARCH https://borgbackup.readthedocs.io/en/stable/internals/data-structures.html#archive-limitation
+  [_] READ https://borgbackup.readthedocs.io/en/stable/faq.html#which-file-types-attributes-etc-are-preserved
+  [_] TRY: borg separately from git-annex "to get a gist of it"
+  [⡞⣱⣗⣿] TUT: Теория и практика бэкапов с Borg / Блог компании Флант / Хабр ⌇⡞⣱⣐⢡
+    https://habr.com/ru/company/flant/blog/420055/#comment_19183409
+    [_] SEIZE:HACK: Выполнение Borg’ом только одной своей команды при заходе на сервер. Например, так:
+      $ cat .ssh/authorized_keys
+      command="/usr/bin/borg serve" ssh-rsa AAAAB3NzaC1yc…
+      command="borg serve --append-only",restrict ssh-rsa AAAAB...
+    + поставка статичным бинарником (by pyinstaller) OR python>=3.4
+      Installation — Borg - Deduplicating Archiver 1.1.13 documentation ⌇⡞⣱⣶⣙
+        https://borgbackup.readthedocs.io/en/stable/installation.html#pyinstaller-binary
+        BAD! binary uses /tmp to unpack Borg with all dependencies. It will fail if /tmp has not enough free space
+      [_] BUT! how to pack it for NAS ?
+        SEE: ARM: https://borg.bauerj.eu/
+
+bup
+  https://bup.github.io/
+  SRC:(Python/C/git): https://github.com/bup/bup
+  BAD? issues are disabled on github => discussion only through maillist
+  + dedup even parts of file
+  TUT: Floating Octothorpe: Bup repositories and Git ⌇⡞⣲⠷⡴
+    https://floatingoctothorpe.uk/2018/bup-repositories-and-git.html
+  ARCH: DESIGN notes ⌇⡞⣲⠷⢁
+    https://raw.githubusercontent.com/bup/bup/master/DESIGN
+  INFO
+    Git-based backup with bup [LWN.net] ⌇⡞⣲⠷⢘
+      https://lwn.net/Articles/380983/
+    20200623_201825 [X] Recover repository from bup repository ⌇⡞⣲⠹⡉
+      https://git-annex.branchable.com/forum/Recover_repository_from_bup_repository/
+
+
+burp
+  https://burp.grke.org/
+  SRC:(C): https://github.com/grke/burp
+  CMP: BURP - BackUp and Restore Program ⌇⡞⣮⡑⡊
+    https://burp.grke.org/why.html
+  CMP: https://habr.com/ru/company/southbridge/blog/452630/
+
+
+zbackup (DONT)
+  NICE: also stream-based, but nicer than borg, heavily used :: CMP: https://habr.com/ru/company/southbridge/blog/454734/
+    BUT: streaming still requires local repo dupl :: https://habr.com/ru/company/southbridge/blog/454734/#comment_20251978
+  BAD: almost dead
+
+
+%%% ==================================
+
+
+TODO:ARCH: single data-distribution diagram (and eventually EVO to integrate events-consumption and circles-of-importance)
+  * home laptop / PC / kedi :: intermediate partial cache
+  * work laptop / PC
+  * phone / tablet :: end-consumption / producers
+  * NAS / VPS :: relay nodes for full cache
+  * sneaknet NVMe sync-drive :: relay for recent cache
+  * backup HDDs / flash-drives / SD cards :: archived info by circles of loss-affordance
+    + rotation strategy
+  NEED: global archive -- where to search for what
+  STRG:
+    Why 3-2-1 Backup Sucks | Unitrends ⌇⡞⣱⣶⢤
+      https://www.unitrends.com/blog/3-2-1-backup-sucks#:~:text=The%203-2-1%20backup,and%20time-honored%20backup%20strategy.&text=The%203-2-1%20backup%20strategy%20simply%20states%20that%20you,off-site%20for%20disaster%20recovery.
+    Являются ли снэпшоты бэкапами? - NTNX ⌇⡞⣲⠙⠌
+      http://blog.in-a-nutshell.ru/are-snapshots-backups/
+      EN: http://recoverymonkey.org/2018/07/24/are-snapshots-backups-and-what-do-you-need-to-protect-against/
 
 INFO: super-long super-large backups
   [AMA] I'm a consultant with 25 years experience archiving petabytes of data for enormous organizations. Ask me anything about long term archival storage. : DataHoarder ⌇⡞⣮⠪⠠
