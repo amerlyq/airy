@@ -20,7 +20,7 @@ gcI(){ [[ -d $1 ]] && return
 alias gir1='gir HEAD~'
 alias g\?='git help'
 # Re-defined
-alias gca='gaa && gcm'
+alias gca='ga && gcm'
 # SEE: http://gitolite.com/git-pull--rebase
 # http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
 # It's like: git rebase --onto @{u} $(git merge-base HEAD @{u}@{1}) OK, that syntax ("@{u}@{1}")
@@ -34,8 +34,8 @@ alias gpCD='gpD $(git-branch-current 2>/dev/null)'
 
 # Additional
 alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
-alias gaa='git add --all'
-alias ga.='gaa .'
+alias ga='git add --all'
+alias ga.='ga .'
 alias giU='giu --patch'
 alias gcff='git commit --fixup'
 gcfd(){ local d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
