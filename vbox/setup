@@ -8,12 +8,19 @@ id | grep -qwF vboxusers || sudo gpasswd -a "${LOGNAME:?}" vboxusers
 linkcp -ct /etc/tmpfiles.d  "unit/vbox.conf"
 cfgOpt uU || [[ ! -d /srv/share ]] && sudo systemd-tmpfiles --create "vbox.conf"
 
+
+### CFG: ~/.config/VirtualBox/VirtualBox.xml
 # TODO: symlink /vm to xdg_airy_vm_dir with fallback to ~/vm OR /data/vm OR ~/VMs OR /data/VMs
 mkdir -p /vm
 VBoxManage setproperty machinefolder /vm
 
-# TODO! change Host key to "ISO_first_group_lock"
-# TODO! exchange Host-Del and Host-Backspace
+# NOTE: change Host key to ISO_first_group_lock=65037
+#   OR:(as usual): AltGr=65027 OR:(less annoying): RightAlt+RightShift="165,161"
+VBoxManage setextradata global GUI/Input/HostKeyCombination 65037
+
+# NOTE: exchange Host-Del and Host-Backspace -- for easier sending Ctrl-Alt-Del
+VBoxManage setextradata global GUI/Input/MachineShortcuts TypeCABS=Del,TypeCAD=Backspace
+
 ## NOTE: disable annoying miniToolBar
 # SEE: http://helpdeskgeek.com/virtualization/hide-the-menu-bar-and-status-bar-in-virtualbox/
 VBoxManage setextradata global GUI/Customizations noMenuBar,noStatusBar
