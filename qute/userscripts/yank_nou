@@ -28,7 +28,10 @@ xtref=$(r.vim-xtref)
 # title=${QUTE_SELECTED_TEXT:-$QUTE_TITLE}
 title=$QUTE_TITLE
 
+# SRC: https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
+printf -v pretty_url '%b' "${QUTE_URL//%/\\x}"
+
 exec xsel -ib <<EOT
 ${blk}$(printf "%$((count * 2))s")${pfx}${title}${xtref:+ $xtref}
-${blk}$(printf "%$(((count + 1) * 2))s")$QUTE_URL
+${blk}$(printf "%$(((count + 1) * 2))s")$pretty_url
 EOT
