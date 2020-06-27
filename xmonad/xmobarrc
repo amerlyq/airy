@@ -6,12 +6,15 @@ Config {
 , allDesktops  = True
 , pickBroadest = False
 , overrideRedirect = False
-, position     = Bottom  -- BottomP 0 56
+, position     = Bottom  -- CASE: xrandr --setmonitor
+-- , position     = BottomW L 24 -- CASE: layoutScreens
+-- , position     = BottomP 0 56 -- CASE: icons-tray
 , bgColor      = "#000000" -- "#1b1d1e"
 , fgColor      = "#ffffff" -- "#a0a0a0"
 , alpha        = 230  -- BUG: text background impossible with alpha
-, font         = "xft:monospace-9.6,Symbola-9"
-, additionalFonts = ["xft:monospace-8,Symbola-8,SourceHanSansJP-8"]
+-- NOTE: smaller size -- useful only when using xrandr split monitor and sitting near the screen
+, font         = "xft:monospace-6.6,Symbola-6.6"
+, additionalFonts = []
 , iconOffset   = -1
 , textOffset   = -1
 , border       = NoBorder
@@ -50,14 +53,14 @@ Config {
 --      \</action></action>\
 -- %loadavg%
 
+--  \<fc=#00cc80>  </fc>\
+--    \<action=`r.wm M-o_h` button=1>\
+--      \%cpu%  %memory% %swap%\
+--    \</action>\
 , template = "%UnsafeStdinReader%}{\
   \%wacom%\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%\
-  \<fc=#00cc80>  </fc>\
-    \<action=`r.wm M-o_h` button=1>\
-      \%cpu%  %memory% %swap%\
-    \</action>\
   \<fc=#0080cc>  </fc>\
     \%battery%\
     \<action=`r.backlight-mon-sys -n +` button=4>\
@@ -67,17 +70,17 @@ Config {
         \</action></action></action>\
     \%date% "
 , commands =
-[ Run Date " ⌚ <fc=#fd971f>%Y-%m-%d-%a</fc> <fc=#ffffff>%H:%M</fc>" "date" 50
-, Run Cpu
-  [ "-t", "<fc=#ff44ff>☾</fc> <total>%"
-  , "-L", "20", "-l", "#b6e354"
-  , "-H", "60", "-h", "#cc0000"
-  , "-n", "#dd8800", "-w2" ] 10
-, Run Memory
-  [ "-t", "<fc=#00bbff>♏</fc> <usedratio>%"
-  , "-L", "25", "-l", "#b6e354"
-  , "-H", "66", "-h", "#ff5995"
-  , "-n", "#008888" ] 10
+[ Run Date " ⌚ <fc=#fd971f>%Y-%m-%d-%a-W%V</fc> <fc=#ffffff>%H:%M</fc>" "date" 50
+-- , Run Cpu
+--   [ "-t", "<fc=#ff44ff>☾</fc> <total>%"
+--   , "-L", "20", "-l", "#b6e354"
+--   , "-H", "60", "-h", "#cc0000"
+--   , "-n", "#dd8800", "-w2" ] 10
+-- , Run Memory
+--   [ "-t", "<fc=#00bbff>♏</fc> <usedratio>%"
+--   , "-L", "25", "-l", "#b6e354"
+--   , "-H", "66", "-h", "#ff5995"
+--   , "-n", "#008888" ] 10
 , Run DynNetwork
   [ "-t", "<fc=#00ff00>↓</fc><rx>K <fc=#ff4400>↑</fc><tx>K"
   , "-H", "128000", "-h", "#ff5995"
@@ -108,8 +111,8 @@ Config {
 --   , ("amer(ua)", "<fc=#ffcc00>UA</fc>")
 --   ]
 -- , Run Com "r.xkb-leds" [] "leds" 10
-, Run Swap
-  [ "-t", "<usedratio>%" ] 100
+-- , Run Swap
+--   [ "-t", "<usedratio>%" ] 100
 , Run Brightness
   [ "-t", "<fc=#cccc00>☀</fc> <percent>%", "--"
   , "-D", "intel_backlight" ] 30
