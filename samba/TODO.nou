@@ -16,6 +16,33 @@ TODO
       BAD: reset on restart
     # map archive = no
     # inherit permissions = yes
+  [_] BUG: cannot remove symlinks on NAS
+    ::: looks like the problem is related to NAS-patched TrashBin ./.!@#$recycle
+    [_] MAYBE you need SMBv3 sharing
+    [Samba] Cannot remove symlink with missing target ⌇⡞⣰⣬⠕
+      https://lists.samba.org/archive/samba/2016-January/197033.html
+        FIXED:BUG:
+          https://bugzilla.samba.org/show_bug.cgi?id=10429
+          https://bugzilla.samba.org/show_bug.cgi?id=8663
+          https://bugzilla.samba.org/show_bug.cgi?id=7234
+      https://lists.samba.org/archive/samba/2016-January/197050.html
+        MAYBE: "…found that enabling the recycle bin for the SMB share in Synology DSM is what causes this bevahior."
+    SEE: linux - Samba, CIFS and Deleting Files - Stack Overflow ⌇⡞⣰⣰⢊
+      https://stackoverflow.com/questions/1314440/samba-cifs-and-deleting-files/1950860
+    ALSO
+      https://superuser.com/questions/1337257/clients-cant-create-symlinks-on-samba-share
+      https://access.redhat.com/solutions/54407
+      https://unix.stackexchange.com/questions/5120/how-do-you-make-samba-follow-symlink-outside-the-shared-path
+  [_] BUG: trailing dot "name." is subjected to Windows-mangling
+    [_] FIND: samba allow special char in path
+    [_] CHECK: can you create "some/group./here" on Windows
+    OFF:SPEC: Naming and Referencing Shares, Directories, Files, and Metadata - Azure Storage | Microsoft Docs ⌇⡞⣰⣴⡎
+      https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-shares--directories--files--and-metadata
+    CFG:(disable): Special characters in Samba filenames - Server Fault ⌇⡞⣰⣳⢱
+      https://serverfault.com/questions/124611/special-characters-in-samba-filenames
+    HACK:(mapping): samba how to display files with colon in their names? - Unix & Linux Stack Exchange ⌇⡞⣰⣴⡥
+      https://unix.stackexchange.com/questions/299130/samba-how-to-display-files-with-colon-in-their-names
+
 
 Permissions
   2018-02-17 [X] windows runs executable only if "r-x" set on file
