@@ -215,7 +215,7 @@ nnoremap [Xtref]u :<C-u>XtrefAura<CR>
 command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
 
 " OBSOL: <LocalLeader><F1>
-nnoremap [Xtref]c :<C-u>XtrefCwd<CR>
+nnoremap [Xtref]U :<C-u>XtrefCwd<CR>
 command! -bar -range -nargs=0  XtrefCwd
   \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
   \ |else|echoerr "Prevented gen tags in $HOME or below"|en
@@ -271,20 +271,21 @@ xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref
 nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(0,'')<CR>
 xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 
-nnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('date',xtref#get(0)))<CR>
+nnoremap <Plug>(xtref-replace-datetime) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('date',xtref#get(0)))<CR>
 " FIXED:(-1): use exact visual selection (to allow spaces in ISO date, etc.)
 "   instead of auto-locating xtref in selected area
-xnoremap <Plug>(xtref-replace-date) :<C-u>call xtref#replace(-1,xtref#to_fmt_cycle('date',xtref#get(-1)))<CR>
+xnoremap <Plug>(xtref-replace-datetime) :<C-u>call xtref#replace(-1,xtref#to_fmt_cycle('date',xtref#get(-1)))<CR>
 
 " MAYBE:([Xtref]r): upgrade xtref marker format one-by-one instead of all at once
 nnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(0,xtref#new())<CR>
 xnoremap <Plug>(xtref-refresh) :<C-u>call xtref#replace(1,xtref#new())<CR>
 
+" RENAME: [t]oggle => [c]onve[r]t => s[w]itch => inve[r]t
 " THINK:FIXME: any "yy" op in vim must modify all {anchor => referer}
 "   <= because using <\ x t> on each copied line is too tedious when creating
 "   cross-refs for tasks and mentionings
-nnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(0,xtref#invert(xtref#get(0)))<CR>
-xnoremap <Plug>(xtref-toggle) :<C-u>call xtref#replace(1,xtref#invert(xtref#get(1)))<CR>
+nnoremap <Plug>(xtref-invert) :<C-u>call xtref#replace(0,xtref#invert(xtref#get(0)))<CR>
+xnoremap <Plug>(xtref-invert) :<C-u>call xtref#replace(1,xtref#invert(xtref#get(1)))<CR>
 
 
 " OBSOL:  <LocalLeader>...
@@ -293,9 +294,10 @@ map <silent> [Xtref]<Delete> <Plug>(xtref-delete)
 
 map <silent> [Xtref]a <Plug>(xtref-new-append)
 map <silent> [Xtref]i <Plug>(xtref-new-insert)
-map <silent> [Xtref]d <Plug>(xtref-replace-date)
-map <silent> [Xtref]r <Plug>(xtref-refresh)
-map <silent> [Xtref]t <Plug>(xtref-toggle)
+map <silent> [Xtref]d <Plug>(xtref-replace-datetime)
+map <silent> [Xtref]r <Plug>(xtref-invert)
+map <silent> [Xtref]R <Plug>(xtref-refresh)
+map <silent> [Xtref]t <Plug>(xtref-replace-datetime)
 map <silent> [Xtref]y <Plug>(xtref-yank-refer)
 map <silent> [Xtref]Y <Plug>(xtref-yank-anchor)
 
