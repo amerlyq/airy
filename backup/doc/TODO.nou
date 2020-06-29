@@ -29,6 +29,12 @@ CMP
       https://github.com/restic/others
     Roundup of remote encrypted deduplicated backups in Linux | The Changelog ⌇⡞⣮⡗⣮
       https://changelog.complete.org/archives/9353-roundup-of-remote-encrypted-deduplicated-backups-in-linux
+  PERF
+    gilbertchen/benchmarking: A performance comparison of Duplicacy, restic, Attic, and duplicity ⌇⡞⣺⠨⢃
+      https://github.com/gilbertchen/benchmarking
+    Big Comparison - Borg vs Restic vs Arq 5 vs Duplicacy vs Duplicati - Comparison - Duplicati ⌇⡞⣺⠩⠃
+      https://forum.duplicati.com/t/big-comparison-borg-vs-restic-vs-arq-5-vs-duplicacy-vs-duplicati/9952
+      https://f000.backblazeb2.com/file/backblaze-b2-public/Backup_Tool_Comparison.xlsx
   VIZ
     2020-06-20 [X] Backup - Freehackers ⌇⡞⣮⡁⣚
       https://www.freehackers.org/Backup
@@ -75,6 +81,95 @@ CMP
     ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}` from cron.
     (/etc/rsync-backup-filter is just "- lost+found" plus system-specific
     exclusions.)
+  G: restic vs borg
+    [⡞⣺⠄⢫] 2018-01-- Borg or Restic? – stickleback.dk ⌇⡞⣺⠄⢣
+      https://stickleback.dk/borg-or-restic/
+        borg -only:local/ssh- +store-key-outside+
+        restic +multi-PC+ -NEED:RAM>100MiB- -SLOW:verification- -SLOW:old.pruning.+3h-
+    [⡞⣺⠉⣨] 2019-11-- Why should I choose restic over borg? · Issue #1875 · restic/restic ⌇⡞⣺⠉⣤
+      https://github.com/borgbackup/borg/issues/3954
+      https://github.com/restic/restic/issues/1875
+        20TiB :: restic -- much longer, lot of RAM, cache file >10G
+          BUT: backends :: S3 or Backblaze as (borg doesnt support this)
+        borg -- much faster, uses almost no memory
+    [⡞⣺⠠⡩] Comparison with Borg / Shortcomings in Restic? - Getting Help - restic forum ⌇⡞⣺⠊⢄
+      https://forum.restic.net/t/comparison-with-borg-shortcomings-in-restic/1690
+        ? slow incremental backup restic=10x of borg
+        ~ 2020-04-- restic is very slow at least on my machines
+    [⡞⣺⠠⡯] Do incremental off-site backups require to download previous backup(s)? - Getting Help - restic forum ⌇⡞⣺⠠⡛
+      https://forum.restic.net/t/do-incremental-off-site-backups-require-to-download-previous-backup-s/2753/8
+      WEB: cold storage
+        C14 Cold Storage | The World’s First Alternative S3 Glacier - Scaleway ⌇⡞⣺⠠⡺
+          https://www.scaleway.com/en/c14-cold-storage/
+            + 75GB free storage
+        S3-Compatible Object Storage - Scaleway ⌇⡞⣺⠠⡷
+          https://www.scaleway.com/en/object-storage/
+            + 0.01€/GB for ingress/egress traffic
+        B2 Cloud Storage: The Lowest Cost On Demand Storage As a Service ⌇⡞⣺⠡⠅
+          https://www.backblaze.com/b2/cloud-storage.html
+            + 6$/month / unlimited
+          How to configure Backblaze B2 with Duplicity on Linux – Backblaze Help ⌇⡞⣺⠡⡰
+            https://help.backblaze.com/hc/en-us/articles/115001518354-How-to-configure-Backblaze-B2-with-Duplicity-on-Linux
+    [_] READ(⡞⣺⠥⣷) REQ Reimplementation of prune by aawsome · Pull Request #2718 · restic/restic ⌇⡞⣺⠥⣯
+      https://github.com/restic/restic/pull/2718
+    [⡞⣺⠦⢎] Strategy for frequent backups of infrequently changing files? - Getting Help - restic forum ⌇⡞⣺⠦⢌
+      https://forum.restic.net/t/strategy-for-frequent-backups-of-infrequently-changing-files/2811/5
+    [⡞⣺⠪⢻] Slow recovery speed - Getting Help - restic forum ⌇⡞⣺⠪⢮
+      https://forum.restic.net/t/slow-recovery-speed/2771/8
+      ::: solve slow initialization step by separating multirepo to multiple small repos for each backup target.
+      [⡞⣺⡐⢓] ALSO: Giving up on multiple backups to same B2 repo, using one repo per backup - Getting Help - restic forum ⌇⡞⣺⡐⡯
+        https://forum.restic.net/t/giving-up-on-multiple-backups-to-same-b2-repo-using-one-repo-per-backup/948/6
+    [⡞⣺⠫⢐] Running restic in docker always causes files to be identified as new - Getting Help - restic forum ⌇⡞⣺⠫⢋
+      https://forum.restic.net/t/running-restic-in-docker-always-causes-files-to-be-identified-as-new/2757/5
+      + USE: --host mydevice1 to be independent from host name (like in docker hash-like)
+    [⡞⣺⠰⠦] is borg backup a good restic alternative ? : linuxquestions ⌇⡞⣺⠰⠎
+      https://www.reddit.com/r/linuxquestions/comments/f4pbxd/is_borg_backup_a_good_restic_alternative/fhs8exy/
+      WEB:
+        Cloud Storage for Offsite Backups - borg support ⌇⡞⣺⠰⡚
+          https://www.rsync.net/products/borg.html
+            + 0.015$/GB/month (<10TiB) => 100GB for $18/year
+            ALT: 82$/month for 10TiB (+physical delivery on demand+)
+            ++ SSH access
+        BorgBase - Secure hosting for your BorgBackup Repos ⌇⡞⣺⠱⡭
+          https://www.borgbase.com/
+          free :: 10GiB 2 repos
+          100GB for 25$/year
+    [⡞⣺⠳⡃] Borg is hands-down the best backup utility I've used. I also use Borgmatic for s... | Hacker News ⌇⡞⣺⠳⠽
+      https://news.ycombinator.com/item?id=19483426
+      ::: IDEA: rsync(1) from each server to a central backup server and then running restic/borg/whatever on that server
+      WEB:
+        Pricing - Relica ⌇⡞⣺⠴⠠
+          https://relicabackup.com/pricing
+            $10/TB/mo
+    [⡞⣺⡂⠯] CMP: S4E5: "Join the Borg? Restic is Futile" | Sysadministrivia ⌇⡞⣺⠴⡓
+      https://sysadministrivia.com/episodes/S4E5
+    [⡞⣺⡂⣢] Recommendations regarding a *medium* size infrastructure - Features and Ideas - restic forum ⌇⡞⣺⡂⠧
+      https://forum.restic.net/t/recommendations-regarding-a-medium-size-infrastructure/2682
+      + Currently restic is not that fast for multi-TB repositories and therefore splitting helps a lot
+      + restic uses --group-by host,paths by default, hence restic would keep 4 snapshots per host and backup unless told otherwise.
+
+    [⡞⣺⡒⣪] Restic for Android - Getting Help - restic forum ⌇⡞⣺⡆⣗
+      https://forum.restic.net/t/restic-for-android/1492/10
+      + Syncthing to folder and backup "that"
+      + RAM usage=8x of index size
+        https://github.com/restic/restic/issues/2093#issuecomment-439724460
+    [⡞⣺⡒⣫] Forget and prune on two synced repositories - Getting Help - restic forum ⌇⡞⣺⡒⣇
+      https://forum.restic.net/t/forget-and-prune-on-two-synced-repositories/2724/5
+      + whole blob of 3-4MB will be ‘repacked’ due to one unneeded chunk
+    [⡞⣺⡝⢩] "restore" only restores the top level - Getting Help - restic forum ⌇⡞⣺⡜⢐
+      https://forum.restic.net/t/restore-only-restores-the-top-level/2718/4
+      = with --one-file-system Btrfs snapshots are considered different filesystems
+        => only mountpoints will be stored
+    [⡞⣺⡡⢇] Switching Restic Backup Servers - Getting Help - restic forum ⌇⡞⣺⡡⢃
+      https://forum.restic.net/t/switching-restic-backup-servers/2382/2
+      = USE: --group-by path when migrating between hosts
+    [⡞⣺⡢⡺] Restoring one directory from backup restores everything - Getting Help - restic forum ⌇⡞⣺⡢⡴
+      https://forum.restic.net/t/restoring-one-directory-from-backup-restores-everything/2390
+      $ restic -r /media/autoshares/restic/mydata restore 8530cb2a --target / --include /data/yang
+    [_] READ: Questions and thoughts on restic security - revocable keys and cryptoperiods - Features and Ideas - restic forum ⌇⡞⣺⡢⢜
+      https://forum.restic.net/t/questions-and-thoughts-on-restic-security-revocable-keys-and-cryptoperiods/2392/4
+    [_] READ: Is it possible to restore from multiple snapshots at once? - Getting Help - restic forum ⌇⡞⣺⡢⣻
+      https://forum.restic.net/t/is-it-possible-to-restore-from-multiple-snapshots-at-once/2402
 
 
 IDEA:DEV:
@@ -123,6 +218,8 @@ restic
   SRC:(Go): https://github.com/restic/restic
   USE: "master" -- because 0.9.6 has bugs for restoration big files
     https://github.com/restic/restic/releases
+    DLD: restic beta releases (/) ⌇⡞⣺⠩⡣
+      https://beta.restic.net/?sort=time&order=desc
   USAGE: Restic Documentation — restic 0.9.6 documentation ⌇⡞⣱⣿⡊
     https://restic.readthedocs.io/en/stable/
   Streaming backup
@@ -141,6 +238,11 @@ restic
       https://www.thepolyglotdeveloper.com/2017/04/cross-compiling-golang-applications-raspberry-pi/
     SEE: Backups segfault on ARMv7 · Issue #2618 · restic/restic · GitHub ⌇⡞⣱⣸⠱
       https://github.com/restic/restic/issues/2618
+  [⡞⣺⡞⠺] HACK: Is it possible to decrypt restic files from the command line? - Getting Help - restic forum ⌇⡞⣺⡞⠪
+    https://forum.restic.net/t/is-it-possible-to-decrypt-restic-files-from-the-command-line/2363/7
+    $ restic -r /path/to/repo cat masterkey | jq -r .encrypt | base64 -d | xxd -p -c32
+    $ cat packfile | head -c -16 | tail -c +17 | openssl aes-256-ctr -d -iv $(cat packfile | head -c 16 | xxd -p) -K aes-encryption-key-in-hex
+
 
 borg
   SRC:(Python): https://github.com/borgbackup/borg
@@ -214,6 +316,11 @@ TODO:ARCH: single data-distribution diagram (and eventually EVO to integrate eve
 INFO: super-long super-large backups
   [AMA] I'm a consultant with 25 years experience archiving petabytes of data for enormous organizations. Ask me anything about long term archival storage. : DataHoarder ⌇⡞⣮⠪⠠
     https://www.reddit.com/r/DataHoarder/comments/har55c/ama_im_a_consultant_with_25_years_experience/
+  Daybreaker v2.1 (quick and dirty prechorus/chorus reversion edit) by Aurelleah | Aurelleah Everfree | Free Listening on SoundCloud ⌇⡞⣺⠒⢌
+    https://soundcloud.com/aurelleah/daybreaker-v21-quick-and-dirty-prechoruschorus-reversion-edit
+      = repetitive renewal process instead of "eternal solidity"
+      SRC: https://github.com/discourse/discourse
+        SRC: https://forum.restic.net/
   https://digipres.org/ ⌇⡞⣮⠫⡪
   Erasure Coding: Backblaze Open Sources Reed-Solomon Code ⌇⡞⣮⠼⣏
     https://www.backblaze.com/blog/reed-solomon/
