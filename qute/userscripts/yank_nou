@@ -22,6 +22,8 @@ blk=${1-}
 pfx=${2-}
 
 # HACK: timestamp working as xref
+# [_] TRY:FIXME: use link-open time instead of copy-time
+#   i.e. I could open link, read article, and same completed task with two timestamps
 xtref=$(r.vim-xtref)
 
 ## BAD: no easy keyboard-only way to remove accidental selections on page
