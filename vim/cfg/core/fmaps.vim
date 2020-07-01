@@ -38,6 +38,7 @@ endf
 "" Aliases to STD blocks by numbers
 " [ai][wWps] -- whole word, paragraph, sentence itself
 " [ai][()b{}B<>\[\]t'"`] -- content of *brackets*, tags, quotes
+" TODO:ADD: ">><" => ">word<"
 let g:block_aliases = '(()0;{{}9;[[]8;''''1;""2;<<>3'  ";$$4
 for p in ['a', 'i']
   call Map_blocks(p, p, 'ox', 'noremap', '(0;{9;[8;"2;''1;<3')  ";`4

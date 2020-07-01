@@ -22,6 +22,7 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 "   'ALT~ ...' -- marker only (compromise / uncertainty)
 "   'GREN! ...' -- rest of line (unshakable confidence)
 "   '!CYAN! ...' -- whole line from beginning
+" IDEA: use "reverse" attribute for notches starting by ":" e.g. ":RED:"
 
 " DEV: phonetic abbreviations in cyrillic, etc.
 "   iabbr 'туду:' -> 'TODO:'
@@ -33,6 +34,7 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 " TODO: separate doc page with all available notches
 " MAYBE: "TBD" and "WiP" | "MIND" .vs. "CARE" | "THEO"
 " ALSO: OPTM|optim(al/um) + OPTZ|optimize
+" NOTE: PA=PRIA BUT $ r.dict-regex '^p\S*\sa\S*$'
 let s:patterns = [
   \ ['Err', 196, '#ff2525', 'RED|Qs|RQ|REQUIRE|ERR%(OR)?|BUG|REGR%(ESSION)?|XXX|WTF|BAD|FAIL%(ED|URE)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'GREN|ADD|NEED|FIND|ALSO|BET%(TER)?|E\.G|e\.g|ADVICE'],
@@ -44,7 +46,7 @@ let s:patterns = [
   \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|TBD|WiP|WIP|FIX%(ME)?|WARN%(ING)?|ATTN?|ATTENTION|REM%(OVE)?|OPTS|OPTIONS'],
   \ ['Did', 243, '#767676', 'GREY|DONE|FIXED|EXPL%(AIN)?|TEMP%(ORARY)?|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR|FORMAT|FMT'],
   \ ['Sem', 163, '#df40af', 'ex:|SEIZE|EVOL?|EVOLVE|EVOLUTION'],
-  \ ['Hdr',  27, '#004fff', 'OFFL?|OFCL|OFFICIAL|DRAW|WF|WORKFLOW'],
+  \ ['Hdr',  27, '#004fff', 'OFFL?|OFCL|OFFICIAL|DRAW|WF|WORKFLOW|PRIA|PRIOR_ART'],
   \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|DEMO|USAGE|DFL|DEFAULT|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP|DEPS|DEPENDS'],
   \]
 
