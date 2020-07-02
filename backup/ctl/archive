@@ -143,6 +143,7 @@ make_backup etc <<< /etc ||:      # = system-wide user configs (skipping passwor
 # ALSO: defects analysis reports
 # find /work/{bug,task,task.done,task.seized} -name '*.nou' -print0 | tar -cvzf analysis-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.gz --null -T -
 
+make_backup itemlists <<< ~/backup-lists ||:
 
 ## NOTE: save lists to be able to restore same hierarchy on demand e.g. to remember active games
 # [_] MAYBE:DEV also save some magnet-donkey-torrent-like hash-sum
@@ -153,6 +154,7 @@ if ((!${#args[@]})) || [[ " ${args[*]} " =~ " flist " ]]; then
     # [[ -d $d ]] || return 0
     fl=$(realpath -m "$dtmp/$d")
     mkdir -p "${fl%/*}"
+    # [_] BET: include mod-time '%y\t%T+\t%s\t%p\n' to estimate time of my last action/attention to each item
     find "$d" -not -readable -prune -o -printf '%y\t%s\t%P\n' > "$fl"
   }
   gather_flist /games  # /games and /opt must backup filelist instead of content

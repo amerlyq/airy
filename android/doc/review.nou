@@ -4,4 +4,29 @@ Review downloaded android apps (mostly FOSS)
 
 %%% Note-taking
 
-...
+Squid ⌇⡞⣽⣰⣤
+  FAIL: backup to ./squid.bak may stop working anytime on upgrade
+  BUT export notes to .pdf one-by-one is very time-consuming
+
+
+%%% Task-managing
+
+Any.do ⌇⡞⣽⣨⣫
+  Backup list of current tasks to text file
+    #sync :: menu => share => ./0/@/backup
+  [_] FIND: history of done tasks
+  [_] CHECK: how to sync it directly to #desktop BET: by some REST API
+    WEB:OFF: https://desktop.any.do/agenda
+    TRY:WEB:API: https://github.com/davoam/anydo-api
+    INTEG: https://anydo.uservoice.com/forums/143587-general/suggestions/9092749-integration-api-third-parties
+
+
+%%% Sync-settings
+
+MyAppList ⌇⡞⣽⣪⠴
+  2020-06-15 [X] CHECK: how to export list directly through google web service or by some installed app
+    ::: только .json с названиями, но без .com идентификаторов
+      OFF: https://takeout.google.com/settings/takeout
+      TALK: https://android.stackexchange.com/questions/204752/how-to-export-a-list-as-text-of-all-play-store-apps-that-i-have-ever-installed/204765
+    ::: USE: "My App List" com.projectsexception.myapplist
+  #backup #list :: on change #auto to ./0/@/backup/myapps/*.xml OR on demand to ./*.{html,txt}
