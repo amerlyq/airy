@@ -28,3 +28,8 @@ Snippets
   UID 1002 but not for the rest of the world, have a file size above 30MB
   and have been modified within the last month
   ; ls -l **/([^A-Z[:digit:]])##(#q.x^X^u1002Lm+30mM-1)
+
+
+HACK
+  Move batch of relative symlinks into another directory
+    $ cd /path/to/dst && ln -srvLt. -- ../dir/with/relsymlinks/*(@)
