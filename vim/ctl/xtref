@@ -167,6 +167,7 @@ parse_xtref(){ local a
   # MAYBE: always use "nano" as inner xts -- and simply strip trailing spaces ${%%⠀*} to reduce 8char to 4-6-7 char
   # [_] FIXME: "nano" parsing is "8)" -- must match branches by value itself, not length only
   # DEV:HACK: jump <g[> using only first 4-char (ignoring nanoseconds)
+  # VIZ:NICE: date-time separators /[+T=_ ]/
   case ${#a}
   in 28|31|34) xts=$(printf '%08x' $(date +'%s %N' --date="$a"))         # nano = 2019-11-08T01:53:33.407997535+0200
   ;; 24) xts=$(printf '%08x' "$(date +%s --date="$a")")                 #  iso = 2020-02-03T22:19:31+0300

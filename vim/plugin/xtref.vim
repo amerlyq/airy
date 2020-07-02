@@ -41,7 +41,12 @@ fun! xtref#vsel()
   if len(lines) == 0
       return ''
   endif
-  let lines[-1] = lines[-1][: cend - (&selection == 'inclusive' ? 1 : 2)]
+  " OLD:BUG:(unicode): let lines[-1] = lines[-1][: cend - (&selection == 'inclusive' ? 1 : 2)]
+  "   FIXME: ±1 must be proportional to size of last char
+  " INFO: cend is position _before_ right edge (w/o last unicode char)
+  "   -- you must extend it by charlen (of last unicode char in selection)
+  let uc_len = strchars(lines[-1][:cend - 2]) + 1
+  let lines[-1] = strcharpart(lines[-1], 0, uc_len)
   let lines[0] = lines[0][cbeg - 1:]
   return join(lines, "\n")
 endf
@@ -140,25 +145,38 @@ fun! xtref#invert(xloci)
   return (pfx ==# a ? r : a) . strcharpart(x, 1)  " fnameescape()
 endf
 
+fun! xtref#cvt(fmt, xts)
+  "" ALT:PERF:(native)
+  " let hexts = substitute(x, '.', '\=printf("%02x",and(char2nr(submatch(0)),0xff))', 'g')
+  " return strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
+  return systemlist('r.vim-xtref -nf '.a:fmt.' -- '.shellescape(a:xts))[0]
+endf
+
 "" NICE: use "r.vim-xtref" as SPOT
 " VIZ:(fmt): braille hex dt date utc unix z85 z85r
 fun! xtref#to_fmt(fmt, xloci)
   let [xts, off] = a:xloci
   let [pfx, x] = [strcharpart(xts, 0, 1), strcharpart(xts, 1)]
   let [a,r] = g:xtref.markers
-  if pfx !=# a && pfx !=# r
-    echoe "Unsupported xtref format"
-    return xts
+
+  " [_] THINK: remove this switch-case as whole and depend on error from "r.vim-xtref"
+  if xts =~# '\v^'. s:r_braille || xts =~# '^20\d\d'
+    return xtref#cvt(a:fmt, xts)
+  elseif pfx ==# '['
+    " NOTE: task-ts conversion :: [⡞⣾⠂⢐] <=> [20XX-...]
+    let [x, sfx] = (stridx(x, ']') < 0) ? [x, ''] : split(x, '\ze\]')
+    return pfx . xtref#cvt(a:fmt, x) . sfx
+  elseif pfx ==# a || pfx ==# r
+    return pfx . xtref#cvt(a:fmt, xts)
   endif
-  "" ALT:PERF:(native)
-  " let hexts = substitute(x, '.', '\=printf("%02x",and(char2nr(submatch(0)),0xff))', 'g')
-  " return pfx . strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
-  return pfx . systemlist('r.vim-xtref -nf '.a:fmt.' -- '.shellescape(xts))[0]
+
+  echoe "Unsupported xtref format"
+  return xts
 endf
 
 "" NOTE: cycle loop :: any => braille | braille => iso8601
 fun! xtref#to_fmt_cycle(fmt, xloci)
-  echom a:xloci[0]
+  " echom a:xloci[0]
   let fmt = (a:xloci[0] =~# '\v'.s:r_braille) ? a:fmt : 'braille'
   " echom fmt
   return xtref#to_fmt(fmt, a:xloci)
