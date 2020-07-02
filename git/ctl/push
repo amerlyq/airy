@@ -1,7 +1,9 @@
 #!/bin/sh -eu
 cd "${1:-$PWD}"
-branch=$(git rev-parse --abbrev-ref HEAD)
-ahead=$(git rev-list HEAD...origin/"$branch" --ignore-submodules --count)
+# SRC: https://stackoverflow.com/questions/171550/find-out-which-remote-branch-a-local-branch-is-tracking
+# ALT:(silent): $ git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)"
+rbranch=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
+ahead=$(git rev-list HEAD..."$rbranch" --ignore-submodules --count)
 ((ahead)) || exit 1
 # FIXME:(sanity-check): exit with error (don't push)
 #   * if any (still local) commit has prefix ~ /^(fix|fixup|tmp|temp):|^.?\w+!/
