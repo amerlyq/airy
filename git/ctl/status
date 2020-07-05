@@ -3,6 +3,11 @@ setopt pipefail 2>/dev/null
 # BUG: git-info don't work if '#!/bin/zsh -e'
 # USAGE: WCOL=20 r.git-status [repos...]
 
+# ERR: branch w/o remote
+# CASE: $ cd ~/aura/btrx/beatrix && gbc tmp
+# git-info:171: ahead_and_behind[(w)1]: parameter not set
+#         .   18 d  2020-07-02 21:33:56
+
 cwd=$PWD
 repos=( $@ )
 names=( ${${^${^repos##$cwd}#/}:-.} )
