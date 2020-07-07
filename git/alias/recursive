@@ -14,3 +14,15 @@ alias Gdw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
 alias Gl.='r.git-all-pull'
 alias Gl='Gl. ~/aura'
 alias Gp='r.git-all-push ~/aura'
+
+# {{{ state analysis
+alias G.="find -type d -name .git -prune -printf '%h\\n'"
+alias G_="find -type d -exec test -d {}/.git \\; -prune -o -not -type d -printf '%P\\n'"
+alias Go="find -type d -name .git -prune -execdir sh -c 'git ls-files --others --ignored --exclude-standard --directory -z | grep -vzE \"(&|_build|__pyc)[^/]+/?$\" | xargs -0rn1 printf \"%s/%s\\n\" \"\$PWD\"' \\;"
+alias Gref="find -name '&*' -printf '%P\\n'"
+# }}}
+
+
+# SEE:ALT:
+# aur/git-machete 2.14.0-1 (+0 0.00%)
+#     Probably the sharpest git repository organizer & rebase/merge workflow automation tool you've ever seen

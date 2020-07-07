@@ -18,7 +18,7 @@ noremap <unique> gH  :<C-U>bfirst<CR>
 noremap <unique> gL  :<C-U>blast<CR>
 noremap <unique> [Frame]` :<C-U>b#<CR>
 
-" Close all but this one ::: ALT: :%bd|e#
+" Close all but this one ::: ALT: :%bd|e# OR: %bd|e#|bd#
 com! -bar -nargs=0 BufOnly call s:bufonly()
 
 fun! s:bufonly()

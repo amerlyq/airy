@@ -45,7 +45,7 @@ let s:patterns = [
   \ ['Inf',  38, '#00afdf', 'CYAN|INFO?|SRC|VARs?|VIZ|ALGO?|SEQ%(UENCE)?|HYPO?|CONTR?|CONTRACT|IMPL|ARCH|PERF%(ORMANCE)?|TALK|SECU%(RE|RITY)?|RELI%(ABILITY)?|RELY|MMAP'],
   \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|TBD|WiP|WIP|FIX%(ME)?|WARN%(ING)?|ATTN?|ATTENTION|REM%(OVE)?|OPTS|OPTIONS'],
   \ ['Did', 243, '#767676', 'GREY|DONE|FIXED|EXPL%(AIN)?|TEMP%(ORARY)?|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR|FORMAT|FMT'],
-  \ ['Sem', 163, '#df40af', 'ex:|SEIZE|EVOL?|EVOLVE|EVOLUTION'],
+  \ ['Sem', 163, '#df40af', 'ex:|SEIZE|BUMP|EVOL?|EVOLVE|EVOLUTION'],
   \ ['Hdr',  27, '#004fff', 'OFFL?|OFCL|OFFICIAL|DRAW|WF|WORKFLOW|PRIA|PRIOR_ART'],
   \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|DEMO|USAGE|DFL|DEFAULT|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP|DEPS|DEPENDS'],
   \]
@@ -71,6 +71,7 @@ endfunction
 
 function! s:everywhere_define(patts)
   let locals = 'term=bold cterm=bold gui=bold'
+  " CHG: use fixed syntax file -- primary hi "notchColor{Red,…}" and linked hi "nou<Worflow><State>"
   for [k,c,g,p] in a:patts  "term=bold,underline guifg=#E01B1B
     exec printf('hi! Notch%s %s ctermfg=%s guifg=%s', k, locals, c, g)
   endfor
