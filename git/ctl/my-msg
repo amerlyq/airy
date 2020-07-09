@@ -236,6 +236,7 @@ $stat{del} = sum0 (map { $_->{del} =~ /-/ ? 0 : $_->{del} } values %diff);
 my %tops;
 foreach my $src (keys %diff) {
     my $i = index($src, "/");
+    # IDEA: use major :/file name as feature e.g. for ./ctl :: [.] => [ctl] dev smth
     my $top = $i == -1 ? "." : substr($src, 0, $i);
     # FIXME: if contains spaces and longer than 20 chars -- crop to "[Aaljsdljljsdf…] ..."
     ## BAD: counts files, not diff

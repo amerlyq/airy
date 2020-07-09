@@ -265,6 +265,10 @@ xnoremap z]  :<C-u>exe "tsel" xtref#invert(xtref#get(1))<CR>
 noremap <silent>  [x  :<C-u>let @/='\v'.g:xtref.r_anchor<CR>n
 noremap <silent>  ]x  :<C-u>let @/='\v'.g:xtref.r_refer<CR>n
 
+"" FAIL: conflicts with [Xtref] TRY:USE: unicode brakets instead of Ascii for [Xtref] .im. alias
+" noremap <silent>  [X  :<C-u>let @/='\v'.g:xtref.r_anchor<CR>N
+" noremap <silent>  ]X  :<C-u>let @/='\v'.g:xtref.r_refer<CR>N
+
 
 nnoremap <Plug>(xtref-new-insert) i<C-r>=xtref#new()<CR><Esc>
 

@@ -1,7 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst festival festival-english festival-us
+# ALSO: speech-dispatcher MAYBE for "snow"
+pkg_inst festival
+pkg_inst -d festival-english festival-us
 
 ## Some say that HTS voices for Festival are the best ones freely available
 ## BUT: festival-us has cmu_us_slt_arctic_hts

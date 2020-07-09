@@ -12,6 +12,8 @@
 "   https://www.fluentcpp.com/2019/01/01/todo_before-clean-codebase-2019/
 " IDEA: use similar concept of dates distinguishing -- VIZ:(date)={created,planned,completed}
 " FIND:(other used ones): $ grep -ohrE '\b[[:upper:]]{3,}:' --include '*.nou' SC
+" IDEA: arbitrary keywords -- surrounded or prefixed by ":" or some unicode e.g. :BlockedBy:
+"   NICE: similar to .rst syntax of control keywords BAD= their hi! may conflict
 
 if &cp||exists('g:loaded_notches')|finish|else|let g:loaded_notches=1|endif
 if !has('autocmd') || v:version <= 701 | finish | endif
@@ -27,6 +29,7 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 " DEV: phonetic abbreviations in cyrillic, etc.
 "   iabbr 'туду:' -> 'TODO:'
 "   HACK:(low-level): -> LOVEHACK :)
+iabbrev  туду:  TODO:
 
 " MAYBE:ALSO: treat whole /:([^)]+):/ as special "notch" word with hi! bg
 " IDEA: add dark bg for all notches to standout from surrounding text even more
@@ -44,7 +47,7 @@ let s:patterns = [
   \ ['Dev',  33, '#0087ff', 'BLUE|DEV%(ELOP)?|CFG|ENH%(ANCE)?|HACK|NICE|RFC|SEP%(ARATE)?|SPL%(IT)?|DECI%(DE)?'],
   \ ['Tbd', 169, '#ff5faf', 'PINK|TODO|CHECK|TRY|MOVE|NOT|REQ%(UEST)?|MAYBE|WAIT%(ING)?'],
   \ ['Inf',  38, '#00afdf', 'CYAN|INFO?|SRC|VARs?|VIZ|ALGO?|SEQ%(UENCE)?|HYPO?|CONTR?|CONTRACT|IMPL|ARCH|PERF%(ORMANCE)?|TALK|SECU%(RE|RITY)?|RELI%(ABILITY)?|RELY|MMAP'],
-  \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|TBD|WiP|WIP|FIX|FIXME|FIXUP|WARN%(ING)?|ATTN?|ATTENTION|REM%(OVE)?|OPTS|OPTIONS'],
+  \ ['Fix', 202, '#ff5f00', 'ORNG|BUT|DONT|TBD|WiP|WIP|FIX|FIXME|FIXUP|WARN%(ING)?|ATTN?|ATTENTION|REM%(OVE)?|OPTS|OPTIONS|BLK|BLOCK|BLOCKED|BlockedBy'],
   \ ['Did', 243, '#767676', 'GREY|DONE|FIXED|EXPL%(AIN)?|TEMP%(ORARY)?|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR|FORMAT|FMT'],
   \ ['Sem', 163, '#df40af', 'ex:|SEIZE|BUMP|EVOL?|EVOLVE|EVOLUTION'],
   \ ['Hdr',  27, '#004fff', 'OFFL?|OFCL|OFFICIAL|DRAW|WF|WORKFLOW|PRIA|PRIOR_ART'],
