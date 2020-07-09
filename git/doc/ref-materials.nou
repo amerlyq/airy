@@ -1,0 +1,37 @@
+% USAGE
+SEE※⡟⠃⡟⣙
+
+Overview / filtering
+  [X] TODO: add my lovely tree(1) ZSH alias "TR" with colorizing etc.
+    $ … | LC_ALL=C tree --noreport -aAC --dirsfirst --fromfile=-
+  All repos tree
+    $ find -type d -name .git -prune -printf '%h\n' TR
+    # $ r.git-tree
+  Wild files (outside of repos)
+    $ find -type d -exec test -d {}/.git \; -prune -o -not -type d -printf '%P\n' TR
+  All ignored files
+    $ find -type d -name .git -prune -execdir sh -c 'git ls-files --others --ignored --exclude-standard --directory -z | xargs -0rn1 printf "%s/%s\n" "$PWD"' \; TR
+    # $ r.git-find | parallel -0 -k 'r.git-status {} && git -C {} -c color.status=always status -s --ignored=traditional | grep --color=never -E ".?[!]\\B" ||true'
+  Remaining (untypical) ignored files
+    $ find -type d -name .git -prune -execdir sh -c 'git ls-files --others --ignored --exclude-standard --directory -z | grep -vzE "(&|_build|__pyc)[^/]+/?$" | xargs -0rn1 printf "%s/%s\n" "$PWD"' \; TR
+
+
+Manipulate
+  Ref-materials :: find, cmp, copy
+    $ find -name '&*' -printf '%P\n' TR
+    Append-only: $ rsync --dry-run -amPvh --out-format='%t %i %f' --include '*/' --include='**/&*/**' --exclude='*' -- '/data/#fractal/aura/btrx/beatrix/' /home/amer/aura/btrx/beatrix
+    ERR: $ rsync --dry-run --delete -aPvh --include '*/' --include='**/&*/**' --exclude='*' -- '/data/#fractal/aura/btrx/beatrix/' /home/amer/aura/btrx/beatrix
+      # --backup --backup-dir="../!rsync-$(date +%Y%m%d_%H%M%S)" --remote-option=--one-file-system
+    FAIL:(diff) $ find a b -type f ! -name 'crazy' -printf '%f\n' | diff -r a b -X -
+
+
+Pure repo statistics ⌇⡟⠇⢚⠓
+  Size of tracked files only (w/o untracked or ignored)
+    $ git ls-files | sed 's/^/HEAD:/' | git cat-file --batch-check='%(objectsize)' | awk '{s+=$0}END{print s}'
+  Size of all files (+untraked+ -ignored-)
+    $ git ls-files --cached --others -z | command du -sch --apparent-size --files0-from=- | awk 'END{print$1}'
+  SEE: alt ways to measure git size only
+    Measuring the many sizes of a Git repository - The GitHub Blog ⌇⡟⠃⡙⡲
+      https://github.blog/2018-03-05-measuring-the-many-sizes-of-a-git-repository/
+    filesize - Find size of Git repository - Stack Overflow ⌇⡟⠃⡙⡯
+      https://stackoverflow.com/questions/8185276/find-size-of-git-repository
