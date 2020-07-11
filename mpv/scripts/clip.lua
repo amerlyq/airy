@@ -75,10 +75,11 @@ function h_write()
     return
   end
   show_status("info", "sent to encoding")
+  -- [_] BET: create hidden tmux session to allow parallel enconding
   local res = utils.subprocess({
     cancellable = false, args = { "r.ffmpeg",
       tostring(mp.get_property_native("path")),
-      tostring(g.A), tostring(g.B)
+      tostring(g.A), tostring(g.B), 'webm'
   }})
   if res["error"] ~= nil then
     show_status("error", "Failed("..res["error"]..") encoding: "..res["stdout"])

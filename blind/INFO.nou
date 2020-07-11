@@ -1,2 +1,27 @@
 ALSO: dyne/frei0r: A large collection of free and portable video plugins
   https://github.com/dyne/frei0r
+
+Tools
+  OFF: Pitivi, a free and open source video editor for Linux ⌇⡟⠉⢅⢍
+    http://www.pitivi.org/
+  OFF: Shotcut - Home ⌇⡟⠉⢅⢤
+    https://shotcut.org/
+  CMP: 6 free and open source video editing tools | Opensource.com ⌇⡟⠉⢅⢟
+    https://opensource.com/life/15/1/current-state-linux-video-editing
+
+
+Thumbnail sheets / collage
+  How to Create Thumbnail Sheets for Your Videos in Linux ⌇⡟⠉⢅⣁
+    https://www.maketecheasier.com/create-thumbnail-sheets-for-videos-linux/
+    $ ffmpeg -ss 3 -i "/path/to/video/file.mp4" -frames 5 -vf "select=not(mod(n\,3000)),scale=320:240,tile=4x3" -vsync vfr -q:v 10 image-sheet-filename_%03d.jpg
+      = Total Frames In Your Video / Number Of Tiles In A Sheet / Number Of Image Sheets You Want
+        Use the value from the “mod(n\,RESULTS)” part of the command.
+  https://gist.github.com/zmwangx/11275000
+  jpeg - Meaningful thumbnails for a Video using FFmpeg - Super User ⌇⡟⠉⢇⡐
+    https://superuser.com/questions/538112/meaningful-thumbnails-for-a-video-using-ffmpeg
+    HACK: generate many >> images, compress to .jpg and pick largest size -- to skip monotonic black/white ones
+      https://superuser.com/questions/538112/meaningful-thumbnails-for-a-video-using-ffmpeg#comment1298658_608125
+    $ ffmpeg -ss 3 -i input.mp4 -vf "select=gt(scene\,0.4)" -frames:v 5 -vsync vfr -vf fps=fps=1/600 out%02d.jpg
+  |aur/vcsi|
+    $ vcsi --width=1200 --grid=3x7 --metadata-position=hidden --output='preview.jpg' -- video.mp4
+  |aur/mtn-git|

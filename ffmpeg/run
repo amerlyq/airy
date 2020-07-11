@@ -1,26 +1,57 @@
-#!/bin/bash -e
+#!/bin/bash
 # USAGE: [-][<HH>:]<MM>:<SS>[.<m>...] OR [-]<S>+[.<m>...]
-fname="$1"
-beg="$2"
-end="$3"
+set -euo pipefail
+fname=$1
+beg=$2
+end=$3
+fmt=${4-}
+ddst=${5-}
 
 src=$(readlink -m "$1")
-[[ -n "$dst" ]] || dst="${src%/*}/fl-clip"
-mkdir -p "$dst"
+[[ -n $ddst ]] || ddst="${src%/*}/fl-clip"
+mkdir -p "$ddst"
 
-path="$dst/${fname##*/}"
-sfx=${beg%.*}; sfx="_${sfx//:}"
-path="${path%.*}${sfx}.${path##*.}"
+mkbeg(){ local s=$1 ni=${1%%.*} nf=${1#*.}
+  [[ $nf ]] && nf=${nf:0:1} || nf=0
+  [[ $s =~ : ]] && s=$ni$nf || s=$(printf "%d'%02d%d\n" $((ni / 60)) $((ni % 60)) $nf)
+  echo "$s"
+}
 
-if [[ -e "$path" ]]; then
+mkdur(){ local b=$1 e=$2 d
+  [[ $b =~ : ]] && exit 1  # not implemented :: 01:02:33.123 => 3753.1
+  [[ $e =~ : ]] && exit 1
+  awk -vb="$beg" -ve="$end" 'BEGIN{ printf "%.0f\n", (e-b)*10 }'
+}
+
+path=$ddst/${fname##*/}
+# e.g. 66.4664 80.447033333333 => sfx=,01'064+140
+sfx=$(mkbeg "$beg")+$(mkdur "$beg" "$end")
+path="${path%.*};${sfx}.${path##*.}"
+
+if [[ -e $path ]]; then
     mv -vfT --backup=t "$path" "${path%.*}_${RANDOM}.${path##*.}"
 fi
 
-# https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg
-exec ffmpeg -y -nostdin -i "$fname" \
+# BAD:PERF: webm=57s .vs. mp4=9s
+if [[ $fmt == webm ]]; then
+  # SRC: https://video.stackexchange.com/questions/19590/convert-mp4-to-webm-without-quality-loss-with-ffmpeg
+  ffmpeg -y -nostdin -i "$fname" \
+    -ss "${beg:-00:00}" -to "${end:--00:00}" \
+    -b:v 0 -crf 30 -pass 1 -an -f webm \
+    -passlogfile "$ddst/ffmpeg2pass" /dev/null
+
+  ffmpeg -y -nostdin -i "$fname" \
+    -ss "${beg:-00:00}" -to "${end:--00:00}" \
+    -b:v 0 -crf 30 -pass 2 -f webm \
+    -passlogfile "$ddst/ffmpeg2pass" "${path%.*}.webm"
+
+else
+  # SRC: https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg
+  ffmpeg -y -nostdin -i "$fname" \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
     -c:v libx264 -c:a aac -codec:d copy \
     "$path"
+fi
 
 # BAD: inexact position
 # -codec:v copy -codec:a copy -codec:d copy \
