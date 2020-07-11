@@ -7,10 +7,10 @@ http://st.suckless.org/patches
 + externalpipe | pipe scroll content to shell cmds
 ~ kbd-input    | TEST http://www.leonerd.org.uk/hacks/fixterms/
  ============= |
-- clipboard    | DEPR: copyq
+- clipboard    | DEPR: copyq :: copies primary => clipboard
 - copyurl      | DEPR: externalpipe + xurls
 ? delkey       | THINK
-- disable-b-it | UNUSED
+- disable-b-it | DEPR-BY: no-bold
 - openbsd      | UNUSED
 ~ scrollback   | TRY
 - solarized    | DEPR: nvim/tmux + true_color
@@ -19,6 +19,54 @@ http://st.suckless.org/patches
 ? vertcenter   | THINK
 ? visualbell   | THINK
 ~ multi-font   | TRY:DEV: need porting
+
+
+2020-07-11 ⌇⡟⠉⣰⣱
+  [⡟⠉⣠⢶] alpha-focus-higlight | BAD: I don't like visual irritatons on window switch
+  [⡟⠉⣡⠓] anysize | NICE: centering window by border
+  [⡟⠉⣡⡷] blinking cursor | BAD: visual distraction
+  [⡟⠉⣡⢲] bold is not bright | DEPR-BY: no-bold
+  [⡟⠉⣣⢵] boxdraw | NICE: gapless pseudographics
+  [⡟⠉⣤⢃] desktopentry | UNUSED for my usecase
+  [_] ? dracula | THINK colorscheme ·based-on· solarized
+  [_] ?? externalpipe-signal | THINK shared instance pipe daemon
+  [⡟⠉⣧⢝] fix IME | OBSOL: st=0.8.2+
+    [_] TRY: input digraphs in ZSH / ranger
+  [$] fix keyboard input | DONE= kbd-input
+  [⡟⠉⣧⣜] font2 | DONE= multi-font DEPR-BY: fontconfig is good enough for me
+  [⡟⠉⣧⣫] gruvbox | UNUSED colorscheme
+  [⡟⠉⣨⠬] hidecursor | DONE
+  [⡟⠉⣨⡌] invert | DEPR-BY: solarized
+  [_] iso14755 | TRY: input unicode in ZSH / ranger
+  [_] keyboard select | CMP: tmux yank mode ⌇⡟⠉⣩⠪
+  [_] ligatures | TRY: ligatures in vim ⌇⡟⠉⣩⢵
+  [_] newterm | TRY: spawn new terminal from current CWD CHECK: how it works with tmux ⌇⡟⠉⣩⣰
+  [$] nordtheme | UNUSED colorscheme
+  [⡟⠉⣪⢽] open copied url | DEPR: copyq / vim / manually
+  [$] openbsd | UNUSED
+  [_] osc 10,11,12 | TRY: integ. vim cursor for EN/RU input
+    [_] FIND: change shape on insert
+  [$] palettes | UNUSED
+  [_] relativeborder | TRY: make border thickness depend on DPI
+  [_] right-click-plumb | NICE: context-aware action on right click
+    [_] HACK: change PWD by OSC 7 -- useful for ※⡟⠉⣩⣰
+      https://st.suckless.org/patches/right_click_to_plumb/
+  [_] rightclickpaste | THINK TRY reduce my finger strain from frequent insert
+  [_] scrollback | THINK:CMP: discard tmux and use this patch and ※⡟⠉⣩⠪
+  [_] selectionbg-alpha | WTF
+  [$] selectioncolors | UNUSED not sure if useful
+  [_] spoiler | TRY
+  [_] sync | NICE dynamic latency / support sync-events from tmux
+  [⡟⠉⣮⢗] themed cursor | UNUSED
+  [_] universcroll | CMP: BUG? zsh
+  [_] vertcenter | CMP: boxdraw
+  [_] vim browse | CMP:ALT: keyboard select ※⡟⠉⣩⠪ + NICE: navi/search in history
+  [⡟⠉⣯⢽] visualbell | BAD: visual distraction
+  [_] visualbell2 | NICE: border/indicator instead of whole screen flashing
+  [_] w3m images | CMP: ueberzug BUG: cursor line flicker/delete image
+  [⡟⠉⣰⡽] workingdir | UNUSED: I better cd() there
+  [⡟⠉⣰⢸] xclearwin | UNUSED I don't change bg on the fly
+  [⡟⠉⣰⣙] resources | UNUSED config.h is enough
 
 
 NOTE
@@ -79,16 +127,30 @@ DEV
 
 
 TODO
-  [_] integrate unicode graphics
-    https://st.suckless.org/patches/boxdraw/
+  [⡟⠉⣣⢻] integrate unicode graphics
+    [⡟⠉⣣⢽] https://st.suckless.org/patches/boxdraw/
     REQ:(my): https://github.com/fabrizioschiavi/pragmatapro/issues/160
-  [_] review list of patches (again)
+  [⡟⠉⣰⣱] review list of patches (again)
     https://st.suckless.org/patches
   [_] CHG: modify font size / dpi when moving window between monitors
     => SEE: dunst can detect event of switching monitors
     2018-04-01 [X] DEV: auto-switch font size between monitors with different dpi
   2017-07-18 [X] try replace argbbg by alpha off patch
   2017-07-18 [X] check/compare/update other patches
+    FIND: dev mail list archive: List of Folders ⌇⡟⠉⣍⠥
+      https://lists.suckless.org/dev/
+    WF:
+      $ cd ~/sdk
+      $ gc1 https://git.suckless.org/st && cd st
+      $ gco . && make clean && \rm -f config.h && \rm -f *.orig && \rm -f *.rej
+      $ mkdir -p new
+      $ wget -P new https://st.suckless.org/patches/alpha/st-alpha-0.8.2.diff
+      $ print -l new/st-no_bold_colors-0.8.1.diff new/st-solarized-both-0.8.4.diff new/st-alpha-0.8.2.diff new/st-hidecursor-0.8.3.diff new/st-externalpipe-0.8.2.diff X patch -Np1 -i
+      $ print -l new/my-{config,tmux,xrandr}-0.8.4.diff X patch -Np1 -i
+      # $ patch -Np1 -i new/my-xrandr.diff
+      $ make
+      $ gc.
+      $ git show > new/my-tmux.diff
   [_] add 'vertcenter' patch
   [_] TODO: dld ready-to-use mappings for ZSH, VIM, ranger (OK: nvim)
     [_] <S-CR> and <C-CR> generates rubbish in vim =>  :.,.+22u

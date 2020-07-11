@@ -1,28 +1,27 @@
 pkgname=st-airy-git
 _pkgname=st
-pkgver=0.7.9
+pkgver=0.8.4
 pkgrel=1
 pkgdesc='Simple virtual terminal emulator for X'
 url='http://st.suckless.org/'
 arch=('i686' 'x86_64')
 license=('MIT')
 options=('zipman')
-depends=('libxft')
+depends=('libx11' 'libxft' 'libxrender' 'libxrandr' 'fontconfig' 'freetype2')
 makedepends=('ncurses' 'libxext' 'git')
 epoch=1
 
-source=('git://git.suckless.org/st#commit=1f24bde'
-  no-bold.diff
-  solarized-dual.diff
-  alpha.diff
-  tmux.diff
-  hidecursor.diff
-  externalpipe.diff
-  kbd-input.diff
-  xrandr.diff
-  config.diff
+source=('git://git.suckless.org/st#commit=fa253f0'
+  st-no_bold_colors-0.8.1.diff
+  st-solarized-both-0.8.4.diff
+  st-alpha-0.8.2.diff
+  st-hidecursor-0.8.3.diff
+  st-externalpipe-0.8.2.diff
+  my-config-0.8.4.diff
+  my-tmux-0.8.4.diff
+  my-xrandr-0.8.4.diff
 )
-sha256sums=(SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP)
+sha256sums=(SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP)
 
 provides=("${_pkgname}")
 conflicts=("${_pkgname}")
@@ -59,7 +58,7 @@ prepare() { local f
     fi
   done
 
-  [[ -z ${FONT_ST-} ]] || sed -ri '/^char font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
+  [[ -z ${FONT_ST-} ]] || sed -ri '/^char \*font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
 
   ## SKIP terminfo: /usr/share/terminfo/s/st is owned by ncurses 6.0-4
   sed -i '/\@tic\s/d' Makefile

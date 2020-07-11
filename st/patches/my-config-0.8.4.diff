@@ -6,38 +6,38 @@ index 877afab..16f7260 100644
   *
   * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
   */
--char font[] = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
-+char font[] = "monospace-14";
- int borderpx = 2;
+-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
++static char *font = "monospace-14";
+ static int borderpx = 2;
  
  /*
-@@ -134,8 +134,9 @@ unsigned int cursorshape = 2;
+@@ -176,8 +176,9 @@ unsigned int cursorshape = 2;
   * Default columns and rows numbers
   */
  
--unsigned int cols = 80;
--unsigned int rows = 24;
+-static unsigned int cols = 80;
+-static unsigned int rows = 24;
 +// Set geometry to keep it when doFloat
-+unsigned int cols = 100;
-+unsigned int rows = 30;
++static unsigned int cols = 100;
++static unsigned int rows = 30;
  
  /*
   * Default colour and shape of the mouse cursor
-@@ -164,6 +165,10 @@ MouseShortcut mshortcuts[] = {
+@@ -217,6 +217,10 @@ MouseShortcut mshortcuts[] = {
  #define MODKEY Mod1Mask
  #define TERMMOD (ControlMask|ShiftMask)
  
 +/* THINK: pass more inner vars from st instance */
-+static char *pipe_url[] = { "r.st-pipe", "--url", winid, NULL };
-+static char *pipe_vim[] = { "r.st-pipe", "--vim", winid, NULL };
++static char *pipe_url[] = { "r.st-pipe", "--url", NULL };
++static char *pipe_vim[] = { "r.st-pipe", "--vim", NULL };
 +
- Shortcut shortcuts[] = {
- 	/* mask                 keysym          function        argument */
- 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
+ static Shortcut shortcuts[] = {
+	/* mask                 keysym          function        argument */
+	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
 @@ -178,6 +183,9 @@ Shortcut shortcuts[] = {
  	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+ 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
  	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
- 	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },
 +	{ TERMMOD,              XK_F6,          swapcolors,     {.i =  0} },
 +	{ TERMMOD,              XK_U,           externalpipe,   {.v = pipe_url} },
 +	{ TERMMOD,              XK_space,       externalpipe,   {.v = pipe_vim} },

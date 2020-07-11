@@ -1,0 +1,104 @@
+diff --git a/config.def.h b/config.def.h
+index 8f7b197..f92798a 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -22,6 +22,15 @@ char *utmp = NULL;
+ char *scroll = NULL;
+ char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
+ 
++/* Multiplexer wrapper */
++int use_mux = 1;
++char mux_nm[64] = "";
++char *mux_new[5] = {"/usr/bin/tmux", "new-session", "-s", NULL, "--"};
++char mux_post[] =
++	"tmux list-clients -t \"$MUX_NM\" 2>/dev/null"
++	"| { read -r _ && ! read -r _; }"
++	"&& tmux kill-session -t \"$MUX_NM\"";
++
+ /* identification sequence returned in DA and DECID */
+ char *vtiden = "\033[?6c";
+ 
+diff --git a/st.c b/st.c
+index 18341c5..e8e669c 100644
+--- a/st.c
++++ b/st.c
+@@ -710,6 +710,16 @@ execsh(char *cmd, char **args)
+ 	signal(SIGTERM, SIG_DFL);
+ 	signal(SIGALRM, SIG_DFL);
+ 
++	if (use_mux) {
++		int i = LEN(mux_new), j = 0;
++		while(args[j++]);
++		char *margs[i + j];
++		while(j--) { margs[i + j] = args[j]; }
++		while(i--) { margs[i] = mux_new[i] ? mux_new[i] : mux_nm; }
++		execvp(mux_new[0], margs);
++		_exit(1);
++	}
++
+ 	execvp(prog, args);
+ 	_exit(1);
+ }
+@@ -945,6 +955,11 @@ ttyresize(int tw, int th)
+ void
+ ttyhangup()
+ {
++	if (use_mux) {
++		setenv("MUX_NM", mux_nm, 1);
++		if (system(mux_post) != 0)
++			fprintf(stderr, "mux_post execution error\n");
++	}
+ 	/* Send SIGHUP to shell */
+ 	kill(pid, SIGHUP);
+ }
+diff --git a/st.h b/st.h
+index 13203fc..11d86bd 100644
+--- a/st.h
++++ b/st.h
+@@ -116,6 +116,10 @@ char *xstrdup(char *);
+ extern char *utmp;
+ extern char *scroll;
+ extern char *stty_args;
++extern int use_mux;
++extern char mux_nm[64];  /* BAD: ugly duplication */
++extern char *mux_new[5];
++extern char mux_post[];
+ extern char *vtiden;
+ extern wchar_t *worddelimiters;
+ extern int allowaltscreen;
+diff --git a/x.c b/x.c
+index aff8793..684311c 100644
+--- a/x.c
++++ b/x.c
+@@ -2027,7 +2027,7 @@ usage(void)
+ 	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
+ 	    " [-n name] [-o file]\n"
+ 	    "          [-T title] [-t title] [-w windowid]"
+-	    " [[-e] command [args ...]]\n"
++	    " [-m|-M] [[-e] command [args ...]]\n"
+ 	    "       %s [-aiv] [-c class] [-f font] [-g geometry]"
+ 	    " [-n name] [-o file]\n"
+ 	    "          [-T title] [-t title] [-w windowid] -l line"
+@@ -2071,6 +2071,12 @@ main(int argc, char *argv[])
+ 	case 'l':
+ 		opt_line = EARGF(usage());
+ 		break;
++	case 'm':
++		use_mux = 1;
++		break;
++	case 'M':
++		use_mux = 0;
++		break;
+ 	case 'n':
+ 		opt_name = EARGF(usage());
+ 		break;
+@@ -2095,6 +2101,9 @@ run:
+ 	if (!opt_title)
+ 		opt_title = (opt_line || !opt_cmd) ? "st" : opt_cmd[0];
+ 
++	if (use_mux) {
++		snprintf(mux_nm, sizeof(mux_nm), "%.43s-%d", (opt_name ? opt_name : "st"), getpid());
++	}
+ 	setlocale(LC_CTYPE, "");
+ 	XSetLocaleModifiers("");
+ 	cols = MAX(cols, 1);
