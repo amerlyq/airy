@@ -21,6 +21,7 @@ call dein#add('embear/vim-localvimrc', {'lazy': 0,
 " CHG: \ 'on_map': '<Leader>cd',
 call dein#add('airblade/vim-rooter', {
   \ 'on_cmd': 'Rooter',
+  \ 'on_func': 'FindRootDirectory',
   \ 'hook_post_source': "
 \\n   let g:rooter_patterns += ['.pjroot', '.agignore']
 \", 'hook_source': "

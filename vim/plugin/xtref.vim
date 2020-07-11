@@ -206,7 +206,7 @@ fun! xtref#ctags(root, ...)
   if !executable('ctags')| echoerr "Not found in PATH: ctags(1)" | return |en
   let dst = shellescape(get(a:, 1, g:xtref.tagfile))
   let _ = join(xtref#call_at(a:root, 'systemlist', 'r.vim-xtref -tr -- -o '.dst), '\n')
-  echom "Done: gen xtref tags for ". a:root
+  echom 'DONE: gen '. g:xtref.tagfile .' for '. a:root
 endf
 
 fun! xtref#syntax()
@@ -237,6 +237,11 @@ nnoremap [Xtref]U :<C-u>XtrefCwd<CR>
 command! -bar -range -nargs=0  XtrefCwd
   \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
   \ |else|echoerr "Prevented gen tags in $HOME or below"|en
+
+" DEPS: https://github.com/airblade/vim-rooter
+nnoremap [Xtref]g :<C-u>XtrefRoot<CR>
+command! -bar -range -nargs=0  XtrefRoot
+  \ call xtref#ctags(FindRootDirectory())
 
 
 " NOTE: search tags in *aura*, same folder as current file, and in all parent dirs of CWD
