@@ -13,6 +13,7 @@ let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 
 let g:xtref.anchor_pfx = '⌇'
 let g:xtref.refer_pfx = '※'
+let g:xtref.task_pfx = '['
 let g:xtref.markers = [g:xtref.anchor_pfx, g:xtref.refer_pfx]
 
 " TODO: support for nanoseconds tail
@@ -94,8 +95,10 @@ fun! xtref#get(visual)
     let [l,c] = [getline('.'), col('.')-1]
   endif
 
-  let b = xtref#lseek(l, g:xtref.markers, c)
-  let e = xtref#rseek(l, g:xtref.markers, c)
+  "" FIXME: enforce suffix for "surrounding" markers "[<braille>]"
+  let pfxs = g:xtref.markers + [g:xtref.task_pfx]
+  let b = xtref#lseek(l, pfxs, c)
+  let e = xtref#rseek(l, pfxs, c)
   if b<0 && e<0 | return ['', 0] |en
 
   if b>0 && e>0
@@ -108,7 +111,7 @@ fun! xtref#get(visual)
     let b = e
   endif
 
-  let e = xtref#rseek(l, g:xtref.markers, b+1)
+  let e = xtref#rseek(l, pfxs, b+1)
   if e<0 | let e = len(l) |en
 
   let s = match(l, '\s', b)
