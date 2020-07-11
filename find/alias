@@ -8,6 +8,20 @@
 # fl() { locate ${1?<what?>} | sed "/\(\/[^/]\+\)\{${2:-5}\}/d" | sort -u; }
 # alias ff='find ./ | grep -i '
 
+# HACK: create tmp symlinks to list of found results
+#%ONELINE: $ ff now -aX ln -svt /tmp/now -- {}
+ffn(){ local d
+  d=${TMPDIR}/ffn/$(date +%Y%m%d_%H%M%S)⁄${*//\//⁄}
+  mkdir -p "$d"
+  # MAYBE: add back-ref to immediate PWD if search is successful
+  # ln -sT -- "$PWD" "$d/PWD"
+  # OR:BET?USE: cmdline only in PWD symlink instead of dirname
+  # ln -sT -- "$PWD" "${TMPDIR}/ffn/$(date +%Y%m%d_%H%M%S)⁄/!${*//\//⁄}"
+  command fd -E .git -E _build\* -Htf "$*" -x \
+    sh -c 'command ln -svT -- "$PWD/$1" "$0/${1//\//⁄}"' "$d" {}
+}
+
+
 alias fs='find . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
 alias fS='find -L . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
 
