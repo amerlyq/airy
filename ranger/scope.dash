@@ -19,7 +19,7 @@ cached=$4
 preview_images=$5 # True|False
 
 # BET: do timeout/trim/fmt/safepipe directly in ranger in identical consistent way
-try(){ timeout --kill-after 5 3 "$@"; }
+try(){ timeout --kill-after 3 3 "$@"; }
 trim(){ head -n "$height"; }
 fmt(){ command fmt -s -w "$width"; }
 safepipe() { "$@"; test $? = 0 -o $? = 141; }
@@ -50,7 +50,9 @@ if [ "$preview_images" = True ]; then
   case "$mimetype"
   in image/svg+xml) convert "$path" "$cached" && exit 6
   # ;; video/* | image/*) exit 7
-  ;; video/*) ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6
+  ;; video/*)
+    vcsi --grid=3x6 --width="$width" --metadata-position=hidden --output="$cached" -- "$path" && exit 6
+    ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6
   ;; image/*) exit 7
   ;; message/rfc822) try mshow -nBFN "$path" && exit 5
   esac
