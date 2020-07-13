@@ -17,11 +17,17 @@ source=('git://git.suckless.org/st#commit=fa253f0'
   st-alpha-0.8.2.diff
   st-hidecursor-0.8.3.diff
   st-externalpipe-0.8.2.diff
-  my-config-0.8.4.diff
   my-tmux-0.8.4.diff
   my-xrandr-0.8.4.diff
+  st-boxdraw_v2-0.8.3.diff
+  st-newterm-0.8.2.diff
+  st-spoiler-20180309-c5ba9c0.diff
+  st-visualbell2-basic-2020-05-13-045a0fa.diff
+  st-ligatures-boxdraw-20200430-0.8.3.diff
+  my-config-0.8.4.diff
 )
-sha256sums=(SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP)
+# sha256sums=(SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP)
+sha256sums=(); for s in "${source[@]}"; do sha256sums+=(SKIP); done
 
 provides=("${_pkgname}")
 conflicts=("${_pkgname}")

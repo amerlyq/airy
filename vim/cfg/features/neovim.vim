@@ -16,7 +16,7 @@ try|set guicursor=a:block-Cursor/lCursor-blinkon0
   " \n-v-c:block-Cursor/lCursor-blinkon0
   " \,sm:block-blinkwait175-blinkoff150-blinkon175
   " \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
-  " BAD:('tmux/st' have no support for percentage or blink or color?):
+  " BAD:('tmux/st' have no support for percentage or blink or color?): ※⡟⠌⠊⢨
   "   o:hor50
   "   o:block-ErrorMsg
   "   o:block-blinkwait200-blinkoff200-blinkon200

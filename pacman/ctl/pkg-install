@@ -34,4 +34,5 @@ esac; done; shift $((OPTIND-1))
 # ign=$(printf '"%s"\n' ${ign[@]:+"${ign[@]}"} | paste -sd ',')
 # [[ $ign ]] && set -- "$@" --ignore "$ign"
 
-sudo pacman --sync "$ondemand" $noninteractive $asdeps -- -
+# shellcheck disable=SC2086
+sudo pacman --sync $ondemand $noninteractive $asdeps -- -

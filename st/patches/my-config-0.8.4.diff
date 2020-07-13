@@ -34,13 +34,14 @@ index 877afab..16f7260 100644
  static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
-@@ -178,6 +183,9 @@ Shortcut shortcuts[] = {
+@@ -178,6 +183,10 @@ Shortcut shortcuts[] = {
  	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
  	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
  	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
 +	{ TERMMOD,              XK_F6,          swapcolors,     {.i =  0} },
 +	{ TERMMOD,              XK_U,           externalpipe,   {.v = pipe_url} },
 +	{ TERMMOD,              XK_space,       externalpipe,   {.v = pipe_vim} },
++	{ TERMMOD,              XK_Return,      newterm,        {.i =  0} },
  };
  
  /*
