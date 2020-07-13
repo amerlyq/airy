@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+#%USAGE: $ adb shell dumpsys batterystats --history | ./$0 | sort -k1n,1 | sort -su -k2n,2 | sort -k1n,1 | gnuplot -p -d -e "set yrange [0:10000];plot '-' u 1:2 w l"
+# => then hover mouse over some point and read "x" on below left
+#   $ date. -d @$((1594467264 + 107631))
+#   => 20200712_202815
+#%SEE: ※⡟⠋⣛⣯
+use warnings FATAL => 'all';
+use autodie;
+use strict;
+use v5.14;  # for s///r
+
+use Time::Local;
+
+my $beg;
+
+while (<<>>) {
+    chomp;
+    s/^\s+//;
+    s/\s+$//;
+    my @F = split('\s+');
+    next unless @F and $F[1] =~ /^\(/;
+    if ($F[2] eq "RESET:TIME:") {
+        my @T = reverse(split('-', $F[3]));  # e.g. 2020-07-11-14-34-24
+        $T[-2] -= 1;  # NOTE: month=0..11
+        $beg = timelocal(@T);
+        print STDERR $beg, $/;
+        next;
+    }
+    my $t = $F[0];  # e.g. +1d16h12m34s153ms
+    $t =~ s/^\+//;
+    $t =~ s/ms$/*0.001/;
+    $t =~ s/s/ + /;
+    $t =~ s/m/*60 + /;
+    $t =~ s/h/*60*60 + /;
+    $t =~ s/d/*24*60*60 + /;
+    # FIXED:(octal => decimal): +1d16h12m08s734ms | +11m18s000ms
+    $t =~ s/(?<=\s)0+(\d)/$1/g;
+    $t = eval $t;
+    my $v = int($F[2]);
+    # print $_ if not defined $t;
+    # BAD: on plot it's shown as 1.5944e+09
+    # print $beg + $t, " ", $v, $/;
+    print $t, " ", $v, $/;
+}
