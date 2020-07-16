@@ -26,6 +26,7 @@ while (<<>>) {
         print STDERR $beg, $/;
         next;
     }
+    next if $F[2] eq "TIME:";  # EXPL: skip anchors
     my $t = $F[0];  # e.g. +1d16h12m34s153ms
     $t =~ s/^\+//;
     $t =~ s/ms$/*0.001/;
