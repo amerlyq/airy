@@ -38,6 +38,11 @@ command! -bar -nargs=0 -range=% EmptyLinesRemove
     \ call UnobtrusiveSubF('%s,%s g/%s/d_', <line1>, <line2>,
     \   '^'.s:sp.'*$')
 
+" USAGE: remove empty blocks after filtering-out "ag --group" results
+command! -bar -nargs=0 -range=% EmptyLinesRemoveHeaders
+    \ call UnobtrusiveSubF('%s,%s g/%s/d_', <line1>, <line2>,
+    \   '\n\n.*\S.*\ze\n\n')
+
 command! -bar -nargs=0 -range=% StripLines
     \ call UnobtrusiveSubF('/%s/,%sd_', '\v^%(\_[\n'.s:sp[1:-2].']*\S)@!',
     \ <line2>)
