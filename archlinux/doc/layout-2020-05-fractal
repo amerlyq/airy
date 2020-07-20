@@ -204,6 +204,7 @@ pacstrap /mnt  base amd-ucode linux linux-firmware base-devel cryptsetup lvm2 bt
 #   UUID=E6567FB5567F8559 /win/data ntfs-3g rw,noauto,x-systemd.automount,nosuid,nodev,relatime,uid=1000,gid=users,dmask=022,fmask=133,windows_names,big_writes 0 0
 #   # NEED: $ print -l username=myuser password=mypass > /root/samba/netshare && chmod 600 $_
 #   //192.168.1.2/share  /net/share  cifs  ro,noauto,x-systemd.automount,credentials=/root/samba/netshare,vers=1.0,uid=1000,gid=users,iocharset=utf8 0 0
+#   //192.168.1.2/share  /net/share  cifs  ro,noauto,x-systemd.automount,credentials=/root/samba/netshare,vers=3.1.1,mfsymlinks,uid=1000,gid=users,iocharset=utf8 0 0
 # HACK: refresh automount units after editing online /etc/fstab
 #   $# systemctl daemon-reload
 #   $# systemctl restart remote-fs.target

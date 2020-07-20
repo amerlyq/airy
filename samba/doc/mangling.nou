@@ -1,0 +1,33 @@
+INFO
+  OFF:SPEC: Naming and Referencing Shares, Directories, Files, and Metadata - Azure Storage | Microsoft Docs ⌇⡞⣰⣴⡎
+    https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-shares--directories--files--and-metadata
+  OFF: Naming Files, Paths, and Namespaces - Win32 apps | Microsoft Docs ⌇⡟⠎⢸⢬
+    https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file?redirectedfrom=MSDN
+  CFG:(disable): Special characters in Samba filenames - Server Fault ⌇⡞⣰⣳⢱
+    https://serverfault.com/questions/124611/special-characters-in-samba-filenames
+  HACK:(mapping): samba how to display files with colon in their names? - Unix & Linux Stack Exchange ⌇⡞⣰⣴⡥
+    https://unix.stackexchange.com/questions/299130/samba-how-to-display-files-with-colon-in-their-names
+
+
+TODO
+  2020-07-15 [X] BUG: trailing dot "name." ※⡞⡚⣰⡋ is subjected to Windows-mangling ⌇⡟⠎⢸⠦
+    OFF:FAIL: WinAPI explicitly does not allow trailing <dot> or <space> or <space-before-dot>
+      << you can workaround it using raw path prefix "\\?\...", BUT then all soft will be broken
+        ¦ I can't see the folder in powershell, cmd.exe or explorer.exe. When I tried to create it a second time, I'm informed it already exists!
+          SRC: https://www.reddit.com/r/windows/comments/1ppuo8/why_cant_i_name_a_folder_with_a_trailing_full_stop/
+      How to create folder with trailing dot (.) in .NET/C#? - Stack Overflow ⌇⡟⠎⢷⢕
+        https://stackoverflow.com/questions/15775867/how-to-create-folder-with-trailing-dot-in-net-c
+      linux - Why does NTFS disallow the use of trailing periods in directory names? - Super User ⌇⡟⠎⢶⡲
+        https://superuser.com/questions/585097/why-does-ntfs-disallow-the-use-of-trailing-periods-in-directory-names
+          ~~ compatibility with old MS-DOS or Windows 3.11 programs. In the 8.3 filename world, an empty extension and no extension at all was the same thing
+          ~~ Win32 API does not allow trailing dot
+        https://github.com/bazelbuild/bazel/issues/2173
+
+  2020-07-15 [$] FIND: samba allow special char in path
+    ::: I only need trailing "." for now -- and it's impossible
+
+  [_] TRY: disable mangling on server
+    ⦅samba⦆ [global] mangled names = no
+    ⦅mount⦆ nomapposix
+
+  [_] CHECK: can you create "some/group./here" on Windows -- looks like trailing dot will disappear on try

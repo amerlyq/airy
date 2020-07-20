@@ -1,0 +1,53 @@
+REF
+  +++ [_] READ https://wiki.samba.org/index.php/Mounting_samba_shares_from_a_unix_client
+  http://linux-training.be/networking/ch20.html
+  https://www.cyberciti.biz/tips/how-do-i-set-permissions-to-samba-shares.html
+
+
+CMP:(NFS vs SAMBA): NFS is 3x faster for 10kB files
+  https://ferhatakgun.com/network-share-performance-differences-between-nfs-smb/
+
+
+INFO
+  CIFS vs SMB: What's the Difference? ⌇⡟⠓⠁⣰
+    https://www.varonis.com/blog/cifs-vs-smb/
+    ¦ SMB -- windows native protocol "Server Message Block"
+    ¦ CIFS -- obsolete impl variation of SMB
+    ¦ samba -- linux impl of SMB with domain-auth infra
+  SEE:
+    $ man mount.cifs
+    $ man mount.smb3
+    $ man smb.conf
+  Samba3/SMB2 - SambaWiki ⌇⡟⠒⣗⡙
+    https://wiki.samba.org/index.php/Samba3/SMB2
+    : SMB3.11 is expected to be introduced in Windows 10
+  UNIX Extensions - SambaWiki ⌇⡟⠒⣙⣡
+    https://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks
+    : DEPR: use POSIX extensions for vers=3.11
+  SMB3-Linux - SambaWiki ⌇⡟⠒⣣⢗
+    https://wiki.samba.org/index.php/SMB3-Linux
+    $ mount –t smb3 //<address>/<share> /mnt -o username=<user>,password=<pass>,vers=3.1.1,posix,mfsymlinks,nomapposix,noperm
+    ATT:(-t smb3)
+
+
+DEBUG:
+  $ sudo bash -c "echo 3 > /proc/fs/cifs/cifsFYI"
+  $ cat /proc/fs/cifs/DebugData
+  $ dmesg
+    [18054.271759] CIFS VFS: Server does not support mounting with posix SMB3.11 extensions.
+    [18054.272954] CIFS VFS: cifs_mount failed w/return code = -95
+
+
+TODO
+  [_] Shares -- MOVE in private profile
+  [_] read about samba and rights for domain users
+    http://www.cyberciti.biz/tips/howto-find-for-available-smb-shares.html
+    http://www.tldp.org/HOWTO/SMB-HOWTO-8.html
+
+
+WTF: IPC$ (2-Bay) in samba shares
+  ? SECU implications ?
+  ? related to iSCSI ?
+  [_] shutdown/reboot
+    https://community.wd.com/t/safe-shutdown/147307/42
+    Utilities -> Maintenance -> Reboot

@@ -1,0 +1,26 @@
+  2018-02-17 [X] windows runs executable only if "r-x" set on file
+    https://wiki.samba.org/index.php/Setting_up_a_Share_Using_POSIX_ACLs
+    https://askubuntu.com/questions/614098/unable-to-get-execute-bit-on-samba-share-working-with-windows-7-client
+    ::: TEMP: allow executing anything, as before samba=3.6.2
+     acl allow execute always = yes
+
+  [_] permissions for cifs mount
+    https://askubuntu.com/questions/982266/how-to-mount-cifs-with-unix-extensions
+    $ sudo mount -t cifs -o "user=$USER,vers=1.0,uid=$(id -u),gid=$(id -g)" "//192.168.1.2/share" /mnt
+    =WHY= https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/mounting_an_smb_share
+    https://unix.stackexchange.com/questions/103415/why-are-files-in-a-smbfs-mounted-share-created-with-executable-bit-set
+    https://superuser.com/questions/744384/allow-chmod-on-cifs-mount
+
+  [_] permissions of created files
+    https://stackoverflow.com/questions/20958888/preserving-file-permissions-for-samba-shares-when-file-is-edited
+      https://www.samba.org/samba/docs/using_samba/ch08.html
+    https://askubuntu.com/questions/97669/i-cant-get-samba-to-set-proper-permissions-on-created-directories
+    https://www.virtualmin.com/node/31110
+    ++ https://forum.openmediavault.org/index.php/Thread/4979-How-I-solved-my-file-permissions-problems-kinda/
+    +++ http://cri.ch/linux/docs/sk0002.html
+    $ vi /etc/samba/smb.conf
+    # force create mode = 0777
+    # force directory mode = 0777
+      BAD: reset on restart
+    # map archive = no
+    # inherit permissions = yes

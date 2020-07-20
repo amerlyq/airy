@@ -14,3 +14,9 @@ USAGE
       ALT: $ v /etc/exports
         /data 192.168.1.0/24(rw,sync,nohide,no_root_squash,no_subtree_check)
     Client: $ sudo mount 192.168.1.2: /mnt
+
+  INFO:LL:NICE: networking - How to mount NFS on Android with correct permissions? - Android Enthusiasts Stack Exchange ⌇⡟⠓⠄⣾
+    https://android.stackexchange.com/questions/200867/how-to-mount-nfs-on-android-with-correct-permissions
+    $# mkdir -p /mnt/NFS /sdcard/NFS
+    $# busybox mount -v -t nfs4 -o vers=4.2,sec=none,rw,tcp,port=2049,context=u:object_r:sdcardfs:s0 <SERVER_IP>:/SHARED_DIR /mnt/NFS
+    $# mount -t sdcardfs -o nosuid,nodev,noexec,noatime,mask=7,gid=9997 /mnt/NFS /mnt/runtime/write/emulated/0/NFS

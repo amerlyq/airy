@@ -1,0 +1,26 @@
+USAGE
+  List all samba users on server
+    $ sudo pdbedit -L -v
+  List all shares in local network
+    $ smbtree -b -N
+    $ smbtree -U $USER
+  List shares (visible to anybody)
+    $ smbclient -L 192.168.1.2 -U%
+    $ smbclient -L 192.168.1.2
+    $ smbclient -L -A <(printf "username = $USER\npassword = $(pass samba/$USER)") 192.168.1.2
+  List files
+    $ smbclient //192.168.1.2/share -c ls
+    $ smbclient //192.168.1.2/Public -N -c ls
+  Upload files
+    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -c "mkdir $USER"
+    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'put "some file.jpg"'
+    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c ls
+  Download all files or folder
+    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'mget *'
+    $ smbclient '//example.com/Public' -N -c 'mask "";prompt OFF;recurse ON;mget *'
+  Permissions (ACL-based)
+    $ smbcacls //192.168.1.2/share myfile -U user%password
+  Mount
+    $ sudo mount -t cifs -o "user=$USER,uid=$(id -u),gid=$(id -g),iocharset=utf8" "//192.168.1.2/share" /mnt
+      # ,workgroup=workgroup,ip=serverip
+    $ mount -t cifs -o "users,user=$USER,uid=$(id -u),gid=$(id -g),iocharset=utf8" "//192.168.1.2/share" /mnt

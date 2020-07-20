@@ -1,0 +1,99 @@
+⌇⡟⠎⣇⢃
+
+ARCH
+  * create/delete/move/follow symlinks
+  * symlinks are copied as-is by ranger/rsync/ssh/samba
+
+SUM
+  * use CIFS vers=1.0 to support true symlinks by UnixExtensions
+    DEPR:(only available for vers=1.0): enabled by implicit !mount.cifs option "unix"
+    + NICE: can create symlinks natively by !ranger
+    - FAIL: can not remove dangling/folder symlinks -- due to NAS RecycleBin
+    ::: SECU: disable RecycleBin OR delete symlinks by !ssh
+
+  * use SMB3 vers=3.1.1. "mfsymlinks" to emulate symlinks
+    CASE: completely removed support for symlinks due to security implications
+    ++ best solution if files are stored on Windows Server -- to provide Unix symlinks
+    - BAD: not interoperable -- can't directly !rsync symlinks from host to remote Unix Server
+      << it will create mess from "mfsymlinks" and real ones on both host and server
+    ::: USAGE: access /share only through !samba and never by !ssh or !rsync
+
+  * use NFSv4 instead of Samba -- to support symlinks natively
+    FAIL: no NFSv4 support on NAS and #android
+      java - Android NFS Client - Stack Overflow ⌇⡟⠓⠂⢚
+        https://stackoverflow.com/questions/59677723/android-nfs-client
+      => looks like there is no FOSS NFSv4 support on #android
+        BUT:MAYBE: some paid apps has one ?
+
+  * use NFSv3 instead of Samba
+    FAIL:SECU: no authentication -- only IP-addr matching
+
+  * ALT:HACK: work with symlinks only through SSH + ranger
+    - create "/net/share" on NAS to have the same paths on NAS and HOST
+    - add !ranger shortcuts to create/remove ssh://lc/%p symlinks using abspath %p on HOST
+    - FAIL:SECU: may mistakenly delete smth outside of /net/share -- need wrapper with checks
+
+  * ALT: don't use symlinks on NAS at all
+    - never mirror desktop filestructure to NAS
+    - treat NAS only as "extender" -- for features large components
+
+
+% BUG: Symlinks support / Unix Extensions
+
+  [_] ALSO: cannot create symlinks :: OSError: [Errno 95] Operation not supported: 'OST' -> '/net/share/misc/music-hifi/OST_'
+    MAYBE: must restart !smbd with my own CFG=smb.conf
+
+    WTF: this actually works manually ? BUT: /etc/fstab contains the same line !
+      $ sudo mount -t cifs -o credentials=/etc/samba/creds/share,vers=1.0,uid=amer,gid=users,iocharset=utf8,rsize=4194304,wsize=4194304 -- //192.168.1.2/share  /mnt
+      NEED: must contain "unix" instead of "nounix" :: $ mount | tail -1
+
+    samba - How to mount cifs with unix extensions - Ask Ubuntu ⌇⡟⠒⣱⠫
+      https://askubuntu.com/questions/982266/how-to-mount-cifs-with-unix-extensions
+      2019: "nounix" still auto-assigned
+
+    [Samba] Do Unix extensions still work with SMB3? ⌇⡟⠒⣲⠴
+      https://lists.samba.org/archive/samba/2017-October/211522.html
+      ::: BAD: unix extensions are not supported over SMB3 ==> USE: "mfsymlinks" OR ranger(1) keybindings
+      ¦ FYI, when we do finalize the UNIX extensions, at least for
+      ¦ the Samba implementation, we're not going to allow clients
+      ¦ to create "real" symlinks on the server - only SMB-followable
+      ¦ symlinks. Allowing clients to create real server symlinks as
+      ¦ in SMB1 UNIX extensions has been a long-term security disaster.
+
+
+% BUG: Symlinks create/remove :: RecycleBin
+
+  [_] BUG: cannot remove symlinks on NAS
+    ::: looks like the problem is related to NAS-patched TrashBin ./.!@#$recycle
+    [_] MAYBE you need SMBv3 sharing
+    [Samba] Cannot remove symlink with missing target ⌇⡞⣰⣬⠕
+      https://lists.samba.org/archive/samba/2016-January/197033.html
+        FIXED:BUG:
+          https://bugzilla.samba.org/show_bug.cgi?id=10429
+          https://bugzilla.samba.org/show_bug.cgi?id=8663
+          https://bugzilla.samba.org/show_bug.cgi?id=7234
+      https://lists.samba.org/archive/samba/2016-January/197050.html
+        MAYBE: "…found that enabling the recycle bin for the SMB share in Synology DSM is what causes this bevahior."
+        [_] TRY: disable recycle on /share
+          <<< BAD: can't delete "dangling" symlinks and symlinks to dirs
+
+    SEE: linux - Samba, CIFS and Deleting Files - Stack Overflow ⌇⡞⣰⣰⢊
+      https://stackoverflow.com/questions/1314440/samba-cifs-and-deleting-files/1950860
+    ALSO
+      https://superuser.com/questions/1337257/clients-cant-create-symlinks-on-samba-share
+      https://access.redhat.com/solutions/54407
+      https://unix.stackexchange.com/questions/5120/how-do-you-make-samba-follow-symlink-outside-the-shared-path
+
+  [_] TRY: insecure links
+    @/devq/hardware/NAS/cfg/smb.conf
+
+  [_] TRY: use newer version of Samba
+    [_] CHECK: if "follow symlinks" works for native symlinks on SMB3.11
+
+  linux - Clients can't create symlinks on Samba share - Super User ⌇⡟⠒⣚⡔
+    https://superuser.com/questions/1337257/clients-cant-create-symlinks-on-samba-share
+    $ sudo mount -t cifs -o …,vers=3.0,mfsymlinks,soft,rsize=8192,wsize=8192 //ip.add.re.ss/share_name /path/to/mount
+    //192.168.1.2/share  /net/share  cifs  ro,x-systemd.automount,credentials=/etc/samba/creds/share,vers=3.0,mfsymlinks,uid=amer,gid=users,iocharset=utf8  0  0
+    $ sudo mount -t cifs -o credentials=/etc/samba/creds/share,vers=1.0,uid=amer,gid=users,iocharset=utf8 -- //192.168.1.2/share  /mnt
+    $ sudo mount -t cifs -o credentials=/etc/samba/creds/share,vers=3.0,mfsymlinks,uid=amer,gid=users,iocharset=utf8 -- //192.168.1.2/share  /mnt
+    $ sudo mount -t cifs -o credentials=/etc/samba/creds/share,vers=3.1.1,uid=amer,gid=users,iocharset=utf8 -- //192.168.1.2/share  /mnt
