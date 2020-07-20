@@ -48,6 +48,10 @@ if has('termguicolors') || exists('$NVIM_TUI_ENABLE_TRUE_COLOR')
   let g:terminal_color_13 = '#ad7fa8'
   let g:terminal_color_14 = '#00f5e9'
   let g:terminal_color_15 = '#eeeeec'
+  " TRY:CHG: use the same block cursor color in :term as in st(1)
+  "   ALSO: https://github.com/neovim/neovim/issues/4696
+  " FAIL: don't work :: https://github.com/neovim/neovim/issues/6591
+  " hi! Cursor ctermfg=240 ctermbg=255 guifg=#555555 guibg=#eeeeee
 endif
 
 " Default home directory.
