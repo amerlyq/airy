@@ -218,6 +218,9 @@ fun! xtref#syntax()
 
   hi! xtrefRefer ctermfg=35 guifg=#00af5f
   call matchadd('xtrefRefer', '\v'. g:xtref.r_refer, -1)
+
+  hi! xtrefReferPfx ctermfg=41 guifg=#3fcf5f
+  call matchadd('xtrefReferPfx', '\v'. g:xtref.refer_pfx, -1)
 endf
 
 
