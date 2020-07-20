@@ -32,7 +32,7 @@ alias auru='paca -Syu'
 
 # ALT: update only installed
 # pacman -Slq aur | grep -ZFxf <(pacman -Qq) | xargs -0 echo
-alias aurU='aur sync -u'                                        # update-rebuild all
+alias aurU='aur sync --upgrades'                                # update-rebuild all
 
 alias aurz='paccache --cachedir /var/cache/pacman/aur --keep 0 --dryrun --'
 alias aurZ='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
@@ -42,3 +42,17 @@ alias aurZ='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
 # https://github.com/AladW/aurutils/issues/208
 #   = Note that when you set your repo as a pacman CacheDir (which is recommended anyway), you can use KeepInstalled and simply run pacman -Sc. repoctl update then proceeds to remove stale entries from the db.
 aurx(){ find /var/cache/pacman/aur -name "*.db.tar" -execdir repo-remove {} "$@" \;; }
+
+# ALT: $ repoctl remove ...
+aur-remove(){ local pkg db
+  for pkg; do
+    aur repo --repo-list | while read -r db; do
+      repo-remove "$(readlink -e "$db")" "$pkg"
+      find "${db%/*}" -name "$pkg*" -delete
+      # NEED:(manually): rm -rf ~/.cache/aurutils/sync/"$pkg"
+    done
+    if expac -Q '%n' "$pkg" >/dev/null; then
+      sudo pacman -R "$pkg"
+    fi
+  done
+}
