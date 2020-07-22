@@ -1486,6 +1486,7 @@ c.url.searchengines = {
     'ja': 'http://www.jango.com/music/{}',
     'mr': 'http://www.mrqe.com/search?q={}',
     'ro': 'http://www.rottentomatoes.com/search/?search={}',
+    'u': 'https://unicode-search.net/unicode-namesearch.pl?term={}',
     'vs': 'https://www.google.com/search?q=%22vimscript%22%20{}',
     'za': 'http://songza.com/search/?q={}',
     'zsh': 'https://www.google.com/search?q=%22zsh%22%20{}',
