@@ -22,7 +22,7 @@ let s:patterns = [
   \ ['Did', 243, '#767676', 'GREY|DONE|FIXED|EXPL%(AIN)?|TEMP%(ORARY)?|UNUSED|OBSOL%(ETE)?|DEPR%(ECATED)?|TL;DR|FORMAT|FMT'],
   \ ['Sem', 163, '#df40af', 'ex:|SEIZE|BUMP|EVOL?|EVOLVE|EVOLUTION'],
   \ ['Hdr',  27, '#004fff', 'OFFL?|OFCL|OFFICIAL|DRAW|WF|WORKFLOW|PRIA|PRIOR_ART|FUTURE|RE|REV-ENG'],
-  \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|DEMO|USAGE|DFL|DEFAULT|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP|DEPS|DEPENDS'],
+  \ ['Msg',  62, '#5f5fdf', 'PURP|NOTE|USE|DEMO|USAGE|DFL|DEFAULT|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEPS?|DEPENDS'],
   \]
 
 function! s:everywhere_print(patts)
