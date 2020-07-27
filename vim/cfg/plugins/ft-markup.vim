@@ -11,7 +11,8 @@ call dein#add('amerlyq/forestanza.vim', {
 "   switchr
 "" HACK notes/outline
 call dein#add('amerlyq/nou.vim', {
-  \ 'on_ft': 'nou'})
+  \ 'on_ft': 'nou',
+  \ 'depends': 'vim-textobj-user'})
 
 
 

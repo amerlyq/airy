@@ -31,9 +31,9 @@ call dein#add('tpope/vim-speeddating', {
 " ALT: 'haya14busa/vim-asterisk' + 'osyo-manga/vim-over'
 call dein#add('AndrewRadev/multichange.vim', {
   \ 'on_cmd': 'Multichange',
-  \ 'on_map': [['n', '[Space]m']],
+  \ 'on_map': [['n', '[Frame]m']],
   \ 'hook_source': "
-\\n   let g:multichange_mapping = '[Space]m'
+\\n   let g:multichange_mapping = '[Frame]m'
 \\n   let g:multichange_motion_mapping = 'm'
 \"})
 
@@ -46,14 +46,14 @@ call dein#add('AndrewRadev/multichange.vim', {
 " BAD: fallback only to builtin 'J/K', ignoring user keymaps
 call dein#add('AndrewRadev/splitjoin.vim', {'lazy': 0,
   \ 'on_cmd': ['SplitjoinJoin', 'SplitjoinSplit'],
-  \ 'on_map': [['n', '[Space]j', '[Space]k']],
+  \ 'on_map': [['n', '[Frame]j', '[Frame]k']],
   \ 'hook_add': "
-\\n   let g:splitjoin_join_mapping = '[Space]j'
-\\n   let g:splitjoin_split_mapping = '[Space]k'
+\\n   let g:splitjoin_join_mapping = '[Frame]j'
+\\n   let g:splitjoin_split_mapping = '[Frame]k'
 \"})
 " 'hook_post_source': 'sil! exe "do FileType" &ft',
-" \\n   nnoremap <unique><silent> [Space]j :SplitjoinJoin<CR>
-" \\n   nnoremap <unique><silent> [Space]k :SplitjoinSplit<CR>
+" \\n   nnoremap <unique><silent> [Frame]j :SplitjoinJoin<CR>
+" \\n   nnoremap <unique><silent> [Frame]k :SplitjoinSplit<CR>
 
 
 

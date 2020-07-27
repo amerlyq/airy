@@ -1,5 +1,6 @@
 let g:mapleader = ','        " Use <Leader> in global plugins.
-let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugins.
+let g:maplocalleader = "\<Space>"  " Use <LocalLeader> in filetype plugins.
+" let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugins.
 " noremap <unique> <Leader> <Nop>
 " noremap <unique> <LocalLeader> <Nop>
 
@@ -9,10 +10,11 @@ let g:maplocalleader = ',.'  " Use <LocalLeader> in filetype plugins.
 
 
 " EXPL: omap omitted for shortcut of '..q' textobj
+" OBSOL: 'Space': '<Space>',
 let s:leads = {
   \'nxo': {
   \  'Frame': '\',
-  \  'Space': '<Space>',
+  \  'Rare': ',.',
   \ },
   \'nx': {
   \  'Quote': 'q',

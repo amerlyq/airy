@@ -39,7 +39,8 @@ call dein#add('thinca/vim-quickrun', {
   \ 'on_map': {'n': '<Plug>'},
   \ 'on_cmd': 'QuickRun',
   \ 'hook_add': "
-\\n   nmap <silent> [Space]r <Plug>(quickrun)
+\\n   nmap <silent> [Frame]r <Plug>(quickrun-op)
+\\n   nmap <silent> [Frame]R <Plug>(quickrun)
 \"})
 
 

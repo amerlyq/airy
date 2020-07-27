@@ -1,8 +1,8 @@
 if &cp||exists('g:loaded_ispace')|finish|else|let g:loaded_ispace=1|endif
 " <S-Space> work only in gvim, but <C-Space> -- everywhere?
 
-nnoremap <unique><silent> [Space]<Space>  i<Space><Esc>
-xnoremap <unique><silent> [Space]<Space>  c<Space><C-r>"<Space><Esc>
+nnoremap <unique><silent> [Frame]<Space>  i<Space><Esc>
+xnoremap <unique><silent> [Frame]<Space>  c<Space><C-r>"<Space><Esc>
 
 " ALT: use 'q<Space> from 'rhysd/vim-operator-surround'
 nnoremap <unique><silent> <Leader><Space>  a<Space><Left><Left><Space><Esc>
@@ -17,12 +17,12 @@ xnoremap <silent> <Plug>(limio-A)  :<C-u>Limio A<Bar>call repeat#set("\<Plug>(li
 nnoremap <silent> <Plug>(limio-s)  :Limio s<Bar>call repeat#set("\<Plug>(limio-s)")<CR>
 xnoremap <silent> <Plug>(limio-S)  :<C-u>Limio S<Bar>call repeat#set("\<Plug>(limio-S)")<CR>
 
-nmap <unique><silent>  [Space]i  <Plug>(limio-i)
-xmap <unique><silent>  [Space]i  <Plug>(limio-I)
-nmap <unique><silent>  [Space]a  <Plug>(limio-a)
-xmap <unique><silent>  [Space]a  <Plug>(limio-A)
-nmap <unique><silent>  [Space]s  <Plug>(limio-s)
-xmap <unique><silent>  [Space]s  <Plug>(limio-S)
+nmap <unique><silent>  [Frame]i  <Plug>(limio-i)
+xmap <unique><silent>  [Frame]i  <Plug>(limio-I)
+nmap <unique><silent>  [Frame]a  <Plug>(limio-a)
+xmap <unique><silent>  [Frame]a  <Plug>(limio-A)
+nmap <unique><silent>  [Frame]s  <Plug>(limio-s)
+xmap <unique><silent>  [Frame]s  <Plug>(limio-S)
 
 command! -bar -nargs=1 Limio call LimitedInput(<q-args>)
 " silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)

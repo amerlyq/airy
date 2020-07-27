@@ -1,7 +1,9 @@
 " TODO: merge with ~/.cache/vim/dein/repos/github.com/rstacruz/vim-xtract/plugin/xtract.vim
 " USAGE: :'<,'>Extract newfile
 
-noremap <LocalLeader>> :Extract<Space>
+" FAIL: not refreshed screen
+map [Frame]e :Extract<Space>
+" noremap <LocalLeader>> :Extract<Space>
 
 command! -range -bang -nargs=1 -complete=file  Extract
       \ :<line1>,<line2>call extract#main(<bang>0, <f-args>)
@@ -34,12 +36,13 @@ function! extract#main(bang, nm) range abort
 
   " ALT: silent exe a:firstline.",".a:lastline . "yank"
   let xa = xtref#new()
-  let xr = xtref#invert(xa)
+  let xr = xtref#invert([xa, 0])
   let lines = extract#vlines()
 
   " NOTE: strip from all lines common min indent TODO: replace '\t' => ' 'x2
   let mindent = min(map(copy(lines),'len(matchstr(v:val, "^\\s*"))'))
-  let @x = join(['# '.xa, ''] + map(lines, 'strpart(v:val, mindent)'), "\n")
+  let cpfx = ''  " OR='# '  OR=&commentstring
+  let @x = join([cpfx . xa, ''] + map(lines, 'strpart(v:val, mindent)'), "\n")
 
   let dir = fnamemodify(path, ':h')
   if !isdirectory(dir)| call mkdir(dir, 'p') |en

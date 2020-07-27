@@ -11,6 +11,7 @@ let g:xtref = {}
 let g:xtref.aura = $HOME."/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 
+" ALT: ⌇ => ¶ .like. https://www.yoctoproject.org/docs/3.1.1/brief-yoctoprojectqs/brief-yoctoprojectqs.html
 let g:xtref.anchor_pfx = '⌇'
 let g:xtref.refer_pfx = '※'
 let g:xtref.task_pfx = '['
@@ -234,6 +235,7 @@ augroup END
 " NOTE: use "xts<C-v><Space>" to insert "xts" literally
 iabbrev <expr> !xts! xtref#new()
 
+" PERF:FIXME:USE: async call -- prevent freeze-up
 " OBSOL: <LocalLeader><F2>
 nnoremap [Xtref]u :<C-u>XtrefAura<CR>
 command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
