@@ -1,21 +1,27 @@
 ⌇⡟⠎⣇⢃
 
-ARCH
+RQs
   * create/delete/move/follow symlinks
   * symlinks are copied as-is by ranger/rsync/ssh/samba
 
-SUM
+
+:::
+
+
+CASE
   * use CIFS vers=1.0 to support true symlinks by UnixExtensions
     DEPR:(only available for vers=1.0): enabled by implicit !mount.cifs option "unix"
     + NICE: can create symlinks natively by !ranger
     - FAIL: can not remove dangling/folder symlinks -- due to NAS RecycleBin
-    ::: SECU: disable RecycleBin OR delete symlinks by !ssh
+    - BAD:PERF: small buffer limits speed :: write=128KiB read=4MiB
+    ::: FAIL: patch samba to disable RecycleBin OR:SECU: delete symlinks by !ssh (ranger aliases)
 
   * use SMB3 vers=3.1.1. "mfsymlinks" to emulate symlinks
     CASE: completely removed support for symlinks due to security implications
     ++ best solution if files are stored on Windows Server -- to provide Unix symlinks
     - BAD: not interoperable -- can't directly !rsync symlinks from host to remote Unix Server
       << it will create mess from "mfsymlinks" and real ones on both host and server
+    - FAIL:PERF: very slow directory listing by symlink (seconds) $ ln -s /_dld /net/share/amer/ttt
     ::: USAGE: access /share only through !samba and never by !ssh or !rsync
 
   * use NFSv4 instead of Samba -- to support symlinks natively
@@ -28,14 +34,20 @@ SUM
   * use NFSv3 instead of Samba
     FAIL:SECU: no authentication -- only IP-addr matching
 
+  * use NFSv3 over SSH ※⡟⠟⡎⠅
+    FAIL:PERF: unusably slow (save file = multi-seconds) like SSHFS ※⡟⠟⠺⢅
+
   * ALT:HACK: work with symlinks only through SSH + ranger
     - create "/net/share" on NAS to have the same paths on NAS and HOST
     - add !ranger shortcuts to create/remove ssh://lc/%p symlinks using abspath %p on HOST
-    - FAIL:SECU: may mistakenly delete smth outside of /net/share -- need wrapper with checks
+    - BAD:SECU: may mistakenly delete smth outside of /net/share OR not symlink -- NEED wrapper with checks
+    ! WARN:SECU: dir-ops under "follow symlinks" is a disaster w/o UNIX Extensions support ※⡟⠟⡂⡟
 
   * ALT: don't use symlinks on NAS at all
+    + use latest SMB3 vers=3.11 w/o symlinks support
     - never mirror desktop filestructure to NAS
     - treat NAS only as "extender" -- for features large components
+    FAIL: can't split #vd into layers and backref from bigger into smaller ones
 
 
 % BUG: Symlinks support / Unix Extensions
@@ -63,9 +75,9 @@ SUM
 
 % BUG: Symlinks create/remove :: RecycleBin
 
-  [_] BUG: cannot remove symlinks on NAS
+  [⡟⠟⡞⢼] BUG: cannot delete "dangling" symlinks and symlinks to dirs
     ::: looks like the problem is related to NAS-patched TrashBin ./.!@#$recycle
-    [_] MAYBE you need SMBv3 sharing
+    [⡟⠟⡑⣕] MAYBE you need SMBv3 sharing ::: FAIL: protocol does not help
     [Samba] Cannot remove symlink with missing target ⌇⡞⣰⣬⠕
       https://lists.samba.org/archive/samba/2016-January/197033.html
         FIXED:BUG:
@@ -74,8 +86,13 @@ SUM
           https://bugzilla.samba.org/show_bug.cgi?id=7234
       https://lists.samba.org/archive/samba/2016-January/197050.html
         MAYBE: "…found that enabling the recycle bin for the SMB share in Synology DSM is what causes this bevahior."
-        [_] TRY: disable recycle on /share
-          <<< BAD: can't delete "dangling" symlinks and symlinks to dirs
+        [⡟⠟⡞⢾] TRY: disable recycle on /share ⌇⡟⠟⡑⣴
+          ::: FAIL: disabling by ./smb.conf_norecycle had no effect -- seems like samba is patched
+        [_] TRY: change options -- maybe symlinks will work in that case ⌇⡟⠟⡤⡫
+          recycle:versions = no
+          recycle:touch = no
+          subject:"[Samba] VFS Recycle" ⌇⡟⠟⡥⡚
+            https://www.mail-archive.com/search?l=samba@lists.samba.org&q=subject:"[Samba]+VFS+Recycle"&o=newest&f=1
 
     SEE: linux - Samba, CIFS and Deleting Files - Stack Overflow ⌇⡞⣰⣰⢊
       https://stackoverflow.com/questions/1314440/samba-cifs-and-deleting-files/1950860
@@ -84,11 +101,28 @@ SUM
       https://access.redhat.com/solutions/54407
       https://unix.stackexchange.com/questions/5120/how-do-you-make-samba-follow-symlink-outside-the-shared-path
 
-  [_] TRY: insecure links
-    @/devq/hardware/NAS/cfg/smb.conf
-
-  [_] TRY: use newer version of Samba
-    [_] CHECK: if "follow symlinks" works for native symlinks on SMB3.11
+  [_] TRY: use newer version of Samba ⌇⡟⠟⠻⠶
+    [⡟⠟⠻⠙] CHECK: if "follow symlinks" works for native symlinks on SMB3.11
+      ::: FAIL: unacceptable behavior
+        * relative symlinks inside share will be viewed like files/dirs
+        * symlinks pointing "back to host" will disappear w/o "allow insecure wide links"
+    [⡟⠟⡁⣳] CHECK: delete symlink visible like dir by simple "rm" and "rmdir" ⌇⡟⠟⡂⡟
+      ::: FAIL: only "rm -rf" can remove directory
+        !. it will delete all real content of dir keeping the real dir empty
+    [⡟⠟⡀⡭] CHECK: posix|unix|linux with vers=3.1.1
+        Requires CIFS (vers=1.0) or SMB3.1.1 (vers=3.1.1) and a server supporting them.
+      +++ [_] READ:DEMO: [Samba] How to turn on SMB3 POSIX extensions in Samba server? ⌇⡟⠟⠽⡏
+        https://lists.samba.org/archive/samba/2019-October/226333.html
+        https://www.snia.org/sites/default/files/SDC/2018/presentations/SMB/Steve_French_SMB311.pdf
+        Page 46 ex: "vers=3.1.1,posix"
+          ⦅dmesg⦆ ERR: CIFS VFS: Server does not support mounting with posix SMB3.11 extensions
+      ::: FAIL: ¦ The posix extensions are still a WIP unfortunately and do no ship with samba.
+        2019-10-07 https://lists.samba.org/archive/samba/2019-October/226348.html
+        2020-07-28 [X] WAIT still not merged
+        ~~~ BUT:MAYBE: even when POSIX merged -- my symlinks will be translated to "mfsymlinks" anyway
+    [_] CHECK: "sfu" option of mount.cifs
+      backup - how to create fake symlinks when copying to CIFS share with rsync - Server Fault ⌇⡟⠟⠹⡎
+        https://serverfault.com/questions/926783/how-to-create-fake-symlinks-when-copying-to-cifs-share-with-rsync
 
   linux - Clients can't create symlinks on Samba share - Super User ⌇⡟⠒⣚⡔
     https://superuser.com/questions/1337257/clients-cant-create-symlinks-on-samba-share

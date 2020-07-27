@@ -4,6 +4,10 @@
     ::: TEMP: allow executing anything, as before samba=3.6.2
      acl allow execute always = yes
 
+  [_] TRY: use native server permissions
+    ¦ file_mode=arg ¦ If  the server does not support the CIFS Unix extensions this overrides the default file mode.
+    ¦ dir_mode=arg  ¦ If the server does not support the CIFS Unix extensions this overrides the  default mode for directories.
+
   [_] permissions for cifs mount
     https://askubuntu.com/questions/982266/how-to-mount-cifs-with-unix-extensions
     $ sudo mount -t cifs -o "user=$USER,vers=1.0,uid=$(id -u),gid=$(id -g)" "//192.168.1.2/share" /mnt

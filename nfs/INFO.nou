@@ -20,3 +20,19 @@ USAGE
     $# mkdir -p /mnt/NFS /sdcard/NFS
     $# busybox mount -v -t nfs4 -o vers=4.2,sec=none,rw,tcp,port=2049,context=u:object_r:sdcardfs:s0 <SERVER_IP>:/SHARED_DIR /mnt/NFS
     $# mount -t sdcardfs -o nosuid,nodev,noexec,noatime,mask=7,gid=9997 /mnt/NFS /mnt/runtime/write/emulated/0/NFS
+
+
+%% NFSv3 over SSH ⌇⡟⠟⡎⠅
+  [⡟⠟⡍⡷] OLD:OFF: 6. Security and NFS ⌇⡟⠟⠺⡧
+    http://nfs.sourceforge.net/nfs-howto/ar01s06.html
+  [⡟⠟⡃⣟] What are the difference between nfs over ssh and sshfs? - Super User ⌇⡟⠟⠺⡾
+    https://superuser.com/questions/991654/what-are-the-difference-between-nfs-over-ssh-and-sshfs
+  [⡟⠟⡅⠵] Mount NFS Folder via SSH Tunnel ⌇⡟⠟⠺⢅
+    https://gist.github.com/proudlygeek/5721498
+    ::: FAIL:PERF: unusably slow (save file = multi-seconds) like SSHFS
+    SERV:
+      /etc/exports ¦ /share  localhost(insecure,rw,sync,no_subtree_check)
+      $ service nfs-kernel-server restart $ OR $ exportfs -a
+    HOST:
+      $ ssh -fNv -L 3049:localhost:2049 user@hostname
+      $ mount -t nfs -o port=3049,proto=tcp localhost:/home/proudlygeek /mnt/nfs-share
