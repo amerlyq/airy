@@ -235,7 +235,6 @@ augroup END
 " NOTE: use "xts<C-v><Space>" to insert "xts" literally
 iabbrev <expr> !xts! xtref#new()
 
-" PERF:FIXME:USE: async call -- prevent freeze-up
 " OBSOL: <LocalLeader><F2>
 nnoremap [Xtref]u :<C-u>XtrefAura<CR>
 command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
@@ -252,10 +251,7 @@ command! -bar -range -nargs=0  XtrefRoot
   \ call xtref#ctags(FindRootDirectory())
 
 
-" NOTE: search tags in *aura*, same folder as current file, and in all parent dirs of CWD
-" THINK: hide tags inside .git = systemlist('git rev-parse --git-dir')[0].'/tags' ⌇Gg-nu
-" HACK:(tags;/): search file in parent dirs, stop when '/' is reached (OR: use '~') ⌇}p-nu
-"   https://stackoverflow.com/questions/5017500/vim-difficulty-setting-up-ctags-source-in-subdirectories-dont-see-tags-file-i
+" NOTE: search tags in *aura*, same folder as current file, and in all parent dirs of CWD ※}p-nu
 " MAYBE: exe 'set tags^='. g:xtref.aura.'/**/'.g:xtref.tagfile
 exe 'set tags^='. g:xtref.aura.'/'.g:xtref.tagfile
 exe 'set tags^='. g:xtref.tagfile.';/'

@@ -1,0 +1,28 @@
+⌇⡟⠟⡜⠊
+
+[_] PERF:FIXME:USE: async call -- prevent vim freeze-up on ~/aura regen
+
+[_] IDEA: reduce size of ./xtref.tags db
+  CASE: if it takes too much RAM or it's so large that jumping in it become slow
+  HACK: post-process DB by deleting orphan anchors and WARN about orphan referers
+    ALT:BET? parse everything myself w/o ctags(1)
+  [_] TRY: don't include @/todo tags into ~/aura -- chain two DB separately
+
+[_] DEV: generate tags for currently opened files in !vim
+  ++ NICE:PERF: no need to wait regeneration of whole ~/aura
+    -- regen only most useful last active context
+  [_] TRY: directly parse files to populate tags into vim structures
+    OR: use in-memory only DB $TMPDIR/xtref.tags OR $XDG_RUNTIME_DIR/xtref.tags
+      BAD: will disappear after shutdown
+      BET? ~/.cache BTRFS .or. /cache XFS
+        BUT: fragmentation of BTRFS
+        MAYBE:USE: "chattr +C" on whole ~/.cache
+
+[_] TRY:ENH: append tags from opened files to in-memory DB instead of rewriting from zero
+  NICE:PERF: can increment tags achieving lazy-caching
+  ++ can async-regen on each file open/save -- to allow immediate jumping
+  +++ can close-open !vim again and immediate jump to last files
+
+[_] THINK: hide tags inside .git = systemlist('git rev-parse --git-dir')[0].'/tags' ⌇Gg-nu
+[X] HACK:(tags;/): search file in parent dirs, stop when '/' is reached (OR: use '~') ⌇}p-nu
+  https://stackoverflow.com/questions/5017500/vim-difficulty-setting-up-ctags-source-in-subdirectories-dont-see-tags-file-i
