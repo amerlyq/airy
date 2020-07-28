@@ -37,6 +37,8 @@ chk_repo(){ synced_repo ~/aura || ask -r "Ignore unsynced git?"; }
 case $1
 in   logout|-o) chk_wnd && chk_tmux && ask "Logout?" && sys_logout
 ;;   reboot|-r) chk_wnd && chk_tmux && ask "Reboot?" && systemctl reboot
+# TODO:ALSO: prevent immediate wakeup $ echo XHC > /proc/acpi/wakeup
+#   $ printf disabled | sudo tee /sys/bus/pci/devices/0000:04:00.0/power/wakeup
 ;; shutdown|-t) chk_wnd && chk_tmux && chk_repo && ask "Shutdown?" && shutdown now
 # BAD:(reboots): systemctl poweroff
 # ALT: run 'r.core lock' on <M-S-z> if no windows found BAD: check skippped if hidden window
