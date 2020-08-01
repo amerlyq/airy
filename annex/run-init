@@ -57,11 +57,15 @@ git config --local 'annex.addsmallfiles' false
 # * feed: author, title
 # BAD:PERF:THINK: not sure if it's worth it
 #   => maybe use only :: https://github.com/przemoc/metastore
-# git config --local 'annex.genmetadata' true
-git config --local 'annex.genmetadata' false
+# NICE: useful for media files timeline -- BUT: useless for "aura"
+git config --local 'annex.genmetadata' true
+# git config --local 'annex.genmetadata' false
 
 ## NOTE: use all available CPU
 git config --local 'annex.jobs' cpus
+
+## FIXED:ERR: You have enabled concurrency, but git-annex is not able to use ssh connection caching
+git config --local 'annex.sshcaching' true
 
 
 # DEBUG: $ git annex matchexpression 'largerthan=100kb or not (mimetype=text/* or mimetype=inode/x-empty)' --file=my.txt --size=100kb --mimetype=text/x-empt --largefiles

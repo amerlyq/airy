@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+set -o pipefail
+exec find "${2:-.}" \
+  ${3+-mindepth 1 -maxdepth "$3"} \
+  -regextype egrep -regex ".*/${1:-.*}" \
+  -printf '%10s %p\n' \
+| LC_ALL=C sort -rnk1

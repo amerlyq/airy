@@ -20,6 +20,18 @@ Dump needles
   Get RBin.filesize and resize file
     $ find -maxdepth 1 -name 'dump.*' -execdir r2 -wnqc"r $(rabin2 -Z {})" {} \;
 
+
+Replace string (in-place)
+  $ cp WDMyCloudEX2_git_1.40.bin{,_}
+  $ r2 -w WDMyCloudEX2_git_1.40.bin
+  | / KingsCaZ
+  ¦ Searching 8 bytes in [0x0-0x576581b]
+  ¦ hits: 1
+  ¦ 0x00000000 hit0_0 .KingsCaZgit.
+  | w GrandTeZ @ hit0_0
+  | q
+
+
 Xref
   Usage locations
     https://www.reddit.com/r/ReverseEngineering/comments/25ok14/radare2_string_xrefs/

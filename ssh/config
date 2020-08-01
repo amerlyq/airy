@@ -6,7 +6,9 @@
 # https://unix.stackexchange.com/questions/61655/multiple-similar-entries-in-ssh-config
 
 ### Common options
-ControlPath /tmp/%u/%r@%h:%p
+# NOTE: must use "%n" to connect to same user@host twice by different aliases
+#   << othewise all aliases will reuse connection established by the first one
+ControlPath /tmp/%u/%n+%r@%h:%p
 ControlPersist 600
 
 Host *
