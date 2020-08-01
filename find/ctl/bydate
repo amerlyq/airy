@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2020  <> and contributors.
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY:
+#%USAGE: $ ./$0
+set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+src=${1:-$PWD}
+dst=${2:-$PWD}
+depth=${3-1}
+
+# ALSO: replace archived files by symlinks to /net after rsync
+# a=( largest-14GB./*(:A:t2) )
+# for s d in ${${a/#//net/_private/irome/vd/}:^a}; do ln -svfT -- $s $d; done
+
+# TODO:CASEs
+# * date .vs. year/date
+# * here-src -> here-dst | depth=1
+# * recursive-src -> here-dst
+# * recursive-here-src -> there-dst
+# * nested hierarchy | -exec -> -execdir
+
+set -x
+find -H "$src" ${depth:+-maxdepth "$depth"} -type f \
+  -not -name "${0##*/}" \
+  -execdir \
+sh -c '
+  # d=$0/$(date +%Y -r "$1")/$(date +%Y-%m-%d -r "$1")
+  d=$0/$(date +%Y-%m-%d -r "$1")
+  mkdir -p "$d"
+  mv -vt "$d" -- "$1"
+' "$(realpath "$dst")" {} \;
