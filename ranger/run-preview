@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY:
+#%USAGE: $ ./$0
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+export SHELL=$(type -p bash)
+
+d_video=${1:-$PWD}
+export d_cache=${2:-~/.cache/ranger}
+
+gen_preview(){ local h src=$1 dst
+  h=$(realpath -- "$src" | head -c-1 | sha1sum | cut -f1 -d' ')
+  dst=$d_cache/$h.jpg
+  # echo "$dst"
+  [[ -f $dst ]] && return
+  vcsi --grid=3x6 --width=1440 --metadata-position=hidden --output="$dst" -- "$src" && return
+  ffmpegthumbnailer -i "$src" -o "$dst" -s 0 && return
+  true
+}; export -f gen_preview
+
+
+# \( -type l -o ! -readable \) -prune -o \
+find -H "$d_video" \
+  -type d \( -name '.git' -o -name '_build*' -o -name '_cache*' \) -prune -o \
+  -xtype f -print \
+| file --dereference --mime-type -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar --print0 -f- \
+| grep -aoP '.*(?=\x00:\s+video/)' \
+| parallel -j2 --halt-on-error now,fail=1 -- gen_preview {}

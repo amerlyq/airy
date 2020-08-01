@@ -22,6 +22,6 @@ Thumbnail sheets / collage
     HACK: generate many >> images, compress to .jpg and pick largest size -- to skip monotonic black/white ones
       https://superuser.com/questions/538112/meaningful-thumbnails-for-a-video-using-ffmpeg#comment1298658_608125
     $ ffmpeg -ss 3 -i input.mp4 -vf "select=gt(scene\,0.4)" -frames:v 5 -vsync vfr -vf fps=fps=1/600 out%02d.jpg
-  |aur/vcsi|
+  |aur/vcsi-git| NEED:(FIXED:sample_aspect_ratio): !vcsi>=7.0.7
     $ vcsi --width=1200 --grid=3x7 --metadata-position=hidden --output='preview.jpg' -- video.mp4
   |aur/mtn-git|
