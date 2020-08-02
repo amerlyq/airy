@@ -26,3 +26,7 @@
 [_] THINK: hide tags inside .git = systemlist('git rev-parse --git-dir')[0].'/tags' ⌇Gg-nu
 [X] HACK:(tags;/): search file in parent dirs, stop when '/' is reached (OR: use '~') ⌇}p-nu
   https://stackoverflow.com/questions/5017500/vim-difficulty-setting-up-ctags-source-in-subdirectories-dont-see-tags-file-i
+
+
+IDEA:OPT(on demand): search whole git history for "deleted anchors" (i.e. only in deleted/modified lines)
+  i.e. mitigate the problem of "dangling refs" -- indistiguishable from "wrong refs"

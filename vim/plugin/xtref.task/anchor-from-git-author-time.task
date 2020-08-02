@@ -1,0 +1,23 @@
+⌇⡟⠧⠪⠋
+Backtracking addition of xtref.
+
+STORY
+  You written many ideas into file and committed it months ago, and now you wish to
+  refer to one of those ideas and facilitate xtref with meaningful "birthtime".
+
+ALG
+  for current line find earliest mentioning in history
+    BAD: line may be modified multiple times
+      -- impossible w/o human intervention in general case,
+      but useful enough in 80% simple cases
+  use earliest date between file modification and git commit
+    CASE: if commit was done weeks after file was created
+  use earliest date between creation date and modificaton -- if file is untracked
+    BAD: useless for !vim -- it fully replaces file inode on each edit
+
+
+BAD
+  ! all xtrefs in single commit will be the same
+    IDEA: increment each next one BAD: must find latest xtref in commit interval
+    IDEA: use totally random seconds BAD: must detect collisions
+    IDEA:NICE: use line-number 0‥3600 => fixed +mm:ss increment
