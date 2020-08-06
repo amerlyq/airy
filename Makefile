@@ -1,7 +1,7 @@
 #!/bin/sh -fCeu
 # vim:ft=make
 #
-# SPDX-FileCopyrightText: 2019 Amelyq <amerlyq@gmail.com> and contributors.
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
 #
 # SPDX-License-Identifier: MIT
 #

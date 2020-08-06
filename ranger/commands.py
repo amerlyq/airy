@@ -454,6 +454,18 @@ class console(Command):
             self.fm.ui.console.history_move(-self.quantifier)
 
 
+class mvsel(Command):
+    """:mvsel %any_path
+
+    Move files from current selection to dir on cmdline (OR one of bookmarks)
+    """
+    def execute(self):
+        dest = self.rest(1)
+        self.fm.cut()
+        self.fm.paste(dest=dest)
+        self.fm.notify(dest)
+
+
 class flat_inode(Command):
     """:flat_inode [-t] [<[fdl]>] [<level>]
 

@@ -1,5 +1,6 @@
 #!/bin/sh -eu
-# USAGE: $ ./$0 ./dir host:/mnt/HD/HD_a2/share/$USER
+# USAGE: $ ./$0 -- ./dir host:/mnt/HD/HD_a2/share/$USER
+# CMP: $ ./$0 --dry-run --delete-after -- dir/ lc:/me/dir
 
 # SEE:(--backup): sync - make rsync wait for a confirmation before actually changing files - Super User ⌇⡞⣯⡸⣀
 #   https://superuser.com/questions/282942/make-rsync-wait-for-a-confirmation-before-actually-changing-files
@@ -14,6 +15,7 @@
 #     <= e.g. if they were deleted wrongly and moving to ~/backup had failed
 dbkp="/me/!rsync/$(date +%Y%m%d_%H%M%S)"
 
+# PERF:(-a): => -rlW
 exec rsync -e ssh -avh --no-group \
   --stats --progress \
   --backup --backup-dir="$dbkp" \

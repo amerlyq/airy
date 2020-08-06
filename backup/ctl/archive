@@ -148,7 +148,7 @@ make_backup itemlists <<< ~/backup-lists ||:
 ## NOTE: save lists to be able to restore same hierarchy on demand e.g. to remember active games
 # [_] MAYBE:DEV also save some magnet-donkey-torrent-like hash-sum
 #   => to search "future IPFS web" for exact copy OR verify if identical
-if ((!${#args[@]})) || [[ " ${args[*]} " =~ " flist " ]]; then
+if ((!${#args[@]})) || [[ " ${args[*]} " =~ " filelists " ]]; then
   dtmp=$(mktemp -d)
   gather_flist(){ local fl d=$1
     # [[ -d $d ]] || return 0

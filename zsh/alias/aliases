@@ -32,6 +32,9 @@ if (($+commands[gnuplot])); then
   pl1(){ gnuplot -p -e "set xlabel '$1'; set ylabel '$2'; plot '-' using 1:2 with lines lw 2 title '$3' noenhanced"; }
 fi
 
+# USAGE: $ r.rsync-ssh --dry-run --delete-after --no-t --  ./ lc:/me/vd G ' <f' | cut -d' ' -f4- LP
+alias -g LP="X zsh -c 'command ln -svT --backup=numbered -- "'"$1:A" "$0/${1//\//⁄}"'"' "'"$(d=/tmp/res && mkdir -p "$d" && echo "$d")"'
+
 # Line trim W/H to term size (w/o two prompts and errcode)
 alias -g CW='| expand | cut -c-"$(tput cols)"'
 alias -g CH='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'

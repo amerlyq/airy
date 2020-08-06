@@ -23,3 +23,15 @@ ip link set up dev eth0
 # same address as in the beginning
 ip route add default via 192.168.123.100 dev eth0
 ping 8.8.8.8
+
+
+# P2P network
+sudo ip addr add 192.168.2.4/24 dev enp67s0
+paci dhcp
+sudo cp /etc/dhcpd.conf /etc/dhcpd.conf.example
+# SEE:CFG: https://wiki.archlinux.org/index.php/Dhcpd
+sudo vis /etc/dhcpd.conf
+sudo /usr/bin/dhcpd -4 -cf /etc/dhcpd.conf -pf /run/dhcpd.pid enp67s0
+nmap 192.168.2.0/24
+ssh 192.168.2.150
+
