@@ -104,7 +104,7 @@ function h_move()
 end
 
 mp.add_key_binding("y", nm("write"),    h_write)
-mp.add_key_binding("M", nm("moving"),   h_move)
+mp.add_key_binding("m", nm("moving"),   h_move)
 mp.add_key_binding("[", nm("mark_beg"), h_mark_beg)
 mp.add_key_binding("]", nm("mark_end"), h_mark_end)
 mp.add_key_binding("{", nm("seek_beg"), h_seek_beg)
