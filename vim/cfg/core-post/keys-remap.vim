@@ -42,6 +42,9 @@ noremap <unique> g8 ga
 " Faster $3 ex-cmds
 noremap <unique> ;  :
 
+" Jumping through :changes list by {g, g;} DUE:(g<Leader>) ※⡟⠱⣔⠚
+noremap <unique> g: g,
+
 " Move to <next|prev> [qf|loc] entry
 noremap <unique> ]q :<C-U><C-R>=v:count1<CR>cnext!<CR>
 noremap <unique> [q :<C-U><C-R>=v:count1<CR>cprevious!<CR>
