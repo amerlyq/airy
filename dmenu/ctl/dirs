@@ -7,7 +7,9 @@ find "$dir" -mindepth 1 -type d -printf '%T@ %P\n' \
 | sort -nr | cut -d' ' -f2- \
 | dmenu -i -b -p "$dir" \
   -nb '#000000' -nf '#999999' -sb '#000000' -sf '#31658C' \
-  -fn '-misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
+  -fn sans:size=9
+
+  # -fn '-misc-fixed-medium-r-normal-*-*-200-75-75-*-*-iso8859-2'
 
 # DEV: options
 # * sort by length and alphabet (hold more results on screen)
