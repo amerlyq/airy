@@ -162,6 +162,7 @@ if (($+commands[xargs])); then
 fi
 
 if (($+commands[xsel])); then
+  alias -g YN='|xsel -ib'
   alias -g Y='|tee >/dev/tty|xsel -ib'
   alias -g Y+='|tee >/dev/tty|xsel -ab'
   alias -g Y:='xsel -ob'

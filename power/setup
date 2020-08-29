@@ -25,5 +25,9 @@ if lsmod | grep -q '^btusb\s'; then
   # fi
 fi
 
+# NEED: /etc/conf.d/lm_sensors
+# cfgOpt -r && sudo sensors-detect
+# svc_activate -e lm_sensors
+
 # INFO:(temperature): $ sensors
 svc_activate -er thermald.service
