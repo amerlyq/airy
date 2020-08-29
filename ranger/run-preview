@@ -10,23 +10,47 @@ set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 export SHELL=$(type -p bash)
 
 d_video=${1:-$PWD}
-export d_cache=${2:-~/.cache/ranger}
+export d_cache=${2:-/tmp/ranger}
+> "$d_cache/error.log"
 
-gen_preview(){ local h src=$1 dst
-  h=$(realpath -- "$src" | head -c-1 | sha1sum | cut -f1 -d' ')
-  dst=$d_cache/$h.jpg
+gen_timelapse(){ local src=$1 dst=$2
+  [[ -f $dst ]] && return || mkdir -p "${dst%/*}"
+  vcsi --grid=3x6 --width=1440 --metadata-position=hidden --output="$dst" -- "$src"
+}; export -f gen_timelapse
+
+gen_thumbnail(){ local src=$1 dst=$2
+  [[ -f $dst ]] && return || mkdir -p "${dst%/*}"
+  ffmpegthumbnailer -i "$src" -o "$dst" -s 0
+}; export -f gen_thumbnail
+
+gen_ranger_preview(){ local hp hc src=$1 dst img
+  hc=$(sha256sum -b "$src" | cut -f1 -d' ')
+
+  # VIZ: fallback
+  dst=$d_cache/thumbnail/${hc:0:2}/$hc.jpg
+  gen_thumbnail "$src" "$dst" && img=$dst
+
+  dst=$d_cache/timelapse/${hc:0:2}/$hc.jpg
+  gen_timelapse "$src" "$dst" && img=$dst
+
+  hp=$(realpath -- "$src" | head -c-1 | sha1sum | cut -f1 -d' ')
+  dst=$d_cache/ranger/$hp.jpg
   # echo "$dst"
-  [[ -f $dst ]] && return
-  vcsi --grid=3x6 --width=1440 --metadata-position=hidden --output="$dst" -- "$src" && return
-  ffmpegthumbnailer -i "$src" -o "$dst" -s 0 && return
-  true
-}; export -f gen_preview
+
+  if [[ ! -f $img ]]; then
+    echo "Err:(img): $src" >> "$d_cache/error.log"
+    return 0
+  fi
+
+  [[ -f $dst ]] && return || mkdir -p "${dst%/*}"
+  ln -svfT -- "$img" "$dst"
+}; export -f gen_ranger_preview
 
 
 # \( -type l -o ! -readable \) -prune -o \
 find -H "$d_video" \
   -type d \( -name '.git' -o -name '_build*' -o -name '_cache*' \) -prune -o \
-  -xtype f -print \
+  -type f -print \
 | file --dereference --mime-type -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar --print0 -f- \
 | grep -aoP '.*(?=\x00:\s+video/)' \
-| parallel -j2 --halt-on-error now,fail=1 -- gen_preview {}
+| parallel -j$(nproc) --halt-on-error now,fail=1 -- gen_ranger_preview {}
