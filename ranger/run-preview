@@ -10,7 +10,8 @@ set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 export SHELL=$(type -p bash)
 
 d_video=${1:-$PWD}
-export d_cache=${2:-/tmp/ranger}
+export d_cache=${2:-/games/irome-misc}
+# export d_cache=${2:-~/.cache/ranger}
 > "$d_cache/error.log"
 
 gen_timelapse(){ local src=$1 dst=$2

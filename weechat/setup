@@ -11,14 +11,13 @@ source ~/.shell/func.d/cfgsetup
 #   ALT:THINK? use simple "ln -s" to pre-create dangling symlinks
 #   <= because installation occurs only AFTER all ./install scripts are executed
 # linkcp -t ~/.weechat/lua -- /opt/matrix.lua
-linkcp -t ~/.weechat/python -- /usr/lib/weechat/python/matrix.py
-linkcp /usr/lib/weechat/python/matrix/ ~/.weechat/python/matrix
+## DEBUG: /script load weechat-matrix.py
+linkcp -t ~/.weechat/python -- /usr/share/weechat/python/weechat-matrix.py
 
 ## Enable
 # linkcp -rt ~/.weechat/lua/autoload -- ~/.weechat/lua/matrix.lua
-linkcp -rt ~/.weechat/python/autoload -- \
-  ~/.weechat/python/edit.py \
-  ~/.weechat/python/matrix.py
+linkcp -rt ~/.weechat/python/autoload -f ~/.weechat/python -- \
+  edit.py weechat-matrix.py
 
 weechat_prf=$(cfg-overlay -M~ -s 'weechat/{}' -b "${AIRY_OVERLAY_BASE-}" -o "${AIRY_OVERLAY_PATH-}" -- profile)
 source "$weechat_prf"  # -> WEECHAT_LIST

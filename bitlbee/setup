@@ -22,10 +22,11 @@ svc_activate -er bitlbee.socket
 
 # BUG: after system update gpg/pass won't work until reboot -- fail for setup
 #   ::: TEMP: remove lines with "bitlbee" and "weechat" from /tmp/airy-*.list
+#   BET: reload gnupg
 # BUG: clean install must create bitlbee identity OR??? force user to prepare existing one ?
 #   ERR: PRIVMSG &bitlbee :The nick is (probably) not registered
 #   ::: ./setup r
-# WARN:NEED: unlock your passwords beforehand $ pass open
+# WARN:NEED: unlock your passwords tomb beforehand $ pass open
 if cfgOpt uUrR; then
   ./exe/configure $(cfgOpt r && echo --renew) -- "${BITLBEE_LIST[@]:?}"
 fi

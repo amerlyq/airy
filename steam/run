@@ -23,11 +23,16 @@ export GDK_SCALE=2
 # exec optirun -b primus steam
 
 # USE:|community/primus_vk|: vulkan offload for Bumblebee
-export ENABLE_PRIMUS_LAYER=1
+# export ENABLE_PRIMUS_LAYER=1
+
+# [_] TODO:TRY: run whole "steam" and each game in separate "cgroup" or "systemd-slice"
+#   => so I could easily kill whole wine game when it hangs
 
 # NEED: $ sudo chrt --fifo --all-tasks --pid 15 $(pidof game)
 # FAIL: can't set "nice" without "sudo" -- which will mess up all permissions of configs and saves
-exec time nice -n -4 taskset --cpu-list 0-8:2 optirun -b primus -- steam "$@"
+# BUT: perm-reset "sudo nice -10 sudo -u user command" will clean up above exported environment...
+# exec time nice -n -4 taskset --cpu-list 0-8:2 optirun -b primus -- steam "$@"
+exec steam "$@"
 # exec optirun steam "$@"
 
 # BAD: crash on "libvgui2_s.so"

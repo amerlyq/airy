@@ -5,4 +5,4 @@ source ~/.shell/func.d/cfgsetup
 ### LINKS ###
 linkcp -t ~/.config/picom -- picom.conf
 
-svc_activate -cue picom.service
+svc_activate -cue"$(cfgOpt uU&&echo rR)" picom.service

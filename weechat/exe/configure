@@ -64,6 +64,7 @@ fi
 #   $ cat /proc/$(pidof weechat)/environ
 ## NOTE: passphrase can be added always <= no passphrase is requested on startup
 #   until some encrypted data will be added (i.e. WEECHAT_PASS_* vars)
+## BET: !weechat>=3.1 :: /set sec.crypt.passphrase_command "r.query-passwd chat/weechat"
 exec <<< ""
 [[ ${weechat_pass:+x} ]] && exec <<< "/secure passphrase $weechat_pass"
 

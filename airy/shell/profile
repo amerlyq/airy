@@ -6,12 +6,13 @@ CURR_PROF='default'
 # TODO: replace by ~/.cache/pacaur OR:BET: /var/cache/pacman/dev
 CURR_DIR_PKG=${CURR_DIR_PKG:-${XDG_CACHE_HOME:-$HOME/.cache}/airy/pkg}
 
+# ALSO: home=$(getent passwd "$USER" | cut -d: -f6)
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/airy
 config=${XDG_CONFIG_HOME:-$HOME/.config}/airy
 
 ### Samba ###
 declare -A AIRY_SAMBA_RO=(
-  [home]="/home/${USER:?}"
+  # [home]="${HOME:?}"
   [data]="/data"
   [mounts]="/media/${USER:?}"
 )

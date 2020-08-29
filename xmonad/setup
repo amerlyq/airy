@@ -5,7 +5,14 @@ THEME_ALLOWED='dark|light'
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-linkcp -t ~/.xmonad xmonad.hs xmobarrc
+# SRC: https://superuser.com/questions/877677/programatically-determine-if-an-script-is-being-executed-on-laptop-or-desktop/877796
+if [[ $(</sys/class/dmi/id/chassis_type) == 3 ]]
+then pltf=desktop
+else pltf=laptop
+fi
+linkcp ./xmobarrc."$pltf" ~/.xmonad/xmobarrc
+
+linkcp -t ~/.xmonad -- xmonad.hs
 lib=~/.xmonad/lib/XMonad
 linkcp -t "$lib/Config/Amer" ./cfg/*
 linkcp -t "$lib/Util/Amer"   ./ext/*

@@ -4,14 +4,15 @@
 source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
-dst=~/.Skype/${CHAT_SKYPE:?}/config.xml
-if cfgOpt r || [[ ! -f $dst ]]; then
-  rm -f "$dst"
-  linkcp -c "${dst##*/}" "$dst"
-fi
-
-if cfgOpt u; then
-  ./config.gen
-fi
+## OBSOLETE: now Skype is also web-based
+# dst=~/.Skype/${CHAT_SKYPE:?}/config.xml
+# if cfgOpt r || [[ ! -f $dst ]]; then
+#   rm -f "$dst"
+#   linkcp -c "${dst##*/}" "$dst"
+# fi
+#
+# if cfgOpt u; then
+#   ./config.gen
+# fi
 
 echo "C: skype"
