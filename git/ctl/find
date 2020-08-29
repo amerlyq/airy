@@ -13,7 +13,7 @@
 # DISABLED: "\( -type d -o -type l -xtype d \)"
 #   <= .git dir symlink is only useful for submodules under git-annex
 #   ::: it means, there is no need to list them as part of <Gs>
-exec find "${1:-$PWD}" \
+exec find -H "${1:-$PWD}" \
   -xtype d \( -name '_build*' -o -name '_cache*' -o -name '&*' \) -prune -o \
   -type d -name .git -prune "${@:2}" -printf '%h\0'
 
