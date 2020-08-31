@@ -1,0 +1,32 @@
+⌇⡟⡌⣘⠙
+
+ALG
+  symmetric passive pull
+    CLIENT(fractal)
+      $ git remote add neo ssh://neo/aura/todo/.git
+      $ git fetch neo
+      $ git merge --ff-only neo/master
+    SERVER(neo)
+      $ git remote add fractal lf:/aura/todo/.git
+      $ git fetch fractal
+      $ git merge --ff-only fractal/master
+
+  asymmetric active push
+    CLIENT(fractal)
+      * pull <- neo/master (as simple remote) -- works for current branch
+      * push -> neo/sync/master -- to prevent pushing into current branch
+      $ git remote add neo ssh://neo/aura/todo/.git
+      [_] TBD:BAD: impossible to setup "remote" to pull from "master" but push to "sync/master"
+    SERVER(neo)
+      $ git merge --ff-only sync/master
+
+
+INFO
+  Working with Git remotes and pushing to multiple Git repositories | Jigarius.com ⌇⡟⡌⣘⠶
+    https://jigarius.com/blog/multiple-git-remote-repositories
+    ¦ Define a git remote which will point to multiple git remotes.
+    ¦ Say, we call it “all”: git remote add all REMOTE-URL-1.
+    ¦ Register 1st push URL: git remote set-url --add --push all REMOTE-URL-1.
+    ¦ Register 2nd push URL: git remote set-url --add --push all REMOTE-URL-2.
+    ¦ Push a branch to all the remotes with git push all BRANCH – replace BRANCH with a real branch name.
+    ¦ You cannot pull from multiple remotes, but you can fetch updates from multiple remotes with git fetch --all.
