@@ -44,6 +44,6 @@ let g:deoplete#enable_auto_pairs = 1
 
 " Use head matcher
 " call deoplete#custom#set('_', 'matchers', ['matcher_head'])
-let g:deoplete#keyword_patterns = {}
+" let g:deoplete#keyword_patterns = {}
 " let g:deoplete#keyword_patterns.tex = '\\?[a-zA-Z_]\w*'
-let g:deoplete#keyword_patterns.tex = '[^\w|\s][a-zA-Z_]\w*'
+" let g:deoplete#keyword_patterns.tex = '[^\w|\s][a-zA-Z_]\w*'
