@@ -6,3 +6,8 @@ HACK: binary files also have "date of creation" which can be used to identify th
     THINK: also use nanoseconds beside seconds to also refer batch-created files
     BUT: also must encode "node" to refer files created at the same time on different platforms
   ALT: for textual files you can add mark inside file header around usual #vim:ft=...
+
+
+FAIL: !vim overwrites file inode on save, therefore birthtime is always changing
+  FAIL: git switching branches / stashing also recreates file
+  ALSO: media files moved to other disks
