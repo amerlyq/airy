@@ -24,3 +24,5 @@ USAGE
     $ sudo mount -t cifs -o "user=$USER,uid=$(id -u),gid=$(id -g),iocharset=utf8" "//192.168.1.2/share" /mnt
       # ,workgroup=workgroup,ip=serverip
     $ mount -t cifs -o "users,user=$USER,uid=$(id -u),gid=$(id -g),iocharset=utf8" "//192.168.1.2/share" /mnt
+  Mount laptop/pc over direct cabel
+    $ sudo mount -t smb3 -o username=$USER,uid=$USER,gid=$USER,nomapposix,noperm,dir_mode=0755,file_mode=0644,iocharset=utf8 -- //192.168.2.3/data /mnt
