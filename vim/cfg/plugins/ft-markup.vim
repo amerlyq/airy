@@ -63,3 +63,13 @@ call dein#add('zaiste/tmux.vim', {
 " let g:riv_projects = [proj1]
 call dein#add('gu-fan/riv.vim', {
   \ 'on_ft': 'rst'})
+
+
+
+call dein#add('aklt/plantuml-syntax')
+  " \ 'on_ft': 'plantuml'})
+" OLD:NICE:IDEA:(plain text) https://github.com/scrooloose/vim-slumlord
+" NICE: https://github.com/previm/previm
+" ALSO: https://wiki.archlinux.org/index.php/List_of_applications/Utilities#UML_modelers
+call dein#add('weirongxu/plantuml-previewer.vim', {
+  \ 'depends': ['tyru/open-browser.vim', 'aklt/plantuml-syntax']})
