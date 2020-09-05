@@ -70,7 +70,7 @@ call dein#add('chrisbra/vim-diff-enhanced', {
 " BUG: sometimes works in same thread, loading CPU. TEMP:FIX: ./setup -U vim
 " FIXME: don't treat '/path/to/file.pdf' as url
 " ALT:CHG: r.b --target tab "$@" BUT how to choose target window (named)?
-call dein#add('tyru/open-browser.vim', {
+call dein#add('tyru/open-browser.vim', {'lazy': 0,
   \ 'on_map': [['nx', '<Plug>(openbrowser-']],
   \ 'on_cmd': 'OpenBrowserSmartSearch',
   \ 'hook_source': "

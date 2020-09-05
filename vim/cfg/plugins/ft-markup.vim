@@ -72,4 +72,8 @@ call dein#add('aklt/plantuml-syntax')
 " NICE: https://github.com/previm/previm
 " ALSO: https://wiki.archlinux.org/index.php/List_of_applications/Utilities#UML_modelers
 call dein#add('weirongxu/plantuml-previewer.vim', {
-  \ 'depends': ['tyru/open-browser.vim', 'aklt/plantuml-syntax']})
+  \ 'depends': ['tyru/open-browser.vim', 'aklt/plantuml-syntax']
+\, 'hook_add': "
+\\n   let g:plantuml_previewer#plantuml_jar_path = '/usr/share/java/plantuml/plantuml.jar'
+\\n   let g:plantuml_previewer#viewer_path = $TMPDIR .'/plantuml'
+\"})

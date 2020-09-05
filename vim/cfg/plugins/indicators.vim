@@ -38,6 +38,7 @@ call dein#add('kshenoy/vim-signature', {'lazy': 0,
 "" Highlight motion, lock current color<->regex {{{1
 " USE:(directly) nmap <unique> <F1>h     :QuickhlManualList<CR>
 " ATTENTION: tag-toggle is unusable on big tag base (like kernels)
+" ALT:BET? https://github.com/inkarkat/vim-mark
 " CHG: [[n, qh, qH, <Leader>?h]]
 " let g:quickhl_manual_colors = [ "ctermbg=..", ... ]
 call dein#add('t9md/vim-quickhl', {

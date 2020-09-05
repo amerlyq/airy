@@ -190,7 +190,7 @@ call dein#add('saihoooooooo/vim-textobj-space', {
   \ 'on_map': {'ox': '<Plug>'},
   \ 'depends': 'vim-textobj-user',
   \ 'hook_source': 'let g:textobj_space_no_default_key_mappings = 1',
-  \ 'hook_add': "call Map_textobj('<Space>', 'space')"})
+  \ 'hook_add': "call Map_textobj('<BackSpace>', 'space')"})
 
 
 
