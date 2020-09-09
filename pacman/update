@@ -22,6 +22,12 @@ sudo -v
 # ) 2>/dev/null &
 
 
+## [_] TODO: update mirrors first before upgrade -- i.e. use two-step upgrade
+# reflector --score 5 --protocol https > /etc/pacman.d/mirrorlist
+# pacman -Syyu
+# udt=$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)
+# echo "Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch" >> /etc/pacman.d/mirrorlist
+
 # NOTE: three-stage process to upgrade AUR together with dependencies
 # HACK: skip 'exit 1' if update 'n' in pacman
 # BUG: skips upgrade if file exists -- because errcode=1

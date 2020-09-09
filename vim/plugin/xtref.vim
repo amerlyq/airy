@@ -236,11 +236,11 @@ augroup END
 iabbrev <expr> !xts! xtref#new()
 
 " OBSOL: <LocalLeader><F2>
-nnoremap [Xtref]u :<C-u>XtrefAura<CR>
+nnoremap [Xtref]U :<C-u>XtrefAura<CR>
 command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
 
 " OBSOL: <LocalLeader><F1>
-nnoremap [Xtref]U :<C-u>XtrefCwd<CR>
+nnoremap [Xtref]u :<C-u>XtrefCwd<CR>
 command! -bar -range -nargs=0  XtrefCwd
   \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
   \ |else|echoerr "Prevented gen tags in $HOME or below"|en
