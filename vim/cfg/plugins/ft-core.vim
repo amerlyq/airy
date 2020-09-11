@@ -116,5 +116,6 @@ call dein#add('LaTeX-Box-Team/LaTeX-Box', {
 
 "" Testing framework for vimscript
 " ALT: 'thinca/vim-themis'
-call dein#add('albfan/vader.vim', {
+" NEW? https://github.com/hupfdule/vader.vim/commit/d0432d92289eb5ffb7b34dd11e541d30fb2618da
+call dein#add('junegunn/vader.vim', {
   \ 'on_ft': 'vader'})

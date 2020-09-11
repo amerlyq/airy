@@ -244,6 +244,10 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
     [ "_NET_WM_WINDOW_TYPE_TOOLTIP"
     , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
     ] ] --> doIgnore
+  -- WTF: it seems "stringProperty" is wrong
+  --   -- we need _NET_WM_WINDOW_TYPE(ATOM) and atom constants to compare
+  , foldr1 (<||>) [ stringProperty "WM_NAME" =? x | x <-
+    [ "Microsoft Teams Notification" ] ] --> doIgnore
   ] <+>
   -- insertPosition Below Newer <+>
   mconcat
