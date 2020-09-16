@@ -415,7 +415,8 @@ if ($opts{commit}) {
             next if $x->{mod} =~ /^[D]/;
             my $f = join('/', $gittopdir, (defined $x->{dst} ? $x->{dst} : $x->{src}));
             # print "= ",$f,$/;  # DEBUG=
-            my $uts = (stat($f))[9];
+            my $uts = (lstat($f))[9];
+            print "ERR: $f$/" if not $uts;
             $authordate = $uts if $uts > $authordate;
         }
         push(@commitargs, '--date='.$authordate) if $authordate;
