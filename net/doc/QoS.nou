@@ -1,0 +1,19 @@
+⌇⡟⡢⢣⠢
+
+SRC: I need a secure and transparent backup method! / Networking, Server, and Protection / Arch Linux Forums ⌇⡟⡢⢒⢄
+  https://bbs.archlinux.org/viewtopic.php?id=109419
+  $ DEV=eth0
+  $ DEV_MAX=100Mbit
+  $ SSH_UPLOAD=750kbit
+  $ SERVER_IP=192.168.10.50/32
+  $ SERVER_PORT=12345
+  $ tc qdisc del dev $DEV root
+  $ tc qdisc add dev $DEV root handle 1: htb default 10
+  $ tc class add dev $DEV parent 1: classid 1:1 htb rate $DEV_MAX
+  $ tc class add dev $DEV parent 1:1 classid 1:10 htb rate 500kbit ceil $DEV_MAX
+  $ tc class add dev $DEV parent 1:1 classid 1:11 htb rate 750kbit ceil $SSH_UPLOAD
+  $ tc qdisc add dev $DEV parent 1:10 handle 10: sfq
+  $ tc qdisc add dev $DEV parent 1:11 handle 11: sfq
+  $ tc filter add dev $DEV parent 1: protocol ip prio 5 \
+  $ u32 match ip dst $SERVER_IP \
+  $ match ip dport $SERVER_PORT 0xffff classid 1:11
