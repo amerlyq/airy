@@ -28,6 +28,8 @@ CFG
 
 %% Local setup
 
+  ALT: manually use cryptsetup ※⡟⡢⡱⣷
+
   CREATE
     $ mkdir -m700 ~/tomb
     $ chattr +C ~/tomb
@@ -142,6 +144,7 @@ Password-protected key
 Manually
   open less intrusive
     $ tomb open secret.tomb -k secret.tomb.key -pngo ro,exec /mnt
+  create w/o !tomb ※⡟⡢⢓⢌
   open w/o tomb
     $ gpg -d secret.tomb.key | cryptsetup --key-file - luksOpen $(sudo losetup --show --find secret.tomb) secret
     $ mount /dev/mapper/secret /mnt

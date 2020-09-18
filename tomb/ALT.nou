@@ -1,0 +1,49 @@
+
+create w/o !tomb ⌇⡟⡢⢓⢌
+  ALSO:(optional): use NBD instead of SSHFS
+
+  [_] WTF: difference between !tomb and manual setup
+    GitHub - dyne/Tomb: the Crypto Undertaker ⌇⡟⡢⢜⣤
+      https://github.com/dyne/Tomb
+
+  Encrypted remote backups with SSHFS and LUKS ⌇⡟⡢⡱⣷
+    https://ruderich.org/simon/notes/encrypted-remote-backups
+    Rysiekúr Memesson: "Encrypted remote backups using SSHFS and LUKS: ht…" - Mastodon ⌇⡟⡢⢓⠐
+      https://mastodon.social/@rysiek/100265647215971016
+
+  GitHub - fw42/sshluks: LUKS crypto containers over SSHFS on untrusted remote storage ⌇⡟⡢⡼⡗
+    https://github.com/fw42/sshluks
+
+  2009-01 Incremental backups to untrusted hosts – Vidar's Blog ⌇⡟⡢⢌⢆
+    https://www.vidarholen.net/contents/blog/?p=8
+    ::: BAD:PERF: 10x traffic per request
+      rsync_upload=120MiB total=40GB partition=400GB
+      => ext3_download=540MiB ext3_upload=1000MiB
+    [_] CHECK:PERF:OBSOLETE?
+      https://www.reddit.com/r/linuxadmin/comments/gzstxj/rsyncnet/fto0ipb/?utm_source=reddit&utm_medium=web2x&context=3
+        ~ in recent years sshfs and FUSE in general are much more efficient and performant.
+        ~ Copy a 5GB file onto it and only 5GB of network traffic
+      [_] SEE: SSHFS performance : linuxquestions ⌇⡟⡢⢥⠱
+        https://www.reddit.com/r/linuxquestions/comments/9btk9s/sshfs_performance/
+
+  I need a secure and transparent backup method! / Networking, Server, and Protection / Arch Linux Forums ⌇⡟⡢⢒⢄
+    https://bbs.archlinux.org/viewtopic.php?id=109419
+      !!! CFG: QoS traffic shaping to reduce network channel saturation for long backup uploads
+    ::: NICE:IDEA: two-stage upload
+      * keep identical local copy of encrypted container
+      * luksopen && mount && !rsync OR !rdiff-backup data into local container
+        Using rdiff-backup with SSHFS | Linode ⌇⡟⡢⢟⠛
+          https://www.linode.com/docs/security/backups/using-rdiff-backup-with-sshfs/
+      * !rsync sparse container to remote as blob
+        + NICE: "sync" and "transfer" are separate in time
+        + NICE: no need for passphrase anymore at the moment of transfer
+        + NICE: economic traffic (rounded on fs block size inside container)
+        + IDEA:MAYBE? no need to encrypt traffic by slow SSHFS
+          - FAIL: makes possible accumulating versioned changes by @EvilMaid※⡟⡢⢗⠱
+        + BET:PERF: !rsync to public NFSv3 LAN share instead of using !rsync--ssh
+      * BAD: duplicate data on local PC, especially detrimental for large volumes
+      * BAD:SECU: encrypted container still available for local adversary
+
+  Mount 2TB encrypted-container file through SSHFS (performance question) ⌇⡟⡢⢚⠠
+    https://www.linuxquestions.org/questions/linux-general-1/mount-2tb-encrypted-container-file-through-sshfs-performance-question-4175453734/
+    ::: PERF: !sshfs has performance issues on network/storage server BET:USE: !cifs works more stable (file=2TiB is OK)
