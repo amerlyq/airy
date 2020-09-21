@@ -1,5 +1,5 @@
 
-create w/o !tomb ⌇⡟⡢⢓⢌
+Manually create w/o !tomb ⌇⡟⡢⢓⢌
   ALSO:(optional): use NBD instead of SSHFS
 
   [_] WTF: difference between !tomb and manual setup
@@ -10,6 +10,9 @@ create w/o !tomb ⌇⡟⡢⢓⢌
     https://ruderich.org/simon/notes/encrypted-remote-backups
     Rysiekúr Memesson: "Encrypted remote backups using SSHFS and LUKS: ht…" - Mastodon ⌇⡟⡢⢓⠐
       https://mastodon.social/@rysiek/100265647215971016
+
+  dm-crypt/Device encryption - ArchWiki ⌇⡟⡦⠞⣊
+    https://wiki.archlinux.org/index.php/Dm-crypt/Device_encryption#Loopback_filesystem
 
   GitHub - fw42/sshluks: LUKS crypto containers over SSHFS on untrusted remote storage ⌇⡟⡢⡼⡗
     https://github.com/fw42/sshluks
@@ -47,3 +50,41 @@ create w/o !tomb ⌇⡟⡢⢓⢌
   Mount 2TB encrypted-container file through SSHFS (performance question) ⌇⡟⡢⢚⠠
     https://www.linuxquestions.org/questions/linux-general-1/mount-2tb-encrypted-container-file-through-sshfs-performance-question-4175453734/
     ::: PERF: !sshfs has performance issues on network/storage server BET:USE: !cifs works more stable (file=2TiB is OK)
+
+
+========================================
+SRC: ※⡟⡢⡱⣷
+
+SETUP
+  $ cd /srv/tomb
+  $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb .
+  $ sudo mkdir -m700 . && chown "$USER:$USER" .
+  $ truncate -s 1G aura.luks
+    # BAD: not supported by SSHFS $ fallocate -l 1G aura.luks
+  $ pass generate tomb/aura
+  $ pass tomb/aura | sudo cryptsetup -v --type luks2 --key-file - --cipher aes-xts-plain64 --hash sha512 --key-size 512 --pbkdf argon2id --key-slot 0 luksFormat --header ~/tomb/aura.keys -- aura.luks
+  $ sudo cryptsetup luksDump --header ~/tomb/aura.keys -- aura.luks
+  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- aura.luks tomb
+  $ sudo dmsetup table /dev/mapper/tomb
+  $ sudo mkfs.ext4 -L tomb -m0 -E lazy_itable_init=0,lazy_journal_init=0 /dev/mapper/tomb
+  $ mount /dev/mapper/tomb /mnt
+  $ sudo install -m 700 -o $USER -g $USER -d -- /mnt
+  $ git clone --bare "file:///aura/aura/todo" /mnt/todo.git
+  $ git -C /aura/aura/todo remote set-url origin /mnt/todo.git
+  $ umount /dev/mapper/tomb
+  $ sudo cryptsetup -v close tomb
+  $ fusermount -u /srv/tomb
+
+SYNC
+  $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb /srv/tomb
+  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb
+  $ mount /dev/mapper/tomb /mnt
+  $ Gl
+  $ ... $ ATT: may error-out due to merge conflict => run rest o commands yourself
+  $ Gp
+  $ sync
+  # HACK: close tomb loop device, which prevents unmounting
+  # losetup -a | cut -d: -f1 | sort -n | tail -1 | xargs -r sudo losetup -d
+  $ umount /dev/mapper/tomb
+  $ sudo cryptsetup -v close tomb
+  $ fusermount -u /srv/tomb

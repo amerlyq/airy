@@ -1,0 +1,63 @@
+⌇⡟⡢⢃⡯
+
+REF: Speeding up Linux disk encryption ⌇⡟⡢⢃⡯
+  https://blog.cloudflare.com/speeding-up-linux-disk-encryption/
+
+USAGE
+  Create 4GB RAM disk
+    $ sudo modprobe brd rd_nr=1 rd_size=4194304
+    $ ls /dev/ram0
+    WARN: !iostat don't work for RAM disks
+  Generate password-locked container with detached header (key)
+    $ fallocate -l 2M crypthdr.img
+    $ sudo cryptsetup luksFormat /dev/ram0 --header crypthdr.img
+    INFO:CMP: http://infotinks.com/dd-fallocate-truncate-making-big-files-quick/
+      !dd allocates whole and writes data
+      !fallocate pre-allocates whole w/o write
+      !truncate creates sparse file and pretends to allocate, but disk usage will grow on actual write
+  Open/unlock device using keyfile
+    $ sudo cryptsetup open --header crypthdr.img /dev/ram0 encrypted-ram0
+    $ ls /dev/mapper/encrypted-ram0
+  Measure data throughput (min latency .vs. max throughput)
+    $ sudo fio --filename=/dev/ram0 --readwrite=readwrite --bs=4k --direct=1 --loops=1000000 --name=plain
+    $ sudo fio --filename=/dev/mapper/encrypted-ram0 --readwrite=readwrite --bs=4k --direct=1 --loops=1000000 --name=crypt
+    $ fio --minimal --bs=4096 --rw=randrw --name=generic_job_name --filename=/dev/sdb1 --numjobs=1 --size=214748364800 --thread --direct=1 --runtime=300 --rwmixread=50 --iodepth=256 --ioengine=libaio
+  PERF:CMP: cyphro
+    $ sudo cryptsetup benchmark
+    $ sudo dmsetup table /dev/mapper/encrypted-ram0
+      0 8388608 crypt aes-xts-plain64 0000000000000000000000000000000000000000000000000000000000000000 0 1:0 0
+  Add/change options to opened container
+    $ cryptsetup refresh ...
+    $ sudo modprobe xtsproxy
+    $ grep -A 11 'xtsproxy' /proc/crypto
+    $ sudo dmsetup table encrypted-ram0 --showkeys | sed 's/aes-xts-plain64/capi:xts-aes-xtsproxy-plain64/' | sed 's/$/ 1 force_inline/' | sudo dmsetup reload encrypted-ram0
+    $ sudo dmsetup suspend encrypted-ram0 && sudo dmsetup resume encrypted-ram0
+
+
+List available
+  OFF: https://gitlab.com/cryptsetup/cryptsetup/wikis/LUKS-standard/on-disk-format.pdf
+  encryption - How do I determine what ciphers & cipher modes I can use in dm-crypt/LUKS? - Super User ⌇⡟⡧⢰⠷
+    https://superuser.com/questions/775200/how-do-i-determine-what-ciphers-cipher-modes-i-can-use-in-dm-crypt-luks/1450671#1450671
+  $ cryptsetup --help | tail -n 8
+  $ sudo cryptsetup benchmark
+    # Tests are approximate using memory only (no storage IO).
+    PBKDF2-sha1      2470143 iterations per second for 256-bit key
+    PBKDF2-sha256    4588954 iterations per second for 256-bit key
+    PBKDF2-sha512    1846084 iterations per second for 256-bit key
+    PBKDF2-ripemd160  937903 iterations per second for 256-bit key
+    PBKDF2-whirlpool  745786 iterations per second for 256-bit key
+    argon2i       6 iterations, 1048576 memory, 4 parallel threads (CPUs) for 256-bit key (requested 2000 ms time)
+    argon2id      6 iterations, 1048576 memory, 4 parallel threads (CPUs) for 256-bit key (requested 2000 ms time)
+    #     Algorithm |       Key |      Encryption |      Decryption
+            aes-cbc        128b      1297.8 MiB/s      4253.1 MiB/s
+        serpent-cbc        128b       114.3 MiB/s       740.7 MiB/s
+        twofish-cbc        128b       222.9 MiB/s       431.1 MiB/s
+            aes-cbc        256b       981.8 MiB/s      3430.3 MiB/s
+        serpent-cbc        256b       117.5 MiB/s       737.8 MiB/s
+        twofish-cbc        256b       229.5 MiB/s       431.7 MiB/s
+            aes-xts        256b      2099.8 MiB/s      2033.2 MiB/s
+        serpent-xts        256b       732.7 MiB/s       718.3 MiB/s
+        twofish-xts        256b       428.4 MiB/s       427.3 MiB/s
+            aes-xts        512b      1847.8 MiB/s      1817.4 MiB/s
+        serpent-xts        512b       734.8 MiB/s       718.8 MiB/s
+        twofish-xts        512b       429.1 MiB/s       427.6 MiB/s
