@@ -8,6 +8,10 @@ source ~/.shell/func.d/cfgsetup
 #
 # MAYBE:(old): must be symlinked into two locations
 #   https://bugs.freedesktop.org/show_bug.cgi?id=98562
+[[ ! -L ~/.config/mimeapps.list ]] \
+  && [[ -f ~/.config/mimeapps.list ]] \
+  && diff -q ~/.config/mimeapps.list mimeapps.list &>/dev/null \
+  && rm ~/.config/mimeapps.list
 linkcp -t ~/.config -- mimeapps.list
 # linkcp -t ~/.local/share/applications -- mimeapps.list
 

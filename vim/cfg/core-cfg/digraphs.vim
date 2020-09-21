@@ -7,3 +7,4 @@ digraph lq 9598  " ╾
 digraph uq 9599  " ╿
 digraph ** 8226  " •
 digraph ~~ 21110 " ≈ | ?2
+digraph $$ 167   " § .instead-of. £
