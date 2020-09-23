@@ -7,7 +7,7 @@ set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 tomb='aura'
 dm='tomb'
 
-choices=osc
+choices=msu
 opts=; while getopts "A$choices" o; do case $o in :|'?') exit 1
 ;; A) opts+=$choices
 esac; opts+=$o; done; shift $((OPTIND - 1))
@@ -104,8 +104,8 @@ function SyncRepos { local err
   done
 }
 
-has o && OpenTomb lc:/me/$dm /srv/$dm $dm /mnt
+has m && OpenTomb lc:/me/$dm /srv/$dm $dm /mnt
 has s && SyncRepos $repos
 # MAYBE: trap '...' EXIT ERR
-has c && CloseTomb lc:/me/$dm /srv/$dm $dm /mnt
+has u && CloseTomb lc:/me/$dm /srv/$dm $dm /mnt
 exit 0
