@@ -183,20 +183,23 @@ sub parse_raw_numstat {
         } else {
             my ($add,$del,$src) = split /\t/, $_, 3;
 
-            # WARN: for newly added binary files numstat "add/del" = "-/-"
-            #   TEMP:HACK: treat whole file as single added/deleted line -- for @tops ordering on L229
-            if ($add eq '-' or $del eq '-') {
-                my $mod = $diff{$src}{mod};
-                $add = ($mod =~ /^[AM]/ ? 1 : 0) if $add eq '-';
-                $del = ($mod =~ /^[DM]/ ? 1 : 0) if $del eq '-';
-            }
-
+            # NOTE:FIXED: renamed binary files has multiline pattern = "- -\0src\0dst\0"
             if (not $src) {
                 $src = <STDIN>;
                 chomp $src;
                 my $dst = <STDIN>;
                 chomp $dst;
             }
+
+            # WARN: for newly added binary files numstat "add/del" = "-/-"
+            #   TEMP:HACK: treat whole file as single added/deleted line -- for @tops ordering on L229
+            if ($add eq '-' or $del eq '-') {
+                my $mod = $diff{$src}{mod};
+                print "ERR: $_\n" if not $mod;
+                $add = ($mod =~ /^[AM]/ ? 1 : 0) if $add eq '-';
+                $del = ($mod =~ /^[DM]/ ? 1 : 0) if $del eq '-';
+            }
+
             @{ $diff{$src} }{qw(add del)} = ($add, $del);
         }
 
