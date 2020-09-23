@@ -1,0 +1,111 @@
+#!/usr/bin/env zsh
+#%SUMMARY: sync local ~/aura repos with remote tomb container
+#%BET: sync all tombs first -- and only then use "Gp" for rest of ~/aura repos
+#%USAGE: $ ./$0 /aura/aura/todo ...
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
+
+tomb='aura'
+dm='tomb'
+
+choices=osc
+opts=; while getopts "A$choices" o; do case $o in :|'?') exit 1
+;; A) opts+=$choices
+esac; opts+=$o; done; shift $((OPTIND - 1))
+[[ -z ${opts//[^$choices]} ]] && opts=$choices  # =DFL
+has(){ [[ $opts =~ [$*] ]]; }
+
+# TODO:(-R): scan ~/aura and gather all repos with (origin|aura)
+#   rmt=$(git remote get-url aura 2>/dev/null || git remote get-url origin)
+#   [[ $rmt == file:///mnt/* ]]
+repos=( "$@" )
+
+
+function isMountAllowed { local dev=$1 mnt=${2-}
+  [[ -n $dev ]] || return 0
+  if [[ $dev == $mnt ]]; then
+    >&2 echo "Warn: already mounted=$dev"
+    return 1
+  fi
+  >&2 echo "Err: wrong mount=$dev"
+  exit 1
+}
+
+function notMounted { local src=$1 tgt=$2 dev # ok=${3:-1} err=0
+  dev=$(findmnt -nfo SOURCE -M $tgt) || return 0
+  isMountAllowed $dev $src
+}
+
+function notOpened { local luks=$1 dm=$2 loop
+  # ALT: cryptsetup isLuks $luks && test -b /dev/disk/by-id/dm-uuid-*$(cryptsetup luksUUID $luks | tr -d -)*
+  # ALT: dmsetup ls | grep $dm | cut -f1 -d_
+  # BAD: don't work w/o "sudo" even for idle run
+  loop=$(sudo cryptsetup status $dm | sed -rn '/^\s*loop:\s*(.*)/s//\1/p') || return $(($?==4?0:$?))
+  isMountAllowed $loop $luks
+}
+
+# HACK: if this device is already mounted --
+#   it means git-syncup was interrupted with errors,
+#   so skip and continue git-syncup again
+function OpenTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
+
+  if notMounted $srv $loc; then
+    sudo install -m 700 -o $USER -g $USER -d -- $loc
+    ## FAIL: can't enter password into background process
+    #    WTF: why I need to enter password for authkey ssh in the first place ?
+    # sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" $srv $loc &
+    sshfs -o "umask=0077,noexec,no_readahead,allow_root" $srv $loc
+  fi
+
+  local luks=$loc/$tomb.luks
+  if notOpened $luks $dm; then
+    # BAD: actual pass path directly depends on $srv
+    #   << dif. servers may contain same LUKS container copy with dif. passwd
+    local pass=$dm/$tomb
+    local keys=~/tomb/$tomb.keys
+    pass $pass | sudo cryptsetup -v --key-file - luksOpen --header $keys -- $luks $dm
+  fi
+
+  local dev=/dev/mapper/$dm
+  if notMounted $dev $mnt; then
+    sudo mount $dev $mnt
+  fi
+}
+
+# TODO: call CloseTomb on demand by flag
+function CloseTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
+  sync
+
+  # FIXME: unmount only single $loop path from notOpened()
+  # HACK: close any stray loop device, which prevents unmounting
+  losetup -a | cut -d: -f1 | sort -n | tail -1 | xargs -r sudo losetup -d
+
+  local dev=/dev/mapper/$dm
+  local luks=$loc/$tomb.luks
+  # FIXME:BAD: must print "Warn: not mounted" instead
+  notMounted $dev $mnt || sudo umount $dev
+  notOpened $luks $dm || sudo cryptsetup -v close -- $dm
+  notMounted $srv $loc || fusermount -u -- $loc
+
+  # ALT: wait until background sshfs exits
+  # wait
+}
+
+function SyncRepos { local err
+  for r; do
+    r.git-status $r
+    ## ATT: may error-out due to merge conflict => run rest of commands yourself
+    # FAIL: fetches all remotes
+    #   FIXME: fetch only specific remote "$tomb" or default one "origin"
+    git-up $r origin 2>&1
+    r.git-status $r
+    r.git-push $r 2>&1 || ((1==(err=$?))) || exit $err
+    r.git-status $r
+    printf "==================\n\n"
+  done
+}
+
+has o && OpenTomb lc:/me/$dm /srv/$dm $dm /mnt
+has s && SyncRepos $repos
+# MAYBE: trap '...' EXIT ERR
+has c && CloseTomb lc:/me/$dm /srv/$dm $dm /mnt
+exit 0

@@ -4,6 +4,11 @@
 # if ((!$+commands[git-up])); then
 
 cwd=${1:-$PWD}
+
+# BAD: too complex to understand
+(($#)) && shift
+(($#)) || set -- --all
+
 clean=1
 cgit(){ git --no-pager -c color.status=always -c color.ui=always "$@"; }
 
@@ -16,7 +21,7 @@ git diff-files --quiet --ignore-submodules -- || clean=0
 # BUG: troubles when you on feature-branch and ustream was rebased
 #   Then you need only fetch instead of pull+rebase
 #   However, you always can do git rebase --abort ...
-cgit fetch --all
+cgit fetch "$@"
 cgit pull --rebase --verbose  # --rebase=preserve
 
 ((!clean)) && cgit stash show && cgit stash pop

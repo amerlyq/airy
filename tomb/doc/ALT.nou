@@ -70,17 +70,19 @@ SETUP
   $ mount /dev/mapper/tomb /mnt
   $ sudo install -m 700 -o $USER -g $USER -d -- /mnt
   $ git clone --bare "file:///aura/aura/todo" /mnt/todo.git
-  $ git -C /aura/aura/todo remote set-url origin /mnt/todo.git
+  $ git -C /aura/aura/todo remote set-url origin file:///mnt/todo.git
   $ umount /dev/mapper/tomb
   $ sudo cryptsetup -v close tomb
   $ fusermount -u /srv/tomb
 
 SYNC
   $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb /srv/tomb
+    # CHECK:(,compression=yes): useless due to sending encrypted data blocks
   $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb
   $ mount /dev/mapper/tomb /mnt
   $ Gl
   $ ... $ ATT: may error-out due to merge conflict => run rest o commands yourself
+    BET: sync tomb first -- and only then use "Gp" for rest of repos
   $ Gp
   $ sync
   # HACK: close tomb loop device, which prevents unmounting
