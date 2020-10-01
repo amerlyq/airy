@@ -223,14 +223,19 @@ fun! xtref#ctags(root, ...)
   echom 'DONE: gen '. g:xtref.tagfile .' for '. a:root
 endf
 
+" BAD: original text italic,bold,underline will affect xtrefs ⌇⡟⡵⠪⡆
+" FAIL: "NONE" does not reset style when overlaying on top of regular hi
+"   [⡟⡵⠱⣘] TRY: add hi suppression at least into .nou syntax
+"   [_] MAYBE: skip "matchadd(...)" if "syn match" already exists
+"     TRY:USE: getmatches() OR empty(synIDattr(hlID('xtrefAnchor'), 'name'))
 fun! xtref#syntax()
-  hi! xtrefAnchor ctermfg=24 guifg=#005f87
+  hi def xtrefAnchor ctermfg=24 guifg=#005f87 cterm=NONE gui=NONE
   call matchadd('xtrefAnchor', '\v'. g:xtref.r_anchor, -1)
 
-  hi! xtrefRefer ctermfg=35 guifg=#00af5f
+  hi def xtrefRefer ctermfg=1 guifg=#00af5f cterm=NONE gui=NONE
   call matchadd('xtrefRefer', '\v'. g:xtref.r_refer, -1)
 
-  hi! xtrefReferPfx ctermfg=41 guifg=#3fcf5f
+  hi def xtrefReferPfx ctermfg=41 guifg=#3fcf5f cterm=NONE gui=NONE
   call matchadd('xtrefReferPfx', '\v'. g:xtref.refer_pfx, -1)
 endf
 
