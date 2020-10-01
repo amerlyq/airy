@@ -12,6 +12,7 @@ let g:xtref.aura = $HOME."/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 
 " ALT: ⌇ => ¶ .like. https://www.yoctoproject.org/docs/3.1.1/brief-yoctoprojectqs/brief-yoctoprojectqs.html
+" OR:USE: '⌇' = "\u2307" = [\u2307]
 let g:xtref.anchor_pfx = '⌇'
 let g:xtref.refer_pfx = '※'
 let g:xtref.task_pfx = '['
@@ -112,13 +113,22 @@ fun! xtref#get(visual)
     let b = e
   endif
 
+  " NOTE: get only first xtref from xtref-train
   let e = xtref#rseek(l, pfxs, b+1)
   if e<0 | let e = len(l) |en
 
+  " NOTE: space is an absolute separator between xtrefs
+  " MAYBE:BET?(simplify): x=l=sub('\s.*','') && e=len(l)
   let s = match(l, '\s', b)
   let len = (s>=0 && s<e) ? s-b : e-b
 
-  return [strpart(l, b, len), b-c]
+  " NOTE: strip trailing decorative alias for braille-based xtrefs_4+
+  "   e.g. ※⡟⡵⠤⢓/comment  MAYBE: hi! this "comment" the same as anchor
+  let x = strpart(l, b, len)
+  let x = substitute(x, '\v^.'. s:r_braille .'\zs.*', '', '')
+
+  " DEBUG: echom join([l, b, len, b-c, x], ' ')
+  return [x, b-c]
 endf
 
 fun! xtref#replace(visual, sub)
