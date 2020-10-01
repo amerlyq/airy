@@ -255,13 +255,13 @@ nnoremap [Xtref]U :<C-u>XtrefAura<CR>
 command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
 
 " OBSOL: <LocalLeader><F1>
-nnoremap [Xtref]u :<C-u>XtrefCwd<CR>
+nnoremap [Xtref]<C-u> :<C-u>XtrefCwd<CR>
 command! -bar -range -nargs=0  XtrefCwd
   \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
   \ |else|echoerr "Prevented gen tags in $HOME or below"|en
 
 " DEPS: https://github.com/airblade/vim-rooter
-nnoremap [Xtref]g :<C-u>XtrefRoot<CR>
+nnoremap [Xtref]u :<C-u>XtrefRoot<CR>
 command! -bar -range -nargs=0  XtrefRoot
   \ call xtref#ctags(FindRootDirectory())
 
@@ -277,11 +277,12 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 " BUG:(TEMP:sil): paused prompt on each :tag
 "   => always prints name of file it opens on tag jump
 " [_] TRY: also overload <gf> to open xtref under cursor as if it was "file"
-nnoremap g]  :sil exe v:count1."tag" xtref#invert(xtref#get(0))<CR>
-xnoremap g]  :<C-u>sil exe v:count1."tag" xtref#invert(xtref#get(1))<CR>
-nnoremap z]  :exe "tsel" xtref#invert(xtref#get(0))<CR>
-xnoremap z]  :<C-u>exe "tsel" xtref#invert(xtref#get(1))<CR>
- noremap g[  :<C-u><C-r>=v:count1<CR>tnext<CR>
+" BAD:NEED:(sil): suppress "search hit bottom" message and jump immediately
+nnoremap <silent>  g]  :sil exe v:count1."tag" xtref#invert(xtref#get(0))<CR>
+xnoremap <silent>  g]  :<C-u>sil exe v:count1."tag" xtref#invert(xtref#get(1))<CR>
+nnoremap <silent>  z]  :exe "tsel" xtref#invert(xtref#get(0))<CR>
+xnoremap <silent>  z]  :<C-u>exe "tsel" xtref#invert(xtref#get(1))<CR>
+ noremap <silent>  g[  :<C-u><C-r>=v:count1<CR>tnext<CR>
  noremap <C-]>  :<C-u>tags<CR>
 
 
