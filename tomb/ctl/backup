@@ -1,47 +1,62 @@
 #!/usr/bin/env zsh
 #%SUMMARY: sync local ~/aura repos with remote tomb container
 #%BET: sync all tombs first -- and only then use "Gp" for rest of ~/aura repos
-#%USAGE: $ ./$0 /aura/aura/todo ...
+#%USAGE: $ ./$0 [-R .] [--] [~/aura/todo] ...
 set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
 tomb='aura'
 dm='tomb'
 
 choices=mcsu
-opts=; while getopts "A$choices" o; do case $o in :|'?') exit 1
+opts=; while getopts "AvR$choices" o; do case $o in :|'?') exit 1
 ;; A) opts+=$choices
 esac; opts+=$o; done; shift $((OPTIND - 1))
-: "${opts:=$choices}"  # =DFL // ALT: [[ -z ${opts//[^$choices]} ]]
+# ALT:(generic: -F => -Fmcsu): [[ -z ${opts//[^R$choices]} ]] && opts+=$choices
+[[ -z ${opts//[R]} ]] && opts+=$choices  # =DFL
 has(){ [[ $opts =~ [$*] ]]; }
 
-# TODO:(-R): scan ~/aura and gather all repos with (origin|aura)
-#   rmt=$(git remote get-url aura 2>/dev/null || git remote get-url origin)
-#   [[ $rmt == file:///mnt/* ]]
-repos=( "$@" )
+function CollectAuraRepos { local d r rmt
+  typeset -ga repos
+  for d; do
+    for r in ${(0)"$(r.git-find "$d")"}; do
+      rmt=$(git -C $r remote get-url "$tomb" || git -C $r remote get-url origin ||:) 2>/dev/null
+      [[ $rmt == file:///mnt/* ]] && repos+=( "$r" )
+      true
+    done
+  done
+}
 
-
-function isMountAllowed { local dev=$1 mnt=${2-}
-  [[ -n $dev ]] || return 0
-  if [[ $dev == $mnt ]]; then
-    >&2 echo "Warn: already mounted=$dev"
-    return 1
+function expectMount { local expected=$((!!$1)) dev=$2 src=${3-} tgt=${4-}
+  if ((expected)); then
+    [[ $dev == $src ]] && return 0
+    [[ -z $dev ]] && >&2 echo "Warn: not mounted=$tgt" && return 1
+  else
+    [[ -z $dev ]] && return 0
+    [[ $dev == $src ]] && >&2 echo "Warn: already mounted=$dev" && return 1
   fi
   >&2 echo "Err: wrong mount=$dev"
   exit 1
 }
 
-function notMounted { local src=$1 tgt=$2 dev # ok=${3:-1} err=0
-  dev=$(findmnt -nfo SOURCE -M $tgt) || return 0
-  isMountAllowed $dev $src
+function notMounted { local src=$1 tgt=$2  # ok=${3:-1} err=0
+  expectMount 0 "$(findmnt -nfo SOURCE -M $tgt)" $src $tgt
+}
+function isMounted { local src=$1 tgt=$2
+  expectMount 1 "$(findmnt -nfo SOURCE -M $tgt)" $src $tgt
 }
 
 function notOpened { local luks=$1 dm=$2 loop
   # ALT: cryptsetup isLuks $luks && test -b /dev/disk/by-id/dm-uuid-*$(cryptsetup luksUUID $luks | tr -d -)*
   # ALT: dmsetup ls | grep $dm | cut -f1 -d_
   # BAD: don't work w/o "sudo" even for idle run
-  loop=$(sudo cryptsetup status $dm | sed -rn '/^\s*loop:\s*(.*)/s//\1/p') || return $(($?==4?0:$?))
-  isMountAllowed $loop $luks
+  loop=$(sudo cryptsetup status $dm | sed -rn '/^\s*loop:\s*(.*)/s//\1/p') || (($?==4?0:$?))
+  expectMount 0 "$loop" $luks $dm
 }
+function isOpened { local luks=$1 dm=$2 loop
+  loop=$(sudo cryptsetup status $dm | sed -rn '/^\s*loop:\s*(.*)/s//\1/p') || (($?==4?0:$?))
+  expectMount 1 "$loop" $luks /dev/mapper/$dm
+}
+
 
 # HACK: if this device is already mounted --
 #   it means git-syncup was interrupted with errors,
@@ -63,7 +78,7 @@ function OpenTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
     #   << dif. servers may contain same LUKS container copy with dif. passwd
     local pass=$dm/$tomb
     local keys=~/tomb/$tomb.keys
-    pass $pass | sudo cryptsetup -v --key-file - luksOpen --header $keys -- $luks $dm
+    pass $pass | sudo cryptsetup --key-file - luksOpen --header $keys -- $luks $dm
   fi
 
   local dev=/dev/mapper/$dm
@@ -82,10 +97,9 @@ function CloseTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
 
   local dev=/dev/mapper/$dm
   local luks=$loc/$tomb.luks
-  # FIXME:BAD: must print "Warn: not mounted" instead
-  notMounted $dev $mnt || sudo umount $dev
-  notOpened $luks $dm || sudo cryptsetup -v close -- $dm
-  notMounted $srv $loc || fusermount -u -- $loc
+  isMounted $dev $mnt && sudo umount $dev
+  isOpened $luks $dm  && sudo cryptsetup close -- $dm
+  isMounted $srv $loc && fusermount -u -- $loc
 
   # ALT: wait until background sshfs exits
   # wait
@@ -109,6 +123,8 @@ function CfgCloneCentralRepos { local r nm srv rmt orn ups
   for r; do
     nm=$r:A:t
     srv=/mnt/$nm.git
+
+    [[ -e $r ]] || git clone "file://$srv" "$r"
     [[ -e $srv ]] || git clone --bare "file://$r:A" "$srv"
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
@@ -125,6 +141,17 @@ function CfgCloneCentralRepos { local r nm srv rmt orn ups
     [[ -n $ups ]] || git -C $r branch --set-upstream-to="origin/$b" "$b"
   done
 }
+
+
+if has R; then  #% -R = scan ~/aura and gather all repos with (origin|aura) => /mnt
+  (($#)) || set -- ~/aura
+  CollectAuraRepos $@
+else
+  repos=( "$@" )
+fi
+
+has s && ((!$#repos)) && >&2 echo "Err: empty repos list" && exit 1
+has v && print -l $repos
 
 has m && OpenTomb lc:/me/$dm /srv/$dm $dm /mnt
 has c && CfgCloneCentralRepos $repos
