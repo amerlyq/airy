@@ -7,11 +7,11 @@ set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 tomb='aura'
 dm='tomb'
 
-choices=msu
+choices=mcsu
 opts=; while getopts "A$choices" o; do case $o in :|'?') exit 1
 ;; A) opts+=$choices
 esac; opts+=$o; done; shift $((OPTIND - 1))
-[[ -z ${opts//[^$choices]} ]] && opts=$choices  # =DFL
+: "${opts:=$choices}"  # =DFL // ALT: [[ -z ${opts//[^$choices]} ]]
 has(){ [[ $opts =~ [$*] ]]; }
 
 # TODO:(-R): scan ~/aura and gather all repos with (origin|aura)
@@ -51,7 +51,8 @@ function OpenTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
   if notMounted $srv $loc; then
     sudo install -m 700 -o $USER -g $USER -d -- $loc
     ## FAIL: can't enter password into background process
-    #    WTF: why I need to enter password for authkey ssh in the first place ?
+    #    [⡟⡸⣆⢓] WTF: why I need to enter password for authkey ssh in the first place ?
+    #      ::: FIXED: $ ssh-copy-id -i ~/.ssh/id_rsa.pub lc && ssh lc 'tail -1 ~/.ssh/authorized_keys >> /_cfg/ssh/authorized_keys'
     # sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" $srv $loc &
     sshfs -o "umask=0077,noexec,no_readahead,allow_root" $srv $loc
   fi
@@ -104,7 +105,29 @@ function SyncRepos { local err
   done
 }
 
+function CfgCloneCentralRepos { local r nm srv rmt orn ups
+  for r; do
+    nm=$r:A:t
+    srv=/mnt/$nm.git
+    [[ -e $srv ]] || git clone --bare "file://$r:A" "$srv"
+
+    # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
+    rmt=$(git -C $r remote get-url $tomb 2>/dev/null ||:)
+    [[ $rmt == "file://$srv" ]] || git -C $r remote add $tomb "file://$srv"
+
+    orn=$(git -C $r remote get-url origin 2>/dev/null ||:)
+    [[ -n $orn ]] || git -C $r remote add origin "file://$srv"
+    [[ $orn != file:///mnt/* || $orn == "file://$srv" ]] || git -C $r remote add -- origin "file://$srv"
+
+    local b=master
+    # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
+    ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name "$b@{u}" 2>/dev/null ||:)
+    [[ -n $ups ]] || git -C $r branch --set-upstream-to="origin/$b" "$b"
+  done
+}
+
 has m && OpenTomb lc:/me/$dm /srv/$dm $dm /mnt
+has c && CfgCloneCentralRepos $repos
 has s && SyncRepos $repos
 # MAYBE: trap '...' EXIT ERR
 has u && CloseTomb lc:/me/$dm /srv/$dm $dm /mnt
