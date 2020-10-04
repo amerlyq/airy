@@ -121,6 +121,14 @@ function SyncRepos { local err
 
 function CfgCloneCentralRepos { local r nm srv rmt orn ups
   for r; do
+
+    ## TODO: clone root-repo and all submodules recursively
+    # root=$(git -C "$r" rev-parse --show-superproject-working-tree --show-toplevel | head -1)
+    # git -C "$root" git submodule foreach ...
+
+    # FIXED: allow executing !r.tomb-backup from repo subfolder
+    [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
+
     nm=$r:A:t
     srv=/mnt/$nm.git
 
