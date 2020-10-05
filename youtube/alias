@@ -3,6 +3,8 @@
 [[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' youtube-dl
 
 alias ydl=youtube-dl
-alias ydl.='ydl -o "%(title)s.%(ext)s"'
+alias ydl.='youtube-dl -o "%(title)s.%(ext)s"'
+alias ydL='youtube-dl -o "%(playlist_title)s/%(playlist_index)s - %(title)s.%(ext)s" --download-archive "youtube-dl.txt"'
+alias ydL.='youtube-dl -o "%(playlist_index)s - %(title)s.%(ext)s" --download-archive ".youtube-dl.txt"'
 alias ydl7="youtube-dl -f 'bestvideo[height<=720]+bestaudio/best'"
 alias ydl8="youtube-dl -f 'bestvideo[height<=1080]+bestaudio/best'"

@@ -1,0 +1,88 @@
+⌇⡟⡻⢖⣋
+
+USAGE:
+  $ cd /data/music/soundcloud && r.youtube-sc 'https://soundcloud.com/<user>/likes'
+    NOTE: use=$user/likes .instead-of. DFL=you/likes
+
+
+Online
+  ALT: play directly in !mpd ※⡟⡺⢁⣴
+  DLD: download audio
+    https://scdownloader.net/
+    https://www.videoconverterfactory.com/tips/how-to-download-off-soundcloud.html
+    https://www.mp3converter.net/soundcloud-downloader
+
+
+Skip nested playlists
+  [_] ERR: when "likes" are downloaded -- it downloads all songs *and playlists* recursively
+    [_] WARN: must manually skip [13/24] "361893515" in //.youtube-dl.txt (not available in country)
+
+
+PERF: skip already downloaded files
+  ytdl-org/youtube-dl: Command-line program to download videos from YouTube.com and other video sites ⌇⡟⡺⡺⡎
+    https://github.com/ytdl-org/youtube-dl#how-do-i-download-only-new-videos-from-a-playlist
+  $ youtube-dl --download-archive archive.txt -- ...
+
+
+dateAdded
+  BAD: downloaded music won't have "dateAdded" ※⡟⡺⡫⢹
+    $ cd /data/music/soundcloud/
+    $ mkdir "Khamsin - Led By The Sun"
+    $ ydl. https://soundcloud.com/bitbird/sets/khamsin-led-by-the-sun
+  FAIL: playlist itself don't have (at least shown part)
+    TRY: https://developers.soundcloud.com/docs/api/reference#tracks
+
+
+Thumbnails
+  API: https://developers.soundcloud.com/docs/api/reference#tracks
+  DEV: stream audio -- and download images separately
+    $ wget https://i1.sndcdn.com/artworks-000665320264-i11kmw-t500x500.jpg
+    $ wget https://i1.sndcdn.com/artworks-p09mvgSeQTnZS6kS-ZaR0eg-original.jpg
+  THINK: always show artwork in mpd
+    https://github.com/fikriomar16/ncmpcpp-with-albumart
+    https://github.com/arybczak/ncmpcpp/issues/306
+    BET: https://github.com/sdushantha/kunst
+  NOTE: insert artwork into mp3
+    $ lame --ti /path/to/file.jpg -- audio.mp3
+    * --ti <file>     audio/song albumArt (jpeg/png/gif file, 128KB max, v2.3)
+    audio - Add album-art cover to mp3/ogg file from command-line in batch mode? - Unix & Linux Stack Exchange ⌇⡞⡉⠛⢦
+      https://unix.stackexchange.com/questions/84915/add-album-art-cover-to-mp3-ogg-file-from-command-line-in-batch-mode
+
+
+Auth
+  [X] ALT:TRY: login from cmdline
+    ::: FAIL: don't work reliably anymore
+
+  Extract cookie from !qute
+    CREATE TABLE cookies
+      ( creation_utc INTEGER NOT NULL
+    + , host_key TEXT NOT NULL
+    + , name TEXT NOT NULL
+    + , value TEXT NOT NULL
+    + , path TEXT NOT NULL
+    + , expires_utc INTEGER NOT NULL
+    + , is_secure INTEGER NOT NULL
+      , is_httponly INTEGER NOT NULL
+      , last_access_utc INTEGER NOT NULL
+      , has_expires INTEGER NOT NULL DEFAULT 1
+      , is_persistent INTEGER NOT NULL DEFAULT 1
+      , priority INTEGER NOT NULL DEFAULT 1
+      , encrypted_value BLOB DEFAULT ''
+      , samesite INTEGER NOT NULL DEFAULT -1
+      , source_scheme INTEGER NOT NULL DEFAULT 0
+      , UNIQUE (host_key, name, path));
+    $ sqlite3 ~/.local/share/qutebrowser/webengine/Cookies 'SELECT * FROM cookies WHERE host_key LIKE "%soundcloud.com";'
+
+  Convert !qute cookie to STD FMT with Header
+    FMT(cookie): https://unix.stackexchange.com/questions/36531/format-of-cookies-when-using-wget/210282
+    ¦ .netscape.com   TRUE   /   FALSE   946684799   NETSCAPE_ID   100103
+    $ echo "# Netscape HTTP Cookie File" > /tmp/co
+    OR: $ curl --cookie-jar /tmp/co example.com
+    $ sqlite3 -separator $'\t' /home/user/.local/share/qutebrowser/webengine/Cookies \
+      'SELECT host_key, path, is_secure, expires_utc, name, value, encrypted_value FROM cookies where host_key LIKE "%soundcloud.com";' \
+      | sed 's/\t/\tTRUE\t/' >> /tmp/co
+
+  BET: directly pass OAuth cookie
+    https://github.com/ytdl-org/youtube-dl/issues/9272#issuecomment-354473116
+    $ oauth=$(sqlite3 /home/user/.local/share/qutebrowser/webengine/Cookies 'SELECT value FROM cookies WHERE host_key="soundcloud.com" AND name="oauth_token";')
+    $ ydl. --add-header "Authorization:OAuth $oauth" -- https://soundcloud.com/you/likes

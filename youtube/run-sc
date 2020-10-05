@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY: download private SC playlist with continuation
+#%USAGE: $ ./$0 https://soundcloud.com/you/likes
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+export LC_ALL='en_US.UTF-8'
+playlist=$1; shift
+(($#)) && exit 1
+
+websrc='soundcloud.com'
+qutecookiedb=~/.local/share/qutebrowser/webengine/Cookies
+oauth=$(sqlite3 "$qutecookiedb" 'SELECT value FROM cookies WHERE host_key="'"$websrc"'" AND name="oauth_token";')
+
+## NOTE: unnecessary OAuth for "/<user>/likes" page
+if [[ ${playlist##*/} == likes ]]; then
+  ydl(){ youtube-dl "$@"; }
+else
+  ydl(){ youtube-dl --add-header "Authorization:OAuth $oauth" "$@"; }
+fi
+
+
+## BAD:PERF: queries *each* song in playlist before printing %(playlist_title)
+# folder=$(ydl --dump-single-json -- "$playlist" | jq -r '.title')
+## BAD:ELEG: queries/prints playlist name for each file in playlist
+folder=$({ ydl --get-filename -o '%(playlist_title)s' \
+  -- "$playlist" 2>/dev/null || exit $(($?==120?0:$?)); } | head -1)
+[[ -n $folder ]] || exit 1
+
+## TEMP:HACK: always download to fixed location
+cd /data/music/soundcloud
+
+if [[ ${PWD##*/} != "$folder" ]]; then
+  mkdir -p "$folder"
+  cd "$folder"
+fi
+
+# MAYBE:ADD: for long .pl with ~700 songs
+#   --ignore-errors --no-warnings --limit-rate 500k --verbose \
+# NEED:(--ignore-errors): due to .wav files don't work with --embed-thumbnails
+# NEED:(--proxy): due to region $ --proxy='socks5://127.0.0.1:17321'
+ydl --xattrs --ignore-errors \
+  --format='bestaudio/best' \
+  --output='%(playlist_index)s - %(title)s.%(ext)s' \
+  --download-archive='.youtube-dl.txt' \
+  "$playlist"
