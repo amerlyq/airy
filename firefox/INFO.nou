@@ -9,10 +9,10 @@ Exported JSON
     $ ... | jq -r '.children[-1].children|map(.uri + "\t" + .title)|.[]'
 
 Native sqlite
-  Filter by previously viewed history -- places.sqlite
+  Filter by previously viewed history -- places.sqlite ⌇⡟⡻⢧⢔
     http://askubuntu.com/questions/412844/can-i-view-firefox-history-with-the-terminal
     http://softholmsyndrome.com/2014/10/27/places-sqlite.html
-    +++ http://forensicswiki.org/wiki/Mozilla_Firefox_3_History_File_Format
+    +++ Mozilla Firefox 3 History File Format - Forensics Wiki ※⡟⡻⢨⣨
      SELECT datetime(moz_historyvisits.visit_date/1000000,'unixepoch'), moz_places.url
      FROM moz_places, moz_historyvisits
      WHERE moz_places.id = moz_historyvisits.place_id
