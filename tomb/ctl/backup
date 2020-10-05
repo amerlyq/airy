@@ -113,13 +113,14 @@ function SyncRepos { local err
     #   FIXME: fetch only specific remote "$tomb" or default one "origin"
     git-up $r origin 2>&1
     r.git-status $r
+    # FIXME: must push "aura" and (only if matching) origin
     r.git-push $r 2>&1 || ((1==(err=$?))) || exit $err
     r.git-status $r
     printf "==================\n\n"
   done
 }
 
-function CfgCloneCentralRepos { local r nm srv rmt orn ups
+function CfgCloneCentralRepos { local r nm mnt srv rmt orn ups
   for r; do
 
     ## TODO: clone root-repo and all submodules recursively
@@ -129,19 +130,23 @@ function CfgCloneCentralRepos { local r nm srv rmt orn ups
     # FIXED: allow executing !r.tomb-backup from repo subfolder
     [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
 
-    nm=$r:A:t
-    srv=/mnt/$nm.git
+    nm=${${r:A:t}#.}
+    mnt=/mnt/$nm.git
+    srv="file://$mnt"
 
-    [[ -e $r ]] || git clone "file://$srv" "$r"
-    [[ -e $srv ]] || git clone --bare "file://$r:A" "$srv"
+    # TRY:SRC:(NF): test non-empty-dir by ZSH: $ /path/to/dir(NF)
+    #   https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
+    [[ -e $r ]] || git clone "$srv" "$r"
+    [[ -e $mnt ]] || git clone --bare "file://$r:A" "$mnt"
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
-    rmt=$(git -C $r remote get-url $tomb 2>/dev/null ||:)
-    [[ $rmt == "file://$srv" ]] || git -C $r remote add $tomb "file://$srv"
+    rmt=$(git -C $r remote get-url "$tomb" 2>/dev/null ||:)
+    [[ -z $rmt ]] && git -C $r remote add "$tomb" "${rmt:=$srv}"
+    [[ $rmt != "$srv" ]] && git -C $r remote set-url "$tomb" "$srv"
 
     orn=$(git -C $r remote get-url origin 2>/dev/null ||:)
-    [[ -n $orn ]] || git -C $r remote add origin "file://$srv"
-    [[ $orn != file:///mnt/* || $orn == "file://$srv" ]] || git -C $r remote add -- origin "file://$srv"
+    [[ -z $orn ]] && git -C $r remote add origin "${orn:=$srv}"
+    [[ $orn == file:///mnt/* && $orn != "$srv" ]] && git -C $r remote set-url origin "$srv"
 
     local b=master
     # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
