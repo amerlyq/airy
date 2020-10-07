@@ -115,6 +115,9 @@ function SyncRepos { local err
     r.git-status $r
     # FIXME: must push "aura" and (only if matching) origin
     r.git-push $r 2>&1 || ((1==(err=$?))) || exit $err
+    ## TODO: sync everything
+    # git push -u origin --all
+    # git push -u origin --tags
     r.git-status $r
     printf "==================\n\n"
   done
