@@ -13,7 +13,8 @@ iabbrev  туду:  TODO:
 let s:patterns = [
   \ ['Err', 196, '#ff2525', 'RED|Qs|RQs?|REQUIRE|ERRs?|ERROR|BUG|REGR%(ESSION)?|XXX|WTF|BAD|FAIL%(ED|URE)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'GREN|ADD|NEED|FIND|ALSO|BET%(TER)?|E\.G|e\.g|ADVICE'],
-  \ ['Ref',  28, '#00af00', 'SEE|READ|REF%(ERENCE)?|TUT%(ORIAL)?|BLOG|BOOK|LIOR|LORE|OV|OVERVIEW'],
+  \ ['Ref',  28, '#00af00', 'SEE|READ|REF%(ERENCE)?|TUT%(ORIAL)?|BLOG|BOOK|LIOR|OV|OVERVIEW'],
+  \ ['Rul',  22, '#1f881f', 'RULE?s?|LORE'],
   \ ['Alt', 178, '#dfaf00', 'YELW|ALT|OR|CASE|THINK|IDEA|CHG|RENAME|CALL|CMP|I\.E|i\.e|EXAM%(INE)?|OPTL?|OPTIONAL'],
   \ ['Dev',  33, '#0087ff', 'BLUE|DEV%(ELOP)?|CFG|ENH%(ANCE)?|HACK|NICE|RFC|SEP%(ARATE)?|SPL%(IT)?|DECI%(DE)?'],
   \ ['Tbd', 169, '#ff5faf', 'PINK|TODO|CHECK|TRY|MOVE|NOT|REQ%(UEST)?|MAYBE|WAIT%(ING)?'],

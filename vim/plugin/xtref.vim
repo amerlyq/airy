@@ -55,7 +55,8 @@ fun! xtref#vsel()
 endf
 
 fun! xtref#copy(xtref, ...)
-  call setreg(get(a:,2,'+'), get(a:,1,' ') . a:xtref, 'c')
+  " RUL(don't add leading space): I often add space myself
+  call setreg(get(a:,2,'+'), get(a:,1,'') . a:xtref, 'c')
 endf
 
 fun! xtref#new(...)
@@ -65,7 +66,7 @@ fun! xtref#new(...)
   "" ALT:PERF: systemlist('r.vim-xtref '.get(a:,1))[0]
   let xts = substitute(printf('%08x', strftime('%s')), '..', '\=nr2char("0x28".submatch(0))', 'g')
   call xtref#copy(g:xtref.refer_pfx . xts)
-  return g:xtref.anchor_pfx . xts
+  return get(a:,1,g:xtref.anchor_pfx) . xts
 endf
 
 
@@ -295,7 +296,9 @@ noremap <silent>  ]x  :<C-u>let @/='\v'.g:xtref.r_refer<CR>n
 " noremap <silent>  ]X  :<C-u>let @/='\v'.g:xtref.r_refer<CR>N
 
 
-nnoremap <Plug>(xtref-new-insert) i<C-r>=xtref#new()<CR><Esc>
+"" WTF:(<Plug>(xtref-yank)): does not exists ?
+nnoremap <Plug>(xtref-new-insert) i<C-r>=xtref#new("")<CR><Esc>
+nnoremap <Plug>(xtref-new-prepend) ^"=xtref#new()." "<CR>P<Plug>(xtref-yank)
 
 nnoremap <Plug>(xtref-new-append) $"=" ".xtref#new()<CR>p<Plug>(xtref-yank)
 xnoremap <Plug>(xtref-new-append) "=xtref#new()<CR>p
@@ -341,6 +344,7 @@ map <silent> [Xtref]<Delete> <Plug>(xtref-delete)
 
 map <silent> [Xtref]a <Plug>(xtref-new-append)
 map <silent> [Xtref]i <Plug>(xtref-new-insert)
+map <silent> [Xtref]I <Plug>(xtref-new-prepend)
 map <silent> [Xtref]d <Plug>(xtref-replace-datetime)
 map <silent> [Xtref]r <Plug>(xtref-invert)
 map <silent> [Xtref]R <Plug>(xtref-refresh)
