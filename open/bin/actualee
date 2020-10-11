@@ -7,7 +7,7 @@ set -euo pipefail -o errtrace
 # REF:(file ...)
 #   https://www.ibm.com/developerworks/community/blogs/58e72888-6340-46ac-b488-d31aa4058e9c/entry/get_over_extensions_use_file_command_to_determine_file_types_in_linux?lang=en
 
-onexit(){ exec pause $? $_pargs "${0##*/}" "${*:-: ${PWD/$HOME/\~}}"; }
+onexit(){ exec pause $? "$_pargs" "${0##*/}" "${*:-: ${PWD/$HOME/\~}}"; }
 # trap 'onexit' HUP INT QUIT TERM ERR
 trap 'onexit' HUP QUIT TERM ERR  # INT -- better to return immediately
 
@@ -44,7 +44,11 @@ in dot.gz|gv.gz) r.graphviz-view "$1"
 case ${ext:?}
 in dot|gv) r.graphviz-view "$1"
 ;; tpp) tpp "$1"
-;; md|rst|org) pandoc --standalone -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
+;; md|rst|org|wiki) pandoc --standalone -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
+;; adoc) asciidoctor -b html -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
+  ## BAD: breaks special properties e.g. "[%collapsible]
+  # asciidoctor -b docbook -o "/tmp/pandoc.docbook" "$1" &&
+  # pandoc --standalone -f docbook -o /tmp/pandoc.html "/tmp/pandoc.docbook" && r.b /tmp/pandoc.html
 ;; ijs) /usr/lib/j8/bin/jconsole "$1"
 ;; jar) java -jar "$1"
 # Launched w/o fork, because of poor cmd support: it opens new instance of
@@ -56,12 +60,13 @@ in dot|gv) r.graphviz-view "$1"
 esac; esac; }
 
 
-by_mime(){ local mime=$(file --brief --mime-type "$1")
+by_mime(){ local mime
+  mime=$(file --brief --mime-type "$1")
 case ${mime:?}
 in text/x-python) "$1"
 ;; application/x*) "$1"
 ;; text/x*) "$1"
-;; video/*) ((_list)) && { mpv --playlist="${args[@]}"; return; } || mpv "$1"
+;; video/*) ((_list)) && { mpv --playlist="${args[*]}"; return; } || mpv "$1"
 ;; *) return 12
 esac; }
 
