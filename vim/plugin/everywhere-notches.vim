@@ -10,6 +10,7 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 " EXPL: phonetic abbreviations in cyrillic, etc.
 iabbrev  туду:  TODO:
 
+" [_] FAIL: below "ex:" is treated as modeline
 let s:patterns = [
   \ ['Err', 196, '#ff2525', 'RED|Qs|RQs?|REQUIRE|ERRs?|ERROR|BUG|REGR%(ESSION)?|XXX|WTF|BAD|FAIL%(ED|URE)?|CRIT%(ICAL)?'],
   \ ['Add',  76, '#5faf00', 'GREN|ADD|NEED|FIND|ALSO|BET%(TER)?|E\.G|e\.g|ADVICE'],

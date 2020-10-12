@@ -119,8 +119,16 @@ fun! xtref#get(visual)
   if e<0 | let e = len(l) |en
 
   " NOTE: space is an absolute separator between xtrefs
+  "   BUT:THINK: for tasks -- use ALL content inside [...] as "x"
   " MAYBE:BET?(simplify): x=l=sub('\s.*','') && e=len(l)
   let s = match(l, '\s', b)
+  if s>=0
+    " DEBUG: echo strpart(l, b, s-b) .'|'. strpart(l, s+1)
+    " FIXED: allow iso8601 date with usual space separator
+    if strpart(l, b, s-b) =~ '20\d\d-\d\d-\d\d$'
+       \ && strpart(l, s+1) =~ '^\d\d:\d\d:\d\d'
+    let s = match(l, '\s', s+1)
+  en|en
   let len = (s>=0 && s<e) ? s-b : e-b
 
   " NOTE: strip trailing decorative alias for braille-based xtrefs_4+
@@ -132,6 +140,7 @@ fun! xtref#get(visual)
   return [x, b-c]
 endf
 
+" [_] BUG: \xd calls twice #get()
 fun! xtref#replace(visual, sub)
 " fun! xtref#replace(...)
 "   let [x, off] = xtref#get()

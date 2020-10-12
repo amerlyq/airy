@@ -69,6 +69,7 @@ call dein#add('Shougo/echodoc.vim', {
 
 " CHECK {{{1
 " ALT 'SirVer/ultisnips'
+"   CMP: https://github.com/Shougo/neosnippet.vim/issues/365
 " vim_version: 7.3.885  # NEED: event TextChanged,TextChangedI
 " unite_sources: neosnippet{,/user,/runtime}
 " DISABLED:(au CursorMoved) -- until I will start to use snippets
