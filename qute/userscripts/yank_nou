@@ -29,9 +29,19 @@ xtref=$(r.vim-xtref)
 ## BAD: no easy keyboard-only way to remove accidental selections on page
 # title=${QUTE_SELECTED_TEXT:-$QUTE_TITLE}
 title=$QUTE_TITLE
+url=$QUTE_URL
+
+# USAGE: :hint --rapid links spawn --userscript yank_nou -- '{hint-url}'
+if [[ $blk == -- ]]; then
+  url=$pfx
+  # https://unix.stackexchange.com/questions/103252/how-do-i-get-a-websites-title-using-command-line
+  title=$(curl -s -- "$url" | grep -o '<title>[^<]*' | tail -c+8)
+  blk=
+  pfx=
+fi
 
 # SRC: https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
-printf -v pretty_url '%b' "${QUTE_URL//%/\\x}"
+printf -v pretty_url '%b' "${url//%/\\x}"
 
 exec xsel -ib <<EOT
 ${blk}$(printf "%$((count * 2))s")${pfx}${title}${xtref:+ $xtref}
