@@ -244,6 +244,12 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
     [ "_NET_WM_WINDOW_TYPE_TOOLTIP"
     , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
     ] ] --> doIgnore
+  -- FAIL: skype pop-up window during call still tiled instead of floating/ignored
+  , foldr1 (<||>) [ stringProperty "_NET_WM_STATE" =? x | x <-
+    [ "WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE"
+    -- , _GTK_HIDE_TITLEBAR_WHEN_MAXIMIZED(CARDINAL) = 1
+    -- , _NET_WM_STATE(ATOM) = WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE
+    ] ] --> doIgnore
   -- WTF: it seems "stringProperty" is wrong
   --   -- we need _NET_WM_WINDOW_TYPE(ATOM) and atom constants to compare
   , foldr1 (<||>) [ stringProperty "WM_NAME" =? x | x <-
