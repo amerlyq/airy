@@ -16,7 +16,9 @@ let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 let g:xtref.anchor_pfx = '⌇'
 let g:xtref.refer_pfx = '※'
 let g:xtref.task_pfx = '['
+let g:xtref.step_pfx = '^'
 let g:xtref.markers = [g:xtref.anchor_pfx, g:xtref.refer_pfx]
+let g:xtref.prefixes = g:xtref.markers + [g:xtref.task_pfx, g:xtref.step_pfx]
 
 " TODO: support for nanoseconds tail
 " ALT:(queue): $ r.vim-xtref -pp $ ALT:(generic): '\S{3,20}\ze\s?'
@@ -56,6 +58,7 @@ endf
 
 fun! xtref#copy(xtref, ...)
   " RUL(don't add leading space): I often add space myself
+  " [_] ENH: if a:1 is array == surround xtref by valus
   call setreg(get(a:,2,'+'), get(a:,1,'') . a:xtref, 'c')
 endf
 
@@ -99,7 +102,7 @@ fun! xtref#get(visual)
   endif
 
   "" FIXME: enforce suffix for "surrounding" markers "[<braille>]"
-  let pfxs = g:xtref.markers + [g:xtref.task_pfx]
+  let pfxs = g:xtref.prefixes
   let b = xtref#lseek(l, pfxs, c)
   let e = xtref#rseek(l, pfxs, c)
   if b<0 && e<0 | return ['', 0] |en
@@ -165,7 +168,7 @@ fun! xtref#invert(xloci)
   let pfx = strcharpart(x, 0, 1)
   " ALT: keep regular tags untouched = (pfx==a ? r : pfx==r ? a : pfx)
   let [a,r] = g:xtref.markers
-  if pfx !=# a && pfx !=# r | return expand('<cword>') | en
+  if index(g:xtref.prefixes, pfx) < 0 | return expand('<cword>') | en
   return (pfx ==# a ? r : a) . strcharpart(x, 1)  " fnameescape()
 endf
 
@@ -226,12 +229,35 @@ function! xtref#call_at(cwd, fn, ...)
   return _
 endfunction
 
+
+" DEV: update tags from added buffers ※⡟⢋⡤⣒
+" ALSO:(async): auto-update tags on file close
 fun! xtref#ctags(root, ...)
   if !executable('ctags')| echoerr "Not found in PATH: ctags(1)" | return |en
-  let dst = shellescape(get(a:, 1, g:xtref.tagfile))
-  let _ = join(xtref#call_at(a:root, 'systemlist', 'r.vim-xtref -tr -- -o '.dst), '\n')
+  let dst = shellescape(g:xtref.tagfile)
+  " let dst = shellescape(get(a:, 1, g:xtref.tagfile))
+
+  " NOTE: append tags only from file paths passed as arg (e.g. ~BufClose~)
+  "   OR from all opened buffers (manually)
+  let bufs = get(a:, 1, [])
+  if type(bufs) == type(1) && bufs == 1
+    let bufs = filter(map(copy(getbufinfo()), 'v:val.name'), 'len(v:val)')
+  end
+
+  let cmd = 'r.vim-xtref -t -- -o '.dst
+  if len(bufs)
+    " THINK:CHG: append to separate $TMPDIR/nou/xtref.tags overlay
+    "   << delete this overlay each time you regen proper Aura or Repo tags
+    let cmd .= ' --append '. join(map(bufs, 'shellescape(v:val)'), ' ')
+  else
+    let cmd .= ' --recurse'
+  end
+
+  " FIXME: use async job
+  let _ = join(xtref#call_at(a:root, 'systemlist', cmd), '\n')
   echom 'DONE: gen '. g:xtref.tagfile .' for '. a:root
 endf
+
 
 " BAD: original text italic,bold,underline will affect xtrefs ⌇⡟⡵⠪⡆
 " FAIL: "NONE" does not reset style when overlaying on top of regular hi
@@ -254,6 +280,19 @@ call xtref#syntax()
 augroup Xtref
   autocmd!
   au WinEnter * call xtref#syntax()
+
+  "" [_] ENH: parse !ctags only in diff from last write
+  " au BufWritePost * XtrefOpened
+
+  " NOTE: only modified buffers
+  " OR: au BufDelete *
+  " OR :echo getbufinfo({'bufmodified': 1})->map({ _, b -> b.bufnr })->join(',')
+  " BUG: always shows "[unite] - mrus" as modified
+  " FAIL: on BufUnload all files are already saved
+  "   NEED: detect somehow if file was modified at least once from the moment
+  "   of opening vim instance -- and reset this var after writing tags
+  " au BufUnload * if index(map(getbufinfo({'bufmodified':1}), 'v:val.bufnr'), '<bufnr>') > -1
+  "   \| call xtref#ctags($TMPDIR.'/airy', ['<afile>']) |en
 augroup END
 
 
@@ -261,7 +300,7 @@ augroup END
 iabbrev <expr> !xts! xtref#new()
 
 " OBSOL: <LocalLeader><F2>
-nnoremap [Xtref]U :<C-u>XtrefAura<CR>
+nnoremap [Xtref]<A-u> :<C-u>XtrefAura<CR>
 command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
 
 " OBSOL: <LocalLeader><F1>
@@ -275,11 +314,16 @@ nnoremap [Xtref]u :<C-u>XtrefRoot<CR>
 command! -bar -range -nargs=0  XtrefRoot
   \ call xtref#ctags(FindRootDirectory())
 
+nnoremap [Xtref]U :<C-u>XtrefOpened<CR>
+command! -bar -range -nargs=0  XtrefOpened
+  \ call xtref#ctags($TMPDIR.'/airy', 1)
+
 
 " NOTE: search tags in *aura*, same folder as current file, and in all parent dirs of CWD ※}p-nu
 " MAYBE: exe 'set tags^='. g:xtref.aura.'/**/'.g:xtref.tagfile
 exe 'set tags^='. g:xtref.aura.'/'.g:xtref.tagfile
 exe 'set tags^='. g:xtref.tagfile.';/'
+exe 'set tags^='. $TMPDIR.'/'.g:xtref.tagfile
 exe 'set tags^='. './'.g:xtref.tagfile.';'
 
 
@@ -321,10 +365,10 @@ nnoremap <Plug>(xtref-task-insert) i[_]<Space><Esc>
 nnoremap <Plug>(xtref-task-new) :call setline('.', substitute(getline('.'), '\v(['. &commentstring[0] .']+\s*)(\[[_X]\]\s*)?', '\1[_] ', ''))<CR>
 nnoremap <Plug>(xtref-task-done) :call setline('.', substitute(getline('.'), '\V[_]\s\?', xtref#new().' [X] ', ''))<CR><Plug>(xtref-yank)
 
-nnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(0)))<CR>
-xnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(1)))<CR>
-nnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref#strip(xtref#get(0)))<CR>
-xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref#strip(xtref#get(1)))<CR>
+nnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(0)),repeat(' ',v:count))<CR>
+xnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(1)),repeat(' ',v:count))<CR>
+nnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref#strip(xtref#get(0)),repeat(' ',v:count))<CR>
+xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref#strip(xtref#get(1)),repeat(' ',v:count))<CR>
 
 " [_] CHECK: limit #get() area by visual selection for bounded replace
 nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(0,'')<CR>
@@ -358,8 +402,9 @@ map <silent> [Xtref]d <Plug>(xtref-replace-datetime)
 map <silent> [Xtref]r <Plug>(xtref-invert)
 map <silent> [Xtref]R <Plug>(xtref-refresh)
 map <silent> [Xtref]t <Plug>(xtref-replace-datetime)
-map <silent> [Xtref]y <Plug>(xtref-yank-refer)
-map <silent> [Xtref]Y <Plug>(xtref-yank-anchor)
+map <silent> [Xtref]y  <Plug>(xtref-yank-refer)
+map <silent> [Xtref]Y 1<Plug>(xtref-yank-refer)
+map <silent> [Xtref]gy <Plug>(xtref-yank-anchor)
 
 " BAD: better use unified keybindings for tasks in nou.vim and xtref
 "   i.e. always confusing <,.> and <\x>

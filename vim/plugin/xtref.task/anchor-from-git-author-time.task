@@ -16,8 +16,23 @@ ALG
     BAD: useless for !vim -- it fully replaces file inode on each edit
 
 
+TODO:USAGE
+  * populate .tags DB (MAYBE:SEP) with xtrefs-from-commits
+  * generate unified auto-agenda in @/todo
+  * add synthetic xtref referers to agenda items
+  * when jumpting these xtrefs -- search them in git-commit-based xtrefs
+
+
 BAD
   ! all xtrefs in single commit will be the same
     IDEA: increment each next one BAD: must find latest xtref in commit interval
     IDEA: use totally random seconds BAD: must detect collisions
     IDEA:NICE: use line-number 0‥3600 => fixed +mm:ss increment
+    ALSO: add xtref only to top-most subtask (in current diff)
+
+
+USAGE:CASE
+  Overview dates
+    $ git ls-files --cached -z |xargs -r0n1 git --no-pager log --follow --diff-filter=A --find-renames=40% --date=format:%Y-%m-%d+%H:%M:%S%z --format=tformat:%ad --
+  Prepend each file by xtref from first git history NICE when porting files between repos
+    $ git ls-files --cached -z |xargs -r0n1 sh -c 'ad=$(git --no-pager log --follow --diff-filter=A --find-renames=40% --date=unix --format=tformat:%ad -- "$0"); xts=$(r.vim-xtref "$ad"); printf "0a\n%s\n.\nwq\n" "$xts" | ex - "$0"'

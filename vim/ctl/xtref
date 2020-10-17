@@ -169,8 +169,8 @@ parse_xtref(){ local a
   # DEV:HACK: jump <g[> using only first 4-char (ignoring nanoseconds)
   # VIZ:NICE: date-time separators /[+T=_ ]/
   case ${#a}
-  in 28|31|34) xts=$(printf '%08x' $(date +'%s %N' --date="$a"))         # nano = 2019-11-08T01:53:33.407997535+0200
-  ;; 24) xts=$(printf '%08x' "$(date +%s --date="$a")")                 #  iso = 2020-02-03T22:19:31+0300
+  in 28|31|34) xts=$(printf '%08x' "$(date +'%s %N' --date="$a")")      # nano = 2019-11-08T01:53:33.407997535+0200
+  ;; 24|25) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  #  iso = 2020-02-03T22:19:31+0300 OR +03:00
   ;; 20) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  #  utc = 2020-02-03T22:19:31Z
   ;; 19) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  # date = 2020-02-04[^0-9]00:19:31
   ;; 16) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  # ut = 20200203T221931Z
@@ -210,7 +210,7 @@ print_xtref(){ local xtref
     ;; "$pf_referer") pfx=$pf_anchor
     ;; '') pfx=$pf_referer    # CASE:(-x): for wild address always means "referer"
     esac
-  xtref=$("cvt_$fmt" "$xts" ${nopfx-"$pfx"})
+  xtref=$("cvt_$fmt" "$xts" "${nopfx-$pfx}")
   printf '%s%s' "$xtref" "$linesep"
 }
 
