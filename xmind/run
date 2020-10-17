@@ -1,0 +1,39 @@
+#!/usr/bin/env zsh
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY: convert .xmind into .nou outline
+#%USAGE: $ ./$0
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
+setopt warn_nested_var warn_create_global
+
+dir=${OUT_DIR:-/tmp/xmind}
+
+function cvt { local d=$1 f=$2 tmp
+  tmp=$(mktemp)
+  xmind2latex -i "$f" -f -o "$tmp"
+  mkdir -p "$d"
+  pandoc -f latex -w asciidoctor -o- -- "$tmp" | awk '
+    /^$/{next}
+    /^=+\s/{
+      i=index($0," ")
+      x=substr($0,1,i-3)
+      if(length(x)){
+        gsub("=","  ",x)
+      }else{
+        print""
+      }
+      print x substr($0,i+1)
+    }' >! "$d/${f:t:r}.nou"
+}
+
+for a; do
+  if [[ -d $a ]]; then
+    cd "$a"
+    find -H . -type f -name '*.xmind' -print0 | parallel -0 env OUT_DIR="$dir/{//}" "$0" {}
+  else
+    cvt "$dir" "$a"
+  fi
+done

@@ -1,0 +1,53 @@
+
+ALG: .xmind -> .latex -> .nou ⌇⡟⢇⢙⠻
+  IDEA: convert to latex -- to store in .git and then post-process
+  [X] TRY: pandoc to convert latex => .rst / .adoc / .json
+    $ xmind2latex -i ./_HomeMap.xmind -f -o /tmp/xmind.tex && pandoc -o /tmp/xmind.json -- /tmp/xmind.tex
+    ::: ERR:(unexpected _): unsupported symbol "_" in latex section headers
+  [$] NEED:FIND: latex preview
+    https://www.google.com/search?q=arch%20linux%20latex%20viewer
+  ::: BET: export .md / .pdf manually
+
+
+[⡟⢊⠌⣜] ALG: cvt .xmind => .md => .nou ⌇⡟⢉⣙⠼
+  Export each .xmind.sheet into separate .md and .pdf velocity=※⡟⢇⢙⠻
+    NEED: remap keys for easier batch-processing
+      <C-j> collapse/expand all
+      <C-n> next sheet
+      <C-m> export as .md
+  Copy only .md files into new repo
+    $ find /cache/mm/xmind -type f -name '*.md' -printf '%P\n' | while IFS= read -r f; do mkdir -p $f:h; cp -aTv -- /cache/mm/xmind/$f $f; done
+  Remove trial watermark
+    $ ff -X sed -i '/XMind - Trial Version/d'
+  Convert H1 to title
+    $ ff -X sed -i '/^# /s//%%%% /'
+  Remove trailing spaces and Windows-esque newlines <^M>
+    $ ff -X sed -i '/\r/s/\r//g; /\s$/s/\s\+$//g'
+  Convert H2 into heading
+    $ ff -X sed -i '/^## /s//%%% /'
+  Treat H3 as outline too (I mostly used it in that way anyway)
+    $ ff -X sed -i '/^### /s//  /'
+  Convert bullet lists into outline
+    $ ff -X gawk -i inplace '/^\t*-\s/{i=index($0,"-");x=substr($0,1,i-1);if(length(x)){gsub("\t","  ",x)};$0=x"    "substr($0,i+2)}1'
+  Merge wrapped lines into very long lines
+    $ ff -X gawk -i inplace '!/^\s*$/{if(/^[%[:space:]]/){if(length(x)){print x};x=$0;next}else{if(length(x)){x=x" "$0;next}}} {if(length(x)){print x;x=""};print}  END{if(length(x))print x}'
+  Remove empty lines and add back more space around headings
+    $ ff -X sed -i '/^$/d;/^%%% .*/s//\n\n\0\n/'
+  Convert leading <Tab> into notes/citations blocks
+    $ ff -X gawk -i inplace '/^\t+/{i=match($0,/\S/);x=substr($0,1,i-1);if(length(x)){gsub("\t","  ",x)};$0=x"    ¦ "substr($0,i)}1'
+  Rename to .nou
+    $ for f in **/*.md; do mv -- $f $f:r.nou; done
+  Add xtrefs from original .xmind mtime (HACK:USE: +1s per sheet)
+    $ for f in **/*.nou; do ts=$(stat -c%Y /cache/mm/xmind/${${f#$PWD}:h}/${f:h:t}.xmind); ts=$(r.vim-xtref -- "$((ts + ${${${f:t}%%[^0-9]*}:-1} - 1))"); sed -i "1s/^/$ts\n\n/" $f; done
+  Fold/wrap long lines by vim rules
+    $ ff -x r.vim +'g/\v^.{121,}/norm gql' +wq
+    # BAD: $ ff -x sh -c 'fold -w120 -s "$0" | sponge "$0"'
+
+
+THINK
+  ? is it reasonable -- won't I lose the ability to convert it \
+    into other formats (and back into MMAP) on demand ?
+    ::: no, it's OK -- I operate mostly .nou anyway,
+      and it's the most comfortable way to refactor them
+  ? MAYBE: write pandoc parser after all ?
+    OR:BET:TEMP: write my own parser and convert into some common FMT understood by !pandoc
