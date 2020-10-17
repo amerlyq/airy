@@ -71,6 +71,13 @@ alias gll='glg -m -M --first-parent'
 alias glc='glg -m -M --no-merges'
 alias glm='glg -m -M --merges'
 
+## MAYBE:BET: invert "glg" and "glo" i.e. hide "orphans" by default
+# only current tree (exlude orphan branches)
+alias glo='glg -- $(git branch --contains $(git rev-list HEAD | tail -1))'
+# only orphan commits
+alias glO='glg $(git reflog --format=format:%h)'
+
+
 ## Statistics on all authors / committers in the repo
 # NOTE: add '... -- dir/file' for blaming
 alias glan='git --no-pager shortlog --summary --numbered --email --all'

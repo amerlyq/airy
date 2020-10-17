@@ -1,6 +1,17 @@
 Only current tree (exlude orphans)
   $ git log -- $(git branch --contains $(git rev-list HEAD | tail -1))
 
+
+[⡟⢋⠞⡠] #git FIND: visually separate orphan branches in git --log
+  [X] G: git log graph orphan branches
+  2019-02-26 Git: Bug: "orphaned" trees indistinguishable in git log --graph output ⌇⡟⢋⠞⡤
+    https://www.spinics.net/lists/git/msg354198.html
+  [PATCH] log: allow --graph and --show-linear-break used together - Jan Kundrát ⌇⡟⢋⠝⡃
+    https://public-inbox.org/git/3305f7dc-0044-41fe-8aab-ee800535d6e9@kde.org/
+    TRY: $ gLl --all --show-linear-break='---'
+    ::: BAD: must patch !git
+
+
 Log
   lg = log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'\n--abbrev-commit --date=relative
   Friendly dates
