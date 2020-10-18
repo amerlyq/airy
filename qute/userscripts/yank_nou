@@ -35,6 +35,7 @@ url=$QUTE_URL
 if [[ $blk == -- ]]; then
   url=$pfx
   # https://unix.stackexchange.com/questions/103252/how-do-i-get-a-websites-title-using-command-line
+  # FAIL: don't work with PDF
   title=$(curl -s -- "$url" | grep -o '<title>[^<]*' | tail -c+8)
   blk=
   pfx=

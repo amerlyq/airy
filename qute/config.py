@@ -1003,7 +1003,7 @@ c.content.ssl_strict = True
 ## List of user stylesheet filenames to use.
 ## Type: List of File, or File
 # c.content.user_stylesheets = []
-## @me USE: darkmode instead
+## @me USE: darkmode instead FAIL: can't toggle darmode RQ restart
 # c.content.user_stylesheets = "style.css" OR 'theme/light.css'
 
 ## Enable WebGL.
@@ -1997,6 +1997,8 @@ config.bind(',S', 'spawn -- r.mpd-soundcloud "{url}"')
 config.bind(',t', 'set content.user_stylesheets theme/dark.css')
 config.bind(',T', 'set content.user_stylesheets theme/light.css')
 config.bind(',z', 'set content.user_stylesheets theme/solarized.css')
+config.bind(',Z', 'config-cycle content.user_stylesheets theme/solarized.css ""')
+# REC: config.bind(',Z', 'config-cycle content.user_stylesheets ~/path/to/solarized-everything-css/css/gruvbox/gruvbox-all-sites.css ""')
 config.bind(',y', 'hint links spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -y "{hint-url}"')
 config.bind(',Y', 'spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -yc mpv "{url}"')
 # config.bind("'", 'enter-mode jump_mark')
