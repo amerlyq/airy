@@ -2,6 +2,14 @@
 
 # grep -Ri 'name' . # find in all files
 
+export SKIM_DEFAULT_OPTIONS="\
+ --interactive\
+ --ansi\
+ --multi\
+ --bind='ctrl-s:toggle-sort'\
+ --tiebreak=-index,begin,end,score\
+"
+
 # DFL: used 'group' to pipe into 'less'
 # BAD: --all-text => skips '--ignore'
 alias ag='command ag --smart-case --group'

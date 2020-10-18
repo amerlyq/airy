@@ -3,3 +3,17 @@ TODO
     ALT: accumulate log continuously and filter post-factum
   SEE: other alternatives to grep(1) / locate(1) / file indexers
     https://en.wikipedia.org/wiki/Full-text_search
+
+
+[_] TRY:SRC: https://github.com/lotabout/skim/issues/332
+  ¦ Allows to search in PDFs, E-Books, Office documents, zip, tar.gz, etc. (see https://github.com/phiresky/ripgrep-all) using ripgrep-all (rga) combined with sk preview
+  ¦ This requires ripgrep-all (rga) installed: https://github.com/phiresky/ripgrep-all
+  ¦ This also uses bat for the preview: https://github.com/sharkdp/bat
+  ¦ skrga: rga + subl - usage: skrga or skrga match_in_content_of_files or skgra regex_match_in_content_of_files
+  ¦ If you provide arguments to skrga you can then use ctrl+q on the list of matches to filter with patterns appearing in each of the lines returned by sk
+  ¦ As an output, this will open the selected entry with SublimeText at the precise line and column where the entry is
+  $ skrga() {
+      local file
+      file="$(sk-tmux --bind "ctrl-p:toggle-preview" --ansi -i --cmd-query "$*" -c 'rga --ignore-case --color=always --line-number --column {}' --preview 'bat --color=always --style=header,numbers --highlight-line "$(echo {1}|cut -d: -f2)" --line-range "$(($(echo {1}|cut -d: -f2))):$(($(echo {1}|cut -d: -f2)+50))" "$(echo {1}|cut -d: -f1)"')"
+      [[ $? -eq 0 ]] && echo "opening $file" && subl "$(echo "$file"|cut -d: -f1):$(echo "$file"|cut -d: -f2):$(echo "$file"|cut -d: -f3)" || return 1
+    }

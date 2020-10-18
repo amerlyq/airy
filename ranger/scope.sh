@@ -120,7 +120,8 @@ handle_extension() {
             ;; # Continue with next handler on failure
 
         ## @amerlyq
-        nou) exit 2 ;;
+        # BUG: despite this -- !ranger read file as not-UTF8
+        # nou) exit 2 ;;
 
         dlt) r.dlt-convert -cFi "${FILE_PATH}" && exit 3
             ;;

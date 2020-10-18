@@ -1,31 +1,47 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 source ~/.shell/func.d/packages
+
+# CMP: https://beyondgrep.com/more-tools/
+# ALT: fuzzy-grep
+#   aur/goagrep-git
+#   aur/agrep-git => |community/tre| :: !agrep -- approximate search
+
+# !cgrep ALT:(agrep):SRC: http://awgn.github.io/cgrep/
+# VIZ: grep egrep fgrep
+pkg_inst grep cgrep
+
+
+# !rg ALT:(~ag, but faster):SRC: https://github.com/BurntSushi/ripgrep
+#   NICE: pcre2 support (ag=pcre1 only)
+# !sk ALT(fzf):SRC: https://github.com/lotabout/skim
+pkg_inst ripgrep skim
+
+## SEE:INTEG:
+# https://github.com/lotabout/skim.vim
+# https://github.com/jremmen/vim-ripgrep
+# https://github.com/aykamko/tag
+# ALSO: https://github.com/junegunn/fzf/wiki/Examples-(completion)
+
+# !rga ALSO: search pdf/sqlite/etc. SRC: https://github.com/phiresky/ripgrep-all
+aur_inst ripgrep-all
+
+
+pkg_inst pdfgrep
+
 
 #| ag      | The silver searcher -- 'ag' instead of 'grep' inside of git project -- very best!
 #   NOTE: ag --ignore 'usr/lib' -- if contains '/' treated as literal path
 #   NOTE: ag --ignore 'python*' -- if not '/' then glob each path component
+# OLD: pkg_inst the_silver_searcher
 
 #| sift-bin| ALT:(grep) standalone parallel binary written in '.go'. Fastest?
 #   + single independent binary SEE https://sift-tool.org/performance
 #   BUT: no support for look-ahead/behind:  (?=..), (?<=..)
 # aur_inst sift-bin
 
-# ALT: fuzzy-grep
-#   skim :: https://github.com/lotabout/skim
-#   aur/goagrep-git
-#   aur/agrep-git
-# ALT: cgrep :: http://awgn.github.io/cgrep/
-# VIZ: grep egrep fgrep
-pkg_inst grep skim
 
-if distro arch; then
-  # TRY:BET: pkg_inst ripgrep  USAGE: rg
-  #   SEE:PERF: https://github.com/BurntSushi/ripgrep
-  pkg_inst the_silver_searcher
-  pkg_inst pdfgrep
-
-elif distro ubuntu; then
-  # pkg_inst silversearcher-ag
-  pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
-  git_inst "ggreer/the_silver_searcher"
-fi
+# elif distro ubuntu; then
+#   # pkg_inst silversearcher-ag
+#   pkg_inst automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
+#   git_inst "ggreer/the_silver_searcher"
+# fi
