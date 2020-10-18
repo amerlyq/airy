@@ -362,7 +362,7 @@ nnoremap <Plug>(xtref-task-convert) 0wi[_]<Space><Esc>$"=" ".xtref#new()<CR>p<Pl
 nnoremap <Plug>(xtref-task-insert) i[_]<Space><Esc>
 " FIXME: smart commentstring parsing -- allow "//" and "/*"
 " FIXME: allow inside multiline block comment /* ... */ -- regex w/o leading commentstring
-nnoremap <Plug>(xtref-task-new) :call setline('.', substitute(getline('.'), '\v(['. &commentstring[0] .']+\s*)(\[[_X]\]\s*)?', '\1[_] ', ''))<CR>
+nnoremap <Plug>(xtref-task-new) :call setline('.', substitute(getline('.'), '\v(['. &commentstring[0] .']+\s+)(\[[_X]\]\s*)?', '\1[_] ', ''))<CR>
 nnoremap <Plug>(xtref-task-done) :call setline('.', substitute(getline('.'), '\V[_]\s\?', xtref#new().' [X] ', ''))<CR><Plug>(xtref-yank)
 
 nnoremap <Plug>(xtref-yank-anchor) :<C-u>call xtref#copy(g:xtref.anchor_pfx.xtref#strip(xtref#get(0)),repeat(' ',v:count))<CR>
