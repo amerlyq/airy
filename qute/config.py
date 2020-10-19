@@ -832,6 +832,7 @@ c.content.host_blocking.whitelist = ['adf.ly']
 # c.content.javascript.enabled = True
 ## @me
 c.content.javascript.enabled = False
+# config.set('content.javascript.enabled', True, '*:///*')
 config.set('content.javascript.enabled', True, '*://127.0.0.1/*')
 config.set('content.javascript.enabled', True, '*://github.com/*')
 config.set('content.javascript.enabled', True, '*://gitlab.com/*')
@@ -1348,7 +1349,7 @@ c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
 ## menu.
 ## Type: Bool
 # c.input.mouse.rocker_gestures = False
-c.input.mouse.rocker_gestures = True  # @me LORE
+# c.input.mouse.rocker_gestures = True  # @me LORE: left+right / right+left
 
 ## Timeout (in milliseconds) for partially typed key bindings. If the
 ## current input forms only partial matches, the keystring will be
