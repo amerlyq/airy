@@ -28,6 +28,9 @@ Manually create w/o !tomb ⌇⡟⡢⢓⢌
         ~ Copy a 5GB file onto it and only 5GB of network traffic
       [_] SEE: SSHFS performance : linuxquestions ⌇⡟⡢⢥⠱
         https://www.reddit.com/r/linuxquestions/comments/9btk9s/sshfs_performance/
+    !!! FAIL:SECU: file --inplace !corruption! if transfer has incomplete writes
+      - in case of network errors will be corrupted receiving file
+      - then if local/remote file was corrupted before sync -- corruption will spread everywhere
 
   I need a secure and transparent backup method! / Networking, Server, and Protection / Arch Linux Forums ⌇⡟⡢⢒⢄
     https://bbs.archlinux.org/viewtopic.php?id=109419
@@ -51,14 +54,19 @@ Manually create w/o !tomb ⌇⡟⡢⢓⢌
     https://www.linuxquestions.org/questions/linux-general-1/mount-2tb-encrypted-container-file-through-sshfs-performance-question-4175453734/
     ::: PERF: !sshfs has performance issues on network/storage server BET:USE: !cifs works more stable (file=2TiB is OK)
 
+  linux - faster way to mount a remote file system than sshfs? - Super User ⌇⡟⡦⠧⠸
+    https://superuser.com/questions/344255/faster-way-to-mount-a-remote-file-system-than-sshfs
+
 
 ========================================
+BET: replace !dig by plain !cryptsetup and !gpg
 SRC: ※⡟⡢⡱⣷
 
 SETUP
-  $ cd /srv/tomb
+  $ cd /srv/tomb  # ALT: /cache/tomb
   $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb .
   $ sudo mkdir -m700 . && chown "$USER:$USER" .
+  # MAYBE: $ chattr +C .
   $ truncate -s 1G aura.luks
     # BAD: not supported by SSHFS $ fallocate -l 1G aura.luks
   $ pass generate tomb/aura
