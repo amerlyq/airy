@@ -44,7 +44,7 @@ in dot.gz|gv.gz) r.graphviz-view "$1"
 case ${ext:?}
 in dot|gv) r.graphviz-view "$1"
 ;; tpp) tpp "$1"
-;; md|rst|org|wiki) pandoc --standalone -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
+;; md|rst|org|wiki|tex) pandoc --standalone -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
 ;; adoc) asciidoctor -b html -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
   ## BAD: breaks special properties e.g. "[%collapsible]
   # asciidoctor -b docbook -o "/tmp/pandoc.docbook" "$1" &&

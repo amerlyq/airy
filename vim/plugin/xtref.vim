@@ -193,7 +193,7 @@ fun! xtref#to_fmt(fmt, xloci)
     " NOTE: task-ts conversion :: [⡞⣾⠂⢐] <=> [20XX-...]
     let [x, sfx] = (stridx(x, ']') < 0) ? [x, ''] : split(x, '\ze\]')
     return pfx . xtref#cvt(a:fmt, x) . sfx
-  elseif pfx ==# a || pfx ==# r
+  elseif pfx ==# a || pfx ==# r  " || pfx=='^'
     return pfx . xtref#cvt(a:fmt, xts)
   endif
 
