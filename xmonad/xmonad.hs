@@ -245,6 +245,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
     , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
     ] ] --> doIgnore
   -- FAIL: skype pop-up window during call still tiled instead of floating/ignored
+  -- TRY: isPreview = isInProperty "_NET_WM_STATE" "_NET_WM_STATE_ABOVE"
   , foldr1 (<||>) [ stringProperty "_NET_WM_STATE" =? x | x <-
     [ "WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE"
     -- , _GTK_HIDE_TITLEBAR_WHEN_MAXIMIZED(CARDINAL) = 1
@@ -262,6 +263,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   , className =? "Skype" --> doF (W.shift "SK")
   -- , className =? "Skype Preview" --> doF (W.shift "SK")
   , className =? "Firefox" --> doF (bring "FF")
+  -- , className =? "xmind-2020" --> (\w -> doF (W.sink w)
   -- , ("5", "Krita")
   -- , ("8", "t-engine64")
   -- , ("9", "Steam")
