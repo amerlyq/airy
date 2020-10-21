@@ -44,10 +44,13 @@ source ${ZDOTDIR}/cfg/amer-key-mix.zsh
 source ${ZDOTDIR}/cfg/filetypes.zsh
 source ${ZDOTDIR}/cfg/completion.zsh
 source ~/.shell/common
+[[ -f ~/aura/monica/zsh/audit.zsh ]] && source ~/aura/monica/zsh/audit.zsh
 # zprof  # HACK Profiling
 
 # Freciency completions and preexec (man fasd)
 # WARNING: quotes are essential!
 # (( ! $#commands[fasd] )) || eval "$(fasd --init auto)"
 
-((!_perf_enable)) || source r.sh-perf-trace
+if ((_perf_enable)); then
+  source r.sh-perf-trace
+fi
