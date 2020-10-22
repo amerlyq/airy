@@ -1,4 +1,9 @@
 #!/usr/bin/env zsh
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
 #%SUMMARY: sync local ~/aura repos with remote tomb container
 #%BET: sync all tombs first -- and only then use "Gp" for rest of ~/aura repos
 #%USAGE: $ ./$0 [-R .] [--] [~/aura/todo] ...
@@ -109,10 +114,11 @@ function CloseTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
   # wait
 }
 
-function SyncRepos {  local r
+function SyncRepos {  local r b
   for r; do
     # FIXED: allow executing !r.tomb-backup from repo subfolder
     [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
+    b=$(git symbolic-ref HEAD 2>/dev/null)
 
     r.git-status $r
     ## ATT: may error-out due to merge conflict => run rest of commands yourself
@@ -121,7 +127,7 @@ function SyncRepos {  local r
     # git-up $r origin 2>&1
 
     local rmt url srv="file:///mnt/${${r:A:t}#.}.git"
-    for rmt in $tomb origin; do
+    for rmt in origin $tomb; do
       url=$(git -C $r remote get-url "$rmt" 2>/dev/null ||:)
       [[ $url == "$srv" ]] && break || unset rmt
       [[ -z $url ]] && continue
@@ -131,18 +137,26 @@ function SyncRepos {  local r
 
     # THINK:ALSO: --recurse-submodules=yes
     # git -C $r fetch --verbose --tags --prune -- "$rmt"
-    git -C $r pull $(has v&&echo --verbose) --tags --autostash --rebase=merges -- "$rmt"
+    git -C $r pull $(has v&&echo --verbose) --tags --autostash --rebase=merges --set-upstream -- "$rmt" "$b"
+    r.git-status $r
 
-    r.git-status $r
-    local err
-    # FIXME: must push "aura" and (only if matching) origin
-    r.git-push $r 2>&1 || ((1==(err=$?))) || exit $err
-    ## TODO: sync everything
-    # local b=master OR:BET: current branch BUT: only if it points to proper $url remote
-    # ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name "$b@{u}" 2>/dev/null ||:)
-    # git push -u origin --all
-    # git push -u origin --tags
-    r.git-status $r
+    # local err
+    # BAD: pushes all BUT: must push "aura" and (only if matching) origin
+    # r.git-push $r 2>&1 || ((1==(err=$?))) || exit $err
+
+    # [_] FIXME! push only branches which !point to $tomb remote!
+    # FAIL?(nonintuitive): pushes "--all" branches only if "current" branch has commits
+    local rbranch ahead
+    rbranch=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name '@{u}')
+    ahead=$(git -C $r rev-list HEAD..."$rbranch" --ignore-submodules --count)
+    if ((ahead)); then
+      # FIXME:(sanity-check): exit with error (don't push)
+      #   * if any (still local) commit has prefix ~ /^(fix|fixup|tmp|temp):|^.?\w+!/
+      ## MAYBE:ALSO: --set-upstream "$rmt"
+      git -C $r push $(has v&&echo --verbose) --atomic --all
+      git -C $r push $(has v&&echo --verbose) --atomic --tags
+      r.git-status $r
+    fi
     printf "==================\n\n"
   done
 }
@@ -171,14 +185,21 @@ function CfgCloneCentralRepos { local r nm mnt srv url orn ups
     [[ -z $url ]] && git -C $r remote add "$tomb" "${url:=$srv}"
     [[ $url != "$srv" ]] && git -C $r remote set-url "$tomb" "$srv"
 
+    # [_] WARN:ALSO: don't create "aura" if you already have "origin" (to prevent duplicate maintenance)
+    #   OR:BET! don't create "origin" if you have "aura" (to preserve STD:WF)
     orn=$(git -C $r remote get-url origin 2>/dev/null ||:)
     [[ -z $orn ]] && git -C $r remote add origin "${orn:=$srv}"
     [[ $orn == file:///mnt/* && $orn != "$srv" ]] && git -C $r remote set-url origin "$srv"
 
     local b=master
-    # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
     ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name "$b@{u}" 2>/dev/null ||:)
-    [[ -n $ups ]] || git -C $r branch --set-upstream-to="origin/$b" "$b"
+    # BAD:(confusing code): fallback to "origin" for DFL branch tracking
+    if [[ -n $ups ]]; then
+      ## [_] WTF: still not tracking -- remotes are not shown until $ gfA
+      # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
+      # OR: git -C $r branch --set-upstream-to="origin/$b" "$b"
+      git -C $r fetch $(has v&&echo --verbose) --tags --prune --set-upstream -- "origin"
+    fi
   done
 }
 
