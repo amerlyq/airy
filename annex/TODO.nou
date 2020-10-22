@@ -125,6 +125,27 @@ RQ
       ALSO: even simple .txt (like lyrics) may require megabytes of space -- not feasible to copy them on smartphone
 
 
+INFO
+  TUT: emanuele/git-annex_tutorial: A tutorial for using git-annex to shared large datasets and code within the Lab. ⌇⡟⢑⠁⡨
+    https://github.com/emanuele/git-annex_tutorial
+
+  HACK: Access to files in git-annex bare repository without using git-annex. ⌇⡟⢐⣸⢧
+    https://gist.github.com/eruffaldi/924f6b53a63dede6e59f
+
+  CASE: Moving to non-bare git-annex repos on my file server ⌇⡟⢐⣹⠧
+    https://operand.ca/2017/07/06/moving-to-non-bare-git-annex-repos-on-my-file-server.html
+    USE: $ git config --local receive.denyCurrentBranch updateInstead
+      << keep ./wdir on server clean and !git push will always update it in-place
+    ALSO:SEE: https://git-annex.branchable.com/bugs/bare_remote_is_not_automatically_synced_to_local_repo/
+      $ man git-annex-group
+      NOTE: Repository group e.g. {manual|client|transfer|backup|source|...}
+      VIZ: standard groups ⌇⡟⢐⣻⠢
+        https://git-annex.branchable.com/preferred_content/standard_groups/
+      E.G.USAGE:(DFL=<empty>)
+        $ git annex wanted . standard
+        $ git annex group . manual
+
+
 WARN
   ARCH: don't use git inside git
     ++ https://git-annex.branchable.com/forum/n00b_question._Can_I_use_git-annex_to_manage_a_tree_that_contains_git_repos__63__/
