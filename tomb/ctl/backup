@@ -28,7 +28,8 @@ function CollectAuraRepos { local d r url
   typeset -ga repos
   for d; do
     for r in ${(0)"$(r.git-find "$d")"}; do
-      url=$(git -C $r remote get-url "$tomb" || git -C $r remote get-url origin ||:) 2>/dev/null
+      # DEPR:(fallback): url=$(git -C $r remote get-url "$tomb" || git -C $r remote get-url origin ||:) 2>/dev/null
+      url=$(git -C $r remote get-url "$tomb" ||:) 2>/dev/null
       [[ $url == file:///mnt/* ]] && repos+=( "$r" )
       true
     done
@@ -127,13 +128,14 @@ function SyncRepos {  local r b
     # git-up $r origin 2>&1
 
     local rmt url srv="file:///mnt/${${r:A:t}#.}.git"
-    for rmt in origin $tomb; do
+    # DEPR:(fallback): origin ...
+    for rmt in $tomb; do
       url=$(git -C $r remote get-url "$rmt" 2>/dev/null ||:)
-      [[ $url == "$srv" ]] && break || unset rmt
       [[ -z $url ]] && continue
+      [[ $url == "$srv" ]] && break || unset rmt
       [[ $url == file:///mnt/* ]] && >&2 echo "Err: remote='$rmt' points to wrong srv='$url'" && exit 1
     done
-    [[ -z ${rmt-} ]] && >&2 echo "Err: private remote not found" && exit 1
+    [[ -z ${rmt-} ]] && >&2 echo "Err: private remote=${rmt:-TBD} not found" && exit 1
 
     # THINK:ALSO: --recurse-submodules=yes
     # git -C $r fetch --verbose --tags --prune -- "$rmt"
@@ -161,7 +163,7 @@ function SyncRepos {  local r b
   done
 }
 
-function CfgCloneCentralRepos { local r nm mnt srv url orn ups
+function CfgCloneCentralRepos { local r
   for r; do
 
     ## TODO: clone root-repo and all submodules recursively
@@ -171,9 +173,9 @@ function CfgCloneCentralRepos { local r nm mnt srv url orn ups
     # FIXED: allow executing !r.tomb-backup from repo subfolder
     [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
 
-    nm=${${r:A:t}#.}
-    mnt=/mnt/$nm.git
-    srv="file://$mnt"
+    local nm=${${r:A:t}#.}
+    local mnt=/mnt/$nm.git
+    local srv="file://$mnt"
 
     # TRY:SRC:(NF): test non-empty-dir by ZSH: $ /path/to/dir(NF)
     #   https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
@@ -181,24 +183,29 @@ function CfgCloneCentralRepos { local r nm mnt srv url orn ups
     [[ -e $mnt ]] || git clone --bare "file://$r:A" "$mnt"
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
-    url=$(git -C $r remote get-url "$tomb" 2>/dev/null ||:)
-    [[ -z $url ]] && git -C $r remote add "$tomb" "${url:=$srv}"
-    [[ $url != "$srv" ]] && git -C $r remote set-url "$tomb" "$srv"
+    local url rmt=$tomb
+    url=$(git -C $r remote get-url "$rmt" 2>/dev/null ||:)
+    [[ -z $url ]] && git -C $r remote add "$rmt" "${url:=$srv}"
+    [[ $url != "$srv" ]] && git -C $r remote set-url "$rmt" "$srv"
 
-    # [_] WARN:ALSO: don't create "aura" if you already have "origin" (to prevent duplicate maintenance)
-    #   OR:BET! don't create "origin" if you have "aura" (to preserve STD:WF)
-    orn=$(git -C $r remote get-url origin 2>/dev/null ||:)
-    [[ -z $orn ]] && git -C $r remote add origin "${orn:=$srv}"
-    [[ $orn == file:///mnt/* && $orn != "$srv" ]] && git -C $r remote set-url origin "$srv"
+    # DEPR:(fallback): don't create "origin" if you have "aura" (NICE: to preserve STD:git:WF)
+    #   OR~~ don't create "aura" if you already have "origin"
+    #   NICE:(both): prevent duplicate maintenance
+    #   E.G.BAD: !git-annex syncs ALL branches (twice)
+    # local orn rmt=origin
+    # orn=$(git -C $r remote get-url origin 2>/dev/null ||:)
+    # [[ -z $orn ]] && git -C $r remote add origin "${orn:=$srv}"
+    # [[ $orn == file:///mnt/* && $orn != "$srv" ]] && git -C $r remote set-url origin "$srv"
 
-    local b=master
-    ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name "$b@{u}" 2>/dev/null ||:)
-    # BAD:(confusing code): fallback to "origin" for DFL branch tracking
-    if [[ -n $ups ]]; then
+    local ups
+    ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null ||:)
+    # BAD:(confusing code): fallback to "$rmt" for DFL branch tracking
+    if [[ -z $ups ]]; then
       ## [_] WTF: still not tracking -- remotes are not shown until $ gfA
+      # local b=master  # => USE:above: "$b@{u}"
       # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
-      # OR: git -C $r branch --set-upstream-to="origin/$b" "$b"
-      git -C $r fetch $(has v&&echo --verbose) --tags --prune --set-upstream -- "origin"
+      # OR: git -C $r branch --set-upstream-to="$rmt/$b" "$b"
+      git -C $r fetch $(has v&&echo --verbose) --tags --prune --set-upstream -- "$rmt"
     fi
   done
 }
