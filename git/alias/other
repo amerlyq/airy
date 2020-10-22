@@ -59,7 +59,10 @@ alias grim='gri --preserve-merges'  # BUG: with -i can be weird!
 alias gria='gri --autostash --autosquash'
 gmo(){ git merge origin/"$1" "${@:2}"; }
 
-alias gfa='git fetch --all --progress --prune --verbose'
+alias gf='git fetch --verbose --progress --prune --tags'
+alias gfa='gf aura'
+alias gfo='gf origin'
+alias gfA='gf --all'
 alias gwRc='gwR origin/"$(git-branch-current 2> /dev/null)"'
 alias gSF='gSf --recursive'
 alias gSFc='gSF git clean -ndx'

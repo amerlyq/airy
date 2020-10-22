@@ -3,6 +3,7 @@
 ## git-annex
 alias gan='git annex'
 alias gai='aura commit-index'
+alias gaI='gai --dry-run'
 
 alias gA='gan add'
 alias gA!='gan add --force-large'
@@ -10,8 +11,12 @@ alias gA.='gan add --jobs=cpus -- .'
 
 alias gam='gan metadata'
 
-alias gas='gan sync'
-alias gac='gan sync --content'
+alias gaS='gan sync --jobs=4 --no-commit'   # WARN:DFL: all remotes are synced USE: arg1=<remote>
+alias gas='gaS --not-only-annex --content'  # = everything (both user and annex)
+alias gao='gaS --only-annex'                # ONLY: git-annex branch (ignore other git branches)
+alias gaO='gaS --not-only-annex'            # = sync all user branches + sync/annex branch
+alias gac='gaS --content'                   # ALSO: sync content
+alias gaC='gaS --no-content'                # i.e. all branches to all remotes
 
 alias gag.='gan get .'
 alias gay.='gan copy .'  #  --to usbdrive
