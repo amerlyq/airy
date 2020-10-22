@@ -17,13 +17,14 @@ esac; opts+=$o; done; shift $((OPTIND - 1))
 # ALT:(generic: -F => -Fmcsu): [[ -z ${opts//[^R$choices]} ]] && opts+=$choices
 [[ -z ${opts//[R]} ]] && opts+=$choices  # =DFL
 has(){ [[ $opts =~ [$*] ]]; }
+git(){ command git --no-pager -c color.status=always -c color.ui=always "$@"; }
 
-function CollectAuraRepos { local d r rmt
+function CollectAuraRepos { local d r url
   typeset -ga repos
   for d; do
     for r in ${(0)"$(r.git-find "$d")"}; do
-      rmt=$(git -C $r remote get-url "$tomb" || git -C $r remote get-url origin ||:) 2>/dev/null
-      [[ $rmt == file:///mnt/* ]] && repos+=( "$r" )
+      url=$(git -C $r remote get-url "$tomb" || git -C $r remote get-url origin ||:) 2>/dev/null
+      [[ $url == file:///mnt/* ]] && repos+=( "$r" )
       true
     done
   done
@@ -108,17 +109,37 @@ function CloseTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
   # wait
 }
 
-function SyncRepos { local err
+function SyncRepos {  local r
   for r; do
+    # FIXED: allow executing !r.tomb-backup from repo subfolder
+    [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
+
     r.git-status $r
     ## ATT: may error-out due to merge conflict => run rest of commands yourself
     # FAIL: fetches all remotes
     #   FIXME: fetch only specific remote "$tomb" or default one "origin"
-    git-up $r origin 2>&1
+    # git-up $r origin 2>&1
+
+    local rmt url srv="file:///mnt/${${r:A:t}#.}.git"
+    for rmt in $tomb origin; do
+      url=$(git -C $r remote get-url "$rmt" 2>/dev/null ||:)
+      [[ $url == "$srv" ]] && break || unset rmt
+      [[ -z $url ]] && continue
+      [[ $url == file:///mnt/* ]] && >&2 echo "Err: remote='$rmt' points to wrong srv='$url'" && exit 1
+    done
+    [[ -z ${rmt-} ]] && >&2 echo "Err: private remote not found" && exit 1
+
+    # THINK:ALSO: --recurse-submodules=yes
+    # git -C $r fetch --verbose --tags --prune -- "$rmt"
+    git -C $r pull $(has v&&echo --verbose) --tags --autostash --rebase=merges -- "$rmt"
+
     r.git-status $r
+    local err
     # FIXME: must push "aura" and (only if matching) origin
     r.git-push $r 2>&1 || ((1==(err=$?))) || exit $err
     ## TODO: sync everything
+    # local b=master OR:BET: current branch BUT: only if it points to proper $url remote
+    # ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name "$b@{u}" 2>/dev/null ||:)
     # git push -u origin --all
     # git push -u origin --tags
     r.git-status $r
@@ -126,7 +147,7 @@ function SyncRepos { local err
   done
 }
 
-function CfgCloneCentralRepos { local r nm mnt srv rmt orn ups
+function CfgCloneCentralRepos { local r nm mnt srv url orn ups
   for r; do
 
     ## TODO: clone root-repo and all submodules recursively
@@ -146,9 +167,9 @@ function CfgCloneCentralRepos { local r nm mnt srv rmt orn ups
     [[ -e $mnt ]] || git clone --bare "file://$r:A" "$mnt"
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
-    rmt=$(git -C $r remote get-url "$tomb" 2>/dev/null ||:)
-    [[ -z $rmt ]] && git -C $r remote add "$tomb" "${rmt:=$srv}"
-    [[ $rmt != "$srv" ]] && git -C $r remote set-url "$tomb" "$srv"
+    url=$(git -C $r remote get-url "$tomb" 2>/dev/null ||:)
+    [[ -z $url ]] && git -C $r remote add "$tomb" "${url:=$srv}"
+    [[ $url != "$srv" ]] && git -C $r remote set-url "$tomb" "$srv"
 
     orn=$(git -C $r remote get-url origin 2>/dev/null ||:)
     [[ -z $orn ]] && git -C $r remote add origin "${orn:=$srv}"
