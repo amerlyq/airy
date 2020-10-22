@@ -98,3 +98,31 @@ SYNC
   $ umount /dev/mapper/tomb
   $ sudo cryptsetup -v close tomb
   $ fusermount -u /srv/tomb
+
+RESIZE
+  $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb .
+  # OR: $ r.tomb-backup -m
+  $ losetup -a | cut -d: -f1 | sort -n | tail -1 | xargs -r sudo losetup -d
+  $ sudo umount /dev/mapper/tomb
+  $ sudo cryptsetup -v close tomb
+  $ truncate -s 10G /srv/tomb/aura.luks
+  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb
+  $ sudo e2fsck -f /dev/mapper/tomb
+  $ sudo resize2fs /dev/mapper/tomb
+  $ sudo mount /dev/mapper/tomb /mnt
+  $ for r in /mnt/*.git; do printf '\n[%s]\n' $g; git -C $r fsck || git -C $r gc --aggressive; done
+  # ALSO: $ git annex fsck
+
+!git-annex
+  $ cd /cache
+  $ gcI myrepo
+  $ r.annex-init
+  $ ga && gc
+  $ gA && gai
+  $ r.tomb-backup -m
+  $ r.tomb-backup -c .
+  WTF: also need $ gfA
+  $ (cd /mnt/myrepo.git && r.git-my-repo -m)
+  $ gac
+  $ (cd /mnt/myrepo.git && git annex init "tomb-nas")
+  $ r.tomb-backup -u

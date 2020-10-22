@@ -205,6 +205,7 @@ function CfgCloneCentralRepos { local r
       # local b=master  # => USE:above: "$b@{u}"
       # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
       # OR: git -C $r branch --set-upstream-to="$rmt/$b" "$b"
+      # [_] BUG: fetch --set-upsteam seems does not work
       git -C $r fetch $(has v&&echo --verbose) --tags --prune --set-upstream -- "$rmt"
     fi
   done
