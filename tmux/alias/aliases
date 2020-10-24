@@ -15,11 +15,14 @@ tmux_display_fix() {
   done
 }
 
-# NOTE: w/o $ret can't return right code from 'r.chroot'
-exit() { local ret=$?
-  # When in SSH tmux, do detach on ',d' instead of exit
-  if [[ -n ${SSH_TTY-} && -z ${TMUX-} && -z ${RANGER_LEVEL-} ]]
-  then tmux detach
-  else builtin exit $ret
-  fi
-}
+## DISABLED: nonintuitive overloaded behavior
+# [X] BUG: [tmux->ssh->,d] detaches gui terminal on target
+#   ::: FIXED: "-z $TMUX" -> "-n …"
+# FIXED: w/o $ret can't return right code from 'r.chroot'
+# exit() { local ret=$?
+#   # When in SSH tmux, do detach on ',d' instead of exit
+#   if [[ -n ${SSH_TTY-} && -n ${TMUX-} && -z ${RANGER_LEVEL-} ]]
+#   then tmux detach
+#   else builtin exit $ret
+#   fi
+# }
