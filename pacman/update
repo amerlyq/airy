@@ -22,17 +22,25 @@ sudo -v
 # ) 2>/dev/null &
 
 
-## [_] TODO: update mirrors first before upgrade -- i.e. use two-step upgrade
-# reflector --score 5 --protocol https > /etc/pacman.d/mirrorlist
-# pacman -Syyu
-# udt=$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)
-# echo "Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch" >> /etc/pacman.d/mirrorlist
+# NOTE:(darkhttpd): $ r.pacman-cache-server && FIX(nft):SEE:SUM
+# NEED: $ echo "192.168.2.4 darkhttpd" >> /etc/hosts
+refresh_mirrors(){ local udt db=${1:+/var/lib/pacman/sync/core.db}
+  ## ALT:(db): enable historical archive for stale system (instead of today's upgrade)
+  # [_] FIXME: must use UTC time corresponding to EOD (FIND: timezone of archive.archlinux.org server)
+  udt=$(date ${db:+-r "$db"} +%Y/%m/%d)
+  reflector --score 5 --protocol https | sed "
+    0,/^Server =/s||Server = http://darkhttpd:8080\\n\\n\\0|
+    \$s|\$|\nServer = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch|
+  " | sudo tee /etc/pacman.d/mirrorlist
+  # pacman -Syyu
+}
 
 # NOTE: three-stage process to upgrade AUR together with dependencies
 # HACK: skip 'exit 1' if update 'n' in pacman
 # BUG: skips upgrade if file exists -- because errcode=1
 # shellcheck disable=SC2046
 pkgupd(){ sudo pacman -Syu $(skip 'PKG_IGNORE[@]') || ((1==$?)); }
+refresh_mirrors "$([[ " $* " =~ " -r " ]]&&echo 1)"
 pkgupd
 # shellcheck disable=SC2046
 aur sync --database=aur --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')
