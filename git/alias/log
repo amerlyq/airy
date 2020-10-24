@@ -11,6 +11,7 @@
 # glg -m --first-parent "$(git merge-base --fork-point HEAD)~...HEAD"
 
 declare -gA _gitfmt
+_gitfmt[cd]='%C(green)%cd%C(reset)'
 _gitfmt[ad]='%C(bold green)%ad%C(reset)'
 _gitfmt[h]='%C(yellow)%h%C(reset)'
 _gitfmt[ph]='%<(60)'
@@ -18,6 +19,7 @@ _gitfmt[s]='%C(white)%s%C(reset)'
 _gitfmt[d]='%C(bold red)%d%C(reset)'
 _gitfmt[aN]='%C(bold blue)[%aN]%C(reset)'
 _gitfmt[std]="${_gitfmt[ad]} ${_gitfmt[h]} ${_gitfmt[ph]}${_gitfmt[s]}${_gitfmt[d]} ${_gitfmt[aN]}"
+_gitfmt[timeline]="${_gitfmt[cd]}│${_gitfmt[ad]}│${_gitfmt[std]#${_gitfmt[ad]}}"
 
 _gitfmt[Iad]='%C(bold reverse green)%ad%C(reset)'
 _gitfmt[Ih]='%C(reverse yellow)%h%C(reset)'
@@ -30,7 +32,7 @@ _gitfmt[Istd]="${_gitfmt[Iad]} ${_gitfmt[Ih]} ${_gitfmt[ph]}${_gitfmt[Is]} ${_gi
 
 _gitfmt[dt]='%Y%m%d %H%M%S'
 _gitfmt[d_]='%Y%m%d_%H%M%S'
-_gitfmt[DT]='%Y-%m-%d %H:%M:%S'
+_gitfmt[DT]='%Y-%m-%d %H:%M:%S'
 _gitfmt[D_]='%Y-%m-%d_%H:%M:%S'
 _gitfmt[d.]='%Y%m%d'
 _gitfmt[D.]='%Y-%m-%d'  # BET: --date=short
@@ -46,7 +48,8 @@ alias gLn='git log --date=short --format=format:"${_gitfmt[Istd]}%n"'
 alias gLt='git log --date=short --format=tformat:"${_gitfmt[std]}"'
 alias gLL='git log --date=format:"${_gitfmt[DT]}" --format=format:"${_gitfmt[std]}"'
 alias gLN='git log --date=format:"${_gitfmt[DT]}" --format=format:"${_gitfmt[Istd]}%n"'
-alias gLT='git log --date=format:"${_gitfmt[DT]}" --format=tformat:"${_gitfmt[std]}"'
+alias gLM='git log --date=format:"${_gitfmt[DT]}" --format=tformat:"${_gitfmt[std]}"'
+alias gLT='git log --date=format:"${_gitfmt[DT]}" --format=format:"${_gitfmt[timeline]}"'
 alias gLF='git log --date=iso8601 --format=format:"commit %H%nparent %P%ntreesh %T%nreflog %gd %gs %gN <%gE>%nauthor %ad %aN <%aE>%ncomitr %cd %cN <%cE>%nsigner %G? %GS%ndecorat %D%S%nsubject %s%nbody %b%nnotes %N%n" --graph'
 
 alias glg='gLl --graph'
@@ -56,6 +59,9 @@ alias glG='gLL --graph'
 alias gla='gLl --graph --all'
 alias gla.='gLl --graph --all -- .'
 alias glA='gLL --graph --all'
+
+alias glt='gLT --graph'
+alias glT='gLT --graph --all'
 
 alias gls='gLN --topo-order --graph --compact-summary'
 alias glS='gLN --topo-order --graph --name-status'
@@ -70,6 +76,7 @@ alias glb='git show-branch'
 alias gll='glg -m -M --first-parent'
 alias glc='glg -m -M --no-merges'
 alias glm='glg -m -M --merges'
+alias glf='glg -p HEAD..origin'  # with fetched
 
 ## MAYBE:BET: invert "glg" and "glo" i.e. hide "orphans" by default
 # only current tree (exlude orphan branches)
@@ -89,7 +96,6 @@ glBR(){ glB "$(git branch --list --remote --sort '-refname' --format '%(refname:
 alias gdR='glBR --patch'
 alias gdR.='gdR -- .'
 
-alias glF='git log -p HEAD..origin'  # with fetched
 # alias gll='git lmsg'
 gln(){ git ldump -n ${1:-10}; } #or -1 for inf
 
