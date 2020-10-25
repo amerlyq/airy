@@ -6,15 +6,23 @@ set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
 ### PREPARE ######################################
 here=$0:A:h
 
-[[ -f .gitattributes ]] || cp -vT -- $here/gitattributes .gitattributes
-diff -u -- $here/gitattributes .gitattributes
+[[ -f .gitattributes ]] || <$here/gitattributes sed '/^#%/d;/  #%.*/s///' >.gitattributes
+
+# NOTE: don't compare comments and empty lines
+diff -u -- <(sed '/^#/d;/^$/d;/  #%.*/s///' $here/gitattributes) <(sed '/^#/d;/^$/d' .gitattributes)
+
+## RQ: for git-annex to commit anything
+# NEED: $ gmy -m
+git config --get user.name
+git config --get user.email
+echo
 
 # git -c annex.tune.objecthash1=true annex init ⌇⡞⡀⠝⠺
 #   https://git-annex.branchable.com/tuning/
 git -c annex.tune.objecthash1=true \
     -c annex.tune.branchhash1=true \
     -c annex.tune.objecthashlower=true \
-  annex init
+  annex init $@
 
 # WARN: maybe also must edit local .git/info/attributes by hooks/post_checkout
 #  making it easier to smudge dotfiles ⌇⡞⡀⠞⢧

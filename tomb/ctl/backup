@@ -115,11 +115,10 @@ function CloseTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
   # wait
 }
 
-function SyncRepos {  local r b
+function SyncRepos {  local r
   for r; do
     # FIXED: allow executing !r.tomb-backup from repo subfolder
     [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
-    b=$(git symbolic-ref HEAD 2>/dev/null)
 
     r.git-status $r
     ## ATT: may error-out due to merge conflict => run rest of commands yourself
@@ -137,9 +136,11 @@ function SyncRepos {  local r b
     done
     [[ -z ${rmt-} ]] && >&2 echo "Err: private remote=${rmt:-TBD} not found" && exit 1
 
+    local br
+    br=$(git symbolic-ref --short HEAD)
     # THINK:ALSO: --recurse-submodules=yes
     # git -C $r fetch --verbose --tags --prune -- "$rmt"
-    git -C $r pull $(has v&&echo --verbose) --tags --autostash --rebase=merges --set-upstream -- "$rmt" "$b"
+    git -C $r pull $(has v&&echo --verbose) --tags --autostash --rebase=merges --set-upstream -- "$rmt" "$br"
     r.git-status $r
 
     # local err
@@ -176,14 +177,15 @@ function CfgCloneCentralRepos { local r
     local nm=${${r:A:t}#.}
     local mnt=/mnt/$nm.git
     local srv="file://$mnt"
+    local rmt=$tomb
 
     # TRY:SRC:(NF): test non-empty-dir by ZSH: $ /path/to/dir(NF)
     #   https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
-    [[ -e $r ]] || git clone "$srv" "$r"
-    [[ -e $mnt ]] || git clone --bare "file://$r:A" "$mnt"
+    [[ -e $r ]] || git clone --origin "$rmt" -- "$srv" "$r"
+    [[ -e $mnt ]] || git clone --bare --mirror -- "file://$r:A" "$mnt"
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
-    local url rmt=$tomb
+    local url
     url=$(git -C $r remote get-url "$rmt" 2>/dev/null ||:)
     [[ -z $url ]] && git -C $r remote add "$rmt" "${url:=$srv}"
     [[ $url != "$srv" ]] && git -C $r remote set-url "$rmt" "$srv"
@@ -201,12 +203,13 @@ function CfgCloneCentralRepos { local r
     ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null ||:)
     # BAD:(confusing code): fallback to "$rmt" for DFL branch tracking
     if [[ -z $ups ]]; then
-      ## [_] WTF: still not tracking -- remotes are not shown until $ gfA
-      # local b=master  # => USE:above: "$b@{u}"
+      git -C $r fetch $(has v&&echo --verbose) --tags --prune -- "$rmt"
+      # ALG:BUG: "git fetch --set-upsteam" seems does not work
+      #  [_] WTF: still not tracking -- remotes are not shown until $ gfA
+      local br
+      br=$(git symbolic-ref --short HEAD)  # OR:USE(ups): "$b@{u}"
       # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
-      # OR: git -C $r branch --set-upstream-to="$rmt/$b" "$b"
-      # [_] BUG: fetch --set-upsteam seems does not work
-      git -C $r fetch $(has v&&echo --verbose) --tags --prune --set-upstream -- "$rmt"
+      git -C $r branch --set-upstream-to="$rmt/$br" "$br"
     fi
   done
 }

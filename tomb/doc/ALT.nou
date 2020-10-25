@@ -126,3 +126,14 @@ RESIZE
   $ gac
   $ (cd /mnt/myrepo.git && git annex init "tomb-nas")
   $ r.tomb-backup -u
+
+CLONE
+  $ cd /aura
+  $ r.tomb-backup -c research
+    # = $ git clone file:///mnt/research.git && ...
+  $ cd ./research
+  $ gmy -m
+    # = $ r.git-my-repo -m
+  $ r.annex-init
+  $ gas --all
+    # = $ git annex  sync --jobs=4 --no-commit  --not-only-annex --content --all
