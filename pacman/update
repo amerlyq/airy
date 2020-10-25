@@ -29,7 +29,7 @@ refresh_mirrors(){ local udt db=${1:+/var/lib/pacman/sync/core.db}
   # [_] FIXME: must use UTC time corresponding to EOD (FIND: timezone of archive.archlinux.org server)
   udt=$(date ${db:+-r "$db"} +%Y/%m/%d)
   reflector --score 5 --protocol https | sed "
-    0,/^Server =/s||Server = http://darkhttpd:8080\\n\\n\\0|
+    0,/^Server =/s||# Server = http://darkhttpd:8080\\n\\n\\0|
     \$s|\$|\nServer = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch|
   " | sudo tee /etc/pacman.d/mirrorlist
   # pacman -Syyu
