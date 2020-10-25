@@ -116,24 +116,27 @@ RESIZE
 !git-annex
   $ cd /cache
   $ gcI myrepo
-  $ r.annex-init
+  $ r.annex-init $(hostname)
   $ ga && gc
   $ gA && gai
   $ r.tomb-backup -m
   $ r.tomb-backup -c .
-  WTF: also need $ gfA
   $ (cd /mnt/myrepo.git && r.git-my-repo -m)
-  $ gac
-  $ (cd /mnt/myrepo.git && git annex init "tomb-nas")
+  $ gas
+  $ (cd /mnt/myrepo.git && git annex init "tomb-nas-aura")
   $ r.tomb-backup -u
 
-CLONE
+CLONE:tomb
   $ cd /aura
   $ r.tomb-backup -c research
     # = $ git clone file:///mnt/research.git && ...
   $ cd ./research
   $ gmy -m
     # = $ r.git-my-repo -m
-  $ r.annex-init
+  $ r.annex-init $(hostname)
   $ gas --all
     # = $ git annex  sync --jobs=4 --no-commit  --not-only-annex --content --all
+
+Archive
+  atool -a %f.tar.xz %f
+  par2 create -n1 -r5 %f.tar.xz

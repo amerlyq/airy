@@ -13,7 +13,7 @@ opts=
 [[ $rgx == *$S* ]] && exit 3
 [[ $sub == *$S* ]] && exit 4
 
-[[ -z $opts && -n $sub ]] && opts='-s'
+[[ -z $opts ]] && (($#>1)) && opts='-s'
 [[ $opts == -s && $3 == -r ]] && opts='-r'
 
 case $opts
