@@ -88,6 +88,7 @@ function OpenTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
     #   << dif. servers may contain same LUKS container copy with dif. passwd
     local pass=$dm/$tomb
     local keys=~/tomb/$tomb.keys
+    # BUG: newline is part of password
     pass $pass | sudo cryptsetup --key-file - luksOpen --header $keys -- $luks $dm
   fi
 

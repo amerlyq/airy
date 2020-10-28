@@ -172,6 +172,7 @@ fun! xtref#invert(xloci)
   return (pfx ==# a ? r : a) . strcharpart(x, 1)  " fnameescape()
 endf
 
+" [_] TODO: allow converting any unprefixed {date <-> braille}
 fun! xtref#cvt(fmt, xts)
   "" ALT:PERF:(native)
   " let hexts = substitute(x, '.', '\=printf("%02x",and(char2nr(submatch(0)),0xff))', 'g')

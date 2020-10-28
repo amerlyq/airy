@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 #%SUMMARY: initialize cloned git-annex repo to default settings
 #%USAGE: $ ./$0
-set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
 ### PREPARE ######################################
 here=$0:A:h
@@ -69,8 +69,9 @@ git config --local 'annex.addsmallfiles' false
 git config --local 'annex.genmetadata' true
 # git config --local 'annex.genmetadata' false
 
-## NOTE: use all available CPU
-git config --local 'annex.jobs' cpus
+## BAD:(=cpus): use all available CPU
+## BET※⡟⠭⣧⡻:saturation(SSD/VFS): neo=5/4 fractal=4/5
+git config --local 'annex.jobs' 4
 
 ## FIXED:ERR: You have enabled concurrency, but git-annex is not able to use ssh connection caching
 git config --local 'annex.sshcaching' true

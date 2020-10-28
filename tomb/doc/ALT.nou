@@ -71,6 +71,7 @@ SETUP
     # BAD: not supported by SSHFS $ fallocate -l 1G aura.luks
   $ pass generate tomb/aura
   $ pass tomb/aura | sudo cryptsetup -v --type luks2 --key-file - --cipher aes-xts-plain64 --hash sha512 --key-size 512 --pbkdf argon2id --key-slot 0 luksFormat --header ~/tomb/aura.keys -- aura.luks
+    # BUG: newline is part of password
   $ sudo cryptsetup luksDump --header ~/tomb/aura.keys -- aura.luks
   $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- aura.luks tomb
   $ sudo dmsetup table /dev/mapper/tomb
@@ -126,17 +127,37 @@ RESIZE
   $ (cd /mnt/myrepo.git && git annex init "tomb-nas-aura")
   $ r.tomb-backup -u
 
+[_] MOVE? -> ☤/annex
+
 CLONE:tomb
   $ cd /aura
   $ r.tomb-backup -c research
-    # = $ git clone file:///mnt/research.git && ...
+    # = $ git clone -o aura file:///mnt/research.git && ...
   $ cd ./research
   $ gmy -m
     # = $ r.git-my-repo -m
   $ r.annex-init $(hostname)
   $ gas --all
     # = $ git annex  sync --jobs=4 --no-commit  --not-only-annex --content --all
+  $ sync  # push all files from !sshfs cache to server
+
+CLONE:p2p
+  $ cd /data
+  $ git clone -o fractal --shallow-submodules ssh://lf/data/amv
+    # ALT: $ git config -f .gitmodules submodule.<name>.shallow true
+    # SRC: https://stackoverflow.com/questions/2144406/how-to-make-shallow-git-submodules
+  TARG: $ git remote add neo ssh://neo/data/amv
+  $ cd ./amv
+  $ gmy -m && r.annex-init $(hostname)
+  TARG: $ gas --all
+  $ gaC
 
 Archive
-  atool -a %f.tar.xz %f
-  par2 create -n1 -r5 %f.tar.xz
+  $ find . -mindepth 1 -maxdepth 1 -type d -exec sh -c 'f=$0.tar.xz; test -f "$f" || atool -a "$f" -- "$0"' {} \;
+    NOTE: remove archives to recreate
+  $ atool -a %f.tar.xz %f
+  $ par2 create -n1 -r5 %f.tar.xz
+
+Selective add
+  $ stat -c'%A %y %n' **/* |LC_ALL=C sort -k2,2 Gv '^d'
+  $ stat -c'%y %n' **/* SS G '^201[24]' |cut -c37- X{} git add '{}'
