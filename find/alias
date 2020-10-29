@@ -22,11 +22,15 @@ ffn(){ local d
 }
 
 
-alias fs='find . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
-alias fS='find -L . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
+alias ds='find . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
+alias dS='find -L . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,1 | tail'
 
 # ALSO: @/airy/elf/ctl/categorize
 alias fh="find . -name .git -prune -o -print | grep -Po '[.]\\K(?:[^./]{3}[.])?[^./]{1,16}$' |LC_ALL=C sort|uniq -c|sort -k1n,1|tail"
+
+# find duplicate annex symlinks i.e. "the same file with different name/path"
+# find -type l -exec readlink -v -- {} + | grep -o '[0-9a-f]\+$' SS |uniq -cd
+# for l ((^.git/)#*(@)) print -lraC2 -- ${${l:A:t}##*-} $l | awk '{++n[$1];a[$1]+="\n"substr($0,length($1)+1)} END{for(h in n){if(n[h]>1)print"["h"]"a[h]}}'
 
 
 alias fUf='git ls-files --others'
@@ -79,11 +83,11 @@ alias fE='fa -Hte'
 alias fX='fa -Htx'
 
 alias ff='fa -Htf'
-alias ff.='ff -g'
+alias 'ff*'='ff -g'
 alias ff0='ff -0'
 alias ff1='ff -d1'
 alias ff2='ff -d2'
-alias fff='ff -L'
+alias ff.='ff -L'
 
 alias fF='fa -tf'
 alias fF.='fF -g'
@@ -114,3 +118,32 @@ alias fL.='fL -g'
 alias fL0='fL -0'
 alias fL1='fL -d1'
 alias fL2='fL -d2'
+
+alias f='fa -H -tf -tl'
+alias 'f*'='f -g'
+alias f0='f -0'
+alias f1='f -d1'
+alias f2='f -d2'
+
+alias f.='f -L'
+alias 'f.*'='f -g'
+alias f.0='f -0'
+alias f.1='f -d1'
+alias f.2='f -d2'
+
+## TODO: use !skim narrowed to list of found files
+# alias 'f/'='f -x'
+# alias 'f/.'='f/ -g'
+# alias 'f/0'='f/ -0'
+# alias 'f/1'='f/ -d1'
+# alias 'f/2'='f/ -d2'
+
+## TODO: generate all aliases from matrix
+# _chars=(type upper)
+# declare -A type=([a]='' [f]=-tf [d]=-td [l]=-tl ['']='-td -tl')
+# for c in "${_chars[@]}"; do
+#   for b in ${!c[@]}; do
+#     ...
+#   done
+# done
+# unset _chars c
