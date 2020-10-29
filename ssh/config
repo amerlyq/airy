@@ -17,6 +17,8 @@ Host *
     #   SEE: http://unix.stackexchange.com/questions/200239/how-can-i-keep-my-ssh-sessions-from-freezing
     TCPKeepAlive=yes
     ServerAliveInterval=120
+    IdentitiesOnly yes
+    # IdentityFile ~/.ssh/id_rsa
     # ServerAliveCountMax=6
     # NOTE:NEED:(server): /etc/ssh/sshd_config:
     #   ClientAliveInterval 60
