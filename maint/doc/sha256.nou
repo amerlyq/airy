@@ -1,0 +1,51 @@
+⌇⡟⠭⣧⡻
+
+[⡟⠭⣧⡻] calculation SHA256 <⡟⢚⡁⣘>
+  ::: BET saturation(VFS/NVMe/SSD/HDD-USB): neo=4/5/?/1 fractal=7/7/5/1
+  [_] TODO: SSD-USB:EXT4
+  [_] TODO: NAS:RAID1:EXT4 ~~ 120MiB/s ?
+
+#pc:neo /data/vd PERF: size=100GiB files=1400 time=2m30s speed=680MiB/sec
+  $ find -type f -print0 | parallel --lb -0 -j3 -- sha256sum -bz >! sha0
+    ==> MAYBE:BET:(-j3 => -j2): disk saturation
+
+ALG:CMP:PERF(marginal benefits):saturation(SSD/VFS): cold/warm for /data/amv
+  size: $ du --exclude=.git -sLBM --apparent-size .
+  cold: $ for i in {2..8}; do echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null; find -xtype f -print0 | time parallel --lb -0 -j$i -- sha256sum -b >/dev/null; done
+  warm: $ for i in {2..8}; do find -xtype f -print0 | time parallel --lb -0 -j$i -- sha256sum -b >/dev/null; done
+    dt: $ Y: |awk -vs=17482 '!t{t=$0} {printf "v=%dMiB dt=%-5s\n",s/$0,sprintf("%.1f%%",($0-t)/t*100);t=$0}' Y
+
+SUMMARY
+  #pc:neo PERF:(NVMe:EXT4) jobs={2..8} cold=17482MiB/195files warm=2394MiB/17files opt_j5=529/977 MiB/s
+    │ (2) v=314MiB/s dt=0.0%   t=55.672 u=99.94s  s=11.05s cpu=199% │ (2) v=711MiB/s  dt=0.0%   t=3.367  u=6.21s  s=0.26s cpu=192%
+    │ (3) v=419MiB/s dt=-25.2% t=41.663 u=110.96s s=12.16s cpu=295% │ (3) v=942MiB/s  dt=-24.6% t=2.539  u=6.33s  s=0.28s cpu=260%
+    │ (4) v=467MiB/s dt=-10.3% t=37.364 u=133.42s s=13.61s cpu=393% │ (4) v=1067MiB/s dt=-11.7% t=2.243  u=6.41s  s=0.31s cpu=299%
+    │ (5) v=529MiB/s dt=-11.7% t=33.007 u=147.25s s=14.64s cpu=490% │ (5) v=977MiB/s  dt=9.1%   t=2.448  u=7.55s  s=0.37s cpu=323%
+    │ (6) v=572MiB/s dt=-7.4%  t=30.552 u=156.36s s=15.21s cpu=561% │ (6) v=970MiB/s  dt=0.7%   t=2.466  u=8.24s  s=0.39s cpu=349%
+    │ (7) v=588MiB/s dt=-2.7%  t=29.716 u=159.98s s=15.10s cpu=589% │ (7) v=934MiB/s  dt=3.9%   t=2.561  u=9.20s  s=0.38s cpu=373%
+    │ (8) v=592MiB/s dt=-0.7%  t=29.507 u=163.54s s=15.53s cpu=606% │ (8) v=948MiB/s  dt=-1.5%  t=2.523  u=9.90s  s=0.40s cpu=408%
+  #pc:fractal PERF:(SSD:BTRFS) jobs={2..8} cache=cold:SSD/warm:VFS size=16769GiB files=189 opt_j5=478/2343 MiB/s
+    │ (2) v=398MiB/s dt=0.0%   t=42.089 u=32.99s  s=15.04s cpu=114% │ (2) v=970MiB/s  dt=0.0%   t=17.270 u=28.33s s=7.91s cpu=209%
+    │ (3) v=443MiB/s dt=-10.1% t=37.840 u=32.61s  s=14.85s cpu=125% │ (3) v=1458MiB/s dt=-33.4% t=11.497 u=27.86s s=7.71s cpu=309%
+    │ (4) v=464MiB/s dt=-4.7%  t=36.075 u=32.39s  s=15.13s cpu=131% │ (4) v=1952MiB/s dt=-25.3% t=8.588  u=27.44s s=7.74s cpu=409%
+    │ (5) v=478MiB/s dt=-2.9%  t=35.025 u=32.50s  s=15.05s cpu=135% │ (5) v=2343MiB/s dt=-16.7% t=7.155  u=27.45s s=7.74s cpu=491%
+    │ (6) v=488MiB/s dt=-1.9%  t=34.344 u=32.34s  s=15.35s cpu=138% │ (6) v=2614MiB/s dt=-10.3% t=6.415  u=28.28s s=7.76s cpu=561%
+    │ (7) v=495MiB/s dt=-1.4%  t=33.874 u=32.71s  s=15.48s cpu=142% │ (7) v=2950MiB/s dt=-11.4% t=5.684  u=28.34s s=7.77s cpu=635%
+    │ (8) v=500MiB/s dt=-1.0%  t=33.527 u=32.43s  s=15.84s cpu=143% │ (8) v=3254MiB/s dt=-9.3%  t=5.153  u=27.62s s=7.68s cpu=684%
+  #pc:fractal PERF:(NVMe:XFS) jobs={2..8} cache=cold:NVMe:XFS size=18GiB files=195 opt_j7=1935/2950 MiB/s
+    │ (2) v=643MiB   dt=0.0%   t=27.153 u=27.66s  s=14.44s cpu=155%
+    │ (3) v=940MiB   dt=-31.5% t=18.595 u=27.50s  s=14.34s cpu=225%
+    │ (4) v=1240MiB  dt=-24.2% t=14.092 u=27.11s  s=14.84s cpu=297%
+    │ (5) v=1512MiB  dt=-18.0% t=11.555 u=27.08s  s=15.14s cpu=365%
+    │ (6) v=1730MiB  dt=-12.6% t=10.104 u=27.28s  s=15.69s cpu=425%
+    │ (7) v=1935MiB  dt=-10.6% t=9.031  u=27.09s  s=16.13s cpu=478%
+    │ (8) v=2078MiB  dt=-6.9%  t=8.412  u=27.88s  s=16.14s cpu=523%
+  #pc:fractal PERF:(HDD-USB:EXT4) jobs={1..8} cold=2394GiB/17files speed_j1=79 MiB/s
+    │ (1) v=79MiB/s  dt=0.0%   t=30.293 u=2.23s   s=1.08s  cpu=10%
+    │ (2) v=63MiB/s  dt=24.8%  t=37.809 u=2.43s   s=1.13s  cpu=9%
+    │ (3) v=56MiB/s  dt=11.8%  t=42.278 u=2.42s   s=1.25s  cpu=8%
+    │ (4) v=56MiB/s  dt=0.2%   t=42.380 u=2.30s   s=1.27s  cpu=8%
+    │ (5) v=54MiB/s  dt=3.4%   t=43.803 u=2.29s   s=1.29s  cpu=8%
+    │ (6) v=52MiB/s  dt=3.6%   t=45.369 u=2.47s   s=1.18s  cpu=8%
+    │ (7) v=52MiB/s  dt=-0.3%  t=45.247 u=2.28s   s=1.20s  cpu=7%
+    │ (8) v=52MiB/s  dt=1.5%   t=45.914 u=2.52s   s=1.22s  cpu=8%
