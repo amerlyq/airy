@@ -15,10 +15,17 @@
 #     <= e.g. if they were deleted wrongly and moving to ~/backup had failed
 dbkp="/me/!rsync/$(date +%Y%m%d_%H%M%S)"
 
+# ERR:FAIL: if "/me" does not exists when copying from NAS to local machine
+#   rsync error: error in file IO (code 11) at rsync.c(727) [receiver=v3.2.3]
+#   rsync: [generator] write error: Broken pipe (32)
+# HACK: don't touch backup dir when copying TO remote
+eval "dst=\${$#}"
+test ! -d /me -a "x${dst##*:}" == "x${dst}" && dbkp=${dbkp#/me/}
+
 # PERF:(-a): => -rlW
 exec rsync -e ssh -avh --no-group \
   --stats --progress \
-  --backup --backup-dir="$dbkp" \
+  ${dbkp:+--backup --backup-dir="$dbkp"} \
   --remote-option=--one-file-system \
   --out-format='%t %i %f' \
   "$@"

@@ -3,6 +3,8 @@
 
 dbkp="../!rsync-$(date +%Y%m%d_%H%M%S)"
 
+# SEE:(annex/symlinks -> real/files): $ rsync -L -K
+
 exec rsync -ah --no-group \
   --stats --progress \
   --info=copy,del,remove,skip \
