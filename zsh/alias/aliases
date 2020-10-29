@@ -107,6 +107,7 @@ for i in {1..9}; do
   alias -g S${i}u="SU -k$i,$i"
 done
 alias -g SC='SS|uniq -c|sort -srn -k1,1'
+alias -g SD='SS|uniq -cd|sort -srn -k1,1'
 # ALT: |perl -e 'print sort{length($a) <=> length($b)} <>'
 alias -g SL='|awk "{print length,\$0}"|sort -ns|cut -d" " -f2-'
 

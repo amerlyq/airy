@@ -17,9 +17,10 @@ setopt no_sh_word_split   # Don't split value by words -- only on demand by
 ### history
 # USAGE:
 #   * zle keymap 'set-local-history' to toggle exclusive history movement
-#   * $ fc -RI $ to manually import history from other terminals
+#   * $ fc -RI $ NICE! manually import history from other terminals (only when you need it)
 setopt no_share_history          # Disable shared history between terminals / sessions (auto-importing)
-setopt inc_append_history        # Write to the history file immediately, not when the shell exits.
+setopt no_inc_append_history     # Write to the history file immediately, not when the shell exits.
+setopt inc_append_history_time   # Write only after when command finishes (to have proper duration time)
 setopt extended_history          # Write the history file in the ':start:elapsed;command' format.
 setopt bang_hist                 # Treat the '!' character specially during expansion.
 setopt hist_expire_dups_first    # Expire a duplicate event first when trimming history.
