@@ -46,6 +46,9 @@ sudo chown "root:$user" ~/.snapshots
 sudo chmod 750 ~/.snapshots
 sudo snapper -c user set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY="8",DAILY="7",WEEKLY="5"}
 sudo btrfs quota enable /home
+## SEE: BUG:[⡟⢛⣔⣪]
+# since SLES12-SP2 btrfs quota via "snapper setup-quota" is needed · Issue #999 · rear/rear ⌇⡟⢜⡷⡔
+#   https://github.com/rear/rear/issues/999
 sudo snapper -c user setup-quota
 sudo snapper -c user get-config
 # v /etc/snapper/configs/user
