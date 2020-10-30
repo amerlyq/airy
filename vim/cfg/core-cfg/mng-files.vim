@@ -30,9 +30,10 @@ noremap <Leader><C-S> :saveas<Space>
 
 
 "" Change current path
-nnoremap <silent><unique> [Frame]cw :lcd %:p:h \| pwd<CR>
-nnoremap <silent><unique> [Frame]cc :lcd ..    \| pwd<CR>
-nnoremap <silent><unique> [Frame]ct :exe 'lcd '.fnameescape(<SID>tagdir()) \| pwd<CR>
+nnoremap <silent><unique> [Frame]cD :exe 'lcd '.fnameescape(get(systemlist('git rev-parse --show-superproject-working-tree'),0,'.'))<CR>
+nnoremap <silent><unique> [Frame]cw :lcd %:p:h<CR>
+nnoremap <silent><unique> [Frame]cc :lcd ..<CR>
+nnoremap <silent><unique> [Frame]ct :exe 'lcd '.fnameescape(<SID>tagdir())<CR>
 
 fun! s:tagdir()
   let d = get(tagfiles(), 0)
