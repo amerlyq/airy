@@ -396,6 +396,8 @@ EOT
     snapper -c $nm set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY=8,DAILY=7,WEEKLY=5}
     btrfs qgroup show -reF $d
     btrfs quota enable $d
+    # WARN: it seems it wasn't enabled on clean system -- must re-enable manually
+    #   ERR:(dmesg): quota not working (qgroup not set)
     snapper -c $nm setup-quota
     snapper -c $nm get-config
   }

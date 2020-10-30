@@ -147,6 +147,7 @@ CLONE:p2p
     # ALT: $ git config -f .gitmodules submodule.<name>.shallow true
     # SRC: https://stackoverflow.com/questions/2144406/how-to-make-shallow-git-submodules
   TARG: $ git remote add neo ssh://neo/data/amv
+  BOTH: $ git branch --set-upstream-to=nas/master master
   $ cd ./amv
   $ gmy -m && r.annex-init $(hostname)
   TARG: $ gas --all

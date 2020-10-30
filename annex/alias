@@ -9,11 +9,11 @@ alias gaI\?='gaI --dry-run'
 
 alias gA='gan add'
 alias gA!='gan add --force-large'
-alias gA.='gan add --jobs=cpus -- .'
+alias gA.='gan add -- .'  # OLD=--jobs=cpus
 
 alias gam='gan metadata'
 
-alias gaS='gan sync --jobs=4 --no-commit'   # WARN:DFL: all remotes are synced USE: arg1=<remote>
+alias gaS='gan sync --no-commit'            # WARN:DFL: all remotes are synced USE: arg1=<remote> OLD=--jobs=4
 alias gas='gaS --not-only-annex --content'  # = everything (both user and annex)
 alias gao='gaS --only-annex'                # ONLY: git-annex branch (ignore other git branches)
 alias gaO='gaS --not-only-annex'            # = sync all user branches + sync/annex branch
