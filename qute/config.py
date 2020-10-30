@@ -925,7 +925,7 @@ config.set('content.javascript.enabled', True, '*://www.reddit.com/*')
 ##   - false
 ##   - ask
 # c.content.notifications = 'ask'
-# c.content.notifications = False  # @me
+c.content.notifications = False  # @me: openning reddit is infuriating
 
 ## Allow pdf.js to view PDF files in the browser. Note that the files can
 ## still be downloaded by clicking the download button in the pdf.js
