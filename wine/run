@@ -1,4 +1,5 @@
 #!/bin/bash -e
+#%ONELINE: $ WINEPREFIX=~/.wine32 WINEARCH=win32 wine myapp.exe
 
 # EXPL: necessary for 'file -b' checkings
 APP=${1%.exe}.exe; [[ -f $APP ]] || exit
@@ -11,6 +12,18 @@ if ! file -b "$APP" | grep -iqF 'x86-64'; then
   export WINEPREFIX=~/.wine32
   export WINEARCH=win32
 fi
+
+
+### Locale
+# SRC: https://unix.stackexchange.com/questions/38876/how-to-fix-russian-letters-in-a-wine-application-when-adjusting-lang-does-not-he/79188
+#   FAIL: "wine control.exe" and "wine intl.cpl"
+#   MAYBE: ttf-mscorefonts-installer
+# CFG:GEN:(ArchLinux): $ sudo vis /etc/locale.gen && sudo locale-gen
+# ALT:GEN:(Ubuntu): $ echo ru_RU.UTF-8 UTF-8 >> /var/lib/locales/supported.d/local && dpkg-reconfigure locales
+#   ALSO:(if still doesn't work): locale-gen --purge --no-archive
+# DEBUG:(russian calendar): $ LANG=ru_RU.utf8 cal
+# USAGE: $ export LANG=ru_RU.UTF-8 LC_CTYPE=ru_RU.UTF-8 ...
+
 
 # WINEPATH to find dlls (or they should lie near *.exe)
 # export WINEPATH=/usr/${TARGET}/bin
