@@ -142,6 +142,7 @@ if (($+commands[grep])); then
   alias -g GF="|${aliases[grep]:-grep} -F"
   alias -g G2='G -C2'
   for i in i q v w x; do alias -g G$i="G -$i"; done
+  alias -g Gb="|(){ ${aliases[grep]:-grep} \"^\$*\" }"
 fi
 
 if (($+commands[xargs])); then
@@ -163,11 +164,13 @@ if (($+commands[xargs])); then
 fi
 
 if (($+commands[xsel])); then
-  alias -g YN='|xsel -ib'
+  alias -g Y-='|xsel -ib'
   alias -g Y='|tee >/dev/tty|xsel -ib'
   alias -g Y+='|tee >/dev/tty|xsel -ab'
-  alias -g Y:='xsel -ob'
-  alias -g Y.='$(xsel -ob)'
+  # FIXME: $ :Y cat
+  alias -g :Y='xsel -ob'
+  alias -g .Y='<(xsel -ob)'
+  alias -g _Y='"$(xsel -ob)"'
 fi
 
 if (($+commands[fzf])); then
@@ -180,11 +183,15 @@ if (($+commands[fzf])); then
 fi
 
 ## Buffers
-_xsel_tmp_buf=${TMPPREFIX:-${TMPDIR:-/tmp}}/zsh-output
-alias -g YT='|stdbuf -oL -eL tee "$_xsel_tmp_buf"'
-alias -g YT+='|stdbuf -oL -eL tee -a "$_xsel_tmp_buf"'
-alias -g YT:='cat "$_xsel_tmp_buf"'
-alias -g YT.='"$_xsel_tmp_buf"'
+_yankbuf=${(q-)${TMPPREFIX:-${TMPDIR:-/tmp}}}/yankbuf
+for i in {0..9}; do
+  alias -g Y$i-=">! $_yankbuf-$i"
+  alias -g Y$i="|stdbuf -oL -eL tee $_yankbuf-$i"
+  alias -g Y$i+="|stdbuf -oL -eL tee -a $_yankbuf-$i"
+  alias -g :Y$i="<$_yankbuf-$i"
+  alias -g .Y$i="$_yankbuf-$i"
+  alias -g _Y$i='"$(<'"$_yankbuf-$i"')"'
+done
 
 # alias -r @="printf \"$(xsel -ob)\n\""
 #   { xsel: Can't open display: (null)
