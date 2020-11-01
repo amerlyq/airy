@@ -28,11 +28,6 @@ alias dS='find -L . -name .git -prune -o -type f -printf "%7s %P\n" | sort -k1n,
 # ALSO: @/airy/elf/ctl/categorize
 alias fh="find . -name .git -prune -o -print | grep -Po '[.]\\K(?:[^./]{3}[.])?[^./]{1,16}$' |LC_ALL=C sort|uniq -c|sort -k1n,1|tail"
 
-# find duplicate annex symlinks i.e. "the same file with different name/path"
-# find -type l -exec readlink -v -- {} + | grep -o '[0-9a-f]\+$' SS |uniq -cd
-# for l ((^.git/)#*(@)) print -lraC2 -- ${${l:A:t}##*-} $l | awk '{++n[$1];a[$1]+="\n"substr($0,length($1)+1)} END{for(h in n){if(n[h]>1)print"["h"]"a[h]}}'
-
-
 alias fUf='git ls-files --others'
 alias fuf='git ls-files --others --exclude-standard'
 alias fU='git ls-files --others --directory'
@@ -130,6 +125,24 @@ alias 'f.*'='f -g'
 alias f.0='f -0'
 alias f.1='f -d1'
 alias f.2='f -d2'
+
+alias fnp='find \( -name .git -o -name "_build*" \) -prune -o \( -type f -o -type l \)'
+alias fn='fnp -printf "%f\\n"'
+alias fnd='fn |LC_ALL=C sort|uniq -cd|sort -k1n,1'
+# find duplicate annex symlinks i.e. "the same file with different name/path"
+# ALT: for l ((^.git/)#*(@)) print -lraC2 -- ${${l:A:t}##*-} $l | awk '{++n[$1];a[$1]+="\n"substr($0,length($1)+1)} END{for(h in n){if(n[h]>1)print"["h"]"a[h]}}'
+alias fnl="find -type l -exec readlink -v -- {} + | grep -o '[0-9a-f]\\+\$' |LC_ALL=C sort|uniq -cd|sort -k1n,1"
+alias fna="find -type l -print -exec readlink -v -- {} \\; | awk -F- '{if(NR%2){n=\$0}else{print \$NF,n}}'"
+# NOTE: same basename but different SHA (readlink basename) :: print fullpaths
+alias fnD="find -type l -print -exec readlink -v -- {} \; | awk -F/ 'NR%2{p=\$0;b=\$NF;++N[b];next} {h=\$NF;if((b in f)&&(b!=H[h])){++d[b]};H[h]=b;f[b]=f[b]\"\\n\"p} END{for(b in d)print f[b]}'"
+# NOTE: same SHA but different dir / basename (i.e. intentional duplicates for tag-dirs)
+alias fnU="find -type l -print -exec readlink -v -- {} \; | awk -F/ 'NR%2{p=\$0;b=\$NF;++N[b];next} {h=\$NF;if((h in H)&&(b!=H[h])){++d[h]};H[h]=b;f[h]=f[h]\"\\n\"p} END{for(h in d)print f[h]}'"
+# e.g. find disk bad blocks
+# fnD X stat -Lc'%s %n' | awk '{if(!(($1-s)%512))print"";s=$1}1'
+
+## IDEA: compare if unique-basename list ($ fnd && f Y2) is also unique in some larger repo
+#  << useful to directly match files metadata by their basenames
+# $ f | awk -F/ 'FNR==NR{a[$NF]=$0;next} {if($NF in a){print$NF}}' .Y2 - SD
 
 ## TODO: use !skim narrowed to list of found files
 # alias 'f/'='f -x'
