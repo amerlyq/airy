@@ -32,7 +32,7 @@ folder=$({ ydl --get-filename -o '%(playlist_title)s' \
 [[ -n $folder ]] || exit 1
 
 ## TEMP:HACK: always download to fixed location
-cd /data/music/soundcloud
+# cd /data/music/soundcloud
 
 if [[ ${PWD##*/} != "$folder" ]]; then
   mkdir -p "$folder"
