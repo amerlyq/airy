@@ -78,8 +78,8 @@ SETUP
   $ sudo mkfs.ext4 -L tomb -m0 -E lazy_itable_init=0,lazy_journal_init=0 /dev/mapper/tomb
   $ mount /dev/mapper/tomb /mnt
   $ sudo install -m 700 -o $USER -g $USER -d -- /mnt
-  $ git clone --bare "file:///aura/aura/todo" /mnt/todo.git
-  $ git -C /aura/aura/todo remote set-url origin file:///mnt/todo.git
+  $ git clone --bare "file:///@/todo" /mnt/todo.git
+  $ git -C /@/todo remote set-url origin file:///mnt/todo.git
   $ umount /dev/mapper/tomb
   $ sudo cryptsetup -v close tomb
   $ fusermount -u /srv/tomb
