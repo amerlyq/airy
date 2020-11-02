@@ -84,6 +84,15 @@ alias gtn='git name-rev --name-only'  # Shows related to release tag name
 alias gtt='git tag --sort=-creatordate --format="%(HEAD)%(creatordate:format-local:%Y-%m-%d %H:%M:%S)%09%(refname:strip=2)%09%(contents:subject)"'
 # alias gtt='git tag'
 
+alias gWa='git worktree add'  # <path> [<commit-ish>]
+alias gWb='git worktree add -b tmp "&tmp" master'
+alias gWs='git worktree add --no-checkout --detach'  # i.e. for sparse checkout READ git-read-tree
+alias gWl='git worktree list'
+alias gWL='git worktree list --porcelain'
+alias gWm='git worktree move'  # FAIL: for submodules
+alias gWr='git worktree repair'
+alias gWx='git worktree remove'
+
 # NOTE:
 #   gwc / gwC | clean | --dry-run / --force
 #   gfa && gwRF  | do on each client after 'push -f'

@@ -47,7 +47,11 @@ function time_dt {
 
 function gita_st { local rep=$1 sfx=${2-}
   stm=$(git log -1 --pretty=format:'%ci' | cut -d' ' -f1,2)
-  name=$(printf "%-${WCOL:-17}s\n" "$rep" | sed 's|[^/]\+/|%F{6}\0%f|')
+  name=$(printf "%-${WCOL:-17}s\n" "$rep")
+  local h t
+  [[ $name =~ / ]] && h='%F{6}'$name:h/'%f' || h=''
+  [[ -L $PWD ]] && t='%F{6}%B'$name:t'%b%f' || t=$name:t
+  name=$h$t
 
   # ALT:(builtin slower then sed):
   #   autoload -U regexp-replace

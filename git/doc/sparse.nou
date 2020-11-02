@@ -1,2 +1,38 @@
-  2020-02-28 [X] CHECK: sparse clone on smth my own
-    https://unix.stackexchange.com/questions/233327/is-it-possible-to-clone-only-part-of-a-git-project
+REF
+  OFF: Git - git-read-tree Documentation ⌇⡟⢞⠎⡁
+    https://git-scm.com/docs/git-read-tree#_sparse_checkout
+  Make sparse clone ⌇⡟⢞⠍⡕
+    https://gist.github.com/hofnerb/a5ebf4e0c89caffc40ee
+  Subdirectory checkouts with Git sparse-checkout ⌇⡟⢞⠍⢣
+    https://gist.github.com/sumardi/5559896
+  git - Is it possible to do a sparse checkout without checking out the whole repository first? - Stack Overflow ⌇⡟⢞⠎⢘
+    https://stackoverflow.com/questions/4114887/is-it-possible-to-do-a-sparse-checkout-without-checking-out-the-whole-repository
+    [_] TRY: --filter=blob:none file:///…/linux
+    2020-02-28 [X] CHECK: sparse clone on smth my own
+      Is it possible to clone only part of a git project? - Unix & Linux Stack Exchange ⌇⡟⢞⠏⢦
+        https://unix.stackexchange.com/questions/233327/is-it-possible-to-clone-only-part-of-a-git-project/468182#468182
+        ::: now works with GitHub
+  linux - git sparse-checkout ignore specific file type - Stack Overflow ⌇⡟⢞⠏⣺
+    https://stackoverflow.com/questions/61623691/git-sparse-checkout-ignore-specific-file-type/61628291#61628291
+  Git sparse checkout error "Entry 'path/to/file' not update. Cannot update sparse checkout" - Stack Overflow ⌇⡟⢞⠐⠉
+    https://stackoverflow.com/questions/56967685/git-sparse-checkout-error-entry-path-to-file-not-update-cannot-update-sparse/61563363#61563363
+
+
+USAGE
+  $ git clone --no-checkout ...
+    OR: $ git worktree add --no-checkout --detach -b tmp ../sparse master
+  $ git config core.sparseCheckout true
+  $ echo "some/dir/" >> .git/info/sparse-checkout
+  $ echo "another/sub/tree" >> .git/info/sparse-checkout
+  $ git read-tree -mu HEAD
+
+  !git>=2.25
+  $ git clone --filter=blob:none --no-checkout --depth 1 --sparse <project-url>
+  $ git sparse-checkout init --cone  # to fetch only root files
+  $ git sparse-checkout set apps/my_app libs/my_lib # etc, to list sub-folders to checkout
+  $ git sparse-checkout add <folder>/<innerfolder> <folder2>/<innerfolder2>
+  # NOTE: they are checked out immediately after this command, no need to run git pull
+
+  Exclude ::
+    /*
+    !some_unwanted_directory/

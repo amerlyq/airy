@@ -7,3 +7,10 @@
 
     $ gSF zsh -c 'r.git-my-repo -w && git checkout $(git commit-tree $(git hash-object -t tree /dev/null) < /dev/null)'
     $ r.git-my-repo -w && git checkout $(git commit-tree $(git hash-object -t tree /dev/null) < /dev/null)
+
+USAGE
+  $ alias Gb gW
+  $ cd /data/amv
+  $ git worktree add /cache/amv-annex git-annex
+  ... (do fix / analysis)
+  $ git worktree remove amv-annex
