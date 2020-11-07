@@ -1,16 +1,44 @@
 <!-- ~/.config/syncthing/config.xml -->
-<!-- NEED: replace "myuser", "myhost", "mytarg" and both "device id" by actual values -->
-<configuration version="29">
-    <folder id="amer-sync-private" label="amer-sync-private" path="/data/sync/amer-sync-private" type="sendreceive" rescanIntervalS="14400" fsWatcherEnabled="true" fsWatcherDelayS="10" ignorePerms="false" autoNormalize="true">
+<!-- NEED: replace "%{USER}", "<password>", and both "device id" by actual values -->
+<configuration version="32">
+    <folder id="all-exchange" label="all-exchange" path="/data/sync/all-exchange" type="sendreceive" rescanIntervalS="14400" fsWatcherEnabled="true" fsWatcherDelayS="10" ignorePerms="false" autoNormalize="true">
         <filesystemType>basic</filesystemType>
-        <device id="75F2JYC-6VBY6AH-6K5KAXD-RJEK4CS-VVSJJQL-CFFYTX6-QAJB7OC-EPQPSA4" introducedBy=""></device>
         <device id="CCK7IOF-I43UJE3-G6ZJWG6-W6UHLE5-YSTB3W4-BKYT4ZI-57ALEWN-LTMS5AC" introducedBy=""></device>
+        <device id="75F2JYC-6VBY6AH-6K5KAXD-RJEK4CS-VVSJJQL-CFFYTX6-QAJB7OC-EPQPSA4" introducedBy=""></device>
+        <minDiskFree unit="%">1</minDiskFree>
+        <versioning>
+            <cleanupIntervalS>3600</cleanupIntervalS>
+        </versioning>
+        <copiers>0</copiers>
+        <pullerMaxPendingKiB>0</pullerMaxPendingKiB>
+        <hashers>0</hashers>
+        <order>oldestFirst</order>
+        <ignoreDelete>false</ignoreDelete>
+        <scanProgressIntervalS>0</scanProgressIntervalS>
+        <pullerPauseS>0</pullerPauseS>
+        <maxConflicts>-1</maxConflicts>
+        <disableSparseFiles>false</disableSparseFiles>
+        <disableTempIndexes>false</disableTempIndexes>
+        <paused>false</paused>
+        <weakHashThresholdPct>25</weakHashThresholdPct>
+        <markerName>.stfolder</markerName>
+        <copyOwnershipFromParent>false</copyOwnershipFromParent>
+        <modTimeWindowS>0</modTimeWindowS>
+        <maxConcurrentWrites>0</maxConcurrentWrites>
+        <disableFsync>false</disableFsync>
+        <blockPullOrder>standard</blockPullOrder>
+        <copyRangeMethod>standard</copyRangeMethod>
+        <caseSensitiveFS>false</caseSensitiveFS>
+        <junctionsAsDirs>true</junctionsAsDirs>
+    </folder>
+    <folder id="%{USER}-sync-private" label="%{USER}-sync-private" path="/data/sync/%{USER}-sync-private" type="sendreceive" rescanIntervalS="14400" fsWatcherEnabled="true" fsWatcherDelayS="10" ignorePerms="false" autoNormalize="true">
+        <filesystemType>basic</filesystemType>
+        <device id="CCK7IOF-I43UJE3-G6ZJWG6-W6UHLE5-YSTB3W4-BKYT4ZI-57ALEWN-LTMS5AC" introducedBy=""></device>
+        <device id="75F2JYC-6VBY6AH-6K5KAXD-RJEK4CS-VVSJJQL-CFFYTX6-QAJB7OC-EPQPSA4" introducedBy=""></device>
         <minDiskFree unit="%">1</minDiskFree>
         <!-- BAD: mostly useless if you have "snapper/btrfs" snapshots each hour -->
-        <versioning type="staggered">
-            <param key="cleanInterval" val="3600"></param>
-            <param key="maxAge" val="7776000"></param>
-            <param key="versionsPath" val=""></param>
+        <versioning>
+            <cleanupIntervalS>3600</cleanupIntervalS>
         </versioning>
         <copiers>0</copiers>
         <pullerMaxPendingKiB>0</pullerMaxPendingKiB>
@@ -27,8 +55,14 @@
         <markerName>.stfolder</markerName>
         <copyOwnershipFromParent>false</copyOwnershipFromParent>
         <modTimeWindowS>0</modTimeWindowS>
+        <maxConcurrentWrites>0</maxConcurrentWrites>
+        <disableFsync>false</disableFsync>
+        <blockPullOrder>standard</blockPullOrder>
+        <copyRangeMethod>standard</copyRangeMethod>
+        <caseSensitiveFS>false</caseSensitiveFS>
+        <junctionsAsDirs>true</junctionsAsDirs>
     </folder>
-    <device id="CCK7IOF-I43UJE3-G6ZJWG6-W6UHLE5-YSTB3W4-BKYT4ZI-57ALEWN-LTMS5AC" name="mytarg" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
+    <device id="CCK7IOF-I43UJE3-G6ZJWG6-W6UHLE5-YSTB3W4-BKYT4ZI-57ALEWN-LTMS5AC" name="%{USER}/phone" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
         <address>dynamic</address>
         <paused>false</paused>
         <autoAcceptFolders>false</autoAcceptFolders>
@@ -36,7 +70,7 @@
         <maxRecvKbps>0</maxRecvKbps>
         <maxRequestKiB>0</maxRequestKiB>
     </device>
-    <device id="75F2JYC-6VBY6AH-6K5KAXD-RJEK4CS-VVSJJQL-CFFYTX6-QAJB7OC-EPQPSA4" name="myhost" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
+    <device id="75F2JYC-6VBY6AH-6K5KAXD-RJEK4CS-VVSJJQL-CFFYTX6-QAJB7OC-EPQPSA4" name="%{USER}/pc" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
         <address>dynamic</address>
         <paused>false</paused>
         <autoAcceptFolders>false</autoAcceptFolders>
@@ -44,8 +78,10 @@
         <maxRecvKbps>0</maxRecvKbps>
         <maxRequestKiB>0</maxRequestKiB>
     </device>
-    <gui enabled="true" tls="false" debugging="false">
+    <gui enabled="true" tls="true" debugging="false">
         <address>127.0.0.1:8384</address>
+        <user>%{USER}</user>
+        <password>%(pass devices/$(host)/syncthing)</password>
         <apikey>wDffudqZtDzzxGA6QR3N3eP39xSU2vKW</apikey>
         <theme>dark</theme>
     </gui>
@@ -95,5 +131,6 @@
         <stunServer>default</stunServer>
         <databaseTuning>auto</databaseTuning>
         <maxConcurrentIncomingRequestKiB>0</maxConcurrentIncomingRequestKiB>
+        <announceLANAddresses>true</announceLANAddresses>
     </options>
 </configuration>
