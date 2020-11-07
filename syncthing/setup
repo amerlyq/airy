@@ -18,6 +18,11 @@ EOT
 # [[ -L /data/sync/= ]] || ln -svfT -- all-exchange /data/sync/=
 # [[ -L /data/sync/@ ]] || ln -svfT -- amer-sync-private /data/sync/@
 
+# RQ: systemctl [--user] daemon-reload
+# linkcp -ct /etc/systemd/system/syncthing@.service.d -- nospam.conf
+linkcp -ct /etc/systemd/user/syncthing.service.d -- nospam.conf
+
+
 # http://docs.syncthing.net/users/autostart.html#systemd
 # ALT:(system-wide): $ svc_activate -e$(cfgOpt uU&&echo rR) syncthing{,-inotify}@"${USER:?}"
-svc_activate -eu$(cfgOpt uU&&echo rR) syncthing.service
+svc_activate -eu"$(cfgOpt uU&&echo rR)" syncthing.service
