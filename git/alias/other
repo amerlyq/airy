@@ -8,13 +8,20 @@
 
 alias gc1='git clone --depth=1 --single-branch'
 [[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' gc1
+# USE: $ gc1b v3.14 for single tag
+alias gc1b='git clone --single-branch --depth=1 --jobs=4 --recurse-submodules --shallow-submodules --branch'
+# HACK: register additional branches to be fetched into shallow-cloned repo
+alias gRr='git remote set-branches --add origin'
+alias gRR='git remote set-branches origin'
 
-alias gc1b='gc1 --branch'  # USE: $ gc1b v3.14 for single tag
+
+alias gcE='git commit --allow-empty -m "Initial empty commit" && git tag -a -m "Initial repo root tag" ROOT'
 gcI(){ [[ -d $1 ]] && return
   git init "$1" && REPO="$1" r.git-my-repo "${2:--m}" &&
     git -C "$1" commit --allow-empty -m "Initial empty commit" &&
     git -C "$1" tag -a -m 'Initial repo root tag' ROOT
 }
+
 
 ## --- Git ---
 alias gw.='git reset --soft HEAD~'
@@ -29,6 +36,11 @@ alias gl='git pull --rebase --verbose'
 alias glu='gss && gl && gsp'
 alias gbl='git branch -vv'
 alias gbL='git branch -va'
+alias gbh='git branch $(git branch --list --remote --sort="-refname" --format="--no-merged=%(refname:short)" -- "origin/release/???" "origin/HEAD" "origin/master") --verbose --all --list'
+alias gbH='git branch $(git branch --list --remote --sort="-refname" --format="--merged=%(refname:short)" -- "origin/release/???" "origin/master" | head -1) --verbose --all --list'
+# BET:(simpler): alias gbH='git branch --merged origin/HEAD -val'
+alias gbmv='git branch --move'
+alias gbmV='git branch --move --force'
 alias gbu='gbl --no-merged'
 alias gbU='gbL --no-merged'
 alias gbum='gbu master'
@@ -43,7 +55,7 @@ alias ga='git add --all'
 alias ga.='ga .'
 alias giU='giu --patch'
 alias gcff='git commit --fixup'
-gcfd(){ local d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
+gcfd(){ local d; d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
 alias gcss='gcs --stat'
 alias gcsd='gcs --diff-filter=d --pretty=short --show-signature'
 alias gcst='git --no-pager log --pretty=tformat:%ad%n%cd HEAD~..HEAD'
