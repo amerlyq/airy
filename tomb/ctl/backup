@@ -12,15 +12,28 @@ set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 # WARN:TODO: if container will be ever corrupted/deleted
 #   -- how to easily restore it from repos structure on either PC ?
 
-tomb='aura'
-dm='tomb'
+grpnm='tomb'
+d_keys=/aura/archive/$grpnm
+d_sshfs=lc:/me/$grpnm  # MOVE:(direct symlink): -> "lc:/tomb"
+d_tombs=/srv/$grpnm/${d_sshfs%%:*}
+d_mnt=/mnt
 
+tomb='aura'  # FIXME? mandatory argument
+
+#%USAGE:(local): $ ./$0 -S '' -T /tmp/tomb -n mytomb -m
 choices=mcsu
-opts=; while getopts "AvR$choices" o; do case $o in :|'?') exit 1
+opts=; while getopts "AK:M:n:RS:T:v$choices" o; do case $o in :|'?') exit 1
 ;; A) opts+=$choices
+;; n) tomb=$OPTARG
+;; K) d_keys=$OPTARG
+;; M) d_mnt=$OPTARG
+;; S) d_sshfs=$OPTARG
+;; T) d_tombs=$OPTARG
 esac; opts+=$o; done; shift $((OPTIND - 1))
 # ALT:(generic: -F => -Fmcsu): [[ -z ${opts//[^R$choices]} ]] && opts+=$choices
 [[ -z ${opts//[R]} ]] && opts+=$choices  # =DFL
+dm=$grpnm-$tomb
+
 has(){ [[ $opts =~ [$*] ]]; }
 git(){ command git --no-pager -c color.status=always -c color.ui=always "$@"; }
 
@@ -71,23 +84,24 @@ function isOpened { local luks=$1 dm=$2 loop
 # HACK: if this device is already mounted --
 #   it means git-syncup was interrupted with errors,
 #   so skip and continue git-syncup again
-function OpenTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
+function OpenTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
 
-  if notMounted $srv $loc; then
+  if [[ -n $rloc ]] && notMounted $rloc $loc; then
     sudo install -m 700 -o $USER -g $USER -d -- $loc
     ## FAIL: can't enter password into background process
     #    [⡟⡸⣆⢓] WTF: why I need to enter password for authkey ssh in the first place ?
     #      ::: FIXED: $ ssh-copy-id -i ~/.ssh/id_rsa.pub lc && ssh lc 'tail -1 ~/.ssh/authorized_keys >> /_cfg/ssh/authorized_keys'
-    # sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" $srv $loc &
-    sshfs -o "umask=0077,noexec,no_readahead,allow_root" $srv $loc
+    # sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" $rloc $loc &
+    sshfs -o "umask=0077,noexec,no_readahead,allow_root" $rloc $loc
   fi
 
   local luks=$loc/$tomb.luks
   if notOpened $luks $dm; then
-    # BAD: actual pass path directly depends on $srv
+    # BAD: actual pass path directly depends on $rloc
     #   << dif. servers may contain same LUKS container copy with dif. passwd
-    local pass=$dm/$tomb
-    local keys=~/tomb/$tomb.keys
+    #   TEMP:TRY: keep unique names for all containers
+    local pass=$grpnm/$tomb
+    local keys=$d_keys/$tomb.keys
     # BUG: newline is part of password
     pass $pass | sudo cryptsetup --key-file - luksOpen --header $keys -- $luks $dm
   fi
@@ -99,18 +113,20 @@ function OpenTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
 }
 
 # TODO: call CloseTomb on demand by flag
-function CloseTomb { local srv=$1 loc=$2 dm=$3 mnt=$4
+function CloseTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
   sync
 
   # FIXME: unmount only single $loop path from notOpened()
   # HACK: close any stray loop device, which prevents unmounting
+  # FAIL: will close all opened loop devices, even unrelated
+  #   BUT:NICE: nested tombs are mutually exclusive anyways
   losetup -a | cut -d: -f1 | sort -n | tail -1 | xargs -r sudo losetup -d
 
   local dev=/dev/mapper/$dm
   local luks=$loc/$tomb.luks
   isMounted $dev $mnt && sudo umount $dev
   isOpened $luks $dm  && sudo cryptsetup close -- $dm
-  isMounted $srv $loc && fusermount -u -- $loc
+  if [[ -n $rloc ]]; then isMounted $rloc $loc && fusermount -u -- $loc; fi
 
   # ALT: wait until background sshfs exits
   # wait
@@ -226,9 +242,9 @@ fi
 has s && ((!$#repos)) && >&2 echo "Err: empty repos list" && exit 1
 has v && print -l $repos
 
-has m && OpenTomb lc:/me/$dm /srv/$dm $dm /mnt
+has m && OpenTomb "$d_sshfs" "$d_tombs" "$dm" "$d_mnt"
 has c && CfgCloneCentralRepos $repos
 has s && SyncRepos $repos
 # MAYBE: trap '...' EXIT ERR
-has u && CloseTomb lc:/me/$dm /srv/$dm $dm /mnt
+has u && CloseTomb "$d_sshfs" "$d_tombs" "$dm" "$d_mnt"
 exit 0

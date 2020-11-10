@@ -65,30 +65,33 @@ SRC: ※⡟⡢⡱⣷
 SETUP
   $ cd /srv/tomb  # ALT: /cache/tomb
   $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb .
-  $ sudo mkdir -m700 . && chown "$USER:$USER" .
-  # MAYBE: $ chattr +C .
+  $ sudo mkdir -m700 . && chown "$USER:$USER" . && chattr +C .
+  $ touch aura.luks
+  $ chattr +C aura.luks
   $ truncate -s 1G aura.luks
     # BAD: not supported by SSHFS $ fallocate -l 1G aura.luks
   $ pass generate tomb/aura
   $ pass tomb/aura | sudo cryptsetup -v --type luks2 --key-file - --cipher aes-xts-plain64 --hash sha512 --key-size 512 --pbkdf argon2id --key-slot 0 luksFormat --header ~/tomb/aura.keys -- aura.luks
     # BUG: newline is part of password
+    # INFO: this LUKS2 headers/metadata backup is 16MB now :: https://cdn.kernel.org/pub/linux/utils/cryptsetup/v2.1/v2.1.0-ReleaseNotes
+  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksAddKey --header ~/tomb/aura.keys -- aura.luks # =(vipe<&-) OR =(stty -echo;cat)
   $ sudo cryptsetup luksDump --header ~/tomb/aura.keys -- aura.luks
-  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- aura.luks tomb
-  $ sudo dmsetup table /dev/mapper/tomb
-  $ sudo mkfs.ext4 -L tomb -m0 -E lazy_itable_init=0,lazy_journal_init=0 /dev/mapper/tomb
-  $ mount /dev/mapper/tomb /mnt
+  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- aura.luks tomb-aura
+  $ sudo dmsetup table /dev/mapper/tomb-aura
+  $ sudo mkfs.ext4 -L tomb-aura -m0 -E lazy_itable_init=0,lazy_journal_init=0 /dev/mapper/tomb-aura
+  $ mount /dev/mapper/tomb-aura /mnt
   $ sudo install -m 700 -o $USER -g $USER -d -- /mnt
   $ git clone --bare "file:///@/todo" /mnt/todo.git
   $ git -C /@/todo remote set-url origin file:///mnt/todo.git
-  $ umount /dev/mapper/tomb
-  $ sudo cryptsetup -v close tomb
+  $ umount /dev/mapper/tomb-aura
+  $ sudo cryptsetup -v close tomb-aura
   $ fusermount -u /srv/tomb
 
 SYNC
   $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb /srv/tomb
     # CHECK:(,compression=yes): useless due to sending encrypted data blocks
-  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb
-  $ mount /dev/mapper/tomb /mnt
+  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb-aura
+  $ mount /dev/mapper/tomb-aura /mnt
   $ Gl
   $ ... $ ATT: may error-out due to merge conflict => run rest o commands yourself
     BET: sync tomb first -- and only then use "Gp" for rest of repos
@@ -96,21 +99,21 @@ SYNC
   $ sync
   # HACK: close tomb loop device, which prevents unmounting
   # losetup -a | cut -d: -f1 | sort -n | tail -1 | xargs -r sudo losetup -d
-  $ umount /dev/mapper/tomb
-  $ sudo cryptsetup -v close tomb
+  $ umount /dev/mapper/tomb-aura
+  $ sudo cryptsetup -v close tomb-aura
   $ fusermount -u /srv/tomb
 
 RESIZE
   $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb .
   # OR: $ r.tomb-backup -m
   $ losetup -a | cut -d: -f1 | sort -n | tail -1 | xargs -r sudo losetup -d
-  $ sudo umount /dev/mapper/tomb
-  $ sudo cryptsetup -v close tomb
+  $ sudo umount /dev/mapper/tomb-aura
+  $ sudo cryptsetup -v close tomb-aura
   $ truncate -s 10G /srv/tomb/aura.luks
-  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb
-  $ sudo e2fsck -f /dev/mapper/tomb
-  $ sudo resize2fs /dev/mapper/tomb
-  $ sudo mount /dev/mapper/tomb /mnt
+  $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb-aura
+  $ sudo e2fsck -f /dev/mapper/tomb-aura
+  $ sudo resize2fs /dev/mapper/tomb-aura
+  $ sudo mount /dev/mapper/tomb-aura /mnt
   $ for r in /mnt/*.git; do printf '\n[%s]\n' $g; git -C $r fsck || git -C $r gc --aggressive; done
   # ALSO: $ git annex fsck
 
