@@ -131,6 +131,10 @@ media = (map (second spawn) . concat) [  -- TODO:USE: spawnHere
     [ ("u", "r.b -p")
     , ("w", "r.notify-winclass")
     , ("l", "echo wmctrl -l | r.notify-sh")
+    , ("M-d", "dunstctl close")
+    , ("M-S-d", "dunstctl close-all")
+    , ("M-y", "dunstctl history-pop")
+    , ("M-<Return>", "dunstctl action")
     ],
     --DEV:(copyq) keySeqFor cmd prf = map (prf ++ " " ++)
     feedCmd "copyq"
