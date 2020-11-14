@@ -16,7 +16,7 @@ alias gRR='git remote set-branches origin'
 
 
 alias gcE='git commit --allow-empty -m "Initial empty commit" && git tag -a -m "Initial repo root tag" ROOT'
-gcI(){ [[ -d $1 ]] && return
+gcI(){ [[ $1 != "." && -d $1 ]] && return
   git init "$1" && REPO="$1" r.git-my-repo "${2:--m}" &&
     git -C "$1" commit --allow-empty -m "Initial empty commit" &&
     git -C "$1" tag -a -m 'Initial repo root tag' ROOT
