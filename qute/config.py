@@ -800,6 +800,7 @@ c.content.headers.accept_language = 'en-US,en;q=0.5'  # @me
 # c.content.host_blocking.whitelist = []
 ## @me
 c.content.host_blocking.whitelist = ['adf.ly']
+# ALSO: 'www.googleadservices.com' -- to be able to click found goods in google search
 
 ## Enable hyperlink auditing (`<a ping>`).
 ## Type: Bool
@@ -2107,8 +2108,8 @@ config.unbind('ZZ')
 # config.bind('b', 'set-cmd-text -s :quickmark-load')
 # config.bind('cd', 'download-clear')
 # config.bind('co', 'tab-only')
-config.bind('cy', 'open -t -- {clipboard}')
-config.bind('c.', 'open -- {clipboard}')
+config.bind('ch', 'open -t -- {clipboard}')     # 'cy'
+config.bind('c<Space>', 'open -- {clipboard}')  # 'c.'
 # config.bind('d', 'tab-close')
 # config.bind('f', 'hint')
 # config.bind('g$', 'tab-focus -1')
