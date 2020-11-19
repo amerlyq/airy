@@ -10,7 +10,9 @@ After=wm.target
 # MAYBE: check some socket?
 # TRY: rework to dbus-activated
 ExecStartPre=/bin/sh -c 'pkill -x dunst; true'
-ExecStart=/usr/bin/dunst
+## ALT: remove spam from journalctl (7+ msgs when closing any window)
+ExecStart=/bin/bash -c 'exec 2> >(grep -vF "WARNING: BadWindow (invalid Window parameter)"); exec dunst'
+# ExecStart=/usr/bin/dunst
 # ExecSuspend=killall -SIGUSR2 dunst
 Restart=always
 RestartSec=1

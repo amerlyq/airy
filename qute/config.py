@@ -2108,8 +2108,8 @@ config.unbind('ZZ')
 # config.bind('b', 'set-cmd-text -s :quickmark-load')
 # config.bind('cd', 'download-clear')
 # config.bind('co', 'tab-only')
-config.bind('ch', 'open -t -- {clipboard}')     # 'cy'
-config.bind('c<Space>', 'open -- {clipboard}')  # 'c.'
+config.bind('cl', 'open -t -- {clipboard}')     # 'cy/ch'
+config.bind('c<Space>', 'open -- {clipboard}')  # 'c./c<Backspace>'
 # config.bind('d', 'tab-close')
 # config.bind('f', 'hint')
 # config.bind('g$', 'tab-focus -1')
