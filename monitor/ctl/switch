@@ -39,8 +39,8 @@ read -r w h x y mw mh <<< "$ext_dims"
 
 
 # NOTE: artificially reduce physical size (mw x mh) to increase virtual dpi
-s1=$((w*$kw))/$((mw*$kw))x$h/$mh+0+0
-s2=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((w*$kw))+0
+s1=$((w*$kw))/$((mw*$kw))x$h/$mh+$x+$y
+s2=$((w-w*$kw))/$((mw-mw*$kw))x$h/$mh+$((x+w*$kw))+$y
 
 del_mon_split "$ext~1"
 del_mon_split "$ext~2"

@@ -39,7 +39,7 @@ doScreen d f = do
     Just ws -> windows (f ws)
 
 
-keys = screens ++ altWksps ++ usedWksps ++ emptyWksps ++ panels ++ markNgo
+keys = screens ++ altWksps ++ usedWksps ++ emptyWksps ++ markNgo  -- ++ panels
 
 altWksps = [ (m ++ "a", backNforth skipped f) | (m, f) <- actions]
 usedWksps =
@@ -60,10 +60,14 @@ screens =
   ]
 
 
-panels = []
-  -- [ ("M-S-p"    , layoutScreens 2 (TwoPane 0.15 0.85) >> windows (view "MON"))
-  -- , ("M-p"      , rescreen)  -- TODO: toggle show/hide second screen
-  -- ]
+-- ENABLED: because "xrandr --setmonitor" don't work with "nvidia" drivers (CHECK: what about "nvidia-drm.modset" ?)
+--   2020-11-20 FIXED? !nvidia>=455.38-7  SEE: @/erian/fractal/bin/r.monitor-home-hdmi
+-- TRY: struts only for left side of screen, to show xmobar only there
+-- TRY: nvidia-drm.modset=1 + xrandr=1.5
+-- panels =
+--   [ ("M-S-p"    , layoutScreens 2 (TwoPane 0.76 0.24) >> windows (view "MON"))
+--   , ("M-p"      , rescreen)  -- TODO: toggle show/hide second screen
+--   ]
 
 -- NEED:DEV: back_and_forth -- to return window on their previous screen
 -- -- if on currentFocused -- shiftHere was pressed again
