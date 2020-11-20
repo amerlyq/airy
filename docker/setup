@@ -5,4 +5,4 @@ source ~/.shell/func.d/cfgsetup
 linkcp -ct /etc/docker -- ./cfg/daemon.json
 
 # WARN: creates 30+ persistent threads -- don't enable unless necessary
-svc_activate -eR docker.service
+svc_activate -R docker.service
