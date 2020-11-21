@@ -33,7 +33,10 @@ setopt hist_verify               # Do not execute immediately upon history expan
 setopt hist_beep                 # Beep when accessing non-existent history.
 
 # DFL: HISTFILE="${ZDOTDIR:-$HOME}/.zhistory"
-HISTFILE=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/history
+# ALT:(custom,persistent): HISTFILE=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/history
+# BET:(audit,transient): prevent frequently changing file to pollute BTRFS snapshots
+HISTFILE=${XDG_CACHE_HOME:-$HOME/.cache}/zsh/history
+
 # INFO: <avg>=20000cmds/year OR: use logrotate-esque way to store old history in archive
 # SRC: https://unix.stackexchange.com/questions/273861/unlimited-history-in-zsh
 HISTSIZE=1000000                 # The maximum number of events to save in the internal history.
