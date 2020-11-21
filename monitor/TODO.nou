@@ -48,6 +48,9 @@ TODO
         Option          "Monitor-DP-3"      "<dummy>"
         Option          "Monitor-HDMI-0"    "<default>"
         Section "Monitor" | Identifier  "<default>" | Option "Enable" "False"
+    [⡟⢹⠲⣣] BAD: you must logoff and start X again -- due to nvidia driver having enabled monitor already on boot
+      ::: MAYBE:FIXED: by modifying /etc/mkinitcpio.conf and rebuilding initramfs
+        MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
   [⡟⢹⠞⢟] FIND: reduce number of monitor modes ⌇⡟⢷⡪⢜
     ::: TEMP: get proper EDID modes from Xorg.log and then add only them manually to your xorg.conf
     [⡟⢸⢇⡦] TRY:(ModeValidation+=NoEdid...): NICE works BAD driver don't trust non-EDID modes
