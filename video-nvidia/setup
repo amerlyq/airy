@@ -11,3 +11,5 @@ source ~/.shell/func.d/cfgsetup
 linkcp -ct /etc/X11/xorg.conf.d -- ./cfg/20-nvidia.conf
 linkcp -ct /etc/modprobe.d -- ./cfg/nvidia.conf ./cfg/blacklist-nvidia-fb.conf
 linkcp -ct /etc/pacman.d/hooks -- ./cfg/nvidia.hook
+
+svc_activate -cue xrandr.service

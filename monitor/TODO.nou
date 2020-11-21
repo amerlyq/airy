@@ -40,13 +40,31 @@ DEV r.monitor-dpi
 
 
 TODO
+  [⡟⢹⠞⢗] BUG: --setmonitor don't work on !nvidia
+    :: INFO: it was discovered, that if monitor was connected _afterwards_ by !xrandr only -- than it works
+    ::: TEMP:(dirty-BUT-impossible to do better): obscure workaround to overcome NVidia BUG
+      ::
+        # USE dummy output and enable monitor afterwards by xrandr.service
+        Option          "Monitor-DP-3"      "<dummy>"
+        Option          "Monitor-HDMI-0"    "<default>"
+        Section "Monitor" | Identifier  "<default>" | Option "Enable" "False"
+  [⡟⢹⠞⢟] FIND: reduce number of monitor modes ⌇⡟⢷⡪⢜
+    ::: TEMP: get proper EDID modes from Xorg.log and then add only them manually to your xorg.conf
+    [⡟⢸⢇⡦] TRY:(ModeValidation+=NoEdid...): NICE works BAD driver don't trust non-EDID modes
+      [_] EDID has some strange non-STD hsync/pixel-clock timings, which I can't reproduce myself
+        /_dld/Elce2017_0-hdmi.pdf
+    [⡟⢸⢇⡦] TRY:(SubSection Display -> Modes ...): appends new modes, not replaces
+    [⡟⢸⠉⠯] TRY: directly use MetaModes for nvidia to reduce number of modelines and prevent implicit generation ::
+      Nov 20 18:32:42 fractal xserver[55140]: (II) NVIDIA(0): Adding implicit MetaMode: "HDMI-0: 3840x1600_75"
+      ::: NOT helped
+
   [_] restore USB ports on external monitor after suspend / resume
     ERR: xhci_hcd 0000:3c:00.0: Refused to change power state
     https://askubuntu.com/questions/1044988/usb-ports-not-working-after-resume-from-sleep-on-ubuntu-18-04
       ::: $ modprobe -r [uex]hci_hcd && modprobe [uex]hci_hcd
       ALSO: restart "xhci_pci" if it blocks "xhci_hcd"
     TRY: https://logfile.ch/linux/2017/06/15/disable-usb-autosuspend-linux/
-  [_] BUG: HDMI don't work
+  2020-11-21 [$] BUG: HDMI don't work
     https://www.google.com/search?q=arch%20linux%20hdmi%20i2c%20i2c-4%3A%20sendbytes%3A%20NAK%20bailout
     https://wiki.archlinux.org/index.php/Bumblebee#Multiple_monitors
     https://www.google.com/search?q=arch%20linux%20modeset%20wired%20to%20nvidia
@@ -105,7 +123,10 @@ TODO
   [_] CHECK: how to be with udev rule, when monitor plug-in/out w/o Xorg started ?
   2017-01-08 [X] can't wake up after dpms
     ::: switch 'Input' to 'HDMI' only (no 'auto')
-  [_] BUG: again can't wake up -- if HDMI primary and only eDP1 off
+
+  [⡟⢹⠟⢊] BUG: again can't wake up -- if HDMI primary and only eDP1 off
+    ::: TEMP: on LG use another HDMI-1 input (instead of HDMI-0) -- it seems totally hardware problem
+      i.e. connect nvidia HDMI-0 output to HDMI-1 input of monitor
     ::: FIXED: workaround to wake up
       $ sleep 1 && xset dpms force standby && sleep 8 && xset dpms force on && xrandr --output DP-1 --auto
     https://askubuntu.com/questions/854754/monitor-stays-in-sleep-when-daisy-chained-via-displayport
@@ -126,16 +147,16 @@ TODO
       https://raspberrypi.stackexchange.com/questions/47229/how-configure-xorg-to-disable-dpms-completly-on-linux-w-sato-desktop
       https://unix.stackexchange.com/questions/374480/external-displayport-screen-wont-wake-up-after-put-to-sleep-on-arch-linux
       https://github.com/rickysarraf/laptop-mode-tools
-  [_] DEV: in hotplug replace dpi depending on --primary
+  2020-11-21 [$] DEV: in hotplug replace dpi depending on --primary
   [_] FIX: r.monitor-scale apply to primary desktop with named profile instead of percent
     * main -- general max auto size
     * game -- 1920 or max, what is less
     * perf -- 1280 or half, what is most crisp
   2016-12-25 [X] Instead of making universal setX/display, maybe use profiles for home/work?
   2016-12-25 [X] BET use default profile with 1 monitor and udev rules for HDMI
-  [_] Disable boot/login on VGA
+  2020-11-21 [$] Disable boot/login on VGA
     http://superuser.com/questions/626482/permanently-disable-second-screen
   2017-01-08 [X] 2nd monitor (xmonad + xrandr)
     [_] BUG? r.b -- don't opened second window
-  [_] CHECK:(system freeze): unplug after monitor is disabled by its front-button
+  2020-11-21 [$] CHECK:(system freeze): unplug after monitor is disabled by its front-button
   2014-11-30 [X] не загружается boot с воткнутым hdmi :> Need disable 'Intel Rapid Start'
