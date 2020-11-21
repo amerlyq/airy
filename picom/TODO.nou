@@ -9,6 +9,14 @@ REF
   http://howifixedmylinux.blogspot.com/2014/03/compton-config-for-i3.html
 
 
+BUG:
+  [⡟⢹⠡⡕] spam in logs
+    Nov 20 18:34:25 fractal picom[55170]: [ 11/20/2020 18:34:25.893 glx_bind_pixmap ERROR ] Failed to query info of pixmap 0x00800242.
+    Nov 20 18:34:25 fractal picom[55170]: [ 11/20/2020 18:34:25.893 paint_one ERROR ] Failed to bind texture for window 0x01c00013.
+    Nov 20 18:34:25 fractal picom[55170]: [ 11/20/2020 18:34:25.893 paint_one ERROR ] Window 0x01c00013 is missing painting data.
+    ::: https://github.com/yshui/picom/issues/429
+      [⡟⢹⠡⡚] TRY: --experimental-backends
+
 You can find the rest of the options here:
   https://github.com/chjj/compton/wiki/perf-guide
   https://github.com/chjj/compton/wiki/vsync-guide
