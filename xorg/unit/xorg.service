@@ -40,10 +40,10 @@ exec /usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -keeptty -verbose 2 \
 # StandardInput=tty
 # MAYBE: fails because xorg launched and occupied tty earlier then 's.r main.target' returns
 # StandardInput=tty-force
-# TTYPath=/dev/tty${XDG_VTNR}
-# TTYReset=yes
+TTYPath=/dev/tty${XDG_VTNR}
+TTYReset=yes
+TTYVTDisallocate=yes
 # TTYVHangup=yes
-# TTYVTDisallocate=no
 
 [Install]
 RequiredBy=xorg.target
