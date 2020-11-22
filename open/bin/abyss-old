@@ -5,6 +5,7 @@
 # Priority for files:
 #   #1 modeline in file
 #   .abyss
+#   ctl
 #   compile
 #   Makefile
 #   CMakeLists.txt
@@ -48,6 +49,7 @@ done; return 12
 dir_build() {
   (($#)) || { abyssrc 'build' && return || ignore 12; }
 
+  [[ -f ctl ]] && { ./ctl "$@"; return; }
   [[ -f compile ]] && { ./compile "$@"; return; }
   [[ -f .git/compile ]] && { ./.git/compile "$@"; return; }
 
