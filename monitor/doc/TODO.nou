@@ -1,0 +1,72 @@
+%% SEIZE
+SEE
+  Security hole
+    https://tyler.vc/auto-monitor-detection-on-linux-with-udev
+    Стань повелителем загрузки Linux / Хабрахабр
+      https://habrahabr.ru/post/254415/
+
+  Systemd-wants
+    http://jasonwryan.com/blog/2014/01/20/udev/
+
+  User privileges
+    https://github.com/xiaq/udevedu
+    https://bbs.archlinux.org/viewtopic.php?id=170294
+
+INFO
+  http://blog.tjll.net/systemd-for-device-activation-and-media-archiving/
+  $ systemctl --all --full -t device
+  http://maemo.soup.io/post/420954421/Tracker-supports-volume-management-under-a-minimal
+    http://webcache.googleusercontent.com/search?q=cache:MxUKB_DILiAJ:http://maemo.soup.io/post/420954421/Tracker-supports-volume-management-under-a-minimal%2BSYSTEMD_USER_WANTS&hl=ru&nfpr=1&ct=clnk
+
+
+
+%% DEV !r.monitor-dpi
+  [_] NEED diff dpi for monitors on diff distance
+    = user specified hashmap `mon[edid]=dpi`
+  [_] Switch all possible dpi at once
+    BAD qutebrowser body 'dpi' is unaffected and related only to screen width?
+  [_] For multiple 'DISPLAY=:0.1' switch dpi individually
+  [_] DEV: in hotplug replace dpi depending on --primary
+
+
+%% FIXME: LG
+  [_] restore USB ports on external monitor after suspend / resume
+    ERR: xhci_hcd 0000:3c:00.0: Refused to change power state
+    https://askubuntu.com/questions/1044988/usb-ports-not-working-after-resume-from-sleep-on-ubuntu-18-04
+      ::: $ modprobe -r [uex]hci_hcd && modprobe [uex]hci_hcd
+      ALSO: restart "xhci_pci" if it blocks "xhci_hcd"
+    TRY: https://logfile.ch/linux/2017/06/15/disable-usb-autosuspend-linux/
+  [_] TRY: disable blinking led on LG monitor OR control backlight
+    UDEV  [3476.637736] change   /devices/pci0000:00/0000:00:02.0/drm/card0/card0-eDP-1/intel_backlight (backlight)
+      BUG: why backlight changes when I plug-in/out external monitor ?
+        MAYBE: due to short blink of laptop screen's LED when xrandr runs
+
+
+%% DEV:auto-profiles
+
+  [_] TRY:ALT aur/grobi-git r72.f02831d-1 (1, 0.77)
+    grobi automates applying xrandr profiles when outputs change
+  [_] FIXME:DONT: 'r.monitor-refresh' when returning from dpms
+    * I may manually disable built-in eDP1 monitor and don't want to enable it when simply move mouse after 20 min
+  [_] TODO: ignore udev events when going to sleep -- don't disable external monitor
+    => seems like xrandr keeps state => only ignore first udev events after wake up to not disable monitor
+    BAD: usb devices also re-init (remove+add) when going to standby
+      ? MAYBE this behavior only when picture through USB3.1 ?
+        CHECK: standby with picture through HDMI
+    * multiple "change" events
+  [_] BUG: multiple identical "change" events from udev on monitor plug-in/out
+    * ignore by rules all the initial events, where choosen properties are empty
+      BAD: can't depend on some vars E.G. SUBSYSTEM=="drm", DEVLINKS=="?*", ACTION=="change"
+        => Dec 30 17:13:01 rose systemd-udevd[261]: Invalid rule /etc/udev/rules.d/95-monitor-hotplug.rules:2: unknown key 'DEVLINKS'
+    * in script check monitor state (?what and where?) and ignore subsequent events
+    * enable or disable monitor depending on current state -- don't "refresh" unconditionally
+    [_] TRY: use ACPI events DP-1 on/off from |acpid| instead of udev events
+  [_] THINK:CHECK:BAD? if two identical monitors have the same edid/hash ?
+    => how to construct their `id` ?
+  [_] BUG: writes bad `DisplaySize` if '--primary' external monitor
+  [_] BUG: if plugged on boot -- enabled as mirror and r.monitor-hotplug isn't triggered
+  [_] CHECK: how to be with udev rule, when monitor plug-in/out w/o Xorg started ?
+  [_] FIX: r.monitor-scale apply to primary desktop with named profile instead of percent
+    * main -- general max auto size
+    * game -- 1920 or max, what is less
+    * perf -- 1280 or half, what is most crisp

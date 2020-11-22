@@ -1,0 +1,115 @@
+⌇⡟⢹⣢⢸
+
+%% [xrandr --setmode]
+
+  [⡟⢹⠞⢗] BUG: --setmonitor don't work on !nvidia
+    :: INFO: it was discovered, that if monitor was connected _afterwards_ by !xrandr only -- than it works
+    ::: TEMP:(dirty-BUT-impossible to do better): obscure workaround to overcome NVidia BUG
+      ::
+        # USE dummy output and enable monitor afterwards by xrandr.service
+        Option          "Monitor-DP-3"      "<dummy>"
+        Option          "Monitor-HDMI-0"    "<default>"
+        Section "Monitor" | Identifier  "<default>" | Option "Enable" "False"
+    [⡟⢹⠲⣣] BAD: you must logoff and start X again -- due to nvidia driver having enabled monitor already on boot
+      ::: MAYBE:FIXED: by modifying /etc/mkinitcpio.conf and rebuilding initramfs
+        MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
+
+
+%% Modelines
+
+  [⡟⢹⠞⢟] FIND: reduce number of monitor modes ⌇⡟⢷⡪⢜
+    ::: TEMP: get proper EDID modes from Xorg.log and then add only them manually to your xorg.conf
+    [⡟⢸⢇⡦] TRY:(ModeValidation+=NoEdid...): NICE works BAD driver don't trust non-EDID modes
+      [_] EDID has some strange non-STD hsync/pixel-clock timings, which I can't reproduce myself
+        /_dld/Elce2017_0-hdmi.pdf
+    [⡟⢸⢇⡦] TRY:(SubSection Display -> Modes ...): appends new modes, not replaces
+    [⡟⢸⠉⠯] TRY: directly use MetaModes for nvidia to reduce number of modelines and prevent implicit generation ::
+      Nov 20 18:32:42 fractal xserver[55140]: (II) NVIDIA(0): Adding implicit MetaMode: "HDMI-0: 3840x1600_75"
+      ::: NOT helped
+    [⡟⢹⠺⣗] PERF:CHECK: fps on nvidia when connected by HDMI on different modes
+      use r.monitor -t -- compare 1920x1080 window .vs. same fullscreen 75fps on glxgears
+      ::: fps=5874/5894 = 0.3% difference
+    [⡟⢹⠸⢒] CHECK: coil whining GPU from !nvidia-settings PowerMizer
+      -- because I edited /etc/mkinitcpio.conf again -- which I commented before due to nvidia quirks
+
+
+%% Multi-monitor
+
+  2020-11-22 [X] DEV: generate xorg.conf of current xrandr settings for multi-monitor setup
+    https://wiki.archlinux.org/index.php/Multihead#Example:_dualhead_configuration_using_relative_coordinates
+    ALT: start custome xrandr/monitor.service to trigger
+    [$] CHECK: if Xorg fails to startup when some of monitors are missing
+
+
+%% HDMI
+
+  2020-11-21 [$] HDMI no 4k
+    $ cvt 3840 1600 60 | sed -n '2s/^\w\+\s//p'
+    $ xrandr --newmode 3840x1600  521.75  3840 4128 4544 5248  1600 1603 1613 1658 -hsync +vsync
+    $ xrandr --addmode HDMI-1 3840x1600
+    $ xrandr --output HDMI-1 --mode 3840x1600
+    $ xrandr --output HDMI-1 --auto
+      https://askubuntu.com/questions/815075/how-can-i-get-4k-60hz-at-420-working-in-ubuntu-16-04
+      https://lars.ingebrigtsen.no/2017/07/01/isnt-4k60hz-hdmi-possible-in-linux/
+      https://forums.geforce.com/default/topic/880214/geforce-900-series/for-all-people-with-black-screens-no-signal-issues/
+      https://forum.level1techs.com/t/why-cant-intel-530-graphics-run-4k-60hz/113809/10
+      https://www.linux.com/news/event/open-source-summit-na/2017/3/fixing-linux-graphics-kernel-true-displayport-compliance-or-how-upstream-patch
+  2020-11-21 [$] BUG: HDMI don't work
+    https://www.google.com/search?q=arch%20linux%20hdmi%20i2c%20i2c-4%3A%20sendbytes%3A%20NAK%20bailout
+    https://www.google.com/search?q=arch%20linux%20modeset%20wired%20to%20nvidia
+    https://www.reddit.com/r/archlinux/comments/4lmdta/nvidia_optimus_modesetting_vs_xf86videointel_and/
+    https://gitlab.gnome.org/GNOME/mutter/issues/239
+    https://github.com/Bumblebee-Project/Bumblebee/wiki/Multi-monitor-setup
+    https://wiki.archlinux.org/index.php/Bumblebee#Multiple_monitors
+    G: arch linux hdmi don't work
+      https://bbs.archlinux.org/viewtopic.php?id=239434
+  2020-11-21 [$] Disable boot/login on VGA
+    http://superuser.com/questions/626482/permanently-disable-second-screen
+  2020-11-21 [$] CHECK:(system freeze): unplug after monitor is disabled by its front-button
+  [⡟⢹⠟⢊] BUG: again can't wake up -- if HDMI primary and only eDP1 off
+    ::: TEMP: on LG use another HDMI-1 input (instead of HDMI-0) -- it seems totally hardware problem
+      i.e. connect nvidia HDMI-0 output to HDMI-1 input of monitor
+    ::: FIXED: workaround to wake up
+      $ sleep 1 && xset dpms force standby && sleep 8 && xset dpms force on && xrandr --output DP-1 --auto
+    https://askubuntu.com/questions/854754/monitor-stays-in-sleep-when-daisy-chained-via-displayport
+      TEMP:FIXED: $ xset dpms force off $ and move mouse to wake it up back
+    CHECK: after drivers upgrade
+    https://wiki.archlinux.org/index.php/intel_graphics#DRI3_issues
+      + https://bbs.archlinux.org/viewtopic.php?id=215930
+      https://bugs.chromium.org/p/chromium/issues/detail?id=370022
+    G: linux hdmi dpms can't wake up
+      https://devtalk.nvidia.com/default/topic/992235/linux/monitor-wont-wake-up-after-suspend/
+      https://bbs.archlinux.org/viewtopic.php?id=213709
+      https://bbs.archlinux.org/viewtopic.php?id=168510
+      https://wiki.archlinux.org/index.php/Display_Power_Management_Signaling
+    TRY: from VTE $ sudo setterm --powersave powerdown
+    TRY: disable DPMS for external montor only
+      https://bbs.archlinux.org/viewtopic.php?id=33497
+      https://unix.stackexchange.com/questions/181218/prevent-dpms-from-being-enabled-again
+      https://raspberrypi.stackexchange.com/questions/47229/how-configure-xorg-to-disable-dpms-completly-on-linux-w-sato-desktop
+      https://unix.stackexchange.com/questions/374480/external-displayport-screen-wont-wake-up-after-put-to-sleep-on-arch-linux
+      https://github.com/rickysarraf/laptop-mode-tools
+  2017-01-08 [X] can't wake up after dpms
+    ::: switch 'Input' to 'HDMI' only (no 'auto')
+  2014-11-30 [X] не загружается boot с воткнутым hdmi :> Need disable 'Intel Rapid Start'
+
+
+%% Boot
+
+  2020-11-22 [$] TRY Enable monitor on boot w/o re-plug
+    :::~ seems like display will wake up if you won't disable monitor before disconnecting it from AC
+    TRY: $ sudo udevadm trigger
+    G: linux display port over usb 3
+    https://superuser.com/questions/636617/disabling-laptop-monitor-on-boot
+    https://wiki.archlinux.org/index.php/Dell_XPS_13_(9350)#External_screen
+    https://wiki.archlinux.org/index.php/DisplayLink
+    https://communities.intel.com/thread/112202
+
+
+%% DEV:auto-profiles
+
+  2017-03-12 [X] DEV: allow matching on first 8..40 symbols instead of whole edid-hash
+  2017-01-08 [X] 2nd monitor (xmonad + xrandr)
+    [$] BUG? r.b -- don't opened second window
+  2016-12-25 [X] Instead of making universal setX/display, maybe use profiles for home/work?
+  2016-12-25 [X] BET use default profile with 1 monitor and udev rules for HDMI

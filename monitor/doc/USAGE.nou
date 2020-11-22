@@ -39,3 +39,8 @@
     $ xrandr --output DP-1 --auto
     ADD: to initial xorg.conf
       https://wiki.archlinux.org/index.php/xrandr#Permanently_adding_undetected_resolutions
+    BUT: Don't works as wanted $ \
+      if [ "$PRIM" == "VBOX0" ]; then
+        xrandr --newmode "1920x1080_60.00"  173.00  1920 2048 2248 2576  1080 1083 1088 1120 -hsync +vsync
+        xrandr --addmode VBOX0 "1920x1080_60.00"
+      fi
