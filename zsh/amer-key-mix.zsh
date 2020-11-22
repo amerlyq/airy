@@ -143,10 +143,15 @@ bindkey -as ',d' 'S q\n'
 # ranger
 bindkey  -s ',s' '^U r\n'
 bindkey -as  's' 'S r\n'
-# make -- save and re-run last cmd by [,m]
-set_fast_exec_cmd 'abyss'
-bindkey    '\C-x\C-m' set-fast-exec-cmd
-bindkey -a '\C-x\C-m' set-fast-exec-cmd
+
+if [[ -r /usr/share/zsh/site-functions/abyss.zsh ]]; then
+  source /usr/share/zsh/site-functions/abyss.zsh
+else
+  # make -- save and re-run last cmd by [,m]
+  set_fast_exec_cmd 'abyss'
+  bindkey    '\C-x\C-m' set-fast-exec-cmd
+  bindkey -a '\C-x\C-m' set-fast-exec-cmd
+fi
 
 
 ### Miscellaneous
