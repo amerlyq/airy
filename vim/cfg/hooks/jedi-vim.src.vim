@@ -24,3 +24,4 @@ let g:jedi#goto_assignments_command = "<LocalLeader>g"  " Declaration
 let g:jedi#rename_command = "<LocalLeader>r"
 let g:jedi#documentation_command = "<LocalLeader>k"
 let g:jedi#usages_command = "<LocalLeader>u"
+let g:jedi#goto_stubs_command = ""

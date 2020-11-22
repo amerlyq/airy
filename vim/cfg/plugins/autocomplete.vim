@@ -25,6 +25,7 @@ call dein#add('scrooloose/syntastic', {
 "" Like neocomplete but for neovim {{{1
 " ALT:BET? https://github.com/neoclide/coc.nvim
 " ATTENTION: :UpdateRemotePlugins and restart. Then once execute :DeopleteEnable
+" FIXME: .like. Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 call dein#add('Shougo/deoplete.nvim', {
   \ 'if': 'has("nvim") && has("python3")',
   \ 'on_i': 1,

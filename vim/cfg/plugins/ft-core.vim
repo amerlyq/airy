@@ -27,9 +27,14 @@ call dein#add('hynek/vim-python-pep8-indent', {
 
 " BUG: update error
 " on_cmd: Pyimport
-" call dein#add('davidhalter/jedi-vim', {
-"   \ 'on_ft': 'python',
-"   \ 'hook_source': _hcat('jedi-vim.src')})
+call dein#add('davidhalter/jedi-vim', {
+  \ 'on_ft': 'python',
+  \ 'hook_source': _hcat('jedi-vim.src')})
+
+
+
+call dein#add('numirias/semshi', {
+  \ 'on_ft': 'python'})
 
 
 
