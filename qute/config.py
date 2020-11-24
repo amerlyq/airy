@@ -1513,7 +1513,7 @@ c.input.partial_timeout = 0  # @me
 ##   - when-searching: Show the scrollbar when searching for text in the webpage. With the QtWebKit backend, this is equal to `never`.
 ##   - overlay: Show an overlay scrollbar. With Qt < 5.11 or on macOS, this is unavailable and equal to `when-searching`; with the QtWebKit backend, this is equal to `never`. Enabling/disabling overlay scrollbars requires a restart.
 # c.scrolling.bar = 'overlay'
-# c.scrolling.bar = 'never'  # @me
+c.scrolling.bar = 'when-searching'  # @me: hide for narrow soundcloud window (unless searching)
 
 ## Enable smooth scrolling for web pages. Note smooth scrolling does not
 ## work with the `:scroll-px` command.
