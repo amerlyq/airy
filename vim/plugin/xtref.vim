@@ -242,16 +242,19 @@ fun! xtref#ctags(root, ...)
   "   OR from all opened buffers (manually)
   let bufs = get(a:, 1, [])
   if type(bufs) == type(1) && bufs == 1
+    if !isdirectory(a:root)| call mkdir(a:root, 'p', 0700) |en
     let bufs = filter(map(copy(getbufinfo()), 'v:val.name'), 'len(v:val)')
   end
 
   let cmd = 'r.vim-xtref -t -- -o '.dst
-  if len(bufs)
+  if !len(bufs)
+    let cmd .= ' --recurse'
+  elseif type(bufs) == type([])
     " THINK:CHG: append to separate $TMPDIR/nou/xtref.tags overlay
     "   << delete this overlay each time you regen proper Aura or Repo tags
     let cmd .= ' --append '. join(map(bufs, 'shellescape(v:val)'), ' ')
-  else
-    let cmd .= ' --recurse'
+  elseif type(bufs) == type('') && bufs[0] == '.'
+    let cmd .= ' --recurse '. join(map(split(bufs, ','), '"--map-xtref=".v:val'), ' ')
   end
 
   " FIXME: use async job
@@ -300,25 +303,26 @@ augroup END
 " NOTE: use "xts<C-v><Space>" to insert "xts" literally
 iabbrev <expr> !xts! xtref#new()
 
-" OBSOL: <LocalLeader><F2>
-nnoremap [Xtref]<A-u> :<C-u>XtrefAura<CR>
-command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
-
-" OBSOL: <LocalLeader><F1>
-nnoremap [Xtref]<C-u> :<C-u>XtrefCwd<CR>
-command! -bar -range -nargs=0  XtrefCwd
-  \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
-  \ |else|echoerr "Prevented gen tags in $HOME or below"|en
-
-" DEPS: https://github.com/airblade/vim-rooter
-nnoremap [Xtref]u :<C-u>XtrefRoot<CR>
-command! -bar -range -nargs=0  XtrefRoot
-  \ call xtref#ctags(FindRootDirectory())
+nnoremap [Xtref]u :<C-u>XtrefNou<CR>
+command! -bar -range -nargs=0  XtrefNou  call xtref#ctags(g:xtref.aura, '.nou')
 
 nnoremap [Xtref]U :<C-u>XtrefOpened<CR>
 command! -bar -range -nargs=0  XtrefOpened
   \ call xtref#ctags($TMPDIR.'/airy', 1)
 
+" DEPS: https://github.com/airblade/vim-rooter
+nnoremap [Xtref]<C-u> :<C-u>XtrefRoot<CR>
+command! -bar -range -nargs=0  XtrefRoot
+  \ call xtref#ctags(FindRootDirectory())
+
+nnoremap [Xtref]<A-u> :<C-u>XtrefCwd<CR>
+command! -bar -range -nargs=0  XtrefCwd
+  \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
+  \ |else|echoerr "Prevented gen tags in $HOME or below"|en
+
+" OBSOL: <LocalLeader><F2>
+nnoremap [Xtref]<A-S-u> :<C-u>XtrefAura<CR>
+command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
 
 " NOTE: search tags in *aura*, same folder as current file, and in all parent dirs of CWD ※}p-nu
 " MAYBE: exe 'set tags^='. g:xtref.aura.'/**/'.g:xtref.tagfile
