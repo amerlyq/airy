@@ -191,7 +191,7 @@ mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=
 
 ### SETUP #####################################################################
 ## NOTE: bake fstab
-timedatectl set-timezone EET
+timedatectl set-timezone Europe/Kiev
 timedatectl set-ntp true
 timedatectl status
 
@@ -264,7 +264,11 @@ arch-chroot /mnt
   locale-gen
 
   pacman -S ntp openssh
-  ln -sf /usr/share/zoneinfo/EET /etc/localtime
+  ## BAD: $ ln -sf /usr/share/zoneinfo/EET /etc/localtime
+  #  * WTF: timedatectl list-timezones don't have EET
+  #  * FAIL: MSTeams defaults to UTC when using EET which is absent from "list-timezones"
+  #  * WARN: systemd creates relative symlink instead of absolute
+  timedatectl set-timezone Europe/Kiev
   hwclock --systohc --utc
   systemctl enable ntpd sshd
 
