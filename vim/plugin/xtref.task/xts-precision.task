@@ -1,7 +1,20 @@
 ⌇⡟⡎⡄⡗
 
-IDEA: dif. xts size beside STD xts4(1sec)=136y
+IDEA: dif. xts size beside STD
+  STD xts4(1sec)=136y
+    USAGE: unique identifiers for user manually generated content/decisions
+      << we need resolution=>3s considering hands dexterity and 1 micro-decision per 6 seconds limitation
   short xts3(5min)=159y | xts2(1day)=179y
     USAGE: for completed tasks with less ISO precision when converting i.e. [⡟⠝] and [⡟⠝⡰]
+      << generally we don't need resolution=<5min for completed/planned/postponed tasks
+    ALT:relative:custom_bias: from e.g. year=2020
+      xts2(5min)=7mo11d
+      xts2(6h)=<45y
+      xts3(1m)=<32y
+      xts1(1mo)=21y
+    ALT:by_modulo:ALG: use year/month part from file/repo and append braille as day/time
+      xts2(1min)=45d
+    ALT: dynamic archiving -- rewrite all xts2(5m) each 6m to xts3(5m)
+      BUT: do we need such complexity and non-absoluteness
   long xts5(5ms)=174y | xts6(20us)=178y | xts6(10us)=89y | xts7(50ns)=114y | xts8(0.2ns)=116y
     USAGE: batch-scripted xtrefs OR log system event OR precise file mtime
