@@ -12,6 +12,7 @@ set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 # WARN:TODO: if container will be ever corrupted/deleted
 #   -- how to easily restore it from repos structure on either PC ?
 
+unset GIT_DIR
 grpnm='tomb'
 d_keys=/aura/archive/$grpnm
 d_sshfs=lc:/me/$grpnm  # MOVE:(direct symlink): -> "lc:/tomb"
@@ -35,14 +36,15 @@ esac; opts+=$o; done; shift $((OPTIND - 1))
 dm=$grpnm-$tomb
 
 has(){ [[ $opts =~ [$*] ]]; }
-git(){ command git --no-pager -c color.status=always -c color.ui=always "$@"; }
+git(){ command git -C ${GIT_DIR:?} --no-pager -c color.status=always -c color.ui=always "$@"; }
 
 function CollectAuraRepos { local d r url
   typeset -ga repos
   for d; do
     for r in ${(0)"$(r.git-find "$d")"}; do
-      # DEPR:(fallback): url=$(git -C $r remote get-url "$tomb" || git -C $r remote get-url origin ||:) 2>/dev/null
-      url=$(git -C $r remote get-url "$tomb" ||:) 2>/dev/null
+      local GIT_DIR=$r
+      # DEPR:(fallback): url=$(git remote get-url "$tomb" || git remote get-url origin ||:) 2>/dev/null
+      url=$(git remote get-url "$tomb" ||:) 2>/dev/null
       [[ $url == file:///mnt/* ]] && repos+=( "$r" )
       true
     done
@@ -134,8 +136,9 @@ function CloseTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
 
 function SyncRepos {  local r
   for r; do
+    local GIT_DIR=$r
     # FIXED: allow executing !r.tomb-backup from repo subfolder
-    [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
+    [[ -e $r ]] && r=$(git rev-parse --show-toplevel)
 
     r.git-status $r
     ## ATT: may error-out due to merge conflict => run rest of commands yourself
@@ -146,7 +149,7 @@ function SyncRepos {  local r
     local rmt url srv="file:///mnt/${${r:A:t}#.}.git"
     # DEPR:(fallback): origin ...
     for rmt in $tomb; do
-      url=$(git -C $r remote get-url "$rmt" 2>/dev/null ||:)
+      url=$(git remote get-url "$rmt" 2>/dev/null ||:)
       [[ -z $url ]] && continue
       [[ $url == "$srv" ]] && break || unset rmt
       [[ $url == file:///mnt/* ]] && >&2 echo "Err: remote='$rmt' points to wrong srv='$url'" && exit 1
@@ -167,8 +170,8 @@ function SyncRepos {  local r
     # [_] FIXME! push only branches which !point to $tomb remote!
     # FAIL?(nonintuitive): pushes "--all" branches only if "current" branch has commits
     local rbranch ahead
-    rbranch=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name '@{u}')
-    ahead=$(git -C $r rev-list HEAD..."$rbranch" --ignore-submodules --count)
+    rbranch=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
+    ahead=$(git rev-list HEAD..."$rbranch" --ignore-submodules --count)
     if ((ahead)); then
       # FIXME:(sanity-check): exit with error (don't push)
       #   * if any (still local) commit has prefix ~ /^(fix|fixup|tmp|temp):|^.?\w+!/
@@ -183,13 +186,14 @@ function SyncRepos {  local r
 
 function CfgCloneCentralRepos { local r
   for r; do
+    local GIT_DIR=$r
 
     ## TODO: clone root-repo and all submodules recursively
-    # root=$(git -C "$r" rev-parse --show-superproject-working-tree --show-toplevel | head -1)
+    # root=$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)
     # git -C "$root" git submodule foreach ...
 
     # FIXED: allow executing !r.tomb-backup from repo subfolder
-    [[ -e $r ]] && r=$(git -C "$r" rev-parse --show-toplevel)
+    [[ -e $r ]] && r=$(git rev-parse --show-toplevel)
 
     local nm=${${r:A:t}#.}
     local mnt=/mnt/$nm.git
@@ -198,35 +202,36 @@ function CfgCloneCentralRepos { local r
 
     # TRY:SRC:(NF): test non-empty-dir by ZSH: $ /path/to/dir(NF)
     #   https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
+    # [_] CHECK: how GIT_DIR will work with git clone
     [[ -e $r ]] || git clone --origin "$rmt" -- "$srv" "$r"
     [[ -e $mnt ]] || git clone --bare --mirror -- "file://$r:A" "$mnt"
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
     local url
-    url=$(git -C $r remote get-url "$rmt" 2>/dev/null ||:)
-    [[ -z $url ]] && git -C $r remote add "$rmt" "${url:=$srv}"
-    [[ $url != "$srv" ]] && git -C $r remote set-url "$rmt" "$srv"
+    url=$(git remote get-url "$rmt" 2>/dev/null ||:)
+    [[ -z $url ]] && git remote add "$rmt" "${url:=$srv}"
+    [[ $url != "$srv" ]] && git remote set-url "$rmt" "$srv"
 
     # DEPR:(fallback): don't create "origin" if you have "aura" (NICE: to preserve STD:git:WF)
     #   OR~~ don't create "aura" if you already have "origin"
     #   NICE:(both): prevent duplicate maintenance
     #   E.G.BAD: !git-annex syncs ALL branches (twice)
     # local orn rmt=origin
-    # orn=$(git -C $r remote get-url origin 2>/dev/null ||:)
-    # [[ -z $orn ]] && git -C $r remote add origin "${orn:=$srv}"
-    # [[ $orn == file:///mnt/* && $orn != "$srv" ]] && git -C $r remote set-url origin "$srv"
+    # orn=$(git remote get-url origin 2>/dev/null ||:)
+    # [[ -z $orn ]] && git remote add origin "${orn:=$srv}"
+    # [[ $orn == file:///mnt/* && $orn != "$srv" ]] && git remote set-url origin "$srv"
 
     local ups
-    ups=$(git -C $r rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null ||:)
+    ups=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null ||:)
     # BAD:(confusing code): fallback to "$rmt" for DFL branch tracking
     if [[ -z $ups ]]; then
-      git -C $r fetch $(has v&&echo --verbose) --tags --prune -- "$rmt"
+      git fetch $(has v&&echo --verbose) --tags --prune -- "$rmt"
       # ALG:BUG: "git fetch --set-upsteam" seems does not work
       #  [_] WTF: still not tracking -- remotes are not shown until $ gfA
       local br
       br=$(git symbolic-ref --short HEAD)  # OR:USE(ups): "$b@{u}"
       # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
-      git -C $r branch --set-upstream-to="$rmt/$br" "$br"
+      git branch --set-upstream-to="$rmt/$br" "$br"
     fi
   done
 }
