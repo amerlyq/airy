@@ -9,6 +9,9 @@
 #%USAGE: $ ./$0 [-R .] [--] [~/aura/todo] ...
 set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
+# DEV:ENH: convert to global r.git-repo tool to support all my usecases
+#   OR:TRY: use existing myrepo tool -- maybe its manifest system will do nicely
+
 # WARN:TODO: if container will be ever corrupted/deleted
 #   -- how to easily restore it from repos structure on either PC ?
 
@@ -156,12 +159,23 @@ function SyncRepos {  local r
     done
     [[ -z ${rmt-} ]] && >&2 echo "Err: private remote=${rmt:-TBD} not found" && exit 1
 
-    local br
-    br=$(git symbolic-ref --short HEAD)
-    # THINK:ALSO: --recurse-submodules=yes
-    # git -C $r fetch --verbose --tags --prune -- "$rmt"
-    git -C $r pull $(has v&&echo --verbose) --tags --autostash --rebase=merges --set-upstream -- "$rmt" "$br"
-    r.git-status $r
+    if [[ -d $r/.git/annex/objects ]]; then
+      git annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --pull --no-push
+    else
+      local br
+      br=$(git symbolic-ref --short HEAD)
+      # THINK:ALSO: --recurse-submodules=yes
+      # git fetch --verbose --tags --prune -- "$rmt"
+      git pull $(has v&&echo --verbose) --tags --autostash --rebase=merges -- "$rmt" "$br"
+      # BUG? overrides beatrix push for "local" -> "aura/master" instead of "aura/local"
+      #   --set-upstream
+    fi
+
+    local fetched
+    fetched=$(git rev-list '@{1}..' --ignore-submodules --count)
+    if ((fetched)); then
+      r.git-status $r
+    fi
 
     # local err
     # BAD: pushes all BUT: must push "aura" and (only if matching) origin
@@ -176,8 +190,19 @@ function SyncRepos {  local r
       # FIXME:(sanity-check): exit with error (don't push)
       #   * if any (still local) commit has prefix ~ /^(fix|fixup|tmp|temp):|^.?\w+!/
       ## MAYBE:ALSO: --set-upstream "$rmt"
-      git -C $r push $(has v&&echo --verbose) --atomic --all
-      git -C $r push $(has v&&echo --verbose) --atomic --tags
+
+      ## ERR: remote: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
+      #   To ssh://rmt/data/repo
+      #   ! [remote rejected]   master -> master (branch is currently checked out)
+      #   error: failed to push some refs to 'ssh://rmt/data/repo'
+      ##  ::: FIXED:WKRND: use !gas on remote system and then !gas again on local -- to sync "master" changes by pulling
+      if [[ -d $r/.git/annex/objects ]]; then
+        git annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --no-pull --push
+      else
+        git push $(has v&&echo --verbose) --atomic --all
+        git push $(has v&&echo --verbose) --atomic --tags
+      fi
+
       r.git-status $r
     fi
     printf "==================\n\n"
