@@ -24,3 +24,26 @@ neovim
     \ },
     \ 'cache_enabled': 1,
     \}
+
+
+[_] BUG:ERR: xsel: BadWindow (invalid Window parameter): Resource temporarily unavailable
+  ERR: xsel silently fails to set selection to file contents if over ~4000 bytes · Issue #33 · kfish/xsel ⌇⡟⣃⡸⣎
+    https://github.com/kfish/xsel/issues/33
+  [_] &vita:cmft #maint CHG: !xsel -> !xclip
+    astrand/xclip: Command line interface to the X11 clipboard ⌇⡟⣃⡻⣕
+      https://github.com/astrand/xclip
+    1255860 – gvim exits with "BadWindow (invalid window parameter)" ⌇⡟⣃⡼⢼
+      https://bugzilla.redhat.com/show_bug.cgi?id=1255860
+      ~~ some problems even in xclip ?
+      == looks like it's the problem of interaction between !xsel and !copyq
+  INFO: it seems !xsel is no more in favor
+    software that sucks less | suckless.org software that sucks less ⌇⡟⣃⡹⣬
+      https://suckless.org/rocks/
+      ::: xclip
+    doc: fix documented order of xclip/xsel by blueyed · Pull Request #7449 · neovim/neovim ⌇⡟⣃⡸⢟
+      https://github.com/neovim/neovim/pull/7449
+      ¦ From #5853 (comment) I would prefer using xclip instead - especially since that skips the extra system() call then (which might even be blocking, when the CLIPBOARD owner is SIGSTOPped).
+      >>> BET: use !xclip now (!xsel was better only in 2015)
+    neovim/clipboard.vim at 82ff3eae7d29f2550d485c23b7b4230d5cd5733f · justinmk/neovim ⌇⡟⣃⡻⣩
+      https://github.com/justinmk/neovim/blob/82ff3eae7d29f2550d485c23b7b4230d5cd5733f/runtime/autoload/provider/clipboard.vim
+      ¦ pbcopy -> wl-copy -> xclip -> xsel -> doitclient -> lemonade
