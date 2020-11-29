@@ -68,8 +68,9 @@ fun! xtref#new(...)
   " let xts = systemlist('xxd -p -r | basenc --z85 | rev', xts)[0]
   "" ALT:PERF: systemlist('r.vim-xtref '.get(a:,1))[0]
   let xts = substitute(printf('%08x', strftime('%s')), '..', '\=nr2char("0x28".submatch(0))', 'g')
+  " MAYBE:REMOVE:BET:USE explicit <Plug>(xtref-yank) -- lib function must not do side-effects
   call xtref#copy(g:xtref.refer_pfx . xts)
-  return get(a:,1,g:xtref.anchor_pfx) . xts
+  return get(a:,1,g:xtref.anchor_pfx) . xts . get(a:,2,'')
 endf
 
 
@@ -360,6 +361,7 @@ nnoremap <Plug>(xtref-new-prepend) ^"=xtref#new()." "<CR>P<Plug>(xtref-yank)
 
 nnoremap <Plug>(xtref-new-append) $"=" ".xtref#new()<CR>p<Plug>(xtref-yank)
 xnoremap <Plug>(xtref-new-append) "=xtref#new()<CR>p
+nnoremap <Plug>(xtref-new-postpone) $"=" ".xtref#new('<','>')<CR>p
 
 " FIXME: skip initial commentstring and insert "[_]" directly before actual text
 " BAD: when converting URL into task -- we will have two trailing xtrefs
@@ -403,6 +405,7 @@ map <silent> [Xtref]<Delete> <Plug>(xtref-delete)
 map <silent> [Xtref]a <Plug>(xtref-new-append)
 map <silent> [Xtref]i <Plug>(xtref-new-insert)
 map <silent> [Xtref]I <Plug>(xtref-new-prepend)
+map <silent> [Xtref]> <Plug>(xtref-new-postpone)
 map <silent> [Xtref]d <Plug>(xtref-replace-datetime)
 map <silent> [Xtref]r <Plug>(xtref-invert)
 map <silent> [Xtref]R <Plug>(xtref-refresh)
