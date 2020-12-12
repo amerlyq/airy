@@ -29,7 +29,7 @@ fi
 ## BAD:ELEG: queries/prints playlist name for each file in playlist
 folder=$({ ydl --get-filename -o '%(playlist_title)s' \
   -- "$playlist" 2>/dev/null || exit $(($?==120?0:$?)); } | head -1)
-[[ -n $folder ]] || exit 1
+[[ -n $folder ]] || { >&2 echo "Err: unknown folder"; exit 1; }
 
 ## TEMP:HACK: always download to fixed location
 # cd /data/music/soundcloud

@@ -229,6 +229,7 @@ function CfgCloneCentralRepos { local r
     #   https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
     # [_] CHECK: how GIT_DIR will work with git clone
     [[ -e $r ]] || git clone --origin "$rmt" -- "$srv" "$r"
+    # [_] TODO:ALSO:(for git-annex-sync): $ gmy -m
     [[ -e $mnt ]] || git clone --bare --mirror -- "file://$r:A" "$mnt"
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
