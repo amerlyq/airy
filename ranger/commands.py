@@ -351,7 +351,7 @@ class df(Command):
         else:
             # DEV: substitute python-like placeholders -> {}, {1}, {2}
             #   else -> append filelist
-            cmd += [f.path for f in fls]
+            cmd += [f.path + ('/' if f.is_directory else '') for f in fls]
             self.fm.execute_command(cmd, flags=flags)
 
 

@@ -28,10 +28,11 @@ gen_ranger_preview(){ local hp hc src=$1 dst img
 
   # VIZ: fallback
   dst=$d_cache/thumbnail/${hc:0:2}/$hc.jpg
-  gen_thumbnail "$src" "$dst" && img=$dst
+  gen_thumbnail "$src" "$dst" && exiv2 -c "sha256=$hc | src=$src" -- "$dst" && img=$dst
+
 
   dst=$d_cache/timelapse/${hc:0:2}/$hc.jpg
-  gen_timelapse "$src" "$dst" && img=$dst
+  gen_timelapse "$src" "$dst" && exiv2 -c "sha256=$hc | src=$src" -- "$dst" && img=$dst
 
   hp=$(realpath -- "$src" | head -c-1 | sha1sum | cut -f1 -d' ')
   dst=$d_cache/ranger/$hp.jpg

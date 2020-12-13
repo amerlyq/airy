@@ -1,6 +1,5 @@
 #!/bin/sh -eu
+# --stats --progress --info=copy,del,remove,skip
 exec rsync -ah --no-group \
-  --stats --progress \
-  --info=copy,del,remove,skip \
-  --out-format='%t %i %f' \
+  --out-format='%i %f' \
   --delete --dry-run "$@"
