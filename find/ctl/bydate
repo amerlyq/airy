@@ -6,11 +6,22 @@
 #
 #%SUMMARY:
 #%USAGE: $ ./$0
+#%ALT:ONELINE:(folders-lvl-1): $ for d in *; do ym=$(find $d -type f -printf '%TY-%Tm\n' | sort | head -1); mkdir -p $ym; mv -t $ym -- $d; done
 set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
 src=${1:-$PWD}
 dst=${2:-$PWD}
 depth=${3-1}
+fmt=${4:-d}
+
+case $fmt
+in d) fmt='%Y-%m-%d'
+;; m) fmt='%Y-%m'
+;; yd) fmt='%Y/%Y-%m-%d'
+;; *%*) fmt="$fmt"
+;; *) >&2 echo "Err: unknown fmt=$fmt"; exit 2
+esac
+export DATEFMT="$fmt"
 
 # ALSO: replace archived files by symlinks to /net after rsync
 # a=( largest-14GB./*(:A:t2) )
@@ -23,12 +34,12 @@ depth=${3-1}
 # * recursive-here-src -> there-dst
 # * nested hierarchy | -exec -> -execdir
 
-find -H "$src" ${depth:+-maxdepth "$depth"} -type f \
+find -H "$src" ${depth:+-maxdepth "$depth"} -xtype f \
   -not -name "${0##*/}" \
   -execdir \
 sh -c '
-  # d=$0/$(date +%Y -r "$1")/$(date +%Y-%m-%d -r "$1")
-  d=$0/$(date +%Y-%m-%d -r "$1")
+  d=$0/$(date +"$DATEFMT" -r "$1")
   mkdir -p "$d"
-  mv -vt "$d" -- "$1"
+  test -f "$d/${1##*/}" && cmp -s -- "$d/${1##*/}" "$1" && bkp=off || bkp=numbered
+  mv --backup="$bkp" -vft "$d" -- "$1"
 ' "$(realpath "$dst")" {} \;
