@@ -257,6 +257,7 @@ function CfgCloneCentralRepos { local r
       local br
       br=$(git symbolic-ref --short HEAD)  # OR:USE(ups): "$b@{u}"
       # OR: git remote add --track master // git remote add -f -t master -m master "$nm" "$url"
+      # [_] MAYBE: always replace default remote of "master" branch ?
       git branch --set-upstream-to="$rmt/$br" "$br"
     fi
   done

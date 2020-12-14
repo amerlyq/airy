@@ -28,7 +28,7 @@ make_backup(){ local f nm=$1
     s/\s+$//              # trailing spaces (ALSO: left before comments)
     /^\s*$/d              # empty lines
     s|~|$HOME|            # expand home dir
-  " | tar --xattrs -pT- -czvf "$f"
+  " | tar --xattrs --exclude='.snapshots' -pT- -czvf "$f"
   # --exclude-from="$fexc"
 }
 
@@ -123,7 +123,7 @@ EOT
 # EOT
 
 # ALSO: tar -I lz4 --xattrs -cpvf "/tmp/x-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.lz4" /data/aura
-# make_backup aura <<< ~/aura             # = all personal repos
+make_backup aura <<< /aura                # = all personal repos with local uncommitted changes
 # make_backup gamesaves <<< ~/gamesaves   # = aggregated game saves
 # make_backup hub <<< ~/hub               # = code examples and teaching materials
 # make_backup sdk <<< ~/sdk               # = misc cloned FOSS code

@@ -7,7 +7,8 @@ pkg_inst zathura
 
 if distro arch; then
   # ERR:(zathura-pdf-mupdf): when opening high-definition-audio-specification.pdf :: error: cycle in forms, uncaught error: cycle in forms
-  pkg_inst zathura-djvu zathura-pdf-poppler
+  # BAD:(zathura-pdf-poppler): no support for .epub
+  pkg_inst zathura-djvu zathura-pdf-mupdf
 fi
 #deb_wget "http://http.us.debian.org/debian/pool/main/z/zathura/zathura_0.2.9-2_amd64.deb"
 
