@@ -4,8 +4,15 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 #
-#%SUMMARY:
-#%USAGE: $ ./$0 rmt-nm [./path/to/expected]
+#%SUMMARY: artificially populate remote repo w/o re-hashing files on NAS (WARN: corrupted files not detected)
+#%ALG:NEED:
+#     * first clone repo to NAS and sync it back to get "annex-uuid" (SEE:ALG: @/todo/my/info/annex.nou [⡟⢚⢳⣇])
+#     * and then prepare clean checkout'ed git-annex branch to apply new logs
+#   $ mv ./.git/info/attributes{,_}
+#   $ git worktree add /cache/amv-annex git-annex && git branch tmp git-annex
+#  USAGE: $ ./$0 nas /net/share/amer/amv-old-mess
+#   $ printf "gitdir: %s\n" "$(realpath -e .git)" > .git_ && mv -vfT .git{_,}
+#   $ git worktree remove /cache/amv-annex
 set -o errexit -o noclobber -o nounset -o pipefail
 setopt warn_nested_var warn_create_global
 zmodload zsh/datetime
@@ -14,12 +21,22 @@ rmt=$1      # e.g. "nas"
 src=${2-}   # import outside dir by unique-basename .vs. generate for already imported current dir
 repo=$(git rev-parse --show-toplevel)  # USE: GIT_DIR and GIT_WORK_TREE
 
-# NEED: clean checkout'ed git-annex branch to apply new logs
-#   git worktree add /cache/amv-annex git-annex
-#   [_] FAIL:PERF: slow as hell -- must somehow exclude .log/.met in git-annex branch from under smudge filter
-#     TRY:(glg): $ printf '* !filter\n.* !filter\n' > /cache/amv-annex/.gitattributes
-#     ALT:(no-hooks): $ git -c core.hooksPath=/dev/null checkout -- .
-#     [_] SEE: $ r.b -r annex-smudge
+# [⡟⣕⡨⡥] FAIL:PERF: "checkout" is as slow as hell -- must somehow exclude .log/.met in git-annex branch from under smudge filter
+#   TRY:(glg): $ printf '* !filter\n.* !filter\n' > /cache/amv-annex/.gitattributes
+#   ALT:(no-hooks): $ git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null checkout -- .
+#     ALT: $ git -c core.attributesFile=/dev/fd/3 worktree add /cache/amv-annex git-annex 3<<<'* !filter'
+#     << FAIL:BET: manually rename .git/info/attributes before checkout
+#   [⡟⣕⡨⡥] SEE: $ r.b -r annex-smudge
+#   INFO
+#     git status extremely slow with v7 ⌇⡟⣕⡯⣕
+#       https://git-annex.branchable.com/bugs/git_status_extremely_slow_with_v7/
+#     smudge ⌇⡟⣕⡰⢵
+#       https://git-annex.branchable.com/todo/smudge/
+# EXPL:(.git_):
+#   Using git-worktree with annex ⌇⡟⣕⡮⣵
+#     https://git-annex.branchable.com/tips/Using_git-worktree_with_annex/
+#   git worktree remove fails ⌇⡟⣕⡯⠵
+#     https://git-annex.branchable.com/bugs/git_worktree_remove_fails/
 #
 dst=$(git -C $repo worktree list --porcelain | awk '$1=="worktree"{w=substr($0,length($1)+2)} $1=="branch"&&$2~"/git-annex$"{print w}')
 uuid=$(git -C $repo config remote.$rmt.annex-uuid)
