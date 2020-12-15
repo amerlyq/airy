@@ -1,0 +1,31 @@
+⌇⡞⣈⠯⣬
+
+Resize the partition
+To calculate the new LUKS volume size, use a simple formula: NEW_PARTITION_SECTOR_END = PARTITION_SECTOR_START + (LUKS_SIZE_SECTORS + LUKS_OFFSET_SECTORS) - 1. The - 1 is because parted takes an inclusive sector end parameter.
+
+# cryptsetup status cryptdisk
+...
+offset:  4096 sectors
+size:    952762368 sectors
+Close the LUKS volume to resize offline. You'll probably need to deactive LVM volums on the cryptdisk or it won't close.
+
+# vgchange -a n vgroup
+# cryptsetup close cryptdisk
+Use parted to resize the partition:
+
+# parted /dev/sda
+ (parted) unit
+ Unit?  [compact]? s
+ (parted) p
+ ...
+  2      8003584s  2000408575s  1992404992s
+Using the formula above returns: 8003584 + (952762368 + 4096) - 1 = 960770047
+
+(parted) resizepart 2 960770047
+ Warning: Shrinking a partition can cause data loss, are you sure you want to continue?
+ Yes/No? y
+ (parted) q
+At this point you can reopen the LUKS volume and remount partitions. You'll need to manually reactive the LVM partitions since if you manually deactivated them above.
+
+# cryptsetup luksOpen /dev/sda2 cryptdisk
+# vgchange -a y vgroup
