@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY: import/export ⌇⡟⣠⠶⡉
+#%USAGE: $ ./$0
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+cd /tmp/t
+[[ -d books ]] && find books -not -writable -exec chmod +w -- {} +
+rm -rf books
+mkdir books
+cd books
+git init .
+git config --local user.name annex
+git config --local user.email test
+
+git annex init test
+git annex config --set annex.largefiles 'not mimetype=text/*'
+
+echo hello > README.rst
+git add README.rst
+git commit -m init
+
+mkdir new old
+for f in old/1 old/2 new/3 new/4; do (head -c100 /dev/zero;echo $f) > $f; done
+git annex add
+git commit -m annex
+
+git-annex initremote android type=adb androiddirectory=/storage/0000-0000/books encryption=none exporttree=yes importtree=yes
+git config remote.android.annex-tracking-branch master
+# git annex sync --no-commit --not-only-annex --content android
+git annex sync android
