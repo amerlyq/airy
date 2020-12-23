@@ -14,9 +14,10 @@ USAGE
   Upload files
     $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -c "mkdir $USER"
     $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'put "some file.jpg"'
-    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c ls
+    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'ls'
   Download all files or folder
     $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'mget *'
+    $ smbclient '//example.com/Public' -U "domain\\$USER%$(pass domain/$USER)" -D "$USER" -c 'get "file with spaces.mp4"'
     $ smbclient '//example.com/Public' -N -c 'mask "";prompt OFF;recurse ON;mget *'
   Permissions (ACL-based)
     $ smbcacls //192.168.1.2/share myfile -U user%password
@@ -27,6 +28,7 @@ USAGE
   Mount laptop/pc over direct cabel
     $ sudo mount -t smb3 -o "username=$USER,uid=$USER,gid=$USER,nomapposix,noperm,dir_mode=0755,file_mode=0644,iocharset=utf8" -- "//192.168.2.3/data" /mnt
   Mount corporate samba ⌇⡟⢷⣓⠟
+    $ sudo apt-get install cifs-utils
     $ sudo mount --verbose -t smb3 -o "username=$USER,domain=kiev,uid=$USER,gid=$USER,vers=3.0,nomapposix,noperm,dir_mode=0755,file_mode=0644,iocharset=utf8,rsize=65536,wsize=65536" -- "//example.com/Public/$USER" /mnt
     FIXED:(domain=kiev):
       https://shocksolution.com/2019/10/23/mount-cifs-error-13-after-update-centos-redhat-linux-7-6/
