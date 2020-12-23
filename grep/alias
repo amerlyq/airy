@@ -1,6 +1,43 @@
 # vim:ft=sh
 
-# grep -Ri 'name' . # find in all files
+#%OFF:REF:
+#%  https://docs.rs/regex/*/regex/bytes/index.html#syntax
+#%  https://docs.rs/regex/*/regex/#syntax
+#%USAGE:STD: -A/-B/-C | -s/-i/-S | -iglob/-g 'foo/**' | -I | -u[u][u]
+#%  --sort[r] none/path/modified/accessed/created -- DFL:none
+#%  -t/-T cmake -- for searching by type
+#%
+alias g='rg --regexp'
+alias g%='rg --passthru'  # colorize-only OR --regexp '^|match'
+# ALT: alias ag='command ag --smart-case --group'  # DFL:(group): pipe into 'less' BAD(--all-text): skips '--ignore'
+alias g-='rg --color=always --with-filename --heading --line-number --column --trim --max-columns $COLUMNS --max-columns-preview --regexp'
+# ALT: agpdf() { find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep --with-filename --label="{}" --color "your pattern"' \;; }
+# alias g:='rg --pre pdftotext --pre-glob "*.pdf"'  # colorize-only OR --regexp '^|match'
+# ALT: grep -Ri 'name' . # find in all files/symlinks
+alias g,='rg --follow --hidden --no-ignore --one-file-system'  # symlinks
+
+# ALT: ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$'
+alias g.="rg -g '!build/' -g '!/libs/' -g '!tags'"
+alias g.0='rg --null-data'
+alias g.1='rg --max-depth 1'
+alias g.2='rg --max-depth 2'
+alias g.c='rg --count-matches'  # --include-zero
+alias g.C='rg --count'
+alias g.g='rg --color=always --with-filename --heading --line-number --column --trim --max-columns $COLUMNS --max-columns-preview --regexp'
+alias g.j='rg --json'
+alias g.l='rg --files-with-matches'
+alias g.l-='rg --files-without-matches'
+alias g.L='rg --line-buffered'
+alias g.o='rg --only-matching'
+alias g.q='rg --vimgrep'
+alias g.V='rg --vimgrep'
+alias g.v='rg --invert-match'
+alias g.w='rg --word-regexp'
+alias g.x='rg --line-regexp'
+alias g.A='rg --no-unicode'  # ascii classes
+alias g.U='rg --multiline --multiline-dotall'
+alias g.X='rg --binary --byte-offset --only-matching'
+
 
 export SKIM_DEFAULT_OPTIONS="\
  --interactive\
@@ -10,49 +47,5 @@ export SKIM_DEFAULT_OPTIONS="\
  --tiebreak=-index,begin,end,score\
 "
 
-# DFL: used 'group' to pipe into 'less'
-# BAD: --all-text => skips '--ignore'
-alias ag='command ag --smart-case --group'
-
 # NICE: interactively fuzzy-search text line and open it in vim
 ks(){ sk --ansi -i -c 'ag --follow --color "{}"' | sed -ur 's/(:[0-9]+:).*/\1/' | ifne xargs -L1 -d\\n r.vim; }
-
-if _has_pr ag
-then agi() { command ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$' "$@"; }
-else agi() { grep -ri "$@" .; }  # --include=*.{cc,h}
-fi
-
-# DEV: highlight: call ag#syntax#himatch_pcre("${@: -1}")
-agg(){ command ag --group --heading -s "$@" | r.vim-stdin -c "set cole=0 fdl=1|setf ag_grp"; }
-agv(){ command ag --vimgrep -s "$@" | r.vim-stdin -c "cgetb|copen"; }
-
-agd() { find . -maxdepth 1 -type f | xargs ag "$@"; }    # in curr dir only
-agw() { agi -w "$@"; }
-agp() { agi --pager less "$@"; }
-agpdf() {
-    find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep --with-filename --label="{}" --color "your pattern"' \;
-}
-# agc() { ag -G "CMakeLists.txt|.*.cmake" $@; }
-
-vima(){ # USAGE: vima agl -w 'pgd' -- open agl search results in vim
-    local cnt=24 als='ag' args std add cmd
-
-    if [[ $1 =~ ^[0-9]+$ ]]; then cnt=$1; shift; fi
-    if [[ $1 =~ ^ag ]]; then als="$1"; shift; fi
-    std=$(which "$als" | sed '
-        /\<ag\>/!d; s/^.*\<ag\>\(.*\)\s*$/\1/; s/\$@//g')
-    cmd="Ag!${std:- }$add"
-    for k in "${@//\\/\\\\}"; do
-        [[ "${k:0:1}" != - ]] && k="\"${k}\""
-        cmd="$cmd$k "
-    done
-    printf "$cmd\n" | $EDITOR -R \
-        -c "set nolist | copen $cnt " \
-        -c "call histadd(':','$cmd')" -c ":$cmd" -
-        # | let g:ag_qhandler='botleft lopen 7'
-        # | let g:magnify_on=0
-        # -c "let g:syntastic_mode_map['mode']='passive'" -c "NeoCompleteDisable" \
-}
-
-vimf(){ ag -g "$@" | $EDITOR -; }
-# vimq(){ $EDITOR -q <(agi --vimgrep $@); }  # Don't work in bash 4.1.5? in ubuntu12?
