@@ -38,4 +38,7 @@ if cfgOpt ur; then
   ./exe/configure $(cfgOpt r && printf -- -r) -- "${WEECHAT_LIST[@]:?}"
 fi
 
-linkcp -m ~/.weechat/logs ~/chat/weechat
+# FIXME: store logs on /aura for btrfs snapshots separately from "/"
+#  -- because rootfs may be reinstalled or snapshot reverted any time
+# [_] MOVE:(logs): /set logger.file.mask "/@/audit/weechat/%Y/%Y-%m-%d-$plugin.$name.weechatlog"
+# linkcp -m ~/.weechat/logs ~/chat/weechat

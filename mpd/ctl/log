@@ -3,6 +3,9 @@ set -o pipefail
 # SEE:
 #   http://www.musicpd.org/doc/protocol/command_reference.html
 
+# MOVE: /@/monica/mpd/ + Makefile(install)
+# SPLIT: "dst" -> /@/audit/mpd/2020/2020-*
+
 dst=~/.config/mpd/history
 fmt='[[%artist% - ]%title%]|[@@ %name%]|[:: %file%]'
 prev=
