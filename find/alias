@@ -114,7 +114,10 @@ alias fL0='fL -0'
 alias fL1='fL -d1'
 alias fL2='fL -d2'
 
-alias f='fa -H -tf -tl'
+
+alias f='_f(){ command fd -E .snapshots -E .git -E "_build*" -H -tf -tl -- "$*"; }; _f'
+[[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' f
+
 alias 'f*'='f -g'
 alias f0='f -0'
 alias f1='f -d1'
@@ -137,6 +140,8 @@ alias fna="find -type l -print -exec readlink -v -- {} \\; | awk -F- '{if(NR%2){
 alias fnD="find -type l -print -exec readlink -v -- {} \; | awk -F/ 'NR%2{p=\$0;b=\$NF;++N[b];next} {h=\$NF;if((b in f)&&(b!=H[h])){++d[b]};H[h]=b;f[b]=f[b]\"\\n\"p} END{for(b in d)print f[b]}'"
 # NOTE: same SHA but different dir / basename (i.e. intentional duplicates for tag-dirs)
 alias fnU="find -type l -print -exec readlink -v -- {} \; | awk -F/ 'NR%2{p=\$0;b=\$NF;++N[b];next} {h=\$NF;if((h in H)&&(b!=H[h])){++d[h]};H[h]=b;f[h]=f[h]\"\\n\"p} END{for(h in d)print f[h]}'"
+# NOTE: similar normalized names (ignoring case and punctuation) NEED: also ignore [www.site.com] prefix and WN/vol-chapter-range suffix  i.e. check if "names are contained in one another" BAD: rm extension
+alias fnS="for a in **/*(@); do b=\${(L)a:t}; b=\${\${\${b:r}#\[www.*.com\]}%%chapter*}.\${b:e}; print -l -- \$a \${b//[[:punct:][:space:]]/}; done | awk -F/ 'NR%2{p=\$0;b=\$NF;++N[b];next} {h=\$NF;if((h in H)&&(b!=H[h])){++d[h]};H[h]=b;f[h]=f[h]\"\\n\"p} END{for(h in d)print f[h]}'"
 # e.g. find disk bad blocks
 # fnD X stat -Lc'%s %n' | awk '{if(!(($1-s)%512))print"";s=$1}1'
 
