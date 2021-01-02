@@ -1,0 +1,37 @@
+
+USAGE
+  https://github.com/J-CPelletier/webcomix
+  Find-out XPath
+    $ scrapy shell https://mangatx.com/manga/meng-shi-zai-shang/ch-1/
+    ::IPython
+      response.xpath('//a[@class="btn next_page"]/@href')[0].get()
+      [i.get() for i in response.xpath('//img[contains(@class,"wp-manga-chapter-img")]/@data-src')]
+
+  Download
+    $ webcomix custom 'Meng Shi Zai Shang' --start-url='https://mangatx.com/manga/meng-shi-zai-shang/ch-1/' --next-page-xpath='//a[@class="btn next_page"]/@href' --image-xpath='//img[contains(@class,"wp-manga-chapter-img")]/@data-src'
+    # --cbz
+    $ webcomix custom 'Meng Shi Zai Shang' --start-url='https://www.mangatown.com/manga/the_distinguished_cute_master/c001/1.html' --next-page-xpath='//*[@class="next_page"]/@href' --image-xpath='//*[@id="image"]/@src' --yes
+    $ for i in {001..210}; do webcomix custom $i --start-url='https://www.mangatown.com/manga/the_distinguished_cute_master/c'$i'/1.html' --next-page-xpath='//*[@class="next_page"]/@href' --image-xpath='//*[@id="image"]/@src' --yes; done
+
+
+ALT:
+  $ gc1 https://github.com/Girbons/comics-downloader
+  $ cd $_ && make linux-build && cd build
+  $ ./comics-downloader -url='https://www.mangatown.com/manga/the_distinguished_cute_master/' -all
+  $ ./comics-downloader -url='https://mangadex.org/chapter/540700/2' -all -country=US -images-only
+
+
+ALT:
+  https://mangatx.com/manga/meng-shi-zai-shang/
+  https://isekaiscan.com/manga/meng-shi-zai-shang/
+  https://mangafast.net/read/meng-shi-zai-shang/
+  Meng Shi Zai Shang Manga Online Free - Manganelo ⌇⡟⣰⠮⠋
+    https://m.manganelo.com/manga-dk118130
+  https://www.mangatown.com/manga/the_distinguished_cute_master/
+
+SEE:
+  https://www.mangatown.com/manga/yaoguai_mingdan/c001/
+  https://www.mangatown.com/manga/the_gamer/c001/
+  Lonely Attack On A Different World Manga Online Free - Manganelo ⌇⡟⣰⠮⠃
+    https://m.manganelo.com/manga-fh119927
+  https://mangadex.org/
