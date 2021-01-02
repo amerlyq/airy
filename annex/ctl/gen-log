@@ -8,11 +8,12 @@
 #%ALG:NEED:
 #     * first clone repo to NAS and sync it back to get "annex-uuid" (SEE:ALG: @/todo/my/info/annex.nou [⡟⢚⢳⣇])
 #     * and then prepare clean checkout'ed git-annex branch to apply new logs
+#   $ gas
 #   $ mv ./.git/info/attributes{,_}
 #   $ git worktree add /cache/amv-annex git-annex && git branch tmp git-annex
 #  USAGE: $ ./$0 nas /net/share/amer/amv-old-mess
 #   $ printf "gitdir: %s\n" "$(realpath -e .git)" > .git_ && mv -vfT .git{_,}
-#   $ git worktree remove /cache/amv-annex
+#   $ git worktree remove /cache/amv-annex && git branch --delete tmp
 set -o errexit -o noclobber -o nounset -o pipefail
 setopt warn_nested_var warn_create_global
 zmodload zsh/datetime

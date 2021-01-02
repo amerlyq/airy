@@ -9,3 +9,9 @@ Interactive pairing
     | trust 00:12:34:56:78:90
     | pair 00:12:34:56:78:90 OR: pair 00:<Tab>
     | connect 00:12:34:56:78:90
+
+
+Audio
+  $ connect 00:12:34:56:78:90
+  ERR: Dec 30 01:37:21 fractal bluetoothd[2050]: src/service.c:btd_service_connect() a2dp-sink profile connect failed for C4:30:18:63:13:C8: Protocol not available
+  NEED: $ paci pulseaudio-bluetooth && pulseaudio -k
