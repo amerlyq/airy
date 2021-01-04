@@ -20,11 +20,14 @@ url=${3:-$(git config --get remote.origin.url | sed '{s@.*git\(.*\)\.com/@g\1:@}
 # git remote show origin | grep "Push *URL" | sed "s@.*:.*:\(.*\$\)@\1@"
 
 
-if [[ -z ${name/-[mMwW]} || -z $mail ]]; then
+if [[ -z ${name/-[amMwW]} || -z $mail ]]; then
   # THINK: replace "source" with global registry to use "set -r"
   source ~/.shell/profile
   if [[ $name == -M ]]; then
     name=${WORK_NAME:?}
+    mail=${MAIN_MAIL:?}
+  elif [[ $name == -a ]]; then
+    name=annex
     mail=${MAIN_MAIL:?}
   elif [[ $name == -m || $repo == /home/* ]]; then
     name=${MAIN_NAME:?}

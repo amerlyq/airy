@@ -25,6 +25,9 @@
 # MAYBE: git config commit.template
 #   IDEA: always populate message by template by "[@tops...] <usermsg>"
 #
+# IDEA: derive msg relative to PWD
+#   i.e. when comitting from inside @/devq/pj/wm[/src] -> generate "[wm] msg" .instead-of. "[pj] msg"
+#
 # IDEA: commit message must help with easier decisions about rewriting history
 # TODO: tops=$(git add -- .; git diff-index --name-only --cached HEAD | sed 's|/.*||' | sort -u; git reset)
 #   $ for d in "${(@f)tops}"; do git add "$d"; git stash push --keep-index --include-untracked; r.git-my-msg --index --commit; git stash pop; done

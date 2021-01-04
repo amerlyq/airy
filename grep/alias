@@ -8,9 +8,10 @@
 #%  -t/-T cmake -- for searching by type
 #%
 alias g='rg --regexp'
+alias g\?='rg --type-list'
 alias g%='rg --passthru'  # colorize-only OR --regexp '^|match'
 # ALT: alias ag='command ag --smart-case --group'  # DFL:(group): pipe into 'less' BAD(--all-text): skips '--ignore'
-alias g-='rg --color=always --with-filename --heading --line-number --column --trim --max-columns $COLUMNS --max-columns-preview --regexp'
+alias g@='rg --color=always --with-filename --heading --line-number --column --trim --max-columns $COLUMNS --max-columns-preview --regexp'
 # ALT: agpdf() { find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep --with-filename --label="{}" --color "your pattern"' \;; }
 # alias g:='rg --pre pdftotext --pre-glob "*.pdf"'  # colorize-only OR --regexp '^|match'
 # ALT: grep -Ri 'name' . # find in all files/symlinks
@@ -18,6 +19,7 @@ alias g,='rg --follow --hidden --no-ignore --one-file-system'  # symlinks
 
 # ALT: ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$'
 alias g.="rg -g '!build/' -g '!/libs/' -g '!tags'"
+alias g-='g. --invert-match'
 alias g.0='rg --null-data'
 alias g.1='rg --max-depth 1'
 alias g.2='rg --max-depth 2'
@@ -30,8 +32,7 @@ alias g.l-='rg --files-without-matches'
 alias g.L='rg --line-buffered'
 alias g.o='rg --only-matching'
 alias g.q='rg --vimgrep'
-alias g.V='rg --vimgrep'
-alias g.v='rg --invert-match'
+alias g.v='rg --vimgrep'
 alias g.w='rg --word-regexp'
 alias g.x='rg --line-regexp'
 alias g.A='rg --no-unicode'  # ascii classes
