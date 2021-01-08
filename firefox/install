@@ -5,13 +5,13 @@ source ~/.shell/func.d/packages
 
 pkg_inst firefox
 
-if distro arch; then
+if distro arch; then :
   # aur_inst pentadactyl-git
   # echo "W: BROKEN:(signing) pentadactyl"
   # echo "N: (update pentadactyl manually): https://github.com/willsALMANJ/pentadactyl-signed/releases"
   # aur_inst firefox-pentadactyl-signed
   # MAYBE:BUG:(flashplugin path):BET? /usr/lib/firefox
-  pkg_inst flashplugin
+  # pkg_inst flashplugin # EOL=2020
 
   # NOTE: for video download helper
   # aur_inst vdhcoapp
