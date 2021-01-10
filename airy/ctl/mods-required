@@ -24,4 +24,8 @@ chk_dups(){ local dups
 chk_dups 'all mods' <<< "$ordered"
 chk_dups 'req mods' <<< "$required"
 
+# WTF: is bash broken now ?
+exec 0<<<"$ordered"
+exec 3<<<"$required"
+
 exec grep -xFf /dev/fd/3 -- /dev/fd/0
