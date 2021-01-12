@@ -145,7 +145,8 @@ parse_xtref(){ local a
   ;; "$pf_referer" | ※) pfx=$pf_referer; a=${1:1}
   ;; *) pfx=$pf_anchor; a=$1
   esac
-  [[ -n $fileref || -f $a ]] && a=$(date +%s --reference="$a")
+  # FIXED: treat $a as file only explicitly to prevent false-positive in /@/todo
+  [[ -n $fileref && -f $a ]] && a=$(date +%s --reference="$a")
 
   # SEE:VIZ: Most common Bash date commands for timestamping « The Intellectual Wilderness ⌇⡞⠸⣪⣽
   #   https://zxq9.com/archives/795
@@ -175,10 +176,25 @@ parse_xtref(){ local a
   ;; 19) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}T${a:11}")")  # date = 2020-02-04[^0-9]00:19:31
   ;; 16) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  # ut = 20200203T221931Z
   ;; 15) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}T${a:9:2}:${a:11:2}:${a:13}")")  # dT = 20200204_001931
-  ;; 11) xts=$(printf '%08x' "$(date +%s --date="$a")")  #  day = 2020-02-04-
-  ;; 10) xts=$(printf '%08x' "$((10#$a))")               # unix = 1580768371  BET: prefix @1580768371 to allow 2020-02-04 w/o sfx BET! not match (*-*)
-  ;;  9) xts=$(printf '%08x' "$(date +%s --date="$a")")  #   dt = 20200204- OR 20200204T
-  ;;  8) xts=$a                                        #  hex = 5e389c73    BET: prefix 0x5e389c73 OR @5e389c73 to allow 20200204 w/o sfx
+  ;; 11) xts=$(printf '%08x' "$(date +%s --date="${a:0:10}-")")  #  day = 2020-02-04-
+  ;; 10)
+    if [[ $a =~ - ]]; then
+      xts=$(printf '%08x' "$(date +%s --date="$a")")
+    elif ! [[ $a =~ [^0-9] ]]; then
+      xts=$(printf '%08x' "$((10#$a))")               # unix = 1580768371  BET: prefix @1580768371 to allow 2020-02-04 w/o sfx BET! not match (*-*)
+    else
+      >&2 echo "Err: unknown fmt=$a"; exit 1
+    fi
+  ;;  9) xts=$(printf '%08x' "$(date +%s --date="${a:0:8}-")")  #   dt = 20200204- OR 20200204T
+  ;;  8)
+    if [[ $a =~ - ]]; then
+      xts=$(printf '%08x' "$(date +%s --date="$a-")")
+    elif ! [[ $a =~ [^0-9a-fA-F] ]]; then
+      xts=$a                                        #  hex = 5e389c73    BET: prefix 0x5e389c73 OR @5e389c73 to allow 20200204 w/o sfx
+    else
+      >&2 echo "Err: unknown fmt=$a"; exit 1
+    fi
+
   # XXX:(5): how to detect "rev .vs. non-rev" format ?   # z85r = @D1ou
   ;;  5) xts=$(printf '%s' "$a" | rev | basenc --z85 -d | od -An -tx1 | tr -d ' ')
   ;;  4) xts=$(unicode -t "$a" | sed 's/^28//' | paste -sd '')  # braille = ⡞⠸⢜⡳
