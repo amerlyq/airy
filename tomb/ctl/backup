@@ -21,6 +21,7 @@ d_keys=/aura/archive/$grpnm
 d_sshfs=lc:/me/$grpnm  # MOVE:(direct symlink): -> "lc:/tomb"
 d_tombs=/srv/$grpnm/${d_sshfs%%:*}
 d_mnt=/mnt
+declare -A online_rmt
 
 tomb='aura'  # FIXME? mandatory argument
 
@@ -159,8 +160,25 @@ function SyncRepos {  local r
     done
     [[ -z ${rmt-} ]] && >&2 echo "Err: private remote=${rmt:-TBD} not found" && exit 1
 
+    # HACK: sync annex only available remotes
+    #   IMPL: if some remotes are not available -- disable them for whole session
+    # OFF:WiP: learn about remotes that are currently unavailable ⌇⡟⣻⣳⡌
+    #   https://git-annex.branchable.com/todo/learn_about_remotes_that_are_currently_unavailable/
+    local _nm _url _annex=""
+    for _nm in $(git remote show); do
+      _url=$(git remote get-url "$_nm")
+      if ((!$+online_rmt["$_url"])); then
+        if git ls-remote --quiet --exit-code --heads -- "$_nm" &>/dev/null
+        then online_rmt["$_url"]=1
+        else online_rmt["$_url"]=0
+        fi
+      fi
+      (($online_rmt["$_url"])) || _annex+=" -c remote.$_nm.annex-sync=false"
+    done
+    [[ -n ${_annex:+x} ]] && >&2 echo "DISABLED:(annex-args): $_annex"
+
     if [[ -d $r/.git/annex/objects ]]; then
-      git annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --pull --no-push
+      git ${=_annex} annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --pull --no-push
     else
       local br
       br=$(git symbolic-ref --short HEAD)
@@ -197,7 +215,7 @@ function SyncRepos {  local r
       #   error: failed to push some refs to 'ssh://rmt/data/repo'
       ##  ::: FIXED:WKRND: use !gas on remote system and then !gas again on local -- to sync "master" changes by pulling
       if [[ -d $r/.git/annex/objects ]]; then
-        git annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --no-pull --push
+        git ${=_annex} annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --no-pull --push
       else
         git push $(has v&&echo --verbose) --atomic --all
         git push $(has v&&echo --verbose) --atomic --tags
