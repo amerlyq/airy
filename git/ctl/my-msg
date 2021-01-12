@@ -28,6 +28,10 @@
 # IDEA: derive msg relative to PWD
 #   i.e. when comitting from inside @/devq/pj/wm[/src] -> generate "[wm] msg" .instead-of. "[pj] msg"
 #
+# NICE: when committing group of files -- embed mtime into extended commit message in .toml or keyval FMT
+#   i.e. use table FMT(mtime path)
+#   ALT: place table into git annotations BUT they can be removed ...
+#
 # IDEA: commit message must help with easier decisions about rewriting history
 # TODO: tops=$(git add -- .; git diff-index --name-only --cached HEAD | sed 's|/.*||' | sort -u; git reset)
 #   $ for d in "${(@f)tops}"; do git add "$d"; git stash push --keep-index --include-untracked; r.git-my-msg --index --commit; git stash pop; done

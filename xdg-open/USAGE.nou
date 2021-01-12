@@ -1,9 +1,24 @@
 
+DEBUG
   $ xdg-mime query filetype my.txt
     text/plain
 
   $ xdg-mime query default text/plain
     wine-extension-txt.desktop
+
+  $ xdg-mime query default inode/directory
+    ranger.desktop
+
+
+BUT: firefox
+  arch linux - Set new default file manager for firefox in Archlinux - Unix & Linux Stack Exchange ⌇⡟⣼⡲⣰
+    https://unix.stackexchange.com/questions/146904/set-new-default-file-manager-for-firefox-in-archlinux
+    $ gio mime inode/directory
+
+WTF
+  Gtk file open dialog hate... can it be replaced? / Applications & Desktop Environments / Arch Linux Forums ⌇⡟⣼⡳⣁
+    https://bbs.archlinux.org/viewtopic.php?id=231697
+    ::: WTF no ?
 
 
 Browser

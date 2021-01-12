@@ -17,3 +17,16 @@ TODO
       file="$(sk-tmux --bind "ctrl-p:toggle-preview" --ansi -i --cmd-query "$*" -c 'rga --ignore-case --color=always --line-number --column {}' --preview 'bat --color=always --style=header,numbers --highlight-line "$(echo {1}|cut -d: -f2)" --line-range "$(($(echo {1}|cut -d: -f2))):$(($(echo {1}|cut -d: -f2)+50))" "$(echo {1}|cut -d: -f1)"')"
       [[ $? -eq 0 ]] && echo "opening $file" && subl "$(echo "$file"|cut -d: -f1):$(echo "$file"|cut -d: -f2):$(echo "$file"|cut -d: -f3)" || return 1
     }
+
+
+TODO: 2017 agn.vim
+  Add cfg.filter option for additional global filters
+  Remove docs from Ag
+  No asserts on bad options in AgSet
+  Doc: useful patterns
+    Like when I searched linux kernels for filter
+    How to use look-ahead / look-behind (as I forgot often)
+      -- especially when they are combined
+    Multiline searches
+      Problems about highlighting those splitted matches
+    + Some more regex features to use in ag

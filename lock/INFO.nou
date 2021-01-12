@@ -4,3 +4,14 @@ TODO
     ALSO:ADD: to ~/.zlogout -- to close forgotten opened tombs
       $ tomb close all | tomb slam all
     [_] CHECK:FAIL? if any errors on close inside .zlogout -- user will be logged-out anyway w/o opportunity to fix them
+  [$] 2017 BUG: i3lock launched twice
+  [$] 2017 BUG: i3lock continuously writes to screenlock.png -- each 10 minutes
+    user 27323 27321  0.0 20.9 14-22:10:29  \_ /home/user/.xmonad/xmonad-x86_64-linux
+    user  7121  7121  0.0  0.0    19:16:47  |   \_ /bin/bash -e /home/user/.bin/r.lock
+    user  7148  7121  0.0  0.2    19:16:47  |       \_ i3lock --nofork --color 111111 --image /tmp/user/screenlock.png
+    user  7149  7121  0.0  0.1    19:16:46  |           \_ i3lock --nofork --color 111111 --image /tmp/user/screenlock.png
+    user 27438 27438  0.0  0.0  2-19:42:55  \_ /usr/bin/xautolock -time 10 -locker r.lock -detectsleep
+      16:32:02 OPEN /tmp/user/screenlock.png
+      16:42:05 OPEN /tmp/user/screenlock.png
+      17:52:27 OPEN /tmp/user/screenlock.png
+    DEBUG: run 'xautolock -time 1 ...'
