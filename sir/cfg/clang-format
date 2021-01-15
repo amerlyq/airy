@@ -61,7 +61,7 @@ AlwaysBreakAfterReturnType: AllDefinitions
 # Templates are some kind of decorators and aren't part of return type, therefore don't stick them together
 #   => use separate line for sliding glance to ignore them easily.
 AlwaysBreakTemplateDeclarations: true
-# (clang8): AlwaysBreakTemplateDeclarations: Yes
+AlwaysBreakTemplateDeclarations: Yes  # (clang8)
 
 # When args are placed on multiple lines, it's hard to concentrate on
 #   adjacent args in middle and easy for them to be lost visually
@@ -102,7 +102,7 @@ BraceWrapping:
 BreakBeforeInheritanceComma: true
 BreakConstructorInitializersBeforeComma: true
 BreakConstructorInitializers: BeforeComma
-# (clang8): BreakInheritanceList: BeforeComma
+BreakInheritanceList: BeforeComma  # (clang8)
 
 # Many developers complain about 80 chars, especially with long C++ identifiers
 # ColumnLimit: 80
@@ -125,8 +125,8 @@ IndentWidth: 4
 UseTab: Never
 
 # Nested define directives must be indented by 1 space each -- to emphasize and attract attention
-#   BAD: clang reuses "IndentWidth: 4" for this; must endure and use less nested defines...
-IndentPPDirectives: AfterHash
+#   BAD:(AfterHash): clang reuses "IndentWidth: 4" for this; must endure and use less nested defines...
+IndentPPDirectives: None
 
 # Useful after headers list, between classes and unrelated functions
 # BUT: for nicely distributed classes/functions by files default "1" must be enough
