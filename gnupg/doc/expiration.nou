@@ -29,6 +29,11 @@ Extend expiration date of subkey
     $ gpg --export-secret-subkeys --armor --output amerlyq.gpg-encrypt.asc "$(gpg --list-secret-keys --keyid-format short | awk '$4=="[E]"{print substr($2,index($2,"/")+1)}')"!
 
   MAYBE: "trust" them on other devices
-    FIXED:ERR: There is no assurance this key belongs to the named user
+    [⡞⣲⡈⣝] FIXED:ERR:
+      gpg: 01BA4719C80B6FE9: There is no assurance this key belongs to the named user
+      gpg: /dev/shm/pass.jhC6g0sC24m6e/WeN5Bd-work-luxoft.com-dkolomoiets.txt: encryption failed: Unusable public key
+    $ gpg --list-secret-keys --keyid-format long
     $ gpg --edit-key 01BA4719C80B6FE9
-     (gpg) trust
+     ⦅gpg⦆ trust, 5, save
+     SECU: use (5) trust=ultimate to be able to encrypt new files
+    $ gpg -K
