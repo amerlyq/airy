@@ -15,8 +15,25 @@ source ~/.shell/profile
 over=${1:-${CURR_XKB[overlay]:-vim}}
 r.xkb-has-overlay "${over:?}"
 
-exec setxkbmap -I/usr/share/X11/xkb -display "${DISPLAY:?}" -option "" \
-  -model pc104 -rules amer \
+# ALT: use libxkbcommon :: /usr/lib/xkbcommon/xkbcli-{compile-keymap,list}
+xkb_remap(){ setxkbmap -I/usr/share/X11/xkb \
+  -display "${DISPLAY:?}" ${1:+-device "$1"} \
+  -option "" -model pc104 -rules amer \
   -layout "${CURR_XKB[layout]:-us,ru,ua}" \
   -variant "${CURR_XKB[variant]:-amer,amer,amer}" \
   -option "${CURR_XKB[option]:-misc:typo,amer:nums,amer:lvl3,amer:mods},over:${over:?}"
+}
+
+# NOTE: prefer to remap only STD keyboards
+kbds=(
+  "Kinesis Advantage2 Keyboard"
+  # TEMP:FAIL: can't disable, because I must be able to change language
+  "ZSA Moonlander Mark I"
+)
+
+for k in "${kbds[@]}"; do
+  if id=$(xinput list --id-only "keyboard:$k"); then
+    xkb_remap "$id"
+    echo "OK: $k"
+  fi
+done
