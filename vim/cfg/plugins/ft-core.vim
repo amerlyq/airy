@@ -18,40 +18,6 @@ call dein#add('ollykel/v-vim')
 
 
 
-""" Python {{{1
-
-call dein#add('hynek/vim-python-pep8-indent', {
-  \ 'on_ft': 'python'})
-
-
-
-" BUG: update error
-" on_cmd: Pyimport
-call dein#add('davidhalter/jedi-vim', {
-  \ 'on_ft': 'python',
-  \ 'hook_source': _hcat('jedi-vim.src')})
-
-
-
-call dein#add('numirias/semshi', {
-  \ 'on_ft': 'python'})
-
-
-
-"" DISABLED: too much CPU load when editing
-" mappings: [ [[, ]], [M, ]M, [ai]C, [ai]M ]
-" \ 'rev': 'update_submodules',
-" call dein#add('klen/python-mode', {
-"   \ 'on_ft': 'python',
-"   \ 'hook_source': _hcat('python-mode.src')})
-
-
-
-" USAGE: ..[ai][fc]  {[]}p[fc] -- next/prev func/class
-" https://github.com/bps/vim-textobj-python
-
-
-
 """ Haskell {{{1
 
 call dein#add('lukerandall/haskellmode-vim', {
