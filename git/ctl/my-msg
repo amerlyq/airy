@@ -31,6 +31,8 @@
 # NICE: when committing group of files -- embed mtime into extended commit message in .toml or keyval FMT
 #   i.e. use table FMT(mtime path)
 #   ALT: place table into git annotations BUT they can be removed ...
+#   TRY: keyval FMT:(~RFC822) to parse/add values to commit messages
+#     https://git-scm.com/docs/git-interpret-trailers ⌇⡠⠈⡞⣋
 #
 # IDEA: commit message must help with easier decisions about rewriting history
 # TODO: tops=$(git add -- .; git diff-index --name-only --cached HEAD | sed 's|/.*||' | sort -u; git reset)

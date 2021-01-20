@@ -10,13 +10,52 @@
     $ git lfs track '*.tar.xz'
     $ git add .gitattributes
 
-  git-annex
+  NICE: LFS local
+    aleb/git-lfs-rsync-agent ⌇⡠⠈⡌⣀
+      https://github.com/aleb/git-lfs-rsync-agent
+    NICE: sinbad/lfs-folderstore: git-lfs custom transfer adapter which simply uses a folder as the remote LFS media store (e.g. a shared NAS folder) ⌇⡠⠈⡍⢆
+      https://github.com/sinbad/lfs-folderstore
+
+
+BET? git-annex
     https://git-annex.branchable.com/
     https://git-annex.branchable.com/walkthrough/
     + distributed storage -- syncs only files metadata
     ~ shows where you can find file and pulls if its remote is available
     - keeps all files under //.git/annex
     >_ useful for backup of my 'synchro' batch of files between disks ?
+
+
+ALT: DVC
+  GitHub - iterative/dvc: 🦉Data Version Control | Git for Data & Models ⌇⡟⡊⢉⣝
+    https://github.com/iterative/dvc
+  [⡠⠈⠽⡬] TALK Does anyone use Data Version Control (DVC)? Thoughts and opinions? : datascience ⌇⡠⠈⠽⡋
+    https://www.reddit.com/r/datascience/comments/aqkg59/does_anyone_use_data_version_control_dvc_thoughts/
+    ::: nothing more than Makefile + versioning ?
+  [⡠⠈⡄⢎] Data Version Control With Python and DVC – Real Python ⌇⡠⠈⡄⢆
+    https://realpython.com/python-data-version-control/
+    ::: svn-style commands and git-lfs style tracking
+    FMT: .dvc files | Data Version Control · DVC ⌇⡠⠈⡄⣝
+      https://dvc.org/doc/user-guide/dvc-files/.dvc
+  [X] DVC vs GIT. Почему GIT'а недостаточно в проектах машинного обучения / Хабр ⌇⡠⠈⡅⣽
+    https://habr.com/ru/post/535274/
+  [X] First Impressions of Data Science Version Control (DVC) ⌇⡠⠈⡆⢲
+    https://christophergs.com/machine%20learning/2019/05/13/first-impressions-of-dvc/#evaluation
+  [⡠⠈⡊⠩] Why Git and Git-LFS is not enough to solve the Machine Learning Reproducibility crisis | by David Herron | Towards Data Science ⌇⡠⠈⡊⠥
+    https://towardsdatascience.com/why-git-and-git-lfs-is-not-enough-to-solve-the-machine-learning-reproducibility-crisis-f733b49e96e8
+  NICE: Use git lfs for file tracking · Issue #211 · iterative/dvc ⌇⡠⠈⡊⢠
+    https://github.com/iterative/dvc/issues/211
+    + symlinks/hardlinks instead of content piping (like git-lfs)
+    + intermediate local versioning of each data variant (on each dvc commit)
+    + push to server only latest version (after git commit)
+    + chaining data products i.e. record Makefile "on the fly"
+      <= like writing Jupyter notebooks or storing IPython history
+
+WTF
+  Nessie vs Git - Project Nessie: A Git-Like Experience for your Data Lake ⌇⡠⠈⡅⢁
+    https://projectnessie.org/develop/nessie_vs_git/
+
+
 
 % Databases  ⌇⡗⢒⠬⣺
   Using diff driver to merge sqlite db
