@@ -28,7 +28,8 @@ curr() { [[ -s $fmod ]] && cat "$fmod"
 next(){ declare -A n
   ## DISABLED:BET: use two-finger scroll
   # n=([zoom]=undo [undo]=scroll [scroll]=zoom)
-  n=([zoom]=undo [undo]=zoom)
+  # n=([zoom]=undo [undo]=zoom)    # screen-presenting
+  n=([mscroll]=undo2 [undo2]=mscroll)  # pdf-annotation
   # n=([zoom]=rotate [rotate]=undo [undo]=zoom)
   mod=${n[${1:-default}]:-zoom}; }
 
@@ -87,6 +88,10 @@ undo) fled 3 32; wacom "$WPAD" <<< '
     AbsWheelDown "key ctrl Y"   # redo xournalpp
     AbsWheelUp   "key ctrl Z"   # undo
 ' ;;
+undo2) fled 3 32; wacom "$WPAD" <<< '
+    AbsWheelDown "key ctrl shift Z"   # redo okular
+    AbsWheelUp   "key ctrl Z"         # undo
+' ;;
 # THINK: Has not much sense, as there is 'Shift + MMove=Lft/Rgt"
 brush) fled 0 32; wacom "$WPAD" <<< '
     Button  1    "key E"  # brush/erase
@@ -120,6 +125,14 @@ zoom) fled 1 64; wacom "$WPAD" <<< '
     # Button  1    "key ctrl shift A"   # hand tool
     AbsWheelDown "key ctrl -"         # xournalpp
     AbsWheelUp   "key ctrl shift ="   # xournalpp
+' ;;
+mscroll) fled 0 32; wacom "$WPAD" <<< '
+    AbsWheelDown  5  # wheel up
+    AbsWheelUp    4  # wheel down
+' ;;
+mzoom) fled 1 64; wacom "$WPAD" <<< '
+    AbsWheelDown  "key +ctrl button 5 key -ctrl"  # wheel zoom in
+    AbsWheelUp    "key +ctrl button 4 key -ctrl"  # wheel zoom out
 ' ;;
 # history) fled 2 64; wacom "$WPAD" <<< '
 #     AbsWheelDown "key ctrl z"  # undo without pick-up

@@ -1,0 +1,15 @@
+#!/bin/bash -e
+cd "$(readlink -e "${0%/*}")"
+source "${PWD%/*}/funcs-lib"
+
+wacom "$WPAD" <<EOT
+  Button   2    "key 5"         # fullscreen
+  Button   3    "key 4"         # underline
+  Button   8    "13"            # [RING MODE] :: mscroll / mzoom
+  AbsWheelUp    "5"             # mwheel up
+  Button   1    "key ctrl 1"    # mode=browse
+  AbsWheelDown  "4"             # mwheel down
+  Button   9    "key 1"         # pen BLUE
+  Button  10    "key 2"         # hi ORNG
+  Button  11    "key 3"         # underline RED
+EOT
