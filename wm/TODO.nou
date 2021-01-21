@@ -28,3 +28,11 @@ DEV
     primary/DP-1 -> 1
     LVDS-1 -> i
     VGA-1 -> m
+
+
+IDEA: remove app fullscreen from cli
+  [SOLVED] Okular - always in full screen ⌇⡠⠉⢥⢲
+    https://forums.fedoraforum.org/showthread.php?322170-Okular-always-in-full-screen
+    $ while test -z "$(wmctrl -l |grep Okular)"; do :; done
+    $ wmctrl -R Okular -b remove,fullscreen
+    $ wmctrl -R Okular -b add,maximized_vert,maximized_horz

@@ -20,7 +20,7 @@ def get_macros_with_date(self):
     macros['dt'] = time.strftime('%Y%m%d')
     macros['dT'] = time.strftime('%Y-%m-%d')
     macros['dw'] = time.strftime('%Y-%m-%d-%a')
-    macros['dW'] = time.strftime('%Y-%m-%d-%a-W%V')
+    macros['dW'] = time.strftime('%Y-%m-%d-%a-W%W')
     macros['date'] = time.strftime('%Y/%m/%d')
     return macros
 
