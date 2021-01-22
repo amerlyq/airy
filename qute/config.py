@@ -1948,6 +1948,15 @@ c.url.start_pages = ['qute://history/']  # @me
 ## Type: FormatString
 # c.window.title_format = '{perc}{current_title}{title_sep}qutebrowser'
 
+## Set the main window background to transparent.  This allows having a
+## transparent tab- or statusbar (might require a compositor such as
+## picom). However, it breaks some functionality such as dmenu embedding
+## via its `-w` option. On some systems, it was additionally reported
+## that main window transparency negatively affects performance.  Note
+## this setting only affects windows opened after setting it.
+## Type: Bool
+# c.window.transparent = False
+
 ## Default zoom level.
 ## Type: Perc
 # c.zoom.default = '100%'

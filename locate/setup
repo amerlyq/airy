@@ -4,7 +4,7 @@ source ~/.shell/func.d/cfgsetup
 
 # Prune btrfs snapshots by Snapper
 if ! grep -q '^PRUNENAMES\b.*\s.snapshots\b' /etc/updatedb.conf; then
-  sudo sed -ri '/^(PRUNENAMES = "[^"]+)"/s||\1 .snapshots"|' /etc/updatedb.conf
+  sudo sed -ri '/^(PRUNENAMES = "[^"]+)"/s||\1 .snapshots build _build"|' /etc/updatedb.conf
 fi
 
 # Prune work dir -- because it can contain too many src files
