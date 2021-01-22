@@ -283,7 +283,7 @@ function CfgCloneCentralRepos { local r
 
 
 if has R; then  #% -R = scan ~/aura and gather all repos with (origin|aura) => /mnt
-  (($#)) || set -- ~/aura
+  (($#)) || set -- '/@/=tag=/sync-tomb'
   CollectAuraRepos $@
 else
   repos=( "$@" )

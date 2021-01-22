@@ -270,13 +270,14 @@ call dein#add('gregsexton/gitv', {
 
 
 " HACK: adding syntax highlight
-call dein#add('amerlyq/vim-tshark', {
-  \ 'on_ft': 'tshark',
-  \ 'hook_source': "
-\\n   let g:tshark_nested_folds = 1
-\\n   let g:tshark_detail_opts = '-V -x -t r'
-\\n   let g:tshark_summary_opts = '-t r'
-\"})
+" ALT: use TUI tool "termshark"
+" call dein#add('amerlyq/vim-tshark', {
+"   \ 'on_ft': 'tshark',
+"   \ 'hook_source': "
+" \\n   let g:tshark_nested_folds = 1
+" \\n   let g:tshark_detail_opts = '-V -x -t r'
+" \\n   let g:tshark_summary_opts = '-t r'
+" \"})
 
 
 
