@@ -1,0 +1,55 @@
+%%%% recoverer.vim %%%%
+
+# recoverer.vim
+Lightweight unintrusive alternative to 'Chrisbra/Recover.vim'
+
+## Alternatives
+* [Recover.vim](https://github.com/Chrisbra/Recover.vim) -- embeds '[d]iff'
+variant into opening menu, which works poorly with neovim; can't be lazy
+loaded.
+* [vim-autoswap](https://github.com/gioele/vim-autoswap)
+
+NOTE: to open the same file multiple times -- use 'vim -R'
+  Likewise '<R>' in 'ranger', then choose '1'
+
+  [_] SEIZE:IDEA: https://github.com/neovim/neovim/issues/1455
+  [_] WARN: swap file may disappear by system delete or appear by instances racing
+    https://vi.stackexchange.com/questions/56/how-can-i-prevent-vim-from-leaving-too-many-files-like-swap-backup-undo
+
+  [_] DEV: auto delete swap if diff equal w/o showing diff at all
+
+  [_] If already opened (pid exists)
+    * Show notify 'it's already opened' (by !r.n and/or :echom)
+    * Silently open all next copy as forced readonly and nomodifiable
+      = don't check swap existance --> don't show split diff
+      = check swap and etc only on |:write| or |:set noreadonly|
+      ? MAYBE:BUG:(vim-stay) keeps 'readonly' even on reopen
+      !! on events focus-in/buf-enter check if another process exited and unlocked that file
+        => check if "b:recoverer_blocked" flag is set
+        => reset that flag and again allow write and modify
+
+  [_] TRY: lazy load 'on_event': 'SwapExists'
+    ::? seems like no need with clean ./plugin/ ?
+  [_] FIXME: individual names for origin buffers
+    = when opening multiple files, several of which need recovery
+  [_] add 'au' for file write and trying to change options
+    BUT: how to transfer editing rights if there is 5 copies opened?
+      => do :e and if no vim pid exists --> unlock swap/write/modify
+  [_] BUG: undo don't work after writing new recover
+    http://stackoverflow.com/questions/21385956/undo-recovery-from-swap-file-in-vim
+
+  [_] DEV: auto-cancel ':recover' if I haven't saved (don't want to apply changes)
+    SEE: how it was done in Linediff
+  ? [_] THINK how to delete all other swap files created on top of *.swp
+
+  2017-05-09 [$] TODO: use 'q' if responded 'pid' exists and file differs
+    2017-05-09 [X] ELSE: use 'e' if no pid -- and jump to diff
+    2017-05-09 [X] ELSE: if file the same -- use 'o' anyway and 'modifiable' off -- to warn user it was opened
+
+  [_] ALSO: use 'cmp' before vimdiff to accelerate diffs on big > 1MB files
+    ?? BUT: can we 'cmp' <file> with <swap> at all ??
+
+INFO
+  autocmd order SEE SwapExists
+    https://vi.stackexchange.com/questions/4493/what-is-the-order-of-winenter-bufenter-bufread-syntax-filetype-events
+    https://gist.github.com/lambdalisue/b4bb1b522abf27d5fd95fd0e72791455

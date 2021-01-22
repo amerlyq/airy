@@ -76,7 +76,7 @@ call dein#add('kopischke/vim-fetch')
 " CHECK:(test on_event) HACK commands Recoverer{Diff,End,Remove}
 " DEPRECATED:
 "   chrisbra/Recover.vim (can't fetch neovim recovery messages)
-call dein#add('amerlyq/recoverer.vim', {'rev': 'wip'})
+" call dein#add('amerlyq/recoverer.vim', {'rev': 'wip'})
 " TRY:FIX:(lazy) double loading => excessive tab
 "   \ 'on_func': 'recoverer#',
 "   \ 'on_event': 'SwapExists'

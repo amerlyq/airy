@@ -1,8 +1,8 @@
 """ Mark-up / highlight
 
 "" HACK jap ranobe translation/formatting {{{1
-call dein#add('amerlyq/forestanza.vim', {
-  \ 'on_ft': 'forestanza'})
+" call dein#add('amerlyq/forestanza.vim', {
+"   \ 'on_ft': 'forestanza'})
 
 
 
