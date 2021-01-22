@@ -2,7 +2,7 @@
 
 "" HACK Adds support of FocusIn/Out events for terminal vim {{{1
 " ATTENTION: neovim has broken t_ti
-call dein#add('amerlyq/vim-focus-autocmd', {'if': '!has("nvim")'})
+" call dein#add('amerlyq/vim-focus-autocmd', {'if': '!has("nvim")'})
 
 call dein#add('embear/vim-localvimrc', {'lazy': 0,
   \ 'on_cmd': 'LocalVimRC',

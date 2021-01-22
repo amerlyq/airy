@@ -6,7 +6,7 @@
 " CHECK:DEV: mappings for submode
 " let g:ag.qhandler="botleft lopen 7"  "OR: copen 20"
 " ALT:TRY: https://github.com/eugen0329/vim-esearch
-call dein#add('amerlyq/agn.vim', {'lazy': 0,
+call dein#add('albfan/ag.vim', {'lazy': 0,
   \ 'if': executable('ag'),
   \ 'on_map': [['nx', '<Plug>(ag-']],
   \ 'depends': 'vim-operator-user',

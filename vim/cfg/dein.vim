@@ -63,7 +63,7 @@ call _cfg('plugins/*.vim')
 " HACK: dev plugins override
 " TODO: choose only currently actively developed ones
 "   -- MAYBE check last change date is lesser then 10days?
-call dein#local(expand('~/aura/vim'),
+call dein#local(expand('/@/aura/vim'),
   \ {'frozen': 1, 'merged': 0}, ['*.vim', 'vim*', 'unite-*'])
 
 call dein#end()  " Recaches runtimepath

@@ -127,9 +127,9 @@ call dein#add('kana/vim-textobj-indent', {
 
 "" HACK Key/value with/beside quotes and space {{{1
 " <Plug>(textobj-[key,value]-*
-call dein#add('amerlyq/vim-textobj-keyvalue', {
-  \ 'on_map': [['ox', 'ak', 'ik', 'av', 'iv']],
-  \ 'depends': 'vim-textobj-user'})
+" call dein#add('amerlyq/vim-textobj-keyvalue', {
+"   \ 'on_map': [['ox', 'ak', 'ik', 'av', 'iv']],
+"   \ 'depends': 'vim-textobj-user'})
 
 
 
