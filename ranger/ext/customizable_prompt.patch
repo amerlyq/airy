@@ -1,0 +1,357 @@
+diff --git a/Makefile b/Makefile
+index 870901da..cde4ab5e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -64,11 +64,11 @@ test:
+ 	@echo "Running doctests..."
+ 	@for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
+ 		echo "Testing $$FILE..."; \
+-		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
++		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH $(PYTHON) $$FILE; \
+ 	done
+ 	@if type py.test > /dev/null; then \
+ 		echo "Running py.test tests..."; \
+-		py.test tests; \
++		$(PYTHON) -m pytest tests; \
+ 	else \
+ 		echo "WARNING: Couldn't run some tests because py.test is not installed!"; \
+ 	fi
+diff --git a/doc/ranger.pod b/doc/ranger.pod
+index fe2b45eb..9fd8e58e 100644
+--- a/doc/ranger.pod
++++ b/doc/ranger.pod
+@@ -794,6 +794,22 @@ Which script should handle generating previews?  If the file doesn't exist, or
+ use_preview_script is off, ranger will handle previews itself by just printing
+ the content.
+ 
++=item prompt_message [str]
++
++Customize prompt message to show when waiting on keypress after :shell -w cmd.
++
++=item prompt_press_to_continue [str, bytes]
++
++Regex of allowed keys to confirm prompt message dialog. Default: [\r\n].
++Examples:
++ ''                 | press any key (beside modifiers)
++ '[ \r\n\x03]'      | <Space>, <Enter> or <C-c> (extended default)
++ 'exit\r|\x04'      | type 'exit' and press <Enter> or press <C-d> (shell-like)
++ '(  |jj)'          | press twice <Space> or 'j' (fancy)
++ 'Q|\x1b\[B'        | 'Shift-q' or esc seq for <Down> (peculiar)
++ '[ \t]|\x1bOR'     | <Space>, <Tab> or <F3>
++ u'(\u0227|\u044b)' | unicode subset (don't use '[...]' set for multibytes!)
++
+ =item save_console_history [bool]
+ 
+ Should the console history be saved on exit?  If disabled, the console history
+diff --git a/ranger/config/rc.conf b/ranger/config/rc.conf
+index f25d3a0c..3ffa7eb0 100644
+--- a/ranger/config/rc.conf
++++ b/ranger/config/rc.conf
+@@ -212,6 +212,13 @@ set clear_filters_on_dir_change false
+ # Disable displaying line numbers in main column
+ set line_numbers false
+ 
++# Prompt dialog customizations for :shell -w
++# BAD:(same as line_numbers)
++#   if user config doesn't contain them at all, then when using 'NORC'
++#   instead of defaults from rc.conf will be used empty string ""
++set prompt_message Press ENTER to continue
++set prompt_press_to_continue [\r\n]
++
+ # ===================================================================
+ # == Local Options
+ # ===================================================================
+diff --git a/ranger/container/settings.py b/ranger/container/settings.py
+index 1faf5860..3588f5ab 100644
+--- a/ranger/container/settings.py
++++ b/ranger/container/settings.py
+@@ -48,6 +48,8 @@ ALLOWED_SETTINGS = {
+     'preview_images_method': str,
+     'preview_max_size': int,
+     'preview_script': (str, type(None)),
++    'prompt_message': (str, u''.__class__),
++    'prompt_press_to_continue': (str, bytes, u''.__class__),
+     'save_console_history': bool,
+     'scroll_offset': int,
+     'shorten_title': int,
+diff --git a/ranger/core/runner.py b/ranger/core/runner.py
+index 78d52764..d3bbf7a4 100644
+--- a/ranger/core/runner.py
++++ b/ranger/core/runner.py
+@@ -27,6 +27,7 @@ import sys
+ from subprocess import Popen, PIPE
+ from ranger.ext.get_executables import get_executables, get_term
+ from ranger.ext.popen_forked import Popen_forked
++from ranger.ext.wait_input_regex import wait_input_regex
+ 
+ 
+ # TODO: Remove unused parts of runner.py
+@@ -34,15 +35,19 @@ from ranger.ext.popen_forked import Popen_forked
+ ALLOWED_FLAGS = 'cfrtCFRT'
+ 
+ 
+-def press_enter():
+-    """Wait for an ENTER-press"""
+-    sys.stdout.write("Press ENTER to continue")
+-    try:
+-        waitfnc = raw_input
+-    except NameError:
+-        # "raw_input" not available in python3
+-        waitfnc = input
+-    waitfnc()
++def prompt_to_continue(opts):
++    """Pause until input contains specified regex"""
++    # CHECK:BAD: if directly embed codes from 'tput'
++    #   => maybe, use pseudocodes directly in rc.conf? Like zsh %F1
++    #       ? import from ncurses?
++    #   OR: if I will generate prompt color depending on error code?
++    #   => but how? lambda? where to set?
++    # prompt.pre = 'ranger(%date) $ cmd  # do I need 'pwd' ?
++    # prompt.post = '--...--'
++    msg = opts.prompt_message.encode('utf-8').decode('unicode_escape')
++    sys.stdout.write(msg)
++    sys.stdout.flush()
++    wait_input_regex(sys.stdin.fileno(), opts.prompt_press_to_continue)
+ 
+ 
+ class Context(object):
+@@ -228,7 +233,7 @@ class Runner(object):
+                 elif process:
+                     self.zombies.add(process)
+                 if wait_for_enter:
+-                    press_enter()
++                    prompt_to_continue(self.fm.settings)
+         finally:
+             self.fm.signal_emit('runner.execute.after',
+                     popen_kws=popen_kws, context=context, error=error)
+diff --git a/ranger/ext/wait_input_regex.py b/ranger/ext/wait_input_regex.py
+new file mode 100644
+index 00000000..4200e8d9
+--- /dev/null
++++ b/ranger/ext/wait_input_regex.py
+@@ -0,0 +1,125 @@
++# This file is part of ranger, the console file manager.
++# License: GNU GPL version 3, see the file "AUTHORS" for details.
++# Author: Dmytro Kolomoiets <amerlyq@gmail.com>, 2016
++
++"""Pause (wait) until input contains specified regex.
++
++Utilizes terminal raw mode and unbuffered stream character-wise reading.
++WARN: can't use 'curses' for input-only task as it clears screen on getch()
++USAGE: wait_input_regex(sys.stdin.fileno(), '[\r\n\x03]')
++"""
++
++import os
++import re
++import termios as T
++from fcntl import fcntl, F_GETFL, F_SETFL
++
++import ranger
++
++
++# Workaround: 'ranger.api.debug' is unavailable on module import and in py.test
++_DEBUG = None
++
++# Used when regex specified by user is invalid (can't be compiled)
++_DEFAULT_REGEX = re.compile(b'[\r\n\x03]')
++
++
++# Raw mode settings SEE: $ man termios
++iflag = ~(T.IGNBRK | T.BRKINT | T.PARMRK | T.ISTRIP |
++          T.INLCR | T.IGNCR | T.ICRNL | T.IXON)
++oflag = ~(T.OPOST)
++lflag = ~(T.ECHO | T.ECHONL | T.ICANON | T.ISIG | T.IEXTEN)
++cflag = ~(T.CSIZE | T.PARENB)
++
++
++def ensure_raw_mode(attrs):
++    """Standalone modifier to termios attributes
++
++    SEE:(POSIX) http://c-faq.com/osdep/cbreak.html
++    """
++    attrs = list(attrs)
++    attrs[0] &= iflag
++    attrs[1] &= oflag
++    attrs[2] &= (attrs[2] & cflag) | T.CS8
++    attrs[3] &= lflag
++    attrs[6][T.VMIN] = 1
++    attrs[6][T.VTIME] = 0
++    return attrs
++
++
++class EnforceRawMode():
++    """Context manager: enforcing raw mode onto file descriptor"""
++    def __init__(self, fd):
++        self.fd = fd
++        self.attrs = T.tcgetattr(self.fd)
++        self.flags = fcntl(self.fd, F_GETFL)
++
++    def __enter__(self):
++        # Clear buffered key presses and set char-wise raw mode
++        T.tcsetattr(self.fd, T.TCSAFLUSH, ensure_raw_mode(self.attrs))
++        # Force waiting on input (turn off non-blocking mode)
++        fcntl(self.fd, F_SETFL, self.flags & ~os.O_NONBLOCK)
++        return self.fd
++
++    def __exit__(self, t, e, trace):
++        T.tcsetattr(self.fd, T.TCSAFLUSH, self.attrs)
++        fcntl(self.fd, F_SETFL, self.flags)
++        if isinstance(e, (IOError, KeyboardInterrupt)):
++            return True
++
++
++def _utf8_to_bytes(s):
++    """HACK: portable way to convert unicode (only) strings to bytes"""
++    if isinstance(s, (str, u''.__class__)) and not isinstance(s, bytes):
++        s = s.encode('utf-8')
++    return s
++
++
++# REM:ALT: can pre-compile regex beforehand to find out errors -- on option set or on rc.conf read
++def compile_byte_regex(rgx):
++    """Adapt unicode regex to match bytearray.
++
++    EXPL: impossible unicode matching: esc seq for F1-F12, etc isn't decodable
++    NOTE: 'rgx' arg can be unicode 'str', bytes, or already compiled regex
++    WARN: take care of escaping regex syntax in term seq by yourself
++    WARN: for multibyte chars use alteration u'(a|b)' instead of set u'[ab]
++    """
++    try:
++        return re.compile(_utf8_to_bytes(rgx))
++    except re.error:
++        if _DEBUG:
++            raise
++        else:
++            # XXX: fm.notify(e, bad=True) is unavailable when ui is down
++            return _DEFAULT_REGEX
++
++
++def watch_sequence(query_byte, comp_rgx):
++    """Accumulate and recognize any esc seq: F1-F12, arrows, multibyte, etc.
++
++    BUT:(minor drawback): each keypress inevitably increases 'buf' size to match
++    """
++    buf = bytearray()
++    m = None
++    while not m:
++        buf += query_byte()
++        m = comp_rgx.search(buf)
++        # DEV:TODO: prompt typed keys immediate echo
++        if _DEBUG:
++            import sys
++            sys.stdout.write(repr(bytes(buf)) + "\r\n")
++            sys.stdout.flush()
++    return bytes(m.group(0))
++
++
++def wait_input_regex(fd, u_rgx):
++    global _DEBUG
++    try:
++        _DEBUG = ranger.arg.debug
++    except AttributeError:
++        _DEBUG = None
++
++    comp_rgx = compile_byte_regex(u_rgx)
++    with EnforceRawMode(fd) as raw_fd:
++        # EXPL: Used lambda for unit testing
++        return watch_sequence(lambda: os.read(raw_fd, 1), comp_rgx)
+diff --git a/tests/ranger/ext/__init__.py b/tests/ranger/ext/__init__.py
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/tests/ranger/ext/test_wait_input_regex.py b/tests/ranger/ext/test_wait_input_regex.py
+new file mode 100644
+index 00000000..adfa0b7d
+--- /dev/null
++++ b/tests/ranger/ext/test_wait_input_regex.py
+@@ -0,0 +1,91 @@
++# -*- coding: utf-8 -*-
++# NOTE: can't use "doctest" for comparing byte strings in portable way
++#   => SEE: https://github.com/moreati/b-prefix-all-the-doctests
++# DEBUG:(manual)
++#   $ ./ranger.py --debug --cmd 'chain shell -w echo; quit'
++
++import re
++import pytest
++import ranger.ext.wait_input_regex as wir
++
++
++cbr = wir.compile_byte_regex
++wseq = wir.watch_sequence
++
++
++def test_compile_byte_regex():
++    b = b'\r\n\x03'
++    r = re.compile(b)
++
++    assert r == cbr(r)
++    assert r == cbr(b)
++    assert r == cbr('\r\n\x03')
++    assert r.pattern == cbr(u'\r\n\x03').pattern
++    assert r == cbr(u'\r\n\x03')
++    assert re.compile(b'') == cbr('')
++
++    if wir._DEBUG:
++        with pytest.raises(re.error):
++            cbr('[\r')
++    else:
++        assert cbr('[\r') == wir._DEFAULT_REGEX
++
++
++def ws(s, r, c=3):
++    # add some random context
++    if (c & 0x1) != 0:
++        s += '$\n'
++    if (c & 0x2) != 0:
++        s = 'any' + s
++    g = iter(wir._utf8_to_bytes(s))
++    return wseq(lambda: bytearray([next(g)]), cbr(r))
++
++
++def test_wseq_dfl():
++    assert b'\r' == ws('\r', '\r')
++    assert b'\r' == ws('\r', '[\n\r\x03]')
++    assert b'\x03' == ws('\x03', '[\n\r\x03]')
++    assert b'\t' == ws('\t', '[ \t]')
++    assert b' ' == ws(' ', '[ \t]')
++
++
++def test_wseq_any():
++    assert b'' == ws('a', '', 1)
++    assert b'' == ws('J', '', 1)
++    assert b'' == ws(' ', '', 1)
++    assert b'' == ws('\r', '', 1)
++    assert b'' == ws('\x03', '', 1)
++    assert b'' == ws('\x1bOR', '', 1)
++
++    assert b'a' == ws('a', '.', 1)
++    assert b'J' == ws('J', '.', 1)
++    assert b' ' == ws(' ', '.', 1)
++    assert b'\r' == ws('\r', '.', 1)
++    assert b'\x03' == ws('\x03', '.', 1)
++    assert b'\x1b' == ws('\x1bOR', '.', 1)
++
++
++def test_wseq_special():
++    # WARN: take care of escaping regex syntax in term seq by yourself
++    assert b'\x1b[A' == ws('\x1b[A', '\x1b\[A')
++    assert b'\x1b[A' == ws('\x1b[A', '\x1b\[[ABCD]')
++    assert b'\x1b[D' == ws('\x1b[D', '\x1b\[[ABCD]')
++    assert b'\x1bOP' == ws('\x1bOP', '\x1bO[PQRS]')
++    assert b'\x1bOQ' == ws('\x1bOQ', '\x1bO[PQRS]')
++
++
++def test_wseq_utf8():
++    assert b'' == ws(u'☼', '')
++    assert b'\x61' == ws(u'☼', '.')  # Bytes are different code point
++    assert u'☼'.encode('utf-8') == ws(u'☼', u'\u263c')
++    assert u'д'.encode('utf-8') == ws(u'выход', u'д')
++
++    # BAD:(limitation) u'[ыд]' compiled to incompatible b'[\xd1\x8b\xd0\xb4]'
++    #   => ALT: for unicode use alteration '(ы|д)' which works as expected
++    assert u'ы'.encode('utf-8') == ws(u'выход', u'(ы|д)')
++
++
++def test_wseq_peculiar():
++    assert b'  ' == ws(' any  ', '(  |jj)')
++    assert b'jj' == ws('j any jj', '(  |jj)')
++    assert b'exit\r' == ws('e ex exit exit any exit\r', 'exit\r')
