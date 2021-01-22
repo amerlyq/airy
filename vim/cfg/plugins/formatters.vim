@@ -29,9 +29,9 @@ call dein#add('junegunn/vim-easy-align', {
 
 
 "" HACK: lyrics multicolumn /multiverse editor to show in ncmpcpp
-call dein#add('amerlyq/lyrics-ed.vim', {
-  \ 'on_func': 'lyrics#',
-  \ 'on_cmd': ['LyricsLoad', 'Lyrics*']})
+" call dein#add('amerlyq/lyrics-ed.vim', {
+"   \ 'on_func': 'lyrics#',
+"   \ 'on_cmd': ['LyricsLoad', 'Lyrics*']})
 
 
 
