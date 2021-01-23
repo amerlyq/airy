@@ -1,19 +1,19 @@
 # vim:ft=sh
 ## Recursive repo
-# __rgit_dfl=~/aura  # TODO: set dfl dir in profile
+# __rgit_dfl=/@/=tag=/git  # TODO: set dfl dir in profile
 # TODO: r.git-all-status "${2:-${1:-$__rgit_dfl}}"
 #   = from any dir user '.' to replace dfl dir by current
 #   ALT: filter-out dfl dir from args list -- scripts could use PWD
 # DEV: by default 'Gs' must show only repos with "unclear" status
 alias Ga='r.git-all'
 alias Gu='r.git-all-status'
-alias Gs='Gu ~/aura'
-alias Gt='Ga ~/aura status -s -unormal'
-alias Gd='Ga ~/aura diff'
+alias Gs='Gu /@/=tag=/git'
+alias Gt='Ga /@/=tag=/git status -s -unormal'
+alias Gd='Ga /@/=tag=/git diff'
 alias Gdw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
 alias Gl.='r.git-all-pull'
-alias Gl='Gl. ~/aura'
-alias Gp='r.git-all-push ~/aura'
+alias Gl='Gl. /@/=tag=/git'
+alias Gp='r.git-all-push /@/=tag=/git'
 
 # {{{ state analysis
 alias G.="find -type d -name .git -prune -printf '%h\\n'"
