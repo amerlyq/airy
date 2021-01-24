@@ -5,6 +5,33 @@ call dein#add('hynek/vim-python-pep8-indent', {
 
 
 
+"" [Syntax] (async linting) https://github.com/dense-analysis/ale
+" DFL: ['flake8', 'mypy', 'pylint', 'pyright']
+" VIZ:linters: ['bandit', 'flake8', 'jedils', 'mypy', 'prospector', 'pycodestyle', 'pydocstyle', 'pyflakes', 'pylama', 'pylint', 'pyls', 'pyre', 'pyright', 'vulture']
+" VIZ:fixers: ['autoimport', ...
+" ALSO: 'javascript': ['eslint'],
+" TALK:(flake.vs.pylint): https://github.com/dense-analysis/ale/issues/3168 ⌇⡠⠍⣤⡵
+" TALK:(fixers+=yapf): Why black over yapf? | Hacker News ⌇⡠⠍⣣⡖
+"   https://news.ycombinator.com/item?id=17155048
+" SEIZE:(linter status): https://www.vimfromscratch.com/articles/vim-for-python/
+" TODO: pytest, nosetest, isort, black
+" FAIL:(autoimport): moves imports outside conditions and above shebang
+call dein#add('dense-analysis/ale', {
+  \ 'on_ft': 'python',
+  \ 'on_cmd': ['ALEInfo', 'ALEFix'],
+  \ 'hook_source': "
+\\n   let g:ale_linters_explicit = 1
+\\n   let g:ale_linters = { 'python': ['flake8', 'pylint'] }
+\\n   let g:ale_python_pylint_use_msg_id = 1
+\\n   let g:ale_python_pylint_options = '--disable=C0103,C0111,W0511'
+\\n
+\\n   let g:ale_fixers = { 'python': ['black', 'isort'] }
+\\n   let g:ale_fix_on_save = 1
+\\n   let g:ale_fix_on_save_ignore = { 'python': [] }
+\"})
+
+
+
 " BUG: update error
 " on_cmd: Pyimport
 call dein#add('davidhalter/jedi-vim', {
