@@ -12,12 +12,19 @@ alias .....='cd ../../../../'
 # SEE:(smart_cd) http://zshwiki.org/home/examples/functions
 # BAD: "/ljsd" => "" => cd "" => cd $PWD
 # MAYBE:BET: directly "edit" file (like ranger) instead of "cd /dir" of file ?
-cdauto() { ((!$#)) || local p=${*: -1}
+cdauto() { ((!$#)) || local p=${*: -1} d l
   if [[ -z ${1-} || $p == - || -d $p ]]; then
     builtin cd "$@" || return
   elif [[ ${1-} == -l ]]; then
     builtin cd "${p%/*}" || return
-    p=$(readlink "$p")
+    l=$(readlink "$p")
+    if [[ $l == /* ]]; then
+      d=$(realpath "${p%/*}")
+      p=${p%/*}/$(realpath --relative-to="$d" -- "$(realpath "$p")")
+    else
+      p=$l
+    fi
+    echo "${p%/*}"
     builtin cd "${p%/*}" || return
     $EDITOR -- "${p##*/}"
   elif [[ ${1-} == -L ]]; then

@@ -11,5 +11,5 @@ linkcp -t ~/.ipython/profile_default 'ipython_config.py'
 
 # WARN:(search-path): '.' -> std-lib -> user-pkg -> aura -> sys-pkg
 dst=$(python -m site --user-site)
-echo /@/lib/python > "$dst/aura.pth"
+echo /@/lib > "$dst/aura.pth"
 python -m site  # DEBUG:INFO

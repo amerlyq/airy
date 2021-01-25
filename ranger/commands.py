@@ -1,21 +1,27 @@
+import os
+import re
+from os import path as fs
+
 from ranger.api.commands import Command
 from ranger.ext.shell_escape import shell_quote
-
-import re
-import os
-from os import path as fs
 
 
 # NOTE: jump to next day only at 7:00AM
 def today_date(delta=7):
     import datetime
-    return (datetime.datetime.now() - datetime.timedelta(hours=delta)).strftime('%Y-%m-%d')
+
+    return (datetime.datetime.now() - datetime.timedelta(hours=delta)).strftime(
+        "%Y-%m-%d"
+    )
+
 
 # BAD: ranger crash on exit if '--choosedir' path was deleted by 3rd party
 def tmpfile(nm):
     ge = os.getenv
-    tmp = ge('RANGER_TMPDIR', fs.join(
-        ge('TMPDIR', fs.join('/tmp', ge('USER', ''), 'ranger'))))
+    tmp = ge(
+        "RANGER_TMPDIR",
+        fs.join(ge("TMPDIR", fs.join("/tmp", ge("USER", ""), "ranger"))),
+    )
     if not fs.isdir(tmp):
         os.mkdir(tmp)
     return fs.join(tmp, nm)
@@ -26,8 +32,9 @@ class ag(Command):
 
     Looks for a string in all marked paths or current dir
     """
-    editor = os.getenv('EDITOR') or 'vim'
-    acmd = 'ag --smart-case --group --color --hidden'  # --search-zip
+
+    editor = os.getenv("EDITOR") or "vim"
+    acmd = "ag --smart-case --group --color --hidden"  # --search-zip
     qarg = re.compile(r"""^(".*"|'.*')$""")
     patterns = []
     # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
@@ -45,7 +52,7 @@ class ag(Command):
     def _arg(self, i=1):
         if self.rest(i):
             ag.patterns.append(self.rest(i))
-        return ag.patterns[-1] if ag.patterns else ''
+        return ag.patterns[-1] if ag.patterns else ""
 
     def _quot(self, patt):
         return patt if ag.qarg.match(patt) else shell_quote(patt)
@@ -53,31 +60,32 @@ class ag(Command):
     def _bare(self, patt):
         return patt[1:-1] if ag.qarg.match(patt) else patt
 
-    def _aug_vim(self, iarg, comm='Ag'):
-        if self.arg(iarg) == '-Q':
+    def _aug_vim(self, iarg, comm="Ag"):
+        if self.arg(iarg) == "-Q":
             self.shift()
-            comm = 'sil AgSet def.e.literal 1|' + comm
+            comm = "sil AgSet def.e.literal 1|" + comm
         # patt = self._quot(self._arg(iarg))
         patt = self._arg(iarg)  # No need to quote in new ag.vim
         # FIXME:(add support)  'AgPaths' + self._sel()
-        cmd = ' '.join([comm, patt])
-        cmdl = [ag.editor, '-c', cmd, '-c', 'only']
-        return (cmdl, '')
+        cmd = " ".join([comm, patt])
+        cmdl = [ag.editor, "-c", cmd, "-c", "only"]
+        return (cmdl, "")
 
     def _aug_nvr(self, iarg, group=None):
-        cmdl = 'ag --smart-case --hidden'.split()
+        cmdl = "ag --smart-case --hidden".split()
         if group:
-            cmdl += ['--column', '--group']
+            cmdl += ["--column", "--group"]
         else:
-            cmdl += ['--vimgrep']
+            cmdl += ["--vimgrep"]
 
         if iarg == 1:
             import shlex
+
             cmdl += shlex.split(self.rest(iarg))
         else:
             # NOTE: only allowed switches
             opt = self.arg(iarg)
-            while opt in ['-Q', '-w']:
+            while opt in ["-Q", "-w"]:
                 self.shift()
                 cmdl.append(opt)
                 opt = self.arg(iarg)
@@ -86,57 +94,70 @@ class ag(Command):
             cmdl.append(patt)
 
         if group:
-            cmdl += ['|', ag.editor, '-', '+"setl noro ma bt=nofile"', '+"set cole=0 fdl=1|setf ag_grp"']
+            cmdl += [
+                "|",
+                ag.editor,
+                "-",
+                '+"setl noro ma bt=nofile"',
+                '+"set cole=0 fdl=1|setf ag_grp"',
+            ]
         else:
             # BUG:(bdelete 1): we close wrong buffer for ranger-filechooser.vim (because it reads into last buffer)
-            cmdl += ['|sort|', ag.editor, '+"setl noro ma bt=nofile|cbuffer|copen"', '-']
-        return (' '.join(cmdl), '')
+            cmdl += [
+                "|sort|",
+                ag.editor,
+                '+"setl noro ma bt=nofile|cbuffer|copen"',
+                "-",
+            ]
+        return (" ".join(cmdl), "")
 
     def _aug_sh(self, iarg, flags=[]):
         cmdl = ag.acmd.split() + flags
         if iarg == 1:
             import shlex
+
             cmdl += shlex.split(self.rest(iarg))
         else:
             # NOTE: only allowed switches
             opt = self.arg(iarg)
-            while opt in ['-Q', '-w']:
+            while opt in ["-Q", "-w"]:
                 self.shift()
                 cmdl.append(opt)
                 opt = self.arg(iarg)
             # TODO: save -Q/-w into ag.patterns =NEED rewrite plugin to join _aug*()
             patt = self._bare(self._arg(iarg))  # THINK? use shlex.split() also/instead
             cmdl.append(patt)
-        if '-g' not in flags:
+        if "-g" not in flags:
             cmdl += self._sel()
-        return (cmdl, '-p')
+        return (cmdl, "-p")
 
     def _choose(self):
-        if self.arg(1) == '-v':
+        if self.arg(1) == "-v":
             return self._aug_nvr(2, False)
-        elif self.arg(1) == '-g':
+        elif self.arg(1) == "-g":
             return self._aug_nvr(2, True)
-        elif self.arg(1) == '-l':
-            return self._aug_sh(2, ['--files-with-matches', '--count'])
-        elif self.arg(1) == '-p':  # paths
-            return self._aug_sh(2, ['-g'])
-        elif self.arg(1) == '-f':
+        elif self.arg(1) == "-l":
+            return self._aug_sh(2, ["--files-with-matches", "--count"])
+        elif self.arg(1) == "-p":  # paths
+            return self._aug_sh(2, ["-g"])
+        elif self.arg(1) == "-f":
             return self._aug_sh(2)
-        elif self.arg(1) == '-r':
-            return self._aug_sh(2, ['--files-with-matches'])
-        elif self.arg(1) == '-u':
-            return self._aug_sh(2, ['--unrestricted', '--follow'])
+        elif self.arg(1) == "-r":
+            return self._aug_sh(2, ["--files-with-matches"])
+        elif self.arg(1) == "-u":
+            return self._aug_sh(2, ["--unrestricted", "--follow"])
         else:
             return self._aug_sh(1)
 
     def _catch(self, cmd):
-        from subprocess import check_output, CalledProcessError
+        from subprocess import CalledProcessError, check_output
+
         try:
             out = check_output(cmd)
         except CalledProcessError:
             return None
         else:
-            return out[:-1].decode('utf-8').splitlines()
+            return out[:-1].decode("utf-8").splitlines()
 
     # DEV
     # NOTE: regex becomes very big for big dirs
@@ -157,7 +178,7 @@ class ag(Command):
         cmd, flags = self._choose()
         # self.fm.notify(cmd)
         # TODO:ENH: cmd may be [..] -- no need to shell_escape
-        if self.arg(1) != '-r':
+        if self.arg(1) != "-r":
             self.fm.execute_command(cmd, flags=flags)
         else:
             self._filter(self._catch(cmd))
@@ -167,18 +188,37 @@ class ag(Command):
         #   <= EXPL: aliases expanded before parsing cmdline
         cmd = self.arg(0)
         flg = self.arg(1)
-        if flg[0] == '-' and flg[1] in 'flvgprw':
-            cmd += ' ' + flg
-        return ['{} {}'.format(cmd, p) for p in reversed(ag.patterns)]
+        if flg[0] == "-" and flg[1] in "flvgprw":
+            cmd += " " + flg
+        return ["{} {}".format(cmd, p) for p in reversed(ag.patterns)]
 
 
 class doc(Command):
-    lst = {'a': 'ARCH', 'b': 'DEBUG', 'c': 'CHGLOG', 'd': 'DEV', 'e': 'EXAMPLES',
-           'f': 'FUTURE', 'g': 'LEGEND', 'h': 'HACK', 'i': 'INFO', 'k': 'WORKLOG',
-           'l': 'LIOR', 'm': 'MAINT', 'n': 'NOTE', 'o': 'comment', 'r': 'README',
-           's': 'SYNERGY', 't': 'TODO', 'u': 'USAGE', 'w': 'HOWTO', 'z': 'SEIZE', '.': '.'}
-    ext = ['.nou', '.rst', '.otl', '.md', '.txt', '']
-    loci = ['doc', 'docs', '_doc', '']
+    lst = {
+        "a": "ARCH",
+        "b": "DEBUG",
+        "c": "CHGLOG",
+        "d": "DEV",
+        "e": "EXAMPLES",
+        "f": "FUTURE",
+        "g": "LEGEND",
+        "h": "HACK",
+        "i": "INFO",
+        "k": "WORKLOG",
+        "l": "LIOR",
+        "m": "MAINT",
+        "n": "NOTE",
+        "o": "comment",
+        "r": "README",
+        "s": "SYNERGY",
+        "t": "TODO",
+        "u": "USAGE",
+        "w": "HOWTO",
+        "z": "SEIZE",
+        ".": ".",
+    }
+    ext = [".nou", ".rst", ".otl", ".md", ".txt", ""]
+    loci = ["doc", "docs", "_doc", ""]
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories
     """
@@ -194,15 +234,15 @@ class doc(Command):
                     return path
 
     def execute(self):
-        nm = self.arg(1) if self.arg(1) else doc.lst['t']
-        if nm == '.':
+        nm = self.arg(1) if self.arg(1) else doc.lst["t"]
+        if nm == ".":
             # NEED: copy "_tmpl/worklog" instead of using empty file
             # FIX:BET: check/create/open symlinks "today.nou" "tomorrow.nou" "nextweek.nou"
             #   => so you could open them directly from filesystem even without ranger shortcut
             #   => relative symlink will be commited in GIT containing date of commit -- nice historical bisect
             nm = today_date()
         if self.quantifier is not None:
-            nm = '{}_{:02d}'.format(nm, self.quantifier)
+            nm = "{}_{:02d}".format(nm, self.quantifier)
         pwd = self.fm.thisdir.path
         path = self._nearest(pwd, nm, fs.isfile)
         # WARNING: opens nested editor if file don't exists!
@@ -217,19 +257,20 @@ class doc(Command):
             self.fm.edit_file(path)
 
     def tab(self):
-        return ['doc ' + nm for nm in doc.lst.values()]
+        return ["doc " + nm for nm in doc.lst.values()]
 
 
 # NOTE:NEED: in ~/.bashrc or ~/.zshrc save $PWD (not pwd) on trap EXIT
 class cd_shelldir(Command):
-    lastdir = tmpfile('cwd')
+    lastdir = tmpfile("cwd")
     """:cd_shelldir
     Goes to path from /tmp/<username>/ranger/cwd
     """
+
     def execute(self):
         try:
             fname = self.fm.confpath(cd_shelldir.lastdir)
-            with open(fname, 'r+') as f:
+            with open(fname, "r+") as f:
                 path = f.readline().rstrip()
                 f.seek(0)
                 f.truncate()
@@ -248,14 +289,15 @@ class cd_shelldir(Command):
 
 class cd_gitroot(Command):
     def execute(self):
-        from subprocess import check_output, CalledProcessError
+        from subprocess import CalledProcessError, check_output
+
         try:
             # cd fm.thisdir.path
-            out = check_output(['git', 'rev-parse', '--show-toplevel'])
+            out = check_output(["git", "rev-parse", "--show-toplevel"])
         except CalledProcessError:
             return self.fm.notify("cd_gitroot: " + out, bad=True)
         else:
-            path = out[:-1].decode('utf-8')
+            path = out[:-1].decode("utf-8")
 
         if path != fs.realpath(self.fm.thisdir.path) and fs.exists(path):
             self.fm.cd(path)
@@ -264,26 +306,32 @@ class cd_gitroot(Command):
 # Auto cd
 class cda(Command):
     def execute(self):
-        if self.arg(1) and self.arg(1)[0] == '-':
+        if self.arg(1) and self.arg(1)[0] == "-":
             flags = self.arg(1)[1:]
             path = self.rest(2)
         else:
-            flags = ''
+            flags = ""
             path = self.rest(1)
 
-        if path[0:1] == '~':
+        if path[0:1] == "~":
             path = fs.expanduser(path)
-        if path[0:1] != '/':
+        if path[0:1] != "/":
             path = fs.join(self.fm.thisdir.path, path)
 
         # Strip :lnum:lpos:
-        path = re.sub(r'(?::\d+){1,2}:?$', '', path)
+        path = re.sub(r"(?::\d+){1,2}:?$", "", path)
 
         if fs.islink(path):
-            if 'l' in flags:
+            if "l" in flags:
                 lpath = os.readlink(path)
-                path = lpath if lpath.startswith('/') else fs.join(fs.dirname(path), lpath)
-            if 'L' in flags:
+                # NOTE: resolve only basename (relative to its dir)
+                if lpath.startswith("/"):
+                    anchor = fs.realpath(fs.dirname(path))
+                    relpath = fs.relpath(fs.realpath(path), anchor)
+                    path = fs.join(fs.dirname(path), relpath)  # MAYBE:USE fs.abspath()
+                else:
+                    path = fs.join(fs.dirname(path), lpath)
+            if "L" in flags:
                 path = fs.realpath(path)
 
         if not fs.exists(path):
@@ -299,7 +347,7 @@ class df(Command):
     def execute(self):
         fls = None
         flags = ""
-        if self.arg(1) and self.arg(1)[0] == '-':
+        if self.arg(1) and self.arg(1)[0] == "-":
             flags = self.arg(1)
             self.shift()
         cmd = self.rest(1).split()
@@ -351,15 +399,15 @@ class df(Command):
         else:
             # DEV: substitute python-like placeholders -> {}, {1}, {2}
             #   else -> append filelist
-            cmd += [f.path + ('/' if f.is_directory else '') for f in fls]
+            cmd += [f.path + ("/" if f.is_directory else "") for f in fls]
             self.fm.execute_command(cmd, flags=flags)
 
 
 class nrenum(Command):
-    bmrk = re.compile(r'(.*)\{(\d+)([^}]+?)(\d+)\}$')
+    bmrk = re.compile(r"(.*)\{(\d+)([^}]+?)(\d+)\}$")
 
     def execute(self):
-        istotal = (self.arg(1)[0:2] == '-t')
+        istotal = self.arg(1)[0:2] == "-t"
         if istotal:
             self.shift()
         chg = int(self.arg(1)) if self.arg(1) else 1
@@ -374,11 +422,11 @@ class nrenum(Command):
         total, ready = int(m.group(2)), int(m.group(4))
 
         if ready == total:
-            if state.startswith('@'):
+            if state.startswith("@"):
                 ready += chg if not istotal else 0
                 total += chg if chg > 0 else 0
         elif ready > total:
-            if state.startswith('@'):
+            if state.startswith("@"):
                 total = ready if chg > 0 else total
         elif ready < total:
             if istotal:
@@ -391,34 +439,35 @@ class nrenum(Command):
         if total < 0:
             total = 0
 
-        if state.endswith('#') and ready == total:
-            state = state[:-1] + '$'
-        elif state.endswith('$') and ready < total:
-            state = state[:-1] + '#'
+        if state.endswith("#") and ready == total:
+            state = state[:-1] + "$"
+        elif state.endswith("$") and ready < total:
+            state = state[:-1] + "#"
 
         nm = "{:s}{{{:d}{:s}{:d}}}".format(name, total, state, ready)
-        return self.fm.execute_console('rename ' + nm)
+        return self.fm.execute_console("rename " + nm)
 
 
 class actualee(Command):
-    FLST = tmpfile('buffer')
+    FLST = tmpfile("buffer")
     """:actualee
     Use '~/.local/bin/actually' to apply secondary action to file/list
     """
-    def execute(self):
-        cmd = ['actualee']
 
-        if self.arg(1) and self.arg(1)[0] == '-':
+    def execute(self):
+        cmd = ["actualee"]
+
+        if self.arg(1) and self.arg(1)[0] == "-":
             cmd += [self.arg(1)]
             self.shift()
         else:
-            cmd += ['-e']
+            cmd += ["-e"]
 
         s = [f.path for f in self.fm.thisdir.files]
         index = s.index(self.fm.thisfile.path)
-        with open(actualee.FLST, 'w') as f:
+        with open(actualee.FLST, "w") as f:
             f.write("\n".join(s[index:] + s[:index]))
-            cmd += ['-l']
+            cmd += ["-l"]
 
         if self.fm.thisfile.is_file:
             cmd += [self.fm.thisfile.path]
@@ -437,9 +486,10 @@ class console(Command):
 
     Open the console with the given command.
     """
+
     def execute(self):
         pos = None
-        if self.arg(1)[0:2] == '-p':
+        if self.arg(1)[0:2] == "-p":
             try:
                 pos = int(self.arg(1)[2:])
                 self.shift()
@@ -459,6 +509,7 @@ class mvsel(Command):
 
     Move files from current selection to dir on cmdline (OR one of bookmarks)
     """
+
     def execute(self):
         dest = self.rest(1)
         self.fm.cut()
@@ -472,35 +523,40 @@ class flat_inode(Command):
     Set/Toggle inode flattened view
         <quantifier> augments missing argument: level or [fdl] bitmask
     """
+
     def q_inode_mask(self, q):
-        return '' if q is None else ('f' if q & 0x1 else '') + \
-            ('d' if q & 0x2 else '') + ('l' if q & 0x4 else '')
+        return (
+            ""
+            if q is None
+            else ("f" if q & 0x1 else "")
+            + ("d" if q & 0x2 else "")
+            + ("l" if q & 0x4 else "")
+        )
 
     def q_flat(self, q):
         return -1 if self.quantifier is None else self.quantifier
 
     def execute(self):
-        toggle = self.arg(1) == '-t'
+        toggle = self.arg(1) == "-t"
         if toggle:
             self.shift()
 
-        if re.match('^-?\d+$', self.arg(1)):
+        if re.match("^-?\d+$", self.arg(1)):
             t = self.arg(2) or self.q_inode_mask(self.quantifier)
             q = self.arg(1)
         else:
             t = self.arg(1)
             q = self.arg(2) or self.q_flat(self.quantifier)
 
-        if toggle and q == self.fm.thisdir.flat \
-           and self.fm.thisdir.inode_type_filter:
-            t, q = '', 0
+        if toggle and q == self.fm.thisdir.flat and self.fm.thisdir.inode_type_filter:
+            t, q = "", 0
 
         self.fm.notify(self.fm.thisdir.inode_type_filter)
-        cmd = 'chain filter_inode_type ' + t + '; flat ' + str(q)
+        cmd = "chain filter_inode_type " + t + "; flat " + str(q)
         self.fm.execute_console(cmd)
 
     def tab(self):
-        return ['flat_inode ' + t for t in 'dfl']
+        return ["flat_inode " + t for t in "dfl"]
 
 
 class edit(Command):
@@ -513,8 +569,8 @@ class edit(Command):
         if not self.arg(1):
             self.fm.edit_file(self.fm.thisfile.path)
         # BAD: don't work
-        elif self.rest(1) in ['.', ' ']:
-            self.fm.edit_file('')
+        elif self.rest(1) in [".", " "]:
+            self.fm.edit_file("")
         else:
             self.fm.edit_file(self.rest(1))
 
@@ -523,8 +579,7 @@ class edit(Command):
 
 
 class mkdircd(Command):
-    """:md <dirname> OR :mkdircd <dirname>
-    """
+    """:md <dirname> OR :mkdircd <dirname>"""
 
     def execute(self):
         nm = self.rest(1)
