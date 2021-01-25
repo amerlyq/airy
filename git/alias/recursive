@@ -7,13 +7,13 @@
 # DEV: by default 'Gs' must show only repos with "unclear" status
 alias Ga='r.git-all'
 alias Gu='r.git-all-status'
-alias Gs='Gu /@/=tag=/git'
-alias Gt='Ga /@/=tag=/git status -s -unormal'
-alias Gd='Ga /@/=tag=/git diff'
+alias Gs='Gu /@/=tag=/aura'
+alias Gt='Ga /@/=tag=/aura status -s -unormal'
+alias Gd='Ga /@/=tag=/aura diff'
 alias Gdw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
 alias Gl.='r.git-all-pull'
-alias Gl='Gl. /@/=tag=/git'
-alias Gp='r.git-all-push /@/=tag=/git'
+alias Gl='Gl. /@/=tag=/aura'
+alias Gp='r.git-all-push /@/=tag=/aura'
 
 # {{{ state analysis
 alias G.="find -type d -name .git -prune -printf '%h\\n'"
