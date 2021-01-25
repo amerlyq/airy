@@ -3,11 +3,11 @@ cd "$(readlink -e "${0%/*}")"
 source "${PWD%/*}/funcs-lib"
 
 wacom "$WPAD" <<EOT
-  Button   2    "key 5"         # fullscreen
-  Button   3    "key 4"         # underline
+  Button   2    "key 5"         # hi RED
+  Button   3    "key 4"         # hi GREN
   Button   8    "13"            # [RING MODE] :: mscroll / mzoom
   AbsWheelUp    "5"             # mwheel up
-  Button   1    "key ctrl 1"    # mode=browse
+  Button   1    "key ctrl K"    # keep-active
   AbsWheelDown  "4"             # mwheel down
   Button   9    "key 1"         # pen BLUE
   Button  10    "key 2"         # hi ORNG
