@@ -14,12 +14,12 @@ if distro arch; then
   pkg_inst xorg-xev
   # ALT: |aur/perwindowlayoutd|
   aur_inst kbdd-git  # FIXME:(upstream): makedeps+=python3
-  aur_inst xcape-git
+  # aur_inst xcape-git
   aur_inst xkbset  # NOTE: only yaourt ayr_inst installs w/o error?
 
 elif distro ubuntu; then
   pkg_inst kbdd
   # FIXED???, works after reboot only after you once press REAL Control_L
-  git_inst 'alols/xcape'
+  # git_inst 'alols/xcape'
   echo "Err: not enough"
 fi

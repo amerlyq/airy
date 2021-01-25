@@ -21,4 +21,5 @@ running_X && ./run
 # dbus=/usr/share/dbus-1/system-services
 # linkcp -c ./unit/kbdd-dbus.service "$dbus/ru.gentoo.KbddService"
 # BUG: https://bbs.archlinux.org/viewtopic.php?id=172798
-svc_activate -cue {kbdd,xcape}.service
+# DISABLED:(xcape.service): unnecessary for ZSA Moonlander
+svc_activate -cue kbdd.service
