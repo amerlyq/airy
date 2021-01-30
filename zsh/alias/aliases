@@ -2,6 +2,10 @@
 [[ -n ${ZSH_NAME-} ]] || return 0  ## Global aliases. Zsh only
 # ATTENTION: disallow aliases after commands requiring args
 
+## lib
+alias j='/@/lib/ctl'
+alias -g J='|/@/lib/ctl'
+
 alias hh='fc -l 1 | grep -E '
 
 # Expand in any place of cmdline.
