@@ -29,6 +29,12 @@
 #   i.e. when comitting from inside @/devq/pj/wm[/src] -> generate "[wm] msg" .instead-of. "[pj] msg"
 #   ALT: use current PWD as prefix when using "gc@/gcd" command
 #
+# IDEA: suggest one of possible messages based on heuristic analysis of diff content
+#   e.g. if it contains my evrywhere-notches or some keywords, etc.
+#   => suggest as <Tab> completion or open git commit message editor (vis) with list of commented lines to edit
+#
+# IDEA: if you only added https:// links (with or w/o xtrefs) -- use "add 5 refs" message instead of diff +/- lines
+#
 # NICE: when committing group of files -- embed mtime into extended commit message in .toml or keyval FMT
 #   i.e. use table FMT(mtime path)
 #   ALT: place table into git annotations BUT they can be removed ...
