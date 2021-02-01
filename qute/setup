@@ -23,6 +23,7 @@ if (( "$(r.xorg -d||echo 0)" > 141 )); then
 fi
 
 ### UPDATE ###
+## DEPRECATED?(!qute>=2.0.1): uses AdBlockPlus now
 dst=~/.local/share/qutebrowser/blocked-hosts
 if running_X && (cfgOpt r || [[ ! -f $dst ]])
 then qutebrowser :adblock-update & fi

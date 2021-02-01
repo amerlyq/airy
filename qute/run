@@ -33,6 +33,7 @@ esac
 # WARN: can crash on Nouveau
 # OBSOLETE:(BAD): "webengine" is newer, but no Caret and white CSS on reload
 # BAD:SECU: --enable-webengine-inspector
+#   << With Qt 5.11 and newer, the inspector/devtools are enabled unconditionally.
 # SECU: $ --qt-flag disable-reading-from-canvas
 #   FAIL:(2020-04 onwards): #5345 youtube disappering controls
 exec qutebrowser --backend "$web" "$@"

@@ -10,15 +10,16 @@
 ##   qute://help/configuring.html
 ##   qute://help/settings.html
 ## SEE: :open qute://configdiff  # @me
+## USE: :config-write-py --force --defaults /t/current.py
 
 ## @me
 # REF: /usr/lib/python3.6/site-packages/qutebrowser
-# c = c  # noqa: F821
-# config = config  # noqa: F821
+c = c  # noqa: F821
+config = config  # noqa: F821
 
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
-# config.load_autoconfig()
+config.load_autoconfig(True)
 
 ## Aliases for commands. The keys of the given dictionary are the
 ## aliases, while the values are the commands they map to.
@@ -40,17 +41,25 @@
 # c.auto_save.session = False
 
 ## Backend to use to display websites. qutebrowser supports two different
-## web rendering engines / backends, QtWebKit and QtWebEngine. QtWebKit
-## was discontinued by the Qt project with Qt 5.6, but picked up as a
-## well maintained fork: https://github.com/annulen/webkit/wiki -
-## qutebrowser only supports the fork. QtWebEngine is Qt's official
-## successor to QtWebKit. It's slightly more resource hungry than
-## QtWebKit and has a couple of missing features in qutebrowser, but is
-## generally the preferred choice.
+## web rendering engines / backends, QtWebEngine and QtWebKit (not
+## recommended). QtWebEngine is Qt's official successor to QtWebKit, and
+## both the default/recommended backend. It's based on a stripped-down
+## Chromium and regularly updated with security fixes and new features by
+## the Qt project: https://wiki.qt.io/QtWebEngine QtWebKit was
+## qutebrowser's original backend when the project was started. However,
+## support for QtWebKit was discontinued by the Qt project with Qt 5.6 in
+## 2016. The development of QtWebKit was picked up in an official fork:
+## https://github.com/qtwebkit/qtwebkit - however, the project seems to
+## have stalled again. The latest release (5.212.0 Alpha 4) from March
+## 2020 is based on a WebKit version from 2016, with many known security
+## vulnerabilities. Additionally, there is no process isolation and
+## sandboxing. Due to all those issues, while support for QtWebKit is
+## still available in qutebrowser for now, using it is strongly
+## discouraged.
 ## Type: String
 ## Valid values:
-##   - webengine: Use QtWebEngine (based on Chromium).
-##   - webkit: Use QtWebKit (based on WebKit, similar to Safari).
+##   - webengine: Use QtWebEngine (based on Chromium - recommended).
+##   - webkit: Use QtWebKit (based on WebKit, similar to Safari - many known security issues!).
 # c.backend = 'webengine'
 
 ## This setting can be used to map keys to other keys. When the key used
@@ -61,6 +70,15 @@
 ## the mapping is ignored.
 ## Type: Dict
 # c.bindings.key_mappings = {'<Ctrl-[>': '<Escape>', '<Ctrl-6>': '<Ctrl-^>', '<Ctrl-M>': '<Return>', '<Ctrl-J>': '<Return>', '<Ctrl-I>': '<Tab>', '<Shift-Return>': '<Return>', '<Enter>': '<Return>', '<Shift-Enter>': '<Return>', '<Ctrl-Enter>': '<Ctrl-Return>'}
+
+## When to show a changelog after qutebrowser was upgraded.
+## Type: String
+## Valid values:
+##   - major: Show changelog for major upgrades (e.g. v2.0.0 -> v3.0.0).
+##   - minor: Show changelog for major and minor upgrades (e.g. v2.0.0 -> v2.1.0).
+##   - patch: Show changelog for major, minor and patch upgrades (e.g. v2.0.0 -> v2.0.1).
+##   - never: Never show changelog after upgrades.
+# c.changelog_after_upgrade = 'minor'
 
 ## Background color of the completion widget category headers.
 ## Type: QssColor
@@ -258,7 +276,7 @@
 
 ## Foreground color of a warning message.
 ## Type: QssColor
-# c.colors.messages.warning.fg = 'white'
+# c.colors.messages.warning.fg = 'black'
 # c.colors.messages.warning.fg = 'lime'  # @me
 
 ## Background color for prompts.
@@ -272,7 +290,7 @@
 ## Foreground color for prompts.
 ## Type: QssColor
 # c.colors.prompts.fg = 'white'
-c.colors.prompts.fg = 'lime'  # @me
+c.colors.prompts.fg = "lime"  # @me
 
 ## Background color for the selected item in filename prompts.
 ## Type: QssColor
@@ -353,7 +371,7 @@ c.colors.prompts.fg = 'lime'  # @me
 ## Default foreground color of the URL in the statusbar.
 ## Type: QssColor
 # c.colors.statusbar.url.fg = 'white'
-c.colors.statusbar.url.fg = 'lime'  # @me
+c.colors.statusbar.url.fg = "lime"  # @me
 
 ## Foreground color of the URL in the statusbar for hovered links.
 ## Type: QssColor
@@ -468,10 +486,11 @@ c.colors.statusbar.url.fg = 'lime'  # @me
 # c.colors.webpage.bg = 'white'
 
 ## Which algorithm to use for modifying how colors are rendered with
-## darkmode.
+## darkmode. The `lightness-cielab` value was added with QtWebEngine 5.14
+## and is treated like `lightness-hsl` with older QtWebEngine versions.
 ## Type: String
 ## Valid values:
-##   - lightness-cielab: Modify colors by converting them to CIELAB color space and inverting the L value.
+##   - lightness-cielab: Modify colors by converting them to CIELAB color space and inverting the L value. Not available with Qt < 5.14.
 ##   - lightness-hsl: Modify colors by converting them to the HSL color space and inverting the lightness (i.e. the "L" in HSL).
 ##   - brightness-rgb: Modify colors by subtracting each of r, g, and b from their maximum value.
 # c.colors.webpage.darkmode.algorithm = 'lightness-cielab'
@@ -506,16 +525,15 @@ c.colors.statusbar.url.fg = 'lime'  # @me
 ## Type: Float
 # c.colors.webpage.darkmode.grayscale.images = 0.0
 
-## Which images to apply dark mode to. WARNING: With QtWebengine 5.15.0,
-## this setting can cause frequent renderer process crashes due to a
+## Which images to apply dark mode to. With QtWebEngine 5.15.0, this
+## setting can cause frequent renderer process crashes due to a
 ## https://codereview.qt-project.org/c/qt/qtwebengine-
-## chromium/+/304211[bug in Qt]. Thus, the 'smart' setting is ignored and
-## treated like 'never' in that case.
+## chromium/+/304211[bug in Qt].
 ## Type: String
 ## Valid values:
 ##   - always: Apply dark mode filter to all images.
 ##   - never: Never apply dark mode filter to any images.
-##   - smart: Apply dark mode based on image content.
+##   - smart: Apply dark mode based on image content. Not available with Qt 5.15.0.
 # c.colors.webpage.darkmode.policy.images = 'smart'
 
 ## Which pages to apply dark mode to.
@@ -554,6 +572,12 @@ c.completion.cmd_history_max_items = 1000  # @me
 ## Type: Int
 # c.completion.delay = 0
 
+## Default filesystem autocomplete suggestions for :open. The elements of
+## this list show up in the completion window under the Filesystem
+## category when the command line contains `:open` but no argument.
+## Type: List of String
+# c.completion.favorite_paths = []
+
 ## Height (in pixels or as percentage of the window) of the completion.
 ## Type: PercOrInt
 # c.completion.height = '50%'
@@ -569,8 +593,9 @@ c.completion.cmd_history_max_items = 1000  # @me
 ##   - quickmarks
 ##   - bookmarks
 ##   - history
-# c.completion.open_categories = ['searchengines', 'quickmarks', 'bookmarks', 'history']
-# c.completion.open_categories = ['history', 'searchengines', 'quickmarks', 'bookmarks']  # @me
+##   - filesystem
+# c.completion.open_categories = ['searchengines', 'quickmarks', 'bookmarks', 'history', 'filesystem']
+# c.completion.open_categories = ['history', 'filesystem', 'searchengines', 'quickmarks', 'bookmarks']  # @me
 
 ## Move on to the next part when there's only one possible completion
 ## left.
@@ -612,9 +637,9 @@ c.completion.cmd_history_max_items = 1000  # @me
 
 ## A list of patterns which should not be shown in the history. This only
 ## affects the completion. Matching URLs are still saved in the history
-## (and visible on the qute://history page), but hidden in the
-## completion. Changing this setting will cause the completion history to
-## be regenerated on the next start, which will take a short while.
+## (and visible on the `:history` page), but hidden in the completion.
+## Changing this setting will cause the completion history to be
+## regenerated on the next start, which will take a short while.
 ## Type: List of UrlPattern
 # c.completion.web_history.exclude = []
 
@@ -632,10 +657,62 @@ c.completion.cmd_history_max_items = 1000  # @me
 ##   - never: Never show a confirmation.
 # c.confirm_quit = ['never']
 
-## Automatically start playing `<video>` elements. Note: On Qt < 5.11,
-## this option needs a restart and does not support URL patterns.
+## Automatically start playing `<video>` elements.
 ## Type: Bool
 # c.content.autoplay = True
+
+## List of URLs to ABP-style adblocking rulesets.  Only used when Brave's
+## ABP-style adblocker is used (see `content.blocking.method`).  You can
+## find an overview of available lists here:
+## https://adblockplus.org/en/subscriptions - note that the special
+## `subscribe.adblockplus.org` links aren't handled by qutebrowser, you
+## will instead need to find the link to the raw `.txt` file (e.g. by
+## extracting it from the `location` parameter of the subscribe URL and
+## URL-decoding it).
+## Type: List of Url
+# c.content.blocking.adblock.lists = ['https://easylist.to/easylist/easylist.txt', 'https://easylist.to/easylist/easyprivacy.txt']
+
+## Enable the ad/host blocker
+## Type: Bool
+# c.content.blocking.enabled = True
+
+## List of URLs to host blocklists for the host blocker.  Only used when
+## the simple host-blocker is used (see `content.blocking.method`).  The
+## file can be in one of the following formats:  - An `/etc/hosts`-like
+## file - One host per line - A zip-file of any of the above, with either
+## only one file, or a file   named `hosts` (with any extension).  It's
+## also possible to add a local file or directory via a `file://` URL. In
+## case of a directory, all files in the directory are read as adblock
+## lists.  The file `~/.config/qutebrowser/blocked-hosts` is always read
+## if it exists.
+## Type: List of Url
+# c.content.blocking.hosts.lists = ['https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts']
+
+## Which method of blocking ads should be used.  Support for Adblock Plus
+## (ABP) syntax blocklists using Brave's Rust library requires the
+## `adblock` Python package to be installed, which is an optional
+## dependency of qutebrowser. It is required when either `adblock` or
+## `both` are selected.
+## Type: String
+## Valid values:
+##   - auto: Use Brave's ABP-style adblocker if available, host blocking otherwise
+##   - adblock: Use Brave's ABP-style adblocker
+##   - hosts: Use hosts blocking
+##   - both: Use both hosts blocking and Brave's ABP-style adblocker
+# c.content.blocking.method = 'auto'
+
+## A list of patterns that should always be loaded, despite being blocked
+## by the ad-/host-blocker. Local domains are always exempt from
+## adblocking. Note this whitelists otherwise blocked requests, not
+## first-party URLs. As an example, if `example.org` loads an ad from
+## `ads.example.org`, the whitelist entry could be
+## `https://ads.example.org/*`. If you want to disable the adblocker on a
+## given page, use the `content.blocking.enabled` setting with a URL
+## pattern instead.
+## Type: List of UrlPattern
+# c.content.blocking.whitelist = []
+c.content.blocking.whitelist = ["adf.ly"]
+# ALSO: 'www.googleadservices.com' -- to be able to click found goods in google search
 
 ## Enable support for the HTML 5 web application cache feature. An
 ## application cache acts like an HTTP cache in some sense. For documents
@@ -649,7 +726,7 @@ c.completion.cmd_history_max_items = 1000  # @me
 ## page cache allows for a nicer user experience when navigating forth or
 ## back to pages in the forward/back history, by pausing and resuming up
 ## to _n_ pages. For more information about the feature, please refer to:
-## http://webkit.org/blog/427/webkit-page-cache-i-the-basics/
+## https://webkit.org/blog/427/webkit-page-cache-i-the-basics/
 ## Type: Int
 # c.content.cache.maximum_pages = 0
 
@@ -681,8 +758,7 @@ c.completion.cmd_history_max_items = 1000  # @me
 ##   - never: Don't accept cookies at all.
 # c.content.cookies.accept = 'all'  # @me WTF:(why there is no 'ask'):
 
-## Store cookies. Note this option needs a restart with QtWebEngine on Qt
-## < 5.9.
+## Store cookies.
 ## Type: Bool
 # c.content.cookies.store = True
 
@@ -690,10 +766,9 @@ c.completion.cmd_history_max_items = 1000  # @me
 ## describing an encoding such as _utf-8_, _iso-8859-1_, etc.
 ## Type: String
 # c.content.default_encoding = 'iso-8859-1'
-c.content.default_encoding = 'utf-8'  # @me
+c.content.default_encoding = "utf-8"  # @me
 
-## Allow websites to share screen content. On Qt < 5.10, a dialog box is
-## always displayed, even if this is set to "true".
+## Allow websites to share screen content.
 ## Type: BoolAsk
 ## Valid values:
 ##   - true
@@ -733,7 +808,7 @@ c.content.geolocation = False  # @me
 ## read from JavaScript is always the global value.
 ## Type: String
 # c.content.headers.accept_language = 'en-US,en;q=0.9'
-c.content.headers.accept_language = 'en-US,en;q=0.5'  # @me
+c.content.headers.accept_language = "en-US,en;q=0.5"  # @me
 # INFO: https://stackoverflow.com/questions/8552927/what-is-q-0-5-in-accept-http-headers
 
 ## Custom headers for qutebrowser HTTP requests.
@@ -773,35 +848,6 @@ c.content.headers.accept_language = 'en-US,en;q=0.5'  # @me
 ## Type: FormatString
 # c.content.headers.user_agent = 'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}'
 
-## Enable host blocking.
-## Type: Bool
-# c.content.host_blocking.enabled = True
-
-## List of URLs of lists which contain hosts to block.  The file can be
-## in one of the following formats:  - An `/etc/hosts`-like file - One
-## host per line - A zip-file of any of the above, with either only one
-## file, or a file   named `hosts` (with any extension).  It's also
-## possible to add a local file or directory via a `file://` URL. In case
-## of a directory, all files in the directory are read as adblock lists.
-## The file `~/.config/qutebrowser/blocked-hosts` is always read if it
-## exists.
-## Type: List of Url
-# c.content.host_blocking.lists = ['https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts']
-# @me OLD: c.content.host_blocking.lists = ['https://www.malwaredomainlist.com/hostslist/hosts.txt', 'http://someonewhocares.org/hosts/hosts', 'http://winhelp2002.mvps.org/hosts.zip', 'http://malwaredomains.lehigh.edu/files/justdomains.zip', 'https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&mimetype=plaintext']
-
-## A list of patterns that should always be loaded, despite being ad-
-## blocked. Note this whitelists blocked hosts, not first-party URLs. As
-## an example, if `example.org` loads an ad from `ads.example.org`, the
-## whitelisted host should be `ads.example.org`. If you want to disable
-## the adblocker on a given page, use the `content.host_blocking.enabled`
-## setting with a URL pattern instead. Local domains are always exempt
-## from hostblocking.
-## Type: List of UrlPattern
-# c.content.host_blocking.whitelist = []
-## @me
-c.content.host_blocking.whitelist = ['adf.ly']
-# ALSO: 'www.googleadservices.com' -- to be able to click found goods in google search
-
 ## Enable hyperlink auditing (`<a ping>`).
 ## Type: Bool
 # c.content.hyperlink_auditing = False
@@ -831,17 +877,18 @@ c.content.host_blocking.whitelist = ['adf.ly']
 ## Enable JavaScript.
 ## Type: Bool
 # c.content.javascript.enabled = True
-## @me
-c.content.javascript.enabled = False
+
+## @me FAIL: must enable, otherwise data:mime/html will be opened as url
+c.content.javascript.enabled = True
 # config.set('content.javascript.enabled', True, '*:///*')
-config.set('content.javascript.enabled', True, '*://127.0.0.1/*')
-config.set('content.javascript.enabled', True, '*://github.com/*')
-config.set('content.javascript.enabled', True, '*://gitlab.com/*')
-config.set('content.javascript.enabled', True, '*://google.com/*')
-config.set('content.javascript.enabled', True, '*://stackoverflow.com/*')
-config.set('content.javascript.enabled', True, '*://*.stackexchange.com/*')
-config.set('content.javascript.enabled', True, '*://*.google.com/*')
-config.set('content.javascript.enabled', True, '*://www.reddit.com/*')
+config.set("content.javascript.enabled", True, "*://127.0.0.1/*")
+config.set("content.javascript.enabled", True, "*://github.com/*")
+config.set("content.javascript.enabled", True, "*://gitlab.com/*")
+config.set("content.javascript.enabled", True, "*://google.com/*")
+config.set("content.javascript.enabled", True, "*://stackoverflow.com/*")
+config.set("content.javascript.enabled", True, "*://*.stackexchange.com/*")
+config.set("content.javascript.enabled", True, "*://*.google.com/*")
+config.set("content.javascript.enabled", True, "*://www.reddit.com/*")
 
 ## Log levels to use for JavaScript console logging messages. When a
 ## JavaScript message with the level given in the dictionary key is
@@ -1012,8 +1059,7 @@ c.content.ssl_strict = True
 ## Type: Bool
 # c.content.webgl = True
 
-## Which interfaces to expose via WebRTC. On Qt 5.10, this option doesn't
-## work because of a Qt bug.
+## Which interfaces to expose via WebRTC.
 ## Type: String
 ## Valid values:
 ##   - all-interfaces: WebRTC has the right to enumerate all interfaces and bind them to discover public interfaces.
@@ -1035,7 +1081,7 @@ c.content.ssl_strict = True
 ## default is used.
 ## Type: Directory
 # c.downloads.location.directory = None
-c.downloads.location.directory = '/_dld'  # @me FIXME:USE: xdg
+c.downloads.location.directory = "/_dld"  # @me FIXME:USE: xdg
 
 ## Prompt the user for the download location. If set to false,
 ## `downloads.location.directory` will be used.
@@ -1073,21 +1119,48 @@ c.downloads.location.prompt = False  # @me
 ## Type: Int
 # c.downloads.remove_finished = -1
 
-## Editor (and arguments) to use for the `open-editor` command. The
-## following placeholders are defined:  * `{file}`: Filename of the file
-## to be edited. * `{line}`: Line in which the caret is found in the
-## text. * `{column}`: Column in which the caret is found in the text. *
+## Editor (and arguments) to use for the `edit-*` commands. The following
+## placeholders are defined:  * `{file}`: Filename of the file to be
+## edited. * `{line}`: Line in which the caret is found in the text. *
+## `{column}`: Column in which the caret is found in the text. *
 ## `{line0}`: Same as `{line}`, but starting from index 0. * `{column0}`:
 ## Same as `{column}`, but starting from index 0.
 ## Type: ShellCommand
 # c.editor.command = ['gvim', '-f', '{file}', '-c', 'normal {line}G{column0}l']
 ## @me
 # c.editor.command = ['r.vim-new', '{file}', '-c', 'call cursor({line}, {column0})']
-c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
+c.editor.command = ["r.vim-new", "{file}", "-c", "normal {line}G{column0}|"]
 
 ## Encoding to use for the editor.
 ## Type: Encoding
 # c.editor.encoding = 'utf-8'
+
+## Handler for selecting file(s) in forms. If `external`, then the
+## commands specified by `fileselect.single_file.command` and
+## `fileselect.multiple_files.command` are used to select one or multiple
+## files respectively.
+## Type: String
+## Valid values:
+##   - default: Use the default file selector.
+##   - external: Use an external command.
+# c.fileselect.handler = 'default'
+c.fileselect.handler = "external"  # @me
+
+## Command (and arguments) to use for selecting multiple files in forms.
+## The command should write the selected file paths to the specified
+## file, separated by newlines. The following placeholders are defined: *
+## `{}`: Filename of the file to be written to.
+## Type: ShellCommand
+# c.fileselect.multiple_files.command = ['xterm', '-e', 'ranger', '--choosefiles={}']
+c.fileselect.multiple_files.command = ["st", "-e", "ranger", "--choosefiles={}"]
+
+## Command (and arguments) to use for selecting a single file in forms.
+## The command should write the selected file path to the specified file.
+## The following placeholders are defined: * `{}`: Filename of the file
+## to be written to.
+## Type: ShellCommand
+# c.fileselect.single_file.command = ['xterm', '-e', 'ranger', '--choosefile={}']
+c.fileselect.single_file.command = ["st", "-e", "ranger", "--choosefile={}"]
 
 ## Font used in the completion categories.
 ## Type: Font
@@ -1332,7 +1405,7 @@ c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
 ## unreliable on this setting, and they may match the url you are
 ## navigating to, or the URL you are navigating from.
 ## Type: Bool
-# c.input.insert_mode.leave_on_load = True
+# c.input.insert_mode.leave_on_load = False
 
 ## Switch to insert mode when clicking flash and other plugins.
 ## Type: Bool
@@ -1354,9 +1427,10 @@ c.editor.command = ['r.vim-new', '{file}', '-c', 'normal {line}G{column0}|']
 
 ## Timeout (in milliseconds) for partially typed key bindings. If the
 ## current input forms only partial matches, the keystring will be
-## cleared after this time.
+## cleared after this time. If set to 0, partially typed bindings are
+## never cleared.
 ## Type: Int
-# c.input.partial_timeout = 5000
+# c.input.partial_timeout = 0
 c.input.partial_timeout = 0  # @me
 
 ## Enable spatial navigation. Spatial navigation consists in the ability
@@ -1409,7 +1483,7 @@ c.input.partial_timeout = 0  # @me
 ## Duration (in milliseconds) to show messages in the statusbar for. Set
 ## to 0 to never clear messages.
 ## Type: Int
-# c.messages.timeout = 2000
+# c.messages.timeout = 3000
 
 ## How to open links in an existing instance if a new one is launched.
 ## This happens when e.g. opening a link from a terminal. See
@@ -1449,6 +1523,11 @@ c.input.partial_timeout = 0  # @me
 ## list) will work.
 ## Type: List of String
 # c.qt.args = []
+
+## Additional environment variables to set. Setting an environment
+## variable to null/None will unset it.
+## Type: Dict
+# c.qt.environ = {}
 
 ## Force a Qt platform to use. This sets the `QT_QPA_PLATFORM`
 ## environment variable and is useful to force using the XCB plugin when
@@ -1505,15 +1584,27 @@ c.input.partial_timeout = 0  # @me
 ##   - single-process: Run all tabs in a single process. This should be used for debugging purposes only, and it disables `:open --private`.
 # c.qt.process_model = 'process-per-site-instance'
 
+## Delete the QtWebEngine Service Worker directory on every start. This
+## workaround can help with certain crashes caused by an unknown
+## QtWebEngine bug related to Service Workers. Those crashes happen
+## seemingly immediately on Windows; after one hour of operation on other
+## systems. Note however that enabling this option *can lead to data
+## loss* on some pages (as Service Worker data isn't persisted) and will
+## negatively impact start-up time.
+## Type: Bool
+# c.qt.workarounds.remove_service_workers = False
+
 ## When/how to show the scrollbar.
 ## Type: String
 ## Valid values:
 ##   - always: Always show the scrollbar.
 ##   - never: Never show the scrollbar.
 ##   - when-searching: Show the scrollbar when searching for text in the webpage. With the QtWebKit backend, this is equal to `never`.
-##   - overlay: Show an overlay scrollbar. With Qt < 5.11 or on macOS, this is unavailable and equal to `when-searching`; with the QtWebKit backend, this is equal to `never`. Enabling/disabling overlay scrollbars requires a restart.
+##   - overlay: Show an overlay scrollbar. On macOS, this is unavailable and equal to `when-searching`; with the QtWebKit backend, this is equal to `never`. Enabling/disabling overlay scrollbars requires a restart.
 # c.scrolling.bar = 'overlay'
-c.scrolling.bar = 'when-searching'  # @me: hide for narrow soundcloud window (unless searching)
+c.scrolling.bar = (
+    "when-searching"  # @me: hide for narrow soundcloud window (unless searching)
+)
 
 ## Enable smooth scrolling for web pages. Note smooth scrolling does not
 ## work with the `:scroll-px` command.
@@ -1630,7 +1721,7 @@ c.scrolling.bar = 'when-searching'  # @me: hide for narrow soundcloud window (un
 
 ## Open new tabs (middleclick/ctrl+click) in the background.
 ## Type: Bool
-# c.tabs.background = False
+# c.tabs.background = True
 
 ## Mouse button with which to close tabs.
 ## Type: String
@@ -1654,7 +1745,9 @@ c.scrolling.bar = 'when-searching'  # @me: hide for narrow soundcloud window (un
 ## Type: Float
 # c.tabs.favicons.scale = 1.0
 
-## When to show favicons in the tab bar.
+## When to show favicons in the tab bar. When switching this from never
+## to always/pinned, note that favicons might not be loaded yet, thus
+## tabs might require a reload to display them.
 ## Type: String
 ## Valid values:
 ##   - always: Always show favicons.
@@ -1674,7 +1767,9 @@ c.scrolling.bar = 'when-searching'  # @me: hide for narrow soundcloud window (un
 ## Type: Int
 # c.tabs.indicator.width = 3
 
-## How to behave when the last tab is closed.
+## How to behave when the last tab is closed. If the
+## `tabs.tabs_are_windows` setting is set, this is ignored and the
+## behavior is always identical to the `close` value.
 ## Type: String
 ## Valid values:
 ##   - ignore: Don't do anything.
@@ -1827,7 +1922,7 @@ c.scrolling.bar = 'when-searching'  # @me: hide for narrow soundcloud window (un
 ## Width (in pixels or as percentage of the window) of the tab bar if
 ## it's vertical.
 ## Type: PercOrInt
-# c.tabs.width = '20%'
+# c.tabs.width = '15%'
 
 ## Wrap when changing tabs.
 ## Type: Bool
@@ -1846,7 +1941,7 @@ c.scrolling.bar = 'when-searching'  # @me: hide for narrow soundcloud window (un
 ## for a blank page.
 ## Type: FuzzyUrl
 # c.url.default_page = 'https://start.duckduckgo.com/'
-c.url.default_page = 'https://google.com/search'  # @me
+c.url.default_page = "https://google.com/search"  # @me
 
 ## URL segments where `:navigate increment/decrement` will search for a
 ## number.
@@ -1876,7 +1971,8 @@ c.url.default_page = 'https://google.com/search'  # @me
 ## * `{quoted}` quotes all characters (for `slash/and&amp` this
 ## placeholder   expands to `slash%2Fand%26amp`). * `{unquoted}` quotes
 ## nothing (for `slash/and&amp` this placeholder   expands to
-## `slash/and&amp`).  The search engine named `DEFAULT` is used when
+## `slash/and&amp`). * `{0}` means the same as `{}`, but can be used
+## multiple times.  The search engine named `DEFAULT` is used when
 ## `url.auto_search` is turned on and something else than a URL was
 ## entered to be opened. Other search engines can be used by prepending
 ## the search engine name to the search term, e.g. `:open google
@@ -1884,55 +1980,54 @@ c.url.default_page = 'https://google.com/search'  # @me
 ## Type: Dict
 # c.url.searchengines = {'DEFAULT': 'https://duckduckgo.com/?q={}'}
 c.url.searchengines = {
-    'DEFAULT': 'https://google.com/search?q={}',
-    'ab': 'https://bbs.archlinux.org/search.php?action=search&author=&forums=&search_in=0&sort_by=0&sort_dir=DESC&show_as=topics&keywords={}',
-    'au': 'https://aur.archlinux.org/packages/?O=0&C=0&SeB=nd&outdated=&SB=n&SO=a&PP=50&do_Search=Go&K={}',
-    'aw': 'https://wiki.archlinux.org/index.php?title=Special:Search&search={}',
-    'cpp': 'https://en.cppreference.com/mwiki/index.php?search={}',
-    'D': 'https://duckduckgo.com/?q=!g%20{}',
-    'd': 'https://duckduckgo.com/?q={}',
-    'di': 'https://duckduckgo.com/?ia=images&q={}',
-    'g': 'https://google.com/search?q={}',
-    'ga': 'https://google.com/search?q=arch%20linux%20{}',
-    'gb': 'https://google.com/search?q=bash%20{}',
-    'gh': 'https://github.com/search?q={}',
-    'gj': 'https://google.com/search?q=%22jsoftware%22%20{}',
-    'gk': 'http://localhost:1248/source/search?q=&defs={}&refs=&path=&hist=&type=&project=linux-3.10.28',
-    'gr': 'https://google.com/search?q=restructuredtext%20{}',
-    'gm': 'https://www.google.com/maps/place/{}',
-    'gv': 'https://google.com/search?q=graphviz%20{}',
-    'gz': 'https://www.google.com/search?q=%22zsh%22%20{}',
-    'ha': 'http://www.haskell.org/hoogle/?hoogle={}',
-    'so': 'http://stackoverflow.com/search?q={}',
-    'en': 'https://google.com/search?q=english%20{}',
-    'ин': 'https://google.com/search?q=english%20{}',
-    'p3': 'https://docs.python.org/3/search.html?check_keywords=yes&area=default&q={}',
-    'pY': 'https://google.com/search?q=python%20{}',
-    'p2': 'https://google.com/search?q=python2%20{}',
-    'py': 'https://google.com/search?q=python3%20{}',
-    'dt': 'http://dictionary.reference.com/browse/{}',
-    'ea': 'http://www.ex.ua/search?original_id=23786&s={}',
-    'ex': 'http://www.ex.ua/search?s={}',
-    'w': 'http://en.wikipedia.org/w/index.php?search={}&title=Special:Search',
-    'wa': 'http://www.wolframalpha.com/input/?i={}',
-    'y': 'http://www.youtube.com/results?search_query={}',
-    'ydl': 'https://www.google.com/search?q=%22youtube-dl%22%20{}',
-    'al': 'http://www.allmusic.com/search/all/{}',
-    'im': 'http://www.imdb.com/find?s=all&q={}',
-    'ja': 'http://www.jango.com/music/{}',
-    'mr': 'http://www.mrqe.com/search?q={}',
-    'ro': 'http://www.rottentomatoes.com/search/?search={}',
-    'u': 'https://unicode-search.net/unicode-namesearch.pl?term={}',
-    'vi': 'https://www.google.com/search?q=%22vimscript%22%20{}',
-    'za': 'http://songza.com/search/?q={}',
-    'zsh': 'https://www.google.com/search?q=%22zsh%22%20{}',
+    "DEFAULT": "https://google.com/search?q={}",
+    "ab": "https://bbs.archlinux.org/search.php?action=search&author=&forums=&search_in=0&sort_by=0&sort_dir=DESC&show_as=topics&keywords={}",
+    "au": "https://aur.archlinux.org/packages/?O=0&C=0&SeB=nd&outdated=&SB=n&SO=a&PP=50&do_Search=Go&K={}",
+    "aw": "https://wiki.archlinux.org/index.php?title=Special:Search&search={}",
+    "cpp": "https://en.cppreference.com/mwiki/index.php?search={}",
+    "D": "https://duckduckgo.com/?q=!g%20{}",
+    "d": "https://duckduckgo.com/?q={}",
+    "di": "https://duckduckgo.com/?ia=images&q={}",
+    "g": "https://google.com/search?q={}",
+    "ga": "https://google.com/search?q=arch%20linux%20{}",
+    "gb": "https://google.com/search?q=bash%20{}",
+    "gh": "https://github.com/search?q={}",
+    "gj": "https://google.com/search?q=%22jsoftware%22%20{}",
+    "gk": "http://localhost:1248/source/search?q=&defs={}&refs=&path=&hist=&type=&project=linux-3.10.28",
+    "gr": "https://google.com/search?q=restructuredtext%20{}",
+    "gm": "https://www.google.com/maps/place/{}",
+    "gv": "https://google.com/search?q=graphviz%20{}",
+    "gz": "https://www.google.com/search?q=%22zsh%22%20{}",
+    "ha": "http://www.haskell.org/hoogle/?hoogle={}",
+    "so": "http://stackoverflow.com/search?q={}",
+    "en": "https://google.com/search?q=english%20{}",
+    "ин": "https://google.com/search?q=english%20{}",
+    "p3": "https://docs.python.org/3/search.html?check_keywords=yes&area=default&q={}",
+    "pY": "https://google.com/search?q=python%20{}",
+    "p2": "https://google.com/search?q=python2%20{}",
+    "py": "https://google.com/search?q=python3%20{}",
+    "dt": "http://dictionary.reference.com/browse/{}",
+    "ea": "http://www.ex.ua/search?original_id=23786&s={}",
+    "ex": "http://www.ex.ua/search?s={}",
+    "w": "http://en.wikipedia.org/w/index.php?search={}&title=Special:Search",
+    "wa": "http://www.wolframalpha.com/input/?i={}",
+    "y": "http://www.youtube.com/results?search_query={}",
+    "ydl": "https://www.google.com/search?q=%22youtube-dl%22%20{}",
+    "al": "http://www.allmusic.com/search/all/{}",
+    "im": "http://www.imdb.com/find?s=all&q={}",
+    "ja": "http://www.jango.com/music/{}",
+    "mr": "http://www.mrqe.com/search?q={}",
+    "ro": "http://www.rottentomatoes.com/search/?search={}",
+    "u": "https://unicode-search.net/unicode-namesearch.pl?term={}",
+    "vi": "https://www.google.com/search?q=%22vimscript%22%20{}",
+    "za": "http://songza.com/search/?q={}",
+    "zsh": "https://www.google.com/search?q=%22zsh%22%20{}",
 }
 
 ## Page(s) to open at the start.
 ## Type: List of FuzzyUrl, or FuzzyUrl
 # c.url.start_pages = ['https://start.duckduckgo.com']
-# c.url.start_pages = ['https://google.com/search']  # @me
-c.url.start_pages = ['qute://history/']  # @me
+c.url.start_pages = ["qute://history/"]  # @me
 
 ## URL parameters to strip with `:yank url`.
 ## Type: List of String
@@ -1967,7 +2062,31 @@ c.url.start_pages = ['qute://history/']  # @me
 ## Type: List of Perc
 # c.zoom.levels = ['25%', '33%', '50%', '67%', '75%', '90%', '100%', '110%', '125%', '150%', '175%', '200%', '250%', '300%', '400%', '500%']
 ## @me
-c.zoom.levels = ['40%', '45%', '50%', '60%', '67%', '75%', '85%', '90%', '95%', '100%', '105%', '110%', '115%', '120%', '125%', '130%', '140%', '150%', '175%', '200%', '300%', '400%', '500%']
+c.zoom.levels = [
+    "40%",
+    "45%",
+    "50%",
+    "60%",
+    "67%",
+    "75%",
+    "85%",
+    "90%",
+    "95%",
+    "100%",
+    "105%",
+    "110%",
+    "115%",
+    "120%",
+    "125%",
+    "130%",
+    "140%",
+    "150%",
+    "175%",
+    "200%",
+    "300%",
+    "400%",
+    "500%",
+]
 
 ## Number of zoom increments to divide the mouse wheel movements to.
 ## Type: Int
@@ -1979,23 +2098,26 @@ c.zoom.levels = ['40%', '45%', '50%', '60%', '67%', '75%', '85%', '90%', '95%', 
 
 ## Bindings for normal mode
 # @me TODO:CFG: rewise my own additional keybinding -- use more defaults
-config.bind(',d', 'tab-close')
-config.bind(',a', 'hint links spawn -- r.wgett -o /_dld/amv -c mpv "{hint-url}"')
-config.bind(',b', 'set content.host_blocking.enabled true ;; reload')
-config.bind(',c', 'config-cycle -p content.ssl_strict')
-config.bind(',B', 'set content.host_blocking.enabled false ;; reload')
-config.bind(',m', 'hint links spawn -- mpv "{hint-url}"')
-config.bind(',M', 'spawn -- mpv "{url}"')
-config.bind(',n', 'hint links spawn -- r.wget-mp3 -poj "{hint-url}"')
-config.bind(',N', 'hint links spawn -- r.wgett -o /_dld/music -jd "r.wget-mp3 -jdt" "{hint-url}"')
-config.bind(',o', 'download-open')
-config.bind(',p', 'hint links spawn -- r.mutt-pocket "{hint-url}"')
-config.bind(',P', 'spawn -- r.mutt-pocket "{url}"')
-config.bind(',Q', "spawn -- r.qr-code '{url}'")
-config.bind(',r', 'set content.proxy system ;; reload')
-config.bind(',R', 'set content.proxy socks://localhost:17321/ ;; reload')  # OR: http://
-config.bind(',s', 'hint links spawn -- r.mpd-soundcloud "{hint-url}"')
-config.bind(',S', 'spawn -- r.mpd-soundcloud "{url}"')
+config.bind(",d", "tab-close")
+config.bind(",a", 'hint links spawn -- r.wgett -o /_dld/amv -c mpv "{hint-url}"')
+config.bind(",b", "set content.blocking.enabled true ;; reload")
+config.bind(",c", "config-cycle -p content.ssl_strict")
+config.bind(",B", "set content.blocking.enabled false ;; reload")
+config.bind(",m", 'hint links spawn -- mpv "{hint-url}"')
+config.bind(",M", 'spawn -- mpv "{url}"')
+config.bind(",n", 'hint links spawn -- r.wget-mp3 -poj "{hint-url}"')
+config.bind(
+    ",N",
+    'hint links spawn -- r.wgett -o /_dld/music -jd "r.wget-mp3 -jdt" "{hint-url}"',
+)
+config.bind(",o", "download-open")
+config.bind(",p", 'hint links spawn -- r.mutt-pocket "{hint-url}"')
+config.bind(",P", 'spawn -- r.mutt-pocket "{url}"')
+config.bind(",Q", "spawn -- r.qr-code '{url}'")
+config.bind(",r", "set content.proxy system ;; reload")
+config.bind(",R", "set content.proxy socks://localhost:17321/ ;; reload")  # OR: http://
+config.bind(",s", 'hint links spawn -- r.mpd-soundcloud "{hint-url}"')
+config.bind(",S", 'spawn -- r.mpd-soundcloud "{url}"')
 
 # SEE: https://www.reddit.com/r/qutebrowser/comments/83avuf/qutebrowser_v120_released_with_perdomain_settings/
 #   => how to add permanent "blacklist" and "whitelist"
@@ -2005,21 +2127,31 @@ config.bind(',S', 'spawn -- r.mpd-soundcloud "{url}"')
 # config.bind(',S', 'set content.javascript.enabled false ;; reload')
 
 # NOTE: WebKit switches CSS immediately, BUT: WebEngine requires ";; reload"
-config.bind(',t', 'set content.user_stylesheets theme/dark.css')
-config.bind(',T', 'set content.user_stylesheets theme/light.css')
-config.bind(',z', 'set content.user_stylesheets theme/solarized.css')
-config.bind(',Z', 'config-cycle content.user_stylesheets theme/solarized.css ""')
+config.bind(",t", "set content.user_stylesheets theme/dark.css")
+config.bind(",T", "set content.user_stylesheets theme/light.css")
+config.bind(",z", "set content.user_stylesheets theme/solarized.css")
+config.bind(",Z", 'config-cycle content.user_stylesheets theme/solarized.css ""')
 # REC: config.bind(',Z', 'config-cycle content.user_stylesheets ~/path/to/solarized-everything-css/css/gruvbox/gruvbox-all-sites.css ""')
-config.bind(',y', 'hint links spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -y "{hint-url}"')
-config.bind(',Y', 'spawn -- r.wgett -o "' + c.downloads.location.directory + '/youtube" -yc mpv "{url}"')
-# config.bind("'", 'enter-mode jump_mark')
+config.bind(
+    ",y",
+    'hint links spawn -- r.wgett -o "'
+    + c.downloads.location.directory
+    + '/youtube" -y "{hint-url}"',
+)
+config.bind(
+    ",Y",
+    'spawn -- r.wgett -o "'
+    + c.downloads.location.directory
+    + '/youtube" -yc mpv "{url}"',
+)
+# config.bind("'", 'mode-enter jump_mark')
 # config.bind('+', 'zoom-in')
 # config.bind('-', 'zoom-out')
 # config.bind('.', 'repeat-command')
 # config.bind('/', 'set-cmd-text /')
 # config.bind(':', 'set-cmd-text :')
 # config.bind(';I', 'hint images tab')
-config.bind(';I', 'hint images tab-bg')
+config.bind(";I", "hint images tab-bg")
 # config.bind(';O', 'hint links fill :open -t -r {hint-url}')
 # config.bind(';R', 'hint --rapid links window')
 # config.bind(';Y', 'hint links yank-primary')
@@ -2041,7 +2173,7 @@ config.bind(';I', 'hint images tab-bg')
 # config.bind('<Alt-7>', 'tab-focus 7')
 # config.bind('<Alt-8>', 'tab-focus 8')
 # config.bind('<Alt-9>', 'tab-focus -1')
-config.bind('<Alt-9>', 'tab-focus 9')
+config.bind("<Alt-9>", "tab-focus 9")
 # config.bind('<Alt-m>', 'tab-mute')
 # config.bind('<Ctrl-A>', 'navigate increment')
 # config.bind('<Ctrl-Alt-p>', 'print')
@@ -2050,11 +2182,11 @@ config.bind('<Alt-9>', 'tab-focus 9')
 # config.bind('<Ctrl-F5>', 'reload -f')
 # config.bind('<Ctrl-F>', 'scroll-page 0 1')
 # config.bind('<Ctrl-N>', 'open -w')
-config.unbind('<Ctrl-N>')
+config.unbind("<Ctrl-N>")
 # config.bind('<Ctrl-PgDown>', 'tab-next')
 # config.bind('<Ctrl-PgUp>', 'tab-prev')
 # config.bind('<Ctrl-Q>', 'quit')
-# config.bind('<Ctrl-Return>', 'follow-selected -t')
+# config.bind('<Ctrl-Return>', 'selection-follow -t')
 # config.bind('<Ctrl-Shift-N>', 'open -p')
 # config.bind('<Ctrl-Shift-T>', 'undo')
 # config.bind('<Ctrl-Shift-Tab>', 'nop')
@@ -2062,7 +2194,7 @@ config.unbind('<Ctrl-N>')
 # config.bind('<Ctrl-T>', 'open -t')
 # config.bind('<Ctrl-Tab>', 'tab-focus last')
 # config.bind('<Ctrl-U>', 'scroll-page 0 -0.5')
-# config.bind('<Ctrl-V>', 'enter-mode passthrough')
+# config.bind('<Ctrl-V>', 'mode-enter passthrough')
 # config.bind('<Ctrl-W>', 'tab-close')
 # config.bind('<Ctrl-X>', 'navigate decrement')
 # config.bind('<Ctrl-^>', 'tab-focus last')
@@ -2072,93 +2204,95 @@ config.unbind('<Ctrl-N>')
 # config.bind('<Escape>', 'clear-keychain ;; search ;; fullscreen --leave')
 # config.bind('<F11>', 'fullscreen')
 # config.bind('<F5>', 'reload')
-# config.bind('<Return>', 'follow-selected')
+# config.bind('<Return>', 'selection-follow')
 # config.bind('<back>', 'back')
 # config.bind('<forward>', 'forward')
 # config.bind('=', 'zoom')
 # config.bind('?', 'set-cmd-text ?')
-# config.bind('@', 'run-macro')
+# config.bind('@', 'macro-run')
 # config.bind('B', 'set-cmd-text -s :quickmark-load -t')
 # config.bind('D', 'tab-close -o')
 # config.bind('F', 'hint all tab')
 # config.bind('G', 'scroll-to-perc')
 # config.bind('H', 'back')
-# config.bind('H', 'scroll left')
-config.bind('H', 'set-cmd-text -s :back')
+# config.bind('H', 'scroll left')  # WTF
+config.bind("H", "set-cmd-text -s :back")
 # config.bind('J', 'tab-next')
 # config.bind('K', 'tab-prev')
 # config.bind('L', 'forward')
-# config.bind('L', 'scroll right')
-config.bind('L', 'set-cmd-text -s :forward')
+# config.bind('L', 'scroll right')  # WTF
+config.bind("L", "set-cmd-text -s :forward")
 # config.bind('M', 'bookmark-add')
 # config.bind('N', 'search-prev')
 # config.bind('O', 'set-cmd-text -s :open -t')
-config.bind('PP', 'nop')  #  'open -t -- {primary}')
-config.bind('Pp', 'nop')  # 'open -t -- {clipboard}')
-config.bind('Q', 'close')
+config.bind("PP", "nop")  #  'open -t -- {primary}')
+config.bind("Pp", "nop")  # 'open -t -- {clipboard}')
+config.bind("Q", "close")
 # config.bind('R', 'reload -f')
-# config.bind('Sb', 'open qute://bookmarks#bookmarks')
-# config.bind('Sh', 'open qute://history')
-# config.bind('Sq', 'open qute://bookmarks')
-# config.bind('Ss', 'open qute://settings')
+# config.bind('Sb', 'bookmark-list --jump')
+# config.bind('Sh', 'history')
+# config.bind('Sq', 'bookmark-list')
+# config.bind('Ss', 'set')
 # config.bind('T', 'tab-focus')
 # config.bind('T', 'hint --rapid links tab-bg')  # @me WTF?
 # config.bind('U', 'undo -w')
-config.bind('U', 'set-cmd-text -s :undo')
-# config.bind('V', 'enter-mode caret ;; toggle-selection --line')
+config.bind("U", "set-cmd-text -s :undo")
+# config.bind('V', 'mode-enter caret ;; selection-toggle --line')
 # config.bind('ZQ', 'quit')
-config.unbind('ZQ')
+config.unbind("ZQ")
 # config.bind('ZZ', 'quit --save')
-config.unbind('ZZ')
+config.unbind("ZZ")
 # config.bind('[[', 'navigate prev')
 # config.bind(']]', 'navigate next')
-# config.bind('`', 'enter-mode set_mark')
+# config.bind('`', 'mode-enter set_mark')
 # config.bind('ad', 'download-cancel')
 # config.bind('b', 'set-cmd-text -s :quickmark-load')
 # config.bind('cd', 'download-clear')
 # config.bind('co', 'tab-only')
-config.bind('cl', 'open -t -- {clipboard}')     # 'cy/ch'
-config.bind('c<Space>', 'open -- {clipboard}')  # 'c./c<Backspace>'
+config.bind("cl", "open -t -- {clipboard}")  # 'cy/ch'
+config.bind("c<Space>", "open -- {clipboard}")  # 'c./c<Backspace>'
 # config.bind('d', 'tab-close')
 # config.bind('f', 'hint')
 # config.bind('g$', 'tab-focus -1')
 # config.bind('g0', 'tab-focus 1')
 # config.bind('gB', 'set-cmd-text -s :bookmark-load -t')
 # config.bind('gC', 'tab-clone')
-config.bind('gc', 'tab-clone')
+config.bind("gc", "tab-clone")
 # config.bind('gD', 'tab-give')
+# config.bind('gJ', 'tab-move +')
+# config.bind('gK', 'tab-move -')
 # config.bind('gO', 'set-cmd-text :open -t -r {url:pretty}')
 # config.bind('gU', 'navigate up -t')
 # config.bind('g^', 'tab-focus 1')
 # config.bind('ga', 'open -t')
-config.bind('ga', 'tab-focus last')
+config.bind("ga", "tab-focus last")
 # config.bind('gb', 'set-cmd-text -s :bookmark-load')
 # config.bind('gd', 'download')
 # config.bind('gf', 'view-source')
 # config.bind('gg', 'scroll-to-perc 0')
 # config.bind('gi', 'hint inputs --first')
-config.bind('gk', 'tab-move -')
+config.bind("gj", "tab-move +")
+config.bind("gk", "tab-move -")
+config.bind("gl", "open -t -- g {clipboard}")
+config.bind("g<Space>", "open -- g {clipboard}")
 # config.bind('gm', 'tab-move')
-config.bind('gn', 'open -t')
+config.bind("gn", "open -t")
 # config.bind('go', 'set-cmd-text :open {url:pretty}')
-config.bind('gj', 'tab-move +')
-# config.bind('gt', 'set-cmd-text -s :buffer')
+# config.bind('gt', 'set-cmd-text -s :tab-select')
 # config.bind('gu', 'navigate up')
-config.bind('gl', 'open -t -- g {clipboard}')
-config.bind('g<Space>', 'open -- g {clipboard}')
 # config.bind('h', 'scroll left')
-config.bind('h', 'back')
-# config.bind('i', 'enter-mode insert')
+config.bind("h", "back")
+# config.bind('i', 'mode-enter insert')
 # config.bind('j', 'scroll down')
 # config.bind('k', 'scroll up')
 # config.bind('l', 'scroll right')
-config.bind('l', 'forward')
+config.bind("l", "forward")
 # config.bind('m', 'quickmark-save')
 # config.bind('n', 'search-next')
 # config.bind('o', 'set-cmd-text -s :open')
-config.bind('pP', 'nop')  #  'open -- {primary}')
-config.bind('pp', 'nop')  #  'open -- {clipboard}')
-# config.bind('q', 'record-macro')
+config.bind("pP", "nop")  #  'open -- {primary}')
+config.bind("pp", "nop")  #  'open -- {clipboard}')
+# config.bind('q', 'macro-record')
 # config.bind('r', 'reload')
 # config.bind('sf', 'save')
 # config.bind('sk', 'set-cmd-text -s :bind')
@@ -2191,7 +2325,7 @@ config.bind('pp', 'nop')  #  'open -- {clipboard}')
 # config.bind('tsh', 'config-cycle -p -t -u *://{url:host}/* content.javascript.enabled ;; reload')
 # config.bind('tsu', 'config-cycle -p -t -u {url} content.javascript.enabled ;; reload')
 # config.bind('u', 'undo')
-# config.bind('v', 'enter-mode caret')
+# config.bind('v', 'mode-enter caret')
 # config.bind('wB', 'set-cmd-text -s :bookmark-load -w')
 # config.bind('wIf', 'devtools-focus')
 # config.bind('wIh', 'devtools left')
@@ -2209,60 +2343,60 @@ config.bind('pp', 'nop')  #  'open -- {clipboard}')
 # config.bind('wo', 'set-cmd-text -s :open -w')
 # config.bind('wp', 'open -w -- {clipboard}')
 # config.bind('xO', 'set-cmd-text :open -b -r {url:pretty}')
-# config.bind('xb', 'config-cycle statusbar.hide')
+# config.bind('xb', 'config-cycle statusbar.hide')  # WTF
 # config.bind('xo', 'set-cmd-text -s :open -b')
-# config.bind('xt', 'config-cycle tabs.show always switching')
-# config.bind('xx', 'config-cycle statusbar.hide ;; config-cycle tabs.show always switching')
+# config.bind('xt', 'config-cycle tabs.show always switching')  # WTF
+# config.bind('xx', 'config-cycle statusbar.hide ;; config-cycle tabs.show always switching')  # WTF
 # config.bind('yD', 'yank domain -s')
 # config.bind('yM', 'yank inline [{title}]({url}) -s')
 # config.bind('yP', 'yank pretty-url -s')
 # config.bind('yT', 'yank title -s')
 # config.bind('yY', 'yank -s')
-config.bind('yc', 'hint code userscript code_select.py')
+config.bind("yc", "hint code userscript code_select.py")
 # config.bind('yd', 'yank domain')
 # config.bind('ym', 'yank inline [{title}]({url})')
 # config.bind('yp', 'yank pretty-url')
 # config.bind('yt', 'yank title')
-config.bind('yv', 'spawn --userscript yank_nou')
-config.bind(';v', "hint --rapid links spawn --userscript yank_nou -- '{hint-url}'")
-config.bind('yV', 'set-cmd-text -s :spawn --userscript yank_nou')
-config.bind('y#', 'spawn --userscript yank_nou "# "')
-config.bind('y[', 'spawn --userscript yank_nou "" "[_] "')
-config.bind('y]', 'spawn --userscript yank_nou "# " "[_] "')
+config.bind("yv", "spawn --userscript yank_nou")
+config.bind(";v", "hint --rapid links spawn --userscript yank_nou -- '{hint-url}'")
+config.bind("yV", "set-cmd-text -s :spawn --userscript yank_nou")
+config.bind("y#", 'spawn --userscript yank_nou "# "')
+config.bind("y[", 'spawn --userscript yank_nou "" "[_] "')
+config.bind("y]", 'spawn --userscript yank_nou "# " "[_] "')
 # config.bind('yy', 'yank')
 # config.bind('{{', 'navigate prev -t')
 # config.bind('}}', 'navigate next -t')
 
 ## @me FIXED:BUG: rogue <Tab> keypresses in QtWebEngine
 # REF: https://github.com/qutebrowser/qutebrowser/issues/4579
-config.bind('<Tab>', 'nop')
+config.bind("<Tab>", "nop")
 
 ## Bindings for caret mode
 # config.bind('$', 'move-to-end-of-line', mode='caret')
 # config.bind('0', 'move-to-start-of-line', mode='caret')
-# config.bind('<Ctrl-Space>', 'drop-selection', mode='caret')
-# config.bind('<Escape>', 'leave-mode', mode='caret')
+# config.bind('<Ctrl-Space>', 'selection-drop', mode='caret')
+# config.bind('<Escape>', 'mode-leave', mode='caret')
 # config.bind('<Return>', 'yank selection', mode='caret')
-# config.bind('<Space>', 'toggle-selection', mode='caret')
+# config.bind('<Space>', 'selection-toggle', mode='caret')
 # config.bind('G', 'move-to-end-of-document', mode='caret')
 # config.bind('H', 'scroll left', mode='caret')
 # config.bind('J', 'scroll down', mode='caret')
 # config.bind('K', 'scroll up', mode='caret')
 # config.bind('L', 'scroll right', mode='caret')
-# config.bind('V', 'toggle-selection --line', mode='caret')
+# config.bind('V', 'selection-toggle --line', mode='caret')
 # config.bind('Y', 'yank selection -s', mode='caret')
 # config.bind('[', 'move-to-start-of-prev-block', mode='caret')
 # config.bind(']', 'move-to-start-of-next-block', mode='caret')
 # config.bind('b', 'move-to-prev-word', mode='caret')
-# config.bind('c', 'enter-mode normal', mode='caret')
+# config.bind('c', 'mode-enter normal', mode='caret')
 # config.bind('e', 'move-to-end-of-word', mode='caret')
 # config.bind('gg', 'move-to-start-of-document', mode='caret')
 # config.bind('h', 'move-to-prev-char', mode='caret')
 # config.bind('j', 'move-to-next-line', mode='caret')
 # config.bind('k', 'move-to-prev-line', mode='caret')
 # config.bind('l', 'move-to-next-char', mode='caret')
-# config.bind('o', 'reverse-selection', mode='caret')
-# config.bind('v', 'toggle-selection', mode='caret')
+# config.bind('o', 'selection-reverse', mode='caret')
+# config.bind('v', 'selection-toggle', mode='caret')
 # config.bind('w', 'move-to-next-word', mode='caret')
 # config.bind('y', 'yank selection', mode='caret')
 # config.bind('{', 'move-to-end-of-prev-block', mode='caret')
@@ -2292,7 +2426,7 @@ config.bind('<Tab>', 'nop')
 # config.bind('<Ctrl-W>', 'rl-unix-word-rubout', mode='command')
 # config.bind('<Ctrl-Y>', 'rl-yank', mode='command')
 # config.bind('<Down>', 'completion-item-focus --history next', mode='command')
-# config.bind('<Escape>', 'leave-mode', mode='command')
+# config.bind('<Escape>', 'mode-leave', mode='command')
 # config.bind('<PgDown>', 'completion-item-focus next-page', mode='command')
 # config.bind('<PgUp>', 'completion-item-focus prev-page', mode='command')
 # config.bind('<Return>', 'command-accept', mode='command')
@@ -2303,20 +2437,20 @@ config.bind('<Tab>', 'nop')
 
 ## Bindings for hint mode
 # config.bind('<Ctrl-B>', 'hint all tab-bg', mode='hint')
-config.bind('<Ctrl-W>', 'hint --mode word all', mode='hint')
+config.bind("<Ctrl-W>", "hint --mode word all", mode="hint")
 # config.bind('<Ctrl-F>', 'hint links', mode='hint')
 # config.bind('<Ctrl-R>', 'hint --rapid links tab-bg', mode='hint')
-# config.bind('<Escape>', 'leave-mode', mode='hint')
-# config.bind('<Return>', 'follow-hint', mode='hint')
+# config.bind('<Escape>', 'mode-leave', mode='hint')
+# config.bind('<Return>', 'hint-follow', mode='hint')
 
 ## Bindings for insert mode
-# config.bind('<Ctrl-E>', 'open-editor', mode='insert')
-# config.bind('<Escape>', 'leave-mode', mode='insert')
+# config.bind('<Ctrl-E>', 'edit-text', mode='insert')
+# config.bind('<Escape>', 'mode-leave', mode='insert')
 # config.bind('<Shift-Ins>', 'insert-text -- {primary}', mode='insert')
 
 ## Bindings for passthrough mode
-# config.bind('<Shift-Escape>', 'leave-mode', mode='passthrough')
-# @me OLD: config.bind('<Ctrl-V>', 'leave-mode', mode='passthrough')
+# config.bind('<Shift-Escape>', 'mode-leave', mode='passthrough')
+# @me OLD: config.bind('<Ctrl-V>', 'mode-leave', mode='passthrough')
 
 ## Bindings for prompt mode
 # config.bind('<Alt-B>', 'rl-backward-word', mode='prompt')
@@ -2338,19 +2472,19 @@ config.bind('<Ctrl-W>', 'hint --mode word all', mode='hint')
 # config.bind('<Ctrl-X>', 'prompt-open-download', mode='prompt')
 # config.bind('<Ctrl-Y>', 'rl-yank', mode='prompt')
 # config.bind('<Down>', 'prompt-item-focus next', mode='prompt')
-# config.bind('<Escape>', 'leave-mode', mode='prompt')
+# config.bind('<Escape>', 'mode-leave', mode='prompt')
 # config.bind('<Return>', 'prompt-accept', mode='prompt')
 # config.bind('<Shift-Tab>', 'prompt-item-focus prev', mode='prompt')
 # config.bind('<Tab>', 'prompt-item-focus next', mode='prompt')
 # config.bind('<Up>', 'prompt-item-focus prev', mode='prompt')
 
 ## Bindings for register mode
-# config.bind('<Escape>', 'leave-mode', mode='register')
+# config.bind('<Escape>', 'mode-leave', mode='register')
 
 ## Bindings for yesno mode
 # config.bind('<Alt-Shift-Y>', 'prompt-yank --sel', mode='yesno')
 # config.bind('<Alt-Y>', 'prompt-yank', mode='yesno')
-# config.bind('<Escape>', 'leave-mode', mode='yesno')
+# config.bind('<Escape>', 'mode-leave', mode='yesno')
 # config.bind('<Return>', 'prompt-accept', mode='yesno')
 # config.bind('N', 'prompt-accept --save no', mode='yesno')
 # config.bind('Y', 'prompt-accept --save yes', mode='yesno')
@@ -2359,18 +2493,22 @@ config.bind('<Ctrl-W>', 'hint --mode word all', mode='hint')
 
 
 ## qute-pass
-config.bind('zl',  'spawn --userscript qute-pass --dmenu-invocation dmenu')
-config.bind('zul', 'spawn --userscript qute-pass --dmenu-invocation dmenu --username-only')
-config.bind('zpl', 'spawn --userscript qute-pass --dmenu-invocation dmenu --password-only')
-config.bind('zol', 'spawn --userscript qute-pass --dmenu-invocation dmenu --otp-only')
+config.bind("zl", "spawn --userscript qute-pass --dmenu-invocation dmenu")
+config.bind(
+    "zul", "spawn --userscript qute-pass --dmenu-invocation dmenu --username-only"
+)
+config.bind(
+    "zpl", "spawn --userscript qute-pass --dmenu-invocation dmenu --password-only"
+)
+config.bind("zol", "spawn --userscript qute-pass --dmenu-invocation dmenu --otp-only")
 
 
 ### Load private part of config
-privatecfg = config.configdir / 'config-private.py'
+privatecfg = config.configdir / "config-private.py"
 if privatecfg.is_file():
     config.source(privatecfg)
 
-### Override config by session settings
+### Override config by session settings (load it again)
 # BUG: url.default_page from session not used
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
