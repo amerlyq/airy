@@ -13,6 +13,7 @@ alias hh='fc -l 1 | grep -E '
 
 ## Consumers
 alias -g NZ='&>/dev/null'
+# THINK: when I use "N1" I mostly expect it to be "N-" to filter stderr results
 alias -g N1='1>/dev/null'
 alias -g N2='2>/dev/null'
 alias -g N2C='2> >(sed -u "s/^/\o033[31m/; s/\$/\o033[0m/")'

@@ -34,7 +34,7 @@ export DATEFMT="$fmt"
 # * recursive-here-src -> there-dst
 # * nested hierarchy | -exec -> -execdir
 
-find -H "$src" ${depth:+-maxdepth "$depth"} -xtype f \
+find -H "$src" ${depth:+-maxdepth "$depth"} -type f \
   -not -name "${0##*/}" \
   -execdir \
 sh -c '
