@@ -9,7 +9,7 @@
 # --- 11 ------------+
 
 DEV=$(xsetwacom --list devices | awk '
-    {tp=$10; sub(/\s+id:.*/,""); printf "W%s=\"%s\" ",tp,$0}')
+    {tp=$NF; sub(/\s+id:.*/,""); printf "W%s=\"%s\" ",tp,$0}')
 [[ $DEV ]] && eval "$DEV" || exit  # if wacom disconnected
 
 wnode(){ xinput --list-props "$WPAD" \

@@ -4,8 +4,8 @@ set -euo pipefail
 state=${1-}
 
 # OBSOLETE? state=$(xsetwacom get "$WTOUCH" Touch)
-getId(){ xinput list --id-only "$(xinput list --name-only | grep -Ei "$1")"; }
-id=$(getId 'Wacom Intuos Pro S Finger')
+getId(){ xinput list --id-only "$(xinput list --name-only | grep -Fi "$1")"; }
+id=$(getId 'Wacom Intuos Pro S Finger' || getId 'Wacom Intuos Pro S (WL) Finger')
 
 if [[ -z $state ]]; then
   state=$(xinput list-props "$id" | awk '/Device Enabled/{print$NF}')
