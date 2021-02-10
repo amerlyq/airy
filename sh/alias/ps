@@ -4,6 +4,7 @@
 # ALSO: sort in order of starting time
 alias p='ps --group 0 --deselect --forest -o user,pid,pgid,pcpu,pmem,etime,args'
 
+# BET: use $ just ps
 pp(){ ps --group 0 --deselect --forest -o user,pid,pgid,pcpu,pmem,etime,args \
   | grep -vE '[0-9]\s(dictd|login|/usr/bin/(bumblebeed|dbus-daemon|ntpd)|/usr/lib/(polkit|rtkit|systemd)|\s\\_\s\(sd-pam\)|\s\\_\s/usr/(bin/(compton|copyq|dbus-daemon|dunst|gpg-agent|kbdd|pulseaudio|syncthing|tmux|xcape|xmobar|xsel)|lib/(at-spi-bus-launcher|dconf-service|Xorg)))\b'
 }
