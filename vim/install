@@ -5,17 +5,10 @@ if distro arch; then
     pkg_inst neovim
     # aur_inst neovim-git
 
-    pkg_inst gvim  # necessary for 'xxd'
-    # ALT:(gvim):
-    # aur/xxd-standalone
-    # aur/go-xxd
-    # aur/xxd-vim
-
-    pkg_inst python-neovim
-    # AUR: python2-neovim
+    pkg_inst python-neovim python-pynvim
 
     ## BUG: on clean system can't build python-psutils
-    aur_inst neovim-remote  # VIZ. $ nvr to talk to vim from inside ranger
+    # aur_inst neovim-remote  # VIZ. $ nvr to talk to vim from inside ranger
 
     # pkg_inst python-yaml
     pkg_inst python-jedi

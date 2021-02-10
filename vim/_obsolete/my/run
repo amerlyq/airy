@@ -33,10 +33,12 @@ if _has_pr nvim; then
 fi
 
 # NOTE: server mode from inside :terminal
-if _has_pr nvim && _has_pr nvr && [[ -n ${NVIM_LISTEN_ADDRESS-} ]]; then
-  # printf '%s\n' "$@" > /tmp/ff
-  exec nvr -cc 'tabprevious' "$@"
-fi
+# BUG:(neovim -> ranger -> nvr -> neovim): keeps old copy of ranger running
+#   BUT: w/o nvr in ranger :e opens nested vim
+# if _has_pr nvim && _has_pr nvr && [[ -n ${NVIM_LISTEN_ADDRESS-} ]]; then
+#   # printf '%s\n' "$@" > /tmp/ff
+#   exec nvr -cc 'tabprevious' "$@"
+# fi
 
 # EXPL: run vim if there are no 'nvim'
 for pr in nvim vis vim vi; do

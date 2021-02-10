@@ -1,6 +1,13 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+# ALT:(gvim): # necessary for 'xxd'
+# aur/xxd-standalone
+# aur/xxd-vim
+# https://github.com/felixge/go-xxd
+# https://crates.io/crates/xxd-rs/0.2.0
+aur_inst xxd-standalone
+
 pkg_inst dhex     # small ncurses binary diff programm with configurable controls
 pkg_inst binwalk  # many ops with firmware / binary
 aur_inst bvi      # small vi-like editor with binary search on '\'

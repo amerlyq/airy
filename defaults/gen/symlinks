@@ -48,9 +48,23 @@ mkdef r.n         r.notify
 mkdef r.b         qutebrowser
 mkdef r.bt        r.elinks
 mkdef r.wm        r.xmonad
+mkdef r.vim       nvim
 mkdef r.e         r.vim
 mkdef r.e-        r.vim-stdin
 # HACK: I can use "EDITOR=r.e" to change it in aliases on the fly
+
+## FUTURE:TBD:
+# * don't allow any editor options after these aliases
+# * abstract away any editor difference behind API (set of aliases with typical ops)
+# * provide separate API sets per each program in family (nvim, vim, vi) w/o common frontend
+# linkcp  /usr/bin/emacs  /usr/local/bin/e
+linkcp  /usr/bin/nvim  /usr/local/bin/e
+linkcp  /usr/bin/nvim  /usr/local/bin/v
+
+## ALSO: browser
+# BUT.vs. w(1) and who(1)
+# linkcp /usr/bin/qutebrowser /usr/local/bin/w
+
 
 ## FAIL: if user didn't added weechat to AIRY_MODS
 # mkdef r.irc       r.weechat

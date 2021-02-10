@@ -1,9 +1,12 @@
 # vim:ft=sh
 
+[[ -n ${ZSH_NAME-} ]] && (($+aliases[e])) && unalias e
+
 # WARNING: Use 'sudo' w/o user cfgs, so viminfo, swap won't've root rights!
-alias v="$EDITOR"
-alias vd='$EDITOR "$(date +%Y%m%d_%H%M%S).nou"'
-alias sv='sudo v'
+# alias v="$EDITOR"
+## NOTE:(v -> nvim):SEE: defaults
+alias v.='v "$(date +%Y%m%d_%H%M%S).nou"'
+alias vs='sudo v'
 alias vi='v -u NONE --noplugin'
 alias vb='v -u ~/.vim/rc/basic'
-scpvim(){ $EDITOR scp://${2:-srk}/"${1:-$(xsel -o)}"; }
+# OLD: scpvim(){ $EDITOR scp://${2:-srk}/"${1:-$(xsel -o)}"; }
