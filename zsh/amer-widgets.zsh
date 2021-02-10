@@ -6,16 +6,16 @@
 # If empty cmd line, copy last line from history
 # NOTE: '<<<' always adds newline => MAYBE copy commands w/o \n to past in vim ?
 zle -N amer-yank-current _yank_current
-function _yank_current() { xsel -ib <<< "${BUFFER:-$(fc -ln -1)}"; }
+function _yank_current() { xci <<< "${BUFFER:-$(fc -ln -1)}"; }
 
 # NOTE: \C-o -- always re-run previous command and copy its output -- so you able to insert it inside new currently created command. (But it could check if BUFFER not empty and execute/insert current command)
 # We can't simply '|tee' output of each command, as we has 'vim' and 'less'
 zle -N amer-yank-output _yank_output
-function _yank_output() { eval $(fc -l -n -1) 2>&1 | xsel -ib; }
+function _yank_output() { eval $(fc -l -n -1) 2>&1 | xci; }
 
 # Send current buffer to history and replace it from '+' register
 zle -N amer-past-current _past_current
-function _past_current() { print -s "$BUFFER"; BUFFER=$(xsel -ob); }
+function _past_current() { print -s "$BUFFER"; BUFFER=$(xco); }
 
 zle -N amer-toggle-ranger _toggle_ranger
 function _toggle_ranger() { print -s "$BUFFER"; eval "ranger"; }

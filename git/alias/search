@@ -25,7 +25,7 @@ _gref(){ local cmd=$1 patt=${*:2}
   case ${#rev} in 0) return 1 ;; 1) eval "$cmd" ;;
   *) git lthis -i --grep="$patt" && echo ;; esac
 }
-alias gre="_gref 'printf %s \$rev | tee /dev/tty | xsel -ib && echo'"
+alias gre="_gref 'printf %s \$rev | tee /dev/tty | xci && echo'"
 alias gcog="_gref 'git checkout \$rev'"
 [[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' gre gcog
 

@@ -1,0 +1,4 @@
+#!/bin/sh
+#%USAGE: $ xco | ...
+# ALSO: -rmlastnl
+exec xc -out ${1+-target "$1"} <&-

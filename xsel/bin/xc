@@ -1,0 +1,10 @@
+#!/bin/sh
+#%USAGE: $ xc [xclip_args] [FILE..]
+# ALT:(xsel -nb): $ xsel --nodetach --clipboard "$@"
+# DEV: "/usr/bin/exec" shebang to pass args/{}
+#   e.g #!/usr/bin/exec xclip -quiet -selection clipboard {}
+#   NEED: ignore scriptfile arg0 OPT: provide as {0}
+# FUTURE? remove alias programs, use only flags
+#   !xcl: xclip -o -t TARGETS
+#   !xcf: xclip -i FILE
+exec xclip -selection clipboard "$@"

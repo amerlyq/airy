@@ -175,11 +175,19 @@ if (($+commands[xxd])); then
   alias -g Xd='|xxd '
 fi
 
-if (($+commands[xsel])); then
-  alias -g Y-='|xsel -ib'
+# FIND: if possible to map alias to different cmd when in the beg of line
+if (($+commands[xclip])); then
+  alias -g Y='|xcio'
+  alias -g YY='|xcio|'
+  alias -g Y-='|xci'
+  alias -g Y:='xco'
+  alias -g YY:='xco|'
+  alias -g Y.='< <(xsel -ob)'
+  alias -g Y\$='"$(xco)"'
+elif (($+commands[xsel])); then
   alias -g Y='|tee >/dev/tty|xsel -ib'
+  alias -g Y-='|xsel -ib'
   alias -g Y+='|tee >/dev/tty|xsel -ab'
-  # FIXME: $ :Y cat
   alias -g :Y='xsel -ob'
   alias -g .Y='<(xsel -ob)'
   alias -g _Y='"$(xsel -ob)"'

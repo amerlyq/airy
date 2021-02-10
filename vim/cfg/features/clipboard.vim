@@ -5,17 +5,20 @@
 " ATT:NEED:(g:clipboard): vim > (6016ac27 of 20170627)
 "   https://github.com/neovim/neovim/issues/6029
 " ALT:DEV: https://neovim.io/doc/user/provider.html
+
+"" FIXME: using default pref=xclip will break my remote clipboard
+"" NOTE:(cache_enabled=0 .vs. -quiet): use single system-wide !xclip .vs. per-session
 let g:clipboard = {
-  \ 'name': 'xsel-remote',
+  \ 'name': 'xclip',
   \ 'copy': {
-  \   '+': 'xsel --nodetach -b -i',
-  \   '*': 'xsel --nodetach -p -i',
+  \   '+': 'xci',
+  \   '*': 'xclip -i -selection primary',
   \  },
   \ 'paste': {
-  \   '+': 'xsel -b -o',
-  \   '*': 'xsel -p -o',
+  \   '+': 'xco',
+  \   '*': 'xclip -o -selection primary',
   \ },
-  \ 'cache_enabled': 1,
+  \ 'cache_enabled': 0,
   \}
 
 " BAD: has('clipboard') needs to access provider => shows errmsg
