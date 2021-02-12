@@ -6,13 +6,16 @@
 
 pkgname=cmake-format-airy-git
 _pkgname=cmake-format
-pkgver=0.6.0
+pkgver=0.6.13
 pkgrel=1
 pkgdesc='Source code formatter for CMake listfiles'
 arch=('any')
 url='https://github.com/cheshirekow/cmake_format'
 license=('GPL3')
 depends=('python-setuptools' 'python-six>=1.13.0')  # 'python-yaml' 'python-jinja')
+optdepends=('python-yaml>=5.3' 'python-jinja>=2.10.3' 'python-argcomplete: automatic shell completion')
+checkdepends=('cmake')
+# source=("$pkgname-$pkgver.tar.gz::https://github.com/cheshirekow/cmake_format/archive/v${pkgver}.tar.gz")
 source=("git+$url")
 sha512sums=('SKIP')
 
@@ -24,7 +27,22 @@ pkgver() {
   git describe --tags | sed 's/-/./g'
 }
 
+check() {
+  mkdir "$srcdir/check"
+  cd "$srcdir/check"
+  export CTEST_OUTPUT_ON_FAILURE=1
+  cmake "$srcdir/cmake_format"
+  ctest --exclude-regex 'verify-export|cmakelang-command-db-test|cmakelang-validate-database|cmakelang-doc-verify-README\.rst'
+
+  # note: Excluding the tests cmakelang-validate-database (would require gpg2 and
+  # python-pgpy and currently fails because an internet connection is required) and
+  # cmakelang-command-db-test (fails if CMake version doesn't match the version
+  # in upstream's CI). Also exluding verify-export and cmakelang-doc-verify-README.rst
+  # which seem specific to how upstream manages their Git repo.
+}
+
 package() {
-  cd "cmake_format"
+  # cd "$srcdir/cmake_format-$pkgver"
+  cd "$srcdir/cmake_format"
   python setup.py install --root="$pkgdir" --optimize=1
 }
