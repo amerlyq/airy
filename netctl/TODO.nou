@@ -5,6 +5,8 @@ USAGE
     $ S.rr netctl-auto@wlp3s0.service
   captive portal -- open network with redirect to login page
     INFO: if no redirect -- open in browser IP of router itself (e.g. gateway / default route)
+  generate new "Key="
+    $  wpa_passphrase $(pass devices/router/ssid|awk '/login:/{print$2}') $(pass devices/router/ssid|head -1) | sed -rn '/.*psk=([0-9a-f]+).*/s//\1/p'
 
 DEBUG
   If error on connection -- see reasons:

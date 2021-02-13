@@ -3,6 +3,10 @@ USAGE
     $ passmenu
   Copy url field from data produced by pass-import
     $ pass urldroplet.com | grep -oP '^url: \K.*' Y
+  Add password manually
+    $ </dev/urandom LC_ALL=C tr -dc '[:alnum:]' | tr -d '0OIl' | head -c20
+      NOTE: entropy=5.8125 per char e.g. char=16 -> bit=93
+    ⦅vim⦆ i<C-r>=system("</dev/urandom LC_ALL=C tr -dc '[:alnum:]' | tr -d '0OIl' | head -c20")
 
 
 Setup
