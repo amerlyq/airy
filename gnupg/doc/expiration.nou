@@ -2,6 +2,8 @@ Extend expiration date of subkey
 
   Import multihost master key from encrypted USB flash-drive
     $ sudo mount /dev/sdb /mnt
+    # $ git annex unlock /path/to/tomb/secu.luks
+    # $ r.tomb-backup -S '' -T /path/to/tomb -n secu -m
     $ cd /mnt
     $ gpg --import ./amerlyq.gpg-{public,private}.asc
 
@@ -18,7 +20,7 @@ Extend expiration date of subkey
     $ gpg --export --armor $gpgkey > amerlyq.gpg-public.asc
     $ gpg --export-secret-subkeys $gpgkey > subkeys.asc
     $ gpg --delete-secret-key $gpgkey
-      = yes, yes, delete, delete
+      = yes, yes, delete, delete, delete
     $ gpg --import subkeys.asc
     $ shred --remove subkeys.asc
     $ mv -vft /mnt -- amerlyq.gpg-{public,private}.asc
@@ -26,7 +28,7 @@ Extend expiration date of subkey
     $ gpg -K
 
   Share encryption key to other devices (only the latest encryption key is actually used by identity)
-    $ gpg --export-secret-subkeys --armor --output amerlyq.gpg-encrypt.asc "$(gpg --list-secret-keys --keyid-format short | awk '$4=="[E]"{print substr($2,index($2,"/")+1)}')"!
+    $ gpg --export-secret-subkeys --armor --output amerlyq.gpg-encrypt.asc "$(gpg --list-secret-keys --keyid-format short | awk '$4=="[E]"{print substr($2,index($2,"/")+1)}')\!"
 
   MAYBE: "trust" them on other devices
     [⡞⣲⡈⣝] FIXED:ERR:
