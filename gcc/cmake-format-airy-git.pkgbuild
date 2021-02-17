@@ -28,7 +28,7 @@ pkgver() {
 }
 
 check() {
-  mkdir "$srcdir/check"
+  mkdir -p "$srcdir/check"
   cd "$srcdir/check"
   export CTEST_OUTPUT_ON_FAILURE=1
   cmake "$srcdir/cmake_format"
