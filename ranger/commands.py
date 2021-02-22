@@ -34,7 +34,7 @@ class ag(Command):
     """
 
     editor = os.getenv("EDITOR") or "vim"
-    acmd = "ag --smart-case --group --color --hidden"  # --search-zip
+    acmd = "rg --smart-case --color always --hidden"  # --search-zip
     qarg = re.compile(r"""^(".*"|'.*')$""")
     patterns = []
     # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
@@ -72,9 +72,9 @@ class ag(Command):
         return (cmdl, "")
 
     def _aug_nvr(self, iarg, group=None):
-        cmdl = "ag --smart-case --hidden".split()
+        cmdl = "rg --smart-case --hidden".split()
         if group:
-            cmdl += ["--column", "--group"]
+            cmdl += ["--column"]
         else:
             cmdl += ["--vimgrep"]
 
