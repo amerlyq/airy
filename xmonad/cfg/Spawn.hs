@@ -25,10 +25,11 @@ main = concat
     , ("M-S-"   ++ k , spawnHereAt Master t)
     ] -- NOTE: We have M-o <Space> for floating terminal instead of (spawnAndDo doCenterFloat t).
     | (k, t) <-
-    [ ("<Space>", "r.t")
-    , ("<Return>", "r.t r.ranger")
-    , ("C-<Space>", "r.t -M")  -- WARNING: if broken >> HW problem
-    , ("C-<Return>", "r.t -M r.ranger")
+    -- DFL: temp dir "/t" for sh VIZ: catalogue "/@" for fm
+    [ ("<Space>", "env --chdir=/t r.t")
+    , ("<Return>", "env --chdir=/@ r.t r.ranger")
+    , ("C-<Space>", "env --chdir=/t r.t -M")  -- WARNING: if broken >> HW problem
+    , ("C-<Return>", "env --chdir=/@ r.t -M r.ranger")
     , ("M1-<Space>", "r.wm-run-xcwd r.t")
     , ("u" , "r.b")
     -- "r.b" open on new empty wksp
