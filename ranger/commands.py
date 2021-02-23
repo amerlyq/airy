@@ -34,7 +34,7 @@ class ag(Command):
     """
 
     editor = os.getenv("EDITOR") or "vim"
-    acmd = "rg --smart-case --color always --hidden"  # --search-zip
+    acmd = "rg --pcre2 --smart-case --color always --hidden"  # --search-zip
     qarg = re.compile(r"""^(".*"|'.*')$""")
     patterns = []
     # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
@@ -72,7 +72,7 @@ class ag(Command):
         return (cmdl, "")
 
     def _aug_nvr(self, iarg, group=None):
-        cmdl = "rg --smart-case --hidden".split()
+        cmdl = "rg --pcre2 --smart-case --hidden".split()
         if group:
             cmdl += ["--column"]
         else:
@@ -87,7 +87,10 @@ class ag(Command):
             opt = self.arg(iarg)
             while opt in ["-Q", "-w"]:
                 self.shift()
-                cmdl.append(opt)
+                if opt == "-Q":
+                    cmdl.append("--fixed-strings")
+                elif opt == "-w":
+                    cmdl.append("--word-regexp")
                 opt = self.arg(iarg)
             # TODO: save -Q/-w into ag.patterns =NEED rewrite plugin to join _aug*()
             patt = self._quot(self._bare(self._arg(iarg)))
@@ -122,7 +125,10 @@ class ag(Command):
             opt = self.arg(iarg)
             while opt in ["-Q", "-w"]:
                 self.shift()
-                cmdl.append(opt)
+                if opt == "-Q":
+                    cmdl.append("--fixed-strings")
+                elif opt == "-w":
+                    cmdl.append("--word-regexp")
                 opt = self.arg(iarg)
             # TODO: save -Q/-w into ag.patterns =NEED rewrite plugin to join _aug*()
             patt = self._bare(self._arg(iarg))  # THINK? use shlex.split() also/instead
