@@ -159,11 +159,30 @@ define diss
     end
   end
   set print max-symbolic-offset 1
-  disassemble /r $addr - $sz*2/3, +$sz
+  disassemble $addr - $sz*2/3, +$sz
   set print max-symbolic-offset 1000
 end
 document diss
 Disassemble section around $pc of specified size in ratio 2:1
+end
+
+define disr
+  set $addr = $pc
+  set $sz = 0x60
+  if $argc == 1
+    set $sz = $arg0
+  else
+    if $argc == 2
+      set $sz = $arg0
+      set $addr = $arg1
+    end
+  end
+  set print max-symbolic-offset 1
+  disassemble /r $addr - $sz*2/3, +$sz
+  set print max-symbolic-offset 1000
+end
+document disr
+Disassemble section around $pc of specified size in ratio 2:1 (+raw instr)
 end
 
 define disf
