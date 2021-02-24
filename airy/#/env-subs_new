@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+#
+#%SUMMARY: replace %{ENV_VAR} expression by ENV_VAR value in any file
+#%USAGE: $ ./$0 [-ip] [-o dst] [--] src.. [<src] [VAR=value..]
+#%  * [show]    $ ./$0 src..
+#%  * [diff]    $ ./$0 -d dst -- src..
+#%  * [inplace] $ ./$0 -i src..
+#%  * [direct]  $ ./$0 -o dst -- src..
+#%  * [mkdirs]  $ ./$0 -po dst -- src..
+#%  * [atomic]  $ ./$0 -pio dst -- src..
+#%  * [stdin]   $ ./$0 -pio dst -- src1 - src3 < src2
+#%
+set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+# FIND: preprocessors for files to replace my env-subs
+#   => E.G. ~/.Xresources, autoconf, etc
+# DEV: multipass replacement
+#   => switch to replace only list of vars and don't touch others
+#   => then in second pass replace all one more time
+# ENH: split to 'env-subs' which extracts env and calls 'list-subs' with args for actual replacement
+#   * 'list-subs' must work on /dev/stdin or 'VAR=5 ... -- file'
+#   => this will allow to do 'env-subs' on subset
+# DEV: optionally allow removing headings
+#   IDEA: impl for ${VAR+\n$VAR}, etc
+#   * for /^%{MULTILINE_BLOCK}/ remove heading newline
+#   * for key = %{VALUE} remove heading space or even whole option
+#   NEED: specify what is treated as heading in each case
+# DEV: prefer working with stdin/stdout as pipe w/o supplying '-'
+# DEV: when %{DPI-} replace by empty '' if DPI is not present
+# DEV: pass key=values on cmdline -- read ENV only if "-E" option specified
+
+lp='%[{]'
+mp='[A-Z_][A-Z_0-9]*'
+rp='[}]'
+dryrun=
+inplace=
+parentdirs=
+sudo=
+
+# [Marker patterns]: l=left m=middle r=right
+while getopts 'ipl:m:nr:' o; do case $o in :|'?') exit 1
+;; [lmr]) declare "${o}p=$OPTARG"
+;; i) inplace=1
+;; n) dryrun=1
+;; p) parentdirs=1
+esac; done; shift $((OPTIND-1))
+
+src=$1
+dst=${2:--}
+
+((dryrun)) && dst=-
+[[ $dst == - ]] && dst=/dev/stdout
+
+has_perm(){ local d=$1; [[ ${d:0:1} == / ]] || d=$PWD/$d
+  until [[ -e $d || $d == / ]]; do d=${d%/*}; d=${d:-/}
+  done; [[ -w $d ]]
+}
+
+# BUT won't it be more destructive then using -s?
+has_perm "$dst" || sudo=sudo
+
+((parentdirs)) && [[ ! -d ${dst%/*} ]] && $sudo mkdir -p "${dst%/*}"
+
+if ((inplace)) && [[ ! $src -ef $dst ]]; then
+  tmp=$dst
+else
+  # ALT: pre-remove / write-into
+  [[ -L $dst ]] && { >&2 echo "Err: refusing to remove symlink dst=$dst"; exit 1; }
+  tmp=$(mktemp)
+  trap 'trap - EXIT; cmp -s "$tmp" "$dst" || $sudo mv -vf "$tmp" "$dst"' EXIT
+fi
+
+# BET:TRY: use ZSH ?
+
+# WARN: unrestricted recursive substitution
+# FIXME: -- endless loop for USER='%USER%' -- set depth limit ?
+# ALT:BAD:(both empty and undef): if (length(v)==0)
+gawk -vl="$lp" -vm="$mp" -vr="$rp" '{
+  while(match($0, l m r)) {
+    k = substr($0, RSTART, RLENGTH)
+    k = gensub(l"("m")"r, "\\1", "1", k)
+    if (!(k in ENVIRON)) {
+      print "No env: "k > "/dev/stderr"
+      exit 4
+    }
+    gsub(l k r, ENVIRON[k])
+  }
+  print
+}' "$src" | $sudo tee "$tmp" >/dev/null
