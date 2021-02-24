@@ -39,7 +39,7 @@ sed -rn '\@^([0-9.]+).*\[([0-9]+)\]: (Entering|Leaving) directory.*\/mib3_integ[
     for(k in t){ print "Err: remains",k,t[k] > "/dev/stderr" }
     for(k in dt){ printf "%4.3f\t%s\n",dt[k],substr(k,index(k,":")+1) }
   }' \
-| sed -r '\@(([^\t]*/output/build|usr_pkgs/luxoft|sdk/nongpl_pkgs)/[^/]+).*@s//\1\/*/' \
+| sed -r '\@(([^\t]*/output/build|sdk)/[^/]+).*@s//\1\/*/' \
 | sed -r '\@(usr_pkgs/[^l][^/]+).*@s//\1\/*/' \
 | awk -F$'\t' -vOFS=$'\t' '{at[$2]+=strtonum($1)} END{for(k in at){printf "%4.3f\t%s\n",at[k],k}}' \
 | sort -nk1,1
