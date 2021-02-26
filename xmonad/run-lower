@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+#
+# SPDX-FileCopyrightText: 2021 Dmytro Kolomoiets <amerlyq+code@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY: ⌇⡠⠴⣱⣻
+#%USAGE: $ ./$0
+#%DEPS: python-xcffib
+
+import operator
+from collections import namedtuple
+from functools import reduce
+
+import xcffib
+import xcffib.xproto as xp
+
+
+class MaskMapping:
+    def __init__(self, nm, obj):
+        gen = ((k.lower(), getattr(obj, k)) for k in dir(obj) if not k.startswith("_"))
+        masks = list(sorted(gen, key=operator.itemgetter(1)))
+        self._struct = namedtuple(nm, (k for k, m in masks))._make(m for k, m in masks)
+
+    def __call__(self, **kw):
+        assert all(k in self._struct._fields for k in kw)
+        mask = reduce(
+            operator.or_, (m for k, m in self._struct._asdict().items() if k in kw)
+        )
+        vals = [kw[k] for k in self._struct._fields if k in kw]
+        return mask, vals
+
+
+ConfigureMasks = MaskMapping("ConfigureMasks", xp.ConfigWindow)
+
+
+## ALT:(EWMH): only top-level windows
+# OR: use older ICCCM standard and filter by presence of WM_STATE
+# REF: https://bbs.archlinux.org/viewtopic.php?id=113346
+# def toplevel_windows(conn, wmcls):
+#     _NET_CLIENT_LIST = (
+#         conn.core.InternAtom(True, len("_NET_CLIENT_LIST"), "_NET_CLIENT_LIST")
+#         .reply()
+#         .atom
+#     )
+#     wroot = conn.get_setup().roots[conn.pref_screen].root
+#     r = conn.core.GetProperty(
+#         False, wroot, _NET_CLIENT_LIST, xp.GetPropertyType.Any, 0, 2 ** 32 - 1
+#     ).reply()
+#     yield from r.value
+
+
+# _NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DOCK
+# WM_CLASS(STRING) = "xmobar"
+def all_windows(conn):
+    # MAYBE:PERF: fetch all cookies into dict first, and then wait in .reply() all in batch
+    fatom = lambda a: conn.core.InternAtom(False, len(a), a).reply().atom
+    WM_CLASS = fatom("WM_CLASS")
+    STRING = fatom("STRING")
+    fprop = lambda w: conn.core.GetProperty(False, w, WM_CLASS, STRING, 0, 0xFFFFFFFF)
+
+    wroot = conn.get_setup().roots[conn.pref_screen].root
+    q = conn.core.QueryTree(wroot).reply()
+    for wid in q.children:
+        r = fprop(wid).reply()
+        if not r.value_len:
+            continue
+        # INFO: x11 - WM_CLASS vs WM_INSTANCE? - Unix & Linux Stack Exchange ⌇⡠⠸⢱⠵
+        #   https://unix.stackexchange.com/questions/494169/wm-class-vs-wm-instance
+        inst, _, cls = r.value.to_string().rstrip("\0").partition("\0")
+        yield (wid, inst, cls)
+
+
+def main():
+    conn = xcffib.connect(display=None)
+    mask, vals = ConfigureMasks(stackmode=xp.StackMode.Below)  # TRY: BottomIf
+
+    # ALT:BAD: raise all other windows beside "xmobar"
+    wmcls = "xmobar"
+    for wid, inst, cls in all_windows(conn):
+        if wmcls in (inst, cls):
+            print(wid)
+            conn.core.ConfigureWindow(wid, mask, vals).discard_reply()
+    conn.flush()
+
+
+if __name__ == "__main__":
+    main()

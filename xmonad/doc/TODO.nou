@@ -254,6 +254,12 @@ FIND:(how to)
 
 FIXME
   [_] BUG: fullscreen overlapping for xmobar
+    Docks appear on top of full screen windows · Issue #211 · xmonad/xmonad-contrib ⌇⡠⠴⠴⡠
+      https://github.com/xmonad/xmonad-contrib/issues/211
+    ATT:
+      * xmobar must be launched before any other window -- or it will be on top of them
+      * you can't reorder xmobar Z depth by !wmctrl as it's excluded by xmonad from being managed
+    ::: FIXED: use !r.xmonad-lower to directly reorder (lower) window by C/Python code (like //tinywm-xcb.c)
   [_] popup/tooltip/balloon DomDom in Wine steals focus
     SEE https://wiki.haskell.org/Xmonad/Frequently_asked_questions
       # 3.7.4 Avoid the master window, but otherwise manage new windows normally
