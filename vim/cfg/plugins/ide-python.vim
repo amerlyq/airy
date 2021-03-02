@@ -16,13 +16,13 @@ call dein#add('hynek/vim-python-pep8-indent', {
 " SEIZE:(linter status): https://www.vimfromscratch.com/articles/vim-for-python/
 " TODO: pytest, nosetest, isort, black
 " FAIL:(autoimport): moves imports outside conditions and above shebang
+" \\n   let g:ale_python_pylint_use_msg_id = 1
 call dein#add('dense-analysis/ale', {
   \ 'on_ft': 'python',
   \ 'on_cmd': ['ALEInfo', 'ALEFix'],
   \ 'hook_source': "
 \\n   let g:ale_linters_explicit = 1
 \\n   let g:ale_linters = { 'python': ['flake8', 'pylint'] }
-\\n   let g:ale_python_pylint_use_msg_id = 1
 \\n   let g:ale_python_pylint_options = '--disable=C0103,C0111,W0511'
 \\n
 \\n   let g:ale_fixers = { 'python': ['black', 'isort'] }

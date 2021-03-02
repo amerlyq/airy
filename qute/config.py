@@ -2002,7 +2002,7 @@ c.url.searchengines = {
     "so": "http://stackoverflow.com/search?q={}",
     "en": "https://google.com/search?q=english%20{}",
     "ин": "https://google.com/search?q=english%20{}",
-    "p3": "https://docs.python.org/3/search.html?check_keywords=yes&area=default&q={}",
+    "py3": "https://docs.python.org/3/search.html?check_keywords=yes&area=default&q={}",
     "pY": "https://google.com/search?q=python%20{}",
     "p2": "https://google.com/search?q=python2%20{}",
     "py": "https://google.com/search?q=python3%20{}",

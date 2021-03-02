@@ -15,7 +15,7 @@ cache=$TMPDIR/qute.cfg
 [[ ${QUTE_COUNT-} ]] || [[ ! -f $cache ]] || QUTE_COUNT=$(sed -n '/^[0-9]$/s//\0/p;q' "$cache")
 
 # HACK: use count=10 to use no indent
-count=$(( ${QUTE_COUNT:-1} % 10 ))
+count=$(( ${QUTE_COUNT:-0} % 10 ))
 echo "$count" >| "$cache"
 
 blk=${1-}
