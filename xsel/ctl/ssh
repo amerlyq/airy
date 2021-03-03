@@ -12,9 +12,3 @@ rem='/tmp/xsel-shared.remote'
 exec r.xsel-shared -L "$loc" -- \
   ssh -o 'StreamLocalBindUnlink=yes' -R "$rem:$loc" \
   "$@"
-
-
-# BET:FIXME:simplify: ⌇⡠⠤⡰⠣
-#   * ADD:(zsh): replace "xci" on any ssh-login by "xc-fwd" :: PATH=/@/airy/ssh/exe:$PATH
-#   * BET:TRY: pass PATH to SSH on connect
-#   * ALT: run only xc-fwd in first connection shell and create connection-named socket

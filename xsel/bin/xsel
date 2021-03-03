@@ -5,6 +5,8 @@
 # DEV: SCHROOT_CHROOT_NAME
 
 ## BAD: using dynamic port, can't get value of random port choosen
+#  i.e. you pass both sockets paths from HOST but you can't know remote value SSH_CONNECTION beforehand
+#  IDEA: rport=$(ssh 'echo $SSH_CONNECTION' -S /path/to/master.sock user@host)
 #   http://blog.wrouesnel.com/articles/SSH%20port%20forwarding%20when%20AllowTCPForwarding%20is%20disabled/
 #   $ socat TCP-LISTEN:<local port>,reuseaddr,fork "EXEC:ssh <server> nc localhost <remote port>"
 # read -r _ rport _ _ <<< "$SSH_CONNECTION"

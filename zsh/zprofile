@@ -25,6 +25,12 @@ fi
 hash ruby 2>/dev/null && PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
 hash cabal 2>/dev/null && PATH=~/.cabal/bin:$PATH
 PATH=~/.local/bin:$PATH
+
+# ALT: ~/.ssh/environment + "PermitUserEnvironment PATH">>/etc/ssh/sshd_config
+#   BAD:(hardcode): can't extend existing PATH
+# [_] TODO: chroot/docker/qemu/vbox -- provide similar clipboard forwarding
+[[ -z ${DISPLAY-} && -n ${SSH_CONNECTION+x} && -d /usr/local/libexec/xc ]] && PATH=/usr/local/libexec/xc:$PATH
+
 export PATH
 # Deduplicate
 # if hash awk 2>/dev/null; then

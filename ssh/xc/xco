@@ -1,0 +1,4 @@
+#!/bin/sh
+#%USAGE: $ xco | ...
+read -r socket < "$XDG_RUNTIME_DIR/xc/${SSH_CONNECTION%% *}"
+exec socat -4 -t 0.5 - "UNIX-CLIENT:$socket" <&-

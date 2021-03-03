@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#%USAGE: $ r.ssh-xc {myalias|user@host} ⌇⡠⠤⡰⠣
+#  STOP: $ ssh -O exit myalias
+#%ONELINE:CFG:(remote): $ echo "socat -4 -t 0.5 - 'TCP4:127.0.0.1:2022'" > /usr/local/bin/xc
+#%ONELINE:CFG:(local): $ ssh -MR 2022 user@host true && socat -4 "TCP4:127.0.0.1:2022",fork SYSTEM:"xclip -selection clipboard -\$(test -t 0&&echo in||echo out)"
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+#%NEED:(openssh>=6.7): add "StreamLocalBindUnlink=yes"
+#%  << both [REMOTE] /etc/sshd_config and [LOCAL] ~/.ssh/config
+
+host=$1
+
+# OR:SAFE: [[ ${host:0:1} != - ]] && loc+=".$1"  # sfx=<host_alias>
+loc=$XDG_RUNTIME_DIR/xc-server.$host
+
+## THINK: how chaining hops will work with clipboard
+rmt="/run/user/1000/xc-client.$(hostname)"
+
+## HACK: forward-propagate hostname-indexed clipboard socket name,
+##   and back-propagate connection details
+rconn=$(ssh -t -o 'StreamLocalBindUnlink=yes' -R "$rmt:$loc" -- "$host" '
+  dst=$XDG_RUNTIME_DIR/xc/${SSH_CONNECTION%% *}
+  mkdir -p -- "${dst%/*}"
+  printf "%s\n" "'"$rmt"'" > "$dst"
+  printf "%s\n" "$SSH_CONNECTION"
+')
+echo "$rconn"
+
+exec socat -4 UNIX-LISTEN:"$loc",fork EXEC:"xc"
+
+
+# MAYBE: must fork "xc" somehow to be continous/reentrant
+# FAIL: $ socat EXEC:"ssh -vvv -W '127.0.0.1:28223' wkme" EXEC:"xc"
+#   ERR: Stdio forwarding request failed: Session open refused by peer
+#   ALT: $ socat -v EXEC:"xc",pipes EXEC:"ssh -vvv -tW '127.0.0.1:28223' wkme",nofork
+# FAIL: $ ssh -o 'ExitOnForwardFailure=yes' -fNTR "$rmt:$loc" "$host"
+#   ERR: Cannot fork into background without a command to execute.
+
+## ALT:HACK(0): allocate and store random server port BAD:(-O): connection must already exist
+#   rport=$(ssh -O forward -tR "127.0.0.1:0:$loc" "$host")
+#   REF: https://unix.stackexchange.com/questions/127940/determine-dynamically-allocated-port-for-openssh-remoteforward
+
+## ALT:BAD: if socat exists with errors -- ssh still be called
+# MAYBE: flock -xonE13 "$loc" ...
+# socat -4 UNIX-LISTEN:"$loc",fork EXEC:"xc" & pid=$!
+# ssh -o 'StreamLocalBindUnlink=yes' -NR "$rmt:$loc" "$host"
+# kill $pid
+# wait
