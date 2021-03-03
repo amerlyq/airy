@@ -85,7 +85,8 @@ function isOpened { local luks=$1 dm=$2 loop
   loop=$(sudo cryptsetup status $dm | sed -rn '/^\s*loop:\s*(.*)/s//\1/p') || (($?==4?0:$?))
   # BUG: loop=/aura.luks != /srv/tomb/lc/aura.luks
   #   FIXED: sudo cryptsetup close -- tomb-aura
-  expectMount 1 "$loop" $luks /dev/mapper/$dm
+  # FIXED:(:P): use realpath(orgn) to compare with loop path
+  expectMount 1 "$loop" ${luks:P} /dev/mapper/$dm
 }
 
 
@@ -103,11 +104,15 @@ function OpenTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
     sshfs -o "umask=0077,noexec,no_readahead,allow_root" $rloc $loc
   fi
 
+  local mode=rw
   local luks=$loc/$tomb.luks
   [[ ! -r $luks ]] && >&2 echo "Err: luks='$luks' file must exist and be readable" && exit 1
-  # FIXME: print warning and mount in read-only
-  [[ ! -w $luks ]] && >&2 echo "Err: luks='$luks' file must be writable to save changes" && exit 1
-  [[ -L $luks ]] && >&2 echo "Err: luks='$luks' must not be symlink. Hint: \$ git annex unlock ${luks##*/}" && exit 1
+  [[ ! -w $luks ]] && mode=ro && >&2 echo "Warn: no write permissions, luks='$luks' file will be mounted readonly"
+  # CHECK: maybe allow writing into symlinks after above fix of "${luks:P}"
+  if [[ -w $luks && -L $luks ]]; then
+    >&2 echo "Err: writable luks='$luks' must not be symlink. Hint: \$ git annex unlock ${luks##*/}"
+    exit 1
+  fi
 
   if notOpened $luks $dm; then
     # BAD: actual pass path directly depends on $rloc
@@ -121,7 +126,7 @@ function OpenTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
 
   local dev=/dev/mapper/$dm
   if notMounted $dev $mnt; then
-    sudo mount $dev $mnt
+    sudo mount -o "$mode" $dev $mnt
   fi
 }
 
