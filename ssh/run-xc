@@ -2,7 +2,7 @@
 #%USAGE: $ r.ssh-xc {myalias|user@host} ⌇⡠⠤⡰⠣
 #  STOP: $ ssh -O exit myalias
 #%ONELINE:CFG:(remote): $ echo "socat -4 -t 0.5 - 'TCP4:127.0.0.1:2022'" > /usr/local/bin/xc
-#%ONELINE:CFG:(local): $ ssh -MR 2022 user@host true && socat -4 "TCP4:127.0.0.1:2022",fork SYSTEM:"xclip -selection clipboard -\$(test -t 0&&echo in||echo out)"
+#%ONELINE:CFG:(local): $ ssh -MR 2022 user@host true && socat -4 "TCP4-L:127.0.0.1:2022",reuseaddr,fork SYSTEM:"xclip -selection clipboard -\$(test -t 0&&echo in||echo out)"
 set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
 #%NEED:(openssh>=6.7): add "StreamLocalBindUnlink=yes"

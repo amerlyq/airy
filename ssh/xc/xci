@@ -3,7 +3,7 @@
 # ALT:(fixed): socket=$XDG_RUNTIME_DIR/xc-shared
 read -r socket < "$XDG_RUNTIME_DIR/xc/${SSH_CONNECTION%% *}"
 # ALT:(port): "TCP4:127.0.0.1:$port"
-exec socat -4 -t 0.5 - "UNIX-CLIENT:$socket" >&- 2>&-
+exec socat -u STDIN "UNIX-CLIENT:$socket" >&- 2>&-
 
 ## ALT: no-portforward fallback to hide errors in vim and prevent copy-paste errors
 # if [[ -z ${DISPLAY-} && -n ${SSH_CONNECTION-} ]] && [[ -S $socket ]] && nc -4 -dzU "$socket"

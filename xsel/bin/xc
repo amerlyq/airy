@@ -3,10 +3,42 @@
 #%  $ xc a "b c" d | ...
 #%  $ xc | ...
 #%  $ ... | xc
+#%DEPs:(local): |moreutils|
+
+## ALT:FAIL: newlines become spaces
+# IFS="
+# "
+# xcio <<EOT
+# $*
+# EOT
 if test $# -gt 0; then
   printf '%s\n' "$@" | xcio
-elif test -t 0 -o ! -e /dev/stdin; then
-  xco
-else
-  xci
+  exit
 fi
+
+ifne sh -c 'xci && exit 77'
+err=$?
+test "$err" -eq 77 && exit 0
+test "$err" -ne 0 && exit "$err"
+exec xco
+
+## ALSO:FAIL: socat keeps opened both ends (even if you close/redirect /dev/null on remote)
+#   test -t 0 -o ! -e /dev/stdin && echo content from stdin
+#   test -p /dev/stdout && echo piping to cmd
+#   test ! -t 1 -a ! -p /dev/stdout && echo redirection to file
+# TRY:ALT:(-t 0.5): ,linger=1
+# TRY:ALT:(/dev/null): ,shut-down|close|null
+# TRY:ALT:(don't work):MAYBE: $ exec xcx -silent
+
+# BET: bash - How to check if a pipe is empty and run a command on the data if it isn't? - Unix & Linux Stack Exchange ⌇⡠⠿⣥⣿
+#   https://unix.stackexchange.com/questions/33049/how-to-check-if-a-pipe-is-empty-and-run-a-command-on-the-data-if-it-isnt/498065#498065
+#  << TRY: use it as self-compiled C script
+
+# OR:(ifne):BAD: shell doesn't support '\0' symbols in strings
+# h=$(head -c 1; echo .)
+# h=${h%.}
+# if test "${#h}" -eq 0; then
+#   exec xco </dev/null
+# else
+#   { printf '%s' "$h"; cat; } | exec xci >/dev/null
+# fi
