@@ -2,6 +2,9 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
+  ## NOTE: fetch many lib32-*
+  #  I don't need them anymore, as I prefer using steam directly
+  #  BUT: steam depends on some lib32- too :(
   pkg_inst wine wine-mono wine-gecko winetricks
 
 elif distro ubuntu; then

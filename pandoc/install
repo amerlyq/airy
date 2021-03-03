@@ -1,7 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
-pkg_inst pandoc
+## BAD:(=52): too many haskell- deps
+# pkg_inst pandoc
+aur_inst pandoc-bin
 
 # NOTE: !pandoc does not have .adoc reader, only writer
 # pkg_inst asciidoctor

@@ -3,11 +3,12 @@ source ~/.shell/func.d/packages
 
 pkg_inst dictd
 
-if distro arch; then
-    echo "Err: need create PKGBUILD for yarxi"
+if distro arch; then :
+    # echo "Err: need create PKGBUILD for yarxi"
     # Dependencies: libc6, libqt4-core (>= 4.6), libqt4-gui (>= 4.6),
     #               libqt4-network (>= 4.6), ttf-sazanami-mincho
     # SEE https://code.google.com/p/yarxi-pl/downloads/list
+    # aur_inst yarxi
 
 elif distro ubuntu; then
     pkg_inst dict
