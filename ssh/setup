@@ -7,4 +7,7 @@ linkcp -t ~/.ssh config
 # NOTE: remote clipboard wrappers
 linkcp -t /usr/local/libexec/xc -f xc -- xci xco xcio
 
-./ssh-keys.gen
+### DISABLED:BET: create encrypted keys only once on ArchLinux install
+#   $ ssh-keygen -t ed25519 -C ED25519_$(hostname) -f ~/.ssh/id_ed25519
+#   $ ssh-keygen -t rsa -C git_$(hostname) -f ~/.ssh/git_rsa
+# ./ssh-keys.gen

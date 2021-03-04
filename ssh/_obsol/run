@@ -33,6 +33,7 @@ fi
 
 old=( -oKexAlgorithms=+diffie-hellman-group1-sha1 )
 
+## BET: use ~/.ssh/config profiles instead of this script
 case $prg
 in mpd)  r.mpd-sir "$@"
 ;; bsrv) ssh bsrv   ${@:--t "$sstmux"}

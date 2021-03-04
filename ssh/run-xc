@@ -26,7 +26,8 @@ rconn=$(ssh -t -o 'StreamLocalBindUnlink=yes' -R "$rmt:$loc" -- "$host" '
 ')
 echo "$rconn"
 
-exec socat -4 UNIX-LISTEN:"$loc",fork EXEC:"xc"
+# [_] FUTURE: exit socat when ssh is disconnected
+exec socat UNIX-LISTEN:"$loc",mode=600,flock-ex-nb,fork EXEC:"xc"
 
 
 # MAYBE: must fork "xc" somehow to be continous/reentrant
