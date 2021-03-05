@@ -25,6 +25,11 @@ Virtual serial port
   Virtual pseudo terminal
     $ man pts
     $ socat -d -d PTY,raw,echo=0,link=/tmp/ttySV{0,1}
+  BET: linux - Socat terminates after connection close - Stack Overflow ⌇⡠⡁⡕⡾
+    https://stackoverflow.com/questions/28032549/socat-terminates-after-connection-close
+    $ "while true" socat PTY,link=/dev/ttyV1,echo=0,raw,unlink-close=0 TCP-LISTEN:11313,forever,reuseaddr
+    >> allow single user for serial port, queue others
+
   [_] FIND: G: linux usb to serial more ports
     [_] SEE: specs for some serial-to-usb adapters --> maybe there is limitation to 4 serials at once
     [_] TRY: change which /dev/ttyS* to which /dev/ttyUSB* is mapped <== reuse /dev/ttyS3 which isn't used
