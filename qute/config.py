@@ -2492,15 +2492,20 @@ config.bind("<Ctrl-W>", "hint --mode word all", mode="hint")
 # config.bind('y', 'prompt-accept yes', mode='yesno')
 
 
-## qute-pass
-config.bind("zl", "spawn --userscript qute-pass --dmenu-invocation dmenu")
-config.bind(
-    "zul", "spawn --userscript qute-pass --dmenu-invocation dmenu --username-only"
+## qute-pass :: keep logins encrypted, use some catchword as filename
+passcmd = " ".join(
+    (
+        "spawn",
+        "--userscript qute-pass",
+        "--dmenu-invocation dmenu",
+        "--username-target secret",
+        '--username-pattern "login: (.+)"',
+    )
 )
-config.bind(
-    "zpl", "spawn --userscript qute-pass --dmenu-invocation dmenu --password-only"
-)
-config.bind("zol", "spawn --userscript qute-pass --dmenu-invocation dmenu --otp-only")
+config.bind("zl", passcmd)
+config.bind("zul", f"{passcmd} --username-only")
+config.bind("zpl", f"{passcmd} --password-only")
+config.bind("zol", f"{passcmd} --otp-only")
 
 
 ### Load private part of config
