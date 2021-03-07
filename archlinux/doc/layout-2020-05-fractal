@@ -204,7 +204,7 @@ pacstrap /mnt  base amd-ucode linux linux-firmware base-devel cryptsetup lvm2 bt
 #   # /dev/nvme1n1p5 LABEL=WinData
 #   UUID=E6567FB5567F8559 /win/data ntfs-3g rw,noauto,x-systemd.automount,nosuid,nodev,relatime,uid=1000,gid=users,dmask=022,fmask=133,windows_names,big_writes 0 0
 #   # NEED: $ print -l username=myuser password=mypass > /root/samba/netshare && chmod 600 $_
-#   //192.168.1.2/share  /net/share  cifs  ro,noauto,x-systemd.automount,credentials=/root/samba/netshare,vers=1.0,uid=1000,gid=users,iocharset=utf8 0 0
+#   //192.168.1.2/share  /net/share  cifs  ro,noauto,credentials=/root/samba/netshare,vers=1.0,uid=1000,gid=users,forceuid,forcegid,iocharset=utf8,rsize=4194304,wsize=4194304 0 0
 #   //192.168.1.2/share  /net/share  cifs  ro,noauto,x-systemd.automount,credentials=/root/samba/netshare,vers=3.1.1,mfsymlinks,uid=1000,gid=users,iocharset=utf8 0 0
 # HACK: refresh automount units after editing online /etc/fstab
 #   $# systemctl daemon-reload
@@ -223,6 +223,7 @@ dd if=/dev/random bs=32 count=1 of=/root/luks/crypt.key
 # MAYBE:BET? use global "umask 077" for "root" user
 chmod 600 /root/luks/crypt.key
 cryptsetup luksAddKey /dev/sda1 /root/luks/crypt.key
+# FIXME:BET: use UUID .instead-of. disk device
 echo "crypt  /dev/sda1  /root/luks/crypt.key  nofail,discard" >> /mnt/etc/crypttab
 
 
