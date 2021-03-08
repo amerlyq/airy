@@ -9,7 +9,9 @@ linkcp -t ~/.ipython/profile_default 'ipython_config.py'
 # pudb.cfg
 # sudo chown -R $USER:$USER ~/.config/pudb
 
+## BET: use PKGBUILD to creates only symlink :: $SYS/site-packages/just -> /@/just/pkg
 # WARN:(search-path): '.' -> std-lib -> user-pkg -> aura -> sys-pkg
-dst=$(python -m site --user-site)
-echo /@/lib > "$dst/aura.pth"
-python -m site  # DEBUG:INFO
+# BAD: don't expose "/@/just" globally -- it will result in names collision
+# dst=$(python -m site --user-site)
+# printf '%s\n' /@/just/pkg /@/just > "$dst/aura.pth"
+# python -m site  # DEBUG:INFO
