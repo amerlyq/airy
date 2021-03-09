@@ -1,0 +1,18 @@
+Screen history
+  VIZ: $ adb shell dumpsys -l
+  $ adb shell dumpsys usagestats | grep SCREEN[_NON]_INTERACTIVE
+
+How to verify android device Screen ON or OFF using adb shell command - Stack Overflow ⌇⡠⡃⠍⡐
+  https://stackoverflow.com/questions/30402582/how-to-verify-android-device-screen-on-or-off-using-adb-shell-command
+  false/true
+    $ adb shell dumpsys power | grep mHoldingDisplaySuspendBlocker
+  Dozing/Awake
+    $ adb shell dumpsys power | grep mWakefulness=
+  {OFF|ON}_{[UN]LOCKED|XXX}
+    $ adb shell dumpsys nfc | grep mScreenState=
+  0/1
+    $ adb shell service call power 12
+    Result: Parcel(00000000 00000000   '........') -> 0 means Screen OFF
+    Result: Parcel(00000000 00000001   '........') -> 1 means Screen ON
+  ~~
+    $ adb shell dumpsys input_method | grep mInteractive=true

@@ -2,7 +2,8 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  pkg_inst android-tools android-udev
+  # DEV:rm: android-tools
+  pkg_inst android-udev
   aur_inst jmtpfs
 
   # NEED:(F-Droid): kdeconnect

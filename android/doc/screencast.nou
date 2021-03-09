@@ -10,8 +10,8 @@ Connect ADB to a device over Wi-Fi.
   https://www.genymotion.com/blog/open-source-project-scrcpy-now-works-wirelessly/
   1. Connect the device to the same Wi-Fi as your computer
   2. Get your device IP address (in Settings → About phone → Status)
-  3. Enable adb over TCP/IP on your device: adb tcpip 5555
-  4. Connect to your device: adb connect DEVICE_IP:5555 (replace DEVICE_IP)
+  3. Enable adb over TCP/IP on your device: $ adb tcpip 5555
+  4. Connect to your device: $ adb connect DEVICE_IP:5555 (replace DEVICE_IP)
   5. Unplug your device
   6. Run scrcpy as usual 8Mbps $ scrcpy --bit-rate 2M --max-size 800
   To switch back to USB mode: adb usb.

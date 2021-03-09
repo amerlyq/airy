@@ -43,18 +43,6 @@ Advanced search in google play OR alternative android market
   "clock +intitle:alarm"
 
 
-Firefox bookmarks
-  open in address line: file:///data/data/org.mozilla.firefox/files/mozilla/ho11cy58.default/browser.db
-  `adb pull` from app data directory without root access ⌇⡠⠻⠙⢓
-    https://gist.github.com/jevakallio/452c54ef613792f25e45663ab2db117b
-    $ adb shell run-as com.package.name cp relative/path/file.ext /sdcard
-    $ adb pull /sdcard/file.ext
-    ERR: run-as: package not debuggable: org.mozilla.firefox
-      How to make a Release Android App debuggable ⌇⡠⠻⠚⡫
-        https://gist.github.com/nstarke/615ca3603fdded8aee47fab6f4917826
-        = basically, you must repack/resign application to make it debuggable
-
-
 BTRFS
   applications - How to bind mount a folder inside /sdcard with correct permissions? - Android Enthusiasts Stack Exchange ⌇⡞⠾⠬⡰
     https://android.stackexchange.com/questions/217741/how-to-bind-mount-a-folder-inside-sdcard-with-correct-permissions/217936#217936

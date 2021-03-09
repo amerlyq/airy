@@ -1,0 +1,43 @@
+
+CFG
+  $ aur_inst android-sdk android-sdk-build-tools-29.0.2 android-sdk-platform-tools android-platform-30
+    ?rm? android-tools
+
+
+  $ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+  $ export ANDROID_SDK_ROOT=/opt/android-sdk
+  $ export PATH=$ANDROID_SDK_ROOT/platform-tools/:$PATH
+  $ cd /cache/ff/fenix
+  $ printf '%s\n' debuggable autosignReleaseWithDebugKey >> ./local.properties
+    FIXED:ERR: android - React Native installRelease Task 'installRelease' not found in root project 'timeReportTool'. Some candidates are: 'uninstallRelease' - Stack Overflow ⌇⡠⡆⠞⠚
+      https://stackoverflow.com/questions/47754337/react-native-installrelease-task-installrelease-not-found-in-root-project-tim
+  $ ./gradlew clean app:assembleRelease
+  $ adb uninstall -k "org.mozilla.firefox"
+    << https://stackoverflow.com/questions/41709102/package-signatures-do-not-match-the-previously-installed-version
+  $ adb shell cmd package uninstall -k "org.mozilla.firefox"
+  $ ./gradlew app:installRelease
+    ERR: com.android.ddmlib.InstallException: INSTALL_FAILED_UPDATE_INCOMPATIBLE: Package org.mozilla.firefox signatures do not match previously installed version; ignoring!
+    FAIL: you can't install locally built debug app (with another signing key) and keep /data and /cache from official one
+  $ adb shell run-as org.mozilla.firefox cp /data/data/org.mozilla.firefox/files/mozilla/o2kz09s3.default/storage-sync.sqlite /sdcard
+
+
+w/o Android Studio
+  Android - ArchWiki ⌇⡠⡅⣧⡽
+    https://wiki.archlinux.org/index.php/android
+  How to Get Flutter and Android Working on Arch Linux :: rockyourcode ⌇⡠⡅⣧⠥
+    https://www.rockyourcode.com/how-to-get-flutter-and-android-working-on-arch-linux/
+  Publishing to Google Play Store · React Native ⌇⡠⡆⠞⠆
+    http://reactnative.dev/docs/signed-apk-android
+  USAGE: Build your app from the command line  |  Android Developers ⌇⡠⡆⠞⠱
+    https://developer.android.com/studio/build/building-cmdline
+
+
+ERR: Failed to install the following Android SDK packages as some licences have not been accepted. · Issue #3687 · jitpack/jitpack.io ⌇⡠⡅⣡⣁
+  https://github.com/jitpack/jitpack.io/issues/3687
+  NEED: fenix
+    $ yes | $ANDROID_SDK_ROOT/tools/bin/sdkmanager "platforms;android-30"
+    $ yes | $ANDROID_SDK_ROOT/tools/bin/sdkmanager "build-tools;29.0.2"
+    DEP: jdk8-openjdk OR jdk11-openjdk OR(15): jdk-openjdk
+  BET? https://discuss.circleci.com/t/android-platform-28-sdk-license-not-accepted/27768/16
+    $ yes | $ANDROID_SDK_ROOT/tools/bin/sdkmanager --licenses
+    $ yes | $ANDROID_SDK_ROOT/tools/bin/sdkmanager --update

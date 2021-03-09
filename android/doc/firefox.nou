@@ -1,0 +1,80 @@
+
+Firefox bookmarks
+  open in address line: file:///data/data/org.mozilla.firefox/files/mozilla/ho11cy58.default/browser.db
+  `adb pull` from app data directory without root access ⌇⡠⠻⠙⢓
+    https://gist.github.com/jevakallio/452c54ef613792f25e45663ab2db117b
+    $ adb shell run-as com.package.name cp relative/path/file.ext /sdcard
+    $ adb pull /sdcard/file.ext
+    ERR: run-as: package not debuggable: org.mozilla.firefox
+      How to make a Release Android App debuggable ⌇⡠⠻⠚⡫
+        https://gist.github.com/nstarke/615ca3603fdded8aee47fab6f4917826
+        = basically, you must repack/resign application to make it debuggable
+  ALT: build firefox "debuggable release" myself and use it for "run-as"
+      fenix/README.md at master · mozilla-mobile/fenix ⌇⡠⡅⢯⠅
+        https://github.com/mozilla-mobile/fenix/blob/master/README.md#building-debuggable-release-variants
+        :: ADD debuggable >> ./<proj-root>/local.properties
+      OFF:DLD: https://www.mozilla.org/en-US/firefox/channel/android/#nightly
+      G: firefox fenix download debuggable release
+
+  ALSO:
+    mortalis13/Tabs-Export-XPI-Android: Firefox addon for Android. Allows to export tabs' URLs to a text file ⌇⡠⡅⣕⣃
+      https://github.com/mortalis13/Tabs-Export-XPI-Android
+  ALT: use adb backup
+    REF: https://android.stackexchange.com/questions/231235/does-adb-backup-restore-still-work-because-it-says-its-deprecated
+    ::: FAIL(firefox): disallows backups in its own manifest
+      1297435 - Firefox disallows adb backup on android ⌇⡠⡅⣑⣢
+        https://bugzilla.mozilla.org/show_bug.cgi?id=1297435
+      1190375 - Create whitelist (or blacklist) for Android Auto Backup ⌇⡠⡅⣑⣞
+        https://bugzilla.mozilla.org/show_bug.cgi?id=1190375
+    $ adb backup "-apk -obb -shared -all -system" -f phone-20180522-120000.adb
+    $ adb backup -noapk com.neverland.alreader
+    $ adb backup -f alreader.ab -f com.neverland.alreader
+    $ abe unpack alreader.ab alreader.tar
+      DEP: aur/android-backup-extractor-git
+      OR: aur/python-android-backup-tools
+    $ tar xf alreader.tar
+    $ cp -t /@/items/android/alreader/ -- apps/com.neverland.alreader/{db/alreader.db,sp/com.neverland.alreader_preferences.xml}
+    $ sqlite3 /tmp/t/apps/com.neverland.alreader/db/alreader.db
+    sqlite> .schema RLIST
+     CREATE TABLE RLIST (_ID INTEGER PRIMARY KEY,FNAME TEXT,CP INTEGER,POS INTEGER,SZ INTEGER,TM INTEGER,TP INTEGER,DF INTEGER,R1 INTEGER,R2 TEXT,R3 TEXT);
+    sqlite> select * from RLIST limit 1;
+     86|/storage/9C33-6BBD/@/ranobe/@@  active/Forty Millenniums of Cultivation {325#}/Forty Millenniums of Cultivation.epub:/OEBPS/content.opf:/Forty Millenniums of Cultivation.epub|65001|4461892|6374179|0||1535581804000|0|Forty Millenniums of Cultivation.epub|
+  ALT: use custom backup FAIL: needs root
+    Jens Stein / oandbackup · GitLab ⌇⡠⡅⢿⣀
+      https://gitlab.com/jensstein/oandbackup/
+  ALT: rooting FAIL: will wipe-out all /data when rooting
+    https://smartandroid.fr/en/comment-rooter-un-samsung-galaxy-note-8-sans-pc/
+    https://forum.xda-developers.com/t/rooting-note-8-sm-n950f-without-wiping-data.3779227/
+  IDEA: backup from extensions or WebIDE on PC
+    [⡠⡅⣀⣄] Firefox Quantum for Android - backup profile without root? - Android Enthusiasts Stack Exchange ⌇⡠⡅⢶⢤
+      https://android.stackexchange.com/questions/188712/firefox-quantum-for-android-backup-profile-without-root
+      http://researchhubs.com/post/computing/javascript/open-a-local-file-with-javascript.html
+      ERR: Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource
+        !firefox>68 https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp
+        CFG: disable "privacy.file_unique_origin" in about:config
+          ::: FAIL: [Bug] about:config doesn't work in Firefox Preview Release · Issue #7865 · mozilla-mobile/fenix ⌇⡠⡆⠮⢶
+            https://github.com/mozilla-mobile/fenix/issues/7865
+    OBSOL: Debugging Firefox for Android with WebIDE - Firefox Developer Tools | MDN ⌇⡠⡅⣀⢺
+      https://developer.mozilla.org/en-US/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_with_WebIDE
+    SECU: Firefox: How a website could steal all your cookies | by Pedro Oliveira | InfoSec Write-ups ⌇⡠⡅⣈⣏
+      https://infosecwriteups.com/firefox-and-how-a-website-could-steal-all-of-your-cookies-581fe4648e8d
+    about:debugging - Firefox Developer Tools | MDN ⌇⡠⡅⣂⡄
+      https://developer.mozilla.org/en-US/docs/Tools/about:debugging#connecting_over_the_network
+      * ⦅open⦆ about:debugging
+      * open new empty tab on phone
+      * inspect this tab on PC
+      * change URL to file:///data/data/org.mozilla.firefox/files/mozilla/
+      * <C-S-i> to console
+      * Inspector: navigate to /html/body/table/tbody/tr[3]/td[1]
+        << copy profile name XXXXXXXX=o2kz09s3.default
+      * FAIL:(Address): try to fetch file:///data/data/org.mozilla.firefox/files/mozilla/o2kz09s3.default/storage-sync.sqlite
+      * FAIL:(Console): REPL ⦅js⦆ var xmlhttp = new XMLHttpRequest(); open("GET", "storage-sync.sqlite", true); xmlhttp.responseType = "arraybuffer"; xmlhttp.send();
+      * FAIL:(Inspector): edit <input type="file">
+  ALT: sync BAD: last day on #andr is not synced even after "Now"
+    History while syncing - it has got only 2 months, why is that?! | Firefox Support Forum | Mozilla Support ⌇⡠⡆⠰⣿
+      https://support.mozilla.org/en-US/questions/1278903
+    SRC: history.js - mozsearch ⌇⡠⡆⠱⠏
+      https://searchfox.org/mozilla-release/source/services/sync/modules/engines/history.js#183
+      WTF: only syncs history for last month and tabs for last week
+    985930 - History older than 6 months is not synced ⌇⡠⡆⠳⢩
+      https://bugzilla.mozilla.org/show_bug.cgi?id=985930
