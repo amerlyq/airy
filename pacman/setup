@@ -32,3 +32,5 @@ append_repo(){ local nm=$1 at=$2
 # BET?USE:(aurto):
 append_repo dev '/^#\[testing\]$/i'
 append_repo aur '$a'
+
+linkcp -t ~/.config/repoctl -- cfg/config.toml

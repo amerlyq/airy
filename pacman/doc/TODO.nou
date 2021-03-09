@@ -17,6 +17,12 @@ ALT:
     ALT: install manually w/o yaourt
 
 TODO
+  2021-03-09 [X] ERR: pacman: /usr/lib/libc.so.6: version `GLIBC_2.33' not found (required by pacman)
+    [SOLVED] pacman error - can't downgrade pacman / Newbie Corner / Arch Linux Forums ⌇⡠⡇⠪⠸
+      https://bbs.archlinux.org/viewtopic.php?id=263432
+      $ pacman --root /mnt --cachedir=/mnt/var/cache/pacman/pkg -S glibc gcc gcc-libs udisks2
+    NICE:USE: https://aur.archlinux.org/packages/pacman-static
+      $ wget https://pkgbuild.com/~eschwartz/repo/x86_64-extracted/pacman-static
   2019-12-02 [X] rebuild python packages when python itself is upgraded
     https://github.com/AladW/aurutils/issues/641#event-2839998079
     HACK: find all python-dependent packages in local "aur" db

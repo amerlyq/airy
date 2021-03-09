@@ -44,6 +44,14 @@ alias aurZ='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
 #   = Note that when you set your repo as a pacman CacheDir (which is recommended anyway), you can use KeepInstalled and simply run pacman -Sc. repoctl update then proceeds to remove stale entries from the db.
 aurx(){ find /var/cache/pacman/aur -name "*.db.tar" -execdir repo-remove {} "$@" \;; }
 
+## NOTE: cleanup aur.db from uninstalled pkgs (so aurU won't update them)
+# CFG: $ repoctl conf new /var/cache/pacman/aur/aur.db.tar
+#   TODO: add this cfg to airy
+# feature: aursync flag for deleting package from db and/or purge · Issue #208 · AladW/aurutils ⌇⡠⡇⠿⠖
+#   https://github.com/AladW/aurutils/issues/208
+alias aurX='repoctl update'
+
+
 # ALT: $ repoctl remove ...
 aur-remove(){ local pkg db
   for pkg; do

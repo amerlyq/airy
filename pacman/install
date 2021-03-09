@@ -23,11 +23,12 @@ KEY=DBE7D3DD8C81D58D0A13D0E76BC26A17B9B7018A \
     'https://raw.githubusercontent.com/AladW/aurutils/master/makepkg/PKGBUILD'
 
 
-# [_] WTF: why reiserfsprogs installed on clean system with aur ?
+# [⡠⡇⡾⣸] WTF: why reiserfsprogs installed on clean system with aur ?
+#   << MAYBE: :: btrfs-progs optionally requires reiserfsprogs: btrfs-convert
 
 
 pkg_inst pacman pacman-contrib
 pkg_inst pkgfile   # grep packages content w/o downloading
 
 # ATT: abs deprecated from 20170515, use asp :: $ asp checkout isync
-aur_inst aurutils-git
+aur_inst aurutils-git repoctl
