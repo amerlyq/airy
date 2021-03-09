@@ -197,7 +197,8 @@ parse_xtref(){ local a
 
   # XXX:(5): how to detect "rev .vs. non-rev" format ?   # z85r = @D1ou
   ;;  5) xts=$(printf '%s' "$a" | rev | basenc --z85 -d | od -An -tx1 | tr -d ' ')
-  ;;  4) xts=$(unicode -t "$a" | sed 's/^28//' | paste -sd '')  # braille = ⡞⠸⢜⡳
+  # OR: /opt/plan9/bin/unicode -t ⡞⠸⢜⡳  -> "285e\n2838\n289c\n2873\n"
+  ;;  4) xts=$(printf '%s' "$a" | iconv -f utf-8 -t utf-16le | od -An -tx2 | tr ' ' \\n | sed 's/^28//' | paste -sd '')  # braille = ⡞⠸⢜⡳
   ;;  3) xts=...  # u2048 = TBD
   ;;  *) >&2 echo "Err: unknown fmt with len=${#a}"; exit 1
   esac
