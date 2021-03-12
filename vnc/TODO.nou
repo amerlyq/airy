@@ -1,21 +1,49 @@
-%%%% Remote desktop
+%%%% "Real" remote desktop
 
 WARN!!! everything going on through VNC is visible on remote end screen !
   => BAD! unlocking X will provide access for anyone having physical access to remote
+
+REMOTE:
+  Connect to actual desktop (real monitor, keyboard, etc.)
+    $ paci x11vnc
+    $ x11vnc -localhost -display :0
+      << NEED:ATT! running Xorg
+
+
+LOCAL: ⌇⡞⡃⣑⣄
+  $ paci tigervnc
+  $ ssh -t -L 5900:localhost:5900 user@host 'x11vnc -localhost -display :0'
+  $ vncviewer -PreferredEncoding=ZRLE localhost:0
+    SEE: $ man vncviewer
+  USE: <F8> for context menu
+    => fullscreen to grab keyboard and send <M> to remote WM
+
+
+%%%% "Virtual" remote desktop
+
+
+REMOTE:
+  Connect to lingering Xorg :1
+    $ sudo pacman -S tigervnc
+    $ aur sync dwm-git
+    $ echo ":1=$USER" >> /etc/tigervnc/vncserver.users
+    $ printf '%s\n' session=dwm geometry=1920x1080 localhost securitytypes=none alwaysshared > ~/.vnc/config
+      VIZ:(session=): /usr/share/xsessions/*.desktop
+      MAYBE: session=st desktop=sandbox nolisten=tcp
+      $ printf '%s\n' '[Desktop Entry]' Type=Application Name=st Exec=st > /usr/share/xsessions/st.desktop
+    $ systemctl start vncserver@:1
+
+
+LOCAL: ⌇⡠⡋⠝⠲
+  $ paci tigervnc
+  $ vncviewer -PreferredEncoding=ZRLE -via user@host localhost::5901
+    OR: $ ssh -O forward -tL '5900:localhost:5901' user@host && vncviewer localhost:1
+
+
+%%%% --------------
 
 ALT:
   xpra
     e.g. "screen for X11" -> remote access to individual windows or whole desktop
     https://www.xpra.org/
     https://wiki.archlinux.org/index.php/Xpra
-
-REMOTE:
-  $ paci x11vnc
-  NEED:ATT! running Xorg
-
-LOCAL: ⌇⡞⡃⣑⣄
-  $ paci tigervnc
-  $ ssh -t -L 5900:localhost:5900 user@host 'x11vnc -localhost -display :0'
-  $ vncviewer -PreferredEncoding=ZRLE localhost:0
-  USE: <F8> for context menu
-    => fullscreen to grab keyboard and send <M> to remote WM
