@@ -18,7 +18,7 @@ rmt="/run/user/1000/xc-client.$(hostname)"
 
 ## HACK: forward-propagate hostname-indexed clipboard socket name,
 ##   and back-propagate connection details
-rconn=$(ssh -t -o 'StreamLocalBindUnlink=yes' -R "$rmt:$loc" -- "$host" '
+rconn=$(ssh -TR "$rmt:$loc" -o ControlMaster=auto -o StreamLocalBindUnlink=yes -- "$host" '
   dst=$XDG_RUNTIME_DIR/xc/${SSH_CONNECTION%% *}
   mkdir -p -- "${dst%/*}"
   printf "%s\n" "'"$rmt"'" > "$dst"
@@ -26,9 +26,15 @@ rconn=$(ssh -t -o 'StreamLocalBindUnlink=yes' -R "$rmt:$loc" -- "$host" '
 ')
 echo "$rconn"
 
-# [_] FUTURE: exit socat when ssh is disconnected
-exec socat UNIX-LISTEN:"$loc",mode=600,flock-ex-nb,fork EXEC:"xc"
 
+# IDEA: auto-remove port forwarding after established connection is closed
+#   $ ssh -fL 9901:localhost:5901 10.1.10.2 sleep 10; vncviewer localhost:9901
+#   << EXPL: ssh prolongates any session, which still has active connections
+#   NICE: can auto-stop forwarding when socat is closed
+#   BAD? seems don't work for -R forwarding
+# [_] FUTURE:(reverse): exit socat when ssh is disconnected
+
+exec socat UNIX-LISTEN:"$loc",mode=600,flock-ex-nb,fork EXEC:"xc"
 
 # MAYBE: must fork "xc" somehow to be continous/reentrant
 # FAIL: $ socat EXEC:"ssh -vvv -W '127.0.0.1:28223' wkme" EXEC:"xc"
