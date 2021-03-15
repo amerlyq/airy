@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# SPDX-FileCopyrightText: 2020 Amerlyq <amerlyq@gmail.com> and contributors.
+# SPDX-FileCopyrightText: 2020-2021 Amerlyq <amerlyq@gmail.com>
 #
 # SPDX-License-Identifier: GPL-3.0-only
 #
-#%SUMMARY:
-#%USAGE: $ ./$0
+#%SUMMARY: search for all git repos in dir
+#%USAGE: $ cd ~/aura && ./$0
 set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
-find "$@" -type d -name .git -prune -printf '%h\n' \
+find "$@" -type d -name .git -prune -printf '%h/\n' \
 | LC_ALL=C tree --noreport -aAC --dirsfirst --fromfile=-

@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2021 Amerlyq <amerlyq@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY: convert git repo to archive with truncated git metainfo
+#%  NICE: readonly repo nested inside git-annex and transparently browsable by AVFS
+#%USAGE: $ ./$0 [https://github.com/... | /path/to/repo/.git]
+#%DEPs: $ paci git pixz
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+url=$1
+dst=$(realpath "${2:-$PWD}")
+dtmp=${3-}
+
+gitclone(){ git clone --single-branch --depth=1 --jobs=4 --recurse-submodules --shallow-submodules "$@"; }
+onexit(){ true; }
+
+
+if [[ $url =~ ^[a-z]+://.* ]]; then
+  if [[ -z $dtmp ]]; then
+    dtmp=$(mktemp -dt "${0##*/}@XXXXX")
+    onexit(){ rm -rf -- "$dtmp"; }
+    trap 'onexit' INT HUP QUIT TERM ERR
+  fi
+  gitclone "$url" "$dtmp"
+  src=$dtmp
+elif [[ -d $url ]]; then
+  # MAYBE:FUTURE: allow compressing some subdirectory of project
+  src=$(git -C "$url" rev-parse --show-superproject-working-tree --show-toplevel)
+  IFS= read -r src <<< "$src"
+else
+  >&2 echo "Err: no heuristic for this type of path"
+  exit 4
+fi
+
+
+gitaugmeta(){ local repo=$1
+  # MAYBE: $ git describe --always --dirty --tags --match '*.*.*' > ".gitsrc"
+  git -C "$repo" --no-pager show --format='raw' --no-patch --notes --output="$repo/.git/commit"
+}
+
+## [_] DEV
+# TODO: use t2sz for foreign repos snapshots
+#   https://github.com/martinellimarco/t2sz
+# ALSO: use tarlz to archive my own sources
+#   https://www.nongnu.org/lzip/tarlz.html
+
+# BAD: easily corrupted for archiving :: --xz | --zstd
+# BAD: not accessible by AVFS :: --lzip (+plzip) | --lz4 | -Ilrz
+# BAD: compression level :: --gzip | --lz4
+# BAD: partial decompress speed :: --bzip2 | --xz
+gitarchive(){ local repo=$1 args
+  # command -v pixz &>/dev/null && args=(-Ipixz)
+  # MAYBE:USE:(--remove-files): to immediately consume existing repos
+  args=( \
+    --zstd
+    --create
+    --force-local  # = ignore ":" in filenames
+    --sort='name'
+    # --xattrs
+    --totals  # = print statistics after packing
+
+    ## ALT:DISABLED: too smart for my purposes
+    # --exclude-vcs-ignores  # FAIL: excludes whole directories, which contain .cvsignore file
+    # --exclude-vcs          # FAIL: excludes .gitmodules (with their urls)
+    --exclude='./build'
+    --exclude='_build*'
+    --exclude='tags'
+    # --exclude='*.tags'
+    --add-file="./.git/logs/HEAD"  # reflog
+    --add-file="./.git/commit"
+    --exclude="./.git"
+  )
+  ZSTD_CLEVEL=19 tar "${args[@]}" --file="$dst" -C "$repo" -- .
+  # ALT:(single frame):
+  #   local tmp=${dst%.tar.*}.tar
+  #   tar "${args[@]}" --file="$tmp" -C "$repo" -- .
+  #   zstd --compress --ultra -22 --force -o "$dst" -- "$tmp"
+  # NICE(multiframe): t2sz -fl 19 -- "$tmp"
+  #   BUG:(-o "$dst"): memory corruption
+  #   FAIL: only first frame (file) is shown in AVFS, too much customized to !ratarmount
+  # NEED:(--extract): $ --preserve-permissions --xattrs
+  touch -m --no-create --reference="$repo/.git/description" -- "$dst"
+}
+
+cd -- "$src"  # ALT: $ tar ... -C "$src" -- .
+
+if [[ -d $dst ]]; then
+  fnm=$url
+  fnm=${fnm##*/}
+  fnm=${fnm%.git}
+  ymd=$(git --no-pager show --no-patch --date='format-local:%Y%m%d' --format='%cd')
+  dst=$dst/${fnm}_${ymd}.tar.zst
+fi
+
+gitaugmeta .
+gitarchive .
+onexit
