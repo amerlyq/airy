@@ -8,6 +8,9 @@
 #%  NICE: readonly repo nested inside git-annex and transparently browsable by AVFS
 #%USAGE: $ ./$0 [https://github.com/... | /path/to/repo/.git]
 #%DEPs: $ paci git pixz
+#%CVT:
+#%  my_ar: $ for f in **/*.xz; do xz -kcd $f | lzip -9o ${f:r}.lz; done
+#%  &refs: $ for f in **/*.xz; do xz -kcd $f | zstd -19 -o ${f:r}.zst; done
 set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
 url=$1

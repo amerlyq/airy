@@ -59,7 +59,9 @@ handle_extension() {
         tar|tar.bz2|tar.xz|tar.zst|taz|tbz|tbz2|tgz|tpz|txz|tz|tzst|war|xz|zip|zst)
             # MAYBE:BAD:(errpipe=141): | head -n "$PV_HEIGHT"
             local vdir=$XDG_RUNTIME_DIR/avfs$FILE_PATH'#/'
-            LC_ALL=C tree --noreport -xaCL 3 --dirsfirst -- "$vdir" && exit 5
+            # DISABLED:(LC_ALL=C for sorting): cyrillic names are converted to octal escape codes
+            # BET: use "broot" for fast-preview of archive contents FAIL: only interactive usage
+            tree --noreport -xaCL 3 --dirsfirst -- "$vdir" && exit 5
             exit 1;;
         ## Archive
         a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
