@@ -1,0 +1,32 @@
+pkgname=t2sz-git
+pkgver=1.0.1
+pkgrel=1
+url="https://github.com/martinellimarco/t2sz"
+pkgdesc="Compress .tar archives to seekable .tar.zstd"
+arch=('x86' 'x86_64')
+depends=('zstd')
+makedepends=('git' 'make' 'cmake')
+source=('git://github.com/martinellimarco/t2sz')
+md5sums=('SKIP')
+license=('GPLv3')
+options=(!strip debug)
+
+pkgver() {
+  cd "$srcdir/t2sz"
+  local date=$(git log -1 --format="%cd" --date=short | sed s/-//g)
+  local commit=$(git rev-parse --short HEAD)
+  echo "$date.$commit"
+}
+
+build() {
+  cd "$srcdir/t2sz"
+  mkdir -p build
+  cd build
+  cmake .. -DCMAKE_BUILD_TYPE="RelWithDebInfo"
+  make
+}
+
+package() {
+  cd "$srcdir/t2sz"
+  make -C build install prefix=/usr sbindir=/usr/bin DESTDIR="$pkgdir"
+}

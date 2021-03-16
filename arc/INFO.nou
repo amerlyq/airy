@@ -26,3 +26,75 @@ Archives
 
     Simple for 7z
       $ 7z x partial.7z.001
+
+
+
+CMP ⌇⡠⡍⢚⠰
+  Lzip
+    SUM:
+      USE:CASE: my own repo archiving and preservation under git-annex @/archive and /x
+      NICE: disk errors compensation even w/o separate !par2
+      ALSO: good compression ratio
+      BAD: probably slow partial extraction | NOT: AVFS support
+    TALK: lzip-bug Archives ⌇⡠⡍⣓⠝
+      https://lists.nongnu.org/archive/html/lzip-bug/
+    Lzip benchmark ⌇⡠⡍⢏⢠
+      https://nongnu.org/lzip/lzip_benchmark.html
+    Substitutes are now available as lzip — 2019 — Blog — GNU Guix ⌇⡠⡍⢏⢰
+      https://guix.gnu.org/blog/2019/substitutes-are-now-available-as-lzip/
+    [⡠⡎⡆⣍] READ: Xz format inadequate for long-term archiving ⌇⡠⡍⢏⢧
+      http://www.nongnu.org/lzip/xz_inadequate.html
+      [⡠⡎⡆⢽] Xz format inadequate for long-term archiving | Hacker News ⌇⡠⡍⢖⣤
+        https://news.ycombinator.com/item?id=12768425
+      [⡠⡍⣖⢈] Xz format inadequate for long-term archiving : linux ⌇⡠⡍⣕⡸
+        https://www.reddit.com/r/linux/comments/58swzc/xz_format_inadequate_for_longterm_archiving/
+        ::: BAD? looks like decompressing some datasets is extremely slow -- so unfeasable for AVFS ?
+    Consider Lzip (or Zstd) for tarball compression · Issue #7761 · fish-shell/fish-shell ⌇⡠⡍⢏⢸
+      https://github.com/fish-shell/fish-shell/issues/7761
+    NEED: partial extraction for AVFS support
+      [⡠⡍⣓⠦] FIND: does lzip allows fast random-access / partial extraction for AVFS ?
+        Random access · Issue #412 · facebook/zstd ⌇⡠⡎⠴⠆
+          https://github.com/facebook/zstd/issues/412
+        Is zstd splitabble in hadoop/spark/etc? · Issue #395 · facebook/zstd ⌇⡠⡎⠾⢺
+          https://github.com/facebook/zstd/issues/395
+      [Lzip-bug] Tarball indexing and plzip ⌇⡠⡍⣒⡴
+        https://lists.nongnu.org/archive/html/lzip-bug/2019-03/msg00001.html
+      Re: [Lzip-bug] Tarball indexing and plzip ⌇⡠⡍⣒⢾
+        https://lists.nongnu.org/archive/html/lzip-bug/2019-03/msg00003.html
+      Tarlz Manual ⌇⡠⡍⣒⡡
+        https://www.nongnu.org/lzip/manual/tarlz_manual.html#Amendments-to-pax-format
+      Re: [Lzip-bug] lzip --list ⌇⡠⡍⣒⣰
+        https://lists.nongnu.org/archive/html/lzip-bug/2016-11/msg00003.html
+  Zstd
+    SUM:
+      USE:CASE: git snapshots / &refs, which can be easily recreated under git-annex @/research
+      NICE: fast find / grep / edit | support by AVFS and !ratarmount
+      ALSO: framing by !t2sz for partial extraction
+      BAD: resistance to disk errors / data integrity
+    Re: [Lzip-bug] lzip vs. zstd ⌇⡠⡍⢑⣢
+      https://lists.gnu.org/archive/html/lzip-bug/2016-10/msg00003.html
+    Re: [Lzip-bug] lzip vs. zstd ⌇⡠⡍⢒⡃
+      https://lists.gnu.org/archive/html/lzip-bug/2016-10/msg00005.html
+    Gregory Szorc's Digital Home | Better Compression with Zstandard ⌇⡠⡍⢐⢿
+      https://gregoryszorc.com/blog/2017/03/07/better-compression-with-zstandard/
+    Arch Linux - News: Now using Zstandard instead of xz for package compression ⌇⡠⡍⢑⡍
+      https://archlinux.org/news/now-using-zstandard-instead-of-xz-for-package-compression/
+
+Other
+  Snappy -- best for text (i.e. sources?)
+    zstd is incredible, but just in case the thought hasn't occurred to someone here... | Hacker News ⌇⡠⡍⢘⢅
+      https://news.ycombinator.com/item?id=16227526
+  Rzip
+    rzip ⌇⡠⡎⡋⡓
+      https://rzip.samba.org/
+      SRC: ※⡠⡍⢖⣤
+  RAC
+    Is zstd splitabble in hadoop/spark/etc? · Issue #395 · facebook/zstd ⌇⡠⡎⡊⠶
+      https://github.com/facebook/zstd/issues/395#issuecomment-793145734
+    wuffs/rac-related-work.md at main · google/wuffs ⌇⡠⡎⡊⠂
+      https://github.com/google/wuffs/blob/main/doc/spec/rac-related-work.md
+  PERF
+    Sysadmin - Round 4: Compression Comparison Benchmarks: zstd vs brotli vs pigz vs bzip2 vs xz etc | Centmin Mod Community Support Forums ⌇⡠⡎⡊⣅
+      https://community.centminmod.com/threads/round-4-compression-comparison-benchmarks-zstd-vs-brotli-vs-pigz-vs-bzip2-vs-xz-etc.18669/
+    Compression notes - Helpful ⌇⡠⡎⠶⠁
+      https://helpful.knobs-dials.com/index.php/Compression_notes
