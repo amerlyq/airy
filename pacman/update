@@ -26,14 +26,16 @@ sudo -v
 # NEED: $ echo "192.168.2.4 darkhttpd" >> /etc/hosts
 refresh_mirrors(){ local udt db=${1:+/var/lib/pacman/sync/core.db}
   ## ALT:(db): enable historical archive for stale system (instead of today's upgrade)
-  # [_] FIXME: must use UTC time corresponding to EOD (FIND: timezone of archive.archlinux.org server)
-  udt=$(date ${db:+-r "$db"} +%Y/%m/%d)
   reflector --score 5 --protocol https | sed "
     1d;
     0,/^Server =/s||# Server = http://darkhttpd:8080\\n\\n\\0|
-    \$s|\$|\nServer = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch|
   " | sudo tee /etc/pacman.d/mirrorlist
-  # pacman -Syyu
+  # FIXED: you must sync db with new mirrors first, before assuming archive timestamp of the db
+  sudo pacman -Sy
+  # [_] FIXME: must use UTC time corresponding to EOD (FIND: timezone of archive.archlinux.org server)
+  udt=$(date ${db:+-r "$db"} +%Y/%m/%d)
+  sudo tee -a /etc/pacman.d/mirrorlist <<< "
+Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch"
 }
 
 # NOTE: three-stage process to upgrade AUR together with dependencies

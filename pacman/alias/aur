@@ -52,6 +52,7 @@ aurx(){ find /var/cache/pacman/aur -name "*.db.tar" -execdir repo-remove {} "$@"
 alias aurX='repoctl update'
 
 
+# FIXME: make proper alias
 # ALT: $ repoctl remove ...
 aur-remove(){ local pkg db
   for pkg; do

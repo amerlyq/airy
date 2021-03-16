@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#%SUMMARY: get date of last rolling upgrade to estimate urgency
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
+exec date --iso=s -r /var/lib/pacman/sync/core.db
