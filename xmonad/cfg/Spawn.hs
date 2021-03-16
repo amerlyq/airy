@@ -68,10 +68,10 @@ scratchpad = (concat . (`map` [
     ],
     [ ("v" , spawnHere "r.tf -e $EDITOR") -- THINK: also open in [tmux]?
     -- , ("S-<Space>", spawnHere "r.tf")
-    , ("<Space>"  , spawnAndDo doCenterFloat "r.t")
+    , ("<Space>"  , spawnAndDo doCenterFloat "st")
     , ("<Return>" , spawnAndDo doCenterFloat "r.tf r.ranger")
-    , ("C-<Space>"  , spawnAndDo doCenterFloat "r.t -M")
-    , ("C-<Return>" , spawnAndDo doCenterFloat "r.t -M r.ranger")
+    , ("C-<Space>"  , spawnAndDo doCenterFloat "st -M")
+    , ("C-<Return>" , spawnAndDo doCenterFloat "st -M r.ranger")
     -- , ("k", "~/.i3/ctl/run-focus k")
     -- r.tf -e gksudo powertop
     -- r.tf -e gksudo tlp start

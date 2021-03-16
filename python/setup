@@ -13,5 +13,6 @@ linkcp -t ~/.ipython/profile_default 'ipython_config.py'
 # WARN:(search-path): '.' -> std-lib -> user-pkg -> aura -> sys-pkg
 # BAD: don't expose "/@/just" globally -- it will result in names collision
 # dst=$(python -m site --user-site)
+# mkdir -p "$dst"
 # printf '%s\n' /@/just/pkg /@/just > "$dst/aura.pth"
 # python -m site  # DEBUG:INFO

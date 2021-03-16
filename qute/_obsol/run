@@ -30,6 +30,9 @@ case $o in '?') true  # pass rest and unsupported options to qutebrowser
 # ;; -g) shift; run "$(dml < ~/.config/qutebrowser/search)"
 esac
 
+# TEMP: work to enlarge text to 120dpi
+export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
+
 # WARN: can crash on Nouveau
 # OBSOLETE:(BAD): "webengine" is newer, but no Caret and white CSS on reload
 # BAD:SECU: --enable-webengine-inspector

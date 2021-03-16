@@ -18,7 +18,8 @@ if distro arch; then
   ## REF: https://clang.llvm.org/extra/clang-rename.html
   # pkg_inst clang-tools-extra
 
-  loc_inst ./cmake-format-airy-git.pkgbuild
+  # BAD:PERF: rebuilds and runs tests each time
+  # loc_inst ./cmake-format-airy-git.pkgbuild
 
 elif distro ubuntu; then
   pkgs=()  # Those libs also necessary to build x32 under x64 system
