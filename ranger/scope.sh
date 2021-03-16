@@ -54,7 +54,7 @@ handle_extension() {
     # shellcheck disable=SC2221,SC2222
     case "${FILE_EXTENSION_LOWER}" in
         ## use AVFS for archive exploration
-        # VIZ: $ grep /path/to/src/avfs -hroP '\.from = "\K[^"]+' |sort -u| sed 's/^\./|/' | paste -sd ''
+        # VIZ: $ grep -hroP '\.from = "\.\K[^"]+' /path/to/src/avfs |sort -u| paste -sd'|'
         Z|a|apk|bz|bz2|deb|ear|gz|jar|lzma|rar|sfx|\
         tar|tar.bz2|tar.xz|tar.zst|taz|tbz|tbz2|tgz|tpz|txz|tz|tzst|war|xz|zip|zst)
             # MAYBE:BAD:(errpipe=141): | head -n "$PV_HEIGHT"

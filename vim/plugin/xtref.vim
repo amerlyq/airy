@@ -381,6 +381,8 @@ xnoremap <Plug>(xtref-yank-refer)  :<C-u>call xtref#copy(g:xtref.refer_pfx.xtref
 nnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(0,'')<CR>
 xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 
+" [_] TODO: allow plain timestamp (with optional spaced timezone like git show --raw) as xtref
+"   ENH: preview iso date in statusline or in NEW floating window
 nnoremap <Plug>(xtref-replace-datetime) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('date',xtref#get(0)))<CR>
 " FIXED:(-1): use exact visual selection (to allow spaces in ISO date, etc.)
 "   instead of auto-locating xtref in selected area

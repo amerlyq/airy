@@ -17,7 +17,8 @@ aur_inst xbindkeys
 if distro arch; then
   # xorg-xdm xorg-docs xorg-xdpyinfo
   # DEPRECATED:(xorg-server-utils): use explicit prs from xorg-apps group
-  pkg_inst xorg-server xorg-xinit
+  pkg_inst xorg-server
+  # CHECK: do we need "xorg-xinit" if I use custom xorg.service ?
   pkg_inst xorg-xprop xorg-xinput xorg-xrandr xorg-xsetroot
 
 elif distro ubuntu; then

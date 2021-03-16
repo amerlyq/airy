@@ -10,7 +10,7 @@ SEE
 INFO: ./uClibc-0.9.32.1/libpthread
   __lll_lock_wait (int *futex, int private)        | ./nptl/sysdeps/unix/sysv/linux/arm/lowlevellock.c:42
   __pthread_mutex_unlock_usercnt ( pthread_mutex{+_t *mutex, int decr)+} | ./nptl/pthread_mutex_unlock.c:33
-    [Switching to thread 181 (LWP 6337)]
+    [Switching to thread 181 (LWP 6337)]  # LWP=Light Weight Process
     #0  0x7726bcf4 in __pthread_mutex_unlock_usercnt () from root/lib/libpthread.so.0
       (gdb) p ((pthread_mutex_t*)$a0)->__data.__owner
       $2 = 11935
