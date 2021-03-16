@@ -80,3 +80,30 @@ Firefox bookmarks
       WTF: only syncs history for last month and tabs for last week
     985930 - History older than 6 months is not synced ⌇⡠⡆⠳⢩
       https://bugzilla.mozilla.org/show_bug.cgi?id=985930
+
+
+ALT: local sync server
+  ¦ Will 6 months / 5000 items limit apply to local server too (like for mozilla.org) or is it adjustable?
+    6 months / 5000 items is enforced by client side see
+      https://searchfox.org/mozilla-central/source/services/sync/modules/engines/history.js#59
+      https://searchfox.org/mozilla-central/source/services/sync/modules/engines/history.js#46
+    mozilla'syncserver has 2g storage quota limit
+      https://mozilla-services.readthedocs.io/en/latest/sync/overview.html#storage-limits
+    but local version have no limit if this key is not set see
+      https://github.com/mozilla-services/server-syncstorage/blob/d370a488155adeb80ee6f1bc016a4aa9d009f181/syncstorage/views/decorators.py#L106
+  ¦ Will switching sync server result in creating different profile --
+  ¦ considering as whole my current history is attached to current profile?
+    from my point of view no
+  ¦ Will there be risk to immediately lose my current history DB if I switch
+  ¦ from mozilla.org to local sync server, or is this action amendable?
+    maybe yes. after you changed sync server, not all of you local history will
+    be upload to new sync server, because of max upload limit see
+       https://searchfox.org/mozilla-central/source/services/sync/modules/engines/history.js#183.
+    backup profile folder before you do the change
+  OFF: if you sign out of using mozilla-hosted sync and then sign in to using a
+  self-hosted sync server, this shouldn't destroy any of your local browsing
+  history - what should happen is that any history from the new sync server
+  (which is empty) should get merged with the local history on your device, and
+  the merged result uploaded to the new sync server
+  I'm not willing to go any further than "should" here; bugs happen!
+  but FWIW I would be happy to do that to my own data
