@@ -47,8 +47,20 @@ PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
 OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
 OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
 
+## FAIL: git-annex symlinks are resolved and lose extension
+# echo "$FILE_PATH" > /t/hi
+
 handle_extension() {
+    # shellcheck disable=SC2221,SC2222
     case "${FILE_EXTENSION_LOWER}" in
+        ## use AVFS for archive exploration
+        # VIZ: $ grep /path/to/src/avfs -hroP '\.from = "\K[^"]+' |sort -u| sed 's/^\./|/' | paste -sd ''
+        Z|a|apk|bz|bz2|deb|ear|gz|jar|lzma|rar|sfx|\
+        tar|tar.bz2|tar.xz|tar.zst|taz|tbz|tbz2|tgz|tpz|txz|tz|tzst|war|xz|zip|zst)
+            # MAYBE:BAD:(errpipe=141): | head -n "$PV_HEIGHT"
+            local vdir=$XDG_RUNTIME_DIR/avfs$FILE_PATH'#/'
+            LC_ALL=C tree --noreport -xaCL 3 --dirsfirst -- "$vdir" && exit 5
+            exit 1;;
         ## Archive
         a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
         rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
@@ -80,6 +92,8 @@ handle_extension() {
             exit 1;;
 
         ## OpenDocument
+        # ALSO: Preview odt or similar formats · Issue #2227 · ranger/ranger ⌇⡠⡍⢛⢔
+        #   https://github.com/ranger/ranger/issues/2227
         odt|ods|odp|sxw)
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
