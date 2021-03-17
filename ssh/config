@@ -13,6 +13,13 @@
 ControlPath /run/user/%i/ssh-%n+%r@%h:%p
 ControlPersist 600
 
+# linux - How do I configure SSH so it doesn't try all the identity files automatically? - Super User ⌇⡠⡑⢲⡍
+#   https://superuser.com/questions/268776/how-do-i-configure-ssh-so-it-doesnt-try-all-the-identity-files-automatically
+#   https://superuser.com/questions/859661/how-can-i-force-ssh-to-ignore-the-identityfile-listed-in-host-for-one-specif
+# [_] FIND: must it be global or in "Host *" section ?
+IdentitiesOnly yes
+
+
 Host *
     SendEnv !LANG !LC_*
     # Compression=yes

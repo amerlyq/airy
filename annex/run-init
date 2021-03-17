@@ -44,10 +44,11 @@ git config --local 'annex.autoupgrade' false
 
 ### ADD ##########################################
 
-# NOTE: I don't care about "special/broken" programs at all,
-# therefore I don't need hashing with SHA256E extension
-# NICE: the same files {./aaa.jpg, ./aaa.JPG, ./aaa.56.jpg} will have same hash
-git config --local 'annex.backend' SHA256
+# NOTE:(SHA256): I don't care about "special/broken" programs at all,
+#   therefore I don't need hashing with SHA256E extension
+#   NICE: the same files {./aaa.jpg, ./aaa.JPG, ./aaa.56.jpg} will have same hash
+# 2021-03-07 CHG:(SHA256E): qute/chromium, ranger/scope.sh, imv(1), etc. always use realpath
+git config --local 'annex.backend' SHA256E
 
 ## DECI? "git add" will never add files to git-annex
 ## FAIL: may accidentally add large files by 'gaa'
