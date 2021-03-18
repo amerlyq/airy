@@ -62,6 +62,8 @@ handle_extension() {
             # DISABLED:(LC_ALL=C for sorting): cyrillic names are converted to octal escape codes
             # BET: use "broot" for fast-preview of archive contents FAIL: only interactive usage
             tree --noreport -xaCL 3 --dirsfirst -- "$vdir" && exit 5
+            # TRY: atool --list -- "${FILE_PATH}" | tree --noreport -aACL 3 --dirsfirst --fromfile=-
+            atool --list -- "${FILE_PATH}" && exit 5
             exit 1;;
         ## Archive
         a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\

@@ -2503,9 +2503,9 @@ passcmd = " ".join(
     )
 )
 config.bind("zl", passcmd)
-config.bind("zul", f"{passcmd} --username-only")
-config.bind("zpl", f"{passcmd} --password-only")
-config.bind("zol", f"{passcmd} --otp-only")
+config.bind("zu", f"{passcmd} --username-only")
+config.bind("zp", f"{passcmd} --password-only")
+config.bind("zO", f"{passcmd} --otp-only")
 
 
 ### Load private part of config

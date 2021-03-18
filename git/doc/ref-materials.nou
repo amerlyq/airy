@@ -13,7 +13,7 @@ Overview / filtering
     $ find -type d -name .git -prune -execdir sh -c 'git ls-files --others --ignored --exclude-standard --directory -z | xargs -0rn1 printf "%s/%s\n" "$PWD"' \; TR
     # $ r.git-find | parallel -0 -k 'r.git-status {} && git -C {} -c color.status=always status -s --ignored=traditional | grep --color=never -E ".?[!]\\B" ||true'
   Remaining (untypical) ignored files
-    $ find -type d -name .git -prune -execdir sh -c 'git ls-files --others --ignored --exclude-standard --directory -z | grep -vzE "(&|_build|__pyc)[^/]+/?$" | xargs -0rn1 printf "%s/%s\n" "$PWD"' \; TR
+    $ find -type d -name .git -prune -execdir sh -c 'git ls-files --others --ignored --exclude-standard --directory -z | grep -vzE "(&|_build|__pyc)[^/]*/?$|[.]pyc$" | xargs -0rn1 printf "%s/%s\n" "$PWD"' \; TR
 
 
 Manipulate
@@ -23,6 +23,21 @@ Manipulate
     ERR: $ rsync --dry-run --delete -aPvh --include '*/' --include='**/&*/**' --exclude='*' -- '/data/#fractal/aura/btrx/beatrix/' /home/amer/aura/btrx/beatrix
       # --backup --backup-dir="../!rsync-$(date +%Y%m%d_%H%M%S)" --remote-option=--one-file-system
     FAIL:(diff) $ find a b -type f ! -name 'crazy' -printf '%f\n' | diff -r a b -X -
+  Archive only refdocs
+    $ find . -name '&*' -print0 | tar --zstd -cvf refs-$(hostname)-$(date +%Y%m%d_%H%M%S).tar.zst --null -T -
+  Archive all differences between branch and workdir
+    $ find -type d -name .git -prune -execdir sh -c 'git ls-files --modified --deleted --others --directory --exclude=__pycache__ -z | xargs -0rn1 printf "%s/%s\n" "$PWD"' \; TR
+    [_] BAD: wild files are skipped
+  [_] TODO:DEV: show local-only branches and tags
+    [⡠⡓⠻⣉] ignore merged branches
+    [_] both branches and tags
+    [_] both current HEAD and all branches
+    [_] both current remote and all other remotes
+    [_] both main repo and submodules
+    $ git for-each-ref --no-merged=origin/HEAD --format='%(refname:lstrip=2) %(upstream:lstrip=2) %(upstream:track)' -- refs/heads/
+      ALSO: $ … | git cherry -v origin/HEAD {}
+    $ find -type d -name .git -prune -execdir sh -c "echo \"[\$(pwd)]\" && git for-each-ref --no-merged=origin/HEAD --format='%(refname:lstrip=2) %(upstream:lstrip=2) %(upstream:track)' -- refs/heads/" \;
+    BAD: $ find -type d -name .git -prune -execdir sh -c "git for-each-ref --no-merged=origin/HEAD --format='%(refname:lstrip=2) %(upstream:lstrip=2) %(upstream:track)' -- refs/heads/ | ifne sh -c 'pwd && cat'" \;
 
 
 Pure repo statistics ⌇⡟⠇⢚⠓
