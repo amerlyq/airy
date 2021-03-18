@@ -48,6 +48,8 @@ git config --local 'annex.autoupgrade' false
 #   therefore I don't need hashing with SHA256E extension
 #   NICE: the same files {./aaa.jpg, ./aaa.JPG, ./aaa.56.jpg} will have same hash
 # 2021-03-07 CHG:(SHA256E): qute/chromium, ranger/scope.sh, imv(1), etc. always use realpath
+#   NEED: renormalize all files extensions: ⌇⡠⡑⣕⡸
+#   $ find -type d \( -name .git -or -name .snapshots \) -prune -o \( -type f -or -type l \) -regex '.+[.][^.]*[A-Z][^.]*' -print
 git config --local 'annex.backend' SHA256E
 
 ## DECI? "git add" will never add files to git-annex
