@@ -7,16 +7,17 @@
 # DEV: by default 'Gs' must show only repos with "unclear" status
 alias Ga='r.git-all'
 alias Gu='r.git-all-status'
-alias Gs='Gu /@/=tag=/aura'
-alias Gsa='Gu /@/=tag=/git'
-alias Gt='Ga /@/=tag=/aura status -s -unormal'
-alias Gd='Ga /@/=tag=/aura diff'
+alias Gr='Gu /@/aura'
+alias Gk='Gu /@'
+alias Gt='Ga /@ status -s -unormal'
+alias Gd='Ga /@ diff'
 alias Gdw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
 alias Gl.='r.git-all-pull'
-alias Gl='Gl. /@/=tag=/aura'
-alias Gp='r.git-all-push /@/=tag=/aura'
+alias Gl='Gl. /@'
+alias Gp='r.git-all-push /@'
 
 # {{{ state analysis
+# SEE※⡟⠃⡟⣙ :/git/doc/ref-materials.nou
 alias G.="find -type d -name .git -prune -printf '%h\\n'"
 alias G_="find -type d -exec test -d {}/.git \\; -prune -o -not -type d -printf '%P\\n'"
 alias Go="find -type d -name .git -prune -execdir sh -c 'git ls-files --others --ignored --exclude-standard --directory -z | grep -vzE \"(&|_build|__pyc)[^/]+/?$\" | xargs -0rn1 printf \"%s/%s\\n\" \"\$PWD\"' \\;"

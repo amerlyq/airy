@@ -13,10 +13,21 @@
 # DISABLED: "\( -type d -o -type l -xtype d \)"
 #   <= .git dir symlink is only useful for submodules under git-annex
 #   ::: it means, there is no need to list them as part of <Gs>
-[[ -d /@/.git ]] && printf '%s\0' '/@'
-exec find -L "${1:-$PWD}" -maxdepth 2 \
+exec find -H "${1:-$PWD}" -maxdepth 1 \
   -xtype d \( -name '_build*' -o -name '_cache*' -o -name '&*' \) -prune -o \
-  -type d -name .git -prune "${@:2}" -printf '%h\0'
+  -xtype d -exec test -e {}/.git \; "${@:2}" -printf '%P\0'
+  # -execdir git -C {} rev-parse --git-dir \;
+  # -xtype d -execdir sh -c '
+  #   g=$(git -C "$0" rev-parse --git-dir 2>/dev/null)
+  #   test "$0/.git" -ef "$g"
+  # ' {} \;
+
+# OR: --is-inside-work-tree
+# OLD: semi-recursive
+# [[ -d /@/.git ]] && printf '%s\0' '/@'
+# exec find -L "${1:-$PWD}" -maxdepth 2 \
+#   -xtype d \( -name '_build*' -o -name '_cache*' -o -name '&*' \) -prune -o \
+#   -type d -name .git -prune "${@:2}" -printf '%h\0'
 
 # FIXME: find dir which contains exact list of file and dir names
 # NEED: fix status/pull/push for bare repo
