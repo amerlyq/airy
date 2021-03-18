@@ -5,6 +5,8 @@
 # .! /!
 
 # NOTE:USE: /@/* as relay point for absolute symlinks
+.1  /at
+.!  /at
 .2  /@
 .@  /@
 
@@ -12,30 +14,30 @@
 ..a  /@/airy/airy
 ..b  /@/airy/backup
 ..g  /@/airy/git
-..m  ~/.mutt
-..M  ~/.mail
+..m  /@/xdg_home/mutt
+..M  /@/xdg_home/mail
 ..i  /@/airy/irc
 ..P  /@/pkgsrc
 ..q  /@/airy/qute
-..Q  ~/.config/qutebrowser
+..Q  /@/xdg_config/qutebrowser
 ..r  /@/airy/ranger
-..R  ~/.local/share/ranger
+..R  /@/xdg_share/ranger
 # ..R  /usr/lib/python3.6/site-packages/ranger
-..s  ~/.cache/airy/pkg/spacemacs
+..s  /@/xdg_cache/airy/pkg/spacemacs
 ..t  /@/airy/tmux
 # ..u  ~/.urxvt
 ..v  /@/airy/vim
-..V  ~/.cache/vim/dein/repos/github.com
-..w  ~/.weechat
+..V  /@/xdg_cache/vim/dein/repos/github.com
+..w  /@/xdg_home/weechat
 ..x  /@/airy/xmonad
-..X  ~/.xmonad
+..X  /@/xdg_home/xmonad
 # ..X  /usr/lib/python3.9/site-packages/xcffib
 ..z  /@/airy/zsh
-..Z  ~/.cache/zsh/.zprezto
+..Z  /@/xdg_cache/zsh/.zprezto
 
 
 ### Modules
-..A  ~/.cache/airy
+..A  /@/xdg_cache/airy
 .A   /@/archive
 # .A   /cache/audit
 # .Ac  ~/.config/airy
@@ -51,27 +53,27 @@
 # .bt  ~/aura/btrx/beatrix-templates
 .b.  /build
 .bx  /@/beatrix
-.bX  ~/.cache/beatrix
+.bX  /@/xdg_cache/beatrix
 .B   /@/bin
 # .B   /@/airy/_build/bin
 # ..B  ~/.bin
 # .C   /@/airy/_build/cfg
 
 .c.  /cache
-.cb  /@/aura/coastline/beatrix
+.cb  /@/coastline/beatrix
 # .cb  ~/.cache/airy/tags/browser
 # .cc  ~/.cache/airy/tags/core
-.cc  ~/.config
+.cc  /@/xdg_config
 # .cd  ~/.cache/airy/tags/dev
 # .cg  ~/.cache/airy/tags/game
 # .ci  ~/.cache/airy/tags/io
-.ch  ~/.cache
+.ch  /@/xdg_cache
 .ck  /var/cache/pacman
-.cl  /@/aura/coastline
+.cl  /@/coastline
 .cm  /mnt
 # .cn  ~/.cache/airy/tags/net
 # .cr  ~/.cache/airy/tags/re
-.cs  ~/.local/share
+.cs  /@/xdg_share
 .ct  /t
 .cu  ${TMPDIR:-/tmp/$USER}/
 # .cx  ~/.cache/airy/tags/xorg
@@ -89,22 +91,22 @@
 # .dw  /data/_work
 .dy  /_dld/youtube
 
-.e.  /@/aura/erian
-.eo  /@/aura/erian_old
+.e.  /@/erian
+.eo  /@/erian_old
 
-.F   ~/aura/feed
+.F   /@/feed
 # .f.  ~/aura/fork
 .fi  /@/finance
-.fl  ~/aura/coastline/fleur
+.fl  /@/coastline/fleur
 # .fs  ~/aura/fork/st
 
 .g.  /games
 .gd  /games/_dld
-.gg  /@/aura/gaming
+.gg  /@/gaming
 .gi  /games/_install
-.gm  /games/_steam/steamapps
+.gm  /@/steamapps
 .gp  /games/_play/wineprefix
-.gs  /games/gamesaves
+.gs  /@/gamesaves
 
 .h.  /@/devq/hack
 .ha  /@/devq/hack/asm/mips
@@ -113,33 +115,30 @@
 
 .i   /@/irome
 .I   /@/items
+# .io  ~/aura/mio
 
 .j   /@/just
 
-# .io  ~/aura/mio
-# .j   ~/work/sim20/src/client
 .k   /@/devq/kernel
 
 .L   /@/lib
-.l.  /@/aura/lyfa
-.li  /@/aura/lib
-.ll  /@/aura/lyfa/lists
+.l.  /@/lyfa
+.li  /@/lib
+.ll  /@/lyfa/lists
 .lp  /@/lib/python
-.ly  /@/aura/lyfa
+.ly  /@/lyfa
 
-.M   /@/aura/work/migration
-.m.  /@/aura/meridia
-.ma  /cache/audit
-# .md  /@/aura/miur/miur-docs
-.me  /@/aura/meridia/estimation
-.mf  /@/aura/meridia/finance
-.mg  /@/aura/meridia/mgmt
-# .mi  /@/aura/miur/mio
-.mj  /@/aura/meridia/languages
+.M   /@/employment/migration
+.m.  /@/meridia
+.md  /@/miur/doc
+.me  /@/meridia/estimation
+.mf  /@/meridia/finance
+.mg  /@/meridia/mgmt
+.mj  /@/meridia/languages
 # .mk  /@/aura/miur/kirie
-.mm  /@/aura/miur
+.mm  /@/miur
 .mo  /@/monica
-.ms  /@/aura/meridia/struct
+.ms  /@/meridia/struct
 .my  /@/my
 
 .n.  /net
@@ -149,16 +148,16 @@
 .nm  /net/share/misc
 .ns  /net/share
 
-.o   /@/aura/demo
-.O   /@/aura/work
+.o   /@/demo
+.O   /@/employment
 
 # .p   ~/pkg
 # .p.  /@/aura/pj
 # .pf  /@/aura/forestanza/forestanza
 # .pj  /@/aura/pj/jira-cli
-.pp  /@/aura/piony
+.pp  /@/piony
 # .ps  /@/aura/forestanza/forestanza.sh
-.ps  ~/.password-store
+.ps  /@/password-store
 # .py  /@/aura/pj/pyarxi
 # .pu  /@/aura/pj/urxvt-ext-evolved
 
@@ -178,34 +177,34 @@
 .r.  /@/research
 .re  /@/seize/kirie/re-elf
 .rs  /@/seize/kirie/sora
-.R.  /@/aura/evernote
-# .Rr  /@/aura/evernote/ranobe
+.R.  /@/evernote
+# .Rr  /@/evernote/ranobe
 
 # .s   /@/aura/shards  # = base, common, dast, lib
-.s   /data/sync
+.s   /@/sync
 # .S   /srv
 # .sr   /srv/repo
-.S   /cache/sdk
+# .S   /cache/sdk
 # (ranger) csr /srv/repo
 
 # .T   ~/aura/tomb
-.T   /@/=tag=/tomb
-.t.  /@/aura/aeternum
+# .T   /@/=tag=/tomb
+.t.  /@/aeternum
 .ta -l /@/todo/my/agenda.nou
-.tb  /@/aura/aeternum/buildsystems
+.tb  /@/aeternum/buildsystems
 # .tc  ~/aura/pj/aeternum-cmake-cross
 .td -l /@/todo/!today
 .tD  /@/todo
 .te -l /@/todo/recurrent/day/everyday.task
-.tf -l /@/aura/feed/www/tabs.adoc
-.tF  /@/aura/aeternum/frameworks
-.tg  /@/aura/aeternum/languages
+.tf -l /@/feed/www/tabs.adoc
+.tF  /@/aeternum/frameworks
+.tg  /@/aeternum/languages
 # .tj  ~/aura/tenjo
 .tl -l /@/todo/!lastlog
 .tL  /@/todo/log
 .tn  /@/todo/now
 .to  /@/todo  # OR: /@/todo/{log,old,ongoing}
-.tp  /@/aura/aeternum/languages/python
+.tp  /@/aeternum/languages/python
 .tr  /@/todo/recurrent
 .tw  /@/todo/my/work/TODO.nou
 .tW  /@/todo/work
@@ -213,16 +212,15 @@
 .ty -l /@/todo/!yesterday
 
 .u   /@/aura
-.U   /cache/audit
+.U   /@/audit
 
 # .v.  ~/aura/vim
 .va  /@/seize/amer/agn.vim
 # .vf  ~/aura/vim/forestanza.vim
 .vm  /vm
-.vn  /@/aura/nou.vim
+.vn  /@/nou.vim
 
 .w.  /work
-# .wa  /work/work/adc
 .wb  /work/bug/!now   # symlink -> ./bug/$date-$jira-$desc>/
 .wB  /work/bug
 # .wc  /work/cache
@@ -231,7 +229,7 @@
 .wh  ~/work
 # .wj  /work/tenjo
 # .wm  /work/repo/_mirror
-.wo  /@/aura/work
+.wo  /@/employment
 # .wp  /work/cache/_prefix
 # .wr  /work/repo/_root
 # .wR  /work/repo
@@ -240,7 +238,7 @@
 # .wt  /work/task       # pj
 .wu  /work/_build     # symlink -> /tmp/_build/
 .ww  /@/seize/kirie/wiw
-.wy  /work/yocto-root
+.wy  /yocto
 
 # BET?(usability): ".wG" .vs. ".Wg"
 .W.  /win
@@ -252,7 +250,7 @@
 # .X   ~/backup-lists/tiers
 
 .y   /aura
-.Y   ~/.cache/aurutils/sync
+.Y   /@/xdg_aurutils
 
 .z   /@/seize
 .Z   /@/archive
