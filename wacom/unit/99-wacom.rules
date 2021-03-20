@@ -18,6 +18,7 @@ ACTION!="add|change", GOTO="wacom_end"
 ## Provide path
 # BET:TRY: to use system path -- maybe it's mapped correctly on new kernels
 # [_] FIXME: use /run/user/... to keep symlink
+# [_] BUG: 99-wacom.rules:21 Invalid value for RUN (char 39: invalid substitution type), ignoring, but please fix it.
 ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c 'p=$sys$devpath; ln -s $${p%/*/*/*}/wacom_led /tmp/wacom_led'"
 ## Give the users group permissions to set Wacom device LEDs.
 ATTRS{idVendor}=="056a", ATTRS{idProduct}=="0314", RUN+="/bin/sh -c '/bin/chgrp users /tmp/wacom_led/*'"

@@ -67,6 +67,9 @@ lvcreate ws -Wy --yes -n cache -L 200G
 ## NOTE: format LV partitions
 mkfs.btrfs -L root -f /dev/ws/root
 mkfs.btrfs -L aura -f /dev/ws/aura
+
+# XFS File-System With Linux 5.10 Punts Year 2038 Problem To The Year 2486 - Phoronix ⌇⡠⡔⠾⣪
+#   https://www.phoronix.com/scan.php?page=news_item&px=XFS-Linux-5.10
 mkfs.xfs -L cache -f /dev/ws/cache
 
 
@@ -178,6 +181,8 @@ pacman -Syyu vis
 mount -o noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@ /dev/ws/root /mnt
 mount -o noatime,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ws/aura /mnt/aura
 mount /dev/ws/cache /mnt/cache
+# FAIL:(x-systemd.automount): useless, because !snapperd on reboot will trigger /.snapshots mounting after only 5s
+#   ~~ though, /data/ and /aura/ will be triggered only after 10m
 mount -o noauto,nofail,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ds/data /mnt/data
 mount -o noauto,nofail,x-systemd.automount /dev/ds/games /mnt/games
 mount -o noauto,x-systemd.automount,fmask=0133 /dev/nvme1n1p2 /mnt/boot
@@ -401,10 +406,10 @@ EOT
     btrfs subvolume delete $d && mkdir $d && mount $d && chmod 750 $d && chown root:users $d
     snapper -c $nm set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY=8,DAILY=7,WEEKLY=5}
     btrfs qgroup show -reF $d
-    btrfs quota enable $d
+    # btrfs quota enable $d
     # WARN: it seems it wasn't enabled on clean system -- must re-enable manually
     #   ERR:(dmesg): quota not working (qgroup not set)
-    snapper -c $nm setup-quota
+    # snapper -c $nm setup-quota
     snapper -c $nm get-config
   }
   snap root /

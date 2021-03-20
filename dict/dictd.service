@@ -13,7 +13,11 @@ PIDFile=%t/%P/%P.pid
 # d /run/bitlbee 0755 bitlbee bitlbee - -
 
 Type=forking
-User=nobody
+
+# SECU:ERR: Special user nobody configured, this is not safe!
+# User=nobody
+DynamicUser=true
+
 ## BET: move/mount dicts directly to /usr/share/dictd instead of keeping on shared media partition
 # Group=users
 # CMP: with /etc/conf.d/dictd

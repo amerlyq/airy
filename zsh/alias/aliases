@@ -130,7 +130,7 @@ alias -g C:="|awk -F':\\\\s' '{print\$1}'"
 alias -g C::="|awk -F':\\\\s' '{print\$NF}'"
 
 # Prints columns 1 2 3 ... n.
-function slit { awk "{ print ${(j:,:):-\$(${^@})} }"; }
+function slit { awk "{ print ${(j:,:):-\$(${^@})} }"; }  # OR: ${...:-\$${^@}}
 alias -g CN='|slit'
 
 alias -g U='|uniq'

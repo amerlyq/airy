@@ -8,8 +8,10 @@
 
 let g:xtref = {}
 " MAYBE: if list -- use first existing dir [/x, /aura, /data/aura, /home/user/aura]
+" [_] FIXME: use /@
 let g:xtref.aura = $HOME."/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
+let g:xtref.lazytagdir = $VPLUGS   " temp store *.tags for newly created/edited files
 
 " ALT: ⌇ => ¶ .like. https://www.yoctoproject.org/docs/3.1.1/brief-yoctoprojectqs/brief-yoctoprojectqs.html
 " OR:USE: '⌇' = "\u2307" = [\u2307]
@@ -251,8 +253,9 @@ fun! xtref#ctags(root, ...)
   if !len(bufs)
     let cmd .= ' --recurse'
   elseif type(bufs) == type([])
-    " THINK:CHG: append to separate $TMPDIR/nou/xtref.tags overlay
-    "   << delete this overlay each time you regen proper Aura or Repo tags
+    " THINK:CHG: append to separate overlay
+    "   let tmp = g:xtref.lazytagdir.'/'.g:xtref.tagfile
+    "   << NEED: delete this overlay each time you regen proper Aura or Repo tags
     let cmd .= ' --append '. join(map(bufs, 'shellescape(v:val)'), ' ')
   elseif type(bufs) == type('') && bufs[0] == '.'
     let cmd .= ' --recurse '. join(map(split(bufs, ','), '"--map-xtref=".v:val'), ' ')
@@ -297,7 +300,7 @@ augroup Xtref
   "   NEED: detect somehow if file was modified at least once from the moment
   "   of opening vim instance -- and reset this var after writing tags
   " au BufUnload * if index(map(getbufinfo({'bufmodified':1}), 'v:val.bufnr'), '<bufnr>') > -1
-  "   \| call xtref#ctags($TMPDIR.'/airy', ['<afile>']) |en
+  "   \| call xtref#ctags(g:xtref.lazytagdir, ['<afile>']) |en
 augroup END
 
 
@@ -309,7 +312,7 @@ command! -bar -range -nargs=0  XtrefNou  call xtref#ctags(g:xtref.aura, '.nou')
 
 nnoremap [Xtref]U :<C-u>XtrefOpened<CR>
 command! -bar -range -nargs=0  XtrefOpened
-  \ call xtref#ctags($TMPDIR.'/airy', 1)
+  \ call xtref#ctags(g:xtref.lazytagdir, 1)
 
 " DEPS: https://github.com/airblade/vim-rooter
 nnoremap [Xtref]<C-u> :<C-u>XtrefRoot<CR>
@@ -329,7 +332,7 @@ command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
 " MAYBE: exe 'set tags^='. g:xtref.aura.'/**/'.g:xtref.tagfile
 exe 'set tags^='. g:xtref.aura.'/'.g:xtref.tagfile
 exe 'set tags^='. g:xtref.tagfile.';/'
-exe 'set tags^='. $TMPDIR.'/'.g:xtref.tagfile
+exe 'set tags^='. g:xtref.lazytagdir.'/'.g:xtref.tagfile
 exe 'set tags^='. './'.g:xtref.tagfile.';'
 
 

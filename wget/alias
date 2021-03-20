@@ -1,3 +1,9 @@
 # vim:ft=sh
 
 [[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' wget
+
+if _has_pr curl; then
+  alias get='curl --continue-at - --location --progress-bar --remote-name --remote-time'
+elif _has_pr wget; then
+  alias get='wget --continue --progress=bar --timestamping'
+fi

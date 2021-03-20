@@ -6,8 +6,8 @@ source ~/.shell/func.d/packages
 
 if distro arch; then
     # USE:(guest-iso): to install adds to guests other than Arch
-    pkg_inst -d linux-headers virtualbox-host-modules-arch virtualbox-guest-iso
-    pkg_inst virtualbox
+    pkg_inst -d linux-headers virtualbox-host-modules-arch
+    pkg_inst virtualbox virtualbox-guest-iso
 
     # ALT:(conflict) aur_inst 'virtualbox-bin' 'virtualbox-host-modules'  # NOT FOUND
     # SEE: https://forum.antergos.com/topic/818/can-t-run-my-vitualbox/4

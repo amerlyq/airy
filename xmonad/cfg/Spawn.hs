@@ -26,6 +26,7 @@ main = concat
     ] -- NOTE: We have M-o <Space> for floating terminal instead of (spawnAndDo doCenterFloat t).
     | (k, t) <-
     -- DFL: temp dir "/t" for sh VIZ: catalogue "/@" for fm
+    -- MAYBE:BET: /t -> /@ to have immediate access to all features
     [ ("<Space>", "env --chdir=/t r.t")
     , ("<Return>", "env --chdir=/@ r.t r.ranger")
     , ("C-<Space>", "env --chdir=/t r.t -M")  -- WARNING: if broken >> HW problem

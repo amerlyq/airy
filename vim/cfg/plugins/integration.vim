@@ -224,6 +224,8 @@ call dein#add('rhysd/committia.vim', {
 " ALT: lambdalisue/vim-gita
 "   SEE: https://lambdalisue.github.io/vimconf2015/#1
 "   ALSO: http://b.hatena.ne.jp/heavenshell/vim/git/
+"   BET:(new): lambdalisue/gina.vim: 👣 Asynchronously control git repositories in Neovim/Vim 8 ⌇⡠⡖⠿⡶
+"     https://github.com/lambdalisue/gina.vim
 " EXPL:(post-hook) Check if already inside some repository
 call dein#add('tpope/vim-fugitive', {
   \ 'augroup': 'fugitive',

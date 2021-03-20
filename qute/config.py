@@ -2504,7 +2504,7 @@ passcmd = " ".join(
 )
 config.bind("zl", passcmd)
 config.bind("zu", f"{passcmd} --username-only")
-config.bind("zp", f"{passcmd} --password-only")
+config.bind("zv", f"{passcmd} --password-only")
 config.bind("zO", f"{passcmd} --otp-only")
 
 

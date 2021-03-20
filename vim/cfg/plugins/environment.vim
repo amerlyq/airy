@@ -1,5 +1,10 @@
 """ Env {{{1
 
+"" :SudaWrite
+call dein#add('lambdalisue/suda.vim')
+
+
+
 "" HACK Adds support of FocusIn/Out events for terminal vim {{{1
 " ATTENTION: neovim has broken t_ti
 " call dein#add('amerlyq/vim-focus-autocmd', {'if': '!has("nvim")'})

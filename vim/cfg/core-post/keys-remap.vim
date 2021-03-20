@@ -10,12 +10,24 @@ if empty(maparg('Y','v'))| exe 'vnoremap <unique> Y y$' |en
 if empty(maparg('[f','n'))
   nnoremap <unique> [f :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 endif
+
 " Prevent Paste loosing the register source. Deleted available by "- reg.
 "   http://stackoverflow.com/a/7797434/1147859
-vnoremap <unique> p pgvy
-vnoremap <unique> P Pgvy
+" vnoremap <unique> p pgvy
+" vnoremap <unique> P Pgvy
+"" SRC: neovim - Clipboard is reset after first paste in Visual Mode - Vi and Vim Stack Exchange ⌇⡠⡖⠑⢖
+"   https://vi.stackexchange.com/questions/25259/clipboard-is-reset-after-first-paste-in-visual-mode
+vnoremap <unique><expr> p 'pgv"'.v:register.'y`>'
+vnoremap <unique><expr> P 'Pgv"'.v:register.'y`>'
 noremap  <unique> zp "0p
 noremap  <unique> zP "0P
+
+"" Forced linewise paste
+" SRC: tpope/vim-unimpaired: unimpaired.vim: Pairs of handy bracket mappings ⌇⡠⡖⠋⣉
+"   https://github.com/tpope/vim-unimpaired
+nnoremap ]p  :<C-u>exe 'put '. v:register<CR>
+nnoremap ]P  :<C-u>exe 'put!'. v:register<CR>
+
 
 " Instead of whole line indention
 inoremap <unique> <C-t>  <C-v><TAB>

@@ -134,6 +134,9 @@ call dein#add('haya14busa/vim-asterisk', {
 "   %s/../.../g  OR  /...  OR  %g/.../d
 " vim_version: '7.3'
 " ALT: AndrewRadev/multichange.vim
+" ALSO:
+"   lambdalisue/reword.vim: 🧬 Vim plugin to provide case-preserving substitutuion ⌇⡠⡖⠿⣣
+"     https://github.com/lambdalisue/reword.vim
 " OBSOLETE:(neovim): if you wish -- call explicitly :OverCommandLine
 call dein#add('osyo-manga/vim-over', {
   \ 'on_cmd': 'OverCommandLine',
