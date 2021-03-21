@@ -80,27 +80,3 @@ Nested repos
   2014-12-01 [X] Git ENH
     http://blog.mixu.net/2012/04/06/git-tips-and-tricks/
   2014-11-30 [X] Сделать отдельный скрипт по манипуляции кучей репозиториев.
-
-
-% DEV
-  2020-07-31 [_] 1h30m DEV #git "repo overview" (like Yocto) -- USE <Gs> to only list "modified" repos ⌇⡟⠟⠧⡓
-    [_] ALSO: git-pull only show progress + updated + errors (like Yocto build)
-  [_] DEV: multirepo overview -- to remember what I did yesterday and pick which project to continue today
-    = print all commits for last day/week per each repo
-  [_] DEV: ./ctl/auto-pick-hunks
-    = add several hunks to index by some heuristic procuring minimal useful commits
-  [_] DEV: ./ctl/auto-message
-    = create description automatically based on hunks currently added into index
-    SEE: how it is done in gitfs(1) -- how many situations it disctinguish
-  [_] DEV: ./ctl/auto-commit
-    = repeat auto-pick-hunks and auto-message until there are no more changes
-  [_] FIND:(maybe faster): if possible to check latest commit hash directly from github
-    TODO: check all in parallel, compose list on update, do git-up sequentially to prevent problems with gnupg
-  * go through all and do 'git fetch'
-    WARNING: fetch+rebase has unrepairable pitfalls
-      http://stackoverflow.com/questions/6284887/whats-the-difference-between-git-fetch-then-git-rebase-and-git-pull-reb
-  = as I see status of all branches -- there no need for git-up
-  * go find all 'behind w/o ahead' and make merges
-    ALT: 'pull --rebase with stash' but w/o internet access
-  * search '.freeze' file up in dir tree -- adding dir1/dir2/$rep accordingly
-    [_] Sync '.freeze' through private *mod*
