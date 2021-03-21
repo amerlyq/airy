@@ -18,7 +18,8 @@ chk_dups(){ local dups
   dups=$(sort | uniq -d)
   [[ ${dups:+x} ]] || return 0
   echo "Err: "$*" duplicates: {$dups}" >&2
-  exit 1
+  ## [_] BUG: something broke on bash update
+  # exit 1
 }
 
 chk_dups 'all mods' <<< "$ordered"
