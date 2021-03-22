@@ -55,9 +55,13 @@ prepare() { local f
   #   s/_BSD_SOURCE/_DEFAULT_SOURCE/
   #   ' config.mk
 
+  # FIXED:ERR: The next patch would create the file boxdraw.c, which already exists!  Skipping patch.
+  rm -f -- boxdraw.c boxdraw_data.h hb.c hb.h
+
   for f in "${source[@]}"; do
     if [[ $f == *.diff || $f == *.patch ]]; then
       # NOTE: apply all patches
+      printf '[%s]\n' "$f"
       patch -Np1 -i "$srcdir/$(basename "$f")"
     elif [[ $f == config.h ]]; then
       # NOTE: user's config.h as-is

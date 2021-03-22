@@ -1,0 +1,27 @@
+Year
+  G: "Product Name" for date in shops
+
+Platform :: laptop .vs. desktop
+  $ sudo dmidecode --string chassis-type
+
+Model
+  $ sudo dmidecode | less
+    Manufacturer: ...
+    Product Name: ...
+    Version: ...
+
+CPU
+  $ grep -m1 'model name' /proc/cpuinfo
+ virtual .vs. physical
+  $ grep 'cpu cores' /proc/cpuinfo
+  $ grep 'core id' /proc/cpuinfo
+
+RAM
+  $ free -m
+  $ dec 15873/1024.
+
+Disk
+  $ lsblk
+
+OS
+  $ cat /etc/lsb-release

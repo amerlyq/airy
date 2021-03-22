@@ -2,8 +2,9 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-    pkg_inst neovim
-    # aur_inst neovim-git
+  # DISABLED: half-year old 0.4.4 version, need 0.5+ which fixed v:register
+  # pkg_inst neovim
+  aur_inst neovim-git
 
     pkg_inst python-neovim python-pynvim
 
