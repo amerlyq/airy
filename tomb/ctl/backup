@@ -44,8 +44,10 @@ git(){ command git -C ${GIT_DIR:?} --no-pager -c color.status=always -c color.ui
 
 function CollectAuraRepos { local d r url
   typeset -ga repos
+  set +o noglob
   for d; do
-    for r in ${(0)"$(r.git-find "$d")"}; do
+    for r in "$d"/*; do
+      [[ -L $r && -d $r/.git ]] || exit
       local GIT_DIR=$r
       # DEPR:(fallback): url=$(git remote get-url "$tomb" || git remote get-url origin ||:) 2>/dev/null
       url=$(git remote get-url "$tomb" ||:) 2>/dev/null
@@ -53,6 +55,7 @@ function CollectAuraRepos { local d r url
       true
     done
   done
+  set -o noglob
 }
 
 function expectMount { local expected=$((!!$1)) dev=$2 src=${3-} tgt=${4-}
