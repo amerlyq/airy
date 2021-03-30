@@ -47,7 +47,7 @@ function CollectAuraRepos { local d r url
   set +o noglob
   for d; do
     for r in "$d"/*; do
-      [[ -L $r && -d $r/.git ]] || exit
+      [[ -L $r && -d $r/.git ]] || continue
       local GIT_DIR=$r
       # DEPR:(fallback): url=$(git remote get-url "$tomb" || git remote get-url origin ||:) 2>/dev/null
       url=$(git remote get-url "$tomb" ||:) 2>/dev/null
@@ -299,7 +299,7 @@ function CfgCloneCentralRepos { local r
 
 
 if has R; then  #% -R = scan ~/aura and gather all repos with (origin|aura) => /mnt
-  (($#)) || set -- '/at/=tag=/sync-tomb'
+  (($#)) || set -- '/@'
   CollectAuraRepos $@
 else
   repos=( "$@" )
