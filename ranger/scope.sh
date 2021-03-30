@@ -50,21 +50,25 @@ OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
 ## FAIL: git-annex symlinks are resolved and lose extension
 # echo "$FILE_PATH" > /t/hi
 
+preview_archive(){ local f=$1 sfx=${2:-#/}
+  # MAYBE:BAD:(errpipe=141): | head -n "$PV_HEIGHT"
+  local vdir=$XDG_RUNTIME_DIR/avfs${f}$sfx
+  # DISABLED:(LC_ALL=C for sorting): cyrillic names are converted to octal escape codes
+  # BET: use "broot" for fast-preview of archive contents FAIL: only interactive usage
+  [[ -d $vdir ]] && tree --noreport -xaCL 3 --dirsfirst -- "$vdir" && exit 5
+  # TRY: atool --list -- "$f" | tree --noreport -aACL 3 --dirsfirst --fromfile=-
+  atool --list -- "$f" && exit 5
+  exit 1
+}
+
 handle_extension() {
     # shellcheck disable=SC2221,SC2222
     case "${FILE_EXTENSION_LOWER}" in
         ## use AVFS for archive exploration
         # VIZ: $ grep -hroP '\.from = "\.\K[^"]+' /path/to/src/avfs |sort -u| paste -sd'|'
-        Z|a|apk|bz|bz2|deb|ear|gz|jar|lzma|rar|sfx|\
-        tar|tar.bz2|tar.xz|tar.zst|taz|tbz|tbz2|tgz|tpz|txz|tz|tzst|war|xz|zip|zst)
-            # MAYBE:BAD:(errpipe=141): | head -n "$PV_HEIGHT"
-            local vdir=$XDG_RUNTIME_DIR/avfs$FILE_PATH'#/'
-            # DISABLED:(LC_ALL=C for sorting): cyrillic names are converted to octal escape codes
-            # BET: use "broot" for fast-preview of archive contents FAIL: only interactive usage
-            tree --noreport -xaCL 3 --dirsfirst -- "$vdir" && exit 5
-            # TRY: atool --list -- "${FILE_PATH}" | tree --noreport -aACL 3 --dirsfirst --fromfile=-
-            atool --list -- "${FILE_PATH}" && exit 5
-            exit 1;;
+        Z|a|apk|bz|bz2|deb|ear|gz|jar|lz|lzma|rar|sfx|\
+        tar|tar.bz2|tar.lz|tar.xz|tar.zst|taz|tbz|tbz2|tgz|tpz|txz|tz|tzst|war|xz|zip|zst)
+            preview_archive "$FILE_PATH" ;;
         ## Archive
         a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
         rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
@@ -385,6 +389,11 @@ handle_mime() {
           # ALT: ldd
           # ALT: readelf -dW
           ;;
+
+        application/zip)    preview_archive "$FILE_PATH" "#uzip/"       ;;
+        application/gzip)   preview_archive "$FILE_PATH" "#ugz#utar/"   ;;
+        application/zstd)   preview_archive "$FILE_PATH" "#uzstd#utar/" ;;
+        application/x-lzip) preview_archive "$FILE_PATH" "#ulzip#utar/" ;;
     esac
 }
 

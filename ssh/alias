@@ -1,6 +1,7 @@
 # vim:ft=sh
 
 alias sshx='ssh -O exit'
+alias sshl='ls -la ${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-*'
 
 # ALT: scp must be double-escaped due to shell expansion on both client and host
 #   ls X{} scp "{}" host:"~/'{}'"

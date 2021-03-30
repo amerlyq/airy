@@ -28,6 +28,24 @@ Archives
       $ 7z x partial.7z.001
 
 
+FUSE
+  AVFS ⌇⡠⡟⠗⡌
+    USAGE
+      $ d=$XDG_RUNTIME_DIR/avfs && mkdir -p "$d" && AVFSBASE=$d mountavfs
+    ALT: manually
+      $ d=$XDG_RUNTIME_DIR/avfs && mkdir -p "$d" && avfsd "$d"
+      $ srw="$d/#avfsstat/symlink_rewrite"; while test ! -e "$srw"; do sleep 0.5; done && echo 1 >! "$srw"
+    QUIT:(lazy=-z):
+      $ fusermount -u "$XDG_RUNTIME_DIR/avfs"
+    [_] TODO: systemd FUSE lazy mount
+      SEE: https://wiki.archlinux.org/index.php/SSHFS#On_demand
+  ratarmount
+    TBD
+  Lazy: mount --bind
+    fstab - How do I set up bind mounts on startup correctly in the systemd world? - Unix & Linux Stack Exchange ⌇⡠⡟⠜⢆
+      https://unix.stackexchange.com/questions/216287/how-do-i-set-up-bind-mounts-on-startup-correctly-in-the-systemd-world
+
+
 
 CMP ⌇⡠⡍⢚⠰
   Lzip

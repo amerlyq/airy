@@ -1,0 +1,33 @@
+# Maintainer:
+# Contributor: Alexander F Rødseth <xyproto@archlinux.org>
+# Contributor: Kevin Piche <kevin@archlinux.org>
+# Contributor: K. Piche <kpiche@rogers.com>
+
+pkgname=avfs-git
+pkgver=1.1.3
+pkgrel=4
+pkgdesc='Virtual filesystem that allows browsing compressed files'
+arch=('x86_64')
+license=('GPL' 'LGPL')
+url='http://avf.sourceforge.net/'
+depends=('fuse2' 'perl' 'xz' 'zstd' 'lzlib')  # AUR: lzlib
+options=('!emptydirs')  #  '!strip' debug
+source=("avfs::git+https://git.code.sf.net/p/avf/git")
+sha512sums=('SKIP')
+provides=(avfs)
+conflicts=(avfs)
+
+build() {
+  cd avfs
+  # mkdir -p ./build && cd ./build
+  /bin/sh autogen.sh
+  ./configure --prefix=/usr --enable-library --enable-fuse --disable-static
+  make
+}
+
+package() {
+  cd avfs
+  make DESTDIR="$pkgdir" install
+}
+
+# vim:set ts=2 sw=2 et:

@@ -1,9 +1,13 @@
 # vim:ft=sh
 
-# USAGE: $ txz arch.tar.gz -- ./
+#%USAGE: $ tlz arch.tar.gz -- ./
 
-alias txz='tar -cvJf'
-alias uxz='tar -xvJf'
+alias tlz='tarlz -9 --create --no-solid --threads=8 --file'
+alias tlZ='tarlz -9 --create --solid --threads=8 --file'
+alias ulz='tarlz --extract --threads=8 --file'
+
+alias tzs='ZSTD_CLEVEL=19 tar --zstd --create --force-local --sort=name --totals --file'
+alias uzs='tar --zstd --extract --preserve-permissions --xattrs --file'
 
 alias tgz='tar -cvzf'
 alias ugz='tar -xvzf'

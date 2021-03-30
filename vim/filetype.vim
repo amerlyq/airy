@@ -39,7 +39,7 @@ augroup filetypedetect
   au BufRead /tmp/gdb/{log.cfg,*/*.cfg} setl ft=fasm ts=8 nowrap
   au BufRead gdb-log.cfg                setl ft=fasm ts=8 nowrap
   au BufRead,BufNewFile *.ftrace        setl ft=ftrace
-  au BufRead,BufNewFile *.weechatlog    setl ft=weechatlog
+  au BufRead,BufNewFile {*.weechatlog,/@/chat/weechat/*.txt}  setl ft=weechatlog
 augroup END
 
 " Use Zeal on Linux for context help

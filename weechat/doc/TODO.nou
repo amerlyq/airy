@@ -23,6 +23,7 @@ BUG
       #  UTF-8
       $ ... | iconv -f UTF-8 -t ISO-8859-1
       #  2019-08-08 12:12:55  Если мне почти ежедневно делегируется по несколько новых задач
+      :exe '!tail -n +'.line('.').' -- % | head -1 | iconv -f UTF-8 -t ISO-8859-1 | xcio'
   2020-04-02 [X] BUG: some unknown plugins write to /dev/stderr on connect
     DEBUG: $ r.weechat 2>/tmp/log
     ERR: Invalid commandline: Unknown option --(PM)

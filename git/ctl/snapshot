@@ -53,6 +53,7 @@ gitaugmeta(){ local repo=$1
 
 # BAD: easily corrupted for archiving :: --xz | --zstd
 # BAD: not accessible by AVFS :: --lzip (+plzip) | --lz4 | -Ilrz
+#   FIXED!(2021-03-27): $ tarlz -9 --create --no-solid --threads=8 --file
 # BAD: compression level :: --gzip | --lz4
 # BAD: partial decompress speed :: --bzip2 | --xz
 gitarchive(){ local repo=$1 args
