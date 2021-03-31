@@ -6,6 +6,15 @@
     $ ssh-add -l
   Delete all cached keys
     $ ssh-add -D
+  Delete keys from gnupg agent
+    https://unix.stackexchange.com/questions/185393/gpg-agent-doesnt-remove-my-ssh-key-from-the-keyring
+    $ ssh-add -l -E md5
+    $ gpg-connect-agent
+      KEYINFO --ssh-list --ssh-fpr
+      ¦ find by MD5, copy HANDLE e.g. 3365433C34421CC53B52C9A82169FD2328CF610B
+      DELETE_KEY <HANDLE>
+      BYE
+    $ ssh-add -l
 
 
 %%% Hosts
