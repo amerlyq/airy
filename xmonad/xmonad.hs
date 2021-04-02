@@ -211,7 +211,8 @@ myManageHook :: ManageHook
 myManageHook = manageSpawn <+> fullscreenManageHook <+>
   mconcat
   [ isFullscreen --> doFullFloat
-  , isDialog --> doCenterFloat
+  , isDialog --> doFloat
+  -- , isDialog --> doCenterFloat
   --   (ask >>= \w -> doF $ W.sink w) >> doShift "IM"
   -- FIXME: bring copyq into between windows stack -- check on first window of fullscreen wksp
   , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
@@ -219,11 +220,12 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   ] <+>
   composeFloat
   [ ("Float" `isPrefixOf`) <$> appName
+  , ("Android Emulator" `isPrefixOf`) <$> appName
   --EXPL: pidgin is tiled by XMonad.Layout.IM
   -- , let lst = "buddy_list Preferences"
   --   in wmhas (stringProperty "WM_WINDOW_ROLE") lst
   -- BAD: floating "Steam" will run away in diagonal bot-right if {borderWidth > 2}
-  , let lst = "feh Gimp piony.py Transmission-gtk"
+  , let lst = "feh Gimp piony.py Transmission-gtk"  -- "jetbrains-studio"
     in wmhas className lst
   , let lst = "PlayOnLinux Dialog"
     in wmhas appName lst
@@ -242,11 +244,13 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   , foldr1 (<||>) [ stringProperty "WM_WINDOW_TYPE" =? x | x <-
     [ "_NET_WM_WINDOW_TYPE_TOOLTIP"
     , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
+    -- _NET_WM_WINDOW_TYPE_DIALOG
     ] ] --> doIgnore
   -- FAIL: skype pop-up window during call still tiled instead of floating/ignored
   -- TRY: isPreview = isInProperty "_NET_WM_STATE" "_NET_WM_STATE_ABOVE"
   , foldr1 (<||>) [ stringProperty "_NET_WM_STATE" =? x | x <-
     [ "WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE"
+    -- _NET_WM_STATE_SKIP_TASKBAR
     -- , _GTK_HIDE_TITLEBAR_WHEN_MAXIMIZED(CARDINAL) = 1
     -- , _NET_WM_STATE(ATOM) = WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE
     ] ] --> doIgnore
