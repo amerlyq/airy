@@ -14,3 +14,18 @@ USAGE
       $ mv /foo/bar /foo/bar-bad
     Copy the snapshot directory to the expected sync target.
       $ cp -a /foo/.bar-backup_asd-crashrecovery-20141221_070112 /foo/bar
+
+
+TODO:TRY: lift ~/.cache to RAM and persist on exit ⌇⡠⡩⢬⡚
+  [_] IDEA: reduce SSD wear by small writes by !vim at least
+    ALT: set different fsync time per directory
+  [_] CFG
+    Anything-sync-daemon - ArchWiki ⌇⡠⡩⢮⢖
+      https://wiki.archlinux.org/index.php/anything-sync-daemon
+    Profile-sync-daemon - ArchWiki ⌇⡠⡩⢮⢝
+      https://wiki.archlinux.org/index.php/Profile-sync-daemon
+    Firefox/Profile on RAM - ArchWiki ⌇⡠⡩⢮⢟
+      https://wiki.archlinux.org/index.php/Firefox/Profile_on_RAM
+  [_] PERF:FIND:(eBPF): measure which folders are most frequently written to
+  [⡠⡩⢶⢯] NICE: Better guidance for database developers [LWN.net] ⌇⡠⡩⢶⢩
+    https://lwn.net/Articles/799807/

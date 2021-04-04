@@ -2,15 +2,10 @@
 # tags: util
 source ~/.shell/func.d/cfgsetup
 
-## /etc/asd.conf
-# WHATTOSYNC=(
-#   '/work/_build'
-#   '/work/_mirror/_ccache'
-# )
-# USE_OVERLAYFS="yes"
+linkcp -ct /etc -- asd.conf
 
 # NEED: $ sudo modprobe overlay
 # sudo modprobe -c | grep overlay
 
 # BAD: too much RAM for ccache on SSD laptop
-# svc_activate -er asd.service
+svc_activate -er asd.service
