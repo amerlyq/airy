@@ -28,8 +28,8 @@ curr() { [[ -s $fmod ]] && cat "$fmod"
 next(){ declare -A n
   ## DISABLED:BET: use two-finger scroll
   # n=([zoom]=undo [undo]=scroll [scroll]=zoom)
-  # n=([zoom]=undo [undo]=zoom)    # screen-presenting
-  n=([mscroll]=undo2 [undo2]=mscroll)  # pdf-annotation
+  n=([zoom]=undo [undo]=zoom)    # screen-presenting
+  # n=([mscroll]=undo2 [undo2]=mscroll)  # pdf-annotation
   # n=([zoom]=rotate [rotate]=undo [undo]=zoom)
   mod=${n[${1:-default}]:-zoom}; }
 
