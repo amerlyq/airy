@@ -2,7 +2,7 @@
 let g:XkbSwitchEnabled = 1
 
 if has('win32') || has('win64')
-    let g:XkbSwitchLib = $CACHE . '/bundle/xkb-switch/libxkbswitch.dll'
+  let g:XkbSwitchLib = $CACHE . '/dein/repos/github.com/lyokha/vim-xkbswitch/libxkbswitch.dll'
 endif
 
 "" all commented to solve MPogoda's issues

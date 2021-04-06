@@ -19,8 +19,8 @@ echo
 
 # git -c annex.tune.objecthash1=true annex init ⌇⡞⡀⠝⠺
 #   https://git-annex.branchable.com/tuning/
+# DISABLED(annex.tune.branchhash1=true): use two-level hierarchy in git-annex branch to reduce each tree-commit size
 git -c annex.tune.objecthash1=true \
-    -c annex.tune.branchhash1=true \
     -c annex.tune.objecthashlower=true \
   annex init $@
 

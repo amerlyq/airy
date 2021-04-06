@@ -22,9 +22,9 @@ fi
 #   => query hardcoded value from some default settings file
 trap "
 xset dpms $(xset q|awk '/Standby:/{print$2}')
-notify-send DUNST_COMMAND_RESUME
+dunstctl set-paused false
 " HUP INT TERM ERR EXIT
-notify-send 'DUNST_COMMAND_PAUSE'
+dunstctl set-paused true
 
 [[ -f $txt ]] || xset dpms 10 dpms force off
 i3lock --nofork --color 111111 --image "$pic"

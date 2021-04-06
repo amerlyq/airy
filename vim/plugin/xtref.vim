@@ -256,14 +256,22 @@ fun! xtref#ctags(root, ...)
     " THINK:CHG: append to separate overlay
     "   let tmp = g:xtref.lazytagdir.'/'.g:xtref.tagfile
     "   << NEED: delete this overlay each time you regen proper Aura or Repo tags
+    "" NICE:(-a): ¦ After creating or appending to the tag file, it is sorted by the tag name, removing identical tag lines.
+    "   ALT:(BufWritePost): append instead of overwrite, and then dedupl by awk
+    "   FAIL: when lines inserted/deleted -- positions of xtrefs below the edit will move,
+    "     and old stale ones won't be auto-removed
+    "   FIXME: filter-out all xtrefs (with passed filepaths) before appending
+    "     [_] FUTURE: remove stale xtrefs from lazydir
+    "     [_] FUTURE: remove deleted files from lazydir
     let cmd .= ' --append '. join(map(bufs, 'shellescape(v:val)'), ' ')
+    echom cmd
   elseif type(bufs) == type('') && bufs[0] == '.'
     let cmd .= ' --recurse '. join(map(split(bufs, ','), '"--map-xtref=".v:val'), ' ')
   end
 
   " FIXME: use async job
   let _ = join(xtref#call_at(a:root, 'systemlist', cmd), '\n')
-  echom 'DONE: gen '. g:xtref.tagfile .' for '. a:root
+  echom 'DONE: gen '. a:root .'/'. g:xtref.tagfile
 endf
 
 
@@ -290,7 +298,10 @@ augroup Xtref
   au WinEnter * call xtref#syntax()
 
   "" [_] ENH: parse !ctags only in diff from last write
-  " au BufWritePost * XtrefOpened
+  " NICE: incremental update -- i.e. append tags from all changed files
+  " BUG: called twice on first write
+  au BufWritePost * sil call xtref#ctags(g:xtref.lazytagdir,
+    \ [expand('<afile>:p',1)])
 
   " NOTE: only modified buffers
   " OR: au BufDelete *

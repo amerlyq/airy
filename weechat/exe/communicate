@@ -35,6 +35,7 @@ stdout_to_pipe(){ local p=$1
   exec > "$p"
 
   # WARN: wait on "$wee_pid" only, not itself; ALT:(kill last job): kill %% 2>/dev/null
+  # ERR: |: tail: cannot open '~/.weechat/logs/core.weechat.weechatlog' for reading: No such file or directory
   tail -n0 -f "$flog" --pid="${wee_pid:-$$}" | grep --line-buffered -P '\t(?:⚠|=!=)\t|\t\K(?:Error:?|irc:)(?=\s)' >&2 &
 }
 

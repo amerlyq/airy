@@ -9,12 +9,12 @@ endif
 
 "" Create cache dirs
 let $CACHE = $VCACHE.'/cache'
-for d in split('bundle bckp swap undo view')  " easytags.d
+for d in split('bckp swap undo view')  " easytags.d
   if !isdirectory(expand('$CACHE/'.d))
     call mkdir(expand('$CACHE/'.d), 'p', 0700)
   endif
 endfor
-let $VPLUGS = $VCACHE.'/plugins'
+let $VPLUGS = $CACHE.'/plugins'
 
 
 " NOTE The '//' at directory end: use full path for filename with '%' separators
