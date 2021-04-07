@@ -14,8 +14,8 @@
 
 ## @me
 # REF: /usr/lib/python3.6/site-packages/qutebrowser
-c = c  # noqa: F821
-config = config  # noqa: F821
+c = c  # pylint:disable=undefined-variable,self-assigning-variable  # ALT: # noqa: F821
+config = config  # pylint:disable=undefined-variable,self-assigning-variable
 
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
