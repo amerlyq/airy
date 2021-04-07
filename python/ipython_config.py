@@ -1,12 +1,13 @@
 # Configuration file for ipython.
+c = c  # pylint:disable=undefined-variable,self-assigning-variable
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Configurable configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # InteractiveShellApp configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # A Mixin for applications that start InteractiveShell instances.
 #
@@ -37,6 +38,13 @@
 
 # A list of dotted module names of IPython extensions to load.
 # c.InteractiveShellApp.extensions = []
+# REQ: https://stackoverflow.com/questions/19092812/measure-max-memory-usage-with-ipython-like-timeit-but-memit
+# REF: https://github.com/pythonprofilers/memory_profiler#ipython-integration
+# TUT: https://towardsdatascience.com/speed-up-jupyter-notebooks-20716cbe2025
+c.InteractiveShellApp.extensions = [
+    "autoreload",
+    "memory_profiler",
+]
 
 # dotted module name of an IPython extension to load.
 # c.InteractiveShellApp.extra_extension = ''
@@ -71,18 +79,18 @@
 # Reraise exceptions encountered loading IPython extensions?
 # c.InteractiveShellApp.reraise_ipython_extension_failures = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # LoggingConfigurable configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # A parent class for Configurables that log.
 #
 # Subclasses have a log trait, and the default behavior is to get the logger
 # from the currently running Application.
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SingletonConfigurable configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # A configurable that only allows one instance.
 #
@@ -90,9 +98,9 @@
 # *any* subclass. To create and retrieve such a class use the
 # :meth:`SingletonConfigurable.instance` method.
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Application configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # This is an application.
 
@@ -105,9 +113,9 @@
 # Set the log level by value or name.
 # c.Application.log_level = 30
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # BaseIPythonApplication configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # IPython: an enhanced interactive Python shell.
 
@@ -141,9 +149,9 @@
 # error.  The default is to append a short message to the usual traceback
 # c.BaseIPythonApplication.verbose_crash = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # TerminalIPythonApp configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Whether to display a banner upon starting IPython.
 c.TerminalIPythonApp.display_banner = False
@@ -155,9 +163,9 @@ c.TerminalIPythonApp.display_banner = False
 # Start IPython quickly by skipping the loading of config files.
 # c.TerminalIPythonApp.quick = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # InteractiveShell configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # An enhanced, interactive shell for Python.
 
@@ -299,9 +307,9 @@ c.TerminalIPythonApp.display_banner = False
 #
 # c.InteractiveShell.xmode = 'Context'
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # TerminalInteractiveShell configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # auto editing of files with syntax errors.
 # c.TerminalInteractiveShell.autoedit_syntax = False
@@ -330,9 +338,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 # Enable auto setting the terminal title.
 # c.TerminalInteractiveShell.term_title = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PromptManager configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # This is the primary interface for producing IPython's prompts.
 
@@ -351,15 +359,15 @@ c.TerminalInteractiveShell.confirm_exit = False
 # Output prompt. '\#' will be transformed to the prompt number
 # c.PromptManager.out_template = 'Out[\\#]: '
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # HistoryAccessorBase configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # An abstract class for History Accessors
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # HistoryAccessor configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Access the history database without adding to it.
 #
@@ -392,9 +400,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 #     ipython --HistoryManager.hist_file=/tmp/ipython_hist.sqlite
 # c.HistoryAccessor.hist_file = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # HistoryManager configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # A class to organize all history-related functionality in one place.
 
@@ -405,9 +413,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 # Should the history database include output? (default: no)
 # c.HistoryManager.db_log_output = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ProfileDir configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # An object to manage the profile directory and its resources.
 #
@@ -421,9 +429,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 # `profile` option.
 # c.ProfileDir.location = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # BaseFormatter configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # A base formatter class that is configurable.
 #
@@ -459,9 +467,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 #
 # c.BaseFormatter.type_printers = {}
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PlainTextFormatter configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # The default pretty-printer.
 #
@@ -505,9 +513,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 #
 # c.PlainTextFormatter.verbose = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Completer configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Activate greedy completion
 #
@@ -515,9 +523,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 # etc., but can be unsafe because the code is actually evaluated on TAB.
 # c.Completer.greedy = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # IPCompleter configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Extension of the completer class with IPython-specific features
 
@@ -547,9 +555,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 # When 0: nothing will be excluded.
 # c.IPCompleter.omit__names = 2
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Magics configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Base class for implementing magic functions.
 #
@@ -568,9 +576,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 #
 # See :mod:`magic_functions` for examples of actual implementation classes.
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ScriptMagics configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Magics for talking to scripts
 #
@@ -592,9 +600,9 @@ c.TerminalInteractiveShell.confirm_exit = False
 # the right interpreter.
 # c.ScriptMagics.script_paths = {}
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # StoreMagics configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Lightweight persistence for python variables.
 #

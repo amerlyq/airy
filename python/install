@@ -6,6 +6,10 @@ pkg_inst python-pip
 
 if distro arch; then
   pkg_inst ipython  # ALSO: jupyter for notebooks in vim
+
+  # SEE: https://pypi.org/project/memory-profiler/
+  pkg_inst python-memory-profiler  # NEED:(ipython): %memit
+
   pkg_inst python-ipdb  # pretty debugger for IPython
   pkg_inst python-pudb
   ## OBSOLETE
