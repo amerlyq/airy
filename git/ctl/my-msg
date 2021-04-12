@@ -190,6 +190,7 @@ sub parse_raw_numstat {
     while (<STDIN>) {
         chomp;
         if (/^:\d{6}\s/) {
+            # FMT: :100644 100644 <oldhash> <newhash> M
             my ($sm,$dm,$sh,$dh,$mod) = split /\s/, substr($_,1), 5;
             my $src = <STDIN>;
             chomp $src;
