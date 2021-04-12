@@ -224,7 +224,7 @@ class doc(Command):
         ".": ".",
     }
     ext = [".nou", ".rst", ".otl", ".md", ".txt", ""]
-    loci = ["doc", "docs", "_doc", ""]
+    loci = ["doc", "docs", "_doc", "todo", ""]
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories
     """

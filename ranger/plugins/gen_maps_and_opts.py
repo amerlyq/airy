@@ -41,7 +41,7 @@ def aura_pathes(fm):
 
 def hook_init(fm):
     old_hook_init(fm)
-    fm.execute_console("set colorscheme " + get_colorscheme(fm))
+    # fm.execute_console("set colorscheme " + get_colorscheme(fm))
     aura_pathes(fm)
 
     # DISABLED: I already have two sets: <F1>..<F9> and <A-1>..<A-9>
