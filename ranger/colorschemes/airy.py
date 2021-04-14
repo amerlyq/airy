@@ -9,8 +9,6 @@ from ranger.colorschemes.solarized import Solarized
 class Scheme(Solarized):
     def use(self, context):
         fg, bg, attr = Solarized.use(self, context)
-        with open("/t/txt", "w") as f:
-            f.write(str(context))
 
         if (
             context.ext_nou

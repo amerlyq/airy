@@ -33,7 +33,7 @@ import XMonad.Actions.SpawnOn       (manageSpawn)
 import XMonad.Hooks.SetWMName       (setWMName)
 import XMonad.Hooks.EwmhDesktops    (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts)
-import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, doRectFloat, isDialog)
+import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, doRectFloat, isDialog, isInProperty)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Hooks.UrgencyHook     (withUrgencyHook, BorderUrgencyHook(..))
 
@@ -248,9 +248,10 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
     ] ] --> doIgnore
   -- FAIL: skype pop-up window during call still tiled instead of floating/ignored
   -- TRY: isPreview = isInProperty "_NET_WM_STATE" "_NET_WM_STATE_ABOVE"
-  , foldr1 (<||>) [ stringProperty "_NET_WM_STATE" =? x | x <-
-    [ "WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE"
-    -- _NET_WM_STATE_SKIP_TASKBAR
+  , foldr1 (<||>) [ isInProperty "_NET_WM_STATE" x | x <-
+    [ "WM_COLORMAP_WINDOWS"
+    , "_NET_WM_STATE_ABOVE"
+    , "_NET_WM_STATE_SKIP_TASKBAR"  -- "Android/IDEa/jetbrains-studio"
     -- , _GTK_HIDE_TITLEBAR_WHEN_MAXIMIZED(CARDINAL) = 1
     -- , _NET_WM_STATE(ATOM) = WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE
     ] ] --> doIgnore
