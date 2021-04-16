@@ -249,9 +249,9 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- FAIL: skype pop-up window during call still tiled instead of floating/ignored
   -- TRY: isPreview = isInProperty "_NET_WM_STATE" "_NET_WM_STATE_ABOVE"
   , foldr1 (<||>) [ isInProperty "_NET_WM_STATE" x | x <-
-    [ "WM_COLORMAP_WINDOWS"
-    , "_NET_WM_STATE_ABOVE"
-    , "_NET_WM_STATE_SKIP_TASKBAR"  -- "Android/IDEa/jetbrains-studio"
+    [ -- "WM_COLORMAP_WINDOWS"
+    -- , "_NET_WM_STATE_ABOVE"
+    "_NET_WM_STATE_SKIP_TASKBAR"  -- "Android/IDEa/jetbrains-studio"
     -- , _GTK_HIDE_TITLEBAR_WHEN_MAXIMIZED(CARDINAL) = 1
     -- , _NET_WM_STATE(ATOM) = WM_COLORMAP_WINDOWS, _NET_WM_STATE_ABOVE
     ] ] --> doIgnore

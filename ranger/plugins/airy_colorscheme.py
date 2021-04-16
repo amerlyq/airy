@@ -10,11 +10,11 @@ for key in ["ext_nou"]:
 OLD_HOOK_BEFORE_DRAWING = B.hook_before_drawing
 
 
-def new_hook_before_drawing(fsobject, color_list):
-    if fsobject.basename.endswith(".nou"):
+def new_hook_before_drawing(fsobj, color_list):
+    if fsobj.is_file and fsobj.basename.endswith(".nou"):
         color_list.append("ext_nou")
 
-    return OLD_HOOK_BEFORE_DRAWING(fsobject, color_list)
+    return OLD_HOOK_BEFORE_DRAWING(fsobj, color_list)
 
 
 B.hook_before_drawing = new_hook_before_drawing
