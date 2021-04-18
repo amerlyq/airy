@@ -11,7 +11,7 @@
 "   switchr
 "" HACK notes/outline
 call dein#add('amerlyq/nou.vim', {
-  \ 'on_ft': 'nou',
+  \ 'lazy': 0,
   \ 'depends': 'vim-textobj-user'})
 
 

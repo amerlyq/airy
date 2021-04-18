@@ -1,4 +1,5 @@
 if exists("did_load_filetypes") | finish | endif
+" if exists('s:custom_filetypes')|finish|else|let s:custom_filetypes=1|endif
 
 augroup filetypedetect
   " Langs
@@ -7,7 +8,6 @@ augroup filetypedetect
   au BufRead,BufNewfile *.p5      setf perl
   au BufRead,BufNewfile *.p6      setf perl6
   au BufRead,BufNewFile *.tex.erb setf tex.eruby
-  au BufRead,BufNewFile *         if getline(1) =~# '^#!.*/bin/jconsole\>'| setf j |en
   " Asm
   au BufRead,BufNewFile *.asm  setl ft=masm syntax=masm
   au BufRead,BufNewFile *.inc  setl ft=masm syntax=masm
@@ -25,8 +25,6 @@ augroup filetypedetect
 
   " MOVE: ftdetect/xtref.vim -- detection must be part of xtref plugin
   au BufRead,BufNewFile *.otl   setl noet  " TEMP:REM*
-  au BufRead,BufNewFile {*.task,TASK}   setf nou  " TEMP:MOVE: ⌇TU:nu
-  au BufRead,BufNewFile 20[0-9][0-9]-[0-1][0-9]-[0-3][0-9]*  edit ++enc=utf8
 
   " System
   au BufRead,BufNewFile {*.gpg,*.asc}   setf gpg

@@ -10,9 +10,8 @@ endf
 
 if s:has('diff --git ', 2)
   set ft=diff
-" MOVE: ftdetect/xtref.vim -- detection must be part of xtref plugin
-elseif s:has('\v^'. g:xtref.r_anchor .'$', 1)  " ALT: '\v^[\u2800-\u28FF]{4}$'
-  set ft=nou  " BET: .task OR .cal
+elseif s:has('^#!.*/bin/jconsole\>')
+  set ft=j
 elseif s:has('^#!\S*guile\s')
   set ft=scheme
 elseif s:has('\v^\u\l{2} \d{2} \d{2}:\d{2}:\d{2} \S', 1)
