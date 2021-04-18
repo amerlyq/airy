@@ -7,16 +7,14 @@ from ranger.colorschemes.solarized import Solarized
 
 
 class Scheme(Solarized):
-    def use(self, context):
-        fg, bg, attr = Solarized.use(self, context)
+    def use(self, ctx):
+        fg, bg, attr = Solarized.use(self, ctx)
+        if ctx.link or ctx.inactive_pane:  # or ctx.marked
+            return fg, bg, attr
 
-        if (
-            context.ext_nou
-            # and not context.marked
-            and not context.link
-            and not context.inactive_pane
-        ):
+        if ctx.ext_nou:
             fg = 187  # OR: 22 28 BET?=30 31 174
-            # fg = C.green
+        elif ctx.wf_log:
+            fg = 98
 
         return fg, bg, attr
