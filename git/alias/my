@@ -7,7 +7,8 @@ alias gcn='r.git-my-msg --index --modtime --commit --prefix'
 alias gcN='r.git-my-msg --index --commit --prefix'
 alias gct='r.git-my-msg --index --commit --prefix="TEMP!"'
 alias gcd='r.git-my-msg --index --commit --diff'
-alias gc.='r.git-my-msg --workdir --modtime --commit'
+# alias gc.='r.git-my-msg --workdir --modtime --commit'
+alias gc.='r.git-my-msg --index --modtime --commit --prefix $PWD:t'
 
 [[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' gc gC gcn gcN gct gcd gc.
 

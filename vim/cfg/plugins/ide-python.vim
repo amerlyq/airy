@@ -112,13 +112,14 @@ call dein#add('thalesmello/vim-textobj-multiline-str', {
 "   OLD: https://github.com/szymonmaszke/vimpyter
 "   TUT:2019: https://towardsdatascience.com/boosting-your-data-science-workflow-with-vim-tmux-14505c5e016e
 " \\n    noremap  <silent> <Plug>JupyterRunVisual     :<C-u>call <SID>opfunc_run_code(visualmode())<CR>gv
+" FIXME: open second file -- no mappings until ":JupyterConnect"
 call dein#add('jupyter-vim/jupyter-vim', {
   \ 'on_ft': 'python',
   \ 'on_cmd': 'JupyterConnect',
   \ 'hook_source': "
 \\n    let g:jupyter_mapkeys = 0
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>z :JupyterConnect<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>R :JupyterRunFile<CR>
+\\n    nnoremap <buffer><silent><unique>  <LocalLeader>r :JupyterRunFile<CR>
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>I :PythonImportThisFile<CR>
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>X :JupyterSendCell<CR>
 \\n

@@ -47,6 +47,7 @@ xnoremap <unique><expr> v  (mode() ==# "\<C-v>") ? "v" : "\<C-v>"
 noremap <unique> ' `
 noremap <unique> ` '
 " Because 'ga' is used by me already
+" NICE: https://spin.atomicobject.com/2011/06/21/character-encoding-tricks-for-vim/
 noremap <unique> g8 ga
 
 " Pinky stretching soothing
