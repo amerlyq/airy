@@ -33,5 +33,5 @@ if ! distro arch; then
   [[ ! -f $dfl ]] || sudo mv -n $dfl{,.disabled}
 fi
 
-svc_activate -cue dunst.service
+svc_activate -cue$(cfgOpt uU&&echo R) dunst.service
 # ALT: ! grep_prs dunst || ./run  # BUG: hangs up airy/setup
