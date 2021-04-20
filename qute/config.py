@@ -973,7 +973,7 @@ config.set("content.javascript.enabled", True, "*://www.reddit.com/*")
 ##   - false
 ##   - ask
 # c.content.notifications = 'ask'
-c.content.notifications = False  # @me: openning reddit is infuriating
+c.content.notifications.enabled = False  # @me: "ask" is infuriating on Reddit
 
 ## Allow pdf.js to view PDF files in the browser. Note that the files can
 ## still be downloaded by clicking the download button in the pdf.js
@@ -1039,7 +1039,7 @@ c.content.notifications = False  # @me: openning reddit is infuriating
 ##   - ask
 # c.content.ssl_strict = 'ask'
 # @me BUT: where to find TLSv1.3 only ?
-c.content.ssl_strict = True
+# c.content.ssl_strict = True
 
 ## How navigation requests to URLs with unknown schemes are handled.
 ## Type: String
