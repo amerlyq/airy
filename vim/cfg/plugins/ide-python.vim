@@ -68,6 +68,9 @@ call dein#add('numirias/semshi', {
 call dein#add('jeetsukumaran/vim-pythonsense', {
   \ 'on_ft': 'python',
   \ 'hook_source': "
+\\n  autocmd MyAutoCmd FileType python call BufMap_vim_pythonsense()
+\\n fun! BufMap_vim_pythonsense() abort
+\\n   if exists('b:BufMap_vim_pythonsense')|return|else|let b:BufMap_vim_pythonsense=1|endif
 \\n   xmap <buffer><silent><unique> <LocalLeader>c <Plug>(PythonsenseOuterClassTextObject)
 \\n   omap <buffer><silent><unique> <LocalLeader>c <Plug>(PythonsenseOuterClassTextObject)
 \\n   xmap <buffer><silent><unique> <LocalLeader>C <Plug>(PythonsenseInnerClassTextObject)
@@ -82,6 +85,7 @@ call dein#add('jeetsukumaran/vim-pythonsense', {
 \\n   xmap <buffer><silent><unique> <LocalLeader>d <Plug>(PythonsenseOuterDocStringTextObject)
 \\n   omap <buffer><silent><unique> <LocalLeader>D <Plug>(PythonsenseInnerDocStringTextObject)
 \\n   xmap <buffer><silent><unique> <LocalLeader>D <Plug>(PythonsenseInnerDocStringTextObject)
+\\n endf
 \"})
 
 
@@ -94,10 +98,14 @@ call dein#add('thalesmello/vim-textobj-multiline-str', {
   \ 'depends': 'vim-textobj-user',
   \ 'hook_source': "
 \\n   let g:textobj_multilinestr_no_default_key_mappings = 1
+\\n   autocmd MyAutoCmd FileType python call BufMap_vim_textobj_multiline_str()
+\\n  fun! BufMap_vim_textobj_multiline_str() abort
+\\n   if exists('b:BufMap_vim_textobj_multiline_str')|return|else|let b:BufMap_vim_textobj_multiline_str=1|endif
 \\n   xmap <buffer><silent><unique> <LocalLeader>q <Plug>(textobj-multilinestr-a)
 \\n   omap <buffer><silent><unique> <LocalLeader>q <Plug>(textobj-multilinestr-a)
 \\n   xmap <buffer><silent><unique> <LocalLeader>Q <Plug>(textobj-multilinestr-i)
 \\n   omap <buffer><silent><unique> <LocalLeader>Q <Plug>(textobj-multilinestr-i)
+\\n  endf
 \"})
 
 
@@ -118,6 +126,9 @@ call dein#add('jupyter-vim/jupyter-vim', {
   \ 'on_cmd': 'JupyterConnect',
   \ 'hook_source': "
 \\n    let g:jupyter_mapkeys = 0
+\\n    autocmd MyAutoCmd FileType python call BufMap_jupyter_vim()
+\\n  fun! BufMap_jupyter_vim() abort
+\\n    if exists('b:BufMap_jupyter_vim')|return|else|let b:BufMap_jupyter_vim=1|endif
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>z :JupyterConnect<CR>
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>r :JupyterRunFile<CR>
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>I :PythonImportThisFile<CR>
@@ -133,6 +144,7 @@ call dein#add('jupyter-vim/jupyter-vim', {
 \\n
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>U :JupyterUpdateShell<CR>
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>b :PythonSetBreak<CR>
+\\n  endf
 \"})
 
 

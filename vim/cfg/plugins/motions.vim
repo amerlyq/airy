@@ -1,9 +1,9 @@
 """ Motions
 
 "" STD plugin for matching pairs/triples of block expr {{{1
-call dein#add('vim-scripts/matchit.zip', {
-  \ 'on_map': [['nvo', '%', 'g%', '[%', ']%'], ['v', 'a%']],
-  \ 'hook_post_source': 'sil! exe "doautocmd Filetype" &filetype'})
+call dein#add('vim-scripts/matchit.zip', {'lazy': 0})
+  " \ 'on_map': [['nvo', '%', 'g%', '[%', ']%'], ['v', 'a%']],
+  " \ 'hook_post_source': 'sil! exe "doautocmd Filetype" &filetype'})
 
 
 

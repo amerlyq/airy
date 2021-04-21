@@ -37,10 +37,6 @@ let g:xtref.r_refer = g:xtref.refer_pfx . g:xtref.r_addr
 digraph xa 8967  " ⌇
 digraph xr 8251  " ※
 
-augroup filetypedetect
-  exe 'au! BufRead,BufNewFile '. g:xtref.tagfile .' edit ++enc=utf8'
-augroup END
-
 fun! xtref#vsel()
   let [lbeg, cbeg] = getpos("'<")[1:2]
   let [lend, cend] = getpos("'>")[1:2]
@@ -296,6 +292,9 @@ call xtref#syntax()
 augroup Xtref
   autocmd!
   au WinEnter * call xtref#syntax()
+
+  " WKRND: wront encoding detection
+  " exe 'au! BufRead,BufNewFile '. g:xtref.tagfile .' edit ++enc=utf8'
 
   "" [_] ENH: parse !ctags only in diff from last write
   " NICE: incremental update -- i.e. append tags from all changed files

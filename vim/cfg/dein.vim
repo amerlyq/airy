@@ -16,9 +16,9 @@ let s:rtp = &rtp  " Back-up &rtp to restore on bad load_state
 
 "" Options
 " let g:dein#install_log_filename = ''
-if executable('git-up')  " EXPL:(gitconfig) alias git-up = '!git-up'
-  let g:dein#types#git#pull_command = 'git-up'
-endif
+" if executable('git-up')  " EXPL:(gitconfig) alias git-up = '!git-up'
+"   let g:dein#types#git#pull_command = 'git-up'
+" endif
 let g:dein#types#git#clone_depth = 1
 let g:dein#install_max_processes = 8
 " let g:dein#install_progress_type = 'title'

@@ -1,7 +1,7 @@
 """ vim-textobj-keyvalue
 " Generalized key/value objects for heterogeneous data (like yaml block style)
 " ALT:(https://github.com/vimtaku/vim-textobj-keyvalue) -- works only with vim maps preferably.
-if exists('g:loaded_textobj_keyvalue')
+if exists('g:loaded_textobj_keyvalue') || !exists('*textobj#user#')
   finish
 endif
 

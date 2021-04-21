@@ -1,7 +1,8 @@
-if exists("did_load_filetypes") | finish | endif
+" if exists("did_load_filetypes") | finish | endif
 " if exists('s:custom_filetypes')|finish|else|let s:custom_filetypes=1|endif
 
-augroup filetypedetect
+augroup custom_filetypes
+  autocmd!
   " Langs
   au BufRead,BufNewFile *.scala   setf scala
   au BufRead,BufNewfile *.n       setf nemerle
