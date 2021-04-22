@@ -4,7 +4,7 @@ module Main (main) where
 
 ---- Std
 import Control.Monad (when, unless)
-import Data.List     (isPrefixOf)
+import Data.List     (isPrefixOf, isInfixOf)
 import Data.Ratio    ((%))
 import Data.Maybe    (maybe, fromMaybe, fromJust, isJust)
 import Text.Read     (readMaybe)
@@ -33,7 +33,7 @@ import XMonad.Actions.SpawnOn       (manageSpawn)
 import XMonad.Hooks.SetWMName       (setWMName)
 import XMonad.Hooks.EwmhDesktops    (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts)
-import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, doRectFloat, isDialog, isInProperty)
+import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, doRectFloat, doFloatAt, isDialog, isInProperty)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Hooks.UrgencyHook     (withUrgencyHook, BorderUrgencyHook(..))
 
@@ -217,10 +217,12 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- FIXME: bring copyq into between windows stack -- check on first window of fullscreen wksp
   , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
   , className =? "rdesktop" --> doFullFloat
+  -- FAIL: don't work ("Android Emulator" `isPrefixOf`)
+  -- WM_NAME(STRING) = "Android Emulator - 10.1_WXGA_Tablet_API_30:5554"
+  , fmap ("Emulator" `isPrefixOf`) title --> doFloatAt (1/200) (1/100)
   ] <+>
   composeFloat
   [ ("Float" `isPrefixOf`) <$> appName
-  , ("Android Emulator" `isPrefixOf`) <$> appName
   --EXPL: pidgin is tiled by XMonad.Layout.IM
   -- , let lst = "buddy_list Preferences"
   --   in wmhas (stringProperty "WM_WINDOW_ROLE") lst
