@@ -153,8 +153,9 @@ do v=/mnt/@/var/$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
 chattr +C /mnt/@/var/log
 # THINK:IDEA: totally separate BTRFS and cache $ mount /cache/xdg ~/.cache/
 # [_] FIXME: disable CoW on ~/.cache/
-for x in cabal cache cargo conan config/skypeforlinux ccache gem local/share/Steam npm stack
+for x in android/avd briefcase/tools cabal cache cargo conan config/skypeforlinux ccache gem local/share/Steam npm stack
 do v=/mnt/@/home/user/.$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
+btrfs subvolume create /mnt/@/home/user/go  # XXX why it reappears
 # ATT:NEED:(manually): $ chattr +C ~/.mail/*/.notmuch/xapian/
 btrfs subvolume list /mnt
 umount /mnt
