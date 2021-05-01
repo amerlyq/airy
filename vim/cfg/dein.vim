@@ -2,17 +2,16 @@
 let s:dein = $VCACHE.'/dein'
 
 "" Add dein to runtime
-for p in ['repos/github.com/Shougo/dein.vim', '.dein']
-  if filereadable(s:dein.'/'.p.'/autoload/dein.vim')
-    exe 'set runtimepath^=' . fnameescape(s:dein.'/'.p)
-    break
-  endif
-endfor
-
-if &rtp !~# '\v/%(\.dein|dein\.vim)>'| finish |en
-" FIXME: eliminate duplicate in &rtp for .dein on load_state
-let s:rtp = &rtp  " Back-up &rtp to restore on bad load_state
-
+" for p in ['repos/github.com/Shougo/dein.vim', '.dein']
+"   if filereadable(s:dein.'/'.p.'/autoload/dein.vim')
+"     exe 'set runtimepath^=' . fnameescape(s:dein.'/'.p)
+"     break
+"   endif
+" endfor
+" if &rtp !~# '\v/%(\.dein|dein\.vim)>'| finish |en
+" " FIXME: eliminate duplicate in &rtp for .dein on load_state
+" let s:rtp = &rtp  " Back-up &rtp to restore on bad load_state
+set runtimepath+=$VCACHE/dein/repos/github.com/Shougo/dein.vim
 
 "" Options
 " let g:dein#install_log_filename = ''
@@ -38,7 +37,8 @@ autocmd MyAutoCmd VimEnter * nested call dein#call_hook('post_source')
 " NOTE: It overwrites your 'runtimepath' completely, you must
 "   not call it after change 'runtimepath' dynamically.
 " ATTENTION: recache by 'call dein#clear_state()'
-if dein#load_state(s:dein)| let &rtp = s:rtp |else| finish |en
+" if dein#load_state(s:dein)| let &rtp = s:rtp |else| finish |en
+if !dein#load_state(s:dein)| finish |en
 
 
 fun! _hcat(nm)

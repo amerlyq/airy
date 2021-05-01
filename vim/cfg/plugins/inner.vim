@@ -2,7 +2,7 @@
 
 "" Main package manager {{{1
 " TEMP:REM: revision fixed before hooks were broken: 'rev': 'e8be5b2'
-" call dein#add('Shougo/dein.vim', {'lazy': 0})
+call dein#add('Shougo/dein.vim', {'lazy': 0})
 
 
 

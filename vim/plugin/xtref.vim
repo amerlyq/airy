@@ -19,13 +19,17 @@ let g:xtref.anchor_pfx = '⌇'
 let g:xtref.refer_pfx = '※'
 let g:xtref.task_pfx = '['
 let g:xtref.step_pfx = '^'
+let g:xtref.event_pfx = '<'
 let g:xtref.markers = [g:xtref.anchor_pfx, g:xtref.refer_pfx]
 let g:xtref.prefixes = g:xtref.markers + [g:xtref.task_pfx, g:xtref.step_pfx]
 
 " TODO: support for nanoseconds tail
 " ALT:(queue): $ r.vim-xtref -pp $ ALT:(generic): '\S{3,20}\ze\s?'
 let s:r_z85 = '[-0-9a-zA-Z.:+=^!/*?&<>()\[\]{}@%$#]{5}'
-let s:r_braille = '[\u2800-\u28FF]{4}'
+let s:r_brchr = '\u2800-\u28FF'
+let s:r_bryes = '['.s:r_brchr.']'
+let s:r_brnot = '[^'.s:r_brchr.']'
+let s:r_braille = s:r_bryes . '{4}'
 let g:xtref.r_addr = '('. s:r_z85 .'|'. s:r_braille .')'
 " IDEA: allow xtref free format in brackets ※[so me] instead of time-format
 "  ALT: use completely different braces
@@ -99,6 +103,18 @@ fun! xtref#get(visual)
   else
     let [l,c] = [getline('.'), col('.')-1]
   endif
+
+  if !a:visual && match(strcharpart(l[c:],0,1), s:r_bryes) == 0
+    let lchars = reverse(split(l[:c-1], '\zs'))
+    let b = match(lchars, s:r_brnot)
+    " FIXME: always include prefix to jump by tag "g["
+    " if index(g:xtref.prefixes, lchars[b]) >= 0| let b = b - 1 |en
+    let e = match(split(l[c:], '\zs'), s:r_brnot)
+    let x = strcharpart(l, len(lchars)-b, b+e)
+    return [x, 0]
+    " return [x, strlen(join(lchars[:b],''))]
+    " return [x, -strlen(strcharpart(l, len(lchars)-b))]
+  end
 
   "" FIXME: enforce suffix for "surrounding" markers "[<braille>]"
   let pfxs = g:xtref.prefixes
@@ -318,7 +334,7 @@ augroup END
 iabbrev <expr> !xts! xtref#new()
 
 nnoremap [Xtref]u :<C-u>XtrefNou<CR>
-command! -bar -range -nargs=0  XtrefNou  call xtref#ctags(g:xtref.aura, '.nou')
+command! -bar -range -nargs=0  XtrefNou  call xtref#ctags(g:xtref.aura, '.nou,.task')
 
 nnoremap [Xtref]U :<C-u>XtrefOpened<CR>
 command! -bar -range -nargs=0  XtrefOpened
