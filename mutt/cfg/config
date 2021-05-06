@@ -40,9 +40,9 @@ set thorough_search         # strip headers and eval mimes before searching
 # # do not show all headers, just a few
 # ignore          *
 # unignore        From To Cc Bcc Date Subject
-# # and in this order
-# unhdr_order     *
-# hdr_order       From: To: Cc: Bcc: Date: Subject:
+# NOTE: reorder headers for easier copy-paste of "date+from+subj" triple
+unhdr_order     *
+hdr_order       Date: From: Subject: To: Cc: Bcc:
 
 
 # Preproc <pipe-message>
@@ -61,7 +61,10 @@ set text_flowed = no   # use flowed format in outgoing msgs (USAGE: smartphones 
 set sig_on_top = yes
 # NOTE: top-posting quoting similar to Outlook
 set attribution = "\n\n-----Original Message-----\nFrom: %n <%a>\nSent: %d\nTo: %r\nCc: %R\nSubject: %s\n"
-# set date_format = "!%a, %b %d, %Y at %I:%M:%S%p %Z"
+
+# DFL: set date_format = "!%a, %b %d, %Y at %I:%M:%S%p %Z"
+# FAIL: don't affect pager_format
+# set date_format = "!%Y-%m-%d-%a %H:%M:%S %Z"
 
 # unset collapse_unread   # keep unread threads uncollapsed -- mitigate BUG freeze on startup
 set collapse_unread
