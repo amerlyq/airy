@@ -153,6 +153,9 @@ do v=/mnt/@/var/$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
 chattr +C /mnt/@/var/log
 # THINK:IDEA: totally separate BTRFS and cache $ mount /cache/xdg ~/.cache/
 # [_] FIXME: disable CoW on ~/.cache/
+# [_] ALSO: browsers caches ALT:BET?TRY: symlink to /cache partition
+#   ~/.local/share/qutebrowser/webengine/Service Worker/CacheStorage
+#   ~/.local/qute-proxy/data/webengine/Service Worker/CacheStorage
 for x in android/avd briefcase/tools cabal cache cargo conan config/skypeforlinux ccache gem local/share/Steam npm stack
 do v=/mnt/@/home/user/.$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
 btrfs subvolume create /mnt/@/home/user/go  # XXX why it reappears
@@ -347,21 +350,23 @@ EOT
   fmd amer:users  750 /games/_steam  /win/{data,games,system}  /net/share
   fmd amer:amer  2700 /home/user /media/amer  /cache/{research,vm,work}  /aura/aura
   chmod -R 700 /home
-  ln -svT /data/_dld /_dld
-  # [_] FIXME: move research to /aura/research -- to keep it under snapshots
+
+  ## NOTE: use relative links for correct snapshots
   # WARN: no folder "sdk" => distribute dld repos by features in e.g. aura or research
-  ln -svT /cache/research /home/user/research
-  ln -svT /cache/vm /vm
-  ln -svT /cache/work /work
+  ln -svT at/feature /@
+  ln -svT data/_dld /_dld
+  ln -svT tmp/t /t  # ALT: directly mount [compressed ?zRAM?] ramdisk here
+  ln -svT aura/x /x
+  ln -svT cache/vm /vm
+  ln -svT cache/work /work
+  ln -svT share/amer /net/user
+  ln -svT user/_private /net/_private
+  ln -svT _private/@linux /net/backup
+
   # BAD: we need additional symlink due to many places still hardcoding "~/aura"
   #   TRY[_] replace all of them by "~/.local/airy"
   #   BUT: then jumping in ranger will have unexpectedly deep paths...
   ln -svT /aura/aura /home/user/aura
-  ln -svT /aura/aurax /x
-  ln -svT share/amer /net/user
-  ln -svT user/_private /net/_private
-  ln -svT _private/@linux /net/backup
-  ln -svT /tmp/t /t  # BET? /tmp/$USER/t
 
 
   vis /etc/pacman.conf  # uncomment 'Color' and '[multilib]'
