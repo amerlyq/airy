@@ -7,6 +7,7 @@ import ranger.gui.widgets.browsercolumn as B
 class CustomKeys(Enum):
     ext_nou = auto()
     wf_log = auto()
+    wf_ref = auto()
 
 
 for key in CustomKeys:
@@ -25,6 +26,8 @@ def new_hook_before_drawing(fsobj, color_list):
     elif fsobj.is_directory:
         if fsobj.basename in ("arc", "log", "todo"):
             color_list.append(CustomKeys.wf_log.name)
+        elif fsobj.basename.startswith("&"):
+            color_list.append(CustomKeys.wf_ref.name)
 
     return OLD_HOOK_BEFORE_DRAWING(fsobj, color_list)
 
