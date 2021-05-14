@@ -22,6 +22,9 @@ gcI(){ [[ $1 != "." && -d $1 ]] && return
     git -C "$1" tag -a -m 'Initial repo root tag' ROOT
 }
 
+# HACK: ignore committed files
+#  $ git rm -r --cached . && git add .
+
 
 ## --- Git ---
 alias gw.='git reset --soft HEAD~'
