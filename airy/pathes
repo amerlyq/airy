@@ -1,15 +1,17 @@
 ### Pathes
 
 ## Agenda
-# .1 /!  OR /@/!
-# .! /!
-
 # NOTE:USE: /@/* as relay point for absolute symlinks
-.1  /at
+.0  /at/=
+.1  /!  # root (?agenda?)
 .!  /at
-.2  /@
-.@  /@
-.3  /at/pkgsrc
+.2  /@  # features
+.@  /at/feature
+.3  /#  # tags (gen-group)
+.#  /at/tag
+.4  /at/group/pkgsrc
+.5  /%  # groups (manually)
+.%  /at/group
 
 ### Configs
 ..a  /@/airy/airy
@@ -18,7 +20,7 @@
 ..m  /@/xdg_home/.mutt
 ..M  /@/xdg_home/.mail  # MOVE: -> /aura
 ..i  /@/airy/irc
-..P  /@/pkgsrc
+..P  /at/group/pkgsrc
 ..q  /@/airy/qute
 ..Q  /@/xdg_config/qutebrowser
 ..r  /@/airy/ranger
@@ -208,13 +210,15 @@
 .tj  /@/todo/my/todo
 .tl -l /@/todo/!lastlog
 .tL  /@/todo/log
+.tm  /@/todo/my/log
 .tn  /@/todo/now
 .to  /@/todo  # OR: /@/todo/{log,old,ongoing}
 .tp  /@/aeternum/languages/python
 .tr  /@/todo/recurrent
 .tt  /@/todo/my/todo
-.tw  /@/todo/my/work/TODO.nou
-.tW  /@/todo/work
+.tu -l /@/todo/my/upcoming.nou
+.tw  /@/todo/work/TODO.nou
+.tW  /@/todo/my/work/TODO.nou
 .tx  /@/todo/my/LEGEND.nou
 .ty -l /@/todo/!yesterday
 
@@ -229,13 +233,15 @@
 
 .w.  /work
 .w,  /work/!now
+.w!  /work/!now
 .wb  /work/bug/!now   # symlink -> ./bug/$date-$jira-$desc>/
 .wB  /work/bug
 # .wc  /work/cache
 .wd  /t/demo
-# .wf  /work/cache/fw
+.wf  /work/!now
 .wh  ~/work
 # .wj  /work/tenjo
+.wl  /@/todo/work/log
 # .wm  /work/repo/_mirror
 .wo  /@/employment
 # .wp  /work/cache/_prefix
