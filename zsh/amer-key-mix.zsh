@@ -133,9 +133,15 @@ bindkey '\C-x\C-l' synchro-dir-pop
 # NOTE:USE: 'space' before command to not store into history
 # BUT: it will be available for 'C-p' anyway
 # CHECK: may break some yank/etc keymaps dependent on 'fc -l'
+
+## DISABLED: I used it only on laptop, to reduce strain on pinky
 # <Enter>
-bindkey    ',j' .accept-line
-bindkey -a ',j' .accept-line
+# bindkey    ',j' .accept-line
+# bindkey -a ',j' .accept-line
+
+# repeat last command
+bindkey  -s ',j' '^U builtin r\n'
+bindkey -as ',j' 'S builtin r\n'
 # quit
 bindkey  -s ',d' '^U q\n'
 bindkey -as  'q' 'S q\n'
