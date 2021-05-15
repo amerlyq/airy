@@ -16,7 +16,13 @@ class Scheme(Solarized):
             fg = 187  # OR: 22 28 BET?=30 31 174
         elif ctx.wf_log:
             fg = 98
+        elif ctx.wf_todo:
+            fg = 98
         elif ctx.wf_ref:
             fg = 28
+        elif ctx.wf_gen:
+            fg = 94
+        elif ctx.wf_misc:
+            fg = 67
 
         return fg, bg, attr
