@@ -59,7 +59,7 @@ alias fwL='fwL0 | tr \\0 \\n'
 alias fwa='fwa0 | tr \\0 \\n'
 alias fwA='fwA0 | tr \\0 \\n'
 
-alias fa='command fd -E .snapshots -E .git -E "_build*"'
+alias fa='command fd -E .snapshots -E .git -E "_build*" -E "="'
 alias fa.='fa -g'
 alias fa0='fa -0'
 alias fa1='fa -d1'
@@ -131,7 +131,7 @@ alias f.2='f. -d2'
 alias f.m='fs --changed-within'
 
 # NOTE: can't be used in aliases composition
-alias f='_f(){ command fd -E .snapshots -E .git -E "_build*" -H -tf -tl -- "$*"; }; _f'
+alias f='_f(){ command fd -E .snapshots -E .git -E "_build*" -E "=" -H -tf -tl -- "$*"; }; _f'
 [[ -z ${ZSH_NAME-} ]] || _alias_ -b 'noglob ' f
 
 alias fnp='find \( -name .git -o -name "_build*" \) -prune -o \( -type f -o -type l \)'

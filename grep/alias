@@ -7,7 +7,11 @@
 #%  --sort[r] none/path/modified/accessed/created -- DFL:none
 #%  -t/-T cmake -- for searching by type
 #%
-alias g='rg --regexp'
+
+# ALT: ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$'
+alias g.="rg -g '!build/' -g '!_build*' -g '!/out/' -g '!/libs/' -g '!tags' -g '!.snapshots/' -g '='"
+
+alias g='g. --regexp'
 alias g\?='rg --type-list'
 alias g%='rg --passthru'  # colorize-only OR --regexp '^|match'
 # ALT: alias ag='command ag --smart-case --group'  # DFL:(group): pipe into 'less' BAD(--all-text): skips '--ignore'
@@ -17,8 +21,6 @@ alias g@='rg --color=always --with-filename --heading --line-number --column --t
 # ALT: grep -Ri 'name' . # find in all files/symlinks
 alias g,='rg --follow --hidden --no-ignore --one-file-system'  # symlinks
 
-# ALT: ag -S -G '^(?:(?!/build/|/libs/|/tags$).)*$'
-alias g.="rg -g '!build/' -g '!/libs/' -g '!tags'"
 alias g-='g. --invert-match'
 alias g.0='rg --null-data'
 alias g.1='rg --max-depth 1'
