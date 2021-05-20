@@ -189,6 +189,11 @@ endf
 
 " [_] TODO: allow converting any unprefixed {date <-> braille}
 fun! xtref#cvt(fmt, xts)
+  if a:xts =~# '\v^'. s:r_bryes .'{2}$'
+    return systemlist('just xts cvt '.shellescape(a:xts).' xts2 date')[0]
+  elseif a:xts =~# '^20\d\d-\d\d-\d\d$'
+    return systemlist('just xts cvt '.shellescape(a:xts).' date xts2')[0]
+  end
   "" ALT:PERF:(native)
   " let hexts = substitute(x, '.', '\=printf("%02x",and(char2nr(submatch(0)),0xff))', 'g')
   " return strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
@@ -203,7 +208,7 @@ fun! xtref#to_fmt(fmt, xloci)
   let [a,r] = g:xtref.markers
 
   " [_] THINK: remove this switch-case as whole and depend on error from "r.vim-xtref"
-  if xts =~# '\v^'. s:r_braille || xts =~# '^20\d\d'
+  if xts =~# '\v^'. s:r_bryes || xts =~# '^20\d\d'
     return xtref#cvt(a:fmt, xts)
   elseif pfx ==# '['
     " NOTE: task-ts conversion :: [⡞⣾⠂⢐] <=> [20XX-...]
@@ -220,7 +225,7 @@ endf
 "" NOTE: cycle loop :: any => braille | braille => iso8601
 fun! xtref#to_fmt_cycle(fmt, xloci)
   " echom a:xloci[0]
-  let fmt = (a:xloci[0] =~# '\v'.s:r_braille) ? a:fmt : 'braille'
+  let fmt = (a:xloci[0] =~# '\v'.s:r_bryes) ? a:fmt : 'braille'
   " echom fmt
   return xtref#to_fmt(fmt, a:xloci)
 endf
@@ -412,7 +417,33 @@ xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 
 " [_] TODO: allow plain timestamp (with optional spaced timezone like git show --raw) as xtref
 "   ENH: preview iso date in statusline or in NEW floating window
-nnoremap <Plug>(xtref-replace-datetime) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('date',xtref#get(0)))<CR>
+
+" FUTURE:ENH: "append" to already existing postopone chain <A|B|C|...>
+fun! xtref#py_postpone(...)
+py3 << EOF
+import vim
+import just.flower.xts.cvt as C
+vim.current.line += " <" + C.date_to_xts2() + ">"
+EOF
+endf
+
+nnoremap <Plug>(xtref-new-postpone-day) :<C-u>call xtref#py_postpone()<CR>
+
+
+fun! xtref#pytest_cvt()
+py3 << EOF
+import vim
+import just.flower.xts.parse as M
+ctx = vim.current
+chg = M.replace_near(ctx.line, ctx.window.cursor[1], form='next')
+if chg != ctx.line:
+  ctx.line = chg
+EOF
+endf
+
+nnoremap <Plug>(xtref-replace-datetime) :<C-u>call xtref#pytest_cvt()<CR>
+" nnoremap <Plug>(xtref-replace-datetime) :<C-u>call xtref#replace(0,xtref#to_fmt_cycle('date',xtref#get(0)))<CR>
+
 " FIXED:(-1): use exact visual selection (to allow spaces in ISO date, etc.)
 "   instead of auto-locating xtref in selected area
 xnoremap <Plug>(xtref-replace-datetime) :<C-u>call xtref#replace(-1,xtref#to_fmt_cycle('date',xtref#get(-1)))<CR>
@@ -434,6 +465,7 @@ map <silent> [Xtref]<Backspace> <Plug>(xtref-delete)
 map <silent> [Xtref]<Delete> <Plug>(xtref-delete)
 
 map <silent> [Xtref]a <Plug>(xtref-new-append)
+map <silent> [Xtref]A <Plug>(xtref-new-postpone-day)
 map <silent> [Xtref]i <Plug>(xtref-new-insert)
 map <silent> [Xtref]I <Plug>(xtref-new-prepend)
 map <silent> [Xtref]> <Plug>(xtref-new-postpone)
