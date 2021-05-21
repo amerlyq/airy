@@ -107,8 +107,8 @@ fun! xtref#get(visual)
   if !a:visual && match(strcharpart(l[c:],0,1), s:r_bryes) == 0
     let lchars = reverse(split(l[:c-1], '\zs'))
     let b = match(lchars, s:r_brnot)
-    " FIXME: always include prefix to jump by tag "g["
-    " if index(g:xtref.prefixes, lchars[b]) >= 0| let b = b - 1 |en
+    " NOTE: always include prefix to jump by tag "g]"
+    if index(g:xtref.prefixes, lchars[b]) >= 0| let b = b + 1 |en
     let e = match(split(l[c:], '\zs'), s:r_brnot)
     let x = strcharpart(l, len(lchars)-b, b+e)
     return [x, 0]
