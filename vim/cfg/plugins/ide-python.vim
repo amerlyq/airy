@@ -59,6 +59,13 @@ call dein#add('davidhalter/jedi-vim', {
 "" [Colorize]
 call dein#add('numirias/semshi', {
   \ 'on_ft': 'python'})
+" FIXED:ERR: lost hi on write SRC https://github.com/numirias/semshi/issues/54
+"   BAD: hi disappears on async complete, not on the write
+" call dein#add('numirias/semshi', {
+"   \ 'on_ft': 'python',
+"   \ 'hook_source': "
+" \\n  autocmd BufWritePre *.py execute ':Semshi highlight'
+" \"})
 
 
 
