@@ -24,6 +24,7 @@ shvim() { ${EDITOR:-nvim} -nR \
 
 # BAD: don't work as expected due to lazy-loaded plugins
 # cmd='UpdateRemotePlugins'
+# BET :call dein#remote_plugins()
 
 cmd='call dein#clear_state()'
 ((doupdate)) && cmd+='|call dein#update()'

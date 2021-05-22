@@ -418,10 +418,12 @@ xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 " [_] TODO: allow plain timestamp (with optional spaced timezone like git show --raw) as xtref
 "   ENH: preview iso date in statusline or in NEW floating window
 
+""
+py3 import vim
+
 " FUTURE:ENH: "append" to already existing postopone chain <A|B|C|...>
 fun! xtref#py_postpone(...)
 py3 << EOF
-import vim
 import just.flower.xts.cvt as C
 vim.current.line += " <" + C.date_to_xts2() + ">"
 EOF
@@ -432,7 +434,6 @@ nnoremap <Plug>(xtref-new-postpone-day) :<C-u>call xtref#py_postpone()<CR>
 
 fun! xtref#pytest_cvt()
 py3 << EOF
-import vim
 import just.flower.xts.parse as M
 ctx = vim.current
 chg = M.replace_near(ctx.line, ctx.window.cursor[1], form='next')
