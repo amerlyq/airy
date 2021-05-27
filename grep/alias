@@ -19,7 +19,7 @@ alias g@='rg --color=always --with-filename --heading --line-number --column --t
 # ALT: agpdf() { find . -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep --with-filename --label="{}" --color "your pattern"' \;; }
 # alias g:='rg --pre pdftotext --pre-glob "*.pdf"'  # colorize-only OR --regexp '^|match'
 # ALT: grep -Ri 'name' . # find in all files/symlinks
-alias g,='rg --follow --hidden --no-ignore --one-file-system'  # symlinks
+alias g,="rg --follow --hidden --no-ignore --one-file-system -g '!tags'"  # symlinks
 
 alias g-='g. --invert-match'
 alias g.0='rg --null-data'
