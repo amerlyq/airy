@@ -217,9 +217,18 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- FIXME: bring copyq into between windows stack -- check on first window of fullscreen wksp
   , className =? "copyq" --> doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
   , className =? "rdesktop" --> doFullFloat
+
   -- FAIL: don't work ("Android Emulator" `isPrefixOf`)
   -- WM_NAME(STRING) = "Android Emulator - 10.1_WXGA_Tablet_API_30:5554"
   , fmap ("Emulator" `isPrefixOf`) title --> doFloatAt (1/200) (1/100)
+  -- TODO ignore completely
+  -- WM_NAME(STRING) =
+  -- _NET_WM_NAME(UTF8_STRING) = "Emulator"
+  -- , stringProperty "_NET_WM_NAME" =? "Emulator" --> doIgnore
+  -- WM_CLASS(STRING) = "-device", "Emulator"
+  -- , fmap ("Android Emulator" `isPrefixOf`) className --> doFloat
+  , className =? "Emulator" --> doFloat
+
   ] <+>
   composeFloat
   [ ("Float" `isPrefixOf`) <$> appName
