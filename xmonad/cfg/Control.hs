@@ -23,7 +23,7 @@ import qualified XMonad.StackSet as W
 --  TRY: sep layout instead of toggle https://github.com/0/.../blob/master/xmonad/xmonad.hs
 --  TRY: Simplest from Tips of http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Layout-BoringWindows.html
 import qualified XMonad.Layout.BoringWindows as B
--- import XMonad.Layout.Minimize       (minimizeWindow, MinimizeMsg(..))
+import XMonad.Actions.Minimize      (minimizeWindow, maximizeWindowAndFocus, withLastMinimized)
 import XMonad.Layout.Maximize       (maximizeRestore)
 import XMonad.Layout.MultiToggle    (Toggle(..))
 import XMonad.Layout.MultiToggle.Instances(StdTransformers(FULL, MIRROR, NOBORDERS))
@@ -115,8 +115,8 @@ layouts =
   , ("M-S-f"    , sendMessage ToggleStruts)
   , ("M-C-f"    , sendMessage $ Toggle STRUTS)
   , ("M-S-C-f"  , sendMessage $ Toggle GAPS)
-  -- , ("M-b"      , withFocused minimizeWindow)
-  -- , ("M-S-b"    , sendMessage RestoreNextMinimizedWin)
+  , ("M-b"      , withFocused minimizeWindow)
+  , ("M-S-b"    , withLastMinimized maximizeWindowAndFocus)
   , ("M-C-b"    , B.clearBoring)
   , ("M-S-C-b"  , B.markBoring)
   ]
