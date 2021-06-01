@@ -36,6 +36,7 @@ import XMonad.Hooks.ManageDocks     (manageDocks, avoidStruts)
 import XMonad.Hooks.ManageHelpers   (composeOne, (-?>), transience, isFullscreen, doFullFloat, doCenterFloat, doRectFloat, doFloatAt, isDialog, isInProperty)
 import XMonad.Hooks.InsertPosition  (insertPosition, Position(Master, Above, Below), Focus(Newer, Older))
 import XMonad.Hooks.UrgencyHook     (withUrgencyHook, BorderUrgencyHook(..))
+import XMonad.Hooks.DynamicProperty (dynamicPropertyChange, dynamicTitle)
 
 ---- Layouts
 import qualified XMonad.StackSet as W
@@ -209,6 +210,7 @@ myLayout = smartBorders
 -- RFC: mconcat . concat $ [ [
 myManageHook :: ManageHook
 myManageHook = manageSpawn <+> fullscreenManageHook <+>
+  -- (dynamicTitle ((stringProperty "WM_NAME" =? "" && stringProperty "_NET_WM_NAME" =? "Emulator") --> doIgnore)) <+>
   mconcat
   [ isFullscreen --> doFullFloat
   , isDialog --> doFloat
@@ -221,9 +223,12 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- FAIL: don't work ("Android Emulator" `isPrefixOf`)
   -- WM_NAME(STRING) = "Android Emulator - 10.1_WXGA_Tablet_API_30:5554"
   , fmap ("Emulator" `isPrefixOf`) title --> doFloatAt (1/200) (1/100)
+
   -- TODO ignore completely
   -- WM_NAME(STRING) =
   -- _NET_WM_NAME(UTF8_STRING) = "Emulator"
+  -- _NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_UTILITY, _KDE_NET_WM_WINDOW_TYPE_OVERRIDE, _NET_WM_WINDOW_TYPE_NORMAL
+  --
   -- , stringProperty "_NET_WM_NAME" =? "Emulator" --> doIgnore
   -- WM_CLASS(STRING) = "-device", "Emulator"
   -- , fmap ("Android Emulator" `isPrefixOf`) className --> doFloat
@@ -247,13 +252,17 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   [ wmhas className "stalonetray Dunst" --> doIgnore
   , wmhas appName "panel desktop_window kdesktop trayer" --> doIgnore
   -- TODO:FIND: exclude pop-up windows for Dunst/copyq from stealing focus
-  -- MAYBE: there bug in copyq WM_WINDOW_TYPE
+  -- MAYBE: there bug in copyq WM_WINDOW_TYPE or it doesn't work with ATOM
+  --   https://xmonad.haskell.narkive.com/mcO5HF2r/use-atomic-window-props-in-window-manage-hook
   -- CHECK:FIND: how to keep kbdd current layout on stealing
   -- THINK:USE: another notifier:
   -- -- http://nochair.net/posts/2010/10-25-freedesktop-notifications-xmobar.html
   -- -- https://wiki.archlinux.org/index.php/Desktop_notifications
-  , foldr1 (<||>) [ stringProperty "WM_WINDOW_TYPE" =? x | x <-
+
+  -- WARN: https://xmonad.haskell.narkive.com/mcO5HF2r/use-atomic-window-props-in-window-manage-hook
+  , foldr1 (<||>) [ isInProperty "_NET_WM_WINDOW_TYPE" x | x <-
     [ "_NET_WM_WINDOW_TYPE_TOOLTIP"
+    , "_NET_WM_WINDOW_TYPE_UTILITY"  -- Emulator toolbar REF: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
     , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
     -- _NET_WM_WINDOW_TYPE_DIALOG
     ] ] --> doIgnore
