@@ -1,0 +1,15 @@
+[Unit]
+Description=Demon - Avfs archive auto-mount
+RequiresMountsFor=%t
+
+[Service]
+Type=forking
+RuntimeDirectory=%P
+# RuntimeDirectoryPreserve=yes
+Environment=AVFSBASE=%t/%P
+ExecStart=/usr/bin/mountavfs
+ExecStop=/usr/bin/umountavfs
+ProtectSystem=strict
+
+[Install]
+WantedBy=demons.target

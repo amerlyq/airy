@@ -1,3 +1,5 @@
 #!/bin/bash -eu
 # tags: util
 source ~/.shell/func.d/cfgsetup
+
+svc_activate -cuer$(cfgOpt uU&&echo R) avfs.service
