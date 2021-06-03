@@ -13,7 +13,7 @@ alias .....='cd ../../../../'
 # BAD: "/ljsd" => "" => cd "" => cd $PWD
 # MAYBE:BET: directly "edit" file (like ranger) instead of "cd /dir" of file ?
 cdauto() { ((!$#)) || local p=${*: -1} d l
-  if [[ -z ${1-} || $p == - || -d $p ]]; then
+  if [[ -z ${1-} || $p == - ]]; then
     builtin cd "$@" || return
   elif [[ ${1-} == -l ]]; then
     builtin cd "${p%/*}" || return
@@ -22,15 +22,21 @@ cdauto() { ((!$#)) || local p=${*: -1} d l
       d=$(realpath "${p%/*}")
       p=${p%/*}/$(realpath --relative-to="$d" -- "$(realpath "$p")")
     else
-      p=$l
+      p=${p%/*}/$l
     fi
-    echo "${p%/*}"
+    echo "$p"
     builtin cd "${p%/*}" || return
-    $EDITOR -- "${p##*/}"
+    if [[ -d $p ]]; then
+      builtin cd "${p##*/}" || return
+    else
+      $EDITOR -- "${p##*/}"
+    fi
   elif [[ ${1-} == -L ]]; then
     p=$(realpath -e "$p")
     builtin cd "${p%/*}" || return
     $EDITOR -- "$p"
+  elif [[ -d $p ]]; then
+    builtin cd "$@" || return
   else
     builtin cd "${@:1:(${BASH:+$#}-1)}" "${p%/*}" || return
   fi
