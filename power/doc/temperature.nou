@@ -15,6 +15,10 @@ TODO
     ::: FAIL: my laptop won't allow to set "high = 85" using ../sensors.conf
 
 
+Sensors
+  $ python3 -c "import psutil; print(psutil.sensors_temperatures())"
+
+
 Watch temperature
   $ watch sensors
   $ watch grep '"cpu MHz"' /proc/cpuinfo
