@@ -95,7 +95,7 @@ nnoremap <unique> g<Leader>O  O<Space><Esc>"_D
 
 " HACK: Insert commented out copy under current line, keeps cursor position
 nnoremap <unique><silent> gcC :call RetainPos(".t.\|norm gcc")<CR>
-xnoremap <unique><silent> gcC :<C-u>call RetainPos("'<,'>t'>\|norm gvgc")<CR>
+" xnoremap <unique><silent> gcC :<C-u>call RetainPos("'<,'>t'>\|norm gvgc")<CR>
 
 nnoremap <unique><silent> gC :.t-1\|Commentary\|+1<CR>
 xnoremap <unique><silent> gC :'<,'>t'<-1<Bar>'[,']Commentary<Bar>']+1<CR>
