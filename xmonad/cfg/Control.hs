@@ -146,6 +146,7 @@ system =
   (inGroup "M-S-<Esc>" . concat)
   [ [ ("o", spawn "r.core logout")
     , ("r", spawn "r.core reboot")
+    , ("s", spawn "systemctl suspend")
     , ("t", spawn "r.core shutdown")
     , ("l", spawn "r.core lock")
     , ("n", refresh)  -- Correct size of the viewed windows (workspace normalizing)
