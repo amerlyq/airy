@@ -2,7 +2,10 @@
 # tags: mail
 source ~/.shell/func.d/cfgsetup
 
-linkcp -t ~/.config/khal config
+linkcp -t ~/.config/khal khal/config
+# linkcp -t ~/.config/vdirsyncer vdir/config
 
-# ALSO:SEE: local calendar
-#   ~/.local/share/khal/calendars/private/
+# systemctl --user enable vdirsyncer.timer
+#
+# vdirsyncer discover work
+# vdirsyncer sync

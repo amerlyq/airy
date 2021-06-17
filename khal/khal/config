@@ -1,0 +1,35 @@
+# vim:ft=config
+# SEE:/etc/khal/khal.conf.sample
+[calendars]
+
+[[home]]
+# ALT:  ~/.local/share/khal/calendars/private/
+path = "/@/todo/cal/"
+color = dark blue
+
+[[work]]
+path = "/@/todo/work/cal/"
+color = dark blue
+readonly = True
+# type = calendar
+
+[sqlite]
+path = "~/.config/khal/khal.db"
+
+[locale]
+local_timezone = Europe/Kiev
+default_timezone = Europe/Kiev
+firstweekday = 0
+monthdisplay = firstday
+
+timeformat = %H:%M
+dateformat = %d.%m.
+longdateformat = %Y-%m-%d-%a-W%W
+datetimeformat = %Y-%m-%d %H:%M
+longdatetimeformat = %Y-%m-%d-%a-W%W %H:%M:%S
+
+
+[default]
+default_calendar = home
+# timedelta = 2 # the default timedelta that list uses
+highlight_event_days = True  # the default is False

@@ -1,0 +1,27 @@
+# vim:ft=config
+
+[general]
+# A folder where vdirsyncer can store some metadata about each pair.
+status_path = "~/.config/vdirsyncer/status/"
+
+# CALDAV
+[pair work]
+a = "work_local"
+b = "work_remote"
+collections = ["from a", "from b"]
+
+# Calendars also have a color property
+metadata = ["displayname", "color"]
+
+[storage work_local]
+type = "filesystem"
+path = "/@/todo/work/cal/"
+fileext = ".ics"
+
+# DAVMAIL:
+[storage work_remote]
+type = "caldav"
+url = "http://localhost:1080/users/user@example.com/calendar/"
+username = "user@example.com"
+# username.fetch = ["command", "pass", "work/user"]
+password.fetch = ["command", "pass", "work/example.com"]
