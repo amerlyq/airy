@@ -206,7 +206,9 @@ function SyncRepos {  local r
     fi
 
     local fetched
-    fetched=$(git rev-list '@{1}..' --ignore-submodules --count)
+    # FIXME:(@{1}): newly cloned repos have only @{0} entry in reflog
+    #   ERR: fatal: log for 'master' only has 1 entries
+    fetched=$(git rev-list '@{1}..' --ignore-submodules --count || echo 0)
     if ((fetched)); then
       r.git-status $r
     fi
