@@ -118,6 +118,9 @@ function OpenTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
   fi
 
   if notOpened $luks $dm; then
+    local lock=${luks:r}.lock
+    [[ -e $lock ]] && >&2 echo "Err: exists lock='$lock', never open tomb from two hosts!" && exit 1
+
     # BAD: actual pass path directly depends on $rloc
     #   << dif. servers may contain same LUKS container copy with dif. passwd
     #   TEMP:TRY: keep unique names for all containers
@@ -125,6 +128,8 @@ function OpenTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
     local keys=$d_keys/$tomb.keys
     # BUG: newline is part of password
     pass $pass | sudo cryptsetup --key-file - luksOpen --header $keys -- $luks $dm
+    # FAIL:FIXME: if dst location is RO
+    print -l "$HOST" > "$lock"
   fi
 
   local dev=/dev/mapper/$dm
@@ -147,7 +152,14 @@ function CloseTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
   local luks=$loc/$tomb.luks
   # MAYBE: I can't check "isOpened" after unmounting "dev" based on "dm"
   isMounted $dev $mnt && sudo umount $mnt
-  isOpened $luks $dm  && sudo cryptsetup close -- $dm
+  if isOpened $luks $dm; then
+    sudo cryptsetup close -- $dm
+    local lock=${luks:r}.lock
+    [[ ! -e $lock ]] && >&2 echo "Warn: expected lock='$lock' does not exist!"
+    local host=$(<"$lock")
+    [[ $host != "$HOST" ]] && >&2 echo "Warn: lock='$lock' contains wrong host='$host'" && exit 1
+    rm -- $lock
+  fi
   if [[ -n $rloc ]]; then isMounted $rloc $loc && fusermount -u -- $loc; fi
 
   # ALT: wait until background sshfs exits
