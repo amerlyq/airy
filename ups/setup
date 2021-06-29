@@ -1,0 +1,15 @@
+#!/bin/bash -e
+# tags: core
+source ~/.shell/func.d/cfgsetup
+
+svc_activate -er$(cfgOpt uU&&echo R) pwrstatd.service
+
+
+### LINKS ###
+# linkcp -ct /etc/ups -- cfg/ups.conf
+# linkcp -ct /etc/udev/rules.d -- cfg/50-ups.rules
+
+# if cfgOpt u; then
+#   sudo udevadm control --reload-rules
+#   sudo udevadm trigger
+# fi
