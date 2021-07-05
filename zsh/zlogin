@@ -36,6 +36,7 @@ systemctl --user import-environment XDG_VTNR PATH TMPDIR EDITOR PAGER
 ## DISABLED: zlogin is the last file -- nothing to skip
 # setopt norcs  # Skip loading of all subsequent rc files
 systemctl --user start main.target
+reset
 
 # ALT: do "exec systemctl" above
 #   BAD: you won't have shell to fix crashing X

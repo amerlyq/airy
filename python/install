@@ -4,6 +4,10 @@ source ~/.shell/func.d/packages
 pkg_inst python
 pkg_inst python-pip
 
+## ALSO:USAGE: show reverse-deps
+# auri pipdeptree
+# pipdeptree -p faker -r
+
 if distro arch; then
   pkg_inst ipython  # ALSO: jupyter for notebooks in vim
 

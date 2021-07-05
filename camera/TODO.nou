@@ -1,3 +1,13 @@
 audio-camera-redirect
   In case VLC does not recognize the pulse:// protocol to record the pulseaudio
   stream, install the pulse plugin using apt-get install vlc-plugin-pulse.
+
+
+Web-camera
+  Preview
+    $ mpv av://v4l2:/dev/video0
+  Record video/+audio
+    $ ffmpeg -f v4l2 -video_size 640x480 -i /dev/video0 -c:v libx264 -preset ultrafast webcam.mp4
+    $ ffmpeg -f v4l2 -video_size 640x480 -i /dev/video0 -f alsa -i default -c:v libx264 -preset ultrafast -c:a aac webcam.mp4
+  Directly SSH
+    $ ssh user@host 'ffmpeg -f v4l2 -video_size 640x480 -i /dev/video0 -c:v libx264 -preset ultrafast -f mpeg -' | mpv -

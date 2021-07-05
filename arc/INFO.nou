@@ -37,6 +37,11 @@ FUSE
       $ srw="$d/#avfsstat/symlink_rewrite"; while test ! -e "$srw"; do sleep 0.5; done && echo 1 >! "$srw"
     QUIT:(lazy=-z):
       $ fusermount -u "$XDG_RUNTIME_DIR/avfs"
+    ERR: frozen mount
+      Bug #1032334 “FUSE sometimes freezes, making it impossible to un...” : Bugs : fuse package : Ubuntu ⌇⡠⣢⠛⣕
+        https://bugs.launchpad.net/ubuntu/+source/fuse/+bug/1032334
+      process - What if 'kill -9' does not work? - Unix & Linux Stack Exchange ⌇⡠⣢⠜⡐
+        https://unix.stackexchange.com/questions/5642/what-if-kill-9-does-not-work
     [_] TODO: systemd FUSE lazy mount
       SEE: https://wiki.archlinux.org/index.php/SSHFS#On_demand
   ratarmount

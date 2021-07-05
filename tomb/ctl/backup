@@ -119,7 +119,7 @@ function OpenTomb { local rloc=$1 loc=$2 dm=$3 mnt=$4
 
   if notOpened $luks $dm; then
     local lock=${luks:r}.lock
-    [[ -e $lock ]] && >&2 echo "Err: exists lock='$lock', never open tomb from two hosts!" && exit 1
+    [[ -e $lock ]] && >&2 echo "Err: exists lock='$lock' ($(<$lock)), never open tomb from two hosts!" && exit 1
 
     # BAD: actual pass path directly depends on $rloc
     #   << dif. servers may contain same LUKS container copy with dif. passwd
