@@ -1,0 +1,16 @@
+[Unit]
+Description=USB-IP Binding on bus id %I
+After=network-online.target usbipd.service
+Wants=network-online.target
+Requires=usbipd.service
+#DefaultInstance=1-1.5
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/usbip bind -b %i
+RemainAfterExit=yes
+ExecStop=/usr/bin/usbip unbind -b %i
+Restart=on-failure
+
+# [Install]
+# WantedBy=multi-user.target

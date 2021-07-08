@@ -1,0 +1,24 @@
+
+
+LOCAL: init
+  ATT: The device needs to be re-bound again after suspending.
+  $ usbip list --local
+  $ usbip bind -b 7-2
+  $ ss --listening --tcp --numeric --processes
+  $ ssh -O forward -R '3240:localhost:3240' user@host
+
+
+REMOTE: init
+  $ usbip list -r localhost
+  $ sudo usbip attach -r localhost -b 7-2
+  $ lsusb
+    Bus 003 Device 002: ID 0b05:17cb
+
+
+REMOTE: deinit
+  $ usbip port
+  $ usbip detach -p 0
+
+
+LOCAL: deinit
+  $ usbip unbind -b 7-2

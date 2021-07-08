@@ -1,0 +1,14 @@
+#!/bin/bash -e
+# tags: comm
+source ~/.shell/func.d/cfgsetup
+
+(lsmod||true) | grep -qw '^usbip_host' || sudo modprobe usbip_host
+
+# BET:FIXME: parse "usbip list -p -l"
+busBTDongle=$(usbip list --local | awk '/0b05:17cb/&&$2=="busid"{print$3}')
+
+if [[ $busBTDongle ]]; then
+  svc_activate -er$(cfgOpt uU&&echo R) usbipd.service
+  svc_activate -ce usbip-bind@.service
+  sudo systemctl start usbip-bind@"$busBTDongle".service
+fi
