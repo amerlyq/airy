@@ -94,6 +94,7 @@ cd -- "$src"  # ALT: $ tar ... -C "$src" -- .
 
 if [[ -d $dst ]]; then
   fnm=$url
+  [[ $fnm == . ]] && fnm=$PWD
   fnm=${fnm##*/}
   fnm=${fnm%.git}
   ymd=$(git --no-pager show --no-patch --date='format-local:%Y%m%d' --format='%cd')

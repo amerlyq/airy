@@ -380,7 +380,9 @@ sub mkpaths { my @subpaths = @files;
 }
 
 sub mkbody {
-    return mkstats() if @files > 2;
+    ## DISABLED:(@files > 2): with long paths result is a mess
+    # * 2021-04-16 [%] * chg src,.: some.nou, docs.nou  +25/-22
+    return mkstats() if @files > 1;
     return mkpaths();
 }
 
@@ -410,7 +412,9 @@ sub mkmsg {
     # ALT: "[%]. chg ..." | "[%]* chg ..." | "[%] * chg ..." | "[%] *chg ..."
     # FIXME! always prepend "*" in the same place -- to be able to filter-out
     #   auto messages from git history and focus only on human-created ones
-    my $msg = "* ". mkmods() ." ". mkcmpts(2) . mkbody();
+    ## DISABLED:(mkcmpts(1)): with long paths result is a mess
+    # * 2021-04-16 [%] * chg src,.: some.nou, docs.nou  +25/-22
+    my $msg = "* ". mkmods() ." ". mkcmpts(1) . mkbody();
     $msg .= mkchgs() if $opts{diff};
     return $msg;
 }
