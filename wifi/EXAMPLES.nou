@@ -23,6 +23,7 @@ Scan
     }
   DEBUG: read msgs -- to determine what is necessary to add into config for it to work
     $ sudo wpa_supplicant -dd -i wlo1 -c /etc/wpa_supplicant/mobile.conf
+    $ netctl-auto start wlp3s0
   When all OK -- get IPv4 to check if inet itself works
     $ sudo dhcpcd wlo1
     $ curl https://example.com
