@@ -1,0 +1,21 @@
+2021-07-09 [X] 1h FIXME: FUSE freeze() ⌇⡠⣭⢻⡲
+  ::: $ echo 1 | sudo tee -a /sys/fs/fuse/connections/XXX/abort
+  INFO
+    Processes in an Uninterruptible Sleep (D) State | Support | SUSE ⌇⡠⣨⢯⢇
+      https://www.suse.com/support/kb/doc/?id=000016919
+      ¦ You cannot kill "D" state processes, even with SIGKILL or kill -9. As the name implies, they are uninterruptible.
+      ¦ You can only clear them by rebooting the server or waiting for the I/O to respond.
+    signals - How to stop 'uninterruptible' process on Linux? - Stack Overflow ⌇⡠⣨⢯⢸
+      https://stackoverflow.com/questions/767551/how-to-stop-uninterruptible-process-on-linux
+      ¦ I used fusepy and accessed the mount point from inside a FUSE callback itself in single-threaded mode.
+      ¦ It's now waiting for itself and I can't kill neither the process itself nor anything trying to read from that mount point
+      ¦ I could brick any system with this
+    [_] #feed:dev,sys NICE:READ: Peeking into Linux kernel-land using /proc filesystem for quick’n’dirty troubleshooting | Tanel Poder Consulting ⌇⡠⣨⢰⣡
+      https://tanelpoder.com/2013/02/21/peeking-into-linux-kernel-land-using-proc-filesystem-for-quickndirty-troubleshooting/
+    linux - Can't kill a sleeping process - Super User ⌇⡠⣨⢱⣦
+      https://superuser.com/questions/539920/cant-kill-a-sleeping-process/541685#541685
+    !. FIXED: FUSE — The Linux Kernel documentation ⌇⡠⣨⢲⠇
+      https://www.kernel.org/doc/html/latest/filesystems/fuse.html#control-filesystem
+      $ echo 1 | sudo tee -a /sys/fs/fuse/connections/XXX/abort
+    Find what process implements a FUSE filesystem - Unix & Linux Stack Exchange ⌇⡠⣨⢳⡃
+      https://unix.stackexchange.com/questions/191821/find-what-process-implements-a-fuse-filesystem
