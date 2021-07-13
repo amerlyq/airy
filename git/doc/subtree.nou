@@ -5,6 +5,19 @@ REF
 NOTE: directory, local branch, and remote -- all have same name "mylib" but mean different things
 
 
+ALT:(once): merge sep repos into single one (w/o subtree remotes) ⌇⡠⣭⢺⢿
+  ALSO: cleanup $ git filter-repo --path-glob '*.jar' --invert-paths
+  https://gist.github.com/martinbuberl/b58fd967f271f32f51f50aee62e7332c
+    # OR: master -> main
+    $ git remote add loci file:///work/20210416-user-stories_
+    $ git fetch loci
+    $ git merge -s ours --no-commit loci/master
+    $ git read-tree --prefix=log/2021-scania/20210416-user-stories/ -u loci/master
+    $ git commit -m "imported as subtree"
+    $ git remote rm loci
+    $ git push
+
+
 SETUP
   Extract single directory into separate repo (without file renames)
     $ cd myrepo
