@@ -1,0 +1,7 @@
+# vim:ft=sh
+
+alias adbd="adb -s \"\$(command adb devices -l|awk '\$3~/^usb:.-.$/{print\$1}')\""
+alias adbe='adb -s emulator-5554'
+alias adbl='adb devices -l'
+alias adbs='adb shell'
+alias adbu='adb shell dumpsys usagestats'

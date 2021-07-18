@@ -1,10 +1,19 @@
+ALT
+  Проброс USB в виртуалку по сети средствами UsbRedir и QEMU / Хабр ⌇⡠⣮⣉⡥
+    https://habr.com/ru/post/265065/
+    [_] ALSO:SEE: udev rules for auto-forward
+    # OR: 007-002
+    $ usbredirserver -p 3240 0b05:17cb
+    $ … -chardev socket,id=usbredirchardev1,port=3240,host=127.0.0.1 \
+      -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1,bus=ehci.0,debug=4
+    ::: BAD: Android emulator does not link with "libusbredir"
 
 
 LOCAL: init
   ATT: The device needs to be re-bound again after suspending.
   $ usbip list --local
   $ usbip bind -b 7-2
-  $ ss --listening --tcp --numeric --processes
+  $ sudo ss --listening --tcp --numeric --processes | grep usbip
   $ ssh -O forward -R '3240:localhost:3240' user@host
 
 
