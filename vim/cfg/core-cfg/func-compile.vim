@@ -34,7 +34,8 @@ noremap <unique><silent> <Leader>M <Esc>:<C-U>up \| Abyss!<CR>
 noremap <unique><silent> [Unite]<Leader>m <Esc>:!<CR>
 noremap <unique><silent> [Unite]<Leader>M <Esc>:Copen<CR>
 
-noremap <unique><silent> <Leader>j <Esc>:<C-U>up \| Silent actualee %<CR>
+noremap <unique><silent> <Leader>j <Esc>:<C-U>up \| call system('tmux send-keys -l -t "$(<"'.$TMPDIR.'/zsh/pane")" -- ",j"')<CR>
+noremap <unique><silent> <Leader>J <Esc>:<C-U>up \| Silent actualee %<CR>
 
 " map <F9> :!gcc -o %< % <enter><CR><C-w>
 

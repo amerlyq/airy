@@ -79,6 +79,17 @@ function set_fast_exec_cmd {
     # WARNING: don't output -- for key-mix setting? or eval "$cmd?"
 }
 
+
+#%USAGE: $ tmux send-keys -l -t "$(<"${TMPDIR:-/tmp}/zsh/pane")" -- ',j'
+zle -N store-tmux-pane store_tmux_pane
+function store_tmux_pane {
+    local tmp=${TMPDIR:-/tmp}/zsh/pane
+    local sid=$(tmux list-windows -F '#{session_id}:#{window_id}.#{pane_id}' -f '#{pane_active}')
+    (set +C; print -l -- "${sid:?}" > "$tmp")
+    printf '%s > %s\n' "$sid" "$tmp"
+    zle reset-prompt
+}
+
 ### TRAPS ###
 
 # Save to history on <C-c> alongside interrupt

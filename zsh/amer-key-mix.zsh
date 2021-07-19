@@ -150,6 +150,10 @@ bindkey -as ',d' 'S q\n'
 bindkey  -s ',s' '^U r\n'
 bindkey -as  's' 'S r\n'
 
+# store tmux pane id -- to send ",j" from !vim
+bindkey    '\C-x\C-j' store-tmux-pane
+bindkey -a '\C-x\C-j' store-tmux-pane
+
 if [[ -r /usr/share/zsh/site-functions/abyss.zsh ]]; then
   source /usr/share/zsh/site-functions/abyss.zsh
 else
