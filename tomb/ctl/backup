@@ -15,6 +15,9 @@ set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 # WARN:TODO: if container will be ever corrupted/deleted
 #   -- how to easily restore it from repos structure on either PC ?
 
+# [_] TODO: systemd service to properly unmount (and rm lockfile) on poweroff
+#   << CHG: "-R" must not mount/unmount anymore, and depend on service instead
+
 unset GIT_DIR
 grpnm='tomb'
 d_keys=/aura/archive/$grpnm
@@ -318,6 +321,13 @@ if has R; then  #% -R = scan ~/aura and gather all repos with (origin|aura) => /
 else
   repos=( "$@" )
 fi
+
+# HACK: skip problematic repos
+# [_] FIXME: use intermediate "mirror" for /etc
+#   ALT:BET? only fetch, don't pull
+exclude=( /@/xdg_etc )
+repos=( "${(@)repos:|exclude}" )
+# print -l "$repos"
 
 has s && ((!$#repos)) && >&2 echo "Err: empty repos list" && exit 1
 has v && print -l $repos
