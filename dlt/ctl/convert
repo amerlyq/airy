@@ -7,7 +7,7 @@ colors=
 dltfile=
 follow=
 index=1
-prefix=${CMAKE_PREFIX_PATH:-/work/cache/_prefix}
+prefix=${CMAKE_PREFIX_PATH:-/work/prefix}
 pretty=
 
 while getopts 'fcFi:Ip:123456789' o; do case $o in :|'?') exit 1
@@ -24,7 +24,7 @@ filter=()
 for id; do filter+=("$id ----" "---- $id"); done
 exec < <(printf '%s\n' "${filter[@]}")
 
-if [[ ${prefix+x} ]]; then
+if [[ -d $prefix ]]; then
   export LD_LIBRARY_PATH=$prefix/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
   export PATH=$prefix/bin:$PATH
 fi
