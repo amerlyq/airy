@@ -51,6 +51,16 @@ FIXED:BUG:(Proton): Failed to initialize graphics. Make sure you have DirectX 11
   ::: game -> <rightclick> -> properties -> start options -> <insert>
     PROTON_USE_WINED3D=1 %command%
 
+  BUG: no lights in "... Pedro"
+    https://steamcommunity.com/app/557340/discussions/0/1744512496198080695/#c1744512563930672568
+      ...the only issue is that the game now launches, but has serious lighting and object issues past the first intro scene.
+    PROTON_USE_WINED3D11=1 DXVK_HUD=fps %command%
+    PROTON_NO_ESYNC=1 | Disable esync
+    PROTON_USE_WINED3D11=1 %command% | Force DX11
+    PROTON_NO_D3D11=1 %command% | Disable DX11
+    PROTON_USE_WINED3D10=1 %command% | Force DX10
+    PROTON_NO_D3D10=1 %command% | Disable DX10
+
 
 FIXED:BUG:(Proton): Black Screen on launch e.g. for RPGMaker games (everything else is OK)
   How to change a game's compatibility to Windows XP : SteamPlay ⌇⡞⠾⠳⡥
