@@ -25,9 +25,10 @@ call dein#add('dense-analysis/ale', {
 \\n   let g:ale_linters = { 'python': ['flake8', 'pylint'] }
 \\n   let g:ale_python_pylint_options = '--disable=C0103,C0111,W0511'
 \\n
-\\n   let g:ale_fixers = { 'python': ['black', 'isort'] }
+\\n   let g:ale_fixers = { 'python': ['isort', 'black'] }
 \\n   let g:ale_fix_on_save = 1
-\\n   let g:ale_fix_on_save_ignore = { 'python': [] }
+\\n   let g:ale_fix_on_save_ignore = { 'python': ['autoimport'] }
+\\n   let g:ale_completion_autoimport = 1
 \"})
 
 

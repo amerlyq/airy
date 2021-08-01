@@ -9,6 +9,7 @@ if !has('autocmd') || v:version <= 701 | finish | endif
 
 " EXPL: phonetic abbreviations in cyrillic, etc.
 iabbrev  туду:  TODO:
+iabbrev  ещвщ:  TODO:
 
 " [_] FAIL: below "ex:" is treated as modeline
 let s:patterns = [
