@@ -6,6 +6,10 @@ https://unix.stackexchange.com/questions/145954/how-can-i-see-i-o-stats-for-a-br
 
 Disk space usage
   $ find . -ls
+  $ sudo \du -xsh /
+  $ sudo \du -xsh /.snapshots/*/snapshot
+  $ sudo ncdu -x $ |community/ncdu| -- CASE search biggest files to delete
+  $ sudo snapper -c root status 4080..7300
 
   Where has my disk space gone? Flame graphs for file systems ⌇⡟⠦⠅⠾
     http://www.brendangregg.com/blog/2017-02-05/file-system-flame-graph.html

@@ -1,7 +1,16 @@
-set clipboard+=unnamedplus
+" SRC: vimrc/ideavimrc at master · apemost/vimrc ⌇⡡⠉⢽⠌
+"   https://github.com/apemost/vimrc/blob/master/ideavimrc
+set clipboard=unnamedplus,ideaput
+
+set ignorecase smartcase incsearch
+
 noremap ,s :<C-U>write<CR>
 " SEE: :actionlist
 noremap ,m :<C-U>action Run<CR>
 
 noremap gc :action CommentByLineComment<CR>
 " noremap <Space>e :action Emulator<CR>
+
+"" don't blink ::: Help -> FindAction -> blink -> OFF
+" Intellij IDEA: how to changing blinking cursor to non-blinking? - Stack Overflow ⌇⡡⠉⢁⢆
+"   https://stackoverflow.com/questions/49420147/intellij-idea-how-to-changing-blinking-cursor-to-non-blinking
