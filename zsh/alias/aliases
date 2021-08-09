@@ -73,12 +73,14 @@ alias -g D!='$(printf "%08x" $(date +%s)|xxd -r -p|basenc --z85|rev)'
 alias -g H='|head'
 alias -g H1='|head -1'
 alias -g H2='|head -2'
+alias -g HH='|head -20'
+alias -g HHH='|head -30'
 
 alias -g T='|tail'
 alias -g T1='|tail -1'
 alias -g T2='|tail -2'
 
-# ALSO:(rest):
+# ALSO:(rest): ALT: "alias -g H-1=..."
 alias -g R='|tail -n +11'
 alias -g R1='|tail -n +2'
 alias -g R2='|tail -n +3'

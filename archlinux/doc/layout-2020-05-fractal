@@ -184,7 +184,7 @@ pacman -Syyu vis
 ## NOTE: assemble mounted filesystem
 mount -o noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@ /dev/ws/root /mnt
 mount -o noatime,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ws/aura /mnt/aura
-mount /dev/ws/cache /mnt/cache
+mount -o noauto,nofail,x-systemd.automount,noatime /dev/ws/cache /mnt/cache
 # FAIL:(x-systemd.automount): useless, because !snapperd on reboot will trigger /.snapshots mounting after only 5s
 #   ~~ though, /data/ and /aura/ will be triggered only after 10m
 mount -o noauto,nofail,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ds/data /mnt/data
