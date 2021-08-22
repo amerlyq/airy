@@ -5,17 +5,24 @@
 #   = from any dir user '.' to replace dfl dir by current
 #   ALT: filter-out dfl dir from args list -- scripts could use PWD
 # DEV: by default 'Gs' must show only repos with "unclear" status
-alias Ga='r.git-all'
-alias Gu='r.git-all-status'
-alias Gk='Gu /@'
-alias Gr='Gu /@/aura'
-alias Gs='Gu /@/aura'
-alias Gt='Ga /@ status -s -unormal'
-alias Gd='Ga /@ diff'
-alias Gdw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
+
+alias Gs.='r.git-all-status'
+alias Gt.='r.git-all . status -s -unormal'
+alias Gd.='r.git-all . diff'
 alias Gl.='r.git-all-pull'
-alias Gl='Gl. /@'
-alias Gp='r.git-all-push /@'
+
+alias Gs='r.git-all-status /@/aura'
+alias Gt='r.git-all /@/aura status -s -unormal'
+alias Gd='r.git-all /@/aura diff'
+alias Gdw='Gd --unified=0 --no-ext-diff --exit-code --no-prefix --word-diff'
+alias Gl='r.git-all-pull /@/aura'
+alias Gp='r.git-all-push /@/aura'
+
+alias Gsa='r.git-all-status /@'
+alias Gta='r.git-all /@ status -s -unormal'
+alias Gda='r.git-all /@ diff'
+alias Gla='r.git-all-pull /@'
+alias Gpa='r.git-all-push /@'
 
 # {{{ state analysis
 # SEE※⡟⠃⡟⣙ :/git/doc/ref-materials.nou
