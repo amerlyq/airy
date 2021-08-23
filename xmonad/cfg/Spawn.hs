@@ -38,6 +38,8 @@ main = concat
     -- THINK: is "r.b" link suitable, if I use "u" anyway (url)
     -- THINK:ENH: make M-g * to go to already opened instead of using mods
     ]
+  ] ++ [
+    ("M-t d", namedScratchpadAction myScratchpads "daily")
   ]
   where
     spawnHereAt pos cmd = withWindowSet $ \ws -> spawnAndDo (doShift (currentTag ws) <+> insertPosition pos Newer) cmd
@@ -61,7 +63,7 @@ scratchpad = (concat . (`map` [
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
-    | nm <- ["agenda", "htop", "ipython", "j8", "lyrics", "ncmpcpp", "todo"]
+    | nm <- ["agenda", "daily", "htop", "ipython", "j8", "lyrics", "ncmpcpp", "todo"]
     ],
     -- Open new window always
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)

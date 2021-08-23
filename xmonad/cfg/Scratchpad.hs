@@ -24,6 +24,7 @@ myScratchpads =
   ] ++
   [ vim "lyrics" "~/aura/lyfa/lists/music/anime.nou" nonFloating
   , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
+  , vim "daily" "/@/todo/!today" nonFloating
   ]
   where
     bottom_l14b3 = customFloating $ RationalRect 0 (2/3) (1/4) (1/3)

@@ -292,6 +292,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- , ("8", "t-engine64")
   -- , ("9", "Steam")
   , className =? "Steam" --> doF (bring "g")
+  , appName =? "daily" --> doF (bring "5")
   , appName =? "mutt" --> doF (bring "MM")  -- (but I can have >1 mutt)
   -- NOTE: strictly speaking, we don't need runOrRaise for mutt
   -- -- only stick it to MM wksp and keys to jump on it
