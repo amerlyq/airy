@@ -24,6 +24,8 @@ myScratchpads =
   ] ++
   [ vim "lyrics" "~/aura/lyfa/lists/music/anime.nou" nonFloating
   , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
+  -- import System.Directory             (canonicalizePath)
+  -- , canonicalizePath "/@/todo/!today" >>= \f -> vim "daily" f nonFloating
   , vim "daily" "/@/todo/!today" nonFloating
   ]
   where

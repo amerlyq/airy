@@ -44,6 +44,7 @@ Quad: Flash, Encrypt, ArchLinux, ClearLinux
   $# parted -s -a opt /dev/sdb set 3 esp on
 
   $# mkfs.vfat /dev/sdb1
+  $# fatlabel /dev/sdb1 exchange
   ALSO: encrypted /dev/sdb2 CFG※⡡⠥⠪⡿
   $# mkfs.fat -F 32 /dev/sdb3
   $# fatlabel /dev/sdb3 CLR_ISO
