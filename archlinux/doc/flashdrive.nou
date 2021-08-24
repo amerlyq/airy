@@ -19,7 +19,7 @@ Separate partition on drive for ArchLinux
   $# mkfs.vfat /dev/sdb1
   $# mkfs.fat -F 32 /dev/sdb2
   $# fatlabel /dev/sdb2 ARCH_201906
-  $# sudo blkid | grep '/dev/sdb2'
+  $# blkid | grep '/dev/sdb2'
 
   $# mkdir -p /mnt/{iso,usb}
   $# mount -o loop archlinux-2018.05.01-x86_64.iso /mnt/iso
@@ -33,9 +33,48 @@ Separate partition on drive for ArchLinux
   $# extlinux --install /mnt/usb/arch/boot/syslinux
   $# umount /mnt/usb
 
-Triple: Flash, ClearLinux, ArchLinux
-  $# parted -s -a opt /dev/sdb mklabel msdos
-  $# parted -s -a opt /dev/sdb mkpart primary fat32 1MiB 11GiB
-  $# parted -s -a opt /dev/sdb mkpart primary fat32 11GiB 14084MiB
-  $# parted -s -a opt /dev/sdb mkpart primary fat32 14084MiB 100%
+
+Quad: Flash, Encrypt, ArchLinux, ClearLinux
   FAIL: https://github.com/clearlinux/distribution/issues/1498
+  $# parted -s -a opt /dev/sdb mklabel msdos
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 1MiB 8GiB
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 8GiB 10GiB
+  $# parted -s -a opt /dev/sdb mkpart primary fat32 10GiB 100%
+  $# parted -s -a opt /dev/sdb set 3 boot on
+  $# parted -s -a opt /dev/sdb set 3 esp on
+
+  $# mkfs.vfat /dev/sdb1
+  ALSO: encrypted /dev/sdb2 CFG※⡡⠥⠪⡿
+  $# mkfs.fat -F 32 /dev/sdb3
+  $# fatlabel /dev/sdb3 CLR_ISO
+  $# blkid | grep '/dev/sdb3'
+
+  $# mkdir -p /mnt/{iso,iso2,usb}
+  $# mount -o loop archlinux-2021.08.01-x86_64.iso /mnt/iso
+  $# mount -o loop clear-34820-live-desktop.iso /mnt/iso2
+  $# mount /dev/sdb3 /mnt/usb
+  $# cp -a /mnt/iso/* /mnt/usb
+  $# cp -ba /mnt/iso2/* /mnt/usb
+  $# sync  # PERF: ~7m
+  $# umount /mnt/iso /mnt/iso2
+  $# rmdir /mnt/iso /mnt/iso2
+
+  # Merge both OS files
+  $ find -name '*~'
+  # NOTE: replace both ClearLinux files by these backuped from ArchLinux
+    # ./~
+  $# mv /mnt/usb/EFI/BOOT/BOOTX64.EFI{,_clearlinux}
+  $# mv /mnt/usb/EFI/BOOT/BOOTX64.EFI{~,}
+  $# mv /mnt/usb/loader/loader.conf{~,}
+
+  # FAIL: you can't override "root" for ClearLinux TEMP: replace only ArchLinux
+  # $# blkid -s PARTUUID -o value /dev/sdb3
+  # $# vis /mnt/usb/loader/entries/Clear-linux-native-5.12.14-1051.conf
+  #   << root=PARTUUID=33d32718-03
+  # OR:(only if initramfs supports it): root=LABEL=ARCH_202108
+  $# sed -i 's/\bARCH_202108\b/CLR_ISO/g' /mnt/usb/loader/entries/*
+
+  $# paci syslinux
+  $# cp -f /usr/lib/syslinux/bios/*.c32 /mnt/usb/syslinux/
+  $# extlinux --install /mnt/usb/syslinux
+  $# umount /mnt/usb
