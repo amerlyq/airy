@@ -6,6 +6,7 @@
 #
 #%SUMMARY:
 #%USAGE: $ ./$0
+#%  e.g: $ r.find-bydate . . 1 '%Y%m%d-'
 #%ALT:ONELINE:(folders-lvl-1): $ for d in *; do ym=$(find $d -type f -printf '%TY-%Tm\n' | sort | head -1); mkdir -p $ym; mv -t $ym -- $d; done
 set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
