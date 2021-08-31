@@ -2,14 +2,21 @@
 # DFL: /usr/share/doc/ranger/config/colorschemes/default.py
 # VIZ: /usr/lib/python3.9/site-packages/ranger/gui/context.py
 
+import curses
+
 import ranger.gui.color as C
 from ranger.colorschemes.solarized import Solarized
 
 
 class Scheme(Solarized):
     def use(self, ctx):
+        islink = ctx.link
+        ctx.link = False
         fg, bg, attr = Solarized.use(self, ctx)
-        if ctx.link or ctx.inactive_pane:  # or ctx.marked
+        if islink:
+            attr |= curses.A_ITALIC
+            return fg, bg, attr
+        if ctx.inactive_pane:  # or ctx.marked
             return fg, bg, attr
 
         if ctx.ext_nou:
