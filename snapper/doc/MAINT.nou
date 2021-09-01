@@ -1,0 +1,37 @@
+
+Cleanup disk size -- DECI how much snapshots to delete
+  [⡡⠯⣋⣲] 1h30m #disk space TODO eval old files diff size ⌇⡡⠯⣋⣧
+    $ sudo \du -xsh /.snapshots/*/snapshot
+    ---
+    80ms $ time \du -ab .
+    20ms $ time find . -xdev -name .git -prune -o -printf '%T+ %s %P\n'
+
+    $ rsync -ah --no-group --out-format='%i %f' --delete --dry-run "$@"
+    $ rsync --archive --dry-run --verbose /src/directory/ /dst/directory/
+    $ rsync --archive --dry-run --one-file-system --list-only /var/snapshot1/ /var/snapshot2/
+      = compares on file name, size and timestamp
+      NOTE: don't use "--delete" as we only want to estimate "additional" size of old snapshot,
+        benefits of deleting new files from newer snapshot are useless
+
+    0.76s $ time sudo \du -xab snapshot N-
+    1.53s $ time sudo find snapshot -xdev -printf '%T+ %s %P\n' N-
+    3.10s $ sudo \rsync --archive --dry-run --no-perms --no-owner --no-group --one-file-system -i 7737/snapshot/ 7738/snapshot
+    $ \rsync --archive --dry-run --out-format=$'%i %l  %f' --no-perms --no-owner --no-group --one-file-system 7737/snapshot/ 7738/snapshot
+
+    :::
+      pair: $ sudo \rsync --dry-run --one-file-system --archive --out-format='%l' -- 7737/snapshot/ 7738/snapshot | awk '{a+=$1}END{print a/1024/1024}'
+      table: $ find /.snapshots -mindepth 2 -maxdepth 2 -type d -name snapshot  | awk 'x{print x,$1}{x=$1}' | while read -r a b; do printf "%s " "$a"; sudo \rsync --dry-run --one-file-system --archive --out-format='%l' -- "$a/" "$b" | awk '{a+=$1}END{print a/1024/1024}'; done
+      wdate: $ (sudo -v; find /.snapshots -mindepth 2 -maxdepth 2 -type d -name snapshot  | awk 'x{print x,$1}{x=$1}' | while read -r a b; do printf "%s " "$a"; sudo \rsync --dry-run --one-file-system --archive --out-format='%l' -- "$a/" "$b" 2>/dev/null | awk '{a+=$1}END{printf"%5.2f GiB ",a/1024/1024/1024}'; sudo sed -rn '/<date>/s/[^>]*>(.*)<.*/\1/p' $a:h/info.xml; done)
+        $ r.snapper-table
+
+    ALSO:IDEA: rsync only files and not directories - Super User ⌇⡡⠯⢽⣀
+      https://superuser.com/questions/458671/rsync-only-files-and-not-directories
+      = to sum only file sizes, ignoring dir sizes
+
+
+IDEA: deduplicate disk blocks
+  [_] #maint TRY dedup BTRFS ⌇⡡⠯⣍⡎
+    REF: Deduplication - btrfs Wiki ⌇⡡⠯⣍⠭
+      https://btrfs.wiki.kernel.org/index.php/Deduplication
+    TUT: How to Save Disk Space using Btrfs Deduplication ⌇⡡⠯⣍⡜
+      https://linuxhint.com/save-disk-space-btrfs-deduplication/#:~:text=The Btrfs filesystem is a,huge amount of disk spaces.
