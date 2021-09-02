@@ -372,11 +372,14 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 "   => always prints name of file it opens on tag jump
 " [_] TRY: also overload <gf> to open xtref under cursor as if it was "file"
 " BAD:NEED:(sil): suppress "search hit bottom" message and jump immediately
-nnoremap <silent>  g]  :sil exe v:count1."tag" xtref#invert(xtref#get(0))<CR>
-xnoremap <silent>  g]  :<C-u>sil exe v:count1."tag" xtref#invert(xtref#get(1))<CR>
+nnoremap <silent>  g]  :exe (v:count?v:count."tag":"tjump") xtref#invert(xtref#get(0))<CR>
+xnoremap <silent>  g]  :<C-u>exe (v:count?v:count."tag":"tjump") xtref#invert(xtref#get(1))<CR>
+ noremap <silent>  g[  :<C-u><C-r>=v:count1<CR>tag<CR>
+
 nnoremap <silent>  z]  :exe "tsel" xtref#invert(xtref#get(0))<CR>
 xnoremap <silent>  z]  :<C-u>exe "tsel" xtref#invert(xtref#get(1))<CR>
- noremap <silent>  g[  :<C-u><C-r>=v:count1<CR>tnext<CR>
+ noremap           z[  :<C-u><C-r>=v:count1<CR>tnext<CR>
+
  noremap <C-]>  :<C-u>tags<CR>
 
 
