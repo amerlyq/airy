@@ -4,8 +4,10 @@
 #   0.76s $ time sudo \du -xab snapshot N-
 #   1.53s $ time sudo find snapshot -xdev -printf '%T+ %s %P\n' N-
 
+root=${1-}
+
 sudo -v
-find /.snapshots -mindepth 2 -maxdepth 2 -type d -name snapshot  | awk 'x{print x,$1}{x=$1}' | while read -r a b; do
+find "$root"/.snapshots -mindepth 2 -maxdepth 2 -type d -name snapshot  | awk 'x{print x,$1}{x=$1}' | while read -r a b; do
   printf "%s " "$a"
   sudo rsync --dry-run --one-file-system --archive --out-format='%l' -- "$a/" "$b" 2>/dev/null |
     awk '{a+=$1}END{printf"%5.2f GiB ",a/1024/1024/1024}'
