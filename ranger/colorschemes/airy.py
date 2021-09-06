@@ -15,6 +15,10 @@ class Scheme(Solarized):
         fg, bg, attr = Solarized.use(self, ctx)
         if islink:
             attr |= curses.A_ITALIC
+            if ctx.bad:
+                if not ctx.good:
+                    fg = 160
+                bg = 235
             return fg, bg, attr
         if ctx.inactive_pane:  # or ctx.marked
             return fg, bg, attr
