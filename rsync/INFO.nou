@@ -29,9 +29,20 @@ Resume / interrupt
 [_] TRY: store checksum in xatter on copy like rmlint
 
 
-Incremental backups with hardlinks
-  https://superuser.com/questions/1245978/using-rsync-on-wsl-bash-for-windows-10-for-incremental-backups
-  $ rsync -aP --link-dest=PATHTO/$PREVIOUSBACKUP $SOURCE $CURRENTBACKUP
+Incremental backups with hardlinks ⌇⡡⠶⢫⢱
+  Using rsync on WSL (Bash for Windows 10) for incremental backups - Super User
+    https://superuser.com/questions/1245978/using-rsync-on-wsl-bash-for-windows-10-for-incremental-backups
+    $ rsync -aP --link-dest=PATHTO/$PREVIOUSBACKUP $SOURCE $CURRENTBACKUP
+  [⡡⠶⢪⣫] Creating differential backups with hard links and rsync | Earl C. Ruby III ⌇⡡⠶⢨⣦
+    https://earlruby.org/2013/05/creating-differential-backups-with-hard-links-and-rsync/
+    $ rsync -avAHX --progress --link-dest="$DAY2" -e ssh user@host:/home/user/ /var/backups/$DAY2/
+  [$] rdiff-backup ⌇⡡⠶⢬⡔
+    https://rdiff-backup.net/
+    https://www.reddit.com/r/linuxquestions/comments/o5443j/incremental_backup_solution_rsync_vs_rsnapshot_vs/
+      BET:USE: !borg/restic with virtual FS for small changes in large binary files
+        considering only last snapshot of rdiff-backup is FS-accessible
+        and previous diffs stored in internal format anyways
+      BET:USE: !rsync for "add new files" like on phone
 
 
 Batch update

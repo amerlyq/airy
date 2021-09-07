@@ -1,0 +1,16 @@
+#!/bin/sh -eu
+#%SUMMARY: hardlink-based snapshots on external USB HDD
+#%ONELINE: $ rsync -avAHX --progress --link-dest="$(ls -d /mnt/*/|tail -1)" ./ /mnt/"$(date +%Y%m%d_%H%M%S)"
+#% REMOTE: $ rsync -avAHX --progress --link-dest="$DAY2" -e ssh user@host:/home/user/ /var/backups/$DAY2/
+
+src=$1  # /path/to/@android
+bkp=$2  # /mnt
+
+old=$(find "$bkp" -mindepth 1 -maxdepth 1 -type d -name '2???????_??????' -print|sort -r|head -1)
+dst=$bkp/$(date +%Y%m%d_%H%M%S)
+test -e "$dst" && echo "Err: exists dst=$dst" && exit 1
+
+# --one-file-system
+exec rsync --archive --acls --hard-links --xattrs \
+  --human-readable --stats --progress --out-format='%t %i %f' \
+  ${old:+--link-dest="$old"} -- "$src/" "$dst/"
