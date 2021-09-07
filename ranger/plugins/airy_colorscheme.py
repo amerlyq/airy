@@ -1,3 +1,4 @@
+import os
 from enum import Enum, auto
 
 import ranger.gui.context as ctx
@@ -5,6 +6,7 @@ import ranger.gui.widgets.browsercolumn as B
 
 
 class CustomKeys(Enum):
+    annexed = auto()
     ext_nou = auto()
     wf_log = auto()
     wf_todo = auto()
@@ -24,6 +26,10 @@ OLD_HOOK_BEFORE_DRAWING = B.hook_before_drawing
 
 def new_hook_before_drawing(fsobj, color_list):
     nm = fsobj.basename
+    if fsobj.is_link:
+        dst = os.readlink(fsobj.path)
+        if not dst.startswith("/") and ".git/annex/objects/" in dst:
+            color_list.append(CustomKeys.annexed.name)
     if fsobj.is_file:
         if nm.endswith(".nou"):
             color_list.append(CustomKeys.ext_nou.name)

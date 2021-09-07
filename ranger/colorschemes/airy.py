@@ -10,15 +10,13 @@ from ranger.colorschemes.solarized import Solarized
 
 class Scheme(Solarized):
     def use(self, ctx):
-        islink = ctx.link
-        ctx.link = False
+        # NOTE: only existing annexed symlinks must mimic to real files
+        annexed = ctx.annexed and ctx.good
+        if annexed:
+            ctx.link = False
         fg, bg, attr = Solarized.use(self, ctx)
-        if islink:
+        if annexed:
             attr |= curses.A_ITALIC
-            if ctx.bad:
-                if not ctx.good:
-                    fg = 160
-                bg = 235
             return fg, bg, attr
         if ctx.inactive_pane:  # or ctx.marked
             return fg, bg, attr
