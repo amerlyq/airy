@@ -1,5 +1,6 @@
 #!/bin/sh -eu
 #%SUMMARY: hardlink-based snapshots on external USB HDD
+#%USAGE: $ cd /media/user/HDD/@android && r.rsync-backup lc:/me/@android/ .
 #%ONELINE: $ rsync -avAHX --progress --link-dest="$(ls -d /mnt/*/|tail -1)" ./ /mnt/"$(date +%Y%m%d_%H%M%S)"
 #% REMOTE: $ rsync -avAHX --progress --link-dest="$DAY2" -e ssh user@host:/home/user/ /var/backups/$DAY2/
 
@@ -10,7 +11,17 @@ old=$(find "$bkp" -mindepth 1 -maxdepth 1 -type d -name '2???????_??????' -print
 dst=$bkp/$(date +%Y%m%d_%H%M%S)
 test -e "$dst" && echo "Err: exists dst=$dst" && exit 1
 
-# --one-file-system
-exec rsync --archive --acls --hard-links --xattrs \
+
+#%NEED: rsync_server>=3.1.1 (FAIL: nas=3.0.7)
+# --acls --one-file-system
+# exec rsync --archive --hard-links --xattrs \
+#   --human-readable --stats --progress --out-format='%t %i %f' \
+#   ${old:+--link-dest="$old"} -- "$src/" "$dst/"
+
+
+#%ALT: $ cp -al "$(ls -d /mnt/*/|tail -1)" /mnt/"$(date +%Y%m%d_%H%M%S)" && rsync -avAHX --progress --delete ./ /mnt/"$(date +%Y%m%d_%H%M%S)"
+test -e "$old" && cp -al -- "$old" "$dst"
+
+exec rsync --archive --hard-links --xattrs \
   --human-readable --stats --progress --out-format='%t %i %f' \
-  ${old:+--link-dest="$old"} -- "$src/" "$dst/"
+  --delete -- "$src/" "$dst/"
