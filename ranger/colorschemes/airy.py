@@ -21,6 +21,10 @@ class Scheme(Solarized):
         if ctx.inactive_pane:  # or ctx.marked
             return fg, bg, attr
 
+        # E.G: aliases to *.nou
+        if ctx.link:
+            return fg, bg, attr
+
         if ctx.ext_nou:
             fg = 187  # OR: 22 28 BET?=30 31 174
         elif ctx.wf_log:

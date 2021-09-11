@@ -144,7 +144,7 @@ noremap <unique> g4 A<Space><Esc>
 noremap <unique> ,g %
 
 nnoremap <unique> cC :t.<CR>
-xnoremap <unique> cC :t'><CR>
+xnoremap <unique> C :t'><CR>
 
 " " Use <C-Space> instead <C-@>
 " SEE: What is it?
