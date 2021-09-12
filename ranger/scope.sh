@@ -358,6 +358,8 @@ handle_mime() {
 
         ## Mail
         message/rfc822)
+            # ALT: https://github.com/djcb/mu
+            # mu view -- "${FILE_PATH}" && exit 5
             mshow -nBFN "${FILE_PATH}" && exit 5
             exit 2;;
 

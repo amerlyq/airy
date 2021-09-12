@@ -99,9 +99,9 @@ call dein#add('osyo-manga/vim-anzu', {
   \ 'on_cmd': ['AnzuUpdateSearchStatus', 'AnzuSignMatchLine'],
   \ 'depends': 'incsearch.vim',
   \ 'hook_source': "
-\\n nmap <silent><unique>  <Leader>#
+\\n nmap <silent>  <Leader>#
 \       <Plug>(incsearch-nohl)<Plug>(anzu-jump)<Plug>(anzu-mode)
-\\n nmap <silent><unique>  <Leader>*
+\\n nmap <silent>  <Leader>*
 \       <Plug>(incsearch-nohl)<Plug>(anzu-n)<Plug>(anzu-mode)
 \", 'hook_add': "
 \\n   nmap  n  <Plug>(incsearch-nohl)<Plug>(anzu-n-with-echo)
