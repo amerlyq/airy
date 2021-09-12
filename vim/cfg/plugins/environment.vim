@@ -24,11 +24,12 @@ call dein#add('embear/vim-localvimrc', {'lazy': 0,
 "" Change root working dir of curr file by auto/manual-cd in the repo {{{1
 " EXPL:(lazy) Only if you want for auto-cd to work
 " CHG: \ 'on_map': '<Leader>cd',
+"" hook_post_source: let g:rooter_patterns += ['.pjroot', '.agignore']
 call dein#add('airblade/vim-rooter', {
   \ 'on_cmd': 'Rooter',
   \ 'on_func': 'FindRootDirectory',
   \ 'hook_post_source': "
-\\n   let g:rooter_patterns += ['.pjroot', '.agignore']
+\\n
 \", 'hook_source': "
 \\n   let g:rooter_manual_only = 1
 \\n   let g:rooter_disable_map = 1

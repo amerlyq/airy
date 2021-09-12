@@ -231,7 +231,6 @@ call dein#add('tpope/vim-fugitive', {
   \ 'augroup': 'fugitive',
   \ 'on_cmd': ['Git', 'Gstatus', 'Gdiff', 'Glog',
   \   'Gbrowse', 'Gblame', 'Gwrite'],
-  \ 'hook_post_source': "call fugitive#detect(expand('%:p'))",
   \ 'hook_add': "
 \\n   autocmd BufReadPost fugitive://* setl bufhidden=delete
 \\n   nnoremap <silent><unique> [Git]s :Gstatus<CR>

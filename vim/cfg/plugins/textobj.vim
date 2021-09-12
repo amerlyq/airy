@@ -213,10 +213,10 @@ call dein#add('kana/vim-textobj-diff', {
   \ 'depends': 'vim-textobj-user',
   \ 'hook_source': "
 \\n   let g:textobj_diff_no_default_key_mappings = 1
-\\n   call Map_nxo('[[', '<Plug>(textobj-diff-hunk-p)')
-\\n   call Map_nxo(']]', '<Plug>(textobj-diff-hunk-n)')
-\\n   call Map_nxo('[{', '<Plug>(textobj-diff-file-p)')
-\\n   call Map_nxo(']}', '<Plug>(textobj-diff-file-n)')
+\\n   call Map_nxo('[[', '<Plug>(textobj-diff-hunk-p)', 'nxo', 0)
+\\n   call Map_nxo(']]', '<Plug>(textobj-diff-hunk-n)', 'nxo', 0)
+\\n   call Map_nxo('[{', '<Plug>(textobj-diff-file-p)', 'nxo', 0)
+\\n   call Map_nxo(']}', '<Plug>(textobj-diff-file-n)', 'nxo', 0)
 \", 'hook_add': "
 \\n   call Map_nxo('iD', '<Plug>(textobj-diff-file)', 'ox')
 \\n   call Map_nxo('iH', '<Plug>(textobj-diff-hunk)', 'ox')
