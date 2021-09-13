@@ -42,6 +42,7 @@ export AIRY_BIN    ?= $(HOME)/.local/bin
 export AIRY_CONFIG ?= $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/airy
 export AIRY_CACHE  ?= $(or $(XDG_CACHE_HOME),$(HOME)/.cache)/airy
 export AIRY_DATA   ?= $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/airy
+export LISTS_STORE_DIR ?= $(AIRY_CACHE)/pacman
 export PATH        := $(AIRY_BIN):$(PATH)
 
 # FIXED:(r.airy): on clean install in same login
@@ -109,7 +110,7 @@ clean:
 # BUG: clean install -- need install aur before setup
 $(tsdir)/--configure--:
 	echo '$(@F)'
-	mkdir -p '$(@D)' '$(dir $(AIRY_ROOT))' '$(AIRY_BIN)' '$(AIRY_TMPDIR)'
+	mkdir -p '$(@D)' '$(dir $(AIRY_ROOT))' '$(AIRY_BIN)' '$(AIRY_TMPDIR)' '$(LISTS_STORE_DIR)'
 	ln -svfT '$(here)' '$(AIRY_ROOT)'
 	ln -svfT '$(realpath $(this))' '$(AIRY_BIN)/airyctl'
 	./airy/setup -m

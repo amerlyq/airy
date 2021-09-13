@@ -2,7 +2,9 @@
 # REF:(groups list): https://www.archlinux.org/groups/
 
 db=~/.cache/airy/install-pkgs.txt
-dsrc=${TMPDIR:?}/airy
+dsrc=${LISTS_STORE_DIR-}
+[[ -n $dsrc ]] || dsrc=/@/xdg_cache/airy/pacman
+[[ -d $dsrc ]] || dsrc=${TMPDIR:-/tmp/$LOGNAME}/airy
 
 # NOTE: generate active db w/o actual cmds execution
 [[ -d $dsrc ]] || airyctl -- all/install flags=-m

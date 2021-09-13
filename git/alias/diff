@@ -5,6 +5,7 @@ alias ge='gd --cached -w'
 
 # NEED:(git>=2.15): https://stackoverflow.com/questions/12590947/using-git-diff-to-detect-code-movement-how-to-use-diff-options/47192896#47192896
 alias gdf='git diff -M --color-moved'  # don't show renamed files
+alias gdh='gdf -I'  # hide by regex
 alias gdi='gdf "$(git rev-list --merges -1 HEAD)~..HEAD"'  # only feature-branch
 alias gdF='gdf --submodule=diff'  # don't show renamed files
 # SEE: http://stackoverflow.com/questions/5685007/making-git-log-ignore-changes-for-certain-paths/21079437#21079437
