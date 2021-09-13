@@ -28,6 +28,7 @@ Manipulate
   Archive all differences between branch and workdir ⌇⡠⡖⣫⠙
     $ find -type d -name .git -prune -execdir sh -c 'git ls-files --modified --deleted --others --directory --exclude=__pycache__ -z | xargs -0rn1 printf "%s/%s\n" "$PWD"' \; TR
     [_] BAD: wild files are skipped
+    BAD: "--others" shows both untracked and ignored e.g. //webengine/ dirs and _build
   [_] TODO:DEV: show local-only branches and tags
     [⡠⡓⠻⣉] ignore merged branches
     [_] both branches and tags
