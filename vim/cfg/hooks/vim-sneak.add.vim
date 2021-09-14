@@ -4,8 +4,8 @@ for c in split('sSfFtT', '\zs')
 endfor
 
 " JUMP next/prev -- explicit repeat (as opposed to implicit 'clever-s')
-call Map_nxo('<CR>', '<Plug>SneakNext')
-call Map_nxo('<BS>', '<Plug>SneakPrevious')
+call Map_nxo('<Del>', '<Plug>Sneak_;')
+call Map_nxo('<BS>', '<Plug>Sneak_,')
 " BUG JUMP by label (as in browser) -- how to configure?
-call Map_nxo('<Leader><CR>', '<Plug>(SneakStreak)')
-call Map_nxo('<Leader><BS>', '<Plug>(SneakStreakBackward)')
+call Map_nxo('<Leader><Del>', '<Plug>SneakLabel_s')
+call Map_nxo('<Leader><BS>', '<Plug>SneakLabel_S')
