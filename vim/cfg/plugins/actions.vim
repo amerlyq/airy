@@ -62,6 +62,7 @@ call dein#add('AndrewRadev/splitjoin.vim', {'lazy': 0,
 call dein#add('AndrewRadev/switch.vim', {
   \ 'on_func': 'switch#',
   \ 'on_cmd': ['Switch', 'SwitchReverse'],
+  \ 'on_map': [['nx', '<CR>', '<BS>']],
   \ 'hook_source': _hcat('switch.src'),
   \ 'hook_add': "
 \\n   nnoremap <silent> <Plug>(switch+date) :<C-u>if !switch#Switch()<Bar> call speeddating#increment(v:count1) <Bar>en<CR>

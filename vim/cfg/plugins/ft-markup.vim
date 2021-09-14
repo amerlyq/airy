@@ -12,7 +12,7 @@
 "" HACK notes/outline
 call dein#add('amerlyq/nou.vim', {
   \ 'lazy': 0,
-  \ 'depends': 'vim-textobj-user'})
+  \ 'depends': ['vim-textobj-user', 'AndrewRadev/switch.vim']})
 
 
 

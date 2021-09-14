@@ -37,6 +37,28 @@ let g:xtref.r_anchor = g:xtref.anchor_pfx . g:xtref.r_addr
 let g:xtref.r_refer = g:xtref.refer_pfx . g:xtref.r_addr
 
 
+if !exists('g:switch_custom_definitions')
+  let g:switch_custom_definitions = []
+endif
+
+"" WF: from everywhere-notches
+" [_] TODO: toggle xtref <-> date
+"   REQ: https://github.com/AndrewRadev/switch.vim/issues/78
+" switch#NormalizedCase(['one', 'two']),
+" switch#NormalizedCaseWords(['five', 'six']),
+let g:switch_custom_definitions +=
+  \[ {
+  \    '\v⌇([\u2800-\u28FF]{2,4})': '※\1',
+  \    '\v※([\u2800-\u28FF]{2,4})': '^\1',
+  \    '\v\^([\u2800-\u28FF]{2,4})': '⌇\1',
+  \  }
+  \, {
+  \    '\v\[([\u2800-\u28FF]{2,4})\]': '<\1>',
+  \    '\v\<([\u2800-\u28FF]{2,4})\>': '[\1]',
+  \  }
+  \]
+
+
 " NOTE: xref artifact ※unReK
 digraph xa 8967  " ⌇
 digraph xr 8251  " ※
