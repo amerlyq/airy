@@ -40,12 +40,12 @@ FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lowe
 
 ## Settings
 HIGHLIGHT_SIZE_MAX=262143  # 256KiB
-HIGHLIGHT_TABWIDTH=${HIGHLIGHT_TABWIDTH:-8}
-HIGHLIGHT_STYLE=${HIGHLIGHT_STYLE:-pablo}
+HIGHLIGHT_TABWIDTH="${HIGHLIGHT_TABWIDTH:-8}"
+HIGHLIGHT_STYLE="${HIGHLIGHT_STYLE:-pablo}"
 HIGHLIGHT_OPTIONS="--replace-tabs=${HIGHLIGHT_TABWIDTH} --style=${HIGHLIGHT_STYLE} ${HIGHLIGHT_OPTIONS:-}"
-PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
-OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
-OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
+PYGMENTIZE_STYLE="${PYGMENTIZE_STYLE:-autumn}"
+OPENSCAD_IMGSIZE="${RNGR_OPENSCAD_IMGSIZE:-1000,1000}"
+OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
 
 ## FAIL: git-annex symlinks are resolved and lose extension
 # echo "$FILE_PATH" > /t/hi
@@ -129,7 +129,7 @@ handle_extension() {
             ;;
 
         ## JSON
-        json)
+        json|ipynb)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
@@ -194,6 +194,9 @@ handle_image() {
             # Thumbnail
             vcsi --grid=3x6 --width="${DEFAULT_SIZE%x*}" --metadata-position=hidden \
               --output="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" && exit 6
+            # Get embedded thumbnail
+            ffmpeg -i "${FILE_PATH}" -map 0:v -map -0:V -c copy "${IMAGE_CACHE_PATH}" && exit 6
+            # Get frame 10% into video
             ffmpegthumbnailer -i "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" -s 0 && exit 6
             exit 1;;
 
@@ -256,7 +259,8 @@ handle_image() {
         #     { [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
         #     { [ "$zip" ] && fn=$(zipinfo -1 -- "${FILE_PATH}"); } || return
         #
-        #     fn=$(echo "$fn" | python -c "import sys; import mimetypes as m; \
+        #     fn=$(echo "$fn" | python -c "from __future__ import print_function; \
+        #             import sys; import mimetypes as m; \
         #             [ print(l, end='') for l in sys.stdin if \
         #               (m.guess_type(l[:-1])[0] or '').startswith('image/') ]" |\
         #         sort -V | head -n 1)
@@ -319,6 +323,13 @@ handle_mime() {
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
+        ## E-mails
+        message/rfc822)
+            # ALT: https://github.com/djcb/mu
+            # mu view -- "${FILE_PATH}" && exit 5
+            mshow -nBFN "${FILE_PATH}" && exit 5
+            exit 2;;
+
         ## XLS
         *ms-excel)
             ## Preview as csv conversion
@@ -356,13 +367,6 @@ handle_mime() {
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
 
-        ## Mail
-        message/rfc822)
-            # ALT: https://github.com/djcb/mu
-            # mu view -- "${FILE_PATH}" && exit 5
-            mshow -nBFN "${FILE_PATH}" && exit 5
-            exit 2;;
-
         ## Image
         image/*)
             ## Preview as text conversion
@@ -377,20 +381,22 @@ handle_mime() {
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
 
+        ## ELF files (executables and shared objects)
+        application/x-executable | application/x-pie-executable | application/x-sharedlib)
+            file --dereference --brief -- "${FILE_PATH}"
+            echo
+            readelf -WCa "${FILE_PATH}" && exit 5
+            # DEV: sort symbols in columns: imported (U), exported (T), data (D)
+            nm -n -- "${FILE_PATH}" && exit 4
+            # ALT: ldd
+            # ALT: readelf -dW
+            exit 1;;
+
         ## @amerlyq
         # application/x-sqlite3)
         #   # BUG: even in readonly mode it creates -wal files
         #   sqlite3 "$path" .fullschema .dbinfo .quit && exit 5
         #   ;;
-
-        application/x-executable)
-          file --dereference --brief -- "${FILE_PATH}"
-          echo
-          # DEV: sort symbols in columns: imported (U), exported (T), data (D)
-          nm -n -- "${FILE_PATH}" && exit 4
-          # ALT: ldd
-          # ALT: readelf -dW
-          ;;
 
         application/zip)    preview_archive "$FILE_PATH" "#uzip/"       ;;
         application/gzip)   preview_archive "$FILE_PATH" "#ugz#utar/"   ;;

@@ -14,7 +14,9 @@ fi
 #   https://www.linuxjournal.com/content/without-gui-how-live-entirely-terminal
 
 if distro arch; then
-  pkg_inst ranger  # ALT: hunter (Rust) nnn (C)
+  ## ALT: hunter (Rust) nnn (C)
+  # pkg_inst ranger  # OLD: 1.9.3-3 = 2020-11-12
+  aur_inst ranger-git
   pkg_inst fbida  # framebuffer image viewer for terminal
   # VIZ:(caca) img2txt caca-config cacaclock cacademo cacafire cacaplay cacaserver cacaview
   pkg_inst libcaca  # colour ASCII art library
