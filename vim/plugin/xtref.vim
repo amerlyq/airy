@@ -394,6 +394,7 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 "   => always prints name of file it opens on tag jump
 " [_] TRY: also overload <gf> to open xtref under cursor as if it was "file"
 " BAD:NEED:(sil): suppress "search hit bottom" message and jump immediately
+"   ::: FIXED: [⡡⡂⢡⡾] #xtref FIX pause on jump ::: :set shortmess+=s
 " [_] FIXME: always use "tag" if over xtref SEP function
 nnoremap <silent>  g]  :exe (v:count?v:count."tag":"tjump") xtref#invert(xtref#get(0))<CR>
 xnoremap <silent>  g]  :<C-u>exe (v:count?v:count."tag":"tjump") xtref#invert(xtref#get(1))<CR>

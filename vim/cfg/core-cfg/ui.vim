@@ -37,7 +37,7 @@ let &titlestring = (has('nvim') ? 'neovim' : 'vim') . ':%{expand("%:~")}%m'
 
 
 set novisualbell    " don't flash the screen
-set shortmess=atTIO " No intro msg, etc
+set shortmess=atTIOs " No intro msg, etc FIXED: no hit bottom/top on tagjump
 " set cmdheight=2   " No hit <CR> twice after :make (but lose one view line)
 " If you accidentally hit or and you want to see the displayed text then use
 " |g<|. This only works when 'more' is set.
