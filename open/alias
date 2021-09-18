@@ -5,7 +5,8 @@
 if command -v remake >/dev/null 2>&1; then
   alias m='remake'
 else
-  alias m='make'
+  alias m="make -j$(nproc)"
+  alias m1="make -j1"
 fi
 
 if command -v time >/dev/null 2>&1; then
