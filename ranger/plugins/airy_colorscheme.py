@@ -27,9 +27,12 @@ OLD_HOOK_BEFORE_DRAWING = B.hook_before_drawing
 def new_hook_before_drawing(fsobj, color_list):
     nm = fsobj.basename
     if fsobj.is_link:
-        dst = os.readlink(fsobj.path)
-        if not dst.startswith("/") and ".git/annex/objects/" in dst:
-            color_list.append(CustomKeys.annexed.name)
+        try:
+            dst = os.readlink(fsobj.path)
+            if not dst.startswith("/") and ".git/annex/objects/" in dst:
+                color_list.append(CustomKeys.annexed.name)
+        except FileNotFoundError:
+            pass
     if fsobj.is_file:
         if nm.endswith(".nou"):
             color_list.append(CustomKeys.ext_nou.name)
