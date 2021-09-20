@@ -59,6 +59,7 @@ call dein#add('AndrewRadev/splitjoin.vim', {'lazy': 0,
 
 "" Change textobj and propagate through the buffer {{{1
 " SEE: g:switch_definitions, {b|g}:switch_custom_definitions
+" \ 'rev': 'execute-functions',
 call dein#add('AndrewRadev/switch.vim', {
   \ 'on_func': 'switch#',
   \ 'on_cmd': ['Switch', 'SwitchReverse'],
