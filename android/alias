@@ -1,6 +1,10 @@
 # vim:ft=sh
 
-alias adbd="adb -s \"\$(command adb devices -l|awk '\$3~/^usb:.-.$/{print\$1}')\""
+# c=scrcpy/client:5580  t=tcpip/wifi:5555  d=device/usb/serial
+alias adbc="adb -s \"\$(command adb devices -l|awk '\$1~/^192.168.1./{print\$1}')\""
+alias adbt="adb -s \"\$(command adb devices -l|awk '\$1~/^127.0.0.1:/{print\$1}')\""
+alias adbd="adb -s \"\$(command adb devices -l|awk '\$1~/^usb:.-.$/{print\$1}')\""
+
 alias adbe='adb -s emulator-5554'
 alias adbl='adb devices -l'
 alias adbs='adb shell'
