@@ -193,15 +193,16 @@ myLayout = smartBorders
     . mkToggle (single REFLECTX)
     . boringWindows
     . minimize
-    . onWorkspace "PI" piLayer
+    -- . onWorkspace "PI" piLayer
     -- . onWorkspace "SK" (reflectHoriz skLayer)
     . trackFloating
-    $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| Grid ||| simplestFloat
+    $ tiled ||| TwoPane (1/100) (1/2) ||| Grid
+    -- $ tiled ||| TwoPane (1/100) (1/2) ||| tabi ||| Grid ||| simplestFloat
   where
     piLayer = gridIM (1%7) (ClassName "Pidgin" `And` Role "buddy_list")
     skLayer = gridIM (1%6) (ClassName "Skype" `And` Not (Title "Options") `And` Not (Role "Chats") `And` Not (Role "CallWindowForm"))
     tiled   = ResizableTall nmaster delta ratio [ratio]
-    tabi    = T.tabbedAlways T.shrinkText myTabConfig
+    -- tabi    = T.tabbedAlways T.shrinkText myTabConfig
     nmaster = 1     -- number of windows in master pane
     ratio   = toRational (1.9 / (1 + sqrt 5.0)) -- phi
     delta   = 1/100 -- step of increasing

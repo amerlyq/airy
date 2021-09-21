@@ -65,12 +65,14 @@ call dein#add('AndrewRadev/switch.vim', {
   \ 'on_cmd': ['Switch', 'SwitchReverse'],
   \ 'on_map': [['nx', '<CR>', '<BS>']],
   \ 'hook_source': _hcat('switch.src'),
-  \ 'hook_add': "
-\\n   nnoremap <silent> <Plug>(switch+date) :<C-u>if !switch#Switch()<Bar> call speeddating#increment(v:count1) <Bar>en<CR>
-\\n   nnoremap <silent> <Plug>(switch-date) :<C-u>if !switch#Switch({'reverse': 1})<Bar> call speeddating#increment(-v:count1) <Bar>en<CR>
-\\n   call Map_nxo('<C-a>', '<Plug>(switch+date)', 'n', 2)
-\\n   call Map_nxo('<C-x>', '<Plug>(switch-date)', 'n', 2)
-\"})
+  \})
+"" DISABLED: incrementing date conflicts with switching date <-> xtref
+"   \ 'hook_add': "
+" \\n   nnoremap <silent> <Plug>(switch+date) :<C-u>if !switch#Switch()<Bar> call speeddating#increment(v:count1) <Bar>en<CR>
+" \\n   nnoremap <silent> <Plug>(switch-date) :<C-u>if !switch#Switch({'reverse': 1})<Bar> call speeddating#increment(-v:count1) <Bar>en<CR>
+" \\n   call Map_nxo('<C-a>', '<Plug>(switch+date)', 'n', 2)
+" \\n   call Map_nxo('<C-x>', '<Plug>(switch-date)', 'n', 2)
+" \"})
 
 
 

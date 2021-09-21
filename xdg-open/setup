@@ -12,7 +12,7 @@ source ~/.shell/func.d/cfgsetup
   && [[ -f ~/.config/mimeapps.list ]] \
   && diff -q ~/.config/mimeapps.list mimeapps.list &>/dev/null \
   && rm ~/.config/mimeapps.list
-linkcp -t ~/.config -- mimeapps.list
+linkcp -ct ~/.config -- mimeapps.list
 # linkcp -t ~/.local/share/applications -- mimeapps.list
 
 
