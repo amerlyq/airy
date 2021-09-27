@@ -2,6 +2,8 @@
 " DISABLED:ALT: 'on_map': [['n', '-', '+']], and use -/+ to switch
 let g:switch_mapping = '<CR>'
 let g:switch_reverse_mapping = '<BS>'
+" let g:switch_find_smallest_match = 0
+" let g:switch_no_builtins = 1
 
 autocmd FileType conf let b:switch_custom_definitions = [
   \ {'\<yes\>': 'no', '\<no\>': 'yes'},
