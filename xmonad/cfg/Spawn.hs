@@ -28,9 +28,9 @@ main = concat
     -- DFL: temp dir "/t" for sh VIZ: catalogue "/@" for fm
     -- MAYBE:BET: /t -> /@ to have immediate access to all features
     [ ("<Space>", "env --chdir=/t r.t")
-    , ("<Return>", "env --chdir=/@ r.t r.ranger")
+    , ("<Return>", "env --chdir=/@ r.t -e r.ranger -y")
     , ("C-<Space>", "env --chdir=/t r.t -M")  -- WARNING: if broken >> HW problem
-    , ("C-<Return>", "env --chdir=/@ r.t -M r.ranger")
+    , ("C-<Return>", "env --chdir=/@ r.t r.ranger")
     , ("M1-<Space>", "r.wm-run-xcwd r.t")
     , ("u" , "r.b")
     -- "r.b" open on new empty wksp

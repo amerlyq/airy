@@ -22,6 +22,12 @@ export RANGER_TMPDIR=${TMPDIR:-/tmp}/ranger
 # FIXED: launch even inside terms w/o color support
 # export TERM=xterm-256color
 
+
+# NOTE:OPT: jump to path from clipboard
+if [[ "$*" == -y ]]; then shift
+  [[ -e $(xco) ]] && set -- "$(xco)"
+fi
+
 # TERMCMD -- for rifle when open_with -t'
 # .._RC -- speed up ranger start time
 # TODO:(termcmd) if inside tmux -- use 'tmux new-window', etc
@@ -34,7 +40,10 @@ RANGER_LOAD_DEFAULT_RC=FALSE \
 # after ranger quits. To undo the effect of this function,
 # you can type "cd -" to return to the original directory.
 
-_ranger_cd(){ local d f=$RANGER_TMPDIR/cwd
-  [[ -s $f ]] && d=$(<"$f")
-  [[ ! -d ${d-} || $d == $PWD ]] || builtin cd -- "$d"
-}; _ranger_cd
+# HACK: script is being sourced
+if (return 0 2>/dev/null); then
+  _ranger_cd(){ local d f=$RANGER_TMPDIR/cwd
+    [[ -s $f ]] && d=$(<"$f")
+    if [[ -d ${d-} && $d != "$PWD" ]]; then builtin cd -- "$d" || return; fi
+  }; _ranger_cd
+fi

@@ -1025,6 +1025,7 @@ c.content.notifications.enabled = False  # @me: "ask" is infuriating on Reddit
 ##   - false
 ##   - ask
 # c.content.register_protocol_handler = 'ask'
+c.content.register_protocol_handler = False  # @me: "ask" is infuriating on Gmail
 
 ## Enable quirks (such as faked user agent headers) needed to get
 ## specific sites to work properly.
