@@ -23,6 +23,11 @@ let g:airline#extensions#tabline#buffer_min_count = (argc()<2 ? 2 : 0)
 " let g:airline#extensions#tabline#tab_min_count = 2
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
+
+" NOTE:(modified defaults): remove :term "!" prefix to show @/todo/!today buffer
+let g:airline#extensions#tabline#ignore_bufadd_pat =
+  \ 'defx|gundo|nerd_tree|startify|tagbar|term://|undotree|vimfiler'
+
 "" GIT signify + fugitive, gitgutter, etc
 ""Maybe it will reduce CPU load, not showing which lines are chaged
 " let g:airline#extensions#hunks#enabled=0

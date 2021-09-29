@@ -7,6 +7,7 @@ import XMonad.Util.NamedScratchpad  (NamedScratchpad(NS), nonFloating, defaultFl
 
 term s c = NS s ("r.t -n " ++ s ++ " -e " ++ c) (appName =? s)
 vim s a = term s ("$EDITOR " ++ a)
+ranger s a = term s ("r.ranger -L " ++ a)
 
 myScratchpads :: [NamedScratchpad]
 myScratchpads =
@@ -26,7 +27,7 @@ myScratchpads =
   , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
   -- import System.Directory             (canonicalizePath)
   -- , canonicalizePath "/@/todo/!today" >>= \f -> vim "daily" f nonFloating
-  , vim "daily" "/@/todo/!today" nonFloating
+  , ranger "daily" "/@/todo/!today" nonFloating
   ]
   where
     bottom_l14b3 = customFloating $ RationalRect 0 (2/3) (1/4) (1/3)

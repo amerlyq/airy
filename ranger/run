@@ -24,9 +24,8 @@ export RANGER_TMPDIR=${TMPDIR:-/tmp}/ranger
 
 
 # NOTE:OPT: jump to path from clipboard
-if [[ "$*" == -y ]]; then shift
-  [[ -e $(xco) ]] && set -- "$(xco)"
-fi
+[[ "$1" == -y ]] && shift && [[ -e $(xco) ]] && set -- "$@" "$(xco)"
+[[ "$1" == -L ]] && shift && set -- "$(realpath "$1")"
 
 # TERMCMD -- for rifle when open_with -t'
 # .._RC -- speed up ranger start time
