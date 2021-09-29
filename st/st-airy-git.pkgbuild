@@ -11,7 +11,7 @@ depends=('libx11' 'libxft' 'libxrender' 'libxrandr' 'fontconfig' 'freetype2')
 makedepends=('ncurses' 'libxext' 'git')
 epoch=1
 
-source=('git://git.suckless.org/st#commit=fa253f0'
+source=('git://git.suckless.org/st#commit=2f6e597'
   st-no_bold_colors-0.8.1.diff
   st-solarized-both-0.8.4.diff
   st-alpha-0.8.2.diff
@@ -25,6 +25,9 @@ source=('git://git.suckless.org/st#commit=fa253f0'
   st-visualbell2-basic-2020-05-13-045a0fa.diff
   st-visualbell2-enhanced-2020-05-13-045a0fa.diff
   st-ligatures-boxdraw-20200430-0.8.3.diff
+  # st-csi_22_23-0.8.4.diff
+  # st-osc10-20210106-4ef0cbd.diff
+  st-undercurl-0.8.4-20210822.diff
   my-config-0.8.4.diff
 )
 # sha256sums=(SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP)
@@ -70,7 +73,7 @@ prepare() { local f
   done
 
   #%ONELINE: $ sed -ri '/char\s\*font\b/s/"[^"]+"/"monospace-12"/g' config.def.h
-  [[ -z ${FONT_ST-} ]] || sed -ri '/^char \*font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
+  [[ -z ${FONT_ST-} ]] || sed -ri '/^static char \*font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
 
   ## SKIP terminfo: /usr/share/terminfo/s/st is owned by ncurses 6.0-4
   sed -i '/\@tic\s/d' Makefile
