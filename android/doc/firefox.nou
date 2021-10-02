@@ -70,7 +70,29 @@ Firefox bookmarks
       * Inspector: navigate to /html/body/table/tbody/tr[3]/td[1]
         << copy profile name XXXXXXXX=o2kz09s3.default
       * FAIL:(Address): try to fetch file:///data/data/org.mozilla.firefox/files/mozilla/o2kz09s3.default/storage-sync.sqlite
-      * FAIL:(Console): REPL ⦅js⦆ var xmlhttp = new XMLHttpRequest(); open("GET", "storage-sync.sqlite", true); xmlhttp.responseType = "arraybuffer"; xmlhttp.send();
+      * FAIL:(Console): REPL ⌇⡡⡘⡒⣼
+        Floating Octothorpe: Receiving files over HTTP with Python ⌇⡡⡘⡒⣚
+          https://floatingoctothorpe.uk/2017/receiving-files-over-http-with-python.html
+        ⦅js⦆ var xmlhttp = new XMLHttpRequest(); xmlhttp.open("GET", "storage-sync.sqlite", true); xmlhttp.responseType = "arraybuffer"; xmlhttp.send();
+        $ cd /t && ipython srv.py
+        ::python
+          from http.server import BaseHTTPRequestHandler, HTTPServer
+          class FileReceiveHandler(BaseHTTPRequestHandler):
+              def do_POST(self):
+                  with open(self.path.lstrip("/"), "wb") as f:
+                      f.write(self.rfile.read(int(self.headers["Content-Length"])))
+          HTTPServer(("", 8888), FileReceiveHandler).serve_forever()
+
+        ::js
+          var fx = new XMLHttpRequest();
+          fx.onreadystatechange = function() {
+              var sx = new XMLHttpRequest();
+              sx.open("POST", "http://localhost:8888/db", true);
+              sx.send(fx.response);
+          }
+          fx.open("GET", "webappsstore.sqlite", true);
+          fx.responseType = "arraybuffer";
+          fx.send();
       * FAIL:(Inspector): edit <input type="file">
   ALT: sync BAD: last day on #andr is not synced even after "Now"
     [_] DEBUG: use "about:sync-log" in the Firefox URL bar to get a list of logs related to Firefox Sync.
@@ -135,3 +157,5 @@ ALT: local sync server
       https://support.mozilla.org/en-US/questions/1192040
   […] https://chat.mozilla.org/#/room/%23sync:mozilla.org ⌇⡠⢌⠶⢦
     TRY: https://addons.mozilla.org/en-US/firefox/addon/about-sync/
+  [_] Expanded extension support in Firefox for Android Nightly | Mozilla Add-ons Community Blog ⌇⡡⡘⠴⣼
+    https://blog.mozilla.org/addons/2020/09/29/expanded-extension-support-in-firefox-for-android-nightly/
