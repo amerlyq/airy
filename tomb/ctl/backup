@@ -248,10 +248,13 @@ function SyncRepos {  local r
       #   error: failed to push some refs to 'ssh://rmt/data/repo'
       ##  ::: FIXED:WKRND: use !gas on remote system and then !gas again on local -- to sync "master" changes by pulling
       if [[ -d $r/.git/annex/objects ]]; then
+        # WARN:SECU:(ghub/wkme): annexed repos are pushed everywhere at once
         git ${=_annex} annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --no-pull --push
       else
-        git push $(has v&&echo --verbose) --atomic --all
-        git push $(has v&&echo --verbose) --atomic --tags
+        # NOTE: push non-annex repos only to "aura"
+        #   << WKRND pushing @/just and @/beatrix to glab during !r.tomb-backup
+        git push $(has v&&echo --verbose) --atomic --all "$rmt"
+        git push $(has v&&echo --verbose) --atomic --tags "$rmt"
       fi
 
       r.git-status $r
