@@ -19,6 +19,11 @@ ControlPersist 600
 # [_] FIND: must it be global or in "Host *" section ?
 IdentitiesOnly yes
 
+# SECU: disable fallback to password
+#   HACK:TEMP: $ ssh -o PasswordAuthentication=yes ...
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PreferredAuthentications publickey,password
 
 Host *
     SendEnv !LANG !LC_*
