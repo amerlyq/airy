@@ -24,3 +24,25 @@ Regrouping commits
     : squash 3ead26f rm classpath from git
     : pick a7323e5 README Junkyism
   Then change it's commit message in editor
+
+
+
+[⡡⡜⡙⠠] 1h LORE: idiom $ git push . HEAD:foo
+  https://github.com/git-lfs/git-lfs/issues/2164#issuecomment-423716663
+    gerrit - What does "git push . HEAD:refs/for/foo" do? - Stack Overflow ⌇⡡⡜⡙⠹
+      https://stackoverflow.com/questions/12918666/what-does-git-push-headrefs-for-foo-do
+      == create branch-like ref to HEAD
+
+
+ALSO:HACK: отредактировать коммит в середине ветки ⌇⡟⣍⡅⠲
+  (или вообще его удалить, или наоборот добавить какой-то левый)
+  $ git checkout <id-dst>
+  $ edit
+  $ git commit -a --amend
+  $ git rebase --onto HEAD <id-dst> mybranch
+  ---
+  $ git-rebase --onto mybranch~5 mybranch~2 mybranch
+  ---
+  $ git cherry-pick --no-commit <id-src>
+  $ git commit --amend
+  $ git rebase --onto HEAD <id-first>^ <id-last>
