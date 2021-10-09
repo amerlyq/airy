@@ -642,6 +642,7 @@ c.completion.cmd_history_max_items = 1000  # @me
 ## regenerated on the next start, which will take a short while.
 ## Type: List of UrlPattern
 # c.completion.web_history.exclude = []
+# c.completion.web_history.exclude = ["teams.microsoft.com"]
 
 ## Number of URLs to show in the web history. 0: no history / -1:
 ## unlimited
