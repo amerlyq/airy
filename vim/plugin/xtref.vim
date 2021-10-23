@@ -29,7 +29,7 @@ let s:r_z85 = '[-0-9a-zA-Z.:+=^!/*?&<>()\[\]{}@%$#]{5}'
 let s:r_brchr = '\u2800-\u28FF'
 let s:r_bryes = '['.s:r_brchr.']'
 let s:r_brnot = '[^'.s:r_brchr.']'
-let s:r_braille = s:r_bryes . '{4}'
+let s:r_braille = s:r_bryes . '{2,4}'
 let g:xtref.r_addr = '('. s:r_z85 .'|'. s:r_braille .')'
 " IDEA: allow xtref free format in brackets ※[so me] instead of time-format
 "  ALT: use completely different braces
