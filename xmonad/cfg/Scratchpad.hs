@@ -26,8 +26,8 @@ myScratchpads =
   [ vim "lyrics" "~/aura/lyfa/lists/music/anime.nou" nonFloating
   , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
   -- import System.Directory             (canonicalizePath)
-  -- , canonicalizePath "/@/todo/!today" >>= \f -> vim "daily" f nonFloating
-  , ranger "daily" "/@/todo/!today" nonFloating
+  -- , canonicalizePath "/@/todo/log/!today" >>= \f -> vim "daily" f nonFloating
+  , ranger "daily" "/@/todo/log/!today" nonFloating
   ]
   where
     bottom_l14b3 = customFloating $ RationalRect 0 (2/3) (1/4) (1/3)
