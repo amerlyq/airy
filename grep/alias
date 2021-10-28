@@ -12,6 +12,8 @@
 alias g.="rg --pcre2 -g '!build/' -g '!_build*' -g '!/out/' -g '!/libs/' -g '!tags' -g '!.snapshots/' -g '!=/'"
 
 alias g='g. --regexp'
+alias gg='g "$(xco)" --column'
+
 alias g\?='rg --type-list'
 alias g%='rg --passthru'  # colorize-only OR --regexp '^|match'
 # ALT: alias ag='command ag --smart-case --group'  # DFL:(group): pipe into 'less' BAD(--all-text): skips '--ignore'
