@@ -58,6 +58,7 @@ call dein#add('davidhalter/jedi-vim', {
 
 
 "" [Colorize]
+" TRY:ALT: https://github.com/nvim-treesitter/nvim-treesitter
 " FIXED:ERR: lost hi on write SRC https://github.com/numirias/semshi/issues/54
 "   BAD: hi disappears on async complete, not on the write
 "   FIXED: chain highlight after auto-fix by ALE (e.g. from "!black")

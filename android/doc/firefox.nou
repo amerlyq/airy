@@ -84,15 +84,19 @@ Firefox bookmarks
           HTTPServer(("", 8888), FileReceiveHandler).serve_forever()
 
         ::js
-          var fx = new XMLHttpRequest();
-          fx.onreadystatechange = function() {
-              var sx = new XMLHttpRequest();
-              sx.open("POST", "http://localhost:8888/db", true);
-              sx.send(fx.response);
-          }
-          fx.open("GET", "webappsstore.sqlite", true);
-          fx.responseType = "arraybuffer";
-          fx.send();
+          # file:///data/data/org.mozilla.fennec_fdroid/databases/
+          ['tab_collections', 'tab_collections-wal', 'tab_collections-shm'
+          ].forEach(fname => {
+            var fx = new XMLHttpRequest();
+            fx.onreadystatechange = function() {
+                var sx = new XMLHttpRequest();
+                sx.open("POST", "http://localhost:8888/" + fname, true);
+                sx.send(fx.response);
+            }
+            fx.open("GET", fname, true);
+            fx.responseType = "arraybuffer";
+            fx.send();
+          });
       * FAIL:(Inspector): edit <input type="file">
   ALT: sync BAD: last day on #andr is not synced even after "Now"
     [_] DEBUG: use "about:sync-log" in the Firefox URL bar to get a list of logs related to Firefox Sync.
