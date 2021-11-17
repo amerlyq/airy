@@ -74,8 +74,8 @@ endf
 
 " Operator mappings
 nnoremap <leader>y "+y
-nnoremap <leader>p "+p
-nnoremap <leader>P "+P
+nnoremap [Frame]p "+p
+nnoremap [Frame]P "+P
 nnoremap g<leader>p  :put +<CR>
 nnoremap g<leader>P  :put!+<CR>
 " DISABLED:[unused] Send shizzle to the black hole (Remove)
@@ -130,8 +130,8 @@ nnoremap <leader>? :<C-U>call <SID>putslash('\V'.@+)<CR>?<CR>
 " SEE: https://github.com/mutewinter/UnconditionalPaste
 nnoremap <silent><unique>  [Frame]t  :RegConvert<CR>
 " Force in-line
-nnoremap <silent><unique>  [Frame]p  :RegConvert b<CR>p
-nnoremap <silent><unique>  [Frame]P  :RegConvert b<CR>P
+nnoremap <silent><unique>  <Leader>p  :RegConvert b<CR>p
+nnoremap <silent><unique>  <Leader>P  :RegConvert b<CR>P
 
 command! -bar -range=0 -bang -nargs=?  RegConvert
     \ call s:RegConvert(<bang>0, <q-args>)

@@ -54,9 +54,11 @@ alias gpCD='gpD $(git-branch-current 2>/dev/null)'
 
 # Additional
 alias gs-='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
-alias ga='git add --all'
+ga(){ git add --all "${@:-.}"; }
+# alias ga='git add --all'
 # alias ga='git add --all $(test -e $PWD/.git || print -- .)'
-alias ga.='ga .'
+alias gaa='git add --all'
+alias ga.='gaa .'
 alias giU='giu --patch'
 alias gcff='git commit --fixup'
 gcfd(){ local d; d=$(date -Rd "$1"); GIT_COMMITTER_DATE="$d" git commit --amend --date="$d" --reuse-message HEAD; }
