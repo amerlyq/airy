@@ -2,6 +2,7 @@
 
 alias sshx='ssh -O exit'
 alias sshl='ls -la ${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-*'
+alias sshp='ssh -o PasswordAuthentication=yes'
 
 # ALT: scp must be double-escaped due to shell expansion on both client and host
 #   ls X{} scp "{}" host:"~/'{}'"
