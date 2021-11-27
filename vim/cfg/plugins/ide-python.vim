@@ -7,6 +7,7 @@ call dein#add('hynek/vim-python-pep8-indent', {
 
 "" [Syntax] (async linting) https://github.com/dense-analysis/ale
 " DFL: ['flake8', 'mypy', 'pylint', 'pyright']
+"   NICE:(pyright):PERF=5x(mypy) BUT:BAD:DEP=nodejs
 " VIZ:linters: ['bandit', 'flake8', 'jedils', 'mypy', 'prospector', 'pycodestyle', 'pydocstyle', 'pyflakes', 'pylama', 'pylint', 'pyls', 'pyre', 'pyright', 'vulture']
 " VIZ:fixers: ['autoimport', ...
 " ALSO: 'javascript': ['eslint'],
@@ -22,8 +23,10 @@ call dein#add('dense-analysis/ale', {
   \ 'on_cmd': ['ALEInfo', 'ALEFix'],
   \ 'hook_source': "
 \\n   let g:ale_linters_explicit = 1
-\\n   let g:ale_linters = { 'python': ['flake8', 'pylint'] }
+\\n   let g:ale_linters = { 'python': ['flake8', 'mypy', 'pylint'] }
 \\n   let g:ale_python_pylint_options = '--disable=C0103,C0111,W0511'
+\\n   let g:ale_python_mypy_ignore_invalid_syntax = 1
+\\n   let g:ale_python_mypy_options = ''
 \\n
 \\n   let g:ale_fixers = { 'python': ['isort', 'black'] }
 \\n   let g:ale_fix_on_save = 1
