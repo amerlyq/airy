@@ -7,6 +7,16 @@
 " SEE: http://www.ibm.com/developerworks/library/l-vim-script-2/
 " MUST SEE: https://github.com/svermeulen/vim-easyclip
 
+
+" Highlight Yanked Region in Nvim/Vim - jdhao's blog ⌇⡡⢨⠆⡲
+"   https://jdhao.github.io/2020/05/22/highlight_yank_region_nvim/
+augroup TextYank
+  autocmd!
+  au TextYankPost * silent! lua vim.highlight.on_yank{higroup="TextYank", timeout=130}
+  au ColorScheme * highlight TextYank term=reverse cterm=reverse gui=reverse
+augroup END
+
+
 """ Helpers
 function! CountLinesInRegister(reg, msg)
   let l = split(getreg(a:reg), '^.\{-}\zs\n', 1)  " -- w/o,  '\n\zs' -- with
