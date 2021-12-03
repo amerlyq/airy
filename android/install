@@ -5,7 +5,13 @@ if distro arch; then
   # DEV:rm: android-tools
   pkg_inst android-tools
   pkg_inst android-udev
-  aur_inst jmtpfs
+  # DISABLED: aur_inst jmtpfs
+  # BET:ALT: adbfs-rootless-git && adb-sync-git
+  #   ALSO:DEV: logcat-color
+  # SRC: Android Debug Bridge - ArchWiki ⌇⡡⢪⢀⢉
+  #   https://wiki.archlinux.org/title/Android_Debug_Bridge
+  # NEED: $ adbfs /media/andr
+  aur_inst adbfs-rootless-git
 
   # NEED:(F-Droid): kdeconnect
   pkg_inst kdeconnect
