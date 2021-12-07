@@ -1,5 +1,13 @@
 let g:deoplete#enable_at_startup = 1
 
+
+" FIXED: ugly hack to enable autocompletion back
+call deoplete#custom#option({
+    \ 'auto_complete_popup': 'auto',
+    \ })
+call deoplete#enable()
+
+
 " set completeopt+=noinsert
 function! s:check_back_space() "{{{
   let col = col('.') - 1
