@@ -38,7 +38,9 @@ autocmd MyAutoCmd VimEnter * nested call dein#call_hook('post_source')
 "   not call it after change 'runtimepath' dynamically.
 " ATTENTION: recache by 'call dein#clear_state()'
 " if dein#load_state(s:dein)| let &rtp = s:rtp |else| finish |en
+" NOTE:(non-lazy): call dein#call_hook('source')
 if !dein#load_state(s:dein)| finish |en
+" call dein#clear_state()
 
 
 fun! _hcat(nm)
@@ -67,6 +69,7 @@ call dein#local(expand('/@/aura'),
   \ {'frozen': 1, 'merged': 0}, ['*.vim', 'vim*', 'unite-*'])
 
 call dein#end()  " Recaches runtimepath
+" NOTE:(non-lazy): call dein#call_hook('source')
 call dein#save_state()
 
 

@@ -96,14 +96,18 @@ call dein#add('kopischke/vim-fetch')
 " EXPL:(non-lazy) always watch over Buf*au for save/restore state
 " \ 'on_cmd': ['CleanViewdir', 'StayReload']
 " ALT: tpope/vim-obsession
-call dein#add('kopischke/vim-stay', {'lazy': 0,
-  \ 'hook_add': "
-\\n   augroup stay_no_lcd
-\\n     autocmd!
-\\n     autocmd User BufStaySavePre  if haslocaldir() | let w:lcd = getcwd() | cd - | cd - | endif
-\\n     autocmd User BufStaySavePost if exists('w:lcd') | execute 'lcd' fnameescape(w:lcd) | unlet w:lcd | endif
-\\n   augroup END
-\"})
+call dein#add('zhimsel/vim-stay', {'lazy': 0})
+
+" ERR: Error detected while processing User Autocommands for "BufStaySavePre":
+"   E186: No previous directory
+" call dein#add('zhimsel/vim-stay', {'lazy': 0,
+"   \ 'hook_add': "
+" \\n   augroup stay_no_lcd
+" \\n     autocmd!
+" \\n     autocmd User BufStaySavePre  if haslocaldir() | let w:lcd = getcwd() | cd - | cd - | endif
+" \\n     autocmd User BufStaySavePost if exists('w:lcd') | execute 'lcd' fnameescape(w:lcd) | unlet w:lcd | endif
+" \\n   augroup END
+" \"})
 " HACK:(stay_no_lcd): prevent :lcd from saving into view
 "   https://github.com/kopischke/vim-stay/issues/11
 " set viewoptions=cursor,folds,slash,unix   " Recommended

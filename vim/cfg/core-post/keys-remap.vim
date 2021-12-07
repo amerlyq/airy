@@ -4,8 +4,10 @@
 inoremap <unique> ,s <Esc>:update<CR>
 
 " Be consistent with C and D which reach the end of line
-if empty(maparg('Y','n'))| exe 'nnoremap <unique> Y y$' |en
-if empty(maparg('Y','v'))| exe 'vnoremap <unique> Y y$' |en
+" DISABLED:SEE:(neovim): same *default-mappings*
+" if empty(maparg('Y','n'))| exe 'nnoremap <unique> Y y$' |en
+" if empty(maparg('Y','v'))| exe 'vnoremap <unique> Y y$' |en
+
 " Cycle through *.h/*.cpp
 if empty(maparg('[f','n'))
   nnoremap <unique> [f :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
@@ -32,9 +34,11 @@ nnoremap ]P  :<C-u>exe 'put!'. v:register<CR>
 " Instead of whole line indention
 inoremap <unique> <C-t>  <C-v><TAB>
 " inoremap <C-d>  <Del>  DONE by vim-rsi
+
 " Enable undo for <C-w> and <C-u>.
-inoremap <unique> <C-w>  <C-g>u<C-w>
-inoremap <unique> <C-u>  <C-g>u<C-u>
+" DISABLED:SEE:(neovim): same *default-mappings*
+" inoremap <unique> <C-u>  <C-g>u<C-u>
+" inoremap <unique> <C-w>  <C-g>u<C-w>
 
 cnoremap <unique> <C-k> <C-\>e getcmdpos() == 1 ?
       \ '' : getcmdline()[:getcmdpos()-2]<CR>

@@ -11,7 +11,10 @@ set wrapscan    " Searches wrap around the end of the file.
 "" Make <C-L> (redraw screen) and turn off search highlighting until the next
 "" search,  http://vim.wikia.com/wiki/Example_vimrc
 nnoremap <unique> [Toggle]H :setl hlsearch! hls?<CR>
-nnoremap <unique> <C-l> :nohlsearch<CR><C-l>
+
+" FAIL:(<unique>): somehow I can't disable GoldenView.vim mappings by dein.vim
+" DISABLED:SEE:(neovim): same *default-mappings*
+" nnoremap <unique> <C-l> :nohlsearch<CR><C-l>
 
 " Amazing custom search command. Thansk to Ingo: http://stackoverflow.com/a/24818933/1147859
 command! -nargs=+ Se execute 'vimgrep /' . [<f-args>][0] . '/ **/*.' . [<f-args>][1]
