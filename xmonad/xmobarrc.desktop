@@ -39,12 +39,6 @@ Config {
 --             \%mpd%\
 --           \</action></action></action></action></fn>\
 
---     \<action=`r.audio 1$'\x25'+` button=4>\
---       \<action=`r.audio 1$'\x25'-` button=5>\
---         \<action=`r.audio` button=1>\
---           \ %default:Master%\
---         \</action></action></action>\
-
 --  \<fc=#cc00cc>  </fc>\
 --    \<action=`r.xkb-lang 0` button=3>\
 --      \<action=`r.xkb-lang +` button=1>\
@@ -61,6 +55,11 @@ Config {
   \%wacom%\
   \<fc=#00cc00>  </fc>\
     \%dynnetwork%\
+    \<action=`r.audio 1$'\x25'+` button=4>\
+      \<action=`r.audio 1$'\x25'-` button=5>\
+        \<action=`r.audio` button=1>\
+          \ %default:Master%\
+        \</action></action></action>\
   \<fc=#0080cc>  </fc>\
     \%date% "
 , commands =
@@ -79,13 +78,13 @@ Config {
   [ "-t", "<fc=#00ff00>↓</fc><rx>K <fc=#ff4400>↑</fc><tx>K"
   , "-H", "128000", "-h", "#ff5995"
   , "-n", "#a0a0a0", "-m", "3" ] 10
--- , Run Volume "default" "Master"
---   [ "-t", "<status> <volume>%"
---   , "-L", "20", "-l", "#b6e354"
---   , "-H", "60", "-h", "#dd6600"
---   , "-n", "#ddffff", "-w2", "--"
---   , "-O", "♪", "-C", "#00dd00"
---   , "-o", "⎋", "-c", "#dd0000" ] 5
+, Run Volume "default" "Master"
+  [ "-t", "<status> <volume>%"
+  , "-L", "20", "-l", "#b6e354"
+  , "-H", "60", "-h", "#dd6600"
+  , "-n", "#ddffff", "-w2", "--"
+  , "-O", "♪", "-C", "#00dd00"
+  , "-o", "⎋", "-c", "#dd0000" ] 5
 -- , Run MPD  -- TRY: '[[%artist% - ]%title%]|[%name%]|[%file%]'
 --   [ "-t", "<fc=#b6b3a4><artist> (<lapsed>/<length>) <title> <statei> <ppos>/<plength></fc>"
 --   , "-M", "60", "--", "-P", "▶", "-Z", "∥", "-S", "◾"

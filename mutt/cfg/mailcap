@@ -6,7 +6,7 @@
 ## HTML
 #text/html; vimprobtab.sh %s &; test=test -n "$DISPLAY"; needsterminal;
 text/html; t="${TMPDIR:-/tmp}/mutt" \; mkdir -p "$t" \; cp -ft "$t" %s \; r.b "$t/$(basename %s)" &; test=test -n "$DISPLAY"; nametemplate=%s.html
-text/html; r.bt -d; copiousoutput; nametemplate=%s.html
+text/html; elinks -dump-width 200 -dump 1 -default-mime-type text/html; copiousoutput; nametemplate=%s.html
 # text/html; lynx -assume_charset=%{charset} -display_charset=utf-8 -dump %s; nametemplate=%s.html; copiousoutput
 # text/html; w3m -I %{charset} -T text/html; copiousoutput; nametemplate=%s.html
 # text/html; elinks -dump %s ; copiousoutput

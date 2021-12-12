@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+#%SUMMARY: show log kernel errors
+#%USAGE: $ ./$0
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
+
+journalctl -b -p5 --follow | grep --line-buffered -E -v \
+  -e 'kernel: audit:\s' \
+  -e 'kernel: kauditd_printk_skb:' \
+  -e 'fractal sudo\['
