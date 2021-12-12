@@ -20,6 +20,9 @@
     #       non-spaces (good for detecting operators)
     submodule = log
     mnemonicprefix = true  # (a/b => i/w): Index, Worktree, Commit, Object
+    ## BAD: not enough for :/key/* reindented and distributed tasks
+    # colorMovedWS = allow-indentation-change
+    colorMovedWS = ignore-all-space
 [difftool]
     # http://jeetworks.org/setting-up-git-to-use-your-diff-viewer-or-editor-of-choice/
     cmd = meld $LOCAL $REMOTE
