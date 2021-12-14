@@ -2366,6 +2366,7 @@ config.bind("y#", 'spawn --userscript yank_nou "# "')
 config.bind("y[", 'spawn --userscript yank_nou "" "[_] "')
 config.bind("y]", 'spawn --userscript yank_nou "# " "[_] "')
 # config.bind('yy', 'yank')
+config.bind("zz", "zoom 52%")
 # config.bind('{{', 'navigate prev -t')
 # config.bind('}}', 'navigate next -t')
 
