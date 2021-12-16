@@ -81,7 +81,7 @@ __timer_stop() {
     unset __timer_stamp
 }
 trap '__timer_start' DEBUG
-PROMPT_COMMAND='__timer_stop'
+PROMPT_COMMAND="__timer_stop; ${PROMPT_COMMAND-}"
 
 
 # ALT prompt for logging -- allow copying bash history as valid scripts!!!

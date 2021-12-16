@@ -18,6 +18,9 @@ HISTCONTROL=ignoreboth
 # append to the history file, don't overwrite it
 shopt -s histappend
 
+# SRC: https://askubuntu.com/questions/67283/is-it-possible-to-make-writing-to-bash-history-immediate
+PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND-}"
+
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=10000
 HISTFILESIZE=10000
