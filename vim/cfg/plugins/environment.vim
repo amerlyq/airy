@@ -56,12 +56,13 @@ call dein#add('airblade/vim-rooter', {
 "" Switch between alternative files [c,cpp,cxx,cc] <-> [h,hpp] {{{1
 " EXPL:(no <unique>) overrides my STD 'cycle through'
 call dein#add('kana/vim-altr', {
-  \ 'on_func': 'altr#',
+  \ 'on_func': ['altr#', 'altr#define'],
   \ 'on_map': [['nvoic', '<Plug>']],
   \ 'hook_source': "
 \\n   call altr#define('%/src/%.c', '%/inc/%.h')
 \\n   call altr#define('%/source/%.cpp', '%/include/%.hpp', '%/include/%.h')
 \\n   call altr#define('%/src/%.cpp', '%/inc/%.h', '%/t/%_test.cpp')
+\\n   call altr#define(['%/key/%', '%/log/%', '%/key/*/%', '%/log/*/%'])
 \", 'hook_add': "
 \\n   nmap <unique> ]f  <Plug>(altr-forward)
 \\n   nmap <unique> [f  <Plug>(altr-back)
