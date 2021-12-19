@@ -11,10 +11,11 @@ dpi=$(r.airy-registry dpi "$(r.xorg -d 2>/dev/null)" 96)
 fw=$(( dpi / 60 ))
 gw=$(( $(r.xorg -w 2>/dev/null||echo 1280) * 2/5 ))
 iw=$(( ( (dpi + 8)/16 + 3)/6 * 16 ))  # BET: 48x48 on LG
+echo "G=$gw F=$fw  I=$iw"
 sed -ri '
-  /^(\s+geometry = ")[0-9]+(x.*)/s//\1'$gw'\2/
+  /^(\s+width = .*)300/s//\1'$gw'/
   /^(\s+frame_width = )[0-9]+/s//\1'$fw'/
-  /^(\s+icon_path = ).*/s/16/'$iw'/g
+  /^(\s+icon_path = ).*/s/48/'$iw'/g
 ' "$dst"
 ## OBSOLETE: font size fixed in latest release
 ## BUG: external monitor -- different dpi
