@@ -73,7 +73,7 @@ call dein#add('chrisbra/vim-diff-enhanced', {
 " FAIL: 'lazy':0 don't load plugin at all
 call dein#add('tyru/open-browser.vim', {
   \ 'on_map': [['nx', '<Plug>(openbrowser-']],
-  \ 'on_cmd': 'OpenBrowserSmartSearch',
+  \ 'on_cmd': ['OpenBrowser', 'OpenBrowserSmartSearch'],
   \ 'hook_source': "
 \\n   let g:openbrowser_no_default_menus = 1
 \\n   let g:openbrowser_force_foreground_after_open = 0

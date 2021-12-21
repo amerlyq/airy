@@ -8,5 +8,5 @@ cfgNo c || git clean -Xdi -- "$PWD"
 ### LINKS ###
 linkcp "$PWD" ~/.config/ranger
 # FIXME: remove "inetutils/hostname" package
-linkcp "/@/items/$(hostname)/ranger/" ~/.local/share/ranger
+linkcp "/@/items/${HOSTNAME:?}/ranger/" ~/.local/share/ranger
 linkcp {,~/.}mime.types
