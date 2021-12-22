@@ -14,6 +14,11 @@ USAGE
       $ mv /foo/bar /foo/bar-bad
     Copy the snapshot directory to the expected sync target.
       $ cp -a /foo/.bar-backup_asd-crashrecovery-20141221_070112 /foo/bar
+  IDEA: manually force sync
+    $ S.rr asd asd-resync
+  CHECK after crash and reboot :: which files in (1) have mtime > than in (2) ※⡡⢱⢫⠋
+    $ r.ramdisk-vim-crash
+    $ (cd /@/xdg_cache/vim && rsync --dry-run --archive --out-format=$'%i %6l  %f' -- .cache-backup_asd-crashrecovery-*/ cache/)
 
 
 TODO:TRY: lift ~/.cache to RAM and persist on exit ⌇⡠⡩⢬⡚
