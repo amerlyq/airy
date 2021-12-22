@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2021 Amerlyq <amerlyq@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+#%SUMMARY: check files modified before crash (absent in last synced state)
+#%WARN: apply immediately after crash/reboot OR you may overwrite newer files by older ones
+#%USAGE: $ ./$0
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
+
+cd /@/xdg_cache/vim
+rsync --dry-run --archive --out-format=$'%i %6l  %f' -- .cache-backup_asd-crashrecovery-*/ cache/
