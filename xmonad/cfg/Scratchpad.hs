@@ -23,8 +23,8 @@ myScratchpads =
     , ("j8", "j8 -c", bottom_l14b3)
     ]
   ] ++
-  [ vim "lyrics" "~/aura/lyfa/lists/music/anime.nou" nonFloating
-  , vim "help" "~/aura/airy/cfg/xorg/xmonad/doc/LIOR.nou" defaultFloating
+  [ vim "lyrics" "/@/lyfa/lists/music/anime.nou" nonFloating
+  , vim "help" "/@/airy/xmonad/doc/LIOR.nou" defaultFloating
   -- import System.Directory             (canonicalizePath)
   -- , canonicalizePath "/@/todo/log/!today" >>= \f -> vim "daily" f nonFloating
   , ranger "daily" "/@/todo/log/!today" nonFloating

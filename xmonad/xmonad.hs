@@ -246,7 +246,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
     in wmhas className lst
   , let lst = "PlayOnLinux Dialog"
     in wmhas appName lst
-  , className =? "Firefox" <&&> appName =? "Download"
+  , className =? "firefox" <&&> appName =? "Download"
   ] <+>
   -- for_window [title="^ElonaPlus"] fullscreen
   mconcat
@@ -287,7 +287,11 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   [ className =? "Pidgin" --> doF (W.shift "PI")
   , className =? "Skype" --> doF (W.shift "SK")
   -- , className =? "Skype Preview" --> doF (W.shift "SK")
-  , className =? "Firefox" --> doF (bring "FF")
+
+  -- WM_WINDOW_ROLE(STRING) = "browser"
+  -- WM_CLASS(STRING) = "Navigator", "firefox"
+  , className =? "firefox" --> doF (bring "b")  -- "FF"
+
   -- , className =? "xmind-2020" --> (\w -> doF (W.sink w)
   -- , ("5", "Krita")
   -- , ("8", "t-engine64")

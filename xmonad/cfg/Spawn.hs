@@ -52,7 +52,7 @@ scratchpad = (concat . (`map` [
   ]) . flip ($) . concat) [
     [ ("M-o", windows $ view "NSP")
     , ("M-S-o", windows $ shift "NSP")
-    , ("f" , runOrRaise "r.firefox" $ className =? "Firefox")
+    , ("f" , runOrRaise "r.firefox" $ className =? "firefox")
     , ("p" , runOrRaise "r.pidgin" $ className =? "Pidgin" <&&> stringProperty "WM_WINDOW_ROLE" =? "buddy_list")
     , ("s" , runOrRaise "skypeforlinux" $ className =? "Skype Preview")
     -- , ("S" , runOrRaise "skype" $ className =? "Skype" <&&> title /=? "Options" <&&> stringProperty "WM_WINDOW_ROLE" /=? "Chats" <&&> stringProperty "WM_WINDOW_ROLE" /=? "CallWindowForm")
