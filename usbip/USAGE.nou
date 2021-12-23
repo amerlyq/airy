@@ -8,16 +8,23 @@ ALT
       -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1,bus=ehci.0,debug=4
     ::: BAD: Android emulator does not link with "libusbredir"
 
+INFO
+  https://www.kernel.org/doc/readme/tools-usb-usbip-README ⌇⡡⣄⠭⡞
+    https://www.kernel.org/doc/readme/tools-usb-usbip-README
 
-LOCAL: init
+
+LOCAL(server): init
   ATT: The device needs to be re-bound again after suspending.
+  $ sudo modprobe usbip_host  # usbip-core.ko usbip-host.ko
   $ usbip list --local
   $ usbip bind -b 7-2
+  # OR: $ S.r usbip-bind@7-4.2.service
   $ sudo ss --listening --tcp --numeric --processes | grep usbip
   $ ssh -O forward -R '3240:localhost:3240' user@host
 
 
-REMOTE: init
+REMOTE(client): init
+  $ sudo modprobe vhci_hcd  # usbip-core.ko vhci-hcd.ko
   $ usbip list -r localhost
   $ sudo usbip attach -r localhost -b 7-2
   $ lsusb
