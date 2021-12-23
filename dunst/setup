@@ -10,12 +10,12 @@ linkcp -c dunstrc "$dst"
 dpi=$(r.airy-registry dpi "$(r.xorg -d 2>/dev/null)" 96)
 fw=$(( dpi / 60 ))
 gw=$(( $(r.xorg -w 2>/dev/null||echo 1280) * 2/5 ))
-iw=$(( ( (dpi + 8)/16 + 3)/6 * 16 ))  # BET: 48x48 on LG
-echo "G=$gw F=$fw  I=$iw"
+iw=$(( ( (dpi + 8)/16 + 3)/4 * 16 ))  # BET: 64x64 on LG
+echo "width=$gw frame=$fw icon=$iw"
 sed -ri '
   /^(\s+width = .*)300/s//\1'$gw'/
   /^(\s+frame_width = )[0-9]+/s//\1'$fw'/
-  /^(\s+icon_path = ).*/s/48/'$iw'/g
+  /^(\s+max_icon_size = )[0-9]+/s//\1'$iw'/
 ' "$dst"
 ## OBSOLETE: font size fixed in latest release
 ## BUG: external monitor -- different dpi
