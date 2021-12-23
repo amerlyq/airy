@@ -1,3 +1,7 @@
+/* SRC: https://wiki.archlinux.org/title/HiDPI#Firefox
+ * NEED:(firefox>=69): about:config
+  toolkit.legacyUserProfileCustomizations.stylesheets = True
+ */
 input:not(.urlbar-input):not(.textbox-input):not(.form-control):not([type='checkbox']) {
     -moz-appearance: none !important;
     background-color: white;
@@ -20,6 +24,7 @@ select {
     color: black;
 }
 
+
 /* ALT:
 button,
 input,
@@ -34,3 +39,16 @@ textarea {
 background-color: white;
 color: black;
 } */
+
+
+/* ALT:(GDK_DPI_SCALE): fontsize
+@namespace url("https://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+// #tabbrowser-tabs, #navigator-toolbox, menuitem, menu, ...
+* {
+    font-size: 15px !important;
+}
+// exception for badge on adblocker
+.toolbarbutton-badge {
+    font-size: 8px !important;
+}
+*/

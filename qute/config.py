@@ -1561,7 +1561,7 @@ c.input.partial_timeout = 0  # @me
 ## with some bitmap fonts. As an alternative to this, it's possible to
 ## set font sizes and the `zoom.default` setting.
 ## Type: Bool
-# c.qt.highdpi = False
+c.qt.highdpi = True  # @me: TRY use everywhere for everyone
 # @me REF: https://github.com/qutebrowser/qutebrowser/issues/4786
 # ALT: run $  ...  -s qt.highdpi true
 

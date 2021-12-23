@@ -14,12 +14,12 @@ has_pr X || die
 
 
 ### LINKS ###
-linkcp {,~/.}pentadactylrc
+# linkcp {,~/.}pentadactylrc
 linkcp {,~/.}pterosaurrc
 
 # ALT: $ GTK_THEME=Adwaita:light firefox %u
-dst=~/.mozilla/firefox/profiles.ini
-if [[ -f $dst ]]; then
-  mprf=$(sed -rn '/Path=(.*)/s//\1/p' "$dst")
-  linkcp -t ~/.mozilla/firefox/"$mprf/chrome" userContent.css
-fi
+# dst=~/.mozilla/firefox/profiles.ini
+# if [[ -f $dst ]]; then
+#   mprf=$(sed -rn '/Path=(.*)/s//\1/p' "$dst")
+#   linkcp -t ~/.mozilla/firefox/"$mprf/chrome" userContent.css
+# fi
