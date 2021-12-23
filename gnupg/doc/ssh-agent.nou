@@ -1,0 +1,15 @@
+
+[⡡⣄⢪⢰] 25m gnupg change SSH key password
+  [$] https://opensource.com/article/19/4/gpg-subkeys-ssh-multiples
+  [$] https://serverfault.com/questions/346958/how-do-i-import-a-rsa-ssh-key-into-gpg-as-the-primary-private-key
+  [⡡⣄⢪⢣] Меняем ssh-agent на gpg-agent — Expertus metuit ⌇⡡⣄⠰⠵
+    https://blog.regolit.com/2017/12/13/replacing-ssh-agent-with-gpg-agent
+  [_] Using GnuPG (2.1) for SSH authentication ⌇⡡⣄⠰⠺
+    https://incenp.org/notes/2015/gnupg-for-ssh-authentication.html
+
+
+HACK: сменить пароль ключа -- удалить и заново добавить
+  $ gpg-connect-agent "DELETE_KEY $(grep -A1 $(ssh-add -l | grep SSH_client C2) ~/.gnupg/sshcontrol T1 C1)" /bye
+  $ ssh-add -l
+  $ ssh-add work_ssh
+  $ gpg-connect-agent reloadagent /bye
