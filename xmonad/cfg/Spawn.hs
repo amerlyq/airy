@@ -30,7 +30,7 @@ main = concat
     [ ("<Space>", "env --chdir=/t r.t")
     , ("<Return>", "env --chdir=/@ r.t -e r.ranger -y")
     , ("C-<Space>", "env --chdir=/t r.t -M")  -- WARNING: if broken >> HW problem
-    , ("C-<Return>", "env --chdir=/@ r.t r.ranger")
+    , ("C-<Return>", "env --chdir=/@ r.t -e r.ranger")
     , ("M1-<Space>", "r.wm-run-xcwd r.t")
     , ("u" , "r.b")
     -- "r.b" open on new empty wksp
@@ -70,8 +70,11 @@ scratchpad = (concat . (`map` [
     | nm <- ["ncmpcpp", "mutt", "ipython"]
     ],
     [ ("v" , spawnHere "r.tf -e $EDITOR") -- THINK: also open in [tmux]?
-    -- , ("S-<Space>", spawnHere "r.tf")
+
+    -- NOTE emergency run pure commands on half-broken Xorg during ArchLinux clean install
+    , ("e", spawn "dmenu_run")
     , ("<Space>"  , spawnAndDo doCenterFloat "st")
+
     , ("<Return>" , spawnAndDo doCenterFloat "r.tf r.ranger")
     , ("C-<Space>"  , spawnAndDo doCenterFloat "st -M")
     , ("C-<Return>" , spawnAndDo doCenterFloat "st -M r.ranger")
