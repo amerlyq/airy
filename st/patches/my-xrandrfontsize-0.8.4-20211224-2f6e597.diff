@@ -2,8 +2,7 @@ diff --git a/config.def.h b/config.def.h
 index f92798a..517abbb 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -8,6 +8,22 @@
- static char *font = "monospace-14";
+@@ -9,5 +9,19 @@
  static int borderpx = 2;
  
 +/*
@@ -13,19 +12,17 @@ index f92798a..517abbb 100644
 +	// skip = fixed relative points size (monitor dpi)
 +	// {"DP-1", 0},   // =0 : fixed absolute pixel size (default screen dpi)
 +	// {"DP-1", 28},  // >0 : auto absolute pixel size (monitor dpi)
-+	{"DP-1", -16},    // <0 : auto relative points size (monitor dpi)
-+	{"DP-1~2", -12},
-+	{"DP-1~1", -16},
-+	{"DP-2", -16},
-+	{"DP-2~2", -12},
-+	{"DP-2~1", -16},
++	// {"DP-1",-16},  // <0 : auto relative points size (monitor dpi)
++	// {"DP-1", 0},   // BUG:(size=0): not restored to default after back'n'forth
++	{"HDMI-0~1", -20},  // BUG:(ignored DPI=220): = 20 is eqv to 10pt (DPI=110)
++	{"HDMI-0~2", -14},
 +};
 +float winmovethreshold = 0.6;
 +
  /*
   * What program is execed by st depends of these precedence rules:
   * 1: program passed with -e
-@@ -239,6 +255,7 @@ static Shortcut shortcuts[] = {
+@@ -272,6 +272,7 @@ static Shortcut shortcuts[] = {
  	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
  	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
  	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
@@ -37,15 +34,14 @@ diff --git a/config.mk b/config.mk
 index aaa54ff..2d28597 100644
 --- a/config.mk
 +++ b/config.mk
-@@ -20,6 +20,8 @@ LIBS = -L$(X11LIB) -lm -lrt -lX11 -lutil -lXft -lXrender\
-        `$(PKG_CONFIG) --libs fontconfig` \
-        `$(PKG_CONFIG) --libs freetype2`
+@@ -24,5 +24,7 @@ LIBS = -L$(X11LIB) -lm -lrt -lX11 -lutil -lXft -lXrender\
  
 +LIBS += -lXrandr
 +
  # flags
  STCPPFLAGS = -DVERSION=\"$(VERSION)\" -D_XOPEN_SOURCE=600
  STCFLAGS = $(INCS) $(STCPPFLAGS) $(CPPFLAGS) $(CFLAGS)
+ STLDFLAGS = $(LIBS) $(LDFLAGS)
 diff --git a/x.c b/x.c
 index 684311c..ce1c418 100644
 --- a/x.c
@@ -58,7 +54,7 @@ index 684311c..ce1c418 100644
  
  char *argv0;
  #include "arg.h"
-@@ -45,6 +46,19 @@ typedef struct {
+@@ -45,5 +46,18 @@ typedef struct {
  	signed char appcursor; /* application cursor */
  } Key;
  
@@ -77,21 +73,21 @@ index 684311c..ce1c418 100644
 +
  /* X modifiers */
  #define XK_ANY_MOD    UINT_MAX
- #define XK_NO_MOD     0
-@@ -228,6 +242,11 @@ static XWindow xw;
- static XSelection xsel;
- static TermWindow win;
+@@ -233,7 +233,12 @@ static XWindow xw;
+ 	[PropertyNotify] = propnotify,
+ 	[SelectionRequest] = selrequest,
+ };
  
 +static double defaultrelfontsize = 0;
 +static MonitorInfo *monitors_info = NULL;
 +static int monitors_num = 0;
 +static int prev_mindex = -1;
 +
- /* Font Ring Cache */
- enum {
- 	FRC_NORMAL,
-@@ -1766,6 +1785,144 @@ xbell(void)
- 		XkbBell(xw.dpy, xw.win, bellvolume, (Atom)NULL);
+ /* Globals */
+ static DC dc;
+ static XWindow xw;
+@@ -2280,6 +2280,144 @@ xseturgency(int add)
+ 	XFree(h);
  }
  
 +static void
@@ -128,7 +124,7 @@ index 684311c..ce1c418 100644
 +					m->defaultfontsize *= -px_pt;
 +				break;
 +			}
-+		fprintf(stderr, "%s: %fpx, %f\n", name, m->defaultfontsize, m->usedfontsize);
++		// fprintf(stderr, "%s: %fpx, %f\n", name, m->defaultfontsize, m->usedfontsize);
 +		XFree(name);
 +
 +		// Restore usedfontsize (zoom) after re-cache for monitors with the same name
@@ -198,13 +194,13 @@ index 684311c..ce1c418 100644
 +		monitors_info[prev_mindex].usedfontsize = usedfontsize;
 +
 +	defaultfontsize = monitors_info[mindex].defaultfontsize;
-+	fprintf(stderr, "Crossing: %fpx\n", defaultfontsize);
++	// fprintf(stderr, "Crossing: %fpx\n", defaultfontsize);
 +
 +	// NOTE: do nothing if font size differs by less than 1%
 +	double fontsize = monitors_info[mindex].usedfontsize;
 +	double delta = 0.01 * usedfontsize;
 +	if (!BETWEEN(fontsize - usedfontsize, -delta, delta)) {
-+		fprintf(stderr, "Adjusted: %fpx\n", fontsize);
++		// fprintf(stderr, "Adjusted: %fpx\n", fontsize);
 +		xunloadfonts();
 +		xloadfonts(usedfont, fontsize);
 +	}
@@ -233,24 +229,24 @@ index 684311c..ce1c418 100644
 +
 +
  void
- focus(XEvent *ev)
+ xbell(void)
  {
-@@ -1912,6 +2069,14 @@ cmessage(XEvent *e)
+@@ -2437,6 +2437,14 @@ cmessage(XEvent *e)
  void
  resize(XEvent *e)
  {
 +	// BAD: no resize on monitor plug/unplug/reconfigure -- until window itself is kept in the same place
 +	// NOTE: no resize event on zoomabs()
-+	fprintf(stderr, "Resize: %dx%d+%d+%d\n",
-+		e->xconfigure.width, e->xconfigure.height, e->xconfigure.x, e->xconfigure.y);
++	// fprintf(stderr, "Resize: %dx%d+%d+%d\n",
++	//     e->xconfigure.width, e->xconfigure.height, e->xconfigure.x, e->xconfigure.y);
 +
 +	adjustmonitorfontsize(getmonitorindex_threshold(
-+		e->xconfigure.width, e->xconfigure.height, e->xconfigure.x, e->xconfigure.y));
++	    e->xconfigure.width, e->xconfigure.height, e->xconfigure.x, e->xconfigure.y));
 +
  	if (e->xconfigure.width == win.w && e->xconfigure.height == win.h)
  		return;
  
-@@ -1944,6 +2109,22 @@ run(void)
+@@ -2469,6 +2469,22 @@ run(void)
  		}
  	} while (ev.type != MapNotify);
  
@@ -273,7 +269,7 @@ index 684311c..ce1c418 100644
  	ttyfd = ttynew(opt_line, shell, opt_io, opt_cmd);
  	cresize(w, h);
  
-@@ -1975,6 +2156,16 @@ run(void)
+@@ -2500,6 +2500,16 @@ run(void)
  			XNextEvent(xw.dpy, &ev);
  			if (XFilterEvent(&ev, None))
  				continue;
@@ -282,7 +278,7 @@ index 684311c..ce1c418 100644
 +					RRNotify_CrtcChange == ((XRRNotifyEvent *)&ev)->subtype)
 +				{
 +					XRRUpdateConfiguration(&ev);
-+					fprintf(stderr, "Monitor change: %d > %d\n", rr_event_base, LASTEvent);
++					// fprintf(stderr, "Monitor change: %d > %d\n", rr_event_base, LASTEvent);
 +					refreshxrandr(0);
 +				}
 +				continue;
