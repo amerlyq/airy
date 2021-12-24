@@ -28,7 +28,8 @@ esac; done; unset o; shift $((OPTIND-1))
 
 # INFO: "sudo" isn't affected by "/dev/stdin" argument ALT: cache "sudo -k" beforehand
 ${chroot:+env --chdir "$d_root" --} \
-  aur build ${update:+--force} --arg-file='/dev/stdin' --
+  aur build ${update:+--force} --arg-file='/dev/stdin'
+  # ${FONT_ST:+--margs -- FONT_ST="$FONT_ST"}
 
 
 ########

@@ -24,7 +24,14 @@ if distro arch; then
   #   ::: rm ~/.cache/airy/pkg/st-airy-git/*.tar.xz
   # BUG: must disable split-screen 12 font for small monitors... when primary external monitor is HDMI-2 itself
   # BUG: env vars aren't passed to !makepkg anymore
-  FONT_ST="${FONT_ST-}" loc_inst ./st-airy-git.pkgbuild
+  #   $ FONT_ST="${FONT_ST-}" loc_inst ./st-airy-git.pkgbuild
+  #   XLR: issue is due to splitting "loc_inst" and actual "build" phases
+  #   FIXED: patch copied PKGBUILD (OR:BET: directly sources!) instead of passing vars
+  loc_inst ./st-airy-git.pkgbuild
+  echo FONT_ST=${FONT_ST-}
+  [[ -n ${FONT_ST-} ]] && sed -ri \
+    '/\+static char \*font\b/s/-[0-9.]+";$/-'"$FONT_ST"'";/' \
+    ~/.cache/aurutils/airy/st-airy-git/my-config-0.8.4.diff
 
   # CHECK? if some needed
   ## reptyr -- attach running pr to a new terminal

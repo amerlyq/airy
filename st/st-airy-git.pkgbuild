@@ -75,7 +75,8 @@ prepare() { local f
   done
 
   #%ONELINE: $ sed -ri '/char\s\*font\b/s/"[^"]+"/"monospace-12"/g' config.def.h
-  [[ -z ${FONT_ST-} ]] || sed -ri '/^static char \*font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
+  # NEED: apply from outside before build
+  # [[ -n ${FONT_ST-} ]] && sed -ri '/^static char \*font/s/("[ [:alpha:]]+-|:\s*(pixel)?size=)[0-9.]+/\1'"$FONT_ST"'/g' config.def.h
 
   ## SKIP terminfo: /usr/share/terminfo/s/st is owned by ncurses 6.0-4
   sed -i '/\@tic\s/d' Makefile
