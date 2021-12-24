@@ -12,24 +12,33 @@ makedepends=('ncurses' 'libxext' 'git')
 epoch=1
 
 source=('git://git.suckless.org/st#commit=2f6e597'
+  st-spoiler-20180309-c5ba9c0.diff
   st-no_bold_colors-0.8.1.diff
   st-solarized-both-0.8.4.diff
   st-alpha-0.8.2.diff
+  st-osc10-20210106-4ef0cbd.diff
+  st-csi_22_23-0.8.4.diff
   st-hidecursor-0.8.3.diff
   st-externalpipe-0.8.2.diff
-  my-tmux-0.8.4.diff
-  # my-xrandr-0.8.4.diff  # CASE: when monitors have different DPI
-  st-boxdraw_v2-0.8.3.diff
   st-newterm-0.8.2.diff
-  st-spoiler-20180309-c5ba9c0.diff
+  my-tmux-0.8.4.diff
+
+  ## CASE: when monitors have different DPI
+  # my-xrandr-0.8.4.diff
+
+  st-boxdraw_v2-0.8.3.diff
+  st-ligatures-boxdraw-20200430-0.8.3.diff
+
+  ## SRC: https://github.com/LukeSmithxyz/st/pull/224
+  #  from Azumgi/glyph_truncation_fix
+  oth-glyph-truncation-fix.diff
+
   st-visualbell2-basic-2020-05-13-045a0fa.diff
   st-visualbell2-enhanced-2020-05-13-045a0fa.diff
-  st-ligatures-boxdraw-20200430-0.8.3.diff
-  # TODO: oth-glyph-truncation-fix.diff
-  # st-csi_22_23-0.8.4.diff
-  # st-osc10-20210106-4ef0cbd.diff
+
   ## FAIL: underline becomes corrupted: mixed white
   # st-undercurl-0.8.4-20210822.diff
+
   my-config-0.8.4.diff
 )
 # sha256sums=(SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP SKIP)

@@ -64,14 +64,14 @@ index 1dc44d6..44d5a8d 100644
  xstartdraw(void)
  {
 @@ -1613,6 +1634,8 @@ xdrawline(Line line, int x1, int y1, int x2)
- 			continue;
- 		if (selected(x, y1))
- 			new.mode ^= ATTR_REVERSE;
-+		if (vbellset && isvbellcell(x, y1))
-+			new.mode ^= ATTR_REVERSE;
- 		if (i > 0 && ATTRCMP(base, new)) {
- 			xdrawglyphfontspecs(specs, base, i, ox, y1);
- 			specs += i;
+ 				continue;
+ 			if (selected(x, y1))
+ 				new.mode ^= ATTR_REVERSE;
++			if (vbellset && isvbellcell(x, y1))
++				new.mode ^= ATTR_REVERSE;
+ 			if (i > 0 && ATTRCMP(base, new)) {
+ 				xdrawglyphfontspecs(specs, base, i, ox, y1);
+ 				specs += i;
 @@ -1714,6 +1737,8 @@ xbell(void)
  		xseturgency(1);
  	if (bellvolume)
