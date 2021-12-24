@@ -60,7 +60,8 @@ EDITOR ?= vi
 flags := -mu
 skip  :=
 tsdir := $(AIRY_CACHE)/ts
-&mods = +r.airy-mods-make "tsdir=$(tsdir)" "flags=$(flags)" "skip=$(skip)"
+# FIXED: removed recipe prefix '+' to avoid make stderr freeze-up on error
+&mods = r.airy-mods-make "tsdir=$(tsdir)" "flags=$(flags)" "skip=$(skip)"
 
 # FAIL: package "defaults" is never called on clean system
 

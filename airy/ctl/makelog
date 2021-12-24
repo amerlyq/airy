@@ -28,10 +28,20 @@ ln -sfT "${log##*/}" "${log%/*}/latest"
 
 # WARN:BUG:(sed -u/awk): isn't really unbuffered -- it will prevent [Y/n] prompt w/o NL
 # awk '{print "E:",$0}'
-{ { make "$@"
-  } 3>&1 1>&2 2>&3 | sed -u 's/^/|: /'
-} |& stdbuf -o0 tee -a "$log" \
-| if [[ -t 1 ]] && ((${#fpretty[@]}))
-then "${fpretty[@]}"; else cat; fi
+
+## FAIL: make(1) is always blocked on errexit due to pipe redirect
+# { { make "$@"
+#   } 3>&1 1>&2 2>&3 3>&- | sed -u 's/^/|: /'
+# } |& stdbuf -o0 tee -a "$log" \
+# | if [[ -t 1 ]] && ((${#fpretty[@]}))
+# then "${fpretty[@]}"; else cat; fi
+
+true >> "$log"
+if [[ -t 1 ]] && ((${#fpretty[@]})); then
+  (tail -f "$log" | "${fpretty[@]}") &
+else
+  tail -f "$log" &
+fi
+{ make "$@" 2> >(sed -u 's/^/|: /'); } >> "$log"
 
 # [[ -s $log ]] || rm "$log"
