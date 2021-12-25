@@ -65,6 +65,7 @@ call dein#add('davidhalter/jedi-vim', {
 " FIXED:ERR: lost hi on write SRC https://github.com/numirias/semshi/issues/54
 "   BAD: hi disappears on async complete, not on the write
 "   FIXED: chain highlight after auto-fix by ALE (e.g. from "!black")
+" ALSO:(python=3.10): match-case :: https://github.com/cyyever/semshi
 call dein#add('numirias/semshi', {
   \ 'on_ft': 'python',
   \ 'depends': 'ale',
