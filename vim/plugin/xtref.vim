@@ -9,7 +9,7 @@
 let g:xtref = {}
 " MAYBE: if list -- use first existing dir [/x, /aura, /data/aura, /home/user/aura]
 " [_] FIXME: use /@
-let g:xtref.aura = $HOME."/aura"   " main dir of your global knowledge base
+let g:xtref.aura = "/@/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 let g:xtref.lazytagdir = $VPLUGS   " temp store *.tags for newly created/edited files
 
@@ -277,7 +277,8 @@ endfunction
 " ALSO:(async): auto-update tags on file close
 fun! xtref#ctags(root, ...)
   if !executable('ctags')| echoerr "Not found in PATH: ctags(1)" | return |en
-  let dst = shellescape(g:xtref.tagfile)
+  let dstdir = get(a:, 2, a:root)
+  let dst = shellescape(dstdir.'/'.g:xtref.tagfile)
   " let dst = shellescape(get(a:, 1, g:xtref.tagfile))
 
   " NOTE: append tags only from file paths passed as arg (e.g. ~BufClose~)
@@ -289,6 +290,10 @@ fun! xtref#ctags(root, ...)
   end
 
   let cmd = 'r.vim-xtref -t -- -o '.dst
+  if dstdir != a:root
+    let cmd .= ' --tag-relative=never'
+  end
+
   if !len(bufs)
     let cmd .= ' --recurse'
   elseif type(bufs) == type([])
@@ -360,30 +365,33 @@ augroup END
 " NOTE: use "xts<C-v><Space>" to insert "xts" literally
 iabbrev <expr> !xts! xtref#new()
 
-nnoremap [Xtref]u :<C-u>XtrefNou<CR>
-command! -bar -range -nargs=0  XtrefNou  call xtref#ctags(g:xtref.aura, '.nou,.task')
+"" DISABLED: prevent overwriting long lazytagdir by short *.nou-only
+" nnoremap [Xtref]U :<C-u>XtrefNou<CR>
+" command! -bar -range -nargs=0  XtrefNou  call xtref#ctags(g:xtref.aura, '.nou,.task')
 
-nnoremap [Xtref]U :<C-u>XtrefOpened<CR>
+nnoremap [Xtref]u :<C-u>XtrefOpened<CR>
 command! -bar -range -nargs=0  XtrefOpened
   \ call xtref#ctags(g:xtref.lazytagdir, 1)
 
 " DEPS: https://github.com/airblade/vim-rooter
-nnoremap [Xtref]<C-u> :<C-u>XtrefRoot<CR>
-command! -bar -range -nargs=0  XtrefRoot
+nnoremap [Xtref]<C-u> :<C-u>XtrefRepo<CR>
+command! -bar -range -nargs=0  XtrefRepo
   \ call xtref#ctags(FindRootDirectory())
 
+" FIXME: prevent in /@ and many other system/network locations
 nnoremap [Xtref]<A-u> :<C-u>XtrefCwd<CR>
 command! -bar -range -nargs=0  XtrefCwd
   \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
   \ |else|echoerr "Prevented gen tags in $HOME or below"|en
 
+"" HACK: use same g:lazytagdir for initial @/aura and then for --append()
 " OBSOL: <LocalLeader><F2>
 nnoremap [Xtref]<A-S-u> :<C-u>XtrefAura<CR>
-command! -bar -range -nargs=0  XtrefAura  call xtref#ctags(g:xtref.aura)
+command! -bar -range -nargs=0  XtrefAura
+  \ call xtref#ctags(g:xtref.aura, [], g:xtref.lazytagdir)
 
 " NOTE: search tags in *aura*, same folder as current file, and in all parent dirs of CWD ※}p-nu
 " MAYBE: exe 'set tags^='. g:xtref.aura.'/**/'.g:xtref.tagfile
-exe 'set tags^='. g:xtref.aura.'/'.g:xtref.tagfile
 exe 'set tags^='. g:xtref.tagfile.';/'
 exe 'set tags^='. g:xtref.lazytagdir.'/'.g:xtref.tagfile
 exe 'set tags^='. './'.g:xtref.tagfile.';'
