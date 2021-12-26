@@ -210,7 +210,7 @@ class doc(Command):
         "g": "LEGEND",
         "h": "HACK",
         "i": "INFO",
-        "k": "WORKLOG",  # OR: WKLOG
+        "k": "WKLOG",  # OR: WORKLOG
         "l": "LIOR",
         "m": "MAINT",
         "n": "NOTE",
