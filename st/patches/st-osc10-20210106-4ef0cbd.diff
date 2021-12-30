@@ -13,13 +13,13 @@ diff --git a/st.c b/st.c
 index abbbe4b..6a57d89 100644
 --- a/st.c
 +++ b/st.c
-@@ -1877,6 +1877,25 @@ strhandle(void)
+@@ -1877,6 +1877,28 @@ strhandle(void)
  				}
  			}
  			return;
-+		case 10: j = defaultfg;  /* set foreground color */
-+		case 11: j = defaultbg;  /* set background color */
-+		case 12: j = defaultcs;  /* set cursor color */
++		case 10: /* set foreground color */
++		case 11: /* set background color */
++		case 12: /* set cursor color */
 +			if (narg < 2)
 +				break;
 +			p = strescseq.args[1];
@@ -27,11 +27,14 @@ index abbbe4b..6a57d89 100644
 +				return;  // explicitly ignore query/read color
 +			/* FALLTHROUGH */
 +		case 112: /* cursor color reset, here p = NULL */
++			switch (par % 100) {
++			case 10: j = defaultfg; break;
++			case 11: j = defaultbg; break;
++			case 12: j = defaultcs; break;
++			default: j = defaultcs; break;
++			}
 +			if (xsetcolorname(j, p)) {
-+				if (par == 112 && narg <= 1)
-+					return; /* cursor color reset without parameter */
 +				fprintf(stderr, "erresc: invalid fg/bg/cs color j=%d, p=%s\n", j, p ? p : "(null)");
-+				strdump();
 +			} else {
 +				redraw();  // MAYBE: not needed to redraw whole screen
 +			}
