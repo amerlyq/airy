@@ -1,0 +1,93 @@
+diff --git i/st.c w/st.c
+index a1e7d23..27a1a57 100644
+--- i/st.c
++++ w/st.c
+@@ -2755,6 +2755,16 @@ draw(void)
+ 		xximspot(term.ocx, term.ocy);
+ }
+ 
++void
++redraw_cursor(void)
++{
++	if (!xstartdraw())
++		return;
++	xdrawcursor(term.c.x, term.c.y, term.line[term.c.y][term.c.x],
++			term.ocx, term.ocy, term.line[term.ocy][term.ocx],
++			term.line[term.ocy], term.col);
++}
++
+ void
+ redraw(void)
+ {
+diff --git i/st.h w/st.h
+index f5934b8..5600282 100644
+--- i/st.h
++++ w/st.h
+@@ -87,6 +87,7 @@ typedef union {
+ } Arg;
+ 
+ void die(const char *, ...);
++void redraw_cursor(void);
+ void redraw(void);
+ void draw(void);
+ 
+diff --git i/x.c w/x.c
+index cee7c50..8df71f8 100644
+--- i/x.c
++++ w/x.c
+@@ -2248,6 +2248,23 @@ run(void)
+ 	FcPatternGetDouble(dc.font.match->pattern, FC_SIZE, 0, &defaultrelfontsize);
+ 	refreshxrandr(0);
+ 
++	int xkb_major = XkbMajorVersion;
++	int xkb_minor = XkbMinorVersion;
++	// VIZ: major_in_out, minor_in_out
++	if (!XkbLibraryVersion(&xkb_major, &xkb_minor)) {
++		// TODO: print major-minor before and after call
++		die("Xkb runtime library is incompatible\n");
++	}
++	int xkb_event_base, xkb_error_base;
++    // VIZ: dpy, opcode_rtrn, event_rtrn, error_rtrn, major_in_out, minor_in_out
++	if (!XkbQueryExtension(xw.dpy, NULL, &xkb_event_base, &xkb_error_base, &xkb_major, &xkb_minor)) {
++		die("Xkb server extension isn't available\n");
++	}
++	// VIZ: display, device_spec, event_type, bits_to_change , values_for_bits
++	if (!XkbSelectEventDetails(xw.dpy, XkbUseCoreKbd, XkbStateNotify, XkbAllStateComponentsMask, XkbGroupStateMask)) {
++		die("Xkb subscribe to events gone wrong\n");
++	}
++
+ 	ttyfd = ttynew(opt_line, shell, opt_io, opt_cmd);
+ 	cresize(w, h);
+ 
+@@ -2280,6 +2297,31 @@ run(void)
+ 			if (XFilterEvent(&ev, None))
+ 				continue;
+ 			if (LASTEvent <= ev.type) {
++				if (xkb_event_base == ev.type) {
++					if (XkbStateNotify != ((XkbAnyEvent *)&ev)->xkb_type) {
++						fprintf(stderr, "Xkb unexpected event\n");
++						continue;
++					}
++					// FAIL: only listen to events sent to this window
++					//   BAD: !xkb broadcasts lang change on <Alt>
++					//   BUT: !kbdd unicasts on XWindowFocus
++					// if (((XkbAnyEvent *)&ev)->display != xw.dpy)
++					// 	continue;
++					int grp = ((XkbStateNotifyEvent*)&ev)->group;
++					// DEBUG: fprintf(stderr, "Xkb lang: %d\n", grp);
++					char *p = NULL;
++					switch (grp) {
++					case 0: p = "#eeeeee"; break;  // en = white
++					case 1: p = "#00eeee"; break;  // ru = cyan
++					case 2: p = "#eeee00"; break;  // ua = yellow
++					case 3: p = "#ee00ee"; break;  // xx = magenta
++					default:
++						fprintf(stderr, "Xkb unknown lang group: %d\n", grp);
++						continue;
++					}
++					xsetcolorname(defaultcs, p);
++					redraw_cursor();
++				}
+ 				if (rr_event_base + RRNotify == ev.type &&
+ 					RRNotify_CrtcChange == ((XRRNotifyEvent *)&ev)->subtype)
+ 				{
