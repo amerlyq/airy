@@ -35,6 +35,7 @@ alias auru='paca -Syu'
 alias aurU='aur sync --upgrades'                                # update-rebuild all
 alias aurv='aur sync --no-view --no-ver -f'  # upgrade single pkg e.g. radare2-git
 
+# ALSO: remove uninstalled "paccache -ruk0"
 alias aurz='paccache --cachedir /var/cache/pacman/aur --keep 0 --dryrun -vvv --'
 alias aurZ='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
 
@@ -49,20 +50,26 @@ aurx(){ find /var/cache/pacman/aur -name "*.db.tar" -execdir repo-remove {} "$@"
 #   TODO: add this cfg to airy
 # feature: aursync flag for deleting package from db and/or purge · Issue #208 · AladW/aurutils ⌇⡠⡇⠿⠖
 #   https://github.com/AladW/aurutils/issues/208
-alias aurX='repoctl update'
+#   paccache -r; paccache -ruk0; repoctl update
+alias aurD='repoctl update'
 
 
 # FIXME: make proper alias
 # ALT: $ repoctl remove ...
-aur-remove(){ local pkg db
-  for pkg; do
-    aur repo --repo-list | while read -r db; do
-      repo-remove "$(readlink -e "$db")" "$pkg"
-      find "${db%/*}" -name "$pkg*" -delete
-      # NEED:(manually): rm -rf ~/.cache/aurutils/sync/"$pkg"
-    done
-    if expac -Q '%n' "$pkg" >/dev/null; then
-      sudo pacman -R "$pkg"
-    fi
+aurX(){ local pkg db
+  ## OLD:
+  # for pkg; do
+  #   aur repo --list-repo | while read -r db; do
+  #     repo-remove "$(readlink -e "$db")" "$pkg"
+  #     find "${db%/*}" -name "$pkg*" -delete
+  #     # NEED:(manually): rm -rf ~/.cache/aurutils/sync/"$pkg"
+  #   done
+  #   if expac -Q '%n' "$pkg" >/dev/null; then
+  #     sudo pacman -R "$pkg"
+  #   fi
+  # done
+  aur repo --list-path | while read -r repo_path; do
+    repo-remove "$repo_path" "$@"
+    paccache -c "${repo_path%/*}" -rvk0 "$@"
   done
 }
