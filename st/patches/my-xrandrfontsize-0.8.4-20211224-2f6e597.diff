@@ -2,7 +2,7 @@ diff --git a/config.def.h b/config.def.h
 index f92798a..517abbb 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -9,5 +9,19 @@
+@@ -9,5 +9,20 @@
  static int borderpx = 2;
  
 +/*
@@ -14,6 +14,7 @@ index f92798a..517abbb 100644
 +	// {"DP-1", 28},  // >0 : auto absolute pixel size (monitor dpi)
 +	// {"DP-1",-16},  // <0 : auto relative points size (monitor dpi)
 +	// {"DP-1", 0},   // BUG:(size=0): not restored to default after back'n'forth
++	{"HDMI-0", -20},  // NOTE: useful for <mf> fullscreen (when split removed)
 +	{"HDMI-0~1", -20},  // BUG:(ignored DPI=220): = 20 is eqv to 10pt (DPI=110)
 +	{"HDMI-0~2", -14},
 +};

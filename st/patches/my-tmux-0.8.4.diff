@@ -51,6 +51,32 @@ index 18341c5..e8e669c 100644
  	/* Send SIGHUP to shell */
  	kill(pid, SIGHUP);
  }
+@@ -1597,6 +1597,9 @@ tsetmode(int priv, int set, const int *args, int narg)
+ 			case 2004: /* 2004: bracketed paste mode */
+ 				xsetmode(set, MODE_BRCKTPASTE);
+ 				break;
++			case 7727: /* 7727: app escape mode */
++				// xsetmode(set, MODE_APPESCAPE);  // \eO[ -> \e[
++				break;
+ 			/* Not implemented mouse modes. See comments there. */
+ 			case 1001: /* mouse highlight mode; can hang the
+ 				      terminal by design when implemented. */
+@@ -1646,6 +1646,15 @@ csihandle(void)
+ 	case 'c': /* DA -- Device Attributes */
+ 		if (csiescseq.arg[0] == 0)
+ 			ttywrite(vtiden, strlen(vtiden), 0);
+ 		break;
++	case '>':
++		switch (csiescseq.mode[1]) {
++		case 'c':  /* DA2 -- Secondary Device Attributes */
++		case 'q':  /* XDA -- Extended Device Identifier */
++			break;  // ignore them for now
++		default:
++			goto unknown;
++		}
++		break;
+ 	case 'b': /* REP -- if last char is printable print it <n> more times */
+ 		DEFAULT(csiescseq.arg[0], 1);
 diff --git a/st.h b/st.h
 index 13203fc..11d86bd 100644
 --- a/st.h
