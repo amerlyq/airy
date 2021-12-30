@@ -44,7 +44,13 @@ fun! s:PatchColorScheme()
   hi! Folded cterm=bold ctermfg=11 ctermbg=0 gui=bold guifg=#657b83 guibg=#073240
   " hi! Folded cterm=underline ctermfg=11 ctermbg=NONE guifg=Cyan guibg=DarkGrey
   "  hi! FoldColumn ctermfg=4 ctermbg=NONE guifg=Cyan guibg=Grey
-  hi! lCursor guifg=NONE ctermbg=4 guibg=Cyan
+
+  "" BET: hi! Cursor ctermbg=BG guibg=BG
+  hi! Cursor ctermbg=15 guibg=#eeeeee
+  hi! iCursor ctermbg=6 guibg=#00ffff
+  hi! rCursor ctermbg=2 guibg=#00ff00
+  hi! oCursor ctermbg=5 guibg=#ff00ff
+
   hi! link ColorColumn StatusLineNC
   " TRY (v.1.5.0?)
   hi! link QuickFixLine TermCursor

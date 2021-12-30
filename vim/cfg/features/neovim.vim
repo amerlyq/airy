@@ -9,11 +9,29 @@ augroup MyAutoCmd
   au CursorHold * if exists(':rshada') | rshada | wshada | endif
 augroup END
 
+"" NOTE: t_EI, t_SI, t_SR  doesn't work anymore
 " SEE :h guicursor for -Cursor/lCursor-
 "   https://github.com/neovim/neovim/wiki/FAQ#how-can-i-change-the-cursor-shape-in-the-terminal
-try|set guicursor=a:block-Cursor/lCursor-blinkon0
-  \,i-ci-ve:ver25,r-cr:hor10,o:hor50
-  " \n-v-c:block-Cursor/lCursor-blinkon0
+try
+  "" SRC: https://github.com/neovim/neovim/issues/6591
+  " hi! Cursor ctermfg=1 ctermbg=1 guifg=#FF0000 guibg=#FF0000
+  " set guicursor=n-c-v:block-Cursor/Cursor-blinkon0
+  " set guicursor+=i-ci:ver1-lCursor/lCursor-blinkwait200-blinkon200-blinkoff150
+  " set guicursor+=r-cr-o:hor1-Cursor/Cursor-blinkwait200-blinkon200-blinkoff150
+
+  set guicursor=a:block-Cursor-blinkon0
+  set guicursor+=i-ci-ve:ver25-iCursor
+  set guicursor+=r-cr:hor10-rCursor
+  set guicursor+=o:hor50-oCursor
+
+  "" @me last OK
+  " set guicursor=a:block-Cursor/lCursor-blinkon0
+  " \,i-ci-ve:ver25,r-cr:hor10,o:hor50
+
+  "" FAIL: attempts
+  " set guicursor=a:block-Cursor/lCursor-blinkon0
+  " \,i-ci-ve:ver25,r-cr:hor10,o:hor50
+  " \,n-v-c:block-Cursor/lCursor-blinkon0
   " \,sm:block-blinkwait175-blinkoff150-blinkon175
   " \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
   " BAD:('tmux/st' have no support for percentage or blink or color?): ※⡟⠌⠊⢨

@@ -12,6 +12,21 @@ let s:kbdd_running = 0
 let s:kbdd_guard = 0
 let s:kbdd_insert = &insertmode
 
+"" FAIL: don't work anymore in neovim
+" if exists('$TMUX') || $TERM =~? 'screen\|tmux'  " FIXED for [tmux -> ssh | vim]
+"   fun! s:wrap(s)
+"     return "\ePtmux;". substitute(escape(a:s, ' '),
+"           \ "\e\\|\<Esc>", "\e\e", 'g') ."\e\\"
+"   endfun
+" else
+"   fun! s:wrap(s)
+"     return escape(a:s, ' ')
+"   endfun
+" endif
+" let g:xkb_altcursorcolor = s:wrap("\e]12;cyan\e\\")
+" let g:xkb_resetcursorcolor = s:wrap("\e]112\e\\")
+
+
 " ALT: use python to monitor dbus events
 "   https://github.com/qnikst/kbdd/wiki/Usecases
 "   https://dbus.freedesktop.org/doc/dbus-python/doc/tutorial.html
@@ -80,6 +95,13 @@ else  " exists('*jobstart')
     let s:kbdd_insert = 1
     if curr != g:xkb.insert
       call xkb#set(g:xkb.insert)
+      " DEBUG: printf '\033Ptmux;\033\033]12;cyan\007\033\\'
+      " DEBUG: printf '\033Ptmux;\033\033]12;cyan\033\033\\\033\\'
+      " (notmux): printf '\033]12;red\e\\'
+      "" FAIL: don't work anymore in neovim
+      " let &t_EI = g:xkb_altcursorcolor
+      " let &t_SI = g:xkb_altcursorcolor
+      " let &t_SR = g:xkb_altcursorcolor
     en
   endf
 
@@ -91,6 +113,11 @@ else  " exists('*jobstart')
     let s:kbdd_insert = 0
     if curr != g:xkb.normal
       call xkb#set(g:xkb.normal)
+      " DEBUG: printf '\033Ptmux;\033\033]112;cyan\033\033\\\033\\'
+      "" FAIL: don't work anymore in neovim
+      " let &t_EI = g:xkb_resetcursorcolor
+      " let &t_SI = g:xkb_resetcursorcolor
+      " let &t_SR = g:xkb_resetcursorcolor
     en
   endf
 
