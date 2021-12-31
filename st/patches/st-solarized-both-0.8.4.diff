@@ -137,9 +137,9 @@ index 210f184..d94c42b 100644
 +void
 +swapcolors(const Arg *dummy)
 +{
-+ usealtcolors = !usealtcolors;
-+ xloadcols();
-+ redraw();
++	usealtcolors = !usealtcolors;
++	xloadcols();
++	redraw();
 +}
 +
  void
@@ -151,7 +151,7 @@ index 210f184..d94c42b 100644
  
 +const char* getcolorname(int i)
 +{
-+    return (usealtcolors) ?  altcolorname[i] : colorname[i];
++	return (usealtcolors) ?  altcolorname[i] : colorname[i];
 +}
 +
  int

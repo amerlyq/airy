@@ -1,3 +1,56 @@
+diff --git i/config.def.h w/config.def.h
+index 6f05dce..05343a2 100644
+--- i/config.def.h
++++ w/config.def.h
+@@ -178,7 +178,10 @@ static const char *colorname[] = {
+ 	"#839496",  /* FIXED: solarized base0/12 */
+ 	"#000000",
+-	"#eeeeee",
+-	"#555555",
++	"#555555",  // = defaultrcs (reverse cursor / during selection)
++	"#eeeeee",  // grp0(en) = white = defaultcs (normal cursor)
++	"#009eee",  // grp1(ru) = cyan
++	"#ee9e00",  // grp2(ua) = yellow
++	"#9e00ee",  // grp3(xx) = magenta
+ };
+ 
+ /* Terminal colors for alternate (light) palette */
+@@ -210,8 +210,11 @@ static const char *altcolorname[] = {
+ 	"#000000",
+ 	"#839496",  /* FIXED: solarized base0/12 */
+-	"#555555",
+-	"#eeeeee",
++	"#eeeeee",  // = defaultrcs (reverse cursor / during selection)
++	"#222222",  // grp0(en) = dim white = defaultcs (normal cursor)
++	"#006aaa",  // grp1(ru) = dim cyan
++	"#aa6a00",  // grp2(ua) = dim yellow
++	"#6a00aa",  // grp3(xx) = dim magenta
+ };
+ 
+ /*
+  * Default colors (colorname index)
+@@ -226,8 +226,9 @@ 
+  */
+ unsigned int defaultfg = 256;
+ unsigned int defaultbg = 257;
+-unsigned int defaultcs = 258;
+-unsigned int defaultrcs = 259;
++unsigned int defaultrcs = 258;
++const unsigned int xkbbasecolor = 259;
++unsigned int defaultcs = xkbbasecolor;
+ 
+ /*
+  * Default shape of cursor
+diff --git i/st.h w/st.h
+index fa2eddf..5600282 100644
+--- i/st.h
++++ w/st.h
+@@ -76,4 +76,5 @@ void *xmalloc(size_t);
+ extern unsigned int tabspaces;
+ extern unsigned int defaultfg;
+ extern unsigned int defaultbg;
++extern const unsigned int xkbbasecolor;
+ extern unsigned int defaultcs;
 diff --git i/st.c w/st.c
 index a1e7d23..27a1a57 100644
 --- i/st.c
@@ -7,13 +60,13 @@ index a1e7d23..27a1a57 100644
  }
  
 +void
-+redraw_cursor(void)
++redrawcursor(void)
 +{
 +	if (!xstartdraw())
 +		return;
 +	xdrawcursor(term.c.x, term.c.y, term.line[term.c.y][term.c.x],
-+			term.ocx, term.ocy, term.line[term.ocy][term.ocx],
-+			term.line[term.ocy], term.col);
++	    term.ocx, term.ocy, term.line[term.ocy][term.ocx],
++	    term.line[term.ocy], term.col);
 +}
 +
  void
@@ -27,7 +80,7 @@ index f5934b8..5600282 100644
  } Arg;
  
  void die(const char *, ...);
-+void redraw_cursor(void);
++void redrawcursor(void);
  void redraw(void);
  void draw(void);
  
@@ -35,23 +88,35 @@ diff --git i/x.c w/x.c
 index cee7c50..8df71f8 100644
 --- i/x.c
 +++ w/x.c
-@@ -2248,6 +2248,23 @@ run(void)
+@@ -2061,6 +2061,14 @@ focus(XEvent *ev)
+ 		xseturgency(0);
+ 		if (IS_SET(MODE_FOCUS))
+ 			ttywrite("\033[I", 3, 0);
++		XkbStateRec xkbstate;
++		if (XkbGetState(xw.dpy, XkbUseCoreKbd, &xkbstate) == Success) {
++			int grp = xkbstate.group;
++			if (grp < 0 || grp > 3)
++				die("Xkb unlikely invalid lang group: %d\n", grp);
++			defaultcs = xkbbasecolor + grp;
++			redrawcursor();
++		}
+ 	} else {
+ 		if (xw.ime.xic)
+ 			XUnsetICFocus(xw.ime.xic);
+@@ -2248,6 +2248,20 @@ run(void)
  	FcPatternGetDouble(dc.font.match->pattern, FC_SIZE, 0, &defaultrelfontsize);
  	refreshxrandr(0);
  
 +	int xkb_major = XkbMajorVersion;
 +	int xkb_minor = XkbMinorVersion;
-+	// VIZ: major_in_out, minor_in_out
 +	if (!XkbLibraryVersion(&xkb_major, &xkb_minor)) {
-+		// TODO: print major-minor before and after call
-+		die("Xkb runtime library is incompatible\n");
++		die("Xkb library (%d.%d) is incompatible with runtime (%d.%d)\n",
++		    XkbMajorVersion, XkbMinorVersion, xkb_major, xkb_minor);
 +	}
-+	int xkb_event_base, xkb_error_base;
-+    // VIZ: dpy, opcode_rtrn, event_rtrn, error_rtrn, major_in_out, minor_in_out
-+	if (!XkbQueryExtension(xw.dpy, NULL, &xkb_event_base, &xkb_error_base, &xkb_major, &xkb_minor)) {
-+		die("Xkb server extension isn't available\n");
++	int xkb_opcode, xkb_event_base, xkb_error_base;
++	if (!XkbQueryExtension(xw.dpy, &xkb_opcode, &xkb_event_base, &xkb_error_base, &xkb_major, &xkb_minor)) {
++		die("Xkb server extension is not available (or incompatible)\n");
 +	}
-+	// VIZ: display, device_spec, event_type, bits_to_change , values_for_bits
 +	if (!XkbSelectEventDetails(xw.dpy, XkbUseCoreKbd, XkbStateNotify, XkbAllStateComponentsMask, XkbGroupStateMask)) {
 +		die("Xkb subscribe to events gone wrong\n");
 +	}
@@ -59,34 +124,30 @@ index cee7c50..8df71f8 100644
  	ttyfd = ttynew(opt_line, shell, opt_io, opt_cmd);
  	cresize(w, h);
  
-@@ -2280,6 +2297,31 @@ run(void)
+@@ -2280,6 +2297,27 @@ run(void)
  			if (XFilterEvent(&ev, None))
  				continue;
  			if (LASTEvent <= ev.type) {
 +				if (xkb_event_base == ev.type) {
++					// NOTE: keep cursor unchanged for other background windows
++					// INFO: xkb events are broadcasted regardless of kbd focus
++					if (!(IS_SET(MODE_FOCUSED)))
++						continue;
 +					if (XkbStateNotify != ((XkbAnyEvent *)&ev)->xkb_type) {
 +						fprintf(stderr, "Xkb unexpected event\n");
 +						continue;
 +					}
-+					// FAIL: only listen to events sent to this window
-+					//   BAD: !xkb broadcasts lang change on <Alt>
-+					//   BUT: !kbdd unicasts on XWindowFocus
-+					// if (((XkbAnyEvent *)&ev)->display != xw.dpy)
-+					// 	continue;
++					// MAYBE:ENH: map color to lang code "en" instead of index
++					//   SEE: libkbdd.c:569: _kbdd_group_names_initialize
 +					int grp = ((XkbStateNotifyEvent*)&ev)->group;
-+					// DEBUG: fprintf(stderr, "Xkb lang: %d\n", grp);
-+					char *p = NULL;
-+					switch (grp) {
-+					case 0: p = "#eeeeee"; break;  // en = white
-+					case 1: p = "#00eeee"; break;  // ru = cyan
-+					case 2: p = "#eeee00"; break;  // ua = yellow
-+					case 3: p = "#ee00ee"; break;  // xx = magenta
-+					default:
-+						fprintf(stderr, "Xkb unknown lang group: %d\n", grp);
++					// DEBUG: fprintf(stderr, "Xkb lang group[0-3]: %d\n", grp);
++					if (grp < 0 || grp > 3) {
++						fprintf(stderr, "Xkb invalid lang group: %d\n", grp);
 +						continue;
 +					}
-+					xsetcolorname(defaultcs, p);
-+					redraw_cursor();
++					defaultcs = xkbbasecolor + grp;
++					redrawcursor();
++					continue;
 +				}
  				if (rr_event_base + RRNotify == ev.type &&
  					RRNotify_CrtcChange == ((XRRNotifyEvent *)&ev)->subtype)

@@ -45,3 +45,24 @@
       grwlf/xkb-switch: Switch your X keyboard layouts from the command line ⌇⡡⣍⣯⢿
         https://github.com/grwlf/xkb-switch
     [≫] CHECK:FAIL? may be worthless in remote tmux
+
+
+2021-12-31 ⌇⡡⣎⣾⣲
+  [⡡⣎⣾⣀] 2h40m !st RFC change cursor color on Xkb event
+    [⡡⣎⣖⠨] 10m !st MOVE: above tasks into @/airy/st/arc/
+    [X] make colors lighter and more orange/blue
+    [⡡⣎⣜⣦] FIND if xkb has any window/display specific info in events/masks
+      ¦ These events are not associated with a particular window. Instead, all
+      ¦ Xkb keyboard status events are reported to all interested clients,
+      ¦ regardless of which window currently has the keyboard focus and
+      ¦ regardless of the grab state of the keyboard.
+    [⡡⣎⣟⣢] ✓ FIND XkbStateNotify mask -- does we filtered to minimum events
+    [⡡⣎⣪⠚] change cursor only after FocusEvent from !kbdd
+      [⡡⣎⣥⡵] 35m SEE: how !kbdd works actually
+        ::: globally listen FocusEvent ++ assign some additional listeners to each window
+          ~~ then globally set XkbLockGroup(display, XkbUseCoreKbd, group)
+      [⡡⣎⣪⢮] ✗ 15m CHECK: how will it work w/o !kbdd
+        [⡡⣎⣺⢥] 20m ::: FAIL: on focus !st must pull current layout and update cursor color
+    [⡡⣎⣶⣼] 50m cleanup xkb patch ::: MOVE to config.h
+      [≫] FUTURE: SPLIT code into sep file NEED hooks
+    [⡡⣎⣾⢱] 15m !vim strip Cursor colors and related config/plugin parts to simplify and reduce interference
