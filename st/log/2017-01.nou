@@ -1,0 +1,84 @@
+2017-01-03
+  Other
+    [$] neovim -> ranger -> 'a' (ag) <M-v> to paste --> eats two letters at beginning
+      :? related to escape-seq of paste? Try using paste-as-text?
+      CHECK: if tmux is involved into problem also, or only st-related
+    2017-01-03 [$] in xmonad windows rearranging (with resizing) don't refresh content in vim
+      > Until fullscreen MAYBE tmux-related, ALSO xmonad don't relay necessary events
+      ::: seems like not problem anymore
+    2017-01-03 [$] when decreasing st window size -- screen lines are cropped and not restored
+      ::: invalid issue :: according to specs VT100 have no scrollback and can't resize at all
+
+2017-01-09
+  Cell rendering issues
+    ::: seems fixed by updating font.conf and font itself
+    2017-01-09 [X] artifacts (scratches) on bg fill SEE :XtermColorTable
+      ~ chars position 'floats' -> letters overlapping stands out
+      TRY: dejavu font, default xfontconfig
+    2017-01-09 [X] horizontal lines cripping on each other (ncmpcpp)
+      SEE:(mail) [dev] [st] bitmap font and chscale 1< line drawing bug
+  Font rendering issues
+    [$] bad antialiasing CHECK! on 96dpi
+    2017-01-09 [X] intermittenly changing inter-letter gaps
+      = resize font in ncmpcpp -- see horizontal/vertical lines
+        ::: new font -- slight overlap on cell borders for several discreet font sizes (small..tiny)
+      ? unconfigured fontconfig
+        SEE: https://wiki.archlinux.org/index.php/Fontconfig
+      ? fallback fonts -- wront wchar_t width in pixels
+        TRY: use another fallback fonts / don't use any
+    [⪡⡊⠰] BUG fat russian bold (+italic) -- like in comments after some time
+      ~ related to fonts w/o bold/italic typefaces -- generated through '90-synthesis.conf' only
+  Program logic
+    2017-01-09 [X] CHECK: removing 'st' patch for startup lines
+      ::: FIXED in mainline
+      Requisites:
+        * multiple fallback fonts for 'monospace'
+        * hi dpi to distinguish different font sizes by eye
+      Running on HiDPI with 'pixelsize' -- all works as expected:
+        $ st -f monospace:pixelsize=35
+      Using relative font size, only first font treats 'size' as relative.
+      But all consequent fonts treat that size like it's absolute:
+        $ st -f monospace:size=10  # only first font ~= pixelsize=35
+        $ st -f monospace:size=35  # only fallbacks ~= pixelsize=35
+      However, if after that I use <C-S-Home> -- fonts will be reloaded
+      and size for all symbols becomes correct.
+      # diff --git a/st.c b/st.c
+      # index 2594c65..6529f56 100644
+      # --- a/st.c
+      # +++ b/st.c
+      # @@ -4399,2 +4399,4 @@ run:
+      #     selinit();
+      # +   xunloadfonts();
+      # +   xloadfonts(usedfont, defaultfontsize);
+      #     run();
+
+2017-07-18
+  2017-07-18 [X] try replace argbbg by alpha off patch
+  2017-07-18 [X] check/compare/update other patches
+    FIND: dev mail list archive: List of Folders ⌇⡟⠉⣍⠥
+      https://lists.suckless.org/dev/
+    WF:
+      $ cd ~/sdk
+      $ gc1 https://git.suckless.org/st && cd st
+      $ gco . && make clean && rm $(git ls-files --others --directory --exclude={new,rm,todo,try,done})
+      $ mkdir -p new
+      $ wget -P new https://st.suckless.org/patches/alpha/st-alpha-0.8.2.diff
+      $ print -l done/st-no_bold_colors-0.8.1.diff done/st-solarized-both-0.8.4.diff done/st-alpha-0.8.2.diff done/st-hidecursor-0.8.3.diff done/st-externalpipe-0.8.2.diff X patch -Np1 -i
+      $ print -l done/st-boxdraw_v2-0.8.3.diff done/st-newterm-0.8.2.diff done/st-spoiler-20180309-c5ba9c0.diff done/st-visualbell2-basic-2020-05-13-045a0fa.diff done/st-ligatures-boxdraw-20200430-0.8.3.diff X patch -Np1 -i
+      $ print -l done/my-{config,tmux,xrandr}-0.8.4.diff X patch -Np1 -i
+      # $ patch -Np1 -i new/my-xrandr.diff
+      $ make
+      $ env -u RANGER_LEVEL ./st -f monospace-12
+      $ gc.
+      $ git show > new/my-tmux.diff
+      ---
+    [X] WTF: $ ./install -u $ error: target not found:
+      BAD
+        $ airyctl -B st-
+        $ r.airy-mods-make tsdir=/tmp flags=-muU st
+      OK
+        $ cd ~/.cache/aurutils/airy
+        $ aur build --force --arg-file='/dev/stdin' -- <<< st-airy-git
+        $ cd ~/.cache/aurutils/airy/st-airy-git
+        $ makepkg --clean --syncdeps
+      ::: !r.pacman-pkg-install >>> sudo pacman --sync '' --noconfirm -- -

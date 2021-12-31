@@ -1,0 +1,47 @@
+2021-12-30-Thu-W52 ⌇⡡⣎⣓⠾
+  [X] 1h BUG: !vim !st !tmux must at least underline misspelled words (as before)
+    [X] !xcape interrupts latching <C->
+      ::: delete xcape
+    [X] FIX !mf fontsize ::: set for HDMI-0 too
+    [X] FIX !tmux underline ::: DISABLED
+    [+] #pc:fra system upgrade
+
+  [X] 1h20m !st BUG: osc10 -- cursor color don't work
+    https://terminalguide.namepad.de/seq/
+    https://www.xfree86.org/current/ctlseqs.html
+    [X] ERR:FIX: modernize patch like "case 104", remove config.h colors
+      erresc: invalid background color p=?
+      erresc: unknown str ESC]11
+      erresc: unknown str ESC]112ESC\
+      erresc: unknown str ESC]12
+
+  [⡡⣍⢩⣀] 1h25m !st IDEA:CHECK: skip tmux esc codes to keep systemd logs clean
+    esc[>c -- DA2 (secondary device attribute) request terminal identification code (should respond VT100)
+    esc[>q -- XDA (NEW) request terminal name and version as string
+      https://gitlab.gnome.org/GNOME/vte/-/issues/235
+    esc[?7727[h/l] -- app escape mode
+      https://groups.google.com/g/vim_use/c/zIdlAugvD9U/m/m0BmpN4ZBe8J?pli=1
+      Terminal feature information schemes · Issue #881 · mintty/mintty ⌇⡡⣍⢔⢇
+        https://github.com/mintty/mintty/issues/881
+      Other features [LWN.net] ⌇⡡⣍⢕⡐
+        https://lwn.net/Articles/752250/
+
+  [%] ✗ 2h30m TRY: blue cursor for vim different lang
+    [X] ✗ NEED? resurrect /@/seize/amer/vim-focus-autocmd/autoload/focau
+      https://www.reddit.com/r/vim/comments/8se9ug/changing_cursor_in_different_modes_with_tmux/
+    [≫] TRY: norcalli/nvim-colorizer.lua: The fastest Neovim colorizer. ⌇⡡⣍⢻⣍
+      https://github.com/norcalli/nvim-colorizer.lua
+    [X] ✗ FAIL: 'guicursor' coloring is not updated by `:highlight Cursor` · Issue #6591 · neovim/neovim ⌇⡡⣍⣀⣙
+      https://github.com/neovim/neovim/issues/6591
+
+  [⡡⣍⣲⣒] ✓ 1h40m !st DEV change cursor color on Xkb event
+    Re: [dev] [st] cursor color and current language from Carlos Torres on 2018-04-20 (dev mail list archive) ⌇⡡⣍⣋⢛
+      https://lists.suckless.org/dev/1804/32670.html
+    [⡡⣍⣯⣋] FIND:IDEA: how kbdd knows when language is changed by !xkb <Alt> ?
+      c++ - Which event is fired when switching kb layout in X.org - Stack Overflow ⌇⡡⣍⣛⠄
+        https://stackoverflow.com/questions/15499723/which-event-is-fired-when-switching-kb-layout-in-x-org
+      qnikst/kbdd: keyboard library for per-window keyboard layout ⌇⡡⣍⣯⣚
+        https://github.com/qnikst/kbdd
+      grwlf/xkb-switch: Switch your X keyboard layouts from the command line ⌇⡡⣍⣯⢿
+        https://github.com/grwlf/xkb-switch
+    [≫] CHECK:FAIL? may be worthless in remote tmux

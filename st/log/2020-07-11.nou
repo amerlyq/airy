@@ -1,0 +1,65 @@
+
+2020-07-11 ⌇⡟⠉⣰⣱
+  [⡟⠉⣠⢶] alpha-focus-higlight | BAD: I don't like visual irritatons on window switch
+  [⡟⠉⣡⠓] anysize | NICE: centering window by border
+    ::: BAD: tile windows have unaligned text -- vert gap between border and first line text
+  [⡟⠉⣡⡷] blinking cursor | BAD: visual distraction
+  [⡟⠉⣡⢲] bold is not bright | DEPR-BY: no-bold
+  [⡟⠉⣣⢵] boxdraw | NICE: gapless pseudographics
+    ::: BUT: disable "braille" -- xtrefs in regular text become eye-bleedingly ugly
+  [⡟⠉⣤⢃] desktopentry | UNUSED for my usecase
+  [_] ? dracula | THINK colorscheme ·based-on· solarized
+  [_] ?? externalpipe-signal | THINK shared instance pipe daemon
+  [⡟⠉⣧⢝] fix IME | OBSOL: st=0.8.2+
+    [_] TRY: input digraphs in ZSH / ranger
+  [$] fix keyboard input | DONE= kbd-input
+  [⡟⠉⣧⣜] font2 | DONE= multi-font DEPR-BY: fontconfig is good enough for me
+  [⡟⠉⣧⣫] gruvbox | UNUSED colorscheme
+  [⡟⠉⣨⠬] hidecursor | DONE
+  [⡟⠉⣨⡌] invert | DEPR-BY: solarized
+  [⡟⠌⠂⠶] iso14755 | TRY: input unicode in ZSH / ranger
+    [_] ERR: breaks on inputting braille e.g. "285f"
+  [⡟⠌⠄⠎] keyboard select | CMP: tmux yank mode ⌇⡟⠉⣩⠪
+    ~~ so-so -- tmux is more comfortable to move
+    - uses "selection" instead of "clipboard"
+  [⡟⠌⠇⣠] ligatures | TRY: ligatures in vim ⌇⡟⠉⣩⢵ ::: NICE! really cool
+  [⡟⠌⠉⠠] newterm | TRY: spawn new terminal from current CWD ⌇⡟⠉⣩⣰
+    [_] ERR: tmux CWD is ignored -- ALSO:DEV: tmux :: <C-l Return> to open new term
+  [$] nordtheme | UNUSED colorscheme
+  [⡟⠉⣪⢽] open copied url | DEPR: copyq / vim / manually
+  [$] openbsd | UNUSED
+  [⡟⠌⠋⢿] osc 10,11,12 | TRY: integ. vim cursor for EN/RU input ⌇⡟⠌⠊⢨
+    [_] BAD: looks like it does not work with vim ?
+      ALSO: EN/RU maybe requires alt-input by <C-^>
+  [$] palettes | UNUSED
+  [⡟⠌⠍⡸] relativeborder | offset of first column/row from border -- depends on font/DPI
+    ::: NOT: I comfortable with defaults, and it's somewhat useless on XMonad anyway
+  [_] right-click-plumb | NICE: context-aware action on right click
+    [_] HACK: change PWD by OSC 7 -- useful for ※⡟⠉⣩⣰
+      https://st.suckless.org/patches/right_click_to_plumb/
+  [⡟⠌⠌⡺] rightclickpaste | THINK TRY reduce my finger strain from frequent insert
+    ::: NOT: shit will happen if <m2> will always insert in ranger/vim/etc.
+  [_] scrollback | THINK:CMP: discard tmux and use this patch and ※⡟⠉⣩⠪
+  [⡟⠌⠏⢪] selectionbg-alpha | WTF ::: FAIL: can't apply patch
+  [$] selectioncolors | UNUSED not sure if useful
+  [⡟⠌⠏⢤] spoiler | NICE: test selection inside $ r.color-16-table
+  [⡟⠌⠒⢺] sync | NICE dynamic latency / support sync-events from tmux FUTURE: too complex for now
+  [⡟⠉⣮⢗] themed cursor | UNUSED
+  [_] universcroll | CMP: BUG? zsh
+  [⡟⠌⠐⠀] vertcenter | ::: useless -- I don't increase "chscale" at all
+  [_] vim browse | CMP:ALT: keyboard select ※⡟⠉⣩⠪ + NICE: navi/search in history
+  [⡟⠉⣯⢽] visualbell | BAD: visual distraction
+  [⡟⠌⠒⢩] visualbell2 | NICE: border/indicator instead of whole screen flashing CHECK: $ printf '\a'
+    ::: BAD: "basic" is very irritating when scrolling in less top/bottom (аж сердце ёкает) OR exiting ranger (after >1min)
+  [_] w3m images | CMP: ueberzug BUG: cursor line flicker/delete image
+  [⡟⠉⣰⡽] workingdir | UNUSED: I better cd() there
+  [⡟⠉⣰⢸] xclearwin | UNUSED I don't change bg on the fly
+  [⡟⠉⣰⣙] resources | UNUSED config.h is enough
+
+
+TODO
+  [⡟⠉⣣⢻] integrate unicode graphics
+    [⡟⠉⣣⢽] https://st.suckless.org/patches/boxdraw/
+    REQ:(my): https://github.com/fabrizioschiavi/pragmatapro/issues/160
+  [⡟⠉⣰⣱] review list of patches (again)
+    https://st.suckless.org/patches
