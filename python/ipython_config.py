@@ -35,12 +35,16 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable
 
 # lines of code to run at IPython startup.
 # c.InteractiveShellApp.exec_lines = []
+# SRC: Autoreload in Ipython ⌇⡡⣏⡔⡺ https://waylonwalker.com/autoreload-ipython/
+c.InteractiveShellApp.exec_lines = ["%autoreload 2"]
+# c.InteractiveShellApp.exec_lines.append('print("Warning: disable autoreload in ipython_config.py to improve performance.")')
 
 # A list of dotted module names of IPython extensions to load.
 # c.InteractiveShellApp.extensions = []
 # REQ: https://stackoverflow.com/questions/19092812/measure-max-memory-usage-with-ipython-like-timeit-but-memit
 # REF: https://github.com/pythonprofilers/memory_profiler#ipython-integration
 # TUT: https://towardsdatascience.com/speed-up-jupyter-notebooks-20716cbe2025
+
 c.InteractiveShellApp.extensions = [
     "autoreload",
     "memory_profiler",
