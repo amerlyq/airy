@@ -56,3 +56,5 @@ find -H "$d_video" \
 | file --dereference --mime-type -e apptype -e ascii -e encoding -e cdf -e compress -e elf -e tar --print0 -f- \
 | grep -aoP '.*(?=\x00:\s+video/)' \
 | parallel -j$(nproc) --halt-on-error now,fail=1 -- gen_ranger_preview {}
+
+# ALT: | xargs -0 -L1 -P0 -- gen_ranger_preview

@@ -4,17 +4,18 @@ source ~/.shell/func.d/cfgsetup
 
 ### GENS ###
 # TEMP: override user settings by standard theme
-./gtk.gen "Adwaita"
+# DISABLED:
+# ./gtk.gen "Adwaita"
 # ./gtk.gen "$THEME"
 # linkcp -t ~/.config/gtk-3.0 ./gtk.css
 
 ## Use gtk themes for Qt4
-cfg=~/.config/Trolltech.conf
-if [[ -f "$cfg" ]]; then
-    if grep -q 'style=' "$cfg"
-    then sed -ri '/^(style=).*/s//\1GTK+/' "$cfg"
-    else sed -ri '/\[Qt\]/s//\0\nstyle=GTK+/' "$cfg"; fi
-    echo "W: $cfg"
-    # gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme Vertex-Dark
-    # Maybe install libgnomeui -- people says then theme will work?
-fi
+# cfg=~/.config/Trolltech.conf
+# if [[ -f "$cfg" ]]; then
+#     if grep -q 'style=' "$cfg"
+#     then sed -ri '/^(style=).*/s//\1GTK+/' "$cfg"
+#     else sed -ri '/\[Qt\]/s//\0\nstyle=GTK+/' "$cfg"; fi
+#     echo "W: $cfg"
+#     # gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme Vertex-Dark
+#     # Maybe install libgnomeui -- people says then theme will work?
+# fi
