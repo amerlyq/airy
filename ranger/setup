@@ -5,8 +5,12 @@ source ~/.shell/func.d/cfgsetup
 
 cfgNo c || git clean -Xdi -- "$PWD"
 
-## init
-# git clone --depth=1 https://github.com/alexanderjeurissen/ranger_devicons /@/airy/ranger/plugins/ranger_devicons
+# ALT: hankei6km/mirage_linemode: Customizable linemode plugin for ranger. ⌇⡡⣐⡤⢫
+#   https://github.com/hankei6km/mirage_linemode
+# ALT: cdump/ranger-devicons2 ⌇⡡⣐⡨⢹ https://github.com/cdump/ranger-devicons2
+if cfgOpt r; then
+  git clone --depth=1 https://github.com/alexanderjeurissen/ranger_devicons /@/airy/ranger/plugins/ranger_devicons
+fi
 
 ### LINKS ###
 linkcp "$PWD" ~/.config/ranger
