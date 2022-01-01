@@ -6,18 +6,25 @@
 # *  (remove) $ pacx emacspeak && aurC && aurx emacspeak && aury
 
 alias aur='AUR_REPO=aur aur'
-alias aurb='aur build --force'          # rebuild inside current dir
-function aurB { local nm; nm=$(r.pacman-loc-prepare "$1") && r.pacman-loc-package "$nm" && sudo pacman -S "$nm"; }
-alias aurC='pacman -Qm | aur vercmp'                            # check updates for foreign pkgs
-alias aure='aur sync'                   # install and prompt to edit files
-alias aurI='aur sync --no-view'         # install
-alias aurc='auri --continue'            # install without download and edit
-# BUG: bare function doesn't expand aliases BUT: function below is not highlighted either
-alias auri='function auri { aurI "$1" && paci "$1"; }; auri'  # install
-alias aurl='pacman -Sl aur'   # list installed aur pkgs
-alias aurr='aur sync --rebuild'  # fully rebuild chosen packages (e.g. python-* pkgs installed as deps)
-alias aurR='aur sync --rebuildtree '      # fully rebuild pkg with all its dependencies
 alias aurs='aur search'
+
+# DISABLED:(--chroot): because DEP=devtools -> DEP=breezy -> repo tracking shit
+alias aure='aur sync'                   # install and prompt to edit files
+alias aurc='aur sync --no-view'         # install and prompt to edit files in chroot
+alias aurC='aurc --continue'            # install without download and edit
+alias aurI='aurc --no-view'             # install
+
+# BUG: bare function doesn't expand aliases BUT: function below is not highlighted either
+# alias auri='function auri { aurI "$1" && paci "$1"; }; auri'  # install
+function auri { AUR_REPO=aur aur sync --no-view "$@" && sudo pacman -S "$1"; }
+
+alias aurf='aur build --force'          # rebuild inside current dir
+alias aurr='aurc --rebuild'         # fully rebuild chosen packages (e.g. python-* pkgs installed as deps)
+alias aurR='aurc --rebuildtree '    # fully rebuild pkg with all its dependencies
+
+# function aurB { local nm; nm=$(r.pacman-loc-prepare "$1") && r.pacman-loc-package "$nm" && sudo pacman -S "$nm"; }
+
+alias aurl='pacman -Sl aur'             # list installed aur pkgs
 function aurq { aur pkglist -P "$@" | command xargs aur search -i; }    # search pkgname by regex
 
 alias aur\?='pacman -Slq aur | grep -vxFf <(aur pkglist)'       # unknown pkgs (not from AUR)
@@ -28,6 +35,7 @@ alias aur\?='pacman -Slq aur | grep -vxFf <(aur pkglist)'       # unknown pkgs (
 #     $ ln -s /var/lib/pacman/sync/aur.db /var/cache/pacman/aur/aur.db
 alias paca='sudo pacman --config /etc/pacman.d/aur.conf'
 alias aury='paca -Sy'
+alias aurY='pacman -Qm | aur vercmp'    # check updates for foreign pkgs
 alias auru='paca -Syu'
 
 # ALT: update only installed
@@ -56,8 +64,9 @@ alias aurD='repoctl update'
 
 # FIXME: make proper alias
 # ALT: $ repoctl remove ...
-aurX(){ local pkg db
+aurX(){
   ## OLD:
+  # local pkg db
   # for pkg; do
   #   aur repo --list-repo | while read -r db; do
   #     repo-remove "$(readlink -e "$db")" "$pkg"

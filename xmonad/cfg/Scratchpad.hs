@@ -13,6 +13,7 @@ myScratchpads :: [NamedScratchpad]
 myScratchpads =
   [ term s s m | (s, m) <-
     [ ("htop"   , defaultFloating)
+    , ("gotop"  , nonFloating)
     , ("ncmpcpp", defaultFloating)
     , ("ipython", customFloating $ RationalRect (1/4) (2/3) 1 (1/3))
     ]

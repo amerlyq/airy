@@ -2,8 +2,15 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
+    ## HACK: remove useless deps on :: at-spi2-atk
+    #  SRC: https://github.com/lah7/gtk3-classic
+    #  = No ATK. No 32-bit libs. No printing, cloudproviders, etc
+    #  [_] TRY: also remove DEP=tracker3
+    #  sudo pacman -Sddw gtk3
+    aur_inst gtk3-classic-noatk-64
+    # pkg_inst gtk2 gtk3
+
     # Install 'Adwaita' to eliminate warnings in GTK apps
-    pkg_inst gtk2 gtk3
     pkg_inst gnome-themes-standard
 
     # BAD: integrity check, many deps

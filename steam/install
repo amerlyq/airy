@@ -1,6 +1,9 @@
 #!/bin/bash -e
 source ~/.shell/func.d/packages
 
+# HACK: remove useless deps on :: zenity -> webkit2 -> at-spi2-atk
+aur_inst zenity-light
+
 pkg_inst steam
 
 if distro arch; then

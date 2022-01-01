@@ -63,7 +63,7 @@ scratchpad = (concat . (`map` [
     ],
     -- Open new or focus the already existing one
     [ ([head nm], namedScratchpadAction myScratchpads nm)
-    | nm <- ["agenda", "daily", "htop", "ipython", "j8", "lyrics", "ncmpcpp", "todo"]
+    | nm <- ["agenda", "daily", "gotop", "htop", "ipython", "j8", "lyrics", "ncmpcpp", "todo"]
     ],
     -- Open new window always
     [ ("S-" ++ [head nm], spawnHere $ "r.tf -e " ++ nm)

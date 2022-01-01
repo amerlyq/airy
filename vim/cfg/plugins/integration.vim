@@ -16,6 +16,21 @@ call dein#add('Shougo/vinarise.vim', {
 
 
 
+" kevinhwang91/rnvimr: Make Ranger running in a floating window to communicate with Neovim via RPC ⌇⡡⢬⡕⠏
+"   https://github.com/kevinhwang91/rnvimr
+call dein#add('kevinhwang91/rnvimr', {
+  \ 'on_cmd': ['RnvimrResize', 'RnvimrToggle'],
+  \ 'hook_source': "
+\\n   let g:rnvimr_enable_ex = 1
+\\n   let g:rnvimr_enable_picker = 1
+\", 'hook_add': "
+\\n   tnoremap <silent> <M-i> <C-\><C-n>:RnvimrResize<CR>
+\\n   nnoremap <silent> <M-o> :RnvimrToggle<CR>
+\\n   tnoremap <silent> <M-o> <C-\><C-n>:RnvimrToggle<CR>
+\"})
+
+
+
 "" CHECK: Integration of python notebooks {{{1
 " OR wilywampa/vim-ipython
 " BUG: don't work with system-wide python
