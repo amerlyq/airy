@@ -6,7 +6,7 @@ set -o pipefail
 cd "${1:-$PWD}"
 # ATT:(-j1): -- gpg-agent can't decrypt keys in-time
 exec r.git-find | r.git-freeze ${2+"$2"} \
-  | parallel -0 -k '
+  | xargs -0 -L1 sh -c '
   echo && r.git-status {} &&
   git-up {} 2>&1 &&
   r.git-status {} && echo'

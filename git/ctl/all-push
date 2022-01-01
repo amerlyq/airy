@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 set -o pipefail
 cd "${1:-$PWD}"
-exec r.git-find | parallel -0 -j1 -k '
+exec r.git-find | xargs -0 -L1 sh -c '
   r.git-push {} 2>&1 || exit $(($?==1?0:$?))
   r.git-status {} && echo && echo'
