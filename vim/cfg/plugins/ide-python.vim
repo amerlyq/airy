@@ -134,6 +134,7 @@ call dein#add('thalesmello/vim-textobj-multiline-str', {
 "   OLD: https://github.com/szymonmaszke/vimpyter
 "   TUT:2019: https://towardsdatascience.com/boosting-your-data-science-workflow-with-vim-tmux-14505c5e016e
 " \\n    noremap  <silent> <Plug>JupyterRunVisual     :<C-u>call <SID>opfunc_run_code(visualmode())<CR>gv
+" \\n    nnoremap <buffer><silent><unique>  <LocalLeader>U :JupyterUpdateShell<CR>
 " FIXME: open second file -- no mappings until ":JupyterConnect"
 call dein#add('jupyter-vim/jupyter-vim', {
   \ 'on_ft': 'python',
@@ -152,6 +153,7 @@ call dein#add('jupyter-vim/jupyter-vim', {
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>h :JupyterSendCell<CR>
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>j :JupyterSendCode g:jupyter_live_exec<CR>
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>s :JupyterSendCode g:jupyter_live_exec<CR>
+\\n    xmap     <buffer><silent><unique>  <LocalLeader>s <Plug>JupyterRunVisual
 \\n    nnoremap <buffer><silent><unique>  <LocalLeader>S :let g:jupyter_live_exec=getline('.')<CR>
 \\n    xnoremap <buffer><silent><unique>  <LocalLeader>S \"sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
 \\n
@@ -165,8 +167,16 @@ call dein#add('jupyter-vim/jupyter-vim', {
 \\n    nmap     <buffer><silent><unique>  <LocalLeader>i <Plug>JupyterRunTextObj<Plug>(textobj-indent-a)
 \\n    nmap     <buffer><silent><unique>  <LocalLeader>G <Plug>JupyterRunTextObj<Plug>(textobj-entire-i)
 \\n
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>U :JupyterUpdateShell<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>b :PythonSetBreak<CR>
+\\n     noremap <buffer><silent><unique>  <LocalLeader>B :<C-u>JupyterSendCode 'breakpoint()'<CR>
+\\n    nnoremap <buffer><silent><unique>  <LocalLeader>b Obreakpoint()<Esc>j
+\\n    nnoremap <buffer><silent><unique>  <LocalLeader>vz :PythonStartDebugger<CR>
+\\n
+\\n    nnoremap <buffer><silent><unique>  <LocalLeader>td :JupyterSendCode '/dir '.expand('<cexpr>')<CR>
+\\n    xnoremap <buffer><silent><unique>  <LocalLeader>td \"sy:<C-u>JupyterSendCode '/dir '.getreg('s')<CR>
+\\n    nnoremap <buffer><silent><unique>  <LocalLeader>te :JupyterSendCode expand('<cexpr>')<CR>
+\\n    xnoremap <buffer><silent><unique>  <LocalLeader>te \"sy:<C-u>JupyterSendCode getreg('s')<CR>
+\\n    nnoremap <buffer><silent><unique>  <LocalLeader>tv :JupyterSendCode '/vars '.expand('<cexpr>')<CR>
+\\n    xnoremap <buffer><silent><unique>  <LocalLeader>tv \"sy:<C-u>JupyterSendCode '/vars '.getreg('s')<CR>
 \\n  endf
 \"})
 
@@ -183,8 +193,51 @@ call dein#add('psf/black', {
 " CFG: :VimspectorInstall debugpy
 " CFG: Setting up Vimspector | Vimspector ⌇⡠⠈⠬⣭
 "   https://puremourning.github.io/vimspector-web/demo-setup.html
+"" LIOR: \\n   let g:vimspector_enable_mappings = 'HUMAN'
+" | F5   | <Plug>VimspectorContinue
+" | F3   | <Plug>VimspectorStop
+" | F4   | <Plug>VimspectorRestart
+" | F6   | <Plug>VimspectorPause
+" | F9   | <Plug>VimspectorToggleBreakpoint
+" | L-F9 | <Plug>VimspectorToggleConditionalBreakpoint
+" | F8   | <Plug>VimspectorAddFunctionBreakpoint
+" | L-F8 | <Plug>VimspectorRunToCursor
+" | F10  | <Plug>VimspectorStepOver
+" | F11  | <Plug>VimspectorStepInto
+" | F12  | <Plug>VimspectorStepOut
 call dein#add('puremourning/vimspector', {
   \ 'on_ft': 'python',
   \ 'hook_source': "
-\\n   let g:vimspector_enable_mappings = 'HUMAN'
+\\n   let g:vimspector_enable_mappings = ''
+\\n   nnoremap <buffer><silent><unique>  <LocalLeader>vg :VimspectorToggleLog<CR>
+\\n   nnoremap <buffer><silent><unique>  <LocalLeader>vG :VimspectorDebugInfo<CR>
+\\n
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>w <Plug>VimspectorBalloonEval
+\\n   xmap     <buffer><silent><unique>  <LocalLeader>w <Plug>VimspectorBalloonEval
+\\n
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vb <Plug>VimspectorToggleBreakpoint
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vB <Plug>VimspectorToggleConditionalBreakpoint
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vf <Plug>VimspectorAddFunctionBreakpoint
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vc <Plug>VimspectorContinue
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vh <Plug>VimspectorRunToCursor
+\\n
+\\n   nnoremap <buffer><silent><unique>  <LocalLeader>va :call vimspector#LaunchWithSettings({'configuration':'attach'})<CR>
+\\n   nnoremap <buffer><silent><unique>  <LocalLeader>ve :call vimspector#LaunchWithSettings({'configuration':'run'})<CR>
+\\n   nnoremap <buffer><silent><unique>  <LocalLeader>vr :call vimspector#LaunchWithSettings({'configuration':'run','stopOnEntry':1})<CR>
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vL <Plug>VimspectorLaunch
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vp <Plug>VimspectorPause
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vq <Plug>VimspectorStop
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vR <Plug>VimspectorRestart
+\\n   nnoremap <buffer><silent><unique>  <LocalLeader>vx :VimspectorReset<CR>
+\\n
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vn <Plug>VimspectorStepOver
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vi <Plug>VimspectorStepInto
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vs <Plug>VimspectorStepOver
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vS <Plug>VimspectorStepInto
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vo <Plug>VimspectorStepOut
+\\n
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vj <Plug>VimspectorDownFrame
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>vk <Plug>VimspectorUpFrame
+\\n   nmap     <buffer><silent><unique>  <LocalLeader><Up> <Plug>VimspectorUpFrame
+\\n   nmap     <buffer><silent><unique>  <LocalLeader><Down> <Plug>VimspectorDownFrame
 \"})
