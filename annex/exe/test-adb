@@ -29,7 +29,12 @@ for f in old/1 old/2 new/3 new/4; do (head -c100 /dev/zero;echo $f) > $f; done
 git annex add
 git commit -m annex
 
-git-annex initremote android type=adb androiddirectory=/storage/0000-0000/books encryption=none exporttree=yes importtree=yes
-git config remote.android.annex-tracking-branch master
+git annex initremote android type=adb androiddirectory=/storage/0000-0000/books encryption=none exporttree=yes importtree=yes
+git config --local remote.android.annex-sync false
+
+# WARN: you MUST export+import before first sync to prevent "main" branch future empty commits!
+# git annex export main --to android
+# git annex import main --from android
+
+# git config remote.android.annex-tracking-branch master
 # git annex sync --no-commit --not-only-annex --content android
-git annex sync android

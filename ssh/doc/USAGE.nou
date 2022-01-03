@@ -8,6 +8,7 @@
     $ ssh-add -D
   Delete keys from gnupg agent
     https://unix.stackexchange.com/questions/185393/gpg-agent-doesnt-remove-my-ssh-key-from-the-keyring
+    [!] ALT:TRY:(no manual .gnupg exploration): $ man gpgconf
     $ ssh-add -l -E md5
     $ gpg-connect-agent
       KEYINFO --ssh-list --ssh-fpr
@@ -15,6 +16,9 @@
       DELETE_KEY <HANDLE>
       BYE
     $ ssh-add -l
+  Reload agent
+    $ gpgconf --reload gpg-agent
+    # OR: kill -SIGHUP
 
 
 %%% Hosts
