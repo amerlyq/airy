@@ -244,7 +244,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
   -- BAD: floating "Steam" will run away in diagonal bot-right if {borderWidth > 2}
   , let lst = "feh Gimp piony.py Transmission-gtk"  -- "jetbrains-studio"
     in wmhas className lst
-  , let lst = "PlayOnLinux Dialog"
+  , let lst = "PlayOnLinux Dialog pinentry-qt"
     in wmhas appName lst
   , className =? "firefox" <&&> appName =? "Download"
   ] <+>
