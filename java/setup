@@ -3,7 +3,9 @@
 source ~/.shell/func.d/cfgsetup
 
 if cfgOpt u; then
-  sudo archlinux-java set 'java-8-openjdk'
+  sudo archlinux-java status
+  # WARN:NEED:(java-17): |local/android-backup-extractor-git| r92.e30cc24-1
+  sudo archlinux-java set 'java-17-openjdk'  # 'java-8-openjdk'
   java -version
   javac -version
 fi
