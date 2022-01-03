@@ -133,52 +133,12 @@ call dein#add('thalesmello/vim-textobj-multiline-str', {
 " ALT: https://github.com/hanschen/vim-ipython-cell
 "   OLD: https://github.com/szymonmaszke/vimpyter
 "   TUT:2019: https://towardsdatascience.com/boosting-your-data-science-workflow-with-vim-tmux-14505c5e016e
-" \\n    noremap  <silent> <Plug>JupyterRunVisual     :<C-u>call <SID>opfunc_run_code(visualmode())<CR>gv
-" \\n    nnoremap <buffer><silent><unique>  <LocalLeader>U :JupyterUpdateShell<CR>
 " FIXME: open second file -- no mappings until ":JupyterConnect"
 call dein#add('jupyter-vim/jupyter-vim', {
   \ 'on_ft': 'python',
   \ 'on_cmd': 'JupyterConnect',
-  \ 'hook_source': "
-\\n    let g:jupyter_mapkeys = 0
-\\n    let g:jupyter_live_exec = 'print(_live())'
-\\n    autocmd MyAutoCmd FileType python call BufMap_jupyter_vim()
-\\n  fun! BufMap_jupyter_vim() abort
-\\n    if exists('b:BufMap_jupyter_vim')|return|else|let b:BufMap_jupyter_vim=1|endif
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>z :JupyterConnect<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>Z :JupyterDisconnect<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>r :JupyterRunFile<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>I :PythonImportThisFile<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>x :JupyterSendCell<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>h :JupyterSendCell<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>j :JupyterSendCode g:jupyter_live_exec<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>s :JupyterSendCode g:jupyter_live_exec<CR>
-\\n    xmap     <buffer><silent><unique>  <LocalLeader>s <Plug>JupyterRunVisual
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>S :let g:jupyter_live_exec=getline('.')<CR>
-\\n    xnoremap <buffer><silent><unique>  <LocalLeader>S \"sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
-\\n
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>l :let b:p=getcurpos()\\|JupyterSendRange\\|call setpos('.',b:p)<CR>
-\\n    xnoremap <buffer><silent><unique>  <LocalLeader>l :JupyterSendRange<CR>
-\\n    nmap     <buffer><silent><unique>  <LocalLeader>e <Plug>JupyterRunTextObj
-\\n    xmap     <buffer><silent><unique>  <LocalLeader>e <Plug>JupyterRunVisual
-\\n    nmap     <buffer><silent><unique>  <LocalLeader>f <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterFunctionTextObject)
-\\n    nmap     <buffer><silent><unique>  <LocalLeader>c <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterClassTextObject)
-\\n    nmap     <buffer><silent><unique>  <LocalLeader>L <Plug>JupyterRunTextObj$
-\\n    nmap     <buffer><silent><unique>  <LocalLeader>i <Plug>JupyterRunTextObj<Plug>(textobj-indent-a)
-\\n    nmap     <buffer><silent><unique>  <LocalLeader>G <Plug>JupyterRunTextObj<Plug>(textobj-entire-i)
-\\n
-\\n     noremap <buffer><silent><unique>  <LocalLeader>B :<C-u>JupyterSendCode 'breakpoint()'<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>b Obreakpoint()<Esc>j
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>vz :PythonStartDebugger<CR>
-\\n
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>td :JupyterSendCode '/dir '.expand('<cexpr>')<CR>
-\\n    xnoremap <buffer><silent><unique>  <LocalLeader>td \"sy:<C-u>JupyterSendCode '/dir '.getreg('s')<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>te :JupyterSendCode expand('<cexpr>')<CR>
-\\n    xnoremap <buffer><silent><unique>  <LocalLeader>te \"sy:<C-u>JupyterSendCode getreg('s')<CR>
-\\n    nnoremap <buffer><silent><unique>  <LocalLeader>tv :JupyterSendCode '/vars '.expand('<cexpr>')<CR>
-\\n    xnoremap <buffer><silent><unique>  <LocalLeader>tv \"sy:<C-u>JupyterSendCode '/vars '.getreg('s')<CR>
-\\n  endf
-\"})
+  \ 'hook_source': _hcat('jupyter-vim.src')
+\})
 
 
 
