@@ -2,5 +2,5 @@
 set -o pipefail
 cd "${1:-$PWD}"
 exec r.git-find | xargs -0 -L1 sh -c '
-  r.git-push {} 2>&1 || exit $(($?==1?0:$?))
-  r.git-status {} && echo && echo'
+  r.git-push "$0" 2>&1 || exit $(($?==1?0:$?))
+  r.git-status "$0" && echo && echo'
