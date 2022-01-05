@@ -7,19 +7,25 @@
 #%SUMMARY: import/export ⌇⡟⣠⠶⡉
 #%USAGE: $ ./$0
 set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+# set -x
 
-cd /tmp/t
-[[ -d books ]] && find books -not -writable -exec chmod +w -- {} +
-rm -rf books
-mkdir books
-cd books
+adb shell "rm -rf /storage/0000-0000/ttt"
+
+cd /tmp
+[[ -d ttt ]] && find ttt -not -writable -exec chmod +w -- {} +
+rm -rf ttt
+mkdir ttt
+
+cd ttt
 git init .
+git config --local init.defaultBranch main
 git config --local user.name annex
 git config --local user.email test
 
 git annex init test
 git annex config --set annex.largefiles 'not mimetype=text/*'
 
+# git commit --allow-empty -m init
 echo hello > README.rst
 git add README.rst
 git commit -m init
@@ -29,12 +35,24 @@ for f in old/1 old/2 new/3 new/4; do (head -c100 /dev/zero;echo $f) > $f; done
 git annex add
 git commit -m annex
 
-git annex initremote android type=adb androiddirectory=/storage/0000-0000/books encryption=none exporttree=yes importtree=yes
+git annex initremote android type=adb androiddirectory=/storage/0000-0000/ttt encryption=none exporttree=yes importtree=yes
 git config --local remote.android.annex-sync false
 
 # WARN: you MUST export+import before first sync to prevent "main" branch future empty commits!
 # git annex export main --to android
 # git annex import main --from android
 
-# git config remote.android.annex-tracking-branch master
-# git annex sync --no-commit --not-only-annex --content android
+# for _ in {0..5}; do git annex import main --from android; done
+# for _ in {0..5}; do git annex export main --to android; done
+
+echo
+git config remote.android.annex-tracking-branch main
+for _ in {0..6}; do git annex sync --no-commit --content android; done
+
+echo
+find . -name .git -prune -o -xtype f -exec stat -c '%s %Y %i %n' {} +
+echo
+adb shell "find /storage/0000-0000/ttt -type f -exec stat -c '%s %Y %i %n' {} +"
+
+echo
+git -c color.ui=no --no-pager log --topo-order --oneline --patch --decorate --graph main
