@@ -36,9 +36,12 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable
 # lines of code to run at IPython startup.
 # c.InteractiveShellApp.exec_lines = []
 # SRC: Autoreload in Ipython ⌇⡡⣏⡔⡺ https://waylonwalker.com/autoreload-ipython/
+# shell.InteractiveTB.set_mode(mode=new_mode)
 c.InteractiveShellApp.exec_lines = [
-    "%autoreload 2",
-    "%xmode Verbose",
+    """%%capture
+    %autoreload 2
+    %xmode Verbose
+    """
 ]
 # c.InteractiveShellApp.exec_lines.append('print("Warning: disable autoreload in ipython_config.py to improve performance.")')
 
