@@ -181,7 +181,7 @@ function SyncRepos {  local r
     #   FIXME: fetch only specific remote "$tomb" or default one "origin"
     # git-up $r origin 2>&1
 
-    local rmt url srv="file:///mnt/${${r:A:t}#.}.git"
+    local rmt url srv="file:///mnt/${${r:a:t}#.}.git"
     # DEPR:(fallback): origin ...
     for rmt in $tomb; do
       url=$(git remote get-url "$rmt" 2>/dev/null ||:)
@@ -195,18 +195,29 @@ function SyncRepos {  local r
     #   IMPL: if some remotes are not available -- disable them for whole session
     # OFF:WiP: learn about remotes that are currently unavailable ⌇⡟⣻⣳⡌
     #   https://git-annex.branchable.com/todo/learn_about_remotes_that_are_currently_unavailable/
-    local _nm _url _annex=""
+    local _nm _url _annex="" _disabled=()
+    # NOTE:(skip): web (glab, ghub), android ("annex import/export")
+    local allowedrmt=( 'file:///mnt' 'ssh://neo/@' 'ssh://lca')
     for _nm in $(git remote show); do
       _url=$(git remote get-url "$_nm")
       if ((!$+online_rmt["$_url"])); then
-        if git ls-remote --quiet --exit-code --heads -- "$_nm" &>/dev/null
-        then online_rmt["$_url"]=1
-        else online_rmt["$_url"]=0
-        fi
+        online_rmt["$_url"]=0
+        for pfx in $allowedrmt; do
+          # DEBUG: print "$_nm CMP $pfx VS $_url"
+          if [[ $_url == $pfx/* ]]; then
+            # FIXED:WARN:(ls-remote): accesses internet and prompts for ssh-key password (e.g. /@/beatrix)
+            if git ls-remote --quiet --exit-code --heads -- "$_nm" &>/dev/null
+            then online_rmt["$_url"]=1
+            fi
+          fi
+        done
       fi
-      (($online_rmt["$_url"])) || _annex+=" -c remote.$_nm.annex-sync=false"
+      if ((!$online_rmt["$_url"])); then
+        _disabled+=("$_nm")
+        _annex+=" -c remote.$_nm.annex-sync=false"
+      fi
     done
-    [[ -n ${_annex:+x} ]] && >&2 echo "DISABLED:(annex-args): $_annex"
+    [[ -n ${_annex:+x} ]] && >&2 echo "DISABLED: ${_disabled[*]}"
 
     if [[ -d $r/.git/annex/objects ]]; then
       git ${=_annex} annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --pull --no-push
@@ -272,9 +283,13 @@ function CfgCloneCentralRepos { local r
     # git -C "$root" git submodule foreach ...
 
     # FIXED: allow executing !r.tomb-backup from repo subfolder
-    [[ -e $r ]] && r=$(git rev-parse --show-toplevel)
+    if [[ -e $r ]]; then
+      topr=$(git rev-parse --show-toplevel)
+      # WKRND: keep "/@/airy" as symlink if not in subfolder
+      [[ $r -ef $topr ]] || r=$topr
+    fi
 
-    local nm=${${r:A:t}#.}
+    local nm=${${r:a:t}#.}
     local mnt=/mnt/$nm.git
     local srv="file://$mnt"
     local rmt=$tomb
@@ -284,7 +299,13 @@ function CfgCloneCentralRepos { local r
     # [_] CHECK: how GIT_DIR will work with git clone
     [[ -e $r ]] || git clone --origin "$rmt" -- "$srv" "$r"
     # [_] TODO:ALSO:(for git-annex-sync): $ gmy -m
-    [[ -e $mnt ]] || git clone --bare --mirror -- "file://$r:A" "$mnt"
+    [[ -e $mnt ]] || git clone --bare --mirror -- "file://${r:a}" "$mnt"
+
+    # BET? use /mnt in push-only mode -- never pull into /mnt itself
+    #   BUT: will annex work in that case?
+    #   remove rmt from bare repo -- to prevent situation,
+    #   when "mnt" after "fra" connects to "neo" and detects,
+    #   that its remote is older than
 
     # NOTE: influence all repos with (origin|aura) =~ file:///mnt/*
     local url
@@ -330,7 +351,8 @@ fi
 #   ALT:BET? only fetch, don't pull
 exclude=( /@/xdg_etc )
 repos=( "${(@)repos:|exclude}" )
-# print -l "$repos"
+# print -l $repos
+# exit
 
 has s && ((!$#repos)) && >&2 echo "Err: empty repos list" && exit 1
 has v && print -l $repos
