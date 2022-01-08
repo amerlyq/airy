@@ -28,6 +28,10 @@ AUR
     $ pacman -Sl aurto
   check logs of last auto-builds (by timer)
     $ journalctl -eu update-aurto
+  Delete package ghost completely (for e.g. rebuild to work)
+    $ sudo repo-remove /var/cache/pacman/aur/aur.db.tar gtk3-classic-noatk-64-3.24.30-1-x86_64.pkg.tar.zst
+    $ sudo pacman --config /etc/pacman.d/aur.conf -Sy
+    $ pikaur --sync --edit gtk3-classic-noatk-64
 
 
 GROUP

@@ -1,84 +1,22 @@
 # vim:ft=sh
+# HELP: $ pikaur -Sh [-Qh -Ph -Gh]
 
-# [_] CHECK: it seems "auru" is not needed anymore after "aurb"
-# USAGE:
-# * (rebuild) $ cd ~/.cache/aurutils/sync/emacspeak && aurb && auru && paci emacspeak
-# *  (remove) $ pacx emacspeak && aurC && aurx emacspeak && aury
+alias aur='sudo pacman --config /etc/pacman.d/aur.conf'
+alias aury='aur -Sy'
 
-alias aur='AUR_REPO=aur aur'
-alias aurs='aur search'
+alias aure='pikaur --sync --edit --rebuild --confirm'
+alias auri='pikaur --sync --noedit --nodiff'
+alias aurI='pikaur --sync --rebuild --noconfirm'
 
-# DISABLED:(--chroot): because DEP=devtools -> DEP=breezy -> repo tracking shit
-alias aure='aur sync'                   # install and prompt to edit files
-alias aurc='aur sync --no-view'         # install and prompt to edit files in chroot
-alias aurC='aurc --continue'            # install without download and edit
-alias aurI='aurc --no-view'             # install
+alias aurs='auri --search'
+alias aurS='aurs --aur'
 
-# BUG: bare function doesn't expand aliases BUT: function below is not highlighted either
-# alias auri='function auri { aurI "$1" && paci "$1"; }; auri'  # install
-function auri { AUR_REPO=aur aur sync --no-view "$@" && sudo pacman -S "$1"; }
+alias aurq='pikaur --query --info'
+alias aurqq='aurq --info'
+alias aurQ='auri --info'
+alias aurQQ='aurQ --info'
 
-alias aurf='aur build --force'          # rebuild inside current dir
-alias aurr='aurc --rebuild'         # fully rebuild chosen packages (e.g. python-* pkgs installed as deps)
-alias aurR='aurc --rebuildtree '    # fully rebuild pkg with all its dependencies
+alias auru='pikaur --query --upgrades'
 
-# function aurB { local nm; nm=$(r.pacman-loc-prepare "$1") && r.pacman-loc-package "$nm" && sudo pacman -S "$nm"; }
-
-alias aurl='pacman -Sl aur'             # list installed aur pkgs
-function aurq { aur pkglist -P "$@" | command xargs aur search -i; }    # search pkgname by regex
-
-alias aur\?='pacman -Slq aur | grep -vxFf <(aur pkglist)'       # unknown pkgs (not from AUR)
-
-# HACK: apply action to "aur" database only (to keep old core/extra/community)
-#   ALT:(for whole aurutils): make wrapper-script from it and export PACMAN=/path/to/script
-#   ALT: make symlink to eliminate necessity to sync custom repo at all
-#     $ ln -s /var/lib/pacman/sync/aur.db /var/cache/pacman/aur/aur.db
-alias paca='sudo pacman --config /etc/pacman.d/aur.conf'
-alias aury='paca -Sy'
-alias aurY='pacman -Qm | aur vercmp'    # check updates for foreign pkgs
-alias auru='paca -Syu'
-
-# ALT: update only installed
-# pacman -Slq aur | grep -ZFxf <(pacman -Qq) | xargs -0 echo
-alias aurU='aur sync --upgrades'                                # update-rebuild all
-alias aurv='aur sync --no-view --no-ver -f'  # upgrade single pkg e.g. radare2-git
-
-# ALSO: remove uninstalled "paccache -ruk0"
-alias aurz='paccache --cachedir /var/cache/pacman/aur --keep 0 --dryrun -vvv --'
-alias aurZ='paccache --cachedir /var/cache/pacman/aur --keep 0 --remove --'
-
-# WARN: it doesn't remove pkg from cache dir BAD: paccache won't find it anymore
-# https://github.com/AladW/aurutils/issues/305 + $ sudo pacman -Syu
-# https://github.com/AladW/aurutils/issues/208
-#   = Note that when you set your repo as a pacman CacheDir (which is recommended anyway), you can use KeepInstalled and simply run pacman -Sc. repoctl update then proceeds to remove stale entries from the db.
-aurx(){ find /var/cache/pacman/aur -name "*.db.tar" -execdir repo-remove {} "$@" \;; }
-
-## NOTE: cleanup aur.db from uninstalled pkgs (so aurU won't update them)
-# CFG: $ repoctl conf new /var/cache/pacman/aur/aur.db.tar
-#   TODO: add this cfg to airy
-# feature: aursync flag for deleting package from db and/or purge · Issue #208 · AladW/aurutils ⌇⡠⡇⠿⠖
-#   https://github.com/AladW/aurutils/issues/208
-#   paccache -r; paccache -ruk0; repoctl update
-alias aurD='repoctl update'
-
-
-# FIXME: make proper alias
-# ALT: $ repoctl remove ...
-aurX(){
-  ## OLD:
-  # local pkg db
-  # for pkg; do
-  #   aur repo --list-repo | while read -r db; do
-  #     repo-remove "$(readlink -e "$db")" "$pkg"
-  #     find "${db%/*}" -name "$pkg*" -delete
-  #     # NEED:(manually): rm -rf ~/.cache/aurutils/sync/"$pkg"
-  #   done
-  #   if expac -Q '%n' "$pkg" >/dev/null; then
-  #     sudo pacman -R "$pkg"
-  #   fi
-  # done
-  aur repo --list-path | while read -r repo_path; do
-    repo-remove "$repo_path" "$@"
-    paccache -c "${repo_path%/*}" -rvk0 "$@"
-  done
-}
+alias aurx='pikaur --remove --recursive'
+alias aurX='aurx --unneeded --cascade'

@@ -18,9 +18,15 @@ has_pkgs(){ command pacman -Qq "$@" &>/dev/null; }
 
 # FAIL: error on clean install
 # MAYBE:BET: install manually according to :/archlinux/doc/layout-2020-05-fractal
-KEY=DBE7D3DD8C81D58D0A13D0E76BC26A17B9B7018A \
-  r.pacman-aur-helper 'aurutils-git' \
-    'https://raw.githubusercontent.com/AladW/aurutils/master/makepkg/PKGBUILD'
+# KEY=DBE7D3DD8C81D58D0A13D0E76BC26A17B9B7018A \
+#   r.pacman-aur-helper 'aurutils-git' \
+#     'https://raw.githubusercontent.com/AladW/aurutils/master/makepkg/PKGBUILD'
+
+## USE:(pikaur): instead of aurutils
+# sudo pacman -S --needed base-devel git
+# git clone https://aur.archlinux.org/pikaur.git
+# cd pikaur
+# makepkg -fsri
 
 
 # [⡠⡇⡾⣸] WTF: why reiserfsprogs installed on clean system with aur ?
