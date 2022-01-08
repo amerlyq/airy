@@ -3,4 +3,11 @@
 # pylint:disable=unused-import
 import os
 import os.path as fs
+import re
 from pathlib import Path
+
+from just.ext.datetime.alias import DD, DT, TH, TM, TT
+from just.ext.datetime.cvt import dt_hmx
+
+# ALT: /__import__("just.iji.util").iji.util.print_ret <expr>
+from just.ext.print import print_ret as p

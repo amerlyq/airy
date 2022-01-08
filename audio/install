@@ -6,9 +6,15 @@ source ~/.shell/func.d/packages
 # lib32-openal | necessary for XAudio2.7 to work under Wine
 
 if distro arch; then
-    pkg_inst alsa-{firmware,lib,plugins,utils,tools}
-    pkg_inst lib32-{alsa-{lib,plugins},libpulse,openal}
-    pkg_inst pulseaudio{,-alsa} libcanberra-pulse
+
+  # MAYBE: not all needed ?
+  pkg_inst alsa-{firmware,lib,plugins,utils,tools}
+  pkg_inst lib32-{alsa-{lib,plugins},libpulse,openal}
+  pkg_inst pulseaudio{,-alsa} libcanberra-pulse
+
+  # pkg_inst pavucontrol  # BAD: gtk black screen
+  # aur_inst pavucontrol-qt-sandsmark-git
+  aur_inst ncpamixer
 
 elif distro ubuntu; then
     ## For Mint

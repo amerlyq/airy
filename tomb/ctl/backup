@@ -186,8 +186,10 @@ function SyncRepos {  local r
     for rmt in $tomb; do
       url=$(git remote get-url "$rmt" 2>/dev/null ||:)
       [[ -z $url ]] && continue
-      [[ $url == "$srv" ]] && break || unset rmt
-      [[ $url == file:///mnt/* ]] && >&2 echo "Err: remote='$rmt' points to wrong srv='$url'" && exit 1
+      [[ $url == "$srv" ]] && break
+      [[ $url =~ "^file:///mnt/.*" ]] && >&2 echo "Err: repo='$r' remote='$rmt' points to wrong srv='$url'" && exit 1
+      # NOTE: otherwise silently ignore this remote, wherever it points is not our problem
+      unset rmt
     done
     [[ -z ${rmt-} ]] && >&2 echo "Err: private remote=${rmt:-TBD} not found" && exit 1
 

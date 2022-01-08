@@ -41,6 +41,10 @@
 #   TRY: keyval FMT:(~RFC822) to parse/add values to commit messages
 #     https://git-scm.com/docs/git-interpret-trailers ⌇⡠⠈⡞⣋
 #
+# [_] BET: git command to auto-split existing changes <⡆⢶|⡊⠶>
+#   into multiple commits
+#   and auto-name in similar way to gitfs
+#
 # IDEA: commit message must help with easier decisions about rewriting history
 # TODO: tops=$(git add -- .; git diff-index --name-only --cached HEAD | sed 's|/.*||' | sort -u; git reset)
 #   $ for d in "${(@f)tops}"; do git add "$d"; git stash push --keep-index --include-untracked; r.git-my-msg --index --commit; git stash pop; done

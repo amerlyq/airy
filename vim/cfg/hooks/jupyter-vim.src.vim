@@ -2,7 +2,8 @@
 let g:jupyter_mapkeys = 0
 
 "" BET: assign it something short during prolog inside IPython
-let g:jupyter_live_pprint = '/__import__("just.iji.util").iji.util.print_ret '
+" let g:jupyter_live_pprint = '/__import__("just.iji.util").iji.util.print_ret '
+let g:jupyter_live_pprint = '/p '
 let g:jupyter_live_exec = g:jupyter_live_pprint .'_live()'
 " let g:jupyter_live_exec = 'print(_live())'
 " let g:jupyter_live_exec = '_live()'
@@ -23,7 +24,10 @@ fun! BufMap_jupyter_vim() abort
 
   nnoremap <buffer><silent><unique>  <LocalLeader>z :JupyterConnect<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>Z :JupyterDisconnect<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>r :JupyterRunFile<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>r :JupyterRunFile -iG %:p<CR>
+  " BET?(no args): <LL>T -> <LL>e == "execute", like __main__
+  nnoremap <buffer><silent><unique>  <LocalLeader>T :JupyterRunFile<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>i :JupyterRunFile -niG %:p<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>I :PythonImportThisFile<CR>
 
   nnoremap <buffer><silent><unique>  <LocalLeader>vd :JupyterSendCode '%debug'<CR>
@@ -44,7 +48,7 @@ fun! BufMap_jupyter_vim() abort
   nmap     <buffer><silent><unique>  <LocalLeader>f <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterFunctionTextObject)
   nmap     <buffer><silent><unique>  <LocalLeader>c <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterClassTextObject)
   nmap     <buffer><silent><unique>  <LocalLeader>L <Plug>JupyterRunTextObj$
-  nmap     <buffer><silent><unique>  <LocalLeader>i <Plug>JupyterRunTextObj<Plug>(textobj-indent-a)
+  " nmap     <buffer><silent><unique>  <LocalLeader>i <Plug>JupyterRunTextObj<Plug>(textobj-indent-a)
   nmap     <buffer><silent><unique>  <LocalLeader>G <Plug>JupyterRunTextObj<Plug>(textobj-entire-i)
 
    noremap <buffer><silent><unique>  <LocalLeader>B :<C-u>JupyterSendCode 'breakpoint()'<CR>
@@ -57,6 +61,9 @@ fun! BufMap_jupyter_vim() abort
   call s:mapsendcode('te', '')
   call s:mapsendcode('tg', '%debug ')
   call s:mapsendcode('tl', '/list ')
+  " call s:mapsendcode('tp', '/p ')
   call s:mapsendcode('tr', "/__import__('pprint').pprint ")
+  call s:mapsendcode('ts', g:jupyter_live_pprint)
   call s:mapsendcode('tv', '/vars ')
+  call s:mapsendcode('tw', '')
 endf
