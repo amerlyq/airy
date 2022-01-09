@@ -4,6 +4,7 @@
 import os
 import os.path as fs
 import re
+import sys
 from pathlib import Path
 
 from just.ext.datetime.alias import DD, DT, TH, TM, TT

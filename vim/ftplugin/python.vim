@@ -22,3 +22,8 @@ EOF
 fun! InferJupyterPkg()
   return py3eval("inferjupyterpkg(r'".expand("%:p")."')")
 endfun
+
+
+"" FAIL:BET: use snippets plugin
+" inoreab <buffer> <expr> cl (match(getline('.'), "^cl\\s*$") < 0 ? "cl" : "class A:\n    def __init__(self):\n        self.a = 1")
+" inoreab <buffer> <expr> s. (match(getline('.'), "^\\s\\+s\\.\\s*$") < 0 ? "s." : "self.")
