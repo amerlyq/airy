@@ -351,7 +351,8 @@ fi
 # HACK: skip problematic repos
 # [_] FIXME: use intermediate "mirror" for /etc
 #   ALT:BET? only fetch, don't pull
-exclude=( /@/xdg_etc )
+# BAD: /home has different remote
+exclude=( /@/xdg_etc /@/xdg_home )
 repos=( "${(@)repos:|exclude}" )
 # print -l $repos
 # exit

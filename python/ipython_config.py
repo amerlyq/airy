@@ -40,9 +40,10 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable
 c.InteractiveShellApp.exec_lines = [
     """%%capture
     %autoreload 2
-    %xmode Verbose
+    %xmode Context
     """
 ]
+# %xmode Verbose
 # c.InteractiveShellApp.exec_lines.append('print("Warning: disable autoreload in ipython_config.py to improve performance.")')
 
 # A list of dotted module names of IPython extensions to load.
