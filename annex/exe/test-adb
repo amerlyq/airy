@@ -37,6 +37,8 @@ git commit -m annex
 
 git annex initremote android type=adb androiddirectory=/storage/0000-0000/ttt encryption=none exporttree=yes importtree=yes
 git config --local remote.android.annex-sync false
+git config --local annex.debug true
+git config --local annex.jobs 1
 
 # WARN: you MUST export+import before first sync to prevent "main" branch future empty commits!
 # git annex export main --to android
