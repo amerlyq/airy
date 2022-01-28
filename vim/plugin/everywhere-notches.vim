@@ -27,7 +27,7 @@ let s:patterns = [
   \ ['Hdr',  27, '#004fff', 'OFFL?|OFCL|OFFICIAL|DRAW|WFs?|WORKFLOW|PRIA|PRIOR_ART|FUT|FUTURE|RE|REV-ENG|XLR|EXPLORE'],
   \ ['Msg',  62, '#5f5fdf', 'PURP|NB|NOTE|USE|DEMO|USAGE|DFL|DEFAULT|STD|SUM%(MARY)?|DEBUG|I\.A|i\.a|DEP[sS]?|DEPENDS'],
   \ ['Unq', 188, '#dfdfdf', 'THEO'],
-  \ ['Com', 101, '#958e68', 'EXPL|EXPLAIN|COS|BECAUSE'],
+  \ ['Com', 101, '#958e68', 'EXPL|EXPLAIN|COS|BECAUSE|AGAIN'],
   \]
 
 function! s:everywhere_print(patts)
