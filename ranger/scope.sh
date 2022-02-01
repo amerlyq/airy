@@ -50,12 +50,16 @@ OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
 ## FAIL: git-annex symlinks are resolved and lose extension
 # echo "$FILE_PATH" > /t/hi
 
-preview_archive(){ local f=$1 sfx=${2:-#/}
+preview_archive(){ local f=$1 sfx=${2:-#/} avfsdir=$XDG_RUNTIME_DIR/avfs
+  # HACK:FIXED:(prevent freeze in recursive archives under fm.avfsdir
+  [[ ${f#"$avfsdir"} == "$f" ]] || exit 1
+
   # MAYBE:BAD:(errpipe=141): | head -n "$PV_HEIGHT"
-  local vdir=$XDG_RUNTIME_DIR/avfs${f}$sfx
+  local vdir=${avfsdir}${f}$sfx
   # DISABLED:(LC_ALL=C for sorting): cyrillic names are converted to octal escape codes
   # BET: use "broot" for fast-preview of archive contents FAIL: only interactive usage
-  [[ -d $vdir ]] && tree --noreport -xaCL 3 --dirsfirst -- "$vdir" && exit 5
+  # FIXED:REM(tree -x): archives inside annex only show top-level folder
+  [[ -d $vdir ]] && tree --noreport -aCL 3 --dirsfirst -- "$vdir" && exit 5
   # TRY: atool --list -- "$f" | tree --noreport -aACL 3 --dirsfirst --fromfile=-
   atool --list -- "$f" && exit 5
   exit 1

@@ -51,6 +51,8 @@ fun! BufMap_jupyter_vim() abort
   " nmap     <buffer><silent><unique>  <LocalLeader>i <Plug>JupyterRunTextObj<Plug>(textobj-indent-a)
   nmap     <buffer><silent><unique>  <LocalLeader>G <Plug>JupyterRunTextObj<Plug>(textobj-entire-i)
 
+  " HACK: for integration with Vimspector (:PythonStartDebugger)
+  "   https://github.com/jupyter-vim/jupyter-vim/pull/69
    noremap <buffer><silent><unique>  <LocalLeader>B :<C-u>JupyterSendCode 'breakpoint()'<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>b Obreakpoint()<Esc>j
   nnoremap <buffer><silent><unique>  <LocalLeader>vz :PythonStartDebugger<CR>

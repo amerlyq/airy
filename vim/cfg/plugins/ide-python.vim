@@ -183,7 +183,7 @@ call dein#add('puremourning/vimspector', {
 \\n
 \\n   nnoremap <buffer><silent><unique>  <LocalLeader>va :call vimspector#LaunchWithSettings({'configuration':'attach'})<CR>
 \\n   nnoremap <buffer><silent><unique>  <LocalLeader>ve :call vimspector#LaunchWithSettings({'configuration':'run'})<CR>
-\\n   nnoremap <buffer><silent><unique>  <LocalLeader>vr :call vimspector#LaunchWithSettings({'configuration':'run','stopOnEntry':1})<CR>
+\\n   nnoremap <buffer><silent><unique>  <LocalLeader>vr :call vimspector#LaunchWithSettings({'configuration':'run','StopOnEntry':1})<CR>
 \\n   nmap     <buffer><silent><unique>  <LocalLeader>vL <Plug>VimspectorLaunch
 \\n   nmap     <buffer><silent><unique>  <LocalLeader>vp <Plug>VimspectorPause
 \\n   nmap     <buffer><silent><unique>  <LocalLeader>vq <Plug>VimspectorStop
