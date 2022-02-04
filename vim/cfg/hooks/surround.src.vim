@@ -13,6 +13,9 @@ let g:operator#surround#blocks = {'-': [
   \ {'block': ['>', '<'],       'motionwise': ['char', 'line'], 'keys': ['>']},
   \ {'block': ['·', '·'],       'motionwise': ['char', 'line'], 'keys': ['o']},
   \ {'block': ['⦅', '⦆'],       'motionwise': ['char', 'line'], 'keys': ['e']},
+  \ {'block': ['<b>', '</b>'],  'motionwise': ['char', 'line'], 'keys': ['b']},
+  \ {'block': ['<i>', '</i>'],  'motionwise': ['char', 'line'], 'keys': ['i']},
+  \ {'block': ['<u>', '</u>'],  'motionwise': ['char', 'line'], 'keys': ['u']},
   \]
   \+map(split('();{};[]', ';'), "{
   \  'keys' : [v:val[1]],
