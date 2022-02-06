@@ -1,4 +1,4 @@
 #!/bin/sh -eu
 # exec ag --color --follow --hidden --ignore .git --column "$@"
 # NEED: --literal => --fixed-strings
-exec rg --color auto --sortr path --no-follow --hidden --glob '!.git' --line-number --column "$@"
+exec rg --color auto --sortr path --no-follow --hidden --glob '!.git' --line-number --column "$@"  # -g '*.nou'
