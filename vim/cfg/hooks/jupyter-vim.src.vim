@@ -19,6 +19,46 @@ fun! s:mapsendcode(k, pfx, ...) abort
   exe 'xnoremap <buffer><silent><unique>  <LocalLeader>'.a:k.' "sy:<C-u>call jupyter#SendCode("'.a:pfx.'".getreg("s")."'.get(a:,1,"").'")<CR>'
 endf
 
+
+"" USAGE: noremap <buffer><silent><unique><expr>  <LocalLeader>s  <SID>opfunc_pprint()
+"   HACK: <expr> mapping is used to fetch any prefixed count and register.
+"   ALSO: avoids using a cmdline -- prevent trigger CmdlineEnter and CmdlineLeave
+fun! Jupyter_opfunc_pprint(type='') abort
+  " HACK: reuse same function for "opfunc" and for <expr> mapping
+  if a:type == ''
+    let b:p = getcurpos()
+    set operatorfunc=Jupyter_opfunc_pprint
+    return 'g@'
+  endif
+
+  " [_] TODO: split function into "generic" and "per-keymap" parts
+  "   SEE: ~/.cache/vim/dein/repos/github.com/jupyter-vim/jupyter-vim/autoload/jupyter/load.vim
+  "   MAYBE: use <SID> for local functions and closures
+  let Fn = {code -> jupyter#SendCode('p('.code.')')}
+
+  let sel_save = &selection
+  let reg_save = getreginfo('"')
+  let cb_save = &clipboard
+  let visual_marks_save = [getpos("'<"), getpos("'>")]
+  try
+    " HACK(inclusive): to yank exact visual text from '[ till '] marks
+    " ALSO(clipboard=): emptied to avoid clobbering the `"*` or `"+` registers
+    set clipboard= selection=inclusive
+    let vcmds = #{line: "'[V']y", char: "`[v`]y", block: "`[\<c-v>`]y"}
+    silent exe 'noautocmd keepjumps normal! ' .. get(vcmds, a:type, '')
+    call Fn(getreg('"'))
+  finally
+    call setreg('"', reg_save)
+    call setpos("'<", visual_marks_save[0])
+    call setpos("'>", visual_marks_save[1])
+    let &clipboard = cb_save
+    let &selection = sel_save
+    call setpos('.', b:p)
+  endtry
+  " NOTE: "mode()" function returns state after this operator
+endf
+
+
 fun! BufMap_jupyter_vim() abort
   if exists('b:BufMap_jupyter_vim')|return|else|let b:BufMap_jupyter_vim=1|endif
 
@@ -38,13 +78,22 @@ fun! BufMap_jupyter_vim() abort
 
   nnoremap <buffer><silent><unique>  <LocalLeader>h :JupyterSendCell<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>x :JupyterSendCell<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>s :call jupyter#SendCell()\|call jupyter#SendCode(g:jupyter_live_exec)<CR>
-  xmap     <buffer><silent><unique>  <LocalLeader>s <Plug>JupyterRunVisual
+  nnoremap <buffer><silent><unique>  <LocalLeader>S :call jupyter#SendCell()\|call jupyter#SendCode(g:jupyter_live_exec)<CR>
+  xmap     <buffer><silent><unique>  <LocalLeader>S <Plug>JupyterRunVisual
+
+  " nnoremap <buffer><silent><unique>  <LocalLeader>s :<C-u>set operatorfunc=<SID>opfunc_run_code<CR>g@
+  " xnoremap <buffer><silent><unique>  <LocalLeader>s "sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<CR>
+   noremap <buffer><silent><unique><expr>  <LocalLeader>s  Jupyter_opfunc_pprint()
+
+  "" NOTE: send current line, eval and pprint result
+  "" [_] MAYBE: trim() assignment on the left to print only results of expr
+  " nnoremap <buffer><silent><unique><expr>  <LocalLeader>ss Jupyter_opfunc_pprint().."_"
+  nmap     <buffer><silent><unique>  <LocalLeader>ss :<C-u>let b:p=getcurpos()<CR>vil"sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<Bar>call setpos('.',b:p)<CR>
 
   nnoremap <buffer><silent><unique>  <LocalLeader>l :let b:p=getcurpos()\|JupyterSendRange\|call setpos('.',b:p)<CR>
   xnoremap <buffer><silent><unique>  <LocalLeader>l :JupyterSendRange<CR>
-  nmap     <buffer><silent><unique>  <LocalLeader>e <Plug>JupyterRunTextObj
-  xmap     <buffer><silent><unique>  <LocalLeader>e <Plug>JupyterRunVisual
+  nmap     <buffer><silent><unique>  <LocalLeader>w <Plug>JupyterRunTextObj
+  xmap     <buffer><silent><unique>  <LocalLeader>w <Plug>JupyterRunVisual
   nmap     <buffer><silent><unique>  <LocalLeader>f <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterFunctionTextObject)
   nmap     <buffer><silent><unique>  <LocalLeader>c <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterClassTextObject)
   nmap     <buffer><silent><unique>  <LocalLeader>L <Plug>JupyterRunTextObj$
@@ -65,7 +114,8 @@ fun! BufMap_jupyter_vim() abort
   call s:mapsendcode('tl', '/list ')
   " call s:mapsendcode('tp', '/p ')
   call s:mapsendcode('tr', "/__import__('pprint').pprint ")
-  call s:mapsendcode('ts', g:jupyter_live_pprint)
+  call s:mapsendcode('ts', 'p(', ')')
+  call s:mapsendcode('tt', g:jupyter_live_pprint)
   call s:mapsendcode('tv', '/vars ')
   call s:mapsendcode('tw', '')
 endf

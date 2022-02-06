@@ -172,8 +172,8 @@ call dein#add('puremourning/vimspector', {
 \\n   nnoremap <buffer><silent><unique>  <LocalLeader>vg :VimspectorToggleLog<CR>
 \\n   nnoremap <buffer><silent><unique>  <LocalLeader>vG :VimspectorDebugInfo<CR>
 \\n
-\\n   nmap     <buffer><silent><unique>  <LocalLeader>w <Plug>VimspectorBalloonEval
-\\n   xmap     <buffer><silent><unique>  <LocalLeader>w <Plug>VimspectorBalloonEval
+\\n   nmap     <buffer><silent><unique>  <LocalLeader>e <Plug>VimspectorBalloonEval
+\\n   xmap     <buffer><silent><unique>  <LocalLeader>e <Plug>VimspectorBalloonEval
 \\n
 \\n   nmap     <buffer><silent><unique>  <LocalLeader>vb <Plug>VimspectorToggleBreakpoint
 \\n   nmap     <buffer><silent><unique>  <LocalLeader>vB <Plug>VimspectorToggleConditionalBreakpoint
