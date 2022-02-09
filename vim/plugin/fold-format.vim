@@ -15,6 +15,7 @@ noremap <silent><unique> zJ  zj
 noremap <silent><unique> zK  zk
 " Focus the current fold by closing all others
 nnoremap <silent><unique> ZZ mzzM`zzv
+nnoremap <silent><unique> zZ mzzM`zzO
 
 " Toggle folds
 nnoremap <unique> [Toggle]z :let &foldmethod=get({'manual': 'syntax',

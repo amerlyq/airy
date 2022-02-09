@@ -88,7 +88,10 @@ fun! BufMap_jupyter_vim() abort
   "" NOTE: send current line, eval and pprint result
   "" [_] MAYBE: trim() assignment on the left to print only results of expr
   " nnoremap <buffer><silent><unique><expr>  <LocalLeader>ss Jupyter_opfunc_pprint().."_"
-  nmap     <buffer><silent><unique>  <LocalLeader>ss :<C-u>let b:p=getcurpos()<CR>vil"sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<Bar>call setpos('.',b:p)<CR>
+  nmap <buffer><silent><unique>  <Plug>JupyterSendPretty  :<C-u>let b:p=getcurpos()<CR>vil"sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<Bar>call setpos('.',b:p)<CR>
+  nmap     <buffer><silent><unique>  <LocalLeader>sl <Plug>JupyterSendPretty
+  nmap     <buffer><silent><unique>  <LocalLeader>ss <Plug>JupyterSendPretty
+  nmap     <buffer><silent><unique>  <LocalLeader>k  <Plug>JupyterSendPretty
 
   nnoremap <buffer><silent><unique>  <LocalLeader>l :let b:p=getcurpos()\|JupyterSendRange\|call setpos('.',b:p)<CR>
   xnoremap <buffer><silent><unique>  <LocalLeader>l :JupyterSendRange<CR>
