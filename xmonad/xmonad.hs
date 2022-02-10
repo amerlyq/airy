@@ -265,6 +265,7 @@ myManageHook = manageSpawn <+> fullscreenManageHook <+>
     [ "_NET_WM_WINDOW_TYPE_TOOLTIP"
     , "_NET_WM_WINDOW_TYPE_UTILITY"  -- Emulator toolbar REF: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
     , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
+    , "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"  -- OR: (WM_NAME = "" && _NET_WM_NAME = "zoom")
     -- _NET_WM_WINDOW_TYPE_DIALOG
     ] ] --> doIgnore
   -- FAIL: skype pop-up window during call still tiled instead of floating/ignored
