@@ -49,7 +49,7 @@ if (($+commands[$EDITOR])); then
   # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
   # ALSO: -c "fencs= fenc=utf8 nobinary nobomb"
   alias -g V='| $EDITOR - -c "setl noro ma bt=nofile nowrap"'
-  alias -g VN='V -c "setf nou"'
+  alias -g VN='V -c "setl ft=nou fdl=99"'
   alias -g VQ='V -c "cgetb|copen"'
     # ALT: ag --vimgrep ... |sort| nvim -q/dev/stdin
   # DEV: highlight: call ag#syntax#himatch_pcre("${@: -1}")
