@@ -70,6 +70,6 @@ unset COOKIE FINGERPRINT
 eval "$session"
 [[ -n $COOKIE && -n $FINGERPRINT ]] || exit 1
 
-echo ---
+echo "--- fp=$FINGERPRINT"
 execcon(){ exec sudo "$exe" --reconnect-timeout=60 "${opts[@]}" "$@"; }
 execcon --non-inter --servercert "$FINGERPRINT" --cookie-on-stdin <<< "$COOKIE"
