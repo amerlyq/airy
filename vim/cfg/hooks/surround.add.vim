@@ -29,6 +29,10 @@ call Map_nxo('[Quote]o', s:ad.'iWo', 'n')
 call Map_nxo('[Quote]o', s:ad.'o', 'x')
 call Map_nxo('[Quote]e', s:ad.'iWe', 'n')
 call Map_nxo('[Quote]e', s:ad.'e', 'x')
+call Map_nxo('[Quote]x', s:ad.'iWx', 'n')
+call Map_nxo('[Quote]x', s:ad.'x', 'x')
+call Map_nxo('[Quote]m', s:ad.'iWm', 'n')
+call Map_nxo('[Quote]m', s:ad.'m', 'x')
 
 "" Sigils for bash
 call Map_nxo('[Quote]@', s:ad.'iw2', 'n')
