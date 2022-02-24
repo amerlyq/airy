@@ -36,8 +36,8 @@ call dein#add('rhysd/vim-textobj-anyblock', {
   \ 'on_map': [['ox', 'ab', 'ib']],
   \ 'depends': 'vim-textobj-user',
   \ 'hook_add': "
-\\n   nmap <silent><unique> [Quote]b <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
-\\n   nmap <silent><unique> [Quote]B <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
+\\n   nmap <silent><unique> [Quote]R <Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)
+\\n   nmap <silent><unique> [Quote]D <Plug>(operator-surround-delete)<Plug>(textobj-anyblock-a)
 \\n   let s:op = '<Plug>(operator-surround-replace)<Plug>(textobj-anyblock-a)'
 \\n   call Map_blocks('[Quote]', s:op, 'n', 'map')
 \"})
