@@ -9,7 +9,7 @@ call dein#add('Shougo/dein.vim', {'lazy': 0})
 "" CHECK Async exec plugin for Vim. Dependency for Shougo plugins {{{1
 " FIXME: must be cloned with dein.vim on first install!
 " EXPL:(lazy: 0) NeoBundle uses it to update plugins
-call dein#add('Shougo/vimproc.vim', {'lazy': 0, 'build': 'make'})
+call dein#add('Shougo/vimproc.vim', {'lazy': 0, 'build': 'make -B'})
 
 
 
