@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail -o errtrace
 
+r.monitor -2
 # r.monitor-scale 2
 # onexit(){ r.monitor-scale 1; }
 # trap 'onexit' HUP INT QUIT TERM ERR
@@ -32,8 +33,8 @@ export GDK_SCALE=2
 # FAIL: can't set "nice" without "sudo" -- which will mess up all permissions of configs and saves
 # BUT: perm-reset "sudo nice -10 sudo -u user command" will clean up above exported environment...
 # exec time nice -n -4 taskset --cpu-list 0-8:2 optirun -b primus -- steam "$@"
-exec steam "$@"
-# exec optirun steam "$@"
+# exec steam "$@"
+exec optirun -b primus -- steam "$@"
 
 # BAD: crash on "libvgui2_s.so"
 # primusrun steam

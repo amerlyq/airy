@@ -22,6 +22,7 @@ echo
 # DISABLED(annex.tune.branchhash1=true): use two-level hierarchy in git-annex branch to reduce each tree-commit size
 git -c annex.tune.objecthash1=true \
     -c annex.tune.objecthashlower=true \
+    -c annex.tune.branchhash1=true \
   annex init $@
 
 # WARN: maybe also must edit local .git/info/attributes by hooks/post_checkout
