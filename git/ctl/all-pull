@@ -7,7 +7,7 @@ cd "${1:-$PWD}"
 # ATT:(-j1): -- gpg-agent can't decrypt keys in-time
 exec r.git-find | r.git-freeze ${2+"$2"} \
   | xargs -0 -L1 sh -c '
-  echo && r.git-status {} &&
-  git-up {} 2>&1 &&
-  r.git-status {} && echo'
+  echo && r.git-status "$0" &&
+  git-up "$0" 2>&1 &&
+  r.git-status "$0" && echo'
 # DISABLED:(ruby/git-up) -- became very bugged
