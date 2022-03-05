@@ -39,7 +39,7 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable
 # shell.InteractiveTB.set_mode(mode=new_mode)
 c.InteractiveShellApp.exec_lines = [
     """%%capture
-    %autoreload 2
+    %autoreload 3
     %xmode Context
     """
 ]

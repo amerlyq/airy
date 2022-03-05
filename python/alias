@@ -3,3 +3,9 @@
 alias i='ipython'
 # alias ii='jupyter console'
 alias ii='jupyter qtconsole'
+
+# Deploy instant server for exposing files in current directory to LAN
+# ALT: $ ruby -run -ehttpd . -p8000
+# alias ihs='python -m SimpleHTTPServer 8000'
+alias ih.='python -m http.server 8000'
+alias iht='env -C /t -- python -m http.server 8000'

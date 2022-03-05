@@ -9,7 +9,9 @@ pkg_inst python-pip
 # pipdeptree -p faker -r
 
 if distro arch; then
-  pkg_inst ipython  # ALSO: jupyter for notebooks in vim
+  pkg_inst ipython
+  # ALSO: jupyter for notebooks in vim
+  pkg_inst python-qtconsole  # python-console
 
   # SEE: https://pypi.org/project/memory-profiler/
   pkg_inst python-memory-profiler  # NEED:(ipython): %memit
