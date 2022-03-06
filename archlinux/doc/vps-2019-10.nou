@@ -64,6 +64,7 @@ greenhost
       ntpd[1309]: bind(24) AF_INET6 fe80::...%2#123 flags 0x11 failed: Cannot assign requested address
       ntpd[1309]: unable to create socket on eth0 (6) for fe80::...%2#123
       ntpd[1309]: failed to init interface for address fe80::...%2
+      TRY: /etc/ntp.conf ADD interface ignore ipv6
   2019-10-02 [X] $ ps --forest aux
   2019-10-02 [X] $ systemctl status && systemctl --user status
   2019-10-02 [X] $ ls -la /var/log/*

@@ -6,7 +6,7 @@
 
 SUBSYSTEM=="power_supply", ACTION=="change", KERNEL=="BAT0", \
 ATTR{status}=="Discharging", ATTR{capacity}=="1[0-9]|[0-9]", TAG+="systemd", \
-RUN+="/bin/systemctl start --no-block battery-notify@critical:$attr{capacity}%.service"
+RUN+="/bin/systemctl start --no-block battery-notify@critical:$attr{capacity}%%.service"
 
 SUBSYSTEM=="power_supply", ACTION=="change", KERNEL=="AC0", ENV{POWER_SUPPLY_ONLINE}=="0", \
 ENV{URGENCY}="normal", ENV{NOTIFY}="no-AC", TAG+="systemd", GOTO="end", \
