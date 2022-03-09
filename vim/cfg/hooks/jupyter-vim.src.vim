@@ -46,7 +46,8 @@ fun! Jupyter_opfunc_pprint(type='') abort
     set clipboard= selection=inclusive
     let vcmds = #{line: "'[V']y", char: "`[v`]y", block: "`[\<c-v>`]y"}
     silent exe 'noautocmd keepjumps normal! ' .. get(vcmds, a:type, '')
-    call Fn(getreg('"'))
+    let code = substitute(getreg('"'), '^\s*return\s*', '', '')
+    call Fn(code)
   finally
     call setreg('"', reg_save)
     call setpos("'<", visual_marks_save[0])
@@ -93,6 +94,7 @@ fun! BufMap_jupyter_vim() abort
   nmap     <buffer><silent><unique>  <LocalLeader>ss <Plug>JupyterSendPretty
   nmap     <buffer><silent><unique>  <LocalLeader>k  <Plug>JupyterSendPretty
 
+  " FIXME: strip("^\s*return\s*") for <LL-l> too
   nnoremap <buffer><silent><unique>  <LocalLeader>l :let b:p=getcurpos()\|JupyterSendRange\|call setpos('.',b:p)<CR>
   xnoremap <buffer><silent><unique>  <LocalLeader>l :JupyterSendRange<CR>
   nmap     <buffer><silent><unique>  <LocalLeader>w <Plug>JupyterRunTextObj

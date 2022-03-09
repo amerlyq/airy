@@ -21,12 +21,11 @@ call dein#add('scrooloose/syntastic', {
 " repository = Shougo/neco-syntax
 
 
-
 "" Like neocomplete but for neovim {{{1
 " ALT:BET? https://github.com/neoclide/coc.nvim
 " ATTENTION: :UpdateRemotePlugins and restart. Then once execute :DeopleteEnable
 " FIXME: .like. Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-call dein#add('Shougo/deoplete.nvim', {
+call dein#add('Shougo/deoplete.nvim', {'lazy': 0,
   \ 'if': 'has("nvim") && has("python3")',
   \ 'on_i': 1,
   \ 'depends': 'context_filetype.vim',
@@ -81,7 +80,20 @@ call dein#add('Shougo/echodoc.vim', {
 "   \ 'hook_source': _hcat('neosnippet.src')})
 
 " call dein#add('Shougo/neosnippet-snippets', {'on_source': 'neosnippet.vim'})
-" call dein#add('honza/vim-snippets', {'on_source': 'neosnippet.vim'})
+
+call dein#add('honza/vim-snippets', {'lazy': 0})
+call dein#add('SirVer/ultisnips', {
+  \ 'on_i': 1,
+  \ 'depends': ['deoplete.nvim', 'vim-snippets'],
+  \ 'hook_add': "let g:UltiSnipsExpandTrigger = '<C-j>'",
+  \ 'hook_source': "let g:UltiSnipsExpandTrigger = '<C-j>'"
+  \})
+
+" 'hook_add': _hcat('ultisnips.src')})
+
+
+
+
 
 
 

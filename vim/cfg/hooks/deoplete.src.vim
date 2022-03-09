@@ -25,6 +25,8 @@ endfunction "}}}
 "" Use head matcher instead of fuzzy matcher
 " call deoplete#custom#set('_', 'matchers', ['matcher_head'])
 
+call deoplete#custom#source('ultisnips', 'rank', 1000)
+
 " <TAB>: completion.
 imap <silent><expr> <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 
