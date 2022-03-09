@@ -52,6 +52,7 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable
 #  'quit', to force a direct exit without any confirmation.
 #  Default: True
 # c.JupyterConsoleApp.confirm_exit = True
+c.JupyterConsoleApp.confirm_exit = False
 
 ## JSON file in which to store connection info [default: kernel-<pid>.json]
 #  See also: ConnectionFileMixin.connection_file
@@ -272,6 +273,7 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable
 #  {version} and {kernel_banner}.
 #  Default: 'Jupyter console {version}\n\n{kernel_banner}'
 # c.ZMQTerminalInteractiveShell.banner = 'Jupyter console {version}\n\n{kernel_banner}'
+c.ZMQTerminalInteractiveShell.banner = ''
 
 ## Callable object called via 'callable' image handler with one argument, `data`,
 #  which is `msg["content"]["data"]` where `msg` is the message from iopub

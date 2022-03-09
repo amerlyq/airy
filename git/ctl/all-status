@@ -2,6 +2,9 @@
 set -o pipefail
 ## DEV show found submodules only in status (yellow color)
 cd "${1:-$PWD}"
+
+# [[ -n ${3-} ]] && export FIND_DEPTH="$3"
+
 export WCOL=$(r.git-find | awk -vd="$PWD" \
   'BEGIN{RS="\0";d=length(d)} {print length-d}' \
   | LC_ALL=C sort -rn | head -1)
