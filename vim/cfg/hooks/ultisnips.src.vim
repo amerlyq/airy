@@ -1,6 +1,17 @@
+" HACK: same as ",s" -- to return to NORMAL after all placeholders filled
+inoremap <silent>  <C-j>  <Esc>:update<CR>
+
+let g:UltiSnipsExpandTrigger = '<C-j>'
+let g:UltiSnipsListSnippets = '<C-s>'
 
 " call deoplete#custom#source('ultisnips', 'rank', 1000)
-" call deoplete#custom#set('ultisnips', 'matchers', ['matcher_fuzzy'])
+
+"" TEMP:FIXED:MOVE=deoplete.src.vim
+"" HACK: also show one-letter snippets, and show snippets on top of others
+" SRC: https://github.com/Shougo/deoplete.nvim/issues/404
+" OR: 'matcher_head'
+" call deoplete#custom#source('ultisnips',
+"   \ {'matchers': ['matcher_fuzzy'], 'rank': 1000})
 
 "" ALT: UltiSnips#CanExpandSnippet() | UltiSnips#CanJumpForwards()
 " function UltiSnips_IsExpandable()
@@ -13,8 +24,14 @@
 
 " UltiSnips_IsExpandable()
 " inoremap <expr> <CR> pumvisible() ? UltiSnips#ExpandSnippetOrJump() : "\<CR>"
-" inoremap <silent> <F12> <C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
-" nnoremap <silent> <F12> a<C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
+
+
+function! UltiSnipsCallUnite()
+  Unite -start-insert -winheight=100 -immediately -no-empty ultisnips
+  return ''
+endfunction
+inoremap <silent> <F4> <C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
+nnoremap <silent> <F4> a<C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
 
 " let g:ulti_expand_or_jump_res = 0
 " function! Ulti_ExpandOrJump_and_getRes()

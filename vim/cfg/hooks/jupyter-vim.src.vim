@@ -63,8 +63,10 @@ endf
 fun! BufMap_jupyter_vim() abort
   if exists('b:BufMap_jupyter_vim')|return|else|let b:BufMap_jupyter_vim=1|endif
 
-  nnoremap <buffer><silent><unique>  <LocalLeader>z :JupyterConnect<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>Z :JupyterDisconnect<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>z :exe'JupyterConnect'\|sleep 200m\|call jupyter#SendCode(InferJupyterPkg())\|exe 'JupyterRunFile -niG %:p'<CR>
+
+  nnoremap <buffer><silent><unique>  <LocalLeader>Z :JupyterConnect<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>X :JupyterDisconnect<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>r :JupyterRunFile -iG %:p<CR>
   " BET?(no args): <LL>T -> <LL>e == "execute", like __main__
   nnoremap <buffer><silent><unique>  <LocalLeader>T :JupyterRunFile<CR>
@@ -78,7 +80,7 @@ fun! BufMap_jupyter_vim() abort
   xnoremap <buffer><silent><unique>  <LocalLeader>J "sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
 
   nnoremap <buffer><silent><unique>  <LocalLeader>h :JupyterSendCell<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>x :JupyterSendCell<CR>
+  " nnoremap <buffer><silent><unique>  <LocalLeader>x :JupyterSendCell<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>S :call jupyter#SendCell()\|call jupyter#SendCode(g:jupyter_live_exec)<CR>
   xmap     <buffer><silent><unique>  <LocalLeader>S <Plug>JupyterRunVisual
 

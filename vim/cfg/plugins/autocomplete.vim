@@ -85,11 +85,11 @@ call dein#add('honza/vim-snippets', {'lazy': 0})
 call dein#add('SirVer/ultisnips', {
   \ 'on_i': 1,
   \ 'depends': ['deoplete.nvim', 'vim-snippets'],
-  \ 'hook_add': "let g:UltiSnipsExpandTrigger = '<C-j>'",
-  \ 'hook_source': "let g:UltiSnipsExpandTrigger = '<C-j>'"
+  \ 'hook_add': _hcat('ultisnips.src'),
+  \ 'hook_source': _hcat('ultisnips.src')
   \})
-
-" 'hook_add': _hcat('ultisnips.src')})
+" \ 'hook_add': "let g:UltiSnipsExpandTrigger = '<C-j>'",
+" \ 'hook_source': "let g:UltiSnipsExpandTrigger = '<C-j>'"
 
 
 
