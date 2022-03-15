@@ -36,9 +36,10 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable  # @me
 # c.InteractiveShellApp.exec_lines = []
 # SRC: Autoreload in Ipython ⌇⡡⣏⡔⡺ https://waylonwalker.com/autoreload-ipython/
 # shell.InteractiveTB.set_mode(mode=new_mode)
+# FAIL: "%autoreload 3" disables reload -- despite being in NEWS
 c.InteractiveShellApp.exec_lines = [
     """%%capture
-    %autoreload 3
+    %autoreload 2
     %xmode Context
     """
 ]  # @me
