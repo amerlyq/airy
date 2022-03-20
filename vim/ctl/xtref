@@ -86,29 +86,38 @@ EOT
 
   # TEMP:FIXED:(posix): old engine has some quirks with '[\]]'
   local r_z85='([-0-9a-zA-Z.:+=^!\/*?&<>()[{}@%$#]|]){5}'
+  local r_dwk='\b(20[0-9][0-9])-(0[0-9]|1[012])-([012][0-9]|3[01])\b'
 
   local r_braille="(${alt_braille%|}){4}"
   local r_addr="($r_z85|$r_braille)"
 
   args=( --options='NONE'
     ${recursive+--recurse}
+    --links=no
 
     --input-encoding='UTF-8'
     --output-encoding='UTF-8'
     --sort='yes'
     --excmd='combine'
-    --output-format='xref'
-    --_xformat=$'%{name}\t%{input}\t%{line};/%{name}/;\"\t%k'
+    --output-format='xref'  # MAYBE:BAD: I lose special directives in output file
+    --_xformat=$'%{name}\t%{input}\t%{line};/%{name}/;\"\t%k\t%{pattern}'
 
     --langdef='xtref'
     --map-xtref='(*)'
     --kinddef-xtref='a,anchor,place of definition'
     --kinddef-xtref='r,reference,jump to location'
+    --kinddef-xtref='d,dayweek,same day context'
     --regex-xtref="/($pf_anchor$r_addr)/\\1/a/"
     --regex-xtref="/($pf_referer$r_addr)/\\1/r/"
+    --regex-xtref="/($r_dwk)/\\1/d/"
     --languages='xtref'
+
+    # FAIL:(does not work): --exclude='/home/amer/aura/items/*'
+    #   FIXED:USE:(path relative to PWD): --exclude='items/*' OR --exclude='items'
+    --exclude='employment/luxoft/log'
   )
-  for g in .git '_build*' tags '*.tags'; do
+  # DEBUG:(stats): $ <xtref.tags C2 |cut -d/ -f-6 SC H
+  for g in '.git' '_build*' 'tags' '*.tags' '&*' 'out' 'items' '#del'; do
     args+=( --exclude="$g" )
   done
   for f in .ignore .gitignore; do

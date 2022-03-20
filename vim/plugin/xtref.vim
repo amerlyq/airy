@@ -285,7 +285,7 @@ fun! xtref#ctags(root, ...)
   "   OR from all opened buffers (manually)
   let bufs = get(a:, 1, [])
   if type(bufs) == type(1) && bufs == 1
-    if !isdirectory(a:root)| call mkdir(a:root, 'p', 0700) |en
+    if !isdirectory(dstdir)| call mkdir(dstdir, 'p', 0700) |en
     let bufs = filter(map(copy(getbufinfo()), 'v:val.name'), 'len(v:val)')
   end
 
@@ -315,7 +315,7 @@ fun! xtref#ctags(root, ...)
 
   " FIXME: use async job
   let _ = join(xtref#call_at(a:root, 'systemlist', cmd), '\n')
-  echom 'DONE: gen '. a:root .'/'. g:xtref.tagfile
+  echom 'DONE:('. a:root .') -> '. dst
 endf
 
 
