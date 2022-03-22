@@ -73,11 +73,10 @@ fun! BufMap_jupyter_vim() abort
   nnoremap <buffer><silent><unique>  <LocalLeader>i :JupyterRunFile -niG %:p<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>I :PythonImportThisFile<CR>
 
-  nnoremap <buffer><silent><unique>  <LocalLeader>vd :JupyterSendCode '%debug'<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>tj :JupyterSendCode '_live()'<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>j :call jupyter#SendCode(g:jupyter_live_exec)<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>J :let g:jupyter_live_exec=getline('.')<CR>
-  xnoremap <buffer><silent><unique>  <LocalLeader>J "sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>J :call jupyter#SendCode(g:jupyter_live_exec)<CR>
+  " nnoremap <buffer><silent><unique>  <LocalLeader>J :let g:jupyter_live_exec=getline('.')<CR>
+  " xnoremap <buffer><silent><unique>  <LocalLeader>J "sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>j :call jupyter#SendCode('%autoreload')<CR>
 
   nnoremap <buffer><silent><unique>  <LocalLeader>h :JupyterSendCell<CR>
   " nnoremap <buffer><silent><unique>  <LocalLeader>x :JupyterSendCell<CR>
@@ -118,6 +117,8 @@ fun! BufMap_jupyter_vim() abort
   call s:mapsendcode('td', '/dir ')
   call s:mapsendcode('te', '')
   call s:mapsendcode('tg', '%debug ')
+  nnoremap <buffer><silent><unique>  <LocalLeader>vd :JupyterSendCode '%debug'<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>tj :JupyterSendCode '_live()'<CR>
   call s:mapsendcode('tl', '/list ')
   " call s:mapsendcode('tp', '/p ')
   call s:mapsendcode('tr', "/__import__('pprint').pprint ")
