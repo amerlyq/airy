@@ -179,6 +179,10 @@ nnoremap <unique>  g<  <
 xnoremap <unique>  >  >gv|
 xnoremap <unique>  <  <gv
 
+" I more often do upper-case than lower-case
+noremap <unique>  gu  gU
+noremap <unique>  gU  gu
+
 
 " HACK: Drag curr line/s vertically and auto-indent. (USE: Overlay+[hjkl])
 nnoremap <unique> <S-Up>    :m-2<CR>==
