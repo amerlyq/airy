@@ -1,0 +1,20 @@
+
+[⡢⠼⢴⡺] 1h15m #andr remote VNC control ⌇⡢⠼⢛⢟
+  [X] ✗ 10m TRY KDEconnect ::: no VNC
+  [X] TRY connect
+    [X] TRY: !multivnc
+      BAD:SECU: no SSH, open port
+      HOST: $ x11vnc -display :0
+        BAD: disconnects after single connection exits
+      firewall: $ { echo flush ruleset; sudo nft list ruleset; } | vipe | sudo nft -f-
+        ADD: tcp dport 5900 accept comment "Accept VNC"
+    [X] TRY: !avnc ::: NICE at least it works with SSH somehow
+      $ ssh-keygen -t rsa -C "andr_avnc" -f ~/.ssh/avnc_rsa -N ""
+      $ cat ~/.ssh/avnc_rsa.pub >> ~/.ssh/authorized_keys
+        ¦ restrict,from="192.168.1.?",command="/bin/false",no-agent-forwarding,no-pty,no-user-rc,no-X11-forwarding,port-forwarding,permitopen="localhost:5900",permitopen="127.0.0.1:5900" ssh-rsa AAAA...= andr_avnc
+        SEE:(restrict): https://superuser.com/questions/1539080/when-setting-up-an-ssh-tunnel-user-authorized-keys-directive-command-blocks
+          IMPL https://github.com/openssh/openssh-portable/commit/383f10fb84a0fee3c01f9d97594f3e22aa3cd5e0
+        [_] SECU:TODO: verify that no other ports can be forwarded beside "permitopen" ⌇⡢⠽⡸⡗
+      HOST: $ x11vnc -localhost -display :0 -nevershared -forever
+        BAD:SECU:USAGE: can't hiddenly browse my laptop #vd from another room
+          BUT: can check MSTeams msgs and search google when needed
