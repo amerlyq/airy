@@ -1,0 +1,41 @@
+⌇⡢⠽⡹⡹
+
+2022-03-24-Thu-W12  &next  pains::
+  [!] #xkb BET reset to *VERY* default !setxkbmap ⌇⡢⠽⡹⠣
+    ENH gradually restore only necessary mappings
+  [_] #xkb CHG Ru number row to same En symbols ⌇⡢⠺⣲⡣
+  [•] 50m/ DEV #xkb switch lang by <RAlt Space> ⌇⡢⠹⢾⢯
+    OR: use <RAlt> as modifier and switch lang by <RAlt e/r/k | s/d/f>
+    [_] ALT: <Shift> L->R and R->L
+    [_] TRY: use modlock/Mode_switch again
+      NICE:SEE /usr/share/X11/xkb/compat/basic
+      * Mode_switch
+      * Any+Lock
+    [_] IDEA: use <RAlt> as modifier <AltGr>
+      ++ and as symbol ISO_First
+        [_] ALT: send symbol <Esc>
+      [_] FIND: send different symbol on press and release
+    [_] READ: https://wiki.archlinux.org/title/X_keyboard_extension
+
+
+2022-03-24-Thu-W12  FUTURE
+  [_] #xkb FUTURE: simplicity::
+    [_] #xkb IDEA merge Ru+Uk into single variant
+      == USE <RAlt s> to enter "ua_i" and <RAlt u> for "ua_ge"
+    [_] #xkb enter punct symbols by <RAlt + …> ⌇⡢⠹⢾⣤
+      == same keys for English and Cyrillic
+  [_] #xkb FUTURE: stability::
+    [_] #xkb FIX x11 keys
+    [_] #xkb FIX sysrq keys
+    [_] #xkb IDEA bare Xorg should also have layout
+      USAGE: when !xmonad breaks I must be able to:
+        switch VT, send SysRQ, or TerminateX
+      e.g. Terminating Xorg with Ctrl+Alt+Backspace
+  [_] #xkb FUTURE: enhancements::
+    [_] #xkb IDEA special punct layout to latch/lock-switch to
+    [_] IDEA: <RAlt Caps> -> something else e.g. <Esc>
+      e.g. caps:escape_shifted_capslock Make Caps Lock an additional Esc, but Shift + Caps Lock is the regular Caps Lock
+    [_] #xkb TRY:USE: compose key
+      https://wiki.archlinux.org/title/Xorg/Keyboard_configuration
+      VIZ: /usr/share/X11/locale/en_US.UTF-8/Compose
+      ADD ~/.XCompose
