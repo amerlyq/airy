@@ -1,7 +1,9 @@
 " HACK: same as ",s" -- to return to NORMAL after all placeholders filled
 inoremap <silent>  <C-j>  <Esc>:update<CR>
+"" FAIL: doesn't work mapping for both "filesave" and "snippet"
+" inoremap <silent>  <C-Space>  <Esc>:update<CR>
 
-let g:UltiSnipsExpandTrigger = '<C-j>'
+let g:UltiSnipsExpandTrigger = '<C-Space>'
 let g:UltiSnipsListSnippets = '<C-s>'
 
 " call deoplete#custom#source('ultisnips', 'rank', 1000)
@@ -30,8 +32,10 @@ function! UltiSnipsCallUnite()
   Unite -start-insert -winheight=100 -immediately -no-empty ultisnips
   return ''
 endfunction
-inoremap <silent> <F4> <C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
-nnoremap <silent> <F4> a<C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
+" OR: <F4>
+inoremap <silent> <C-s> <C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
+nnoremap <silent> <C-s> a<C-R>=(pumvisible()? "\<LT>C-E>":"")<CR><C-R>=UltiSnipsCallUnite()<CR>
+
 
 " let g:ulti_expand_or_jump_res = 0
 " function! Ulti_ExpandOrJump_and_getRes()

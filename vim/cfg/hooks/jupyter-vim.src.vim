@@ -85,15 +85,21 @@ fun! BufMap_jupyter_vim() abort
 
   " nnoremap <buffer><silent><unique>  <LocalLeader>s :<C-u>set operatorfunc=<SID>opfunc_run_code<CR>g@
   " xnoremap <buffer><silent><unique>  <LocalLeader>s "sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<CR>
-   noremap <buffer><silent><unique><expr>  <LocalLeader>s  Jupyter_opfunc_pprint()
+   noremap <buffer><silent><unique><expr>  <LocalLeader>k  Jupyter_opfunc_pprint()
 
   "" NOTE: send current line, eval and pprint result
   "" [_] MAYBE: trim() assignment on the left to print only results of expr
+  ""   [!] OR:BET:ENH: if match(var=...) then simply eval w/o "p(...)" wrapper
   " nnoremap <buffer><silent><unique><expr>  <LocalLeader>ss Jupyter_opfunc_pprint().."_"
   nmap <buffer><silent><unique>  <Plug>JupyterSendPretty  :<C-u>let b:p=getcurpos()<CR>vil"sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<Bar>call setpos('.',b:p)<CR>
-  nmap     <buffer><silent><unique>  <LocalLeader>sl <Plug>JupyterSendPretty
-  nmap     <buffer><silent><unique>  <LocalLeader>ss <Plug>JupyterSendPretty
-  nmap     <buffer><silent><unique>  <LocalLeader>k  <Plug>JupyterSendPretty
+  nmap     <buffer><silent><unique>  <LocalLeader>kl <Plug>JupyterSendPretty
+  nmap     <buffer><silent><unique>  <LocalLeader>kk <Plug>JupyterSendPretty
+  nmap     <buffer><silent><unique>  <LocalLeader>s  <Plug>JupyterSendPretty
+
+  " HACK: send for-loops
+  " ALT:XLR:CHG: send all current indent and below ++ single top line (for-loop/if-cond)
+  nmap <buffer><silent><unique>  <Plug>JupyterSendOutline  :<C-u>let b:p=getcurpos()<CR>vip:JupyterSendRange<Bar>call setpos('.',b:p)<CR>
+  nmap     <buffer><silent><unique>  <LocalLeader>o  <Plug>JupyterSendOutline
 
   " FIXME: strip("^\s*return\s*") for <LL-l> too
   nnoremap <buffer><silent><unique>  <LocalLeader>l :let b:p=getcurpos()\|JupyterSendRange\|call setpos('.',b:p)<CR>
