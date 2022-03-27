@@ -273,7 +273,7 @@ c.JupyterConsoleApp.confirm_exit = False
 #  {version} and {kernel_banner}.
 #  Default: 'Jupyter console {version}\n\n{kernel_banner}'
 # c.ZMQTerminalInteractiveShell.banner = 'Jupyter console {version}\n\n{kernel_banner}'
-c.ZMQTerminalInteractiveShell.banner = ''
+c.ZMQTerminalInteractiveShell.banner = ""
 
 ## Callable object called via 'callable' image handler with one argument, `data`,
 #  which is `msg["content"]["data"]` where `msg` is the message from iopub
@@ -387,6 +387,7 @@ c.ZMQTerminalInteractiveShell.include_other_output = True
 #  in orange: printf "\x1b[38;2;255;100;0mTRUECOLOR\x1b[0m\n"
 #  Default: False
 # c.ZMQTerminalInteractiveShell.true_color = False
+c.ZMQTerminalInteractiveShell.true_color = True
 
 ## Whether to use the kernel's is_complete message
 #          handling. If False, then the frontend will use its

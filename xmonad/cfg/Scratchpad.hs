@@ -5,7 +5,7 @@ import XMonad.ManageHook            (appName, (=?))
 import XMonad.StackSet              (RationalRect(..))
 import XMonad.Util.NamedScratchpad  (NamedScratchpad(NS), nonFloating, defaultFloating, customFloating)
 
-term s c = NS s ("r.t -n " ++ s ++ " -e " ++ c) (appName =? s)
+term s c = NS s ("env --chdir=/t r.t -n " ++ s ++ " -e " ++ c) (appName =? s)
 vim s a = term s ("$EDITOR " ++ a)
 ranger s a = term s ("r.ranger -L " ++ a)
 
