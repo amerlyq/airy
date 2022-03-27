@@ -34,7 +34,7 @@ fun! Jupyter_opfunc_pprint(type='') abort
   " [_] TODO: split function into "generic" and "per-keymap" parts
   "   SEE: ~/.cache/vim/dein/repos/github.com/jupyter-vim/jupyter-vim/autoload/jupyter/load.vim
   "   MAYBE: use <SID> for local functions and closures
-  let Fn = {code -> jupyter#SendCode('p('.code.')')}
+  " let Fn = {code -> jupyter#SendCode('p('.code.')')}
 
   let sel_save = &selection
   let reg_save = getreginfo('"')
@@ -46,8 +46,26 @@ fun! Jupyter_opfunc_pprint(type='') abort
     set clipboard= selection=inclusive
     let vcmds = #{line: "'[V']y", char: "`[v`]y", block: "`[\<c-v>`]y"}
     silent exe 'noautocmd keepjumps normal! ' .. get(vcmds, a:type, '')
-    let code = substitute(getreg('"'), '^\s*return\s*', '', '')
-    call Fn(code)
+
+    let lines = split(getreg('"'), "\n")
+    " for i in range(len(lines))
+    "   let lines[i] = substitute(lines[i], '^\s*return\s*', '', '')
+    " endfor
+    let lines[-1] = substitute(lines[-1], '^\s*return\s*', '', '')
+    if len(lines) == 1
+      let lines[0] = 'p('.lines[0].')'
+    else
+      " WARN: only works for black-formatted python
+			let idx = stridx(lines[-1], " = ")
+      if idx != -1
+        " HACK: pprint last assignment
+        let lastvar = trim(strpart(lines[-1], 0, idx))
+        call add(lines, 'p('.lastvar.')')
+      endif
+    endif
+    let code = join(lines, "\n")
+    " OR: call Fn(code)
+    call jupyter#SendCode(code)
   finally
     call setreg('"', reg_save)
     call setpos("'<", visual_marks_save[0])
@@ -85,16 +103,18 @@ fun! BufMap_jupyter_vim() abort
 
   " nnoremap <buffer><silent><unique>  <LocalLeader>s :<C-u>set operatorfunc=<SID>opfunc_run_code<CR>g@
   " xnoremap <buffer><silent><unique>  <LocalLeader>s "sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<CR>
-   noremap <buffer><silent><unique><expr>  <LocalLeader>k  Jupyter_opfunc_pprint()
+   noremap <buffer><silent><unique><expr>  <Plug>JupyterSendSmart  Jupyter_opfunc_pprint()
+   map     <buffer><silent><unique>  <LocalLeader>k  <Plug>JupyterSendSmart
+  nmap     <buffer><silent><unique>  <LocalLeader>s  vil<Plug>JupyterSendSmart
+  xmap     <buffer><silent><unique>  <LocalLeader>s  <Plug>JupyterSendSmart
 
   "" NOTE: send current line, eval and pprint result
-  "" [_] MAYBE: trim() assignment on the left to print only results of expr
-  ""   [!] OR:BET:ENH: if match(var=...) then simply eval w/o "p(...)" wrapper
   " nnoremap <buffer><silent><unique><expr>  <LocalLeader>ss Jupyter_opfunc_pprint().."_"
   nmap <buffer><silent><unique>  <Plug>JupyterSendPretty  :<C-u>let b:p=getcurpos()<CR>vil"sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<Bar>call setpos('.',b:p)<CR>
   nmap     <buffer><silent><unique>  <LocalLeader>kl <Plug>JupyterSendPretty
   nmap     <buffer><silent><unique>  <LocalLeader>kk <Plug>JupyterSendPretty
-  nmap     <buffer><silent><unique>  <LocalLeader>s  <Plug>JupyterSendPretty
+  " nmap     <buffer><silent><unique>  <LocalLeader>s  <Plug>JupyterSendPretty
+  " xmap     <buffer><silent><unique>  <LocalLeader>s <Plug>JupyterRunVisual
 
   " HACK: send for-loops
   " ALT:XLR:CHG: send all current indent and below ++ single top line (for-loop/if-cond)
