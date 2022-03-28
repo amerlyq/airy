@@ -10,14 +10,16 @@ set -fCeu
 
 # BAD: if main monitor resized -- on secondary one everything becomes too large
 
-export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
+# export QT_AUTO_SCREEN_SCALE_FACTOR=1  # HiDpi for Qt>=5.6
+export QT_ENABLE_HIGHDPI_SCALING=1    # HiDpi for Qt>=5.14
 
 # TODO: under profile check
 # BET: export something dpi-like into profile
 # ALT: provide run-hd and run-hidpi and then symlink one or another inside erian profile overrides
 # ALT: compare here dpi with threshold
-export QT_SCREEN_SCALE_FACTORS="2;1"
-# export QT_SCALE_FACTOR=2
+# OR: export QT_SCALE_FACTOR=2
+# FAIL: interferes with "QT_ENABLE_HIGHDPI_SCALING"
+# export QT_SCREEN_SCALE_FACTORS="2;1" QT_FONT_DPI=96
 
 ### GTK
 # export GDK_SCALE=$(r.xorg -s)

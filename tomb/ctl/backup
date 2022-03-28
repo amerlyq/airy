@@ -221,6 +221,7 @@ function SyncRepos {  local r
     done
     [[ -n ${_annex:+x} ]] && >&2 echo "DISABLED: ${_disabled[*]}"
 
+    # WARN: no "/objects" in newly initialized remote clone -- do first sync manually?
     if [[ -d $r/.git/annex/objects ]]; then
       git ${=_annex} annex $(has v&&echo --verbose) sync --no-commit --not-only-annex --content --pull --no-push
     else
