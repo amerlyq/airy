@@ -9,6 +9,7 @@
 
 
 HACK: сменить пароль ключа -- удалить и заново добавить
+  $ ssh-keygen -p -f ~/.ssh/work_ssh
   $ gpg-connect-agent "DELETE_KEY $(grep -A1 $(ssh-add -l | grep SSH_client C2) ~/.gnupg/sshcontrol T1 C1)" /bye
   $ ssh-add -l
   $ ssh-add work_ssh

@@ -20,4 +20,5 @@ pxy="socks://[::1]:$port"
 exec r.qute-new ~/.local/qute-proxy \
   --set content.proxy "$pxy" \
   --set content.proxy_dns_requests true \
+  --set zoom.default "90%"
   "$@"
