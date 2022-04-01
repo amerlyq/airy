@@ -397,6 +397,23 @@ exe 'set tags^='. g:xtref.lazytagdir.'/'.g:xtref.tagfile
 exe 'set tags^='. './'.g:xtref.tagfile.';'
 
 
+fun! xtref#py_jump(...)
+py3 << EOF
+import just.flower.xts.parse as M
+ctx = vim.current
+if m := M.find_near(ctx.line, ctx.window.cursor[1]):
+  pfx = "※" if m.group(0)[0] == "⌇" else "⌇"
+  vn = vim.eval("v:count")
+  cmd = vn + "tag" if vn != "0" else "tjump"
+  vim.command(cmd + " " + pfx + m.group(1))
+EOF
+endf
+nnoremap <Plug>(xtref-jump)  :<C-u>call xtref#py_jump()<CR>
+
+map  g]        <Plug>(xtref-jump)
+map  g<Space>  <Plug>(xtref-jump)
+
+
 "" NOTE: jump anchor from referal under cursor, and vice versa
 " BUG:(TEMP:sil): paused prompt on each :tag
 "   => always prints name of file it opens on tag jump
@@ -404,7 +421,7 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 " BAD:NEED:(sil): suppress "search hit bottom" message and jump immediately
 "   ::: FIXED: [⡡⡂⢡⡾] #xtref FIX pause on jump ::: :set shortmess+=s
 " [_] FIXME: always use "tag" if over xtref SEP function
-nnoremap <silent>  g]  :exe (v:count?v:count."tag":"tjump") xtref#invert(xtref#get(0))<CR>
+" nnoremap <silent>  g]  :exe (v:count?v:count."tag":"tjump") xtref#invert(xtref#get(0))<CR>
 xnoremap <silent>  g]  :<C-u>exe (v:count?v:count."tag":"tjump") xtref#invert(xtref#get(1))<CR>
  noremap <silent>  g[  :<C-u><C-r>=v:count1<CR>tag<CR>
 
