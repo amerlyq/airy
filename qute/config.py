@@ -14,8 +14,15 @@
 
 ## @me
 # REF: /usr/lib/python3.6/site-packages/qutebrowser
-c = c  # pylint:disable=undefined-variable,self-assigning-variable  # ALT: # noqa: F821
-config = config  # pylint:disable=undefined-variable,self-assigning-variable
+# c = c  # pylint:disable=undefined-variable,self-assigning-variable  # ALT: # noqa: F821
+# config = config  # pylint:disable=undefined-variable,self-assigning-variable
+
+# pylint: disable=C0111
+from qutebrowser.config.config import ConfigContainer  # noqa: F401
+from qutebrowser.config.configfiles import ConfigAPI  # noqa: F401
+
+config: ConfigAPI = config  # noqa: F821 pylint: disable=E0602,C0103
+c: ConfigContainer = c  # noqa: F821 pylint: disable=E0602,C0103
 
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
@@ -494,6 +501,7 @@ c.colors.statusbar.url.fg = "lime"  # @me
 ## color).
 ## Type: QtColor
 # c.colors.webpage.bg = 'white'
+c.colors.webpage.bg = "#101010"
 
 ## Which algorithm to use for modifying how colors are rendered with
 ## darkmode. The `lightness-cielab` value was added with QtWebEngine 5.14
@@ -2285,6 +2293,7 @@ config.bind(";I", "hint images tab-bg")
 # config.bind(';f', 'hint all tab-fg')
 # config.bind(';h', 'hint all hover')
 # config.bind(';i', 'hint images')
+config.bind(";m", "spawn --userscript dump_feed.py")
 # config.bind(';o', 'hint links fill :open {hint-url}')
 # config.bind(';r', 'hint --rapid links tab-bg')
 # config.bind(';t', 'hint inputs')

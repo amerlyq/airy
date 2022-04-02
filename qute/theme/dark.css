@@ -1,9 +1,29 @@
 ::-webkit-scrollbar { width: 0px; height: 0px; }
 
+/* ALT:VIZ: https://github.com/qutebrowser/qutebrowser/blob/master/doc/help/configuring.asciidoc#pre-built-colorschemes */
+
 /* SEE: http://www.w3schools.com/cssref/css_selectors.asp */
 
+* {
+  border-color: #657b83 !important;
+  color: #bbccbb !important;
+}
+
+a {
+  color: #70e070 !important;
+}
+
+code {
+  /* FAIL: does not work */
+  background-color: #094352 !important;
+  border-color: #094352 !important;
+  color: #93a1a1 !important;
+}
+
+
 /* http://www-archive.mozilla.org/unix/customizing.html */
-*:not(img):not(code) {
+/* *:not(img):not(code) { */
+*:not(img) {
     /* font-size: 1.04em; */
     background-color: #101010 !important;
 }
@@ -26,9 +46,6 @@ h1,h2,h3,h4,button {
     color: #b8ddea !important;
 }
 
-a {
-    color: #70e070 !important;
-}
 a:hover,a:focus {
     color: #7070e0 !important;
 }

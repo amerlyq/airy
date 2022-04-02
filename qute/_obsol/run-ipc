@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#%SUMMARY:
+#%USAGE: $ ./$0
+set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+exit
+
+# FAIL: crashes !qute
+_url="background.jpg"
+salt=$(echo -n "$USER" | md5sum | cut -d' ' -f1)
+sock="${XDG_RUNTIME_DIR}/qutebrowser/ipc-$salt"
+
+## ALT:
+# echo '{"args":[":tab-mute"], "target_arg":"", "protocol_version":1}'
+# socat - UNIX-CONNECT:"${XDG_RUNTIME_DIR}/qutebrowser/ipc-$(echo -n "$USER" | md5sum | cut -d' ' -f1)"
+
+# OR: $ /usr/bin/qutebrowser :tab-next
+printf '{"args": ["%s"], "target_arg": "window", "version": "1.11.1",
+"protocol_version": 1, "cwd": "%s"}\n' "${_url}" "${PWD}" \
+| socat - UNIX-CONNECT:"${sock}"
