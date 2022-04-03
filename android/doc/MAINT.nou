@@ -1,0 +1,22 @@
+
+2022-04-02-Sat-W13
+  [+] ‼ 25m SECU:BUG? private24 constantly wants to login ⌇⡢⡈⡿⡶
+    -- looks like a fishing attempt of another app
+    [_] SECU:READ: Compromising Android Applications with Intent Manipulation | Trustwave ⌇⡢⡈⢚⠥
+      https://www.trustwave.com/en-us/resources/blogs/spiderlabs-blog/compromising-android-applications-with-intent-manipulation/
+    user: $ adb shell dumpsys activity services
+    user: $ adb shell dumpsys activity services myservice
+    running: $ adb shell dumpsys activity services | grep "ServiceRecord" | awk '{print $4}' | sed 's/.$//' | sort
+    system: $ adb shell service list
+    all: $ ps | grep myservice
+    intents: $ adb shell dumpsys activity broadcasts |grep -iE ".+\.[0-9A-Z_\-]+:$" |sort
+      Capturing/Intercepting Android Intents during runtime - Stack Overflow ⌇⡢⡈⢄⣗
+        https://stackoverflow.com/questions/26372030/capturing-intercepting-android-intents-during-runtime
+        $ adb logcat Gi intent Gi privat
+      Using ADB to Determine Package Name and Launchable Activity | Zebra ⌇⡢⡈⢆⡹
+        https://www.zebra.com/us/en/support-downloads/knowledge-articles/evm/Using-ADB-to-Determine-Package-Name-and-Launchable-Activity.html
+        $ adb shell pm list packages
+        $ adb shell pm list packages -3 | grep myapp
+        $ adb shell dumpsys package | grep -Eo "^[[:space:]]+[0-9a-f]+[[:space:]]+com.symbol.wfc.voice/[^[:space:]]+" | grep -oE "[^[:space:]]+$"
+        Try to guess the main activity or test one by one using the am start command.
+        $ am start -n com.symbol.wfc.voice/.CallStarterActivity
