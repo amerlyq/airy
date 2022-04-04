@@ -23,7 +23,9 @@ code {
 
 /* http://www-archive.mozilla.org/unix/customizing.html */
 /* *:not(img):not(code) { */
-*:not(img) {
+/* SRC: https://css-tricks.com/css-not-with-multiple-classes/ */
+/*   FAIL?(Safari-only): *:not(img,canvas) { */
+*:not(img):not(canvas):not(.trackItem) {
     /* font-size: 1.04em; */
     background-color: #101010 !important;
 }
