@@ -18,6 +18,8 @@ call dein#add('hynek/vim-python-pep8-indent', {
 " TODO: pytest, nosetest, isort, black
 " FAIL:(autoimport): moves imports outside conditions and above shebang
 " \\n   let g:ale_python_pylint_use_msg_id = 1
+" \\n   let g:ale_python_mypy_use_global = 1
+" FAIL: \\n   let g:ale_python_mypy_executable = 'dmypy check'
 call dein#add('dense-analysis/ale', {
   \ 'on_ft': 'python',
   \ 'on_cmd': ['ALEInfo', 'ALEFix'],
