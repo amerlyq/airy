@@ -2,8 +2,38 @@
 
 default partial
 xkb_compatibility "airy" {
-
+    include "airy(mods_latch)"
 };
+
+
+partial
+xkb_compatibility "mods_latch" {
+    virtual_modifiers  Alt,Meta,Super;
+
+    interpret.repeat= False;
+    latchMods.clearLocks= True;
+    latchMods.latchToLock= False;
+
+    interpret Shift_L { action= LatchMods(modifiers=Shift); };
+    interpret Shift_R { action= LatchMods(modifiers=Shift); };
+
+    interpret Control_L { action= LatchMods(modifiers=Control); };
+    interpret Control_R { action= LatchMods(modifiers=Control); };
+
+    interpret Alt_L+Any { virtualModifier= Alt;
+        action= LatchMods(modifiers=modMapMods); };
+    interpret Alt_L { action= LatchMods(modifiers=Alt); };
+
+    interpret Meta_L+Any { virtualModifier= Meta;
+        action = LatchMods(modifiers=modMapMods); };
+    interpret Meta_L { action = LatchMods(modifiers=Meta); };
+
+    // NEED:(clearLocks): prevent sticky "Super" when switching language
+    interpret Super_L+Any { virtualModifier= Super;
+        action = LatchMods(clearLocks,modifiers=modMapMods); };
+    interpret Super_L { action = LatchMods(clearLocks,modifiers=Super); };
+};
+
 
 partial
 xkb_compatibility "debug" {
