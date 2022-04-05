@@ -1,0 +1,61 @@
+// vim:ft=cpp
+// DEBUG: $ /@/airy/xkb/cfg/apply || /@/airy/xkb/cfg/debug
+// ---------------------------------------
+// DFL::
+//   keycodes:   xfree86+aliases(qwerty)
+//   types:      complete
+//   compat:     complete
+//   symbols:    pc+us
+//   geometry:   pc(pc104)
+//
+! model = keycodes
+  *     = evdev+aliases(qwerty)
+
+! model = types
+  *     = complete+airy
+
+! model = compat
+  *     = complete+airy
+
+! model = geometry
+  *     = pc(pc104)
+
+! model = symbols
+  *     = pc
+
+// ---------------------------------------
+! layout = symbols
+  *      = +%l%(v)
+
+
+! layout[1] = symbols
+  *         = +%l[1]:1
+
+! layout[2] = symbols
+  *         = +%l[2]:2
+
+! layout[3] = symbols
+  *         = +%l[3]:3
+
+! layout[4] = symbols
+  *         = +%l[4]:4
+
+
+! layout[1] variant[1] = symbols
+  *         airy       = +%v[1]%(l[1]):1
+
+! layout[2] variant[2] = symbols
+  *         airy       = +%v[2]%(l[2]):2
+
+! layout[3] variant[3] = symbols
+  *         airy       = +%v[3]%(l[3]):3
+
+! layout[4] variant[4] = symbols
+  *         airy       = +%v[4]%(l[4]):4
+
+
+// ---------------------------------------
+! option = symbols
+  airy = +airy
+  airy:base = +airy(base)
+  airy:langleader = +airy(langleader)

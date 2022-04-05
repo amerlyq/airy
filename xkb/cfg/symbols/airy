@@ -1,0 +1,28 @@
+// vim:ft=cpp
+
+default partial alphanumeric_keys modifier_keys
+xkb_symbols "airy" {
+    include "airy(base)"
+    include "airy(langleader)"
+};
+
+// STD: copy-pasted from "rules/base"
+partial modifier_keys
+xkb_symbols "base" {
+    // include "pc"
+    include "ctrl(nocaps)"
+    include "altwin(swap_lalt_lwin)"
+};
+
+// TBD: description
+partial modifier_keys
+xkb_symbols "langleader" {
+    virtual_modifiers AltGr;
+    key <RALT> {
+        type[Group1]= "PC_SUPER_LEVEL2",
+        type[Group2]= "PC_SUPER_LEVEL2",
+        symbols[Group1]= [ NoSymbol, ISO_Last_Group ],
+        symbols[Group2]= [ ISO_First_Group, NoSymbol ],
+        virtualMods= AltGr
+    };
+};

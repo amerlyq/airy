@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#%DEBUG: $ … -v 10 … -variant ",airy" …
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+exec setxkbmap -v 5 -I "" -I/@/airy/xkb/cfg -I/usr/share/X11/xkb \
+  -model airy -rules airy -layout us,ru -option "" -option airy "$@"

@@ -1,8 +1,13 @@
 ⌇⡢⠽⡹⡹
 
 2022-03-24-Thu-W12  &next  pains::
-  [!] #xkb BET reset to *VERY* default !setxkbmap ⌇⡢⠽⡹⠣
+  [>] #xkb BET reset to *VERY* default !setxkbmap ⌇⡢⠽⡹⠣
     ENH gradually restore only necessary mappings
+    * ASUS laptop keys=70+Fn+21+Off=93
+    DFL: $ setxkbmap -option "" -model pc104 -rules evdev -layout us
+    NOW: $ setxkbmap -I/usr/share/X11/xkb -option "" -model pc104 -rules amer \
+      -layout "us,ru,ua" -variant "amer,amer,amer" \
+      -option "misc:typo,amer:nums,amer:lvl3,amer:mods,over:vim"
   [_] #xkb CHG Ru number row to same En symbols ⌇⡢⠺⣲⡣
   [•] 50m/ DEV #xkb switch lang by <RAlt Space> ⌇⡢⠹⢾⢯
     OR: use <RAlt> as modifier and switch lang by <RAlt e/r/k | s/d/f>
@@ -39,3 +44,112 @@
       https://wiki.archlinux.org/title/Xorg/Keyboard_configuration
       VIZ: /usr/share/X11/locale/en_US.UTF-8/Compose
       ADD ~/.XCompose
+
+
+2022-04-04-Mon-W14
+  [⡢⡋⠛⣞] #xkb XLR reset to *VERY* default !setxkbmap ※⡢⠽⡹⠣
+    DFL: at least something working
+      $ setxkbmap -v 10 -I "" -I/usr/share/X11/xkb -option "" -model pc104 -rules evdev -layout us,ru -option "ctrl:nocaps,altwin:swap_lalt_lwin,grp:toggle"
+      FAIL: no <LAlt> = ISO_First_Group
+      FAIL: arrows don't work :: with "-rules base" -> keycodes=xfree86
+      FAIL: can't extend/include //rules/base into my own //rules/airy
+        ::: TRY:CFG use //rules/base and pass my opts by "-compat complete+airy"
+          FAIL: I can't use my own custom "-option" -- because they are limited to whatever "base" has
+          FAIL: "-option" is ignored in presence of explicit "-symbols"
+            ::: CFG: my own rules "airy" ++ directly copy all used options from "base"
+    DEBUG:
+      $ setxkbmap -v 10 -I "" -I/@/airy/xkb/cfg -I/usr/share/X11/xkb -option "" -model pc104 -rules base -layout us,ru -option "ctrl:nocaps,altwin:swap_lalt_lwin,grp:toggle" -print
+        ‼ WARN: you need "-rules base" because I symlinked "rules/amer" and this file is first to be found in dir
+        ‼ FAIL: no error if option does not exist in //rules/base
+    CFG: my own rules "airy"
+      FAIL: should specify each "layout[1]" separately when using array "-layout us,ru"
+        What is wrong with these XKB rules files? - Unix & Linux Stack Exchange ⌇⡢⡋⠂⠽
+          https://unix.stackexchange.com/questions/240566/what-is-wrong-with-these-xkb-rules-files
+      WARN: need to use "airy.lst" too -- otherwise !setxkbmap won't find //rules/airy
+      BAD: "-model" and "-layout/-variant" should be always specified --
+          otherwise they use first file in //rules/* and resolve empty defaults to some bizzare values
+        FAIL: I dunno where it gets these values
+          ::: but most likely they are queried from !Xserver when unset
+            trySetString(&settings.layout, vd.layout, FROM_SERVER);
+    DONE:
+      $ setxkbmap -v 10 -I "" -I/@/airy/xkb/cfg -I/usr/share/X11/xkb -model airy -rules airy -layout us,ru -option "" -option airy -print
+    CHECK: compile
+      $ setxkbmap -v 5 -I "" -I/@/airy/xkb/cfg -I/usr/share/X11/xkb -model airy -rules airy -layout us,ru -option "" -option airy -print | xkbcomp -I/@/airy/xkb/cfg -
+    [⡢⡋⠴⡈] ERR: Error loading new keyboard description
+      ::: should pass -I to Xserver too OR symlink into default location
+        SEE:DEBUG: logs $ s.l xorg
+      NOTE: !setxkbmap only constructs names and sends them to remote !Xserver
+      -- and !Xserver compiles XKB by itself using remote local XKB files
+        https://github.com/freedesktop/xorg-xserver/blob/aeed57d722f2eb978c17fd7e859334d34af38d05/xkb/XKM_file_format.txt
+        FAIL:(man Xserver): can't append -xkbdir, and can't even replace when running SUID Xorg
+          ::: use symlinks into default
+      ERR:WARN:(ignore): Keycodes above 256 (e.g. <I256>) are not supported by X and are ignored
+        ::: https://bugzilla.redhat.com/show_bug.cgi?id=1615700
+        Peter Hutterer 2018-08-14 05:51:54 UTC
+        ¦ yeah, that's fine. we've started adding high keycodes to xkeyboard-config
+        ¦ because we can finally handle them on wayland. but the same maps are used
+        ¦ under X where we can't - hence the warning. It's just a warning, no
+        ¦ functional changes (those keycodes were never available anyway).
+  [⡢⡋⠟⢵] 30m WARN: !setxkbmap "Multiple definitions of"
+    What is wrong with these XKB rules files? - Unix & Linux Stack Exchange ⌇⡢⡊⣘⠅
+      https://unix.stackexchange.com/questions/240566/what-is-wrong-with-these-xkb-rules-files
+      NICE:TUT: how to write !rules
+    [$] MAYBE:TRY: archlinux debug symbols server for gdb
+    ::: NOT:issue -- warning is due to CMDLINE parsed first and set opts with highest prio,
+      after which !setxkbmap queries !Xserver for its own options, which have less prio, and ignored
+      HACK: to avoid WARN -- you should set opts by default rules or by cmdline config file
+        -- both of which will override Xorg silently afterwards
+  [⡢⡋⠡⠯] CHECK: man !setxkbmap -- CMP options usage/expl from SRC
+    -synch == better don't use -- it forces automatic XSynchronize() after each X11 request
+    -compat ... == better don't use directly, use rules
+  [⡢⡋⡒⠊] READ: virtual mods
+  [⡢⡋⡕⣧] FAIL:(type=): does not work: <RAlt> still uses defaults "Shift=Level2"
+    ::: NEED:USE: { type[Group1]="PC_SUPER_LEVEL2" } for multi-lang
+
+
+2022-04-04-Mon-W14 FUTURE
+  [_] TRY:WTF: default latching means
+    base.lst:  lv3:caps_switch_latch Caps Lock; acts as onetime lock when pressed together with another 3rd-level chooser
+    base.lst:  lv3:bksl_switch_latch Backslash; acts as onetime lock when pressed together with another 3rd level chooser
+    base.lst:  lv3:lsgt_switch_latch The "&lt; &gt;" key; acts as onetime lock when pressed together with another 3rd level chooser
+  [!] READ: X keyboard extension - ArchWiki ⌇⡢⡊⣛⡄
+    << this is f*k*ng &important to fill-in gaps in my understanding
+    https://wiki.archlinux.org/title/X_keyboard_extension
+    [•] DEBUG: https://wiki.archlinux.org/title/X_keyboard_extension#Debugging_XKB
+    [_] IDEA: use NumLock as proper modifier for my layout
+      << because it's not used at all
+  [_] SEE:IDEA:TRY: many other ways to switch language
+    /usr/share/X11/xkb/symbols/group
+  [⡢⡋⡢⢂] READ: Еще несколько "переключателей". — Linux-библиотека ⌇⡢⡊⣟⠯
+    http://www.linuxlib.ru/Linux/xkb/example4.html
+    << NICE: может содержать объяснение че за хня происходит с залипанием русского языка
+      ::: нет, не объясняет, но показывает хак с радио-группой и переключением вариантов
+    * grp:switch -> Mode_switch -> SetGroup() -- держит группу только пока нажата она сама
+  >>>
+  [_] FUTURE:TRY:
+    [_] TRY: кто-то уже сделал нужную мне xkb_symbols "unipunct"
+    [_] ADD: Multi_key back to <RAlt>
+      symbols[Group1] = [ Mode_switch, Multi_key ],
+    [_] switch lang
+      hold(RAlt) -> SetGroup(symbols)
+      downup(RAlt) -> LockGroup(en)
+      <RAlt+Space> -> LockGroup(ru)
+        OR: <Shift+RAlt> -> LockGroup(ru)
+      NOTE: https://www.x.org/releases/X11R7.6/doc/kbproto/xkbproto.html
+        ¦ If StickyKeys are enabled, all SA_SetMods and SA_SetGroup actions act
+        ¦ like SA_LatchMods and SA_LatchGroup respectively. If the LatchToLock
+        ¦ AccessX option is set, either action behaves as if both the
+        ¦ SA_ClearLocks and SA_LatchToLock flags are set.
+      [_] MAYBE: it will be possible by using smth similar to
+        /usr/share/X11/xkb/compat/ledcompose
+      [_] SEE: [PATCH 1/3] xkb: Several fixes to ISOLock and a few related changes. ⌇⡢⡋⡐⢍
+          https://xorg-devel.x.narkive.com/KXYK9C1W/patch-1-3-xkb-several-fixes-to-isolock-and-a-few-related-changes#post2
+    [_] IDEA: instead of DFL model=pc104 use my own
+      generic model=airy OR model=asuslap|Kinesis|ZSA
+      ⁇ is it useful for something else beside "geometry" ?
+        << it's easier to over-map non-existent keys, than to reduce precisely
+
+
+2022-04-05-Tue-W14
+  [⡢⡌⡠⡔] FAIL:CHECK no default LatchMods()
+    ::: NOT only level3 and level5 (and maybe shift)

@@ -1,0 +1,24 @@
+// vim:ft=cpp
+
+default partial
+xkb_compatibility "airy" {
+
+};
+
+partial
+xkb_compatibility "debug" {
+    // OR:
+    // indicator "LED1" { modifiers = Lock; };
+    // indicator "LED2" { groups = 2; };
+    // indicator "LED3" { controls = audiblebell; };
+
+    // FAIL:ERR: does not work --> USE=Mod4
+    // virtual_modifiers Super;
+
+    // SRC:
+    //   /usr/share/X11/xkb/keycodes/evdev:583
+    //     indicator 1  = "Caps Lock";
+    indicator "Caps Lock" {
+        modifiers= Mod4;
+    };
+};
