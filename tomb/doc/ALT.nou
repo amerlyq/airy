@@ -91,6 +91,9 @@ SETUP
 SYNC
   $ sshfs -f --debug -o "umask=0077,noexec,no_readahead,allow_root" lc:/me/tomb /srv/tomb
     # CHECK:(,compression=yes): useless due to sending encrypted data blocks
+    # ALSO: oauto_cache,reconnect,defer_permissions,noappledouble,nolocalcaches,no_readahead | cache_timeout=115200,attr_timeout=115200
+      linux - faster way to mount a remote file system than sshfs? - Super User ⌇⡢⡌⡪⡔
+        https://superuser.com/questions/344255/faster-way-to-mount-a-remote-file-system-than-sshfs
   $ pass tomb/aura | sudo cryptsetup -v --key-file - luksOpen --header ~/tomb/aura.keys -- /srv/tomb/aura.luks tomb-aura
   $ mount /dev/mapper/tomb-aura /mnt
   $ Gl
