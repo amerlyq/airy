@@ -2,7 +2,8 @@
 source ~/.shell/func.d/packages
 
 if distro arch; then
-  aur_inst xurls  # REQ:(st)
+  ## FAIL broken build, requires "go"
+  # aur_inst xurls  # REQ:(st)
   aur_inst fpp-git  # REQ:(tmux) Facebook PathPicker
 
 elif distro ubuntu; then

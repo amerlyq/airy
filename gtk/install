@@ -12,6 +12,7 @@ if distro arch; then
     #    OR:ALT: manually precompile gtk/theme/{Adwaita,HighContrast}/*.scss -> *.css
     #    SRC: https://github.com/lah7/gtk3-classic/issues/49
     #    https://aur.archlinux.org/packages/gtk3-classic-noatk-64/#news
+    ## FIXED:ADD: sed -i 's/^.*atkbridge_dep/#\0/g' "gtk+-$_gtkver/meson.build" "gtk+-$_gtkver/gtk/meson.build"
     aur_inst gtk3-classic-noatk-64
     # pkg_inst gtk2 gtk3
 
