@@ -501,7 +501,7 @@ c.colors.statusbar.url.fg = "lime"  # @me
 ## color).
 ## Type: QtColor
 # c.colors.webpage.bg = 'white'
-c.colors.webpage.bg = "#101010"
+# c.colors.webpage.bg = "#101010"  # @me
 
 ## Which algorithm to use for modifying how colors are rendered with
 ## darkmode. The `lightness-cielab` value was added with QtWebEngine 5.14
@@ -2260,9 +2260,17 @@ config.bind(",S", 'spawn -- r.mpd-soundcloud "{url}"')
 # config.bind(',S', 'set content.javascript.enabled false ;; reload')
 
 # NOTE: WebKit switches CSS immediately, BUT: WebEngine requires ";; reload"
-config.bind(",t", "set content.user_stylesheets theme/dark.css")
-config.bind(",T", "set content.user_stylesheets theme/light.css")
-config.bind(",z", "set content.user_stylesheets theme/solarized.css")
+
+config.bind(
+    ",t", "set colors.webpage.bg #101010 ;; set content.user_stylesheets theme/dark.css"
+)
+config.bind(
+    ",T", "set colors.webpage.bg white ;; set content.user_stylesheets theme/light.css"
+)
+config.bind(
+    ",z",
+    "set colors.webpage.bg #002b36 ;; set content.user_stylesheets theme/solarized.css",
+)
 config.bind(",Z", 'config-cycle content.user_stylesheets theme/solarized.css ""')
 # REC: config.bind(',Z', 'config-cycle content.user_stylesheets ~/path/to/solarized-everything-css/css/gruvbox/gruvbox-all-sites.css ""')
 config.bind(
