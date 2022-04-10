@@ -1,7 +1,13 @@
 """ Python {{{1
 
-call dein#add('hynek/vim-python-pep8-indent', {
-  \ 'on_ft': 'python'})
+" DEP: $ auri python-lsp-all
+call dein#add('neovim/nvim-lspconfig', {
+  \ 'on_ft': 'python',
+  \ 'hook_source': _hcat('python-lsp.src')})
+
+
+" call dein#add('hynek/vim-python-pep8-indent', {
+"   \ 'on_ft': 'python'})
 
 
 
@@ -20,36 +26,36 @@ call dein#add('hynek/vim-python-pep8-indent', {
 " \\n   let g:ale_python_pylint_use_msg_id = 1
 " \\n   let g:ale_python_mypy_use_global = 1
 " FAIL: \\n   let g:ale_python_mypy_executable = 'dmypy check'
-call dein#add('dense-analysis/ale', {
-  \ 'on_ft': 'python',
-  \ 'on_cmd': ['ALEInfo', 'ALEFix'],
-  \ 'hook_source': "
-\\n   let g:ale_linters_explicit = 1
-\\n   let g:ale_linters = { 'python': ['flake8', 'mypy', 'pylint'] }
-\\n   let g:ale_python_pylint_options = '--disable=C0103,C0111,W0511'
-\\n   let g:ale_python_mypy_ignore_invalid_syntax = 1
-\\n   let g:ale_python_mypy_options = ''
-\\n
-\\n   let g:ale_fixers = { 'python': ['isort', 'black'] }
-\\n   let g:ale_fix_on_save = 1
-\\n   let g:ale_fix_on_save_ignore = { 'python': ['autoimport'] }
-\\n   let g:ale_completion_autoimport = 1
-\"})
+" call dein#add('dense-analysis/ale', {
+"   \ 'on_ft': 'python',
+"   \ 'on_cmd': ['ALEInfo', 'ALEFix'],
+"   \ 'hook_source': "
+" \\n   let g:ale_linters_explicit = 1
+" \\n   let g:ale_linters = { 'python': ['flake8', 'mypy', 'pylint'] }
+" \\n   let g:ale_python_pylint_options = '--disable=C0103,C0111,W0511'
+" \\n   let g:ale_python_mypy_ignore_invalid_syntax = 1
+" \\n   let g:ale_python_mypy_options = ''
+" \\n
+" \\n   let g:ale_fixers = { 'python': ['isort', 'black'] }
+" \\n   let g:ale_fix_on_save = 1
+" \\n   let g:ale_fix_on_save_ignore = { 'python': ['autoimport'] }
+" \\n   let g:ale_completion_autoimport = 1
+" \"})
 
 
 
-" BUG: update error
-" on_cmd: Pyimport
-call dein#add('davidhalter/jedi-vim', {
-  \ 'on_ft': 'python',
-  \ 'hook_source': _hcat('jedi-vim.src')})
-" \\n   let g:jedi#goto_command = "<LocalLeader>d"
-" \\n   let g:jedi#goto_assignments_command = "<LocalLeader>g"  " Declaration
-" \\n   let g:jedi#rename_command = "<LocalLeader>r"
-" \\n   let g:jedi#documentation_command = "<LocalLeader>k"
-" \\n   let g:jedi#usages_command = "<LocalLeader>u"
-" \\n   let g:jedi#goto_stubs_command = ""
-" \'})
+" " BUG: update error
+" " on_cmd: Pyimport
+" call dein#add('davidhalter/jedi-vim', {
+"   \ 'on_ft': 'python',
+"   \ 'hook_source': _hcat('jedi-vim.src')})
+" " \\n   let g:jedi#goto_command = "<LocalLeader>d"
+" " \\n   let g:jedi#goto_assignments_command = "<LocalLeader>g"  " Declaration
+" " \\n   let g:jedi#rename_command = "<LocalLeader>r"
+" " \\n   let g:jedi#documentation_command = "<LocalLeader>k"
+" " \\n   let g:jedi#usages_command = "<LocalLeader>u"
+" " \\n   let g:jedi#goto_stubs_command = ""
+" " \'})
 
 
 
@@ -68,13 +74,14 @@ call dein#add('davidhalter/jedi-vim', {
 "   BAD: hi disappears on async complete, not on the write
 "   FIXED: chain highlight after auto-fix by ALE (e.g. from "!black")
 " ALSO:(python=3.10): match-case :: https://github.com/cyyever/semshi
-call dein#add('numirias/semshi', {
-  \ 'on_ft': 'python',
-  \ 'depends': 'ale',
-  \ 'hook_source': "
-\\n  augroup AleSemshi | augroup END
-\\n  autocmd! AleSemshi User ALEFixPost Semshi highlight
-\"})
+call dein#add('numirias/semshi', { 'on_ft': 'python' })
+" call dein#add('numirias/semshi', {
+"   \ 'on_ft': 'python',
+"   \ 'depends': 'ale',
+"   \ 'hook_source': "
+" \\n  augroup AleSemshi | augroup END
+" \\n  autocmd! AleSemshi User ALEFixPost Semshi highlight
+" \"})
 
 
 
@@ -144,10 +151,10 @@ call dein#add('jupyter-vim/jupyter-vim', {
 
 
 
-"" [Formatting]
-call dein#add('psf/black', {
-  \ 'on_ft': 'python',
-  \ 'on_cmd': 'Black'})
+" "" [Formatting]
+" call dein#add('psf/black', {
+"   \ 'on_ft': 'python',
+"   \ 'on_cmd': 'Black'})
 
 
 

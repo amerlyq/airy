@@ -120,7 +120,7 @@ BUG
       https://mypy.readthedocs.io/en/stable/mypy_daemon.html
     [_] TRY: use coc.vim instead of ALE
       https://github.com/neoclide/coc-python/issues/155
-    [_] BET:TRY:(pylsp-mypy): for python-lsp-server
+    [•] BET:TRY:(pylsp-mypy): for python-lsp-server
       Update plugin to use python-lsp-server instead of python-language-server · Issue #51 · tomv564/pyls-mypy ⌇⡢⡉⣳⠏
         https://github.com/tomv564/pyls-mypy/issues/51
       [‣] ‼ NICE:CFG: python-lsp/pylsp-mypy: Mypy plugin for the Python LSP Server. ⌇⡢⡉⣳⡹
@@ -138,3 +138,29 @@ BUG
       microsoft/pyright: Static type checker for Python ⌇⡢⡉⣴⣷
         https://github.com/microsoft/pyright
         https://news.ycombinator.com/item?id=29179844
+
+
+2022-04-10-Sun-W14
+  [%⡢⡒⣠⣩] 3h15m &novelty TRY:CHG: faster !mypy / diff server ※⡢⡇⠝⡝
+    [⡢⡒⣚⢷] READ: install python-lsp-server
+      https://github.com/neovim/nvim-lspconfig
+      https://jdhao.github.io/2019/11/20/neovim_builtin_lsp_hands_on/
+      Plug 'neovim/nvim-lspconfig'
+      lua << EOF
+      require("lspconfig").pylsp.setup{}
+      EOF
+    [⡢⡒⣝⡒] install and CFG python-lsp-server
+      $ auri python-lsp-all
+        # $ paci python-lsp-server python-lsp-black
+        # $ auri python-lsp-mypy python-lsp-isort
+      https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#pylsp
+    [%] disable ALE
+    [%] verify server works
+      https://github.com/python-lsp/python-lsp-server/#configuration
+      https://github.com/python-lsp
+      https://github.com/python-lsp/python-lsp-black
+    [⡢⡓⠈⢶] 2h10m WTF: why dmypy runs several seconds ?
+      ::: disabled !dmypy -- TEMP:USE !mypy with incremental cache
+    […] WAIT https://github.com/python-rope/rope/pull/464
+    [_] ALT:(deoplete) for LSP
+      https://github.com/hrsh7th/nvim-cmp
