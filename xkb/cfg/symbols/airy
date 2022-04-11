@@ -2,11 +2,13 @@
 
 default partial alphanumeric_keys modifier_keys
 xkb_symbols "airy" {
-    include "airy(base)"
-    include "airy(langleader)"
     include "airy(unipunct)"
     // WARN: should be included only for grp2
-    // include "airy(zip-ru-ua)"
+    // include "airy(zip):2"
+
+    include "airy(base)"
+    include "airy(langleader)"
+    include "airy(lvl3_menu_latch)"
 };
 
 // STD: copy-pasted from "rules/base"
@@ -15,7 +17,7 @@ xkb_symbols "base" {
     // include "pc"
     include "ctrl(nocaps)"
     include "altwin(swap_lalt_lwin)"
-    include "level3(menu_switch)"
+    // include "level3(menu_switch)"
 };
 
 // TBD: description
@@ -31,6 +33,23 @@ xkb_symbols "langleader" {
     };
 };
 
+
+// DFL: include "level3(menu_switch)"
+// The Menu key (while pressed) chooses the third shift level.
+partial modifier_keys
+xkb_symbols "lvl3_menu_latch" {
+  key <MENU> {
+    type[Group1]= "ONE_LEVEL",
+    symbols[Group1]= [ ISO_Level3_Latch ]
+  };
+  replace key <LVL3> {
+    type[Group1]= "ONE_LEVEL",
+    symbols[Group1]= [ ISO_Level3_Latch ]
+  };
+  modifier_map Mod5 { <LVL3> };
+};
+
+
 partial alphanumeric_keys
 xkb_symbols "unipunct" {
     name[Group1]= "Punctuation only (extend US punctuation)";
@@ -38,18 +57,18 @@ xkb_symbols "unipunct" {
     // ALSO: stress=U0301 // COMBINING ACUTE ACCENT
     // SRC:(U02BC): https://ukrainian.stackexchange.com/questions/40/ ⌇⡢⡔⠥⢤
     key <TLDE> { [ grave,  asciitilde,  U02BC, rightsinglequotemark] };  // ` ~ ʼ ’(old)
-    key <AE01> { [     1,      exclam,      division,       U2248  ] };  // 1 ! ÷ ≈
+    key <AE01> { [     1,      exclam,      division,       U2248  ] };  // 1 ! ÷ ≈   ¬
     key <AE02> { [     2,          at,      currency,    infinity  ] };  // 2 @ ¤ ∞
     key <AE03> { [     3,  numbersign,       section,  numerosign  ] };  // 3 # § №
     key <AE04> { [     4,      dollar,     semicolon,    EuroSign  ] };  // 4 $ ; €
-    key <AE05> { [     5,     percent,        degree,       U20B4  ] };  // 5 % ° ₴ ‰
-    key <AE06> { [     6,  asciicircum,       less, lessthanequal  ] };  // 6 ^
-    key <AE07> { [     7,   ampersand,  greater, greaterthanequal  ] };  // 7 &
-    key <AE08> { [     8,    asterisk,enfilledcircbullet,multiply  ] };  // 8 *
-    key <AE09> { [     9,   parenleft,   bracketleft,   braceleft  ] };  // 9 (
-    key <AE10> { [     0,  parenright,  bracketright,  braceright  ] };  // 0 )
+    key <AE05> { [     5,     percent,        degree,       U20B4  ] };  // 5 % ° ₴   ‰
+    key <AE06> { [     6,  asciicircum,       less, lessthanequal  ] };  // 6 ^ < ≤
+    key <AE07> { [     7,   ampersand,  greater, greaterthanequal  ] };  // 7 & > ≥
+    key <AE08> { [     8,    asterisk,periodcentered,    multiply  ] };  // 8 * · ×   ∴
+    key <AE09> { [     9,   parenleft,   bracketleft,   braceleft  ] };  // 9 ( [ {
+    key <AE10> { [     0,  parenright,  bracketright,  braceright  ] };  // 0 ) ] }
     key <AE11> { [ minus,  underscore,        emdash,      endash  ] };  // - _
-    key <AE12> { [ equal,        plus,      notequal,   plusminus  ] };  // = +
+    key <AE12> { [ equal,        plus,      notequal,   plusminus  ] };  // = + ≠ ±
 
 
     key <AD11> { [ bracketleft,   braceleft,   union, intersection ] };  // [ { ∪ ∩
@@ -65,22 +84,22 @@ xkb_symbols "unipunct" {
  // key <AC11> { [ Cyrillic_e,        Cyrillic_E,  Ukrainian_ie,         Ukrainian_IE  ] };
 
 
-    key <AB08> { [ comma,  less,     lessthanequal,    guillemotleft  ] };  // , < ≤ «
+    key <AB08> { [ comma,  less,     guillemotleft,   doublelowquotemark ] };  // , < «
  // key <AB08> { [ Cyrillic_be,       Cyrillic_BE,  guillemotleft,  doublelowquotemark  ] };
-    key <AB09> { [ period, greater,  greaterthanequal, guillemotright ] };  // . > ≥ »
+    key <AB09> { [ period, greater,  guillemotright, leftdoublequotemark ] };  // . > »
  // key <AB09> { [ Cyrillic_yu,       Cyrillic_YU, guillemotright, leftdoublequotemark  ] };
-    key <AB10> { [ slash,  question, ellipsis,         questiondown   ] };  // / ? … ¿
+    key <AB10> { [ slash,  question,          U2026,      questiondown   ] };  // / ? … ¿
 };
 
 
 partial alphanumeric_keys
-xkb_symbols "zip-ru-ua" {
+xkb_symbols "zip" {
 
     // TODO: replace lvl(1,2) by NoSymbol and only then uncomment in order to reuse definitions
     // include "us(basic)"
     // include "ru(common)"
 
-    name[Group1]= "Russian+Ukrainian (reuse same US punctuation)";
+    name[Group1]= "Russian+Ukrainian (reuse extended US punctuation)";
 
     key <LatQ> { [ Cyrillic_ha,   Cyrillic_HA ] };
     key <LatW> { [ Cyrillic_be,   Cyrillic_BE ] };

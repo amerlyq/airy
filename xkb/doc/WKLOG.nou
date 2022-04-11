@@ -186,7 +186,7 @@
 
 
 2022-04-11-Mon-W15
-  [⡢⡔⠺⣶] ◔ 2h45m ^⡢⠽⡹⡹ #xkb CFG mixed ru-en-ua-punct ※⡢⠽⡹⠣
+  [⡢⡔⡚⣁] ◔ 3h45m ^⡢⠽⡹⡹ #xkb CFG mixed ru-en-ua-punct ※⡢⠽⡹⠣
     [⡢⡔⠘⢺] 15m copy 1:1 whole "unipunct" layout (and others)
     [⡢⡔⠷⣸] 2h create totally independent layout first
       REF
@@ -199,6 +199,7 @@
           https://ukrainian.stackexchange.com/questions/40/Який-символ-використовувати-для-позначення-апострофа-в-електронних-текстах-украї
           ::: USE: U+02BC but allow to enter U+2019 too (to search on older pages)
       [⡢⡔⠷⣴] 1h combine "unipunct" common layout
+      [+] 1h FIXUP loading zip-ru-ua ※⡢⠽⡹⠣ -- to start using it during work
       [_] ALT:IDEA: don't move RU keys -- keep them in same place, but access on lvl3=
         хм, если их уже и так засунули на lvl3 -- то какая разница,
         зачем перемещать буквы на другие позиции, если уже помнить основные?
@@ -208,6 +209,8 @@
           иначе печатать будет просто невозможно
       [_] FUTURE: combine with "us(symbolic)"
         [_] ALSO: look through other "us/en" variants
+    [_] READ:OFF:REF: useful links ⌇⡢⡔⡏⢦
+      https://www.x.org/wiki/XKB/
     [_] TRY: replace common parts by existing ones
       [_] SPLIT "punct" layer to reuse same lvl3 for both RU and EN
       [_] :reuse: include "us(basic)" NEED remove lvl(1,2) by NoSymbol from :punct:
@@ -217,11 +220,13 @@
         [_] ADD:CFG: open my geometry layout preview on !xmonad hotkey
     [_] FIXUP:ADD: RAlt=<AltGr> -> lvl3 key when holding
       [⡢⡔⠛⢝] TEMP: use <Menu> or <RCtrl> ::: level3(menu_switch)
+        [_] NICE:SEIZE: useful piece level3("ralt_switch_for_alts_toggle")
         [_] IDEA:USE: lvl3= <LAlt> as I don't use it often anyways
           MAYBE: press it by left thumb finger
         [_] MAYBE: remap them to <Meta> inof <AltGr>
         [_] TODO: like "caps_switch_latch" and "ralt_switch_multikey"
       [_] BET? use latching/locking "group" for ALL :punct: instead of lvl3=
+        e.g. use ISO_Group_Latch ++ universal ISO_Lock
         [_] IDEA: lock group/lvl3 on <RAlt>, latch on <XMod> + <RAlt>
           ALT: latch lvl3 on <LAlt|Super>, lock on <LAlt> + <RAlt>
     [_] ADD: <LCtrl> overlay to hjkl arrows
