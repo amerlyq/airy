@@ -183,3 +183,47 @@
           http://mkweb.bcgsc.ca/carpalx/
         Generating Optimal Keyboard Layouts (with Code) | by Blake Sanie | codeburst ⌇⡢⡍⢴⠧
           https://codeburst.io/generating-optimal-keyboard-layouts-with-code-44f1752c48cc
+
+
+2022-04-11-Mon-W15
+  [⡢⡔⠺⣶] ◔ 2h45m ^⡢⠽⡹⡹ #xkb CFG mixed ru-en-ua-punct ※⡢⠽⡹⠣
+    [⡢⡔⠘⢺] 15m copy 1:1 whole "unipunct" layout (and others)
+    [⡢⡔⠷⣸] 2h create totally independent layout first
+      REF
+        /usr/share/X11/xkb/symbols/level3
+        /usr/include/X11/keysymdef.h
+      [⡢⡔⠷⣭] combine "ruu" primary layout
+        == nice phonetic addition of ukr and rus
+      [⡢⡔⠷⣱] ALSO:SEE: "ua" for possible letters
+        [⡢⡔⠥⢭] 15m пунктуація - Який символ використовувати для позначення апострофа в електронних текстах українською? - Ukrainian Language Stack Exchange ⌇⡢⡔⠥⢤
+          https://ukrainian.stackexchange.com/questions/40/Який-символ-використовувати-для-позначення-апострофа-в-електронних-текстах-украї
+          ::: USE: U+02BC but allow to enter U+2019 too (to search on older pages)
+      [⡢⡔⠷⣴] 1h combine "unipunct" common layout
+      [_] ALT:IDEA: don't move RU keys -- keep them in same place, but access on lvl3=
+        хм, если их уже и так засунули на lvl3 -- то какая разница,
+        зачем перемещать буквы на другие позиции, если уже помнить основные?
+          << возможно так будет легче печатать и легче запомнить,
+          но это требует длительных экспериментов и ориентир на усталость рук
+        [_] WARN: в этом случае lvl3 *обязательно* должен быть под левой рукой,
+          иначе печатать будет просто невозможно
+      [_] FUTURE: combine with "us(symbolic)"
+        [_] ALSO: look through other "us/en" variants
+    [_] TRY: replace common parts by existing ones
+      [_] SPLIT "punct" layer to reuse same lvl3 for both RU and EN
+      [_] :reuse: include "us(basic)" NEED remove lvl(1,2) by NoSymbol from :punct:
+        WARN: don't include "ua(winkeys)", it will uselessly override symbols
+      [_] TODO: update geometry
+        @/airy/xkb/cfg/geometry/airy
+        [_] ADD:CFG: open my geometry layout preview on !xmonad hotkey
+    [_] FIXUP:ADD: RAlt=<AltGr> -> lvl3 key when holding
+      [⡢⡔⠛⢝] TEMP: use <Menu> or <RCtrl> ::: level3(menu_switch)
+        [_] IDEA:USE: lvl3= <LAlt> as I don't use it often anyways
+          MAYBE: press it by left thumb finger
+        [_] MAYBE: remap them to <Meta> inof <AltGr>
+        [_] TODO: like "caps_switch_latch" and "ralt_switch_multikey"
+      [_] BET? use latching/locking "group" for ALL :punct: instead of lvl3=
+        [_] IDEA: lock group/lvl3 on <RAlt>, latch on <XMod> + <RAlt>
+          ALT: latch lvl3 on <LAlt|Super>, lock on <LAlt> + <RAlt>
+    [_] ADD: <LCtrl> overlay to hjkl arrows
+    [_] FUTURE: optimize both EN and RU at the same time around punctuation
+      [_] ALT:IDEA: move ALL common RU/EN punct to lvl3 -- to keep RU symbols at same places

@@ -4,6 +4,9 @@ default partial alphanumeric_keys modifier_keys
 xkb_symbols "airy" {
     include "airy(base)"
     include "airy(langleader)"
+    include "airy(unipunct)"
+    // WARN: should be included only for grp2
+    // include "airy(zip-ru-ua)"
 };
 
 // STD: copy-pasted from "rules/base"
@@ -12,6 +15,7 @@ xkb_symbols "base" {
     // include "pc"
     include "ctrl(nocaps)"
     include "altwin(swap_lalt_lwin)"
+    include "level3(menu_switch)"
 };
 
 // TBD: description
@@ -25,4 +29,88 @@ xkb_symbols "langleader" {
         symbols[Group2]= [ ISO_First_Group, NoSymbol ],
         virtualMods= AltGr
     };
+};
+
+partial alphanumeric_keys
+xkb_symbols "unipunct" {
+    name[Group1]= "Punctuation only (extend US punctuation)";
+
+    // ALSO: stress=U0301 // COMBINING ACUTE ACCENT
+    // SRC:(U02BC): https://ukrainian.stackexchange.com/questions/40/ ⌇⡢⡔⠥⢤
+    key <TLDE> { [ grave,  asciitilde,  U02BC, rightsinglequotemark] };  // ` ~ ʼ ’(old)
+    key <AE01> { [     1,      exclam,      division,       U2248  ] };  // 1 ! ÷ ≈
+    key <AE02> { [     2,          at,      currency,    infinity  ] };  // 2 @ ¤ ∞
+    key <AE03> { [     3,  numbersign,       section,  numerosign  ] };  // 3 # § №
+    key <AE04> { [     4,      dollar,     semicolon,    EuroSign  ] };  // 4 $ ; €
+    key <AE05> { [     5,     percent,        degree,       U20B4  ] };  // 5 % ° ₴ ‰
+    key <AE06> { [     6,  asciicircum,       less, lessthanequal  ] };  // 6 ^
+    key <AE07> { [     7,   ampersand,  greater, greaterthanequal  ] };  // 7 &
+    key <AE08> { [     8,    asterisk,enfilledcircbullet,multiply  ] };  // 8 *
+    key <AE09> { [     9,   parenleft,   bracketleft,   braceleft  ] };  // 9 (
+    key <AE10> { [     0,  parenright,  bracketright,  braceright  ] };  // 0 )
+    key <AE11> { [ minus,  underscore,        emdash,      endash  ] };  // - _
+    key <AE12> { [ equal,        plus,      notequal,   plusminus  ] };  // = +
+
+
+    key <AD11> { [ bracketleft,   braceleft,   union, intersection ] };  // [ { ∪ ∩
+    key <AD12> { [ bracketright,  braceright, includedin, includes ] };  // ] } ⊂ ⊃
+ // key <AD12> { [ Cyrillic_hardsign, Cyrillic_HARDSIGN,  Ukrainian_yi,         Ukrainian_YI  ] };
+    key <BKSL> { [ backslash,     bar,           brokenbar,  slash ] };  // \ | ¦ /
+ // key <BKSL> { [ Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN, backslash,  bar  ] };
+ // key <LSGT> { [ U230A,     U230B, U2308, U2309      ] }; // ⌊ ⌋ ⌈ ⌉
+
+
+    key <AC10> { [ semicolon,  colon,    downarrow,   uparrow     ] };  // ; : ↓ ↑
+    key <AC11> { [ apostrophe, quotedbl, rightarrow,  leftarrow   ] };  // ' " → ←
+ // key <AC11> { [ Cyrillic_e,        Cyrillic_E,  Ukrainian_ie,         Ukrainian_IE  ] };
+
+
+    key <AB08> { [ comma,  less,     lessthanequal,    guillemotleft  ] };  // , < ≤ «
+ // key <AB08> { [ Cyrillic_be,       Cyrillic_BE,  guillemotleft,  doublelowquotemark  ] };
+    key <AB09> { [ period, greater,  greaterthanequal, guillemotright ] };  // . > ≥ »
+ // key <AB09> { [ Cyrillic_yu,       Cyrillic_YU, guillemotright, leftdoublequotemark  ] };
+    key <AB10> { [ slash,  question, ellipsis,         questiondown   ] };  // / ? … ¿
+};
+
+
+partial alphanumeric_keys
+xkb_symbols "zip-ru-ua" {
+
+    // TODO: replace lvl(1,2) by NoSymbol and only then uncomment in order to reuse definitions
+    // include "us(basic)"
+    // include "ru(common)"
+
+    name[Group1]= "Russian+Ukrainian (reuse same US punctuation)";
+
+    key <LatQ> { [ Cyrillic_ha,   Cyrillic_HA ] };
+    key <LatW> { [ Cyrillic_be,   Cyrillic_BE ] };
+    key <LatE> { [ Cyrillic_u,    Cyrillic_U,    Cyrillic_yu, Cyrillic_YU ] };
+    key <LatR> { [ Cyrillic_ka,   Cyrillic_KA,   registered ] };  // ®
+    key <LatT> { [ Cyrillic_ie,   Cyrillic_IE,   Cyrillic_e, Cyrillic_E ] };
+ // key <AD05> { [ Cyrillic_ie,   Cyrillic_IE,   Cyrillic_io,          Cyrillic_IO  ] };
+    key <LatY> { [ Cyrillic_en,   Cyrillic_EN ] };
+    key <LatU> { [ Cyrillic_ghe,  Cyrillic_GHE,  Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ] };
+    key <LatI> { [ Cyrillic_sha,  Cyrillic_SHA,  Cyrillic_shcha, Cyrillic_SHCHA ] };
+    key <LatO> { [ Cyrillic_zhe,  Cyrillic_ZHE ] };
+    key <LatP> { [ Cyrillic_ze,   Cyrillic_ZE,   paragraph,  U204B ] };  // ¶ ⁋
+
+
+    key <LatA> { [ Cyrillic_ef,   Cyrillic_EF ] };
+    key <LatS> { [ Cyrillic_yeru, Cyrillic_YERU,  Ukrainian_i,  Ukrainian_I ] };
+    key <LatD> { [ Cyrillic_ve,   Cyrillic_VE ] };
+    key <LatF> { [ Cyrillic_a,    Cyrillic_A ] };
+    key <LatG> { [ Cyrillic_pe,   Cyrillic_PE ] };
+    key <LatH> { [ Cyrillic_er,   Cyrillic_ER ] };
+    key <LatJ> { [ Cyrillic_o,    Cyrillic_O, Cyrillic_io, Cyrillic_IO ] };
+    key <LatK> { [ Cyrillic_el,   Cyrillic_EL ] };
+    key <LatL> { [ Cyrillic_de,   Cyrillic_DE ] };
+
+
+    key <LatZ> { [ Cyrillic_ya,   Cyrillic_YA ] };
+    key <LatX> { [ Cyrillic_che,  Cyrillic_CHE, Cyrillic_tse, Cyrillic_TSE ] };
+    key <LatC> { [ Cyrillic_es,   Cyrillic_ES,      copyright ] };  // ©
+    key <LatV> { [ Cyrillic_em,   Cyrillic_EM,             mu ] };  // µ
+    key <LatB> { [ Cyrillic_i,    Cyrillic_I, Cyrillic_shorti, Cyrillic_SHORTI ] };
+    key <LatN> { [ Cyrillic_te,   Cyrillic_TE,      trademark ] };  // ™
+    key <LatM> { [ Cyrillic_softsign, Cyrillic_SOFTSIGN, Cyrillic_hardsign, Cyrillic_HARDSIGN ] };
 };
