@@ -101,16 +101,16 @@ xkb_symbols "zip" {
 
     name[Group1]= "Russian+Ukrainian (reuse extended US punctuation)";
 
-    key <LatQ> { [ Cyrillic_ha,   Cyrillic_HA ] };
-    key <LatW> { [ Cyrillic_be,   Cyrillic_BE ] };
+    key <LatQ> { [ Cyrillic_ha,   Cyrillic_HA, Cyrillic_shorti, Cyrillic_SHORTI ] };  // "й" same placement
+    key <LatW> { [ Cyrillic_be,   Cyrillic_BE, Cyrillic_tse, Cyrillic_TSE ] };  // "ц" same placement
     key <LatE> { [ Cyrillic_u,    Cyrillic_U,    Cyrillic_yu, Cyrillic_YU ] };
     key <LatR> { [ Cyrillic_ka,   Cyrillic_KA,   registered ] };  // ®
     key <LatT> { [ Cyrillic_ie,   Cyrillic_IE,   Cyrillic_e, Cyrillic_E ] };
  // key <AD05> { [ Cyrillic_ie,   Cyrillic_IE,   Cyrillic_io,          Cyrillic_IO  ] };
     key <LatY> { [ Cyrillic_en,   Cyrillic_EN ] };
     key <LatU> { [ Cyrillic_ghe,  Cyrillic_GHE,  Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ] };
-    key <LatI> { [ Cyrillic_sha,  Cyrillic_SHA,  Cyrillic_shcha, Cyrillic_SHCHA ] };
-    key <LatO> { [ Cyrillic_zhe,  Cyrillic_ZHE ] };
+    key <LatI> { [ Cyrillic_sha,  Cyrillic_SHA,  Cyrillic_shcha, Cyrillic_SHCHA ] };  // "щ" phonetic copy
+    key <LatO> { [ Cyrillic_zhe,  Cyrillic_ZHE,  Cyrillic_shcha, Cyrillic_SHCHA ] };  // "щ" same placement
     key <LatP> { [ Cyrillic_ze,   Cyrillic_ZE,   paragraph,  U204B ] };  // ¶ ⁋
 
 
@@ -126,10 +126,10 @@ xkb_symbols "zip" {
 
 
     key <LatZ> { [ Cyrillic_ya,   Cyrillic_YA ] };
-    key <LatX> { [ Cyrillic_che,  Cyrillic_CHE, Cyrillic_tse, Cyrillic_TSE ] };
+    key <LatX> { [ Cyrillic_che,  Cyrillic_CHE, Cyrillic_tse, Cyrillic_TSE ] };  // "ц" phonetic copy
     key <LatC> { [ Cyrillic_es,   Cyrillic_ES,      copyright ] };  // ©
     key <LatV> { [ Cyrillic_em,   Cyrillic_EM,             mu ] };  // µ
-    key <LatB> { [ Cyrillic_i,    Cyrillic_I, Cyrillic_shorti, Cyrillic_SHORTI ] };
+    key <LatB> { [ Cyrillic_i,    Cyrillic_I, Cyrillic_shorti, Cyrillic_SHORTI ] };  // "й" phonetic copy
     key <LatN> { [ Cyrillic_te,   Cyrillic_TE,      trademark ] };  // ™
-    key <LatM> { [ Cyrillic_softsign, Cyrillic_SOFTSIGN, Cyrillic_hardsign, Cyrillic_HARDSIGN ] };
+    key <LatM> { [ Cyrillic_softsign, Cyrillic_SOFTSIGN, Cyrillic_hardsign, Cyrillic_HARDSIGN ] };  // "ъ" phonetic copy
 };
