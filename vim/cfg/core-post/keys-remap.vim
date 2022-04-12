@@ -2,6 +2,8 @@
 
 " To put actual ',s' in insert use:  ,<C-d>s
 inoremap <unique> ,s <Esc>:update<CR>
+inoremap <unique> ,ы <Esc>:update<CR>
+inoremap <unique> ,і <Esc>:update<CR>
 
 " Be consistent with C and D which reach the end of line
 " DISABLED:SEE:(neovim): same *default-mappings*

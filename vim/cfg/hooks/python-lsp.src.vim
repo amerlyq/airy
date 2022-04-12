@@ -20,6 +20,12 @@ local on_attach = function(client, bufnr)
   -- Format on save -- and restore highlights
   vim.cmd [[autocmd BufWritePre <buffer> exe 'lua vim.lsp.buf.formatting_sync()'|Semshi highlight]]
 
+  -- FIXED: too bright hi! for !neovim LSP ※⡢⡔⢀⠔
+  -- vim.cmd [[hi! DiagnosticUnderlineWarn term=underline gui=underline guisp=#5f5f00]]
+  vim.cmd [[hi! DiagnosticWarn ctermfg=94 guifg=#875f00]]
+
+
+
   -- Mappings.
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
