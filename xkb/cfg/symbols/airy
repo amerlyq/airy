@@ -31,8 +31,8 @@ xkb_symbols "langleader" {
         // WTF:WHY: latch always switches to different group instead of always the same one group=1
         // symbols[Group1]= [ ISO_Group_Latch, ISO_Last_Group ],
         // symbols[Group1]= [ ISO_Lock, ISO_Last_Group ],
-        symbols[Group1]= [ ISO_First_Group, ISO_Last_Group ],
-        symbols[Group2]= [ ISO_Group_Latch, ISO_First_Group ],
+        symbols[Group1]= [ NoSymbol, ISO_Last_Group ],
+        symbols[Group2]= [ ISO_First_Group, NoSymbol ],
         virtualMods= AltGr
     };
 };
@@ -41,6 +41,8 @@ xkb_symbols "langleader" {
 partial modifier_keys
 xkb_symbols "space_esc" {
     key.type = "THREE_LEVEL";
+    // IDEA:MAYBE: custom three-level [Base, AltGr, LevelThree]
+    //   << FAIL: useless w/o AltGr latching
     key <SPCE> { [ space, space, Escape ] };
 };
 

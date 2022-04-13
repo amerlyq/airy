@@ -232,3 +232,33 @@
     [_] ADD: <LCtrl> overlay to hjkl arrows
     [_] FUTURE: optimize both EN and RU at the same time around punctuation
       [_] ALT:IDEA: move ALL common RU/EN punct to lvl3 -- to keep RU symbols at same places
+
+
+2022-04-12-Tue-W15
+  [+] 2h30m ^⡢⠽⡹⡹ #xkb ⌇⡢⡖⡯⠂
+    [⡢⡕⠻⠆] 5m IDEA: вернуть "й" и "ч" на те же кнопки что и раньше -- но доступаться к ним через AltGr
+      [⡢⡕⠻⠇] TEMP: copy these letters, instead of moving
+      [_] WARN:NEED: always-on grammar check -- because I may often use wrong buttons when re-learning layout
+        FIND: better grammar check plugins for neovim e.g. like LSP servers
+    [⡢⡕⢧⠢] 20m BET: inof phonetic similarity -- group all moved letters to "most easy access area for finger motion"
+      i.e. middle-row of left hand OR move lvl3= modifier to press by right hand too
+        [X] FIXME: don't duplicate phonetic/location/access -- it becomes confusing to remember very fast
+    [+⡢⡕⢍⠲] 40m NEED:DEV: letter frequency in my corpus of texts :: @/just/airy/layout.py
+      о:10.66   н: 6.85   м: 3.30   я: 2.15   ч: 1.49   ю: 0.67   э: 0.30
+      е: 8.71   с: 5.16   к: 3.30   ь: 2.13   г: 1.37   ш: 0.61   ё: 0.27
+      и: 7.70   р: 4.80   д: 2.95   ы: 2.03   й: 1.10   ц: 0.57   ъ: 0.05
+      а: 7.69   в: 4.05   п: 2.88   з: 1.71   ж: 0.99   щ: 0.42
+      т: 7.15   л: 3.66   у: 2.47   б: 1.59   х: 0.85   ф: 0.35
+    [⡢⡕⢯⢾] 25m #xkb IDEA: press latching <AltGr> twice to lock EN
+      [X] DFL latch/set EN when typing RU
+    [%⡢⡕⣆⡌] 50m IDEA:FIXUP: вместо локинга на двойной клик -- наоборот разблокировать группу
+      [_] BUG: нужен тройной клик чтобы переключиться на EN
+        WTF:WHY: latch always switches to different group instead of always the same one group=1
+          [_] MAYBE: issue due to "ISO_Group_Latch" was being secretly interpreted differently
+            [_] TRY: assign desired behavior directly to First/Last group
+            [_] ALT: use ISO_Lock to persist Latching results
+    [⡢⡕⢹⡥] 10m #xkb IDEA: <Space> as <Esc> when used with <AltGr> or NICE: even with <Shift>
+    [_] IDEA:HACK: !st ENH patch -- use RED cursor when lvl3 activated
+      BAD: maybe will be irritating, as I type half of RU through <AltGr> only
+      MAYBE: blink cursor OR use underblock cursor -- when Group/lvl3 is "Latched" instead of "Locked"
+    [_] IDEA:DEV: generate layout textual preview by !python based on !setxkbmap -query
