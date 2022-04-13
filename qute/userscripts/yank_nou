@@ -25,7 +25,7 @@ pfx=${2-}
 # [_] TRY:FIXME: use link-open time instead of copy-time
 #   i.e. I could open link, read article, and same completed task with two timestamps
 # [_] BET: parse qutebrowser history "last open time"
-xtref=$(just xts new pin)
+xtref=$(just xts new pin | tr -d $' \n')
 
 ## BAD: no easy keyboard-only way to remove accidental selections on page
 # title=${QUTE_SELECTED_TEXT:-$QUTE_TITLE}
@@ -41,6 +41,8 @@ if [[ $blk == -- ]]; then
   blk=
   pfx=
 fi
+
+title=$(printf '%s' "$title" | tr $'\n' $' ' | sed 's/^\s*//;s/\s*$//')
 
 # SRC: https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
 printf -v pretty_url '%b' "${url//%/\\x}"
