@@ -151,6 +151,7 @@
 
 
 2022-04-05-Tue-W14
+  [⪡⡊⢐] ADD same numbers override
   [⡢⡌⡠⡔] FAIL:CHECK no default LatchMods()
     ::: NOT only level3 and level5 (and maybe shift)
   [⡢⡌⢈⣩] 2h ^⡢⠽⡹⡹ #xkb TODO: restore latching ※⡢⠽⡹⠣
@@ -185,6 +186,18 @@
           https://codeburst.io/generating-optimal-keyboard-layouts-with-code-44f1752c48cc
 
 
+2022-04-09-Sat-W14
+  [_] BUG! кажется я его нашёл -- причину залипания Ru языка
+    <Super RAlt> свитчит язык И сбрасывает <Super> только при переключении Ru->En
+    но если текущий уже Ru -- сброса не происходит, а язык залипает
+    тогда при смене окна -- и сразу же попытке переключить на En -- оно на самом деле переключается на Ru
+  [_] FUTURE: log all my en-ru-ua-hotkey keypresses by #monica
+    USE it as text corpus to generate new kbd layout
+  [_] XLR: move my right hand by one key to the right
+    [_] USE: "white" layout as a base
+    [_] TRY: generate "white" layout for RU
+
+
 2022-04-11-Mon-W15
   [⡢⡔⡚⣁] ◔ 3h45m ^⡢⠽⡹⡹ #xkb CFG mixed ru-en-ua-punct ※⡢⠽⡹⠣
     [⡢⡔⠘⢺] 15m copy 1:1 whole "unipunct" layout (and others)
@@ -198,7 +211,10 @@
         [⡢⡔⠥⢭] 15m пунктуація - Який символ використовувати для позначення апострофа в електронних текстах українською? - Ukrainian Language Stack Exchange ⌇⡢⡔⠥⢤
           https://ukrainian.stackexchange.com/questions/40/Який-символ-використовувати-для-позначення-апострофа-в-електронних-текстах-украї
           ::: USE: U+02BC but allow to enter U+2019 too (to search on older pages)
+        [%] IDEA: keep Ukr as 3rd lang, but still provide і/ї/є/ы as AltGr syms
+          ::: only use <AltGr>, no need for 3rd lang
       [⡢⡔⠷⣴] 1h combine "unipunct" common layout
+        [X] add "¦" as <AltGr+|>
       [+] 1h FIXUP loading zip-ru-ua ※⡢⠽⡹⠣ -- to start using it during work
       [_] ALT:IDEA: don't move RU keys -- keep them in same place, but access on lvl3=
         хм, если их уже и так засунули на lvl3 -- то какая разница,
@@ -262,3 +278,19 @@
       BAD: maybe will be irritating, as I type half of RU through <AltGr> only
       MAYBE: blink cursor OR use underblock cursor -- when Group/lvl3 is "Latched" instead of "Locked"
     [_] IDEA:DEV: generate layout textual preview by !python based on !setxkbmap -query
+
+
+2022-04-13-Wed-W15
+  [+] 30m <W> IDEA: use <RAlt> as Level3 inof <Menu>, and switch language by Level3 +(e|r)
+    OR +(space|menu) to be layout agnostic
+    FAIL +(lshift|rshift) -- COS I should be able to type big letters
+    ::: BAD: my right thumb finger may be hurt due to too frequent usage
+    [_] ⁇ WTF:FIND кажись Level3 должен быть связан с AltGr чтобы логично работать как модификатор
+    [_] BAD: ISO_{First,Last}_Group do not clear lvl3= flag, resulting in toggling
+  [•] ◔ 10m/ !qute TRY/FIND map russian to insert/switch tab ⌇⡢⡖⣜⢸
+    HACK: Accept commands when non-latin keyboard layout is enabled · Issue #1594 · qutebrowser/qutebrowser ⌇⡢⡗⠕⣨
+      https://github.com/qutebrowser/qutebrowser/issues/1594
+      ¦ config.unbind('.')
+      ¦ en_keys = "qwertyuiop[]asdfghjkl;'zxcvbnm,./"+'QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?'
+      ¦ ru_keys = 'йцукенгшщзхъфывапролджэячсмитьбю.'+'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,'
+      ¦ c.bindings.key_mappings.update(dict(zip(ru_keys, en_keys)))

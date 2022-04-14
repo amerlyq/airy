@@ -38,6 +38,10 @@
 [commit]
     verbose = true
 
+[safe]
+    # SECU: https://github.blog/2022-04-12-git-security-vulnerability-announced/
+    directory = /etc
+
 # BAD: some build systems breaks on "git log -1 | head -n 1"
 # [format]
 #     pretty = oneline
