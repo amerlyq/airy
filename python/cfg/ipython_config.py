@@ -1,6 +1,8 @@
 # Configuration file for ipython.
 c = c  # pylint:disable=undefined-variable,self-assigning-variable  # @me
 
+from pygments.token import Token
+
 # ------------------------------------------------------------------------------
 # InteractiveShellApp(Configurable) configuration
 # ------------------------------------------------------------------------------
@@ -554,6 +556,7 @@ c.TerminalIPythonApp.display_banner = False  # @me
 ## Set the color scheme (NoColor, Neutral, Linux, or LightBG).
 #  See also: InteractiveShell.colors
 # c.TerminalInteractiveShell.colors = 'Neutral'
+# c.TerminalInteractiveShell.colors = "Linux"  # @me
 
 ## Set to confirm when you try to exit IPython with an EOF (Control-D in Unix,
 #  Control-Z/Enter in Windows). By typing 'exit' or 'quit', you can force a
@@ -629,6 +632,10 @@ c.TerminalInteractiveShell.confirm_exit = False  # @me
 ## Override highlighting format for specific tokens
 #  Default: {}
 # c.TerminalInteractiveShell.highlighting_style_overrides = {}
+c.TerminalInteractiveShell.highlighting_style_overrides = {
+    Token.PromptNum: "#00ff00 bold",
+    Token.Prompt: "#009900",
+}
 
 ## Total length of command history
 #  See also: InteractiveShell.history_length
