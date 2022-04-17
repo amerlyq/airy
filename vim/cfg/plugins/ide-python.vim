@@ -4,6 +4,7 @@
 call dein#add('neovim/nvim-lspconfig', {
   \ 'on_ft': 'python',
   \ 'hook_source': _hcat('python-lsp.src')})
+" call dein#add('neovim/nvim-lspconfig', {'lazy': 0, 'on_ft': 'python'})
 
 
 " call dein#add('hynek/vim-python-pep8-indent', {

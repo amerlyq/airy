@@ -1,5 +1,9 @@
 " DEBUG
 " :lua print(vim.lsp.get_log_path())
+" DEPS: aur/python-lsp-all
+"   NEED python-lsp-server, python-lsp-black, python-lsp-isort, python-lsp-mypy, python-pylsp-rope, python-pylint
+"   OPT: python-pyflakes, python-mccabe, python-pycodestyle, python-pydocstyle,python-rope, flake8
+"   ALSO: pip install pylsp-autoimport && auri python-autoimport
 
 lua << EOF
 -- SRC: https://github.com/neovim/nvim-lspconfig
@@ -9,6 +13,8 @@ local opts = { noremap=true, silent=true }
 vim.api.nvim_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
 vim.api.nvim_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
 vim.api.nvim_set_keymap('n', '<LocalLeader>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+
+-- local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -59,6 +65,7 @@ require("lspconfig").pylsp.setup {
   -- This will be the default in neovim 0.7+
   flags = { debounce_text_changes = 150 },
   filetypes = {"python"},
+  -- capabilities = capabilities,
   settings = {
     -- NEED: nested "pylsp" dict
     --   TALK: https://github.com/neovim/nvim-lspconfig/issues/1347
@@ -72,25 +79,76 @@ require("lspconfig").pylsp.setup {
       -- configurationSources = {"flake8"},
       -- SRC:WTF: https://github.com/neovim/nvim-lspconfig/issues/903
       -- formatCommand = {"black"}
+
+      -- plugins = {
+      --   autoimport = {enabled = true},
+      --   rope_autoimport = { enabled = true },
+
+      --   pycodestyle = { enabled = false, maxLineLength = 88 },
+      --   pydocstyle = { enabled = false },
+      --   isort = { enabled = false },
+      --   black = { enabled = false },
+      --   mypy = { enabled = false },
+      --   rope = { enabled = false },
+      --   flake8 = { enabled = false },
+      --   pylint = { enabled = false },
+
+
+      --   autopep8_format = {enabled = false},
+      --   definition = {enabled = false},
+      --   flake8_lint = {enabled = false},
+      --   folding = {enabled = false},
+      --   highlight = {enabled = false},
+      --   hover = {enabled = false},
+      --   jedi_completion = {enabled = false},
+      --   jedi_rename = {enabled = false},
+      --   mccabe_lint = {enabled = false},
+      --   preload_imports = {enabled = false},
+      --   pycodestyle_lint = {enabled = false},
+      --   pydocstyle_lint = {enabled = false},
+      --   pyflakes_lint = {enabled = false},
+      --   pylint_lint = {enabled = false},
+      --   references = {enabled = false},
+      --   rope_completion = {enabled = false},
+      --   rope_rename = {enabled = false},
+      --   signature = {enabled = false},
+      --   symbols = {enabled = false},
+      --   yapf_format = {enabled = false},
+      -- },
       plugins = {
         pylint = { enabled = true },
-        isort = { enabled = true },
-        black = { enabled = true, cache_config = true },
-        autoimport = { enabled = true },
-        mypy = { enabled = true },
+        -- pylint = { enabled = true, args = {"--disable C0301"}},
         -- pylint = { enabled = false, args = { "--rcfile=pylint.ini" }, },
+        -- isort = { enabled = true },
+        -- black = { enabled = true, cache_config = true },
+        mypy = { enabled = true },
         rope_completion = { enabled = true },
+
+        -- DEP: pylsp-autoimport
+        -- FAIL: autoimport = { enabled = true },
+        -- SRC: https://github.com/bageljrkhanofemus/dotfiles/blob/4a8d7e555ca96d0d4b17eda6ed37c68c7ec6a045/dot_config/nvim/lua/configs/lsp.lua
+        rope_autoimport = { enabled = true },
 
         pydocstyle = { enabled = false },
         autopep8 = { enabled = false },
         yapf = { enabled = false },
         flake8 = { enabled = false },
-        pycodestyle = { enabled = false },
+        pycodestyle = { enabled = false, maxLineLength = 88 },
         pyflakes = { enabled = false },
       }
     }
   }
 }
+
+-- require("refactoring").setup({})
+vim.diagnostic.config({
+  virtual_text = true,
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = false,
+})
+
 EOF
 
 " set completeopt-=preview
