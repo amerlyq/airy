@@ -60,18 +60,34 @@ require("lspconfig").pylsp.setup {
   flags = { debounce_text_changes = 150 },
   filetypes = {"python"},
   settings = {
-    -- ALT:TRY:DFL: pycodestyle
-    -- configurationSources = {"flake8"},
-    -- SRC:WTF: https://github.com/neovim/nvim-lspconfig/issues/903
-    -- formatCommand = {"black"}
-    plugins = {
-      black = { enabled = true, cache_config = true },
-      mypy = { enabled = true },
-      pylint = { enabled = false, args = { "--rcfile=pylint.ini" }, },
-      rope_completion = { enabled = true },
+    -- NEED: nested "pylsp" dict
+    --   TALK: https://github.com/neovim/nvim-lspconfig/issues/1347
+    --   FIXED: https://neovim.discourse.group/t/pylsp-config-is-not-taken-into-account/1846/2
+    pylsp = {
+      -- ALT:DFL=pycodestyle
+      --   FAIL: can't suppress file-wide errors like E266 "##" comments in !qute
+      --   SRC:TALK: https://github.com/PyCQA/pycodestyle/issues/381
+      -- DEPs: flake8 python-flake8-black python-flake8-docstrings python-flake8-isort python-flake8-typing-imports python-pytest-flake8
+      configurationSources = {"pylint"},
+      -- configurationSources = {"flake8"},
+      -- SRC:WTF: https://github.com/neovim/nvim-lspconfig/issues/903
+      -- formatCommand = {"black"}
+      plugins = {
+        pylint = { enabled = true },
+        isort = { enabled = true },
+        black = { enabled = true, cache_config = true },
+        autoimport = { enabled = true },
+        mypy = { enabled = true },
+        -- pylint = { enabled = false, args = { "--rcfile=pylint.ini" }, },
+        rope_completion = { enabled = true },
 
-      autopep8 = { enabled = false },
-      yapf = { enabled = false },
+        pydocstyle = { enabled = false },
+        autopep8 = { enabled = false },
+        yapf = { enabled = false },
+        flake8 = { enabled = false },
+        pycodestyle = { enabled = false },
+        pyflakes = { enabled = false },
+      }
     }
   }
 }

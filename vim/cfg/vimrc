@@ -49,4 +49,6 @@ endtry
 
 " Exec .vimrc in curr dir, but deny itc :autocmd, :shell and :write cmds
 " DEPRECATED:(exrc):USE:(vim-localvimrc)
-set noexrc secure modeline modelines=3   " also parse 'vim:...' cmds from comments
+" DISABLED(modeline modelines=3): explicitly enable only for some ftplugin
+"   << prevent treating example abbrev "ex:" at the end of file as vim/ex cmd
+set noexrc secure nomodeline  " don't parse 'vim:...' cmds from comments

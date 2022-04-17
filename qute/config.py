@@ -2653,6 +2653,12 @@ config.bind("zv", f"{passcmd} --password-only")
 config.bind("zO", f"{passcmd} --otp-only")
 
 
+### @me Allow RU keybindings (NOTE: using unipunct layout=airy)
+en_keys = "qwertyuiopasdfghjklzxcvbnm" + "QWERTYUIOPASDFGHJKLZXCVBNM"
+ru_keys = "йцукенгшщзфывапролдячсмить" + "ЙЦУКЕНГШЩЗФЫВАПРОЛДЯЧСМИТЬ"
+c.bindings.key_mappings.update(dict(zip(ru_keys, en_keys)))
+
+
 ### Load private part of config
 privatecfg = config.configdir / "config-private.py"
 if privatecfg.is_file():
