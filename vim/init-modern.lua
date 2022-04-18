@@ -1,48 +1,15 @@
--- SRC: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
--- Install packer
-local install_path = vim.fn.stdpath 'data' .. '/site/pack/packer/start/packer.nvim'
+-- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-  vim.fn.execute('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
-end
-
-local packer_group = vim.api.nvim_create_augroup('Packer', { clear = true })
-vim.api.nvim_create_autocmd('BufWritePost', { command = 'source <afile> | PackerCompile', group = packer_group, pattern = 'init.lua' })
-
+--SRC: https://github.com/lewis6991/impatient.nvim
+require('impatient')
 --USAGE :LuaCacheProfile
 -- require('impatient').enable_profile()
 
-require('packer').startup(function(use)
-  use 'lewis6991/impatient.nvim'
-  use 'wbthomason/packer.nvim' -- Package manager
-  use 'tpope/vim-fugitive' -- Git commands in nvim
-  use 'numToStr/Comment.nvim' -- "gc" to comment visual regions/lines
-  use 'ludovicchabant/vim-gutentags' -- Automatic tags management
-  -- UI to select things (files, grep results, open buffers...)
-  use { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } }
-  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
-  use 'nvim-lualine/lualine.nvim' -- Fancier statusline
-  -- Add indentation guides even on blank lines
-  use 'lukas-reineke/indent-blankline.nvim'
-  -- Add git related info in the signs columns and popups
-  use { 'lewis6991/gitsigns.nvim', requires = { 'nvim-lua/plenary.nvim' } }
-  -- Highlight, edit, and navigate code using a fast incremental parsing library
-  use 'nvim-treesitter/nvim-treesitter'
-  -- Additional textobjects for treesitter
-  use 'nvim-treesitter/nvim-treesitter-textobjects'
-  use 'neovim/nvim-lspconfig' -- Collection of configurations for built-in LSP client
-  use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
-  use 'hrsh7th/cmp-nvim-lsp'
-  use 'saadparwaiz1/cmp_luasnip'
-  use 'L3MON4D3/LuaSnip' -- Snippets plugin
 
-  -- @me
-  use 'ishan9299/nvim-solarized-lua'
-  -- use 'shaunsingh/solarized.nvim'
-  -- use 'tanvirtin/monokai.nvim'
-  -- @me for TSHighlightCapturesUnderCursor
-  -- use 'nvim-treesitter/playground'
-end)
+-- TODO: ctags incremental re-generation
+-- https://github.com/ludovicchabant/vim-gutentags
+vim.g.gutentags_dont_load = true
+
 
 --Set highlight on search
 vim.o.hlsearch = true
@@ -69,23 +36,36 @@ vim.wo.signcolumn = 'yes'
 
 --Set colorscheme
 vim.o.termguicolors = true
+--SRC: https://github.com/ishan9299/nvim-solarized-lua.git
+--ALT: 'shaunsingh/solarized.nvim'
 vim.cmd [[colorscheme solarized]]
 -- vim.g.solarized_disable_background = true
 -- require('solarized').set()
--- require('monokai').setup {}
 
 
--- @me
-vim.cmd [[highlight IndentBlanklineIndent1 guifg=#E06C75 gui=nocombine]]
-vim.cmd [[highlight IndentBlanklineIndent2 guifg=#E5C07B gui=nocombine]]
-vim.cmd [[highlight IndentBlanklineIndent3 guifg=#98C379 gui=nocombine]]
-vim.cmd [[highlight IndentBlanklineIndent4 guifg=#56B6C2 gui=nocombine]]
-vim.cmd [[highlight IndentBlanklineIndent5 guifg=#61AFEF gui=nocombine]]
-vim.cmd [[highlight IndentBlanklineIndent6 guifg=#C678DD gui=nocombine]]
+-- EXPL: Add indentation guides even on blank lines
+-- SRC: https://github.com/lukas-reineke/indent-blankline.nvim
+vim.highlight.create('IndentBlanklineOdd', {ctermfg=8, ctermbg=0, guifg='#002b36', guibg='#072f3b', gui=nocombine}, false)
+vim.highlight.create('IndentBlanklineEven', {ctermfg=8, ctermbg=0, guifg='#002b36', guibg='#072f3b', gui=nocombine}, false)
+-- vim.cmd [[highlight IndentBlanklineIndent1 guifg=#E06C75 gui=nocombine]]
+-- vim.cmd [[highlight IndentBlanklineIndent2 guifg=#E5C07B gui=nocombine]]
+-- vim.cmd [[highlight IndentBlanklineIndent3 guifg=#98C379 gui=nocombine]]
+-- vim.cmd [[highlight IndentBlanklineIndent4 guifg=#56B6C2 gui=nocombine]]
+-- vim.cmd [[highlight IndentBlanklineIndent5 guifg=#61AFEF gui=nocombine]]
+-- vim.cmd [[highlight IndentBlanklineIndent6 guifg=#C678DD gui=nocombine]]
+
 require("indent_blankline").setup {
+    -- char = '┊',
+    -- char = "",
+    char = " ",
+    -- filetype_exclude = { 'help', 'packer' },
+    -- buftype_exclude = { 'terminal', 'nofile' },
     -- use_treesitter = true,
     -- show_current_context = true,
+    -- show_trailing_blankline_indent = false,
     show_first_indent_level = false,
+    char_highlight_list = { "IndentBlanklineOdd", "IndentBlanklineEven" },
+    -- space_char_highlight_list = { "IndentBlanklineOdd", "IndentBlanklineEven" },
     -- space_char_blankline = " ",
     -- char_highlight_list = {
     --     "IndentBlanklineIndent1",
@@ -125,6 +105,7 @@ vim.api.nvim_set_keymap('n', '<F3>', [[
 vim.o.completeopt = 'menuone,noselect'
 
 --Set statusbar
+--SRC: https://github.com/nvim-lualine/lualine.nvim
 require('lualine').setup {
   options = {
     icons_enabled = false,
@@ -135,7 +116,8 @@ require('lualine').setup {
 }
 
 --Enable Comment.nvim
-require('Comment').setup()
+-- https://github.com/numToStr/Comment.nvim
+-- require('Comment').setup()
 
 --Remap space as leader key
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
@@ -156,24 +138,24 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
---Map blankline
-vim.g.indent_blankline_char = '┊'
-vim.g.indent_blankline_filetype_exclude = { 'help', 'packer' }
-vim.g.indent_blankline_buftype_exclude = { 'terminal', 'nofile' }
-vim.g.indent_blankline_show_trailing_blankline_indent = false
-
 -- Gitsigns
-require('gitsigns').setup {
-  signs = {
-    add = { text = '+' },
-    change = { text = '~' },
-    delete = { text = '_' },
-    topdelete = { text = '‾' },
-    changedelete = { text = '~' },
-  },
-}
+-- Add git related info in the signs columns and popups
+--DEP: plenary.nvim
+--SRC: https://github.com/lewis6991/gitsigns.nvim
+-- require('gitsigns').setup {
+--   signs = {
+--     add = { text = '+' },
+--     change = { text = '~' },
+--     delete = { text = '_' },
+--     topdelete = { text = '‾' },
+--     changedelete = { text = '~' },
+--   },
+-- }
 
 -- Telescope
+--EXPL: UI to select things (files, grep results, open buffers...)
+--SRC: https://github.com/nvim-telescope/telescope.nvim
+--DEP: plenary.nvim
 require('telescope').setup {
   defaults = {
     mappings = {
@@ -186,6 +168,8 @@ require('telescope').setup {
 }
 
 -- Enable telescope fzf native
+-- https://github.com/nvim-telescope/telescope-fzf-native.nvim
+--NEED: $ cd ... && make
 require('telescope').load_extension 'fzf'
 
 --Add leader shortcuts
@@ -203,8 +187,16 @@ vim.keymap.set('n', '<leader>so', function()
 end)
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles)
 
+--SRC: https://github.com/nvim-treesitter/playground
+--OPT: :packadd playground
+--  <F3> :TSHighlightCapturesUnderCursor
+
 -- Treesitter configuration
+-- Highlight, edit, and navigate code using a fast incremental parsing library
 -- Parsers must be installed manually via :TSInstall
+--SRC: https://github.com/nvim-treesitter/nvim-treesitter
+--SRC: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+--ALSO:VIZ: https://github.com/nvim-treesitter/nvim-treesitter/wiki/Extra-modules-and-plugins
 require('nvim-treesitter.configs').setup {
   highlight = {
     enable = true, -- false will disable the whole extension
@@ -263,6 +255,8 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
 -- LSP settings
+-- Collection of configurations for built-in LSP client
+-- SRC: https://github.com/neovim/nvim-lspconfig
 local lspconfig = require 'lspconfig'
 local on_attach = function(_, bufnr)
   local opts = { buffer = bufnr }
@@ -289,7 +283,8 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 
 -- Enable the following language servers
-local servers = { 'clangd', 'rust_analyzer', 'pylsp', 'tsserver' }
+-- local servers = { 'clangd', 'rust_analyzer', 'pylsp', 'tsserver' }
+local servers = { 'pylsp', 'tsserver' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = on_attach,
@@ -331,9 +326,11 @@ lspconfig.sumneko_lua.setup {
 }
 
 -- luasnip setup
+-- https://github.com/L3MON4D3/LuaSnip
 local luasnip = require 'luasnip'
 
 -- nvim-cmp setup
+-- https://github.com/hrsh7th/nvim-cmp
 local cmp = require 'cmp'
 cmp.setup {
   snippet = {
@@ -369,8 +366,8 @@ cmp.setup {
     end,
   }),
   sources = {
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
+    { name = 'nvim_lsp' }, -- https://github.com/hrsh7th/cmp-nvim-lsp
+    { name = 'luasnip' }, -- https://github.com/saadparwaiz1/cmp_luasnip
   },
 }
 -- vim: ts=2 sts=2 sw=2 et

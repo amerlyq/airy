@@ -3,7 +3,7 @@ fmt=${1:-%f:%l:%c:%m}
 excmd="setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|if len(getqflist())>1|copen|en"
 
 if [ -n "${NVIM_LISTEN_ADDRESS-}" ]; then
-  exec xargs -rn1 -d\\n realpath | ifne $EDITOR - -c "$excmd"
+  exec xargs -rn1 -d\\n realpath | ifne nvr - -c "$excmd"
 else
   exec ifne $EDITOR - -c "$excmd"
 fi

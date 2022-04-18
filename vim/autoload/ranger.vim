@@ -136,7 +136,7 @@ fun! ranger#do(paths, ...) abort
     \}
 
   " MAYBE:OLD: jobstart() need string instead of list
-  let cmd = [ranger#cfg('rangerexe')]
+  let cmd = ['env', 'EDITOR=nvr', ranger#cfg('rangerexe')]
   let cmd += ['--choosefiles=' . opts.tempname]
   let _ = ranger#cfg('rangercmd') | if !empty(_)| let cmd += ['--cmd='._] |en
   let _ = get(a:paths, 0) | if !empty(_)| let cmd +=  ['--selectfile='._] |en

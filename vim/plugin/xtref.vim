@@ -11,7 +11,8 @@ let g:xtref = {}
 " [_] FIXME: use /@
 let g:xtref.aura = "/@/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
-let g:xtref.lazytagdir = $VPLUGS   " temp store *.tags for newly created/edited files
+" $VPLUGS = temp store *.tags for newly created/edited files
+let g:xtref.lazytagdir = "/@/xdg_cache/vim/cache/plugins"
 
 " ALT: ⌇ => ¶ .like. https://www.yoctoproject.org/docs/3.1.1/brief-yoctoprojectqs/brief-yoctoprojectqs.html
 " OR:USE: '⌇' = "\u2307" = [\u2307]
