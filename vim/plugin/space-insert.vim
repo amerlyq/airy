@@ -5,8 +5,8 @@ nnoremap <unique><silent> [Frame]<Space>  i<Space><Esc>
 xnoremap <unique><silent> [Frame]<Space>  c<Space><C-r>"<Space><Esc>
 
 " ALT: use 'q<Space> from 'rhysd/vim-operator-surround'
-nnoremap <unique><silent> <Leader><Space>  a<Space><Left><Left><Space><Esc>
-xmap     <unique><silent> <Leader><Space>  [Quote]a<Space>
+" nnoremap <unique><silent> <Leader><Space>  a<Space><Left><Left><Space><Esc>
+" xmap     <unique><silent> <Leader><Space>  [Quote]a<Space>
 
 " BAD:FIXME: don't query for inserted char on repeat
 "   http://vimcasts.org/episodes/creating-repeatable-mappings-with-repeat-vim/
