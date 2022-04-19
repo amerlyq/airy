@@ -1,0 +1,52 @@
+
+2022-04-04-Mon-W14
+  [_] 2h FIND soundcloud mpd play private playlist ⌇⡢⡊⣛⣟
+    [_] TRY:USE: soundcloud API
+    [_] ALT:BET?TRY fetch information from playlist metadata directly from soundcloud
+    [_] IDEA: re-sort by "ctime" -- to split 2021 from 2022 music by year/month ⌇⡢⠓⢞⣛
+      [!] FAIL: music 848/1872  $ j md store /@/music
+        UnicodeDecodeError: 'utf-8' codec can't decode byte 0xfb in position 41: invalid start byte
+
+
+2022-04-13-Wed-W15
+  [⡊⢗] store !ff tabs from #andr
+    xbmc - Soundcloud API authentication without a web browser - Stack Overflow ⌇⡢⡗⠍⡄
+      https://stackoverflow.com/questions/14449508/soundcloud-api-authentication-without-a-web-browser
+    html - Soundcloud API return only mp3 formats? - Stack Overflow ⌇⡢⡗⠍⡉
+      https://stackoverflow.com/questions/10496534/soundcloud-api-return-only-mp3-formats
+    How to get SoundCloud API access? : soundcloud ⌇⡢⡗⠍⡯
+      https://www.reddit.com/r/soundcloud/comments/71bpl4/how_to_get_soundcloud_api_access/
+    Soundcloud: “Requesting non-expiring tokens is not allowed” · Issue #3755 · quodlibet/quodlibet ⌇⡢⡗⠍⡴
+      https://github.com/quodlibet/quodlibet/issues/3755
+    Fill MPC/MPD playlist with SoundCloud stream URLs ⌇⡢⡗⠍⢏
+      https://gist.github.com/mikaelz/2852205d9f816a951a05
+    Stream MPD To Me by The Date | Listen online for free on SoundCloud ⌇⡢⡗⠍⢦
+      https://soundcloud.com/thedateband/mpd-to-me
+    Plugin reference — Music Player Daemon 0.24~git documentation ⌇⡢⡗⠍⢯
+      https://mpd.readthedocs.io/en/latest/plugins.html
+        [_] NICE: it supports "apikey" setting, MAYBE private playlist will "just work"
+    [⡢⡗⠎⡿] Soundcloud support - Volumio Development / Suggest a feature - Volumio ⌇⡢⡗⠎⠇
+      https://community.volumio.org/t/soundcloud-support/2831
+      /etc/mpd.conf playlist_plugin { name "soundcloud" enabled "true" apikey "###########################" }
+        API keys are generated from your SoundCloud account by going to “Developers” > “Register a New App”.
+        $ mpc load soundcloud://track/≤track-id>
+        $ mpc load soundcloud://playlist/≤playlist-id>
+        $ mpc load soundcloud://url/http://soundcloud.com/some/track/or/playlist
+    I made MPD index SoundCloud, here's how I did it | polyfloyd's stuff ⌇⡢⡗⠎⢷
+      https://polyfloyd.net/post/soundcloud-fuse-mpd/
+      https://github.com/polyfloyd/soundcloud-fs
+      [_] NICE: using FUSE to access SoundCloud
+    Creating a searchable music site, using the SoundCloud API | by Ethan Jarrell | hello JS ⌇⡢⡗⠏⣗
+      https://blog.hellojs.org/june-25-2017-creating-a-searchable-music-site-using-the-soundcloud-api-1b6d1723610
+    Reverse Engineering Soundcloud API - Yasoob Khalid ⌇⡢⡗⠐⣇
+      https://yasoob.me/2018/04/15/reverse-engineering-soundcloud-api/
+    javascript - React/Redux + Soundcloud API - Stack Overflow ⌇⡢⡗⠑⠤
+      https://stackoverflow.com/questions/34474249/react-redux-soundcloud-api
+    soundcloud · PyPI ⌇⡢⡗⠑⠰
+      https://pypi.org/project/soundcloud/
+    API - Guide - SoundCloud Developers ⌇⡢⡗⠑⡡
+      https://developers.soundcloud.com/docs/api/guide#authentication
+    SoundCloud API V2 Notes ⌇⡢⡗⠑⡩
+      https://gist.github.com/opcon/4618008fbd2f5d2fd6ccababccc5111c
+    Soundcloud Authentication and API - Stack Overflow ⌇⡢⡗⠑⡯
+      https://stackoverflow.com/questions/16922918/soundcloud-authentication-and-api
