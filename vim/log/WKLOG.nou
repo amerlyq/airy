@@ -1,0 +1,88 @@
+
+2022-04-17-Sun-W15
+  [_] CFG: !nvim in Lua ※⡢⡜⠥⣩
+    [_] TUT Neovim LSP Enhanced. Additional features to enhance your LSP… | by alpha2phi | Medium ⌇⡢⡜⠤⡏
+      https://alpha2phi.medium.com/neovim-lsp-enhanced-a3d313abee65
+    [_] IDEA: split into multiple files, and then "amalgamate" everything into single .lua for speed
+      [•] FIND: neovim pre-compile .lua to bytecode for faster startup
+        lewis6991/impatient.nvim: Improve startup time for Neovim ⌇⡢⡝⡗⢷
+          https://github.com/lewis6991/impatient.nvim
+    [_] TRY: plugins
+      [%] Semshi-like semantic highlighting · Issue #81 · nvim-treesitter/nvim-treesitter ⌇⡢⡝⢊⣳
+        https://github.com/nvim-treesitter/nvim-treesitter/issues/81
+        […] WAIT feat(lsp): add support for semantic tokens by theHamsta · Pull Request #15723 · neovim/neovim ⌇⡢⡝⢑⢛
+          https://github.com/neovim/neovim/pull/15723
+      [_] TRY: bluz71/vim-nightfly-guicolors: Another dark color scheme for Vim & Neovim ⌇⡢⡝⢐⡀
+        https://github.com/bluz71/vim-nightfly-guicolors
+      [_] leap.nvim was 0.7
+      [_] https://github.com/mrjones2014/legendary.nvim
+      [_] Introducing [syntax-tree-surfer] plugin! Surf through your document and move elements around using the nvim-treesitter API! : neovim ⌇⡢⡜⠣⠩
+        https://www.reddit.com/r/neovim/comments/u2pbf8/introducing_syntaxtreesurfer_plugin_surf_through/
+      [_] [plugin] command_center.nvim: a simple and flexible command palette for neovim : neovim ⌇⡢⡜⠣⡔
+        https://www.reddit.com/r/neovim/comments/u0sg97/plugin_command_centernvim_a_simple_and_flexible/
+      kassio/neoterm: Wrapper of some vim/neovim's :terminal functions. ⌇⡢⡝⠺⡖
+        https://github.com/kassio/neoterm
+      kevinhwang91/nvim-hlslens: Hlsearch Lens for Neovim ⌇⡢⡝⡙⣁
+        https://github.com/kevinhwang91/nvim-hlslens
+      jackguo380/vim-lsp-cxx-highlight: Vim plugin for C/C++/ObjC semantic highlighting using cquery, ccls, or clangd ⌇⡢⡝⢋⣚
+        https://github.com/jackguo380/vim-lsp-cxx-highlight
+
+
+2022-04-18-Mon-W16
+  [⡢⡝⠽⠈] 10m #vim profile slow keypress ⌇⡢⡝⠽⠎
+    ::: most likely airline() is slow
+      ALSO:WTF: ultisnip is fired up in .nou
+    Profiling Vim ⌇⡢⡝⠹⣑
+      https://thoughtbot.com/blog/profiling-vim
+    A vim profiling tool | RustRepo ⌇⡢⡝⠺⠇
+      https://rustrepo.com/repo/terror-vim-profiler
+    Enable profiling errors when used with fzy-lua-native · Issue #35 · lewis6991/impatient.nvim ⌇⡢⡝⠺⠚
+      https://github.com/lewis6991/impatient.nvim/issues/35
+  [⡊⢜] 6h IDEA: create my own minimal init-modern.lua for python IDE with plugins from zero ⌇⡢⡜⠥⣩
+    [⡊⢜] WAIT: archlinux neovim v0.7.0
+    [⡢⡝⡊⡍] ^⡢⡜⠥⣩ update system for #vim
+    [⡊⢜] ^⡢⡜⠥⣩ CFG #vim init.lua plugins
+      [X] nohlsearch
+      [X] colorscheme
+      [X] indents
+      [X] WTF treesitter
+      [⡊⢜] TODO: run only on python files through ranger
+    [⡢⡝⢋⠊] TRY: no package manager -- setup and manage everything myself
+      :: FIND: fuck plugin managers -- simply point default to folder with plugins downloaded by $ git submodules
+      [⡢⡝⡪⣸] Nvim documentation: repeat ⌇⡢⡝⡪⣳
+        https://neovim.io/doc/user/repeat.html#packages
+      [X] wbthomason/packer.nvim: A use-package inspired plugin manager for Neovim. Uses native packages, supports Luarocks dependencies, written in Lua, allows for expressive config ⌇⡢⡝⡗⠽
+        https://github.com/wbthomason/packer.nvim
+      [X] What are "native packages" and is it faster than packer? : neovim ⌇⡢⡝⡊⣅
+        https://www.reddit.com/r/neovim/comments/ql4y42/what_are_native_packages_and_is_it_faster_than/
+      [X] Git Submodules · Issue #6 · savq/paq-nvim ⌇⡢⡝⡡⢇
+        https://github.com/savq/paq-nvim/issues/6
+        NICE: only ~250 LOC -- nothing beside "git submodules"
+      [⡢⡝⡬⠇] Version control vim plugins with git submodules - wiki.ryantoddgarza ⌇⡢⡝⡡⡄
+        https://wiki.ryantoddgarza.com/version-control-vim-plugins-with-git-submodules/
+       WF:USAGE:
+        add:
+          cd /@/plugins/nvim/extra/start
+          git submodule add https://github.com/username/reponame.git
+        remove:
+          git submodule deinit .../reponame
+          git rm -r <plugin-filepath>
+          rm -rf .git/modules/<plugin-filepath>
+        update one/all
+          git submodule update --remote --merge <plugin-filepath>
+          git submodule update --remote --merge
+          TRY: git pull --recurse-submodules --update-shallow
+          @me git submodule update --remote --jobs=5 --recursive --single-branch --depth=1 --recommend-shallow --
+        clone:
+          git clone --depth=1 --recurse-submodules --shallow-submodules ... # --single-branch
+      [⡢⡝⡯⣸] HiPhish's Workshop ⌇⡢⡝⡡⡛
+        https://hiphish.github.io/blog/2021/12/05/managing-vim-plugins-without-plugin-manager/
+    [≫] TRY: keep colorscheme directly in @/airy to reduce number of plugins
+      shaunsingh/solarized.nvim: Port of the Solarized colorscheme for vim, written in lua, with treesitter support. ⌇⡢⡝⡒⡂
+        https://github.com/shaunsingh/solarized.nvim
+      ishan9299/nvim-solarized-lua: solarized colorscheme in lua for nvim 0.5 ⌇⡢⡝⡒⡟
+        https://github.com/ishan9299/nvim-solarized-lua
+      shaunsingh/moonlight.nvim: Port of VSCode's Moonlight colorscheme for NeoVim written in Lua with built-in support for native LSP, TreeSitter and many more plugins ⌇⡢⡝⡕⣊
+        https://github.com/shaunsingh/moonlight.nvim
+    [⡢⡝⡥⡙] TMPL:SRC: nvim-lua/kickstart.nvim: A small, documented, and featureful neovim starter config ⌇⡢⡜⠢⠳
+      https://github.com/nvim-lua/kickstart.nvim
