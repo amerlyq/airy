@@ -8,9 +8,10 @@ xkb_compatibility "airy" {
 
 partial
 xkb_compatibility "mods_latch" {
-    virtual_modifiers  Alt,Meta,Super;
+    virtual_modifiers  Alt,AltGr,Meta,Super,LevelThree;
 
     interpret.repeat= False;
+    // setMods.clearLocks= True;
     latchMods.clearLocks= True;
     latchMods.latchToLock= False;
 
@@ -39,17 +40,21 @@ xkb_compatibility "mods_latch" {
     interpret ISO_Level3_Latch { action= LatchMods(modifiers=LevelThree); };
 
     // ALT:ADD(latchToLock): latch/set EN when typing RU, lock by pressing twice
-    interpret ISO_Group_Latch {
-        // useModMapMods= level1;
-        virtualModifier= AltGr;
-        action= LatchGroup(group=1);
-    };
+    // interpret ISO_Group_Latch {
+    //     // useModMapMods= level1;
+    //     virtualModifier= AltGr;
+    //     action= LatchGroup(group=1);
+    // };
+
     // https://web.archive.org/web/20020202090345/http://www.tsu.ru/~pascal/en/xkb/gram-action.html#iso-lock
+    // EXPL:FAIL: ISO_Lock: click=lock(En), press=set(En)
+    // interpret ISO_Lock { action= ISOLock(group=+1,affect=groups+ctrls); };
     // interpret ISO_Lock { action= ISOLock(all); };
     // interpret ISO_Lock {
     //     // useModMapMods= level2;
     //     action= ISOLock(group=2,affect=groups);
     // };
+
     // HACK:(clearLocks): prevent single RU char after switching to EN by double-tap
     // interpret ISO_First_Group+Any {
     //     useModMapMods= level1;
