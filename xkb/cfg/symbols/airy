@@ -128,15 +128,15 @@ xkb_symbols "unipunct" {
 
     // ALSO: stress=U0301 // COMBINING ACUTE ACCENT
     // SRC:(U02BC): https://ukrainian.stackexchange.com/questions/40/ ⌇⡢⡔⠥⢤
-    key <TLDE> { [ grave,  asciitilde,  U02BC, rightsinglequotemark] };  // ` ~ ʼ ’(old)
-    key <AE01> { [     1,      exclam,      division,       U2248  ] };  // 1 ! ÷ ≈   ¬
+    key <TLDE> { [ grave,  asciitilde,         U2248,   therefore  ] };  // ` ~ ≈ ∴
+    key <AE01> { [     1,      exclam,       notsign,    division  ] };  // 1 ! ¬ ÷
     key <AE02> { [     2,          at,      currency,    infinity  ] };  // 2 @ ¤ ∞
     key <AE03> { [     3,  numbersign,       section,  numerosign  ] };  // 3 # § №
     key <AE04> { [     4,      dollar,     semicolon,    EuroSign  ] };  // 4 $ ; €
     key <AE05> { [     5,     percent,        degree,       U20B4  ] };  // 5 % ° ₴   ‰
     key <AE06> { [     6,asciicircum,doublelowquotemark,lessthanequal]};  // 6 ^ „ ≤
     key <AE07> { [     7,ampersand,leftdoublequotemark,greaterthanequal]};// 7 & “ ≥
-    key <AE08> { [     8,    asterisk,periodcentered,    multiply  ] };  // 8 * · ×   ∴
+    key <AE08> { [     8,    asterisk,periodcentered,    multiply  ] };  // 8 * · ×
     key <AE09> { [     9,   parenleft,   bracketleft,   braceleft  ] };  // 9 ( [ {
     key <AE10> { [     0,  parenright,  bracketright,  braceright  ] };  // 0 ) ] }
     key <AE11> { [ minus,  underscore,        emdash,      endash  ] };  // - _
@@ -165,12 +165,18 @@ xkb_symbols "zip" {
     // include "us(basic)"
     // include "ru(common)"
 
+    // MOVE? en.lvl3
+    // R -> registered=®
+    // С -> copyright=©
+    // T -> trademark=™
+    // M -> mu=µ
+
     name[Group1]= "Russian+Ukrainian (reuse extended US punctuation)";
 
     key <LatQ> { [Cyrillic_shorti,Cyrillic_SHORTI,Ukrainian_yi,Ukrainian_YI] };
     key <LatW> { [ Cyrillic_tse,  Cyrillic_TSE  ] };
     key <LatE> { [ Cyrillic_u,    Cyrillic_U,     Cyrillic_yu, Cyrillic_YU ] };
-    key <LatR> { [ Cyrillic_ka,   Cyrillic_KA,    registered ] };  // ®
+    key <LatR> { [ Cyrillic_ka,   Cyrillic_KA, U02BC, rightsinglequotemark ] };  // ʼ ’(old) - Ukr_apostrophe
     key <LatT> { [ Cyrillic_ie,   Cyrillic_IE,    Cyrillic_io, Cyrillic_IO ] };
     key <LatY> { [ Cyrillic_en,   Cyrillic_EN   ] };
     key <LatU> { [ Cyrillic_ghe,  Cyrillic_GHE,   Ukrainian_ghe_with_upturn, Ukrainian_GHE_WITH_UPTURN ] };
@@ -189,14 +195,13 @@ xkb_symbols "zip" {
     key <LatK> { [ Cyrillic_el,   Cyrillic_EL ] };
     key <LatL> { [ Cyrillic_de,   Cyrillic_DE ] };
 
-
     key <LatZ> { [ Cyrillic_ya,   Cyrillic_YA  ] };
     key <LatX> { [ Cyrillic_che,  Cyrillic_CHE,   Ukrainian_ie, Ukrainian_IE ] };
-    key <LatC> { [ Cyrillic_es,   Cyrillic_ES,    Cyrillic_e,   Cyrillic_E ] };  // ALT: copyright=©
-    key <LatV> { [ Cyrillic_em,   Cyrillic_EM  ] };  // ALT: mu=µ
+    key <LatC> { [ Cyrillic_es,   Cyrillic_ES,    Cyrillic_e,   Cyrillic_E ] };
+    key <LatV> { [ Cyrillic_em,   Cyrillic_EM  ] };
     key <LatB> { [ Cyrillic_i,    Cyrillic_I   ] };
-    key <LatN> { [ Cyrillic_te,   Cyrillic_TE,    trademark ] };  // ™
-    key <LatM> { [ Cyrillic_softsign, Cyrillic_SOFTSIGN, Cyrillic_hardsign, Cyrillic_HARDSIGN ] };  // "ъ" phonetic copy
+    key <LatN> { [ Cyrillic_te,   Cyrillic_TE ] };
+    key <LatM> { [ Cyrillic_softsign, Cyrillic_SOFTSIGN, Cyrillic_hardsign, Cyrillic_HARDSIGN ] };  // ь Ь ъ Ъ
 };
 
 
