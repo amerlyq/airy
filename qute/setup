@@ -6,6 +6,10 @@ source ~/.shell/func.d/cfgsetup
 
 Deprecated ~/.config/qutebrowser/{keys,qutebrowser}.conf
 
+if cfgOpt r; then
+  /usr/share/qutebrowser/scripts/dictcli.py install en-US ru-RU
+fi
+
 ### LINKS ###
 linkcp -t ~/.config/qutebrowser \
   config.py theme

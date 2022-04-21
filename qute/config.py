@@ -1819,6 +1819,9 @@ c.scrolling.bar = (
 ##   - uk-UA: Ukrainian (Ukraine)
 ##   - vi-VN: Vietnamese (Viet Nam)
 # c.spellcheck.languages = []
+# NEED: $ /usr/share/qutebrowser/scripts/dictcli.py --help
+# CFG: $ /usr/share/qutebrowser/scripts/dictcli.py install en-US ru-RU
+c.spellcheck.languages = ["en-US", "ru-RU"]  # @me
 
 ## Padding (in pixels) for the statusbar.
 ## Type: Padding
