@@ -1,3 +1,4 @@
+-- vim:ts=2:sts=2:sw=2:et
 -- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 
 --SRC: https://github.com/lewis6991/impatient.nvim
@@ -250,126 +251,13 @@ require('nvim-treesitter.configs').setup {
   },
 }
 
--- Diagnostic keymaps
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
-
--- LSP settings
--- Collection of configurations for built-in LSP client
--- SRC: https://github.com/neovim/nvim-lspconfig
-local lspconfig = require 'lspconfig'
-local on_attach = function(_, bufnr)
-  local opts = { buffer = bufnr }
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
-  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-  vim.keymap.set('n', '<leader>wl', function()
-    vim.inspect(vim.lsp.buf.list_workspace_folders())
-  end, opts)
-  vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-  vim.keymap.set('n', '<leader>so', require('telescope.builtin').lsp_document_symbols, opts)
-  vim.api.nvim_create_user_command("Format", vim.lsp.buf.formatting, {})
-end
-
--- nvim-cmp supports additional completion capabilities
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
-
--- Enable the following language servers
--- local servers = { 'clangd', 'rust_analyzer', 'pylsp', 'tsserver' }
-local servers = { 'pylsp' }
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = on_attach,
-    capabilities = capabilities,
-  }
-end
-
--- Example custom server
 -- Make runtime files discoverable to the server
 local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, 'lua/?.lua')
 table.insert(runtime_path, 'lua/?/init.lua')
 
-lspconfig.sumneko_lua.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    Lua = {
-      runtime = {
-        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-        version = 'LuaJIT',
-        -- Setup your lua path
-        path = runtime_path,
-      },
-      diagnostics = {
-        -- Get the language server to recognize the `vim` global
-        globals = { 'vim' },
-      },
-      workspace = {
-        -- Make the server aware of Neovim runtime files
-        library = vim.api.nvim_get_runtime_file('', true),
-      },
-      -- Do not send telemetry data containing a randomized but unique identifier
-      telemetry = {
-        enable = false,
-      },
-    },
-  },
-}
 
--- luasnip setup
--- https://github.com/L3MON4D3/LuaSnip
-local luasnip = require 'luasnip'
+require 'plugins.python-lsp'
+require 'plugins.luasnip'
 
--- nvim-cmp setup
--- https://github.com/hrsh7th/nvim-cmp
-local cmp = require 'cmp'
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert({
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
-    ['<Tab>'] = function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end,
-    ['<S-Tab>'] = function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end,
-  }),
-  sources = {
-    { name = 'nvim_lsp' }, -- https://github.com/hrsh7th/cmp-nvim-lsp
-    { name = 'luasnip' }, -- https://github.com/saadparwaiz1/cmp_luasnip
-  },
-}
--- vim: ts=2 sts=2 sw=2 et
+-- require("refactoring").setup({})
