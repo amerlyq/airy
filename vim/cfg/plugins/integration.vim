@@ -242,19 +242,19 @@ call dein#add('rhysd/committia.vim', {
 "   BET:(new): lambdalisue/gina.vim: 👣 Asynchronously control git repositories in Neovim/Vim 8 ⌇⡠⡖⠿⡶
 "     https://github.com/lambdalisue/gina.vim
 " EXPL:(post-hook) Check if already inside some repository
-call dein#add('tpope/vim-fugitive', {
-  \ 'augroup': 'fugitive',
-  \ 'on_cmd': ['Git', 'Gstatus', 'Gdiff', 'Glog',
-  \   'Gbrowse', 'Gblame', 'Gwrite'],
-  \ 'hook_add': "
-\\n   autocmd BufReadPost fugitive://* setl bufhidden=delete
-\\n   nnoremap <silent><unique> [Git]s :Gstatus<CR>
-\\n   nnoremap <silent><unique> [Git]l :Glog<CR>
-\\n   nnoremap <silent><unique> [Git]d :Gdiff<CR>
-\\n   nnoremap <silent><unique> [Git]w :Gwrite<CR>
-\\n   nnoremap <silent><unique> [Git]b :Gblame<CR>
-\\n   nnoremap <silent><unique> [Git]# :call fugitive#detect(expand('%:p'))<CR>
-\"})
+" call dein#add('tpope/vim-fugitive', {
+"   \ 'augroup': 'fugitive',
+"   \ 'on_cmd': ['Git', 'Gstatus', 'Gdiff', 'Glog',
+"   \   'Gbrowse', 'Gblame', 'Gwrite'],
+"   \ 'hook_add': "
+" \\n   autocmd BufReadPost fugitive://* setl bufhidden=delete
+" \\n   nnoremap <silent><unique> [Git]s :Gstatus<CR>
+" \\n   nnoremap <silent><unique> [Git]l :Glog<CR>
+" \\n   nnoremap <silent><unique> [Git]d :Gdiff<CR>
+" \\n   nnoremap <silent><unique> [Git]w :Gwrite<CR>
+" \\n   nnoremap <silent><unique> [Git]b :Gblame<CR>
+" \\n   nnoremap <silent><unique> [Git]# :call fugitive#detect(expand('%:p'))<CR>
+" \"})
 
 
 

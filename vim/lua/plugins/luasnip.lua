@@ -40,7 +40,12 @@ cmp.setup {
     end,
   }),
   sources = {
-    { name = 'nvim_lsp' }, -- https://github.com/hrsh7th/cmp-nvim-lsp
-    { name = 'luasnip' }, -- https://github.com/saadparwaiz1/cmp_luasnip
+    { name = 'nvim_lsp' },  -- https://github.com/hrsh7th/cmp-nvim-lsp
+    { name = 'luasnip' },   -- https://github.com/saadparwaiz1/cmp_luasnip
+    { name = 'buffer' },    -- https://github.com/hrsh7th/cmp-buffer
+    { name = 'calc' },      -- https://github.com/hrsh7th/cmp-calc
+    { name = 'digraphs' },  -- https://github.com/dmitmel/cmp-digraphs
+    { name = 'path' },      -- https://github.com/hrsh7th/cmp-path
+    { name = 'cmdline' },   -- CFG: https://github.com/hrsh7th/cmp-cmdline
   },
 }

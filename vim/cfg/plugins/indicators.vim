@@ -63,9 +63,9 @@ call dein#add('t9md/vim-quickhl', {
 " EXPL: not in 'hook_source' because plugin isn't lazy
 " SEE:(iav_term) RangerChooser
 " TRY:ALT: https://github.com/Yggdroot/indentLine
-call dein#add('nathanaelkane/vim-indent-guides', {
-  \ 'hook_add': _hcat('indent-guides.src') . "\n"
-  \." nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>"})
+" call dein#add('nathanaelkane/vim-indent-guides', {
+"   \ 'hook_add': _hcat('indent-guides.src') . "\n"
+"   \." nnoremap <unique> [Toggle]I :IndentGuidesToggle<CR>"})
 
 
 
@@ -76,14 +76,15 @@ call dein#add('nathanaelkane/vim-indent-guides', {
 " BETTER: lisp, vim --> Activates only specified languages
 "   'sh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] }
 "   'zsh': { 'parentheses': ['start=/(/ end=/)/', 'start=/{/ end=/}/'] }
-call dein#add('luochen1990/rainbow', {
-  \ 'on_ft': ['lisp', 'vim', 'tex', 'xml', 'html', 'xhtml', 'php', 'css'],
-  \ 'on_cmd': 'RainbowToggle*',
-  \ 'hook_add': "noremap <unique> [Toggle]r :<C-u>RainbowToggle<CR>",
-  \ 'hook_source': "
-\\n   let g:rainbow_active = 1
-\\n   let g:rainbow_conf = {'separately': { '*': {}, 'lisp': {}, 'vim': {} }}
-\\n   let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]
-\\n   let g:rainbow_conf.guifgs = ['#df0000', '#ff5f00', '#dfaf00', '#00af00', '#0087ff', '#af00ff']
-\\n   let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
-\"})
+"" DISABLED:(too buggy): randomly enabled -- and leaks hi! grps until errors
+" call dein#add('luochen1990/rainbow', {
+"   \ 'on_ft': ['lisp', 'vim', 'tex', 'xml', 'html', 'xhtml', 'php', 'css'],
+"   \ 'on_cmd': 'RainbowToggle*',
+"   \ 'hook_add': "noremap <unique> [Toggle]r :<C-u>RainbowToggle<CR>",
+"   \ 'hook_source': "
+" \\n   let g:rainbow_active = 1
+" \\n   let g:rainbow_conf = {'separately': { '*': {}, 'lisp': {}, 'vim': {} }}
+" \\n   let g:rainbow_conf.ctermfgs = [160, 202, 178, 34, 33, 129]
+" \\n   let g:rainbow_conf.guifgs = ['#df0000', '#ff5f00', '#dfaf00', '#00af00', '#0087ff', '#af00ff']
+" \\n   let g:rainbow_conf.separately.c = {'ctermfgs': [7, 7] + g:rainbow_conf.ctermfgs}
+" \"})

@@ -46,39 +46,59 @@ vim.cmd [[colorscheme solarized]]
 -- require('solarized').set()
 
 
+vim.o.cursorline = true
+vim.o.list = true
+vim.opt.listchars = {tab='▸ ', trail='·', extends='»', precedes='«', nbsp='␣' }
+vim.highlight.create('Whitespace', {ctermfg=0, ctermbg=8, guifg='#073642', guibg='#002b36', gui=nocombine}, false)
+
+
 -- EXPL: Add indentation guides even on blank lines
 -- SRC: https://github.com/lukas-reineke/indent-blankline.nvim
-vim.highlight.create('IndentBlanklineOdd', {ctermfg=8, ctermbg=0, guifg='#002b36', guibg='#072f3b', gui=nocombine}, false)
-vim.highlight.create('IndentBlanklineEven', {ctermfg=8, ctermbg=0, guifg='#002b36', guibg='#072f3b', gui=nocombine}, false)
--- vim.cmd [[highlight IndentBlanklineIndent1 guifg=#E06C75 gui=nocombine]]
--- vim.cmd [[highlight IndentBlanklineIndent2 guifg=#E5C07B gui=nocombine]]
--- vim.cmd [[highlight IndentBlanklineIndent3 guifg=#98C379 gui=nocombine]]
--- vim.cmd [[highlight IndentBlanklineIndent4 guifg=#56B6C2 gui=nocombine]]
--- vim.cmd [[highlight IndentBlanklineIndent5 guifg=#61AFEF gui=nocombine]]
--- vim.cmd [[highlight IndentBlanklineIndent6 guifg=#C678DD gui=nocombine]]
+-- FIXED: visual block selection uses "reverse" but plugin does not support that
+-- FIXME: dunno how to "hi! link"
+-- FUTURE:BET: reuse short func from there inof large buggy plugin below
+--    ~/.cache/vim/dein/repos/github.com/nathanaelkane/vim-indent-guides/autoload/indent_guides.vim
+-- OR:TRY: ⌇⡢⡥⢛⠵ https://github.com/glepnir/indent-guides.nvim
 
+-- FIXED:WKRND: visually select indented space
+--   SRC: https://github.com/lukas-reineke/indent-blankline.nvim/issues/328
+-- vim.cmd([[hi! Visual cterm=None ctermfg=102 ctermbg=23 gui=None guifg=#586e75 guibg=#002b36 guisp=none ]])
+-- vim.highlight.create('Visual', {cterm=None, ctermfg=102, ctermbg=242,
+--   gui=None, guifg='#586e75', guibg='#002b36', guisp=None}, true)
+-- vim.cmd([[hi! Visual guibg=#586e75 gui=None guifg=#002b36 ]])
+vim.cmd([[hi! Visual guibg=#839496 gui=None guifg=#002b36 ]])
+
+
+
+-- SEE:(blend): more virt_text display options by bfredl · Pull Request #14065 · neovim/neovim ⌇⡢⡥⢘⡞
+--   https://github.com/neovim/neovim/pull/14065
+
+-- vim.g.loaded_indent_blankline = 1
 require("indent_blankline").setup {
-    -- char = '┊',
-    -- char = "",
-    char = " ",
-    -- filetype_exclude = { 'help', 'packer' },
-    -- buftype_exclude = { 'terminal', 'nofile' },
-    -- use_treesitter = true,
-    -- show_current_context = true,
-    -- show_trailing_blankline_indent = false,
-    show_first_indent_level = false,
-    char_highlight_list = { "IndentBlanklineOdd", "IndentBlanklineEven" },
-    -- space_char_highlight_list = { "IndentBlanklineOdd", "IndentBlanklineEven" },
-    -- space_char_blankline = " ",
-    -- char_highlight_list = {
-    --     "IndentBlanklineIndent1",
-    --     "IndentBlanklineIndent2",
-    --     "IndentBlanklineIndent3",
-    --     "IndentBlanklineIndent4",
-    --     "IndentBlanklineIndent5",
-    --     "IndentBlanklineIndent6",
-    -- },
+  char = '┊',
+  -- char = "",
+  -- char = " ",
+  -- filetype_exclude = { 'help', 'packer' },
+  -- buftype_exclude = { 'terminal', 'nofile' },
+  -- use_treesitter = true,
+  -- show_current_context = true,
+  -- show_trailing_blankline_indent = false,
+  show_first_indent_level = false,
+  -- char_highlight_list = { "IndentBlanklineOdd" },
+  -- space_char_highlight_list = { "IndentBlanklineOdd", "IndentBlanklineEven" },
+  -- space_char_blankline = " ",
 }
+-- -- vim.highlight.create('IndentBlanklineChar', {ctermfg=8, ctermbg=0, guifg='#002b36', guibg='#073642', gui=None}, false)
+-- -- vim.highlight.create('IndentBlanklineSpaceChar', {gui='NONE'}, false)
+-- -- vim.highlight.create('IndentBlanklineSpaceCharBlankline', {gui='NONE'}, false)
+-- -- vim.highlight.create('IndentBlanklineContextChar', {gui='NONE'}, false)
+-- vim.cmd([[
+--   hi! IndentBlanklineChar gui=None
+--   hi! IndentBlanklineSpaceChar gui=None
+--   hi! IndentBlanklineSpaceCharBlankline gui=None
+--   hi! IndentBlanklineContextChar gui=None
+-- ]])
+
 
 
 --Add move line shortcuts
@@ -115,6 +135,12 @@ require('lualine').setup {
     theme = 'onedark',
     component_separators = '|',
     section_separators = '',
+    globalstatus = true,
+  },
+  sections = {
+    lualine_b = {'diagnostics'},  -- 'branch', 'diff'
+    lualine_c = {'buffers'},
+    lualine_x = {'tabs', 'filetype'},  -- 'encoding', 'fileformat'
   },
 }
 
@@ -259,14 +285,21 @@ table.insert(runtime_path, 'lua/?/init.lua')
 
 -- NOTE: for jupyter buf mappings
 vim.cmd([[
-  augroup MyAutoCmd
-    autocmd!
-    autocmd FileType c setlocal cindent
-  augroup END
+augroup MyAutoCmd
+autocmd!
+autocmd FileType c setlocal cindent
+augroup END
 ]])
 
 require 'plugins.python-lsp'
 require 'plugins.luasnip'
+
+-- tnoremap <silent> <M-i> <C-\><C-n>:RnvimrResize<CR>
+-- nnoremap <silent> <M-o> :RnvimrToggle<CR>
+-- tnoremap <silent> <M-o> <C-\><C-n>:RnvimrToggle<CR>
+vim.keymap.set({'n'}, '<S-Tab>', ':RnvimrToggle<CR>', {})
+vim.keymap.set({'n'}, '<Tab>',   ':RnvimrToggle<CR>', {})
+vim.keymap.set({'n'}, '<C-Tab>', ':RnvimrResize<CR>', {})
 
 -- SRC: https://github.com/folke/which-key.nvim
 require("which-key").setup {}
