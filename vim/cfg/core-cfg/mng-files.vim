@@ -21,8 +21,10 @@ com! -bar Qfast try|sil quit|catch/:E37/|conf quit
 " Save, Drop, File
 " ATTENTION be aware, that :update will not create NEW files like touch!
 noremap <Leader>s :<C-U>update<CR>
+noremap <Leader>ы :<C-U>update<CR>
 " noremap <Leader>S :<C-U>wa<CR>
 noremap <Leader>d :<C-U>Qfast<CR>
+noremap <Leader>в :<C-U>Qfast<CR>
 noremap <Leader>D :<C-U>qa<CR>
 " cnoremap <Leader>d <C-E><C-U>q<CR>
 noremap <Leader>S :<C-U>Wunix<CR>
@@ -93,6 +95,7 @@ function! s:BufDelSafe()
 endfunction
 command! -bar Safebd call <SID>BufDelSafe()
 nnoremap <Leader>x :<C-U>Safebd<CR>
+nnoremap <Leader>ч :<C-U>Safebd<CR>
 
 " reload current buffer while discarding changes
 "nnoremap <Leader>e :edit!<cr>

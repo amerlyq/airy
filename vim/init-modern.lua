@@ -124,8 +124,8 @@ require('lualine').setup {
 
 --Remap space as leader key
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = ','
+vim.g.maplocalleader = ' '  -- OR: "\<Space>"
 
 --Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -257,7 +257,18 @@ table.insert(runtime_path, 'lua/?.lua')
 table.insert(runtime_path, 'lua/?/init.lua')
 
 
+-- NOTE: for jupyter buf mappings
+vim.cmd([[
+  augroup MyAutoCmd
+    autocmd!
+    autocmd FileType c setlocal cindent
+  augroup END
+]])
+
 require 'plugins.python-lsp'
 require 'plugins.luasnip'
+
+-- SRC: https://github.com/folke/which-key.nvim
+require("which-key").setup {}
 
 -- require("refactoring").setup({})
