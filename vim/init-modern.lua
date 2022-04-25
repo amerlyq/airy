@@ -49,13 +49,16 @@ vim.cmd [[colorscheme solarized]]
 vim.o.cursorline = true
 vim.o.list = true
 vim.opt.listchars = {tab='▸ ', trail='·', extends='»', precedes='«', nbsp='␣' }
-vim.highlight.create('Whitespace', {ctermfg=0, ctermbg=8, guifg='#073642', guibg='#002b36', gui=nocombine}, false)
+-- vim.highlight.create('Whitespace', {ctermfg=0, ctermbg=8, guifg='#073642', guibg='#002b36', gui=nocombine}, false)
+vim.highlight.create('Whitespace', {ctermfg=0, guifg='#072f3b'}, false)
+
 
 
 -- EXPL: Add indentation guides even on blank lines
 -- SRC: https://github.com/lukas-reineke/indent-blankline.nvim
 -- FIXED: visual block selection uses "reverse" but plugin does not support that
 -- FIXME: dunno how to "hi! link"
+--   TRY: vim.highlight.link("TelescopeMatching", "Constant", true)
 -- FUTURE:BET: reuse short func from there inof large buggy plugin below
 --    ~/.cache/vim/dein/repos/github.com/nathanaelkane/vim-indent-guides/autoload/indent_guides.vim
 -- OR:TRY: ⌇⡢⡥⢛⠵ https://github.com/glepnir/indent-guides.nvim
@@ -66,7 +69,7 @@ vim.highlight.create('Whitespace', {ctermfg=0, ctermbg=8, guifg='#073642', guibg
 -- vim.highlight.create('Visual', {cterm=None, ctermfg=102, ctermbg=242,
 --   gui=None, guifg='#586e75', guibg='#002b36', guisp=None}, true)
 -- vim.cmd([[hi! Visual guibg=#586e75 gui=None guifg=#002b36 ]])
-vim.cmd([[hi! Visual guibg=#839496 gui=None guifg=#002b36 ]])
+vim.cmd([[hi! Visual cterm=None ctermbg=242 guibg=#839496 gui=None,nocombine guifg=#002b36 ]])
 
 
 
@@ -75,9 +78,9 @@ vim.cmd([[hi! Visual guibg=#839496 gui=None guifg=#002b36 ]])
 
 -- vim.g.loaded_indent_blankline = 1
 require("indent_blankline").setup {
-  char = '┊',
+  -- char = '┊',
   -- char = "",
-  -- char = " ",
+  char = " ",
   -- filetype_exclude = { 'help', 'packer' },
   -- buftype_exclude = { 'terminal', 'nofile' },
   -- use_treesitter = true,
@@ -88,7 +91,7 @@ require("indent_blankline").setup {
   -- space_char_highlight_list = { "IndentBlanklineOdd", "IndentBlanklineEven" },
   -- space_char_blankline = " ",
 }
--- -- vim.highlight.create('IndentBlanklineChar', {ctermfg=8, ctermbg=0, guifg='#002b36', guibg='#073642', gui=None}, false)
+vim.highlight.create('IndentBlanklineChar', {ctermfg=8, ctermbg=0, guifg='#002b36', guibg='#072f3b', gui=None}, false)
 -- -- vim.highlight.create('IndentBlanklineSpaceChar', {gui='NONE'}, false)
 -- -- vim.highlight.create('IndentBlanklineSpaceCharBlankline', {gui='NONE'}, false)
 -- -- vim.highlight.create('IndentBlanklineContextChar', {gui='NONE'}, false)
@@ -127,22 +130,6 @@ vim.api.nvim_set_keymap('n', '<F3>', [[
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 
---Set statusbar
---SRC: https://github.com/nvim-lualine/lualine.nvim
-require('lualine').setup {
-  options = {
-    icons_enabled = false,
-    theme = 'onedark',
-    component_separators = '|',
-    section_separators = '',
-    globalstatus = true,
-  },
-  sections = {
-    lualine_b = {'diagnostics'},  -- 'branch', 'diff'
-    lualine_c = {'buffers'},
-    lualine_x = {'tabs', 'filetype'},  -- 'encoding', 'fileformat'
-  },
-}
 
 --Enable Comment.nvim
 -- https://github.com/numToStr/Comment.nvim
@@ -291,8 +278,9 @@ autocmd FileType c setlocal cindent
 augroup END
 ]])
 
+require 'plugins.lualine'
+require 'plugins.cmp'
 require 'plugins.python-lsp'
-require 'plugins.luasnip'
 
 -- tnoremap <silent> <M-i> <C-\><C-n>:RnvimrResize<CR>
 -- nnoremap <silent> <M-o> :RnvimrToggle<CR>
@@ -301,6 +289,7 @@ vim.keymap.set({'n'}, '<S-Tab>', ':RnvimrToggle<CR>', {})
 vim.keymap.set({'n'}, '<Tab>',   ':RnvimrToggle<CR>', {})
 vim.keymap.set({'n'}, '<C-Tab>', ':RnvimrResize<CR>', {})
 
+-- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
 -- SRC: https://github.com/folke/which-key.nvim
 require("which-key").setup {}
 
