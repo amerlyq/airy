@@ -52,7 +52,7 @@ cmp.setup {
     { name = 'calc' },      -- https://github.com/hrsh7th/cmp-calc
     { name = 'fuzzy_buffer' },-- CFG: https://github.com/tzachar/cmp-fuzzy-buffer
   }, {
-    { name = 'digraphs' },  -- https://github.com/dmitmel/cmp-digraphs
+    -- { name = 'digraphs' },  -- https://github.com/dmitmel/cmp-digraphs
     { name = 'path' },      -- https://github.com/hrsh7th/cmp-path
     { name = 'cmdline' },   -- CFG: https://github.com/hrsh7th/cmp-cmdline
     -- { name = 'fuzzy_path' },-- CFG: https://github.com/tzachar/cmp-fuzzy-path

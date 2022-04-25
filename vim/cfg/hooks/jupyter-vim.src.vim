@@ -8,6 +8,9 @@ let g:jupyter_live_exec = g:jupyter_live_pprint .'_live()'
 " let g:jupyter_live_exec = 'print(_live())'
 " let g:jupyter_live_exec = '_live()'
 
+" FIXED:(removed '##'): prevent .py code hi! in my own header '## …' comments
+let g:jupyter_cell_separators = ['#%%', '# %%', '# <codecell>']
+
 
 autocmd MyAutoCmd FileType python call BufMap_jupyter_vim()
 

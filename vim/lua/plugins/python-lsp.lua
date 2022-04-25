@@ -49,7 +49,7 @@ local lsp_mappings = function(_client, bufnr)
   vim.keymap.set('n', '<LocalLeader>R', vim.lsp.buf.rename, opts) -- DFL=<leader>rn
   vim.keymap.set('n', '<LocalLeader>u', vim.lsp.buf.references, opts) -- DFL=gr
   -- vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-  vim.keymap.set('n', '<leader>so', require('telescope.builtin').lsp_document_symbols, opts)
+  vim.keymap.set('n', '<Tab>s', require('telescope.builtin').lsp_document_symbols, opts)
 
   -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<LocalLeader>F', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
   vim.api.nvim_create_user_command("Format", vim.lsp.buf.formatting, {})
@@ -138,6 +138,8 @@ local settings = {
       -- DEP: pylsp-autoimport
       -- FAIL: autoimport = { enabled = true },
       -- SRC: https://github.com/bageljrkhanofemus/dotfiles/blob/4a8d7e555ca96d0d4b17eda6ed37c68c7ec6a045/dot_config/nvim/lua/configs/lsp.lua
+      -- WAIT https://github.com/python-lsp/python-lsp-server/pull/199
+      -- NEED: $ pip install . --user
       rope_autoimport = { enabled = true },
 
       pydocstyle = { enabled = false },
@@ -149,6 +151,7 @@ local settings = {
     }
   },
 
+  --DEP: $ paci lua-language-server
   Lua = { -- sumneko_lua
     runtime = {
       -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
