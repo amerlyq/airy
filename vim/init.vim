@@ -12,8 +12,9 @@ EOF
 
 execute 'source $VIMHOME/cfg/vimrc'
 
-nnoremap <S-Tab> :RnvimrToggle<CR>
-nnoremap <C-Tab> :RnvimrResize<CR>
+nnoremap <M-o> :RnvimrToggle<CR>
+tnoremap <M-o> <C-\><C-n>:RnvimrToggle<CR>
+tnoremap <M-i> <C-\><C-n>:RnvimrResize<CR>
 
 " hi! Visual  guibg=#586e75 gui=None guifg=#002b36
 hi! Visual  cterm=None,nocombine ctermbg=242 guibg=#839496 gui=None,nocombine guifg=#002b36

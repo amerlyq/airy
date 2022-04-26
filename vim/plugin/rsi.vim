@@ -1,0 +1,1 @@
+/@/xdg_cache/vim/dein/repos/github.com/tpope/vim-rsi/plugin/rsi.vim
