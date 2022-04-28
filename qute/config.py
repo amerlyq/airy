@@ -2394,6 +2394,7 @@ config.unbind("ZZ")
 # config.bind('ad', 'download-cancel')
 # config.bind('b', 'set-cmd-text -s :quickmark-load')
 # config.bind('cd', 'download-clear')
+config.bind('cX', 'download-delete')
 # config.bind('co', 'tab-only')
 config.bind("cl", "open -t -- {clipboard}")  # 'cy/ch'
 config.bind("c<Space>", "open -- {clipboard}")  # 'c./c<Backspace>'
