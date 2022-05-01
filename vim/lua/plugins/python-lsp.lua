@@ -66,6 +66,7 @@ local on_attach = function(client, bufnr)
 
   -- Format on save -- and restore highlights
   -- vim.cmd [[autocmd BufWritePre <buffer> exe 'lua vim.lsp.buf.formatting_sync()'|Semshi highlight]]
+  -- WTF: it's registered for all .py buffers BUT formatting works only for first buffer
   vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]
 
   -- FIXED: too bright hi! for !neovim LSP ※⡢⡔⢀⠔
@@ -127,20 +128,22 @@ local settings = {
     --   yapf_format = {enabled = false},
     -- },
     plugins = {
+      -- BAD:NEED: $ paci nuspell
       pylint = { enabled = true },
       -- pylint = { enabled = true, args = {"--disable C0301"}},
       -- pylint = { enabled = false, args = { "--rcfile=pylint.ini" }, },
       isort = { enabled = true },
       black = { enabled = true, cache_config = true },
       mypy = { enabled = true },
-      rope_completion = { enabled = true },
+      -- rope_completion = { enabled = true },
 
       -- DEP: pylsp-autoimport
       -- FAIL: autoimport = { enabled = true },
       -- SRC: https://github.com/bageljrkhanofemus/dotfiles/blob/4a8d7e555ca96d0d4b17eda6ed37c68c7ec6a045/dot_config/nvim/lua/configs/lsp.lua
       -- WAIT https://github.com/python-lsp/python-lsp-server/pull/199
       -- NEED: $ pip install . --user
-      rope_autoimport = { enabled = true },
+      -- DISABLED:ERR: code errors
+      -- rope_autoimport = { enabled = true },
 
       pydocstyle = { enabled = false },
       autopep8 = { enabled = false },

@@ -4,9 +4,9 @@ let g:jupyter_mapkeys = 0
 "" BET: assign it something short during prolog inside IPython
 " let g:jupyter_live_pprint = '/__import__("just.iji.util").iji.util.print_ret '
 let g:jupyter_live_pprint = '/p '
-let g:jupyter_live_exec = g:jupyter_live_pprint .'_live()'
+" let g:jupyter_live_exec = g:jupyter_live_pprint .'_live()'
 " let g:jupyter_live_exec = 'print(_live())'
-" let g:jupyter_live_exec = '_live()'
+let g:jupyter_live_exec = '_live()'
 
 " FIXED:(removed '##'): prevent .py code hi! in my own header '## …' comments
 let g:jupyter_cell_separators = ['#%%', '# %%', '# <codecell>']
@@ -20,6 +20,44 @@ autocmd MyAutoCmd FileType python call BufMap_jupyter_vim()
 fun! s:mapsendcode(k, pfx, ...) abort
   exe 'nnoremap <buffer><silent><unique>  <LocalLeader>'.a:k.' :call jupyter#SendCode("'.a:pfx.'".expand("<cexpr>")."'.get(a:,1,"").'")<CR>'
   exe 'xnoremap <buffer><silent><unique>  <LocalLeader>'.a:k.' "sy:<C-u>call jupyter#SendCode("'.a:pfx.'".getreg("s")."'.get(a:,1,"").'")<CR>'
+endf
+
+
+fun! Jupyter_connected() abort
+  return py3eval('"_jupyter_session" in globals() and _jupyter_session.kernel_client.check_connection()')
+endfun
+
+
+fun! Jupyter_connect_buf() abort
+  if !Jupyter_connected()
+    JupyterConnect
+    sleep 200m
+  en
+  call jupyter#SendCode(InferJupyterPkg())
+  JupyterRunFile -niG %:p
+endfun
+
+
+fun! Jupyter_send_pprint(text) abort
+  let lines = split(a:text, "\n")
+  " for i in range(len(lines))
+  "   let lines[i] = substitute(lines[i], '^\s*return\s*', '', '')
+  " endfor
+  let lines[-1] = substitute(lines[-1], '^\s*return\s*', '', '')
+  if len(lines) == 1
+    let lines[0] = 'p('.lines[0].')'
+  else
+    " WARN: only works for black-formatted python
+    let idx = stridx(lines[-1], " = ")
+    if idx != -1
+      " HACK: pprint last assignment
+      let lastvar = trim(strpart(lines[-1], 0, idx))
+      call add(lines, 'p('.lastvar.')')
+    endif
+  endif
+  let code = join(lines, "\n")
+  " OR: call Fn(code)
+  return jupyter#SendCode(code)
 endf
 
 
@@ -49,26 +87,7 @@ fun! Jupyter_opfunc_pprint(type='') abort
     set clipboard= selection=inclusive
     let vcmds = #{line: "'[V']y", char: "`[v`]y", block: "`[\<c-v>`]y"}
     silent exe 'noautocmd keepjumps normal! ' .. get(vcmds, a:type, '')
-
-    let lines = split(getreg('"'), "\n")
-    " for i in range(len(lines))
-    "   let lines[i] = substitute(lines[i], '^\s*return\s*', '', '')
-    " endfor
-    let lines[-1] = substitute(lines[-1], '^\s*return\s*', '', '')
-    if len(lines) == 1
-      let lines[0] = 'p('.lines[0].')'
-    else
-      " WARN: only works for black-formatted python
-			let idx = stridx(lines[-1], " = ")
-      if idx != -1
-        " HACK: pprint last assignment
-        let lastvar = trim(strpart(lines[-1], 0, idx))
-        call add(lines, 'p('.lastvar.')')
-      endif
-    endif
-    let code = join(lines, "\n")
-    " OR: call Fn(code)
-    call jupyter#SendCode(code)
+    call Jupyter_send_pprint(getreg('"'))
   finally
     call setreg('"', reg_save)
     call setpos("'<", visual_marks_save[0])
@@ -84,8 +103,7 @@ endf
 fun! BufMap_jupyter_vim() abort
   if exists('b:BufMap_jupyter_vim')|return|else|let b:BufMap_jupyter_vim=1|endif
 
-  nnoremap <buffer><silent><unique>  <LocalLeader>z :exe'JupyterConnect'\|sleep 200m\|call jupyter#SendCode(InferJupyterPkg())\|exe 'JupyterRunFile -niG %:p'<CR>
-
+  nnoremap <buffer><silent><unique>  <LocalLeader>z :call Jupyter_connect_buf()<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>Z :JupyterConnect<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>X :JupyterDisconnect<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>r :JupyterRunFile -iG %:p<CR>
@@ -94,9 +112,13 @@ fun! BufMap_jupyter_vim() abort
   nnoremap <buffer><silent><unique>  <LocalLeader>i :JupyterRunFile -niG %:p<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>I :PythonImportThisFile<CR>
 
-  nnoremap <buffer><silent><unique>  <LocalLeader>J :call jupyter#SendCode(g:jupyter_live_exec)<CR>
-  " nnoremap <buffer><silent><unique>  <LocalLeader>J :let g:jupyter_live_exec=getline('.')<CR>
-  " xnoremap <buffer><silent><unique>  <LocalLeader>J "sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
+  " IDEA: call "_live" on each ",s" save :USAGE:
+  augroup jupy | autocmd! | augroup END
+  au! jupy BufWritePost <buffer> if Jupyter_connected()| call Jupyter_send_pprint(g:jupyter_live_exec) |en
+
+  nnoremap <buffer><silent><unique>  <LocalLeader>f :call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>J :let g:jupyter_live_exec=getline('.')<Bar>echom g:jupyter_live_exec<CR>
+  xnoremap <buffer><silent><unique>  <LocalLeader>J "sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>j :call jupyter#SendCode('%autoreload')<CR>
 
   nnoremap <buffer><silent><unique>  <LocalLeader>h :JupyterSendCell<CR>
@@ -129,8 +151,10 @@ fun! BufMap_jupyter_vim() abort
   xnoremap <buffer><silent><unique>  <LocalLeader>l :JupyterSendRange<CR>
   nmap     <buffer><silent><unique>  <LocalLeader>w <Plug>JupyterRunTextObj
   xmap     <buffer><silent><unique>  <LocalLeader>w <Plug>JupyterRunVisual
-  nmap     <buffer><silent><unique>  <LocalLeader>f <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterFunctionTextObject)
-  nmap     <buffer><silent><unique>  <LocalLeader>c <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterClassTextObject)
+  " nmap     <buffer><silent><unique>  <LocalLeader>F <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterFunctionTextObject)
+  " nmap     <buffer><silent><unique>  <LocalLeader>C <Plug>JupyterRunTextObj<Plug>(PythonsenseOuterClassTextObject)
+  nmap     <buffer><silent><unique>  <LocalLeader>F <Plug>JupyterRunTextObjaf
+  nmap     <buffer><silent><unique>  <LocalLeader>C <Plug>JupyterRunTextObjac
   nmap     <buffer><silent><unique>  <LocalLeader>L <Plug>JupyterRunTextObj$
   " nmap     <buffer><silent><unique>  <LocalLeader>i <Plug>JupyterRunTextObj<Plug>(textobj-indent-a)
   nmap     <buffer><silent><unique>  <LocalLeader>G <Plug>JupyterRunTextObj<Plug>(textobj-entire-i)

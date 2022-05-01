@@ -43,6 +43,8 @@ K('n', 'K',  'a<CR><Right><Esc>')
 K('n', 'cC', ":t.<CR>", "dupl cur line")
 K('x', 'C', ":t'><CR>")
 
+--Reselect pasted visual selection
+vim.keymap.set('n', 'gv', "'`[' . strpart(getregtype(), 0, 1) . '`]'", { expr = true })
 
 --Buffers switch
 K('nx', 'gh', ":<C-U>bprev<CR>")
@@ -56,6 +58,16 @@ K('nx', 'zh', "<C-W>h")
 K('nx', 'zj', "<C-W>j")
 K('nx', 'zk', "<C-W>k")
 K('nx', 'zl', "<C-W>l")
+
+--Reindent
+--USE: instead 'g<' -- ':mes' or ':norm! g<'
+K('n', '>', '>>_')
+K('n', '<', '<<_')
+K('n', 'g>', '>')
+K('n', 'g<', '<')
+--Re-select visual block after indent
+K('x', '>', '>gv|')
+K('x', '<', '<gv')
 
 
 --OFF: Add move line shortcuts

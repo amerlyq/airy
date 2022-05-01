@@ -2,7 +2,7 @@
 -- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 
 --SRC: https://github.com/lewis6991/impatient.nvim
-require('impatient')
+-- require('impatient')
 --USAGE :LuaCacheProfile
 -- require('impatient').enable_profile()
 
@@ -82,7 +82,16 @@ vim.keymap.set('v', '*', '<Cmd>lua vim.fn.setreg("/", getVisualSelection(), "v")
 
 -- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
 -- SRC: https://github.com/folke/which-key.nvim
-require("which-key").setup {}
+-- ALT: telescope.actions.which_key()
+local presets = require("which-key.plugins.presets")
+presets.operators[">"] = nil
+presets.operators["<lt>"] = nil
+require("which-key").setup {
+  spelling = {
+    enabled = false, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+    suggestions = 20, -- how many suggestions should be shown in the list?
+  },
+}
 
 -- require("refactoring").setup({})
 
