@@ -13,6 +13,14 @@ require('nvim-treesitter.configs').setup {
   highlight = {
     enable = true, -- false will disable the whole extension
   },
+  --SRC: https://github.com/JoosepAlviste/nvim-ts-context-commentstring
+  --  USAGE: automatically changes "commentstring" based on HEREDOC language
+  context_commentstring = {
+    enable = true,
+    -- config = {
+    --   css = '// %s'
+    -- }
+  },
   incremental_selection = {
     enable = true,
     keymaps = {

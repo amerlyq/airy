@@ -108,7 +108,7 @@ fun! BufMap_jupyter_vim() abort
   " xnoremap <buffer><silent><unique>  <LocalLeader>s "sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<CR>
    noremap <buffer><silent><unique><expr>  <Plug>JupyterSendSmart  Jupyter_opfunc_pprint()
    map     <buffer><silent><unique>  <LocalLeader>k  <Plug>JupyterSendSmart
-  nmap     <buffer><silent><unique>  <LocalLeader>s  vil<Plug>JupyterSendSmart
+  nmap     <buffer><silent><unique>  <LocalLeader>s  _vg_<Plug>JupyterSendSmart
   xmap     <buffer><silent><unique>  <LocalLeader>s  <Plug>JupyterSendSmart
 
   "" NOTE: send current line, eval and pprint result

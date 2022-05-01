@@ -60,6 +60,25 @@ require("trouble").setup {
   use_diagnostic_signs = true,
 }
 
+require('nvim_comment').setup {
+  -- HACK: pull "commentstring" based on HEREDOC language
+  -- hook = function()
+  --   if vim.api.nvim_buf_get_option(0, "filetype") == "vue" then
+  --     require("ts_context_commentstring.internal").update_commentstring()
+  --   end
+  -- end
+}
+
+
+-- ALT:SRC: https://github.com/yogeshdhamija/better-asterisk-remap.vim/blob/master/plugin/better-asterisk-remap.vim
+-- nnoremap * :let old=@"<CR>yiw:let @/="\\V\\C\\<".escape(@", '/\')."\\>"<CR>:set hlsearch<CR>:let @"=old<CR>:redraw!<CR>:echo "/".@/<CR>
+-- vnoremap * :<C-U>let old=@"<CR>gvy:let @/="\\V\\C".escape(@", '/\')<CR>:set hlsearch<CR>:let @"=old<CR>:redraw!<CR>:echo "/".@/<CR>
+require 'seize.vsel'
+-- DEBUG: vim.keymap.set('v', '*', '<Cmd>lua print(vim.inspect(getVisualSelection()))<CR>', nore)
+-- vim.keymap.set('v', '*', (function() vim.fn.setreg("/", getVisualSelection(), "v") end), nore)
+vim.keymap.set('v', '*', '<Cmd>lua vim.fn.setreg("/", getVisualSelection(), "v")<CR><Esc>n', nore)
+
+
 
 -- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
 -- SRC: https://github.com/folke/which-key.nvim

@@ -1,8 +1,25 @@
+-- WAIT:(merge): for "desc" param ⌇⡢⡮⢰⢋
+--  https://github.com/folke/which-key.nvim/issues/242
+local KG = vim.api.nvim_set_keymap  -- OR: vim.keymap.set
+-- local KB = vim.api.nvim_buf_set_keymap(bufnr=0, m, lhs, rhs, opts)
+-- ALT: https://github.com/folke/which-key.nvim/issues/267
+function noremap(modes, lhs, rhs, desc)
+  local opts = { noremap = true }
+  if type(rhs) == "function" then
+    opts.callback = rhs
+    rhs = ''
+  end
+  for i = 1, #modes do
+    KG(modes:sub(i,i), lhs, rhs, opts)
+  end
+end
+local K = noremap
+
+
 --Remap space as leader key
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.g.mapleader = ','
 vim.g.maplocalleader = ' ' -- OR: "\<Space>"
-local nore = { noremap = true }
+vim.keymap.set({'n','v'}, '<Space>', '<Nop>', { silent = true })
 
 
 --Remap for dealing with word wrap
@@ -12,76 +29,76 @@ vim.keymap.set('x', 'v', 'mode() ==# "\\<C-v>" ? "v" : "\\<C-v>"', { expr = true
 
 
 --Prevent triggering macros inof quoting
-vim.keymap.set({'n', 'v'}, 'Q', 'q', nore)
-vim.keymap.set({'n', 'v'}, 'q', '<Nop>', nore) -- TEMP: until surround enabled
+K('nx', 'Q', 'q')
+K('nx', 'q', '<Nop>') -- TEMP: until surround enabled
 
 
 --Create above/below empty line with auto indent
-vim.keymap.set('n', 'go', 'o<Space><Esc>^"_D', nore)
-vim.keymap.set('n', 'gO', 'O<Space><Esc>^"_D', nore)
-vim.keymap.set('n', 'K', 'a<CR><Right><Esc>', nore)
+K('n', 'go', 'o<Space><Esc>^"_D')
+K('n', 'gO', 'O<Space><Esc>^"_D')
+K('n', 'K',  'a<CR><Right><Esc>')
 
 
 --Duplicate current line
-vim.keymap.set('n', 'cC', ":t.<CR>", nore)
-vim.keymap.set('x', 'C', ":t'><CR>", nore)
+K('n', 'cC', ":t.<CR>", "dupl cur line")
+K('x', 'C', ":t'><CR>")
 
 
 --Buffers switch
-vim.keymap.set({ 'n', 'v' }, 'gh', ":<C-U>bprev<CR>", { noremap = true })
-vim.keymap.set({ 'n', 'v' }, 'gl', ":<C-U>bnext<CR>", { noremap = true })
-vim.keymap.set({ 'n', 'v' }, 'gH', ":<C-U>bfirst<CR>", { noremap = true })
-vim.keymap.set({ 'n', 'v' }, 'gL', ":<C-U>blast<CR>", { noremap = true })
+K('nx', 'gh', ":<C-U>bprev<CR>")
+K('nx', 'gl', ":<C-U>bnext<CR>")
+K('nx', 'gH', ":<C-U>bfirst<CR>")
+K('nx', 'gL', ":<C-U>blast<CR>")
 
 
 --Window switch
-vim.keymap.set({ 'n', 'v' }, 'zh', "<C-W>h", { noremap = true })
-vim.keymap.set({ 'n', 'v' }, 'zj', "<C-W>j", { noremap = true })
-vim.keymap.set({ 'n', 'v' }, 'zk', "<C-W>k", { noremap = true })
-vim.keymap.set({ 'n', 'v' }, 'zl', "<C-W>l", { noremap = true })
+K('nx', 'zh', "<C-W>h")
+K('nx', 'zj', "<C-W>j")
+K('nx', 'zk', "<C-W>k")
+K('nx', 'zl', "<C-W>l")
 
 
 --OFF: Add move line shortcuts
-vim.api.nvim_set_keymap('n', '<A-j>', ':m .+1<CR>==', { noremap = true })
-vim.api.nvim_set_keymap('n', '<A-k>', ':m .-2<CR>==', { noremap = true })
-vim.api.nvim_set_keymap('i', '<A-j>', '<Esc>:m .+1<CR>==gi', { noremap = true })
-vim.api.nvim_set_keymap('i', '<A-k>', '<Esc>:m .-2<CR>==gi', { noremap = true })
-vim.api.nvim_set_keymap('v', '<A-j>', ':m \'>+1<CR>gv=gv', { noremap = true })
-vim.api.nvim_set_keymap('v', '<A-k>', ':m \'<-2<CR>gv=gv', { noremap = true })
+K('n', '<A-j>', ':m .+1<CR>==')
+K('i', '<A-j>', '<Esc>:m .+1<CR>==gi')
+K('v', '<A-j>', ':m \'>+1<CR>gv=gv')
+K('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
+K('n', '<A-k>', ':m .-2<CR>==')
+K('v', '<A-k>', ':m \'<-2<CR>gv=gv')
 
 
 --Buffers save/close/exit
-vim.keymap.set('i', ',s', '<Esc>:update<CR>', { noremap = true })
-vim.keymap.set('i', ',ы', '<Esc>:update<CR>', { noremap = true })
-vim.keymap.set({ 'n', 'v' }, ',s', ':<C-U>update<CR>', { noremap = true })
+K('i', ',s', '<Esc>:update<CR>')
+K('i', ',ы', '<Esc>:update<CR>')
+K('nx', ',s', ':<C-U>update<CR>')
 -- " FIXED:(E173):SEE http://vim.1045645.n5.nabble.com/Re-how-to-suppress-quot-E173-1-more-file-to-edit-quot-td5716336.html#a5716344
 -- " ALT: if argc()>1|sil blast|sil bfirst|en
 -- set noconfirm   " abort action on unsaved for Qfast to work
 vim.cmd [[com! -bar Qfast try|sil quit|catch/:E37/|conf quit
   \|catch/:E173/|try|sil qall|catch/E37/|conf qall|endt|endt]]
-vim.keymap.set({ 'n', 'v' }, ',d', ':<C-U>Qfast<CR>', { noremap = true })
-vim.keymap.set({ 'n', 'v' }, ',x', function()
+K('nx', ',d', ':<C-U>Qfast<CR>')
+K('nx', ',x', function()
   vim.cmd([[exe (bufnr('%') == bufnr('$') ? 'bprev' : 'bnext') .'|bdelete '. bufnr('%')]])
-end, { noremap = true })
+end)
 
 
 --DEBUG
 --SRC: https://github.com/nvim-treesitter/playground
 --OPT: :packadd playground
 --  <F3> :TSHighlightCapturesUnderCursor
-vim.api.nvim_set_keymap('n', '<F3>', [[
+K('n', '<F3>', [[
 :echo 'hi<'.synIDattr(synID(line('.'), col('.'), 1), 'name')
 \.'> trans<'.synIDattr(synID(line('.'), col('.'), 0), 'name').'> lo<'
 \.synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>'<CR>
-]], { noremap = true })
+]])
 
 
 --CFG plugins
-vim.keymap.set('n', '<M-o>', ':RnvimrToggle<CR>', nore)
-vim.keymap.set('t', '<M-o>', '<C-\\><C-n>:RnvimrToggle<CR>', nore)
-vim.keymap.set('t', '<M-i>', '<C-\\><C-n>:RnvimrResize<CR>', nore)
--- vim.keymap.set({ 'n' }, '<S-Tab>', ':RnvimrToggle<CR>', nore)
--- vim.keymap.set({ 'n' }, '<Tab>', ':RnvimrToggle<CR>', nore)
--- vim.keymap.set({ 'n' }, '<C-Tab>', ':RnvimrResize<CR>', {})
+K('n', '<M-o>', ':RnvimrToggle<CR>')
+K('t', '<M-o>', '<C-\\><C-n>:RnvimrToggle<CR>')
+K('t', '<M-i>', '<C-\\><C-n>:RnvimrResize<CR>')
+-- K('n', '<S-Tab>', ':RnvimrToggle<CR>')
+-- K('n', '<Tab>', ':RnvimrToggle<CR>')
+-- K('n', '<C-Tab>', ':RnvimrResize<CR>')
 
-vim.keymap.set('n', '<Tab>q', ':TroubleToggle<CR>')
+K('n', '<Tab>q', ':TroubleToggle<CR>')
