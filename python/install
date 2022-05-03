@@ -8,30 +8,19 @@ pkg_inst python-pip
 # auri pipdeptree
 # pipdeptree -p faker -r
 
-if distro arch; then
-  pkg_inst ipython
-  # ALSO: jupyter for notebooks in vim
-  pkg_inst python-qtconsole  # python-console
+pkg_inst ipython
+# ALSO: jupyter for notebooks in vim
+pkg_inst python-qtconsole  # python-console
 
-  #%USAGE: py 'plot(cos(arange(30)))'
-  #%  ALSO: automatic usage in !ipython
-  #%  SEE: https://github.com/deshaw/pyflyby
-  #%  TUT: https://www.deshaw.com/research/desco-quansight-improving-jupyter-efficiency
-  pip_inst pyflyby pylsp-autoimport
+#%USAGE: py 'plot(cos(arange(30)))'
+#%  ALSO: automatic usage in !ipython
+#%  SEE: https://github.com/deshaw/pyflyby
+#%  TUT: https://www.deshaw.com/research/desco-quansight-improving-jupyter-efficiency
+pip_inst pyflyby
 
-  # SEE: https://pypi.org/project/memory-profiler/
-  pkg_inst python-memory-profiler  # NEED:(ipython): %memit
+# SEE: https://pypi.org/project/memory-profiler/
+pkg_inst python-memory-profiler  # NEED:(ipython): %memit
 
-  pkg_inst python-ipdb  # pretty debugger for IPython
-  pkg_inst python-pudb
-  ## OBSOLETE
-  # pkg_inst python2
-  # pkg_inst python2-pip
-
-elif distro ubuntu; then
-  pkg_inst python3 python3-pip
-  pkg_inst python3-pip
-  pip_inst -p 'IPython' ipython
-  pip_inst -y ipdb{,}
-  pip_inst -y pudb{,}
-fi
+# https://pypi.org/project/ipdb/
+# pkg_inst python-ipdb  # pretty debugger for IPython
+# pkg_inst python-pudb  # DISABLED: useless TUI
