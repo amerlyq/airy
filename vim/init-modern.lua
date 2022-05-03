@@ -52,6 +52,11 @@ require 'plugins.guides'
 require 'plugins.telescope'
 require 'plugins.treesitter'
 
+-- TODO: ctags incremental re-generation
+-- https://github.com/ludovicchabant/vim-gutentags
+vim.g.gutentags_dont_load = true
+
+
 require("trouble").setup {
   icons=false,  -- NEED:DEP=nvim-web-devicons
   -- auto_open = true,

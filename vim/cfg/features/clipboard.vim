@@ -8,6 +8,8 @@
 
 "" FIXME: using default pref=xclip will break my remote clipboard
 "" NOTE:(cache_enabled=0 .vs. -quiet): use single system-wide !xclip .vs. per-session
+"" WTF: xclip is called on each window switch -- BUT .lua only calls it once
+if $SSH_CONNECTION
 let g:clipboard = {
   \ 'name': 'xclip',
   \ 'copy': {
@@ -20,6 +22,7 @@ let g:clipboard = {
   \ },
   \ 'cache_enabled': 0,
   \}
+endif
 
 " BAD: has('clipboard') needs to access provider => shows errmsg
 "   E.G. system w/o my 'xsel-remote' wrapper installed (ubuntu chroot / android)

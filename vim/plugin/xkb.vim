@@ -6,10 +6,9 @@ if &cp||exists('g:loaded_xkb')|finish|else|let g:loaded_xkb=1|endif
 " WARN: must be outside -- to redefine functions on script first source
 let g:xkb_use_monitor = 0  " TEMP: disabled, bugged
 
-let s:kbdd_svc='ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.'
-let s:kbdd_set='dbus-send --dest=' . s:kbdd_svc . 'set_layout uint32:'
-let s:kbdd_get='dbus-send --print-reply=literal --dest='
-  \. s:kbdd_svc . 'getCurrentLayout'
+let s:kbdd_svc = 'ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.'
+let s:kbdd_set = split('dbus-send --dest=' . s:kbdd_svc . 'set_layout')  " uint32:1
+let s:kbdd_get = split('dbus-send --print-reply=literal --dest='. s:kbdd_svc .'getCurrentLayout')
 let s:kbdd_mon = ['dbus-monitor', '--profile',
   \ 'interface=ru.gentoo.kbdd,member=layoutChanged']
 
@@ -45,7 +44,7 @@ endf
 
 fun! xkb#set(i)
   let s:kbdd_guard += 1
-  return system(s:kbdd_set . a:i)
+  return system(s:kbdd_set + ["uint32:".a:i])
 endf
 
 fun! xkb#show()

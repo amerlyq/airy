@@ -76,6 +76,12 @@ local on_attach = function(client, bufnr)
   lsp_mappings(bufnr)
 end
 
+-- Make runtime files discoverable to the server
+-- FIXME: only use /@/airy/nvim/lua/ location
+local runtime_path = vim.split(package.path, ';')
+table.insert(runtime_path, 'lua/?.lua')
+table.insert(runtime_path, 'lua/?/init.lua')
+
 
 -- VIZ: https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
 local settings = {
