@@ -61,7 +61,7 @@ do_if() {
   ((!${#pkgs[@]})) || ${cmd:?} "${pkgs[@]}"
 }
 
-pip_inst(){ do_if -c 'sudo pip3 install --upgrade' "$@"; }
+pip_inst(){ do_if -c 'pip3 install --upgrade' "$@"; }
 cab_inst(){ do_if -c 'cabal install' "$@"; }
 iskip(){ declare -n a="$1"; (( ${#a[@]} ))||return 0
   printf -- '--ignore '; (IFS=,;printf '%s\n' "${a[*]// /\\ }")

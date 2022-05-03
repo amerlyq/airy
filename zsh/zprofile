@@ -22,9 +22,12 @@ fi
 # TODO: distribute to ./env inside |airy/{ruby,cabal}| similar to /etc/profile.d/*
 #   => symlink into ~/.config/airy/env/<group.mod> -- to source by all
 # NEW: $(ruby -rubygems -e "puts Gem.user_dir")/bin
-hash ruby 2>/dev/null && PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
-hash cabal 2>/dev/null && PATH=~/.cabal/bin:$PATH
-PATH=~/.local/bin:$PATH
+
+# hash ruby 2>/dev/null && PATH=$PATH:$(ruby -e 'print Gem.user_dir')/bin
+# hash cabal 2>/dev/null && PATH=~/.cabal/bin:$PATH
+# PATH=~/.local/bin:$PATH
+PATH=~/.local/bin:/usr/local/bin:/usr/bin
+
 
 # ALT: ~/.ssh/environment + "PermitUserEnvironment PATH">>/etc/ssh/sshd_config
 #   BAD:(hardcode): can't extend existing PATH
