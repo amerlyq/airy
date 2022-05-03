@@ -1,0 +1,16 @@
+
+DEBUG:PERF
+  $ sudo /usr/share/bcc/tools/execsnoop -T
+  $ v --startuptime /t/log merge.py
+  [60/99ms]
+    019.838: sourcing /data/cache/plugins/nvim_pure/start/nvim-lspconfig/plugin/lspconfig.vim
+    018.911: sourcing /@/airy/nvim/pack/pure/start/nvim-solarized-lua/colors/solarized.lua
+    013.932: sourcing /usr/share/nvim/runtime/filetype.vim
+    011.230: sourcing /data/cache/plugins/nvim_pure/start/nvim-treesitter/plugin/nvim-treesitter.lua
+
+
+FAIL: all plugins dirs are hiddenly added to &rtp -- so many ENOENT anyway
+  TODO:DEBUG: $ strace
+
+WTF: still sourced despite removed from &rtp
+  010.410  000.071  000.048: sourcing /etc/xdg/nvim/sysinit.vim

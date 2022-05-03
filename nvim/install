@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+source ~/.shell/func.d/packages
+
+pkg_inst neovim
+
+# VIZ. $ nvr to talk to vim from inside ranger
+aur_inst neovim-remote
+
+
+# DEPS:(aur/python-lsp-all):
+#   python-pylsp-rope ALSO: pip install pylsp-autoimport && auri python-autoimport
+pkg_inst python-pylint python-lsp-{server,black}
+aur_inst python-pylsp-mypy python-lsp-isort
