@@ -1,4 +1,6 @@
 
+USE: [090ef894] [nvim] minimal config for testing
+
 DEBUG:PERF
   $ sudo /usr/share/bcc/tools/execsnoop -T
   $ v --startuptime /t/log merge.py
@@ -7,6 +9,9 @@ DEBUG:PERF
     018.911: sourcing /@/airy/nvim/pack/pure/start/nvim-solarized-lua/colors/solarized.lua
     013.932: sourcing /usr/share/nvim/runtime/filetype.vim
     011.230: sourcing /data/cache/plugins/nvim_pure/start/nvim-treesitter/plugin/nvim-treesitter.lua
+
+  ALSO: Speedup neovim - rok ⌇⡢⡱⢨⢉
+    https://aca.github.io/neovim_startuptime.html
 
 
 FAIL: all plugins dirs are hiddenly added to &rtp -- so many ENOENT anyway

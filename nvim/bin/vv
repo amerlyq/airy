@@ -1,0 +1,7 @@
+#!/bin/sh
+# SRC: /usr/share/vim/vimfiles/plugin/redact_pass.vim
+export XDG_CONFIG_HOME=/var/empty XDG_DATA_HOME=/var/empty
+exec /usr/bin/nvim -n -u NONE --clean \
+  --cmd "set nobackup nowritebackup noswapfile noundofile viminfo= shada=" \
+  --cmd "let g:loaded_remote_plugins=0" \
+  "$@"

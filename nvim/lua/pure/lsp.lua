@@ -1,6 +1,6 @@
 print(123)
 
-vim.cmd [[packadd! nvim-lspconfig]]
+vim.cmd [[packadd nvim-lspconfig]]
 
 local on_attach = function(client, bufnr)
   vim.api.nvim_create_autocmd('BufWritePre', {

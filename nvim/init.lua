@@ -13,13 +13,14 @@ vim.cmd 'colorscheme airy'            -- PERF=2ms
 -- vim.cmd [[colorscheme solarized]]  -- PERF=19ms
 
 
--- ALT: nvim/after/ftplugin/python.lua
+--FAIL? "packadd" may add "autocmd Filetype" but they won't be triggered
+--ALT: nvim/after/ftplugin/python.lua
 vim.api.nvim_create_autocmd('FileType', {
   desc = "(lazy) LSP and TreeSitter",
   pattern = 'python',  -- vim.bo.filetype
   nested = true,
   callback = function()
-    require'pure.lsp'
-    vim.cmd [[packadd! nvim-treesitter]]
+    require 'pure.lsp'
+    vim.cmd [[packadd nvim-treesitter]]
   end
 })
