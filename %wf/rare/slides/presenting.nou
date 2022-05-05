@@ -1,6 +1,6 @@
 
 +++ Screencast your keys. ⌇⡡⡑⡛⡎
-  https://www.thregr.org/~wavexx/software/screenkey/
+  OFF: https://www.thregr.org/~wavexx/software/screenkey/
   https://gitlab.com/screenkey/screenkey
   [⡊⢬] 20m FIND screen keypress software
     [X] !! WARN:SECU: all my manually typed passwords will be visible
@@ -8,6 +8,9 @@
       $ screenkey --no-systray --geometry 1400x800+2400+0 --font-size large --mods-mode emacs --font monospace
       [$] IDEA:NICE: print pressed keys into !xmobar in a place of MPD widget
         BET: simply move screenkey window to overlap there
-        ::: USAGE: $ screenkey --no-systray --geometry 1600x500+800+1740 --font-size large --mods-mode emacs --font monospace
+        ::: USAGE: $ screenkey --no-systray --opacity=1 --persist --timeout=0 --position=fixed --geometry=48%x5%+16%+96% --font-size=large --font=monospace --mods-mode=emacs
+          HACK: toggle for "sudo" prompt by pressing both Shift (or Ctrl/Alt)
+          ALT:(--fixed): hold Shift/Ctrl to keep window visible
+
     [$] does not builds due to patched gkt3
       $ showmethekey-gtk

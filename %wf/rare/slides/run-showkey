@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#%SUMMARY: show pressed keys over !xmobar
+#%USAGE: $ ./$0
+set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+exec screenkey --no-systray --opacity=0 --persist --timeout=0 --position=fixed --geometry=48%x120+16%+2064 --font-size=large --font=monospace --mods-mode=emacs
