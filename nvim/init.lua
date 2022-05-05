@@ -9,7 +9,16 @@ o.shortmess:remove {'F'} -- DFL=filnxtToOF
 vim.opt.whichwrap:remove({ 'b', 's' })
 
 require 'airy.fastboot'
+require 'airy.options'
 require 'airy.statusline'
+
+require 'keys.lead'
+require 'keys.escape'
+require 'keys.move'
+require 'keys.edit'
+require 'keys.select'
+require 'keys.plugins'
+
 
 o.termguicolors = true
 -- [_] NICE:TRY: rewrite to Lua batch-API -- *api-highlights* nvim_buf_add_highlight()

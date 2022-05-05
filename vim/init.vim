@@ -3,18 +3,7 @@ let $VIMHOME=fnamemodify(resolve(expand('<sfile>')), ':h')
 let g:indent_blankline_char = " "
 let g:indent_blankline_show_first_indent_level = v:false
 
-lua << EOF
-local runtime_path = vim.split(package.path, ';')
-table.insert(runtime_path, 'lua/?.lua')
-table.insert(runtime_path, 'lua/?/init.lua')
-require 'plugins.lualine'
-EOF
-
 execute 'source $VIMHOME/cfg/vimrc'
-
-nnoremap <M-o> :RnvimrToggle<CR>
-tnoremap <M-o> <C-\><C-n>:RnvimrToggle<CR>
-tnoremap <M-i> <C-\><C-n>:RnvimrResize<CR>
 
 " hi! Visual  guibg=#586e75 gui=None guifg=#002b36
 hi! Visual  cterm=None,nocombine ctermbg=242 guibg=#839496 gui=None,nocombine guifg=#002b36

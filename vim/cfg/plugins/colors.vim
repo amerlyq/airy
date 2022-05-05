@@ -3,17 +3,17 @@
 
 "" Fast bottom/top status panels w/ integration {{{1
 " USE: Directly pick buffer on <M-1..9> OR [Frame]1..9
-" call dein#add('vim-airline/vim-airline-themes', {'lazy': 0})
-" call dein#add('vim-airline/vim-airline', {
-"   \ 'on_event': 'VimEnter',
-"   \ 'depends': 'vim-airline-themes',
-"   \ 'hook_source': _hcat('airline.src'),
-"   \ 'hook_add': "
-" \\n   for i in range(1,9)
-" \\n     call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
-" \\n     call Map_nxo('<M-'.i.'>', '<Plug>AirlineSelectTab'.i, 'n')
-" \\n   endfor
-" \"})
+call dein#add('vim-airline/vim-airline-themes', {'lazy': 0})
+call dein#add('vim-airline/vim-airline', {
+  \ 'on_event': 'VimEnter',
+  \ 'depends': 'vim-airline-themes',
+  \ 'hook_source': _hcat('airline.src'),
+  \ 'hook_add': "
+\\n   for i in range(1,9)
+\\n     call Map_nxo('[Frame]'.i, '<Plug>AirlineSelectTab'.i, 'n')
+\\n     call Map_nxo('<M-'.i.'>', '<Plug>AirlineSelectTab'.i, 'n')
+\\n   endfor
+\"})
 
 
 
@@ -26,8 +26,8 @@
 "" Sticked to this colorscheme 2+ years already... {{{1
 " ALT:(both) https://github.com/Samuel-Phillips/nvim-colors-solarized
 
-" call dein#add('lifepillar/vim-solarized8', {'lazy': 0,
-"   \ 'hook_add': _hcat('solarized.add')})
+call dein#add('lifepillar/vim-solarized8', {'lazy': 0,
+  \ 'hook_add': _hcat('solarized.add')})
 
 " DEV: simplified solarized -- with menu/etc removed
 "   -- possibly with re-defined colors for nou.vim?

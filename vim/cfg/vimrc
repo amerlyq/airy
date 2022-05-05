@@ -41,7 +41,7 @@ syntax enable  " 'enable' only sets groups not set yet. Use 'on' to overwrite
 try
   if exists('$TMUX') && &t_Co <= 16
     " solarized8_[light|dark][|_[low|high|flat]]
-    color slate |else| color solarized
+    color slate |else| color solarized8
   endif
 catch /^Vim\%((\a\+)\)\=:E185/
   color slate
