@@ -84,7 +84,10 @@ local highlights = {
   PmenuThumb       = { bg='#839496' },
   Question         = { fg='#2aa198', bold=true },
   Search           = { fg='#b58900', reverse=true },
-  SignColumn       = { fg='#839496' },
+  --FIXED: dark „fissure“ on the left of linenumbers column
+  -- [DiffAdd, DiffChange, DiffDelete, DiffText, SignColumn, LineNr, FoldColumn, SpecialKey]
+  SignColumn       = { link='LineNr' },
+  -- SignColumn       = { fg='#839496' },
   Visual           = { fg='#586e75', bg='#002b36', reverse=true },
   VisualNOS        = { bg='#073642', reverse=true },
   WarningMsg       = { fg='#cb4b16', bold=true },
@@ -106,6 +109,13 @@ local highlights = {
   ReplaceMode      = { fg='#cb4b16', bg='#fdf6e3', reverse=true },
   VisualMode       = { fg='#d33682', bg='#fdf6e3', reverse=true },
   CommandMode      = { fg='#d33682', bg='#fdf6e3', reverse=true },
+
+  --FIXED: make 'listchars' hardly visible
+  -- vim.highlight.create('Whitespace', {ctermfg=0, ctermbg=8, guifg='#073642', guibg='#002b36', gui=nocombine}, false)
+  Whitespace       = { fg='#072f3b' },
+
+  --FIXED: wrong .py "def …" color
+  -- vim.highlight.link("TSKeywordFunction", "TSKeyword", true)
 }
 
 
