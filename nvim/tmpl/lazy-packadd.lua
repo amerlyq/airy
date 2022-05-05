@@ -22,6 +22,7 @@
 ----[:/init.lua]----
 --(boilerplate:trigger)
 --ALT: nvim/after/ftplugin/python.lua
+--ALT:BET? on VimEnter -> if ft==python then load
 vim.api.nvim_create_autocmd('FileType', {
   -- group = api.nvim_create_augroup('LazyPackadd', {}),
   desc = "(Lazy) packadd LSP and TreeSitter",
@@ -33,9 +34,6 @@ vim.api.nvim_create_autocmd('FileType', {
   end
 })
 
-  api.nvim_create_autocmd("FileType", {
-    desc = "Reattach module",
-  })
 
 
 ----[:/lua/lazy/lsp.lua]----

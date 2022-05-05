@@ -20,13 +20,20 @@ o.breakindent = true
 --Save undo history
 vim.opt.undofile = true
 
+--FIXME:FAIL:(once=true): only restore position on first opening
+--ALT: https://github.com/vladdoster/remember.nvim
+vim.api.nvim_create_autocmd('BufReadPost', {
+  desc = "(State) restore cursor position",
+  command = 'silent! normal! g`"zv'
+})
+
 --Case insensitive searching UNLESS /C or capital in search
 o.ignorecase = true
 o.smartcase = true
 
 --Decrease update time
-o.updatetime = 250
-vim.wo.signcolumn = 'yes'
+o.updatetime = 1000
+vim.wo.signcolumn = 'number'
 
 o.cursorline = true
 o.list = true

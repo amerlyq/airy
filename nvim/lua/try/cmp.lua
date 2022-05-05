@@ -3,6 +3,9 @@
 -- https://github.com/L3MON4D3/LuaSnip
 local luasnip = require 'luasnip'
 
+-- CHECK Since updating to 0.7 I can no longer cycle through LSP completions with ctrl-n and ctrl-p : neovim ⌇⡢⡴⠋⠣
+--   https://www.reddit.com/r/neovim/comments/uehlkq/since_updating_to_07_i_can_no_longer_cycle/
+
 -- nvim-cmp setup
 -- https://github.com/hrsh7th/nvim-cmp
 local cmp = require 'cmp'

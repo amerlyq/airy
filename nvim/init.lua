@@ -21,8 +21,8 @@ require 'keys.plugins'
 
 
 o.termguicolors = true
--- [_] NICE:TRY: rewrite to Lua batch-API -- *api-highlights* nvim_buf_add_highlight()
-vim.cmd 'colorscheme airy'            -- PERF=2ms
+vim.cmd 'colorscheme airy'            -- PERF=1.8ms
+-- vim.cmd 'colorscheme airy_viml'    -- PERF=2ms
 -- vim.g.material_style = "deep ocean"
 -- vim.cmd 'colorscheme material'     -- PERF=8ms
 -- vim.cmd 'colorscheme soluarized'   -- PERF=12ms
