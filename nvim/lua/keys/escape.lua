@@ -1,6 +1,7 @@
 local K = require 'keys.K'
 
 --Buffers save/close/exit
+-- [_] THINK:MAYBE: replace by "set autowriteall"
 K('i', ',s', '<Esc>:update<CR>')
 K('nx', ',s', ':<C-U>update<CR>')
 
