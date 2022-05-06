@@ -56,12 +56,22 @@ cmp.setup {
   }),
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },  -- https://github.com/hrsh7th/cmp-nvim-lsp
-    -- { name = 'vsnip' },  -- For vsnip users.
+
     { name = 'luasnip' },   -- https://github.com/saadparwaiz1/cmp_luasnip
+    -- ALT: disable filtering completion candidates by snippet's show_condition
+    -- { name = 'luasnip', option = { use_show_condition = false } },
+
     -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
+    -- { name = 'vsnip' },  -- For vsnip users.
   }),
 }
+
+-- Loading snippets
+luasnip.filetype_extend("all", { "_" })
+require("luasnip.loaders.from_snipmate").lazy_load(opts)
+-- require("luasnip.loaders.from_snipmate").load(opts) -- opts can be ommited
+-- require("luasnip.loaders.from_lua").lazy_load(opts)
 
 
 if vim.fn.has('vim_starting') == 0 then

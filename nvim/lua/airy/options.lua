@@ -40,5 +40,5 @@ o.list = true
 vim.opt.listchars = {tab='▸ ', trail='·', extends='»', precedes='«', nbsp='␣' }
 
 -- Set completeopt to have a better completion experience
-o.completeopt = 'menu,menuone,noselect'
+o.completeopt = 'menuone,noselect'  -- menu,
 o.whichwrap = '<,>,[,]'

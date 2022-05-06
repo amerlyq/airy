@@ -1,19 +1,29 @@
 --[Deferred loading of large plugins]
 
-local lazy_starting = true
+local lazy_done = false
 
 local seen_filetypes = {}
 
 
-local function lazy_ft(t)
-  if t then
-    seen_filetypes[t.match] = true
+local function load_now(t)
+  if t.match == 'lua' then
+    local p = vim.fn.fnamemodify(t.file, ":p")
+    -- NOTE: load plugin immediately only for my colorscheme
+    if p:match('/colors/airy.lua$') then
+      vim.cmd [[ packadd nvim-colorizer.lua ]]
+      require'colorizer'.setup {
+        'lua';
+        'css';
+        'javascript';
+        html = { mode = 'foreground'; }
+      }
+      require'colorizer'.attach_to_buffer(t.buf)
+    end
   end
+end
 
-  if lazy_starting then
-    return
-  end
 
+local function load_lazy()
   -- DEBUG: print(vim.inspect(g.lazy_filetypes))
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
   if seen_filetypes['python'] then
@@ -23,10 +33,22 @@ local function lazy_ft(t)
 end
 
 
+local function lazy_ft(t)
+  if t then
+    seen_filetypes[t.match] = true
+    load_now(t)
+  end
+  if lazy_done then
+    load_lazy()
+  end
+end
+
+
 local function lazy_packadd()
   require 'lazy.cmp' -- +luasnip
-  lazy_starting = false
-  lazy_ft()
+
+  lazy_done = true
+  load_lazy()
 
   -- WARN: packadd adds "after" to &rtp but skips loading
   --   VIZ: pack/*/opt/{name}/{plugin,ftdetect}/**/*.{vim,lua}
@@ -44,6 +66,8 @@ local function lazy_packadd()
 
   -- FUTURE:MAYBE: emit a user 'event' to chain my other pieces
   -- doautocmd User PluginsLoaded
+  vim.notify("DONE: lazy")
+  -- vim.notify(("%s %s"):format(count, name), res == "err" and vim.log.levels.ERROR)
 end
 
 
