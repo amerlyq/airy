@@ -32,3 +32,59 @@
     [%] 45m lazy for "treesitter" too
       lua/nvim-treesitter/configs.lua:  api.nvim_create_autocmd("FileType", {
       lua/nvim-treesitter/indent.lua:  vim.api.nvim_create_autocmd("Filetype", {
+  [_] #nvim IDEA:PERF: disable "filetype on"
+  [_] HACK:TRY: lazy load plugins on "FuncUndefined"
+    ~/.cache/vim/dein/repos/github.com/Shougo/dein.vim/autoload/dein/min.vim:30
+    [_] NICE:ALT: plugins which are not easily automated (e.g. vim-surround) -- can be loaded after delay
+      The illusion of fast startup times in vim | Devlog ⌇⡢⡳⡰⢽
+        https://vonheikemen.github.io/devlog/tools/the-illusion-of-fast-startup-times-in-vim/
+    [_] ALT: keybinding loading for e.g. :PlantUML
+      command! MarkdownPreview packadd markdown-preview.nvim | call mkdp#util#open_preview_page()"
+      autocmd! FileType qf packadd quickfix-reflector.vim
+
+
+2022-05-05-Thu-W18
+  [%] 4h20m CFG #nvim in Lua ⌇⡢⡴⣌⢣
+    [X] 35m XLR: links
+    [⡢⡳⣢⢌] 25m Speedup neovim - rok ⌇⡢⡳⣢⢇
+      https://aca.github.io/neovim_startuptime.html
+    [X] 25m MOVE vim/lua into nvim
+    [⡢⡳⣴⢾] 50m SEIZE https://www.reddit.com/r/vim/comments/ufgrl8/journey_to_the_ultimate_imap_jk_esc/
+    [X] 15m PERF #nvim
+    [⡢⡴⠒⣞] 1h50m PERF colorscheme in .lua batch API
+      [X] NICE:(nvim_set_hl): use as a base
+        /@/plugins/nvim/core/start/nvim-treesitter/plugin/nvim-treesitter.lua
+      [⡢⡴⠃⣰] SEE: *api-highlights* nvim_buf_add_highlight()
+        PERF:NOTE: hl multiple regions in buf by single group ##
+          src = vim.new_highlight_source()
+          buf = vim.current.buffer
+          for i in range(5):
+              buf.add_highlight("String",i,0,-1,src_id=src)
+      [⡢⡴⠐⣭] FAIL: should use ns_id=0 to override colorscheme
+        # local ns_id = vim.api.nvim_create_namespace(vim.g.colors_name)
+      [⡢⡴⠑⢶] CMP: almost no difference
+        OLD: # 017.366  002.150  002.150: sourcing /@/airy/nvim/colors/airy.vim
+        NEW: # 017.073  001.871  001.871: sourcing /@/airy/nvim/colors/airy.lua
+      [⡢⡴⠒⢮] TRY: "blend/combine" to highlight word "hi" in bold w/o altering its color
+        https://git.packetlostandfound.us/chiefnoah/neovim/commit/628f8f3dfdbc734096b04c3040c1f4d2cea873c4
+        ::: FAIL: "blend" works like "opacity"
+           and "nocombine" ¦ override attributes instead of combining them
+    [%⡢⡴⠝⢉] 40m FIXME lazy load for "treesitter"
+      [X] check PERF logs
+  [_] TRY: use similar hi! by treesitter like in Semshi
+    [_] TODO: re-create colorscheme from zero -- redefine only needed groups
+      USE: as a base -- vim.g.material_style = "deep ocean" /@/plugins/#/material.nvim
+  [_] #nvim USE new cfg for .nou
+    [_] NEED: merge notches/etc. plugins into single pack with nou.vim
+    [_] NEED: bkgr ranger
+  [_] INSTALL:
+    andymass/vim-matchup: vim match-up: even better % navigate and highlight matching words modern matchit and matchparen ⌇⡢⡳⣞⠢
+      https://github.com/andymass/vim-matchup
+      [_] TRY: lazy load by pressing "%"
+    phaazon/hop.nvim: Neovim motions on speed! ⌇⡢⡳⣢⡈
+      https://github.com/phaazon/hop.nvim
+      nmap <silent><Leader>w :packadd hop.nvim \| :lua require'hop'.jump_words()<cr>
+    Intelligently reopen files at your last edit position with `remember.nvim` : neovim ⌇⡢⡴⠈⣉
+      https://www.reddit.com/r/neovim/comments/ufi9ws/intelligently_reopen_files_at_your_last_edit/
+      Preserve last editing position in VIM - Stack Overflow ⌇⡢⡴⠈⣠
+        https://stackoverflow.com/questions/7894330/preserve-last-editing-position-in-vim/14449484#14449484
