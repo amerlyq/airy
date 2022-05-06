@@ -19,13 +19,4 @@ require 'keys.edit'
 require 'keys.select'
 require 'keys.plugins'
 
-
-vim.api.nvim_create_autocmd('FileType', {
-  desc = "(Lazy) packadd LSP and TreeSitter",
-  once = true,
-  pattern = 'python',
-  callback = function()
-    require 'lazy.treesitter'
-    require 'lazy.lsp'
-  end
-})
+require 'lazy.init'

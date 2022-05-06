@@ -19,6 +19,7 @@ local o, g = vim.opt, vim.g
 -- + /@/airy/nvim/after
 -- ? /usr/share/vim/vimfiles
 o.runtimepath = { '/@/airy/nvim', '/usr/share/nvim/runtime', '/@/airy/nvim/after' }
+o.packpath = { '/@/airy/nvim', '/usr/share/nvim/runtime' }
 
 
 g.loaded_tutor_mode_plugin = 0

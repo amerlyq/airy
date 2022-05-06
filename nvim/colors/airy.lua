@@ -118,8 +118,13 @@ local highlights = {
   -- vim.highlight.link("TSKeywordFunction", "TSKeyword", true)
 }
 
-
 local nvim_set_hl = vim.api.nvim_set_hl
+-- local fnm = 'nvim_set_hl'
+-- local reqs = {}
 for nm, attrs in pairs(highlights) do
   nvim_set_hl(0, nm, attrs)
+  -- table.insert(reqs, {fnm, {0, nm, attrs}})
 end
+-- FAIL: nvim_call_atomic not available via Lua on nvim 0.4.3 or 0.4.4 · Issue #13191 · neovim/neovim ⌇⡢⡵⠲⡀
+--   https://github.com/neovim/neovim/issues/13191
+-- vim.api.nvim_call_atomic(reqs)
