@@ -31,9 +31,10 @@ vim.api.nvim_create_autocmd('BufReadPost', {
 o.ignorecase = true
 o.smartcase = true
 
---Decrease update time
+--Decrease update time for write(swap) and CursorHold
 o.updatetime = 1000
-vim.wo.signcolumn = 'number'
+--DISABLED('number'): I'm used to detect LSP finished loading by the time when column appears
+vim.wo.signcolumn = 'auto'
 
 o.cursorline = true
 o.list = true

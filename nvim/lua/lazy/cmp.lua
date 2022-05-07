@@ -69,8 +69,8 @@ cmp.setup {
 
 -- Loading snippets
 luasnip.filetype_extend("all", { "_" })
-require("luasnip.loaders.from_snipmate").lazy_load(opts)
--- require("luasnip.loaders.from_snipmate").load(opts) -- opts can be ommited
+require("luasnip.loaders.from_snipmate").load()
+-- require("luasnip.loaders.from_snipmate").lazy_load(opts)
 -- require("luasnip.loaders.from_lua").lazy_load(opts)
 
 

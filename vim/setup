@@ -5,14 +5,14 @@
 source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
-config=${XDG_CONFIG_HOME:=~/.config}/nvim
-linkcp "$PWD" ~/.vim
-linkcp "$PWD" "$config"
+# config=${XDG_CONFIG_HOME:=~/.config}/nvim
+# linkcp "$PWD" "$config"
+# linkcp "$PWD" ~/.vim
 linkcp ideavimrc ~/.ideavimrc
 
-cache=${XDG_DATA_HOME:=~/.cache}
-mkdir -vp "$cache"/{shada,vim}
-cfgNo c || rm -rf "$cache"/vim/*
+# cache=${XDG_DATA_HOME:=~/.cache}
+# mkdir -vp "$cache"/{shada,vim}
+# cfgNo c || rm -rf "$cache"/vim/*
 
 ### SPELL ###
 # WARNING: first clean install will always fail as uk*.sug file is absent!

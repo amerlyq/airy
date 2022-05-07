@@ -32,7 +32,8 @@
     [%] 45m lazy for "treesitter" too
       lua/nvim-treesitter/configs.lua:  api.nvim_create_autocmd("FileType", {
       lua/nvim-treesitter/indent.lua:  vim.api.nvim_create_autocmd("Filetype", {
-  [_] #nvim IDEA:PERF: disable "filetype on"
+  [_] #nvim IDEA:PERF: disable "filetype on" by DFL, and then enable only on demand or after delay
+    https://github.com/LunarVim/LunarVim/issues/1418
   [_] HACK:TRY: lazy load plugins on "FuncUndefined"
     ~/.cache/vim/dein/repos/github.com/Shougo/dein.vim/autoload/dein/min.vim:30
     [_] NICE:ALT: plugins which are not easily automated (e.g. vim-surround) -- can be loaded after delay
@@ -41,6 +42,8 @@
     [_] ALT: keybinding loading for e.g. :PlantUML
       command! MarkdownPreview packadd markdown-preview.nvim | call mkdp#util#open_preview_page()"
       autocmd! FileType qf packadd quickfix-reflector.vim
+    [_] SEIZE: ready-to-use code to load on fn/cmd call ⌇⡢⡶⡳⣝
+      https://github.com/tjdevries/lazy.nvim
 
 
 2022-05-05-Thu-W18
@@ -133,3 +136,7 @@
   [_] CFG super-tab
     Example mappings · hrsh7th/nvim-cmp Wiki ⌇⡢⡵⡗⢢
       https://github.com/hrsh7th/nvim-cmp/wiki/Example-mappings#luasnip
+
+
+2022-05-07-Sat-W18
+  [_] CFG #nvim in Lua ⌇⡢⡶⡅⣋

@@ -78,5 +78,9 @@ require('nvim-treesitter.configs').setup {
 
 -- FAIL: cmds not loaded when directly opening .py file
 -- if vim.fn.has('vim_starting') == 0 then
-vim.cmd [[packadd nvim-treesitter]]
+vim.cmd [[
+packadd nvim-treesitter
+packadd nvim-treesitter-textobjects
+packadd nvim-ts-context-commentstring
+]]
 -- end

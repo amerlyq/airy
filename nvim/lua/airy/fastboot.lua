@@ -21,13 +21,18 @@ local o, g = vim.opt, vim.g
 o.runtimepath = { '/@/airy/nvim', '/usr/share/nvim/runtime', '/@/airy/nvim/after' }
 o.packpath = { '/@/airy/nvim', '/usr/share/nvim/runtime' }
 
+--NEED:USE: ":rshada" in lazy load
+o.shadafile = 'NONE'
 
+--ALT: copy-paste and edit /usr/share/nvim and export new $VIMRUNTIME
+--  NICE: won't load all those unnecessary files/plugins at all
 g.loaded_tutor_mode_plugin = 0
 g.loaded_2html_plugin = 0
 g.loaded_netrwPlugin = 0
 g.loaded_tarPlugin = 0
 g.loaded_zipPlugin = 0
 g.loaded_gzip = 0
+g.loaded_shada_plugin = 0  -- DISABLED: register FileType *.shada
 
 g.loaded_ruby_provider = 0
 g.loaded_node_provider = 0
@@ -45,7 +50,6 @@ g.did_load_filetypes = 0
 -- let g:loaded_logiPat           = 0
 -- let g:loaded_rrhelper          = 0
 -- let g:loaded_man               = 0
--- let g:loaded_shada_plugin      = 0
 -- let g:loaded_spellfile_plugin  = 0
 -- let g:loaded_netrw             = 0
 -- let g:loaded_remote_plugins    = 0

@@ -29,6 +29,13 @@ local function load_lazy()
   if seen_filetypes['python'] then
     require 'lazy.treesitter'
     require 'lazy.lsp'
+
+    vim.cmd [[
+      augroup MyAutoCmd | autocmd! | augroup END
+      runtime seize/jupyter-vim.vim
+      packadd jupyter-vim
+      call BufMap_jupyter_vim()
+    ]]
   end
 end
 
@@ -45,6 +52,10 @@ end
 
 
 local function lazy_packadd()
+  --WARN: marks (last position) is only written to ShaDa on vim exit
+  --  MAYBE: use "au BufWipeout :wshada" to store them
+  vim.cmd [[ set shadafile= | rshada ]]
+
   require 'lazy.cmp' -- +luasnip
 
   lazy_done = true
@@ -66,7 +77,7 @@ local function lazy_packadd()
 
   -- FUTURE:MAYBE: emit a user 'event' to chain my other pieces
   -- doautocmd User PluginsLoaded
-  vim.notify("DONE: lazy")
+  vim.notify("Lazy: DONE")
   -- vim.notify(("%s %s"):format(count, name), res == "err" and vim.log.levels.ERROR)
 end
 
@@ -76,8 +87,9 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = lazy_ft
 })
 
+vim.defer_fn(lazy_packadd, 250)
 -- NOTE: using wait=1s to exit from short sessions immediately
-vim.fn.timer_start(1000, lazy_packadd)
+-- vim.fn.timer_start(1000, lazy_packadd)
 -- vim.api.nvim_create_autocmd('VimEnter', {
 --   desc = "Lazy packadd by filetype + cmp",
 --   callback = lazy_packadd
