@@ -27,15 +27,19 @@ local function load_lazy()
   -- DEBUG: print(vim.inspect(g.lazy_filetypes))
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
   if seen_filetypes['python'] then
+    -- FIXME: load both for .py and .lua
     require 'lazy.treesitter'
     require 'lazy.lsp'
 
-    vim.cmd [[
-      augroup MyAutoCmd | autocmd! | augroup END
-      runtime seize/jupyter-vim.vim
-      packadd jupyter-vim
-      call BufMap_jupyter_vim()
-    ]]
+    --FAIL: should load mappings only inside buffer
+    if vim.bo.filetype == 'python' then
+      vim.cmd [[
+        augroup MyAutoCmd | autocmd! | augroup END
+        runtime seize/jupyter-vim.vim
+        packadd jupyter-vim
+        call BufMap_jupyter_vim()
+      ]]
+    end
   end
 end
 
@@ -51,29 +55,79 @@ local function lazy_ft(t)
 end
 
 
-local function lazy_packadd()
-  --WARN: marks (last position) is only written to ShaDa on vim exit
-  --  MAYBE: use "au BufWipeout :wshada" to store them
-  vim.cmd [[ set shadafile= | rshada ]]
-
+local function load_always()
   require 'lazy.cmp' -- +luasnip
 
-  lazy_done = true
-  load_lazy()
+  -- Gitsigns
+  -- Add git related info in the signs columns and popups
+  --DEP: plenary.nvim
+  --SRC: https://github.com/lewis6991/gitsigns.nvim
+  require('gitsigns').setup {
+    signs = {
+      add = { text = '+' },
+      change = { text = '~' },
+      delete = { text = '_' },
+      topdelete = { text = '‾' },
+      changedelete = { text = '~' },
+    },
+  }
 
+  --Enable Comment.nvim
+  -- https://github.com/numToStr/Comment.nvim
+  -- require('Comment').setup()
+  require('nvim_comment').setup {
+    -- HACK: pull "commentstring" based on HEREDOC language
+    -- hook = function()
+    --   if vim.api.nvim_buf_get_option(0, "filetype") == "vue" then
+    --     require("ts_context_commentstring.internal").update_commentstring()
+    --   end
+    -- end
+  }
+end
+
+
+local function source_plugins()
   -- WARN: packadd adds "after" to &rtp but skips loading
   --   VIZ: pack/*/opt/{name}/{plugin,ftdetect}/**/*.{vim,lua}
 
   -- DEBUG: what files ':runtime' found
   -- vim.opt.verbose = 2
 
+  --WARN: marks (last position) is only written to ShaDa on vim exit
+  --  MAYBE: use "au BufWipeout :wshada" to store them
+  --ALSO:OR: vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')
+  vim.cmd [[
+    runtime! /@/airy/nvim/plugin/*.vim
+    runtime! /@/airy/nvim/plugin/*.lua
+    source $VIMRUNTIME/plugin/rplugin.vim
+
+    packloadall
+    runtime! after/plugin/**/*.vim
+    runtime! after/plugin/**/*.lua
+  ]]
+
   -- VIZ: find -path '*/after/plugin/*'
-  vim.cmd [[ runtime! OPT after/plugin/*.lua ]]
+  -- vim.cmd [[ runtime! OPT after/plugin/*.lua ]]
   -- vim.cmd [[ runtime! OPT  after/plugin/**/*.vim  after/plugin/**/*.lua ]]
   -- local tosrc = vim.api.nvim_get_runtime_file('after/plugin/**/*.lua', true)
   -- for _, f in ipairs(tosrc) do
   --   vim.cmd [[ source f ]]
   -- end
+end
+
+
+local function lazy_packadd()
+  --SRC: https://github.com/lewis6991/impatient.nvim
+  require('impatient')
+  --USAGE :LuaCacheProfile
+  -- require('impatient').enable_profile()
+
+  load_always()
+  lazy_done = true
+  load_lazy()
+  source_plugins()
+
+  vim.cmd 'set shadafile= | rshada'
 
   -- FUTURE:MAYBE: emit a user 'event' to chain my other pieces
   -- doautocmd User PluginsLoaded
@@ -87,10 +141,18 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = lazy_ft
 })
 
+
 vim.defer_fn(lazy_packadd, 250)
+-- vim.api.nvim_create_autocmd('VimEnter', {
+--   desc = "(Lazy) loading ALL deferred plugins",
+--   callback = lazy_packadd
+-- })
+
+
 -- NOTE: using wait=1s to exit from short sessions immediately
 -- vim.fn.timer_start(1000, lazy_packadd)
 -- vim.api.nvim_create_autocmd('VimEnter', {
 --   desc = "Lazy packadd by filetype + cmp",
 --   callback = lazy_packadd
 -- })
+

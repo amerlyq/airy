@@ -1,6 +1,5 @@
 --[Treesitter configuration]
 --%SUMMARY: Highlight, edit, and navigate code using a fast incremental parsing library
-vim.cmd [[packadd! nvim-treesitter]]
 
 --SRC: https://github.com/nvim-treesitter/nvim-treesitter
 --SRC: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
@@ -70,17 +69,3 @@ require('nvim-treesitter.configs').setup {
     },
   },
 }
-
-
---MAYBE: initialize
--- -- require("nvim-treesitter.configs").reattach_module(mod)
--- -- vim.cmd [[ setlocal indentexpr=nvim_treesitter#indent() ]]
-
--- FAIL: cmds not loaded when directly opening .py file
--- if vim.fn.has('vim_starting') == 0 then
-vim.cmd [[
-packadd nvim-treesitter
-packadd nvim-treesitter-textobjects
-packadd nvim-ts-context-commentstring
-]]
--- end

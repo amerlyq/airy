@@ -42,7 +42,9 @@ end
 -- vim.api.nvim_exec_autocmds({'FileType'}, {group='', buffer=0, pattern='python', modeline=false})
 --HACK: copy-pasted "autocmd FileType" to avoid triggering all events for python in ALL plugins
 --  NOTE: run only once -- for the current buffer, which triggered "packadd", afterwards STD autocmd will do same
+if vim.bo.filetype == 'python' then
 require'lspconfig'["pylsp"].manager.try_add()
+end
 
 
 -- NOTE:(vim_starting=1): if launched by opening .py file

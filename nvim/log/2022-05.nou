@@ -32,8 +32,12 @@
     [%] 45m lazy for "treesitter" too
       lua/nvim-treesitter/configs.lua:  api.nvim_create_autocmd("FileType", {
       lua/nvim-treesitter/indent.lua:  vim.api.nvim_create_autocmd("Filetype", {
-  [_] #nvim IDEA:PERF: disable "filetype on" by DFL, and then enable only on demand or after delay
+  [⡢⡶⢽⠡] #nvim IDEA:PERF: disable "filetype on" by DFL, and then enable only on demand or after delay
     https://github.com/LunarVim/LunarVim/issues/1418
+    ⦅lua⦆ vim.cmd [[ syntax off | filetype off | filetype plugin indent off ]]
+    FAIL: useless, as it sources //{ftplugin,indent}.vim anyways,
+    and then loads additional files to *disable* previously loaded files.
+    Moreover, deferring syntax/highlight results in flickering, which is a pain.
   [_] HACK:TRY: lazy load plugins on "FuncUndefined"
     ~/.cache/vim/dein/repos/github.com/Shougo/dein.vim/autoload/dein/min.vim:30
     [_] NICE:ALT: plugins which are not easily automated (e.g. vim-surround) -- can be loaded after delay

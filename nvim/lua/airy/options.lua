@@ -1,3 +1,4 @@
+-- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 local o, g = vim.opt, vim.g
 
 --Set highlight on search
@@ -19,13 +20,6 @@ o.breakindent = true
 
 --Save undo history
 vim.opt.undofile = true
-
---FIXME:FAIL:(once=true): only restore position on first opening
---ALT: https://github.com/vladdoster/remember.nvim
-vim.api.nvim_create_autocmd('BufReadPost', {
-  desc = "(State) restore cursor position",
-  command = 'silent! normal! g`"zv'
-})
 
 --Case insensitive searching UNLESS /C or capital in search
 o.ignorecase = true

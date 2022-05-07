@@ -1,11 +1,4 @@
 --[nvim-cmp + luasnip]
-vim.cmd [[
-  packadd! nvim-cmp
-  packadd! LuaSnip
-  packadd! cmp-nvim-lsp
-  packadd! cmp_luasnip
-]]
-
 
 -- https://github.com/hrsh7th/nvim-cmp
 local cmp = require 'cmp'
@@ -72,13 +65,3 @@ luasnip.filetype_extend("all", { "_" })
 require("luasnip.loaders.from_snipmate").load()
 -- require("luasnip.loaders.from_snipmate").lazy_load(opts)
 -- require("luasnip.loaders.from_lua").lazy_load(opts)
-
-
-if vim.fn.has('vim_starting') == 0 then
-vim.cmd [[
-  packadd nvim-cmp
-  packadd LuaSnip
-  packadd cmp-nvim-lsp
-  packadd cmp_luasnip
-]]
-end
