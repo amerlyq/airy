@@ -37,6 +37,8 @@ local function load_lazy()
         augroup MyAutoCmd | autocmd! | augroup END
         runtime seize/jupyter-vim.vim
         packadd jupyter-vim
+        let b:jupyter_kernel_type = &filetype
+        call jupyter#load#MakeStandardCommands()
         call BufMap_jupyter_vim()
       ]]
     end
@@ -93,11 +95,9 @@ local function source_plugins()
   -- DEBUG: what files ':runtime' found
   -- vim.opt.verbose = 2
 
-  --WARN: marks (last position) is only written to ShaDa on vim exit
-  --  MAYBE: use "au BufWipeout :wshada" to store them
   --ALSO:OR: vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')
   vim.cmd [[
-    runtime! /@/airy/nvim/plugin/*.vim
+    source /@/airy/nvim/plugin/*.vim
     runtime! /@/airy/nvim/plugin/*.lua
     source $VIMRUNTIME/plugin/rplugin.vim
 
@@ -127,11 +127,11 @@ local function lazy_packadd()
   load_lazy()
   source_plugins()
 
-  vim.cmd 'set shadafile= | rshada'
-
   -- FUTURE:MAYBE: emit a user 'event' to chain my other pieces
   -- doautocmd User PluginsLoaded
-  vim.notify("Lazy: DONE")
+
+  --DISABLED: very distracting periphery text change
+  -- vim.notify("Lazy: DONE")
   -- vim.notify(("%s %s"):format(count, name), res == "err" and vim.log.levels.ERROR)
 end
 

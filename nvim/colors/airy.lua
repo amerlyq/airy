@@ -60,11 +60,12 @@ local highlights = {
   DiffDelete       = { fg='#dc322f', bg='#073642', bold=true },
   DiffText         = { fg='#268bd2', bg='#073642', sp='#268bd2' },
 
-  StatusLine       = { fg='#839496', bg='#073642', reverse=true },
+  StatusLine       = { fg='#839496', bg='#073642' },
   StatusLineNC     = { fg='#586e75', bg='#073642', reverse=true },
-  TabLine          = { fg='#586e75', bg='#073642', reverse=true },
-  TabLineFill      = { fg='#586e75', bg='#073642', reverse=true },
-  TabLineSel       = { fg='#839496', bg='#073642', reverse=true },
+  -- TabLine,TabLineFill          = { fg='#586e75', bg='#073642', reverse=true },
+  TabLine          = { fg='#828997', bg='#073642' },
+  TabLineFill      = { fg='#586e75', bg='#073642' },
+  TabLineSel       = { fg='#abb2bf', bg='#002b36', bold=true },
   VertSplit        = { fg='#073642', bg='#586e75' },
 
   ColorColumn      = { bg='#073642' },
@@ -113,6 +114,9 @@ local highlights = {
   --FIXED: make 'listchars' hardly visible
   -- vim.highlight.create('Whitespace', {ctermfg=0, ctermbg=8, guifg='#073642', guibg='#002b36', gui=nocombine}, false)
   Whitespace       = { fg='#072f3b' },
+
+  --FIXED: default yank hl is irritating
+  TextYank         = { reverse=true },
 
   --FIXED: wrong .py "def …" color
   -- vim.highlight.link("TSKeywordFunction", "TSKeyword", true)

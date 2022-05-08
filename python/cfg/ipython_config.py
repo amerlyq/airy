@@ -57,7 +57,7 @@ c.InteractiveShellApp.exec_lines = [
 c.InteractiveShellApp.extensions = [
     "autoreload",
     "memory_profiler",
-    "pyflyby",
+    # "pyflyby",
 ]  # @me
 
 ## Dotted module name(s) of one or more IPython extensions to load.

@@ -4,6 +4,8 @@ local K = require 'keys.K'
 K('n', 'go', 'o<Space><Esc>^"_D')
 K('n', 'gO', 'O<Space><Esc>^"_D')
 K('n', 'K',  'a<CR><Right><Esc>')
+K('n', '<C-k>', 'i<CR><Right><Esc>:m .-2<CR>')
+K('n', '<C-j>', ':<C-u>+m.-<CR>J')
 
 
 --Reindent

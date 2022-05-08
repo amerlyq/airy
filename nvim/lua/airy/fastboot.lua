@@ -27,11 +27,20 @@ o.shortmess:remove {'F'} -- DFL=filnxtToOF
 
 -- OR: vim.env.MYVIMRC.parent
 o.runtimepath = { '/@/airy/nvim', vim.env.VIMRUNTIME }  -- '/@/airy/nvim/after'
-o.packpath = '/@/plugins/nvim'
+o.packpath = '/@/plugins/nvim/lazy'
 -- NEED:(python,nou): vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')
 o.loadplugins = false
---NEED:USE: ":rshada" in lazy load
-o.shadafile = 'NONE'
+
+
+--FAIL: waiting the «jump to the last position» is VERY irritating
+--   (here) o.shadafile = 'NONE'
+--   (lazy-load) vim.cmd [[ set shadafile= | rshada | silent! normal! g`"zvzz ]]
+--WARN: marks (last position) is only written to ShaDa on vim exit
+--  MAYBE: use "au BufWipeout :wshada" to store them
+--PERF: reduce .shada file size to ~115kB (5ms) .vs. DFL=660kB (~36ms)
+--  HACK:(edit): source $VIMRUNTIME/plugin/shada.vim | edit /@/xdg_share/nvim/shada/main.shada
+o.shada = { "'30", "<0", "s1", "h", "rterm://" }
+o.history = 999
 
 
 g.loaded_ruby_provider = 0

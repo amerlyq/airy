@@ -9,18 +9,18 @@ autocmd('FileType', {
 
 
 -- Highlight on yank
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-autocmd('TextYankPost', {
-  group = highlight_group,
-  callback = vim.highlight.on_yank
+vim.api.nvim_create_autocmd('TextYankPost', {
+  callback = function() vim.highlight.on_yank { higroup="TextYank", timeout=130 } end,
+  group = vim.api.nvim_create_augroup('YankHighlight', { clear = true }),
 })
 
 
 --FIXME:FAIL:(once=true): only restore position on first opening
 --ALT: https://github.com/vladdoster/remember.nvim
+--WARN: ShaDa should be loaded on startup for this to work
 autocmd('BufReadPost', {
   desc = "(State) restore cursor position",
-  command = 'silent! normal! g`"zv'
+  command = 'silent! normal! g`"zvzz'
 })
 
 

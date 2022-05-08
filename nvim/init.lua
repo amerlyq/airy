@@ -1,5 +1,5 @@
 -- vim:ts=2:sts=2:sw=2:et
-local o, g = vim.opt, vim.g
+vim.cmd [[ let $MYLUA = fnamemodify($MYVIMRC, ':h') . '/lua/' ]]
 
 require 'airy.fastboot'
 
@@ -7,17 +7,16 @@ require 'airy.options'
 require 'airy.colors'
 require 'airy.autocmds'
 
-require 'airy.statusline'
-
 require 'keys.lead'
 require 'keys.escape'
 require 'keys.move'
 require 'keys.edit'
-require 'keys.select'
+require 'keys.visual'
+require 'keys.yank'
+
 require 'keys.plugins'
 
-require 'lazy.init'
+require 'lazy'
+require 'lazy.rnvimr'
 
---PERF: search
-o.grepprg = "rg --vimgrep --smart-case --sortr path --no-follow --hidden --glob '!.git'"
-
+require 'airy.statusline'
