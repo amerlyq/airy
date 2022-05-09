@@ -108,7 +108,7 @@ local function buffers()
       -- local ft = bufgetopt(b, 'filetype')
       local mod = bufgetopt(b, 'modified')
       local hl = (b == cur) and "%#TabLineSel#" or "%#TabLine#"
-      local nm = vim.fn.fnamemodify(fnm, ':t')
+      local nm = fnm and vim.fn.fnamemodify(fnm, ':t') or "[No Name]"
       local sfx = (mod and '+' or '') -- '●'
       s = s .. hl .. " " .. nm .. sfx .. " "
     end

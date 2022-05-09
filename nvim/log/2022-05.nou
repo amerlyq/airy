@@ -163,4 +163,32 @@
 
 
 2022-05-08-Sun-W18
-  [•] CFG #nvim in Lua ⌇⡢⡷⢃⣟
+  [%⡢⡸⠕⡰] 8h30m CFG #nvim in Lua ※⡢⡷⢃⣟
+    [X] 15m TODO: check once again !execsnoop from ranger
+    [⡢⡷⢗⣗] 30m MOVE: rnvimr.vim from "lazy" into "always/preload" to work as netrw (low loading time)
+    [X] 25m ENH //paths
+    [⡢⡷⢾⠿] 1h50m FIX shada,jupyter,ranger
+    [⡢⡷⣱⠔] 3h DEV statusline with bufferlist and hl
+      [⡢⡷⣛⣴] ALSO: print fields if enc!=utf8 or crlf!=unix
+      [⪡⡊⢰] ✗ FIXME: lualine disable calling "git diff" on BufEnter/Write <⡊⢫>
+        https://github.com/feline-nvim/feline.nvim
+        https://github.com/glepnir/galaxyline.nvim
+        https://github.com/beauwilliams/statusline.lua
+        https://github.com/windwp/windline.nvim
+      [X] ALT:DEV: very simple statusline myself
+        [X] ✓ BUT: what about colors and bufferlist ?
+        NICE: https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html
+        https://stackoverflow.com/questions/70234195/neovim-statusline-show-filename-with-minimal-setup-and-without-plugin
+    [⡢⡸⠀⡔] 1h FIXME: old keymaps, statusline hl
+    [⡢⡸⠔⢐] 1h20m FIXME: nested ranger
+      [X] ✗ preload ranger after 1s
+        ::: should remove from init :: nvim_open_win(rnvimr#context#bufnr(), v:true, init_layout)
+      alias failed: No such command: mkdircd
+      Invalid linemode: devicons; should be filename/metatitle/permissions/file ...
+      The error `'doc'` was caused by evaluating the following code:
+        `for k,nm in fm.commands['doc'].lst.items(): cmd("map O{0} doc {1}".format(k, nm))`
+      alias failed: No such command: rg
+
+
+2022-05-09-Mon-W19
+  [_] CFG #nvim in Lua ⌇⡢⡸⣠⢀

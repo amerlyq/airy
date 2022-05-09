@@ -28,8 +28,8 @@ local function load_lazy()
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
   if seen_filetypes['python'] then
     -- FIXME: load both for .py and .lua
-    require 'lazy.treesitter'
-    require 'lazy.lsp'
+    require 'plug.treesitter'
+    require 'plug.lsp'
 
     --FAIL: should load mappings only inside buffer
     if vim.bo.filetype == 'python' then
@@ -58,21 +58,8 @@ end
 
 
 local function load_always()
-  require 'lazy.cmp' -- +luasnip
-
-  -- Gitsigns
-  -- Add git related info in the signs columns and popups
-  --DEP: plenary.nvim
-  --SRC: https://github.com/lewis6991/gitsigns.nvim
-  require('gitsigns').setup {
-    signs = {
-      add = { text = '+' },
-      change = { text = '~' },
-      delete = { text = '_' },
-      topdelete = { text = '‾' },
-      changedelete = { text = '~' },
-    },
-  }
+  require 'plug.cmp' -- +luasnip
+  require 'plug.gitsigns'
 
   --Enable Comment.nvim
   -- https://github.com/numToStr/Comment.nvim

@@ -1,6 +1,10 @@
 local o, g = vim.o, vim.g
 local K = require 'keys.K'
 
+
+K('n', ',tl', "<Cmd>let &showtabline=(&stal?1:2)")
+
+
 --DEBUG
 --SRC: https://github.com/nvim-treesitter/playground
 --OPT: :packadd playground

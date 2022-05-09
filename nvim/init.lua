@@ -17,6 +17,6 @@ require 'keys.yank'
 require 'keys.plugins'
 
 require 'lazy'
-require 'lazy.rnvimr'
+require 'plug.rnvimr'
 
 require 'airy.statusline'
