@@ -2,6 +2,8 @@
 # Termcap
 set -eu
 
+# FIXME: generate config (and call all !tput) only ONCE
+
 # ALT: ...=$'\E[01;38;5;74m'
 ### Colors ###
 export LESS_TERMCAP_md=$(tput bold; tput setaf 2)

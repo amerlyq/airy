@@ -26,12 +26,14 @@ if [[ -z ${name/-[amMwW]} || -z $mail ]]; then
   if [[ $name == -M ]]; then
     name=${WORK_NAME:?}
     mail=${MAIN_MAIL:?}
+    mail=${mail/@/+code@}
   elif [[ $name == -a ]]; then
     name=annex
     mail=${MAIN_MAIL:?}
   elif [[ $name == -m || $repo == /home/* ]]; then
     name=${MAIN_NAME:?}
     mail=${MAIN_MAIL:?}
+    mail=${mail/@/+code@}
   elif [[ $name == -w || $repo == /work/* ]]; then
     name=${WORK_NAME:?}
     mail=${WORK_MAIL:?}

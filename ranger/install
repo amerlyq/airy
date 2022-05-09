@@ -16,6 +16,8 @@ fi
 if distro arch; then
   ## ALT: hunter (Rust) nnn (C)
   # pkg_inst ranger  # OLD: 1.9.3-3 = 2020-11-12
+  # [_] NEED: set __release__=True during AUR install to prevent running "git describe" on each startup
+  #   sed -ri '/^(__release__).*/s//\1 = True/' ranger/__init__.py
   aur_inst ranger-git
   pkg_inst fbida  # framebuffer image viewer for terminal
   # VIZ:(caca) img2txt caca-config cacaclock cacademo cacafire cacaplay cacaserver cacaview
