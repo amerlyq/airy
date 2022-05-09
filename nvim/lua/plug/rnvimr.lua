@@ -4,13 +4,10 @@ local K = require'keys.bind'.K
 g.rnvimr_enable_picker = 1
 -- g.rnvimr_shadow_winblend = 50
 
-g.rnvimr_layout = {
-  relative = 'editor',
-  width= 0.88 * o.columns,
-  height= 0.88 * o.lines,
-  col= 0.06 * o.columns + 2,
-  row= 0.06 * o.lines,
-  style= 'minimal'
+g.rnvimr_presets = {
+  {width = 0.88, height = 0.88, col=0.06, row=0.06},
+  {width = 0.96, height = 0.96, col=0.02, row=0.02},
+  -- {width = 0.98, height = 0.50, col=0.01, row=0.01},
 }
 
 --OR: g.rnvimr_enable_ex = 1

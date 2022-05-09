@@ -15,6 +15,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 
+--FIXME: don't jump after moving between buffers
 --FIXME:FAIL:(once=true): only restore position on first opening
 --ALT: https://github.com/vladdoster/remember.nvim
 --WARN: ShaDa should be loaded on startup for this to work
@@ -45,3 +46,19 @@ autocmd("BufWritePre", {
     vim.fn.winrestview(save)
   end
 })
+
+
+--DISABLED: use "which-key" which overrules this
+--HACK: Infinite wait on mappings, but timeout on keycodes (like <\e..>)
+--WARN: you must eliminate clushing keymaps like ',x' and ',xy'
+-- local K = require'keys.bind'.K
+-- local o, g = vim.opt, vim.g
+-- o.timeout =
+-- set timeoutlen=1000 ttimeoutlen=32
+-- set notimeout ttimeout
+-- " Leave insert mode quickly
+-- augroup FastEscape
+--   autocmd!
+--   au InsertEnter * set timeoutlen=0 ttimeoutlen=0
+--   au InsertLeave * set timeoutlen=1000 ttimeoutlen=32
+-- augroup END

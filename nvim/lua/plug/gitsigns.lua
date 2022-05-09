@@ -1,3 +1,4 @@
+local K = require'keys.bind'.K
 
 -- Gitsigns
 -- Add git related info in the signs columns and popups
@@ -11,7 +12,8 @@
 -- :Gitsigns change_base ~
 -- :Gitsigns reset_buffer
 -- :Gitsigns change_base nil true
-require('gitsigns').setup {
+local M = require('gitsigns')
+M.setup {
   signs = {
     add = { text = '+' },
     change = { text = '~' },
@@ -20,3 +22,6 @@ require('gitsigns').setup {
     changedelete = { text = '~' },
   },
 }
+
+K('n', ']c', M.next_hunk, "(gitsigns) next_hunk")
+K('n', '[c', M.prev_hunk, "(gitsigns) prev_hunk")

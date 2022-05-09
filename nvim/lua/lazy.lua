@@ -5,31 +5,16 @@ local lazy_plugins_loaded = false
 local seen_filetypes = {}
 
 
-local function load_now(t)
-  if t.match == 'lua' then
-    local p = vim.fn.fnamemodify(t.file, ":p")
-    -- NOTE: load plugin immediately only for my colorscheme
-    if p:match('/colors/airy.lua$') then
-      vim.cmd [[ packadd nvim-colorizer.lua ]]
-      require'colorizer'.setup {
-        'lua';
-        'css';
-        'javascript';
-        html = { mode = 'foreground'; }
-      }
-      require'colorizer'.attach_to_buffer(t.buf)
-    end
-  end
-end
-
-
+--BAD: called each time you open buffers of the same type
+--  WKRND: should wrap everything behind "require" singletons
+--    BUT:FIXME: how to be with buffer-local mappings ?
 local function load_ondemand()
   -- DEBUG: print(vim.inspect(g.lazy_filetypes))
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
   if seen_filetypes['python'] then
     -- FIXME: load both for .py and .lua
     require 'plug.treesitter'
-    require 'plug.lsp'
+    require 'lsp.init'
 
     --FAIL: should load mappings only inside buffer
     if vim.bo.filetype == 'python' then
@@ -42,14 +27,28 @@ local function load_ondemand()
         call BufMap_jupyter_vim()
       ]]
     end
+
+  elseif seen_filetypes['lua'] then
+    local t = seen_filetypes['lua']
+    local p = vim.fn.fnamemodify(t.file, ":p")
+    -- NOTE: load plugin immediately only for my colorscheme
+    if p:match('/colors/airy.lua$') then
+      vim.cmd [[ packadd nvim-colorizer.lua ]]
+      require'colorizer'.setup {
+        'lua',
+        'css',
+        'javascript',
+        html = { mode = 'foreground' }
+      }
+      require'colorizer'.attach_to_buffer(t.buf)
+    end
   end
 end
 
 
 local function on_filetype(t)
   if t then
-    seen_filetypes[t.match] = true
-    load_now(t)
+    seen_filetypes[t.match] = t
   end
   if lazy_plugins_loaded then
     load_ondemand()
@@ -72,6 +71,20 @@ local function setup_always()
     --   end
     -- end
   }
+
+  -- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
+  -- SRC: https://github.com/folke/which-key.nvim
+  -- ALT: telescope.actions.which_key()
+  local presets = require("which-key.plugins.presets")
+  presets.operators[">"] = nil
+  presets.operators["<lt>"] = nil
+  require("which-key").setup {
+    spelling = {
+      enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+      suggestions = 20, -- how many suggestions should be shown in the list?
+    },
+  }
+
 end
 
 

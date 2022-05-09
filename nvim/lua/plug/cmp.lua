@@ -2,8 +2,10 @@
 
 -- https://github.com/hrsh7th/nvim-cmp
 local cmp = require 'cmp'
+
 -- https://github.com/L3MON4D3/LuaSnip
 local luasnip = require 'luasnip'
+
 
 cmp.setup {
   snippet = {
@@ -49,16 +51,55 @@ cmp.setup {
   }),
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },  -- https://github.com/hrsh7th/cmp-nvim-lsp
-
-    { name = 'luasnip' },   -- https://github.com/saadparwaiz1/cmp_luasnip
     -- ALT: disable filtering completion candidates by snippet's show_condition
     -- { name = 'luasnip', option = { use_show_condition = false } },
+    { name = 'luasnip' },   -- https://github.com/saadparwaiz1/cmp_luasnip
 
     -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
     -- { name = 'vsnip' },  -- For vsnip users.
-  }),
+  }
+  -- ,{
+  --   { name = 'buffer' },    -- https://github.com/hrsh7th/cmp-buffer
+  --   { name = 'calc' },      -- https://github.com/hrsh7th/cmp-calc
+  --   { name = 'fuzzy_buffer' },-- CFG: https://github.com/tzachar/cmp-fuzzy-buffer
+  -- }, {
+  --   -- { name = 'digraphs' },  -- https://github.com/dmitmel/cmp-digraphs
+  --   { name = 'path' },      -- https://github.com/hrsh7th/cmp-path
+  --   { name = 'cmdline' },   -- CFG: https://github.com/hrsh7th/cmp-cmdline
+  --   -- { name = 'fuzzy_path' },-- CFG: https://github.com/tzachar/cmp-fuzzy-path
+  --   { name = 'rg' },        -- https://github.com/lukas-reineke/cmp-rg
+  -- }
+  ),
 }
+
+-- Set configuration for specific filetype.
+-- cmp.setup.filetype('gitcommit', {
+--   sources = cmp.config.sources({
+--     { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+--   }, {
+--     { name = 'buffer' },
+--   })
+-- })
+
+-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+-- cmp.setup.cmdline('/', {
+--   mapping = cmp.mapping.preset.cmdline(),
+--   sources = {
+--     { name = 'buffer' }
+--   }
+-- })
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+-- cmp.setup.cmdline(':', {
+--   mapping = cmp.mapping.preset.cmdline(),
+--   sources = cmp.config.sources({
+--     { name = 'path' }
+--   }, {
+--     { name = 'cmdline' }
+--   })
+-- })
+
 
 -- Loading snippets
 luasnip.filetype_extend("all", { "_" })

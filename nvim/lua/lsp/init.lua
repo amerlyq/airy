@@ -1,39 +1,29 @@
+-- LSP settings
+-- Collection of configurations for built-in LSP client
+-- SRC: https://github.com/neovim/nvim-lspconfig
 
 --NOTE:(sfx=!): only add to &rtp for init.vim access, don't source plugin/*
 vim.cmd [[ packadd! nvim-lspconfig ]]
 
 
-local on_attach = function(client, bufnr)
-  vim.api.nvim_create_autocmd('BufWritePre', {
-    buffer = 0,
-    callback = vim.lsp.buf.formatting_sync
-  })
-end
-
-local settings = {
-  pylsp = {
-    -- configurationSources = {"pylint"},
-    plugins = {
-      pylint = { enabled = true },
-      isort = { enabled = true },
-      black = { enabled = true, cache_config = true },
-      mypy = { enabled = true },
-      -- rope_completion = { enabled = true },
-    }
-  },
-}
-
 local lspconfig = require 'lspconfig'
 local capabilities = vim.lsp.protocol.make_client_capabilities()
+-- nvim-cmp supports additional completion capabilities
 capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 
--- ALSO: { 'sumneko_lua', 'clangd', 'rust_analyzer', 'pyright', 'tsserver' }
-local servers = { 'pylsp' }
+
+-- Enable the following language servers
+-- Use a loop to conveniently call 'setup' on multiple servers and
+-- map buffer local keybindings when the language server attaches
+-- ALSO: { 'clangd', 'rust_analyzer', 'pyright', 'tsserver' }
+local servers = { 'pylsp', 'sumneko_lua' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
-    on_attach = on_attach,
+    on_attach = require('lsp.attach'),
     capabilities = capabilities,
-    settings = settings,
+    settings = require('lsp.' .. lsp),
+    -- filetypes = {"python"},
+    -- flags = { debounce_text_changes = 150 }, -- NOTE:DFL for !neovim>=0.7
   }
 end
 

@@ -5,10 +5,23 @@ local K = require'keys.bind'.K
 K('', '<C-l>', '<Cmd>setl hlsearch! hls?<CR>')
 
 
-K('nx', ',rd', 'g//d<CR>', "Delete matching lines")
-K('nx', ',re', 's;;;g<CR>', "Erase matching words")
-K('nx', ',rp', 's::<C-r>":g', "Replace by pasted register")
--- K('nx', ',ry', 's::<C-r>":g')
+K('n', ',c', ':%s;;;g<Left><Left>', "Replace all matches by")
+K('x', ',c', ':s;;;g<Left><Left>', "Replace matches in selected region by")
+-- '<Leader>c' : 's;;<C-r>=SubsCount()<CR>;g',
+-- '<Leader>C' : 'g//'
+-- '<Leader>R' : 'v//'
+
+K('nx', ',rd', '<Cmd>g//d<CR>', "Delete matching lines")
+
+K('n', ',re', '<Cmd>%s;;;g<CR>', "Erase matching words")
+K('x', ',re', ':s;;;g<CR>', "Erase matching words")
+
+K('n', ',rq', '<Cmd>%s;[\'"`«»„“];;g<CR>', "Erase quotes")
+K('x', ',rq', ':s;[\'"`«»„“];;g<CR>', "Erase quotes")
+
+K('n', ',ry', "<Cmd>%s;;<C-r>=escape(getreg('\"'),';')<CR>;g<CR>", "Replace by pasted register")
+K('x', ',ry', ":s;;<C-r>=escape(getreg('\"'),';')<CR>;g<CR>", "Replace by pasted register")
+-- K('nx', ',rp', ...
 
 
 -- K('nx', ',rw', 's::<C-r><C-w>:g')

@@ -120,6 +120,12 @@ local highlights = {
 
   --FIXED: wrong .py "def …" color
   -- vim.highlight.link("TSKeywordFunction", "TSKeyword", true)
+  TSFuncBuiltin    = { fg='#1f58ff' },
+
+  -- FIXED: too bright hi! for !neovim LSP ※⡢⡔⢀⠔
+  DiagnosticError  = { fg='#870000', ctermfg=88 },
+  DiagnosticWarn   = { fg='#875f00', ctermfg=94 },
+  -- DiagnosticUnderlineWarn term=underline gui=underline guisp=#5f5f00
 }
 
 local nvim_set_hl = vim.api.nvim_set_hl
