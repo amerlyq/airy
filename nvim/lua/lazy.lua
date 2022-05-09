@@ -1,6 +1,6 @@
 --[Deferred loading of large plugins]
 
-local lazy_done = false
+local lazy_plugins_loaded = false
 
 local seen_filetypes = {}
 
@@ -23,7 +23,7 @@ local function load_now(t)
 end
 
 
-local function load_lazy()
+local function load_ondemand()
   -- DEBUG: print(vim.inspect(g.lazy_filetypes))
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
   if seen_filetypes['python'] then
@@ -46,18 +46,18 @@ local function load_lazy()
 end
 
 
-local function lazy_ft(t)
+local function on_filetype(t)
   if t then
     seen_filetypes[t.match] = true
     load_now(t)
   end
-  if lazy_done then
-    load_lazy()
+  if lazy_plugins_loaded then
+    load_ondemand()
   end
 end
 
 
-local function load_always()
+local function setup_always()
   require 'plug.cmp' -- +luasnip
   require 'plug.gitsigns'
 
@@ -76,47 +76,53 @@ end
 
 
 local function source_plugins()
-  -- WARN: packadd adds "after" to &rtp but skips loading
-  --   VIZ: pack/*/opt/{name}/{plugin,ftdetect}/**/*.{vim,lua}
-
-  -- DEBUG: what files ':runtime' found
-  -- vim.opt.verbose = 2
-
-  --ALSO:OR: vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')
+  -- OR: vim.fn.glob(MYCONF .. '/plugin/*.vim',1,1)
   vim.cmd [[
-    for f in glob('/@/airy/nvim/plugin/*.vim', 1, 1)| exe 'source' fnameescape(f) |endfor
-    for f in glob('/@/airy/nvim/plugin/*.lua', 1, 1)| exe 'luafile' fnameescape(f)|endfor
+    for f in glob('/@/airy/nvim/plugin/*.vim',1,1)| exe 'source' fnameescape(f) |endfor
+    for f in glob('/@/airy/nvim/plugin/*.lua',1,1)| exe 'luafile' fnameescape(f)|endfor
     source $VIMRUNTIME/plugin/rplugin.vim
-
-    packloadall
-    runtime! after/plugin/**/*.vim
-    runtime! after/plugin/**/*.lua
   ]]
-
-  -- VIZ: find -path '*/after/plugin/*'
-  -- vim.cmd [[ runtime! OPT after/plugin/*.lua ]]
-  -- vim.cmd [[ runtime! OPT  after/plugin/**/*.vim  after/plugin/**/*.lua ]]
-  -- local tosrc = vim.api.nvim_get_runtime_file('after/plugin/**/*.lua', true)
-  -- for _, f in ipairs(tosrc) do
-  --   vim.cmd [[ source f ]]
-  -- end
 end
 
 
-local function lazy_packadd()
+local function source_after()
+  -- WARN: packadd adds "after" to &rtp but skips loading
+  --   VIZ: pack/*/opt/{name}/{plugin,ftdetect}/**/*.{vim,lua}
+  vim.cmd [[
+    runtime! after/plugin/**/*.vim
+    runtime! after/plugin/**/*.lua
+  ]]
+  -- ALT:VIZ: find -path '*/after/plugin/*'
+  -- vim.cmd [[ runtime! OPT after/plugin/*.lua ]]
+  -- vim.cmd [[ runtime! OPT after/plugin/**/*.vim  after/plugin/**/*.lua ]]
+  -- local tosrc = vim.api.nvim_get_runtime_file('after/plugin/**/*.lua', true)
+  -- for _, f in ipairs(tosrc) do vim.cmd [[ source f ]] end
+end
+
+
+local function on_delayed_startup()
+
   --SRC: https://github.com/lewis6991/impatient.nvim
   --require('impatient')
   --USAGE :LuaCacheProfile
   -- require('impatient').enable_profile()
 
-  load_always()
-  lazy_done = true
-  load_lazy()
+  --HACK: add lazy plugins to &rtp
+  vim.opt.packpath = MYPLUG .. '/lazy'
+
+  setup_always()
   source_plugins()
+
+  --WARN: loads all &rtp 'MYPLUG/preload' plugins AGAIN
+  vim.cmd 'packloadall!'
+
+  load_ondemand()
+  source_after()
+
+  lazy_plugins_loaded = true
 
   -- FUTURE:MAYBE: emit a user 'event' to chain my other pieces
   -- doautocmd User PluginsLoaded
-
   --DISABLED: very distracting periphery text change
   -- vim.notify("Lazy: DONE")
   -- vim.notify(("%s %s"):format(count, name), res == "err" and vim.log.levels.ERROR)
@@ -125,20 +131,20 @@ end
 
 vim.api.nvim_create_autocmd('FileType', {
   desc = "(Aux) register filetypes or trigger deferred packadd",
-  callback = lazy_ft
+  callback = on_filetype
 })
 
 
-vim.defer_fn(lazy_packadd, 250)
+vim.defer_fn(on_delayed_startup, 250)
 -- vim.api.nvim_create_autocmd('VimEnter', {
 --   desc = "(Lazy) loading ALL deferred plugins",
---   callback = lazy_packadd
+--   callback = on_delayed_startup
 -- })
 
 
 -- NOTE: using wait=1s to exit from short sessions immediately
--- vim.fn.timer_start(1000, lazy_packadd)
+-- vim.fn.timer_start(1000, on_delayed_startup)
 -- vim.api.nvim_create_autocmd('VimEnter', {
 --   desc = "Lazy packadd by filetype + cmp",
---   callback = lazy_packadd
+--   callback = on_delayed_startup
 -- })

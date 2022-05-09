@@ -26,8 +26,10 @@ o.shortmess:remove {'F'} -- DFL=filnxtToOF
 -- ? /usr/share/vim/vimfiles
 
 -- OR: vim.env.MYVIMRC.parent
-o.runtimepath = { '/@/airy/nvim', vim.env.VIMRUNTIME }  -- '/@/airy/nvim/after'
-o.packpath = '/@/plugins/nvim/lazy'
+o.runtimepath = { MYCONF, vim.env.VIMRUNTIME }  -- '/@/airy/nvim/after'
+-- o.packpath = MYPLUG .. '/lazy'
+-- o.packpath = MYPLUG .. '/preload'
+o.packpath = ''
 -- NEED:(python,nou): vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')
 o.loadplugins = false
 

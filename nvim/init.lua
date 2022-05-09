@@ -1,5 +1,12 @@
 -- vim:ts=2:sts=2:sw=2:et
-vim.cmd [[ let $MYLUA = fnamemodify($MYVIMRC, ':h') . '/lua/' ]]
+
+-- USAGE: vim.env.MYLUA
+-- vim.cmd [[ let $MYLUA = fnamemodify($MYVIMRC, ':h') . '/lua/' ]]
+MYCONF = '/@/airy/nvim'
+MYPLUG = '/@/plugins/nvim'
+
+-- DEBUG: what files ':runtime' found
+-- vim.opt.verbose = 2
 
 require 'airy.fastboot'
 

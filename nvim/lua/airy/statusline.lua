@@ -65,6 +65,17 @@ vim.api.nvim_create_autocmd({'VimEnter', 'BufAdd', 'BufDelete'}, {
   callback = hide_statusline
 })
 
+--NOTE: after diagnostics cleared -- hide statusbar manually <,tl>
+vim.api.nvim_create_autocmd({'DiagnosticChanged'}, {
+  desc = "(auto) open statusbar on new diagnostics",
+  callback = function()
+    local diags = vim.diagnostic.get(0)
+    if #diags > 0 then
+      o.showtabline = 2
+    end
+  end
+})
+
 
 -- ALSO: https://github.com/arkav/lualine-lsp-progress
 local function lsp()
