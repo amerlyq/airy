@@ -1,5 +1,5 @@
 local o, g = vim.o, vim.g
-local K = require 'keys.K'
+local K = require'keys.bind'.K
 
 g.rnvimr_enable_picker = 1
 -- g.rnvimr_shadow_winblend = 50

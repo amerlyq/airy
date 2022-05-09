@@ -1,5 +1,5 @@
 local o, g = vim.o, vim.g
-local K = require 'keys.K'
+local K = require'keys.bind'.K
 
 
 K('n', ',tl', "<Cmd>let &showtabline=(&stal?1:2)")

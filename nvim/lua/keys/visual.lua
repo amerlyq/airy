@@ -1,3 +1,6 @@
+local K = require'keys.bind'.K
+local KE = require'keys.bind'.KE
+
 KE('x', 'v', 'mode() ==# "\\<C-v>" ? "v" : "\\<C-v>"')
 
 --Reselect pasted visual selection
@@ -10,7 +13,7 @@ KE('n', 'gv', "'`[' . strpart(getregtype(), 0, 1) . '`]'")
 require 'seize.vsel'
 -- DEBUG: vim.keymap.set('v', '*', '<Cmd>lua print(vim.inspect(getVisualSelection()))<CR>', nore)
 -- vim.keymap.set('v', '*', (function() vim.fn.setreg("/", getVisualSelection(), "v") end), nore)
-vim.keymap.set('v', '*', '<Cmd>lua vim.fn.setreg("/", getVisualSelection(), "v")<CR><Esc>n', { noremap = true })
+K('v', '*', '<Cmd>lua vim.fn.setreg("/", getVisualSelection(), "v")<CR><Esc>n')
 
 
 -- Prevent Paste loosing the register source. Deleted available by "- reg.

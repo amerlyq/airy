@@ -1,4 +1,4 @@
-local K = require 'keys.K'
+local K = require'keys.bind'.K
 
 --Buffers save/close/exit
 -- [_] THINK:MAYBE: replace by "set autowriteall"

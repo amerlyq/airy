@@ -1,4 +1,4 @@
-local K = require 'keys.K'
+local K = require'keys.bind'.K
 
 --Create above/below empty line with auto indent
 K('n', 'go', 'o<Space><Esc>^"_D')

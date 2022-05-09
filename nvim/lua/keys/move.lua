@@ -1,4 +1,4 @@
-local K = require 'keys.K'
+local K = require'keys.bind'.K
 
 --Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })

@@ -1,5 +1,4 @@
-
-local K = require 'keys.K'
+local K = require'keys.bind'.K
 
 --Remap space as leader key
 vim.g.mapleader = ','

@@ -1,4 +1,4 @@
-local K = require 'keys.K'
+local K = require'keys.bind'.K
 
 K('n', ',/', function()
   local s = "\\V" .. vim.fn.getreg("+")

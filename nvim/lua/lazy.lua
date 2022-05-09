@@ -84,8 +84,8 @@ local function source_plugins()
 
   --ALSO:OR: vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')
   vim.cmd [[
-    source /@/airy/nvim/plugin/*.vim
-    runtime! /@/airy/nvim/plugin/*.lua
+    for f in glob('/@/airy/nvim/plugin/*.vim', 1, 1)| exe 'source' fnameescape(f) |endfor
+    for f in glob('/@/airy/nvim/plugin/*.lua', 1, 1)| exe 'luafile' fnameescape(f)|endfor
     source $VIMRUNTIME/plugin/rplugin.vim
 
     packloadall
@@ -105,7 +105,7 @@ end
 
 local function lazy_packadd()
   --SRC: https://github.com/lewis6991/impatient.nvim
-  require('impatient')
+  --require('impatient')
   --USAGE :LuaCacheProfile
   -- require('impatient').enable_profile()
 
@@ -142,4 +142,3 @@ vim.defer_fn(lazy_packadd, 250)
 --   desc = "Lazy packadd by filetype + cmp",
 --   callback = lazy_packadd
 -- })
-
