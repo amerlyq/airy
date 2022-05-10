@@ -191,4 +191,58 @@
 
 
 2022-05-09-Mon-W19
-  [_] CFG #nvim in Lua ⌇⡢⡸⣠⢀
+  [⡢⡹⢦⡞] 8h20m CFG #nvim in Lua ⌇⡢⡸⣠⢀
+    [⡢⡹⠆⡤] 2h15m update rnvimr | CHECK !execsnoop
+      [⡢⡸⣷⢬] TODO: suggest execsnoop
+      [⡢⡹⠆⡚] TODO: suggest singleton
+        https://github.com/kevinhwang91/rnvimr/issues/115
+    [⡢⡹⠂⠯] 30m FIX my own ranger
+      [⡢⡹⠁⢕] install release ranger to prevent checking version on startup
+        [⡢⡹⠂⠱] NEED: monkey-patch AUR __release__ during installation
+        13:57:55 git              12727  12725    0 /usr/bin/git describe
+      [X] DISABLED: @me prevent spawning x3 tmux commands only to rename hidden statusline
+        set update_tmux_title false
+        13:57:55 tmux             12729  12725    0 /usr/bin/tmux show-window-options -v allow-rename
+        13:57:55 tmux             12730  12725    0 /usr/bin/tmux display-message -p #W
+        13:57:55 tmux             12731  12725    0 /usr/bin/tmux show-window-options -v automatic-rename
+    [⡢⡹⠑⠎] ⋆ 15m rnvimr github
+    [⡢⡹⠷⣀] 1h port some keys
+      [⡢⡹⠰⠭] fix "remove empty trailing lines"
+    [⡢⡹⠽⡰] 40m fix table.unpack(keys)
+    [⡢⡹⡔⡾] 20m update plugins
+    [⡢⡹⡔⢃] 1h20m FIXME lazy loading
+      ::: finally :TS hl works
+    [⡢⡹⢕⠆] 2h merge remaining removed configs
+      [X] ◔ 1h add my usual useful options/keybindings
+  [⡢⡹⢥⣭] 2h15m #notches IDEA:PERF: generate .lua plugin from my spec.py ⌇⡢⡹⠥⠁
+    >> looks like matchadd() is still the way to go
+    [X] HACK: use keywords overlay group inside vim.api.nvim_set_hl()
+      [⡢⡹⡰⠺] TRY: overlay hl group api nvim_buf_set_extmark()
+        ::: FAIL: does not accept regexes
+        https://www.reddit.com/r/neovim/comments/s4o7zt/can_virtual_text_be_used_to_highlight_lines/
+      [⡢⡹⢕⢣] nvim_set_decoration_provider
+        ::: FAIL: callback for frequent creating extmarks
+    [>] place it inside @/nou.vim package
+    [_] SEIZE: folke/todo-comments.nvim: ✅ Highlight, list and search todo comments in your projects ⌇⡢⡮⢮⠺
+      https://github.com/folke/todo-comments.nvim
+  ~~~
+  [_] #nvim XLR:TRY run global ranger in !tmux and connect to it by "tmux attach" and callback by !nvr
+    [_] IDEA: import !nvr as my plugin to ranger -- to reduce !nvr startup time
+      [_] ALT: use same hack with vim client session from !rnvimr
+    [_] OBSOL: most of !rnvimr beside window open/hide code
+      [_] SEE: minimal ex: ⦅vim⦆ *api-floatwin*
+      [_] ALT:USE: https://github.com/voldikss/vim-floaterm
+        https://github.com/jlesquembre/nterm.nvim
+      [_] BET? akinsho/toggleterm.nvim: A neovim lua plugin to help easily manage multiple terminal windows ⌇⡢⡹⢠⣁
+        https://github.com/akinsho/toggleterm.nvim
+  [_] #nvim ALT quickhl ~~ NICE: position-based highlight (single instance) inof regex (all matches)
+    Pocco81/HighStr.nvim: 🦎 A NeoVim plugin for highlighting visual selections like in a normal document editor! ⌇⡢⡹⡷⣐
+      https://github.com/Pocco81/HighStr.nvim
+    structured/"rich" text, text annotations/overlay · Issue #1767 · neovim/neovim ⌇⡢⡹⡸⡉
+      https://github.com/neovim/neovim/issues/1767
+  [_] TRY: grammar on the fly
+    brymer-meneses/grammar-guard.nvim: Grammar Guard is a Neovim plugin that checks your grammar as you write your LaTeX, Markdown or plain text document. ⌇⡢⡹⢠⣗
+      https://github.com/brymer-meneses/grammar-guard.nvim
+  [!] READ: pros/cons of fmts
+    Plugin metadata formats: what has been tried already, why did they fail, and can it succeed? - Plugins - Neovim Discourse ⌇⡢⡹⢠⣲
+      https://neovim.discourse.group/t/plugin-metadata-formats-what-has-been-tried-already-why-did-they-fail-and-can-it-succeed/1153

@@ -2,21 +2,25 @@
 --EXPL: UI to select things (files, grep results, open buffers...)
 --SRC: https://github.com/nvim-telescope/telescope.nvim
 --DEP: plenary.nvim
+
 require('telescope').setup {
   defaults = {
     mappings = {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+        ['<C-j>'] = "move_selection_next",
+        ['<C-k>'] = "move_selection_previous",
       },
-      -- n = {
+      n = {
+        ['q'] = "close",
       --   ['?'] = require('telescope').action_generate.which_key {
       --     name_width = 20, -- typically leads to smaller floats
       --     max_height = 0.5, -- increase potential maximum height
       --     separator = " > ", -- change sep between mode, keybind, and name
       --     close_with_action = false, -- do not close float on action
       --   },
-      -- },
+      },
     },
   },
 }
@@ -31,17 +35,21 @@ require('telescope').setup {
 require('telescope').load_extension 'fzf'
 
 local B = require('telescope.builtin')
+local KG = vim.api.nvim_set_keymap
+local Kn = function(lhs, fn) KG('n', lhs, '', { callback=fn, noremap=true }) end
 
 --Add leader shortcuts
-vim.keymap.set('n', '<Tab><Space>', B.buffers)
-vim.keymap.set('n', '<Tab><Tab>', B.resume)
-vim.keymap.set('n', '<Tab>f', (function() B.find_files {previewer=false} end))
-vim.keymap.set('n', '<Tab>b', B.current_buffer_fuzzy_find)
-vim.keymap.set('n', '<Tab>g', B.git_status)
-vim.keymap.set('n', '<Tab>G', B.git_bcommits)
-vim.keymap.set('n', '<Tab>h', B.help_tags)
-vim.keymap.set('n', '<Tab>t', B.tags)
-vim.keymap.set('n', '<Tab>d', B.grep_string)
-vim.keymap.set('n', '<Tab>p', B.live_grep)
-vim.keymap.set('n', '<Tab>o', (function() B.tags {only_current_buffer=true} end))
-vim.keymap.set('n', '<Tab>?', B.oldfiles)
+Kn('<Tab><CR>', B.builtin)
+Kn('<Tab><Space>', B.buffers)
+Kn('<Tab><Tab>', B.resume)
+
+Kn('<Tab>f', (function() B.find_files {previewer=false} end))
+Kn('<Tab>b', B.current_buffer_fuzzy_find)
+Kn('<Tab>g', B.git_status)
+Kn('<Tab>G', B.git_bcommits)
+Kn('<Tab>h', B.help_tags)
+Kn('<Tab>t', B.tags)
+Kn('<Tab>d', B.grep_string)
+Kn('<Tab>p', B.live_grep)
+Kn('<Tab>o', (function() B.tags {only_current_buffer=true} end))
+Kn('<Tab>?', B.oldfiles)

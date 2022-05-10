@@ -72,6 +72,8 @@ local function setup_always()
     -- end
   }
 
+  require 'plug.telescope'
+
   -- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
   -- SRC: https://github.com/folke/which-key.nvim
   -- ALT: telescope.actions.which_key()
@@ -148,11 +150,12 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 
-vim.defer_fn(on_delayed_startup, 250)
--- vim.api.nvim_create_autocmd('VimEnter', {
---   desc = "(Lazy) loading ALL deferred plugins",
---   callback = on_delayed_startup
--- })
+-- vim.defer_fn(on_delayed_startup, 250)
+vim.api.nvim_create_autocmd('VimEnter', {
+  desc = "(Lazy) loading ALL deferred plugins",
+  -- callback = on_delayed_startup
+  callback = function() vim.defer_fn(on_delayed_startup, 8) end
+})
 
 
 -- NOTE: using wait=1s to exit from short sessions immediately
