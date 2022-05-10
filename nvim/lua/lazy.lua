@@ -123,7 +123,7 @@ local function on_delayed_startup()
   -- require('impatient').enable_profile()
 
   --HACK: add lazy plugins to &rtp
-  vim.opt.packpath = MYPLUG .. '/lazy'
+  vim.opt.packpath = { MYPLUG .. '/lazy', MYCONF }
 
   setup_always()
   source_plugins()
