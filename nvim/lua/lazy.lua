@@ -29,6 +29,9 @@ local function load_ondemand()
     end
 
   elseif seen_filetypes['lua'] then
+    -- require 'plug.treesitter'
+    -- require 'lsp.init'
+
     local t = seen_filetypes['lua']
     local p = vim.fn.fnamemodify(t.file, ":p")
     -- NOTE: load plugin immediately only for my colorscheme

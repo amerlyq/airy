@@ -11,7 +11,7 @@ hi! IndentBlanklineChar  ctermfg=8 ctermbg=0 cterm=None guifg=#002b36 guibg=#072
 set shada='100,<0,s10,h
 
 unlet $XDG_CONFIG_HOME
-let g:loaded_ranger = 0
-autocmd VimEnter set packpath=/@/airy/vim | lua require('plug.rnvimr') | packadd rnvimr
+" let g:loaded_ranger = 0
+" autocmd VimEnter set packpath=/@/airy/vim | lua require('plug.rnvimr') | packadd rnvimr
 
 execute 'source $VIMHOME/cfg/vimrc'

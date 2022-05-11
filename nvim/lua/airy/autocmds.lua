@@ -10,7 +10,7 @@ autocmd('FileType', {
 
 -- Highlight on yank
 vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function() vim.highlight.on_yank { higroup="TextYank", timeout=130 } end,
+  callback = function() vim.highlight.on_yank { higroup = "TextYank", timeout = 130 } end,
   group = vim.api.nvim_create_augroup('YankHighlight', { clear = true }),
 })
 
@@ -40,6 +40,8 @@ autocmd("BufWritePre", {
   callback = function()
     local save = vim.fn.winsaveview()
     --BAD:(keeppatterns): prevents us using shortcut :g/xxx/s///e
+    --TEMP: remove shit from MSTeams copy-paste
+    vim.api.nvim_exec('keepjumps keeppatterns silent g/[\\r\\u200b]/s/[\\r\\u200b]//e', false)
     vim.api.nvim_exec('keepjumps keeppatterns silent g/\\s\\+$/s/\\s\\+$//e', false)
     vim.api.nvim_exec('keepjumps keeppatterns silent! /\\v^%(\\_s*\\S)@!/,$d_', false)
     --ALSO: let &fixeol=g:strip_lines

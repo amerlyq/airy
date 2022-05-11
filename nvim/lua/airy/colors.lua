@@ -9,6 +9,7 @@ vim.cmd 'colorscheme airy'            -- PERF=1.8ms
 -- vim.cmd 'colorscheme soluarized'   -- PERF=12ms
 -- vim.cmd [[colorscheme solarized]]  -- PERF=19ms
 
+-- NICE: https://github.com/NLKNguyen/papercolor-theme
 
 --SRC: https://github.com/folke/tokyonight.nvim ⌇⡢⡮⢮⠥
 -- vim.g.tokyonight_style = "night"

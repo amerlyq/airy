@@ -17,7 +17,7 @@ noremap <unique> [Toggle]t :<C-u>ToggleStripLines<Bar>ToggleStripSpaces<CR>
 
 noremap <unique> [Replace]E :<C-u>EmptyLinesCompress<CR>
 
-let s:sp = '[ \t\xa0\u3000]'
+let s:sp = '[ \t\xa0\u3000\r\u200b]'
 fun! s:var(nm)
   return get(b:, a:nm, get(g:, a:nm, ''))
 endf

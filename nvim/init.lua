@@ -27,6 +27,7 @@ require 'keys.lead'
 require 'keys.escape'
 
 require 'keys.edit'
+require 'keys.integ'
 require 'keys.move'
 require 'keys.replace'
 require 'keys.visual'
