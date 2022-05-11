@@ -9,3 +9,5 @@ setl softtabstop=4
 
 setl nocindent
 setl commentstring='\ %s
+
+nnoremap <buffer>  <LocalLeader>z  <Cmd>PlantumlOpen<CR>
