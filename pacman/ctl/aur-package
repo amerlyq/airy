@@ -15,5 +15,5 @@ while getopts 'hiu' o; do case $o in :|'?') exit 1
 esac; done; shift $((OPTIND-1))
 (($#)) && exec < <(printf '%s\n' "$@") || [[ ! -t 0 ]] || exit 1
 
-xargs -r -- aur sync --no-view $noninteractive $ondemand --
-# xargs -r -- pikaur --sync --devel --noedit --nodiff $noninteractive $ondemand --
+# xargs -r -- aur sync --no-view $noninteractive $ondemand --
+xargs -r -- pikaur --sync --devel --noedit --nodiff $noninteractive $ondemand --

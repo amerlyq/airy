@@ -44,6 +44,8 @@ sudo -v
 nonempty ./aur.{list,deps}    -- r.pacman-aur-package ${aur:+"-$aur"} --
 nonempty ./loc.{list,deps}    -- r.pacman-loc-package ${loc:+"-$loc"} --
 nonempty ./{aur,loc,pkg}.deps -- r.pacman-pkg-install ${pkg:+"-$pkg"} -d --
-nonempty ./{aur,loc,pkg}.list -- r.pacman-pkg-install ${pkg:+"-$pkg"} --
+# FAIL: pikaur does not populate aur db
+nonempty ./{loc,pkg}.list -- r.pacman-pkg-install ${pkg:+"-$pkg"} --
+# nonempty ./{aur,loc,pkg}.list -- r.pacman-pkg-install ${pkg:+"-$pkg"} --
 
 onexit

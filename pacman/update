@@ -46,8 +46,8 @@ pkgupd(){ sudo pacman -Syu $(skip 'PKG_IGNORE[@]') || ((1==$?)); }
 refresh_mirrors "$([[ " $* " =~ " -r " ]]&&echo 1)"
 pkgupd
 # shellcheck disable=SC2046
-aur sync --database=aur --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')
-# pikaur --sync --devel --noedit --noconfirm --upgrades $(skip 'AUR_IGNORE[@]')
+# aur sync --database=aur --no-view --no-confirm --upgrades $(skip 'AUR_IGNORE[@]')
+pikaur --sync --devel --noedit --noconfirm --upgrades $(skip 'AUR_IGNORE[@]')
 #   TRY: --dbpath to point to aur.db from !aurutils <⡊⠹>
 pkgupd
 
