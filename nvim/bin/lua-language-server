@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+basedir=$(mktemp -d "/tmp/lua-language-server.XXXX")
+DEFAULT_LOGPATH="$TMPPATH/log"
+DEFAULT_METAPATH="$TMPPATH/meta"
+
+onexit(){ rm -rf -- "$basedir"; }
+trap 'onexit' INT HUP QUIT TERM ERR
+
+/usr/lib/lua-language-server/bin/lua-language-server \
+  -E /usr/lib/lua-language-server/main.lua \
+  --logpath="$DEFAULT_LOGPATH" \
+  --metapath="$DEFAULT_METAPATH" \
+  "$@"
+
+onexit

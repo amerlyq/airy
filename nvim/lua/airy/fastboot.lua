@@ -4,7 +4,7 @@ local o, g = vim.opt, vim.g
 --DEBUG: turn on printing messages during file operations and from autocmd
 --SRC: autocmd - FileType autocommand not working in Neovim - Vi and Vim Stack Exchange ⌇⡢⡲⣓⠎
 --   https://vi.stackexchange.com/questions/22637/filetype-autocommand-not-working-in-neovim
-o.shortmess:remove {'F'} -- DFL=filnxtToOF
+o.shortmess:remove { 'F' } -- DFL=filnxtToOF
 
 
 --PERF: reduce ENOENT checks
@@ -26,12 +26,12 @@ o.shortmess:remove {'F'} -- DFL=filnxtToOF
 -- ? /usr/share/vim/vimfiles
 
 -- OR: vim.env.MYVIMRC.parent
-o.runtimepath = { MYCONF, vim.env.VIMRUNTIME }  -- '/@/airy/nvim/after'
+o.runtimepath = { MYCONF, vim.env.VIMRUNTIME } -- '/@/airy/nvim/after'
 o.packpath = { MYCONF, MYPLUG .. '/preload' }
 -- o.packpath = MYPLUG .. '/lazy'
 -- o.packpath = ''
 -- NEED:(python,nou): vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')
-o.loadplugins = false
+-- o.loadplugins = false
 
 
 --FAIL: waiting the «jump to the last position» is VERY irritating

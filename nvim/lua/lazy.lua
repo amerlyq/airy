@@ -29,25 +29,24 @@ local function load_ondemand()
     end
 
   elseif seen_filetypes['lua'] then
-    -- require 'plug.treesitter'
-    -- require 'lsp.init'
+    require 'plug.treesitter'
+    require 'lsp.init'
 
     local t = seen_filetypes['lua']
     local p = vim.fn.fnamemodify(t.file, ":p")
     -- NOTE: load plugin immediately only for my colorscheme
     if p:match('/colors/airy.lua$') then
       vim.cmd [[ packadd nvim-colorizer.lua ]]
-      require'colorizer'.setup {
+      require 'colorizer'.setup {
         'lua',
         'css',
         'javascript',
         html = { mode = 'foreground' }
       }
-      require'colorizer'.attach_to_buffer(t.buf)
+      require 'colorizer'.attach_to_buffer(t.buf)
     end
   end
 end
-
 
 local function on_filetype(t)
   if t then
@@ -57,7 +56,6 @@ local function on_filetype(t)
     load_ondemand()
   end
 end
-
 
 local function setup_always()
   require 'plug.cmp' -- +luasnip
@@ -92,7 +90,6 @@ local function setup_always()
 
 end
 
-
 local function source_plugins()
   -- OR: vim.fn.glob(MYCONF .. '/plugin/*.vim',1,1)
   vim.cmd [[
@@ -101,7 +98,6 @@ local function source_plugins()
     source $VIMRUNTIME/plugin/rplugin.vim
   ]]
 end
-
 
 local function source_after()
   -- WARN: packadd adds "after" to &rtp but skips loading
@@ -116,7 +112,6 @@ local function source_after()
   -- local tosrc = vim.api.nvim_get_runtime_file('after/plugin/**/*.lua', true)
   -- for _, f in ipairs(tosrc) do vim.cmd [[ source f ]] end
 end
-
 
 local function on_delayed_startup()
 
@@ -146,7 +141,6 @@ local function on_delayed_startup()
   -- vim.notify(("%s %s"):format(count, name), res == "err" and vim.log.levels.ERROR)
 end
 
-
 vim.api.nvim_create_autocmd('FileType', {
   desc = "(Aux) register filetypes or trigger deferred packadd",
   callback = on_filetype
@@ -157,7 +151,13 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.api.nvim_create_autocmd('VimEnter', {
   desc = "(Lazy) loading ALL deferred plugins",
   -- callback = on_delayed_startup
-  callback = function() vim.defer_fn(on_delayed_startup, 8) end
+  callback = function()
+    -- vim.cmd [[
+    --   for f in glob('/@/airy/nvim/plugin/pack/airy/start/*/plugin/*.vim',1,1)| exe 'source' fnameescape(f) |endfor
+    -- ]]
+    -- vim.cmd 'packadd dictl'
+    vim.defer_fn(on_delayed_startup, 8)
+  end
 })
 
 

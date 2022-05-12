@@ -26,10 +26,13 @@ local settings = {
       version = 'LuaJIT',
       -- Setup your lua path
       -- path = runtime_path,
+      pathStrict = 'true',
     },
     diagnostics = {
       -- Get the language server to recognize the `vim` global
       globals = { 'vim' },
+      -- Disable scanning whole workspace in the background
+      workspaceDelay = -1,
     },
     workspace = {
       -- Make the server aware of Neovim runtime files

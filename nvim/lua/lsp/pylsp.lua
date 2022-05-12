@@ -39,46 +39,46 @@ local settings = {
 
 return settings
 
-    -- ALT:DFL=pycodestyle
-    --   FAIL: can't suppress file-wide errors like E266 "##" comments in !qute
-    --   SRC:TALK: https://github.com/PyCQA/pycodestyle/issues/381
-    -- DEPs: flake8 python-flake8-black python-flake8-docstrings python-flake8-isort python-flake8-typing-imports python-pytest-flake8
-    -- configurationSources = {"pylint"},
-    -- configurationSources = {"flake8"},
-    -- SRC:WTF: https://github.com/neovim/nvim-lspconfig/issues/903
-    -- formatCommand = {"black"}
+-- ALT:DFL=pycodestyle
+--   FAIL: can't suppress file-wide errors like E266 "##" comments in !qute
+--   SRC:TALK: https://github.com/PyCQA/pycodestyle/issues/381
+-- DEPs: flake8 python-flake8-black python-flake8-docstrings python-flake8-isort python-flake8-typing-imports python-pytest-flake8
+-- configurationSources = {"pylint"},
+-- configurationSources = {"flake8"},
+-- SRC:WTF: https://github.com/neovim/nvim-lspconfig/issues/903
+-- formatCommand = {"black"}
 
-    -- plugins = {
-    --   autoimport = {enabled = true},
-    --   rope_autoimport = { enabled = true },
+-- plugins = {
+--   autoimport = {enabled = true},
+--   rope_autoimport = { enabled = true },
 
-    --   pycodestyle = { enabled = false, maxLineLength = 88 },
-    --   pydocstyle = { enabled = false },
-    --   isort = { enabled = false },
-    --   black = { enabled = false },
-    --   mypy = { enabled = false },
-    --   rope = { enabled = false },
-    --   flake8 = { enabled = false },
-    --   pylint = { enabled = false },
+--   pycodestyle = { enabled = false, maxLineLength = 88 },
+--   pydocstyle = { enabled = false },
+--   isort = { enabled = false },
+--   black = { enabled = false },
+--   mypy = { enabled = false },
+--   rope = { enabled = false },
+--   flake8 = { enabled = false },
+--   pylint = { enabled = false },
 
-    --   autopep8_format = {enabled = false},
-    --   definition = {enabled = false},
-    --   flake8_lint = {enabled = false},
-    --   folding = {enabled = false},
-    --   highlight = {enabled = false},
-    --   hover = {enabled = false},
-    --   jedi_completion = {enabled = false},
-    --   jedi_rename = {enabled = false},
-    --   mccabe_lint = {enabled = false},
-    --   preload_imports = {enabled = false},
-    --   pycodestyle_lint = {enabled = false},
-    --   pydocstyle_lint = {enabled = false},
-    --   pyflakes_lint = {enabled = false},
-    --   pylint_lint = {enabled = false},
-    --   references = {enabled = false},
-    --   rope_completion = {enabled = false},
-    --   rope_rename = {enabled = false},
-    --   signature = {enabled = false},
-    --   symbols = {enabled = false},
-    --   yapf_format = {enabled = false},
-    -- },
+--   autopep8_format = {enabled = false},
+--   definition = {enabled = false},
+--   flake8_lint = {enabled = false},
+--   folding = {enabled = false},
+--   highlight = {enabled = false},
+--   hover = {enabled = false},
+--   jedi_completion = {enabled = false},
+--   jedi_rename = {enabled = false},
+--   mccabe_lint = {enabled = false},
+--   preload_imports = {enabled = false},
+--   pycodestyle_lint = {enabled = false},
+--   pydocstyle_lint = {enabled = false},
+--   pyflakes_lint = {enabled = false},
+--   pylint_lint = {enabled = false},
+--   references = {enabled = false},
+--   rope_completion = {enabled = false},
+--   rope_rename = {enabled = false},
+--   signature = {enabled = false},
+--   symbols = {enabled = false},
+--   yapf_format = {enabled = false},
+-- },
