@@ -281,3 +281,15 @@
   [_] #nvim SEIZE
     dotfiles/.config/nvim at master · nanotee/dotfiles ⌇⡢⡻⢛⠝
       https://github.com/nanotee/dotfiles/tree/master/.config/nvim
+
+
+2022-05-12-Thu-W19
+  [⡢⡽⠠⣦] 30m CHECK: sumneko .lua ROOT:string() -- does it generate /tmp name OR if some other fn does
+    ::: FIXED: wrapper for server to delete tempdir ++ config.diagnostics.workspaceDelay=-1 to disable scanning
+    sh               10397  10394    0 /usr/bin/sh /usr/bin/lua-language-server
+    mktemp           10398  10397    0 /usr/bin/mktemp -d /tmp/lua-language-server.XXXX
+    lua-language-se  10397  10394    0 /usr/lib/lua-language-server/bin/lua-language-server -E
+      /usr/lib/lua-language-server/main.lua
+      --logpath=/tmp/lua-language-server.VPOz/log
+      --metapath=/tmp/lua-language-server.VPOz/meta
+  [%] 30m/ restore !r.dict on

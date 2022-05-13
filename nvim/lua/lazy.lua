@@ -61,6 +61,8 @@ local function setup_always()
   require 'plug.cmp' -- +luasnip
   require 'plug.gitsigns'
 
+  require 'plug.surround'
+
   --Enable Comment.nvim
   -- https://github.com/numToStr/Comment.nvim
   -- require('Comment').setup()

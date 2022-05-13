@@ -2138,6 +2138,7 @@ c.url.searchengines = {
     "so": "http://stackoverflow.com/search?q={}",
     "en": "https://google.com/search?q=english%20{}",
     "ин": "https://google.com/search?q=english%20{}",
+    "pu": "https://google.com/search?q=plantuml%20{}",
     "py3": "https://docs.python.org/3/search.html?check_keywords=yes&area=default&q={}",
     "pY": "https://google.com/search?q=python%20{}",
     "p2": "https://google.com/search?q=python2%20{}",
@@ -2394,7 +2395,7 @@ config.unbind("ZZ")
 # config.bind('ad', 'download-cancel')
 # config.bind('b', 'set-cmd-text -s :quickmark-load')
 # config.bind('cd', 'download-clear')
-config.bind('cX', 'download-delete')
+config.bind("cX", "download-delete")
 # config.bind('co', 'tab-only')
 config.bind("cl", "open -t -- {clipboard}")  # 'cy/ch'
 config.bind("c<Space>", "open -- {clipboard}")  # 'c./c<Backspace>'
