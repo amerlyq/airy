@@ -1,4 +1,4 @@
---%GenBy:
+--%GenBy: /home/amer/aura/just/flower/notches/luagen.py
 local M = {}
 
 M.highlights = {

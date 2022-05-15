@@ -35,7 +35,22 @@ require('nvim-treesitter.configs').setup {
   indent = {
     enable = true,
   },
+  -- NOTE:(custom queries): ./after/queries/<filetype>/textobjects.scm
+  -- REF: https://github.com/nvim-treesitter/nvim-treesitter#adding-queries
   textobjects = {
+    swap = {
+      enable = true,
+      swap_next = { ["ga"] = "@parameter.inner" },
+      swap_previous = { ["gA"] = "@parameter.inner" },
+    },
+    lsp_interop = {
+      enable = true,
+      border = "none",
+      peek_definition_code = {
+        ["<Bslash>df"] = "@function.outer",
+        ["<Bslash>dF"] = "@class.outer",
+      },
+    },
     select = {
       enable = true,
       lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
