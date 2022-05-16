@@ -1,34 +1,39 @@
-
 local KB = vim.api.nvim_buf_set_keymap
 local B = vim.lsp.buf
 
 
 -- REF: `:help vim.lsp.*` for documentation on any of the below functions
-local function lsp_mappings(_client, bufnr)
-  local KBn = function(lhs, fn) KB(bufnr, 'n', lhs, '', { callback=fn, noremap=true }) end
+local function lsp_mappings(client, bufnr)
+  local KBn = function(lhs, fn, s) KB(bufnr, 'n', lhs, '', { callback = fn, noremap = true, desc = s }) end
 
-  KBn('gD', B.declaration)
-  KBn('gd', B.definition)
-  KBn('gw', B.references) -- DFL=gr  @me=<LocalLeader>u
+  KBn('gd', B.definition, "definition [LSP]")
+  KBn('gD', B.type_definition, "type_def [LSP]") -- DFL=,D | <LL>d
+  -- KBn('gD', B.declaration) -- NOT
+  KBn('gw', B.references, "references [LSP]") -- DFL=gr  @me=<LocalLeader>u
+  -- KBn('gW', B.incoming_calls) -- NOT
+  -- KBn('gW', B.outgoing_calls) -- NOT
+  -- KBn('<LocalLeader>g', B.implementation) -- DFL=gi NOT
 
-  KBn('<LocalLeader>K', B.hover)  -- DFL=K
-  KBn('<LocalLeader>g', B.implementation)  -- DFL=gi
+  KBn('<F1>', B.hover, "hover [LSP]") -- DFL=K | <LL>K
   -- KBn('<C-k>', B.signature_help)
+
   -- KBn('<leader>wa', B.add_workspace_folder)
   -- KBn('<leader>wr', B.remove_workspace_folder)
   -- KBn('<leader>wl', function()
   --   vim.inspect(B.list_workspace_folders())
   -- end)
-  KBn('<LocalLeader>d', B.type_definition) -- DFL=,D
-  KBn(',rn', B.rename) -- ALT=<LocalLeader>R
-  -- KBn('<leader>ca', B.code_action)
-  -- KBn('<Tab>s', require('telescope.builtin').lsp_document_symbols)
+
+  KBn(',rn', B.rename, "Rename all under cursor [LSP]") -- ALT=<LocalLeader>R
+  KBn(',ra', B.code_action, "code_action [LSP]") -- DFL= <leader>ca
+  KBn('\\cg', function()
+    vim.api.nvim_set_current_dir(client.config.root_dir)
+  end, "Go to .git pj root") -- ALT: vim-rooter
 
   -- vim.api.nvim_buf_set_keymap(bufnr, '<LocalLeader>F', '<cmd>lua B.formatting()<CR>')
   vim.api.nvim_create_user_command("Format", B.formatting, {})
 
   -- nnoremap <silent> g0    <cmd>lua B.document_symbol()<CR>
-  -- nnoremap <silent> gW    <cmd>lua B.workspace_symbol()<CR>
+  KBn('gW', B.workspace_symbol, "workspace_symbol [LSP]")
 end
 
 return lsp_mappings

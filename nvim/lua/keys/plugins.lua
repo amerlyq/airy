@@ -1,5 +1,5 @@
 local o, g = vim.o, vim.g
-local K = require'keys.bind'.K
+local K = require 'keys.bind'.K
 
 
 K('n', ',tl', "<Cmd>let &showtabline=(&stal<2?2:1)<CR>")
@@ -22,7 +22,16 @@ end, "Show :hl group under cursor")
 -- ]])
 
 
---CFG plugins
+--[CFG plugins]
 
+-- ALT: vimscript
+-- https://github.com/preservim/tagbar
+-- https://github.com/liuchengxu/vista.vim
+K('nx', '<Tab>t', '<Cmd>SymbolsOutline<CR>')
 
-K('n', '<Tab>q', ':TroubleToggle<CR>')
+-- ALT:BET? usability
+--   TALK https://www.reddit.com/r/neovim/comments/qk7uk1/telescope_pluginextension_that_lets_you_visit/hj31c50/?context=3
+-- https://github.com/simnalamburt/vim-mundo
+K('nx', '<Tab>u', '<Cmd>UndotreeToggle<CR>')
+
+K('nx', '<Tab>q', '<Cmd>TroubleToggle<CR>')

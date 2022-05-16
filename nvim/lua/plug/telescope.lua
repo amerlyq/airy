@@ -14,12 +14,12 @@ require('telescope').setup {
       },
       n = {
         ['q'] = "close",
-      --   ['?'] = require('telescope').action_generate.which_key {
-      --     name_width = 20, -- typically leads to smaller floats
-      --     max_height = 0.5, -- increase potential maximum height
-      --     separator = " > ", -- change sep between mode, keybind, and name
-      --     close_with_action = false, -- do not close float on action
-      --   },
+        --   ['?'] = require('telescope').action_generate.which_key {
+        --     name_width = 20, -- typically leads to smaller floats
+        --     max_height = 0.5, -- increase potential maximum height
+        --     separator = " > ", -- change sep between mode, keybind, and name
+        --     close_with_action = false, -- do not close float on action
+        --   },
       },
     },
   },
@@ -34,22 +34,23 @@ require('telescope').setup {
 --NEED: $ cd ... && make
 require('telescope').load_extension 'fzf'
 
-local B = require('telescope.builtin')
+local T = require('telescope.builtin')
 local KG = vim.api.nvim_set_keymap
-local Kn = function(lhs, fn) KG('n', lhs, '', { callback=fn, noremap=true }) end
+local Kn = function(lhs, fn, s) KG('n', lhs, '', { callback = fn, noremap = true, desc = s }) end
 
 --Add leader shortcuts
-Kn('<Tab><CR>', B.builtin)
-Kn('<Tab><Space>', B.buffers)
-Kn('<Tab><Tab>', B.resume)
+Kn('<Tab><CR>', T.builtin, "T.builtins")
+Kn('<Tab><Space>', T.buffers, "T.buffers")
+Kn('<Tab><Tab>', T.resume, "T.resume")
+Kn('<Tab>?', T.oldfiles, "T.oldfiles")
 
-Kn('<Tab>f', (function() B.find_files {previewer=false} end))
-Kn('<Tab>b', B.current_buffer_fuzzy_find)
-Kn('<Tab>g', B.git_status)
-Kn('<Tab>G', B.git_bcommits)
-Kn('<Tab>h', B.help_tags)
-Kn('<Tab>t', B.tags)
-Kn('<Tab>d', B.grep_string)
-Kn('<Tab>p', B.live_grep)
-Kn('<Tab>o', (function() B.tags {only_current_buffer=true} end))
-Kn('<Tab>?', B.oldfiles)
+Kn('<Tab>b', T.current_buffer_fuzzy_find, "T.fuzzy_buf")
+Kn('<Tab>d', T.grep_string, "T.grep_string")
+Kn('<Tab>f', (function() T.find_files { previewer = false } end), "T.find_files")
+Kn('<Tab>g', T.git_status, "T.git_status")
+Kn('<Tab>G', T.git_bcommits, "T.git_bcommits")
+Kn('<Tab>h', T.help_tags, "T.help_tags")
+Kn('<Tab>o', (function() T.tags { only_current_buffer = true } end), "T.tags_buf")
+Kn('<Tab>p', T.live_grep, "T.live_grep")
+Kn('<Tab>s', T.lsp_document_symbols, "lsp_document_symbols [T]")
+Kn('<Tab>T', T.tags, "tags [T]")

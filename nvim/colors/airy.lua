@@ -127,6 +127,38 @@ local highlights = {
   DiagnosticError = { fg = '#870000', ctermfg = 88 },
   DiagnosticWarn  = { fg = '#875f00', ctermfg = 94 },
   -- DiagnosticUnderlineWarn term=underline gui=underline guisp=#5f5f00
+
+  -- FIXED:(too shallow colors): https://github.com/p00f/nvim-ts-rainbow
+  -- ALT:(vim/rainbow): ctermfgs = [160, 202, 178, 34, 33, 129]
+  --   guifgs = ['#df0000', '#ff5f00', '#dfaf00', '#00af00', '#0087ff', '#af00ff']
+  -- rainbowcol1 = { fg = '#cc241d' }, -- DFL: ctermfg=9  guifg=#cc241d
+  -- rainbowcol2 = { fg = '#d65d0e' }, -- DFL: ctermfg=10 guifg=#a89984
+  -- rainbowcol3 = { fg = '#d79921' }, -- DFL: ctermfg=11 guifg=#b16286
+  -- rainbowcol4 = { fg = '#689d6a' }, -- DFL: ctermfg=12 guifg=#d79921
+  -- rainbowcol5 = { fg = '#458588' }, -- DFL: ctermfg=13 guifg=#689d6a
+  -- rainbowcol7 = { fg = '#b16286' }, -- DFL: ctermfg=15 guifg=#458588
+  -- rainbowcol6 = { fg = '#a89984' }, -- DFL: ctermfg=14 guifg=#d65d0e
+
+  -- OFF: textDocument/documentHighlight
+  -- ALT: semshiSelected xxx ctermfg=231 ctermbg=161 guifg=#ffffff guibg=#d7005f
+  LspReferenceText = { fg = '#ffffff', bg = '#d7005f' },
+  LspReferenceRead = { fg = '#ffffff', bg = '#689d6a' },
+  LspReferenceWrite = { fg = '#ffffff', bg = '#d65d0e' },
+
+  -- TODO: reuse fore some TS* groups
+  -- semshiLocal    xxx ctermfg=209 guifg=#ff875f
+  -- semshiGlobal   xxx ctermfg=214 guifg=#ffaf00
+  -- semshiImported xxx cterm=bold ctermfg=214 gui=bold guifg=#ffaf00
+  -- semshiParameter xxx ctermfg=75 guifg=#5fafff
+  -- semshiParameterUnused xxx cterm=underline ctermfg=117 gui=underline guifg=#87d7ff
+  -- semshiFree     xxx ctermfg=218 guifg=#ffafd7
+  -- semshiBuiltin  xxx ctermfg=207 guifg=#ff5fff
+  -- semshiAttribute xxx ctermfg=49 guifg=#00ffaf
+  -- semshiSelf     xxx ctermfg=249 guifg=#b2b2b2
+  -- semshiUnresolved xxx cterm=underline ctermfg=226 gui=underline guifg=#ffff00
+  -- semshiSelected xxx ctermfg=231 ctermbg=161 guifg=#ffffff guibg=#d7005f
+  -- semshiErrorSign xxx ctermfg=231 ctermbg=160 guifg=#ffffff guibg=#d70000
+  -- semshiErrorChar xxx ctermfg=231 ctermbg=160 guifg=#ffffff guibg=#d70000
 }
 
 local nvim_set_hl = vim.api.nvim_set_hl

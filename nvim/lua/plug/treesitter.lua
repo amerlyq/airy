@@ -15,6 +15,14 @@ require('nvim-treesitter.configs').setup {
   highlight = {
     enable = true, -- false will disable the whole extension
   },
+  rainbow = {
+    enable = true,
+    -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
+    extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+    max_file_lines = nil, -- Do not enable for files with more than n lines, int
+    -- colors = {}, -- table of hex strings
+    -- termcolors = {} -- table of colour name strings
+  },
   --SRC: https://github.com/JoosepAlviste/nvim-ts-context-commentstring
   --  USAGE: automatically changes "commentstring" based on HEREDOC language
   context_commentstring = {
@@ -40,8 +48,8 @@ require('nvim-treesitter.configs').setup {
   textobjects = {
     swap = {
       enable = true,
-      swap_next = { ["ga"] = "@parameter.inner" },
-      swap_previous = { ["gA"] = "@parameter.inner" },
+      swap_previous = { ["ga"] = "@parameter.inner" },
+      swap_next = { ["gA"] = "@parameter.inner" },
     },
     lsp_interop = {
       enable = true,
@@ -82,5 +90,11 @@ require('nvim-treesitter.configs').setup {
         ['[]'] = '@class.outer',
       },
     },
+  },
+  --SRC: https://github.com/andymass/vim-matchup
+  matchup = {
+    enable = true,
+    -- disable = { "c", "ruby" },
+    -- disable_virtual_text = true,
   },
 }

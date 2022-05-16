@@ -12,6 +12,8 @@
 local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, 'lua/?.lua')
 table.insert(runtime_path, 'lua/?/init.lua')
+-- table.insert(runtime_path, '/usr/share/luajit-2.1.0-beta3/?.lua')
+
 
 
 -- VIZ: settings
@@ -24,13 +26,13 @@ local settings = {
     runtime = {
       -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
       version = 'LuaJIT',
-      -- Setup your lua path
+      -- OPT: Setup your lua path
       -- path = runtime_path,
-      pathStrict = 'true',
+      -- pathStrict = 'true',
     },
     diagnostics = {
       -- Get the language server to recognize the `vim` global
-      globals = { 'vim' },
+      globals = { 'vim', 'require' },
       -- Disable scanning whole workspace in the background
       workspaceDelay = -1,
     },

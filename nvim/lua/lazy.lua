@@ -57,41 +57,6 @@ local function on_filetype(t)
   end
 end
 
-local function setup_always()
-  require 'plug.cmp' -- +luasnip
-  require 'plug.gitsigns'
-
-  require 'plug.surround'
-
-  --Enable Comment.nvim
-  -- https://github.com/numToStr/Comment.nvim
-  -- require('Comment').setup()
-  require('nvim_comment').setup {
-    -- HACK: pull "commentstring" based on HEREDOC language
-    -- hook = function()
-    --   if vim.api.nvim_buf_get_option(0, "filetype") == "vue" then
-    --     require("ts_context_commentstring.internal").update_commentstring()
-    --   end
-    -- end
-  }
-
-  require 'plug.telescope'
-
-  -- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
-  -- SRC: https://github.com/folke/which-key.nvim
-  -- ALT: telescope.actions.which_key()
-  local presets = require("which-key.plugins.presets")
-  presets.operators[">"] = nil
-  presets.operators["<lt>"] = nil
-  require("which-key").setup {
-    spelling = {
-      enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
-      suggestions = 20, -- how many suggestions should be shown in the list?
-    },
-  }
-
-end
-
 local function source_plugins()
   -- OR: vim.fn.glob(MYCONF .. '/plugin/*.vim',1,1)
   vim.cmd [[
@@ -125,7 +90,7 @@ local function on_delayed_startup()
   --HACK: add lazy plugins to &rtp
   vim.opt.packpath = { MYPLUG .. '/lazy', MYCONF }
 
-  setup_always()
+  require 'plug.always'
   source_plugins()
 
   --WARN: loads all &rtp 'MYPLUG/preload' plugins AGAIN
