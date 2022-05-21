@@ -59,3 +59,16 @@ require("which-key").setup {
     suggestions = 20, -- how many suggestions should be shown in the list?
   },
 }
+
+
+-- SRC: https://github.com/ghillb/cybu.nvim
+-- TALK: https://www.reddit.com/r/neovim/comments/uu2rfn/cybunvim_v10_a_plugin_to_cycle_buffers_with/
+-- require("cybu").setup()
+require("cybu").setup {
+  display_time = 350,
+  style = {
+    devicons = {
+      enabled = false,
+    },
+  }
+}

@@ -31,6 +31,7 @@ require 'keys.integ'
 require 'keys.move'
 require 'keys.remap'
 require 'keys.replace'
+require 'keys.utils'
 require 'keys.visual'
 require 'keys.yank'
 
