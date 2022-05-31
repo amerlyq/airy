@@ -3,6 +3,10 @@ local K = require 'keys.bind'.K
 
 
 K('n', ',tl', "<Cmd>let &showtabline=(&stal<2?2:1)<CR>")
+-- ALT: [Toggle]w
+-- setl wrap! wrap?\|if exists('&bri')\|setl bri!\|endif<CR>
+K('n', ',tw', "<Cmd>setl wrap! wrap?<CR>")
+
 
 
 -- K('n', '<F3>', [[

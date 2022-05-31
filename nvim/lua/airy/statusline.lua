@@ -107,9 +107,8 @@ local function filetype()
   return s .. " "
 end
 
-
 local function delcommonpfxsfx(s, t)
-  for i = 1, math.min(#s,#t) do
+  for i = 1, math.min(#s, #t) do
     if s:byte(i) ~= t:byte(i) then
       if i > 2 then
         s = "…" .. s:sub(i)
@@ -118,7 +117,7 @@ local function delcommonpfxsfx(s, t)
       break
     end
   end
-  for j = 1, math.min(#s,#t) do
+  for j = 1, math.min(#s, #t) do
     if s:byte(-j) ~= t:byte(-j) then
       if j > 2 then
         s = s:sub(1, -j) .. "…"
@@ -130,7 +129,6 @@ local function delcommonpfxsfx(s, t)
   return s, t
 end
 
-
 local function buffers()
   local s = ""
   local prevnm = ""
@@ -141,8 +139,10 @@ local function buffers()
       -- local bt = bufgetopt(b, 'buftype')
       -- local ft = bufgetopt(b, 'filetype')
       local mod = bufgetopt(b, 'modified')
+      -- FIXME: don't shorten current buffer
       local hl = (b == cur) and "%#TabLineSel#" or "%#TabLine#"
       local nm = fnm and vim.fn.fnamemodify(fnm, ':t') or "[No Name]"
+      -- NEED: modify previous entry -- insert !hi=underline group at beg/end pos of reuse
       local snm = delcommonpfxsfx(nm, prevnm)
       local sfx = (mod and '+' or '') -- '●'
       s = s .. hl .. " " .. snm .. sfx .. " "

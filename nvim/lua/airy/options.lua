@@ -32,8 +32,17 @@ vim.wo.signcolumn = 'auto'
 
 o.cursorline = true
 o.list = true
-vim.opt.listchars = {tab='▸ ', trail='·', extends='»', precedes='«', nbsp='␣' }
+vim.opt.listchars = { tab = '▸ ', trail = '·', extends = '»', precedes = '«', nbsp = '␣' }
 
 -- Set completeopt to have a better completion experience
-o.completeopt = 'menuone,noselect'  -- menu,
+o.completeopt = 'menuone,noselect' -- menu,
 o.whichwrap = '<,>,[,]'
+
+
+-- set foldenable
+-- set foldcolumn=2        " fold levels ruler on left (clickable)
+-- "set foldmethod=manual  " <expr|syntax|marker> -- syntax defines folds
+o.foldlevel = 99 -- close folds below this depth, initially
+-- set foldlevelstart=99   " close folds below this depth, on enter
+-- " set foldopen=all      " open on cursor touch, DISABLED: prevents 'za' fold
+-- set fillchars=fold:\    " don't place extra dashes on scr right after foldtext
