@@ -2,7 +2,7 @@
 local M = {}
 
 function M.register()
-  local spec = require'notches.spec'
+  local spec = require 'notches.spec'
 
   local ns_id = 0 -- FAIL: vim.api.nvim_create_namespace('notches')
   local nvim_set_hl = vim.api.nvim_set_hl
@@ -28,11 +28,12 @@ function M.register()
 end
 
 function M.iabbrev()
-  local spec = require'notches.spec'
+  local spec = require 'notches.spec'
   local enxkb = 'qwertyuiop asdfghjkl zxcvbnm QWERTYUIOP ASDFGHJKL ZXCVBNM'
   local ruxkb = 'йцукенгшщз фывапролд ячсмить йцукенгшщз фывапролд ячсмить'
   for _, vrgx in pairs(spec.patterns) do
     for notch in string.gmatch(vrgx:gsub('[\\%%()]', ''), "([^|]+)") do
+      -- TODO: both lower() and UPPER() case should translate to same UPPER iabbr
       -- :iab[breviate] [<expr>] [<buffer>] {lhs} {rhs}
       local ru = vim.fn.tr(notch:gsub('[-.:;]', ''), enxkb, ruxkb)
       local cmd = string.format('iab <buffer> %s %s', ru, notch)
