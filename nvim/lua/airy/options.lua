@@ -18,6 +18,10 @@ o.mouse = 'a'
 --Enable break indent
 o.breakindent = true
 
+-- Restrain vim from messing with '#' indent in python, etc.
+o.cinkeys:remove({ '0#' })
+o.indentkeys:remove({ '0#' })
+
 --Save undo history
 vim.opt.undofile = true
 
@@ -46,3 +50,5 @@ o.foldlevel = 99 -- close folds below this depth, initially
 -- set foldlevelstart=99   " close folds below this depth, on enter
 -- " set foldopen=all      " open on cursor touch, DISABLED: prevents 'za' fold
 -- set fillchars=fold:\    " don't place extra dashes on scr right after foldtext
+
+o.formatoptions:append({ o = true })
