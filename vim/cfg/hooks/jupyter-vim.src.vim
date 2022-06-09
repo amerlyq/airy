@@ -125,6 +125,8 @@ fun! BufMap_jupyter_vim() abort
   " nnoremap <buffer><silent><unique>  <LocalLeader>x :JupyterSendCell<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>S :call jupyter#SendCell()\|call jupyter#SendCode(g:jupyter_live_exec)<CR>
   xmap     <buffer><silent><unique>  <LocalLeader>S <Plug>JupyterRunVisual
+  nnoremap <buffer><silent><unique>  <LocalLeader>d <Cmd>call jupyter#RunFile("-niG", expand('%:p')) \| call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>D <Cmd>call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
 
   " nnoremap <buffer><silent><unique>  <LocalLeader>s :<C-u>set operatorfunc=<SID>opfunc_run_code<CR>g@
   " xnoremap <buffer><silent><unique>  <LocalLeader>s "sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<CR>

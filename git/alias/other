@@ -81,7 +81,8 @@ alias grim='gri --preserve-merges'  # BUG: with -i can be weird!
 alias gria='gri --autostash --autosquash'
 gmo(){ git merge origin/"$1" "${@:2}"; }
 
-alias gf='git fetch --verbose --progress --prune --tags'
+# WARN:REM(--prune): prevent deleting local branches/tags
+alias gf='git fetch --verbose --progress --tags'
 alias gfa='gf aura'
 alias gfo='gf origin'
 alias gfA='gf --all'

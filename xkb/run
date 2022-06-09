@@ -4,6 +4,10 @@ source ~/.shell/profile
 # FAIL:(xset q &>/dev/null): will launch socket-activated Xorg when not needed
 [[ $DISPLAY ]] || exit 0
 
+# TEMP: new layout on startup
+/@/airy/xkb/cfg/apply || /@/airy/xkb/cfg/debug
+exit
+
 # declare -A CURR_XKB=(
 #   [layout]='us,ua,ru' [variant]='basic,winkeys,winkeys'
 #   [overlay]='vim' [option]='misc:typo,amer:lvl3,amer:mods'
