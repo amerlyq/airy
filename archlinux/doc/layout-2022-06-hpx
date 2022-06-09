@@ -1,0 +1,407 @@
+# vim: ft=sh
+# SUM: "spectre x360 14-ea1*" Windows dualboot -- with Intel Optane H10 SSD
+# NEED:
+#  SRC: https://gist.github.com/mukulanand8/e7efd5b81926be7eba3325232a78a7e1
+#   * disable Windows fast-startup and hibernation (OR: EFI partition may be demaged)
+#       WARN: Windows updates may re-enable Fast Startup
+#   * switch Windows date-time to UTC and fix current time
+#   * shrink C: volume to make unallocated space for Linux
+#   * (if needed) download and install AHCI drivers for Windows
+#   * Disable Intel RST / Intel Optane RAID ※⡢⢢⡒⣩ (OR: disk C: may be corrupted)
+#   * Disable Secure Boot in BIOS (can leave existing keys)
+#   * (not found) Switch SATA from Intel Premium RST to AHCI in BIOS
+#
+# ARCH: M.2 1TB :: Linux: 875 GiB == 896000 MiB
+#   /boot   fat32  200MiB | (efi) Windows
+#   /       btrfs  100GiB | +snapshots -- ArchLinux rolling releases, +recovery /var/cache files, +/home/user/.*
+#   /data   btrfs  500GiB | +snapshots, +/_dld,games -> /data/_dld,games -CoW , shrink when /cache needs more space
+#   /cache  ext4   270GiB | +reflink for ccache, +compile, +dbench (concurrent compiling for ct-ng), +src/sdk
+#   swap    swap   5GiB   |
+
+
+### WiFi Connect #####
+# $ iwctl  # (iwd) station wlan0 connect-hidden <ssid>
+# $ iwctl --passphrase <passphrase> station wlan0 connect-hidden <ssid>
+
+
+# Disable PC beep
+setterm -blength 0
+
+# NOTE:TEMP: replace CapsLock by Ctrl
+printf 'keymaps 0-255\nkeycode 58 = Control\n' > /etc/vconsole.map
+echo KEYMAP=/etc/vconsole.map > /etc/vconsole.conf
+loadkeys /etc/vconsole.map
+
+
+ls /sys/firmware/efi/efivars
+parted -l
+#  * /dev/nvme0n1  1024GB
+#  * /dev/nvme1n1  29.3GB
+
+
+############################################################################
+## NOTE: use unallocated space for lvm-on-luks
+parted /dev/nvme0n1
+#  - unit s
+#  - print    ## $ dec (164206591/2048+1)*2048 -->
+#  - mkpart primary 164206592s 100%
+#  - unit MiB
+#  - print
+#  - align-check opt 5
+#  - quit
+
+## NOTE: Default AES cipher in XTS mode (effective key 256-bit)
+# INFO: Взлом и защита шифрования дисков LUKS / Хабр ⌇⡞⢺⠀⡲
+#   https://habr.com/ru/post/457542/
+# FIXED:(grub/luks2): https://savannah.gnu.org/bugs/?55093
+# ALSO: $ … --iter-time 5000 --use-random
+cryptsetup -v --key-size 512 --hash sha512 --type luks2 luksFormat /dev/nvme0n1p5
+
+## ADD: second passphrase -- to disclose in emergencies and then remove it
+#  :: enter existing passphrase to open dev, then new one for next key slot
+## ALSO: check both keys are present and open encrypted device
+# cryptsetup --hash sha512 luksAddKey /dev/nvme0n1p5
+cryptsetup luksDump /dev/nvme0n1p5
+cryptsetup --allow-discards --persistent luksOpen /dev/nvme0n1p5 luks
+
+
+## NOTE: init partition as Physical Volume, add PV to new Volume Group
+pvcreate --dataalignment 1m /dev/mapper/luks
+vgcreate ws /dev/mapper/luks
+
+## NOTE: create LV partitions
+# BET:(/etc/crypttab): swap  /dev/sdx4  /dev/urandom swap,cipher=aes-cbc-essiv:sha256,size=256
+lvcreate ws -Wy --yes -n root -L 100G
+lvcreate ws -Wy --yes -n data -L 500G
+lvcreate ws -Wy --yes -n cache -L 270G
+lvcreate ws -Wy --yes -n swap -L 5G -C y
+lvs
+
+## NOTE: format LV partitions
+mkfs.btrfs -L root -f /dev/ws/root
+mkfs.btrfs -L data -f /dev/ws/data
+mkfs.ext4 -L cache /dev/ws/cache
+mkswap -L swap -f /dev/ws/swap
+
+
+### INFO ######################################################################
+lsblk -ao NAME,HOTPLUG,SIZE,ROTA,FSTYPE,STATE,RM,LABEL,TYPE,MOUNTPOINT
+lsblk -ao +fstype,label,rota,state
+# nvme0n1         953.9G  disk
+# ...
+# └─nvme0n1p5       875G  part   crypto_LUKS
+#   └─luks          875G  crypt  LVM2_member
+#     ├─ws-root     100G  lvm    btrfs
+#     ├─ws-data     500G  lvm    btrfs
+#     ├─ws-cache    270G  lvm    ext4
+#     └─ws-swap       5G  lvm    swap
+
+lvmdiskscan
+dmsetup ls --tree
+# dmsetup remove /dev/mapper/luks  # NOTE: del old LVM completely
+# vgremove -f ws  # NOTE: del only group, keeping LVM
+pvdisplay
+pvs
+vgdisplay
+vgs
+lvs
+
+
+### SNAPSHOTS #################################################################
+## NOTE: create btrfs layout for snapshots
+mount -o compress=zstd,autodefrag /dev/ws/data /mnt
+btrfs quota disable /mnt
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@snapshots
+mkdir -vp /mnt/@/.snapshots
+umount /mnt
+
+mount -o compress=zstd,autodefrag /dev/ws/root /mnt
+btrfs quota disable /mnt
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@snapshots
+mkdir -vp /mnt/@/{.snapshots,boot,cache,data}
+
+for x in cache lib/docker log
+do v=/mnt/@/var/$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
+chattr +C /mnt/@/var/log
+# THINK:IDEA: totally separate BTRFS and cache $ mount /cache/xdg ~/.cache/
+# [_] FIXME: disable CoW on ~/.cache/
+# [_] ALSO: browsers caches ALT:BET?TRY: symlink to /cache partition
+#   ~/.local/share/qutebrowser/webengine/Service Worker/CacheStorage
+#   ~/.local/qute-proxy/data/webengine/Service Worker/CacheStorage
+# ALSO: config/Microsoft/Microsoft\ Teams
+for x in android/avd cabal cache cargo gradle local/share/Steam rustup
+do v=/mnt/@/home/user/.$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
+
+btrfs subvolume list /mnt
+umount /mnt
+
+
+### BOOTSTRAP #################################################################
+pacman-key --init
+pacman-key --populate archlinux
+pacman -Syyu neovim
+
+
+### LAYOUT ####################################################################
+## NOTE: assemble mounted filesystem
+swapon /dev/ws/swap
+mount -o noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@ /dev/ws/root /mnt
+mount -o noatime,nofail,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ws/data /mnt/data
+mount -o noatime,nofail,noauto,x-systemd.automount /dev/ws/cache /mnt/cache
+mount -o noauto,x-systemd.automount,fmask=0133 /dev/nvme0n1p1 /mnt/boot
+
+# FAIL:(snapper): can't mount snapshots somewhere rarely accessible (e.g. /root/*) to prevent automount
+#   [_] TODO: exclude it from system-wide grep and updatedb (MAYBE: by using chmod 000)
+# WARN:(x-systemd.automount): useless for BTRFS
+#   COS !snapperd on reboot will trigger /.snapshots mounting after only 5s
+#   ~~ though, /cache/ will be triggered only after 10m
+mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@snapshots /dev/ws/root /mnt/.snapshots
+mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=/@snapshots /dev/ws/data /mnt/data/.snapshots
+
+
+### SETUP #####################################################################
+## NOTE: bake fstab
+timedatectl set-timezone Europe/Kiev
+timedatectl set-ntp true
+timedatectl status
+
+# NEW: "base" is almost empty now -- install everything manually
+pacstrap /mnt  base intel-ucode linux linux-firmware base-devel cryptsetup lvm2 btrfs-progs neovim git
+
+
+## CHG: manually remove swap of host system (if necessary)
+# ADD: auto-mount Windows partitions WARN! only after disabling fast-startup and hibernation
+#   # /dev/nvme1n1p5 LABEL=WinData
+#   UUID=E6567FB5567F8559 /win/data ntfs-3g rw,noauto,x-systemd.automount,nosuid,nodev,relatime,uid=1000,gid=users,dmask=022,fmask=133,windows_names,big_writes 0 0
+#   # NEED: $ print -l username=myuser password=mypass > /root/samba/netshare && chmod 600 $_
+#   //192.168.1.2/share  /net/share  cifs  ro,noauto,credentials=/root/samba/netshare,vers=1.0,uid=1000,gid=users,forceuid,forcegid,iocharset=utf8,rsize=4194304,wsize=4194304 0 0
+#   //192.168.1.2/share  /net/share  cifs  ro,noauto,x-systemd.automount,credentials=/root/samba/netshare,vers=3.1.1,mfsymlinks,uid=1000,gid=users,iocharset=utf8 0 0
+# HACK: refresh automount units after editing online /etc/fstab
+#   $# systemctl daemon-reload
+#   $# systemctl restart remote-fs.target
+#   OR: $# systemctl restart local-fs.target
+genfstab -pU /mnt >> /mnt/etc/fstab
+
+
+bootctl --path=/mnt/boot install
+mkdir -p /mnt/boot/loader/entries
+# <UUID> is raw encrypted device -- find by ':r!blkid -dno UUID /dev/nvme0n1p5' in vi (OR: ':< ...' in nvim)
+# ALT:(rootflags): use "btrfs {get,set}-default ..."
+cat > /mnt/boot/loader/entries/arch.conf <<EOT
+title Arch Linux Enc
+linux /vmlinuz-linux
+initrd /intel-ucode.img
+initrd /initramfs-linux.img
+options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ quiet
+EOT
+
+cat > /mnt/boot/loader/loader.conf <<EOT
+timeout 3
+default arch
+editor 0
+EOT
+
+
+### SYSTEM ####################################################################
+arch-chroot /mnt
+{
+  # NOTE: replace CapsLock by Ctrl
+  printf 'keymaps 0-255\nkeycode 58 = Control\n' > /etc/vconsole.map
+  echo KEYMAP=/etc/vconsole.map > /etc/vconsole.conf
+  loadkeys /etc/vconsole.map
+
+  # pacman -S sed gzip
+  export LANG=en_US.UTF-8
+  # CHG: uncomment 'en_US.UTF-8'  OR: $ echo "$LANG UTF-8" > /etc/locale.gen
+  nvim /etc/locale.gen
+  echo "LANG=$LANG" > /etc/locale.conf
+  locale-gen
+
+  pacman -S ntp openssh
+  ## BAD: $ ln -sf /usr/share/zoneinfo/EET /etc/localtime
+  #  * WTF: timedatectl list-timezones don't have EET
+  #  * FAIL: MSTeams defaults to UTC when using EET which is absent from "list-timezones"
+  #  * WARN: systemd creates relative symlink instead of absolute
+  timedatectl set-timezone Europe/Kiev
+  # ? timedatectl set-ntp true
+  # ? ntpd -qg
+  hwclock --systohc --utc
+  # ADD:(/etc/ntp.conf): interface ignore ipv6
+  systemctl enable ntpd sshd
+
+  nvim /etc/ssh/sshd_config
+  ##ADD:
+  #   AllowUsers amer
+  #   Match User amer
+  #     StreamLocalBindUnlink yes
+  #   PermitRootLogin no  # OR? prohibit-password
+  #   PasswordAuthentication no
+  ##USE: $ sudo pkill -SIGHUP sshd OR: $ systemctl restart sshd
+  #  WARN! firewall
+  #  WARN: don't "~feel lucky~" -- keep remote opened shell
+  #    ~ use telnet/etc. connected in parallel
+  #    ~ fix SSH problems and conflicts e.g. Port=445 with samba
+
+  echo hpx > /etc/hostname
+  nvim /etc/hosts
+  # 127.0.0.1  localhost  hpx
+  # ::1        localhost  hpx
+
+  # pacman -S mkinitcpio
+  # FIXED:BAD: small EFI 100MB is not enough for fallback image
+  # CHG: PRESETS=('default')
+  nvim /etc/mkinitcpio.d/linux.preset
+  # CHG: HOOKS=(base udev keyboard autodetect modconf block encrypt lvm2 filesystems fsck)
+  nvim /etc/mkinitcpio.conf
+  mkinitcpio -k 5.18.2-arch1-1 -vM
+  mkinitcpio -p linux
+
+  pacman -S netctl dhcpcd ifplugd wpa_supplicant iwd
+  ip link
+
+  systemctl enable netctl-auto@wlan0
+  wpa_passphrase mywifi mypasswd > /etc/netctl/wifi_dhcp
+  cat > /etc/netctl/wifi_dhcp <<EOT
+Description='Home WiFi'
+Interface=wlan0
+Connection=wireless
+Security=wpa
+IP=dhcp
+ESSID='mywifi'
+Key='...'
+Hidden=yes
+EOT
+
+  cat > /etc/netctl/wifi_static <<EOT
+Description='Home WiFi static'
+Interface=wlan0
+Connection=wireless
+Security=wpa
+IP=static
+ESSID='mywifi'
+Key='...'
+Hidden=yes
+ExcludeAuto=yes
+Address='192.168.1.8/24'
+Gateway='192.168.1.1'
+DNS=('192.168.1.1')
+EOT
+
+  pacman -S sudo polkit
+  useradd --create-home --home-dir /home/user --user-group --groups users,wheel --shell /bin/bash --comment admin -- amer
+  # OR: uncomment first '%wheel' $ EDITOR=nvim visudo
+  echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+  # OR: echo "amer ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user
+  passwd amer
+  passwd
+
+
+  ### TODO: continue ----------------------------------
+
+  ## NOTE: fix shared "users" access for /data
+  fmd(){ mkdir -p "${@:3}" && chown -R "$1" -- "${@:3}" && chmod -R "$2" -- "${@:3}"; }
+  fmd root:users 2770 /{aura,cache,data,games} /data/{_dld,music}
+  fmd root:users  750 {,/aura,/data}/.snapshots
+  fmd amer:users  750 /games/_steam  /win/{data,games,system}  /net/share
+  fmd amer:amer  2700 /home/user /media/amer  /cache/{research,vm,work}  /aura/aura
+  chmod -R 700 /home
+
+  ## NOTE: use relative links for correct snapshots
+  # WARN: no folder "sdk" => distribute dld repos by features in e.g. aura or research
+  ln -svT at/feature /@
+  ln -svT data/_dld /_dld
+  ln -svT tmp/t /t  # ALT: directly mount [compressed ?zRAM?] ramdisk here
+  ln -svT aura/x /x
+  ln -svT cache/vm /vm
+  ln -svT cache/work /work
+  ln -svT share/amer /net/user
+  ln -svT user/_private /net/_private
+  ln -svT _private/@linux /net/backup
+
+  # BAD: we need additional symlink due to many places still hardcoding "~/aura"
+  #   TRY[_] replace all of them by "~/.local/airy"
+  #   BUT: then jumping in ranger will have unexpectedly deep paths...
+  ln -svT /aura/aura /home/user/aura
+
+
+  nvim /etc/pacman.conf  # uncomment 'Color' and '[multilib]'
+  pacman -Syu
+  pacman -S reflector
+  cp -vf --backup=t /etc/pacman.d/mirrorlist{,}
+  # [_] FIXME:BET: use 5 mirrors with longest retension of old packages
+  reflector --score 5 --protocol https > /etc/pacman.d/mirrorlist
+  pacman -Syyu
+  udt=$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)
+  echo "Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch" >> /etc/pacman.d/mirrorlist
+
+  echo "Include = /etc/pacman.d/aur.conf" >> /etc/pacman.conf
+  cat > /etc/pacman.d/aur.conf <<EOT
+[options]
+CacheDir = /var/cache/pacman/aur
+[aur]
+SigLevel = Optional TrustAll
+Server = file:///var/cache/pacman/aur
+EOT
+  install -dm1775 -o amer -g users -- /var/cache/pacman/aur
+  repo-add /var/cache/pacman/aur/aur.db.tar
+  chown -R amer:users /var/cache/pacman/aur
+  pacman -Sy
+
+  # shellcheck disable=SC2117
+  su amer
+  {
+    ### AUR
+    mkdir -p ~/.cache/aurutils/sync/aurutils-git
+    cd ~/.cache/aurutils/sync/aurutils-git
+    curl -L "https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils-git.tar.gz" | tar xz --strip-components=1
+    gpg --recv-keys 6BC26A17B9B7018A
+    makepkg PKGBUILD --syncdeps --clean --install --noconfirm --force
+    aur sync --database=aur --no-view --no-confirm --upgrades -- gotop-bin
+    sudo pacman --noconfirm --sync --needed -- gotop-bin
+  }
+
+  ## FAIL:(snapper): hardcoded dir /.snapshots must be always present and mounted
+  # SEE: @/airy/snapper/init.gen
+  pacman -S snapper
+  # INFO: create /etc/snapper/configs/root
+  # WARN: all ".snapshots" must be present and already mounted (i.a. to generate /etc/fstab)
+  snap(){ local cmd="snapper --no-dbus -c $1" d=$2/.snapshots
+    umount "$d" && rmdir "$d" && $cmd create-config "${d%/*}"
+    # FIXME: adjust chmod/chown again
+    btrfs subvolume delete "$d" && mkdir "$d" && mount "$d" && chmod 750 "$d" && chown root:users "$d"
+    $cmd set-config NUMBER_LIMIT{,_IMPORTANT}=4-10 TIMELINE_LIMIT_{HOURLY=8,DAILY=7,WEEKLY=5}
+    $cmd get-config
+  }
+  snap root /
+  snap aura /aura
+  snap data /data
+  fmd amer:amer  2700 /data/.snapshots
+  systemctl enable snapper-{cleanup,timeline,boot}.timer
+}
+
+# umount /mnt/hostrun
+# rmdir -v /mnt/hostrun
+umount -R /mnt
+}
+
+lvchange -a n ws   # stop LVM group
+cryptsetup -v close luks
+reboot
+
+
+## DEBUG: on boot problems
+setterm -blength 0
+cryptsetup luksOpen /dev/nvme0n1p5 luks
+mount -o subvol=@ /dev/ws/root /mnt
+arch-chroot /mnt
+...
+
+
+## FIXED: after EFI extend or Windows repair
+bootctl --path=/mnt/boot install
+
+
+# FIXED:ERR: kvm: disabled by bios
+#   Tweaker -> Advanced CPU Settings -> SVM Mode -> Enabled
