@@ -40,7 +40,8 @@ vim.opt.listchars = { tab = '▸ ', trail = '·', extends = '»', precedes = '«
 
 -- Set completeopt to have a better completion experience
 o.completeopt = 'menuone,noselect' -- menu,
-o.whichwrap = '<,>,[,]'
+-- DISABLED:(<,>): don't wrap arrows in normal mode (nor DFL=b,s for <BS> and <Space>)
+o.whichwrap = '[,]'
 
 
 -- set foldenable
