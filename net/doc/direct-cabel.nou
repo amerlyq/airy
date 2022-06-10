@@ -56,6 +56,15 @@ CFG:(persistent)
       Address=('192.168.2.3/24')
       Routes=('192.168.1.4/32 via 192.168.2.4')
     $ S.E netctl-ifplugd@enp0s20f0u1
+  HACK: mycloud requires DHCP on fractal
+    https://wiki.archlinux.org/title/dhcpd
+    $ sudo cp /usr/lib/systemd/system/dhcpd4.service /etc/systemd/system/dhcpd4@.service
+    $ v /etc/systemd/system/dhcpd4@.service
+      ADD(%I): ExecStart=/usr/bin/dhcpd -4 -q -cf /etc/dhcpd.conf -pf /run/dhcpd4/dhcpd.pid %I
+    $ S.r dhcpd4@enp69s0.service
+    $ S.s dhcpd4@enp69s0.service
+      # fractal dhcpd[323496]: DHCPOFFER on 192.168.2.150 to 00:11:22:33:44:55 (MyCloud) via enp69s0
+    $ sshp lc 'cd /mnt/HD/HD_a2/_cfg && ./setup'
 
 
 TODO
