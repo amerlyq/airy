@@ -6,6 +6,21 @@ xkb_types "airy" {
 
     // Super is not default modificator, so you need custom types
 
+    type "AMER_SHIFT_SUPER" {
+        modifiers = Shift+Super;
+
+        map[None] = Level1;
+        map[Shift] = Level2;
+        map[Super] = Level3;
+        map[Shift+Super] = Level3;
+
+        preserve[Shift+Super] = Shift;
+
+        level_name[Level1] = "Base";
+        level_name[Level2] = "Shift";
+        level_name[Level3] = "Super";
+    };
+
     type "AMER_SUPER_LVL3" {
         modifiers = Super+LevelThree;
 

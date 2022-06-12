@@ -87,11 +87,9 @@ xkb_symbols "langleader_space" {
         [ space, ISO_Next_Group, ISO_First_Group, ISO_Last_Group ]
     };
 
-    // HACK: use non-present keycoce as a direct langswitch=RU
-    //   NICE: avoids latched modifiers of Super+...
-    key <KATA> { type[Group1] = "ONE_LEVEL", [ ISO_Last_Group ] };
-    // key <LatD> { overlay1=<KATA> };  // -> RU
-    // key <LatS> { overlay1=<ESC> };
+    // HACK: extend <M-L> by langswitch
+    // BAD: latching modifier isn't resetting by ISO_Next_Group
+    key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Next_Group ] };
 };
 
 
@@ -144,6 +142,12 @@ xkb_symbols "lvl3_menu_latch" {
         symbols[Group1]= [ ISO_Level3_Latch ]
     };
     modifier_map Mod5 { <LVL3> };
+
+    // HACK: use non-present keycoce as a direct langswitch=RU
+    //   NICE: avoids latched modifiers of Super+...
+    key <KATA> { type[Group1] = "ONE_LEVEL", [ ISO_Last_Group ] };
+    // key <LatD> { overlay1=<KATA> };  // -> RU
+    // key <LatS> { overlay1=<ESC> };
 };
 
 
@@ -221,6 +225,8 @@ xkb_symbols "zip" {
     key <LatJ> { [ Cyrillic_o,    Cyrillic_O  ] };
     key <LatK> { [ Cyrillic_el,   Cyrillic_EL ] };
     key <LatL> { [ Cyrillic_de,   Cyrillic_DE ] };
+    // FIXED?
+    key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Next_Group ] };
 
     key <LatZ> { [ Cyrillic_ya,   Cyrillic_YA, Cyrillic_hardsign, Cyrillic_HARDSIGN  ] };  // ъ Ъ
     key <LatX> { [ Cyrillic_che,  Cyrillic_CHE,   Ukrainian_ie, Ukrainian_IE ] };
