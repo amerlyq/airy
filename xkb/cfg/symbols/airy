@@ -7,9 +7,13 @@ xkb_symbols "airy" {
     // include "airy(zip):2"
 
     include "airy(base)"
-    include "airy(langleader)"
+    // DISABLED: no RALT on #pc:hpx
+    // include "airy(langleader_ralt)"
+    include "airy(langleader_space)"
+
     include "airy(lvl3_menu_latch)"
-    include "airy(space_esc)"
+    include "airy(overlay_lctrl)"
+    include "airy(overlay_ralt)"
     include "airy(overlay_vim)"
 };
 
@@ -18,20 +22,19 @@ partial modifier_keys
 xkb_symbols "base" {
     // include "pc"
     include "ctrl(nocaps)"
-    // include "altwin(swap_lalt_lwin)"
+    include "altwin(swap_lalt_lwin)"
     // include "level3(menu_switch)"
 };
 
 // TBD: description
 partial modifier_keys
-xkb_symbols "langleader" {
+xkb_symbols "langleader_ralt" {
+    // STD: copy-pasted from "symbols/altwin"
+    // BET? key <LALT> { type[Group1] = "THREE_LEVEL", [ Super_L, Super_L, ISO_First_Group ] };
+    // key <LALT> { type[Group1] = "ONE_LEVEL", [ Super_L ] };
+    // key <LWIN> { [ Alt_L, Meta_L ] };
 
-    // include "altwin(swap_lalt_lwin)"
-    // key <LALT> { type[Group1] = "THREE_LEVEL", [ Super_L, Super_L, ISO_First_Group ] };
-    key <LALT> { type[Group1] = "ONE_LEVEL", [ Super_L ] };
-    key <LWIN> { [ Alt_L, Meta_L ] };
-
-    replace key <MENU> {
+    replace key <RALT> {
         // type[Group1]= "THREE_LEVEL",
         // type[Group2]= "THREE_LEVEL",
         // symbols[Group1]= [ NoSymbol, NoSymbol, ISO_Last_Group ],
@@ -71,6 +74,18 @@ xkb_symbols "langleader" {
         // symbols[Group2]= [ ISO_First_Group, ISO_First_Group, VoidSymbol ],
         // actions[Group2]= [ LockGroup(group=1), LockGroup(group=1), SetMods(clearLocks) ]
     };
+};
+
+// TBD: description
+partial modifier_keys
+xkb_symbols "langleader_space" {
+    // IDEA:MAYBE: custom three-level [Base, AltGr, LevelThree]
+    //   << FAIL: useless w/o AltGr latching
+    // HACK: do <Esc> by <O1+Space>
+    replace key <SPCE> {
+        type= "AMER_SUPER_LVL3",
+        [ space, ISO_Next_Group, ISO_First_Group, ISO_Last_Group ]
+    };
 
     // HACK: use non-present keycoce as a direct langswitch=RU
     //   NICE: avoids latched modifiers of Super+...
@@ -79,15 +94,25 @@ xkb_symbols "langleader" {
     // key <LatS> { overlay1=<ESC> };
 };
 
+
 // TBD: description
 partial modifier_keys
-xkb_symbols "space_esc" {
-    key.type = "THREE_LEVEL";
-    // IDEA:MAYBE: custom three-level [Base, AltGr, LevelThree]
-    //   << FAIL: useless w/o AltGr latching
-    key <SPCE> { [ space, space, Escape ] };
+xkb_symbols "overlay_lctrl" {
+    replace key <LCTL> {
+        type= "THREE_LEVEL",
+        [ Overlay1_Enable, Overlay1_Enable, Overlay1_Enable ],
+        actions= [
+            SetControls(ctrls=Overlay1),
+            SetControls(clearLocks,ctrls=Overlay1),
+            LockControls(ctrls=Overlay1)
+        ]
+    };
+};
 
-    key <LCTL> {
+
+// HACK: only for #pc:neo -- righthand-only overlay
+xkb_symbols "overlay_ralt" {
+    replace key <RALT> {
         type= "THREE_LEVEL",
         [ Overlay1_Enable, Overlay1_Enable, Overlay1_Enable ],
         actions= [
@@ -104,7 +129,7 @@ xkb_symbols "space_esc" {
 partial modifier_keys
 xkb_symbols "lvl3_menu_latch" {
     virtual_modifiers LevelThree, Super;
-    key <RALT> {
+    key <MENU> {
         virtualMods= LevelThree,
         type[Group1]= "PC_SUPER_LEVEL2",
         symbols[Group1]= [ ISO_Level3_Latch, NoSymbol ],

@@ -2,5 +2,27 @@
 
 default partial
 xkb_types "airy" {
+    virtual_modifiers LevelThree, Super;
+
+    // Super is not default modificator, so you need custom types
+
+    type "AMER_SUPER_LVL3" {
+        modifiers = Super+LevelThree;
+
+        map[None] = Level1;
+        map[Super] = Level2;
+        map[LevelThree] = Level3;
+        map[Super+LevelThree] = Level4;
+
+        // FAIL: latching Super/Level3 are not auto-reset :(
+        // preserve[Super] = Shift;
+        // preserve[LevelThree] = Shift;
+        // preserve[Super+LevelThree] = Shift;
+
+        level_name[Level1] = "Base";
+        level_name[Level2] = "Super";
+        level_name[Level3] = "Level3";
+        level_name[Level4] = "Super+Level3";
+    };
 
 };

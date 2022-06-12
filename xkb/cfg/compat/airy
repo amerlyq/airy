@@ -66,6 +66,12 @@ xkb_compatibility "mods_latch" {
     //     virtualModifier= AltGr;
     //     action= LockGroup(group=1);
     // };
+
+    // NOTE: removed line "virtualModifier= AltGr;"
+    interpret ISO_Next_Group {
+        useModMapMods= level1;
+        action= LockGroup(group=+1);
+    };
 };
 
 

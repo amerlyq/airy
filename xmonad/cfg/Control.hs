@@ -57,9 +57,9 @@ focusing =
   [ ("M-h"      , windows W.focusMaster)
   , ("M-j"      , windows W.focusDown)
   , ("M-k"      , windows W.focusUp)
-  , ("M-l"      , GN.nextMatchWithThis GN.History wkspName)
-  , ("M-;"      , GN.nextMatchWithThis GN.Forward className)
-  , ("M-S-;"    , GN.nextMatchWithThis GN.Backward className)
+  , ("M-;"      , GN.nextMatchWithThis GN.History wkspName)
+  , ("M-'"      , GN.nextMatchWithThis GN.Forward className)
+  , ("M-S-'"    , GN.nextMatchWithThis GN.Backward className)
   , ("M-q"      , urgentNback)
   , ("M-S-q"    , pullUrgents)
   , ("M-C-q"    , clearUrgents)
@@ -67,7 +67,7 @@ focusing =
 
 swap =
   [ ("M-S-h"    , windows W.shiftMaster)
-  , ("M-S-l"    , GN.nextMatchWithThis GN.History wkspName >> windows W.swapMaster)
+  , ("M-S-;"    , GN.nextMatchWithThis GN.History wkspName >> windows W.swapMaster)
   , ("M-S-j"    , windows W.swapDown)
   , ("M-S-k"    , windows W.swapUp)
   ]
@@ -78,8 +78,8 @@ edit =
   , ("M-S-,"    , sendMessage MirrorShrink)
   , ("M-S-."    , sendMessage MirrorExpand)
   -- , ("M-m"      , Tall 1 0 0.5)  -- FIND:(how?)
-  , ("M-'"      , sendMessage . IncMasterN $  1)
-  , ("M-S-'"    , sendMessage . IncMasterN $ -1)
+  -- , ("M-'"      , sendMessage . IncMasterN $  1)
+  -- , ("M-S-'"    , sendMessage . IncMasterN $ -1)
   ---- float
   -- THINK: jumps between last two float windows -- do combo M-w, M-l better then i3 model
   , ("M-w"      , GN.nextMatch GN.History isFloat)
