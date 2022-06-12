@@ -88,12 +88,15 @@ local function on_delayed_startup()
   -- require('impatient').enable_profile()
 
   --HACK: add lazy plugins to &rtp
-  vim.opt.packpath = { MYPLUG .. '/lazy', MYCONF }
+  --DISABLED:(MYCONF,...): prevent duplicates in &rtp
+  --  NOTE: always treat MYCONF as preload-only and don't insert it here again
+  vim.opt.packpath = { MYPLUG .. '/lazy' }
 
   require 'plug.always'
   source_plugins()
 
   --WARN: loads all &rtp 'MYPLUG/preload' plugins AGAIN
+  -- print(vim.inspect(vim.opt.runtimepath))
   vim.cmd 'packloadall!'
 
   load_ondemand()

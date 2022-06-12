@@ -18,6 +18,9 @@ o.mouse = 'a'
 --Enable break indent
 o.breakindent = true
 
+--Always use spaces for indent
+o.expandtab = true
+
 -- Restrain vim from messing with '#' indent in python, etc.
 o.cinkeys:remove({ '0#' })
 o.indentkeys:remove({ '0#' })

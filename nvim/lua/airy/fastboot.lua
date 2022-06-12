@@ -26,8 +26,10 @@ o.shortmess:remove { 'F' } -- DFL=filnxtToOF
 -- ? /usr/share/vim/vimfiles
 
 -- OR: vim.env.MYVIMRC.parent
-o.runtimepath = { MYCONF, vim.env.VIMRUNTIME } -- '/@/airy/nvim/after'
-o.packpath = { MYCONF, MYPLUG .. '/preload' }
+o.runtimepath = { MYCONF, vim.env.VIMRUNTIME, MYCONF .. '/after' }
+--DISABLED:(,...): prevent duplicates in &rtp
+--   MAYBE: always treat MYCONF as preload-only and then replace packpath by "/lazy" only
+o.packpath = { MYPLUG .. '/preload', MYCONF }
 -- o.packpath = MYPLUG .. '/lazy'
 -- o.packpath = ''
 -- NEED:(python,nou): vim.cmd('source ' .. vim.env.VIMRUNTIME .. '/plugin/rplugin.vim')

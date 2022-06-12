@@ -27,9 +27,9 @@ require('nvim-treesitter.configs').setup {
   --  USAGE: automatically changes "commentstring" based on HEREDOC language
   context_commentstring = {
     enable = true,
-    -- config = {
-    --   css = '// %s'
-    -- }
+    config = {
+      cpp = '// %s'
+    }
   },
   incremental_selection = {
     enable = true,
