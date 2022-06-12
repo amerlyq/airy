@@ -28,7 +28,7 @@ if ((!$#)); then
     printf "PARTS:  " && (cd /dev && ls sd?[0-9] 2>/dev/null || echo)
     printf "SAMBA:  " && (sed -rn '/^\s+(\w+)\)\s+dosamba.*/s//\1/p' "$0" | xargs || echo)
     printf "ACTIVE: " && (ls --color=auto "$mnt") && echo || echo
-    lsblk -ao NAME,HOTPLUG,SIZE,ROTA,FSTYPE,STATE,RM,LABEL,TYPE,MOUNTPOINT
+    lsblk -ao NAME,HOTPLUG,SIZE,ROTA,FSTYPE,STATE,RM,LABEL,TYPE,MOUNTPOINTS
     exit
 fi
 
