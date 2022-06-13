@@ -5,6 +5,7 @@ source ~/.shell/profile
 [[ $DISPLAY ]] || exit 0
 
 # TEMP: new layout on startup
+cd /t  # NOTE: writes debug compilation file into $PWD
 /@/airy/xkb/cfg/apply || /@/airy/xkb/cfg/debug
 exit
 
