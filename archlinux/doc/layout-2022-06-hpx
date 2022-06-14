@@ -255,7 +255,9 @@ arch-chroot /mnt
   nvim /etc/mkinitcpio.d/linux.preset
   # CHG: HOOKS=(base udev keyboard autodetect modconf block encrypt lvm2 filesystems fsck)
   nvim /etc/mkinitcpio.conf
-  mkinitcpio -k 5.18.2-arch1-1 -vM
+  mkinitcpio -vM
+  ## OR: if archiso kernel is older than in arch-chroot
+  # mkinitcpio -k 5.18.2-arch1-1 -vM
   mkinitcpio -p linux
 
   pacman -S netctl dhcpcd ifplugd wpa_supplicant iwd
@@ -298,68 +300,42 @@ EOT
   passwd
 
 
-  ### TODO: continue ----------------------------------
-
-  ## NOTE: fix shared "users" access for /data
+  ## NOTE: stop shared "users" access to /data
   fmd(){ mkdir -p "${@:3}" && chown -R "$1" -- "${@:3}" && chmod -R "$2" -- "${@:3}"; }
-  fmd root:users 2770 /{aura,cache,data,games} /data/{_dld,music}
-  fmd root:users  750 {,/aura,/data}/.snapshots
-  fmd amer:users  750 /games/_steam  /win/{data,games,system}  /net/share
-  fmd amer:amer  2700 /home/user /media/amer  /cache/{research,vm,work}  /aura/aura
+  fmd root:users  750 {,/data}/.snapshots
+  fmd amer:users  750 /cache/_steam  /media/winsys
+  fmd amer:amer  2700 /home/user /cache/{,vm,work}  /data/{,_dld,aura,music}  /media/amer  /net/share
   chmod -R 700 /home
 
   ## NOTE: use relative links for correct snapshots
+  ln -svT at/feature /@     # IDEA:USE: /at/*
+  ln -svT data/_dld /_dld   # IDEA:USE: /d/*
+  ln -svT tmp/t /t          # ALT: directly mount [compressed ?zRAM?] ramdisk here
+  ln -svT cache/work /work  # IDEA:USE: /w/*
+
   # WARN: no folder "sdk" => distribute dld repos by features in e.g. aura or research
-  ln -svT at/feature /@
-  ln -svT data/_dld /_dld
-  ln -svT tmp/t /t  # ALT: directly mount [compressed ?zRAM?] ramdisk here
-  ln -svT aura/x /x
-  ln -svT cache/vm /vm
-  ln -svT cache/work /work
-  ln -svT share/amer /net/user
-  ln -svT user/_private /net/_private
-  ln -svT _private/@linux /net/backup
-
-  # BAD: we need additional symlink due to many places still hardcoding "~/aura"
-  #   TRY[_] replace all of them by "~/.local/airy"
-  #   BUT: then jumping in ranger will have unexpectedly deep paths...
-  ln -svT /aura/aura /home/user/aura
-
+  # ln -svT data/_steam /games
+  # ln -svT aura/x /x
+  # ln -svT cache/vm /vm
+  # ln -svT share/amer /net/user
+  # ln -svT user/_private /net/_private
+  # ln -svT _private/@linux /net/backup
+  # TEMP: ln -svT /aura/aura /home/user/aura
 
   nvim /etc/pacman.conf  # uncomment 'Color' and '[multilib]'
   pacman -Syu
-  pacman -S reflector
-  cp -vf --backup=t /etc/pacman.d/mirrorlist{,}
-  # [_] FIXME:BET: use 5 mirrors with longest retension of old packages
-  reflector --score 5 --protocol https > /etc/pacman.d/mirrorlist
-  pacman -Syyu
-  udt=$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)
-  echo "Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch" >> /etc/pacman.d/mirrorlist
-
-  echo "Include = /etc/pacman.d/aur.conf" >> /etc/pacman.conf
-  cat > /etc/pacman.d/aur.conf <<EOT
-[options]
-CacheDir = /var/cache/pacman/aur
-[aur]
-SigLevel = Optional TrustAll
-Server = file:///var/cache/pacman/aur
-EOT
-  install -dm1775 -o amer -g users -- /var/cache/pacman/aur
-  repo-add /var/cache/pacman/aur/aur.db.tar
-  chown -R amer:users /var/cache/pacman/aur
-  pacman -Sy
 
   # shellcheck disable=SC2117
   su amer
   {
+    ssh-keygen -t ed25519 -C "ED_$(cat /etc/hostname)" -f /home/user/.ssh/id_ed25519
+
     ### AUR
-    mkdir -p ~/.cache/aurutils/sync/aurutils-git
-    cd ~/.cache/aurutils/sync/aurutils-git
-    curl -L "https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils-git.tar.gz" | tar xz --strip-components=1
-    gpg --recv-keys 6BC26A17B9B7018A
-    makepkg PKGBUILD --syncdeps --clean --install --noconfirm --force
-    aur sync --database=aur --no-view --no-confirm --upgrades -- gotop-bin
-    sudo pacman --noconfirm --sync --needed -- gotop-bin
+    cd /tmp
+    curl -L https://aur.archlinux.org/cgit/aur.git/snapshot/pikaur.tar.gz | tar -xz
+    cd pikaur
+    makepkg -fsi
+    pikaur -S gotop-bin
   }
 
   ## FAIL:(snapper): hardcoded dir /.snapshots must be always present and mounted
@@ -375,7 +351,6 @@ EOT
     $cmd get-config
   }
   snap root /
-  snap aura /aura
   snap data /data
   fmd amer:amer  2700 /data/.snapshots
   systemctl enable snapper-{cleanup,timeline,boot}.timer
