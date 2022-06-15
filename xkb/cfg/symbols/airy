@@ -91,7 +91,7 @@ xkb_symbols "langleader_space" {
 
     // HACK: extend <M-L> by langswitch
     // BAD: latching modifier isn't resetting by ISO_Next_Group
-    key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Next_Group ] };
+    // key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Next_Group ] };
 
     replace key <LVL3> {
         type[Group1]= "ONE_LEVEL",
@@ -115,7 +115,9 @@ xkb_symbols "overlay_lctrl" {
         [ Overlay1_Enable, Overlay1_Enable, Overlay1_Enable ],
         actions= [
             SetControls(ctrls=Overlay1),
-            SetControls(clearLocks,ctrls=Overlay1),
+            // Field clearLocks is not defined for an action of type SetControls
+            // SetControls(clearLocks,ctrls=Overlay1),
+            SetControls(ctrls=Overlay1),
             LockControls(ctrls=Overlay1)
         ]
     };
@@ -129,7 +131,7 @@ xkb_symbols "overlay_ralt" {
         [ Overlay1_Enable, Overlay1_Enable, Overlay1_Enable ],
         actions= [
             SetControls(ctrls=Overlay1),
-            SetControls(clearLocks,ctrls=Overlay1),
+            SetControls(ctrls=Overlay1),
             LockControls(ctrls=Overlay1)
         ]
     };
@@ -243,7 +245,7 @@ xkb_symbols "zip" {
     key <LatK> { [ Cyrillic_el,   Cyrillic_EL ] };
     key <LatL> { [ Cyrillic_de,   Cyrillic_DE ] };
     // FIXED?
-    key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Next_Group ] };
+    // key <LatL> { type= "AMER_SHIFT_SUPER", [ Cyrillic_de, Cyrillic_DE, ISO_Next_Group ] };
 
     key <LatZ> { [ Cyrillic_ya,   Cyrillic_YA, Cyrillic_hardsign, Cyrillic_HARDSIGN  ] };  // ъ Ъ
     key <LatX> { [ Cyrillic_che,  Cyrillic_CHE,   Ukrainian_ie, Ukrainian_IE ] };
