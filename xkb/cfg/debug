@@ -3,6 +3,6 @@ set -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
 
 flt(){ awk -vm="^No symbols defined for" '$0~m{c+=1} !($0~m){print} END{print"ERR("m"): N="c}'; }
 
-"${0%/*}/apply" -print | tee -a /dev/tty \
-  | xkbcomp -I/@/airy/xkb/cfg - "$@" \
+"${0%/*}/apply" "$@" -print | tee -a /dev/tty \
+  | xkbcomp -I/@/airy/xkb/cfg - \
   2> >(flt)

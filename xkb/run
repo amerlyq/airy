@@ -6,8 +6,8 @@ source ~/.shell/profile
 
 # TEMP: new layout on startup
 cd /t  # NOTE: writes debug compilation file into $PWD
-/@/airy/xkb/cfg/apply || /@/airy/xkb/cfg/debug
-exit
+# /@/airy/xkb/cfg/apply || /@/airy/xkb/cfg/debug
+# exit
 
 # declare -A CURR_XKB=(
 #   [layout]='us,ua,ru' [variant]='basic,winkeys,winkeys'
@@ -17,32 +17,36 @@ exit
 # THINK: replace overlay for any layouts
 # MAYBE: is calling setxkbmap again with only '-option "over:$over"' enough?
 
-over=${1:-${CURR_XKB[overlay]:-vim}}
-r.xkb-has-overlay "${over:?}"
+# over=${1:-${CURR_XKB[overlay]:-vim}}
+# r.xkb-has-overlay "${over:?}"
+#
+# # ALT: use libxkbcommon :: /usr/lib/xkbcommon/xkbcli-{compile-keymap,list}
+# xkb_remap(){ setxkbmap -I/usr/share/X11/xkb \
+#   -display "${DISPLAY:?}" ${1:+-device "$1"} \
+#   -option "" -model pc104 -rules amer \
+#   -layout "${CURR_XKB[layout]:-us,ru,ua}" \
+#   -variant "${CURR_XKB[variant]:-amer,amer,amer}" \
+#   -option "${CURR_XKB[option]:-misc:typo,amer:nums,amer:lvl3,amer:mods},over:${over:?}"
+# }
 
-# ALT: use libxkbcommon :: /usr/lib/xkbcommon/xkbcli-{compile-keymap,list}
-xkb_remap(){ setxkbmap -I/usr/share/X11/xkb \
-  -display "${DISPLAY:?}" ${1:+-device "$1"} \
-  -option "" -model pc104 -rules amer \
-  -layout "${CURR_XKB[layout]:-us,ru,ua}" \
-  -variant "${CURR_XKB[variant]:-amer,amer,amer}" \
-  -option "${CURR_XKB[option]:-misc:typo,amer:nums,amer:lvl3,amer:mods},over:${over:?}"
+xkb_remap(){ local dev=$1; shift; local opt=$*
+   setxkbmap -v 5 -I "" -I/@/airy/xkb/cfg -I/usr/share/X11/xkb -device "$dev" \
+   -model airy -rules airy -layout us,zip -option "" -option "airy${opt:+,$opt}"
 }
 
 # NOTE: prefer to remap only STD keyboards
-kbds=(
-  "Kinesis Advantage2 Keyboard"
-  # TEMP:FAIL: can't disable, because I must be able to change language
-  "ZSA Moonlander Mark I"
-  # COS: old habits on laptop die hard
-  "AT Translated Set 2 keyboard"
-  "Logitech K340"
-  "Logitech K750"
-)
+declare -A kbds
+# TEMP:FAIL: can't disable, because I must be able to change language
+kbds["ZSA Moonlander Mark I"]="airy:zsa"
+# COS: old habits on laptop die hard
+kbds["AT Translated Set 2 keyboard"]="airy:neo"
+# "Kinesis Advantage2 Keyboard"
+# "Logitech K340"
+# "Logitech K750"
 
-for k in "${kbds[@]}"; do
+for k in "${!kbds[@]}"; do
   if id=$(xinput list --id-only "keyboard:$k"); then
-    xkb_remap "$id"
+    xkb_remap "$id" "${kbds["$k"]}"
     echo "OK: $k"
   fi
 done

@@ -10,11 +10,12 @@ xkb_symbols "airy" {
     // DISABLED: no RALT on #pc:hpx
     // include "airy(langleader_ralt)"
     include "airy(langleader_space)"
-
-    include "airy(lvl3_menu_latch)"
     include "airy(overlay_lctrl)"
-    include "airy(overlay_ralt)"
     include "airy(overlay_vim)"
+
+    // USE: rules/options to enable them
+    // include "airy(lvl3_latch_menu)"
+    // include "airy(overlay_ralt)"
 };
 
 // STD: copy-pasted from "rules/base"
@@ -91,6 +92,18 @@ xkb_symbols "langleader_space" {
     // HACK: extend <M-L> by langswitch
     // BAD: latching modifier isn't resetting by ISO_Next_Group
     key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Next_Group ] };
+
+    replace key <LVL3> {
+        type[Group1]= "ONE_LEVEL",
+        symbols[Group1]= [ ISO_Level3_Latch ]
+    };
+    modifier_map Mod5 { <LVL3> };
+
+    // HACK: use non-present keycoce as a direct langswitch=RU
+    //   NICE: avoids latched modifiers of Super+...
+    key <KATA> { type[Group1] = "ONE_LEVEL", [ ISO_Last_Group ] };
+    // key <LatD> { overlay1=<KATA> };  // -> RU
+    // key <LatS> { overlay1=<ESC> };
 };
 
 
@@ -126,7 +139,7 @@ xkb_symbols "overlay_ralt" {
 // DFL: include "level3(menu_switch)"
 // The Menu key (while pressed) chooses the third shift level.
 partial modifier_keys
-xkb_symbols "lvl3_menu_latch" {
+xkb_symbols "lvl3_latch_menu" {
     virtual_modifiers LevelThree, Super;
     key <MENU> {
         virtualMods= LevelThree,
@@ -141,17 +154,17 @@ xkb_symbols "lvl3_menu_latch" {
         // Redirect(key=<AB01>,mods=Control,clearmods=LevelFive), Redirect(key=<AB01>,mods=Shift+Control,clearmods=LevelFive), // Ctrl+Z
         overlay1=<KATA>   // -> RU
     };
-    replace key <LVL3> {
-        type[Group1]= "ONE_LEVEL",
-        symbols[Group1]= [ ISO_Level3_Latch ]
-    };
-    modifier_map Mod5 { <LVL3> };
+};
 
-    // HACK: use non-present keycoce as a direct langswitch=RU
-    //   NICE: avoids latched modifiers of Super+...
-    key <KATA> { type[Group1] = "ONE_LEVEL", [ ISO_Last_Group ] };
-    // key <LatD> { overlay1=<KATA> };  // -> RU
-    // key <LatS> { overlay1=<ESC> };
+
+xkb_symbols "lvl3_latch_ralt" {
+    virtual_modifiers LevelThree, Super;
+    replace key <RALT> {
+        virtualMods= LevelThree,
+        type[Group1]= "PC_SUPER_LEVEL2",
+        symbols[Group1]= [ ISO_Level3_Latch, ISO_Next_Group ],
+        overlay1=<KATA>   // -> RU
+    };
 };
 
 
