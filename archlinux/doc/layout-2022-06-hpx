@@ -168,7 +168,7 @@ timedatectl set-ntp true
 timedatectl status
 
 # NEW: "base" is almost empty now -- install everything manually
-pacstrap /mnt  base intel-ucode linux linux-firmware base-devel cryptsetup lvm2 btrfs-progs neovim git
+pacstrap /mnt  base intel-ucode linux linux-firmware cryptsetup lvm2 btrfs-progs base-devel neovim man git
 
 
 ## CHG: manually remove swap of host system (if necessary)
@@ -354,6 +354,14 @@ EOT
   snap data /data
   fmd amer:amer  2700 /data/.snapshots
   systemctl enable snapper-{cleanup,timeline,boot}.timer
+
+
+  ### TODO: continue ----------------------------------
+
+  ### OPT Xorg
+  # https://wiki.archlinux.org/title/Intel_graphics#Installation
+  pacman -S xorg-server xf86-video-intel mesa lib32-mesa vulkan-intel
+  # libva libva-intel-driver mesa-libgl lib32-mesa-libgl  # ? intel-media-driver
 }
 
 # umount /mnt/hostrun
