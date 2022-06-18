@@ -82,6 +82,8 @@
   [%] 1h10m CFG поднять Xorg на новом ноуте
     [/] READ: wayland
   [_] READ: general links
+    HP Spectre x360 (2020) - ArchWiki ⌇⡢⢮⠌⠕
+      https://wiki.archlinux.org/title/HP_Spectre_x360_(2020)
   [_] DEV very basic !airyctl in .py
   [_] CFG поднять Xorg на новом ноуте
   [_] NICE: virtual keyboard for #pc:hpx
@@ -98,6 +100,7 @@
     OR:TRY: lvm cache
     OR: keep there /aura for faster grep
     OR: directly mount /t as [compressed ?zRAM?] ramdisk
+    OR: simply mount as /t -- for persistent "working area" for daily experimenting
   [_] TRY: fun with wayland + Qtile
     VIZ: Are we Wayland yet? ⌇⡢⢩⠔⢯
       https://arewewaylandyet.com/
@@ -108,3 +111,30 @@
   [⡢⢫⢴⢆] 10m list explicitly installed
     $ pacman -Qe
   [⡢⢫⢷⠢] 10m install fonts for Qtile
+
+
+2022-06-18-Sat-W24
+  [_] BUG: too many udev
+    41 systemd-udevd processes on startup · Issue #11405 · systemd/systemd ⌇⡢⢭⣬⣯
+      https://github.com/systemd/systemd/issues/11405
+      ¦ Please try to set children_max= in udev.conf.
+      ¦ https://www.freedesktop.org/software/systemd/man/udev.conf.html
+    186200 - Multiple instances of udev daemon when system boots - arm st1q - chromium ⌇⡢⢭⣿⠧
+      https://bugs.chromium.org/p/chromium/issues/detail?id=186200
+  [≫] TRY: replace pulseaudio+jack2 by pipewire
+    PipeWire is a fantastic JACK replacement : linuxaudio ⌇⡢⢮⠊⢝
+      https://www.reddit.com/r/linuxaudio/comments/pel0nr/pipewire_is_a_fantastic_jack_replacement/
+    JACK Audio Connection Kit - ArchWiki ⌇⡢⢮⠋⣟
+      https://wiki.archlinux.org/title/JACK_Audio_Connection_Kit#Comparison_of_JACK_implementations
+  [_] keyboard delay
+    berzoidberg/i8042-spectre-dkms: Fixes keyboard init delay in HP Spectre models ⌇⡢⢮⠋⣥
+      https://github.com/berzoidberg/i8042-spectre-dkms
+  [_] ERR: audio
+    Advanced Linux Sound Architecture - ArchWiki ⌇⡢⢮⠋⣵
+      https://wiki.archlinux.org/title/Advanced_Linux_Sound_Architecture#ALSA_firmware
+      ::: sof-firmware
+  [_] ERR: cpu
+    Pcc_cpufreq initstate no such device Error - Support - Manjaro Linux Forum ⌇⡢⢮⠋⢵
+      https://forum.manjaro.org/t/pcc-cpufreq-initstate-no-such-device-error/14172/4
+    kernel/git/stable/stable-queue.git - Linux kernel stable patch queue ⌇⡢⢮⠋⢻
+      https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/diff/releases/5.8.4/cpufreq-intel_pstate-fix-cpuinfo_max_freq-when-msr_t.patch?id=7a5af378bcb60d514b939788d62678e8f0bee3af

@@ -18,6 +18,7 @@ Type=forking
 # ALSO:BUG: after Xorg crash or terminate I can't input anything in console MAYBE:USE: -noreset
 # BUG:FIXED:(server does not have extension for dpms option):
 #   ::: USE:(dpms flag): http://grml.ml.grml.narkive.com/DxpaREft/xorg-does-not-have-extension-for-dpms-option
+# SRC: https://github.com/joukewitteveen/xlogin/blob/master/x-daemon.in
 ExecStart=/bin/sh -c "trap 'echo waited SIGUSR1 received; exit 0' USR1; (trap '' USR1;\
 exec /usr/bin/Xorg ${DISPLAY} vt${XDG_VTNR} -nolisten tcp -keeptty -verbose 2 \
     dpms -c -f 0 -s 0 -ardelay 250 -arinterval 25 %{DPI} \

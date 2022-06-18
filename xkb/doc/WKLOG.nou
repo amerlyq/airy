@@ -301,3 +301,18 @@
 
 2022-06-06-Mon-W23
   [_] IDEA:BET? switch lang ru/en by lctrl/rctrl
+  [_] [1h] ^⡢⠽⡹⡹ #xkb ※⡢⠽⡹⠣ <⡢⡊⣭⣣>
+    [_] REM $ cd /usr/share/X11/xkb && ls -l $(fl)
+    = keep symlinks "for now" -- to preserve !r.xkb on reboot
+    [_] look what else I could SEIZE from old CFG
+    [_] backup my own CFG files
+
+
+2022-06-14-Tue-W24
+  [_] FIND: #xkb latch reset modifiers
+    [✗] WTF: 34fbc0e0 resets "lvl3_latch" when switching lang to "en" by <menu+Space>
+      FAIL: I was wrong, !st cursor changes color, but modifier bit is still kept
+    [_] SEE: code, why mods are reset for other keys, and not reset for ISO_ ?
+      [_] IDEA:MAYBE: use some no-op virtual key, and press it as macro after langswitch
+    [_] MAYBE: there are some special opts for "interpret" ?
+    [_] OR: re-read one of older guides from Ivan Pascal
