@@ -1,12 +1,14 @@
 #!/bin/bash -eu
 # tags: xorg
-source ~/.shell/func.d/cfgsetup
+# source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 # linkcp -t /etc/X11 xkb
 # BET: create local PKGBUILD and install settings through package
 # linkcp -kt '/usr/share/X11' xkb/{compat,rules,symbols,types}/*
+PATH=/@/airy/airy/bin:$PATH
 (cd cfg && linkcp -kt '/usr/share/X11/xkb' {compat,rules,symbols,types}/*)
+exit
 
 # CHECK: maybe broken, as airy/setup sets DISPLAY=:0
 # NOTE: broken after exporting DISPLAY for *monitor*

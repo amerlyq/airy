@@ -1,11 +1,11 @@
 #!/bin/bash -e
-source ~/.shell/profile
+# source ~/.shell/profile
 # CHECK: maybe broken, as airy/setup sets DISPLAY=:0
 # FAIL:(xset q &>/dev/null): will launch socket-activated Xorg when not needed
 [[ $DISPLAY ]] || exit 0
 
 # TEMP: new layout on startup
-cd /t  # NOTE: writes debug compilation file into $PWD
+# cd /t  # NOTE: writes debug compilation file into $PWD
 # /@/airy/xkb/cfg/apply || /@/airy/xkb/cfg/debug
 # exit
 
@@ -39,13 +39,14 @@ declare -A kbds
 # TEMP:FAIL: can't disable, because I must be able to change language
 kbds["ZSA Moonlander Mark I"]="airy:zsa"
 # COS: old habits on laptop die hard
-kbds["AT Translated Set 2 keyboard"]="airy:neo"
+# kbds["AT Translated Set 2 keyboard"]="airy:neo"
+kbds["AT Translated Set 2 keyboard"]="airy:hpx"
 # "Kinesis Advantage2 Keyboard"
 # "Logitech K340"
 # "Logitech K750"
 
 for k in "${!kbds[@]}"; do
-  if id=$(xinput list --id-only "keyboard:$k"); then
+  if id=$(xinput list --id-only "keyboard:$k" 2>/dev/null); then
     xkb_remap "$id" "${kbds["$k"]}"
     echo "OK: $k"
   fi

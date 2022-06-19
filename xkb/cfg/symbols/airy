@@ -84,14 +84,16 @@ xkb_symbols "langleader_space" {
     //   << FAIL: useless w/o AltGr latching
     // HACK: do <Esc> by <O1+Space>
     replace key <SPCE> {
-        type= "AMER_SUPER_LVL3",
+        // type= "AMER_SUPER_LVL3",
         // [ space, ISO_Next_Group, ISO_First_Group, ISO_Last_Group ]
-        [ space, space, ISO_First_Group, ISO_Last_Group ]
+        // [ space, space, ISO_First_Group, ISO_Last_Group ]
+        type= "THREE_LEVEL",
+        [ space, space, Escape ]
     };
 
     // HACK: extend <M-L> by langswitch
     // BAD: latching modifier isn't resetting by ISO_Next_Group
-    // key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Next_Group ] };
+    replace key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Last_Group ] };
 
     replace key <LVL3> {
         type[Group1]= "ONE_LEVEL",
@@ -146,9 +148,7 @@ xkb_symbols "lvl3_latch_menu" {
     key <MENU> {
         virtualMods= LevelThree,
         type[Group1]= "PC_SUPER_LEVEL2",
-        // symbols[Group1]= [ ISO_Level3_Latch, NoSymbol ],
-        // symbols[Group1]= [ ISO_Level3_Latch, ISO_Last_Group ],
-        symbols[Group1]= [ ISO_Level3_Latch, ISO_Next_Group ],
+        symbols[Group1]= [ ISO_Level3_Latch, ISO_First_Group ],
 
         // [⡢⡞⣒⠂] TRY: clear modifiers through redirection
         //   FAIL: redirection won't execute action= of another
@@ -164,7 +164,7 @@ xkb_symbols "lvl3_latch_ralt" {
     replace key <RALT> {
         virtualMods= LevelThree,
         type[Group1]= "PC_SUPER_LEVEL2",
-        symbols[Group1]= [ ISO_Level3_Latch, ISO_Next_Group ],
+        symbols[Group1]= [ ISO_Level3_Latch, ISO_First_Group ],
         overlay1=<KATA>   // -> RU
     };
 };
@@ -245,7 +245,7 @@ xkb_symbols "zip" {
     key <LatK> { [ Cyrillic_el,   Cyrillic_EL ] };
     key <LatL> { [ Cyrillic_de,   Cyrillic_DE ] };
     // FIXED?
-    // key <LatL> { type= "AMER_SHIFT_SUPER", [ Cyrillic_de, Cyrillic_DE, ISO_Next_Group ] };
+    // key <LatL> { type= "AMER_SHIFT_SUPER", [ Cyrillic_de, Cyrillic_DE, ISO_Last_Group ] };
 
     key <LatZ> { [ Cyrillic_ya,   Cyrillic_YA, Cyrillic_hardsign, Cyrillic_HARDSIGN  ] };  // ъ Ъ
     key <LatX> { [ Cyrillic_che,  Cyrillic_CHE,   Ukrainian_ie, Ukrainian_IE ] };
