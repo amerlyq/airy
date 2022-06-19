@@ -20,7 +20,8 @@ def tmpfile(nm):
     ge = os.getenv
     tmp = ge(
         "RANGER_TMPDIR",
-        fs.join(ge("TMPDIR", fs.join("/tmp", ge("USER", ""), "ranger"))),
+        # ALT: fs.join(ge("TMPDIR", fs.join("/tmp", ge("USER", ""), "ranger"))),
+        fs.join(ge("XDG_RUNTIME_DIR", "/tmp"), "ranger"),
     )
     if not fs.isdir(tmp):
         os.mkdir(tmp)
