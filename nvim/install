@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-source ~/.shell/func.d/packages
+source /@/airy/airy/shell/func.d/packages
 
 pkg_inst neovim
 
@@ -10,5 +10,7 @@ aur_inst neovim-remote
 # DEPS:(aur/python-lsp-all):
 #   python-pylsp-rope ALSO: pip install pylsp-autoimport && auri python-autoimport
 pkg_inst python-pylint python-lsp-{server,black}
-aur_inst python-pylsp-mypy  # python-lsp-isort
-pip_inst pyls-isort
+aur_inst python-pylsp-mypy python-pyls-isort # python-lsp-isort
+# pip_inst pyls-isort
+
+pkg_inst lua-language-server

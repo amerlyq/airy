@@ -58,3 +58,8 @@ K('nx', '<Tab>u', '<Cmd>UndotreeToggle<CR>')
 
 
 K('nx', '<Tab>q', '<Cmd>TroubleToggle<CR>')
+
+
+-- SRC: https://github.com/AndrewRadev/switch.vim
+g.switch_mapping = '<CR>'
+g.switch_reverse_mapping = '<BS>'
