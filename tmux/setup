@@ -7,7 +7,7 @@ source ~/.shell/func.d/cfgsetup
 # error connecting to /tmp//tmux-1000/default (No such file or directory)
 
 ### LINKS ###
-linkcp "$PWD/tmux.conf" ~/.tmux.conf
+linkcp -t ~/.config/tmux -- tmux.conf
 linkcp "$PWD/theme-${THEME}.conf" ~/.config/airy/theme-tmux.conf
 
 if distro arch; then

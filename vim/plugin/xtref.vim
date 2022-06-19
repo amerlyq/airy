@@ -12,7 +12,7 @@ let g:xtref = {}
 let g:xtref.aura = "/@/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 " $VPLUGS = temp store *.tags for newly created/edited files
-let g:xtref.lazytagdir = "/@/xdg_cache/vim/cache/plugins"
+let g:xtref.lazytagdir = "/@/xdg_cache/nvim"
 
 " ALT: ⌇ => ¶ .like. https://www.yoctoproject.org/docs/3.1.1/brief-yoctoprojectqs/brief-yoctoprojectqs.html
 " OR:USE: '⌇' = "\u2307" = [\u2307]
@@ -290,7 +290,8 @@ fun! xtref#ctags(root, ...)
     let bufs = filter(map(copy(getbufinfo()), 'v:val.name'), 'len(v:val)')
   end
 
-  let cmd = 'r.vim-xtref -t -- -o '.dst
+  " let cmd = 'r.vim-xtref -t -- -o '.dst
+  let cmd = '/@/airy/vim/ctl/xtref -t -- -o '.dst
   if dstdir != a:root
     let cmd .= ' --tag-relative=never'
   end
@@ -540,5 +541,5 @@ map <silent> [Xtref]X <Plug>(xtref-task-done)
 
 
 " HACK: new leader
-map <silent>  [Frame]x  [Xtref]
+map <silent>  \x  [Xtref]
 noremap <silent>  [Xtref] <Nop>

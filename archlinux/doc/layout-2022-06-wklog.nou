@@ -101,6 +101,10 @@
     OR: keep there /aura for faster grep
     OR: directly mount /t as [compressed ?zRAM?] ramdisk
     OR: simply mount as /t -- for persistent "working area" for daily experimenting
+    [_] BET? keep whole !qute on /t for faster startup
+      * do same way like qute-proxy
+      * BUT: no need to keep qute-proxy there too
+      [?] IDEA: symlink qute-proxy and qute to share histories
   [_] TRY: fun with wayland + Qtile
     VIZ: Are we Wayland yet? ⌇⡢⢩⠔⢯
       https://arewewaylandyet.com/
@@ -114,6 +118,27 @@
 
 
 2022-06-18-Sat-W24
+  [X] ◔ 5h35m #pc:hpx CFG install archlinux ※⡢⢢⣿⢘
+    ‼ WARN: не увлекаться #pc:hpx -- мне ещё искать дом для покупки
+    [✗⡢⢭⣳⠀] 35m TRY Wayland anyways
+      * can't find HiDPI fix for !qtile
+      * very slow startup of !xterm
+      ::: not ready to use, TRY:FUTURE: some other time, when system works
+        https://bbs.archlinux.org/viewtopic.php?id=272707
+        [≫] TUT:CFG: Colin Woodbury - Full Wayland Setup on Arch Linux ⌇⡢⢭⣾⣝
+          https://www.fosskers.ca/en/blog/wayland
+        [≫] Revisiting Wayland for ArchLinux :: Rohit Goswami — Reflections ⌇⡢⢭⣿⠈
+          https://rgoswami.me/posts/revisiting-wayland-2021-archlinux/
+      [≫] run !st in XWayland
+    [%] 1h20m why font size so small
+      264x176: dpi=289  # xpyinfo | grep -B2 resolu
+      285x190: dpi=267 -> 288(96*3)
+    [X] 1h CFG copy only necesary mods one-by-one
+    [X] 50m CFG copy only necesary repos
+    [X] 1h CFG: nvim, tmux, ff, qute, etc. w/o using !airyctl
+      << #preps to edit #just.airy
+    [X] 50m CFG airy
+  ~~~
   [_] BUG: too many udev
     41 systemd-udevd processes on startup · Issue #11405 · systemd/systemd ⌇⡢⢭⣬⣯
       https://github.com/systemd/systemd/issues/11405
@@ -138,3 +163,15 @@
       https://forum.manjaro.org/t/pcc-cpufreq-initstate-no-such-device-error/14172/4
     kernel/git/stable/stable-queue.git - Linux kernel stable patch queue ⌇⡢⢮⠋⢻
       https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/diff/releases/5.8.4/cpufreq-intel_pstate-fix-cpuinfo_max_freq-when-msr_t.patch?id=7a5af378bcb60d514b939788d62678e8f0bee3af
+
+
+2022-06-19-Sun-W24
+  [%] BUG: switch ranger-back moves cursor
+    ::: looks like it's [I [O escape codes -- to move focus
+    [%] FIND culprit :: st, fish, readline, tmux, ranger
+      ::: TEMP: disable "focus-events" in !tmux
+    [≫] TRY: proper fix to support "focus-events"
+  >>>
+  [_] #nvim TODO black theme
+    * better energy efficiency for OLED
+    * less blue colors for burn-out like what occured on #pc:neo

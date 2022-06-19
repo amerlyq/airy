@@ -7,26 +7,26 @@ index 877afab..16f7260 100644
   * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
   */
 -static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
-+static char *font = "monospace-9";
++static char *font = "monospace-13";
  static int borderpx = 2;
- 
+
  /*
 @@ -176,8 +176,9 @@ unsigned int cursorshape = 2;
   * Default columns and rows numbers
   */
- 
+
 -static unsigned int cols = 80;
 -static unsigned int rows = 24;
 +// Set geometry to keep it when doFloat
 +static unsigned int cols = 100;
 +static unsigned int rows = 30;
- 
+
  /*
   * Default colour and shape of the mouse cursor
 @@ -217,6 +217,10 @@ MouseShortcut mshortcuts[] = {
  #define MODKEY Mod1Mask
  #define TERMMOD (ControlMask|ShiftMask)
- 
+
 +/* THINK: pass more inner vars from st instance */
 +static char *pipe_url[] = { "r.st-pipe", "--url", NULL };
 +static char *pipe_vim[] = { "r.st-pipe", "--vim", NULL };
@@ -43,9 +43,9 @@ index 877afab..16f7260 100644
 +	{ TERMMOD,              XK_space,       externalpipe,   {.v = pipe_vim} },
 +	{ TERMMOD,              XK_Return,      newterm,        {.i =  0} },
  };
- 
+
  /*
-# @@ -540,2 +540,2 @@ 
+# @@ -540,2 +540,2 @@
 #  // Active style
 # -#define UNDERCURL_STYLE UNDERCURL_SPIKY
 # +#define UNDERCURL_STYLE UNDERCURL_CAPPED
