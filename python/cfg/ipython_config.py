@@ -56,7 +56,7 @@ c.InteractiveShellApp.exec_lines = [
 # TUT: https://towardsdatascience.com/speed-up-jupyter-notebooks-20716cbe2025
 c.InteractiveShellApp.extensions = [
     "autoreload",
-    "memory_profiler",
+    # "memory_profiler",
     # "pyflyby",
 ]  # @me
 

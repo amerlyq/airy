@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # tags: lang
-source ~/.shell/func.d/cfgsetup
+# source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
 # linkcp {,~/.}pdbrc
@@ -8,10 +8,13 @@ source ~/.shell/func.d/cfgsetup
 # sudo chown -R $USER:$USER ~/.config/pudb
 
 # DFL: generate by $ ipython profile create
+PATH=/@/airy/airy/bin:$PATH
 linkcp -t ~/.ipython/profile_default -- cfg/ipython_config.py
 linkcp -t ~/.ipython/profile_default/startup -- cfg/ipython_startup.py
 linkcp -t ~/.jupyter -- cfg/jupyter_{,qt}console_config.py
 linkcp cfg/mypy.ini ~/.config/mypy/config
+# SRC: https://pylint.pycqa.org/en/latest/user_guide/usage/run.html
+linkcp -t ~/.config -- cfg/pylintrc
 
 
 ## BET: use PKGBUILD to creates only symlink :: $SYS/site-packages/just -> /@/just/pkg

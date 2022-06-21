@@ -1,0 +1,97 @@
+#%NEW: $ pylint --generate-rcfile > .pylintrc
+# REF: http://pylint.pycqa.org/en/latest/technical_reference/features.html#format-checker-options
+[MAIN]
+
+# A comma-separated list of package or module names from where C extensions may
+# be loaded. Extensions are loading into the active Python interpreter and may
+# run arbitrary code.
+extension-pkg-allow-list=curses,PyQt5,pygit2
+# List of module names for which member attributes should not be checked
+# (useful for modules/projects where namespaces are manipulated during runtime
+# and thus existing member attributes cannot be deduced by static analysis). It
+# supports qualified module names, as well as Unix pattern matching.
+# OLD: generated-members = '(unyt|U)\..+'
+ignored-modules = unyt
+
+
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use.
+jobs=0
+
+# List of plugins (as comma separated values of python module names) to load,
+# usually to register additional checkers.
+load-plugins=
+
+# Pickle collected data for later comparisons.
+persistent=yes
+
+# ALSO:
+# python - Ignore by directory using Pylint - Stack Overflow ⌇⡡⡚⣅⡆
+#   https://stackoverflow.com/questions/2503717/ignore-by-directory-using-pylint/52123522#52123522
+# ignore=CVS
+
+
+[MESSAGES CONTROL]
+# OR= C0103,C0111,W0511
+disable=consider-using-f-string,
+        missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
+        # wrong-spelling-in-comment
+
+[BASIC]
+
+# Good variable names regexes, separated by a comma. If names match any regex,
+# they will always be accepted
+## USE: inof C0103
+# good-names=i,j,k,ex,Run,_,pk,x,y
+# good-names-rgxs = ^[_a-z][_a-z0-9]?$
+good-names-rgxs = ^[a-z][a-z0-9]?$
+
+
+[DESIGN]
+
+# Maximum number of arguments for function / method.
+max-args=6
+
+[FORMAT]
+
+# Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
+expected-line-ending-format=LF
+
+# Regexp for a line that is allowed to be longer than the limit.
+# SEE: https://github.com/PyCQA/pylint/issues/2178
+ignore-long-lines = ^\s*(#.*\s+)?https?://\S+$
+
+# Maximum number of characters on a single line.
+# NOTE: "!black" needs 88, but we want to allow long comments
+max-line-length = 112
+
+[MISCELLANEOUS]
+
+# List of note tags to take in consideration, separated by a comma.
+## USE: inof W0511
+# NOTE: enable only during clean-up, LSP being very intrusive and distracting
+# notes=FIXME,
+#       XXX,
+#       TODO
+notes=
+
+
+[SPELLING]
+
+# Spelling dictionary name. Available dictionaries: none. To make it work,
+# install the 'python-enchant' package.
+# SRC: https://stackoverflow.com/questions/27162315/automated-docstring-and-comments-spell-check
+# DEP: 'python-pyenchant'
+# spelling-dict = en_US
+
+
+[TYPECHECK]
+
+# List of members which are set dynamically and missed by pylint inference
+# system, and so shouldn't trigger E1101 when accessed. Python regular
+# expressions are accepted.
+# FAIL: still does not support '(?:...)' groups
+#   https://github.com/PyCQA/pylint/issues/1167
+generated-members = fmt\.R[a-z]+
