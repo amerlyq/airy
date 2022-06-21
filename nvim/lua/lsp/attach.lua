@@ -24,7 +24,7 @@ local on_attach = function(client, bufnr)
   end
 
   local B = vim.lsp.buf
-  autocmd('BufWritePre', B.formatting_sync, "Auto Format")
+  autocmd('BufWritePre', B.format, "Auto Format")
   -- ALT: vim-illuminate
   autocmd({ 'CursorHold', 'CursorHoldI' }, B.document_highlight, "hi! show under cursor")
   autocmd('CursorMoved', B.clear_references, "hi! clear under cursor")

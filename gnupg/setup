@@ -1,18 +1,20 @@
 #!/bin/bash -e
 # tags: net
-source ~/.shell/func.d/cfgsetup
+# source ~/.shell/func.d/cfgsetup
 
 ### LINKS ###
+PATH=/@/airy/airy/bin:$PATH
 mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
 linkcp -t  ~/.gnupg gpg{,-agent}.conf
 
 # svc_activate -cue gpg-agent.service
-d=/usr/share/doc/gnupg/examples/systemd-user
-svc_activate -cue -f "$d" gpg-agent-ssh.socket gpg-agent.socket
-svc_activate -cu -f "$d" gpg-agent.service
+# d=/usr/share/doc/gnupg/examples/systemd-user
+# svc_activate -cue -f "$d" gpg-agent-ssh.socket gpg-agent.socket
+svc_activate -cue gpg-agent-ssh.socket gpg-agent.socket
+svc_activate -cu gpg-agent.service
 # dirmngr.service dirmngr.socket
 
-if cfgOpt u; then
+# if cfgOpt u; then
   # echo RELOADAGENT | tee >(gpg-connect-agent)
   gpg-connect-agent reloadagent /bye
-fi
+# fi

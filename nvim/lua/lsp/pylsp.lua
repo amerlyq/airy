@@ -10,7 +10,7 @@ local settings = {
   --   TALK: https://github.com/neovim/nvim-lspconfig/issues/1347
   --   FIXED: https://neovim.discourse.group/t/pylsp-config-is-not-taken-into-account/1846/2
   pylsp = {
-    -- configurationSources = {"pylint"},
+    configurationSources = { "pylint" },
     plugins = {
       -- BAD:NEED: $ paci nuspell
       pylint = { enabled = true }, -- , args = {"--rcfile=pylint.ini", "--disable C0301"}
