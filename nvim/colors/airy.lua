@@ -2,6 +2,14 @@
 if vim.fn.exists 'syntax_on' then vim.api.nvim_command 'syntax reset' end
 vim.g.colors_name = 'airy'
 
+-- solarized
+-- local bg = '#002b36'
+-- local cg = '#073642'
+
+-- true black
+local bg = '#000000'
+local cg = '#021b24'
+
 -- VIZ: fg,bg,sp,gui = bold italic reverse standout underline underlineline undercurl underdot underdash strikethrough
 -- ALSO:(default=true): don't override existing definition
 local highlights = {
@@ -37,17 +45,17 @@ local highlights = {
 
   Cursor = { fg = '#fdf6e3', bg = '#268bd2' },
 
-  Normal        = { fg = '#93a1a1', bg = '#002b36' },
-  FoldColumn    = { fg = '#839496', bg = '#073642' },
-  Folded        = { fg = '#839496', bg = '#073642', sp = '#002b36', bold = true },
-  Terminal      = { fg = '#93a1a1', bg = '#002b36' },
-  ToolbarButton = { fg = '#93a1a1', bg = '#073642', bold = true },
-  ToolbarLine   = { bg = '#073642' },
+  Normal        = { fg = '#93a1a1', bg = bg },
+  FoldColumn    = { fg = '#839496', bg = cg },
+  Folded        = { fg = '#839496', bg = cg, sp = bg, bold = true },
+  Terminal      = { fg = '#93a1a1', bg = bg },
+  ToolbarButton = { fg = '#93a1a1', bg = cg, bold = true },
+  ToolbarLine   = { bg = cg },
 
-  CursorLineNr = { fg = '#839496', bg = '#073642', bold = true },
-  LineNr       = { fg = '#657b83', bg = '#073642' },
+  CursorLineNr = { fg = '#839496', bg = cg, bold = true },
+  LineNr       = { fg = '#657b83', bg = bg },
   NonText      = { fg = '#657b83', bold = true },
-  SpecialKey   = { fg = '#657b83', bg = '#073642', bold = true },
+  SpecialKey   = { fg = '#657b83', bg = cg, bold = true },
   SpellBad     = { fg = '#6c71c4', sp = '#6c71c4', undercurl = true },
   SpellCap     = { fg = '#6c71c4', sp = '#6c71c4', undercurl = true },
   SpellLocal   = { fg = '#b58900', sp = '#b58900', undercurl = true },
@@ -55,31 +63,31 @@ local highlights = {
   Title        = { fg = '#cb4b16', bold = true },
 
 
-  DiffAdd    = { fg = '#859900', bg = '#073642', sp = '#859900' },
-  DiffChange = { fg = '#b58900', bg = '#073642', sp = '#b58900' },
-  DiffDelete = { fg = '#dc322f', bg = '#073642', bold = true },
-  DiffText   = { fg = '#268bd2', bg = '#073642', sp = '#268bd2' },
+  DiffAdd    = { fg = '#859900', bg = bg, sp = '#859900' },
+  DiffChange = { fg = '#b58900', bg = bg, sp = '#b58900' },
+  DiffDelete = { fg = '#dc322f', bg = bg, bold = true },
+  DiffText   = { fg = '#268bd2', bg = bg, sp = '#268bd2' },
 
-  StatusLine   = { fg = '#839496', bg = '#073642' },
-  StatusLineNC = { fg = '#586e75', bg = '#073642', reverse = true },
+  StatusLine   = { fg = '#839496', bg = cg },
+  StatusLineNC = { fg = '#586e75', bg = cg, reverse = true },
   -- TabLine,TabLineFill          = { fg='#586e75', bg='#073642', reverse=true },
-  TabLine      = { fg = '#828997', bg = '#073642' },
-  TabLineFill  = { fg = '#586e75', bg = '#073642' },
-  TabLineSel   = { fg = '#abb2bf', bg = '#002b36', bold = true },
-  VertSplit    = { fg = '#073642', bg = '#586e75' },
+  TabLine      = { fg = '#828997', bg = cg },
+  TabLineFill  = { fg = '#586e75', bg = cg },
+  TabLineSel   = { fg = '#abb2bf', bg = bg, bold = true },
+  VertSplit    = { fg = cg, bg = '#586e75' },
 
-  ColorColumn  = { bg = '#073642' },
+  ColorColumn  = { bg = cg },
   Conceal      = { fg = '#268bd2' },
-  CursorColumn = { bg = '#073642' },
-  CursorLine   = { bg = '#073642' },
+  CursorColumn = { bg = cg },
+  CursorLine   = { bg = bg, underline = true },
   Directory    = { fg = '#268bd2' },
   EndOfBuffer  = { fg = 'NONE' },
   ErrorMsg     = { fg = '#dc322f', bg = '#fdf6e3', reverse = true },
   IncSearch    = { fg = '#cb4b16', standout = true },
-  MatchParen   = { fg = '#fdf6e3', bg = '#073642', bold = true },
+  MatchParen   = { fg = '#fdf6e3', bg = cg, bold = true },
   ModeMsg      = { fg = '#268bd2' },
   MoreMsg      = { fg = '#268bd2' },
-  Pmenu        = { fg = '#93a1a1', bg = '#073642' },
+  Pmenu        = { fg = '#93a1a1', bg = cg },
   PmenuSbar    = { bg = '#586e75' },
   PmenuSel     = { fg = '#eee8d5', bg = '#657b83' },
   PmenuThumb   = { bg = '#839496' },
@@ -90,9 +98,9 @@ local highlights = {
   SignColumn   = { link = 'LineNr' },
   -- SignColumn       = { fg='#839496' },
   Visual       = { fg = '#586e75', bg = '#002b36', reverse = true },
-  VisualNOS    = { bg = '#073642', reverse = true },
+  VisualNOS    = { bg = cg, reverse = true },
   WarningMsg   = { fg = '#cb4b16', bold = true },
-  WildMenu     = { fg = '#eee8d5', bg = '#073642', reverse = true },
+  WildMenu     = { fg = '#eee8d5', bg = cg, reverse = true },
   Comment      = { fg = '#586e75', italic = true },
   Constant     = { fg = '#2aa198' },
   CursorIM     = { bg = '#93a1a1' },
