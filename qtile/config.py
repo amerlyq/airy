@@ -25,7 +25,9 @@
 # SOFTWARE.
 
 from libqtile import bar, layout, widget
-from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.config import Click, Drag
+from libqtile.config import EzKey as K
+from libqtile.config import Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
@@ -108,6 +110,9 @@ keys = [
     # Key([mod, "shift"], "slash", lazy.prev_layout(), desc="Toggle between layouts"),
     Key([mod], "f", lazy.next_layout(), desc="Toggle between layouts"),
     # Key([mod], "f", lazy.window.toggle_fullscreen(), desc="Toggle fullscreen"),
+    # K("M-S-x", lazy.hide_show_bar("top")),
+    # K("M-x", lazy.hide_show_bar("bottom")),
+    K("M-S-f", lazy.hide_show_bar("bottom")),
     Key([mod], "backslash", lazy.window.kill(), desc="Kill focused window"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
