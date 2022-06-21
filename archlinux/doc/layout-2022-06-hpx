@@ -83,6 +83,10 @@ mkfs.btrfs -L data -f /dev/ws/data
 mkfs.ext4 -L cache /dev/ws/cache
 mkswap -L swap -f /dev/ws/swap
 
+## HACK: free-up 5% reserved disk space on non-root disks
+tune2fs -l /dev/ws/cache | grep "^Block size:"
+tune2fs -r "$((200*1024*1024/4096))" /dev/ws/cache  # =51200
+
 
 ### INFO ######################################################################
 lsblk -ao NAME,HOTPLUG,SIZE,ROTA,FSTYPE,STATE,RM,LABEL,TYPE,MOUNTPOINT

@@ -515,3 +515,26 @@
           https://github.com/tpope/vim-characterize
         someone-stole-my-name/yaml-companion.nvim: Get, set and autodetect YAML schemas in your buffers. ⌇⡢⢉⡁⠳
           https://github.com/someone-stole-my-name/yaml-companion.nvim
+
+
+2022-06-20-Mon-W25
+  [⡢⢰⢧⡁] ◔ 1h #nvim mypy diagnostics on <,q> wrong FMT for :quickfix ⌇⡢⢱⢤⠼
+    [X] 20m $ sudo /usr/share/bcc/tools/execsnoop -T
+      16:59:56 mypy             5268   5257     0 /usr/bin/mypy --show-column-numbers --config-file /data/aura/just/mypy.ini /data/aura/just/airy/airy.py --incremental --follow-imports silent
+      16:59:56 python           5272   5257     0 /usr/bin/python -c from pylint import epylint;epylint.Run() /data/aura/just/airy/airy.py -f json
+      16:59:56 python           5273   5272     0 /usr/bin/python -c import sys; from pylint.lint import Run; Run(sys.argv[1:]) --msg-template {path}:{line}: {category} ({msg_id}, {symbol}, {obj}) {msg} -r n just/airy/airy.py -f json
+      16:59:58 python           5285   5257     0 /usr/bin/python /usr/lib/python3.10/site-packages/jedi/inference/compiled/subprocess/__main__.py /usr/lib/python3.10/site-packages 3.10.5
+    [$] TRY: run same cmds manually to get raw output CMP with nvim-lspconfig
+    [X] 20m analyze code
+      vim-patch:8.2.4329: no support for end line number and column in 'errorformat' by zeertzjq · Pull Request #17345 · neovim/neovim · GitHub ⌇⡢⢰⢥⠅
+        https://github.com/neovim/neovim/pull/17345
+    [✗⡊⣛] 15m create 'errorformat' to parse "end_col"
+      FMT: airy.py|64 col 35-38 error| No overload variant
+      errorformat+=%f\ %l\ col\ %c-%k\ %m
+      errorformat+=%-G%.%#
+    [⡢⢰⢧⠫] ✓ 5m NICE:TRY
+      GitHub - kevinhwang91/nvim-bqf: Better quickfix window in Neovim, polish old quickfix window. ⌇⡢⢰⢢⠧
+        https://github.com/kevinhwang91/nvim-bqf
+  [_] SEE: #nvim ENH statusline
+    A boring statusline for Neovim ⌇⡢⢰⡼⡑
+      https://zignar.net/2022/01/21/a-boring-statusline-for-neovim/

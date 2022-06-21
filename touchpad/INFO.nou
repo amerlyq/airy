@@ -71,3 +71,17 @@ TEMP:(xorg.conf.d): if broken drivers
   # MatchDevicePath "/dev/input/event*"
   # Driver          "evdev"
   Driver          "libinput"
+
+
+
+2022-06-20-Mon-W25
+  [%⡊⣛] 30m CFG touchpad enable touch-click ⌇⡢⢱⢥⣚
+    caps: $ sudo libinput list-devices | less
+    props: $ xinput --list-props "ELAN072D:00 04F3:315B Touchpad"
+    apply::
+      $ xinput --set-prop --type=int "ELAN072D:00 04F3:315B Touchpad" "libinput Tapping Enabled" 1
+      $ xinput --set-prop --type=float "ELAN072D:00 04F3:315B Touchpad" "libinput Accel Speed" 0.5
+    reboot: /etc/X11/xorg.conf.d/30-touchpad.conf
+      https://wiki.archlinux.org/title/Libinput#Tapping_button_re-mapping
+      https://wiki.archlinux.org/title/Touchpad_Synaptics
+      [>] TODO: xorg.conf
