@@ -85,7 +85,6 @@
     HP Spectre x360 (2020) - ArchWiki ⌇⡢⢮⠌⠕
       https://wiki.archlinux.org/title/HP_Spectre_x360_(2020)
   [_] DEV very basic !airyctl in .py
-  [_] CFG поднять Xorg на новом ноуте
   [_] NICE: virtual keyboard for #pc:hpx
     tools | suckless.org software that sucks less ⌇⡢⢥⣪⠨
       https://tools.suckless.org/x/svkbd/
@@ -115,6 +114,7 @@
   [⡢⢫⢴⢆] 10m list explicitly installed
     $ pacman -Qe
   [⡢⢫⢷⠢] 10m install fonts for Qtile
+  [_] TRY:ADD: i915 options (screen flicker, etc.)
 
 
 2022-06-18-Sat-W24
@@ -146,6 +146,9 @@
       ¦ https://www.freedesktop.org/software/systemd/man/udev.conf.html
     186200 - Multiple instances of udev daemon when system boots - arm st1q - chromium ⌇⡢⢭⣿⠧
       https://bugs.chromium.org/p/chromium/issues/detail?id=186200
+    [$] ::: mostly fixed after sof-firmware
+      [_] one excessive fork still hangs
+      [_] FAIL: after reboot AGAIN: 40+ forks
   [≫] TRY: replace pulseaudio+jack2 by pipewire
     PipeWire is a fantastic JACK replacement : linuxaudio ⌇⡢⢮⠊⢝
       https://www.reddit.com/r/linuxaudio/comments/pel0nr/pipewire_is_a_fantastic_jack_replacement/
@@ -154,10 +157,11 @@
   [_] keyboard delay
     berzoidberg/i8042-spectre-dkms: Fixes keyboard init delay in HP Spectre models ⌇⡢⢮⠋⣥
       https://github.com/berzoidberg/i8042-spectre-dkms
-  [_] ERR: audio
+  [X] ERR: audio
     Advanced Linux Sound Architecture - ArchWiki ⌇⡢⢮⠋⣵
       https://wiki.archlinux.org/title/Advanced_Linux_Sound_Architecture#ALSA_firmware
-      ::: sof-firmware
+    ::: sof-firmware
+      [_] CHECK: I can play music
   [_] ERR: cpu
     Pcc_cpufreq initstate no such device Error - Support - Manjaro Linux Forum ⌇⡢⢮⠋⢵
       https://forum.manjaro.org/t/pcc-cpufreq-initstate-no-such-device-error/14172/4
@@ -182,13 +186,28 @@
     [%] FIND culprit :: st, fish, readline, tmux, ranger
       ::: TEMP: disable "focus-events" in !tmux
     [≫] TRY: proper fix to support "focus-events"
+  [_] FIND:FIX all !s.Be
+  [_] TRY: replace !ff by fork :: aur/librewolf-bin OR aur/icecat-bin OR aur/cyberfox-bin
+    IDEA: get less deps on system
+  [_] #hpx IDEA: toggle status of camera button LED
+    :: "off" when shut down, "RED" when camera is open
 
 
 2022-06-20-Mon-W25
-  [_] #hpx IDEA: toggle status of camera button LED
-    :: "off" when shut down, "RED" when camera is open
-  [_] ADD touchpad
-    xinput --set-prop --type=int "ELAN072D:00 04F3:315B Touchpad" "libinput Tapping Drag Lock Enabled" 1
+  [%] 2h25m/4h #pc:hpx CFG
+    [+] 20m login google + soundcloud for music
+    [%] 20m CFG !qtile
+      [X] 10m bar hide -> top
+      [$] IDEA: vertical bar ~~ additional line
+        BAD: takes space on the right -- impossible to open 2nd wnd
+        ::: BET: use <M-x> to hide bar
+    [X] 1h15m CFG gnupg
+      [X] 15m CFG manually setup gnupg mod
+      [⡢⢰⠹⡲] 40m install git-annex
+      [X] #sync#annex for @/archive
+      [X] 20m import gnupg keys from secu.luks
+      [>] rename @/password-store to @/passdb
+    [%⡊⣛] 30m CFG touchpad enable touch-click ※⡢⢱⢥⣚
 
 
 2022-06-21-Tue-W25
