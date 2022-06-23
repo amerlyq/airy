@@ -54,7 +54,7 @@ opts=( "$server" )
 && opts+=( --config="$cfg" ) \
 || opts+=( --user="$user" --authgroup="$group" --pfs --disable-ipv6 )
 
-pass=$(r.query-passwd "work/$server/$user" ||:)
+pass=$(pass "work/$server/$user" ||:)
 
 # USAGE: first time -- only auth w/o sudo
 if ((interactive)) || [[ -z $pass ]]; then

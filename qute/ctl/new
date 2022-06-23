@@ -8,8 +8,11 @@ set -euo pipefail
 basedir=$1
 shift
 
+PATH=/@/airy/airy/bin:$PATH
+
+# theme
 linkcp -t "$basedir"/config -f ~/.config/qutebrowser \
-  bookmarks quickmarks theme \
+  bookmarks quickmarks \
   config.py config-private.py style.css
 
 linkcp -t "$basedir"/data -f ~/.local/share/qutebrowser \

@@ -194,7 +194,7 @@ title Arch Linux Enc
 linux /vmlinuz-linux
 initrd /intel-ucode.img
 initrd /initramfs-linux.img
-options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ quiet
+options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ quiet resume=/dev/ws/swap
 EOT
 
 cat > /mnt/boot/loader/loader.conf <<EOT
@@ -253,7 +253,7 @@ arch-chroot /mnt
   # FIXED:BAD: small EFI 100MB is not enough for fallback image
   # CHG: PRESETS=('default')
   nvim /etc/mkinitcpio.d/linux.preset
-  # CHG: HOOKS=(base udev keyboard autodetect modconf block encrypt lvm2 filesystems fsck)
+  # CHG: HOOKS=(base udev keyboard autodetect modconf block encrypt lvm2 filesystems resume fsck)
   nvim /etc/mkinitcpio.conf
   mkinitcpio -vM
   ## OR: if archiso kernel is older than in arch-chroot

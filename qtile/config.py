@@ -1,122 +1,76 @@
-# Copyright (c) 2010 Aldo Cortesi
-# Copyright (c) 2010, 2014 dequis
-# Copyright (c) 2012 Randall Ma
-# Copyright (c) 2012-2014 Tycho Andersen
-# Copyright (c) 2012 Craig Barnes
-# Copyright (c) 2013 horsik
-# Copyright (c) 2013 Tao Sauvage
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# from typing import Any, Callable
 
 from libqtile import bar, layout, widget
-from libqtile.config import Click, Drag
-from libqtile.config import EzKey as K
-from libqtile.config import Group, Key, Match, Screen
+from libqtile.config import Click, Drag, EzKey, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
 # pylint:disable=invalid-name
 
+
+def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
+    return EzKey(keydef, *cmds, desc=desc)  # type:ignore
+
+
 mod = "mod4"
-terminal = guess_terminal()
+terminal: str = guess_terminal()
 ranger = ["st", "-e", "ranger", "--choosedir=/run/user/1000/ranger/cwd", "--"]
 
 keys = [
     # A list of available commands that can be bound to keys can be found
     # at https://docs.qtile.org/en/latest/manual/config/lazy.html
-    Key([mod], "a", lazy.screen.toggle_group(), desc="Back'n'forth"),
+    K("M-a", lazy.screen.toggle_group(), desc="Back'n'forth"),
     # Switch between windows
-    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
-    Key([mod], "semicolon", lazy.layout.right(), desc="Move focus to right"),
-    Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
-    Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod, "shift"], "quoteright", lazy.layout.previous(), desc="Move focus back"),
-    Key(
-        [mod],
-        "quoteright",
-        lazy.layout.next(),
-        desc="Move window focus to other window",
-    ),
+    # K("M-h", lazy.layout.left(), desc="Move focus to left"),
+    K("M-h", lazy.spawn(terminal), desc="Launch terminal"),
+    K("M-<semicolon>", lazy.layout.right(), desc="Move focus to right"),
+    K("M-j", lazy.layout.down(), desc="Move focus down"),
+    K("M-k", lazy.layout.up(), desc="Move focus up"),
+    K("M-S-<quoteright>", lazy.layout.previous(), desc="Move focus back"),
+    K("M-<quoteright>", lazy.layout.next(), desc="Move window focus to other window"),
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
-    Key(
-        [mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"
-    ),
-    Key(
-        [mod, "shift"],
-        "l",
-        lazy.layout.shuffle_right(),
-        desc="Move window to the right",
-    ),
-    Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
-    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    K("M-S-h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    K("M-S-l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    K("M-S-j", lazy.layout.shuffle_down(), desc="Move window down"),
+    K("M-S-k", lazy.layout.shuffle_up(), desc="Move window up"),
     # Grow windows. If current window is on the edge of screen and direction
     # will be to screen edge - window would shrink.
-    Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key(
-        [mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"
-    ),
-    Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
-    Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
-    Key([mod], "m", lazy.layout.maximize(), desc="Zoom window in layout"),
-    # Key([mod, "shift"], "m", lazy.layout.minimize(), desc="Zoom window in layout"),
-    Key([mod, "shift"], "m", lazy.layout.grow(), desc="Zoom-in window"),
-    Key([mod, "shift"], "n", lazy.layout.shrink(), desc="Zoom-out window"),
-    # Toggle between split and unsplit sides of stack.
-    # * Split = all windows displayed
-    # * Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
-    Key(
-        [mod],
-        "slash",
+    K("M-C-h", lazy.layout.grow_left(), desc="Grow window to the left"),
+    K("M-C-l", lazy.layout.grow_right(), desc="Grow window to the right"),
+    K("M-C-j", lazy.layout.grow_down(), desc="Grow window down"),
+    K("M-C-k", lazy.layout.grow_up(), desc="Grow window up"),
+    K("M-n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    K("M-m", lazy.layout.maximize(), desc="Zoom window in layout"),
+    # K("M-S-m", lazy.layout.minimize(), desc="Zoom window in layout"),
+    K("M-S-m", lazy.layout.grow(), desc="Zoom-in window"),
+    K("M-S-n", lazy.layout.shrink(), desc="Zoom-out window"),
+    K(
+        "M-<slash>",
         lazy.layout.toggle_split(),
-        desc="Toggle between split and unsplit sides of stack",
+        desc="Toggle between split and unsplit sides of stack"
+        # * Split = all windows displayed
+        # * Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
     ),
-    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
-    Key(
-        [mod],
-        "space",
-        lazy.spawn(ranger + ["/@/airy"]),
-        desc="Launch fm",
-    ),
-    Key(
-        [mod, "shift"],
-        "space",
-        lazy.spawn(ranger + ["/@/just"]),
-        desc="Launch fm",
-    ),
-    Key([mod], "o", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
-    Key([mod], "u", lazy.spawn(["qutebrowser"]), desc="Launch terminal"),
+    K("M-<Return>", lazy.spawn(terminal), desc="Launch terminal"),
+    K("M-<space>", lazy.spawn(ranger + ["/@/airy"]), desc="Launch fm"),
+    K("M-S-<space>", lazy.spawn(ranger + ["/@/just"]), desc="Launch fm"),
+    K("M-o", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
+    K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch terminal"),
     # Toggle between different layouts as defined below
-    Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-    # Key([mod], "slash", lazy.next_layout(), desc="Toggle between layouts"),
-    # Key([mod], "question", lazy.previous_layout(), desc="Toggle between layouts"),
-    # Key([mod, "shift"], "slash", lazy.prev_layout(), desc="Toggle between layouts"),
-    Key([mod], "f", lazy.next_layout(), desc="Toggle between layouts"),
-    # Key([mod], "f", lazy.window.toggle_fullscreen(), desc="Toggle fullscreen"),
+    K("M-<Tab>", lazy.next_layout(), desc="Toggle between layouts"),
+    # K("M-slash", lazy.next_layout(), desc="Toggle between layouts"),
+    # K("M-question", lazy.previous_layout(), desc="Toggle between layouts"),
+    # K("M-S-slash", lazy.prev_layout(), desc="Toggle between layouts"),
+    K("M-f", lazy.next_layout(), desc="Toggle between layouts"),
+    # K("M-f", lazy.window.toggle_fullscreen(), desc="Toggle fullscreen"),
     # K("M-S-x", lazy.hide_show_bar("top")),
     # K("M-x", lazy.hide_show_bar("bottom")),
     K("M-S-f", lazy.hide_show_bar("bottom")),
-    Key([mod], "backslash", lazy.window.kill(), desc="Kill focused window"),
-    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
-    Key([mod], "e", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+    K("M-<backslash>", lazy.window.kill(), desc="Kill focused window"),
+    K("M-C-r", lazy.reload_config(), desc="Reload the config"),
+    K("M-C-q", lazy.shutdown(), desc="Shutdown Qtile"),
+    K("M-e", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
 ]
 
 groups = [Group(i) for i in "123456789"]
@@ -174,7 +128,7 @@ screens = [
     Screen(
         bottom=bar.Bar(
             [
-                widget.CurrentLayout(),
+                widget.CurrentLayoutIcon(),
                 widget.GroupBox(),
                 widget.TextBox(" "),
                 widget.Prompt(),
@@ -239,6 +193,7 @@ floating_layout = layout.Floating(
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
+        Match(title="pinentry-qt"),  # GPG key password entry
     ]
 )
 auto_fullscreen = True

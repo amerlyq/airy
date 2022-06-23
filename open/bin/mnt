@@ -1,5 +1,6 @@
-#!/bin/bash -e
-source ~/.shell/profile
+#!/bin/bash
+# source ~/.shell/profile
+set -euo pipefail
 
 # ???? instead of file name
 # sudo LC_ALL="ru_RU.UTF-8" ranger (don't work but helps)
@@ -20,7 +21,7 @@ mnt=/media/$user
 action=m
 
 # Disk mounting util
-if [[ -n $1 && ${#1} -le 2 ]]; then action=$1; shift; fi
+if [[ -n ${1-} && ${#1} -le 2 ]]; then action=$1; shift; fi
 
 if ((!$#)); then
     printf "LABELS: " && (cd /dev/disk/by-label 2>/dev/null && ls --color=auto || echo)

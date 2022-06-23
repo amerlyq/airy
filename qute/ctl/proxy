@@ -17,7 +17,9 @@ esac
 # FIXME: must pass whole local path if we use UNIX proxy
 pxy="socks://[::1]:$port"
 
-exec r.qute-new ~/.local/qute-proxy \
+swd=$(dirname "$(realpath "$0")")
+
+exec "$swd/new" ~/.local/qute-proxy \
   --set content.proxy "$pxy" \
   --set content.proxy_dns_requests true \
   --set zoom.default "90%"
