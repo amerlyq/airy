@@ -182,3 +182,102 @@
     [%] FIND culprit :: st, fish, readline, tmux, ranger
       ::: TEMP: disable "focus-events" in !tmux
     [≫] TRY: proper fix to support "focus-events"
+
+
+2022-06-20-Mon-W25
+  [_] #hpx IDEA: toggle status of camera button LED
+    :: "off" when shut down, "RED" when camera is open
+  [_] ADD touchpad
+    xinput --set-prop --type=int "ELAN072D:00 04F3:315B Touchpad" "libinput Tapping Drag Lock Enabled" 1
+
+
+2022-06-21-Tue-W25
+  [⡢⢲⠚⠫] ✓ 15m раздел кеш тюн2фс снять резерв 5% (13.5GB) -> BUT: leave 200MB reserve
+    $ sudo tune2fs -l /dev/mapper/ws-cache |grep "^Block size:"
+    $ sudo tune2fs -r "$((200*1024*1024/4096))" /dev/mapper/ws-cache  # =51200
+    [+] ✓ Проверить zstd как сжатие на бтрфс
+  [X] 30m commit @/airy
+  [X] 20m add SSH for git push
+  [X] ≈ 40m CHECK: enable hibernation
+    [⡢⢲⠗⣷] FAIL: слишком быстро разряжается, возможно это сон, а не гибернация
+      ::: 11h = 58% -> 38% $ systemctl suspend
+    [X] FIND: wiki for any other problems
+      REF: https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate
+    CHECK: verify/set fitting size for SWAP
+      $ cat /sys/power/image_size
+      […] TODO: on boot
+    /boot/loader/entries/arch.conf
+      ADD(kernel args): … resume=/dev/ws/swap
+      ALT:NEED(unencrypted partition with size=RAM): Intel Rapid Start Technology (IRST)
+    /etc/mkinitcpio.conf
+      ADD: "resume" OR "systemd"
+      HOOKS=(… udev … lvm2 filesystems resume fsck)
+      $ sudo mkinitcpio -p linux
+    MAYBE: if LED continues to emit light
+      /etc/systemd/sleep.conf.d/hibernatemode.conf
+      [Sleep]
+      HibernateMode=shutdown
+    USAGE
+      $ systemctl hibernate
+    CMP:
+      NICE:SECU: requires crypto disk password
+      BAD:PERF: long time to boot from zero and enter password
+      ::: useful if you need to store all opened windows for long time
+    WTF: why sleep/suspend on #hpx consumes much more battery than #pc:neo
+      [_] FIND: energy consumption during laptop sleep
+        MAYBE: I should better configure system somehow ?
+
+
+2022-06-22-Wed-W25
+  [•] BAD: systemctl suspend -- deep sleep
+    [_] TODO: suspend-then-hibernate on lidclose
+    HACK: check laptop is able to get into deep sleep
+      $ cat /sys/power/mem_sleep
+      [s2idle] deep
+      TRY:(kernel cmdline): mem_sleep_default=deep
+    READ
+      [_] Power management - ArchWiki ⌇⡢⢳⡳⢖
+        https://wiki.archlinux.org/title/Power_management
+        [_] Category:Power management - ArchWiki ⌇⡢⢳⡴⢡
+          https://wiki.archlinux.org/title/Category:Power_management
+      [_] CPU frequency scaling - ArchWiki ⌇⡢⢳⡳⢜
+        https://wiki.archlinux.org/title/CPU_frequency_scaling
+      [_] Laptop - ArchWiki ⌇⡢⢳⡳⢶
+        https://wiki.archlinux.org/title/laptop
+        [_] Power management/Suspend and hibernate - ArchWiki ⌇⡢⢳⡴⠩
+          https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate
+        [_] Advanced Configuration and Power Interface - Wikipedia ⌇⡢⢳⡴⡏
+          https://en.wikipedia.org/wiki/Advanced_Configuration_and_Power_Interface#Power_states
+        [_] Wakeup triggers - ArchWiki ⌇⡢⢳⡴⡜
+          https://wiki.archlinux.org/title/Wakeup_triggers
+        [_] chrony - ArchWiki ⌇⡢⢳⡴⡣
+          https://wiki.archlinux.org/title/Chrony
+      [_] Framework Laptop - ArchWiki ⌇⡢⢳⡲⡬
+        https://wiki.archlinux.org/title/Framework_Laptop
+    INFO
+      No suspend (s2idle only) on XP13 9310 ? / Laptop Issues / Arch Linux Forums ⌇⡢⢳⡮⣵
+        https://bbs.archlinux.org/viewtopic.php?id=266921
+      [SOLVED] Lenovo X1C6 / X1Y3 (2018): No deep sleep (S3)? (Page 3) / Laptop Issues / Arch Linux Forums ⌇⡢⢳⡯⡖
+        https://bbs.archlinux.org/viewtopic.php?id=234913&p=3
+      [%] No deep sleep on HP Specter x360 15 / Laptop Issues / Arch Linux Forums ⌇⡢⢳⡯⣁
+        https://bbs.archlinux.org/viewtopic.php?id=244203
+        [$] uswsusp - ArchWiki ⌇⡢⢳⡲⠤
+          https://wiki.archlinux.org/title/Uswsusp
+      OFF: https://www.kernel.org/doc/Documentation/power/states.txt ⌇⡢⢳⡯⣄
+        https://www.kernel.org/doc/Documentation/power/states.txt
+      TRY:WF: Enable sleep and after 1hour hibernate when lid is closed - Support - Manjaro Linux Forum ⌇⡢⢳⡯⣎
+        https://forum.manjaro.org/t/enable-sleep-and-after-1hour-hibernate-when-lid-is-closed/106038
+      Solved: XPS 13 9310, Ubuntu, deep sleep missing - Dell Community ⌇⡢⢳⡰⠅
+        https://www.dell.com/community/XPS/XPS-13-9310-Ubuntu-deep-sleep-missing/td-p/7734008
+        ::: OFF: no mode by design
+          ¦ The S3 deep sleep mode is not available on the XPS 13 9310. This is by design.
+          ¦ dell chose to not include deep sleep in this computer's firmware.
+      20.04 - Dell XPS 13 sleep problems - Ask Ubuntu ⌇⡢⢳⡰⢏
+        https://askubuntu.com/questions/1290864/dell-xps-13-sleep-problems/1290964?noredirect=1#comment2192523_1290964
+        ¦ "XPS 9310 only offers Modern Standby for Windows and Suspend to Idle for Linux."
+        ¦ This means deep sleep is not supported by the firmware on this machine.
+      Missing S3 sleep state - HP Support Community - 7748582 ⌇⡢⢳⡱⢻
+        https://h30434.www3.hp.com/t5/Notebook-Operating-System-and-Recovery/Missing-S3-sleep-state/td-p/7748582
+        - Microsoft introduced "modern suspend/s0ix/s2idle" in a way that breaks backward compatibility with "classic" S3-sleep
+        - Intel added "modern suspend"-support to the linux kernel, but only for their own hardware
+        - HP uses modern suspend, thereby choosing to lose S3 support, and thus all support for all OSes that are not windows 10.
