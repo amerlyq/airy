@@ -5,10 +5,12 @@
 
 require('telescope').setup {
   defaults = {
+    layout_strategy = 'vertical',
+    -- layout_config = { height = 0.95 },
     mappings = {
       i = {
         ['<C-u>'] = false,
-        ['<C-d>'] = false,
+        ['<C-d>'] = "close",
         ['<C-j>'] = "move_selection_next",
         ['<C-k>'] = "move_selection_previous",
       },
@@ -45,12 +47,17 @@ Kn('<Tab><Tab>', T.resume, "T.resume")
 Kn('<Tab>?', T.oldfiles, "T.oldfiles")
 
 Kn('<Tab>b', T.current_buffer_fuzzy_find, "T.fuzzy_buf")
-Kn('<Tab>d', T.grep_string, "T.grep_string")
+Kn('<Tab>d', T.diagnostics, "T.diagnostics")
 Kn('<Tab>f', (function() T.find_files { previewer = false } end), "T.find_files")
 Kn('<Tab>g', T.git_status, "T.git_status")
 Kn('<Tab>G', T.git_bcommits, "T.git_bcommits")
 Kn('<Tab>h', T.help_tags, "T.help_tags")
+Kn('<Tab>j', T.jumplist, "T.jumplist")
+Kn('<Tab>l', T.lsp_document_symbols, "lsp_document_symbols [T]")
+Kn('<Tab>m', T.oldfiles, "T.oldfiles")
 Kn('<Tab>o', (function() T.tags { only_current_buffer = true } end), "T.tags_buf")
-Kn('<Tab>p', T.live_grep, "T.live_grep")
-Kn('<Tab>s', T.lsp_document_symbols, "lsp_document_symbols [T]")
+Kn('<Tab>q', T.quickfix, "T.quickfix")
+Kn('<Tab>r', T.live_grep, "T.live_grep (rg)")
+Kn('<Tab>s', T.grep_string, "T.grep_string (fuzzy)")
+Kn('<Tab>t', T.tagstack, "T.tagstack")
 Kn('<Tab>T', T.tags, "tags [T]")

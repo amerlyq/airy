@@ -3,6 +3,7 @@ local K = require'keys.bind'.K
 --Buffers save/close/exit
 -- [_] THINK:MAYBE: replace by "set autowriteall"
 K('i', ',s', '<Esc>:update<CR>')
+K('i', ',ы', '<Esc>:update<CR>')
 K('nx', ',s', ':<C-U>update<CR>')
 
 -- " FIXED:(E173):SEE http://vim.1045645.n5.nabble.com/Re-how-to-suppress-quot-E173-1-more-file-to-edit-quot-td5716336.html#a5716344

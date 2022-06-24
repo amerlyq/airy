@@ -84,10 +84,11 @@
   [_] READ: general links
     HP Spectre x360 (2020) - ArchWiki ⌇⡢⢮⠌⠕
       https://wiki.archlinux.org/title/HP_Spectre_x360_(2020)
-  [_] DEV very basic !airyctl in .py
-  [_] NICE: virtual keyboard for #pc:hpx
+  [>] DEV very basic !airyctl in .py
+  [⡢⢵⣞⣶] NICE: virtual keyboard for #pc:hpx
     tools | suckless.org software that sucks less ⌇⡢⢥⣪⠨
       https://tools.suckless.org/x/svkbd/
+      [_] TODO: toggle on icon inside wm bar
   [≫] NEED:TRY: Wayland ※⡢⡴⣐⣣ after Xorg start working
   [≫] IDEA: re-CFG whole system from scratch with security in mind ※⡢⡴⣐⣹
 
@@ -300,3 +301,57 @@
         - Microsoft introduced "modern suspend/s0ix/s2idle" in a way that breaks backward compatibility with "classic" S3-sleep
         - Intel added "modern suspend"-support to the linux kernel, but only for their own hardware
         - HP uses modern suspend, thereby choosing to lose S3 support, and thus all support for all OSes that are not windows 10.
+
+
+2022-06-23-Thu-W25
+  [X] 6h20m+2h /4h #pc:hpx CFG ⌇⡢⢵⢒⣴
+    [X] ⊞ 35m CFG !qtile term <M-h>
+    [X] 1h40m #prep for #wk:login
+      [X] ⊞ 20m DEV !airyctl
+      [X] ⊞ 45m <W:env> DEV !airyctl
+      [X] ⊞ 35m <W:env> CFG !vpn -> !qute for #work
+    [%] 4h5m #hpx #sync #annex for @/wklog
+      [X] 1h30m <W:env> #sync repos for @/wklog
+        [X] ✓ create "hpx" group for batch-cloning and fixup repos
+        [X] ✓ ENH: verify and manually delete sample hooks
+      [X] 2h <W:env> #sync repos -- manual fixup
+      [X] 10m[→1h] <W:env> #sync #annex
+      [X] 25m FIX /at/features paths
+        [X] remove dup repos from /data/aura
+        [X] rename @/password-store to @/passdb
+        [>] merge /data/aura/{at,/hub}
+    [+] ⊞ 30m #sync some music/media from #ssd:t5
+    [+] 45m <W> misc CFG :: telescope (inof skim), kbdd, powertop, atool ...
+    [+] 45m <W> setup !mpv and !nsxiv for music during #wk
+      [%] 20m <W> #hpx archiver frontend ::: USE: !atool-git
+        [≫] TRY: mholt/archiver: Easily create & extract archives, and compress & decompress files of various formats ⌇⡢⢴⣓⠄
+          https://github.com/mholt/archiver
+        [~] OLD: peha/deco ⌇⡢⢴⣒⣉
+          https://github.com/peha/deco
+        [X] ✓ solsticedhiver/atool: atool with support for zstd ⌇⡢⢴⣒⡴
+          https://github.com/solsticedhiver/atool
+        [$] Dirout/larz: Archive tool for efficient decompression. ⌇⡢⢴⣒⢩
+          https://github.com/Dirout/larz
+      [%] 20m <W> #hpx image viewer
+        sandsmark/qeh: feh, but better ⌇⡢⢴⣞⢬
+          https://github.com/sandsmark/qeh/
+        nsxiv/nsxiv: Read-only mirror of Neo Simple X Image Viewer ⌇⡢⢴⣞⢥
+          https://github.com/nsxiv/nsxiv
+        karlch/vimiv-qt: An image viewer with vim-like keybindings ⌇⡢⢴⣞⢢
+          https://github.com/karlch/vimiv-qt
+        Koko - KDE Applications ⌇⡢⢴⣞⢯
+          https://apps.kde.org/koko/
+        explosion-mental/mage: iMAGE viewer ⌇⡢⢴⣡⣤
+          https://github.com/explosion-mental/mage
+        occivink/mpv-image-viewer: Configuration, scripts and tips for using mpv as an image viewer ⌇⡢⢴⣢⠾
+          https://github.com/occivink/mpv-image-viewer
+        occivink/mpv-gallery-view: Gallery-view scripts for mpv ⌇⡢⢴⣢⡜
+          https://github.com/occivink/mpv-gallery-view
+          [_] IDEA:TRY: use it for @/irome navi by thumbnails
+       ALT
+        extra/geeqie 1.7.3-1
+        extra/gwenview 22.04.2-1 (kde-applications kde-graphics)
+        community/kuickshow 0.10.2-1
+        community/nomacs 1:3.17.2206-8
+        community/phototonic 2.1-3
+        community/viu 1.4.0-1

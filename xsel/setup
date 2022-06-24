@@ -1,7 +1,9 @@
 #!/bin/bash -eu
 # tags: xorg
 # deps: socat
-source ~/.shell/func.d/cfgsetup
+# source ~/.shell/func.d/cfgsetup
+
+PATH=/@/airy/airy/bin:$PATH
 
 # ALT:(tmux.service): must modify PATH for lingering session
 linkcp -t /usr/local/bin -f bin -- xcx xci xco xcio xc
