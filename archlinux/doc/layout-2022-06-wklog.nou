@@ -355,3 +355,18 @@
         community/nomacs 1:3.17.2206-8
         community/phototonic 2.1-3
         community/viu 1.4.0-1
+
+
+2022-06-24-Fri-W25
+  [%] 1h #pc:hpx CFG <⡊⣞>
+    [⡢⢵⣿⠓] ✗ 20m FIND: run tmux !xclip w/o shell
+      ::: according to docs -- only some cmds able to accept direct args w/o shell
+      [≫] FUTURE: read tmux SRC to verify if it's truly impossible
+    [⡢⢵⣹⢽] ✓ 10m FIXME #jupyter err hl -- like on #pc:neo
+      ::: SEE: ※⡊⢛ //core/ultratb.py:845 CHG: -> "bg:ansiblack"
+        $ sudo v /usr/lib/python3.10/site-packages/IPython/core/ultratb.py
+        ¦ style = stack_data.style_with_executing_node(style, "bg:ansiyellow")
+    [⡢⢵⣷⣨] ≈ 25m #nvim FIXME: "*" on selection works only from 2nd time
+      [≫] IDEA: analyze and copy snippet from vim plugin "*"
+        https://github.com/haya14busa/vim-asterisk/blob/master/autoload/asterisk.vim
+      [≫] IDEA: run copied vim snippet inside lua code

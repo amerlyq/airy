@@ -129,7 +129,9 @@ screens = [
         bottom=bar.Bar(
             [
                 widget.CurrentLayoutIcon(),
-                widget.GroupBox(),
+                # widget.AGroupBox(),
+                widget.GroupBox(highlight_method="block", inactive="242424"),
+                widget.Sep(),
                 widget.TextBox(" "),
                 widget.Prompt(),
                 widget.WindowName(),
@@ -143,7 +145,6 @@ screens = [
                 # widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
                 widget.Systray(),
                 # widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-                widget.QuickExit(),
                 widget.NetGraph(),
                 widget.MemoryGraph(fill_color="#00aa00"),
                 widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
@@ -152,8 +153,9 @@ screens = [
                     format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
                     foreground="#00971f",
                 ),
+                widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
                 widget.Clock(
-                    format=" %Y-%m-%d-%a-W%V", update_interval=60, foreground="#fd971f"
+                    format="%Y-%m-%d-%a-W%V", update_interval=60, foreground="#fd971f"
                 ),
                 widget.Clock(format=" %H:%M", update_interval=5),
             ],
