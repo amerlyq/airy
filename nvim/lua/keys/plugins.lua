@@ -63,3 +63,16 @@ K('nx', '<Tab>q', '<Cmd>TroubleToggle<CR>')
 -- SRC: https://github.com/AndrewRadev/switch.vim
 g.switch_mapping = '<CR>'
 g.switch_reverse_mapping = '<BS>'
+
+
+-- Switch between alternative files [c,cpp,cxx,cc] <-> [h,hpp]
+-- EXPL:(no <unique>) overrides my STD 'cycle through'
+g.loaded_altr = 1
+K('', ']f', '<Cmd>call altr#forward()<CR>')
+K('', '[f', '<Cmd>call altr#back()<CR>')
+-- command! -bar -nargs=0  A  call altr#forward()
+vim.cmd [[
+  call altr#define('%/src/%.c', '%/inc/%.h')
+  call altr#define('%/source/%.cpp', '%/include/%.hpp', '%/include/%.h')
+  call altr#define('%/src/%.cpp', '%/inc/%.h', '%/t/%_test.cpp')
+]]

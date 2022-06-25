@@ -4,7 +4,7 @@
 " SPDX-PackageName: vim-xtref
 " SPDX-PackageSummary: timestamp-based cross-refs manipulation and tagging
 "   = xtref = cross(X)-time(T)-references
-"
+if &cp||exists('g:loaded_xtref')|finish|else|let g:loaded_xtref=1|endif
 
 let g:xtref = {}
 " MAYBE: if list -- use first existing dir [/x, /aura, /data/aura, /home/user/aura]
@@ -36,28 +36,6 @@ let g:xtref.r_addr = '('. s:r_z85 .'|'. s:r_braille .')'
 "  ALT: use completely different braces
 let g:xtref.r_anchor = g:xtref.anchor_pfx . g:xtref.r_addr
 let g:xtref.r_refer = g:xtref.refer_pfx . g:xtref.r_addr
-
-
-if !exists('g:switch_custom_definitions')
-  let g:switch_custom_definitions = []
-endif
-
-"" WF: from everywhere-notches
-" [_] TODO: toggle xtref <-> date
-"   REQ: https://github.com/AndrewRadev/switch.vim/issues/78
-" switch#NormalizedCase(['one', 'two']),
-" switch#NormalizedCaseWords(['five', 'six']),
-let g:switch_custom_definitions +=
-  \[ {
-  \    '\v⌇([\u2800-\u28FF]{2,4})': '※\1',
-  \    '\v※([\u2800-\u28FF]{2,4})': '^\1',
-  \    '\v\^([\u2800-\u28FF]{2,4})': '⌇\1',
-  \  }
-  \, {
-  \    '\v\[([\u2800-\u28FF]{2,4})\]': '<\1>',
-  \    '\v\<([\u2800-\u28FF]{2,4})\>': '[\1]',
-  \  }
-  \]
 
 
 " NOTE: xref artifact ※unReK

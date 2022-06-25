@@ -12,7 +12,17 @@ KE('n', 'gv', "'`[' . strpart(getregtype(), 0, 1) . '`]'")
 -- vnoremap * :<C-U>let old=@"<CR>gvy:let @/="\\V\\C".escape(@", '/\')<CR>:set hlsearch<CR>:let @"=old<CR>:redraw!<CR>:echo "/".@/<CR>
 -- DEBUG: vim.keymap.set('v', '*', '<Cmd>lua print(vim.inspect(getVisualSelection()))<CR>', nore)
 -- vim.keymap.set('v', '*', (function() vim.fn.setreg("/", getVisualSelection(), "v") end), nore)
-K('v', '*', '<Cmd>lua vim.fn.setreg("/", require("seize.vsel")(), "v")<CR><Esc>n')
+-- BUG: always jumps to previous selection inof current
+-- K('v', '*', '<Cmd>lua vim.fn.setreg("/", require("seize.vsel")(), "v")<CR><Esc>n')
+-- FIXED:TEMP: again use old "vim-asterisk" plugin
+--   IDEA: analyze and copy vsel snippet from vim-asterisk
+--   IDEA: run copied vim snippet inside lua code
+local stars = {'*', '#', 'g*', 'g#', 'z*', 'z#', 'gz*', 'gz#'}
+for _, k in ipairs(stars) do
+  K('', k, '<Plug>(asterisk-' .. k .. ')')
+end
+-- HACK: z8 -- is easier to press
+K('', 'z8', '<Plug>(asterisk-z*)')
 
 
 -- Prevent Paste loosing the register source. Deleted available by "- reg.
