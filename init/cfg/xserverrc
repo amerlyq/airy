@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/bin/Xorg :0 -nolisten tcp -keeptty -verbose 2 dpms -c -f 0 -s 0 -ardelay 250 -arinterval 40 -dpi 288 "$@" vt${XDG_VTNR:?}

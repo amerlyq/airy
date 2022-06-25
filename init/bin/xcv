@@ -1,0 +1,18 @@
+#!/bin/sh
+
+bkl=${1:-200}
+
+echo "$bkl" | sudo tee /sys/class/backlight/intel_backlight/brightness
+
+# echo balance_power | sudo tee -a /sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference
+
+xinput --set-prop --type=float "ELAN072D:00 04F3:315B Touchpad" "libinput Accel Speed" 0.5
+xinput --set-prop --type=int "ELAN072D:00 04F3:315B Touchpad" "libinput Tapping Enabled" 1
+xinput --set-prop --type=int "ELAN072D:00 04F3:315B Touchpad" "libinput Tapping Drag Lock Enabled" 1
+
+/d/airy/xkb/run
+
+kbdd
+
+# redshift -P -o -v
+redshift -P -O 4600
