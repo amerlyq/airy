@@ -1,0 +1,43 @@
+2022-06-26-Sun-W25
+  [•] 40m ERR: tpm0 ⌇⡢⢸⡲⡃
+    ¦ Jun 26 14:37:45 hpx kernel: tpm tpm0: [Firmware Bug]: TPM interrupt not working, polling instead
+    The message [Firmware Bug]: TPM interrupt not working, polling instead is reported when executing "dmesg" on Whitley-based systems - Lenovo ThinkSystem - Lenovo Support UA ⌇⡢⢸⡛⢱
+      https://support.lenovo.com/ua/en/solutions/ht512219-the-message-firmware-bug-tpm-interrupt-not-working-polling-instead-is-reported-when-executing-dmesg-on-whitley-based-systems-lenovo-thinksystem
+      * the interrupt mode of TPM is still under development by the Linux Kernel Organization
+      * TEMP:ADD:(kernel cmdline): … tpm_tis.interrupts=0
+    OFF 204121 – tpm_tis - TPM interrupt not working, polling instead ⌇⡢⢸⡜⣪
+      https://bugzilla.kernel.org/show_bug.cgi?id=204121
+    Trusted Platform Module - ArchWiki ⌇⡢⢸⡜⢁
+      https://wiki.archlinux.org/title/Trusted_Platform_Module
+      $ sudo journalctl -k --grep=tpm
+      $ cat /sys/class/tpm/tpm0/device/description
+      $ cat /sys/class/tpm/tpm0/tpm_version_major
+      ::: v2
+    [SOLVED] TPM error at login / Newbie Corner / Arch Linux Forums ⌇⡢⢸⡯⣘
+      https://bbs.archlinux.org/viewtopic.php?id=263004
+      ::: blacklist /etc/modprobe.d/ `tpm_crb` and `tpm_tis` by :install /bin/false
+        BAD: can't remove pkg=tmp2-tss
+          -- RQ:DEP for chain=libsecret-pinentry-gnupg-pass and !openconnect
+ ---
+  [⡢⢸⡩⡣] 25m DECI do I need it ?
+    ::: NOT: useless right now
+      [≫] FUTURE: maybe USE for boot/SSH when I will do system hardening
+    ✗ FIND:PERF faster encryption ?
+      Does the TPM affect performance of Windows BitLocker? - Super User ⌇⡢⢸⡦⣕
+        https://superuser.com/questions/1266301/does-the-tpm-affect-performance-of-windows-bitlocker
+        ¦ The TPM is not used during normal encrypted data access operations.
+      [≫] READ: How Windows uses the TPM - Windows security | Microsoft Docs ⌇⡢⢸⡧⣹
+        https://docs.microsoft.com/en-us/windows/security/information-protection/tpm/how-windows-uses-the-tpm
+        + prevent bruteforce
+    ~ preventing boot if kernel/uefi had changed -- so I will be aware there was "evil maid"
+      BUT: should be able to boot from USB stick to restore kernel
+      FAIL:SECU: still does not prevent HW firmware changes
+        e.g. your kbd may monitor your keypresses
+    ~ hiding SSH privat keys to prevent stealing
+      BUT: can't backup them myself either
+      TUT: Using a TPM for SSH authentication ⌇⡢⢸⡠⢆
+        https://incenp.org/notes/2020/tpm-based-ssh-key.html
+    INFO: (1) Using the TPM - It's Not Rocket Science (Anymore) - Johannes Holland & Peter Huewe - YouTube ⌇⡢⢸⡡⠣
+      https://www.youtube.com/watch?v=XwaSyHJIos8
+    Protecting systems with the TPM [LWN.net] ⌇⡢⢸⡢⠾
+      https://lwn.net/Articles/674751/
