@@ -1,5 +1,5 @@
 2022-06-26-Sun-W25
-  [•] 40m ERR: tpm0 ⌇⡢⢸⡲⡃
+  [%] 1h25m ERR: tpm0 ⌇⡢⢸⡲⡃
     ¦ Jun 26 14:37:45 hpx kernel: tpm tpm0: [Firmware Bug]: TPM interrupt not working, polling instead
     The message [Firmware Bug]: TPM interrupt not working, polling instead is reported when executing "dmesg" on Whitley-based systems - Lenovo ThinkSystem - Lenovo Support UA ⌇⡢⢸⡛⢱
       https://support.lenovo.com/ua/en/solutions/ht512219-the-message-firmware-bug-tpm-interrupt-not-working-polling-instead-is-reported-when-executing-dmesg-on-whitley-based-systems-lenovo-thinksystem
@@ -41,3 +41,15 @@
       https://www.youtube.com/watch?v=XwaSyHJIos8
     Protecting systems with the TPM [LWN.net] ⌇⡢⢸⡢⠾
       https://lwn.net/Articles/674751/
+ ---
+  [%⡢⢸⢾⣼] 20m disable -- and verify blacklist by !lsmod after reboot
+    ¦ The blacklist command will blacklist a module so that it will not
+    ¦ be loaded automatically, but the module may be loaded if another
+    ¦ non-blacklisted module depends on it or if it is loaded manually.
+    1598249 – TPM drivers are built-in in the kernel instead of being .ko modules, so it's not possible to blacklist them. ⌇⡢⢸⢾⣽
+      https://bugzilla.redhat.com/show_bug.cgi?id=1598249
+      ¦ Yes, this is intentional. We changed TPM to be built in because
+      ¦ we eventually want to turn on IMA which relies on the TPM. As the
+      ¦ message notes, it's a firmware bug but things should still be
+      ¦ functional. If there are other issue besides the firmware
+      ¦ message, feel free to reopen the bug.

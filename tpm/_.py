@@ -1,4 +1,4 @@
-from just.airy.api import ln
+from just.airy.api import cp
 
 # FUTURE:BET: directly generate blacklisting code by class
-ln("blacklist-tpm.conf", under="/etc/modprobe.d")
+cp("blacklist-tpm.conf", under="/etc/modprobe.d")
