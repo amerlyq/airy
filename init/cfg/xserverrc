@@ -1,2 +1,7 @@
 #!/bin/sh
-exec /usr/bin/Xorg :0 -nolisten tcp -keeptty -verbose 2 dpms -c -f 0 -s 0 -ardelay 250 -arinterval 40 -dpi 288 "$@" vt${XDG_VTNR:?}
+## HACK: clean-up login screen
+exec > /dev/null 2>&1
+# ALT:BAD: these logs are dup of file content
+# mkdir -p ~/.local/share/xorg/
+# exec > ~/.local/share/xorg/xinit.log 2>&1
+exec /usr/bin/Xorg :0 -verbose 2 -nolisten tcp -keeptty dpms -c -f 0 -s 0 -ardelay 250 -arinterval 40 -dpi 288 "$@" vt${XDG_VTNR:?}
