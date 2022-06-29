@@ -1,7 +1,9 @@
 # from typing import Any, Callable
+# SEE: /usr/lib/python3.10/site-packages/libqtile/backend/x11/xkeysyms.py
 
-from libqtile import bar, layout, widget
-from libqtile.config import Click, Drag, EzKey, Group, Key, Match, Screen
+from libqtile import bar, hook, layout, qtile, widget
+from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
+                             Screen)
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
@@ -55,7 +57,14 @@ keys = [
     K("M-<Return>", lazy.spawn(terminal), desc="Launch terminal"),
     K("M-<space>", lazy.spawn(ranger + ["/@/airy"]), desc="Launch fm"),
     K("M-S-<space>", lazy.spawn(ranger + ["/@/just"]), desc="Launch fm"),
-    K("M-o", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
+    KeyChord(
+        [mod],
+        "o",
+        [
+            Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
+            Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
+        ],
+    ),  # , mode="Launch"
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch terminal"),
     # Toggle between different layouts as defined below
     K("M-<Tab>", lazy.next_layout(), desc="Toggle between layouts"),
@@ -71,6 +80,7 @@ keys = [
     K("M-C-r", lazy.reload_config(), desc="Reload the config"),
     K("M-C-q", lazy.shutdown(), desc="Shutdown Qtile"),
     K("M-e", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+    K("M-<minus>", lazy.spawn("xset dpms force off".split()), desc="Screen off"),
 ]
 
 groups = [Group(i) for i in "123456789"]
@@ -195,7 +205,7 @@ floating_layout = layout.Floating(
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
-        Match(title="pinentry-qt"),  # GPG key password entry
+        Match(wm_class="pinentry-qt"),  # GPG key password entry
     ]
 )
 auto_fullscreen = True
@@ -218,3 +228,14 @@ wl_input_rules = None
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
 wmname = "LG3D"
+
+
+# Mpv player in floating mode · Issue #2651 · qtile/qtile ⌇⡢⢼⡸⣣
+#   https://github.com/qtile/qtile/issues/2651
+@hook.subscribe.client_new
+def disable_floating(window):
+    rules = [Match(wm_class="mpv")]
+
+    if any(window.match(rule) for rule in rules):
+        window.togroup(qtile.current_group.name)
+        window.cmd_disable_floating()
