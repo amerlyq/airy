@@ -104,3 +104,10 @@ BUG
     # Cannot open "/proc/sys/net/ipv4/route/flush": Permission denied
     http://lists.infradead.org/pipermail/openconnect-devel/2013-August/001176.html
     https://patchwork.ozlabs.org/patch/514804/
+  [⡢⢼⠹⠵] BUG
+    ¦ openconnect Got inappropriate HTTP CONNECT response:
+    ¦ HTTP/1.1 401 Unauthorized
+    ¦ Creating SSL connection failed
+    ¦ Cookie was rejected by server; exiting.
+    ::: FIXED: need reboot after suspend-wakeup
+      ALT:WKRND: run with OPT=--verbose

@@ -67,6 +67,7 @@ fi
 ((splitroute)) && opts+=( --script="vpn-slice ${script:?}" )
 
 unset COOKIE FINGERPRINT
+printf '%s\n' "$session"
 eval "$session"
 [[ -n $COOKIE && -n $FINGERPRINT ]] || exit 1
 
