@@ -63,10 +63,13 @@ local highlights = {
   Title        = { fg = '#cb4b16', bold = true },
 
 
-  DiffAdd    = { fg = '#859900', bg = bg, sp = '#859900' },
-  DiffChange = { fg = '#b58900', bg = bg, sp = '#b58900' },
-  DiffDelete = { fg = '#dc322f', bg = bg, bold = true },
+  DiffAdd    = { fg = '#859900', bg = '#001200', sp = '#859900' },
+  DiffChange = { fg = '#b58900', bg = '#140c00', sp = '#b58900' },
+  DiffDelete = { fg = '#dc322f', bg = '#120000', bold = true },
   DiffText   = { fg = '#268bd2', bg = bg, sp = '#268bd2' },
+
+  -- GitGutterChange = { fg = '#b58900', bg = '#000000', sp = '#b58900', underline = true },
+  -- GitGutterChange = { fg = '#b58900', bg = '#140c00', sp = '#b58900' },
 
   StatusLine   = { fg = '#839496', bg = cg },
   StatusLineNC = { fg = '#586e75', bg = cg, reverse = true },

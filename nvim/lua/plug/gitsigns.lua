@@ -1,4 +1,7 @@
-local K = require'keys.bind'.K
+local K = require 'keys.bind'.K
+
+-- FAIL: looks like gitsigns.is_hl_set() check is wrong -- TEMP: use fallback grps
+-- vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { fg = '#b58900', bg = '#000000', sp = '#b58900', underline = true })
 
 -- Gitsigns
 -- Add git related info in the signs columns and popups
@@ -22,7 +25,7 @@ M.setup {
   -- linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
   -- word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
   -- current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
-  signs = {
+  signs      = {
     add = { text = '+' },
     change = { text = '~' },
     delete = { text = '_' },
