@@ -1,0 +1,25 @@
+
+2022-06-27-Mon-W26
+  [⡢⢹⣪⠆] 1h10m FIXME: keyboard i8042 input delay on reboot and wakeup ⌇⡢⢹⣌⢽
+    ::: ADD: i8042.noaux i8042.dritek=1
+    NOTE https://wiki.archlinux.org/title/HP_Spectre_x360_(2020)#Keyboard
+    DEV https://github.com/berzoidberg/i8042-spectre-dkms
+    SRC:WKRND https://patchwork.kernel.org/project/linux-input/patch/20210201160336.16008-1-anton@cpp.in/
+    1436636 – Keyboard not working after resume with kernel 4.10.5-200.fc25.x86_64 ⌇⡢⢹⣀⡙
+      https://bugzilla.redhat.com/show_bug.cgi?id=1436636
+    Keyboard not working initially on HP 15s-fq2xxx, FIX (i8042 dritek=1) : linuxquestions ⌇⡢⢹⣁⠈
+      https://www.reddit.com/r/linuxquestions/comments/sdxl2m/keyboard_not_working_initially_on_hp_15sfq2xxx/
+      […] CHECK: may not fix "suspend" issue -- and I will need dkms anyways
+        ::: several tries were OK, keep waiting
+    input/i8042: Add dritek quirk for Acer Aspire One AO532 - Patchwork ⌇⡢⢹⣁⢋
+      https://patchwork.kernel.org/project/linux-input/patch/20220418200949.6009-1-hdegoede@redhat.com/
+    linux/i8042-x86ia64io.h at master · torvalds/linux ⌇⡢⢹⣁⢽
+      https://github.com/torvalds/linux/blob/master/drivers/input/serio/i8042-x86ia64io.h
+    ::: #dld /@/research/airy/hw/i8042-spectre-dkms
+  [_] FIND: can we disable PS/2 at all ?
+    Jun 27 16:34:13 hpx kernel: i8042: PNP: PS/2 Controller [PNP0303:PS2K] at 0x60,0x64 irq 1
+    Jun 27 16:34:13 hpx kernel: serio: i8042 KBD port at 0x60,0x64 irq 1
+  [⡢⢹⣧⢽] USE: i8042.noaux -- to remove message
+    ¦ Jun 27 16:34:13 hpx kernel: i8042: PNP: PS/2 appears to have AUX port disabled, if this is incorrect please boot with i8042.nopnp
+      Intel QC71 - ArchWiki ⌇⡢⢹⣋⣌
+        https://wiki.archlinux.org/title/Intel_QC71

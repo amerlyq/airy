@@ -198,7 +198,7 @@ title Arch Linux Enc
 linux /vmlinuz-linux
 initrd /intel-ucode.img
 initrd /initramfs-linux.img
-options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ quiet resume=/dev/ws/swap
+options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ resume=/dev/ws/swap quiet i8042.noaux i8042.dritek=1
 EOT
 
 cat > /mnt/boot/loader/loader.conf <<EOT
@@ -258,6 +258,7 @@ arch-chroot /mnt
   # CHG: PRESETS=('default')
   nvim /etc/mkinitcpio.d/linux.preset
   # CHG: HOOKS=(base udev keyboard autodetect modconf block encrypt lvm2 filesystems resume fsck)
+  # CHG: MODULES=(i915) -- COS: /dev/dri/card0 should be present early for Xorg autologin
   nvim /etc/mkinitcpio.conf
   mkinitcpio -vM
   ## OR: if archiso kernel is older than in arch-chroot

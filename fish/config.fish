@@ -20,8 +20,10 @@ end
 
 
 ## git
-abbr -a gaa 'git add --all'
+abbr -a ga  'git add --all'
 abbr -a ga. 'git add --all .'
+abbr -a gau 'git add --updated'
+abbr -a gc1 'git clone --depth=1 --single-branch'
 abbr -a gc  '/@/airy/git/ctl/my-msg --index --modtime --commit'
 abbr -a gc. '/@/airy/git/ctl/my-msg --index --modtime --commit --prefix (basename $PWD)'
 abbr -a gcs 'git show'
@@ -31,10 +33,9 @@ abbr -a gd. 'git diff -M --color-moved .'
 abbr -a gd  'git diff -M --color-moved --cached -w'
 abbr -a gds 'git diff -M --color-moved --stat'
 abbr -a gf  'git fetch --verbose --progress --tags'
-abbr -a giu 'git add --updated'
 abbr -a glg 'git log --date=short --format=format:"%C(bold green)%ad%C(reset) %C(yellow)%h%C(reset) %<(60)%C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset)" --graph'
 abbr -a gl  'git pull --rebase --verbose'
-abbr -a gs 'git status -sb --show-stash'
+abbr -a gs  'git status -sb --show-stash'
 abbr -a Gs 'just world dash modified'
 abbr -a Gu 'just world dash unsynced'
 abbr -a gz1 '/@/airy/git/ctl/snapshot'

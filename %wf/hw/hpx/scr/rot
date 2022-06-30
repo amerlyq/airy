@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+
+normal="1 0 0 0 1 0 0 0 1"
+inverted="-1 0 1 0 -1 1 0 0 1"
+left="0 -1 1 1 0 0 0 0 1"
+right="0 1 0 -1 0 1 0 0 1"
+
+if [[ ${1-} ]]; then
+  ori=right
+  mtx=$right
+else
+  ori=normal
+  mtx=$normal
+fi
+
+xrandr --output eDP-1 --rotate "$ori"
+xinput set-prop "ELAN2514:00 04F3:2BEE" "Coordinate Transformation Matrix" $mtx
