@@ -2,16 +2,16 @@
 
 ## Agenda
 # NOTE:USE: /@/* as relay point for absolute symlinks
-.0  /at/=
+.0  /@/at/=
 .1  /!  # root (?agenda?)
-.!  /at
+.!  /@/at
 .2  /@  # features
-.@  /at/feature
+.@  /@/at/feature
 .3  /#  # tags (gen-group)
-.#  /at/tag
-.4  /at/group/pkgsrc
+.#  /@/at/tag
+.4  /@/at/group/pkgsrc
 .5  /%  # groups (manually)
-.%  /at/group
+.%  /@/at/group
 
 ### Configs
 ..a  /@/airy/airy
@@ -21,7 +21,7 @@
 ..M  /@/xdg_home/.mail  # MOVE: -> /aura
 ..n  /@/airy/nvim
 ..i  /@/airy/irc
-..P  /at/group/pkgsrc
+..P  /@/at/group/pkgsrc
 ..q  /@/airy/qute
 ..Q  /@/xdg_config/qutebrowser
 ..r  /@/airy/ranger
@@ -98,17 +98,22 @@
 .d.  /data
 .dA  /data/anime
 .da  /data/amv
+.dc  /data/media/comics
 .dd  /data/_dld
+.de  /data/media/demo
 .df  /data/fantasy
+.dh  /data/hist
 .dl  /_dld
 .dL  /data/TextOfSongs
-.dm  /@/music
+.dm  /data/media
 .dM  /data/mems
+.do  /data/others
 .dp  /data/photos
 .dP  /data/photos_priv
 .dr  /_dld/rtorrent
 # .ds  /@/seize/kirie/dast
-# .du  /data/aura
+.ds  /data/sync
+.du  /data/aura
 .dv  /data/amv
 .dw  /data/wall
 .dy  /_dld/youtube
@@ -123,19 +128,21 @@
 .fl  /@/coastline/fleur
 # .fs  ~/aura/fork/st
 
-.g.  /games
-.gd  /games/_dld
+.g.  /@/games
+.gd  /@/games/_dld
 .gg  /@/gaming
-.gi  /games/_install
+.gi  /@/games/_install
 .gm  /@/steamapps
-.gp  /games/_play/wineprefix
+.gp  /@/games/_play/wineprefix
 .gs  /@/gamesaves
 
 .h.  /@/devq/hack
 .ha  /@/devq/hack/asm/mips
+.hi  /data/hist
 .hs  /@/devq/hack/smashthestack
 .hw  /@/devq/hardware
 .hx  /@/airy/hw/log/2022-06-XX.nou
+.hy  /data/hist/_synchro
 
 .i   /@/irome
 .I   /@/items
@@ -175,7 +182,8 @@
 .m.  /@/meridia
 # .md  /@/miur/doc
 .md  /@/metadata
-.me  /@/meridia/estimation
+# .me  /@/meridia/estimation
+.me  /data/media
 .mf  /@/meridia/finance
 .mg  /@/meridia/mgmt
 .mj  /@/meridia/languages
@@ -183,7 +191,10 @@
 .mm  /@/miur
 .mo  /@/monica
 .ms  /@/meridia/struct
-.my  /@/my
+.mu  /@/music
+.mv  /data/amv
+# .my  /@/my
+.my  /data/media/youtube
 
 .n.  /net
 .nb  /net/backup
@@ -204,10 +215,12 @@
 # .p.  /@/aura/pj
 # .pf  /@/aura/forestanza/forestanza
 .pg  /@/plugins
+.ph  /@/photos
+.pH  /@/photos_priv
 # .pj  /@/aura/pj/jira-cli
 .pp  /@/piony
 # .ps  /@/aura/forestanza/forestanza.sh
-.ps  /@/password-store
+.ps  /@/passdb
 # .py  /@/aura/pj/pyarxi
 # .pu  /@/aura/pj/urxvt-ext-evolved
 
@@ -337,7 +350,8 @@
 .x   /x
 # .X   ~/backup-lists/tiers
 
-.y   /aura
+# .y   /aura
+.y   /@/aura
 .Y   /@/xdg_aurutils
 
 .z   /@/seize

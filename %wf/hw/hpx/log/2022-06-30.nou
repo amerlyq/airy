@@ -1,0 +1,42 @@
+2022-06-30-Thu-W26
+  [X] ⊞ 1h10m <both> #hpx CFG input latency / lagging keyboard ⌇⡢⢾⣕⣲
+    [•] MAYBE: laggy issue is due to GuC or fbc=1
+      options i915 enable_guc=3 enable_fbc=1
+    [•] TRY: uninstall intel driver again -- and measure !glxgears
+    [•] CFG picom
+      $ picom
+      $ hsetroot -solid '#000000'
+      Poor performance when vsync is enabled · Issue #25 · yshui/picom ⌇⡢⢽⢎⢸
+        https://github.com/yshui/picom/issues/25
+      vsync not working with a rotated display (#996) · Issues · xorg / xserver · GitLab ⌇⡢⢽⢎⣋
+        https://gitlab.freedesktop.org/xorg/xserver/-/issues/996
+      TearFree (VSync) option missing in xf86-video-modesetting (modesetting DDX) (#244) · Issues · xorg / xserver · GitLab ⌇⡢⢽⢐⠒
+        https://gitlab.freedesktop.org/xorg/xserver/-/issues/244
+    [_] TRY: disable _psr=0 for monitor to have stable 60Hz
+    [_] FIND: linux measure keyboard latency // FIND reasons
+      [_] measuring by camera
+        Is It Snappy? ⌇⡢⢽⡿⠾
+          https://isitsnappy.com/
+        display - How can I measure the input lag/latency of my monitor? - Super User ⌇⡢⢽⡿⡂
+          https://superuser.com/questions/1581842/how-can-i-measure-the-input-lag-latency-of-my-monitor
+        Linux input lag analysis(7DEs tested + Windows) : linux_gaming ⌇⡢⢽⡿⡑
+          https://www.reddit.com/r/linux_gaming/comments/c0ly6b/linux_input_lag_analysis7des_tested_windows/
+        Our Keyboard Typing Experience Tests: Latency - RTINGS.com ⌇⡢⢽⢈⣹
+          https://www.rtings.com/keyboard/tests/latency
+      [_] How do I improve my fps and input latency on linux? : linux_gaming ⌇⡢⢽⢀⢜
+        https://www.reddit.com/r/linux_gaming/comments/tgel5h/how_do_i_improve_my_fps_and_input_latency_on_linux/
+        LatencyFleX: A new approach to game latency reduction | Tatsuyuki Ishi ⌇⡢⢽⢀⣯
+          https://ishitatsuyuki.github.io/post/latencyflex/
+    [_] XLR input latency
+      [!] +++ NICE:TUT:READ Meditating with microprocessors Series: Part-3: Trading off power for UltraLowLatency | Slowbreathing ⌇⡢⢽⢋⡠
+        https://slowbreathing.github.io/articles/2020-07/MeditatingProcessor-3
+      От High Ceph Latency к Kernel Patch с помощью eBPF/BCC / Хабр ⌇⡢⢽⢈⢃
+        https://habr.com/ru/company/selectel/blog/458592/
+      The Old Man and His Smartphone, Episode II - Paul E. McKenney's Journal — LiveJournal ⌇⡢⢽⢈⢙
+        https://paulmck.livejournal.com/53952.html
+      [RFC v2 14/17] perf kwork: Implement bpf trace - Yang Jihong ⌇⡢⢽⢉⠸
+        https://lore.kernel.org/bpf/20220624140349.16964-15-yangjihong1@huawei.com/
+      bpf: BPF based latency tracing [LWN.net] ⌇⡢⢽⢉⡎
+        https://lwn.net/Articles/648515/
+      Measure and reduce keyboard input latency with QMK on the Kinesis Advantage (2021) - Michael Stapelberg ⌇⡢⢽⢊⢲
+        https://michael.stapelberg.ch/posts/2021-05-08-keyboard-input-latency-qmk-kinesis/

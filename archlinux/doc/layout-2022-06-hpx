@@ -164,6 +164,11 @@ mount -o noauto,x-systemd.automount,fmask=0133 /dev/nvme0n1p1 /mnt/boot
 mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@snapshots /dev/ws/root /mnt/.snapshots
 mount -o noauto,x-systemd.automount,noatime,compress=zstd,autodefrag,ssd,subvol=/@snapshots /dev/ws/data /mnt/data/.snapshots
 
+## HACK: inof symlink and re-creation of pointed dir on boot MAYBE: ,size=10G
+# tmpfs   /t    tmpfs  rw,noatime,nodev,nosuid,uid=amer,gid=users,mode=1700 0 0
+mkdir -v /t
+mount -t tmpfs -o noatime,nodev,nosuid,uid=amer,gid=users,mode=1700 /t
+
 
 ### SETUP #####################################################################
 ## NOTE: bake fstab

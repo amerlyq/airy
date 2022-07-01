@@ -102,6 +102,7 @@
   [X] FIX: run Xorg -> Qtile
   [_] &low add fast /build partition
     OR:TRY: lvm cache
+      [_] FIND:PERF: are there any gains ?
     OR: keep there /aura for faster grep
     OR: directly mount /t as [compressed ?zRAM?] ramdisk
     OR: simply mount as /t -- for persistent "working area" for daily experimenting
@@ -109,6 +110,11 @@
       * do same way like qute-proxy
       * BUT: no need to keep qute-proxy there too
       [?] IDEA: symlink qute-proxy and qute to share histories
+      [_] IDEA: relocate whole !qute basedir into RAM by !asd
+        [!] BUT: still keep .sqlite on disk
+        [_] FIND: !qute in RAM in OFF issues
+          Firefox/Profile on RAM - ArchWiki ⌇⡢⢿⠔⣡
+            https://wiki.archlinux.org/title/Firefox/Profile_on_RAM
   [_] TRY: fun with wayland + Qtile
     VIZ: Are we Wayland yet? ⌇⡢⢩⠔⢯
       https://arewewaylandyet.com/
@@ -528,3 +534,8 @@
         ::: /etc/mkinitcpio.conf :: MODULES= ( i915 )
       [$] MAYBE: problem due to !udev not initializing /dev/dri/card0 yet
         [$] TRY: start Xorg by systemd -- to depend on card0 init
+
+
+2022-07-01
+  [_] READ:SECU: Security - ArchWiki ⌇⡢⢿⠕⣊
+    https://wiki.archlinux.org/title/Security

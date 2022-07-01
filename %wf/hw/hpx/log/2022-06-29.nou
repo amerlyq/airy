@@ -1,0 +1,69 @@
+2022-06-29-Wed-W26
+  [%] 7h10m #hpx CFG ⌇⡢⢾⠇⢝
+    [%] 50m FIXME: intel diagonal tearing
+      ~~ either setup "KVM" or setup "intel"
+      [X] ⋆ 25m FIXME: intel diagonal tearing when !qute scrolling
+      [X] 10m FIND/READ:INFO
+        [SOLVED] Screen tearing with Intel Iris Xe, i915 and picom / Kernel & Hardware / Arch Linux Forums ⌇⡢⢼⡗⣅
+          https://bbs.archlinux.org/viewtopic.php?id=269553
+    [%] 35m CFG HuC GuC
+      [X] 15m CFG HuC
+        BAD: HuC disabled by default (offloading media decoding HEVC/H.265)
+          $ sudo cat /sys/kernel/debug/dri/0/gt/uc/huc_info
+        DEBUG:VIZ: currently enabled opts and their description
+          $ sudo systool -m i915 -av
+          $ modinfo -p i915
+        ::: [2] = GuC=no HuC=yes
+          options i915 enable_guc=2
+        [X] ✓ CHECK: HuC dmesg
+          [30130.586970] i915 0000:00:02.0: [drm] GuC firmware i915/icl_guc_33.0.0.bin version 33.0 submission:disabled
+          [30130.586973] i915 0000:00:02.0: [drm] HuC firmware i915/icl_huc_9.0.0.bin version 9.0 authenticated:yes
+      [X] 20m READ: iommu ++ CFG HuC
+    [X] ⋆ 1h15m <W:me> CFG: intel drivers ++ video
+      Intel graphics - ArchWiki ⌇⡢⢼⡫⡂
+        https://wiki.archlinux.org/title/intel_graphics#Disable_Vertical_Synchronization_(VSYNC)
+      Hardware video acceleration - ArchWiki ⌇⡢⢼⡬⢩
+        https://wiki.archlinux.org/title/Hardware_video_acceleration#Verification
+      USAGE:
+        $ ffmpeg -vaapi_device /dev/dri/renderD128 -i input.mp4 -vf 'format=nv12,hwupload' -c:v hevc_vaapi -f mp4 -rc_mode 1 -qp 25 output.mp4
+      [X] verify $ lsinitcpio /boot/initramfs-linux.img | grep -i modp
+    [X] ⊞ 1h20m <W:me> ADD: xrandr 1500x1000 and remove other modelines
+      [%] ADD: modeline 1500x1000
+      [_] WTF: only single mode present, but all VESA are printed
+        $ grep . /sys/class/drm/*/modes
+        /sys/class/drm/card0-eDP-1/modes:3000x2000
+      [?] create my own EDID
+        Kernel mode setting - ArchWiki ⌇⡢⢼⣃⣜
+          https://wiki.archlinux.org/title/Kernel_mode_setting#Forcing_modes_and_EDID
+    [%] 30m CHECK: !mpv hwdec ++ vainfo ++ intel_gpu_top
+      [?] WARN:
+        ¦ MESA-INTEL: warning: Performance support disabled, consider sysctl dev.i915.perf_stream_paranoid=0
+    [%] 25m CHECK: tearing on scroll
+      ::: FAIL: no tearing но скролл очень рывками
+        DEBUG $ mpv --video-sync=display-resample
+      ::: FAIL: freeze-up of !qute
+        [X] ✓ CHECK: mitigation
+      [X] ≈ 25m ALT:IDEA: depend on !picom to mitigate tearing
+        FAIL: not work on rotated screen
+      [_] SEE: intel - Gentoo Wiki ⌇⡢⢼⢾⠱
+        https://wiki.gentoo.org/wiki/Intel#Screen_tearing
+      INFO
+        Intel Media For Linux | 01.org ⌇⡢⢼⢾⡐
+          https://01.org/intel-media-for-linux
+        drm/i915 Intel GFX Driver — The Linux Kernel documentation ⌇⡢⢼⢾⡫
+          https://01.org/linuxgraphics/gfx-docs/drm/gpu/i915.html
+      [_] WTF:PERF: now only 90fps for !glxgears
+        [_] CHECK: !ff on rotated screen again
+    [+] ‼ 20m DEBUG blacklist=vmd
+    [%] 20m TODO: $ powertop --calibrate
+    [+] 25m camera Xorg logs -- dirty shutdown of !qtile during reboot
+      Qtile loses connection with X when shutting down · Issue #3351 · qtile/qtile ⌇⡢⢼⢯⡭
+        https://github.com/qtile/qtile/issues/3351
+    [%] ✗ 1h10m WTF: !sensors do not detect fans RPM
+      [X] 45m fan controls -- too hot laptop
+        [_] WTF: no control over temperature/fans
+      [+] 25m #hpx Windows // CFG cooling :: too hot
+      [_] CPU frequency scaling - ArchWiki ⌇⡢⢼⣈⢮
+        https://wiki.archlinux.org/title/CPU_frequency_scaling
+      [_] Talk:Fan speed control - ArchWiki ⌇⡢⢼⣍⢪
+        https://wiki.archlinux.org/title/Talk:Fan_speed_control

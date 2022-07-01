@@ -1,5 +1,5 @@
-# from typing import Any, Callable
 # SEE: /usr/lib/python3.10/site-packages/libqtile/backend/x11/xkeysyms.py
+from typing import cast
 
 from libqtile import bar, hook, layout, qtile, widget
 from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
@@ -15,7 +15,7 @@ def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
 
 
 mod = "mod4"
-terminal: str = guess_terminal()
+terminal = ["env", "--chdir=/t", cast(str, guess_terminal())]
 ranger = ["st", "-e", "ranger", "--choosedir=/run/user/1000/ranger/cwd", "--"]
 
 keys = [
@@ -65,7 +65,7 @@ keys = [
             Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
         ],
     ),  # , mode="Launch"
-    K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch terminal"),
+    K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
     # Toggle between different layouts as defined below
     K("M-<Tab>", lazy.next_layout(), desc="Toggle between layouts"),
     # K("M-slash", lazy.next_layout(), desc="Toggle between layouts"),
