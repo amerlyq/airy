@@ -5,8 +5,12 @@
 # BUG: clean setup -- sets "vim" and you must override it
 #   $ PAGER=r.pager EDITOR=r.vim ./setup -m
 # PATH    OVERRIDE="%{PATH}"
-EDITOR  DEFAULT="%{EDITOR}"
-VISUAL  DEFAULT="%{EDITOR}"
-PAGER   DEFAULT="%{PAGER}"
+# EDITOR  DEFAULT="%{EDITOR}"
+# VISUAL  DEFAULT="%{EDITOR}"
+# PAGER   DEFAULT="%{PAGER}"
 #LESS   DEFAULT="M q e h15 z23 b80"
 #LESS="-a -i -j6 -M -N -R -S -w -z-4 -x4"
+
+EDITOR  DEFAULT=nvim
+VISUAL  DEFAULT=nvim
+PAGER   DEFAULT=page
