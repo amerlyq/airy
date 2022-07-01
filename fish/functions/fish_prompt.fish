@@ -63,14 +63,14 @@ function fish_prompt
     set -l blue (set_color -o blue)
     set -l normal (set_color normal)
 
-    set -l arrow_color "$green"
+    set -l arrow_color "$red"
     if test $__last_command_exit_status != 0
-        set arrow_color "$red"
+        set arrow_color "$yellow"
     end
 
-    set -l arrow "$arrow_color➜ "
+    set -l arrow "╼"
     if fish_is_root_user
-        set arrow "$arrow_color# "
+        set arrow "#"
     end
 
     set -l cwd $cyan(basename (prompt_pwd))
@@ -86,5 +86,7 @@ function fish_prompt
         end
     end
 
-    echo -n -s $arrow ' '$cwd $repo_info $normal ' '
+    # echo -n -s $arrow ' '$cwd $repo_info $normal ' '
+    ## @me
+    echo -n -s "$arrow_color┌──" ' '$cwd $repo_info $normal \n"$arrow_color└$arrow "
 end
