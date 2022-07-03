@@ -20,7 +20,8 @@ end
 
 
 ## git
-abbr -a ga  'git add --all'
+abbr -a gA  'git annex add'
+abbr -a ga  'git add --all (test -e $PWD/.git || echo .)'
 abbr -a ga. 'git add --all .'
 abbr -a gau 'git add --update'
 abbr -a gc1 'git clone --depth=1 --single-branch'

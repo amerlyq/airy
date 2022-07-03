@@ -14,15 +14,15 @@ playlist=$1; shift
 
 websrc='soundcloud.com'
 # qutecookiedb=~/.local/share/qutebrowser/webengine/Cookies
-# qutecookiedb="/.snapshots/$(ls /.snapshots | tail -1)/snapshot/home/user/.local/share/qutebrowser/webengine/Cookies"
-qutecookiedb="/home/.snapshots/$(ls /home/.snapshots | tail -1)/snapshot/$USER/.local/share/qutebrowser/webengine/Cookies"
+qutecookiedb="/.snapshots/$(ls /.snapshots | tail -1)/snapshot/home/user/.local/share/qutebrowser/webengine/Cookies"
+# qutecookiedb="/home/.snapshots/$(ls /home/.snapshots | tail -1)/snapshot/$USER/.local/share/qutebrowser/webengine/Cookies"
 oauth=$(sqlite3 "$qutecookiedb" 'SELECT value FROM cookies WHERE host_key="'"$websrc"'" AND name="oauth_token";')
 
 ## NOTE: unnecessary OAuth for "/<user>/likes" page
 if [[ ${playlist##*/} == likes ]]; then
-  ydl(){ youtube-dl "$@"; }
+  ydl(){ yt-dlp "$@"; }
 else
-  ydl(){ youtube-dl --add-header "Authorization:OAuth $oauth" "$@"; }
+  ydl(){ yt-dlp --add-header "Authorization:OAuth $oauth" "$@"; }
 fi
 
 
