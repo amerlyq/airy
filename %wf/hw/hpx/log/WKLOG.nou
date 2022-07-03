@@ -1,0 +1,30 @@
+
+2022-07-01-Fri-W26
+  [_] READ:SECU: Security - ArchWiki ⌇⡢⢿⠕⣊
+    https://wiki.archlinux.org/title/Security
+
+
+2022-07-02-Sat-W26
+  [%] 40m/ CFG: !dict TEMP at least online FIND replacement w/o server <⡊⣦> ※⡢⣀⢥⡁
+  [%⡢⣀⡱⠼] 15m/ #hpx vsync in !qute
+    Web browser "VSYNC synchronization", display Hz, and input lag tester ⌇⡢⣀⡱⠮
+      https://www.vsynctester.com/
+    [•] FIND: kernel psr monitor
+      Improving Linux battery life, enabling PSR by default, testers wanted - Hans' hacking log — LiveJournal ⌇⡢⣀⢨⠰
+        https://hansdegoede.livejournal.com/18653.html
+        $ cat /sys/kernel/debug/dri/0/i915_edp_psr_status
+      Display Hardware Handling ⌇⡢⣀⢨⢟
+        https://01.org/linuxgraphics/gfx-docs/drm/ch04s02.html#id-1.4.3.4.11
+  [⡢⣀⣎⡰] ‼ 2h #hpx FAIL: frozen system due to building aur/clasp-cl-git ⌇⡢⣁⡰⡈
+    FAIL: too long to build
+      ¦ you need more than 8 GB of RAM and it will be 1-2 hours build time.
+      ¦ If you have 8 GB of RAM you can turn off the parallel build which will then run for a day or so.
+    ALT: thirdlaw/cando - Docker Image | Docker Hub ⌇⡢⣀⣎⡥
+      https://hub.docker.com/r/thirdlaw/cando
+    Limiting Process Resource Consumption in Unix | Baeldung on Linux ⌇⡢⣀⣌⢤
+      https://www.baeldung.com/linux/limit-resource-consumption
+      $ systemd-run --scope -p MemoryLimit=1000M -p CPUQuota=10% ./myProcess.sh
+    How can I limit the CPU and RAM usage for a process? - Ask Ubuntu ⌇⡢⣀⣍⡩
+      https://askubuntu.com/questions/1367612/how-can-i-limit-the-cpu-and-ram-usage-for-a-process
+      $ prlimit --pid 12345 --as=2048000000
+    [_] TODO:CFG: always keep cgroup limit for any builds/programs

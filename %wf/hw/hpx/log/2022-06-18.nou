@@ -1,0 +1,51 @@
+
+2022-06-18-Sat-W24
+  [X] ◔ 5h35m #pc:hpx CFG install archlinux ※⡢⢢⣿⢘
+    ‼ WARN: не увлекаться #pc:hpx -- мне ещё искать дом для покупки
+    [✗⡢⢭⣳⠀] 35m TRY Wayland anyways
+      * can't find HiDPI fix for !qtile
+      * very slow startup of !xterm
+      ::: not ready to use, TRY:FUTURE: some other time, when system works
+        https://bbs.archlinux.org/viewtopic.php?id=272707
+        [≫] TUT:CFG: Colin Woodbury - Full Wayland Setup on Arch Linux ⌇⡢⢭⣾⣝
+          https://www.fosskers.ca/en/blog/wayland
+        [≫] Revisiting Wayland for ArchLinux :: Rohit Goswami — Reflections ⌇⡢⢭⣿⠈
+          https://rgoswami.me/posts/revisiting-wayland-2021-archlinux/
+      [≫] run !st in XWayland
+    [%] 1h20m why font size so small
+      264x176: dpi=289  # xpyinfo | grep -B2 resolu
+      285x190: dpi=267 -> 288(96*3)
+    [X] 1h CFG copy only necesary mods one-by-one
+    [X] 50m CFG copy only necesary repos
+    [X] 1h CFG: nvim, tmux, ff, qute, etc. w/o using !airyctl
+      << #preps to edit #just.airy
+    [X] 50m CFG airy
+  ~~~
+  [_] BUG: too many udev
+    41 systemd-udevd processes on startup · Issue #11405 · systemd/systemd ⌇⡢⢭⣬⣯
+      https://github.com/systemd/systemd/issues/11405
+      ¦ Please try to set children_max= in udev.conf.
+      ¦ https://www.freedesktop.org/software/systemd/man/udev.conf.html
+    186200 - Multiple instances of udev daemon when system boots - arm st1q - chromium ⌇⡢⢭⣿⠧
+      https://bugs.chromium.org/p/chromium/issues/detail?id=186200
+    [$] ::: mostly fixed after sof-firmware
+      [_] one excessive fork still hangs
+      [_] FAIL: after reboot AGAIN: 40+ forks
+  [≫] TRY: replace pulseaudio+jack2 by pipewire
+    PipeWire is a fantastic JACK replacement : linuxaudio ⌇⡢⢮⠊⢝
+      https://www.reddit.com/r/linuxaudio/comments/pel0nr/pipewire_is_a_fantastic_jack_replacement/
+    JACK Audio Connection Kit - ArchWiki ⌇⡢⢮⠋⣟
+      https://wiki.archlinux.org/title/JACK_Audio_Connection_Kit#Comparison_of_JACK_implementations
+  [_] keyboard delay
+    berzoidberg/i8042-spectre-dkms: Fixes keyboard init delay in HP Spectre models ⌇⡢⢮⠋⣥
+      https://github.com/berzoidberg/i8042-spectre-dkms
+  [X] ERR: audio
+    Advanced Linux Sound Architecture - ArchWiki ⌇⡢⢮⠋⣵
+      https://wiki.archlinux.org/title/Advanced_Linux_Sound_Architecture#ALSA_firmware
+    ::: sof-firmware
+      [_] CHECK: I can play music
+  [_] ERR: cpu
+    Pcc_cpufreq initstate no such device Error - Support - Manjaro Linux Forum ⌇⡢⢮⠋⢵
+      https://forum.manjaro.org/t/pcc-cpufreq-initstate-no-such-device-error/14172/4
+    kernel/git/stable/stable-queue.git - Linux kernel stable patch queue ⌇⡢⢮⠋⢻
+      https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/diff/releases/5.8.4/cpufreq-intel_pstate-fix-cpuinfo_max_freq-when-msr_t.patch?id=7a5af378bcb60d514b939788d62678e8f0bee3af

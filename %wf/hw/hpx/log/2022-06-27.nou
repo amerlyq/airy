@@ -1,0 +1,62 @@
+
+2022-06-27-Mon-W26
+  [%] ◔ 3h #pc:hpx CFG ⌇⡢⢺⣝⡎
+    [⡢⢹⢽⠉] ⋆ 30m run xcv from xinit and suspend hook
+      $ journalctl -b -u systemd-suspend.service
+      [>] FAIL: even with correct USER and DISPLAY it still does not set !xkb properly
+        [>] MAYBE: try ./xorg.conf AGAIN
+    [%] ◔ 2h30m #pc:hpx CFG identify unlabeled PCI -- TODO reduce power consumption ※⡢⢺⣚⠷
+      [⡢⢺⠝⢀] disable NMI watchdogs
+        Power management - ArchWiki ⌇⡢⢺⠗⢨
+          https://wiki.archlinux.org/title/Power_management#Disabling_NMI_watchdog
+        Improving performance - ArchWiki ⌇⡢⢺⠗⡦
+          https://wiki.archlinux.org/title/Improving_performance#Watchdogs
+        ::: ADD:(kernel): nowatchdog
+          [X] CHECK: after reboot
+  [%] 4h10m #pc:hpx PERF: faster reboot ⌇⡢⢺⣝⡆
+    [+⡢⢹⣪⠆] ⊞ 1h10m FIXME: keyboard i8042 input delay on reboot and wakeup ※⡢⢹⣌⢽
+    [+⡢⢹⣪⣞] ‼ 1h #pc:hpx FAIL upgrade
+      ::: COS: /etc/modprobe.d/blacklist-tpm.conf had linked "tpm" to /bin/false
+        ~~ earlier I had no problems until "mkinitcpio" copied that into //initramfs and cryptsetup failed
+    [+⡢⢹⣪⡕] ⊞ 1h CFG agetty autologin -- SECU I have disk password anyway
+      ‼ ERR: if Xorg/Wayland crashes when screen was locked…
+        -- SECU: autologin will enter unlocked Xorg as on boot
+        -- if Xorg always crashes -- you will need archiso
+      ALT:SECU: use greetd -- it won't login into Xorg after crash
+        greetd - ArchWiki ⌇⡢⢹⣟⠅
+          https://wiki.archlinux.org/title/Greetd
+        Can anyone explain what greetd is? : swaywm ⌇⡢⢹⣞⢒
+          https://www.reddit.com/r/swaywm/comments/qiz4aa/can_anyone_explain_what_greetd_is/
+      [X] getty - ArchWiki ⌇⡢⢹⣣⡜
+        https://wiki.archlinux.org/title/getty
+      [X] ✗ TRY:FIND: directly execute xinit
+        [SOLVED] Can I boot without getty / text interfaces? / Applications & Desktop Environments / Arch Linux Forums ⌇⡢⢹⣡⡎
+          https://bbs.archlinux.org/viewtopic.php?id=238024
+    [⡢⢹⣻⢌] ⊞ 1h BAD: delay after autologin
+      [Solved] Xorg starting slow using automatic login / Applications & Desktop Environments / Arch Linux Forums ⌇⡢⢹⣭⠡
+        https://bbs.archlinux.org/viewtopic.php?id=244343
+      [X] ✗ MAYBE: due to entropy
+        low=256 $ cat /proc/sys/kernel/random/entropy_avail
+        [$] OR: install and enable |haveged| -- software emulated entropy
+        [X] ✗ ADD:SECU: random.trust_cpu=on
+          You Can Now Tell Linux At Boot-Time If You Don't Trust Your CPU Random Number Generator - Phoronix ⌇⡢⢹⣭⣾
+            https://www.phoronix.com/scan.php?page=news_item&px=Linux-4.19-Boot-Time-RNG-Trust
+          unprivilege the CPU's random number generator (RDRAND) / set kernel parameter "`random.trust_cpu=off`" · Issue #6941 · QubesOS/qubes-issues ⌇⡢⢹⣯⡚
+            https://github.com/QubesOS/qubes-issues/issues/6941
+          Entropy, Randomness, /dev/random vs /dev/urandom, Entropy Sources, Entropy Gathering Daemons, RDRAND ⌇⡢⢹⣰⠞
+            https://www.kicksecure.com/wiki/Dev/Entropy#RDRAND
+          Any fix in sight for the rng / boot issue? / Kernel & Hardware / Arch Linux Forums ⌇⡢⢹⣰⡜
+            https://bbs.archlinux.org/viewtopic.php?id=244874
+      [%⡢⢹⣵⡤] ERR: Xorg crashes, and then restarts /var/log/Xorg.0.log
+        ¦ (II) modesetting: Driver for Modesetting Kernel Drivers: kms
+        ¦   vs (II) modeset(0): using drv /dev/dri/card0
+        ¦ (EE) open /dev/dri/card0: No such file or directory
+        ¦ (EE) Screen 0 deleted because of no matching config section.
+        ¦ Fatal server error: (EE) no screens found(EE)
+        ::: don't exec xinit in fish
+      [⡢⢹⣻⡸] ✓ ALT: add i915 into initramfs -- for early KMS
+        [SOLVED] error/warning with auto-login and auto-startx / Newbie Corner / Arch Linux Forums ⌇⡢⢹⣷⢙
+          https://bbs.archlinux.org/viewtopic.php?id=259149
+        ::: /etc/mkinitcpio.conf :: MODULES= ( i915 )
+      [$] MAYBE: problem due to !udev not initializing /dev/dri/card0 yet
+        [$] TRY: start Xorg by systemd -- to depend on card0 init

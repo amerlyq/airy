@@ -1,0 +1,72 @@
+
+2022-06-09-Thu-W23
+  [+] 4h #buy laptop install archlinux ⌇⡢⢢⣿⢘
+    [%] 2h CFG
+      Installation guide - ArchWiki ⌇⡢⢢⡒⠉
+        https://wiki.archlinux.org/title/installation_guide
+      General recommendations - ArchWiki ⌇⡢⢢⡑⣹
+        https://wiki.archlinux.org/title/General_recommendations
+      Laptop - ArchWiki ⌇⡢⢢⡒⠍
+        https://wiki.archlinux.org/title/Laptop
+      Laptop/HP - ArchWiki ⌇⡢⢢⡒⠔
+        https://wiki.archlinux.org/title/Laptop/HP
+      Category:Laptops - ArchWiki ⌇⡢⢢⡒⠳
+        https://wiki.archlinux.org/title/Category:Laptops
+      [_] READ: Improving performance - ArchWiki ⌇⡢⢺⠗⡹
+        https://wiki.archlinux.org/title/Improving_performance
+      [_] sysctl - ArchWiki ⌇⡢⢺⠛⠞
+        https://wiki.archlinux.org/title/Sysctl
+    […] SEE:OV
+      HP Spectre x360 (2020) - ArchWiki ⌇⡢⢢⡄⠖
+        https://wiki.archlinux.org/title/HP_Spectre_x360_(2020)
+        VIZ: https://wiki.archlinux.org/title/Category:HP
+      Linux on Spectre x360 14 : spectrex360 ⌇⡢⢢⡃⠵
+        https://www.reddit.com/r/spectrex360/comments/lqth33/linux_on_spectre_x360_14/
+        ::: disable BitLocker which is enabled by default, after which you'll need to disable secure boot.
+        Trying to boot with Intel-VMD enabled - Issues & Assistance - Garuda Linux Forum ⌇⡢⢢⡃⣪
+          https://forum.garudalinux.org/t/trying-to-boot-with-intel-vmd-enabled/4774
+      Does the HP Spectre x360 run Linux? Can you install it? ⌇⡢⢢⡄⢂
+        https://www.xda-developers.com/does-hp-spectre-x36-2022-linux/
+        ::: ALT: use WSL inof ArchLinux ?
+    [X] ✗ Intel Optane on Linux ⌇⡢⢢⡒⣩
+      ::: impossible to use in Dual-Boot, because cache will contain mess from both Windows and Linux
+      Basic Installation of Arch Linux Dual-Boot with lvm and bcache (using Intel Optane Memory) on MSI GF63 8RD-NE1050Ti · GitHub ⌇⡢⢢⠨⢁
+        https://gist.github.com/mukulanand8/e7efd5b81926be7eba3325232a78a7e1
+        ::: bcache
+      Issue with using M.2 SSD in Intel Optane slot / Newbie Corner / Arch Linux Forums ⌇⡢⢢⠨⢃
+        https://bbs.archlinux.org/viewtopic.php?id=274789
+      Solid state drive/NVMe - ArchWiki ⌇⡢⢢⠨⢅
+        https://wiki.archlinux.org/title/Solid_state_drive/NVMe
+      Dual boot Linux and Windows 10 with Intel Optane memory? / Kernel & Hardware / Arch Linux Forums ⌇⡢⢢⠨⢇
+        https://bbs.archlinux.org/viewtopic.php?id=240791
+      ubuntu-how-to-use-intel-optane-memory-for-ssd-caching - Codenotary ⌇⡢⢢⠹⢡
+        https://codenotary.com/blog/ubuntu-how-to-use-intel-optane-memory-for-ssd-caching/
+        ::: lvmcache
+      Can Linux Use Optane? – CertSimple.com ⌇⡢⢢⠺⢒
+        https://certsimple.com/can-linux-use-optane/
+        ::: Intel discontinued the Optane Memory M10, 800P, 900P, and 905P SSDs
+          Intel Kills Off All Optane-Only SSDs for Consumers, No Replacements Planned (Updated) | Tom's Hardware ⌇⡢⢢⠺⢹
+            https://www.tomshardware.com/news/intel-kills-off-all-optane-only-ssds-for-consumers-no-replacements-planned#:~:text=Intel discontinued the Optane Memory,for the client market segment.
+      performance - How does Linux handle Intel's Optane Persistent Memory Modules under Memory Mode? - Stack Overflow ⌇⡢⢢⠻⢱
+        https://stackoverflow.com/questions/66282496/how-does-linux-handle-intels-optane-persistent-memory-modules-under-memory-mode
+      [SOLVED] Linux Mint Live does not see partitions on SSD - Linux Mint Forums ⌇⡢⢢⡂⠾
+        https://forums.linuxmint.com/viewtopic.php?t=369802
+      Bcache - ArchWiki ⌇⡢⢢⠼⢋
+        https://wiki.archlinux.org/title/bcache
+      LVM - ArchWiki ⌇⡢⢢⠼⣬
+        https://wiki.archlinux.org/title/LVM#Cache
+      Suggestions for using Optane memory? - General Discussion - Clear Linux OS Forum ⌇⡢⢢⠿⠿
+        https://community.clearlinux.org/t/suggestions-for-using-optane-memory/2572/10
+        ::: the drive does appear in my bios as a raid 0 drive but i see no where i can change that setting
+      Solved: How to manage optane memory to dual boot? - Intel Communities ⌇⡢⢢⡀⢃
+        https://community.intel.com/t5/Intel-Optane-Memory/How-to-manage-optane-memory-to-dual-boot/m-p/659944
+      [⡢⢢⡊⣽] How to dualboot Ubuntu with Intel Optane/SSD in Windows - YouTube ⌇⡢⢢⡁⢧
+        https://www.youtube.com/watch?v=2uXgbF3P2F8
+      [SOLVED] Optane - Dual boot problem (GRUB doesn't load). [Archive] - Ubuntu Forums ⌇⡢⢢⡁⣖
+        https://ubuntuforums.org/archive/index.php/t-2458373.html
+        ::: The issue was indeed Intel Optane which I had to disable using
+        "Intel® Optane™ Memory and Storage Management Application" (just
+        changing RST to AHCI apparently wasn't enough).
+          https://www.microsoft.com/en-us/p/intel-optane-memory-and-storage-management/9mzng5hzwz1t
+      Struggling to get Arch configured properly : archlinux ⌇⡢⢢⡂⢹
+        https://www.reddit.com/r/archlinux/comments/gl4xb8/struggling_to_get_arch_configured_properly/
