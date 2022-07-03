@@ -1,37 +1,27 @@
 
-2022-06-19-Sun-W24
-  [X] 1h15m FIX #nou#nvim in Lua ※⡢⢃⡠⢾
-    [X] ≈ 40m CFG:FIX #nou and ERR !tmux focus
-      [X] ✓ #nou still does not work textobj
-    [X] 10m FIX reset hlsearch :: vim-cool
-    [X] 20m CFG #nou switch ++ ADD xtref
-    [X] 5m enable @/audit/hpx/vim
-  [%] 35m #nvim TODO OLED black theme
-    * better energy efficiency for OLED
-    * less blue colors for burn-out like what occured on #pc:neo
-    https://github.com/topics/vim-colorscheme-dark
-    https://benfrain.com/the-best-neovim-color-schemes-in-2021/
-    https://vimcolorschemes.com/
-
-
-2022-06-25-Sat-W25
-  [⡢⢷⡙⣿] 2h20m FIX #nou#nvim in Lua ※⡢⢃⡠⢾
-    [⡢⢶⣥⣬] ⊞ 10m #nvim BUG: <C-a> <C-x> on dates have reversed direction
-      ::: COS "day" is treated as negative number e.g. "-26"
-    [⡢⢷⠱⣰] ✓ 1h5m #nou BUG: <CR> on xts4 toggles pfx inof body
-      [X] 10m TODO: work on xts4 itself globally despite any pfx
-      [⡢⢷⠞⡍] 10m TODO: globally translate any unix ts
-      [⡢⢷⠱⣠] ‼ 45m BUG:FIXED can't use "nou#util#R*" in ./plugin/* due wrong global 'commentstring'
-    [⡢⢶⣩⡧] ⊞ 15m #nou FIXME don't count cancelled tasks time
-      ¦ [$] ↻ /40m #body:shower,shave #3 >Fri<
-    [⡢⢷⡙⣥] ⊞ 50m #nou FIXME jump by <[g> and <[f> between key/log
-      [X] 25m FIX mapcheck() ~ AGAIN related to which-key maps
-      [X] 25m FIX plugin altr#define() preload
-
-
-2022-06-27-Mon-W26
-  [⡢⢹⢓⠍] ✓ 20m #nvim CFG:IDEA: show gitsign as a bkgr of cur lineno (for narrow windows) ⌇⡢⢹⢓⠓
-    Display line number with signcolumn=number when sign text is empty · Issue #14587 · neovim/neovim ⌇⡢⢹⢏⡮
-      https://github.com/neovim/neovim/issues/14587
-    Disable output on the signcolumn · Issue #163 · lewis6991/gitsigns.nvim ⌇⡢⢹⢐⣓
-      https://github.com/lewis6991/gitsigns.nvim/issues/163
+2022-07-01-Fri-W26
+  [⡢⢿⡎⡦] 5m #nvim MOVE undo/etc. to ~/.local/state
+    defaults: move session persistent data to $XDG_STATE_HOME by etircopyh · Pull Request #15583 · neovim/neovim ⌇⡢⢿⡎⠳
+      https://github.com/neovim/neovim/pull/15583
+    Add XDG_STATE_DIR (4f2884e1) · Commits · xdg / xdg-specs · GitLab ⌇⡢⢿⡎⠚
+      https://gitlab.freedesktop.org/xdg/xdg-specs/-/commit/4f2884e16db35f2962d9b64312917c81be5cb54b
+  [⡢⢿⡂⠝] ⊞ 30m #nvim as PAGER inof !less ⌇⡢⣀⠡⠡
+    ::: USE: page-git
+    ~ lucc/nvimpager: Use nvim as a pager to view manpages, diffs, etc with nvim's syntax highlighting ⌇⡢⢿⠼⡔
+      https://github.com/lucc/nvimpager
+    [X] ✓ I60R/page: Use neovim as pager ⌇⡢⢿⠼⡎
+      https://github.com/I60R/page
+    [_] TRY:VIZ: other available pagers
+      $ pikaur --sync --noedit --nodiff --search pager
+      [_] FIND: !pikaur FMT show date of last update
+    [_] SEE
+      Use Neovim as Your Man Pager ⌇⡢⢿⠽⠿
+        https://www.chrisdeluca.me/article/use-neovim-as-your-man-pager/
+      Nifty Nvim/Vim Techniques That Make My Life Easier -- Series 8 - jdhao's digital space ⌇⡢⢿⠽⡇
+        https://jdhao.github.io/2020/11/11/nifty_nvim_techniques_s8/
+      Using Neovim as MANPAGER, is there a way to preserve/improve syntax highlighting? : neovim ⌇⡢⢿⠽⡪
+        https://www.reddit.com/r/neovim/comments/5kvy7d/using_neovim_as_manpager_is_there_a_way_to/
+        ¦ This is a known issue. There is no way to get around it for now. If you would like to know more,
+        see https://github.com/nhooyr/neovim/pull/1
+        edit: I've opened https://github.com/neovim/neovim/issues/5846 for this
+        edit: fixed at https://github.com/neovim/neovim/pull/5847 ;)

@@ -61,3 +61,11 @@ o.foldlevel = 99 -- close folds below this depth, initially
 -- set fillchars=fold:\    " don't place extra dashes on scr right after foldtext
 
 o.formatoptions:append({ o = true })
+
+
+-- Moving ============================
+o.scrolloff = 3     -- context lines visible at screen edge when scroll
+-- set sidescrolloff=4 " keep N columns on side visible when scrolling
+-- set scrolljump=0    " minimum number of lines to scroll, OR: =-50 (50%)
+-- set sidescroll=16   " horizontal scroll by 1 char (DFL:(0) -- half screen)
+-- set nostartofline   " keep column when  <C-[fbud]> or [ggGHML], :25
