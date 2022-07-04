@@ -12,13 +12,14 @@ xkb_types "airy" {
         map[None] = Level1;
         map[Shift] = Level2;
         map[Super] = Level3;
-        map[Shift+Super] = Level3;
+        map[Shift+Super] = Level4;
 
-        preserve[Shift+Super] = Shift;
+        // preserve[Shift+Super] = Shift;
 
         level_name[Level1] = "Base";
         level_name[Level2] = "Shift";
         level_name[Level3] = "Super";
+        level_name[Level4] = "Shift+Super";
     };
 
     type "AMER_SUPER_LVL3" {

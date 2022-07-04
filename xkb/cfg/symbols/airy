@@ -93,7 +93,9 @@ xkb_symbols "langleader_space" {
 
     // HACK: extend <M-L> by langswitch
     // BAD: latching modifier isn't resetting by ISO_Next_Group
-    replace key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Last_Group ] };
+    // BAD: Shift+Super does not work
+    //   << NEED: ergnomics of <Super+Menu> is BAD to switch to ENG in mixed RU + #tags
+    replace key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Last_Group, ISO_First_Group ] };
 
     replace key <LVL3> {
         type[Group1]= "ONE_LEVEL",
