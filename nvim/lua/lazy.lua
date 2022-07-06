@@ -4,6 +4,51 @@ local lazy_plugins_loaded = false
 
 local seen_filetypes = {}
 
+local function ft_python()
+  -- FIXME: load both for .py and .lua
+  require 'plug.treesitter'
+  require 'lsp.init'
+
+  --FAIL: should load mappings only inside buffer
+  if vim.bo.filetype == 'python' then
+    vim.cmd [[
+      augroup MyAutoCmd | autocmd! | augroup END
+      runtime seize/jupyter-vim.vim
+      packadd jupyter-vim
+      let b:jupyter_kernel_type = &filetype
+      call jupyter#load#MakeStandardCommands()
+      call BufMap_jupyter_vim()
+    ]]
+  end
+end
+
+local function ft_lua()
+  require 'plug.treesitter'
+  require 'lsp.init'
+
+  local t = seen_filetypes['lua']
+  local p = vim.fn.fnamemodify(t.file, ":p")
+  -- NOTE: load plugin immediately only for my colorscheme
+  if p:match('/colors/airy.lua$') then
+    vim.cmd [[ packadd nvim-colorizer.lua ]]
+    require 'colorizer'.setup {
+      'lua',
+      'css',
+      'javascript',
+      html = { mode = 'foreground' }
+    }
+    require 'colorizer'.attach_to_buffer(t.buf)
+  end
+end
+
+local function ft_lisp()
+  require 'plug.treesitter'
+
+  -- ERR:XLR: why I can't lazy-load it
+  -- vim.g['conjure#mapping#prefix'] = " "
+  -- vim.g['g:conjure#mapping#eval_current_form'] = {" s"}
+  -- require("conjure.main").main()
+end
 
 --BAD: called each time you open buffers of the same type
 --  WKRND: should wrap everything behind "require" singletons
@@ -12,39 +57,11 @@ local function load_ondemand()
   -- DEBUG: print(vim.inspect(g.lazy_filetypes))
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
   if seen_filetypes['python'] then
-    -- FIXME: load both for .py and .lua
-    require 'plug.treesitter'
-    require 'lsp.init'
-
-    --FAIL: should load mappings only inside buffer
-    if vim.bo.filetype == 'python' then
-      vim.cmd [[
-        augroup MyAutoCmd | autocmd! | augroup END
-        runtime seize/jupyter-vim.vim
-        packadd jupyter-vim
-        let b:jupyter_kernel_type = &filetype
-        call jupyter#load#MakeStandardCommands()
-        call BufMap_jupyter_vim()
-      ]]
-    end
-
+    ft_python()
+  elseif seen_filetypes['lisp'] then
+    ft_lisp()
   elseif seen_filetypes['lua'] then
-    require 'plug.treesitter'
-    require 'lsp.init'
-
-    local t = seen_filetypes['lua']
-    local p = vim.fn.fnamemodify(t.file, ":p")
-    -- NOTE: load plugin immediately only for my colorscheme
-    if p:match('/colors/airy.lua$') then
-      vim.cmd [[ packadd nvim-colorizer.lua ]]
-      require 'colorizer'.setup {
-        'lua',
-        'css',
-        'javascript',
-        html = { mode = 'foreground' }
-      }
-      require 'colorizer'.attach_to_buffer(t.buf)
-    end
+    ft_lua()
   end
 end
 

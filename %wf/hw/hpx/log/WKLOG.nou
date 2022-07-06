@@ -32,3 +32,77 @@
         https://wiki.archlinux.org/title/makepkg
       [SOLVED] How to limit cpu usage by makepkg? / Applications & Desktop Environments / Arch Linux Forums ⌇⡢⣁⢫⠏
         https://bbs.archlinux.org/viewtopic.php?id=192233
+
+
+2022-07-06-Wed-W27
+  [_] REMOVE pulseaudio digital profiles
+    FAQ · Wiki · PipeWire / pipewire · GitLab ⌇⡢⣅⢇⢍
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/FAQ#is-pipewire-ready-yet
+      ¦ With the right model:vendor id (see with lsusb) it is possible to make
+      ¦ a custom profile and remove the non-functional IEC958 profile.
+  [%] ◔ 1h35m #hpx CFG:REM: !pulse -> !pipewire
+    [X] CFG
+    [≫] DEBUG: latency $ pw-top
+    PipeWire - ArchWiki ⌇⡢⣅⢄⣳
+      https://wiki.archlinux.org/title/PipeWire
+    FAQ · Wiki · PipeWire / pipewire · GitLab ⌇⡢⣅⢄⣢
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/FAQ#is-pipewire-ready-yet
+      [_] TRY: tinyalsa as DEP inof full alsa
+    [%] TRY: replace pulseaudio+jack2 by pipewire <⡊⣙>
+      PipeWire is a fantastic JACK replacement : linuxaudio ⌇⡢⢮⠊⢝
+        https://www.reddit.com/r/linuxaudio/comments/pel0nr/pipewire_is_a_fantastic_jack_replacement/
+      JACK Audio Connection Kit - ArchWiki ⌇⡢⢮⠋⣟
+        https://wiki.archlinux.org/title/JACK_Audio_Connection_Kit#Comparison_of_JACK_implementations
+  [%] 1h25m udev too many
+    $ sudo strace -fttT -s64 -p 757
+    $ journalctl -b | grep ioctl
+    udev - What nasty systemd-udevd overloading my CPU? - Ask Ubuntu ⌇⡢⣅⢟⢓
+      https://askubuntu.com/questions/1017571/what-nasty-systemd-udevd-overloading-my-cpu
+      $ udevadm monitor
+      $ udevadm monitor --environment --udev
+        WTF: /sys/devices/virtual/thermal/thermal_zone3
+          << value TEMP=42050 is stuck
+        BUT: error is in zone5
+          Jul 06 17:33:31 hpx kernel: thermal thermal_zone5: failed to read out thermal zone (-61)
+        WTF: msg
+          Jul 06 17:33:31 hpx kernel: intel_tcc_cooling: Programmable TCC Offset detected
+      $ cat /sys/bus/usb/devices/2-1/2-1.6/2-1.6.2/id*
+      $ lsusb -d 413c:8162
+    186200 - Multiple instances of udev daemon when system boots - arm st1q - chromium ⌇⡢⣅⢟⣓
+      https://bugs.chromium.org/p/chromium/issues/detail?id=186200
+      WKRND: restart
+      $ sudo systemctl stop systemd-udevd systemd-udevd-control.socket systemd-udevd-kernel.socket
+      $ sudo initctl stop udev
+      $ sudo initctl start udev
+    udev - What nasty systemd-udevd overloading my CPU? - Ask Ubuntu ⌇⡢⣅⢟⡩
+      https://askubuntu.com/questions/1017571/what-nasty-systemd-udevd-overloading-my-cpu
+    FS#16001 : [udev] udevd uses excessive cpu and spawns too many process on boot-up ⌇⡢⣅⢭⡪
+      https://bugs.archlinux.org/task/16001
+    DEBUG
+      udev debugging during system boot | Support | SUSE ⌇⡢⣅⢭⠩
+        https://www.suse.com/support/kb/doc/?id=000016651
+        /etc/udev/udev.conf
+        - udev_log="err"
+        + udev_log="debug"
+        reboot
+        /var/log/messages
+      ALT:(kernel cmdline): udev.log-priority=debug
+        [_] SEE: analyze udev boot logs from 2022-07-06 18:55
+      ALT: /etc/mkinitcpio.conf FILES="... /etc/udev/udev.conf"
+  [+] powersave energy
+    Fan is not running and my laptop is melting - Technical Issues and Assistance / Hardware - Manjaro Linux Forum ⌇⡢⣅⢧⡐
+      https://archived.forum.manjaro.org/t/fan-is-not-running-and-my-laptop-is-melting/45796/18
+      $ tlpui
+      $ tlp-stat
+      hirschmann/nbfc: NoteBook FanControl ⌇⡢⣅⢨⢎
+        https://github.com/hirschmann/nbfc
+        $ nbfc-linux-git
+  [+] speakers
+    212465 – Internal Speakers Bang & Olufsen on HP Spectre X360 Convertible model 13-aw2025na don't work at all - no matching ASoC machine driver found ⌇⡢⣅⢫⡄
+      https://bugzilla.kernel.org/show_bug.cgi?id=212465
+      $ alsaucm -c sof-soundwire set _verb HiFi set _enadev Speaker
+      $ speaker-test -Dhw:0,2 -c2 -r48000
+      $ alsaucm -c sof-soundwire set _verb HiFi set _enadev Headphone
+      $ speaker-test -Dhw:0,0 -c2 -r48000
+    No sound on HP Spectre x360 laptop - Linux Mint Forums ⌇⡢⣅⢫⣥
+      https://forums.linuxmint.com/viewtopic.php?t=367828

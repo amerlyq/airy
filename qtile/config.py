@@ -84,6 +84,11 @@ keys = [
     K("M-C-q", lazy.shutdown(), desc="Shutdown Qtile"),
     K("M-e", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
     K("M-<minus>", lazy.spawn("xset dpms force off".split()), desc="Screen off"),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
+    Key([], "XF86AudioMute", lazy.spawn("amixer -c 0 -q set Master toggle")),
+    K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
+    K("M-<Page_Down>", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
 ]
 
 groups = [Group(i) for i in "123456789"]
@@ -166,6 +171,7 @@ screens = [
                     format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
                     foreground="#00971f",
                 ),
+                widget.PulseVolume(),
                 widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
                 widget.Clock(
                     format="%Y-%m-%d-%a-W%V", update_interval=60, foreground="#fd971f"

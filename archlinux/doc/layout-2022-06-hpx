@@ -154,6 +154,8 @@ swapon /dev/ws/swap
 mount -o noatime,compress=zstd,autodefrag,ssd,discard=async,subvol=/@ /dev/ws/root /mnt
 mount -o noatime,nofail,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ws/data /mnt/data
 mount -o noatime,nofail,noauto,x-systemd.automount /dev/ws/cache /mnt/cache
+# FIXME: ensure fstab will contain automount
+#   FIXED:ERR: FAT-fs (nvme0n1p1): Volume was not properly unmounted. Some data may be corrupt.
 mount -o noauto,x-systemd.automount,fmask=0133 /dev/nvme0n1p1 /mnt/boot
 
 # FAIL:(snapper): can't mount snapshots somewhere rarely accessible (e.g. /root/*) to prevent automount
