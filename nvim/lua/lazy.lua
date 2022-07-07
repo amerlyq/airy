@@ -44,10 +44,24 @@ end
 local function ft_lisp()
   require 'plug.treesitter'
 
-  -- ERR:XLR: why I can't lazy-load it
-  -- vim.g['conjure#mapping#prefix'] = " "
-  -- vim.g['g:conjure#mapping#eval_current_form'] = {" s"}
-  -- require("conjure.main").main()
+  if vim.bo.filetype == 'lisp' then
+
+    -- TODO:(apply):VIZ: clojure fennel janet hy julia racket scheme lua lisp
+    vim.cmd [[
+      packadd conjure
+      let g:conjure#mapping#def_word = ['gd']
+      let g:conjure#mapping#doc_word = ['gD']
+      let g:conjure#mapping#eval_root_form = "s"
+      let g:conjure#mapping#eval_buf = "i"
+      let g:conjure#highlight#enabled = v:true
+      let g:conjure#highlight#timeout = 300
+    ]]
+    -- PERF: +8ms of startup time
+    require("conjure.main").main()
+    -- HACK: trigger FileType manually -- otherwise plugin doesn't work
+    --   /cache/plugins/nvim/all/conjure/fnl/conjure/mapping.fnl:103
+    require('conjure.mapping')['on-filetype']()
+  end
 end
 
 --BAD: called each time you open buffers of the same type

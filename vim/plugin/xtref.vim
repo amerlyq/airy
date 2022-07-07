@@ -451,7 +451,7 @@ xnoremap <Plug>(xtref-delete) :<C-u>call xtref#replace(1,'')<CR>
 "   ENH: preview iso date in statusline or in NEW floating window
 
 ""
-py3 import vim
+" py3 import vim
 
 " FUTURE:ENH: "append" to already existing postopone chain <A|B|C|...>
 fun! xtref#py_postpone(...)

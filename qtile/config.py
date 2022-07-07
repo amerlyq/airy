@@ -64,8 +64,9 @@ keys = [
         [mod],
         "o",
         [
-            Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
             Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
+            Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
+            Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
         ],
     ),  # , mode="Launch"
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
@@ -87,8 +88,10 @@ keys = [
     Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
     Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
     Key([], "XF86AudioMute", lazy.spawn("amixer -c 0 -q set Master toggle")),
-    K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
-    K("M-<Page_Down>", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
+    K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Master 1dB+"), desc="Volume up"),
+    K("M-<Page_Down>", lazy.spawn("amixer -c 0 -q set Master 1dB-"), desc="Volume down"),
+    K("M-x", lazy.spawn(["env", "--chdir=/d/research/clipboard/infinitecopy", "--",
+                            "poetry", "run", "infinitecopy"]), desc="Volume down"),
 ]
 
 groups = [Group(i) for i in "123456789"]
