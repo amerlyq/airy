@@ -106,3 +106,28 @@
       $ speaker-test -Dhw:0,0 -c2 -r48000
     No sound on HP Spectre x360 laptop - Linux Mint Forums ⌇⡢⣅⢫⣥
       https://forums.linuxmint.com/viewtopic.php?t=367828
+
+
+2022-07-08-Fri-W27
+  [⡢⣈⠙⠹] ‼ 15m <W> WTF watchdog haven't rebooted PC ⌇⡢⣈⠨⣹
+    ¦ watchdog: BUG: soft lockup -- CPU#1 stuck for 44591s!
+    Anyone using watchdog daemons on a desktop/laptop? [SOLVED] / Kernel & Hardware / Arch Linux Forums ⌇⡢⣈⠅⣮
+      https://bbs.archlinux.org/viewtopic.php?id=163768
+      /etc/systemd/system.conf :: RuntimeWatchdogSec=60
+      ¦ Jul 08 14:30:15 systemd[1]: Set hardware watchdog to 1min.
+      [X] FAIL: -> BET: $ reboot
+        $ sudo systemctl daemon-reexec
+          reboot or "systemctl daemon-reload" for changes to /etc/systemd/system.conf? - Server Fault ⌇⡢⣈⠑⠷
+            https://serverfault.com/questions/805745/reboot-or-systemctl-daemon-reload-for-changes-to-etc-systemd-system-conf
+        $ sudo systemctl system.slice restart
+    INFO systemd for Administrators, Part XV ⌇⡢⣈⠅⣳
+      http://0pointer.de/blog/projects/watchdog.html
+    https://www.kernel.org/doc/Documentation/lockup-watchdogs.txt ⌇⡢⣈⠆⢐
+  [⡢⣈⠧⣈] ⁇ 10m <W> WTF:SECU: smb tried to SSH into work PC ⌇⡢⣈⠫⠬
+    stats: -- those IPs never in 'Accepted public', only in 'invalid format'
+    linux - Cannot ssh my ubuntu server. "kex_exchange_identification: banner line contains invalid characters" - Stack Overflow ⌇⡢⣈⠨⡽
+      https://stackoverflow.com/questions/66685456/cannot-ssh-my-ubuntu-server-kex-exchange-identification-banner-line-contains
+      ~~ probably due to our admins HTTPS trying to access SSHD 445
+    Weird kex_exchange_identification log messages [SOLVED] - users - Fedora Mailing-Lists ⌇⡢⣈⠪⣾
+      https://lists.fedoraproject.org/archives/list/users@lists.fedoraproject.org/thread/QL6G3EBSO6NIZCB7SML2HUN757BRZXRX/
+      ::: The error has been happening forever, but the latest sshd now logs it (it previously just ignored it).
