@@ -1646,6 +1646,26 @@ c.input.partial_timeout = 0  # @me
 ## list) will work.
 ## Type: List of String
 # c.qt.args = []
+#
+# SRC: https://github.com/qutebrowser/qutebrowser/issues/5375
+# WAIT: https://github.com/qutebrowser/qutebrowser/issues/5378
+# DEBUG: chrome://gpu/
+c.qt.args += [
+    "use-gl=desktop",
+    # "enable-gpu-rasterization",  # BET?
+    "ignore-gpu-blacklist",
+    "ignore-gpu-blocklist",
+    "enable-accelerated-video-decode",
+    # "enable-vulkan",
+    # --use-gl=desktop
+    # --disable-gpu-driver-bug-workarounds
+
+    # "enable-accelerated-2d-canvas",
+    # "enable-gpu-memory-buffer-video-frames",
+    # "enable-native-gpu-memory-buffers",
+    # "enable-oop-rasterization",
+    # "enable-zero-copy",
+]
 
 ## Additional environment variables to set. Setting an environment
 ## variable to null/None will unset it.
@@ -2240,6 +2260,7 @@ config.bind(",a", 'hint links spawn -- r.wgett -o /_dld/amv -c mpv "{hint-url}"'
 config.bind(",b", "set content.blocking.enabled true ;; reload")
 config.bind(",c", "config-cycle -p content.ssl_strict")
 config.bind(",B", "set content.blocking.enabled false ;; reload")
+config.bind(",F", "spawn --userscript dump_feed.py")
 config.bind(",m", 'hint links spawn -- mpv "{hint-url}"')
 config.bind(",M", 'spawn -- mpv "{url}"')
 config.bind(",n", 'hint links spawn -- r.wget-mp3 -poj "{hint-url}"')
@@ -2305,7 +2326,8 @@ config.bind(";I", "hint images tab-bg")
 # config.bind(';f', 'hint all tab-fg')
 # config.bind(';h', 'hint all hover')
 # config.bind(';i', 'hint images')
-config.bind(";m", "spawn --userscript dump_feed.py")
+config.bind(";m", 'hint links spawn -- mpv "{hint-url}" --ytdl-format="mp4[height<=720]/best[height<=?720]"')
+config.bind(";M", 'spawn -- mpv "{url}" --ytdl-format="mp4[height<=720]/best[height<=?720]"')
 # config.bind(';o', 'hint links fill :open {hint-url}')
 # config.bind(';r', 'hint --rapid links tab-bg')
 # config.bind(';t', 'hint inputs')

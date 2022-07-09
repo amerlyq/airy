@@ -25,7 +25,7 @@ fun! dictl#get(word)
   setlocal buftype=nofile ff=dos
   setlocal nobuflisted
 
-  silent! exe "noautocmd r!dict " .shellescape(word). ' | r.dict --filter'
+  silent! exe "noautocmd r!dict " .shellescape(word). ' | iconv -t utf-8 | pandoc -f html -t markdown | sed -r "s/(> )+/  /g;/^\s*\$/d"'
 
   " OR:(online)
   " silent! exe "noautocmd r!" g:dict_curl_command "-s" g:dict_curl_options "dict://" . host[0] . "/d:" . quoted_word . ":" . db

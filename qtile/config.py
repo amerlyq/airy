@@ -246,7 +246,7 @@ wmname = "LG3D"
 #   https://github.com/qtile/qtile/issues/2651
 @hook.subscribe.client_new
 def disable_floating(window):
-    rules = [Match(wm_class="mpv")]
+    rules = [Match(wm_class="mpv"), Match(wm_instance_class="mpv")]
 
     if any(window.match(rule) for rule in rules):
         window.togroup(qtile.current_group.name)

@@ -131,3 +131,29 @@
     Weird kex_exchange_identification log messages [SOLVED] - users - Fedora Mailing-Lists ⌇⡢⣈⠪⣾
       https://lists.fedoraproject.org/archives/list/users@lists.fedoraproject.org/thread/QL6G3EBSO6NIZCB7SML2HUN757BRZXRX/
       ::: The error has been happening forever, but the latest sshd now logs it (it previously just ignored it).
+  [⡢⣈⡬⣹] 1h #hpx CFG enable back GuC/HuC ⌇⡢⣉⡏⢰
+    [⡢⣈⠶⠥] ✓ CHECK: !mpv hwdec w/o enabled GuC/HuC
+      ::: yes, it works
+    [⡢⣈⡬⣼] ✗ 55m CHECK: !qute CPU load during HW audio/video decoding (e.g. youtube)
+      [⡢⣈⡦⡞] 35m ALT:FIND: hwdecode options for !qute
+        Youtube playback in h264 only with hardware acceleration · Issue #4001 · qutebrowser/qutebrowser ⌇⡢⣈⡞⡫
+          https://github.com/qutebrowser/qutebrowser/issues/4001
+          [X] DEBUG: chrome://gpu/
+            ::: BET: use !mpv to play youtube :: <;M>
+        Investigate Chromium GPU flags · Issue #5378 · qutebrowser/qutebrowser ⌇⡢⣈⡟⣸
+          https://github.com/qutebrowser/qutebrowser/issues/5378
+          Reduce CPU usage · Issue #5375 · qutebrowser/qutebrowser ⌇⡢⣈⡢⠇
+            https://github.com/qutebrowser/qutebrowser/issues/5375
+        How To Enable Hardware Accelerated Video Decode In Google Chrome, Brave, Vivaldi And Opera Browsers On Debian, Ubuntu Or Linux Mint - Linux Uprising Blog ⌇⡢⣈⡣⣗
+          https://www.linuxuprising.com/2021/01/how-to-enable-hardware-accelerated.html
+          [✗⡊⣭] CFG chrome://flags/#enable-accelerated-video-decode
+        Chrome 99 on Linux does hardware decoding with Vulkan : Stadia ⌇⡢⣈⡤⡃
+          https://www.reddit.com/r/Stadia/comments/scwj28/chrome_99_on_linux_does_hardware_decoding_with/
+          [⡢⣈⡭⠑] CHECK: $ intel_gpu_top
+            ::: NICE: mpv --vo=vaapi shows much more video load than 3D
+        FS#71888 : [mesa] 21.2.1-1 - Vulkan stops working in Chromium-based browsers ⌇⡢⣈⡤⡟
+          https://bugs.archlinux.org/task/71888
+          Consequences of not enabling Vulkan on chromium / Newbie Corner / Arch Linux Forums ⌇⡢⣈⡥⡎
+            https://bbs.archlinux.org/viewtopic.php?id=256698
+            Chromium 81 Is Released With Many Security Fixes And Mostly Working Vulkan Rendering Support - LinuxReviews ⌇⡢⣈⡥⡄
+              https://linuxreviews.org/Chromium_81_Is_Released_With_Many_Security_Fixes_And_Mostly_Working_Vulkan_Rendering_Support#:~:text=Vulkan support is disabled by,of Chromium 81) to Enabled
