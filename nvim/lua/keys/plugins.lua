@@ -76,6 +76,3 @@ vim.cmd [[
   call altr#define('%/source/%.cpp', '%/include/%.hpp', '%/include/%.h')
   call altr#define('%/src/%.cpp', '%/inc/%.h', '%/t/%_test.cpp')
 ]]
-
--- TEMP:
-g.vlime_force_default_keys = true

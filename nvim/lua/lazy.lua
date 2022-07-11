@@ -46,6 +46,28 @@ local function ft_lisp()
 
   if vim.bo.filetype == 'lisp' then
 
+    local bufnr = seen_filetypes['lisp'].buf
+    local KB = vim.api.nvim_buf_set_keymap
+
+    KB(bufnr, 'n', '<Space>z', '<Cmd>call vlime#plugin#ConnectREPL("127.0.0.1",7002)<CR>',
+      { noremap = true, desc = 'Connect to a VLIME server'})
+    KB(bufnr, 'n', '<CR>', '<Cmd>call vlime#plugin#SendToREPL(vlime#ui#CurTopExpr())<CR>'
+      .. '<Cmd>call vlime#plugin#SendToREPL("(if (fboundp \'_live) (_live))")<CR>'
+      , { noremap = true, desc = 'Eval top-expr for vlime + croaton' })
+    KB(bufnr, 'x', '<CR>', '<Cmd>call vlime#plugin#SendToREPL(vlime#ui#CurSelection())<CR>',
+      { noremap = true, desc = 'Eval for vlime selection' })
+
+    vim.g.vlime_force_default_keys = true
+    -- DEBUG: :echo g:vlime_default_window_settings["repl"]
+    -- WTF: somehow it totally hides the REPL split window; BUT: that's actually OK
+    vim.g.vlime_window_settings = {
+      repl = {
+        pos = "botright",
+        size = 40,
+        vertical = true
+      }
+    }
+
     -- TODO:(apply):VIZ: clojure fennel janet hy julia racket scheme lua lisp
     -- vim.cmd [[
     --   packadd conjure
