@@ -51,9 +51,14 @@ local function ft_lisp()
 
     KB(bufnr, 'n', '<Space>z', '<Cmd>call vlime#plugin#ConnectREPL("127.0.0.1",7002)<CR>',
       { noremap = true, desc = 'Connect to a VLIME server'})
+
+    KB(bufnr, 'n', '<Space>f', '<Cmd>call vlime#plugin#SendToREPL("(_live)")<CR>',
+      { noremap = true, desc = 'Run _live()'})
+
     KB(bufnr, 'n', '<CR>', '<Cmd>call vlime#plugin#SendToREPL(vlime#ui#CurTopExpr())<CR>'
       .. '<Cmd>call vlime#plugin#SendToREPL("(if (fboundp \'_live) (_live))")<CR>'
       , { noremap = true, desc = 'Eval top-expr for vlime + croaton' })
+
     KB(bufnr, 'x', '<CR>', '<Cmd>call vlime#plugin#SendToREPL(vlime#ui#CurSelection())<CR>',
       { noremap = true, desc = 'Eval for vlime selection' })
 
