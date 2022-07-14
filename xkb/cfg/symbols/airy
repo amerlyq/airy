@@ -95,7 +95,8 @@ xkb_symbols "langleader_space" {
     // BAD: latching modifier isn't resetting by ISO_Next_Group
     // BAD: Shift+Super does not work
     //   << NEED: ergnomics of <Super+Menu> is BAD to switch to ENG in mixed RU + #tags
-    replace key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Last_Group, ISO_First_Group ] };
+    // replace key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Last_Group, ISO_First_Group ] };
+    replace key <LatL> { type= "AMER_SHIFT_SUPER", [ NoSymbol, NoSymbol, ISO_Last_Group, ISO_Last_Group ] };
 
     replace key <LVL3> {
         type[Group1]= "ONE_LEVEL",
@@ -146,9 +147,9 @@ xkb_symbols "overlay_ralt" {
 // The Menu key (while pressed) chooses the third shift level.
 partial modifier_keys
 xkb_symbols "lvl3_latch_menu" {
-    virtual_modifiers LevelThree, Super;
+    // virtual_modifiers LevelThree, Super;
     key <MENU> {
-        virtualMods= LevelThree,
+        // virtualMods= LevelThree,
         type[Group1]= "PC_SUPER_LEVEL2",
         symbols[Group1]= [ ISO_Level3_Latch, ISO_First_Group ],
 
@@ -162,11 +163,12 @@ xkb_symbols "lvl3_latch_menu" {
 
 
 xkb_symbols "lvl3_latch_ralt" {
-    virtual_modifiers LevelThree, Super;
     replace key <RALT> {
-        virtualMods= LevelThree,
         type[Group1]= "PC_SUPER_LEVEL2",
         symbols[Group1]= [ ISO_Level3_Latch, ISO_First_Group ],
+        // FAIL:
+        // type= "AMER_SHIFT_SUPER",
+        // [ ISO_Level3_Latch, ISO_Level3_Latch, ISO_Last_Group, ISO_First_Group ],
         overlay1=<KATA>   // -> RU
     };
 };
@@ -247,7 +249,8 @@ xkb_symbols "zip" {
     key <LatK> { [ Cyrillic_el,   Cyrillic_EL ] };
     // key <LatL> { [ Cyrillic_de,   Cyrillic_DE ] };
     // FIXED?
-    key <LatL> { type= "AMER_SHIFT_SUPER", [ Cyrillic_de, Cyrillic_DE, ISO_Last_Group, ISO_First_Group ] };
+    // key <LatL> { type= "AMER_SHIFT_SUPER", [ Cyrillic_de, Cyrillic_DE, ISO_Last_Group, ISO_First_Group ] };
+    key <LatL> { type= "AMER_SHIFT_SUPER", [ Cyrillic_de, Cyrillic_DE, ISO_First_Group, ISO_Last_Group ] };
 
     key <LatZ> { [ Cyrillic_ya,   Cyrillic_YA, Cyrillic_hardsign, Cyrillic_HARDSIGN  ] };  // ъ Ъ
     key <LatX> { [ Cyrillic_che,  Cyrillic_CHE,   Ukrainian_ie, Ukrainian_IE ] };
