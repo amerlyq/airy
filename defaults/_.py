@@ -3,21 +3,29 @@ from just.airy.api import ln
 ln("cfg/pam_environment", file="~/.pam_environment")
 
 
-ln("/@/airy/qute/ctl/proxy", file="bw", under="/usr/local/bin")
-ln("qutebrowser", at="/usr/bin", file="b", under="/usr/local/bin")
-ln("nvim", at="/usr/bin", file="v", under="/usr/local/bin")
-ln("nvim", at="/usr/bin", file="vim", under="/usr/local/bin")
+def ab(src, file=None, **kw) -> None:
+    return ln(src, file=file, **kw, under="/usr/local/bin")
 
 
-ln("ranger", at="/usr/bin", file=",s", under="/usr/local/bin")
-ln("/@/just/ctl", file="j", under="/usr/local/bin")
-ln("/@/just/ctl", file="just", under="/usr/local/bin")
+ab("/@/airy/qute/ctl/proxy", "bw")
+ab("qutebrowser", "b", at="/usr/bin")
+ab("nvim", "v", at="/usr/bin")
+ab("nvim", "vim", at="/usr/bin")
+ab("/@/airy/vim/ctl/qf", "vq")
 
-ln("/@/airy/hw/scr/rot", under="/usr/local/bin")
-ln("/@/airy/init/bin/xcv", under="/usr/local/bin")
 
-ln("xc", at="/@/airy/xsel/bin", under="/usr/local/bin")
-ln("xci", at="/@/airy/xsel/bin", under="/usr/local/bin")
-ln("xcio", at="/@/airy/xsel/bin", under="/usr/local/bin")
-ln("xco", at="/@/airy/xsel/bin", under="/usr/local/bin")
-ln("xcx", at="/@/airy/xsel/bin", under="/usr/local/bin")
+ab("/@/airy/grep/ctl/repo", "re")
+ab("/@/airy/grep/ctl/ia", "rs")
+
+ab("ranger", ",s", at="/usr/bin")
+ab("/@/just/ctl", "j")
+ab("/@/just/ctl", "just")
+
+ab("/@/airy/hw/scr/rot")
+ab("/@/airy/init/bin/xcv")
+
+ab("xc", at="/@/airy/xsel/bin")
+ab("xci", at="/@/airy/xsel/bin")
+ab("xcio", at="/@/airy/xsel/bin")
+ab("xco", at="/@/airy/xsel/bin")
+ab("xcx", at="/@/airy/xsel/bin")

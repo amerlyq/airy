@@ -1,6 +1,9 @@
 #!/bin/sh -eu
 fmt=${1:-%f:%l:%c:%m}
-excmd="setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|bwipe|if len(getqflist())>1|copen|en"
+# |bwipe
+# excmd="setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|if len(getqflist())>1|copen|en"
+## HACK: wait until lazy plugins loaded before reading QF
+excmd="autocmd User LazyPluginsLoaded  setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|copen"
 
 if [ -n "${NVIM_LISTEN_ADDRESS-}" ]; then
   # exec xargs -rn1 -d\\n realpath | ifne nvr - -c "$excmd"

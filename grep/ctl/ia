@@ -1,0 +1,10 @@
+#!/bin/sh -eu
+# FAIL: can't pipe directly to nvim due to stdin blocking
+#   ::: FIXED:USE: !ifne OR !sponge to drain stdin before passing to !nvim
+exec sk --ansi --interactive --multi \
+  --bind='ctrl-s:toggle-sort' \
+  --tiebreak=-index,begin,end,score \
+  --cmd-history=/@/xdg_share/skim_history \
+  \
+  --cmd 're --color=always '"$*"' "{}"' \
+  | ifne vq

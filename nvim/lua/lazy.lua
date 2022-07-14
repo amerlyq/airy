@@ -164,6 +164,7 @@ local function on_delayed_startup()
 
   -- FUTURE:MAYBE: emit a user 'event' to chain my other pieces
   -- doautocmd User PluginsLoaded
+  vim.api.nvim_command('doautocmd <nomodeline> User LazyPluginsLoaded')
   --DISABLED: very distracting periphery text change
   -- vim.notify("Lazy: DONE")
   -- vim.notify(("%s %s"):format(count, name), res == "err" and vim.log.levels.ERROR)

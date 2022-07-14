@@ -1,4 +1,5 @@
 #!/bin/sh -eu
 # exec ag --color --follow --hidden --ignore .git --column "$@"
 # NEED: --literal => --fixed-strings
-exec rg --color auto --sortr path --no-follow --hidden --glob '!.git' --line-number --column "$@"  # -g '*.nou'
+# USAGE: prefix "(?-i)" to undo OPT=--ignore-case
+exec rg --ignore-case --color auto --sortr path --no-follow --hidden --glob '!.git' --line-number --column "$@"  # -g '*.nou'
