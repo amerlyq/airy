@@ -84,7 +84,7 @@ abbr -a pacz 'pacman -Qdt'
 
 
 ## just.lib
-abbr -a j.s 'just moni scr | v -'
+abbr -a j.s 'just moni scr | ifne v - -c "setf nou"'
 abbr -a ji 'just airy install'
 abbr -a wks 'just tenjo wk'
 abbr -a j.j 'just tenjo cat --timefmt=h --begdate=d --enddate=0 --outputfmt=j -t'
