@@ -90,8 +90,12 @@ keys = [
     Key([], "XF86AudioMute", lazy.spawn("amixer -c 0 -q set Master toggle")),
     K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Master 1dB+"), desc="Volume up"),
     K("M-<Page_Down>", lazy.spawn("amixer -c 0 -q set Master 1dB-"), desc="Volume down"),
-    K("M-x", lazy.spawn(["env", "--chdir=/d/research/clipboard/infinitecopy", "--",
-                            "poetry", "run", "infinitecopy"]), desc="Volume down"),
+    # K("M-x", lazy.spawn(["env", "--chdir=/d/research/clipboard/infinitecopy", "--",
+    #                         "poetry", "run", "infinitecopy"]), desc="Clipboard"),
+    K("M-x", lazy.spawn(["copyq", "toggle"]), desc="Clipboard toggle"),
+    K("M-C-x", lazy.spawn(["copyq", "edit -1"]), desc="Clipboard edit"),
+    K("M-c", lazy.spawn(["copyq", "previous"]), desc="Clipboard prev"),
+    K("M-v", lazy.spawn(["copyq", "next"]), desc="Clipboard next"),
 ]
 
 groups = [Group(i) for i in "123456789"]
@@ -218,6 +222,7 @@ floating_layout = layout.Floating(
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class="pinentry-qt"),  # GPG key password entry
+        Match(wm_class="copyq"),  # doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
     ]
 )
 auto_fullscreen = True
