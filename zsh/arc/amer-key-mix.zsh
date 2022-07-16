@@ -94,10 +94,10 @@ bindkey -a '^S' history-incremental-search-forward
 # Prev-hist-cmd, depending on text from beginning till cursor #'\e[A','\e[B'
 bindkey    '^P' up-line-or-history                 #up-line-or-search
 bindkey    '^N' down-line-or-history               #down-line-or-search
-# bindkey -a '^P' history-substring-search-up        #up-history
-# bindkey -a '^N' history-substring-search-down      #down-history
-bindkey -a '^P' history-beginning-search-backward
-bindkey -a '^N' history-beginning-search-forward
+bindkey -a '^P' history-substring-search-up        #up-history
+bindkey -a '^N' history-substring-search-down      #down-history
+# bindkey -a '^P' history-beginning-search-backward
+# bindkey -a '^N' history-beginning-search-forward
 
 
 ## Command-line copy-paste-edit
@@ -143,12 +143,14 @@ bindkey '\C-x\C-l' synchro-dir-pop
 bindkey  -s ',j' '^U builtin r\n'
 bindkey -as ',j' 'S builtin r\n'
 # quit
-bindkey  -s ',d' '^U q\n'
-bindkey -as  'q' 'S q\n'
-bindkey -as ',d' 'S q\n'
+bindkey  -s ',d' '^U exit\n'
+bindkey -as  'q' 'S exit\n'
+bindkey -as ',d' 'S exit\n'
 # ranger
-bindkey  -s ',s' '^U r\n'
-bindkey -as  's' 'S r\n'
+bindkey  -s ',s' '^U fm\n'
+bindkey -as  's' 'S fm\n'
+bindkey  -s ',f' '^U fm\n'
+bindkey -as  'f' 'S fm\n'
 
 # store tmux pane id -- to send ",j" from !vim
 bindkey    '\C-x\C-j' store-tmux-pane

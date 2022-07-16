@@ -1,0 +1,129 @@
+
+[[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
+
+export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
+[[ -n $SSH_CONNECTION ]] && export PINENTRY_USER_DATA='USE_CURSES=1'
+# autoload -Uz add-zsh-hook
+# function _gpg-agent-update-tty {
+#   gpg-connect-agent UPDATESTARTUPTTY /bye >/dev/null
+# }
+# add-zsh-hook preexec _gpg-agent-update-tty
+
+
+## DFL:VIZ: interactive monitor shinstdin zle
+setopt pipefail
+
+## Directory
+setopt autocd
+setopt autopushd
+setopt cdablevars
+setopt extendedglob
+setopt noclobber
+setopt pushdignoredups
+setopt pushdsilent
+setopt pushdtohome
+for i ({1..9}) alias "$i"="cd +$i"; unset i
+
+
+############################################################
+### History
+# PERF=~20000cmds/year
+HISTFILE=~/.zsh_history
+HISTSIZE=1000000
+SAVEHIST=1000000
+setopt extendedhistory
+setopt histexpiredupsfirst
+setopt histfindnodups
+setopt histignorealldups
+setopt histignoredups
+setopt histignorespace
+setopt histsavenodups
+# setopt histverify
+setopt incappendhistorytime
+
+
+## NOTE: store audit events from zsh history by days ⌇⡟⢏⠰⣔
+# ALT:※⡟⢏⠰⣔※⡟⢏⠱⣻ source /d/monica/zsh/audit.zsh
+# FIXED: (set +o clobber; </d/audit/$HOST/zsh/20??/20??-* > $HISTFILE)
+zshaddhistory() { local f
+  [[ ${1:0:1} == " " ]] && return 2
+  print -sr -- ${1%%$'\n'}  # BAD: no dur and "-n" does not help to strip
+  print -v f -P -- '%D{%Y/%Y-%m-%d}'
+  f=/d/audit/$HOST/zsh/$f
+  [[ -d $f:h ]] || mkdir -p $f:h
+  fc -p $f  # BAD:(no ts/dur): print -rn -- $1 >> $f
+}
+
+
+############################################################
+### TEMP
+
+source /usr/share/doc/pkgfile/command-not-found.zsh
+
+source() {
+  [[ $1.zwc -nt $1 ]] || zcompile $1
+  builtin source $@
+}
+
+source /d/airy/zsh/arc/amer-widgets.zsh
+source /d/airy/zsh/arc/amer-key-mix.zsh
+source /d/airy/zsh/arc/alias/aliases
+# TEMP: import from !fish
+source ~/.zsh_aliases
+
+
+############################################################
+### Prompt
+
+# source /d/airy/zsh/arc/prompt.d/path
+
+_set_prompt() {
+  local color=1
+  if [[ $debian_chroot ]]; then color=4
+  elif [[ $SSH_CONNECTION ]]; then color=2
+    if [[ $TMUX ]]; then color=4
+    elif [[ $HOST =~ vbox ]]; then color=3
+    fi
+  elif [[ -z $TMUX ]]; then color=7
+  elif [[ $RANGER_LEVEL ]]; then color=34
+  fi
+
+  local nest=
+  [[ $debian_chroot ]] && nest+=C
+  [[ $RANGER_LEVEL ]] && nest+=R
+  [[ $VIM ]] && nest+=V
+  [[ $nest ]] && nest="%F{60}%B$nest%b%F{$color}"
+
+  # local parts
+  # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
+
+  PROMPT="%(?..%F{1}%?↵%f
+)%F{$color}┌${nest:-─}─%f %B%F{220}%~%f%b
+%F{$color}└%(!.#.╼)%f "
+}; _set_prompt
+
+
+############################################################
+### Plugins
+_plugins=/d/plugins/zsh
+
+# DEBUG: $ rm -f ~/.zcompdump; compinit
+fpath=($_plugins/zsh-completions/src $fpath)
+
+source $_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+bindkey -M viins "^F" vi-forward-word
+bindkey -M viins "^E" vi-add-eol
+
+source $_plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+source $_plugins/alias-tips/alias-tips.plugin.zsh
+
+source $_plugins/zsh-autopair/autopair.zsh
+autopair-init
+
+# ATT: should be at the end of ZSHRC
+source $_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+############################################################
+eval "$(mcfly init zsh)"
+# eval "$(thefuck --alias '!' --enable-experimental-instant-mode)"
