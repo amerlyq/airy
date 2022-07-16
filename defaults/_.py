@@ -23,6 +23,7 @@ ab("/@/just/ctl", "just")
 
 ab("/@/airy/hw/scr/rot")
 ab("/@/airy/init/bin/xcv")
+ab("/@/airy/open/bin/man")
 
 ab("xc", at="/@/airy/xsel/bin")
 ab("xci", at="/@/airy/xsel/bin")

@@ -462,6 +462,12 @@ class actualee(Command):
     """
 
     def execute(self):
+        cur = self.fm.thisfile
+        if cur.is_file:
+            if 'x' in cur.get_permission_string():
+                self.fm.execute_command(cur.path)
+                return
+
         cmd = ["actualee"]
 
         if self.arg(1) and self.arg(1)[0] == "-":

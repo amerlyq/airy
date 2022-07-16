@@ -25,6 +25,7 @@ abbr -a ga  'git add --all (test -e $PWD/.git || echo .)'
 abbr -a ga. 'git add --all .'
 abbr -a gau 'git add --update'
 abbr -a gc1 'git clone --depth=1 --single-branch'
+abbr -a gs1 'git submodule add --depth=1'
 abbr -a gc  '/@/airy/git/ctl/my-msg --index --modtime --commit (test -e .git || echo --prefix=(basename $PWD))'
 abbr -a gc. '/@/airy/git/ctl/my-msg --index --modtime --commit --prefix=(basename $PWD)'
 abbr -a gcn '/@/airy/git/ctl/my-msg --index --modtime --commit --prefix'
@@ -84,7 +85,7 @@ abbr -a pacz 'pacman -Qdt'
 
 
 ## just.lib
-abbr -a j.s 'just moni scr | ifne v - -c "setf nou"'
+abbr -a j.s 'just moni scr | ifne v - -c "setl ft=nou fdl=99 bt=nofile"'
 abbr -a ji 'just airy install'
 abbr -a wks 'just tenjo wk'
 abbr -a j.j 'just tenjo cat --timefmt=h --begdate=d --enddate=0 --outputfmt=j -t'
