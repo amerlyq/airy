@@ -1,4 +1,6 @@
 # SEE: /usr/lib/python3.10/site-packages/libqtile/backend/x11/xkeysyms.py
+import os
+import time
 from typing import cast
 
 from libqtile import bar, hook, layout, qtile, widget
@@ -6,6 +8,8 @@ from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
                              Screen)
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
+
+from psutil import Process
 
 # pylint:disable=invalid-name
 
@@ -256,6 +260,35 @@ def disable_floating(window):
     if any(window.match(rule) for rule in rules):
         window.togroup(qtile.current_group.name)
         window.cmd_disable_floating()
+
+prev = None
+@hook.subscribe.client_focus
+def audit_focus(w):
+    global prev
+    # w = qtile.current_screen.group.current_window
+    if not w or w.wid == prev:
+        return
+    prev = w.wid
+
+    dst = f"/d/audit/{os.uname().nodename}/wm/"
+    ts = time.time()
+    dst += time.strftime("%Y/%Y-%m-%d", time.localtime(ts))
+
+    inst, kls = w.get_wm_class()
+    nm = inst if inst == kls else inst + " " + kls
+
+    # TODO: app path/pid which have this window
+    ps = Process(w.get_pid())
+    with ps.oneshot():
+        pid = ps.pid
+        app = ps.name()  # ps.exe(), ps.cmdline(), ps.create_time()
+
+    # TODO:PERF: write in batch/second inof each ctxswitch
+    with open(dst, 'a', encoding='utf-8') as f:
+        # ALSO: state :: w.maximized w.minimized w.floating:
+        line = f"{int(ts)} {app} {pid} {nm} {w.wid}\t{w.name}\n"
+        # TODO: ensure file ends with \n before append
+        f.write(line)
 
 
 # def toggle_focus_floating():

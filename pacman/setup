@@ -8,7 +8,7 @@ distro arch || exit
 # OR: system-wide export MAKEFLAGS="-j$(expr $(nproc) \+ 1)"
 #   http://unix.stackexchange.com/questions/268221/use-multi-threaded-make-by-default
 cfg=/etc/makepkg.conf
-mf="MAKEFLAGS='-j$(nproc)'"
+mf="MAKEFLAGS='-j$(nproc --ignore=1)'"
 grep -qxF "$mf" "$cfg" || sudo gawk -i inplace -vmf="$mf" \
   '/^(#\s*)?MAKEFLAGS=/{$0=mf}1' "$cfg"
 

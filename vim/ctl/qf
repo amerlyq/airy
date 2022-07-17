@@ -3,7 +3,11 @@ fmt=${1:-%f:%l:%c:%m}
 # |bwipe
 # excmd="setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|if len(getqflist())>1|copen|en"
 ## HACK: wait until lazy plugins loaded before reading QF
-excmd="autocmd User LazyPluginsLoaded  setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|copen"
+# BAD:(copen -- prevents syntax hl -- BET: open manually by <,q> after that)
+excmd="setl bt=nofile nowrap efm=$fmt | cbuffer"
+# excmd="setl noro ma bt=nofile nowrap efm=$fmt | autocmd User LazyPluginsLoaded  cbuffer "
+# excmd="setl noro ma bt=nofile nowrap efm=$fmt | autocmd User LazyPluginsLoaded  cbuffer|copen"
+# excmd="autocmd User LazyPluginsLoaded  setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|copen"
 
 if [ -n "${NVIM_LISTEN_ADDRESS-}" ]; then
   # exec xargs -rn1 -d\\n realpath | ifne nvr - -c "$excmd"
