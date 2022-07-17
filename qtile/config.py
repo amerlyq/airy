@@ -4,11 +4,11 @@ import time
 from typing import cast
 
 from libqtile import bar, hook, layout, qtile, widget
+from libqtile.backend.x11 import window
 from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
                              Screen)
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
-
 from psutil import Process
 
 # pylint:disable=invalid-name
@@ -89,11 +89,16 @@ keys = [
     K("M-C-q", lazy.shutdown(), desc="Shutdown Qtile"),
     K("M-e", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
     K("M-<minus>", lazy.spawn("xset dpms force off".split()), desc="Screen off"),
-    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
-    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
-    Key([], "XF86AudioMute", lazy.spawn("amixer -c 0 -q set Master toggle")),
+    ## FAIL: unknown keysym
+    # Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
+    # Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
+    # Key([], "XF86AudioMute", lazy.spawn("amixer -c 0 -q set Master toggle")),
     K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Master 1dB+"), desc="Volume up"),
-    K("M-<Page_Down>", lazy.spawn("amixer -c 0 -q set Master 1dB-"), desc="Volume down"),
+    K(
+        "M-<Page_Down>",
+        lazy.spawn("amixer -c 0 -q set Master 1dB-"),
+        desc="Volume down",
+    ),
     # K("M-x", lazy.spawn(["env", "--chdir=/d/research/clipboard/infinitecopy", "--",
     #                         "poetry", "run", "infinitecopy"]), desc="Clipboard"),
     K("M-x", lazy.spawn(["copyq", "toggle"]), desc="Clipboard toggle"),
@@ -226,7 +231,9 @@ floating_layout = layout.Floating(
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class="pinentry-qt"),  # GPG key password entry
-        Match(wm_class="copyq"),  # doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
+        Match(
+            wm_class="copyq"
+        ),  # doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
     ]
 )
 auto_fullscreen = True
@@ -261,34 +268,75 @@ def disable_floating(window):
         window.togroup(qtile.current_group.name)
         window.cmd_disable_floating()
 
-prev = None
-@hook.subscribe.client_focus
-def audit_focus(w):
-    global prev
-    # w = qtile.current_screen.group.current_window
-    if not w or w.wid == prev:
-        return
-    prev = w.wid
 
-    dst = f"/d/audit/{os.uname().nodename}/wm/"
+prev_focus = None
+prev_cbsel = None
+
+
+def audit_log(text: str, grp: str) -> None:
     ts = time.time()
-    dst += time.strftime("%Y/%Y-%m-%d", time.localtime(ts))
+    sfx = time.strftime("%Y/%Y-%m-%d", time.localtime(ts))
+    dst = f"/d/audit/{os.uname().nodename}/{grp}/{sfx}"
 
-    inst, kls = w.get_wm_class()
-    nm = inst if inst == kls else inst + " " + kls
+    # TODO:PERF: write in batch/second inof each ctxswitch
+    with open(dst, "a", encoding="utf-8") as f:
+        # ALSO: state :: w.maximized w.minimized w.floating:
+        line = f"{int(ts)} {text}\n"
+        # TODO: ensure file ends with \n before append
+        f.write(line)
 
+
+@hook.subscribe.client_focus
+def audit_focus(w: window.Window) -> None:
+    global prev_focus
+    # w = qtile.current_screen.group.current_window
+    if not w or w.wid == prev_focus:
+        return
+    prev_focus = w.wid
+
+    nm = "?"
+    if wikls := w.get_wm_class():
+        inst, kls = wikls
+        nm = inst if inst == kls else inst + " " + kls
+
+    # PERF: cache mapping pid->name
     # TODO: app path/pid which have this window
     ps = Process(w.get_pid())
     with ps.oneshot():
         pid = ps.pid
         app = ps.name()  # ps.exe(), ps.cmdline(), ps.create_time()
 
-    # TODO:PERF: write in batch/second inof each ctxswitch
-    with open(dst, 'a', encoding='utf-8') as f:
-        # ALSO: state :: w.maximized w.minimized w.floating:
-        line = f"{int(ts)} {app} {pid} {nm} {w.wid}\t{w.name}\n"
-        # TODO: ensure file ends with \n before append
-        f.write(line)
+    audit_log(f"{app} {pid} {nm} {w.wid}\t{w.name}", "wm")
+
+
+@hook.subscribe.selection_change
+def audit_cb(name, selection) -> None:
+    global prev_cbsel
+    oid = selection["owner"]
+    sel = selection["selection"]
+    if name != "CLIPBOARD" or (oid, sel) == prev_cbsel:
+        return
+    prev_cbsel = (oid, sel)
+
+    ## FAIL: !copyq and !qtile always re-own selections
+    # if oid in qtile.windows_map:
+    #     owner = qtile.windows_map[oid].window
+    # else:
+    #     # owner = xcbq.window.XWindow(qtile.core.conn, oid)
+    #     owner = window.Window(window.XWindow(qtile.core.conn, oid), qtile)
+
+    ## FUT:ADD: black-listing
+    # if owner_class := owner.get_wm_class():
+    #     if any(x in owner_class for x in blacklist):
+    #         return
+
+    sel = sel.rstrip().replace("\r", "").replace("\n", "\r")
+    cnt = len(sel)
+    nl = sel.count("\n") + 1
+    if cnt > 200:
+        sel = sel[:200] + "..."
+
+    audit_log(f"{oid} {nl}/{cnt}\t{sel}", "cb")
 
 
 # def toggle_focus_floating():

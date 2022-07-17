@@ -45,10 +45,13 @@ K('nx', 'gY', '<Plug>(LiveEasyAlign)')
 K("n", "<C-Tab>", "<Plug>(CybuPrev)")
 K("n", "<S-Tab>", "<Plug>(CybuNext)")
 
--- ALT: vimscript
 -- https://github.com/preservim/tagbar
--- https://github.com/liuchengxu/vista.vim
-K('nx', '<Tab>t', '<Cmd>SymbolsOutline<CR>')
+-- ALSO:SEE: TagbarOpenAutoClose, TagbarTogglePause, TagbarShowTag
+K('nx', '<Tab>t', '<Cmd>TagbarToggle<CR>')
+-- ALT: https://github.com/simrat39/symbols-outline.nvim
+K('nx', '<Tab>T', '<Cmd>SymbolsOutline<CR>')
+-- ALT: https://github.com/liuchengxu/vista.vim
+-- WTF: https://github.com/glepnir/lspsaga.nvim
 
 
 -- ALT:BET? usability

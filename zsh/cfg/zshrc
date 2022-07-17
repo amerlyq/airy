@@ -71,6 +71,29 @@ source /d/airy/zsh/arc/alias/aliases
 # TEMP: import from !fish
 source ~/.zsh_aliases
 
+# TEMP: cdauto paths (OLD-style)
+# TODO:CHG:(cdauto): cd /path/to/somefile(:h)
+source /d/airy/sh/alias/cd
+while read -r k p; do
+  # SEE: https://vincent.bernat.ch/en/blog/2015-zsh-directory-bookmarks
+  # USAGE: cd ~.a
+  [[ ${k:0:1} == "." && -z ${${k:1}//[a-zA-Z0-9.]} ]] && hash -d -- "${k:1}"="${p#-l }"
+  alias "$k"="cdauto $p"
+done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
+
+fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
+  command fm --choosedir="$f" "$@"
+  [[ -s $f ]] && d=$(<"$f")
+  if [[ -d ${d-} && $d != $PWD ]]; then builtin cd -- "$d" || return; fi
+}
+
+zshexit(){  # _ranger_cwd
+  local tmp=${XDG_RUNTIME_DIR:?}/ranger/cwd
+  [[ -d $tmp && $RANGER_LEVEL ]] || return 0
+  # [[ -d $tmp ]] || command mkdir -p "$tmp"
+  (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
+}
+
 
 # Allow command line editing in an external editor.
 autoload -Uz edit-command-line
@@ -86,6 +109,7 @@ zle -N glob-alias
 
 # control-space expands all aliases, including global
 bindkey -M viins "^ " glob-alias
+
 
 
 ############################################################
@@ -114,7 +138,7 @@ _set_prompt() {
   # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
 
   PROMPT="%(?..%F{1}%?↵%f
-)%F{$color}┌${nest:-─}─%f %B%F{220}%~%f%b
+)%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b
 %F{$color}└%(!.#.╼)%f "
 }; _set_prompt
 

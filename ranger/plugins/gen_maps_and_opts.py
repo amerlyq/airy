@@ -33,6 +33,7 @@ def aura_pathes(fm):
     except IOError:
         return fm.notify(fpathes, bad=True)
 
+    # FIXME: allow ".#"
     lst = [l.split("#", 1)[0].strip().split(None, 1) for l in lst]
     lst = filter(lambda e: len(e) > 1, lst)
     for e in sorted(lst, key=lambda l: l[0]):  # reverse=True
