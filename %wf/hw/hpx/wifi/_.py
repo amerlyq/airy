@@ -1,6 +1,6 @@
-from just.airy.api import cp
+from just.airy.api import Pkg
 
-cp("blacklist-bt.conf", under="/etc/modprobe.d")
+Pkg("wireless-regdb")
 
 # ALSO: for !tlp
 # systemctl mask systemd-rfkill.socket

@@ -35,7 +35,7 @@
 
 
 2022-07-06-Wed-W27
-  [_] REMOVE pulseaudio digital profiles
+  [_] REM pulseaudio digital profiles
     FAQ · Wiki · PipeWire / pipewire · GitLab ⌇⡢⣅⢇⢍
       https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/FAQ#is-pipewire-ready-yet
       ¦ With the right model:vendor id (see with lsusb) it is possible to make
@@ -157,3 +157,110 @@
             https://bbs.archlinux.org/viewtopic.php?id=256698
             Chromium 81 Is Released With Many Security Fixes And Mostly Working Vulkan Rendering Support - LinuxReviews ⌇⡢⣈⡥⡄
               https://linuxreviews.org/Chromium_81_Is_Released_With_Many_Security_Fixes_And_Mostly_Working_Vulkan_Rendering_Support#:~:text=Vulkan support is disabled by,of Chromium 81) to Enabled
+
+
+2022-07-17-Sun-W28
+  [+] 15m FIXME crash copyq before xorg
+    systemd - Writing a service that depends on Xorg - Super User ⌇⡢⣔⡒⠈
+      https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg
+      FAIL: no graphical targets
+        $ systemctl --user list-units --type target
+  [%] 35m #hpx FIX intel screen tearing on rotate
+    [X] SEE: why I disabled it before (beside PERF)
+    glxgears
+     modeline
+      1908 frames in 5.0 seconds = 381.556 FPS
+      3614 frames in 5.0 seconds = 722.682 FPS
+     intel
+       595 frames in 5.0 seconds = 118.992 FPS
+      6603 frames in 5.0 seconds = 1320.515 FPS
+     intel no-3D
+       410 frames in 5.0 seconds = 81.890 FPS
+      1614 frames in 5.0 seconds = 322.790 FPS
+  [%] 50m ERR boot
+    [⡢⣔⡯⢈] ERR: hpet_acpi_add: no address or irqs in _CRS
+      ::: hpet=disable  // no need to use this OLD tech, as I have better TSC timer
+      OFF: High Precision Event Timer Driver for Linux — The Linux Kernel documentation ⌇⡢⣔⡬⡇
+        https://docs.kernel.org/timers/hpet.html
+      Enabling the HPET Linux kernel setting can significantly improve the performance of a DB2 OLTP workload running on an AMD platform using Opteron processors ⌇⡢⣔⡬⡍
+        https://www.ibm.com/support/pages/enabling-hpet-linux-kernel-setting-can-significantly-improve-performance-db2-oltp-workload-running-amd-platform-using-opteron-processors
+      HPET enabled in BIOS, not presented as available_clocksource -- config, kernel code, &/or BIOS? ⌇⡢⣔⡫⣴
+        https://yhbt.net/lore/all/20170513221536.bmijpvmv47pab75c@gavran.carpriv.carnet.hr/t/
+      I discovered universal problem with HPET: freezing, pulseaudio crackling, sound skips & video stutter. : linux ⌇⡢⣔⡫⣺
+        https://www.reddit.com/r/linux/comments/euj0s/i_discovered_universal_problem_with_hpet_freezing/
+      [X] ALSO: hpet: HPET dysfunctional in PC10. Force disabled
+        x86: HPET PC10 quirk workaround and some cleanup | Patchew ⌇⡢⣔⡮⣆
+          https://patchew.org/Xen/9963c7a2-f880-66fc-8f12-b1ddd0619c91@suse.com/da80b8dd-177c-d27a-9a00-c9538a139d37@suse.com/
+        PSA: If your clocksource is HPET rather than TSC you may see severely crippled performance in games (DX11 especially) : linux_gaming ⌇⡢⣔⡯⠘
+          https://www.reddit.com/r/linux_gaming/comments/rsvjqb/psa_if_your_clocksource_is_hpet_rather_than_tsc/
+          $ cat /sys/devices/system/clocksource/clocksource*/current_clocksource
+  [⡢⣔⡱⣸] 10m FUTURE: stop spamming journal on each sudo <⡊⣝>
+    [solved] pam fails to find unit dbus-org.freedesktop.home1.service / Newbie Corner / Arch Linux Forums ⌇⡢⢳⡪⠒
+      https://bbs.archlinux.org/viewtopic.php?id=258297
+
+
+2022-07-18-Mon-W29
+  [%] 50m ERR: boot/pipewire ⌇⡢⣕⡪⡯
+    Jul 18 13:10:31 hpx pipewire[1539]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+    Jul 18 13:10:31 hpx pipewire[1539]: mod.rt: could not set nice-level to -11: No such file or directory
+    OFF: Performance tuning · Wiki · PipeWire / pipewire · GitLab ⌇⡢⣕⠹⡱
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Performance-tuning#rlimits
+    Real time configuration errors in journal log (#2152) · Issues · PipeWire / pipewire · GitLab ⌇⡢⣕⠸⠍
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/2152
+    DEBUG
+      $ chrt -a -p $(pidof pipewire)
+      $ pw-dump
+      $ pw-top
+      $ pw-profiler
+  [⡢⣕⡗⡊] ✗ 30m #hpx CFG disable unwanted HDMI sinks ⌇⡢⣕⡪⡷
+    WirePlumber - ArchWiki ⌇⡢⣕⡐⢥
+      https://wiki.archlinux.org/title/WirePlumber
+      https://www.reddit.com/r/archlinux/comments/skbp08/wireplumber_can_now_disable_hdmi_audio_output/
+      $ pw-cli list-objects V
+        ✗ node.name = "Midi-Bridge"
+        ✗ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_5__sink"
+        ✗ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_4__sink"
+        ✗ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_3__sink"
+        ✓ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink"
+        ✓ node.name = "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__source"
+        ✓ node.name = "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_6__source"
+        MAYBE: node.name = "PulseAudio Volume Control"
+    ::: { "node.nick", "matches", "HDMI" }
+      FAIL: Unable to disable device nodes (#2363) · Issues · PipeWire / pipewire · GitLab ⌇⡢⣕⡖⢛
+        https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/2363
+        [≫] TRY: disable by sof driver itself
+  [⡢⣕⡪⠌] ✗ 1h FAIL: intel driver -- can't play !mpv w/o 3D -- can't Rotate+TearFree w/o intel ⌇⡢⣕⡡⠖
+    ::: TEMP:USE: !picom and vsync=True for non-rotated/not-scaled screens
+      FUTURE:USE: wayland or Windows
+    xf86-video-modesetting: Tear-free desktops for all! - mupuf.org ⌇⡢⣕⡘⡌
+      https://www.mupuf.org/blog/2018/09/24/teaching_x_modesetting_new_tricks/
+      https://unix.stackexchange.com/questions/667911/intel-modesetting-driver-screen-tearing
+    vsync not working with a rotated display (#996) · Issues · xorg / xserver · GitLab ⌇⡢⣕⡙⢆
+      https://gitlab.freedesktop.org/xorg/xserver/-/issues/996
+    Tearing with rotated screen · Issue #328 · yshui/picom ⌇⡢⣕⡙⢁
+      https://github.com/yshui/picom/issues/328
+    TearFree (VSync) option missing in xf86-video-modesetting (modesetting DDX) (#244) · Issues · xorg / xserver · GitLab ⌇⡢⣕⡙⢫
+      https://gitlab.freedesktop.org/xorg/xserver/-/issues/244
+    Modesetting: Per-CRTC framebuffers to provide 32k framebuffers to everyone (and enable Tear-free support) (!24) · Merge requests · xorg / xserver · GitLab ⌇⡢⣕⡛⢡
+      https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/24
+      ::: FAIL: ¦ I'm not sure we have anyone left here at intel who cares about Xorg
+        == modesetting TearFree isn't merged (and doesn't work for Rotated anyway)
+    [X] FIND: why I dropped wayland
+      * no HiDPI in !qtile
+      * screen recording -- unavailable ?
+      * slow XWayland startup for !st
+        (can't give up on !st due to my patches)
+      * MAYBE: tearing on rotated screen won't go away
+      * I'm not ready to search replacements for #monica
+    [$] BET? use WSL or VBox from Windows
+      FAIL: can't reuse /boot partition
+      BAD: space for games and media files is only on encrypted SSD
+      BAD: media can't be played inside VBox -- need VGA forwarding for 2D/3D accel
+      FAIL: don't want to CFG/fight with Windows
+    [⡢⣕⡩⣏] ≈ 10m ALT: rotate single window
+      How to rotate window in X11 - Unix & Linux Stack Exchange ⌇⡢⣕⡧⠥
+        https://unix.stackexchange.com/questions/354678/how-to-rotate-window-in-x11
+      ::: only possible for nested Xephyr or XWayland on Wayland
+        BUT: native !ff can be rotated in Weston easily
+      [_] ALT:TRY: restart !qtile + wayland only for !ff
+        TODO: disable auto-login
