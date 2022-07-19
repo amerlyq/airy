@@ -1,3 +1,4 @@
+
 require 'plug.cmp' -- +luasnip
 require 'plug.gitsigns'
 
@@ -57,6 +58,10 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done {
     }
   }
 })
+
+
+require('pretty-fold').setup()
+require('pretty-fold.preview').setup()
 
 
 require 'plug.telescope'

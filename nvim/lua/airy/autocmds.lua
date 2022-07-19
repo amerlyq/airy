@@ -64,3 +64,22 @@ autocmd("BufWritePre", {
 --   au InsertEnter * set timeoutlen=0 ttimeoutlen=0
 --   au InsertLeave * set timeoutlen=1000 ttimeoutlen=32
 -- augroup END
+
+
+-- SRC: https://github.com/wfxr/minimap.vim/issues
+-- local g = vim.g
+-- g.minimap_width = 8
+-- g.minimap_auto_start = 1
+-- g.minimap_auto_start_win_enter = 0
+-- autocmd('WinEnter', {
+--   -- SRC:https://github.com/wfxr/minimap.vim/issues/146
+--   desc = "(HACK) don't ever enter minimap window/buffer",
+--   callback = function()
+--     local mmwinnr = vim.fn.bufwinnr("-MINIMAP-")
+--     if mmwinnr == -1 then return end
+--     if vim.fn.winnr() == mmwinnr then
+--       -- Go to the other window.
+--       vim.api.nvim_command("wincmd t")
+--     end
+--   end
+-- })

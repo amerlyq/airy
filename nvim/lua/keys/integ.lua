@@ -1,16 +1,18 @@
 local K = require 'keys.bind'.K
+local bw = "b"
 
 -- ALSO: https://gist.github.com/habamax/0a6c1d2013ea68adcf2a52024468752e
 -- SEE: https://github.com/nanotee/dotfiles/tree/master/.config/nvim
 --   map[''].gx = {'...'}
 -- if vim.fn.has("unix") == 1 then
 K('n', 'gx', '<Cmd>call jobstart(["xdg-open", expand("<cfile>")], {"detach": v:true})<CR>')
--- K('x', 'gx', '<Cmd>call jobstart(["r.b", "--", GetVisualSelection(" ")], {"detach": v:true})<CR>')
--- K('x', 'gx', function() vim.fn.jobstart(["r.b", "--", getVisualSelection()], {detach=true})end)
+-- K('x', 'gx', '<Cmd>call jobstart([bw, "--", GetVisualSelection(" ")], {"detach": v:true})<CR>')
+-- K('x', 'gx', function() vim.fn.jobstart([bw, "--", getVisualSelection()], {detach=true})end)
 
 vim.cmd [[
 fun! OpenBrowser(url)
-  call jobstart(["r.b", "--", a:url], {"detach": v:true})
+  let bw = "b"
+  call jobstart([bw, "--", a:url], {"detach": v:true})
 endf
 ]]
 
@@ -28,7 +30,7 @@ K('x', 'gx', function()
   -- local vsel = require('seize.vsel')()
   vim.cmd('noau normal! "vy')
   local vsel = vim.fn.getreg('v')
-  local handle, _pid = vim.loop.spawn('r.b', {
+  local handle, _pid = vim.loop.spawn(bw, {
     args = { "--", vsel },
     detached = true
   }, (function() print('DONE') end)) -- handle:close()
