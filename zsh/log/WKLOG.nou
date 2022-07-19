@@ -64,3 +64,16 @@
       https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/sudo
     ohmyzsh/plugins/dirhistory at master · ohmyzsh/ohmyzsh ⌇⡢⣒⣦⢀
       https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/dirhistory
+
+
+2022-07-17-Sun-W28
+  [⡢⣓⣟⠐] 20m zsh FIX expand alias :: <C-x a>
+    [X] SEE: prezto edit/completion for <"^ ">
+    macos - How to expand aliases inline in zsh? - Super User ⌇⡢⣓⣖⣚
+      https://superuser.com/questions/1514569/how-to-expand-aliases-inline-in-zsh
+      autoload -Uz compinit; compinit;
+      bindkey "^Xa" _expand_alias
+      zstyle ':completion:*' completer _expand_alias _complete _ignored
+      zstyle ':completion:*' regular true
+    [⡢⣓⣟⠻] Expand aliases with CTRL+SPACE ⌇⡢⣓⣝⣝
+      https://gist.github.com/akarzim/557e7b36c538b23dc50fee9f92e09960

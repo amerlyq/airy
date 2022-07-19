@@ -88,7 +88,7 @@ fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
 }
 
 zshexit(){  # _ranger_cwd
-  local tmp=${XDG_RUNTIME_DIR:?}/ranger/cwd
+  local tmp=${XDG_RUNTIME_DIR:?}/ranger
   [[ -d $tmp && $RANGER_LEVEL ]] || return 0
   # [[ -d $tmp ]] || command mkdir -p "$tmp"
   (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
@@ -136,6 +136,7 @@ _set_prompt() {
 
   # local parts
   # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
+  # OR: ╭ ╰
 
   PROMPT="%(?..%F{1}%?↵%f
 )%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b

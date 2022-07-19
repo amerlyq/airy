@@ -1,7 +1,7 @@
 [Unit]
 Description=DE - Window Compositor - %P
-Requisite=wm.target
-After=wm.target
+# Requisite=wm.target
+# After=wm.target
 # PartOf=main.target
 # Before=main.target
 # DISABLED: until xorg drivers more stable
@@ -18,4 +18,4 @@ Restart=on-abnormal
 # TimeoutStopSec=5
 
 [Install]
-WantedBy=main.target
+WantedBy=xsession.target

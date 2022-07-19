@@ -1,10 +1,29 @@
 #!/bin/sh -eu
 # FAIL: can't pipe directly to nvim due to stdin blocking
 #   ::: FIXED:USE: !ifne OR !sponge to drain stdin before passing to !nvim
-exec sk --ansi --interactive --multi \
+
+cmd="re --color=always $*"
+export FZF_DEFAULT_COMMAND="$cmd '--files'"
+
+# --bind ctrl-a:select-all
+# --bind '?:preview:cat {}'
+# --query '' \
+# --tiebreak=begin,end,length \
+
+# --delimiter=':' --preview-window hidden \
+# --bind 'ctrl-v:preview:bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
+# --preview 'bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
+
+exec fzf --ansi --disabled --multi \
+  --bind "change:reload:$cmd {q} || true" \
   --bind='ctrl-s:toggle-sort' \
-  --tiebreak=-index,begin,end,score \
-  --cmd-history=/@/xdg_share/skim_history \
-  \
-  --cmd 're --color=always '"$*"' "{}"' \
+  --history=/@/xdg_share/skim_history \
   | ifne vq
+
+# exec sk --ansi --interactive --multi \
+#   --bind='ctrl-s:toggle-sort' \
+#   --tiebreak=-index,begin,end,score \
+#   --cmd-history=/@/xdg_share/skim_history \
+#   \
+#   --cmd 're --color=always '"$*"' "{}"' \
+#   | ifne vq

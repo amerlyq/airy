@@ -94,10 +94,14 @@ bindkey -a '^S' history-incremental-search-forward
 # Prev-hist-cmd, depending on text from beginning till cursor #'\e[A','\e[B'
 bindkey    '^P' up-line-or-history                 #up-line-or-search
 bindkey    '^N' down-line-or-history               #down-line-or-search
-bindkey -a '^P' history-substring-search-up        #up-history
-bindkey -a '^N' history-substring-search-down      #down-history
 # bindkey -a '^P' history-beginning-search-backward
 # bindkey -a '^N' history-beginning-search-forward
+
+## Arrows
+bindkey -M viins "^[OA" history-substring-search-up
+bindkey -M viins "^[[A" history-substring-search-up
+bindkey -M viins "^[OB" history-substring-search-down
+bindkey -M viins "^[[B" history-substring-search-down
 
 
 ## Command-line copy-paste-edit

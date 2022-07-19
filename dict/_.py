@@ -2,6 +2,12 @@ from just.airy.api import Pkg, cp
 
 Pkg("dictd")
 
+## OR:
+# Aur("goldendict-webengine-git")
+# Aur("goldendict-enruen-content")
+
+
+
 cp("cfg/colorit.conf", under="/etc/dict")
 cp("cfg/dict.conf", under="/etc/dict")
 cp("cfg/dict_fallbacks.conf", under="/etc/dict")

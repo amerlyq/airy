@@ -18,6 +18,18 @@ def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
     return EzKey(keydef, *cmds, desc=desc)  # type:ignore
 
 
+prev_layout = 0  # lazy.current_group.current_layout
+def toggle_maxlayout(qtile, laymax: int = 2) -> None:
+    global prev_layout
+    l = qtile.current_group.current_layout
+    if l == laymax:
+        l = prev_layout
+    else:
+        prev_layout = l
+        l = laymax
+    qtile.current_group.use_layout(l)
+
+
 mod = "mod4"
 terminal = ["env", "--chdir=/t", cast(str, guess_terminal())]
 ranger = ["st", "-e", "ranger", "--choosedir=/run/user/1000/ranger/cwd", "--"]
@@ -55,7 +67,7 @@ keys = [
     # EzKey('M-w', f.toggle_focus_floating(), f.warp_cursor_here()),
     # K("M-w", f.toggle_focus_floating(), desc="Focus floating"),
     K(
-        "M-<slash>",
+        "M-<Tab>",
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack"
         # * Split = all windows displayed
@@ -75,12 +87,14 @@ keys = [
     ),  # , mode="Launch"
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
     # Toggle between different layouts as defined below
-    K("M-<Tab>", lazy.next_layout(), desc="Toggle between layouts"),
+    K("M-<slash>", lazy.next_layout(), desc="Toggle between layouts"),
     # K("M-slash", lazy.next_layout(), desc="Toggle between layouts"),
     # K("M-question", lazy.previous_layout(), desc="Toggle between layouts"),
     # K("M-S-slash", lazy.prev_layout(), desc="Toggle between layouts"),
-    K("M-f", lazy.next_layout(), desc="Toggle between layouts"),
     # K("M-f", lazy.window.toggle_fullscreen(), desc="Toggle fullscreen"),
+    # K("M-f", lazy.next_layout(), desc="Toggle fullscreen"),
+    # K("M-f", lazy.to_layout_index(2), desc="Fullscreen"),
+    K("M-f", lazy.function(toggle_maxlayout), desc="Fullscreen"),
     # K("M-S-x", lazy.hide_show_bar("top")),
     # K("M-x", lazy.hide_show_bar("bottom")),
     K("M-S-f", lazy.hide_show_bar("bottom")),
@@ -142,7 +156,7 @@ layouts = [
     layout.VerticalTile(
         ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2
     ),
-    # layout.MonadTall(ratio=0.587),
+    layout.MonadTall(ratio=0.587),
     layout.Max(),
     # layout.MonadWide(),
     # layout.RatioTile(),
@@ -333,8 +347,9 @@ def audit_cb(name, selection) -> None:
     sel = sel.rstrip().replace("\r", "").replace("\n", "\r")
     cnt = len(sel)
     nl = sel.count("\n") + 1
-    if cnt > 200:
-        sel = sel[:200] + "..."
+    maxlen = 1024
+    if cnt > maxlen:
+        sel = sel[:maxlen] + "..."
 
     audit_log(f"{oid} {nl}/{cnt}\t{sel}", "cb")
 

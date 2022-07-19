@@ -1,9 +1,9 @@
-from just.airy.api import ln, cp, Pkg
+from just.airy.api import Pkg, cp, ln
 
 Pkg("mpd")  # mpc
 
-ln("/d/music" , under="~/.config/mpd")
-ln("cfg/mpd.conf" , under="~/.config/mpd")
+ln("/d/music", under="~/.config/mpd")
+ln("cfg/mpd.conf", under="~/.config/mpd")
 
 # CHECK: dir content -- BET link whole dir
 # linkcp -t "$dir"/playlists ./radio/*
@@ -12,8 +12,8 @@ ln("cfg/mpd.conf" , under="~/.config/mpd")
 # ./cfg/state.gen "$dir"/mpd.state
 
 # FIXME: use UNIX socket
-cp("unit/mpd.socket" , under="~/.config/systemd/user")
-cp("unit/mpd.service" , under="~/.config/systemd/user")
+cp("unit/mpd.socket", under="~/.config/systemd/user")
+cp("unit/mpd.service", under="~/.config/systemd/user")
 
 # ALSO: mpd-log.service
 
