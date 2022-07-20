@@ -20,4 +20,5 @@ Pkg("rtkit")
 
 # OFF: https://wiki.archlinux.org/title/WirePlumber
 #   NICE: disable unnecessary HDMI outputs from menu
-cp("cfg/51-hdmi-disable.lua", under="~/.config/wireplumber/main.lua.d")
+# FAIL: doesn't disable anything -- TRY:FIND: how to tweak SOF/modprobe itself
+# cp("cfg/51-hdmi-disable.lua", under="~/.config/wireplumber/main.lua.d")

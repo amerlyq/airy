@@ -2,8 +2,10 @@ from just.airy import M
 # pkgs = ["neovim"]
 pkgs = []
 
+# MAYBE: "code-minimap-bin" for minimap.vim
+
 # VIZ. $ nvr to talk to vim from inside ranger
-aurs = ["neovim-git", "neovim-remote", "code-minimap-bin"]
+aurs = ["neovim-git", "neovim-remote"]
 
 
 # DEPS:(aur/python-lsp-all):
