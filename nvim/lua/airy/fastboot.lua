@@ -55,7 +55,7 @@ g.python3_host_prog = '/usr/bin/python3'
 -- SRC: Introducing filetype.lua and a call for help : neovim ⌇⡢⡱⡦⣳
 --   https://www.reddit.com/r/neovim/comments/rvwsl3/introducing_filetypelua_and_a_call_for_help/
 g.do_filetype_lua = 1
-g.did_load_filetypes = 0
+-- g.did_load_filetypes = 0
 
 
 --DISABLED:BET:USE: 'o.loadplugins = false'

@@ -79,3 +79,7 @@ vim.cmd [[
   call altr#define('%/source/%.cpp', '%/include/%.hpp', '%/include/%.h')
   call altr#define('%/src/%.cpp', '%/inc/%.h', '%/t/%_test.cpp')
 ]]
+
+-- OR: use \dl \dr -- to merge with \df \ds submode
+K('n', '\\l', '<Cmd>LinediffReset<CR>')
+K('x', '\\l', ':Linediff<CR>')
