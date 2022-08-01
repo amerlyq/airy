@@ -82,17 +82,22 @@ while read -r k p; do
 done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
 
 fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
+  # NOTE: exit ranger-nested shell && sync last PWD (inof ZSHEXIT)
+  if [[ -n ${RANGER_LEVEL-} ]]; then
+    (set +C && print -n -- "$PWD" > "$f")  # Disable clobbering
+    exit
+  fi
   command fm --choosedir="$f" "$@"
   [[ -s $f ]] && d=$(<"$f")
   if [[ -d ${d-} && $d != $PWD ]]; then builtin cd -- "$d" || return; fi
 }
 
-zshexit(){  # _ranger_cwd
-  local tmp=${XDG_RUNTIME_DIR:?}/ranger
-  [[ -d $tmp && $RANGER_LEVEL ]] || return 0
-  # [[ -d $tmp ]] || command mkdir -p "$tmp"
-  (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
-}
+# zshexit(){  # _ranger_cwd
+#   local tmp=${XDG_RUNTIME_DIR:?}/ranger
+#   [[ -d $tmp && $RANGER_LEVEL ]] || return 0
+#   # [[ -d $tmp ]] || command mkdir -p "$tmp"
+#   (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
+# }
 
 
 # Allow command line editing in an external editor.
