@@ -43,17 +43,24 @@ setopt incappendhistorytime
 
 
 ## NOTE: store audit events from zsh history by days ⌇⡟⢏⠰⣔
-# ALT:※⡟⢏⠰⣔※⡟⢏⠱⣻ source /d/monica/zsh/audit.zsh
-# FIXED: (set +o clobber; </d/audit/$HOST/zsh/20??/20??-* > $HISTFILE)
+# [_] CHECK:FAIL? shells local sessions don't sync immediately anymore -- only after shell was closed
+# SEE: INC_APPEND_HISTORY or SHARE_HISTORY
 zshaddhistory() { local f
-  [[ ${1:0:1} == " " ]] && return 2
+  [[ ${1:0:1} == " " ]] && return 2  # [[ -o hist_ignore_space ]] &&
   print -sr -- ${1%%$'\n'}  # BAD: no dur and "-n" does not help to strip
   print -v f -P -- '%D{%Y/%Y-%m-%d}'
   f=/d/audit/$HOST/zsh/$f
+  # BAD:PERF: checks directory existence on each command
   [[ -d $f:h ]] || mkdir -p $f:h
   fc -p $f  # BAD:(no ts/dur): print -rn -- $1 >> $f
 }
 
+# HACK:(split): cvt ZSH histfile to audit logs ⌇⡟⢔⣳⡀
+#   $ gawk '/^: [0-9]{10}:[0-9];/{f=strftime("%Y/%Y-%m-%d",substr($0,3,10))} {print >> f}' ~/.zsh_history
+# HACK:(sync): pre-populate history file on new system from all audit logs of old PC ⌇⡟⢏⠱⣻
+# if [[ -n $HISTFILE ]] && [[ ! -f $HISTFILE ]] && [[ -d $_audit[d_log] ]]; then
+#   (set +o clobber; <$_audit[d_log]/20??/20??-* > $HISTFILE)
+# fi
 
 ############################################################
 ### TEMP
@@ -83,21 +90,19 @@ done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
 
 fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
   # NOTE: exit ranger-nested shell && sync last PWD (inof ZSHEXIT)
-  if [[ -n ${RANGER_LEVEL-} ]]; then
-    (set +C && print -n -- "$PWD" > "$f")  # Disable clobbering
-    exit
-  fi
+  [[ -n ${RANGER_LEVEL-} ]] && exit  # && (set +C && pwd > "$f")
   command fm --choosedir="$f" "$@"
   [[ -s $f ]] && d=$(<"$f")
   if [[ -d ${d-} && $d != $PWD ]]; then builtin cd -- "$d" || return; fi
 }
 
-# zshexit(){  # _ranger_cwd
-#   local tmp=${XDG_RUNTIME_DIR:?}/ranger
-#   [[ -d $tmp && $RANGER_LEVEL ]] || return 0
-#   # [[ -d $tmp ]] || command mkdir -p "$tmp"
-#   (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
-# }
+# FIXED:(<C-d>): should sync PWD even when exiting on <C-D> inof <,s>
+zshexit(){  # _ranger_cwd
+  local tmp=${XDG_RUNTIME_DIR:?}/ranger
+  [[ -d $tmp && $RANGER_LEVEL ]] || return 0
+  # [[ -d $tmp ]] || command mkdir -p "$tmp"
+  (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
+}
 
 
 # Allow command line editing in an external editor.

@@ -83,6 +83,7 @@ keys = [
             Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
             Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
             Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
+            Key([], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"),
         ],
     ),  # , mode="Launch"
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
@@ -197,16 +198,22 @@ screens = [
                 widget.MemoryGraph(fill_color="#00aa00"),
                 widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
                 widget.CPUGraph(),
+                widget.PulseVolume(),
                 widget.Battery(
                     format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
                     foreground="#00971f",
                 ),
-                widget.PulseVolume(),
-                widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
+                # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
+                # SRC: Support for Window Buttons · Issue #3182 · qtile/qtile ⌇⡢⣪⡶⢎
+                #   https://github.com/qtile/qtile/issues/3182
+                widget.TextBox("[✗]", mouse_callbacks={"Button1": lazy.window.kill()},
+                               foreground="#4040ff"),
+                # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
+                # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
                 widget.Clock(
-                    format="%Y-%m-%d-%a-W%V", update_interval=60, foreground="#fd971f"
+                    format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"
                 ),
-                widget.Clock(format=" %H:%M", update_interval=5),
+                widget.Clock(format="%H:%M", update_interval=5),
             ],
             40,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
@@ -274,6 +281,7 @@ wmname = "LG3D"
 
 # Mpv player in floating mode · Issue #2651 · qtile/qtile ⌇⡢⢼⡸⣣
 #   https://github.com/qtile/qtile/issues/2651
+# FAIL:(on reload): mpv becomes floating AGAIN
 @hook.subscribe.client_new
 def disable_floating(window):
     rules = [Match(wm_class="mpv"), Match(wm_instance_class="mpv")]
