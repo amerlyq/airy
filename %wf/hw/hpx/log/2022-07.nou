@@ -1,0 +1,266 @@
+
+2022-07-01-Fri-W26
+  [_] READ:SECU: Security - ArchWiki ⌇⡢⢿⠕⣊
+    https://wiki.archlinux.org/title/Security
+
+
+2022-07-02-Sat-W26
+  [%] 40m/ CFG: !dict TEMP at least online FIND replacement w/o server <⡊⣦> ※⡢⣀⢥⡁
+  [%⡢⣀⡱⠼] 15m/ #hpx vsync in !qute
+    Web browser "VSYNC synchronization", display Hz, and input lag tester ⌇⡢⣀⡱⠮
+      https://www.vsynctester.com/
+    [•] FIND: kernel psr monitor
+      Improving Linux battery life, enabling PSR by default, testers wanted - Hans' hacking log — LiveJournal ⌇⡢⣀⢨⠰
+        https://hansdegoede.livejournal.com/18653.html
+        $ cat /sys/kernel/debug/dri/0/i915_edp_psr_status
+      Display Hardware Handling ⌇⡢⣀⢨⢟
+        https://01.org/linuxgraphics/gfx-docs/drm/ch04s02.html#id-1.4.3.4.11
+  [⡢⣀⣎⡰] ‼ 2h #hpx FAIL: frozen system due to building aur/clasp-cl-git ⌇⡢⣁⡰⡈
+    FAIL: too long to build
+      ¦ you need more than 8 GB of RAM and it will be 1-2 hours build time.
+      ¦ If you have 8 GB of RAM you can turn off the parallel build which will then run for a day or so.
+    ALT: thirdlaw/cando - Docker Image | Docker Hub ⌇⡢⣀⣎⡥
+      https://hub.docker.com/r/thirdlaw/cando
+    Limiting Process Resource Consumption in Unix | Baeldung on Linux ⌇⡢⣀⣌⢤
+      https://www.baeldung.com/linux/limit-resource-consumption
+      $ systemd-run --scope -p MemoryLimit=1000M -p CPUQuota=10% ./myProcess.sh
+    How can I limit the CPU and RAM usage for a process? - Ask Ubuntu ⌇⡢⣀⣍⡩
+      https://askubuntu.com/questions/1367612/how-can-i-limit-the-cpu-and-ram-usage-for-a-process
+      $ prlimit --pid 12345 --as=2048000000
+    [_] TODO:CFG: always keep cgroup limit for any builds/programs
+      makepkg - ArchWiki ⌇⡢⣁⢪⢣
+        https://wiki.archlinux.org/title/makepkg
+      [SOLVED] How to limit cpu usage by makepkg? / Applications & Desktop Environments / Arch Linux Forums ⌇⡢⣁⢫⠏
+        https://bbs.archlinux.org/viewtopic.php?id=192233
+
+
+2022-07-06-Wed-W27
+  [_] REM pulseaudio digital profiles
+    FAQ · Wiki · PipeWire / pipewire · GitLab ⌇⡢⣅⢇⢍
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/FAQ#is-pipewire-ready-yet
+      ¦ With the right model:vendor id (see with lsusb) it is possible to make
+      ¦ a custom profile and remove the non-functional IEC958 profile.
+  [%] ◔ 1h35m #hpx CFG:REM: !pulse -> !pipewire
+    [X] CFG
+    [≫] DEBUG: latency $ pw-top
+    PipeWire - ArchWiki ⌇⡢⣅⢄⣳
+      https://wiki.archlinux.org/title/PipeWire
+    FAQ · Wiki · PipeWire / pipewire · GitLab ⌇⡢⣅⢄⣢
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/FAQ#is-pipewire-ready-yet
+      [_] TRY: tinyalsa as DEP inof full alsa
+    [%] TRY: replace pulseaudio+jack2 by pipewire <⡊⣙>
+      PipeWire is a fantastic JACK replacement : linuxaudio ⌇⡢⢮⠊⢝
+        https://www.reddit.com/r/linuxaudio/comments/pel0nr/pipewire_is_a_fantastic_jack_replacement/
+      JACK Audio Connection Kit - ArchWiki ⌇⡢⢮⠋⣟
+        https://wiki.archlinux.org/title/JACK_Audio_Connection_Kit#Comparison_of_JACK_implementations
+  [%] 1h25m udev too many
+    $ sudo strace -fttT -s64 -p 757
+    $ journalctl -b | grep ioctl
+    udev - What nasty systemd-udevd overloading my CPU? - Ask Ubuntu ⌇⡢⣅⢟⢓
+      https://askubuntu.com/questions/1017571/what-nasty-systemd-udevd-overloading-my-cpu
+      $ udevadm monitor
+      $ udevadm monitor --environment --udev
+        WTF: /sys/devices/virtual/thermal/thermal_zone3
+          << value TEMP=42050 is stuck
+        BUT: error is in zone5
+          Jul 06 17:33:31 hpx kernel: thermal thermal_zone5: failed to read out thermal zone (-61)
+        WTF: msg
+          Jul 06 17:33:31 hpx kernel: intel_tcc_cooling: Programmable TCC Offset detected
+      $ cat /sys/bus/usb/devices/2-1/2-1.6/2-1.6.2/id*
+      $ lsusb -d 413c:8162
+    186200 - Multiple instances of udev daemon when system boots - arm st1q - chromium ⌇⡢⣅⢟⣓
+      https://bugs.chromium.org/p/chromium/issues/detail?id=186200
+      WKRND: restart
+      $ sudo systemctl stop systemd-udevd systemd-udevd-control.socket systemd-udevd-kernel.socket
+      $ sudo initctl stop udev
+      $ sudo initctl start udev
+    udev - What nasty systemd-udevd overloading my CPU? - Ask Ubuntu ⌇⡢⣅⢟⡩
+      https://askubuntu.com/questions/1017571/what-nasty-systemd-udevd-overloading-my-cpu
+    FS#16001 : [udev] udevd uses excessive cpu and spawns too many process on boot-up ⌇⡢⣅⢭⡪
+      https://bugs.archlinux.org/task/16001
+    DEBUG
+      udev debugging during system boot | Support | SUSE ⌇⡢⣅⢭⠩
+        https://www.suse.com/support/kb/doc/?id=000016651
+        /etc/udev/udev.conf
+        - udev_log="err"
+        + udev_log="debug"
+        reboot
+        /var/log/messages
+      ALT:(kernel cmdline): udev.log-priority=debug
+        [_] SEE: analyze udev boot logs from 2022-07-06 18:55
+      ALT: /etc/mkinitcpio.conf FILES="... /etc/udev/udev.conf"
+  [+] powersave energy
+    Fan is not running and my laptop is melting - Technical Issues and Assistance / Hardware - Manjaro Linux Forum ⌇⡢⣅⢧⡐
+      https://archived.forum.manjaro.org/t/fan-is-not-running-and-my-laptop-is-melting/45796/18
+      $ tlpui
+      $ tlp-stat
+      hirschmann/nbfc: NoteBook FanControl ⌇⡢⣅⢨⢎
+        https://github.com/hirschmann/nbfc
+        $ nbfc-linux-git
+  [+] speakers
+    212465 – Internal Speakers Bang & Olufsen on HP Spectre X360 Convertible model 13-aw2025na don't work at all - no matching ASoC machine driver found ⌇⡢⣅⢫⡄
+      https://bugzilla.kernel.org/show_bug.cgi?id=212465
+      $ alsaucm -c sof-soundwire set _verb HiFi set _enadev Speaker
+      $ speaker-test -Dhw:0,2 -c2 -r48000
+      $ alsaucm -c sof-soundwire set _verb HiFi set _enadev Headphone
+      $ speaker-test -Dhw:0,0 -c2 -r48000
+    No sound on HP Spectre x360 laptop - Linux Mint Forums ⌇⡢⣅⢫⣥
+      https://forums.linuxmint.com/viewtopic.php?t=367828
+
+
+2022-07-08-Fri-W27
+  [⡢⣈⠙⠹] ‼ 15m <W> WTF watchdog haven't rebooted PC ⌇⡢⣈⠨⣹
+    ¦ watchdog: BUG: soft lockup -- CPU#1 stuck for 44591s!
+    Anyone using watchdog daemons on a desktop/laptop? [SOLVED] / Kernel & Hardware / Arch Linux Forums ⌇⡢⣈⠅⣮
+      https://bbs.archlinux.org/viewtopic.php?id=163768
+      /etc/systemd/system.conf :: RuntimeWatchdogSec=60
+      ¦ Jul 08 14:30:15 systemd[1]: Set hardware watchdog to 1min.
+      [X] FAIL: -> BET: $ reboot
+        $ sudo systemctl daemon-reexec
+          reboot or "systemctl daemon-reload" for changes to /etc/systemd/system.conf? - Server Fault ⌇⡢⣈⠑⠷
+            https://serverfault.com/questions/805745/reboot-or-systemctl-daemon-reload-for-changes-to-etc-systemd-system-conf
+        $ sudo systemctl system.slice restart
+    INFO systemd for Administrators, Part XV ⌇⡢⣈⠅⣳
+      http://0pointer.de/blog/projects/watchdog.html
+    https://www.kernel.org/doc/Documentation/lockup-watchdogs.txt ⌇⡢⣈⠆⢐
+  [⡢⣈⠧⣈] ⁇ 10m <W> WTF:SECU: smb tried to SSH into work PC ⌇⡢⣈⠫⠬
+    stats: -- those IPs never in 'Accepted public', only in 'invalid format'
+    linux - Cannot ssh my ubuntu server. "kex_exchange_identification: banner line contains invalid characters" - Stack Overflow ⌇⡢⣈⠨⡽
+      https://stackoverflow.com/questions/66685456/cannot-ssh-my-ubuntu-server-kex-exchange-identification-banner-line-contains
+      ~~ probably due to our admins HTTPS trying to access SSHD 445
+    Weird kex_exchange_identification log messages [SOLVED] - users - Fedora Mailing-Lists ⌇⡢⣈⠪⣾
+      https://lists.fedoraproject.org/archives/list/users@lists.fedoraproject.org/thread/QL6G3EBSO6NIZCB7SML2HUN757BRZXRX/
+      ::: The error has been happening forever, but the latest sshd now logs it (it previously just ignored it).
+  [⡢⣈⡬⣹] 1h #hpx CFG enable back GuC/HuC ⌇⡢⣉⡏⢰
+    [⡢⣈⠶⠥] ✓ CHECK: !mpv hwdec w/o enabled GuC/HuC
+      ::: yes, it works
+    [⡢⣈⡬⣼] ✗ 55m CHECK: !qute CPU load during HW audio/video decoding (e.g. youtube)
+      [⡢⣈⡦⡞] 35m ALT:FIND: hwdecode options for !qute
+        Youtube playback in h264 only with hardware acceleration · Issue #4001 · qutebrowser/qutebrowser ⌇⡢⣈⡞⡫
+          https://github.com/qutebrowser/qutebrowser/issues/4001
+          [X] DEBUG: chrome://gpu/
+            ::: BET: use !mpv to play youtube :: <;M>
+        Investigate Chromium GPU flags · Issue #5378 · qutebrowser/qutebrowser ⌇⡢⣈⡟⣸
+          https://github.com/qutebrowser/qutebrowser/issues/5378
+          Reduce CPU usage · Issue #5375 · qutebrowser/qutebrowser ⌇⡢⣈⡢⠇
+            https://github.com/qutebrowser/qutebrowser/issues/5375
+        How To Enable Hardware Accelerated Video Decode In Google Chrome, Brave, Vivaldi And Opera Browsers On Debian, Ubuntu Or Linux Mint - Linux Uprising Blog ⌇⡢⣈⡣⣗
+          https://www.linuxuprising.com/2021/01/how-to-enable-hardware-accelerated.html
+          [✗⡊⣭] CFG chrome://flags/#enable-accelerated-video-decode
+        Chrome 99 on Linux does hardware decoding with Vulkan : Stadia ⌇⡢⣈⡤⡃
+          https://www.reddit.com/r/Stadia/comments/scwj28/chrome_99_on_linux_does_hardware_decoding_with/
+          [⡢⣈⡭⠑] CHECK: $ intel_gpu_top
+            ::: NICE: mpv --vo=vaapi shows much more video load than 3D
+        FS#71888 : [mesa] 21.2.1-1 - Vulkan stops working in Chromium-based browsers ⌇⡢⣈⡤⡟
+          https://bugs.archlinux.org/task/71888
+          Consequences of not enabling Vulkan on chromium / Newbie Corner / Arch Linux Forums ⌇⡢⣈⡥⡎
+            https://bbs.archlinux.org/viewtopic.php?id=256698
+            Chromium 81 Is Released With Many Security Fixes And Mostly Working Vulkan Rendering Support - LinuxReviews ⌇⡢⣈⡥⡄
+              https://linuxreviews.org/Chromium_81_Is_Released_With_Many_Security_Fixes_And_Mostly_Working_Vulkan_Rendering_Support#:~:text=Vulkan support is disabled by,of Chromium 81) to Enabled
+
+
+2022-07-17-Sun-W28
+  [+] 15m FIXME crash copyq before xorg
+    systemd - Writing a service that depends on Xorg - Super User ⌇⡢⣔⡒⠈
+      https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg
+      FAIL: no graphical targets
+        $ systemctl --user list-units --type target
+  [%] 35m #hpx FIX intel screen tearing on rotate
+    [X] SEE: why I disabled it before (beside PERF)
+    glxgears
+     modeline
+      1908 frames in 5.0 seconds = 381.556 FPS
+      3614 frames in 5.0 seconds = 722.682 FPS
+     intel
+       595 frames in 5.0 seconds = 118.992 FPS
+      6603 frames in 5.0 seconds = 1320.515 FPS
+     intel no-3D
+       410 frames in 5.0 seconds = 81.890 FPS
+      1614 frames in 5.0 seconds = 322.790 FPS
+  [%] 50m ERR boot
+    [⡢⣔⡯⢈] ERR: hpet_acpi_add: no address or irqs in _CRS
+      ::: hpet=disable  // no need to use this OLD tech, as I have better TSC timer
+      OFF: High Precision Event Timer Driver for Linux — The Linux Kernel documentation ⌇⡢⣔⡬⡇
+        https://docs.kernel.org/timers/hpet.html
+      Enabling the HPET Linux kernel setting can significantly improve the performance of a DB2 OLTP workload running on an AMD platform using Opteron processors ⌇⡢⣔⡬⡍
+        https://www.ibm.com/support/pages/enabling-hpet-linux-kernel-setting-can-significantly-improve-performance-db2-oltp-workload-running-amd-platform-using-opteron-processors
+      HPET enabled in BIOS, not presented as available_clocksource -- config, kernel code, &/or BIOS? ⌇⡢⣔⡫⣴
+        https://yhbt.net/lore/all/20170513221536.bmijpvmv47pab75c@gavran.carpriv.carnet.hr/t/
+      I discovered universal problem with HPET: freezing, pulseaudio crackling, sound skips & video stutter. : linux ⌇⡢⣔⡫⣺
+        https://www.reddit.com/r/linux/comments/euj0s/i_discovered_universal_problem_with_hpet_freezing/
+      [X] ALSO: hpet: HPET dysfunctional in PC10. Force disabled
+        x86: HPET PC10 quirk workaround and some cleanup | Patchew ⌇⡢⣔⡮⣆
+          https://patchew.org/Xen/9963c7a2-f880-66fc-8f12-b1ddd0619c91@suse.com/da80b8dd-177c-d27a-9a00-c9538a139d37@suse.com/
+        PSA: If your clocksource is HPET rather than TSC you may see severely crippled performance in games (DX11 especially) : linux_gaming ⌇⡢⣔⡯⠘
+          https://www.reddit.com/r/linux_gaming/comments/rsvjqb/psa_if_your_clocksource_is_hpet_rather_than_tsc/
+          $ cat /sys/devices/system/clocksource/clocksource*/current_clocksource
+  [⡢⣔⡱⣸] 10m FUTURE: stop spamming journal on each sudo <⡊⣝>
+    [solved] pam fails to find unit dbus-org.freedesktop.home1.service / Newbie Corner / Arch Linux Forums ⌇⡢⢳⡪⠒
+      https://bbs.archlinux.org/viewtopic.php?id=258297
+
+
+2022-07-18-Mon-W29
+  [%] 50m ERR: boot/pipewire ⌇⡢⣕⡪⡯
+    Jul 18 13:10:31 hpx pipewire[1539]: mod.rt: RTKit error: org.freedesktop.DBus.Error.ServiceUnknown
+    Jul 18 13:10:31 hpx pipewire[1539]: mod.rt: could not set nice-level to -11: No such file or directory
+    OFF: Performance tuning · Wiki · PipeWire / pipewire · GitLab ⌇⡢⣕⠹⡱
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Performance-tuning#rlimits
+    Real time configuration errors in journal log (#2152) · Issues · PipeWire / pipewire · GitLab ⌇⡢⣕⠸⠍
+      https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/2152
+    DEBUG
+      $ chrt -a -p $(pidof pipewire)
+      $ pw-dump
+      $ pw-top
+      $ pw-profiler
+  [⡢⣕⡗⡊] ✗ 30m #hpx CFG disable unwanted HDMI sinks ⌇⡢⣕⡪⡷
+    WirePlumber - ArchWiki ⌇⡢⣕⡐⢥
+      https://wiki.archlinux.org/title/WirePlumber
+      https://www.reddit.com/r/archlinux/comments/skbp08/wireplumber_can_now_disable_hdmi_audio_output/
+      $ pw-cli list-objects V
+        ✗ node.name = "Midi-Bridge"
+        ✗ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_5__sink"
+        ✗ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_4__sink"
+        ✗ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_3__sink"
+        ✓ node.name = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink"
+        ✓ node.name = "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__source"
+        ✓ node.name = "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_6__source"
+        MAYBE: node.name = "PulseAudio Volume Control"
+    ::: { "node.nick", "matches", "HDMI" }
+      FAIL: Unable to disable device nodes (#2363) · Issues · PipeWire / pipewire · GitLab ⌇⡢⣕⡖⢛
+        https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/2363
+        [≫] TRY: disable by sof driver itself
+  [⡢⣕⡪⠌] ✗ 1h FAIL: intel driver -- can't play !mpv w/o 3D -- can't Rotate+TearFree w/o intel ⌇⡢⣕⡡⠖
+    ::: TEMP:USE: !picom and vsync=True for non-rotated/not-scaled screens
+      FUTURE:USE: wayland or Windows
+    xf86-video-modesetting: Tear-free desktops for all! - mupuf.org ⌇⡢⣕⡘⡌
+      https://www.mupuf.org/blog/2018/09/24/teaching_x_modesetting_new_tricks/
+      https://unix.stackexchange.com/questions/667911/intel-modesetting-driver-screen-tearing
+    vsync not working with a rotated display (#996) · Issues · xorg / xserver · GitLab ⌇⡢⣕⡙⢆
+      https://gitlab.freedesktop.org/xorg/xserver/-/issues/996
+    Tearing with rotated screen · Issue #328 · yshui/picom ⌇⡢⣕⡙⢁
+      https://github.com/yshui/picom/issues/328
+    TearFree (VSync) option missing in xf86-video-modesetting (modesetting DDX) (#244) · Issues · xorg / xserver · GitLab ⌇⡢⣕⡙⢫
+      https://gitlab.freedesktop.org/xorg/xserver/-/issues/244
+    Modesetting: Per-CRTC framebuffers to provide 32k framebuffers to everyone (and enable Tear-free support) (!24) · Merge requests · xorg / xserver · GitLab ⌇⡢⣕⡛⢡
+      https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/24
+      ::: FAIL: ¦ I'm not sure we have anyone left here at intel who cares about Xorg
+        == modesetting TearFree isn't merged (and doesn't work for Rotated anyway)
+    [X] FIND: why I dropped wayland
+      * no HiDPI in !qtile
+      * screen recording -- unavailable ?
+      * slow XWayland startup for !st
+        (can't give up on !st due to my patches)
+      * MAYBE: tearing on rotated screen won't go away
+      * I'm not ready to search replacements for #monica
+    [$] BET? use WSL or VBox from Windows
+      FAIL: can't reuse /boot partition
+      BAD: space for games and media files is only on encrypted SSD
+      BAD: media can't be played inside VBox -- need VGA forwarding for 2D/3D accel
+      FAIL: don't want to CFG/fight with Windows
+    [⡢⣕⡩⣏] ≈ 10m ALT: rotate single window
+      How to rotate window in X11 - Unix & Linux Stack Exchange ⌇⡢⣕⡧⠥
+        https://unix.stackexchange.com/questions/354678/how-to-rotate-window-in-x11
+      ::: only possible for nested Xephyr or XWayland on Wayland
+        BUT: native !ff can be rotated in Weston easily
+      [_] ALT:TRY: restart !qtile + wayland only for !ff
+        TODO: disable auto-login

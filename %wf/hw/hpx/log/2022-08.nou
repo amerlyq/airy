@@ -1,0 +1,38 @@
+
+2022-08-04-Thu-W31
+  [⡢⣫⣤⠢] 20m+10m <W+me> WKRND:XXX again hurt my ears by volume <⡋⠇> ⌇⡢⣬⠉⣿
+    INFO
+      Suggestions before filing an SOF bug — SOF Project 2.2 documentation ⌇⡢⣪⣡⣘
+        https://thesofproject.github.io/latest/getting_started/intel_debug/suggestions.html?highlight=alsamixer
+      linux - Pulseaudio controls wrong volume bar - Xonar DSX - Super User ⌇⡢⣫⣥⢎
+        https://superuser.com/questions/1117482/pulseaudio-controls-wrong-volume-bar-xonar-dsx
+      sound - Prevent volume keys from changing both ALSA master volume and Ubuntu volume - Ask Ubuntu ⌇⡢⣫⣥⣋
+        https://askubuntu.com/questions/1380917/prevent-volume-keys-from-changing-both-alsa-master-volume-and-ubuntu-volume
+        [≫] FUTURE:TRY: disable unnecessary Master in same way
+      Mistreats headphone port with dysfunctional ALSA Master volume on ICH7 (#393) · Issues · PulseAudio / pulseaudio · GitLab ⌇⡢⣫⣦⠆
+        https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/393
+      [⡢⣫⣨⢀] https://bugzilla.kernel.org/buglist.cgi?quicksearch=HP Spectre x360 ⌇⡢⣫⣧⣸
+    alsa-info
+      Product Name:      HP Spectre x360 Convertible 14-ea1xxx
+      Firmware Version:  F.26
+      System SKU:        4X5C8UA#ABA
+      Board Vendor:      HP
+      Board Name:        89DB
+      ALSA modules:      snd_soc_skl_hda_dsp (card 0)
+      Soundcards recognised by ALSA
+         0 [sofhdadsp      ]: sof-hda-dsp - sof-hda-dsp
+         HP-HPSpectrex360Convertible14_ea1xxx--89DB
+      PCI Soundcards installed in the system:
+         0000:00:1f.3 Multimedia audio controller [0401]: Intel Corporation Tiger Lake-LP Smart Sound Technology Audio Controller [8086:a0c8] (rev 30)
+            Subsystem: Hewlett-Packard Company Device [103c:89da]
+      Codec: Realtek ALC245
+      Simple mixer control 'Headphone',0
+    $ amixer -c 0
+    $ amixer -c 0 info Headphone
+      Card sysdefault:0 'sofhdadsp'/'HP-HPSpectrex360Convertible14_ea1xxx--89DB'
+        Mixer name    : 'Realtek ALC245'
+        Components    : 'HDA:80862812,80860101,00100000 HDA:10ec0245,103c89db,00100001 cfg-dmics:2'
+        Controls      : 46
+        Simple ctrls  : 17
+    ::: TEMP:WKRND: directly control Headphone -- to avoid accidental large volume by !alsamixer
+      $ amixer -c 0 -q set Headphone 1dB-
