@@ -108,10 +108,11 @@ keys = [
     # Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
     # Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
     # Key([], "XF86AudioMute", lazy.spawn("amixer -c 0 -q set Master toggle")),
-    K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Master 1dB+"), desc="Volume up"),
+    ## FIXED:USE: "Headphone" inof "Master" due to SOF driver wrong wiring
+    K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Headphone 1dB+"), desc="Volume up"),
     K(
         "M-<Page_Down>",
-        lazy.spawn("amixer -c 0 -q set Master 1dB-"),
+        lazy.spawn("amixer -c 0 -q set Headphone 1dB-"),
         desc="Volume down",
     ),
     # K("M-x", lazy.spawn(["env", "--chdir=/d/research/clipboard/infinitecopy", "--",
