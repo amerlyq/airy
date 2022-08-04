@@ -19,6 +19,8 @@ def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
 
 
 prev_layout = 0  # lazy.current_group.current_layout
+
+
 def toggle_maxlayout(qtile, laymax: int = 2) -> None:
     global prev_layout
     l = qtile.current_group.current_layout
@@ -83,7 +85,18 @@ keys = [
             Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
             Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
             Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
-            Key([], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"),
+            Key(
+                [], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"
+            ),
+        ]
+        + [
+            Key(
+                [],
+                str(i),
+                lazy.spawn(f"/@/airy/backlight/run-mon-sys -n {i or 10}0%"),
+                desc=f"Brightness-{i or 10}0%",
+            )
+            for i in range(0, 10)
         ],
     ),  # , mode="Launch"
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
@@ -104,10 +117,32 @@ keys = [
     K("M-C-q", lazy.shutdown(), desc="Shutdown Qtile"),
     K("M-e", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
     K("M-<minus>", lazy.spawn("xset dpms force off".split()), desc="Screen off"),
-    ## FAIL: unknown keysym
-    # Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -c 0 -q set Master 1dB+")),
-    # Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -c 0 -q set Master 1dB-")),
-    # Key([], "XF86AudioMute", lazy.spawn("amixer -c 0 -q set Master toggle")),
+    K(
+        "<XF86MonBrightnessDown>",
+        lazy.spawn("/@/airy/backlight/run-mon-sys -n -"),
+        desc="Brightness-",
+    ),
+    K(
+        "<XF86MonBrightnessUp>",
+        lazy.spawn("/@/airy/backlight/run-mon-sys -n +"),
+        desc="Brightness+",
+    ),
+    # KeyChord(
+    #     [mod],
+    #     "<Escape>",
+    #     [
+    #         Key(
+    #             [],
+    #             str(i),
+    #             lazy.spawn(f"/@/airy/backlight/run-mon-sys -n {i or 10}0%"),
+    #             desc=f"Brightness-{i or 10}0%",
+    #         )
+    #         for i in range(0, 10)
+    #     ],
+    # ),
+    K("<XF86AudioRaiseVolume>", lazy.spawn("amixer -c 0 -q set Headphone 1dB+")),
+    K("<XF86AudioLowerVolume>", lazy.spawn("amixer -c 0 -q set Headphone 1dB-")),
+    K("<XF86AudioMute>", lazy.spawn("amixer -c 0 -q set Master toggle")),
     ## FIXED:USE: "Headphone" inof "Master" due to SOF driver wrong wiring
     K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Headphone 1dB+"), desc="Volume up"),
     K(
@@ -207,8 +242,11 @@ screens = [
                 # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
                 # SRC: Support for Window Buttons · Issue #3182 · qtile/qtile ⌇⡢⣪⡶⢎
                 #   https://github.com/qtile/qtile/issues/3182
-                widget.TextBox("[✗]", mouse_callbacks={"Button1": lazy.window.kill()},
-                               foreground="#4040ff"),
+                widget.TextBox(
+                    "[✗]",
+                    mouse_callbacks={"Button1": lazy.window.kill()},
+                    foreground="#4040ff",
+                ),
                 # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
                 # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
                 widget.Clock(

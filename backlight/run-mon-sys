@@ -14,9 +14,12 @@ dir=/sys/class/backlight/$dev
 set_led(){ local val=$1
   val=$((val > max ? max : val < 0 ? 0 : val))
   [[ $O =~ u ]] || ((val < max / 20)) && val=$((max / 20))
+  [[ -t 0 ]] || sudo --non-interactive true 2>/dev/null \
+    || printf 'GETPIN\nBYE\n' | pinentry-qt | sed 's/^D //' | sudo --prompt= --stdin -- true
   [[ -w $dir/brightness ]] || sudo=sudo
   ((val == cur)) || ${sudo-} tee "$dir/brightness" <<< "$val"
-  [[ ! $O =~ n ]] || r.n $'\U0001F4A1' "$((val*100/max))%"
+  # CHG: notify-send NEED: at least dunst RENAME r.n -> ntf
+  # [[ ! $O =~ n ]] || r.n $'\U0001F4A1' "$((val*100/max))%"
 }
 
 max=$(<"$dir/max_brightness")
