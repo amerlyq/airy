@@ -83,3 +83,16 @@ vim.cmd [[
 -- OR: use \dl \dr -- to merge with \df \ds submode
 K('n', '\\l', '<Cmd>LinediffReset<CR>')
 K('x', '\\l', ':Linediff<CR>')
+
+
+
+-- SRC: https://github.com/dhruvasagar/vim-table-mode
+-- NOTE: starts creating table as soon as you type <i C-k vv> '│'
+-- g.table_mode_always_active = 1
+-- g.table_mode_map_prefix = '<Leader>t'
+g.table_mode_corner = '┼'
+-- g.table_mode_corner_corner = '┐'
+-- FAIL: during insert treats unicode as single-byte len
+-- g.table_mode_separator = '│'
+g.table_mode_fillchar = '─'
+g.table_mode_header_fillchar = '─'

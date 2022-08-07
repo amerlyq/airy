@@ -1,4 +1,5 @@
 // vim:ft=cpp
+// VIZ: /usr/include/X11/keysymdef.h
 
 default partial alphanumeric_keys modifier_keys
 xkb_symbols "airy" {
@@ -191,13 +192,13 @@ xkb_symbols "unipunct" {
     key <AE08> { [     8,    asterisk,periodcentered,    multiply  ] };  // 8 * · ×
     key <AE09> { [     9,   parenleft,   bracketleft,   braceleft  ] };  // 9 ( [ {
     key <AE10> { [     0,  parenright,  bracketright,  braceright  ] };  // 0 ) ] }
-    key <AE11> { [ minus,  underscore,        emdash,      endash  ] };  // - _
-    key <AE12> { [ equal,        plus,      notequal,   plusminus  ] };  // = + ≠ ±
+    key <AE11> { [ minus,  underscore,        emdash,horizlinescan5] };  // - _ — ─
+    key <AE12> { [ equal,        plus,      notequal,crossinglines ] };  // = + ≠ ┼   ±
 
 
     key <AD11> { [ bracketleft,   braceleft,   union, intersection ] };  // [ { ∪ ∩   ❲
     key <AD12> { [ bracketright,  braceright, includedin, includes ] };  // ] } ⊂ ⊃   ⟯
-    key <BKSL> { [ backslash,     bar,           brokenbar,  slash ] };  // \ | ¦ /
+    key <BKSL> { [ backslash,     bar,         brokenbar,  vertbar ] };  // \ | ¦ │
  // key <LSGT> { [ U230A,     U230B, U2308, U2309      ] }; // ⌊ ⌋ ⌈ ⌉
 
 

@@ -18,18 +18,6 @@ o.mouse = 'a'
 --Enable break indent
 o.breakindent = true
 
--- Tab/Space
-o.expandtab = true  --Always use spaces for indent
-o.shiftround = true
-o.tabstop = 2
-o.softtabstop = 2
-o.shiftwidth = 2
-
--- Restrain vim from messing with '#' indent in python, etc.
-o.cinkeys:remove({ '0#' })
-o.indentkeys:remove({ '0#' })
-o.commentstring = '# %s'
-
 --Save undo history
 vim.opt.undofile = true
 
@@ -63,7 +51,23 @@ o.foldlevel = 99 -- close folds below this depth, initially
 o.formatoptions:append({ o = true })
 
 
--- Moving ============================
+--- Edit ============================
+-- Tab/Space
+o.expandtab = true  --Always use spaces for indent
+o.shiftround = true
+o.tabstop = 2
+o.softtabstop = 2
+o.shiftwidth = 2
+
+-- Restrain vim from messing with '#' indent in python, etc.
+o.cinkeys:remove({ '0#' })
+o.indentkeys:remove({ '0#' })
+o.commentstring = '# %s'
+
+-- cursor can be positioned anywhere in V-BLOCK mode
+o.virtualedit = 'block'
+
+--- Move ============================
 o.scrolloff = 3     -- context lines visible at screen edge when scroll
 -- set sidescrolloff=4 " keep N columns on side visible when scrolling
 -- set scrolljump=0    " minimum number of lines to scroll, OR: =-50 (50%)
