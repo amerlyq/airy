@@ -20,3 +20,8 @@ pkgs += ["lua-language-server"]
 links = [(Path.cwd(), "~/.config/nvim")]
 
 # TODO: mkdir /@/audit/$HOST/vim
+# mkdir -p ~/.cache/nvim/spell
+# src='http://ftp.vim.org/pub/vim/runtime/spell'
+# for nm in {ru,en,uk}.utf-8.{spl,sug}; do
+#     wget "$src/$nm" -O ~/.cache/nvim/spell/"$nm"
+# done

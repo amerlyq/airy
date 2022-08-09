@@ -17,6 +17,9 @@ ab("/@/airy/vim/ctl/qf", "vq")
 ab("/usr/bin/ranger", ",s")
 ab("/usr/bin/ranger", "fm")
 
+#%USAGE: $ diff -u A B | diff-so-fancy
+ab("/usr/bin/diff-so-fancy", "dfc")
+
 ab("/@/airy/grep/ctl/repo", "re")
 ab("/@/airy/grep/ctl/ia", "rs")
 
