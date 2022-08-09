@@ -1,0 +1,58 @@
+Sed
+http://www.f-notes.info/linux:sed
+
+// Regex for grep and else
+http://www.gnu.org/software/grep/manual/grep.html#Regular-Expressions
+
+// Cool man
+http://www.grymoire.com/unix/sed.html
+http://www.theunixschool.com/2011/09/sed-selective-printing.html
+
+// Sed -- explained regexes
+http://www.catonmat.net/blog/sed-one-liners-explained-part-two/
+
+// Sed -- join lines (after grep -C 2), then you can split them again!
+sed -e :a -e '$!N; s/\n/:/; ta' test.txt
+awk '/^>/ {print (NR==1?"":RS)$0;next} {printf "%s",$0}' file
+http://elehack.net/blog/2012/09/joining-lines-with-sed
+
+// Удаление комментариев из С++
+sed -e '{N; s@\(.*\)//.*$@\1@g}' -e '{N; s@\(.*\)\/\*[^\(\*\/\)]*\|\n*\*\/\(.*\)@\1\2@g}'
+
+http://www.regular-expressions.info/repeat.html#lazy
+
+Joining Lines with sed
+http://elehack.net/blog/2012/09/joining-lines-with-sed
+http://www.unix.com/shell-programming-and-scripting/126374-how-use-sed-join-multiple-lines.html
+
+Cool syntax
+http://superuser.com/questions/394282/sed-perform-only-first-nth-matched-replacement
+
+
+Binary data extraction dtb.bin
+xxd -p dtb.bin | sed ':a; N; s/[\s\n]\+//g; ta' | sed -n 's/.*6d656d6f7279\(00\)*00000003.\{16\}\(.\{8\}\).\{8\}00000002.*/\2/p'
+
+
+Print
+awk -F: '{printf ("%02d:%02d:%02d\n", $1,$2,$3)}'
+
+grep list
+http://stackoverflow.com/questions/12936448/using-grep-to-remove-lines-from-a-file-where-the-keys-exist-in-another-file
+
+Distance between numbers in row
+awk 'NR>2{print $3-a[(NR-2)%3]}{a[NR%3]=$3}' file
+
+Append text ( More portable to use ed; some systems don't support \n in sed )
+printf "/^Hello My love, you're dirty girl/a\nI know, I am, my sexy knight\n.\nw\nq\n" | /bin/ed $filename
+
+Buffered output and immediata (why tee was lagged when dumping COM output)
+http://www.gnu.org/software/gawk/manual/gawk.html#I_002fO-Functions
+
+To be reworked:
+echo 'Hi!'  |  sed 's/.*/Hi!/;q' <(yes)
+
+Awk manual
+http://www.gnu.org/software/gawk/manual/
+
+Заменить слово во всех файлах рекурсивно
+grep -lr --exclude-dir=".git" -e "oldword" . | xargs sed -i "s/oldword/newword/g"
