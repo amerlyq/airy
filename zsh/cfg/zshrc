@@ -223,5 +223,9 @@ zstyle ':completion:*' completer _expand _complete _files _correct _approximate
 
 ############################################################
 # DEP=mcfly NICE: fzf-like Ctrl-R history by frecency/timestamp
-eval "$(mcfly init zsh)"
+# eval "$(mcfly init zsh)"
 # eval "$(thefuck --alias '!' --enable-experimental-instant-mode)"
+
+# HACK: #miur※⡢⣯⢁⢏ pre-fill prompt (inof running) by specified cmdline on ZSH startup
+#   BET: print help notice  above shell-out to use $F / $S vars in cmdline
+# if [[ -n ${ZSH_BUFFER-} ]]; then print -z "$ZSH_BUFFER" && unset ZSH_BUFFER; fi
