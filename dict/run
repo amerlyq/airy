@@ -11,20 +11,21 @@ fdmenu() {
     local fl=~/.local/share/airy/dict-words-${lang:-any}.txt
     mkdir -p "${fl%/*}"
     touch "$fl"
+    local lchg='dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.set_layout'
 
     if [[ $lang ]]; then
-      langprev=$(r.xkb-lang -n)
+      langprev=$(qdbus ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.getCurrentLayout)
       # ^BUG: Changes lang --> but it influences current window also!
       # ALT: change language only after dmenu launched (wmctrl/xdotool &)
       # BETTER: launch $DMENU & pid=$!; then wmctrl $pid wnd and wait $pid
-      { sleep 0.1; r.xkb-lang $lang; } &
+      { sleep 0.1; $lchg uint32:$([[ $lang == en ]] && echo 0 || echo 1); } &
     fi
 
     # FIXED: use reverse order for words
     word=$(tac "$fl" | cut -f2- | awk '!a[$0]++' | $DMENU)  # KEEP
     # WARNING: on errror won't be called, but we can't use trap or it will be
     # run again on EXIT or some independent error/etc in inappropriate place
-    ${langprev:+r.xkb-lang $langprev}
+    ${langprev:+$lchg uint32:$langprev}
 
     [[ $word ]] || return
 
@@ -39,7 +40,7 @@ fvim() {
     # NEED:ENH: simultaneously translate word and then open vim
     l=${lang:0:1}
     l=${l^^}${lang:1}
-    exec r.vim-new -c "Dict $1" -c 'only' -c "call histadd(':', 'Dict $1')" -c 'silent! /\V\[^\w-]\zs'"$l"'\ze-\%('"$l"'\)\@!'
+    exec st -e v -c "Dict $1" -c 'only' -c "call histadd(':', 'Dict $1')" -c 'silent! /\V\[^\w-]\zs'"$l"'\ze-\%('"$l"'\)\@!'
 
     # exec r.tf $EDITOR --noplugin -u ~/.vim/rc/basic -c 'setf markdown' <(dict "$word" | r.dict --filter)
     # exec r.tf $EDITOR -c 'setf markdown' <(dict "$word" |& r.dict --filter)
