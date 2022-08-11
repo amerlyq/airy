@@ -21,20 +21,40 @@ def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
 prev_layout = 0  # lazy.current_group.current_layout
 
 
-def toggle_maxlayout(qtile, laymax: int = 2) -> None:
+def toggle_maxlayout(wm, laymax: int = 2) -> None:
     global prev_layout
-    l = qtile.current_group.current_layout
+    l = wm.current_group.current_layout
     if l == laymax:
         l = prev_layout
     else:
         prev_layout = l
         l = laymax
-    qtile.current_group.use_layout(l)
+    wm.current_group.use_layout(l)
 
 
 mod = "mod4"
 terminal = ["env", "--chdir=/t", cast(str, guess_terminal())]
 ranger = ["st", "-e", "ranger", "--choosedir=/run/user/1000/ranger/cwd", "--"]
+
+mod_open = [
+    Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
+    Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
+    Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
+    Key([], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"),
+] + [
+    Key(
+        [],
+        str(i),
+        lazy.spawn(f"/@/airy/backlight/run-mon-sys -n {i or 10}0%"),
+        desc=f"Brightness-{i or 10}0%",
+    )
+    for i in range(0, 10)
+]
+
+mod_info = [
+    Key([], "e", lazy.spawn(["/@/airy/dict/run", "--en", "--dmenu"]), desc="Tr En"),
+    Key([], "r", lazy.spawn(["/@/airy/dict/run", "--ru", "--dmenu"]), desc="Tr Ru"),
+]
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -78,27 +98,8 @@ keys = [
     K("M-<Return>", lazy.spawn(terminal), desc="Launch terminal"),
     K("M-<space>", lazy.spawn(ranger + ["/@/airy"]), desc="Launch fm"),
     K("M-S-<space>", lazy.spawn(ranger + ["/@/just"]), desc="Launch fm"),
-    KeyChord(
-        [mod],
-        "o",
-        [
-            Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
-            Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
-            Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
-            Key(
-                [], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"
-            ),
-        ]
-        + [
-            Key(
-                [],
-                str(i),
-                lazy.spawn(f"/@/airy/backlight/run-mon-sys -n {i or 10}0%"),
-                desc=f"Brightness-{i or 10}0%",
-            )
-            for i in range(0, 10)
-        ],
-    ),  # , mode="Launch"
+    KeyChord([mod], "o", mod_open),  # , mode="Launch"
+    KeyChord([mod], "i", mod_info),
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
     # Toggle between different layouts as defined below
     K("M-<slash>", lazy.next_layout(), desc="Toggle between layouts"),
