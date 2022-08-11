@@ -38,6 +38,11 @@ local bufgetname = vim.api.nvim_buf_get_name
 local bufcurrent = vim.api.nvim_get_current_buf
 -- local bufloaded = vim.api.nvim_buf_is_loaded
 
+vim.cmd([[
+fun! AirySwitchBuffer(bufnr, mouseclicks, mousebutton, modifiers)
+  execute ":buffer " . a:bufnr
+endf
+]])
 
 local function hide_statusline(t)
   local nr = 0
@@ -129,6 +134,10 @@ local function delcommonpfxsfx(s, t)
   return s, t
 end
 
+local function clickable(bufid, label)
+  return "%" .. bufid .. "@AirySwitchBuffer@" .. label .. "%X"
+end
+
 local function buffers()
   local s = ""
   local prevnm = ""
@@ -145,7 +154,7 @@ local function buffers()
       -- NEED: modify previous entry -- insert !hi=underline group at beg/end pos of reuse
       local snm = delcommonpfxsfx(nm, prevnm)
       local sfx = (mod and '+' or '') -- '●'
-      s = s .. hl .. " " .. snm .. sfx .. " "
+      s = s .. clickable(b, hl .. " " .. snm .. sfx .. " ")
       prevnm = nm
     end
   end
