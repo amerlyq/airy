@@ -1,0 +1,29 @@
+Wacom drivers setup
+Start, All Programs, Accessories, Connect to a Network Projector: 192.168.10.51
+
+STEP 1:
+Go to start > settings > control panel > wacom tablet properties
+Delete any extra pens or tablets or programs.
+
+STEP 2:
+In the Wacom Tablet Properties, set your pen's pressure response to right in the middle so you get a LINEAR response curve.
+
+STEP 3:
+CLOSE THE WACOM TABLET PROPERTIES or else it's going to overwrite the changes you make in Step 6
+
+STEP 4:
+Go to Settings > Control Panel > Adminstrative Tools > Services. Highlight "TabletServiceWacom" and click STOP the service.
+
+STEP 5:
+Go to your Wacom preferences file, which is probably located here:
+C:\Users\d.kolomoiets\AppData\Roaming\WTablet\Wacom_Tablet.dat
+(Back up this file before you go change it, in case you need to revert.)
+
+STEP 6:
+Search for "threshold" until you find the setting for your eraser and tip.
+"PressureCurveControlPoint 40 0 512 512 2047 2047"
+change to 40 0 239 23 1407 2047
+
+STEP 7:
+Go to Settings > Control Panel > Adminstrative Tools > Services.
+Highlight "TabletServiceWacom" and click START the service.

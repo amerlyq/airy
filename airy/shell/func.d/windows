@@ -129,6 +129,7 @@ pairLink()
         # http://stackoverflow.com/questions/21357813/weirdness-when-running-cmd-exe-c-under-git-bash
         cmd //c mklink $ltp "$(unix2win "$1")" "$(unix2win "$2")"
         #: mklink /D где_будет_лежать_ссылка  куда_ссылаться
+        # e.g. mklink /D "c:\Users\имя_пользователя\.VirtualBox" "e:\userf\.VirtualBox"
     else
         ln -sfv "${src}" "${dst}"
     fi
