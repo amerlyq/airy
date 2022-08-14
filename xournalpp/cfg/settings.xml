@@ -3,20 +3,22 @@
 <settings>
   <property name="pressureSensitivity" value="true"/>
   <property name="minimumPressure" value="0.05000000"/>
-  <property name="pressureMultiplier" value="1.00000000"/>
+  <property name="pressureMultiplier" value="2.00000000"/>
   <property name="zoomGesturesEnabled" value="true"/>
-  <property name="selectedToolbar" value="custom Copy"/>
+  <property name="selectedToolbar" value="Right hand Note Taking"/>
   <property name="lastSavePath" value="/@/airy/xournalpp/bkgr"/>
   <property name="lastOpenPath" value=""/>
   <property name="lastImagePath" value=""/>
+  <property name="edgePanSpeed" value="20.00000000"/>
+  <property name="edgePanMaxMult" value="5.00000000"/>
   <property name="zoomStep" value="10.00000000"/>
   <property name="zoomStepScroll" value="2.00000000"/>
-  <property name="displayDpi" value="110"/>
-  <property name="mainWndWidth" value="1666"/>
-  <property name="mainWndHeight" value="1596"/>
+  <property name="displayDpi" value="135"/>
+  <property name="mainWndWidth" value="1500"/>
+  <property name="mainWndHeight" value="1000"/>
   <property name="maximized" value="false"/>
   <property name="showToolbar" value="true"/>
-  <property name="showSidebar" value="true"/>
+  <property name="showSidebar" value="false"/>
   <property name="sidebarWidth" value="166"/>
   <property name="sidebarOnRight" value="false"/>
   <property name="scrollbarOnLeft" value="false"/>
@@ -36,12 +38,12 @@
   <property name="presentationHideElements" value="mainMenubar,sidebarContents"/>
   <!--The cursor icon used with a stylus, allowed values are "none", "dot", "big"-->
   <property name="stylusCursorType" value="dot"/>
-  <property name="highlightPosition" value="false"/>
-  <property name="cursorHighlightColor" value="2164260608"/>
+  <property name="highlightPosition" value="true"/>
+  <property name="cursorHighlightColor" value="1006698465"/>
   <property name="cursorHighlightBorderColor" value="2147483903"/>
-  <property name="cursorHighlightRadius" value="30.00000000"/>
-  <property name="cursorHighlightBorderWidth" value="0.00000000"/>
-  <property name="darkTheme" value="true"/>
+  <property name="cursorHighlightRadius" value="18.00000000"/>
+  <property name="cursorHighlightBorderWidth" value="1.00000000"/>
+  <property name="darkTheme" value="false"/>
   <property name="useStockIcons" value="false"/>
   <property name="disableScrollbarFadeout" value="true"/>
   <!--Hides scroolbars in the main window, allowed values: "none", "horizontal", "vertical", "both"-->
@@ -51,9 +53,9 @@
   <property name="defaultSaveName" value="%F-Note-%H-%M"/>
   <property name="autosaveEnabled" value="true"/>
   <property name="autosaveTimeout" value="3"/>
-  <property name="addHorizontalSpace" value="false"/>
+  <property name="addHorizontalSpace" value="true"/>
   <property name="addHorizontalSpaceAmount" value="150"/>
-  <property name="addVerticalSpace" value="false"/>
+  <property name="addVerticalSpace" value="true"/>
   <property name="addVerticalSpaceAmount" value="150"/>
   <property name="drawDirModsEnabled" value="false"/>
   <property name="drawDirModsRadius" value="50"/>
@@ -88,10 +90,10 @@
   <property name="strokeFilterIgnoreTime" value="150"/>
   <property name="strokeFilterIgnoreLength" value="1.00000000"/>
   <property name="strokeFilterSuccessiveTime" value="500"/>
-  <property name="strokeFilterEnabled" value="true"/>
+  <property name="strokeFilterEnabled" value="false"/>
   <property name="doActionOnStrokeFiltered" value="true"/>
   <property name="trySelectOnStrokeFiltered" value="false"/>
-  <property name="snapRecognizedShapesEnabled" value="false"/>
+  <property name="snapRecognizedShapesEnabled" value="true"/>
   <property name="restoreLineWidthEnabled" value="false"/>
   <property name="numIgnoredStylusEvents" value="0"/>
   <property name="inputSystemTPCButton" value="false"/>
@@ -135,15 +137,37 @@
       <attribute name="tool" type="string" value="selectRegion"/>
     </data>
     <data name="touch">
-      <attribute name="device" type="string" value=""/>
+      <attribute name="device" type="string" value="ELAN072D:00 04F3:315B Mouse"/>
       <attribute name="disableDrawing" type="boolean" value="true"/>
-      <attribute name="tool" type="string" value="none"/>
+      <attribute name="eraserMode" type="string" value="none"/>
+      <attribute name="size" type="string" value="none"/>
+      <attribute name="tool" type="string" value="eraser"/>
     </data>
   </data>
   <data name="deviceClasses">
     <data name="Asus TouchPad">
       <attribute name="deviceClass" type="int" value="1"/>
       <attribute name="deviceSource" type="int" value="0"/>
+    </data>
+    <data name="ELAN072D:00 04F3:315B Mouse">
+      <attribute name="deviceClass" type="int" value="1"/>
+      <attribute name="deviceSource" type="int" value="0"/>
+    </data>
+    <data name="ELAN072D:00 04F3:315B Touchpad">
+      <attribute name="deviceClass" type="int" value="1"/>
+      <attribute name="deviceSource" type="int" value="6"/>
+    </data>
+    <data name="ELAN2514:00 04F3:2BEE">
+      <attribute name="deviceClass" type="int" value="4"/>
+      <attribute name="deviceSource" type="int" value="5"/>
+    </data>
+    <data name="ELAN2514:00 04F3:2BEE Stylus Eraser (0)">
+      <attribute name="deviceClass" type="int" value="3"/>
+      <attribute name="deviceSource" type="int" value="2"/>
+    </data>
+    <data name="ELAN2514:00 04F3:2BEE Stylus Pen (0)">
+      <attribute name="deviceClass" type="int" value="2"/>
+      <attribute name="deviceSource" type="int" value="1"/>
     </data>
     <data name="Kensington Expert Wireless TB Mouse">
       <attribute name="deviceClass" type="int" value="1"/>
@@ -223,7 +247,7 @@
       <attribute name="drawingType" type="string" value="default"/>
     </data>
     <data name="pen">
-      <attribute name="color" type="hex" value="ff0000"/>
+      <attribute name="color" type="hex" value="ff00ff"/>
       <attribute name="drawingType" type="string" value="default"/>
       <attribute name="fill" type="int" value="0"/>
       <attribute name="fillAlpha" type="int" value="128"/>
