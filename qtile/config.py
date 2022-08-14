@@ -3,6 +3,8 @@ import os
 import time
 from typing import cast
 
+from just.ext.datetime.cvt import ts_xts3aw
+from just.ext.datetime.local import ltoday
 from libqtile import bar, hook, layout, qtile, widget
 from libqtile.backend.x11 import window
 from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
@@ -12,6 +14,10 @@ from libqtile.utils import guess_terminal
 from psutil import Process
 
 # pylint:disable=invalid-name
+
+import importlib, sys
+importlib.reload(sys.modules['just.ext.datetime.cvt'])
+from just.ext.datetime.cvt import ts_xts3aw
 
 
 def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
@@ -39,8 +45,11 @@ ranger = ["st", "-e", "ranger", "--choosedir=/run/user/1000/ranger/cwd", "--"]
 mod_open = [
     Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
     Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
+    Key([], "i", lazy.spawn(["st", "-e", "ipython"]), desc="Launch ipython"),
     Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
     Key([], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"),
+    Key([], "v", lazy.spawn(["st", "-e", "v"]), desc="Launch vim"),
+    Key([], "x", lazy.spawn(["/@/airy/xournalpp/run"]), desc="Launch xournal"),
 ] + [
     Key(
         [],
@@ -250,9 +259,12 @@ screens = [
                 ),
                 # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
                 # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
-                widget.Clock(
-                    format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"
+                widget.GenPollText(
+                    func=lambda: ts_xts3aw(ltoday()),
+                    update_interval=60,
+                    foreground="#fd971f",
                 ),
+                # widget.Clock(format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"),
                 widget.Clock(format="%H:%M", update_interval=5),
             ],
             40,
