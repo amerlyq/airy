@@ -1,8 +1,5 @@
-from just.airy.spec import AiryMod
+from just.airy.api import Pkg, Aur
 
-if 'm' not in globals():
-    m = AiryMod()
+Pkg("openconnect")
 
-m.pkgs.append("openconnect")
-
-m.aurs.append("vpn-slice")
+Aur("vpn-slice-git")

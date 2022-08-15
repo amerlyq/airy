@@ -1,4 +1,6 @@
 from just.airy.api import Pkg
 
-Pkg("dkms")
-Pkg("linux-headers")
+## FAIL: does not solve the issues
+##   TEMP:WKRND:USE kernel(cmdline) += i8042.dritek=1
+# Pkg("dkms")
+# Pkg("linux-headers")

@@ -1,3 +1,4 @@
 from just.airy.api import Pkg
 
-Pkg("thermald")
+## FAIL: does not work
+# Pkg("thermald")

@@ -1,23 +1,26 @@
-from just.airy import M
-# pkgs = ["neovim"]
-pkgs = []
+from just.airy.api import Aur, Pkg, ln
 
 # MAYBE: "code-minimap-bin" for minimap.vim
 
 # VIZ. $ nvr to talk to vim from inside ranger
-aurs = ["neovim-git", "neovim-remote"]
+# Pkg("neovim")
+Aur("neovim-git")
+Aur("neovim-remote")
 
 
 # DEPS:(aur/python-lsp-all):
 #   python-pylsp-rope ALSO: pip install pylsp-autoimport && auri python-autoimport
-pkgs += ["python-pylint", "python-lsp-server", "python-lsp-black"]
-aurs += ["python-pylsp-mypy", "python-pyls-isort"]  # python-lsp-isort
+Pkg("python-pylint")
+Pkg("python-lsp-server")
+Pkg("python-lsp-black")
+Aur("python-pylsp-mypy")
+Aur("python-pyls-isort")  # python-lsp-isort
 # pip_inst pyls-isort
 
-pkgs += ["lua-language-server"]
+Pkg("lua-language-server")
 
 ## ALT: don't use symlinks -- always copy whole file, and then install it by PKGBUILD
-links = [(Path.cwd(), "~/.config/nvim")]
+ln(".", under="~/.config/nvim")
 
 # TODO: mkdir /@/audit/$HOST/vim
 # mkdir -p ~/.cache/nvim/spell

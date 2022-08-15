@@ -4,7 +4,7 @@ from just.airy.api import Pkg, cp, ln
 
 Pkg("mesa")
 # Pkg("lib32-mesa")  # BAD: pulls 20+ many pkgs
-Pkg("xf86-video-intel")  # BAD: laggy input as hell
+# Pkg("xf86-video-intel")  # BAD: laggy input as hell
 Pkg("vulkan-intel")
 Pkg("intel-media-driver")  # offloading media decoding HEVC/H.265 micro (HuC)
 

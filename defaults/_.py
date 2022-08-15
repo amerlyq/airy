@@ -26,7 +26,7 @@ ab("/@/airy/grep/ctl/ia", "rs")
 ab("/@/just/ctl", "j")
 ab("/@/just/ctl", "just")
 
-ab("/@/airy/hw/scr/rot")
+ab("/@/airy/hpx/scr/rot")
 ab("/@/airy/init/bin/xcv")
 ab("/@/airy/open/bin/man")
 ab("/@/airy/open/bin/actualee")

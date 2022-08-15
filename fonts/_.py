@@ -1,8 +1,5 @@
-from just.airy.spec import AiryMod
+from just.airy.api import Pkg, Aur
 
-if 'm' not in globals():
-    m = AiryMod()
+Pkg("ttf-dejavu")
 
-m.pkgs.append("ttf-dejavu")
-
-m.aurs.append("ttf-symbola")
+Aur("ttf-symbola")

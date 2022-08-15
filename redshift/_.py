@@ -1,6 +1,5 @@
-from just.airy.spec import m
+from just.airy.api import Aur, ln
 
-# m += AUR("redshift-minimal")
-m.aurs.append("redshift-minimal")
+Aur("redshift-minimal")
 
-# m.links.append(("redshift.conf", "-t", "~/.config/redshift"))
+ln("redshift.conf", under="~/.config/redshift")
