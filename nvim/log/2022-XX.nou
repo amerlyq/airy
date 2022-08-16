@@ -32,3 +32,25 @@
     https://www.vikasraj.dev/blog/lsp-neovim-retrospective
     [>] NICE: !neovim=0.8 will have {au LspAttach}
       -- I can remove lspconfig altogether SEE cfg snip above ※⡢⣦⢔⣾
+
+
+2022-08-15-Mon-W33
+  [⡢⣺⠲⠠] 14:05 ٍ⊞ 35m #nvim USAGE grep and yank all buffers matches ⌇⡢⣺⢚⡰
+    LIOR
+      :call setreg('b', [])
+        OR: :let @b=""
+      :bufdo g//norm!//"Byy | norm!"bp
+      https://stackoverflow.com/questions/19430200/how-to-clear-vim-registers-effectively
+    //e
+      https://www.reddit.com/r/vim/comments/1xc2yr/shortcut_to_jump_to_end_of_search_match/
+      https://stackoverflow.com/questions/5955965/move-to-start-and-end-of-search-lookup
+    :execute "cexpr [] | bufdo vimgrepadd // %" | copen
+      https://vi.stackexchange.com/questions/2904/how-to-show-search-results-for-all-open-buffers
+    :bufdo vimgrepadd threading % | copen
+      https://stackoverflow.com/questions/11975174/how-do-i-search-the-open-buffers-in-vim
+    cdo %s/<search term>/<replace term>/cg
+      https://stackoverflow.com/questions/5686206/search-replace-using-quickfix-list-in-vim/38559267#38559267
+    :let buf=bufnr('%') | exec 'bufdo some_command' | exec 'b' buf
+      https://stackoverflow.com/questions/24726022/how-do-i-prevent-changing-buffer-when-using-the-bufdo-command
+    :vimgrep /\%>10l-/ *.txt  # skip yaml header
+      https://vi.stackexchange.com/questions/29745/search-multiple-buffers-without-replacing

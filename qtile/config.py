@@ -204,11 +204,12 @@ layouts = [
         ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2
     ),
     layout.MonadTall(ratio=0.587),
+    # MAYBE: use maximized layout.Columns() inof this HACK
     layout.Max(),
     # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
-    # layout.TreeTab(),
+    # layout.TreeTab(),  ## FAIL: I need smth similar -- BUT horizontal (like i3)
     # layout.Zoomy(),
 ]
 
@@ -276,16 +277,17 @@ screens = [
 
 # Drag floating layouts.
 mouse = [
-    Drag(
-        [mod],
-        "Button1",
-        lazy.window.set_position_floating(),
-        start=lazy.window.get_position(),
-    ),
-    Drag(
-        [mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()
-    ),
-    Click([mod], "Button2", lazy.window.bring_to_front()),
+    ## DISABLED: interferes with #hpx Tablet and latching #xkb Mod key
+    # Drag(
+    #     [mod],
+    #     "Button1",
+    #     lazy.window.set_position_floating(),
+    #     start=lazy.window.get_position(),
+    # ),
+    # Drag(
+    #     [mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()
+    # ),
+    # Click([mod], "Button2", lazy.window.bring_to_front()),
 ]
 
 dgroups_key_binder = None
