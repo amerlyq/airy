@@ -1,4 +1,3 @@
---%DEBUG: :echo getmatches()
 local M = {}
 
 function M.register()
@@ -19,8 +18,9 @@ function M.register()
   -- local rpfx = '\\v%(^|.*!|\\A@1<=)'
   -- local rsfx = '%(!.*|[:?*.=~]+|\\A@=|$)'
   local rpfx = '\\v<'
-  local rsfx = '%(>|[:?=])'
+  local rsfx = '%([:=?!]|>)'
 
+  -- DEBUG: :echo getmatches()
   vim.fn.clearmatches()
   for hlgrp, vrgx in pairs(spec.patterns) do
     matchadd(hlgrp, rpfx .. vrgx .. rsfx, -1)
