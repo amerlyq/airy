@@ -6,6 +6,7 @@ Pkg("pipewire")
 # Pkg("lib32-pipewire")  # BAD: too many deps
 Pkg("pipewire-alsa")
 Pkg("pipewire-pulse")
+# pacman -Ss pipewire-media-session
 Pkg("wireplumber")
 Pkg("qpwgraph")
 
