@@ -110,6 +110,8 @@ keys = [
     KeyChord([mod], "o", mod_open),  # , mode="Launch"
     KeyChord([mod], "i", mod_info),
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
+    K("M-<bracketleft>", lazy.next_screen(), desc="Toggle between screens"),
+    K("M-<bracketright>", lazy.next_screen(), desc="Toggle between screens"),
     # Toggle between different layouts as defined below
     K("M-<slash>", lazy.next_layout(), desc="Toggle between layouts"),
     # K("M-slash", lazy.next_layout(), desc="Toggle between layouts"),
@@ -292,7 +294,7 @@ mouse = [
 
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: list
-follow_mouse_focus = True
+follow_mouse_focus = False
 bring_front_click = False
 cursor_warp = False
 floating_layout = layout.Floating(

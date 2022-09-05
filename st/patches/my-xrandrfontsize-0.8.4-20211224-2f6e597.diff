@@ -2,9 +2,9 @@ diff --git a/config.def.h b/config.def.h
 index f92798a..517abbb 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -9,5 +9,20 @@
+@@ -9,5 +9,23 @@
  static int borderpx = 2;
- 
+
 +/*
 + * Override/adjust fontsize of choosen monitors:
 + */
@@ -17,6 +17,9 @@ index f92798a..517abbb 100644
 +	{"HDMI-0", -20},  // NOTE: useful for <mf> fullscreen (when split removed)
 +	{"HDMI-0~1", -20},  // BUG:(ignored DPI=220): = 20 is eqv to 10pt (DPI=110)
 +	{"HDMI-0~2", -14},
++	{"DP-1", -20},
++	{"DP-1~1", -20},
++	{"DP-1~2", -14},
 +};
 +float winmovethreshold = 0.6;
 +
@@ -36,7 +39,7 @@ index aaa54ff..2d28597 100644
 --- a/config.mk
 +++ b/config.mk
 @@ -24,5 +24,7 @@ LIBS = -L$(X11LIB) -lm -lrt -lX11 -lutil -lXft -lXrender\
- 
+
 +LIBS += -lXrandr
 +
  # flags
@@ -52,13 +55,13 @@ index 684311c..ce1c418 100644
  #include <X11/Xft/Xft.h>
  #include <X11/XKBlib.h>
 +#include <X11/extensions/Xrandr.h>
- 
+
  char *argv0;
  #include "arg.h"
 @@ -45,5 +46,18 @@ typedef struct {
  	signed char appcursor; /* application cursor */
  } Key;
- 
+
 +typedef struct {
 +	const char *name;
 +	float defaultfontsize;
@@ -78,7 +81,7 @@ index 684311c..ce1c418 100644
  	[PropertyNotify] = propnotify,
  	[SelectionRequest] = selrequest,
  };
- 
+
 +static double defaultrelfontsize = 0;
 +static MonitorInfo *monitors_info = NULL;
 +static int monitors_num = 0;
@@ -90,7 +93,7 @@ index 684311c..ce1c418 100644
 @@ -2280,6 +2280,144 @@ xseturgency(int add)
  	XFree(h);
  }
- 
+
 +static void
 +cachemonitorinfo()
 +{
@@ -246,11 +249,11 @@ index 684311c..ce1c418 100644
 +
  	if (e->xconfigure.width == win.w && e->xconfigure.height == win.h)
  		return;
- 
+
 @@ -2469,6 +2469,22 @@ run(void)
  		}
  	} while (ev.type != MapNotify);
- 
+
 +	int rr_event_base, rr_error_base, rr_major, rr_minor;
 +	if (!XRRQueryExtension (xw.dpy, &rr_event_base, &rr_error_base) ||
 +	    !XRRQueryVersion (xw.dpy, &rr_major, &rr_minor) ||
@@ -269,7 +272,7 @@ index 684311c..ce1c418 100644
 +
  	ttyfd = ttynew(opt_line, shell, opt_io, opt_cmd);
  	cresize(w, h);
- 
+
 @@ -2500,6 +2500,16 @@ run(void)
  			XNextEvent(xw.dpy, &ev);
  			if (XFilterEvent(&ev, None))
