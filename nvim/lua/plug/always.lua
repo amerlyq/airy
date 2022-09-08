@@ -61,7 +61,7 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done {
 
 
 require('pretty-fold').setup()
-require('pretty-fold.preview').setup()
+require('fold-preview').setup()
 
 
 require 'plug.telescope'

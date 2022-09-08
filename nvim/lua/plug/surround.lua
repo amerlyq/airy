@@ -1,20 +1,30 @@
 require("nvim-surround").setup {
   keymaps = {
     -- ALSO:TODO: use <C-q> for insert mappings
-    insert = "q", -- qa | ys
-    insert_line = "Q", -- ql | yss
-    visual = "q",
-    delete = "ds", -- qd
-    change = "cs", -- qr
+    -- insert = "q", -- qa | ys
+    -- insert_line = "Q", -- ql | yss
+    -- visual = "q",
+    -- delete = "ds", -- qd
+    -- change = "cs", -- qr
+    insert = "<C-g>s",
+    insert_line = "<C-g>S",
+    normal = "ys",
+    normal_cur = "yss",
+    normal_line = "yS",
+    normal_cur_line = "ySS",
+    visual = "S",
+    visual_line = "gS",
+    delete = "ds",
+    change = "cs",
   },
-  delimiters = {
+  surrounds = {
     -- invalid_key_behavior = function()
     --   vim.api.nvim_err_writeln(
     --     "Error: Invalid character! Configure this message in " ..
     --     'require("nvim-surround").setup()'
     --   )
     -- end,
-    pairs = {
+    -- pairs = {
       -- ["("] = { "( ", " )" },
       -- [")"] = { "(", ")" },
       -- ["{"] = { "{ ", " }" },
@@ -24,20 +34,20 @@ require("nvim-surround").setup {
       -- ["["] = { "[ ", " ]" },
       -- ["]"] = { "[", "]" },
 
-      ["“"] = { '“', '”' },
-      ["«"] = { '«', '»' },
-      ["‹"] = { '‹', '›' },
+      ["“"] = { add = { '“', '”' } },
+      ["«"] = { add = { '«', '»' } },
+      ["‹"] = { add = { '‹', '›' } },
 
-      ["$"] = { '${', '}' },
-      ["@"] = { '${', '[@]}' },
+      ["$"] = { add = { '${', '}' } },
+      ["@"] = { add = { '${', '[@]}' } },
 
-      ["x"] = { '⦅', '⦆' },
-      ["e"] = { '⸢', '⸥' },
-      ["B"] = { '⦏', '⦐' },
-      ["m"] = { '【', '】' },
+      ["x"] = { add = { '⦅', '⦆' } },
+      ["e"] = { add = { '⸢', '⸥' } },
+      ["B"] = { add = { '⦏', '⦐' } },
+      ["m"] = { add = { '【', '】' } },
 
       -- Define pairs based on function evaluations!
-      ["i"] = function()
+      ["i"] = { add = function()
         return {
           require("nvim-surround.utils").get_input(
             "Enter the left delimiter: "
@@ -46,15 +56,15 @@ require("nvim-surround").setup {
             "Enter the right delimiter: "
           )
         }
-      end,
-      ["f"] = function()
+      end },
+      ["f"] = { add = function()
         return {
           require("nvim-surround.utils").get_input(
             "Enter the function name: "
           ) .. "(",
           ")"
         }
-      end,
+      end },
 
       -- ["a"] = {
       --   { "this", "has", "several", "lines" },
@@ -72,18 +82,18 @@ require("nvim-surround").setup {
       -- b = { "<b>", "</b>" },
       -- i = { "<i>", "</i>" },
       -- u = { "<u>", "</u>" },
-    },
-    separators = {
+    -- },
+    -- separators = {
       -- ["'"] = { "'", "'" },
       -- ['"'] = { '"', '"' },
       -- ["`"] = { "`", "`" },
 
-      [" "] = { " ", " " },
-      ["*"] = { "*", "*" },
-      ["_"] = { "_", "_" },
-      ["~"] = { "~", "~" },
-      ["·"] = { '·', '·' },
-    },
+      [" "] = { add = { " ", " " } },
+      ["*"] = { add = { "*", "*" } },
+      ["_"] = { add = { "_", "_" } },
+      ["~"] = { add = { "~", "~" } },
+      ["·"] = { add = { '·', '·' } },
+    -- },
     -- HTML = {
     --   ["t"] = "type", -- Change just the tag type
     --   ["T"] = "whole", -- Change the whole tag contents
