@@ -43,3 +43,79 @@
         Simple ctrls  : 17
     ::: TEMP:WKRND: directly control Headphone -- to avoid accidental large volume by !alsamixer
       $ amixer -c 0 -q set Headphone 1dB-
+
+
+2022-09-10-Sat-W36
+  [•] 15m #hpx CFG linux powersave
+    [•] 5m detailed monitoring by device
+      $ awk '{print $1*10^-6 " W"}' /sys/class/power_supply/BAT0/power_now
+      $ upower --monitor-detail
+      $ sudo tlp-stat -s
+    [•] 10m intel driver options
+      Intel(R) Speed Select Technology User Guide — The Linux Kernel 5.10.0-rc1+ documentation ⌇⡣⠜⢂⡘
+        https://www.infradead.org/~mchehab/kernel_docs/admin-guide/pm/intel-speed-select.html
+      intel_pstate CPU Performance Scaling Driver — The Linux Kernel documentation ⌇⡣⠜⢂⡚
+        https://www.kernel.org/doc/html/v5.0/admin-guide/pm/intel_pstate.html
+      RE: [PATCH v4 2/2] cpufreq: intel_pstate: Implement passive mode with HWP enabled - Doug Smythies ⌇⡣⠜⢂⡢
+        https://lore.kernel.org/linux-pm/000401d668d7$426d8760$c7489620$@net/
+      RRZE-HPC/likwid: Performance monitoring and benchmarking suite ⌇⡣⠜⢂⡋
+        https://github.com/RRZE-HPC/likwid
+    [_] FIND: list everything I can disable
+    [_] FIND: #windows :: monitor power draw
+    [_] CFG #hpx tlp/tlpui
+    [_] FIND: if blacklisting modprobe will poweroff device
+      OR not -- and device will run on full power
+
+
+2022-09-11-Sun-W36
+  [+] 23:00 ⊞ 1h45m #hpx CFG windows powerdraw
+  [⡣⠞⠾⣉] 1h10m #hpx CFG linux powersave
+    [%] 21:50 10m windows
+      How to check power usage on Windows PC? ⌇⡣⠞⠮⣁
+        https://ccm.net/computing/windows/1479-check-the-energy-consumption-of-your-pc-in-windows/
+      Open Hardware Monitor - Core temp, fan speed and voltages in a free software gadget ⌇⡣⠞⠮⣵
+        https://openhardwaremonitor.org/
+      How to measure your PC's total power consumption ⌇⡣⠞⠯⠸
+        https://www.thewindowsclub.com/how-to-measure-your-pcs-total-power-consumption
+      How to Check Your PC Power Consumption (3 METHODS) ⌇⡣⠞⠯⡍
+        https://asapguide.com/check-pc-power/
+    [⡣⠞⠾⣅] 22:00 1h linux
+      [_] SEE: b -r powersave
+      [•] SEE: b -r power2
+        [⡣⠞⠺⢬] Improve Battery Life on Linux Laptop to the Extreme | encomHat ⌇⡣⠞⠶⡇
+          https://encomhat.com/2021/09/linux-laptop-battery/
+            /etc/tmpfiles.d/energy_performance_preference.conf
+              w /sys/devices/system/cpu/cpufreq/policy?/energy_performance_preference - - - - power
+            -1W $ sudo cpupower frequency-set -g powersave
+            -2W $# echo powersupersave > /sys/module/pcie_aspm/parameters/policy
+            -½W $ echo "options i915 enable_guc=2 enable_dc=4 enable_fbc=1 enable_psr=1 enable_psr2_sel_fetch=1 disable_power_well=1" > /etc/modprobe.d/i915.conf
+            -1W * switching Rapid Storage off in the BIOS
+              [!] BAD? vmd driver -- CPU never below C2
+                Intel VMD Driver Lands For Linux 4.5 Along With Other PCI Changes - Phoronix ⌇⡣⠟⢍⠞
+                  https://www.phoronix.com/news/Linux-4.5-PCI-Updates
+                Bug List ⌇⡣⠟⢍⡜
+                  https://bugzilla.kernel.org/buglist.cgi?quicksearch=vmd
+            -½W * wireless card
+        Scaling governor gets set to powersave with intel_pstate in passive mode (#91) · Issues · Bastien Nocera / power-profiles-daemon · GitLab ⌇⡣⠞⠶⣙
+          https://gitlab.freedesktop.org/hadess/power-profiles-daemon/-/issues/91
+        [v2,2/3] cpufreq: intel_pstate: Support of energy performance hint using HWP - Patchwork ⌇⡣⠞⠷⠠
+          https://patchwork.kernel.org/project/linux-pm/patch/1481059937-193048-3-git-send-email-srinivas.pandruvada@linux.intel.com/
+        [_] OFF: intel_pstate CPU Performance Scaling Driver — The Linux Kernel documentation ⌇⡣⠞⠷⢬
+          https://01.org/linuxgraphics/gfx-docs/drm/admin-guide/pm/intel_pstate.html
+        [_] Manage Wi-Fi latency and dynamic power-savings on Linux | Ctrl blog ⌇⡣⠞⠺⢥
+          https://www.ctrl.blog/entry/linux-wifi-dpm-latency.html
+          $ iw dev
+          $ iw dev wlan0 get power_save
+          $ iw dev wlan0 set power_save on
+        [%⡣⠞⠻⣯] How to optimize laptop battery life with TLP on Linux - Linux Tutorials - Learn Linux Configuration ⌇⡣⠞⠻⣤
+          https://linuxconfig.org/how-to-optimize-laptop-battery-life-with-tlp-on-linux
+          $ cat /sys/module/snd_hda_intel/parameters/power_save
+        [⡣⠞⠽⡺] NICE Power Management | System Analysis and Tuning Guide | SUSE Linux Enterprise Server 15 SP1 ⌇⡣⠞⠼⣡
+          https://documentation.suse.com/sles/15-SP1/html/SLES-all/cha-tuning-power.html
+          $ cpupower -c all frequency-info
+          $ sudo cpupower monitor
+          $# echo 7 > /sys/module/cpufreq/parameters/debug
+          $ sudo powertop --auto-tune
+        [•] Chapter 15. Importance of power management Red Hat Enterprise Linux 8 | Red Hat Customer Portal ⌇⡣⠞⠾⡄
+          https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/importance-of-power-management_monitoring-and-managing-system-status-and-performance
+          https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/power_management_guide/index

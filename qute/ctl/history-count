@@ -2,8 +2,22 @@
 #%SUMMARY: count visited links -- yesterday from 18:30 to 22:30
 set -euo pipefail
 
-db=${XDG_DATA_HOME:-~/.local/share}/qutebrowser/history.sqlite
-ts=$(date +%s -d 'today - 24 hours + 6 hours')
+# db=${XDG_DATA_HOME:-~/.local/share}/qutebrowser/history.sqlite
+db=~/.local/qute-proxy/data/history.sqlite
 
-exec sqlite3 "$db" \
-  "SELECT count(*) FROM History WHERE atime > $ts AND url NOT LIKE '%soundcloud%'"
+# OR: ts=$(date +%s -d 'today - 24 hours + 6 hours')
+ts="unixepoch('now', '-2 days')"
+
+# SELECT strftime("%H:%M", h.visit_date/1000000, 'unixepoch', 'localtime'), p.url
+# FROM moz_places p, moz_historyvisits h
+# WHERE p.id = h.place_id AND h.visit_date/1000000 > unixepoch('now', '-1 days')
+# ORDER BY h.visit_date
+sqlite3 "$db" -separator ' ' <<EOT
+SELECT count(*) FROM History WHERE atime > $ts AND url NOT LIKE '%soundcloud%';
+
+SELECT strftime("%H:%M", atime, 'unixepoch', 'localtime'), url
+FROM History
+WHERE atime > $ts
+  AND url NOT LIKE '%soundcloud%'
+ORDER BY atime;
+EOT
