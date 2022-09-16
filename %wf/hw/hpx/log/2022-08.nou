@@ -119,3 +119,47 @@
         [•] Chapter 15. Importance of power management Red Hat Enterprise Linux 8 | Red Hat Customer Portal ⌇⡣⠞⠾⡄
           https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/importance-of-power-management_monitoring-and-managing-system-status-and-performance
           https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/power_management_guide/index
+
+
+2022-09-14-Wed-W37
+  [_] #hpx CFG TRY: disable RST ⌇⡣⠤⢖⡟
+    ¦ On the taskbar, click the search box, and then type Intel Rapid Storage
+    ¦ Technology . Click Intel Rapid Storage Technology. The Intel Rapid
+    ¦ Storage Technology window is displayed. On the Intel Optane memory tab,
+    ¦ click Disable to disable the Intel Optane memory.
+    OR: Disable Intel RST from BIOS Setup by resetting the SATA Mode parameter
+    from RAID (or one of the Optane settings) to AHCI.
+   INFO
+    NVMe SSD PCI device will be invisible when Intel VMD is enabled - Lenovo ThinkSystem - Lenovo Support US ⌇⡣⠢⠫⣽
+      https://datacentersupport.lenovo.com/us/en/products/servers/thinksystem/sn550/7x16/solutions/ht506197-nvme-ssd-pci-device-will-be-invisible-when-intel-vmd-is-enabled-lenovo-thinksystem
+    Trying to boot with Intel-VMD enabled - Issues & Assistance - Garuda Linux Forum ⌇⡣⠢⠬⠅
+      https://forum.garudalinux.org/t/trying-to-boot-with-intel-vmd-enabled/4774
+        But, let's look at each of the bullet points and expand on them:
+          Change SATA mode to AHCI in system configuration of my Dell Precision 7920 (BIOS system settings)
+          Enable Intel VMD in the system configuration
+        These should be straightforward as they are BIOS/EFI settings.
+          add "vmd" module to /etc/mkinitcpio.conf
+        Add the module vmd to the MODULES list, then run sudo mkinitcpio -P to regenerate all initramfs.
+          add nvme_load=YES
+        Edit /etc/default/grub and add nvme_load=YES to GRUB_CMDLINE_LINUX line, then regenerate the GRUB menu with sudo grub-mkconfig -o /boot/grub/grub.cfg .
+    [_] 213047 – VMD created PCI bridge lacks ACPI companion device - no d3cold support for NVMe ⌇⡣⠢⠬⢅
+      https://bugzilla.kernel.org/show_bug.cgi?id=213047
+    [_] VMD Controller - Can it stay disabled? : intel ⌇⡣⠢⠬⢵
+      https://www.reddit.com/r/intel/comments/vb91k0/vmd_controller_can_it_stay_disabled/
+    [_] HACK: advanced/hidden bios settings -- TRY: to disable VMD
+      [•] SSD playing hide and seek? | Linux.org ⌇⡣⠢⠭⠽
+        https://www.linux.org/threads/ssd-playing-hide-and-seek.31926/
+        ¦ I discovered that Acer BIOS have hidden options, unlocked with Ctrl+S
+      [•] Access Advanced BIOS Settings in HP Laptop [2022 Guide] ⌇⡣⠢⠭⡰
+        https://10scopes.com/access-advanced-bios-settings-hp/
+        ¦ Press Alt+F1 to unlock the hidden settings. If nothing happens, press Shift+F1 or Ctrl+F1
+      [_] How to get advanced bios - HP Support Community - 8095143 ⌇⡣⠢⠭⢳
+        https://h30434.www3.hp.com/t5/Notebook-Operating-System-and-Recovery/How-to-get-advanced-bios/td-p/8095143
+        ~ Boot up your computer. When you see the startup logo screen, press
+          CTRL+F10 and then CTRL+F11 to get into the BIOS. (It only works for
+          some computer and you may need to try it for a few times until you get in).
+        ~ Boot up your computer and then press the F8, F9, F10 or Del key to
+          get in to BIOS. Then quickly press the A key to show the Advanced settings.
+        ~ In the BIOS, press Fn+Tab for 3 times.
+      [?] How do I access advanced BIOS settings in HP? - Quora ⌇⡣⠢⠮⠚
+        https://www.quora.com/How-do-I-access-advanced-BIOS-settings-in-HP
