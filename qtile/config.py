@@ -311,6 +311,9 @@ floating_layout = layout.Floating(
         Match(
             wm_class="copyq"
         ),  # doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
+        # WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST
+        # WM_CLASS(STRING) = "onboard", "Onboard"
+        Match( wm_class="onboard"),
     ]
 )
 auto_fullscreen = True
