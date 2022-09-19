@@ -163,3 +163,73 @@
         ~ In the BIOS, press Fn+Tab for 3 times.
       [?] How do I access advanced BIOS settings in HP? - Quora ⌇⡣⠢⠮⠚
         https://www.quora.com/How-do-I-access-advanced-BIOS-settings-in-HP
+
+
+2022-09-17-Sat-W37
+  [X] 40m #hpx CFG TRY: disable RST ※⡣⠤⢖⡟
+    [$] OR:TRY: switch by Windows
+    [<] ALSO:TRY: blacklist "vmd" module and try load system
+      [$] &1st FIND:CHECK: flashdrive with linux will boot
+      ::: FAIL: cryptsetup can't find disk  # blacklist vmd
+    [⡣⠦⠢⡥] 22:00 35m FIND: maybe Intel Optane -- impossible to switch to AHCI
+      Can Intel® Optane™ Memory products be used in SATA... ⌇⡣⠦⠚⢵
+        https://www.intel.com/content/www/us/en/support/articles/000056844/memory-and-storage/intel-optane-memory.html
+        Some 11th Generation mobile platforms support Intel® VMD and the
+          settings for the SATA controller in the BIOS differ from the one noted
+          above. See How to Configure RAID or Intel® Optane™ Memory with Intel®
+          RST on an Intel® VMD Capable Platform.
+        Other SATA modes like AHCI and/or IDE are not compatible.
+        Changing the BIOS configuration (SATA mode) requires an OS reinstallation.
+        If Intel® Optane™-related settings cannot be found in the BIOS
+          environment, check with the system/motherboard manufacturer (OEM) for
+          system compatibility with Intel® Optane™ memory.
+      [$] VMD 1.9 Linux Release Notes ⌇⡣⠦⠛⡠
+        https://www.ks.uiuc.edu/Research/vmd/current/linuxrelnotes.html
+      Driver for new VMD device [LWN.net] ⌇⡣⠦⠛⡵
+        https://lwn.net/Articles/662206/
+      211879 – S0ix: Unable to achieve S0ix on Dell XPS 13 9310 ⌇⡣⠦⠛⢞
+        https://bugzilla.kernel.org/show_bug.cgi?id=211879
+        $ cat /sys/class/drm/card0/power/rc6_residency_ms
+        $ sudo cat /sys/kernel/debug/pmc_core/package_cstate_show
+        $# dmesg -C && ./turbostat -o ts.out rtcwake -m freeze -s 60 && dmesg > dmesg.out
+        $ ./turbostat -o ts-idle.out sleep 60
+        $ sudo cat /sys/kernel/debug/dri/0/i915_dmc_info
+          zero DC5 -> DC6 transitions, and the counter for DC3 -> DC5
+          transitions keeps incrementing even over suspend cycles
+            "By design, DC5 value is reset after DC9 entry." it would mean DC9 is never entered
+        W10 tool $ powercfg.exe /SleepStudy
+        $# cat /sys/devices/system/cpu/cpuidle/low_power_idle_system_residency_us
+        $# cat /sys/devices/system/cpu/cpuidle/low_power_idle_cpu_residency_us
+        In order to get S0ix, the first step is to enter PC10.
+        Looks like your gfx driver and DMC FW is loaded.
+        Also suggest check PCI device D3 status:
+          $ echo -n "file pci-driver.c +p" > /sys/kernel/debug/dynamic_debug/control
+          $ echo N > /sys/module/printk/parameters/console_suspend
+          $ echo 1 > /sys/power/pm_debug_message
+          $ turbostat -o tc.out rtcwake -m freeze -s 60
+          after resume back, check turbostat log: tc.log and dmesg log: dmesg | grep "PCI PM"
+        Currently you are running snd_hda_intel, which is a legacy driver.
+          TRY: sof /etc/modprobe.d/alsa-base.conf
+          options snd-intel-dspcfg dsp_driver=3
+          Then reboot and double check the PC10 status.
+          $ lspci -vvv -s 0000:00:1f.3
+            Kernel driver in use: sof-audio-pci-intel-tgl
+            Kernel modules: snd_hda_intel, snd_sof_pci_intel_tgl
+        ::: For S0ix, currently mainline kernel VMD Linux driver has issue to
+          put NVMe PCIe root port into D3cold, which is working in progress.
+        PCIe root ports D3hot should be the issue.
+          [ 1098.929935] pcieport 10000:e0:06.0: PCI PM: Suspend power state: D3hot
+          [ 1098.966037] pcieport 0000:00:1c.0: PCI PM: Suspend power state: D3hot
+          [ 1098.966050] pcieport 0000:00:1d.0: PCI PM: Suspend power state: D3hot
+      [!] 213047 – VMD created PCI bridge lacks ACPI companion device - no d3cold support for NVMe ⌇⡣⠦⠞⢏
+        https://bugzilla.kernel.org/show_bug.cgi?id=213047
+      213717 – S0ix: can't reach s0ix - HP Spectre 13-aw2002 ⌇⡣⠦⠟⡈
+        https://bugzilla.kernel.org/show_bug.cgi?id=213717
+        $ cat /sys/devices/system/cpu/cpuidle/low_power_idle_cpu_residency_us
+        $ sudo cat /sys/module/pcie_aspm/parameters/policy
+      215063 – S0ix: can't reach s0ix with VMD and raid mode - Dell XPS 13 9305 ⌇⡣⠦⠡⢖
+        https://bugzilla.kernel.org/show_bug.cgi?id=215063
+        intel/S0ixSelftestTool: S0ix Selftest Tool is designed to do the initial debugging for the S2idle path CPU Package C-state and S0ix failures in Linux OS for Intel® Client platforms, it also supports the basic runtime PC10 status check. ⌇⡣⠦⠡⣨
+          https://github.com/intel/S0ixSelftestTool
+      215367 – S0ix: not able to enter S0ix, low_power_idle_system_residency_us 0 - XPS 13 7390 ICL ⌇⡣⠦⠡⣰
+        https://bugzilla.kernel.org/show_bug.cgi?id=215367
