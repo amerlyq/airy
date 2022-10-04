@@ -190,7 +190,7 @@
       211879 – S0ix: Unable to achieve S0ix on Dell XPS 13 9310 ⌇⡣⠦⠛⢞
         https://bugzilla.kernel.org/show_bug.cgi?id=211879
         $ cat /sys/class/drm/card0/power/rc6_residency_ms
-        $ sudo cat /sys/kernel/debug/pmc_core/package_cstate_show
+        NICE: $ sudo cat /sys/kernel/debug/pmc_core/package_cstate_show
         $# dmesg -C && ./turbostat -o ts.out rtcwake -m freeze -s 60 && dmesg > dmesg.out
         $ ./turbostat -o ts-idle.out sleep 60
         $ sudo cat /sys/kernel/debug/dri/0/i915_dmc_info
