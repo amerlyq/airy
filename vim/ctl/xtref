@@ -89,7 +89,10 @@ EOT
   local r_dwk='\b(20[0-9][0-9])-(0[0-9]|1[012])-([012][0-9]|3[01])\b'
 
   local r_braille="(${alt_braille%|}){4}"
-  local r_addr="($r_z85|$r_braille)"
+
+  ## DISABLED:(z85): old xtrefs, not using them; and I'm too lazy to cvt
+  # local r_addr="($r_z85|$r_braille)"
+  local r_addr=$r_braille
 
   args=( --options='NONE'
     ${recursive+--recurse}
@@ -109,7 +112,10 @@ EOT
     --kinddef-xtref='d,dayweek,same day context'
     --regex-xtref="/($pf_anchor$r_addr)/\\1/a/"
     --regex-xtref="/($pf_referer$r_addr)/\\1/r/"
-    --regex-xtref="/($r_dwk)/\\1/d/"
+
+    ## DISABLED: no WF to use dates for now but .xtref file size doubles
+    # --regex-xtref="/($r_dwk)/\\1/d/"
+
     --languages='xtref'
 
     # FAIL:(does not work): --exclude='/home/amer/aura/items/*'
