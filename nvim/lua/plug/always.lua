@@ -36,7 +36,8 @@ require('dressing').setup()
 
 -- MORE: https://github.com/windwp/nvim-autopairs
 require('nvim-autopairs').setup {
-  -- enable_check_bracket_line = false,
+  -- disable_filetype = { "TelescopePrompt", "lisp" },
+  enable_check_bracket_line = false,
   map_c_h = true,
   check_ts = true,
 }

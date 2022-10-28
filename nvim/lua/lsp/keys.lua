@@ -31,7 +31,7 @@ local function lsp_mappings(client, bufnr)
 
   -- vim.api.nvim_buf_set_keymap(bufnr, '<LocalLeader>F', '<cmd>lua B.formatting()<CR>')
   KBn(',F', function() B.format { async = true } end, "formatting [LSP]")
-  vim.api.nvim_create_user_command("Format", B.formatting, {})
+  vim.api.nvim_create_user_command("Format", B.format, {})
 
   -- nnoremap <silent> g0    <cmd>lua B.document_symbol()<CR>
   KBn('gW', B.workspace_symbol, "workspace_symbol [LSP]")
