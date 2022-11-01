@@ -30,6 +30,7 @@ fi
 # folder=$(ydl --dump-single-json -- "$playlist" | jq -r '.title')
 ## BAD:ELEG: queries/prints playlist name for each file in playlist
 folder=$({ ydl --get-filename -o '%(playlist_title)s' \
+  --sleep-requests 1 --sleep-interval 1 \
   -- "$playlist" 2>/dev/null || exit $(($?==120?0:$?)); } | head -1)
 [[ -n $folder ]] || { >&2 echo "Err: unknown folder"; exit 1; }
 
@@ -49,4 +50,6 @@ ydl --xattrs --ignore-errors \
   --format='bestaudio/best' \
   --output='%(playlist_index)s - %(title)s.%(ext)s' \
   --download-archive='.youtube-dl.txt' \
+  --sleep-requests 5 \
+  --sleep-interval 5 \
   "$playlist"
