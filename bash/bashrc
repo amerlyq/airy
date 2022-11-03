@@ -27,7 +27,7 @@ HISTFILESIZE=10000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+[[ $DISPLAY ]] && shopt -s checkwinsize
 
 # Expand aliases to be available in scripts
 # shopt -s expand_aliases
@@ -50,10 +50,8 @@ stty -echoctl
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
-  if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+  if [[ -r /usr/share/bash-completion/bash_completion ]]; then
     source /usr/share/bash-completion/bash_completion
-  elif [[ -f /etc/bash_completion ]]; then
-    source /etc/bash_completion
   fi
 fi
 
@@ -72,4 +70,4 @@ bind -x '"\C-o": _xc_copy_output'
 BASH_AIRY=$(readlink -e "$BASH_SOURCE")
 BASH_AIRY=${BASH_AIRY%/*}
 source "$BASH_AIRY/prompt"
-source ~/.shell/common
+# source ~/.shell/common

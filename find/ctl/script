@@ -12,7 +12,7 @@
 # ----------
 (($#)) && dir=$1 && shift
 (($#)) && interp=${1:+\\b$1\\b} && shift
-(($#)) && set -- -exec ag --vimgrep "$@" -- {} \; || {
+(($#)) && set -- -exec rg --vimgrep "$@" -- {} \; || {
   # TODO: find all bash scripts and sort them by rev date
   #   => useful to find my last ideas implemented to copy-paste
   # ALT: annotate pathes by date in normal format %Y-%m-%d

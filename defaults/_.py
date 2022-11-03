@@ -1,6 +1,8 @@
 from just.airy.api import ln
 
-ln("cfg/pam_environment", file="~/.pam_environment")
+# DEPR: https://bugs.archlinux.org/task/68945
+# ln("cfg/pam_environment", file="~/.pam_environment")
+ln("cfg/profile", under="/etc")
 
 
 def ab(src: str, file: str = None, **kw: str) -> ln:

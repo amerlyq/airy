@@ -2666,6 +2666,7 @@ config.bind("<Ctrl-W>", "hint --mode word all", mode="hint")
 
 
 ## qute-pass :: keep logins encrypted, use some catchword as filename
+# "--no-insert-mode",
 passcmd = " ".join(
     (
         "spawn",

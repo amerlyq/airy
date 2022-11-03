@@ -2,8 +2,8 @@
 #%SUMMARY: count visited links -- yesterday from 18:30 to 22:30
 set -euo pipefail
 
-# db=${XDG_DATA_HOME:-~/.local/share}/qutebrowser/history.sqlite
-db=~/.local/qute-proxy/data/history.sqlite
+db=${XDG_DATA_HOME:-~/.local/share}/qutebrowser/history.sqlite
+# db=~/.local/qute-proxy/data/history.sqlite
 
 # OR: ts=$(date +%s -d 'today - 24 hours + 6 hours')
 ts="unixepoch('now', '-2 days')"

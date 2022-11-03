@@ -1,0 +1,46 @@
+#!sh /etc/profile
+# WARN: sourced only by login shells
+
+umask 022
+
+# /usr/local/sbin:
+export PATH=/usr/local/bin:/usr/bin
+
+# Load profiles from /etc/profile.d
+export ANDROID_HOME='/opt/android-sdk'
+export ANDROID_SDK_ROOT=$ANDROID_HOME
+
+PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+PATH=$PATH:/usr/lib/jvm/default/bin
+
+# https://wiki.archlinux.org/index.php/Perl_Policy#Binaries_and_scripts
+PATH=$PATH:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+
+# = source /etc/locale.conf | $XDG_CONFIG_HOME/locale.conf | SEE FS#56688
+export LANG=en_US.UTF-8
+# export all locale (7) variables when they exist
+# export LANG LANGUAGE LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY \
+#        LC_MESSAGES LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT \
+#        LC_IDENTIFICATION
+
+
+export EDITOR=nvim
+export VISUAL=nvim
+export PAGER=page
+
+
+# Source global bash config, when interactive but not posix or sh mode
+# if test "$BASH" &&\
+#    test "$PS1" &&\
+#    test -z "$POSIXLY_CORRECT" &&\
+#    test "${0#-}" != sh &&\
+#    test -r /etc/bash.bashrc
+# then
+#   . /etc/bash.bashrc
+# fi
+
+# Termcap is outdated, old, and crusty, kill it.
+# unset TERMCAP
+
+# Man is much better than us at figuring this out
+# unset MANPATH
