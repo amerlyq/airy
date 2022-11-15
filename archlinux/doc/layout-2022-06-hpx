@@ -208,9 +208,12 @@ initrd /initramfs-linux.img
 options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ resume=/dev/ws/swap quiet i8042.noaux i8042.dritek=1
 EOT
 
+## ALT: "timeout 0 && default arch"
+#   ¦ menu can still be shown by pressing and holding a key during boot before systemd-boot is launched
+#   ¦ Setting this to "menu-force" disables the timeout while always showing the menu
 cat > /mnt/boot/loader/loader.conf <<EOT
-timeout 3
-default arch
+timeout 4
+default @saved
 editor 0
 EOT
 

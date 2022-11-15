@@ -27,4 +27,4 @@ redshift -P -O 4600
 # TEMP: store j.s at least on boot
 (adb connect 192.168.1.8 &&
   adb shell dumpsys usagestats > /data/hist/andr/usage/$(date +%Y/%Y%m%d_%H%M%S) &&
-  adb disconnect)
+  adb disconnect) || true
