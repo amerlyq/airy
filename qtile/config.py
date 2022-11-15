@@ -205,7 +205,7 @@ layouts = [
     layout.VerticalTile(
         ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2
     ),
-    layout.MonadTall(ratio=0.587),
+    layout.MonadTall(ratio=0.587, border_focus="#00af00"),
     # MAYBE: use maximized layout.Columns() inof this HACK
     layout.Max(),
     # layout.MonadWide(),
