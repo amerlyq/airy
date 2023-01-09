@@ -1,4 +1,5 @@
 # SEE: /usr/lib/python3.10/site-packages/libqtile/backend/x11/xkeysyms.py
+#%DEBUG: $ tail -F ~/.local/share/qtile/qtile.log
 import os
 import time
 from typing import cast
@@ -170,6 +171,15 @@ keys = [
     K("M-v", lazy.spawn(["copyq", "next"]), desc="Clipboard next"),
 ]
 
+
+# window.togroup(qtile.current_group.name)
+def toscreen_noswap(wm, nm) -> None:
+    cs = wm.current_screen
+    grp = wm.groups_map[nm]
+    if grp != wm.current_group and grp.screen in (cs, None):
+        cs.set_group(grp)
+
+
 groups = [Group(i) for i in "123456789"]
 
 for i in groups:
@@ -179,7 +189,9 @@ for i in groups:
             Key(
                 [mod],
                 i.name,
-                lazy.group[i.name].toscreen(),
+                # lazy.group[i.name].toscreen(),
+                # FAIL:
+                lazy.function(toscreen_noswap, i.name),
                 desc="Switch to group {}".format(i.name),
             ),
             # mod1 + shift + letter of group = switch to & move focused window to group
@@ -296,7 +308,7 @@ dgroups_key_binder = None
 dgroups_app_rules = []  # type: list
 follow_mouse_focus = False
 bring_front_click = False
-cursor_warp = False
+cursor_warp = True
 floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
@@ -360,6 +372,7 @@ def audit_log(text: str, grp: str) -> None:
     dst = f"/d/audit/{os.uname().nodename}/{grp}/{sfx}"
 
     # TODO:PERF: write in batch/second inof each ctxswitch
+    #   ALSO:TODO: mkdir for "year"
     with open(dst, "a", encoding="utf-8") as f:
         # ALSO: state :: w.maximized w.minimized w.floating:
         line = f"{int(ts)} {text}\n"

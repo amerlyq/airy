@@ -9,7 +9,7 @@ vim.cmd [[ packadd! nvim-lspconfig ]]
 local lspconfig = require 'lspconfig'
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 -- nvim-cmp supports additional completion capabilities
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 
 -- Enable the following language servers
