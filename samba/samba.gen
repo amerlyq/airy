@@ -1,6 +1,13 @@
 #!/bin/bash -eu
-source ~/.shell/profile
+# source ~/.shell/profile
 cd "$(dirname "$(readlink -e "$0")")"
+
+declare -A AIRY_SAMBA_RO=(
+  [dl]="/data/_dld"
+  [irome]="/data/media/irome"
+)
+declare -A AIRY_SAMBA_RW=(
+)
 
 dst=${1:-/etc/samba/smb.conf}
 tmp=${TMPDIR:-/tmp}/smb.conf
