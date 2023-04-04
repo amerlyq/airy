@@ -1,5 +1,6 @@
 --%RELOAD:FAIL: require('plenary.reload').reload_module('airy.statusline', true)
 --%RELOAD:ALT: luafile $MYLUA/airy/statusline.lua
+--%WARN:NEED: 'set mouse=a' -- otherwise clicking won't work in some modes
 local o, g = vim.opt, vim.g
 --OBSOL: https://github.com/nvim-lualine/lualine.nvim
 -- ALSO https://github.com/kdheepak/tabline.nvim

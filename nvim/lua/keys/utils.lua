@@ -11,7 +11,7 @@ K('n', ',tw', "<Cmd>setl wrap! wrap?<CR>")
 
 -- Spell =========
 -- o.spellfile = { MYCONF .. '/spell/en.utf-8.add' } -- One file of mixed content
-o.spellfile = '~/.config/nvim/spell/en.utf-8.add' -- One file of mixed content
+o.spellfile = vim.fs.normalize('~/.config/nvim/spell/en.utf-8.add') -- One file of mixed content
 o.spellcapcheck = ''  -- Don't auto-capitilize suggested words
 -- if !filereadable(&spellfile . '.spl')| exe 'mkspell' &spellfile |en
 

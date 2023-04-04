@@ -16,7 +16,8 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
 -- ALSO: { 'clangd', 'rust_analyzer', 'pyright', 'tsserver' }
-local servers = { 'pylsp', 'sumneko_lua' }
+-- TODO  'sumneko_lua' -> 'lua_ls' for 'lspconfig>=0.2.0'
+local servers = { 'pylsp' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = require('lsp.attach'),
@@ -34,8 +35,8 @@ end
 --  NOTE: run only once -- for the current buffer, which triggered "packadd", afterwards STD autocmd will do same
 if vim.bo.filetype == 'python' then
   require 'lspconfig'["pylsp"].manager.try_add()
-elseif vim.bo.filetype == 'lua' then
-  require 'lspconfig'["sumneko_lua"].manager.try_add()
+-- elseif vim.bo.filetype == 'lua' then
+--   require 'lspconfig'["sumneko_lua"].manager.try_add()
 end
 
 

@@ -5,6 +5,31 @@ local o, g = vim.opt, vim.g
 o.hlsearch = true
 
 o.clipboard = 'unnamedplus'
+if vim.fn.has("wsl") == 1 then
+  -- OFF: from ":h 'clipboard"
+  -- g.clipboard = {
+  --   name = 'WslClipboard',
+  --   copy = {
+  --     ['+'] = 'clip.exe',
+  --     ['*'] = 'clip.exe',
+  --   },
+  --   -- FAIL: too slow -- and does not copy from remote host in Citrix-VDI-WSL2 anyway
+  --   paste = {
+  --     ['+'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+  --     ['*'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+  --   },
+  --   cache_enabled = 0,
+  -- }
+
+  -- SRC: https://www.reddit.com/r/neovim/comments/vxdjyb/comment/iknh207/
+  -- ALT: copy-only (to workaround "mouse=a" in Citrix-VDI-WSL2)
+  vim.api.nvim_create_autocmd('TextYankPost', {
+    group = vim.api.nvim_create_augroup('Yank', { clear = true }),
+    callback = function()
+      vim.fn.system('clip.exe', vim.fn.getreg('"'))
+    end,
+  })
+end
 
 -- DISABLED: inherits "r.sh" from ranger which accesses too much files
 o.shell = '/bin/sh'
@@ -13,6 +38,8 @@ o.shell = '/bin/sh'
 vim.wo.number = true
 
 --Enable mouse mode
+-- DISABLED:FAIL:('a'): can't mouse copy/clipboard in WSL2 Citrix VDI
+--   CANCELLED: can't mouse-click to switch tabs/buffers anymore
 o.mouse = 'a'
 
 --Enable break indent

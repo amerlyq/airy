@@ -34,31 +34,34 @@ require('legendary').setup()
 require('dressing').setup()
 
 
+-- DISABLED: I'm pissed off by the need to delete braces all the time
+--   TEMP: work w/o this plugin to understand what I will be missing,
+--     and if my suffering is mitigating any bigger suffering
 -- MORE: https://github.com/windwp/nvim-autopairs
-require('nvim-autopairs').setup {
-  -- disable_filetype = { "TelescopePrompt", "lisp" },
-  enable_check_bracket_line = false,
-  map_c_h = true,
-  check_ts = true,
-}
--- If you want insert `(` after select function or method item
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-local handlers = require('nvim-autopairs.completion.handlers')
-local cmp = require('cmp')
-local kinds = cmp.lsp.CompletionItemKind
-cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done {
-  -- map_char = { tex = '' },
-  filetypes = {
-    lisp = {
-      ["("] = {
-        kind = { kinds.Function, kinds.Method },
-        handler = handlers.lisp
-      },
-      -- FIXME: disable macro-prefix
-      ["'"] = false,
-    }
-  }
-})
+-- require('nvim-autopairs').setup {
+--   disable_filetype = { "c" },  -- COS irritating brackets everywhere,fixing wrong ones is longer than typing
+--   enable_check_bracket_line = false,
+--   map_c_h = true,
+--   check_ts = true,
+-- }
+-- -- If you want insert `(` after select function or method item
+-- local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+-- local handlers = require('nvim-autopairs.completion.handlers')
+-- local cmp = require('cmp')
+-- local kinds = cmp.lsp.CompletionItemKind
+-- cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done {
+--   -- map_char = { tex = '' },
+--   filetypes = {
+--     lisp = {
+--       ["("] = {
+--         kind = { kinds.Function, kinds.Method },
+--         handler = handlers.lisp
+--       },
+--       -- FIXME: disable macro-prefix
+--       ["'"] = false,
+--     }
+--   }
+-- })
 
 
 require('pretty-fold').setup()

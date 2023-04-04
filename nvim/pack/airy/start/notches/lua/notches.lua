@@ -30,17 +30,17 @@ end
 function M.iabbrev()
   local spec = require 'notches.spec'
   local enxkb = 'qwertyuiop asdfghjkl zxcvbnm QWERTYUIOP ASDFGHJKL ZXCVBNM'
-  local ruxkb = 'йцукенгшщз фывапролд ячсмить йцукенгшщз фывапролд ячсмить'
+  local ruxkb = 'йцукенгшщз фывапролд ячсмить ЙЦУКЕНГШЩЗ ФЫВАПРОЛД ЯЧСМИТЬ'
   local exclude = { ['ти'] = true } -- suppress abbrevs overlapping with real-life words
   for _, vrgx in pairs(spec.patterns) do
     for notch in string.gmatch(vrgx:gsub('[\\%%()]', ''), "([^|]+)") do
-      -- TODO: both lower() and UPPER() case should translate to same UPPER iabbr
-      -- :iab[breviate] [<expr>] [<buffer>] {lhs} {rhs}
-      local ru = vim.fn.tr(notch:gsub('[-.:;]', ''), enxkb, ruxkb)
+      -- EXPL: both lower() and UPPER() case should translate to same UPPER iabbr
+      local norm = notch:gsub('[-.:;]', '')
+      local ru = vim.fn.tr(string.lower(norm), enxkb, ruxkb)
+      local ru_ = vim.fn.tr(string.upper(norm), enxkb, ruxkb)
       if exclude[ru] == nil then
-        local cmd = string.format('iab <buffer> %s %s', ru, notch)
-        -- print(cmd)
-        vim.cmd(cmd)
+        vim.cmd(string.format('iab <buffer> %s %s', ru, notch))
+        vim.cmd(string.format('iab <buffer> %s %s', ru_, notch))
       end
     end
   end
