@@ -327,6 +327,7 @@ augroup Xtref
   "" [_] ENH: parse !ctags only in diff from last write
   " NICE: incremental update -- i.e. append tags from all changed files
   " BUG: called twice on first write
+  "" DISABLED: if too old !ctags=5.9
   au BufWritePost * sil call xtref#ctags(g:xtref.lazytagdir,
     \ [expand('<afile>:p',1)])
 

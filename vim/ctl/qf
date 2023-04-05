@@ -1,5 +1,21 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 fmt=${1:-%f:%l:%c:%m}
+pfx=${2:-$PWD}
+
+# exec awk -vd="$pfx" '{if(/^[^/]/){print d"/"$0}else{print$0}}' |
+#   ifne nvr -q /dev/stdin -c 'if len(getwininfo())>1|close|en|if len(getqflist())>1|copen|else|cfirst|en'
+
+qf=$(awk -vd="$pfx" '{if(/^[^/]/){print d"/"$0}else{print$0}}')
+exec 3<<<"$qf"
+#caddfile /dev/fd/3|
+# TODO:SEE: how !rnvimr is closing its own window when you open files from it
+#   [_] FIXME: only close specific "rnvimr" window (by id or bufname)
+# exec nvr -q /dev/fd/3 -c 'if len(getwininfo())>1|close|en|if len(getqflist())>1|copen|else|cfirst|en'
+exec nvr -q /dev/fd/3 -c 'exe"RnvimrToggle"|if len(getqflist())>1|copen|else|cfirst|en'
+
+exit
+#########################
+
 # |bwipe
 # excmd="setl noro ma bt=nofile nowrap efm=$fmt|cbuffer|if len(getqflist())>1|copen|en"
 ## HACK: wait until lazy plugins loaded before reading QF
@@ -11,7 +27,10 @@ excmd="setl bt=nofile nowrap efm=$fmt | cbuffer"
 
 if [ -n "${NVIM_LISTEN_ADDRESS-}" ]; then
   # exec xargs -rn1 -d\\n realpath | ifne nvr - -c "$excmd"
-  exec xargs -rn1 -d\\n realpath | ifne nvr -q /dev/stdin
+  # sed -r 's/:([0-9]|\s).*//' | xargs -rn1 -d\\n realpath | ifne nvr -q /dev/stdin
+  exec awk -vd="$pfx" '{if(/^[^/]/){print d"/"$0}else{print$0}}' |
+    ifne nvr -q /dev/stdin -c 'close|if len(getqflist())>1|copen|else|cfirst|en'
+  # ... | ifne nvr -l - -c "$excmd | wincmd p"
 else
   exec ifne $EDITOR - -c "$excmd"
 fi

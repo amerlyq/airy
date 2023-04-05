@@ -7,6 +7,7 @@ let g:jupyter_live_pprint = '/p '
 " let g:jupyter_live_exec = g:jupyter_live_pprint .'_live()'
 " let g:jupyter_live_exec = 'print(_live())'
 let g:jupyter_live_exec = '_live()'
+let g:jupyter_live_auto = 1
 
 " FIXED:(removed '##'): prevent .py code hi! in my own header '## …' comments
 let g:jupyter_cell_separators = ['#%%', '# %%', '# <codecell>']
@@ -114,7 +115,10 @@ fun! BufMap_jupyter_vim() abort
 
   " IDEA: call "_live" on each ",s" save :USAGE:
   augroup jupy | autocmd! | augroup END
-  au! jupy BufWritePost <buffer> if Jupyter_connected()| call Jupyter_send_pprint(g:jupyter_live_exec) |en
+  " FAIL: doesn't work for current file :: call jupyter#SendCode('%autoreload')
+  " BAD: runs _live() even on error during sourcing
+  au! jupy BufWritePost <buffer> if g:jupyter_live_auto && Jupyter_connected()| call jupyter#RunFile("-niG", expand('%:p'))|call Jupyter_send_pprint(g:jupyter_live_exec) |en
+  nnoremap <buffer><silent><unique>  <LocalLeader>ta :let g:jupyter_live_auto=!g:jupyter_live_auto<Bar>echom g:jupyter_live_auto<CR>
 
   nnoremap <buffer><silent><unique>  <LocalLeader>f :call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>J :let g:jupyter_live_exec=getline('.')<Bar>echom g:jupyter_live_exec<CR>
@@ -127,6 +131,8 @@ fun! BufMap_jupyter_vim() abort
   xmap     <buffer><silent><unique>  <LocalLeader>S <Plug>JupyterRunVisual
   nnoremap <buffer><silent><unique>  <LocalLeader>d <Cmd>call jupyter#RunFile("-niG", expand('%:p')) \| call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>D <Cmd>call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
+  " FAIL: doesn't print anything back
+  nnoremap <buffer><silent><unique>  <LocalLeader>p <Cmd>call jupyter#RunFile("-niG", expand('%:p')) \| call jupyter#SendCode("%prun -s tottime -l 10 ".g:jupyter_live_exec)<CR>
 
   " nnoremap <buffer><silent><unique>  <LocalLeader>s :<C-u>set operatorfunc=<SID>opfunc_run_code<CR>g@
   " xnoremap <buffer><silent><unique>  <LocalLeader>s "sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<CR>
@@ -167,6 +173,7 @@ fun! BufMap_jupyter_vim() abort
   nnoremap <buffer><silent><unique>  <LocalLeader>b Obreakpoint()<Esc>j
   nnoremap <buffer><silent><unique>  <LocalLeader>vz :PythonStartDebugger<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>tp :call jupyter#SendCode(InferJupyterPkg())<CR>
+
 
   call s:mapsendcode('tc', '/len list(', ')')
   call s:mapsendcode('td', '/dir ')
