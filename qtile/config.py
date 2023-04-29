@@ -69,6 +69,7 @@ mod_info = [
 keys = [
     # A list of available commands that can be bound to keys can be found
     # at https://docs.qtile.org/en/latest/manual/config/lazy.html
+    # FIXME:BAD:(swap bw screens):USE: toscreen_noswap()
     K("M-a", lazy.screen.toggle_group(), desc="Back'n'forth"),
     # Switch between windows
     # K("M-h", lazy.layout.left(), desc="Move focus to left"),
@@ -153,14 +154,14 @@ keys = [
     #         for i in range(0, 10)
     #     ],
     # ),
-    K("<XF86AudioRaiseVolume>", lazy.spawn("amixer -c 0 -q set Headphone 1dB+")),
-    K("<XF86AudioLowerVolume>", lazy.spawn("amixer -c 0 -q set Headphone 1dB-")),
+    K("<XF86AudioRaiseVolume>", lazy.spawn("amixer -q -- set Master 1%+")),
+    K("<XF86AudioLowerVolume>", lazy.spawn("amixer -q -- set Master 1%-")),
     K("<XF86AudioMute>", lazy.spawn("amixer -c 0 -q set Master toggle")),
-    ## FIXED:USE: "Headphone" inof "Master" due to SOF driver wrong wiring
-    K("M-<Page_Up>", lazy.spawn("amixer -c 0 -q set Headphone 1dB+"), desc="Volume up"),
+    ## OLD:FIXED:USE: "amixer -c 0 -q set Headphone 1dB+" inof "Master" due to SOF driver wrong wiring
+    K("M-<Page_Up>", lazy.spawn("amixer -q -- set Master 1%+"), desc="Volume up"),
     K(
         "M-<Page_Down>",
-        lazy.spawn("amixer -c 0 -q set Headphone 1dB-"),
+        lazy.spawn("amixer -q -- set Master 1%-"),
         desc="Volume down",
     ),
     # K("M-x", lazy.spawn(["env", "--chdir=/d/research/clipboard/infinitecopy", "--",
@@ -217,7 +218,9 @@ layouts = [
     layout.VerticalTile(
         ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2
     ),
-    layout.MonadTall(ratio=0.587, border_focus="#00af00"),
+    # layout.MonadTall(ratio=0.587, border_focus="#00af00"),
+    # NOTE: emulate xrandr split-screen ratio for ultrawide ext monitor
+    layout.MonadTall(ratio=0.238, border_focus="#00af00"),
     # MAYBE: use maximized layout.Columns() inof this HACK
     layout.Max(),
     # layout.MonadWide(),
@@ -325,7 +328,14 @@ floating_layout = layout.Floating(
         ),  # doRectFloat (W.RationalRect (1/6) (1/5) (4/10) (4/10))
         # WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST
         # WM_CLASS(STRING) = "onboard", "Onboard"
-        Match( wm_class="onboard"),
+        Match(wm_class="onboard"),
+        Match(wm_type="_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"),  # =zoom OR: (WM_NAME = "" && _NET_WM_NAME = "zoom")
+        # --> doIgnore
+        # "_NET_WM_WINDOW_TYPE_TOOLTIP"
+        # "_NET_WM_WINDOW_TYPE_UTILITY"
+        # "_NET_WM_WINDOW_TYPE_NOTIFICATION"
+        # "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"
+        # "_NET_WM_WINDOW_TYPE_DIALOG"
     ]
 )
 auto_fullscreen = True
