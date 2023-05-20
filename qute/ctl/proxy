@@ -19,8 +19,9 @@ pxy="socks://[::1]:$port"
 
 swd=$(dirname "$(realpath "$0")")
 
+## TEMP:DISABLE: I don't have a remote SSH anymore
+# --set content.proxy "$pxy" \
 exec "$swd/new" ~/.local/qute-proxy \
-  --set content.proxy "$pxy" \
   --set content.proxy_dns_requests true \
   --set zoom.default "90%"
   "$@"

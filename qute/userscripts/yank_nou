@@ -25,7 +25,7 @@ pfx=${2-}
 # [_] TRY:FIXME: use link-open time instead of copy-time
 #   i.e. I could open link, read article, and same completed task with two timestamps
 # [_] BET: parse qutebrowser history "last open time"
-xtref=$(just xts new pin | tr -d $' \n')
+xtref=$(just xts new xts pin | tr -d $' \n')
 
 ## BAD: no easy keyboard-only way to remove accidental selections on page
 # title=${QUTE_SELECTED_TEXT:-$QUTE_TITLE}

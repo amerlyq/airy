@@ -6,4 +6,9 @@ basedir=$(mktemp -dt "qute@${0##*/}~XXXX")
 onexit(){ rm -rf "$basedir"; }
 trap 'onexit' INT HUP QUIT TERM ERR
 
-r.qute-new "$basedir" "$@"
+
+swd=$(dirname "$(realpath "$0")")
+
+"$swd/new" "$basedir" "$@" \
+  --set content.proxy "socks://[::1]:17321" \
+  --set content.proxy_dns_requests true
