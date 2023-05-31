@@ -42,7 +42,7 @@ case ${basename##*.}.$ext
 in dot.gz|gv.gz) r.graphviz-view "$1"
 ;; *)
 case ${ext:?}
-in dot|gv) xdot "$1"  # r.graphviz-view
+in dot|gv) xdot --hide-toolbar "$1"  # r.graphviz-view
 ;; tpp) tpp "$1"
 ;; md|rst|org|wiki|tex) pandoc --standalone -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html
 ;; adoc) asciidoctor -b html -o /tmp/pandoc.html "$1" && r.b /tmp/pandoc.html

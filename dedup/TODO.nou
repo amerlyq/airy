@@ -29,6 +29,15 @@ ALT
   $ rmlint -o sh:stdout,cmd=echo .
 
 
+WF:CASE: verify if backup contains any unique files not on current PC
+  $ rmlint -rkm -T df -o fdupes -c fdupes:omitfirst -S pma -- /path/to/backup // /data
+    * (//) only files in "backup" will be deleted (if passed to | xargs rm --)
+    * (-k) "data" won't be deduplicated
+    * only unique files in "backup" will be left
+    * (-m) unique files in "backup" will be deduplicated only if they are present in "data"
+    REF: https://rmlint.readthedocs.io/en/latest/tutorial.html
+
+
 Search one set of directories inside another
   $ rmlint --hidden --types=df --output=fdupes --rank-by=pma --keep-all-tagged --must-match-tagged ... // ...
   $ rmlint -rkm -T df -o fdupes -S pma ... // -- ...

@@ -14,7 +14,7 @@ host=$1
 loc=$XDG_RUNTIME_DIR/xc-server.$host
 
 ## THINK: how chaining hops will work with clipboard
-rmt="/run/user/1000/xc-client.$(hostname)"
+rmt="/run/user/1000/xc-client.${HOSTNAME:?}"
 
 ## HACK: forward-propagate hostname-indexed clipboard socket name,
 ##   and back-propagate connection details

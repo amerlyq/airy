@@ -14,9 +14,17 @@ xinput --set-prop --type=float "ELAN072D:00 04F3:315B Touchpad" "libinput Accel 
 xinput --set-prop --type=int "ELAN072D:00 04F3:315B Touchpad" "libinput Tapping Enabled" 1
 xinput --set-prop --type=int "ELAN072D:00 04F3:315B Touchpad" "libinput Tapping Drag Lock Enabled" 1
 
+
+## Wacom as Touchpad
+xinput --set-prop --type=float "Wacom Intuos Pro S Finger" "libinput Accel Speed" 0.88
+xinput --set-prop --type=int "Wacom Intuos Pro S Finger" "libinput Tapping Drag Lock Enabled" 1
+xinput --set-prop --type=float "Wacom Intuos Pro S (WL) Finger" "libinput Accel Speed" 0.88
+xinput --set-prop --type=int "Wacom Intuos Pro S (WL) Finger" "libinput Tapping Drag Lock Enabled" 1
+
+
 xset b off s off dpms 900 1500 1800 r rate 250 40
 
-# /d/airy/xkb/run
+/d/airy/xkb/run
 
 kbdd
 
@@ -24,7 +32,10 @@ kbdd
 redshift -P -O 4600
 
 
+xrandr --output eDP-1 --auto --primary --output DP-2 --auto --above eDP-1
+
 # TEMP: store j.s at least on boot
-(adb connect 192.168.1.8 &&
-  adb shell dumpsys usagestats > /data/hist/andr/usage/$(date +%Y/%Y%m%d_%H%M%S) &&
-  adb disconnect) || true
+# FIXME: disconnect only if there was not connection yet
+# (adb connect 192.168.1.5 &&
+#   adb shell dumpsys usagestats > /data/hist/andr/usage/$(date +%Y/%Y%m%d_%H%M%S) &&
+#   adb disconnect) || true
