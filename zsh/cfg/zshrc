@@ -1,6 +1,7 @@
 
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
+# export XDG_RUNTIME_DIR=/tmp  # TEMP: for WSL2
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
 [[ -n $SSH_CONNECTION ]] && export PINENTRY_USER_DATA='USE_CURSES=1'
 # autoload -Uz add-zsh-hook
@@ -9,6 +10,8 @@ export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
 # }
 # add-zsh-hook preexec _gpg-agent-update-tty
 
+## Disable suspending on <C-s>, <C-q>
+setopt noflowcontrol
 
 ## DFL:VIZ: interactive monitor shinstdin zle
 setopt pipefail

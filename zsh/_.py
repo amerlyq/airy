@@ -1,8 +1,8 @@
 from just.airy.api import Pkg, ln
 
 Pkg("zsh")
-Pkg("mcfly")
-Pkg("thefuck")
+# Pkg("mcfly")
+# Pkg("thefuck")
 # Pkg("fzf")
 
 
