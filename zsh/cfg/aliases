@@ -1,9 +1,10 @@
 ## git
 alias gA='git annex add'
-alias ga='git add --all $(test -e $PWD/.git || echo .)'
-alias ga.='git add --all .'
+alias ga='(){ git add "${@:-.}" }'  #  --all $(test -e $PWD/.git || echo .)
+alias ga.='git add .'
+alias gaa='git add --all'
 alias gau='git add --update'
-alias gax='GIT_DISCOVERY_ACROSS_FILESYSTEM=1 git add --all .'
+alias gax='GIT_DISCOVERY_ACROSS_FILESYSTEM=1 git add .'
 alias gc1='git clone --depth=1 --single-branch'
 alias gs1='git submodule add --depth=1'
 alias gc='/@/airy/git/ctl/my-msg --index --modtime --commit $(test -e .git || echo --prefix=$PWD:t)'
