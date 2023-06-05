@@ -5,6 +5,8 @@ from os import path as fs
 from ranger.api.commands import Command
 from ranger.ext.shell_escape import shell_quote
 
+# HACK:FIXME: wide icons (OR: narrow font)
+os.environ["RANGER_DEVICONS_SEPARATOR"]="  "
 
 # NOTE: jump to next day only at 7:00AM
 def today_date(delta=7):
