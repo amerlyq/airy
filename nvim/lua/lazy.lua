@@ -22,6 +22,13 @@ local function ft_python()
   end
 end
 
+
+local function ft_cpp()
+  require 'plug.treesitter'
+  require 'lsp.init'
+end
+
+
 local function ft_lua()
   require 'plug.treesitter'
   require 'lsp.init'
@@ -40,6 +47,7 @@ local function ft_lua()
     require 'colorizer'.attach_to_buffer(t.buf)
   end
 end
+
 
 local function ft_lisp()
   require 'plug.treesitter'
@@ -100,6 +108,7 @@ local function ft_lisp()
   end
 end
 
+
 --BAD: called each time you open buffers of the same type
 --  WKRND: should wrap everything behind "require" singletons
 --    BUT:FIXME: how to be with buffer-local mappings ?
@@ -110,6 +119,8 @@ local function load_ondemand()
     ft_python()
   elseif seen_filetypes['lisp'] then
     ft_lisp()
+  elseif seen_filetypes['cpp'] then
+    ft_cpp()
   elseif seen_filetypes['lua'] then
     ft_lua()
   end

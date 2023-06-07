@@ -154,7 +154,8 @@ if ($opts{index}) {
     push @cmd, '--find-renames', '--find-copies', '--minimal', '--raw', '--numstat', '-z';
 }
 
-my $usediff = 1 if -t STDIN;
+my $usediff = 1;
+# my $usediff = 1 if -t STDIN;
 
 my $pid;
 if ($usediff) {
