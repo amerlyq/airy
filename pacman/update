@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-source ~/.shell/profile
+# source ~/.shell/profile
 
 skip(){ set -- ${!1:+"${!1}"}; (($#))||return 0
   printf -- '--ignore '; (IFS=,;printf '%s\n' "${*// /\\ }")

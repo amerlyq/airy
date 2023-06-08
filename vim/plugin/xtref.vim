@@ -340,6 +340,10 @@ augroup Xtref
   "   of opening vim instance -- and reset this var after writing tags
   " au BufUnload * if index(map(getbufinfo({'bufmodified':1}), 'v:val.bufnr'), '<bufnr>') > -1
   "   \| call xtref#ctags(g:xtref.lazytagdir, ['<afile>']) |en
+
+  "" NOTE: override xtref by ctags for some filetypes
+  au FileType {c,cpp} noremap <silent>  g]  :<C-u>exe (v:count?v:count."tag":"tjump")<CR>
+
 augroup END
 
 

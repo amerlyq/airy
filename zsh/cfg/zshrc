@@ -1,7 +1,12 @@
 
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
-# export XDG_RUNTIME_DIR=/tmp  # TEMP: for WSL2
+
+# TEMP: for WSL2
+# export EDITOR=nvim
+: "${XDG_RUNTIME_DIR:=/tmp}"
+
+
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
 [[ -n $SSH_CONNECTION ]] && export PINENTRY_USER_DATA='USE_CURSES=1'
 # autoload -Uz add-zsh-hook
@@ -190,6 +195,8 @@ _set_prompt() {
   PROMPT="%(?..%F{1}%?↵%f
 )%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b
 %F{$color}└%(!.#.╼)%f "
+  ## OR:(WSL2): append {"$'\e[2 q'"%} to 2nd line ::
+  #   )%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b%{"$'\e[2 q'"%}
 }; _set_prompt
 
 
