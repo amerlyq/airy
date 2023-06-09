@@ -43,9 +43,11 @@ if vim.bo.filetype == 'c' or vim.bo.filetype == 'cpp' then
   vim.cmd [[ packadd clangd_extensions.nvim ]]
   -- FIXME: probably should be merged
   require("clangd_extensions").setup {
-    on_attach = require('lsp.attach'),
-    capabilities = capabilities,
-    settings = require('lsp.' .. 'clangd'),
+    server = {
+      on_attach = require('lsp.attach'),
+      capabilities = capabilities,
+      settings = require('lsp.' .. 'clangd'),
+    }
   }
   require 'lspconfig'["clangd"].manager.try_add()
 end
