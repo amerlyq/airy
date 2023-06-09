@@ -342,7 +342,8 @@ augroup Xtref
   "   \| call xtref#ctags(g:xtref.lazytagdir, ['<afile>']) |en
 
   "" NOTE: override xtref by ctags for some filetypes
-  au FileType {c,cpp} noremap <silent>  g]  :<C-u>exe (v:count?v:count."tag":"tjump")<CR>
+  " au FileType {c,cpp} noremap <silent>  g]  :<C-u>exe (v:count?v:count."tag":"tjump")<CR>
+  au FileType {c,cpp} noremap <silent>  g]  g<C-]>
 
 augroup END
 

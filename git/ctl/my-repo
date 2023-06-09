@@ -22,7 +22,7 @@ url=${3:-$(git config --get remote.origin.url | sed '{s@.*git\(.*\)\.com/@g\1:@}
 
 if [[ -z ${name/-[amMwW]} || -z $mail ]]; then
   # THINK: replace "source" with global registry to use "set -r"
-  source ~/.shell/profile
+  source /@/airy/airy/shell/profile
   if [[ $name == -M ]]; then
     name=${WORK_NAME:?}
     mail=${MAIN_MAIL:?}
