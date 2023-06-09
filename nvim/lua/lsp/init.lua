@@ -39,6 +39,17 @@ if vim.bo.filetype == 'python' then
 --   require 'lspconfig'["sumneko_lua"].manager.try_add()
 end
 
+if vim.bo.filetype == 'c' or vim.bo.filetype == 'cpp' then
+  vim.cmd [[ packadd clangd_extensions.nvim ]]
+  -- FIXME: probably should be merged
+  require("clangd_extensions").setup {
+    on_attach = require('lsp.attach'),
+    capabilities = capabilities,
+    settings = require('lsp.' .. 'clangd'),
+  }
+  require 'lspconfig'["clangd"].manager.try_add()
+end
+
 
 -- NOTE:(vim_starting=1): if launched by opening .py file
 --   >> defer till startup next step "plugin/*" auto sourcing

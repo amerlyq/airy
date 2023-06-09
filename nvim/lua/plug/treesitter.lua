@@ -5,7 +5,7 @@
 --SRC: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 --ALSO:VIZ: https://github.com/nvim-treesitter/nvim-treesitter/wiki/Extra-modules-and-plugins
 
---CFG:    :TSInstall python lua lisp
+--CFG:    :TSInstall bash c cpp cmake commonlisp diff lua python
 --MAINT:  :TSUpdate
 --DEBUG:  :TSModuleInfo
 

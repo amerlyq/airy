@@ -119,7 +119,7 @@ local function load_ondemand()
     ft_python()
   elseif seen_filetypes['lisp'] then
     ft_lisp()
-  elseif seen_filetypes['cpp'] then
+  elseif seen_filetypes['c'] or seen_filetypes['cpp'] then
     ft_cpp()
   elseif seen_filetypes['lua'] then
     ft_lua()
