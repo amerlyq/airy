@@ -1,3 +1,6 @@
+# vim:ft=zsh
+# SEE: /d/research/airy/zsh/prezto/modules/git/alias.zsh
+
 ## git
 alias gA='git annex add'
 alias ga='(){ git add "${@:-.}" }'  #  --all $(test -e $PWD/.git || echo .)
@@ -11,6 +14,7 @@ alias gc='/@/airy/git/ctl/my-msg --index --modtime --commit $(test -e .git || ec
 alias gc.='/@/airy/git/ctl/my-msg --index --modtime --commit --prefix=$PWD:t'
 alias gcn='/@/airy/git/ctl/my-msg --index --modtime --commit --prefix'
 alias gcf='git commit --amend --reuse-message HEAD'
+alias gcF='git commit --amend --verbose'
 alias gcm='git commit --message'
 alias gco='git checkout'
 alias gcs='git show'

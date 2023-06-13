@@ -417,7 +417,8 @@ handle_fallback() {
     # shellcheck disable=SC2017
     local maxcol=$(( (PV_WIDTH-6) / 7 * 2 ))  # actualwidth=$((height/2*7+6))
     local maxln=$(( PV_HEIGHT - 2 ))
-    r2 -qnSTNN -c'eco solarized' -c'e scr.color=2' -c"pxl $maxln" "${FILE_PATH}" && exit 4
+    # BAD: "-T" is not supported anymore
+    r2 -qnSNN -c'eco solarized' -c'e scr.color=2' -c"pxl $maxln" "${FILE_PATH}" && exit 4
     # TRY:FIND:(number of pairs/width): https://github.com/radareorg/radare2/blob/master/libr/core/cmd_print.c
     # r2 -qnSTNN -c'eco solarized' -c'e scr.color=2' -c"pxx $((maxcol*maxln))" "${FILE_PATH}" && exit 4
     xxd -c "$maxcol" -l $((maxcol*maxln)) "${FILE_PATH}" | sed 's/^0\{4\}//' && exit 4

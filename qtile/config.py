@@ -223,6 +223,7 @@ layouts = [
     layout.MonadTall(ratio=0.238, border_focus="#00af00"),
     # MAYBE: use maximized layout.Columns() inof this HACK
     layout.Max(),
+    layout.MonadThreeCol(main_centered=True, ratio=0.333, border_focus="#00af00"),
     # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
