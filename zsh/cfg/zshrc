@@ -129,6 +129,9 @@ zle -N glob-alias
 bindkey -M viins "^ " glob-alias
 
 
+# NOTE: remove "/" from default set to prevent deleting whole path at once
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
 # SRC: https://unix.stackexchange.com/questions/76227/how-to-make-cd-dir-filename-take-me-to-dir
 autoload -Uz select-word-style
 zle -N select-word-style

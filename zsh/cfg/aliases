@@ -30,12 +30,14 @@ alias gds='gdf --stat'
 alias gdsf='gdf --stat --diff-filter=mr'
 alias gdsm='gdf --stat --diff-filter=MR'
 
-alias gdm='git -c mergetool.vimdiff.cmd='\''nvim -d "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
+# IDEA: "base .cmp. others(local)" and "merged .cmp. myown(remote)"
+alias gdm='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
+alias gdmm='git -c mergetool.vimdiff.cmd='\''nvim -d "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
 alias gdml='git -c mergetool.vimdiff.cmd='\''nvim -d "$MERGED" "$LOCAL"'\'' mergetool --tool=vimdiff'
 alias gdmr='git -c mergetool.vimdiff.cmd='\''nvim -d "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
-alias gdo='git -c mergetool.vimdiff.cmd='\''nvim -d "$LOCAL" "$BASE" "$REMOTE"'\'' mergetool --tool=vimdiff'
-alias gdol='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL"'\'' mergetool --tool=vimdiff'
-alias gdor='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$REMOTE"'\'' mergetool --tool=vimdiff'
+alias gdmM='git -c mergetool.vimdiff.cmd='\''nvim -d "$LOCAL" "$BASE" "$REMOTE"'\'' mergetool --tool=vimdiff'
+alias gdmL='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL"'\'' mergetool --tool=vimdiff'
+alias gdmR='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$REMOTE"'\'' mergetool --tool=vimdiff'
 
 alias gf='git fetch --verbose --progress --tags'
 alias gir='git reset'
