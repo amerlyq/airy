@@ -23,4 +23,5 @@ K('t', '<M-o>', '<C-\\><C-n>:RnvimrToggle<CR>')
 K('t', '<M-i>', '<C-\\><C-n>:RnvimrResize<CR>')
 
 --HACK: preload in background for better responsiveness
-vim.defer_fn(function () vim.cmd('RnvimrStartBackground') end, 1000)
+--DISABLED:FAIL: window opens and imm closes -- resets VSEL and messes up :as !skim
+-- vim.defer_fn(function () vim.cmd('RnvimrStartBackground') end, 1000)

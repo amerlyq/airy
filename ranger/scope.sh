@@ -413,6 +413,7 @@ handle_fallback() {
     # echo '----- File Type Classification -----' && file --dereference --brief -- "${FILE_PATH}" && exit 5
     # exit 1
     file --dereference --brief -- "${FILE_PATH}"  # | sed 's/,\s*/\n/g'
+    [[ -s ${FILE_PATH} ]] || exit 1
     echo  # printf "<$(printf "=%.0s" {1..62})>\n"
     # shellcheck disable=SC2017
     local maxcol=$(( (PV_WIDTH-6) / 7 * 2 ))  # actualwidth=$((height/2*7+6))

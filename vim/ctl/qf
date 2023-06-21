@@ -11,7 +11,8 @@ exec 3<<<"$qf"
 # TODO:SEE: how !rnvimr is closing its own window when you open files from it
 #   [_] FIXME: only close specific "rnvimr" window (by id or bufname)
 # exec nvr -q /dev/fd/3 -c 'if len(getwininfo())>1|close|en|if len(getqflist())>1|copen|else|cfirst|en'
-exec nvr -q /dev/fd/3 -c 'exe"RnvimrToggle"|if len(getqflist())>1|copen|else|cfirst|en'
+# exec nvr -q /dev/fd/3 -c 'exe"RnvimrToggle"|if len(getqflist())>1|copen|else|cfirst|en'
+exec nvr -q /dev/fd/3 -c 'if len(getqflist())>1|copen|else|cfirst|en'
 
 exit
 #########################
