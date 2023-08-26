@@ -1,9 +1,10 @@
 # Configuration file for jupyter-console.
-c = c  # pylint:disable=undefined-variable,self-assigning-variable
 
-# ------------------------------------------------------------------------------
+c = get_config()  #noqa
+
+#------------------------------------------------------------------------------
 # ConnectionFileMixin(LoggingConfigurable) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## Mixin for configurable classes that work with connection files
 
 ## JSON file in which to store connection info [default: kernel-<pid>.json]
@@ -45,9 +46,11 @@ c = c  # pylint:disable=undefined-variable,self-assigning-variable
 #  Default: 'tcp'
 # c.ConnectionFileMixin.transport = 'tcp'
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # JupyterConsoleApp(ConnectionFileMixin) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+## The base Jupyter console application.
+
 ## Set to display confirmation dialog on exit. You can always use 'exit' or
 #  'quit', to force a direct exit without any confirmation.
 #  Default: True
@@ -105,9 +108,9 @@ c.JupyterConsoleApp.confirm_exit = False
 #  See also: ConnectionFileMixin.transport
 # c.JupyterConsoleApp.transport = 'tcp'
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## This is an application.
 
 ## The date format used by logging formatters for %(asctime)s
@@ -123,6 +126,53 @@ c.JupyterConsoleApp.confirm_exit = False
 #  Default: 30
 # c.Application.log_level = 30
 
+## Configure additional log handlers.
+#
+#  The default stderr logs handler is configured by the log_level, log_datefmt
+#  and log_format settings.
+#
+#  This configuration can be used to configure additional handlers (e.g. to
+#  output the log to a file) or for finer control over the default handlers.
+#
+#  If provided this should be a logging configuration dictionary, for more
+#  information see:
+#  https://docs.python.org/3/library/logging.config.html#logging-config-
+#  dictschema
+#
+#  This dictionary is merged with the base logging configuration which defines
+#  the following:
+#
+#  * A logging formatter intended for interactive use called
+#    ``console``.
+#  * A logging handler that writes to stderr called
+#    ``console`` which uses the formatter ``console``.
+#  * A logger with the name of this application set to ``DEBUG``
+#    level.
+#
+#  This example adds a new handler that writes to a file:
+#
+#  .. code-block:: python
+#
+#     c.Application.logging_config = {
+#         'handlers': {
+#             'file': {
+#                 'class': 'logging.FileHandler',
+#                 'level': 'DEBUG',
+#                 'filename': '<path/to/file>',
+#             }
+#         },
+#         'loggers': {
+#             '<application-name>': {
+#                 'level': 'DEBUG',
+#                 # NOTE: if you don't list the default "console"
+#                 # handler here then it will be disabled
+#                 'handlers': ['console', 'file'],
+#             },
+#         }
+#     }
+#  Default: {}
+# c.Application.logging_config = {}
+
 ## Instead of starting the Application, dump configuration to stdout
 #  Default: False
 # c.Application.show_config = False
@@ -131,9 +181,9 @@ c.JupyterConsoleApp.confirm_exit = False
 #  Default: False
 # c.Application.show_config_json = False
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # JupyterApp(Application) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## Base class for Jupyter applications
 
 ## Answer yes to any prompts.
@@ -164,6 +214,10 @@ c.JupyterConsoleApp.confirm_exit = False
 #  See also: Application.log_level
 # c.JupyterApp.log_level = 30
 
+##
+#  See also: Application.logging_config
+# c.JupyterApp.logging_config = {}
+
 ## Instead of starting the Application, dump configuration to stdout
 #  See also: Application.show_config
 # c.JupyterApp.show_config = False
@@ -172,9 +226,9 @@ c.JupyterConsoleApp.confirm_exit = False
 #  See also: Application.show_config_json
 # c.JupyterApp.show_config_json = False
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # ZMQTerminalIPythonApp(JupyterApp, JupyterConsoleApp) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## Answer yes to any prompts.
 #  See also: JupyterApp.answer_yes
 # c.ZMQTerminalIPythonApp.answer_yes = False
@@ -239,6 +293,10 @@ c.JupyterConsoleApp.confirm_exit = False
 #  See also: Application.log_level
 # c.ZMQTerminalIPythonApp.log_level = 30
 
+##
+#  See also: Application.logging_config
+# c.ZMQTerminalIPythonApp.logging_config = {}
+
 ## set the shell (ROUTER) port [default: random]
 #  See also: ConnectionFileMixin.shell_port
 # c.ZMQTerminalIPythonApp.shell_port = 0
@@ -266,9 +324,9 @@ c.JupyterConsoleApp.confirm_exit = False
 #  See also: ConnectionFileMixin.transport
 # c.ZMQTerminalIPythonApp.transport = 'tcp'
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # ZMQTerminalInteractiveShell(SingletonConfigurable) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## Text to display before the first prompt. Will be formatted with variables
 #  {version} and {kernel_banner}.
 #  Default: 'Jupyter console {version}\n\n{kernel_banner}'
@@ -395,9 +453,9 @@ c.ZMQTerminalInteractiveShell.true_color = True
 #  Default: True
 # c.ZMQTerminalInteractiveShell.use_kernel_is_complete = True
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # KernelManager(ConnectionFileMixin) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## Manages a single kernel in a subprocess on this host.
 #
 #      This version starts kernels with Popen.
@@ -448,9 +506,9 @@ c.ZMQTerminalInteractiveShell.true_color = True
 #  See also: ConnectionFileMixin.transport
 # c.KernelManager.transport = 'tcp'
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # KernelRestarter(LoggingConfigurable) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## Monitor and autorestart a kernel.
 
 ## Whether to include every poll event in debugging output.
@@ -476,9 +534,9 @@ c.ZMQTerminalInteractiveShell.true_color = True
 #  Default: 3.0
 # c.KernelRestarter.time_to_dead = 3.0
 
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Session(Configurable) configuration
-# ------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ## Object for handling serialization and sending of messages.
 #
 #      The Session object handles building messages and sending them
