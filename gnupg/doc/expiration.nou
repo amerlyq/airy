@@ -16,9 +16,9 @@ Extend expiration date of subkey
     $ gpg --send-key --keyserver <server> $gpgkey
 
   Re-export master to flash-drive, keeping only subkeys (SEE: ./new-key.nou for details)
-    $ gpg --export-secret-keys --armor $gpgkey > amerlyq.gpg-private.asc
-    $ gpg --export --armor $gpgkey > amerlyq.gpg-public.asc
-    $ gpg --export-secret-subkeys $gpgkey > subkeys.asc
+    $ gpg --export-secret-keys --armor $gpgkey >! amerlyq.gpg-private.asc
+    $ gpg --export --armor $gpgkey >! amerlyq.gpg-public.asc
+    $ gpg --export-secret-subkeys $gpgkey >! subkeys.asc
     $ gpg --delete-secret-key $gpgkey
       = yes, yes, delete, delete, delete
     $ gpg --import subkeys.asc

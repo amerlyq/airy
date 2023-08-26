@@ -10,8 +10,11 @@
 --DEBUG:  :TSModuleInfo
 
 require('nvim-treesitter.configs').setup {
-  -- ensure_installed = { "c", "lua", "rust" },
-  ensure_installed = { "python", "lua" },
+  ensure_installed = {
+    "python", "lua", "bash",
+    "c", "cpp", "cmake", "commonlisp",
+    "diff", "json", "rst", "xml"
+  },
   highlight = {
     enable = true, -- false will disable the whole extension
   },

@@ -167,7 +167,7 @@ timedatectl set-ntp true
 timedatectl status
 
 # NEW: "base" is almost empty now -- install everything manually
-pacstrap /mnt  base intel-ucode linux linux-firmware cryptsetup lvm2 btrfs-progs base-devel neovim man git
+pacstrap /mnt  base intel-ucode linux linux-firmware cryptsetup lvm2 btrfs-progs base-devel neovim zsh man git
 
 
 ## CHG: manually remove swap of host system (if necessary)
@@ -228,7 +228,7 @@ arch-chroot /mnt
   ntpd -qg
   hwclock --systohc --utc
   # ADD:(/etc/ntp.conf): interface ignore ipv6
-  systemctl enable ntpd sshd
+  systemctl enable ntpd sshd systemd-resolved
 
   nvim /etc/ssh/sshd_config
   ##ADD:
@@ -331,6 +331,8 @@ EOT
     cd pikaur
     makepkg -fsi
     pikaur -S gotop-bin
+
+    sudo usermod -s /usr/bin/zsh dk
   }
 
   ## FAIL:(snapper): hardcoded dir /.snapshots must be always present and mounted
@@ -354,7 +356,7 @@ EOT
 
   ### OPT Xorg
   # https://wiki.archlinux.org/title/Intel_graphics#Installation
-  pacman -S xorg-server mesa vulkan-intel intel-media-driver
+  pacman -S xorg-server xorg-xinit mesa vulkan-intel intel-media-driver
 }
 
 # umount /mnt/hostrun
