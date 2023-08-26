@@ -25,9 +25,10 @@ K('x', 'C', ":t'><CR>")
 
 
 --OFF: Add move line shortcuts
-K('n', '<A-j>', ':m .+1<CR>==')
-K('i', '<A-j>', '<Esc>:m .+1<CR>==gi')
-K('v', '<A-j>', ':m \'>+1<CR>gv=gv')
-K('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
-K('n', '<A-k>', ':m .-2<CR>==')
-K('v', '<A-k>', ':m \'<-2<CR>gv=gv')
+--OBSOL:USE=mini.move
+-- K('n', '<A-j>', ':m .+1<CR>==')
+-- K('i', '<A-j>', '<Esc>:m .+1<CR>==gi')
+-- K('v', '<A-j>', ':m \'>+1<CR>gv=gv')
+-- K('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
+-- K('n', '<A-k>', ':m .-2<CR>==')
+-- K('v', '<A-k>', ':m \'<-2<CR>gv=gv')

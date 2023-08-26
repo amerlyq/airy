@@ -4,6 +4,20 @@ require 'plug.gitsigns'
 
 require 'plug.surround'
 
+require('mini.move').setup({  --- ALT※⡤⣪⡒⡮
+  mappings = {
+    left  = '<S-left>',
+    right = '<S-right>',
+    down  = '<S-down>',
+    up    = '<S-up>',
+
+    line_left  = '<S-left>',
+    line_right = '<S-right>',
+    line_down  = '<S-down>',
+    line_up    = '<S-up>',
+  }
+})
+
 --Enable Comment.nvim
 -- https://github.com/numToStr/Comment.nvim
 -- require('Comment').setup()
