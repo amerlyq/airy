@@ -2,7 +2,13 @@
 // VIZ: /usr/include/X11/keysymdef.h
 
 default partial alphanumeric_keys modifier_keys
-xkb_symbols "airy" {
+xkb_symbols "us" {
+    // include "pc"
+    include "airy(mixin)"
+};
+
+partial alphanumeric_keys modifier_keys
+xkb_symbols "mixin" {
     include "airy(unipunct)"
     // WARN: should be included only for grp2
     // include "airy(zip):2"

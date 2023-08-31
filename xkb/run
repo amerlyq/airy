@@ -30,7 +30,8 @@
 # }
 
 xkb_remap(){ local dev=$1; shift; local opt=$*
-   setxkbmap -v 5 -I "" -I/@/airy/xkb/cfg -I/usr/share/X11/xkb -device "$dev" \
+   # FIXED:(-I/@/airy/xkb/cfg): use symblinks to allow reloads by other apps
+   setxkbmap -v 5 -I "" -I/usr/share/X11/xkb -device "$dev" \
    -model airy -rules airy -layout us,zip -option "" -option "airy${opt:+,$opt}"
 }
 

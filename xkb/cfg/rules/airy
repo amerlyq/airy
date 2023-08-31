@@ -29,10 +29,12 @@
 
 
 ! layout[1] = symbols
+  // airy      = +%l[1]:1
   us        = +%l[1]:1
   *         = +%l[1]:1
 
 ! layout[2] = symbols
+  // airy      = +%l[2]:2
   zip       = +airy(%l[2]):2
   *         = +%l[2]:2
 
@@ -44,9 +46,11 @@
 
 
 ! layout[1] variant[1] = symbols
+  // airy      airy       = +%l[1]%(v[1]):1
   *         airy       = +%v[1]%(l[1]):1
 
 ! layout[2] variant[2] = symbols
+  // airy      zip        = +%l[2]%(v[2]):2
   *         airy       = +%v[2]%(l[2]):2
 
 ! layout[3] variant[3] = symbols
