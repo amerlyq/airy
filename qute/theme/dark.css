@@ -13,13 +13,23 @@ a {
   color: #70e070 !important;
 }
 
-code {
-  /* FAIL: does not work */
+/* FAIL: does not work */
+/* code { */
+pre code {
+/* :not(pre):not(code) { */
   background-color: #094352 !important;
   border-color: #094352 !important;
   color: #93a1a1 !important;
+  /* FAIL: font-family: 'PragmataPro Mono Liga' !important; */
+  /* font-family: 'PragmataPro Mono Liga', monospace !important; */
+  font-family: 'Source Code Pro' !important;
 }
 
+/*
+:not(pre):not(code) {
+  font-family: PragmataPro Mono Liga !important;
+}
+*/
 
 /* http://www-archive.mozilla.org/unix/customizing.html */
 /* *:not(img):not(code) { */

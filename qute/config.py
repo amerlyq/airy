@@ -1716,6 +1716,7 @@ c.qt.args += [
     # --use-gl=desktop
     # --disable-gpu-driver-bug-workarounds
 
+    "disable-accelerated-2d-canvas",  # COS:(!7489)※⡥⡛⢷⣏
     # "enable-accelerated-2d-canvas",
     # "enable-gpu-memory-buffer-video-frames",
     # "enable-native-gpu-memory-buffers",
@@ -2731,6 +2732,8 @@ config.bind("<Ctrl-W>", "hint --mode word all", mode="hint")
 ## Bindings for passthrough mode
 # config.bind('<Shift-Escape>', 'mode-leave', mode='passthrough')
 # @me OLD: config.bind('<Ctrl-V>', 'mode-leave', mode='passthrough')
+# config.bind('<Mod4>', 'nop', mode='passthrough')  @me Citrix
+# config.bind('<Mod1>', 'nop', mode='passthrough')  @me Citrix
 
 ## Bindings for prompt mode
 # config.bind('<Alt-B>', 'rl-backward-word', mode='prompt')

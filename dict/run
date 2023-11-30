@@ -1,4 +1,5 @@
 #!/bin/bash -e
+#%DEPS: qt6-tools(qdbus6)
 
 filter() {
     # sed -r '/(<blockquote>)+([^<>]*)(<\/blockquote>)+/s//\2<br>/g'
@@ -14,7 +15,7 @@ fdmenu() {
     local lchg='dbus-send --dest=ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.set_layout'
 
     if [[ $lang ]]; then
-      langprev=$(qdbus ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.getCurrentLayout)
+      langprev=$(qdbus6 ru.gentoo.KbddService /ru/gentoo/KbddService ru.gentoo.kbdd.getCurrentLayout)
       # ^BUG: Changes lang --> but it influences current window also!
       # ALT: change language only after dmenu launched (wmctrl/xdotool &)
       # BETTER: launch $DMENU & pid=$!; then wmctrl $pid wnd and wait $pid

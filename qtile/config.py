@@ -263,7 +263,7 @@ screens = [
                 widget.MemoryGraph(fill_color="#00aa00"),
                 widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
                 widget.CPUGraph(),
-                widget.PulseVolume(),
+                # widget.PulseVolume(),
                 widget.Battery(
                     format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
                     foreground="#00971f",
@@ -371,6 +371,16 @@ def disable_floating(window):
     if any(window.match(rule) for rule in rules):
         window.togroup(qtile.current_group.name)
         window.cmd_disable_floating()
+
+
+# WKRND:BUG: Floating windows re-open in the same Group · Issue #4523 · qtile/qtile ⌇⡥⡖⡚⢓
+#   https://github.com/qtile/qtile/issues/4523
+@hook.subscribe.client_new
+def fix_group(window):
+    if "copyq" in window.get_wm_class():
+        group = qtile.current_group
+        if window.group != group:
+            window.togroup(group.name)
 
 
 prev_focus = None

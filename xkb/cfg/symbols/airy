@@ -30,7 +30,22 @@ partial modifier_keys
 xkb_symbols "base" {
     // include "pc"
     include "ctrl(nocaps)"
-    include "altwin(swap_lalt_lwin)"
+
+    /// DISABLED:FAIL: !qute/qt6 sends Super_L to Citrix in passthrough mode
+    // include "altwin(swap_lalt_lwin)"
+    // virtual_modifiers  Super;
+    key <LALT> {
+        type[group1] = "ONE_LEVEL",
+        symbols[Group1]= [ VoidSymbol ],
+        // actions[Group1]= [ SetMods(mods=Super) ],
+        actions[Group1]= [ LatchMods(clearLocks,modifiers=Super) ]
+	//// virtualModifier= Super;
+        //// actions[Group1]= [ SetMods(mods=modMapMods) ],
+    };
+    key <LWIN> {[  Alt_L,  Meta_L  ]};
+    modifier_map Mod4 { <LALT> };
+    modifier_map Mod1 { <LWIN> };
+
     // include "level3(menu_switch)"
 };
 
@@ -202,8 +217,8 @@ xkb_symbols "unipunct" {
     key <AE12> { [ equal,        plus,      notequal,crossinglines ] };  // = + ≠ ┼   ±
 
 
-    key <AD11> { [ bracketleft,   braceleft,   union, intersection ] };  // [ { ∪ ∩   ❲
-    key <AD12> { [ bracketright,  braceright, includedin, includes ] };  // ] } ⊂ ⊃   ⟯
+    key <AD11> { [ bracketleft,   braceleft,   U2E22, intersection ] };  // [ { ⸢    ∪ ∩ ❲
+    key <AD12> { [ bracketright,  braceright,  U2E25, includes ] };  // ] } ⸥    ⊂ ⊃ ⟯
     key <BKSL> { [ backslash,     bar,         brokenbar,  vertbar ] };  // \ | ¦ │
  // key <LSGT> { [ U230A,     U230B, U2308, U2309      ] }; // ⌊ ⌋ ⌈ ⌉
 

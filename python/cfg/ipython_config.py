@@ -90,7 +90,7 @@ c.InteractiveShellApp.extensions = [
 #          When False, the current working directory is added to sys.path, allowing imports
 #          of modules defined in the current directory.
 #  Default: False
-# c.InteractiveShellApp.ignore_cwd = False
+c.InteractiveShellApp.ignore_cwd = True
 
 ## Configure matplotlib for interactive use with
 #          the default matplotlib backend.
@@ -328,7 +328,7 @@ c.TerminalIPythonApp.display_banner = False  # @me
 
 ## If True, IPython will not add the current working directory to sys.path.
 #  See also: InteractiveShellApp.ignore_cwd
-# c.TerminalIPythonApp.ignore_cwd = False
+c.TerminalIPythonApp.ignore_cwd = True
 
 ## Class to use to instantiate the TerminalInteractiveShell object. Useful for
 #  custom Frontends

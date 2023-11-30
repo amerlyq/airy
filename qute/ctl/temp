@@ -9,6 +9,7 @@ trap 'onexit' INT HUP QUIT TERM ERR
 
 swd=$(dirname "$(realpath "$0")")
 
-"$swd/new" "$basedir" "$@" \
-  --set content.proxy "socks://[::1]:17321" \
-  --set content.proxy_dns_requests true
+"$swd/new" "$basedir" "$@"
+
+  # --set content.proxy "socks://[::1]:17321" \
+  # --set content.proxy_dns_requests true
