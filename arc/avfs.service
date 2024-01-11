@@ -9,7 +9,11 @@ RuntimeDirectory=%P
 Environment=AVFSBASE=%t/%P
 ExecStart=/usr/bin/mountavfs
 ExecStop=/usr/bin/umountavfs
-ProtectSystem=strict
+
+## TEMP:DISABLED:ERR: fusermount: mount failed: Operation not permitted
+## SEE:SECU: https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
+# ProtectSystem=strict
+# ReadWritePaths=/dev/tty /dev/null /dev/fuse
 
 [Install]
 WantedBy=default.target
