@@ -101,9 +101,12 @@ EOT
     --input-encoding='UTF-8'
     --output-encoding='UTF-8'
     --sort='yes'
-    --excmd='combine'
     --output-format='xref'  # MAYBE:BAD: I lose special directives in output file
-    --_xformat=$'%{name}\t%{input}\t%{line};/%{name}/;\"\t%k\t%{pattern}'
+
+    # --excmd='combine'
+    # --_xformat=$'%{name}\t%{input}\t%{line};/%{name}/;\"\t%k\t%{pattern}'
+    --excmd='pattern'
+    --_xformat=$'%{name}\t%{input}\t/%{name}/'
 
     --langdef='xtref'
     --map-xtref='(*)'

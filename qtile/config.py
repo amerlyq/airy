@@ -214,7 +214,6 @@ layouts = [
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
     # layout.Bsp(),
-    # layout.Matrix(),
     layout.VerticalTile(
         ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2
     ),
@@ -224,6 +223,7 @@ layouts = [
     # MAYBE: use maximized layout.Columns() inof this HACK
     layout.Max(),
     layout.MonadThreeCol(main_centered=True, ratio=0.333, border_focus="#00af00"),
+    layout.Matrix(),
     # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
