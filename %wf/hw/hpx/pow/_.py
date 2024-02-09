@@ -1,4 +1,4 @@
-from just.airy.api import Pkg, ln
+from airy.api import Pkg, ln
 
 # ln("hpx.conf", under="/etc/tlp.d")
 

@@ -1,3 +1,3 @@
-from just.airy.api import cp
+from airy.api import cp
 
 cp("blacklist-hw.conf", under="/etc/modprobe.d")

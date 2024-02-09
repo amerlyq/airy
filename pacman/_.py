@@ -1,4 +1,4 @@
-from just.airy.api import Pkg
+from airy.api import Pkg
 
 # [⡢⣁⢫⣪] ⊞ 30m HACK: pikaur makepkg shallow clones ※⡢⣁⢬⡏
 # $ v /usr/share/makepkg/source/git.sh

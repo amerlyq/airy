@@ -1,5 +1,5 @@
 from pathlib import Path
-from just.airy.api import cp, ln, Aur
+from airy.api import cp, ln, Aur
 
 # Aur("kbdd-git")
 

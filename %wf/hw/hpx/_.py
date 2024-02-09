@@ -1,4 +1,4 @@
-from just.airy.api import Deps
+from airy.api import Deps
 
 # DEBUG: airy/tmpl
 

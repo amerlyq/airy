@@ -1,4 +1,4 @@
-from just.airy.api import ln, Pkg
+from airy.api import ln, Pkg
 
 Pkg("ncmpcpp")
 

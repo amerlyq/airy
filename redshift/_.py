@@ -1,4 +1,4 @@
-from just.airy.api import Aur, ln
+from airy.api import Aur, ln
 
 Aur("redshift-minimal")
 

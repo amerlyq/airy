@@ -1,4 +1,4 @@
-from just.airy.api import Pkg, cp, ln
+from airy.api import Pkg, cp, ln
 
 Pkg("my")
 

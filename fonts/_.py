@@ -1,4 +1,4 @@
-from just.airy.api import Pkg, Aur
+from airy.api import Pkg, Aur
 
 Pkg("ttf-dejavu")
 

@@ -1,4 +1,4 @@
-from just.airy.api import Pkg, ln
+from airy.api import Pkg, ln
 
 # PERF: ⌇⡢⣳⢱⣇
 #   https://akrl.sdf.org/gccemacs.html

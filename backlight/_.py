@@ -1,4 +1,4 @@
-from just.airy.api import Pkg, cp, ln
+from airy.api import Pkg, cp, ln
 
 ln("unit/backlight.rules", under="/etc/udev/rules.d")
 # USE: $ sudo udevadm control --reload-rules

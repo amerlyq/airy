@@ -1,4 +1,4 @@
-from just.airy.api import Pkg, cp
+from airy.api import Pkg, cp
 
 Pkg("dictd")
 

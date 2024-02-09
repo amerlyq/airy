@@ -1,3 +1,3 @@
-from just.airy.api import Pkg
+from airy.api import Pkg
 
 Pkg("qtile")

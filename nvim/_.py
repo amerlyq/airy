@@ -1,4 +1,4 @@
-from just.airy.api import Aur, Pkg, ln
+from airy.api import Aur, Pkg, ln
 
 # MAYBE: "code-minimap-bin" for minimap.vim
 

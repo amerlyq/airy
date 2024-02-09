@@ -1,4 +1,4 @@
-from just.airy.api import ln
+from airy.api import ln
 
 # DEPR: https://bugs.archlinux.org/task/68945
 # ln("cfg/pam_environment", file="~/.pam_environment")

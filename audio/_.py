@@ -1,4 +1,4 @@
-from just.airy.api import cp, ln, Pkg
+from airy.api import cp, ln, Pkg
 
 # cp("blacklist-hdmi.conf", under="/etc/modprobe.d")
 

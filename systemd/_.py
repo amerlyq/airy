@@ -1,4 +1,4 @@
-from just.airy.api import ln, cp, Pkg
+from airy.api import ln, cp, Pkg
 
 # sudo systemctl enable --now earlyoom.service
 Pkg("earlyoom")

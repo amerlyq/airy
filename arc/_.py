@@ -1,4 +1,4 @@
-from just.airy.api import cp, Pkg
+from airy.api import cp, Pkg
 
 Pkg("avfs")
 
