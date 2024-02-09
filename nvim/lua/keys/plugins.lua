@@ -8,6 +8,9 @@ local K = require 'keys.bind'.K
 --OPT: :packadd playground
 --  <F3> :TSHighlightCapturesUnderCursor
 -- K('n', '<F3>', ':packadd playground | TSHighlightCapturesUnderCursor<CR>')
+-- News - Neovim docs ⌇⡥⣆⠱⠹
+--   https://neovim.io/doc/user/news.html#news-breaking
+--   NOTE: Renamed vim.treesitter.playground to vim.treesitter.dev.
 K('n', '<F3>', function()
   vim.cmd 'packadd playground | TSHighlightCapturesUnderCursor'
   K('nx', '<F3>', '<Cmd>TSHighlightCapturesUnderCursor<CR>', "Show :hl group under cursor")

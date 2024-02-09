@@ -3,8 +3,8 @@ from just.airy.api import Aur, Pkg, ln
 # MAYBE: "code-minimap-bin" for minimap.vim
 
 # VIZ. $ nvr to talk to vim from inside ranger
-# Pkg("neovim")
-Aur("neovim-git")
+Pkg("neovim")
+# Aur("neovim-git")
 Aur("neovim-remote")
 
 

@@ -33,7 +33,7 @@ function M.iabbrev()
   local ruxkb = 'йцукенгшщз фывапролд ячсмить ЙЦУКЕНГШЩЗ ФЫВАПРОЛД ЯЧСМИТЬ'
   local exclude = { ['ти'] = true } -- suppress abbrevs overlapping with real-life words
   for _, vrgx in pairs(spec.patterns) do
-    for notch in string.gmatch(vrgx:gsub('[\\%%()]', ''), "([^|]+)") do
+    for notch in string.gmatch(vrgx:gsub('[\\%%()<>]', ''), "([^|]+)") do
       -- EXPL: both lower() and UPPER() case should translate to same UPPER iabbr
       local norm = notch:gsub('[-.:;]', '')
       local ru = vim.fn.tr(string.lower(norm), enxkb, ruxkb)
