@@ -2287,6 +2287,7 @@ c.url.searchengines = {
     "za": "http://songza.com/search/?q={}",
     "zsh": "https://www.google.com/search?q=%22zsh%22%20{}",
     "англ": "https://google.com/search?q=english%20{}",
+    "ук": "https://google.com/search?q=українською%20{}",
 }
 
 ## Page(s) to open at the start.
@@ -2648,6 +2649,12 @@ config.bind("zz", "zoom 52%")
 ## @me FIXED:BUG: rogue <Tab> keypresses in QtWebEngine
 # REF: https://github.com/qutebrowser/qutebrowser/issues/4579
 config.bind("<Tab>", "nop")
+
+## @me FIXED:BAD: google spreadsheets deletes cell under cursor on !qtile <M+Tab>
+# REF: [QTCREATORBUG-26818] Pressing ISO_Level5_Shift inserts null character - Qt Bug Tracker ⌇⡥⣜⣈⠯
+#   https://bugreports.qt.io/browse/QTCREATORBUG-26818
+# FAIL: probably due to VoidSymbol in xkb inof expected Meta_L or Super_L
+# config.bind("<Mod4>", "nop")
 
 ## Bindings for caret mode
 # config.bind('$', 'move-to-end-of-line', mode='caret')
