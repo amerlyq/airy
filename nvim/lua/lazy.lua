@@ -49,6 +49,17 @@ local function ft_lua()
 end
 
 
+local function ft_vim()
+  local t = seen_filetypes['vim']
+  vim.cmd [[ packadd nvim-colorizer.lua ]]
+  require 'colorizer'.setup {
+    'vim',
+    html = { mode = 'foreground' }
+  }
+  require 'colorizer'.attach_to_buffer(t.buf)
+end
+
+
 local function ft_lisp()
   require 'plug.treesitter'
 
@@ -123,6 +134,8 @@ local function load_ondemand()
     ft_cpp()
   elseif seen_filetypes['lua'] then
     ft_lua()
+  elseif seen_filetypes['vim'] then
+    ft_vim()
   end
 end
 

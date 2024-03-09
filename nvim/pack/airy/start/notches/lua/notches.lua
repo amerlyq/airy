@@ -17,8 +17,8 @@ function M.register()
   local matchadd = vim.fn.matchadd
   -- local rpfx = '\\v%(^|.*!|\\A@1<=)'
   -- local rsfx = '%(!.*|[:?*.=~]+|\\A@=|$)'
-  local rpfx = '\\v<'
-  local rsfx = '%([:=?!]|>)'
+  local rpfx = '\\v<%('
+  local rsfx = ')%([:=?!]|>)'
 
   -- DEBUG: :echo getmatches()
   vim.fn.clearmatches()
@@ -33,12 +33,14 @@ function M.iabbrev()
   local ruxkb = 'йцукенгшщз фывапролд ячсмить ЙЦУКЕНГШЩЗ ФЫВАПРОЛД ЯЧСМИТЬ'
   local exclude = { ['ти'] = true } -- suppress abbrevs overlapping with real-life words
   for _, vrgx in pairs(spec.patterns) do
-    for notch in string.gmatch(vrgx:gsub('[\\%%()<>]', ''), "([^|]+)") do
+    vrgx = vrgx:gsub('[\\]', '')  -- ALSO: strip wb='<%()>'
+    for notch in string.gmatch(vrgx, '([^|]+)') do
       -- EXPL: both lower() and UPPER() case should translate to same UPPER iabbr
       local norm = notch:gsub('[-.:;]', '')
       local ru = vim.fn.tr(string.lower(norm), enxkb, ruxkb)
       local ru_ = vim.fn.tr(string.upper(norm), enxkb, ruxkb)
       if exclude[ru] == nil then
+        -- DEBUG: print(notch)
         vim.cmd(string.format('iab <buffer> %s %s', ru, notch))
         vim.cmd(string.format('iab <buffer> %s %s', ru_, notch))
       end
