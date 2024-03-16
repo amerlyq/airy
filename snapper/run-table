@@ -8,8 +8,13 @@ root=${1-}
 
 sudo -v
 find "$root"/.snapshots -mindepth 2 -maxdepth 2 -type d -name snapshot  | awk 'x{print x,$1}{x=$1}' | while read -r a b; do
-  printf "%s " "$a"
-  sudo rsync --dry-run --one-file-system --archive --out-format='%l' -- "$a/" "$b" 2>/dev/null |
-    awk '{a+=$1}END{printf"%5.2f GiB ",a/1024/1024/1024}'
-  sudo sed -rn '/<date>/s/[^>]*>(.*)<.*/\1/p' $a:h/info.xml
+  ts=$(sudo sed -rn '/<date>/s/[^>]*>(.*)<.*/\1/p' $a:h/info.xml)
+  printf "[%s]  %s " "$ts" "$a"
+  sudo rsync --dry-run --one-file-system --archive --out-format='%l %f' -- "$a/" "$b" 2>/dev/null |
+    gawk '{sz+=$1; a[substr($0,index($0,"/snapshot/")+9)]=$1} END{
+      printf"%5.2f GiB\n",sz/1024/1024/1024;
+      PROCINFO["sorted_in"]="@val_num_desc";
+      i=0; for (k in a) { z=a[k]/1024/1024; if(i>10||z<30){if(i>0)print"";break}; printf"  %7.2f  %s\n",z,k; ++i;}
+    }'
+    # awk '{a+=$1}END{printf"%5.2f GiB ",a/1024/1024/1024}'
 done
