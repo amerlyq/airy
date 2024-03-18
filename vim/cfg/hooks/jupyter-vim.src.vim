@@ -1,19 +1,14 @@
 
 let g:jupyter_mapkeys = 0
 
-"" BET: assign it something short during prolog inside IPython
-" let g:jupyter_live_pprint = '/__import__("just.iji.util").iji.util.print_ret '
-let g:jupyter_live_pprint = '/p '
-" let g:jupyter_live_exec = g:jupyter_live_pprint .'_live()'
-" let g:jupyter_live_exec = 'print(_live())'
-let g:jupyter_live_exec = '_live()'
-let g:jupyter_live_auto = 1
-
 " FIXED:(removed '##'): prevent .py code hi! in my own header '## …' comments
 let g:jupyter_cell_separators = ['#%%', '# %%', '# <codecell>']
 
-
-autocmd MyAutoCmd FileType python call BufMap_jupyter_vim()
+augroup jupy
+" DISABLED: file is re-sourced on each .py buffer, resetting prev exec-on-write
+" autocmd!
+au! FileType python call BufMap_jupyter_vim()
+augroup END
 
 " \\n    noremap  <silent> <Plug>JupyterRunVisual     :<C-u>call <SID>opfunc_run_code(visualmode())<CR>gv
 " \\n    nnoremap <buffer><silent><unique>  <LocalLeader>U :JupyterUpdateShell<CR>
@@ -102,7 +97,15 @@ endf
 
 
 fun! BufMap_jupyter_vim() abort
-  if exists('b:BufMap_jupyter_vim')|return|else|let b:BufMap_jupyter_vim=1|endif
+  if exists('b:BufMap_jupyter_vim')|return|endif
+
+  "" BET: assign it something short during prolog inside IPython
+  " let b:jupyter_live_pprint = '/__import__("just.iji.util").iji.util.print_ret '
+  let b:jupyter_live_pprint = '/p '
+  " let b:jupyter_live_exec = b:jupyter_live_pprint .'_live()'
+  " let b:jupyter_live_exec = 'print(_live())'
+  let b:jupyter_live_exec = '_live()'
+  let b:jupyter_live_auto = 1
 
   nnoremap <buffer><silent><unique>  <LocalLeader>z :call Jupyter_connect_buf()<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>Z :JupyterConnect<CR>
@@ -114,25 +117,24 @@ fun! BufMap_jupyter_vim() abort
   nnoremap <buffer><silent><unique>  <LocalLeader>I :PythonImportThisFile<CR>
 
   " IDEA: call "_live" on each ",s" save :USAGE:
-  augroup jupy | autocmd! | augroup END
   " FAIL: doesn't work for current file :: call jupyter#SendCode('%autoreload')
   " BAD: runs _live() even on error during sourcing
-  au! jupy BufWritePost <buffer> if g:jupyter_live_auto && Jupyter_connected()| call jupyter#RunFile("-niG", expand('%:p'))|call Jupyter_send_pprint(g:jupyter_live_exec) |en
-  nnoremap <buffer><silent><unique>  <LocalLeader>ta :let g:jupyter_live_auto=!g:jupyter_live_auto<Bar>echom g:jupyter_live_auto<CR>
+  au! jupy BufWritePost <buffer> if b:jupyter_live_auto && Jupyter_connected()| call jupyter#RunFile("-niG", expand('%:p'))|call Jupyter_send_pprint(b:jupyter_live_exec) |en
+  nnoremap <buffer><silent><unique>  <LocalLeader>ta :let b:jupyter_live_auto=!b:jupyter_live_auto<Bar>echom b:jupyter_live_auto<CR>
 
-  nnoremap <buffer><silent><unique>  <LocalLeader>f :call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>J :let g:jupyter_live_exec=getline('.')<Bar>echom g:jupyter_live_exec<CR>
-  xnoremap <buffer><silent><unique>  <LocalLeader>J "sy:<C-u>let g:jupyter_live_exec=getreg('s')<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>f :call Jupyter_send_pprint(b:jupyter_live_exec)<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>J :let b:jupyter_live_exec=getline('.')<Bar>echom b:jupyter_live_exec<CR>
+  xnoremap <buffer><silent><unique>  <LocalLeader>J "sy:<C-u>let b:jupyter_live_exec=getreg('s')<CR>
   nnoremap <buffer><silent><unique>  <LocalLeader>j :call jupyter#SendCode('%autoreload')<CR>
 
   nnoremap <buffer><silent><unique>  <LocalLeader>h :JupyterSendCell<CR>
   " nnoremap <buffer><silent><unique>  <LocalLeader>x :JupyterSendCell<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>S :call jupyter#SendCell()\|call jupyter#SendCode(g:jupyter_live_exec)<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>S :call jupyter#SendCell()\|call jupyter#SendCode(b:jupyter_live_exec)<CR>
   xmap     <buffer><silent><unique>  <LocalLeader>S <Plug>JupyterRunVisual
-  nnoremap <buffer><silent><unique>  <LocalLeader>d <Cmd>call jupyter#RunFile("-niG", expand('%:p')) \| call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
-  nnoremap <buffer><silent><unique>  <LocalLeader>D <Cmd>call Jupyter_send_pprint(g:jupyter_live_exec)<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>d <Cmd>call jupyter#RunFile("-niG", expand('%:p')) \| call Jupyter_send_pprint(b:jupyter_live_exec)<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>D <Cmd>call Jupyter_send_pprint(b:jupyter_live_exec)<CR>
   " FAIL: doesn't print anything back
-  nnoremap <buffer><silent><unique>  <LocalLeader>p <Cmd>call jupyter#RunFile("-niG", expand('%:p')) \| call jupyter#SendCode("%prun -s tottime -l 10 ".g:jupyter_live_exec)<CR>
+  nnoremap <buffer><silent><unique>  <LocalLeader>p <Cmd>call jupyter#RunFile("-niG", expand('%:p')) \| call jupyter#SendCode("%prun -s tottime -l 10 ".b:jupyter_live_exec)<CR>
 
   " nnoremap <buffer><silent><unique>  <LocalLeader>s :<C-u>set operatorfunc=<SID>opfunc_run_code<CR>g@
   " xnoremap <buffer><silent><unique>  <LocalLeader>s "sy:<C-u>call jupyter#SendCode('p('.getreg("s").')')<CR>
@@ -185,7 +187,9 @@ fun! BufMap_jupyter_vim() abort
   " call s:mapsendcode('tp', '/p ')
   call s:mapsendcode('tr', "/__import__('pprint').pprint ")
   call s:mapsendcode('ts', 'p(', ')')
-  call s:mapsendcode('tt', g:jupyter_live_pprint)
+  call s:mapsendcode('tt', b:jupyter_live_pprint)
   call s:mapsendcode('tv', '/vars ')
   call s:mapsendcode('tw', '')
+
+  let b:BufMap_jupyter_vim = 1
 endf

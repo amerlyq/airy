@@ -9,10 +9,10 @@ if &cp||exists('g:loaded_xtref')|finish|else|let g:loaded_xtref=1|endif
 let g:xtref = {}
 " MAYBE: if list -- use first existing dir [/x, /aura, /data/aura, /home/user/aura]
 " [_] FIXME: use /@
-let g:xtref.aura = "/@/aura"   " main dir of your global knowledge base
+let g:xtref.aura = "/d/aura"   " main dir of your global knowledge base
 let g:xtref.tagfile = 'xtref.tags' " separate DB for xrefs to prevent
 " $VPLUGS = temp store *.tags for newly created/edited files
-let g:xtref.lazytagdir = "/@/xdg_cache/nvim"
+let g:xtref.lazytagdir = "/d/xdg_cache/nvim"
 
 " ALT: ⌇ => ¶ .like. https://www.yoctoproject.org/docs/3.1.1/brief-yoctoprojectqs/brief-yoctoprojectqs.html
 " OR:USE: '⌇' = "\u2307" = [\u2307]
@@ -22,7 +22,8 @@ let g:xtref.task_pfx = '['
 let g:xtref.step_pfx = '^'
 let g:xtref.event_pfx = '<'
 let g:xtref.markers = [g:xtref.anchor_pfx, g:xtref.refer_pfx]
-let g:xtref.prefixes = g:xtref.markers + [g:xtref.task_pfx, g:xtref.step_pfx]
+let g:xtref.leaders = g:xtref.markers + [g:xtref.step_pfx]
+let g:xtref.prefixes = g:xtref.leaders + [g:xtref.task_pfx]
 
 " TODO: support for nanoseconds tail
 " ALT:(queue): $ r.vim-xtref -pp $ ALT:(generic): '\S{3,20}\ze\s?'
@@ -31,11 +32,12 @@ let s:r_brchr = '\u2800-\u28FF'
 let s:r_bryes = '['.s:r_brchr.']'
 let s:r_brnot = '[^'.s:r_brchr.']'
 let s:r_braille = s:r_bryes . '{2,4}'
-let g:xtref.r_addr = '('. s:r_z85 .'|'. s:r_braille .')'
+" let g:xtref.r_addr = '('. s:r_z85 .'|'. s:r_braille .')'
 " IDEA: allow xtref free format in brackets ※[so me] instead of time-format
 "  ALT: use completely different braces
-let g:xtref.r_anchor = g:xtref.anchor_pfx . g:xtref.r_addr
-let g:xtref.r_refer = g:xtref.refer_pfx . g:xtref.r_addr
+let g:xtref.r_anchor = g:xtref.anchor_pfx . s:r_braille
+let g:xtref.r_refer = g:xtref.refer_pfx . s:r_braille
+let g:xtref.r_any = '\v['. join(g:xtref.leaders) .']'. s:r_braille
 
 
 " NOTE: xref artifact ※unReK
@@ -269,7 +271,7 @@ fun! xtref#ctags(root, ...)
   end
 
   " let cmd = 'r.vim-xtref -t -- -o '.dst
-  let cmd = '/@/airy/vim/ctl/xtref -t -- -o '.dst
+  let cmd = '/d/airy/vim/ctl/xtref -t -- -o '.dst
   if dstdir != a:root
     let cmd .= ' --tag-relative=never'
   end
@@ -391,13 +393,16 @@ if m := M.find_near(ctx.line, ctx.window.cursor[1]):
   pfx = "※" if m.group(0)[0] == "⌇" else "⌇"
   vn = vim.eval("v:count")
   cmd = vn + "tag" if vn != "0" else "tjump"
-  vim.command(cmd + " " + pfx + m.group(1))
+  cmdline = cmd + " " + pfx + m.group(1)
+  # vim.command(cmdline)
 EOF
+  return ":\<C-u>". py3eval('cmdline') ."\<CR>"
 endf
-nnoremap <Plug>(xtref-jump)  :<C-u>call xtref#py_jump()<CR>
 
-map  g]        <Plug>(xtref-jump)
-map  g<Space>  <Plug>(xtref-jump)
+nnoremap  <expr> <Plug>(xtref-jump)  (match(getline('.'), g:xtref.r_any)<0 ? "g\<C-]>" : xtref#py_jump())
+
+nmap  g]        <Plug>(xtref-jump)
+nmap  g<Space>  <Plug>(xtref-jump)
 
 
 "" NOTE: jump anchor from referal under cursor, and vice versa

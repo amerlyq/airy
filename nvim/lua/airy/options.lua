@@ -23,6 +23,7 @@ if vim.fn.has("wsl") == 1 then
 
   -- SRC: https://www.reddit.com/r/neovim/comments/vxdjyb/comment/iknh207/
   -- ALT: copy-only (to workaround "mouse=a" in Citrix-VDI-WSL2)
+  -- ALSO: $ sudo ln -fTs /mnt/c/WINDOWS/system32/clip.exe  /usr/local/bin/xci
   vim.api.nvim_create_autocmd('TextYankPost', {
     group = vim.api.nvim_create_augroup('Yank', { clear = true }),
     callback = function()
