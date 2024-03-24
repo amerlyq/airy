@@ -1,48 +1,48 @@
 ### Pathes
 
 ## Agenda
-# NOTE:USE: /@/* as relay point for absolute symlinks
-.0  /@/at/=
+# NOTE:USE: /d/* (or /@/*) as relay point for absolute symlinks
+.0  /d/at/=
 .1  /!  # root (?agenda?)
-.!  /@/at
+.!  /d/at
 .2  /@  # features
-.@  /@/at/feature
+.@  /d/at/feature
 .3  /#  # tags (gen-group)
-.#  /@/at/tag
-.4  /@/at/group/pkgsrc
+.#  /d/at/tag
+.4  /d/at/group/pkgsrc
 .5  /%  # groups (manually)
-.%  /@/at/group
+.%  /d/at/group
 
 ### Configs
-..a  /@/airy/airy
-..b  /@/airy/backup
-..g  /@/airy/git
-..m  /@/xdg_home/.mutt
-..M  /@/xdg_home/.mail  # MOVE: -> /aura
-..n  /@/airy/nvim
-..i  /@/airy/irc
-..P  /@/at/group/pkgsrc
-..q  /@/airy/qute/config.py
-..Q  /@/xdg_config/qutebrowser
-..r  /@/airy/ranger
-..R  /@/xdg_share/ranger
+..a  /d/airy/airy
+..b  /d/airy/backup
+..g  /d/airy/git
+..m  /d/xdg_home/.mutt
+..M  /d/xdg_home/.mail  # MOVE: -> /aura
+..n  /d/airy/nvim
+..i  /d/airy/irc
+..P  /d/at/group/pkgsrc
+..q  /d/airy/qute/config.py
+..Q  /d/xdg_config/qutebrowser
+..r  /d/airy/ranger
+..R  /d/xdg_share/ranger
 # ..R  /usr/lib/python3.6/site-packages/ranger
-..s  /@/xdg_cache/airy/pkg/spacemacs
-..t  /@/airy/tmux
+..s  /d/xdg_cache/airy/pkg/spacemacs
+..t  /d/airy/tmux
 # ..u  ~/.urxvt
-..v  /@/airy/vim
-..V  /@/xdg_cache/vim/dein/repos/github.com
-..w  /@/xdg_home/.weechat
-..x  /@/airy/xmonad
-..X  /@/xdg_home/.xmonad
+..v  /d/airy/vim
+..V  /d/xdg_cache/vim/dein/repos/github.com
+..w  /d/xdg_home/.weechat
+..x  /d/airy/xmonad
+..X  /d/xdg_home/.xmonad
 # ..X  /usr/lib/python3.9/site-packages/xcffib
 ..z  /d/airy/zsh/cfg/zshrc
-..Z  /@/xdg_cache/zsh/.zprezto
+..Z  /d/xdg_cache/zsh/.zprezto
 
 
 ### Modules
-..A  /@/xdg_cache/airy
-.A   /@/archive
+..A  /d/xdg_cache/airy
+.A   /d/archive
 # .A   /cache/audit
 # .Ac  ~/.config/airy
 # .Ah  ~/.cache/airy
@@ -51,49 +51,49 @@
 # .At  ~/.cache/airy/tags
 
 # BET? .a   /@
-.a   /@/airy
+.a   /d/airy
 
 # .b.  ~/aura/btrx
 # .bt  ~/aura/btrx/beatrix-templates
 .b.  /build
-.bx  /@/beatrix
-.bX  /@/xdg_cache/beatrix
+.bx  /d/beatrix
+.bX  /d/xdg_cache/beatrix
 .B  /usr/local/bin
-..B   /@/bin
-# .B   /@/airy/_build/bin
-# .C   /@/airy/_build/cfg
+..B   /d/bin
+# .B   /d/airy/_build/bin
+# .C   /d/airy/_build/cfg
 
 .c.  /cache
-.ca  /@/xdg_share/pikaur/aur_repos
-.cA  /@/xdg_cache/pikaur/build
-.cb  /@/coastline/beatrix
+.ca  /d/xdg_share/pikaur/aur_repos
+.cA  /d/xdg_cache/pikaur/build
+.cb  /d/coastline/beatrix
 # .cb  ~/.cache/airy/tags/browser
 # .cc  ~/.cache/airy/tags/core
-.cc  /@/xdg_config
+.cc  /d/xdg_config
 # .cd  ~/.cache/airy/tags/dev
-.cf  /@/coastline/fleur
+.cf  /d/coastline/fleur
 # .cg  ~/.cache/airy/tags/game
 # .ci  ~/.cache/airy/tags/io
 .cI  /usr/include
-.ch  /@/xdg_cache
+.ch  /d/xdg_cache
 .ck  /var/cache/pacman
 .cK  /var/lib/pacman/sync
-.cl  /@/xdg_local
-.cL  /@/xdg_local/lib
+.cl  /d/xdg_local
+.cL  /d/xdg_local/lib
 .cm  /mnt
 # .cn  ~/.cache/airy/tags/net
-.co  /@/coastline
+.co  /d/coastline
 .cp  /opt
-.cq  /@/xdg_local/qute-proxy
+.cq  /d/xdg_local/qute-proxy
 # .cr  ~/.cache/airy/tags/re
-.cs  /@/xdg_share
+.cs  /d/xdg_share
 .cS  /usr/share
 .ct  /t
 # .cu  ${TMPDIR:-/tmp/$USER}/
-.cw  /@/chat/weechat
+.cw  /d/chat/weechat
 # .cx  ~/.cache/airy/tags/xorg
 .cx  /run/user/1000
-.cz  /@/chat
+.cz  /d/chat
 
 .d.  /data
 .dA  /data/anime
@@ -111,149 +111,153 @@
 .dp  /data/photos
 .dP  /data/photos_priv
 .dr  /_dld/rtorrent
-# .ds  /@/seize/kirie/dast
+# .ds  /d/seize/kirie/dast
 .ds  /data/sync
 .du  /data/aura
 .dv  /data/amv
 .dw  /data/wall
 .dy  /_dld/youtube
 
-.e.  /@/erian
-.eo  /@/erian_old
+.e.  /d/erian
+.eo  /d/erian_old
 
-.F   /@/feed
+.F   /d/feed
 # .f.  ~/aura/fork
-.fa  /@/fantasy
-.fi  /@/finance
-.fl  /@/coastline/fleur
+.fa  /d/fantasy
+.fi  /d/finance
+.fl  /d/coastline/fleur
 # .fs  ~/aura/fork/st
 
-.g.  /@/games
-.gd  /@/games/_dld
-.gg  /@/gaming
-.gi  /@/games/_install
-.gm  /@/steamapps
-.gp  /@/games/_play/wineprefix
-# .gs  /@/gamesaves
-.gs  /@/plugins
+.g.  /d/games
+.gd  /d/games/_dld
+.gg  /d/gaming
+.gi  /d/games/_install
+.gm  /d/steamapps
+.gp  /d/games/_play/wineprefix
+# .gs  /d/gamesaves
+.gs  /d/plugins
 
-.h.  /@/devq/hack
-.ha  /@/devq/hack/asm/mips
+.h.  /d/devq/hack
+.ha  /d/devq/hack/asm/mips
 .hi  /data/hist
-.hs  /@/devq/hack/smashthestack
-.hw  /@/devq/hardware
-.hx  /@/airy/hw/log/WKLOG.nou
+.hs  /d/devq/hack/smashthestack
+.hw  /d/devq/hardware
+.hx  /d/airy/hw/log/WKLOG.nou
 .hy  /data/hist/_synchro
 
-.i   /@/irome
-.I   /@/items
+.i.  /d/irome
+.id  /d/irome/_dld
+.ii  /d/irome
+.iv  /d/irome/view/2024
+
+.I   /d/items
 # .io  ~/aura/mio
 
-.J   /@/just
-.j.  /@/just
-.ja  /@/just/airy/airy.py
-.jA  /@/just/monica/android/__init__.py
-.jc  /@/just/monica/clipboard
-.jd  /@/just/ext/datetime
-.je  /@/just/ext
-.jf  /@/just/ext/fso
-.jg  /@/just/world/git
-# .ji  /@/just/use/iji
-.ji  /@/just/remi
-.jj  /@/just/flower/tenjo
-.jk  /@/just/ctl
-.jl  /@/just/reelf
-.jm  /@/just/miur
-.jo  /@/just/monica
-.jq  /@/just/monica/qute
-.jr  /@/just/reelf
-.jv  /@/just/live
-.jw  /@/just/world
-.jW  /@/just/web
-.jx  /@/just/flower/xts
+.J   /d/just
+.j.  /d/just
+.ja  /d/just/airy/airy.py
+.jA  /d/just/monica/android/__init__.py
+.jc  /d/just/monica/clipboard
+.jd  /d/just/ext/datetime
+.je  /d/just/ext
+.jf  /d/just/ext/fso
+.jg  /d/just/world/git
+# .ji  /d/just/use/iji
+.ji  /d/just/remi
+.jj  /d/just/flower/tenjo
+.jk  /d/just/ctl
+.jl  /d/just/reelf
+.jm  /d/just/miur
+.jo  /d/just/monica
+.jq  /d/just/monica/qute
+.jr  /d/just/reelf
+.jv  /d/just/live
+.jw  /d/just/world
+.jW  /d/just/web
+.jx  /d/just/flower/xts
 
-.k   /@/devq/kernel
+.k   /d/devq/kernel
 
-# .L   /@/lib
-.l.  /@/lyfa
-# .li  /@/lib
-.ll  /@/lyfa/lists
-# .lp  /@/lib/python
-.ly  /@/lyfa
+# .L   /d/lib
+.l.  /d/lyfa
+# .li  /d/lib
+.ll  /d/lyfa/lists
+# .lp  /d/lib/python
+.ly  /d/lyfa
 
-.M   /@/employment/migration
-.m.  /@/meridia
-# .md  /@/miur/doc
-.md  /@/metadata
-# .me  /@/meridia/estimation
+.M   /d/employment/migration
+.m.  /d/meridia
+# .md  /d/miur/doc
+.md  /d/metadata
+# .me  /d/meridia/estimation
 .me  /data/media
-.mf  /@/meridia/finance
-.mg  /@/meridia/mgmt
-.mi  /@/miur/lisp
-.mj  /@/meridia/languages
-# .mk  /@/aura/miur/kirie
-.ml  /@/miur/lisp
-.mL  /@/just/miur/lisp/log/WKLOG.nou
-.mm  /@/miur
-.mo  /@/just/monica
-.ms  /@/meridia/struct
-.mu  /@/music
+.mf  /d/meridia/finance
+.mg  /d/meridia/mgmt
+.mi  /d/miur/lisp
+.mj  /d/meridia/languages
+# .mk  /d/aura/miur/kirie
+.ml  /d/miur/lisp
+.mL  /d/just/miur/lisp/log/WKLOG.nou
+.mm  /d/miur
+.mo  /d/just/monica
+.ms  /d/meridia/struct
+.mu  /d/music
 .mv  /data/amv
-# .my  /@/my
+# .my  /d/my
 .my  /data/media/youtube
 
 .n.  /net
 .nb  /net/backup
-.ng  /@/plugins/nvim/all
+.ng  /d/plugins/nvim/all
 .nh  /net/share/amer
 .nn  /net/share/amer/_private
 .nm  /net/share/misc
-.no  /@/nou.vim
+.no  /d/nou.vim
 .ns  /net/share
 .nS  /usr/share/nvim/runtime
 .nV  /usr/share/nvim/runtime
-.nv  /@/airy/nvim/init.lua
+.nv  /d/airy/nvim/init.lua
 
-.o   /@/demo
-.O   /@/employment
+.o   /d/demo
+.O   /d/employment
 
 # .p   ~/pkg
-# .p.  /@/aura/pj
-# .pf  /@/aura/forestanza/forestanza
-.pg  /@/plugins
-.ph  /@/photos
-.pH  /@/photos_priv
-# .pj  /@/aura/pj/jira-cli
-.pp  /@/piony
-# .ps  /@/aura/forestanza/forestanza.sh
-.ps  /@/passdb
-# .py  /@/aura/pj/pyarxi
-# .pu  /@/aura/pj/urxvt-ext-evolved
+# .p.  /d/aura/pj
+# .pf  /d/aura/forestanza/forestanza
+.pg  /d/plugins
+.ph  /d/photos
+.pH  /d/photos_priv
+# .pj  /d/aura/pj/jira-cli
+.pp  /d/piony
+# .ps  /d/aura/forestanza/forestanza.sh
+.ps  /d/passdb
+# .py  /d/aura/pj/pyarxi
+# .pu  /d/aura/pj/urxvt-ext-evolved
 
-.q.  /@/devq
-.q3  /@/devq/projects/pa3arch
-.qa  /@/devq/android
-.qc  /@/devq/projects/callgraph
-.qe  /@/devq/iji/python
-.qj  /@/devq/iji
-.ql  /@/devq/langs
-.qm  /@/devq/projects/mindmap
-.qp  /@/devq/projects
-.qr  /@/devq/re
-.qt  /@/airy/qtile/config.py
-.qu  /@/devq/projects/aura
-.qw  /@/devq/projects/airywm
+.q.  /d/devq
+.q3  /d/devq/projects/pa3arch
+.qa  /d/devq/android
+.qc  /d/devq/projects/callgraph
+.qe  /d/devq/iji/python
+.qj  /d/devq/iji
+.ql  /d/devq/langs
+.qm  /d/devq/projects/mindmap
+.qp  /d/devq/projects
+.qr  /d/devq/re
+.qt  /d/airy/qtile/config.py
+.qu  /d/devq/projects/aura
+.qw  /d/devq/projects/airywm
 
-.r.  /@/research
-.re  /@/seize/kirie/re-elf
+.r.  /d/research
+.re  /d/seize/kirie/re-elf
 .rl  /d/research/coastline
-.rs  /@/seize/kirie/sora
-.R.  /@/evernote
-# .Rr  /@/evernote/ranobe
+.rs  /d/seize/kirie/sora
+.R.  /d/evernote
+# .Rr  /d/evernote/ranobe
 
-# .s   /@/aura/shards  # = base, common, dast, lib
-.s   /@/sync/@
-.S   /@/sync
+# .s   /d/aura/shards  # = base, common, dast, lib
+.s   /d/sync/@
+.S   /d/sync
 # .S   /srv
 # .sr   /srv/repo
 # .S   /cache/sdk
@@ -261,66 +265,66 @@
 
 # .T   ~/aura/tomb
 .T   /t
-.t.  /@/aeternum
-.ta  /@/todo/alg
-.tb  /@/aeternum/buildsystems
-.tc  /@/todo/now/cal.nou
-.td -l /@/todo/log/!today
-# .te -l /@/todo/recurrent/day/everyday.task
+.t.  /d/aeternum
+.ta  /d/todo/alg
+.tb  /d/aeternum/buildsystems
+.tc  /d/todo/now/cal.nou
+.td -l /d/todo/log/!today
+# .te -l /d/todo/recurrent/day/everyday.task
 .te  /d/just/flower/tenjo/tmpl/dailylog.py
-# .tf -l /@/feed/www/tabs.adoc
-.tf  /@/todo/frwk/feed.nou
-.tF  /@/aeternum/frameworks
-.tg  /@/aeternum/languages
-.ti  /@/todo/ideas/feed.nou
-.tj  /@/todo/now
-.tk -l /@/todo/key/!today
-.tK -l /@/todo/key/!last
-.tl -l /@/todo/log/!last
-.tL -l /@/todo/key/!last
-.tm  /@/todo/my
-# .tn  /@/todo/now
-.tn  /@/todo/now/next.nou
-.to  /@/todo  # OR: /@/todo/{log,old,ongoing}
-.tp  /@/aeternum/languages/python
-.tr  /@/todo/now/rest.nou
-.tt -l /@/todo/log/!today
-.tT -l /@/todo/log/!last
-# .tu -l /@/todo/my/upcoming.nou
-.tw  /@/todo/work/TODO.nou
-.tW  /@/todo/work/!archive
-.tx  /@/todo/now
-.ty -l /@/todo/log/!today
-.tY -l /@/todo/key/!today
-.tz  /@/todo/arc
+# .tf -l /d/feed/www/tabs.adoc
+.tf  /d/todo/frwk/feed.nou
+.tF  /d/aeternum/frameworks
+.tg  /d/aeternum/languages
+.ti  /d/todo/ideas/feed.nou
+.tj  /d/todo/now
+.tk -l /d/todo/key/!today
+.tK -l /d/todo/key/!last
+.tl -l /d/todo/log/!last
+.tL -l /d/todo/key/!last
+.tm  /d/todo/my
+# .tn  /d/todo/now
+.tn  /d/todo/now/next.nou
+.to  /d/todo  # OR: /d/todo/{log,old,ongoing}
+.tp  /d/aeternum/languages/python
+.tr  /d/todo/now/rest.nou
+.tt -l /d/todo/log/!today
+.tT -l /d/todo/log/!last
+# .tu -l /d/todo/my/upcoming.nou
+.tw  /d/todo/work/TODO.nou
+.tW  /d/todo/work/!archive
+.tx  /d/todo/now
+.ty -l /d/todo/log/!today
+.tY -l /d/todo/key/!today
+.tz  /d/todo/arc
 
-.u   /@/audit
-.U   /@/aura
+.u   /d/audit
+.U   /d/aura
 
 # .v.  ~/aura/vim
-.va  /@/audit/!today/vim
-.vb  /@/plugins/nvim/lazy/pack/boot/start
-.vc  /@/airy/nvim/colors/airy.lua
-.vd  /@/airy/nvim/pack/airy/start
-.ve  /@/plugins/nvim/lazy/extra/start
+.va  /d/audit/!today/vim
+.vb  /d/plugins/nvim/lazy/pack/boot/start
+.vc  /d/airy/nvim/colors/airy.lua
+.vd  /d/airy/nvim/pack/airy/start
+.ve  /d/plugins/nvim/lazy/extra/start
 # .vf  ~/aura/vim/forestanza.vim
-.vg  /@/plugins/nvim/all
-.vG  /@/seize/amer/agn.vim
-.vh  /@/airy/vim/plugin
-.vi  /@/airy/nvim/init.lua
-.vk  /@/airy/nvim/lua/keys/plugins.lua
-.vl  /@/airy/nvim/lua/lazy.lua
-.vL  /@/airy/nvim/log
+.vg  /d/plugins/nvim/all
+.vG  /d/seize/amer/agn.vim
+.vh  /d/airy/vim/plugin
+.vi  /d/airy/nvim/init.lua
+.vk  /d/airy/nvim/lua/keys/plugins.lua
+.vl  /d/airy/nvim/lua/lazy.lua
+.vL  /d/airy/nvim/log
 .vm  /vm
-.vn  /@/airy/nvim
-.vo  /@/airy/nvim/lua/airy/options.lua
-.vp  /@/airy/vim/lua/plug
-.vs  /@/airy/nvim/snippets/python.snippets
-.vS  /@/xdg_cache/vim/dein/repos/github.com/honza/vim-snippets/snippets/python.snippets
-.vt  /@/airy/vim/lua/plug/telescope.lua
-.vu  /@/airy/nvim/plugin
-.vv  /@/airy/vim/cfg
-.vz  /@/airy/nvim/lua/lazy.lua
+.vn  /d/airy/nvim
+.vo  /d/airy/nvim/lua/airy/options.lua
+.vp  /d/airy/vim/lua/plug
+.vs  /d/airy/nvim/snippets/python.snippets
+.vS  /d/xdg_cache/vim/dein/repos/github.com/honza/vim-snippets/snippets/python.snippets
+.vt  /d/airy/vim/lua/plug/telescope.lua
+.vu  /d/airy/nvim/plugin
+.vv  /d/airy/vim/cfg
+.vz  /d/airy/nvim/lua/lazy.lua
 
 .w. -l /d/wklog/!pj
 .w, -l /work/!now
@@ -332,7 +336,7 @@
 .we  /d/employment
 .wf -l /work/!now
 .wh  ~/work
-.wi  /@/seize/kirie/wiw
+.wi  /d/seize/kirie/wiw
 # .wj  /work/tenjo
 .wk  /d/wklog
 .wl  /d/todo/work/log
@@ -360,12 +364,12 @@
 # .X   ~/backup-lists/tiers
 
 # .y   /aura
-.y   /@/aura
-.Y   /@/xdg_aurutils
+.y   /d/aura
+.Y   /d/xdg_aurutils
 
-.z   /@/seize
-.Z   /@/archive
+.z   /d/seize
+.Z   /d/archive
 
 
-g.k -l /@/todo/key/!today
-g.w  /@/todo/work/TODO.nou
+g.k -l /d/todo/key/!today
+g.w  /d/todo/work/TODO.nou
