@@ -18,8 +18,13 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 -- ALSO: { 'rust_analyzer', 'pyright', 'tsserver' }
 -- TODO  'sumneko_lua' -> 'lua_ls' for 'lspconfig>=0.2.0'
 local servers = { 'pylsp', 'clangd' }
+-- local qnx_base = "/opt/qnx/qnx710"
+-- local qnx_host = qnx_base .. "/host/linux/x86_64"
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
+    -- cmd = { "clangd-12", "--query-driver="..qnx_host.."/usr/bin/ntoaarch64-gcc" },
+    -- PATH=qnx_host.."/usr/bin:"..vim.env.PATH,
+    -- cmd_env = {QNX_HOST=qnx_host, QNX_TARGET=qnx_base .. "/target/qnx7"},
     on_attach = require('lsp.attach'),
     capabilities = capabilities,
     settings = require('lsp.' .. lsp),

@@ -7,8 +7,8 @@ local function lsp_mappings(client, bufnr)
   local KBn = function(lhs, fn, s) KB(bufnr, 'n', lhs, '', { callback = fn, noremap = true, desc = s }) end
 
   KBn('gd', B.definition, "definition [LSP]")
-  KBn('gD', B.type_definition, "type_def [LSP]") -- DFL=,D | <LL>d
-  -- KBn('gD', B.declaration) -- NOT
+  -- KBn('gD', B.type_definition, "type_def [LSP]") -- DFL=,D | <LL>d
+  KBn('gD', B.declaration, "decl [LSP]") -- NOT
   KBn('gw', B.references, "references [LSP]") -- DFL=gr  @me=<LocalLeader>u
   -- KBn('gW', B.incoming_calls) -- NOT
   -- KBn('gW', B.outgoing_calls) -- NOT
