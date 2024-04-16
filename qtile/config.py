@@ -1,6 +1,8 @@
 # SEE: /usr/lib/python3.10/site-packages/libqtile/backend/x11/xkeysyms.py
-#%DEBUG: $ tail -F ~/.local/share/qtile/qtile.log
+# %DEBUG: $ tail -F ~/.local/share/qtile/qtile.log
+import importlib
 import os
+import sys
 import time
 from typing import cast
 
@@ -16,8 +18,8 @@ from psutil import Process
 
 # pylint:disable=invalid-name
 
-import importlib, sys
-importlib.reload(sys.modules['just.ext.datetime.cvt'])
+
+importlib.reload(sys.modules["just.ext.datetime.cvt"])
 from just.ext.datetime.cvt import ts_xts3aw
 
 
@@ -45,6 +47,7 @@ ranger = ["st", "-e", "ranger", "--choosedir=/run/user/1000/ranger/cwd", "--"]
 
 mod_open = [
     Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
+    Key([], "c", lazy.spawn(["st", "-e", "calc"]), desc="Launch calculator"),
     Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
     Key([], "i", lazy.spawn(["st", "-e", "ipython"]), desc="Launch ipython"),
     Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
@@ -102,7 +105,7 @@ keys = [
     K(
         "M-<Tab>",
         lazy.layout.toggle_split(),
-        desc="Toggle between split and unsplit sides of stack"
+        desc="Toggle between split and unsplit sides of stack",
         # * Split = all windows displayed
         # * Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
     ),
@@ -154,14 +157,19 @@ keys = [
     #         for i in range(0, 10)
     #     ],
     # ),
-    K("<XF86AudioRaiseVolume>", lazy.spawn("amixer -q -- set Master 1%+")),
-    K("<XF86AudioLowerVolume>", lazy.spawn("amixer -q -- set Master 1%-")),
-    K("<XF86AudioMute>", lazy.spawn("amixer -c 0 -q set Master toggle")),
+    K("<XF86AudioRaiseVolume>", lazy.spawn("amixer -q -- sset Master playback 1%+")),
+    K("<XF86AudioLowerVolume>", lazy.spawn("amixer -q -- sset Master playback 1%-")),
+    K("<XF86AudioMute>", lazy.spawn("amixer -c 0 -q sset Master playback toggle")),
     ## OLD:FIXED:USE: "amixer -c 0 -q set Headphone 1dB+" inof "Master" due to SOF driver wrong wiring
-    K("M-<Page_Up>", lazy.spawn("amixer -q -- set Master 1%+"), desc="Volume up"),
+    K(
+        "M-<Page_Up>",
+        # FIXED:(flock): avoid data racing, which disbalances audio channels
+        lazy.spawn("flock -xFw1 /usr/bin/amixer amixer -q -- sset Master playback 1%+"),
+        desc="Volume up",
+    ),
     K(
         "M-<Page_Down>",
-        lazy.spawn("amixer -q -- set Master 1%-"),
+        lazy.spawn("flock -xFw1 /usr/bin/amixer amixer -q -- sset Master playback 1%-"),
         desc="Volume down",
     ),
     # K("M-x", lazy.spawn(["env", "--chdir=/d/research/clipboard/infinitecopy", "--",
@@ -330,7 +338,9 @@ floating_layout = layout.Floating(
         # WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST
         # WM_CLASS(STRING) = "onboard", "Onboard"
         Match(wm_class="onboard"),
-        Match(wm_type="_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"),  # =zoom OR: (WM_NAME = "" && _NET_WM_NAME = "zoom")
+        Match(
+            wm_type="_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"
+        ),  # =zoom OR: (WM_NAME = "" && _NET_WM_NAME = "zoom")
         # --> doIgnore
         # "_NET_WM_WINDOW_TYPE_TOOLTIP"
         # "_NET_WM_WINDOW_TYPE_UTILITY"
