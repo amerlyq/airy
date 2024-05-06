@@ -556,7 +556,7 @@ class flat_inode(Command):
         if toggle:
             self.shift()
 
-        if re.match("^-?\d+$", self.arg(1)):
+        if re.match("^-?\\d+$", self.arg(1)):
             t = self.arg(2) or self.q_inode_mask(self.quantifier)
             q = self.arg(1)
         else:

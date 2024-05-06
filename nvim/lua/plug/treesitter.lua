@@ -14,7 +14,7 @@ require('nvim-treesitter.configs').setup {
     "python", "lua", "bash",
     "c", "cpp", "cmake", "commonlisp",
     "diff", "json", "rst",
-    "vimdoc", "xml"
+    "v", "vimdoc", "xml"
   },
   highlight = {
     enable = true, -- false will disable the whole extension
