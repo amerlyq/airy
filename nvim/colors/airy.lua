@@ -63,9 +63,9 @@ local highlights = {
   Title        = { fg = '#cb4b16', bold = true },
 
 
-  DiffAdd    = { fg = '#859900', bg = '#001200', sp = '#859900' },
-  DiffChange = { fg = '#b58900', bg = '#140c00', sp = '#b58900' },
-  DiffDelete = { fg = '#dc322f', bg = '#120000', bold = true },
+  DiffAdd    = { fg = '#859900', bg = '#001a00', sp = '#859900' },
+  DiffChange = { fg = '#b58900', bg = '#1a1200', sp = '#b58900' },
+  DiffDelete = { fg = '#dc322f', bg = '#1a0000', bold = true },
   DiffText   = { fg = '#268bd2', bg = bg, sp = '#268bd2' },
 
   -- GitGutterChange = { fg = '#b58900', bg = '#000000', sp = '#b58900', underline = true },

@@ -6,7 +6,7 @@ import sys
 import time
 from typing import cast
 
-from just.ext.datetime.cvt import ts_xts3aw
+from just.ext.datetime.cvt import ts_ymd3aw
 from just.ext.datetime.local import ltoday
 from libqtile import bar, hook, layout, qtile, widget
 from libqtile.backend.x11 import window
@@ -19,8 +19,9 @@ from psutil import Process
 # pylint:disable=invalid-name
 
 
-importlib.reload(sys.modules["just.ext.datetime.cvt"])
-from just.ext.datetime.cvt import ts_xts3aw
+## DEV:DEBUG: propagate changes on <M-C-r> reload of !qtile
+# importlib.reload(sys.modules["just.ext.datetime.cvt"])
+# from just.ext.datetime.cvt import ts_ymd3aw
 
 
 def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
@@ -287,7 +288,7 @@ screens = [
                 # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
                 # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
                 widget.GenPollText(
-                    func=lambda: ts_xts3aw(ltoday()),
+                    func=lambda: ts_ymd3aw(ltoday()),
                     update_interval=60,
                     foreground="#fd971f",
                 ),

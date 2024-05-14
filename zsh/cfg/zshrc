@@ -183,11 +183,13 @@ _set_prompt() {
     fi
   elif [[ -z $TMUX ]]; then color=7
   elif [[ $RANGER_LEVEL ]]; then color=34
+  elif [[ $MIUR_LEVEL ]]; then color=62
   fi
 
   local nest=
   [[ $debian_chroot ]] && nest+=C
   [[ $RANGER_LEVEL ]] && nest+=R
+  [[ $MIUR_LEVEL ]] && nest+=M
   [[ $VIM ]] && nest+=V
   [[ $nest ]] && nest="%F{60}%B$nest%b%F{$color}"
 

@@ -97,11 +97,14 @@ alias pacz='pacman -Qdt'
 
 ## just.lib
 alias j.s='just moni scr | ifne v - -c "setl ft=nou fdl=99 bt=nofile"'
-alias j.ymd3='for i in {01..31}; do print -- $(just xts cvt 2023-08-$i date ymd3) $i; done | column -xc40'
+alias ymd3='for i in {01..31}; do print -- $(just xts cvt 2023-08-$i date ymd3) $i; done | column -xc40'
 alias ji='just airy install'
 alias wks='just tenjo wk'
 alias j.j='just tenjo cat --timefmt=h --begdate=d --enddate=0 --outputfmt=j -t'
 alias fs='just miur navi'
 alias jm='just miur navi'
-alias ij='PYDEVD_DISABLE_FILE_VALIDATION=1 jupyter console'
 alias ii='ipython'
+alias ij='jupyter console'  # PYDEVD_DISABLE_FILE_VALIDATION=1
+alias ijk='ipython kernel -f ipython-kernel.json --IPKernelApp.parent_handle=1'
+alias ijc='jupyter console --existing ipython-kernel.json'
+alias ijq='jupyter run --existing ipython-kernel.json =(echo quit)'

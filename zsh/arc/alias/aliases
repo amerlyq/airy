@@ -100,8 +100,10 @@ alias -g CC='|cat'
 alias -g Cn='|nl -s"  " -w4'
 alias -g Cs='|tr \\n \\0 | command du --files0-from=- --dereference-args --bytes --total'
 alias -g Cz='|tr \\0 \\n'
-alias -g Csum='|paste -sd+|bc'  # NOTE: slower than awk, can't float as perl
-# ALT: |perl -nle '$s+=(split)[1];END{print $s}'
+# ALT: slower than awk, can't float as perl
+#   alias -g Csum='|paste -sd+|bc'
+#   OR: |perl -nle '$s+=(split)[1];END{print $s}'
+alias -g C+="|awk '{a+=strtonum(\$1)} END{print a}'"
 alias -g TC='|column -Lt'
 alias -g TT='|column -Lts'"$'\t'"
 alias -g TR='|LC_ALL=C tree --noreport -aAC --dirsfirst --fromfile=-'
@@ -136,6 +138,9 @@ alias -g C\$="|awk '{print\$NF}'"
 alias -g C/\$="|awk -F/ '{print\$NF}'"
 alias -g C:="|awk -F':\\\\s' '{print\$1}'"
 alias -g C::="|awk -F':\\\\s' '{print\$NF}'"
+alias -g C\#='|cut -d"#" -f2-'
+alias -g Ck='|cut -d"=" -f1'  # NOTE: "C\==..." is not supported
+alias -g Cv='|cut -d"=" -f2-'
 
 # Prints columns 1 2 3 ... n.
 function slit { awk "{ print ${(j:,:):-\$(${^@})} }"; }  # OR: ${...:-\$${^@}}
