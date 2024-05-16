@@ -1,0 +1,26 @@
+#!/bin/bash
+# USAGE: $ ./$0 file "ww:hh:x:y"
+# USAGE: $ ./$0 file "800:in_h:in_w/3:0" -f
+set -euo pipefail
+
+# editing - How can I crop a video with ffmpeg? - Video Production Stack Exchange ⌇⡦⡅⡙⢸
+#   https://video.stackexchange.com/questions/4563/how-can-i-crop-a-video-with-ffmpeg
+# FFMPEG: crop a video without losing the quality - Stack Overflow ⌇⡦⡅⡛⢋
+#   https://stackoverflow.com/questions/33378548/ffmpeg-crop-a-video-without-losing-the-quality
+
+
+path=$1
+crop=$2
+force=${3:+x}
+
+# NOTE: append '1' to cvt inof preview
+if [[ -z $force ]]; then
+  ffplay -hide_banner -loglevel warning -i "$path" \
+   -vf "crop=$crop,setpts=0.1*N/FRAME_RATE/TB"
+else
+  ffmpeg -hide_banner -nostdin -i "$path" \
+    -crf 23 -codec:v libx264 -c:a copy \
+    -vf "crop=$crop" \
+    "${path%.*}v.${path##*.}"
+
+fi

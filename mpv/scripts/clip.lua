@@ -5,7 +5,6 @@
 --% * Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
 --%
 
-local utils = require 'mp.utils'
 local g = { A = 0.0, B = mp.get_property_number("length") or 0.0 }
 
 -- Options
@@ -76,15 +75,21 @@ function h_write()
   end
   show_status("info", "sent to encoding")
   -- [_] BET: create hidden tmux session to allow parallel enconding
-  local res = utils.subprocess({
-    cancellable = false, args = { "r.ffmpeg",
-      tostring(mp.get_property_native("path")),
-      tostring(g.A), tostring(g.B), 'webm'
+
+  local r = mp.command_native({
+      name = "subprocess",
+      playback_only = false,
+      capture_stdout = true,
+      capture_stderr = true,
+      args = { "r.ffmpeg",
+        tostring(mp.get_property_native("path")),
+        tostring(g.A), tostring(g.B), 'fast'
   }})
-  if res["error"] ~= nil then
-    show_status("error", "Failed("..res["error"]..") encoding: "..res["stdout"])
+  if r.status == 0 then
+    -- TODO: show how much time passed
+    show_status("info", string.format("Success encoding: %d", r.status))
   else
-    show_status("info", "Success encoding: "..res["stdout"])
+    show_status("error", string.format("Failed(%d) encoding: %s", r.status, r.stderr))
   end
 end
 

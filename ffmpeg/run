@@ -1,15 +1,25 @@
 #!/bin/bash
 # USAGE: [-][<HH>:]<MM>:<SS>[.<m>...] OR [-]<S>+[.<m>...]
 set -euo pipefail
+
 fname=$1
 beg=$2
 end=$3
 fmt=${4-}
 ddst=${5-}
 
-src=$(readlink -m "$1")
-[[ -n $ddst ]] || ddst="${src%/*}/fl-clip"
-mkdir -p "$ddst"
+path=$fname
+# ddst="${fname%/*}/fl-clip"
+# src=$(readlink -m "$1")
+if [[ -n $ddst ]]; then
+  mkdir -p "$ddst"
+  path=$ddst/${fname##*/}
+fi
+
+exec >> /t/log
+# exec &> /t/ffmpeg_${path##*/}.log
+printf "\n\n---\nARGS: %s\n" "$*"
+set -x
 
 mkbeg(){ local s=$1 ni=${1%%.*} nf=${1#*.}
   [[ $nf ]] && nf=${nf:0:1} || nf=0
@@ -23,10 +33,11 @@ mkdur(){ local b=$1 e=$2 d
   awk -vb="$beg" -ve="$end" 'BEGIN{ printf "%.0f\n", (e-b)*10 }'
 }
 
-path=$ddst/${fname##*/}
 # e.g. 66.4664 80.447033333333 => sfx=,01'064+140
-sfx=$(mkbeg "$beg")+$(mkdur "$beg" "$end")
-path="${path%.*};${sfx}.${path##*.}"
+# sfx=$(mkbeg "$beg")+$(mkdur "$beg" "$end")
+# path="${path%.*};${sfx}.${path##*.}"
+sfx=$(awk -vt="$beg" 'BEGIN{t=strtonum(t);printf"%02dm%02ds%d",t/60,t%60,(t-int(t))*10}')
+path="${path%.*}_${sfx}.${path##*.}"
 
 if [[ -e $path ]]; then
     mv -vfT --backup=t "$path" "${path%.*}_${RANDOM}.${path##*.}"
@@ -45,17 +56,43 @@ if [[ $fmt == webm ]]; then
     -b:v 0 -crf 30 -pass 2 -f webm \
     -passlogfile "$ddst/ffmpeg2pass" "${path%.*}.webm"
 
+elif [[ $fmt == copy ]]; then
+
+  # SEE: How to precisely trim video with ffmpeg? -ss and -t are off by more than a half second - Video Production Stack Exchange ⌇⡦⡅⡩⠴
+  #   https://video.stackexchange.com/questions/25291/how-to-precisely-trim-video-with-ffmpeg-ss-and-t-are-off-by-more-than-a-half
+  # [≫] video streaming - ffmpeg delay in appearing the image - Super User ⌇⡦⡅⡩⠠
+  #   https://superuser.com/questions/1496844/ffmpeg-delay-in-appearing-the-image
+  # ‼ ffmpeg, first second of cut video part freezed - Video Production Stack Exchange ⌇⡦⡅⡩⡟
+  #   https://video.stackexchange.com/questions/16516/ffmpeg-first-second-of-cut-video-part-freezed
+  # ‼ video editing - ffmpeg - How can I cut starting precisely from a keyframe while codec copying? - Super User ⌇⡦⡅⡫⡏
+  #   https://superuser.com/questions/1076283/ffmpeg-how-can-i-cut-starting-precisely-from-a-keyframe-while-codec-copying
+  # ::: FAIL: "-c:v copy" will have 1-2sec frame-skip on copied clip, which will be skipped in !mpv
+  #   BUT if not discarded it will become a frozen 1st frame for 1-2sec after cropping/reencoding
+
+  # BAD: inexact position
+  # -loglevel info
+  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
+    -ss "${beg:-00:00}" -to "${end:--00:00}" \
+    -codec:v copy -codec:a copy -codec:d copy \
+    -avoid_negative_ts make_zero \
+    "$path"
+
+elif [[ $fmt == fast ]]; then
+
+  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
+    -ss "${beg:-00:00}" -to "${end:--00:00}" \
+    -crf 23 -codec:v libx264 -codec:a copy -codec:d copy \
+    -avoid_negative_ts make_zero \
+    "$path"
+
 else
   # SRC: https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg
-  ffmpeg -y -nostdin -i "$fname" \
+  ffmpeg -y -nostats -nostdin -i "$fname" \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
     -c:v libx264 -c:a aac -codec:d copy \
     "$path"
 fi
 
-# BAD: inexact position
-# -codec:v copy -codec:a copy -codec:d copy \
 
-        # OR -c copy \
 # ALT ffmpeg -y -nostdin -ss $BEGIN -i "$SRC" -t $DURATION "$DST"
 # OR ffmpeg -ss $BEGIN -i $SRC -to $END -strict -2 ${DST}.mp4

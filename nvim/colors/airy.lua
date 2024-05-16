@@ -41,9 +41,12 @@ local highlights = {
   Structure        = { link = "Type" },
   Tag              = { link = "Special" },
   Typedef          = { link = "Type" },
-  lCursor          = { link = "Cursor" },
 
-  Cursor = { fg = '#fdf6e3', bg = '#268bd2' },
+  -- e5e WTF: cursor disappears after nvim->ranger->shell-<ranger->shell ※⡦⡃⣯⡪
+  Cursor        = { fg = '#fdf6e3', bg = '#268bd2' },
+  lCursor       = { link = "Cursor" },
+  TermCursor    = { link = "Cursor" },
+  TermCursorNC  = { link = "Cursor" },
 
   Normal        = { fg = '#93a1a1', bg = bg },
   FoldColumn    = { fg = '#839496', bg = cg },
